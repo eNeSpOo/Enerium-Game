@@ -1,0 +1,83 @@
+{
+  "checked": "2026-09-26",
+  "source": "https://ai.google.dev/gemini-api/docs/pricing; список моделей — GET v1beta/models этим ключом",
+  "note": "Цены в долларах США, стандартный режим. Пакетный режим (Batch API) — вдвое дешевле, ответ до 24 часов. Бесплатного уровня у моделей картинок нет.",
+  "default": [
+    "nb2"
+  ],
+  "default_why": "ADR-0009: Nano Banana 2 — основная, Pro — точечно для сложных сцен, Lite не берём",
+  "models": {
+    "pro": {
+      "id": "gemini-3-pro-image",
+      "name": "Nano Banana Pro",
+      "sizes": [
+        "1K",
+        "2K",
+        "4K"
+      ],
+      "per_image": {
+        "1K": 0.134,
+        "2K": 0.134,
+        "4K": 0.24
+      },
+      "per_million": {
+        "input": 2.0,
+        "text_out": 12.0,
+        "image_out": 120.0
+      },
+      "refs_max": {
+        "object": 6,
+        "character": 5,
+        "style": 3
+      }
+    },
+    "nb2": {
+      "id": "gemini-3.1-flash-image",
+      "name": "Nano Banana 2",
+      "sizes": [
+        "512",
+        "1K",
+        "2K",
+        "4K"
+      ],
+      "per_image": {
+        "512": 0.045,
+        "1K": 0.067,
+        "2K": 0.101,
+        "4K": 0.151
+      },
+      "per_million": {
+        "input": 0.5,
+        "text_out": 3.0,
+        "image_out": 60.0
+      },
+      "refs_max": {
+        "object": 10,
+        "character": 4,
+        "style": 3
+      }
+    },
+    "lite": {
+      "id": "gemini-3.1-flash-lite-image",
+      "name": "Nano Banana 2 Lite",
+      "sizes": [
+        "1K"
+      ],
+      "per_image": {
+        "1K": 0.0336
+      },
+      "per_million": {
+        "input": 0.25,
+        "text_out": 1.5,
+        "image_out": 30.0
+      },
+      "refs_max": {
+        "object": 14
+      }
+    }
+  },
+  "not_used": {
+    "gemini-2.5-flash-image": "Nano Banana: устарела, отключение 02.10.2026",
+    "imagen": "этому ключу не выдаётся в списке моделей"
+  }
+}

@@ -38,3 +38,7 @@ desktop.ini
 
 # Локальные настройки превью Claude Code
 .claude/launch.json
+
+# Python
+__pycache__/
+*.pyc

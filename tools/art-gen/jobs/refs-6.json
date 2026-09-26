@@ -1,0 +1,115 @@
+{
+  "name": "Шесть референсов до пилота: сравнение моделей",
+  "models": [
+    "pro",
+    "nb2",
+    "lite"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+  "cutout_rule": "Isolate the subject on a perfectly flat, uniform, solid pure {name} background ({hex}) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use {name} or similar colors anywhere in the subject.",
+  "categories": {
+    "resources": {
+      "aspect": "1:1",
+      "size": "1K",
+      "refs": [
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-03-cave-teal-runes.webp",
+        "art/style/ref-01-cave-amber-teal.webp"
+      ],
+      "frame": "Format: square resource illustration for the inventory and the item card. One object, centered, about 55-60% of the frame, with a clear silhouette that still reads at 96 px. Beautiful atmospheric painted background of the place where the resource is found, softly out of focus and darker than the object, with a subtle dark vignette so the object stands out."
+    },
+    "arenas": {
+      "aspect": "9:16",
+      "size": "2K",
+      "refs": [
+        "art/style/ref-03-cave-teal-runes.webp",
+        "art/style/ref-04-beast-gold-cracks.jpg",
+        "art/style/ref-01-cave-amber-teal.webp"
+      ],
+      "frame": "Format: vertical battle background for a phone screen, portrait 9:16. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective walls, no ceiling, no sky. The central playfield — the middle 60% of the width, from 15% to 85% of the height — is plain floor only: stone slabs, sand ripples and fine cracks, calm and lower in contrast. No crystals, objects, markings, slots, frames, rectangles, cards, tokens or figures on the playfield: the game places its own pieces there later. Put the interesting details along the edges and in the corners. Even, readable lighting over the playfield, no strong hotspot in the center."
+    },
+    "heroes": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [
+        "art/style/ref-04-beast-gold-cracks.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-03-cave-teal-runes.webp"
+      ],
+      "frame": "Format: vertical hero card portrait, 4:5. Half-body, three-quarter view, head in the upper third, face well lit and readable at small size; the lower quarter may be darker because the card puts the name there. Rich atmospheric background that tells where the hero lived, with depth and soft focus, darker than the character. Light comes from below and from glowing crystals; rim light separates the figure from the background."
+    },
+    "icons": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "magenta",
+      "refs": [
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-05-victory.jpg"
+      ],
+      "frame": "Format: game UI icon, square. One bold emblem, centered, about 80% of the canvas, frontal view, a simple strong silhouette that stays readable at 24 px, crisp clean edges, painted material detail inside the silhouette. The glow stays inside the shape: no halo outside the silhouette."
+    },
+    "effects": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "magenta",
+      "refs": [
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "frame": "Format: battle status-effect icon for a small round badge over a hero card, shown at 20-28 px. A circular medallion about 85% of the canvas: thin forged dark-iron rim, dark stone disc inside, one bold simple symbol in the center. Extremely readable, high contrast, minimal detail."
+    },
+    "abilities": {
+      "aspect": "1:1",
+      "size": "1K",
+      "refs": [
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-03-cave-teal-runes.webp"
+      ],
+      "frame": "Format: square ability icon, full-bleed painting from edge to edge (the game puts its own frame on top). One clear central image with a bold silhouette readable at 48 px, dark background with a darker vignette at the edges, strong glow in the color of the magic school."
+    }
+  },
+  "jobs": [
+    {
+      "id": "res-warm-clay",
+      "category": "resources",
+      "title": "Тёплый замес — ресурс Мастерской форм",
+      "source": "docs/content/ресурсы-рецепты-дроп.md, биом 1: ключ ремесла алхимии, элита «Подмастерье»; docs/lore/мастерская-форм-текст.md",
+      "subject": "Subject: 'Warm Clay', a craft resource from the Workshop of Forms. A single fist-sized lump of freshly kneaded clay, warm ochre-terracotta, with deep finger and palm prints, moist and soft; a faint warmth seems to live inside its folds, as if it were still warm from the hands that knead it every day (subtle warmth, NOT lava, NOT fire). It rests on a worn wooden worktable dusted with pale sand, a small wooden spatula beside it. Background: the dim, silent, abandoned Workshop of Forms deep underground — a thin stream of sand falls from a crack in the dark vault like an hourglass that nobody turns; white-green crystals glow coldly from within in cracks of the stone wall; the shape of an unfinished clay hand lies on a shelf in the gloom. The whole hall is cold white-green; the clay is the only warm thing in it."
+    },
+    {
+      "id": "arena-workshop",
+      "category": "arenas",
+      "title": "Арена боя · Мастерская форм, вид сверху",
+      "source": "docs/gdd/08-биомы.md §8.5; docs/lore/мастерская-форм-текст.md, с. 2; docs/lore/дайджест.md «Мотивы и палитра»",
+      "subject": "Subject: the floor of the Workshop of Forms, the first hall under the city of Endalor, where a god once sculpted living beings from clay and abandoned the work halfway. Large worn stone floor slabs with cracks; drifts and still ripples of pale sand. White-green crystals glowing from within grow only in the cracks along the edges and in the corners; their cold light spills onto the floor. In the corners: thin streams of sand fall from the unseen vault into small round piles with a faint haze, like hourglasses nobody turns. Along the left and right edges: parts of heavy wooden worktables seen from above with unfinished clay works lying on them — a hand without fingers, a face without features, half of a small beast — sculpting chisels, clay-stained cloths, clay pots. At the very top and bottom edges: the foot of the stone walls with half-formed clay bodies emerging from the stone, made precisely and calmly, unfinished, not grotesque. The hall is cold: near-black stone, white-green crystal light, pale sand. The only warm color is the ochre clay of the unfinished works. No candles, no fire, no warm lamps, no grid, no characters."
+    },
+    {
+      "id": "hero-ilmerra",
+      "category": "heroes",
+      "title": "Ильмерра — эльфийка, лекарь, школа Воздуха, «Хранители Песочных Часов»",
+      "source": "docs/content/герои/цикл-1.md, h01_1: витрина «Она слушала песок и знала, чей он», глава «Зал у корней»; docs/lore/свод-лора-текст.txt — Алаэль",
+      "subject": "Subject: Ilmerra, an elven woman from long ago, keeper of a hall where the hourglasses of those who had no kin were kept; a healer of the Air school. Ageless calm face with the fine lines of great age, gentle and attentive, long silver-white hair loosely braided with thin leather cords, pointed elven ears. She holds a small old hourglass with scratched glass close to her ear and listens to the sand inside, eyes half-closed. Layered druid robes of muted sage-green and grey linen, a woven shawl, a simple necklace of wooden beads; faint white-green wisps of wind curl around her sleeves (Air school). Background: a vast quiet hall among colossal tree roots in the heart of the elven forest; in niches between the roots stand rows of hourglasses, each one slightly different, dim; soft white-green light rises from below, sand motes drift in the air. She is lit from below by that white-green light, with a subtle rim light on her hair."
+    },
+    {
+      "id": "icon-valor",
+      "category": "icons",
+      "title": "Доблесть — руна доблести",
+      "source": "docs/gdd/10-прогрессия-героя.md: одна руна доблести — одна доблесть; в интерфейсе доблесть — звёзды",
+      "subject": "Subject: 'Rune of Valor', the emblem of a hero's valor. A thick rounded-hexagon tablet of dark basalt with a bevelled rim of old gold; on its face rises a solid, filled five-pointed star in raised relief, like a star of rank — NOT a pentagram, no interlaced or outlined star, no occult symbol. The star glows warm gold (#DDBC7A) from within; hairline cracks in the stone leak the same golden light. Frontal, symmetric, heavy and precious."
+    },
+    {
+      "id": "fx-ward",
+      "category": "effects",
+      "title": "Бафф «Оберег» — щит на союзнике",
+      "source": "design/ui/battle.js, LIB «Оберег» (kind: shield); design/ui/fx.js — щит #8fdcff, полезные эффекты",
+      "subject": "Subject: the buff 'Ward', a protective shield on an ally. Rim of the medallion: dark iron with a thin teal (#48E5D4) glowing line that marks a positive effect. Symbol in the center: a bold dome-shaped shield of translucent ice-blue light (#8FDCFF) arching over a small amulet charm; the dome has a bright edge and a soft inner glow. The symbol takes about 60% of the medallion."
+    },
+    {
+      "id": "ab-stop",
+      "category": "abilities",
+      "title": "Способность «Остановка» — школа Времени",
+      "source": "design/ui/battle.js, LIB «Остановка»: цель теряет накопленные атаки и 2 атаки их не копит; стихия Время — карст Энериум, зелёный",
+      "subject": "Subject: 'Stop', a Time school control spell: the target loses its gathered attacks and cannot gather new ones for a while. An old bronze hourglass tilted in mid-air, its sand frozen mid-fall — grains hang motionless in the air around the glass; thin concentric rings of green light (Energium green, #4FDC8B) are frozen around it like ripples on still water; green light rises from below; dark stone background with faint cracks. Cold, still, precise."
+    }
+  ]
+}

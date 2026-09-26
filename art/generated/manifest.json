@@ -1,0 +1,1285 @@
+{
+  "items": [
+    {
+      "file": "art/generated/icons/icon-valor__nb2.png",
+      "category": "icons",
+      "job": "icon-valor",
+      "title": "Доблесть — руна доблести",
+      "source": "docs/gdd/10-прогрессия-героя.md: одна руна доблести — одна доблесть; в интерфейсе доблесть — звёзды",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-26T20:54:53+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-05-victory.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: game UI icon, square. One bold emblem, centered, about 80% of the canvas, frontal view, a simple strong silhouette that stays readable at 24 px, crisp clean edges, painted material detail inside the silhouette. The glow stays inside the shape: no halo outside the silhouette.\n\nSubject: 'Rune of Valor', the emblem of a hero's valor. A thick rounded-hexagon tablet of dark basalt with a bevelled rim of old gold; carved deep into its face is a five-pointed star made of angular rune strokes, glowing warm gold (#DDBC7A) from within; hairline cracks in the stone leak the same golden light. Frontal, symmetric, heavy and precious.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 938,
+        "candidatesTokenCount": 1407,
+        "totalTokenCount": 2345,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 422
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0677,
+      "seconds": 11.2,
+      "status": "заменён: пробный запрос, вышла пентаграмма; промт исправлен",
+      "raw": "art/generated/icons/icon-valor__nb2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.428,
+        "opaque_share": 0.565,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "71c3c0a25efdd469e063b743e562e27b614d8ba92e443854c7c39e7b27704b4e"
+    },
+    {
+      "file": "art/generated/resources/res-warm-clay__pro.jpg",
+      "category": "resources",
+      "job": "res-warm-clay",
+      "title": "Тёплый замес — ресурс Мастерской форм",
+      "source": "docs/content/ресурсы-рецепты-дроп.md, биом 1: ключ ремесла алхимии, элита «Подмастерье»; docs/lore/мастерская-форм-текст.md",
+      "model": "gemini-3-pro-image",
+      "model_name": "Nano Banana Pro",
+      "date": "2026-09-26T20:56:52+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-03-cave-teal-runes.webp",
+        "art/style/ref-01-cave-amber-teal.webp"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: square resource illustration for the inventory and the item card. One object, centered, about 55-60% of the frame, with a clear silhouette that still reads at 96 px. Beautiful atmospheric painted background of the place where the resource is found, softly out of focus and darker than the object, with a subtle dark vignette so the object stands out.\n\nSubject: 'Warm Clay', a craft resource from the Workshop of Forms. A single fist-sized lump of freshly kneaded clay, warm ochre-terracotta, with deep finger and palm prints, moist and soft; a faint warmth seems to live inside its folds, as if it were still warm from the hands that knead it every day (subtle warmth, NOT lava, NOT fire). It rests on a worn wooden worktable dusted with pale sand, a small wooden spatula beside it. Background: the dim, silent, abandoned Workshop of Forms deep underground — a thin stream of sand falls from a crack in the dark vault like an hourglass that nobody turns; white-green crystals glow coldly from within in cracks of the stone wall; the shape of an unfinished clay hand lies on a shelf in the gloom. The whole hall is cold white-green; the clay is the only warm thing in it.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1224,
+        "candidatesTokenCount": 1342,
+        "totalTokenCount": 2855,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 450
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 774
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "thoughtsTokenCount": 289,
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.143,
+      "seconds": 19.5,
+      "status": "референс, не утверждён",
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "618784dccc44faae31d6baaba7cca97414eb994fdced17c6cc5b858e3834bb34"
+    },
+    {
+      "file": "art/generated/resources/res-warm-clay__nb2.jpg",
+      "category": "resources",
+      "job": "res-warm-clay",
+      "title": "Тёплый замес — ресурс Мастерской форм",
+      "source": "docs/content/ресурсы-рецепты-дроп.md, биом 1: ключ ремесла алхимии, элита «Подмастерье»; docs/lore/мастерская-форм-текст.md",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-26T20:57:09+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-03-cave-teal-runes.webp",
+        "art/style/ref-01-cave-amber-teal.webp"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: square resource illustration for the inventory and the item card. One object, centered, about 55-60% of the frame, with a clear silhouette that still reads at 96 px. Beautiful atmospheric painted background of the place where the resource is found, softly out of focus and darker than the object, with a subtle dark vignette so the object stands out.\n\nSubject: 'Warm Clay', a craft resource from the Workshop of Forms. A single fist-sized lump of freshly kneaded clay, warm ochre-terracotta, with deep finger and palm prints, moist and soft; a faint warmth seems to live inside its folds, as if it were still warm from the hands that knead it every day (subtle warmth, NOT lava, NOT fire). It rests on a worn wooden worktable dusted with pale sand, a small wooden spatula beside it. Background: the dim, silent, abandoned Workshop of Forms deep underground — a thin stream of sand falls from a crack in the dark vault like an hourglass that nobody turns; white-green crystals glow coldly from within in cracks of the stone wall; the shape of an unfinished clay hand lies on a shelf in the gloom. The whole hall is cold white-green; the clay is the only warm thing in it.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1224,
+        "candidatesTokenCount": 1608,
+        "totalTokenCount": 2832,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 450
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 774
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0693,
+      "seconds": 16.2,
+      "status": "референс, не утверждён",
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "afe355e9f7bbd42e3517235136e51c0d8e6293dbcd0cc78c24d3ce3d6efea361"
+    },
+    {
+      "file": "art/generated/resources/res-warm-clay__lite.jpg",
+      "category": "resources",
+      "job": "res-warm-clay",
+      "title": "Тёплый замес — ресурс Мастерской форм",
+      "source": "docs/content/ресурсы-рецепты-дроп.md, биом 1: ключ ремесла алхимии, элита «Подмастерье»; docs/lore/мастерская-форм-текст.md",
+      "model": "gemini-3.1-flash-lite-image",
+      "model_name": "Nano Banana 2 Lite",
+      "date": "2026-09-26T20:57:13+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-03-cave-teal-runes.webp",
+        "art/style/ref-01-cave-amber-teal.webp"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: square resource illustration for the inventory and the item card. One object, centered, about 55-60% of the frame, with a clear silhouette that still reads at 96 px. Beautiful atmospheric painted background of the place where the resource is found, softly out of focus and darker than the object, with a subtle dark vignette so the object stands out.\n\nSubject: 'Warm Clay', a craft resource from the Workshop of Forms. A single fist-sized lump of freshly kneaded clay, warm ochre-terracotta, with deep finger and palm prints, moist and soft; a faint warmth seems to live inside its folds, as if it were still warm from the hands that knead it every day (subtle warmth, NOT lava, NOT fire). It rests on a worn wooden worktable dusted with pale sand, a small wooden spatula beside it. Background: the dim, silent, abandoned Workshop of Forms deep underground — a thin stream of sand falls from a crack in the dark vault like an hourglass that nobody turns; white-green crystals glow coldly from within in cracks of the stone wall; the shape of an unfinished clay hand lies on a shelf in the gloom. The whole hall is cold white-green; the clay is the only warm thing in it.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 3810,
+        "candidatesTokenCount": 1462,
+        "totalTokenCount": 5272,
+        "promptTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 3360
+          },
+          {
+            "modality": "TEXT",
+            "tokenCount": 450
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0351,
+      "seconds": 4.7,
+      "status": "референс, не утверждён",
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "a52c5ebf1b2f9c19b7daa1dfc414b178fe85b5174c70b6f1add4db17015f820b"
+    },
+    {
+      "file": "art/generated/arenas/arena-workshop__pro.jpg",
+      "category": "arenas",
+      "job": "arena-workshop",
+      "title": "Арена боя · Мастерская форм, вид сверху",
+      "source": "docs/gdd/08-биомы.md §8.5; docs/lore/мастерская-форм-текст.md, с. 2; docs/lore/дайджест.md «Мотивы и палитра»",
+      "model": "gemini-3-pro-image",
+      "model_name": "Nano Banana Pro",
+      "date": "2026-09-26T20:57:37+03:00",
+      "params": {
+        "aspectRatio": "9:16",
+        "imageSize": "2K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-03-cave-teal-runes.webp",
+        "art/style/ref-04-beast-gold-cracks.jpg",
+        "art/style/ref-01-cave-amber-teal.webp"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: vertical battle background for a phone screen, portrait 9:16. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective walls, no ceiling, no sky. The central area stays open, calm and lower in contrast: two teams of five cards will stand on it, heroes in the lower third and enemies in the upper third. Put the interesting details along the edges and in the corners. Even, readable lighting over the playfield, no strong hotspot in the center.\n\nSubject: the floor of the Workshop of Forms, the first hall under the city of Endalor, where a god once sculpted living beings from clay and abandoned the work halfway. Large worn stone floor slabs with cracks; drifts and still ripples of pale sand everywhere; in the cracks grow white-green crystals glowing from within, their cold light pooling on the floor. Two or three columns of sand seen from above: thin streams fall from the unseen vault into round conical piles with a soft haze around them. Along the left and right edges: parts of heavy wooden worktables seen from above with unfinished clay works lying on them — a hand without fingers, a face without features, half of a small beast — sculpting chisels, clay-stained cloths, clay pots. At the very top and bottom edges: the foot of the stone walls with half-formed clay bodies emerging from the stone, made precisely and calmly, unfinished, not grotesque. Colors: near-black stone, cold white-green crystal light, pale sand, warm ochre clay as the only warm accent. No grid, no characters on the playfield.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1302,
+        "candidatesTokenCount": 1404,
+        "totalTokenCount": 2908,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 528
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 774
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "thoughtsTokenCount": 202,
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1428,
+      "seconds": 23.7,
+      "status": "заменён: в первом промте Lite нарисовал слоты карт, Pro сделал зал тёплым; промт исправлен",
+      "px": [
+        1536,
+        2752
+      ],
+      "sha256": "92b6b7eaebd9aa02de578928a5a403c1f65055272d308ee2b1ec6254f1b0a0bf"
+    },
+    {
+      "file": "art/generated/arenas/arena-workshop__nb2.jpg",
+      "category": "arenas",
+      "job": "arena-workshop",
+      "title": "Арена боя · Мастерская форм, вид сверху",
+      "source": "docs/gdd/08-биомы.md §8.5; docs/lore/мастерская-форм-текст.md, с. 2; docs/lore/дайджест.md «Мотивы и палитра»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-26T20:57:56+03:00",
+      "params": {
+        "aspectRatio": "9:16",
+        "imageSize": "2K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-03-cave-teal-runes.webp",
+        "art/style/ref-04-beast-gold-cracks.jpg",
+        "art/style/ref-01-cave-amber-teal.webp"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: vertical battle background for a phone screen, portrait 9:16. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective walls, no ceiling, no sky. The central area stays open, calm and lower in contrast: two teams of five cards will stand on it, heroes in the lower third and enemies in the upper third. Put the interesting details along the edges and in the corners. Even, readable lighting over the playfield, no strong hotspot in the center.\n\nSubject: the floor of the Workshop of Forms, the first hall under the city of Endalor, where a god once sculpted living beings from clay and abandoned the work halfway. Large worn stone floor slabs with cracks; drifts and still ripples of pale sand everywhere; in the cracks grow white-green crystals glowing from within, their cold light pooling on the floor. Two or three columns of sand seen from above: thin streams fall from the unseen vault into round conical piles with a soft haze around them. Along the left and right edges: parts of heavy wooden worktables seen from above with unfinished clay works lying on them — a hand without fingers, a face without features, half of a small beast — sculpting chisels, clay-stained cloths, clay pots. At the very top and bottom edges: the foot of the stone walls with half-formed clay bodies emerging from the stone, made precisely and calmly, unfinished, not grotesque. Colors: near-black stone, cold white-green crystal light, pale sand, warm ochre clay as the only warm accent. No grid, no characters on the playfield.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1302,
+        "candidatesTokenCount": 2061,
+        "totalTokenCount": 3363,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 528
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 774
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1680
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1026,
+      "seconds": 18.5,
+      "status": "заменён: в первом промте Lite нарисовал слоты карт, Pro сделал зал тёплым; промт исправлен",
+      "px": [
+        1536,
+        2752
+      ],
+      "sha256": "94cc0b714159e7fc39b5cbb4054f9ddf96c9ac5a6560e245caf69c7186f82fda"
+    },
+    {
+      "file": "art/generated/arenas/arena-workshop__lite.jpg",
+      "category": "arenas",
+      "job": "arena-workshop",
+      "title": "Арена боя · Мастерская форм, вид сверху",
+      "source": "docs/gdd/08-биомы.md §8.5; docs/lore/мастерская-форм-текст.md, с. 2; docs/lore/дайджест.md «Мотивы и палитра»",
+      "model": "gemini-3.1-flash-lite-image",
+      "model_name": "Nano Banana 2 Lite",
+      "date": "2026-09-26T20:58:01+03:00",
+      "params": {
+        "aspectRatio": "9:16",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-03-cave-teal-runes.webp",
+        "art/style/ref-04-beast-gold-cracks.jpg",
+        "art/style/ref-01-cave-amber-teal.webp"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: vertical battle background for a phone screen, portrait 9:16. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective walls, no ceiling, no sky. The central area stays open, calm and lower in contrast: two teams of five cards will stand on it, heroes in the lower third and enemies in the upper third. Put the interesting details along the edges and in the corners. Even, readable lighting over the playfield, no strong hotspot in the center.\n\nSubject: the floor of the Workshop of Forms, the first hall under the city of Endalor, where a god once sculpted living beings from clay and abandoned the work halfway. Large worn stone floor slabs with cracks; drifts and still ripples of pale sand everywhere; in the cracks grow white-green crystals glowing from within, their cold light pooling on the floor. Two or three columns of sand seen from above: thin streams fall from the unseen vault into round conical piles with a soft haze around them. Along the left and right edges: parts of heavy wooden worktables seen from above with unfinished clay works lying on them — a hand without fingers, a face without features, half of a small beast — sculpting chisels, clay-stained cloths, clay pots. At the very top and bottom edges: the foot of the stone walls with half-formed clay bodies emerging from the stone, made precisely and calmly, unfinished, not grotesque. Colors: near-black stone, cold white-green crystal light, pale sand, warm ochre clay as the only warm accent. No grid, no characters on the playfield.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 3888,
+        "candidatesTokenCount": 1616,
+        "totalTokenCount": 5504,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 528
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 3360
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0353,
+      "seconds": 4.9,
+      "status": "заменён: в первом промте Lite нарисовал слоты карт, Pro сделал зал тёплым; промт исправлен",
+      "px": [
+        768,
+        1376
+      ],
+      "sha256": "4f341aaf3a69cb130366d5723e930f507b4e1a5eef43416729c3310aae2319ed"
+    },
+    {
+      "file": "art/generated/heroes/hero-ilmerra__pro.jpg",
+      "category": "heroes",
+      "job": "hero-ilmerra",
+      "title": "Ильмерра — эльфийка, лекарь, школа Воздуха, «Хранители Песочных Часов»",
+      "source": "docs/content/герои/цикл-1.md, h01_1: витрина «Она слушала песок и знала, чей он», глава «Зал у корней»; docs/lore/свод-лора-текст.txt — Алаэль",
+      "model": "gemini-3-pro-image",
+      "model_name": "Nano Banana Pro",
+      "date": "2026-09-26T20:58:20+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-04-beast-gold-cracks.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-03-cave-teal-runes.webp"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: vertical hero card portrait, 4:5. Half-body, three-quarter view, head in the upper third, face well lit and readable at small size; the lower quarter may be darker because the card puts the name there. Rich atmospheric background that tells where the hero lived, with depth and soft focus, darker than the character. Light comes from below and from glowing crystals; rim light separates the figure from the background.\n\nSubject: Ilmerra, an elven woman from long ago, keeper of a hall where the hourglasses of those who had no kin were kept; a healer of the Air school. Ageless calm face with the fine lines of great age, gentle and attentive, long silver-white hair loosely braided with thin leather cords, pointed elven ears. She holds a small old hourglass with scratched glass close to her ear and listens to the sand inside, eyes half-closed. Layered druid robes of muted sage-green and grey linen, a woven shawl, a simple necklace of wooden beads; faint white-green wisps of wind curl around her sleeves (Air school). Background: a vast quiet hall among colossal tree roots in the heart of the elven forest; in niches between the roots stand rows of hourglasses, each one slightly different, dim; soft white-green light rises from below, sand motes drift in the air. She is lit from below by that white-green light, with a subtle rim light on her hair.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1263,
+        "candidatesTokenCount": 1400,
+        "totalTokenCount": 2975,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 489
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 774
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "thoughtsTokenCount": 312,
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.144,
+      "seconds": 19.2,
+      "status": "референс, не утверждён",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "9e202285841b18af471772fd960f311f1bb5975241fb5baf8968d1451067de13"
+    },
+    {
+      "file": "art/generated/heroes/hero-ilmerra__nb2.jpg",
+      "category": "heroes",
+      "job": "hero-ilmerra",
+      "title": "Ильмерра — эльфийка, лекарь, школа Воздуха, «Хранители Песочных Часов»",
+      "source": "docs/content/герои/цикл-1.md, h01_1: витрина «Она слушала песок и знала, чей он», глава «Зал у корней»; docs/lore/свод-лора-текст.txt — Алаэль",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-26T20:58:32+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-04-beast-gold-cracks.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-03-cave-teal-runes.webp"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: vertical hero card portrait, 4:5. Half-body, three-quarter view, head in the upper third, face well lit and readable at small size; the lower quarter may be darker because the card puts the name there. Rich atmospheric background that tells where the hero lived, with depth and soft focus, darker than the character. Light comes from below and from glowing crystals; rim light separates the figure from the background.\n\nSubject: Ilmerra, an elven woman from long ago, keeper of a hall where the hourglasses of those who had no kin were kept; a healer of the Air school. Ageless calm face with the fine lines of great age, gentle and attentive, long silver-white hair loosely braided with thin leather cords, pointed elven ears. She holds a small old hourglass with scratched glass close to her ear and listens to the sand inside, eyes half-closed. Layered druid robes of muted sage-green and grey linen, a woven shawl, a simple necklace of wooden beads; faint white-green wisps of wind curl around her sleeves (Air school). Background: a vast quiet hall among colossal tree roots in the heart of the elven forest; in niches between the roots stand rows of hourglasses, each one slightly different, dim; soft white-green light rises from below, sand motes drift in the air. She is lit from below by that white-green light, with a subtle rim light on her hair.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1263,
+        "candidatesTokenCount": 1554,
+        "totalTokenCount": 2817,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 489
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 774
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0691,
+      "seconds": 12.2,
+      "status": "референс, не утверждён",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "2da5b92288133eec7a649fb852b82f3bc2fa4faf86bffad3a3247115ead2d510"
+    },
+    {
+      "file": "art/generated/heroes/hero-ilmerra__lite.jpg",
+      "category": "heroes",
+      "job": "hero-ilmerra",
+      "title": "Ильмерра — эльфийка, лекарь, школа Воздуха, «Хранители Песочных Часов»",
+      "source": "docs/content/герои/цикл-1.md, h01_1: витрина «Она слушала песок и знала, чей он», глава «Зал у корней»; docs/lore/свод-лора-текст.txt — Алаэль",
+      "model": "gemini-3.1-flash-lite-image",
+      "model_name": "Nano Banana 2 Lite",
+      "date": "2026-09-26T20:58:36+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-04-beast-gold-cracks.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-03-cave-teal-runes.webp"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: vertical hero card portrait, 4:5. Half-body, three-quarter view, head in the upper third, face well lit and readable at small size; the lower quarter may be darker because the card puts the name there. Rich atmospheric background that tells where the hero lived, with depth and soft focus, darker than the character. Light comes from below and from glowing crystals; rim light separates the figure from the background.\n\nSubject: Ilmerra, an elven woman from long ago, keeper of a hall where the hourglasses of those who had no kin were kept; a healer of the Air school. Ageless calm face with the fine lines of great age, gentle and attentive, long silver-white hair loosely braided with thin leather cords, pointed elven ears. She holds a small old hourglass with scratched glass close to her ear and listens to the sand inside, eyes half-closed. Layered druid robes of muted sage-green and grey linen, a woven shawl, a simple necklace of wooden beads; faint white-green wisps of wind curl around her sleeves (Air school). Background: a vast quiet hall among colossal tree roots in the heart of the elven forest; in niches between the roots stand rows of hourglasses, each one slightly different, dim; soft white-green light rises from below, sand motes drift in the air. She is lit from below by that white-green light, with a subtle rim light on her hair.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 3849,
+        "candidatesTokenCount": 1472,
+        "totalTokenCount": 5321,
+        "promptTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 3360
+          },
+          {
+            "modality": "TEXT",
+            "tokenCount": 489
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0351,
+      "seconds": 4.2,
+      "status": "референс, не утверждён",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "d2ae5efe612a1ab769250e02514f3e7cb639bfe2c7c2876912fb2a46592243a8"
+    },
+    {
+      "file": "art/generated/icons/icon-valor__pro.png",
+      "category": "icons",
+      "job": "icon-valor",
+      "title": "Доблесть — руна доблести",
+      "source": "docs/gdd/10-прогрессия-героя.md: одна руна доблести — одна доблесть; в интерфейсе доблесть — звёзды",
+      "model": "gemini-3-pro-image",
+      "model_name": "Nano Banana Pro",
+      "date": "2026-09-26T20:58:54+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-05-victory.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: game UI icon, square. One bold emblem, centered, about 80% of the canvas, frontal view, a simple strong silhouette that stays readable at 24 px, crisp clean edges, painted material detail inside the silhouette. The glow stays inside the shape: no halo outside the silhouette.\n\nSubject: 'Rune of Valor', the emblem of a hero's valor. A thick rounded-hexagon tablet of dark basalt with a bevelled rim of old gold; on its face rises a solid, filled five-pointed star in raised relief, like a star of rank — NOT a pentagram, no interlaced or outlined star, no occult symbol. The star glows warm gold (#DDBC7A) from within; hairline cracks in the stone leak the same golden light. Frontal, symmetric, heavy and precious.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 961,
+        "candidatesTokenCount": 1401,
+        "totalTokenCount": 2593,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 445
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "thoughtsTokenCount": 231,
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1425,
+      "seconds": 17.7,
+      "status": "референс, не утверждён",
+      "raw": "art/generated/icons/icon-valor__pro.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.443,
+        "opaque_share": 0.55,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "6c7641fa8f343da46d17afcdea3353c7d01b5f1ee2b8c2bc5d6f82fd7f7e9ba5"
+    },
+    {
+      "file": "art/generated/icons/icon-valor__nb2-v2.png",
+      "category": "icons",
+      "job": "icon-valor",
+      "title": "Доблесть — руна доблести",
+      "source": "docs/gdd/10-прогрессия-героя.md: одна руна доблести — одна доблесть; в интерфейсе доблесть — звёзды",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-26T20:59:04+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-05-victory.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: game UI icon, square. One bold emblem, centered, about 80% of the canvas, frontal view, a simple strong silhouette that stays readable at 24 px, crisp clean edges, painted material detail inside the silhouette. The glow stays inside the shape: no halo outside the silhouette.\n\nSubject: 'Rune of Valor', the emblem of a hero's valor. A thick rounded-hexagon tablet of dark basalt with a bevelled rim of old gold; on its face rises a solid, filled five-pointed star in raised relief, like a star of rank — NOT a pentagram, no interlaced or outlined star, no occult symbol. The star glows warm gold (#DDBC7A) from within; hairline cracks in the stone leak the same golden light. Frontal, symmetric, heavy and precious.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 961,
+        "candidatesTokenCount": 1411,
+        "totalTokenCount": 2372,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 445
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0686,
+      "seconds": 8.9,
+      "status": "референс, не утверждён",
+      "raw": "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.42,
+        "opaque_share": 0.572,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "07ab88778da118ae9db1175544e0e0b813d51171862b89522a26ee4bd13fbeb2"
+    },
+    {
+      "file": "art/generated/icons/icon-valor__lite.png",
+      "category": "icons",
+      "job": "icon-valor",
+      "title": "Доблесть — руна доблести",
+      "source": "docs/gdd/10-прогрессия-героя.md: одна руна доблести — одна доблесть; в интерфейсе доблесть — звёзды",
+      "model": "gemini-3.1-flash-lite-image",
+      "model_name": "Nano Banana 2 Lite",
+      "date": "2026-09-26T20:59:09+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-05-victory.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: game UI icon, square. One bold emblem, centered, about 80% of the canvas, frontal view, a simple strong silhouette that stays readable at 24 px, crisp clean edges, painted material detail inside the silhouette. The glow stays inside the shape: no halo outside the silhouette.\n\nSubject: 'Rune of Valor', the emblem of a hero's valor. A thick rounded-hexagon tablet of dark basalt with a bevelled rim of old gold; on its face rises a solid, filled five-pointed star in raised relief, like a star of rank — NOT a pentagram, no interlaced or outlined star, no occult symbol. The star glows warm gold (#DDBC7A) from within; hairline cracks in the stone leak the same golden light. Frontal, symmetric, heavy and precious.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 2685,
+        "candidatesTokenCount": 1491,
+        "totalTokenCount": 4176,
+        "promptTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 2240
+          },
+          {
+            "modality": "TEXT",
+            "tokenCount": 445
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0348,
+      "seconds": 4.8,
+      "status": "референс, не утверждён",
+      "raw": "art/generated/icons/icon-valor__lite.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.617,
+        "opaque_share": 0.377,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "12310017a034ea73a333c317a529271dea19b983115b1ff7ea5825566776cc25"
+    },
+    {
+      "file": "art/generated/effects/fx-ward__pro.png",
+      "category": "effects",
+      "job": "fx-ward",
+      "title": "Бафф «Оберег» — щит на союзнике",
+      "source": "design/ui/battle.js, LIB «Оберег» (kind: shield); design/ui/fx.js — щит #8fdcff, полезные эффекты",
+      "model": "gemini-3-pro-image",
+      "model_name": "Nano Banana Pro",
+      "date": "2026-09-26T20:59:27+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: battle status-effect icon for a small round badge over a hero card, shown at 20-28 px. A circular medallion about 85% of the canvas: thin forged dark-iron rim, dark stone disc inside, one bold simple symbol in the center. Extremely readable, high contrast, minimal detail.\n\nSubject: the buff 'Ward', a protective shield on an ally. Rim of the medallion: dark iron with a thin teal (#48E5D4) glowing line that marks a positive effect. Symbol in the center: a bold dome-shaped shield of translucent ice-blue light (#8FDCFF) arching over a small amulet charm; the dome has a bright edge and a soft inner glow. The symbol takes about 60% of the medallion.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 697,
+        "candidatesTokenCount": 1335,
+        "totalTokenCount": 2238,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 439
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "thoughtsTokenCount": 206,
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1408,
+      "seconds": 17.4,
+      "status": "референс, не утверждён",
+      "raw": "art/generated/effects/fx-ward__pro.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.338,
+        "opaque_share": 0.654,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "cff456087676be927cd411bc64fa80273b1d235d5b8f03d80873712b8955a19e"
+    },
+    {
+      "file": "art/generated/effects/fx-ward__nb2.png",
+      "category": "effects",
+      "job": "fx-ward",
+      "title": "Бафф «Оберег» — щит на союзнике",
+      "source": "design/ui/battle.js, LIB «Оберег» (kind: shield); design/ui/fx.js — щит #8fdcff, полезные эффекты",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-26T20:59:38+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: battle status-effect icon for a small round badge over a hero card, shown at 20-28 px. A circular medallion about 85% of the canvas: thin forged dark-iron rim, dark stone disc inside, one bold simple symbol in the center. Extremely readable, high contrast, minimal detail.\n\nSubject: the buff 'Ward', a protective shield on an ally. Rim of the medallion: dark iron with a thin teal (#48E5D4) glowing line that marks a positive effect. Symbol in the center: a bold dome-shaped shield of translucent ice-blue light (#8FDCFF) arching over a small amulet charm; the dome has a bright edge and a soft inner glow. The symbol takes about 60% of the medallion.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 697,
+        "candidatesTokenCount": 1555,
+        "totalTokenCount": 2252,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 439
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0689,
+      "seconds": 9.5,
+      "status": "референс, не утверждён",
+      "raw": "art/generated/effects/fx-ward__nb2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.359,
+        "opaque_share": 0.634,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "12f0d7679fab154a0c200ad9de1aa2cb65bbb08dc6847434e403ae71cc387488"
+    },
+    {
+      "file": "art/generated/effects/fx-ward__lite.png",
+      "category": "effects",
+      "job": "fx-ward",
+      "title": "Бафф «Оберег» — щит на союзнике",
+      "source": "design/ui/battle.js, LIB «Оберег» (kind: shield); design/ui/fx.js — щит #8fdcff, полезные эффекты",
+      "model": "gemini-3.1-flash-lite-image",
+      "model_name": "Nano Banana 2 Lite",
+      "date": "2026-09-26T20:59:43+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: battle status-effect icon for a small round badge over a hero card, shown at 20-28 px. A circular medallion about 85% of the canvas: thin forged dark-iron rim, dark stone disc inside, one bold simple symbol in the center. Extremely readable, high contrast, minimal detail.\n\nSubject: the buff 'Ward', a protective shield on an ally. Rim of the medallion: dark iron with a thin teal (#48E5D4) glowing line that marks a positive effect. Symbol in the center: a bold dome-shaped shield of translucent ice-blue light (#8FDCFF) arching over a small amulet charm; the dome has a bright edge and a soft inner glow. The symbol takes about 60% of the medallion.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1559,
+        "candidatesTokenCount": 1474,
+        "totalTokenCount": 3033,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 439
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0345,
+      "seconds": 4.0,
+      "status": "референс, не утверждён",
+      "raw": "art/generated/effects/fx-ward__lite.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.677,
+        "opaque_share": 0.317,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "5bb72adefbaacdd041cd3b1a3de8def4de0fb20edad27e60428861f6081ee609"
+    },
+    {
+      "file": "art/generated/abilities/ab-stop__pro.jpg",
+      "category": "abilities",
+      "job": "ab-stop",
+      "title": "Способность «Остановка» — школа Времени",
+      "source": "design/ui/battle.js, LIB «Остановка»: цель теряет накопленные атаки и 2 атаки их не копит; стихия Время — карст Энериум, зелёный",
+      "model": "gemini-3-pro-image",
+      "model_name": "Nano Banana Pro",
+      "date": "2026-09-26T21:00:00+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-03-cave-teal-runes.webp"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: square ability icon, full-bleed painting from edge to edge (the game puts its own frame on top). One clear central image with a bold silhouette readable at 48 px, dark background with a darker vignette at the edges, strong glow in the color of the magic school.\n\nSubject: 'Stop', a Time school control spell: the target loses its gathered attacks and cannot gather new ones for a while. An old bronze hourglass tilted in mid-air, its sand frozen mid-fall — grains hang motionless in the air around the glass; thin concentric rings of green light (Energium green, #4FDC8B) are frozen around it like ripples on still water; green light rises from below; dark stone background with faint cracks. Cold, still, precise.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 863,
+        "candidatesTokenCount": 1347,
+        "totalTokenCount": 2398,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 347
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "thoughtsTokenCount": 188,
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1411,
+      "seconds": 17.2,
+      "status": "референс, не утверждён",
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "d3869ebdfe841cafd1fca5cbc66c039488f78a36734583d02fbab8fa8bf40a73"
+    },
+    {
+      "file": "art/generated/abilities/ab-stop__nb2.jpg",
+      "category": "abilities",
+      "job": "ab-stop",
+      "title": "Способность «Остановка» — школа Времени",
+      "source": "design/ui/battle.js, LIB «Остановка»: цель теряет накопленные атаки и 2 атаки их не копит; стихия Время — карст Энериум, зелёный",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-26T21:00:11+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-03-cave-teal-runes.webp"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: square ability icon, full-bleed painting from edge to edge (the game puts its own frame on top). One clear central image with a bold silhouette readable at 48 px, dark background with a darker vignette at the edges, strong glow in the color of the magic school.\n\nSubject: 'Stop', a Time school control spell: the target loses its gathered attacks and cannot gather new ones for a while. An old bronze hourglass tilted in mid-air, its sand frozen mid-fall — grains hang motionless in the air around the glass; thin concentric rings of green light (Energium green, #4FDC8B) are frozen around it like ripples on still water; green light rises from below; dark stone background with faint cracks. Cold, still, precise.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 863,
+        "candidatesTokenCount": 1411,
+        "totalTokenCount": 2274,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 347
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0685,
+      "seconds": 10.3,
+      "status": "референс, не утверждён",
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "cae1b7dd757dfdf37f4134c7c741fac8e7b7c2d706b253da34a73e69311b1394"
+    },
+    {
+      "file": "art/generated/abilities/ab-stop__lite.jpg",
+      "category": "abilities",
+      "job": "ab-stop",
+      "title": "Способность «Остановка» — школа Времени",
+      "source": "design/ui/battle.js, LIB «Остановка»: цель теряет накопленные атаки и 2 атаки их не копит; стихия Время — карст Энериум, зелёный",
+      "model": "gemini-3.1-flash-lite-image",
+      "model_name": "Nano Banana 2 Lite",
+      "date": "2026-09-26T21:00:15+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-03-cave-teal-runes.webp"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: square ability icon, full-bleed painting from edge to edge (the game puts its own frame on top). One clear central image with a bold silhouette readable at 48 px, dark background with a darker vignette at the edges, strong glow in the color of the magic school.\n\nSubject: 'Stop', a Time school control spell: the target loses its gathered attacks and cannot gather new ones for a while. An old bronze hourglass tilted in mid-air, its sand frozen mid-fall — grains hang motionless in the air around the glass; thin concentric rings of green light (Energium green, #4FDC8B) are frozen around it like ripples on still water; green light rises from below; dark stone background with faint cracks. Cold, still, precise.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 2587,
+        "candidatesTokenCount": 1434,
+        "totalTokenCount": 4021,
+        "promptTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 2240
+          },
+          {
+            "modality": "TEXT",
+            "tokenCount": 347
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0347,
+      "seconds": 4.5,
+      "status": "референс, не утверждён",
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "453ed40cf28b9af10dbccbfaaf14168faff55e0e728152a7be1804f31712c53b"
+    },
+    {
+      "file": "art/generated/arenas/arena-workshop__pro-v2.jpg",
+      "category": "arenas",
+      "job": "arena-workshop",
+      "title": "Арена боя · Мастерская форм, вид сверху",
+      "source": "docs/gdd/08-биомы.md §8.5; docs/lore/мастерская-форм-текст.md, с. 2; docs/lore/дайджест.md «Мотивы и палитра»",
+      "model": "gemini-3-pro-image",
+      "model_name": "Nano Banana Pro",
+      "date": "2026-09-26T21:01:04+03:00",
+      "params": {
+        "aspectRatio": "9:16",
+        "imageSize": "2K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-03-cave-teal-runes.webp",
+        "art/style/ref-04-beast-gold-cracks.jpg",
+        "art/style/ref-01-cave-amber-teal.webp"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: vertical battle background for a phone screen, portrait 9:16. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective walls, no ceiling, no sky. The central playfield — the middle 60% of the width, from 15% to 85% of the height — is plain floor only: stone slabs, sand ripples and fine cracks, calm and lower in contrast. No crystals, objects, markings, slots, frames, rectangles, cards, tokens or figures on the playfield: the game places its own pieces there later. Put the interesting details along the edges and in the corners. Even, readable lighting over the playfield, no strong hotspot in the center.\n\nSubject: the floor of the Workshop of Forms, the first hall under the city of Endalor, where a god once sculpted living beings from clay and abandoned the work halfway. Large worn stone floor slabs with cracks; drifts and still ripples of pale sand. White-green crystals glowing from within grow only in the cracks along the edges and in the corners; their cold light spills onto the floor. In the corners: thin streams of sand fall from the unseen vault into small round piles with a faint haze, like hourglasses nobody turns. Along the left and right edges: parts of heavy wooden worktables seen from above with unfinished clay works lying on them — a hand without fingers, a face without features, half of a small beast — sculpting chisels, clay-stained cloths, clay pots. At the very top and bottom edges: the foot of the stone walls with half-formed clay bodies emerging from the stone, made precisely and calmly, unfinished, not grotesque. The hall is cold: near-black stone, white-green crystal light, pale sand. The only warm color is the ochre clay of the unfinished works. No candles, no fire, no warm lamps, no grid, no characters.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1368,
+        "candidatesTokenCount": 1425,
+        "totalTokenCount": 3068,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 594
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 774
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "thoughtsTokenCount": 275,
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1441,
+      "seconds": 25.5,
+      "status": "референс, не утверждён",
+      "px": [
+        1536,
+        2752
+      ],
+      "sha256": "51d3c2c2ab979b512cfde9b179ddf0e7d4faa0dec9d7de0a5de0d7c99ad6edf0"
+    },
+    {
+      "file": "art/generated/arenas/arena-workshop__nb2-v2.jpg",
+      "category": "arenas",
+      "job": "arena-workshop",
+      "title": "Арена боя · Мастерская форм, вид сверху",
+      "source": "docs/gdd/08-биомы.md §8.5; docs/lore/мастерская-форм-текст.md, с. 2; docs/lore/дайджест.md «Мотивы и палитра»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-26T21:01:24+03:00",
+      "params": {
+        "aspectRatio": "9:16",
+        "imageSize": "2K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-03-cave-teal-runes.webp",
+        "art/style/ref-04-beast-gold-cracks.jpg",
+        "art/style/ref-01-cave-amber-teal.webp"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: vertical battle background for a phone screen, portrait 9:16. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective walls, no ceiling, no sky. The central playfield — the middle 60% of the width, from 15% to 85% of the height — is plain floor only: stone slabs, sand ripples and fine cracks, calm and lower in contrast. No crystals, objects, markings, slots, frames, rectangles, cards, tokens or figures on the playfield: the game places its own pieces there later. Put the interesting details along the edges and in the corners. Even, readable lighting over the playfield, no strong hotspot in the center.\n\nSubject: the floor of the Workshop of Forms, the first hall under the city of Endalor, where a god once sculpted living beings from clay and abandoned the work halfway. Large worn stone floor slabs with cracks; drifts and still ripples of pale sand. White-green crystals glowing from within grow only in the cracks along the edges and in the corners; their cold light spills onto the floor. In the corners: thin streams of sand fall from the unseen vault into small round piles with a faint haze, like hourglasses nobody turns. Along the left and right edges: parts of heavy wooden worktables seen from above with unfinished clay works lying on them — a hand without fingers, a face without features, half of a small beast — sculpting chisels, clay-stained cloths, clay pots. At the very top and bottom edges: the foot of the stone walls with half-formed clay bodies emerging from the stone, made precisely and calmly, unfinished, not grotesque. The hall is cold: near-black stone, white-green crystal light, pale sand. The only warm color is the ochre clay of the unfinished works. No candles, no fire, no warm lamps, no grid, no characters.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1368,
+        "candidatesTokenCount": 2122,
+        "totalTokenCount": 3490,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 594
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 774
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1680
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1028,
+      "seconds": 20.0,
+      "status": "референс, не утверждён",
+      "px": [
+        1536,
+        2752
+      ],
+      "sha256": "cd91f2546cbbceef024ef172da8254c15591d8ed9752b900e18cd64c9e3e2478"
+    },
+    {
+      "file": "art/generated/arenas/arena-workshop__lite-v2.jpg",
+      "category": "arenas",
+      "job": "arena-workshop",
+      "title": "Арена боя · Мастерская форм, вид сверху",
+      "source": "docs/gdd/08-биомы.md §8.5; docs/lore/мастерская-форм-текст.md, с. 2; docs/lore/дайджест.md «Мотивы и палитра»",
+      "model": "gemini-3.1-flash-lite-image",
+      "model_name": "Nano Banana 2 Lite",
+      "date": "2026-09-26T21:01:28+03:00",
+      "params": {
+        "aspectRatio": "9:16",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/style/ref-03-cave-teal-runes.webp",
+        "art/style/ref-04-beast-gold-cracks.jpg",
+        "art/style/ref-01-cave-amber-teal.webp"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: vertical battle background for a phone screen, portrait 9:16. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective walls, no ceiling, no sky. The central playfield — the middle 60% of the width, from 15% to 85% of the height — is plain floor only: stone slabs, sand ripples and fine cracks, calm and lower in contrast. No crystals, objects, markings, slots, frames, rectangles, cards, tokens or figures on the playfield: the game places its own pieces there later. Put the interesting details along the edges and in the corners. Even, readable lighting over the playfield, no strong hotspot in the center.\n\nSubject: the floor of the Workshop of Forms, the first hall under the city of Endalor, where a god once sculpted living beings from clay and abandoned the work halfway. Large worn stone floor slabs with cracks; drifts and still ripples of pale sand. White-green crystals glowing from within grow only in the cracks along the edges and in the corners; their cold light spills onto the floor. In the corners: thin streams of sand fall from the unseen vault into small round piles with a faint haze, like hourglasses nobody turns. Along the left and right edges: parts of heavy wooden worktables seen from above with unfinished clay works lying on them — a hand without fingers, a face without features, half of a small beast — sculpting chisels, clay-stained cloths, clay pots. At the very top and bottom edges: the foot of the stone walls with half-formed clay bodies emerging from the stone, made precisely and calmly, unfinished, not grotesque. The hall is cold: near-black stone, white-green crystal light, pale sand. The only warm color is the ochre clay of the unfinished works. No candles, no fire, no warm lamps, no grid, no characters.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 3954,
+        "candidatesTokenCount": 1527,
+        "totalTokenCount": 5481,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 594
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 3360
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0352,
+      "seconds": 4.7,
+      "status": "референс, не утверждён",
+      "px": [
+        768,
+        1376
+      ],
+      "sha256": "e155efcf81a3ca7b895320586355375d6c0d01cc48acb5a72618b1a9491cff0d"
+    }
+  ]
+}
