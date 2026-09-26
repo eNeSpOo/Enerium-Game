@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="iron" x1="12" y1="0" x2="106" y2="128" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#62696b"/><stop offset=".24" stop-color="#30373a"/><stop offset=".68" stop-color="#21272a"/><stop offset="1" stop-color="#474e50"/>
+    </linearGradient>
+    <linearGradient id="plate" x1="5" y1="5" x2="29" y2="29" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#555c5e"/><stop offset=".35" stop-color="#303638"/><stop offset="1" stop-color="#14191b"/>
+    </linearGradient>
+    <g id="corner">
+      <path d="M3 25V14L14 3H25V7H17L7 17V25Z" fill="url(#plate)" stroke="#15191a" stroke-width="1"/>
+      <path d="M4 23V14L14 4H23" stroke="#737879" stroke-width=".8" opacity=".65"/>
+      <path d="M11 25V19L19 11H25" stroke="#454d50" stroke-width="1"/>
+      <path d="M13 17L17 13L20 16L16 20Z" fill="#1b2022" stroke="#727778" stroke-width=".65"/>
+      <path d="M14 16L16 14" stroke="#9b9c94" stroke-width=".8" opacity=".7"/>
+      <path d="M7 29V25M25 7H29" stroke="#747775" stroke-width=".65" opacity=".5"/>
+    </g>
+  </defs>
+  <path d="M15 2H113L126 15V113L113 126H15L2 113V15Z" stroke="#030506" stroke-width="4"/>
+  <path d="M15 3H113L125 15V113L113 125H15L3 113V15Z" stroke="url(#iron)" stroke-width="2"/>
+  <path d="M19 8H109L120 19V109L109 120H19L8 109V19Z" stroke="#343b3e" stroke-width=".85"/>
+  <path d="M20 10H108L118 20V108L108 118H20L10 108V20Z" stroke="#090c0e" stroke-width="1.5"/>
+  <use href="#corner"/><use href="#corner" transform="translate(128 0) rotate(90)"/>
+  <use href="#corner" transform="translate(128 128) rotate(180)"/><use href="#corner" transform="translate(0 128) rotate(270)"/>
+</svg>

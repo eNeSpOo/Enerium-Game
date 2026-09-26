@@ -1,0 +1,37 @@
+[
+  {
+    "sourceFile": "image_fx_ (99).jpg",
+    "asset": "assets/art/shelter-room.jpg",
+    "providedBy": "user 2026-09-24",
+    "sha256": "4b54cae2c420a6c93a1a6a81108ce66c41bd3e3083485b49a631fc264f68b462",
+    "modified": false
+  },
+  {
+    "sourceFile": "image_fx_ - 2025-03-01T001016_u2net.png",
+    "asset": "assets/art/shelter-enzo.png",
+    "providedBy": "user 2026-09-24",
+    "sha256": "f2f4898cf73fe1bdf4d996169ecc00bf93e07d1ed0b400b436da6509b50ef3c3",
+    "modified": false
+  },
+  {
+    "sourceFile": "image_fx_ - 2025-03-01T182954_inspyrenet.png",
+    "asset": "assets/art/shelter-smith.png",
+    "providedBy": "user 2026-09-24",
+    "sha256": "c8e02d9746b1bc7897407942d03e936e13b539d9c3557856aa1d29d9a8a02d85",
+    "modified": false
+  },
+  {
+    "sourceFile": "image_fx_ - 2025-03-01T002316_inspyrenet.png",
+    "asset": "assets/art/shelter-alchemist.png",
+    "providedBy": "user 2026-09-24",
+    "sha256": "d621683cad6df28cf290705b180f37f2768889acca860ed3bda2bf21812dbe20",
+    "modified": false
+  },
+  {
+    "sourceFile": "image_fx_ - 2025-03-01T173249_inspyrenet.png",
+    "asset": "assets/art/shelter-mage.png",
+    "providedBy": "user 2026-09-24",
+    "sha256": "72a86c83c5526b61b02dccceee2c62e151a7ee06667ad47ff71ca3f78b0ddb8e",
+    "modified": false
+  }
+]

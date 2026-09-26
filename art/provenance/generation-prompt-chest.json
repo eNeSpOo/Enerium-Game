@@ -1,0 +1,8 @@
+{
+  "asset": "assets/art/reward-chest-v1.png",
+  "tool": "built-in image_gen",
+  "prompt": "Create ONE isolated painted dark fantasy game UI reward chest asset, a small ancient reliquary coffer, three-quarter frontal view. The UI style is near-black forest green, worn old bronze gold edges, realistic hand-painted metal, dark wood, restrained teal light only in tiny seams. A squat compact chest with a broad hinged lid, ornate sculptural bronze clasp and modest leaf engraving, clear simple outer silhouette readable at 80px. Valuable, weathered, calm; no excessive gems or acid neon, no red, no spikes obscuring the silhouette, no characters. Main subject fills 80 percent of square canvas, centered with generous safe margin. Background deliberately opaque flat near-black green #080e0c with only a soft contact shadow. No text, no numbers, no watermark, no UI frame, no checkerboard. This is a separate item illustration for an existing UI, not a screen mockup. Hand-painted art, not a generic flat gift icon, not photoreal product photography.",
+  "source": "exec-4098a1f6-145a-4f35-a33e-cdb98f0908bc.png",
+  "background": "Deliberately opaque near-black forest green. Not an alpha cutout.",
+  "status": "Draft, not user accepted."
+}

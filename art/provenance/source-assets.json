@@ -1,0 +1,102 @@
+[
+  {
+    "target": "assets/art/spirit.png",
+    "source": "Assets/Enerium_Asset/Sprite_Atlas/Scene2_Biom/Canvas 1/Value/Value Quadro (1).png",
+    "origin": "User project artwork; copied unmodified"
+  },
+  {
+    "target": "assets/art/gold.png",
+    "source": "Assets/Enerium_Asset/Sprite_Atlas/Scene2_Biom/Canvas 1/Value/Value Quadro (2).png",
+    "origin": "User project artwork; copied unmodified"
+  },
+  {
+    "target": "assets/art/souls.png",
+    "source": "Assets/Enerium_Asset/Sprite_Atlas/Scene2_Biom/Canvas 1/Value/Value Quadro (3).png",
+    "origin": "User project artwork; copied unmodified"
+  },
+  {
+    "target": "assets/art/enerium.png",
+    "source": "Assets/Enerium_Asset/Sprite_Atlas/Scene2_Biom/Canvas 1/Value/Value Quadro (4).png",
+    "origin": "User project artwork; copied unmodified"
+  },
+  {
+    "target": "assets/art/gold-pile.png",
+    "source": "Assets/Enerium_Asset/Sprite_Atlas/Scene1_Sanctuary/Canvas3UI_Archive+/BuyHeroes/Img_GoldHero.png",
+    "origin": "User project artwork; copied unmodified"
+  },
+  {
+    "target": "assets/art/rune-key.png",
+    "source": "Assets/Enerium_Asset/Sprite_Atlas/Scene1_Sanctuary/Canvas3UI_Archive+/SelectBiom/Img_SelectBiomRuneKey.png",
+    "origin": "User project artwork; copied unmodified"
+  },
+  {
+    "target": "assets/art/wanderer.png",
+    "source": "Assets/Resources/EneriumLocal/UI/BattleV11/wanderer-v12-portrait.png",
+    "origin": "User project artwork; copied unmodified"
+  },
+  {
+    "target": "assets/art/hero-portrait-1.png",
+    "source": "Assets/Enerium_Asset/Sprite_Atlas/Scene2_Biom/Canvas 1/Heroes/AvatarHero1.png",
+    "origin": "User project portrait, unmodified; example binding in gallery fixtures"
+  },
+  {
+    "target": "assets/art/hero-portrait-2.png",
+    "source": "Assets/Enerium_Asset/Sprite_Atlas/Scene2_Biom/Canvas 1/Heroes/AvatarHero2.png",
+    "origin": "User project portrait, unmodified; example binding in gallery fixtures"
+  },
+  {
+    "target": "assets/art/hero-portrait-3.png",
+    "source": "Assets/Enerium_Asset/Sprite_Atlas/Scene2_Biom/Canvas 1/Heroes/AvatarHero3.png",
+    "origin": "User project portrait, unmodified; example binding in gallery fixtures"
+  },
+  {
+    "target": "assets/art/hero-portrait-4.png",
+    "source": "Assets/Enerium_Asset/Sprite_Atlas/Scene2_Biom/Canvas 1/Heroes/AvatarHero4.png",
+    "origin": "User project portrait, unmodified; example binding in gallery fixtures"
+  },
+  {
+    "target": "assets/art/hero-portrait-5.png",
+    "source": "Assets/Enerium_Asset/Sprite_Atlas/Scene2_Biom/Canvas 1/Heroes/AvatarHero5.png",
+    "origin": "User project portrait, unmodified; example binding in gallery fixtures"
+  },
+  {
+    "target": "assets/art/lock.png",
+    "origin": "User project lock, unmodified RGBA; corner/hole alpha=0 verified",
+    "source": "Assets/Enerium_Asset/Sprite_Atlas/Scene1_Sanctuary/Canvas4UI_Archive++/WandererAppearence/Img_WandererAppearenceLock.png"
+  },
+  {
+    "origin": "Project art-map draft binding, source copied unmodified",
+    "target": "assets/art/item-hollow-crown.png",
+    "source": "Assets/Enerium_Asset/Sprite_Atlas/Scene2_Biom/Canvas 2/Other (168).png"
+  },
+  {
+    "origin": "Project art-map draft binding, source copied unmodified",
+    "target": "assets/art/item-gravebloom.png",
+    "source": "Assets/Enerium_Asset/Sprite_Atlas/Scene2_Biom/Canvas 2/Other (166).png"
+  },
+  {
+    "origin": "Project art-map draft binding, source copied unmodified",
+    "target": "assets/art/item-silent-bell.png",
+    "source": "Assets/Enerium_Asset/Sprite_Atlas/Scene2_Biom/Canvas 2/Other (263).png"
+  },
+  {
+    "origin": "Project art-map draft binding, source copied unmodified",
+    "target": "assets/art/item-stormglass.png",
+    "source": "Assets/Enerium_Asset/Sprite_Atlas/Scene2_Biom/Canvas 2/Other (151).png"
+  },
+  {
+    "origin": "Project art-map draft binding, source copied unmodified",
+    "target": "assets/art/item-ashen-seal.png",
+    "source": "Assets/Enerium_Asset/Sprite_Atlas/Scene2_Biom/Canvas 2/Other (199).png"
+  },
+  {
+    "origin": "Project art-map draft binding, source copied unmodified",
+    "target": "assets/art/item-cinder-heart.png",
+    "source": "Assets/Enerium_Asset/Sprite_Atlas/Scene2_Biom/Canvas 2/Other (296).png"
+  },
+  {
+    "target": "assets/art/equipment-gloves-v1.png",
+    "source": "User supplied Downloads/ImgSkill.png",
+    "origin": "Copied byte-for-byte for the illustrative equipment fixture; item statistics and definition not approved"
+  }
+]

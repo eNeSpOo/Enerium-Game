@@ -1,0 +1,15 @@
+# Текст — с нормализацией концов строк, остальное — двоичное
+* text=auto
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.psd binary
+*.pdf binary
+*.docx binary
+*.xlsx binary
+*.mp3 binary
+*.wav binary
+*.ogg binary
+*.ttf binary
+*.otf binary

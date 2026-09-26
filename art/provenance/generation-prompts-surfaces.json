@@ -1,0 +1,22 @@
+{
+  "tool": "built-in image_gen",
+  "reference": "assets/reference/panel-stone-user-reference.png",
+  "outputs": [
+    {
+      "file": "assets/art/panel-stone-v1.png",
+      "status": "superseded: too grainy and bright in actual UI",
+      "prompt": "Use case: stylized-concept. Asset type: a single full-bleed tileable 1536x1024 opaque raster texture for the inner surfaces of a dark fantasy game UI. The attached small reference image is ONLY a material, darkness and color reference. Create a larger detailed near-black charcoal stone surface matching its extreme darkness, with restrained natural stone grain and very fine hairline fissures, subtly visible soft grey mineral variation. Almost black neutral graphite, only a barely perceptible cool undertone, absolutely no green tint or turquoise patches. Flat front-facing orthographic material scan, even subdued illumination across the whole image. The texture must be calm enough for small light UI labels drawn on top: low contrast, average tones around #0c0e10 to #111416, thin fissures almost black, rare soft mineral areas no brighter than #1b1e20. Fine natural detail visible on close inspection, no large boulders or stone bricks. Seamless repeat-friendly outer edges, no vignetting, no central highlight, no frame, no border, no corners, no text, no UI, no objects, no icons, no symbols. Render ONLY this opaque black stone material, no transparency."
+    },
+    {
+      "file": "assets/art/panel-stone-v2.png",
+      "status": "current draft, pending user review",
+      "opaque": true,
+      "prompt": "Use case: style-transfer. Asset type: opaque game UI stone material texture, full bleed 1536x1024. Image 1 is the generated texture to revise. Image 2 is the user's authoritative darkness / material reference. Change the texture in Image 1 to match Image 2 much more closely. The first texture is FAR too bright, grainy and busy. The required result is almost black, smooth weathered charcoal slate, softly shaded large irregular mineral planes, very low contrast; tiny smooth diffuse gray highlights BARELY visible. Remove the speckled salt-and-pepper grain almost entirely. Remove most of the bright scuffing. Sparse, fine, extremely subtle hairline cracks and broader almost imperceptible weathered seams rather than a graphic web of black lines. Broad surfaces should be approx RGB 7,10,12 to 12,15,17; only rare edges approx 19,21,23; no patches brighter than dark #171a1c. Neutral cool black, no green tint. The whole material should read as BLACK first, stone only on closer inspection. Even front-facing orthographic lighting, no vignette, no spotlight. Seamless repeat-friendly outer edges. Preserve full bleed flat texture only. No frame, no border, no text, no objects, no symbols. Do not add light scratches or sparkling grain. Use Image 2 as the primary visual target for subtlety and smoothness, not Image 1's rough granite noise."
+    }
+  ],
+  "frame": {
+    "file": "assets/art/frame-forged-iron-v1.svg",
+    "source": "Code-authored scalable dark iron frame; no raster editing",
+    "status": "draft"
+  }
+}
