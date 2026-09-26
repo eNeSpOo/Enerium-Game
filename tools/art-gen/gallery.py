@@ -85,7 +85,7 @@ def main():
     blocks = []
     for job in order:
         its = jobs[job]
-        last = next(i for i in reversed(its) if not replaced(i))
+        last = next((i for i in reversed(its) if not replaced(i)), its[-1])   # у задания могут быть заменены все версии
         cards = []
         for it in its:
             src = pathlib.Path(it["file"]).relative_to("art/generated").as_posix()

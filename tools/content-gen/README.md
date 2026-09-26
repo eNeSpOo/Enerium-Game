@@ -31,3 +31,11 @@ python tools/content-gen/heroes/export_ui.py
 ```
 
 После правки циклов запускайте оба скрипта.
+
+## Экономика
+
+`economy/economy.py` — калькулятор к `docs/content/экономика-золото-дух.md`: цена уровней и кругов героя, доход забега, сроки. Числа — данными в начале файла, только целые. Флаг `--sim` перемеряет бой через Node и `design/ui/battle.js`. Нужен Python 3.
+
+```bash
+python tools/content-gen/economy/economy.py
+```

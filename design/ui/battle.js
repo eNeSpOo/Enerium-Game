@@ -262,6 +262,7 @@ function chanceTable(u) {
   });
 }
 const emit = (b, e) => { e.at = b.t; b.ev.push(e); };
+const CTL_ST = ['stun', 'silence', 'stop'];   // контроль: на него действует иммунитет по рангу; дебафы — не контроль (ADR-0010)
 const has = (u, k) => u.st.find(s => s.k === k);
 const rmSt = (u, s) => { u.st.splice(u.st.indexOf(s), 1); };
 const alive = arr => arr.filter(v => v.alive);
@@ -430,7 +431,7 @@ function cast(b, u, ab, isUlt) {
       let coef = ab.coef;
       if (ab.per) { const p = t.st.find(s => s.k === ab.per.kind && s.school === ab.per.school); if (p) coef = fl(coef * (100 + ab.per.pct * p.stacks), 100); }
       const d = hit(b, u, t, ab.stat, fl(coef * boost, 100), { mass, drain: ab.drain });
-      if (d > 0 && ab.then) addStatus(b, u, t, ab.then, ab.then.st === 'stun');
+      if (d > 0 && ab.then) addStatus(b, u, t, ab.then, CTL_ST.includes(ab.then.st));
     } break;
     case 'dot': case 'hot': for (const t of tg) addPeriodic(b, u, t, ab); break;
     case 'heal': for (const t of tg) heal(b, u, t, fl(u.atk[ab.stat] * ab.coef * boost, 10000), mass); break;
@@ -438,7 +439,7 @@ function cast(b, u, ab, isUlt) {
     case 'taunt': for (const v of b.u[1 - u.side]) if (v.alive) { let m = 0; for (let j = 0; j < v.th.length; j++) if (b.u[u.side][j].alive && v.th[j] > m) m = v.th[j]; v.th[u.i] = fl(m * RULES.threat.tauntPct, 100) + RULES.threat.tauntAdd; v.cur = u.i; } break;
     case 'ctrl': for (const t of tg) addStatus(b, u, t, { st: ab.st, left: ab.left }, true); break;
     case 'debuff': for (const t of tg) addStatus(b, u, t, { st: ab.st, left: ab.left, pow: ab.pow }, false); break;
-    case 'dispel': for (const t of tg) { const lost = t.sh; t.sh = 0; t.st = t.st.filter(s => s.k !== 'hot'); emit(b, { k: 'dispel', s: u, t, v: lost }); if (ab.then) addStatus(b, u, t, ab.then, false); } break;
+    case 'dispel': for (const t of tg) { const lost = t.sh; t.sh = 0; t.st = t.st.filter(s => s.k !== 'hot'); emit(b, { k: 'dispel', s: u, t, v: lost }); if (ab.then) addStatus(b, u, t, ab.then, CTL_ST.includes(ab.then.st)); } break;
   }
 }
 function hit(b, src, t, stat, coef, o) {

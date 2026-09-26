@@ -1382,7 +1382,7 @@
       },
       "cost_usd": 0.0688,
       "seconds": 10.9,
-      "status": "заменён: тёплые красные трещины на фоне, а зал по лору холодный; промт исправлен",
+      "status": "заменён: нарисован по старым фигурам GPT, автор просил новых врагов с нуля",
       "px": [
         928,
         1152
@@ -1436,7 +1436,7 @@
       },
       "cost_usd": 0.0691,
       "seconds": 9.9,
-      "status": "партия 1, ждёт автора",
+      "status": "заменён: нарисован по старым фигурам GPT, автор просил новых врагов с нуля",
       "px": [
         928,
         1152
@@ -1490,7 +1490,7 @@
       },
       "cost_usd": 0.0689,
       "seconds": 14.5,
-      "status": "партия 1, ждёт автора",
+      "status": "заменён: нарисован по старым фигурам GPT, автор просил новых врагов с нуля",
       "px": [
         928,
         1152
@@ -2455,7 +2455,7 @@
       },
       "cost_usd": 0.0691,
       "seconds": 9.7,
-      "status": "партия 1, ждёт автора",
+      "status": "заменён: нарисован по старым фигурам GPT, автор просил новых врагов с нуля",
       "px": [
         928,
         1152
@@ -2851,6 +2851,1033 @@
         1024
       ],
       "sha256": "e2cf7d67a6c1509104e062247922e2f70a75fc1f6d8094e4798031dfe0e41083"
+    },
+    {
+      "file": "art/generated/enemies/ws-faceless__nb2.jpg",
+      "category": "enemies",
+      "job": "ws-faceless",
+      "title": "Безликий образец — рядовой, сила",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 5",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:52:35+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting.\n\nSubject: 'Faceless Sample', the first creature anyone meets in the Workshop. An elven figure of grey-green clay in a rough sketch of clothing, with a rope instead of a belt, holding a stone blank of a sword that has no crossguard yet. No face at all — only two shallow dents pressed by a thumb where the eyes should be; still it looks straight at the viewer. Made simply but solidly, honest, walks straight at you.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1100,
+        "candidatesTokenCount": 1529,
+        "totalTokenCount": 2629,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 584
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.069,
+      "seconds": 14.7,
+      "status": "партия 2, ждёт автора",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "c65126c1919479aad0b948771c0d7b2408b0b696ed4bc7b27ef5127f8a820dee"
+    },
+    {
+      "file": "art/generated/enemies/ws-longarm__nb2.jpg",
+      "category": "enemies",
+      "job": "ws-longarm",
+      "title": "Долгорукий образец — рядовой, ловкость",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 6",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:52:45+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting.\n\nSubject: 'Long-armed Sample'. Stooped and thin, with two different arms: one is ordinary, the other stretches almost to the ground and ends in a heavy stone hand, as if the maker began stretching it and could not stop. It keeps its distance and reaches those who stand at the back.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1069,
+        "candidatesTokenCount": 1461,
+        "totalTokenCount": 2530,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 553
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0688,
+      "seconds": 9.9,
+      "status": "партия 2, ждёт автора",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "2aeb975ec2adcf890d1e59bfe6c1f860db2f6c0b53ea69d7a3668bb64f1aa62f"
+    },
+    {
+      "file": "art/generated/enemies/ws-hollow__nb2.jpg",
+      "category": "enemies",
+      "job": "ws-hollow",
+      "title": "Пустотелый образец — рядовой, маг воздуха",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 7",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:52:56+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting.\n\nSubject: 'Hollow Sample', a shell. Its chest is open like an empty mould from which the casting was removed, and there is nothing inside but wind. It throws its head back and spreads its thin arms, and a whirl of sand and air bursts from its empty chest and mouth.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1066,
+        "candidatesTokenCount": 1445,
+        "totalTokenCount": 2511,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 550
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0687,
+      "seconds": 10.2,
+      "status": "партия 2, ждёт автора",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "3fda2277e2e93dad00d9c7578ac963e538cc4589dda84295418927400953310a"
+    },
+    {
+      "file": "art/generated/enemies/ws-headless__nb2.jpg",
+      "category": "enemies",
+      "job": "ws-headless",
+      "title": "Безголовый образец — рядовой, держит удар",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 8",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:53:06+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting.\n\nSubject: 'Headless Sample'. A four-legged beast the size of a bull with no head: the neck simply ends, flat, as if cut along a ruler. Mighty shoulders, lumps of clay on its back, legs like logs. Calm and immovable, a living wall.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1064,
+        "candidatesTokenCount": 1483,
+        "totalTokenCount": 2547,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 548
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0688,
+      "seconds": 10.5,
+      "status": "партия 2, ждёт автора",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "d6eb62aac3013d4c77f7b1f5f376954dbc4088c8ee8eef5676d33501bfdf70b2"
+    },
+    {
+      "file": "art/generated/enemies/ws-raw__nb2.jpg",
+      "category": "enemies",
+      "job": "ws-raw",
+      "title": "Сырой образец — рядовой, лекарь",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 9",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:53:18+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting.\n\nSubject: 'Raw Sample'. It was never dried: covered in drips as if half-melted in a sun that never shone there, wearing a clay apron, clay constantly dripping from its palms. It pinches clay off itself to patch the cracks of others. There is something kind about it.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1067,
+        "candidatesTokenCount": 1525,
+        "totalTokenCount": 2592,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 551
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0689,
+      "seconds": 11.4,
+      "status": "партия 2, ждёт автора",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "a2696f759d78560c626f01af5ca97abe6c1274adbec644704e66517c5b784473"
+    },
+    {
+      "file": "art/generated/enemies/ws-onearm__nb2.jpg",
+      "category": "enemies",
+      "job": "ws-onearm",
+      "title": "Однорукий образец — редкий, убийца",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 10",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:53:29+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting.\n\nSubject: 'One-armed Sample'. Lean and fast, on long thin legs. Its only arm ends in a long blade like a splinter chipped from stone; the other shoulder is smoothed away completely, as if it was never meant to be. Made in a hurry, the fastest thing in the Workshop, poised to dart to the back rows.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1076,
+        "candidatesTokenCount": 1486,
+        "totalTokenCount": 2562,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 560
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0688,
+      "seconds": 11.1,
+      "status": "партия 2, ждёт автора",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "5cccc6fab4e2ff322aa835154fb38a2a390150e613a7006b78eb7fe4171f2a5a"
+    },
+    {
+      "file": "art/generated/enemies/ws-apprentice__nb2.jpg",
+      "category": "enemies",
+      "job": "ws-apprentice",
+      "title": "Подмастерье — элита, сила",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 12",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:53:38+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting.\n\nSubject: 'Apprentice', a servant of the Workshop who still kneads clay for everyone although there is no one left to knead for. A stocky fellow in an apron over a rough shirt and wide trousers; his arms are covered in clay up to the elbows and twice as thick as they should be, fists like chopping blocks. A simple, almost kind face with two pressed hollows for eyes.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1089,
+        "candidatesTokenCount": 1542,
+        "totalTokenCount": 2631,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 573
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.069,
+      "seconds": 9.4,
+      "status": "партия 2, ждёт автора",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "eeeef81acacdbae38f7e55784e178516554f7e367ba46997e6e23ee48c26688e"
+    },
+    {
+      "file": "art/generated/enemies/ws-carver__nb2.jpg",
+      "category": "enemies",
+      "job": "ws-carver",
+      "title": "Резчик — элита, ловкость",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 13",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:53:48+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting.\n\nSubject: 'Carver', a servant of the Workshop who trimmed the excess from every blank. Tall, thin, stooped like everyone who bent over fine work for long. His apron is crossed with straps holding rows of chisels, and instead of a right hand he has a fan of thin blades.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1068,
+        "candidatesTokenCount": 1467,
+        "totalTokenCount": 2535,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 552
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0688,
+      "seconds": 10.0,
+      "status": "партия 2, ждёт автора",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "3ebb94f957e25d62bbb1fe7f19d7f9966a79671f33eab543bb5b7c22af65d75c"
+    },
+    {
+      "file": "art/generated/enemies/ws-prop__nb2.jpg",
+      "category": "enemies",
+      "job": "ws-prop",
+      "title": "Упор — элита, держит удар",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 14",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:53:58+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting.\n\nSubject: 'Prop', a servant of the Workshop that held work in place while the clay set. Broad, squat, solid, in an apron and leg wraps. In front of him he holds a stone slab with the sign of the Workshop like a shield; the sign is an abstract carved mark, not letters.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1070,
+        "candidatesTokenCount": 1473,
+        "totalTokenCount": 2543,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 554
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0688,
+      "seconds": 9.8,
+      "status": "заменён: выглядел живым орком, плита сбоку, знак похож на букву",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "c762e4ce093ca153d03feb8021c75176b5d0b9518e599f7bd5a1fb3846a728aa"
+    },
+    {
+      "file": "art/generated/enemies/ws-bellows__nb2.jpg",
+      "category": "enemies",
+      "job": "ws-bellows",
+      "title": "Мех — элита, маг воздуха",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 15",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:54:10+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting.\n\nSubject: 'Bellows', a servant of the Workshop who once fanned the forges. Thin and sinewy, his chest is gathered in folds like a forge bellows; nozzles on his shoulders from which dust keeps trailing. He inflates himself with his hands as if about to blow on the whole world.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1071,
+        "candidatesTokenCount": 1525,
+        "totalTokenCount": 2596,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 555
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.069,
+      "seconds": 11.6,
+      "status": "заменён: выглядел живым стариком, грудь как бинты, а не меха",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "22845ec4e079b7a211a78528a7c7d4ecf6adb6edf8f6351d21915a7ad996d51d"
+    },
+    {
+      "file": "art/generated/enemies/ws-darner__nb2.jpg",
+      "category": "enemies",
+      "job": "ws-darner",
+      "title": "Штопарь — элита, лекарь",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 16",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:54:20+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting.\n\nSubject: 'Darner', a servant of the Workshop who sews up everything that cracked. Long-armed, stooped, in an apron; on one hand long needles instead of fingers. Spools of thread and a small pot of resin on his belt. Forever bending to thread a needle, calmly, even in battle.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1073,
+        "candidatesTokenCount": 1527,
+        "totalTokenCount": 2600,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 557
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.069,
+      "seconds": 10.1,
+      "status": "партия 2, ждёт автора",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "d85a301ca94826ac258365f11d31bfe5bedcafbbfa3d3888ae48c8c3ee7801b8"
+    },
+    {
+      "file": "art/generated/enemies/ws-remover__nb2.jpg",
+      "category": "enemies",
+      "job": "ws-remover",
+      "title": "Съёмщик — элита, снимает силу",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 17",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:54:31+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting.\n\nSubject: 'Remover', a servant of the Workshop who took moulds from finished work. A calm figure in a long apron. In his raised hand he holds an empty mask — someone's face, removed the way a mould is removed from a finished piece. Several more blank masks hang from his belt.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1069,
+        "candidatesTokenCount": 1517,
+        "totalTokenCount": 2586,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 553
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0689,
+      "seconds": 11.1,
+      "status": "заменён: выглядел живым юношей, а не глиной",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "20655b5093dac0a1cb3aa9aeeb60b025b7e81086cbe77c6fe9058c61dcfaee26"
+    },
+    {
+      "file": "art/generated/enemies/ws-first-sketch__nb2.jpg",
+      "category": "enemies",
+      "job": "ws-first-sketch",
+      "title": "Первый набросок — босс Мастерской",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 18",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:54:43+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting.\n\nSubject: 'The First Sketch', the boss of the last step of the Workshop — the very first attempt, begun and abandoned halfway. Huge, three times taller than a man, hunched, made of two halves that do not fit each other: the left half is an elf, the right half a beast — a shoulder in rough clay fur, an arm ending in a clawed paw, a beast's leg. Instead of a face a smooth mask with two hollows. A small foreign hand is stuck onto its side. It is not evil: it has been searching for a very long time for what to finish itself with. Show its scale — it barely fits the frame.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1145,
+        "candidatesTokenCount": 1553,
+        "totalTokenCount": 2698,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 629
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0691,
+      "seconds": 12.0,
+      "status": "заменён: не грозный — автор просил, чтобы босс биома пугал видом",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "45deb41310465b6e8fac4454f5351cf398defbda57a225ad06921cbd7cacbb81"
+    },
+    {
+      "file": "art/generated/enemies/ws-master__nb2.jpg",
+      "category": "enemies",
+      "job": "ws-master",
+      "title": "Мастер — рунный страж Мастерской",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 19",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:54:57+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting.\n\nSubject: 'The Master', guardian of the road down. A tall elf of smooth, almost polished clay, long hair, a calm face, eyes closed. A master's apron, forearms wrapped; on his belt hangs a chisel of white-green stone glowing from within. One hand is raised, palm forward: stop. The only finished creature in the whole Workshop — noticeably more refined than the others.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1090,
+        "candidatesTokenCount": 1560,
+        "totalTokenCount": 2650,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 574
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0691,
+      "seconds": 14.3,
+      "status": "партия 2, ждёт автора",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "32c454efcdb517f9a00a5c0e594f9ee004088b2620e04118c9821e5acce55d83"
+    },
+    {
+      "file": "art/generated/enemies/ws-prop__nb2-v2.jpg",
+      "category": "enemies",
+      "job": "ws-prop",
+      "title": "Упор — элита, держит удар",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 14",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T01:09:32+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting. Every creature is made entirely of clay: a matte clay surface with finger marks, seams and tool strokes; no human skin, no realistic flesh; hair is sculpted clay; eyes are pressed hollows or smooth clay without pupils. They must not look like living people, orcs or goblins.\n\nSubject: 'Prop', a servant of the Workshop that held work in place while the clay set. Broad, squat, immovable, made of grey-green clay, in a clay apron and leg wraps. He holds a thick stone slab IN FRONT of himself like a tower shield, covering his body from chin to knees; only his head, shoulders and clay fingers gripping the edges show above and around it. Carved on the slab is the sign of the Workshop — a simple hourglass outline, not letters and not a rune. A low planted stance, as if nothing could ever move him.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1184,
+        "candidatesTokenCount": 1479,
+        "totalTokenCount": 2663,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 668
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0689,
+      "seconds": 10.6,
+      "status": "партия 2, переделка по замечанию автора, ждёт автора",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "68127b3ab69effcee9ac44d141c2c9c63536a3dae53b74325e6ad9e5233ba721"
+    },
+    {
+      "file": "art/generated/enemies/ws-bellows__nb2-v2.jpg",
+      "category": "enemies",
+      "job": "ws-bellows",
+      "title": "Мех — элита, маг воздуха",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 15",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T01:09:42+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting. Every creature is made entirely of clay: a matte clay surface with finger marks, seams and tool strokes; no human skin, no realistic flesh; hair is sculpted clay; eyes are pressed hollows or smooth clay without pupils. They must not look like living people, orcs or goblins.\n\nSubject: 'Bellows', a servant of the Workshop who once fanned the forges. A thin, sinewy clay body; his whole chest IS a forge bellows — pleated accordion folds of cracked clay between two flat clay boards. Two short nozzles stick out of his shoulders, each trailing a thin stream of dust. He presses the bellows chest with both hands as if about to blow on the whole world; a cloud of dust and sand swirls around him.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1160,
+        "candidatesTokenCount": 1484,
+        "totalTokenCount": 2644,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 644
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0689,
+      "seconds": 9.7,
+      "status": "партия 2, переделка по замечанию автора, ждёт автора",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "8353149b6547ec662318df030839cb7d73f585414e48ebdde8f149efb504e4db"
+    },
+    {
+      "file": "art/generated/enemies/ws-remover__nb2-v2.jpg",
+      "category": "enemies",
+      "job": "ws-remover",
+      "title": "Съёмщик — элита, снимает силу",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 17",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T01:09:53+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting. Every creature is made entirely of clay: a matte clay surface with finger marks, seams and tool strokes; no human skin, no realistic flesh; hair is sculpted clay; eyes are pressed hollows or smooth clay without pupils. They must not look like living people, orcs or goblins.\n\nSubject: 'Remover', a servant of the Workshop who took moulds from finished work. A calm, tall figure of smooth grey clay in a long clay apron down to the ankles; his own face is a quiet clay face with closed, pressed eyes. In his raised hand he holds an empty mask — a hollow clay face with no eyes, taken off like a mould from a finished piece. Three or four more empty masks hang from his belt on cords. An unsettling calm.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1162,
+        "candidatesTokenCount": 1558,
+        "totalTokenCount": 2720,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 646
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0691,
+      "seconds": 10.8,
+      "status": "партия 2, переделка по замечанию автора, ждёт автора",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "9b151b9d1c884248ade1c56f41213138c476162b759b9071ec22027343b0d8d8"
+    },
+    {
+      "file": "art/generated/enemies/ws-first-sketch__nb2-v2.jpg",
+      "category": "enemies",
+      "job": "ws-first-sketch",
+      "title": "Первый набросок — босс Мастерской",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 18",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T01:10:05+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting. Every creature is made entirely of clay: a matte clay surface with finger marks, seams and tool strokes; no human skin, no realistic flesh; hair is sculpted clay; eyes are pressed hollows or smooth clay without pupils. They must not look like living people, orcs or goblins.\n\nSubject: 'The First Sketch', the BOSS of the Workshop of Forms — it must look menacing and overwhelming. A colossal hunched figure three times taller than a man, towering over the viewer from a low camera angle; it fills the whole frame and its head nearly touches the top edge. It is made of two halves that do not fit: the left half a gaunt elf of pale grey clay, the right half a huge beast — a massive shoulder in rough clay fur, a long arm ending in a great clawed paw raised to strike, a heavy beast leg. Instead of a face a smooth blank mask with two dark hollows, lit from below. A small foreign hand is stuck onto its side. Deep cracks run through its clay and thin streams of sand pour out of them. Tiny clay figures and a workbench at its feet show its scale. Not evil — terrifying in size and weight, like a storm about to fall.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1254,
+        "candidatesTokenCount": 1587,
+        "totalTokenCount": 2841,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 738
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0692,
+      "seconds": 12.6,
+      "status": "партия 2, переделка по замечанию автора, ждёт автора",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "a6dd9a7b7d3d81ab5e306191f1d208d9027509eca46cacd4774c67cb0eae8c05"
+    },
+    {
+      "file": "art/generated/enemies/ws-first-sketch__pro.jpg",
+      "category": "enemies",
+      "job": "ws-first-sketch",
+      "title": "Первый набросок — босс Мастерской",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 18",
+      "model": "gemini-3-pro-image",
+      "model_name": "Nano Banana Pro",
+      "date": "2026-09-27T01:10:26+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting. Every creature is made entirely of clay: a matte clay surface with finger marks, seams and tool strokes; no human skin, no realistic flesh; hair is sculpted clay; eyes are pressed hollows or smooth clay without pupils. They must not look like living people, orcs or goblins.\n\nSubject: 'The First Sketch', the BOSS of the Workshop of Forms — it must look menacing and overwhelming. A colossal hunched figure three times taller than a man, towering over the viewer from a low camera angle; it fills the whole frame and its head nearly touches the top edge. It is made of two halves that do not fit: the left half a gaunt elf of pale grey clay, the right half a huge beast — a massive shoulder in rough clay fur, a long arm ending in a great clawed paw raised to strike, a heavy beast leg. Instead of a face a smooth blank mask with two dark hollows, lit from below. A small foreign hand is stuck onto its side. Deep cracks run through its clay and thin streams of sand pour out of them. Tiny clay figures and a workbench at its feet show its scale. Not evil — terrifying in size and weight, like a storm about to fall.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1254,
+        "candidatesTokenCount": 1396,
+        "totalTokenCount": 2903,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 738
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "thoughtsTokenCount": 253,
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1433,
+      "seconds": 19.5,
+      "status": "партия 2, переделка по замечанию автора, ждёт автора",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "e6902e525a0483bef131c38bc7a538d0f43c6b9953a76fc03a375270a75fb496"
     }
   ]
 }

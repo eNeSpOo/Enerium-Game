@@ -1,0 +1,101 @@
+{
+  "name": "Партия 3 (предложение, ждёт «да»): значки эффектов боя",
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.",
+  "negative": "No text, no letters, no numbers, no runes that look like letters, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+  "cutout_rule": "Isolate the subject on a perfectly flat, uniform, solid pure {name} background ({hex}) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use {name} or similar colors anywhere in the subject.",
+  "categories": {
+    "effects": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "magenta",
+      "refs": [
+        "art/generated/effects/fx-ward__nb2.raw.jpg",
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg"
+      ],
+      "frame": "Format: battle status-effect badge shown at 20–28 px over a hero card, same family as the approved 'Ward' badge in the first reference image. A circular medallion about 85% of the canvas: thin forged dark-iron rim with a thin glowing line in the rim — teal (#48E5D4) for a helpful effect, rust red (#DC6A52) for a harmful one — a dark stone disc inside, and one bold simple symbol in the center that stays readable at 20 px. The glow stays inside the medallion. No pink or magenta tint."
+    }
+  },
+  "jobs": [
+    {
+      "id": "fx-stun",
+      "category": "effects",
+      "title": "Оглушение — вредный, контроль",
+      "source": "design/ui/fx.js ICON stun: chain",
+      "subject": "Subject: stun — the target skips its turn. Harmful effect, rust-red rim line. Symbol: a closed heavy chain link with small impact stars."
+    },
+    {
+      "id": "fx-silence",
+      "category": "effects",
+      "title": "Безмолвие — вредный, контроль",
+      "source": "fx.js ICON silence: lock",
+      "subject": "Subject: silence — only basic attacks. Harmful effect, rust-red rim line. Symbol: a small padlock over a spark that has gone out."
+    },
+    {
+      "id": "fx-stop",
+      "category": "effects",
+      "title": "Остановка — вредный, контроль (время)",
+      "source": "fx.js ICON stop: hour; ADR-0010",
+      "subject": "Subject: stop — the target acts last in the round. Harmful effect, rust-red rim line. Symbol: an hourglass with its sand frozen mid-fall, a faint green (#4FDC8B) glint in the sand."
+    },
+    {
+      "id": "fx-weak",
+      "category": "effects",
+      "title": "Ослабление — вредный",
+      "source": "fx.js ICON weak: down",
+      "subject": "Subject: weakness — less damage. Harmful effect, rust-red rim line. Symbol: a cracked sword pointing down."
+    },
+    {
+      "id": "fx-mark",
+      "category": "effects",
+      "title": "Метка — вредный",
+      "source": "fx.js ICON mark",
+      "subject": "Subject: mark — the target takes more damage. Harmful effect, rust-red rim line. Symbol: a painted target ring with a small notch."
+    },
+    {
+      "id": "fx-pierce",
+      "category": "effects",
+      "title": "Пробитие — вредный",
+      "source": "fx.js ICON pierce: crack",
+      "subject": "Subject: pierce — lower physical defense. Harmful effect, rust-red rim line. Symbol: a small shield split by a crack."
+    },
+    {
+      "id": "fx-burn",
+      "category": "effects",
+      "title": "Горение — урон со временем, огонь",
+      "source": "fx.js DOT Огонь: ember",
+      "subject": "Subject: burning — damage every turn. Harmful effect, rust-red rim line. Symbol: a scarlet (#F0564A) ember flame."
+    },
+    {
+      "id": "fx-wither",
+      "category": "effects",
+      "title": "Увядание — урон со временем, тьма",
+      "source": "fx.js DOT Тьма: wisp",
+      "cutout": "green",
+      "subject": "Subject: withering — damage every turn that feeds the caster. Harmful effect, rust-red rim line. Symbol: a lavender (#A986EE) wisp curling out of a withered leaf."
+    },
+    {
+      "id": "fx-cut",
+      "category": "effects",
+      "title": "Порезы — урон со временем, воздух",
+      "source": "fx.js DOT Воздух: cut",
+      "subject": "Subject: cuts — damage every turn. Harmful effect, rust-red rim line. Symbol: three thin parallel slashes of pale white-green wind."
+    },
+    {
+      "id": "fx-regen",
+      "category": "effects",
+      "title": "Сияние — лечение со временем",
+      "source": "fx.js hot",
+      "subject": "Subject: healing over time. Helpful effect, teal rim line. Symbol: a small pale-gold (#F4E6AE) drop of light with a soft radiance inside the disc."
+    },
+    {
+      "id": "fx-immune",
+      "category": "effects",
+      "title": "Иммунитет к контролю",
+      "source": "ADR-0010: иммунитет по рангам; fx.js resist",
+      "subject": "Subject: control immunity — this enemy may shake off stun and silence. Neutral effect, old-gold rim line. Symbol: a broken chain link bouncing off a small gold shield."
+    }
+  ]
+}
