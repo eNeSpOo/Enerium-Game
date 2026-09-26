@@ -1280,6 +1280,1577 @@
         1376
       ],
       "sha256": "e155efcf81a3ca7b895320586355375d6c0d01cc48acb5a72618b1a9491cff0d"
+    },
+    {
+      "file": "art/generated/arenas/arena-workshop-wide__nb2.jpg",
+      "category": "arenas",
+      "job": "arena-workshop-wide",
+      "title": "Арена боя · Мастерская форм, вид сверху, 21:9",
+      "source": "docs/gdd/08-биомы.md §8.5; docs/lore/мастерская-форм-текст.md, с. 2; одобренная вертикальная арена art/generated/arenas/arena-workshop__nb2-v2.jpg",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:36:38+03:00",
+      "params": {
+        "aspectRatio": "21:9",
+        "imageSize": "2K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/arenas/arena-workshop__nb2-v2.jpg",
+        "art/style/ref-03-cave-teal-runes.webp"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective walls, no ceiling, no sky. The battle goes left to right: the heroes stand in the left third, the enemies in the right third, so the whole horizontal middle band — from 12% to 88% of the width and from 20% to 80% of the height — is plain floor only: stone slabs, sand ripples and fine cracks, calm and lower in contrast. No crystals, objects, markings, slots, frames, rectangles, cards, tokens or figures on the playfield. Put the interesting details along the top and bottom edges and in the corners. Even, readable lighting over the playfield. The first reference image is the approved vertical version of this very scene: keep its look, palette and objects, but recompose it into this wide horizontal format.\n\nSubject: the floor of the Workshop of Forms, the first hall under the city of Endalor, where a god once sculpted living beings from clay and abandoned the work halfway. Large worn stone floor slabs with cracks; drifts and still ripples of pale sand. White-green crystals glowing from within grow only in the cracks along the top and bottom edges and in the corners; their cold light spills onto the floor. In the corners: thin streams of sand fall from the unseen vault into small round piles with a faint haze, like hourglasses nobody turns. Along the top and bottom edges: parts of heavy wooden worktables seen from above with unfinished clay works lying on them — a hand without fingers, a face without features, half of a small beast — sculpting chisels, clay-stained cloths, clay pots; the foot of the stone walls with half-formed clay bodies emerging from the stone, made precisely and calmly, unfinished, not grotesque. The hall is cold: near-black stone, white-green crystal light, pale sand. The only warm color is the ochre clay of the unfinished works. No candles, no fire, no warm lamps, no grid, no characters.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1160,
+        "candidatesTokenCount": 2079,
+        "totalTokenCount": 3239,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 644
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1680
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1026,
+      "seconds": 17.1,
+      "status": "партия 1, ждёт автора",
+      "px": [
+        3168,
+        1344
+      ],
+      "sha256": "60794149525df5b359de33b790641f588445fdd82613f6a9e19564af0d84a528"
+    },
+    {
+      "file": "art/generated/enemies/foe-faceless__nb2.jpg",
+      "category": "enemies",
+      "job": "foe-faceless",
+      "title": "Безликий образец — рядовой, сила",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 5; фигура art/enemies/workshop/sample-faceless.png",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:36:49+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/enemies/workshop/sample-faceless.png",
+        "art/generated/heroes/hero-ilmerra__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. The figure fills most of the frame, head and shoulders in the upper third, clear silhouette. The creature must follow the attached character reference exactly: shape, proportions, missing parts, clothing and tools. Render it in the painted style of the attached style reference. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. Light comes from below; the clay is the only warm color in the scene.\n\nSubject: 'Faceless Sample', the first unfinished work anyone meets in the Workshop. An elven figure of grey-green clay in a rough sketch of clothing, with a rope instead of a belt, holding a stone blank of a sword that has no crossguard yet. It has no face at all — only two shallow dents pressed by a thumb where the eyes should be — and still it looks straight at the viewer. Made simply but solidly, calm and honest, unfinished but not ugly.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 954,
+        "candidatesTokenCount": 1504,
+        "totalTokenCount": 2458,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 438
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0688,
+      "seconds": 10.9,
+      "status": "заменён: тёплые красные трещины на фоне, а зал по лору холодный; промт исправлен",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "479a8c76bc035952540bbafee53cd1b2be6961d9cec2c40c2363f4eb0a0ac91c"
+    },
+    {
+      "file": "art/generated/enemies/foe-apprentice__nb2.jpg",
+      "category": "enemies",
+      "job": "foe-apprentice",
+      "title": "Подмастерье — элита, сила",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 12; фигура art/enemies/workshop/servant-apprentice.png",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:36:59+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/enemies/workshop/servant-apprentice.png",
+        "art/generated/heroes/hero-ilmerra__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. The figure fills most of the frame, head and shoulders in the upper third, clear silhouette. The creature must follow the attached character reference exactly: shape, proportions, missing parts, clothing and tools. Render it in the painted style of the attached style reference. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. Light comes from below; the clay is the only warm color in the scene.\n\nSubject: 'Apprentice', a servant of the Workshop who still kneads clay for everyone although there is no one left to knead for. A stocky fellow in an apron over a rough shirt and wide trousers; his arms are covered in clay up to the elbows and twice as thick as they should be, fists like chopping blocks. A simple, almost kind face with two pressed hollows for eyes. Heavy, thorough, silent.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 943,
+        "candidatesTokenCount": 1597,
+        "totalTokenCount": 2540,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 427
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0691,
+      "seconds": 9.9,
+      "status": "партия 1, ждёт автора",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "04ceebe88010f1cbe00af5fb6a33ead1175172be4b77a701032b0fd6f3d06b8b"
+    },
+    {
+      "file": "art/generated/enemies/foe-first-sketch__nb2.jpg",
+      "category": "enemies",
+      "job": "foe-first-sketch",
+      "title": "Первый набросок — босс Мастерской",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 18; фигура art/enemies/workshop/boss-first-sketch.png",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:37:13+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/enemies/workshop/boss-first-sketch.png",
+        "art/generated/heroes/hero-ilmerra__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. The figure fills most of the frame, head and shoulders in the upper third, clear silhouette. The creature must follow the attached character reference exactly: shape, proportions, missing parts, clothing and tools. Render it in the painted style of the attached style reference. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. Light comes from below; the clay is the only warm color in the scene.\n\nSubject: 'The First Sketch', the boss of the last step of the Workshop — the very first attempt, begun and abandoned halfway. Huge, three times taller than a man, hunched, made of two halves that do not fit each other: the left half is an elf, the right half a beast — a shoulder in rough clay fur, an arm ending in a clawed paw, a beast's leg. Instead of a face a smooth mask with two hollows. A small foreign hand is stuck onto its side. It is not evil: it has been searching for a very long time for what to finish itself with. Show its scale — the figure barely fits the frame.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 994,
+        "candidatesTokenCount": 1513,
+        "totalTokenCount": 2507,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 478
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0689,
+      "seconds": 14.5,
+      "status": "партия 1, ждёт автора",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "38ed28fef541b424fd0b4c2c5f0e821fd038f0672377ba43ddbaa7a3c922d150"
+    },
+    {
+      "file": "art/generated/schools/school-air__nb2.png",
+      "category": "schools",
+      "job": "school-air",
+      "title": "Школа Воздуха — Элазиум",
+      "source": "docs/lore/дайджест.md «Боги, стихии, карсты»; токен --air",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:37:22+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: game UI icon of a magic school, square. One emblem centered, about 80% of the canvas: a charged carst crystal that glows from within in the school's color, with a small symbol of the element inside or around it. All seven school icons share the same composition, size, angle and painted material, so they read as one set. Simple strong silhouette readable at 20 px, crisp clean edges, the glow stays inside the silhouette.\n\nSubject: the school of Air. Elazium carst — a crystal of white with a green tint (#DFF4E5), light and translucent; three thin curling wind strokes wrap around it.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 936,
+        "candidatesTokenCount": 1399,
+        "totalTokenCount": 2335,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 420
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0685,
+      "seconds": 9.3,
+      "status": "партия 1, ждёт автора",
+      "raw": "art/generated/schools/school-air__nb2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.773,
+        "opaque_share": 0.19,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "36c023be74380f4b003c9ae59786c7a80aec87469d8601c681ce961b079f7389"
+    },
+    {
+      "file": "art/generated/schools/school-earth__nb2.png",
+      "category": "schools",
+      "job": "school-earth",
+      "title": "Школа Земли — Рубидиум",
+      "source": "docs/lore/дайджест.md; токен --earth",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:37:32+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: game UI icon of a magic school, square. One emblem centered, about 80% of the canvas: a charged carst crystal that glows from within in the school's color, with a small symbol of the element inside or around it. All seven school icons share the same composition, size, angle and painted material, so they read as one set. Simple strong silhouette readable at 20 px, crisp clean edges, the glow stays inside the silhouette.\n\nSubject: the school of Earth. Rubidium carst — an amber-orange crystal (#EB9D40) rising from a rough rock base with a few small roots.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 931,
+        "candidatesTokenCount": 1468,
+        "totalTokenCount": 2399,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 415
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0687,
+      "seconds": 9.5,
+      "status": "заменён: розовый отсвет от пурпурного ключа; промт исправлен",
+      "raw": "art/generated/schools/school-earth__nb2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.66,
+        "opaque_share": 0.297,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "6c5dd2fe9851eca2888609298fcbdf859ea5c86d5dc468aaed82d1e0abeba20e"
+    },
+    {
+      "file": "art/generated/schools/school-fire__nb2.png",
+      "category": "schools",
+      "job": "school-fire",
+      "title": "Школа Огня — Нитриум",
+      "source": "docs/lore/дайджест.md; токен --fire",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:37:43+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: game UI icon of a magic school, square. One emblem centered, about 80% of the canvas: a charged carst crystal that glows from within in the school's color, with a small symbol of the element inside or around it. All seven school icons share the same composition, size, angle and painted material, so they read as one set. Simple strong silhouette readable at 20 px, crisp clean edges, the glow stays inside the silhouette.\n\nSubject: the school of Fire. Nitrium carst — a scarlet crystal (#F0564A) with a living flame burning inside it.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 926,
+        "candidatesTokenCount": 1442,
+        "totalTokenCount": 2368,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 410
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0686,
+      "seconds": 10.1,
+      "status": "партия 1, ждёт автора",
+      "raw": "art/generated/schools/school-fire__nb2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.575,
+        "opaque_share": 0.412,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "d68f432dd133562e8b73dddbaf24e2ea4b8c6c45d3717e617268e28f0548d2c6"
+    },
+    {
+      "file": "art/generated/schools/school-water__nb2.png",
+      "category": "schools",
+      "job": "school-water",
+      "title": "Школа Воды — Паладиум",
+      "source": "docs/lore/дайджест.md; токен --water",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:37:51+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: game UI icon of a magic school, square. One emblem centered, about 80% of the canvas: a charged carst crystal that glows from within in the school's color, with a small symbol of the element inside or around it. All seven school icons share the same composition, size, angle and painted material, so they read as one set. Simple strong silhouette readable at 20 px, crisp clean edges, the glow stays inside the silhouette.\n\nSubject: the school of Water. Paladium carst — a deep blue crystal (#5A94F7) with a drop and a circular ripple glowing inside it.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 930,
+        "candidatesTokenCount": 1411,
+        "totalTokenCount": 2341,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 414
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0685,
+      "seconds": 7.5,
+      "status": "партия 1, ждёт автора",
+      "raw": "art/generated/schools/school-water__nb2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.686,
+        "opaque_share": 0.309,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "258185c6648d4e44d4fe7e88d525996b4aec55edbc137434a0340a5a8c372e10"
+    },
+    {
+      "file": "art/generated/schools/school-time__nb2.png",
+      "category": "schools",
+      "job": "school-time",
+      "title": "Школа Времени — Энериум",
+      "source": "docs/lore/дайджест.md; токен --time",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:38:01+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: game UI icon of a magic school, square. One emblem centered, about 80% of the canvas: a charged carst crystal that glows from within in the school's color, with a small symbol of the element inside or around it. All seven school icons share the same composition, size, angle and painted material, so they read as one set. Simple strong silhouette readable at 20 px, crisp clean edges, the glow stays inside the silhouette.\n\nSubject: the school of Time. Energium carst — a green crystal (#4FDC8B) with a small hourglass silhouette glowing inside it.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 926,
+        "candidatesTokenCount": 1510,
+        "totalTokenCount": 2436,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 410
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0688,
+      "seconds": 9.1,
+      "status": "партия 1, ждёт автора",
+      "raw": "art/generated/schools/school-time__nb2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.629,
+        "opaque_share": 0.317,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "63b07fc936f5b7cc93c0f6e6a2d18397d70113e7a60d93bbf22198cb92eddc8f"
+    },
+    {
+      "file": "art/generated/schools/school-light__nb2.png",
+      "category": "schools",
+      "job": "school-light",
+      "title": "Школа Света — без покровителя",
+      "source": "docs/lore/дайджест.md: Свет и Тьма — стихии без покровителя, запретная школа; токен --light",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:38:11+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: game UI icon of a magic school, square. One emblem centered, about 80% of the canvas: a charged carst crystal that glows from within in the school's color, with a small symbol of the element inside or around it. All seven school icons share the same composition, size, angle and painted material, so they read as one set. Simple strong silhouette readable at 20 px, crisp clean edges, the glow stays inside the silhouette.\n\nSubject: the school of Light — a forbidden school without a god and without a carst. A narrow crystal-shaped shard of pure pale-gold light (#F4E6AE) radiating thin rays; no stone base.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 941,
+        "candidatesTokenCount": 1444,
+        "totalTokenCount": 2385,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 425
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0686,
+      "seconds": 9.2,
+      "status": "заменён: розовые лучи от пурпурного ключа; промт исправлен",
+      "raw": "art/generated/schools/school-light__nb2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.827,
+        "opaque_share": 0.103,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "2e217439619983921615f19449d8dbcc63671ab175bb7105ac5bc88f769a55e2"
+    },
+    {
+      "file": "art/generated/schools/school-dark__nb2.png",
+      "category": "schools",
+      "job": "school-dark",
+      "title": "Школа Тьмы — без покровителя",
+      "source": "docs/lore/дайджест.md; токен --dark",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:38:21+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: game UI icon of a magic school, square. One emblem centered, about 80% of the canvas: a charged carst crystal that glows from within in the school's color, with a small symbol of the element inside or around it. All seven school icons share the same composition, size, angle and painted material, so they read as one set. Simple strong silhouette readable at 20 px, crisp clean edges, the glow stays inside the silhouette.\n\nSubject: the school of Darkness — a forbidden school without a god and without a carst. A crystal-shaped shard of deep night with a soft lavender rim light (#A986EE) and a thin crescent of shadow curling around it.\n\nIsolate the subject on a perfectly flat, uniform, solid pure green background (#00FF00) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use green or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 946,
+        "candidatesTokenCount": 1454,
+        "totalTokenCount": 2400,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 430
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0687,
+      "seconds": 10.5,
+      "status": "партия 1, ждёт автора",
+      "raw": "art/generated/schools/school-dark__nb2.raw.jpg",
+      "cutout": {
+        "key": "green",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.669,
+        "opaque_share": 0.292,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "c2e425dd446601e0286f0f4f98945895049e9c55c9dddfe55e768ef8c30b97fd"
+    },
+    {
+      "file": "art/generated/classes/class-tank__nb2.png",
+      "category": "classes",
+      "job": "class-tank",
+      "title": "Класс: танк",
+      "source": "docs/content/герои/герои.csv, классы; ADR-0004",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:38:31+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: game UI icon of a hero class, square. One emblem centered, about 80% of the canvas, made of dark forged iron with worn old-gold edges and a faint warm glow from below; neutral, no element colors. All seven class icons share the same material, size and angle, so they read as one set. Simple bold silhouette readable at 20 px, crisp clean edges.\n\nSubject: the Tank class. A heavy tower shield with a riveted rim, seen from the front.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 903,
+        "candidatesTokenCount": 1383,
+        "totalTokenCount": 2286,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 387
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0684,
+      "seconds": 8.8,
+      "status": "заменён: без подложки — набор классов разнобойный; промт исправлен",
+      "raw": "art/generated/classes/class-tank__nb2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.487,
+        "opaque_share": 0.503,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 0.999,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "73a7f52e93158d49a1306b1b3dc4d0acb0a48f856eeb94784081703d0eadd419"
+    },
+    {
+      "file": "art/generated/classes/class-str__nb2.png",
+      "category": "classes",
+      "job": "class-str",
+      "title": "Класс: физ ДД силы",
+      "source": "docs/content/герои/герои.csv; ADR-0004",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:38:41+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: game UI icon of a hero class, square. One emblem centered, about 80% of the canvas, made of dark forged iron with worn old-gold edges and a faint warm glow from below; neutral, no element colors. All seven class icons share the same material, size and angle, so they read as one set. Simple bold silhouette readable at 20 px, crisp clean edges.\n\nSubject: the strength damage dealer class. A heavy two-handed war axe, blade up, seen from the front.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 906,
+        "candidatesTokenCount": 1420,
+        "totalTokenCount": 2326,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 390
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0686,
+      "seconds": 9.4,
+      "status": "заменён: без подложки и с розовым лучом от ключа; промт исправлен",
+      "raw": "art/generated/classes/class-str__nb2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.443,
+        "opaque_share": 0.455,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 0.846,
+        "ok": false,
+        "why": "фон исходника не ровный ключ — возможно, нарисована шахматка"
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "d1ad32d02901c029aad99e72a5c6a7d53151aab2f810d0fda79596f067854784"
+    },
+    {
+      "file": "art/generated/classes/class-agi__nb2.png",
+      "category": "classes",
+      "job": "class-agi",
+      "title": "Класс: физ ДД ловкости",
+      "source": "docs/content/герои/герои.csv; ADR-0004",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:38:51+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: game UI icon of a hero class, square. One emblem centered, about 80% of the canvas, made of dark forged iron with worn old-gold edges and a faint warm glow from below; neutral, no element colors. All seven class icons share the same material, size and angle, so they read as one set. Simple bold silhouette readable at 20 px, crisp clean edges.\n\nSubject: the agility damage dealer class. A drawn short bow with an arrow nocked, the arrow pointing up and to the right.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 909,
+        "candidatesTokenCount": 1421,
+        "totalTokenCount": 2330,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 393
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0686,
+      "seconds": 8.9,
+      "status": "заменён: без подложки — набор разнобойный; промт исправлен",
+      "raw": "art/generated/classes/class-agi__nb2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.747,
+        "opaque_share": 0.244,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "64c573d42409137059eef174fc23b78efdfe017a15df733b4fd6f8bc07503c8e"
+    },
+    {
+      "file": "art/generated/classes/class-mage__nb2.png",
+      "category": "classes",
+      "job": "class-mage",
+      "title": "Класс: маг ДД",
+      "source": "docs/content/герои/герои.csv; ADR-0004",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:39:01+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: game UI icon of a hero class, square. One emblem centered, about 80% of the canvas, made of dark forged iron with worn old-gold edges and a faint warm glow from below; neutral, no element colors. All seven class icons share the same material, size and angle, so they read as one set. Simple bold silhouette readable at 20 px, crisp clean edges.\n\nSubject: the magic damage dealer class. A short staff topped with a floating crystal shard and a small spark above it.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 906,
+        "candidatesTokenCount": 1537,
+        "totalTokenCount": 2443,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 390
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0689,
+      "seconds": 10.0,
+      "status": "партия 1, ждёт автора",
+      "raw": "art/generated/classes/class-mage__nb2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.419,
+        "opaque_share": 0.57,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "883a6d059c3e4dab34cb093ed15fca9d7c98e4d99c3dec643f8db05b8c46531d"
+    },
+    {
+      "file": "art/generated/classes/class-healer__nb2.png",
+      "category": "classes",
+      "job": "class-healer",
+      "title": "Класс: лекарь",
+      "source": "docs/content/герои/герои.csv; ADR-0004",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:39:12+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: game UI icon of a hero class, square. One emblem centered, about 80% of the canvas, made of dark forged iron with worn old-gold edges and a faint warm glow from below; neutral, no element colors. All seven class icons share the same material, size and angle, so they read as one set. Simple bold silhouette readable at 20 px, crisp clean edges.\n\nSubject: the healer class. An open palm facing up with a small drop of light floating above it.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 903,
+        "candidatesTokenCount": 1479,
+        "totalTokenCount": 2382,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 387
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0687,
+      "seconds": 9.6,
+      "status": "партия 1, ждёт автора",
+      "raw": "art/generated/classes/class-healer__nb2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.42,
+        "opaque_share": 0.57,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "46b7c0a62992bd1d9872e7f66db7f2ae436ae685a02708b0ffdb1e6b9a4c7a8c"
+    },
+    {
+      "file": "art/generated/classes/class-debuffer__nb2.png",
+      "category": "classes",
+      "job": "class-debuffer",
+      "title": "Класс: дебаффер",
+      "source": "docs/content/герои/герои.csv; ADR-0004",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:39:23+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: game UI icon of a hero class, square. One emblem centered, about 80% of the canvas, made of dark forged iron with worn old-gold edges and a faint warm glow from below; neutral, no element colors. All seven class icons share the same material, size and angle, so they read as one set. Simple bold silhouette readable at 20 px, crisp clean edges.\n\nSubject: the debuffer class — weakens and binds. A short broken chain with one cracked link in the middle.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 905,
+        "candidatesTokenCount": 1505,
+        "totalTokenCount": 2410,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 389
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0688,
+      "seconds": 9.8,
+      "status": "заменён: в круглой рамке — набор разнобойный; промт исправлен",
+      "raw": "art/generated/classes/class-debuffer__nb2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.477,
+        "opaque_share": 0.511,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "d12a083ce52ab1ab078442c3ee20674f2e184c2c69c024f1f9b0a605aa9b2cf7"
+    },
+    {
+      "file": "art/generated/classes/class-farmer__nb2.png",
+      "category": "classes",
+      "job": "class-farmer",
+      "title": "Класс: фармящий",
+      "source": "docs/content/герои/герои.csv; «фармящий класс» — фарм-пассивки поднимают добычу отряда",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:39:33+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: game UI icon of a hero class, square. One emblem centered, about 80% of the canvas, made of dark forged iron with worn old-gold edges and a faint warm glow from below; neutral, no element colors. All seven class icons share the same material, size and angle, so they read as one set. Simple bold silhouette readable at 20 px, crisp clean edges.\n\nSubject: the gatherer class, whose passives raise the squad's loot. A small sack of goods tied with a rope, a single old coin leaning against it.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 917,
+        "candidatesTokenCount": 1450,
+        "totalTokenCount": 2367,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 401
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0686,
+      "seconds": 9.9,
+      "status": "партия 1, ждёт автора",
+      "raw": "art/generated/classes/class-farmer__nb2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.454,
+        "opaque_share": 0.536,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "c766c1b8fea44f3ac8cf52ee485f8661e8e6cc945f894dd81098f5cd0c43a6ee"
+    },
+    {
+      "file": "art/generated/enemies/foe-faceless__nb2-v2.jpg",
+      "category": "enemies",
+      "job": "foe-faceless",
+      "title": "Безликий образец — рядовой, сила",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 5; фигура art/enemies/workshop/sample-faceless.png",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:42:15+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/enemies/workshop/sample-faceless.png",
+        "art/generated/heroes/hero-ilmerra__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. The figure fills most of the frame, head and shoulders in the upper third, clear silhouette. The creature must follow the attached character reference exactly: shape, proportions, missing parts, clothing and tools. Render it in the painted style of the attached style reference. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. Light comes from below; the clay is the only warm color in the scene.\n\nSubject: 'Faceless Sample', the first unfinished work anyone meets in the Workshop. An elven figure of grey-green clay in a rough sketch of clothing, with a rope instead of a belt, holding a stone blank of a sword that has no crossguard yet. It has no face at all — only two shallow dents pressed by a thumb where the eyes should be — and still it looks straight at the viewer. Made simply but solidly, calm and honest, unfinished but not ugly. The whole scene is lit only by cold white-green crystal light from below; no red, orange or warm light in the background — the grey-green clay of the figure is the only warm-ish tone.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "I have generated the card portrait for the 'Faceless Sample' as you requested. The illustration accurately depicts the unfinished elven figure with grey-green clay, ensuring its unique faceless features and rough attire are preserved. I've strictly adhered to your lighting instructions, placing strong cold white-green light sources from below to create a dark-fantasy atmosphere while making the figure's grey-green form the only warm element in the scene. I have also confirmed there are no text, UI elements, or borders.",
+      "usage": {
+        "promptTokenCount": 997,
+        "candidatesTokenCount": 1597,
+        "totalTokenCount": 2594,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 481
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0691,
+      "seconds": 9.7,
+      "status": "партия 1, ждёт автора",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "681d75f4006d4fae050983f02dc7a87a6764388e7b1c819cd1b585569b24d6b3"
+    },
+    {
+      "file": "art/generated/schools/school-earth__nb2-v2.png",
+      "category": "schools",
+      "job": "school-earth",
+      "title": "Школа Земли — Рубидиум",
+      "source": "docs/lore/дайджест.md; токен --earth",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:42:25+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: game UI icon of a magic school, square. One emblem centered, about 80% of the canvas: a charged carst crystal that glows from within in the school's color, with a small symbol of the element inside or around it. All seven school icons share the same composition, size, angle and painted material, so they read as one set. Simple strong silhouette readable at 20 px, crisp clean edges, the glow stays inside the silhouette. No light rays, no halo and no glow outside the crystal: the crystal ends with a crisp dark outline, and any glow stays inside it. No pink or magenta tint anywhere.\n\nSubject: the school of Earth. Rubidium carst — an amber-orange crystal (#EB9D40) rising from a rough rock base with a few small roots.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 967,
+        "candidatesTokenCount": 1509,
+        "totalTokenCount": 2476,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 451
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0689,
+      "seconds": 10.2,
+      "status": "партия 1, ждёт автора",
+      "raw": "art/generated/schools/school-earth__nb2-v2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.679,
+        "opaque_share": 0.299,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "04415afe6035bbbe78ea1c850b0d906483ef6e9af52b75f4ef965fc4a77d90ad"
+    },
+    {
+      "file": "art/generated/schools/school-light__nb2-v2.png",
+      "category": "schools",
+      "job": "school-light",
+      "title": "Школа Света — без покровителя",
+      "source": "docs/lore/дайджест.md: Свет и Тьма — стихии без покровителя, запретная школа; токен --light",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:42:35+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: game UI icon of a magic school, square. One emblem centered, about 80% of the canvas: a charged carst crystal that glows from within in the school's color, with a small symbol of the element inside or around it. All seven school icons share the same composition, size, angle and painted material, so they read as one set. Simple strong silhouette readable at 20 px, crisp clean edges, the glow stays inside the silhouette. No light rays, no halo and no glow outside the crystal: the crystal ends with a crisp dark outline, and any glow stays inside it. No pink or magenta tint anywhere.\n\nSubject: the school of Light — a forbidden school without a god and without a carst. A narrow crystal-shaped shard of pure pale-gold light (#F4E6AE) radiating thin rays; no stone base.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 977,
+        "candidatesTokenCount": 1480,
+        "totalTokenCount": 2457,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 461
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0688,
+      "seconds": 9.4,
+      "status": "партия 1, ждёт автора",
+      "raw": "art/generated/schools/school-light__nb2-v2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.756,
+        "opaque_share": 0.175,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "d042f99186f87afcd0b06e72e9ca497c5c28b38329f271ba2119399f2007c3e1"
+    },
+    {
+      "file": "art/generated/classes/class-tank__nb2-v2.png",
+      "category": "classes",
+      "job": "class-tank",
+      "title": "Класс: танк",
+      "source": "docs/content/герои/герои.csv, классы; ADR-0004",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:42:45+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: game UI icon of a hero class, square. Every class icon sits on the same thick rounded-hexagon tablet of dark basalt with a bevelled rim of worn old gold, exactly like the Rune of Valor icon in the first reference image; the class symbol is carved and raised on the tablet in dark forged iron with old-gold edges. The tablet fills about 85% of the canvas. Neutral colors, no element colors, no pink, no light beams, no glow outside the tablet. All seven class icons share this tablet, size and angle, so they read as one set. Simple bold symbol readable at 20 px.\n\nSubject: the Tank class. A heavy tower shield with a riveted rim, seen from the front.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 950,
+        "candidatesTokenCount": 1511,
+        "totalTokenCount": 2461,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 434
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0688,
+      "seconds": 9.4,
+      "status": "партия 1, ждёт автора",
+      "raw": "art/generated/classes/class-tank__nb2-v2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.419,
+        "opaque_share": 0.57,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "1fbc3f9c3f694694464068fde40e812df3bd1699ec9f402e613cacc1640d0783"
+    },
+    {
+      "file": "art/generated/classes/class-str__nb2-v2.png",
+      "category": "classes",
+      "job": "class-str",
+      "title": "Класс: физ ДД силы",
+      "source": "docs/content/герои/герои.csv; ADR-0004",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:42:55+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: game UI icon of a hero class, square. Every class icon sits on the same thick rounded-hexagon tablet of dark basalt with a bevelled rim of worn old gold, exactly like the Rune of Valor icon in the first reference image; the class symbol is carved and raised on the tablet in dark forged iron with old-gold edges. The tablet fills about 85% of the canvas. Neutral colors, no element colors, no pink, no light beams, no glow outside the tablet. All seven class icons share this tablet, size and angle, so they read as one set. Simple bold symbol readable at 20 px.\n\nSubject: the strength damage dealer class. A heavy two-handed war axe, blade up, seen from the front.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 953,
+        "candidatesTokenCount": 1411,
+        "totalTokenCount": 2364,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 437
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0685,
+      "seconds": 9.1,
+      "status": "партия 1, ждёт автора",
+      "raw": "art/generated/classes/class-str__nb2-v2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.419,
+        "opaque_share": 0.57,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "4de004f3dea31752a6691e4059c9c7426d81ef2616d9407fbebce094ebb31883"
+    },
+    {
+      "file": "art/generated/classes/class-agi__nb2-v2.png",
+      "category": "classes",
+      "job": "class-agi",
+      "title": "Класс: физ ДД ловкости",
+      "source": "docs/content/герои/герои.csv; ADR-0004",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:43:05+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: game UI icon of a hero class, square. Every class icon sits on the same thick rounded-hexagon tablet of dark basalt with a bevelled rim of worn old gold, exactly like the Rune of Valor icon in the first reference image; the class symbol is carved and raised on the tablet in dark forged iron with old-gold edges. The tablet fills about 85% of the canvas. Neutral colors, no element colors, no pink, no light beams, no glow outside the tablet. All seven class icons share this tablet, size and angle, so they read as one set. Simple bold symbol readable at 20 px.\n\nSubject: the agility damage dealer class. A drawn short bow with an arrow nocked, the arrow pointing up and to the right.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 956,
+        "candidatesTokenCount": 1431,
+        "totalTokenCount": 2387,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 440
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0686,
+      "seconds": 9.7,
+      "status": "партия 1, ждёт автора",
+      "raw": "art/generated/classes/class-agi__nb2-v2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.419,
+        "opaque_share": 0.57,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "62e3089cd6712fb31b606abd31a705e3db6b79f0ffa18e6a5f2984c1e6f3e183"
+    },
+    {
+      "file": "art/generated/classes/class-debuffer__nb2-v2.png",
+      "category": "classes",
+      "job": "class-debuffer",
+      "title": "Класс: дебаффер",
+      "source": "docs/content/герои/герои.csv; ADR-0004",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T00:43:15+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.\n\nFormat: game UI icon of a hero class, square. Every class icon sits on the same thick rounded-hexagon tablet of dark basalt with a bevelled rim of worn old gold, exactly like the Rune of Valor icon in the first reference image; the class symbol is carved and raised on the tablet in dark forged iron with old-gold edges. The tablet fills about 85% of the canvas. Neutral colors, no element colors, no pink, no light beams, no glow outside the tablet. All seven class icons share this tablet, size and angle, so they read as one set. Simple bold symbol readable at 20 px.\n\nSubject: the debuffer class — weakens and binds. A short broken chain with one cracked link in the middle.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 952,
+        "candidatesTokenCount": 1447,
+        "totalTokenCount": 2399,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 436
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0687,
+      "seconds": 9.6,
+      "status": "партия 1, ждёт автора",
+      "raw": "art/generated/classes/class-debuffer__nb2-v2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.419,
+        "opaque_share": 0.57,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "e2cf7d67a6c1509104e062247922e2f70a75fc1f6d8094e4798031dfe0e41083"
     }
   ]
 }

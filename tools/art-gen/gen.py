@@ -12,6 +12,7 @@ import argparse
 import base64
 import datetime
 import hashlib
+import io
 import json
 import os
 import pathlib
@@ -78,12 +79,26 @@ def fit_size(size, model):
     return smaller[-1] if smaller else sizes[0]
 
 
+def ref_bytes(p):
+    """Референс для модели. Прозрачный PNG кладём на тёмную подложку: иначе модель видит фигуру на пустоте."""
+    if p.suffix.lower() != ".png":
+        return p.read_bytes(), MIME[p.suffix.lower()]
+    with Image.open(p) as im:
+        if im.mode not in ("RGBA", "LA", "P"):
+            return p.read_bytes(), "image/png"
+        im = im.convert("RGBA")
+        bg = Image.new("RGBA", im.size, (40, 42, 46, 255))
+        bg.alpha_composite(im)
+        buf = io.BytesIO()
+        bg.convert("RGB").save(buf, "PNG")
+        return buf.getvalue(), "image/png"
+
+
 def call(key, model_id, prompt, refs, aspect, size):
     parts = [{"text": prompt}]
     for ref in refs:
-        p = ROOT / ref
-        parts.append({"inline_data": {"mime_type": MIME[p.suffix.lower()],
-                                      "data": base64.b64encode(p.read_bytes()).decode("ascii")}})
+        data, mime = ref_bytes(ROOT / ref)
+        parts.append({"inline_data": {"mime_type": mime, "data": base64.b64encode(data).decode("ascii")}})
     body = {
         "contents": [{"role": "user", "parts": parts}],
         "generationConfig": {

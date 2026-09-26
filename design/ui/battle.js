@@ -8,14 +8,16 @@
    та же карта снова не ходит. Бой — сценарий, который сервер считает целиком заранее.
    Биом — испытание на истощение: здоровье и павшие переходят с этажа на этаж. Сид — сам биом.
 
-   Вторая модель для сравнения — «10 раундов» (ADR-0008, открытый вопрос автора), режим 'rounds':
+   Основная модель — «10 раундов» (ADR-0010), режим 'rounds'. Прежняя модель темпа ADR-0007 ('tempo') оставлена для справки:
    - в раунде каждая живая карта ходит один раз, по убыванию скорости; равную скорость решает
      бросок генератора, один на карту в начале боя;
    - в свой ход карта делает один бросок против таблицы шансов: способность, ульта или обычная атака.
      Ни цены в атаках, ни ротации, ни зарядки ульты;
    - длительность эффектов — в ходах носителя, то есть в раундах;
    - после последнего раунда «песок вышел»: этаж не взят, как при пределе времени в основной модели.
-   Числа модели — в RULES.rounds и в поле r каждой способности. Режим по умолчанию — 'tempo' (ADR-0007).
+   Числа модели — в RULES.rounds и в поле r каждой способности. Режим по умолчанию — 'rounds'.
+   Иммунитет к контролю — по рангу карты (RULES.resist, ADR-0010). Рунный страж — пять карт: страж и четыре элиты.
+   Добыча этажа считается здесь же (floorLoot): её решает сервер, шанс ресурса — отдельный поток генератора.
 
    Инварианты ядра соблюдены и в прототипе:
    - только целые числа: время в мс, доли — в процентах или базисных пунктах (10 000 = 100 %);
@@ -40,7 +42,7 @@ const RULES = {
     'Босс': { thr: 150, main: 'str', fx: 'melee' }, 'Страж': { thr: 150, main: 'str', fx: 'melee' },
   },
   threat: { base: 100, dealt: 100, taken: 50, heal: 150, cast: 30, ult: 150, switchPct: 120, decayPct: 97, tauntPct: 130, tauntAdd: 50 },
-  resist: { boss: 2500, guard: 5000 },  // сопротивление контролю, б. п. (§5.4)
+  resist: { rune: 2500, uber: 5000, forgotten: 7500, clan: 10000 },  // иммунитет к контролю по рангу, б. п. (ADR-0010); рядовой, элита и босс биома — 0
   ultAfter: 3, ultChargeDiv: 2,         // §5.1: три применения, затем зарядка = сумма цен / 2
   shieldCapPct: 100,                    // щит не больше здоровья
   foeLvl: { base: 20, perFloor: 1 },    // уровень карт врага растёт с этажом
@@ -54,32 +56,40 @@ const RULES = {
     gapMs: 700,                         // надпись «Раунд N» между раундами, мс
     foeHpPct: 60,                       // здоровье врагов в этой модели: за 10 раундов каждая карта ходит только 10 раз
   },
+  drop: {                               // добыча по рангу убитой карты (§9.1, ADR-0010); золото и дух — до пересчёта экономики
+    o: { gold: 20, spirit: 10 },
+    e: { gold: 100, spirit: 50, souls: 1, keys: 1 },            // элита: душа и ключ ремесла своего биома
+    b: { gold: 500, spirit: 250, souls: 5, uniqueBp: 500 },     // босс биома: шанс уникального ресурса
+    rune: { souls: 0 },                                         // рунный страж: руны пределов — отдельно (§11)
+    basePerFloorBp: 1000,               // шанс базового ресурса за взятый этаж; артефакты прибавляют свои б. п.
+  },
 };
 
 /* ================== библиотека способностей ==================
    Каждая способность — набор примитивов: kind (что делает), tgt (правило цели), stat и coef
    (база = характеристика × coef / 100), price (цена в обычных атаках), st/left/pow (эффект).
    school: «класс» — немагический приём класса, иначе стихия школы.
-   r — модель «10 раундов»: ch — шанс сработать в ход карты, б. п.; left — длительность эффекта в раундах. */
+   r — модель «10 раундов»: ch — шанс сработать в ход карты, б. п.; left — длительность эффекта в раундах.
+   Описания d — для основной модели «10 раундов»; price и left без r — прежняя модель темпа. */
 const LIB = {
   // --- герои: общие приёмы классов
   'Вызов': { school: 'класс', kind: 'taunt', tgt: 'all', price: 3, r: { ch: 2500 }, d: 'Все враги переключаются на стража: угроза выше лучшей на 30%.' },
-  'Удар щитом': { school: 'класс', kind: 'dmg', stat: 'str', coef: 160, tgt: 'threat', then: { st: 'stun', left: 2 }, price: 4, r: { ch: 2000, left: 1 }, d: 'Урон силой и оглушение на 2 атаки цели.' },
+  'Удар щитом': { school: 'класс', kind: 'dmg', stat: 'str', coef: 160, tgt: 'threat', then: { st: 'stun', left: 2 }, price: 4, r: { ch: 2000, left: 1 }, d: 'Урон силой и оглушение: цель пропускает свой ход.' },
   'Быстрый выпад': { school: 'класс', kind: 'dmg', stat: 'str', coef: 150, tgt: 'threat', price: 2, r: { ch: 3000 }, d: 'Короткий удар силой.' },
   'Разряд': { school: 'класс', kind: 'dmg', stat: 'int', coef: 250, tgt: 'lowest', price: 3, r: { ch: 2500 }, d: 'Урон интеллектом по самому раненому врагу.' },
   'Живая вода': { school: 'класс', kind: 'heal', stat: 'int', coef: 250, tgt: 'ally_lowest', price: 3, r: { ch: 3000 }, d: 'Лечит самого раненого героя.' },
   'Оберег': { school: 'класс', kind: 'shield', stat: 'int', coef: 100, tgt: 'allies', price: 4, r: { ch: 2000 }, d: 'Щит всему отряду, тратится первым.' },
-  'Оковы': { school: 'класс', kind: 'ctrl', st: 'stun', left: 2, tgt: 'danger', price: 4, r: { ch: 2000, left: 1 }, d: 'Оглушение на 2 атаки самому готовому к способности врагу. Боссы сопротивляются.' },
-  'Ослабление': { school: 'класс', kind: 'debuff', st: 'weak', pow: 2500, left: 5, tgt: 'threat', price: 3, r: { ch: 2500, left: 3 }, d: '−25% урона цели на 5 её атак.' },
+  'Оковы': { school: 'класс', kind: 'ctrl', st: 'stun', left: 2, tgt: 'danger', price: 4, r: { ch: 2000, left: 1 }, d: 'Оглушение на раунд тому врагу, кто ходит раньше всех из ещё не ходивших. У рунных и старших боссов — иммунитет по рангу.' },
+  'Ослабление': { school: 'класс', kind: 'debuff', st: 'weak', pow: 2500, left: 5, tgt: 'threat', price: 3, r: { ch: 2500, left: 3 }, d: '−25% урона цели на 3 раунда.' },
   // --- герои: школы стихий
-  'Осыпание': { school: 'Земля', kind: 'debuff', st: 'pierce', pow: 3000, left: 4, tgt: 'threat', price: 3, r: { ch: 2500, left: 3 }, d: '−30% физ. защиты цели на 4 её атаки: открывает цель ударам силы.' },
-  'Горение': { school: 'Огонь', kind: 'dot', stat: 'str', coef: 40, max: 3, left: 5, tgt: 'threat', price: 3, r: { ch: 3000, left: 3 }, d: 'Поджог: урон каждую атаку цели, до 3 стаков на 5 атак.' },
+  'Осыпание': { school: 'Земля', kind: 'debuff', st: 'pierce', pow: 3000, left: 4, tgt: 'threat', price: 3, r: { ch: 2500, left: 3 }, d: '−30% физ. защиты цели на 3 раунда: открывает цель ударам силы.' },
+  'Горение': { school: 'Огонь', kind: 'dot', stat: 'str', coef: 40, max: 3, left: 5, tgt: 'threat', price: 3, r: { ch: 3000, left: 3 }, d: 'Поджог: урон в каждый ход цели, до 3 стаков на 3 раунда.' },
   'Погребальный костёр': { school: 'Огонь', kind: 'dmg', stat: 'str', coef: 300, per: { kind: 'dot', school: 'Огонь', pct: 25 }, tgt: 'threat', price: 5, r: { ch: 1500 }, d: 'Мощный удар: +25% за каждый стак горения на цели.' },
-  'Остановка': { school: 'Время', kind: 'ctrl', st: 'stop', left: 2, tgt: 'danger', price: 4, r: { ch: 2000, left: 2 }, d: 'Цель теряет накопленные атаки и 2 атаки их не копит.' },
-  'Сияние': { school: 'Свет', kind: 'hot', stat: 'int', coef: 35, max: 3, left: 5, over: true, tgt: 'ally_lowest', price: 3, r: { ch: 2500, left: 3 }, d: 'Лечит цель каждую её атаку; лишнее становится щитом.' },
-  'Увядание': { school: 'Тьма', kind: 'dot', stat: 'int', coef: 40, max: 3, left: 5, drain: 1000, tgt: 'threat', price: 3, r: { ch: 2500, left: 3 }, d: 'Урон каждую атаку цели; 10% урона лечат наложившего.' },
+  'Остановка': { school: 'Время', kind: 'ctrl', st: 'stop', left: 2, tgt: 'danger', price: 4, r: { ch: 2000, left: 2 }, d: 'Цель ходит последней в раунде два раунда подряд.' },
+  'Сияние': { school: 'Свет', kind: 'hot', stat: 'int', coef: 35, max: 3, left: 5, over: true, tgt: 'ally_lowest', price: 3, r: { ch: 2500, left: 3 }, d: 'Лечит цель в каждый её ход 3 раунда; лишнее становится щитом.' },
+  'Увядание': { school: 'Тьма', kind: 'dot', stat: 'int', coef: 40, max: 3, left: 5, drain: 1000, tgt: 'threat', price: 3, r: { ch: 2500, left: 3 }, d: 'Урон в каждый ход цели 3 раунда; 10% урона лечат наложившего.' },
   // --- ульты героев
-  'Долгая ночь': { school: 'Тьма', kind: 'ctrl', st: 'silence', left: 3, tgt: 'all', ult: true, r: { ch: 800, left: 2 }, d: 'Безмолвие всем врагам на 3 их атаки. Боссы сопротивляются.' },
+  'Долгая ночь': { school: 'Тьма', kind: 'ctrl', st: 'silence', left: 3, tgt: 'all', ult: true, r: { ch: 800, left: 2 }, d: 'Безмолвие всем врагам на 2 раунда: только обычная атака. У рунных и старших боссов — иммунитет по рангу.' },
   'Испепеление': { school: 'Время', kind: 'dmg', stat: 'int', coef: 400, tgt: 'threat', ult: true, r: { ch: 800 }, d: 'Крупный урон одной цели.' },
   // --- враги Мастерской форм: та же библиотека
   'Каменный осколок': { school: 'Земля', kind: 'dmg', stat: 'str', coef: 150, tgt: 'threat', price: 2, r: { ch: 3000 }, d: 'Быстрый удар.' },
@@ -89,19 +99,22 @@ const LIB = {
   'Замазка': { school: 'Земля', kind: 'heal', stat: 'int', coef: 220, tgt: 'ally_lowest', price: 3, r: { ch: 2500 }, d: 'Лечит самого раненого из своих.' },
   'Удар в спину': { school: 'класс', kind: 'dmg', stat: 'str', coef: 190, tgt: 'healer', price: 2, r: { ch: 3000 }, d: 'Сразу идёт к лекарю отряда.' },
   'Замес': { school: 'Земля', kind: 'dmg', stat: 'str', coef: 240, tgt: 'threat', price: 3, r: { ch: 2500 }, d: 'Тяжёлый удар.' },
-  'Тяжёлая рука': { school: 'класс', kind: 'debuff', st: 'weak', pow: 2000, left: 4, tgt: 'threat', price: 4, r: { ch: 2000, left: 2 }, d: '−20% урона цели на 4 её атаки.' },
+  'Тяжёлая рука': { school: 'класс', kind: 'debuff', st: 'weak', pow: 2000, left: 4, tgt: 'threat', price: 4, r: { ch: 2000, left: 2 }, d: '−20% урона цели на 2 раунда.' },
   'Подрез': { school: 'Воздух', kind: 'dot', stat: 'str', coef: 30, max: 4, left: 4, tgt: 'lowest', price: 3, r: { ch: 2500, left: 3 }, d: 'Порезы по самому раненому, до 4 стаков.' },
   'Снять лишнее': { school: 'класс', kind: 'dmg', stat: 'str', coef: 220, tgt: 'lowest', price: 3, r: { ch: 2500 }, d: 'Добивает самого раненого.' },
   'Плита': { school: 'Земля', kind: 'shield', stat: 'str', coef: 150, tgt: 'allies', price: 4, r: { ch: 2000 }, d: 'Щит всем своим.' },
   'Меха': { school: 'Воздух', kind: 'dmg', stat: 'int', coef: 80, tgt: 'all', price: 3, r: { ch: 2500 }, d: 'Порыв по всему отряду.' },
-  'Сквозняк': { school: 'Воздух', kind: 'ctrl', st: 'stop', left: 2, tgt: 'danger', price: 4, r: { ch: 2000, left: 1 }, d: 'Сбивает накопленные атаки у самого готового героя.' },
+  'Сквозняк': { school: 'Воздух', kind: 'ctrl', st: 'stop', left: 2, tgt: 'danger', price: 4, r: { ch: 2000, left: 1 }, d: 'Самый готовый герой ходит последним в раунде.' },
   'Заплата': { school: 'Земля', kind: 'heal', stat: 'int', coef: 240, tgt: 'ally_lowest', price: 2, r: { ch: 3000 }, d: 'Быстро латает самого раненого.' },
   'Шов': { school: 'Земля', kind: 'heal', stat: 'int', coef: 120, tgt: 'allies', price: 4, r: { ch: 2000 }, d: 'Лечит всех своих.' },
-  'Съём': { school: 'класс', kind: 'debuff', st: 'mark', pow: 2000, left: 5, tgt: 'threat', price: 3, r: { ch: 2500, left: 3 }, d: 'Метка: цель получает +20% урона 5 атак.' },
+  'Съём': { school: 'класс', kind: 'debuff', st: 'mark', pow: 2000, left: 5, tgt: 'threat', price: 3, r: { ch: 2500, left: 3 }, d: 'Метка: цель получает +20% урона 3 раунда.' },
   'Снять форму': { school: 'класс', kind: 'dispel', then: { st: 'weak', pow: 2500, left: 4 }, tgt: 'lowest', price: 3, r: { ch: 2500, left: 2 }, d: 'Снимает щит и лечение, затем ослабляет.' },
   'Правка': { school: 'Земля', kind: 'dmg', stat: 'str', coef: 260, tgt: 'threat', price: 2, r: { ch: 3000 }, d: 'Удар по тому, кто мешает.' },
   'Глиняный вал': { school: 'Земля', kind: 'dmg', stat: 'str', coef: 90, tgt: 'all', price: 3, r: { ch: 2500 }, d: 'Массовый удар по отряду.' },
   'Последний штрих': { school: 'Земля', kind: 'dmg', stat: 'str', coef: 220, tgt: 'all', ult: true, r: { ch: 1500 }, d: 'Ульта: тяжёлый удар по всему отряду.' },
+  // --- рунный страж Мастерской
+  'Резец Мастера': { school: 'класс', kind: 'dmg', stat: 'str', coef: 280, tgt: 'threat', price: 3, r: { ch: 3000 }, d: 'Точный удар резцом из светящегося камня.' },
+  'Остановись': { school: 'класс', kind: 'ctrl', st: 'stun', left: 2, tgt: 'danger', price: 4, r: { ch: 2000, left: 1 }, d: 'Ладонь вперёд: самый готовый к ходу пропускает его.' },
 };
 
 /* ================== пассивки ================== */
@@ -115,22 +128,24 @@ const PAS = {
 };
 
 /* ================== карты врагов Мастерской форм ==================
+   rank — ранг карты: o рядовой, e элита, b босс биома, rune рунный страж (ADR-0010).
    st — Сила, Интеллект, Ловкость, Выносливость, Скорость; hpPct — множитель здоровья карты.
    Уклонение = Ловкость / 400 (§3.2): заметно уклоняются только ловкие — Долгорукий, Однорукий, Резчик. */
 const FOES = {
-  o1: { name: 'Безликий образец', cls: 'Физ. ДД силы', el: 'Земля', st: [104, 20, 20, 110, 60], hpPct: 125, abs: ['Каменный осколок'] },
-  o2: { name: 'Долгорукий образец', cls: 'Физ. ДД ловкости', el: 'Земля', st: [77, 20, 60, 90, 70], hpPct: 125, abs: ['Длинная рука'] },
-  o3: { name: 'Пустотелый образец', cls: 'Маг. ДД', el: 'Воздух', st: [20, 108, 20, 90, 70], hpPct: 125, abs: ['Порыв'] },
-  o4: { name: 'Безголовый образец', cls: 'Танк', el: 'Земля', st: [72, 20, 15, 240, 50], hpPct: 125, abs: ['Напор'] },
-  o5: { name: 'Сырой образец', cls: 'Лекарь', el: 'Земля', st: [20, 104, 20, 140, 60], hpPct: 125, abs: ['Замазка'] },
-  o6: { name: 'Однорукий образец', cls: 'Дебаффер', el: 'Земля', st: [93, 31, 70, 80, 130], hpPct: 125, main: 'str', fx: 'melee', abs: ['Удар в спину'] },
-  e1: { name: 'Подмастерье', cls: 'Физ. ДД силы', el: 'Земля', st: [135, 25, 30, 180, 60], hpPct: 350, abs: ['Замес', 'Тяжёлая рука'] },
-  e2: { name: 'Резчик', cls: 'Физ. ДД ловкости', el: 'Земля', st: [104, 25, 80, 150, 80], hpPct: 350, abs: ['Подрез', 'Снять лишнее'] },
-  e3: { name: 'Упор', cls: 'Танк', el: 'Земля', st: [83, 25, 20, 280, 50], hpPct: 400, abs: ['Напор', 'Плита'] },
-  e4: { name: 'Мех', cls: 'Маг. ДД', el: 'Воздух', st: [25, 135, 30, 150, 70], hpPct: 325, abs: ['Меха', 'Сквозняк'] },
-  e5: { name: 'Штопарь', cls: 'Лекарь', el: 'Земля', st: [25, 124, 20, 180, 60], hpPct: 325, abs: ['Заплата', 'Шов'] },
-  e6: { name: 'Съёмщик', cls: 'Дебаффер', el: 'Земля', st: [31, 119, 40, 160, 70], hpPct: 350, abs: ['Съём', 'Снять форму'] },
-  b1: { name: 'Первый набросок', cls: 'Босс', el: 'Земля', st: [156, 52, 30, 300, 60], hpPct: 1500, abs: ['Правка', 'Глиняный вал'], ult: 'Последний штрих', pas: ['Незавершённость'], resist: 'boss' },
+  o1: { rank: 'o', name: 'Безликий образец', cls: 'Физ. ДД силы', el: 'Земля', st: [104, 20, 20, 110, 60], hpPct: 125, abs: ['Каменный осколок'] },
+  o2: { rank: 'o', name: 'Долгорукий образец', cls: 'Физ. ДД ловкости', el: 'Земля', st: [77, 20, 60, 90, 70], hpPct: 125, abs: ['Длинная рука'] },
+  o3: { rank: 'o', name: 'Пустотелый образец', cls: 'Маг. ДД', el: 'Воздух', st: [20, 108, 20, 90, 70], hpPct: 125, abs: ['Порыв'] },
+  o4: { rank: 'o', name: 'Безголовый образец', cls: 'Танк', el: 'Земля', st: [72, 20, 15, 240, 50], hpPct: 125, abs: ['Напор'] },
+  o5: { rank: 'o', name: 'Сырой образец', cls: 'Лекарь', el: 'Земля', st: [20, 104, 20, 140, 60], hpPct: 125, abs: ['Замазка'] },
+  o6: { rank: 'o', name: 'Однорукий образец', cls: 'Дебаффер', el: 'Земля', st: [93, 31, 70, 80, 130], hpPct: 125, main: 'str', fx: 'melee', abs: ['Удар в спину'] },
+  e1: { rank: 'e', name: 'Подмастерье', cls: 'Физ. ДД силы', el: 'Земля', st: [135, 25, 30, 180, 60], hpPct: 350, abs: ['Замес', 'Тяжёлая рука'] },
+  e2: { rank: 'e', name: 'Резчик', cls: 'Физ. ДД ловкости', el: 'Земля', st: [104, 25, 80, 150, 80], hpPct: 350, abs: ['Подрез', 'Снять лишнее'] },
+  e3: { rank: 'e', name: 'Упор', cls: 'Танк', el: 'Земля', st: [83, 25, 20, 280, 50], hpPct: 400, abs: ['Напор', 'Плита'] },
+  e4: { rank: 'e', name: 'Мех', cls: 'Маг. ДД', el: 'Воздух', st: [25, 135, 30, 150, 70], hpPct: 325, abs: ['Меха', 'Сквозняк'] },
+  e5: { rank: 'e', name: 'Штопарь', cls: 'Лекарь', el: 'Земля', st: [25, 124, 20, 180, 60], hpPct: 325, abs: ['Заплата', 'Шов'] },
+  e6: { rank: 'e', name: 'Съёмщик', cls: 'Дебаффер', el: 'Земля', st: [31, 119, 40, 160, 70], hpPct: 350, abs: ['Съём', 'Снять форму'] },
+  b1: { rank: 'b', name: 'Первый набросок', cls: 'Босс', el: 'Земля', st: [156, 52, 30, 300, 60], hpPct: 1500, abs: ['Правка', 'Глиняный вал'], ult: 'Последний штрих', pas: ['Незавершённость'] },
+  g1: { rank: 'rune', name: 'Мастер', cls: 'Страж', el: 'Земля', st: [150, 60, 60, 320, 70], hpPct: 1800, abs: ['Резец Мастера', 'Остановись'] },
 };
 
 /* ================== колоды этажей ==================
@@ -160,7 +175,9 @@ function floorSeed(biomeSeed, floor) { return mix32((biomeSeed ^ Math.imul(floor
 /* ================== биомы ==================
    Сид — сам биом: один и тот же биом с тем же отрядом всегда даёт тот же сценарий. */
 const BIOMES = {
-  b1: { name: 'Мастерская форм', seed: seedOf('Мастерская форм'), floors: FLOORS },
+  b1: { name: 'Мастерская форм', seed: seedOf('Мастерская форм'), floors: FLOORS,
+    // рунный страж — пять карт (ADR-0010): Мастер ждёт и отвечает; Упор держит, Штопарь латает, Резчик добивает слабых, Съёмщик снимает силу
+    guard: { g: 'r', m: ['g1', 'e3', 'e5', 'e2', 'e6'] } },
 };
 function makeRng(seed) {  // mulberry32: целые 32 бита; roll(n) — целое от 0 до n − 1
   let a = seed >>> 0;
@@ -183,7 +200,7 @@ function mkUnit(src, side, i) {
   const as = clamp(RULES.caps.asMin + spd, RULES.caps.asMin, RULES.caps.asMax);
   const C = RULES.cls[src.cls] || { main: 'str', fx: 'melee' };
   const u = {
-    key: src.key, id: src.id, name: src.name, side, i, cls: src.cls, el: src.el, lvl: src.lvl, lead: !!src.lead, resist: src.resist || null,
+    key: src.key, id: src.id, name: src.name, side, i, cls: src.cls, el: src.el, lvl: src.lvl, lead: !!src.lead, rank: src.rank || null,
     main: src.main || C.main, fx: src.fx || C.fx,
     maxHp, hp: src.dead ? 0 : src.hp != null ? clamp(src.hp, 1, maxHp) : maxHp, sh: 0,
     atk: { str: fl(s.atk * (100 + str) * L, 100 * s.lvlDiv), int: fl(s.atk * (100 + int) * L, 100 * s.lvlDiv) },
@@ -211,7 +228,7 @@ function heroSrc(h) {
 function foeSrc(id, floor, k, lead, hp) {
   const f = FOES[id];
   return { key: id + '#' + k, id, name: f.name, cls: f.cls, el: f.el, lvl: RULES.foeLvl.base + floor * RULES.foeLvl.perFloor, st: f.st,
-    hpPct: f.hpPct, main: f.main, fx: f.fx, abs: f.abs, ult: f.ult, pas: f.pas, resist: f.resist, lead, hp };
+    hpPct: f.hpPct, main: f.main, fx: f.fx, abs: f.abs, ult: f.ult, pas: f.pas, rank: f.rank, lead, hp };
 }
 function floorFoes(biome, floor, siegeHp) {
   const F = BIOMES[biome].floors[floor - 1];
@@ -220,7 +237,7 @@ function floorFoes(biome, floor, siegeHp) {
 
 /* ================== бой ================== */
 function create(o) {
-  const mode = o.mode === 'rounds' ? 'rounds' : 'tempo';
+  const mode = o.mode === 'tempo' ? 'tempo' : 'rounds';   // основная модель — «10 раундов» (ADR-0010)
   const b = { mode, t: 0, limit: mode === 'rounds' ? Infinity : o.limitMs, rng: makeRng(o.seed), seed: o.seed, u: [[], []], over: false, win: false, why: '', ev: [],
     round: 0, queue: [] };
   // порядок героев в отряде на бой не влияет: иначе перестановка отряда перебрасывала бы случайность
@@ -476,7 +493,8 @@ function addShield(b, src, t, v) {
 }
 function addStatus(b, src, t, s, isCtrl) {
   if (!t.alive) return;
-  if (isCtrl && t.resist && b.rng(10000) < RULES.resist[t.resist]) { emit(b, { k: 'resist', s: src, t, st: s.st }); return; }
+  const imm = isCtrl && t.rank ? RULES.resist[t.rank] || 0 : 0;   // иммунитет к контролю по рангу; дебафы — не контроль
+  if (imm > 0 && b.rng(10000) < imm) { emit(b, { k: 'resist', s: src, t, st: s.st }); return; }
   const dl = src.side !== t.side ? src.pas.find(p => p.kind === 'debuffLeft') : null;
   const left = s.left + (dl ? dl.add : 0);
   const ex = has(t, s.st);                       // одинаковые обновляют длительность, разные стакаются (§5.4)
@@ -520,6 +538,26 @@ function floorBattle(heroes, biome, floor, siegeHp, mode) {
   const B = BIOMES[biome], g = B.floors[floor - 1].g;
   return create({ heroes, foes: floorFoes(biome, floor, siegeHp), seed: floorSeed(B.seed, floor), limitMs: RULES.floor.limitMs[g], mode });
 }
+/* Рунный страж — отдельный бой из пяти карт после биома (§8.6, §11, ADR-0010) */
+function guardBattle(heroes, biome, mode) {
+  const B = BIOMES[biome], G = B.guard, lvl = B.floors.length + 1;
+  const foes = G.m.map((id, k) => foeSrc(id, lvl, k, k === 0, null));
+  return create({ heroes, foes, seed: floorSeed(B.seed, lvl), limitMs: RULES.floor.limitMs.b, mode });
+}
+/* Добыча этажа по рангам убитых карт. Шансы — свой поток генератора от сида этажа,
+   чтобы бросок добычи не сдвигал случайность боя. bonusBp — прибавка к шансу ресурса от артефактов. */
+function floorLoot(biome, floor, b, bonusBp) {
+  const D = RULES.drop, L = { gold: 0, spirit: 0, souls: 0, keys: 0, base: 0, unique: 0 };
+  for (const u of b.u[1]) if (!u.alive) {
+    const d = D[u.rank] || {};
+    L.gold += d.gold || 0; L.spirit += d.spirit || 0; L.souls += d.souls || 0; L.keys += d.keys || 0;
+  }
+  const rng = makeRng(mix32((floorSeed(BIOMES[biome].seed, floor) ^ 0x4C4F4F54) >>> 0));   // 'LOOT'
+  if (b.win && rng(10000) < D.basePerFloorBp + (bonusBp || 0)) L.base = 1;
+  const boss = b.u[1].find(u => u.rank === 'b');
+  if (boss && !boss.alive && rng(10000) < D.b.uniqueBp) L.unique = 1;
+  return L;
+}
 function carry(heroes, b) {
   return heroes.map(h => { const u = b.u[0].find(v => v.key === h.key); return Object.assign({}, h, { hp: u.hp, dead: !u.alive }); });
 }
@@ -538,5 +576,5 @@ function simRun(heroes, biome, siegeHp, mode) {
   return { floors, runMs, bossHp };
 }
 
-root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, BIOMES, seedOf, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, carry, simRun, elemMul, ready, readyRound, order, chanceTable, pct, fxOf };
+root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, BIOMES, seedOf, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, carry, simRun, guardBattle, floorLoot, elemMul, ready, readyRound, order, chanceTable, pct, fxOf };
 })(typeof window !== 'undefined' ? window : globalThis);
