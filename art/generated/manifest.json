@@ -5149,12 +5149,203 @@
       },
       "cost_usd": 0.0688,
       "seconds": 10.8,
-      "status": "ждёт автора: без картинки-эталона в запросе; рука сама кончается лезвием, второе плечо заглажено",
+      "status": "заменён: автор — не враг и не эльф, история не читается: «уроды непонятного происхождения, кунсткамера». Образцы — незаконченные эльфы Виала",
       "px": [
         928,
         1152
       ],
       "sha256": "ea79c3f0ac81aa439ae01ec6d5cb90ae40ae26fbfe1fec1eaad3446c24fb73ff"
+    },
+    {
+      "file": "art/generated/portraits/ep-onearm__nb2-v6.jpg",
+      "category": "portraits",
+      "job": "ep-onearm",
+      "title": "Однорукий образец — рядовой, физ ДД ловкости (решение автора 27.09.2026)",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 10",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T02:45:20+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Painterly dark-fantasy card art, like a hand-painted oil sketch: visible textured brush strokes, simplified planar shapes, muted earthy colors, deep black shadows, crisp cold rim light, warm light from below, dust and sand hanging in the light. Not a 3D render, not a photo, not a cartoon, not anime.\n\nEnemy card portrait, 4:5. Camera at chest height. The creature is centered; the bottom edge of the picture cuts the body at the waist: head, torso and arms in frame, no hips, no legs. The head sits in the upper third with a little space above it. It is an enemy: dangerous, alive and caught in action — not a specimen standing still like an exhibit. Its story reads from its body, its pose and the place around it. Every creature here is unfinished work of clay left by the god Vial in his Workshop of Forms; what is unfinished gives it its name and is clearly visible.\n\nThe creature: the One-armed Sample — a rare, fast assassin of the Workshop, an unfinished elf sculpted from grey-green clay in a hurry. Elven proportions, long pointed ears swept back, a fine sharp elven face with high cheekbones, narrow almond eyes and a thin hard mouth; long hair roughed in with a few fast strokes of clay, streaming back. A sketch of a hunter's clothing: a strap across the chest and a short scrap of clay cloth flying behind. The haste shows everywhere: thumb smears, unsmoothed seams, the clay of the waist left rough and lumpy. It has exactly one arm: long and wiry, and instead of a hand it ends in a long jagged blade of pale stone, like a splinter chipped off a rock and pushed into the wet clay of the forearm — no hand, no fingers. The other side of the body has no shoulder and no arm at all: the clay is smoothed flat into one clean, even slope from the neck down, as if an arm there was never planned. Pose: it lunges forward in a low crouch, body in a three-quarter turn, the blade arm raised and cocked, ready to strike — a killer mid-dash. Gaze: cold, narrowed eyes slide past the viewer, fixed on someone behind — the healer in the back row. Background: the corner of the Workshop where it was made: a sculptor's workbench with a split stone block, a long splinter missing from it; stone chips and an abandoned mallet on the bench; a thin column of sand pouring from the dark vault; white-green crystals glowing in the cracks of the floor light it from below.\n\nNo legs, no full body. No text, no letters, no numbers, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 582,
+        "candidatesTokenCount": 1618,
+        "totalTokenCount": 2200,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 582
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.069,
+      "seconds": 9.5,
+      "status": "заменён: эльф, история и бросок читаются, но в полный рост с ногами и клинок в кисти",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "e43da616732ad1952971e3ee65c9c58466964b6a8d4c73246517a3a5634d893b"
+    },
+    {
+      "file": "art/generated/portraits/ep-onearm__pro.jpg",
+      "category": "portraits",
+      "job": "ep-onearm",
+      "title": "Однорукий образец — рядовой, физ ДД ловкости (решение автора 27.09.2026)",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 10",
+      "model": "gemini-3-pro-image",
+      "model_name": "Nano Banana Pro",
+      "date": "2026-09-27T02:46:25+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Painterly dark-fantasy card art, like a hand-painted oil sketch: visible textured brush strokes, simplified planar shapes, muted earthy colors, deep black shadows, crisp cold rim light, warm light from below, dust and sand hanging in the light. Not a 3D render, not a photo, not a cartoon, not anime.\n\nEnemy card portrait, 4:5. Camera at chest height. The creature is centered; the bottom edge of the picture cuts the body at the waist: head, torso and arms in frame, no hips, no legs — the legs are never visible, whatever the pose. The head sits in the upper third with a little space above it. It is an enemy: dangerous, alive and caught in action — not a specimen standing still like an exhibit. Its story reads from its body, its pose and the place around it. Every creature here is unfinished work of clay left by the god Vial in his Workshop of Forms; what is unfinished gives it its name and is clearly visible.\n\nThe creature: the One-armed Sample — a rare, fast assassin of the Workshop, an unfinished elf sculpted from grey-green clay in a hurry. Elven proportions, long pointed ears swept back, a fine sharp elven face with high cheekbones, narrow almond eyes and a thin hard mouth; long hair roughed in with a few fast strokes of clay, streaming back. A sketch of a hunter's clothing: a strap across the chest and a scrap of clay cloth flying behind. The haste shows everywhere: thumb smears, unsmoothed seams, rough lumps of clay left on the body. It has exactly one arm, and that arm has no hand: the forearm narrows and becomes a long jagged blade of pale stone, like a splinter chipped off a rock — the way a mantis's forelimb becomes a blade. There is no hand anywhere in the picture. On the other side of the body there is no shoulder and no arm: the clay is smoothed flat into one clean, even slope from the neck down, as if an arm there was never planned. Pose: the upper body leans forward toward the viewer in a three-quarter turn, as if it is about to dash past; the blade arm is raised and cocked, ready to strike. Gaze: cold, narrowed eyes slide past the viewer, fixed on someone behind — the healer in the back row. Background: the corner of the Workshop where it was made: a sculptor's workbench with a split stone block, a long splinter missing from it; stone chips and an abandoned mallet on the bench; a thin column of sand pouring from the dark vault; white-green crystals glowing in the cracks of the floor light it from below.\n\nNo legs, no full body. No text, no letters, no numbers, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 596,
+        "candidatesTokenCount": 1362,
+        "totalTokenCount": 2219,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 596
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "thoughtsTokenCount": 261,
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1416,
+      "seconds": 18.1,
+      "status": "заменён: эльф, спешка и история читаются, но клинок в кулаке, а развёрнут спиной — не видно, что второго плеча нет",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "27438549acf1a98faf11782722dca050cf06280277dec65b495c641d202b8eb1"
+    },
+    {
+      "file": "art/generated/portraits/ep-onearm__pro-v2.jpg",
+      "category": "portraits",
+      "job": "ep-onearm",
+      "title": "Однорукий образец — рядовой, физ ДД ловкости (решение автора 27.09.2026)",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 10",
+      "model": "gemini-3-pro-image",
+      "model_name": "Nano Banana Pro",
+      "date": "2026-09-27T02:47:38+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Painterly dark-fantasy card art, like a hand-painted oil sketch: visible textured brush strokes, simplified planar shapes, muted earthy colors, deep black shadows, crisp cold rim light, warm light from below, dust and sand hanging in the light. Not a 3D render, not a photo, not a cartoon, not anime.\n\nEnemy card portrait, 4:5. Camera at chest height. The creature is centered; the bottom edge of the picture cuts the body at the waist: head, torso and arms in frame, no hips, no legs — the legs are never visible, whatever the pose. The head sits in the upper third with a little space above it. It is an enemy: dangerous, alive and caught in action — not a specimen standing still like an exhibit. Its story reads from its body, its pose and the place around it. Every creature here is unfinished work of clay left by the god Vial in his Workshop of Forms; what is unfinished gives it its name and is clearly visible.\n\nThe creature: the One-armed Sample — a rare, fast assassin of the Workshop, an unfinished elf sculpted from grey-green clay in a hurry. Elven proportions, long pointed ears swept back, a fine sharp elven face with high cheekbones, narrow almond eyes and a thin hard mouth; long hair roughed in with a few fast strokes of clay, streaming back. A sketch of a hunter's clothing: a strap across the chest and a scrap of clay cloth flying behind. The haste shows everywhere: thumb smears, unsmoothed seams, rough lumps of clay left on the body. Its single arm has no hand: from the middle of the forearm the clay turns into a long jagged blade of pale stone, like a splinter chipped off a rock; the blade is part of the arm. There is no hand, no fist and no fingers anywhere in the picture. Pose: it faces the viewer almost frontally, the upper body leaning forward as if about to dash, so both sides of the body are clearly visible. On one side, the single arm is held low and out from the body, the blade pointing down and back, ready to slash upward. On the other side there is no shoulder and no arm: a clean, smooth, flat slope of clay runs from the neck down to the waist, as if an arm there was never planned — this empty side is clearly visible. Gaze: cold, narrowed eyes slide past the viewer, fixed on someone behind — the healer in the back row. Background: the corner of the Workshop where it was made: a sculptor's workbench with a split stone block, a long splinter missing from it; stone chips and an abandoned mallet on the bench; a thin column of sand pouring from the dark vault; white-green crystals glowing in the cracks of the floor light it from below.\n\nNo legs, no full body. No text, no letters, no numbers, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 622,
+        "candidatesTokenCount": 1428,
+        "totalTokenCount": 2304,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 622
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "thoughtsTokenCount": 254,
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1424,
+      "seconds": 19.1,
+      "status": "заменён: рука одна, кисти нет, пустая сторона видна, но стоит бюстом на подставке — экспонат, а не враг; кристаллы янтарные вместо бело-зелёных",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "48cd801e08749a765d2610e707f7bdf65fdfff1718798358180d1024e5016961"
+    },
+    {
+      "file": "art/generated/portraits/ep-onearm__pro-v3.jpg",
+      "category": "portraits",
+      "job": "ep-onearm",
+      "title": "Однорукий образец — рядовой, физ ДД ловкости (решение автора 27.09.2026)",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 10",
+      "model": "gemini-3-pro-image",
+      "model_name": "Nano Banana Pro",
+      "date": "2026-09-27T02:48:42+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Painterly dark-fantasy card art, like a hand-painted oil sketch: visible textured brush strokes, simplified planar shapes, muted earthy colors, deep black shadows, crisp cold rim light, warm light from below, dust and sand hanging in the light. Not a 3D render, not a photo, not a cartoon, not anime.\n\nEnemy card portrait, 4:5. Camera at chest height. The creature is centered; the bottom edge of the picture cuts the body at the waist: head, torso and arms in frame, no hips, no legs — the legs are never visible, whatever the pose. The head sits in the upper third with a little space above it. It is an enemy: dangerous, alive and caught in action — not a specimen standing still like an exhibit. Its story reads from its body, its pose and the place around it. Every creature here is unfinished work of clay left by the god Vial in his Workshop of Forms; what is unfinished gives it its name and is clearly visible.\n\nThe creature: the One-armed Sample — a rare, fast assassin of the Workshop, an unfinished elf sculpted from grey-green clay in a hurry. It is alive and moving — not a statue, not a bust on a stand. Elven proportions, long pointed ears swept back, a fine sharp elven face with high cheekbones, narrow almond eyes and a thin hard mouth; long hair roughed in with a few fast strokes of clay. A sketch of a hunter's clothing: a strap across the chest and a scrap of clay cloth. The haste shows everywhere: thumb smears, unsmoothed seams, rough lumps of clay left on the body. Its single arm has no hand: the forearm narrows and continues straight into a long jagged blade of pale stone, in line with the arm, like a splinter chipped off a rock; the blade is the end of the arm. There is no hand, no fist and no fingers anywhere in the picture. On the other side of the body there is no shoulder and no arm: a clean, smooth, flat slope of clay runs from the neck down to the waist, as if an arm there was never planned. Pose: caught mid-lunge straight toward the viewer — the upper body thrown forward and low, head forward, facing the viewer so that both sides of the body are clearly visible: the blade arm swept back and low to one side, ready to slash upward, and the smooth empty slope on the other side. Hair and the scrap of cloth whip back, sand and dust are torn up around it. Gaze: cold, narrowed eyes slide past the viewer, fixed on someone behind — the healer in the back row. Background: the corner of the Workshop where it was made, dark and cold: a sculptor's workbench with a split stone block, a long splinter missing from it; stone chips and an abandoned mallet on the bench; a thin column of sand pouring from the dark vault; cold white-green crystals glowing in the cracks of the floor light it from below — the crystals are white-green, never orange or amber.\n\nNo legs, no full body. No text, no letters, no numbers, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 673,
+        "candidatesTokenCount": 1373,
+        "totalTokenCount": 2344,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 673
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "thoughtsTokenCount": 298,
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1424,
+      "seconds": 17.5,
+      "status": "ждёт автора: незаконченный эльф-убийца в броске, рука сама переходит в клинок, пустая сторона видна; в кадр попали бёдра — карточка срежет низ",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "652b0400465e27bc64e2004cad8282a983986b1f8098f6a191a119aa4ff9a5b8"
     }
   ]
 }
