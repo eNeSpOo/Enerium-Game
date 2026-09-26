@@ -522,6 +522,65 @@ button.well:hover{border-color:var(--iron-3)}
 .ruler i.cur{background:var(--spirit);box-shadow:0 0 10px var(--spirit)}
 .ruler i.wall{background:var(--rust);box-shadow:0 0 8px rgba(220,106,82,.6)}
 @container main (max-height: 360px){ .bt{--rowh:86px;--colw:84px;--fh:52px} .bt-floor b{font-size:26px} }
+.bt-ctrl .btn[aria-pressed="true"]{color:var(--spirit);border-color:rgba(72,229,212,.45)}
+.bc{cursor:pointer}
+.bc.sel .face{box-shadow:0 0 0 2px var(--gold),0 0 18px -2px var(--gold)}
+.bc.shielded .face::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px rgba(143,220,255,.8),inset 0 0 16px rgba(143,220,255,.4);pointer-events:none}
+.bc .fell{display:none;position:absolute;left:0;right:0;top:36%;text-align:center;font:700 10px/1 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--rust);background:rgba(12,6,4,.84);padding:4px 0}
+.bc.dead .fell{display:block}
+.fly.small{font-size:12px}
+/* слой эффектов: холст частиц и векторные росчерки поверх поля */
+.fx-cv,.fx-svg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:4}
+.fx-svg{overflow:visible}
+.fx-slash{fill:none;stroke-width:3.2;stroke-linecap:round;filter:drop-shadow(0 0 4px rgba(255,241,207,.85))}
+.fx-slash.thin{stroke-width:1.6}
+.fx-ring{fill:none}
+.fx-dome{fill:rgba(143,220,255,.08);stroke:var(--shield);stroke-width:1.6;filter:drop-shadow(0 0 6px rgba(143,220,255,.7))}
+.fx-taunt{fill:none;stroke:#ff5a44;stroke-width:2;filter:drop-shadow(0 0 3px rgba(255,90,68,.85))}
+.fx-line{fill:none;stroke-width:1.2;opacity:.3}
+.fx-line.foe{stroke:#ff6a4d}
+.fx-line.hero{stroke:var(--spirit)}
+.fx-line.hot{opacity:.95;stroke-width:1.8;stroke-dasharray:5 4}
+.fx-icon .fx-icon-bg{fill:rgba(6,8,10,.88);stroke:currentColor;stroke-width:1.2}
+.fx-icon use{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.fx-flash{position:absolute;inset:-30px;z-index:5;pointer-events:none;background:radial-gradient(55% 60% at 50% 50%,var(--c),transparent 72%)}
+/* карточка бойца в бою */
+.bt-insp{position:absolute;left:calc(var(--colw) + 112px);right:calc(var(--colw) + 112px);top:0;z-index:3;display:flex;flex-direction:column;gap:5px;padding:8px 10px;border-radius:10px;background:rgba(9,11,13,.92);border:1px solid var(--iron-2);box-shadow:0 12px 30px -12px #000;font-size:12px;line-height:1.3;color:var(--parch-2)}
+.bt-insp[hidden]{display:none}
+.bt-insp .h{display:flex;align-items:baseline;gap:8px}
+.bt-insp .h b{font:600 17px/1 var(--f-d);color:var(--parch)}
+.bt-insp .h .x{margin-left:auto;width:24px;height:24px;align-self:center}
+.bt-insp b.num{color:var(--parch)}
+.bi-ab{display:flex;flex-wrap:wrap;gap:4px}
+.bi-ab span{display:inline-flex;align-items:center;height:20px;padding:0 6px;border-radius:5px;background:#12161a;border:1px solid var(--iron);color:var(--parch-2);font-size:11.5px}
+.bi-ab span.next{border-color:var(--gold-3);color:var(--gold)}
+.bi-ab span.ult{border-color:rgba(72,229,212,.4);color:var(--spirit)}
+.bi-st{display:flex;flex-direction:column;gap:1px;color:#ffc2b4}
+.bi-th{display:flex;gap:10px;flex-wrap:wrap}
+/* свёрнутые забеги в верхней строке */
+.g-runs{display:flex;gap:4px;min-width:0;flex:none}
+.g-run{position:relative;display:flex;align-items:center;gap:6px;height:32px;padding:0 8px 0 5px;border-radius:9px;border:1px solid var(--iron);background:#0b0d10;color:var(--parch-2);overflow:hidden;flex:none}
+.g-run .ic{display:grid;place-items:center;width:20px;height:20px;border-radius:6px;background:var(--spirit-3);color:var(--spirit)}
+.g-run .ic .i{width:13px;height:13px}
+.g-run .tx{display:flex;flex-direction:column;line-height:1.1;text-align:left}
+.g-run b{font:700 11px/1.1 var(--f-u);color:var(--parch)}
+.g-run small{font:700 10px/1.1 var(--f-u);color:var(--parch-3)}
+.g-run .hpm{position:absolute;left:0;bottom:0;height:2px;width:calc(var(--v)*1%);background:linear-gradient(90deg,#7d2a22,var(--hp));transition:width .3s}
+.g-run.cur{border-color:rgba(72,229,212,.5)}
+.g-run.done .ic{background:#2a2213;color:var(--gold)}
+.g-run.done small{color:var(--gold)}
+/* итог: здоровье отряда по этажам */
+.curve{display:flex;align-items:flex-end;gap:2px;height:48px;padding-top:4px;border-bottom:1px solid var(--iron)}
+.curve i{flex:1 1 0;min-width:3px;max-width:14px;height:calc(var(--v)*1%);border-radius:2px 2px 0 0;background:linear-gradient(0deg,#7d2a22,var(--hp))}
+.curve i.el{background:linear-gradient(0deg,var(--gold-3),var(--gold))}
+/* каталог эффектов в UI-ките */
+.fx-stage{position:relative;height:210px;border-radius:12px;overflow:hidden;border:1px solid var(--iron);background:radial-gradient(60% 80% at 50% 110%,rgba(72,229,212,.08),transparent),#07090a;--fh:56px;--rowh:92px}
+.fx-stage .bc{top:auto}
+.fx-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px}
+.fx-btn{appearance:none;text-align:left;display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:9px;border:1px solid var(--iron);background:#0c0f12;color:var(--parch);cursor:pointer;font:inherit}
+.fx-btn:hover{border-color:var(--gold-3)}
+.fx-btn b{font-size:13.5px}
+.fx-btn small{font-size:11.5px;color:var(--parch-3);line-height:1.25}
 
 /* Герои */
 .hs{display:grid;grid-template-columns:318px minmax(0,1fr);gap:10px;height:100%}
@@ -961,7 +1020,9 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
       </div>
       <div class="p-block">
         <h2>Бой пять на пять</h2>
-        <p style="margin-top:6px">Тестовая сцена по решениям 26.09.2026: враги — такие же карты, как герои, этаж — готовая колода, способности из одной библиотеки. Цель выбирает угроза, у части способностей своё правило цели. Попыток и энергии нет: сид этажа постоянен всю неделю, поэтому повтор тем же отрядом даёт тот же итог. Босса берут осадой за несколько забегов. Ядро — <b>battle.js</b>: целые числа, генератор с сидом, числа баланса в данных.</p>
+        <p style="margin-top:6px">Тестовая сцена по ADR-0004 и ADR-0005. Враги — такие же карты, как герои, этаж — готовая колода, способности из одной библиотеки. Действия идут по одному, у каждого свой эффект; линии показывают, кто в кого целится, а нажатие на карту открывает её способности, эффекты и угрозу. Биом — испытание на истощение: здоровье и павшие переходят на следующий этаж. Сид — сам биом. Забег можно свернуть, забегов может идти несколько.</p>
+        <div class="p-ctrls" id="devSpeed" style="margin-top:10px;align-items:center"><span class="p-note">Скорость прототипа:</span><button class="p-chip" data-speed="1" aria-pressed="true">×1</button><button class="p-chip" data-speed="2" aria-pressed="false">×2</button><button class="p-chip" data-speed="4" aria-pressed="false">×4</button><button class="p-chip" data-speed="8" aria-pressed="false">×8</button></div>
+        <p class="p-note" style="margin-top:6px">В игре ускорения нет: бой идёт в реальном времени сервера. Переключатель — только чтобы быстрее проверить прототип.</p>
       </div>
     </aside>
   </div>
@@ -1018,6 +1079,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 
 <script>window.EN_ASSET='assets/';</script>
 <script src="battle.js"></script>
+<script src="fx.js"></script>
 <script>
 'use strict';
 /* Все числа ниже — демонстрационные фикстуры: взяты из текущего UIKit
@@ -1075,6 +1137,8 @@ function initialState() {
       { id: 's1', name: 'Отряд I', m: ['h1', 'h2', 'h3', 'h4', 'h5'] },
       { id: 's2', name: 'Против элит', m: ['h1', 'h2', 'h3', 'h5', null] },
       { id: 's3', name: 'Эхо · Земля', m: ['h1', 'h3', 'h5', 'h2', null] },
+      { id: 's4', name: 'Авангард', m: ['h1', 'h2', 'h4', null, null] },
+      { id: 's5', name: 'Тени', m: ['h3', 'h5', null, null, null] },
     ],
     selSquad: 's1', prepSquad: 's1', echoSquad: 's1', act: null, selItem: 'crown',
     offers: [
@@ -1201,8 +1265,8 @@ function initialState() {
     ],
     gift: { day: 4, got: 3 },
     lore: { sec: 'best', foe: 'o1' },
-    siege: { hp: null, max: null, killed: false }, lastRun: null, runs: 0,
-    overlay: null, toast: null, battle: null,
+    siege: {}, lastRun: {}, runs: [], runNo: 0, focus: null, aim: true, insp: null,
+    overlay: null, toast: null,
   };
 }
 
@@ -1289,7 +1353,7 @@ function topBar(m) {
   if (m.chip) mid += m.chip;
   return `<header class="g-top">
     <button class="g-ava" data-a="go" data-v="profile" aria-label="Странник, уровень ${S.acc.level}" ${S.route === 'profile' ? 'aria-current="page"' : ''}><span class="ring" style="--p:${pct}"><img src="${ART('wanderer.png')}" alt=""><span class="lv">${S.acc.level}</span></span></button>
-    ${mid}<span class="g-spacer"></span>
+    ${mid}<span class="g-spacer"></span>${trayHtml()}
     <div class="g-wallet">${['gold', 'spirit', 'souls', 'enerium'].map(k => `<button class="g-cur" data-a="sheet" data-v="cur:${k}" aria-label="${CUR[k].n}: ${fmt(S.wallet[k])}"><img src="${CUR[k].img}" alt=""><span class="num">${fmt(S.wallet[k])}</span>${k === 'enerium' ? '<span class="plus" aria-hidden="true">+</span>' : ''}</button>`).join('')}</div>
     <button class="g-icon" data-a="sheet" data-v="inbox" aria-label="Входящие: ${unread}">${ic('bell')}${unread ? `<span class="bdg">${unread}</span>` : ''}</button>
   </header>`;
@@ -1371,8 +1435,8 @@ function descent() {
           <p class="quote">«Место, где никого не ждут — и всё равно всех встречают»</p>
           <div class="facts">
             <div class="stat"><b>${EB.FLOORS.length}</b><small>этажей</small></div>
-            <div class="stat"><b>${S.lastRun && S.lastRun.wall ? S.lastRun.wall : '—'}</b><small>стена</small></div>
-            <div class="stat"><b>${S.siege.killed && S.siege.hp == null ? 'пал' : siegeDone() + '%'}</b><small>осада босса</small></div>
+            <div class="stat"><b>${S.lastRun.b1 && S.lastRun.b1.wall ? S.lastRun.b1.wall : '—'}</b><small>стена</small></div>
+            <div class="stat"><b>${G('b1').killed && G('b1').hp == null ? 'пал' : siegeDone('b1') + '%'}</b><small>осада босса</small></div>
             <div class="stat"><b>${k}<span class="faint">/14</span></b><small>изучено</small></div>
           </div>
         </div>
@@ -1408,7 +1472,8 @@ function figBtn(f, seal) {
 const FIG_WH = { 5: [542, 860], 6: [626, 860], 7: [626, 860], 8: [826, 860], 9: [638, 860], 10: [945, 860], 12: [653, 860], 13: [580, 860], 14: [591, 860], 15: [451, 860], 16: [594, 860], 17: [416, 860], 18: [540, 860], 19: [378, 860] };
 
 /* ================== Бой ==================
-   Пять карт против колоды этажа. Ядро — battle.js; здесь только показ. */
+   Пять карт против колоды этажа. Ядро — battle.js, эффекты — fx.js; здесь только показ.
+   Действия идут по одному. Ускорить бой нельзя, только свернуть: сценарий идёт в реальном времени сервера. */
 const SLOT = { 1: [[1, 1]], 2: [[1, .5], [1, 1.5]], 3: [[1, 1], [1, 0], [1, 2]], 4: [[1, 1], [1, 0], [1, 2], [0, 1]], 5: [[1, 1], [1, 0], [1, 2], [0, .5], [0, 1.5]] };
 const SCHOOL_C = { 'Огонь': 'var(--fire)', 'Земля': 'var(--earth)', 'Воздух': 'var(--air)', 'Вода': 'var(--water)', 'Свет': 'var(--light)', 'Тьма': 'var(--dark)', 'Время': 'var(--time)' };
 const ST_VIEW = { stun: ['chain', 'Оглушение'], silence: ['lock', 'Безмолвие'], stop: ['hour', 'Остановка'], weak: ['down', 'Ослабление'], mark: ['flag', 'Метка'], pierce: ['minus', 'Пробитие защиты'] };
@@ -1416,45 +1481,53 @@ const CLS_OF = { 'Физ. ДД силы': 'Физ. ДД', 'Физ. ДД ловк
 const unitKnown = u => u.side === 0 || known(u.id);
 const uName = u => unitKnown(u) ? u.name : 'Неизвестный';
 const unitImg = u => u.side === 0 ? H(u.id).img : WS(F(u.id).pg);
-function cardHtml(u, n, k) {
-  const [col, row] = SLOT[n][k], kn = unitKnown(u);
-  return `<div class="bc ${u.side ? 'foe' : ''} ${u.lead ? 'lead' : ''} ${kn ? '' : 'unk'} ${u.alive ? '' : 'dead'}" id="bc${u.side}${u.i}" data-el="${u.el}" style="--k:${col};--r:${row}" title="${kn ? u.name + ' · ' + u.cls + ' · ' + u.el : 'Не изучен: имя и способности откроет первая победа'}">
-    <div class="face"><img src="${unitImg(u)}" alt=""><span class="cls">${CLS(CLS_OF[u.cls] || u.cls)}</span><span class="aim" title="Столько противников целится в эту карту">${ic('eye')}<b>0</b></span><div class="sts"></div></div>
+const runById = id => S.runs.find(r => r.id === id);
+const focusRun = () => runById(S.focus);
+function cardHtml(R, u, n, k) {
+  const [col, row] = SLOT[n][k], kn = unitKnown(u), d = R.disp[dkey(u)] || { hp: u.hp, sh: u.sh, dead: !u.alive };
+  return `<div class="bc ${u.side ? 'foe' : ''} ${u.lead ? 'lead' : ''} ${kn ? '' : 'unk'} ${d.dead ? 'dead' : ''} ${d.sh > 0 && !d.dead ? 'shielded' : ''} ${S.insp === dkey(u) ? 'sel' : ''}" id="bc${u.side}${u.i}" data-a="insp" data-v="${dkey(u)}" data-el="${u.el}" style="--k:${col};--r:${row}" title="${kn ? u.name + ' · ' + u.cls + ' · ' + u.el : 'Не изучен: имя и способности откроет первая победа'}">
+    <div class="face"><img src="${unitImg(u)}" alt=""><span class="cls">${CLS(CLS_OF[u.cls] || u.cls)}</span><span class="aim" title="Столько противников целится в эту карту">${ic('eye')}<b>0</b></span><div class="sts"></div>${u.side ? '' : '<span class="fell">пал</span>'}</div>
     <span class="nm">${kn ? u.name : 'Не изучен'}</span>
-    ${bar(u.hp / u.maxHp * 100, 'hp', `<span class="sh" style="left:0;width:${Math.min(100, u.sh * 100 / u.maxHp)}%"></span>`)}
+    ${bar(d.hp / u.maxHp * 100, 'hp', `<span class="sh" style="left:0;width:${Math.min(100, d.sh * 100 / u.maxHp)}%"></span>`)}
     <div class="chg"><i style="--v:0"></i></div>
   </div>`;
 }
 function battle() {
-  const R = S.battle;
+  const R = focusRun();
   if (!R || !R.b) return { title: 'Бой', html: '<section class="scr"></section>' };
-  const b = R.b, FL = EB.FLOORS[R.floor - 1], lead = FL.g !== 'o' ? b.u[1][0] : null;
+  const b = R.b, B = EB.BIOMES[R.biome], FL = B.floors[R.floor - 1], lead = FL.g !== 'o' ? b.u[1][0] : null;
   const typ = FL.g === 'o' ? 'Рядовые' : FL.g === 'e' ? 'Элита' : 'Босс биома';
-  const side = sd => b.u[sd].map((u, k) => cardHtml(u, b.u[sd].length, k)).join('');
-  return { title: 'Мастерская форм', sub: `забег ${R.runNo}`, back: 'descent', html: `<section class="scr flush"><div class="bt" id="bt">
+  const side = sd => b.u[sd].map((u, k) => cardHtml(R, u, b.u[sd].length, k)).join('');
+  return { title: B.name, sub: `забег ${R.runNo}${R.demo ? ' · демо' : ''}`, back: 'descent', html: `<section class="scr flush"><div class="bt" id="bt">
     <img class="bg" src="${WS(11)}" alt="">
     <div class="bt-hud">
-      <div class="bt-floor"><b id="btFloor">${R.floor}</b><span>/ ${EB.FLOORS.length}</span></div>
-      <span class="chip ${FL.g !== 'o' ? 'gold' : ''}">${FL.g === 'e' ? ic('gem') : FL.g === 'b' ? ic('crown') : ''}${typ}${lead ? ' · ' + uName(lead) : ''}${FL.g === 'b' ? ` · осада ${siegeDone()}%` : ''}</span>
-      <div class="bt-clock"><div class="row"><span>${ic('hour')} Бой</span><span class="num" id="btClock">${clock(R.view / 1000)} / ${clock(b.limit / 1000)}</span></div>${bar(R.view * 100 / b.limit, 'sand')}<div class="row"><span>Забег идёт</span><span class="num" id="btRun">${clock((R.runMs + R.view) / 1000)}</span></div></div>
-      <span class="chip" title="Сид этажа постоянен всю неделю: тот же отряд с той же ротацией даст тот же итог">${ic('lock')}сид ${seedTag(R.floor)}</span>
+      <div class="bt-floor"><b>${R.floor}</b><span>/ ${B.floors.length}</span></div>
+      <span class="chip ${FL.g !== 'o' ? 'gold' : ''}">${FL.g === 'e' ? ic('gem') : FL.g === 'b' ? ic('crown') : ''}${typ}${lead ? ' · ' + uName(lead) : ''}${FL.g === 'b' ? ` · осада ${siegeDone(R.biome)}%` : ''}</span>
+      <div class="bt-clock"><div class="row"><span>${ic('hour')} Бой</span><span class="num" id="btClock">${clock(R.view / 1000)} / ${clock(b.limit / 1000)}</span></div>${bar(Math.min(100, R.view * 100 / b.limit), 'sand')}<div class="row"><span>Забег идёт</span><span class="num" id="btRun">${clock((R.runMs + R.view) / 1000)}</span></div></div>
+      <span class="chip" title="Сид — сам биом: тот же отряд с той же ротацией всегда получает тот же сценарий">${ic('lock')}сценарий ${seedTag(R)}</span>
       <div class="bt-ctrl">
-        <div class="tabs" role="group" aria-label="Скорость просмотра">${[1, 2, 4].map(x => `<button aria-selected="${R.speed === x}" data-a="speed" data-v="${x}">×${x}</button>`).join('')}</div>
-        <button class="btn" data-a="skip">${ic('ff')}К итогу</button>
+        <button class="btn sm" data-a="aim" aria-pressed="${S.aim}" title="Линии: кто в кого целится">${ic('eye')}Цели</button>
+        <button class="btn sm ghost warn" data-a="endact">Прервать</button>
+        <button class="btn" data-a="minimize" title="Бой продолжится, его видно в верхней строке">${ic('down')}Свернуть</button>
       </div>
     </div>
-    <div class="bt-field">
+    <div class="bt-field" id="btField">
       <div class="bt-side h">${side(0)}</div>
       <div class="bt-side f">${side(1)}</div>
       <div class="bt-feed" id="btFeed">${R.feed.map(x => `<p>${x}</p>`).join('')}</div>
+      <div class="bt-insp" id="btInsp" hidden></div>
     </div>
     ${R.banner ? `<div class="bt-banner"><b>${R.banner[0]}</b><small>${R.banner[1]}</small></div>` : ''}
     <div class="ruler" aria-hidden="true">${rulerHtml(R)}</div>
   </div></section>` };
 }
 function rulerHtml(R) {
-  const sg = siegeDone(), wall = S.lastRun && S.lastRun.wall;
-  return EB.FLOORS.map((x, i) => { const f = i + 1; return `<i class="${x.g === 'e' ? 'el5' : ''} ${x.g === 'b' ? 'boss' : ''} ${f < R.floor ? 'past' : ''} ${f === R.floor ? 'cur' : ''} ${wall === f && f > R.floor ? 'wall' : ''}" ${x.g === 'b' ? `style="--sg:${sg}"` : ''}></i>`; }).join('');
+  const sg = siegeDone(R.biome), last = S.lastRun[R.biome], wall = last && last.wall;
+  return EB.BIOMES[R.biome].floors.map((x, i) => { const f = i + 1; return `<i class="${x.g === 'e' ? 'el5' : ''} ${x.g === 'b' ? 'boss' : ''} ${f < R.floor ? 'past' : ''} ${f === R.floor ? 'cur' : ''} ${wall === f && f > R.floor ? 'wall' : ''}" ${x.g === 'b' ? `style="--sg:${sg}"` : ''}></i>`; }).join('');
+}
+function trayHtml() {
+  const list = S.runs.filter(r => !r.over || !r.seen); if (!list.length) return '';
+  return `<div class="g-runs">${list.map(R => `<button class="g-run ${R.over ? 'done' : ''} ${S.route === 'battle' && S.focus === R.id ? 'cur' : ''}" data-a="focus" data-v="${R.id}" id="run-${R.id}" title="${EB.BIOMES[R.biome].name} · забег ${R.runNo}"><span class="ic">${ic(R.over ? 'flag' : 'eye')}</span><span class="tx"><b>${EB.BIOMES[R.biome].name.split(' ')[0]} · ${R.runNo}</b><small>${R.over ? 'итог' : 'этаж ' + R.floor}</small></span><i class="hpm" style="--v:${partyPct(R)}"></i></button>`).join('')}</div>`;
 }
 
 /* ================== Герои ================== */
@@ -1872,7 +1945,7 @@ function storeView() {
 const SCREENS = { shelter, descent, battle, heroes, craft: craftView, week: weekView, echo: echoView, contracts: contractsView, rituals: ritualsView, arena: arenaView, clan: clanView, event: eventView, profile: profileView, chronicle: chronicleView, store: storeView };
 
 /* ================== занятость ================== */
-const busyNote = id => { if (S.act && S.act.squad.includes(id)) return 'Забег · Мастерская'; const h = H(id); return h.busy; };
+const busyNote = id => { const r = runOf(id); if (r) return 'Забег · ' + EB.BIOMES[r.biome].name; const h = H(id); return h.busy; };
 const shelterTags = () => '';
 
 /* ================== карточка предмета: лист и панель Запасов ================== */
@@ -1902,14 +1975,14 @@ const OV = {
     const cur = echo ? S.echoSquad : S.prepSquad;
     const s = sq(cur);
     const members = s.m.filter(Boolean);
-    const busy = members.filter(id => busyNote(id) && !(S.act && !echo && S.act.squad.includes(id)));
+    const busy = members.filter(id => busyNote(id));
     const ready = members.length - busy.length;
     const els = [...new Set(members.map(id => H(id).el))];
     const body = `<div class="row" style="flex-wrap:wrap;gap:6px">${S.squads.map(x => `<button class="p-chip" aria-pressed="${x.id === cur}" data-a="${echo ? 'esq' : 'psq'}" data-v="${x.id}" style="text-transform:none;letter-spacing:0;font-size:13px">${x.name}</button>`).join('')}</div>
       <div class="sq-slots">${s.m.map(id => id ? heroCard(H(id), { act: 'noop', note: busy.includes(id) ? busyNote(id) : '', dim: busy.includes(id) }) : `<div class="hc empty">${ic('plus')}</div>`).join('')}</div>
       <div class="row"><div class="stat"><b>${fmt(sqBM(s))}</b><small>боевая мощь</small></div><span class="g-spacer"></span><div class="col" style="gap:4px;align-items:flex-end"><span class="eyebrow">${echo ? 'Стихии отряда' : 'В зале чаще всего'}</span><span class="row" style="gap:4px">${echo ? els.map(e => el(e)).join('') : el('Земля') + el('Воздух')}</span></div></div>
       ${echo ? (ready < 5 ? `<p class="reason warn">Для Эхо нужны ровно пять свободных героев. Свободно: ${ready}.</p>` : '<p class="reason">Отряд сохранится для следующих целей и повторных атак.</p>')
-        : `<p class="reason">${busy.length ? `${busy.map(id => H(id).name).join(', ')} заняты — отряд пойдёт ${['', 'один', 'вдвоём', 'втроём', 'вчетвером'][ready] || 'без них'}.` : `Этажи — готовые колоды, сид постоянен всю неделю: тот же отряд с той же ротацией пройдёт их так же.${S.lastRun ? ` Прошлый забег: ${S.lastRun.wall ? 'стена на этаже ' + S.lastRun.wall : S.lastRun.kind === 'boss' ? 'босс повержен' : S.lastRun.kind === 'siege' ? 'дошёл до босса' : 'прерван'}.` : ''}`}</p>`}`;
+        : `<p class="reason">${busy.length ? `${busy.map(id => H(id).name).join(', ')} заняты — отряд пойдёт ${['', 'один', 'вдвоём', 'втроём', 'вчетвером'][ready] || 'без них'}.` : `Этажи — готовые колоды, сид — сам биом: тот же отряд с той же ротацией пройдёт их так же. Здоровье между этажами не восстанавливается.${S.lastRun.b1 ? ` Прошлый забег: ${S.lastRun.b1.wall ? 'стена на этаже ' + S.lastRun.b1.wall : S.lastRun.b1.kind === 'boss' ? 'босс повержен' : S.lastRun.b1.kind === 'siege' ? 'дошёл до босса' : 'прерван'}.` : ''}`}</p>`}`;
     const foot = `<button class="link" data-a="go" data-v="heroes" data-seg="heroes:squads">${ic('users')}Отряды</button>${echo ? `<button class="btn go" data-a="close">Сохранить</button>` : `<button class="btn go" data-a="start" ${ready ? '' : 'disabled'}>${ic('down')}Начать забег</button>`}`;
     return sheet(echo ? 'Отряд для Эхо' : 'Отряд для спуска', body, foot, true);
   },
@@ -1991,22 +2064,25 @@ const OV = {
       <div class="col" style="gap:4px">${rp.map(([k, m, r], i) => `<div class="srow"><span class="n"><b style="color:var(--parch)">${k}</b> · ${m}</span><span class="v">+${i === 0 ? '0,05' : '0'}%</span><span></span></div>`).join('')}</div>
       <p class="reason">Бонус = 0,05% × редкость × цикл × круг. Круги повторяются после доблести.</p>`);
   },
-  result() {
-    const R = S.battle, L = R.loot, E = R.end || { kind: 'abort' };
-    const nk = R.newKnown.map(F), sg = siegeDone(), n = EB.FLOORS.length;
-    const passed = E.kind === 'boss' ? n : R.floor - 1;
+  result(o) {
+    const R = runById(o.arg) || focusRun(); if (!R) return '';
+    const L = R.loot, E = R.end || { kind: 'abort' }, B = EB.BIOMES[R.biome], sg = siegeDone(R.biome);
+    const nk = R.newKnown.map(F), n = B.floors.length;
+    const passed = E.kind === 'boss' ? n - R.startFloor + 1 : R.floor - R.startFloor;
     let title, head;
     if (E.kind === 'boss') { title = 'Первый набросок повержен'; head = 'Мастерская пройдена до конца. Осталось победить рунного стража — тогда откроется Подземный лес.'; }
-    else if (E.kind === 'siege') { const dealt = sg - R.siegeFrom; title = 'Осада продолжается'; head = `Отряд дошёл до босса и снял ${dealt}% его здоровья, всего снято ${sg}%. Урон сохранится до следующего забега. Чем меньше у босса здоровья, тем он опаснее: последние проценты даются труднее первых.`; }
+    else if (E.kind === 'siege') { title = 'Осада продолжается'; head = `Отряд дошёл до босса и снял ${sg - R.siegeFrom}% его здоровья, всего снято ${sg}%. Урон сохранится до следующего забега. Чем меньше у босса здоровья, тем он опаснее.`; }
     else if (E.kind === 'wall') { title = `Стена — этаж ${E.floor}`; head = `${E.why === 'time' ? 'Время боя вышло' : 'Отряд пал'} на этаже ${E.floor}. В колоде: ${E.foes.map(id => known(id) ? F(id).name : 'неизвестный').join(', ')}.`; }
     else { title = 'Забег прерван'; head = `Отряд поднялся с этажа ${R.floor}.`; }
+    if (R.demo) head = 'Демо-прыжок сразу к боссу с полным здоровьем: осада биома и стена не меняются. ' + head;
     const body = `<p class="muted" style="font-size:15px">${head} Отряд поднялся порталом наверх, как ото сна.</p>
       <div class="row" style="gap:18px;flex-wrap:wrap"><div class="stat"><b>${passed}</b><small>этажей пройдено</small></div><div class="stat"><b>${R.kills}</b><small>побед</small></div><div class="stat"><b>${clock(R.runMs / 1000)}</b><small>время забега</small></div>${E.kind === 'boss' || sg ? `<div class="stat"><b>${E.kind === 'boss' ? 100 : sg}%</b><small>осада босса</small></div>` : ''}</div>
+      ${R.curve.length ? `<div class="col" style="gap:3px"><span class="eyebrow">Здоровье отряда после каждого этажа</span><div class="curve">${R.curve.map((v, i) => `<i class="${B.floors[R.startFloor + i - 1].g !== 'o' ? 'el' : ''}" style="--v:${Math.max(3, v)}" title="Этаж ${R.startFloor + i}: ${v}%"></i>`).join('')}</div><small class="faint">Золотые столбики — элиты и босс. Здоровье не восстанавливалось.</small></div>` : ''}
       <span class="eyebrow">Добыча</span>
       <div class="row" style="gap:14px;flex-wrap:wrap">${money('gold', L.gold)}${money('spirit', L.spirit)}${money('souls', L.souls)}<span class="row" style="gap:4px">${well(I('cinder'), { act: 'noop', size: 30 })}<b class="num">×${L.cinder}</b></span></div>
       ${nk.length ? `<div class="newfoe">${nk.map(f => `<img src="${WS(f.pg)}" alt="">`).join('')}<div class="col" style="gap:3px"><span class="eyebrow" style="color:var(--spirit)">Новое в бестиарии</span><b class="serif" style="font-size:20px">${nk.map(f => f.name).join(', ')}</b><small class="faint">Запись открыта во всех режимах</small></div><button class="link" data-a="foe" data-v="${nk[0].id}" style="margin-left:auto">Прочитать ${ic('chev')}</button></div>` : ''}
-      ${E.kind === 'boss' ? '' : '<p class="reason">Сид этажей один на неделю: тот же отряд с той же ротацией пройдёт их так же. Чтобы пройти дальше, поменяй состав, порядок способностей или стихии.</p>'}`;
-    return dialog(title, body, `<button class="btn ghost" data-a="leave">В Убежище</button><button class="btn" data-a="resquad">${ic('users')}Сменить отряд</button><button class="btn go" data-a="again">${ic('down')}Ещё забег</button>`);
+      ${E.kind === 'boss' ? '' : '<p class="reason">Сид — сам биом: тот же отряд с той же ротацией пройдёт его так же. Чтобы пройти дальше, поменяй состав, порядок способностей или стихии.</p>'}`;
+    return dialog(title, body, `<button class="btn ghost" data-a="leave" data-v="${R.id}">В Убежище</button><button class="btn" data-a="resquad" data-v="${R.id}">${ic('users')}Сменить отряд</button><button class="btn go" data-a="again" data-v="${R.id}">${ic('down')}Ещё забег</button>`);
   },
   mem() {
     const M = S.mem, o = M.offer, p = o[M.pick];
@@ -2061,7 +2137,7 @@ function overlay() {
 }
 
 /* ================== действия ================== */
-function go(r, keepOverlay) { stopBattle(r); S.route = r; if (!keepOverlay) S.overlay = null; render(); }
+function go(r, keepOverlay) { S.route = r; if (!keepOverlay) S.overlay = null; render(); }
 function open(t, arg, extra = {}) { S.overlay = { t, arg, ...extra }; render(); focusOverlay(); }
 function close() { S.overlay = null; render(); }
 function toast(t, img) { S.toast = { t, img, id: Date.now() }; render(); const id = S.toast.id; setTimeout(() => { if (S.toast && S.toast.id === id) { S.toast = null; const el = document.querySelector('.g .toast'); el && el.remove(); } }, 2600); }
@@ -2122,7 +2198,7 @@ const ACT = {
   esq(v) { S.echoSquad = v; render(); },
   eattack() {
     const s = sq(S.echoSquad), m = s.m.filter(Boolean), busy = m.filter(id => busyNote(id));
-    if (m.length < 5 || busy.length) { S.overlay = { t: 'confirm', title: 'Отряд не готов', text: m.length < 5 ? `В «${s.name}» ${m.length} из 5 героев. Эхо принимает ровно пятерых.` : (() => { const by = {}; busy.forEach(id => { (by[busyNote(id)] = by[busyNote(id)] || []).push(H(id).name); }); return Object.entries(by).map(([why, names]) => names.length === m.length ? `Весь «${s.name}» занят: ${why.toLowerCase()}.` : `${names.join(', ')} — ${why.toLowerCase()}.`).join(' '); })(), warn: busy.length && S.act ? 'Дождитесь конца забега или прервите его, чтобы освободить отряд.' : '', ok: 'Изменить отряд', act: 'echoprep' }; render(); focusOverlay(); return; }
+    if (m.length < 5 || busy.length) { S.overlay = { t: 'confirm', title: 'Отряд не готов', text: m.length < 5 ? `В «${s.name}» ${m.length} из 5 героев. Эхо принимает ровно пятерых.` : (() => { const by = {}; busy.forEach(id => { (by[busyNote(id)] = by[busyNote(id)] || []).push(H(id).name); }); return Object.entries(by).map(([why, names]) => names.length === m.length ? `Весь «${s.name}» занят: ${why.toLowerCase()}.` : `${names.join(', ')} — ${why.toLowerCase()}.`).join(' '); })(), warn: busy.length && S.runs.some(r => !r.over) ? 'Дождитесь конца забега или прервите его, чтобы освободить отряд.' : '', ok: 'Изменить отряд', act: 'echoprep' }; render(); focusOverlay(); return; }
     const sl = S.echo.slots[S.echo.sel], f = F(sl.foe), c = ECHO_COST(f);
     if (!spend('souls', c)) return;
     const dmg = Math.min(sl.hp, Math.round(sl.max * (0.35 + Math.random() * 0.2)));
@@ -2150,96 +2226,202 @@ const ACT = {
   giftget() { S.gift.got = S.gift.day; S.wallet.enerium += 50; S.overlay = null; toast('Дар дня: Энериум ×50', ART('enerium.png')); },
   giftsclaim() { I('chest').q += 19; S.overlay = null; toast('19 сундуков перенесены в запасы', ART('reward-chest-v1.png')); },
   psq(v) { S.prepSquad = v; render(); },
-  start() { startRun(); },
-  speed(v) { if (S.battle) S.battle.speed = +v; document.querySelectorAll('.bt-ctrl .tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.v === v)); },
-  skip() { const R = S.battle; if (!R || R.over) return; let guard = 0; while (!R.over && guard++ < 100000) advance(R, 5000, false); },
-  again() { S.overlay = null; startRun(); },
-  resquad() { S.overlay = null; S.route = 'descent'; S.selBiome = 'b1'; open('prep'); },
-  leave() { S.overlay = null; S.battle = null; go('shelter'); },
+  start() { startRun(S.prepSquad, 'b1'); },
+  again(v) { const R = runById(v) || focusRun(), sqId = R ? R.squadId : S.prepSquad; prune(v); S.overlay = null; startRun(sqId, R ? R.biome : 'b1'); },
+  resquad(v) { prune(v); S.overlay = null; S.route = 'descent'; S.selBiome = 'b1'; open('prep'); },
+  focus(v) { const R = runById(v); if (!R) return; S.focus = v; S.insp = null; if (R.over) { R.seen = true; S.overlay = { t: 'result', arg: v }; render(); focusOverlay(); } else go('battle'); },
+  minimize() { S.insp = null; go('descent'); },
+  aim() { S.aim = !S.aim; const b = document.querySelector('[data-a="aim"]'); b && b.setAttribute('aria-pressed', S.aim); const R = focusRun(); R && paintAim(R); },
+  insp(v) { S.insp = S.insp === v ? null : v; document.querySelectorAll('.bc.sel').forEach(e => e.classList.remove('sel')); if (S.insp) { const e = document.querySelector(`.bc[data-v="${S.insp}"]`); e && e.classList.add('sel'); } const R = focusRun(); R && paintInsp(R); },
+  leave(v) { prune(v); S.overlay = null; go('shelter'); },
   endact() { S.overlay = { t: 'confirm', title: 'Прервать забег', text: 'Отряд поднимется наверх. Добыча с пройденных этажей и урон по боссу сохранятся.', ok: 'Прервать', act: 'endactdo', danger: true }; render(); focusOverlay(); },
-  endactdo() { const R = S.battle; S.overlay = null; if (R && !R.over) { R.end = { kind: 'abort', floor: R.floor }; endRun(R); } else { S.act = null; render(); } },
+  endactdo() { const R = focusRun(); S.overlay = null; if (R && !R.over) { R.end = { kind: 'abort', floor: R.floor }; endRun(R, visible(R)); } else render(); },
 };
 
 /* ================== забег ==================
-   Этаж — готовая колода врагов-карт. Здоровье между этажами восстанавливается.
-   Забег идёт до первого проигранного этажа; добыча не пропадает.
-   Босс — осада: урон по нему копится между забегами. */
-const WEEK_SEED = 0x5EED2609;   // сид недели: один на всех, меняется с неделей расы
-let loop = null;
-const siegeDone = () => { const G = S.siege; return G.hp == null || !G.max ? 0 : Math.round(100 - G.hp * 100 / G.max); };
-const seedTag = f => (EB.floorSeed(WEEK_SEED, f) >>> 16).toString(16).toUpperCase().padStart(4, '0');
-function startRun() {
-  const s = sq(S.prepSquad);
-  const ids = s.m.filter(id => id && !H(id).busy);
-  if (!ids.length) return toast('В отряде нет свободных героев');
-  S.act = { biome: 'b1', squad: ids };
-  S.runs++;
-  S.battle = { floor: 1, heroes: ids.map(id => EB.heroSrc(H(id))), speed: S.battle ? S.battle.speed : 2, runMs: 0, view: 0, kills: 0,
-    loot: { gold: 0, spirit: 0, souls: 0, cinder: 0 }, newKnown: [], over: false, gap: 0, feed: [], banner: null, runNo: S.runs, siegeFrom: siegeDone(), end: null, flyN: 0 };
-  newFloor(S.battle);
-  S.overlay = null; S.route = 'battle'; render();
-  clearInterval(loop); loop = setInterval(tick, 100);
+   Сервер считает сценарий целиком, клиент показывает его в реальном времени: ускорить нельзя, свернуть можно.
+   Этажи — готовые колоды. Здоровье и павшие переходят на следующий этаж: биом — испытание на истощение.
+   Босс — осада: урон по нему копится между забегами. Забегов может идти несколько сразу. */
+let loop = null, fxInst = null, devSpeed = 1;
+const TICK = 50;
+const dkey = u => u.side + ':' + u.i;
+const G = biome => S.siege[biome] || (S.siege[biome] = { hp: null, max: null, killed: false });
+const siegeDone = biome => { const g = G(biome); return g.hp == null || !g.max ? 0 : Math.round(100 - g.hp * 100 / g.max); };
+const seedTag = R => (EB.BIOMES[R.biome].seed >>> 16).toString(16).toUpperCase().padStart(4, '0');
+const runOf = id => S.runs.find(r => !r.over && r.squad.includes(id));
+const partyPctOf = b => { const max = b.u[0].reduce((a, u) => a + u.maxHp, 0) || 1; return Math.round(b.u[0].reduce((a, u) => a + u.hp, 0) * 100 / max); };
+const partyPct = R => { if (!R.b) return 0; const us = R.b.u[0], max = us.reduce((a, u) => a + u.maxHp, 0) || 1; return Math.round(us.reduce((a, u) => a + (R.disp[dkey(u)] ? R.disp[dkey(u)].hp : u.hp), 0) * 100 / max); };
+const prune = v => { S.runs = S.runs.filter(r => !(r.over && (r.id === v || r.seen))); };
+function startRun(squadId, biome = 'b1', demoFloor) {
+  prune();
+  const s = sq(squadId);
+  const ids = s.m.filter(id => id && !H(id).busy && !runOf(id));
+  if (!ids.length) return toast('Все герои этого отряда уже в забеге');
+  const R = { id: 'r' + (++S.runNo), runNo: S.runNo, biome, squadId, squad: ids, heroes: ids.map(id => EB.heroSrc(H(id))), floor: demoFloor || 1, startFloor: demoFloor || 1, demo: !!demoFloor,
+    view: 0, runMs: 0, kills: 0, loot: { gold: 0, spirit: 0, souls: 0, cinder: 0 }, newKnown: [], over: false, seen: false, gap: 0, feed: [], banner: null,
+    siegeFrom: siegeDone(biome), end: null, flyN: 0, disp: {}, curve: [], lastActor: null };
+  S.runs.push(R);
+  newFloor(R);
+  S.focus = R.id; S.insp = null; S.overlay = null; S.route = 'battle'; render();
+  ensureLoop();
 }
 function newFloor(R) {
-  R.b = EB.floorBattle(R.heroes, WEEK_SEED, R.floor, R.floor === EB.FLOORS.length ? S.siege.hp : null);
-  R.view = 0; R.feed = [];
-  const g = EB.FLOORS[R.floor - 1].g, lead = R.b.u[1][0];
-  R.banner = g === 'o' ? null : [g === 'e' ? 'Элита · ' + uName(lead) : uName(lead), g === 'e' ? 'этаж ' + R.floor + ' · лидер и свита' : S.siege.hp != null ? 'осада продолжается · снято ' + siegeDone() + '%' : 'босс биома · осада'];
+  const B = EB.BIOMES[R.biome];
+  R.b = EB.floorBattle(R.heroes, R.biome, R.floor, R.floor === B.floors.length && !R.demo ? G(R.biome).hp : null);   // демо-прыжок не трогает осаду
+  R.view = 0; R.feed = []; R.disp = {}; R.lastActor = null; syncDisp(R);
+  const g = B.floors[R.floor - 1].g, lead = R.b.u[1][0], tired = R.floor > R.startFloor ? ' · здоровье не восстановлено' : '';
+  R.banner = [g === 'o' ? `Этаж ${R.floor}` : g === 'e' ? 'Элита · ' + uName(lead) : uName(lead), (g === 'o' ? 'рядовые' : g === 'e' ? 'лидер и свита' : R.demo ? 'демо-прыжок: осада биома не меняется' : G(R.biome).hp != null ? 'осада · снято ' + siegeDone(R.biome) + '%' : 'босс биома · осада') + tired];
 }
-function stopBattle(next) { if (next !== 'battle') { clearInterval(loop); loop = null; } }
-function tick() { const R = S.battle; if (!R || R.over || S.route !== 'battle' || S.overlay) return; advance(R, 100 * R.speed, true); }
-function advance(R, ms, draw) {
-  if (R.gap > 0) { R.gap -= ms; if (R.gap <= 0) { R.floor++; newFloor(R); if (draw) render(); } return; }
+function ensureLoop() { if (!loop && S.runs.some(r => !r.over)) loop = setInterval(tickAll, TICK); }
+function tickAll() {
+  const live = S.runs.filter(r => !r.over);
+  if (!live.length) { clearInterval(loop); loop = null; return; }
+  for (const R of live) advance(R, TICK * devSpeed);
+  paintTray();
+}
+const visible = R => S.route === 'battle' && S.focus === R.id && !!document.getElementById('bt');
+function advance(R, ms) {
+  const vis = visible(R);
+  if (R.gap > 0) { R.gap -= ms; if (R.gap <= 0) { R.floor++; newFloor(R); if (vis) render(); } return; }
   const b = R.b;
-  R.view = Math.min(b.limit, R.view + ms);
-  if (R.banner && R.view > 1800) { R.banner = null; if (draw) { const x = document.querySelector('.bt-banner'); x && x.remove(); } }
-  while (!b.over && EB.nextAt(b) <= R.view) onEvents(R, EB.step(b), draw);
-  if (!b.over && R.view >= b.limit) onEvents(R, EB.step(b), draw);
-  if (draw) paintHud(R);
-  if (b.over) floorDone(R, draw);
+  R.view += ms;
+  if (R.banner && R.view > 2200) { R.banner = null; if (vis) { const x = document.querySelector('.bt-banner'); x && x.remove(); } }
+  while (!b.over && R.view >= b.t) onAction(R, EB.step(b), vis);
+  if (vis) paintHud(R);
+  if (b.over && R.view >= b.t) floorDone(R, vis);
 }
-function onEvents(R, ev, draw) {
-  for (const e of ev) if (e.k === 'die' && e.t.side === 1) {
-    const g = e.t.lead ? EB.FLOORS[R.floor - 1].g : 'o', L = R.loot; R.kills++;
+function onAction(R, a, vis) {
+  if (!a) return;
+  if (a.s) R.lastActor = a.s;
+  for (const e of a.ev) if (e.k === 'die' && e.t.side === 1) {
+    const g = e.t.lead ? EB.BIOMES[R.biome].floors[R.floor - 1].g : 'o', L = R.loot; R.kills++;
     if (g === 'o') { L.gold += 20; L.spirit += 10; L.cinder += 1; } else if (g === 'e') { L.gold += 100; L.spirit += 50; L.souls += 1; } else { L.gold += 500; L.spirit += 250; L.souls += 5; }
-    if (!known(e.t.id)) { S.known.push(e.t.id); R.newKnown.push(e.t.id); if (draw) toast(`Новое в бестиарии: ${F(e.t.id).name}`, WS(F(e.t.id).pg)); }
+    if (!known(e.t.id)) { S.known.push(e.t.id); R.newKnown.push(e.t.id); }
   }
-  if (draw) showEvents(R, ev);
+  if (vis) playAction(R, a); else syncDisp(R);
 }
-function floorDone(R, draw) {
-  const b = R.b, g = EB.FLOORS[R.floor - 1].g;
-  R.runMs += EB.floorMs(R.floor, b.t);
+function floorDone(R, vis) {
+  const b = R.b, B = EB.BIOMES[R.biome], g = B.floors[R.floor - 1].g;
+  R.runMs += b.t;
+  R.heroes = EB.carry(R.heroes, b);
+  R.curve.push(partyPctOf(b));
   let bossDead = false;
-  if (g === 'b') { const boss = b.u[1][0]; S.siege.max = boss.maxHp; bossDead = !boss.alive; if (bossDead) { S.siege.hp = null; S.siege.killed = true; } else S.siege.hp = boss.hp; }
-  if (b.win && R.floor < EB.FLOORS.length) { R.gap = 1200; if (draw) feed(R, `<span class="sp">Этаж ${R.floor} пройден</span> · бой ${clock(b.t / 1000)}`); return; }
+  if (g === 'b') { const boss = b.u[1][0], sg = G(R.biome); bossDead = !boss.alive; if (!R.demo) { sg.max = boss.maxHp; if (bossDead) { sg.hp = null; sg.killed = true; } else sg.hp = boss.hp; } }
+  if (b.win && R.floor < B.floors.length) { R.gap = EB.RULES.floor.gapMs; R.runMs += R.gap; if (vis) feed(R, `<span class="sp">Этаж ${R.floor} пройден</span> · здоровье отряда ${partyPctOf(b)}%`); return; }
   R.end = bossDead ? { kind: 'boss' } : g === 'b' ? { kind: 'siege', why: b.why } : { kind: 'wall', floor: R.floor, why: b.why, foes: b.u[1].map(u => u.id) };
-  endRun(R);
+  endRun(R, vis);
 }
-function endRun(R) {
-  R.over = true; clearInterval(loop); loop = null;
+function endRun(R, vis) {
+  R.over = true;
   const L = R.loot; S.wallet.gold += L.gold; S.wallet.spirit += L.spirit; S.wallet.souls += L.souls; I('cinder').q += L.cinder;
-  S.lastRun = { wall: R.end.kind === 'wall' ? R.end.floor : null, kind: R.end.kind, floor: R.floor };
-  S.act = null;
-  S.overlay = { t: 'result' }; render(); focusOverlay();
+  if (!R.demo) S.lastRun[R.biome] = { wall: R.end.kind === 'wall' ? R.end.floor : null, kind: R.end.kind, floor: R.floor };
+  if (vis) { R.seen = true; S.overlay = { t: 'result', arg: R.id }; render(); focusOverlay(); }
+  else toast(`${EB.BIOMES[R.biome].name} · забег ${R.runNo}: ${R.end.kind === 'wall' ? 'стена на этаже ' + R.end.floor : R.end.kind === 'boss' ? 'босс повержен' : R.end.kind === 'siege' ? 'осада продолжается' : 'прерван'}. Итог — в верхней строке`);
 }
 
-/* ---------- показ событий ядра ---------- */
+/* ---------- показ действий ядра ---------- */
+function fxFor() {
+  const host = document.getElementById('btField'); if (!host) return null;
+  if (!fxInst || fxInst.host !== host) { fxInst && fxInst.destroy(); fxInst = EnFx.create(host, { speed: () => devSpeed }); }
+  return fxInst;
+}
+function syncUnits(R, us) { for (const u of us) if (u) R.disp[dkey(u)] = { hp: u.hp, sh: u.sh, dead: !u.alive }; }
+function syncDisp(R) { if (R.b) { syncUnits(R, R.b.u[0]); syncUnits(R, R.b.u[1]); } }
+function targetOf(b, u) {
+  const opp = b.u[1 - u.side];
+  if (u.cur >= 0 && opp[u.cur] && opp[u.cur].alive) return u.cur;
+  let best = -1; for (let j = 0; j < opp.length; j++) if (opp[j].alive && (best < 0 || u.th[j] > u.th[best])) best = j;
+  return best;
+}
+function targetsText(s, cast) {
+  if (!cast || !cast.t.length) return '';
+  const own = cast.t[0].side === s.side;
+  if (cast.mass) return ' → ' + (own ? 'все свои' : s.side ? 'весь отряд' : 'все враги');
+  return ' → ' + (cast.t[0] === s ? 'на себя' : uName(cast.t[0]));
+}
+function playAction(R, a) {
+  const fx = fxFor(); if (!fx || !a.s) { syncDisp(R); paintCards(R); return; }
+  const T = ms => ms / devSpeed, el = u => u && document.getElementById('bc' + u.side + u.i), C = EnFx.COL;
+  const idx = a.ev.findIndex(e => e.k === 'swing' || e.k === 'cast' || e.k === 'skip');
+  const pre = idx < 0 ? a.ev : a.ev.slice(0, idx), main = idx < 0 ? [] : a.ev.slice(idx);
+  // 1. горение, яд и лечение со временем срабатывают в начале хода носителя
+  for (const e of pre) {
+    if (e.k === 'dot' && el(e.t)) { fx.dot(el(e.t), e.school); flyAt(R, e.t, fmt(e.v), 'dmg small'); }
+    else if (e.k === 'heal' && e.v > 0 && el(e.t)) { fx.hot(el(e.t)); flyAt(R, e.t, '+' + fmt(e.v), 'heal small'); }
+    else if (e.k === 'die' && el(e.t)) { fx.death(el(e.t)); feed(R, `<span class="bd">✝</span> <b>${uName(e.t)}</b>`); }
+  }
+  if (pre.length) { syncUnits(R, pre.map(e => e.t)); paintCards(R); }
+  const actor = el(a.s); if (!main.length || !actor) { syncDisp(R); paintCards(R); return; }
+  pulse(a.s, 'act', T(a.dur * .7));
+  let hitDone = false;
+  const impact = () => {
+    if (hitDone) return; hitDone = true;
+    for (const e of main) switch (e.k) {
+      case 'hit': flyAt(R, e.t, fmt(e.v), e.crit ? 'crit' : e.t.side === 0 ? 'dmg' : ''); pulse(e.t, 'hit', T(160)); if (e.crit && el(e.t)) fx.crit(el(e.t)); break;
+      case 'miss': el(e.t) && fx.miss(el(e.t), e.t.side); flyAt(R, e.t, 'промах', 'miss'); break;
+      case 'heal': if (!e.quiet && e.v > 0) { flyAt(R, e.t, '+' + fmt(e.v), 'heal'); pulse(e.t, 'heal', T(320)); } break;
+      case 'shield': flyAt(R, e.t, '+' + fmt(e.v) + ' щит', 'shield'); break;
+      case 'status': if (el(e.t)) { if (e.st === 'dot') fx.dot(el(e.t), e.school); else if (e.st === 'hot') fx.hot(el(e.t)); else if (e.st === 'stun' || e.st === 'silence' || e.st === 'stop') fx.ctrl(el(e.t), e.st); else fx.debuff(el(e.t), e.st); } break;
+      case 'resist': el(e.t) && fx.resist(el(e.t), e.st); flyAt(R, e.t, 'сопротивление', 'info'); break;
+      case 'dispel': el(e.t) && fx.dispel(el(e.t)); break;
+      case 'die': el(e.t) && fx.death(el(e.t)); feed(R, `<span class="bd">✝</span> <b>${uName(e.t)}</b>`); break;
+    }
+    syncDisp(R); paintCards(R);
+  };
+  if (a.kind === 'skip') { fx.ctrl(actor, 'stun'); flyAt(R, a.s, 'оглушён', 'info'); impact(); return; }
+  if (a.kind === 'attack') {
+    const sw = main.find(e => e.k === 'swing'), t = sw && el(sw.t);
+    if (!t) return impact();
+    if (a.fx === 'arrow') fx.arrow(actor, t, C.steel, impact);
+    else if (a.fx === 'magic') fx.bolt(actor, t, C[a.s.el] || C.spirit, impact);
+    else fx.slash(t, C.steel, impact);
+    setTimeout(impact, T(a.dur * .9));
+    return;
+  }
+  const ab = a.ab, cast = main.find(e => e.k === 'cast'), color = C[ab.school] || C.steel;
+  const tEl = (cast ? cast.t : []).map(el).filter(Boolean);
+  flyAt(R, a.s, ab.n, a.kind === 'ult' ? 'ult' : 'abil', -26);
+  feed(R, `<b>${uName(a.s)}</b> · <span class="${a.kind === 'ult' ? 'sp' : 'gd'}">${ab.n}</span>${a.kind === 'ult' ? ' · ульта' : ''}${targetsText(a.s, cast)}`);
+  const last = i => i === tEl.length - 1 ? impact : null;
+  const go = () => {
+    if (!tEl.length) return impact();
+    switch (ab.kind) {
+      case 'dmg':
+        if (tEl.length > 1) fx.wave(actor, tEl, color, i => { if (i === tEl.length - 1) impact(); });
+        else if (a.fx === 'arrow') fx.arrow(actor, tEl[0], color, impact);
+        else if (a.fx === 'magic') fx.bolt(actor, tEl[0], color, impact, true);
+        else fx.slash(tEl[0], color, impact, true);
+        if (ab.drain) setTimeout(() => fx.drain(tEl[0], actor), T(520));
+        break;
+      case 'heal': case 'hot': tEl.forEach((t, i) => fx.heal(t, last(i))); break;
+      case 'shield': tEl.forEach((t, i) => fx.shield(t, last(i))); break;
+      case 'taunt': fx.taunt(actor, R.b.u[1 - a.s.side].filter(u => u.alive).map(el).filter(Boolean)); setTimeout(impact, T(480)); break;
+      default:
+        if (tEl.length > 1) fx.wave(actor, tEl, color, i => { if (i === tEl.length - 1) impact(); });
+        else fx.bolt(actor, tEl[0], color, impact);
+    }
+  };
+  if (a.kind === 'ult') { fx.ult(actor, color); setTimeout(go, T(650)); } else go();
+  setTimeout(impact, T(a.dur * .9));   // страховка: к концу действия его итог показан всегда
+}
 function paintHud(R) {
   const q = id => document.getElementById(id); if (!q('bt')) return;
   const b = R.b;
   q('btClock').textContent = `${clock(R.view / 1000)} / ${clock(b.limit / 1000)}`;
-  const cb = q('bt').querySelector('.bt-clock .bar'); cb && cb.style.setProperty('--v', R.view * 100 / b.limit);
+  const cb = q('bt').querySelector('.bt-clock .bar'); cb && cb.style.setProperty('--v', Math.min(100, R.view * 100 / b.limit));
   q('btRun').textContent = clock((R.runMs + R.view) / 1000);
-  paintCards(R);
+  paintCards(R); paintAim(R); paintInsp(R);
 }
 function paintCards(R) {
-  const b = R.b, aim = [b.u[0].map(() => 0), b.u[1].map(() => 0)];
-  for (const sd of [0, 1]) for (const u of b.u[sd]) { const t = b.u[1 - sd][u.cur]; if (u.alive && t && t.alive) aim[1 - sd][u.cur]++; }
+  const b = R.b; if (!b) return;
+  const aim = [b.u[0].map(() => 0), b.u[1].map(() => 0)];
+  for (const sd of [0, 1]) for (const u of b.u[sd]) { if (!u.alive) continue; const j = targetOf(b, u); if (j >= 0) aim[1 - sd][j]++; }
   for (const sd of [0, 1]) b.u[sd].forEach((u, i) => {
     const el = document.getElementById('bc' + sd + i); if (!el) return;
-    el.classList.toggle('dead', !u.alive);
-    const hb = el.querySelector('.bar'); hb.style.setProperty('--v', u.hp * 100 / u.maxHp);
-    hb.querySelector('.sh').style.width = Math.min(100, u.sh * 100 / u.maxHp) + '%';
+    const d = R.disp[dkey(u)] || { hp: u.hp, sh: u.sh, dead: !u.alive };
+    el.classList.toggle('dead', d.dead); el.classList.toggle('shielded', d.sh > 0 && !d.dead);
+    const hb = el.querySelector('.bar'); hb.style.setProperty('--v', d.hp * 100 / u.maxHp);
+    hb.querySelector('.sh').style.width = Math.min(100, d.sh * 100 / u.maxHp) + '%';
     const cg = el.querySelector('.chg');
     let v = 0, ult = false;
     if (u.phase === 'charge') { v = u.chargeMax ? (u.chargeMax - u.charge) * 100 / u.chargeMax : 100; ult = true; }
@@ -2247,11 +2429,50 @@ function paintCards(R) {
     else if (u.abs.length) v = Math.min(100, u.cnt * 100 / u.abs[u.ptr].price);
     cg.className = 'chg' + (ult ? ' ult' : '') + (u.abs.length ? '' : ' none');
     cg.firstElementChild.style.setProperty('--v', v);
-    el.classList.toggle('ready', u.alive && u.phase === 'ult');
-    const am = el.querySelector('.aim'), n = u.alive ? aim[sd][i] : 0;
+    el.classList.toggle('ready', !d.dead && u.phase === 'ult');
+    const am = el.querySelector('.aim'), n = d.dead ? 0 : aim[sd][i];
     am.classList.toggle('on', n > 0); am.lastElementChild.textContent = n;
-    el.querySelector('.sts').innerHTML = u.alive ? statusChips(u) : '';
+    el.querySelector('.sts').innerHTML = d.dead ? '' : statusChips(u);
   });
+}
+function paintAim(R) {
+  const f = fxFor(); if (!f) return;
+  if (!S.aim) return f.lines([]);
+  const b = R.b, pairs = [];
+  for (const sd of [0, 1]) for (const u of b.u[sd]) {
+    if (!u.alive) continue; const j = targetOf(b, u); if (j < 0) continue;
+    const a = document.getElementById('bc' + sd + u.i), c = document.getElementById('bc' + (1 - sd) + j);
+    if (a && c) pairs.push({ from: a, to: c, cls: sd ? 'foe' : 'hero', hot: R.lastActor === u });
+  }
+  f.lines(pairs);
+}
+function stText(x) {
+  if (x.k === 'dot') return `<span>${x.school}: ${fmt(x.per * x.stacks)} урона в каждую атаку · стаков ${x.stacks} · ещё ${x.left}</span>`;
+  if (x.k === 'hot') return `<span style="color:#9ff0c0">${x.school}: +${fmt(x.per * x.stacks)} здоровья в каждую атаку · ещё ${x.left}</span>`;
+  const n = { stun: 'Оглушение: пропускает ход', silence: 'Безмолвие: без способностей', stop: 'Остановка: не копит атаки', weak: `Ослабление: −${x.pow / 100}% урона`, mark: `Метка: +${x.pow / 100}% получаемого урона`, pierce: `Пробитие: −${x.pow / 100}% физ. защиты` }[x.k];
+  return n ? `<span>${n} · ещё ${x.left} ${atkWord(x.left)}</span>` : '';
+}
+function paintInsp(R) {
+  const box = document.getElementById('btInsp'); if (!box) return;
+  if (!S.insp) { box.hidden = true; return; }
+  const [sd, i] = S.insp.split(':').map(Number), u = R.b.u[sd] && R.b.u[sd][i];
+  if (!u) { box.hidden = true; return; }
+  const d = R.disp[dkey(u)] || { hp: u.hp, sh: u.sh, dead: !u.alive }, close = `<button class="iconbtn x" data-a="insp" data-v="${S.insp}" aria-label="Закрыть">${ic('x')}</button>`;
+  box.hidden = false;
+  if (!unitKnown(u)) { box.innerHTML = `<div class="h"><b>Неизвестный противник</b>${close}</div><span>Имя, способности и повадки откроет первая победа. Видны здоровье и эффекты.</span><span>Здоровье <b class="num">${fmt(d.hp)}</b> / ${fmt(u.maxHp)}</span>${u.st.length ? `<div class="bi-st">${u.st.map(stText).join('')}</div>` : ''}`; return; }
+  const opp = R.b.u[1 - sd], j = targetOf(R.b, u);
+  const abs = u.abs.map((ab, k) => { const nx = k === u.ptr && u.phase === 'rot'; return `<span class="${nx ? 'next' : ''}" title="${ab.d || ''}">${ab.n} · ${nx ? Math.min(u.cnt, ab.price) + '/' + ab.price : ab.price} ${atkWord(ab.price)}</span>`; }).join('');
+  const ult = u.ult ? `<span class="ult" title="${u.ult.d || ''}">${u.ult.n} · ${u.phase === 'ult' ? 'готова' : u.phase === 'charge' ? 'зарядка ' + (u.chargeMax - u.charge) + '/' + u.chargeMax : 'после ' + (EB.RULES.ultAfter - u.uses) + ' применений'}</span>` : '';
+  const th = opp.map((v, k) => [v, u.th[k]]).filter(([v]) => v.alive).sort((x, y) => y[1] - x[1]).slice(0, 3).map(([v, t]) => `<span>${uName(v)} <b class="num">${fmt(t)}</b></span>`).join('');
+  box.innerHTML = `<div class="h"><b>${u.name}</b><span class="faint">${u.cls} · ${u.el}</span>${close}</div>
+    <span>Здоровье <b class="num">${fmt(d.hp)}</b> / ${fmt(u.maxHp)}${d.sh ? ` · щит <b class="num">${fmt(d.sh)}</b>` : ''} · атака ${fmt(u.atk[u.main])} · защита ${fmt(u.def.str)} / ${fmt(u.def.int)}</span>
+    <span>Цель: <b>${!d.dead && j >= 0 ? uName(opp[j]) : '—'}</b> · выбирает угроза</span>
+    ${abs || ult ? `<div class="bi-ab">${abs}${ult}</div>` : ''}
+    ${u.st.length ? `<div class="bi-st">${u.st.map(stText).join('')}</div>` : ''}
+    ${th ? `<div class="bi-th"><span class="faint">Угроза к противникам:</span>${th}</div>` : ''}`;
+}
+function paintTray() {
+  for (const R of S.runs) { const e = document.getElementById('run-' + R.id); if (!e) continue; e.querySelector('small').textContent = R.over ? 'итог' : 'этаж ' + R.floor; e.querySelector('.hpm').style.setProperty('--v', partyPct(R)); e.classList.toggle('done', R.over); }
 }
 function statusChips(u) {
   return u.st.map(x => {
@@ -2269,33 +2490,12 @@ function flyAt(R, u, txt, cls, dy = 0) {
   const e = document.createElement('span'); e.className = 'fly ' + cls; e.textContent = txt;
   e.style.left = ((r.left - br.left) / sc + (u.side ? -18 : 24) + R.flyN * 5) + 'px';
   e.style.top = ((r.top - br.top) / sc + 10 + dy + R.flyN * 4) + 'px';
-  bt.appendChild(e); setTimeout(() => e.remove(), 950);
+  e.style.animationDuration = (900 / devSpeed) + 'ms';
+  bt.appendChild(e); setTimeout(() => e.remove(), 950 / devSpeed);
 }
 function feed(R, html) {
   R.feed.push(html); if (R.feed.length > 4) R.feed.shift();
   const f = document.getElementById('btFeed'); if (f) f.innerHTML = R.feed.map(x => `<p>${x}</p>`).join('');
-}
-function showEvents(R, ev) {
-  if (!document.getElementById('bt')) return;
-  const fast = R.speed >= 4;
-  for (const e of ev) switch (e.k) {
-    case 'swing': pulse(e.s, 'act'); break;
-    case 'hit': case 'dot': pulse(e.t, 'hit', 110); if (!fast || e.crit) flyAt(R, e.t, fmt(e.v), e.crit ? 'crit' : e.t.side === 0 ? 'dmg' : ''); break;
-    case 'miss': if (!fast) flyAt(R, e.t, 'промах', 'miss'); break;
-    case 'heal': if (!e.quiet && e.v > 0) { pulse(e.t, 'heal', 260); if (!fast) flyAt(R, e.t, '+' + fmt(e.v), 'heal'); } break;
-    case 'shield': if (!fast) flyAt(R, e.t, '+' + fmt(e.v) + ' щит', 'shield'); break;
-    case 'resist': flyAt(R, e.t, 'сопротивление', 'info'); break;
-    case 'skip': if (!fast) flyAt(R, e.s, 'оглушён', 'info'); break;
-    case 'die': feed(R, `<span class="bd">✝</span> <b>${uName(e.t)}</b>`); break;
-    case 'cast': {
-      flyAt(R, e.s, e.n, e.ult ? 'ult' : 'abil', -22);
-      const own = e.t.length && e.t[0].side === e.s.side;
-      const to = !e.t.length ? '' : e.mass ? (own ? 'все свои' : e.s.side ? 'весь отряд' : 'все враги') : e.t[0] === e.s ? 'на себя' : uName(e.t[0]);
-      feed(R, `<b>${uName(e.s)}</b> · <span class="${e.ult ? 'sp' : 'gd'}">${e.n}</span>${e.ult ? ' · ульта' : ''}${to ? ' → ' + to : ''}`);
-      if (e.mass) e.t.forEach(t => pulse(t, own ? 'heal' : 'hit', 220));
-      break;
-    }
-  }
 }
 
 /* ================== отрисовка ================== */
@@ -2307,15 +2507,18 @@ function render() {
   const act = document.activeElement, q = act && act.id === 'invq' ? { id: 'invq', s: act.selectionStart } : null;
   g.innerHTML = topBar(scr) + rail() + `<main class="g-main" id="gmain" data-route="${S.route}">${scr.html}</main>` + overlay() + (S.toast ? toastHtml() : '');
   if (q) { const e = document.getElementById(q.id); if (e) { e.focus(); try { e.setSelectionRange(q.s, q.s); } catch (_) { } } }
-  if (S.route === 'battle' && S.battle && !S.battle.over && !loop) loop = setInterval(tick, 100);
+  ensureLoop();
+  if (fxInst && fxInst.host !== document.getElementById('btField')) { fxInst.destroy(); fxInst = null; }
+  if (S.route === 'battle' && focusRun()) paintHud(focusRun());
   if (S.route === 'heroes' && S.seg.heroes === 'coll' && S.seg.hero === 'skills') bindRotation();
-  if (S.route === 'descent' && S.act) decorateActivation();
+  if (S.route === 'descent' && S.runs.some(r => !r.over)) decorateActivation();
   window.dispatchEvent(new CustomEvent('en-render'));
 }
 function focusOverlay() { requestAnimationFrame(() => { const x = document.querySelector('.g .ov .x, .g .talk .ans button'); x && x.focus({ preventScroll: true }); }); }
 function decorateActivation() {
-  const cta = document.querySelector('.banner .cta'); if (!cta || S.selBiome !== 'b1' || !S.battle || S.battle.over) return;
-  cta.innerHTML = `<span class="chip spirit">${ic('users')}Отряд в забеге · этаж ${S.battle.floor}</span><div class="row" style="gap:6px"><button class="btn ghost sm warn" data-a="endact">Прервать</button><button class="btn go big" data-a="go" data-v="battle">${ic('eye')}К бою</button></div>`;
+  const cta = document.querySelector('.banner .cta'); if (!cta || S.selBiome !== 'b1') return;
+  const live = S.runs.filter(r => !r.over && r.biome === 'b1'); if (!live.length) return;
+  cta.innerHTML = `<span class="chip spirit">${ic('users')}Забегов идёт: ${live.length}</span><div class="row" style="gap:6px"><button class="btn" data-a="sheet" data-v="prep">${ic('plus')}Ещё отряд</button><button class="btn go big" data-a="focus" data-v="${live[0].id}">${ic('eye')}К бою</button></div>`;
 }
 function bindRotation() {
   const list = document.getElementById('rotList'); if (!list) return;
@@ -2351,7 +2554,8 @@ function bindGame() {
 /* ================== презентация ================== */
 const FLOWS = [
   ['Убежище и следующий шаг', 'Проводники, текущие занятия и одна главная кнопка', () => { S.route = 'shelter'; S.overlay = null; }],
-  ['Забег по Мастерской форм', 'Пять карт против колоды этажа. Повтор даёт тот же итог, босса берут осадой', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = { t: 'prep', arg: '' }; }],
+  ['Забег по Мастерской форм', 'Бой на истощение: здоровье не восстанавливается. Эффекты, цели, карточка бойца', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = { t: 'prep', arg: '' }; }],
+  ['Бой с боссом · демо-прыжок', 'Отряд I сразу на 35-м этаже: ульты, массовые удары, осада', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = null; startRun('s1', 'b1', 35); }],
   ['Бестиарий: известный и неизвестный', 'Силуэт до первой победы, глина и совет старика после', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = { t: 'foe', arg: known('o6') ? 'e3' : 'o6' }; }],
   ['Развитие героя', 'Уровень, рунный предел и доблесть — одна лестница', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.seg.hero = 'power'; S.selHero = 'h2'; S.overlay = null; }],
   ['Ротация перетаскиванием', 'Порядок способностей в карточке героя', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.seg.hero = 'skills'; S.selHero = 'h2'; S.overlay = null; }],
@@ -2462,7 +2666,12 @@ function renderKit() {
   const sw = (c, n, s) => `<div><i style="background:${c}"></i><span><b>${n}</b>${s}</span></div>`;
   const carst = [['var(--air)', 'Воздух', 'Элазиум'], ['var(--earth)', 'Земля', 'Рубидиум'], ['var(--fire)', 'Огонь', 'Нитриум'], ['var(--water)', 'Вода', 'Паладиум'], ['var(--time)', 'Время', 'Энериум'], ['var(--light)', 'Свет', 'без покровителя'], ['var(--dark)', 'Тьма', 'без покровителя']];
   const h = S.heroes[1], f1 = F('o1'), f6 = F('o6');
+  const kc = (id, img, name, el, x, foe, lead) => `<div class="bc ${foe ? 'foe' : ''} ${lead ? 'lead' : ''}" id="${id}" data-el="${el}" style="${foe ? 'right' : 'left'}:${x}%;top:${lead ? 44 : 56}px"><div class="face"><img src="${img}" alt=""></div><span class="nm">${name}</span>${bar(foe ? 72 : 86, 'hp')}<div class="chg"><i style="--v:40"></i></div></div>`;
   k.innerHTML = `
+  <section class="k-box" style="grid-column:1/-1"><h3>Эффекты боя · ${EnFx.KINDS.length} видов</h3>
+    <div class="fx-stage" id="fxStage">${kc('kh1', S.heroes[0].img, S.heroes[0].name, S.heroes[0].el, 6)}${kc('kh2', S.heroes[3].img, S.heroes[3].name, S.heroes[3].el, 22)}${kc('kf1', WS(F('e1').pg), F('e1').name, 'Земля', 38, true, true)}${kc('kf2', WS(F('o3').pg), F('o3').name, 'Воздух', 22, true)}${kc('kf3', WS(F('o5').pg), F('o5').name, 'Земля', 6, true)}</div>
+    <div class="fx-list">${EnFx.KINDS.map(([key, n, d]) => `<button class="fx-btn" data-fx="${key}"><b>${n}</b><small>${d}</small></button>`).join('')}</div>
+    <p class="k-note">Нажмите вид — он сыграет на сцене. Каждый вид — отдельная работа художника и в Unity: частицы, анимация, звук. Цвет заклинаний и урона со временем берётся из школы стихии, у каждой школы свой урон со временем.</p></section>
   <section class="k-box"><h3>Материал</h3><div class="k-sw">${sw('var(--ink)', 'Уголь', '#0a0c0e · фон')}${sw('var(--stone)', 'Камень', '#121518 · панель')}${sw('var(--iron-2)', 'Железо', '#394047 · рамка')}${sw('var(--parch)', 'Пергамент', '#ece4d3 · текст')}${sw('var(--gold)', 'Золото', '#ddbc7a · заголовки')}${sw('var(--spirit)', 'Свет духа', '#48e5d4 · выбор')}</div><p class="k-note">Бирюза — только у выбранного и у главного действия. Больше нигде.</p></section>
   <section class="k-box"><h3>Стихии = карсты</h3><div class="k-sw">${carst.map(([c, n, s]) => sw(c, n, s)).join('')}</div><div class="k-row">${carst.map(([, n]) => el(n)).join('')}</div><p class="k-note">Цвет берётся из лора, форма кристалла и подпись дублируют цвет.</p></section>
   <section class="k-box"><h3>Семь редкостей</h3><div class="k-row">${[1, 2, 3, 4, 5, 6, 7].map(r => rar(r)).join('')}</div><div class="k-row">${[1, 2, 3, 4, 5, 6, 7].map(r => well({ n: RAR[r], img: [0, ART('item-cinder-heart.png'), ART('item-cinder-heart.png'), ART('item-stormglass.png'), ART('item-gravebloom.png'), ART('item-hollow-crown.png'), ART('item-ashen-seal.png'), ART('item-silent-bell.png')][r], r }, { act: 'noop', q: r * 3, size: 48 })).join('')}</div><p class="k-note">Редкость — нижняя кромка колодца и камень у названия.</p></section>
@@ -2483,6 +2692,35 @@ function renderKit() {
   <section class="k-box"><h3>Слой поверх: лист и диалог</h3><div class="k-demo" style="height:170px;position:relative;overflow:hidden;border:1px solid var(--iron)"><div style="position:absolute;inset:0;background:rgba(3,4,5,.55)"></div><div class="sheet" style="width:52%;animation:none"><div class="sheet-h" style="min-height:40px;padding:6px 8px 6px 12px"><h2 style="font-size:17px">Сведения</h2><span class="iconbtn x" style="width:26px;height:26px">${ic('x')}</span></div><div class="sheet-b" style="padding:8px 12px;gap:6px"><span class="faint" style="font-size:12px">уточняет работу, не уводит с экрана</span>${bar(60)}</div><div class="sheet-f" style="padding:6px 12px"><button class="btn go sm" style="margin-left:auto">Действие</button></div></div></div><p class="k-note">Лист справа — сведения и настройка. Диалог по центру — только цена, последствия и итог.</p></section>`;
 }
 
+let kitFxInst = null;
+function kitFx(kind) {
+  const st = document.getElementById('fxStage'); if (!st) return;
+  if (!kitFxInst || kitFxInst.host !== st) { kitFxInst && kitFxInst.destroy(); kitFxInst = EnFx.create(st, { speed: () => 1 }); }
+  const f = kitFxInst, C = EnFx.COL, h1 = st.querySelector('#kh1'), h2 = st.querySelector('#kh2'), foes = [...st.querySelectorAll('.bc.foe')].sort((a, b) => a.offsetLeft - b.offsetLeft), t = foes[0];
+  const kf = st.querySelector('#kf2');
+  switch (kind) {
+    case 'slash': f.slash(t, C.steel, null, true); break;
+    case 'arrow': f.arrow(h2, kf); break;
+    case 'bolt': f.bolt(h1, t, C['Время'], null, true); break;
+    case 'wave': f.wave(kf, [h1, h2], C['Воздух']); break;
+    case 'heal': f.heal(h1); break;
+    case 'hot': f.hot(h1); setTimeout(() => f.hot(h1), 500); break;
+    case 'shield': f.shield(h1); setTimeout(() => f.shield(h2), 180); break;
+    case 'taunt': f.taunt(h1, foes); break;
+    case 'dot': ['Огонь', 'Земля', 'Воздух', 'Тьма', 'Вода', 'Время'].forEach((sc, i) => setTimeout(() => f.dot(foes[i % foes.length], sc), i * 420)); break;
+    case 'debuff': f.debuff(t, 'weak'); setTimeout(() => f.debuff(kf, 'mark'), 400); break;
+    case 'ctrl': f.ctrl(foes[0], 'stun'); setTimeout(() => f.ctrl(foes[1], 'silence'), 350); setTimeout(() => f.ctrl(foes[2], 'stop'), 700); break;
+    case 'drain': f.drain(t, h2); break;
+    case 'dispel': f.dispel(h1); break;
+    case 'ult': f.ult(h2, C['Тьма']); setTimeout(() => f.wave(h2, foes, C['Тьма']), 600); break;
+    case 'crit': f.slash(t, C.gold, () => f.crit(t), true); break;
+    case 'miss': f.miss(kf, 1); break;
+    case 'resist': f.resist(t, 'stun'); break;
+    case 'death': f.death(kf); break;
+    case 'aim': f.lines([{ from: foes[0], to: h1, cls: 'foe' }, { from: foes[1], to: h1, cls: 'foe' }, { from: foes[2], to: h2, cls: 'foe', hot: true }, { from: h1, to: foes[0], cls: 'hero' }, { from: h2, to: foes[1], cls: 'hero' }]); setTimeout(() => f.lines([]), 2600); break;
+  }
+}
+
 /* ================== запуск ================== */
 function boot() {
   document.body.insertAdjacentHTML('afterbegin', SPRITE);
@@ -2492,10 +2730,12 @@ function boot() {
   renderMap(); renderKit();
   const fl = document.getElementById('flows');
   fl.innerHTML = FLOWS.map(([t, d], i) => `<li><button class="p-flow" data-flow="${i}"><span><b>${t}</b><small>${d}</small></span></button></li>`).join('');
-  fl.addEventListener('click', e => { const b = e.target.closest('[data-flow]'); if (!b) return; stopBattle('x'); FLOWS[+b.dataset.flow][2](); render(); if (S.overlay) focusOverlay(); if (window.innerWidth < 1200) document.getElementById('devWrap').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+  fl.addEventListener('click', e => { const b = e.target.closest('[data-flow]'); if (!b) return; FLOWS[+b.dataset.flow][2](); render(); if (S.overlay) focusOverlay(); if (window.innerWidth < 1200) document.getElementById('devWrap').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
   document.querySelectorAll('.p-tab').forEach(t => t.addEventListener('click', () => showPage(t.dataset.page)));
   document.querySelectorAll('[data-size]').forEach(b => b.addEventListener('click', () => setSize(b.dataset.size === 'sm')));
-  document.getElementById('btnReset').addEventListener('click', () => { stopBattle('x'); S = initialState(); render(); });
+  document.getElementById('btnReset').addEventListener('click', () => { clearInterval(loop); loop = null; if (fxInst) { fxInst.destroy(); fxInst = null; } S = initialState(); render(); });
+  document.getElementById('devSpeed').addEventListener('click', e => { const b = e.target.closest('[data-speed]'); if (!b) return; devSpeed = +b.dataset.speed; document.querySelectorAll('#devSpeed [data-speed]').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+  document.getElementById('kitGrid').addEventListener('click', e => { const b = e.target.closest('[data-fx]'); if (b) kitFx(b.dataset.fx); });
   document.getElementById('btnFull').addEventListener('click', () => { const d = document.getElementById('device'); const req = d.requestFullscreen || d.webkitRequestFullscreen; if (req) Promise.resolve(req.call(d)).catch(() => { }); });
   document.addEventListener('fullscreenchange', () => { const on = !!document.fullscreenElement; g.classList.toggle('full', on); document.getElementById('device').classList.toggle('fs', on); fitDevice(); });
   addEventListener('resize', fitDevice);

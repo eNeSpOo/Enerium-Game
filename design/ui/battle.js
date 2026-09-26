@@ -1,8 +1,11 @@
 /* Энериум · бой пять на пять — прототип ядра для UI-кита.
    Правила боя: docs/gdd/05-боевая-система.md; характеристики: docs/gdd/03-герой.md (§3.2);
    цена в атаках и ротация: docs/gdd/04-способности-и-ротация.md.
-   Решения автора 26.09.2026: до пяти врагов на этаже, враги — такие же карты, как герои,
-   одна библиотека способностей, массовые способности у обеих сторон, агро симметричное.
+   Решения автора 26.09.2026 (ADR-0004, ADR-0005): до пяти врагов на этаже, враги — такие же карты,
+   как герои, одна библиотека способностей, массовые способности у обеих сторон, агро симметричное.
+   Действия идут по одному: порядок задаёт скорость атаки карт, а каждое действие занимает
+   своё время на экране (RULES.act). Бой — сценарий, который сервер считает целиком заранее.
+   Биом — испытание на истощение: здоровье и павшие переходят с этажа на этаж. Сид — сам биом.
 
    Инварианты ядра соблюдены и в прототипе:
    - только целые числа: время в мс, доли — в процентах или базисных пунктах (10 000 = 100 %);
@@ -18,20 +21,21 @@ const RULES = {
   caps: { defPct: 50, evaBp: 2500, critBp: 2500, asMin: 50, asMax: 250 },     // скорость атаки — в сотых удара в секунду
   critDmgPct: 150, K: 112,                                                     // §5.2
   elem: { circle: ['Вода', 'Огонь', 'Земля', 'Воздух'], fwd: 125, back: 75, pair: ['Свет', 'Тьма'], pairPct: 150, base: 100 }, // §3.1
-  cls: {  // thr — классовый множитель угрозы (§5.3), main — характеристика обычной атаки, healer — цель правила «лекарь противника»
-    'Танк': { thr: 300, main: 'str' },
-    'Физ. ДД': { thr: 100, main: 'str' }, 'Физ. ДД силы': { thr: 100, main: 'str' }, 'Физ. ДД ловкости': { thr: 100, main: 'str' },
-    'Маг. ДД': { thr: 100, main: 'int' },
-    'Хилер': { thr: 100, main: 'int', healer: true }, 'Лекарь': { thr: 100, main: 'int', healer: true },
-    'Контроль': { thr: 120, main: 'int' }, 'Дебаффер': { thr: 120, main: 'int' },
-    'Босс': { thr: 150, main: 'str' }, 'Страж': { thr: 150, main: 'str' },
+  cls: {  // thr — классовый множитель угрозы (§5.3), main — характеристика обычной атаки, fx — вид удара на экране, healer — цель правила «лекарь противника»
+    'Танк': { thr: 300, main: 'str', fx: 'melee' },
+    'Физ. ДД': { thr: 100, main: 'str', fx: 'melee' }, 'Физ. ДД силы': { thr: 100, main: 'str', fx: 'melee' }, 'Физ. ДД ловкости': { thr: 100, main: 'str', fx: 'arrow' },
+    'Маг. ДД': { thr: 100, main: 'int', fx: 'magic' },
+    'Хилер': { thr: 100, main: 'int', fx: 'magic', healer: true }, 'Лекарь': { thr: 100, main: 'int', fx: 'magic', healer: true },
+    'Контроль': { thr: 120, main: 'int', fx: 'magic' }, 'Дебаффер': { thr: 120, main: 'int', fx: 'magic' },
+    'Босс': { thr: 150, main: 'str', fx: 'melee' }, 'Страж': { thr: 150, main: 'str', fx: 'melee' },
   },
   threat: { base: 100, dealt: 100, taken: 50, heal: 150, cast: 30, ult: 150, switchPct: 120, decayPct: 97, tauntPct: 130, tauntAdd: 50 },
   resist: { boss: 2500, guard: 5000 },  // сопротивление контролю, б. п. (§5.4)
   ultAfter: 3, ultChargeDiv: 2,         // §5.1: три применения, затем зарядка = сумма цен / 2
   shieldCapPct: 100,                    // щит не больше здоровья
   foeLvl: { base: 20, perFloor: 1 },    // уровень карт врага растёт с этажом
-  floor: { limitMs: { o: 45000, e: 75000, b: 150000 }, minMs: { o: 4000, e: 17000, b: 75000 } }, // §7 и §8.2
+  act: { attack: 900, cast: 1300, mass: 1700, ult: 2400, skip: 600 },  // сколько действие идёт на экране, мс реального времени
+  floor: { limitMs: { o: 150000, e: 240000, b: 360000 }, gapMs: 2500 }, // предел боя этажа и переход к следующему, мс
 };
 
 /* ================== библиотека способностей ==================
@@ -94,25 +98,25 @@ const PAS = {
 /* ================== карты врагов Мастерской форм ==================
    st — Сила, Интеллект, Ловкость, Выносливость, Скорость; hpPct — множитель здоровья карты. */
 const FOES = {
-  o1: { name: 'Безликий образец', cls: 'Физ. ДД силы', el: 'Земля', st: [130, 26, 60, 110, 60], hpPct: 250, abs: ['Каменный осколок'] },
-  o2: { name: 'Долгорукий образец', cls: 'Физ. ДД ловкости', el: 'Земля', st: [97, 26, 160, 90, 70], hpPct: 250, abs: ['Длинная рука'] },
-  o3: { name: 'Пустотелый образец', cls: 'Маг. ДД', el: 'Воздух', st: [26, 136, 60, 90, 70], hpPct: 250, abs: ['Порыв'] },
-  o4: { name: 'Безголовый образец', cls: 'Танк', el: 'Земля', st: [91, 26, 50, 240, 50], hpPct: 250, abs: ['Напор'] },
-  o5: { name: 'Сырой образец', cls: 'Лекарь', el: 'Земля', st: [26, 130, 50, 140, 60], hpPct: 250, abs: ['Замазка'] },
-  o6: { name: 'Однорукий образец', cls: 'Дебаффер', el: 'Земля', st: [117, 39, 150, 80, 130], hpPct: 250, abs: ['Удар в спину'] },
-  e1: { name: 'Подмастерье', cls: 'Физ. ДД силы', el: 'Земля', st: [169, 32, 70, 180, 60], hpPct: 700, abs: ['Замес', 'Тяжёлая рука'] },
-  e2: { name: 'Резчик', cls: 'Физ. ДД ловкости', el: 'Земля', st: [130, 32, 180, 150, 80], hpPct: 700, abs: ['Подрез', 'Снять лишнее'] },
-  e3: { name: 'Упор', cls: 'Танк', el: 'Земля', st: [104, 32, 60, 280, 50], hpPct: 800, abs: ['Напор', 'Плита'] },
-  e4: { name: 'Мех', cls: 'Маг. ДД', el: 'Воздух', st: [32, 169, 70, 150, 70], hpPct: 650, abs: ['Меха', 'Сквозняк'] },
-  e5: { name: 'Штопарь', cls: 'Лекарь', el: 'Земля', st: [32, 156, 60, 180, 60], hpPct: 650, abs: ['Заплата', 'Шов'] },
-  e6: { name: 'Съёмщик', cls: 'Дебаффер', el: 'Земля', st: [39, 149, 90, 160, 70], hpPct: 700, abs: ['Съём', 'Снять форму'] },
-  b1: { name: 'Первый набросок', cls: 'Босс', el: 'Земля', st: [195, 65, 60, 300, 60], hpPct: 3000, abs: ['Правка', 'Глиняный вал'], ult: 'Последний штрих', pas: ['Незавершённость'], resist: 'boss' },
+  o1: { name: 'Безликий образец', cls: 'Физ. ДД силы', el: 'Земля', st: [104, 20, 60, 110, 60], hpPct: 125, abs: ['Каменный осколок'] },
+  o2: { name: 'Долгорукий образец', cls: 'Физ. ДД ловкости', el: 'Земля', st: [77, 20, 160, 90, 70], hpPct: 125, abs: ['Длинная рука'] },
+  o3: { name: 'Пустотелый образец', cls: 'Маг. ДД', el: 'Воздух', st: [20, 108, 60, 90, 70], hpPct: 125, abs: ['Порыв'] },
+  o4: { name: 'Безголовый образец', cls: 'Танк', el: 'Земля', st: [72, 20, 50, 240, 50], hpPct: 125, abs: ['Напор'] },
+  o5: { name: 'Сырой образец', cls: 'Лекарь', el: 'Земля', st: [20, 104, 50, 140, 60], hpPct: 125, abs: ['Замазка'] },
+  o6: { name: 'Однорукий образец', cls: 'Дебаффер', el: 'Земля', st: [93, 31, 150, 80, 130], hpPct: 125, main: 'str', fx: 'melee', abs: ['Удар в спину'] },
+  e1: { name: 'Подмастерье', cls: 'Физ. ДД силы', el: 'Земля', st: [135, 25, 70, 180, 60], hpPct: 350, abs: ['Замес', 'Тяжёлая рука'] },
+  e2: { name: 'Резчик', cls: 'Физ. ДД ловкости', el: 'Земля', st: [104, 25, 180, 150, 80], hpPct: 350, abs: ['Подрез', 'Снять лишнее'] },
+  e3: { name: 'Упор', cls: 'Танк', el: 'Земля', st: [83, 25, 60, 280, 50], hpPct: 400, abs: ['Напор', 'Плита'] },
+  e4: { name: 'Мех', cls: 'Маг. ДД', el: 'Воздух', st: [25, 135, 70, 150, 70], hpPct: 325, abs: ['Меха', 'Сквозняк'] },
+  e5: { name: 'Штопарь', cls: 'Лекарь', el: 'Земля', st: [25, 124, 60, 180, 60], hpPct: 325, abs: ['Заплата', 'Шов'] },
+  e6: { name: 'Съёмщик', cls: 'Дебаффер', el: 'Земля', st: [31, 119, 90, 160, 70], hpPct: 350, abs: ['Съём', 'Снять форму'] },
+  b1: { name: 'Первый набросок', cls: 'Босс', el: 'Земля', st: [156, 52, 60, 300, 60], hpPct: 1500, abs: ['Правка', 'Глиняный вал'], ult: 'Последний штрих', pas: ['Незавершённость'], resist: 'boss' },
 };
 
 /* ================== колоды этажей ==================
    g: o — рядовые, e — элита с сопровождением, b — босс с сопровождением. Первым идёт лидер. */
 const FLOORS = [
-  { g: 'o', m: ['o1', 'o1'] }, { g: 'o', m: ['o1', 'o2'] }, { g: 'o', m: ['o1', 'o1', 'o2'] }, { g: 'o', m: ['o2', 'o1', 'o3'] },
+  { g: 'o', m: ['o1'] }, { g: 'o', m: ['o1', 'o1'] }, { g: 'o', m: ['o1', 'o2'] }, { g: 'o', m: ['o2', 'o1', 'o3'] },
   { g: 'e', m: ['e1', 'o1', 'o1'] },
   { g: 'o', m: ['o1', 'o2', 'o3'] }, { g: 'o', m: ['o4', 'o1', 'o2'] }, { g: 'o', m: ['o4', 'o3', 'o2'] }, { g: 'o', m: ['o1', 'o2', 'o3', 'o5'] },
   { g: 'e', m: ['e2', 'o2', 'o3'] },
@@ -130,7 +134,14 @@ const FLOORS = [
 
 /* ================== генератор ================== */
 function mix32(x) { x = Math.imul(x ^ (x >>> 16), 0x7feb352d); x = Math.imul(x ^ (x >>> 15), 0x846ca68b); return (x ^ (x >>> 16)) >>> 0; }
-function floorSeed(week, floor) { return mix32((week ^ Math.imul(floor, 0x9E3779B1)) >>> 0); }
+function seedOf(str) { let h = 0x811C9DC5; for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 0x01000193) >>> 0; return mix32(h); }  // FNV-1a
+function floorSeed(biomeSeed, floor) { return mix32((biomeSeed ^ Math.imul(floor, 0x9E3779B1)) >>> 0); }
+
+/* ================== биомы ==================
+   Сид — сам биом: один и тот же биом с тем же отрядом всегда даёт тот же сценарий. */
+const BIOMES = {
+  b1: { name: 'Мастерская форм', seed: seedOf('Мастерская форм'), floors: FLOORS },
+};
 function makeRng(seed) {  // mulberry32: целые 32 бита; roll(n) — целое от 0 до n − 1
   let a = seed >>> 0;
   return n => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) % n; };
@@ -140,7 +151,8 @@ function makeRng(seed) {  // mulberry32: целые 32 бита; roll(n) — ц�
 const fl = (a, b) => Math.floor(a / b);
 const clamp = (v, lo, hi) => v < lo ? lo : v > hi ? hi : v;
 const thrMul = u => (RULES.cls[u.cls] || { thr: 100 }).thr;
-const mainStat = u => (RULES.cls[u.cls] || { main: 'str' }).main;
+const mainStat = u => u.main;
+const fxOf = (u, stat) => stat === 'int' ? 'magic' : u.fx === 'magic' ? 'melee' : u.fx;   // вид удара на экране
 const isHealer = u => !!(RULES.cls[u.cls] && RULES.cls[u.cls].healer);
 const pct = u => fl(u.hp * 10000, u.maxHp);
 
@@ -149,9 +161,11 @@ function mkUnit(src, side, i) {
   const [str, int, agi, sta, spd] = src.st;
   const maxHp = fl(s.hp * (100 + sta) * L * (src.hpPct || 100), 100 * s.lvlDiv * 100);
   const as = clamp(RULES.caps.asMin + spd, RULES.caps.asMin, RULES.caps.asMax);
+  const C = RULES.cls[src.cls] || { main: 'str', fx: 'melee' };
   const u = {
     key: src.key, id: src.id, name: src.name, side, i, cls: src.cls, el: src.el, lvl: src.lvl, lead: !!src.lead, resist: src.resist || null,
-    maxHp, hp: src.hp != null ? clamp(src.hp, 1, maxHp) : maxHp, sh: 0,
+    main: src.main || C.main, fx: src.fx || C.fx,
+    maxHp, hp: src.dead ? 0 : src.hp != null ? clamp(src.hp, 1, maxHp) : maxHp, sh: 0,
     atk: { str: fl(s.atk * (100 + str) * L, 100 * s.lvlDiv), int: fl(s.atk * (100 + int) * L, 100 * s.lvlDiv) },
     def: { str: fl(s.def * str * L, s.lvlDiv), int: fl(s.def * int * L, s.lvlDiv) },
     eva: Math.min(RULES.caps.evaBp, fl(agi * 10000, s.evaDiv)),
@@ -162,7 +176,7 @@ function mkUnit(src, side, i) {
     ult: src.ult && LIB[src.ult] ? Object.assign({ n: src.ult }, LIB[src.ult]) : null,
     pas: (src.pas || []).map(n => PAS[n]).filter(Boolean),
     ptr: 0, cnt: 0, uses: 0, spent: 0, phase: 'rot', charge: 0, chargeMax: 0, nAbil: 0,
-    st: [], th: [], cur: -1, alive: true, next: 0, lowUsed: false,
+    st: [], th: [], cur: -1, alive: !src.dead, next: 0, lowUsed: false,
     dealt: 0, healed: 0, taken: 0,
   };
   for (const p of u.pas) if (p.kind === 'crit') u.crit = Math.min(RULES.caps.critBp, u.crit + p.bp);
@@ -177,10 +191,10 @@ function heroSrc(h) {
 function foeSrc(id, floor, k, lead, hp) {
   const f = FOES[id];
   return { key: id + '#' + k, id, name: f.name, cls: f.cls, el: f.el, lvl: RULES.foeLvl.base + floor * RULES.foeLvl.perFloor, st: f.st,
-    hpPct: f.hpPct, abs: f.abs, ult: f.ult, pas: f.pas, resist: f.resist, lead, hp };
+    hpPct: f.hpPct, main: f.main, fx: f.fx, abs: f.abs, ult: f.ult, pas: f.pas, resist: f.resist, lead, hp };
 }
-function floorFoes(floor, siegeHp) {
-  const F = FLOORS[floor - 1];
+function floorFoes(biome, floor, siegeHp) {
+  const F = BIOMES[biome].floors[floor - 1];
   return F.m.map((id, k) => foeSrc(id, floor, k, F.g !== 'o' && k === 0, F.g === 'b' && k === 0 ? siegeHp : null));
 }
 
@@ -206,38 +220,46 @@ function elemMul(a, d) {
 }
 
 function nextActor(b) { let best = null; for (const side of [0, 1]) for (const u of b.u[side]) if (u.alive && (!best || u.next < best.next)) best = u; return best; }
-function nextAt(b) { const u = nextActor(b); return u && u.next <= b.limit ? u.next : b.limit + 1; }
+/* Одно действие одной карты. Порядок — по готовности (скорость атаки), время на экране — RULES.act.
+   Возвращает запись действия: когда началось, сколько длится, кто действует, что и какие события. */
 function step(b) {
-  if (b.over) return b.ev.splice(0);
+  if (b.over) return null;
   const u = nextActor(b);
-  if (!u || u.next > b.limit) { b.t = b.limit; finish(b, false, 'time'); return b.ev.splice(0); }
-  b.t = u.next;
-  act(b, u);
+  if (!u || b.t >= b.limit) { finish(b, false, 'time'); return { at: b.t, dur: 0, kind: 'end', ev: b.ev.splice(0) }; }
+  const at = b.t;
+  const a = act(b, u);
   u.next += u.ivl;
+  const dur = RULES.act[a.kind];
+  b.t += dur;
   const a0 = b.u[0].some(v => v.alive), a1 = b.u[1].some(v => v.alive);
   if (!a1) finish(b, true, 'win'); else if (!a0) finish(b, false, 'wipe');
-  return b.ev.splice(0);
+  return { at, dur, s: u, kind: a.kind, ab: a.ab || null, fx: a.fx || null, school: a.school || null, ev: b.ev.splice(0) };
 }
 function finish(b, win, why) { b.over = true; b.win = win; b.why = why; emit(b, { k: 'end', win, why }); }
 function run(b) { while (!b.over) step(b); return b; }
 
 function act(b, u) {
-  tickPeriodic(b, u); if (!u.alive) return;
+  tickPeriodic(b, u); if (!u.alive) return { kind: 'skip' };
   const stun = has(u, 'stun');
-  if (stun) { stun.left--; if (stun.left <= 0) rmSt(u, stun); emit(b, { k: 'skip', s: u }); decay(u); return; }
+  if (stun) { stun.left--; if (stun.left <= 0) rmSt(u, stun); emit(b, { k: 'skip', s: u }); decay(u); return { kind: 'skip' }; }
   const silenced = !!has(u, 'silence'), stopped = !!has(u, 'stop');
-  if (u.phase === 'ult' && u.ult && !silenced) { cast(b, u, u.ult, true); u.phase = 'rot'; u.uses = 0; }
+  let out;
+  if (u.phase === 'ult' && u.ult && !silenced) { cast(b, u, u.ult, true); u.phase = 'rot'; u.uses = 0; out = { kind: 'ult', ab: u.ult, fx: abFx(u, u.ult), school: u.ult.school }; }
   else if (u.phase === 'rot' && u.abs.length && u.cnt >= u.abs[u.ptr].price && !silenced) {
     const ab = u.abs[u.ptr]; cast(b, u, ab, false);
     u.cnt = 0; u.ptr = (u.ptr + 1) % u.abs.length; u.uses++; u.spent += ab.price;
     if (u.ult && u.uses >= RULES.ultAfter) { u.phase = 'charge'; u.charge = fl(u.spent, RULES.ultChargeDiv); u.chargeMax = u.charge; u.spent = 0; if (u.charge <= 0) u.phase = 'ult'; }
+    out = { kind: ab.tgt === 'all' || ab.tgt === 'allies' ? 'mass' : 'cast', ab, fx: abFx(u, ab), school: ab.school };
   } else {
     attack(b, u);
     if (!stopped) { if (u.phase === 'charge') { u.charge--; if (u.charge <= 0) u.phase = 'ult'; } else if (u.phase === 'rot') u.cnt++; }
+    out = { kind: 'attack', fx: fxOf(u, u.main) };
   }
   for (const s of u.st.slice()) if (s.k === 'weak' || s.k === 'mark' || s.k === 'pierce' || s.k === 'silence' || s.k === 'stop') { s.left--; if (s.left <= 0) rmSt(u, s); }
   decay(u);
+  return out;
 }
+const abFx = (u, ab) => ab.fx || (ab.stat ? fxOf(u, ab.stat) : 'magic');
 function decay(u) { for (let j = 0; j < u.th.length; j++) u.th[j] = fl(u.th[j] * RULES.threat.decayPct, 100); }
 
 /* ---------- цели ---------- */
@@ -274,7 +296,7 @@ function pick(b, u, rule) {
 /* ---------- действия ---------- */
 function attack(b, u) {
   const t = pick(b, u, 'threat')[0]; if (!t) return;
-  emit(b, { k: 'swing', s: u, t });
+  emit(b, { k: 'swing', s: u, t, fx: fxOf(u, u.main) });
   hit(b, u, t, mainStat(u), 100, {});
 }
 function cast(b, u, ab, isUlt) {
@@ -387,24 +409,30 @@ function tickPeriodic(b, u) {
   }
 }
 
-/* ================== забег ================== */
-function floorBattle(heroes, week, floor, siegeHp) {
-  const g = FLOORS[floor - 1].g;
-  return create({ heroes, foes: floorFoes(floor, siegeHp), seed: floorSeed(week, floor), limitMs: RULES.floor.limitMs[g] });
+/* ================== забег ==================
+   Этажи идут подряд, здоровье и павшие переходят дальше: биом — испытание на истощение.
+   Щиты, эффекты и зарядка способностей обнуляются между этажами. */
+function floorBattle(heroes, biome, floor, siegeHp) {
+  const B = BIOMES[biome], g = B.floors[floor - 1].g;
+  return create({ heroes, foes: floorFoes(biome, floor, siegeHp), seed: floorSeed(B.seed, floor), limitMs: RULES.floor.limitMs[g] });
 }
-function floorMs(floor, battleMs) { return Math.max(battleMs, RULES.floor.minMs[FLOORS[floor - 1].g]); }
-function simRun(heroes, week, siegeHp) {
-  const floors = []; let runMs = 0, bossHp = siegeHp;
-  for (let f = 1; f <= FLOORS.length; f++) {
-    const b = run(floorBattle(heroes, week, f, bossHp));
-    runMs += floorMs(f, b.t);
-    const boss = FLOORS[f - 1].g === 'b' ? b.u[1][0] : null;
-    floors.push({ floor: f, win: b.win, why: b.why, ms: b.t, alive: b.u[0].filter(v => v.alive).length, bossHp: boss ? boss.hp : null, bossMax: boss ? boss.maxHp : null });
+function carry(heroes, b) {
+  return heroes.map(h => { const u = b.u[0].find(v => v.key === h.key); return Object.assign({}, h, { hp: u.hp, dead: !u.alive }); });
+}
+function simRun(heroes, biome, siegeHp) {
+  const B = BIOMES[biome], floors = []; let runMs = 0, bossHp = siegeHp, cur = heroes.map(h => Object.assign({}, h));
+  for (let f = 1; f <= B.floors.length; f++) {
+    const b = run(floorBattle(cur, biome, f, bossHp));
+    runMs += b.t + (f < B.floors.length ? RULES.floor.gapMs : 0);
+    const boss = B.floors[f - 1].g === 'b' ? b.u[1][0] : null;
     if (boss) bossHp = boss.alive ? boss.hp : 0;
+    cur = carry(cur, b);
+    const hp = b.u[0].reduce((a, u) => a + u.hp, 0), max = b.u[0].reduce((a, u) => a + u.maxHp, 0);
+    floors.push({ floor: f, win: b.win, why: b.why, ms: b.t, alive: b.u[0].filter(v => v.alive).length, pct: fl(hp * 100, max), bossHp: boss ? boss.hp : null, bossMax: boss ? boss.maxHp : null });
     if (!b.win) break;
   }
   return { floors, runMs, bossHp };
 }
 
-root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, floorMs, simRun, elemMul, ready, pct };
+root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, BIOMES, seedOf, floorSeed, makeRng, create, step, run, heroSrc, floorFoes, floorBattle, carry, simRun, elemMul, ready, pct, fxOf };
 })(typeof window !== 'undefined' ? window : globalThis);
