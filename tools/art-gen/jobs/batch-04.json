@@ -1,0 +1,120 @@
+{
+  "name": "Партия 4: враги Мастерской портретом, как портреты героев — основа для всех врагов (решение автора 27.09.2026)",
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint and frame character portraits, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.",
+  "negative": "No text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+  "cutout_rule": "Isolate the subject on a perfectly flat, uniform, solid pure {name} background ({hex}) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Do not use {name} or similar colors anywhere in the subject.",
+  "categories": {
+    "enemies": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "frame": "Format: vertical enemy card portrait, 4:5 — a PORTRAIT crop exactly like our heroes' card portraits (see the first reference image): bust to waist-up, three-quarter view, the face and upper body fill most of the frame, head in the upper third, readable at about 74 px wide. The creature's defining feature — the thing it is named after — must stay inside the frame even in this close crop. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, the 'servants' are more finished, with even hands, faces, aprons and tools, the Master is the only finished one. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Every creature is made entirely of clay: a matte clay surface with finger marks, seams and tool strokes; no human skin, no realistic flesh; hair is sculpted clay; eyes are pressed hollows or smooth clay without pupils. They must not look like living people, orcs or goblins. Clay colors: grey-green and warm ochre. Background: the dim abandoned Workshop of Forms — dark stone, a thin stream of sand falling from above, white-green crystals glowing from within in the cracks; darker and softer than the figure. Lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen portraits share the same framing, painting style, palette and lighting."
+    }
+  },
+  "jobs": [
+    {
+      "id": "wp-faceless",
+      "category": "enemies",
+      "title": "Безликий образец — рядовой, сила",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 5",
+      "subject": "Subject: 'Faceless Sample', the first creature anyone meets in the Workshop. An elven figure of grey-green clay in a rough sketch of clothing, a rope instead of a belt, holding a stone blank of a sword without a crossguard upright in front of its chest. The faceless head is the focus: no face at all — only two shallow dents pressed by a thumb where the eyes should be; still it looks straight at the viewer. Simple, solid, honest."
+    },
+    {
+      "id": "wp-longarm",
+      "category": "enemies",
+      "title": "Долгорукий образец — рядовой, ловкость",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 6",
+      "subject": "Subject: 'Long-armed Sample'. Stooped and thin, head lowered, watching. One arm is ordinary; the other is far longer and reaches toward the viewer, its heavy stone hand huge in the foreground — as if the maker began stretching it and could not stop."
+    },
+    {
+      "id": "wp-hollow",
+      "category": "enemies",
+      "title": "Пустотелый образец — рядовой, маг воздуха",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 7",
+      "subject": "Subject: 'Hollow Sample', a shell. Its chest is open like an empty mould from which the casting was removed; nothing inside but wind. Head thrown back, thin arms spread, a whirl of sand and air bursting from its empty chest and mouth."
+    },
+    {
+      "id": "wp-headless",
+      "category": "enemies",
+      "title": "Безголовый образец — рядовой, держит удар",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 8",
+      "subject": "Subject: 'Headless Sample', a four-legged BEAST the size of a bull — not a humanoid, no human torso, no arms. Portrait of its front half at shoulder level, seen from the front three-quarter view: massive bull-like shoulders and forelegs like logs, lumps of clay on its back; where the head should be, the neck simply ends in a flat, smooth cut as if along a ruler. Calm and immovable, a living wall of clay."
+    },
+    {
+      "id": "wp-raw",
+      "category": "enemies",
+      "title": "Сырой образец — рядовой, лекарь",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 9",
+      "subject": "Subject: 'Raw Sample'. It was never dried: covered in drips as if half-melted, wearing a clay apron, clay dripping from its palms; it pinches clay off its own shoulder to patch a crack. A kind, patient face."
+    },
+    {
+      "id": "wp-onearm",
+      "category": "enemies",
+      "title": "Однорукий образец — редкий, убийца",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 10",
+      "subject": "Subject: 'One-armed Sample'. Lean and tense, about to dart to the back rows. Its only arm ends in a long blade like a splinter chipped from stone, raised close beside its face; the other shoulder is smoothed away completely, flat, as if it was never meant to be."
+    },
+    {
+      "id": "wp-apprentice",
+      "category": "enemies",
+      "title": "Подмастерье — элита, сила",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 12",
+      "subject": "Subject: 'Apprentice', a servant who still kneads clay for everyone although there is no one left to knead for. Stocky; apron over a rough shirt; his clay-covered forearms are twice as thick as they should be, kneading a lump of clay in front of his chest; fists like chopping blocks. A simple, almost kind face; his eyes are two pressed hollows with no eyeballs."
+    },
+    {
+      "id": "wp-carver",
+      "category": "enemies",
+      "title": "Резчик — элита, ловкость",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 13",
+      "subject": "Subject: 'Carver', a servant who trimmed the excess from every blank. Tall, thin, stooped as if still bent over fine work; straps across the apron hold rows of chisels; instead of a right hand he has a fan of thin blades, raised in front of him."
+    },
+    {
+      "id": "wp-prop",
+      "category": "enemies",
+      "title": "Упор — элита, держит удар",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 14",
+      "subject": "Subject: 'Prop', a servant that held work in place while the clay set. Broad and squat; the top of a thick stone slab held in front of him like a tower shield fills the lower half of the frame, a simple carved hourglass outline visible on it (not letters, not a rune); above it his calm heavy clay head and the clay fingers gripping the slab's edges."
+    },
+    {
+      "id": "wp-bellows",
+      "category": "enemies",
+      "title": "Мех — элита, маг воздуха",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 15",
+      "subject": "Subject: 'Bellows', a servant who once fanned the forges. Thin and sinewy; his chest IS a forge bellows — pleated accordion folds of cracked clay built into his own torso, not an instrument held in his hands. Short nozzles on his shoulders trail thin streams of dust; his hands press the folds of his own chest as if about to blow on the whole world."
+    },
+    {
+      "id": "wp-darner",
+      "category": "enemies",
+      "title": "Штопарь — элита, лекарь",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 16",
+      "subject": "Subject: 'Darner', a servant who sews up everything that cracked. Long-armed and stooped, bending to thread a needle even now; on one hand long needles instead of fingers; spools of thread on a strap across his chest and a small pot of resin."
+    },
+    {
+      "id": "wp-remover",
+      "category": "enemies",
+      "title": "Съёмщик — элита, снимает силу",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 17",
+      "subject": "Subject: 'Remover', a servant who took moulds from finished work. A calm figure of smooth grey clay in a long apron; his own quiet face has closed pressed eyes. His raised hand holds an empty eyeless clay mask beside his face; more blank masks hang on cords across his chest. An unsettling calm."
+    },
+    {
+      "id": "wp-first-sketch",
+      "category": "enemies",
+      "title": "Первый набросок — босс Мастерской",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 18",
+      "subject": "Subject: 'The First Sketch', the BOSS of the Workshop — menacing even in a portrait. The colossal figure looms over the viewer from a low angle; its smooth blank mask with two dark hollows, lit from below, dominates the upper frame. The left side is a gaunt elven shoulder of pale clay; the right side a massive beast shoulder in rough clay fur, with a great clawed paw raised beside the mask. A small foreign hand is stuck onto its side. Deep cracks with thin streams of sand pouring out. It feels enormous even in this close crop. Not evil — terrifying in size and weight."
+    },
+    {
+      "id": "wp-master",
+      "category": "enemies",
+      "title": "Мастер — рунный страж Мастерской",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 19",
+      "subject": "Subject: 'The Master', guardian of the road down. A tall elf of smooth, almost polished clay, long sculpted hair, a calm face with the eyes CLOSED. One hand raised palm forward toward the viewer: stop. A chisel of white-green stone glowing from within hangs at his belt, visible at the lower edge. The only finished creature in the Workshop — noticeably more refined than the others."
+    }
+  ]
+}
