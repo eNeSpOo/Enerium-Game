@@ -112,7 +112,7 @@ module.exports = [
   },
   extra: {
     items: [
-      { id: 'chest_eq4', n: 'Ларец снаряжения · эпический', tier: 'product', r: 4, img: 'reward-chest-v1.png', lore: 'Один предмет снаряжения эпической редкости, случайный слот.' },
+      { id: 'chest_eq4', n: 'Ларец снаряжения · эпический', tier: 'product', r: 4, lore: 'Один предмет снаряжения эпической редкости, случайный слот.' },
     ],
     recipes: [
       { id: 'r_chest_eq4', n: 'Ларец снаряжения · эпический', kind: 'special', out: ['chest_eq4', 1], in: [['tr4', 1], ['tr3', 1], ['copper', 30], ['k7_smith', 2]],

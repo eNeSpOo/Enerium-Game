@@ -21,8 +21,13 @@ cd tools/content-gen/recipes && node build.js && node assemble.js
 
 ## Герои
 
-`heroes/build_heroes.py` собирает `docs/content/герои/герои.csv` из файлов `цикл-N.md` и печатает распределения по классам, стихиям и расам. Нужен Python 3.
+Исходник — markdown `docs/content/герои/цикл-N.md`. Оба скрипта читают его и ничего в нём не меняют. Нужен Python 3.
+- `heroes/build_heroes.py` собирает `docs/content/герои/герои.csv`, проверяет сеты — 5 героев и бюджет доблести 15 — и печатает распределения по классам, стихиям и расам.
+- `heroes/export_ui.py` выгружает героев и сеты в `design/ui/heroes.js` для раздела «Герои» в UI-ките. В выгрузке: витрина, роль, обрывки, главы, бонусы сетов, мотивы дедукции и заметки команды.
 
 ```bash
 python tools/content-gen/heroes/build_heroes.py
+python tools/content-gen/heroes/export_ui.py
 ```
+
+После правки циклов запускайте оба скрипта.

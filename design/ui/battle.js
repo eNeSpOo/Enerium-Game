@@ -8,6 +8,15 @@
    та же карта снова не ходит. Бой — сценарий, который сервер считает целиком заранее.
    Биом — испытание на истощение: здоровье и павшие переходят с этажа на этаж. Сид — сам биом.
 
+   Вторая модель для сравнения — «10 раундов» (ADR-0008, открытый вопрос автора), режим 'rounds':
+   - в раунде каждая живая карта ходит один раз, по убыванию скорости; равную скорость решает
+     бросок генератора, один на карту в начале боя;
+   - в свой ход карта делает один бросок против таблицы шансов: способность, ульта или обычная атака.
+     Ни цены в атаках, ни ротации, ни зарядки ульты;
+   - длительность эффектов — в ходах носителя, то есть в раундах;
+   - после последнего раунда «песок вышел»: этаж не взят, как при пределе времени в основной модели.
+   Числа модели — в RULES.rounds и в поле r каждой способности. Режим по умолчанию — 'tempo' (ADR-0007).
+
    Инварианты ядра соблюдены и в прототипе:
    - только целые числа: время в мс, доли — в процентах или базисных пунктах (10 000 = 100 %);
    - вся случайность — из генератора с сидом, порядок обращений к нему — часть формата боя;
@@ -38,53 +47,61 @@ const RULES = {
   tempoPct: 250,                        // скорость атаки из §3.2, растянутая для экрана: интервал ×2,5
   act: { attack: 900, cast: 1300, mass: 1700, ult: 2400, skip: 600 },  // сколько действие идёт на экране; раньше карта снова не ходит
   floor: { limitMs: { o: 150000, e: 240000, b: 360000 }, gapMs: 2500 }, // предел боя этажа и переход к следующему, мс
+  rounds: {                             // модель «10 раундов»
+    max: 10,                            // раундов в бою; после последнего — «песок вышел»
+    capBp: 6000,                        // сумма шансов способностей карты не выше 60 %: больше — сжимается пропорционально
+    act: { attack: 600, cast: 900, mass: 1100, ult: 1600, skip: 400 },   // сколько ход идёт на экране, мс
+    gapMs: 700,                         // надпись «Раунд N» между раундами, мс
+    foeHpPct: 60,                       // здоровье врагов в этой модели: за 10 раундов каждая карта ходит только 10 раз
+  },
 };
 
 /* ================== библиотека способностей ==================
    Каждая способность — набор примитивов: kind (что делает), tgt (правило цели), stat и coef
    (база = характеристика × coef / 100), price (цена в обычных атаках), st/left/pow (эффект).
-   school: «класс» — немагический приём класса, иначе стихия школы. */
+   school: «класс» — немагический приём класса, иначе стихия школы.
+   r — модель «10 раундов»: ch — шанс сработать в ход карты, б. п.; left — длительность эффекта в раундах. */
 const LIB = {
   // --- герои: общие приёмы классов
-  'Вызов': { school: 'класс', kind: 'taunt', tgt: 'all', price: 3, d: 'Все враги переключаются на стража: угроза выше лучшей на 30%.' },
-  'Удар щитом': { school: 'класс', kind: 'dmg', stat: 'str', coef: 160, tgt: 'threat', then: { st: 'stun', left: 2 }, price: 4, d: 'Урон силой и оглушение на 2 атаки цели.' },
-  'Быстрый выпад': { school: 'класс', kind: 'dmg', stat: 'str', coef: 150, tgt: 'threat', price: 2, d: 'Короткий удар силой.' },
-  'Разряд': { school: 'класс', kind: 'dmg', stat: 'int', coef: 250, tgt: 'lowest', price: 3, d: 'Урон интеллектом по самому раненому врагу.' },
-  'Живая вода': { school: 'класс', kind: 'heal', stat: 'int', coef: 250, tgt: 'ally_lowest', price: 3, d: 'Лечит самого раненого героя.' },
-  'Оберег': { school: 'класс', kind: 'shield', stat: 'int', coef: 100, tgt: 'allies', price: 4, d: 'Щит всему отряду, тратится первым.' },
-  'Оковы': { school: 'класс', kind: 'ctrl', st: 'stun', left: 2, tgt: 'danger', price: 4, d: 'Оглушение на 2 атаки самому готовому к способности врагу. Боссы сопротивляются.' },
-  'Ослабление': { school: 'класс', kind: 'debuff', st: 'weak', pow: 2500, left: 5, tgt: 'threat', price: 3, d: '−25% урона цели на 5 её атак.' },
+  'Вызов': { school: 'класс', kind: 'taunt', tgt: 'all', price: 3, r: { ch: 2500 }, d: 'Все враги переключаются на стража: угроза выше лучшей на 30%.' },
+  'Удар щитом': { school: 'класс', kind: 'dmg', stat: 'str', coef: 160, tgt: 'threat', then: { st: 'stun', left: 2 }, price: 4, r: { ch: 2000, left: 1 }, d: 'Урон силой и оглушение на 2 атаки цели.' },
+  'Быстрый выпад': { school: 'класс', kind: 'dmg', stat: 'str', coef: 150, tgt: 'threat', price: 2, r: { ch: 3000 }, d: 'Короткий удар силой.' },
+  'Разряд': { school: 'класс', kind: 'dmg', stat: 'int', coef: 250, tgt: 'lowest', price: 3, r: { ch: 2500 }, d: 'Урон интеллектом по самому раненому врагу.' },
+  'Живая вода': { school: 'класс', kind: 'heal', stat: 'int', coef: 250, tgt: 'ally_lowest', price: 3, r: { ch: 3000 }, d: 'Лечит самого раненого героя.' },
+  'Оберег': { school: 'класс', kind: 'shield', stat: 'int', coef: 100, tgt: 'allies', price: 4, r: { ch: 2000 }, d: 'Щит всему отряду, тратится первым.' },
+  'Оковы': { school: 'класс', kind: 'ctrl', st: 'stun', left: 2, tgt: 'danger', price: 4, r: { ch: 2000, left: 1 }, d: 'Оглушение на 2 атаки самому готовому к способности врагу. Боссы сопротивляются.' },
+  'Ослабление': { school: 'класс', kind: 'debuff', st: 'weak', pow: 2500, left: 5, tgt: 'threat', price: 3, r: { ch: 2500, left: 3 }, d: '−25% урона цели на 5 её атак.' },
   // --- герои: школы стихий
-  'Осыпание': { school: 'Земля', kind: 'debuff', st: 'pierce', pow: 3000, left: 4, tgt: 'threat', price: 3, d: '−30% физ. защиты цели на 4 её атаки: открывает цель ударам силы.' },
-  'Горение': { school: 'Огонь', kind: 'dot', stat: 'str', coef: 40, max: 3, left: 5, tgt: 'threat', price: 3, d: 'Поджог: урон каждую атаку цели, до 3 стаков на 5 атак.' },
-  'Погребальный костёр': { school: 'Огонь', kind: 'dmg', stat: 'str', coef: 300, per: { kind: 'dot', school: 'Огонь', pct: 25 }, tgt: 'threat', price: 5, d: 'Мощный удар: +25% за каждый стак горения на цели.' },
-  'Остановка': { school: 'Время', kind: 'ctrl', st: 'stop', left: 2, tgt: 'danger', price: 4, d: 'Цель теряет накопленные атаки и 2 атаки их не копит.' },
-  'Сияние': { school: 'Свет', kind: 'hot', stat: 'int', coef: 35, max: 3, left: 5, over: true, tgt: 'ally_lowest', price: 3, d: 'Лечит цель каждую её атаку; лишнее становится щитом.' },
-  'Увядание': { school: 'Тьма', kind: 'dot', stat: 'int', coef: 40, max: 3, left: 5, drain: 1000, tgt: 'threat', price: 3, d: 'Урон каждую атаку цели; 10% урона лечат наложившего.' },
+  'Осыпание': { school: 'Земля', kind: 'debuff', st: 'pierce', pow: 3000, left: 4, tgt: 'threat', price: 3, r: { ch: 2500, left: 3 }, d: '−30% физ. защиты цели на 4 её атаки: открывает цель ударам силы.' },
+  'Горение': { school: 'Огонь', kind: 'dot', stat: 'str', coef: 40, max: 3, left: 5, tgt: 'threat', price: 3, r: { ch: 3000, left: 3 }, d: 'Поджог: урон каждую атаку цели, до 3 стаков на 5 атак.' },
+  'Погребальный костёр': { school: 'Огонь', kind: 'dmg', stat: 'str', coef: 300, per: { kind: 'dot', school: 'Огонь', pct: 25 }, tgt: 'threat', price: 5, r: { ch: 1500 }, d: 'Мощный удар: +25% за каждый стак горения на цели.' },
+  'Остановка': { school: 'Время', kind: 'ctrl', st: 'stop', left: 2, tgt: 'danger', price: 4, r: { ch: 2000, left: 2 }, d: 'Цель теряет накопленные атаки и 2 атаки их не копит.' },
+  'Сияние': { school: 'Свет', kind: 'hot', stat: 'int', coef: 35, max: 3, left: 5, over: true, tgt: 'ally_lowest', price: 3, r: { ch: 2500, left: 3 }, d: 'Лечит цель каждую её атаку; лишнее становится щитом.' },
+  'Увядание': { school: 'Тьма', kind: 'dot', stat: 'int', coef: 40, max: 3, left: 5, drain: 1000, tgt: 'threat', price: 3, r: { ch: 2500, left: 3 }, d: 'Урон каждую атаку цели; 10% урона лечат наложившего.' },
   // --- ульты героев
-  'Долгая ночь': { school: 'Тьма', kind: 'ctrl', st: 'silence', left: 3, tgt: 'all', ult: true, d: 'Безмолвие всем врагам на 3 их атаки. Боссы сопротивляются.' },
-  'Испепеление': { school: 'Время', kind: 'dmg', stat: 'int', coef: 400, tgt: 'threat', ult: true, d: 'Крупный урон одной цели.' },
+  'Долгая ночь': { school: 'Тьма', kind: 'ctrl', st: 'silence', left: 3, tgt: 'all', ult: true, r: { ch: 800, left: 2 }, d: 'Безмолвие всем врагам на 3 их атаки. Боссы сопротивляются.' },
+  'Испепеление': { school: 'Время', kind: 'dmg', stat: 'int', coef: 400, tgt: 'threat', ult: true, r: { ch: 800 }, d: 'Крупный урон одной цели.' },
   // --- враги Мастерской форм: та же библиотека
-  'Каменный осколок': { school: 'Земля', kind: 'dmg', stat: 'str', coef: 150, tgt: 'threat', price: 2, d: 'Быстрый удар.' },
-  'Длинная рука': { school: 'класс', kind: 'dmg', stat: 'str', coef: 170, tgt: 'lowest', price: 3, d: 'Дотягивается до самого раненого.' },
-  'Порыв': { school: 'Воздух', kind: 'dmg', stat: 'int', coef: 60, tgt: 'all', price: 4, d: 'Массовый удар ветром по всему отряду.' },
-  'Напор': { school: 'класс', kind: 'taunt', tgt: 'all', price: 4, d: 'Все герои переключаются на него.' },
-  'Замазка': { school: 'Земля', kind: 'heal', stat: 'int', coef: 220, tgt: 'ally_lowest', price: 3, d: 'Лечит самого раненого из своих.' },
-  'Удар в спину': { school: 'класс', kind: 'dmg', stat: 'str', coef: 190, tgt: 'healer', price: 2, d: 'Сразу идёт к лекарю отряда.' },
-  'Замес': { school: 'Земля', kind: 'dmg', stat: 'str', coef: 240, tgt: 'threat', price: 3, d: 'Тяжёлый удар.' },
-  'Тяжёлая рука': { school: 'класс', kind: 'debuff', st: 'weak', pow: 2000, left: 4, tgt: 'threat', price: 4, d: '−20% урона цели на 4 её атаки.' },
-  'Подрез': { school: 'Воздух', kind: 'dot', stat: 'str', coef: 30, max: 4, left: 4, tgt: 'lowest', price: 3, d: 'Порезы по самому раненому, до 4 стаков.' },
-  'Снять лишнее': { school: 'класс', kind: 'dmg', stat: 'str', coef: 220, tgt: 'lowest', price: 3, d: 'Добивает самого раненого.' },
-  'Плита': { school: 'Земля', kind: 'shield', stat: 'str', coef: 150, tgt: 'allies', price: 4, d: 'Щит всем своим.' },
-  'Меха': { school: 'Воздух', kind: 'dmg', stat: 'int', coef: 80, tgt: 'all', price: 3, d: 'Порыв по всему отряду.' },
-  'Сквозняк': { school: 'Воздух', kind: 'ctrl', st: 'stop', left: 2, tgt: 'danger', price: 4, d: 'Сбивает накопленные атаки у самого готового героя.' },
-  'Заплата': { school: 'Земля', kind: 'heal', stat: 'int', coef: 240, tgt: 'ally_lowest', price: 2, d: 'Быстро латает самого раненого.' },
-  'Шов': { school: 'Земля', kind: 'heal', stat: 'int', coef: 120, tgt: 'allies', price: 4, d: 'Лечит всех своих.' },
-  'Съём': { school: 'класс', kind: 'debuff', st: 'mark', pow: 2000, left: 5, tgt: 'threat', price: 3, d: 'Метка: цель получает +20% урона 5 атак.' },
-  'Снять форму': { school: 'класс', kind: 'dispel', then: { st: 'weak', pow: 2500, left: 4 }, tgt: 'lowest', price: 3, d: 'Снимает щит и лечение, затем ослабляет.' },
-  'Правка': { school: 'Земля', kind: 'dmg', stat: 'str', coef: 260, tgt: 'threat', price: 2, d: 'Удар по тому, кто мешает.' },
-  'Глиняный вал': { school: 'Земля', kind: 'dmg', stat: 'str', coef: 90, tgt: 'all', price: 3, d: 'Массовый удар по отряду.' },
-  'Последний штрих': { school: 'Земля', kind: 'dmg', stat: 'str', coef: 220, tgt: 'all', ult: true, d: 'Ульта: тяжёлый удар по всему отряду.' },
+  'Каменный осколок': { school: 'Земля', kind: 'dmg', stat: 'str', coef: 150, tgt: 'threat', price: 2, r: { ch: 3000 }, d: 'Быстрый удар.' },
+  'Длинная рука': { school: 'класс', kind: 'dmg', stat: 'str', coef: 170, tgt: 'lowest', price: 3, r: { ch: 2500 }, d: 'Дотягивается до самого раненого.' },
+  'Порыв': { school: 'Воздух', kind: 'dmg', stat: 'int', coef: 60, tgt: 'all', price: 4, r: { ch: 2000 }, d: 'Массовый удар ветром по всему отряду.' },
+  'Напор': { school: 'класс', kind: 'taunt', tgt: 'all', price: 4, r: { ch: 2000 }, d: 'Все герои переключаются на него.' },
+  'Замазка': { school: 'Земля', kind: 'heal', stat: 'int', coef: 220, tgt: 'ally_lowest', price: 3, r: { ch: 2500 }, d: 'Лечит самого раненого из своих.' },
+  'Удар в спину': { school: 'класс', kind: 'dmg', stat: 'str', coef: 190, tgt: 'healer', price: 2, r: { ch: 3000 }, d: 'Сразу идёт к лекарю отряда.' },
+  'Замес': { school: 'Земля', kind: 'dmg', stat: 'str', coef: 240, tgt: 'threat', price: 3, r: { ch: 2500 }, d: 'Тяжёлый удар.' },
+  'Тяжёлая рука': { school: 'класс', kind: 'debuff', st: 'weak', pow: 2000, left: 4, tgt: 'threat', price: 4, r: { ch: 2000, left: 2 }, d: '−20% урона цели на 4 её атаки.' },
+  'Подрез': { school: 'Воздух', kind: 'dot', stat: 'str', coef: 30, max: 4, left: 4, tgt: 'lowest', price: 3, r: { ch: 2500, left: 3 }, d: 'Порезы по самому раненому, до 4 стаков.' },
+  'Снять лишнее': { school: 'класс', kind: 'dmg', stat: 'str', coef: 220, tgt: 'lowest', price: 3, r: { ch: 2500 }, d: 'Добивает самого раненого.' },
+  'Плита': { school: 'Земля', kind: 'shield', stat: 'str', coef: 150, tgt: 'allies', price: 4, r: { ch: 2000 }, d: 'Щит всем своим.' },
+  'Меха': { school: 'Воздух', kind: 'dmg', stat: 'int', coef: 80, tgt: 'all', price: 3, r: { ch: 2500 }, d: 'Порыв по всему отряду.' },
+  'Сквозняк': { school: 'Воздух', kind: 'ctrl', st: 'stop', left: 2, tgt: 'danger', price: 4, r: { ch: 2000, left: 1 }, d: 'Сбивает накопленные атаки у самого готового героя.' },
+  'Заплата': { school: 'Земля', kind: 'heal', stat: 'int', coef: 240, tgt: 'ally_lowest', price: 2, r: { ch: 3000 }, d: 'Быстро латает самого раненого.' },
+  'Шов': { school: 'Земля', kind: 'heal', stat: 'int', coef: 120, tgt: 'allies', price: 4, r: { ch: 2000 }, d: 'Лечит всех своих.' },
+  'Съём': { school: 'класс', kind: 'debuff', st: 'mark', pow: 2000, left: 5, tgt: 'threat', price: 3, r: { ch: 2500, left: 3 }, d: 'Метка: цель получает +20% урона 5 атак.' },
+  'Снять форму': { school: 'класс', kind: 'dispel', then: { st: 'weak', pow: 2500, left: 4 }, tgt: 'lowest', price: 3, r: { ch: 2500, left: 2 }, d: 'Снимает щит и лечение, затем ослабляет.' },
+  'Правка': { school: 'Земля', kind: 'dmg', stat: 'str', coef: 260, tgt: 'threat', price: 2, r: { ch: 3000 }, d: 'Удар по тому, кто мешает.' },
+  'Глиняный вал': { school: 'Земля', kind: 'dmg', stat: 'str', coef: 90, tgt: 'all', price: 3, r: { ch: 2500 }, d: 'Массовый удар по отряду.' },
+  'Последний штрих': { school: 'Земля', kind: 'dmg', stat: 'str', coef: 220, tgt: 'all', ult: true, r: { ch: 1500 }, d: 'Ульта: тяжёлый удар по всему отряду.' },
 };
 
 /* ================== пассивки ================== */
@@ -174,7 +191,7 @@ function mkUnit(src, side, i) {
     eva: Math.min(RULES.caps.evaBp, fl(agi * 10000, s.evaDiv)),
     crit: Math.min(RULES.caps.critBp, fl(agi * 10000, s.critDiv)),
     critDmg: RULES.critDmgPct,
-    ivl: fl(100000 * RULES.tempoPct, as * 100),
+    as, ivl: fl(100000 * RULES.tempoPct, as * 100),
     abs: (src.abs || []).map(n => LIB[n] && Object.assign({ n }, LIB[n])).filter(Boolean),
     ult: src.ult && LIB[src.ult] ? Object.assign({ n: src.ult }, LIB[src.ult]) : null,
     pas: (src.pas || []).map(n => PAS[n]).filter(Boolean),
@@ -203,13 +220,29 @@ function floorFoes(biome, floor, siegeHp) {
 
 /* ================== бой ================== */
 function create(o) {
-  const b = { t: 0, limit: o.limitMs, rng: makeRng(o.seed), seed: o.seed, u: [[], []], over: false, win: false, why: '', ev: [] };
+  const mode = o.mode === 'rounds' ? 'rounds' : 'tempo';
+  const b = { mode, t: 0, limit: mode === 'rounds' ? Infinity : o.limitMs, rng: makeRng(o.seed), seed: o.seed, u: [[], []], over: false, win: false, why: '', ev: [],
+    round: 0, queue: [] };
   // порядок героев в отряде на бой не влияет: иначе перестановка отряда перебрасывала бы случайность
   o.heroes.slice().sort((x, y) => x.key < y.key ? -1 : x.key > y.key ? 1 : 0).forEach((s, i) => b.u[0].push(mkUnit(s, 0, i)));
-  o.foes.forEach((s, i) => b.u[1].push(mkUnit(s, 1, i)));
+  const foeSrc = mode === 'rounds' ? s => Object.assign({}, s, { hpPct: fl((s.hpPct || 100) * RULES.rounds.foeHpPct, 100) }) : s => s;
+  o.foes.forEach((s, i) => b.u[1].push(mkUnit(foeSrc(s), 1, i)));
   for (const side of [0, 1]) for (const u of b.u[side]) u.th = b.u[1 - side].map(v => fl(RULES.threat.base * thrMul(v), 100));
-  for (const side of [0, 1]) for (const u of b.u[side]) u.next = b.rng(u.ivl);   // порядок: герои, затем враги
+  if (mode === 'rounds') for (const side of [0, 1]) for (const u of b.u[side]) { u.tie = b.rng(10000); u.table = chanceTable(u); u.acted = false; }  // порядок: герои, затем враги
+  else for (const side of [0, 1]) for (const u of b.u[side]) u.next = b.rng(u.ivl);   // порядок: герои, затем враги
   return b;
+}
+/* Таблица шансов карты для модели «10 раундов»: способности по порядку, затем ульта.
+   Длительности эффектов заменены раундовыми (r.left). Если сумма шансов выше RULES.rounds.capBp,
+   шансы сжимаются пропорционально — иначе карта с тремя способностями почти не била бы обычной атакой. */
+function chanceTable(u) {
+  const list = u.abs.concat(u.ult ? [u.ult] : []).filter(ab => ab.r && ab.r.ch > 0);
+  const sum = list.reduce((a, ab) => a + ab.r.ch, 0), cap = RULES.rounds.capBp;
+  return list.map(ab => {
+    const left = ab.r.left != null ? ab.r.left : ab.left;
+    return Object.assign({}, ab, { ch: sum > cap ? fl(ab.r.ch * cap, sum) : ab.r.ch, left,
+      then: ab.then ? Object.assign({}, ab.then, { left: ab.r.left != null ? ab.r.left : ab.then.left }) : undefined });
+  });
 }
 const emit = (b, e) => { e.at = b.t; b.ev.push(e); };
 const has = (u, k) => u.st.find(s => s.k === k);
@@ -228,6 +261,7 @@ function nextActor(b) { let best = null; for (const side of [0, 1]) for (const u
    Возвращает запись действия: когда началось, сколько длится, кто действует, что и какие события. */
 function step(b) {
   if (b.over) return null;
+  if (b.mode === 'rounds') return stepRound(b);
   const u = nextActor(b);
   if (!u || u.next > b.limit) { b.t = b.limit; finish(b, false, 'time'); return { at: b.t, dur: 0, kind: 'end', ev: b.ev.splice(0) }; }
   b.t = u.next;
@@ -241,7 +275,69 @@ function step(b) {
 }
 function finish(b, win, why) { b.over = true; b.win = win; b.why = why; emit(b, { k: 'end', win, why }); }
 function run(b) { while (!b.over) step(b); return b; }
-function nextAt(b) { const u = nextActor(b); return u && u.next <= b.limit ? u.next : b.limit + 1; }
+function nextAt(b) {
+  if (b.mode === 'rounds') return b.t;   // ходы идут подряд: следующий начинается, когда кончился предыдущий
+  const u = nextActor(b); return u && u.next <= b.limit ? u.next : b.limit + 1;
+}
+
+/* ---------- модель «10 раундов» ---------- */
+/* Очередь раунда: по убыванию скорости, равную решает бросок начала боя. Под «Остановкой» — в конец. */
+function order(b) {
+  const all = [];
+  for (const side of [0, 1]) for (const u of b.u[side]) if (u.alive) all.push(u);
+  const late = u => has(u, 'stop') ? 1 : 0;
+  return all.sort((x, y) => late(x) - late(y) || y.as - x.as || y.tie - x.tie || x.side - y.side || x.i - y.i);
+}
+/* Один шаг: начало раунда или ход одной карты. Возвращает запись действия, как step в основной модели,
+   плюс номер раунда, бросок и шанс сработавшей способности. */
+function stepRound(b) {
+  let u = null;
+  while (!u) {
+    if (!b.queue.length) {
+      if (b.round >= RULES.rounds.max) { finish(b, false, 'sand'); return { at: b.t, dur: 0, kind: 'end', round: b.round, ev: b.ev.splice(0) }; }
+      b.round++;
+      for (const side of [0, 1]) for (const v of b.u[side]) v.acted = false;
+      b.queue = order(b);
+      emit(b, { k: 'round', n: b.round });
+      const at = b.t, dur = RULES.rounds.gapMs; b.t += dur;
+      return { at, dur, kind: 'round', round: b.round, order: b.queue.slice(), ev: b.ev.splice(0) };
+    }
+    const next = b.queue.shift();
+    if (next.alive) u = next;
+  }
+  const at = b.t;
+  const a = actRound(b, u);
+  u.acted = true;
+  const dur = RULES.rounds.act[a.kind];
+  b.t = at + dur;
+  const a0 = b.u[0].some(v => v.alive), a1 = b.u[1].some(v => v.alive);
+  if (!a1) finish(b, true, 'win'); else if (!a0) finish(b, false, 'wipe');
+  return { at, dur, s: u, kind: a.kind, ab: a.ab || null, fx: a.fx || null, school: a.school || null, round: b.round, roll: a.roll, ch: a.ch || 0, ev: b.ev.splice(0) };
+}
+function actRound(b, u) {
+  tickPeriodic(b, u); if (!u.alive) return { kind: 'skip' };
+  const stun = has(u, 'stun');
+  if (stun) { stun.left--; if (stun.left <= 0) rmSt(u, stun); emit(b, { k: 'skip', s: u }); endTurn(u); return { kind: 'skip' }; }
+  const roll = b.rng(10000);   // один бросок на ход, даже под безмолвием: порядок обращений к генератору не зависит от эффектов
+  let ab = null;
+  if (!has(u, 'silence')) { let sum = 0; for (const x of u.table) { sum += x.ch; if (roll < sum) { ab = x; break; } } }
+  let out;
+  if (ab) { cast(b, u, ab, !!ab.ult); out = { kind: ab.ult ? 'ult' : ab.tgt === 'all' || ab.tgt === 'allies' ? 'mass' : 'cast', ab, fx: abFx(u, ab), school: ab.school, roll, ch: ab.ch }; }
+  else { attack(b, u); out = { kind: 'attack', fx: fxOf(u, u.main), roll }; }
+  endTurn(u);
+  return out;
+}
+/* Длительности считают ходы носителя: в модели раундов это и есть раунды. */
+function endTurn(u) {
+  for (const s of u.st.slice()) if (s.k === 'weak' || s.k === 'mark' || s.k === 'pierce' || s.k === 'silence' || s.k === 'stop') { s.left--; if (s.left <= 0) rmSt(u, s); }
+  decay(u);
+}
+/* «Самый готовый» в модели раундов — кто ходит раньше всех из ещё не ходивших; если все сходили — самый быстрый. */
+function readyRound(b, v) {
+  if (!v.alive) return -1;
+  const q = b.queue.indexOf(v);
+  return q >= 0 ? 20000 - q : 10000 + v.as;
+}
 
 function act(b, u) {
   tickPeriodic(b, u); if (!u.alive) return { kind: 'skip' };
@@ -293,7 +389,7 @@ function pick(b, u, rule) {
     case 'ally_lowest': return mates.length ? [minBy(mates, pct)] : [];
     case 'lowest': return foes.length ? [minBy(foes, pct)] : [];
     case 'healer': { const h = foes.find(isHealer); if (h) return [h]; break; }
-    case 'danger': { const d = maxBy(foes, ready); if (d && ready(d) > 0) return [d]; break; }
+    case 'danger': { const rd = b.mode === 'rounds' ? v => readyRound(b, v) : ready, d = maxBy(foes, rd); if (d && rd(d) > 0) return [d]; break; }
   }
   const t = byThreat(b, u); return t ? [t] : [];
 }
@@ -386,7 +482,10 @@ function addStatus(b, src, t, s, isCtrl) {
   const ex = has(t, s.st);                       // одинаковые обновляют длительность, разные стакаются (§5.4)
   if (ex) { ex.left = Math.max(ex.left, left); ex.left0 = Math.max(ex.left, ex.left0); ex.pow = Math.max(ex.pow, s.pow || 0); }
   else t.st.push({ k: s.st, left, left0: left, pow: s.pow || 0 });
-  if (s.st === 'stop') { t.cnt = 0; if (t.phase === 'charge') t.charge = t.chargeMax; }
+  if (s.st === 'stop') {
+    if (b.mode === 'rounds') { const q = b.queue.indexOf(t); if (q >= 0) { b.queue.splice(q, 1); b.queue.push(t); } }   // ходит последней в раунде
+    else { t.cnt = 0; if (t.phase === 'charge') t.charge = t.chargeMax; }
+  }
   emit(b, { k: 'status', s: src, t, st: s.st, left });
 }
 function addPeriodic(b, src, t, ab) {
@@ -416,28 +515,28 @@ function tickPeriodic(b, u) {
 
 /* ================== забег ==================
    Этажи идут подряд, здоровье и павшие переходят дальше: биом — испытание на истощение.
-   Щиты, эффекты и зарядка способностей обнуляются между этажами. */
-function floorBattle(heroes, biome, floor, siegeHp) {
+   Щиты, эффекты и зарядка способностей обнуляются между этажами. mode — 'tempo' (ADR-0007) или 'rounds'. */
+function floorBattle(heroes, biome, floor, siegeHp, mode) {
   const B = BIOMES[biome], g = B.floors[floor - 1].g;
-  return create({ heroes, foes: floorFoes(biome, floor, siegeHp), seed: floorSeed(B.seed, floor), limitMs: RULES.floor.limitMs[g] });
+  return create({ heroes, foes: floorFoes(biome, floor, siegeHp), seed: floorSeed(B.seed, floor), limitMs: RULES.floor.limitMs[g], mode });
 }
 function carry(heroes, b) {
   return heroes.map(h => { const u = b.u[0].find(v => v.key === h.key); return Object.assign({}, h, { hp: u.hp, dead: !u.alive }); });
 }
-function simRun(heroes, biome, siegeHp) {
+function simRun(heroes, biome, siegeHp, mode) {
   const B = BIOMES[biome], floors = []; let runMs = 0, bossHp = siegeHp, cur = heroes.map(h => Object.assign({}, h));
   for (let f = 1; f <= B.floors.length; f++) {
-    const b = run(floorBattle(cur, biome, f, bossHp));
+    const b = run(floorBattle(cur, biome, f, bossHp, mode));
     runMs += b.t + (f < B.floors.length ? RULES.floor.gapMs : 0);
     const boss = B.floors[f - 1].g === 'b' ? b.u[1][0] : null;
     if (boss) bossHp = boss.alive ? boss.hp : 0;
     cur = carry(cur, b);
     const hp = b.u[0].reduce((a, u) => a + u.hp, 0), max = b.u[0].reduce((a, u) => a + u.maxHp, 0);
-    floors.push({ floor: f, win: b.win, why: b.why, ms: b.t, alive: b.u[0].filter(v => v.alive).length, pct: fl(hp * 100, max), bossHp: boss ? boss.hp : null, bossMax: boss ? boss.maxHp : null });
+    floors.push({ floor: f, win: b.win, why: b.why, ms: b.t, rounds: b.round, alive: b.u[0].filter(v => v.alive).length, pct: fl(hp * 100, max), bossHp: boss ? boss.hp : null, bossMax: boss ? boss.maxHp : null });
     if (!b.win) break;
   }
   return { floors, runMs, bossHp };
 }
 
-root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, BIOMES, seedOf, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, carry, simRun, elemMul, ready, pct, fxOf };
+root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, BIOMES, seedOf, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, carry, simRun, elemMul, ready, readyRound, order, chanceTable, pct, fxOf };
 })(typeof window !== 'undefined' ? window : globalThis);

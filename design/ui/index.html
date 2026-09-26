@@ -151,16 +151,16 @@ img{max-width:100%}
 .g.full{width:100vw;height:100vh;height:100dvh;border-radius:0}
 .g *{-webkit-tap-highlight-color:transparent}
 .g button{cursor:pointer}
-.g .num{font-variant-numeric:lining-nums tabular-nums}
-.g .serif{font-family:var(--f-d)}
-.g .muted{color:var(--parch-2)}
-.g .faint{color:var(--parch-3)}
-.g .gold{color:var(--gold)}
-.g .spirit{color:var(--spirit)}
-.g .caps{font:700 11px/1.2 var(--f-u);letter-spacing:.14em;text-transform:uppercase}
-.g .eyebrow{font:700 10.5px/1.2 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--gold-2)}
-.g h1,.g h2,.g h3,.g h4{margin:0;font-weight:600;font-family:var(--f-d);text-wrap:balance}
-.g p{margin:0}
+.g .num,.tr-page .num,#kitHeroes .num{font-variant-numeric:lining-nums tabular-nums}
+.g .serif,.tr-page .serif,#kitHeroes .serif{font-family:var(--f-d)}
+.g .muted,.tr-page .muted,#kitHeroes .muted{color:var(--parch-2)}
+.g .faint,.tr-page .faint,#kitHeroes .faint{color:var(--parch-3)}
+.g .gold,.tr-page .gold,#kitHeroes .gold{color:var(--gold)}
+.g .spirit,.tr-page .spirit{color:var(--spirit)}
+.g .caps,.tr-page .caps{font:700 11px/1.2 var(--f-u);letter-spacing:.14em;text-transform:uppercase}
+.g .eyebrow,.tr-page .eyebrow,#kitHeroes .eyebrow{font:700 10.5px/1.2 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--gold-2)}
+.g h1,.g h2,.g h3,.g h4,.tr-page h3{margin:0;font-weight:600;font-family:var(--f-d);text-wrap:balance}
+.g p,.tr-page p{margin:0}
 
 /* верхняя строка */
 .g-top{grid-column:1/-1;grid-row:1;display:flex;align-items:center;gap:10px;padding-right:8px;background:linear-gradient(#0e1114,#0a0c0e);border-bottom:1px solid var(--iron);position:relative;z-index:6;min-width:0}
@@ -513,6 +513,73 @@ button.well:hover{border-color:var(--iron-3)}
 .rot .ult b .i{width:11px;height:11px}
 .rot .ult.charging b{color:var(--spirit);opacity:.6}
 .rot .ult.ready b{color:var(--spirit);filter:drop-shadow(0 0 4px var(--spirit))}
+/* модель «10 раундов»: шансы способностей вместо сегментов, очередь раунда, песок раундов */
+.rot .ch{display:inline-flex;align-items:center;gap:1px;flex:none;height:11px;padding:0 2px 0 1px;border-radius:3px;background:rgba(7,9,11,.6);color:var(--sc,var(--parch-2));font:700 8.5px/1 var(--f-u);font-variant-numeric:tabular-nums}
+.rot .ch .i{width:9px;height:9px}
+.rot .ch b{color:var(--parch-2);font-weight:700}
+.rot .ch.u{color:var(--gold)}
+.rot .ch.on{background:color-mix(in srgb,var(--sc,var(--gold)) 38%,#0b0d10);box-shadow:0 0 7px var(--sc,var(--gold))}
+.rot .ch.on b{color:var(--parch)}
+.bc.done .face{filter:saturate(.55) brightness(.8)}
+.bt-queue{position:absolute;left:calc(var(--colw) + 112px);right:calc(var(--colw) + 112px);top:2px;display:flex;justify-content:center;gap:3px;pointer-events:none}
+.bt-queue.static{position:static;display:inline-flex}
+.bt-queue i{position:relative;width:18px;height:18px;flex:none;border-radius:5px;overflow:hidden;border:1px solid #2f5e5a;background:#0b0d10;transition:opacity .2s ease,transform .2s ease}
+.bt-queue i.f{border-color:#6b3a33}
+.bt-queue i img{width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+.bt-queue i.now{border-color:var(--gold);box-shadow:0 0 7px var(--gold);transform:translateY(2px)}
+.bt-queue i.done{opacity:.35}
+.bt-rflash{position:absolute;left:50%;top:34%;z-index:6;font:600 26px/1 var(--f-d);color:var(--gold);text-shadow:0 0 16px rgba(221,188,122,.35),0 2px 6px #000;pointer-events:none;animation:rflash .7s ease both}
+@keyframes rflash{0%{opacity:0;transform:translate(-50%,-30%)}25%{opacity:1;transform:translate(-50%,-50%)}100%{opacity:0;transform:translate(-50%,-70%)}}
+.p-cmp{width:100%;border-collapse:collapse;margin-top:8px;font-size:12.5px}
+.p-cmp th,.p-cmp td{padding:4px 6px 4px 0;border-bottom:1px solid #1e2328;text-align:left;vertical-align:top}
+.p-cmp th{color:var(--parch-3);font-weight:400}
+.p-cmp td b{color:var(--parch)}
+.p-cmp .curve{height:34px}
+/* UI-кит · герои из docs/content/герои/: коллекция, карточка, ордены */
+.kh-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.kh-top select{height:30px;border-radius:8px;border:1px solid var(--iron-2);background:#0c0f11;color:var(--parch);font:14px var(--f-u);padding:0 8px;max-width:230px}
+.kh-top label{display:inline-flex;align-items:center;gap:6px;color:var(--parch-2);font-size:13px;cursor:pointer}
+.kh-top .n{color:var(--parch-3);font-size:13px;margin-left:auto}
+.kh-main{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:14px;align-items:start}
+.kh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px;max-height:760px;overflow:auto;padding:2px;scrollbar-width:thin;scrollbar-color:#2c3238 transparent}
+.kh-card{appearance:none;display:flex;flex-direction:column;gap:4px;padding:5px;border-radius:10px;border:1px solid var(--iron);background:#0c0f12;color:var(--parch);text-align:left;cursor:pointer;font:inherit;min-width:0}
+.kh-card:hover{border-color:var(--iron-3)}
+.kh-card[aria-pressed="true"]{border-color:var(--spirit);box-shadow:0 0 0 1px var(--spirit)}
+.kh-card[data-el="Воздух"],.kh-big[data-el="Воздух"]{--c:var(--air)}.kh-card[data-el="Земля"],.kh-big[data-el="Земля"]{--c:var(--earth)}.kh-card[data-el="Огонь"],.kh-big[data-el="Огонь"]{--c:var(--fire)}.kh-card[data-el="Вода"],.kh-big[data-el="Вода"]{--c:var(--water)}.kh-card[data-el="Время"],.kh-big[data-el="Время"]{--c:var(--time)}.kh-card[data-el="Свет"],.kh-big[data-el="Свет"]{--c:var(--light)}.kh-card[data-el="Тьма"],.kh-big[data-el="Тьма"]{--c:var(--dark)}
+.kh-ph{position:relative;display:grid;place-items:center;aspect-ratio:4/5;border-radius:7px;overflow:hidden;background:radial-gradient(120% 70% at 50% 112%,color-mix(in srgb,var(--c,#555) 55%,transparent),transparent 62%),linear-gradient(180deg,#101418,#0a0c0e);box-shadow:inset 0 -3px 0 var(--rc,var(--iron-2))}
+.kh-ph b{font:600 30px/1 var(--f-d);color:color-mix(in srgb,var(--c,#aaa) 55%,var(--parch-2));text-shadow:0 2px 10px #000}
+.kh-ph .cl{position:absolute;left:4px;top:4px;display:grid;place-items:center;width:18px;height:18px;border-radius:5px;background:rgba(7,9,11,.7);color:var(--parch-2)}
+.kh-ph .cl .i{width:12px;height:12px}
+.kh-ph .sp{position:absolute;right:4px;top:4px;font:700 9px/1 var(--f-u);letter-spacing:.06em;color:var(--amber);background:rgba(7,9,11,.75);padding:3px 4px;border-radius:4px}
+.kh-nm{font:600 15px/1.05 var(--f-d);color:var(--parch);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.kh-sub{display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--parch-3);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kh-det{position:sticky;top:10px;display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:12px;border:1px solid var(--iron);background:#0c0f12;max-height:760px;overflow:auto;scrollbar-width:thin;scrollbar-color:#2c3238 transparent}
+.kh-det p{margin:0}
+.kh-big{width:92px;flex:none}
+.kh-big .kh-ph b{font-size:40px}
+.kh-meta{display:flex;flex-wrap:wrap;gap:4px}
+.kh-ch{display:flex;flex-direction:column;gap:3px;padding:8px 10px;border-radius:8px;border:1px solid var(--iron);background:#0a0c0e}
+.kh-ch b{font:600 16px/1.1 var(--f-d);color:var(--gold)}
+.kh-ch.lock b{color:var(--parch-3)}
+.kh-ch.lock small{color:var(--parch-3)}
+.kh-frag{margin:0;padding-left:16px;color:var(--parch-2);font:italic 500 15px/1.35 var(--f-d)}
+.kh-team{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-radius:8px;border:1px dashed rgba(230,168,75,.35);color:var(--parch-2);font-size:13px}
+.kh-team::before{content:"для команды · игрок не видит";font:700 10px/1 var(--f-u);letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
+.kh-val{display:flex;align-items:center;gap:10px}
+.kh-val input{flex:1;accent-color:var(--gold)}
+.kh-sets{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:10px}
+.kh-set{display:flex;flex-direction:column;gap:7px;padding:12px;border-radius:12px;border:1px solid var(--iron);background:#0c0f12}
+.kh-set p{margin:0}
+.kh-set h4{margin:0;font:600 20px/1.1 var(--f-d);color:var(--parch)}
+.kh-mem{display:flex;flex-wrap:wrap;gap:5px}
+.kh-mem button,.kh-mem span{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 8px;border-radius:7px;border:1px solid var(--iron-2);background:#0a0c0e;color:var(--parch);font:13px var(--f-u)}
+.kh-mem button{cursor:pointer}
+.kh-mem .unk{color:var(--parch-3);border-style:dashed}
+.kh-mem .hid{opacity:.6;border-style:dashed}
+.kh-tiers{border-collapse:collapse;font-size:12.5px;width:100%}
+.kh-tiers td{padding:3px 8px 3px 0;border-top:1px solid #1b2025;color:var(--parch-2);vertical-align:top}
+.kh-tiers td:first-child{color:var(--gold);width:26px;font-weight:700}
+@media (max-width:1100px){.kh-main{grid-template-columns:minmax(0,1fr)}.kh-det{position:static;max-height:none}}
 /* анимации карты: применила способность — выросла; попала способность — вздрогнула */
 @keyframes cshake{0%,100%{translate:0 0;rotate:0deg}20%{translate:-3px 1px;rotate:-2deg}40%{translate:3px -1px;rotate:2deg}60%{translate:-2px 0;rotate:-1deg}80%{translate:2px 0;rotate:1deg}}
 @keyframes cgrow{0%{scale:1}35%{scale:1.14}100%{scale:1}}
@@ -1027,6 +1094,28 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 .k-box .hc{max-width:110px}
 
 /* ===== Древо рецептов: шесть циклов, узлы по ярусам, связи — рецепты «входы → выход» ===== */
+/* вкладка «Древо рецептов» — инструмент команды во всю ширину, не экран телефона (ADR-0008) */
+.tr-page{margin-top:14px;height:clamp(560px,calc(100vh - 200px),920px);color:var(--parch);font:14px/1.35 var(--f-u)}
+.tr-page button{cursor:pointer}
+.tr-page .tr-main{grid-template-columns:minmax(0,1fr) 340px}
+.tr-page .tn{grid-template-columns:26px minmax(0,1fr);height:32px}
+.tr-page .tn .ti{width:26px;height:26px}
+.tr-page .tn b{font-size:12px}
+.tr-page .tr-bar{flex-wrap:wrap;row-gap:6px}
+.tr-find{position:relative}
+.tr-find input,.tr-page select{height:30px;border-radius:8px;border:1px solid var(--iron-2);background:#0c0f11;color:var(--parch);font:14px var(--f-u);padding:0 10px}
+.tr-find input{width:230px}
+.tr-page select{max-width:250px}
+.tr-only-l{display:inline-flex;align-items:center;gap:6px;color:var(--parch-2);font-size:13px;cursor:pointer;white-space:nowrap}
+.tr-hits{position:absolute;left:0;top:34px;z-index:5;width:360px;max-height:380px;overflow:auto;display:flex;flex-direction:column;gap:2px;padding:6px;border-radius:10px;border:1px solid var(--iron-2);background:#0b0d10;box-shadow:0 14px 34px rgba(0,0,0,.65)}
+.tr-hits[hidden],.tr-find:not(:focus-within) .tr-hits{display:none}
+.tr-hits button{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:6px 8px;border-radius:6px;border:0;background:transparent;color:var(--parch);font:14px var(--f-u);text-align:left}
+.tr-hits button:hover{background:#151a1e}
+.tr-hits small{color:var(--parch-3);font-size:12px;white-space:nowrap}
+.tn.hit{box-shadow:0 0 0 2px var(--gold),0 0 12px -2px var(--gold)}
+.tr-only .tn:not(.sel):not(.up):not(.down){display:none}
+.tr-use .faint{align-self:center}
+@media (max-width:1100px){.tr-page{height:auto}.tr-page .tr{height:auto}.tr-page .tr-main{grid-template-columns:minmax(0,1fr)}.tr-page .tr-canvas{height:600px}.tr-page .tr-info{overflow:visible}}
 .tr{display:flex;flex-direction:column;gap:8px;height:100%;min-height:0}
 .tr-bar{display:flex;align-items:center;gap:8px;min-width:0;flex:none}
 .tr-bar .tabs button{padding:0 10px;display:inline-flex;align-items:center;gap:3px}
@@ -1111,6 +1200,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
   <nav class="p-tabs" role="tablist" aria-label="Разделы">
     <button class="p-tab" role="tab" data-page="proto" aria-selected="true">Прототип</button>
     <button class="p-tab" role="tab" data-page="map" aria-selected="false">Карта экранов</button>
+    <button class="p-tab" role="tab" data-page="tree" aria-selected="false">Древо рецептов</button>
     <button class="p-tab" role="tab" data-page="kit" aria-selected="false">UI-кит</button>
   </nav>
 </header>
@@ -1136,6 +1226,10 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
         <p style="margin-top:6px">Тестовая сцена по ADR-0004 и ADR-0005. Враги — такие же карты, как герои, этаж — готовая колода, способности из одной библиотеки. Каждая карта действует на своей скорости атаки, у каждого действия свой эффект. Красная рамка показывает, в кого целятся, кнопка «Знаки» объясняет индикаторы, а нажатие на карту открывает её способности, эффекты и угрозу. Биом — испытание на истощение: здоровье и павшие переходят на следующий этаж. Сид — сам биом. Забег можно свернуть, забегов может идти несколько.</p>
         <div class="p-ctrls" id="devSpeed" style="margin-top:10px;align-items:center"><span class="p-note">Скорость прототипа:</span><button class="p-chip" data-speed="1" aria-pressed="true">×1</button><button class="p-chip" data-speed="2" aria-pressed="false">×2</button><button class="p-chip" data-speed="4" aria-pressed="false">×4</button><button class="p-chip" data-speed="8" aria-pressed="false">×8</button></div>
         <p class="p-note" style="margin-top:6px">В игре ускорения нет: бой идёт в реальном времени сервера. Переключатель — только чтобы быстрее проверить прототип.</p>
+        <div class="p-ctrls" id="devModel" style="margin-top:12px;align-items:center"><span class="p-note">Модель боя:</span><button class="p-chip" data-model="tempo" aria-pressed="true">Истощение</button><button class="p-chip" data-model="rounds" aria-pressed="false">10 раундов</button></div>
+        <p class="p-note" style="margin-top:6px">«10 раундов» — вариант из ADR-0008 для сравнения. Карты ходят по очереди по скорости, способность срабатывает по шансу, иначе — обычная атака. После десятого раунда песок вышел: этаж не взят. Новый забег идёт по выбранной модели.</p>
+        <div class="p-ctrls" style="margin-top:8px"><button class="p-chip" id="devCompare">Сравнить на отряде I</button></div>
+        <div id="devCmp"></div>
       </div>
     </aside>
   </div>
@@ -1180,6 +1274,13 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
   </div>
 </section>
 
+<section class="p-page" id="page-tree" hidden>
+  <div class="p-sec">
+    <h2 style="font-size:34px">Древо рецептов</h2>
+    <p class="p-lead">Инструмент команды и конструктора, а не экран игрока (ADR-0008): что откуда идёт, из чего собирать рецепт и куда двигать дальше. Здесь всё, включая спойлеры цикла VI. Поиск находит узел по названию, фильтр по ресурсу показывает его цепочку по всем циклам. Данные — <code>recipes.js</code>, обоснование — <code>docs/content/ресурсы-рецепты-дроп.md</code>.</p>
+    <div class="tr-page" id="treeRoot"></div>
+  </div>
+</section>
 <section class="p-page" id="page-kit" hidden>
   <div class="p-sec">
     <h2 style="font-size:34px">UI-кит «Свет снизу»</h2>
@@ -1194,6 +1295,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <script src="battle.js"></script>
 <script src="fx.js"></script>
 <script src="recipes.js"></script>
+<script src="heroes.js"></script>
 <script>
 'use strict';
 /* Все числа ниже — демонстрационные фикстуры: взяты из текущего UIKit
@@ -1204,6 +1306,8 @@ const ART = n => A('art/' + n);
 const PATH = n => A('path-icons/path-' + String(n).padStart(2, '0') + '.jpg');
 const WS = n => ART('workshop-page-' + String(n).padStart(2, '0') + ([1, 4, 11, 20].includes(n) ? '.jpg' : '.png'));
 const DUST = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><radialGradient id="g" cx="50%" cy="80%" r="60%"><stop offset="0" stop-color="#f3e2b4"/><stop offset=".6" stop-color="#b08d55"/><stop offset="1" stop-color="#5d4a2c"/></radialGradient></defs><path d="M6 52c6-12 14-22 26-22s20 10 26 22z" fill="url(#g)"/><path d="M20 44c3-4 7-7 12-7" stroke="#fff3cf" stroke-opacity=".5" stroke-width="2" fill="none"/><circle cx="22" cy="18" r="2.2" fill="#f7e9c2"/><circle cx="38" cy="12" r="1.6" fill="#f7e9c2" opacity=".8"/><circle cx="31" cy="22" r="1.3" fill="#f7e9c2" opacity=".7"/><circle cx="44" cy="24" r="1.8" fill="#f7e9c2" opacity=".6"/></svg>');
+/* Сундук — заглушка до генерации в стиле ADR-0009: арт GPT убран */
+const CHEST = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><radialGradient id="l" cx="50%" cy="100%" r="70%"><stop offset="0" stop-color="#ddbc7a" stop-opacity=".35"/><stop offset="1" stop-color="#121518" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" rx="10" fill="#121518"/><rect width="64" height="64" rx="10" fill="url(#l)"/><path d="M14 31h36v16a3 3 0 0 1-3 3H17a3 3 0 0 1-3-3z" fill="#2b241c" stroke="#ddbc7a" stroke-width="2"/><path d="M14 31c0-9 8-15 18-15s18 6 18 15z" fill="#3a3024" stroke="#ddbc7a" stroke-width="2"/><path d="M24 17.5V50M40 17.5V50" stroke="#b1915a" stroke-width="1.5" opacity=".55"/><rect x="28" y="28" width="8" height="10" rx="1.5" fill="#ddbc7a"/><circle cx="32" cy="33" r="1.6" fill="#121518"/></svg>');
 
 const CUR = {
   gold: { n: 'Золото', img: ART('gold.png'), src: 'Каждый враг, контракты, ритуалы героев' },
@@ -1298,10 +1402,10 @@ function initialState() {
       { id: 'hfrag', n: 'Осколки: Хронист', r: 3, q: 42, cat: 'frag', spec: 'Сборный герой', img: ART('hero-portrait-3.png'), riddle: '42 из 50. Остальное — у Эхо.', from: 'Эхо, Возрождение душ', recipes: [] },
       { id: 'act', n: 'Активация биома', r: 4, q: 1, cat: 'act', spec: 'Экземпляр крафтового биома', img: PATH(22), riddle: 'Что внутри — узнаешь, когда откроешь.', from: 'Мастерская', recipes: [], action: 'Активировать' },
       { id: 'many', n: 'Многоликий', r: 4, q: 1, cat: 'act', spec: 'Крафт или биом недели', img: PATH(18), riddle: 'Носит лица тех, кого победили на этой неделе.', from: 'Эхо: Убер-босс недели', recipes: [], action: 'Активировать' },
-      { id: 'chest', n: 'Ларец рабочих', r: 3, q: 3, cat: 'act', spec: 'Лутбокс События', img: ART('reward-chest-v1.png'), riddle: 'Шарды рабочих и гарантированная валюта.', from: 'Дары путешествия', recipes: [], action: 'Открыть' },
+      { id: 'chest', n: 'Ларец рабочих', r: 3, q: 3, cat: 'act', spec: 'Лутбокс События', img: CHEST, riddle: 'Шарды рабочих и гарантированная валюта.', from: 'Дары путешествия', recipes: [], action: 'Открыть' },
     ],
     craft: [null, null, null, null, null, null], craftSel: 0, book: false, invCat: 'all', invQ: '',
-    tree: { cyc: 1, mode: 'player', sel: null },
+    tree: { cyc: 1, sel: null, q: '', only: false },   // вкладка «Древо рецептов» — инструмент команды
     recipes: [
       { id: 'bind', n: 'Связующее', out: 'Связующее', outImg: ART('item-cinder-heart.png'), outQ: '1–3', in: [['cinder', 3], ['key', 1]], fav: true, cyc: 1 },
       { id: 'call', n: 'Активация биома', out: 'Активация биома', outImg: PATH(22), outQ: '1', in: [['bind', 2], ['crown', 1]], fav: false, cyc: 1, chain: true, unique: 'Полая корона' },
@@ -1421,6 +1525,8 @@ function heroCard(h, o = {}) {
 const sq = id => S.squads.find(s => s.id === id);
 const plural = (n, one, few, many) => { const a = n % 10, b = n % 100; return a === 1 && b !== 11 ? one : a >= 2 && a <= 4 && (b < 12 || b > 14) ? few : many; };
 const atkWord = n => plural(n, 'атака', 'атаки', 'атак');
+const roundWord = n => plural(n, 'раунд', 'раунда', 'раундов');
+const pctBp = bp => Math.round(bp / 100) + ' %';
 const schoolMark = sc => !sc || sc === 'класс' ? '' : `<span class="el bare" data-el="${sc}" title="Школа: ${sc}" style="margin-right:5px"></span>`;
 const sqBM = s => s.m.filter(Boolean).reduce((a, id) => a + H(id).bm, 0);
 
@@ -1459,7 +1565,7 @@ const CLS = c => ic(CLS_ICON[c] || 'gem');
 
 /* ================== каркас ================== */
 const NAV = [['shelter', 'Убежище', 12], ['descent', 'Спуск', 10], ['heroes', 'Герои', 24], ['craft', 'Ремесло', 11], ['week', 'Неделя', 6]];
-const SECTION = { shelter: 'shelter', descent: 'descent', battle: 'descent', heroes: 'heroes', craft: 'craft', tree: 'craft', week: 'week', echo: 'week', contracts: 'week', rituals: 'week', arena: 'week', clan: 'week', event: 'week' };
+const SECTION = { shelter: 'shelter', descent: 'descent', battle: 'descent', heroes: 'heroes', craft: 'craft', week: 'week', echo: 'week', contracts: 'week', rituals: 'week', arena: 'week', clan: 'week', event: 'week' };
 function navBadge(k) {
   if (k === 'week') { const n = S.rituals.slots.filter(s => s.st === 'ready').length + (S.contracts.day.signed ? 0 : 1); return n ? `<span class="bdg">${n}</span>` : ''; }
   if (k === 'heroes') return S.heroes.some(h => h.lvl >= h.cap && h.lim < 5) ? '<span class="bdg ok">!</span>' : '';
@@ -1611,16 +1717,27 @@ const focusRun = () => runById(S.focus);
 const abIcon = ab => ab.kind === 'dmg' ? (ab.tgt === 'all' ? 'wave' : ab.stat === 'int' ? 'staff' : 'sword') : ab.kind === 'heal' || ab.kind === 'hot' ? 'heal' : ab.kind === 'shield' ? 'shield' : ab.kind === 'taunt' ? 'target'
   : ab.kind === 'ctrl' || ab.kind === 'debuff' ? (ST_ICON[ab.st] || ['down'])[0] : ab.kind === 'dot' ? DOT_ICON[ab.school] || 'flame' : ab.kind === 'dispel' ? 'crack' : 'spark';
 const si = (icon, n, p, cls, title, color) => `<span class="si ${cls}" style="--p:${p}${color ? ';--rc:' + color : ''}" title="${title}">${ic(icon)}${n ? `<b>${n}</b>` : ''}</span>`;
-function statusHtml(u, d) {
-  const good = [], bad = [];
+function statusHtml(u, d, rounds) {
+  const good = [], bad = [], per = rounds ? 'в каждый ход носителя' : 'в каждую атаку носителя', word = rounds ? roundWord : atkWord;
   if (d.sh > 0 && !d.dead) good.push(si('shield', '', 100, 'good', `Щит: ${fmt(d.sh)}, тратится первым`));
   for (const x of u.st) {
     const p = x.left0 ? Math.max(8, Math.round(x.left * 100 / x.left0)) : 100;
-    if (x.k === 'hot') good.push(si('heal', x.stacks > 1 ? x.stacks : '', p, 'good', `${x.school}: +${fmt(x.per * x.stacks)} здоровья в каждую атаку носителя · ещё ${x.left}`));
-    else if (x.k === 'dot') bad.push(si(DOT_ICON[x.school] || 'flame', x.stacks, p, 'bad', `${x.school}: ${fmt(x.per * x.stacks)} урона в каждую атаку носителя · стаков ${x.stacks} · ещё ${x.left}`, SCHOOL_C[x.school]));
-    else if (ST_ICON[x.k]) bad.push(si(ST_ICON[x.k][0], x.left, p, 'bad', `${ST_ICON[x.k][1]} · ещё ${x.left} ${atkWord(x.left)}`));
+    if (x.k === 'hot') good.push(si('heal', x.stacks > 1 ? x.stacks : '', p, 'good', `${x.school}: +${fmt(x.per * x.stacks)} здоровья ${per} · ещё ${x.left} ${word(x.left)}`));
+    else if (x.k === 'dot') bad.push(si(DOT_ICON[x.school] || 'flame', x.stacks, p, 'bad', `${x.school}: ${fmt(x.per * x.stacks)} урона ${per} · стаков ${x.stacks} · ещё ${x.left} ${word(x.left)}`, SCHOOL_C[x.school]));
+    else if (ST_ICON[x.k]) bad.push(si(ST_ICON[x.k][0], x.left, p, 'bad', `${rounds && x.k === 'stop' ? 'Остановка: ходит последней в раунде' : ST_ICON[x.k][1]} · ещё ${x.left} ${word(x.left)}`));
   }
   return [good.join(''), bad.join('')];
+}
+/* модель «10 раундов»: значок и шанс каждой способности; сработавшая светится */
+function chanceHtml(u, fired) {
+  if (!u.table || !u.table.length) return '';
+  return u.table.map(ab => `<span class="ch ${ab.ult ? 'u' : ''} ${fired === ab.n ? 'on' : ''}" style="--sc:${ab.ult ? 'var(--gold)' : SCHOOL_C[ab.school] || 'var(--parch-2)'}" title="${ab.n}${ab.ult ? ' · ульта' : ''}: шанс ${pctBp(ab.ch)} в свой ход">${ic(ab.ult ? 'crown' : abIcon(ab))}<b>${Math.round(ab.ch / 100)}</b></span>`).join('');
+}
+/* очередь раунда: кто уже сходил, по порядку, затем кто ещё ходит; тот, кто ходит сейчас, — золотом */
+function queueHtml(R) {
+  const b = R.b; if (!b || b.mode !== 'rounds') return '';
+  const acted = R.acted || [], now = acted[acted.length - 1];
+  return acted.concat(b.queue.filter(u => u.alive)).map(u => `<i class="${u.side ? 'f' : ''} ${u === now ? 'now' : acted.includes(u) ? 'done' : ''}" title="${uName(u)}"><img src="${unitImg(u)}" alt=""></i>`).join('');
 }
 function rotHtml(u) {
   if (!u.abs || !u.abs.length) return '';
@@ -1631,8 +1748,18 @@ function rotHtml(u) {
   const ult = u.ult ? `<span class="ult ${u.phase === 'ult' ? 'ready' : u.phase === 'charge' ? 'charging' : ''}" title="Три способности по ротации — и заряжается ульта «${u.ult.n}»">${[0, 1, 2].map(i => `<i class="${up || i < u.uses ? 'on' : ''}"></i>`).join('')}<b>${ic('crown')}</b></span>` : '';
   return nx + seg + ult;
 }
-function legendHtml() {
+function legendHtml(mode) {
   const seg = (k, on, u) => `<span class="rot"><span class="seg ${u ? 'u' : ''}">${Array.from({ length: k }, (_, i) => `<i class="${i < on ? 'on' : ''}"></i>`).join('')}</span></span>`;
+  if (mode === 'rounds') return `<span class="h">Индикаторы карты · 10 раундов</span>
+    <span class="ex"><span class="rot"><span class="ch" style="--sc:var(--earth)">${ic('target')}<b>20</b></span><span class="ch on" style="--sc:var(--earth)">${ic('crack')}<b>20</b></span><span class="ch u" style="--sc:var(--gold)">${ic('crown')}<b>8</b></span></span></span><span>Способности и ульта с шансом в процентах: столько раз из ста карта применит её в свой ход. Иначе — обычная атака. Сработавшая светится.</span>
+    <span class="ex"><span class="bt-queue static"><i class="done"></i><i class="now"></i><i class="f"></i><i></i></span></span><span>Сверху — очередь раунда по скорости: золотом — кто ходит, бледные — уже сходили, красная рамка — враги.</span>
+    <span class="ex">${ic('hour')}<b class="num">3 / 10</b></span><span>Раунд боя. Каждая карта ходит раз за раунд. После десятого раунда песок вышел: этаж не взят, урон по боссу идёт в осаду.</span>
+    <span class="ex"><span class="frame"></span></span><span>Красная рамка — в карту целятся противники, ×N — сколько.</span>
+    <span class="h">Эффекты</span>
+    <span class="ex">${si('heal', 2, 70, 'good', '')}${si('shield', '', 100, 'good', '')}</span><span>Слева вверху — полезные: лечение со временем, щит.</span>
+    <span class="ex">${si('flame', 3, 60, 'bad', '', 'var(--fire)')}${si('down', 2, 40, 'bad', '')}</span><span>Справа вверху — вредные: урон со временем в цвете школы, ослабление, метка, пробитие.</span>
+    <span class="ex">${si('hour', 2, 45, 'bad', '')}</span><span>Кольцо тает — столько раундов осталось. Остановка — карта ходит последней в раунде.</span>
+    <span class="ex big">${ic('chain')}</span><span>Контроль — крупный знак поверх портрета: оглушение — пропуск хода, безмолвие — только обычная атака.</span>`;
   return `<span class="h">Индикаторы карты</span>
     <span class="ex">${ic('sword')}${seg(3, 2)}</span><span>Значок — какая способность следующая, сегменты — сколько атак до неё.</span>
     <span class="ex"><span class="rot"><span class="ult"><i class="on"></i><i class="on"></i><i></i><b>${ic('crown')}</b></span></span></span><span>Три ромба — применённые способности. После третьей копится ульта: бирюзовые сегменты, корона светится — ульта готова.</span>
@@ -1663,8 +1790,10 @@ function battle() {
     <div class="bt-hud">
       <div class="bt-floor"><b>${R.floor}</b><span>/ ${B.floors.length}</span></div>
       <span class="chip ${FL.g !== 'o' ? 'gold' : ''}">${FL.g === 'e' ? ic('gem') : FL.g === 'b' ? ic('crown') : ''}${typ}${lead ? ' · ' + uName(lead) : ''}${FL.g === 'b' ? ` · осада ${siegeDone(R.biome)}%` : ''}</span>
-      <div class="bt-clock"><div class="row"><span>${ic('hour')} Бой</span><span class="num" id="btClock">${clock(R.view / 1000)} / ${clock(b.limit / 1000)}</span></div>${bar(Math.min(100, R.view * 100 / b.limit), 'sand')}<div class="row"><span>Забег идёт</span><span class="num" id="btRun">${clock((R.runMs + R.view) / 1000)}</span></div></div>
-      <span class="chip" title="Сид — сам биом: тот же отряд с той же ротацией всегда получает тот же сценарий">${ic('lock')}сценарий ${seedTag(R)}</span>
+      ${b.mode === 'rounds'
+        ? `<div class="bt-clock"><div class="row"><span>${ic('hour')} Раунд</span><span class="num" id="btClock">${b.round} / ${EB.RULES.rounds.max}</span></div>${bar(b.round * 100 / EB.RULES.rounds.max, 'sand')}<div class="row"><span>Забег идёт</span><span class="num" id="btRun">${clock((R.runMs + R.view) / 1000)}</span></div></div>`
+        : `<div class="bt-clock"><div class="row"><span>${ic('hour')} Бой</span><span class="num" id="btClock">${clock(R.view / 1000)} / ${clock(b.limit / 1000)}</span></div>${bar(Math.min(100, R.view * 100 / b.limit), 'sand')}<div class="row"><span>Забег идёт</span><span class="num" id="btRun">${clock((R.runMs + R.view) / 1000)}</span></div></div>`}
+      <span class="chip" title="Сид — сам биом: тот же отряд с той же ротацией всегда получает тот же сценарий">${ic('lock')}сценарий ${seedTag(R)}</span>${b.mode === 'rounds' ? `<span class="chip spirit" title="Модель боя для сравнения, ADR-0008">10 раундов</span>` : ''}
       <div class="bt-ctrl">
         <button class="btn sm" data-a="legend" aria-pressed="${!!S.legend}" title="Что значат знаки на картах">${ic('info')}Знаки</button>
         <button class="btn sm ghost warn" data-a="endact">Прервать</button>
@@ -1675,8 +1804,9 @@ function battle() {
       <div class="bt-side h">${side(0)}</div>
       <div class="bt-side f">${side(1)}</div>
       <div class="bt-feed" id="btFeed">${R.feed.map(x => `<p>${x}</p>`).join('')}</div>
+      ${b.mode === 'rounds' ? `<div class="bt-queue" id="btQueue">${queueHtml(R)}</div>` : ''}
       <div class="bt-insp" id="btInsp" hidden></div>
-      <div class="bt-legend" id="btLegend" ${S.legend ? '' : 'hidden'}>${legendHtml()}</div>
+      <div class="bt-legend" id="btLegend" ${S.legend ? '' : 'hidden'}>${legendHtml(b.mode)}</div>
     </div>
     ${R.banner ? `<div class="bt-banner"><b>${R.banner[0]}</b><small>${R.banner[1]}</small></div>` : ''}
     <div class="ruler" aria-hidden="true">${rulerHtml(R)}</div>
@@ -1860,7 +1990,7 @@ function craftView() {
   return { ...meta, html: `<section class="scr"><div class="cr">
     ${invPanel('work')}
     <div class="pnl table">
-      <div class="pnl-h"><h2>${S.book ? 'Книга рецептов' : 'Стол мастера'}</h2><div class="aside row"><button class="btn sm" data-a="go" data-v="tree">${ic('gem')}Древо</button><button class="btn sm ${S.book ? '' : ''}" data-a="book">${ic('book')}${S.book ? 'К столу' : 'Книга рецептов'}</button></div></div>
+      <div class="pnl-h"><h2>${S.book ? 'Книга рецептов' : 'Стол мастера'}</h2><div class="aside row"><button class="btn sm ${S.book ? '' : ''}" data-a="book">${ic('book')}${S.book ? 'К столу' : 'Книга рецептов'}</button></div></div>
       ${table}
       ${S.book ? '' : `<div class="row" style="justify-content:flex-end;gap:6px"><button class="btn ghost sm" data-a="cclear" ${S.craft.some(Boolean) ? '' : 'disabled'}>Очистить</button><button class="btn go" data-a="ccreate" ${S.craft.some(Boolean) ? '' : 'disabled'}>Создать</button></div>`}
     </div>
@@ -1891,35 +2021,19 @@ function marketView() {
 }
 
 /* ================== Древо рецептов ==================
-   Отдельное окно: шесть циклов, узлы — ресурсы и изделия по ярусам, связи — рецепты «входы → выход».
+   Инструмент команды и конструктора, а не экран игрока (ADR-0008): видно, что откуда идёт,
+   из чего собирать рецепт и куда двигать дальше. Отдельная вкладка презентации, весь набор со спойлерами цикла VI.
    Данные — recipes.js (window.EN_RECIPES), обоснование — docs/content/ресурсы-рецепты-дроп.md.
-   «Как видит игрок»: только найденное, неоткрытое — силуэт и «?», как в бестиарии. «Все · для команды»: весь набор со спойлерами.
    В игре рецепты живут на сервере; клиент получает только открытые игроком. */
 const RX = window.EN_RECIPES || { specs: {}, tiers: {}, cycles: [], items: [], recipes: [], drops: {} };
 const RXI = {}, RX_OUT = {}, RX_USE = {};
 RX.items.forEach(it => { RXI[it.id] = it; });
 RX.recipes.forEach(r => { (RX_OUT[r.out[0]] = RX_OUT[r.out[0]] || []).push(r); r.in.forEach(([id]) => { (RX_USE[id] = RX_USE[id] || []).push(r); }); });
-/* демо-знания игрока: цикл II, Мастерская форм и Подземный лес пройдены, Библиотека Улариона — рубеж */
-const TREE_SEEN = new Set(RX.items.filter(i => i.cyc === 1 && ['basic', 'key', 'unique', 'vshard'].includes(i.tier)).map(i => i.id)
-  .concat(['rn1_1', 'rn1_2', 'rn1_3', 'rn1_4', 'vr1', 'p1a', 'p1b', 'act1', 'find1', 'runechip', 'mechpart', 'rag', 'k3_tail', 'k3_eng', 'k3_ench', 'k3_smith', 'many']));
-const TREE_REC = { r_p1a: 'known', r_p1b: 'known', r_p1c: ['sand', 'k1_alch'], r_rn1_2: 'known', r_rn1_3: 'noqty', r_act1: 'known', r_p2a: ['rag'] };
 const TR_IC = { unique: 'crown', act: 'door', call: 'eye', find: 'search', trophy: 'flag', echo: 'users', product: 'star', valor: 'star', vshard: 'spark' };
-const treeTeam = () => S.tree.mode === 'team';
-const trOpen = c => treeTeam() || (c <= S.acc.cycle && RX.cycles[c - 1] && !RX.cycles[c - 1].team);
-const trBiomeKnown = id => treeTeam() || S.biomes.some(b => b.id === id && b.state !== 'lock');
-function trRecState(r) {
-  if (treeTeam()) return 'known';
-  if (r.team) return null;
-  if (TREE_REC[r.id]) return TREE_REC[r.id];
-  return r.known0 && r.in.every(([id]) => TREE_SEEN.has(id)) ? 'known' : null;
-}
-const trInVisible = (r, id) => { const s = trRecState(r); return s === 'known' || s === 'noqty' || (Array.isArray(s) && s.includes(id)); };
-function trNamed(id) {
-  const it = RXI[id];
-  if (treeTeam()) return true;
-  if (!it || it.team) return false;
-  return TREE_SEEN.has(id) || (RX_OUT[id] || []).some(r => trRecState(r));
-}
+const TR_RES = ['basic', 'key', 'unique'];   // ресурсы добычи — в фильтре
+const trEsc = x => String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+const trNorm = x => String(x).toLowerCase().replace(/ё/g, 'е');
+const trHit = it => { const q = trNorm(S.tree.q.trim()); return q.length > 1 && trNorm(it.n).includes(q); };
 function trIcon(it) {
   if (it.img) return `<img src="${it.img.startsWith('path:') ? PATH(+it.img.slice(5)) : ART(it.img)}" alt="">`;
   if (it.glyph && it.tier === 'rune') return `<span class="gl">${it.glyph}</span>`;
@@ -1930,39 +2044,38 @@ function trLayout(c) {
   const cy = RX.cycles[c - 1], [A, B] = cy.biomes, its = RX.items.filter(i => i.cyc === c);
   const pick = f => its.filter(f).map(i => i.id), byB = (b, t) => pick(i => i.b === b && i.tier === t);
   const recs = RX.recipes.filter(r => r.cyc === c);
-  const far = [...new Set(recs.flatMap(r => r.in.filter(([id]) => RXI[id].cyc !== c && trInVisible(r, id)).map(([id]) => id)))];
-  const kh = b => 'Ключи · ' + (trBiomeKnown(b.id) ? b.n : 'не открыт');
+  const far = [...new Set(recs.flatMap(r => r.in.filter(([id]) => RXI[id].cyc !== c).map(([id]) => id)))];
   return { recs, far, strip: [1, 2, 3, 4, 5].map(k => `rn${c}_${k}`).concat([`vs${c}`, `vr${c}`]),
     cols: [['Добыча', [...byB(A.id, 'basic'), ...byB(B.id, 'basic'), ...byB(A.id, 'unique'), ...byB(B.id, 'unique')]],
-      [kh(A), byB(A.id, 'key')], [kh(B), byB(B.id, 'key')], ['Заготовки', pick(i => i.tier === 'part')],
+      ['Ключи · ' + A.n, byB(A.id, 'key')], ['Ключи · ' + B.n, byB(B.id, 'key')], ['Заготовки', pick(i => i.tier === 'part')],
       ['Изделия', pick(i => ['act', 'call', 'product'].includes(i.tier))], ['Крафт и Эхо', pick(i => ['find', 'trophy', 'echo'].includes(i.tier))]] };
 }
 const trLayoutIds = c => { const L = trLayout(c); return new Set(L.cols.flatMap(x => x[1]).concat(L.far, L.strip)); };
+/* вся цепочка узла по всем циклам: up — из чего собирается, down — куда уходит */
 function trChain(sel) {
   const up = new Set(), down = new Set();
-  const goUp = id => (RX_OUT[id] || []).forEach(r => { if (trRecState(r)) r.in.forEach(([x]) => { if (trInVisible(r, x) && !up.has(x)) { up.add(x); goUp(x); } }); });
-  const goDown = id => (RX_USE[id] || []).forEach(r => { const o = r.out[0]; if (trInVisible(r, id) && !down.has(o)) { down.add(o); goDown(o); } });
+  const goUp = id => (RX_OUT[id] || []).forEach(r => r.in.forEach(([x]) => { if (!up.has(x)) { up.add(x); goUp(x); } }));
+  const goDown = id => (RX_USE[id] || []).forEach(r => { const o = r.out[0]; if (!down.has(o)) { down.add(o); goDown(o); } });
   if (sel) { goUp(sel); goDown(sel); }
   return { up, down };
 }
 const TR_SHORT = { rune: it => 'Предел ' + it.glyph, vshard: () => 'Осколки', valor: () => 'Доблесть' };
 function tnHtml(id, ch, o = {}) {
-  const it = RXI[id], named = trNamed(id), sel = S.tree.sel;
+  const it = RXI[id], sel = S.tree.sel;
   const st = sel === id ? 'sel' : ch.up.has(id) ? 'up' : ch.down.has(id) ? 'down' : '';
-  const later = named && !o.far ? (RX_USE[id] || []).filter(r => r.cyc > it.cyc && trInVisible(r, id) && (treeTeam() || !r.team)).map(r => r.cyc) : [];
+  const later = o.far ? [] : (RX_USE[id] || []).filter(r => r.cyc > it.cyc).map(r => r.cyc);
   const port = o.far ? `<span class="port">${ROMAN[it.cyc]}</span>` : later.length ? `<span class="port">→${ROMAN[Math.min(...later)]}</span>` : '';
-  const label = named ? (o.short && TR_SHORT[it.tier] ? TR_SHORT[it.tier](it) : it.n) : ['basic', 'key', 'unique', 'rune', 'vshard', 'find', 'trophy', 'echo'].includes(it.tier) ? 'Не найдено' : 'Неизвестно';
-  const cls = ['tn', it.tier === 'key' ? 'key' : '', it.tier === 'unique' ? 'uniq' : '', ['part', 'act', 'call', 'product', 'valor'].includes(it.tier) ? 'made' : '', o.far ? 'far' : '', named ? '' : 'unk', st];
-  return `<button class="${cls.join(' ').replace(/\s+/g, ' ').trim()}" data-a="tsel" data-v="${id}" data-tn="${id}" aria-pressed="${sel === id}" title="${named ? it.n : label}"><span class="ti" data-r="${named ? it.r : 1}">${named ? trIcon(it) : '<span class="gl">?</span>'}</span><b>${label}</b>${port}</button>`;
+  const label = o.short && TR_SHORT[it.tier] ? TR_SHORT[it.tier](it) : it.n;
+  const cls = ['tn', it.tier === 'key' ? 'key' : '', it.tier === 'unique' ? 'uniq' : '', ['part', 'act', 'call', 'product', 'valor'].includes(it.tier) ? 'made' : '', o.far ? 'far' : '', trHit(it) ? 'hit' : '', st];
+  return `<button class="${cls.join(' ').replace(/\s+/g, ' ').trim()}" data-a="tsel" data-v="${id}" data-tn="${id}" aria-pressed="${sel === id}" title="${trEsc(it.n)}"><span class="ti" data-r="${it.r}">${trIcon(it)}</span><b>${label}</b>${port}</button>`;
 }
 let TR_EDGES = [];
 function trEdges(L, ch) {
   const present = new Set(L.cols.flatMap(x => x[1]).concat(L.far, L.strip)), sel = S.tree.sel, out = [];
   for (const r of L.recs) {
-    if (!present.has(r.out[0]) || !trRecState(r)) continue;
-    const o = r.out[0];
+    const o = r.out[0]; if (!present.has(o)) continue;
     for (const [id] of r.in) {
-      if (!present.has(id) || !trInVisible(r, id)) continue;
+      if (!present.has(id)) continue;
       const up = (o === sel || ch.up.has(o)) && ch.up.has(id), down = (id === sel || ch.down.has(id)) && ch.down.has(o);
       out.push([id, o, up ? 'up' : down ? 'down' : '']);
     }
@@ -1987,66 +2100,90 @@ function drawTree() {
 }
 const trWell = (it, q) => it ? `<button class="well" data-r="${it.r}" data-a="tsel" data-v="${it.id}" title="${it.n}" aria-label="${it.n}${q != null ? ', ' + q : ''}">${trIcon(it)}${q != null ? `<span class="q">${q}</span>` : ''}</button>` : '<span class="well empty">?</span>';
 function trRecipe(r) {
-  const st = trRecState(r);
-  if (!st) return '<p class="faint" style="font-size:12.5px">Рецепт не найден. Его ищут перебором в Мастерской: шесть ячеек, при неудаче сгорает всё положенное.</p>';
-  const cells = r.in.map(([x, q]) => trInVisible(r, x) ? trWell(RXI[x], st === 'known' ? q : '?') : trWell(null)).join('');
-  const note = st === 'noqty' ? 'Все ресурсы угаданы, количества — нет.' : Array.isArray(st) ? `В книге: открыто ${st.length} из ${r.in.length}. Каждая попытка с ещё одним верным открывает позицию.` : '';
-  return `<div class="tr-ing">${cells}<span class="faint">${ic('arrow')}</span>${trWell(RXI[r.out[0]], r.out[1])}</div>${note ? `<p class="reason">${note}</p>` : ''}${treeTeam() ? `<p class="reason">${r.why}</p>` : ''}`;
+  const cells = r.in.map(([x, q]) => trWell(RXI[x], q)).join('');
+  return `<div class="tr-ing">${cells}<span class="faint">${ic('arrow')}</span>${trWell(RXI[r.out[0]], r.out[1])}</div>${r.why ? `<p class="reason">${r.why}</p>` : ''}`;
+}
+/* цепочка по циклам — строка на цикл; узлы чужого цикла — золотом */
+function trChainList(ids, own) {
+  const byC = {}; for (const id of ids) { const it = RXI[id]; (byC[it.cyc] = byC[it.cyc] || []).push(it); }
+  return Object.keys(byC).sort((a, b) => a - b).map(c => `<div class="tr-use"><span class="faint" style="font-size:12px;min-width:24px">${ROMAN[c]}</span>${byC[c].map(it => `<button class="chip ${+c !== own ? 'gold' : ''}" data-a="tsel" data-v="${it.id}">${trEsc(it.n)}</button>`).join('')}</div>`).join('');
 }
 function trCard(id) {
-  const it = RXI[id], team = treeTeam(), T = RX.tiers[it.tier] || { n: '' };
-  if (!trNamed(id)) return `<div class="row" style="gap:10px"><span class="tr-big unk">?</span><div class="col" style="gap:3px;min-width:0"><span class="eyebrow">${T.n}</span><b class="serif" style="font-size:19px;line-height:1.05">${['basic', 'key', 'unique', 'rune', 'vshard', 'find', 'trophy', 'echo'].includes(it.tier) ? 'Не найдено' : 'Неизвестный рецепт'}</b></div></div>
-    <p class="faint" style="font-size:12.5px">${['basic', 'key', 'unique', 'rune', 'vshard', 'find', 'trophy', 'echo'].includes(it.tier) ? 'Имя, загадка и место добычи откроются, когда ресурс впервые попадёт в запасы.' : 'Рецепт не найден. Верное сочетание откроет его навсегда; подсказки появляются с четырёх верных ингредиентов.'}</p>`;
+  const it = RXI[id], T = RX.tiers[it.tier] || { n: '' };
   const cy = RX.cycles[it.cyc - 1], bm = it.b ? cy.biomes.find(b => b.id === it.b) : null;
   const where = bm ? `${bm.n} · цикл ${cy.roman}` : `цикл ${cy.roman}`;
-  const sp = it.spec ? it.spec.split('+').map(s => RX.specs[s].n.toLowerCase()).join(' + ') : '';
-  const recs = RX_OUT[id] || [], uses = (RX_USE[id] || []).filter(r => trInVisible(r, id) && (team || !r.team));
-  const showSrc = team || TREE_SEEN.has(id) || !['basic', 'key', 'unique', 'rune', 'vshard', 'find', 'trophy', 'echo'].includes(it.tier);
-  const opened = it.tier === 'act' ? TREE_SEEN.has(id.replace('act', 'find')) : it.tier === 'call' ? TREE_SEEN.has(id.replace('call', 'tr')) : false;
-  const opens = it.opens ? `<p class="muted" style="font-size:12.5px">${it.tier === 'act' ? 'Активирует крафтовый биом' : 'Призывает в Эхо крафтового босса'}${team || opened ? ` «${it.opens}». ${it.opensLore}` : '. Что внутри, станет известно после активации.'}</p>` : '';
-  return `<div class="row" style="gap:10px;align-items:center"><span class="tr-big" data-r="${it.r}">${trIcon(it)}</span><div class="col" style="gap:3px;min-width:0"><span class="eyebrow">${T.n}${sp ? ' · ' + sp : ''}</span><b class="serif" style="font-size:19px;line-height:1.05">${it.n}</b><span class="faint" style="font-size:12px">${where}${it.elite ? ' · элита «' + it.elite + '»' : ''}</span></div></div>
-    ${it.team ? '<span class="chip warn" style="align-self:flex-start">для команды · спойлер §38</span>' : ''}
+  const sp = it.spec ? it.spec.split('+').map(x => RX.specs[x].n.toLowerCase()).join(' + ') : '';
+  const recs = RX_OUT[id] || [], uses = RX_USE[id] || [], ch = trChain(id);
+  const opens = it.opens ? `<p class="muted" style="font-size:12.5px">${it.tier === 'act' ? 'Активирует крафтовый биом' : 'Призывает в Эхо крафтового босса'} «${it.opens}». ${it.opensLore}</p>` : '';
+  return `<div class="row" style="gap:10px;align-items:center"><span class="tr-big" data-r="${it.r}">${trIcon(it)}</span><div class="col" style="gap:3px;min-width:0"><span class="eyebrow">${T.n}${sp ? ' · ' + sp : ''}</span><b class="serif" style="font-size:20px;line-height:1.05">${it.n}</b><span class="faint" style="font-size:12px">${where}${it.elite ? ' · элита «' + it.elite + '»' : ''}</span></div></div>
+    ${it.team ? '<span class="chip warn" style="align-self:flex-start">спойлер §38 · игроку до цикла VI не показывать</span>' : ''}
     <p class="quote">${it.lore}</p>${opens}
     ${recs.length ? `<span class="eyebrow">Рецепт</span>${recs.map(trRecipe).join('')}` : ''}
-    ${showSrc ? `<span class="eyebrow">Где падает</span><ul class="tr-src">${it.src.map(s => `<li>${s}</li>`).join('')}</ul>` : ''}
-    <span class="eyebrow">Куда идёт</span>${uses.length ? `<div class="tr-use">${uses.map(r => `<button class="chip ${r.cyc !== it.cyc ? 'gold' : ''}" data-a="tsel" data-v="${r.out[0]}">${RXI[r.out[0]].n}${r.cyc !== it.cyc ? ' · цикл ' + ROMAN[r.cyc] : ''}</button>`).join('')}</div>` : `<p class="faint" style="font-size:12.5px">${team ? 'Конечное изделие.' : 'Пока ни в одном известном рецепте.'}</p>`}`;
+    ${it.src && it.src.length ? `<span class="eyebrow">Где падает</span><ul class="tr-src">${it.src.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}
+    <span class="eyebrow">Куда идёт</span>${uses.length ? `<div class="tr-use">${uses.map(r => `<button class="chip ${r.cyc !== it.cyc ? 'gold' : ''}" data-a="tsel" data-v="${r.out[0]}">${RXI[r.out[0]].n}${r.cyc !== it.cyc ? ' · цикл ' + ROMAN[r.cyc] : ''}</button>`).join('')}</div>` : '<p class="faint" style="font-size:12.5px">Конечное изделие.</p>'}
+    ${ch.up.size ? `<span class="eyebrow">Вся цепочка вверх · из чего собирается</span>${trChainList(ch.up, it.cyc)}` : ''}
+    ${ch.down.size ? `<span class="eyebrow">Вся цепочка вниз · куда уходит по циклам</span>${trChainList(ch.down, it.cyc)}` : ''}`;
 }
 function trSummary(c, L) {
-  const cy = RX.cycles[c - 1], team = treeTeam();
-  const found = L.recs.filter(r => trRecState(r)).length;
-  return `<span class="eyebrow">Цикл ${cy.roman}${team ? ' · ' + cy.god : ''}</span>
-    <b class="serif" style="font-size:18px;line-height:1.1">${cy.biomes.map(b => trBiomeKnown(b.id) ? b.n : 'не открыт').join(' · ')}</b>
-    <p class="muted" style="font-size:12.5px">${team ? cy.about + ` Крафтовый биом «${cy.craftBiome}», крафтовый босс «${cy.craftBoss}».` : 'Нажмите ресурс или изделие: золотом подсветится, что для него нужно, пунктиром — куда оно идёт.'}</p>
-    <dl class="kv"><dt>Рецептов ${team ? 'в цикле' : 'найдено'}</dt><dd>${team ? L.recs.length : found}</dd><dt>Ресурсов добычи</dt><dd>6 базовых · 12 ключей · 2 уникальных</dd></dl>
-    <div class="tr-leg"><span><i></i>что нужно выбранному</span><span><i class="d"></i>куда оно идёт</span><span><i class="s"></i>выбранный узел</span><span><i class="q"></i>«?» — не найдено</span><span><b class="gold" style="font:700 10px var(--f-u)">→III</b>&nbsp;уходит в рецепт цикла III</span></div>
-    <p class="reason">${team ? 'Все числа — демонстрация. Хребет цикла: добыча → заготовки → активация → крафтовый биом → находка → призыв → крафтовый босс → трофей → следующий цикл.' : 'Рецепты скрыты. Древо растёт с каждым найденным рецептом.'}</p>`;
+  const cy = RX.cycles[c - 1];
+  return `<span class="eyebrow">Цикл ${cy.roman} · ${cy.god}</span>
+    <b class="serif" style="font-size:19px;line-height:1.1">${cy.biomes.map(b => b.n).join(' · ')}</b>
+    <p class="muted" style="font-size:13px">${cy.about} Крафтовый биом «${cy.craftBiome}», крафтовый босс «${cy.craftBoss}».</p>
+    <dl class="kv"><dt>Рецептов в цикле</dt><dd>${L.recs.length}</dd><dt>Ресурсов добычи</dt><dd>6 базовых · 12 ключей · 2 уникальных</dd></dl>
+    <div class="tr-leg"><span><i></i>что нужно выбранному</span><span><i class="d"></i>куда оно идёт</span><span><i class="s"></i>выбранный узел</span><span><b class="gold" style="font:700 10px var(--f-u)">→III</b>&nbsp;уходит в рецепт цикла III</span></div>
+    <p class="reason">Нажмите узел: золотом подсветится, что для него нужно, пунктиром — куда он идёт. Справа — вся цепочка по циклам. Все числа — демонстрация. Хребет цикла: добыча → заготовки → активация → крафтовый биом → находка → призыв → крафтовый босс → трофей → следующий цикл.</p>`;
 }
-function treeView() {
-  if (!RX.cycles.length) return { title: 'Древо рецептов', back: 'craft', html: '<section class="scr"><p class="faint">Нет данных: рядом с index.html должен лежать recipes.js.</p></section>' };
-  const T = S.tree, c = T.cyc, cy = RX.cycles[c - 1], team = treeTeam(), open = trOpen(c);
-  const tabs = RX.cycles.map(x => `<button role="tab" aria-selected="${x.n === c}" data-a="tcyc" data-v="${x.n}">${x.roman}${trOpen(x.n) ? '' : ic('lock')}</button>`).join('');
-  const cap = open ? `${cy.god} · ${cy.el.toLowerCase()} · ${cy.karst}` : 'не открыт';
-  const bar = `<div class="tr-bar"><div class="tabs" role="tablist" aria-label="Циклы">${tabs}</div><span class="tr-cy">${cap}</span>${team && cy.team ? '<span class="chip warn">спойлер</span>' : ''}<span class="g-spacer"></span><div class="tabs" role="tablist" aria-label="Режим"><button role="tab" aria-selected="${!team}" data-a="tmode" data-v="player">Как видит игрок</button><button role="tab" aria-selected="${team}" data-a="tmode" data-v="team">Все · для команды</button></div></div>`;
-  let canvas, info;
-  if (!open) {
-    TR_EDGES = [];
-    const deep = cy.team;
-    canvas = `<div class="pnl tr-canvas" id="trCanvas"><div class="tr-lock"><div class="col"><span class="ph"></span><b class="serif" style="font-size:22px">${deep ? 'Глубже · не открыто' : 'Цикл ' + cy.roman + ' не открыт'}</b><p class="faint" style="font-size:13px">${deep ? 'Что лежит ниже, древо покажет, когда туда дойдёт Странник.' : 'Ресурсы и рецепты цикла появятся, когда откроется его первый биом: для этого нужна победа над рунным стражем прошлого цикла.'}</p></div></div></div>`;
-    info = `<span class="eyebrow">Цикл ${cy.roman}</span><p class="muted" style="font-size:13px">Пустой карст матовый и не светится. Заряженный светится изнутри.</p><p class="reason">Переключите «Все · для команды», чтобы увидеть весь цикл.</p>`;
-  } else {
-    const L = trLayout(c), ch = trChain(T.sel);
-    TR_EDGES = trEdges(L, ch);
-    const cols = L.cols.map(([h, ids], i) => `<div class="tr-col"><small title="${h}">${h}</small>${ids.map(id => tnHtml(id, ch)).join('')}${i === 3 && L.far.length ? `<span class="sep">Из прошлых циклов</span>${L.far.map(id => tnHtml(id, ch, { far: true })).join('')}` : ''}</div>`).join('');
-    const strip = `<div class="tr-strip"><small>Стражи</small>${L.strip.slice(0, 5).map(id => tnHtml(id, ch, { short: true })).join('')}<span class="gap"></span>${L.strip.slice(5).map(id => tnHtml(id, ch, { short: true })).join('')}</div>`;
-    canvas = `<div class="pnl tr-canvas ${T.sel ? 'tr-on' : ''}" id="trCanvas"><svg class="tr-lines" id="trLines" aria-hidden="true"></svg><div class="tr-cols">${cols}</div>${strip}</div>`;
-    info = T.sel && RXI[T.sel] ? trCard(T.sel) : trSummary(c, L);
-  }
-  return { title: 'Древо рецептов', sub: 'шесть циклов', back: 'craft', html: `<section class="scr tr">${bar}<div class="tr-main">${canvas}<aside class="pnl tr-info fit" aria-label="Сведения об узле">${info}</aside></div></section>` };
+function treePage() {
+  if (!RX.cycles.length) return '<p class="faint">Нет данных: рядом с index.html должен лежать recipes.js.</p>';
+  const T = S.tree, c = T.cyc, cy = RX.cycles[c - 1];
+  const tabs = RX.cycles.map(x => `<button role="tab" aria-selected="${x.n === c}" data-a="tcyc" data-v="${x.n}">${x.roman}</button>`).join('');
+  const res = `<select id="trRes" aria-label="Фильтр по ресурсу"><option value="">Фильтр по ресурсу…</option>${RX.cycles.map(x => `<optgroup label="Цикл ${x.roman}">${RX.items.filter(i => i.cyc === x.n && TR_RES.includes(i.tier)).map(i => `<option value="${i.id}" ${T.sel === i.id ? 'selected' : ''}>${trEsc(i.n)}</option>`).join('')}</optgroup>`).join('')}</select>`;
+  const find = `<div class="tr-find"><input type="search" id="trQ" placeholder="Поиск по названию" value="${trEsc(T.q)}" autocomplete="off" aria-label="Поиск по названию"><div class="tr-hits" id="trHits" hidden></div></div>`;
+  const bar = `<div class="tr-bar"><div class="tabs" role="tablist" aria-label="Циклы">${tabs}</div><span class="tr-cy">${cy.god} · ${cy.el.toLowerCase()} · ${cy.karst}</span>${cy.team ? '<span class="chip warn">спойлер</span>' : ''}<span class="g-spacer"></span>${find}${res}<label class="tr-only-l"><input type="checkbox" id="trOnly" ${T.only ? 'checked' : ''}>только связи выбранного</label></div>`;
+  const L = trLayout(c), ch = trChain(T.sel);
+  TR_EDGES = trEdges(L, ch);
+  const cols = L.cols.map(([h, ids], i) => `<div class="tr-col"><small title="${h}">${h}</small>${ids.map(id => tnHtml(id, ch)).join('')}${i === 3 && L.far.length ? `<span class="sep">Из прошлых циклов</span>${L.far.map(id => tnHtml(id, ch, { far: true })).join('')}` : ''}</div>`).join('');
+  const strip = `<div class="tr-strip"><small>Стражи</small>${L.strip.slice(0, 5).map(id => tnHtml(id, ch, { short: true })).join('')}<span class="gap"></span>${L.strip.slice(5).map(id => tnHtml(id, ch, { short: true })).join('')}</div>`;
+  const canvas = `<div class="pnl tr-canvas ${T.sel ? 'tr-on' : ''} ${T.sel && T.only ? 'tr-only' : ''}" id="trCanvas"><svg class="tr-lines" id="trLines" aria-hidden="true"></svg><div class="tr-cols">${cols}</div>${strip}</div>`;
+  const info = T.sel && RXI[T.sel] ? trCard(T.sel) : trSummary(c, L);
+  return `<div class="tr">${bar}<div class="tr-main">${canvas}<aside class="pnl tr-info" aria-label="Сведения об узле">${info}</aside></div></div>`;
 }
-window.addEventListener('en-render', () => { if (S.route === 'tree') drawTree(); });
-addEventListener('resize', () => { if (S.route === 'tree') requestAnimationFrame(drawTree); });
-document.addEventListener('click', e => { if (S.route === 'tree' && !e.target.closest('#game')) requestAnimationFrame(() => requestAnimationFrame(drawTree)); });
-document.addEventListener('fullscreenchange', () => { if (S.route === 'tree') requestAnimationFrame(drawTree); });
+/* поиск: список совпадений по всем циклам и подсветка узлов текущего цикла; поле не перерисовывается */
+function paintTreeHits() {
+  const box = document.getElementById('trHits'); if (!box) return;
+  const q = trNorm(S.tree.q.trim());
+  const hits = q.length > 1 ? RX.items.filter(it => trNorm(it.n).includes(q)).slice(0, 14) : [];
+  box.innerHTML = hits.map(it => `<button data-a="tsel" data-v="${it.id}"><span>${trEsc(it.n)}</span><small>${(RX.tiers[it.tier] || { n: '' }).n} · цикл ${ROMAN[it.cyc]}</small></button>`).join('') || (q.length > 1 ? '<small class="faint" style="padding:6px 8px">Ничего не найдено</small>' : '');
+  box.hidden = !box.innerHTML;
+  document.querySelectorAll('#trCanvas [data-tn]').forEach(e => e.classList.toggle('hit', trHit(RXI[e.dataset.tn])));
+}
+const treeShown = () => { const p = document.getElementById('page-tree'); return !!p && !p.hidden; };
+function renderTree() {
+  const root = document.getElementById('treeRoot'); if (!root) return;
+  root.innerHTML = treePage(); paintTreeHits();
+  requestAnimationFrame(drawTree);
+}
+function bindTree() {
+  const root = document.getElementById('treeRoot'); if (!root) return;
+  root.addEventListener('click', e => {
+    const b = e.target.closest('[data-a]'); if (!b) return;
+    if (b.dataset.a === 'tcyc') { S.tree.cyc = +b.dataset.v; S.tree.sel = null; renderTree(); }
+    else if (b.dataset.a === 'tsel') {
+      const v = b.dataset.v, it = RXI[v]; if (!it) return;
+      const fromHits = !!b.closest('#trHits');
+      if (!trLayoutIds(S.tree.cyc).has(v)) S.tree.cyc = it.cyc;
+      S.tree.sel = fromHits || S.tree.sel !== v ? v : null;
+      if (fromHits) S.tree.q = '';
+      renderTree();
+    }
+  });
+  root.addEventListener('input', e => { if (e.target.id === 'trQ') { S.tree.q = e.target.value; paintTreeHits(); } });
+  root.addEventListener('change', e => {
+    if (e.target.id === 'trRes') { const v = e.target.value; if (v && RXI[v]) { S.tree.sel = v; S.tree.cyc = RXI[v].cyc; S.tree.only = true; } else { S.tree.sel = null; S.tree.only = false; } renderTree(); }
+    else if (e.target.id === 'trOnly') { S.tree.only = e.target.checked; renderTree(); }
+  });
+}
+addEventListener('resize', () => { if (treeShown()) requestAnimationFrame(drawTree); });
 
 /* ================== Неделя ================== */
 const WEEKLY = () => [
@@ -2070,7 +2207,7 @@ function weekView() {
         <span class="faint">${ic('chev')}</span>
         <div class="phase"><b>Подсчёт</b><small>один серверный час</small></div>
       </div>
-      <button class="gifts" data-a="sheet" data-v="gifts"><img src="${ART('reward-chest-v1.png')}" alt=""><span><b>Дары</b><small>${chests} сундуков</small></span><span class="bdg">2</span></button>
+      <button class="gifts" data-a="sheet" data-v="gifts"><img src="${CHEST}" alt=""><span><b>Дары</b><small>${chests} сундуков</small></span><span class="bdg">2</span></button>
     </div>
     <div class="wk-grid">${WEEKLY().map(w => `<button class="mode ${w.hot ? 'hot' : ''}" data-a="go" data-v="${w.r}"><span class="pic"><img src="${PATH(w.p)}" alt=""></span><h3>${w.n}</h3><span class="ln">${w.l1}<br>${w.l2}</span><span class="ft"><span class="go-lbl">${w.act} ${ic('chev')}</span></span></button>`).join('')}</div>
   </section>` };
@@ -2199,7 +2336,7 @@ function eventView() {
   return { title: 'Событие недели', back: 'week', chip: weekChip(), html: `<section class="scr">
     <div class="pnl pad col" style="gap:8px">
       <div class="row"><div class="stat"><b style="font-size:32px">${fmt(E.pts)}</b><small>личных очков</small></div><span class="g-spacer"></span><span class="chip spirit">РП1 коллекции +0,05%</span><button class="btn sm" data-a="sheet" data-v="rank:Событие">Место 212</button></div>
-      <div class="ms">${E.ms.map((m, i) => `<div class="m ${E.pts >= m ? 'got' : ''}">${well(i < 3 ? I('chest') : { n: 'Ларец', img: ART('reward-chest-v1.png'), r: 5 }, { act: 'item', val: 'chest', size: 44 })}<small class="num">${fmt(m)}</small></div>`).join('')}</div>
+      <div class="ms">${E.ms.map((m, i) => `<div class="m ${E.pts >= m ? 'got' : ''}">${well(i < 3 ? I('chest') : { n: 'Ларец', img: CHEST, r: 5 }, { act: 'item', val: 'chest', size: 44 })}<small class="num">${fmt(m)}</small></div>`).join('')}</div>
       <div class="track" style="--v:${Math.min(100, E.pts / max * 100 * 1.6)}"><i></i></div>
     </div>
     <div class="col scroll grow" style="gap:6px"><span class="eyebrow">Откуда очки</span>${E.src.map(([n, d, p]) => `<div class="opp"><span class="col" style="gap:2px"><b>${n}</b><small class="faint">${d}</small></span><b class="num serif gold" style="font-size:20px">+${p}</b><button class="link" data-a="go" data-v="${n === 'Контракты' ? 'contracts' : n === 'Путешествия' ? 'descent' : n === 'Ритуалы' ? 'rituals' : n === 'Эхо' ? 'echo' : 'arena'}">Перейти ${ic('chev')}</button></div>`).join('')}</div>
@@ -2261,7 +2398,7 @@ function storeView() {
   return { ...meta, html: `<section class="scr">${body}</section>` };
 }
 
-const SCREENS = { shelter, descent, battle, heroes, craft: craftView, tree: treeView, week: weekView, echo: echoView, contracts: contractsView, rituals: ritualsView, arena: arenaView, clan: clanView, event: eventView, profile: profileView, chronicle: chronicleView, store: storeView };
+const SCREENS = { shelter, descent, battle, heroes, craft: craftView, week: weekView, echo: echoView, contracts: contractsView, rituals: ritualsView, arena: arenaView, clan: clanView, event: eventView, profile: profileView, chronicle: chronicleView, store: storeView };
 
 /* ================== занятость ================== */
 const busyNote = id => { const r = runOf(id); if (r) return 'Забег · ' + EB.BIOMES[r.biome].name; const h = H(id); return h.busy; };
@@ -2352,7 +2489,7 @@ const OV = {
   gifts() {
     const rows = [['Эхо', 'Личный рейтинг', 'планка 25 000 очков', 2, 'Ларец осколков'], ['Контракты', 'Личный рейтинг', 'вчерашний контракт', 1, 'Ларец ключей'], ['Клановый босс', 'Клановые награды', 'доля по вкладу', 16, 'Ларец талисманов']];
     return sheet('Дары путешествия', `<div class="tabs"><button aria-selected="true">Личный рейтинг</button><button aria-selected="false">Клановые награды</button></div>
-      <div class="row" style="gap:10px"><img src="${ART('reward-chest-v1.png')}" alt="" style="width:56px;height:56px;border-radius:10px;object-fit:cover"><div class="stat"><b>59</b><small>сундуков доступно</small></div><span class="g-spacer"></span><button class="link" data-a="toast" data-v="Состав: осколки героев недели, ключи, талисманы">Состав ${ic('chev')}</button></div>
+      <div class="row" style="gap:10px"><img src="${CHEST}" alt="" style="width:56px;height:56px;border-radius:10px;object-fit:cover"><div class="stat"><b>59</b><small>сундуков доступно</small></div><span class="g-spacer"></span><button class="link" data-a="toast" data-v="Состав: осколки героев недели, ключи, талисманы">Состав ${ic('chev')}</button></div>
       ${rows.map(([m, c, b, n, box]) => `<div class="mail"><div class="col" style="gap:2px"><b>${m} · ${box}</b><small class="faint">${c} · ${b} · неделя ${S.week.race}</small></div><span class="chip">×${n}</span></div>`).join('')}
       <p class="reason">Сундуки переходят в запасы и открываются там. Итоги текущей недели ждут подсчёта.</p>`, `<button class="btn go" data-a="giftsclaim">Забрать в запасы</button>`);
   },
@@ -2390,12 +2527,12 @@ const OV = {
     const passed = E.kind === 'boss' ? n - R.startFloor + 1 : R.floor - R.startFloor;
     let title, head;
     if (E.kind === 'boss') { title = 'Первый набросок повержен'; head = 'Мастерская пройдена до конца. Осталось победить рунного стража — тогда откроется Подземный лес.'; }
-    else if (E.kind === 'siege') { title = 'Осада продолжается'; head = `Отряд дошёл до босса и снял ${sg - R.siegeFrom}% его здоровья, всего снято ${sg}%. Урон сохранится до следующего забега. Чем меньше у босса здоровья, тем он опаснее.`; }
-    else if (E.kind === 'wall') { title = `Стена — этаж ${E.floor}`; head = `${E.why === 'time' ? 'Время боя вышло' : 'Отряд пал'} на этаже ${E.floor}. В колоде: ${E.foes.map(id => known(id) ? F(id).name : 'неизвестный').join(', ')}.`; }
+    else if (E.kind === 'siege') { title = 'Осада продолжается'; head = `${E.why === 'sand' ? 'Песок вышел после десятого раунда. ' : ''}Отряд дошёл до босса и снял ${sg - R.siegeFrom}% его здоровья, всего снято ${sg}%. Урон сохранится до следующего забега. Чем меньше у босса здоровья, тем он опаснее.`; }
+    else if (E.kind === 'wall') { title = `Стена — этаж ${E.floor}`; head = `${E.why === 'time' ? 'Время боя вышло' : E.why === 'sand' ? 'Песок вышел: десять раундов прошли, время скоротечно. Этаж не взят' : 'Отряд пал'} на этаже ${E.floor}. В колоде: ${E.foes.map(id => known(id) ? F(id).name : 'неизвестный').join(', ')}.`; }
     else { title = 'Забег прерван'; head = `Отряд поднялся с этажа ${R.floor}.`; }
     if (R.demo) head = 'Демо-прыжок сразу к боссу с полным здоровьем: осада биома и стена не меняются. ' + head;
     const body = `<p class="muted" style="font-size:15px">${head} Отряд поднялся порталом наверх, как ото сна.</p>
-      <div class="row" style="gap:18px;flex-wrap:wrap"><div class="stat"><b>${passed}</b><small>этажей пройдено</small></div><div class="stat"><b>${R.kills}</b><small>побед</small></div><div class="stat"><b>${clock(R.runMs / 1000)}</b><small>время забега</small></div>${E.kind === 'boss' || sg ? `<div class="stat"><b>${E.kind === 'boss' ? 100 : sg}%</b><small>осада босса</small></div>` : ''}</div>
+      <div class="row" style="gap:18px;flex-wrap:wrap"><div class="stat"><b>${passed}</b><small>этажей пройдено</small></div><div class="stat"><b>${R.kills}</b><small>побед</small></div><div class="stat"><b>${clock(R.runMs / 1000)}</b><small>время забега</small></div>${R.mode === 'rounds' ? '<div class="stat"><b>10 раундов</b><small>модель боя</small></div>' : ''}${E.kind === 'boss' || sg ? `<div class="stat"><b>${E.kind === 'boss' ? 100 : sg}%</b><small>осада босса</small></div>` : ''}</div>
       ${R.curve.length ? `<div class="col" style="gap:3px"><span class="eyebrow">Здоровье отряда после каждого этажа</span><div class="curve">${R.curve.map((v, i) => `<i class="${B.floors[R.startFloor + i - 1].g !== 'o' ? 'el' : ''}" style="--v:${Math.max(3, v)}" title="Этаж ${R.startFloor + i}: ${v}%"></i>`).join('')}</div><small class="faint">Золотые столбики — элиты и босс. Здоровье не восстанавливалось.</small></div>` : ''}
       <span class="eyebrow">Добыча</span>
       <div class="row" style="gap:14px;flex-wrap:wrap">${money('gold', L.gold)}${money('spirit', L.spirit)}${money('souls', L.souls)}<span class="row" style="gap:4px">${well(I('cinder'), { act: 'noop', size: 30 })}<b class="num">×${L.cinder}</b></span></div>
@@ -2429,7 +2566,7 @@ const OV = {
   },
   gift() {
     const d = S.gift;
-    const cell = i => { const day = i + 1, got = day <= d.got, now = day === d.day && !got, big = day === 20; return `<div class="gday ${got ? 'got' : ''} ${now ? 'now' : ''} ${big ? 'big' : ''}"><small>${day}</small>${big ? `<img src="${ART('reward-chest-v1.png')}" alt="">` : `<img src="${[CUR.gold.img, CUR.spirit.img, CUR.souls.img, CUR.enerium.img, ART('rune-key.png')][i % 5]}" alt="">`}${got ? `<span class="ck">${ic('check')}</span>` : ''}</div>`; };
+    const cell = i => { const day = i + 1, got = day <= d.got, now = day === d.day && !got, big = day === 20; return `<div class="gday ${got ? 'got' : ''} ${now ? 'now' : ''} ${big ? 'big' : ''}"><small>${day}</small>${big ? `<img src="${CHEST}" alt="">` : `<img src="${[CUR.gold.img, CUR.spirit.img, CUR.souls.img, CUR.enerium.img, ART('rune-key.png')][i % 5]}" alt="">`}${got ? `<span class="ck">${ic('check')}</span>` : ''}</div>`; };
     return dialog('Дар дня', `<div class="gcal">${Array.from({ length: 30 }, (_, i) => cell(i)).join('')}</div><p class="reason">Главный дар — на двадцатый день. Часть пропусков прощается. Награды растут с уровнем Странника.</p>`, d.got < d.day ? `<button class="btn go" data-a="giftget">Забрать день ${d.day}</button>` : `<button class="btn" data-a="close">Получено · до завтра</button>`, 'wide');
   },
   settings() {
@@ -2508,9 +2645,6 @@ const ACT = {
   autocraft(v) { open('autocraft', v); },
   acdo(v) { const r = S.recipes.find(x => x.id === v); const u = document.getElementById('acUnique'); if (u && !u.checked) return toast('Без согласия особый ресурс не списывается'); S.overlay = null; toast(`Создано: ${r.out}`, r.outImg); },
   toCraft(v) { S.seg.craft = 'work'; S.book = false; S.overlay = null; S.route = 'craft'; ACT.put(v); },
-  tcyc(v) { S.tree.cyc = +v; S.tree.sel = null; render(); },
-  tmode(v) { S.tree.mode = v === 'team' ? 'team' : 'player'; if (S.tree.sel && !trLayoutIds(S.tree.cyc).has(S.tree.sel)) S.tree.sel = null; render(); },
-  tsel(v) { const it = RXI[v]; if (!it) return; if (!trLayoutIds(S.tree.cyc).has(v)) S.tree.cyc = it.cyc; S.tree.sel = S.tree.sel === v ? null : v; render(); },
   use(v) { const it = I(v); S.overlay = { t: 'confirm', title: it.action + ' · ' + it.n, text: it.id === 'chest' ? 'Ларец откроется здесь, в запасах. Содержимое станет известно после подтверждения.' : 'Экземпляр появится в Спуске. Что внутри — станет известно после активации.', ok: it.action, act: 'usedo', v }; render(); focusOverlay(); },
   usedo(v) { const it = I(v); it.q--; if (it.q <= 0) S.items = S.items.filter(x => x !== it); S.overlay = null; toast(v === 'chest' ? 'Ларец открыт: шарды рабочих ×3, золото 800' : 'Экземпляр активирован (демо)'); },
   buy(v) { const [id, q, c, p] = S.shop[+v]; S.overlay = { t: 'confirm', title: 'Купить в лавке', text: `${I(id).n} ×${q}`, ok: 'Купить', act: 'buydo', v, cost: [c, p] }; render(); focusOverlay(); },
@@ -2546,7 +2680,7 @@ const ACT = {
   claimgo(v) { const m = S.inbox.find(x => x.id === v); S.inbox = S.inbox.filter(x => x !== m); go(m.go); },
   claimall() { S.inbox.filter(m => m.rew.length).forEach(m => ACT.claim(m.id)); toast('Всё забрано'); },
   giftget() { S.gift.got = S.gift.day; S.wallet.enerium += 50; S.overlay = null; toast('Дар дня: Энериум ×50', ART('enerium.png')); },
-  giftsclaim() { I('chest').q += 19; S.overlay = null; toast('19 сундуков перенесены в запасы', ART('reward-chest-v1.png')); },
+  giftsclaim() { I('chest').q += 19; S.overlay = null; toast('19 сундуков перенесены в запасы', CHEST); },
   psq(v) { S.prepSquad = v; render(); },
   start() { startRun(S.prepSquad, 'b1'); },
   again(v) { const R = runById(v) || focusRun(), sqId = R ? R.squadId : S.prepSquad; prune(v); S.overlay = null; startRun(sqId, R ? R.biome : 'b1'); },
@@ -2565,7 +2699,7 @@ const ACT = {
    Каждая карта действует на своей скорости атаки, поэтому действия идут вперемешку, а не хором.
    Этажи — готовые колоды. Здоровье и павшие переходят на следующий этаж: биом — испытание на истощение.
    Босс — осада: урон по нему копится между забегами. Забегов может идти несколько сразу. */
-let loop = null, fxInst = null, devSpeed = 1;
+let loop = null, fxInst = null, devSpeed = 1, devModel = 'tempo';   // devModel — модель боя для сравнения: 'tempo' (ADR-0007) или 'rounds'
 const TICK = 50;
 const dkey = u => u.side + ':' + u.i;
 const G = biome => S.siege[biome] || (S.siege[biome] = { hp: null, max: null, killed: false });
@@ -2580,7 +2714,7 @@ function startRun(squadId, biome = 'b1', demoFloor) {
   const s = sq(squadId);
   const ids = s.m.filter(id => id && !H(id).busy && !runOf(id));
   if (!ids.length) return toast('Все герои этого отряда уже в забеге');
-  const R = { id: 'r' + (++S.runNo), runNo: S.runNo, biome, squadId, squad: ids, heroes: ids.map(id => EB.heroSrc(H(id))), floor: demoFloor || 1, startFloor: demoFloor || 1, demo: !!demoFloor,
+  const R = { id: 'r' + (++S.runNo), runNo: S.runNo, biome, squadId, squad: ids, heroes: ids.map(id => EB.heroSrc(H(id))), floor: demoFloor || 1, startFloor: demoFloor || 1, demo: !!demoFloor, mode: devModel, acted: [], fired: null,
     view: 0, runMs: 0, kills: 0, loot: { gold: 0, spirit: 0, souls: 0, cinder: 0 }, newKnown: [], over: false, seen: false, gap: 0, feed: [], banner: null,
     siegeFrom: siegeDone(biome), end: null, flyN: 0, disp: {}, curve: [], lastActor: null, pending: 0, endAt: null };
   S.runs.push(R);
@@ -2590,8 +2724,8 @@ function startRun(squadId, biome = 'b1', demoFloor) {
 }
 function newFloor(R) {
   const B = EB.BIOMES[R.biome];
-  R.b = EB.floorBattle(R.heroes, R.biome, R.floor, R.floor === B.floors.length && !R.demo ? G(R.biome).hp : null);   // демо-прыжок не трогает осаду
-  R.view = 0; R.feed = []; R.disp = {}; R.lastActor = null; R.pending = 0; R.endAt = null; syncDisp(R);
+  R.b = EB.floorBattle(R.heroes, R.biome, R.floor, R.floor === B.floors.length && !R.demo ? G(R.biome).hp : null, R.mode);   // демо-прыжок не трогает осаду
+  R.view = 0; R.feed = []; R.disp = {}; R.lastActor = null; R.pending = 0; R.endAt = null; R.acted = []; R.fired = null; syncDisp(R);
   const g = B.floors[R.floor - 1].g, lead = R.b.u[1][0], tired = R.floor > R.startFloor ? ' · здоровье не восстановлено' : '';
   R.banner = [g === 'o' ? `Этаж ${R.floor}` : g === 'e' ? 'Элита · ' + uName(lead) : uName(lead), (g === 'o' ? 'рядовые' : g === 'e' ? 'лидер и свита' : R.demo ? 'демо-прыжок: осада биома не меняется' : G(R.biome).hp != null ? 'осада · снято ' + siegeDone(R.biome) + '%' : 'босс биома · осада') + tired];
 }
@@ -2617,6 +2751,8 @@ function advance(R, ms) {
 function onAction(R, a, vis) {
   if (!a) return;
   if (a.s) R.lastActor = a.s;
+  if (a.kind === 'round') { R.acted = []; if (vis && a.round > 1) roundFlash(a.round); }
+  else if (a.round && a.s) { R.acted.push(a.s); R.fired = a.ab ? { key: dkey(a.s), n: a.ab.n, until: R.view + a.dur } : null; }
   for (const e of a.ev) if (e.k === 'die' && e.t.side === 1) {
     const g = e.t.lead ? EB.BIOMES[R.biome].floors[R.floor - 1].g : 'o', L = R.loot; R.kills++;
     if (g === 'o') { L.gold += 20; L.spirit += 10; L.cinder += 1; } else if (g === 'e') { L.gold += 100; L.spirit += 50; L.souls += 1; } else { L.gold += 500; L.spirit += 250; L.souls += 5; }
@@ -2631,7 +2767,8 @@ function floorDone(R, vis) {
   R.curve.push(partyPctOf(b));
   let bossDead = false;
   if (g === 'b') { const boss = b.u[1][0], sg = G(R.biome); bossDead = !boss.alive; if (!R.demo) { sg.max = boss.maxHp; if (bossDead) { sg.hp = null; sg.killed = true; } else sg.hp = boss.hp; } }
-  if (b.win && R.floor < B.floors.length) { R.gap = EB.RULES.floor.gapMs; R.runMs += R.gap; if (vis) feed(R, `<span class="sp">Этаж ${R.floor} пройден</span> · здоровье отряда ${partyPctOf(b)}%`); return; }
+  if (b.win && R.floor < B.floors.length) { R.gap = EB.RULES.floor.gapMs; R.runMs += R.gap; if (vis) feed(R, `<span class="sp">Этаж ${R.floor} пройден</span>${b.mode === 'rounds' ? ` за ${b.round} ${roundWord(b.round)}` : ''} · здоровье отряда ${partyPctOf(b)}%`); return; }
+  if (b.why === 'sand' && vis) feed(R, '<span class="gd">Песок вышел</span> · время скоротечно');
   R.end = bossDead ? { kind: 'boss' } : g === 'b' ? { kind: 'siege', why: b.why } : { kind: 'wall', floor: R.floor, why: b.why, foes: b.u[1].map(u => u.id) };
   endRun(R, vis);
 }
@@ -2729,8 +2866,9 @@ function playAction(R, a) {
   }
   const ab = a.ab, color = C[ab.school] || C.steel;
   const tEl = (cs ? cs.t : []).map(el).filter(Boolean);
-  flyAt(R, a.s, ab.n, a.kind === 'ult' ? 'ult' : 'abil', -26);
-  feed(R, `<b>${uName(a.s)}</b> · <span class="${a.kind === 'ult' ? 'sp' : 'gd'}">${ab.n}</span>${a.kind === 'ult' ? ' · ульта' : ''}${targetsText(a.s, cs)}`);
+  const chTxt = a.round && a.ch ? ' · ' + pctBp(a.ch) : '';
+  flyAt(R, a.s, ab.n + chTxt, a.kind === 'ult' ? 'ult' : 'abil', -26);
+  feed(R, `<b>${uName(a.s)}</b> · <span class="${a.kind === 'ult' ? 'sp' : 'gd'}">${ab.n}</span>${chTxt}${a.kind === 'ult' ? ' · ульта' : ''}${targetsText(a.s, cs)}`);
   const last = i => i === tEl.length - 1 ? impact : null;
   const go = () => {
     if (!tEl.length) return impact();
@@ -2754,9 +2892,15 @@ function playAction(R, a) {
 }
 function paintHud(R) {
   const q = id => document.getElementById(id); if (!q('bt')) return;
-  const b = R.b;
-  q('btClock').textContent = `${clock(R.view / 1000)} / ${clock(b.limit / 1000)}`;
-  const cb = q('bt').querySelector('.bt-clock .bar'); cb && cb.style.setProperty('--v', Math.min(100, R.view * 100 / b.limit));
+  const b = R.b, cb = q('bt').querySelector('.bt-clock .bar');
+  if (b.mode === 'rounds') {
+    q('btClock').textContent = `${b.round} / ${EB.RULES.rounds.max}`;
+    cb && cb.style.setProperty('--v', b.round * 100 / EB.RULES.rounds.max);
+    setHtml(q('btQueue'), queueHtml(R));
+  } else {
+    q('btClock').textContent = `${clock(R.view / 1000)} / ${clock(b.limit / 1000)}`;
+    cb && cb.style.setProperty('--v', Math.min(100, R.view * 100 / b.limit));
+  }
   q('btRun').textContent = clock((R.runMs + R.view) / 1000);
   paintCards(R); paintInsp(R);
 }
@@ -2774,20 +2918,22 @@ function paintCards(R) {
     const n = d.dead ? 0 : aim[sd][i];
     el.classList.toggle('aimed', n > 0); el.classList.toggle('many', n > 1);
     setHtml(el.querySelector('.tgt'), n > 1 ? '×' + n : '');
-    const [good, bad] = d.dead ? ['', ''] : statusHtml(u, d);
+    const [good, bad] = d.dead ? ['', ''] : statusHtml(u, d, b.mode === 'rounds');
     setHtml(el.querySelector('.buffs'), good); setHtml(el.querySelector('.debuffs'), bad);
     const ctl = !d.dead && u.st.find(x => CTL.includes(x.k));
     el.classList.toggle('ctl-on', !!ctl); el.classList.toggle('ctl-stun', !!ctl && ctl.k === 'stun');
     setHtml(el.querySelector('.ctl'), ctl ? ic(ST_ICON[ctl.k][0]) : '');
-    setHtml(el.querySelector('.rot'), d.dead ? '' : rotHtml(u));
+    setHtml(el.querySelector('.rot'), d.dead ? '' : b.mode === 'rounds' ? chanceHtml(u, R.fired && R.fired.key === dkey(u) && R.view < R.fired.until ? R.fired.n : null) : rotHtml(u));
     el.classList.toggle('ready', !d.dead && u.phase === 'ult');
+    el.classList.toggle('done', b.mode === 'rounds' && !d.dead && !b.over && (R.acted || []).includes(u) && u !== (R.acted || [])[R.acted.length - 1]);
   });
 }
-function stText(x) {
-  if (x.k === 'dot') return `<span>${x.school}: ${fmt(x.per * x.stacks)} урона в каждую атаку · стаков ${x.stacks} · ещё ${x.left}</span>`;
-  if (x.k === 'hot') return `<span style="color:#9ff0c0">${x.school}: +${fmt(x.per * x.stacks)} здоровья в каждую атаку · ещё ${x.left}</span>`;
-  const n = { stun: 'Оглушение: пропускает ход', silence: 'Безмолвие: без способностей', stop: 'Остановка: не копит атаки', weak: `Ослабление: −${x.pow / 100}% урона`, mark: `Метка: +${x.pow / 100}% получаемого урона`, pierce: `Пробитие: −${x.pow / 100}% физ. защиты` }[x.k];
-  return n ? `<span>${n} · ещё ${x.left} ${atkWord(x.left)}</span>` : '';
+function stText(x, rounds) {
+  const per = rounds ? 'в каждый ход' : 'в каждую атаку', word = rounds ? roundWord : atkWord;
+  if (x.k === 'dot') return `<span>${x.school}: ${fmt(x.per * x.stacks)} урона ${per} · стаков ${x.stacks} · ещё ${x.left} ${word(x.left)}</span>`;
+  if (x.k === 'hot') return `<span style="color:#9ff0c0">${x.school}: +${fmt(x.per * x.stacks)} здоровья ${per} · ещё ${x.left} ${word(x.left)}</span>`;
+  const n = { stun: 'Оглушение: пропускает ход', silence: rounds ? 'Безмолвие: только обычная атака' : 'Безмолвие: без способностей', stop: rounds ? 'Остановка: ходит последней в раунде' : 'Остановка: не копит атаки', weak: `Ослабление: −${x.pow / 100}% урона`, mark: `Метка: +${x.pow / 100}% получаемого урона`, pierce: `Пробитие: −${x.pow / 100}% физ. защиты` }[x.k];
+  return n ? `<span>${n} · ещё ${x.left} ${word(x.left)}</span>` : '';
 }
 function paintInsp(R) {
   const box = document.getElementById('btInsp'); if (!box) return;
@@ -2796,17 +2942,48 @@ function paintInsp(R) {
   if (!u) { box.hidden = true; return; }
   const d = R.disp[dkey(u)] || { hp: u.hp, sh: u.sh, dead: !u.alive }, close = `<button class="iconbtn x" data-a="insp" data-v="${S.insp}" aria-label="Закрыть">${ic('x')}</button>`;
   box.hidden = false;
-  if (!unitKnown(u)) { box.innerHTML = `<div class="h"><b>Неизвестный противник</b>${close}</div><span>Имя, способности и повадки откроет первая победа. Видны здоровье и эффекты.</span><span>Здоровье <b class="num">${fmt(d.hp)}</b> / ${fmt(u.maxHp)}</span>${u.st.length ? `<div class="bi-st">${u.st.map(stText).join('')}</div>` : ''}`; return; }
+  const rounds = R.b.mode === 'rounds', stT = x => stText(x, rounds);
+  if (!unitKnown(u)) { box.innerHTML = `<div class="h"><b>Неизвестный противник</b>${close}</div><span>Имя, способности и повадки откроет первая победа. Видны здоровье и эффекты.</span><span>Здоровье <b class="num">${fmt(d.hp)}</b> / ${fmt(u.maxHp)}</span>${u.st.length ? `<div class="bi-st">${u.st.map(stT).join('')}</div>` : ''}`; return; }
   const opp = R.b.u[1 - sd], j = targetOf(R.b, u);
-  const abs = u.abs.map((ab, k) => { const nx = k === u.ptr && u.phase === 'rot'; return `<span class="${nx ? 'next' : ''}" title="${ab.d || ''}">${ab.n} · ${nx ? Math.min(u.cnt, ab.price) + '/' + ab.price : ab.price} ${atkWord(ab.price)}</span>`; }).join('');
-  const ult = u.ult ? `<span class="ult" title="${u.ult.d || ''}">${u.ult.n} · ${u.phase === 'ult' ? 'готова' : u.phase === 'charge' ? 'зарядка ' + (u.chargeMax - u.charge) + '/' + u.chargeMax : 'после ' + (EB.RULES.ultAfter - u.uses) + ' применений'}</span>` : '';
+  let abs, ult;
+  if (rounds) {
+    const rest = 10000 - u.table.reduce((a, ab) => a + ab.ch, 0);
+    abs = u.table.filter(ab => !ab.ult).map(ab => `<span title="${ab.d || ''}">${ab.n} · ${pctBp(ab.ch)}${ab.left ? ' · ' + ab.left + ' ' + roundWord(ab.left) : ''}</span>`).join('') + `<span class="faint">Обычная атака · ${pctBp(rest)}</span>`;
+    ult = u.table.filter(ab => ab.ult).map(ab => `<span class="ult" title="${ab.d || ''}">${ab.n} · ульта · ${pctBp(ab.ch)}</span>`).join('');
+  } else {
+    abs = u.abs.map((ab, k) => { const nx = k === u.ptr && u.phase === 'rot'; return `<span class="${nx ? 'next' : ''}" title="${ab.d || ''}">${ab.n} · ${nx ? Math.min(u.cnt, ab.price) + '/' + ab.price : ab.price} ${atkWord(ab.price)}</span>`; }).join('');
+    ult = u.ult ? `<span class="ult" title="${u.ult.d || ''}">${u.ult.n} · ${u.phase === 'ult' ? 'готова' : u.phase === 'charge' ? 'зарядка ' + (u.chargeMax - u.charge) + '/' + u.chargeMax : 'после ' + (EB.RULES.ultAfter - u.uses) + ' применений'}</span>` : '';
+  }
   const th = opp.map((v, k) => [v, u.th[k]]).filter(([v]) => v.alive).sort((x, y) => y[1] - x[1]).slice(0, 3).map(([v, t]) => `<span>${uName(v)} <b class="num">${fmt(t)}</b></span>`).join('');
   box.innerHTML = `<div class="h"><b>${u.name}</b><span class="faint">${u.cls} · ${u.el}</span>${close}</div>
     <span>Здоровье <b class="num">${fmt(d.hp)}</b> / ${fmt(u.maxHp)}${d.sh ? ` · щит <b class="num">${fmt(d.sh)}</b>` : ''} · атака ${fmt(u.atk[u.main])} · защита ${fmt(u.def.str)} / ${fmt(u.def.int)}</span>
     <span>Цель: <b>${!d.dead && j >= 0 ? uName(opp[j]) : '—'}</b> · выбирает угроза</span>
     ${abs || ult ? `<div class="bi-ab">${abs}${ult}</div>` : ''}
-    ${u.st.length ? `<div class="bi-st">${u.st.map(stText).join('')}</div>` : ''}
+    ${u.st.length ? `<div class="bi-st">${u.st.map(stT).join('')}</div>` : ''}
     ${th ? `<div class="bi-th"><span class="faint">Угроза к противникам:</span>${th}</div>` : ''}`;
+}
+function roundFlash(n) {
+  const bt = document.getElementById('bt'); if (!bt) return;
+  const e = document.createElement('div'); e.className = 'bt-rflash'; e.textContent = 'Раунд ' + n;
+  e.style.animationDuration = (EB.RULES.rounds.gapMs / devSpeed) + 'ms';
+  bt.appendChild(e); setTimeout(() => e.remove(), EB.RULES.rounds.gapMs / devSpeed + 50);
+}
+/* Сравнение моделей на одном забеге: тот же отряд, тот же биом и сид, свежий босс */
+function compareModels() {
+  const s = sq('s1'), heroes = s.m.filter(Boolean).map(id => EB.heroSrc(H(id))), B = EB.BIOMES.b1;
+  const cols = [['Истощение', EB.simRun(heroes, 'b1', null)], ['10 раундов', EB.simRun(heroes, 'b1', null, 'rounds')]];
+  const why = { wipe: 'отряд пал', time: 'время вышло', sand: 'песок вышел' };
+  const row = (name, f) => `<tr><th>${name}</th>${cols.map(([, r]) => `<td>${f(r)}</td>`).join('')}</tr>`;
+  const last = r => r.floors[r.floors.length - 1];
+  const fights = r => r.floors.reduce((a, x) => a + x.ms, 0);
+  document.getElementById('devCmp').innerHTML = `<table class="p-cmp"><tr><th></th>${cols.map(([n]) => `<th>${n}</th>`).join('')}</tr>
+    ${row('Пройдено', r => `<b>${r.floors.filter(x => x.win).length}</b> из ${B.floors.length}`)}
+    ${row('Стоп', r => { const l = last(r); return l.win ? 'дошёл до конца' : `этаж ${l.floor} · ${why[l.why] || l.why}`; })}
+    ${row('Здоровье', r => last(r).pct + ' %')}
+    ${row('Забег', r => clock(r.runMs / 1000))}
+    ${row('Средний бой', r => Math.round(fights(r) / r.floors.length / 1000) + ' с')}
+    ${row('По этажам', r => `<div class="curve">${r.floors.map(x => `<i class="${B.floors[x.floor - 1].g !== 'o' ? 'el' : ''}" style="--v:${Math.max(3, x.pct)}" title="Этаж ${x.floor}: здоровье ${x.pct} %${x.rounds ? ' · раундов ' + x.rounds : ''}"></i>`).join('')}</div>`)}
+  </table><p class="p-note" style="margin-top:6px">${s.name} · ${heroes.length} героев · Мастерская форм с первого этажа, босс со свежим здоровьем. В модели раундов здоровье врагов — ${EB.RULES.rounds.foeHpPct} % от основной: за 10 раундов каждая карта ходит только 10 раз.</p>`;
 }
 function paintTray() {
   for (const R of S.runs) { const e = document.getElementById('run-' + R.id); if (!e) continue; e.querySelector('small').textContent = R.over ? 'итог' : 'этаж ' + R.floor; e.querySelector('.hpm').style.setProperty('--v', partyPct(R)); e.classList.toggle('done', R.over); }
@@ -2896,7 +3073,6 @@ const FLOWS = [
   ['Развитие героя', 'Уровень, рунный предел и доблесть — одна лестница', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.seg.hero = 'power'; S.selHero = 'h2'; S.overlay = null; }],
   ['Ротация перетаскиванием', 'Порядок способностей в карточке героя', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.seg.hero = 'skills'; S.selHero = 'h2'; S.overlay = null; }],
   ['Мастерская', 'Шесть ячеек вокруг результата и книга рецептов', () => { S.route = 'craft'; S.seg.craft = 'work'; S.book = false; S.craft = [{ id: 'cinder', q: 3 }, { id: 'key', q: 1 }, null, null, null, null]; S.craftSel = 0; S.overlay = null; }],
-  ['Древо рецептов', 'Шесть циклов: что из чего делается и куда идёт. Игрок видит только найденное, команда — всё', () => { S.route = 'tree'; S.tree = { cyc: 1, mode: 'player', sel: 'p1a' }; S.overlay = null; }],
   ['Неделя → Эхо', 'Шесть недельных режимов на одном экране, цель и атака', () => { S.route = 'echo'; S.echo.sel = 0; S.overlay = null; }],
   ['Контракт', 'Составить, заверить золотом, подписать', () => { S.route = 'contracts'; S.seg.contracts = 'day'; S.overlay = null; }],
   ['Память Странника', 'Одна из трёх, переброс и закрепление', () => { S.route = 'profile'; S.seg.profile = 'mem'; S.overlay = S.mem.slots[0].st === 'open' ? { t: 'mem' } : null; }],
@@ -2932,6 +3108,7 @@ function showPage(id) {
   document.querySelectorAll('.p-page').forEach(p => p.hidden = p.id !== 'page-' + id);
   try { localStorage.setItem('en-page', id); } catch (_) { }
   if (id === 'proto') requestAnimationFrame(fitDevice);
+  if (id === 'tree') renderTree();
 }
 
 /* ================== карта экранов ================== */
@@ -3008,6 +3185,10 @@ function renderKit() {
   <section class="k-box" style="grid-column:1/-1"><h3>Карта бойца: индикаторы и эффекты</h3>
     <div class="card-demo">${kitCards()}</div>
     <div class="bt-legend static">${legendHtml()}</div></section>
+  <section class="k-box" style="grid-column:1/-1"><h3>Карта бойца · модель «10 раундов»</h3>
+    <div class="card-demo">${kitCardsRounds()}</div>
+    <p class="k-note">Вариант для сравнения из ADR-0008: вместо сегментов и ромбов — шанс каждой способности в свой ход, сработавшая светится. Бледная карта уже сходила в этом раунде.</p>
+    <div class="bt-legend static">${legendHtml('rounds')}</div></section>
   <section class="k-box" style="grid-column:1/-1"><h3>Эффекты боя · ${EnFx.KINDS.length} видов</h3>
     <div class="fx-stage" id="fxStage">${kc('kh1', S.heroes[0].img, S.heroes[0].name, S.heroes[0].el, 6)}${kc('kh2', S.heroes[3].img, S.heroes[3].name, S.heroes[3].el, 22)}${kc('kf1', WS(F('e1').pg), F('e1').name, 'Земля', 38, true, true)}${kc('kf2', WS(F('o3').pg), F('o3').name, 'Воздух', 22, true)}${kc('kf3', WS(F('o5').pg), F('o5').name, 'Земля', 6, true)}</div>
     <div class="fx-list">${EnFx.KINDS.map(([key, n, d]) => `<button class="fx-btn" data-fx="${key}"><b>${n}</b><small>${d}</small></button>`).join('')}</div>
@@ -3026,13 +3207,16 @@ function renderKit() {
   <section class="k-box"><h3>Вкладки, чипы, метки</h3><div class="k-demo col" style="gap:10px"><div class="tabs"><button aria-selected="true">Сила</button><button aria-selected="false">Навыки</button><button aria-selected="false">Путь</button></div><div class="k-row"><span class="chip gold">${ic('gem')}Элита</span><span class="chip spirit">${ic('check')}готово</span><span class="chip warn">${ic('lock')}цикл III</span><span class="chip">${ic('hour')}3 д 5 ч</span></div><div class="k-row"><span class="stars lg">${stars(1, 3)}</span><span class="faint">доблесть: позиций = личный максимум</span></div><div class="k-row"><span class="limits">${limits(2)}</span><span class="faint">рунный предел: 5 отметок</span></div></div></section>
   <section class="k-box"><h3>Шкалы</h3><div class="k-demo col" style="gap:10px"><div class="col" style="gap:4px"><small class="faint">Здоровье и щит</small>${bar(64, 'hp lg', '<span class="sh" style="left:0;width:18%"></span>')}</div><div class="col" style="gap:4px"><small class="faint">Бюджет попытки — песок</small>${bar(46, 'sand')}</div><div class="col" style="gap:4px"><small class="faint">Опыт и прогресс</small>${bar(62)}</div><div class="col" style="gap:4px"><small class="faint">Резервуар и готовность</small>${bar(80, 'sp')}</div></div></section>
   <section class="k-box"><h3>Герой</h3><div class="k-demo" style="display:grid;grid-template-columns:repeat(3,minmax(0,110px));gap:8px">${heroCard(S.heroes[0], { act: 'noop' })}${heroCard(h, { act: 'noop', sel: true })}${heroCard(S.heroes[3], { act: 'noop', note: 'Ритуал · 42 мин', dim: true })}</div><p class="k-note">Звёзд ровно столько, сколько доблестей доступно герою. Занятость написана поверх портрета.</p></section>
+  <section class="k-box" style="grid-column:1/-1"><h3>Герои · ${window.EN_HEROES ? EN_HEROES.heroes.length : 0} из черновиков</h3>
+    <p class="k-note">Данные — <code>docs/content/герои/</code>, выгрузка <code>tools/content-gen/heroes/export_ui.py</code> в <code>heroes.js</code>. Черновик, ждёт автора. Портреты пока заглушки: свет стихии снизу, нижняя кромка — редкость. Арт рисуется отдельно в <code>art/generated/</code>.</p>
+    <div id="kitHeroes"></div></section>
   <section class="k-box"><h3>Враг</h3><div class="k-demo row" style="gap:18px;justify-content:center;height:170px"><div class="fig" style="height:150px"><img src="${WS(f1.pg)}" alt=""></div><div class="fig unk" style="height:150px"><img src="${WS(f6.pg)}" alt=""><span class="qm">?</span></div></div><p class="k-note">Глина — изучен. Силуэт со светом духа по контуру — до первой победы.</p></section>
   <section class="k-box"><h3>Кристалл Памяти</h3><div class="k-demo mem" style="grid-template-columns:repeat(3,1fr)"><div class="mslot"><span class="crys"></span><small class="faint">пустой карст</small></div><div class="mslot open"><span class="crys"></span><small class="spirit">можно вспомнить</small></div><div class="mslot set" data-r="3"><span class="crys"></span><small class="faint">закреплено</small></div></div><p class="k-note">Состояние из лора: пустой карст матовый, заряженный светится изнутри.</p></section>
   <section class="k-box"><h3>Иконки путей</h3><div class="k-row">${[[12, 'Убежище'], [10, 'Спуск'], [24, 'Герои'], [11, 'Ремесло'], [6, 'Неделя'], [18, 'Эхо'], [38, 'Контракты'], [33, 'Ритуалы'], [3, 'Арена'], [26, 'Клан'], [21, 'Событие'], [29, 'Странник']].map(([p, n]) => `<figure style="margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;width:64px"><img src="${PATH(p)}" alt="" style="width:48px;height:48px;border-radius:12px;box-shadow:0 0 0 1px #262c32"><figcaption style="font-size:11px;color:var(--parch-2);text-align:center;line-height:1.1">${n}</figcaption></figure>`).join('')}</div><p class="k-note">Авторский набор. Иконка узнаётся, подпись остаётся всегда.</p></section>
   <section class="k-box"><h3>Слой поверх: лист и диалог</h3><div class="k-demo" style="height:170px;position:relative;overflow:hidden;border:1px solid var(--iron)"><div style="position:absolute;inset:0;background:rgba(3,4,5,.55)"></div><div class="sheet" style="width:52%;animation:none"><div class="sheet-h" style="min-height:40px;padding:6px 8px 6px 12px"><h2 style="font-size:17px">Сведения</h2><span class="iconbtn x" style="width:26px;height:26px">${ic('x')}</span></div><div class="sheet-b" style="padding:8px 12px;gap:6px"><span class="faint" style="font-size:12px">уточняет работу, не уводит с экрана</span>${bar(60)}</div><div class="sheet-f" style="padding:6px 12px"><button class="btn go sm" style="margin-left:auto">Действие</button></div></div></div><p class="k-note">Лист справа — сведения и настройка. Диалог по центру — только цена, последствия и итог.</p></section>
-  ${RXI.sand ? `<section class="k-box"><h3>Древо рецептов · узлы</h3><div class="k-demo tr-cols">${[['sand', ''], ['k1_ench', 'up'], ['u4', ''], ['p1a', 'sel'], ['act1', 'down'], ['k4_hunt', '', 1]].map(([id, st, unk]) => { const it = RXI[id]; return `<span class="tn ${it.tier === 'key' ? 'key' : it.tier === 'unique' ? 'uniq' : ['part', 'act'].includes(it.tier) ? 'made' : ''} ${unk ? 'unk' : ''} ${st}"><span class="ti" data-r="${unk ? 1 : it.r}">${unk ? '<span class="gl">?</span>' : trIcon(it)}</span><b>${unk ? 'Не найдено' : it.n}</b></span>`; }).join('')}</div>
-    <div class="tr-leg"><span><i></i>что нужно выбранному</span><span><i class="d"></i>куда оно идёт</span><span><i class="s"></i>выбранный узел</span><span><i class="q"></i>силуэт и «?» — не найдено, как в бестиарии</span></div>
-    <p class="k-note">Окно «Древо рецептов»: Ремесло → «Древо». Узлы стоят по ярусам — добыча, ключи ремёсел, заготовки, изделия, крафт и Эхо; внизу — руны стражей. Цвет узла — редкость. Игрок видит только найденное, команда — все шесть циклов.</p></section>` : ''}`;
+  ${RXI.sand ? `<section class="k-box"><h3>Древо рецептов · узлы</h3><div class="k-demo tr-cols">${[['sand', ''], ['k1_ench', 'up'], ['u4', ''], ['p1a', 'sel'], ['act1', 'down'], ['k4_hunt', '']].map(([id, st, unk]) => { const it = RXI[id]; return `<span class="tn ${it.tier === 'key' ? 'key' : it.tier === 'unique' ? 'uniq' : ['part', 'act'].includes(it.tier) ? 'made' : ''} ${unk ? 'unk' : ''} ${st}"><span class="ti" data-r="${unk ? 1 : it.r}">${unk ? '<span class="gl">?</span>' : trIcon(it)}</span><b>${unk ? 'Не найдено' : it.n}</b></span>`; }).join('')}</div>
+    <div class="tr-leg"><span><i></i>что нужно выбранному</span><span><i class="d"></i>куда оно идёт</span><span><i class="s"></i>выбранный узел</span></div>
+    <p class="k-note">Вкладка «Древо рецептов» рядом с «Картой экранов» — инструмент команды и конструктора, игрок древо не видит (ADR-0008). Узлы стоят по ярусам — добыча, ключи ремёсел, заготовки, изделия, крафт и Эхо; внизу — руны стражей. Цвет узла — редкость.</p></section>` : ''}`;
 }
 
 function kitCards() {
@@ -3048,6 +3232,129 @@ function kitCards() {
     + card({ side: 0, name: h5.name, cls: h5.cls, el: h5.el, img: h5.img, maxHp: 893, abs: [A('Оковы'), A('Увядание'), A('Ослабление')], ptr: 2, cnt: 1, uses: 2, phase: 'rot', ult: A('Долгая ночь'), chargeMax: 5, charge: 5, st: [{ k: 'hot', school: 'Свет', per: 40, stacks: 2, left: 3, left0: 5 }] }, { hp: 610, sh: 150 }, '', 26)
     + card({ side: 1, name: 'Первый набросок', cls: 'Босс', el: 'Земля', img: WS(F('b1').pg), maxHp: 20000, abs: [A('Правка'), A('Глиняный вал')], ptr: 0, cnt: 0, uses: 3, phase: 'charge', chargeMax: 5, charge: 2, ult: A('Последний штрих'), st: [{ k: 'dot', school: 'Огонь', per: 60, stacks: 3, left: 4, left0: 5 }, { k: 'silence', left: 2, left0: 3 }, { k: 'mark', left: 3, left0: 5, pow: 2000 }] }, { hp: 12000, sh: 0 }, 'lead', 52)
     + card({ side: 1, name: 'Мех', cls: 'Маг. ДД', el: 'Воздух', img: WS(F('e4').pg), maxHp: 3000, abs: [A('Меха'), A('Сквозняк')], ptr: 0, cnt: 2, uses: 0, phase: 'rot', ult: null, st: [{ k: 'stun', left: 1, left0: 2 }] }, { hp: 2100, sh: 0 }, '', 76);
+}
+/* та же карта в модели «10 раундов»: шансы из таблицы ядра, длительности в раундах */
+function kitCardsRounds() {
+  const A = n => Object.assign({ n }, EB.LIB[n]);
+  const T = (abs, ult) => EB.chanceTable({ abs: abs.map(A), ult: ult ? A(ult) : null });
+  const card = (u, d, cls, left, fired) => {
+    const [good, bad] = statusHtml(u, d, true), ctl = u.st.find(x => CTL.includes(x.k));
+    return `<div class="bc ${u.side ? 'foe' : ''} ${cls} ${ctl ? 'ctl-on' + (ctl.k === 'stun' ? ' ctl-stun' : '') : ''}" data-el="${u.el}" style="left:${left}%;top:14px">
+      <div class="face"><img src="${u.img}" alt=""><div class="buffs">${good}</div><div class="debuffs">${bad}</div><span class="cls">${CLS(CLS_OF[u.cls] || u.cls)}</span><span class="tgt"></span><span class="ctl">${ctl ? ic(ST_ICON[ctl.k][0]) : ''}</span></div>
+      <span class="nm">${u.name}</span>${bar(d.hp * 100 / u.maxHp, 'hp', `<span class="sh" style="left:0;width:${Math.min(100, d.sh * 100 / u.maxHp)}%"></span>`)}<div class="rot">${chanceHtml(u, fired)}</div></div>`;
+  };
+  const h1 = H('h1'), h4 = H('h4'), h5 = H('h5');
+  return card({ side: 0, name: h1.name, cls: h1.cls, el: h1.el, img: h1.img, maxHp: 1557, table: T(['Вызов', 'Удар щитом', 'Осыпание']), st: [{ k: 'weak', left: 1, left0: 3, pow: 2000 }] }, { hp: 1100, sh: 0 }, '', 4, 'Удар щитом')
+    + card({ side: 0, name: h4.name, cls: h4.cls, el: h4.el, img: h4.img, maxHp: 1200, table: T(['Живая вода', 'Сияние', 'Оберег']), st: [] }, { hp: 700, sh: 200 }, 'done', 26)
+    + card({ side: 0, name: h5.name, cls: h5.cls, el: h5.el, img: h5.img, maxHp: 893, table: T(['Оковы', 'Увядание', 'Ослабление'], 'Долгая ночь'), st: [{ k: 'hot', school: 'Свет', per: 40, stacks: 1, left: 2, left0: 3 }] }, { hp: 610, sh: 0 }, '', 50)
+    + card({ side: 1, name: 'Первый набросок', cls: 'Босс', el: 'Земля', img: WS(F('b1').pg), maxHp: 20000, table: T(['Правка', 'Глиняный вал'], 'Последний штрих'), st: [{ k: 'stop', left: 1, left0: 2 }, { k: 'dot', school: 'Огонь', per: 60, stacks: 2, left: 2, left0: 3 }] }, { hp: 12000, sh: 0 }, 'lead', 76);
+}
+/* ================== UI-кит · герои из черновиков ==================
+   Коллекция 110 героев с фильтрами, карточка с главами по доблести, ордены и братства.
+   У братства состав виден в витрине; у ордена — «1 из 5» и мотив, остальных игрок вычисляет (дедукция).
+   «Для команды» показывает заметки, скрытых участников и спойлеры. */
+const KH = { tab: 'heroes', cyc: '', set: '', cls: '', el: '', team: false, sel: 'h01_1', valor: null };
+const KH_CLS = { 'танк': 'Танк', 'лекарь': 'Хилер', 'дебаффер': 'Контроль', 'маг ДД': 'Маг. ДД', 'физ ДД ловкости': 'Физ. ДД', 'физ ДД силы': 'Физ. ДД' };
+const KH_CLASSES = ['танк', 'лекарь', 'дебаффер', 'маг ДД', 'физ ДД силы', 'физ ДД ловкости', 'фармящий'];
+const KH_ELS = ['Воздух', 'Земля', 'Огонь', 'Вода', 'Время', 'Свет', 'Тьма'];
+const khData = () => window.EN_HEROES || { heroes: [], sets: [] };
+const khSet = no => khData().sets.find(x => x.no === no);
+const khHero = id => khData().heroes.find(x => x.id === id);
+const khInit = n => n.replace(/[«»"]/g, '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+const khSpoil = h => h.cycle === 6;
+function khPh(h, big) {
+  const main = h.cls.split(' / ')[0];
+  return `<span class="kh-ph" style="--rc:var(--r${h.r})"><b>${khInit(h.name)}</b><span class="cl" title="${h.cls}">${KH_CLS[main] ? CLS(KH_CLS[main]) : ic('gem')}</span>${khSpoil(h) && !big ? '<span class="sp">VI</span>' : ''}</span>`;
+}
+function khFilter(h) {
+  if (KH.cyc && h.cycle !== +KH.cyc) return false;
+  if (KH.set && h.set !== +KH.set) return false;
+  if (KH.cls && !h.cls.split(' / ').includes(KH.cls)) return false;
+  if (KH.el && h.el !== KH.el) return false;
+  return true;
+}
+function khCard(h) {
+  return `<button class="kh-card" data-kh="sel" data-v="${h.id}" data-el="${h.el}" aria-pressed="${KH.sel === h.id}" title="${h.name} · ${khSet(h.set).name}">${khPh(h)}<span class="kh-nm">${h.name}</span><span class="kh-sub">${el(h.el, true)}${h.cls}</span><span class="stars">${stars(0, h.maxV)}</span></button>`;
+}
+function khDetail() {
+  const h = khHero(KH.sel); if (!h) return '<p class="faint">Выберите героя.</p>';
+  const S_ = khSet(h.set), v = KH.valor == null ? 0 : Math.min(KH.valor, h.maxV);
+  const chs = h.ch.map(([t, x], i) => i < v ? `<div class="kh-ch"><small class="faint">Глава ${ROMAN[i + 1]}</small><b>${t}</b><p class="muted" style="font-size:14px">${x}</p></div>` : `<div class="kh-ch lock"><small>Глава ${ROMAN[i + 1]} · откроется на доблести ${i + 1}</small><b>${t}</b></div>`).join('');
+  const setTxt = S_.type === 'братство' ? 'Братство · состав виден в витрине' : v >= 1 || KH.team ? 'Орден · раскрыт доблестью 1' : 'Орден · не раскрыт до доблести 1';
+  return `<div class="row" style="gap:12px;align-items:flex-start"><span class="kh-big" data-el="${h.el}">${khPh(h, true)}</span><div class="col" style="gap:5px;min-width:0">
+      <span class="eyebrow">${h.id} · цикл ${ROMAN[h.cycle]}${khSpoil(h) ? ' · спойлер' : ''}</span>
+      <b class="serif" style="font-size:24px;line-height:1.05;color:var(--parch)">${h.name}</b>
+      <div class="kh-meta">${rar(h.r)}${el(h.el)}<span class="chip">${h.cls}</span><span class="chip">${h.folk}</span><span class="chip">${h.acq}</span></div>
+      <span class="stars lg">${stars(v, h.maxV)}</span></div></div>
+    <p class="quote">«${h.show}»</p>
+    <span class="eyebrow">${setTxt}</span>
+    <b class="serif" style="font-size:17px;color:var(--parch)">${S_.type === 'орден' && !(v >= 1 || KH.team) ? '???' : S_.name}</b>
+    <span class="eyebrow">Роль в бою</span><p class="muted" style="font-size:13.5px">${h.role || ''}</p>
+    <span class="eyebrow">Обрывки · видны и при доблести 0</span><ul class="kh-frag">${h.frags.map(f => `<li>«${f}»</li>`).join('')}</ul>
+    <span class="eyebrow">Главы по доблести</span>
+    <div class="kh-val"><input type="range" min="0" max="${h.maxV}" value="${v}" data-kh="val" aria-label="Доблесть героя"><b class="num" style="color:var(--gold)">${v} / ${h.maxV}</b></div>
+    ${chs}
+    ${h.shards ? `<span class="eyebrow">Источник осколков</span><p class="muted" style="font-size:13px">${h.shards}</p>` : ''}
+    ${KH.team && h.team.length ? `<div class="kh-team">${h.team.map(x => `<p>${x}</p>`).join('')}</div>` : ''}`;
+}
+function khSetBox(S_) {
+  const ms = khData().heroes.filter(h => h.set === S_.no), open = S_.type === 'братство';
+  const shown = open || KH.team ? ms : ms.slice(0, 1);
+  const mem = ms.map(h => shown.includes(h)
+    ? `<button data-kh="mem" data-v="${h.id}" class="${!open && !ms.slice(0, 1).includes(h) ? 'hid' : ''}" title="${h.cls} · ${h.el}">${el(h.el, true)}${h.name}</button>`
+    : `<span class="unk" title="Скрыт до доблести 1: вычисляется по мотиву и главам">? · скрыт</span>`).join('');
+  return `<div class="kh-set">
+    <div class="row" style="gap:8px;flex-wrap:wrap"><h4>${S_.name}</h4><span class="chip ${open ? 'gold' : ''}">${S_.type}</span>${S_.cycle === 6 ? '<span class="chip warn">спойлер · цикл VI</span>' : ''}<span class="faint" style="font-size:12.5px">цикл ${ROMAN[S_.cycle]}${S_.domain ? ' · домен «' + S_.domain + '»' : ''}</span></div>
+    ${open ? `<p class="quote">«${S_.show}»</p>` : `<p class="muted" style="font-size:13px"><b style="color:var(--gold-2)">Мотив для дедукции:</b> ${S_.motif}</p>`}
+    <p class="muted" style="font-size:13px">${S_.who}</p>
+    <span class="eyebrow">${open ? 'Состав виден' : 'Раскрыт 1 из 5 · остальных игрок вычисляет'}</span>
+    <div class="kh-mem">${mem}</div>
+    <p style="font-size:13px;color:var(--parch-2)">${S_.bonus}</p>
+    <table class="kh-tiers">${S_.tiers.map(([t, c, b]) => `<tr><td>${t}</td><td>${c}</td><td>${b}</td></tr>`).join('')}</table>
+    ${KH.team && S_.team.length ? `<div class="kh-team">${S_.team.map(x => `<p>${x}</p>`).join('')}</div>` : ''}
+  </div>`;
+}
+function khPaint() {
+  const root = document.getElementById('kitHeroes'); if (!root) return;
+  const D = khData();
+  if (!D.heroes.length) { root.innerHTML = '<p class="faint">Нет данных: рядом с index.html должен лежать heroes.js.</p>'; return; }
+  const opt = (v, t, cur) => `<option value="${v}" ${String(cur) === String(v) ? 'selected' : ''}>${t}</option>`;
+  const sets = D.sets.filter(x => !KH.cyc || x.cycle === +KH.cyc);
+  const list = D.heroes.filter(khFilter);
+  const top = `<div class="kh-top"><div class="tabs" role="tablist"><button role="tab" data-kh="tab" data-v="heroes" aria-selected="${KH.tab === 'heroes'}">Коллекция</button><button role="tab" data-kh="tab" data-v="sets" aria-selected="${KH.tab === 'sets'}">Ордены и братства</button></div>
+    <select data-kh="cyc" aria-label="Цикл">${opt('', 'Все циклы', KH.cyc)}${[1, 2, 3, 4, 5, 6].map(c => opt(c, 'Цикл ' + ROMAN[c], KH.cyc)).join('')}</select>
+    <select data-kh="set" aria-label="Орден">${opt('', 'Все ордены и братства', KH.set)}${sets.map(x => opt(x.no, `${ROMAN[x.cycle]} · ${x.name}`, KH.set)).join('')}</select>
+    <select data-kh="cls" aria-label="Класс">${opt('', 'Все классы', KH.cls)}${KH_CLASSES.map(c => opt(c, c, KH.cls)).join('')}</select>
+    <select data-kh="el" aria-label="Стихия">${opt('', 'Все стихии', KH.el)}${KH_ELS.map(e => opt(e, e, KH.el)).join('')}</select>
+    <label><input type="checkbox" data-kh="team" ${KH.team ? 'checked' : ''}>для команды</label>
+    <span class="n">${KH.tab === 'heroes' ? `показано ${list.length} из ${D.heroes.length}` : `сетов ${sets.filter(x => !KH.set || x.no === +KH.set).length} из ${D.sets.length}`}</span></div>`;
+  const body = KH.tab === 'heroes'
+    ? `<div class="kh-main"><div class="kh-grid">${list.map(khCard).join('') || '<p class="faint">Никого: ослабьте фильтры.</p>'}</div><div class="kh-det" id="khDet">${khDetail()}</div></div>`
+    : `<div class="kh-sets">${sets.filter(x => !KH.set || x.no === +KH.set).map(khSetBox).join('')}</div>`;
+  root.innerHTML = top + body;
+}
+function bindKitHeroes() {
+  const root = document.getElementById('kitGrid'); if (!root) return;
+  root.addEventListener('click', e => {
+    const b = e.target.closest('[data-kh]'); if (!b || !b.closest('#kitHeroes')) return;
+    const a = b.dataset.kh, v = b.dataset.v;
+    if (a === 'tab') { KH.tab = v; khPaint(); }
+    else if (a === 'sel') { KH.sel = v; KH.valor = null; khPaint(); }
+    else if (a === 'mem') { KH.sel = v; KH.valor = null; KH.tab = 'heroes'; KH.set = String(khHero(v).set); khPaint(); }
+  });
+  root.addEventListener('change', e => {
+    const t = e.target, a = t.dataset && t.dataset.kh; if (!a || !t.closest('#kitHeroes')) return;
+    if (a === 'team') KH.team = t.checked;
+    else if (['cyc', 'set', 'cls', 'el'].includes(a)) { KH[a] = t.value; if (a === 'cyc') KH.set = ''; }
+    else return;
+    khPaint();
+  });
+  root.addEventListener('input', e => {
+    const t = e.target; if (!t.dataset || t.dataset.kh !== 'val') return;
+    KH.valor = +t.value; const d = document.getElementById('khDet'); if (!d) return;
+    d.innerHTML = khDetail(); const r = d.querySelector('[data-kh="val"]'); r && r.focus();
+    const card = document.querySelector(`#kitHeroes .kh-card[data-v="${KH.sel}"] .stars`); if (card) card.innerHTML = stars(0, khHero(KH.sel).maxV);
+  });
 }
 let kitFxInst = null;
 function kitFx(kind) {
@@ -3086,7 +3393,7 @@ function boot() {
   const g = $game();
   bindGame();
   render();
-  renderMap(); renderKit();
+  renderMap(); renderKit(); khPaint();
   const fl = document.getElementById('flows');
   fl.innerHTML = FLOWS.map(([t, d], i) => `<li><button class="p-flow" data-flow="${i}"><span><b>${t}</b><small>${d}</small></span></button></li>`).join('');
   fl.addEventListener('click', e => { const b = e.target.closest('[data-flow]'); if (!b) return; FLOWS[+b.dataset.flow][2](); render(); if (S.overlay) focusOverlay(); if (window.innerWidth < 1200) document.getElementById('devWrap').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
@@ -3094,12 +3401,16 @@ function boot() {
   document.querySelectorAll('[data-size]').forEach(b => b.addEventListener('click', () => setSize(b.dataset.size === 'sm')));
   document.getElementById('btnReset').addEventListener('click', () => { clearInterval(loop); loop = null; if (fxInst) { fxInst.destroy(); fxInst = null; } S = initialState(); render(); });
   document.getElementById('devSpeed').addEventListener('click', e => { const b = e.target.closest('[data-speed]'); if (!b) return; devSpeed = +b.dataset.speed; document.querySelectorAll('#devSpeed [data-speed]').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+  document.getElementById('devModel').addEventListener('click', e => { const b = e.target.closest('[data-model]'); if (!b) return; devModel = b.dataset.model; document.querySelectorAll('#devModel [data-model]').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+  document.getElementById('devCompare').addEventListener('click', compareModels);
+  bindTree();
+  bindKitHeroes();
   document.getElementById('kitGrid').addEventListener('click', e => { const b = e.target.closest('[data-fx]'); if (b) kitFx(b.dataset.fx); });
   document.getElementById('btnFull').addEventListener('click', () => { const d = document.getElementById('device'); const req = d.requestFullscreen || d.webkitRequestFullscreen; if (req) Promise.resolve(req.call(d)).catch(() => { }); });
   document.addEventListener('fullscreenchange', () => { const on = !!document.fullscreenElement; g.classList.toggle('full', on); document.getElementById('device').classList.toggle('fs', on); fitDevice(); });
   addEventListener('resize', fitDevice);
   let page = 'proto'; try { page = localStorage.getItem('en-page') || 'proto'; } catch (_) { }
-  const fromHash = () => { const h = location.hash.slice(1); return ['proto', 'map', 'kit'].includes(h) ? h : null; };
+  const fromHash = () => { const h = location.hash.slice(1); return ['proto', 'map', 'tree', 'kit'].includes(h) ? h : null; };
   if (fromHash()) page = fromHash();
   addEventListener('hashchange', () => { const h = fromHash(); if (h) showPage(h); });
   showPage(page);
