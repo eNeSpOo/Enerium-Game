@@ -438,48 +438,90 @@ button.well:hover{border-color:var(--iron-3)}
 .shelf-figs .fig:hover{background:rgba(255,255,255,.03)}
 .shelf-figs .fig.boss{height:100%}
 
-/* Бой */
-.bt{position:absolute;inset:0;overflow:hidden;background:#07090a}
-.bt>.bg{position:absolute;inset:-4%;width:108%;height:108%;object-fit:cover;object-position:50% 60%;filter:brightness(.55) saturate(.9)}
-.bt::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,6,8,.7),transparent 22%,transparent 70%,rgba(5,6,8,.9)),radial-gradient(60% 50% at 70% 72%,rgba(72,229,212,.1),transparent);pointer-events:none}
-.bt-hud{position:absolute;left:10px;right:10px;top:8px;z-index:3;display:flex;align-items:center;gap:14px}
+/* Бой: пять карт против отряда врагов-карт. Раскладка 3 + 2 только для вида — цель выбирает угроза */
+.bt{position:absolute;inset:0;overflow:hidden;background:#07090a;--rowh:100px;--colw:92px;--fh:62px}
+.bt>.bg{position:absolute;inset:-4%;width:108%;height:108%;object-fit:cover;object-position:50% 60%;filter:brightness(.4) saturate(.85)}
+.bt::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(5,6,8,.78),transparent 20%,transparent 74%,rgba(5,6,8,.92)),radial-gradient(46% 40% at 50% 104%,rgba(72,229,212,.13),transparent);pointer-events:none}
+.bt-hud{position:absolute;left:10px;right:10px;top:7px;z-index:5;display:flex;align-items:center;gap:12px;min-width:0}
 .bt-floor{display:flex;align-items:baseline;gap:6px}
 .bt-floor b{font:600 30px/1 var(--f-d);color:var(--parch)}
 .bt-floor span{font:600 18px/1 var(--f-d);color:var(--parch-3)}
-.bt-budget{flex:1 1 0;max-width:300px;display:flex;flex-direction:column;gap:4px}
-.bt-budget .row{justify-content:space-between;font-size:12px;color:var(--parch-2)}
+.bt-clock{display:flex;flex-direction:column;gap:3px;width:150px;flex:none}
+.bt-clock .row{justify-content:space-between;font-size:11.5px;color:var(--parch-2);gap:8px}
+.bt-clock .row .i{width:13px;height:13px}
 .bt-ctrl{margin-left:auto;display:flex;gap:6px;align-items:center}
-.bt-stage{position:absolute;left:0;right:0;top:56px;bottom:40px;z-index:2}
-.party{position:absolute;left:18px;top:6px;bottom:0;width:270px}
-.pm{position:absolute;width:64px;display:flex;flex-direction:column;gap:3px;transition:transform .12s}
-.pm .face{position:relative;width:64px;height:64px;border-radius:12px;overflow:hidden;border:1px solid color-mix(in srgb,var(--rc) 50%,#2a2f35);box-shadow:0 8px 16px -6px #000}
-.pm .face img{width:100%;height:100%;object-fit:cover;object-position:50% 20%}
-.pm .bar{height:5px}
-.pm .rot{display:flex;gap:2px}
-.pm .rot i{flex:1 1 0;height:3px;border-radius:2px;background:#2b3136}
-.pm .rot i.on{background:var(--gold)}
-.pm.hit{transform:translateX(-4px)}
-.pm.act .face{box-shadow:0 0 0 1px var(--spirit),0 0 18px -2px var(--spirit)}
-.pm.dead .face img{filter:grayscale(1) brightness(.35)}
-.foe{position:absolute;right:8%;bottom:0;height:88%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
-.foe img{height:100%;width:auto;filter:drop-shadow(0 10px 18px rgba(0,0,0,.8));transition:opacity .3s,filter .12s,transform .12s}
-.foe.hit img{filter:brightness(1.6) drop-shadow(0 10px 18px rgba(0,0,0,.8));transform:translateX(3px)}
-.foe.gone img{opacity:0;transform:translateY(10px)}
-.foe-card{position:absolute;right:10px;top:0;z-index:3;width:250px;padding:8px 10px;display:flex;flex-direction:column;gap:5px}
-.foe-card h3{font-size:19px;color:var(--parch);line-height:1}
-.fly{position:absolute;z-index:6;pointer-events:none;font:700 17px/1 var(--f-u);color:#fff;text-shadow:0 2px 4px #000,0 0 10px rgba(0,0,0,.6);animation:fly .9s ease-out forwards;white-space:nowrap}
-.fly.crit{font-size:23px;color:var(--gold)}
-.fly.abil{font-size:14px;color:var(--spirit);letter-spacing:.06em}
+.bt-field{position:absolute;left:0;right:0;top:50px;bottom:34px;z-index:2}
+.bt-side{position:absolute;top:0;bottom:0;width:calc(var(--colw) + 86px)}
+.bt-side.h{left:12px}
+.bt-side.f{right:12px}
+.bt-feed{position:absolute;left:calc(var(--colw) + 112px);right:calc(var(--colw) + 112px);bottom:2px;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none}
+.bt-feed p{margin:0;max-width:100%;padding:3px 9px;border-radius:7px;background:rgba(7,9,11,.62);font-size:12px;line-height:1.25;color:var(--parch-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #000}
+.bt-feed p b{color:var(--parch);font-weight:700}
+.bt-feed p .sp{color:var(--spirit)}
+.bt-feed p .gd{color:var(--gold)}
+.bt-feed p .bd{color:#ff9b8a}
+.bt-feed p:nth-last-child(n+3){opacity:.55}
+.bt-banner{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);z-index:6;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;pointer-events:none;animation:fade .3s ease}
+.bt-banner b{font:600 30px/1 var(--f-d);color:var(--gold);text-shadow:0 0 18px rgba(221,188,122,.35),0 2px 6px #000}
+.bt-banner small{font:700 11px/1.2 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--parch-2);text-shadow:0 1px 3px #000}
+/* карта бойца: герой и враг устроены одинаково */
+.bc{position:absolute;top:calc(var(--r) * var(--rowh));width:74px;display:flex;flex-direction:column;gap:3px;transition:transform .14s ease,opacity .5s ease;--c:var(--iron-2)}
+.bt-side.h .bc{left:calc(var(--k) * var(--colw))}
+.bt-side.f .bc{right:calc(var(--k) * var(--colw))}
+.bc[data-el="Воздух"]{--c:var(--air)}.bc[data-el="Земля"]{--c:var(--earth)}.bc[data-el="Огонь"]{--c:var(--fire)}.bc[data-el="Вода"]{--c:var(--water)}.bc[data-el="Время"]{--c:var(--time)}.bc[data-el="Свет"]{--c:var(--light)}.bc[data-el="Тьма"]{--c:var(--dark)}
+.bc .face{position:relative;flex:none;height:var(--fh);border-radius:9px;overflow:hidden;background:#0b0d10;border:1px solid color-mix(in srgb,var(--c) 45%,#262b31);box-shadow:0 10px 18px -10px #000,inset 0 -3px 0 color-mix(in srgb,var(--c) 70%,transparent);transition:box-shadow .2s,filter .12s}
+.bc .face img{width:100%;height:100%;object-fit:cover;object-position:50% 18%}
+.bc.foe .face img{object-position:50% 8%}
+.bc.foe .face{background:radial-gradient(90% 70% at 50% 100%,rgba(236,228,211,.08),transparent),#0c0e11}
+.bc .cls{position:absolute;right:3px;top:3px;display:grid;place-items:center;width:17px;height:17px;border-radius:5px;background:rgba(6,8,10,.82);color:var(--parch-2)}
+.bc .cls .i{width:11px;height:11px}
+.bc .aim{position:absolute;left:3px;top:3px;display:none;align-items:center;gap:2px;height:17px;padding:0 4px;border-radius:5px;background:rgba(40,12,8,.85);color:#ffb3a3;font:700 10.5px/1 var(--f-u)}
+.bc .aim .i{width:11px;height:11px}
+.bc .aim.on{display:inline-flex}
+.bc .sts{position:absolute;left:2px;right:2px;bottom:3px;display:flex;flex-wrap:wrap-reverse;gap:2px}
+.bc .sts span{display:inline-flex;align-items:center;gap:1px;height:15px;padding:0 3px;border-radius:4px;background:rgba(6,8,10,.86);color:var(--parch);font:700 10px/1 var(--f-u)}
+.bc .sts span .i{width:10px;height:10px}
+.bc .sts span.dot::before{content:"";width:6px;height:8px;background:var(--sc,var(--rust));clip-path:polygon(50% 0,100% 38%,50% 100%,0 38%)}
+.bc .sts span.good{color:#9ff0c0}
+.bc .sts span.bad{color:#ffb3a3}
+.bc .nm{font:700 10px/1 var(--f-u);letter-spacing:.03em;color:var(--parch-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #000}
+.bc .bar{height:5px}
+.bc .chg{position:relative;height:3px;border-radius:2px;background:#1b1f23;overflow:hidden}
+.bc .chg i{position:absolute;left:0;top:0;bottom:0;width:calc(var(--v)*1%);background:var(--gold-2);transition:width .15s}
+.bc .chg.ult i{background:var(--spirit);box-shadow:0 0 6px var(--spirit)}
+.bc .chg.none{visibility:hidden}
+.bc.lead{width:84px;--fh:calc(var(--rowh) - 30px)}
+.bc.lead .face{border-color:var(--gold-2);box-shadow:0 0 0 1px var(--gold-3),0 12px 22px -10px rgba(221,188,122,.45),inset 0 -3px 0 var(--gold-2)}
+.bc.lead .nm{color:var(--gold)}
+.bc.ready .face{box-shadow:0 0 0 1px var(--spirit),0 0 18px -2px var(--spirit)}
+.bt-side.h .bc.act{transform:translateX(7px)}
+.bt-side.f .bc.act{transform:translateX(-7px)}
+.bc.hit .face{filter:brightness(1.65)}
+.bc.heal .face{box-shadow:0 0 0 1px #6fe3a0,0 0 16px -3px #6fe3a0}
+.bc.dead{opacity:.26}
+.bc.dead .face img{filter:grayscale(1) brightness(.5)}
+.bc.unk .face img{filter:brightness(0) drop-shadow(0 0 1px rgba(72,229,212,.8)) drop-shadow(0 0 6px rgba(72,229,212,.25))}
+.bc.unk .nm{color:var(--spirit)}
+.fly{position:absolute;z-index:7;pointer-events:none;font:700 16px/1 var(--f-u);color:#fff;text-shadow:0 2px 4px #000,0 0 10px rgba(0,0,0,.6);animation:fly .9s ease-out forwards;white-space:nowrap}
+.fly.crit{font-size:21px;color:var(--gold)}
+.fly.abil{font-size:13px;color:var(--spirit);letter-spacing:.06em}
+.fly.ult{font:600 19px/1 var(--f-d);color:var(--spirit);text-shadow:0 0 12px var(--spirit),0 2px 4px #000}
 .fly.dmg{color:#ff9b8a}
-@keyframes fly{0%{transform:translateY(0) scale(.8);opacity:0}15%{opacity:1;transform:translateY(-6px) scale(1.05)}100%{transform:translateY(-44px) scale(1);opacity:0}}
+.fly.heal{color:#8ff0b4}
+.fly.shield{color:var(--shield);font-size:13px}
+.fly.miss{color:var(--parch-3);font-size:12px}
+.fly.info{color:var(--amber);font-size:12px;letter-spacing:.04em}
+@keyframes fly{0%{transform:translateY(0) scale(.8);opacity:0}15%{opacity:1;transform:translateY(-6px) scale(1.05)}100%{transform:translateY(-40px) scale(1);opacity:0}}
 .ruler{position:absolute;left:14px;right:14px;bottom:10px;z-index:3;height:22px;display:flex;align-items:flex-end;gap:2px}
-.ruler i{flex:1 1 0;height:6px;border-radius:2px;background:#262b30}
+.ruler i{position:relative;flex:1 1 0;height:6px;border-radius:2px;background:#262b30;overflow:hidden}
 .ruler i.el5{height:12px;background:#4c4335}
-.ruler i.boss{height:18px;background:#6b5230}
+.ruler i.boss{height:18px;background:#3a2c1b}
+.ruler i.boss::after{content:"";position:absolute;left:0;right:0;bottom:0;height:calc(var(--sg,0)*1%);background:linear-gradient(0deg,var(--gold-3),var(--gold))}
 .ruler i.past{background:var(--gold-3)}
 .ruler i.past.el5{background:var(--gold-2)}
 .ruler i.cur{background:var(--spirit);box-shadow:0 0 10px var(--spirit)}
-.bt .skipbar{position:absolute;right:12px;bottom:40px;z-index:4}
+.ruler i.wall{background:var(--rust);box-shadow:0 0 8px rgba(220,106,82,.6)}
+@container main (max-height: 360px){ .bt{--rowh:86px;--colw:84px;--fh:52px} .bt-floor b{font-size:26px} }
 
 /* Герои */
 .hs{display:grid;grid-template-columns:318px minmax(0,1fr);gap:10px;height:100%}
@@ -836,8 +878,6 @@ button.well:hover{border-color:var(--iron-3)}
 .icard{display:flex;flex-direction:column;gap:10px;padding:12px;min-height:0}
 .icard .acts2{margin-top:auto;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
 .well.cur{border-color:var(--spirit);box-shadow:0 0 0 1px var(--spirit),0 8px 16px -8px var(--spirit)}
-/* бой: портрет не сжимается */
-.pm .face{flex:none}
 /* компактный режим для низких экранов (844×390 и ниже): по высоте рабочей области */
 .g-main{container-type:size;container-name:main}
 .hs{grid-template-columns:minmax(250px,34%) minmax(0,1fr)}
@@ -919,6 +959,10 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
         <p style="margin:6px 0 10px">Нажмите — прототип перейдёт в нужное место. Дальше кликается всё.</p>
         <ol class="p-flows" id="flows"></ol>
       </div>
+      <div class="p-block">
+        <h2>Бой пять на пять</h2>
+        <p style="margin-top:6px">Тестовая сцена по решениям 26.09.2026: враги — такие же карты, как герои, этаж — готовая колода, способности из одной библиотеки. Цель выбирает угроза, у части способностей своё правило цели. Попыток и энергии нет: сид этажа постоянен всю неделю, поэтому повтор тем же отрядом даёт тот же итог. Босса берут осадой за несколько забегов. Ядро — <b>battle.js</b>: целые числа, генератор с сидом, числа баланса в данных.</p>
+      </div>
     </aside>
   </div>
 </section>
@@ -973,6 +1017,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 </div>
 
 <script>window.EN_ASSET='assets/';</script>
+<script src="battle.js"></script>
 <script>
 'use strict';
 /* Все числа ниже — демонстрационные фикстуры: взяты из текущего UIKit
@@ -998,6 +1043,9 @@ const STAT_HINT = ['физ. урон и защита', 'маг. урон и за
 const GRADE = { 1: '×2', 2: '×1,5', 3: '×1,25' };
 const CLS_ICON = { 'Танк': 'shield', 'Физ. ДД': 'sword', 'Маг. ДД': 'staff', 'Хилер': 'heal', 'Контроль': 'chain' };
 
+const EB = window.EnBattle;
+/* способность героя берётся из общей библиотеки ядра: цена, описание и школа — из одного места */
+const AB = n => ({ n, c: EB.LIB[n].price, d: EB.LIB[n].d, school: EB.LIB[n].school });
 function initialState() {
   return {
     route: 'shelter', from: null,
@@ -1007,20 +1055,20 @@ function initialState() {
     week: { race: 'Эльфов', next: 'Зверей', left: 3 * 86400 + 5 * 3600 + 12 * 60 },
     heroes: [
       { id: 'h1', name: 'Страж Кряжа', cls: 'Танк', el: 'Земля', race: 'Саганы', r: 1, cycle: 1, img: ART('hero-portrait-1.png'), lvl: 42, cap: 50, lim: 0, valor: 1, maxV: 3, bm: 26840, st: [128, 54, 72, 246, 62], gr: [2, 3, 3, 1, 3],
-        ab: [{ n: 'Вызов', c: 3, d: 'Враг бьёт только стража: угроза танка ×3.' }, { n: 'Удар щитом', c: 4, d: 'Урон силой и оглушение на 2 атаки цели.' }],
+        ab: ['Вызов', 'Удар щитом', 'Осыпание'].map(AB),
         pas: [{ n: 'Несгибаемость', t: 'боевая', d: 'Щит, когда здоровье ниже половины.' }, { n: 'Трофейщик', t: 'фарм', d: 'Больше золота с элит.' }], ult: null, busy: null, },
       { id: 'h2', name: 'Пламенный Клинок', cls: 'Физ. ДД', el: 'Огонь', race: 'Люди', r: 1, cycle: 1, img: ART('hero-portrait-2.png'), lvl: 50, cap: 50, lim: 0, valor: 0, maxV: 1, bm: 25920, st: [245, 54, 128, 72, 62], gr: [1, 3, 2, 3, 3],
-        ab: [{ n: 'Быстрый выпад', c: 2, d: 'Короткий удар силой, копит скорость.' }, { n: 'Шквал', c: 4, d: 'Серия из трёх ударов по одной цели.' }, { n: 'Пробитие', c: 3, d: '−30% физ. защиты цели на 4 атаки.' }],
+        ab: ['Горение', 'Быстрый выпад', 'Погребальный костёр'].map(AB),
         pas: [{ n: 'Точность', t: 'боевая', d: 'Выше шанс крита.' }, { n: 'Охотник', t: 'фарм', d: 'Больше духа с рядовых.' }], ult: null, busy: null, },
       { id: 'h3', name: 'Хронист', cls: 'Маг. ДД', el: 'Время', race: 'Искажённые', r: 1, cycle: 1, img: ART('hero-portrait-3.png'), lvl: 118, cap: 150, lim: 1, valor: 2, maxV: 5, bm: 24200, st: [72, 246, 54, 62, 128], gr: [3, 1, 3, 3, 2],
-        ab: [{ n: 'Разряд', c: 3, d: 'Урон интеллектом по одной цели.' }],
+        ab: ['Разряд', 'Остановка'].map(AB),
         pas: [{ n: 'Средоточие', t: 'боевая', d: 'Каждая третья способность сильнее.' }, { n: 'Знаток', t: 'фарм', d: 'Чаще падают базовые ресурсы.' }], ult: { n: 'Испепеление', at: 5, d: 'Откроется на доблести 5.' }, busy: null, },
       { id: 'h4', name: 'Светоносная', cls: 'Хилер', el: 'Свет', race: 'Эльфы', r: 1, cycle: 1, img: ART('hero-portrait-4.png'), lvl: 46, cap: 50, lim: 0, valor: 1, maxV: 2, bm: 22140, st: [62, 246, 54, 128, 72], gr: [3, 1, 3, 2, 3],
-        ab: [{ n: 'Живая вода', c: 3, d: 'Лечит самого раненого героя.' }, { n: 'Оберег', c: 4, d: 'Щит на отряд, тратится первым.' }],
+        ab: ['Живая вода', 'Сияние', 'Оберег'].map(AB),
         pas: [{ n: 'Отклик', t: 'боевая', d: 'Крит лечения даёт щит.' }, { n: 'Собиратель трав', t: 'фарм', d: 'Больше ресурсов алхимии.' }], ult: null, busy: null, },
       { id: 'h5', name: 'Тень Увядания', cls: 'Контроль', el: 'Тьма', race: 'Нежить', r: 1, cycle: 1, img: ART('hero-portrait-5.png'), lvl: 35, cap: 50, lim: 0, valor: 2, maxV: 2, bm: 19750, st: [62, 246, 54, 128, 72], gr: [3, 1, 3, 2, 3],
-        ab: [{ n: 'Оковы', c: 4, d: 'Оглушение на 2 атаки цели. Боссы сопротивляются.' }, { n: 'Ослабление', c: 3, d: '−25% атаки цели на 5 её атак.' }],
-        pas: [{ n: 'Тень', t: 'боевая', d: 'Дебафы держатся на атаку дольше.' }, { n: 'Дознаватель', t: 'фарм', d: 'Выше шанс ключа с элит.' }], ult: null, busy: null, },
+        ab: ['Оковы', 'Увядание', 'Ослабление'].map(AB),
+        pas: [{ n: 'Тень', t: 'боевая', d: 'Дебафы держатся на атаку дольше.' }, { n: 'Дознаватель', t: 'фарм', d: 'Выше шанс ключа с элит.' }], ult: { n: 'Долгая ночь', at: 2, d: 'безмолвие всем врагам на 3 их атаки, боссы сопротивляются.' }, busy: null, },
     ],
     selHero: 'h1', qty: 1,
     squads: [
@@ -1153,6 +1201,7 @@ function initialState() {
     ],
     gift: { day: 4, got: 3 },
     lore: { sec: 'best', foe: 'o1' },
+    siege: { hp: null, max: null, killed: false }, lastRun: null, runs: 0,
     overlay: null, toast: null, battle: null,
   };
 }
@@ -1191,6 +1240,9 @@ function heroCard(h, o = {}) {
   </button>`;
 }
 const sq = id => S.squads.find(s => s.id === id);
+const plural = (n, one, few, many) => { const a = n % 10, b = n % 100; return a === 1 && b !== 11 ? one : a >= 2 && a <= 4 && (b < 12 || b > 14) ? few : many; };
+const atkWord = n => plural(n, 'атака', 'атаки', 'атак');
+const schoolMark = sc => !sc || sc === 'класс' ? '' : `<span class="el bare" data-el="${sc}" title="Школа: ${sc}" style="margin-right:5px"></span>`;
 const sqBM = s => s.m.filter(Boolean).reduce((a, id) => a + H(id).bm, 0);
 
 /* ================== иконки ================== */
@@ -1318,13 +1370,13 @@ function descent() {
           <h2>Мастерская форм</h2>
           <p class="quote">«Место, где никого не ждут — и всё равно всех встречают»</p>
           <div class="facts">
-            <div class="stat"><b>35</b><small>ступеней</small></div>
-            <div class="stat"><b>9</b><small>попыток</small></div>
-            <div class="stat"><b>12:45</b><small>бюджет боя</small></div>
+            <div class="stat"><b>${EB.FLOORS.length}</b><small>этажей</small></div>
+            <div class="stat"><b>${S.lastRun && S.lastRun.wall ? S.lastRun.wall : '—'}</b><small>стена</small></div>
+            <div class="stat"><b>${S.siege.killed && S.siege.hp == null ? 'пал' : siegeDone() + '%'}</b><small>осада босса</small></div>
             <div class="stat"><b>${k}<span class="faint">/14</span></b><small>изучено</small></div>
           </div>
         </div>
-        <div class="cta"><button class="btn go big" data-a="sheet" data-v="prep">${ic('down')}Спуститься</button></div>
+        <div class="cta"><button class="btn go big" data-a="sheet" data-v="prep">${ic('down')}Начать забег</button></div>
       </div>
       <div class="pnl shelf">
         <div class="pnl-h"><h2>Обитатели</h2><span class="faint" style="font-size:12.5px">до первой победы враг показывает только мощь, здоровье, стихию и тип</span></div>
@@ -1355,38 +1407,54 @@ function figBtn(f, seal) {
 }
 const FIG_WH = { 5: [542, 860], 6: [626, 860], 7: [626, 860], 8: [826, 860], 9: [638, 860], 10: [945, 860], 12: [653, 860], 13: [580, 860], 14: [591, 860], 15: [451, 860], 16: [594, 860], 17: [416, 860], 18: [540, 860], 19: [378, 860] };
 
-/* ================== Бой ================== */
+/* ================== Бой ==================
+   Пять карт против колоды этажа. Ядро — battle.js; здесь только показ. */
+const SLOT = { 1: [[1, 1]], 2: [[1, .5], [1, 1.5]], 3: [[1, 1], [1, 0], [1, 2]], 4: [[1, 1], [1, 0], [1, 2], [0, 1]], 5: [[1, 1], [1, 0], [1, 2], [0, .5], [0, 1.5]] };
+const SCHOOL_C = { 'Огонь': 'var(--fire)', 'Земля': 'var(--earth)', 'Воздух': 'var(--air)', 'Вода': 'var(--water)', 'Свет': 'var(--light)', 'Тьма': 'var(--dark)', 'Время': 'var(--time)' };
+const ST_VIEW = { stun: ['chain', 'Оглушение'], silence: ['lock', 'Безмолвие'], stop: ['hour', 'Остановка'], weak: ['down', 'Ослабление'], mark: ['flag', 'Метка'], pierce: ['minus', 'Пробитие защиты'] };
+const CLS_OF = { 'Физ. ДД силы': 'Физ. ДД', 'Физ. ДД ловкости': 'Физ. ДД', 'Лекарь': 'Хилер', 'Дебаффер': 'Контроль', 'Босс': 'Танк', 'Страж': 'Танк' };
+const unitKnown = u => u.side === 0 || known(u.id);
+const uName = u => unitKnown(u) ? u.name : 'Неизвестный';
+const unitImg = u => u.side === 0 ? H(u.id).img : WS(F(u.id).pg);
+function cardHtml(u, n, k) {
+  const [col, row] = SLOT[n][k], kn = unitKnown(u);
+  return `<div class="bc ${u.side ? 'foe' : ''} ${u.lead ? 'lead' : ''} ${kn ? '' : 'unk'} ${u.alive ? '' : 'dead'}" id="bc${u.side}${u.i}" data-el="${u.el}" style="--k:${col};--r:${row}" title="${kn ? u.name + ' · ' + u.cls + ' · ' + u.el : 'Не изучен: имя и способности откроет первая победа'}">
+    <div class="face"><img src="${unitImg(u)}" alt=""><span class="cls">${CLS(CLS_OF[u.cls] || u.cls)}</span><span class="aim" title="Столько противников целится в эту карту">${ic('eye')}<b>0</b></span><div class="sts"></div></div>
+    <span class="nm">${kn ? u.name : 'Не изучен'}</span>
+    ${bar(u.hp / u.maxHp * 100, 'hp', `<span class="sh" style="left:0;width:${Math.min(100, u.sh * 100 / u.maxHp)}%"></span>`)}
+    <div class="chg"><i style="--v:0"></i></div>
+  </div>`;
+}
 function battle() {
-  const B = S.battle;
-  if (!B) return { title: 'Бой', html: '<section class="scr"></section>' };
-  const f = F(B.foe), k = known(f.id);
-  const party = B.party.map((p, i) => { const h = H(p.id); return `<div class="pm ${p.hp <= 0 ? 'dead' : ''}" id="pm${i}" data-r="${h.r}" style="${PM_POS[i]}"><div class="face"><img src="${h.img}" alt="${h.name}"></div>${bar(p.hp / p.max * 100, 'hp', `<span class="sh" style="left:0;width:${Math.min(100, p.sh / p.max * 100)}%"></span>`)}<div class="rot">${h.ab.map((a, j) => `<i class="${j < p.ptr ? 'on' : ''}"></i>`).join('')}</div></div>`; }).join('');
-  return { title: 'Мастерская форм', sub: `попытка ${9 - B.att} из 9`, back: 'descent', html: `<section class="scr flush"><div class="bt" id="bt">
+  const R = S.battle;
+  if (!R || !R.b) return { title: 'Бой', html: '<section class="scr"></section>' };
+  const b = R.b, FL = EB.FLOORS[R.floor - 1], lead = FL.g !== 'o' ? b.u[1][0] : null;
+  const typ = FL.g === 'o' ? 'Рядовые' : FL.g === 'e' ? 'Элита' : 'Босс биома';
+  const side = sd => b.u[sd].map((u, k) => cardHtml(u, b.u[sd].length, k)).join('');
+  return { title: 'Мастерская форм', sub: `забег ${R.runNo}`, back: 'descent', html: `<section class="scr flush"><div class="bt" id="bt">
     <img class="bg" src="${WS(11)}" alt="">
     <div class="bt-hud">
-      <div class="bt-floor"><b id="btFloor">${B.floor}</b><span>/ 35</span></div>
-      <span class="chip ${f.g === 'e' ? 'gold' : ''}" id="btType">${f.g === 'e' ? ic('gem') : ''}${f.type}</span>
-      <div class="bt-budget"><div class="row"><span>${ic('hour')} Бюджет попытки</span><span class="num" id="btBudget">${clock(B.budget)}</span></div>${bar(B.budget / 765 * 100, 'sand')}</div>
+      <div class="bt-floor"><b id="btFloor">${R.floor}</b><span>/ ${EB.FLOORS.length}</span></div>
+      <span class="chip ${FL.g !== 'o' ? 'gold' : ''}">${FL.g === 'e' ? ic('gem') : FL.g === 'b' ? ic('crown') : ''}${typ}${lead ? ' · ' + uName(lead) : ''}${FL.g === 'b' ? ` · осада ${siegeDone()}%` : ''}</span>
+      <div class="bt-clock"><div class="row"><span>${ic('hour')} Бой</span><span class="num" id="btClock">${clock(R.view / 1000)} / ${clock(b.limit / 1000)}</span></div>${bar(R.view * 100 / b.limit, 'sand')}<div class="row"><span>Забег идёт</span><span class="num" id="btRun">${clock((R.runMs + R.view) / 1000)}</span></div></div>
+      <span class="chip" title="Сид этажа постоянен всю неделю: тот же отряд с той же ротацией даст тот же итог">${ic('lock')}сид ${seedTag(R.floor)}</span>
       <div class="bt-ctrl">
-        <div class="tabs" role="group" aria-label="Скорость просмотра">${[1, 2, 4].map(x => `<button aria-selected="${B.speed === x}" data-a="speed" data-v="${x}">×${x}</button>`).join('')}</div>
+        <div class="tabs" role="group" aria-label="Скорость просмотра">${[1, 2, 4].map(x => `<button aria-selected="${R.speed === x}" data-a="speed" data-v="${x}">×${x}</button>`).join('')}</div>
         <button class="btn" data-a="skip">${ic('ff')}К итогу</button>
       </div>
     </div>
-    <div class="bt-stage">
-      <div class="party">${party}</div>
-      <div class="foe" id="foe"><img id="foeImg" src="${WS(f.pg)}" alt=""></div>
-      <div class="pnl flat foe-card" id="foeCard">${foeCard(f, B)}</div>
+    <div class="bt-field">
+      <div class="bt-side h">${side(0)}</div>
+      <div class="bt-side f">${side(1)}</div>
+      <div class="bt-feed" id="btFeed">${R.feed.map(x => `<p>${x}</p>`).join('')}</div>
     </div>
-    <div class="ruler" aria-hidden="true">${Array.from({ length: 35 }, (_, i) => `<i class="${(i + 1) % 5 === 0 && i < 34 ? 'el5' : ''} ${i === 34 ? 'boss' : ''} ${i + 1 < B.floor ? 'past' : ''} ${i + 1 === B.floor ? 'cur' : ''}"></i>`).join('')}</div>
+    ${R.banner ? `<div class="bt-banner"><b>${R.banner[0]}</b><small>${R.banner[1]}</small></div>` : ''}
+    <div class="ruler" aria-hidden="true">${rulerHtml(R)}</div>
   </div></section>` };
 }
-const PM_POS = ['left:150px;top:62px', 'left:74px;top:12px', 'left:74px;top:122px', 'left:0;top:52px', 'left:0;top:162px'];
-function foeCard(f, B) {
-  const k = known(f.id);
-  return `<div class="row" style="justify-content:space-between"><h3>${k ? f.name : 'Неизвестный противник'}</h3>${el(f.el)}</div>
-    ${bar(B.fhp / B.fmax * 100, 'hp lg')}
-    <div class="row faint" style="justify-content:space-between;font-size:12px"><span class="num" id="foeHp">${fmt(Math.max(0, Math.round(B.fhp)))} / ${fmt(B.fmax)}</span><span>БМ <b class="num" style="color:var(--parch)">${fmt(f.bm)}</b></span></div>
-    ${k ? '' : '<span class="reason">Имя и способности откроет первая победа</span>'}`;
+function rulerHtml(R) {
+  const sg = siegeDone(), wall = S.lastRun && S.lastRun.wall;
+  return EB.FLOORS.map((x, i) => { const f = i + 1; return `<i class="${x.g === 'e' ? 'el5' : ''} ${x.g === 'b' ? 'boss' : ''} ${f < R.floor ? 'past' : ''} ${f === R.floor ? 'cur' : ''} ${wall === f && f > R.floor ? 'wall' : ''}" ${x.g === 'b' ? `style="--sg:${sg}"` : ''}></i>`; }).join('');
 }
 
 /* ================== Герои ================== */
@@ -1451,9 +1519,9 @@ function heroDetail(h) {
   } else if (t === 'skills') {
     body = `<div class="hd-cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)">
       <div class="col scroll" style="gap:6px"><div class="row" style="justify-content:space-between"><span class="eyebrow">Ротация · перетащите, чтобы изменить порядок</span></div>
-        <div class="rot-list" id="rotList">${h.ab.map((a, i) => `<div class="ab" draggable="false" data-i="${i}" tabindex="0" aria-label="${i + 1}. ${a.n}. Alt и стрелки меняют порядок"><span class="h" data-drag="${i}">${ic('grip')}</span><span class="n">${i + 1}</span><span><b>${a.n}</b><small>${a.d}</small></span><span class="chip" title="Цена в обычных атаках">${a.c} атаки</span></div>`).join('')}
-        ${h.ult ? `<div class="ab lock"><span class="h">${ic('lock')}</span><span class="n">${ic('crown')}</span><span><b>${h.ult.n}</b><small>Ультимейт · ${h.ult.d}</small></span><span class="chip">доблесть ${h.ult.at}</span></div>` : ''}</div>
-        ${h.ab.length === 1 ? '<span class="reason">Одна активная способность: ротация повторяет её.</span>' : ''}
+        <div class="rot-list" id="rotList">${h.ab.map((a, i) => `<div class="ab" draggable="false" data-i="${i}" tabindex="0" aria-label="${i + 1}. ${a.n}. Alt и стрелки меняют порядок"><span class="h" data-drag="${i}">${ic('grip')}</span><span class="n">${i + 1}</span><span><b>${schoolMark(a.school)}${a.n}</b><small>${a.d}</small></span><span class="chip" title="Цена в обычных атаках">${a.c} ${atkWord(a.c)}</span></div>`).join('')}
+        ${h.ult ? (h.valor >= h.ult.at ? `<div class="ab"><span class="h">${ic('crown')}</span><span class="n">У</span><span><b>${h.ult.n}</b><small>Ультимейт: ${h.ult.d} Заряжается после трёх применений способностей.</small></span><span class="chip spirit">открыт</span></div>` : `<div class="ab lock"><span class="h">${ic('lock')}</span><span class="n">${ic('crown')}</span><span><b>${h.ult.n}</b><small>Ультимейт · ${h.ult.d}</small></span><span class="chip">доблесть ${h.ult.at}</span></div>`) : ''}</div>
+        <span class="reason">Кристалл у названия — магия школы стихии героя; без него — приём класса.${h.ab.length === 1 ? ' Одна активная способность: ротация повторяет её.' : ''}</span>
       </div>
       <div class="col" style="gap:6px"><span class="eyebrow">Пассивные</span>${h.pas.map(p => `<div class="chap" style="grid-template-columns:1fr"><div><b>${p.n}</b> <span class="chip" style="height:18px;margin-left:4px">${p.t}</span><small class="faint" style="display:block;margin-top:3px">${p.d}</small></div></div>`).join('')}</div>
     </div>`;
@@ -1804,7 +1872,7 @@ function storeView() {
 const SCREENS = { shelter, descent, battle, heroes, craft: craftView, week: weekView, echo: echoView, contracts: contractsView, rituals: ritualsView, arena: arenaView, clan: clanView, event: eventView, profile: profileView, chronicle: chronicleView, store: storeView };
 
 /* ================== занятость ================== */
-const busyNote = id => { if (S.act && S.act.squad.includes(id)) return 'Спуск · Мастерская'; const h = H(id); return h.busy; };
+const busyNote = id => { if (S.act && S.act.squad.includes(id)) return 'Забег · Мастерская'; const h = H(id); return h.busy; };
 const shelterTags = () => '';
 
 /* ================== карточка предмета: лист и панель Запасов ================== */
@@ -1841,8 +1909,8 @@ const OV = {
       <div class="sq-slots">${s.m.map(id => id ? heroCard(H(id), { act: 'noop', note: busy.includes(id) ? busyNote(id) : '', dim: busy.includes(id) }) : `<div class="hc empty">${ic('plus')}</div>`).join('')}</div>
       <div class="row"><div class="stat"><b>${fmt(sqBM(s))}</b><small>боевая мощь</small></div><span class="g-spacer"></span><div class="col" style="gap:4px;align-items:flex-end"><span class="eyebrow">${echo ? 'Стихии отряда' : 'В зале чаще всего'}</span><span class="row" style="gap:4px">${echo ? els.map(e => el(e)).join('') : el('Земля') + el('Воздух')}</span></div></div>
       ${echo ? (ready < 5 ? `<p class="reason warn">Для Эхо нужны ровно пять свободных героев. Свободно: ${ready}.</p>` : '<p class="reason">Отряд сохранится для следующих целей и повторных атак.</p>')
-        : `<p class="reason">${busy.length ? `${busy.map(id => H(id).name).join(', ')} заняты — отряд пойдёт ${['', 'один', 'вдвоём', 'втроём', 'вчетвером'][ready] || 'без них'}.` : 'Отряд привязан к активации: сменить состав можно только отменой спуска.'}</p>`}`;
-    const foot = `<button class="link" data-a="go" data-v="heroes" data-seg="heroes:squads">${ic('users')}Отряды</button>${echo ? `<button class="btn go" data-a="close">Сохранить</button>` : `<button class="btn go" data-a="start" ${ready ? '' : 'disabled'}>${ic('down')}Начать спуск</button>`}`;
+        : `<p class="reason">${busy.length ? `${busy.map(id => H(id).name).join(', ')} заняты — отряд пойдёт ${['', 'один', 'вдвоём', 'втроём', 'вчетвером'][ready] || 'без них'}.` : `Этажи — готовые колоды, сид постоянен всю неделю: тот же отряд с той же ротацией пройдёт их так же.${S.lastRun ? ` Прошлый забег: ${S.lastRun.wall ? 'стена на этаже ' + S.lastRun.wall : S.lastRun.kind === 'boss' ? 'босс повержен' : S.lastRun.kind === 'siege' ? 'дошёл до босса' : 'прерван'}.` : ''}`}</p>`}`;
+    const foot = `<button class="link" data-a="go" data-v="heroes" data-seg="heroes:squads">${ic('users')}Отряды</button>${echo ? `<button class="btn go" data-a="close">Сохранить</button>` : `<button class="btn go" data-a="start" ${ready ? '' : 'disabled'}>${ic('down')}Начать забег</button>`}`;
     return sheet(echo ? 'Отряд для Эхо' : 'Отряд для спуска', body, foot, true);
   },
   foe(o) {
@@ -1924,14 +1992,21 @@ const OV = {
       <p class="reason">Бонус = 0,05% × редкость × цикл × круг. Круги повторяются после доблести.</p>`);
   },
   result() {
-    const B = S.battle, L = B.loot;
-    const nk = B.newKnown.map(F);
-    const body = `<p class="muted" style="font-size:15px">${B.win ? 'Мастерская пройдена до конца.' : `Бюджет попытки исчерпан на ступени ${B.floor} из 35.`} Отряд поднялся порталом наверх, как ото сна.</p>
-      <div class="row" style="gap:18px"><div class="stat"><b>${B.floor - 1}</b><small>пройдено ступеней</small></div><div class="stat"><b>${B.kills}</b><small>побед</small></div><div class="stat"><b>${S.act ? S.act.att : 0}</b><small>осталось попыток</small></div></div>
+    const R = S.battle, L = R.loot, E = R.end || { kind: 'abort' };
+    const nk = R.newKnown.map(F), sg = siegeDone(), n = EB.FLOORS.length;
+    const passed = E.kind === 'boss' ? n : R.floor - 1;
+    let title, head;
+    if (E.kind === 'boss') { title = 'Первый набросок повержен'; head = 'Мастерская пройдена до конца. Осталось победить рунного стража — тогда откроется Подземный лес.'; }
+    else if (E.kind === 'siege') { const dealt = sg - R.siegeFrom; title = 'Осада продолжается'; head = `Отряд дошёл до босса и снял ${dealt}% его здоровья, всего снято ${sg}%. Урон сохранится до следующего забега. Чем меньше у босса здоровья, тем он опаснее: последние проценты даются труднее первых.`; }
+    else if (E.kind === 'wall') { title = `Стена — этаж ${E.floor}`; head = `${E.why === 'time' ? 'Время боя вышло' : 'Отряд пал'} на этаже ${E.floor}. В колоде: ${E.foes.map(id => known(id) ? F(id).name : 'неизвестный').join(', ')}.`; }
+    else { title = 'Забег прерван'; head = `Отряд поднялся с этажа ${R.floor}.`; }
+    const body = `<p class="muted" style="font-size:15px">${head} Отряд поднялся порталом наверх, как ото сна.</p>
+      <div class="row" style="gap:18px;flex-wrap:wrap"><div class="stat"><b>${passed}</b><small>этажей пройдено</small></div><div class="stat"><b>${R.kills}</b><small>побед</small></div><div class="stat"><b>${clock(R.runMs / 1000)}</b><small>время забега</small></div>${E.kind === 'boss' || sg ? `<div class="stat"><b>${E.kind === 'boss' ? 100 : sg}%</b><small>осада босса</small></div>` : ''}</div>
       <span class="eyebrow">Добыча</span>
       <div class="row" style="gap:14px;flex-wrap:wrap">${money('gold', L.gold)}${money('spirit', L.spirit)}${money('souls', L.souls)}<span class="row" style="gap:4px">${well(I('cinder'), { act: 'noop', size: 30 })}<b class="num">×${L.cinder}</b></span></div>
-      ${nk.length ? `<div class="newfoe">${nk.map(f => `<img src="${WS(f.pg)}" alt="">`).join('')}<div class="col" style="gap:3px"><span class="eyebrow" style="color:var(--spirit)">Новое в бестиарии</span><b class="serif" style="font-size:20px">${nk.map(f => f.name).join(', ')}</b><small class="faint">Запись открыта во всех режимах</small></div><button class="link" data-a="foe" data-v="${nk[0].id}" style="margin-left:auto">Прочитать ${ic('chev')}</button></div>` : ''}`;
-    return dialog(B.win ? 'Мастерская пройдена' : 'Попытка окончена', body, `<button class="btn ghost" data-a="leave">В Убежище</button>${S.act && S.act.att > 0 ? `<button class="btn go" data-a="again">Ещё попытка · ${S.act.att}</button>` : ''}`);
+      ${nk.length ? `<div class="newfoe">${nk.map(f => `<img src="${WS(f.pg)}" alt="">`).join('')}<div class="col" style="gap:3px"><span class="eyebrow" style="color:var(--spirit)">Новое в бестиарии</span><b class="serif" style="font-size:20px">${nk.map(f => f.name).join(', ')}</b><small class="faint">Запись открыта во всех режимах</small></div><button class="link" data-a="foe" data-v="${nk[0].id}" style="margin-left:auto">Прочитать ${ic('chev')}</button></div>` : ''}
+      ${E.kind === 'boss' ? '' : '<p class="reason">Сид этажей один на неделю: тот же отряд с той же ротацией пройдёт их так же. Чтобы пройти дальше, поменяй состав, порядок способностей или стихии.</p>'}`;
+    return dialog(title, body, `<button class="btn ghost" data-a="leave">В Убежище</button><button class="btn" data-a="resquad">${ic('users')}Сменить отряд</button><button class="btn go" data-a="again">${ic('down')}Ещё забег</button>`);
   },
   mem() {
     const M = S.mem, o = M.offer, p = o[M.pick];
@@ -2047,7 +2122,7 @@ const ACT = {
   esq(v) { S.echoSquad = v; render(); },
   eattack() {
     const s = sq(S.echoSquad), m = s.m.filter(Boolean), busy = m.filter(id => busyNote(id));
-    if (m.length < 5 || busy.length) { S.overlay = { t: 'confirm', title: 'Отряд не готов', text: m.length < 5 ? `В «${s.name}» ${m.length} из 5 героев. Эхо принимает ровно пятерых.` : (() => { const by = {}; busy.forEach(id => { (by[busyNote(id)] = by[busyNote(id)] || []).push(H(id).name); }); return Object.entries(by).map(([why, names]) => names.length === m.length ? `Весь «${s.name}» занят: ${why.toLowerCase()}${S.act ? `, осталось попыток: ${S.act.att}` : ''}.` : `${names.join(', ')} — ${why.toLowerCase()}.`).join(' '); })(), warn: busy.length && S.act ? 'Завершите спуск или дождитесь его конца, чтобы освободить отряд.' : '', ok: 'Изменить отряд', act: 'echoprep' }; render(); focusOverlay(); return; }
+    if (m.length < 5 || busy.length) { S.overlay = { t: 'confirm', title: 'Отряд не готов', text: m.length < 5 ? `В «${s.name}» ${m.length} из 5 героев. Эхо принимает ровно пятерых.` : (() => { const by = {}; busy.forEach(id => { (by[busyNote(id)] = by[busyNote(id)] || []).push(H(id).name); }); return Object.entries(by).map(([why, names]) => names.length === m.length ? `Весь «${s.name}» занят: ${why.toLowerCase()}.` : `${names.join(', ')} — ${why.toLowerCase()}.`).join(' '); })(), warn: busy.length && S.act ? 'Дождитесь конца забега или прервите его, чтобы освободить отряд.' : '', ok: 'Изменить отряд', act: 'echoprep' }; render(); focusOverlay(); return; }
     const sl = S.echo.slots[S.echo.sel], f = F(sl.foe), c = ECHO_COST(f);
     if (!spend('souls', c)) return;
     const dmg = Math.min(sl.hp, Math.round(sl.max * (0.35 + Math.random() * 0.2)));
@@ -2075,86 +2150,152 @@ const ACT = {
   giftget() { S.gift.got = S.gift.day; S.wallet.enerium += 50; S.overlay = null; toast('Дар дня: Энериум ×50', ART('enerium.png')); },
   giftsclaim() { I('chest').q += 19; S.overlay = null; toast('19 сундуков перенесены в запасы', ART('reward-chest-v1.png')); },
   psq(v) { S.prepSquad = v; render(); },
-  start() { startBattle(); },
+  start() { startRun(); },
   speed(v) { if (S.battle) S.battle.speed = +v; document.querySelectorAll('.bt-ctrl .tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.v === v)); },
-  skip() { if (!S.battle || S.battle.over) return; while (!S.battle.over) simStep(1.2, false); endBattle(); },
-  again() { S.overlay = null; startBattle(true); },
+  skip() { const R = S.battle; if (!R || R.over) return; let guard = 0; while (!R.over && guard++ < 100000) advance(R, 5000, false); },
+  again() { S.overlay = null; startRun(); },
+  resquad() { S.overlay = null; S.route = 'descent'; S.selBiome = 'b1'; open('prep'); },
   leave() { S.overlay = null; S.battle = null; go('shelter'); },
-  endact() { S.overlay = { t: 'confirm', title: 'Завершить спуск', text: 'Отряд освободится, оставшиеся попытки и урон по боссу пропадут.', ok: 'Завершить', act: 'endactdo', danger: true }; render(); focusOverlay(); },
-  endactdo() { S.act = null; S.overlay = null; toast('Спуск завершён. Отряд свободен'); },
+  endact() { S.overlay = { t: 'confirm', title: 'Прервать забег', text: 'Отряд поднимется наверх. Добыча с пройденных этажей и урон по боссу сохранятся.', ok: 'Прервать', act: 'endactdo', danger: true }; render(); focusOverlay(); },
+  endactdo() { const R = S.battle; S.overlay = null; if (R && !R.over) { R.end = { kind: 'abort', floor: R.floor }; endRun(R); } else { S.act = null; render(); } },
 };
 
-/* ================== бой ================== */
+/* ================== забег ==================
+   Этаж — готовая колода врагов-карт. Здоровье между этажами восстанавливается.
+   Забег идёт до первого проигранного этажа; добыча не пропадает.
+   Босс — осада: урон по нему копится между забегами. */
+const WEEK_SEED = 0x5EED2609;   // сид недели: один на всех, меняется с неделей расы
 let loop = null;
-const LADDER = f => f <= 4 ? ['o1', 'o1', 'o2'] : f <= 9 ? ['o1', 'o2', 'o3'] : f <= 14 ? ['o1', 'o2', 'o3', 'o4'] : f <= 19 ? ['o2', 'o3', 'o4', 'o5'] : f <= 24 ? ['o3', 'o4', 'o5', 'o6'] : f <= 29 ? ['o4', 'o5', 'o6'] : ['o5', 'o6'];
-function foeFor(B, f) { if (f === 35) return 'b1'; if (f % 5 === 0) return B.elites[f / 5 - 1]; if (f === 22 && !known('o6')) return 'o6'; const p = LADDER(f); return p[Math.floor(Math.random() * p.length)]; }
-function setFoe(B) { B.foe = foeFor(B, B.floor); const f = F(B.foe); B.fmax = Math.round(f.hp * (1 + (B.floor - 1) * 0.09)); B.fhp = B.fmax; }
-function startBattle(again) {
+const siegeDone = () => { const G = S.siege; return G.hp == null || !G.max ? 0 : Math.round(100 - G.hp * 100 / G.max); };
+const seedTag = f => (EB.floorSeed(WEEK_SEED, f) >>> 16).toString(16).toUpperCase().padStart(4, '0');
+function startRun() {
   const s = sq(S.prepSquad);
-  const ids = s.m.filter(id => id && !(H(id).busy));
-  if (!S.act || !again && S.act.biome !== 'b1') S.act = { biome: 'b1', squad: ids, att: 9 };
-  S.act.att = Math.max(0, S.act.att - 1);
-  const party = S.act.squad.map(id => { const h = H(id); const max = 900 + h.st[3] * 4; return { id, hp: max, max, sh: 0, ptr: 0, cnt: 0, cd: Math.random() * 1.2, dps: 48 + h.bm / 420, n: 0 }; });
-  const el = ['e1', 'e2', 'e3', 'e4', 'e5', 'e6'].sort(() => Math.random() - .5);
-  S.battle = { floor: 1, party, budget: 765, speed: S.battle ? S.battle.speed : 2, kills: 0, loot: { gold: 0, spirit: 0, souls: 0, cinder: 0 }, newKnown: [], elites: el, over: false, gap: 0, ecd: 2, att: S.act.att };
-  setFoe(S.battle);
+  const ids = s.m.filter(id => id && !H(id).busy);
+  if (!ids.length) return toast('В отряде нет свободных героев');
+  S.act = { biome: 'b1', squad: ids };
+  S.runs++;
+  S.battle = { floor: 1, heroes: ids.map(id => EB.heroSrc(H(id))), speed: S.battle ? S.battle.speed : 2, runMs: 0, view: 0, kills: 0,
+    loot: { gold: 0, spirit: 0, souls: 0, cinder: 0 }, newKnown: [], over: false, gap: 0, feed: [], banner: null, runNo: S.runs, siegeFrom: siegeDone(), end: null, flyN: 0 };
+  newFloor(S.battle);
   S.overlay = null; S.route = 'battle'; render();
   clearInterval(loop); loop = setInterval(tick, 100);
 }
+function newFloor(R) {
+  R.b = EB.floorBattle(R.heroes, WEEK_SEED, R.floor, R.floor === EB.FLOORS.length ? S.siege.hp : null);
+  R.view = 0; R.feed = [];
+  const g = EB.FLOORS[R.floor - 1].g, lead = R.b.u[1][0];
+  R.banner = g === 'o' ? null : [g === 'e' ? 'Элита · ' + uName(lead) : uName(lead), g === 'e' ? 'этаж ' + R.floor + ' · лидер и свита' : S.siege.hp != null ? 'осада продолжается · снято ' + siegeDone() + '%' : 'босс биома · осада'];
+}
 function stopBattle(next) { if (next !== 'battle') { clearInterval(loop); loop = null; } }
-function tick() { const B = S.battle; if (!B || B.over || S.route !== 'battle') return; if (S.overlay) return; simStep(0.1 * B.speed * 1.5, true); if (B.over) endBattle(); }
-function fly(txt, cls, x, y) { const bt = document.getElementById('bt'); if (!bt) return; const e = document.createElement('span'); e.className = 'fly ' + cls; e.textContent = txt; e.style.left = x + 'px'; e.style.top = y + 'px'; bt.appendChild(e); setTimeout(() => e.remove(), 950); }
-function simStep(dt, draw) {
-  const B = S.battle; if (!B || B.over) return;
-  if (B.gap > 0) { B.gap -= dt; if (B.gap <= 0) { B.floor++; if (B.floor > 35) { B.win = true; B.over = true; return; } setFoe(B); if (draw) redrawFoe(); } B.budget -= dt; if (B.budget <= 0) { B.budget = 0; B.over = true; } return; }
-  B.budget -= dt; if (B.budget <= 0) { B.budget = 0; B.over = true; return; }
-  const f = F(B.foe), bt = draw && document.getElementById('bt'), W = bt ? bt.clientWidth : 800;
-  B.party.forEach((p, i) => {
-    if (p.hp <= 0) return; p.cd -= dt; if (p.cd > 0) return; p.cd += 1.1 + Math.random() * .3;
-    const h = H(p.id); p.cnt++;
-    let dmg = p.dps * (0.8 + Math.random() * .4) * 1.2, cls = '', txt;
-    const ab = h.ab[p.ptr % h.ab.length];
-    if (p.cnt >= ab.c + 1) { p.cnt = 0; p.ptr = (p.ptr + 1) % Math.max(1, h.ab.length); dmg *= 2.2; cls = 'abil'; txt = ab.n; if (h.cls === 'Хилер') { const low = B.party.filter(q => q.hp > 0).sort((a, b) => a.hp / a.max - b.hp / b.max)[0]; low.hp = Math.min(low.max, low.hp + low.max * .18); } }
-    else if (Math.random() < .15) { dmg *= 1.5; cls = 'crit'; }
-    B.fhp -= dmg;
-    p.n++;
-    if (draw) { if (txt || cls || p.n % 3 === 0) fly(txt || fmt(Math.round(dmg)), cls, W * (0.56 + Math.random() * 0.18), 170 + Math.random() * 100); if (txt) fly(fmt(Math.round(dmg)), 'crit', W * (0.6 + Math.random() * 0.12), 210 + Math.random() * 40); const pm = document.getElementById('pm' + i); if (pm) { pm.classList.add('act'); setTimeout(() => pm.classList.remove('act'), 180); } const fo = document.getElementById('foe'); if (fo) { fo.classList.add('hit'); setTimeout(() => fo.classList.remove('hit'), 110); } }
-  });
-  B.ecd -= dt;
-  if (B.ecd <= 0 && B.fhp > 0) {
-    B.ecd = f.g === 'e' ? 1.6 : 2.2;
-    const alive = B.party.filter(p => p.hp > 0), tgt = Math.random() < .7 && alive[0] ? alive[0] : alive[Math.floor(Math.random() * alive.length)];
-    if (tgt) { const d = tgt.max * (f.g === 'e' ? .09 : .05) * (0.7 + Math.random() * .6); tgt.hp = Math.max(1, tgt.hp - d); if (draw) { const i = B.party.indexOf(tgt); const pm = document.getElementById('pm' + i); if (pm) { const r = pm.getBoundingClientRect(), br = bt.getBoundingClientRect(); fly('−' + fmt(Math.round(d)), 'dmg', (r.left - br.left) / (br.width / bt.clientWidth) + 10, (r.top - br.top) / (br.height / bt.clientHeight) - 6); pm.classList.add('hit'); setTimeout(() => pm.classList.remove('hit'), 120); } } }
+function tick() { const R = S.battle; if (!R || R.over || S.route !== 'battle' || S.overlay) return; advance(R, 100 * R.speed, true); }
+function advance(R, ms, draw) {
+  if (R.gap > 0) { R.gap -= ms; if (R.gap <= 0) { R.floor++; newFloor(R); if (draw) render(); } return; }
+  const b = R.b;
+  R.view = Math.min(b.limit, R.view + ms);
+  if (R.banner && R.view > 1800) { R.banner = null; if (draw) { const x = document.querySelector('.bt-banner'); x && x.remove(); } }
+  while (!b.over && EB.nextAt(b) <= R.view) onEvents(R, EB.step(b), draw);
+  if (!b.over && R.view >= b.limit) onEvents(R, EB.step(b), draw);
+  if (draw) paintHud(R);
+  if (b.over) floorDone(R, draw);
+}
+function onEvents(R, ev, draw) {
+  for (const e of ev) if (e.k === 'die' && e.t.side === 1) {
+    const g = e.t.lead ? EB.FLOORS[R.floor - 1].g : 'o', L = R.loot; R.kills++;
+    if (g === 'o') { L.gold += 20; L.spirit += 10; L.cinder += 1; } else if (g === 'e') { L.gold += 100; L.spirit += 50; L.souls += 1; } else { L.gold += 500; L.spirit += 250; L.souls += 5; }
+    if (!known(e.t.id)) { S.known.push(e.t.id); R.newKnown.push(e.t.id); if (draw) toast(`Новое в бестиарии: ${F(e.t.id).name}`, WS(F(e.t.id).pg)); }
   }
-  if (B.fhp <= 0) {
-    B.kills++; const L = B.loot;
-    if (f.g === 'o') { L.gold += 20; L.spirit += 10; L.cinder += 1 + Math.floor(Math.random() * 3); } else if (f.g === 'e') { L.gold += 100; L.spirit += 50; L.souls += 1; } else { L.gold += 500; L.spirit += 250; L.souls += 5; }
-    if (!known(f.id)) { S.known.push(f.id); B.newKnown.push(f.id); if (draw) toast(`Новое в бестиарии: ${f.name}`, WS(f.pg)); }
-    B.party.forEach(p => { if (p.hp > 0) p.hp = Math.min(p.max, p.hp + p.max * .06); });
-    B.gap = 0.9; if (draw) { const fo = document.getElementById('foe'); fo && fo.classList.add('gone'); }
-  }
-  if (draw) redrawHud();
+  if (draw) showEvents(R, ev);
 }
-function redrawHud() {
-  const B = S.battle, q = id => document.getElementById(id);
-  if (!q('bt')) return;
-  q('btFloor').textContent = B.floor; q('btBudget').textContent = clock(B.budget);
-  const bb = q('bt').querySelector('.bt-budget .bar'); bb && bb.style.setProperty('--v', B.budget / 765 * 100);
-  const fc = q('foeCard'); if (fc) { const hb = fc.querySelector('.bar'); hb && hb.style.setProperty('--v', Math.max(0, B.fhp / B.fmax * 100)); const t = q('foeHp'); t && (t.textContent = `${fmt(Math.max(0, Math.round(B.fhp)))} / ${fmt(B.fmax)}`); }
-  B.party.forEach((p, i) => { const pm = q('pm' + i); if (!pm) return; pm.querySelector('.bar').style.setProperty('--v', p.hp / p.max * 100); pm.querySelectorAll('.rot i').forEach((e, j) => e.classList.toggle('on', j < p.ptr)); });
-  document.querySelectorAll('.ruler i').forEach((e, i) => { e.classList.toggle('past', i + 1 < B.floor); e.classList.toggle('cur', i + 1 === B.floor); });
+function floorDone(R, draw) {
+  const b = R.b, g = EB.FLOORS[R.floor - 1].g;
+  R.runMs += EB.floorMs(R.floor, b.t);
+  let bossDead = false;
+  if (g === 'b') { const boss = b.u[1][0]; S.siege.max = boss.maxHp; bossDead = !boss.alive; if (bossDead) { S.siege.hp = null; S.siege.killed = true; } else S.siege.hp = boss.hp; }
+  if (b.win && R.floor < EB.FLOORS.length) { R.gap = 1200; if (draw) feed(R, `<span class="sp">Этаж ${R.floor} пройден</span> · бой ${clock(b.t / 1000)}`); return; }
+  R.end = bossDead ? { kind: 'boss' } : g === 'b' ? { kind: 'siege', why: b.why } : { kind: 'wall', floor: R.floor, why: b.why, foes: b.u[1].map(u => u.id) };
+  endRun(R);
 }
-function redrawFoe() {
-  const B = S.battle, f = F(B.foe);
-  const fo = document.getElementById('foe'), im = document.getElementById('foeImg'), fc = document.getElementById('foeCard'), ty = document.getElementById('btType');
-  if (!fo) return;
-  fo.classList.remove('gone'); im.src = WS(f.pg); fc.innerHTML = foeCard(f, B);
-  ty.className = 'chip ' + (f.g === 'e' ? 'gold' : ''); ty.innerHTML = (f.g === 'e' ? ic('gem') : '') + f.type;
-}
-function endBattle() {
-  const B = S.battle; B.over = true; clearInterval(loop); loop = null;
-  const L = B.loot; S.wallet.gold += L.gold; S.wallet.spirit += L.spirit; S.wallet.souls += L.souls; I('cinder').q += L.cinder;
+function endRun(R) {
+  R.over = true; clearInterval(loop); loop = null;
+  const L = R.loot; S.wallet.gold += L.gold; S.wallet.spirit += L.spirit; S.wallet.souls += L.souls; I('cinder').q += L.cinder;
+  S.lastRun = { wall: R.end.kind === 'wall' ? R.end.floor : null, kind: R.end.kind, floor: R.floor };
+  S.act = null;
   S.overlay = { t: 'result' }; render(); focusOverlay();
+}
+
+/* ---------- показ событий ядра ---------- */
+function paintHud(R) {
+  const q = id => document.getElementById(id); if (!q('bt')) return;
+  const b = R.b;
+  q('btClock').textContent = `${clock(R.view / 1000)} / ${clock(b.limit / 1000)}`;
+  const cb = q('bt').querySelector('.bt-clock .bar'); cb && cb.style.setProperty('--v', R.view * 100 / b.limit);
+  q('btRun').textContent = clock((R.runMs + R.view) / 1000);
+  paintCards(R);
+}
+function paintCards(R) {
+  const b = R.b, aim = [b.u[0].map(() => 0), b.u[1].map(() => 0)];
+  for (const sd of [0, 1]) for (const u of b.u[sd]) { const t = b.u[1 - sd][u.cur]; if (u.alive && t && t.alive) aim[1 - sd][u.cur]++; }
+  for (const sd of [0, 1]) b.u[sd].forEach((u, i) => {
+    const el = document.getElementById('bc' + sd + i); if (!el) return;
+    el.classList.toggle('dead', !u.alive);
+    const hb = el.querySelector('.bar'); hb.style.setProperty('--v', u.hp * 100 / u.maxHp);
+    hb.querySelector('.sh').style.width = Math.min(100, u.sh * 100 / u.maxHp) + '%';
+    const cg = el.querySelector('.chg');
+    let v = 0, ult = false;
+    if (u.phase === 'charge') { v = u.chargeMax ? (u.chargeMax - u.charge) * 100 / u.chargeMax : 100; ult = true; }
+    else if (u.phase === 'ult') { v = 100; ult = true; }
+    else if (u.abs.length) v = Math.min(100, u.cnt * 100 / u.abs[u.ptr].price);
+    cg.className = 'chg' + (ult ? ' ult' : '') + (u.abs.length ? '' : ' none');
+    cg.firstElementChild.style.setProperty('--v', v);
+    el.classList.toggle('ready', u.alive && u.phase === 'ult');
+    const am = el.querySelector('.aim'), n = u.alive ? aim[sd][i] : 0;
+    am.classList.toggle('on', n > 0); am.lastElementChild.textContent = n;
+    el.querySelector('.sts').innerHTML = u.alive ? statusChips(u) : '';
+  });
+}
+function statusChips(u) {
+  return u.st.map(x => {
+    if (x.k === 'dot') return `<span class="dot bad" style="--sc:${SCHOOL_C[x.school] || 'var(--rust)'}" title="${x.school}: урон каждую атаку носителя, стаков ${x.stacks}">${x.stacks}</span>`;
+    if (x.k === 'hot') return `<span class="good" title="${x.school}: лечение каждую атаку носителя">${ic('heal')}${x.stacks}</span>`;
+    const v = ST_VIEW[x.k]; return v ? `<span class="bad" title="${v[1]}: ещё ${x.left} ${atkWord(x.left)}">${ic(v[0])}${x.left}</span>` : '';
+  }).join('');
+}
+function pulse(u, cls, ms = 150) { const el = document.getElementById('bc' + u.side + u.i); if (!el) return; el.classList.add(cls); setTimeout(() => el.classList.remove(cls), ms); }
+function flyAt(R, u, txt, cls, dy = 0) {
+  const bt = document.getElementById('bt'), el = document.getElementById('bc' + u.side + u.i); if (!bt || !el) return;
+  if (bt.querySelectorAll('.fly').length > 18) return;
+  const br = bt.getBoundingClientRect(), r = el.getBoundingClientRect(), sc = br.width / bt.clientWidth || 1;
+  R.flyN = (R.flyN + 1) % 5;
+  const e = document.createElement('span'); e.className = 'fly ' + cls; e.textContent = txt;
+  e.style.left = ((r.left - br.left) / sc + (u.side ? -18 : 24) + R.flyN * 5) + 'px';
+  e.style.top = ((r.top - br.top) / sc + 10 + dy + R.flyN * 4) + 'px';
+  bt.appendChild(e); setTimeout(() => e.remove(), 950);
+}
+function feed(R, html) {
+  R.feed.push(html); if (R.feed.length > 4) R.feed.shift();
+  const f = document.getElementById('btFeed'); if (f) f.innerHTML = R.feed.map(x => `<p>${x}</p>`).join('');
+}
+function showEvents(R, ev) {
+  if (!document.getElementById('bt')) return;
+  const fast = R.speed >= 4;
+  for (const e of ev) switch (e.k) {
+    case 'swing': pulse(e.s, 'act'); break;
+    case 'hit': case 'dot': pulse(e.t, 'hit', 110); if (!fast || e.crit) flyAt(R, e.t, fmt(e.v), e.crit ? 'crit' : e.t.side === 0 ? 'dmg' : ''); break;
+    case 'miss': if (!fast) flyAt(R, e.t, 'промах', 'miss'); break;
+    case 'heal': if (!e.quiet && e.v > 0) { pulse(e.t, 'heal', 260); if (!fast) flyAt(R, e.t, '+' + fmt(e.v), 'heal'); } break;
+    case 'shield': if (!fast) flyAt(R, e.t, '+' + fmt(e.v) + ' щит', 'shield'); break;
+    case 'resist': flyAt(R, e.t, 'сопротивление', 'info'); break;
+    case 'skip': if (!fast) flyAt(R, e.s, 'оглушён', 'info'); break;
+    case 'die': feed(R, `<span class="bd">✝</span> <b>${uName(e.t)}</b>`); break;
+    case 'cast': {
+      flyAt(R, e.s, e.n, e.ult ? 'ult' : 'abil', -22);
+      const own = e.t.length && e.t[0].side === e.s.side;
+      const to = !e.t.length ? '' : e.mass ? (own ? 'все свои' : e.s.side ? 'весь отряд' : 'все враги') : e.t[0] === e.s ? 'на себя' : uName(e.t[0]);
+      feed(R, `<b>${uName(e.s)}</b> · <span class="${e.ult ? 'sp' : 'gd'}">${e.n}</span>${e.ult ? ' · ульта' : ''}${to ? ' → ' + to : ''}`);
+      if (e.mass) e.t.forEach(t => pulse(t, own ? 'heal' : 'hit', 220));
+      break;
+    }
+  }
 }
 
 /* ================== отрисовка ================== */
@@ -2173,8 +2314,8 @@ function render() {
 }
 function focusOverlay() { requestAnimationFrame(() => { const x = document.querySelector('.g .ov .x, .g .talk .ans button'); x && x.focus({ preventScroll: true }); }); }
 function decorateActivation() {
-  const cta = document.querySelector('.banner .cta'); if (!cta || S.selBiome !== 'b1') return;
-  cta.innerHTML = `<span class="chip spirit">${ic('users')}Отряд в спуске · попыток ${S.act.att}</span><div class="row" style="gap:6px"><button class="btn ghost sm warn" data-a="endact">Завершить</button><button class="btn go big" data-a="again" ${S.act.att ? '' : 'disabled'}>${ic('down')}Ещё попытка</button></div>`;
+  const cta = document.querySelector('.banner .cta'); if (!cta || S.selBiome !== 'b1' || !S.battle || S.battle.over) return;
+  cta.innerHTML = `<span class="chip spirit">${ic('users')}Отряд в забеге · этаж ${S.battle.floor}</span><div class="row" style="gap:6px"><button class="btn ghost sm warn" data-a="endact">Прервать</button><button class="btn go big" data-a="go" data-v="battle">${ic('eye')}К бою</button></div>`;
 }
 function bindRotation() {
   const list = document.getElementById('rotList'); if (!list) return;
@@ -2210,7 +2351,7 @@ function bindGame() {
 /* ================== презентация ================== */
 const FLOWS = [
   ['Убежище и следующий шаг', 'Проводники, текущие занятия и одна главная кнопка', () => { S.route = 'shelter'; S.overlay = null; }],
-  ['Спуск в Мастерскую форм', 'Отряд → бой → итог. Пропуск к итогу доступен всегда', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = { t: 'prep', arg: '' }; }],
+  ['Забег по Мастерской форм', 'Пять карт против колоды этажа. Повтор даёт тот же итог, босса берут осадой', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = { t: 'prep', arg: '' }; }],
   ['Бестиарий: известный и неизвестный', 'Силуэт до первой победы, глина и совет старика после', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = { t: 'foe', arg: known('o6') ? 'e3' : 'o6' }; }],
   ['Развитие героя', 'Уровень, рунный предел и доблесть — одна лестница', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.seg.hero = 'power'; S.selHero = 'h2'; S.overlay = null; }],
   ['Ротация перетаскиванием', 'Порядок способностей в карточке героя', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.seg.hero = 'skills'; S.selHero = 'h2'; S.overlay = null; }],

@@ -6,5 +6,21 @@
   {
     "file": "Enerium_Артефакты_Финал.xlsx",
     "sha256": "5ce256fac97ff64dc2b938ad44b5c4fad04717e6d3d2c40fd4fa47256470c16b"
+  },
+  {
+    "file": "Enerium_Талисманы_Финал.xlsx",
+    "sha256": "b394d8add4868157de0fef2a725c3ef7015d32185d80593b1e58bb325f88d211",
+    "received": "2026-09-26"
+  },
+  {
+    "file": "Enerium_Сет_бонусы_героев_ФИНАЛ.xlsx",
+    "source_name": "Enerium_Сет_бонусы_героев _ФИНАЛ.xlsx",
+    "sha256": "5bbe1a092242ac117c68ffa473b3b23df23d81e4c03fd302d5c1a1fd840b0ba3",
+    "received": "2026-09-26"
+  },
+  {
+    "file": "Enerium_Способности_элементов.xlsx",
+    "sha256": "cd39c40ba194e6ec08d16f338ab9580d8b3b4710e9d63b1782c0ea8ae512326b",
+    "received": "2026-09-26"
   }
 ]
