@@ -30,7 +30,9 @@ const KINDS = [
   ['miss', 'Промах', 'росчерк проходит мимо карты'],
   ['resist', 'Сопротивление', 'знак контроля разбивается о карту'],
   ['death', 'Гибель', 'карта тускнеет и осыпается глиной'],
-  ['aim', 'Линии целей', 'кто в кого целится: красные — враги, бирюзовые — герои'],
+  ['target', 'Под атакой', 'красная рамка на карте, в которую целятся; ×N — сколько противников'],
+  ['cast', 'Применение способности', 'карта на миг вырастает и возвращается'],
+  ['shake', 'Попадание способности', 'карта вздрагивает от удара'],
 ];
 const ICON = { stun: 'chain', silence: 'lock', stop: 'hour', weak: 'down', mark: 'flag', pierce: 'minus', resist: 'shield' };
 const DOT = { 'Огонь': 'ember', 'Земля': 'bubble', 'Воздух': 'cut', 'Тьма': 'wisp', 'Вода': 'frost', 'Время': 'sand', 'Свет': 'mote', 'класс': 'ember' };
@@ -52,7 +54,6 @@ function create(host, opt = {}) {
   const T = ms => ms / spd();
   const cv = document.createElement('canvas'); cv.className = 'fx-cv';
   const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'fx-svg');
-  const gAim = document.createElementNS(NS, 'g'); gAim.setAttribute('class', 'fx-aim'); svg.appendChild(gAim);
   host.append(cv, svg);
   const ctx = cv.getContext('2d');
   let W = 0, Hh = 0, dpr = 1;
@@ -240,15 +241,6 @@ function create(host, opt = {}) {
       kick();
     },
     shake(px, ms) { const t = host.parentElement || host; t.animate([{ transform: 'translate(0,0)' }, { transform: `translate(${px}px,${-px / 2}px)` }, { transform: `translate(${-px}px,${px / 2}px)` }, { transform: 'translate(0,0)' }], { duration: T(ms), iterations: 1 }); },
-    lines(pairs) {
-      while (gAim.firstChild) gAim.removeChild(gAim.firstChild);
-      for (const pr of pairs) {
-        const a = center(pr.from), b = center(pr.to), dx = b.x - a.x;
-        const x0 = a.x + Math.sign(dx) * a.w * .5, x1 = b.x - Math.sign(dx) * b.w * .5;
-        const p = document.createElementNS(NS, 'path'); p.setAttribute('d', `M${x0} ${a.y} C${x0 + dx * .3} ${a.y} ${x1 - dx * .3} ${b.y} ${x1} ${b.y}`);
-        p.setAttribute('class', 'fx-line ' + pr.cls + (pr.hot ? ' hot' : '')); gAim.appendChild(p);
-      }
-    },
     destroy() { dead = true; cancelAnimationFrame(raf); cv.remove(); svg.remove(); },
     host,
   };

@@ -473,23 +473,53 @@ button.well:hover{border-color:var(--iron-3)}
 .bc .face img{width:100%;height:100%;object-fit:cover;object-position:50% 18%}
 .bc.foe .face img{object-position:50% 8%}
 .bc.foe .face{background:radial-gradient(90% 70% at 50% 100%,rgba(236,228,211,.08),transparent),#0c0e11}
-.bc .cls{position:absolute;right:3px;top:3px;display:grid;place-items:center;width:17px;height:17px;border-radius:5px;background:rgba(6,8,10,.82);color:var(--parch-2)}
+.bc .cls{position:absolute;right:3px;bottom:3px;display:grid;place-items:center;width:17px;height:17px;border-radius:5px;background:rgba(6,8,10,.82);color:var(--parch-2)}
 .bc .cls .i{width:11px;height:11px}
-.bc .aim{position:absolute;left:3px;top:3px;display:none;align-items:center;gap:2px;height:17px;padding:0 4px;border-radius:5px;background:rgba(40,12,8,.85);color:#ffb3a3;font:700 10.5px/1 var(--f-u)}
-.bc .aim .i{width:11px;height:11px}
-.bc .aim.on{display:inline-flex}
-.bc .sts{position:absolute;left:2px;right:2px;bottom:3px;display:flex;flex-wrap:wrap-reverse;gap:2px}
-.bc .sts span{display:inline-flex;align-items:center;gap:1px;height:15px;padding:0 3px;border-radius:4px;background:rgba(6,8,10,.86);color:var(--parch);font:700 10px/1 var(--f-u)}
-.bc .sts span .i{width:10px;height:10px}
-.bc .sts span.dot::before{content:"";width:6px;height:8px;background:var(--sc,var(--rust));clip-path:polygon(50% 0,100% 38%,50% 100%,0 38%)}
-.bc .sts span.good{color:#9ff0c0}
-.bc .sts span.bad{color:#ffb3a3}
 .bc .nm{font:700 10px/1 var(--f-u);letter-spacing:.03em;color:var(--parch-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #000}
 .bc .bar{height:5px}
-.bc .chg{position:relative;height:3px;border-radius:2px;background:#1b1f23;overflow:hidden}
-.bc .chg i{position:absolute;left:0;top:0;bottom:0;width:calc(var(--v)*1%);background:var(--gold-2);transition:width .15s}
-.bc .chg.ult i{background:var(--spirit);box-shadow:0 0 6px var(--spirit)}
-.bc .chg.none{visibility:hidden}
+/* эффекты на карте: полезные слева вверху, вредные справа; кольцо тает вместе с длительностью */
+.bc .buffs,.bc .debuffs{position:absolute;top:3px;display:flex;flex-wrap:wrap;gap:3px;max-width:50%}
+.bc .buffs{left:3px}
+.bc .debuffs{right:3px;justify-content:flex-end}
+.si{position:relative;display:grid;place-items:center;width:17px;height:17px;border-radius:50%;background:conic-gradient(var(--rc) calc(var(--p)*1%),rgba(255,255,255,.14) 0);flex:none}
+.si::before{content:"";position:absolute;inset:2px;border-radius:50%;background:#0b0d10}
+.si .i{position:relative;width:10px;height:10px;color:var(--rc)}
+.si b{position:absolute;right:-4px;bottom:-4px;min-width:10px;height:10px;padding:0 2px;border-radius:5px;background:#0b0d10;color:#fff;font:700 8.5px/10px var(--f-u);text-align:center;box-shadow:0 0 0 1px rgba(255,255,255,.15)}
+.si.good{--rc:#7ef0a8}
+.si.bad{--rc:#ff8a74}
+/* контроль — крупный знак поверх портрета */
+.bc .ctl{position:absolute;inset:0;display:none;place-items:center;color:#ffd08a;background:rgba(10,8,6,.38)}
+.bc .ctl .i{width:30px;height:30px;stroke-width:2;filter:drop-shadow(0 0 6px rgba(0,0,0,.95))}
+.bc.ctl-on .ctl{display:grid}
+.bc.ctl-stun .face img{filter:grayscale(.65) brightness(.8)}
+/* под атакой: красная рамка, ×N — сколько противников целится */
+.bc .tgt{position:absolute;left:3px;bottom:3px;display:none;height:15px;padding:0 4px;border-radius:4px;background:rgba(70,14,8,.92);color:#ffc0b2;font:700 10px/15px var(--f-u)}
+.bc.many .tgt{display:block}
+.bc.aimed .face{border-color:#ff5a44;box-shadow:0 0 0 1px rgba(255,90,68,.55),0 0 14px -3px rgba(255,90,68,.75)}
+.bc.struck .face{border-color:#ff7a5c;box-shadow:0 0 0 2px #ff7a5c,0 0 22px 1px rgba(255,90,68,.85)}
+/* ротация: значок следующей способности, сегменты атак до неё, три ромба до ульты и корона */
+.rot{display:flex;align-items:center;gap:3px;height:11px;min-width:0}
+.rot .nx{display:grid;place-items:center;width:12px;height:11px;flex:none;color:var(--sc,var(--parch-2))}
+.rot .nx.u{color:var(--spirit)}
+.rot .nx .i{width:11px;height:11px}
+.rot .seg{flex:1 1 0;display:flex;gap:1px;height:5px;min-width:0}
+.rot .seg i{flex:1 1 0;border-radius:1px;background:#272c31}
+.rot .seg i.on{background:var(--gold)}
+.rot .seg.u i.on{background:var(--spirit);box-shadow:0 0 4px var(--spirit)}
+.rot .ult{display:flex;align-items:center;gap:1px;flex:none}
+.rot .ult i{width:5px;height:5px;margin:0 1px;transform:rotate(45deg);background:#2c3237}
+.rot .ult i.on{background:var(--spirit)}
+.rot .ult b{display:grid;place-items:center;width:12px;height:11px;color:#3a4148}
+.rot .ult b .i{width:11px;height:11px}
+.rot .ult.charging b{color:var(--spirit);opacity:.6}
+.rot .ult.ready b{color:var(--spirit);filter:drop-shadow(0 0 4px var(--spirit))}
+/* анимации карты: применила способность — выросла; попала способность — вздрогнула */
+@keyframes cshake{0%,100%{translate:0 0;rotate:0deg}20%{translate:-3px 1px;rotate:-2deg}40%{translate:3px -1px;rotate:2deg}60%{translate:-2px 0;rotate:-1deg}80%{translate:2px 0;rotate:1deg}}
+@keyframes cgrow{0%{scale:1}35%{scale:1.14}100%{scale:1}}
+@keyframes cgrowU{0%{scale:1}30%{scale:1.24}100%{scale:1}}
+.bc.shake{animation:cshake .38s ease}
+.bc.casting{animation:cgrow .5s cubic-bezier(.2,.8,.2,1);z-index:3}
+.bc.casting.ult{animation-name:cgrowU;animation-duration:.8s}
 .bc.lead{width:84px;--fh:calc(var(--rowh) - 30px)}
 .bc.lead .face{border-color:var(--gold-2);box-shadow:0 0 0 1px var(--gold-3),0 12px 22px -10px rgba(221,188,122,.45),inset 0 -3px 0 var(--gold-2)}
 .bc.lead .nm{color:var(--gold)}
@@ -521,9 +551,20 @@ button.well:hover{border-color:var(--iron-3)}
 .ruler i.past.el5{background:var(--gold-2)}
 .ruler i.cur{background:var(--spirit);box-shadow:0 0 10px var(--spirit)}
 .ruler i.wall{background:var(--rust);box-shadow:0 0 8px rgba(220,106,82,.6)}
-@container main (max-height: 360px){ .bt{--rowh:86px;--colw:84px;--fh:52px} .bt-floor b{font-size:26px} }
+@container main (max-height: 360px){ .bt{--rowh:86px;--colw:84px;--fh:48px} .bt-floor b{font-size:26px} }
 .bt-ctrl .btn[aria-pressed="true"]{color:var(--spirit);border-color:rgba(72,229,212,.45)}
 .bc{cursor:pointer}
+/* легенда знаков на картах */
+.bt-legend{position:absolute;left:calc(var(--colw) + 112px);right:calc(var(--colw) + 112px);top:0;z-index:3;display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;padding:9px 12px;border-radius:10px;background:rgba(9,11,13,.95);border:1px solid var(--iron-2);box-shadow:0 12px 30px -12px #000;font-size:11.5px;line-height:1.3;color:var(--parch-2)}
+.bt-legend[hidden]{display:none}
+.bt-legend.static{position:static;background:#0b0e10}
+.bt-legend .h{grid-column:1/-1;font:700 10.5px/1.2 var(--f-u);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-2)}
+.bt-legend .ex{display:flex;align-items:center;gap:4px;min-width:52px}
+.bt-legend .ex .rot{width:52px}
+.bt-legend .ex > .i{width:14px;height:14px;color:var(--parch-2)}
+.bt-legend .ex.big > .i{width:22px;height:22px;color:#ffd08a}
+.bt-legend .frame{width:24px;height:17px;border-radius:4px;border:1.5px solid #ff5a44;box-shadow:0 0 8px rgba(255,90,68,.6)}
+.card-demo{position:relative;height:130px;--fh:58px;--rowh:100px}
 .bc.sel .face{box-shadow:0 0 0 2px var(--gold),0 0 18px -2px var(--gold)}
 .bc.shielded .face::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px rgba(143,220,255,.8),inset 0 0 16px rgba(143,220,255,.4);pointer-events:none}
 .bc .fell{display:none;position:absolute;left:0;right:0;top:36%;text-align:center;font:700 10px/1 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--rust);background:rgba(12,6,4,.84);padding:4px 0}
@@ -537,10 +578,6 @@ button.well:hover{border-color:var(--iron-3)}
 .fx-ring{fill:none}
 .fx-dome{fill:rgba(143,220,255,.08);stroke:var(--shield);stroke-width:1.6;filter:drop-shadow(0 0 6px rgba(143,220,255,.7))}
 .fx-taunt{fill:none;stroke:#ff5a44;stroke-width:2;filter:drop-shadow(0 0 3px rgba(255,90,68,.85))}
-.fx-line{fill:none;stroke-width:1.2;opacity:.3}
-.fx-line.foe{stroke:#ff6a4d}
-.fx-line.hero{stroke:var(--spirit)}
-.fx-line.hot{opacity:.95;stroke-width:1.8;stroke-dasharray:5 4}
 .fx-icon .fx-icon-bg{fill:rgba(6,8,10,.88);stroke:currentColor;stroke-width:1.2}
 .fx-icon use{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .fx-flash{position:absolute;inset:-30px;z-index:5;pointer-events:none;background:radial-gradient(55% 60% at 50% 50%,var(--c),transparent 72%)}
@@ -1020,7 +1057,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
       </div>
       <div class="p-block">
         <h2>Бой пять на пять</h2>
-        <p style="margin-top:6px">Тестовая сцена по ADR-0004 и ADR-0005. Враги — такие же карты, как герои, этаж — готовая колода, способности из одной библиотеки. Действия идут по одному, у каждого свой эффект; линии показывают, кто в кого целится, а нажатие на карту открывает её способности, эффекты и угрозу. Биом — испытание на истощение: здоровье и павшие переходят на следующий этаж. Сид — сам биом. Забег можно свернуть, забегов может идти несколько.</p>
+        <p style="margin-top:6px">Тестовая сцена по ADR-0004 и ADR-0005. Враги — такие же карты, как герои, этаж — готовая колода, способности из одной библиотеки. Каждая карта действует на своей скорости атаки, у каждого действия свой эффект. Красная рамка показывает, в кого целятся, кнопка «Знаки» объясняет индикаторы, а нажатие на карту открывает её способности, эффекты и угрозу. Биом — испытание на истощение: здоровье и павшие переходят на следующий этаж. Сид — сам биом. Забег можно свернуть, забегов может идти несколько.</p>
         <div class="p-ctrls" id="devSpeed" style="margin-top:10px;align-items:center"><span class="p-note">Скорость прототипа:</span><button class="p-chip" data-speed="1" aria-pressed="true">×1</button><button class="p-chip" data-speed="2" aria-pressed="false">×2</button><button class="p-chip" data-speed="4" aria-pressed="false">×4</button><button class="p-chip" data-speed="8" aria-pressed="false">×8</button></div>
         <p class="p-note" style="margin-top:6px">В игре ускорения нет: бой идёт в реальном времени сервера. Переключатель — только чтобы быстрее проверить прототип.</p>
       </div>
@@ -1265,7 +1302,7 @@ function initialState() {
     ],
     gift: { day: 4, got: 3 },
     lore: { sec: 'best', foe: 'o1' },
-    siege: {}, lastRun: {}, runs: [], runNo: 0, focus: null, aim: true, insp: null,
+    siege: {}, lastRun: {}, runs: [], runNo: 0, focus: null, insp: null, legend: false,
     overlay: null, toast: null,
   };
 }
@@ -1331,6 +1368,13 @@ const ICONS = {
   door: '<path d="M5 21V4h11v17M16 4l3 1v16l-3-1"/>', spark: '<path d="M12 3l1.8 6.2L20 11l-6.2 1.8L12 19l-1.8-6.2L4 11l6.2-1.8z"/>',
   sort: '<path d="M7 4v16M4 17l3 3 3-3M17 20V4M14 7l3-3 3 3"/>', full: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
   star: '<path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/>', flag: '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
+  flame: '<path d="M12 3c.5 3.5 5 5.5 5 10.2A5 5 0 0 1 7 13.2c0-2.6 1.6-4 2.2-6.2.9 1 1.5 2.1 1.7 3.5.8-2.2 1.1-4.7 1.1-7.5z"/>',
+  drop: '<path d="M12 3.5c3.2 4.2 6 7.3 6 10.6a6 6 0 0 1-12 0c0-3.3 2.8-6.4 6-10.6z"/><path d="M9.5 14.5a2.6 2.6 0 0 0 2.5 2.4"/>',
+  cut: '<path d="M4 7l16 4M4 12.5l16 4M6 18l12 2.5"/>',
+  skull: '<path d="M12 3.5a7 7 0 0 0-7 7c0 2.4 1.2 4.1 3 5.2V19h8v-3.3c1.8-1.1 3-2.8 3-5.2a7 7 0 0 0-7-7z"/><path d="M9.5 11h.01M14.5 11h.01M11 19v-2M13 19v-2" stroke-width="2.2"/>',
+  target: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/><path d="M12 1.5v4M12 18.5v4M1.5 12h4M18.5 12h4"/>',
+  crack: '<path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/><path d="M12.5 6l-2.5 5 3 2-2 5"/>',
+  wave: '<path d="M3 9c3-3 6 3 9 0s6 3 9 0M3 15c3-3 6 3 9 0s6 3 9 0"/>',
 };
 const SPRITE = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>${Object.entries(ICONS).map(([k, v]) => `<symbol id="i-${k}" viewBox="0 0 24 24">${v}</symbol>`).join('')}</defs></svg>`;
 const CLS = c => ic(CLS_ICON[c] || 'gem');
@@ -1473,23 +1517,61 @@ const FIG_WH = { 5: [542, 860], 6: [626, 860], 7: [626, 860], 8: [826, 860], 9: 
 
 /* ================== Бой ==================
    Пять карт против колоды этажа. Ядро — battle.js, эффекты — fx.js; здесь только показ.
-   Действия идут по одному. Ускорить бой нельзя, только свернуть: сценарий идёт в реальном времени сервера. */
+   Каждая карта действует на своей скорости атаки. Ускорить бой нельзя, только свернуть:
+   сценарий идёт в реальном времени сервера. */
 const SLOT = { 1: [[1, 1]], 2: [[1, .5], [1, 1.5]], 3: [[1, 1], [1, 0], [1, 2]], 4: [[1, 1], [1, 0], [1, 2], [0, 1]], 5: [[1, 1], [1, 0], [1, 2], [0, .5], [0, 1.5]] };
 const SCHOOL_C = { 'Огонь': 'var(--fire)', 'Земля': 'var(--earth)', 'Воздух': 'var(--air)', 'Вода': 'var(--water)', 'Свет': 'var(--light)', 'Тьма': 'var(--dark)', 'Время': 'var(--time)' };
-const ST_VIEW = { stun: ['chain', 'Оглушение'], silence: ['lock', 'Безмолвие'], stop: ['hour', 'Остановка'], weak: ['down', 'Ослабление'], mark: ['flag', 'Метка'], pierce: ['minus', 'Пробитие защиты'] };
+const ST_ICON = { stun: ['chain', 'Оглушение: пропускает ходы'], silence: ['lock', 'Безмолвие: без способностей'], stop: ['hour', 'Остановка: не копит атаки'], weak: ['down', 'Ослабление: меньше урона'], mark: ['target', 'Метка: получает больше урона'], pierce: ['crack', 'Пробитие: ниже физ. защита'] };
+const DOT_ICON = { 'Огонь': 'flame', 'Земля': 'drop', 'Воздух': 'cut', 'Тьма': 'skull', 'Вода': 'drop', 'Время': 'hour', 'Свет': 'spark', 'класс': 'flame' };
+const CTL = ['stun', 'silence', 'stop'];
 const CLS_OF = { 'Физ. ДД силы': 'Физ. ДД', 'Физ. ДД ловкости': 'Физ. ДД', 'Лекарь': 'Хилер', 'Дебаффер': 'Контроль', 'Босс': 'Танк', 'Страж': 'Танк' };
 const unitKnown = u => u.side === 0 || known(u.id);
 const uName = u => unitKnown(u) ? u.name : 'Неизвестный';
 const unitImg = u => u.side === 0 ? H(u.id).img : WS(F(u.id).pg);
 const runById = id => S.runs.find(r => r.id === id);
 const focusRun = () => runById(S.focus);
+const abIcon = ab => ab.kind === 'dmg' ? (ab.tgt === 'all' ? 'wave' : ab.stat === 'int' ? 'staff' : 'sword') : ab.kind === 'heal' || ab.kind === 'hot' ? 'heal' : ab.kind === 'shield' ? 'shield' : ab.kind === 'taunt' ? 'target'
+  : ab.kind === 'ctrl' || ab.kind === 'debuff' ? (ST_ICON[ab.st] || ['down'])[0] : ab.kind === 'dot' ? DOT_ICON[ab.school] || 'flame' : ab.kind === 'dispel' ? 'crack' : 'spark';
+const si = (icon, n, p, cls, title, color) => `<span class="si ${cls}" style="--p:${p}${color ? ';--rc:' + color : ''}" title="${title}">${ic(icon)}${n ? `<b>${n}</b>` : ''}</span>`;
+function statusHtml(u, d) {
+  const good = [], bad = [];
+  if (d.sh > 0 && !d.dead) good.push(si('shield', '', 100, 'good', `Щит: ${fmt(d.sh)}, тратится первым`));
+  for (const x of u.st) {
+    const p = x.left0 ? Math.max(8, Math.round(x.left * 100 / x.left0)) : 100;
+    if (x.k === 'hot') good.push(si('heal', x.stacks > 1 ? x.stacks : '', p, 'good', `${x.school}: +${fmt(x.per * x.stacks)} здоровья в каждую атаку носителя · ещё ${x.left}`));
+    else if (x.k === 'dot') bad.push(si(DOT_ICON[x.school] || 'flame', x.stacks, p, 'bad', `${x.school}: ${fmt(x.per * x.stacks)} урона в каждую атаку носителя · стаков ${x.stacks} · ещё ${x.left}`, SCHOOL_C[x.school]));
+    else if (ST_ICON[x.k]) bad.push(si(ST_ICON[x.k][0], x.left, p, 'bad', `${ST_ICON[x.k][1]} · ещё ${x.left} ${atkWord(x.left)}`));
+  }
+  return [good.join(''), bad.join('')];
+}
+function rotHtml(u) {
+  if (!u.abs || !u.abs.length) return '';
+  const ab = u.abs[u.ptr], up = u.phase === 'charge' || u.phase === 'ult';
+  const nx = up ? `<span class="nx u" title="Ульта: ${u.ult ? u.ult.n : ''}">${ic('crown')}</span>` : `<span class="nx" style="--sc:${SCHOOL_C[ab.school] || 'var(--parch-2)'}" title="Следующая способность: ${ab.n}">${ic(abIcon(ab))}</span>`;
+  const n = up ? Math.max(1, u.chargeMax) : ab.price, on = up ? (u.phase === 'ult' ? n : u.chargeMax - u.charge) : Math.min(u.cnt, ab.price);
+  const seg = `<span class="seg ${up ? 'u' : ''}" title="${up ? 'Атаки до ульты' : 'Атаки до способности «' + ab.n + '»'}">${Array.from({ length: n }, (_, i) => `<i class="${i < on ? 'on' : ''}"></i>`).join('')}</span>`;
+  const ult = u.ult ? `<span class="ult ${u.phase === 'ult' ? 'ready' : u.phase === 'charge' ? 'charging' : ''}" title="Три способности по ротации — и заряжается ульта «${u.ult.n}»">${[0, 1, 2].map(i => `<i class="${up || i < u.uses ? 'on' : ''}"></i>`).join('')}<b>${ic('crown')}</b></span>` : '';
+  return nx + seg + ult;
+}
+function legendHtml() {
+  const seg = (k, on, u) => `<span class="rot"><span class="seg ${u ? 'u' : ''}">${Array.from({ length: k }, (_, i) => `<i class="${i < on ? 'on' : ''}"></i>`).join('')}</span></span>`;
+  return `<span class="h">Индикаторы карты</span>
+    <span class="ex">${ic('sword')}${seg(3, 2)}</span><span>Значок — какая способность следующая, сегменты — сколько атак до неё.</span>
+    <span class="ex"><span class="rot"><span class="ult"><i class="on"></i><i class="on"></i><i></i><b>${ic('crown')}</b></span></span></span><span>Три ромба — применённые способности. После третьей копится ульта: бирюзовые сегменты, корона светится — ульта готова.</span>
+    <span class="ex"><span class="frame"></span></span><span>Красная рамка — в карту целятся противники, ×N — сколько.</span>
+    <span class="h">Эффекты</span>
+    <span class="ex">${si('heal', 2, 70, 'good', '')}${si('shield', '', 100, 'good', '')}</span><span>Слева вверху — полезные: лечение со временем, щит.</span>
+    <span class="ex">${si('flame', 3, 60, 'bad', '', 'var(--fire)')}${si('down', 2, 40, 'bad', '')}</span><span>Справа вверху — вредные: урон со временем в цвете школы, ослабление, метка, пробитие.</span>
+    <span class="ex">${si('hour', 2, 45, 'bad', '')}</span><span>Кольцо тает — столько атак носителя осталось. Число — стаки или оставшиеся атаки.</span>
+    <span class="ex big">${ic('chain')}</span><span>Контроль — крупный знак поверх портрета: оглушение, безмолвие, остановка.</span>`;
+}
 function cardHtml(R, u, n, k) {
   const [col, row] = SLOT[n][k], kn = unitKnown(u), d = R.disp[dkey(u)] || { hp: u.hp, sh: u.sh, dead: !u.alive };
-  return `<div class="bc ${u.side ? 'foe' : ''} ${u.lead ? 'lead' : ''} ${kn ? '' : 'unk'} ${d.dead ? 'dead' : ''} ${d.sh > 0 && !d.dead ? 'shielded' : ''} ${S.insp === dkey(u) ? 'sel' : ''}" id="bc${u.side}${u.i}" data-a="insp" data-v="${dkey(u)}" data-el="${u.el}" style="--k:${col};--r:${row}" title="${kn ? u.name + ' · ' + u.cls + ' · ' + u.el : 'Не изучен: имя и способности откроет первая победа'}">
-    <div class="face"><img src="${unitImg(u)}" alt=""><span class="cls">${CLS(CLS_OF[u.cls] || u.cls)}</span><span class="aim" title="Столько противников целится в эту карту">${ic('eye')}<b>0</b></span><div class="sts"></div>${u.side ? '' : '<span class="fell">пал</span>'}</div>
+  return `<div class="bc ${u.side ? 'foe' : ''} ${u.lead ? 'lead' : ''} ${kn ? '' : 'unk'} ${d.dead ? 'dead' : ''} ${S.insp === dkey(u) ? 'sel' : ''}" id="bc${u.side}${u.i}" data-a="insp" data-v="${dkey(u)}" data-el="${u.el}" style="--k:${col};--r:${row}" title="${kn ? u.name + ' · ' + u.cls + ' · ' + u.el : 'Не изучен: имя и способности откроет первая победа'}">
+    <div class="face"><img src="${unitImg(u)}" alt=""><div class="buffs"></div><div class="debuffs"></div><span class="cls">${CLS(CLS_OF[u.cls] || u.cls)}</span><span class="tgt"></span><span class="ctl"></span>${u.side ? '' : '<span class="fell">пал</span>'}</div>
     <span class="nm">${kn ? u.name : 'Не изучен'}</span>
     ${bar(d.hp / u.maxHp * 100, 'hp', `<span class="sh" style="left:0;width:${Math.min(100, d.sh * 100 / u.maxHp)}%"></span>`)}
-    <div class="chg"><i style="--v:0"></i></div>
+    <div class="rot"></div>
   </div>`;
 }
 function battle() {
@@ -1506,7 +1588,7 @@ function battle() {
       <div class="bt-clock"><div class="row"><span>${ic('hour')} Бой</span><span class="num" id="btClock">${clock(R.view / 1000)} / ${clock(b.limit / 1000)}</span></div>${bar(Math.min(100, R.view * 100 / b.limit), 'sand')}<div class="row"><span>Забег идёт</span><span class="num" id="btRun">${clock((R.runMs + R.view) / 1000)}</span></div></div>
       <span class="chip" title="Сид — сам биом: тот же отряд с той же ротацией всегда получает тот же сценарий">${ic('lock')}сценарий ${seedTag(R)}</span>
       <div class="bt-ctrl">
-        <button class="btn sm" data-a="aim" aria-pressed="${S.aim}" title="Линии: кто в кого целится">${ic('eye')}Цели</button>
+        <button class="btn sm" data-a="legend" aria-pressed="${!!S.legend}" title="Что значат знаки на картах">${ic('info')}Знаки</button>
         <button class="btn sm ghost warn" data-a="endact">Прервать</button>
         <button class="btn" data-a="minimize" title="Бой продолжится, его видно в верхней строке">${ic('down')}Свернуть</button>
       </div>
@@ -1516,6 +1598,7 @@ function battle() {
       <div class="bt-side f">${side(1)}</div>
       <div class="bt-feed" id="btFeed">${R.feed.map(x => `<p>${x}</p>`).join('')}</div>
       <div class="bt-insp" id="btInsp" hidden></div>
+      <div class="bt-legend" id="btLegend" ${S.legend ? '' : 'hidden'}>${legendHtml()}</div>
     </div>
     ${R.banner ? `<div class="bt-banner"><b>${R.banner[0]}</b><small>${R.banner[1]}</small></div>` : ''}
     <div class="ruler" aria-hidden="true">${rulerHtml(R)}</div>
@@ -2231,8 +2314,8 @@ const ACT = {
   resquad(v) { prune(v); S.overlay = null; S.route = 'descent'; S.selBiome = 'b1'; open('prep'); },
   focus(v) { const R = runById(v); if (!R) return; S.focus = v; S.insp = null; if (R.over) { R.seen = true; S.overlay = { t: 'result', arg: v }; render(); focusOverlay(); } else go('battle'); },
   minimize() { S.insp = null; go('descent'); },
-  aim() { S.aim = !S.aim; const b = document.querySelector('[data-a="aim"]'); b && b.setAttribute('aria-pressed', S.aim); const R = focusRun(); R && paintAim(R); },
-  insp(v) { S.insp = S.insp === v ? null : v; document.querySelectorAll('.bc.sel').forEach(e => e.classList.remove('sel')); if (S.insp) { const e = document.querySelector(`.bc[data-v="${S.insp}"]`); e && e.classList.add('sel'); } const R = focusRun(); R && paintInsp(R); },
+  legend() { S.legend = !S.legend; if (S.legend) S.insp = null; const lg = document.getElementById('btLegend'); lg && (lg.hidden = !S.legend); const b = document.querySelector('[data-a="legend"]'); b && b.setAttribute('aria-pressed', S.legend); document.querySelectorAll('.bc.sel').forEach(e => e.classList.remove('sel')); const R = focusRun(); R && paintInsp(R); },
+  insp(v) { S.insp = S.insp === v ? null : v; S.legend = false; const lg = document.getElementById('btLegend'); lg && (lg.hidden = true); document.querySelectorAll('.bc.sel').forEach(e => e.classList.remove('sel')); if (S.insp) { const e = document.querySelector(`.bc[data-v="${S.insp}"]`); e && e.classList.add('sel'); } const R = focusRun(); R && paintInsp(R); },
   leave(v) { prune(v); S.overlay = null; go('shelter'); },
   endact() { S.overlay = { t: 'confirm', title: 'Прервать забег', text: 'Отряд поднимется наверх. Добыча с пройденных этажей и урон по боссу сохранятся.', ok: 'Прервать', act: 'endactdo', danger: true }; render(); focusOverlay(); },
   endactdo() { const R = focusRun(); S.overlay = null; if (R && !R.over) { R.end = { kind: 'abort', floor: R.floor }; endRun(R, visible(R)); } else render(); },
@@ -2240,6 +2323,7 @@ const ACT = {
 
 /* ================== забег ==================
    Сервер считает сценарий целиком, клиент показывает его в реальном времени: ускорить нельзя, свернуть можно.
+   Каждая карта действует на своей скорости атаки, поэтому действия идут вперемешку, а не хором.
    Этажи — готовые колоды. Здоровье и павшие переходят на следующий этаж: биом — испытание на истощение.
    Босс — осада: урон по нему копится между забегами. Забегов может идти несколько сразу. */
 let loop = null, fxInst = null, devSpeed = 1;
@@ -2259,7 +2343,7 @@ function startRun(squadId, biome = 'b1', demoFloor) {
   if (!ids.length) return toast('Все герои этого отряда уже в забеге');
   const R = { id: 'r' + (++S.runNo), runNo: S.runNo, biome, squadId, squad: ids, heroes: ids.map(id => EB.heroSrc(H(id))), floor: demoFloor || 1, startFloor: demoFloor || 1, demo: !!demoFloor,
     view: 0, runMs: 0, kills: 0, loot: { gold: 0, spirit: 0, souls: 0, cinder: 0 }, newKnown: [], over: false, seen: false, gap: 0, feed: [], banner: null,
-    siegeFrom: siegeDone(biome), end: null, flyN: 0, disp: {}, curve: [], lastActor: null };
+    siegeFrom: siegeDone(biome), end: null, flyN: 0, disp: {}, curve: [], lastActor: null, pending: 0, endAt: null };
   S.runs.push(R);
   newFloor(R);
   S.focus = R.id; S.insp = null; S.overlay = null; S.route = 'battle'; render();
@@ -2268,7 +2352,7 @@ function startRun(squadId, biome = 'b1', demoFloor) {
 function newFloor(R) {
   const B = EB.BIOMES[R.biome];
   R.b = EB.floorBattle(R.heroes, R.biome, R.floor, R.floor === B.floors.length && !R.demo ? G(R.biome).hp : null);   // демо-прыжок не трогает осаду
-  R.view = 0; R.feed = []; R.disp = {}; R.lastActor = null; syncDisp(R);
+  R.view = 0; R.feed = []; R.disp = {}; R.lastActor = null; R.pending = 0; R.endAt = null; syncDisp(R);
   const g = B.floors[R.floor - 1].g, lead = R.b.u[1][0], tired = R.floor > R.startFloor ? ' · здоровье не восстановлено' : '';
   R.banner = [g === 'o' ? `Этаж ${R.floor}` : g === 'e' ? 'Элита · ' + uName(lead) : uName(lead), (g === 'o' ? 'рядовые' : g === 'e' ? 'лидер и свита' : R.demo ? 'демо-прыжок: осада биома не меняется' : G(R.biome).hp != null ? 'осада · снято ' + siegeDone(R.biome) + '%' : 'босс биома · осада') + tired];
 }
@@ -2286,9 +2370,10 @@ function advance(R, ms) {
   const b = R.b;
   R.view += ms;
   if (R.banner && R.view > 2200) { R.banner = null; if (vis) { const x = document.querySelector('.bt-banner'); x && x.remove(); } }
-  while (!b.over && R.view >= b.t) onAction(R, EB.step(b), vis);
+  while (!b.over && EB.nextAt(b) <= R.view) onAction(R, EB.step(b), vis);
+  if (!b.over && R.view > b.limit) onAction(R, EB.step(b), vis);   // время боя вышло
   if (vis) paintHud(R);
-  if (b.over && R.view >= b.t) floorDone(R, vis);
+  if (b.over) { if (R.endAt == null) R.endAt = R.view + 1400; if (!vis || R.view >= R.endAt) floorDone(R, vis); }   // дать доиграть последний удар
 }
 function onAction(R, a, vis) {
   if (!a) return;
@@ -2327,6 +2412,19 @@ function fxFor() {
 }
 function syncUnits(R, us) { for (const u of us) if (u) R.disp[dkey(u)] = { hp: u.hp, sh: u.sh, dead: !u.alive }; }
 function syncDisp(R) { if (R.b) { syncUnits(R, R.b.u[0]); syncUnits(R, R.b.u[1]); } }
+/* действия идут вперемешку, поэтому показ меняется по событиям в момент попадания;
+   когда все попадания доиграны, показ сверяется с ядром */
+function applyEv(R, e) {
+  if (!e.t || !e.t.maxHp) return;
+  const k = dkey(e.t), d = R.disp[k] || (R.disp[k] = { hp: e.t.hp, sh: e.t.sh, dead: !e.t.alive });
+  switch (e.k) {
+    case 'hit': case 'dot': { const ab = Math.min(d.sh, e.sh || 0); d.sh -= ab; d.hp = Math.max(0, d.hp - (e.v - (e.sh || 0))); break; }
+    case 'heal': d.hp = Math.min(e.t.maxHp, d.hp + (e.v || 0)); break;
+    case 'shield': d.sh = Math.min(e.t.maxHp, d.sh + (e.v || 0)); break;
+    case 'dispel': d.sh = 0; break;
+    case 'die': d.dead = true; d.hp = 0; d.sh = 0; break;
+  }
+}
 function targetOf(b, u) {
   const opp = b.u[1 - u.side];
   if (u.cur >= 0 && opp[u.cur] && opp[u.cur].alive) return u.cur;
@@ -2346,42 +2444,54 @@ function playAction(R, a) {
   const pre = idx < 0 ? a.ev : a.ev.slice(0, idx), main = idx < 0 ? [] : a.ev.slice(idx);
   // 1. горение, яд и лечение со временем срабатывают в начале хода носителя
   for (const e of pre) {
+    applyEv(R, e);
     if (e.k === 'dot' && el(e.t)) { fx.dot(el(e.t), e.school); flyAt(R, e.t, fmt(e.v), 'dmg small'); }
     else if (e.k === 'heal' && e.v > 0 && el(e.t)) { fx.hot(el(e.t)); flyAt(R, e.t, '+' + fmt(e.v), 'heal small'); }
     else if (e.k === 'die' && el(e.t)) { fx.death(el(e.t)); feed(R, `<span class="bd">✝</span> <b>${uName(e.t)}</b>`); }
   }
-  if (pre.length) { syncUnits(R, pre.map(e => e.t)); paintCards(R); }
-  const actor = el(a.s); if (!main.length || !actor) { syncDisp(R); paintCards(R); return; }
-  pulse(a.s, 'act', T(a.dur * .7));
+  const actor = el(a.s);
+  if (!main.length || !actor) { if (!R.pending) syncDisp(R); paintCards(R); return; }
+  const skill = a.kind === 'cast' || a.kind === 'mass' || a.kind === 'ult';
+  pulse(a.s, 'act', T(a.dur * .6));
+  if (skill) pulse(a.s, a.kind === 'ult' ? 'casting ult' : 'casting', T(a.kind === 'ult' ? 800 : 500));
+  // в кого идёт удар — у цели вспыхивает красная рамка
+  const sw = main.find(e => e.k === 'swing'), cs = main.find(e => e.k === 'cast');
+  const aimAt = sw ? sw.t : cs && !cs.mass && cs.t.length && cs.t[0].side !== a.s.side ? cs.t[0] : null;
+  if (aimAt) pulse(aimAt, 'struck', T(a.dur * .6));
+  R.pending++;
   let hitDone = false;
   const impact = () => {
-    if (hitDone) return; hitDone = true;
-    for (const e of main) switch (e.k) {
-      case 'hit': flyAt(R, e.t, fmt(e.v), e.crit ? 'crit' : e.t.side === 0 ? 'dmg' : ''); pulse(e.t, 'hit', T(160)); if (e.crit && el(e.t)) fx.crit(el(e.t)); break;
-      case 'miss': el(e.t) && fx.miss(el(e.t), e.t.side); flyAt(R, e.t, 'промах', 'miss'); break;
-      case 'heal': if (!e.quiet && e.v > 0) { flyAt(R, e.t, '+' + fmt(e.v), 'heal'); pulse(e.t, 'heal', T(320)); } break;
-      case 'shield': flyAt(R, e.t, '+' + fmt(e.v) + ' щит', 'shield'); break;
-      case 'status': if (el(e.t)) { if (e.st === 'dot') fx.dot(el(e.t), e.school); else if (e.st === 'hot') fx.hot(el(e.t)); else if (e.st === 'stun' || e.st === 'silence' || e.st === 'stop') fx.ctrl(el(e.t), e.st); else fx.debuff(el(e.t), e.st); } break;
-      case 'resist': el(e.t) && fx.resist(el(e.t), e.st); flyAt(R, e.t, 'сопротивление', 'info'); break;
-      case 'dispel': el(e.t) && fx.dispel(el(e.t)); break;
-      case 'die': el(e.t) && fx.death(el(e.t)); feed(R, `<span class="bd">✝</span> <b>${uName(e.t)}</b>`); break;
+    if (hitDone) return; hitDone = true; R.pending--;
+    for (const e of main) {
+      applyEv(R, e);
+      switch (e.k) {
+        case 'hit': flyAt(R, e.t, fmt(e.v), e.crit ? 'crit' : e.t.side === 0 ? 'dmg' : ''); pulse(e.t, skill ? 'shake' : 'hit', T(skill ? 380 : 160)); if (e.crit && el(e.t)) fx.crit(el(e.t)); break;
+        case 'miss': el(e.t) && fx.miss(el(e.t), e.t.side); flyAt(R, e.t, 'промах', 'miss'); break;
+        case 'heal': if (!e.quiet && e.v > 0) { flyAt(R, e.t, '+' + fmt(e.v), 'heal'); pulse(e.t, 'heal', T(320)); } break;
+        case 'shield': flyAt(R, e.t, '+' + fmt(e.v) + ' щит', 'shield'); break;
+        case 'status': if (el(e.t)) { if (e.st === 'dot') fx.dot(el(e.t), e.school); else if (e.st === 'hot') fx.hot(el(e.t)); else if (CTL.includes(e.st)) fx.ctrl(el(e.t), e.st); else fx.debuff(el(e.t), e.st); } break;
+        case 'resist': el(e.t) && fx.resist(el(e.t), e.st); flyAt(R, e.t, 'сопротивление', 'info'); break;
+        case 'dispel': el(e.t) && fx.dispel(el(e.t)); break;
+        case 'die': el(e.t) && fx.death(el(e.t)); feed(R, `<span class="bd">✝</span> <b>${uName(e.t)}</b>`); break;
+      }
     }
-    syncDisp(R); paintCards(R);
+    if (!R.pending) syncDisp(R);
+    paintCards(R);
   };
+  setTimeout(impact, T(a.dur * .9));   // страховка: к концу действия его итог показан всегда
   if (a.kind === 'skip') { fx.ctrl(actor, 'stun'); flyAt(R, a.s, 'оглушён', 'info'); impact(); return; }
   if (a.kind === 'attack') {
-    const sw = main.find(e => e.k === 'swing'), t = sw && el(sw.t);
+    const t = sw && el(sw.t);
     if (!t) return impact();
     if (a.fx === 'arrow') fx.arrow(actor, t, C.steel, impact);
     else if (a.fx === 'magic') fx.bolt(actor, t, C[a.s.el] || C.spirit, impact);
     else fx.slash(t, C.steel, impact);
-    setTimeout(impact, T(a.dur * .9));
     return;
   }
-  const ab = a.ab, cast = main.find(e => e.k === 'cast'), color = C[ab.school] || C.steel;
-  const tEl = (cast ? cast.t : []).map(el).filter(Boolean);
+  const ab = a.ab, color = C[ab.school] || C.steel;
+  const tEl = (cs ? cs.t : []).map(el).filter(Boolean);
   flyAt(R, a.s, ab.n, a.kind === 'ult' ? 'ult' : 'abil', -26);
-  feed(R, `<b>${uName(a.s)}</b> · <span class="${a.kind === 'ult' ? 'sp' : 'gd'}">${ab.n}</span>${a.kind === 'ult' ? ' · ульта' : ''}${targetsText(a.s, cast)}`);
+  feed(R, `<b>${uName(a.s)}</b> · <span class="${a.kind === 'ult' ? 'sp' : 'gd'}">${ab.n}</span>${a.kind === 'ult' ? ' · ульта' : ''}${targetsText(a.s, cs)}`);
   const last = i => i === tEl.length - 1 ? impact : null;
   const go = () => {
     if (!tEl.length) return impact();
@@ -2402,7 +2512,6 @@ function playAction(R, a) {
     }
   };
   if (a.kind === 'ult') { fx.ult(actor, color); setTimeout(go, T(650)); } else go();
-  setTimeout(impact, T(a.dur * .9));   // страховка: к концу действия его итог показан всегда
 }
 function paintHud(R) {
   const q = id => document.getElementById(id); if (!q('bt')) return;
@@ -2410,8 +2519,9 @@ function paintHud(R) {
   q('btClock').textContent = `${clock(R.view / 1000)} / ${clock(b.limit / 1000)}`;
   const cb = q('bt').querySelector('.bt-clock .bar'); cb && cb.style.setProperty('--v', Math.min(100, R.view * 100 / b.limit));
   q('btRun').textContent = clock((R.runMs + R.view) / 1000);
-  paintCards(R); paintAim(R); paintInsp(R);
+  paintCards(R); paintInsp(R);
 }
+const setHtml = (e, h) => { if (e && e.__h !== h) { e.innerHTML = h; e.__h = h; } };   // DOM трогаем, только если знак изменился
 function paintCards(R) {
   const b = R.b; if (!b) return;
   const aim = [b.u[0].map(() => 0), b.u[1].map(() => 0)];
@@ -2422,29 +2532,17 @@ function paintCards(R) {
     el.classList.toggle('dead', d.dead); el.classList.toggle('shielded', d.sh > 0 && !d.dead);
     const hb = el.querySelector('.bar'); hb.style.setProperty('--v', d.hp * 100 / u.maxHp);
     hb.querySelector('.sh').style.width = Math.min(100, d.sh * 100 / u.maxHp) + '%';
-    const cg = el.querySelector('.chg');
-    let v = 0, ult = false;
-    if (u.phase === 'charge') { v = u.chargeMax ? (u.chargeMax - u.charge) * 100 / u.chargeMax : 100; ult = true; }
-    else if (u.phase === 'ult') { v = 100; ult = true; }
-    else if (u.abs.length) v = Math.min(100, u.cnt * 100 / u.abs[u.ptr].price);
-    cg.className = 'chg' + (ult ? ' ult' : '') + (u.abs.length ? '' : ' none');
-    cg.firstElementChild.style.setProperty('--v', v);
+    const n = d.dead ? 0 : aim[sd][i];
+    el.classList.toggle('aimed', n > 0); el.classList.toggle('many', n > 1);
+    setHtml(el.querySelector('.tgt'), n > 1 ? '×' + n : '');
+    const [good, bad] = d.dead ? ['', ''] : statusHtml(u, d);
+    setHtml(el.querySelector('.buffs'), good); setHtml(el.querySelector('.debuffs'), bad);
+    const ctl = !d.dead && u.st.find(x => CTL.includes(x.k));
+    el.classList.toggle('ctl-on', !!ctl); el.classList.toggle('ctl-stun', !!ctl && ctl.k === 'stun');
+    setHtml(el.querySelector('.ctl'), ctl ? ic(ST_ICON[ctl.k][0]) : '');
+    setHtml(el.querySelector('.rot'), d.dead ? '' : rotHtml(u));
     el.classList.toggle('ready', !d.dead && u.phase === 'ult');
-    const am = el.querySelector('.aim'), n = d.dead ? 0 : aim[sd][i];
-    am.classList.toggle('on', n > 0); am.lastElementChild.textContent = n;
-    el.querySelector('.sts').innerHTML = d.dead ? '' : statusChips(u);
   });
-}
-function paintAim(R) {
-  const f = fxFor(); if (!f) return;
-  if (!S.aim) return f.lines([]);
-  const b = R.b, pairs = [];
-  for (const sd of [0, 1]) for (const u of b.u[sd]) {
-    if (!u.alive) continue; const j = targetOf(b, u); if (j < 0) continue;
-    const a = document.getElementById('bc' + sd + u.i), c = document.getElementById('bc' + (1 - sd) + j);
-    if (a && c) pairs.push({ from: a, to: c, cls: sd ? 'foe' : 'hero', hot: R.lastActor === u });
-  }
-  f.lines(pairs);
 }
 function stText(x) {
   if (x.k === 'dot') return `<span>${x.school}: ${fmt(x.per * x.stacks)} урона в каждую атаку · стаков ${x.stacks} · ещё ${x.left}</span>`;
@@ -2474,14 +2572,13 @@ function paintInsp(R) {
 function paintTray() {
   for (const R of S.runs) { const e = document.getElementById('run-' + R.id); if (!e) continue; e.querySelector('small').textContent = R.over ? 'итог' : 'этаж ' + R.floor; e.querySelector('.hpm').style.setProperty('--v', partyPct(R)); e.classList.toggle('done', R.over); }
 }
-function statusChips(u) {
-  return u.st.map(x => {
-    if (x.k === 'dot') return `<span class="dot bad" style="--sc:${SCHOOL_C[x.school] || 'var(--rust)'}" title="${x.school}: урон каждую атаку носителя, стаков ${x.stacks}">${x.stacks}</span>`;
-    if (x.k === 'hot') return `<span class="good" title="${x.school}: лечение каждую атаку носителя">${ic('heal')}${x.stacks}</span>`;
-    const v = ST_VIEW[x.k]; return v ? `<span class="bad" title="${v[1]}: ещё ${x.left} ${atkWord(x.left)}">${ic(v[0])}${x.left}</span>` : '';
-  }).join('');
+function pulse(u, cls, ms = 150) {
+  const el = document.getElementById('bc' + u.side + u.i); if (!el) return;
+  const cs = cls.split(' ');
+  if (cs.includes('shake') || cs.includes('casting')) { el.classList.remove(...cs); void el.offsetWidth; el.style.animationDuration = ms + 'ms'; }
+  el.classList.add(...cs);
+  setTimeout(() => { el.classList.remove(...cs); el.style.animationDuration = ''; }, ms);
 }
-function pulse(u, cls, ms = 150) { const el = document.getElementById('bc' + u.side + u.i); if (!el) return; el.classList.add(cls); setTimeout(() => el.classList.remove(cls), ms); }
 function flyAt(R, u, txt, cls, dy = 0) {
   const bt = document.getElementById('bt'), el = document.getElementById('bc' + u.side + u.i); if (!bt || !el) return;
   if (bt.querySelectorAll('.fly').length > 18) return;
@@ -2668,6 +2765,9 @@ function renderKit() {
   const h = S.heroes[1], f1 = F('o1'), f6 = F('o6');
   const kc = (id, img, name, el, x, foe, lead) => `<div class="bc ${foe ? 'foe' : ''} ${lead ? 'lead' : ''}" id="${id}" data-el="${el}" style="${foe ? 'right' : 'left'}:${x}%;top:${lead ? 44 : 56}px"><div class="face"><img src="${img}" alt=""></div><span class="nm">${name}</span>${bar(foe ? 72 : 86, 'hp')}<div class="chg"><i style="--v:40"></i></div></div>`;
   k.innerHTML = `
+  <section class="k-box" style="grid-column:1/-1"><h3>Карта бойца: индикаторы и эффекты</h3>
+    <div class="card-demo">${kitCards()}</div>
+    <div class="bt-legend static">${legendHtml()}</div></section>
   <section class="k-box" style="grid-column:1/-1"><h3>Эффекты боя · ${EnFx.KINDS.length} видов</h3>
     <div class="fx-stage" id="fxStage">${kc('kh1', S.heroes[0].img, S.heroes[0].name, S.heroes[0].el, 6)}${kc('kh2', S.heroes[3].img, S.heroes[3].name, S.heroes[3].el, 22)}${kc('kf1', WS(F('e1').pg), F('e1').name, 'Земля', 38, true, true)}${kc('kf2', WS(F('o3').pg), F('o3').name, 'Воздух', 22, true)}${kc('kf3', WS(F('o5').pg), F('o5').name, 'Земля', 6, true)}</div>
     <div class="fx-list">${EnFx.KINDS.map(([key, n, d]) => `<button class="fx-btn" data-fx="${key}"><b>${n}</b><small>${d}</small></button>`).join('')}</div>
@@ -2692,6 +2792,20 @@ function renderKit() {
   <section class="k-box"><h3>Слой поверх: лист и диалог</h3><div class="k-demo" style="height:170px;position:relative;overflow:hidden;border:1px solid var(--iron)"><div style="position:absolute;inset:0;background:rgba(3,4,5,.55)"></div><div class="sheet" style="width:52%;animation:none"><div class="sheet-h" style="min-height:40px;padding:6px 8px 6px 12px"><h2 style="font-size:17px">Сведения</h2><span class="iconbtn x" style="width:26px;height:26px">${ic('x')}</span></div><div class="sheet-b" style="padding:8px 12px;gap:6px"><span class="faint" style="font-size:12px">уточняет работу, не уводит с экрана</span>${bar(60)}</div><div class="sheet-f" style="padding:6px 12px"><button class="btn go sm" style="margin-left:auto">Действие</button></div></div></div><p class="k-note">Лист справа — сведения и настройка. Диалог по центру — только цена, последствия и итог.</p></section>`;
 }
 
+function kitCards() {
+  const A = n => Object.assign({ n }, EB.LIB[n]);
+  const card = (u, d, cls, left) => {
+    const [good, bad] = statusHtml(u, d), ctl = u.st.find(x => CTL.includes(x.k));
+    return `<div class="bc ${u.side ? 'foe' : ''} ${cls} ${ctl ? 'ctl-on' + (ctl.k === 'stun' ? ' ctl-stun' : '') : ''}" data-el="${u.el}" style="left:${left}%;top:14px">
+      <div class="face"><img src="${u.img}" alt=""><div class="buffs">${good}</div><div class="debuffs">${bad}</div><span class="cls">${CLS(CLS_OF[u.cls] || u.cls)}</span><span class="tgt">${cls.includes('many') ? '×3' : ''}</span><span class="ctl">${ctl ? ic(ST_ICON[ctl.k][0]) : ''}</span></div>
+      <span class="nm">${u.name}</span>${bar(d.hp * 100 / u.maxHp, 'hp', `<span class="sh" style="left:0;width:${Math.min(100, d.sh * 100 / u.maxHp)}%"></span>`)}<div class="rot">${rotHtml(u)}</div></div>`;
+  };
+  const h1 = H('h1'), h5 = H('h5');
+  return card({ side: 0, name: h1.name, cls: h1.cls, el: h1.el, img: h1.img, maxHp: 1557, abs: [A('Вызов'), A('Удар щитом'), A('Осыпание')], ptr: 1, cnt: 3, uses: 1, phase: 'rot', ult: null, st: [{ k: 'dot', school: 'Воздух', per: 30, stacks: 3, left: 2, left0: 4 }, { k: 'weak', left: 2, left0: 4, pow: 2000 }] }, { hp: 900, sh: 0 }, 'aimed many', 4)
+    + card({ side: 0, name: h5.name, cls: h5.cls, el: h5.el, img: h5.img, maxHp: 893, abs: [A('Оковы'), A('Увядание'), A('Ослабление')], ptr: 2, cnt: 1, uses: 2, phase: 'rot', ult: A('Долгая ночь'), chargeMax: 5, charge: 5, st: [{ k: 'hot', school: 'Свет', per: 40, stacks: 2, left: 3, left0: 5 }] }, { hp: 610, sh: 150 }, '', 26)
+    + card({ side: 1, name: 'Первый набросок', cls: 'Босс', el: 'Земля', img: WS(F('b1').pg), maxHp: 20000, abs: [A('Правка'), A('Глиняный вал')], ptr: 0, cnt: 0, uses: 3, phase: 'charge', chargeMax: 5, charge: 2, ult: A('Последний штрих'), st: [{ k: 'dot', school: 'Огонь', per: 60, stacks: 3, left: 4, left0: 5 }, { k: 'silence', left: 2, left0: 3 }, { k: 'mark', left: 3, left0: 5, pow: 2000 }] }, { hp: 12000, sh: 0 }, 'lead', 52)
+    + card({ side: 1, name: 'Мех', cls: 'Маг. ДД', el: 'Воздух', img: WS(F('e4').pg), maxHp: 3000, abs: [A('Меха'), A('Сквозняк')], ptr: 0, cnt: 2, uses: 0, phase: 'rot', ult: null, st: [{ k: 'stun', left: 1, left0: 2 }] }, { hp: 2100, sh: 0 }, '', 76);
+}
 let kitFxInst = null;
 function kitFx(kind) {
   const st = document.getElementById('fxStage'); if (!st) return;
@@ -2717,7 +2831,9 @@ function kitFx(kind) {
     case 'miss': f.miss(kf, 1); break;
     case 'resist': f.resist(t, 'stun'); break;
     case 'death': f.death(kf); break;
-    case 'aim': f.lines([{ from: foes[0], to: h1, cls: 'foe' }, { from: foes[1], to: h1, cls: 'foe' }, { from: foes[2], to: h2, cls: 'foe', hot: true }, { from: h1, to: foes[0], cls: 'hero' }, { from: h2, to: foes[1], cls: 'hero' }]); setTimeout(() => f.lines([]), 2600); break;
+    case 'target': h1.classList.add('aimed'); t.classList.add('struck'); setTimeout(() => t.classList.remove('struck'), 700); setTimeout(() => h1.classList.remove('aimed'), 2600); break;
+    case 'cast': h2.classList.remove('casting'); void h2.offsetWidth; h2.classList.add('casting'); setTimeout(() => h2.classList.remove('casting'), 520); setTimeout(() => f.heal(h1), 220); break;
+    case 'shake': f.bolt(h1, t, C['Время'], () => { t.classList.remove('shake'); void t.offsetWidth; t.classList.add('shake'); setTimeout(() => t.classList.remove('shake'), 400); }, true); break;
   }
 }
 

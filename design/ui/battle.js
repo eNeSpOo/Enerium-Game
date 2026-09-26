@@ -3,8 +3,9 @@
    цена в атаках и ротация: docs/gdd/04-способности-и-ротация.md.
    Решения автора 26.09.2026 (ADR-0004, ADR-0005): до пяти врагов на этаже, враги — такие же карты,
    как герои, одна библиотека способностей, массовые способности у обеих сторон, агро симметричное.
-   Действия идут по одному: порядок задаёт скорость атаки карт, а каждое действие занимает
-   своё время на экране (RULES.act). Бой — сценарий, который сервер считает целиком заранее.
+   Каждая карта действует на своей скорости атаки (RULES.tempoPct растягивает её для экрана),
+   поэтому карты ходят не хором и не по очереди сторон. Пока идёт анимация действия (RULES.act),
+   та же карта снова не ходит. Бой — сценарий, который сервер считает целиком заранее.
    Биом — испытание на истощение: здоровье и павшие переходят с этажа на этаж. Сид — сам биом.
 
    Инварианты ядра соблюдены и в прототипе:
@@ -34,7 +35,8 @@ const RULES = {
   ultAfter: 3, ultChargeDiv: 2,         // §5.1: три применения, затем зарядка = сумма цен / 2
   shieldCapPct: 100,                    // щит не больше здоровья
   foeLvl: { base: 20, perFloor: 1 },    // уровень карт врага растёт с этажом
-  act: { attack: 900, cast: 1300, mass: 1700, ult: 2400, skip: 600 },  // сколько действие идёт на экране, мс реального времени
+  tempoPct: 250,                        // скорость атаки из §3.2, растянутая для экрана: интервал ×2,5
+  act: { attack: 900, cast: 1300, mass: 1700, ult: 2400, skip: 600 },  // сколько действие идёт на экране; раньше карта снова не ходит
   floor: { limitMs: { o: 150000, e: 240000, b: 360000 }, gapMs: 2500 }, // предел боя этажа и переход к следующему, мс
 };
 
@@ -96,40 +98,41 @@ const PAS = {
 };
 
 /* ================== карты врагов Мастерской форм ==================
-   st — Сила, Интеллект, Ловкость, Выносливость, Скорость; hpPct — множитель здоровья карты. */
+   st — Сила, Интеллект, Ловкость, Выносливость, Скорость; hpPct — множитель здоровья карты.
+   Уклонение = Ловкость / 400 (§3.2): заметно уклоняются только ловкие — Долгорукий, Однорукий, Резчик. */
 const FOES = {
-  o1: { name: 'Безликий образец', cls: 'Физ. ДД силы', el: 'Земля', st: [104, 20, 60, 110, 60], hpPct: 125, abs: ['Каменный осколок'] },
-  o2: { name: 'Долгорукий образец', cls: 'Физ. ДД ловкости', el: 'Земля', st: [77, 20, 160, 90, 70], hpPct: 125, abs: ['Длинная рука'] },
-  o3: { name: 'Пустотелый образец', cls: 'Маг. ДД', el: 'Воздух', st: [20, 108, 60, 90, 70], hpPct: 125, abs: ['Порыв'] },
-  o4: { name: 'Безголовый образец', cls: 'Танк', el: 'Земля', st: [72, 20, 50, 240, 50], hpPct: 125, abs: ['Напор'] },
-  o5: { name: 'Сырой образец', cls: 'Лекарь', el: 'Земля', st: [20, 104, 50, 140, 60], hpPct: 125, abs: ['Замазка'] },
-  o6: { name: 'Однорукий образец', cls: 'Дебаффер', el: 'Земля', st: [93, 31, 150, 80, 130], hpPct: 125, main: 'str', fx: 'melee', abs: ['Удар в спину'] },
-  e1: { name: 'Подмастерье', cls: 'Физ. ДД силы', el: 'Земля', st: [135, 25, 70, 180, 60], hpPct: 350, abs: ['Замес', 'Тяжёлая рука'] },
-  e2: { name: 'Резчик', cls: 'Физ. ДД ловкости', el: 'Земля', st: [104, 25, 180, 150, 80], hpPct: 350, abs: ['Подрез', 'Снять лишнее'] },
-  e3: { name: 'Упор', cls: 'Танк', el: 'Земля', st: [83, 25, 60, 280, 50], hpPct: 400, abs: ['Напор', 'Плита'] },
-  e4: { name: 'Мех', cls: 'Маг. ДД', el: 'Воздух', st: [25, 135, 70, 150, 70], hpPct: 325, abs: ['Меха', 'Сквозняк'] },
-  e5: { name: 'Штопарь', cls: 'Лекарь', el: 'Земля', st: [25, 124, 60, 180, 60], hpPct: 325, abs: ['Заплата', 'Шов'] },
-  e6: { name: 'Съёмщик', cls: 'Дебаффер', el: 'Земля', st: [31, 119, 90, 160, 70], hpPct: 350, abs: ['Съём', 'Снять форму'] },
-  b1: { name: 'Первый набросок', cls: 'Босс', el: 'Земля', st: [156, 52, 60, 300, 60], hpPct: 1500, abs: ['Правка', 'Глиняный вал'], ult: 'Последний штрих', pas: ['Незавершённость'], resist: 'boss' },
+  o1: { name: 'Безликий образец', cls: 'Физ. ДД силы', el: 'Земля', st: [104, 20, 20, 110, 60], hpPct: 125, abs: ['Каменный осколок'] },
+  o2: { name: 'Долгорукий образец', cls: 'Физ. ДД ловкости', el: 'Земля', st: [77, 20, 60, 90, 70], hpPct: 125, abs: ['Длинная рука'] },
+  o3: { name: 'Пустотелый образец', cls: 'Маг. ДД', el: 'Воздух', st: [20, 108, 20, 90, 70], hpPct: 125, abs: ['Порыв'] },
+  o4: { name: 'Безголовый образец', cls: 'Танк', el: 'Земля', st: [72, 20, 15, 240, 50], hpPct: 125, abs: ['Напор'] },
+  o5: { name: 'Сырой образец', cls: 'Лекарь', el: 'Земля', st: [20, 104, 20, 140, 60], hpPct: 125, abs: ['Замазка'] },
+  o6: { name: 'Однорукий образец', cls: 'Дебаффер', el: 'Земля', st: [93, 31, 70, 80, 130], hpPct: 125, main: 'str', fx: 'melee', abs: ['Удар в спину'] },
+  e1: { name: 'Подмастерье', cls: 'Физ. ДД силы', el: 'Земля', st: [135, 25, 30, 180, 60], hpPct: 350, abs: ['Замес', 'Тяжёлая рука'] },
+  e2: { name: 'Резчик', cls: 'Физ. ДД ловкости', el: 'Земля', st: [104, 25, 80, 150, 80], hpPct: 350, abs: ['Подрез', 'Снять лишнее'] },
+  e3: { name: 'Упор', cls: 'Танк', el: 'Земля', st: [83, 25, 20, 280, 50], hpPct: 400, abs: ['Напор', 'Плита'] },
+  e4: { name: 'Мех', cls: 'Маг. ДД', el: 'Воздух', st: [25, 135, 30, 150, 70], hpPct: 325, abs: ['Меха', 'Сквозняк'] },
+  e5: { name: 'Штопарь', cls: 'Лекарь', el: 'Земля', st: [25, 124, 20, 180, 60], hpPct: 325, abs: ['Заплата', 'Шов'] },
+  e6: { name: 'Съёмщик', cls: 'Дебаффер', el: 'Земля', st: [31, 119, 40, 160, 70], hpPct: 350, abs: ['Съём', 'Снять форму'] },
+  b1: { name: 'Первый набросок', cls: 'Босс', el: 'Земля', st: [156, 52, 30, 300, 60], hpPct: 1500, abs: ['Правка', 'Глиняный вал'], ult: 'Последний штрих', pas: ['Незавершённость'], resist: 'boss' },
 };
 
 /* ================== колоды этажей ==================
    g: o — рядовые, e — элита с сопровождением, b — босс с сопровождением. Первым идёт лидер. */
 const FLOORS = [
-  { g: 'o', m: ['o1'] }, { g: 'o', m: ['o1', 'o1'] }, { g: 'o', m: ['o1', 'o2'] }, { g: 'o', m: ['o2', 'o1', 'o3'] },
-  { g: 'e', m: ['e1', 'o1', 'o1'] },
-  { g: 'o', m: ['o1', 'o2', 'o3'] }, { g: 'o', m: ['o4', 'o1', 'o2'] }, { g: 'o', m: ['o4', 'o3', 'o2'] }, { g: 'o', m: ['o1', 'o2', 'o3', 'o5'] },
-  { g: 'e', m: ['e2', 'o2', 'o3'] },
-  { g: 'o', m: ['o4', 'o2', 'o5'] }, { g: 'o', m: ['o3', 'o3', 'o5'] }, { g: 'o', m: ['o4', 'o1', 'o2', 'o3'] }, { g: 'o', m: ['o4', 'o2', 'o3', 'o5'] },
+  { g: 'o', m: ['o1'] }, { g: 'o', m: ['o1'] }, { g: 'o', m: ['o2'] }, { g: 'o', m: ['o1', 'o1'] },
+  { g: 'e', m: ['e1'] },
+  { g: 'o', m: ['o1', 'o2'] }, { g: 'o', m: ['o1', 'o3'] }, { g: 'o', m: ['o4', 'o1'] }, { g: 'o', m: ['o2', 'o3'] },
+  { g: 'e', m: ['e2', 'o2'] },
+  { g: 'o', m: ['o4', 'o2', 'o3'] }, { g: 'o', m: ['o1', 'o3', 'o5'] }, { g: 'o', m: ['o4', 'o1', 'o2'] }, { g: 'o', m: ['o3', 'o3', 'o5'] },
   { g: 'e', m: ['e5', 'o4', 'o1'] },
-  { g: 'o', m: ['o2', 'o3', 'o5', 'o1'] }, { g: 'o', m: ['o4', 'o3', 'o3', 'o5'] }, { g: 'o', m: ['o6', 'o1', 'o2'] }, { g: 'o', m: ['o4', 'o6', 'o3', 'o5'] },
-  { g: 'e', m: ['e3', 'o5', 'o2', 'o3'] },
-  { g: 'o', m: ['o4', 'o2', 'o3', 'o5', 'o1'] }, { g: 'o', m: ['o6', 'o3', 'o5', 'o4'] }, { g: 'o', m: ['o4', 'o6', 'o2', 'o3', 'o5'] }, { g: 'o', m: ['o4', 'o3', 'o3', 'o6', 'o5'] },
-  { g: 'e', m: ['e4', 'o3', 'o3', 'o5'] },
-  { g: 'o', m: ['o4', 'o6', 'o6', 'o3', 'o5'] }, { g: 'o', m: ['o4', 'o2', 'o2', 'o3', 'o5'] }, { g: 'o', m: ['o4', 'o4', 'o3', 'o6', 'o5'] }, { g: 'o', m: ['o6', 'o6', 'o3', 'o3', 'o5'] },
-  { g: 'e', m: ['e6', 'o4', 'o5', 'o6'] },
-  { g: 'o', m: ['o4', 'o6', 'o3', 'o3', 'o5'] }, { g: 'o', m: ['o4', 'o2', 'o6', 'o3', 'o5'] }, { g: 'o', m: ['o4', 'o4', 'o6', 'o3', 'o5'] }, { g: 'o', m: ['o4', 'o6', 'o3', 'o5'] },
-  { g: 'b', m: ['b1', 'o4', 'o5'] },
+  { g: 'o', m: ['o4', 'o2', 'o5'] }, { g: 'o', m: ['o6', 'o1', 'o3'] }, { g: 'o', m: ['o4', 'o6', 'o5'] }, { g: 'o', m: ['o2', 'o3', 'o3', 'o5'] },
+  { g: 'e', m: ['e3', 'o5', 'o2'] },
+  { g: 'o', m: ['o4', 'o2', 'o3', 'o5'] }, { g: 'o', m: ['o6', 'o3', 'o5', 'o4'] }, { g: 'o', m: ['o4', 'o6', 'o2', 'o3'] }, { g: 'o', m: ['o4', 'o3', 'o3', 'o5'] },
+  { g: 'e', m: ['e4', 'o3', 'o5', 'o4'] },
+  { g: 'o', m: ['o4', 'o6', 'o3', 'o3', 'o5'] }, { g: 'o', m: ['o4', 'o2', 'o2', 'o3', 'o5'] }, { g: 'o', m: ['o4', 'o4', 'o3', 'o6', 'o5'] }, { g: 'o', m: ['o6', 'o6', 'o3', 'o3', 'o5'] },
+  { g: 'e', m: ['e6', 'o4', 'o5', 'o6', 'o3'] },
+  { g: 'o', m: ['o4', 'o6', 'o3', 'o3', 'o5'] }, { g: 'o', m: ['o4', 'o2', 'o6', 'o3', 'o5'] }, { g: 'o', m: ['o4', 'o4', 'o6', 'o3', 'o5'] }, { g: 'o', m: ['o4', 'o6', 'o3', 'o5', 'o2'] },
+  { g: 'b', m: ['b1', 'o4', 'o5', 'o3', 'o6'] },
 ];
 
 /* ================== генератор ================== */
@@ -171,7 +174,7 @@ function mkUnit(src, side, i) {
     eva: Math.min(RULES.caps.evaBp, fl(agi * 10000, s.evaDiv)),
     crit: Math.min(RULES.caps.critBp, fl(agi * 10000, s.critDiv)),
     critDmg: RULES.critDmgPct,
-    ivl: fl(100000, as),
+    ivl: fl(100000 * RULES.tempoPct, as * 100),
     abs: (src.abs || []).map(n => LIB[n] && Object.assign({ n }, LIB[n])).filter(Boolean),
     ult: src.ult && LIB[src.ult] ? Object.assign({ n: src.ult }, LIB[src.ult]) : null,
     pas: (src.pas || []).map(n => PAS[n]).filter(Boolean),
@@ -220,23 +223,25 @@ function elemMul(a, d) {
 }
 
 function nextActor(b) { let best = null; for (const side of [0, 1]) for (const u of b.u[side]) if (u.alive && (!best || u.next < best.next)) best = u; return best; }
-/* Одно действие одной карты. Порядок — по готовности (скорость атаки), время на экране — RULES.act.
+/* Одно действие одной карты. Действует та, чья очередь по её собственной скорости атаки;
+   следующий её ход — не раньше, чем кончится анимация этого (RULES.act).
    Возвращает запись действия: когда началось, сколько длится, кто действует, что и какие события. */
 function step(b) {
   if (b.over) return null;
   const u = nextActor(b);
-  if (!u || b.t >= b.limit) { finish(b, false, 'time'); return { at: b.t, dur: 0, kind: 'end', ev: b.ev.splice(0) }; }
+  if (!u || u.next > b.limit) { b.t = b.limit; finish(b, false, 'time'); return { at: b.t, dur: 0, kind: 'end', ev: b.ev.splice(0) }; }
+  b.t = u.next;
   const at = b.t;
   const a = act(b, u);
-  u.next += u.ivl;
   const dur = RULES.act[a.kind];
-  b.t += dur;
+  u.next = Math.max(at + u.ivl, at + dur);
   const a0 = b.u[0].some(v => v.alive), a1 = b.u[1].some(v => v.alive);
   if (!a1) finish(b, true, 'win'); else if (!a0) finish(b, false, 'wipe');
   return { at, dur, s: u, kind: a.kind, ab: a.ab || null, fx: a.fx || null, school: a.school || null, ev: b.ev.splice(0) };
 }
 function finish(b, win, why) { b.over = true; b.win = win; b.why = why; emit(b, { k: 'end', win, why }); }
 function run(b) { while (!b.over) step(b); return b; }
+function nextAt(b) { const u = nextActor(b); return u && u.next <= b.limit ? u.next : b.limit + 1; }
 
 function act(b, u) {
   tickPeriodic(b, u); if (!u.alive) return { kind: 'skip' };
@@ -379,8 +384,8 @@ function addStatus(b, src, t, s, isCtrl) {
   const dl = src.side !== t.side ? src.pas.find(p => p.kind === 'debuffLeft') : null;
   const left = s.left + (dl ? dl.add : 0);
   const ex = has(t, s.st);                       // одинаковые обновляют длительность, разные стакаются (§5.4)
-  if (ex) { ex.left = Math.max(ex.left, left); ex.pow = Math.max(ex.pow, s.pow || 0); }
-  else t.st.push({ k: s.st, left, pow: s.pow || 0 });
+  if (ex) { ex.left = Math.max(ex.left, left); ex.left0 = Math.max(ex.left, ex.left0); ex.pow = Math.max(ex.pow, s.pow || 0); }
+  else t.st.push({ k: s.st, left, left0: left, pow: s.pow || 0 });
   if (s.st === 'stop') { t.cnt = 0; if (t.phase === 'charge') t.charge = t.chargeMax; }
   emit(b, { k: 'status', s: src, t, st: s.st, left });
 }
@@ -389,8 +394,8 @@ function addPeriodic(b, src, t, ab) {
   let per = fl(src.atk[ab.stat] * ab.coef, 100);
   if (ab.kind === 'dot') per = fl(per * elemMul(src.el, t.el), 100);
   const p = t.st.find(s => s.k === ab.kind && s.school === ab.school);
-  if (p) { p.stacks = Math.min(ab.max, p.stacks + 1); p.left = ab.left; if (per > p.per) p.per = per; p.src = src; }
-  else t.st.push({ k: ab.kind, school: ab.school, per, stacks: 1, max: ab.max, left: ab.left, src, drain: ab.drain || 0, over: !!ab.over });
+  if (p) { p.stacks = Math.min(ab.max, p.stacks + 1); p.left = ab.left; p.left0 = ab.left; if (per > p.per) p.per = per; p.src = src; }
+  else t.st.push({ k: ab.kind, school: ab.school, per, stacks: 1, max: ab.max, left: ab.left, left0: ab.left, src, drain: ab.drain || 0, over: !!ab.over });
   emit(b, { k: 'status', s: src, t, st: ab.kind, school: ab.school });
 }
 function tickPeriodic(b, u) {
@@ -434,5 +439,5 @@ function simRun(heroes, biome, siegeHp) {
   return { floors, runMs, bossHp };
 }
 
-root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, BIOMES, seedOf, floorSeed, makeRng, create, step, run, heroSrc, floorFoes, floorBattle, carry, simRun, elemMul, ready, pct, fxOf };
+root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, BIOMES, seedOf, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, carry, simRun, elemMul, ready, pct, fxOf };
 })(typeof window !== 'undefined' ? window : globalThis);
