@@ -5340,12 +5340,107 @@
       },
       "cost_usd": 0.1424,
       "seconds": 17.5,
-      "status": "ждёт автора: незаконченный эльф-убийца в броске, рука сама переходит в клинок, пустая сторона видна; в кадр попали бёдра — карточка срежет низ",
+      "status": "одобрен автором 27.09.2026 — Однорукий образец, рядовой физ ДД ловкости",
       "px": [
         928,
         1152
       ],
       "sha256": "652b0400465e27bc64e2004cad8282a983986b1f8098f6a191a119aa4ff9a5b8"
+    },
+    {
+      "file": "art/generated/portraits/ep-hollow__nb2.jpg",
+      "category": "portraits",
+      "job": "ep-hollow",
+      "title": "Пустотелый образец — рядовой, маг воздуха",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 7",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T02:52:15+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Painterly dark-fantasy card art, like a hand-painted oil sketch: visible textured brush strokes, simplified planar shapes, muted earthy colors, deep black shadows, crisp cold rim light, warm light from below, dust and sand hanging in the light. Not a 3D render, not a photo, not a cartoon, not anime.\n\nEnemy card portrait, 4:5. Camera at chest height. The creature is centered; the bottom edge of the picture cuts the body at the waist: head, torso and arms in frame, no hips, no legs — the legs are never visible, whatever the pose. The head sits in the upper third with a little space above it. It is an enemy: dangerous, alive and caught in action — not a specimen standing still like an exhibit. Its story reads from its body, its pose and the place around it. Every creature here is unfinished work of clay left by the god Vial in his Workshop of Forms; what is unfinished gives it its name and is clearly visible.\n\nThe creature: the Hollow Sample — a rank-and-file air mage of the Workshop, an unfinished elf that is only a shell. It was cast in a mould, not sculpted: a thin shell of pale sandy clay, thin as eggshell, with a faint casting seam running down the middle of its face and body. Elven features: long pointed ears, a narrow fine face, a smooth skull. Its chest is split open like an empty mould from which the casting was taken out: the two halves stand apart, and inside there is nothing — only darkness and wind; the inner walls are smooth like the inside of a mould. Pose: it throws its head back, mouth wide open, and spreads its thin arms wide; a whirlwind of sand and air bursts out of its open chest and its mouth and blasts toward the viewer, pushing everything away. Its eyes are closed — it breathes long and evenly, as if for all who were never allowed to breathe. Background: its own place — a silent empty hall of the Workshop; open empty moulds of clay lie on the shelves and tables behind it, the same shape as its chest; a column of falling sand is torn and bent by its wind; cold white-green crystals glowing in the cracks of the floor light it from below.\n\nNo legs, no full body. No text, no letters, no numbers, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 508,
+        "candidatesTokenCount": 1565,
+        "totalTokenCount": 2073,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 508
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0688,
+      "seconds": 9.4,
+      "status": "ждёт автора, вариант Nano Banana 2: грудь раскрыта, как пустая форма, такие же формы на полках; голова не запрокинута, свет в сепии без бело-зелёных кристаллов",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "8d54865cc448eef6e89bcb434702e9bf0407b70ea931aa5842ea4ec448e4ca05"
+    },
+    {
+      "file": "art/generated/portraits/ep-hollow__pro.jpg",
+      "category": "portraits",
+      "job": "ep-hollow",
+      "title": "Пустотелый образец — рядовой, маг воздуха",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 7",
+      "model": "gemini-3-pro-image",
+      "model_name": "Nano Banana Pro",
+      "date": "2026-09-27T02:53:09+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Painterly dark-fantasy card art, like a hand-painted oil sketch: visible textured brush strokes, simplified planar shapes, muted earthy colors, deep black shadows, crisp cold rim light, warm light from below, dust and sand hanging in the light. Not a 3D render, not a photo, not a cartoon, not anime.\n\nEnemy card portrait, 4:5. Camera at chest height. The creature is centered; the bottom edge of the picture cuts the body at the waist: head, torso and arms in frame, no hips, no legs — the legs are never visible, whatever the pose. The head sits in the upper third with a little space above it. It is an enemy: dangerous, alive and caught in action — not a specimen standing still like an exhibit. Its story reads from its body, its pose and the place around it. Every creature here is unfinished work of clay left by the god Vial in his Workshop of Forms; what is unfinished gives it its name and is clearly visible.\n\nThe creature: the Hollow Sample — a rank-and-file air mage of the Workshop, an unfinished elf that is only a shell. It was cast in a mould, not sculpted: a thin shell of pale sandy clay, thin as eggshell, with a faint casting seam running down the middle of its face and body. Elven features: long pointed ears, a narrow fine face, a smooth skull. Its chest is split open like an empty mould from which the casting was taken out: the two halves stand apart, and inside there is nothing — only darkness and wind; the inner walls are smooth like the inside of a mould. Pose: its head is thrown far back, face turned up to the dark vault, mouth wide open; its thin arms are spread wide. A whirlwind of sand and air bursts out of its open chest and its mouth, spirals up and around it and blasts outward toward the viewer, pushing everything away. Its eyes are closed — it breathes long and evenly, as if for all who were never allowed to breathe. Background: its own place — a silent empty hall of the Workshop; open empty moulds of clay lie on the shelves and tables behind it, the same shape as its chest; a column of falling sand is torn and bent by its wind. Cold white-green crystals glowing in the cracks of the floor light it from below — the only light in the hall.\n\nNo legs, no full body. No text, no letters, no numbers, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 531,
+        "candidatesTokenCount": 1394,
+        "totalTokenCount": 2175,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 531
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "thoughtsTokenCount": 250,
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1417,
+      "seconds": 17.9,
+      "status": "ждёт автора, вариант Pro: голова запрокинута, вихрь вокруг тела, холодные кристаллы; грудь — скорее пролом, чем раскрытая форма",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "70bc0887f84a88a6016c9bdabf3d1549023d00bf456dd2cc288a80a9f987c9ce"
     }
   ]
 }
