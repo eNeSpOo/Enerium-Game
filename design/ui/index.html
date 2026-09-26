@@ -1026,6 +1026,82 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 .k-box .mem{display:grid}
 .k-box .hc{max-width:110px}
 
+/* ===== Древо рецептов: шесть циклов, узлы по ярусам, связи — рецепты «входы → выход» ===== */
+.tr{display:flex;flex-direction:column;gap:8px;height:100%;min-height:0}
+.tr-bar{display:flex;align-items:center;gap:8px;min-width:0;flex:none}
+.tr-bar .tabs button{padding:0 10px;display:inline-flex;align-items:center;gap:3px}
+.tr-bar .tabs button .i{width:11px;height:11px;opacity:.7}
+.tr-cy{font:italic 500 15px/1.1 var(--f-d);color:var(--parch-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto}
+.tr-main{display:grid;grid-template-columns:minmax(0,1fr) 232px;gap:8px;flex:1 1 0;min-height:0}
+.tr-canvas{position:relative;isolation:isolate;display:flex;flex-direction:column;gap:5px;padding:6px;min-height:0;min-width:0;overflow:hidden}
+.tr-lines{position:absolute;left:0;top:0;width:100%;height:100%;z-index:-1;pointer-events:none;overflow:visible}
+.tr-cols{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;flex:1 1 0;min-height:0}
+.tr-col{display:flex;flex-direction:column;gap:3px;min-width:0;min-height:0}
+.tr-col>small{flex:none;height:13px;font:700 9.5px/13px var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tr-col>.sep{flex:none;margin-top:4px;font:700 9px/1.1 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--gold-3)}
+.tn{position:relative;flex:none;display:grid;grid-template-columns:22px minmax(0,1fr);align-items:center;gap:5px;height:27px;min-width:0;padding:0 4px 0 2px;border-radius:7px;border:1px solid var(--iron);background:#0d1013;color:var(--parch);text-align:left;transition:opacity .15s,border-color .15s,box-shadow .15s}
+.tn:hover{border-color:var(--iron-3)}
+.tn .ti{display:grid;place-items:center;width:22px;height:22px;border-radius:6px;overflow:hidden;color:var(--rc,var(--parch-2));background:radial-gradient(80% 80% at 50% 100%,color-mix(in srgb,var(--rc,#2b3036) 30%,transparent),transparent 70%),#0a0c0e;box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--rc,#2b3036) 75%,transparent)}
+.tn .ti .i{width:13px;height:13px}
+.tn .ti img{width:100%;height:100%;object-fit:contain}
+.tn b{min-width:0;font:700 10.5px/1.08 var(--f-u);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.tn .gl,.tr-ing .gl{font:600 12px/1 var(--f-d);color:var(--gold)}
+.tn.key{border-color:color-mix(in srgb,var(--r2) 26%,var(--iron))}
+.tn.uniq{border-color:color-mix(in srgb,var(--r4) 50%,var(--iron))}
+.tn.made{background:linear-gradient(180deg,rgba(221,188,122,.05),transparent),#0f1216}
+.tn.far{border-style:dashed}
+.tn .port{position:absolute;right:-3px;top:-6px;height:12px;padding:0 3px;border-radius:4px;background:#0a0c0e;border:1px solid var(--gold-3);color:var(--gold-2);font:700 8.5px/10px var(--f-u);letter-spacing:.02em}
+.tn.unk b{color:var(--parch-3);font-weight:400}
+.tn.unk .ti{background:#070809;box-shadow:inset 0 0 0 1px rgba(72,229,212,.25)}
+.tn.unk .ti .gl{color:var(--spirit);text-shadow:0 0 8px var(--spirit)}
+.tn.sel{border-color:var(--spirit);box-shadow:0 0 0 1px var(--spirit),0 0 14px -4px var(--spirit)}
+.tn.up{border-color:var(--gold-2);box-shadow:inset 0 -9px 12px -10px var(--gold)}
+.tn.down{border-color:var(--parch-3);border-style:dashed}
+.tr-on .tn:not(.sel):not(.up):not(.down){opacity:.3}
+.te{fill:none;stroke:#3a424b;stroke-width:1.1;opacity:.6}
+.te.up{stroke:var(--gold);stroke-width:1.8;opacity:1}
+.te.down{stroke:var(--parch-2);stroke-width:1.4;stroke-dasharray:4 3;opacity:.9}
+.tr-on .te:not(.up):not(.down){opacity:.1}
+.tr-strip{flex:none;display:flex;align-items:center;gap:5px;padding-top:5px;border-top:1px solid var(--iron)}
+.tr-strip>small{flex:none;font:700 9.5px/1.1 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--parch-3)}
+.tr-strip .tn{flex:1 1 0}
+.tr-strip .gap{flex:none;width:6px}
+.tr-lock{flex:1 1 0;display:grid;place-items:center;text-align:center;padding:20px}
+.tr-lock .col{align-items:center;gap:6px;max-width:44ch}
+.tr-lock .ph{display:grid;place-items:center;width:46px;height:56px;clip-path:polygon(50% 0,100% 34%,82% 100%,18% 100%,0 34%);background:linear-gradient(160deg,#8c8f92,#4b4f53 60%,#2e3134);opacity:.55}
+.tr-info{padding:10px;display:flex;flex-direction:column;gap:8px;min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:#2c3238 transparent}
+.tr-info>*{flex-shrink:0}
+.tr-info .quote{font-size:14px}
+.tr-big{display:grid;place-items:center;width:48px;height:48px;flex:none;border-radius:10px;border:1px solid var(--iron);color:var(--rc,var(--parch-2));background:radial-gradient(80% 80% at 50% 100%,color-mix(in srgb,var(--rc,#2b3036) 26%,transparent),transparent 70%),#0d1013;box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--rc,#2b3036) 70%,transparent)}
+.tr-big .i{width:24px;height:24px}.tr-big img{width:80%;height:80%;object-fit:contain}.tr-big .gl{font:600 22px/1 var(--f-d);color:var(--gold)}
+.tr-big.unk{color:var(--spirit);font:600 24px/1 var(--f-d);text-shadow:0 0 10px var(--spirit)}
+.tr-src{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:3px;font-size:12px;line-height:1.3;color:var(--parch-2)}
+.tr-src li{position:relative;padding-left:11px}
+.tr-src li::before{content:"";position:absolute;left:1px;top:6px;width:4px;height:4px;transform:rotate(45deg);background:var(--gold-3)}
+.tr-use{display:flex;flex-wrap:wrap;gap:4px}
+.tr-use .chip{cursor:pointer;height:auto;min-height:22px;white-space:normal;text-align:left;line-height:1.15;padding:3px 7px}
+.tr-ing{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+.tr-ing .well{--s:32px;border-radius:7px}
+.tr-ing .well .i{width:15px;height:15px;color:var(--rc,var(--parch-2))}
+.tr-ing .well .q{font-size:10.5px;right:2px;bottom:1px}
+.tr-ing .well.empty{font:600 15px/1 var(--f-d);color:var(--spirit)}
+.tr-leg{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--parch-2)}
+.tr-leg span{display:flex;align-items:center;gap:7px}
+.tr-leg i{flex:none;display:inline-block;width:22px;border-top:2px solid var(--gold)}
+.tr-leg i.d{border-top:2px dashed var(--parch-2)}
+.tr-leg i.s{width:14px;height:14px;border:1px solid var(--spirit);border-radius:4px;box-shadow:0 0 8px -2px var(--spirit)}
+.tr-leg i.q{width:14px;height:14px;border:1px dashed var(--iron-3);border-radius:4px}
+.k-box .tr-cols{grid-template-columns:repeat(2,minmax(0,1fr));flex:none}
+@container main (max-height: 360px){
+  .tr-main{grid-template-columns:minmax(0,1fr) 208px}
+  .tr-cols{gap:5px}
+  .tr-col{gap:2px}
+  .tn{height:24px;grid-template-columns:19px minmax(0,1fr);gap:4px}
+  .tn .ti{width:19px;height:19px}
+  .tn b{font-size:9.8px}
+  .tr-cy{font-size:13.5px}
+}
+
 </style>
 </head>
 <body>
@@ -1117,6 +1193,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <script>window.EN_ASSET='assets/';</script>
 <script src="battle.js"></script>
 <script src="fx.js"></script>
+<script src="recipes.js"></script>
 <script>
 'use strict';
 /* Все числа ниже — демонстрационные фикстуры: взяты из текущего UIKit
@@ -1224,6 +1301,7 @@ function initialState() {
       { id: 'chest', n: 'Ларец рабочих', r: 3, q: 3, cat: 'act', spec: 'Лутбокс События', img: ART('reward-chest-v1.png'), riddle: 'Шарды рабочих и гарантированная валюта.', from: 'Дары путешествия', recipes: [], action: 'Открыть' },
     ],
     craft: [null, null, null, null, null, null], craftSel: 0, book: false, invCat: 'all', invQ: '',
+    tree: { cyc: 1, mode: 'player', sel: null },
     recipes: [
       { id: 'bind', n: 'Связующее', out: 'Связующее', outImg: ART('item-cinder-heart.png'), outQ: '1–3', in: [['cinder', 3], ['key', 1]], fav: true, cyc: 1 },
       { id: 'call', n: 'Активация биома', out: 'Активация биома', outImg: PATH(22), outQ: '1', in: [['bind', 2], ['crown', 1]], fav: false, cyc: 1, chain: true, unique: 'Полая корона' },
@@ -1381,7 +1459,7 @@ const CLS = c => ic(CLS_ICON[c] || 'gem');
 
 /* ================== каркас ================== */
 const NAV = [['shelter', 'Убежище', 12], ['descent', 'Спуск', 10], ['heroes', 'Герои', 24], ['craft', 'Ремесло', 11], ['week', 'Неделя', 6]];
-const SECTION = { shelter: 'shelter', descent: 'descent', battle: 'descent', heroes: 'heroes', craft: 'craft', week: 'week', echo: 'week', contracts: 'week', rituals: 'week', arena: 'week', clan: 'week', event: 'week' };
+const SECTION = { shelter: 'shelter', descent: 'descent', battle: 'descent', heroes: 'heroes', craft: 'craft', tree: 'craft', week: 'week', echo: 'week', contracts: 'week', rituals: 'week', arena: 'week', clan: 'week', event: 'week' };
 function navBadge(k) {
   if (k === 'week') { const n = S.rituals.slots.filter(s => s.st === 'ready').length + (S.contracts.day.signed ? 0 : 1); return n ? `<span class="bdg">${n}</span>` : ''; }
   if (k === 'heroes') return S.heroes.some(h => h.lvl >= h.cap && h.lim < 5) ? '<span class="bdg ok">!</span>' : '';
@@ -1782,7 +1860,7 @@ function craftView() {
   return { ...meta, html: `<section class="scr"><div class="cr">
     ${invPanel('work')}
     <div class="pnl table">
-      <div class="pnl-h"><h2>${S.book ? 'Книга рецептов' : 'Стол мастера'}</h2><div class="aside row"><button class="btn sm ${S.book ? '' : ''}" data-a="book">${ic('book')}${S.book ? 'К столу' : 'Книга рецептов'}</button></div></div>
+      <div class="pnl-h"><h2>${S.book ? 'Книга рецептов' : 'Стол мастера'}</h2><div class="aside row"><button class="btn sm" data-a="go" data-v="tree">${ic('gem')}Древо</button><button class="btn sm ${S.book ? '' : ''}" data-a="book">${ic('book')}${S.book ? 'К столу' : 'Книга рецептов'}</button></div></div>
       ${table}
       ${S.book ? '' : `<div class="row" style="justify-content:flex-end;gap:6px"><button class="btn ghost sm" data-a="cclear" ${S.craft.some(Boolean) ? '' : 'disabled'}>Очистить</button><button class="btn go" data-a="ccreate" ${S.craft.some(Boolean) ? '' : 'disabled'}>Создать</button></div>`}
     </div>
@@ -1811,6 +1889,164 @@ function marketView() {
       : `<div class="lot">${well(I('storm'), { act: 'item', size: 40 })}<span class="col" style="gap:2px"><b>Грозовое стекло</b><small class="faint">выставлено 2 ч назад</small></span><span class="num muted">×2</span>${money('gold', 5400)}<button class="btn sm ghost" data-a="toast" data-v="Лот снят">Снять</button></div>`}</div>
   </section>`;
 }
+
+/* ================== Древо рецептов ==================
+   Отдельное окно: шесть циклов, узлы — ресурсы и изделия по ярусам, связи — рецепты «входы → выход».
+   Данные — recipes.js (window.EN_RECIPES), обоснование — docs/content/ресурсы-рецепты-дроп.md.
+   «Как видит игрок»: только найденное, неоткрытое — силуэт и «?», как в бестиарии. «Все · для команды»: весь набор со спойлерами.
+   В игре рецепты живут на сервере; клиент получает только открытые игроком. */
+const RX = window.EN_RECIPES || { specs: {}, tiers: {}, cycles: [], items: [], recipes: [], drops: {} };
+const RXI = {}, RX_OUT = {}, RX_USE = {};
+RX.items.forEach(it => { RXI[it.id] = it; });
+RX.recipes.forEach(r => { (RX_OUT[r.out[0]] = RX_OUT[r.out[0]] || []).push(r); r.in.forEach(([id]) => { (RX_USE[id] = RX_USE[id] || []).push(r); }); });
+/* демо-знания игрока: цикл II, Мастерская форм и Подземный лес пройдены, Библиотека Улариона — рубеж */
+const TREE_SEEN = new Set(RX.items.filter(i => i.cyc === 1 && ['basic', 'key', 'unique', 'vshard'].includes(i.tier)).map(i => i.id)
+  .concat(['rn1_1', 'rn1_2', 'rn1_3', 'rn1_4', 'vr1', 'p1a', 'p1b', 'act1', 'find1', 'runechip', 'mechpart', 'rag', 'k3_tail', 'k3_eng', 'k3_ench', 'k3_smith', 'many']));
+const TREE_REC = { r_p1a: 'known', r_p1b: 'known', r_p1c: ['sand', 'k1_alch'], r_rn1_2: 'known', r_rn1_3: 'noqty', r_act1: 'known', r_p2a: ['rag'] };
+const TR_IC = { unique: 'crown', act: 'door', call: 'eye', find: 'search', trophy: 'flag', echo: 'users', product: 'star', valor: 'star', vshard: 'spark' };
+const treeTeam = () => S.tree.mode === 'team';
+const trOpen = c => treeTeam() || (c <= S.acc.cycle && RX.cycles[c - 1] && !RX.cycles[c - 1].team);
+const trBiomeKnown = id => treeTeam() || S.biomes.some(b => b.id === id && b.state !== 'lock');
+function trRecState(r) {
+  if (treeTeam()) return 'known';
+  if (r.team) return null;
+  if (TREE_REC[r.id]) return TREE_REC[r.id];
+  return r.known0 && r.in.every(([id]) => TREE_SEEN.has(id)) ? 'known' : null;
+}
+const trInVisible = (r, id) => { const s = trRecState(r); return s === 'known' || s === 'noqty' || (Array.isArray(s) && s.includes(id)); };
+function trNamed(id) {
+  const it = RXI[id];
+  if (treeTeam()) return true;
+  if (!it || it.team) return false;
+  return TREE_SEEN.has(id) || (RX_OUT[id] || []).some(r => trRecState(r));
+}
+function trIcon(it) {
+  if (it.img) return `<img src="${it.img.startsWith('path:') ? PATH(+it.img.slice(5)) : ART(it.img)}" alt="">`;
+  if (it.glyph && it.tier === 'rune') return `<span class="gl">${it.glyph}</span>`;
+  const sp = it.spec && RX.specs[it.spec.split('+')[0]];
+  return ic(TR_IC[it.tier] || (sp ? sp.icon : 'gem'));
+}
+function trLayout(c) {
+  const cy = RX.cycles[c - 1], [A, B] = cy.biomes, its = RX.items.filter(i => i.cyc === c);
+  const pick = f => its.filter(f).map(i => i.id), byB = (b, t) => pick(i => i.b === b && i.tier === t);
+  const recs = RX.recipes.filter(r => r.cyc === c);
+  const far = [...new Set(recs.flatMap(r => r.in.filter(([id]) => RXI[id].cyc !== c && trInVisible(r, id)).map(([id]) => id)))];
+  const kh = b => 'Ключи · ' + (trBiomeKnown(b.id) ? b.n : 'не открыт');
+  return { recs, far, strip: [1, 2, 3, 4, 5].map(k => `rn${c}_${k}`).concat([`vs${c}`, `vr${c}`]),
+    cols: [['Добыча', [...byB(A.id, 'basic'), ...byB(B.id, 'basic'), ...byB(A.id, 'unique'), ...byB(B.id, 'unique')]],
+      [kh(A), byB(A.id, 'key')], [kh(B), byB(B.id, 'key')], ['Заготовки', pick(i => i.tier === 'part')],
+      ['Изделия', pick(i => ['act', 'call', 'product'].includes(i.tier))], ['Крафт и Эхо', pick(i => ['find', 'trophy', 'echo'].includes(i.tier))]] };
+}
+const trLayoutIds = c => { const L = trLayout(c); return new Set(L.cols.flatMap(x => x[1]).concat(L.far, L.strip)); };
+function trChain(sel) {
+  const up = new Set(), down = new Set();
+  const goUp = id => (RX_OUT[id] || []).forEach(r => { if (trRecState(r)) r.in.forEach(([x]) => { if (trInVisible(r, x) && !up.has(x)) { up.add(x); goUp(x); } }); });
+  const goDown = id => (RX_USE[id] || []).forEach(r => { const o = r.out[0]; if (trInVisible(r, id) && !down.has(o)) { down.add(o); goDown(o); } });
+  if (sel) { goUp(sel); goDown(sel); }
+  return { up, down };
+}
+const TR_SHORT = { rune: it => 'Предел ' + it.glyph, vshard: () => 'Осколки', valor: () => 'Доблесть' };
+function tnHtml(id, ch, o = {}) {
+  const it = RXI[id], named = trNamed(id), sel = S.tree.sel;
+  const st = sel === id ? 'sel' : ch.up.has(id) ? 'up' : ch.down.has(id) ? 'down' : '';
+  const later = named && !o.far ? (RX_USE[id] || []).filter(r => r.cyc > it.cyc && trInVisible(r, id) && (treeTeam() || !r.team)).map(r => r.cyc) : [];
+  const port = o.far ? `<span class="port">${ROMAN[it.cyc]}</span>` : later.length ? `<span class="port">→${ROMAN[Math.min(...later)]}</span>` : '';
+  const label = named ? (o.short && TR_SHORT[it.tier] ? TR_SHORT[it.tier](it) : it.n) : ['basic', 'key', 'unique', 'rune', 'vshard', 'find', 'trophy', 'echo'].includes(it.tier) ? 'Не найдено' : 'Неизвестно';
+  const cls = ['tn', it.tier === 'key' ? 'key' : '', it.tier === 'unique' ? 'uniq' : '', ['part', 'act', 'call', 'product', 'valor'].includes(it.tier) ? 'made' : '', o.far ? 'far' : '', named ? '' : 'unk', st];
+  return `<button class="${cls.join(' ').replace(/\s+/g, ' ').trim()}" data-a="tsel" data-v="${id}" data-tn="${id}" aria-pressed="${sel === id}" title="${named ? it.n : label}"><span class="ti" data-r="${named ? it.r : 1}">${named ? trIcon(it) : '<span class="gl">?</span>'}</span><b>${label}</b>${port}</button>`;
+}
+let TR_EDGES = [];
+function trEdges(L, ch) {
+  const present = new Set(L.cols.flatMap(x => x[1]).concat(L.far, L.strip)), sel = S.tree.sel, out = [];
+  for (const r of L.recs) {
+    if (!present.has(r.out[0]) || !trRecState(r)) continue;
+    const o = r.out[0];
+    for (const [id] of r.in) {
+      if (!present.has(id) || !trInVisible(r, id)) continue;
+      const up = (o === sel || ch.up.has(o)) && ch.up.has(id), down = (id === sel || ch.down.has(id)) && ch.down.has(o);
+      out.push([id, o, up ? 'up' : down ? 'down' : '']);
+    }
+  }
+  return out;
+}
+function trPath(a, b) {
+  const ax2 = a.x + a.w, bx2 = b.x + b.w, ay = a.y + a.h / 2, by = b.y + b.h / 2;
+  if (ax2 <= b.x) { const d = Math.max(16, (b.x - ax2) / 2); return `M${ax2} ${ay}C${ax2 + d} ${ay} ${b.x - d} ${by} ${b.x} ${by}`; }
+  if (bx2 <= a.x) { const d = Math.max(16, (a.x - bx2) / 2); return `M${a.x} ${ay}C${a.x - d} ${ay} ${bx2 + d} ${by} ${bx2} ${by}`; }
+  const dn = a.y < b.y, y1 = dn ? a.y + a.h : a.y, y2 = dn ? b.y : b.y + b.h, x1 = a.x + a.w / 2, x2 = b.x + b.w / 2, m = (y1 + y2) / 2;
+  return `M${x1} ${y1}C${x1} ${m} ${x2} ${m} ${x2} ${y2}`;
+}
+function drawTree() {
+  const cv = document.getElementById('trCanvas'), svg = document.getElementById('trLines');
+  if (!cv || !svg) return;
+  const pos = {};
+  cv.querySelectorAll('[data-tn]').forEach(e => { pos[e.dataset.tn] = { x: e.offsetLeft, y: e.offsetTop, w: e.offsetWidth, h: e.offsetHeight }; });
+  svg.setAttribute('viewBox', `0 0 ${cv.clientWidth} ${cv.clientHeight}`);
+  const order = { '': 0, down: 1, up: 2 };
+  svg.innerHTML = TR_EDGES.slice().sort((a, b) => order[a[2]] - order[b[2]]).map(([a, b, c]) => pos[a] && pos[b] ? `<path class="te ${c}" d="${trPath(pos[a], pos[b])}"/>` : '').join('');
+}
+const trWell = (it, q) => it ? `<button class="well" data-r="${it.r}" data-a="tsel" data-v="${it.id}" title="${it.n}" aria-label="${it.n}${q != null ? ', ' + q : ''}">${trIcon(it)}${q != null ? `<span class="q">${q}</span>` : ''}</button>` : '<span class="well empty">?</span>';
+function trRecipe(r) {
+  const st = trRecState(r);
+  if (!st) return '<p class="faint" style="font-size:12.5px">Рецепт не найден. Его ищут перебором в Мастерской: шесть ячеек, при неудаче сгорает всё положенное.</p>';
+  const cells = r.in.map(([x, q]) => trInVisible(r, x) ? trWell(RXI[x], st === 'known' ? q : '?') : trWell(null)).join('');
+  const note = st === 'noqty' ? 'Все ресурсы угаданы, количества — нет.' : Array.isArray(st) ? `В книге: открыто ${st.length} из ${r.in.length}. Каждая попытка с ещё одним верным открывает позицию.` : '';
+  return `<div class="tr-ing">${cells}<span class="faint">${ic('arrow')}</span>${trWell(RXI[r.out[0]], r.out[1])}</div>${note ? `<p class="reason">${note}</p>` : ''}${treeTeam() ? `<p class="reason">${r.why}</p>` : ''}`;
+}
+function trCard(id) {
+  const it = RXI[id], team = treeTeam(), T = RX.tiers[it.tier] || { n: '' };
+  if (!trNamed(id)) return `<div class="row" style="gap:10px"><span class="tr-big unk">?</span><div class="col" style="gap:3px;min-width:0"><span class="eyebrow">${T.n}</span><b class="serif" style="font-size:19px;line-height:1.05">${['basic', 'key', 'unique', 'rune', 'vshard', 'find', 'trophy', 'echo'].includes(it.tier) ? 'Не найдено' : 'Неизвестный рецепт'}</b></div></div>
+    <p class="faint" style="font-size:12.5px">${['basic', 'key', 'unique', 'rune', 'vshard', 'find', 'trophy', 'echo'].includes(it.tier) ? 'Имя, загадка и место добычи откроются, когда ресурс впервые попадёт в запасы.' : 'Рецепт не найден. Верное сочетание откроет его навсегда; подсказки появляются с четырёх верных ингредиентов.'}</p>`;
+  const cy = RX.cycles[it.cyc - 1], bm = it.b ? cy.biomes.find(b => b.id === it.b) : null;
+  const where = bm ? `${bm.n} · цикл ${cy.roman}` : `цикл ${cy.roman}`;
+  const sp = it.spec ? it.spec.split('+').map(s => RX.specs[s].n.toLowerCase()).join(' + ') : '';
+  const recs = RX_OUT[id] || [], uses = (RX_USE[id] || []).filter(r => trInVisible(r, id) && (team || !r.team));
+  const showSrc = team || TREE_SEEN.has(id) || !['basic', 'key', 'unique', 'rune', 'vshard', 'find', 'trophy', 'echo'].includes(it.tier);
+  const opened = it.tier === 'act' ? TREE_SEEN.has(id.replace('act', 'find')) : it.tier === 'call' ? TREE_SEEN.has(id.replace('call', 'tr')) : false;
+  const opens = it.opens ? `<p class="muted" style="font-size:12.5px">${it.tier === 'act' ? 'Активирует крафтовый биом' : 'Призывает в Эхо крафтового босса'}${team || opened ? ` «${it.opens}». ${it.opensLore}` : '. Что внутри, станет известно после активации.'}</p>` : '';
+  return `<div class="row" style="gap:10px;align-items:center"><span class="tr-big" data-r="${it.r}">${trIcon(it)}</span><div class="col" style="gap:3px;min-width:0"><span class="eyebrow">${T.n}${sp ? ' · ' + sp : ''}</span><b class="serif" style="font-size:19px;line-height:1.05">${it.n}</b><span class="faint" style="font-size:12px">${where}${it.elite ? ' · элита «' + it.elite + '»' : ''}</span></div></div>
+    ${it.team ? '<span class="chip warn" style="align-self:flex-start">для команды · спойлер §38</span>' : ''}
+    <p class="quote">${it.lore}</p>${opens}
+    ${recs.length ? `<span class="eyebrow">Рецепт</span>${recs.map(trRecipe).join('')}` : ''}
+    ${showSrc ? `<span class="eyebrow">Где падает</span><ul class="tr-src">${it.src.map(s => `<li>${s}</li>`).join('')}</ul>` : ''}
+    <span class="eyebrow">Куда идёт</span>${uses.length ? `<div class="tr-use">${uses.map(r => `<button class="chip ${r.cyc !== it.cyc ? 'gold' : ''}" data-a="tsel" data-v="${r.out[0]}">${RXI[r.out[0]].n}${r.cyc !== it.cyc ? ' · цикл ' + ROMAN[r.cyc] : ''}</button>`).join('')}</div>` : `<p class="faint" style="font-size:12.5px">${team ? 'Конечное изделие.' : 'Пока ни в одном известном рецепте.'}</p>`}`;
+}
+function trSummary(c, L) {
+  const cy = RX.cycles[c - 1], team = treeTeam();
+  const found = L.recs.filter(r => trRecState(r)).length;
+  return `<span class="eyebrow">Цикл ${cy.roman}${team ? ' · ' + cy.god : ''}</span>
+    <b class="serif" style="font-size:18px;line-height:1.1">${cy.biomes.map(b => trBiomeKnown(b.id) ? b.n : 'не открыт').join(' · ')}</b>
+    <p class="muted" style="font-size:12.5px">${team ? cy.about + ` Крафтовый биом «${cy.craftBiome}», крафтовый босс «${cy.craftBoss}».` : 'Нажмите ресурс или изделие: золотом подсветится, что для него нужно, пунктиром — куда оно идёт.'}</p>
+    <dl class="kv"><dt>Рецептов ${team ? 'в цикле' : 'найдено'}</dt><dd>${team ? L.recs.length : found}</dd><dt>Ресурсов добычи</dt><dd>6 базовых · 12 ключей · 2 уникальных</dd></dl>
+    <div class="tr-leg"><span><i></i>что нужно выбранному</span><span><i class="d"></i>куда оно идёт</span><span><i class="s"></i>выбранный узел</span><span><i class="q"></i>«?» — не найдено</span><span><b class="gold" style="font:700 10px var(--f-u)">→III</b>&nbsp;уходит в рецепт цикла III</span></div>
+    <p class="reason">${team ? 'Все числа — демонстрация. Хребет цикла: добыча → заготовки → активация → крафтовый биом → находка → призыв → крафтовый босс → трофей → следующий цикл.' : 'Рецепты скрыты. Древо растёт с каждым найденным рецептом.'}</p>`;
+}
+function treeView() {
+  if (!RX.cycles.length) return { title: 'Древо рецептов', back: 'craft', html: '<section class="scr"><p class="faint">Нет данных: рядом с index.html должен лежать recipes.js.</p></section>' };
+  const T = S.tree, c = T.cyc, cy = RX.cycles[c - 1], team = treeTeam(), open = trOpen(c);
+  const tabs = RX.cycles.map(x => `<button role="tab" aria-selected="${x.n === c}" data-a="tcyc" data-v="${x.n}">${x.roman}${trOpen(x.n) ? '' : ic('lock')}</button>`).join('');
+  const cap = open ? `${cy.god} · ${cy.el.toLowerCase()} · ${cy.karst}` : 'не открыт';
+  const bar = `<div class="tr-bar"><div class="tabs" role="tablist" aria-label="Циклы">${tabs}</div><span class="tr-cy">${cap}</span>${team && cy.team ? '<span class="chip warn">спойлер</span>' : ''}<span class="g-spacer"></span><div class="tabs" role="tablist" aria-label="Режим"><button role="tab" aria-selected="${!team}" data-a="tmode" data-v="player">Как видит игрок</button><button role="tab" aria-selected="${team}" data-a="tmode" data-v="team">Все · для команды</button></div></div>`;
+  let canvas, info;
+  if (!open) {
+    TR_EDGES = [];
+    const deep = cy.team;
+    canvas = `<div class="pnl tr-canvas" id="trCanvas"><div class="tr-lock"><div class="col"><span class="ph"></span><b class="serif" style="font-size:22px">${deep ? 'Глубже · не открыто' : 'Цикл ' + cy.roman + ' не открыт'}</b><p class="faint" style="font-size:13px">${deep ? 'Что лежит ниже, древо покажет, когда туда дойдёт Странник.' : 'Ресурсы и рецепты цикла появятся, когда откроется его первый биом: для этого нужна победа над рунным стражем прошлого цикла.'}</p></div></div></div>`;
+    info = `<span class="eyebrow">Цикл ${cy.roman}</span><p class="muted" style="font-size:13px">Пустой карст матовый и не светится. Заряженный светится изнутри.</p><p class="reason">Переключите «Все · для команды», чтобы увидеть весь цикл.</p>`;
+  } else {
+    const L = trLayout(c), ch = trChain(T.sel);
+    TR_EDGES = trEdges(L, ch);
+    const cols = L.cols.map(([h, ids], i) => `<div class="tr-col"><small title="${h}">${h}</small>${ids.map(id => tnHtml(id, ch)).join('')}${i === 3 && L.far.length ? `<span class="sep">Из прошлых циклов</span>${L.far.map(id => tnHtml(id, ch, { far: true })).join('')}` : ''}</div>`).join('');
+    const strip = `<div class="tr-strip"><small>Стражи</small>${L.strip.slice(0, 5).map(id => tnHtml(id, ch, { short: true })).join('')}<span class="gap"></span>${L.strip.slice(5).map(id => tnHtml(id, ch, { short: true })).join('')}</div>`;
+    canvas = `<div class="pnl tr-canvas ${T.sel ? 'tr-on' : ''}" id="trCanvas"><svg class="tr-lines" id="trLines" aria-hidden="true"></svg><div class="tr-cols">${cols}</div>${strip}</div>`;
+    info = T.sel && RXI[T.sel] ? trCard(T.sel) : trSummary(c, L);
+  }
+  return { title: 'Древо рецептов', sub: 'шесть циклов', back: 'craft', html: `<section class="scr tr">${bar}<div class="tr-main">${canvas}<aside class="pnl tr-info fit" aria-label="Сведения об узле">${info}</aside></div></section>` };
+}
+window.addEventListener('en-render', () => { if (S.route === 'tree') drawTree(); });
+addEventListener('resize', () => { if (S.route === 'tree') requestAnimationFrame(drawTree); });
+document.addEventListener('click', e => { if (S.route === 'tree' && !e.target.closest('#game')) requestAnimationFrame(() => requestAnimationFrame(drawTree)); });
+document.addEventListener('fullscreenchange', () => { if (S.route === 'tree') requestAnimationFrame(drawTree); });
 
 /* ================== Неделя ================== */
 const WEEKLY = () => [
@@ -2025,7 +2261,7 @@ function storeView() {
   return { ...meta, html: `<section class="scr">${body}</section>` };
 }
 
-const SCREENS = { shelter, descent, battle, heroes, craft: craftView, week: weekView, echo: echoView, contracts: contractsView, rituals: ritualsView, arena: arenaView, clan: clanView, event: eventView, profile: profileView, chronicle: chronicleView, store: storeView };
+const SCREENS = { shelter, descent, battle, heroes, craft: craftView, tree: treeView, week: weekView, echo: echoView, contracts: contractsView, rituals: ritualsView, arena: arenaView, clan: clanView, event: eventView, profile: profileView, chronicle: chronicleView, store: storeView };
 
 /* ================== занятость ================== */
 const busyNote = id => { const r = runOf(id); if (r) return 'Забег · ' + EB.BIOMES[r.biome].name; const h = H(id); return h.busy; };
@@ -2272,6 +2508,9 @@ const ACT = {
   autocraft(v) { open('autocraft', v); },
   acdo(v) { const r = S.recipes.find(x => x.id === v); const u = document.getElementById('acUnique'); if (u && !u.checked) return toast('Без согласия особый ресурс не списывается'); S.overlay = null; toast(`Создано: ${r.out}`, r.outImg); },
   toCraft(v) { S.seg.craft = 'work'; S.book = false; S.overlay = null; S.route = 'craft'; ACT.put(v); },
+  tcyc(v) { S.tree.cyc = +v; S.tree.sel = null; render(); },
+  tmode(v) { S.tree.mode = v === 'team' ? 'team' : 'player'; if (S.tree.sel && !trLayoutIds(S.tree.cyc).has(S.tree.sel)) S.tree.sel = null; render(); },
+  tsel(v) { const it = RXI[v]; if (!it) return; if (!trLayoutIds(S.tree.cyc).has(v)) S.tree.cyc = it.cyc; S.tree.sel = S.tree.sel === v ? null : v; render(); },
   use(v) { const it = I(v); S.overlay = { t: 'confirm', title: it.action + ' · ' + it.n, text: it.id === 'chest' ? 'Ларец откроется здесь, в запасах. Содержимое станет известно после подтверждения.' : 'Экземпляр появится в Спуске. Что внутри — станет известно после активации.', ok: it.action, act: 'usedo', v }; render(); focusOverlay(); },
   usedo(v) { const it = I(v); it.q--; if (it.q <= 0) S.items = S.items.filter(x => x !== it); S.overlay = null; toast(v === 'chest' ? 'Ларец открыт: шарды рабочих ×3, золото 800' : 'Экземпляр активирован (демо)'); },
   buy(v) { const [id, q, c, p] = S.shop[+v]; S.overlay = { t: 'confirm', title: 'Купить в лавке', text: `${I(id).n} ×${q}`, ok: 'Купить', act: 'buydo', v, cost: [c, p] }; render(); focusOverlay(); },
@@ -2657,6 +2896,7 @@ const FLOWS = [
   ['Развитие героя', 'Уровень, рунный предел и доблесть — одна лестница', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.seg.hero = 'power'; S.selHero = 'h2'; S.overlay = null; }],
   ['Ротация перетаскиванием', 'Порядок способностей в карточке героя', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.seg.hero = 'skills'; S.selHero = 'h2'; S.overlay = null; }],
   ['Мастерская', 'Шесть ячеек вокруг результата и книга рецептов', () => { S.route = 'craft'; S.seg.craft = 'work'; S.book = false; S.craft = [{ id: 'cinder', q: 3 }, { id: 'key', q: 1 }, null, null, null, null]; S.craftSel = 0; S.overlay = null; }],
+  ['Древо рецептов', 'Шесть циклов: что из чего делается и куда идёт. Игрок видит только найденное, команда — всё', () => { S.route = 'tree'; S.tree = { cyc: 1, mode: 'player', sel: 'p1a' }; S.overlay = null; }],
   ['Неделя → Эхо', 'Шесть недельных режимов на одном экране, цель и атака', () => { S.route = 'echo'; S.echo.sel = 0; S.overlay = null; }],
   ['Контракт', 'Составить, заверить золотом, подписать', () => { S.route = 'contracts'; S.seg.contracts = 'day'; S.overlay = null; }],
   ['Память Странника', 'Одна из трёх, переброс и закрепление', () => { S.route = 'profile'; S.seg.profile = 'mem'; S.overlay = S.mem.slots[0].st === 'open' ? { t: 'mem' } : null; }],
@@ -2789,7 +3029,10 @@ function renderKit() {
   <section class="k-box"><h3>Враг</h3><div class="k-demo row" style="gap:18px;justify-content:center;height:170px"><div class="fig" style="height:150px"><img src="${WS(f1.pg)}" alt=""></div><div class="fig unk" style="height:150px"><img src="${WS(f6.pg)}" alt=""><span class="qm">?</span></div></div><p class="k-note">Глина — изучен. Силуэт со светом духа по контуру — до первой победы.</p></section>
   <section class="k-box"><h3>Кристалл Памяти</h3><div class="k-demo mem" style="grid-template-columns:repeat(3,1fr)"><div class="mslot"><span class="crys"></span><small class="faint">пустой карст</small></div><div class="mslot open"><span class="crys"></span><small class="spirit">можно вспомнить</small></div><div class="mslot set" data-r="3"><span class="crys"></span><small class="faint">закреплено</small></div></div><p class="k-note">Состояние из лора: пустой карст матовый, заряженный светится изнутри.</p></section>
   <section class="k-box"><h3>Иконки путей</h3><div class="k-row">${[[12, 'Убежище'], [10, 'Спуск'], [24, 'Герои'], [11, 'Ремесло'], [6, 'Неделя'], [18, 'Эхо'], [38, 'Контракты'], [33, 'Ритуалы'], [3, 'Арена'], [26, 'Клан'], [21, 'Событие'], [29, 'Странник']].map(([p, n]) => `<figure style="margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;width:64px"><img src="${PATH(p)}" alt="" style="width:48px;height:48px;border-radius:12px;box-shadow:0 0 0 1px #262c32"><figcaption style="font-size:11px;color:var(--parch-2);text-align:center;line-height:1.1">${n}</figcaption></figure>`).join('')}</div><p class="k-note">Авторский набор. Иконка узнаётся, подпись остаётся всегда.</p></section>
-  <section class="k-box"><h3>Слой поверх: лист и диалог</h3><div class="k-demo" style="height:170px;position:relative;overflow:hidden;border:1px solid var(--iron)"><div style="position:absolute;inset:0;background:rgba(3,4,5,.55)"></div><div class="sheet" style="width:52%;animation:none"><div class="sheet-h" style="min-height:40px;padding:6px 8px 6px 12px"><h2 style="font-size:17px">Сведения</h2><span class="iconbtn x" style="width:26px;height:26px">${ic('x')}</span></div><div class="sheet-b" style="padding:8px 12px;gap:6px"><span class="faint" style="font-size:12px">уточняет работу, не уводит с экрана</span>${bar(60)}</div><div class="sheet-f" style="padding:6px 12px"><button class="btn go sm" style="margin-left:auto">Действие</button></div></div></div><p class="k-note">Лист справа — сведения и настройка. Диалог по центру — только цена, последствия и итог.</p></section>`;
+  <section class="k-box"><h3>Слой поверх: лист и диалог</h3><div class="k-demo" style="height:170px;position:relative;overflow:hidden;border:1px solid var(--iron)"><div style="position:absolute;inset:0;background:rgba(3,4,5,.55)"></div><div class="sheet" style="width:52%;animation:none"><div class="sheet-h" style="min-height:40px;padding:6px 8px 6px 12px"><h2 style="font-size:17px">Сведения</h2><span class="iconbtn x" style="width:26px;height:26px">${ic('x')}</span></div><div class="sheet-b" style="padding:8px 12px;gap:6px"><span class="faint" style="font-size:12px">уточняет работу, не уводит с экрана</span>${bar(60)}</div><div class="sheet-f" style="padding:6px 12px"><button class="btn go sm" style="margin-left:auto">Действие</button></div></div></div><p class="k-note">Лист справа — сведения и настройка. Диалог по центру — только цена, последствия и итог.</p></section>
+  ${RXI.sand ? `<section class="k-box"><h3>Древо рецептов · узлы</h3><div class="k-demo tr-cols">${[['sand', ''], ['k1_ench', 'up'], ['u4', ''], ['p1a', 'sel'], ['act1', 'down'], ['k4_hunt', '', 1]].map(([id, st, unk]) => { const it = RXI[id]; return `<span class="tn ${it.tier === 'key' ? 'key' : it.tier === 'unique' ? 'uniq' : ['part', 'act'].includes(it.tier) ? 'made' : ''} ${unk ? 'unk' : ''} ${st}"><span class="ti" data-r="${unk ? 1 : it.r}">${unk ? '<span class="gl">?</span>' : trIcon(it)}</span><b>${unk ? 'Не найдено' : it.n}</b></span>`; }).join('')}</div>
+    <div class="tr-leg"><span><i></i>что нужно выбранному</span><span><i class="d"></i>куда оно идёт</span><span><i class="s"></i>выбранный узел</span><span><i class="q"></i>силуэт и «?» — не найдено, как в бестиарии</span></div>
+    <p class="k-note">Окно «Древо рецептов»: Ремесло → «Древо». Узлы стоят по ярусам — добыча, ключи ремёсел, заготовки, изделия, крафт и Эхо; внизу — руны стражей. Цвет узла — редкость. Игрок видит только найденное, команда — все шесть циклов.</p></section>` : ''}`;
 }
 
 function kitCards() {
