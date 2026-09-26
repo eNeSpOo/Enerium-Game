@@ -1,0 +1,29 @@
+{
+  "name": "Портреты врагов — правка готовой картинки: когда модель упорно рисует лишнее (вторую руку, кисть с ножом), правим свой же вариант, а не рисуем заново",
+  "models": [
+    "nb2"
+  ],
+  "style": "Keep the painterly style of the attached picture: the same brush strokes, light, colors and background.",
+  "negative": "No text, no letters, no numbers, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+  "cutout_rule": "",
+  "categories": {
+    "portraits": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [],
+      "frame": "Edit the attached enemy portrait. Keep the creature's head, face, clay, clothes, the background, the light and the framing exactly as they are. Change only what is listed below."
+    }
+  },
+  "jobs": [
+    {
+      "id": "ep-onearm",
+      "category": "portraits",
+      "title": "Однорукий образец — рядовой, физ ДД ловкости (решение автора 27.09.2026)",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 10; правка art/generated/portraits/ep-onearm__nb2-v4.jpg",
+      "refs": [
+        "art/generated/portraits/ep-onearm__nb2-v4.jpg"
+      ],
+      "subject": "1. Remove the hand and all fingers of its only arm. The forearm ends right there, and the long stone blade that points to the lower right grows straight out of the end of the forearm, as its continuation: clay turns into pale grey stone where the hand was. The blade is part of the arm, it is not held.\n2. Remove the extra blade that sticks out to the left of the arm near the left edge of the picture: that part of the arm is plain clay, and there is only one blade.\n3. On the right side of the picture, where there is no arm, remove the rounded shoulder too: the line from the neck runs down to the waist as one smooth, flat, polished slope, no shoulder at all."
+    }
+  ]
+}

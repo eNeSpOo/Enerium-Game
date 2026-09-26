@@ -1382,7 +1382,7 @@
       },
       "cost_usd": 0.0688,
       "seconds": 10.9,
-      "status": "заменён: нарисован по старым фигурам GPT, автор просил новых врагов с нуля",
+      "status": "эталон портрета врага — выбран автором 27.09.2026: по пояс, без ног",
       "px": [
         928,
         1152
@@ -3926,7 +3926,7 @@
       },
       "cost_usd": 0.069,
       "seconds": 14.4,
-      "status": "партия 4, портрет — основа врагов, ждёт автора",
+      "status": "заменён: партия 4 — враги делаются по одному, у каждого свой портрет (ADR-0012)",
       "px": [
         928,
         1152
@@ -3980,7 +3980,7 @@
       },
       "cost_usd": 0.0691,
       "seconds": 11.9,
-      "status": "партия 4, портрет — основа врагов, ждёт автора",
+      "status": "заменён: партия 4 — враги делаются по одному, у каждого свой портрет (ADR-0012)",
       "px": [
         928,
         1152
@@ -4034,7 +4034,7 @@
       },
       "cost_usd": 0.0691,
       "seconds": 12.7,
-      "status": "партия 4, портрет — основа врагов, ждёт автора",
+      "status": "заменён: партия 4 — враги делаются по одному, у каждого свой портрет (ADR-0012)",
       "px": [
         928,
         1152
@@ -4142,7 +4142,7 @@
       },
       "cost_usd": 0.0689,
       "seconds": 10.5,
-      "status": "партия 4, портрет — основа врагов, ждёт автора",
+      "status": "заменён: партия 4 — враги делаются по одному, у каждого свой портрет (ADR-0012)",
       "px": [
         928,
         1152
@@ -4196,7 +4196,7 @@
       },
       "cost_usd": 0.0688,
       "seconds": 10.1,
-      "status": "партия 4, портрет — основа врагов, ждёт автора",
+      "status": "заменён: партия 4 — враги делаются по одному, у каждого свой портрет (ADR-0012)",
       "px": [
         928,
         1152
@@ -4250,7 +4250,7 @@
       },
       "cost_usd": 0.069,
       "seconds": 10.6,
-      "status": "партия 4, портрет — основа врагов, ждёт автора",
+      "status": "заменён: партия 4 — враги делаются по одному, у каждого свой портрет (ADR-0012)",
       "px": [
         928,
         1152
@@ -4304,7 +4304,7 @@
       },
       "cost_usd": 0.0691,
       "seconds": 9.5,
-      "status": "партия 4, портрет — основа врагов, ждёт автора",
+      "status": "заменён: партия 4 — враги делаются по одному, у каждого свой портрет (ADR-0012)",
       "px": [
         928,
         1152
@@ -4358,7 +4358,7 @@
       },
       "cost_usd": 0.0687,
       "seconds": 9.3,
-      "status": "партия 4, портрет — основа врагов, ждёт автора",
+      "status": "заменён: партия 4 — враги делаются по одному, у каждого свой портрет (ADR-0012)",
       "px": [
         928,
         1152
@@ -4412,7 +4412,7 @@
       },
       "cost_usd": 0.0691,
       "seconds": 10.0,
-      "status": "партия 4, портрет — основа врагов, ждёт автора",
+      "status": "заменён: партия 4 — враги делаются по одному, у каждого свой портрет (ADR-0012)",
       "px": [
         928,
         1152
@@ -4466,7 +4466,7 @@
       },
       "cost_usd": 0.0692,
       "seconds": 12.4,
-      "status": "партия 4, портрет — основа врагов, ждёт автора",
+      "status": "заменён: партия 4 — враги делаются по одному, у каждого свой портрет (ADR-0012)",
       "px": [
         928,
         1152
@@ -4520,7 +4520,7 @@
       },
       "cost_usd": 0.069,
       "seconds": 10.7,
-      "status": "партия 4, портрет — основа врагов, ждёт автора",
+      "status": "заменён: партия 4 — враги делаются по одному, у каждого свой портрет (ADR-0012)",
       "px": [
         928,
         1152
@@ -4574,7 +4574,7 @@
       },
       "cost_usd": 0.0692,
       "seconds": 15.0,
-      "status": "партия 4, портрет — основа врагов, ждёт автора",
+      "status": "заменён: партия 4 — враги делаются по одному, у каждого свой портрет (ADR-0012)",
       "px": [
         928,
         1152
@@ -4628,7 +4628,7 @@
       },
       "cost_usd": 0.0691,
       "seconds": 12.0,
-      "status": "партия 4, портрет — основа врагов, ждёт автора",
+      "status": "заменён: партия 4 — враги делаются по одному, у каждого свой портрет (ADR-0012)",
       "px": [
         928,
         1152
@@ -4683,7 +4683,7 @@
       },
       "cost_usd": 0.1435,
       "seconds": 20.0,
-      "status": "партия 4, портрет — основа врагов, ждёт автора",
+      "status": "заменён: партия 4 — враги делаются по одному, у каждого свой портрет (ADR-0012)",
       "px": [
         928,
         1152
@@ -4737,12 +4737,424 @@
       },
       "cost_usd": 0.0692,
       "seconds": 9.7,
-      "status": "партия 4, портрет — основа врагов, ждёт автора",
+      "status": "заменён: партия 4 — враги делаются по одному, у каждого свой портрет (ADR-0012)",
       "px": [
         928,
         1152
       ],
       "sha256": "08215e8ef4bf802ca678f9a05e663a8e63efce0dd548707b8892d91893494cce"
+    },
+    {
+      "file": "art/generated/portraits/ep-longarm__nb2.jpg",
+      "category": "portraits",
+      "job": "ep-longarm",
+      "title": "Долгорукий образец — рядовой, ловкость",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 6",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T02:12:02+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/enemies/foe-faceless__nb2.jpg"
+      ],
+      "prompt": "Painted dark-fantasy game art by the same hand as the attached reference portrait.\n\nEnemy card portrait. Copy the attached reference portrait exactly in framing, crop, camera distance, painting style, lighting and palette: waist-up, NO legs; the head, shoulders, both arms and the torso fill the frame; the creature holds or shows its signature trait in front of its body. Same dark workshop background with cracks and a few glowing crystals, same dust in the light. The creature is made of clay like the reference. Only the creature changes.\n\nThe creature: the Long-armed Sample. A stooped, thin clay figure with an elven head, watching from a distance. One arm is ordinary; the other is unnaturally long — its forearm stretches on and on and ends in a heavy stone hand, much bigger than the other hand, held in front of the body.\n\nNo legs, no full body. No text, no letters, no numbers, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 475,
+        "candidatesTokenCount": 1515,
+        "totalTokenCount": 1990,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 217
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0686,
+      "seconds": 10.1,
+      "status": "заменён: скопировал эталон целиком, а нужна только камера; Долгорукий убран из состава (Однорукий — физ ДД ловкости)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "f5a218859a21e73d37e619dbaa980ae7476b128553a00ade3b691e4d5a3f7497"
+    },
+    {
+      "file": "art/generated/portraits/ep-longarm__nb2-v2.jpg",
+      "category": "portraits",
+      "job": "ep-longarm",
+      "title": "Долгорукий образец — рядовой, ловкость",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 6",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T02:12:12+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/enemies/foe-faceless__nb2.jpg"
+      ],
+      "prompt": "Painted dark-fantasy game art by the same hand as the attached reference portrait.\n\nEnemy card portrait. Copy the attached reference portrait exactly in framing, crop, camera distance, painting style, lighting and palette: waist-up, NO legs; the head, shoulders, both arms and the torso fill the frame; the creature holds or shows its signature trait in front of its body. Same dark workshop background with cracks and a few glowing crystals, same dust in the light. The creature is made of clay like the reference. Only the creature changes.\n\nThe creature: the Long-armed Sample. A stooped, thin clay figure with an elven head, watching from a distance. One arm is ordinary; the other is unnaturally long — its forearm stretches on and on and ends in a heavy stone hand, much bigger than the other hand, held in front of the body.\n\nNo legs, no full body. No text, no letters, no numbers, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 475,
+        "candidatesTokenCount": 1447,
+        "totalTokenCount": 1922,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 217
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0684,
+      "seconds": 9.5,
+      "status": "заменён: скопировал эталон целиком, а нужна только камера; Долгорукий убран из состава (Однорукий — физ ДД ловкости)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "3914bacd707bb711982f13a861915bd9e50058396e637fcf90bae7f6eb9ee4ba"
+    },
+    {
+      "file": "art/generated/portraits/ep-overdried__nb2.jpg",
+      "category": "portraits",
+      "job": "ep-overdried",
+      "title": "Пересохший образец — рядовой, дебаффер (предложение)",
+      "source": "новый враг вместо Долгорукого по решению автора 27.09.2026: Однорукий — физ ДД ловкости, нужен дебаффер",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T02:18:10+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/enemies/foe-faceless__nb2.jpg"
+      ],
+      "prompt": "Painted dark-fantasy game art: visible confident brush strokes, simplified planar shapes, crisp rim light, deep shadows, light from below, dust in the light. Same painterly hand as the attached reference.\n\nEnemy card portrait, 4:5. Take ONLY the camera from the attached reference image: the same camera angle, distance and staging — waist-up, no legs, the figure centered, facing the viewer in a slight three-quarter turn, its signature trait held or shown in front of the body. Do NOT copy anything else from the reference: design a completely different creature with its own body, face, clothes, silhouette, pose and colors, and give it its own background from its own corner of the Workshop of Forms.\n\nThe creature: the Over-dried Sample, a rank-and-file debuffer of the Workshop of Forms. A clay figure left to dry too close to a forge and forgotten: its clay has turned pale grey-white, hard and brittle like a potsherd, covered from head to waist in a web of deep cracks, dry dust trickling out of them. A narrow, gaunt, barely sketched face, lips pulled tight by the dryness. One hand reaches toward the viewer, its fingers cracked down to a bone-white core, and thin cracks spread outward from its fingertips like frost across the air. Background: a cold, long-dead kiln of the Workshop behind it, cracked pottery shards on a shelf, a thin stream of sand, a few faint white-green crystals. Dry, brittle, unsettling.\n\nNo legs, no full body. No text, no letters, no numbers, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 612,
+        "candidatesTokenCount": 1531,
+        "totalTokenCount": 2143,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 354
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0687,
+      "seconds": 9.5,
+      "status": "одобрен автором 27.09.2026 — Пересохший образец, рядовой дебаффер",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "73fb3404c5da4bef11845a96146303aa1c9f4370f7689c56159052155275c3fa"
+    },
+    {
+      "file": "art/generated/portraits/ep-onearm__nb2.jpg",
+      "category": "portraits",
+      "job": "ep-onearm",
+      "title": "Однорукий образец — рядовой, физ ДД ловкости (решение автора 27.09.2026)",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 10",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T02:22:28+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/enemies/foe-faceless__nb2.jpg"
+      ],
+      "prompt": "Painted dark-fantasy game art: visible confident brush strokes, simplified planar shapes, crisp rim light, deep shadows, light from below, dust in the light. Same painterly hand as the attached reference.\n\nEnemy card portrait, 4:5. Take ONLY the camera from the attached reference image: the same camera angle, distance and staging — waist-up, no legs, the figure centered, facing the viewer in a slight three-quarter turn, its signature trait held or shown in front of the body. Do NOT copy anything else from the reference: design a completely different creature with its own body, face, clothes, silhouette, pose and colors, and give it its own background from its own corner of the Workshop of Forms.\n\nThe creature: the One-armed Sample, a rank-and-file agility fighter — the fastest assassin of the Workshop, made in a hurry. Lean, wiry grey-green clay with quick rough thumb strokes left unsmoothed. Its only arm ends not in a hand but in a long blade like a splinter chipped from stone, raised and angled forward, ready to strike. Where the other arm should be, the shoulder is smoothed away completely — flat and blank, as if it was never meant to be. Pose: leaning forward, coiled, caught mid-dash. Gaze: narrow sharp eyes looking past the viewer toward the back rows — it goes straight for the weakest. Background: its own corner of the Workshop — a split stone block with a long splinter missing, stone chips scattered on a workbench, a thin stream of sand, a few faint white-green crystals.\n\nNo legs, no full body. No text, no letters, no numbers, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 625,
+        "candidatesTokenCount": 1561,
+        "totalTokenCount": 2186,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 367
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0688,
+      "seconds": 10.6,
+      "status": "заменён: это перерисованный Безликий — картинка эталона прикладывалась к запросу. Дальше ракурс задаётся словами, без картинки",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "6dcd78278a71bbb7ce13521c220bbd843bf4e8271c72715f54dda907f00cf6ca"
+    },
+    {
+      "file": "art/generated/portraits/ep-onearm__nb2-v2.jpg",
+      "category": "portraits",
+      "job": "ep-onearm",
+      "title": "Однорукий образец — рядовой, физ ДД ловкости (решение автора 27.09.2026)",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 10",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T02:29:47+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Painted dark-fantasy game art: visible confident brush strokes, simplified planar shapes, crisp rim light, deep shadows, light from below, dust in the light. A hand-painted digital illustration for a game card — not a 3D render, not a photo.\n\nEnemy card portrait, 4:5. Camera at chest height, looking straight at the creature. The creature is centered and cut off at the waist: head, torso and arms in frame, no legs, no hips. The head sits in the upper third with a little space above it. What the creature is named after — its unfinished part — is clearly visible in front of the body. The creature is made entirely of clay, it is not a living person. Everything else — its body, clay, face, clothes, silhouette, pose, hands, gaze and background — is its own and is described below.\n\nThe creature: the One-armed Sample, the fastest killer of the Workshop of Forms, sculpted in a hurry. Dark rust-red terracotta clay, rough and dry, covered in quick finger drags and knife scrapes that nobody smoothed, with ragged seams where lumps were pressed on. A lean, sinewy, narrow body, like a greyhound turned into a man: a narrow waist, ribs pinched out with two fingers, a long neck. The head is long and narrow and thrust forward like a spearhead; the clay of the skull is pulled back in one rough stroke into a short swept-back crest; no ears. The face is only pinched out: a sharp brow ridge, a sharp nose ridge, two thin eye slits and a thin hard mouth, each cut with a single knife stroke. It has only the right arm: long, wiry, bound with a few strips of rough cloth, and it ends not in a hand but in a long jagged blade of pale grey stone, like a splinter chipped off a rock, with flint-like flake scars, as long as the forearm. The left shoulder is missing: on that side the body is smoothed away into one clean, flat, polished slope from the neck down to the waist — the only smooth surface on its rough body, as if an arm there was never planned. Pose: low and coiled, leaning forward in a three-quarter turn that shows its smooth left side to the viewer; the blade arm sweeps across the front of the body, the point aimed forward and down — the instant before it darts. Gaze: the eye slits slide past the viewer, over the viewer's shoulder, toward someone far behind — it hunts for the weakest in the back row. Background: its own place in the Workshop — a narrow passage between tall columns of falling sand pouring from the dark vault to the floor; the nearest sand streams are torn and bent by its speed, a trail of dust behind it, small stone splinters in the air; the cold white-green glow of crystals in the floor cracks lights it from below. Palette: warm rust-red clay against cold white-green light and pale grey stone.\n\nNo legs, no full body. No text, no letters, no numbers, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 658,
+        "candidatesTokenCount": 1655,
+        "totalTokenCount": 2313,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 658
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0691,
+      "seconds": 8.8,
+      "status": "заменён: свой, не Безликий, но голова вышла собачьей, а лезвие зажато в кисти — по лору рука сама кончается лезвием",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "cc34da5edd91bc68776d55faa329e43891be5863b9297c5f11e7c6eeda077532"
+    },
+    {
+      "file": "art/generated/portraits/ep-onearm__nb2-v3.jpg",
+      "category": "portraits",
+      "job": "ep-onearm",
+      "title": "Однорукий образец — рядовой, физ ДД ловкости (решение автора 27.09.2026)",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 10",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T02:30:55+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Painted dark-fantasy game art: visible confident brush strokes, simplified planar shapes, crisp rim light, deep shadows, light from below, dust in the light. A hand-painted digital illustration for a game card — not a 3D render, not a photo.\n\nEnemy card portrait, 4:5. Camera at chest height, looking straight at the creature. The creature is centered; the bottom edge of the picture cuts the body at the waist: head, torso and arms in frame, no hips, no legs. The head sits in the upper third with a little space above it. What the creature is named after — its unfinished part — is clearly visible in front of the body. The creature is made entirely of clay, it is not a living person. Everything else — its body, clay, face, clothes, silhouette, pose, hands, gaze and background — is its own and is described below.\n\nThe creature: the One-armed Sample, the fastest killer of the Workshop of Forms, sculpted in a hurry. A humanoid, not an animal. Dark rust-red terracotta clay, rough and dry, covered in quick finger drags and knife scrapes that nobody smoothed, with ragged seams where lumps were pressed on. A lean, sinewy, narrow body: a narrow waist, ribs pinched out with two fingers, a long neck; a few strips of rough cloth wound around the waist. The head is narrow, bald and long, thrust forward on the neck; the clay at the back of the skull is pulled back in one rough stroke into a short swept-back crest; no ears. The face is barely made: a sharp brow ridge and a sharp nose pinched out between two fingers, two thin eye slits and a thin hard mouth, each cut with a single knife stroke. Its only arm is the right one, and it has no hand: the forearm narrows and turns straight into a long jagged blade of pale grey stone, as long as the forearm — as if a splinter chipped off a rock was pushed into the stump of the arm, clay flowing into stone at the wrist; flint-like flake scars along the blade. No fingers, no grip, it is not holding anything. Its left side has no shoulder and no arm at all: the clay there is smoothed flat into one clean, polished slope from the neck down to the waist — the only smooth surface on its rough body, as if an arm there was never planned. Pose: the body faces the viewer almost frontally, so both sides are clearly visible — the blade arm and the smooth empty slope; it leans forward, low and coiled, head thrust forward, the blade arm drawn back and cocked, ready to slash — the instant before it darts. Gaze: the eye slits slide past the viewer, over the viewer's shoulder, toward someone far behind — it hunts for the weakest in the back row. Background: its own place in the Workshop — a narrow passage between tall columns of falling sand pouring from the dark vault to the floor; the nearest sand streams are torn and bent by its speed, a trail of dust behind it, small stone splinters in the air; the cold white-green glow of crystals in the floor cracks lights it from below. Palette: warm rust-red clay against cold white-green light and pale grey stone.\n\nNo legs, no full body. No text, no letters, no numbers, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 715,
+        "candidatesTokenCount": 1702,
+        "totalTokenCount": 2417,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 715
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0693,
+      "seconds": 9.6,
+      "status": "заменён: свой, но с двумя руками и лезвием в кисти — поправлен правками v4 и v5",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "41a24dd1760c3fb0ac4a4ca6fe84e4d82ed5a113d5d30adbb8759516bbe574d7"
+    },
+    {
+      "file": "art/generated/portraits/ep-onearm__nb2-v4.jpg",
+      "category": "portraits",
+      "job": "ep-onearm",
+      "title": "Однорукий образец — рядовой, физ ДД ловкости (решение автора 27.09.2026)",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 10; правка art/generated/portraits/ep-onearm__nb2-v3.jpg",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T02:31:51+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/portraits/ep-onearm__nb2-v3.jpg"
+      ],
+      "prompt": "Keep the painterly style of the attached picture: the same brush strokes, light, colors and background.\n\nEdit the attached enemy portrait. Keep the creature's head, face, clay, clothes, the background, the light and the framing exactly as they are. Change only what is listed below.\n\n1. The creature must have only ONE arm. Remove its left arm — the arm on the right side of the picture — completely, together with the shoulder. On that side the outline of the torso runs from the neck straight down to the waist as one clean, smooth, polished slope of clay, as if an arm there was never planned. Where the arm was, show the background behind it.\n2. Its remaining arm — on the left side of the picture — has no hand. From the middle of the forearm the clay turns into a long jagged blade of pale grey stone, like a stone splinter pushed into the stump of the arm, clay flowing into stone. No wrist, no hand, no fingers, nothing held: the blade grows straight out of the forearm.\n\nNo text, no letters, no numbers, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 508,
+        "candidatesTokenCount": 1548,
+        "totalTokenCount": 2056,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 250
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0687,
+      "seconds": 10.7,
+      "status": "заменён: промежуточная правка — лишней руки нет, но кисть с ножом осталась и вылез второй клинок",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "2660c7147e9f01fe9cd965f3a1f95a232ec01f7292764c5ddf7f8171069b4837"
+    },
+    {
+      "file": "art/generated/portraits/ep-onearm__nb2-v5.jpg",
+      "category": "portraits",
+      "job": "ep-onearm",
+      "title": "Однорукий образец — рядовой, физ ДД ловкости (решение автора 27.09.2026)",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 10; правка art/generated/portraits/ep-onearm__nb2-v4.jpg",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T02:32:37+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/portraits/ep-onearm__nb2-v4.jpg"
+      ],
+      "prompt": "Keep the painterly style of the attached picture: the same brush strokes, light, colors and background.\n\nEdit the attached enemy portrait. Keep the creature's head, face, clay, clothes, the background, the light and the framing exactly as they are. Change only what is listed below.\n\n1. Remove the hand and all fingers of its only arm. The forearm ends right there, and the long stone blade that points to the lower right grows straight out of the end of the forearm, as its continuation: clay turns into pale grey stone where the hand was. The blade is part of the arm, it is not held.\n2. Remove the extra blade that sticks out to the left of the arm near the left edge of the picture: that part of the arm is plain clay, and there is only one blade.\n3. On the right side of the picture, where there is no arm, remove the rounded shoulder too: the line from the neck runs down to the waist as one smooth, flat, polished slope, no shoulder at all.\n\nNo text, no letters, no numbers, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 507,
+        "candidatesTokenCount": 1568,
+        "totalTokenCount": 2075,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 249
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0688,
+      "seconds": 10.8,
+      "status": "ждёт автора: без картинки-эталона в запросе; рука сама кончается лезвием, второе плечо заглажено",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "ea79c3f0ac81aa439ae01ec6d5cb90ae40ae26fbfe1fec1eaad3446c24fb73ff"
     }
   ]
 }

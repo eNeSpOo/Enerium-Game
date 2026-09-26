@@ -1,0 +1,110 @@
+{
+  "name": "Портреты врагов: ракурс — как у эталона автора (Безликий: по пояс, без ног), но задан словами. Картинку эталона к запросу не прикладываем: модель её перерисовывает. У каждого врага свои тело, глина, лицо, поза и место. По одному, с одобрения автора",
+  "models": [
+    "nb2"
+  ],
+  "style": "Painted dark-fantasy game art: visible confident brush strokes, simplified planar shapes, crisp rim light, deep shadows, light from below, dust in the light. A hand-painted digital illustration for a game card — not a 3D render, not a photo.",
+  "negative": "No legs, no full body. No text, no letters, no numbers, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+  "cutout_rule": "",
+  "categories": {
+    "portraits": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [],
+      "frame": "Enemy card portrait, 4:5. Camera at chest height, looking straight at the creature. The creature is centered; the bottom edge of the picture cuts the body at the waist: head, torso and arms in frame, no hips, no legs. The head sits in the upper third with a little space above it. What the creature is named after — its unfinished part — is clearly visible in front of the body. The creature is made entirely of clay, it is not a living person. Everything else — its body, clay, face, clothes, silhouette, pose, hands, gaze and background — is its own and is described below."
+    }
+  },
+  "jobs": [
+    {
+      "id": "ep-overdried",
+      "category": "portraits",
+      "title": "Пересохший образец — рядовой, дебаффер (предложение)",
+      "source": "новый враг вместо Долгорукого по решению автора 27.09.2026: Однорукий — физ ДД ловкости, нужен дебаффер",
+      "subject": "The creature: the Over-dried Sample, a rank-and-file debuffer of the Workshop of Forms. A clay figure left to dry too close to a forge and forgotten: its clay has turned pale grey-white, hard and brittle like a potsherd, covered from head to waist in a web of deep cracks, dry dust trickling out of them. A narrow, gaunt, barely sketched face, lips pulled tight by the dryness. One hand reaches toward the viewer, its fingers cracked down to a bone-white core, and thin cracks spread outward from its fingertips like frost across the air. Background: a cold, long-dead kiln of the Workshop behind it, cracked pottery shards on a shelf, a thin stream of sand, a few faint white-green crystals. Dry, brittle, unsettling."
+    },
+    {
+      "id": "ep-hollow",
+      "category": "portraits",
+      "title": "Пустотелый образец — рядовой, маг воздуха",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 7",
+      "subject": "The creature: the Hollow Sample. A thin clay shell; its chest is open like an empty mould with nothing inside but wind. Head thrown back, mouth open, thin arms spread; a whirl of sand and air pours out of its open chest and mouth."
+    },
+    {
+      "id": "ep-headless",
+      "category": "portraits",
+      "title": "Безголовый образец — рядовой, держит удар",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 8",
+      "subject": "The creature: the Headless Sample, a clay beast the size of a bull. Its front half close to the viewer: massive shoulders and forelegs; where the head should be, the neck ends in a flat smooth cut; lumps of clay on its back. Calm as a wall."
+    },
+    {
+      "id": "ep-raw",
+      "category": "portraits",
+      "title": "Сырой образец — рядовой, лекарь",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 9",
+      "subject": "The creature: the Raw Sample. Never dried — wet clay runs and drips down its body as if half-melted; a clay apron; clay drips from its palms as it pinches clay off its own shoulder to patch a crack. A kind face."
+    },
+    {
+      "id": "ep-onearm",
+      "category": "portraits",
+      "title": "Однорукий образец — рядовой, физ ДД ловкости (решение автора 27.09.2026)",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 10",
+      "subject": "The creature: the One-armed Sample, the fastest killer of the Workshop of Forms, sculpted in a hurry. A humanoid, not an animal. Dark rust-red terracotta clay, rough and dry, covered in quick finger drags and knife scrapes that nobody smoothed, with ragged seams where lumps were pressed on. A lean, sinewy, narrow body: a narrow waist, ribs pinched out with two fingers, a long neck; a few strips of rough cloth wound around the waist. The head is narrow, bald and long, thrust forward on the neck; the clay at the back of the skull is pulled back in one rough stroke into a short swept-back crest; no ears. The face is barely made: a sharp brow ridge and a sharp nose pinched out between two fingers, two thin eye slits and a thin hard mouth, each cut with a single knife stroke. Its only arm is the right one, and it has no hand: the forearm narrows and turns straight into a long jagged blade of pale grey stone, as long as the forearm — as if a splinter chipped off a rock was pushed into the stump of the arm, clay flowing into stone at the wrist; flint-like flake scars along the blade. No fingers, no grip, it is not holding anything. Its left side has no shoulder and no arm at all: the clay there is smoothed flat into one clean, polished slope from the neck down to the waist — the only smooth surface on its rough body, as if an arm there was never planned. Pose: the body faces the viewer almost frontally, so both sides are clearly visible — the blade arm and the smooth empty slope; it leans forward, low and coiled, head thrust forward, the blade arm drawn back and cocked, ready to slash — the instant before it darts. Gaze: the eye slits slide past the viewer, over the viewer's shoulder, toward someone far behind — it hunts for the weakest in the back row. Background: its own place in the Workshop — a narrow passage between tall columns of falling sand pouring from the dark vault to the floor; the nearest sand streams are torn and bent by its speed, a trail of dust behind it, small stone splinters in the air; the cold white-green glow of crystals in the floor cracks lights it from below. Palette: warm rust-red clay against cold white-green light and pale grey stone."
+    },
+    {
+      "id": "ep-apprentice",
+      "category": "portraits",
+      "title": "Подмастерье — элита, сила",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 12",
+      "subject": "The creature: the Apprentice, a servant of the Workshop. Stocky, an apron over a rough shirt; clay-covered forearms twice as thick as normal, fists like chopping blocks kneading a lump of clay; a simple, almost kind face with two pressed hollows for eyes."
+    },
+    {
+      "id": "ep-carver",
+      "category": "portraits",
+      "title": "Резчик — элита, ловкость",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 13",
+      "subject": "The creature: the Carver, a servant of the Workshop. Tall, thin, stooped; his apron is crossed with straps holding rows of chisels; instead of a right hand he has a fan of thin blades."
+    },
+    {
+      "id": "ep-prop",
+      "category": "portraits",
+      "title": "Упор — элита, держит удар",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 14",
+      "subject": "The creature: the Prop, a servant of the Workshop. Broad and squat, in an apron and wraps; he holds a stone slab carved with the sign of the Workshop — an hourglass mark — in front of him like a shield."
+    },
+    {
+      "id": "ep-bellows",
+      "category": "portraits",
+      "title": "Мех — элита, маг воздуха",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 15",
+      "subject": "The creature: the Bellows, a servant of the Workshop. Thin and sinewy; his chest is made of folds like forge bellows; nozzles on his shoulders trail dust; he squeezes his own chest with his hands."
+    },
+    {
+      "id": "ep-darner",
+      "category": "portraits",
+      "title": "Штопарь — элита, лекарь",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 16",
+      "subject": "The creature: the Darner, a servant of the Workshop. Long-armed, stooped, in an apron; one hand has long needles instead of fingers; spools of thread and a small pot of resin at his belt; he is threading a needle."
+    },
+    {
+      "id": "ep-remover",
+      "category": "portraits",
+      "title": "Съёмщик — элита, снимает силу",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 17",
+      "subject": "The creature: the Remover, a servant of the Workshop. A calm figure in a long apron holding up an empty mask — a face removed like a mould from finished work; more masks hang at his belt."
+    },
+    {
+      "id": "ep-first-sketch",
+      "category": "portraits",
+      "title": "Первый набросок — босс Мастерской",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 18",
+      "subject": "The creature: the First Sketch, the boss — huge and menacing, barely fitting the frame. Its left half is an elf, its right half a beast with a clay-furred shoulder and a clawed paw; instead of a face a smooth mask with two hollows; a small foreign hand is stuck to its side."
+    },
+    {
+      "id": "ep-master",
+      "category": "portraits",
+      "title": "Мастер — рунный страж Мастерской",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 19",
+      "subject": "The creature: the Master, the rune guardian. A tall elf of smooth, polished clay, long hair, a calm face with closed eyes; one hand raised palm forward — stop; a chisel of glowing white-green stone at his belt. The only finished one."
+    }
+  ]
+}
