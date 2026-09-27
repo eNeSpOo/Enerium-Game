@@ -1382,7 +1382,7 @@
       },
       "cost_usd": 0.0688,
       "seconds": 10.9,
-      "status": "эталон портрета врага — выбран автором 27.09.2026: по пояс, без ног",
+      "status": "основа — выбран автором 27.09.2026: Безликий образец, физ ДД силы (ADR-0013); он же эталон кадра врага",
       "px": [
         928,
         1152
@@ -3061,7 +3061,7 @@
       },
       "cost_usd": 0.0688,
       "seconds": 10.5,
-      "status": "заменён: полный рост — автор выбрал портретный ракурс, как у героев (ADR-0011)",
+      "status": "основа — выбран автором 27.09.2026: Безголовый образец, танк, выносливость (ADR-0013)",
       "px": [
         928,
         1152
@@ -3115,12 +3115,46 @@
       },
       "cost_usd": 0.0689,
       "seconds": 11.4,
-      "status": "заменён: полный рост — автор выбрал портретный ракурс, как у героев (ADR-0011)",
+      "status": "заменён отражённой копией ws-raw__nb2-mirror.jpg — её автор взял в основу",
       "px": [
         928,
         1152
       ],
       "sha256": "a2696f759d78560c626f01af5ca97abe6c1274adbec644704e66517c5b784473"
+    },
+    {
+      "file": "art/generated/enemies/ws-raw__nb2-mirror.jpg",
+      "category": "enemies",
+      "job": "ws-raw",
+      "title": "Сырой образец — рядовой, лекарь",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 9",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T03:14:25+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting.\n\nSubject: 'Raw Sample'. It was never dried: covered in drips as if half-melted in a sun that never shone there, wearing a clay apron, clay constantly dripping from its palms. It pinches clay off itself to patch the cracks of others. There is something kind about it.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {},
+      "cost_usd": 0,
+      "seconds": 0,
+      "status": "основа — выбран автором 27.09.2026: Сырой образец, лекарь, интеллект (ADR-0013); отражён по горизонтали по просьбе автора, без новой генерации",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "05bb3ce7ba70bc29d84056b96162d84317f2bca9344c066b94e14200dc4f8112",
+      "derived_from": "art/generated/enemies/ws-raw__nb2.jpg"
     },
     {
       "file": "art/generated/enemies/ws-onearm__nb2.jpg",
@@ -3169,7 +3203,7 @@
       },
       "cost_usd": 0.0688,
       "seconds": 11.1,
-      "status": "заменён: полный рост — автор выбрал портретный ракурс, как у героев (ADR-0011)",
+      "status": "основа — выбран автором 27.09.2026: Однорукий образец, физ ДД ловкости (ADR-0013)",
       "px": [
         928,
         1152
@@ -3980,7 +4014,7 @@
       },
       "cost_usd": 0.0691,
       "seconds": 11.9,
-      "status": "заменён: партия 4 — враги делаются по одному, у каждого свой портрет (ADR-0012)",
+      "status": "основа — выбран автором 27.09.2026: Долгорукий образец, дебаффер — интеллект, контроль (ADR-0013)",
       "px": [
         928,
         1152
@@ -4034,7 +4068,7 @@
       },
       "cost_usd": 0.0691,
       "seconds": 12.7,
-      "status": "заменён: партия 4 — враги делаются по одному, у каждого свой портрет (ADR-0012)",
+      "status": "основа — выбран автором 27.09.2026: Пустотелый образец, маг ДД, интеллект (ADR-0013)",
       "px": [
         928,
         1152
@@ -4896,7 +4930,7 @@
       },
       "cost_usd": 0.0687,
       "seconds": 9.5,
-      "status": "одобрен автором 27.09.2026 — Пересохший образец, рядовой дебаффер",
+      "status": "заменён: Пересохший не в основе — автор вернул Долгорукого дебаффером (ADR-0013)",
       "px": [
         928,
         1152
@@ -5340,7 +5374,7 @@
       },
       "cost_usd": 0.1424,
       "seconds": 17.5,
-      "status": "одобрен автором 27.09.2026 — Однорукий образец, рядовой физ ДД ловкости",
+      "status": "заменён: был одобрен, но в основу автор взял enemies/ws-onearm__nb2.jpg (ADR-0013)",
       "px": [
         928,
         1152
@@ -5387,7 +5421,7 @@
       },
       "cost_usd": 0.0688,
       "seconds": 9.4,
-      "status": "ждёт автора, вариант Nano Banana 2: грудь раскрыта, как пустая форма, такие же формы на полках; голова не запрокинута, свет в сепии без бело-зелёных кристаллов",
+      "status": "заменён: в основу автор взял enemies/wp-hollow__nb2.jpg (ADR-0013)",
       "px": [
         928,
         1152
@@ -5435,7 +5469,7 @@
       },
       "cost_usd": 0.1417,
       "seconds": 17.9,
-      "status": "ждёт автора, вариант Pro: голова запрокинута, вихрь вокруг тела, холодные кристаллы; грудь — скорее пролом, чем раскрытая форма",
+      "status": "заменён: в основу автор взял enemies/wp-hollow__nb2.jpg (ADR-0013)",
       "px": [
         928,
         1152
