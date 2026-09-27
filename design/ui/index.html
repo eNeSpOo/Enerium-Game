@@ -638,6 +638,20 @@ button.well:hover{border-color:var(--iron-3)}
 .kl-data td:first-child{width:34%;color:var(--gold-2)}
 @media (max-width:1100px){.kl-main{grid-template-columns:minmax(0,1fr)}.kl-det{position:static;max-height:none}.kl-eff{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:700px){.kl-mx{grid-template-columns:minmax(0,1fr)}.kl-mx .h,.kl-mx>span:first-child{display:none}.kl-top input{width:100%}}
+/* UI-кит · способности героя по доблести (ADR-0016): открытые — ярко, закрытые — с доблестью, на которой откроются */
+.kh-kit [data-set="Огонь"]{--c:var(--fire)}.kh-kit [data-set="Земля"]{--c:var(--earth)}.kh-kit [data-set="Воздух"]{--c:var(--air)}.kh-kit [data-set="Вода"]{--c:var(--water)}.kh-kit [data-set="Время"]{--c:var(--time)}.kh-kit [data-set="Свет"]{--c:var(--light)}.kh-kit [data-set="Тьма"]{--c:var(--dark)}.kh-kit [data-set="Без школы"]{--c:#b9c0c8}.kh-kit [data-set="Фарм"]{--c:var(--gold)}
+.kh-kit{display:flex;flex-direction:column;gap:4px}
+.kh-ab{appearance:none;display:grid;grid-template-columns:22px 20px minmax(0,1fr);align-items:center;gap:7px;padding:5px 9px 5px 6px;border-radius:8px;border:1px solid var(--iron);background:#0a0c0e;box-shadow:inset 2px 0 0 color-mix(in srgb,var(--c,#888) 60%,transparent);color:var(--parch);font:inherit;text-align:left;cursor:pointer}
+.kh-ab:hover{border-color:var(--iron-3)}
+.kh-ab .dv{font:600 16px/1 var(--f-d);color:var(--gold);text-align:center}
+.kh-ab .ti{display:grid;place-items:center;color:color-mix(in srgb,var(--c,#aaa) 80%,var(--parch))}
+.kh-ab .ti .i{width:16px;height:16px}
+.kh-ab .tx{display:flex;flex-direction:column;min-width:0}
+.kh-ab b{font:600 15px/1.1 var(--f-d);color:var(--parch)}
+.kh-ab small{font-size:11.5px;line-height:1.25;color:var(--parch-3)}
+.kh-ab.lock{opacity:.5}
+.kh-ab.lock .dv{color:var(--parch-3)}
+.kh-ab.ult{background:radial-gradient(120% 120% at 0% 50%,color-mix(in srgb,var(--c,#888) 18%,transparent),transparent 60%),#0a0c0e}
 /* анимации карты: применила способность — выросла; попала способность — вздрогнула */
 @keyframes cshake{0%,100%{translate:0 0;rotate:0deg}20%{translate:-3px 1px;rotate:-2deg}40%{translate:3px -1px;rotate:2deg}60%{translate:-2px 0;rotate:-1deg}80%{translate:2px 0;rotate:1deg}}
 @keyframes cgrow{0%{scale:1}35%{scale:1.14}100%{scale:1}}
@@ -3394,12 +3408,27 @@ function khDetail() {
     <span class="eyebrow">${setTxt}</span>
     <b class="serif" style="font-size:17px;color:var(--parch)">${S_.type === 'орден' && !(v >= 1 || KH.team) ? '???' : S_.name}</b>
     <span class="eyebrow">Роль в бою</span><p class="muted" style="font-size:13.5px">${h.role || ''}</p>
+    ${h.kit ? khKit(h, v) : ''}
     <span class="eyebrow">Обрывки · видны и при доблести 0</span><ul class="kh-frag">${h.frags.map(f => `<li>«${f}»</li>`).join('')}</ul>
     <span class="eyebrow">Главы по доблести</span>
     <div class="kh-val"><input type="range" min="0" max="${h.maxV}" value="${v}" data-kh="val" aria-label="Доблесть героя"><b class="num" style="color:var(--gold)">${v} / ${h.maxV}</b></div>
     ${chs}
     ${h.shards ? `<span class="eyebrow">Источник осколков</span><p class="muted" style="font-size:13px">${h.shards}</p>` : ''}
     ${KH.team && h.team.length ? `<div class="kh-team">${h.team.map(x => `<p>${x}</p>`).join('')}</div>` : ''}`;
+}
+/* способности героя по доблести: доблесть 0 — первая активная, каждая доблесть — новая, последняя — ульта (ADR-0016).
+   Описание берётся из библиотеки (abilities.js), нажатие ведёт в её раздел. */
+function khKit(h, v) {
+  const D = klData(), mul = (h.chPct / 10000).toFixed(2).replace('.', ',');
+  const rows = h.kit.map(x => {
+    const a = klFind(x.id) || { n: x.id, k: '', set: '', d: '' }, open = x.v <= v;
+    const what = x.slot === 'ult' ? 'ульта' : x.slot === 'pas' ? 'пассивка' : x.slot === 'react' ? 'реакция' : a.k === 'farm' ? 'фарм' : (D.kinds[a.k] || '').toLowerCase();
+    const tier = x.slot !== 'pas' && x.slot !== 'react' && a.tier && D.tiers[a.tier] ? ' · ' + D.tiers[a.tier].toLowerCase() : '';
+    const ch = x.chR ? ' · ' + String(x.chR / 100).replace('.', ',') + ' %' : '';
+    return `<button class="kh-ab ${x.slot === 'ult' ? 'ult' : ''} ${open ? '' : 'lock'}" data-kh="ab" data-v="${x.id}" data-set="${a.set}" title="${klEsc(a.d)}">`
+      + `<span class="dv">${x.v}</span><span class="ti">${ic(KL_IC[a.k] || 'gem')}</span><span class="tx"><b>${a.n}</b><small>${what}${tier}${ch}${open ? '' : ' · откроется на доблести ' + x.v}</small></span></button>`;
+  }).join('');
+  return `<span class="eyebrow">Способности по доблести · шанс × ${mul}</span><div class="kh-kit">${rows}</div>`;
 }
 function khSetBox(S_) {
   const ms = khData().heroes.filter(h => h.set === S_.no), open = S_.type === 'братство';
@@ -3445,6 +3474,7 @@ function bindKitHeroes() {
     if (a === 'tab') { KH.tab = v; khPaint(); }
     else if (a === 'sel') { KH.sel = v; KH.valor = null; khPaint(); }
     else if (a === 'mem') { KH.sel = v; KH.valor = null; KH.tab = 'heroes'; KH.set = String(khHero(v).set); khPaint(); }
+    else if (a === 'ab') klJump(v);
   });
   root.addEventListener('change', e => {
     const t = e.target, a = t.dataset && t.dataset.kh; if (!a || !t.closest('#kitHeroes')) return;
@@ -3548,6 +3578,14 @@ function klSelect(id) {
   document.querySelectorAll('#kitLib .kl-tile').forEach(t => t.setAttribute('aria-pressed', String(t.dataset.v === id)));
   const d = document.getElementById('klDet'); if (!d) return;
   const a = klFind(id); d.dataset.set = a ? a.set : ''; d.innerHTML = klDetail(); d.scrollTop = 0;
+}
+/* переход из карточки героя: набор способности, сама способность выбрана и видна в списке */
+function klJump(id) {
+  const a = klFind(id); if (!a) return;
+  Object.assign(KL, { set: a.set, kind: '', tier: '', type: '', q: '', sel: id }); klPaint();
+  const box = document.getElementById('kitLib'), body = box && box.querySelector('.kl-body'), tile = box && box.querySelector(`.kl-tile[data-v="${id}"]`);
+  if (body && tile) body.scrollTop += tile.getBoundingClientRect().top - body.getBoundingClientRect().top - 40;
+  if (box) box.closest('.k-box').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 function bindKitLib() {
   const root = document.getElementById('kitGrid'); if (!root) return;
