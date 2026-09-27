@@ -2,6 +2,7 @@
 
 Что куда идёт — в ui-art.json рядом: путь в прототипе → картинка из art/generated/.
 Картинки сжимаются до размера для экрана телефона, исходники не трогаются.
+mirror: true — отразить по горизонтали: на карте герой смотрит вправо, на врагов, а враг — влево, на героев.
 
   python tools/art-gen/export_ui.py
 """
@@ -9,7 +10,7 @@ import json
 import pathlib
 import sys
 
-from PIL import Image
+from PIL import Image, ImageOps
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SPEC = pathlib.Path(__file__).with_name("ui-art.json")
@@ -26,12 +27,14 @@ def main():
         size = tuple(src.get("size", spec["size"]))
         with Image.open(ROOT / "art/generated" / src["from"]) as im:
             pic = im.convert("RGB").resize(size, Image.LANCZOS)
+        if src.get("mirror"):
+            pic = ImageOps.mirror(pic)
         path = out / dst
         path.parent.mkdir(parents=True, exist_ok=True)
         pic.save(path, "JPEG", quality=86, optimize=True, progressive=True)
         kb = path.stat().st_size // 1024
         total += kb
-        print(f"{dst:22} ← {src['from']}  {size[0]}×{size[1]}, {kb} КБ")
+        print(f"{dst:22} ← {src['from']}  {size[0]}×{size[1]}{', отражён' if src.get('mirror') else ''}, {kb} КБ")
     print(f"Итого {len(spec['items'])} картинок, {total} КБ → {spec['out']}")
 
 

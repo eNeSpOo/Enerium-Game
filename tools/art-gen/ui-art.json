@@ -1,27 +1,63 @@
 {
-  "note": "Какой арт из art/generated/ идёт в прототип design/ui/. Враги — ADR-0013, отряд — герои сета 1 «Хранители Песочных Часов», арена — вторая раскладка. Выгрузка: python tools/art-gen/export_ui.py",
+  "note": "Какой арт из art/generated/ идёт в прототип design/ui/. Враги — ADR-0013, отряд — герои сета 1 «Хранители Песочных Часов», арена — вторая раскладка. mirror — отражение: герой на карте смотрит вправо, враг — влево (решение автора 27.09.2026). Выгрузка: python tools/art-gen/export_ui.py",
   "out": "design/ui/assets/art",
-  "size": [464, 576],
+  "size": [
+    464,
+    576
+  ],
   "items": {
     "foes/o1.jpg": "enemies/foe-faceless__nb2.jpg",
     "foes/o2.jpg": "enemies/wp-longarm__nb2.jpg",
-    "foes/o3.jpg": "enemies/wp-hollow__nb2.jpg",
-    "foes/o4.jpg": "enemies/ws-headless__nb2.jpg",
+    "foes/o3.jpg": {
+      "from": "enemies/wp-hollow__nb2.jpg",
+      "mirror": true
+    },
+    "foes/o4.jpg": {
+      "from": "enemies/ws-headless__nb2.jpg",
+      "mirror": true
+    },
     "foes/o5.jpg": "enemies/ws-raw__nb2-mirror.jpg",
     "foes/o6.jpg": "enemies/ws-onearm__nb2.jpg",
     "foes/e1.jpg": "enemies/ws-apprentice__nb2.jpg",
     "foes/e2.jpg": "enemies/ws-carver__nb2.jpg",
-    "foes/e3.jpg": "enemies/ws-prop__nb2-v4.jpg",
-    "foes/e4.jpg": "enemies/ws-bellows__nb2-v2.jpg",
-    "foes/e5.jpg": "enemies/ws-darner__nb2.jpg",
+    "foes/e3.jpg": {
+      "from": "enemies/ws-prop__nb2-v4.jpg",
+      "mirror": true
+    },
+    "foes/e4.jpg": {
+      "from": "enemies/ws-bellows__nb2-v2.jpg",
+      "mirror": true
+    },
+    "foes/e5.jpg": {
+      "from": "enemies/ws-darner__nb2.jpg",
+      "mirror": true
+    },
     "foes/e6.jpg": "enemies/ws-remover__nb2-v2.jpg",
     "foes/b1.jpg": "enemies/wp-first-sketch__nb2.jpg",
     "foes/g1.jpg": "enemies/ws-master__nb2.jpg",
-    "heroes/h1.jpg": "heroes/hero-garth__nb2.jpg",
-    "heroes/h2.jpg": "heroes/hero-hravn__nb2.jpg",
-    "heroes/h3.jpg": "heroes/hero-laeira__nb2.jpg",
-    "heroes/h4.jpg": "heroes/hero-ilmerra__nb2.jpg",
+    "heroes/h1.jpg": {
+      "from": "heroes/hero-garth__nb2.jpg",
+      "mirror": true
+    },
+    "heroes/h2.jpg": {
+      "from": "heroes/hero-hravn__nb2.jpg",
+      "mirror": true
+    },
+    "heroes/h3.jpg": {
+      "from": "heroes/hero-laeira__nb2.jpg",
+      "mirror": true
+    },
+    "heroes/h4.jpg": {
+      "from": "heroes/hero-ilmerra__nb2.jpg",
+      "mirror": true
+    },
     "heroes/h5.jpg": "heroes/hero-mirt__nb2.jpg",
-    "arena-workshop.jpg": { "from": "arenas/arena-workshop-wide__nb2-v2.jpg", "size": [1688, 716] }
+    "arena-workshop.jpg": {
+      "from": "arenas/arena-workshop-wide__nb2-v2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    }
   }
 }
