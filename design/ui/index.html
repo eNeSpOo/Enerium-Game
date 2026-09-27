@@ -1370,6 +1370,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <script src="recipes.js"></script>
 <script src="heroes.js"></script>
 <script src="abilities.js"></script>
+<script src="kits.js"></script>
 <script>
 'use strict';
 /* Все числа ниже — демонстрационные фикстуры: взяты из текущего UIKit
@@ -1403,7 +1404,8 @@ const GRADE = { 1: '×2', 2: '×1,5', 3: '×1,25' };
 const CLS_ICON = { 'Танк': 'shield', 'Физ. ДД': 'sword', 'Маг. ДД': 'staff', 'Хилер': 'heal', 'Контроль': 'chain' };
 
 const EB = window.EnBattle;
-/* способность героя берётся из общей библиотеки ядра: цена, описание и школа — из одного места */
+/* Прежняя библиотека ядра — для модели темпа. В модели «10 раундов» герой прототипа берёт набор из распределения: поле draft —
+   его черновик в docs/content/герои/, набор — kits.js (ADR-0016), способности — abilities.js (ADR-0015). */
 const AB = n => ({ n, c: EB.LIB[n].price, d: EB.LIB[n].d, school: EB.LIB[n].school });
 function initialState() {
   return {
@@ -1413,19 +1415,19 @@ function initialState() {
     acc: { level: 24, xp: 7289, next: 11758, cycle: 2 },
     week: { race: 'Эльфов', next: 'Зверей', left: 3 * 86400 + 5 * 3600 + 12 * 60 },
     heroes: [
-      { id: 'h1', name: 'Гарт Нишевой', cls: 'Танк', el: 'Земля', race: 'Дворфы', r: 1, cycle: 1, img: AV('heroes/h1.jpg'), lvl: 42, cap: 50, lim: 0, valor: 1, maxV: 3, bm: 26840, st: [128, 54, 72, 246, 62], gr: [2, 3, 3, 1, 3],
+      { id: 'h1', name: 'Гарт Нишевой', cls: 'Танк', el: 'Земля', race: 'Дворфы', draft: 'h01_2', r: 4, cycle: 1, img: AV('heroes/h1.jpg'), lvl: 42, cap: 50, lim: 0, valor: 2, maxV: 4, bm: 26840, st: [128, 54, 72, 246, 62], gr: [2, 3, 3, 1, 3],
         ab: ['Вызов', 'Удар щитом', 'Осыпание'].map(AB),
         pas: [{ n: 'Несгибаемость', t: 'боевая', d: 'Щит, когда здоровье ниже половины.' }, { n: 'Трофейщик', t: 'фарм', d: 'Больше золота с элит.' }], ult: null, busy: null, },
-      { id: 'h2', name: 'Хравн Сборщик', cls: 'Физ. ДД ловкости', fx: 'melee', el: 'Огонь', race: 'Люди', r: 1, cycle: 1, img: AV('heroes/h2.jpg'), lvl: 50, cap: 50, lim: 0, valor: 0, maxV: 1, bm: 25920, st: [128, 54, 245, 72, 62], gr: [2, 3, 1, 3, 3],
+      { id: 'h2', name: 'Хравн Сборщик', cls: 'Физ. ДД ловкости', fx: 'melee', el: 'Огонь', race: 'Люди', draft: 'h01_3', r: 4, cycle: 1, img: AV('heroes/h2.jpg'), lvl: 50, cap: 50, lim: 0, valor: 1, maxV: 3, bm: 25920, st: [128, 54, 245, 72, 62], gr: [2, 3, 1, 3, 3],
         ab: ['Горение', 'Быстрый выпад', 'Погребальный костёр'].map(AB),
         pas: [{ n: 'Точность', t: 'боевая', d: 'Выше шанс крита.' }, { n: 'Охотник', t: 'фарм', d: 'Больше духа с рядовых.' }], ult: null, busy: null, },
-      { id: 'h3', name: 'Лаэйра', cls: 'Маг. ДД', el: 'Время', race: 'Эльфы', r: 1, cycle: 1, img: AV('heroes/h3.jpg'), lvl: 118, cap: 150, lim: 1, valor: 2, maxV: 5, bm: 24200, st: [72, 246, 54, 62, 128], gr: [3, 1, 3, 3, 2],
+      { id: 'h3', name: 'Лаэйра', cls: 'Маг. ДД', el: 'Время', race: 'Эльфы', draft: 'h01_5', r: 2, cycle: 1, img: AV('heroes/h3.jpg'), lvl: 118, cap: 150, lim: 1, valor: 2, maxV: 2, bm: 24200, st: [72, 246, 54, 62, 128], gr: [3, 1, 3, 3, 2],
         ab: ['Разряд', 'Остановка'].map(AB),
         pas: [{ n: 'Средоточие', t: 'боевая', d: 'Каждая третья способность сильнее.' }, { n: 'Знаток', t: 'фарм', d: 'Чаще падают базовые ресурсы.' }], ult: { n: 'Испепеление', at: 5, d: 'Откроется на доблести 5.' }, busy: null, },
-      { id: 'h4', name: 'Ильмерра', cls: 'Хилер', el: 'Воздух', race: 'Эльфы', r: 1, cycle: 1, img: AV('heroes/h4.jpg'), lvl: 46, cap: 50, lim: 0, valor: 1, maxV: 2, bm: 22140, st: [62, 246, 54, 128, 72], gr: [3, 1, 3, 2, 3],
+      { id: 'h4', name: 'Ильмерра', cls: 'Хилер', el: 'Воздух', race: 'Эльфы', draft: 'h01_1', r: 5, cycle: 1, img: AV('heroes/h4.jpg'), lvl: 46, cap: 50, lim: 0, valor: 1, maxV: 3, bm: 22140, st: [62, 246, 54, 128, 72], gr: [3, 1, 3, 2, 3],
         ab: ['Живая вода', 'Лёгкая поступь', 'Оберег'].map(AB),
         pas: [{ n: 'Отклик', t: 'боевая', d: 'Крит лечения даёт щит.' }, { n: 'Собиратель трав', t: 'фарм', d: 'Больше ресурсов алхимии.' }], ult: null, busy: null, },
-      { id: 'h5', name: 'Мирт Переписчик', cls: 'Контроль', el: 'Вода', race: 'Люди', r: 1, cycle: 1, img: AV('heroes/h5.jpg'), lvl: 35, cap: 50, lim: 0, valor: 2, maxV: 2, bm: 19750, st: [62, 246, 54, 128, 72], gr: [3, 1, 3, 2, 3],
+      { id: 'h5', name: 'Мирт Переписчик', cls: 'Контроль', el: 'Вода', race: 'Люди', draft: 'h01_4', r: 3, cycle: 1, img: AV('heroes/h5.jpg'), lvl: 35, cap: 50, lim: 0, valor: 3, maxV: 3, bm: 19750, st: [62, 246, 54, 128, 72], gr: [3, 1, 3, 2, 3],
         ab: ['Оковы', 'Стужа', 'Ослабление'].map(AB),
         pas: [{ n: 'Тень', t: 'боевая', d: 'Дебафы держатся на раунд дольше.' }, { n: 'Дознаватель', t: 'фарм', d: 'Выше шанс ключа с элит.' }], ult: { n: 'Ледяные оковы', at: 2, d: 'лёд сковывает всех врагов на 2 раунда, у рунных и старших боссов — иммунитет по рангу.' }, busy: null, },
     ],
@@ -1782,9 +1784,14 @@ function figBtn(f, seal) {
    сценарий идёт в реальном времени сервера. */
 const SLOT = { 1: [[1, 1]], 2: [[1, .5], [1, 1.5]], 3: [[1, 1], [1, 0], [1, 2]], 4: [[1, 1], [1, 0], [1, 2], [0, 1]], 5: [[1, 1], [1, 0], [1, 2], [0, .5], [0, 1.5]] };
 const SCHOOL_C = { 'Огонь': 'var(--fire)', 'Земля': 'var(--earth)', 'Воздух': 'var(--air)', 'Вода': 'var(--water)', 'Свет': 'var(--light)', 'Тьма': 'var(--dark)', 'Время': 'var(--time)' };
-const ST_ICON = { stun: ['chain', 'Оглушение: пропускает ходы'], silence: ['lock', 'Безмолвие: без способностей'], stop: ['hour', 'Остановка: не копит атаки'], weak: ['down', 'Ослабление: меньше урона'], mark: ['target', 'Метка: получает больше урона'], pierce: ['crack', 'Пробитие: ниже физ. защита'] };
+const ST_ICON = { stun: ['chain', 'Оглушение: пропускает ходы'], silence: ['lock', 'Безмолвие: без способностей'], stop: ['hour', 'Остановка: ходит последней, ульта не срабатывает'], weak: ['down', 'Ослабление: меньше урона'], mark: ['target', 'Метка: получает больше урона'], pierce: ['crack', 'Осыпание: ниже физ. защита'],
+  paralyze: ['chain', 'Паралич: без обычной атаки'], freeze: ['drop', 'Заморозка: пропускает ходы, лёд спадает от крупного удара'], terror: ['skull', 'Ужас: не действует, спадает от удара'], knock: ['wave', 'Сброс: пропускает ход, угроза обнулена'], blind: ['eye', 'Ослепление: удары мимо'],
+  slow: ['hour', 'Стужа: ходит позже'], miss: ['eye', 'Слепота: чаще промахивается'], rend: ['crack', 'Засветка: ниже маг. защита'], chanceDown: ['down', 'Истечение: реже способности'], break: ['crack', 'Слом строя: слабее криты, реже уклоняется'],
+  dmgUp: ['up', 'Жар: больше урона'], guard: ['shield', 'Каменная кожа: меньше получаемого урона'], evade: ['ff', 'Попутный ветер: выше уклонение'], lifesteal: ['drop', 'Кровожадность: вампиризм'], healTaken: ['heal', 'Живая вода: больше получаемого лечения'], defUp: ['shield', 'Освящение: выше защита'], chanceUp: ['up', 'Ускорение: чаще способности'], critUp: ['star', 'Боевой дух: чаще криты'] };
 const DOT_ICON = { 'Огонь': 'flame', 'Земля': 'drop', 'Воздух': 'cut', 'Тьма': 'skull', 'Вода': 'drop', 'Время': 'hour', 'Свет': 'spark', 'класс': 'flame' };
-const CTL = ['stun', 'silence', 'stop'];
+const CTL = ['stun', 'silence', 'stop', 'paralyze', 'freeze', 'terror', 'knock', 'blind'];
+const GOOD_ST = EB.GOOD_ST || [];   // баффы — среди полезных эффектов, слева
+const SKIP_TXT = { stun: 'оглушён', freeze: 'во льду', terror: 'в ужасе', knock: 'сбит с ног', paralyze: 'парализован' };
 const CLS_OF = { 'Физ. ДД силы': 'Физ. ДД', 'Физ. ДД ловкости': 'Физ. ДД', 'Лекарь': 'Хилер', 'Дебаффер': 'Контроль', 'Босс': 'Танк', 'Страж': 'Танк' };
 const unitKnown = u => u.side === 0 || known(u.id);
 const uName = u => unitKnown(u) ? u.name : 'Неизвестный';
@@ -1793,8 +1800,32 @@ const unitPos = u => u.side === 0 ? '50% 18%' : FPOS(F(u.id));
 const runById = id => S.runs.find(r => r.id === id);
 const focusRun = () => runById(S.focus);
 const abIcon = ab => ab.kind === 'dmg' ? (ab.tgt === 'all' ? 'wave' : ab.stat === 'int' ? 'staff' : 'sword') : ab.kind === 'heal' || ab.kind === 'hot' ? 'heal' : ab.kind === 'shield' ? 'shield' : ab.kind === 'taunt' ? 'target'
-  : ab.kind === 'ctrl' || ab.kind === 'debuff' ? (ST_ICON[ab.st] || ['down'])[0] : ab.kind === 'dot' ? DOT_ICON[ab.school] || 'flame' : ab.kind === 'dispel' ? 'crack' : 'spark';
+  : ab.kind === 'ctrl' || ab.kind === 'debuff' || ab.kind === 'buff' ? (ST_ICON[ab.st] || ['down'])[0] : ab.kind === 'dot' ? DOT_ICON[ab.school] || 'flame' : ab.kind === 'dispel' ? 'crack'
+  : ab.kind === 'passive' ? 'gem' : ab.kind === 'reaction' ? 'swap' : 'spark';
 const si = (icon, n, p, cls, title, color) => `<span class="si ${cls}" style="--p:${p}${color ? ';--rc:' + color : ''}" title="${title}">${ic(icon)}${n ? `<b>${n}</b>` : ''}</span>`;
+/* Набор героя из распределения (ADR-0016): способности по доблести и доли хода по редкости. Закрытые отдают свою долю обычной атаке. */
+const heroKit = h => h.draft && window.EN_KITS && EN_KITS.heroes[h.draft] || null;
+function heroKitHtml(h) {
+  const K = heroKit(h), L = EB.lib(), acts = K.kit.filter(x => x.slot === 'act' && L[x.id]), ults = K.kit.filter(x => x.slot === 'ult');
+  const w = acts.reduce((a, x) => a + L[x.id].ch, 0);
+  const share = x => x.slot === 'act' && L[x.id] ? Math.floor(K.actPct * L[x.id].ch / w) : x.slot === 'ult' ? Math.floor(K.ultPct / ults.length) : 0;
+  const basic = 10000 - K.kit.filter(x => x.v <= h.valor).reduce((a, x) => a + share(x), 0);
+  const rows = K.kit.map(x => {
+    const a = L[x.id] || { n: x.id, d: '' }, on = x.v <= h.valor, s = share(x);
+    const what = x.slot === 'ult' ? 'Ульта' : x.slot === 'pas' ? 'Пассивка' : x.slot === 'react' ? 'Реакция' : '';
+    return `<div class="ab ${on ? '' : 'lock'}"><span class="h">${ic(on ? (x.slot === 'ult' ? 'crown' : abIcon(a)) : 'lock')}</span><span class="n">${x.v}</span>`
+      + `<span><b>${schoolMark(a.school)}${a.n}</b><small>${what ? what + ' · ' : ''}${a.d}</small></span>`
+      + `<span class="chip ${x.slot === 'ult' && on ? 'spirit' : ''}" title="${on ? 'Доля хода' : 'Откроется на доблести ' + x.v}">${on ? (s ? pctBp(s) : 'всегда') : 'доблесть ' + x.v}</span></div>`;
+  }).join('');
+  return `<div class="hd-cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)">
+    <div class="col scroll" style="gap:6px"><span class="eyebrow">Способности по доблести · доля хода</span>
+      <div class="rot-list">${rows}<div class="ab"><span class="h">${ic('sword')}</span><span class="n">—</span><span><b>Обычная атака</b><small>Если ни одна способность не сработала.</small></span><span class="chip">${pctBp(basic)}</span></div></div>
+      <span class="reason">Число слева — доблесть, на которой способность открывается; последняя — ульта (ADR-0016). Кристалл у названия — школа. В свой ход герой бросает шанс по долям хода.</span></div>
+    <div class="col" style="gap:6px"><span class="eyebrow">Доли хода · ${K.rarity}</span>
+      <div class="pnl pad" style="background:#0e1114;display:flex;flex-direction:column;gap:4px"><span>Способности — <b class="num">${pctBp(K.actPct)}</b>, ульта — <b class="num">${pctBp(K.ultPct)}</b></span>
+      <small class="faint">Редкость задаёт, как часто срабатывают способности и ульта: у обычного героя — 29 % и 1 %, у вневременного — 50 % и 10 %. Активные делят долю по весу, закрытые доблестью отдают свою часть обычной атаке.</small></div></div>
+  </div>`;
+}
 function statusHtml(u, d, rounds) {
   const good = [], bad = [], per = rounds ? 'в каждый ход носителя' : 'в каждую атаку носителя', word = rounds ? roundWord : atkWord;
   if (d.sh > 0 && !d.dead) good.push(si('shield', '', 100, 'good', `Щит: ${fmt(d.sh)}, тратится первым`));
@@ -1802,7 +1833,7 @@ function statusHtml(u, d, rounds) {
     const p = x.left0 ? Math.max(8, Math.round(x.left * 100 / x.left0)) : 100;
     if (x.k === 'hot') good.push(si('heal', x.stacks > 1 ? x.stacks : '', p, 'good', `${x.school}: +${fmt(x.per * x.stacks)} здоровья ${per} · ещё ${x.left} ${word(x.left)}`));
     else if (x.k === 'dot') bad.push(si(DOT_ICON[x.school] || 'flame', x.stacks, p, 'bad', `${x.school}: ${fmt(x.per * x.stacks)} урона ${per} · стаков ${x.stacks} · ещё ${x.left} ${word(x.left)}`, SCHOOL_C[x.school]));
-    else if (ST_ICON[x.k]) bad.push(si(ST_ICON[x.k][0], x.left, p, 'bad', `${rounds && x.k === 'stop' ? 'Остановка: ходит последней в раунде' : ST_ICON[x.k][1]} · ещё ${x.left} ${word(x.left)}`));
+    else if (ST_ICON[x.k]) { const g = GOOD_ST.includes(x.k); (g ? good : bad).push(si(ST_ICON[x.k][0], x.left, p, g ? 'good' : 'bad', `${ST_ICON[x.k][1]} · ещё ${x.left} ${word(x.left)}`)); }
   }
   return [good.join(''), bad.join('')];
 }
@@ -1829,15 +1860,15 @@ function rotHtml(u) {
 function legendHtml(mode) {
   const seg = (k, on, u) => `<span class="rot"><span class="seg ${u ? 'u' : ''}">${Array.from({ length: k }, (_, i) => `<i class="${i < on ? 'on' : ''}"></i>`).join('')}</span></span>`;
   if (mode === 'rounds') return `<span class="h">Индикаторы карты · 10 раундов</span>
-    <span class="ex"><span class="rot"><span class="ch" style="--sc:var(--earth)">${ic('target')}<b>20</b></span><span class="ch on" style="--sc:var(--earth)">${ic('crack')}<b>20</b></span><span class="ch u" style="--sc:var(--gold)">${ic('crown')}<b>8</b></span></span></span><span>Способности и ульта с шансом в процентах: столько раз из ста карта применит её в свой ход. Иначе — обычная атака. Сработавшая светится.</span>
+    <span class="ex"><span class="rot"><span class="ch" style="--sc:var(--earth)">${ic('target')}<b>20</b></span><span class="ch on" style="--sc:var(--earth)">${ic('crack')}<b>20</b></span><span class="ch u" style="--sc:var(--gold)">${ic('crown')}<b>8</b></span></span></span><span>Способности и ульта с долей хода в процентах: столько раз из ста карта применит её в свой ход. Иначе — обычная атака. Доли задаёт редкость героя или ранг врага (ADR-0016). Сработавшая светится.</span>
     <span class="ex"><span class="bt-queue static"><i class="done"></i><i class="now"></i><i class="f"></i><i></i></span></span><span>Сверху — очередь раунда по скорости: золотом — кто ходит, бледные — уже сходили, красная рамка — враги.</span>
     <span class="ex">${ic('hour')}<b class="num">3 / 10</b></span><span>Раунд боя. Каждая карта ходит раз за раунд. После десятого раунда — «Время скоротечно…»: этаж не взят, урон по боссу идёт в осаду.</span>
     <span class="ex"><span class="frame"></span></span><span>Красная рамка — в карту целятся противники, ×N — сколько.</span>
     <span class="h">Эффекты</span>
     <span class="ex">${si('heal', 2, 70, 'good', '')}${si('shield', '', 100, 'good', '')}</span><span>Слева вверху — полезные: лечение со временем, щит.</span>
-    <span class="ex">${si('flame', 3, 60, 'bad', '', 'var(--fire)')}${si('down', 2, 40, 'bad', '')}</span><span>Справа вверху — вредные: урон со временем в цвете школы, ослабление, метка, пробитие.</span>
-    <span class="ex">${si('hour', 2, 45, 'bad', '')}</span><span>Кольцо тает — столько раундов осталось. Остановка — карта ходит последней в раунде.</span>
-    <span class="ex big">${ic('chain')}</span><span>Контроль — крупный знак поверх портрета: оглушение — пропуск хода, безмолвие — только обычная атака.</span>`;
+    <span class="ex">${si('flame', 3, 60, 'bad', '', 'var(--fire)')}${si('down', 2, 40, 'bad', '')}</span><span>Справа вверху — вредные: урон со временем в цвете школы, дебаффы — осыпание, стужа, метка, ослабление. Баффы — слева, среди полезных.</span>
+    <span class="ex">${si('hour', 2, 45, 'bad', '')}</span><span>Кольцо тает — столько раундов осталось.</span>
+    <span class="ex big">${ic('chain')}</span><span>Контроль — крупный знак поверх портрета: оглушение, заморозка, ужас и сброс — пропуск хода; паралич — без обычной атаки; безмолвие — только обычная атака; ослепление — удары мимо; остановка — ход последним, без ульты.</span>`;
   return `<span class="h">Индикаторы карты</span>
     <span class="ex">${ic('sword')}${seg(3, 2)}</span><span>Значок — какая способность следующая, сегменты — сколько атак до неё.</span>
     <span class="ex"><span class="rot"><span class="ult"><i class="on"></i><i class="on"></i><i></i><b>${ic('crown')}</b></span></span></span><span>Три ромба — применённые способности. После третьей копится ульта: бирюзовые сегменты, корона светится — ульта готова.</span>
@@ -1958,6 +1989,8 @@ function heroDetail(h) {
         </div>
       </div>
     </div>`;
+  } else if (t === 'skills' && heroKit(h)) {
+    body = heroKitHtml(h);
   } else if (t === 'skills') {
     body = `<div class="hd-cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)">
       <div class="col scroll" style="gap:6px"><span class="eyebrow">Способности · шанс в свой ход</span>
@@ -2978,6 +3011,7 @@ function playAction(R, a) {
         case 'status': if (el(e.t)) { if (e.st === 'dot') fx.dot(el(e.t), e.school); else if (e.st === 'hot') fx.hot(el(e.t)); else if (CTL.includes(e.st)) fx.ctrl(el(e.t), e.st); else fx.debuff(el(e.t), e.st); } break;
         case 'resist': el(e.t) && fx.resist(el(e.t), e.st); flyAt(R, e.t, 'иммунитет', 'info'); break;
         case 'dispel': el(e.t) && fx.dispel(el(e.t)); break;
+        case 'unstatus': flyAt(R, e.t, e.st === 'freeze' ? 'лёд спал' : 'очнулся', 'info'); break;
         case 'die': el(e.t) && fx.death(el(e.t)); feed(R, `<span class="bd">✝</span> <b>${uName(e.t)}</b>`); break;
       }
     }
@@ -2985,7 +3019,7 @@ function playAction(R, a) {
     paintCards(R);
   };
   setTimeout(impact, T(a.dur * .9));   // страховка: к концу действия его итог показан всегда
-  if (a.kind === 'skip') { fx.ctrl(actor, 'stun'); flyAt(R, a.s, 'оглушён', 'info'); impact(); return; }
+  if (a.kind === 'skip') { fx.ctrl(actor, a.st || 'stun'); flyAt(R, a.s, SKIP_TXT[a.st] || 'оглушён', 'info'); impact(); return; }
   if (a.kind === 'attack') {
     const t = sw && el(sw.t);
     if (!t) return impact();
@@ -3062,7 +3096,7 @@ function stText(x, rounds) {
   const per = rounds ? 'в каждый ход' : 'в каждую атаку', word = rounds ? roundWord : atkWord;
   if (x.k === 'dot') return `<span>${x.school}: ${fmt(x.per * x.stacks)} урона ${per} · стаков ${x.stacks} · ещё ${x.left} ${word(x.left)}</span>`;
   if (x.k === 'hot') return `<span style="color:#9ff0c0">${x.school}: +${fmt(x.per * x.stacks)} здоровья ${per} · ещё ${x.left} ${word(x.left)}</span>`;
-  const n = { stun: 'Оглушение: пропускает ход', silence: rounds ? 'Безмолвие: только обычная атака' : 'Безмолвие: без способностей', stop: rounds ? 'Остановка: ходит последней в раунде' : 'Остановка: не копит атаки', weak: `Ослабление: −${x.pow / 100}% урона`, mark: `Метка: +${x.pow / 100}% получаемого урона`, pierce: `Пробитие: −${x.pow / 100}% физ. защиты` }[x.k];
+  const n = { stun: 'Оглушение: пропускает ход', silence: rounds ? 'Безмолвие: только обычная атака' : 'Безмолвие: без способностей', stop: rounds ? 'Остановка: ходит последней в раунде, ульта не срабатывает' : 'Остановка: не копит атаки', weak: `Ослабление: −${x.pow / 100}% урона`, mark: `Метка: +${x.pow / 100}% получаемого урона`, pierce: `Осыпание: −${x.pow / 100}% физ. защиты`, paralyze: 'Паралич: без обычной атаки', freeze: 'Заморозка: пропускает ход, лёд спадает от крупного удара', terror: 'Ужас: не действует, спадает от удара', knock: 'Сброс: пропускает ход', blind: 'Ослепление: удары мимо', slow: `Стужа: −${x.pow / 100}% скорости`, miss: `Слепота: +${x.pow / 100}% промахов`, rend: `Засветка: −${x.pow / 100}% маг. защиты`, chanceDown: 'Истечение: реже способности', break: 'Слом строя: слабее криты, реже уклоняется', dmgUp: `Жар: +${x.pow / 100}% урона`, guard: `Каменная кожа: −${x.pow / 100}% получаемого урона`, evade: `Уклонение +${x.pow / 100}%`, lifesteal: `Вампиризм ${x.pow / 100}%`, healTaken: `Лечение по нему +${x.pow / 100}%`, defUp: `Защита +${x.pow / 100}%`, chanceUp: 'Ускорение: чаще способности', critUp: `Крит +${x.pow / 100}%` }[x.k];
   return n ? `<span>${n} · ещё ${x.left} ${word(x.left)}</span>` : '';
 }
 function paintInsp(R) {
@@ -3353,8 +3387,8 @@ function kitCards() {
 }
 /* та же карта в модели «10 раундов»: шансы из таблицы ядра, длительности в раундах */
 function kitCardsRounds() {
-  const A = n => Object.assign({ n }, EB.LIB[n]);
-  const T = (abs, ult) => EB.chanceTable({ abs: abs.map(A), ult: ult ? A(ult) : null });
+  const K = window.EN_KITS || { heroes: {}, foes: {} };
+  const T = (kit, valor) => kit ? EB.chanceTable({ kit, valor }) : [];
   const card = (u, d, cls, left, fired) => {
     const [good, bad] = statusHtml(u, d, true), ctl = u.st.find(x => CTL.includes(x.k));
     return `<div class="bc ${u.side ? 'foe' : ''} ${cls} ${ctl ? 'ctl-on' + (ctl.k === 'stun' ? ' ctl-stun' : '') : ''}" data-el="${u.el}" style="left:${left}%;top:14px">
@@ -3362,10 +3396,10 @@ function kitCardsRounds() {
       <span class="nm">${u.name}</span>${bar(d.hp * 100 / u.maxHp, 'hp', `<span class="sh" style="left:0;width:${Math.min(100, d.sh * 100 / u.maxHp)}%"></span>`)}<div class="rot">${chanceHtml(u, fired)}</div></div>`;
   };
   const h1 = H('h1'), h4 = H('h4'), h5 = H('h5');
-  return card({ side: 0, name: h1.name, cls: h1.cls, el: h1.el, img: h1.img, maxHp: 1557, table: T(['Вызов', 'Удар щитом', 'Осыпание']), st: [{ k: 'weak', left: 1, left0: 3, pow: 2000 }] }, { hp: 1100, sh: 0 }, '', 4, 'Удар щитом')
-    + card({ side: 0, name: h4.name, cls: h4.cls, el: h4.el, img: h4.img, maxHp: 1200, table: T(['Живая вода', 'Лёгкая поступь', 'Оберег']), st: [] }, { hp: 700, sh: 200 }, 'done', 26)
-    + card({ side: 0, name: h5.name, cls: h5.cls, el: h5.el, img: h5.img, maxHp: 893, table: T(['Оковы', 'Стужа', 'Ослабление'], 'Ледяные оковы'), st: [{ k: 'hot', school: 'Воздух', per: 40, stacks: 1, left: 2, left0: 3 }] }, { hp: 610, sh: 0 }, '', 50)
-    + card({ side: 1, name: 'Первый набросок', cls: 'Босс', el: 'Земля', img: FA(F('b1')), maxHp: 20000, table: T(['Правка', 'Глиняный вал'], 'Последний штрих'), st: [{ k: 'stop', left: 1, left0: 2 }, { k: 'dot', school: 'Огонь', per: 60, stacks: 2, left: 2, left0: 3 }] }, { hp: 12000, sh: 0 }, 'lead', 76);
+  return card({ side: 0, name: h1.name, cls: h1.cls, el: h1.el, img: h1.img, maxHp: 1557, table: T(K.heroes.h01_2, 4), st: [{ k: 'guard', left: 1, left0: 2, pow: 2500 }] }, { hp: 1100, sh: 300 }, '', 4, 'Каменный осколок')
+    + card({ side: 0, name: h4.name, cls: h4.cls, el: h4.el, img: h4.img, maxHp: 1200, table: T(K.heroes.h01_1, 3), st: [{ k: 'evade', left: 2, left0: 3, pow: 2000 }] }, { hp: 700, sh: 0 }, 'done', 26)
+    + card({ side: 0, name: h5.name, cls: h5.cls, el: h5.el, img: h5.img, maxHp: 893, table: T(K.heroes.h01_4, 3), st: [{ k: 'hot', school: 'Воздух', per: 40, stacks: 2, left: 1, left0: 2 }] }, { hp: 610, sh: 0 }, '', 50)
+    + card({ side: 1, name: 'Первый набросок', cls: 'Босс', el: 'Земля', img: FA(F('b1')), maxHp: 20000, table: T(K.foes.b1, 99), st: [{ k: 'freeze', left: 2, left0: 3 }, { k: 'slow', left: 3, left0: 4, pow: 3000 }, { k: 'dot', school: 'Огонь', per: 60, stacks: 2, left: 2, left0: 3 }] }, { hp: 12000, sh: 0 }, 'lead', 76);
 }
 /* ================== UI-кит · герои из черновиков ==================
    Коллекция 110 героев с фильтрами, карточка с главами по доблести, ордены и братства.

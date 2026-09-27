@@ -29,6 +29,7 @@ import library as L  # noqa: E402  библиотека собирается т�
 HEROES_CSV = ROOT / "docs/content/герои/герои.csv"
 OUT_JSON = HERE / "kits.json"
 OUT_MD = ROOT / "docs/content/распределение-способностей.md"
+OUT_UI = ROOT / "design/ui/kits.js"   # наборы для ядра боя прототипа
 
 RAR = ["обычная", "редкая", "уникальная", "эпическая", "древняя", "первородная", "вневременная"]
 # Доли хода по редкости героя — модель автора 27.09.2026: ульта, способности, обычная атака.
@@ -611,7 +612,8 @@ def build():
         items = kit_items([(0, "ult" if ".ult." in aid else "act", aid) for aid, _, _ in kit], by_id, RANK_R[rank])
         for x, (aid, skin, tgt) in zip(items, kit):
             x.update(**{"as": skin, "tgt": tgt})
-        foes[fid] = {"name": name, "cls": cls, "el": el, "rank": rank, "note": FOE_NOTES.get(fid, ""), "kit": items}
+        foes[fid] = {"name": name, "cls": cls, "el": el, "rank": rank, "note": FOE_NOTES.get(fid, ""),
+                     "ultPct": RARITY_ULT[RANK_R[rank]], "actPct": RARITY_ACT[RANK_R[rank]], "kit": items}
     data = {"rules": {"unlock": UNLOCK, "unlockFarm": UNLOCK_FARM,
                       "rarityShares": {n: {"ult": u, "act": a, "basic": 10000 - u - a} for n, u, a in zip(RAR, RARITY_ULT, RARITY_ACT)},
                       "shareRule": "доли — для полного набора; активные делят долю по весу, ульты — поровну; закрытая доблестью способность отдаёт долю обычной атаке",
@@ -787,11 +789,23 @@ def write_md(data, by_id):
     OUT_MD.write_text("\n".join(L_) + "\n", encoding="utf-8")
 
 
+def write_ui(data):
+    """Наборы для ядра боя прототипа: доблесть открытия, место, запись библиотеки; у врагов — имя врага и правило цели."""
+    keep = ("v", "slot", "id", "as", "tgt")
+    ui = {"heroes": {hid: {"ultPct": h["ultPct"], "actPct": h["actPct"], "rarity": h["rarity"], "maxV": h["maxV"],
+                           "kit": [{k: x[k] for k in keep if x.get(k) is not None} for x in h["kit"]]} for hid, h in data["heroes"].items()},
+          "foes": {fid: {"rank": f["rank"], "ultPct": f["ultPct"], "actPct": f["actPct"],
+                         "kit": [{k: x[k] for k in keep if x.get(k) is not None} for x in f["kit"]]} for fid, f in data["foes"].items()}}
+    OUT_UI.write_text("/* Собрано tools/content-gen/abilities/assign.py — наборы способностей героев и врагов (ADR-0016). Руками не править. */\n"
+                      "window.EN_KITS = " + json.dumps(ui, ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     data, by_id = build()
     OUT_JSON.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     write_md(data, by_id)
+    write_ui(data)
     n = len(data["heroes"])
     per = {}
     for h in data["heroes"].values():
