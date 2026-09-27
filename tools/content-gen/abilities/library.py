@@ -10,7 +10,8 @@
 
 Выход:
   tools/content-gen/abilities/library.json — данные для ядра;
-  docs/content/библиотека-способностей.md  — черновик для автора.
+  docs/content/библиотека-способностей.md  — черновик для автора;
+  design/ui/abilities.js                   — раздел «Библиотека способностей» в UI-ките прототипа.
 
 Числа — демонстрация. Шанс — в базисных пунктах за ход (10 000 = 100 %), длительность — в раундах,
 коэффициент — в процентах от главного стата наложившего, сила эффекта — в базисных пунктах.
@@ -25,6 +26,7 @@ SRC = json.loads((HERE / "source.json").read_text(encoding="utf-8"))
 TABLE = {int(a["№"]): a for a in SRC["abilities"]}
 OUT_JSON = HERE / "library.json"
 OUT_MD = ROOT / "docs/content/библиотека-способностей.md"
+OUT_UI = ROOT / "design/ui/abilities.js"
 
 # ---------------- схема (решения автора 27.09.2026) ----------------
 KINDS = ["dmg", "heal", "shield", "dot", "hot", "ctrl", "debuff", "buff"]
@@ -670,16 +672,69 @@ def write_md(lib, every):
     OUT_MD.write_text("\n".join(L) + "\n", encoding="utf-8")
 
 
+# ---------------- выгрузка в UI-кит ----------------
+UI_SKIP = {"id", "n", "set", "kind", "tier", "twist", "d", "src", "trig"}
+
+
+def ui_num(x):
+    """Главные числа способности одной строкой — подпись плитки в UI-ките."""
+    k, t = x["kind"], x.get("tier")
+    c, left, mx, n = x.get("coef"), x.get("left"), x.get("max"), x.get("targets")
+    grp = f" · {n} цели" if t == "grp" and n else ""
+    if x.get("shieldPct"):
+        return f"{x['shieldPct']} % здоровья"
+    if x.get("rewind"):
+        return f"возврат за {rounds(x['rewind'])}"
+    if k in ("dmg", "heal", "shield"):
+        return f"{'по ' if t != 'one' else ''}{c} %{grp}"
+    if k in ("dot", "hot"):
+        more = f" · сразу {x['stacks']}" if x.get("stacks") else (f" · до {mx}" if mx and mx > 1 else "")
+        return f"{c} % · {rounds(left)}{more}{grp}"
+    if k in ("ctrl", "debuff", "buff"):
+        return f"{rounds(left)}{grp}"
+    if k == "reaction":
+        return "когда " + TRIG[x["trig"]]
+    if k == "farm":
+        return "ульта" if x.get("ult") else "активка"
+    return "пассивка"
+
+
+def ui_item(x, typ):
+    s = x.get("src")
+    return {"id": x["id"], "n": x["n"], "set": x["set"], "t": typ, "k": "farm" if x["kind"] in ("farm", "farmPassive") else x["kind"],
+            "tier": x.get("tier"), "trig": x.get("trig"), "d": x["d"], "tw": x.get("twist") or "", "num": ui_num(x), "ch": x.get("ch"),
+            "src": [s["no"], s["name"], s["text"], s["school"], s["type"]] if s else None,
+            "data": {k: v for k, v in x.items() if k not in UI_SKIP}}
+
+
+def write_ui(lib, every):
+    sets = []
+    for sname, s in lib["sets"].items():
+        items = [ui_item(x, typ) for part, typ in (("active", "act"), ("ult", "ult"), ("passive", "pas"), ("reaction", "react")) for x in s[part]]
+        sets.append({"n": sname, "eff": {k: [v["n"], v["d"]] for k, v in s["eff"].items()}, "items": items})
+    farm = lib["farm"]
+    sets.append({"n": "Фарм", "eff": None,
+                 "items": [ui_item(x, typ) for part, typ in (("passive", "pas"), ("active", "act"), ("ult", "ult")) for x in farm[part]]})
+    data = {"total": len(every), "sets": sets,
+            "kinds": {**KIND_NAME, "passive": "Пассивка", "reaction": "Реакция", "farm": "Фарм"},
+            "tiers": {**TIER_NAME, "self": "На этаж"}, "triggers": TRIG,
+            "rules": {"ch": CH, "ctrlCh": CTRL_CH, "ultCh": ULT_CH, "ultPow": ULT_POW, "capBp": 6000}}
+    OUT_UI.write_text("/* Собрано tools/content-gen/abilities/library.py — библиотека способностей по ADR-0015. Руками не править.\n"
+                      "   Черновик · ждёт автора: названия с номером — из таблицы автора, остальные — заглушки; числа — демонстрация. */\n"
+                      "window.EN_ABILITIES = " + json.dumps(data, ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     lib, every = build()
     OUT_JSON.write_text(json.dumps(lib, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     write_md(lib, every)
+    write_ui(lib, every)
     by = {}
     for x in every:
         k = "ульт" if x.get("ult") else {"passive": "пассивок", "reaction": "реакций", "farmPassive": "фарм-пассивок", "farm": "фарм-активок"}.get(x["kind"], "активных")
         by[k] = by.get(k, 0) + 1
-    print(f"Способностей {len(every)}: " + ", ".join(f"{k} {v}" for k, v in by.items()) + f" → {OUT_JSON.relative_to(ROOT)}, {OUT_MD.relative_to(ROOT)}")
+    print(f"Способностей {len(every)}: " + ", ".join(f"{k} {v}" for k, v in by.items()) + f" → {OUT_JSON.relative_to(ROOT)}, {OUT_MD.relative_to(ROOT)}, {OUT_UI.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
