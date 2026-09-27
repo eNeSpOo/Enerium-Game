@@ -50,7 +50,7 @@
       "size": "1K",
       "cutout": "black",
       "refs": [],
-      "frame": "Format: an ornate frame for an enemy card in a dark fantasy card battler, landscape 5:4, seen straight on, symmetric. The frame is a border only. The whole canvas is solid pure black — outside the frame and inside its window alike; only the frame itself is painted, nothing inside the window. The border is about 9% of the frame width thick and richly detailed; ornaments rise above the top edge and stand out at the corners. The rank must read instantly even on a small card: the more dangerous the rank, the richer the material, the heavier the ornament and the stronger the magical light."
+      "frame": "Format: a frame for an enemy card in a dark fantasy card battler, landscape 5:4, seen straight on, symmetric. The whole canvas is solid pure black — outside the frame and inside its window alike; only the frame itself is painted. The frame line is thin — about 3% of the frame width — and the window stays large and empty. Decorative dark fantasy elements gather at the corners and at the top center and may reach outward beyond the line. The rank shows through beautiful intimidation, not wealth: the more dangerous the rank, the more menacing and awe-inspiring the ornament — thorns, horns, claws, bone filigree, dark flame, glowing runes — while the frame stays elegant."
     },
     "elements": {
       "aspect": "1:1",
@@ -76,11 +76,32 @@
   },
   "jobs": [
     {
+      "id": "mark-frame-rank",
+      "category": "frames",
+      "title": "Рамка ранга: рядовой",
+      "source": "ADR-0010 — ранги; автор 27.09.2026: рамки тонкие, ранг — красивое устрашение, трепет",
+      "subject": "Rank: rank-and-file — the lowest of seven ranks. A thin line of dark worn iron with small hairline cracks; tiny plain angular brackets at the four corners; no light, no crest. Humble and grim."
+    },
+    {
       "id": "mark-frame-elite",
       "category": "frames",
       "title": "Рамка ранга: элита",
-      "source": "ADR-0010 — ранги врагов; схема автора 27.09.2026: опасность врага показывает рамка",
-      "subject": "Rank: Elite — the second of seven ranks, clearly above a plain rank-and-file enemy but far below a boss. Old bronze with a dark patina, heavy rivets and engraved bands along the border; at the top center a cut amber gem held in a bronze claw, a warm ember light pulsing inside the gem, faint amber embers drifting around the claw."
+      "source": "ADR-0010 — ранги; автор 27.09.2026: рамки тонкие, ранг — красивое устрашение, трепет",
+      "subject": "Rank: Elite — the second of seven ranks. A thin line of blackened iron; thorny tendrils curl out of the four corners; at the top center a small sharp crest of thorns around a faint ember glow. A clear sense of threat."
+    },
+    {
+      "id": "mark-frame-boss",
+      "category": "frames",
+      "title": "Рамка ранга: босс биома",
+      "source": "ADR-0010 — ранги; автор 27.09.2026: рамки тонкие, ранг — красивое устрашение, трепет",
+      "subject": "Rank: Biome boss — the third of seven ranks, the master of the last step of a biome. A thin line of blackened iron and old bone; large curved horns rise from the two upper corners, bone thorns run along the sides, and at the top center a dark crest like a crown of thorns holds a slit of burning ember light, like a watching eye; thin dark smoke curls around the horns. Awe and dread."
+    },
+    {
+      "id": "mark-frame-rune",
+      "category": "frames",
+      "title": "Рамка ранга: рунный босс",
+      "source": "ADR-0010 — ранги; автор 27.09.2026: рамки тонкие, ранг — красивое устрашение, трепет",
+      "subject": "Rank: Rune boss — the fourth of seven ranks, the guardian who decides whether you may pass deeper. A thin line of ancient dark stone bound with blackened metal; along the line faint carved glyphs glow in spirit turquoise (#48E5D4) — invented signs, not letters of any real alphabet; at the top center a tall sigil with a pair of spread stone wings and a turquoise light in its heart; the corners end in sharp stone points. Solemn, sacred awe."
     },
     {
       "id": "mark-el-time",

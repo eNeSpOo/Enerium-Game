@@ -1,0 +1,54 @@
+{
+  "name": "Герои-заглушки сета 1 в стиле меток — по промту автора: тёмное фэнтези, мягкие переходы, проработанные тени, магический свет. Автор 27.09.2026: «уж очень она красивая получилась». Герой смотрит вправо — на врагов",
+  "models": [
+    "nb2"
+  ],
+  "style": "Dark fantasy game art with a gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring the scene to life: the magical glow and aura of the hero's element, embers or motes in the air, light that comes from below and from the magic itself. Deep darkness around the figure, the hero emerges from shadow; rich worn materials and textures. Dramatic, high contrast.",
+  "negative": "No text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No bodies, no skulls, no blood.",
+  "cutout_rule": "",
+  "categories": {
+    "heroes": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [],
+      "frame": "Format: vertical hero card portrait, 4:5. Half-body, three-quarter view; the hero faces and looks toward the right side of the picture — toward the enemies. Head in the upper third, the face well lit and readable at small size; the lower quarter is darker because the card puts the name there. The background tells where the hero lived, but it sinks into deep shadow and soft focus, darker than the character."
+    }
+  },
+  "jobs": [
+    {
+      "id": "hero-garth",
+      "category": "heroes",
+      "title": "Гарт Нишевой — дворф, танк, Земля (сет 1)",
+      "source": "docs/content/герои/цикл-1.md, h01_2",
+      "subject": "Subject: Garth the Niche-cutter, a dwarf tank of the Earth school, a keeper who cut niches in the mountain for the hourglasses of miners who had passed away. A broad, weathered dwarf of middle age with a heavy braided beard grey with stone dust, a strong calm face, deep-set patient eyes. A leather stonecutter's apron over dark chainmail, thick forearms; a heavy square shield like a slab of cut stone with a niche carved in its face, strapped to his arm; a stonecutter's hammer and chisel at his belt. He stands squarely behind his shield, immovable. Faint amber light of the Earth school glows in the cracks of the stone and along the shield's edge. Background: a hall carved inside a dwarven mountain; its walls are covered with rows of small niches, each exactly the width of a palm, each holding a small dusty hourglass; one tall niche cut to a full body's height stands empty in the wall behind him. Warm amber crystal light rises from below, stone dust hangs in the air. His Earth magic: amber light glows in the cracks of the stone and runs along the shield's edge."
+    },
+    {
+      "id": "hero-hravn",
+      "category": "heroes",
+      "title": "Хравн Сборщик — северянин, физ ДД ловкости, Огонь (сет 1)",
+      "source": "docs/content/герои/цикл-1.md, h01_3",
+      "subject": "Subject: Hravn the Gatherer, a northern warrior, a quick agile fighter of the Fire school; after every battle he gathered the hourglasses of the fallen and carried them home. Lean, sinewy and quick, a weathered face, a braided red-blond beard with iron rings, long hair tied back, a leather-and-fur northern jerkin, bracers. Two light hand axes: one hangs ready in his right hand, the other at his belt; small embers of the Fire school glow along their edges. Over his shoulder hangs a heavy leather sack bulging with hourglasses; in his left hand he holds up a small hourglass he has just picked from the sand and looks at it with a grave face. Background: a battlefield in the cold north after a battle, at dusk: pale sand drifts over dropped shields, spears and helmets, the wind carries sand across the field. Red-orange ember light rises from below, sparks and sand drift in the wind. His Fire magic: embers burn along the edges of the axes and drift around him."
+    },
+    {
+      "id": "hero-laeira",
+      "category": "heroes",
+      "title": "Лаэйра — эльфийка, маг ДД, Время (сет 1)",
+      "source": "docs/content/герои/цикл-1.md, h01_5",
+      "subject": "Subject: Laeira, an elven woman, a mage of the Time school, the last keeper of the brotherhood of hourglass keepers. Young by elven measure but serious; a narrow fine face, dark hair pinned up with a few loose strands, pointed elven ears, attentive grey-green eyes; a long dark robe with thin green trim of the Time school. She holds an old hourglass with a scratched glass and turns it over: the glass is empty, no sand falls, and around her a few grains of sand hang motionless in the air, stopped in time, glowing faint green. Background: her hall in the Time quarter of the city: long tables covered with empty hourglasses of every size; through a tall arched window, the rooftops of the quarter with big hourglass shapes over the roofs. Soft green light of the Time school rises from below. Her Time magic: a soft green glow and frozen grains of sand around the hourglass."
+    },
+    {
+      "id": "hero-ilmerra",
+      "category": "heroes",
+      "title": "Ильмерра — эльфийка, лекарь, Воздух (сет 1)",
+      "source": "docs/content/герои/цикл-1.md, h01_1",
+      "subject": "Subject: Ilmerra, an elven woman from long ago, keeper of a hall where the hourglasses of those who had no kin were kept; a healer of the Air school. Ageless calm face with the fine lines of great age, gentle and attentive, long silver-white hair loosely braided with thin leather cords, pointed elven ears. She holds a small old hourglass with scratched glass close to her ear and listens to the sand inside, eyes half-closed. Layered druid robes of muted sage-green and grey linen, a woven shawl, a simple necklace of wooden beads; faint white-green wisps of wind curl around her sleeves (Air school). Background: a vast quiet hall among colossal tree roots in the heart of the elven forest; in niches between the roots stand rows of hourglasses, each one slightly different, dim; soft white-green light rises from below, sand motes drift in the air. She is lit from below by that white-green light, with a subtle rim light on her hair. Her Air magic: pale white-green wisps of wind curl around her."
+    },
+    {
+      "id": "hero-mirt",
+      "category": "heroes",
+      "title": "Мирт Переписчик — человек запада, дебаффер, Вода (сет 1)",
+      "source": "docs/content/герои/цикл-1.md, h01_4",
+      "subject": "Subject: Mirt the Copyist, a man of the western lands, a debuffer of the Water school; a keeper who began writing down who the dead had been. A thin, careful scholar of middle years, clean-shaven, tired kind eyes, ink-stained fingers, a dark blue scholar's coat with a worn collar; he holds a writing board with a sheet of paper and a quill and writes a single line. Frost creeps from the tip of his quill across the paper and curls around his fingers as thin chains of ice — the Water school. Background: a quiet stone crypt beneath a temple hill, low arches, stone shelves along the walls with folded written sheets and small hourglasses laid on them; cold blue light spills from under an arch behind him. The crypt is calm, clean and dignified, it smells of stone, not of death. His Water magic: cold blue frost light only — no warm light anywhere in the picture."
+    }
+  ]
+}
