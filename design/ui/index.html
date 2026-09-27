@@ -184,6 +184,7 @@ img{max-width:100%}
 .g-cur{display:flex;align-items:center;gap:5px;height:100%;padding:0 7px;border:0;background:none;border-radius:7px;color:var(--parch);font:700 14px/1 var(--f-u)}
 .g-cur:hover{background:#12161a}
 .g-cur img{width:20px;height:20px;object-fit:contain}
+.coin-fly{position:fixed;width:18px;height:18px;object-fit:contain;pointer-events:none;z-index:60;filter:drop-shadow(0 0 6px rgba(221,188,122,.65))}
 .g-cur .plus{display:grid;place-items:center;width:15px;height:15px;border-radius:4px;background:var(--spirit-3);color:var(--spirit);font:700 13px/1 var(--f-u);margin-left:1px}
 .g-icon{position:relative;display:grid;place-items:center;width:36px;height:36px;border-radius:9px;border:1px solid var(--iron);background:#0b0d10;color:var(--parch-2);flex:none}
 .g-icon:hover{color:var(--gold);border-color:var(--iron-2)}
@@ -1228,7 +1229,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
         <div class="p-ctrls" id="devSpeed" style="margin-top:10px;align-items:center"><span class="p-note">Скорость прототипа:</span><button class="p-chip" data-speed="1" aria-pressed="true">×1</button><button class="p-chip" data-speed="2" aria-pressed="false">×2</button><button class="p-chip" data-speed="4" aria-pressed="false">×4</button><button class="p-chip" data-speed="8" aria-pressed="false">×8</button></div>
         <p class="p-note" style="margin-top:6px">В игре ускорения нет: бой идёт в реальном времени сервера. Переключатель — только чтобы быстрее проверить прототип.</p>
         <div class="p-ctrls" id="devModel" style="margin-top:12px;align-items:center"><span class="p-note">Модель боя:</span><button class="p-chip" data-model="rounds" aria-pressed="true">10 раундов</button><button class="p-chip" data-model="tempo" aria-pressed="false">Прежняя · темп</button></div>
-        <p class="p-note" style="margin-top:6px">Основная модель — «10 раундов» (ADR-0010). Карты ходят по очереди по скорости, способность срабатывает по шансу, иначе — обычная атака. Биом — испытание на выносливость, 10 раундов — проверка урона: после десятого песок вышел, этаж не взят. Прежняя модель темпа (ADR-0007) — для справки.</p>
+        <p class="p-note" style="margin-top:6px">Основная модель — «10 раундов» (ADR-0010). Карты ходят по очереди по скорости, способность срабатывает по шансу, иначе — обычная атака. Биом — испытание на выносливость, 10 раундов — проверка урона: после десятого — «Время скоротечно…», этаж не взят. Прежняя модель темпа (ADR-0007) — для справки.</p>
         <div class="p-ctrls" style="margin-top:8px"><button class="p-chip" id="devCompare">Сравнить на отряде I</button></div>
         <div id="devCmp"></div>
       </div>
@@ -1341,7 +1342,7 @@ function initialState() {
       { id: 'h1', name: 'Гарт Нишевой', cls: 'Танк', el: 'Земля', race: 'Дворфы', r: 1, cycle: 1, img: ART('heroes/h1.jpg'), lvl: 42, cap: 50, lim: 0, valor: 1, maxV: 3, bm: 26840, st: [128, 54, 72, 246, 62], gr: [2, 3, 3, 1, 3],
         ab: ['Вызов', 'Удар щитом', 'Осыпание'].map(AB),
         pas: [{ n: 'Несгибаемость', t: 'боевая', d: 'Щит, когда здоровье ниже половины.' }, { n: 'Трофейщик', t: 'фарм', d: 'Больше золота с элит.' }], ult: null, busy: null, },
-      { id: 'h2', name: 'Хравн Сборщик', cls: 'Физ. ДД ловкости', fx: 'melee', el: 'Огонь', race: 'Люди', r: 1, cycle: 1, img: ART('heroes/h2.jpg'), lvl: 50, cap: 50, lim: 0, valor: 0, maxV: 1, bm: 25920, st: [245, 54, 128, 72, 62], gr: [1, 3, 2, 3, 3],
+      { id: 'h2', name: 'Хравн Сборщик', cls: 'Физ. ДД ловкости', fx: 'melee', el: 'Огонь', race: 'Люди', r: 1, cycle: 1, img: ART('heroes/h2.jpg'), lvl: 50, cap: 50, lim: 0, valor: 0, maxV: 1, bm: 25920, st: [128, 54, 245, 72, 62], gr: [2, 3, 1, 3, 3],
         ab: ['Горение', 'Быстрый выпад', 'Погребальный костёр'].map(AB),
         pas: [{ n: 'Точность', t: 'боевая', d: 'Выше шанс крита.' }, { n: 'Охотник', t: 'фарм', d: 'Больше духа с рядовых.' }], ult: null, busy: null, },
       { id: 'h3', name: 'Лаэйра', cls: 'Маг. ДД', el: 'Время', race: 'Эльфы', r: 1, cycle: 1, img: ART('heroes/h3.jpg'), lvl: 118, cap: 150, lim: 1, valor: 2, maxV: 5, bm: 24200, st: [72, 246, 54, 62, 128], gr: [3, 1, 3, 3, 2],
@@ -1756,7 +1757,7 @@ function legendHtml(mode) {
   if (mode === 'rounds') return `<span class="h">Индикаторы карты · 10 раундов</span>
     <span class="ex"><span class="rot"><span class="ch" style="--sc:var(--earth)">${ic('target')}<b>20</b></span><span class="ch on" style="--sc:var(--earth)">${ic('crack')}<b>20</b></span><span class="ch u" style="--sc:var(--gold)">${ic('crown')}<b>8</b></span></span></span><span>Способности и ульта с шансом в процентах: столько раз из ста карта применит её в свой ход. Иначе — обычная атака. Сработавшая светится.</span>
     <span class="ex"><span class="bt-queue static"><i class="done"></i><i class="now"></i><i class="f"></i><i></i></span></span><span>Сверху — очередь раунда по скорости: золотом — кто ходит, бледные — уже сходили, красная рамка — враги.</span>
-    <span class="ex">${ic('hour')}<b class="num">3 / 10</b></span><span>Раунд боя. Каждая карта ходит раз за раунд. После десятого раунда песок вышел: этаж не взят, урон по боссу идёт в осаду.</span>
+    <span class="ex">${ic('hour')}<b class="num">3 / 10</b></span><span>Раунд боя. Каждая карта ходит раз за раунд. После десятого раунда — «Время скоротечно…»: этаж не взят, урон по боссу идёт в осаду.</span>
     <span class="ex"><span class="frame"></span></span><span>Красная рамка — в карту целятся противники, ×N — сколько.</span>
     <span class="h">Эффекты</span>
     <span class="ex">${si('heal', 2, 70, 'good', '')}${si('shield', '', 100, 'good', '')}</span><span>Слева вверху — полезные: лечение со временем, щит.</span>
@@ -2535,10 +2536,10 @@ const OV = {
     const passed = E.kind === 'boss' ? n - R.startFloor + 1 : R.floor - R.startFloor;
     let title, head;
     if (E.kind === 'boss') { title = 'Первый набросок повержен'; head = 'Мастерская пройдена до конца. Осталось победить рунного стража — тогда откроется Подземный лес.'; }
-    else if (E.kind === 'siege') { title = 'Осада продолжается'; head = `${E.why === 'sand' ? 'Песок вышел после десятого раунда. ' : ''}Отряд дошёл до босса и снял ${sg - R.siegeFrom}% его здоровья, всего снято ${sg}%. Урон сохранится до следующего забега. Чем меньше у босса здоровья, тем он опаснее.`; }
+    else if (E.kind === 'siege') { title = 'Осада продолжается'; head = `${E.why === 'sand' ? 'Время скоротечно… Десять раундов прошли. ' : ''}Отряд дошёл до босса и снял ${sg - R.siegeFrom}% его здоровья, всего снято ${sg}%. Урон сохранится до следующего забега. Чем меньше у босса здоровья, тем он опаснее.`; }
     else if (E.kind === 'guardWin') { title = 'Мастер пропустил дальше'; head = 'Рунный страж и четыре элиты повержены. Теперь, если пройден и босс биома, откроется Подземный лес.'; }
-    else if (E.kind === 'guardLose') { title = 'Мастер не пропустил'; head = `${E.why === 'sand' ? 'Песок вышел: десять раундов прошли, а страж ещё стоит' : 'Отряд пал'}. Рунный страж — пять карт, у Мастера иммунитет к контролю ${Math.round((EB.RULES.resist.rune || 0) / 100)} %.`; }
-    else if (E.kind === 'wall') { title = `Стена — этаж ${E.floor}`; head = `${E.why === 'time' ? 'Время боя вышло' : E.why === 'sand' ? 'Песок вышел: десять раундов прошли, время скоротечно. Этаж не взят' : 'Отряд пал'} на этаже ${E.floor}. В колоде: ${E.foes.map(id => known(id) ? F(id).name : 'неизвестный').join(', ')}.`; }
+    else if (E.kind === 'guardLose') { title = 'Мастер не пропустил'; head = `${E.why === 'sand' ? 'Время скоротечно… Десять раундов прошли, а страж ещё стоит' : 'Отряд пал'}. Рунный страж — пять карт, у Мастера иммунитет к контролю ${Math.round((EB.RULES.resist.rune || 0) / 100)} %.`; }
+    else if (E.kind === 'wall') { title = `Стена — этаж ${E.floor}`; head = `${E.why === 'time' ? 'Время боя вышло' : E.why === 'sand' ? 'Время скоротечно… Десять раундов прошли, этаж не взят' : 'Отряд пал'} на этаже ${E.floor}. В колоде: ${E.foes.map(id => known(id) ? F(id).name : 'неизвестный').join(', ')}.`; }
     else { title = 'Забег прерван'; head = `Отряд поднялся с этажа ${R.floor}.`; }
     if (R.demo) head = 'Демо-прыжок сразу к боссу с полным здоровьем: осада биома и стена не меняются. ' + head;
     const body = `<p class="muted" style="font-size:15px">${head} Отряд поднялся порталом наверх, как ото сна.</p>
@@ -2780,17 +2781,44 @@ function floorDone(R, vis) {
   R.curve.push(partyPctOf(b));
   const got = EB.floorLoot(R.biome, R.guard ? B.floors.length + 1 : R.floor, b, 0), L = R.loot;   // 0 — прибавка артефактов к шансу ресурса
   L.gold += got.gold; L.spirit += got.spirit; L.souls += got.souls; L.keys += got.keys; L.cinder += got.base; L.unique += got.unique;
-  if (R.guard) { R.end = { kind: b.win ? 'guardWin' : 'guardLose', why: b.why }; if (b.why === 'sand' && vis) feed(R, '<span class="gd">Песок вышел</span> · время скоротечно'); return endRun(R, vis); }
+  // добыча этажа — в кошелёк сразу, как убиты все враги этажа: валюта летит в панель, как магнитом (§5.6)
+  S.wallet.gold += got.gold; S.wallet.spirit += got.spirit; S.wallet.souls += got.souls; I('cinder').q += got.base;
+  if (vis) magnet(got);
+  if (R.guard) { R.end = { kind: b.win ? 'guardWin' : 'guardLose', why: b.why }; if (b.why === 'sand' && vis) feed(R, '<span class="gd">Время скоротечно…</span> · десять раундов прошли'); return endRun(R, vis); }
   let bossDead = false;
   if (g === 'b') { const boss = b.u[1][0], sg = G(R.biome); bossDead = !boss.alive; if (!R.demo) { sg.max = boss.maxHp; if (bossDead) { sg.hp = null; sg.killed = true; } else sg.hp = boss.hp; } }
   if (b.win && R.floor < B.floors.length) { R.gap = EB.RULES.floor.gapMs; R.runMs += R.gap; if (vis) feed(R, `<span class="sp">Этаж ${R.floor} пройден</span>${b.mode === 'rounds' ? ` за ${b.round} ${roundWord(b.round)}` : ''} · здоровье отряда ${partyPctOf(b)}%`); return; }
-  if (b.why === 'sand' && vis) feed(R, '<span class="gd">Песок вышел</span> · время скоротечно');
+  if (b.why === 'sand' && vis) feed(R, '<span class="gd">Время скоротечно…</span> · десять раундов прошли');
   R.end = bossDead ? { kind: 'boss' } : g === 'b' ? { kind: 'siege', why: b.why } : { kind: 'wall', floor: R.floor, why: b.why, foes: b.u[1].map(u => u.id) };
   endRun(R, vis);
 }
+/* Магнит: монеты валюты летят со стороны врагов в панель валют, число в панели подпрыгивает.
+   Разброс монет — из номера монеты, без случайности: это показ, а не расчёт. */
+function magnet(got) {
+  const from = document.querySelector('.bt-side.f'); if (!from) return;
+  const fr = from.getBoundingClientRect();
+  [['gold', got.gold], ['spirit', got.spirit], ['souls', got.souls]].filter(([, n]) => n > 0).forEach(([k, n], j) => {
+    const to = document.querySelector(`.g-cur[data-v="cur:${k}"]`); if (!to) return;
+    const tr = to.getBoundingClientRect(), count = Math.min(6, 2 + String(n).length);
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('img'); el.src = CUR[k].img; el.alt = ''; el.className = 'coin-fly';
+      const x0 = fr.left + fr.width * (20 + (i * 37 + j * 17) % 60) / 100, y0 = fr.top + fr.height * (30 + (i * 53 + j * 29) % 40) / 100;
+      el.style.left = x0 + 'px'; el.style.top = y0 + 'px'; document.body.appendChild(el);
+      const dx = tr.left + tr.width / 2 - x0 - 9, dy = tr.top + tr.height / 2 - y0 - 9;
+      el.animate([{ transform: 'translate(0,0) scale(.6)', opacity: 0 }, { transform: 'translate(0,-14px) scale(1.1)', opacity: 1, offset: .25 },
+        { transform: `translate(${dx}px,${dy}px) scale(.7)`, opacity: .9 }], { duration: 800 + i * 70, delay: j * 140 + i * 60, easing: 'cubic-bezier(.5,0,.9,.45)', fill: 'forwards' })
+        .onfinish = () => { el.remove(); if (i === count - 1) bumpCur(k); };
+    }
+  });
+}
+function bumpCur(k) {
+  const b = document.querySelector(`.g-cur[data-v="cur:${k}"]`); if (!b) return;
+  const n = b.querySelector('.num'); if (n) n.textContent = fmt(S.wallet[k]);
+  b.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.2)' }, { transform: 'scale(1)' }], { duration: 280 });
+}
 function endRun(R, vis) {
   R.over = true;
-  const L = R.loot; S.wallet.gold += L.gold; S.wallet.spirit += L.spirit; S.wallet.souls += L.souls; I('cinder').q += L.cinder;
+  // добыча уже в кошельке: её зачисляет каждый взятый этаж (floorDone); отмена забега только освобождает героев
   if (!R.demo && !R.guard) S.lastRun[R.biome] = { wall: R.end.kind === 'wall' ? R.end.floor : null, kind: R.end.kind, floor: R.floor };
   if (vis) { R.seen = true; S.overlay = { t: 'result', arg: R.id }; render(); focusOverlay(); }
   else toast(`${EB.BIOMES[R.biome].name} · забег ${R.runNo}: ${R.end.kind === 'wall' ? 'стена на этаже ' + R.end.floor : R.end.kind === 'boss' ? 'босс повержен' : R.end.kind === 'siege' ? 'осада продолжается' : R.end.kind === 'guardWin' ? 'рунный страж пропустил дальше' : R.end.kind === 'guardLose' ? 'рунный страж не пропустил' : 'прерван'}. Итог — в верхней строке`);
@@ -2988,7 +3016,7 @@ function roundFlash(n) {
 function compareModels() {
   const s = sq('s1'), heroes = s.m.filter(Boolean).map(id => EB.heroSrc(H(id))), B = EB.BIOMES.b1;
   const cols = [['10 раундов', EB.simRun(heroes, 'b1', null, 'rounds')], ['Прежняя · темп', EB.simRun(heroes, 'b1', null, 'tempo')]];
-  const why = { wipe: 'отряд пал', time: 'время вышло', sand: 'песок вышел' };
+  const why = { wipe: 'отряд пал', time: 'время вышло', sand: 'время скоротечно' };
   const row = (name, f) => `<tr><th>${name}</th>${cols.map(([, r]) => `<td>${f(r)}</td>`).join('')}</tr>`;
   const last = r => r.floors[r.floors.length - 1];
   const fights = r => r.floors.reduce((a, x) => a + x.ms, 0);
