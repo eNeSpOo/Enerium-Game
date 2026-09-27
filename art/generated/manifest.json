@@ -5955,7 +5955,7 @@
       },
       "cost_usd": 0.0686,
       "seconds": 9.7,
-      "status": "проба меток, ждёт автора: стихия Время",
+      "status": "заменён: первая проба — автор: «слишком просто»; вторая — в стиле его промта",
       "raw": "art/generated/elements/mark-el-time__nb2.raw.jpg",
       "cutout": {
         "key": "magenta",
@@ -6071,7 +6071,7 @@
       },
       "cost_usd": 0.0686,
       "seconds": 8.6,
-      "status": "проба меток, ждёт автора: редкость «эпическая»",
+      "status": "заменён: первая проба — автор: «слишком просто»; вторая — в стиле его промта",
       "raw": "art/generated/rarity/mark-rar-epic__nb2.raw.jpg",
       "cutout": {
         "key": "green",
@@ -6129,7 +6129,7 @@
       },
       "cost_usd": 0.0687,
       "seconds": 8.4,
-      "status": "проба меток, ждёт автора: рамка ранга «элита»",
+      "status": "заменён: первая проба — автор: «слишком просто»; вторая — в стиле его промта",
       "raw": "art/generated/frames/mark-frame-elite__nb2-v2.raw.jpg",
       "cutout": {
         "key": "magenta",
@@ -6187,7 +6187,7 @@
       },
       "cost_usd": 0.0688,
       "seconds": 9.0,
-      "status": "проба меток, ждёт автора: класс «танк» — каплевидный щит",
+      "status": "заменён: первая проба — автор: «слишком просто»; вторая — в стиле его промта",
       "raw": "art/generated/classes/mark-cls-tank__nb2-v2.raw.jpg",
       "cutout": {
         "key": "magenta",
@@ -6204,6 +6204,297 @@
         1024
       ],
       "sha256": "53aaab339a6db49c3d17fa72e84954a252e7a35438a0076d3df68545de7b972b"
+    },
+    {
+      "file": "art/generated/frames/mark-frame-elite__nb2-v3.png",
+      "category": "frames",
+      "job": "mark-frame-elite",
+      "title": "Рамка ранга: элита",
+      "source": "ADR-0010 — ранги врагов; схема автора 27.09.2026: опасность врага показывает рамка",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T04:56:24+03:00",
+      "params": {
+        "aspectRatio": "5:4",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.\n\nFormat: an ornate frame for an enemy card in a dark fantasy card battler, landscape 5:4, seen straight on, symmetric. The frame is a border only: the whole inside is empty pure black — nothing inside the window. The border is about 9% of the frame width thick and richly detailed; ornaments rise above the top edge and stand out at the corners. The rank must read instantly even on a small card: the more dangerous the rank, the richer the material, the heavier the ornament and the stronger the magical light.\n\nRank: Elite — the second of seven ranks, clearly above a plain rank-and-file enemy but far below a boss. Old bronze with a dark patina, heavy rivets and engraved bands along the border; at the top center a cut amber gem held in a bronze claw, a warm ember light pulsing inside the gem, faint amber embers drifting around the claw.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no vignette, no checkerboard. Glow, aura and magical light around the subject are welcome and fade into the black. Leave a clear margin of black around the subject on all sides.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 365,
+        "candidatesTokenCount": 1569,
+        "totalTokenCount": 1934,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 365
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0687,
+      "seconds": 10.3,
+      "status": "заменён: снаружи рамки модель залила белым вместо чёрного",
+      "raw": "art/generated/frames/mark-frame-elite__nb2-v3.raw.jpg",
+      "cutout": {
+        "key": "black",
+        "mode": "RGBA",
+        "corners_max_alpha": 255,
+        "transparent_share": 0.258,
+        "opaque_share": 0.727,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 0.0,
+        "ok": false,
+        "why": "углы не прозрачные; фон исходника не ровный ключ — возможно, нарисована шахматка"
+      },
+      "px": [
+        1152,
+        928
+      ],
+      "sha256": "5940fa085f4b2e3dad735dbd7fc1f829d74270c5293b14e8089b89db7aeae422"
+    },
+    {
+      "file": "art/generated/elements/mark-el-time__nb2-v2.png",
+      "category": "elements",
+      "job": "mark-el-time",
+      "title": "Стихия: Время",
+      "source": "GDD §3.1 — семь стихий; цвет карста Энериум из art/style/style.md",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T04:56:34+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.\n\nFormat: game icon of an element, square, no border around the picture. A round medallion about 70% of the canvas, centered: an ornate rim of dark forged iron and old gold; inside it the element itself is alive — its sign and its energy swirl and glow in the element's own color, and a soft magical aura spills beyond the rim into the black. All seven element medallions share the same rim, so they read as one set; the living element inside makes each one unique.\n\nThe element of Time: an hourglass of old gold and glass in the center of the medallion; green Energium light (#4FDC8B) swirls around it, grains of sand hang frozen in the air mid-fall, a faint green aura spills beyond the rim.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no vignette, no checkerboard. Glow, aura and magical light around the subject are welcome and fade into the black. Leave a clear margin of black around the subject on all sides.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 339,
+        "candidatesTokenCount": 1494,
+        "totalTokenCount": 1833,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 339
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0685,
+      "seconds": 8.9,
+      "status": "проба 2 в стиле промта автора — ждёт автора: стихия Время",
+      "raw": "art/generated/elements/mark-el-time__nb2-v2.raw.jpg",
+      "cutout": {
+        "key": "black",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.349,
+        "opaque_share": 0.609,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "250148b7da870600ec850e26aa3df3825ad580b9e20da2e6bf1925ef46cfa163"
+    },
+    {
+      "file": "art/generated/classes/mark-cls-tank__nb2-v3.png",
+      "category": "classes",
+      "job": "mark-cls-tank",
+      "title": "Класс: танк",
+      "source": "GDD §3.1 — классы",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T04:56:44+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.\n\nFormat: game icon of a hero class, square, no border around the picture. One weapon or item that stands for the class, centered, about 75% of the canvas, shown whole at a slight dynamic angle. Richly detailed worn materials — dark forged iron, old wood, leather, old gold — with a magical accent: glowing runes, embers or an aura in cold turquoise or warm gold. A strong silhouette that still reads when the icon is small.\n\nThe Tank class: a heavy heater shield — a flat top and a pointed bottom — of dark oak and blackened iron, battered by countless blows, with a thick riveted rim and an old-gold boss; faint turquoise runes glow in the cracks of the iron, as if the shield itself refuses to break.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no vignette, no checkerboard. Glow, aura and magical light around the subject are welcome and fade into the black. Leave a clear margin of black around the subject on all sides.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 338,
+        "candidatesTokenCount": 1546,
+        "totalTokenCount": 1884,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 338
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0686,
+      "seconds": 9.9,
+      "status": "проба 2 в стиле промта автора — ждёт автора: класс «танк»",
+      "raw": "art/generated/classes/mark-cls-tank__nb2-v3.raw.jpg",
+      "cutout": {
+        "key": "black",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.507,
+        "opaque_share": 0.442,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "93274d001b8299113b380934fd1b2f07651e9a24b6e7fa4668c361b7e4fd9ada"
+    },
+    {
+      "file": "art/generated/rarity/mark-rar-epic__nb2-v2.png",
+      "category": "rarity",
+      "job": "mark-rar-epic",
+      "title": "Редкость: эпическая (4 из 7)",
+      "source": "GDD §3.1 — семь редкостей; цвет — токен --r4 интерфейса",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T04:56:53+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.\n\nFormat: game icon of a rarity, square, no border around the picture. One carst crystal — the magic crystal of this world — upright, centered, about 70% of the canvas, floating in the dark. The seven rarities form a ladder from a dull cracked stone to a flawless crystal blazing with inner light: the higher the rarity, the cleaner the facets, the brighter the light inside and the stronger the aura and the floating shards around it.\n\nEpic rarity, the fourth of seven: a clean faceted violet crystal (#A986EE) with a strong violet light inside, bright inner facets, a soft violet aura around it and a few small violet shards floating nearby.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no vignette, no checkerboard. Glow, aura and magical light around the subject are welcome and fade into the black. Leave a clear margin of black around the subject on all sides.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 321,
+        "candidatesTokenCount": 1412,
+        "totalTokenCount": 1733,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 321
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0682,
+      "seconds": 8.2,
+      "status": "проба 2 в стиле промта автора — ждёт автора: редкость «эпическая»",
+      "raw": "art/generated/rarity/mark-rar-epic__nb2-v2.raw.jpg",
+      "cutout": {
+        "key": "black-glow",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.685,
+        "opaque_share": 0.238,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "4650e5cc1b1424a0d2fab1aeb6b03ef5b1655e6a7308badac4fe43ab7d56ac27"
+    },
+    {
+      "file": "art/generated/frames/mark-frame-elite__nb2-v4.png",
+      "category": "frames",
+      "job": "mark-frame-elite",
+      "title": "Рамка ранга: элита",
+      "source": "ADR-0010 — ранги врагов; схема автора 27.09.2026: опасность врага показывает рамка",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T04:58:17+03:00",
+      "params": {
+        "aspectRatio": "5:4",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.\n\nFormat: an ornate frame for an enemy card in a dark fantasy card battler, landscape 5:4, seen straight on, symmetric. The frame is a border only. The whole canvas is solid pure black — outside the frame and inside its window alike; only the frame itself is painted, nothing inside the window. The border is about 9% of the frame width thick and richly detailed; ornaments rise above the top edge and stand out at the corners. The rank must read instantly even on a small card: the more dangerous the rank, the richer the material, the heavier the ornament and the stronger the magical light.\n\nRank: Elite — the second of seven ranks, clearly above a plain rank-and-file enemy but far below a boss. Old bronze with a dark patina, heavy rivets and engraved bands along the border; at the top center a cut amber gem held in a bronze claw, a warm ember light pulsing inside the gem, faint amber embers drifting around the claw.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no vignette, no checkerboard. Glow, aura and magical light around the subject are welcome and fade into the black. Leave a clear margin of black around the subject on all sides.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 381,
+        "candidatesTokenCount": 1415,
+        "totalTokenCount": 1796,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 381
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0683,
+      "seconds": 9.1,
+      "status": "проба 2 в стиле промта автора — ждёт автора: рамка ранга «элита»",
+      "raw": "art/generated/frames/mark-frame-elite__nb2-v4.raw.jpg",
+      "cutout": {
+        "key": "black",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.619,
+        "opaque_share": 0.365,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 0.999,
+        "ok": true
+      },
+      "px": [
+        1152,
+        928
+      ],
+      "sha256": "51eed9a0c827a66cdfe3d5f4e68a34c34eb0e67caa2efd01ad30064696d4daef"
     }
   ]
 }

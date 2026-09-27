@@ -13,13 +13,22 @@ import sys
 
 import numpy as np
 from PIL import Image
+from scipy import ndimage
 
-# hot — каналы, которые у ключа полные, cold — пустые
+# hot — каналы, которые у ключа полные, cold — пустые.
+# black — не хромакей: метки в стиле автора рисуются на чёрном, со свечением и аурой (remove_black).
 KEYS = {
     "magenta": {"rgb": (255, 0, 255), "hot": [0, 2], "cold": [1], "hex": "#FF00FF"},
     "green": {"rgb": (0, 255, 0), "hot": [1], "cold": [0, 2], "hex": "#00FF00"},
     "blue": {"rgb": (0, 0, 255), "hot": [2], "cold": [0, 1], "hex": "#0000FF"},
+    "black": {"rgb": (0, 0, 0), "hot": [], "cold": [0, 1, 2], "hex": "#000000", "dark": 24},
+    # светящиеся предметы — кристаллы: тусклая часть ауры полупрозрачная, тает в фон
+    "black-glow": {"rgb": (0, 0, 0), "hot": [], "cold": [0, 1, 2], "hex": "#000000", "dark": 56},
 }
+# Чёрный фон: пиксель не ярче dark ключа по самому яркому каналу — кандидат в фон.
+# Фон — такие области, связанные с краем кадра, и закрытые области больше BIG_HOLE кадра (окно рамки).
+# До NOISE — шум сжатия в чёрном: полностью прозрачно.
+BIG_HOLE, NOISE = 0.02, 10
 # Доля ключевого цвета в пикселе: до LO — объект, от HI — фон, между — край.
 LO, HI = 0.10, 0.70
 # Пороги проверки
@@ -36,7 +45,38 @@ def key_amount(rgb, key):
     return (hot - cold) / 255.0
 
 
+def black_background(v, dark):
+    """Маска фона на чёрном: тёмное, связанное с краем кадра, и большие закрытые тёмные окна."""
+    h, w = v.shape
+    lab, n = ndimage.label(v <= dark)
+    if not n:
+        return np.zeros_like(v, bool)
+    keep = np.zeros(n + 1, bool)
+    keep[np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))] = True
+    sizes = ndimage.sum(np.ones_like(v), lab, index=np.arange(1, n + 1))
+    keep[1:] |= sizes > BIG_HOLE * h * w
+    keep[0] = False
+    return keep[lab]
+
+
+def remove_black(img, key="black"):
+    """Предмет — непрозрачный; в фоне альфа растёт с яркостью, так хвосты ауры тают мягко."""
+    dark = KEYS[key]["dark"]
+    rgb = np.asarray(img.convert("RGB")).astype(np.float32)
+    v = rgb.max(-1)
+    bg = black_background(v, dark)
+    alpha = np.where(bg, np.clip((v - NOISE) / (dark - NOISE), 0.0, 1.0) ** 2, 1.0)
+    alpha[alpha < 0.04] = 0.0
+    # в фоне цвет — без примеси чёрного: C = a*F, отсюда F = C / a
+    fg = np.where(bg[..., None], np.clip(rgb / np.maximum(alpha, 1e-3)[..., None], 0, 255), rgb)
+    fg[alpha == 0] = 0
+    out = np.dstack([fg, alpha * 255.0]).round().astype(np.uint8)
+    return Image.fromarray(out, "RGBA")
+
+
 def remove_key(img, key="magenta"):
+    if key.startswith("black"):
+        return remove_black(img, key)
     rgb = np.asarray(img.convert("RGB")).astype(np.float32)
     m = key_amount(rgb, key)
     alpha = 1.0 - np.clip((m - LO) / (HI - LO), 0.0, 1.0)
@@ -74,8 +114,11 @@ def check(path, raw_path=None, key="magenta"):
     r["transparent_share"] = round(float((a == 0).mean()), 3)
     r["opaque_share"] = round(float((a == 255).mean()), 3)
     solid = a > 128
-    m = key_amount(arr[..., :3].astype(np.float32), key)
-    r["key_left_share"] = round(float(((m > 0.35) & solid).sum() / max(1, int(solid.sum()))), 4)
+    if key.startswith("black"):
+        r["key_left_share"] = 0.0          # у чёрного фона нет цвета ключа, который мог бы остаться на предмете
+    else:
+        m = key_amount(arr[..., :3].astype(np.float32), key)
+        r["key_left_share"] = round(float(((m > 0.35) & solid).sum() / max(1, int(solid.sum()))), 4)
     why = []
     if r["corners_max_alpha"] > CORNER_ALPHA_MAX:
         why.append("углы не прозрачные")
@@ -89,7 +132,8 @@ def check(path, raw_path=None, key="magenta"):
         b = max(4, min(rh, rw) // 32)
         ring = np.concatenate([raw[:b].reshape(-1, 3), raw[-b:].reshape(-1, 3),
                                raw[:, :b].reshape(-1, 3), raw[:, -b:].reshape(-1, 3)])
-        r["raw_border_key_share"] = round(float((key_amount(ring, key) >= HI).mean()), 3)
+        on_key = ring.max(-1) <= KEYS[key]["dark"] if key.startswith("black") else key_amount(ring, key) >= HI
+        r["raw_border_key_share"] = round(float(on_key.mean()), 3)
         if r["raw_border_key_share"] < RAW_BORDER_KEY_MIN:
             why.append("фон исходника не ровный ключ — возможно, нарисована шахматка")
     r["ok"] = not why

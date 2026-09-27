@@ -1,5 +1,5 @@
 {
-  "name": "Метки карт: рамка опасности врага по рангу (ADR-0010), стихия — круглый медальон, класс — оружие или предмет, редкость героя — кристалл карста. Схема автора 27.09.2026; его примеры — только направление, из них ничего не берём. Пробная четвёрка, остальное — после одобрения",
+  "name": "Метки карт: рамка опасности врага по рангу (ADR-0010), стихия — медальон, класс — оружие или предмет, редкость героя — кристалл карста. Стиль — по промту автора 27.09.2026: тёмное фэнтези, цифровая живопись с мягкими переходами, проработанными тенями и акцентом на деталях, магический свет, сплошной чёрный фон. Первая проба в простом стиле автором отклонена: «слишком просто»",
   "plan": {
     "Рамки рангов (ADR-0010)": {
       "рядовой": "тонкое тёмное железо, без украшений",
@@ -41,37 +41,37 @@
   "models": [
     "nb2"
   ],
-  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
-  "negative": "No text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
-  "cutout_rule": "Isolate the subject on a perfectly flat, uniform, solid pure {name} background ({hex}) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use {name} or similar colors anywhere in the subject.",
+  "style": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.",
+  "negative": "No text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+  "cutout_rule": "The background is solid pure black ({hex}), flat, edge to edge: no gradient, no texture, no floor, no vignette, no checkerboard. Glow, aura and magical light around the subject are welcome and fade into the black. Leave a clear margin of black around the subject on all sides.",
   "categories": {
     "frames": {
       "aspect": "5:4",
       "size": "1K",
-      "cutout": "magenta",
+      "cutout": "black",
       "refs": [],
-      "frame": "Format: an ornate frame for an enemy card in a mobile card battler, landscape 5:4, seen straight on, flat and symmetric. The frame is a border only: the whole inside is an empty window of exactly the same flat background color as the outside — nothing at all inside the frame: no mist, no smoke, no glow, no light, no sparkles and no color inside the window. The border is about 8% of the frame width thick; small ornaments may rise a little above the top edge and stand out at the corners. The frame is centered and a clear margin of background surrounds it on all sides. The rank of the enemy must read instantly at 74 px wide: the more dangerous the rank, the richer the material and the heavier the ornament. All seven items of this set share the same size, angle, outline and painted material, so they read as one set. Simple strong silhouette readable at 20 px, crisp clean edges with a dark outline. Any glow stays inside the shape: no light rays, no halo and no light spill outside it. No pink or magenta tint anywhere in the subject."
+      "frame": "Format: an ornate frame for an enemy card in a dark fantasy card battler, landscape 5:4, seen straight on, symmetric. The frame is a border only. The whole canvas is solid pure black — outside the frame and inside its window alike; only the frame itself is painted, nothing inside the window. The border is about 9% of the frame width thick and richly detailed; ornaments rise above the top edge and stand out at the corners. The rank must read instantly even on a small card: the more dangerous the rank, the richer the material, the heavier the ornament and the stronger the magical light."
     },
     "elements": {
       "aspect": "1:1",
       "size": "1K",
-      "cutout": "magenta",
+      "cutout": "black",
       "refs": [],
-      "frame": "Format: game UI icon of an element, square. A round medallion about 80% of the canvas: a thick rim of dark forged iron and worn stone with small old-gold rivets; inside it, a dark stone disc with one bold symbol of the element that glows from within in the element's own color. All seven items of this set share the same size, angle, outline and painted material, so they read as one set. Simple strong silhouette readable at 20 px, crisp clean edges with a dark outline. Any glow stays inside the shape: no light rays, no halo and no light spill outside it. No pink or magenta tint anywhere in the subject."
+      "frame": "Format: game icon of an element, square, no border around the picture. A round medallion about 70% of the canvas, centered: an ornate rim of dark forged iron and old gold; inside it the element itself is alive — its sign and its energy swirl and glow in the element's own color, and a soft magical aura spills beyond the rim into the black. All seven element medallions share the same rim, so they read as one set; the living element inside makes each one unique."
     },
     "classes": {
       "aspect": "1:1",
       "size": "1K",
-      "cutout": "magenta",
+      "cutout": "black",
       "refs": [],
-      "frame": "Format: game UI icon of a hero class, square. One weapon or item that stands for the class, centered, about 80% of the canvas, shown whole, frontal or at a slight angle. Worn, heavy materials: dark forged iron, old wood, leather, touches of old gold; neutral colors, no element colors, no glow. All seven items of this set share the same size, angle, outline and painted material, so they read as one set. Simple strong silhouette readable at 20 px, crisp clean edges with a dark outline. Any glow stays inside the shape: no light rays, no halo and no light spill outside it. No pink or magenta tint anywhere in the subject."
+      "frame": "Format: game icon of a hero class, square, no border around the picture. One weapon or item that stands for the class, centered, about 75% of the canvas, shown whole at a slight dynamic angle. Richly detailed worn materials — dark forged iron, old wood, leather, old gold — with a magical accent: glowing runes, embers or an aura in cold turquoise or warm gold. A strong silhouette that still reads when the icon is small."
     },
     "rarity": {
       "aspect": "1:1",
       "size": "1K",
-      "cutout": "magenta",
+      "cutout": "black-glow",
       "refs": [],
-      "frame": "Format: game UI icon of a rarity, square. One carst crystal — the magic crystal of this world — upright, frontal, centered, about 75% of the canvas. The seven rarities form a ladder from a rough matte stone to a flawless crystal full of inner light: the higher the rarity, the cleaner the facets and the stronger the light inside. All seven items of this set share the same size, angle, outline and painted material, so they read as one set. Simple strong silhouette readable at 20 px, crisp clean edges with a dark outline. Any glow stays inside the shape: no light rays, no halo and no light spill outside it. No pink or magenta tint anywhere in the subject."
+      "frame": "Format: game icon of a rarity, square, no border around the picture. One carst crystal — the magic crystal of this world — upright, centered, about 70% of the canvas, floating in the dark. The seven rarities form a ladder from a dull cracked stone to a flawless crystal blazing with inner light: the higher the rarity, the cleaner the facets, the brighter the light inside and the stronger the aura and the floating shards around it."
     }
   },
   "jobs": [
@@ -80,29 +80,28 @@
       "category": "frames",
       "title": "Рамка ранга: элита",
       "source": "ADR-0010 — ранги врагов; схема автора 27.09.2026: опасность врага показывает рамка",
-      "subject": "Rank: Elite — the second of seven ranks, clearly above a plain rank-and-file enemy. Old bronze with a darker patina, heavy round rivets along the whole border, bevelled edges; at the top center a small cut gemstone of warm amber held in a bronze claw. The gem is a solid stone with a bright highlight: it does not glow and casts no light."
+      "subject": "Rank: Elite — the second of seven ranks, clearly above a plain rank-and-file enemy but far below a boss. Old bronze with a dark patina, heavy rivets and engraved bands along the border; at the top center a cut amber gem held in a bronze claw, a warm ember light pulsing inside the gem, faint amber embers drifting around the claw."
     },
     {
       "id": "mark-el-time",
       "category": "elements",
       "title": "Стихия: Время",
       "source": "GDD §3.1 — семь стихий; цвет карста Энериум из art/style/style.md",
-      "subject": "The element of Time: an hourglass symbol drawn in green Energium light (#4FDC8B), its grains of sand frozen mid-fall inside the glass."
+      "subject": "The element of Time: an hourglass of old gold and glass in the center of the medallion; green Energium light (#4FDC8B) swirls around it, grains of sand hang frozen in the air mid-fall, a faint green aura spills beyond the rim."
     },
     {
       "id": "mark-cls-tank",
       "category": "classes",
       "title": "Класс: танк",
       "source": "GDD §3.1 — классы",
-      "subject": "The Tank class: a heavy heater shield — a flat top and a pointed bottom, not round — made of dark oak planks bound with a thick iron rim and rivets, with a round old-gold boss in the center; dents and scratches from blows it has taken. Seen from the front. No glow, no sparks, no light accents on it."
+      "subject": "The Tank class: a heavy heater shield — a flat top and a pointed bottom — of dark oak and blackened iron, battered by countless blows, with a thick riveted rim and an old-gold boss; faint turquoise runes glow in the cracks of the iron, as if the shield itself refuses to break."
     },
     {
       "id": "mark-rar-epic",
       "category": "rarity",
-      "cutout": "green",
       "title": "Редкость: эпическая (4 из 7)",
       "source": "GDD §3.1 — семь редкостей; цвет — токен --r4 интерфейса",
-      "subject": "Epic rarity, the fourth of seven: a clean faceted violet crystal (#A986EE) with a soft violet light glowing inside and a few bright inner facets — clearly precious, but not yet radiant."
+      "subject": "Epic rarity, the fourth of seven: a clean faceted violet crystal (#A986EE) with a strong violet light inside, bright inner facets, a soft violet aura around it and a few small violet shards floating nearby."
     }
   ]
 }
