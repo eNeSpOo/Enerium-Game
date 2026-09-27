@@ -51,8 +51,12 @@ node tools/content-gen/abilities/check_core.js
 
 ## Экономика
 
-`economy/economy.py` — калькулятор к `docs/content/экономика-золото-дух.md`: цена уровней и кругов героя, доход забега, сроки. Числа — данными в начале файла, только целые. Флаг `--sim` перемеряет бой через Node и `design/ui/battle.js`. Нужен Python 3.
+`economy/economy.py` — калькулятор к `docs/content/экономика-золото-дух.md`: цена уровней и кругов героя, доход забега, сроки. Числа — данными в начале файла, только целые. Флаг `--sim` перемеряет бой через Node: `design/ui/battle.js` с наборами способностей из `abilities.js` и `kits.js`, отряд — как в прототипе; вывод вставить в `SIM`. Темп цикла I по ADR-0018 — таблица Т15. Нужен Python 3.
 
 ```bash
 python tools/content-gen/economy/economy.py
+```
+
+```bash
+python tools/content-gen/economy/economy.py --sim
 ```
