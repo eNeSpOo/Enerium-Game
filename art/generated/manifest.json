@@ -5855,6 +5855,355 @@
         1344
       ],
       "sha256": "8467f5e0e4686ef52af9ece0e80891fe0bfa1dd257fc99ce1d28c128102455a8"
+    },
+    {
+      "file": "art/generated/frames/mark-frame-elite__nb2.png",
+      "category": "frames",
+      "job": "mark-frame-elite",
+      "title": "Рамка ранга: элита",
+      "source": "ADR-0010 — ранги врагов; схема автора 27.09.2026: опасность врага показывает рамка",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T04:34:43+03:00",
+      "params": {
+        "aspectRatio": "5:4",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: an ornate frame for an enemy card in a mobile card battler, landscape 5:4, seen straight on, flat and symmetric. The frame is a border only: the whole inside is an empty window of the same flat background color as the rest of the canvas — nothing at all inside the frame. The border is about 8% of the frame width thick; small ornaments may rise a little above the top edge and stand out at the corners. The frame is centered and a clear margin of background surrounds it on all sides. The rank of the enemy must read instantly at 74 px wide: the more dangerous the rank, the richer the material and the heavier the ornament. All seven items of this set share the same size, angle, outline and painted material, so they read as one set. Simple strong silhouette readable at 20 px, crisp clean edges with a dark outline. Any glow stays inside the shape: no light rays, no halo and no light spill outside it. No pink or magenta tint anywhere in the subject.\n\nRank: Elite — the second of seven ranks, clearly above a plain rank-and-file enemy. Old bronze with a darker patina, heavy round rivets along the whole border, bevelled edges; at the top center a small cut gemstone of warm amber held in a bronze claw.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 546,
+        "candidatesTokenCount": 1541,
+        "totalTokenCount": 2087,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 546
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0687,
+      "seconds": 8.6,
+      "status": "заменён: внутри окна дымка от свечения — после вырезки легла бы налётом на портрет",
+      "raw": "art/generated/frames/mark-frame-elite__nb2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 26,
+        "transparent_share": 0.582,
+        "opaque_share": 0.31,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": false,
+        "why": "углы не прозрачные"
+      },
+      "px": [
+        1152,
+        928
+      ],
+      "sha256": "5a412257b5861b9d7183404edf86ffef237e79b8bf911866d4b17ab892d10a20"
+    },
+    {
+      "file": "art/generated/elements/mark-el-time__nb2.png",
+      "category": "elements",
+      "job": "mark-el-time",
+      "title": "Стихия: Время",
+      "source": "GDD §3.1 — семь стихий; цвет карста Энериум из art/style/style.md",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T04:34:53+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: game UI icon of an element, square. A round medallion about 80% of the canvas: a thick rim of dark forged iron and worn stone with small old-gold rivets; inside it, a dark stone disc with one bold symbol of the element that glows from within in the element's own color. All seven items of this set share the same size, angle, outline and painted material, so they read as one set. Simple strong silhouette readable at 20 px, crisp clean edges with a dark outline. Any glow stays inside the shape: no light rays, no halo and no light spill outside it. No pink or magenta tint anywhere in the subject.\n\nThe element of Time: an hourglass symbol drawn in green Energium light (#4FDC8B), its grains of sand frozen mid-fall inside the glass.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 447,
+        "candidatesTokenCount": 1517,
+        "totalTokenCount": 1964,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 447
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0686,
+      "seconds": 9.7,
+      "status": "проба меток, ждёт автора: стихия Время",
+      "raw": "art/generated/elements/mark-el-time__nb2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.392,
+        "opaque_share": 0.602,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "c570136f707b04204448e5a5bbc21870853aa27c68541221ca0228daecd7dec4"
+    },
+    {
+      "file": "art/generated/classes/mark-cls-tank__nb2.png",
+      "category": "classes",
+      "job": "mark-cls-tank",
+      "title": "Класс: танк",
+      "source": "GDD §3.1 — классы",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T04:35:03+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: game UI icon of a hero class, square. One weapon or item that stands for the class, centered, about 80% of the canvas, shown whole, frontal or at a slight angle. Worn, heavy materials: dark forged iron, old wood, leather, touches of old gold; neutral colors, no element colors, no glow. All seven items of this set share the same size, angle, outline and painted material, so they read as one set. Simple strong silhouette readable at 20 px, crisp clean edges with a dark outline. Any glow stays inside the shape: no light rays, no halo and no light spill outside it. No pink or magenta tint anywhere in the subject.\n\nThe Tank class: a heavy shield — dark oak planks bound with a thick iron rim and rivets, a round old-gold boss in the center, dents and scratches from blows it has taken; seen from the front.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 465,
+        "candidatesTokenCount": 1524,
+        "totalTokenCount": 1989,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 465
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0686,
+      "seconds": 8.9,
+      "status": "заменён: круглый щит путается с медальоном стихии, лишние искры",
+      "raw": "art/generated/classes/mark-cls-tank__nb2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.44,
+        "opaque_share": 0.549,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "e34ea36b012c828b4f515573080530f844c914c06edd6734f298c407f0f23f7b"
+    },
+    {
+      "file": "art/generated/rarity/mark-rar-epic__nb2.png",
+      "category": "rarity",
+      "job": "mark-rar-epic",
+      "title": "Редкость: эпическая (4 из 7)",
+      "source": "GDD §3.1 — семь редкостей; цвет — токен --r4 интерфейса",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T04:35:12+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: game UI icon of a rarity, square. One carst crystal — the magic crystal of this world — upright, frontal, centered, about 75% of the canvas. The seven rarities form a ladder from a rough matte stone to a flawless crystal full of inner light: the higher the rarity, the cleaner the facets and the stronger the light inside. All seven items of this set share the same size, angle, outline and painted material, so they read as one set. Simple strong silhouette readable at 20 px, crisp clean edges with a dark outline. Any glow stays inside the shape: no light rays, no halo and no light spill outside it. No pink or magenta tint anywhere in the subject.\n\nEpic rarity, the fourth of seven: a clean faceted violet crystal (#A986EE) with a soft violet light glowing inside and a few bright inner facets — clearly precious, but not yet radiant.\n\nIsolate the subject on a perfectly flat, uniform, solid pure green background (#00FF00) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use green or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 466,
+        "candidatesTokenCount": 1496,
+        "totalTokenCount": 1962,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 466
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0686,
+      "seconds": 8.6,
+      "status": "проба меток, ждёт автора: редкость «эпическая»",
+      "raw": "art/generated/rarity/mark-rar-epic__nb2.raw.jpg",
+      "cutout": {
+        "key": "green",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.777,
+        "opaque_share": 0.219,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "86fbce628a63c1fd76b26c9bffff26ee5f2493e46cb2d3418329d7aa22c846e4"
+    },
+    {
+      "file": "art/generated/frames/mark-frame-elite__nb2-v2.png",
+      "category": "frames",
+      "job": "mark-frame-elite",
+      "title": "Рамка ранга: элита",
+      "source": "ADR-0010 — ранги врагов; схема автора 27.09.2026: опасность врага показывает рамка",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T04:36:48+03:00",
+      "params": {
+        "aspectRatio": "5:4",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: an ornate frame for an enemy card in a mobile card battler, landscape 5:4, seen straight on, flat and symmetric. The frame is a border only: the whole inside is an empty window of exactly the same flat background color as the outside — nothing at all inside the frame: no mist, no smoke, no glow, no light, no sparkles and no color inside the window. The border is about 8% of the frame width thick; small ornaments may rise a little above the top edge and stand out at the corners. The frame is centered and a clear margin of background surrounds it on all sides. The rank of the enemy must read instantly at 74 px wide: the more dangerous the rank, the richer the material and the heavier the ornament. All seven items of this set share the same size, angle, outline and painted material, so they read as one set. Simple strong silhouette readable at 20 px, crisp clean edges with a dark outline. Any glow stays inside the shape: no light rays, no halo and no light spill outside it. No pink or magenta tint anywhere in the subject.\n\nRank: Elite — the second of seven ranks, clearly above a plain rank-and-file enemy. Old bronze with a darker patina, heavy round rivets along the whole border, bevelled edges; at the top center a small cut gemstone of warm amber held in a bronze claw. The gem is a solid stone with a bright highlight: it does not glow and casts no light.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 585,
+        "candidatesTokenCount": 1533,
+        "totalTokenCount": 2118,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 585
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0687,
+      "seconds": 8.4,
+      "status": "проба меток, ждёт автора: рамка ранга «элита»",
+      "raw": "art/generated/frames/mark-frame-elite__nb2-v2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.703,
+        "opaque_share": 0.284,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1152,
+        928
+      ],
+      "sha256": "d5360b820a22277796b7b907c995c803aeb559c8454fe9f3f2e9a4a2887fec40"
+    },
+    {
+      "file": "art/generated/classes/mark-cls-tank__nb2-v2.png",
+      "category": "classes",
+      "job": "mark-cls-tank",
+      "title": "Класс: танк",
+      "source": "GDD §3.1 — классы",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T04:36:58+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: game UI icon of a hero class, square. One weapon or item that stands for the class, centered, about 80% of the canvas, shown whole, frontal or at a slight angle. Worn, heavy materials: dark forged iron, old wood, leather, touches of old gold; neutral colors, no element colors, no glow. All seven items of this set share the same size, angle, outline and painted material, so they read as one set. Simple strong silhouette readable at 20 px, crisp clean edges with a dark outline. Any glow stays inside the shape: no light rays, no halo and no light spill outside it. No pink or magenta tint anywhere in the subject.\n\nThe Tank class: a heavy heater shield — a flat top and a pointed bottom, not round — made of dark oak planks bound with a thick iron rim and rivets, with a round old-gold boss in the center; dents and scratches from blows it has taken. Seen from the front. No glow, no sparks, no light accents on it.\n\nIsolate the subject on a perfectly flat, uniform, solid pure magenta background (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear margin of background around the subject. Do not use magenta or similar colors anywhere in the subject.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 492,
+        "candidatesTokenCount": 1561,
+        "totalTokenCount": 2053,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 492
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0688,
+      "seconds": 9.0,
+      "status": "проба меток, ждёт автора: класс «танк» — каплевидный щит",
+      "raw": "art/generated/classes/mark-cls-tank__nb2-v2.raw.jpg",
+      "cutout": {
+        "key": "magenta",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.486,
+        "opaque_share": 0.509,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "53aaab339a6db49c3d17fa72e84954a252e7a35438a0076d3df68545de7b972b"
     }
   ]
 }
