@@ -137,7 +137,8 @@ if KITS.exists():
     for h in heroes:
         k = kits.get(h["id"])
         if k:
-            h.update(school=k["school"], chPct=k["chPct"], kit=[{"v": x["v"], "slot": x["slot"], "id": x["id"], "chR": x["chR"]} for x in k["kit"]])
+            h.update(school=k["school"], chPct=k["chPct"], kitHand=k.get("hand", False), kitWhy=k.get("why", ""),
+                     kit=[{"v": x["v"], "slot": x["slot"], "id": x["id"], "chR": x["chR"]} for x in k["kit"]])
 data = {"sets": sets, "heroes": sorted(heroes, key=lambda h: h["id"])}
 OUT.write_text("/* Собрано tools/content-gen/heroes/export_ui.py из docs/content/герои/цикл-1..6.md. Руками не править.\n"
                "   Черновик · ждёт автора. Поля team — только для команды: игрок их не видит. */\n"

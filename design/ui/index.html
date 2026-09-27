@@ -3428,7 +3428,9 @@ function khKit(h, v) {
     return `<button class="kh-ab ${x.slot === 'ult' ? 'ult' : ''} ${open ? '' : 'lock'}" data-kh="ab" data-v="${x.id}" data-set="${a.set}" title="${klEsc(a.d)}">`
       + `<span class="dv">${x.v}</span><span class="ti">${ic(KL_IC[a.k] || 'gem')}</span><span class="tx"><b>${a.n}</b><small>${what}${tier}${ch}${open ? '' : ' · откроется на доблести ' + x.v}</small></span></button>`;
   }).join('');
-  return `<span class="eyebrow">Способности по доблести · шанс × ${mul}</span><div class="kh-kit">${rows}</div>`;
+  const why = h.kitHand ? (h.kitWhy ? `<p class="muted" style="font-size:13px">${h.kitWhy}</p>` : '')
+    : '<p class="faint" style="font-size:12.5px">Набор собран автоматом по роли класса — черновик: сеты пересобираются вручную.</p>';
+  return `<span class="eyebrow">Способности по доблести · шанс × ${mul}${h.kitHand ? ' · собран вручную' : ''}</span><div class="kh-kit">${rows}</div>${why}`;
 }
 function khSetBox(S_) {
   const ms = khData().heroes.filter(h => h.set === S_.no), open = S_.type === 'братство';
