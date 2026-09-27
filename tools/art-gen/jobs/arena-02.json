@@ -1,0 +1,28 @@
+{
+  "name": "Арена Мастерской 21:9, вторая раскладка: карты лежат в левой и правой четвертях — там только пол; стены тонкой полосой сверху и снизу, столы и кристаллы — в средней половине (замечание автора 27.09.2026)",
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images (approved game art), but do NOT copy their subjects, objects, letters or composition unless told to.",
+  "negative": "No text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+  "cutout_rule": "",
+  "categories": {
+    "arenas": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [
+        "art/generated/arenas/arena-workshop-wide__nb2.jpg"
+      ],
+      "frame": "Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective walls, no ceiling, no sky. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit floor over their whole height: stone slabs, sand and fine cracks only — no walls, no tables, no crystals, no objects, no falling sand there. The hall continues beyond the left and right edges of the picture: there are no side walls. Walls appear only as a thin strip along the very top and bottom edges, no more than 7% of the height. All details — worktables, clay works, crystals, falling sand — are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm, because the game shows banners there. The attached reference is the current version of this scene: keep its look, palette, lighting and objects, but recompose it by these rules."
+    }
+  },
+  "jobs": [
+    {
+      "id": "arena-workshop-wide",
+      "category": "arenas",
+      "title": "Арена Мастерской форм, 21:9 — зоны карт по бокам свободны",
+      "source": "замечание автора 27.09.2026: карты ложатся в стены и на столы; ADR-0005 — бой пять на пять",
+      "subject": "Subject: the floor of a long hall of the Workshop of Forms, the first hall under the city of Endalor, where a god once sculpted living beings from clay and abandoned the work halfway. Large worn stone floor slabs with cracks; drifts and still ripples of pale sand. In the central half only: at the top edge and at the bottom edge, one heavy wooden worktable each, seen from above, with unfinished clay works lying on them — a hand without fingers, a face without features, half of a small beast — sculpting chisels, clay-stained cloths; white-green crystals glowing from within in the cracks near the tables; one thin stream of sand falling from the unseen vault into a small round pile beside each table. The hall is cold: near-black stone, white-green crystal light, pale sand. The only warm color is the ochre clay of the unfinished works. No candles, no fire, no warm lamps, no grid, no characters, no cards."
+    }
+  ]
+}
