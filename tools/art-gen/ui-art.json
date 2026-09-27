@@ -1,5 +1,5 @@
 {
-  "note": "Какой арт из art/generated/ идёт в прототип design/ui/. Враги — ADR-0013, отряд — герои сета 1 «Хранители Песочных Часов», арена — вторая раскладка. mirror — отражение: герой на карте смотрит вправо, враг — влево (решение автора 27.09.2026). Выгрузка: python tools/art-gen/export_ui.py",
+  "note": "Какой арт из art/generated/ идёт в прототип design/ui/. Враги — ADR-0013, отряд — герои сета 1 «Хранители Песочных Часов», арена — вторая раскладка. mirror — отражение: корпус героя на карте развёрнут вправо, к врагам, корпус врага — влево, к героям (решение автора 27.09.2026). Выгрузка: python tools/art-gen/export_ui.py",
   "out": "design/ui/assets/art",
   "size": [
     464,
@@ -11,10 +11,7 @@
       "from": "enemies/wp-longarm__nb2.jpg",
       "mirror": true
     },
-    "foes/o3.jpg": {
-      "from": "enemies/wp-hollow__nb2.jpg",
-      "mirror": true
-    },
+    "foes/o3.jpg": "enemies/wp-hollow__nb2.jpg",
     "foes/o4.jpg": {
       "from": "enemies/ws-headless__nb2.jpg",
       "mirror": true
@@ -49,10 +46,7 @@
       "from": "heroes/hero-hravn__nb2.jpg",
       "mirror": true
     },
-    "heroes/h3.jpg": {
-      "from": "heroes/hero-laeira__nb2.jpg",
-      "mirror": true
-    },
+    "heroes/h3.jpg": "heroes/hero-laeira__nb2.jpg",
     "heroes/h4.jpg": {
       "from": "heroes/hero-ilmerra__nb2.jpg",
       "mirror": true
