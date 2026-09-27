@@ -3419,19 +3419,21 @@ function khDetail() {
 /* способности героя по доблести: доблесть 0 — первая активная, каждая доблесть — новая, последняя — ульта (ADR-0016).
    Описание берётся из библиотеки (abilities.js), нажатие ведёт в её раздел. */
 function khKit(h, v) {
-  const D = klData(), mul = (h.chPct / 10000).toFixed(2).replace('.', ',');
+  const D = klData(), P = bp => String(bp / 100).replace('.', ',') + ' %';
+  const open = h.kit.filter(x => x.v <= v && x.share), basic = 10000 - open.reduce((s, x) => s + x.share, 0);
   const rows = h.kit.map(x => {
-    const a = klFind(x.id) || { n: x.id, k: '', set: '', d: '' }, open = x.v <= v;
+    const a = klFind(x.id) || { n: x.id, k: '', set: '', d: '' }, on = x.v <= v;
     const what = x.slot === 'ult' ? 'ульта' : x.slot === 'pas' ? 'пассивка' : x.slot === 'react' ? 'реакция' : a.k === 'farm' ? 'фарм' : (D.kinds[a.k] || '').toLowerCase();
     const tier = x.slot !== 'pas' && x.slot !== 'react' && a.tier && D.tiers[a.tier] ? ' · ' + D.tiers[a.tier].toLowerCase() : '';
-    const ch = x.chR ? ' · ' + String(x.chR / 100).replace('.', ',') + ' %' : '';
-    return `<button class="kh-ab ${x.slot === 'ult' ? 'ult' : ''} ${open ? '' : 'lock'}" data-kh="ab" data-v="${x.id}" data-set="${a.set}" title="${klEsc(a.d)}">`
-      + `<span class="dv">${x.v}</span><span class="ti">${ic(KL_IC[a.k] || 'gem')}</span><span class="tx"><b>${a.n}</b><small>${what}${tier}${ch}${open ? '' : ' · откроется на доблести ' + x.v}</small></span></button>`;
+    const ch = x.share ? ' · ' + P(x.share) + ' хода' : x.chR ? ' · шанс ' + P(x.chR) : '';
+    return `<button class="kh-ab ${x.slot === 'ult' ? 'ult' : ''} ${on ? '' : 'lock'}" data-kh="ab" data-v="${x.id}" data-set="${a.set}" title="${klEsc(a.d)}">`
+      + `<span class="dv">${x.v}</span><span class="ti">${ic(KL_IC[a.k] || 'gem')}</span><span class="tx"><b>${a.n}</b><small>${what}${tier}${ch}${on ? '' : ' · откроется на доблести ' + x.v}</small></span></button>`;
   }).join('');
   const why = h.kitHand ? (h.kitWhy ? `<p class="muted" style="font-size:13px">${h.kitWhy}</p>` : '')
     : '<p class="faint" style="font-size:12.5px">Набор собран автоматом по роли класса — черновик: сеты пересобираются вручную.</p>';
-  const cap = h.capPct ? ` · потолок ${h.capPct / 100} %` : '';
-  return `<span class="eyebrow">Способности по доблести · шанс × ${mul}${cap}${h.kitHand ? ' · собран вручную' : ''}</span><div class="kh-kit">${rows}</div>${why}`;
+  const head = h.actPct ? ` · способности ${P(h.actPct)}, ульта ${P(h.ultPct)}` : '';
+  return `<span class="eyebrow">Способности по доблести${head}${h.kitHand ? ' · собран вручную' : ''}</span><div class="kh-kit">${rows}</div>`
+    + `<p class="faint" style="font-size:12.5px">На доблести ${v} обычная атака — ${P(basic)} хода: закрытые способности отдают ей свою долю.</p>${why}`;
 }
 function khSetBox(S_) {
   const ms = khData().heroes.filter(h => h.set === S_.no), open = S_.type === 'братство';
