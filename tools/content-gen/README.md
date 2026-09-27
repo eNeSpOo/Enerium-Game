@@ -39,12 +39,14 @@ python tools/content-gen/heroes/export_ui.py
 - `library.py` собирает библиотеку способностей по ADR-0015: восемь наборов — семь школ и «Без школы» — по восемь видов в трёх ступенях по числу целей, ульты, пассивки и реакции, общий набор фарма. Пишет `library.json` для ядра, черновик `docs/content/библиотека-способностей.md` и `design/ui/abilities.js` — раздел «Библиотека способностей» в UI-ките. Проверяет, что названия не повторяются, каждое из 72 названий таблицы использовано один раз, а контроль, дебафф и бафф у наборов свои.
 
 - `assign.py` распределяет библиотеку по героям из `docs/content/герои/герои.csv` и по врагам Мастерской (ADR-0016). Пишет `kits.json`, черновик `docs/content/распределение-способностей.md` и `design/ui/kits.js` — наборы для ядра боя прототипа. Проверяет, что двух одинаковых наборов нет. Наборы попадают в карточку героя UI-кита через `heroes/export_ui.py` — запускайте его после `assign.py`.
+- `check_core.js` — автопроверка библиотеки в ядре боя прототипа, нужен Node. Каждая из 339 способностей срабатывает в подобранном бою без ошибок, числа боя и добычи остаются целыми. Запускайте после `library.py` и `assign.py` и после правок `design/ui/battle.js`.
 
 ```bash
 python tools/content-gen/abilities/extract.py
 python tools/content-gen/abilities/library.py
 python tools/content-gen/abilities/assign.py
 python tools/content-gen/heroes/export_ui.py
+node tools/content-gen/abilities/check_core.js
 ```
 
 ## Экономика

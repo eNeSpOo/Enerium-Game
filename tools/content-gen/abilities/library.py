@@ -66,6 +66,7 @@ TRIG = {
     "ccd": "на героя наложили контроль", "crit": "герой нанёс крит", "foeUlt": "враг применил ульту",
     "firstHit": "по герою пришёл первый удар за этаж",
 }
+TRIG_PCT = {"allyLow": 30, "half": 50, "low": 25}   # пороги здоровья триггеров, % — из текстов TRIG
 
 # ---------------- восемь наборов ----------------
 # eff — эффекты набора: (название, смысл, данные). act — по виду три способности: на всех, на 2–3, на одного;
@@ -104,7 +105,7 @@ SETS = {
         "react": [("hit", "Ответный жар", "20 % шанс поджечь атакующего — 1 стак горения.", {"ch": 2000, "then": "dot"}),
                   ("crit", "Огонь в ране", "Цель получает 1 стак горения.", {"then": "dot"}),
                   ("kill", "Перекинувшийся огонь", "Если враг горел, горение со всеми стаками переходит на случайного врага.", {"then": "spreadDot"}),
-                  ("allyDown", "Пепел павших", "Отряду +15 % урона до конца этажа.", {"st": "dmgUp", "pow": 1500, "floor": True})],
+                  ("allyDown", "Пепел павших", "Отряду +15 % урона до конца этажа.", {"st": "dmgUp", "pow": 1500, "floor": True, "party": True})],
     },
     "Земля": {
         "eff": {"dot": ("яд", "урон в начале каждого хода цели; на раунд дольше горения, но слабее", {}),
@@ -221,7 +222,7 @@ SETS = {
                 "heal": [("Половодье", "целям с тремя стаками родника — ещё щит на 10 % здоровья", {"atStacks": {"n": 3, "shieldPct": 10}}, 43),
                          ("Прилив", "с родником +15 %", {"vsHot": 15}, 42), ("Глоток", "с родником +25 %", {"vsHot": 25}, 41)],
                 "shield": [("Ледяной покров", "", {}, None), ("Ледяная стена", "", {}, None),
-                           ("Ледяная броня", "кто бьёт по щиту, получает стужу на раунд", {"thorns": "debuff"}, None)],
+                           ("Ледяная броня", "кто бьёт по щиту, получает стужу на раунд", {"thorns": "debuff", "thornsLeft": 1}, None)],
                 "dot": [("Стылый туман", "", {}, None), ("Иней", "", {}, None), ("Обморожение", "", {}, None)],
                 "hot": [("Капель", "", {}, None), ("Живой ключ", "", {}, None), ("Родник", "", {}, 40)],
                 "ctrl": [("Заморозки", "", {}, None), ("Ледяная хватка", "", {}, None), ("Ледяные оковы", "", {}, 38)],
@@ -535,7 +536,7 @@ def build_farm():
 def build():
     lib = {"source": SRC["source"],
            "rules": {"kinds": KINDS, "tiers": TIERS, "groupTargets": GROUP_N, "tiersTpl": TPL, "ch": CH, "ctrlCh": CTRL_CH, "ultCh": ULT_CH,
-                     "ultPow": ULT_POW, "ultLonger": ULT_LONGER, "ultStacks": ULT_STACKS, "capBp": 6000, "triggers": TRIG,
+                     "ultPow": ULT_POW, "ultLonger": ULT_LONGER, "ultStacks": ULT_STACKS, "capBp": 6000, "triggers": TRIG, "trigPct": TRIG_PCT,
                      "farmStacks": True, "noSchool": "фарм-герои и герои без стихии"},
            "sets": {name: build_set(name, S) for name, S in SETS.items()}, "farm": build_farm()}
     every = [x for s in lib["sets"].values() for part in ("active", "ult", "passive", "reaction") for x in s[part]]
@@ -729,7 +730,7 @@ def write_ui(lib, every):
     data = {"total": len(every), "sets": sets,
             "kinds": {**KIND_NAME, "passive": "Пассивка", "reaction": "Реакция", "farm": "Фарм"},
             "tiers": {**TIER_NAME, "self": "На этаж"}, "triggers": TRIG,
-            "rules": {"ch": CH, "ctrlCh": CTRL_CH, "ultCh": ULT_CH, "ultPow": ULT_POW, "capBp": 6000, "farmStacks": True}}
+            "rules": {"ch": CH, "ctrlCh": CTRL_CH, "ultCh": ULT_CH, "ultPow": ULT_POW, "capBp": 6000, "farmStacks": True, "trigPct": TRIG_PCT}}
     OUT_UI.write_text("/* Собрано tools/content-gen/abilities/library.py — библиотека способностей по ADR-0015. Руками не править.\n"
                       "   Черновик: названия с номером — из таблицы автора, остальные автор принял как рабочие; числа — демонстрация. */\n"
                       "window.EN_ABILITIES = " + json.dumps(data, ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")

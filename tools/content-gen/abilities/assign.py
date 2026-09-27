@@ -791,7 +791,7 @@ def write_md(data, by_id):
 
 def write_ui(data):
     """Наборы для ядра боя прототипа: доблесть открытия, место, запись библиотеки; у врагов — имя врага и правило цели."""
-    keep = ("v", "slot", "id", "as", "tgt")
+    keep = ("v", "slot", "id", "as", "tgt", "chR")   # chR — шанс реакции по редкости героя
     ui = {"heroes": {hid: {"ultPct": h["ultPct"], "actPct": h["actPct"], "rarity": h["rarity"], "maxV": h["maxV"],
                            "kit": [{k: x[k] for k in keep if x.get(k) is not None} for x in h["kit"]]} for hid, h in data["heroes"].items()},
           "foes": {fid: {"rank": f["rank"], "ultPct": f["ultPct"], "actPct": f["actPct"],

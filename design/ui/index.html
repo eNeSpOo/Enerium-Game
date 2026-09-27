@@ -1787,11 +1787,13 @@ const SCHOOL_C = { 'Огонь': 'var(--fire)', 'Земля': 'var(--earth)', '�
 const ST_ICON = { stun: ['chain', 'Оглушение: пропускает ходы'], silence: ['lock', 'Безмолвие: без способностей'], stop: ['hour', 'Остановка: ходит последней, ульта не срабатывает'], weak: ['down', 'Ослабление: меньше урона'], mark: ['target', 'Метка: получает больше урона'], pierce: ['crack', 'Осыпание: ниже физ. защита'],
   paralyze: ['chain', 'Паралич: без обычной атаки'], freeze: ['drop', 'Заморозка: пропускает ходы, лёд спадает от крупного удара'], terror: ['skull', 'Ужас: не действует, спадает от удара'], knock: ['wave', 'Сброс: пропускает ход, угроза обнулена'], blind: ['eye', 'Ослепление: удары мимо'],
   slow: ['hour', 'Стужа: ходит позже'], miss: ['eye', 'Слепота: чаще промахивается'], rend: ['crack', 'Засветка: ниже маг. защита'], chanceDown: ['down', 'Истечение: реже способности'], break: ['crack', 'Слом строя: слабее криты, реже уклоняется'],
-  dmgUp: ['up', 'Жар: больше урона'], guard: ['shield', 'Каменная кожа: меньше получаемого урона'], evade: ['ff', 'Попутный ветер: выше уклонение'], lifesteal: ['drop', 'Кровожадность: вампиризм'], healTaken: ['heal', 'Живая вода: больше получаемого лечения'], defUp: ['shield', 'Освящение: выше защита'], chanceUp: ['up', 'Ускорение: чаще способности'], critUp: ['star', 'Боевой дух: чаще криты'] };
+  dmgUp: ['up', 'Жар: больше урона'], guard: ['shield', 'Каменная кожа: меньше получаемого урона'], evade: ['ff', 'Попутный ветер: выше уклонение'], lifesteal: ['drop', 'Кровожадность: вампиризм'], healTaken: ['heal', 'Живая вода: больше получаемого лечения'], defUp: ['shield', 'Освящение: выше защита'], chanceUp: ['up', 'Ускорение: чаще способности'], critUp: ['star', 'Боевой дух: чаще криты'],
+  iceblock: ['drop', 'Ледяной панцирь: урон не проходит, пропускает ход'], trophy: ['target', 'Метка трофея: больше добычи при гибели'], greed: ['star', 'Жадный взгляд: павшие враги дают больше добычи'] };
+const AURA_TXT = { dmgUp: ['up', 'Урон'], evade: ['ff', 'Уклонение'], lifesteal: ['drop', 'Вампиризм'] };   // эффекты реакций до конца этажа
 const DOT_ICON = { 'Огонь': 'flame', 'Земля': 'drop', 'Воздух': 'cut', 'Тьма': 'skull', 'Вода': 'drop', 'Время': 'hour', 'Свет': 'spark', 'класс': 'flame' };
 const CTL = ['stun', 'silence', 'stop', 'paralyze', 'freeze', 'terror', 'knock', 'blind'];
 const GOOD_ST = EB.GOOD_ST || [];   // баффы — среди полезных эффектов, слева
-const SKIP_TXT = { stun: 'оглушён', freeze: 'во льду', terror: 'в ужасе', knock: 'сбит с ног', paralyze: 'парализован' };
+const SKIP_TXT = { stun: 'оглушён', freeze: 'во льду', terror: 'в ужасе', knock: 'сбит с ног', paralyze: 'парализован', iceblock: 'в ледяном панцире' };
 const CLS_OF = { 'Физ. ДД силы': 'Физ. ДД', 'Физ. ДД ловкости': 'Физ. ДД', 'Лекарь': 'Хилер', 'Дебаффер': 'Контроль', 'Босс': 'Танк', 'Страж': 'Танк' };
 const unitKnown = u => u.side === 0 || known(u.id);
 const uName = u => unitKnown(u) ? u.name : 'Неизвестный';
@@ -1808,14 +1810,15 @@ const heroKit = h => h.draft && window.EN_KITS && EN_KITS.heroes[h.draft] || nul
 function heroKitHtml(h) {
   const K = heroKit(h), L = EB.lib(), acts = K.kit.filter(x => x.slot === 'act' && L[x.id]), ults = K.kit.filter(x => x.slot === 'ult');
   const w = acts.reduce((a, x) => a + L[x.id].ch, 0);
-  const share = x => x.slot === 'act' && L[x.id] ? Math.floor(K.actPct * L[x.id].ch / w) : x.slot === 'ult' ? Math.floor(K.ultPct / ults.length) : 0;
+  const up = K.kit.filter(x => x.slot === 'pas' && x.v <= h.valor && L[x.id] && L[x.id].pas === 'ultUp').reduce((a, x) => a + L[x.id].pct, 0);   // «Неспешность»
+  const share = x => x.slot === 'act' && L[x.id] ? Math.floor(K.actPct * L[x.id].ch / w) : x.slot === 'ult' ? Math.floor(Math.floor(K.ultPct / ults.length) * (100 + up) / 100) : 0;
   const basic = 10000 - K.kit.filter(x => x.v <= h.valor).reduce((a, x) => a + share(x), 0);
   const rows = K.kit.map(x => {
     const a = L[x.id] || { n: x.id, d: '' }, on = x.v <= h.valor, s = share(x);
     const what = x.slot === 'ult' ? 'Ульта' : x.slot === 'pas' ? 'Пассивка' : x.slot === 'react' ? 'Реакция' : '';
     return `<div class="ab ${on ? '' : 'lock'}"><span class="h">${ic(on ? (x.slot === 'ult' ? 'crown' : abIcon(a)) : 'lock')}</span><span class="n">${x.v}</span>`
       + `<span><b>${schoolMark(a.school)}${a.n}</b><small>${what ? what + ' · ' : ''}${a.d}</small></span>`
-      + `<span class="chip ${x.slot === 'ult' && on ? 'spirit' : ''}" title="${on ? 'Доля хода' : 'Откроется на доблести ' + x.v}">${on ? (s ? pctBp(s) : 'всегда') : 'доблесть ' + x.v}</span></div>`;
+      + `<span class="chip ${x.slot === 'ult' && on ? 'spirit' : ''}" title="${on ? (x.chR ? 'Шанс реакции: растёт с редкостью героя' : 'Доля хода') : 'Откроется на доблести ' + x.v}">${on ? (s ? pctBp(s) : x.chR ? 'шанс ' + pctBp(x.chR) : 'всегда') : 'доблесть ' + x.v}</span></div>`;
   }).join('');
   return `<div class="hd-cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)">
     <div class="col scroll" style="gap:6px"><span class="eyebrow">Способности по доблести · доля хода</span>
@@ -1835,6 +1838,7 @@ function statusHtml(u, d, rounds) {
     else if (x.k === 'dot') bad.push(si(DOT_ICON[x.school] || 'flame', x.stacks, p, 'bad', `${x.school}: ${fmt(x.per * x.stacks)} урона ${per} · стаков ${x.stacks} · ещё ${x.left} ${word(x.left)}`, SCHOOL_C[x.school]));
     else if (ST_ICON[x.k]) { const g = GOOD_ST.includes(x.k); (g ? good : bad).push(si(ST_ICON[x.k][0], x.left, p, g ? 'good' : 'bad', `${ST_ICON[x.k][1]} · ещё ${x.left} ${word(x.left)}`)); }
   }
+  if (u.aura) for (const k in AURA_TXT) if (u.aura[k]) good.push(si(AURA_TXT[k][0], '', 100, 'good', `${AURA_TXT[k][1]} +${u.aura[k] / 100}% до конца этажа`));
   return [good.join(''), bad.join('')];
 }
 /* модель «10 раундов»: значок и шанс каждой способности; сработавшая светится */
@@ -2884,6 +2888,18 @@ function onAction(R, a, vis) {
   }
   if (vis) playAction(R, a); else syncDisp(R);
 }
+/* Бонусы фарма этажа для ленты: складываются от всех фарм-героев (ADR-0015) */
+function farmText(F) {
+  if (!F) return '';
+  const parts = [];
+  if (F.goldPct) parts.push(`золото +${F.goldPct} %`);
+  if (F.spiritPct) parts.push(`дух +${F.spiritPct} %`);
+  if (F.allPct) parts.push(`вся добыча +${F.allPct} %`);
+  if (F.basePct) parts.push(`шанс ресурса +${F.basePct} %`);
+  if (F.baseSure) parts.push('ресурс наверняка');
+  if (F.keySure) parts.push('второй ключ с каждой элиты');
+  return parts.join(', ');
+}
 function floorDone(R, vis) {
   const b = R.b, B = EB.BIOMES[R.biome], g = deckOf(R).g;
   R.runMs += b.t;
@@ -2894,6 +2910,7 @@ function floorDone(R, vis) {
   // добыча этажа — в кошелёк сразу, как убиты все враги этажа: валюта летит в панель, как магнитом (§5.6)
   S.wallet.gold += got.gold; S.wallet.spirit += got.spirit; S.wallet.souls += got.souls; I('cinder').q += got.base;
   if (vis) magnet(got);
+  const fm = farmText(got.farm); if (vis && fm) feed(R, `<span class="gd">Фарм</span> · ${fm}`);
   if (R.guard) { R.end = { kind: b.win ? 'guardWin' : 'guardLose', why: b.why }; if (b.why === 'sand' && vis) feed(R, '<span class="gd">Время скоротечно…</span> · десять раундов прошли'); return endRun(R, vis); }
   let bossDead = false;
   if (g === 'b') { const boss = b.u[1][0], sg = G(R.biome); bossDead = !boss.alive; if (!R.demo) { sg.max = boss.maxHp; if (bossDead) { sg.hp = null; sg.killed = true; } else sg.hp = boss.hp; } }
@@ -2962,6 +2979,7 @@ function applyEv(R, e) {
     case 'shield': d.sh = Math.min(e.t.maxHp, d.sh + (e.v || 0)); break;
     case 'dispel': d.sh = 0; break;
     case 'die': d.dead = true; d.hp = 0; d.sh = 0; break;
+    case 'survive': d.hp = e.hp; d.dead = false; break;   // спасение от смерти — раз за биом
   }
 }
 function targetOf(b, u) {
@@ -2981,12 +2999,20 @@ function playAction(R, a) {
   const T = ms => ms / devSpeed, el = u => u && document.getElementById('bc' + u.side + u.i), C = EnFx.COL;
   const idx = a.ev.findIndex(e => e.k === 'swing' || e.k === 'cast' || e.k === 'skip');
   const pre = idx < 0 ? a.ev : a.ev.slice(0, idx), main = idx < 0 ? [] : a.ev.slice(idx);
+  // реакции, спасение от смерти, лёд и снятие контроля — и в начале хода, и в самом действии
+  const side = e => {
+    if (e.k === 'react') { flyAt(R, e.s, e.n, 'abil', -26); feed(R, `<b>${uName(e.s)}</b> · <span class="gd">${e.n}</span>${e.t && e.t !== e.s ? ' → ' + uName(e.t) : ''}`); }
+    else if (e.k === 'survive') flyAt(R, e.t, 'на волоске', 'info');
+    else if (e.k === 'unhurt') flyAt(R, e.t, 'лёд', 'info');
+    else if (e.k === 'unstatus') flyAt(R, e.t, e.st === 'freeze' ? 'лёд спал' : 'очнулся', 'info');
+  };
   // 1. горение, яд и лечение со временем срабатывают в начале хода носителя
   for (const e of pre) {
     applyEv(R, e);
     if (e.k === 'dot' && el(e.t)) { fx.dot(el(e.t), e.school); flyAt(R, e.t, fmt(e.v), 'dmg small'); }
     else if (e.k === 'heal' && e.v > 0 && el(e.t)) { fx.hot(el(e.t)); flyAt(R, e.t, '+' + fmt(e.v), 'heal small'); }
     else if (e.k === 'die' && el(e.t)) { fx.death(el(e.t)); feed(R, `<span class="bd">✝</span> <b>${uName(e.t)}</b>`); }
+    else side(e);
   }
   const actor = el(a.s);
   if (!main.length || !actor) { if (!R.pending) syncDisp(R); paintCards(R); return; }
@@ -3011,7 +3037,7 @@ function playAction(R, a) {
         case 'status': if (el(e.t)) { if (e.st === 'dot') fx.dot(el(e.t), e.school); else if (e.st === 'hot') fx.hot(el(e.t)); else if (CTL.includes(e.st)) fx.ctrl(el(e.t), e.st); else fx.debuff(el(e.t), e.st); } break;
         case 'resist': el(e.t) && fx.resist(el(e.t), e.st); flyAt(R, e.t, 'иммунитет', 'info'); break;
         case 'dispel': el(e.t) && fx.dispel(el(e.t)); break;
-        case 'unstatus': flyAt(R, e.t, e.st === 'freeze' ? 'лёд спал' : 'очнулся', 'info'); break;
+        case 'unstatus': case 'react': case 'survive': case 'unhurt': side(e); break;
         case 'die': el(e.t) && fx.death(el(e.t)); feed(R, `<span class="bd">✝</span> <b>${uName(e.t)}</b>`); break;
       }
     }
@@ -3096,7 +3122,7 @@ function stText(x, rounds) {
   const per = rounds ? 'в каждый ход' : 'в каждую атаку', word = rounds ? roundWord : atkWord;
   if (x.k === 'dot') return `<span>${x.school}: ${fmt(x.per * x.stacks)} урона ${per} · стаков ${x.stacks} · ещё ${x.left} ${word(x.left)}</span>`;
   if (x.k === 'hot') return `<span style="color:#9ff0c0">${x.school}: +${fmt(x.per * x.stacks)} здоровья ${per} · ещё ${x.left} ${word(x.left)}</span>`;
-  const n = { stun: 'Оглушение: пропускает ход', silence: rounds ? 'Безмолвие: только обычная атака' : 'Безмолвие: без способностей', stop: rounds ? 'Остановка: ходит последней в раунде, ульта не срабатывает' : 'Остановка: не копит атаки', weak: `Ослабление: −${x.pow / 100}% урона`, mark: `Метка: +${x.pow / 100}% получаемого урона`, pierce: `Осыпание: −${x.pow / 100}% физ. защиты`, paralyze: 'Паралич: без обычной атаки', freeze: 'Заморозка: пропускает ход, лёд спадает от крупного удара', terror: 'Ужас: не действует, спадает от удара', knock: 'Сброс: пропускает ход', blind: 'Ослепление: удары мимо', slow: `Стужа: −${x.pow / 100}% скорости`, miss: `Слепота: +${x.pow / 100}% промахов`, rend: `Засветка: −${x.pow / 100}% маг. защиты`, chanceDown: 'Истечение: реже способности', break: 'Слом строя: слабее криты, реже уклоняется', dmgUp: `Жар: +${x.pow / 100}% урона`, guard: `Каменная кожа: −${x.pow / 100}% получаемого урона`, evade: `Уклонение +${x.pow / 100}%`, lifesteal: `Вампиризм ${x.pow / 100}%`, healTaken: `Лечение по нему +${x.pow / 100}%`, defUp: `Защита +${x.pow / 100}%`, chanceUp: 'Ускорение: чаще способности', critUp: `Крит +${x.pow / 100}%` }[x.k];
+  const n = { stun: 'Оглушение: пропускает ход', silence: rounds ? 'Безмолвие: только обычная атака' : 'Безмолвие: без способностей', stop: rounds ? 'Остановка: ходит последней в раунде, ульта не срабатывает' : 'Остановка: не копит атаки', weak: `Ослабление: −${x.pow / 100}% урона`, mark: `Метка: +${x.pow / 100}% получаемого урона`, pierce: `Осыпание: −${x.pow / 100}% физ. защиты`, paralyze: 'Паралич: без обычной атаки', freeze: 'Заморозка: пропускает ход, лёд спадает от крупного удара', terror: 'Ужас: не действует, спадает от удара', knock: 'Сброс: пропускает ход', blind: 'Ослепление: удары мимо', slow: `Стужа: −${x.pow / 100}% скорости`, miss: `Слепота: +${x.pow / 100}% промахов`, rend: `Засветка: −${x.pow / 100}% маг. защиты`, chanceDown: 'Истечение: реже способности', break: 'Слом строя: слабее криты, реже уклоняется', dmgUp: `Жар: +${x.pow / 100}% урона`, guard: `Каменная кожа: −${x.pow / 100}% получаемого урона`, evade: `Уклонение +${x.pow / 100}%`, lifesteal: `Вампиризм ${x.pow / 100}%`, healTaken: `Лечение по нему +${x.pow / 100}%`, defUp: `Защита +${x.pow / 100}%`, chanceUp: 'Ускорение: чаще способности', critUp: `Крит +${x.pow / 100}%`, iceblock: 'Ледяной панцирь: урон не проходит', trophy: `Метка трофея: +${x.pow}% добычи при гибели`, greed: `Жадный взгляд: павшие враги дают +${x.pow}% добычи` }[x.k];
   return n ? `<span>${n} · ещё ${x.left} ${word(x.left)}</span>` : '';
 }
 function paintInsp(R) {
@@ -3123,6 +3149,7 @@ function paintInsp(R) {
     <span>Здоровье <b class="num">${fmt(d.hp)}</b> / ${fmt(u.maxHp)}${d.sh ? ` · щит <b class="num">${fmt(d.sh)}</b>` : ''} · атака ${fmt(u.atk[u.main])} · защита ${fmt(u.def.str)} / ${fmt(u.def.int)}</span>
     <span>Цель: <b>${!d.dead && j >= 0 ? uName(opp[j]) : '—'}</b> · выбирает угроза${u.rank && EB.RULES.resist[u.rank] ? ` · иммунитет к контролю <b class="num">${Math.round(EB.RULES.resist[u.rank] / 100)} %</b>` : ''}</span>
     ${abs || ult ? `<div class="bi-ab">${abs}${ult}</div>` : ''}
+    ${u.lpas && u.lpas.length ? `<div class="bi-ab">${u.lpas.map(p => `<span title="${p.d || ''}">${p.n} · ${p.kind === 'reaction' ? 'реакция' : 'пассивка'}${u.usedBiome.includes(p.id) ? ' · уже сработала' : ''}</span>`).join('')}</div>` : ''}
     ${u.st.length ? `<div class="bi-st">${u.st.map(stT).join('')}</div>` : ''}
     ${th ? `<div class="bi-th"><span class="faint">Угроза к противникам:</span>${th}</div>` : ''}`;
 }
