@@ -1,5 +1,5 @@
 {
-  "name": "Портреты врагов — правка готовой картинки: когда модель упорно рисует лишнее (вторую руку, кисть с ножом), правим свой же вариант, а не рисуем заново",
+  "name": "Правки своих вариантов врагов: когда модель упорно рисует лишнее или не то лицо, правим готовую картинку, а не рисуем заново",
   "models": [
     "nb2"
   ],
@@ -8,6 +8,12 @@
   "cutout_rule": "",
   "categories": {
     "portraits": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [],
+      "frame": "Edit the attached enemy portrait. Keep the creature's head, face, clay, clothes, the background, the light and the framing exactly as they are. Change only what is listed below."
+    },
+    "enemies": {
       "aspect": "4:5",
       "size": "1K",
       "refs": [],
@@ -24,6 +30,16 @@
         "art/generated/portraits/ep-onearm__nb2-v4.jpg"
       ],
       "subject": "1. Remove the hand and all fingers of its only arm. The forearm ends right there, and the long stone blade that points to the lower right grows straight out of the end of the forearm, as its continuation: clay turns into pale grey stone where the hand was. The blade is part of the arm, it is not held.\n2. Remove the extra blade that sticks out to the left of the arm near the left edge of the picture: that part of the arm is plain clay, and there is only one blade.\n3. On the right side of the picture, where there is no arm, remove the rounded shoulder too: the line from the neck runs down to the waist as one smooth, flat, polished slope, no shoulder at all."
+    },
+    {
+      "id": "ws-prop",
+      "category": "enemies",
+      "title": "Упор — элита, держит удар",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 14; правка art/generated/enemies/ws-prop__nb2-v3.jpg",
+      "refs": [
+        "art/generated/enemies/ws-prop__nb2-v3.jpg"
+      ],
+      "subject": "Change only his face and head: make it clearly elven and more refined — a broad but noble elven face with high cheekbones, a straight narrow nose, a calm steady mouth and no heavy brow ridge; sculpted clay hair pulled back tight into a short tail. Keep the pointed ears, the pressed eyes, the clay, the body, the pose, the slab with the hourglass, the background and the light exactly as they are. He must not look like an orc or an ogre."
     }
   ]
 }

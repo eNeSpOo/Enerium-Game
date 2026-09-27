@@ -3257,7 +3257,7 @@
       },
       "cost_usd": 0.069,
       "seconds": 9.4,
-      "status": "заменён: полный рост — автор выбрал портретный ракурс, как у героев (ADR-0011)",
+      "status": "основа — выбран автором 27.09.2026: Подмастерье, элита, физ ДД силы (ADR-0013)",
       "px": [
         928,
         1152
@@ -3311,7 +3311,7 @@
       },
       "cost_usd": 0.0688,
       "seconds": 10.0,
-      "status": "заменён: полный рост — автор выбрал портретный ракурс, как у героев (ADR-0011)",
+      "status": "основа — выбран автором 27.09.2026: Резчик, элита, физ ДД ловкости (ADR-0013)",
       "px": [
         928,
         1152
@@ -3473,7 +3473,7 @@
       },
       "cost_usd": 0.069,
       "seconds": 10.1,
-      "status": "заменён: полный рост — автор выбрал портретный ракурс, как у героев (ADR-0011)",
+      "status": "основа — выбран автором 27.09.2026: Штопарь, элита, лекарь (ADR-0013)",
       "px": [
         928,
         1152
@@ -3635,7 +3635,7 @@
       },
       "cost_usd": 0.0691,
       "seconds": 14.3,
-      "status": "заменён: полный рост — автор выбрал портретный ракурс, как у героев (ADR-0011)",
+      "status": "основа — выбран автором 27.09.2026: Мастер, рунный страж (ADR-0013)",
       "px": [
         928,
         1152
@@ -3743,7 +3743,7 @@
       },
       "cost_usd": 0.0689,
       "seconds": 9.7,
-      "status": "заменён: полный рост — автор выбрал портретный ракурс, как у героев (ADR-0011)",
+      "status": "основа — выбран автором 27.09.2026: Мех, элита, маг ДД, воздух (ADR-0013)",
       "px": [
         928,
         1152
@@ -3797,7 +3797,7 @@
       },
       "cost_usd": 0.0691,
       "seconds": 10.8,
-      "status": "заменён: полный рост — автор выбрал портретный ракурс, как у героев (ADR-0011)",
+      "status": "основа — выбран автором 27.09.2026: Съёмщик, элита, дебаффер (ADR-0013)",
       "px": [
         928,
         1152
@@ -4608,7 +4608,7 @@
       },
       "cost_usd": 0.0692,
       "seconds": 15.0,
-      "status": "заменён: партия 4 — враги делаются по одному, у каждого свой портрет (ADR-0012)",
+      "status": "основа — выбран автором 27.09.2026: Первый набросок, босс биома (ADR-0013)",
       "px": [
         928,
         1152
@@ -5475,6 +5475,113 @@
         1152
       ],
       "sha256": "70bc0887f84a88a6016c9bdabf3d1549023d00bf456dd2cc288a80a9f987c9ce"
+    },
+    {
+      "file": "art/generated/enemies/ws-prop__nb2-v3.jpg",
+      "category": "enemies",
+      "job": "ws-prop",
+      "title": "Упор — элита, держит удар",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 14",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T03:22:11+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/heroes/hero-ilmerra__nb2.jpg",
+        "art/generated/resources/res-warm-clay__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images: the first shows how we paint characters, the second shows the Workshop's clay and its cold white-green crystal light. Do NOT copy their subjects or composition.\n\nFormat: vertical enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Three-quarter view, the figure fills most of the frame, head and shoulders in the upper third, clear readable silhouette. This is a NEW ORIGINAL design made from the description only. World rule: every creature of the Workshop of Forms was sculpted of clay by a god and left unfinished — the 'samples' are rough unfinished tries, each named after its missing or unfinished part; the 'servants' are more finished, with even hands, faces, aprons and tools; the Master is the only finished one, smooth and polished. Everything is made precisely and calmly — unfinished, but not ugly and not grotesque. Clay colors: grey-green and warm ochre, visible finger marks and tool strokes on the clay. Figures have elven proportions unless the description says otherwise. Background: the dim abandoned Workshop of Forms deep underground — dark stone, a thin stream of sand falling from a crack above, white-green crystals glowing from within in the cracks; darker and softer than the figure. The whole scene is lit by cold white-green crystal light from below; no red, orange or warm light; the clay is the only warm color. All fourteen creatures of this set share the same painting style, palette and lighting. Every creature is made entirely of clay: a matte clay surface with finger marks, seams and tool strokes; no human skin, no realistic flesh; hair is sculpted clay; eyes are pressed hollows or smooth clay without pupils. They must not look like living people, orcs or goblins.\n\nSubject: 'Prop', a servant of the Workshop: on servants like him the work was held in place while the clay set, and nobody has ever managed to move him. A broad, squat, immovable elf of grey-green clay with warm ochre patches — wide as a door, a thick neck, heavy shoulders, pointed elven ears, a calm stubborn face with pressed eyes. A clay apron, forearms bound in cloth wraps. He stands half-turned behind a thick stone slab that rests on the floor in front of him like a tower shield: one shoulder is braced against its top edge and both clay hands grip it. The slab covers only his lower body and one side; his head, broad shoulders, chest and both arms stay clearly visible above and around it. Carved on the slab is the sign of the Workshop — a simple hourglass outline, not letters and not a rune. The slab bears fresh chips and cracks from blows it has taken; dust and sand shake off it as if a blow has just landed, and he does not move. Behind him on a workbench stands a half-finished clay figure propped up with wooden struts — the work he once held while it set.\n\nNo text, no letters, no numbers, no runes that look like letters, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1308,
+        "candidatesTokenCount": 1597,
+        "totalTokenCount": 2905,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 792
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 516
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0693,
+      "seconds": 9.1,
+      "status": "заменён: основой автор выбрал v4 — тот же Упор с эльфийским лицом",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "757e2e98051ffdc9514d05e53876a150693318a2605e023041b8692c51e4a3b0"
+    },
+    {
+      "file": "art/generated/enemies/ws-prop__nb2-v4.jpg",
+      "category": "enemies",
+      "job": "ws-prop",
+      "title": "Упор — элита, держит удар",
+      "source": "docs/lore/мастерская-форм-текст.md, с. 14; правка art/generated/enemies/ws-prop__nb2-v3.jpg",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-27T03:23:09+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/enemies/ws-prop__nb2-v3.jpg"
+      ],
+      "prompt": "Keep the painterly style of the attached picture: the same brush strokes, light, colors and background.\n\nEdit the attached enemy portrait. Keep the creature's head, face, clay, clothes, the background, the light and the framing exactly as they are. Change only what is listed below.\n\nChange only his face and head: make it clearly elven and more refined — a broad but noble elven face with high cheekbones, a straight narrow nose, a calm steady mouth and no heavy brow ridge; sculpted clay hair pulled back tight into a short tail. Keep the pointed ears, the pressed eyes, the clay, the body, the pose, the slab with the hourglass, the background and the light exactly as they are. He must not look like an orc or an ogre.\n\nNo text, no letters, no numbers, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 453,
+        "candidatesTokenCount": 1517,
+        "totalTokenCount": 1970,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 195
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0686,
+      "seconds": 12.5,
+      "status": "основа — выбран автором 27.09.2026: Упор, элита, танк — нарисован заново по рецепту партии 2, лицо эльфийское правкой (ADR-0013)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "144da50d3ecc6b64232591d099ce99b6b886d5e3f942c902ff62a3f01ec37a0a"
     }
   ]
 }
