@@ -3312,7 +3312,7 @@ function renderKit() {
     <p class="k-note">Данные — <code>docs/content/герои/</code>, выгрузка <code>tools/content-gen/heroes/export_ui.py</code> в <code>heroes.js</code>. Черновик, ждёт автора. Портреты пока заглушки: свет стихии снизу, нижняя кромка — редкость. Арт рисуется отдельно в <code>art/generated/</code>.</p>
     <div id="kitHeroes"></div></section>
   <section class="k-box" style="grid-column:1/-1"><h3>Библиотека способностей · ${window.EN_ABILITIES ? EN_ABILITIES.total : 0}</h3>
-    <p class="k-note">Данные — <code>docs/content/библиотека-способностей.md</code>, выгрузка <code>tools/content-gen/abilities/library.py</code> в <code>abilities.js</code>, решения — ADR-0015. Черновик, ждёт автора: названия с номером — из таблицы автора, остальные — заглушки; числа — демонстрация. Набор без фильтров показан матрицей «вид × ступень», фильтр или поиск ищут по всей библиотеке. По героям способности ещё не распределены.</p>
+    <p class="k-note">Данные — <code>docs/content/библиотека-способностей.md</code>, выгрузка <code>tools/content-gen/abilities/library.py</code> в <code>abilities.js</code>, решения — ADR-0015. Черновик: названия с номером — из таблицы автора, остальные автор принял как рабочие; числа — демонстрация. Набор без фильтров показан матрицей «вид × ступень», фильтр или поиск ищут по всей библиотеке. По героям способности ещё не распределены.</p>
     <div id="kitLib" class="kl"></div></section>
   <section class="k-box"><h3>Враг</h3><div class="k-demo row" style="gap:18px;justify-content:center;height:170px"><div class="fig" style="height:150px"><img src="${FA(f1)}" alt=""></div><div class="fig unk" style="height:150px"><img src="${FA(f6)}" alt=""><span class="qm">?</span></div></div><p class="k-note">Изучен — картина целиком. До первой победы картина затемнена и размыта, поверх — знак вопроса.</p></section>
   <section class="k-box"><h3>Кристалл Памяти</h3><div class="k-demo mem" style="grid-template-columns:repeat(3,1fr)"><div class="mslot"><span class="crys"></span><small class="faint">пустой карст</small></div><div class="mslot open"><span class="crys"></span><small class="spirit">можно вспомнить</small></div><div class="mslot set" data-r="3"><span class="crys"></span><small class="faint">закреплено</small></div></div><p class="k-note">Состояние из лора: пустой карст матовый, заряженный светится изнутри.</p></section>
@@ -3517,7 +3517,7 @@ function klDetail() {
   const src = a.src
     ? `<div class="kl-src"><span class="eyebrow">Таблица автора · №${a.src[0]}</span><p><b style="color:var(--parch)">«${a.src[1]}»</b> · ${a.src[3]} · ${a.src[4].toLowerCase()}</p>`
       + `<p class="muted">${a.src[2]}</p><small class="faint">Название сохранено, механика новая: таблица делалась под прежний бой со счётчиком атак.</small></div>`
-    : '<p class="faint" style="font-size:12.5px">Название — заглушка.</p>';
+    : '<p class="faint" style="font-size:12.5px">Название рабочее, не из таблицы автора.</p>';
   const data = Object.entries(a.data).map(([k, v]) => `<tr><td>${k}</td><td>${klEsc(typeof v === 'object' ? JSON.stringify(v) : v)}</td></tr>`).join('');
   return `<div class="row" style="gap:10px"><span class="kl-ico">${ic(KL_IC[a.k] || 'gem')}</span><div class="col" style="gap:3px"><span class="eyebrow">${eyebrow}</span><b class="nm">${a.n}</b></div></div>`
     + (a.k === 'reaction' ? '' : `<div class="kl-meta">${a.ch ? `<span class="chip">шанс ${a.ch / 100} %</span>` : ''}<span class="chip">${a.num}</span>${a.t === 'ult' ? '<span class="chip gold">ульта</span>' : ''}</div>`)
