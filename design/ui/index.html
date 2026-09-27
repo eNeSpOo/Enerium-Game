@@ -1743,9 +1743,9 @@ function descent() {
           <h2>Мастерская форм</h2>
           <p class="quote">«Место, где никого не ждут — и всё равно всех встречают»</p>
           <div class="facts">
-            <div class="stat"><b>${EB.FLOORS.length}</b><small>этажей</small></div>
+            <div class="stat"><b>${EB.BIOMES.b1.floors.length}</b><small>этажей</small></div>
             <div class="stat"><b>${S.lastRun.b1 && S.lastRun.b1.wall ? S.lastRun.b1.wall : '—'}</b><small>стена</small></div>
-            <div class="stat"><b>${G('b1').killed && G('b1').hp == null ? 'пал' : siegeDone('b1') + '%'}</b><small>осада босса</small></div>
+            ${EB.BIOMES.b1.siege === false ? `<div class="stat"><b>${G('b1').killed ? 'пал' : 'стоит'}</b><small>босс биома</small></div>` : `<div class="stat"><b>${G('b1').killed && G('b1').hp == null ? 'пал' : siegeDone('b1') + '%'}</b><small>осада босса</small></div>`}
             <div class="stat"><b>${k}<span class="faint">/14</span></b><small>изучено</small></div>
           </div>
         </div>
@@ -1866,7 +1866,7 @@ function legendHtml(mode) {
   if (mode === 'rounds') return `<span class="h">Индикаторы карты · 10 раундов</span>
     <span class="ex"><span class="rot"><span class="ch" style="--sc:var(--earth)">${ic('target')}<b>20</b></span><span class="ch on" style="--sc:var(--earth)">${ic('crack')}<b>20</b></span><span class="ch u" style="--sc:var(--gold)">${ic('crown')}<b>8</b></span></span></span><span>Способности и ульта с долей хода в процентах: столько раз из ста карта применит её в свой ход. Иначе — обычная атака. Доли задаёт редкость героя или ранг врага (ADR-0016). Сработавшая светится.</span>
     <span class="ex"><span class="bt-queue static"><i class="done"></i><i class="now"></i><i class="f"></i><i></i></span></span><span>Сверху — очередь раунда по скорости: золотом — кто ходит, бледные — уже сходили, красная рамка — враги.</span>
-    <span class="ex">${ic('hour')}<b class="num">3 / 10</b></span><span>Раунд боя. Каждая карта ходит раз за раунд. После десятого раунда — «Время скоротечно…»: этаж не взят, урон по боссу идёт в осаду.</span>
+    <span class="ex">${ic('hour')}<b class="num">3 / 10</b></span><span>Раунд боя. Каждая карта ходит раз за раунд. После десятого раунда — «Время скоротечно…»: этаж не взят. С цикла II урон по боссу идёт в осаду.</span>
     <span class="ex"><span class="frame"></span></span><span>Красная рамка — в карту целятся противники, ×N — сколько.</span>
     <span class="h">Эффекты</span>
     <span class="ex">${si('heal', 2, 70, 'good', '')}${si('shield', '', 100, 'good', '')}</span><span>Слева вверху — полезные: лечение со временем, щит.</span>
@@ -1902,7 +1902,7 @@ function battle() {
     <div class="bt-bgs"><img class="bg${R.floor % 2 ? '' : ' flip'}" src="${ARENA}" alt=""><img class="bg bg2${R.floor % 2 ? ' flip' : ''}" src="${ARENA}" alt=""></div>
     <div class="bt-hud">
       <div class="bt-floor">${R.guard ? `<b>${ic('crown')}</b><span>страж</span>` : `<b>${R.floor}</b><span>/ ${B.floors.length}</span>`}</div>
-      <span class="chip ${FL.g !== 'o' ? 'gold' : ''}">${FL.g === 'e' ? ic('gem') : FL.g === 'b' ? ic('crown') : ''}${typ}${lead ? ' · ' + uName(lead) : ''}${FL.g === 'b' ? ` · осада ${siegeDone(R.biome)}%` : ''}</span>
+      <span class="chip ${FL.g !== 'o' ? 'gold' : ''}">${FL.g === 'e' ? ic('gem') : FL.g === 'b' ? ic('crown') : ''}${typ}${lead ? ' · ' + uName(lead) : ''}${FL.g === 'b' && B.siege !== false ? ` · осада ${siegeDone(R.biome)}%` : ''}</span>
       ${b.mode === 'rounds'
         ? `<div class="bt-clock"><div class="row"><span>${ic('hour')} Раунд</span><span class="num" id="btClock">${b.round} / ${EB.RULES.rounds.max}</span></div>${bar(b.round * 100 / EB.RULES.rounds.max, 'sand')}<div class="row"><span>Забег идёт</span><span class="num" id="btRun">${clock((R.runMs + R.view) / 1000)}</span></div></div>`
         : `<div class="bt-clock"><div class="row"><span>${ic('hour')} Бой</span><span class="num" id="btClock">${clock(R.view / 1000)} / ${clock(b.limit / 1000)}</span></div>${bar(Math.min(100, R.view * 100 / b.limit), 'sand')}<div class="row"><span>Забег идёт</span><span class="num" id="btRun">${clock((R.runMs + R.view) / 1000)}</span></div></div>`}
@@ -2652,9 +2652,9 @@ const OV = {
     else if (E.kind === 'guardLose') { title = 'Мастер не пропустил'; head = `${E.why === 'sand' ? 'Время скоротечно… Десять раундов прошли, а страж ещё стоит' : 'Отряд пал'}. Рунный страж — пять карт, у Мастера иммунитет к контролю ${Math.round((EB.RULES.resist.rune || 0) / 100)} %.`; }
     else if (E.kind === 'wall') { title = `Стена — этаж ${E.floor}`; head = `${E.why === 'time' ? 'Время боя вышло' : E.why === 'sand' ? 'Время скоротечно… Десять раундов прошли, этаж не взят' : 'Отряд пал'} на этаже ${E.floor}. В колоде: ${E.foes.map(id => known(id) ? F(id).name : 'неизвестный').join(', ')}.`; }
     else { title = 'Забег прерван'; head = `Отряд поднялся с этажа ${R.floor}.`; }
-    if (R.demo) head = 'Демо-прыжок сразу к боссу с полным здоровьем: осада биома и стена не меняются. ' + head;
+    if (R.demo) head = 'Демо-прыжок сразу к боссу с полным здоровьем: ' + (B.siege !== false ? 'осада биома и стена не меняются. ' : 'стена не меняется. ') + head;
     const body = `<p class="muted" style="font-size:15px">${head} Отряд поднялся порталом наверх, как ото сна.</p>
-      <div class="row" style="gap:18px;flex-wrap:wrap">${R.guard ? '' : `<div class="stat"><b>${passed}</b><small>этажей пройдено</small></div>`}<div class="stat"><b>${R.kills}</b><small>побед</small></div><div class="stat"><b>${clock(R.runMs / 1000)}</b><small>время забега</small></div>${R.mode === 'rounds' ? '<div class="stat"><b>10 раундов</b><small>модель боя</small></div>' : ''}${E.kind === 'boss' || sg ? `<div class="stat"><b>${E.kind === 'boss' ? 100 : sg}%</b><small>осада босса</small></div>` : ''}</div>
+      <div class="row" style="gap:18px;flex-wrap:wrap">${R.guard ? '' : `<div class="stat"><b>${passed}</b><small>этажей пройдено</small></div>`}<div class="stat"><b>${R.kills}</b><small>побед</small></div><div class="stat"><b>${clock(R.runMs / 1000)}</b><small>время забега</small></div>${R.mode === 'rounds' ? '<div class="stat"><b>10 раундов</b><small>модель боя</small></div>' : ''}${B.siege !== false && (E.kind === 'boss' || sg) ? `<div class="stat"><b>${E.kind === 'boss' ? 100 : sg}%</b><small>осада босса</small></div>` : ''}</div>
       ${R.curve.length ? `<div class="col" style="gap:3px"><span class="eyebrow">Здоровье отряда после каждого этажа</span><div class="curve">${R.curve.map((v, i) => `<i class="${B.floors[R.startFloor + i - 1].g !== 'o' ? 'el' : ''}" style="--v:${Math.max(3, v)}" title="Этаж ${R.startFloor + i}: ${v}%"></i>`).join('')}</div><small class="faint">Золотые столбики — элиты и босс. Здоровье не восстанавливалось.</small></div>` : ''}
       <span class="eyebrow">Добыча</span>
       <div class="row" style="gap:14px;flex-wrap:wrap">${money('gold', L.gold)}${money('spirit', L.spirit)}${money('souls', L.souls)}<span class="row" style="gap:4px">${well(I('cinder'), { act: 'noop', size: 30 })}<b class="num">×${L.cinder}</b></span><span class="chip" title="Ключи ремёсел биома — с элит, по одному (ADR-0010)">${ic('gem')}ключей ремёсел ×${L.keys}</span>${L.unique ? `<span class="chip gold">${ic('crown')}уникальный ×${L.unique}</span>` : ''}</div>
@@ -2820,7 +2820,8 @@ const ACT = {
    Сервер считает сценарий целиком, клиент показывает его в реальном времени: ускорить нельзя, свернуть можно.
    Каждая карта действует на своей скорости атаки, поэтому действия идут вперемешку, а не хором.
    Этажи — готовые колоды. Здоровье и павшие переходят на следующий этаж: биом — испытание на истощение.
-   Босс — осада: урон по нему копится между забегами. Забегов может идти несколько сразу. */
+   Босс — осада с цикла II: урон по нему копится между забегами; в обучающем биоме цикла I босс берётся за один забег (ADR-0018).
+   Забегов может идти несколько сразу. */
 let loop = null, fxInst = null, devSpeed = 1, devModel = 'rounds';   // devModel — модель боя: 'rounds' (ADR-0010, основная) или прежняя 'tempo' (ADR-0007)
 const TICK = 50;
 const dkey = u => u.side + ':' + u.i;
@@ -2913,10 +2914,10 @@ function floorDone(R, vis) {
   const fm = farmText(got.farm); if (vis && fm) feed(R, `<span class="gd">Фарм</span> · ${fm}`);
   if (R.guard) { R.end = { kind: b.win ? 'guardWin' : 'guardLose', why: b.why }; if (b.why === 'sand' && vis) feed(R, '<span class="gd">Время скоротечно…</span> · десять раундов прошли'); return endRun(R, vis); }
   let bossDead = false;
-  if (g === 'b') { const boss = b.u[1][0], sg = G(R.biome); bossDead = !boss.alive; if (!R.demo) { sg.max = boss.maxHp; if (bossDead) { sg.hp = null; sg.killed = true; } else sg.hp = boss.hp; } }
+  if (g === 'b') { const boss = b.u[1][0], sg = G(R.biome); bossDead = !boss.alive; if (!R.demo) { sg.max = boss.maxHp; if (bossDead) { sg.hp = null; sg.killed = true; } else if (B.siege !== false) sg.hp = boss.hp; } }   // без осады урон по боссу не копится
   if (b.win && R.floor < B.floors.length) { R.gap = EB.RULES.floor.gapMs; R.runMs += R.gap; if (vis) camPan(); if (vis) feed(R, `<span class="sp">Этаж ${R.floor} пройден</span>${b.mode === 'rounds' ? ` за ${b.round} ${roundWord(b.round)}` : ''} · здоровье отряда ${partyPctOf(b)}%`); return; }
   if (b.why === 'sand' && vis) feed(R, '<span class="gd">Время скоротечно…</span> · десять раундов прошли');
-  R.end = bossDead ? { kind: 'boss' } : g === 'b' ? { kind: 'siege', why: b.why } : { kind: 'wall', floor: R.floor, why: b.why, foes: b.u[1].map(u => u.id) };
+  R.end = bossDead ? { kind: 'boss' } : g === 'b' && B.siege !== false ? { kind: 'siege', why: b.why } : { kind: 'wall', floor: R.floor, why: b.why, foes: b.u[1].map(u => u.id) };
   endRun(R, vis);
 }
 /* Камера едет вправо, в следующую «комнату» биома: фон уезжает влево, павшие враги — вместе со своей комнатой.
@@ -3243,7 +3244,7 @@ function bindGame() {
 const FLOWS = [
   ['Убежище и следующий шаг', 'Проводники, текущие занятия и одна главная кнопка', () => { S.route = 'shelter'; S.overlay = null; }],
   ['Забег по Мастерской форм', 'Бой на истощение: здоровье не восстанавливается. Эффекты, цели, карточка бойца', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = { t: 'prep', arg: '' }; }],
-  ['Бой с боссом · демо-прыжок', 'Отряд I сразу на 35-м этаже: ульты, массовые удары, осада', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = null; startRun('s1', 'b1', 35); }],
+  ['Бой с боссом · демо-прыжок', 'Отряд I сразу на последнем этаже: босс, ульты, массовые удары', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = null; startRun('s1', 'b1', EB.BIOMES.b1.floors.length); }],
   ['Рунный страж · пять карт', 'Мастер и четыре элиты, иммунитет стража к контролю 25 %', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = null; startRun('s1', 'b1', null, true); }],
   ['Бестиарий: известный и неизвестный', 'Скрыт до первой победы, картина и совет старика после', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = { t: 'foe', arg: known('o6') ? 'e3' : 'o6' }; }],
   ['Развитие героя', 'Уровень, рунный предел и доблесть — одна лестница', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.seg.hero = 'power'; S.selHero = 'h2'; S.overlay = null; }],

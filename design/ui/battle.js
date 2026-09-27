@@ -54,7 +54,7 @@ const RULES = {
   resist: { rune: 2500, uber: 5000, forgotten: 7500, clan: 10000 },  // иммунитет к контролю по рангу, б. п. (ADR-0010); рядовой, элита и босс биома — 0
   ultAfter: 3, ultChargeDiv: 2,         // §5.1: три применения, затем зарядка = сумма цен / 2
   shieldCapPct: 100,                    // щит не больше здоровья
-  foeLvl: { base: 20, perFloor: 1 },    // уровень карт врага растёт с этажом
+  foeLvl: { base: 20, perFloor: 1 },    // уровень карт врага растёт с этажом; у биома может быть свой (BIOMES.foeLvl)
   tempoPct: 250,                        // скорость атаки из §3.2, растянутая для экрана: интервал ×2,5
   act: { attack: 900, cast: 1300, mass: 1700, ult: 2400, skip: 600 },  // сколько действие идёт на экране; раньше карта снова не ходит
   floor: { limitMs: { o: 150000, e: 240000, b: 360000 }, gapMs: 2500 }, // предел боя этажа и переход к следующему, мс
@@ -164,7 +164,8 @@ const FOES = {
 /* ================== колоды этажей ==================
    g: o — рядовые, e — элита с сопровождением, b — босс с сопровождением. Первым идёт лидер.
    Колоды — готовые пресеты: одни и те же этажи у всех игроков, без случайности в гонке (ADR-0011).
-   Элит на этаже становится больше к концу биома: 15-й и 20-й — по две, 25-й и 30-й — по три. */
+   FLOORS — образец длинного биома цикла II: 35 этажей, элит к концу больше — 15-й и 20-й по две, 25-й и 30-й по три.
+   На нём калькулятор экономики считает дни цикла II; в прототипе его не показываем. */
 const FLOORS = [
   { g: 'o', m: ['o1'] }, { g: 'o', m: ['o1'] }, { g: 'o', m: ['o2'] }, { g: 'o', m: ['o1', 'o1'] },
   { g: 'e', m: ['e1'] },
@@ -181,6 +182,16 @@ const FLOORS = [
   { g: 'o', m: ['o4', 'o6', 'o3', 'o3', 'o5'] }, { g: 'o', m: ['o4', 'o2', 'o6', 'o3', 'o5'] }, { g: 'o', m: ['o4', 'o4', 'o6', 'o3', 'o5'] }, { g: 'o', m: ['o4', 'o6', 'o3', 'o5', 'o2'] },
   { g: 'b', m: ['b1', 'o4', 'o5', 'o3', 'o6'] },
 ];
+/* Обучающий биом цикла I (ADR-0018): 15 этажей, элиты на 5-м и 10-м, босс на 15-м — без осады.
+   Цикл I вводит игрока в механики, стены и вкусный фарм — с цикла II. Отряд без доблести берёт его с нуля примерно за час игры. */
+const FLOORS_TUTOR = [
+  { g: 'o', m: ['o1'] }, { g: 'o', m: ['o1'] }, { g: 'o', m: ['o2'] }, { g: 'o', m: ['o1', 'o1'] },
+  { g: 'e', m: ['e1', 'o2'] },
+  { g: 'o', m: ['o1', 'o3'] }, { g: 'o', m: ['o4', 'o1'] }, { g: 'o', m: ['o2', 'o3'] }, { g: 'o', m: ['o4', 'o2', 'o3'] },
+  { g: 'e', m: ['e2', 'o2'] },
+  { g: 'o', m: ['o4', 'o1', 'o2'] }, { g: 'o', m: ['o3', 'o3', 'o5'] }, { g: 'o', m: ['o4', 'o2', 'o5'] }, { g: 'o', m: ['o6', 'o1', 'o3'] },
+  { g: 'b', m: ['b1', 'o4', 'o5'] },
+];
 
 /* ================== генератор ================== */
 function mix32(x) { x = Math.imul(x ^ (x >>> 16), 0x7feb352d); x = Math.imul(x ^ (x >>> 15), 0x846ca68b); return (x ^ (x >>> 16)) >>> 0; }
@@ -188,11 +199,16 @@ function seedOf(str) { let h = 0x811C9DC5; for (let i = 0; i < str.length; i++) 
 function floorSeed(biomeSeed, floor) { return mix32((biomeSeed ^ Math.imul(floor, 0x9E3779B1)) >>> 0); }
 
 /* ================== биомы ==================
-   Сид — сам биом: один и тот же биом с тем же отрядом всегда даёт тот же сценарий. */
+   Сид — сам биом: один и тот же биом с тем же отрядом всегда даёт тот же сценарий.
+   n — номер биома: от него растут души. foeLvl — уровень врагов: base + этаж × perFloor, без него — RULES.foeLvl.
+   siege: false — босс берётся за один забег, урон по нему не копится: осада — с цикла II (ADR-0018). bossHpPct — здоровье босса этого биома. */
 const BIOMES = {
-  b1: { n: 1, name: 'Мастерская форм', seed: seedOf('Мастерская форм'), floors: FLOORS,   // n — номер биома: от него растут души
+  b1: { n: 1, cycle: 1, name: 'Мастерская форм', seed: seedOf('Мастерская форм'), floors: FLOORS_TUTOR,
+    foeLvl: { base: 1, perFloor: 1 }, bossHpPct: 900, siege: false,
     // рунный страж — пять карт (ADR-0010): Мастер ждёт и отвечает; Упор держит, Штопарь латает, Резчик добивает слабых, Съёмщик снимает силу
     guard: { g: 'r', m: ['g1', 'e3', 'e5', 'e2', 'e6'] } },
+  // образец длинного биома цикла II — для калькулятора экономики; сид прежней Мастерской, чтобы прогоны были сравнимы
+  c2: { n: 1, cycle: 2, name: 'Образец биома цикла II', seed: seedOf('Мастерская форм'), floors: FLOORS, siege: true },
 };
 function makeRng(seed) {  // mulberry32: целые 32 бита; roll(n) — целое от 0 до n − 1
   let a = seed >>> 0;
@@ -494,14 +510,16 @@ function heroSrc(h) {
     pas: h.pas.filter(p => p.t === 'боевая').map(p => p.n),
     kit: h.draft && KITS().heroes[h.draft] || null, valor: h.valor || 0 };   // набор из распределения (ADR-0016): черновик героя h.draft
 }
-function foeSrc(id, floor, k, lead, hp) {
+function foeSrc(id, lvl, k, lead, hp, hpPct) {
   const f = FOES[id];
-  return { key: id + '#' + k, id, name: f.name, cls: f.cls, el: f.el, lvl: RULES.foeLvl.base + floor * RULES.foeLvl.perFloor, st: f.st,
-    hpPct: f.hpPct, main: f.main, fx: f.fx, abs: f.abs, ult: f.ult, pas: f.pas, rank: f.rank, lead, hp, kit: KITS().foes[id] || null };
+  return { key: id + '#' + k, id, name: f.name, cls: f.cls, el: f.el, lvl, st: f.st,
+    hpPct: hpPct || f.hpPct, main: f.main, fx: f.fx, abs: f.abs, ult: f.ult, pas: f.pas, rank: f.rank, lead, hp, kit: KITS().foes[id] || null };
 }
+const foeLvlOf = (B, floor) => { const L = B.foeLvl || RULES.foeLvl; return L.base + floor * L.perFloor; };
+/* Колода этажа. Осада — только в биоме с осадой: иначе босс каждый забег со свежим здоровьем. */
 function floorFoes(biome, floor, siegeHp) {
-  const F = BIOMES[biome].floors[floor - 1];
-  return F.m.map((id, k) => foeSrc(id, floor, k, F.g !== 'o' && k === 0, F.g === 'b' && k === 0 ? siegeHp : null));
+  const B = BIOMES[biome], F = B.floors[floor - 1], boss = k => F.g === 'b' && k === 0;
+  return F.m.map((id, k) => foeSrc(id, foeLvlOf(B, floor), k, F.g !== 'o' && k === 0, boss(k) && B.siege !== false ? siegeHp : null, boss(k) ? B.bossHpPct : null));
 }
 
 /* ================== бой ================== */
@@ -1019,7 +1037,7 @@ function floorBattle(heroes, biome, floor, siegeHp, mode) {
 /* Рунный страж — отдельный бой из пяти карт после биома (§8.6, §11, ADR-0010) */
 function guardBattle(heroes, biome, mode) {
   const B = BIOMES[biome], G = B.guard, lvl = B.floors.length + 1;
-  const foes = G.m.map((id, k) => foeSrc(id, lvl, k, k === 0, null));
+  const foes = G.m.map((id, k) => foeSrc(id, foeLvlOf(B, lvl), k, k === 0, null));
   return create({ heroes, foes, seed: floorSeed(B.seed, lvl), limitMs: RULES.floor.limitMs.b, mode });
 }
 /* Добыча этажа по рангам убитых карт. Шансы — свой поток генератора от сида этажа,
@@ -1068,5 +1086,5 @@ function simRun(heroes, biome, siegeHp, mode) {
   return { floors, runMs, bossHp };
 }
 
-root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, BIOMES, lib: lib2, kitTable, GOOD_ST, SKIP_ST, seedOf, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, carry, simRun, guardBattle, floorLoot, elemMul, ready, readyRound, order, chanceTable, pct, fxOf };
+root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, FLOORS_TUTOR, BIOMES, lib: lib2, kitTable, GOOD_ST, SKIP_ST, seedOf, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, carry, simRun, guardBattle, floorLoot, elemMul, ready, readyRound, order, chanceTable, pct, fxOf };
 })(typeof window !== 'undefined' ? window : globalThis);
