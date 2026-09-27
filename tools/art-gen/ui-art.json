@@ -7,7 +7,10 @@
   ],
   "items": {
     "foes/o1.jpg": "enemies/foe-faceless__nb2.jpg",
-    "foes/o2.jpg": "enemies/wp-longarm__nb2.jpg",
+    "foes/o2.jpg": {
+      "from": "enemies/wp-longarm__nb2.jpg",
+      "mirror": true
+    },
     "foes/o3.jpg": {
       "from": "enemies/wp-hollow__nb2.jpg",
       "mirror": true
@@ -18,7 +21,10 @@
     },
     "foes/o5.jpg": "enemies/ws-raw__nb2-mirror.jpg",
     "foes/o6.jpg": "enemies/ws-onearm__nb2.jpg",
-    "foes/e1.jpg": "enemies/ws-apprentice__nb2.jpg",
+    "foes/e1.jpg": {
+      "from": "enemies/ws-apprentice__nb2.jpg",
+      "mirror": true
+    },
     "foes/e2.jpg": "enemies/ws-carver__nb2.jpg",
     "foes/e3.jpg": {
       "from": "enemies/ws-prop__nb2-v4.jpg",

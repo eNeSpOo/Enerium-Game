@@ -441,7 +441,17 @@ button.well:hover{border-color:var(--iron-3)}
 
 /* Бой: пять карт против отряда врагов-карт. Раскладка 3 + 2 только для вида — цель выбирает угроза */
 .bt{position:absolute;inset:0;overflow:hidden;background:#07090a;--rowh:100px;--colw:92px;--fh:62px}
-.bt>.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;filter:brightness(.62) saturate(.9)}
+.bt-bgs{position:absolute;inset:0;will-change:transform}
+.bt-bgs>.bg{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;filter:brightness(.62) saturate(.9)}
+.bt-bgs>.bg2{left:100%}
+.bt-bgs>.flip{transform:scaleX(-1)}   /* зеркальная копия: шов между комнатами незаметен */
+.bt.panning .bt-bgs{transition:transform var(--pan) cubic-bezier(.65,0,.35,1);transform:translateX(-100%)}
+.bt.panning .bt-side.f{transition:transform var(--pan) cubic-bezier(.65,0,.35,1),opacity var(--pan) ease;transform:translateX(calc(-1 * var(--bw)));opacity:0}
+.bt.panning .bt-side.h .bc{animation:walk .42s ease-in-out infinite alternate}
+.bt.panning .bt-feed,.bt.panning .bt-queue{opacity:.3;transition:opacity .3s}
+@keyframes walk{to{translate:0 -3px}}
+.bt-side.f.enter .bc{animation:foeIn .7s cubic-bezier(.2,.75,.25,1) both;animation-delay:calc((var(--k) * 2 + var(--r)) * 80ms)}
+@keyframes foeIn{from{transform:translateX(220%);opacity:0}}
 .bt::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(5,6,8,.78),transparent 20%,transparent 74%,rgba(5,6,8,.92)),radial-gradient(46% 40% at 50% 104%,rgba(72,229,212,.13),transparent);pointer-events:none}
 .bt-hud{position:absolute;left:10px;right:10px;top:7px;z-index:5;display:flex;align-items:center;gap:12px;min-width:0}
 .bt-floor{display:flex;align-items:baseline;gap:6px}
@@ -1305,11 +1315,13 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 const ASSET = window.EN_ASSET || '../enerium/assets/';
 const A = p => ASSET + p;
 const ART = n => A('art/' + n);
+const ART_V = '912b521e';   // версия выгрузки арта — её ставит tools/art-gen/export_ui.py, чтобы браузер не брал старые картинки из кэша
+const AV = n => ART(n) + '?v=' + ART_V;
 const PATH = n => A('path-icons/path-' + String(n).padStart(2, '0') + '.jpg');
 /* Арт врагов — основа ADR-0013, арена — вторая раскладка; выгрузка tools/art-gen/export_ui.py */
-const FA = f => ART('foes/' + f.id + '.jpg');
+const FA = f => AV('foes/' + f.id + '.jpg');
 const FPOS = f => f.pos || '50% 22%';
-const ARENA = ART('arena-workshop.jpg');
+const ARENA = AV('arena-workshop.jpg');
 const DUST = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><radialGradient id="g" cx="50%" cy="80%" r="60%"><stop offset="0" stop-color="#f3e2b4"/><stop offset=".6" stop-color="#b08d55"/><stop offset="1" stop-color="#5d4a2c"/></radialGradient></defs><path d="M6 52c6-12 14-22 26-22s20 10 26 22z" fill="url(#g)"/><path d="M20 44c3-4 7-7 12-7" stroke="#fff3cf" stroke-opacity=".5" stroke-width="2" fill="none"/><circle cx="22" cy="18" r="2.2" fill="#f7e9c2"/><circle cx="38" cy="12" r="1.6" fill="#f7e9c2" opacity=".8"/><circle cx="31" cy="22" r="1.3" fill="#f7e9c2" opacity=".7"/><circle cx="44" cy="24" r="1.8" fill="#f7e9c2" opacity=".6"/></svg>');
 /* Сундук — заглушка до генерации в стиле ADR-0009: арт GPT убран */
 const CHEST = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><radialGradient id="l" cx="50%" cy="100%" r="70%"><stop offset="0" stop-color="#ddbc7a" stop-opacity=".35"/><stop offset="1" stop-color="#121518" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" rx="10" fill="#121518"/><rect width="64" height="64" rx="10" fill="url(#l)"/><path d="M14 31h36v16a3 3 0 0 1-3 3H17a3 3 0 0 1-3-3z" fill="#2b241c" stroke="#ddbc7a" stroke-width="2"/><path d="M14 31c0-9 8-15 18-15s18 6 18 15z" fill="#3a3024" stroke="#ddbc7a" stroke-width="2"/><path d="M24 17.5V50M40 17.5V50" stroke="#b1915a" stroke-width="1.5" opacity=".55"/><rect x="28" y="28" width="8" height="10" rx="1.5" fill="#ddbc7a"/><circle cx="32" cy="33" r="1.6" fill="#121518"/></svg>');
@@ -1339,19 +1351,19 @@ function initialState() {
     acc: { level: 24, xp: 7289, next: 11758, cycle: 2 },
     week: { race: 'Эльфов', next: 'Зверей', left: 3 * 86400 + 5 * 3600 + 12 * 60 },
     heroes: [
-      { id: 'h1', name: 'Гарт Нишевой', cls: 'Танк', el: 'Земля', race: 'Дворфы', r: 1, cycle: 1, img: ART('heroes/h1.jpg'), lvl: 42, cap: 50, lim: 0, valor: 1, maxV: 3, bm: 26840, st: [128, 54, 72, 246, 62], gr: [2, 3, 3, 1, 3],
+      { id: 'h1', name: 'Гарт Нишевой', cls: 'Танк', el: 'Земля', race: 'Дворфы', r: 1, cycle: 1, img: AV('heroes/h1.jpg'), lvl: 42, cap: 50, lim: 0, valor: 1, maxV: 3, bm: 26840, st: [128, 54, 72, 246, 62], gr: [2, 3, 3, 1, 3],
         ab: ['Вызов', 'Удар щитом', 'Осыпание'].map(AB),
         pas: [{ n: 'Несгибаемость', t: 'боевая', d: 'Щит, когда здоровье ниже половины.' }, { n: 'Трофейщик', t: 'фарм', d: 'Больше золота с элит.' }], ult: null, busy: null, },
-      { id: 'h2', name: 'Хравн Сборщик', cls: 'Физ. ДД ловкости', fx: 'melee', el: 'Огонь', race: 'Люди', r: 1, cycle: 1, img: ART('heroes/h2.jpg'), lvl: 50, cap: 50, lim: 0, valor: 0, maxV: 1, bm: 25920, st: [128, 54, 245, 72, 62], gr: [2, 3, 1, 3, 3],
+      { id: 'h2', name: 'Хравн Сборщик', cls: 'Физ. ДД ловкости', fx: 'melee', el: 'Огонь', race: 'Люди', r: 1, cycle: 1, img: AV('heroes/h2.jpg'), lvl: 50, cap: 50, lim: 0, valor: 0, maxV: 1, bm: 25920, st: [128, 54, 245, 72, 62], gr: [2, 3, 1, 3, 3],
         ab: ['Горение', 'Быстрый выпад', 'Погребальный костёр'].map(AB),
         pas: [{ n: 'Точность', t: 'боевая', d: 'Выше шанс крита.' }, { n: 'Охотник', t: 'фарм', d: 'Больше духа с рядовых.' }], ult: null, busy: null, },
-      { id: 'h3', name: 'Лаэйра', cls: 'Маг. ДД', el: 'Время', race: 'Эльфы', r: 1, cycle: 1, img: ART('heroes/h3.jpg'), lvl: 118, cap: 150, lim: 1, valor: 2, maxV: 5, bm: 24200, st: [72, 246, 54, 62, 128], gr: [3, 1, 3, 3, 2],
+      { id: 'h3', name: 'Лаэйра', cls: 'Маг. ДД', el: 'Время', race: 'Эльфы', r: 1, cycle: 1, img: AV('heroes/h3.jpg'), lvl: 118, cap: 150, lim: 1, valor: 2, maxV: 5, bm: 24200, st: [72, 246, 54, 62, 128], gr: [3, 1, 3, 3, 2],
         ab: ['Разряд', 'Остановка'].map(AB),
         pas: [{ n: 'Средоточие', t: 'боевая', d: 'Каждая третья способность сильнее.' }, { n: 'Знаток', t: 'фарм', d: 'Чаще падают базовые ресурсы.' }], ult: { n: 'Испепеление', at: 5, d: 'Откроется на доблести 5.' }, busy: null, },
-      { id: 'h4', name: 'Ильмерра', cls: 'Хилер', el: 'Воздух', race: 'Эльфы', r: 1, cycle: 1, img: ART('heroes/h4.jpg'), lvl: 46, cap: 50, lim: 0, valor: 1, maxV: 2, bm: 22140, st: [62, 246, 54, 128, 72], gr: [3, 1, 3, 2, 3],
+      { id: 'h4', name: 'Ильмерра', cls: 'Хилер', el: 'Воздух', race: 'Эльфы', r: 1, cycle: 1, img: AV('heroes/h4.jpg'), lvl: 46, cap: 50, lim: 0, valor: 1, maxV: 2, bm: 22140, st: [62, 246, 54, 128, 72], gr: [3, 1, 3, 2, 3],
         ab: ['Живая вода', 'Лёгкая поступь', 'Оберег'].map(AB),
         pas: [{ n: 'Отклик', t: 'боевая', d: 'Крит лечения даёт щит.' }, { n: 'Собиратель трав', t: 'фарм', d: 'Больше ресурсов алхимии.' }], ult: null, busy: null, },
-      { id: 'h5', name: 'Мирт Переписчик', cls: 'Контроль', el: 'Вода', race: 'Люди', r: 1, cycle: 1, img: ART('heroes/h5.jpg'), lvl: 35, cap: 50, lim: 0, valor: 2, maxV: 2, bm: 19750, st: [62, 246, 54, 128, 72], gr: [3, 1, 3, 2, 3],
+      { id: 'h5', name: 'Мирт Переписчик', cls: 'Контроль', el: 'Вода', race: 'Люди', r: 1, cycle: 1, img: AV('heroes/h5.jpg'), lvl: 35, cap: 50, lim: 0, valor: 2, maxV: 2, bm: 19750, st: [62, 246, 54, 128, 72], gr: [3, 1, 3, 2, 3],
         ab: ['Оковы', 'Стужа', 'Ослабление'].map(AB),
         pas: [{ n: 'Тень', t: 'боевая', d: 'Дебафы держатся на раунд дольше.' }, { n: 'Дознаватель', t: 'фарм', d: 'Выше шанс ключа с элит.' }], ult: { n: 'Ледяные оковы', at: 2, d: 'лёд сковывает всех врагов на 2 раунда, у рунных и старших боссов — иммунитет по рангу.' }, busy: null, },
     ],
@@ -1365,9 +1377,9 @@ function initialState() {
     ],
     selSquad: 's1', prepSquad: 's1', echoSquad: 's1', act: null, selItem: 'crown',
     offers: [
-      { id: 'o1', name: 'Образец стража', cls: 'Танк', el: 'Земля', race: 'Дворфы', r: 1, cycle: 1, img: ART('heroes/h1.jpg'), price: 12000, bm: 520, maxV: 1 },
-      { id: 'o2', name: 'Образец клинка', cls: 'Физ. ДД', el: 'Огонь', race: 'Люди', r: 2, cycle: 2, img: ART('heroes/h2.jpg'), price: 24000, bm: 610, maxV: 2 },
-      { id: 'o3', name: 'Образец хрониста', cls: 'Маг. ДД', el: 'Время', race: 'Эльфы', r: 3, cycle: 3, img: ART('heroes/h3.jpg'), price: 36000, bm: 700, maxV: 3, locked: 'Откроется в цикле III' },
+      { id: 'o1', name: 'Образец стража', cls: 'Танк', el: 'Земля', race: 'Дворфы', r: 1, cycle: 1, img: AV('heroes/h1.jpg'), price: 12000, bm: 520, maxV: 1 },
+      { id: 'o2', name: 'Образец клинка', cls: 'Физ. ДД', el: 'Огонь', race: 'Люди', r: 2, cycle: 2, img: AV('heroes/h2.jpg'), price: 24000, bm: 610, maxV: 2 },
+      { id: 'o3', name: 'Образец хрониста', cls: 'Маг. ДД', el: 'Время', race: 'Эльфы', r: 3, cycle: 3, img: AV('heroes/h3.jpg'), price: 36000, bm: 700, maxV: 3, locked: 'Откроется в цикле III' },
     ],
     selOffer: 'o1',
     biomes: [
@@ -1404,7 +1416,7 @@ function initialState() {
       { id: 'key', n: 'Рунический ключ', r: 2, q: 20, cat: 'key', spec: 'Вход к рунному стражу', img: ART('rune-key.png'), riddle: 'Ключ богов открывает дорогу вниз, но не обещает её.', from: 'Контракты, элиты', recipes: ['Связующее'] },
       { id: 'rune50', n: 'Руна предела · 50', r: 2, q: 10, cat: 'key', spec: 'Развитие героя', img: null, glyph: 'I', riddle: 'Десять рун одного цикла пробивают предел.', from: 'Мастер (рунный страж)', recipes: ['Руна предела 150'] },
       { id: 'vfrag', n: 'Осколки руны доблести', r: 2, q: 112, cat: 'key', spec: 'Развитие героя', img: null, glyph: 'V', riddle: 'Сто осколков собираются в одну руну.', from: 'Второй рунный страж цикла', recipes: ['Руна доблести'] },
-      { id: 'hfrag', n: 'Осколки: Лаэйра', r: 3, q: 42, cat: 'frag', spec: 'Сборный герой', img: ART('heroes/h3.jpg'), riddle: '42 из 50. Остальное — у Эхо.', from: 'Эхо, Возрождение душ', recipes: [] },
+      { id: 'hfrag', n: 'Осколки: Лаэйра', r: 3, q: 42, cat: 'frag', spec: 'Сборный герой', img: AV('heroes/h3.jpg'), riddle: '42 из 50. Остальное — у Эхо.', from: 'Эхо, Возрождение душ', recipes: [] },
       { id: 'act', n: 'Активация биома', r: 4, q: 1, cat: 'act', spec: 'Экземпляр крафтового биома', img: PATH(22), riddle: 'Что внутри — узнаешь, когда откроешь.', from: 'Мастерская', recipes: [], action: 'Активировать' },
       { id: 'many', n: 'Многоликий', r: 4, q: 1, cat: 'act', spec: 'Крафт или биом недели', img: PATH(18), riddle: 'Носит лица тех, кого победили на этой неделе.', from: 'Эхо: Убер-босс недели', recipes: [], action: 'Активировать' },
       { id: 'chest', n: 'Ларец рабочих', r: 3, q: 3, cat: 'act', spec: 'Лутбокс События', img: CHEST, riddle: 'Шарды рабочих и гарантированная валюта.', from: 'Дары путешествия', recipes: [], action: 'Открыть' },
@@ -1790,7 +1802,7 @@ function battle() {
   const typ = FL.g === 'o' ? 'Рядовые' : FL.g === 'e' ? 'Элита' : FL.g === 'r' ? 'Рунный страж' : 'Босс биома';
   const side = sd => b.u[sd].map((u, k) => cardHtml(R, u, b.u[sd].length, k)).join('');
   return { title: B.name, sub: `забег ${R.runNo}${R.demo ? ' · демо' : ''}`, back: 'descent', html: `<section class="scr flush"><div class="bt" id="bt">
-    <img class="bg" src="${ARENA}" alt="">
+    <div class="bt-bgs"><img class="bg${R.floor % 2 ? '' : ' flip'}" src="${ARENA}" alt=""><img class="bg bg2${R.floor % 2 ? ' flip' : ''}" src="${ARENA}" alt=""></div>
     <div class="bt-hud">
       <div class="bt-floor">${R.guard ? `<b>${ic('crown')}</b><span>страж</span>` : `<b>${R.floor}</b><span>/ ${B.floors.length}</span>`}</div>
       <span class="chip ${FL.g !== 'o' ? 'gold' : ''}">${FL.g === 'e' ? ic('gem') : FL.g === 'b' ? ic('crown') : ''}${typ}${lead ? ' · ' + uName(lead) : ''}${FL.g === 'b' ? ` · осада ${siegeDone(R.biome)}%` : ''}</span>
@@ -1806,7 +1818,7 @@ function battle() {
     </div>
     <div class="bt-field" id="btField">
       <div class="bt-side h">${side(0)}</div>
-      <div class="bt-side f">${side(1)}</div>
+      <div class="bt-side f${R.enter ? ' enter' : ''}">${side(1)}</div>
       <div class="bt-feed" id="btFeed">${R.feed.map(x => `<p>${x}</p>`).join('')}</div>
       ${b.mode === 'rounds' ? `<div class="bt-queue" id="btQueue">${queueHtml(R)}</div>` : ''}
       <div class="bt-insp" id="btInsp" hidden></div>
@@ -1938,7 +1950,7 @@ function hireView() {
       <div class="col" style="gap:6px">${S.offers.map(x => `<button class="preset" data-a="offer" data-v="${x.id}" aria-current="${x.id === o.id}" style="flex-direction:row;align-items:center;gap:10px"><img src="${x.img}" alt="" style="width:40px;height:40px;border-radius:8px;object-fit:cover;${x.locked ? 'filter:grayscale(1) brightness(.6)' : ''}"><span class="col" style="gap:3px;flex:1"><b>${x.name}</b>${rar(x.r)}</span>${x.locked ? `<span class="chip">${ic('lock')}ц. ${ROMAN[x.cycle]}</span>` : money('gold', x.price)}</button>`).join('')}</div>
       <div class="hr"></div>
       <span class="eyebrow">Возрождение душ</span>
-      <div class="rebirth"><img src="${ART('heroes/h3.jpg')}" alt=""><div class="col" style="gap:4px;flex:1"><b class="serif" style="font-size:16px">Лаэйра · осколки</b>${bar(84)}<small class="faint">42 / 50 · активация 800 душ</small></div></div>
+      <div class="rebirth"><img src="${AV('heroes/h3.jpg')}" alt=""><div class="col" style="gap:4px;flex:1"><b class="serif" style="font-size:16px">Лаэйра · осколки</b>${bar(84)}<small class="faint">42 / 50 · активация 800 душ</small></div></div>
       <div class="row" style="gap:6px"><button class="btn sm" data-a="toast" data-v="Прокрутка возрождения: демо">Прокрутка${costTag('enerium', 100)}</button><button class="btn sm ghost" data-a="sheet" data-v="cur:dust"><img src="${DUST}" alt="" width="16" height="16">${fmt(dust)} праха</button></div>
     </div>
     <div class="pnl hd">${heroHead({ ...o, valor: 0, lvl: 1 }, 'мощь на старте')}
@@ -2741,8 +2753,10 @@ function newFloor(R) {
     : EB.floorBattle(R.heroes, R.biome, R.floor, R.floor === B.floors.length && !R.demo ? G(R.biome).hp : null, R.mode);   // демо-прыжок не трогает осаду
   R.view = 0; R.feed = []; R.disp = {}; R.lastActor = null; R.pending = 0; R.endAt = null; R.acted = []; R.fired = null; syncDisp(R);
   if (R.guard) { R.banner = ['Рунный страж · ' + uName(R.b.u[1][0]), 'пять карт · иммунитет стража к контролю ' + Math.round((EB.RULES.resist.rune || 0) / 100) + ' %']; return; }
-  const g = B.floors[R.floor - 1].g, lead = R.b.u[1][0], tired = R.floor > R.startFloor ? ' · здоровье не восстановлено' : '';
-  R.banner = [g === 'o' ? `Этаж ${R.floor}` : g === 'e' ? 'Элита · ' + uName(lead) : uName(lead), (g === 'o' ? 'рядовые' : g === 'e' ? 'лидер и свита' : R.demo ? 'демо-прыжок: осада биома не меняется' : G(R.biome).hp != null ? 'осада · снято ' + siegeDone(R.biome) + '%' : 'босс биома · осада') + tired];
+  const g = B.floors[R.floor - 1].g, lead = R.b.u[1][0];
+  R.enter = R.floor > R.startFloor;   // новая колода въезжает справа — камера пришла в следующую «комнату»
+  R.banner = [`Этаж ${R.floor}`, g === 'o' ? 'рядовые' : g === 'e' ? 'элита · ' + uName(lead)
+    : R.demo ? 'босс биома · демо-прыжок' : G(R.biome).hp != null ? 'босс биома · осада, снято ' + siegeDone(R.biome) + ' %' : 'босс биома · ' + uName(lead)];
 }
 function ensureLoop() { if (!loop && S.runs.some(r => !r.over)) loop = setInterval(tickAll, TICK); }
 function tickAll() {
@@ -2757,6 +2771,7 @@ function advance(R, ms) {
   if (R.gap > 0) { R.gap -= ms; if (R.gap <= 0) { R.floor++; newFloor(R); if (vis) render(); } return; }
   const b = R.b;
   R.view += ms;
+  if (R.enter && R.view > 1200) R.enter = false;
   if (R.banner && R.view > 2200) { R.banner = null; if (vis) { const x = document.querySelector('.bt-banner'); x && x.remove(); } }
   while (!b.over && EB.nextAt(b) <= R.view) onAction(R, EB.step(b), vis);
   if (!b.over && R.view > b.limit) onAction(R, EB.step(b), vis);   // время боя вышло
@@ -2787,10 +2802,19 @@ function floorDone(R, vis) {
   if (R.guard) { R.end = { kind: b.win ? 'guardWin' : 'guardLose', why: b.why }; if (b.why === 'sand' && vis) feed(R, '<span class="gd">Время скоротечно…</span> · десять раундов прошли'); return endRun(R, vis); }
   let bossDead = false;
   if (g === 'b') { const boss = b.u[1][0], sg = G(R.biome); bossDead = !boss.alive; if (!R.demo) { sg.max = boss.maxHp; if (bossDead) { sg.hp = null; sg.killed = true; } else sg.hp = boss.hp; } }
-  if (b.win && R.floor < B.floors.length) { R.gap = EB.RULES.floor.gapMs; R.runMs += R.gap; if (vis) feed(R, `<span class="sp">Этаж ${R.floor} пройден</span>${b.mode === 'rounds' ? ` за ${b.round} ${roundWord(b.round)}` : ''} · здоровье отряда ${partyPctOf(b)}%`); return; }
+  if (b.win && R.floor < B.floors.length) { R.gap = EB.RULES.floor.gapMs; R.runMs += R.gap; if (vis) camPan(); if (vis) feed(R, `<span class="sp">Этаж ${R.floor} пройден</span>${b.mode === 'rounds' ? ` за ${b.round} ${roundWord(b.round)}` : ''} · здоровье отряда ${partyPctOf(b)}%`); return; }
   if (b.why === 'sand' && vis) feed(R, '<span class="gd">Время скоротечно…</span> · десять раундов прошли');
   R.end = bossDead ? { kind: 'boss' } : g === 'b' ? { kind: 'siege', why: b.why } : { kind: 'wall', floor: R.floor, why: b.why, foes: b.u[1].map(u => u.id) };
   endRun(R, vis);
+}
+/* Камера едет вправо, в следующую «комнату» биома: фон уезжает влево, павшие враги — вместе со своей комнатой.
+   Пока одна арена на биом, «комната» — её зеркальная копия. Идёт 80 % паузы между этажами. */
+function camPan() {
+  const bt = document.getElementById('bt'); if (!bt) return;
+  bt.style.setProperty('--bw', bt.clientWidth + 'px');
+  bt.style.setProperty('--pan', Math.round(EB.RULES.floor.gapMs * 0.8 / devSpeed) + 'ms');
+  void bt.offsetWidth;   // пересчёт стилей: переход начнётся с нынешнего места
+  bt.classList.add('panning');
 }
 /* Магнит: монеты валюты летят со стороны врагов в панель валют, число в панели подпрыгивает.
    Разброс монет — из номера монеты, без случайности: это показ, а не расчёт. */

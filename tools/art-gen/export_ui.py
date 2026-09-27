@@ -6,8 +6,10 @@ mirror: true — отразить по горизонтали: на карте �
 
   python tools/art-gen/export_ui.py
 """
+import hashlib
 import json
 import pathlib
+import re
 import sys
 
 from PIL import Image, ImageOps
@@ -36,6 +38,21 @@ def main():
         total += kb
         print(f"{dst:22} ← {src['from']}  {size[0]}×{size[1]}{', отражён' if src.get('mirror') else ''}, {kb} КБ")
     print(f"Итого {len(spec['items'])} картинок, {total} КБ → {spec['out']}")
+    stamp_version(out, spec)
+
+
+def stamp_version(out, spec):
+    """Версия выгрузки — хеш картинок. Она попадает в адреса картинок прототипа: браузер не покажет старые из кэша."""
+    h = hashlib.sha1()
+    for dst in sorted(spec["items"]):
+        h.update((out / dst).read_bytes())
+    ver = h.hexdigest()[:8]
+    page = ROOT / "design/ui/index.html"
+    raw = page.read_bytes().decode("utf-8")
+    new, n = re.subn(r"const ART_V = '[^']*';", f"const ART_V = '{ver}';", raw, count=1)
+    if n:
+        page.write_bytes(new.encode("utf-8"))
+        print(f"Версия выгрузки {ver} — записана в design/ui/index.html")
 
 
 if __name__ == "__main__":
