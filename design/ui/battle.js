@@ -183,14 +183,15 @@ const FLOORS = [
   { g: 'b', m: ['b1', 'o4', 'o5', 'o3', 'o6'] },
 ];
 /* Обучающий биом цикла I (ADR-0018): 15 этажей, элиты на 5-м и 10-м, босс на 15-м — без осады.
-   Цикл I вводит игрока в механики, стены и вкусный фарм — с цикла II. Отряд без доблести берёт его с нуля примерно за час игры. */
+   Биом 1 закрывают двое героев: столько их у игрока к концу первого часа. На этаже — не больше двух врагов,
+   первые этажи берёт и один герой. Стены и вкусный фарм — с цикла II. */
 const FLOORS_TUTOR = [
   { g: 'o', m: ['o1'] }, { g: 'o', m: ['o1'] }, { g: 'o', m: ['o2'] }, { g: 'o', m: ['o1', 'o1'] },
-  { g: 'e', m: ['e1', 'o2'] },
-  { g: 'o', m: ['o1', 'o3'] }, { g: 'o', m: ['o4', 'o1'] }, { g: 'o', m: ['o2', 'o3'] }, { g: 'o', m: ['o4', 'o2', 'o3'] },
+  { g: 'e', m: ['e1'] },
+  { g: 'o', m: ['o1', 'o3'] }, { g: 'o', m: ['o4', 'o1'] }, { g: 'o', m: ['o2', 'o3'] }, { g: 'o', m: ['o4', 'o3'] },
   { g: 'e', m: ['e2', 'o2'] },
-  { g: 'o', m: ['o4', 'o1', 'o2'] }, { g: 'o', m: ['o3', 'o3', 'o5'] }, { g: 'o', m: ['o4', 'o2', 'o5'] }, { g: 'o', m: ['o6', 'o1', 'o3'] },
-  { g: 'b', m: ['b1', 'o4', 'o5'] },
+  { g: 'o', m: ['o4', 'o2'] }, { g: 'o', m: ['o3', 'o5'] }, { g: 'o', m: ['o4', 'o5'] }, { g: 'o', m: ['o6', 'o3'] },
+  { g: 'b', m: ['b1', 'o4'] },
 ];
 
 /* ================== генератор ================== */
@@ -201,12 +202,13 @@ function floorSeed(biomeSeed, floor) { return mix32((biomeSeed ^ Math.imul(floor
 /* ================== биомы ==================
    Сид — сам биом: один и тот же биом с тем же отрядом всегда даёт тот же сценарий.
    n — номер биома: от него растут души. foeLvl — уровень врагов: base + этаж × perFloor, без него — RULES.foeLvl.
-   siege: false — босс берётся за один забег, урон по нему не копится: осада — с цикла II (ADR-0018). bossHpPct — здоровье босса этого биома. */
+   siege: false — босс берётся за один забег, урон по нему не копится: осада — с цикла II (ADR-0018).
+   foeHpPct — здоровье врагов биома, % от их hpPct: этажи и свита стража; bossHpPct и guardHpPct — здоровье босса и стража этого биома. */
 const BIOMES = {
   b1: { n: 1, cycle: 1, name: 'Мастерская форм', seed: seedOf('Мастерская форм'), floors: FLOORS_TUTOR,
-    foeLvl: { base: 1, perFloor: 1 }, bossHpPct: 900, siege: false,
-    // рунный страж — пять карт (ADR-0010): Мастер ждёт и отвечает; Упор держит, Штопарь латает, Резчик добивает слабых, Съёмщик снимает силу
-    guard: { g: 'r', m: ['g1', 'e3', 'e5', 'e2', 'e6'] } },
+    foeLvl: { base: 1, perFloor: 1 }, foeHpPct: 50, bossHpPct: 400, guardHpPct: 50, siege: false,
+    // рунный страж обучения — три карты (ADR-0018): Мастер и две элиты, по силам двум героям. Подмастерье бьёт, Мех — по всем
+    guard: { g: 'r', m: ['g1', 'e1', 'e4'] } },
   // образец длинного биома цикла II — для калькулятора экономики; сид прежней Мастерской, чтобы прогоны были сравнимы
   c2: { n: 1, cycle: 2, name: 'Образец биома цикла II', seed: seedOf('Мастерская форм'), floors: FLOORS, siege: true },
 };
@@ -519,8 +521,10 @@ const foeLvlOf = (B, floor) => { const L = B.foeLvl || RULES.foeLvl; return L.ba
 /* Колода этажа. Осада — только в биоме с осадой: иначе босс каждый забег со свежим здоровьем. */
 function floorFoes(biome, floor, siegeHp) {
   const B = BIOMES[biome], F = B.floors[floor - 1], boss = k => F.g === 'b' && k === 0;
-  return F.m.map((id, k) => foeSrc(id, foeLvlOf(B, floor), k, F.g !== 'o' && k === 0, boss(k) && B.siege !== false ? siegeHp : null, boss(k) ? B.bossHpPct : null));
+  return F.m.map((id, k) => foeSrc(id, foeLvlOf(B, floor), k, F.g !== 'o' && k === 0, boss(k) && B.siege !== false ? siegeHp : null,
+    boss(k) ? B.bossHpPct : foeHpOf(B, id)));
 }
+const foeHpOf = (B, id) => B.foeHpPct ? fl(FOES[id].hpPct * B.foeHpPct, 100) : null;   // здоровье врагов биома — доля их hpPct
 
 /* ================== бой ================== */
 function create(o) {
@@ -1037,7 +1041,7 @@ function floorBattle(heroes, biome, floor, siegeHp, mode) {
 /* Рунный страж — отдельный бой из пяти карт после биома (§8.6, §11, ADR-0010) */
 function guardBattle(heroes, biome, mode) {
   const B = BIOMES[biome], G = B.guard, lvl = B.floors.length + 1;
-  const foes = G.m.map((id, k) => foeSrc(id, foeLvlOf(B, lvl), k, k === 0, null));
+  const foes = G.m.map((id, k) => foeSrc(id, foeLvlOf(B, lvl), k, k === 0, null, k === 0 ? B.guardHpPct : foeHpOf(B, id)));
   return create({ heroes, foes, seed: floorSeed(B.seed, lvl), limitMs: RULES.floor.limitMs.b, mode });
 }
 /* Добыча этажа по рангам убитых карт. Шансы — свой поток генератора от сида этажа,

@@ -1296,7 +1296,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
       </div>
       <div class="p-block">
         <h2>Бой пять на пять</h2>
-        <p style="margin-top:6px">Тестовая сцена по ADR-0005, ADR-0007 и ADR-0010. Враги — такие же карты, как герои, этаж — готовая колода, способности из одной библиотеки. Карты ходят по очереди по скорости, способность срабатывает по шансу, у каждого действия свой эффект. Красная рамка показывает, в кого целятся, кнопка «Знаки» объясняет индикаторы, а нажатие на карту открывает её способности, эффекты и угрозу. Биом — испытание на выносливость: здоровье и павшие переходят на следующий этаж, 10 раундов на этаж — проверка урона. Рунный страж — пять карт. Сид — сам биом. Забег можно свернуть, забегов может идти несколько.</p>
+        <p style="margin-top:6px">Тестовая сцена по ADR-0005, ADR-0007 и ADR-0010. Враги — такие же карты, как герои, этаж — готовая колода, способности из одной библиотеки. Карты ходят по очереди по скорости, способность срабатывает по шансу, у каждого действия свой эффект. Красная рамка показывает, в кого целятся, кнопка «Знаки» объясняет индикаторы, а нажатие на карту открывает её способности, эффекты и угрозу. Биом — испытание на выносливость: здоровье и павшие переходят на следующий этаж, 10 раундов на этаж — проверка урона. Рунный страж — Мастер и его свита. Сид — сам биом. Забег можно свернуть, забегов может идти несколько.</p>
         <div class="p-ctrls" id="devSpeed" style="margin-top:10px;align-items:center"><span class="p-note">Скорость прототипа:</span><button class="p-chip" data-speed="1" aria-pressed="true">×1</button><button class="p-chip" data-speed="2" aria-pressed="false">×2</button><button class="p-chip" data-speed="4" aria-pressed="false">×4</button><button class="p-chip" data-speed="8" aria-pressed="false">×8</button></div>
         <p class="p-note" style="margin-top:6px">В игре ускорения нет: бой идёт в реальном времени сервера. Переключатель — только чтобы быстрее проверить прототип.</p>
         <div class="p-ctrls" id="devModel" style="margin-top:12px;align-items:center"><span class="p-note">Модель боя:</span><button class="p-chip" data-model="rounds" aria-pressed="true">10 раундов</button><button class="p-chip" data-model="tempo" aria-pressed="false">Прежняя · темп</button></div>
@@ -2648,8 +2648,8 @@ const OV = {
     let title, head;
     if (E.kind === 'boss') { title = 'Первый набросок повержен'; head = 'Мастерская пройдена до конца. Осталось победить рунного стража — тогда откроется Подземный лес.'; }
     else if (E.kind === 'siege') { title = 'Осада продолжается'; head = `${E.why === 'sand' ? 'Время скоротечно… Десять раундов прошли. ' : ''}Отряд дошёл до босса и снял ${sg - R.siegeFrom}% его здоровья, всего снято ${sg}%. Урон сохранится до следующего забега. Чем меньше у босса здоровья, тем он опаснее.`; }
-    else if (E.kind === 'guardWin') { title = 'Мастер пропустил дальше'; head = 'Рунный страж и четыре элиты повержены. Теперь, если пройден и босс биома, откроется Подземный лес.'; }
-    else if (E.kind === 'guardLose') { title = 'Мастер не пропустил'; head = `${E.why === 'sand' ? 'Время скоротечно… Десять раундов прошли, а страж ещё стоит' : 'Отряд пал'}. Рунный страж — пять карт, у Мастера иммунитет к контролю ${Math.round((EB.RULES.resist.rune || 0) / 100)} %.`; }
+    else if (E.kind === 'guardWin') { title = 'Мастер пропустил дальше'; head = 'Рунный страж и его свита повержены. Теперь, если пройден и босс биома, откроется Подземный лес.'; }
+    else if (E.kind === 'guardLose') { title = 'Мастер не пропустил'; head = `${E.why === 'sand' ? 'Время скоротечно… Десять раундов прошли, а страж ещё стоит' : 'Отряд пал'}. Рунный страж — ${guardCards()}, у Мастера иммунитет к контролю ${Math.round((EB.RULES.resist.rune || 0) / 100)} %.`; }
     else if (E.kind === 'wall') { title = `Стена — этаж ${E.floor}`; head = `${E.why === 'time' ? 'Время боя вышло' : E.why === 'sand' ? 'Время скоротечно… Десять раундов прошли, этаж не взят' : 'Отряд пал'} на этаже ${E.floor}. В колоде: ${E.foes.map(id => known(id) ? F(id).name : 'неизвестный').join(', ')}.`; }
     else { title = 'Забег прерван'; head = `Отряд поднялся с этажа ${R.floor}.`; }
     if (R.demo) head = 'Демо-прыжок сразу к боссу с полным здоровьем: ' + (B.siege !== false ? 'осада биома и стена не меняются. ' : 'стена не меняется. ') + head;
@@ -2826,6 +2826,7 @@ let loop = null, fxInst = null, devSpeed = 1, devModel = 'rounds';   // devModel
 const TICK = 50;
 const dkey = u => u.side + ':' + u.i;
 const G = biome => S.siege[biome] || (S.siege[biome] = { hp: null, max: null, killed: false });
+const guardCards = () => { const n = EB.BIOMES.b1.guard.m.length; return { 3: 'три карты', 4: 'четыре карты', 5: 'пять карт' }[n] || n + ' карт'; };   // страж обучения — три карты (ADR-0018)
 const siegeDone = biome => { const g = G(biome); return g.hp == null || !g.max ? 0 : Math.round(100 - g.hp * 100 / g.max); };
 const seedTag = R => (EB.BIOMES[R.biome].seed >>> 16).toString(16).toUpperCase().padStart(4, '0');
 const runOf = id => S.runs.find(r => !r.over && r.squad.includes(id));
@@ -2852,7 +2853,7 @@ function newFloor(R) {
   R.b = R.guard ? EB.guardBattle(R.heroes, R.biome, R.mode)
     : EB.floorBattle(R.heroes, R.biome, R.floor, R.floor === B.floors.length && !R.demo ? G(R.biome).hp : null, R.mode);   // демо-прыжок не трогает осаду
   R.view = 0; R.feed = []; R.disp = {}; R.lastActor = null; R.pending = 0; R.endAt = null; R.acted = []; R.fired = null; syncDisp(R);
-  if (R.guard) { R.banner = ['Рунный страж · ' + uName(R.b.u[1][0]), 'пять карт · иммунитет стража к контролю ' + Math.round((EB.RULES.resist.rune || 0) / 100) + ' %']; return; }
+  if (R.guard) { R.banner = ['Рунный страж · ' + uName(R.b.u[1][0]), guardCards() + ' · иммунитет стража к контролю ' + Math.round((EB.RULES.resist.rune || 0) / 100) + ' %']; return; }
   const g = B.floors[R.floor - 1].g, lead = R.b.u[1][0];
   R.enter = R.floor > R.startFloor;   // новая колода въезжает справа — камера пришла в следующую «комнату»
   R.banner = [`Этаж ${R.floor}`, g === 'o' ? 'рядовые' : g === 'e' ? 'элита · ' + uName(lead)
@@ -3245,7 +3246,7 @@ const FLOWS = [
   ['Убежище и следующий шаг', 'Проводники, текущие занятия и одна главная кнопка', () => { S.route = 'shelter'; S.overlay = null; }],
   ['Забег по Мастерской форм', 'Бой на истощение: здоровье не восстанавливается. Эффекты, цели, карточка бойца', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = { t: 'prep', arg: '' }; }],
   ['Бой с боссом · демо-прыжок', 'Отряд I сразу на последнем этаже: босс, ульты, массовые удары', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = null; startRun('s1', 'b1', EB.BIOMES.b1.floors.length); }],
-  ['Рунный страж · пять карт', 'Мастер и четыре элиты, иммунитет стража к контролю 25 %', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = null; startRun('s1', 'b1', null, true); }],
+  ['Рунный страж · ' + guardCards(), 'Мастер и две элиты — страж обучения цикла I, иммунитет к контролю 25 %', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = null; startRun('s1', 'b1', null, true); }],
   ['Бестиарий: известный и неизвестный', 'Скрыт до первой победы, картина и совет старика после', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = { t: 'foe', arg: known('o6') ? 'e3' : 'o6' }; }],
   ['Развитие героя', 'Уровень, рунный предел и доблесть — одна лестница', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.seg.hero = 'power'; S.selHero = 'h2'; S.overlay = null; }],
   ['Ротация перетаскиванием', 'Порядок способностей в карточке героя', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.seg.hero = 'skills'; S.selHero = 'h2'; S.overlay = null; }],
