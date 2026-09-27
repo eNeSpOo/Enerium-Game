@@ -323,10 +323,10 @@ button.well:hover{border-color:var(--iron-3)}
 .hc.empty{border-style:dashed;border-color:#2c3238;box-shadow:none;background:#0b0d10;display:grid;place-items:center;color:var(--parch-3)}
 .hc.empty::after{display:none}
 
-/* фигура врага: изученный — глина; неизвестный — силуэт */
+/* арт врага: изученный — картина целиком; неизвестный — затемнён и размыт, поверх знак вопроса */
 .fig{position:relative;display:flex;align-items:flex-end;justify-content:center;border:0;background:none;padding:0}
-.fig img{height:100%;width:auto;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.6))}
-.fig.unk img{filter:brightness(0) drop-shadow(0 0 1px rgba(72,229,212,.8)) drop-shadow(0 0 6px rgba(72,229,212,.25))}
+.fig img{height:100%;width:auto;aspect-ratio:4/5;object-fit:cover;object-position:50% 22%;border-radius:8px;border:1px solid #262b31;box-shadow:0 8px 14px -8px #000}
+.fig.unk img{filter:blur(5px) brightness(.32) saturate(.5);border-color:rgba(72,229,212,.45)}
 .fig .qm{position:absolute;inset:0;display:grid;place-items:center;font:600 22px/1 var(--f-d);color:var(--spirit);text-shadow:0 0 10px var(--spirit)}
 
 /* строка «ключ: значение» */
@@ -440,7 +440,7 @@ button.well:hover{border-color:var(--iron-3)}
 
 /* Бой: пять карт против отряда врагов-карт. Раскладка 3 + 2 только для вида — цель выбирает угроза */
 .bt{position:absolute;inset:0;overflow:hidden;background:#07090a;--rowh:100px;--colw:92px;--fh:62px}
-.bt>.bg{position:absolute;inset:-4%;width:108%;height:108%;object-fit:cover;object-position:50% 60%;filter:brightness(.4) saturate(.85)}
+.bt>.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;filter:brightness(.62) saturate(.9)}
 .bt::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(5,6,8,.78),transparent 20%,transparent 74%,rgba(5,6,8,.92)),radial-gradient(46% 40% at 50% 104%,rgba(72,229,212,.13),transparent);pointer-events:none}
 .bt-hud{position:absolute;left:10px;right:10px;top:7px;z-index:5;display:flex;align-items:center;gap:12px;min-width:0}
 .bt-floor{display:flex;align-items:baseline;gap:6px}
@@ -597,7 +597,7 @@ button.well:hover{border-color:var(--iron-3)}
 .bc.heal .face{box-shadow:0 0 0 1px #6fe3a0,0 0 16px -3px #6fe3a0}
 .bc.dead{opacity:.26}
 .bc.dead .face img{filter:grayscale(1) brightness(.5)}
-.bc.unk .face img{filter:brightness(0) drop-shadow(0 0 1px rgba(72,229,212,.8)) drop-shadow(0 0 6px rgba(72,229,212,.25))}
+.bc.unk .face img{filter:blur(4px) brightness(.35) saturate(.5)}
 .bc.unk .nm{color:var(--spirit)}
 .fly{position:absolute;z-index:7;pointer-events:none;font:700 16px/1 var(--f-u);color:#fff;text-shadow:0 2px 4px #000,0 0 10px rgba(0,0,0,.6);animation:fly .9s ease-out forwards;white-space:nowrap}
 .fly.crit{font-size:21px;color:var(--gold)}
@@ -803,7 +803,7 @@ button.well:hover{border-color:var(--iron-3)}
 .eslots{display:flex;flex-direction:column;gap:6px;min-height:0}
 .eslot{display:grid;grid-template-columns:40px 1fr;gap:8px;align-items:center;padding:6px 8px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;text-align:left;color:var(--parch);flex:1 1 0;min-height:0}
 .eslot .ph{height:46px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
-.eslot .ph img{height:100%}
+.eslot .ph img{height:100%;aspect-ratio:4/5;object-fit:cover;border-radius:6px}
 .eslot b{display:block;font:600 15px/1.05 var(--f-d)}
 .eslot small{display:flex;justify-content:space-between;color:var(--parch-3);font-size:11.5px;margin-top:3px}
 .eslot .bar{margin-top:4px;height:4px}
@@ -811,7 +811,7 @@ button.well:hover{border-color:var(--iron-3)}
 .eslot.empty{border-style:dashed;grid-template-columns:1fr;place-items:center;color:var(--parch-3);font-size:12.5px;text-align:center}
 .etarget{position:relative;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);min-height:0;overflow:hidden}
 .etarget .stage{position:relative;display:flex;align-items:flex-end;justify-content:center;padding-top:6px;background:radial-gradient(60% 50% at 50% 100%,rgba(72,229,212,.14),transparent 70%)}
-.etarget .stage img{height:94%;width:auto;filter:drop-shadow(0 10px 16px rgba(0,0,0,.8))}
+.etarget .stage img{height:94%;width:auto;aspect-ratio:4/5;object-fit:cover;object-position:50% 22%;border-radius:12px;border:1px solid #262b31;box-shadow:0 12px 20px -10px #000}
 .etarget .info{display:flex;flex-direction:column;gap:8px;padding:12px 12px 12px 4px;min-width:0}
 .ladder14{display:flex;align-items:center;gap:10px;padding:8px 12px}
 .l14{flex:1 1 0;display:flex;gap:3px;align-items:flex-end}
@@ -933,7 +933,7 @@ button.well:hover{border-color:var(--iron-3)}
 .shelf-r>small,.shelf-b>small{font:700 10px/1 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--parch-3);margin-bottom:3px}
 .shelf-g .shelf-figs{flex:1 1 0;min-height:0;display:flex;gap:4px;align-items:stretch;border-bottom:1px solid #2a2f35;padding:0 2px 1px;background:linear-gradient(0deg,rgba(72,229,212,.07),transparent 40%)}
 .shelf-g .fig{position:relative;height:auto;flex-basis:0;flex-shrink:1;min-width:0;border-radius:6px;padding:0;display:block}
-.shelf-g .fig img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:50% 100%}
+.shelf-g .fig img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .shelf-g .fig:hover{background:rgba(255,255,255,.035)}
 .shelf-b .shelf-figs{gap:8px}
 .seal-tag{position:absolute;left:50%;bottom:4px;transform:translateX(-50%);display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:5px;background:rgba(10,11,12,.86);border:1px solid rgba(221,188,122,.35);font:700 9.5px/1 var(--f-u);letter-spacing:.08em;text-transform:uppercase;color:var(--gold);white-space:nowrap}
@@ -994,7 +994,7 @@ button.well:hover{border-color:var(--iron-3)}
 
 /* ===== слои ===== */
 .foe-hero{position:relative;height:190px;border-radius:12px;overflow:hidden;border:1px solid var(--iron);flex:none;display:flex;align-items:flex-end;justify-content:center}
-.foe-hero .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.55)}
+.foe-hero .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(12px) brightness(.38) saturate(.8)}
 .foe-hero .fig{position:relative;height:92%}
 .foe-hero .fig img{height:100%}
 .mail{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:9px 10px;border-radius:10px;border:1px solid var(--iron);background:#0e1114}
@@ -1011,7 +1011,8 @@ button.well:hover{border-color:var(--iron-3)}
 .oprow b{font-size:14px}
 .worker{display:grid;place-items:center;width:40px;height:40px;border-radius:9px;border:1px dashed var(--iron-2);color:var(--parch-3)}
 .newfoe{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;border:1px solid rgba(72,229,212,.45);background:radial-gradient(60% 120% at 10% 100%,rgba(72,229,212,.14),transparent 70%),#0e1114}
-.newfoe img{height:84px;width:auto;filter:drop-shadow(0 6px 10px #000)}
+.newfoe img{height:84px;width:auto;aspect-ratio:4/5;object-fit:cover;border-radius:8px;border:1px solid #262b31;box-shadow:0 6px 10px -6px #000}
+.foe-art{height:150px;width:auto;aspect-ratio:4/5;object-fit:cover;border-radius:10px;border:1px solid #262b31;box-shadow:0 8px 14px -6px #000}
 .dlg.wide{width:min(700px,calc(100% - 30px))}
 .gcal{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px}
 .gday{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 2px 5px;border-radius:8px;border:1px solid var(--iron);background:#0e1114}
@@ -1255,7 +1256,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
       <li><b>Одно главное действие</b><span>Оно светится снизу, как заряженный карст, и несёт цену прямо на себе. Причина недоступности — строкой рядом.</span></li>
       <li><b>Шахта вместо меню</b><span>Пять разделов всегда под рукой: Убежище, Спуск, Герои, Ремесло, Неделя. Странник — портрет в шапке.</span></li>
       <li><b>Шапка — одна строка</b><span>Название, вкладки, четыре валюты и входящие делят 46 пикселей. Отдельных заголовков окон и крестиков нет.</span></li>
-      <li><b>Лор несёт смысл</b><span>Стихии окрашены цветами карстов, таймеры — песком, неизученный враг — силуэтом, советы — голосом сказителя.</span></li>
+      <li><b>Лор несёт смысл</b><span>Стихии окрашены цветами карстов, таймеры — песком, неизученный враг — затемнённой картиной, советы — голосом сказителя.</span></li>
       <li><b>Одни шаблоны на всё</b><span>Бой, итог, отряд, карточка и подтверждение одинаковы во всех режимах — выучил раз, узнаёшь везде.</span></li>
     </ul>
   </div>
@@ -1304,7 +1305,10 @@ const ASSET = window.EN_ASSET || '../enerium/assets/';
 const A = p => ASSET + p;
 const ART = n => A('art/' + n);
 const PATH = n => A('path-icons/path-' + String(n).padStart(2, '0') + '.jpg');
-const WS = n => ART('workshop-page-' + String(n).padStart(2, '0') + ([1, 4, 11, 20].includes(n) ? '.jpg' : '.png'));
+/* Арт врагов — основа ADR-0013, арена — вторая раскладка; выгрузка tools/art-gen/export_ui.py */
+const FA = f => ART('foes/' + f.id + '.jpg');
+const FPOS = f => f.pos || '50% 22%';
+const ARENA = ART('arena-workshop.jpg');
 const DUST = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><radialGradient id="g" cx="50%" cy="80%" r="60%"><stop offset="0" stop-color="#f3e2b4"/><stop offset=".6" stop-color="#b08d55"/><stop offset="1" stop-color="#5d4a2c"/></radialGradient></defs><path d="M6 52c6-12 14-22 26-22s20 10 26 22z" fill="url(#g)"/><path d="M20 44c3-4 7-7 12-7" stroke="#fff3cf" stroke-opacity=".5" stroke-width="2" fill="none"/><circle cx="22" cy="18" r="2.2" fill="#f7e9c2"/><circle cx="38" cy="12" r="1.6" fill="#f7e9c2" opacity=".8"/><circle cx="31" cy="22" r="1.3" fill="#f7e9c2" opacity=".7"/><circle cx="44" cy="24" r="1.8" fill="#f7e9c2" opacity=".6"/></svg>');
 /* Сундук — заглушка до генерации в стиле ADR-0009: арт GPT убран */
 const CHEST = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><radialGradient id="l" cx="50%" cy="100%" r="70%"><stop offset="0" stop-color="#ddbc7a" stop-opacity=".35"/><stop offset="1" stop-color="#121518" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" rx="10" fill="#121518"/><rect width="64" height="64" rx="10" fill="url(#l)"/><path d="M14 31h36v16a3 3 0 0 1-3 3H17a3 3 0 0 1-3-3z" fill="#2b241c" stroke="#ddbc7a" stroke-width="2"/><path d="M14 31c0-9 8-15 18-15s18 6 18 15z" fill="#3a3024" stroke="#ddbc7a" stroke-width="2"/><path d="M24 17.5V50M40 17.5V50" stroke="#b1915a" stroke-width="1.5" opacity=".55"/><rect x="28" y="28" width="8" height="10" rx="1.5" fill="#ddbc7a"/><circle cx="32" cy="33" r="1.6" fill="#121518"/></svg>');
@@ -1334,21 +1338,21 @@ function initialState() {
     acc: { level: 24, xp: 7289, next: 11758, cycle: 2 },
     week: { race: 'Эльфов', next: 'Зверей', left: 3 * 86400 + 5 * 3600 + 12 * 60 },
     heroes: [
-      { id: 'h1', name: 'Страж Кряжа', cls: 'Танк', el: 'Земля', race: 'Саганы', r: 1, cycle: 1, img: ART('hero-portrait-1.png'), lvl: 42, cap: 50, lim: 0, valor: 1, maxV: 3, bm: 26840, st: [128, 54, 72, 246, 62], gr: [2, 3, 3, 1, 3],
+      { id: 'h1', name: 'Гарт Нишевой', cls: 'Танк', el: 'Земля', race: 'Дворфы', r: 1, cycle: 1, img: ART('heroes/h1.jpg'), lvl: 42, cap: 50, lim: 0, valor: 1, maxV: 3, bm: 26840, st: [128, 54, 72, 246, 62], gr: [2, 3, 3, 1, 3],
         ab: ['Вызов', 'Удар щитом', 'Осыпание'].map(AB),
         pas: [{ n: 'Несгибаемость', t: 'боевая', d: 'Щит, когда здоровье ниже половины.' }, { n: 'Трофейщик', t: 'фарм', d: 'Больше золота с элит.' }], ult: null, busy: null, },
-      { id: 'h2', name: 'Пламенный Клинок', cls: 'Физ. ДД', el: 'Огонь', race: 'Люди', r: 1, cycle: 1, img: ART('hero-portrait-2.png'), lvl: 50, cap: 50, lim: 0, valor: 0, maxV: 1, bm: 25920, st: [245, 54, 128, 72, 62], gr: [1, 3, 2, 3, 3],
+      { id: 'h2', name: 'Хравн Сборщик', cls: 'Физ. ДД ловкости', fx: 'melee', el: 'Огонь', race: 'Люди', r: 1, cycle: 1, img: ART('heroes/h2.jpg'), lvl: 50, cap: 50, lim: 0, valor: 0, maxV: 1, bm: 25920, st: [245, 54, 128, 72, 62], gr: [1, 3, 2, 3, 3],
         ab: ['Горение', 'Быстрый выпад', 'Погребальный костёр'].map(AB),
         pas: [{ n: 'Точность', t: 'боевая', d: 'Выше шанс крита.' }, { n: 'Охотник', t: 'фарм', d: 'Больше духа с рядовых.' }], ult: null, busy: null, },
-      { id: 'h3', name: 'Хронист', cls: 'Маг. ДД', el: 'Время', race: 'Искажённые', r: 1, cycle: 1, img: ART('hero-portrait-3.png'), lvl: 118, cap: 150, lim: 1, valor: 2, maxV: 5, bm: 24200, st: [72, 246, 54, 62, 128], gr: [3, 1, 3, 3, 2],
+      { id: 'h3', name: 'Лаэйра', cls: 'Маг. ДД', el: 'Время', race: 'Эльфы', r: 1, cycle: 1, img: ART('heroes/h3.jpg'), lvl: 118, cap: 150, lim: 1, valor: 2, maxV: 5, bm: 24200, st: [72, 246, 54, 62, 128], gr: [3, 1, 3, 3, 2],
         ab: ['Разряд', 'Остановка'].map(AB),
         pas: [{ n: 'Средоточие', t: 'боевая', d: 'Каждая третья способность сильнее.' }, { n: 'Знаток', t: 'фарм', d: 'Чаще падают базовые ресурсы.' }], ult: { n: 'Испепеление', at: 5, d: 'Откроется на доблести 5.' }, busy: null, },
-      { id: 'h4', name: 'Светоносная', cls: 'Хилер', el: 'Свет', race: 'Эльфы', r: 1, cycle: 1, img: ART('hero-portrait-4.png'), lvl: 46, cap: 50, lim: 0, valor: 1, maxV: 2, bm: 22140, st: [62, 246, 54, 128, 72], gr: [3, 1, 3, 2, 3],
-        ab: ['Живая вода', 'Сияние', 'Оберег'].map(AB),
+      { id: 'h4', name: 'Ильмерра', cls: 'Хилер', el: 'Воздух', race: 'Эльфы', r: 1, cycle: 1, img: ART('heroes/h4.jpg'), lvl: 46, cap: 50, lim: 0, valor: 1, maxV: 2, bm: 22140, st: [62, 246, 54, 128, 72], gr: [3, 1, 3, 2, 3],
+        ab: ['Живая вода', 'Лёгкая поступь', 'Оберег'].map(AB),
         pas: [{ n: 'Отклик', t: 'боевая', d: 'Крит лечения даёт щит.' }, { n: 'Собиратель трав', t: 'фарм', d: 'Больше ресурсов алхимии.' }], ult: null, busy: null, },
-      { id: 'h5', name: 'Тень Увядания', cls: 'Контроль', el: 'Тьма', race: 'Нежить', r: 1, cycle: 1, img: ART('hero-portrait-5.png'), lvl: 35, cap: 50, lim: 0, valor: 2, maxV: 2, bm: 19750, st: [62, 246, 54, 128, 72], gr: [3, 1, 3, 2, 3],
-        ab: ['Оковы', 'Увядание', 'Ослабление'].map(AB),
-        pas: [{ n: 'Тень', t: 'боевая', d: 'Дебафы держатся на раунд дольше.' }, { n: 'Дознаватель', t: 'фарм', d: 'Выше шанс ключа с элит.' }], ult: { n: 'Долгая ночь', at: 2, d: 'безмолвие всем врагам на 2 раунда, у рунных и старших боссов — иммунитет по рангу.' }, busy: null, },
+      { id: 'h5', name: 'Мирт Переписчик', cls: 'Контроль', el: 'Вода', race: 'Люди', r: 1, cycle: 1, img: ART('heroes/h5.jpg'), lvl: 35, cap: 50, lim: 0, valor: 2, maxV: 2, bm: 19750, st: [62, 246, 54, 128, 72], gr: [3, 1, 3, 2, 3],
+        ab: ['Оковы', 'Стужа', 'Ослабление'].map(AB),
+        pas: [{ n: 'Тень', t: 'боевая', d: 'Дебафы держатся на раунд дольше.' }, { n: 'Дознаватель', t: 'фарм', d: 'Выше шанс ключа с элит.' }], ult: { n: 'Ледяные оковы', at: 2, d: 'лёд сковывает всех врагов на 2 раунда, у рунных и старших боссов — иммунитет по рангу.' }, busy: null, },
     ],
     selHero: 'h1', qty: 1,
     squads: [
@@ -1360,9 +1364,9 @@ function initialState() {
     ],
     selSquad: 's1', prepSquad: 's1', echoSquad: 's1', act: null, selItem: 'crown',
     offers: [
-      { id: 'o1', name: 'Образец стража', cls: 'Танк', el: 'Земля', race: 'Саганы', r: 1, cycle: 1, img: ART('hero-portrait-1.png'), price: 12000, bm: 520, maxV: 1 },
-      { id: 'o2', name: 'Образец клинка', cls: 'Физ. ДД', el: 'Огонь', race: 'Люди', r: 2, cycle: 2, img: ART('hero-portrait-2.png'), price: 24000, bm: 610, maxV: 2 },
-      { id: 'o3', name: 'Образец хрониста', cls: 'Маг. ДД', el: 'Время', race: 'Искажённые', r: 3, cycle: 3, img: ART('hero-portrait-3.png'), price: 36000, bm: 700, maxV: 3, locked: 'Откроется в цикле III' },
+      { id: 'o1', name: 'Образец стража', cls: 'Танк', el: 'Земля', race: 'Дворфы', r: 1, cycle: 1, img: ART('heroes/h1.jpg'), price: 12000, bm: 520, maxV: 1 },
+      { id: 'o2', name: 'Образец клинка', cls: 'Физ. ДД', el: 'Огонь', race: 'Люди', r: 2, cycle: 2, img: ART('heroes/h2.jpg'), price: 24000, bm: 610, maxV: 2 },
+      { id: 'o3', name: 'Образец хрониста', cls: 'Маг. ДД', el: 'Время', race: 'Эльфы', r: 3, cycle: 3, img: ART('heroes/h3.jpg'), price: 36000, bm: 700, maxV: 3, locked: 'Откроется в цикле III' },
     ],
     selOffer: 'o1',
     biomes: [
@@ -1373,20 +1377,20 @@ function initialState() {
     ],
     selBiome: 'b1',
     foes: [
-      { id: 'o1', g: 'o', name: 'Безликий образец', type: 'Рядовой', tag: 'Сила · ближний бой', cls: 'Физ. ДД силы', el: 'Земля', race: 'Эльфы', hp: 4800, bm: 12400, pg: 5, desc: 'Первый, кого встречает каждый спустившийся. Лица нет — только два следа там, где должны быть глаза.', tip: 'Он честный противник — на таких и учатся.' },
-      { id: 'o2', g: 'o', name: 'Долгорукий образец', type: 'Рядовой', tag: 'Ловкость · достаёт издалека', cls: 'Физ. ДД ловкости', el: 'Земля', race: 'Эльфы', hp: 5400, bm: 13100, pg: 6, desc: 'Одна рука тянется почти до земли и кончается тяжёлой каменной кистью.', tip: 'Не оставляй слабых в хвосте без присмотра.' },
-      { id: 'o3', g: 'o', name: 'Пустотелый образец', type: 'Рядовой', tag: 'Маг · воздух', cls: 'Маг. ДД', el: 'Воздух', race: 'Эльфы', hp: 6000, bm: 13800, pg: 7, desc: 'Скорлупа с раскрытой грудью. Внутри ничего, кроме ветра.', tip: 'Держи строй покрепче. Кого он разбросает, тех легче добить.' },
-      { id: 'o4', g: 'o', name: 'Безголовый образец', type: 'Рядовой', tag: 'Держит удар', cls: 'Танк', el: 'Земля', race: 'Звери', hp: 6600, bm: 14500, pg: 8, desc: 'Зверь размером с быка, а головы у него нет. Идёт вперёд, пока перед ним что-то стоит.', tip: 'Помогут терпение и хороший удар.' },
-      { id: 'o5', g: 'o', name: 'Сырой образец', type: 'Рядовой', tag: 'Лекарь', cls: 'Лекарь', el: 'Земля', race: 'Эльфы', hp: 7200, bm: 15200, pg: 9, desc: 'Его так и не высушили. Латает себя — и не жалеет, пока не кончится.', tip: 'Бей быстрее, чем он успеет замазаться.' },
-      { id: 'o6', g: 'o', name: 'Однорукий образец', type: 'Рядовой', tag: 'Убийца · редкий', cls: 'Дебаффер', el: 'Земля', race: 'Эльфы', hp: 7800, bm: 15900, pg: 10, rare: true, desc: 'Сделан наспех и потому быстрее всех. Сразу уходит к заднему ряду.', tip: 'Береги тех, кто лечит и колдует. Он придёт за ними.' },
-      { id: 'e1', g: 'e', name: 'Подмастерье', type: 'Элита', tag: 'Сила', cls: 'Физ. ДД силы', el: 'Земля', race: 'Эльфы', hp: 18500, bm: 32600, pg: 12, desc: 'Месит глину для всей Мастерской и не заметил, что месить больше не для кого.', tip: 'Поставь вперёд того, кто выдержит.' },
-      { id: 'e2', g: 'e', name: 'Резчик', type: 'Элита', tag: 'Ловкость', cls: 'Физ. ДД ловкости', el: 'Земля', race: 'Эльфы', hp: 19200, bm: 33000, pg: 13, desc: 'Снимал лишнее с каждой заготовки. Теперь лишним считает тебя.', tip: 'Не давай ему выбирать. Прикрой слабого.' },
-      { id: 'e3', g: 'e', name: 'Упор', type: 'Элита', tag: 'Держит удар', cls: 'Танк', el: 'Земля', race: 'Эльфы', hp: 19900, bm: 33400, pg: 14, desc: 'Держит перед собой каменную плиту со знаком Мастерской, как щит.', tip: 'Стену не ломают лбом. Бей туда, где плиты нет.' },
-      { id: 'e4', g: 'e', name: 'Мех', type: 'Элита', tag: 'Маг · воздух', cls: 'Маг. ДД', el: 'Воздух', race: 'Эльфы', hp: 20600, bm: 33800, pg: 15, desc: 'Грудь собрана из складок, как кузнечные меха. Бьёт порывами.', tip: 'Кто стоит крепко, тот и не улетит.' },
-      { id: 'e5', g: 'e', name: 'Штопарь', type: 'Элита', tag: 'Лекарь', cls: 'Лекарь', el: 'Земля', race: 'Эльфы', hp: 21300, bm: 34200, pg: 16, desc: 'Всё, что треснуло, зашивает. Раньше чужую работу, теперь себя.', tip: 'Бей сильно и сразу.' },
-      { id: 'e6', g: 'e', name: 'Съёмщик', type: 'Элита', tag: 'Снимает силу', cls: 'Дебаффер', el: 'Земля', race: 'Эльфы', hp: 22000, bm: 34600, pg: 17, desc: 'Снимает с героев то, чем они сильны, как снимают форму с готовой работы.', tip: 'Не копи силу на один удар.' },
-      { id: 'b1', g: 'b', name: 'Первый набросок', type: 'Босс биома', tag: 'Хозяин последней ступени', cls: 'Босс', el: 'Земля', race: 'Не определена', hp: 86000, bm: 76200, pg: 18, desc: 'Самая первая попытка, брошенная на середине. Он очень давно ищет, чем себя закончить.', tip: 'Силы не растрачивай в начале — под конец он опаснее всего.' },
-      { id: 'g1', g: 'b', name: 'Мастер', type: 'Рунный страж', tag: 'Страж дороги вниз', cls: 'Страж', el: 'Земля', race: 'Эльфы', hp: 78000, bm: 64500, pg: 19, desc: 'Единственный законченный во всей Мастерской. Решает, можно ли пустить чужого дальше.', tip: 'Он ждёт и отвечает. Мастер не любит суеты.' },
+      { id: 'o1', g: 'o', name: 'Безликий образец', type: 'Рядовой', tag: 'Сила · ближний бой', cls: 'Физ. ДД силы', el: 'Земля', race: 'Эльфы', hp: 4800, bm: 12400, desc: 'Первый, кого встречает каждый спустившийся. Лица нет — только два следа там, где должны быть глаза.', tip: 'Он честный противник — на таких и учатся.' },
+      { id: 'o2', g: 'o', name: 'Долгорукий образец', type: 'Рядовой', tag: 'Контроль · достаёт издалека', cls: 'Дебаффер', el: 'Земля', race: 'Эльфы', hp: 5400, bm: 13100, desc: 'Одна рука тянется почти до земли и кончается тяжёлой каменной кистью.', tip: 'Не оставляй слабых в хвосте без присмотра.' },
+      { id: 'o3', g: 'o', name: 'Пустотелый образец', type: 'Рядовой', tag: 'Маг · воздух', cls: 'Маг. ДД', el: 'Воздух', race: 'Эльфы', hp: 6000, bm: 13800, desc: 'Скорлупа с раскрытой грудью. Внутри ничего, кроме ветра.', tip: 'Держи строй покрепче. Кого он разбросает, тех легче добить.' },
+      { id: 'o4', g: 'o', name: 'Безголовый образец', type: 'Рядовой', tag: 'Держит удар', cls: 'Танк', el: 'Земля', race: 'Звери', pos: '50% 62%', hp: 6600, bm: 14500, desc: 'Зверь размером с быка, а головы у него нет. Идёт вперёд, пока перед ним что-то стоит.', tip: 'Помогут терпение и хороший удар.' },
+      { id: 'o5', g: 'o', name: 'Сырой образец', type: 'Рядовой', tag: 'Лекарь', cls: 'Лекарь', el: 'Земля', race: 'Эльфы', hp: 7200, bm: 15200, desc: 'Его так и не высушили. Латает себя — и не жалеет, пока не кончится.', tip: 'Бей быстрее, чем он успеет замазаться.' },
+      { id: 'o6', g: 'o', name: 'Однорукий образец', type: 'Рядовой', tag: 'Убийца · редкий', cls: 'Физ. ДД ловкости', el: 'Земля', race: 'Эльфы', hp: 7800, bm: 15900, rare: true, desc: 'Сделан наспех и потому быстрее всех. Сразу уходит к заднему ряду.', tip: 'Береги тех, кто лечит и колдует. Он придёт за ними.' },
+      { id: 'e1', g: 'e', name: 'Подмастерье', type: 'Элита', tag: 'Сила', cls: 'Физ. ДД силы', el: 'Земля', race: 'Эльфы', hp: 18500, bm: 32600, desc: 'Месит глину для всей Мастерской и не заметил, что месить больше не для кого.', tip: 'Поставь вперёд того, кто выдержит.' },
+      { id: 'e2', g: 'e', name: 'Резчик', type: 'Элита', tag: 'Ловкость', cls: 'Физ. ДД ловкости', el: 'Земля', race: 'Эльфы', hp: 19200, bm: 33000, desc: 'Снимал лишнее с каждой заготовки. Теперь лишним считает тебя.', tip: 'Не давай ему выбирать. Прикрой слабого.' },
+      { id: 'e3', g: 'e', name: 'Упор', type: 'Элита', tag: 'Держит удар', cls: 'Танк', el: 'Земля', race: 'Эльфы', hp: 19900, bm: 33400, desc: 'Держит перед собой каменную плиту со знаком Мастерской, как щит.', tip: 'Стену не ломают лбом. Бей туда, где плиты нет.' },
+      { id: 'e4', g: 'e', name: 'Мех', type: 'Элита', tag: 'Маг · воздух', cls: 'Маг. ДД', el: 'Воздух', race: 'Эльфы', hp: 20600, bm: 33800, desc: 'Грудь собрана из складок, как кузнечные меха. Бьёт порывами.', tip: 'Кто стоит крепко, тот и не улетит.' },
+      { id: 'e5', g: 'e', name: 'Штопарь', type: 'Элита', tag: 'Лекарь', cls: 'Лекарь', el: 'Земля', race: 'Эльфы', hp: 21300, bm: 34200, desc: 'Всё, что треснуло, зашивает. Раньше чужую работу, теперь себя.', tip: 'Бей сильно и сразу.' },
+      { id: 'e6', g: 'e', name: 'Съёмщик', type: 'Элита', tag: 'Снимает силу', cls: 'Дебаффер', el: 'Земля', race: 'Эльфы', hp: 22000, bm: 34600, desc: 'Снимает с героев то, чем они сильны, как снимают форму с готовой работы.', tip: 'Не копи силу на один удар.' },
+      { id: 'b1', g: 'b', name: 'Первый набросок', type: 'Босс биома', tag: 'Хозяин последней ступени', cls: 'Босс', el: 'Земля', race: 'Не определена', hp: 86000, bm: 76200, desc: 'Самая первая попытка, брошенная на середине. Он очень давно ищет, чем себя закончить.', tip: 'Силы не растрачивай в начале — под конец он опаснее всего.' },
+      { id: 'g1', g: 'b', name: 'Мастер', type: 'Рунный страж', tag: 'Страж дороги вниз', cls: 'Страж', el: 'Земля', race: 'Эльфы', hp: 78000, bm: 64500, desc: 'Единственный законченный во всей Мастерской. Решает, можно ли пустить чужого дальше.', tip: 'Он ждёт и отвечает. Мастер не любит суеты.' },
     ],
     known: ['o1', 'o2', 'o3', 'o4', 'o5', 'e1', 'e2', 'e3', 'e4', 'e5', 'e6', 'b1', 'g1'],
     items: [
@@ -1399,7 +1403,7 @@ function initialState() {
       { id: 'key', n: 'Рунический ключ', r: 2, q: 20, cat: 'key', spec: 'Вход к рунному стражу', img: ART('rune-key.png'), riddle: 'Ключ богов открывает дорогу вниз, но не обещает её.', from: 'Контракты, элиты', recipes: ['Связующее'] },
       { id: 'rune50', n: 'Руна предела · 50', r: 2, q: 10, cat: 'key', spec: 'Развитие героя', img: null, glyph: 'I', riddle: 'Десять рун одного цикла пробивают предел.', from: 'Мастер (рунный страж)', recipes: ['Руна предела 150'] },
       { id: 'vfrag', n: 'Осколки руны доблести', r: 2, q: 112, cat: 'key', spec: 'Развитие героя', img: null, glyph: 'V', riddle: 'Сто осколков собираются в одну руну.', from: 'Второй рунный страж цикла', recipes: ['Руна доблести'] },
-      { id: 'hfrag', n: 'Осколки: Хронист', r: 3, q: 42, cat: 'frag', spec: 'Сборный герой', img: ART('hero-portrait-3.png'), riddle: '42 из 50. Остальное — у Эхо.', from: 'Эхо, Возрождение душ', recipes: [] },
+      { id: 'hfrag', n: 'Осколки: Лаэйра', r: 3, q: 42, cat: 'frag', spec: 'Сборный герой', img: ART('heroes/h3.jpg'), riddle: '42 из 50. Остальное — у Эхо.', from: 'Эхо, Возрождение душ', recipes: [] },
       { id: 'act', n: 'Активация биома', r: 4, q: 1, cat: 'act', spec: 'Экземпляр крафтового биома', img: PATH(22), riddle: 'Что внутри — узнаешь, когда откроешь.', from: 'Мастерская', recipes: [], action: 'Активировать' },
       { id: 'many', n: 'Многоликий', r: 4, q: 1, cat: 'act', spec: 'Крафт или биом недели', img: PATH(18), riddle: 'Носит лица тех, кого победили на этой неделе.', from: 'Эхо: Убер-босс недели', recipes: [], action: 'Активировать' },
       { id: 'chest', n: 'Ларец рабочих', r: 3, q: 3, cat: 'act', spec: 'Лутбокс События', img: CHEST, riddle: 'Шарды рабочих и гарантированная валюта.', from: 'Дары путешествия', recipes: [], action: 'Открыть' },
@@ -1656,7 +1660,7 @@ function descent() {
     const row = g => S.foes.filter(f => f.g === g).map(f => figBtn(f)).join('');
     main = `<div class="biome">
       <div class="banner">
-        <img src="${WS(1)}" alt="">
+        <img src="${ARENA}" alt="" style="object-position:50% 4%">
         <div class="in">
           <span class="eyebrow">Цикл I · первый зал под Эндалором</span>
           <h2>Мастерская форм</h2>
@@ -1687,17 +1691,15 @@ function descent() {
         <p class="quote">${front ? 'Босс биома не побеждён. Рунный страж ждёт после него.' : 'Босс и рунный страж повержены. Биом можно проходить ради добычи.'}</p>
       </div><div class="cta"><button class="btn go big off" disabled>${ic('down')}Спуститься</button><span class="reason">В прототипе бой собран на Мастерской форм</span></div></div>
       <div class="pnl pad col" style="justify-content:center;align-items:center;text-align:center">
-        <p class="faint" style="max-width:52ch">Иллюстрация зала и его обитатели появятся вместе с авторским контентом. До первой встречи здесь будут только силуэты — имена и способности открывает победа.</p>
+        <p class="faint" style="max-width:52ch">Иллюстрация зала и его обитатели появятся вместе с авторским контентом. До первой встречи враги будут скрыты — имена и способности открывает победа.</p>
       </div></div>`;
   }
   return { title: 'Спуск', sub: 'цикл ' + ROMAN[S.acc.cycle], html: `<section class="scr"><div class="ds">${shaft}${main}</div></section>` };
 }
 function figBtn(f, seal) {
   const k = known(f.id);
-  const [w, h] = FIG_WH[f.pg] || [600, 860];
-  return `<button class="fig ${k ? '' : 'unk'} ${f.g === 'b' ? 'boss' : ''}" style="flex-grow:${(w / h).toFixed(3)}" data-a="foe" data-v="${f.id}" aria-label="${k ? f.name : 'Не изучен'}" title="${k ? f.name : 'Не изучен'}"><img src="${WS(f.pg)}" alt="" width="${w}" height="${h}">${k ? '' : '<span class="qm">?</span>'}${seal ? `<span class="seal-tag">${ic('check')}${seal}</span>` : ''}</button>`;
+    return `<button class="fig ${k ? '' : 'unk'} ${f.g === 'b' ? 'boss' : ''}" data-a="foe" data-v="${f.id}" aria-label="${k ? f.name : 'Не изучен'}" title="${k ? f.name : 'Не изучен'}"><img src="${FA(f)}" alt="" style="object-position:${FPOS(f)}">${k ? '' : '<span class="qm">?</span>'}${seal ? `<span class="seal-tag">${ic('check')}${seal}</span>` : ''}</button>`;
 }
-const FIG_WH = { 5: [542, 860], 6: [626, 860], 7: [626, 860], 8: [826, 860], 9: [638, 860], 10: [945, 860], 12: [653, 860], 13: [580, 860], 14: [591, 860], 15: [451, 860], 16: [594, 860], 17: [416, 860], 18: [540, 860], 19: [378, 860] };
 
 /* ================== Бой ==================
    Пять карт против колоды этажа. Ядро — battle.js, эффекты — fx.js; здесь только показ.
@@ -1711,7 +1713,8 @@ const CTL = ['stun', 'silence', 'stop'];
 const CLS_OF = { 'Физ. ДД силы': 'Физ. ДД', 'Физ. ДД ловкости': 'Физ. ДД', 'Лекарь': 'Хилер', 'Дебаффер': 'Контроль', 'Босс': 'Танк', 'Страж': 'Танк' };
 const unitKnown = u => u.side === 0 || known(u.id);
 const uName = u => unitKnown(u) ? u.name : 'Неизвестный';
-const unitImg = u => u.side === 0 ? H(u.id).img : WS(F(u.id).pg);
+const unitImg = u => u.side === 0 ? H(u.id).img : FA(F(u.id));
+const unitPos = u => u.side === 0 ? '50% 18%' : FPOS(F(u.id));
 const runById = id => S.runs.find(r => r.id === id);
 const focusRun = () => runById(S.focus);
 const abIcon = ab => ab.kind === 'dmg' ? (ab.tgt === 'all' ? 'wave' : ab.stat === 'int' ? 'staff' : 'sword') : ab.kind === 'heal' || ab.kind === 'hot' ? 'heal' : ab.kind === 'shield' ? 'shield' : ab.kind === 'taunt' ? 'target'
@@ -1773,7 +1776,7 @@ function legendHtml(mode) {
 function cardHtml(R, u, n, k) {
   const [col, row] = SLOT[n][k], kn = unitKnown(u), d = R.disp[dkey(u)] || { hp: u.hp, sh: u.sh, dead: !u.alive };
   return `<div class="bc ${u.side ? 'foe' : ''} ${u.lead ? 'lead' : ''} ${kn ? '' : 'unk'} ${d.dead ? 'dead' : ''} ${S.insp === dkey(u) ? 'sel' : ''}" id="bc${u.side}${u.i}" data-a="insp" data-v="${dkey(u)}" data-el="${u.el}" style="--k:${col};--r:${row}" title="${kn ? u.name + ' · ' + u.cls + ' · ' + u.el : 'Не изучен: имя и способности откроет первая победа'}">
-    <div class="face"><img src="${unitImg(u)}" alt=""><div class="buffs"></div><div class="debuffs"></div><span class="cls">${CLS(CLS_OF[u.cls] || u.cls)}</span><span class="tgt"></span><span class="ctl"></span>${u.side ? '' : '<span class="fell">пал</span>'}</div>
+    <div class="face"><img src="${unitImg(u)}" alt="" style="object-position:${unitPos(u)}"><div class="buffs"></div><div class="debuffs"></div><span class="cls">${CLS(CLS_OF[u.cls] || u.cls)}</span><span class="tgt"></span><span class="ctl"></span>${u.side ? '' : '<span class="fell">пал</span>'}</div>
     <span class="nm">${kn ? u.name : 'Не изучен'}</span>
     ${bar(d.hp / u.maxHp * 100, 'hp', `<span class="sh" style="left:0;width:${Math.min(100, d.sh * 100 / u.maxHp)}%"></span>`)}
     <div class="rot"></div>
@@ -1786,7 +1789,7 @@ function battle() {
   const typ = FL.g === 'o' ? 'Рядовые' : FL.g === 'e' ? 'Элита' : FL.g === 'r' ? 'Рунный страж' : 'Босс биома';
   const side = sd => b.u[sd].map((u, k) => cardHtml(R, u, b.u[sd].length, k)).join('');
   return { title: B.name, sub: `забег ${R.runNo}${R.demo ? ' · демо' : ''}`, back: 'descent', html: `<section class="scr flush"><div class="bt" id="bt">
-    <img class="bg" src="${WS(11)}" alt="">
+    <img class="bg" src="${ARENA}" alt="">
     <div class="bt-hud">
       <div class="bt-floor">${R.guard ? `<b>${ic('crown')}</b><span>страж</span>` : `<b>${R.floor}</b><span>/ ${B.floors.length}</span>`}</div>
       <span class="chip ${FL.g !== 'o' ? 'gold' : ''}">${FL.g === 'e' ? ic('gem') : FL.g === 'b' ? ic('crown') : ''}${typ}${lead ? ' · ' + uName(lead) : ''}${FL.g === 'b' ? ` · осада ${siegeDone(R.biome)}%` : ''}</span>
@@ -1934,7 +1937,7 @@ function hireView() {
       <div class="col" style="gap:6px">${S.offers.map(x => `<button class="preset" data-a="offer" data-v="${x.id}" aria-current="${x.id === o.id}" style="flex-direction:row;align-items:center;gap:10px"><img src="${x.img}" alt="" style="width:40px;height:40px;border-radius:8px;object-fit:cover;${x.locked ? 'filter:grayscale(1) brightness(.6)' : ''}"><span class="col" style="gap:3px;flex:1"><b>${x.name}</b>${rar(x.r)}</span>${x.locked ? `<span class="chip">${ic('lock')}ц. ${ROMAN[x.cycle]}</span>` : money('gold', x.price)}</button>`).join('')}</div>
       <div class="hr"></div>
       <span class="eyebrow">Возрождение душ</span>
-      <div class="rebirth"><img src="${ART('hero-portrait-3.png')}" alt=""><div class="col" style="gap:4px;flex:1"><b class="serif" style="font-size:16px">Хронист · осколки</b>${bar(84)}<small class="faint">42 / 50 · активация 800 душ</small></div></div>
+      <div class="rebirth"><img src="${ART('heroes/h3.jpg')}" alt=""><div class="col" style="gap:4px;flex:1"><b class="serif" style="font-size:16px">Лаэйра · осколки</b>${bar(84)}<small class="faint">42 / 50 · активация 800 душ</small></div></div>
       <div class="row" style="gap:6px"><button class="btn sm" data-a="toast" data-v="Прокрутка возрождения: демо">Прокрутка${costTag('enerium', 100)}</button><button class="btn sm ghost" data-a="sheet" data-v="cur:dust"><img src="${DUST}" alt="" width="16" height="16">${fmt(dust)} праха</button></div>
     </div>
     <div class="pnl hd">${heroHead({ ...o, valor: 0, lvl: 1 }, 'мощь на старте')}
@@ -2226,9 +2229,9 @@ function echoView() {
   const s = sq(S.echoSquad);
   return { title: 'Эхо', back: 'week', chip: weekChip(), html: `<section class="scr">
     <div class="ec">
-      <div class="eslots">${E.slots.map((x, i) => { if (!x) return `<button class="eslot empty" data-a="summon" data-v="${i}"><span>${ic('plus')}<br>Призвать цель<br><b class="num" style="color:var(--parch)">1 душа</b></span></button>`; const ff = F(x.foe); return `<button class="eslot" data-a="esel" data-v="${i}" aria-current="${i === E.sel}"><span class="ph"><img src="${WS(ff.pg)}" alt=""></span><span style="min-width:0"><b>${known(ff.id) ? ff.name : 'Неизвестный'}</b>${bar(x.hp / x.max * 100, 'hp')}<small><span>ступень ${x.step}</span><span class="num">${ic('hour')} ${dur(x.left)}</span></small></span></button>`; }).join('')}</div>
+      <div class="eslots">${E.slots.map((x, i) => { if (!x) return `<button class="eslot empty" data-a="summon" data-v="${i}"><span>${ic('plus')}<br>Призвать цель<br><b class="num" style="color:var(--parch)">1 душа</b></span></button>`; const ff = F(x.foe); return `<button class="eslot" data-a="esel" data-v="${i}" aria-current="${i === E.sel}"><span class="ph"><img src="${FA(ff)}" alt="" style="object-position:${FPOS(ff)}"></span><span style="min-width:0"><b>${known(ff.id) ? ff.name : 'Неизвестный'}</b>${bar(x.hp / x.max * 100, 'hp')}<small><span>ступень ${x.step}</span><span class="num">${ic('hour')} ${dur(x.left)}</span></small></span></button>`; }).join('')}</div>
       <div class="pnl etarget">
-        ${f ? `<div class="stage"><img src="${WS(f.pg)}" alt="${k ? f.name : 'Неизвестный противник'}"></div>
+        ${f ? `<div class="stage"><img src="${FA(f)}" alt="${k ? f.name : 'Неизвестный противник'}"></div>
         <div class="info">
           <div class="row" style="flex-wrap:wrap;gap:5px"><span class="chip ${f.g === 'e' ? 'gold' : ''}">${f.type} · ступень ${sl.step}</span>${el(f.el)}</div>
           <h2 class="serif" style="font-size:28px;line-height:1">${k ? f.name : 'Неизвестный противник'}</h2>
@@ -2380,9 +2383,9 @@ function chronicleView() {
   const L = S.lore, f = F(L.foe), k = known(f.id);
   const sec = [['best', 'Бестиарий', `${S.known.length}/14`], ['world', 'Мир', '3'], ['mech', 'Механики', '12'], ['self', 'История Странника', '1']];
   let pages;
-  if (L.sec === 'best') pages = `<div class="page"><span class="eyebrow">Мастерская форм · цикл I</span><div class="bgrid">${S.foes.map(x => `<button class="fig ${known(x.id) ? '' : 'unk'}" data-a="lorefoe" data-v="${x.id}" aria-current="${x.id === f.id}" title="${known(x.id) ? x.name : 'Не изучен'}"><img src="${WS(x.pg)}" alt="" style="height:100%;width:100%;object-fit:contain"></button>`).join('')}</div>
+  if (L.sec === 'best') pages = `<div class="page"><span class="eyebrow">Мастерская форм · цикл I</span><div class="bgrid">${S.foes.map(x => `<button class="fig ${known(x.id) ? '' : 'unk'}" data-a="lorefoe" data-v="${x.id}" aria-current="${x.id === f.id}" title="${known(x.id) ? x.name : 'Не изучен'}"><img src="${FA(x)}" alt="" style="object-position:${FPOS(x)}">${known(x.id) ? '' : '<span class="qm">?</span>'}</button>`).join('')}</div>
       <p class="reason">Знание одного противника действует во всех режимах: биомах, Эхо и у Кланового босса.</p></div>
-    <div class="page">${k ? `<div class="row" style="gap:12px;align-items:flex-start"><img src="${WS(f.pg)}" alt="" style="height:150px;width:auto;filter:drop-shadow(0 8px 14px #000)"><div class="col" style="gap:6px"><span class="eyebrow">${f.type} · ${f.tag}</span><h2 class="serif" style="font-size:26px">${f.name}</h2><div class="row" style="gap:5px;flex-wrap:wrap">${el(f.el)}<span class="chip">${f.cls}</span><span class="chip">${f.race}</span></div><p class="muted" style="font-size:14px">${f.desc}</p></div></div><p class="quote"><b>Совет старика</b>${f.tip}</p>` : `<div class="col" style="align-items:center;text-align:center;gap:8px;justify-content:center;flex:1"><div class="fig unk" style="height:150px"><img src="${WS(f.pg)}" alt="" style="height:100%"></div><h2 class="serif" style="font-size:24px">Неизвестный противник</h2><p class="faint">${f.type} · БМ ${fmt(f.bm)} · здоровье ${fmt(f.hp)} · ${f.el}</p><p class="reason">Запись откроет первая подтверждённая победа.</p></div>`}</div>`;
+    <div class="page">${k ? `<div class="row" style="gap:12px;align-items:flex-start"><img class="foe-art" src="${FA(f)}" alt="" style="object-position:${FPOS(f)}"><div class="col" style="gap:6px"><span class="eyebrow">${f.type} · ${f.tag}</span><h2 class="serif" style="font-size:26px">${f.name}</h2><div class="row" style="gap:5px;flex-wrap:wrap">${el(f.el)}<span class="chip">${f.cls}</span><span class="chip">${f.race}</span></div><p class="muted" style="font-size:14px">${f.desc}</p></div></div><p class="quote"><b>Совет старика</b>${f.tip}</p>` : `<div class="col" style="align-items:center;text-align:center;gap:8px;justify-content:center;flex:1"><div class="fig unk" style="height:150px"><img src="${FA(f)}" alt="" style="object-position:${FPOS(f)}"><span class="qm">?</span></div><h2 class="serif" style="font-size:24px">Неизвестный противник</h2><p class="faint">${f.type} · БМ ${fmt(f.bm)} · здоровье ${fmt(f.hp)} · ${f.el}</p><p class="reason">Запись откроет первая подтверждённая победа.</p></div>`}</div>`;
   else pages = `<div class="page"><span class="eyebrow">${sec.find(s => s[0] === L.sec)[1]}</span><h2 class="serif" style="font-size:26px">${L.sec === 'world' ? 'Пролом богов' : L.sec === 'mech' ? 'Шесть циклов' : 'Обрывки'}</h2><p class="muted">${L.sec === 'world' ? 'Эндалор парит над проломом. Под городом — портал в шахту и спуск, который зовут экзаменом богов.' : L.sec === 'mech' ? 'Спуск разбит на шесть циклов по два биома. Новый цикл открывает биомы, героев, рецепты и место Памяти.' : 'Память о пещере возвращается кусками, как сон. Остальное откроется по мере пути.'}</p><p class="reason">Статьи открываются по мере прохождения и не раскрывают будущий сюжет.</p></div><div class="page"><div class="col" style="flex:1;justify-content:center;align-items:center;text-align:center;gap:6px"><span class="faint">${ic('lock')}</span><p class="faint">Следующая запись закрыта</p></div></div>`;
   return { title: 'Летопись', html: `<section class="scr"><div class="ch">
     <div class="pnl toc">${sec.map(([k2, n, c]) => `<button aria-current="${L.sec === k2}" data-a="lore" data-v="${k2}"><span>${n}</span><span class="faint num" style="font-size:12px">${c}</span></button>`).join('')}</div>
@@ -2449,7 +2452,7 @@ const OV = {
   },
   foe(o) {
     const f = F(o.arg), k = known(f.id);
-    const body = `<div class="foe-hero"><img class="bg" src="${WS(1)}" alt=""><div class="fig ${k ? '' : 'unk'}"><img src="${WS(f.pg)}" alt=""></div></div>
+    const body = `<div class="foe-hero"><img class="bg" src="${FA(f)}" alt=""><div class="fig ${k ? '' : 'unk'}"><img src="${FA(f)}" alt="" style="object-position:${FPOS(f)}">${k ? '' : '<span class="qm">?</span>'}</div></div>
       <div class="row" style="flex-wrap:wrap;gap:5px"><span class="chip ${f.g !== 'o' ? 'gold' : ''}">${f.g === 'e' ? ic('gem') : f.g === 'b' ? ic('crown') : ''}${f.type}</span>${el(f.el)}${k ? `<span class="chip">${f.cls}</span><span class="chip">${f.race}</span>` : ''}</div>
       <div class="row" style="gap:18px"><div class="stat"><b>${fmt(f.bm)}</b><small>боевая мощь</small></div><div class="stat"><b>${fmt(f.hp)}</b><small>здоровье</small></div>${f.id === 'g1' ? '<div class="stat"><b>50%</b><small>сопр. контролю</small></div>' : ''}</div>
       ${k ? `<p class="muted" style="font-size:14px">${f.desc}</p><div class="pnl pad" style="background:#0e1114"><p class="quote"><b>Совет старика</b>${f.tip}</p></div><span class="eyebrow">Повадки</span><p class="muted" style="font-size:13.5px">${f.tag}.</p>`
@@ -2543,7 +2546,7 @@ const OV = {
       ${R.curve.length ? `<div class="col" style="gap:3px"><span class="eyebrow">Здоровье отряда после каждого этажа</span><div class="curve">${R.curve.map((v, i) => `<i class="${B.floors[R.startFloor + i - 1].g !== 'o' ? 'el' : ''}" style="--v:${Math.max(3, v)}" title="Этаж ${R.startFloor + i}: ${v}%"></i>`).join('')}</div><small class="faint">Золотые столбики — элиты и босс. Здоровье не восстанавливалось.</small></div>` : ''}
       <span class="eyebrow">Добыча</span>
       <div class="row" style="gap:14px;flex-wrap:wrap">${money('gold', L.gold)}${money('spirit', L.spirit)}${money('souls', L.souls)}<span class="row" style="gap:4px">${well(I('cinder'), { act: 'noop', size: 30 })}<b class="num">×${L.cinder}</b></span><span class="chip" title="Ключи ремёсел биома — с элит, по одному (ADR-0010)">${ic('gem')}ключей ремёсел ×${L.keys}</span>${L.unique ? `<span class="chip gold">${ic('crown')}уникальный ×${L.unique}</span>` : ''}</div>
-      ${nk.length ? `<div class="newfoe">${nk.map(f => `<img src="${WS(f.pg)}" alt="">`).join('')}<div class="col" style="gap:3px"><span class="eyebrow" style="color:var(--spirit)">Новое в бестиарии</span><b class="serif" style="font-size:20px">${nk.map(f => f.name).join(', ')}</b><small class="faint">Запись открыта во всех режимах</small></div><button class="link" data-a="foe" data-v="${nk[0].id}" style="margin-left:auto">Прочитать ${ic('chev')}</button></div>` : ''}
+      ${nk.length ? `<div class="newfoe">${nk.map(f => `<img src="${FA(f)}" alt="" style="object-position:${FPOS(f)}">`).join('')}<div class="col" style="gap:3px"><span class="eyebrow" style="color:var(--spirit)">Новое в бестиарии</span><b class="serif" style="font-size:20px">${nk.map(f => f.name).join(', ')}</b><small class="faint">Запись открыта во всех режимах</small></div><button class="link" data-a="foe" data-v="${nk[0].id}" style="margin-left:auto">Прочитать ${ic('chev')}</button></div>` : ''}
       ${E.kind === 'boss' ? '' : '<p class="reason">Сид — сам биом: тот же отряд с той же ротацией пройдёт его так же. Чтобы пройти дальше, поменяй состав, порядок способностей или стихии.</p>'}`;
     return dialog(title, body, `<button class="btn ghost" data-a="leave" data-v="${R.id}">В Убежище</button><button class="btn" data-a="resquad" data-v="${R.id}">${ic('users')}Сменить отряд</button><button class="btn go" data-a="again" data-v="${R.id}">${ic('down')}Ещё забег</button>`);
   },
@@ -3067,7 +3070,7 @@ const FLOWS = [
   ['Забег по Мастерской форм', 'Бой на истощение: здоровье не восстанавливается. Эффекты, цели, карточка бойца', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = { t: 'prep', arg: '' }; }],
   ['Бой с боссом · демо-прыжок', 'Отряд I сразу на 35-м этаже: ульты, массовые удары, осада', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = null; startRun('s1', 'b1', 35); }],
   ['Рунный страж · пять карт', 'Мастер и четыре элиты, иммунитет стража к контролю 25 %', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = null; startRun('s1', 'b1', null, true); }],
-  ['Бестиарий: известный и неизвестный', 'Силуэт до первой победы, глина и совет старика после', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = { t: 'foe', arg: known('o6') ? 'e3' : 'o6' }; }],
+  ['Бестиарий: известный и неизвестный', 'Скрыт до первой победы, картина и совет старика после', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = { t: 'foe', arg: known('o6') ? 'e3' : 'o6' }; }],
   ['Развитие героя', 'Уровень, рунный предел и доблесть — одна лестница', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.seg.hero = 'power'; S.selHero = 'h2'; S.overlay = null; }],
   ['Ротация перетаскиванием', 'Порядок способностей в карточке героя', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.seg.hero = 'skills'; S.selHero = 'h2'; S.overlay = null; }],
   ['Мастерская', 'Шесть ячеек вокруг результата и книга рецептов', () => { S.route = 'craft'; S.seg.craft = 'work'; S.book = false; S.craft = [{ id: 'cinder', q: 3 }, { id: 'key', q: 1 }, null, null, null, null]; S.craftSel = 0; S.overlay = null; }],
@@ -3188,7 +3191,7 @@ function renderKit() {
     <p class="k-note">Основная модель: вместо сегментов и ромбов — шанс каждой способности в свой ход, сработавшая светится. Бледная карта уже сходила в этом раунде.</p>
     <div class="bt-legend static">${legendHtml('rounds')}</div></section>
   <section class="k-box" style="grid-column:1/-1"><h3>Эффекты боя · ${EnFx.KINDS.length} видов</h3>
-    <div class="fx-stage" id="fxStage">${kc('kh1', S.heroes[0].img, S.heroes[0].name, S.heroes[0].el, 6)}${kc('kh2', S.heroes[3].img, S.heroes[3].name, S.heroes[3].el, 22)}${kc('kf1', WS(F('e1').pg), F('e1').name, 'Земля', 38, true, true)}${kc('kf2', WS(F('o3').pg), F('o3').name, 'Воздух', 22, true)}${kc('kf3', WS(F('o5').pg), F('o5').name, 'Земля', 6, true)}</div>
+    <div class="fx-stage" id="fxStage">${kc('kh1', S.heroes[0].img, S.heroes[0].name, S.heroes[0].el, 6)}${kc('kh2', S.heroes[3].img, S.heroes[3].name, S.heroes[3].el, 22)}${kc('kf1', FA(F('e1')), F('e1').name, 'Земля', 38, true, true)}${kc('kf2', FA(F('o3')), F('o3').name, 'Воздух', 22, true)}${kc('kf3', FA(F('o5')), F('o5').name, 'Земля', 6, true)}</div>
     <div class="fx-list">${EnFx.KINDS.map(([key, n, d]) => `<button class="fx-btn" data-fx="${key}"><b>${n}</b><small>${d}</small></button>`).join('')}</div>
     <p class="k-note">Нажмите вид — он сыграет на сцене. Каждый вид — отдельная работа художника и в Unity: частицы, анимация, звук. Цвет заклинаний и урона со временем берётся из школы стихии, у каждой школы свой урон со временем.</p></section>
   <section class="k-box"><h3>Материал</h3><div class="k-sw">${sw('var(--ink)', 'Уголь', '#0a0c0e · фон')}${sw('var(--stone)', 'Камень', '#121518 · панель')}${sw('var(--iron-2)', 'Железо', '#394047 · рамка')}${sw('var(--parch)', 'Пергамент', '#ece4d3 · текст')}${sw('var(--gold)', 'Золото', '#ddbc7a · заголовки')}${sw('var(--spirit)', 'Свет духа', '#48e5d4 · выбор')}</div><p class="k-note">Бирюза — только у выбранного и у главного действия. Больше нигде.</p></section>
@@ -3208,7 +3211,7 @@ function renderKit() {
   <section class="k-box" style="grid-column:1/-1"><h3>Герои · ${window.EN_HEROES ? EN_HEROES.heroes.length : 0} из черновиков</h3>
     <p class="k-note">Данные — <code>docs/content/герои/</code>, выгрузка <code>tools/content-gen/heroes/export_ui.py</code> в <code>heroes.js</code>. Черновик, ждёт автора. Портреты пока заглушки: свет стихии снизу, нижняя кромка — редкость. Арт рисуется отдельно в <code>art/generated/</code>.</p>
     <div id="kitHeroes"></div></section>
-  <section class="k-box"><h3>Враг</h3><div class="k-demo row" style="gap:18px;justify-content:center;height:170px"><div class="fig" style="height:150px"><img src="${WS(f1.pg)}" alt=""></div><div class="fig unk" style="height:150px"><img src="${WS(f6.pg)}" alt=""><span class="qm">?</span></div></div><p class="k-note">Глина — изучен. Силуэт со светом духа по контуру — до первой победы.</p></section>
+  <section class="k-box"><h3>Враг</h3><div class="k-demo row" style="gap:18px;justify-content:center;height:170px"><div class="fig" style="height:150px"><img src="${FA(f1)}" alt=""></div><div class="fig unk" style="height:150px"><img src="${FA(f6)}" alt=""><span class="qm">?</span></div></div><p class="k-note">Изучен — картина целиком. До первой победы картина затемнена и размыта, поверх — знак вопроса.</p></section>
   <section class="k-box"><h3>Кристалл Памяти</h3><div class="k-demo mem" style="grid-template-columns:repeat(3,1fr)"><div class="mslot"><span class="crys"></span><small class="faint">пустой карст</small></div><div class="mslot open"><span class="crys"></span><small class="spirit">можно вспомнить</small></div><div class="mslot set" data-r="3"><span class="crys"></span><small class="faint">закреплено</small></div></div><p class="k-note">Состояние из лора: пустой карст матовый, заряженный светится изнутри.</p></section>
   <section class="k-box"><h3>Иконки путей</h3><div class="k-row">${[[12, 'Убежище'], [10, 'Спуск'], [24, 'Герои'], [11, 'Ремесло'], [6, 'Неделя'], [18, 'Эхо'], [38, 'Контракты'], [33, 'Ритуалы'], [3, 'Арена'], [26, 'Клан'], [21, 'Событие'], [29, 'Странник']].map(([p, n]) => `<figure style="margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;width:64px"><img src="${PATH(p)}" alt="" style="width:48px;height:48px;border-radius:12px;box-shadow:0 0 0 1px #262c32"><figcaption style="font-size:11px;color:var(--parch-2);text-align:center;line-height:1.1">${n}</figcaption></figure>`).join('')}</div><p class="k-note">Авторский набор. Иконка узнаётся, подпись остаётся всегда.</p></section>
   <section class="k-box"><h3>Слой поверх: лист и диалог</h3><div class="k-demo" style="height:170px;position:relative;overflow:hidden;border:1px solid var(--iron)"><div style="position:absolute;inset:0;background:rgba(3,4,5,.55)"></div><div class="sheet" style="width:52%;animation:none"><div class="sheet-h" style="min-height:40px;padding:6px 8px 6px 12px"><h2 style="font-size:17px">Сведения</h2><span class="iconbtn x" style="width:26px;height:26px">${ic('x')}</span></div><div class="sheet-b" style="padding:8px 12px;gap:6px"><span class="faint" style="font-size:12px">уточняет работу, не уводит с экрана</span>${bar(60)}</div><div class="sheet-f" style="padding:6px 12px"><button class="btn go sm" style="margin-left:auto">Действие</button></div></div></div><p class="k-note">Лист справа — сведения и настройка. Диалог по центру — только цена, последствия и итог.</p></section>
@@ -3227,9 +3230,9 @@ function kitCards() {
   };
   const h1 = H('h1'), h5 = H('h5');
   return card({ side: 0, name: h1.name, cls: h1.cls, el: h1.el, img: h1.img, maxHp: 1557, abs: [A('Вызов'), A('Удар щитом'), A('Осыпание')], ptr: 1, cnt: 3, uses: 1, phase: 'rot', ult: null, st: [{ k: 'dot', school: 'Воздух', per: 30, stacks: 3, left: 2, left0: 4 }, { k: 'weak', left: 2, left0: 4, pow: 2000 }] }, { hp: 900, sh: 0 }, 'aimed many', 4)
-    + card({ side: 0, name: h5.name, cls: h5.cls, el: h5.el, img: h5.img, maxHp: 893, abs: [A('Оковы'), A('Увядание'), A('Ослабление')], ptr: 2, cnt: 1, uses: 2, phase: 'rot', ult: A('Долгая ночь'), chargeMax: 5, charge: 5, st: [{ k: 'hot', school: 'Свет', per: 40, stacks: 2, left: 3, left0: 5 }] }, { hp: 610, sh: 150 }, '', 26)
-    + card({ side: 1, name: 'Первый набросок', cls: 'Босс', el: 'Земля', img: WS(F('b1').pg), maxHp: 20000, abs: [A('Правка'), A('Глиняный вал')], ptr: 0, cnt: 0, uses: 3, phase: 'charge', chargeMax: 5, charge: 2, ult: A('Последний штрих'), st: [{ k: 'dot', school: 'Огонь', per: 60, stacks: 3, left: 4, left0: 5 }, { k: 'silence', left: 2, left0: 3 }, { k: 'mark', left: 3, left0: 5, pow: 2000 }] }, { hp: 12000, sh: 0 }, 'lead', 52)
-    + card({ side: 1, name: 'Мех', cls: 'Маг. ДД', el: 'Воздух', img: WS(F('e4').pg), maxHp: 3000, abs: [A('Меха'), A('Сквозняк')], ptr: 0, cnt: 2, uses: 0, phase: 'rot', ult: null, st: [{ k: 'stun', left: 1, left0: 2 }] }, { hp: 2100, sh: 0 }, '', 76);
+    + card({ side: 0, name: h5.name, cls: h5.cls, el: h5.el, img: h5.img, maxHp: 893, abs: [A('Оковы'), A('Стужа'), A('Ослабление')], ptr: 2, cnt: 1, uses: 2, phase: 'rot', ult: A('Ледяные оковы'), chargeMax: 5, charge: 5, st: [{ k: 'hot', school: 'Воздух', per: 40, stacks: 2, left: 3, left0: 5 }] }, { hp: 610, sh: 150 }, '', 26)
+    + card({ side: 1, name: 'Первый набросок', cls: 'Босс', el: 'Земля', img: FA(F('b1')), maxHp: 20000, abs: [A('Правка'), A('Глиняный вал')], ptr: 0, cnt: 0, uses: 3, phase: 'charge', chargeMax: 5, charge: 2, ult: A('Последний штрих'), st: [{ k: 'dot', school: 'Огонь', per: 60, stacks: 3, left: 4, left0: 5 }, { k: 'silence', left: 2, left0: 3 }, { k: 'mark', left: 3, left0: 5, pow: 2000 }] }, { hp: 12000, sh: 0 }, 'lead', 52)
+    + card({ side: 1, name: 'Мех', cls: 'Маг. ДД', el: 'Воздух', img: FA(F('e4')), maxHp: 3000, abs: [A('Меха'), A('Сквозняк')], ptr: 0, cnt: 2, uses: 0, phase: 'rot', ult: null, st: [{ k: 'stun', left: 1, left0: 2 }] }, { hp: 2100, sh: 0 }, '', 76);
 }
 /* та же карта в модели «10 раундов»: шансы из таблицы ядра, длительности в раундах */
 function kitCardsRounds() {
@@ -3243,9 +3246,9 @@ function kitCardsRounds() {
   };
   const h1 = H('h1'), h4 = H('h4'), h5 = H('h5');
   return card({ side: 0, name: h1.name, cls: h1.cls, el: h1.el, img: h1.img, maxHp: 1557, table: T(['Вызов', 'Удар щитом', 'Осыпание']), st: [{ k: 'weak', left: 1, left0: 3, pow: 2000 }] }, { hp: 1100, sh: 0 }, '', 4, 'Удар щитом')
-    + card({ side: 0, name: h4.name, cls: h4.cls, el: h4.el, img: h4.img, maxHp: 1200, table: T(['Живая вода', 'Сияние', 'Оберег']), st: [] }, { hp: 700, sh: 200 }, 'done', 26)
-    + card({ side: 0, name: h5.name, cls: h5.cls, el: h5.el, img: h5.img, maxHp: 893, table: T(['Оковы', 'Увядание', 'Ослабление'], 'Долгая ночь'), st: [{ k: 'hot', school: 'Свет', per: 40, stacks: 1, left: 2, left0: 3 }] }, { hp: 610, sh: 0 }, '', 50)
-    + card({ side: 1, name: 'Первый набросок', cls: 'Босс', el: 'Земля', img: WS(F('b1').pg), maxHp: 20000, table: T(['Правка', 'Глиняный вал'], 'Последний штрих'), st: [{ k: 'stop', left: 1, left0: 2 }, { k: 'dot', school: 'Огонь', per: 60, stacks: 2, left: 2, left0: 3 }] }, { hp: 12000, sh: 0 }, 'lead', 76);
+    + card({ side: 0, name: h4.name, cls: h4.cls, el: h4.el, img: h4.img, maxHp: 1200, table: T(['Живая вода', 'Лёгкая поступь', 'Оберег']), st: [] }, { hp: 700, sh: 200 }, 'done', 26)
+    + card({ side: 0, name: h5.name, cls: h5.cls, el: h5.el, img: h5.img, maxHp: 893, table: T(['Оковы', 'Стужа', 'Ослабление'], 'Ледяные оковы'), st: [{ k: 'hot', school: 'Воздух', per: 40, stacks: 1, left: 2, left0: 3 }] }, { hp: 610, sh: 0 }, '', 50)
+    + card({ side: 1, name: 'Первый набросок', cls: 'Босс', el: 'Земля', img: FA(F('b1')), maxHp: 20000, table: T(['Правка', 'Глиняный вал'], 'Последний штрих'), st: [{ k: 'stop', left: 1, left0: 2 }, { k: 'dot', school: 'Огонь', per: 60, stacks: 2, left: 2, left0: 3 }] }, { hp: 12000, sh: 0 }, 'lead', 76);
 }
 /* ================== UI-кит · герои из черновиков ==================
    Коллекция 110 героев с фильтрами, карточка с главами по доблести, ордены и братства.

@@ -1,0 +1,39 @@
+"""Выгрузка одобренного арта в прототип интерфейса.
+
+Что куда идёт — в ui-art.json рядом: путь в прототипе → картинка из art/generated/.
+Картинки сжимаются до размера для экрана телефона, исходники не трогаются.
+
+  python tools/art-gen/export_ui.py
+"""
+import json
+import pathlib
+import sys
+
+from PIL import Image
+
+ROOT = pathlib.Path(__file__).resolve().parents[2]
+SPEC = pathlib.Path(__file__).with_name("ui-art.json")
+
+
+def main():
+    sys.stdout.reconfigure(encoding="utf-8")
+    spec = json.loads(SPEC.read_text(encoding="utf-8"))
+    out = ROOT / spec["out"]
+    total = 0
+    for dst, src in spec["items"].items():
+        if isinstance(src, str):
+            src = {"from": src}
+        size = tuple(src.get("size", spec["size"]))
+        with Image.open(ROOT / "art/generated" / src["from"]) as im:
+            pic = im.convert("RGB").resize(size, Image.LANCZOS)
+        path = out / dst
+        path.parent.mkdir(parents=True, exist_ok=True)
+        pic.save(path, "JPEG", quality=86, optimize=True, progressive=True)
+        kb = path.stat().st_size // 1024
+        total += kb
+        print(f"{dst:22} ← {src['from']}  {size[0]}×{size[1]}, {kb} КБ")
+    print(f"Итого {len(spec['items'])} картинок, {total} КБ → {spec['out']}")
+
+
+if __name__ == "__main__":
+    main()
