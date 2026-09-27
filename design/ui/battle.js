@@ -60,6 +60,8 @@ const RULES = {
   floor: { limitMs: { o: 150000, e: 240000, b: 360000 }, gapMs: 2500 }, // предел боя этажа и переход к следующему, мс
   rounds: {                             // модель «10 раундов»
     max: 10,                            // раундов в бою; после последнего — «Время скоротечно…»
+    rune: 25,                           // бой с рунным боссом — 25 раундов на всех циклах (решение автора 28.09.2026, ADR-0020)
+    runeCut: 1,                         // особенность каждого РБ: его обычная атака отнимает у предела раунд
     capBp: 6000,                        // сумма шансов способностей карты не выше 60 %: больше — сжимается пропорционально
     act: { attack: 600, cast: 900, mass: 1100, ult: 1600, skip: 400 },   // сколько ход идёт на экране, мс
     gapMs: 700,                         // надпись «Раунд N» между раундами, мс
@@ -206,7 +208,7 @@ function floorSeed(biomeSeed, floor) { return mix32((biomeSeed ^ Math.imul(floor
    foeHpPct — здоровье врагов биома, % от их hpPct: этажи и свита стража; bossHpPct и guardHpPct — здоровье босса и стража этого биома. */
 const BIOMES = {
   b1: { n: 1, cycle: 1, name: 'Мастерская форм', seed: seedOf('Мастерская форм'), floors: FLOORS_TUTOR,
-    foeLvl: { base: 1, perFloor: 1 }, foeHpPct: 50, bossHpPct: 400, guardHpPct: 50, siege: false,
+    foeLvl: { base: 1, perFloor: 1 }, foeHpPct: 50, bossHpPct: 400, guardHpPct: 175, siege: false,
     // рунный страж обучения — три карты (ADR-0018): Мастер и две элиты, по силам двум героям. Подмастерье бьёт, Мех — по всем
     guard: { g: 'r', m: ['g1', 'e1', 'e4'] } },
   // образец длинного биома цикла II — для калькулятора экономики; сид прежней Мастерской, чтобы прогоны были сравнимы
@@ -530,7 +532,7 @@ const foeHpOf = (B, id) => B.foeHpPct ? fl(FOES[id].hpPct * B.foeHpPct, 100) : n
 function create(o) {
   const mode = o.mode === 'tempo' ? 'tempo' : 'rounds';   // основная модель — «10 раундов» (ADR-0010)
   const b = { mode, t: 0, limit: mode === 'rounds' ? Infinity : o.limitMs, rng: makeRng(o.seed), seed: o.seed, u: [[], []], over: false, win: false, why: '', ev: [],
-    round: 0, queue: [], farm: [], cov: {} };
+    round: 0, maxRounds: o.maxRounds || RULES.rounds.max, queue: [], farm: [], cov: {} };
   // порядок героев в отряде на бой не влияет: иначе перестановка отряда перебрасывала бы случайность
   const heroCard = mode === 'rounds' ? s => s : s => Object.assign({}, s, { kit: null });   // прежняя модель темпа — на прежней библиотеке, без наборов
   o.heroes.slice().sort((x, y) => x.key < y.key ? -1 : x.key > y.key ? 1 : 0).forEach((s, i) => b.u[0].push(mkUnit(heroCard(s), 0, i)));
@@ -612,7 +614,7 @@ function stepRound(b) {
   let u = null;
   while (!u) {
     if (!b.queue.length) {
-      if (b.round >= RULES.rounds.max) { finish(b, false, 'sand'); return { at: b.t, dur: 0, kind: 'end', round: b.round, ev: b.ev.splice(0) }; }
+      if (b.round >= b.maxRounds) { finish(b, false, 'sand'); return { at: b.t, dur: 0, kind: 'end', round: b.round, ev: b.ev.splice(0) }; }
       b.round++;
       for (const side of [0, 1]) for (const v of b.u[side]) v.acted = false;
       b.queue = order(b);
@@ -743,6 +745,9 @@ function pickN(b, u, rule, n) {
 function attack(b, u) {
   const t = pick(b, u, 'threat')[0]; if (!t) return;
   emit(b, { k: 'swing', s: u, t, fx: fxOf(u, u.main) });
+  if (u.rank === 'rune' && b.mode === 'rounds' && b.maxRounds > b.round) {   // РБ: обычная атака отнимает у боя раунд, но не текущий
+    b.maxRounds = Math.max(b.round, b.maxRounds - RULES.rounds.runeCut); emit(b, { k: 'cut', s: u, n: b.maxRounds });
+  }
   const d = hit(b, u, t, mainStat(u), 100, { basic: true });
   u.nBasic++;
   const nb = libPas(u, 'nthBasicDot');   // «Тлеющий след»: каждая N-я обычная атака — стак урона по времени своей школы
@@ -1038,11 +1043,12 @@ function floorBattle(heroes, biome, floor, siegeHp, mode) {
   const B = BIOMES[biome], g = B.floors[floor - 1].g;
   return create({ heroes, foes: floorFoes(biome, floor, siegeHp), seed: floorSeed(B.seed, floor), limitMs: RULES.floor.limitMs[g], mode });
 }
-/* Рунный страж — отдельный бой из пяти карт после биома (§8.6, §11, ADR-0010) */
+/* Рунный страж — отдельный бой после биома (§8.6, §11, ADR-0010): страж и свита, в обучении цикла I — три карты (ADR-0018).
+   Бой идёт до RULES.rounds.rune раундов, каждая обычная атака рунного босса отнимает раунд (ADR-0020). */
 function guardBattle(heroes, biome, mode) {
   const B = BIOMES[biome], G = B.guard, lvl = B.floors.length + 1;
   const foes = G.m.map((id, k) => foeSrc(id, foeLvlOf(B, lvl), k, k === 0, null, k === 0 ? B.guardHpPct : foeHpOf(B, id)));
-  return create({ heroes, foes, seed: floorSeed(B.seed, lvl), limitMs: RULES.floor.limitMs.b, mode });
+  return create({ heroes, foes, seed: floorSeed(B.seed, lvl), limitMs: RULES.floor.limitMs.b, mode, maxRounds: RULES.rounds.rune });
 }
 /* Добыча этажа по рангам убитых карт. Шансы — свой поток генератора от сида этажа,
    чтобы бросок добычи не сдвигал случайность боя. bonusBp — прибавка к шансу ресурса от артефактов.

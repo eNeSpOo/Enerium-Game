@@ -1904,7 +1904,7 @@ function battle() {
       <div class="bt-floor">${R.guard ? `<b>${ic('crown')}</b><span>страж</span>` : `<b>${R.floor}</b><span>/ ${B.floors.length}</span>`}</div>
       <span class="chip ${FL.g !== 'o' ? 'gold' : ''}">${FL.g === 'e' ? ic('gem') : FL.g === 'b' ? ic('crown') : ''}${typ}${lead ? ' · ' + uName(lead) : ''}${FL.g === 'b' && B.siege !== false ? ` · осада ${siegeDone(R.biome)}%` : ''}</span>
       ${b.mode === 'rounds'
-        ? `<div class="bt-clock"><div class="row"><span>${ic('hour')} Раунд</span><span class="num" id="btClock">${b.round} / ${EB.RULES.rounds.max}</span></div>${bar(b.round * 100 / EB.RULES.rounds.max, 'sand')}<div class="row"><span>Забег идёт</span><span class="num" id="btRun">${clock((R.runMs + R.view) / 1000)}</span></div></div>`
+        ? `<div class="bt-clock"><div class="row"><span>${ic('hour')} Раунд</span><span class="num" id="btClock">${b.round} / ${b.maxRounds}</span></div>${bar(b.round * 100 / b.maxRounds, 'sand')}<div class="row"><span>Забег идёт</span><span class="num" id="btRun">${clock((R.runMs + R.view) / 1000)}</span></div></div>`
         : `<div class="bt-clock"><div class="row"><span>${ic('hour')} Бой</span><span class="num" id="btClock">${clock(R.view / 1000)} / ${clock(b.limit / 1000)}</span></div>${bar(Math.min(100, R.view * 100 / b.limit), 'sand')}<div class="row"><span>Забег идёт</span><span class="num" id="btRun">${clock((R.runMs + R.view) / 1000)}</span></div></div>`}
       <span class="chip" title="Сид — сам биом: тот же отряд с той же ротацией всегда получает тот же сценарий">${ic('lock')}сценарий ${seedTag(R)}</span>${b.mode === 'rounds' ? `<span class="chip spirit" title="Модель боя для сравнения, ADR-0008">10 раундов</span>` : ''}
       <div class="bt-ctrl">
@@ -2649,7 +2649,7 @@ const OV = {
     if (E.kind === 'boss') { title = 'Первый набросок повержен'; head = 'Мастерская пройдена до конца. Осталось победить рунного стража — тогда откроется Подземный лес.'; }
     else if (E.kind === 'siege') { title = 'Осада продолжается'; head = `${E.why === 'sand' ? 'Время скоротечно… Десять раундов прошли. ' : ''}Отряд дошёл до босса и снял ${sg - R.siegeFrom}% его здоровья, всего снято ${sg}%. Урон сохранится до следующего забега. Чем меньше у босса здоровья, тем он опаснее.`; }
     else if (E.kind === 'guardWin') { title = 'Мастер пропустил дальше'; head = 'Рунный страж и его свита повержены. Теперь, если пройден и босс биома, откроется Подземный лес.'; }
-    else if (E.kind === 'guardLose') { title = 'Мастер не пропустил'; head = `${E.why === 'sand' ? 'Время скоротечно… Десять раундов прошли, а страж ещё стоит' : 'Отряд пал'}. Рунный страж — ${guardCards()}, у Мастера иммунитет к контролю ${Math.round((EB.RULES.resist.rune || 0) / 100)} %.`; }
+    else if (E.kind === 'guardLose') { title = 'Мастер не пропустил'; head = `${E.why === 'sand' ? `Время скоротечно… Раунды вышли, а страж ещё стоит: каждая его обычная атака отнимала раунд, из ${EB.RULES.rounds.rune} осталось ${E.rounds}` : 'Отряд пал'}. Рунный страж — ${guardCards()}, у Мастера иммунитет к контролю ${Math.round((EB.RULES.resist.rune || 0) / 100)} %.`; }
     else if (E.kind === 'wall') { title = `Стена — этаж ${E.floor}`; head = `${E.why === 'time' ? 'Время боя вышло' : E.why === 'sand' ? 'Время скоротечно… Десять раундов прошли, этаж не взят' : 'Отряд пал'} на этаже ${E.floor}. В колоде: ${E.foes.map(id => known(id) ? F(id).name : 'неизвестный').join(', ')}.`; }
     else { title = 'Забег прерван'; head = `Отряд поднялся с этажа ${R.floor}.`; }
     if (R.demo) head = 'Демо-прыжок сразу к боссу с полным здоровьем: ' + (B.siege !== false ? 'осада биома и стена не меняются. ' : 'стена не меняется. ') + head;
@@ -2913,7 +2913,7 @@ function floorDone(R, vis) {
   S.wallet.gold += got.gold; S.wallet.spirit += got.spirit; S.wallet.souls += got.souls; I('cinder').q += got.base;
   if (vis) magnet(got);
   const fm = farmText(got.farm); if (vis && fm) feed(R, `<span class="gd">Фарм</span> · ${fm}`);
-  if (R.guard) { R.end = { kind: b.win ? 'guardWin' : 'guardLose', why: b.why }; if (b.why === 'sand' && vis) feed(R, '<span class="gd">Время скоротечно…</span> · десять раундов прошли'); return endRun(R, vis); }
+  if (R.guard) { R.end = { kind: b.win ? 'guardWin' : 'guardLose', why: b.why, rounds: b.maxRounds }; if (b.why === 'sand' && vis) feed(R, `<span class="gd">Время скоротечно…</span> · ${b.maxRounds} ${roundWord(b.maxRounds)} прошли`); return endRun(R, vis); }
   let bossDead = false;
   if (g === 'b') { const boss = b.u[1][0], sg = G(R.biome); bossDead = !boss.alive; if (!R.demo) { sg.max = boss.maxHp; if (bossDead) { sg.hp = null; sg.killed = true; } else if (B.siege !== false) sg.hp = boss.hp; } }   // без осады урон по боссу не копится
   if (b.win && R.floor < B.floors.length) { R.gap = EB.RULES.floor.gapMs; R.runMs += R.gap; if (vis) camPan(); if (vis) feed(R, `<span class="sp">Этаж ${R.floor} пройден</span>${b.mode === 'rounds' ? ` за ${b.round} ${roundWord(b.round)}` : ''} · здоровье отряда ${partyPctOf(b)}%`); return; }
@@ -3007,6 +3007,7 @@ function playAction(R, a) {
     else if (e.k === 'survive') flyAt(R, e.t, 'на волоске', 'info');
     else if (e.k === 'unhurt') flyAt(R, e.t, 'лёд', 'info');
     else if (e.k === 'unstatus') flyAt(R, e.t, e.st === 'freeze' ? 'лёд спал' : 'очнулся', 'info');
+    else if (e.k === 'cut') { flyAt(R, e.s, '−1 раунд', 'info', -26); feed(R, `<b>${uName(e.s)}</b> · <span class="gd">время скоротечно</span> · раундов в бою: ${e.n}`); }   // РБ отнимает раунд (ADR-0020)
   };
   // 1. горение, яд и лечение со временем срабатывают в начале хода носителя
   for (const e of pre) {
@@ -3039,7 +3040,7 @@ function playAction(R, a) {
         case 'status': if (el(e.t)) { if (e.st === 'dot') fx.dot(el(e.t), e.school); else if (e.st === 'hot') fx.hot(el(e.t)); else if (CTL.includes(e.st)) fx.ctrl(el(e.t), e.st); else fx.debuff(el(e.t), e.st); } break;
         case 'resist': el(e.t) && fx.resist(el(e.t), e.st); flyAt(R, e.t, 'иммунитет', 'info'); break;
         case 'dispel': el(e.t) && fx.dispel(el(e.t)); break;
-        case 'unstatus': case 'react': case 'survive': case 'unhurt': side(e); break;
+        case 'unstatus': case 'react': case 'survive': case 'unhurt': case 'cut': side(e); break;
         case 'die': el(e.t) && fx.death(el(e.t)); feed(R, `<span class="bd">✝</span> <b>${uName(e.t)}</b>`); break;
       }
     }
@@ -3086,8 +3087,8 @@ function paintHud(R) {
   const q = id => document.getElementById(id); if (!q('bt')) return;
   const b = R.b, cb = q('bt').querySelector('.bt-clock .bar');
   if (b.mode === 'rounds') {
-    q('btClock').textContent = `${b.round} / ${EB.RULES.rounds.max}`;
-    cb && cb.style.setProperty('--v', b.round * 100 / EB.RULES.rounds.max);
+    q('btClock').textContent = `${b.round} / ${b.maxRounds}`;
+    cb && cb.style.setProperty('--v', b.round * 100 / b.maxRounds);
     setHtml(q('btQueue'), queueHtml(R));
   } else {
     q('btClock').textContent = `${clock(R.view / 1000)} / ${clock(b.limit / 1000)}`;
