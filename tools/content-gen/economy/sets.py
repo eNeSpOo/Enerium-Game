@@ -492,7 +492,7 @@ def layouts_table():
         hs = sorted(hs, key=lambda h: -h[2])
         total = sum(h[2] for h in hs)
         return [label, len(hs), ' + '.join(str(h[2]) for h in hs) + f' = {total}', tiers_of(total),
-                '; '.join(f'{h[0]} — {h[1]}, {h[3]}' for h in hs if h[2] > 1) or '—']
+                '; '.join(f'{h[0]} — {h[1]}, {h[3]}' for h in hs if h[1] != 'золото') or '—']
     for no, cyc, name, *_ in ORDERS:
         rows.append(row(short(name), ros[name]))
     for name in EX_BROTHERHOODS:

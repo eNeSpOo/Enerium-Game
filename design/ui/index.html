@@ -151,16 +151,16 @@ img{max-width:100%}
 .g.full{width:100vw;height:100vh;height:100dvh;border-radius:0}
 .g *{-webkit-tap-highlight-color:transparent}
 .g button{cursor:pointer}
-.g .num,.tr-page .num,#kitHeroes .num,#kitLib .num{font-variant-numeric:lining-nums tabular-nums}
-.g .serif,.tr-page .serif,#kitHeroes .serif,#kitLib .serif{font-family:var(--f-d)}
-.g .muted,.tr-page .muted,#kitHeroes .muted,#kitLib .muted{color:var(--parch-2)}
-.g .faint,.tr-page .faint,#kitHeroes .faint,#kitLib .faint{color:var(--parch-3)}
-.g .gold,.tr-page .gold,#kitHeroes .gold,#kitLib .gold{color:var(--gold)}
-.g .spirit,.tr-page .spirit{color:var(--spirit)}
-.g .caps,.tr-page .caps{font:700 11px/1.2 var(--f-u);letter-spacing:.14em;text-transform:uppercase}
-.g .eyebrow,.tr-page .eyebrow,#kitHeroes .eyebrow,#kitLib .eyebrow{font:700 10.5px/1.2 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--gold-2)}
-.g h1,.g h2,.g h3,.g h4,.tr-page h3{margin:0;font-weight:600;font-family:var(--f-d);text-wrap:balance}
-.g p,.tr-page p{margin:0}
+.g .num,.tr-page .num,#kitHeroes .num,#kitLib .num,#kitRoster .num{font-variant-numeric:lining-nums tabular-nums}
+.g .serif,.tr-page .serif,#kitHeroes .serif,#kitLib .serif,#kitRoster .serif{font-family:var(--f-d)}
+.g .muted,.tr-page .muted,#kitHeroes .muted,#kitLib .muted,#kitRoster .muted{color:var(--parch-2)}
+.g .faint,.tr-page .faint,#kitHeroes .faint,#kitLib .faint,#kitRoster .faint{color:var(--parch-3)}
+.g .gold,.tr-page .gold,#kitHeroes .gold,#kitLib .gold,#kitRoster .gold{color:var(--gold)}
+.g .spirit,.tr-page .spirit,#kitRoster .spirit{color:var(--spirit)}
+.g .caps,.tr-page .caps,#kitRoster .caps{font:700 11px/1.2 var(--f-u);letter-spacing:.14em;text-transform:uppercase}
+.g .eyebrow,.tr-page .eyebrow,#kitHeroes .eyebrow,#kitLib .eyebrow,#kitRoster .eyebrow{font:700 10.5px/1.2 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--gold-2)}
+.g h1,.g h2,.g h3,.g h4,.tr-page h3,#kitRoster h2,#kitRoster h4{margin:0;font-weight:600;font-family:var(--f-d);text-wrap:balance}
+.g p,.tr-page p,#kitRoster p{margin:0}
 
 /* верхняя строка */
 .g-top{grid-column:1/-1;grid-row:1;display:flex;align-items:center;gap:10px;padding-right:8px;background:linear-gradient(#0e1114,#0a0c0e);border-bottom:1px solid var(--iron);position:relative;z-index:6;min-width:0}
@@ -761,7 +761,7 @@ button.well:hover{border-color:var(--iron-3)}
 /* Герои */
 .hs{display:grid;grid-template-columns:318px minmax(0,1fr);gap:10px;height:100%}
 .coll{display:flex;flex-direction:column;gap:8px;min-height:0;padding:10px}
-.coll-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-content:start}
+.coll-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:max-content;gap:8px;align-content:start}
 .hd{display:flex;flex-direction:column;min-height:0;min-width:0;padding:10px 12px 10px}
 .hd-top{display:grid;grid-template-columns:74px minmax(0,1fr) auto;gap:12px;align-items:start}
 .hd-face{position:relative;width:74px;height:88px;border-radius:12px;overflow:hidden;border:1px solid color-mix(in srgb,var(--rc) 55%,#2a2f35);box-shadow:inset 0 -3px 0 var(--rc)}
@@ -804,6 +804,77 @@ button.well:hover{border-color:var(--iron-3)}
 .chap .n{font:600 20px/1 var(--f-d);color:var(--gold);text-align:center;padding-top:2px}
 .chap.lock{border-style:dashed;color:var(--parch-3)}
 .chap.lock .n{color:var(--parch-3)}
+
+/* Состав героев (roster.js): заглушка портрета — свет школы снизу и инициалы; Безликий — капюшон без лица */
+.rs-ph{position:relative;display:grid;place-items:center;overflow:hidden;background:radial-gradient(120% 70% at 50% 112%,color-mix(in srgb,var(--c,#8a9098) 55%,transparent),transparent 62%),linear-gradient(180deg,#101418,#0a0c0e)}
+.rs-ph b{font:600 30px/1 var(--f-d);color:color-mix(in srgb,var(--c,#aaa) 55%,var(--parch-2));text-shadow:0 2px 10px #000}
+.rs-ph[data-el="Воздух"]{--c:var(--air)}.rs-ph[data-el="Земля"]{--c:var(--earth)}.rs-ph[data-el="Огонь"]{--c:var(--fire)}.rs-ph[data-el="Вода"]{--c:var(--water)}.rs-ph[data-el="Время"]{--c:var(--time)}.rs-ph[data-el="Свет"]{--c:var(--light)}.rs-ph[data-el="Тьма"]{--c:var(--dark)}
+.rs-ph.faceless img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%}
+.el[data-el="без стихии"]{--c:#8a9098}
+.hc .rs-ph,.hd-face .rs-ph,.rs-av .rs-ph{position:absolute;inset:0}
+.hd-face .rs-ph b{font-size:32px}
+.rs-own{position:absolute;right:5px;top:24px;z-index:1;display:grid;place-items:center;width:17px;height:17px;border-radius:50%;background:var(--spirit-3);color:var(--spirit);box-shadow:0 0 0 1px rgba(72,229,212,.4)}
+.rs-own .i{width:11px;height:11px}
+.chip.wr{white-space:normal;height:auto;min-height:22px;line-height:1.15;padding:3px 8px}
+.rs-team[aria-pressed="true"]{color:var(--amber);border-color:rgba(230,168,75,.45);background:rgba(230,168,75,.08)}
+.rs-sel{height:28px;min-width:0;border-radius:8px;border:1px solid var(--iron-2);background:#0c0f11;color:var(--parch);font:13px var(--f-u);padding:0 4px}
+.rs-filters{gap:4px}
+.rs-filters .rs-sel{flex:1 1 0}
+/* строка героя в списках Призыва */
+.rs-list{display:flex;flex-direction:column;gap:4px}
+.rs-list>*{flex:none}
+.rs-row{appearance:none;display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px;align-items:center;padding:4px 8px 4px 4px;border-radius:9px;border:1px solid var(--iron);background:#0e1114;color:var(--parch);text-align:left;width:100%;flex:none}
+.rs-row[aria-current="true"]{border-color:rgba(72,229,212,.5);box-shadow:inset 0 -12px 16px -14px var(--spirit)}
+.rs-row.dim{opacity:.55}
+.rs-row .tx{display:flex;flex-direction:column;min-width:0}
+.rs-row b{font:600 15px/1.1 var(--f-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rs-row small{font-size:11.5px;line-height:1.25;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rs-row .num{font-size:12px}
+.rs-av{position:relative;width:30px;height:30px;border-radius:7px;overflow:hidden;box-shadow:inset 0 -2px 0 var(--rc),0 0 0 1px #242a30}
+.rs-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+.rs-av .rs-ph b{font-size:12px}
+.rs-tut{color:var(--spirit)}
+/* Призыв: три вкладки, переключатель цикла, колонки «За души» */
+.rs-hbar{flex:none;gap:8px}
+.rs-cyc button{padding:0 9px}
+.hs.rs-hs{flex:1 1 0;min-height:0;height:auto}
+.rs-next{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12.5px;color:var(--parch-2);flex:none}
+.rs-aside{gap:6px}
+.rs-aside .stat{align-items:flex-end}
+.rs-aside .stat b{font-size:26px;color:var(--gold)}
+.rs-kv{grid-template-columns:auto minmax(0,1fr);font-size:12.5px}
+.rs-kv dd{text-align:left;font-variant-numeric:normal;color:var(--parch-2)}
+.rs-p,.g .rs-p,#kitRoster .rs-p{margin:3px 0 0;font:italic 500 14px/1.35 var(--f-d);color:var(--parch-2)}
+.rs-none{background:#0e1114;display:flex;flex-direction:column;gap:4px}
+.rs-none b{font-size:17px;color:var(--parch)}
+.rs-set{background:#0e1114;gap:6px;padding:10px}
+.rs-set h4{margin:0;font:600 18px/1.1 var(--f-d);color:var(--parch)}
+.kh-mem .me{border-color:rgba(72,229,212,.55)}
+.kh-mem small{color:var(--gold-2);font-size:11px;margin-left:2px}
+.rs-vp{justify-content:space-between;flex:none;flex-wrap:wrap}
+.rs-souls{flex:1 1 0;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.rs-col{display:flex;flex-direction:column;gap:6px;min-height:0;min-width:0;padding:10px}
+.rs-colh{display:flex;flex-direction:column;gap:3px;flex:none}
+.rs-colh b{font:600 18px/1.1 var(--f-d);color:var(--gold)}
+.rs-colh .rs-sel{align-self:flex-start;max-width:100%}
+.rs-colf{display:flex;flex-direction:column;gap:6px;flex:none}
+.rs-colf .row{flex-wrap:wrap}
+.rs-line{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--parch-2);flex:none}
+.rs-closed{flex:1 1 0;display:flex;flex-direction:column;justify-content:center;gap:8px;padding:18px 22px}
+.rs-closed h2{font-size:26px;color:var(--gold)}
+.rs-closed p{max-width:64ch}
+/* UI-кит · состав героев */
+.rs-kph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 22%}
+.rk-tab{border-collapse:collapse;font-size:12.5px;width:100%}
+.rk-tab th,.rk-tab td{padding:4px 8px;border-top:1px solid #1b2025;text-align:left;vertical-align:top;color:var(--parch-2)}
+.rk-tab th{color:var(--gold-2);font-weight:700;white-space:nowrap}
+.rk-tab td.n{text-align:right;font-variant-numeric:tabular-nums;color:var(--parch)}
+.rk-tab small{display:block;color:var(--parch-3);font-size:11px}
+.rk-hn{appearance:none;border:0;background:none;padding:0;color:var(--parch);font:600 14px/1.1 var(--f-d);cursor:pointer;text-align:left}
+.rk-hn:hover{color:var(--gold)}
+.rk-scroll{overflow:auto;max-height:440px;scrollbar-width:thin;scrollbar-color:#2c3238 transparent;border:1px solid #1b1f24;border-radius:10px}
+.rk-rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px;align-items:start}
+.rk-rules>div{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:12px;border:1px solid var(--iron);background:#0c0f12;min-width:0}
 
 /* Отряды */
 .sq{display:grid;grid-template-columns:230px minmax(0,1fr);gap:10px;height:100%}
@@ -1020,8 +1091,6 @@ button.well:hover{border-color:var(--iron-3)}
 .mini{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;color:var(--parch);font-size:13px}
 .mini img{width:34px;height:34px;border-radius:8px;object-fit:cover}
 .mini:hover{border-color:rgba(72,229,212,.45)}
-.rebirth{display:flex;gap:10px;align-items:center;padding:8px;border-radius:10px;border:1px solid var(--iron);background:#0e1114}
-.rebirth img{width:44px;height:44px;border-radius:9px;object-fit:cover}
 .faces{display:flex;gap:3px}
 .faces img{width:30px;height:30px;border-radius:7px;object-fit:cover;box-shadow:0 0 0 1px #2a3036}
 
@@ -1408,6 +1477,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <script src="heroes.js"></script>
 <script src="abilities.js"></script>
 <script src="kits.js"></script>
+<script src="roster.js"></script>
 <script>
 'use strict';
 /* Все числа ниже — демонстрационные фикстуры: взяты из текущего UIKit
@@ -1447,7 +1517,7 @@ const AB = n => ({ n, c: EB.LIB[n].price, d: EB.LIB[n].d, school: EB.LIB[n].scho
 function initialState() {
   return {
     route: 'shelter', from: null,
-    seg: { heroes: 'coll', craft: 'work', arena: 'arena', clan: 'pass', profile: 'over', contracts: 'day', store: 'en', rituals: 'work', chron: 'best', hero: 'power', market: 'buy' },
+    seg: { heroes: 'coll', craft: 'work', arena: 'arena', clan: 'pass', profile: 'over', contracts: 'day', store: 'en', rituals: 'work', chron: 'best', hero: 'power', market: 'buy', hire: 'gold', rhero: 'who' },
     wallet: { gold: 124850, spirit: 8420, souls: 1260, enerium: 340, keys: 20, dust: 180 },
     acc: { level: 24, xp: 7289, next: 11758, cycle: 2 },
     week: { race: 'Эльфов', next: 'Зверей', left: 3 * 86400 + 5 * 3600 + 12 * 60 },
@@ -1469,6 +1539,10 @@ function initialState() {
         pas: [{ n: 'Тень', t: 'боевая', d: 'Дебафы держатся на раунд дольше.' }, { n: 'Дознаватель', t: 'фарм', d: 'Выше шанс ключа с элит.' }], ult: { n: 'Ледяные оковы', at: 2, d: 'лёд сковывает всех врагов на 2 раунда, у рунных и старших боссов — иммунитет по рангу.' }, busy: null, },
     ],
     selHero: 'h1', qty: 1,
+    /* Состав героев (roster.js): коллекция «Все герои / Мои» и Призыв. cyc — текущий цикл для демо, пусто — цикл аккаунта.
+       Купленные и пробуждённые герои — в owned: приходят с 0 ур., 0 РП и 0 Добл (ADR-0019). */
+    hview: 'all',
+    rs: { cyc: 0, gcyc: 0, dcyc: 0, gsel: '', dsel: '', ssel: '', sel: 'c1-01', val: null, f: { cyc: '', src: '', cls: '' }, owned: {}, shards: {}, spins: 0, last: '' },
     squads: [
       { id: 's1', name: 'Отряд I', m: ['h1', 'h2', 'h3', 'h4', 'h5'] },
       { id: 's2', name: 'Против элит', m: ['h1', 'h2', 'h3', 'h5', null] },
@@ -1477,12 +1551,6 @@ function initialState() {
       { id: 's5', name: 'Тени', m: ['h3', 'h5', null, null, null] },
     ],
     selSquad: 's1', prepSquad: 's1', echoSquad: 's1', act: null, selItem: 'crown',
-    offers: [
-      { id: 'o1', name: 'Образец стража', cls: 'Танк', el: 'Земля', race: 'Дворфы', r: 1, cycle: 1, img: AV('heroes/h1.jpg'), price: 12000, bm: 520, maxV: 1 },
-      { id: 'o2', name: 'Образец клинка', cls: 'Физ. ДД', el: 'Огонь', race: 'Люди', r: 2, cycle: 2, img: AV('heroes/h2.jpg'), price: 24000, bm: 610, maxV: 2 },
-      { id: 'o3', name: 'Образец хрониста', cls: 'Маг. ДД', el: 'Время', race: 'Эльфы', r: 3, cycle: 3, img: AV('heroes/h3.jpg'), price: 36000, bm: 700, maxV: 3, locked: 'Откроется в цикле III' },
-    ],
-    selOffer: 'o1',
     biomes: [
       { id: 'b1', cyc: 1, name: 'Мастерская форм', state: 'done' },
       { id: 'b2', cyc: 1, name: 'Подземный лес', state: 'done' },
@@ -1972,25 +2040,225 @@ function trayHtml() {
   return `<div class="g-runs">${list.map(R => `<button class="g-run ${R.over ? 'done' : ''} ${S.route === 'battle' && S.focus === R.id ? 'cur' : ''}" data-a="focus" data-v="${R.id}" id="run-${R.id}" title="${EB.BIOMES[R.biome].name} · забег ${R.runNo}"><span class="ic">${ic(R.over ? 'flag' : 'eye')}</span><span class="tx"><b>${EB.BIOMES[R.biome].name.split(' ')[0]} · ${R.runNo}</b><small>${R.over ? 'итог' : 'этаж ' + R.floor}</small></span><i class="hpm" style="--v:${partyPct(R)}"></i></button>`).join('')}</div>`;
 }
 
-/* ================== Герои ================== */
+/* ================== Герои ==================
+   Коллекция: «Все герои» — состав игры (roster.js), «Мои» — герои аккаунта с фильтром «Свободные».
+   Отряд боя прототипа — прежние герои S.heroes с наборами способностей; купленные и пробуждённые в Призыве — из состава. */
 function heroes() {
   const seg = S.seg.heroes;
   const meta = { title: 'Герои', seg: { key: 'heroes', items: [['coll', 'Коллекция'], ['squads', 'Отряды'], ['hire', 'Призыв']] } };
   if (seg === 'squads') return { ...meta, html: squadsView() };
   if (seg === 'hire') return { ...meta, html: hireView() };
-  const h = H(S.selHero);
+  if (S.hview !== 'mine') return { ...meta, html: rsCollView() };
+  const own = Object.keys(S.rs.owned).map(id => RSI[id]).filter(Boolean);
+  let h = H(S.selHero);
+  const rh = h ? null : own.find(x => x.id === S.selHero);
+  if (!h && !rh) { h = S.heroes[0]; S.selHero = h.id; }
   const hf = S.hfilter || 'all', sortBM = S.hsort === 'bm';
   let list = S.heroes.filter(x => hf === 'all' || !busyNote(x.id));
   if (sortBM) list = [...list].sort((a, b) => b.bm - a.bm);
-  const grid = list.map(x => heroCard(x, { sel: x.id === h.id, note: busyNote(x.id) })).join('') || '<p class="faint" style="grid-column:1/-1">Все герои заняты</p>';
+  const grid = list.map(x => heroCard(x, { sel: h && x.id === h.id, note: busyNote(x.id) })).join('') + own.map(x => rsCard(x, { act: 'hero', sel: rh && x.id === rh.id })).join('')
+    || '<p class="faint" style="grid-column:1/-1">Все герои заняты</p>';
   return { ...meta, html: `<section class="scr"><div class="hs">
     <div class="pnl coll">
-      <div class="row" style="justify-content:space-between"><div class="tabs" role="tablist"><button role="tab" aria-selected="${hf === 'all'}" data-a="hfilter" data-v="all">Все · ${S.heroes.length}</button><button role="tab" aria-selected="${hf === 'free'}" data-a="hfilter" data-v="free">Свободные · ${S.heroes.filter(x => !busyNote(x.id)).length}</button></div><button class="iconbtn" data-a="hsort" aria-pressed="${sortBM}" aria-label="Сортировать по боевой мощи" title="По боевой мощи">${ic('sort')}</button></div>
-      <div class="coll-grid scroll grow">${grid}</div>
+      ${rsViewTabs(RS.heroes.filter(rsFilter).length)}
+      <div class="row" style="justify-content:space-between"><div class="tabs" role="tablist"><button role="tab" aria-selected="${hf === 'all'}" data-a="hfilter" data-v="all">Все · ${S.heroes.length + own.length}</button><button role="tab" aria-selected="${hf === 'free'}" data-a="hfilter" data-v="free">Свободные · ${S.heroes.filter(x => !busyNote(x.id)).length + own.length}</button></div><button class="iconbtn" data-a="hsort" aria-pressed="${sortBM}" aria-label="Сортировать по боевой мощи" title="По боевой мощи">${ic('sort')}</button></div>
+      <div class="coll-grid scroll grow" data-keep="mine">${grid}</div>
       <button class="collpow" data-a="sheet" data-v="coll"><span><b>Сила коллекции</b><small>Рейтинговые пассивки всех героев</small></span><span class="chip spirit">+0,05%</span>${ic('chev')}</button>
     </div>
-    ${heroDetail(h)}
+    ${h ? heroDetail(h) : rsDetail(rh)}
   </div></section>` };
+}
+
+/* ================== Герои · состав героев (roster.js) ==================
+   Состав игры по источникам (ADR-0019, ADR-0021 — ADR-0024). Выгрузка tools/content-gen/heroes/export_roster.py, руками не править.
+   Числа — только из EN_ROSTER.rules; rules.stub — заглушки прототипа: этих чисел в источниках нет.
+   Поля team — только для команды: орден игрок видит на последней доблести героя, с флажком «для команды» (KH.team) — сразу. */
+const RS = window.EN_ROSTER || { heroes: [], sets: [], weeks: [], classes: [], sources: [], srcInfo: {}, rules: null };
+const RSI = Object.fromEntries(RS.heroes.map(h => [h.id, h]));
+const RSS = Object.fromEntries(RS.sets.map(s => [s.key, s]));
+const RS_SRC = { gold: 'за золото', donat: 'за Энериум', roulette: 'возрождение душ', echo: 'Эхо', craft: 'крафт' };
+const RS_SRC_ONE = { gold: 'Золото', donat: 'Энериум', roulette: 'Рулетка', echo: 'Эхо', craft: 'Крафт' };
+const RS_SRC_OF = { gold: 'героев за золото', donat: 'донатных героев', roulette: 'героев рулетки', echo: 'героев Эхо', craft: 'героев крафта' };
+const RS_SHARD = ['roulette', 'echo'];   // сборные из осколков: их пробуждают души (ADR-0019, §15); крафтовых собирает рецепт
+const RS_HOW = { gold: 'нанят за золото', donat: 'куплен за Энериум', souls: 'пробуждён душами' };
+const RS_CLS_IC = { 'танк': 'shield', 'лекарь': 'heal', 'контроль': 'chain', 'маг ДД': 'staff', 'физ ДД силы': 'sword', 'физ ДД ловкости': 'sword', 'фармер': 'star' };
+/* Безликий (ADR-0023, п. 10): лица нет, облик — одежда и силуэт. Заглушка до арта */
+const FACELESS = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 100"><defs><linearGradient id="c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2d343a"/><stop offset="1" stop-color="#14181b"/></linearGradient><radialGradient id="v" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="#000"/><stop offset="1" stop-color="#0b0d10"/></radialGradient></defs><rect width="80" height="100" fill="#0a0c0e"/><path d="M40 14C26 14 18 26 18 41c0 7-3 13-8 19L6 100h68l-4-40c-5-6-8-12-8-19 0-15-8-27-22-27z" fill="url(#c)" stroke="#6a5534" stroke-width="1.2"/><path d="M40 24c-9 0-15 8-15 19 0 9 6 17 15 17s15-8 15-17c0-11-6-19-15-19z" fill="url(#v)"/><path d="M26 38c2-8 7-13 14-13s12 5 14 13" fill="none" stroke="#b1915a" stroke-opacity=".4" stroke-width="1"/><path d="M28 74c4 4 8 6 12 6s8-2 12-6" fill="none" stroke="#6a5534" stroke-opacity=".7" stroke-width="1"/></svg>');
+const rsCyc = () => S.rs.cyc || S.acc.cycle;   // текущий цикл: демо-переключатель Призыва, иначе цикл аккаунта
+const rsFrom = src => RS.srcInfo[src] ? RS.srcInfo[src].from : 1;
+const rsInit = n => n.replace(/[«»"]/g, '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+const rsOld = h => h && h.team && h.team.draft ? S.heroes.find(x => x.draft === h.team.draft) || null : null;   // герой отряда боя прототипа
+const rsHas = h => !!h && (!!S.rs.owned[h.id] || !!rsOld(h));
+const rsGold = (c, k) => { const g = RS.rules.gold, bp = RS.rules.bp; return Math.floor(g.first * c * (bp + g.stepBp * (k - 1)) / bp); };   // ADR-0023, «Второй круг», п. 1
+const rsBought = c => RS.heroes.filter(h => h.src === 'gold' && h.c === c && rsHas(h)).length;
+const rsTiers = sum => { const t = RS.rules.tierBySum.find(([lo]) => sum >= lo); return t ? t[1] : 0; };   // ADR-0022, п. 6
+const rsDonatPrice = h => RS.rules.stub.donatPrice[h.place - 1];
+const rsShardPrice = h => RS.rules.dust[h.r - 1][1] * h.c;   // §15.3: цена осколка в прахе × номер цикла героя
+const rsDustOf = h => RS.rules.dust[h.r - 1][0] * h.c;       // §15.3: прах за повторный осколок × номер цикла героя
+const rsPool = () => RS.heroes.filter(h => h.src === 'roulette' && h.c === rsCyc());   // §15.1: пул прокрутки привязан к циклу; прошлые циклы — в каталоге праха
+const rsWeek = () => RS.weeks.find(w => w.gen.toLowerCase() === String(S.week.race).toLowerCase()) || RS.weeks[0];
+const rsChTitle = (h, i) => h.ch && h.ch[i] ? h.ch[i][0] : h.chT[i];
+const rsV = h => S.rs.val && S.rs.val.id === h.id ? Math.min(S.rs.val.v, h.maxV) : S.rs.owned[h.id] ? S.rs.owned[h.id].valor : 0;
+const rsFilter = h => { const f = S.rs.f; return (!f.cyc || h.c === +f.cyc) && (!f.src || h.src === f.src) && (!f.cls || h.cl.includes(f.cls)); };
+function rsSetWeek(race) {
+  const i = RS.weeks.findIndex(w => w.race === race); if (i < 0) return;
+  S.week.race = cap1(RS.weeks[i].gen); S.week.next = cap1(RS.weeks[(i + 1) % RS.weeks.length].gen);
+}
+function rsAdd(h, how) { S.rs.owned[h.id] = { lvl: 0, lim: 0, valor: 0, how }; }   // ADR-0019: любой герой приходит с 0 ур., 0 РП и 0 Добл
+function rsFace(h) {
+  const o = rsOld(h);
+  if (o) return `<img src="${o.img}" alt="">`;
+  if (h.src === 'donat') return `<span class="rs-ph faceless" data-el="${h.sch}"><img src="${FACELESS}" alt=""></span>`;
+  return `<span class="rs-ph" data-el="${h.sch}"><b>${rsInit(h.n)}</b></span>`;
+}
+const rsSrcChip = h => `<span class="chip ${h.src === 'donat' ? 'spirit' : h.src === 'echo' ? 'gold' : ''}">${RS_SRC_ONE[h.src]}${h.src === 'gold' ? ' · №' + h.no : h.src === 'donat' ? ' · ' + h.place + '-й' : ''}</span>`;
+const rsAversShort = h => `+${pctBp(h.avers.bp != null ? h.avers.bp : RS.rules.aversionBp)} урона по расе «${h.avers.race}»`;
+function rsCard(h, o = {}) {
+  const has = rsHas(h), own = S.rs.owned[h.id];
+  return `<button class="hc rs-hc ${o.sel ? 'sel' : ''}" data-r="${h.r}" data-a="${o.act || 'rssel'}" data-v="${h.id}" aria-label="${h.n}, ${RS_SRC[h.src]}, цикл ${ROMAN[h.c]}${has ? ', в коллекции' : ''}">
+    ${rsFace(h)}
+    <span class="top"><span class="stars">${stars(own ? own.valor : 0, h.maxV)}</span>${el(h.sch, true)}</span>
+    ${has ? `<span class="rs-own" title="В коллекции">${ic('check')}</span>` : ''}
+    <span class="bot"><span class="nm">${h.n}</span><span class="meta"><span>${RS_SRC_ONE[h.src]}</span><span>${ROMAN[h.c]}</span></span></span>
+  </button>`;
+}
+function rsRow(h, o = {}) {
+  return `<button class="rs-row ${o.dim ? 'dim' : ''}" data-r="${h.r}" data-a="${o.act}" data-v="${h.id}" aria-current="${!!o.sel}"><span class="rs-av">${rsFace(h)}</span><span class="tx"><b>${h.n}</b><small>${o.sub != null ? o.sub : h.cls}</small></span>${o.right || ''}</button>`;
+}
+/* «Все герои» — состав игры с фильтрами, «Мои» — герои аккаунта */
+function rsViewTabs(all) {
+  const v = S.hview === 'mine' ? 'mine' : 'all', tabs = [['all', 'Все герои', all], ['mine', 'Мои', S.heroes.length + Object.keys(S.rs.owned).length]];
+  return `<div class="tabs" role="tablist" aria-label="Коллекция">${tabs.map(([k, l, n]) => `<button role="tab" aria-selected="${v === k}" data-a="hview" data-v="${k}">${l} · ${n}</button>`).join('')}</div>`;
+}
+function rsHead(h, v, aside) {
+  const own = S.rs.owned[h.id];
+  return `<div class="hd-top">
+    <div class="hd-face" data-r="${h.r}">${rsFace(h)}</div>
+    <div class="col" style="gap:5px;min-width:0">
+      <div class="hd-name"><h2>${h.n}</h2></div>
+      <div class="row" style="flex-wrap:wrap;gap:5px"><span class="chip wr">${ic(RS_CLS_IC[h.cl[0]] || 'gem')}${h.cls}</span>${el(h.sch)}<span class="chip">${h.race}</span></div>
+      <div class="row" style="gap:8px;flex-wrap:wrap">${rar(h.r)}<span class="faint caps">цикл ${ROMAN[h.c]}</span>${rsSrcChip(h)}</div>
+    </div>
+    ${aside ? `<div class="hd-bm rs-aside">${aside}</div>` : `<div class="hd-bm"><span class="eyebrow">доблесть</span><span class="row" style="gap:6px"><span class="stars lg" title="Доблесть ${v} из ${h.maxV}">${stars(v, h.maxV)}</span><span class="faint num" style="font-size:12px">${v}/${h.maxV}</span></span>${own ? `<small class="faint num">ур. ${own.lvl} · РП ${own.lim}</small>` : ''}</div>`}
+  </div>`;
+}
+/* личный максимум задаёт источник (ADR-0019): у Эхо и доната — по циклу героя */
+function rsMaxTxt(h) {
+  const I = RS.srcInfo[h.src]; if (!I) return '';
+  if (I.byCycle) return `у ${RS_SRC_OF[h.src]} — номер цикла − 1`;
+  return I.maxV[0] === I.maxV[1] ? `как у всех ${RS_SRC_OF[h.src]}` : `у ${RS_SRC_OF[h.src]} — ${I.maxV[0]}–${I.maxV[1]}`;
+}
+function rsSrcLong(h) {
+  if (h.src === 'gold') return `Найм за золото · №${h.no} в каталоге цикла ${ROMAN[h.c]}${h.tut ? ' · <span class="rs-tut">обучение</span>' : ''}`;
+  if (h.src === 'donat') { const s = RSS[h.dset]; return `Донатный сет «${s.name}» за Энериум · ${h.place}-й из ${s.members.length}`; }
+  if (h.src === 'roulette') return 'Возрождение душ: осколки, пробуждение душами';
+  if (h.src === 'echo') { const w = RS.weeks.find(x => x.race === h.week) || { gen: h.week }; return `Эхо · неделя ${w.gen}: отряд, отбивший ${w.civ ? `нашествие цивилизации ${w.civ} — «${w.raid}»` : 'нашествие'}. Осколки — из сундуков за места`; }
+  return 'Скрытый рецепт крафта: его находят перебором';
+}
+function rsWhoHtml(h) {
+  const facts = [['Откуда', rsSrcLong(h)], ['Доблесть', `максимум ${h.maxV} · ${rsMaxTxt(h)}`]]
+    .concat(h.avers ? [['Неприязнь', h.avers.race ? `${rsAversShort(h)}. Особенность героя Эхо, не способность: действует везде, где встречаются враги этой расы` : h.avers.text || '']] : [])
+    .concat([['Приходит', '0 ур. · 0 РП · 0 Добл'], [h.maxV > 1 ? 'Главы' : 'Глава', h.chT.map((t, i) => '«' + rsChTitle(h, i) + '»').join(' · ')]]);
+  return `${h.src === 'donat' ? `<p class="reason">Безликий: лица нет — стёрлось. Имя и облик видны сразу, себя он вспомнит на последней доблести.</p>` : ''}
+    <p class="quote">${h.who}</p>
+    <dl class="kv rs-kv">${facts.map(([k, x]) => `<dt>${k}</dt><dd>${x}</dd>`).join('')}</dl>
+    ${KH.team && h.team ? rsTeamHtml(h) : ''}`;
+}
+function rsTeamHtml(h) {
+  const T = h.team, sets = (T.sets || []).map(k => RSS[k]).filter(Boolean);
+  return `<div class="kh-team">${T.draft ? `<p><b>Черновик:</b> ${T.draft}</p>` : ''}${sets.map(s => `<p><b>Орден:</b> ${s.name}${s.proposed ? ' — предложение, ждёт автора' : ''}${T.also === s.key ? '. «Хитрый переход»: он и в донатном сете, и в ордене (ADR-0023, п. 11)' : ''}</p>`).join('')}${(T.notes || []).map(x => `<p>${x}</p>`).join('')}</div>`;
+}
+/* «Воспоминания героя»: заголовки глав видны до открытия (§33.1), текст — по доблести; нет текста в главы/цикл-N.md — только заголовок */
+function rsChaptersHtml(h, v) {
+  const rows = [`<div class="chap"><span class="n">·</span><div><b>Обрывки личности</b><small class="faint" style="display:block">${h.src === 'donat' ? 'Лица нет, кем был — не помнит. Остались ремесло и чужие голоса.' : 'Остались лишь обрывки: голоса, дорога и чувство утраты.'}</small></div></div>`];
+  h.chT.forEach((_, i) => {
+    const no = i + 1, x = h.ch && h.ch[i], title = rsChTitle(h, i);
+    rows.push(no <= v
+      ? `<div class="chap"><span class="n">${ROMAN[no]}</span><div><b>${title}</b>${x && x[1].length ? x[1].map(p => `<p class="rs-p">${p}</p>`).join('') : '<small class="faint" style="display:block">Текст главы пишется — пока только заголовок.</small>'}</div></div>`
+      : `<div class="chap lock"><span class="n">${ROMAN[no]}</span><div><b>${title}</b><small style="display:block">Откроется на доблести ${no}${no === h.maxV ? ' · последний день' : ''}</small></div></div>`);
+  });
+  return rows.join('');
+}
+const rsValorPick = (h, v) => `<div class="row rs-vp"><span class="eyebrow">доблесть · примерить</span><div class="qty" role="group" aria-label="Доблесть героя, демо">${Array.from({ length: h.maxV + 1 }, (_, i) => `<button aria-pressed="${i === v}" data-a="rsval" data-v="${h.id}:${i}">${i}</button>`).join('')}</div></div>`;
+/* ступени сета — по сумме максимумов (ADR-0022, п. 6), условия — §30 */
+function rsTierRows(s) {
+  const R = RS.rules, size = s.members.length;
+  return Array.from({ length: rsTiers(s.sum) }, (_, i) => {
+    const need = R.tierNeed[i];
+    const cond = need != null ? `${need} ${plural(need, 'участник', 'участника', 'участников')} с доблестью от ${R.tierValor}` : `все ${size} на личных максимумах`;
+    return `<tr><td>${ROMAN[i + 1]}</td><td>${cond}</td><td class="num">${s.n && s.n[i] != null ? 'N = ' + fmt(s.n[i]) : ''}</td></tr>`;
+  }).join('');
+}
+/* сет: донатный виден целиком, у ордена игрок знает только своего героя; «для команды» — всех */
+function rsSetBox(s, h, o = {}) {
+  if (!s) return '';
+  const donat = s.kind === 'donat', riddle = !!(h && h.team && h.team.also === s.key), n = rsTiers(s.sum);
+  const pick = o.pick || (id => `data-a="rssel" data-v="${id}"`);
+  const mem = s.members.map(id => {
+    const m = RSI[id], me = !!h && id === h.id;
+    return donat || KH.team || me ? `<button ${pick(id)} class="${me ? 'me' : ''}" title="${m.cls} · максимум доблести ${m.maxV}">${el(m.sch, true)}${m.n}<small>${m.maxV}</small></button>` : '<span class="unk" title="Игрок вычисляет по главам">? · скрыт</span>';
+  }).join('');
+  return `<div class="kh-set rs-set">
+    <div class="row" style="gap:6px;flex-wrap:wrap"><h4>${donat ? '«' + s.name + '»' : s.name}</h4><span class="chip ${donat ? 'spirit' : 'gold'}">${donat ? 'донатный сет' : 'орден'}</span>${s.proposed && KH.team ? '<span class="chip warn">предложение</span>' : ''}${riddle ? '<span class="chip warn">загадка</span>' : ''}<span class="faint" style="font-size:12px">цикл ${ROMAN[s.cycle]}</span></div>
+    ${riddle ? '<p class="reason">Главы не отвечают прямо, остался ли он в ордене: последнюю можно понять и так, и так.</p>' : ''}
+    <div class="kh-mem">${mem}</div>
+    <p class="muted" style="font-size:12.5px">Сумма максимумов доблести — <b class="num">${s.sum}</b>: ${n ? n + ' ' + plural(n, 'ступень', 'ступени', 'ступеней') : 'ступеней нет'}.${donat ? ' Герой приходит с 0 доблести — ступень I включит первая руна доблести.' : ''}</p>
+    ${s.bonus ? `<p style="font-size:13px;color:var(--parch-2)">${s.bonus}</p>` : '<p class="faint" style="font-size:12.5px">Бонус ордена ещё не задан.</p>'}
+    ${n ? `<table class="kh-tiers">${rsTierRows(s)}</table>` : ''}
+  </div>`;
+}
+/* орден скрыт до последней доблести (ADR-0022, п. 5), кроме режима «для команды»; донатный сет виден сразу */
+function rsSetHtml(h, v, o = {}) {
+  const hidden = (h.team && h.team.sets) || [], open = v >= h.maxV || KH.team;
+  const out = h.dset ? [rsSetBox(RSS[h.dset], h, o)] : [];
+  if (open) {
+    hidden.forEach(k => out.push(rsSetBox(RSS[k], h, o)));
+    if (!hidden.length) out.push('<div class="pnl pad rs-none"><b class="serif">Вне орденов</b><p class="faint">Последняя глава никого не называет: не каждый герой состоит в ордене.</p></div>');
+    if (KH.team && v < h.maxV && hidden.length) out.push(`<p class="reason warn">Игрок увидит орден на доблести ${h.maxV}.</p>`);
+  } else out.push(`<div class="pnl pad rs-none"><b class="serif">Орден не раскрыт</b><p class="faint">Состоит ли герой в ордене, откроет последняя доблесть — глава «${rsChTitle(h, h.maxV - 1)}». Неизвестные участники остаются скрытыми.</p></div>`);
+  return out.join('');
+}
+function rsGetHtml(h) {
+  const own = S.rs.owned[h.id], old = rsOld(h);
+  if (old) return `<span class="eyebrow">В коллекции · отряд боя</span><p class="muted" style="font-size:13px">В бой прототипа ${old.name} идёт на прежнем наборе способностей: доблесть отряда — до пересчёта обучения под максимум ${h.maxV}.</p><button class="btn sm" data-a="rsmine" data-v="${old.id}">${ic('up')}Развитие</button>`;
+  if (own) return `<span class="eyebrow">В коллекции · ${RS_HOW[own.how] || ''}</span><div class="row" style="gap:16px"><div class="stat"><b>${own.lvl}</b><small>уровень</small></div><div class="stat"><b>${own.lim}</b><small>рунный предел</small></div><div class="stat"><b>${own.valor}/${h.maxV}</b><small>доблесть</small></div></div><p class="reason">Дальше — уровень, руны предела и доблести, как у всех героев. Бой прототипа пока идёт на героях с наборами способностей.</p>`;
+  const how = {
+    gold: `Найм за золото. Цена — по счёту покупки: следующий герой цикла ${ROMAN[h.c]} стоит ${fmt(rsGold(h.c, rsBought(h.c) + 1))} золота.`,
+    donat: `Донатный сет «${h.dset && RSS[h.dset] ? RSS[h.dset].name : ''}» за Энериум: любого из пятерых, первый дешевле всех.`,
+    roulette: 'Возрождение душ даёт осколки или, реже, полный чертёж. Недостающие осколки — за прах, собранного героя пробуждают души.',
+    echo: 'Сундуки Эхо за места дают осколки отряда недели. Недостающие — за прах, собранного героя пробуждают души.',
+    craft: 'Скрытый рецепт: его находят перебором в Мастерской.',
+  }[h.src] || '';
+  const go = h.src === 'craft' ? '' : `<button class="btn sm" data-a="rsgo" data-v="${h.id}">${ic('arrow')}${h.src === 'gold' ? 'К найму' : h.src === 'donat' ? 'В витрину' : 'К душам'}</button>`;
+  return `<span class="eyebrow">Как получить</span><p class="muted" style="font-size:13px">${how}</p>${h.c > rsCyc() ? `<span class="chip warn">${ic('lock')}откроется в цикле ${ROMAN[h.c]}</span>` : ''}${go}`;
+}
+function rsDetail(h) {
+  if (!h) return '<div class="pnl hd"><p class="faint">Выберите героя.</p></div>';
+  const t = S.seg.rhero || 'who', v = rsV(h);
+  const body = t === 'mem' ? `<div class="col scroll grow" style="gap:6px" data-keep="rsmem:${h.id}">${rsValorPick(h, v)}${rsChaptersHtml(h, v)}</div>`
+    : t === 'set' ? `<div class="col scroll grow" style="gap:8px" data-keep="rsset:${h.id}">${rsValorPick(h, v)}${rsSetHtml(h, v)}</div>`
+    : `<div class="hd-cols"><div class="col scroll" style="gap:8px">${rsWhoHtml(h)}</div><div class="col scroll" style="gap:8px">${rsGetHtml(h)}</div></div>`;
+  const team = `<button class="iconbtn rs-team" data-a="rsteam" aria-pressed="${!!KH.team}" aria-label="Для команды" title="Для команды: орден, черновик и заметки видны сразу">${ic('eye')}</button>`;
+  return `<div class="pnl hd">${rsHead(h, v)}<div class="hd-body"><div class="row" style="justify-content:space-between"><div class="tabs" role="tablist" aria-label="Разделы героя">${[['who', 'Герой'], ['mem', 'Воспоминания'], ['set', 'Орден']].map(([k, l]) => `<button role="tab" aria-selected="${t === k}" data-a="seg" data-v="rhero:${k}">${l}</button>`).join('')}</div>${team}</div>${body}</div></div>`;
+}
+const RS_NODATA = '<section class="scr"><div class="pnl pad"><p class="faint">Нет данных: рядом с index.html должен лежать roster.js.</p></div></section>';
+function rsCollView() {
+  if (!RS.heroes.length) return RS_NODATA;
+  const f = S.rs.f, list = RS.heroes.filter(rsFilter), sel = RSI[S.rs.sel] || list[0] || RS.heroes[0];
+  const opt = (v, t, cur) => `<option value="${v}" ${String(cur) === String(v) ? 'selected' : ''}>${t}</option>`;
+  const grid = list.map(h => rsCard(h, { sel: h.id === sel.id })).join('') || '<p class="faint" style="grid-column:1/-1">Никого: ослабьте фильтры</p>';
+  return `<section class="scr"><div class="hs">
+    <div class="pnl coll">
+      ${rsViewTabs(list.length)}
+      <div class="row rs-filters">
+        <select class="rs-sel" data-a="rsf" data-v="cyc" aria-label="Цикл">${opt('', 'Цикл', f.cyc)}${ROMAN.slice(1).map((r, i) => opt(i + 1, 'Цикл ' + r, f.cyc)).join('')}</select>
+        <select class="rs-sel" data-a="rsf" data-v="src" aria-label="Источник">${opt('', 'Откуда', f.src)}${RS.sources.map(k => opt(k, RS_SRC_ONE[k], f.src)).join('')}</select>
+        <select class="rs-sel" data-a="rsf" data-v="cls" aria-label="Класс">${opt('', 'Класс', f.cls)}${RS.classes.map(k => opt(k, k, f.cls)).join('')}</select>
+      </div>
+      <div class="coll-grid scroll grow" data-keep="rsgrid:${f.cyc}:${f.src}:${f.cls}">${grid}</div>
+    </div>
+    ${rsDetail(sel)}
+  </div></section>`;
 }
 function heroHead(h, bmLabel = 'боевая мощь') {
   return `<div class="hd-top">
@@ -2078,33 +2346,131 @@ function squadsView() {
     </div>
   </div></section>`;
 }
+/* ================== Призыв: три способа получить героя (ADR-0019) ==================
+   За золото — каталог цикла, цена по счёту покупки (ADR-0023); за Энериум — донатный сет цикла, с цикла II (ADR-0021);
+   за души — возрождение душ, осколки отряда Эхо недели и каталог праха (§15, ADR-0023). Цикл I–VI переключается для демо. */
 function hireView() {
-  const o = S.offers.find(x => x.id === S.selOffer);
-  const dust = S.wallet.dust;
-  return `<section class="scr"><div class="hs">
+  if (!RS.heroes.length) return RS_NODATA;
+  const t = S.seg.hire || 'gold', c = rsCyc();
+  const tabs = [['gold', 'За золото'], ['donat', 'За Энериум'], ['souls', 'За души']];
+  return `<section class="scr">
+    <div class="row rs-hbar"><div class="tabs" role="tablist" aria-label="Способ получить героя">${tabs.map(([k, l]) => `<button role="tab" aria-selected="${t === k}" data-a="seg" data-v="hire:${k}">${l}</button>`).join('')}</div>
+      <span class="g-spacer"></span><span class="eyebrow">цикл · демо</span>
+      <div class="tabs rs-cyc" role="tablist" aria-label="Текущий цикл, демо">${ROMAN.slice(1).map((r, i) => `<button role="tab" aria-selected="${c === i + 1}" data-a="rscyc" data-v="${i + 1}">${r}</button>`).join('')}</div></div>
+    ${t === 'donat' ? rsDonatView() : t === 'souls' ? rsSoulsView() : rsGoldView()}
+  </section>`;
+}
+/* за золото: каталог цикла, «№» — только порядок; цена k-й покупки цикла растёт линейно, максимум доблести — 1 */
+function rsGoldView() {
+  const cur = rsCyc(), c = S.rs.gcyc || cur, open = c <= cur, k = rsBought(c) + 1;
+  const cat = RS.heroes.filter(h => h.src === 'gold' && h.c === c).sort((a, b) => a.no - b.no);
+  const sel = cat.find(h => h.id === S.rs.gsel) || cat.find(h => !rsHas(h)) || cat[0];
+  const opts = ROMAN.slice(1).map((r, i) => `<option value="${i + 1}" ${i + 1 === c ? 'selected' : ''}>Каталог цикла ${r}${i + 1 > cur ? ' · закрыт' : ''}</option>`).join('');
+  const rows = cat.map(h => rsRow(h, { act: 'gsel', sel: sel && h.id === sel.id, sub: `${h.cls}${h.tut ? ' · <span class="rs-tut">обучение</span>' : ''}`, right: rsHas(h) ? `<span class="chip gold">${ic('check')}есть</span>` : `<span class="faint num">№${h.no}</span>` })).join('');
+  return `<div class="hs rs-hs">
     <div class="pnl coll">
-      <span class="eyebrow">За золото</span>
-      <div class="col" style="gap:6px">${S.offers.map(x => `<button class="preset" data-a="offer" data-v="${x.id}" aria-current="${x.id === o.id}" style="flex-direction:row;align-items:center;gap:10px"><img src="${x.img}" alt="" style="width:40px;height:40px;border-radius:8px;object-fit:cover;${x.locked ? 'filter:grayscale(1) brightness(.6)' : ''}"><span class="col" style="gap:3px;flex:1"><b>${x.name}</b>${rar(x.r)}</span>${x.locked ? `<span class="chip">${ic('lock')}ц. ${ROMAN[x.cycle]}</span>` : money('gold', x.price)}</button>`).join('')}</div>
-      <div class="hr"></div>
-      <span class="eyebrow">Возрождение душ</span>
-      <div class="rebirth"><img src="${AV('heroes/h3.jpg')}" alt=""><div class="col" style="gap:4px;flex:1"><b class="serif" style="font-size:16px">Лаэйра · осколки</b>${bar(84)}<small class="faint">42 / 50 · активация 800 душ</small></div></div>
-      <div class="row" style="gap:6px"><button class="btn sm" data-a="toast" data-v="Прокрутка возрождения: демо">Прокрутка${costTag('enerium', 100)}</button><button class="btn sm ghost" data-a="sheet" data-v="cur:dust"><img src="${DUST}" alt="" width="16" height="16">${fmt(dust)} праха</button></div>
+      <div class="row"><select class="rs-sel grow" data-a="gcyc" aria-label="Каталог героев за золото">${opts}</select><span class="chip" title="Нанято героев этого каталога">${k - 1} / ${cat.length}</span></div>
+      <p class="rs-next">${open ? `Следующая покупка — ${k}-я в цикле:${money('gold', rsGold(c, k))}` : `${ic('lock')}Каталог откроется в цикле ${ROMAN[c]} — героев можно изучить заранее`}</p>
+      <div class="rs-list scroll grow" data-keep="gcat:${c}">${rows}</div>
     </div>
-    <div class="pnl hd">${heroHead({ ...o, valor: 0, lvl: 1 }, 'мощь на старте')}
-      <div class="hd-body">
-        <div class="hd-cols">
-          <div class="col" style="gap:6px"><span class="eyebrow">Потенциал</span>
-            <p class="muted" style="font-size:13.5px">Доблестей: ${o.maxV}. Столько же глав истории и способностей по мере доблести.</p>
-            <span class="eyebrow" style="margin-top:4px">Способности класса</span>
-            <div class="row" style="flex-wrap:wrap;gap:5px">${(o.cls === 'Танк' ? ['Вызов', 'Удар щитом', 'Несгибаемость'] : o.cls === 'Физ. ДД' ? ['Быстрый выпад', 'Шквал', 'Точность'] : ['Разряд', 'Прожигание', 'Средоточие']).map(n => `<span class="chip">${n}</span>`).join('')}</div>
-          </div>
-          <div class="col" style="gap:8px;justify-content:flex-end;align-items:flex-end;text-align:right">
-            ${o.locked ? `<span class="chip warn">${ic('lock')}${o.locked}</span><p class="reason">Способности можно изучить заранее.</p>` : `<p class="reason">После приглашения герой появится в коллекции.</p><button class="btn go" data-a="hire">Пригласить${costTag('gold', o.price)}</button>`}
-          </div>
-        </div>
+    ${sel ? rsGoldCard(sel, c, k, open) : '<div class="pnl hd"></div>'}
+  </div>`;
+}
+function rsGoldCard(h, c, k, open) {
+  const g = RS.rules.gold, price = rsGold(c, k);
+  const aside = rsHas(h) ? `<span class="chip gold">${ic('check')}в коллекции</span><button class="link" data-a="rsopen" data-v="${h.id}">Открыть ${ic('chev')}</button>`
+    : open ? `<div class="stat"><b>${fmt(price)}</b><small>${k}-я покупка цикла ${ROMAN[c]}</small></div><button class="btn go" data-a="gbuy" data-v="${h.id}">Нанять${costTag('gold', price)}</button>`
+    : `<span class="chip warn">${ic('lock')}цикл ${ROMAN[c]}</span><small class="faint">витрина до перехода</small>`;
+  const next = Array.from({ length: g.preview }, (_, i) => k + i).map(n => `<div class="srow"><span class="n">${n}-я покупка цикла ${ROMAN[c]}</span><span class="v">${fmt(rsGold(c, n))}</span><span></span></div>`).join('');
+  return `<div class="pnl hd">${rsHead(h, 0, aside)}
+    <div class="hd-body"><div class="hd-cols">
+      <div class="col scroll" style="gap:8px">${rsWhoHtml(h)}</div>
+      <div class="col scroll" style="gap:6px">
+        <span class="eyebrow">Цена — по счёту покупки</span>
+        <p class="reason num">${fmt(g.first)} × ${c} × (1 + ${pctBp(g.stepBp)} × (${k} − 1)) = ${fmt(price)}</p>
+        <div class="stats">${next}</div>
+        <p class="reason">№ в каталоге — только порядок. Какого героя брать, решаете вы: цена растёт с каждой покупкой в цикле, и всех героев цикла к его концу не выкупить.</p>
       </div>
+    </div></div></div>`;
+}
+/* за Энериум: донатный сет цикла — пятеро Безликих, любой из пяти, цена растёт от первого к пятому; в цикле I — обучение */
+function rsDonatView() {
+  const cur = rsCyc(), from = rsFrom('donat'), sets = RS.sets.filter(s => s.kind === 'donat').sort((a, b) => a.cycle - b.cycle);
+  if (!sets.length) return '<div class="pnl pad rs-closed"><p class="faint">Донатных сетов нет в данных.</p></div>';
+  if (cur < from) return `<div class="pnl rs-closed fit"><span class="eyebrow">Цикл ${ROMAN[cur]} · обучение</span><h2>Донатных сетов в цикле ${ROMAN[cur]} нет</h2>
+    <p class="muted">Это обучение: за Энериум героев не продают. С цикла ${ROMAN[from]} на каждом новом цикле открывается донатный сет — пятеро Безликих. Первый — «${sets[0].name}».</p>
+    <p class="reason">Купить можно любого из пятерых: первый дешевле всех, пятый дороже всех. Сила донатных героев — в пользе для аккаунта, а не в бою.</p></div>`;
+  const s = sets.find(x => x.cycle === (S.rs.dcyc || cur)) || sets.filter(x => x.cycle <= cur).pop() || sets[0], open = s.cycle <= cur;
+  const sel = RSI[s.members.find(id => id === S.rs.dsel) || s.members.find(id => !rsHas(RSI[id])) || s.members[0]];
+  const opts = sets.map(x => `<option value="${x.cycle}" ${x === s ? 'selected' : ''}>Сет цикла ${ROMAN[x.cycle]} · «${x.name}»${x.cycle > cur ? ' · закрыт' : ''}</option>`).join('');
+  const rows = s.members.map(id => { const h = RSI[id]; return rsRow(h, { act: 'dsel', sel: h === sel, sub: `${h.place}-й · ${h.cls}`, right: rsHas(h) ? `<span class="chip gold">${ic('check')}есть</span>` : money('enerium', rsDonatPrice(h)) }); }).join('');
+  return `<div class="hs rs-hs">
+    <div class="pnl coll">
+      <select class="rs-sel" data-a="dcyc" aria-label="Донатный сет">${opts}</select>
+      <p class="rs-next">Безликие: лица нет, имя и облик видны сразу. Цена растёт от первого к пятому<span class="chip warn" title="Цен героев за Энериум в источниках нет — заглушка прототипа">цены — заглушка</span></p>
+      <div class="rs-list scroll grow" data-keep="dset:${s.cycle}">${rows}${rsSetBox(s, null, { pick: id => `data-a="dsel" data-v="${id}"` })}</div>
     </div>
-  </div></section>`;
+    ${rsDonatCard(sel, s, open)}
+  </div>`;
+}
+function rsDonatCard(h, s, open) {
+  const price = rsDonatPrice(h);
+  const aside = rsHas(h) ? `<span class="chip gold">${ic('check')}в коллекции</span><button class="link" data-a="rsopen" data-v="${h.id}">Открыть ${ic('chev')}</button>`
+    : open ? `<div class="stat"><b>${fmt(price)}</b><small>${h.place}-й из ${s.members.length} · заглушка</small></div><button class="btn go" data-a="dbuy" data-v="${h.id}">Купить${costTag('enerium', price)}</button>`
+    : `<span class="chip warn">${ic('lock')}цикл ${ROMAN[s.cycle]}</span><small class="faint">откроется при переходе</small>`;
+  return `<div class="pnl hd">${rsHead(h, 0, aside)}
+    <div class="hd-body"><div class="hd-cols">
+      <div class="col scroll" style="gap:8px">${rsWhoHtml(h)}</div>
+      <div class="col scroll" style="gap:6px"><span class="eyebrow">Воспоминания · по доблести</span>${rsChaptersHtml(h, 0)}</div>
+    </div></div></div>`;
+}
+/* за души: возрождение душ, отряд Эхо недели, каталог праха; собранного героя пробуждают души */
+function rsSoulsView() {
+  return `<div class="rs-souls">${rsRouletteCol()}${rsEchoCol()}${rsDustCol()}</div>`;
+}
+const rsShardTag = h => rsHas(h) ? `<span class="chip gold">${ic('check')}есть</span>` : `<span class="faint num">${S.rs.shards[h.id] || 0}/${RS.rules.stub.shards}</span>`;
+function rsRouletteCol() {
+  const cur = rsCyc(), from = rsFrom('roulette'), I = RS.srcInfo.roulette, R = RS.rules, last = RSI[S.rs.last];
+  const head = `<div class="rs-colh"><span class="eyebrow">Возрождение душ</span><b>Рулетка · цикл ${ROMAN[cur]}</b><small class="faint">${I ? `герои с максимумом доблести ${I.maxV[0]}–${I.maxV[1]}: ` : ''}осколки или, реже, полный чертёж. Героев прошлых циклов — в каталоге праха</small></div>`;
+  if (cur < from) return `<div class="pnl rs-col">${head}<p class="rs-line">${ic('lock')}Откроется с цикла ${ROMAN[from]}.</p></div>`;
+  const rows = rsPool().map(h => rsRow(h, { act: 'ssel', sel: S.rs.ssel === h.id, sub: `${RAR[h.r]} · доблесть до ${h.maxV}`, right: rsShardTag(h) })).join('') || '<p class="faint">В пуле этого цикла героев нет.</p>';
+  return `<div class="pnl rs-col">${head}
+    <div class="rs-list scroll grow" data-keep="roul:${cur}">${rows}</div>
+    <div class="rs-colf"><p class="reason">${last ? `Прошлая прокрутка: <b>${last.n}</b> · осколков +${R.stub.spinShards} (заглушка)` : 'Результат решает сервер; в прототипе — по очереди из пула.'}</p><button class="btn go sm" data-a="spin">Прокрутка${costTag('enerium', R.spin)}</button></div>
+  </div>`;
+}
+function rsEchoCol() {
+  const cur = rsCyc(), from = rsFrom('echo'), W = rsWeek();
+  const squad = W ? W.squad.map(id => RSI[id]).filter(Boolean) : [];
+  const to = squad.length ? squad[squad.length - 1].c : from;
+  const wsel = `<select class="rs-sel" data-a="sweek" aria-label="Неделя расы, демо">${RS.weeks.map(w => `<option value="${w.race}" ${w === W ? 'selected' : ''}>Неделя ${w.gen}</option>`).join('')}</select>`;
+  const head = `<div class="rs-colh"><span class="eyebrow">Эхо · отряд недели</span>${wsel}${W && W.civ ? `<b>${W.civ}</b><small class="faint">древняя цивилизация, жившая задолго до этеров. Её нашествие «${W.raid}» отбил этот отряд — по герою за цикл, с ${ROMAN[from]} по ${ROMAN[to]}</small>` :`<small class="faint">отряд, отбивший нашествие древней цивилизации; по герою за цикл, с ${ROMAN[from]} по ${ROMAN[to]}</small>`}</div>`;
+  if (cur < from) return `<div class="pnl rs-col">${head}<p class="rs-line">${ic('lock')}Эхо откроется с цикла ${ROMAN[from]}.</p></div>`;
+  const av = squad.find(h => h.avers && h.avers.race);
+  const rows = squad.map(h => { const open = h.c <= cur; return rsRow(h, { act: 'ssel', sel: S.rs.ssel === h.id, dim: !open, sub: open ? `цикл ${ROMAN[h.c]} · доблесть до ${h.maxV}` : `откроется в цикле ${ROMAN[h.c]}`, right: open ? rsShardTag(h) : ic('lock') }); }).join('');
+  return `<div class="pnl rs-col">${head}
+    ${av ? `<p class="rs-line">${ic('target')}Неприязнь: ${rsAversShort(av)}</p>` : ''}
+    <div class="rs-list scroll grow">${rows}</div>
+    <div class="rs-colf"><p class="reason">Осколки открытых к циклу героев — в сундуках Эхо за места; недостающие — за прах.</p><button class="link" data-a="sheet" data-v="gifts">Дары путешествия ${ic('chev')}</button></div>
+  </div>`;
+}
+function rsDustCol() {
+  const cur = rsCyc(), R = RS.rules, need = R.stub.shards, sel = RSI[S.rs.ssel];
+  const cat = RS.heroes.filter(h => RS_SHARD.includes(h.src) && h.c <= cur && !rsHas(h));
+  const rows = cat.map(h => rsRow(h, { act: 'ssel', sel: !!sel && sel.id === h.id, sub: `${RS_SRC_ONE[h.src]} · осколок ${fmt(rsShardPrice(h))} праха`, right: rsShardTag(h) })).join('') || '<p class="faint">Все герои доступных циклов собраны.</p>';
+  let foot = '<p class="reason">Выберите героя: осколки — за прах, собранного пробуждают души.</p>';
+  if (sel && RS_SHARD.includes(sel.src)) {
+    const n = S.rs.shards[sel.id] || 0;
+    foot = rsHas(sel) ? `<p class="reason"><b>${sel.n}</b> уже в коллекции: его повторные осколки уходят в прах — ${fmt(rsDustOf(sel))} за осколок.</p>`
+      : `<div class="row" style="gap:6px;justify-content:space-between"><b class="serif" style="font-size:15px">${sel.n}</b><button class="link" data-a="rhero" data-v="${sel.id}">Карточка ${ic('chev')}</button></div>
+        ${bar(Math.min(100, n * 100 / need))}<small class="faint num">осколков ${n} / ${need} · число — заглушка</small>
+        <div class="row" style="gap:6px"><button class="btn sm" data-a="dustbuy" data-v="${sel.id}" ${sel.c <= cur ? '' : 'disabled'}>Осколок${costTag('dust', rsShardPrice(sel))}</button><button class="btn go sm" data-a="activate" data-v="${sel.id}" ${n >= need ? '' : 'disabled'}>Пробудить${costTag('souls', R.stub.activateSouls)}</button></div>`;
+  }
+  return `<div class="pnl rs-col">
+    <div class="rs-colh"><span class="eyebrow">Каталог праха</span><span class="row" style="gap:8px"><b>Прах душ</b>${money('dust', S.wallet.dust)}</span><small class="faint">цена осколка — по редкости и циклу героя</small></div>
+    <div class="rs-list scroll grow" data-keep="dust:${cur}">${rows}</div>
+    <div class="rs-colf">${foot}</div>
+  </div>`;
 }
 
 /* ================== Ремесло ================== */
@@ -2609,6 +2975,13 @@ function dialog(title, body, foot = '', cls = '') {
     <div class="dlg fit ${cls}"><div class="dlg-h"><h2>${title}</h2><button class="iconbtn x" data-a="close" aria-label="Закрыть">${ic('x')}</button></div><div class="dlg-b">${body}</div>${foot ? `<div class="dlg-f">${foot}</div>` : ''}</div></div>`;
 }
 const OV = {
+  /* полная карточка героя состава поверх любого экрана (§15.1: из каталога праха — полная карточка) */
+  rhero(o) {
+    const h = RSI[o.arg]; if (!h) return '';
+    const v = rsV(h);
+    return sheet(h.n, `${rsHead(h, v)}${rsWhoHtml(h)}<span class="eyebrow">Воспоминания</span>${rsChaptersHtml(h, v)}<span class="eyebrow">Орден и сет</span>${rsSetHtml(h, v)}`,
+      `<button class="link" data-a="rsopen" data-v="${h.id}">${ic('users')}В коллекции</button>`, true);
+  },
   prep(o) {
     const echo = o.arg === 'echo';
     const cur = echo ? S.echoSquad : S.prepSquad;
@@ -2799,7 +3172,68 @@ const ACT = {
   hero(v) { S.selHero = v; render(); },
   hfilter(v) { S.hfilter = v; render(); },
   hsort() { S.hsort = S.hsort === 'bm' ? null : 'bm'; render(); },
-  'hero-open'(v) { S.selHero = v; S.seg.heroes = 'coll'; go('heroes'); },
+  'hero-open'(v) { S.selHero = v; S.seg.heroes = 'coll'; S.hview = 'mine'; go('heroes'); },
+  /* коллекция на составе героев (roster.js) */
+  hview(v) { S.hview = v; render(); },
+  rssel(v) { if (!RSI[v]) return; S.rs.sel = v; S.rs.val = null; S.hview = 'all'; S.seg.heroes = 'coll'; go('heroes'); },
+  rsopen(v) { ACT.rssel(v); },
+  rsmine(v) { S.hview = 'mine'; S.selHero = v; S.seg.hero = 'power'; render(); },
+  rsf(v, t) { S.rs.f[v] = t.value; render(); },
+  rsval(v) { const [id, n] = v.split(':'); S.rs.val = { id, v: +n }; render(); },
+  rsteam() { KH.team = !KH.team; render(); khPaint(); rkPaint(); },
+  rsgo(v) {
+    const h = RSI[v]; if (!h) return;
+    const lift = h.src !== 'gold' && h.c > rsCyc();   // сет и осколки видны только открытым циклам — демо поднимает цикл
+    S.seg.heroes = 'hire';
+    if (h.src === 'gold') { S.seg.hire = 'gold'; S.rs.gcyc = h.c; S.rs.gsel = v; }
+    else if (h.src === 'donat') { S.seg.hire = 'donat'; S.rs.dcyc = h.c; S.rs.dsel = v; }
+    else { S.seg.hire = 'souls'; S.rs.ssel = v; if (h.week) rsSetWeek(h.week); }
+    if (lift) S.rs.cyc = h.c;
+    go('heroes');
+    if (lift) toast(`Демо: текущий цикл — ${ROMAN[h.c]}`);
+  },
+  /* Призыв: за золото, за Энериум, за души (ADR-0019) */
+  rscyc(v) { S.rs.cyc = +v; S.rs.gcyc = 0; S.rs.dcyc = 0; render(); },
+  gcyc(v, t) { S.rs.gcyc = +t.value; S.rs.gsel = ''; render(); },
+  dcyc(v, t) { S.rs.dcyc = +t.value; S.rs.dsel = ''; render(); },
+  gsel(v) { S.rs.gsel = v; render(); },
+  dsel(v) { S.rs.dsel = v; render(); },
+  ssel(v) { S.rs.ssel = v; render(); },
+  sweek(v, t) { rsSetWeek(t.value); render(); },
+  rhero(v) { open('rhero', v); },
+  gbuy(v) {
+    const h = RSI[v]; if (!h || rsHas(h) || h.c > rsCyc()) return;
+    const k = rsBought(h.c) + 1;
+    S.overlay = { t: 'confirm', title: 'Нанять героя', text: `${h.n} придёт в коллекцию с 0 уровнем, 0 рунных пределов и 0 доблести. Это ${k}-я покупка каталога цикла ${ROMAN[h.c]}: следующая будет стоить ${fmt(rsGold(h.c, k + 1))}.`, ok: 'Нанять', act: 'gbuydo', v, cost: ['gold', rsGold(h.c, k)] };
+    render(); focusOverlay();
+  },
+  gbuydo(v) { const h = RSI[v]; if (!h || rsHas(h)) return close(); if (!spend('gold', rsGold(h.c, rsBought(h.c) + 1))) return close(); rsAdd(h, 'gold'); S.overlay = null; toast(`${h.n} в коллекции: 0 ур. · 0 РП · 0 Добл`); },
+  dbuy(v) {
+    const h = RSI[v]; if (!h || rsHas(h) || h.c > rsCyc()) return;
+    S.overlay = { t: 'confirm', title: 'Купить донатного героя', text: `${h.n} — ${h.place}-й из сета «${RSS[h.dset].name}». Придёт с 0 уровнем, 0 рунных пределов и 0 доблести; лица нет, себя он вспомнит на последней доблести.`, warn: 'Цена — заглушка прототипа: цен героев за Энериум в источниках нет.', ok: 'Купить', act: 'dbuydo', v, cost: ['enerium', rsDonatPrice(h)] };
+    render(); focusOverlay();
+  },
+  dbuydo(v) { const h = RSI[v]; if (!h || rsHas(h)) return close(); if (!spend('enerium', rsDonatPrice(h))) return close(); rsAdd(h, 'donat'); S.overlay = null; toast(`${h.n} в коллекции: 0 ур. · 0 РП · 0 Добл`); },
+  spin() {
+    const pool = rsPool(); if (!pool.length || !spend('enerium', RS.rules.spin)) return;
+    const h = pool[S.rs.spins % pool.length], n = RS.rules.stub.spinShards;   // демо: по очереди из пула, в игре результат решает сервер
+    S.rs.spins++; S.rs.last = h.id; S.rs.ssel = h.id;
+    if (rsHas(h)) { const d = n * rsDustOf(h); S.wallet.dust += d; toast(`${h.n} уже в коллекции: осколки ×${n} ушли в прах · +${fmt(d)}`); }
+    else { S.rs.shards[h.id] = (S.rs.shards[h.id] || 0) + n; toast(`Возрождение душ: ${h.n} · осколков +${n}`); }
+  },
+  dustbuy(v) { const h = RSI[v]; if (!h || rsHas(h) || h.c > rsCyc() || !spend('dust', rsShardPrice(h))) return; S.rs.shards[v] = (S.rs.shards[v] || 0) + 1; render(); },
+  activate(v) {
+    const h = RSI[v], need = RS.rules.stub.shards; if (!h || rsHas(h) || (S.rs.shards[v] || 0) < need) return;
+    S.overlay = { t: 'confirm', title: 'Пробудить героя', text: `${h.n} соберётся из ${need} осколков и придёт с 0 уровнем, 0 рунных пределов и 0 доблести. Лишние осколки уйдут в прах.`, warn: 'Число осколков и цена в душах — заглушки: таблица не утверждена (§15.1).', ok: 'Пробудить', act: 'activatedo', v, cost: ['souls', RS.rules.stub.activateSouls] };
+    render(); focusOverlay();
+  },
+  activatedo(v) {
+    const h = RSI[v], need = RS.rules.stub.shards; if (!h || rsHas(h)) return close();
+    if (!spend('souls', RS.rules.stub.activateSouls)) return close();
+    const extra = (S.rs.shards[v] || 0) - need, d = extra > 0 ? extra * rsDustOf(h) : 0;   // §15.2: сначала комплект, остаток — в прах
+    delete S.rs.shards[v]; S.wallet.dust += d; rsAdd(h, 'souls'); S.overlay = null;
+    toast(`${h.n} пробуждён душами${d ? ' · лишние осколки → прах +' + fmt(d) : ''}`);
+  },
   item(v) { open('item', v); },
   isel(v) { S.selItem = v; const it = I(v); if (it && it.isNew) it.isNew = false; render(); },
   npc(v) { S.overlay = { t: 'npc', arg: v, i: 0 }; NPCS[v].isNew = false; render(); focusOverlay(); },
@@ -2816,9 +3250,6 @@ const ACT = {
   sqrem(v) { sq(S.selSquad).m[+v] = null; render(); },
   sqadd(v) { const s = sq(S.selSquad), i = s.m.indexOf(null); if (i < 0) return toast('В отряде уже пятеро'); s.m[i] = v; render(); },
   sqslot() { toast('Нажмите героя ниже, чтобы поставить его сюда'); },
-  offer(v) { S.selOffer = v; render(); },
-  hire() { const o = S.offers.find(x => x.id === S.selOffer); S.overlay = { t: 'confirm', title: 'Пригласить героя', text: `${o.name} появится в коллекции с уровнем 1.`, ok: 'Пригласить', act: 'hiredo', cost: ['gold', o.price] }; render(); focusOverlay(); },
-  hiredo() { const o = S.offers.find(x => x.id === S.selOffer); if (!spend('gold', o.price)) return close(); S.overlay = null; toast(`${o.name} присоединился к коллекции (демо)`); },
   cat(v) { S.invCat = v; render(); },
   put(v) { const it = I(v); let i = S.craft[S.craftSel] && S.craft[S.craftSel].id !== v ? S.craft.findIndex(c => !c) : S.craftSel; const ex = S.craft.findIndex(c => c && c.id === v); if (ex >= 0) i = ex; if (i < 0) return toast('Все шесть ячеек заняты'); const c = S.craft[i]; if (c && c.id === v) { if (c.q < Math.min(100, it.q)) c.q++; } else S.craft[i] = { id: v, q: 1 }; S.craftSel = i; render(); },
   cslot(v) { S.craftSel = +v; render(); },
@@ -3275,7 +3706,9 @@ function render() {
   const g = $game(); if (!g) return;
   const scr = SCREENS[S.route]();
   const act = document.activeElement, q = act && act.id === 'invq' ? { id: 'invq', s: act.selectionStart } : null;
+  const keep = {}; g.querySelectorAll('[data-keep]').forEach(e => { keep[e.dataset.keep] = e.scrollTop; });   // §33.3: положение списка сохраняется
   g.innerHTML = topBar(scr) + rail() + `<main class="g-main" id="gmain" data-route="${S.route}">${scr.html}</main>` + overlay() + (S.toast ? toastHtml() : '');
+  g.querySelectorAll('[data-keep]').forEach(e => { if (keep[e.dataset.keep]) e.scrollTop = keep[e.dataset.keep]; });
   if (q) { const e = document.getElementById(q.id); if (e) { e.focus(); try { e.setSelectionRange(q.s, q.s); } catch (_) { } } }
   ensureLoop();
   if (fxInst && fxInst.host !== document.getElementById('btField')) { fxInst.destroy(); fxInst = null; }
@@ -3293,10 +3726,10 @@ function bindGame() {
   const g = $game();
   g.addEventListener('click', e => {
     const t = e.target.closest('[data-a]'); if (!t || !g.contains(t) || t.disabled) return;
-    if (t.tagName === 'INPUT') return;
+    if (t.tagName === 'INPUT' || t.tagName === 'SELECT') return;
     const f = ACT[t.dataset.a]; if (f) { e.preventDefault(); f(t.dataset.v || '', t, e); }
   });
-  g.addEventListener('change', e => { const t = e.target; if (t.matches('input[data-a]')) { const f = ACT[t.dataset.a]; f && f(t.dataset.v || '', t, e); } });
+  g.addEventListener('change', e => { const t = e.target; if (t.matches('input[data-a], select[data-a]')) { const f = ACT[t.dataset.a]; f && f(t.dataset.v || '', t, e); } });
   g.addEventListener('input', e => { if (e.target.id === 'invq') { S.invQ = e.target.value; render(); } });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && S.overlay) { e.preventDefault(); close(); } });
   setInterval(() => {
@@ -3312,8 +3745,10 @@ const FLOWS = [
   ['Бой с боссом · демо-прыжок', 'Отряд I сразу на последнем этаже: босс, ульты, массовые удары', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = null; startRun('s1', 'b1', EB.BIOMES.b1.floors.length); }],
   ['Рунный страж · ' + guardCards(), 'Мастер и две элиты — страж обучения цикла I, иммунитет к контролю 25 %', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = null; startRun('s1', 'b1', null, true); }],
   ['Бестиарий: известный и неизвестный', 'Скрыт до первой победы, картина и совет старика после', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = { t: 'foe', arg: known('o6') ? 'e3' : 'o6' }; }],
-  ['Развитие героя', 'Уровень, рунный предел и доблесть — одна лестница', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.seg.hero = 'power'; S.selHero = 'h2'; S.overlay = null; }],
-  ['Ротация перетаскиванием', 'Порядок способностей в карточке героя', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.seg.hero = 'skills'; S.selHero = 'h2'; S.overlay = null; }],
+  ['Развитие героя', 'Уровень, рунный предел и доблесть — одна лестница', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.seg.hero = 'power'; S.selHero = 'h2'; S.overlay = null; }],
+  ['Ротация перетаскиванием', 'Порядок способностей в карточке героя', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.seg.hero = 'skills'; S.selHero = 'h2'; S.overlay = null; }],
+  ['Коллекция · состав героев', 'Все герои игры: фильтры по циклу, источнику и классу; орден скрыт до последней доблести', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'all'; S.seg.rhero = 'who'; S.overlay = null; }],
+  ['Призыв · три способа', 'За золото, за Энериум, за души; цикл I–VI — переключатель для демо', () => { S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'gold'; S.overlay = null; }],
   ['Мастерская', 'Шесть ячеек вокруг результата и книга рецептов', () => { S.route = 'craft'; S.seg.craft = 'work'; S.book = false; S.craft = [{ id: 'cinder', q: 3 }, { id: 'key', q: 1 }, null, null, null, null]; S.craftSel = 0; S.overlay = null; }],
   ['Неделя → Эхо', 'Шесть недельных режимов на одном экране, цель и атака', () => { S.route = 'echo'; S.echo.sel = 0; S.overlay = null; }],
   ['Контракт', 'Составить, заверить золотом, подписать', () => { S.route = 'contracts'; S.seg.contracts = 'day'; S.overlay = null; }],
@@ -3449,8 +3884,11 @@ function renderKit() {
   <section class="k-box"><h3>Вкладки, чипы, метки</h3><div class="k-demo col" style="gap:10px"><div class="tabs"><button aria-selected="true">Сила</button><button aria-selected="false">Навыки</button><button aria-selected="false">Путь</button></div><div class="k-row"><span class="chip gold">${ic('gem')}Элита</span><span class="chip spirit">${ic('check')}готово</span><span class="chip warn">${ic('lock')}цикл III</span><span class="chip">${ic('hour')}3 д 5 ч</span></div><div class="k-row"><span class="stars lg">${stars(1, 3)}</span><span class="faint">доблесть: позиций = личный максимум</span></div><div class="k-row"><span class="limits">${limits(2)}</span><span class="faint">рунный предел: 5 отметок</span></div></div></section>
   <section class="k-box"><h3>Шкалы</h3><div class="k-demo col" style="gap:10px"><div class="col" style="gap:4px"><small class="faint">Здоровье и щит</small>${bar(64, 'hp lg', '<span class="sh" style="left:0;width:18%"></span>')}</div><div class="col" style="gap:4px"><small class="faint">Бюджет попытки — песок</small>${bar(46, 'sand')}</div><div class="col" style="gap:4px"><small class="faint">Опыт и прогресс</small>${bar(62)}</div><div class="col" style="gap:4px"><small class="faint">Резервуар и готовность</small>${bar(80, 'sp')}</div></div></section>
   <section class="k-box"><h3>Герой</h3><div class="k-demo" style="display:grid;grid-template-columns:repeat(3,minmax(0,110px));gap:8px">${heroCard(S.heroes[0], { act: 'noop' })}${heroCard(h, { act: 'noop', sel: true })}${heroCard(S.heroes[3], { act: 'noop', note: 'Ритуал · 42 мин', dim: true })}</div><p class="k-note">Звёзд ровно столько, сколько доблестей доступно герою. Занятость написана поверх портрета.</p></section>
-  <section class="k-box" style="grid-column:1/-1"><h3>Герои · ${window.EN_HEROES ? EN_HEROES.heroes.length : 0} из черновиков</h3>
-    <p class="k-note">Данные — <code>docs/content/герои/</code>, выгрузка <code>tools/content-gen/heroes/export_ui.py</code> в <code>heroes.js</code>. Черновик, ждёт автора. Портреты пока заглушки: свет стихии снизу, нижняя кромка — редкость. Арт рисуется отдельно в <code>art/generated/</code>.</p>
+  <section class="k-box" style="grid-column:1/-1"><h3>Состав героев · ${RS.heroes.length} · по источникам</h3>
+    <p class="k-note">Состав игры по ADR-0019 и ADR-0021 — ADR-0024: золото, донат за Энериум, возрождение душ, Эхо, крафт. Данные — <code>docs/content/герои/состав-героев.csv</code> и главы <code>docs/content/герои/главы/</code>, выгрузка <code>tools/content-gen/heroes/export_roster.py</code> в <code>roster.js</code>. Черновик, ждёт автора. Орден игрок видит на последней доблести героя; «для команды» показывает орден, черновик и заметки — флажок общий с разделом «Герои черновиков». Числа — демонстрация, заглушки прототипа помечены. Этот же состав — в прототипе: «Герои → Коллекция» и «Герои → Призыв».</p>
+    <div id="kitRoster"></div></section>
+  <section class="k-box" style="grid-column:1/-1"><h3>Герои черновиков · ${window.EN_HEROES ? EN_HEROES.heroes.length : 0} · прежняя редакция</h3>
+    <p class="k-note">Данные — <code>docs/content/герои/</code>, выгрузка <code>tools/content-gen/heroes/export_ui.py</code> в <code>heroes.js</code>. Черновик, ждёт автора. Портреты пока заглушки: свет стихии снизу, нижняя кромка — редкость. Арт рисуется отдельно в <code>art/generated/</code>. Наборы способностей отряда боя прототипа — отсюда; новый состав — раздел «Состав героев» выше.</p>
     <div id="kitHeroes"></div></section>
   <section class="k-box" style="grid-column:1/-1"><h3>Библиотека способностей · ${window.EN_ABILITIES ? EN_ABILITIES.total : 0}</h3>
     <p class="k-note">Данные — <code>docs/content/библиотека-способностей.md</code>, выгрузка <code>tools/content-gen/abilities/library.py</code> в <code>abilities.js</code>, решения — ADR-0015. Черновик: названия с номером — из таблицы автора, остальные автор принял как рабочие; числа — демонстрация. Набор без фильтров показан матрицей «вид × ступень», фильтр или поиск ищут по всей библиотеке. По героям способности ещё не распределены.</p>
@@ -3686,7 +4124,7 @@ function bindKitHeroes() {
   });
   root.addEventListener('change', e => {
     const t = e.target, a = t.dataset && t.dataset.kh; if (!a || !t.closest('#kitHeroes')) return;
-    if (a === 'team') KH.team = t.checked;
+    if (a === 'team') { KH.team = t.checked; rkPaint(); render(); }   // флажок общий: состав героев и прототип тоже
     else if (['cyc', 'set', 'cls', 'el'].includes(a)) { KH[a] = t.value; if (a === 'cyc') KH.set = ''; }
     else return;
     khPaint();
@@ -3696,6 +4134,120 @@ function bindKitHeroes() {
     KH.valor = +t.value; const d = document.getElementById('khDet'); if (!d) return;
     d.innerHTML = khDetail(); const r = d.querySelector('[data-kh="val"]'); r && r.focus();
     const card = document.querySelector(`#kitHeroes .kh-card[data-v="${KH.sel}"] .stars`); if (card) card.innerHTML = stars(0, khHero(KH.sel).maxV);
+  });
+}
+/* ================== UI-кит · состав героев ==================
+   Состав из roster.js: коллекция с фильтрами, карточка с главами по доблести, ордены и донатные сеты, отряды Эхо, правила и цены.
+   Игрок видит орден на последней доблести героя; «для команды» — флажок KH.team, общий с разделом «Герои черновиков», — показывает всё.
+   Карточка и сеты — те же функции, что в прототипе (rsWhoHtml, rsChaptersHtml, rsSetHtml). */
+const RK = { tab: 'heroes', cyc: '', src: '', cls: '', sch: '', sel: 'c1-01', valor: null };
+const rkPick = id => `data-rk="sel" data-v="${id}"`;
+const rkFilter = h => (!RK.cyc || h.c === +RK.cyc) && (!RK.src || h.src === RK.src) && (!RK.cls || h.cl.includes(RK.cls)) && (!RK.sch || h.sch === RK.sch);
+function rkPh(h) {
+  const o = rsOld(h), img = o ? o.img : h.src === 'donat' ? FACELESS : '';
+  return `<span class="kh-ph rs-kph" style="--rc:var(--r${h.r})">${img ? `<img src="${img}" alt="">` : `<b>${rsInit(h.n)}</b>`}<span class="cl" title="${h.cls}">${ic(RS_CLS_IC[h.cl[0]] || 'gem')}</span></span>`;
+}
+function rkCard(h) {
+  return `<button class="kh-card" ${rkPick(h.id)} data-el="${h.sch}" aria-pressed="${RK.sel === h.id}" title="${h.n} · ${RS_SRC[h.src]}">${rkPh(h)}<span class="kh-nm">${h.n}</span><span class="kh-sub">${el(h.sch, true)}${h.cls}</span><span class="kh-sub">${RS_SRC_ONE[h.src]} · цикл ${ROMAN[h.c]}</span><span class="stars">${stars(0, h.maxV)}</span></button>`;
+}
+function rkDetail() {
+  const h = RSI[RK.sel]; if (!h) return '<p class="faint">Выберите героя.</p>';
+  const v = RK.valor == null ? 0 : Math.min(RK.valor, h.maxV);
+  return `<div class="row" style="gap:12px;align-items:flex-start"><span class="kh-big" data-el="${h.sch}">${rkPh(h)}</span><div class="col" style="gap:5px;min-width:0">
+      <span class="eyebrow">${h.id} · цикл ${ROMAN[h.c]}</span>
+      <b class="serif" style="font-size:24px;line-height:1.05;color:var(--parch)">${h.n}</b>
+      <div class="kh-meta">${rar(h.r)}${el(h.sch)}<span class="chip wr">${h.cls}</span><span class="chip">${h.race}</span>${rsSrcChip(h)}</div>
+      <span class="stars lg">${stars(v, h.maxV)}</span></div></div>
+    ${rsWhoHtml(h)}
+    <span class="eyebrow">Воспоминания · главы по доблести</span>
+    <div class="kh-val"><input type="range" min="0" max="${h.maxV}" value="${v}" data-rk="val" aria-label="Доблесть героя"><b class="num" style="color:var(--gold)">${v} / ${h.maxV}</b></div>
+    ${rsChaptersHtml(h, v)}
+    <span class="eyebrow">Орден и сет</span>
+    ${rsSetHtml(h, v, { pick: rkPick })}`;
+}
+function rkSetsHtml() {
+  const sets = RS.sets.filter(s => !RK.cyc || s.cycle === +RK.cyc);
+  return `<p class="k-note" style="margin-bottom:10px">Ступени — по сумме личных максимумов доблести пятерых (ADR-0022), условия ступеней — §30, бонусы и N — <code>docs/content/сет-бонусы.md</code>. Состав донатного сета виден в витрине; состав ордена игрок вычисляет по последним главам — «для команды» показывает всех.</p>
+    <div class="kh-sets">${sets.map(s => rsSetBox(s, null, { pick: rkPick })).join('') || '<p class="faint">Нет сетов этого цикла.</p>'}</div>`;
+}
+function rkEchoHtml() {
+  const cyc = [...new Set(RS.weeks.flatMap(w => w.squad.map(id => RSI[id].c)))].sort((a, b) => a - b);
+  const rows = RS.weeks.map(w => {
+    const sq = w.squad.map(id => RSI[id]), av = sq.find(h => h.avers && h.avers.race);
+    const civ = w.civ ? `<small>${w.civ} · «${w.raid}»${KH.team && w.team ? ' · ' + w.team.theme : ''}</small>` : '';
+    return `<tr><th>Неделя ${w.gen}${civ}<small>${av ? rsAversShort(av) : ''}</small></th>${cyc.map(c => { const h = sq.find(x => x.c === c); return `<td>${h ? `<button class="rk-hn" ${rkPick(h.id)}>${h.n}</button><small>${h.cls} · ${h.race} · доблесть до ${h.maxV}</small>` : '—'}</td>`; }).join('')}</tr>`;
+  }).join('');
+  return `<div class="rk-scroll"><table class="rk-tab"><tr><th>Отряд</th>${cyc.map(c => `<th>Цикл ${ROMAN[c]}</th>`).join('')}</tr>${rows}</table></div>
+    <p class="k-note" style="margin-top:8px">Эхо — память о древних цивилизациях, живших задолго до этеров (ADR-0024). Пятеро одной недели — отряд, отбивший её нашествие: игрок собирает его по герою за цикл, максимум доблести — номер цикла героя − 1. Сундук Эхо недели даёт осколки героев отряда, открытых к текущему циклу. Неприязнь — особенность, а не способность: действует везде, где встречаются враги этой расы.</p>`;
+}
+function rkRulesHtml() {
+  const R = RS.rules, cyc = ROMAN.slice(1).map((_, i) => i + 1);
+  const size = c => RS.heroes.filter(h => h.src === 'gold' && h.c === c).length, maxK = Math.max(...cyc.map(size));
+  const src = RS.sources.filter(k => RS.srcInfo[k]).map(k => { const I = RS.srcInfo[k]; return `<tr><th>${cap1(RS_SRC[k])}</th><td class="n">${ROMAN[I.from]}</td><td class="n">${I.count}</td><td>${I.byCycle ? 'номер цикла героя − 1' : I.maxV[0] === I.maxV[1] ? I.maxV[0] : I.maxV[0] + '–' + I.maxV[1]}</td></tr>`; }).join('');
+  const gold = Array.from({ length: maxK }, (_, j) => `<tr><th>${j + 1}</th>${cyc.map(c => `<td class="n">${j < size(c) ? fmt(rsGold(c, j + 1)) : ''}</td>`).join('')}</tr>`).join('');
+  const dust = R.dust.map(([d, p], i) => `<tr><th>${RAR[i + 1]}</th>${cyc.map(c => `<td class="n">${fmt(d * c)} / ${fmt(p * c)}</td>`).join('')}</tr>`).join('');
+  const bySum = [...R.tierBySum].sort((a, b) => a[0] - b[0]);
+  const tiers = bySum.map(([lo, n], i) => `<tr><th>${bySum[i + 1] ? lo + '–' + (bySum[i + 1][0] - 1) : lo + ' и больше'}</th><td>${n} ${plural(n, 'ступень', 'ступени', 'ступеней')}</td></tr>`).join('');
+  const conds = R.tierNeed.map((need, i) => `<tr><th>${ROMAN[i + 1]}</th><td>${need} ${plural(need, 'участник', 'участника', 'участников')} с доблестью от ${R.tierValor}</td></tr>`).join('') + `<tr><th>${ROMAN[R.tierNeed.length + 1]}</th><td>все пятеро на личных максимумах</td></tr>`;
+  const st = R.stub;
+  return `<div class="rk-rules">
+    <div><span class="eyebrow">Источники · ADR-0019</span><table class="rk-tab"><tr><th>Источник</th><th>С цикла</th><th>Героев</th><th>Максимум доблести</th></tr>${src}</table>
+      <p class="k-note">Любой герой приходит с 0 уровнем, 0 рунных пределов и 0 доблести.</p></div>
+    <div><span class="eyebrow">Ступени сетов · ADR-0022, §30</span><table class="rk-tab"><tr><th>Сумма максимумов</th><th>Ступеней</th></tr>${tiers}</table><table class="rk-tab"><tr><th>Ступень</th><th>Условие</th></tr>${conds}</table></div>
+    <div><span class="eyebrow">Неприязнь героев Эхо · ADR-0024</span><p class="k-note">+${pctBp(R.aversionBp)} урона по врагам расы своей недели — демонстрация, число в данных.</p>
+      <span class="eyebrow">Возрождение душ · §15.1</span><p class="k-note">Прокрутка — ${fmt(R.spin)} Энериума, пул привязан к циклу: в прототипе — герои рулетки текущего цикла, героев прошлых циклов продаёт каталог праха.</p>
+      <span class="eyebrow">Заглушки прототипа — ждут автора</span><p class="k-note">Осколков на героя — ${st.shards}, осколков за прокрутку — ${st.spinShards}, пробуждение — ${fmt(st.activateSouls)} душ, донатные герои с 1-го по 5-го — ${st.donatPrice.map(fmt).join(' / ')} Энериума. Этих чисел нет в источниках (§15.1, ADR-0021).</p></div>
+    <div><span class="eyebrow">Цена героя за золото · k-я покупка цикла · ADR-0023</span><p class="k-note">${fmt(R.gold.first)} × цикл × (1 + ${pctBp(R.gold.stepBp)} × (k − 1)); строк — по размеру каталога цикла.</p>
+      <div class="rk-scroll" style="max-height:300px"><table class="rk-tab"><tr><th>k</th>${cyc.map(c => `<th>${ROMAN[c]}</th>`).join('')}</tr>${gold}</table></div></div>
+    <div><span class="eyebrow">Прах · §15.3, демонстрация</span><p class="k-note">Прах за повторный осколок / цена осколка в прахе, × номер цикла героя.</p>
+      <div class="rk-scroll"><table class="rk-tab"><tr><th>Редкость</th>${cyc.map(c => `<th>${ROMAN[c]}</th>`).join('')}</tr>${dust}</table></div></div>
+  </div>`;
+}
+function rkHtml() {
+  if (!RS.heroes.length) return '<p class="faint">Нет данных: рядом с index.html должен лежать roster.js.</p>';
+  const opt = (v, t, cur) => `<option value="${v}" ${String(cur) === String(v) ? 'selected' : ''}>${t}</option>`;
+  const list = RS.heroes.filter(rkFilter);
+  const tabs = [['heroes', 'Герои'], ['sets', 'Ордены и сеты'], ['echo', 'Отряды Эхо'], ['rules', 'Правила и цены']];
+  const top = `<div class="kh-top"><div class="tabs" role="tablist">${tabs.map(([k, l]) => `<button role="tab" data-rk="tab" data-v="${k}" aria-selected="${RK.tab === k}">${l}</button>`).join('')}</div>
+    <select data-rk="cyc" aria-label="Цикл">${opt('', 'Все циклы', RK.cyc)}${ROMAN.slice(1).map((r, i) => opt(i + 1, 'Цикл ' + r, RK.cyc)).join('')}</select>
+    <select data-rk="src" aria-label="Источник">${opt('', 'Все источники', RK.src)}${RS.sources.map(k => opt(k, cap1(RS_SRC[k]), RK.src)).join('')}</select>
+    <select data-rk="cls" aria-label="Класс">${opt('', 'Все классы', RK.cls)}${RS.classes.map(k => opt(k, k, RK.cls)).join('')}</select>
+    <select data-rk="sch" aria-label="Школа">${opt('', 'Все школы', RK.sch)}${RS.schools.map(k => opt(k, k, RK.sch)).join('')}</select>
+    <label><input type="checkbox" data-rk="team" ${KH.team ? 'checked' : ''}>для команды</label>
+    <span class="n">${RK.tab === 'heroes' ? `показано ${list.length} из ${RS.heroes.length}` : RK.tab === 'sets' ? `сетов ${RS.sets.filter(s => !RK.cyc || s.cycle === +RK.cyc).length} из ${RS.sets.length}` : ''}</span></div>`;
+  const body = RK.tab === 'sets' ? rkSetsHtml() : RK.tab === 'echo' ? rkEchoHtml() : RK.tab === 'rules' ? rkRulesHtml()
+    : `<div class="kh-main"><div class="kh-grid">${list.map(rkCard).join('') || '<p class="faint">Никого: ослабьте фильтры.</p>'}</div><div class="kh-det" id="rkDet">${rkDetail()}</div></div>`;
+  return top + body;
+}
+function rkPaint() {
+  const root = document.getElementById('kitRoster'); if (root) root.innerHTML = rkHtml();
+}
+/* выбор героя в сетке не перерисовывает список: прокрутка остаётся на месте */
+function rkSelect(id) {
+  RK.sel = id; RK.valor = null;
+  const d = document.getElementById('rkDet');
+  if (RK.tab !== 'heroes' || !d) { RK.tab = 'heroes'; rkPaint(); return; }
+  document.querySelectorAll('#kitRoster .kh-card').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.v === id)));
+  d.innerHTML = rkDetail(); d.scrollTop = 0;
+}
+function bindKitRoster() {
+  const root = document.getElementById('kitGrid'); if (!root) return;
+  root.addEventListener('click', e => {
+    const b = e.target.closest('[data-rk]'); if (!b || !b.closest('#kitRoster') || b.tagName === 'SELECT' || b.tagName === 'INPUT') return;
+    if (b.dataset.rk === 'tab') { RK.tab = b.dataset.v; rkPaint(); }
+    else if (b.dataset.rk === 'sel') rkSelect(b.dataset.v);
+  });
+  root.addEventListener('change', e => {
+    const t = e.target, a = t.dataset && t.dataset.rk; if (!a || !t.closest('#kitRoster')) return;
+    if (a === 'team') { KH.team = t.checked; khPaint(); render(); }
+    else if (['cyc', 'src', 'cls', 'sch'].includes(a)) RK[a] = t.value;
+    else return;
+    rkPaint();
+  });
+  root.addEventListener('input', e => {
+    const t = e.target; if (!t.dataset || t.dataset.rk !== 'val') return;
+    RK.valor = +t.value; const d = document.getElementById('rkDet'); if (!d) return;
+    d.innerHTML = rkDetail(); const r = d.querySelector('[data-rk="val"]'); r && r.focus();
   });
 }
 /* ================== UI-кит · библиотека способностей ==================
@@ -3854,7 +4406,7 @@ function boot() {
   const g = $game();
   bindGame();
   render();
-  renderMap(); renderKit(); khPaint(); klPaint(); rzPaint();
+  renderMap(); renderKit(); rkPaint(); khPaint(); klPaint(); rzPaint();
   const fl = document.getElementById('flows');
   fl.innerHTML = FLOWS.map(([t, d], i) => `<li><button class="p-flow" data-flow="${i}"><span><b>${t}</b><small>${d}</small></span></button></li>`).join('');
   fl.addEventListener('click', e => { const b = e.target.closest('[data-flow]'); if (!b) return; FLOWS[+b.dataset.flow][2](); render(); if (S.overlay) focusOverlay(); if (window.innerWidth < 1200) document.getElementById('devWrap').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
@@ -3866,6 +4418,7 @@ function boot() {
   document.getElementById('devCompare').addEventListener('click', compareModels);
   bindTree();
   bindKitHeroes();
+  bindKitRoster();
   bindKitLib();
   bindKitRes();
   document.getElementById('kitGrid').addEventListener('click', e => { const b = e.target.closest('[data-fx]'); if (b) kitFx(b.dataset.fx); });
