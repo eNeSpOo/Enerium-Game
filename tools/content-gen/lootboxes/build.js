@@ -838,7 +838,8 @@ for (const mid of Object.keys(WEEK)) T.push(`| ${MODES[mid].n} | ${posLabel(mid,
   }
   inline.curShare = `${fx(shares.reduce((a, q) => q.cmp(a) < 0 ? q : a).mul(new Q(100)), 0)}–${fx(shares.reduce((a, q) => q.cmp(a) > 0 ? q : a, Q0).mul(new Q(100)), 0)} %`;
   const lik = REC.drops.craftBosses.find(b => b.id === 'lik');
-  inline.likShards = lik ? lik.heroShardsWeek : '—';
+  /* доля недельных осколков героев в базисных пунктах (ADR-0025): 1350 → «13,5 %» */
+  inline.likShards = lik && lik.heroShardsWeekBp != null ? `${Math.floor(lik.heroShardsWeekBp / 100)}${lik.heroShardsWeekBp % 100 ? ',' + String(lik.heroShardsWeekBp % 100).replace(/0+$/, '') : ''} %` : '—';
   inline.boxesFreeRange = [2, 3, 4, 5, 6].map(c => Object.keys(WEEK).reduce((a, mid) => a + WEEK[mid][c].free.boxes, 0)).filter((v, i, a) => a.indexOf(v) === i).join('–');
 }
 

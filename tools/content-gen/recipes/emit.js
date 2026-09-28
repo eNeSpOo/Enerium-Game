@@ -170,7 +170,7 @@ function buildDrops(CYC, places, items, recipes, byId) {
   const craftBosses = places.map(p => ({ id: p.boss.id, name: p.boss.label, cyc: p.cyc, spec: p.boss.spec, race: p.boss.race, call: p.boss.call, trophy: p.boss.trophy,
     trophies: CS.trophies, specKeys: CS.specKeys, spirit: CS.spirit * p.cyc, gold: CS.spirit * p.cyc / 2, enerium: CS.enerium * p.cyc, runeKeyBp: CS.runeKeyBp, runeKeys: p.cyc,
     workerBoxRarity: Math.min(7, p.cyc + 1), summonSouls: CS.summonSouls, immunityBp: CS.immunityBp, team: p.team }))
-    .concat([{ id: 'lik', name: 'Лик недели', cyc: 2, spec: null, race: 'раса недели', call: 'mask', trophy: null, trophies: 0, heroShardsWeek: 20, specKeys: 0, spirit: 0, gold: 0, enerium: 0,
+    .concat([{ id: 'lik', name: 'Лик недели', cyc: 2, spec: null, race: 'раса недели', call: 'mask', trophy: null, trophies: 0, heroShardsWeekBp: C.CRAFT.lik.heroShardsWeekBp, specKeys: 0, spirit: 0, gold: 0, enerium: 0,
       runeKeyBp: 0, runeKeys: 0, workerBoxRarity: 0, summonSouls: CS.summonSouls, immunityBp: CS.immunityBp, team: false }]);
   /* пробуждённые (ADR-0025): тот же вид записи, что у крафтового босса; cyc — цикл, с которого есть рецепт пробуждения.
      awake — id обычного босса; powerCycleStep — сила как у крафтового босса на столько циклов выше. */

@@ -3,7 +3,7 @@
 const fs = require('fs');
 const C = require('./common');
 const fmt = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-const pct = bp => (bp % 100 ? (bp / 100).toFixed(2).replace('.', ',') : String(bp / 100)) + ' %';
+const pct = bp => (bp % 100 ? (bp / 100).toFixed(2).replace(/0$/, '').replace('.', ',') : String(bp / 100)) + ' %';   // 1350 → 13,5 %
 const x100 = n => (n % 100 ? (n / 100).toFixed(2).replace(/0$/, '').replace('.', ',') : String(n / 100));
 const KIND = { part: 'заготовка', made: 'изделие', act: 'активация', call: 'призыв', hero: 'герой', product: 'награда', story: 'сюжет', rune: 'руна', valor: 'руна доблести' };
 const raceLc = r => ['Забытые', 'Перворождённые'].includes(r) ? r : r.toLowerCase();   // имена народов финала и Эхо — с заглавной, как в своде
@@ -39,7 +39,7 @@ module.exports = function tables({ items, recipes, byId, CYC, ROMAN, places, dro
     bossRaces: Object.entries(byRace).map(([r, n]) => `${raceLc(r)} — ${n}`).join(', '),
     awakened: stats.total.awakened, awakeTrophies: C.CRAFT.awake.trophies, awakeKeys: C.CRAFT.awake.specKeys, awakeMul: C.CRAFT.awake.currencyMul,
     awakeChestStep: C.CRAFT.awake.chestStep, awakePowerStep: C.CRAFT.awake.powerCycleStep, awakeRuneKey: pct(C.CRAFT.awake.runeKeyBp), bossRuneKey: pct(C.CRAFT.boss.runeKeyBp),
-    manyCycle: ROMAN[byId[C.CRAFT.awake.item].cyc] };
+    manyCycle: ROMAN[byId[C.CRAFT.awake.item].cyc], likShare: pct(C.CRAFT.lik.heroShardsWeekBp) };
   block('inline');
   for (const [k, v] of Object.entries(inline)) L.push(`${k}: ${v}`);
 
@@ -171,7 +171,7 @@ module.exports = function tables({ items, recipes, byId, CYC, ROMAN, places, dro
   L.push('| Крафтовый биом | Цикл | Этажей | Ресурс за этаж | Находки | Дух / золото / души / осколки сборных героев | Рунный ключ |', '|---|---|---|---|---|---|---|');
   for (const b of drops.craftBiomes) L.push(`| ${b.name} | ${ROMAN[b.cyc]} | ${b.floors} | ${pct(b.resPerFloorBp)} | ${b.finds} + ${pct(b.secondFindBp)} | ${fmt(b.spirit)} / ${fmt(b.gold)} / ${b.souls} / ${b.heroShards} | ${pct(b.runeKeyBp)} × ${b.runeKeys} |`);
   L.push('', '| Крафтовый босс | Цикл | Раса | Ремесло | Ресурсы: трофей / ключи ремесла | Валюта: дух / золото / Энериум — заглушка | Рунный ключ | Сундук крафтового босса | Иммунитет к контролю |', '|---|---|---|---|---|---|---|---|---|');
-  for (const s of drops.craftBosses) L.push(`| ${s.name} | ${ROMAN[s.cyc]} | ${s.race} | ${s.spec ? C.SPECS[s.spec].n.toLowerCase() : '—'} | ${s.trophy ? nm(s.trophy) + ' ×' + s.trophies : '20 осколков героев недели'} / ${s.specKeys} | ${fmt(s.spirit)} / ${fmt(s.gold)} / ${s.enerium} | ${s.runeKeyBp ? pct(s.runeKeyBp) + ' × ' + s.runeKeys : '—'} | ${s.workerBoxRarity ? 'редкость ' + s.workerBoxRarity : '—'} | ${pct(s.immunityBp)} |`);
+  for (const s of drops.craftBosses) L.push(`| ${s.name} | ${ROMAN[s.cyc]} | ${s.race} | ${s.spec ? C.SPECS[s.spec].n.toLowerCase() : '—'} | ${s.trophy ? nm(s.trophy) + ' ×' + s.trophies : pct(s.heroShardsWeekBp) + ' недельных осколков героев'} / ${s.specKeys} | ${fmt(s.spirit)} / ${fmt(s.gold)} / ${s.enerium} | ${s.runeKeyBp ? pct(s.runeKeyBp) + ' × ' + s.runeKeys : '—'} | ${s.workerBoxRarity ? 'редкость ' + s.workerBoxRarity : '—'} | ${pct(s.immunityBp)} |`);
 
   block('pools');
   L.push('| Цикл | Ключи | Уникальные | Ресурсы руин | Находки | Трофеи | Награды мастерской |', '|---|---|---|---|---|---|---|');

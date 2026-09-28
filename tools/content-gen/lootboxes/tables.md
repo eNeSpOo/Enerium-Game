@@ -349,7 +349,7 @@ boxes2fan: 35
 talWeek: 3–5
 workersWeek: 3–4
 curShare: 1–4 %
-likShards: 20
+likShards: 13,5 %
 boxesFreeRange: 24
 x17worst: ×1,51
 clanPayer: ×1,24

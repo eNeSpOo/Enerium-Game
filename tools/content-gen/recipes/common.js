@@ -88,6 +88,9 @@ const CRAFT = {
   /* Пробуждённый крафтовый босс (ADR-0025, «Многоликий и арт», п. 5): призыв — обычный призыв своей руины, Многоликий, вторая находка руины
      и вещи из истории босса. Сильнее и босс — как крафтовый босс на powerCycleStep циклов выше, — и лут: трофеи и ключи ремесла,
      сундук на chestStep ступеней выше, валюта × currencyMul. Призыв тот же: предмет и 1 душа (§17.1). */
+  /* Лик недели платит долю недельных осколков героев — 13,5 % (ADR-0025, «Числа Эхо — ответ автора»). Абсолютные числа по циклам
+     считает калькулятор экономики Эхо: echo-rules.js, likShards; экран Эхо берёт их оттуда. */
+  lik: { heroShardsWeekBp: 1350 },
   awake: { item: ECHO.many.item, callR: 5, trophies: 2, specKeys: 4, currencyMul: 2, runeKeyBp: 4000, chestStep: 1, powerCycleStep: 1 },
 };
 const MARKET = { basic: 5, key: 300, craftres: 150, unique: 25000, find: 2500, trophy: 50000, commissionPct: 10 };
