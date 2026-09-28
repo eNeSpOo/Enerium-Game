@@ -7920,7 +7920,7 @@
       },
       "cost_usd": 0.0686,
       "seconds": 10.3,
-      "status": "значки атрибутов — ждёт автора: сила",
+      "status": "значки атрибутов — одобрен автором 28.09.2026: сила",
       "raw": "art/generated/attributes/attr-str__nb2.raw.jpg",
       "cutout": {
         "key": "black",
@@ -8095,7 +8095,7 @@
       },
       "cost_usd": 0.0685,
       "seconds": 9.4,
-      "status": "значки атрибутов — ждёт автора: Доблесть",
+      "status": "значки атрибутов — одобрен автором 28.09.2026: Доблесть",
       "raw": "art/generated/attr-tiles/attr-valor__nb2-v2.raw.jpg",
       "cutout": {
         "key": "black",
@@ -8211,7 +8211,7 @@
       },
       "cost_usd": 0.0688,
       "seconds": 9.4,
-      "status": "значки атрибутов — ждёт автора: танк — щит",
+      "status": "значки атрибутов — одобрен автором 28.09.2026: танк — щит",
       "raw": "art/generated/attr-tiles/attr-cls-tank__nb2-v2.raw.jpg",
       "cutout": {
         "key": "black",
@@ -8269,7 +8269,7 @@
       },
       "cost_usd": 0.0685,
       "seconds": 9.6,
-      "status": "значки атрибутов — ждёт автора: интеллект",
+      "status": "значки атрибутов — одобрен автором 28.09.2026: интеллект",
       "raw": "art/generated/attributes/attr-int__nb2.raw.jpg",
       "cutout": {
         "key": "black",
@@ -8327,7 +8327,7 @@
       },
       "cost_usd": 0.0684,
       "seconds": 9.7,
-      "status": "значки атрибутов — ждёт автора: ловкость",
+      "status": "значки атрибутов — одобрен автором 28.09.2026: ловкость",
       "raw": "art/generated/attributes/attr-agi__nb2.raw.jpg",
       "cutout": {
         "key": "black",
@@ -8444,7 +8444,7 @@
       },
       "cost_usd": 0.0686,
       "seconds": 9.9,
-      "status": "значки атрибутов — ждёт автора: скорость",
+      "status": "значки атрибутов — одобрен автором 28.09.2026: скорость",
       "raw": "art/generated/attributes/attr-spd__nb2.raw.jpg",
       "cutout": {
         "key": "black-glow",
@@ -8502,7 +8502,7 @@
       },
       "cost_usd": 0.0685,
       "seconds": 9.7,
-      "status": "значки атрибутов — ждёт автора: здоровье",
+      "status": "значки атрибутов — одобрен автором 28.09.2026: здоровье",
       "raw": "art/generated/attributes/attr-hp__nb2.raw.jpg",
       "cutout": {
         "key": "black-glow",
@@ -8560,7 +8560,7 @@
       },
       "cost_usd": 0.0685,
       "seconds": 8.8,
-      "status": "значки атрибутов — ждёт автора: физический урон",
+      "status": "значки атрибутов — одобрен автором 28.09.2026: физический урон",
       "raw": "art/generated/attributes/attr-patk__nb2.raw.jpg",
       "cutout": {
         "key": "black",
@@ -8618,7 +8618,7 @@
       },
       "cost_usd": 0.0687,
       "seconds": 9.5,
-      "status": "значки атрибутов — ждёт автора: магический урон",
+      "status": "значки атрибутов — одобрен автором 28.09.2026: магический урон",
       "raw": "art/generated/attributes/attr-matk__nb2.raw.jpg",
       "cutout": {
         "key": "black-glow",
@@ -8676,7 +8676,7 @@
       },
       "cost_usd": 0.0687,
       "seconds": 8.4,
-      "status": "значки атрибутов — ждёт автора: уклонение",
+      "status": "значки атрибутов — одобрен автором 28.09.2026: уклонение",
       "raw": "art/generated/attributes/attr-eva__nb2.raw.jpg",
       "cutout": {
         "key": "black",
@@ -8734,7 +8734,7 @@
       },
       "cost_usd": 0.0687,
       "seconds": 10.2,
-      "status": "значки атрибутов — ждёт автора: шанс крита",
+      "status": "значки атрибутов — одобрен автором 28.09.2026: шанс крита",
       "raw": "art/generated/attributes/attr-crit__nb2.raw.jpg",
       "cutout": {
         "key": "black",
@@ -8850,7 +8850,7 @@
       },
       "cost_usd": 0.0685,
       "seconds": 10.7,
-      "status": "значки атрибутов — ждёт автора: выносливость",
+      "status": "значки атрибутов — одобрен автором 28.09.2026: выносливость",
       "raw": "art/generated/attributes/attr-end__nb2-v2.raw.jpg",
       "cutout": {
         "key": "black",
@@ -8908,7 +8908,7 @@
       },
       "cost_usd": 0.0687,
       "seconds": 9.9,
-      "status": "значки атрибутов — ждёт автора: урон крита",
+      "status": "значки атрибутов — одобрен автором 28.09.2026: урон крита",
       "raw": "art/generated/attributes/attr-critdmg__nb2-v2.raw.jpg",
       "cutout": {
         "key": "black-glow",
@@ -9298,7 +9298,7 @@
       },
       "cost_usd": 0.0687,
       "seconds": 10.1,
-      "status": "значки атрибутов — ждёт автора: физ ДД силы — меч",
+      "status": "значки атрибутов — одобрен автором 28.09.2026: физ ДД силы — меч",
       "raw": "art/generated/attr-tiles/attr-cls-str__nb2.raw.jpg",
       "cutout": {
         "key": "black",
@@ -9356,7 +9356,7 @@
       },
       "cost_usd": 0.0688,
       "seconds": 11.0,
-      "status": "значки атрибутов — ждёт автора: физ ДД ловкости — лук",
+      "status": "значки атрибутов — одобрен автором 28.09.2026: физ ДД ловкости — лук",
       "raw": "art/generated/attr-tiles/attr-cls-agi__nb2.raw.jpg",
       "cutout": {
         "key": "black",
@@ -9414,7 +9414,7 @@
       },
       "cost_usd": 0.0686,
       "seconds": 8.8,
-      "status": "значки атрибутов — ждёт автора: маг ДД — посох с кристаллом",
+      "status": "значки атрибутов — одобрен автором 28.09.2026: маг ДД — посох с кристаллом",
       "raw": "art/generated/attr-tiles/attr-cls-mage__nb2.raw.jpg",
       "cutout": {
         "key": "black",
@@ -9472,7 +9472,7 @@
       },
       "cost_usd": 0.0687,
       "seconds": 8.9,
-      "status": "значки атрибутов — ждёт автора: лекарь — чаша живой воды",
+      "status": "значки атрибутов — одобрен автором 28.09.2026: лекарь — чаша живой воды",
       "raw": "art/generated/attr-tiles/attr-cls-healer__nb2.raw.jpg",
       "cutout": {
         "key": "black",
@@ -9530,7 +9530,7 @@
       },
       "cost_usd": 0.0689,
       "seconds": 10.3,
-      "status": "значки атрибутов — ждёт автора: контроль (дебаффер) — оковы",
+      "status": "значки атрибутов — одобрен автором 28.09.2026: контроль (дебаффер) — оковы",
       "raw": "art/generated/attr-tiles/attr-cls-control__nb2.raw.jpg",
       "cutout": {
         "key": "black",
@@ -9588,7 +9588,7 @@
       },
       "cost_usd": 0.0686,
       "seconds": 56.8,
-      "status": "значки атрибутов — ждёт автора: фармер — кирка с мешком",
+      "status": "значки атрибутов — одобрен автором 28.09.2026: фармер — кирка с мешком",
       "raw": "art/generated/attr-tiles/attr-cls-farmer__nb2.raw.jpg",
       "cutout": {
         "key": "black",
@@ -9646,7 +9646,7 @@
       },
       "cost_usd": 0.0687,
       "seconds": 9.6,
-      "status": "кристаллы редкости по ADR-0027 — ждёт автора: обычная (1 из 7)",
+      "status": "кристаллы редкости по ADR-0027 — одобрен автором 28.09.2026: обычная (1 из 7)",
       "raw": "art/generated/attr-rarity/attr-rar-common__nb2-v2.raw.jpg",
       "cutout": {
         "key": "black",
@@ -9704,7 +9704,7 @@
       },
       "cost_usd": 0.0689,
       "seconds": 10.0,
-      "status": "кристаллы редкости по ADR-0027 — ждёт автора: древняя (5 из 7)",
+      "status": "кристаллы редкости по ADR-0027 — одобрен автором 28.09.2026: древняя (5 из 7)",
       "raw": "art/generated/attr-rarity/attr-rar-ancient__nb2-v2.raw.jpg",
       "cutout": {
         "key": "black-glow",
@@ -9878,7 +9878,7 @@
       },
       "cost_usd": 0.0687,
       "seconds": 9.2,
-      "status": "кристаллы редкости по ADR-0027 — ждёт автора: эпическая (4 из 7)",
+      "status": "кристаллы редкости по ADR-0027 — одобрен автором 28.09.2026: эпическая (4 из 7)",
       "raw": "art/generated/attr-rarity/attr-rar-epic__nb2-v2.raw.jpg",
       "cutout": {
         "key": "black-glow",
@@ -9936,7 +9936,7 @@
       },
       "cost_usd": 0.0685,
       "seconds": 10.5,
-      "status": "кристаллы редкости по ADR-0027 — ждёт автора: первородная (6 из 7)",
+      "status": "кристаллы редкости по ADR-0027 — одобрен автором 28.09.2026: первородная (6 из 7)",
       "raw": "art/generated/attr-rarity/attr-rar-primordial__nb2-v2.raw.jpg",
       "cutout": {
         "key": "black-glow",
@@ -9994,7 +9994,7 @@
       },
       "cost_usd": 0.0686,
       "seconds": 10.4,
-      "status": "кристаллы редкости по ADR-0027 — ждёт автора: вневременная (7 из 7)",
+      "status": "кристаллы редкости по ADR-0027 — одобрен автором 28.09.2026: вневременная (7 из 7)",
       "raw": "art/generated/attr-rarity/attr-rar-timeless__nb2-v2.raw.jpg",
       "cutout": {
         "key": "black-glow",
@@ -10052,7 +10052,7 @@
       },
       "cost_usd": 0.0685,
       "seconds": 11.0,
-      "status": "кристаллы редкости по ADR-0027 — ждёт автора: редкая (2 из 7)",
+      "status": "кристаллы редкости по ADR-0027 — одобрен автором 28.09.2026: редкая (2 из 7)",
       "raw": "art/generated/attr-rarity/attr-rar-rare__nb2-v3.raw.jpg",
       "cutout": {
         "key": "black",
@@ -10110,7 +10110,7 @@
       },
       "cost_usd": 0.0688,
       "seconds": 11.5,
-      "status": "кристаллы редкости по ADR-0027 — ждёт автора: уникальная (3 из 7)",
+      "status": "кристаллы редкости по ADR-0027 — одобрен автором 28.09.2026: уникальная (3 из 7)",
       "raw": "art/generated/attr-rarity/attr-rar-unique__nb2-v3.raw.jpg",
       "cutout": {
         "key": "black-glow",

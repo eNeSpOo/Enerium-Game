@@ -1,5 +1,5 @@
 {
-  "note": "Какой арт из art/generated/ идёт в прототип design/ui/. Враги — ADR-0013, отряд — герои сета 1 «Хранители Песочных Часов», арена — вторая раскладка. mirror — отражение: корпус героя на карте развёрнут вправо, к врагам, корпус врага — влево, к героям (решение автора 27.09.2026). Выгрузка: python tools/art-gen/export_ui.py Эхо, неделя эльфов — арена и портреты Иш-Кантуна, одобрены автором 28.09.2026 (ADR-0025, п. 8): ik-01…ik-14 — ступени лестницы 1–14, ik-15 — Многоликий.",
+  "note": "Какой арт из art/generated/ идёт в прототип design/ui/. Враги — ADR-0013, отряд — герои сета 1 «Хранители Песочных Часов», арена — вторая раскладка. mirror — отражение: корпус героя на карте развёрнут вправо, к врагам, корпус врага — влево, к героям (решение автора 27.09.2026). Выгрузка: python tools/art-gen/export_ui.py Эхо, неделя эльфов — арена и портреты Иш-Кантуна, одобрены автором 28.09.2026 (ADR-0025, п. 8): ik-01…ik-14 — ступени лестницы 1–14, ik-15 — Многоликий. Значки атрибутов, редкостей (ADR-0027), классов и доблести одобрены автором 28.09.2026: PNG 128×128 с прозрачностью, эмблема вписана в 80 % кадра (fit).",
   "out": "design/ui/assets/art",
   "size": [
     464,
@@ -83,6 +83,238 @@
     "echo/ik-12.jpg": "echo/ik-12-great-count-priest__nb2-v2.jpg",
     "echo/ik-13.jpg": "echo/ik-13-jade-steps-lady__nb2-v3.jpg",
     "echo/ik-14.jpg": "echo/ik-14-last-day__nb2-v2.jpg",
-    "echo/ik-15.jpg": "echo/ik-15-many-faced__nb2.jpg"
+    "echo/ik-15.jpg": "echo/ik-15-many-faced__nb2.jpg",
+    "icons/power.png": {
+      "from": "attributes/attr-power__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/def-phys.png": {
+      "from": "attributes/attr-def-phys__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/def-mag.png": {
+      "from": "attributes/attr-def-mag__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/str.png": {
+      "from": "attributes/attr-str__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/int.png": {
+      "from": "attributes/attr-int__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/agi.png": {
+      "from": "attributes/attr-agi__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/end.png": {
+      "from": "attributes/attr-end__nb2-v2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/spd.png": {
+      "from": "attributes/attr-spd__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/hp.png": {
+      "from": "attributes/attr-hp__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/patk.png": {
+      "from": "attributes/attr-patk__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/matk.png": {
+      "from": "attributes/attr-matk__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/eva.png": {
+      "from": "attributes/attr-eva__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/crit.png": {
+      "from": "attributes/attr-crit__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/critdmg.png": {
+      "from": "attributes/attr-critdmg__nb2-v2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/r1.png": {
+      "from": "attr-rarity/attr-rar-common__nb2-v2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/r2.png": {
+      "from": "attr-rarity/attr-rar-rare__nb2-v3.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/r3.png": {
+      "from": "attr-rarity/attr-rar-unique__nb2-v3.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/r4.png": {
+      "from": "attr-rarity/attr-rar-epic__nb2-v2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/r5.png": {
+      "from": "attr-rarity/attr-rar-ancient__nb2-v2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/r6.png": {
+      "from": "attr-rarity/attr-rar-primordial__nb2-v2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/r7.png": {
+      "from": "attr-rarity/attr-rar-timeless__nb2-v2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/cls-tank.png": {
+      "from": "attr-tiles/attr-cls-tank__nb2-v2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/cls-healer.png": {
+      "from": "attr-tiles/attr-cls-healer__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/cls-str.png": {
+      "from": "attr-tiles/attr-cls-str__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/cls-agi.png": {
+      "from": "attr-tiles/attr-cls-agi__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/cls-mage.png": {
+      "from": "attr-tiles/attr-cls-mage__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/cls-control.png": {
+      "from": "attr-tiles/attr-cls-control__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/cls-farmer.png": {
+      "from": "attr-tiles/attr-cls-farmer__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    },
+    "icons/valor.png": {
+      "from": "attr-tiles/attr-valor__nb2-v2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 80
+    }
   }
 }
