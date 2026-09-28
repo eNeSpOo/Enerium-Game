@@ -1419,6 +1419,9 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 }
 
 </style>
+<link rel="stylesheet" href="screens/craft.css">
+<link rel="stylesheet" href="screens/bag.css">
+<link rel="stylesheet" href="screens/echo.css">
 </head>
 <body>
 <div class="p-app">
@@ -4689,5 +4692,10 @@ function boot() {
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 
 </script>
+<!-- экраны на общих запасах: договор — screens/model.js; грузятся до boot() -->
+<script src="screens/model.js"></script>
+<script src="screens/craft.js"></script>
+<script src="screens/bag.js"></script>
+<script src="screens/echo.js"></script>
 </body>
 </html>
