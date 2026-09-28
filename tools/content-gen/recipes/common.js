@@ -1,40 +1,55 @@
-/* Общие справочники и параметры дропа. Все числа — демонстрация, под прогоны. Шансы — в базисных пунктах (10 000 = 100 %). */
+/* Общие справочники и параметры добычи. Все числа — демонстрация, под прогоны. Шансы — в базисных пунктах (10 000 = 100 %).
+   Источники: GDD §9, §11–§13, §17–§19, §23; ADR-0010 (ключ и душа с элиты, базовый за этаж по шансу), ADR-0011 (души растут с биомом),
+   ADR-0014 (дух и золото × цикл, биом 2 — ещё +0,5 цикла), ADR-0018 (цикл I — обучение), ADR-0019 (герои из скрытых рецептов). */
 const SPECS = {
-  hunt: { n: 'Охота', icon: 'target' },
-  tail: { n: 'Портняжное дело', icon: 'cut' },
-  eng: { n: 'Инженерия', icon: 'gear' },
   alch: { n: 'Алхимия', icon: 'drop' },
   ench: { n: 'Зачарование', icon: 'spark' },
+  eng: { n: 'Инженерия', icon: 'gear' },
+  tail: { n: 'Портняжное дело', icon: 'cut' },
+  hunt: { n: 'Охота', icon: 'target' },
   smith: { n: 'Кузнечество', icon: 'flame' },
 };
-const SPEC_ORDER = ['hunt', 'tail', 'eng', 'alch', 'ench', 'smith'];
+const SPEC_ORDER = ['alch', 'ench', 'eng', 'tail', 'hunt', 'smith'];
+/* Ярусы. drop — падает, а не создаётся; res — ресурс ремесла: к нему относится правило §9.2 «не больше двух одного ремесла». */
 const TIERS = {
-  basic: { n: 'Базовый ресурс', r: 1 },
-  key: { n: 'Ключ ремесла', r: 2 },
-  unique: { n: 'Уникальный ресурс биома', r: 4 },
-  rune: { n: 'Руна предела', r: 2 },
-  vshard: { n: 'Осколок доблести', r: 3 },
-  valor: { n: 'Руна доблести', r: 4 },
+  basic: { n: 'Базовый ресурс', r: 1, drop: true, res: true },
+  key: { n: 'Ключ ремесла', r: 2, drop: true, res: true },
+  unique: { n: 'Уникальный ресурс босса', r: 4, drop: true },
+  craftres: { n: 'Ресурс крафтового биома', r: 2, drop: true, res: true },
+  find: { n: 'Находка крафтового биома', r: 3, drop: true },
+  trophy: { n: 'Трофей крафтового босса', r: 5, drop: true },
   part: { n: 'Заготовка', r: 2 },
+  made: { n: 'Изделие', r: 3 },
   act: { n: 'Активация крафтового биома', r: 3 },
-  call: { n: 'Призыв крафтового босса', r: 3 },
-  find: { n: 'Находка крафтового биома', r: 3 },
-  trophy: { n: 'Трофей крафтового босса', r: 4 },
-  echo: { n: 'Добыча Эхо', r: 4 },
-  product: { n: 'Изделие', r: 3 },
+  call: { n: 'Призыв крафтового босса', r: 4 },
+  hero: { n: 'Герой из скрытого рецепта', r: 3 },
+  product: { n: 'Награда мастерской', r: 4 },
+  rune: { n: 'Руна предела', r: 2 },
+  vshard: { n: 'Осколок доблести', r: 3, drop: true },
+  valor: { n: 'Руна доблести', r: 4 },
+  echo: { n: 'Добыча Эхо', r: 4, drop: true },
 };
-/* Рядовой, элита, босс биома: GDD §9.1 для биома 1; рост — старый ориентир §9.1:
-   золото и дух ×3 за цикл, души элиты +1 и босса +5 за каждый следующий биом. */
+const RARITY = { 'обычная': 1, 'редкая': 2, 'уникальная': 3, 'эпическая': 4, 'древняя': 5, 'первородная': 6, 'вневременная': 7 };
+/* Добыча врагов биома. Дух — ADR-0014: рядовой 10, элита 50, босс 250, рунный страж 500 за победу; × цикл, во втором биоме цикла — × (цикл + 0,5).
+   Золото — половина духа, округление вниз. Души — ADR-0011: элита — номер биома, босс — 5 × номер биома.
+   Базовый ресурс — один за взятый этаж с шансом basePerFloorBp (ADR-0010); в цикле I — предложение 5 000 б. п.: обучение крафту без лавки и рынка.
+   Уникальный — 5 % с босса (§9.1). Рунический ключ — элита 5 %, босс 10 %; за срабатывание столько ключей, какой цикл (§11). */
 const ENEMY = {
-  ordinary: { gold: 20, spirit: 10, basics: [1, 3] },
-  elite: { gold: 100, spirit: 50, basics: [1, 2], specKeys: 1, runeKeyBp: 500, runeKeyBpMax: 1000 },
-  boss: { gold: 500, spirit: 250, uniqueBp: 500, uniqueBpArtifacts: 1000, runeKeyBp: 1000, runeKeyBpMax: 2500 },
+  spirit: { ordinary: 10, elite: 50, boss: 250, guard: 500 },
+  soulsElitePerBiome: 1, soulsBossPerBiome: 5,
+  basePerFloorBp: 1000, basePerFloorBpByCycle: [5000, 1000, 1000, 1000, 1000, 1000],
+  uniqueBp: 500, eliteRuneKeyBp: 500, bossRuneKeyBp: 1000, eliteRuneKeyBpMax: 1000, bossRuneKeyBpMax: 2500,
 };
+/* Колоды для оценок «за забег». Мастерская форм — обучающая колода прототипа (ADR-0018): 15 этажей, элиты Подмастерье (5-й) и Резчик (10-й).
+   Второй биом цикла I в прототипе ещё не собран — предложение: 25 этажей и все шесть элит. Цикл II и дальше — образец ADR-0011: 35 этажей, 12 элит. */
+const DECKS = { tutorial: { floors: 15, elites: 2 }, cycle1b: { floors: 25, elites: 6 }, sample: { floors: 35, elites: 12 } };
 const GUARD = {
   limits: { runesPerKill: 2, weightsBp: [4000, 2700, 1800, 1000, 500] },
   valor: { shardsBp: [[1, 5000], [2, 2500], [3, 1250], [5, 725], [10, 300]], undefinedBp: 225, shardsPerRune: 100 },
-  dailyCapPerCycle: 10,
+  dailyCap: 10,   // общий дневной кап побед над рунными боссами (ADR-0022)
 };
+/* Перековка рун предела: три младшие + ключ ремесла. Ключи по ступеням: зачарование A, кузнечество A, алхимия B, зачарование B (A — мастерская, B — творение). */
+const RUNE_KEYS = [null, null, ['ench', 0], ['smith', 0], ['alch', 1], ['ench', 1]];
 const RITUALS = {
   workers: { minutes: [30, 60, 120, 180, 240, 300, 360], basics: [6, 12, 24, 36, 48, 60, 72], keys: [0, 0, 0, 1, 1, 2, 3],
     unique: { chanceBp: 100, minutes: 360, crew: 5, uniques: 1 } },
@@ -70,11 +85,11 @@ const BOXES = {
   perSlot: { workers: 5, keys: 2, heroShards: 5, equipment: 1, talismans: 1 },
   categories: [['Событие', 'Шарды рабочих'], ['Контракты', 'Рунные ключи'], ['Арена и Лига', 'Снаряжение'], ['Эхо', 'Осколки героев недели'], ['Клановый босс', 'Духовные талисманы'], ['Крафтовые боссы', 'Шарды рабочих']],
 };
+/* Крафтовый биом — экземпляр из предмета (§12.2): 10 этажей, ресурс биома за этаж с шансом, находка — одна гарантированно, вторая — 50 %.
+   Крафтовый босс живёт в Эхо (§12.3): ранг «Забытый босс», иммунитет к контролю 75 % (ADR-0010); призыв — предмет и 1 душа (§17.1). */
 const CRAFT = {
-  biome: { finds: 1, secondFindBp: 5000, gold: 3000, spirit: 1500, souls: 2, heroShards: 10, basics: 60, eventPoints: 60, runeKeyBp: 1000 },
-  boss: { trophies: 1, specKeys: 2, enerium: 5, runeKeyBp: 2000, summonSouls: 1 },
+  biome: { floors: 10, resPerFloorBp: 6000, finds: 1, secondFindBp: 5000, spirit: 1500, souls: 2, heroShards: 10, eventPoints: 60, runeKeyBp: 1000 },
+  boss: { trophies: 1, specKeys: 2, enerium: 5, runeKeyBp: 2000, summonSouls: 1, immunityBp: 7500 },
 };
-const MARKET = { basic: 5, key: 300, unique: 25000, commissionPct: 10 };
-/* Колода первого биома из design/ui/battle.js (ADR-0007): 110 рядовых, 6 элит, босс. */
-const DECK_B1 = { ordinary: 110, elite: 6, boss: 1, floors: 35 };
-module.exports = { SPECS, SPEC_ORDER, TIERS, ENEMY, GUARD, RITUALS, CONTRACTS, ECHO, CLAN, EVENT, BOXES, CRAFT, MARKET, DECK_B1 };
+const MARKET = { basic: 5, key: 300, craftres: 150, unique: 25000, find: 2500, trophy: 50000, commissionPct: 10 };
+module.exports = { SPECS, SPEC_ORDER, TIERS, RARITY, ENEMY, DECKS, GUARD, RUNE_KEYS, RITUALS, CONTRACTS, ECHO, CLAN, EVENT, BOXES, CRAFT, MARKET };

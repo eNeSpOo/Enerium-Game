@@ -1195,9 +1195,9 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 .tr-bar .tabs button .i{width:11px;height:11px;opacity:.7}
 .tr-cy{font:italic 500 15px/1.1 var(--f-d);color:var(--parch-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto}
 .tr-main{display:grid;grid-template-columns:minmax(0,1fr) 232px;gap:8px;flex:1 1 0;min-height:0}
-.tr-canvas{position:relative;isolation:isolate;display:flex;flex-direction:column;gap:5px;padding:6px;min-height:0;min-width:0;overflow:hidden}
+.tr-canvas{position:relative;isolation:isolate;display:flex;flex-direction:column;gap:5px;padding:6px;min-height:0;min-width:0;overflow:auto;scrollbar-width:thin;scrollbar-color:#2c3238 transparent}
 .tr-lines{position:absolute;left:0;top:0;width:100%;height:100%;z-index:-1;pointer-events:none;overflow:visible}
-.tr-cols{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;flex:1 1 0;min-height:0}
+.tr-cols{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;flex:1 0 auto;min-height:0}
 .tr-col{display:flex;flex-direction:column;gap:3px;min-width:0;min-height:0}
 .tr-col>small{flex:none;height:13px;font:700 9.5px/13px var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tr-col>.sep{flex:none;margin-top:4px;font:700 9px/1.1 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--gold-3)}
@@ -1210,6 +1210,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 .tn .gl,.tr-ing .gl{font:600 12px/1 var(--f-d);color:var(--gold)}
 .tn.key{border-color:color-mix(in srgb,var(--r2) 26%,var(--iron))}
 .tn.uniq{border-color:color-mix(in srgb,var(--r4) 50%,var(--iron))}
+.tn.cr{border-color:color-mix(in srgb,var(--r3) 40%,var(--iron))}
 .tn.made{background:linear-gradient(180deg,rgba(221,188,122,.05),transparent),#0f1216}
 .tn.far{border-style:dashed}
 .tn .port{position:absolute;right:-3px;top:-6px;height:12px;padding:0 3px;border-radius:4px;background:#0a0c0e;border:1px solid var(--gold-3);color:var(--gold-2);font:700 8.5px/10px var(--f-u);letter-spacing:.02em}
@@ -1254,6 +1255,40 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 .tr-leg i.s{width:14px;height:14px;border:1px solid var(--spirit);border-radius:4px;box-shadow:0 0 8px -2px var(--spirit)}
 .tr-leg i.q{width:14px;height:14px;border:1px dashed var(--iron-3);border-radius:4px}
 .k-box .tr-cols{grid-template-columns:repeat(2,minmax(0,1fr));flex:none}
+/* UI-кит · ресурсы Этериоса: ярусы × циклы, подсказка при наведении */
+.rz{position:relative;display:flex;flex-direction:column;gap:10px}
+.rz-leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--parch-2)}
+.rz-leg span{display:inline-flex;align-items:center;gap:5px}
+.rz-leg .i{width:14px;height:14px;color:var(--parch-2)}
+.rz-scroll{overflow-x:auto;scrollbar-width:thin;scrollbar-color:#2c3238 transparent;border:1px solid #1b1f24;border-radius:10px}
+.rz-grid{display:grid;grid-template-columns:118px repeat(6,minmax(152px,1fr));min-width:1040px}
+.rz-grid>div{padding:8px;border-top:1px solid #16191c;border-left:1px solid #16191c;min-width:0}
+.rz-grid>div:nth-child(-n+7){border-top:0}
+.rz-grid>div:nth-child(7n+1){border-left:0}
+.rz-h{font:700 11px/1.2 var(--f-u);letter-spacing:.12em;text-transform:uppercase;color:var(--gold-2);background:#0b0e10}
+.rz-h small{display:block;margin-top:3px;font:italic 500 13px/1.15 var(--f-d);letter-spacing:0;text-transform:none;color:var(--parch-3)}
+.rz-t{font:700 12.5px/1.2 var(--f-u);color:var(--parch);background:#0b0e10}
+.rz-t small{display:block;font-weight:400;color:var(--parch-3);font-size:11.5px;margin-top:3px}
+.rz-cell{display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start}
+.rz-cell.team{background:repeating-linear-gradient(135deg,transparent 0 9px,rgba(232,90,78,.045) 9px 18px)}
+.rz-sub{flex-basis:100%;font:700 9.5px/1.25 var(--f-u);letter-spacing:.08em;text-transform:uppercase;color:var(--parch-3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rz-sub:first-child{margin-top:0}
+.rz-it{--s:34px;border-radius:8px;cursor:pointer;color:var(--rc,var(--parch-2))}
+.rz-it .i{width:16px;height:16px}
+.rz-it img{width:82%;height:82%;object-fit:contain}
+.rz-it .gl{font:600 14px/1 var(--f-d);color:var(--gold)}
+.rz-it .rz-k{position:absolute;right:1px;top:0;display:grid;color:var(--gold-2)}
+.rz-it .rz-k .i{width:11px;height:11px}
+.rz-it:hover,.rz-it:focus-visible{border-color:var(--spirit);outline:none;box-shadow:0 0 0 1px var(--spirit),inset 0 -2px 0 color-mix(in srgb,var(--rc,#2b3036) 70%,transparent)}
+.rz-n{font:600 20px/1 var(--f-d);color:var(--parch);font-variant-numeric:lining-nums tabular-nums}
+.rz-tip{position:absolute;z-index:6;width:300px;max-width:calc(100% - 8px);padding:10px 12px;border-radius:10px;border:1px solid var(--iron-2);background:#0b0d10;box-shadow:0 14px 34px rgba(0,0,0,.65);pointer-events:none;display:flex;flex-direction:column;gap:5px;font-size:13px;line-height:1.3;color:var(--parch)}
+.rz-tip[hidden]{display:none}
+.rz-tip b{font:600 19px/1.1 var(--f-d);color:var(--gold)}
+.rz-tip .e{font:700 10px/1.25 var(--f-u);letter-spacing:.12em;text-transform:uppercase;color:var(--gold-2)}
+.rz-tip p{margin:0;font:italic 500 14.5px/1.3 var(--f-d);color:var(--parch)}
+.rz-tip ul{margin:0;padding-left:15px;color:var(--parch-2);font-size:12px}
+.rz-tip .faint{color:var(--parch-3)}
+.rz-tip .chip{height:auto;padding:2px 7px;font-size:11px}
 @container main (max-height: 360px){
   .tr-main{grid-template-columns:minmax(0,1fr) 208px}
   .tr-cols{gap:5px}
@@ -1640,6 +1675,7 @@ const ICONS = {
   target: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/><path d="M12 1.5v4M12 18.5v4M1.5 12h4M18.5 12h4"/>',
   crack: '<path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/><path d="M12.5 6l-2.5 5 3 2-2 5"/>',
   wave: '<path d="M3 9c3-3 6 3 9 0s6 3 9 0M3 15c3-3 6 3 9 0s6 3 9 0"/>',
+  key: '<circle cx="7.5" cy="12" r="3.5"/><path d="M11 12h10M17.5 12v3.5M20.5 12v2.5"/>',
 };
 const SPRITE = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>${Object.entries(ICONS).map(([k, v]) => `<symbol id="i-${k}" viewBox="0 0 24 24">${v}</symbol>`).join('')}</defs></svg>`;
 const CLS = c => ic(CLS_ICON[c] || 'gem');
@@ -2149,8 +2185,10 @@ const RX = window.EN_RECIPES || { specs: {}, tiers: {}, cycles: [], items: [], r
 const RXI = {}, RX_OUT = {}, RX_USE = {};
 RX.items.forEach(it => { RXI[it.id] = it; });
 RX.recipes.forEach(r => { (RX_OUT[r.out[0]] = RX_OUT[r.out[0]] || []).push(r); r.in.forEach(([id]) => { (RX_USE[id] = RX_USE[id] || []).push(r); }); });
-const TR_IC = { unique: 'crown', act: 'door', call: 'eye', find: 'search', trophy: 'flag', echo: 'users', product: 'star', valor: 'star', vshard: 'spark' };
-const TR_RES = ['basic', 'key', 'unique'];   // ресурсы добычи — в фильтре
+const TR_IC = { unique: 'crown', act: 'door', call: 'eye', find: 'search', trophy: 'flag', echo: 'users', hero: 'users', product: 'gem', valor: 'star', vshard: 'spark' };
+const TR_RES = ['basic', 'key', 'unique', 'craftres', 'find', 'trophy'];   // ресурсы добычи — в фильтре
+const TR_MADE = ['part', 'made', 'act', 'call', 'product', 'valor', 'hero'];   // создаются рецептом
+const TR_CRAFT = ['craftres', 'find', 'trophy'];   // добыча крафтовых биомов и боссов
 const trEsc = x => String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 const trNorm = x => String(x).toLowerCase().replace(/ё/g, 'е');
 const trHit = it => { const q = trNorm(S.tree.q.trim()); return q.length > 1 && trNorm(it.n).includes(q); };
@@ -2160,15 +2198,22 @@ function trIcon(it) {
   const sp = it.spec && RX.specs[it.spec.split('+')[0]];
   return ic(TR_IC[it.tier] || (sp ? sp.icon : 'gem'));
 }
+/* Колонки цикла: добыча биомов, ключи мастерской и творения, заготовки, изделия, крафтовые биомы и Эхо, герои и награды.
+   Входы из прошлых циклов стоят в колонке своего яруса под чертой «из прошлых циклов». */
+const TR_COL = it => ['basic', 'unique', 'vshard', 'rune', 'echo'].includes(it.tier) ? 0 : it.tier === 'key' ? 1 : it.tier === 'part' ? 3 : it.tier === 'made' ? 4
+  : ['act', 'call', 'craftres', 'find', 'trophy'].includes(it.tier) ? 5 : 6;
 function trLayout(c) {
   const cy = RX.cycles[c - 1], [A, B] = cy.biomes, its = RX.items.filter(i => i.cyc === c);
   const pick = f => its.filter(f).map(i => i.id), byB = (b, t) => pick(i => i.b === b && i.tier === t);
   const recs = RX.recipes.filter(r => r.cyc === c);
   const far = [...new Set(recs.flatMap(r => r.in.filter(([id]) => RXI[id].cyc !== c).map(([id]) => id)))];
-  return { recs, far, strip: [1, 2, 3, 4, 5].map(k => `rn${c}_${k}`).concat([`vs${c}`, `vr${c}`]),
-    cols: [['Добыча', [...byB(A.id, 'basic'), ...byB(B.id, 'basic'), ...byB(A.id, 'unique'), ...byB(B.id, 'unique')]],
-      ['Ключи · ' + A.n, byB(A.id, 'key')], ['Ключи · ' + B.n, byB(B.id, 'key')], ['Заготовки', pick(i => i.tier === 'part')],
-      ['Изделия', pick(i => ['act', 'call', 'product'].includes(i.tier))], ['Крафт и Эхо', pick(i => ['find', 'trophy', 'echo'].includes(i.tier))]] };
+  const craft = (cy.craft || []).flatMap(pid => { const p = RX.places.find(x => x.id === pid); return [p.act, ...p.res, p.find, p.boss.call, p.boss.trophy]; });
+  const cols = [['Добыча биомов', [...byB(A.id, 'basic'), ...byB(B.id, 'basic'), ...byB(A.id, 'unique'), ...byB(B.id, 'unique'), ...pick(i => i.tier === 'echo')]],
+    ['Ключи · ' + A.n, byB(A.id, 'key')], ['Ключи · ' + B.n, byB(B.id, 'key')], ['Заготовки', pick(i => i.tier === 'part')],
+    ['Изделия', pick(i => i.tier === 'made')], ['Руины и Эхо', craft.concat(pick(i => i.tier === 'call' && !craft.includes(i.id)))],
+    ['Герои и награды', pick(i => i.tier === 'hero' || i.tier === 'product')]];
+  const farBy = cols.map(() => []); far.forEach(id => farBy[TR_COL(RXI[id])].push(id));
+  return { recs, far, farBy, strip: [1, 2, 3, 4, 5].map(k => `rn${c}_${k}`).concat([`vs${c}`, `vr${c}`]), cols };
 }
 const trLayoutIds = c => { const L = trLayout(c); return new Set(L.cols.flatMap(x => x[1]).concat(L.far, L.strip)); };
 /* вся цепочка узла по всем циклам: up — из чего собирается, down — куда уходит */
@@ -2186,7 +2231,7 @@ function tnHtml(id, ch, o = {}) {
   const later = o.far ? [] : (RX_USE[id] || []).filter(r => r.cyc > it.cyc).map(r => r.cyc);
   const port = o.far ? `<span class="port">${ROMAN[it.cyc]}</span>` : later.length ? `<span class="port">→${ROMAN[Math.min(...later)]}</span>` : '';
   const label = o.short && TR_SHORT[it.tier] ? TR_SHORT[it.tier](it) : it.n;
-  const cls = ['tn', it.tier === 'key' ? 'key' : '', it.tier === 'unique' ? 'uniq' : '', ['part', 'act', 'call', 'product', 'valor'].includes(it.tier) ? 'made' : '', o.far ? 'far' : '', trHit(it) ? 'hit' : '', st];
+  const cls = ['tn', it.tier === 'key' ? 'key' : '', it.tier === 'unique' ? 'uniq' : '', TR_CRAFT.includes(it.tier) ? 'cr' : '', TR_MADE.includes(it.tier) ? 'made' : '', o.far ? 'far' : '', trHit(it) ? 'hit' : '', st];
   return `<button class="${cls.join(' ').replace(/\s+/g, ' ').trim()}" data-a="tsel" data-v="${id}" data-tn="${id}" aria-pressed="${sel === id}" title="${trEsc(it.n)}"><span class="ti" data-r="${it.r}">${trIcon(it)}</span><b>${label}</b>${port}</button>`;
 }
 let TR_EDGES = [];
@@ -2214,7 +2259,10 @@ function drawTree() {
   if (!cv || !svg) return;
   const pos = {};
   cv.querySelectorAll('[data-tn]').forEach(e => { pos[e.dataset.tn] = { x: e.offsetLeft, y: e.offsetTop, w: e.offsetWidth, h: e.offsetHeight }; });
-  svg.setAttribute('viewBox', `0 0 ${cv.clientWidth} ${cv.clientHeight}`);
+  svg.style.width = svg.style.height = '0px';   // сперва убрать прежний размер, иначе он раздует прокрутку
+  const w = cv.scrollWidth, h = cv.scrollHeight;   // колонки поздних циклов длиннее окна — холст прокручивается, линии тянутся на всю высоту
+  svg.style.width = w + 'px'; svg.style.height = h + 'px';
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
   const order = { '': 0, down: 1, up: 2 };
   svg.innerHTML = TR_EDGES.slice().sort((a, b) => order[a[2]] - order[b[2]]).map(([a, b, c]) => pos[a] && pos[b] ? `<path class="te ${c}" d="${trPath(pos[a], pos[b])}"/>` : '').join('');
 }
@@ -2231,13 +2279,15 @@ function trChainList(ids, own) {
 function trCard(id) {
   const it = RXI[id], T = RX.tiers[it.tier] || { n: '' };
   const cy = RX.cycles[it.cyc - 1], bm = it.b ? cy.biomes.find(b => b.id === it.b) : null;
-  const where = bm ? `${bm.n} · цикл ${cy.roman}` : `цикл ${cy.roman}`;
+  const where = bm ? `${bm.n} · цикл ${cy.roman}` : it.place ? `${it.place} · цикл ${cy.roman}` : `цикл ${cy.roman}`;
   const sp = it.spec ? it.spec.split('+').map(x => RX.specs[x].n.toLowerCase()).join(' + ') : '';
   const recs = RX_OUT[id] || [], uses = RX_USE[id] || [], ch = trChain(id);
   const opens = it.opens ? `<p class="muted" style="font-size:12.5px">${it.tier === 'act' ? 'Активирует крафтовый биом' : 'Призывает в Эхо крафтового босса'} «${it.opens}». ${it.opensLore}</p>` : '';
-  return `<div class="row" style="gap:10px;align-items:center"><span class="tr-big" data-r="${it.r}">${trIcon(it)}</span><div class="col" style="gap:3px;min-width:0"><span class="eyebrow">${T.n}${sp ? ' · ' + sp : ''}</span><b class="serif" style="font-size:20px;line-height:1.05">${it.n}</b><span class="faint" style="font-size:12px">${where}${it.elite ? ' · элита «' + it.elite + '»' : ''}</span></div></div>
+  const who = it.elite ? ' · элита «' + it.elite + '»' : it.boss && it.tier === 'unique' ? ' · босс «' + it.boss + '»' : it.foe ? ' · «' + it.foe + '»' : '';
+  const hero = it.tier === 'hero' ? `<div class="row" style="gap:8px;flex-wrap:wrap"><span class="chip">${it.cls}</span><span class="chip">${it.race} · ${it.school}</span><span class="chip gold">максимум доблести ${it.maxV}</span></div>` : '';
+  return `<div class="row" style="gap:10px;align-items:center"><span class="tr-big" data-r="${it.r}">${trIcon(it)}</span><div class="col" style="gap:3px;min-width:0"><span class="eyebrow">${T.n}${sp ? ' · ' + sp : ''}</span><b class="serif" style="font-size:20px;line-height:1.05">${it.n}</b><span class="faint" style="font-size:12px">${where}${who}</span></div></div>
     ${it.team ? '<span class="chip warn" style="align-self:flex-start">спойлер §38 · игроку до цикла VI не показывать</span>' : ''}
-    <p class="quote">${it.lore}</p>${opens}
+    ${hero}<p class="quote">${it.lore}</p>${opens}
     ${recs.length ? `<span class="eyebrow">Рецепт</span>${recs.map(trRecipe).join('')}` : ''}
     ${it.src && it.src.length ? `<span class="eyebrow">Где падает</span><ul class="tr-src">${it.src.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}
     <span class="eyebrow">Куда идёт</span>${uses.length ? `<div class="tr-use">${uses.map(r => `<button class="chip ${r.cyc !== it.cyc ? 'gold' : ''}" data-a="tsel" data-v="${r.out[0]}">${RXI[r.out[0]].n}${r.cyc !== it.cyc ? ' · цикл ' + ROMAN[r.cyc] : ''}</button>`).join('')}</div>` : '<p class="faint" style="font-size:12.5px">Конечное изделие.</p>'}
@@ -2245,13 +2295,17 @@ function trCard(id) {
     ${ch.down.size ? `<span class="eyebrow">Вся цепочка вниз · куда уходит по циклам</span>${trChainList(ch.down, it.cyc)}` : ''}`;
 }
 function trSummary(c, L) {
-  const cy = RX.cycles[c - 1];
+  const cy = RX.cycles[c - 1], st = RX.stats && RX.stats.byCycle[c - 1], t = st ? st.tiers : {};
+  const places = (cy.craft || []).map(pid => RX.places.find(p => p.id === pid));
   return `<span class="eyebrow">Цикл ${cy.roman} · ${cy.god}</span>
     <b class="serif" style="font-size:19px;line-height:1.1">${cy.biomes.map(b => b.n).join(' · ')}</b>
-    <p class="muted" style="font-size:13px">${cy.about} Крафтовый биом «${cy.craftBiome}», крафтовый босс «${cy.craftBoss}».</p>
-    <dl class="kv"><dt>Рецептов в цикле</dt><dd>${L.recs.length}</dd><dt>Ресурсов добычи</dt><dd>6 базовых · 12 ключей · 2 уникальных</dd></dl>
-    <div class="tr-leg"><span><i></i>что нужно выбранному</span><span><i class="d"></i>куда оно идёт</span><span><i class="s"></i>выбранный узел</span><span><b class="gold" style="font:700 10px var(--f-u)">→III</b>&nbsp;уходит в рецепт цикла III</span></div>
-    <p class="reason">Нажмите узел: золотом подсветится, что для него нужно, пунктиром — куда он идёт. Справа — вся цепочка по циклам. Все числа — демонстрация. Хребет цикла: добыча → заготовки → активация → крафтовый биом → находка → призыв → крафтовый босс → трофей → следующий цикл.</p>`;
+    <p class="muted" style="font-size:13px">${cy.about}</p>
+    <dl class="kv"><dt>Рецептов в цикле</dt><dd>${L.recs.length}</dd>
+      ${st ? `<dt>Ресурсов добычи</dt><dd>${st.resources}: ${t.basic} базовых · ${t.key} ключей · ${t.unique} уникальных · ${t.craftres + t.find + t.trophy} крафтовых</dd><dt>Развилок в древе</dt><dd>${st.forks}</dd>` : ''}
+      <dt>${places.length > 1 ? 'Крафтовые биомы' : 'Крафтовый биом'}</dt><dd>${places.map(p => p.n).join(', ')}</dd>
+      <dt>${places.length > 1 ? 'Крафтовые боссы' : 'Крафтовый босс'}</dt><dd>${places.map(p => p.boss.label).join(', ')}</dd></dl>
+    <div class="tr-leg"><span><i></i>что нужно выбранному</span><span><i class="d"></i>куда оно идёт</span><span><i class="s"></i>выбранный узел</span><span><b class="gold" style="font:700 10px var(--f-u)">→III</b>&nbsp;уходит в рецепт цикла III</span><span><i class="q"></i>из прошлых циклов</span></div>
+    <p class="reason">Нажмите узел: золотом подсветится, что для него нужно, пунктиром — куда он идёт. Справа — вся цепочка по циклам. Все числа — демонстрация. Слои цикла: добыча → заготовки → изделия → активация руины → её ресурсы и находка → призыв Забытого в Эхо → трофей → герои и ларцы. Каждая руина подсказывает дорогу к следующей.</p>`;
 }
 function treePage() {
   if (!RX.cycles.length) return '<p class="faint">Нет данных: рядом с index.html должен лежать recipes.js.</p>';
@@ -2262,7 +2316,7 @@ function treePage() {
   const bar = `<div class="tr-bar"><div class="tabs" role="tablist" aria-label="Циклы">${tabs}</div><span class="tr-cy">${cy.god} · ${cy.el.toLowerCase()} · ${cy.karst}</span>${cy.team ? '<span class="chip warn">спойлер</span>' : ''}<span class="g-spacer"></span>${find}${res}<label class="tr-only-l"><input type="checkbox" id="trOnly" ${T.only ? 'checked' : ''}>только связи выбранного</label></div>`;
   const L = trLayout(c), ch = trChain(T.sel);
   TR_EDGES = trEdges(L, ch);
-  const cols = L.cols.map(([h, ids], i) => `<div class="tr-col"><small title="${h}">${h}</small>${ids.map(id => tnHtml(id, ch)).join('')}${i === 3 && L.far.length ? `<span class="sep">Из прошлых циклов</span>${L.far.map(id => tnHtml(id, ch, { far: true })).join('')}` : ''}</div>`).join('');
+  const cols = L.cols.map(([h, ids], i) => `<div class="tr-col"><small title="${h}">${h}</small>${ids.map(id => tnHtml(id, ch)).join('')}${L.farBy[i].length ? `<span class="sep">Из прошлых циклов</span>${L.farBy[i].map(id => tnHtml(id, ch, { far: true })).join('')}` : ''}</div>`).join('');
   const strip = `<div class="tr-strip"><small>Стражи</small>${L.strip.slice(0, 5).map(id => tnHtml(id, ch, { short: true })).join('')}<span class="gap"></span>${L.strip.slice(5).map(id => tnHtml(id, ch, { short: true })).join('')}</div>`;
   const canvas = `<div class="pnl tr-canvas ${T.sel ? 'tr-on' : ''} ${T.sel && T.only ? 'tr-only' : ''}" id="trCanvas"><svg class="tr-lines" id="trLines" aria-hidden="true"></svg><div class="tr-cols">${cols}</div>${strip}</div>`;
   const info = T.sel && RXI[T.sel] ? trCard(T.sel) : trSummary(c, L);
@@ -3396,9 +3450,80 @@ function renderKit() {
   <section class="k-box"><h3>Кристалл Памяти</h3><div class="k-demo mem" style="grid-template-columns:repeat(3,1fr)"><div class="mslot"><span class="crys"></span><small class="faint">пустой карст</small></div><div class="mslot open"><span class="crys"></span><small class="spirit">можно вспомнить</small></div><div class="mslot set" data-r="3"><span class="crys"></span><small class="faint">закреплено</small></div></div><p class="k-note">Состояние из лора: пустой карст матовый, заряженный светится изнутри.</p></section>
   <section class="k-box"><h3>Иконки путей</h3><div class="k-row">${[[12, 'Убежище'], [10, 'Спуск'], [24, 'Герои'], [11, 'Ремесло'], [6, 'Неделя'], [18, 'Эхо'], [38, 'Контракты'], [33, 'Ритуалы'], [3, 'Арена'], [26, 'Клан'], [21, 'Событие'], [29, 'Странник']].map(([p, n]) => `<figure style="margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;width:64px"><img src="${PATH(p)}" alt="" style="width:48px;height:48px;border-radius:12px;box-shadow:0 0 0 1px #262c32"><figcaption style="font-size:11px;color:var(--parch-2);text-align:center;line-height:1.1">${n}</figcaption></figure>`).join('')}</div><p class="k-note">Авторский набор. Иконка узнаётся, подпись остаётся всегда.</p></section>
   <section class="k-box"><h3>Слой поверх: лист и диалог</h3><div class="k-demo" style="height:170px;position:relative;overflow:hidden;border:1px solid var(--iron)"><div style="position:absolute;inset:0;background:rgba(3,4,5,.55)"></div><div class="sheet" style="width:52%;animation:none"><div class="sheet-h" style="min-height:40px;padding:6px 8px 6px 12px"><h2 style="font-size:17px">Сведения</h2><span class="iconbtn x" style="width:26px;height:26px">${ic('x')}</span></div><div class="sheet-b" style="padding:8px 12px;gap:6px"><span class="faint" style="font-size:12px">уточняет работу, не уводит с экрана</span>${bar(60)}</div><div class="sheet-f" style="padding:6px 12px"><button class="btn go sm" style="margin-left:auto">Действие</button></div></div></div><p class="k-note">Лист справа — сведения и настройка. Диалог по центру — только цена, последствия и итог.</p></section>
-  ${RXI.sand ? `<section class="k-box"><h3>Древо рецептов · узлы</h3><div class="k-demo tr-cols">${[['sand', ''], ['k1_ench', 'up'], ['u4', ''], ['p1a', 'sel'], ['act1', 'down'], ['k4_hunt', '']].map(([id, st, unk]) => { const it = RXI[id]; return `<span class="tn ${it.tier === 'key' ? 'key' : it.tier === 'unique' ? 'uniq' : ['part', 'act'].includes(it.tier) ? 'made' : ''} ${unk ? 'unk' : ''} ${st}"><span class="ti" data-r="${unk ? 1 : it.r}">${unk ? '<span class="gl">?</span>' : trIcon(it)}</span><b>${unk ? 'Не найдено' : it.n}</b></span>`; }).join('')}</div>
+  ${RX.stats ? `<section class="k-box" style="grid-column:1/-1"><h3>Ресурсы Этериоса · ${RX.stats.total.resources}</h3>
+    <p class="k-note">Все ресурсы игры по шести циклам и ярусам: базовые падают с этажей, ключи — с каждой элиты, уникальные — с боссов биомов, крафтовые — в руинах и у Забытых в Эхо. Иконка — заглушка: ремесло или ярус, нижняя кромка — редкость. Наведите или выберите клавиатурой — подсказка с загадкой и источником; нажмите — узел откроется в «Древе рецептов». Данные — <code>recipes.js</code>, обоснование и летопись Этриона — <code>docs/content/ресурсы-рецепты-дроп.md</code>. Цикл VI — спойлер, только для команды.</p>
+    <div id="kitRes" class="rz"></div></section>` : ''}
+  ${RXI.sand ? `<section class="k-box"><h3>Древо рецептов · узлы</h3><div class="k-demo tr-cols">${[['sand', ''], ['k1_ench', 'up'], ['u4', ''], ['p_clay', 'sel'], ['act_cb1', 'down'], ['k4_hunt', '', 1]].map(([id, st, unk]) => { const it = RXI[id]; if (!it) return ''; return `<span class="tn ${it.tier === 'key' ? 'key' : it.tier === 'unique' ? 'uniq' : TR_MADE.includes(it.tier) ? 'made' : ''} ${unk ? 'unk' : ''} ${st}"><span class="ti" data-r="${unk ? 1 : it.r}">${unk ? '<span class="gl">?</span>' : trIcon(it)}</span><b>${unk ? 'Не найдено' : it.n}</b></span>`; }).join('')}</div>
     <div class="tr-leg"><span><i></i>что нужно выбранному</span><span><i class="d"></i>куда оно идёт</span><span><i class="s"></i>выбранный узел</span></div>
-    <p class="k-note">Вкладка «Древо рецептов» рядом с «Картой экранов» — инструмент команды и конструктора, игрок древо не видит (ADR-0008). Узлы стоят по ярусам — добыча, ключи ремёсел, заготовки, изделия, крафт и Эхо; внизу — руны стражей. Цвет узла — редкость.</p></section>` : ''}`;
+    <p class="k-note">Вкладка «Древо рецептов» рядом с «Картой экранов» — инструмент команды и конструктора, игрок древо не видит (ADR-0008). Узлы стоят по слоям: добыча, ключи мастерской и творения, заготовки, изделия, руины и Эхо, герои и награды; внизу — руны стражей. Цвет узла — редкость, пунктир — вход из прошлого цикла.</p></section>` : ''}`;
+}
+
+/* ================== UI-кит · ресурсы Этериоса ==================
+   Градация всех ресурсов по шести циклам и ярусам: базовые, ключи элит, уникальные боссов, ресурсы руин, находки, трофеи.
+   Данные — recipes.js (window.EN_RECIPES). Иконки — заглушки из ic(): ремесло или ярус; кромка — редкость. */
+const RZ_ROWS = [
+  ['basic', 'Базовые', 'этаж биома, по шансу'],
+  ['key', 'Ключи элит', 'каждая элита, один'],
+  ['unique', 'Уникальные', 'босс биома, 5 %'],
+  ['craftres', 'Ресурсы руин', 'этаж крафтового биома'],
+  ['find', 'Находки', 'закрытие крафтового биома'],
+  ['trophy', 'Трофеи', 'Забытый в Эхо, за победу'],
+];
+function rzIt(it) {
+  return `<button class="well rz-it" data-rz="${it.id}" data-r="${it.r}" aria-label="${trEsc(it.n)}">${trIcon(it)}${it.tier === 'key' ? `<span class="rz-k">${ic('key')}</span>` : ''}</button>`;
+}
+function rzCell(cy, tier) {
+  const its = RX.items.filter(i => i.cyc === cy.n && i.tier === tier);
+  if (!its.length) return '<span class="faint" style="font-size:12px">—</span>';
+  if (['basic', 'key', 'unique'].includes(tier)) return cy.biomes.map(b => { const g = its.filter(i => i.b === b.id); return g.length ? `<span class="rz-sub">${b.id.slice(1)} · ${b.n}</span>${g.map(rzIt).join('')}` : ''; }).join('');
+  return (cy.craft || []).map(pid => { const p = RX.places.find(x => x.id === pid), g = its.filter(i => i.b === pid); return g.length ? `<span class="rz-sub">${tier === 'trophy' ? p.boss.label : p.n}</span>${g.map(rzIt).join('')}` : ''; }).join('');
+}
+function rzPaint() {
+  const root = document.getElementById('kitRes'); if (!root || !RX.cycles.length) return;
+  const specs = (RX.specOrder || Object.keys(RX.specs)).map(s => `<span>${ic(RX.specs[s].icon)}${RX.specs[s].n}</span>`).join('');
+  const head = `<div class="rz-h">Ярус</div>${RX.cycles.map(cy => `<div class="rz-h">${cy.roman} · ${cy.god}<small>${cy.el} · ${cy.karst}${cy.team ? ' · для команды' : ''}</small></div>`).join('')}`;
+  const rows = RZ_ROWS.map(([t, n, d]) => `<div class="rz-t">${n}<small>${d}</small></div>${RX.cycles.map(cy => `<div class="rz-cell ${cy.team ? 'team' : ''}">${rzCell(cy, t)}</div>`).join('')}`).join('');
+  const totals = `<div class="rz-t">Всего</div>${RX.stats.byCycle.map(s => `<div class="rz-n">${s.resources}</div>`).join('')}`;
+  root.innerHTML = `<div class="rz-leg">${specs}<span>${ic('key')}ключ элиты</span><span>${ic('crown')}уникальный</span><span>${ic('search')}находка</span><span>${ic('flag')}трофей</span></div>
+    <div class="rz-scroll"><div class="rz-grid">${head}${rows}${totals}</div></div>
+    <div class="rz-tip" id="rzTip" role="tooltip" hidden></div>`;
+}
+function rzTipHtml(it) {
+  const T = RX.tiers[it.tier] || { n: '' }, cy = RX.cycles[it.cyc - 1];
+  const bm = it.b ? cy.biomes.find(b => b.id === it.b) : null;
+  const where = bm ? bm.n : it.place || '';
+  const who = it.elite ? `элита «${it.elite}»` : it.tier === 'unique' ? `босс «${it.boss}»` : it.foe ? `«${it.foe}»` : '';
+  const sp = it.spec ? RX.specs[it.spec.split('+')[0]].n.toLowerCase() : '';
+  const uses = [...new Set((RX_USE[it.id] || []).map(r => r.out[0]))];
+  return `<span class="e">${T.n}${sp ? ' · ' + sp : ''} · цикл ${cy.roman}</span><b>${trEsc(it.n)}</b>
+    <span class="faint" style="font-size:12px">${[where, who].filter(Boolean).join(' · ')}</span>
+    ${it.team ? '<span class="chip warn" style="align-self:flex-start">спойлер · только команде</span>' : ''}
+    <p>${trEsc(it.lore)}</p>
+    <ul>${(it.src || []).slice(0, 2).map(s => `<li>${trEsc(s)}</li>`).join('')}</ul>
+    <span class="faint" style="font-size:12px">Идёт в ${uses.length} ${plural(uses.length, 'рецепт', 'рецепта', 'рецептов')}${uses.length ? ': ' + uses.slice(0, 3).map(id => trEsc(RXI[id].n)).join(', ') + (uses.length > 3 ? '…' : '') : ''}</span>`;
+}
+function rzShow(btn) {
+  const root = document.getElementById('kitRes'), tip = document.getElementById('rzTip'), it = btn && RXI[btn.dataset.rz];
+  if (!root || !tip || !it) return;
+  tip.innerHTML = rzTipHtml(it); tip.hidden = false;
+  const r = root.getBoundingClientRect(), b = btn.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+  let x = b.left - r.left + b.width / 2 - w / 2, y = b.bottom - r.top + 8;
+  x = Math.max(0, Math.min(x, root.clientWidth - w));
+  if (b.bottom + h + 12 > innerHeight && b.top - h - 8 > 0) y = b.top - r.top - h - 8;   // не помещается снизу — над иконкой
+  tip.style.left = x + 'px'; tip.style.top = y + 'px';
+}
+function bindKitRes() {
+  const hide = () => { const t = document.getElementById('rzTip'); if (t) t.hidden = true; };
+  document.addEventListener('mouseover', e => { const b = e.target.closest && e.target.closest('#kitRes [data-rz]'); if (b) rzShow(b); else if (e.target.closest && !e.target.closest('#rzTip')) hide(); });
+  document.addEventListener('focusin', e => { const b = e.target.closest && e.target.closest('#kitRes [data-rz]'); if (b) rzShow(b); else hide(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') hide(); });
+  document.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('#kitRes [data-rz]'); if (!b) return;
+    const it = RXI[b.dataset.rz]; if (!it) return;
+    hide(); S.tree.sel = it.id; S.tree.cyc = it.cyc; S.tree.only = false; S.tree.q = '';
+    showPage('tree'); try { history.replaceState(null, '', '#tree'); } catch (_) { }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 }
 
 function kitCards() {
@@ -3715,7 +3840,7 @@ function boot() {
   const g = $game();
   bindGame();
   render();
-  renderMap(); renderKit(); khPaint(); klPaint();
+  renderMap(); renderKit(); khPaint(); klPaint(); rzPaint();
   const fl = document.getElementById('flows');
   fl.innerHTML = FLOWS.map(([t, d], i) => `<li><button class="p-flow" data-flow="${i}"><span><b>${t}</b><small>${d}</small></span></button></li>`).join('');
   fl.addEventListener('click', e => { const b = e.target.closest('[data-flow]'); if (!b) return; FLOWS[+b.dataset.flow][2](); render(); if (S.overlay) focusOverlay(); if (window.innerWidth < 1200) document.getElementById('devWrap').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
@@ -3728,6 +3853,7 @@ function boot() {
   bindTree();
   bindKitHeroes();
   bindKitLib();
+  bindKitRes();
   document.getElementById('kitGrid').addEventListener('click', e => { const b = e.target.closest('[data-fx]'); if (b) kitFx(b.dataset.fx); });
   document.getElementById('btnFull').addEventListener('click', () => { const d = document.getElementById('device'); const req = d.requestFullscreen || d.webkitRequestFullscreen; if (req) Promise.resolve(req.call(d)).catch(() => { }); });
   document.addEventListener('fullscreenchange', () => { const on = !!document.fullscreenElement; g.classList.toggle('full', on); document.getElementById('device').classList.toggle('fs', on); fitDevice(); });
