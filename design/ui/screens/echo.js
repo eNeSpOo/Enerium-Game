@@ -543,7 +543,7 @@ function headHtml(W, c) {
   const kpi = c >= EM.from ? `<div class="stat"><b>${fmt(S.echo.score)}</b><small>очков недели</small></div><button class="stat ech-rank" data-a="sheet" data-v="rank:Эхо"><b>${S.echo.score ? S.echo.place : '—'}</b><small>место</small></button>`
     : `<span class="chip">${ic('book')}цикл ${ROMAN[c]} · обучение без рейтинга</span>`;
   return `<div class="pnl ech-head">
-    <div class="ech-civ"><b>${W.civ}</b><small>Неделя ${W.gen} · древняя цивилизация задолго до этеров · нашествие «${W.raid}»</small></div>
+    <div class="ech-civ"><b>${W.civ}</b><small>${PL(`Неделя ${W.gen} · нашествие «${W.raid}»`, `Неделя ${W.gen} · древняя цивилизация задолго до этеров · нашествие «${W.raid}»`)}</small></div>
     <div class="ech-kpi">${kpi}</div>
     <button class="ech-week" data-a="echweek" aria-label="Отряд и награды недели"><span class="ech-faces">${faces}</span><span class="tx"><b>Отряд недели</b><small>${open.length ? `открыто ${open.length} из ${squad.length}` : 'с цикла ' + ROMAN[EM.from]}${av ? ' · неприязнь +' + pctBp(av.avers.bp != null ? av.avers.bp : RS.rules.aversionBp) : ''}</small></span>${claim ? `<span class="bdg">${claim}</span>` : ''}${ic('chev')}</button>
   </div>`;
@@ -565,8 +565,8 @@ function summonHtml(i) {
     <div class="info">
       <span class="eyebrow">Слот ${i + 1} · свободен</span>
       <h2 class="serif ech-name">Призвать цель</h2>
-      <p class="muted ech-p">Эхо предложит ${n} ${plural(n, 'вариант', 'варианта', 'вариантов')} ${a > 1 ? `из открытых ступеней 1–${a}: слабые чаще, сильные реже` : 'с первой ступени — пока открыта только она'}; с шансом ${pctBp2(manyBp())} — Многоликий. Выбранную цель не отменить, у каждой свой срок.</p>
-      <div class="row ech-wide"><span class="eyebrow">вариантов</span><div class="tabs" role="tablist" aria-label="Вариантов призыва">${[[false, ECH.offer.base], [true, ECH.offer.wide]].map(([w, k]) => `<button role="tab" aria-selected="${S.ech.wide === w}" data-a="echwide" data-v="${w ? 1 : 0}">${k}</button>`).join('')}</div><span class="faint ech-s">${ECH.offer.wide} — с артефактом выбора, демо</span></div>
+      ${PL(`Эхо предложит ${n} ${plural(n, 'вариант', 'варианта', 'вариантов')} ${a > 1 ? `из открытых ступеней 1–${a}` : 'с первой ступени'}. Выбранную цель не отменить, у каждой свой срок.`, `Эхо предложит ${n} ${plural(n, 'вариант', 'варианта', 'вариантов')} ${a > 1 ? `из открытых ступеней 1–${a}: слабые чаще, сильные реже` : 'с первой ступени — пока открыта только она'}; с шансом ${pctBp2(manyBp())} — Многоликий. Выбранную цель не отменить, у каждой свой срок.`, 'p', 'muted ech-p')}
+      <div class="row ech-wide team-only"><span class="eyebrow">вариантов</span><div class="tabs" role="tablist" aria-label="Вариантов призыва">${[[false, ECH.offer.base], [true, ECH.offer.wide]].map(([w, k]) => `<button role="tab" aria-selected="${S.ech.wide === w}" data-a="echwide" data-v="${w ? 1 : 0}">${k}</button>`).join('')}</div><span class="faint ech-s">${ECH.offer.wide} — с артефактом выбора, демо</span></div>
       ${S.ech.note ? `<p class="reason warn">${S.ech.note}</p>` : ''}
       <div class="e-foot">
         <p class="reason ech-inv">Крафтового босса и Многоликого зовут из запасов. <button class="link" data-a="go" data-v="craft:stock">Запасы ${ic('chev')}</button></p>
@@ -588,7 +588,7 @@ function pickHtml(i, p, c) {
 }
 function foeHtml(i, x, c) {
   const f = foe(x.fid, x), cost = atkCost(x), s = sq(S.echoSquad), av = aversIn(s, x.race), rn = roundsOf(x.g), imm = f.fb ? f.fb.immunityBp : immOf(x.g);
-  const chips = `<span class="chip ${x.g === 'o' ? '' : 'gold'}">${rankIc(x.g)}${rankOf(f)}</span>${x.el ? el(x.el) : ''}${imm ? `<span class="chip" title="Иммунитет к контролю по рангу (ADR-0010)">иммунитет ${pctBp(imm)}</span>` : ''}${x.g === 'm' ? '<span class="chip warn">правила — черновик</span>' : ''}<span class="chip" title="Бой ядром, как в биомах: один этаж, главный враг и четыре защитника (ADR-0025)">${ic('hour')}${rn} ${plural(rn, 'раунд', 'раунда', 'раундов')}</span>`;
+  const chips = `<span class="chip ${x.g === 'o' ? '' : 'gold'}">${rankIc(x.g)}${rankOf(f)}</span>${x.el ? el(x.el) : ''}${imm ? `<span class="chip" title="${tmT('Иммунитет к контролю', 'Иммунитет к контролю по рангу (ADR-0010)')}">иммунитет ${pctBp(imm)}</span>` : ''}${x.g === 'm' ? '<span class="chip warn team-only">правила — черновик</span>' : ''}<span class="chip" title="${tmT('Раундов в бою', 'Бой ядром, как в биомах: один этаж, главный враг и четыре защитника (ADR-0025)')}">${ic('hour')}${rn} ${plural(rn, 'раунд', 'раунда', 'раундов')}</span>`;
   const reward = x.g === 'craft' ? `<div class="stat"><b>лут</b><small>${f.fb.workerBoxRarity ? 'ресурсы и сундук' : 'осколки героев'}</small></div>`
     : c >= EM.from ? `<div class="stat"><b>${fmt(ptsOf(x.step, c))}</b><small>очков за победу</small></div>` : '<div class="stat"><b>—</b><small>обучение без очков</small></div>';
   return `<div class="pnl etarget">
@@ -600,8 +600,8 @@ function foeHtml(i, x, c) {
       <div class="row ech-stats"><div class="stat"><b>${fmt(x.bm)}</b><small>боевая мощь</small></div><div class="stat"><b class="num" data-ech-t="${i}">${dur(x.left)}</b><small>до исчезновения</small></div>${reward}<button class="link" data-a="echfoe" data-v="${x.fid}" style="margin-left:auto">Сведения ${ic('chev')}</button></div>
       <div class="e-foot">
         ${squadLine(x, s, av)}
-        <button class="btn go big" data-a="echatk" data-v="${x.uid}:${x.atk + 1}" title="Бой ядром: исход решён при оплате, просмотр можно пропустить">Атаковать${costTag('souls', cost)}</button>
-        <p class="reason ech-why">Бой ядром: ${rn} ${plural(rn, 'раунд', 'раунда', 'раундов')}, ${EB.RULES.echo.guards[x.g] ? 'главный враг и защитников ' + EB.RULES.echo.guards[x.g] : 'один на один'}; «Пропустить» — сразу итог. ${XR() ? 'Цена атаки — данные режима.' : 'Цена атаки — прежняя сетка §17.5, ждёт баланса.'}</p>
+        <button class="btn go big" data-a="echatk" data-v="${x.uid}:${x.atk + 1}" title="${tmT('Исход решён при оплате, просмотр можно пропустить', 'Бой ядром: исход решён при оплате, просмотр можно пропустить')}">Атаковать${costTag('souls', cost)}</button>
+        <p class="reason ech-why team-only">Бой ядром: ${rn} ${plural(rn, 'раунд', 'раунда', 'раундов')}, ${EB.RULES.echo.guards[x.g] ? 'главный враг и защитников ' + EB.RULES.echo.guards[x.g] : 'один на один'}; «Пропустить» — сразу итог. ${XR() ? 'Цена атаки — данные режима.' : 'Цена атаки — прежняя сетка §17.5, ждёт баланса.'}</p>
       </div>
     </div></div>`;
 }
@@ -610,15 +610,15 @@ function squadLine(x, s, av) {
   const wk = S.ech.weekSquad && weekSquad(x.race);
   if (!wk) return `<div class="row"><div class="faces">${s.m.filter(Boolean).map(id => `<img src="${H(id).img}" alt="${H(id).name}">`).join('')}</div><span class="faint num ech-sq">${s.name} · ${fmt(sqBM(s))}${av.n ? ' · неприязнь +' + pctBp(av.bp) : ''}</span><button class="link" data-a="sheet" data-v="prep:echo" style="margin-left:auto">Изменить</button></div>`;
   const hs = wk.map(id => RSI[id]).filter(Boolean), a = hs.find(h => h.avers && h.avers.race === x.race);
-  return `<div class="row"><div class="faces ech-wf">${hs.map(h => `<span class="rs-av" title="${h.n}">${rsFace(h)}</span>`).join('')}</div><span class="faint num ech-sq">Отряд недели · демо · уровень врагов${a ? ' · неприязнь +' + pctBp(a.avers.bp != null ? a.avers.bp : RS.rules.aversionBp) : ''}</span><button class="link" data-a="echwsq" style="margin-left:auto">Свой отряд</button></div>`;
+  return `<div class="row"><div class="faces ech-wf">${hs.map(h => `<span class="rs-av" title="${h.n}">${rsFace(h)}</span>`).join('')}</div><span class="faint num ech-sq">Отряд недели${TM(' · демо · уровень врагов')}${a ? ' · неприязнь +' + pctBp(a.avers.bp != null ? a.avers.bp : RS.rules.aversionBp) : ''}</span><button class="link" data-a="echwsq" style="margin-left:auto">Свой отряд</button></div>`;
 }
 function ladderHtml(W) {
   const inSlot = new Set(S.echo.slots.filter(x => x && x.kind !== 'craft' && x.race === W.race).map(x => x.step));
   const cells = STEPS.map((g, j) => { const st = j + 1, f = stepFoe(fidOf(W.race, st)), k = kn(f.fid); return `<i class="${g === 'o' ? '' : g} ${st <= S.ech.avail ? 'av' : ''} ${st === S.ech.avail ? 'top' : ''} ${k ? 'kn' : ''} ${inSlot.has(st) ? 'on' : ''}" title="Ступень ${st} · ${ECH.rank[g]}${k ? ' · ' + f.n : ''}${st > S.ech.avail ? ' · закрыта' : ''}"></i>`; }).join('');
   const nk = STEPS.filter((g, j) => kn(fidOf(W.race, j + 1))).length + (kn('many') ? 1 : 0);
   return `<div class="pnl ladder14 ech-ladder"><span class="eyebrow" style="white-space:nowrap">Лестница недели</span>
-    <div class="l14" aria-label="Открыто ступеней: ${S.ech.avail} из ${TOP}">${cells}<span class="sep"></span><i class="m ${kn('many') ? 'kn' : ''} ${inSlot.has(MANY) ? 'on' : ''}" title="Ступень ${MANY} · Многоликий — выпадает при призыве с шансом ${pctBp2(manyBp())}, без ограничения «раз в неделю»; лёгкий бой один на один, за победу — ресурс «Многоликий»"></i></div>
-    <span class="faint num ech-lt">${S.ech.avail} / ${TOP} · победа над верхней открывает следующую · Многоликий — ${pctBp2(manyBp())} призыва</span>
+    <div class="l14" aria-label="Открыто ступеней: ${S.ech.avail} из ${TOP}">${cells}<span class="sep"></span><i class="m ${kn('many') ? 'kn' : ''} ${inSlot.has(MANY) ? 'on' : ''}" title="${tmT(`Ступень ${MANY} · Многоликий`, `Ступень ${MANY} · Многоликий — выпадает при призыве с шансом ${pctBp2(manyBp())}, без ограничения «раз в неделю»; лёгкий бой один на один, за победу — ресурс «Многоликий»`)}"></i></div>
+    <span class="faint num ech-lt">${PL(`${S.ech.avail} / ${TOP}`, `${S.ech.avail} / ${TOP} · победа над верхней открывает следующую · Многоликий — ${pctBp2(manyBp())} призыва`)}</span>
     <button class="link" data-a="echbest">${ic('book')}Бестиарий ${nk}/${MANY}</button></div>`;
 }
 SCREENS.echo = function () {
@@ -705,7 +705,7 @@ function craftLoot(x, f, loot) {
 }
 function lootHtml(x) {
   if (x.k === 'item') { const it = BAG.item(x.id); return `<div class="row ech-loot">${itIcon(it, 30)}<span>${it.n}</span><b class="num">×${x.n}</b><span class="faint">в запасах</span></div>`; }
-  if (x.k === 'cur') return `<div class="row ech-loot">${money(x.id, x.n)}<span class="faint">${CUR[x.id].n.toLowerCase()}</span>${x.stub ? '<span class="chip warn">заглушка</span>' : ''}</div>`;
+  if (x.k === 'cur') return `<div class="row ech-loot">${money(x.id, x.n)}<span class="faint">${CUR[x.id].n.toLowerCase()}</span>${x.stub ? '<span class="chip warn team-only">заглушка</span>' : ''}</div>`;
   if (x.k === 'rune') return `<div class="row ech-loot">${x.hit ? `${money('keys', x.n)}<span class="faint">рунные ключи · шанс ${pctBp(x.bp)}</span>` : `<span class="faint">Рунный ключ: шанс ${pctBp(x.bp)} — не выпал</span>`}</div>`;
   if (x.k === 'chest') return `<div class="row ech-loot"><span class="well ech-it" data-r="${x.spec.r}" style="--s:30px"><img src="${CHEST}" alt=""></span><span>${boxName(x.spec.box, x.spec.r)}</span><span class="faint">в запасах, откроется там</span></div>`;
   if (x.k === 'shards') { const h = RSI[x.id]; return `<div class="row ech-loot"><span class="rs-av" data-r="${h.r}">${rsFace(h)}</span><span>${h.n}: осколков ×${x.n}</span>${x.dust ? `<span class="faint">уже в коллекции — в прах +${fmt(x.dust)}</span>` : ''}</div>`; }
@@ -792,7 +792,7 @@ function ruinMain(x) {
         <p class="quote">${cap1(p.where)}</p>
         <div class="facts"><div class="stat"><b>${cb.floors}</b><small>этажей</small></div><div class="stat"><b>${pctBp(cb.resPerFloorBp)}</b><small>ресурс за этаж</small></div><div class="stat"><b>${cb.finds} + ${pctBp(cb.secondFindBp)}</b><small>находки</small></div></div>
       </div>
-      <div class="ech-cta"><button class="btn go big off" disabled>${ic('down')}Начать забег</button><span class="reason">Забег — позже: ядро боя руин ещё не собрано</span><button class="link" data-a="echcbx" data-v="${x.uid}">Покинуть руину ${ic('x')}</button></div>
+      <div class="ech-cta"><button class="btn go big off" disabled>${ic('down')}Начать забег</button><span class="reason">Забег — позже${TM(': ядро боя руин ещё не собрано')}</span><button class="link" data-a="echcbx" data-v="${x.uid}">Покинуть руину ${ic('x')}</button></div>
     </div>
     <div class="pnl ech-rbody"><p class="muted ech-where">${p.lore}</p>${ruinParts(cb)}</div>
   </div>`;
@@ -983,7 +983,7 @@ Object.assign(ACT, {
   echcbx(v) {
     const x = S.ech.biomes.find(b => b.uid === v);
     S.overlay = x && x.many ? { t: 'confirm', title: 'Покинуть биом Многоликого', text: 'Биом закроется и освободит слот биомов. Очков за него не будет, Многоликий не вернётся.', ok: 'Покинуть', act: 'echcbxdo', v, danger: true }
-      : { t: 'confirm', title: 'Покинуть руину', text: 'Руина закроется и освободит слот биомов. Добычи за неё не будет, предмет активации не вернётся.', warn: 'Демо: забег по руинам появится вместе с их ядром боя.', ok: 'Покинуть', act: 'echcbxdo', v, danger: true };
+      : { t: 'confirm', title: 'Покинуть руину', text: 'Руина закроется и освободит слот биомов. Добычи за неё не будет, предмет активации не вернётся.', warnTeam: 'Демо: забег по руинам появится вместе с их ядром боя.', ok: 'Покинуть', act: 'echcbxdo', v, danger: true };
     render(); focusOverlay();
   },
   echcbxdo(v) { const x = S.ech.biomes.find(b => b.uid === v); S.ech.biomes = S.ech.biomes.filter(b => b.uid !== v); if (S.ech.cb === v) S.ech.cb = null; S.overlay = null; toast(`${x && x.many ? 'Биом Многоликого покинут' : 'Руина покинута'}: слот биомов свободен`); },
@@ -1006,16 +1006,16 @@ Object.assign(OV, {
       <span class="eyebrow">Отряд недели · открыто ${open.length} из ${squad.length} к циклу ${ROMAN[c]}</span>
       <p class="reason">Пятеро, кто отбил это нашествие: по герою за цикл, с ${ROMAN[squad.length ? squad[0].c : EM.from]} по ${ROMAN[squad.length ? squad[squad.length - 1].c : EM.from]}.</p>
       <div class="rs-list">${rows}</div>
-      ${av ? `<p class="rs-line">${ic('target')}Неприязнь: ${rsAversShort(av)} — у всех пятерых.</p><p class="reason">Особенность героев Эхо, не способность: действует везде, где встречаются враги этой расы.</p>` : ''}
+      ${av ? `<p class="rs-line">${ic('target')}Неприязнь: ${rsAversShort(av)} — у всех пятерых.</p><p class="reason team-only">Особенность героев Эхо, не способность: действует везде, где встречаются враги этой расы.</p>` : ''}
       <p class="reason">Осколки — из сундуков Эхо; недостающие — за прах, собранного героя пробуждают души.</p>
       <span class="eyebrow">Награды недели · ${LBX.boxes[EM.box].n.toLowerCase()}</span>
-      ${c < EM.from ? `<p class="reason">Цикл ${ROMAN[c]} — обучение: рейтинга и сундуков нет, они с цикла ${ROMAN[EM.from]}.</p>` : `${pk}<p class="reason">Пороги планок — демо, ждут баланса очков. Места и клановые планки — после подсчёта недели. Сундук даёт осколки героев отряда, открытых к циклу.</p>`}
-      <span class="eyebrow">Демо прототипа</span>
-      <div class="row ech-demo"><select class="rs-sel" data-a="sweek" aria-label="Неделя расы, демо">${RS.weeks.map(w => `<option value="${w.race}" ${w === W ? 'selected' : ''}>Неделя ${w.gen}</option>`).join('')}</select>
+      ${c < EM.from ? `<p class="reason">Цикл ${ROMAN[c]} — обучение: рейтинга и сундуков нет, они с цикла ${ROMAN[EM.from]}.</p>` : `${pk}${PL('Места и клановые планки — после подсчёта недели.', 'Пороги планок — демо, ждут баланса очков. Места и клановые планки — после подсчёта недели. Сундук даёт осколки героев отряда, открытых к циклу.', 'p', 'reason')}`}
+      <span class="eyebrow team-only">Демо прототипа</span>
+      <div class="row ech-demo team-only"><select class="rs-sel" data-a="sweek" aria-label="Неделя расы, демо">${RS.weeks.map(w => `<option value="${w.race}" ${w === W ? 'selected' : ''}>Неделя ${w.gen}</option>`).join('')}</select>
         <div class="tabs rs-cyc" role="tablist" aria-label="Цикл аккаунта, демо">${ROMAN.slice(1).map((r, j) => `<button role="tab" aria-selected="${c === j + 1}" data-a="echcyc" data-v="${j + 1}">${r}</button>`).join('')}</div>
         <button class="btn sm" data-a="echopen" ${S.ech.avail >= TOP ? 'disabled' : ''}>Открыть все ${TOP} ступеней</button><button class="btn sm" data-a="echmdemo" ${freeCount() ? '' : 'disabled'} title="При призыве Многоликий выпадает с шансом ${pctBp2(manyBp())}">Многоликий в слот</button>
         ${weekSquad(W.race) ? `<button class="btn sm" data-a="echwsq" aria-pressed="${!!S.ech.weekSquad}" title="Атаки Эхо — отрядом недели: пятеро героев Эхо этой цивилизации, наборы из echo-foes.js, уровень врагов цели">Бой отрядом недели${S.ech.weekSquad ? ' · вкл' : ''}</button>` : ''}</div>
-      <p class="reason">Неделя и цикл аккаунта — переключатели прототипа. Новая неделя сбрасывает лестницу.</p>`;
+      <p class="reason team-only">Неделя и цикл аккаунта — переключатели прототипа. Новая неделя сбрасывает лестницу.</p>`;
     return sheet('Неделя Эхо', body, '', true);
   },
   echbest() {
@@ -1052,7 +1052,7 @@ Object.assign(OV, {
       <span class="eyebrow">Доступность</span><ul class="ech-checks">${ck.map(x => `<li class="${x.ok ? 'ok' : 'no'}">${ic(x.ok ? 'check' : 'x')}<span>${x.t}</span></li>`).join('')}</ul>
       <span class="eyebrow">Расход</span><div class="row" style="gap:10px">${itIcon(it, 34, hide)}<b class="num">×1</b>${kind === 'call' ? `<span class="faint">и</span>${money('souls', cost)}` : ''}</div>
       <span class="eyebrow">Ограничения</span><ul class="ech-rules">${RULES[kind]().map(r => `<li>${r}</li>`).join('')}</ul>
-      ${kind === 'echo' ? '<span class="chip warn" style="align-self:flex-start" title="ADR-0025: этаж — состав ступени, биом — в слот биомов, как руина">как понят ответ автора — поправит автор</span>' : ''}`;
+      ${kind === 'echo' ? '<span class="chip warn team-only" style="align-self:flex-start" title="ADR-0025: этаж — состав ступени, биом — в слот биомов, как руина">как понят ответ автора — поправит автор</span>' : ''}`;
     return sheet(T[0], body, `<button class="btn ghost" data-a="close">Отмена</button><button class="btn go" data-a="echactdo" data-v="${o.op}" ${ok ? '' : 'disabled'}>${T[1]}${kind === 'call' ? costTag('souls', cost) : ''}</button>`);
   },
   /* экземпляр открыт после операции (§12.5) */
@@ -1072,7 +1072,7 @@ Object.assign(OV, {
       const body = `<span class="eyebrow">Крафтовый биом · цикл ${ROMAN[cb.cyc]}</span><b class="serif ech-civn">${cb.name}</b><p class="quote">${p.lore}</p>
         <div class="row" style="gap:18px;flex-wrap:wrap"><div class="stat"><b>${cb.floors}</b><small>этажей</small></div><div class="stat"><b>${pctBp(cb.resPerFloorBp)}</b><small>ресурс за этаж</small></div><div class="stat"><b>${cb.finds} + ${pctBp(cb.secondFindBp)}</b><small>находки</small></div><div class="stat"><b>${bioUsed()} / ${bioCap()}</b><small>слоты биомов</small></div></div>
         ${ruinParts(cb)}
-        <p class="reason">Руина стоит в «Спуске» и занимает слот биомов, общий с забегами. Забег — позже: ядро боя руин ещё не собрано.</p>`;
+        <p class="reason">Руина стоит в «Спуске» и занимает слот биомов, общий с забегами. Забег — позже${TM(': ядро боя руин ещё не собрано')}.</p>`;
       return dialog('Руина открыта', body, `<button class="btn ghost" data-a="close">Остаться</button><button class="btn go" data-a="echgo" data-v="descent:${x.uid}">${ic('down')}В Спуск</button>`, 'wide');
     }
     const x = S.echo.slots[o.slot];
@@ -1084,7 +1084,7 @@ Object.assign(OV, {
         ${f.face ? `<small class="faint">лицо: ${kn(f.face.fid) ? f.face.n : 'врага недели, ещё не изученного'}</small>` : ''}
         <div class="row" style="gap:16px;flex-wrap:wrap"><div class="stat"><b>${fmt(x.bm)}</b><small>боевая мощь</small></div><div class="stat"><b>${fmt(x.max)}</b><small>здоровье</small></div><div class="stat"><b>${dur(x.left)}</b><small>срок</small></div><div class="stat"><b>${a}</b><small>${souls(a)} за атаку</small></div></div>
       </div></div>
-      <p class="reason">${kn(x.fid) ? 'Запись в бестиарии уже открыта.' : 'Имя и повадки откроет первая победа.'} Слот ${o.slot + 1} Эхо, отменить нельзя. Цена атаки — прежняя сетка, ждёт баланса.</p>`;
+      <p class="reason">${kn(x.fid) ? 'Запись в бестиарии уже открыта.' : 'Имя и повадки откроет первая победа.'} Слот ${o.slot + 1} Эхо, отменить нельзя.${TM(' Цена атаки — прежняя сетка, ждёт баланса.')}</p>`;
     return dialog('Призван крафтовый босс', body, `<button class="btn ghost" data-a="close">Остаться</button><button class="btn go" data-a="echgo" data-v="echo:${o.slot}">В Эхо ${ic('chev')}</button>`);
   },
   /* итог атаки (ADR-0025): исход, отнятое здоровье, очки, раунды, кто что сделал; при победе — бестиарий, лестница и добыча.
@@ -1108,7 +1108,7 @@ Object.assign(OV, {
       <table class="ech-res-t"><thead><tr><th>Герой</th><th>урон</th><th>по главному</th><th>лечение</th></tr></thead><tbody>${rows}</tbody></table>
       <p class="reason ech-res-foes">${foesTxt}</p>
       ${won}
-      <p class="reason">Атака ${L.no} · ${fmt(L.cost)} ${souls(L.cost)} · бой посчитан целиком при оплате: просмотр и «Пропустить» итог не меняют.${L.kill ? ` Слот ${L.slot + 1} свободен.` : ''}</p>`;
+      <p class="reason">Атака ${L.no} · ${fmt(L.cost)} ${souls(L.cost)}${TM(' · бой посчитан целиком при оплате: просмотр и «Пропустить» итог не меняют')}.${L.kill ? ` Слот ${L.slot + 1} свободен.` : ''}</p>`;
     const next = live ? `<button class="btn go" data-a="echagain" data-v="${L.slot}:${x.uid}:${x.atk + 1}">Атаковать ещё${costTag('souls', atkCost(x))}</button>`
       : !S.echo.slots[L.slot] && !S.ech.pending[L.slot] ? `<button class="btn go" data-a="echnext" data-v="${L.slot}">Призвать новую${costTag('souls', XE.summonSouls)}</button>` : '';
     return dialog(`${nameOf(f)} — ${L.kill ? 'победа' : 'атака ' + L.no}`, body, `<button class="btn ghost" data-a="close">К целям</button>${next}`, 'wide');

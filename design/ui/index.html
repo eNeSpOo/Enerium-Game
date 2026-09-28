@@ -41,11 +41,17 @@
   --sand:#c9a86a;
   /* стихии = карсты */
   --air:#dff4e5; --earth:#eb9d40; --fire:#f0564a; --water:#5a94f7; --time:#4fdc8b; --light:#f4e6ae; --dark:#a986ee;
-  /* редкости */
-  --r1:#a4a8ad; --r2:#66c275; --r3:#5a94f7; --r4:#a986ee; --r5:#eb9d40; --r6:#e85a4e; --r7:#f3e6b8;
+  /* редкости по схеме автора (ADR-0027): обычная — белая, редкая — жёлтая, уникальная — бирюзовая, эпическая — фиолетовая,
+     древняя — красная, первородная — оранжевая, вневременная — зелёная. Бирюза уникальной темнее и синее света духа (--spirit),
+     чтобы редкость не читалась как выбор */
+  --r1:#e6e8ea; --r2:#f0cc4f; --r3:#1fb8d0; --r4:#a986ee; --r5:#e85a4e; --r6:#eb9d40; --r7:#5fd67a;
   --f-d:"Cormorant Garamond","Cormorant",Georgia,"Times New Roman",serif;
   --f-u:"PT Sans Narrow","Arial Narrow","Roboto Condensed",sans-serif;
   --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .055 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* воздух: три шага отступов — между блоками экрана, внутри карточки, между строками (UI-кит, «Правила воздуха») */
+  --sp-l:16px;
+  --sp-m:12px;
+  --sp-s:8px;
 }
 *,*::before,*::after{box-sizing:border-box}
 html,body{min-height:100%}
@@ -55,6 +61,11 @@ img{max-width:100%}
 :focus-visible{outline:2px solid var(--spirit);outline-offset:2px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .i{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+/* режим «Игрок / Команда» (флаг KH.team, переключатель в панели прототипа): служебное — только команде,
+   короткая версия пометки — только игроку. В режиме «Команда» служебное в кадре телефона обведено пунктиром */
+html:not(.team) .team-only{display:none!important}
+html.team .player-only{display:none!important}
+html.team .g .team-only{outline:1px dashed rgba(169,134,238,.55);outline-offset:1px}
 
 /* ============================================================
    Презентация вокруг игры
@@ -129,7 +140,7 @@ img{max-width:100%}
 .p-table td.m{color:var(--parch-3)}
 /* UI-кит */
 .k-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
-.k-box{background:var(--ink);background-image:var(--noise);border:1px solid #1b1f24;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.k-box{background:var(--ink);background-image:var(--noise);border:1px solid #1b1f24;border-radius:14px;padding:var(--sp-l);display:flex;flex-direction:column;gap:var(--sp-m);min-width:0}
 .k-box h3{margin:0;font:700 12px/1 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--gold-2)}
 .k-sw{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
 .k-sw div{border-radius:10px;border:1px solid #232830;overflow:hidden;font-size:12px;color:var(--parch-2)}
@@ -142,6 +153,36 @@ img{max-width:100%}
 .k-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .k-demo{position:relative;background:var(--ink);border-radius:10px;padding:12px}
 .k-note{color:var(--parch-3);font-size:13px;margin:0}
+/* UI-кит · правила воздуха: отступы, карточка, лист, две строки, одна рамка, служебное — команде */
+.k-air-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:var(--sp-m)}
+.k-air-r{display:flex;flex-direction:column;gap:var(--sp-s);padding:var(--sp-m);border-radius:10px;background:#0b0e10;border:1px solid #1b1f24;min-width:0}
+.k-air-r>b{font:600 18px/1.15 var(--f-d);color:var(--gold)}
+.k-air-r>small{color:var(--parch-2);font-size:13px;line-height:1.4}
+.k-air-r code{font-size:12px;color:var(--parch)}
+.k-air-sp{display:flex;flex-direction:column;gap:var(--sp-s)}
+.k-air-sp span{display:flex;align-items:center;gap:var(--sp-s);font-size:12.5px;color:var(--parch-2)}
+.k-air-sp i{flex:none;width:var(--w);height:14px;border-radius:2px;background:rgba(72,229,212,.22);box-shadow:inset 0 0 0 1px rgba(72,229,212,.55)}
+.k-air-card{display:grid;grid-template-columns:48px minmax(0,1fr);gap:var(--sp-s) var(--sp-m);align-items:center;padding:var(--sp-m);border-radius:12px;background:var(--stone);border:1px solid var(--iron)}
+.k-air-card img{width:48px;height:58px;object-fit:cover;object-position:50% 18%;border-radius:8px;grid-row:span 2}
+.k-air-card .nm{font:600 19px/1 var(--f-d);color:var(--parch)}
+.k-air-card .nums{display:flex;gap:var(--sp-m);font-size:12px;color:var(--parch-3)}
+.k-air-card .nums b{font:600 17px/1 var(--f-d);color:var(--parch);margin-right:4px;font-variant-numeric:lining-nums tabular-nums}
+.k-air-card .ft{grid-column:1/-1;display:flex;gap:var(--sp-s);align-items:center;flex-wrap:wrap}
+.k-air-card .ft .btn{margin-left:auto}
+.k-air-lore summary{list-style:none;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.k-air-lore summary::-webkit-details-marker{display:none}
+.k-air-lore .clamp{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.k-air-lore[open] .clamp{display:block}
+.k-air-lore .more{align-self:flex-start;color:var(--gold-2);font:700 11px/1 var(--f-u);letter-spacing:.1em;text-transform:uppercase}
+.k-air-lore[open] .more{display:none}
+.k-air-fr{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-s)}
+.k-air-fr figure{margin:0;display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.k-air-fr figcaption{font-size:12px;color:var(--parch-3);text-align:center}
+.k-air-fr .bx{border:1px solid var(--iron-2);border-radius:8px;padding:5px;min-height:18px}
+.k-air-fr .no .bx{border-color:rgba(220,106,82,.5)}
+.k-air-fr .ok .bx{border-color:rgba(72,229,212,.45);display:flex;flex-direction:column;gap:6px;padding:var(--sp-s)}
+.k-air-fr .ok .ln{height:6px;border-radius:3px;background:#262b31}
+.k-air-fr .ok .ln+.ln{width:70%}
 
 /* ============================================================
    ИГРА — каркас
@@ -212,8 +253,8 @@ img{max-width:100%}
 .g-main{grid-column:2;grid-row:2;position:relative;min-width:0;min-height:0;overflow:hidden;background:radial-gradient(120% 90% at 50% 120%,rgba(72,229,212,.05),transparent 60%),var(--noise),linear-gradient(#0c0e11,#090b0d)}
 .scr{position:absolute;inset:0;padding:10px;display:flex;flex-direction:column;gap:10px;min-width:0;min-height:0}
 .scr.flush{padding:0}
-.row{display:flex;align-items:center;gap:8px;min-width:0}
-.col{display:flex;flex-direction:column;gap:8px;min-width:0;min-height:0}
+.row{display:flex;align-items:center;gap:var(--sp-s);min-width:0}
+.col{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0;min-height:0}
 .grow{flex:1 1 0;min-width:0;min-height:0}
 .scroll{overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#2c3238 transparent}
 .scroll::-webkit-scrollbar{width:6px;height:6px}.scroll::-webkit-scrollbar-thumb{background:#2c3238;border-radius:3px}
@@ -223,7 +264,7 @@ img{max-width:100%}
    ============================================================ */
 .pnl{position:relative;background:linear-gradient(180deg,rgba(255,255,255,.018),transparent 40%),var(--stone);border:1px solid var(--iron);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
 .pnl.flat{background:rgba(12,14,17,.72);backdrop-filter:blur(2px)}
-.pnl.pad{padding:12px}
+.pnl.pad{padding:var(--sp-m)}
 .pnl-h{display:flex;align-items:center;gap:8px;min-width:0}
 .pnl-h h2{font-size:19px;color:var(--gold);line-height:1.1}
 .pnl-h .aside{margin-left:auto}
@@ -352,14 +393,14 @@ button.well:hover{border-color:var(--iron-3)}
 .sheet-h h2{font-size:22px;color:var(--gold);line-height:1.05}
 .sheet-h .x{margin-left:auto}
 .sheet-b>*,.dlg-b>*{flex-shrink:0}
-.sheet-b{flex:1 1 0;min-height:0;overflow:auto;padding:12px 14px;display:flex;flex-direction:column;gap:12px;scrollbar-width:thin;scrollbar-color:#2c3238 transparent}
-.sheet-f{display:flex;gap:8px;align-items:center;padding:10px 14px;border-top:1px solid var(--iron);background:rgba(8,10,12,.6)}
+.sheet-b{flex:1 1 0;min-height:0;overflow:auto;padding:var(--sp-m) var(--sp-l);display:flex;flex-direction:column;gap:var(--sp-m);scrollbar-width:thin;scrollbar-color:#2c3238 transparent}
+.sheet-f{display:flex;gap:var(--sp-s);align-items:center;padding:var(--sp-m) var(--sp-l);border-top:1px solid var(--iron);background:rgba(8,10,12,.6)}
 .sheet-f .btn.go{margin-left:auto}
 .dlg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,calc(100% - 40px));max-height:calc(100% - 24px);display:flex;flex-direction:column;background:radial-gradient(90% 60% at 50% 110%,rgba(72,229,212,.08),transparent 70%),linear-gradient(180deg,#171b1f,#111417);border:1px solid var(--iron-2);border-radius:14px;box-shadow:0 30px 80px rgba(0,0,0,.75);animation:pop .22s cubic-bezier(.2,.8,.2,1)}
 .dlg-h{display:flex;align-items:flex-start;gap:10px;padding:14px 12px 8px 18px}
 .dlg-h h2{font-size:25px;color:var(--gold);line-height:1.05}
 .dlg-h .x{margin-left:auto}
-.dlg-b{padding:4px 18px 12px;overflow:auto;display:flex;flex-direction:column;gap:12px;min-height:0}
+.dlg-b{padding:4px 18px 12px;overflow:auto;display:flex;flex-direction:column;gap:var(--sp-m);min-height:0}
 .dlg-f{display:flex;gap:8px;justify-content:flex-end;align-items:center;padding:10px 14px 14px}
 @keyframes fade{from{opacity:0}}
 @keyframes slide{from{transform:translateX(30px);opacity:0}}
@@ -775,8 +816,8 @@ button.well:hover{border-color:var(--iron-3)}
 .hd-name h2{font-size:26px;line-height:.95;color:var(--parch)}
 .hd-bm{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
 .hd-bm b{font:600 30px/1 var(--f-d);color:var(--gold);font-variant-numeric:lining-nums tabular-nums}
-.hd-body{flex:1 1 0;min-height:0;margin-top:8px;display:flex;flex-direction:column;gap:8px}
-.hd-cols{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:12px;flex:1 1 0;min-height:0}
+.hd-body{flex:1 1 0;min-height:0;margin-top:var(--sp-s);display:flex;flex-direction:column;gap:var(--sp-s)}
+.hd-cols{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:var(--sp-m);flex:1 1 0;min-height:0}
 .stats{display:flex;flex-direction:column;gap:1px}
 .srow{display:grid;grid-template-columns:1fr auto 38px;gap:8px;align-items:center;padding:3px 6px;border-radius:7px}
 .srow:nth-child(odd){background:rgba(255,255,255,.022)}
@@ -1206,7 +1247,7 @@ button.well:hover{border-color:var(--iron-3)}
 .e-foot .btn.go{width:100%}
 /* Запасы: список и карточка рядом */
 .stock{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:10px;height:100%}
-.icard{display:flex;flex-direction:column;gap:10px;padding:12px;min-height:0}
+.icard{display:flex;flex-direction:column;gap:var(--sp-m);padding:var(--sp-m);min-height:0}
 .icard .acts2{margin-top:auto;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
 .well.cur{border-color:var(--spirit);box-shadow:0 0 0 1px var(--spirit),0 8px 16px -8px var(--spirit)}
 /* компактный режим для низких экранов (844×390 и ниже): по высоте рабочей области */
@@ -1468,6 +1509,10 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
     </div>
     <p class="p-rot">Поверните телефон горизонтально — игра развернётся на весь экран.</p>
     <aside class="p-side">
+      <div class="p-block">
+        <div class="p-ctrls" id="devMode" role="group" aria-label="Режим показа" style="align-items:center"><span class="p-note">Режим:</span><button class="p-chip" data-mode="player" aria-pressed="true">Игрок</button><button class="p-chip" data-mode="team" aria-pressed="false">Команда</button></div>
+        <p class="p-note" style="margin-top:6px">«Игрок» — экран, как в игре. «Команда» — ещё служебное: формулы, ссылки на решения, заглушки, демо-переключатели и спойлеры; в кадре оно обведено пунктиром. Флажок «для команды» в UI-ките — этот же.</p>
+      </div>
       <div class="p-block">
         <div class="p-ctrls"><button class="p-chip" data-size="lg" aria-pressed="true">932 × 430</button><button class="p-chip" data-size="sm" aria-pressed="false">844 × 390</button><button class="p-chip" id="btnFull">Во весь экран</button><button class="p-chip" id="btnReset">Сбросить</button></div>
         <p class="p-note" style="margin-top:10px">Числа — демонстрационные фикстуры текущего UIKit и GDD, не баланс. Реплики проводников, загадки и главы — заглушки, не канон. Тексты врагов — из «Записей сказителя».</p>
@@ -1770,6 +1815,36 @@ function initialState() {
   };
 }
 
+/* ================== режим «Игрок / Команда» ==================
+   Один флаг на весь прототип — KH.team: его же ставят флажки «для команды» в UI-ките и глаз в карточке героя.
+   «Игрок» (по умолчанию) — экран, как в игре. «Команда» — ещё служебное: формулы и таблицы расчётов, ссылки на ADR и §,
+   «демо», «заглушка», «черновик», пояснения прототипа, демо-переключатели, поля «для команды» и спойлеры.
+   Разметка: класс team-only — CSS прячет его в режиме «Игрок»; TM(html, тег, классы) — обёртка; PL(игроку, команде, тег, классы) —
+   короткая пометка игроку и полная команде; tmT(игроку, команде) — для атрибутов title. Спойлеры по-прежнему не рисуются без флага
+   (itTeam, rsSetHtml).
+   Выбор помнит localStorage; без него страница открывается в режиме «Игрок». Проверка — tools/content-gen/screens/check_player_view.js */
+const TEAM_KEY = 'en-team';
+const teamSaved = () => { try { return localStorage.getItem(TEAM_KEY) === '1'; } catch (_) { return false; } };
+const TM = (h, tag = 'span', cls = '') => h ? `<${tag} class="team-only${cls ? ' ' + cls : ''}">${h}</${tag}>` : '';
+const PL = (p, t, tag = 'span', cls = '') => (p ? `<${tag} class="player-only${cls ? ' ' + cls : ''}">${p}</${tag}>` : '') + TM(t, tag, cls);
+const tmT = (p, t) => KH.team ? t : p;
+/* текст из собранных данных (roster.js, recipes.js): игроку — без ссылок на ADR и §, без пометок «предложение», «у автора», «заглушка»;
+   полный текст — команде */
+const plText = t => String(t || '').replace(/\s*\((?:ADR|§)[^)]*\)/g, '').replace(/^\s*(?:Предложение|Черновик)\s*:\s*/i, '')
+  .split(/(?<=[.!?])\s+/).filter(x => !/автор|заглушк|демо(?!н)|черновик|прототип|ADR|§/i.test(x)).join(' ').trim();
+const plData = (t, tag = 'span', cls = '') => { const p = plText(t); return p === String(t || '') ? (cls ? `<${tag} class="${cls}">${t}</${tag}>` : t) : PL(p, t, tag, cls); };
+function paintTeam() {
+  const on = !!KH.team;
+  document.documentElement.classList.toggle('team', on);
+  document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.mode === 'team') === on)));
+  document.querySelectorAll('input[data-kh="team"], input[data-rk="team"], input[data-lb="team"]').forEach(x => { x.checked = on; });
+}
+function setTeam(on) {
+  KH.team = !!on;
+  try { localStorage.setItem(TEAM_KEY, KH.team ? '1' : '0'); } catch (_) { }
+  paintTeam(); render(); khPaint(); rkPaint(); lbPaint();
+}
+
 /* ================== помощники ================== */
 let S = initialState();
 const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI'];
@@ -1984,9 +2059,9 @@ function descent() {
         <span class="eyebrow">Цикл ${ROMAN[b.cyc]} · ${front ? 'рубеж спуска' : 'пройден'}</span>
         <h2>${b.name}</h2>
         <p class="quote">${front ? 'Босс биома не побеждён. Рунный страж ждёт после него.' : 'Босс и рунный страж повержены. Биом можно проходить ради добычи.'}</p>
-      </div><div class="cta"><button class="btn go big off" disabled>${ic('down')}Спуститься</button><span class="reason">В прототипе бой собран на Мастерской форм</span></div></div>
+      </div><div class="cta"><button class="btn go big off" disabled>${ic('down')}Спуститься</button><span class="reason team-only">В прототипе бой собран на Мастерской форм</span></div></div>
       <div class="pnl pad col" style="justify-content:center;align-items:center;text-align:center">
-        <p class="faint" style="max-width:52ch">Иллюстрация зала и его обитатели появятся вместе с авторским контентом. До первой встречи враги будут скрыты — имена и способности открывает победа.</p>
+        ${PL('До первой встречи враги скрыты — имена и способности открывает победа.', 'Иллюстрация зала и его обитатели появятся вместе с авторским контентом. До первой встречи враги будут скрыты — имена и способности открывает победа.', 'p', 'faint')}
       </div></div>`;
   }
   return { title: 'Спуск', sub: 'цикл ' + ROMAN[S.acc.cycle], html: `<section class="scr"><div class="ds">${shaft}${main}</div></section>` };
@@ -1995,7 +2070,7 @@ function descent() {
    Бой — 25 раундов, каждая обычная атака стража отнимает раунд (ADR-0020) */
 function guardHtml() {
   const open = G('b1').killed, n = EB.BIOMES.b1.guard.m.length;
-  return `<div class="row ds-guard"><button class="btn sm${open ? '' : ' off'}" data-a="guard" ${open ? '' : 'disabled'} title="${open ? `Мастер ждёт: ${guardCards()}, ${EB.RULES.rounds.rune} раундов, каждая его обычная атака отнимает раунд` : 'Страж ждёт за боссом биома: откроется после победы над ним'}">${ic('crown')}Рунный страж</button><button class="btn sm ghost" data-a="guard" data-v="demo" title="Демо прототипа: сразу к стражу, ${n} ${plural(n, 'карта', 'карты', 'карт')}; босс и стена не меняются">демо-вход</button></div>`;
+  return `<div class="row ds-guard"><button class="btn sm${open ? '' : ' off'}" data-a="guard" ${open ? '' : 'disabled'} title="${open ? `Мастер ждёт: ${guardCards()}, ${EB.RULES.rounds.rune} раундов, каждая его обычная атака отнимает раунд` : 'Страж ждёт за боссом биома: откроется после победы над ним'}">${ic('crown')}Рунный страж</button><button class="btn sm ghost team-only" data-a="guard" data-v="demo" title="Демо прототипа: сразу к стражу, ${n} ${plural(n, 'карта', 'карты', 'карт')}; босс и стена не меняются">демо-вход</button></div>`;
 }
 function figBtn(f, seal) {
   const k = known(f.id);
@@ -2051,10 +2126,10 @@ function heroKitHtml(h) {
   return `<div class="hd-cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)">
     <div class="col scroll" style="gap:6px"><span class="eyebrow">Способности по доблести · доля хода</span>
       <div class="rot-list">${rows}<div class="ab"><span class="h">${ic('sword')}</span><span class="n">—</span><span><b>Обычная атака</b><small>Если ни одна способность не сработала.</small></span><span class="chip">${pctBp(basic)}</span></div></div>
-      <span class="reason">Число слева — доблесть, на которой способность открывается; последняя — ульта (ADR-0016). Кристалл у названия — школа. В свой ход герой бросает шанс по долям хода.</span></div>
+      ${PL('Число слева — доблесть, на которой способность открывается. Кристалл у названия — школа.', 'Число слева — доблесть, на которой способность открывается; последняя — ульта (ADR-0016). Кристалл у названия — школа. В свой ход герой бросает шанс по долям хода.', 'span', 'reason')}</div>
     <div class="col" style="gap:6px"><span class="eyebrow">Доли хода · ${K.rarity}</span>
       <div class="pnl pad" style="background:#0e1114;display:flex;flex-direction:column;gap:4px"><span>Способности — <b class="num">${pctBp(K.actPct)}</b>, ульта — <b class="num">${pctBp(K.ultPct)}</b></span>
-      <small class="faint">Редкость задаёт, как часто срабатывают способности и ульта: у обычного героя — 29 % и 1 %, у вневременного — 50 % и 10 %. Активные делят долю по весу, закрытые доблестью отдают свою часть обычной атаке.</small></div></div>
+      <small class="faint team-only">Редкость задаёт, как часто срабатывают способности и ульта: у обычного героя — 29 % и 1 %, у вневременного — 50 % и 10 %. Активные делят долю по весу, закрытые доблестью отдают свою часть обычной атаке.</small></div></div>
   </div>`;
 }
 function statusHtml(u, d, rounds) {
@@ -2092,7 +2167,7 @@ function rotHtml(u) {
 function legendHtml(mode) {
   const seg = (k, on, u) => `<span class="rot"><span class="seg ${u ? 'u' : ''}">${Array.from({ length: k }, (_, i) => `<i class="${i < on ? 'on' : ''}"></i>`).join('')}</span></span>`;
   if (mode === 'rounds') return `<span class="h">Индикаторы карты · 10 раундов</span>
-    <span class="ex"><span class="rot"><span class="ch" style="--sc:var(--earth)">${ic('target')}<b>20</b></span><span class="ch on" style="--sc:var(--earth)">${ic('crack')}<b>20</b></span><span class="ch u" style="--sc:var(--gold)">${ic('crown')}<b>8</b></span></span></span><span>Способности и ульта с долей хода в процентах: столько раз из ста карта применит её в свой ход. Иначе — обычная атака. Доли задаёт редкость героя или ранг врага (ADR-0016). Сработавшая светится.</span>
+    <span class="ex"><span class="rot"><span class="ch" style="--sc:var(--earth)">${ic('target')}<b>20</b></span><span class="ch on" style="--sc:var(--earth)">${ic('crack')}<b>20</b></span><span class="ch u" style="--sc:var(--gold)">${ic('crown')}<b>8</b></span></span></span><span>Способности и ульта с долей хода в процентах: столько раз из ста карта применит её в свой ход. Иначе — обычная атака. Доли задаёт редкость героя или ранг врага${TM(' (ADR-0016)')}. Сработавшая светится.</span>
     <span class="ex"><span class="bt-queue static"><i class="done"></i><i class="now"></i><i class="f"></i><i></i></span></span><span>Сверху — очередь раунда по скорости: золотом — кто ходит, бледные — уже сходили, красная рамка — враги.</span>
     <span class="ex">${ic('hour')}<b class="num">3 / 10</b></span><span>Раунд боя. Каждая карта ходит раз за раунд. После десятого раунда — «Время скоротечно…»: этаж не взят. С цикла II урон по боссу идёт в осаду.</span>
     <span class="ex"><span class="frame"></span></span><span>Красная рамка — в карту целятся противники, ×N — сколько.</span>
@@ -2136,11 +2211,11 @@ function battle() {
   } else {
     const B = EB.BIOMES[R.biome], FL = deckOf(R), lead = FL.g !== 'o' ? b.u[1][0] : null;
     const typ = FL.g === 'o' ? 'Рядовые' : FL.g === 'e' ? 'Элита' : FL.g === 'r' ? 'Рунный страж' : 'Босс биома';
-    title = B.name; sub = `забег ${R.runNo}${R.demo ? ' · демо' : ''}`;
+    title = B.name; sub = `забег ${R.runNo}${R.demo ? TM(' · демо') : ''}`;
     badge = R.guard ? `<b>${ic('crown')}</b><span>страж</span>` : `<b>${R.floor}</b><span>/ ${B.floors.length}</span>`;
     // рунный страж: его обычная атака отнимает у боя раунд (ADR-0020) — видно в чипе, в часах и в ленте
     chip = `<span class="chip ${FL.g !== 'o' ? 'gold' : ''}">${FL.g === 'e' ? ic('gem') : FL.g === 'b' || FL.g === 'r' ? ic('crown') : ''}${typ}${lead ? ' · ' + uName(lead) : ''}${FL.g === 'b' && B.siege !== false ? ` · осада ${siegeDone(R.biome)}%` : ''}</span>`
-      + (R.guard && b.mode === 'rounds' ? `<span class="chip warn bt-cutchip" title="Особенность каждого рунного босса: его обычная атака отнимает у предела раунд, текущий бой доигрывается (ADR-0020)">${ic('hour')}удар стража · −${EB.RULES.rounds.runeCut} раунд</span>` : '');
+      + (R.guard && b.mode === 'rounds' ? `<span class="chip warn bt-cutchip" title="${tmT('Обычная атака рунного босса отнимает у боя раунд, текущий бой доигрывается', 'Особенность каждого рунного босса: его обычная атака отнимает у предела раунд, текущий бой доигрывается (ADR-0020)')}">${ic('hour')}удар стража · −${EB.RULES.rounds.runeCut} раунд</span>` : '');
     if (R.guard && b.mode === 'rounds') row2 = ['Отнял страж', 'btCut', guardCut(R)];
     bgs = `<img class="bg${R.floor % 2 ? '' : ' flip'}" src="${ARENA}" alt=""><img class="bg bg2${R.floor % 2 ? ' flip' : ''}" src="${ARENA}" alt="">`;
   }
@@ -2152,7 +2227,7 @@ function battle() {
       ${b.mode === 'rounds'
         ? `<div class="bt-clock" id="btClockBox"><div class="row"><span>${ic('hour')} Раунд</span><span class="num" id="btClock">${b.round} / ${b.maxRounds}</span></div>${bar(b.round * 100 / b.maxRounds, 'sand')}<div class="row"><span>${row2[0]}</span><span class="num" id="${row2[1]}">${row2[2]}</span></div></div>`
         : `<div class="bt-clock"><div class="row"><span>${ic('hour')} Бой</span><span class="num" id="btClock">${clock(R.view / 1000)} / ${clock(b.limit / 1000)}</span></div>${bar(Math.min(100, R.view * 100 / b.limit), 'sand')}<div class="row"><span>Забег идёт</span><span class="num" id="btRun">${clock((R.runMs + R.view) / 1000)}</span></div></div>`}
-      <span class="chip" title="${sc ? 'Сид атаки выдаёт сервер: бой посчитан целиком до показа, исход известен' : 'Сид — сам биом: тот же отряд с той же ротацией всегда получает тот же сценарий'}">${ic('lock')}сценарий ${seedTag(R)}</span>${b.mode === 'rounds' && !sc && !R.guard ? `<span class="chip spirit" title="Модель боя для сравнения, ADR-0008">10 раундов</span>` : ''}
+      <span class="chip team-only" title="${sc ? 'Сид атаки выдаёт сервер: бой посчитан целиком до показа, исход известен' : 'Сид — сам биом: тот же отряд с той же ротацией всегда получает тот же сценарий'}">${ic('lock')}сценарий ${seedTag(R)}</span>${b.mode === 'rounds' && !sc && !R.guard ? `<span class="chip spirit team-only" title="Модель боя для сравнения, ADR-0008">10 раундов</span>` : ''}
       <div class="bt-ctrl">
         <button class="btn sm" data-a="legend" aria-pressed="${!!S.legend}" title="Что значат знаки на картах">${ic('info')}Знаки</button>
         ${sc ? (sc.skip ? `<button class="btn go" data-a="${sc.skip}" data-v="${R.id}" title="${sc.skipTip || 'Сразу к итогу: исход уже решён'}">${ic('ff')}Пропустить</button>` : '') + (sc.abort ? `<button class="btn sm ghost warn" data-a="${sc.abort}" data-v="${R.id}">Прервать</button>` : '') : `<button class="btn sm ghost warn" data-a="endact">Прервать</button>`}
@@ -2295,15 +2370,15 @@ function rsMaxTxt(h) {
   return I.maxV[0] === I.maxV[1] ? `как у всех ${RS_SRC_OF[h.src]}` : `у ${RS_SRC_OF[h.src]} — ${I.maxV[0]}–${I.maxV[1]}`;
 }
 function rsSrcLong(h) {
-  if (h.src === 'gold') return `Найм за золото · №${h.no} в каталоге цикла ${ROMAN[h.c]}${h.tut ? ' · <span class="rs-tut">обучение</span>' : ''}`;
-  if (h.src === 'donat') { const s = RSS[h.dset]; return `Донатный сет «${s.name}» за Энериум · ${h.place}-й из ${s.members.length}`; }
+  if (h.src === 'gold') return `Найм за золото${TM(` · №${h.no} в каталоге цикла ${ROMAN[h.c]}${h.tut ? ' · <span class="rs-tut">обучение</span>' : ''}`)}`;
+  if (h.src === 'donat') { const s = RSS[h.dset]; return `Донатный сет «${s.name}» за Энериум${TM(` · ${h.place}-й из ${s.members.length}`)}`; }
   if (h.src === 'roulette') return 'Возрождение душ: осколки, пробуждение душами';
-  if (h.src === 'echo') { const w = RS.weeks.find(x => x.race === h.week) || { gen: h.week }; return `Эхо · неделя ${w.gen}: отряд, отбивший ${w.civ ? `нашествие цивилизации ${w.civ} — «${w.raid}»` : 'нашествие'}. Осколки — из сундуков за места`; }
+  if (h.src === 'echo') { const w = RS.weeks.find(x => x.race === h.week) || { gen: h.week }; return `Эхо · неделя ${w.gen}${TM(`: отряд, отбивший ${w.civ ? `нашествие цивилизации ${w.civ} — «${w.raid}»` : 'нашествие'}. Осколки — из сундуков за места`)}`; }
   return 'Скрытый рецепт крафта: его находят перебором';
 }
 function rsWhoHtml(h) {
-  const facts = [['Откуда', rsSrcLong(h)], ['Доблесть', `максимум ${h.maxV} · ${rsMaxTxt(h)}`]]
-    .concat(h.avers ? [['Неприязнь', h.avers.race ? `${rsAversShort(h)}. Особенность героя Эхо, не способность: действует везде, где встречаются враги этой расы` : h.avers.text || '']] : [])
+  const facts = [['Откуда', rsSrcLong(h)], ['Доблесть', `максимум ${h.maxV}${TM(' · ' + rsMaxTxt(h))}`]]
+    .concat(h.avers ? [['Неприязнь', h.avers.race ? `${rsAversShort(h)}${TM('. Особенность героя Эхо, не способность: действует везде, где встречаются враги этой расы')}` : h.avers.text || '']] : [])
     .concat([['Приходит', '0 ур. · 0 РП · 0 Добл'], [h.maxV > 1 ? 'Главы' : 'Глава', h.chT.map((t, i) => '«' + rsChTitle(h, i) + '»').join(' · ')]]);
   return `${h.src === 'donat' ? `<p class="reason">Безликий: лица нет — стёрлось. Имя и облик видны сразу, себя он вспомнит на последней доблести.</p>` : ''}
     <p class="quote">${h.who}</p>
@@ -2320,12 +2395,12 @@ function rsChaptersHtml(h, v) {
   h.chT.forEach((_, i) => {
     const no = i + 1, x = h.ch && h.ch[i], title = rsChTitle(h, i);
     rows.push(no <= v
-      ? `<div class="chap"><span class="n">${ROMAN[no]}</span><div><b>${title}</b>${x && x[1].length ? x[1].map(p => `<p class="rs-p">${p}</p>`).join('') : '<small class="faint" style="display:block">Текст главы пишется — пока только заголовок.</small>'}</div></div>`
+      ? `<div class="chap"><span class="n">${ROMAN[no]}</span><div><b>${title}</b>${x && x[1].length ? x[1].map(p => `<p class="rs-p">${p}</p>`).join('') : '<small class="faint team-only" style="display:block">Текст главы пишется — пока только заголовок.</small>'}</div></div>`
       : `<div class="chap lock"><span class="n">${ROMAN[no]}</span><div><b>${title}</b><small style="display:block">Откроется на доблести ${no}${no === h.maxV ? ' · последний день' : ''}</small></div></div>`);
   });
   return rows.join('');
 }
-const rsValorPick = (h, v) => `<div class="row rs-vp"><span class="eyebrow">доблесть · примерить</span><div class="qty" role="group" aria-label="Доблесть героя, демо">${Array.from({ length: h.maxV + 1 }, (_, i) => `<button aria-pressed="${i === v}" data-a="rsval" data-v="${h.id}:${i}">${i}</button>`).join('')}</div></div>`;
+const rsValorPick = (h, v) => `<div class="row rs-vp team-only"><span class="eyebrow">доблесть · примерить</span><div class="qty" role="group" aria-label="Доблесть героя, демо">${Array.from({ length: h.maxV + 1 }, (_, i) => `<button aria-pressed="${i === v}" data-a="rsval" data-v="${h.id}:${i}">${i}</button>`).join('')}</div></div>`;
 /* ступени сета — по сумме максимумов (ADR-0022, п. 6), условия — §30 */
 function rsTierRows(s) {
   const R = RS.rules, size = s.members.length;
@@ -2342,14 +2417,14 @@ function rsSetBox(s, h, o = {}) {
   const pick = o.pick || (id => `data-a="rssel" data-v="${id}"`);
   const mem = s.members.map(id => {
     const m = RSI[id], me = !!h && id === h.id;
-    return donat || KH.team || me ? `<button ${pick(id)} class="${me ? 'me' : ''}" title="${m.cls} · максимум доблести ${m.maxV}">${el(m.sch, true)}${m.n}<small>${m.maxV}</small></button>` : '<span class="unk" title="Игрок вычисляет по главам">? · скрыт</span>';
+    return donat || KH.team || me ? `<button ${pick(id)} class="${me ? 'me' : ''}" title="${m.cls} · максимум доблести ${m.maxV}">${el(m.sch, true)}${m.n}<small>${m.maxV}</small></button>` : `<span class="unk" title="${tmT('Откроется главами', 'Игрок вычисляет по главам')}">? · скрыт</span>`;
   }).join('');
   return `<div class="kh-set rs-set">
     <div class="row" style="gap:6px;flex-wrap:wrap"><h4>${donat ? '«' + s.name + '»' : s.name}</h4><span class="chip ${donat ? 'spirit' : 'gold'}">${donat ? 'донатный сет' : 'орден'}</span>${s.proposed && KH.team ? '<span class="chip warn">предложение</span>' : ''}${riddle ? '<span class="chip warn">загадка</span>' : ''}<span class="faint" style="font-size:12px">цикл ${ROMAN[s.cycle]}</span></div>
     ${riddle ? '<p class="reason">Главы не отвечают прямо, остался ли он в ордене: последнюю можно понять и так, и так.</p>' : ''}
     <div class="kh-mem">${mem}</div>
     <p class="muted" style="font-size:12.5px">Сумма максимумов доблести — <b class="num">${s.sum}</b>: ${n ? n + ' ' + plural(n, 'ступень', 'ступени', 'ступеней') : 'ступеней нет'}.${donat ? ' Герой приходит с 0 доблести — ступень I включит первая руна доблести.' : ''}</p>
-    ${s.bonus ? `<p style="font-size:13px;color:var(--parch-2)">${s.bonus}</p>` : '<p class="faint" style="font-size:12.5px">Бонус ордена ещё не задан.</p>'}
+    ${s.bonus ? `<p style="font-size:13px;color:var(--parch-2)">${plData(s.bonus)}</p>` : '<p class="faint team-only" style="font-size:12.5px">Бонус ордена ещё не задан.</p>'}
     ${n ? `<table class="kh-tiers">${rsTierRows(s)}</table>` : ''}
   </div>`;
 }
@@ -2366,8 +2441,8 @@ function rsSetHtml(h, v, o = {}) {
 }
 function rsGetHtml(h) {
   const own = S.rs.owned[h.id], old = rsOld(h);
-  if (old) return `<span class="eyebrow">В коллекции · отряд боя</span><p class="muted" style="font-size:13px">В бой прототипа ${old.name} идёт на прежнем наборе способностей: доблесть отряда — до пересчёта обучения под максимум ${h.maxV}.</p><button class="btn sm" data-a="rsmine" data-v="${old.id}">${ic('up')}Развитие</button>`;
-  if (own) return `<span class="eyebrow">В коллекции · ${RS_HOW[own.how] || ''}</span><div class="row" style="gap:16px"><div class="stat"><b>${own.lvl}</b><small>уровень</small></div><div class="stat"><b>${own.lim}</b><small>рунный предел</small></div><div class="stat"><b>${own.valor}/${h.maxV}</b><small>доблесть</small></div></div><p class="reason">Дальше — уровень, руны предела и доблести, как у всех героев. Бой прототипа пока идёт на героях с наборами способностей.</p>`;
+  if (old) return `<span class="eyebrow">В коллекции${TM(' · отряд боя')}</span><p class="muted team-only" style="font-size:13px">В бой прототипа ${old.name} идёт на прежнем наборе способностей: доблесть отряда — до пересчёта обучения под максимум ${h.maxV}.</p><button class="btn sm" data-a="rsmine" data-v="${old.id}">${ic('up')}Развитие</button>`;
+  if (own) return `<span class="eyebrow">В коллекции · ${RS_HOW[own.how] || ''}</span><div class="row" style="gap:16px"><div class="stat"><b>${own.lvl}</b><small>уровень</small></div><div class="stat"><b>${own.lim}</b><small>рунный предел</small></div><div class="stat"><b>${own.valor}/${h.maxV}</b><small>доблесть</small></div></div><p class="reason">Дальше — уровень, руны предела и доблести, как у всех героев.${TM(' Бой прототипа пока идёт на героях с наборами способностей.')}</p>`;
   const how = {
     gold: `Найм за золото. Цена — по счёту покупки: следующий герой цикла ${ROMAN[h.c]} стоит ${fmt(rsGold(h.c, rsBought(h.c) + 1))} золота.`,
     donat: `Донатный сет «${h.dset && RSS[h.dset] ? RSS[h.dset].name : ''}» за Энериум: любого из пятерых, первый дешевле всех.`,
@@ -2384,7 +2459,7 @@ function rsDetail(h) {
   const body = t === 'mem' ? `<div class="col scroll grow" style="gap:6px" data-keep="rsmem:${h.id}">${rsValorPick(h, v)}${rsChaptersHtml(h, v)}</div>`
     : t === 'set' ? `<div class="col scroll grow" style="gap:8px" data-keep="rsset:${h.id}">${rsValorPick(h, v)}${rsSetHtml(h, v)}</div>`
     : `<div class="hd-cols"><div class="col scroll" style="gap:8px">${rsWhoHtml(h)}</div><div class="col scroll" style="gap:8px">${rsGetHtml(h)}</div></div>`;
-  const team = `<button class="iconbtn rs-team" data-a="rsteam" aria-pressed="${!!KH.team}" aria-label="Для команды" title="Для команды: орден, черновик и заметки видны сразу">${ic('eye')}</button>`;
+  const team = `<button class="iconbtn rs-team team-only" data-a="rsteam" aria-pressed="${!!KH.team}" aria-label="Режим «Команда»" title="Режим «Команда»: орден, черновик и заметки видны сразу. Нажать — вернуться к виду игрока">${ic('eye')}</button>`;
   return `<div class="pnl hd">${rsHead(h, v)}<div class="hd-body"><div class="row" style="justify-content:space-between"><div class="tabs" role="tablist" aria-label="Разделы героя">${[['who', 'Герой'], ['mem', 'Воспоминания'], ['set', 'Орден']].map(([k, l]) => `<button role="tab" aria-selected="${t === k}" data-a="seg" data-v="rhero:${k}">${l}</button>`).join('')}</div>${team}</div>${body}</div></div>`;
 }
 const RS_NODATA = '<section class="scr"><div class="pnl pad"><p class="faint">Нет данных: рядом с index.html должен лежать roster.js.</p></div></section>';
@@ -2469,13 +2544,13 @@ function heroDetail(h) {
           const ult = h.ult ? (h.valor >= h.ult.at ? `<div class="ab"><span class="h">${ic('crown')}</span><span class="n">У</span><span><b>${h.ult.n}</b><small>Ультимейт: ${h.ult.d} Срабатывает по шансу, без зарядки.</small></span><span class="chip spirit">${pctBp(ch(h.ult.n))}</span></div>` : `<div class="ab lock"><span class="h">${ic('lock')}</span><span class="n">${ic('crown')}</span><span><b>${h.ult.n}</b><small>Ультимейт · ${h.ult.d}</small></span><span class="chip">доблесть ${h.ult.at}</span></div>`) : '';
           return `<div class="rot-list">${rows}${ult}<div class="ab"><span class="h">${ic('sword')}</span><span class="n">—</span><span><b>Обычная атака</b><small>Если ни одна способность не сработала.</small></span><span class="chip">${pctBp(rest)}</span></div></div>`;
         })()}
-        <span class="reason">Кристалл у названия — магия школы стихии героя; без него — приём класса. Порядок способностей не важен: в свой ход герой бросает шанс (ADR-0010). Сумма шансов карты — не выше ${pctBp(EB.RULES.rounds.capBp)}, лишнее сжимается пропорционально.</span>
+        ${PL('Кристалл у названия — магия школы стихии героя; без него — приём класса.', `Кристалл у названия — магия школы стихии героя; без него — приём класса. Порядок способностей не важен: в свой ход герой бросает шанс (ADR-0010). Сумма шансов карты — не выше ${pctBp(EB.RULES.rounds.capBp)}, лишнее сжимается пропорционально.`, 'span', 'reason')}
       </div>
       <div class="col" style="gap:6px"><span class="eyebrow">Пассивные</span>${h.pas.map(p => `<div class="chap" style="grid-template-columns:1fr"><div><b>${p.n}</b> <span class="chip" style="height:18px;margin-left:4px">${p.t}</span><small class="faint" style="display:block;margin-top:3px">${p.d}</small></div></div>`).join('')}</div>
     </div>`;
   } else {
     const ch = [`<div class="chap"><span class="n">·</span><div><b>Обрывки личности</b><small class="faint" style="display:block">Остались лишь обрывки: незнакомые голоса, дорога и ощущение утраты.</small></div></div>`];
-    for (let i = 1; i <= h.maxV; i++) ch.push(i <= h.valor ? `<div class="chap"><span class="n">${ROMAN[i]}</span><div><b>Глава ${ROMAN[i]}</b><small class="faint" style="display:block">Открыта доблестью ${i}. Текст главы задаёт автор.</small></div></div>` : `<div class="chap lock"><span class="n">${ROMAN[i]}</span><div><b>Глава ${ROMAN[i]}</b><small style="display:block">Откроется на доблести ${i}</small></div></div>`);
+    for (let i = 1; i <= h.maxV; i++) ch.push(i <= h.valor ? `<div class="chap"><span class="n">${ROMAN[i]}</span><div><b>Глава ${ROMAN[i]}</b><small class="faint" style="display:block">Открыта доблестью ${i}.${TM(' Текст главы задаёт автор.')}</small></div></div>` : `<div class="chap lock"><span class="n">${ROMAN[i]}</span><div><b>Глава ${ROMAN[i]}</b><small style="display:block">Откроется на доблести ${i}</small></div></div>`);
     body = `<div class="hd-cols"><div class="col scroll" style="gap:6px">${ch.join('')}</div>
       <div class="col" style="gap:8px"><span class="eyebrow">Орден</span><div class="pnl pad" style="background:#0e1114"><b class="serif" style="font-size:18px">Не раскрыт</b><p class="faint" style="font-size:12.5px;margin-top:4px">Связи с орденами открываются главами. Неизвестные участники остаются скрыты.</p></div>
       <span class="reason">Число глав равно личному максимуму доблести: у этого героя — ${h.maxV}.</span></div></div>`;
@@ -2513,8 +2588,8 @@ function hireView() {
   const tabs = [['gold', 'За золото'], ['donat', 'За Энериум'], ['souls', 'За души']];
   return `<section class="scr">
     <div class="row rs-hbar"><div class="tabs" role="tablist" aria-label="Способ получить героя">${tabs.map(([k, l]) => `<button role="tab" aria-selected="${t === k}" data-a="seg" data-v="hire:${k}">${l}</button>`).join('')}</div>
-      <span class="g-spacer"></span><span class="eyebrow">цикл · демо</span>
-      <div class="tabs rs-cyc" role="tablist" aria-label="Текущий цикл, демо">${ROMAN.slice(1).map((r, i) => `<button role="tab" aria-selected="${c === i + 1}" data-a="rscyc" data-v="${i + 1}">${r}</button>`).join('')}</div></div>
+      <span class="g-spacer"></span><span class="eyebrow team-only">цикл · демо</span>
+      <div class="tabs rs-cyc team-only" role="tablist" aria-label="Текущий цикл, демо">${ROMAN.slice(1).map((r, i) => `<button role="tab" aria-selected="${c === i + 1}" data-a="rscyc" data-v="${i + 1}">${r}</button>`).join('')}</div></div>
     ${t === 'donat' ? rsDonatView() : t === 'souls' ? rsSoulsView() : rsGoldView()}
   </section>`;
 }
@@ -2544,10 +2619,13 @@ function rsGoldCard(h, c, k, open) {
     <div class="hd-body"><div class="hd-cols">
       <div class="col scroll" style="gap:8px">${rsWhoHtml(h)}</div>
       <div class="col scroll" style="gap:6px">
-        <span class="eyebrow">Цена — по счёту покупки</span>
-        <p class="reason num">${fmt(g.first)} × ${c} × (1 + ${pctBp(g.stepBp)} × (${k} − 1)) = ${fmt(price)}</p>
-        <div class="stats">${next}</div>
-        <p class="reason">№ в каталоге — только порядок. Какого героя брать, решаете вы: цена растёт с каждой покупкой в цикле, и всех героев цикла к его концу не выкупить.</p>
+        <p class="reason player-only">Цена растёт с каждой покупкой в цикле.</p>
+        <div class="col team-only" style="gap:6px">
+          <span class="eyebrow">Цена — по счёту покупки</span>
+          <p class="reason num">${fmt(g.first)} × ${c} × (1 + ${pctBp(g.stepBp)} × (${k} − 1)) = ${fmt(price)}</p>
+          <div class="stats">${next}</div>
+          <p class="reason">№ в каталоге — только порядок. Какого героя брать, решаете вы: цена растёт с каждой покупкой в цикле, и всех героев цикла к его концу не выкупить.</p>
+        </div>
       </div>
     </div></div></div>`;
 }
@@ -2565,7 +2643,7 @@ function rsDonatView() {
   return `<div class="hs rs-hs">
     <div class="pnl coll">
       <select class="rs-sel" data-a="dcyc" aria-label="Донатный сет">${opts}</select>
-      <p class="rs-next">Безликие: лица нет, имя и облик видны сразу. Цена растёт от первого к пятому<span class="chip warn" title="Цен героев за Энериум в источниках нет — заглушка прототипа">цены — заглушка</span></p>
+      <p class="rs-next">Безликие: лица нет, имя и облик видны сразу. Цена растёт от первого к пятому<span class="chip warn team-only" title="Цен героев за Энериум в источниках нет — заглушка прототипа">цены — заглушка</span></p>
       <div class="rs-list scroll grow" data-keep="dset:${s.cycle}">${rows}${rsSetBox(s, null, { pick: id => `data-a="dsel" data-v="${id}"` })}</div>
     </div>
     ${rsDonatCard(sel, s, open)}
@@ -2574,7 +2652,7 @@ function rsDonatView() {
 function rsDonatCard(h, s, open) {
   const price = rsDonatPrice(h);
   const aside = rsHas(h) ? `<span class="chip gold">${ic('check')}в коллекции</span><button class="link" data-a="rsopen" data-v="${h.id}">Открыть ${ic('chev')}</button>`
-    : open ? `<div class="stat"><b>${fmt(price)}</b><small>${h.place}-й из ${s.members.length} · заглушка</small></div><button class="btn go" data-a="dbuy" data-v="${h.id}">Купить${costTag('enerium', price)}</button>`
+    : open ? `<div class="stat"><b>${fmt(price)}</b><small>${h.place}-й из ${s.members.length}${TM(' · заглушка')}</small></div><button class="btn go" data-a="dbuy" data-v="${h.id}">Купить${costTag('enerium', price)}</button>`
     : `<span class="chip warn">${ic('lock')}цикл ${ROMAN[s.cycle]}</span><small class="faint">откроется при переходе</small>`;
   return `<div class="pnl hd">${rsHead(h, 0, aside)}
     <div class="hd-body"><div class="hd-cols">
@@ -2594,14 +2672,14 @@ function rsRouletteCol() {
   const rows = rsPool().map(h => rsRow(h, { act: 'ssel', sel: S.rs.ssel === h.id, sub: `${RAR[h.r]} · доблесть до ${h.maxV}`, right: rsShardTag(h) })).join('') || '<p class="faint">В пуле этого цикла героев нет.</p>';
   return `<div class="pnl rs-col">${head}
     <div class="rs-list scroll grow" data-keep="roul:${cur}">${rows}</div>
-    <div class="rs-colf"><p class="reason">${last ? `Прошлая прокрутка: <b>${last.n}</b> · осколков +${R.stub.spinShards} (заглушка)` : 'Результат решает сервер; в прототипе — по очереди из пула.'}</p><button class="btn go sm" data-a="spin">Прокрутка${costTag('enerium', R.spin)}</button></div>
+    <div class="rs-colf"><p class="reason">${last ? `Прошлая прокрутка: <b>${last.n}</b> · осколков +${R.stub.spinShards}${TM(' (заглушка)')}` : TM('Результат решает сервер; в прототипе — по очереди из пула.')}</p><button class="btn go sm" data-a="spin">Прокрутка${costTag('enerium', R.spin)}</button></div>
   </div>`;
 }
 function rsEchoCol() {
   const cur = rsCyc(), from = rsFrom('echo'), W = rsWeek();
   const squad = W ? W.squad.map(id => RSI[id]).filter(Boolean) : [];
   const to = squad.length ? squad[squad.length - 1].c : from;
-  const wsel = `<select class="rs-sel" data-a="sweek" aria-label="Неделя расы, демо">${RS.weeks.map(w => `<option value="${w.race}" ${w === W ? 'selected' : ''}>Неделя ${w.gen}</option>`).join('')}</select>`;
+  const wsel = `<select class="rs-sel team-only" data-a="sweek" aria-label="Неделя расы, демо">${RS.weeks.map(w => `<option value="${w.race}" ${w === W ? 'selected' : ''}>Неделя ${w.gen}</option>`).join('')}</select>`;
   const head = `<div class="rs-colh"><span class="eyebrow">Эхо · отряд недели</span>${wsel}${W && W.civ ? `<b>${W.civ}</b><small class="faint">древняя цивилизация, жившая задолго до этеров. Её нашествие «${W.raid}» отбил этот отряд — по герою за цикл, с ${ROMAN[from]} по ${ROMAN[to]}</small>` :`<small class="faint">отряд, отбивший нашествие древней цивилизации; по герою за цикл, с ${ROMAN[from]} по ${ROMAN[to]}</small>`}</div>`;
   if (cur < from) return `<div class="pnl rs-col">${head}<p class="rs-line">${ic('lock')}Эхо откроется с цикла ${ROMAN[from]}.</p></div>`;
   const av = squad.find(h => h.avers && h.avers.race);
@@ -2621,7 +2699,7 @@ function rsDustCol() {
     const n = S.rs.shards[sel.id] || 0;
     foot = rsHas(sel) ? `<p class="reason"><b>${sel.n}</b> уже в коллекции: его повторные осколки уходят в прах — ${fmt(rsDustOf(sel))} за осколок.</p>`
       : `<div class="row" style="gap:6px;justify-content:space-between"><b class="serif" style="font-size:15px">${sel.n}</b><button class="link" data-a="rhero" data-v="${sel.id}">Карточка ${ic('chev')}</button></div>
-        ${bar(Math.min(100, n * 100 / need))}<small class="faint num">осколков ${n} / ${need} · число — заглушка</small>
+        ${bar(Math.min(100, n * 100 / need))}<small class="faint num">осколков ${n} / ${need}${TM(' · число — заглушка')}</small>
         <div class="row" style="gap:6px"><button class="btn sm" data-a="dustbuy" data-v="${sel.id}" ${sel.c <= cur ? '' : 'disabled'}>Осколок${costTag('dust', rsShardPrice(sel))}</button><button class="btn go sm" data-a="activate" data-v="${sel.id}" ${n >= need ? '' : 'disabled'}>Пробудить${costTag('souls', R.stub.activateSouls)}</button></div>`;
   }
   return `<div class="pnl rs-col">
@@ -3034,7 +3112,7 @@ function arenaView() {
       <div class="sq-slots" style="max-width:560px">${s.m.map(id => heroCard(H(id))).join('')}</div>
       <p class="reason">Назначается из последнего состава атаки. Вас видят полностью — стройте отряд, устойчивый к разным ответам.</p></div></section>` }; }
   return { ...meta, html: `<section class="scr">
-    <div class="row"><div class="stat"><b>${fmt(A2.rating)}</b><small>рейтинг</small></div><div class="stat" style="margin-left:14px"><b>${A2.att}<span class="faint"> / ${A2.max}</span></b><small>атак · +20 в день</small></div><span class="g-spacer"></span><span class="faint" style="font-size:12.5px">Сид боя закреплён: каждого соперника атакуют один раз</span><button class="btn sm" data-a="toast" data-v="Список соперников обновлён">${ic('swap')}Обновить</button><button class="btn sm" data-a="sheet" data-v="rank:Арена">Место 88</button></div>
+    <div class="row"><div class="stat"><b>${fmt(A2.rating)}</b><small>рейтинг</small></div><div class="stat" style="margin-left:14px"><b>${A2.att}<span class="faint"> / ${A2.max}</span></b><small>атак · +20 в день</small></div><span class="g-spacer"></span><span class="faint" style="font-size:12.5px">${PL('Каждого соперника атакуют один раз', 'Сид боя закреплён: каждого соперника атакуют один раз')}</span><button class="btn sm" data-a="toast" data-v="Список соперников обновлён">${ic('swap')}Обновить</button><button class="btn sm" data-a="sheet" data-v="rank:Арена">Место 88</button></div>
     <div class="col scroll grow" style="gap:6px">${A2.opp.map((o, i) => `<button class="opp" data-a="sheet" data-v="opp:${i}"><span class="col" style="gap:3px"><b>${o.n}</b><small class="faint">рейтинг <span class="num">${fmt(o.rt)}</span> · БМ <span class="num">${fmt(o.bm)}</span></small></span><span class="faces">${o.f.map(id => `<img src="${H(id).img}" alt="" data-r="${H(id).r}">`).join('')}</span><span class="link">Состав ${ic('chev')}</span></button>`).join('')}</div>
   </section>` };
 }
@@ -3045,7 +3123,7 @@ function clanView() {
   const meta = { title: 'Клан', back: 'week', seg: { key: 'clan', items: [['pass', 'Паспорт'], ['boss', 'Босс'], ['mem', 'Участники'], ['tree', 'Древо']] } };
   if (t === 'boss') return { ...meta, html: `<section class="scr">
     <div class="row"><span class="eyebrow">Круг ${C.boss.circle} · элиты недели</span><span class="g-spacer"></span><span class="chip">${ic('bolt')}атак ${C.boss.att} / 5 · общий кошелёк</span><span class="chip">${ic('hour')}<span class="num" data-cd="week">${dur(S.week.left)}</span></span></div>
-    <div class="rcards grow">${C.boss.elites.map(([e, bm, hp]) => `<div class="rcard" data-r="4"><div class="row" style="justify-content:space-between"><span class="chip gold">${ic('gem')}Элита</span>${el(e)}</div><b>Неизученная элита</b><small class="faint">БМ <span class="num">${fmt(bm)}</span> · без сопротивлений</small>${bar(100, 'hp')}<small class="faint num">${fmt(hp)} / ${fmt(hp)}</small><button class="btn sm go" style="margin-top:auto" data-a="toast" data-v="Атака элиты: демо">Атаковать · 1 атака</button></div>`).join('')}</div>
+    <div class="rcards grow">${C.boss.elites.map(([e, bm, hp]) => `<div class="rcard" data-r="4"><div class="row" style="justify-content:space-between"><span class="chip gold">${ic('gem')}Элита</span>${el(e)}</div><b>Неизученная элита</b><small class="faint">БМ <span class="num">${fmt(bm)}</span> · без сопротивлений</small>${bar(100, 'hp')}<small class="faint num">${fmt(hp)} / ${fmt(hp)}</small><button class="btn sm go" style="margin-top:auto" data-a="toast" data-v="${tmT('Атака элиты пока недоступна', 'Атака элиты: демо')}">Атаковать · 1 атака</button></div>`).join('')}</div>
     <p class="reason">Три победы над элитами призывают Кланового босса недели. Контроль на него не действует — только дебафы. Очки делятся по снятому здоровью в момент смерти врага.</p>
   </section>` };
   if (t === 'mem') return { ...meta, html: `<section class="scr"><div class="col scroll grow" style="gap:6px">${[['Тихий ветер', 'Глава', 42, 1320], ['Северный странник', 'Казначей', 38, 980], ['Странник', 'Участник', 24, 540], ['Собиратель искр', 'Участник', 31, 410]].map(([n, r, l, v]) => `<div class="opp"><span class="col" style="gap:2px"><b>${n}</b><small class="faint">${r} · ур. ${l}</small></span><span class="col" style="align-items:flex-end;gap:2px"><b class="num" style="font-family:var(--f-u)">${fmt(v)}</b><small class="faint">вклад недели</small></span><span class="link">Профиль ${ic('chev')}</span></div>`).join('')}</div></section>` };
@@ -3114,10 +3192,10 @@ function profileView() {
   else if (t === 'mem') body = `<div class="pnl pad col" style="gap:12px">
       <div class="row"><h2 class="serif gold" style="font-size:22px">Память Странника</h2><span class="g-spacer"></span><button class="btn sm ghost" data-a="toast" data-v="Каталог: 146 записей, семь редкостей">${ic('book')}Каталог</button></div>
       <div class="mem">${S.mem.slots.map((s, i) => s.st === 'open' ? `<button class="mslot open" data-a="dlg" data-v="mem"><span class="crys"></span><b class="serif" style="font-size:17px">Место цикла ${ROMAN[s.c]}</b><span class="chip spirit">можно вспомнить</span></button>` : s.st === 'set' ? `<div class="mslot set" data-r="${s.p.r}"><span class="crys"></span><b class="serif" style="font-size:17px">${s.p.n}</b><small class="faint">${s.p.d}</small></div>` : `<div class="mslot"><span class="crys"></span><b class="serif faint" style="font-size:17px">Цикл ${ROMAN[s.c]}</b><small class="faint">закрыто</small></div>`).join('')}</div>
-      <div class="row"><p class="reason">Пять мест открываются в циклах II–VI. Выбор — один вариант из трёх; сначала редкость, потом вес пассивки.</p><span class="g-spacer"></span><button class="btn sm" data-a="dlg" data-v="memreset" ${S.mem.slots.some(s => s.st === 'set') ? '' : 'disabled'}>Полный сброс${costTag('enerium', 100)}</button></div>
+      <div class="row"><p class="reason">Пять мест открываются в циклах II–VI. Выбор — один вариант из трёх${TM('; сначала редкость, потом вес пассивки')}.</p><span class="g-spacer"></span><button class="btn sm" data-a="dlg" data-v="memreset" ${S.mem.slots.some(s => s.st === 'set') ? '' : 'disabled'}>Полный сброс${costTag('enerium', 100)}</button></div>
     </div>`;
   else if (t === 'arts') body = `<div class="col" style="min-height:0"><div class="row"><span class="eyebrow">Пассивные умения аккаунта · потолок — текущий цикл</span></div><div class="col scroll grow" style="gap:6px">${S.arts.map((a, i) => `<div class="art"><span class="lv">${ROMAN[a.lv]}</span><span class="col" style="gap:2px"><b class="serif" style="font-size:18px">${a.n}</b><small class="muted">${a.d}</small></span>${a.lv < a.max ? `<button class="btn sm" data-a="artup" data-v="${i}">Улучшить${costTag('souls', a.cost)}</button>` : '<span class="chip gold">максимум</span>'}</div>`).join('')}</div></div>`;
-  else body = `<div class="col" style="min-height:0"><div class="row"><div class="tabs"><button aria-selected="true">Персональные</button><button aria-selected="false">Возрождённые</button><button aria-selected="false">Таинственные</button></div></div><div class="rcards grow" style="grid-template-columns:repeat(2,minmax(0,1fr))">${S.ach.map(a => a.hidden ? `<div class="rcard" data-r="1" style="border-style:dashed"><b class="faint">???</b><small class="faint">Условие скрыто до открытия</small></div>` : `<div class="rcard" data-r="${a.done ? 5 : 3}"><b>${a.n}</b><small class="faint">${a.d}</small>${bar(a.p / a.g * 100, a.p >= a.g ? 'sp' : '')}<div class="row" style="justify-content:space-between"><small class="muted">${a.eff}</small>${a.claim ? '<button class="btn sm go" data-a="toast" data-v="Эффект получен: +2% шанс ключа">Получить</button>' : a.done ? `<span class="chip spirit">${ic('check')}действует</span>` : `<span class="num faint" style="font-size:12px">${a.p}/${a.g}</span>`}</div></div>`).join('')}</div></div>`;
+  else body = `<div class="col" style="min-height:0"><div class="row"><div class="tabs"><button aria-selected="true">Персональные</button><button aria-selected="false">Возрождённые</button><button aria-selected="false">Таинственные</button></div></div><div class="rcards grow" style="grid-template-columns:repeat(2,minmax(0,1fr))">${S.ach.map(a => a.hidden ? `<div class="rcard" data-r="1" style="border-style:dashed"><b class="faint">???</b><small class="faint">Условие скрыто до открытия</small></div>` : `<div class="rcard" data-r="${a.done ? 6 : 3}"><b>${a.n}</b><small class="faint">${a.d}</small>${bar(a.p / a.g * 100, a.p >= a.g ? 'sp' : '')}<div class="row" style="justify-content:space-between"><small class="muted">${a.eff}</small>${a.claim ? '<button class="btn sm go" data-a="toast" data-v="Эффект получен: +2% шанс ключа">Получить</button>' : a.done ? `<span class="chip spirit">${ic('check')}действует</span>` : `<span class="num faint" style="font-size:12px">${a.p}/${a.g}</span>`}</div></div>`).join('')}</div></div>`;
   return { ...meta, html: `<section class="scr"><div class="pf">${id}${body}</div></section>` };
 }
 
@@ -3129,7 +3207,7 @@ function chronicleView() {
   if (L.sec === 'best') pages = `<div class="page"><span class="eyebrow">Мастерская форм · цикл I</span><div class="bgrid">${S.foes.map(x => `<button class="fig ${known(x.id) ? '' : 'unk'}" data-a="lorefoe" data-v="${x.id}" aria-current="${x.id === f.id}" title="${known(x.id) ? x.name : 'Не изучен'}"><img src="${FA(x)}" alt="" style="object-position:${FPOS(x)}">${known(x.id) ? '' : '<span class="qm">?</span>'}</button>`).join('')}</div>
       <p class="reason">Знание одного противника действует во всех режимах: биомах, Эхо и у Кланового босса.</p></div>
     <div class="page">${k ? `<div class="row" style="gap:12px;align-items:flex-start"><img class="foe-art" src="${FA(f)}" alt="" style="object-position:${FPOS(f)}"><div class="col" style="gap:6px"><span class="eyebrow">${f.type} · ${f.tag}</span><h2 class="serif" style="font-size:26px">${f.name}</h2><div class="row" style="gap:5px;flex-wrap:wrap">${el(f.el)}<span class="chip">${f.cls}</span><span class="chip">${f.race}</span></div><p class="muted" style="font-size:14px">${f.desc}</p></div></div><p class="quote"><b>Совет старика</b>${f.tip}</p>` : `<div class="col" style="align-items:center;text-align:center;gap:8px;justify-content:center;flex:1"><div class="fig unk" style="height:150px"><img src="${FA(f)}" alt="" style="object-position:${FPOS(f)}"><span class="qm">?</span></div><h2 class="serif" style="font-size:24px">Неизвестный противник</h2><p class="faint">${f.type} · БМ ${fmt(f.bm)} · здоровье ${fmt(f.hp)} · ${f.el}</p><p class="reason">Запись откроет первая подтверждённая победа.</p></div>`}</div>`;
-  else pages = `<div class="page"><span class="eyebrow">${sec.find(s => s[0] === L.sec)[1]}</span><h2 class="serif" style="font-size:26px">${L.sec === 'world' ? 'Пролом богов' : L.sec === 'mech' ? 'Шесть циклов' : 'Обрывки'}</h2><p class="muted">${L.sec === 'world' ? 'Эндалор парит над проломом. Под городом — портал в шахту и спуск, который зовут экзаменом богов.' : L.sec === 'mech' ? 'Спуск разбит на шесть циклов по два биома. Новый цикл открывает биомы, героев, рецепты и место Памяти.' : 'Память о пещере возвращается кусками, как сон. Остальное откроется по мере пути.'}</p><p class="reason">Статьи открываются по мере прохождения и не раскрывают будущий сюжет.</p></div><div class="page"><div class="col" style="flex:1;justify-content:center;align-items:center;text-align:center;gap:6px"><span class="faint">${ic('lock')}</span><p class="faint">Следующая запись закрыта</p></div></div>`;
+  else pages = `<div class="page"><span class="eyebrow">${sec.find(s => s[0] === L.sec)[1]}</span><h2 class="serif" style="font-size:26px">${L.sec === 'world' ? 'Пролом богов' : L.sec === 'mech' ? 'Шесть циклов' : 'Обрывки'}</h2><p class="muted">${L.sec === 'world' ? 'Эндалор парит над проломом. Под городом — портал в шахту и спуск, который зовут экзаменом богов.' : L.sec === 'mech' ? 'Спуск разбит на шесть циклов по два биома. Новый цикл открывает биомы, героев, рецепты и место Памяти.' : 'Память о пещере возвращается кусками, как сон. Остальное откроется по мере пути.'}</p><p class="reason">Статьи открываются по мере прохождения${TM(' и не раскрывают будущий сюжет')}.</p></div><div class="page"><div class="col" style="flex:1;justify-content:center;align-items:center;text-align:center;gap:6px"><span class="faint">${ic('lock')}</span><p class="faint">Следующая запись закрыта</p></div></div>`;
   return { title: 'Летопись', html: `<section class="scr"><div class="ch">
     <div class="pnl toc">${sec.map(([k2, n, c]) => `<button aria-current="${L.sec === k2}" data-a="lore" data-v="${k2}"><span>${n}</span><span class="faint num" style="font-size:12px">${c}</span></button>`).join('')}</div>
     <div class="pnl book">${pages}</div>
@@ -3141,11 +3219,11 @@ function storeView() {
   const t = S.seg.store;
   const meta = { title: 'Лавка Энериума', seg: { key: 'store', items: [['en', 'Энериум'], ['pass', 'Пропуск'], ['look', 'Облик']] } };
   let body;
-  if (t === 'en') body = `<div class="rcards grow" style="grid-template-columns:repeat(3,minmax(0,1fr))">${[['Горсть Энериума', 400, '199 ₽', true], ['Запас Энериума', 1600, '699 ₽', true], ['Ежедневная выдача', 30, '299 ₽ / 30 дней', false]].map(([n, q, p, x2]) => `<div class="rcard" data-r="${x2 ? 5 : 3}"><img src="${ART('enerium.png')}" alt="" style="width:48px;height:48px;object-fit:contain"><b>${n}</b><small class="muted num">${fmt(q)} Энериума${x2 ? ' · первая покупка ×2' : ' в день'}</small><button class="btn go sm" style="margin-top:auto" data-a="toast" data-v="Покупка в прототипе не выполняется">${p}</button></div>`).join('')}</div><p class="reason">За деньги — только больше возможностей отработать прогресс. Души, попытки и рейтинг не продаются.</p>`;
-  else if (t === 'pass') body = `<div class="pnl pad col" style="gap:8px"><div class="row"><h2 class="serif gold" style="font-size:22px">Осенний путь</h2><span class="chip">620 очков</span><span class="g-spacer"></span><button class="btn go sm" data-a="toast" data-v="Платный ряд: демо">Открыть платный ряд</button></div>
+  if (t === 'en') body = `<div class="rcards grow" style="grid-template-columns:repeat(3,minmax(0,1fr))">${[['Горсть Энериума', 400, '199 ₽', true], ['Запас Энериума', 1600, '699 ₽', true], ['Ежедневная выдача', 30, '299 ₽ / 30 дней', false]].map(([n, q, p, x2]) => `<div class="rcard" data-r="${x2 ? 6 : 3}"><img src="${ART('enerium.png')}" alt="" style="width:48px;height:48px;object-fit:contain"><b>${n}</b><small class="muted num">${fmt(q)} Энериума${x2 ? ' · первая покупка ×2' : ' в день'}</small><button class="btn go sm" style="margin-top:auto" data-a="toast" data-v="${tmT('Покупка пока недоступна', 'Покупка в прототипе не выполняется')}">${p}</button></div>`).join('')}</div><p class="reason">За деньги — только больше возможностей отработать прогресс. Души, попытки и рейтинг не продаются.</p>`;
+  else if (t === 'pass') body = `<div class="pnl pad col" style="gap:8px"><div class="row"><h2 class="serif gold" style="font-size:22px">Осенний путь</h2><span class="chip">620 очков</span><span class="g-spacer"></span><button class="btn go sm" data-a="toast" data-v="${tmT('Платный ряд пока недоступен', 'Платный ряд: демо')}">Открыть платный ряд</button></div>
       <div class="ms">${[0, 100, 250, 500, 800, 1200].map((m, i) => `<div class="m ${620 >= m ? 'got' : ''}">${well({ n: 'Награда', img: i % 2 ? ART('spirit.png') : ART('gold.png'), r: i < 3 ? 2 : 4 }, { act: 'noop', size: 44 })}<small class="num">${m}</small></div>`).join('')}</div><div class="track" style="--v:62"><i></i></div>
       <p class="reason">Очки пропуска даёт только активность — купить прогресс нельзя.</p></div>`;
-  else body = `<div class="rcards grow" style="grid-template-columns:repeat(4,minmax(0,1fr))">${['Рамка «Пепел»', 'Портрет героя', 'Рамка «Карст»', 'Шрифт имени'].map((n, i) => `<div class="rcard" data-r="${i + 2}"><b>${n}</b><small class="faint">${i === 1 ? 'из полученных героев' : 'за достижения'}</small><button class="btn sm" style="margin-top:auto" data-a="toast" data-v="Облик: демо">${i === 1 ? 'Выбрать' : 'Условие'}</button></div>`).join('')}</div>`;
+  else body = `<div class="rcards grow" style="grid-template-columns:repeat(4,minmax(0,1fr))">${['Рамка «Пепел»', 'Портрет героя', 'Рамка «Карст»', 'Шрифт имени'].map((n, i) => `<div class="rcard" data-r="${i + 2}"><b>${n}</b><small class="faint">${i === 1 ? 'из полученных героев' : 'за достижения'}</small><button class="btn sm" style="margin-top:auto" data-a="toast" data-v="${tmT('Облик пока недоступен', 'Облик: демо')}">${i === 1 ? 'Выбрать' : 'Условие'}</button></div>`).join('')}</div>`;
   return { ...meta, html: `<section class="scr">${body}</section>` };
 }
 
@@ -3219,7 +3297,7 @@ const OV = {
       <div class="sq-slots">${s.m.map(id => id ? heroCard(H(id), { act: 'noop', note: busy.includes(id) ? busyNote(id) : '', dim: busy.includes(id) }) : `<div class="hc empty">${ic('plus')}</div>`).join('')}</div>
       <div class="row"><div class="stat"><b>${fmt(sqBM(s))}</b><small>боевая мощь</small></div><span class="g-spacer"></span><div class="col" style="gap:4px;align-items:flex-end"><span class="eyebrow">${echo ? 'Стихии отряда' : 'В зале чаще всего'}</span><span class="row" style="gap:4px">${echo ? els.map(e => el(e)).join('') : el('Земля') + el('Воздух')}</span></div></div>
       ${echo ? (ready < 5 ? `<p class="reason warn">Для Эхо нужны ровно пять свободных героев. Свободно: ${ready}.</p>` : '<p class="reason">Отряд сохранится для следующих целей и повторных атак.</p>')
-        : `<p class="reason">${busy.length ? `${busy.map(id => H(id).name).join(', ')} заняты — отряд пойдёт ${['', 'один', 'вдвоём', 'втроём', 'вчетвером'][ready] || 'без них'}.` : `Этажи — готовые колоды, сид — сам биом: тот же отряд с той же ротацией пройдёт их так же. Здоровье между этажами не восстанавливается.${S.lastRun.b1 ? ` Прошлый забег: ${S.lastRun.b1.wall ? 'стена на этаже ' + S.lastRun.b1.wall : S.lastRun.b1.kind === 'boss' ? 'босс повержен' : S.lastRun.b1.kind === 'siege' ? 'дошёл до босса' : 'прерван'}.` : ''}`}</p>`}`;
+        : `<p class="reason">${busy.length ? `${busy.map(id => H(id).name).join(', ')} заняты — отряд пойдёт ${['', 'один', 'вдвоём', 'втроём', 'вчетвером'][ready] || 'без них'}.` : `${PL('Тот же отряд пройдёт этажи так же.', 'Этажи — готовые колоды, сид — сам биом: тот же отряд с той же ротацией пройдёт их так же.')} Здоровье между этажами не восстанавливается.${S.lastRun.b1 ? ` Прошлый забег: ${S.lastRun.b1.wall ? 'стена на этаже ' + S.lastRun.b1.wall : S.lastRun.b1.kind === 'boss' ? 'босс повержен' : S.lastRun.b1.kind === 'siege' ? 'дошёл до босса' : 'прерван'}.` : ''}`}</p>`}`;
     const foot = `<button class="link" data-a="go" data-v="heroes" data-seg="heroes:squads">${ic('users')}Отряды</button>${echo ? `<button class="btn go" data-a="close">Сохранить</button>` : `<button class="btn go" data-a="start" ${ready ? '' : 'disabled'}>${ic('down')}Начать забег</button>`}`;
     return sheet(echo ? 'Отряд для Эхо' : 'Отряд для спуска', body, foot, true);
   },
@@ -3276,7 +3354,7 @@ const OV = {
     return sheet(p.n, `<div class="row" style="gap:16px"><div class="stat"><b>${fmt(p.rt)}</b><small>рейтинг</small></div><div class="stat"><b>${fmt(p.bm)}</b><small>боевая мощь</small></div></div>
       <span class="eyebrow">Состав виден полностью</span>
       <div class="col" style="gap:6px">${p.f.map(id => { const h = H(id); return `<div class="oprow" data-r="${h.r}"><img src="${h.img}" alt=""><span class="col" style="gap:2px"><b>${h.name}</b><small class="faint">${h.cls} · ур. ${h.lvl}</small></span>${el(h.el)}<span class="stars">${stars(h.valor, h.maxV)}</span></div>`; }).join('')}</div>
-      <p class="reason">Сид закреплён парой составов на сезон: исход решает только подбор отряда.</p>`, `<span class="faint" style="font-size:12.5px">атак: ${S.arena.att} / ${S.arena.max}</span><button class="btn go" data-a="arenago" data-v="${o.arg}">Атаковать</button>`);
+      <p class="reason">${PL('Исход решает только подбор отряда.', 'Сид закреплён парой составов на сезон: исход решает только подбор отряда.')}</p>`, `<span class="faint" style="font-size:12.5px">атак: ${S.arena.att} / ${S.arena.max}</span><button class="btn go" data-a="arenago" data-v="${o.arg}">Атаковать</button>`);
   },
   ritual(o) {
     const [tab, i] = String(o.arg).split(':'), R = S.rituals, x = (tab === 'hero' ? R.hero : R.work)[+i];
@@ -3295,7 +3373,7 @@ const OV = {
     const rp = [['РП1', 'Событие', 'ларцы рабочих'], ['РП2', 'Контракты', 'рунные ключи'], ['РП3', 'Арена и Лига', 'снаряжение'], ['РП4', 'Эхо', 'осколки героев недели'], ['РП5', 'Клановый босс', 'талисманы']];
     return sheet('Сила коллекции', `<p class="muted" style="font-size:14px">Рейтинговые пассивки считаются по всем героям коллекции — даже занятым и тем, кто вне отрядов.</p>
       <div class="col" style="gap:4px">${rp.map(([k, m, r], i) => `<div class="srow"><span class="n"><b style="color:var(--parch)">${k}</b> · ${m}</span><span class="v">+${i === 0 ? '0,05' : '0'}%</span><span></span></div>`).join('')}</div>
-      <p class="reason">Бонус = 0,05% × редкость × цикл × круг. Круги повторяются после доблести.</p>`);
+      <p class="reason">${PL('Бонус растёт с редкостью, циклом и кругом героя.', 'Бонус = 0,05% × редкость × цикл × круг.')} Круги повторяются после доблести.</p>`);
   },
   result(o) {
     const R = runById(o.arg) || focusRun(); if (!R) return '';
@@ -3309,28 +3387,29 @@ const OV = {
     else if (E.kind === 'guardLose') { title = 'Мастер не пропустил'; head = `${E.why === 'sand' ? `Время скоротечно… Раунды вышли, а страж ещё стоит: каждая его обычная атака отнимала раунд, из ${EB.RULES.rounds.rune} осталось ${E.rounds}` : 'Отряд пал'}. Рунный страж — ${guardCards()}, у Мастера иммунитет к контролю ${Math.round((EB.RULES.resist.rune || 0) / 100)} %.`; }
     else if (E.kind === 'wall') { title = `Стена — этаж ${E.floor}`; head = `${E.why === 'time' ? 'Время боя вышло' : E.why === 'sand' ? 'Время скоротечно… Десять раундов прошли, этаж не взят' : 'Отряд пал'} на этаже ${E.floor}. В колоде: ${E.foes.map(id => known(id) ? F(id).name : 'неизвестный').join(', ')}.`; }
     else { title = 'Забег прерван'; head = `Отряд поднялся с этажа ${R.floor}.`; }
-    if (R.demo) head = 'Демо-прыжок сразу к боссу с полным здоровьем: ' + (B.siege !== false ? 'осада биома и стена не меняются. ' : 'стена не меняется. ') + head;
+    if (R.demo) head = TM('Демо-прыжок сразу к боссу с полным здоровьем: ' + (B.siege !== false ? 'осада биома и стена не меняются. ' : 'стена не меняется. ')) + head;
     const body = `<p class="muted" style="font-size:15px">${head} Отряд поднялся порталом наверх, как ото сна.</p>
-      <div class="row" style="gap:18px;flex-wrap:wrap">${R.guard ? '' : `<div class="stat"><b>${passed}</b><small>этажей пройдено</small></div>`}<div class="stat"><b>${R.kills}</b><small>побед</small></div><div class="stat"><b>${clock(R.runMs / 1000)}</b><small>время забега</small></div>${R.mode === 'rounds' ? '<div class="stat"><b>10 раундов</b><small>модель боя</small></div>' : ''}${B.siege !== false && (E.kind === 'boss' || sg) ? `<div class="stat"><b>${E.kind === 'boss' ? 100 : sg}%</b><small>осада босса</small></div>` : ''}</div>
+      <div class="row" style="gap:18px;flex-wrap:wrap">${R.guard ? '' : `<div class="stat"><b>${passed}</b><small>этажей пройдено</small></div>`}<div class="stat"><b>${R.kills}</b><small>побед</small></div><div class="stat"><b>${clock(R.runMs / 1000)}</b><small>время забега</small></div>${R.mode === 'rounds' ? '<div class="stat team-only"><b>10 раундов</b><small>модель боя</small></div>' : ''}${B.siege !== false && (E.kind === 'boss' || sg) ? `<div class="stat"><b>${E.kind === 'boss' ? 100 : sg}%</b><small>осада босса</small></div>` : ''}</div>
       ${R.curve.length ? `<div class="col" style="gap:3px"><span class="eyebrow">Здоровье отряда после каждого этажа</span><div class="curve">${R.curve.map((v, i) => `<i class="${B.floors[R.startFloor + i - 1].g !== 'o' ? 'el' : ''}" style="--v:${Math.max(3, v)}" title="Этаж ${R.startFloor + i}: ${v}%"></i>`).join('')}</div><small class="faint">Золотые столбики — элиты и босс. Здоровье не восстанавливалось.</small></div>` : ''}
       <span class="eyebrow">Добыча · ресурсы — в запасах</span>
       <div class="row" style="gap:14px;flex-wrap:wrap">${money('gold', L.gold)}${money('spirit', L.spirit)}${money('souls', L.souls)}${lootHtml(L.items)}</div>
-      ${Object.keys(L.items || {}).length ? '' : `<p class="reason">Ресурсов не выпало: базовый — за взятый этаж с шансом ${pctBp(EB.RULES.drop.basePerFloorBp)}, ключ ремесла — с каждой элиты.</p>`}
+      ${Object.keys(L.items || {}).length ? '' : `<p class="reason">Ресурсов не выпало${TM(`: базовый — за взятый этаж с шансом ${pctBp(EB.RULES.drop.basePerFloorBp)}, ключ ремесла — с каждой элиты`)}.</p>`}
       ${nk.length ? `<div class="newfoe">${nk.map(f => `<img src="${FA(f)}" alt="" style="object-position:${FPOS(f)}">`).join('')}<div class="col" style="gap:3px"><span class="eyebrow" style="color:var(--spirit)">Новое в бестиарии</span><b class="serif" style="font-size:20px">${nk.map(f => f.name).join(', ')}</b><small class="faint">Запись открыта во всех режимах</small></div><button class="link" data-a="foe" data-v="${nk[0].id}" style="margin-left:auto">Прочитать ${ic('chev')}</button></div>` : ''}
-      ${E.kind === 'boss' ? '' : '<p class="reason">Сид — сам биом: тот же отряд с той же ротацией пройдёт его так же. Чтобы пройти дальше, поменяй состав, порядок способностей или стихии.</p>'}`;
+      ${E.kind === 'boss' ? '' : `<p class="reason">${PL('Тот же отряд пройдёт биом так же.', 'Сид — сам биом: тот же отряд с той же ротацией пройдёт его так же.')} Чтобы пройти дальше, поменяй состав, порядок способностей или стихии.</p>`}`;
     return dialog(title, body, `<button class="btn ghost" data-a="leave" data-v="${R.id}">В Убежище</button><button class="btn" data-a="resquad" data-v="${R.id}">${ic('users')}Сменить отряд</button><button class="btn go" data-a="again" data-v="${R.id}">${ic('down')}Ещё забег</button>`);
   },
   mem() {
     const M = S.mem, o = M.offer, p = o[M.pick];
     const body = `<p class="muted" style="font-size:14px">Вспоминается одно из трёх. Смотреть бесплатно — закрепить до полного сброса.</p>
       <div class="pick3">${o.map((x, i) => `<button class="pick" data-r="${x.r}" aria-pressed="${i === M.pick}" data-a="mpick" data-v="${i}"><span class="crys"></span>${rar(x.r)}<b>${x.n}</b><small class="faint">${x.cat}</small></button>`).join('')}</div>
-      <div class="pnl pad" style="background:#0e1114"><b class="serif" style="font-size:19px">${p.n}</b><p class="muted" style="font-size:14px;margin-top:2px">${p.d}</p><small class="faint">Эффект показан как заглушка: в расчётах прототипа не участвует.</small></div>`;
+      <div class="pnl pad" style="background:#0e1114"><b class="serif" style="font-size:19px">${p.n}</b><p class="muted" style="font-size:14px;margin-top:2px">${p.d}</p><small class="faint team-only">Эффект показан как заглушка: в расчётах прототипа не участвует.</small></div>`;
     return dialog('Место Памяти · цикл II', body, `<button class="btn" data-a="mreroll">${ic('swap')}Перебросить${M.free ? ' · бесплатно ' + M.free : costTag('enerium', 50)}</button><button class="btn go" data-a="mset">Вспомнить</button>`);
   },
   memreset() {
     return dialog('Полный сброс Памяти', `<p class="muted">Все закреплённые пассивки во всех открытых циклах пропадут. Выбор придётся пройти заново с места цикла II. Цикл, уровень и герои не меняются.</p><p class="reason warn">Сброс доступен один раз за неделю расы.</p>`, `<button class="btn ghost" data-a="close">Отмена</button><button class="btn warn" data-a="mreset">Сбросить${costTag('enerium', 100)}</button>`);
   },
-  confirm(o) { return dialog(o.title, `<p class="muted" style="font-size:15px">${o.text}</p>${o.warn ? `<p class="reason warn">${o.warn}</p>` : ''}`, `<button class="btn ghost" data-a="close">Отмена</button><button class="btn ${o.danger ? 'warn' : 'go'}" data-a="${o.act}" data-v="${o.v || ''}">${o.ok}${o.cost ? costTag(o.cost[0], o.cost[1]) : ''}</button>`); },
+  /* warnTeam — пометка прототипа под подтверждением: видна только в режиме «Команда» */
+  confirm(o) { return dialog(o.title, `<p class="muted" style="font-size:15px">${o.text}</p>${o.warn ? `<p class="reason warn">${o.warn}</p>` : ''}${o.warnTeam ? `<p class="reason warn team-only">${o.warnTeam}</p>` : ''}`, `<button class="btn ghost" data-a="close">Отмена</button><button class="btn ${o.danger ? 'warn' : 'go'}" data-a="${o.act}" data-v="${o.v || ''}">${o.ok}${o.cost ? costTag(o.cost[0], o.cost[1]) : ''}</button>`); },
   gift() {
     const d = S.gift;
     const cell = i => { const day = i + 1, got = day <= d.got, now = day === d.day && !got, big = day === 20; return `<div class="gday ${got ? 'got' : ''} ${now ? 'now' : ''} ${big ? 'big' : ''}"><small>${day}</small>${big ? `<img src="${CHEST}" alt="">` : `<img src="${[CUR.gold.img, CUR.spirit.img, CUR.souls.img, CUR.enerium.img, ART('rune-key.png')][i % 5]}" alt="">`}${got ? `<span class="ck">${ic('check')}</span>` : ''}</div>`; };
@@ -3343,7 +3422,7 @@ const OV = {
 function talkView(o) {
   const n = NPCS[o.arg], line = n.say[o.i || 0], more = (o.i || 0) < n.say.length - 1;
   return `<div class="talk" role="dialog" aria-modal="true" aria-label="Разговор: ${n.n}">
-    <div class="txt"><span class="eyebrow">${n.n} · ${n.role} <span class="chip" style="height:18px;margin-left:6px">демо-реплика</span></span>
+    <div class="txt"><span class="eyebrow">${n.n} · ${n.role} <span class="chip team-only" style="height:18px;margin-left:6px">демо-реплика</span></span>
       <p class="say">${line}</p>
       <div class="ans">
         ${more ? `<button data-a="talkmore"><span class="k">1</span>Расскажи больше</button>` : ''}
@@ -3389,14 +3468,16 @@ const ACT = {
   rsmine(v) { S.hview = 'mine'; S.selHero = v; S.seg.hero = 'power'; render(); },
   rsf(v, t) { S.rs.f[v] = t.value; render(); },
   rsval(v) { const [id, n] = v.split(':'); S.rs.val = { id, v: +n }; render(); },
-  rsteam() { KH.team = !KH.team; render(); khPaint(); rkPaint(); lbPaint(); },
+  rsteam() { setTeam(!KH.team); },   // глаз в карточке героя — тот же режим «Команда», что в панели прототипа
   rsgo(v) {
     const h = RSI[v]; if (!h) return;
-    const lift = h.src !== 'gold' && h.c > rsCyc();   // сет и осколки видны только открытым циклам — демо поднимает цикл
+    /* сет и осколки видны только открытым циклам: в режиме «Команда» демо поднимает цикл и ставит неделю героя Эхо,
+       игрок просто переходит к своему способу получить героя */
+    const lift = KH.team && h.src !== 'gold' && h.c > rsCyc();
     S.seg.heroes = 'hire';
     if (h.src === 'gold') { S.seg.hire = 'gold'; S.rs.gcyc = h.c; S.rs.gsel = v; }
     else if (h.src === 'donat') { S.seg.hire = 'donat'; S.rs.dcyc = h.c; S.rs.dsel = v; }
-    else { S.seg.hire = 'souls'; S.rs.ssel = v; if (h.week) rsSetWeek(h.week); }
+    else { S.seg.hire = 'souls'; S.rs.ssel = v; if (h.week && KH.team) rsSetWeek(h.week); }
     if (lift) S.rs.cyc = h.c;
     go('heroes');
     if (lift) toast(`Демо: текущий цикл — ${ROMAN[h.c]}`);
@@ -3419,7 +3500,7 @@ const ACT = {
   gbuydo(v) { const h = RSI[v]; if (!h || rsHas(h)) return close(); if (!spend('gold', rsGold(h.c, rsBought(h.c) + 1))) return close(); rsAdd(h, 'gold'); S.overlay = null; toast(`${h.n} в коллекции: 0 ур. · 0 РП · 0 Добл`); },
   dbuy(v) {
     const h = RSI[v]; if (!h || rsHas(h) || h.c > rsCyc()) return;
-    S.overlay = { t: 'confirm', title: 'Купить донатного героя', text: `${h.n} — ${h.place}-й из сета «${RSS[h.dset].name}». Придёт с 0 уровнем, 0 рунных пределов и 0 доблести; лица нет, себя он вспомнит на последней доблести.`, warn: 'Цена — заглушка прототипа: цен героев за Энериум в источниках нет.', ok: 'Купить', act: 'dbuydo', v, cost: ['enerium', rsDonatPrice(h)] };
+    S.overlay = { t: 'confirm', title: 'Купить донатного героя', text: `${h.n} — ${h.place}-й из сета «${RSS[h.dset].name}». Придёт с 0 уровнем, 0 рунных пределов и 0 доблести; лица нет, себя он вспомнит на последней доблести.`, warnTeam: 'Цена — заглушка прототипа: цен героев за Энериум в источниках нет.', ok: 'Купить', act: 'dbuydo', v, cost: ['enerium', rsDonatPrice(h)] };
     render(); focusOverlay();
   },
   dbuydo(v) { const h = RSI[v]; if (!h || rsHas(h)) return close(); if (!spend('enerium', rsDonatPrice(h))) return close(); rsAdd(h, 'donat'); S.overlay = null; toast(`${h.n} в коллекции: 0 ур. · 0 РП · 0 Добл`); },
@@ -3433,7 +3514,7 @@ const ACT = {
   dustbuy(v) { const h = RSI[v]; if (!h || rsHas(h) || h.c > rsCyc() || !spend('dust', rsShardPrice(h))) return; S.rs.shards[v] = (S.rs.shards[v] || 0) + 1; render(); },
   activate(v) {
     const h = RSI[v], need = RS.rules.stub.shards; if (!h || rsHas(h) || (S.rs.shards[v] || 0) < need) return;
-    S.overlay = { t: 'confirm', title: 'Пробудить героя', text: `${h.n} соберётся из ${need} осколков и придёт с 0 уровнем, 0 рунных пределов и 0 доблести. Лишние осколки уйдут в прах.`, warn: 'Число осколков и цена в душах — заглушки: таблица не утверждена (§15.1).', ok: 'Пробудить', act: 'activatedo', v, cost: ['souls', RS.rules.stub.activateSouls] };
+    S.overlay = { t: 'confirm', title: 'Пробудить героя', text: `${h.n} соберётся из ${need} осколков и придёт с 0 уровнем, 0 рунных пределов и 0 доблести. Лишние осколки уйдут в прах.`, warnTeam: 'Число осколков и цена в душах — заглушки: таблица не утверждена (§15.1).', ok: 'Пробудить', act: 'activatedo', v, cost: ['souls', RS.rules.stub.activateSouls] };
     render(); focusOverlay();
   },
   activatedo(v) {
@@ -3665,7 +3746,7 @@ function newFloor(R) {
   const g = B.floors[R.floor - 1].g, lead = R.b.u[1][0];
   R.enter = R.floor > R.startFloor;   // новая колода въезжает справа — камера пришла в следующую «комнату»
   R.banner = [`Этаж ${R.floor}`, g === 'o' ? 'рядовые' : g === 'e' ? 'элита · ' + uName(lead)
-    : R.demo ? 'босс биома · демо-прыжок' : G(R.biome).hp != null ? 'босс биома · осада, снято ' + siegeDone(R.biome) + ' %' : 'босс биома · ' + uName(lead)];
+    : R.demo ? 'босс биома' + TM(' · демо-прыжок') : G(R.biome).hp != null ? 'босс биома · осада, снято ' + siegeDone(R.biome) + ' %' : 'босс биома · ' + uName(lead)];
 }
 function ensureLoop() { if (!loop && S.runs.some(r => !r.over)) loop = setInterval(tickAll, TICK); }
 function tickAll() {
@@ -4222,13 +4303,37 @@ function renderMap() {
 }
 
 /* ================== UI-кит ================== */
+/* «Правила воздуха»: экран дышит — одно главное, подробности в листе, служебное только команде. Токены отступов — --sp-l, --sp-m, --sp-s */
+function kitAirHtml(h) {
+  const nums = `<span><b>${h.lvl}</b>уровень</span><span><b>${fmt(h.bm)}</b>боевая мощь</span>`;
+  return `<section class="k-box" style="grid-column:1/-1"><h3>Правила воздуха</h3>
+    <p class="k-note">Экран дышит: одно главное и одно действие, остальное — по нажатию. Проверить экран — режим «Игрок» в панели прототипа и <code>tools/content-gen/screens/check_player_view.js</code>.</p>
+    <div class="k-air-g">
+      <div class="k-air-r"><b>1 · Отступы 16 / 12 / 8</b>
+        <div class="k-air-sp"><span style="--w:var(--sp-l)"><i></i>16 — поля листа, диалога и раздела · <code>--sp-l</code></span><span style="--w:var(--sp-m)"><i></i>12 — внутри карточки и между карточками · <code>--sp-m</code></span><span style="--w:var(--sp-s)"><i></i>8 — между строками, числами и чипами · <code>--sp-s</code></span></div>
+        <small>Других шагов нет. Значение — токеном, не числом в стиле.</small></div>
+      <div class="k-air-r"><b>2 · Карточка</b>
+        <div class="k-air-card"><img src="${h.img}" alt=""><span class="nm">${h.name}</span><span class="nums">${nums}</span><div class="ft"><span class="chip">${h.cls}</span>${el(h.el)}<button class="btn sm go" type="button">Развитие</button></div></div>
+        <small>Картинка, имя, до двух чисел, до двух чипов, одно главное действие.</small></div>
+      <div class="k-air-r"><b>3 · Подробности — в листе</b>
+        <small>Всё, что уточняет карточку, — состав, шансы, история, правила — открывается по нажатию листом справа. Экран не теряет места и не копит текст.</small></div>
+      <div class="k-air-r"><b>4 · Две строки</b>
+        <details class="k-air-lore"><summary><span class="quote clamp">Самая первая попытка, брошенная на середине. Он очень давно ищет, чем себя закончить, и под конец опаснее всего: силы в начале не растрачивай.</span><span class="more">ещё</span></summary></details>
+        <small>Текста на экране — не больше двух строк. Лор свёрнут и раскрывается по «ещё».</small></div>
+      <div class="k-air-r"><b>5 · Одна рамка</b>
+        <div class="k-air-fr"><figure class="no"><div class="bx"><div class="bx"><div class="bx"></div></div></div><figcaption>✕ рамка в рамке в рамке</figcaption></figure><figure class="ok"><div class="bx"><i class="ln"></i><i class="ln"></i></div><figcaption>✓ одна рамка, внутри строки</figcaption></figure></div>
+        <small>Внутри панели — строки, отступы и разделители, а не новые панели.</small></div>
+      <div class="k-air-r"><b>6 · Служебное — команде</b>
+        <small>Формулы и таблицы расчётов, ссылки на ADR и §, «демо», «заглушка», «черновик», пояснения прототипа, демо-переключатели и поля «для команды» — класс <code>team-only</code>, видны только в режиме «Команда». Пометка, важная игроку, — коротко игроку и полностью команде: <code>PL(игроку, команде)</code>.</small></div>
+    </div></section>`;
+}
 function renderKit() {
   const k = document.getElementById('kitGrid'); if (!k) return;
   const sw = (c, n, s) => `<div><i style="background:${c}"></i><span><b>${n}</b>${s}</span></div>`;
   const carst = [['var(--air)', 'Воздух', 'Элазиум'], ['var(--earth)', 'Земля', 'Рубидиум'], ['var(--fire)', 'Огонь', 'Нитриум'], ['var(--water)', 'Вода', 'Паладиум'], ['var(--time)', 'Время', 'Энериум'], ['var(--light)', 'Свет', 'без покровителя'], ['var(--dark)', 'Тьма', 'без покровителя']];
   const h = S.heroes[1], f1 = F('o1'), f6 = F('o6');
   const kc = (id, img, name, el, x, foe, lead) => `<div class="bc ${foe ? 'foe' : ''} ${lead ? 'lead' : ''}" id="${id}" data-el="${el}" style="${foe ? 'right' : 'left'}:${x}%;top:${lead ? 44 : 56}px"><div class="face"><img src="${img}" alt=""></div><span class="nm">${name}</span>${bar(foe ? 72 : 86, 'hp')}<div class="chg"><i style="--v:40"></i></div></div>`;
-  k.innerHTML = `
+  k.innerHTML = `${kitAirHtml(h)}
   <section class="k-box" style="grid-column:1/-1"><h3>Карта бойца · прежняя модель темпа (ADR-0007)</h3>
     <div class="card-demo">${kitCards()}</div>
     <div class="bt-legend static">${legendHtml()}</div></section>
@@ -4242,7 +4347,8 @@ function renderKit() {
     <p class="k-note">Нажмите вид — он сыграет на сцене. Каждый вид — отдельная работа художника и в Unity: частицы, анимация, звук. Цвет заклинаний и урона со временем берётся из школы стихии, у каждой школы свой урон со временем.</p></section>
   <section class="k-box"><h3>Материал</h3><div class="k-sw">${sw('var(--ink)', 'Уголь', '#0a0c0e · фон')}${sw('var(--stone)', 'Камень', '#121518 · панель')}${sw('var(--iron-2)', 'Железо', '#394047 · рамка')}${sw('var(--parch)', 'Пергамент', '#ece4d3 · текст')}${sw('var(--gold)', 'Золото', '#ddbc7a · заголовки')}${sw('var(--spirit)', 'Свет духа', '#48e5d4 · выбор')}</div><p class="k-note">Бирюза — только у выбранного и у главного действия. Больше нигде.</p></section>
   <section class="k-box"><h3>Стихии = карсты</h3><div class="k-sw">${carst.map(([c, n, s]) => sw(c, n, s)).join('')}</div><div class="k-row">${carst.map(([, n]) => el(n)).join('')}</div><p class="k-note">Цвет берётся из лора, форма кристалла и подпись дублируют цвет.</p></section>
-  <section class="k-box"><h3>Семь редкостей</h3><div class="k-row">${[1, 2, 3, 4, 5, 6, 7].map(r => rar(r)).join('')}</div><div class="k-row">${[1, 2, 3, 4, 5, 6, 7].map(r => well({ n: RAR[r], img: [0, ART('item-cinder-heart.png'), ART('item-cinder-heart.png'), ART('item-stormglass.png'), ART('item-gravebloom.png'), ART('item-hollow-crown.png'), ART('item-ashen-seal.png'), ART('item-silent-bell.png')][r], r }, { act: 'noop', q: r * 3, size: 48 })).join('')}</div><p class="k-note">Редкость — нижняя кромка колодца и камень у названия.</p></section>
+  <section class="k-box"><h3>Семь редкостей</h3><div class="k-row">${[1, 2, 3, 4, 5, 6, 7].map(r => rar(r)).join('')}</div><div class="k-row">${[1, 2, 3, 4, 5, 6, 7].map(r => well({ n: RAR[r], img: [0, ART('item-cinder-heart.png'), ART('item-cinder-heart.png'), ART('item-stormglass.png'), ART('item-gravebloom.png'), ART('item-hollow-crown.png'), ART('item-ashen-seal.png'), ART('item-silent-bell.png')][r], r }, { act: 'noop', q: r * 3, size: 48 })).join('')}</div><div class="k-row">${well({ n: RAR[3], img: ART('item-stormglass.png'), r: 3 }, { act: 'noop', size: 48 })}<span class="k-note">уникальная</span>${well({ n: RAR[3], img: ART('item-stormglass.png'), r: 3 }, { act: 'noop', size: 48, sel: true })}<span class="k-note">она же выбрана</span></div>
+    <p class="k-note">Редкость — нижняя кромка колодца и камень у названия. Цвета — по ADR-0027: белая, жёлтая, бирюзовая, фиолетовая, красная, оранжевая, зелёная. Бирюза уникальной (<code>--r3</code>) взята темнее и синее света духа (<code>--spirit</code>): выбор — кольцо и свечение, редкость — кромка и камень.</p></section>
   <section class="k-box"><h3>Шрифты</h3><div class="k-type">
     <div><small>Заголовок</small><span style="font:600 30px/1.05 var(--f-d);color:var(--gold)">Мастерская форм</span></div>
     <div><small>Число</small><span style="font:600 30px/1 var(--f-d);color:var(--parch);font-variant-numeric:lining-nums tabular-nums">26 840</span></div>
@@ -4544,7 +4650,7 @@ function bindKitLoot() {
     else if (a === 'who') LB.who = t.value;
     else if (a === 'awake') LB.awake = t.checked;
     else if (a === 'seed') LB.seed = t.value.trim() || 'проба-1';
-    else if (a === 'team') { KH.team = t.checked; khPaint(); rkPaint(); render(); }   // флажок общий с разделами героев и прототипом
+    else if (a === 'team') { setTeam(t.checked); return; }   // флажок — режим «Команда» всего прототипа: общий с разделами героев и панелью прототипа
     else return;
     lbPaint();
   });
@@ -4584,7 +4690,7 @@ function kitCardsRounds() {
    Коллекция 110 героев с фильтрами, карточка с главами по доблести, ордены и братства.
    У братства состав виден в витрине; у ордена — «1 из 5» и мотив, остальных игрок вычисляет (дедукция).
    «Для команды» показывает заметки, скрытых участников и спойлеры. */
-const KH = { tab: 'heroes', cyc: '', set: '', cls: '', el: '', team: false, sel: 'h01_1', valor: null };
+const KH = { tab: 'heroes', cyc: '', set: '', cls: '', el: '', team: teamSaved(), sel: 'h01_1', valor: null };   // team — режим «Команда» всего прототипа (setTeam)
 const KH_CLS = { 'танк': 'Танк', 'лекарь': 'Хилер', 'дебаффер': 'Контроль', 'маг ДД': 'Маг. ДД', 'физ ДД ловкости': 'Физ. ДД', 'физ ДД силы': 'Физ. ДД' };
 const KH_CLASSES = ['танк', 'лекарь', 'дебаффер', 'маг ДД', 'физ ДД силы', 'физ ДД ловкости', 'фармящий'];
 const KH_ELS = ['Воздух', 'Земля', 'Огонь', 'Вода', 'Время', 'Свет', 'Тьма'];
@@ -4696,7 +4802,7 @@ function bindKitHeroes() {
   });
   root.addEventListener('change', e => {
     const t = e.target, a = t.dataset && t.dataset.kh; if (!a || !t.closest('#kitHeroes')) return;
-    if (a === 'team') { KH.team = t.checked; rkPaint(); lbPaint(); render(); }   // флажок общий: состав героев, лутбоксы и прототип тоже
+    if (a === 'team') { setTeam(t.checked); return; }   // флажок — режим «Команда» всего прототипа: состав героев, лутбоксы и панель прототипа тоже
     else if (['cyc', 'set', 'cls', 'el'].includes(a)) { KH[a] = t.value; if (a === 'cyc') KH.set = ''; }
     else return;
     khPaint();
@@ -4811,7 +4917,7 @@ function bindKitRoster() {
   });
   root.addEventListener('change', e => {
     const t = e.target, a = t.dataset && t.dataset.rk; if (!a || !t.closest('#kitRoster')) return;
-    if (a === 'team') { KH.team = t.checked; khPaint(); lbPaint(); render(); }
+    if (a === 'team') { setTeam(t.checked); return; }   // флажок — режим «Команда» всего прототипа
     else if (['cyc', 'src', 'cls', 'sch'].includes(a)) RK[a] = t.value;
     else return;
     rkPaint();
@@ -4977,6 +5083,8 @@ function boot() {
   document.body.insertAdjacentHTML('afterbegin', SPRITE);
   const g = $game();
   bindGame();
+  paintTeam();
+  document.getElementById('devMode').addEventListener('click', e => { const b = e.target.closest('[data-mode]'); if (b) setTeam(b.dataset.mode === 'team'); });
   render();
   renderMap(); renderKit(); rkPaint(); khPaint(); klPaint(); rzPaint(); lbPaint();
   const fl = document.getElementById('flows');

@@ -38,7 +38,7 @@ const ZP_GRP = [
   ['wallet', 'Кошелёк'], ['rune', 'Руны предела'], ['vshard', 'Осколки доблести'], ['valor', 'Руны доблести'],
   ['h.echo', 'Отряды Эхо'], ['h.roulette', 'Возрождение душ'],
   ['act', 'Активации крафтовых биомов'], ['call', 'Призывы'], ['echo', 'Добыча Эхо'],
-  ['chest', 'Закрытые сундуки'], ['extra', 'Из сундуков · свои экраны позже'],
+  ['chest', 'Закрытые сундуки'], ['extra', `Из сундуков${TM(' · свои экраны позже')}`],
 ];
 const ZP_GRP_I = Object.fromEntries(ZP_GRP.map(([k], i) => [k, i]));
 /* фильтры вкладки: цикл, ремесло, редкость, «не в найденных рецептах»; поиск — у всех */
@@ -53,15 +53,16 @@ const ZP_EMPTY = {
   chest: 'Сундуков нет: их приносят Дары путешествия, крафтовые боссы и первые победы.',
 };
 const ZP_EXTRA_IC = { tal: 'gem', wsh: 'gear', eq: 'shield' };
+/* пометки — [игроку, команде]: про экраны, которых в прототипе ещё нет, знает только команда (режим «Игрок / Команда») */
 const ZP_EXTRA_NOTE = {
-  tal: 'Духовный талисман. Своего экрана у талисманов пока нет — до него талисман лежит здесь.',
-  wsh: 'Шарды рабочего: из них собирают рабочего для ритуалов. Экран рабочих — позже, шарды ждут здесь.',
-  eq: 'Предмет снаряжения. Экран снаряжения появится позже — до него предмет лежит здесь.',
+  tal: ['Духовный талисман.', 'Духовный талисман. Своего экрана у талисманов пока нет — до него талисман лежит здесь.'],
+  wsh: ['Шарды рабочего: из них собирают рабочего для ритуалов.', 'Шарды рабочего: из них собирают рабочего для ритуалов. Экран рабочих — позже, шарды ждут здесь.'],
+  eq: ['Предмет снаряжения.', 'Предмет снаряжения. Экран снаряжения появится позже — до него предмет лежит здесь.'],
 };
 const DAR_TABS = [['me', 'Личный рейтинг'], ['clan', 'Клановые награды'], ['hist', 'История']];
 const DAR_NOTE = {
-  me: 'Планки платят за накопленное и подтверждаются сразу, места — после подсчёта недели. «Получить» переносит закрытые сундуки в запасы: открывают их только там.',
-  clan: 'Клановые сундуки выдаются на каждого участника в общий пул клана: половину делит сервер по вкладу, половину — глава, журнал раздачи виден всем. Открывают сундуки в запасах.',
+  me: ['«Получить» переносит сундуки в запасы — открывают их там.', 'Планки платят за накопленное и подтверждаются сразу, места — после подсчёта недели. «Получить» переносит закрытые сундуки в запасы: открывают их только там.'],
+  clan: ['Клановые сундуки делят по вкладу и по решению главы; журнал раздачи виден всем.', 'Клановые сундуки выдаются на каждого участника в общий пул клана: половину делит сервер по вкладу, половину — глава, журнал раздачи виден всем. Открывают сундуки в запасах.'],
 };
 
 /* ================== помощники ================== */
@@ -248,7 +249,7 @@ function zpCardItem(e) {
   const fn = act && typeof ACTIVATE[it.tier] === 'function';
   const acts = !act ? `<button class="btn" data-a="toCraft" data-v="${it.id}" title="Положить на стол мастерской">${ic('arrow')}На стол мастера</button>`
     : fn ? `<button class="btn go" data-a="zpact" data-v="${it.id}">Активировать</button>`
-      : `<span class="chip warn" title="Обработчик активации ещё не подключён">недоступно</span><button class="btn" disabled>Активировать</button>`;
+      : `<span class="chip warn" title="${tmT('Активация пока недоступна', 'Обработчик активации ещё не подключён')}">недоступно</span><button class="btn" disabled>Активировать</button>`;
   const usesHtml = uses.length ? `<div class="tr-use">${uses.map(r => `<span class="chip wr">${trEsc(r.n)}</span>`).join('')}</div>`
     : `<p class="faint zp-p">${act ? 'В рецепты не входит: предмет применяют из запасов.' : 'Ни в одном найденном рецепте — пока лежит без дела.'}</p>`;
   return `<div class="pnl icard fit zp-card">
@@ -290,7 +291,7 @@ function zpCardHero(e) {
 function zpCardExtra(e) {
   return `<div class="pnl icard fit zp-card">
     ${zpHead(`<span class="tr-big" data-r="${e.r}">${ic(ZP_EXTRA_IC[e.xk] || 'gem')}</span>`, 'Из сундуков', trEsc(e.name), rar(e.r) + zpNewChip(e), e.q, 'в запасах')}
-    <div class="col scroll grow zp-body"><p class="muted zp-p">${ZP_EXTRA_NOTE[e.xk] || ''}</p></div>
+    <div class="col scroll grow zp-body">${ZP_EXTRA_NOTE[e.xk] ? PL(...ZP_EXTRA_NOTE[e.xk], 'p', 'muted zp-p') : ''}</div>
   </div>`;
 }
 
@@ -317,7 +318,7 @@ function zpInfo(sp, def) {
   return `<span class="eyebrow">Гарантированно</span><div class="row zp-cur">${def.cur.map(([k, a]) => money(k, a)).join('') || '<span class="faint">—</span>'}</div>
     <span class="eyebrow">${def.n} ${plural(def.n, 'предмет', 'предмета', 'предметов')} · редкость каждого</span>${win}
     <span class="eyebrow">Возможное содержимое</span><table class="rk-tab lb-tab">${rows}</table>${heroes}
-    <p class="reason">Просмотр состава — не выдача.</p>`;
+    <p class="reason team-only">Просмотр состава — не выдача.</p>`;
 }
 /* итог открытия: что и куда легло */
 function zpResHtml(L) {
@@ -350,7 +351,7 @@ function zpCardChest(e) {
       ${Object.keys(src).length ? `<span class="eyebrow">Откуда</span><ul class="tr-src">${Object.entries(src).map(([s, k]) => `<li>${trEsc(s)}${k > 1 ? ` · ${k} шт.` : ''}</li>`).join('')}</ul>` : ''}
       ${zpInfo(sp, def)}
     </div>
-    <div class="zp-foot">${ctl}<p class="reason" title="Сид приходит вместе с сундуком; каждый сундук открывается один раз">В игре итог открытия решает сервер.</p></div>
+    <div class="zp-foot">${ctl}<p class="reason"${KH.team ? ' title="Сид приходит вместе с сундуком; каждый сундук открывается один раз"' : ''}>${PL('Каждый сундук открывается один раз.', 'В игре итог открытия решает сервер.')}</p></div>
   </div>`;
 }
 function zpCard(e, tab) {
@@ -502,12 +503,12 @@ OV.gifts = function (o = {}) {   // без аргумента — как зов�
   let body;
   if (tab === 'hist') {
     const h = rows.filter(p => p.st === 'got').sort((a, b) => G.got[b.key] - G.got[a.key]);
-    body = `<span class="eyebrow">Получено · ${h.length}</span>${h.map(darRow).join('') || '<p class="faint">Пока ничего не получено.</p>'}<p class="reason">Полученное не выдаётся второй раз ни здесь, ни на другом экране.</p>`;
+    body = `<span class="eyebrow">Получено · ${h.length}</span>${h.map(darRow).join('') || '<p class="faint">Пока ничего не получено.</p>'}<p class="reason team-only">Полученное не выдаётся второй раз ни здесь, ни на другом экране.</p>`;
   } else {
     const mine = rows.filter(p => p.cat === tab), okR = mine.filter(p => p.st === 'ok'), wait = mine.filter(p => p.st === 'wait');
     body = `<span class="eyebrow">Подтверждено · ${darChests(darCount(okR))}</span>${okR.map(darRow).join('') || '<p class="faint">Всё подтверждённое уже получено.</p>'}
       <span class="eyebrow">${tab === 'clan' ? 'Ждёт подсчёта и распределения' : 'Ждёт подсчёта недели'} · ${wait.length}</span>${wait.map(darRow).join('') || '<p class="faint">Ничего не ждёт.</p>'}
-      <p class="reason">${DAR_NOTE[tab]}</p>`;
+      ${PL(...DAR_NOTE[tab], 'p', 'reason')}`;
   }
   const foot = `<button class="link" data-a="zpto" data-v="chest">${ic('arrow')}Сундуки в запасах</button>${tab === 'hist' ? '' : `<button class="btn go" data-a="darall" data-v="${tab}" ${cnt[tab] ? '' : 'disabled'}>Получить всё${cnt[tab] ? ' · ' + fmt(cnt[tab]) : ''}</button>`}`;
   return sheet('Дары путешествия', `${top}${tabs}${body}`, foot, true);

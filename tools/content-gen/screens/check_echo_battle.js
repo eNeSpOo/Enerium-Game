@@ -585,7 +585,8 @@ function suite() {
   {
     S = initialState(); S.route = 'descent'; S.selBiome = 'b1'; S.overlay = null;
     let h = scan('Спуск', draw());
-    if (!/data-a="guard"[^>]*disabled/.test(h) || !h.includes('data-a="guard" data-v="demo"')) fail('Спуск: нет входа к стражу или он открыт до босса');
+    if (!/data-a="guard"[^>]*disabled/.test(h)) fail('Спуск: нет входа к стражу или он открыт до босса');
+    if (!/class="[^"]*\bteam-only\b[^"]*" data-a="guard" data-v="demo"/.test(h)) fail('Спуск: демо-вход к стражу — не только для команды (режим «Игрок / Команда»)');
     ACT.guard('');
     if (S.runs.length) fail('Спуск: страж впустил до победы над боссом');
     ACT.guard('demo');

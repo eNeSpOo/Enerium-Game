@@ -13,6 +13,7 @@
    Запуск: node tools/content-gen/screens/check_bag.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
+const { strip } = require('./check_player_view.js');   // вид игрока: без элементов team-only (режим «Игрок / Команда»)
 const UI = path.join(__dirname, '..', '..', '..', 'design', 'ui');
 const html = fs.readFileSync(path.join(UI, 'index.html'), 'utf8');
 const err = [];
@@ -98,7 +99,7 @@ for (const tab of ['res', 'rune', 'shard', 'act', 'chest', 'art']) {
     if (T.S.zp.sel[tab] !== e.key) say(`${tab} · ${e.key}: выбор не запомнен`);
     if (e.kind === 'item' && !g.includes('Найденные рецепты')) say(`${tab} · ${e.key}: в карточке нет найденных рецептов`);
     if (e.kind === 'item' && !e.it.team && e.it.lore && !g.includes('Загадка')) say(`${tab} · ${e.key}: в карточке нет загадки`);
-    if (e.kind === 'item' && /ADR-|\(§/.test(g.slice(g.indexOf('zp-card')))) say(`${tab} · ${e.key}: в карточке ссылка на ADR или §`);
+    if (e.kind === 'item' && /ADR-|\(§/.test(strip(g.slice(g.indexOf('zp-card'))))) say(`${tab} · ${e.key}: игроку видна ссылка на ADR или §`);
   }
   leak(game(`вкладка ${tab}`), `вкладка ${tab}`);
 }
@@ -228,7 +229,9 @@ function openGroup(key, n, where) {
   sumCheck(before, after, L.sum, where);
   const h = game(where + ' · итог');
   if (!h.includes('Итог · открыто')) say(`${where}: итог не в карточке`);
-  if (!h.includes('решает сервер')) say(`${where}: нет пометки «в игре итог решает сервер»`);
+  /* пометка прототипа «в игре итог решает сервер» — команде; игроку — «каждый сундук открывается один раз» */
+  if (!h.includes('решает сервер') || strip(h).includes('решает сервер')) say(`${where}: пометка «в игре итог решает сервер» — не только для команды`);
+  if (!strip(h).includes('открывается один раз')) say(`${where}: игроку не видно «каждый сундук открывается один раз»`);
   cnt.open += L.sum.n;
   return ids.slice(0, want);
 }

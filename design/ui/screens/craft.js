@@ -220,7 +220,7 @@ function wsAttempt(consent) {
   if (!cells.every(c => BAG.has(c.id, c.q))) { S.overlay = null; return toast('Не хватает в запасах — поправьте стол'); }
   if (!consent && cells.some(c => wsSpecial(c.id))) return toast(WS_REFUSE.consent);
   const v = WS_SRV.check(cells);
-  if (v.refuse) { S.overlay = null; return toast(`${v.hero.n} уже в коллекции. Что даёт повтор рецепта героя, не решено — заглушка прототипа`); }
+  if (v.refuse) { S.overlay = null; return toast(`${v.hero.n} уже в коллекции.${TM(' Что даёт повтор рецепта героя, не решено — заглушка прототипа')}`); }
   const isNew = !!v.made && !WS_SRV.isKnown(v.made);
   cells.forEach(c => BAG.take(c.id, c.q));   // со стола уходит всё: рецепт расходует своё, лишнее и неудача сгорают
   S.ws.last = cells; S.ws.cells = wsEmpty(); S.ws.sel = 0;
@@ -399,7 +399,7 @@ Object.assign(OV, {
       + p.stop.map(id => `<li class="unk">${ic('lock')}<b>${trEsc(wsName(id))}</b><span>рецепт не найден</span></li>`).join('')
       + wsStepHtml(r, n, true);
     const warn = [];
-    if (p.owned) warn.push(`<p class="reason warn">${trEsc(p.hero.n)} уже в коллекции. Что даёт повтор рецепта героя, не решено — заглушка прототипа.</p>`);
+    if (p.owned) warn.push(`<p class="reason warn">${trEsc(p.hero.n)} уже в коллекции.${TM(' Что даёт повтор рецепта героя, не решено — заглушка прототипа.')}</p>`);
     if (p.stop.length) warn.push(`<p class="reason warn">Этап не найден: ${p.stop.map(id => '«' + trEsc(wsName(id)) + '»').join(', ')}. Автодокрафт остановлен — рецепт этапа ищут на столе.</p>`);
     if (p.lack.length) warn.push(`<p class="reason warn">Не хватает: ${trEsc(wsNames(p.lack))}.</p>`);
     const extra = p.extra.length ? `<p class="reason">Останется в запасах: ${trEsc(wsNames(p.extra))}.</p>` : '';
