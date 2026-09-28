@@ -71,7 +71,7 @@ const CONTRACTS = {   // награды контрактов — заглушк�
    design/ui/lootboxes.js, сборщик tools/content-gen/lootboxes, правила — docs/content/лутбоксы.md. */
 const ECHO = {
   summonSouls: 1, oldAttackSouls: { ordinary: 1, elite: 2, boss: 4, uber: 25 }, pointsCycleMul: 3,
-  uber: { item: 'many', count: 1 },
+  uber: { item: 'many', count: 1 },   // добыча за Многоликого — пятнадцатую ступень (ADR-0025): 1 Многоликий, ресурс своей недели; имя поля прежнее — его читает экран Эхо
 };
 /* Крафтовый биом — экземпляр из предмета (§12.2): 10 этажей, ресурс биома за этаж с шансом, находка — одна гарантированно, вторая — 50 %.
    Активных — по одному за цикл (ADR-0023, п. 5): в цикле I — один, второй — с цикла II за артефакт; потолок — номер цикла.
@@ -83,6 +83,10 @@ const CRAFT = {
   biome: { floors: 10, resPerFloorBp: 6000, finds: 1, secondFindBp: 5000, spirit: 1500, souls: 2, heroShards: 10, eventPoints: 60, runeKeyBp: 1000 },
   activeCap: [1, 2, 3, 4, 5, 6],
   boss: { trophies: 1, specKeys: 2, spirit: 1000, enerium: 5, runeKeyBp: 2000, summonSouls: 1, immunityBp: 7500 },
+  /* Пробуждённый крафтовый босс (ADR-0025, «Многоликий и арт», п. 5): призыв — обычный призыв своей руины, Многоликий, вторая находка руины
+     и вещи из истории босса. Сильнее и босс — как крафтовый босс на powerCycleStep циклов выше, — и лут: трофеи и ключи ремесла,
+     сундук на chestStep ступеней выше, валюта × currencyMul. Призыв тот же: предмет и 1 душа (§17.1). */
+  awake: { item: 'many', callR: 5, trophies: 2, specKeys: 4, currencyMul: 2, runeKeyBp: 4000, chestStep: 1, powerCycleStep: 1 },
 };
 const MARKET = { basic: 5, key: 300, craftres: 150, unique: 25000, find: 2500, trophy: 50000, commissionPct: 10 };
 module.exports = { SPECS, SPEC_ORDER, TIERS, RARITY, ENEMY, DECKS, GUARD, RUNE_KEYS, RITUALS, CONTRACTS, ECHO, CRAFT, MARKET };

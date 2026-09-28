@@ -3,8 +3,9 @@
    Что собирается:
    - ресурсы добычи: общий пул из 36 базовых (ADR-0023, п. 1), шесть ключей на биом (п. 2), уникальные боссов;
      ресурсы, находки и трофеи крафтовых биомов и боссов (п. 4, 5);
-   - рецепты: заготовки и изделия (поля in и why у предмета), активации крафтовых биомов, призывы крафтовых боссов,
-     герои из скрытых рецептов (ADR-0019), награды мастерской, перековка рун предела и руна доблести.
+   - рецепты: заготовки и изделия (поля in и why у предмета), активации крафтовых биомов, призывы крафтовых боссов
+     и их пробуждённых версий за Многоликого (ADR-0025), герои из скрытых рецептов (ADR-0019), награды мастерской,
+     перековка рун предела и руна доблести.
    Героев берём из docs/content/герои/состав-героев.csv — только читаем. Id, ожидаемое имя и источник «крафт» сверяются;
    расхождение — предупреждение, а не ошибка: состав правят отдельно.
    Запуск: node build.js — проверки и вывод (emit.js). */
@@ -21,6 +22,10 @@ const addRecipe = r => { if (recipes.some(x => x.id === r.id)) throw new Error('
 const pct = bp => (bp % 100 ? (bp / 100).toFixed(2).replace('.', ',') : String(bp / 100)) + ' %';
 const lcFirst = s => s.charAt(0).toLowerCase() + s.slice(1);
 const raceLc = r => ['Забытые', 'Перворождённые'].includes(r) ? r : r.toLowerCase();   // имена народов финала и Эхо — с заглавной, как в своде
+/* Пробуждение крафтового босса требует Многоликого: рецепт пробуждения — не раньше цикла, где Многоликий появляется (Эхо). */
+const AW = C.CRAFT.awake;
+const MANY_CYC = (CYC.find(cy => (cy.echo || []).some(e => e.id === AW.item)) || { n: 0 }).n;
+if (!MANY_CYC) throw new Error('нет предмета пробуждения ' + AW.item + ' в данных циклов');
 
 /* CSV с кавычками: поля в "…", внутри кавычек запятые и переводы строк — часть поля. Лишние столбцы («также в сете» и новые) не мешают. */
 function readCsv(file) {
@@ -89,8 +94,18 @@ for (const cy of CYC) {
     addRecipe({ id: 'r_' + boss.call.id, cyc: c, n: boss.call.n, kind: 'call', out: [boss.call.id, 1], in: boss.call.in,
       why: `${boss.call.why} Босс встаёт в Эхо за предмет и 1 душу; раса — ${raceLc(boss.race)}, ремесло — ${lcFirst(C.SPECS[boss.spec].n)}.`, team });
     const [tid, tn, tlore] = boss.trophy;
+    const aw = boss.awake, alabel = aw ? `${label} · ${aw.adj}` : null;
     addItem({ id: tid, n: tn, cyc: c, b: cb.id, place: cb.n, tier: 'trophy', spec: boss.spec, r: 5, foe: label, lore: tlore, team,
-      src: [`Крафтовый босс «${label}» · Эхо · 1 за победу`] });
+      src: [`Крафтовый босс «${label}» · Эхо · 1 за победу`].concat(aw ? [`Пробуждённый — «${alabel}» · Эхо · ${AW.trophies} за победу`] : []) });
+    /* Пробуждённый босс (ADR-0025, «Многоликий и арт», п. 5): обычный призыв своей руины, Многоликий, вторая находка и вещи из истории босса. */
+    if (aw) {
+      const ac = Math.max(c, MANY_CYC), ateam = team || !!CYC[ac - 1].team, acall = boss.call.id + '_aw';
+      places[places.length - 1].boss.awake = { id: boss.id + '_aw', label: alabel, lore: aw.lore, call: acall, cyc: ac };
+      addItem({ id: acall, n: aw.call.n, cyc: ac, b: cb.id, place: cb.n, tier: 'call', spec: boss.spec, r: AW.callR, opens: alabel, opensLore: `${boss.lore} ${aw.lore}`,
+        race: boss.race, lore: aw.call.lore, team: ateam, src: ['Мастерская · рецепт'] });
+      addRecipe({ id: 'r_' + acall, cyc: ac, n: aw.call.n, kind: 'call', out: [acall, 1], in: aw.call.in, team: ateam,
+        why: `${aw.call.why} Пробуждённый босс встаёт в Эхо за предмет и 1 душу: сила — как у крафтового босса на ${AW.powerCycleStep} цикл выше, трофеев — ${AW.trophies}, сундук — на ${AW.chestStep} ступень выше.` });
+    }
   }
   /* Заготовки и изделия: рецепт — в самом предмете. */
   for (const it of cy.items) {

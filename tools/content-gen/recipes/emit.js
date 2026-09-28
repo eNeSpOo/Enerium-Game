@@ -6,6 +6,7 @@
    - достижимость (§12): предмет или падает, или создаётся рецептом, все входы которого достижимы, — считается до неподвижной точки;
    - всё, что падает, нужно хотя бы в одном рецепте; у заготовки и изделия есть выход дальше;
    - призыв крафтового босса несёт находку своей руины и уникальный ресурс босса биома (§12.3);
+   - у каждого крафтового босса есть пробуждённый: его призыв несёт обычный призыв той же руины, Многоликого и её находку (ADR-0025);
    - руины идут цепочкой: активация руины не требует добычи руины, которая открывается позже, — в цикле I их проходят по одной,
      в том же активном слоте, что и обычные забеги (ADR-0014, ADR-0023, п. 5);
    - герой с максимумом доблести 4–5 требует трофея, уникального ресурса или двух находок.
@@ -62,6 +63,9 @@ module.exports = function emit(D) {
     const r = (OUT[p.boss.call] || [])[0]; if (!r) { err.push(`${p.boss.call}: нет рецепта призыва`); continue; }
     if (!r.in.some(([id]) => byId[id] && byId[id].tier === 'unique')) err.push(`${r.id}: призыв без уникального ресурса босса биома (§12.3)`);
     if (!r.in.some(([id]) => id === p.find)) err.push(`${r.id}: призыв без находки своей руины «${p.n}»`);
+    const a = p.boss.awake, ra = a && (OUT[a.call] || [])[0];
+    if (!ra) { err.push(`${p.boss.id}: нет пробуждённого босса и рецепта его призыва (ADR-0025)`); continue; }
+    for (const need of [p.boss.call, C.CRAFT.awake.item, p.find]) if (!ra.in.some(([id]) => id === need)) err.push(`${ra.id}: пробуждение без «${byId[need] ? byId[need].n : need}»`);
   }
   if (err.length) return fail(err, warnings);
 
@@ -129,7 +133,7 @@ function buildStats(items, recipes, CYC, places, USE, byId, isDrop) {
   const total = { items: items.length, recipes: recipes.length, pool: items.filter(i => i.pool).length,
     resources: items.filter(i => RES.includes(i.tier)).length,
     tiers: Object.fromEntries(tiers.map(t => [t, items.filter(i => i.tier === t).length])),
-    craftBiomes: places.length, craftBosses: places.length + 1 };
+    craftBiomes: places.length, craftBosses: places.length + 1, awakened: places.filter(p => p.boss.awake).length };
   return { byCycle, total };
 }
 
@@ -168,6 +172,14 @@ function buildDrops(CYC, places, items, recipes, byId) {
     workerBoxRarity: Math.min(7, p.cyc + 1), summonSouls: CS.summonSouls, immunityBp: CS.immunityBp, team: p.team }))
     .concat([{ id: 'lik', name: 'Лик недели', cyc: 2, spec: null, race: 'раса недели', call: 'mask', trophy: null, trophies: 0, heroShardsWeek: 20, specKeys: 0, spirit: 0, gold: 0, enerium: 0,
       runeKeyBp: 0, runeKeys: 0, workerBoxRarity: 0, summonSouls: CS.summonSouls, immunityBp: CS.immunityBp, team: false }]);
+  /* пробуждённые (ADR-0025): тот же вид записи, что у крафтового босса; cyc — цикл, с которого есть рецепт пробуждения.
+     awake — id обычного босса; powerCycleStep — сила как у крафтового босса на столько циклов выше. */
+  const AW = C.CRAFT.awake;
+  for (const p of places.filter(x => x.boss.awake)) { const a = p.boss.awake, c = a.cyc, cur = CS.spirit * c * AW.currencyMul;
+    craftBosses.push({ id: a.id, name: a.label, cyc: c, spec: p.boss.spec, race: p.boss.race, call: a.call, trophy: p.boss.trophy,
+      trophies: AW.trophies, specKeys: AW.specKeys, spirit: cur, gold: cur / 2, enerium: CS.enerium * c * AW.currencyMul, runeKeyBp: AW.runeKeyBp, runeKeys: c,
+      workerBoxRarity: Math.min(7, c + 1 + AW.chestStep), summonSouls: CS.summonSouls, immunityBp: CS.immunityBp, team: p.team || !!CYC[c - 1].team,
+      awake: p.boss.id, powerCycleStep: AW.powerCycleStep }); }
   const M = C.MARKET;
   const market = { basic: cyc6.map(c => M.basic * c), key: cyc6.map(c => M.key * c), craftres: cyc6.map(c => M.craftres * c), unique: cyc6.map(c => M.unique * c),
     find: cyc6.map(c => M.find * c), trophy: cyc6.map(c => M.trophy * c), commissionPct: M.commissionPct, soulsTradable: false };
@@ -197,7 +209,7 @@ function writeJs({ items, recipes, drops, stats, CYC, ROMAN, places }) {
     craft: places.filter(p => p.cyc === cy.n).map(p => p.id),
     craftBiome: places.filter(p => p.cyc === cy.n).map(p => p.n).join(', '),
     craftBoss: places.filter(p => p.cyc === cy.n).map(p => p.boss.label).join(', ') }));
-  const keysOrder = ['id', 'n', 'cyc', 'b', 'pool', 'place', 'tier', 'spec', 'r', 'img', 'glyph', 'boss', 'foe', 'opens', 'opensLore', 'heroId', 'cls', 'race', 'school', 'maxV', 'team', 'lore', 'src'];
+  const keysOrder = ['id', 'n', 'cyc', 'b', 'pool', 'place', 'tier', 'spec', 'r', 'img', 'glyph', 'boss', 'foe', 'opens', 'opensLore', 'heroId', 'cls', 'race', 'school', 'maxV', 'week', 'team', 'lore', 'src'];
   const clean = it => { const o = {}; for (const k of keysOrder) if (it[k] !== undefined && it[k] !== null && !(['team', 'pool'].includes(k) && !it[k])) o[k] = it[k]; return o; };
   const rkeys = ['id', 'cyc', 'n', 'kind', 'out', 'in', 'known0', 'hidden', 'team', 'why', 'weight'];
   const rclean = r => { const o = {}; for (const k of rkeys) if (r[k] !== undefined && !(['team', 'known0', 'hidden'].includes(k) && !r[k])) o[k] = r[k]; return o; };

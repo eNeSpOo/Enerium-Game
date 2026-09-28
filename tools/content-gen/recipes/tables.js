@@ -36,7 +36,10 @@ module.exports = function tables({ items, recipes, byId, CYC, ROMAN, places, dro
     forksFirst: S[0].forks, forksLast: S[S.length - 1].forks, biomesByCycle: S.map(s => s.biomesInChains).join(' / '),
     heroes: heroRecs.length, heroesByCycle: S.map(s => s.kinds.hero).join(' / '), places: places.length, heroValor: valorCount,
     heaviest: `${heaviest.n} — вес ${heaviest.weight}`, heaviestHero: `${heaviestHero.n} — вес ${heaviestHero.weight}`,
-    bossRaces: Object.entries(byRace).map(([r, n]) => `${raceLc(r)} — ${n}`).join(', ') };
+    bossRaces: Object.entries(byRace).map(([r, n]) => `${raceLc(r)} — ${n}`).join(', '),
+    awakened: stats.total.awakened, awakeTrophies: C.CRAFT.awake.trophies, awakeKeys: C.CRAFT.awake.specKeys, awakeMul: C.CRAFT.awake.currencyMul,
+    awakeChestStep: C.CRAFT.awake.chestStep, awakePowerStep: C.CRAFT.awake.powerCycleStep, awakeRuneKey: pct(C.CRAFT.awake.runeKeyBp), bossRuneKey: pct(C.CRAFT.boss.runeKeyBp),
+    manyCycle: ROMAN[byId[C.CRAFT.awake.item].cyc] };
   block('inline');
   for (const [k, v] of Object.entries(inline)) L.push(`${k}: ${v}`);
 
@@ -76,6 +79,14 @@ module.exports = function tables({ items, recipes, byId, CYC, ROMAN, places, dro
   for (const p of places) { const act = OUT[p.act][0], call = OUT[p.boss.call][0];
     L.push(`| ${cyLabel(CYC[p.cyc - 1])} | ${p.n} | ${p.where} | ${nm(p.act)}: ${ing(act.in)} | ${p.needs.length ? p.needs.map(b => places.find(x => x.id === b).n).join(', ') : '—'} | ${p.res.map(nm).join(', ')} | ${nm(p.find)} | ${p.boss.label} · ${raceLc(p.boss.race)} · ${C.SPECS[p.boss.spec].n.toLowerCase()} | ${nm(p.boss.call)}: ${ing(call.in)} | ${nm(p.boss.trophy)} |`); }
 
+  /* ——— пробуждённые крафтовые боссы (ADR-0025): призыв, сила и лут против обычного ——— */
+  block('awakened');
+  const AW = C.CRAFT.awake, CB = drops.craftBosses, RN = Object.keys(C.RARITY);   // RARITY — имя → номер по порядку
+  L.push('| Цикл | Пробуждённый босс | Руина | Призыв — из чего | Сила | Трофей | Ключи ремесла | Дух / золото / Энериум — заглушка | Рунный ключ | Сундук крафтового босса, редкость |', '|---|---|---|---|---|---|---|---|---|---|');
+  for (const p of places) { const a = p.boss.awake, w = CB.find(b => b.id === a.id), o = CB.find(b => b.id === p.boss.id), r = OUT[a.call][0], up = a.cyc + AW.powerCycleStep;
+    const same = CB.find(b => !b.awake && b.trophy && b.cyc === a.cyc);   // обычный крафтовый босс того же цикла — для сравнения сундука
+    L.push(`| ${cyLabel(CYC[a.cyc - 1])} | ${a.label} | ${p.n} | ${nm(a.call)}: ${ing(r.in)} | как крафтовый босс ${up <= CYC.length ? 'цикла ' + ROMAN[up] : 'на ' + AW.powerCycleStep + ' цикл выше ' + ROMAN[a.cyc]} | ${nm(w.trophy)} ×${w.trophies} (обычный — ×${o.trophies}) | ${w.specKeys} (обычный — ${o.specKeys}) | ${fmt(w.spirit)} / ${fmt(w.gold)} / ${w.enerium} | ${pct(w.runeKeyBp)} × ${w.runeKeys} | ${RN[w.workerBoxRarity - 1]} (у обычного крафтового босса цикла ${ROMAN[a.cyc]} — ${RN[same.workerBoxRarity - 1]}) |`); }
+
   /* ——— каталог: общий пул ——— */
   block('pool catalog');
   L.push('| Ресурс | Ремесло | Идёт в | Строка для игрока |', '|---|---|---|---|');
@@ -96,9 +107,9 @@ module.exports = function tables({ items, recipes, byId, CYC, ROMAN, places, dro
     for (const p of places.filter(x => x.cyc === c)) {
       L.push(`\n**Крафтовый биом «${p.n}»** — ${p.where}. Кто там — предложение: ${p.foes}. Босс — ${p.boss.label}, ${raceLc(p.boss.race)}.${p.team ? ' **Для команды.**' : ''}\n`);
       L.push('| Предмет | Ярус | Ремесло | Откуда | Идёт в | Строка для игрока |', '|---|---|---|---|---|---|');
-      for (const id of [p.act, ...p.res, p.find, p.boss.call, p.boss.trophy]) { const it = byId[id];
-        const where = it.tier === 'act' || it.tier === 'call' ? 'мастерская, рецепт' : it.tier === 'craftres' ? `этаж, ${pct(C.CRAFT.biome.resPerFloorBp)}` : it.tier === 'find' ? `1 за закрытие + ${pct(C.CRAFT.biome.secondFindBp)}` : `«${p.boss.label}», 1 за победу`;
-        const goes = it.tier === 'act' ? `призывает «${p.n}» в «Биомах»` : it.tier === 'call' ? `призывает «${p.boss.label}» в Эхо` : usedIn(id, c);
+      for (const id of [p.act, ...p.res, p.find, p.boss.call, p.boss.awake.call, p.boss.trophy]) { const it = byId[id];
+        const where = it.tier === 'act' || it.tier === 'call' ? `мастерская, рецепт${it.cyc !== c ? ', с цикла ' + ROMAN[it.cyc] : ''}` : it.tier === 'craftres' ? `этаж, ${pct(C.CRAFT.biome.resPerFloorBp)}` : it.tier === 'find' ? `1 за закрытие + ${pct(C.CRAFT.biome.secondFindBp)}` : `«${p.boss.label}», 1 за победу; пробуждённый — ${C.CRAFT.awake.trophies}`;
+        const goes = it.tier === 'act' ? `призывает «${p.n}» в «Биомах»` : it.tier === 'call' ? `призывает «${it.opens}» в Эхо` : usedIn(id, c);
         L.push(`| ${it.n} | ${C.TIERS[it.tier].n.toLowerCase()} | ${it.spec ? C.SPECS[it.spec].n.toLowerCase() : '—'} | ${where} | ${goes} | ${it.lore} |`); }
     }
     block(`cycle ${c} recipes`);
