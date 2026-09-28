@@ -163,6 +163,7 @@
 node tools/content-gen/screens/check_craft.js
 node tools/content-gen/screens/check_bag.js
 node tools/content-gen/screens/check_echo.js
+node tools/content-gen/screens/check_echo_battle.js   # бой Эхо ядром: демо и данные, 14 примитивов, девять Уберов против отрядов недели, Многоликий, рунный страж со «Спуска»
 node tools/content-gen/screens/check_all.js
 node tools/content-gen/lootboxes/check_ui.js
 ```

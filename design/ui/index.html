@@ -1557,6 +1557,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <script src="roster.js"></script>
 <script src="lootboxes.js"></script>
 <script src="echo-foes.js"></script>
+<script src="echo-rules.js"></script>
 <script>
 'use strict';
 /* Все числа ниже — демонстрационные фикстуры: взяты из текущего UIKit
@@ -1564,7 +1565,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 const ASSET = window.EN_ASSET || '../enerium/assets/';
 const A = p => ASSET + p;
 const ART = n => A('art/' + n);
-const ART_V = '78d68b59';   // версия выгрузки арта — её ставит tools/art-gen/export_ui.py, чтобы браузер не брал старые картинки из кэша
+const ART_V = '9bd3f9f4';   // версия выгрузки арта — её ставит tools/art-gen/export_ui.py, чтобы браузер не брал старые картинки из кэша
 const AV = n => ART(n) + '?v=' + ART_V;
 const PATH = n => A('path-icons/path-' + String(n).padStart(2, '0') + '.jpg');
 /* Арт врагов — основа ADR-0013, арена — вторая раскладка; выгрузка tools/art-gen/export_ui.py */

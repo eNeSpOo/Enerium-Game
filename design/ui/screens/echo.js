@@ -383,27 +383,28 @@ function clsOf(f, d) {
 }
 /* карта ядра: f — враг экрана, k — место в колоде, 0 — главный враг. hp — { max, hp } главного врага цели Эхо: шкала здоровья Эхо;
    без неё главный враг полный — этаж биома Многоликого: здоровье по образцу × FT.biome.mainHpPct */
-function unitOf(f, k, lvl, hp) {
+function unitOf(f, k, lvl, hp, row) {
   const d = dataFoe(f) || {}, cls = clsOf(f, d), tp = tplOf(cls, f.g), rank = d.rank || coreRank(f.g), main = k === 0;
   const kit = d.kit ? { rank, actPct: d.actPct, ultPct: d.ultPct, kit: d.kit } : demoKit(cls, d.el || f.el, rank);
   const u = { key: `ech:${f.fid}#${k}`, id: 'ech:' + f.fid, name: f.n, cls, el: d.el || f.el, lvl, st: d.st || tp.st, race: f.race, rank, kit };
   if (d.basic) u.basic = d.basic; else if (main && f.g === 'u' && !d.kit) u.basicAll = FT.uberAll;   // Убер-босс демо: атака по всем
   if (main && hp) { u.maxHp = hp.max; u.hp = hp.hp; u.used = (hp.used || []).slice(); }   // «раз за жизнь» цели — между атаками, как здоровье
-  else u.hpPct = main ? Math.floor((d.hpPct || tp.hpPct) * FT.biome.mainHpPct / 100) : d.hpPct || tp.hpPct;
+  else if (main) u.hpPct = row && Number.isInteger(row.manyHpPct) ? row.manyHpPct : Math.floor((d.hpPct || tp.hpPct) * FT.biome.mainHpPct / 100);   // этаж биома Многоликого
+  else u.hpPct = row && Number.isInteger(row.foeHpPct) ? Math.floor((d.hpPct || tp.hpPct) * row.foeHpPct / 100) : d.hpPct || tp.hpPct;   // защитник: доля своего образца
   return u;
 }
 /* защитники: из echo-foes.js (def) или демо — ранги по типу главного врага, ступени — по кругу от его ступени, без повторов.
    Сколько — правило ядра по типу врага: у Многоликого их нет */
-function guardsOf(x, main, lvl) {
+function guardsOf(x, main, lvl, row) {
   const need = EB.RULES.echo.guards[x.g] || 0, race = ECH.civ[main.race] ? main.race : weekOf(S).race;
   if (!need) return [];
   const d = dataFoe(main);
-  if (d && Array.isArray(d.def) && d.def.length === need && d.def.every(fid => stepFoe(fid))) return d.def.map((fid, k) => unitOf(stepFoe(fid), k + 1, lvl));
+  if (d && Array.isArray(d.def) && d.def.length === need && d.def.every(fid => stepFoe(fid))) return d.def.map((fid, k) => unitOf(stepFoe(fid), k + 1, lvl, null, row));
   const used = new Set([x.step]), out = [];
   [...(FT.guards[x.g] || FT.guards.o)].slice(0, need).forEach((g, k) => {
     const all = STEPS.map((gg, j) => j + 1).filter(st => STEPS[st - 1] === g), free = all.filter(st => !used.has(st));
     const st = free.length ? free[((x.step || TOP) + k) % free.length] : all[k % all.length];
-    used.add(st); out.push(unitOf(stepFoe(fidOf(race, st)), k + 1, lvl));
+    used.add(st); out.push(unitOf(stepFoe(fidOf(race, st)), k + 1, lvl, null, row));
   });
   return out;
 }
@@ -430,9 +431,17 @@ const attackIds = x => S.ech.weekSquad && weekSquad(x.race) ? weekSquad(x.race) 
    Сила пробуждённого крафтового босса — как у крафтового босса на powerCycleStep циклов выше (recipes.js) */
 function fightOf(x, ids, no) {
   ensureLib();
-  const main = foe(x.fid, x), c = x.pcyc || x.cyc || S.acc.cycle, lvl = lvlOf(x.step || TOP, c);
-  const m = unitOf(main, 0, lvl, { max: x.max, hp: x.hp, used: x.used });
-  return { main, heroes: heroesOf(ids, lvl), o: { seed: EB.seedOf(`эхо|${x.race}|бой|${x.uid}|${no}`), g: x.g, maxRounds: roundsOf(x.g), main: m, guards: guardsOf(x, main, lvl) } };
+  const main = foe(x.fid, x), c = x.pcyc || x.cyc || S.acc.cycle, row = x.step ? ruleRow(x.step, c) : null, lvl = x.kind === 'craft' ? craftLvl(c) : lvlOf(x.step || TOP, c);
+  const m = unitOf(main, 0, lvl, { max: x.max, hp: x.hp, used: x.used }, row);
+  return { main, heroes: heroesOf(ids, lvl), o: { seed: EB.seedOf(`эхо|${x.race}|бой|${x.uid}|${no}`), g: x.g, maxRounds: roundsOf(x.g), main: m, guards: guardsOf(x, main, lvl, row) } };
+}
+/* уровень крафтового босса: как у Убер-босса его цикла силы по правилам (за циклом VI — шаг последнего цикла), иначе демо */
+function craftLvl(c) {
+  const R = XR(), cs = R && R.cycles ? Object.keys(R.cycles).map(Number).sort((a, b) => a - b) : [];
+  if (!cs.length) return lvlOf(TOP, c);
+  const lo = cs[0], hi = cs[cs.length - 1], at1 = k => ruleOf(TOP, 'foeLvl', k), k = Math.max(lo, Math.min(c, hi));
+  const v = at1(k); if (!v) return lvlOf(TOP, c);
+  return c > hi && cs.length > 1 ? v + (at1(hi) - at1(cs[cs.length - 2])) * (c - hi) : v;
 }
 /* облик врагов в бою: изученность — на момент боя, чтобы просмотр не выдал исход; портрет — арт недели или заглушка */
 function lookUp(o, main) {
@@ -446,12 +455,12 @@ function target(s, kind, x, o = {}) {
   if (kind === 'step' && x === MANY) kind = 'many';   // пятнадцатая ступень лестницы — Многоликий
   const W = weekOf(s), c = s.acc.cycle, base = { uid: 'ech' + (++s.ech.seq), kind, race: W.race, cyc: c, atk: 0 };
   if (kind === 'step') {
-    const f = stepFoe(fidOf(W.race, x)), max = hpOf(x, c);
-    return { ...base, fid: f.fid, step: x, g: f.g, el: f.el, bm: at(ECH.bm[x - 1], c), max, hp: o.hpBp ? Math.max(1, Math.floor(max * o.hpBp / BP)) : max, left: (o.leftH || ECH.lifeH[f.g]) * ECH.hour };
+    const f = stepFoe(fidOf(W.race, x)), max = hpOf(x, c, W.race);
+    return { ...base, fid: f.fid, step: x, g: f.g, el: f.el, bm: at(ECH.bm[x - 1], c), max, hp: o.hpBp ? Math.max(1, Math.floor(max * o.hpBp / BP)) : max, left: (o.leftH || lifeOf(f.g)) * ECH.hour };
   }
   if (kind === 'many') {
-    const u = manyFoe(W.race), max = hpOf(MANY, c);
-    return { ...base, fid: 'many', step: MANY, g: 'm', el: u.el, bm: at(ECH.many.bm, c), max, hp: max, left: ECH.lifeH.m * ECH.hour };
+    const u = manyFoe(W.race), max = hpOf(MANY, c, W.race);
+    return { ...base, fid: 'many', step: MANY, g: 'm', el: u.el, bm: at(ECH.many.bm, c), max, hp: max, left: lifeOf('m') * ECH.hour };
   }
   const fb = x, pc = fb.cyc + (fb.powerCycleStep || 0), face = fb.id === 'lik' ? likFace(s, W, base.uid) : '', max = at(ECH.craft.hp, pc);   // пробуждённый — сила цикла выше
   return { ...base, fid: fb.id, step: 0, g: 'craft', race: face ? W.race : fb.race, el: face ? stepFoe(face).el : '', face, cyc: fb.cyc, pcyc: pc, bm: at(ECH.craft.bm, pc), max, hp: max, left: ECH.lifeH.craft * ECH.hour };
@@ -489,8 +498,9 @@ function sync() {
 function draw(avail, n, key) {
   const roll = rng(key), pool = Array.from({ length: Math.min(avail, MANY) }, (_, j) => j + 1), out = [];
   while (out.length < n && pool.length) {
-    let r = roll(pool.reduce((a, st) => a + ECH.pickW[st - 1], 0)), k = 0;
-    while (r >= ECH.pickW[pool[k] - 1]) { r -= ECH.pickW[pool[k] - 1]; k++; }
+    const W = pickW();
+    let r = roll(pool.reduce((a, st) => a + W[st - 1], 0)), k = 0;
+    while (r >= W[pool[k] - 1]) { r -= W[pool[k] - 1]; k++; }
     out.push(pool.splice(k, 1)[0]);
   }
   return out.sort((a, b) => a - b);
@@ -551,7 +561,7 @@ function pickHtml(i, p, c) {
   const rows = p.offers.map(st => {
     const f = stepFoe(fidOf(S.ech.wk, st)), a = atkCost({ step: st, g: f.g, cyc: c });
     return `<div class="ech-offer">${ph(f, 'sm')}<span class="col" style="gap:3px;min-width:0"><b class="serif">${shortOf(f)}</b><span class="row" style="gap:4px"><span class="chip ${f.g === 'o' ? '' : 'gold'}">${rankIc(f.g)}${ECH.short[f.g]} · ${st}</span>${el(f.el)}</span></span>
-      <span class="ech-om"><small class="num">мощь ${fmt(bmOf(st, c))}</small><small class="num">здоровье ${fmt(hpOf(st, c))}</small><small class="ech-om3">${ECH.lifeH[f.g]} ч · атака ${a} ${souls(a)} · ${roundsOf(f.g)} ${plural(roundsOf(f.g), 'раунд', 'раунда', 'раундов')}</small></span>
+      <span class="ech-om"><small class="num">мощь ${fmt(bmOf(st, c))}</small><small class="num">здоровье ${fmt(hpOf(st, c, S.ech.wk))}</small><small class="ech-om3">${lifeOf(f.g)} ч · атака ${a} ${souls(a)} · ${roundsOf(f.g)} ${plural(roundsOf(f.g), 'раунд', 'раунда', 'раундов')}</small></span>
       <button class="btn sm go" data-a="echpick" data-v="${i}:${st}">Выбрать</button></div>`;
   }).join('');
   return `<div class="pnl etarget ech-pick">
@@ -626,8 +636,8 @@ function winApply(i, x, L) {
   S.echo.score += L.pts;
   if (x.kind === 'step' && x.race === S.ech.wk && x.step === S.ech.avail && S.ech.avail < MANY) L.opened = ++S.ech.avail;   // лестница растёт после сильнейшего доступного (§17.4); после Убер-босса — Многоликий
   if (x.g === 'm') {   // победа над Многоликим — ресурс «Многоликий», привязанный к своей неделе (ADR-0025)
-    BAG.add(XE.uber.item, XE.uber.count); S.ech.manyWk[x.race] = (S.ech.manyWk[x.race] || 0) + XE.uber.count;
-    L.loot.push({ k: 'item', id: XE.uber.item, n: XE.uber.count });
+    const md = manyDrop(); BAG.add(md.item, md.count); S.ech.manyWk[x.race] = (S.ech.manyWk[x.race] || 0) + md.count;
+    L.loot.push({ k: 'item', id: md.item, n: md.count });
   }
   if (x.kind === 'craft') craftLoot(x, f, L.loot);
   S.echo.slots[i] = null;
@@ -798,10 +808,10 @@ function manyMain(x) {
 function manyFloor(R) {
   ensureLib();
   const X = XF(), comp = X && X.manyBiome && X.manyBiome[R.week] ? X.manyBiome[R.week][R.floor - 1] : null;
-  const f = comp && stepFoe(comp.lead) || manyStepFoe(R.week, R.floor), step = f.step, lvl = lvlOf(step, R.cyc), x = { step, g: f.g, race: R.week, cyc: R.cyc };
+  const f = comp && stepFoe(comp.lead) || manyStepFoe(R.week, R.floor), step = f.step, row = ruleRow(step, R.cyc), lvl = lvlOf(step, R.cyc), x = { step, g: f.g, race: R.week, cyc: R.cyc };
   const guards = comp && comp.foes.length === 1 + EB.RULES.echo.guards[f.g] && comp.foes.slice(1).every(fid => stepFoe(fid))
-    ? comp.foes.slice(1).map((fid, k) => unitOf(stepFoe(fid), k + 1, lvl)) : guardsOf(x, f, lvl);
-  const o = { seed: EB.seedOf(`эхо|${R.week}|многоликий|${R.uid}|${R.floor}`), g: f.g, maxRounds: roundsOf(f.g), main: unitOf(f, 0, lvl, null), guards };
+    ? comp.foes.slice(1).map((fid, k) => unitOf(stepFoe(fid), k + 1, lvl, null, row)) : guardsOf(x, f, lvl, row);
+  const o = { seed: EB.seedOf(`эхо|${R.week}|многоликий|${R.uid}|${R.floor}`), g: f.g, maxRounds: roundsOf(f.g), main: unitOf(f, 0, lvl, null, row), guards };
   lookUp(o, f);
   R.b = EB.echoBattle(R.heroes, o); R.fl = f;   // отряд — со здоровьем и павшими прошлого этажа (carry)
   R.banner = [`Этаж ${step}`, `${ECH.rank[f.g]} · ${nameOf(f)} · ${o.maxRounds} ${plural(o.maxRounds, 'раунд', 'раунда', 'раундов')}`];
@@ -879,7 +889,7 @@ Object.assign(ACT, {
     sync(); const [a, b] = v.split(':'), i = +a, st = +b, p = S.ech.pending[i];
     if (!p || !p.offers.includes(st) || S.echo.slots[i]) return;
     const x = target(S, 'step', st); S.echo.slots[i] = x; delete S.ech.pending[i]; S.echo.sel = i;
-    toast(`Цель в слоте ${i + 1}: ${nameOf(foe(x.fid, x))} · ступень ${st} · ${ECH.lifeH[x.g]} ч`);
+    toast(`Цель в слоте ${i + 1}: ${nameOf(foe(x.fid, x))} · ступень ${st} · ${lifeOf(x.g)} ч`);
   },
   /* атака: цена в душах один раз, бой ядром, здоровье цели сохраняется (§17.3, ADR-0025). v — «uid:номер атаки»:
      повтор с тем же номером ничего не списывает и не начисляет; без v — следующая атака по выбранной цели */
@@ -1003,7 +1013,7 @@ Object.assign(OV, {
     sync();
     const sl = S.echo.slots.find(x => x && x.fid === o.arg) || null, f = foe(o.arg, sl); if (!f) return '';
     const c = S.acc.cycle, rec = kn(f.fid), W = RS.weeks.find(w => w.race === f.race);
-    const hp = sl ? sl.max : f.g === 'craft' ? at(ECH.craft.hp, f.cyc) : hpOf(f.step, c);
+    const hp = sl ? sl.max : f.g === 'craft' ? at(ECH.craft.hp, f.cyc + (f.fb && f.fb.powerCycleStep || 0)) : hpOf(f.step, c, f.race);
     const bm = sl ? sl.bm : f.g === 'craft' ? at(ECH.craft.bm, f.cyc) : f.g === 'm' ? at(ECH.many.bm, c) : at(ECH.bm[f.step - 1], c);
     const faces = f.g === 'm' ? STEPS.map((g, j) => stepFoe(fidOf(f.race, j + 1))).filter(x => kn(x.fid)).map(x => x.n) : [];
     const body = `<div class="ech-foehero">${ph(f, 'lg')}</div>
