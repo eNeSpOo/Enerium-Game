@@ -21,14 +21,14 @@
       "Шанс крита": "мишень со стрелой в центре",
       "Урон крита": "вспышка критического удара, неровные лучи"
     },
-    "Редкости, GDD §3.1; цвета — токены --r1…--r7 прототипа": {
-      "обычная": "#A4A8AD — тусклый треснувший камень, без света",
-      "редкая": "#66C275 — мутный, в трещинах, слабый свет",
-      "уникальная": "#5A94F7 — грани почти чистые, мягкий свет",
-      "эпическая": "#A986EE — чистые грани, ровный свет; перерисована в форме серии, проба заменена",
-      "древняя": "#EB9D40 — без трещин, сильный свет",
-      "первородная": "#E85A4E — безупречный, яркий свет",
-      "вневременная": "#F3E6B8 — чистый кристалл, полный света"
+    "Редкости — ADR-0027: цвета — схема автора; форма — огранённая капля по образцу автора, образец описан словами (ADR-0012)": {
+      "обычная": "белая — ячеистый кристалл, самый тусклый",
+      "редкая": "жёлтая — огранённый, искры в гранях",
+      "уникальная": "бирюзовая — трещины звездой от светящегося центра",
+      "эпическая": "фиолетовая — кристаллические ячейки внутри",
+      "древняя": "красная — вихрь пламени внутри",
+      "первородная": "оранжевая — огонь внутри и по краю",
+      "вневременная": "зелёная — самая яркая, свет изнутри"
     },
     "Классы — на плитке доблести; схема автора из style.md, «Метки карт»; классы — GDD §3.1, прототип": {
       "физ ДД силы": "боевой меч",
@@ -46,7 +46,9 @@
     "Звезда доблести дважды вышла розой ветров: четыре длинных луча и четыре коротких диагональных, хотя промт просил ровно четыре",
     "Фон: модель дважды заменила чёрный белым — доблесть v1 и шлем выносливости v1. После фразы «never white or grey» в рамке фон чёрный",
     "Том интеллекта: часть тёмной обложки ушла в прозрачность ключом black — просвет около 22×22 px из 1024, на тёмном интерфейсе не виден",
-    "Запись «древней» редкости в манифест упала: файл держал другой процесс (OSError 22). Запись восстановлена по файлам, цена — оценка по среднему партии"
+    "Запись «древней» редкости в манифест упала: файл держал другой процесс (OSError 22). Запись восстановлена по файлам, цена — оценка по среднему партии",
+    "Редкости перерисованы по ADR-0027 (28.09.2026): прежняя серия шла от старых токенов прототипа, в манифесте она «заменён»",
+    "Редкие цвета: жёлтый модель сперва дала бледно-бежевым — помогло «yellow through and through like citrine, never white or grey». Бирюзовой стиль добавил тёплый свет снизу и искры — помогло «no warm or orange tones, no embers»; вторая попытка вышла миндалём, а не каплей"
   ],
   "models": [
     "nb2"
@@ -67,7 +69,7 @@
       "size": "1K",
       "cutout": "black-glow",
       "refs": [],
-      "frame": "Format: game UI icon of a rarity, square, no border around the picture. One carst crystal — the magic crystal of this world — upright, centered, floating in the dark, about 80% of the canvas high. All seven rarity icons show the same crystal shape: a broad, stubby, double-pointed hexagonal crystal — a short thick body with a pointed top and a pointed bottom, as wide as two thirds of its height — so that even at 24 px it reads as a solid spot of color, not a thin sliver. A bare crystal: no setting, no metal caps or bands, no stand, no base, no floating shards. The seven rarities form a ladder from a dull cracked stone to a flawless crystal full of light: the higher the rarity, the cleaner the facets and the brighter the light inside. All the detail lives inside the silhouette — facets, cracks, light. A crisp rim light runs along the whole outline and cleanly separates the crystal from the black. No runes, glyphs or symbols."
+      "frame": "Format: game UI icon of a rarity, square, no border around the picture. One carst crystal — the magic crystal of this world — upright, centered, floating in the dark, about 80% of the canvas high. The crystal floats on pitch black: everything around it is solid pure black to the very edges of the canvas, never white or grey. All seven rarity icons are one series with one crystal shape: a faceted crystal drop, almond-like — full and rounded in its lower part, tapering to a point at the top, about two thirds as wide as it is tall — so that even at 24 px it reads as a solid spot of color. Its surface is cut into facets that lie like cells, with soft painterly edges; fine cracks run along the facets; a bright light rim runs along the whole contour. Energy of its own lives inside the crystal. The seven rarities form a ladder of inner light: the higher the rarity, the more light pours from inside. A bare crystal: no setting, no metal caps or bands, no stand, no base, no shards or sparks floating outside it. All the detail lives inside the silhouette. No runes, glyphs or symbols."
     },
     "attr-tiles": {
       "aspect": "1:1",
@@ -163,52 +165,52 @@
       "id": "attr-rar-common",
       "category": "attr-rarity",
       "title": "Редкость: обычная (1 из 7)",
-      "source": "GDD §3.1 — семь редкостей; цвет — токен --r1; схема автора: от тусклого треснувшего камня до чистого кристалла, полного света",
+      "source": "ADR-0027 — цвет: белая; форма — огранённая капля по образцу автора, описан словами (ADR-0012); GDD §3.1 — семь редкостей",
       "cutout": "black",
-      "subject": "Rarity: Common, the first of seven — the lowest step. The crystal is dull grey (#A4A8AD), almost a stone: rough matte facets, chipped edges and deep cracks, no light inside — only a cold glint along its edges."
+      "subject": "Rarity: Common, the first of seven — the dullest step. A white crystal cut into stone-like cells: matte pale cells like weathered stone, with cracks between them; hardly any light inside, only the cold pale glow of its rim."
     },
     {
       "id": "attr-rar-rare",
       "category": "attr-rarity",
       "title": "Редкость: редкая (2 из 7)",
-      "source": "GDD §3.1 — семь редкостей; цвет — токен --r2; схема автора: от тусклого треснувшего камня до чистого кристалла, полного света",
+      "source": "ADR-0027 — цвет: жёлтая; форма — огранённая капля по образцу автора, описан словами (ADR-0012); GDD §3.1 — семь редкостей",
       "cutout": "black",
-      "subject": "Rarity: Rare, the second of seven. The crystal is green (#66C275) and still rough: cloudy facets and a few cracks; a faint green light glimmers deep inside."
+      "subject": "Rarity: Rare, the second of seven. A saturated golden-yellow crystal, yellow through and through like citrine — clearly yellow, never white or grey: clean cut facets; bright sparks glint inside the facets, and a warm yellow light glows within."
     },
     {
       "id": "attr-rar-unique",
       "category": "attr-rarity",
       "title": "Редкость: уникальная (3 из 7)",
-      "source": "GDD §3.1 — семь редкостей; цвет — токен --r3; схема автора: от тусклого треснувшего камня до чистого кристалла, полного света",
-      "subject": "Rarity: Unique, the third of seven. The crystal is blue (#5A94F7): its facets mostly clean, with a couple of fine cracks; a soft blue light glows inside, and a faint blue aura hugs it."
+      "source": "ADR-0027 — цвет: бирюзовая; форма — огранённая капля по образцу автора, описан словами (ADR-0012); GDD §3.1 — семь редкостей",
+      "subject": "Rarity: Unique, the third of seven. A turquoise crystal, turquoise through and through from its tip to its base, with no warm or orange tones anywhere: cracks radiate like a star from its glowing center, and cold light shines out from the center through them. No embers."
     },
     {
       "id": "attr-rar-epic",
       "category": "attr-rarity",
       "title": "Редкость: эпическая (4 из 7)",
-      "source": "GDD §3.1 — семь редкостей; цвет — токен --r4; схема автора: от тусклого треснувшего камня до чистого кристалла, полного света; форма серии вместо узкого кристалла пробы",
-      "subject": "Rarity: Epic, the fourth of seven — the middle step. The crystal is violet (#A986EE): clean facets with one faint healed crack; a steady violet light glows inside — bright, but not yet blazing; a soft violet aura hugs it."
+      "source": "ADR-0027 — цвет: фиолетовая; форма — огранённая капля по образцу автора, описан словами (ADR-0012); GDD §3.1 — семь редкостей",
+      "subject": "Rarity: Epic, the fourth of seven. A violet crystal: inside it, crystalline cells — a honeycomb of inner facets — catch a steady violet light."
     },
     {
       "id": "attr-rar-ancient",
       "category": "attr-rarity",
       "title": "Редкость: древняя (5 из 7)",
-      "source": "GDD §3.1 — семь редкостей; цвет — токен --r5; схема автора: от тусклого треснувшего камня до чистого кристалла, полного света",
-      "subject": "Rarity: Ancient, the fifth of seven. The crystal is amber-orange (#EB9D40): flawless clean facets, no cracks; a strong warm light fills it, and a soft amber aura hugs it."
+      "source": "ADR-0027 — цвет: красная; форма — огранённая капля по образцу автора, описан словами (ADR-0012); GDD §3.1 — семь редкостей",
+      "subject": "Rarity: Ancient, the fifth of seven. A deep red crystal: inside it a whirl of flame swirls around the center and lights it from within."
     },
     {
       "id": "attr-rar-primordial",
       "category": "attr-rarity",
       "title": "Редкость: первородная (6 из 7)",
-      "source": "GDD §3.1 — семь редкостей; цвет — токен --r6; схема автора: от тусклого треснувшего камня до чистого кристалла, полного света",
-      "subject": "Rarity: Primordial, the sixth of seven. The crystal is deep red (#E85A4E): flawless, its facets sharp and clear; an intense red light burns inside, and a bright red aura hugs it."
+      "source": "ADR-0027 — цвет: оранжевая; форма — огранённая капля по образцу автора, описан словами (ADR-0012); GDD §3.1 — семь редкостей",
+      "subject": "Rarity: Primordial, the sixth of seven. An orange crystal: fire burns inside it and flickers along its edges; strong warm light fills it."
     },
     {
       "id": "attr-rar-timeless",
       "category": "attr-rarity",
       "title": "Редкость: вневременная (7 из 7)",
-      "source": "GDD §3.1 — семь редкостей; цвет — токен --r7; схема автора: от тусклого треснувшего камня до чистого кристалла, полного света",
-      "subject": "Rarity: Timeless, the seventh of seven — the highest step. The crystal is pale gold-white (#F3E6B8): flawless and full of light, blazing from within — the brightest of all; a radiant pale-gold aura hugs it."
+      "source": "ADR-0027 — цвет: зелёная; форма — огранённая капля по образцу автора, описан словами (ADR-0012); GDD §3.1 — семь редкостей",
+      "subject": "Rarity: Timeless, the seventh of seven — the highest step. A vivid green crystal, the brightest of all: pure light pours from deep inside and fills it completely; a soft green aura hugs it."
     },
     {
       "id": "attr-cls-str",

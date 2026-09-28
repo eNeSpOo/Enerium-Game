@@ -7978,7 +7978,7 @@
       },
       "cost_usd": 0.0686,
       "seconds": 9.1,
-      "status": "значки атрибутов — ждёт автора: эпическая (4 из 7)",
+      "status": "заменён: ADR-0027 — автор сменил цвета редкостей и форму кристалла",
       "raw": "art/generated/attr-rarity/attr-rar-epic__nb2.raw.jpg",
       "cutout": {
         "key": "black-glow",
@@ -8966,7 +8966,7 @@
       },
       "cost_usd": 0.0684,
       "seconds": 10.9,
-      "status": "значки атрибутов — ждёт автора: обычная (1 из 7)",
+      "status": "заменён: ADR-0027 — автор сменил цвета редкостей и форму кристалла",
       "raw": "art/generated/attr-rarity/attr-rar-common__nb2.raw.jpg",
       "cutout": {
         "key": "black",
@@ -9024,7 +9024,7 @@
       },
       "cost_usd": 0.0688,
       "seconds": 9.9,
-      "status": "значки атрибутов — ждёт автора: редкая (2 из 7)",
+      "status": "заменён: ADR-0027 — автор сменил цвета редкостей и форму кристалла",
       "raw": "art/generated/attr-rarity/attr-rar-rare__nb2.raw.jpg",
       "cutout": {
         "key": "black",
@@ -9082,7 +9082,7 @@
       },
       "cost_usd": 0.0685,
       "seconds": 10.2,
-      "status": "значки атрибутов — ждёт автора: уникальная (3 из 7)",
+      "status": "заменён: ADR-0027 — автор сменил цвета редкостей и форму кристалла",
       "raw": "art/generated/attr-rarity/attr-rar-unique__nb2.raw.jpg",
       "cutout": {
         "key": "black-glow",
@@ -9124,7 +9124,7 @@
       "cost_usd": 0.0686,
       "cost_note": "оценка по среднему партии (21 картинок): ответ API с токенами потерян — запись в манифест упала, файл был занят другим процессом (OSError 22); запись восстановлена по файлам",
       "seconds": null,
-      "status": "значки атрибутов — ждёт автора: древняя (5 из 7)",
+      "status": "заменён: ADR-0027 — автор сменил цвета редкостей и форму кристалла",
       "raw": "art/generated/attr-rarity/attr-rar-ancient__nb2.raw.jpg",
       "cutout": {
         "key": "black-glow",
@@ -9182,7 +9182,7 @@
       },
       "cost_usd": 0.0686,
       "seconds": 10.5,
-      "status": "значки атрибутов — ждёт автора: первородная (6 из 7)",
+      "status": "заменён: ADR-0027 — автор сменил цвета редкостей и форму кристалла",
       "raw": "art/generated/attr-rarity/attr-rar-primordial__nb2.raw.jpg",
       "cutout": {
         "key": "black-glow",
@@ -9240,7 +9240,7 @@
       },
       "cost_usd": 0.0683,
       "seconds": 9.1,
-      "status": "значки атрибутов — ждёт автора: вневременная (7 из 7)",
+      "status": "заменён: ADR-0027 — автор сменил цвета редкостей и форму кристалла",
       "raw": "art/generated/attr-rarity/attr-rar-timeless__nb2.raw.jpg",
       "cutout": {
         "key": "black-glow",
@@ -9605,6 +9605,528 @@
         1024
       ],
       "sha256": "c841be484f69f3ee6654677838e9f0e28271f896292e46270a8cf70b8ac72be4"
+    },
+    {
+      "file": "art/generated/attr-rarity/attr-rar-common__nb2-v2.png",
+      "category": "attr-rarity",
+      "job": "attr-rar-common",
+      "title": "Редкость: обычная (1 из 7)",
+      "source": "ADR-0027 — цвет: белая; форма — огранённая капля по образцу автора, описан словами (ADR-0012); GDD §3.1 — семь редкостей",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T13:40:49+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.\n\nFormat: game UI icon of a rarity, square, no border around the picture. One carst crystal — the magic crystal of this world — upright, centered, floating in the dark, about 80% of the canvas high. The crystal floats on pitch black: everything around it is solid pure black to the very edges of the canvas, never white or grey. All seven rarity icons are one series with one crystal shape: a faceted crystal drop, almond-like — full and rounded in its lower part, tapering to a point at the top, about two thirds as wide as it is tall — so that even at 24 px it reads as a solid spot of color. Its surface is cut into facets that lie like cells, with soft painterly edges; fine cracks run along the facets; a bright light rim runs along the whole contour. Energy of its own lives inside the crystal. The seven rarities form a ladder of inner light: the higher the rarity, the more light pours from inside. A bare crystal: no setting, no metal caps or bands, no stand, no base, no shards or sparks floating outside it. All the detail lives inside the silhouette. No runes, glyphs or symbols.\n\nRarity: Common, the first of seven — the dullest step. A white crystal cut into stone-like cells: matte pale cells like weathered stone, with cracks between them; hardly any light inside, only the cold pale glow of its rim.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance. The whole icon with its glow fits inside the central 80% of the canvas in both width and height: an empty black margin of at least a tenth of the canvas stays on every side — top, bottom, left and right.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 519,
+        "candidatesTokenCount": 1532,
+        "totalTokenCount": 2051,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 519
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0687,
+      "seconds": 9.6,
+      "status": "кристаллы редкости по ADR-0027 — ждёт автора: обычная (1 из 7)",
+      "raw": "art/generated/attr-rarity/attr-rar-common__nb2-v2.raw.jpg",
+      "cutout": {
+        "key": "black",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.659,
+        "opaque_share": 0.318,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "9eeaa9682dde413dea937973b6e06126ab451ea0183a0f2ef225d73fd859fb56"
+    },
+    {
+      "file": "art/generated/attr-rarity/attr-rar-ancient__nb2-v2.png",
+      "category": "attr-rarity",
+      "job": "attr-rar-ancient",
+      "title": "Редкость: древняя (5 из 7)",
+      "source": "ADR-0027 — цвет: красная; форма — огранённая капля по образцу автора, описан словами (ADR-0012); GDD §3.1 — семь редкостей",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T13:40:59+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.\n\nFormat: game UI icon of a rarity, square, no border around the picture. One carst crystal — the magic crystal of this world — upright, centered, floating in the dark, about 80% of the canvas high. The crystal floats on pitch black: everything around it is solid pure black to the very edges of the canvas, never white or grey. All seven rarity icons are one series with one crystal shape: a faceted crystal drop, almond-like — full and rounded in its lower part, tapering to a point at the top, about two thirds as wide as it is tall — so that even at 24 px it reads as a solid spot of color. Its surface is cut into facets that lie like cells, with soft painterly edges; fine cracks run along the facets; a bright light rim runs along the whole contour. Energy of its own lives inside the crystal. The seven rarities form a ladder of inner light: the higher the rarity, the more light pours from inside. A bare crystal: no setting, no metal caps or bands, no stand, no base, no shards or sparks floating outside it. All the detail lives inside the silhouette. No runes, glyphs or symbols.\n\nRarity: Ancient, the fifth of seven. A deep red crystal: inside it a whirl of flame swirls around the center and lights it from within.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance. The whole icon with its glow fits inside the central 80% of the canvas in both width and height: an empty black margin of at least a tenth of the canvas stays on every side — top, bottom, left and right.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 499,
+        "candidatesTokenCount": 1602,
+        "totalTokenCount": 2101,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 499
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0689,
+      "seconds": 10.0,
+      "status": "кристаллы редкости по ADR-0027 — ждёт автора: древняя (5 из 7)",
+      "raw": "art/generated/attr-rarity/attr-rar-ancient__nb2-v2.raw.jpg",
+      "cutout": {
+        "key": "black-glow",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.728,
+        "opaque_share": 0.227,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "c2fad9642445e46f4ecbbec7a2b23fb084eedddcc7cf5da237cc28beb62c94e3"
+    },
+    {
+      "file": "art/generated/attr-rarity/attr-rar-rare__nb2-v2.png",
+      "category": "attr-rarity",
+      "job": "attr-rar-rare",
+      "title": "Редкость: редкая (2 из 7)",
+      "source": "ADR-0027 — цвет: жёлтая; форма — огранённая капля по образцу автора, описан словами (ADR-0012); GDD §3.1 — семь редкостей",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T13:41:32+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.\n\nFormat: game UI icon of a rarity, square, no border around the picture. One carst crystal — the magic crystal of this world — upright, centered, floating in the dark, about 80% of the canvas high. The crystal floats on pitch black: everything around it is solid pure black to the very edges of the canvas, never white or grey. All seven rarity icons are one series with one crystal shape: a faceted crystal drop, almond-like — full and rounded in its lower part, tapering to a point at the top, about two thirds as wide as it is tall — so that even at 24 px it reads as a solid spot of color. Its surface is cut into facets that lie like cells, with soft painterly edges; fine cracks run along the facets; a bright light rim runs along the whole contour. Energy of its own lives inside the crystal. The seven rarities form a ladder of inner light: the higher the rarity, the more light pours from inside. A bare crystal: no setting, no metal caps or bands, no stand, no base, no shards or sparks floating outside it. All the detail lives inside the silhouette. No runes, glyphs or symbols.\n\nRarity: Rare, the second of seven. A yellow crystal with clean cut facets; bright sparks glint inside the facets, and a faint warm yellow light glows within.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance. The whole icon with its glow fits inside the central 80% of the canvas in both width and height: an empty black margin of at least a tenth of the canvas stays on every side — top, bottom, left and right.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 503,
+        "candidatesTokenCount": 1418,
+        "totalTokenCount": 1921,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 503
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0683,
+      "seconds": 10.2,
+      "status": "заменён: вышел бледно-бежевым с золотыми искрами вместо жёлтого — с 24 px путается с белой обычной; промт исправлен",
+      "raw": "art/generated/attr-rarity/attr-rar-rare__nb2-v2.raw.jpg",
+      "cutout": {
+        "key": "black",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.695,
+        "opaque_share": 0.292,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "0d78726a750f41b8ed981242fbae506303f82f7610dc3ed553dd1148fb2b1c12"
+    },
+    {
+      "file": "art/generated/attr-rarity/attr-rar-unique__nb2-v2.png",
+      "category": "attr-rarity",
+      "job": "attr-rar-unique",
+      "title": "Редкость: уникальная (3 из 7)",
+      "source": "ADR-0027 — цвет: бирюзовая; форма — огранённая капля по образцу автора, описан словами (ADR-0012); GDD §3.1 — семь редкостей",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T13:41:43+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.\n\nFormat: game UI icon of a rarity, square, no border around the picture. One carst crystal — the magic crystal of this world — upright, centered, floating in the dark, about 80% of the canvas high. The crystal floats on pitch black: everything around it is solid pure black to the very edges of the canvas, never white or grey. All seven rarity icons are one series with one crystal shape: a faceted crystal drop, almond-like — full and rounded in its lower part, tapering to a point at the top, about two thirds as wide as it is tall — so that even at 24 px it reads as a solid spot of color. Its surface is cut into facets that lie like cells, with soft painterly edges; fine cracks run along the facets; a bright light rim runs along the whole contour. Energy of its own lives inside the crystal. The seven rarities form a ladder of inner light: the higher the rarity, the more light pours from inside. A bare crystal: no setting, no metal caps or bands, no stand, no base, no shards or sparks floating outside it. All the detail lives inside the silhouette. No runes, glyphs or symbols.\n\nRarity: Unique, the third of seven. A turquoise crystal: cracks radiate like a star from its glowing center, and light shines out from the center through them.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance. The whole icon with its glow fits inside the central 80% of the canvas in both width and height: an empty black margin of at least a tenth of the canvas stays on every side — top, bottom, left and right.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 502,
+        "candidatesTokenCount": 1498,
+        "totalTokenCount": 2000,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 502
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0686,
+      "seconds": 9.7,
+      "status": "заменён: нижняя треть буро-оранжевая, под кристаллом искры — бирюза замутнена; промт исправлен",
+      "raw": "art/generated/attr-rarity/attr-rar-unique__nb2-v2.raw.jpg",
+      "cutout": {
+        "key": "black-glow",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.689,
+        "opaque_share": 0.254,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "ccccaceeb88db92ae996025f11a20e03de69748b5571f66d9e4316637ec3f90f"
+    },
+    {
+      "file": "art/generated/attr-rarity/attr-rar-epic__nb2-v2.png",
+      "category": "attr-rarity",
+      "job": "attr-rar-epic",
+      "title": "Редкость: эпическая (4 из 7)",
+      "source": "ADR-0027 — цвет: фиолетовая; форма — огранённая капля по образцу автора, описан словами (ADR-0012); GDD §3.1 — семь редкостей",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T13:41:52+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.\n\nFormat: game UI icon of a rarity, square, no border around the picture. One carst crystal — the magic crystal of this world — upright, centered, floating in the dark, about 80% of the canvas high. The crystal floats on pitch black: everything around it is solid pure black to the very edges of the canvas, never white or grey. All seven rarity icons are one series with one crystal shape: a faceted crystal drop, almond-like — full and rounded in its lower part, tapering to a point at the top, about two thirds as wide as it is tall — so that even at 24 px it reads as a solid spot of color. Its surface is cut into facets that lie like cells, with soft painterly edges; fine cracks run along the facets; a bright light rim runs along the whole contour. Energy of its own lives inside the crystal. The seven rarities form a ladder of inner light: the higher the rarity, the more light pours from inside. A bare crystal: no setting, no metal caps or bands, no stand, no base, no shards or sparks floating outside it. All the detail lives inside the silhouette. No runes, glyphs or symbols.\n\nRarity: Epic, the fourth of seven. A violet crystal: inside it, crystalline cells — a honeycomb of inner facets — catch a steady violet light.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance. The whole icon with its glow fits inside the central 80% of the canvas in both width and height: an empty black margin of at least a tenth of the canvas stays on every side — top, bottom, left and right.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 500,
+        "candidatesTokenCount": 1536,
+        "totalTokenCount": 2036,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 500
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0687,
+      "seconds": 9.2,
+      "status": "кристаллы редкости по ADR-0027 — ждёт автора: эпическая (4 из 7)",
+      "raw": "art/generated/attr-rarity/attr-rar-epic__nb2-v2.raw.jpg",
+      "cutout": {
+        "key": "black-glow",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.745,
+        "opaque_share": 0.208,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "e0af43a3a245f24f569b61f8ad07a5e2db897bef72bc2db53f369a64394e8836"
+    },
+    {
+      "file": "art/generated/attr-rarity/attr-rar-primordial__nb2-v2.png",
+      "category": "attr-rarity",
+      "job": "attr-rar-primordial",
+      "title": "Редкость: первородная (6 из 7)",
+      "source": "ADR-0027 — цвет: оранжевая; форма — огранённая капля по образцу автора, описан словами (ADR-0012); GDD §3.1 — семь редкостей",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T13:42:05+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.\n\nFormat: game UI icon of a rarity, square, no border around the picture. One carst crystal — the magic crystal of this world — upright, centered, floating in the dark, about 80% of the canvas high. The crystal floats on pitch black: everything around it is solid pure black to the very edges of the canvas, never white or grey. All seven rarity icons are one series with one crystal shape: a faceted crystal drop, almond-like — full and rounded in its lower part, tapering to a point at the top, about two thirds as wide as it is tall — so that even at 24 px it reads as a solid spot of color. Its surface is cut into facets that lie like cells, with soft painterly edges; fine cracks run along the facets; a bright light rim runs along the whole contour. Energy of its own lives inside the crystal. The seven rarities form a ladder of inner light: the higher the rarity, the more light pours from inside. A bare crystal: no setting, no metal caps or bands, no stand, no base, no shards or sparks floating outside it. All the detail lives inside the silhouette. No runes, glyphs or symbols.\n\nRarity: Primordial, the sixth of seven. An orange crystal: fire burns inside it and flickers along its edges; strong warm light fills it.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance. The whole icon with its glow fits inside the central 80% of the canvas in both width and height: an empty black margin of at least a tenth of the canvas stays on every side — top, bottom, left and right.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 500,
+        "candidatesTokenCount": 1456,
+        "totalTokenCount": 1956,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 500
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0685,
+      "seconds": 10.5,
+      "status": "кристаллы редкости по ADR-0027 — ждёт автора: первородная (6 из 7)",
+      "raw": "art/generated/attr-rarity/attr-rar-primordial__nb2-v2.raw.jpg",
+      "cutout": {
+        "key": "black-glow",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.598,
+        "opaque_share": 0.323,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "4e1ea8a6615e1598906d94ede413502fa8dab777fdaa5e16013b0a6116444fec"
+    },
+    {
+      "file": "art/generated/attr-rarity/attr-rar-timeless__nb2-v2.png",
+      "category": "attr-rarity",
+      "job": "attr-rar-timeless",
+      "title": "Редкость: вневременная (7 из 7)",
+      "source": "ADR-0027 — цвет: зелёная; форма — огранённая капля по образцу автора, описан словами (ADR-0012); GDD §3.1 — семь редкостей",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T13:42:16+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.\n\nFormat: game UI icon of a rarity, square, no border around the picture. One carst crystal — the magic crystal of this world — upright, centered, floating in the dark, about 80% of the canvas high. The crystal floats on pitch black: everything around it is solid pure black to the very edges of the canvas, never white or grey. All seven rarity icons are one series with one crystal shape: a faceted crystal drop, almond-like — full and rounded in its lower part, tapering to a point at the top, about two thirds as wide as it is tall — so that even at 24 px it reads as a solid spot of color. Its surface is cut into facets that lie like cells, with soft painterly edges; fine cracks run along the facets; a bright light rim runs along the whole contour. Energy of its own lives inside the crystal. The seven rarities form a ladder of inner light: the higher the rarity, the more light pours from inside. A bare crystal: no setting, no metal caps or bands, no stand, no base, no shards or sparks floating outside it. All the detail lives inside the silhouette. No runes, glyphs or symbols.\n\nRarity: Timeless, the seventh of seven — the highest step. A vivid green crystal, the brightest of all: pure light pours from deep inside and fills it completely; a soft green aura hugs it.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance. The whole icon with its glow fits inside the central 80% of the canvas in both width and height: an empty black margin of at least a tenth of the canvas stays on every side — top, bottom, left and right.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 511,
+        "candidatesTokenCount": 1493,
+        "totalTokenCount": 2004,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 511
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0686,
+      "seconds": 10.4,
+      "status": "кристаллы редкости по ADR-0027 — ждёт автора: вневременная (7 из 7)",
+      "raw": "art/generated/attr-rarity/attr-rar-timeless__nb2-v2.raw.jpg",
+      "cutout": {
+        "key": "black-glow",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.673,
+        "opaque_share": 0.254,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "081115e4a0ac2cf2f0225c0f69ba55e60de9e1a36fbef136ee885c607591960c"
+    },
+    {
+      "file": "art/generated/attr-rarity/attr-rar-rare__nb2-v3.png",
+      "category": "attr-rarity",
+      "job": "attr-rar-rare",
+      "title": "Редкость: редкая (2 из 7)",
+      "source": "ADR-0027 — цвет: жёлтая; форма — огранённая капля по образцу автора, описан словами (ADR-0012); GDD §3.1 — семь редкостей",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T13:43:28+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.\n\nFormat: game UI icon of a rarity, square, no border around the picture. One carst crystal — the magic crystal of this world — upright, centered, floating in the dark, about 80% of the canvas high. The crystal floats on pitch black: everything around it is solid pure black to the very edges of the canvas, never white or grey. All seven rarity icons are one series with one crystal shape: a faceted crystal drop, almond-like — full and rounded in its lower part, tapering to a point at the top, about two thirds as wide as it is tall — so that even at 24 px it reads as a solid spot of color. Its surface is cut into facets that lie like cells, with soft painterly edges; fine cracks run along the facets; a bright light rim runs along the whole contour. Energy of its own lives inside the crystal. The seven rarities form a ladder of inner light: the higher the rarity, the more light pours from inside. A bare crystal: no setting, no metal caps or bands, no stand, no base, no shards or sparks floating outside it. All the detail lives inside the silhouette. No runes, glyphs or symbols.\n\nRarity: Rare, the second of seven. A saturated golden-yellow crystal, yellow through and through like citrine — clearly yellow, never white or grey: clean cut facets; bright sparks glint inside the facets, and a warm yellow light glows within.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance. The whole icon with its glow fits inside the central 80% of the canvas in both width and height: an empty black margin of at least a tenth of the canvas stays on every side — top, bottom, left and right.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 521,
+        "candidatesTokenCount": 1474,
+        "totalTokenCount": 1995,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 521
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0685,
+      "seconds": 11.0,
+      "status": "кристаллы редкости по ADR-0027 — ждёт автора: редкая (2 из 7)",
+      "raw": "art/generated/attr-rarity/attr-rar-rare__nb2-v3.raw.jpg",
+      "cutout": {
+        "key": "black",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.758,
+        "opaque_share": 0.232,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "ba334834a9324a486c59ae92b052bf3394c36c1505ba9306eec6ce598c930863"
+    },
+    {
+      "file": "art/generated/attr-rarity/attr-rar-unique__nb2-v3.png",
+      "category": "attr-rarity",
+      "job": "attr-rar-unique",
+      "title": "Редкость: уникальная (3 из 7)",
+      "source": "ADR-0027 — цвет: бирюзовая; форма — огранённая капля по образцу автора, описан словами (ADR-0012); GDD §3.1 — семь редкостей",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T13:43:41+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.\n\nFormat: game UI icon of a rarity, square, no border around the picture. One carst crystal — the magic crystal of this world — upright, centered, floating in the dark, about 80% of the canvas high. The crystal floats on pitch black: everything around it is solid pure black to the very edges of the canvas, never white or grey. All seven rarity icons are one series with one crystal shape: a faceted crystal drop, almond-like — full and rounded in its lower part, tapering to a point at the top, about two thirds as wide as it is tall — so that even at 24 px it reads as a solid spot of color. Its surface is cut into facets that lie like cells, with soft painterly edges; fine cracks run along the facets; a bright light rim runs along the whole contour. Energy of its own lives inside the crystal. The seven rarities form a ladder of inner light: the higher the rarity, the more light pours from inside. A bare crystal: no setting, no metal caps or bands, no stand, no base, no shards or sparks floating outside it. All the detail lives inside the silhouette. No runes, glyphs or symbols.\n\nRarity: Unique, the third of seven. A turquoise crystal, turquoise through and through from its tip to its base, with no warm or orange tones anywhere: cracks radiate like a star from its glowing center, and cold light shines out from the center through them. No embers.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance. The whole icon with its glow fits inside the central 80% of the canvas in both width and height: an empty black margin of at least a tenth of the canvas stays on every side — top, bottom, left and right.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 525,
+        "candidatesTokenCount": 1578,
+        "totalTokenCount": 2103,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 525
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0688,
+      "seconds": 11.5,
+      "status": "кристаллы редкости по ADR-0027 — ждёт автора: уникальная (3 из 7)",
+      "raw": "art/generated/attr-rarity/attr-rar-unique__nb2-v3.raw.jpg",
+      "cutout": {
+        "key": "black-glow",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.728,
+        "opaque_share": 0.21,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "0412717e32d14a0123c10180c7c8ab3196751102584f2531dbf9bd81ac9522ac"
     }
   ]
 }
