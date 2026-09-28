@@ -7,7 +7,7 @@
       из вариантов и повтором без второго расхода; атаки до победы на каждой из 14 ступеней — каждая атака бой ядром (ADR-0025):
       цена один раз, повтор того же номера атаки ничего не списывает, здоровье цели — из итога боя, «Пропустить» открывает итог;
       после первой атаки цели оставляем 1 здоровья — шкала Эхо растёт ×3 за цикл, а отряд прототипа нет; победа — очки, бестиарий,
-      рост лестницы; Убер-босс открывает пятнадцатую ступень — Многоликого, победа над ним даёт ресурс «Многоликий» своей недели;
+      рост лестницы до Убер-босса; Многоликий выпадает при призыве с шансом manySummonBp, победа над ним даёт ресурс «Многоликий» своей недели;
       цель с вышедшим сроком уходит; планки недели → сундуки осколков в запасах, один раз.
    4. Активации из запасов на каждой неделе и цикле: все крафтовые боссы (ACTIVATE.call), биом Многоликого (ACTIVATE.echo) —
       в слот биомов без душ, забег по 14 ступеням с одной попыткой и очками за взятые этажи, все руины (ACTIVATE.act).
@@ -109,7 +109,7 @@ function suite() {
   const EL = ['Воздух', 'Земля', 'Огонь', 'Вода', 'Время'], CLS = ['Танк', 'Физ. ДД силы', 'Физ. ДД ловкости', 'Маг. ДД', 'Лекарь', 'Дебаффер'], names = new Set();
   if (TOP !== 14) fail('ступеней лестницы ' + TOP + ', а не 14');
   for (const k of ['points', 'hp', 'bm']) if (D[k].length !== TOP) fail(`данные: ${k} — ${D[k].length} чисел на ${TOP} ступеней`);
-  if (D.pickW.length !== TOP + 1) fail(`данные: pickW — ${D.pickW.length} чисел на ${TOP} ступеней и Многоликого`);
+  if (D.pickW.length !== TOP) fail(`данные: pickW — ${D.pickW.length} чисел на ${TOP} ступеней`);
   for (const w of RS.weeks) {
     const c = D.civ[w.race];
     if (!c) { fail('нет цивилизации недели ' + w.race); continue; }
@@ -159,7 +159,7 @@ function suite() {
       if (!p || !p.offers.length) { fail(key + ': призыв не дал вариантов'); continue; }
       ACT.echsum('2');
       if (S.wallet.souls !== souls0 - XE.summonSouls) fail(`${key}: призыв с повтором стоил ${souls0 - S.wallet.souls}`);
-      if (p.offers.length !== Math.min(D.offer.wide, S.ech.avail) || new Set(p.offers).size !== p.offers.length || p.offers.some(st => st < 1 || st > S.ech.avail)) fail(`${key}: варианты ${p.offers.join(', ')} при открытых 1–${S.ech.avail}`);
+      if (p.offers.length !== Math.min(D.offer.wide, S.ech.avail) || new Set(p.offers).size !== p.offers.length || p.offers.some(st => st < 1 || st > S.ech.avail && st !== TOP + 1)) fail(`${key}: варианты ${p.offers.join(', ')} при открытых 1–${S.ech.avail}`);
       out.offers += p.offers.length;
       h = draw(); scan(key + ' · выбор цели', h);
       ACT.echpick('2:' + p.offers[p.offers.length - 1]);
@@ -169,17 +169,17 @@ function suite() {
       scan(key + ' · цель', draw());
       S.ech.wide = false; clearEcho(); ACT.echsum('0'); if (!S.ech.pending[0] || S.ech.pending[0].offers.length !== D.offer.base) fail(key + ': без артефакта вариантов не ' + D.offer.base); S.ech.wide = true;
 
-      /* каждая ступень до победы: очки, бестиарий, рост лестницы; Убер-босс открывает пятнадцатую — Многоликого,
+      /* каждая ступень до победы: очки, бестиарий, рост лестницы до Убер-босса; Многоликий — не ступень лестницы, выпадает при призыве,
          победа над Многоликим (лёгкий бой один на один) даёт ресурс «Многоликий» (ADR-0025) */
       for (let st = 1; st <= TOP + 1; st++) {
-        clearEcho(); S.ech.avail = st;
+        clearEcho(); S.ech.avail = Math.min(st, TOP);
         const t = E.target('step', st), score0 = S.echo.score, many0 = BAG.qty(XE.uber.item);
         if (st > TOP && (t.kind !== 'many' || t.fid !== 'many')) { fail(`${key}: пятнадцатая ступень — не Многоликий`); continue; }
         S.echo.slots[0] = t; scan(`${key} · ступень ${st}`, draw());
         if (!kill(`${key} · ступень ${st}`, 0)) continue;
         if (!S.ech.known[t.fid]) fail(`${key}: ступень ${st} не открыла запись бестиария`);
         if (S.echo.score - score0 !== pts(st, c)) fail(`${key}: ступень ${st} дала ${S.echo.score - score0} очков вместо ${pts(st, c)}`);
-        if (S.ech.avail !== Math.min(st + 1, TOP + 1)) fail(`${key}: после ступени ${st} открыто ${S.ech.avail}`);
+        if (S.ech.avail !== Math.min(st + 1, TOP)) fail(`${key}: после ступени ${st} открыто ${S.ech.avail}`);
         if ((BAG.qty(XE.uber.item) - many0) !== (st > TOP ? XE.uber.count : 0)) fail(`${key}: ступень ${st} — Многоликий ${BAG.qty(XE.uber.item) - many0}`);
         if (st > TOP && (S.ech.manyWk[w.race] || 0) < XE.uber.count) fail(`${key}: Многоликий не привязан к своей неделе`);
         h = draw(); scan(`${key} · победа ${st}`, h);
@@ -233,7 +233,13 @@ function suite() {
           if (S.bag.chests.length !== ch0 + 1 || ch.box !== 'craft' || ch.r !== fb.workerBoxRarity) fail(k2 + ': нет сундука крафтового босса');
           else { try { EnLoot.resolve(LBX, ch); } catch (x2) { fail(k2 + ': сундук не открывается — ' + x2.message); } out.chests++; }
         }
-        if (fb.heroShardsWeek && sh0 === JSON.stringify(S.rs.shards) && S.wallet.dust === dust0) fail(k2 + ': Лик недели не дал осколков');
+        if (fb.heroShardsWeekBp || fb.heroShardsWeek) {   // Лик недели: осколки одного героя недели — ровно likShards цикла (или прах за них)
+          const want = E.likShards(c, fb), got = S.ech.last && S.ech.last.loot.find(l => l.k === 'shards');
+          const open = (RS.weeks.find(v => v.race === x.race) || w).squad.map(id => RSI[id]).filter(h => h && h.c <= c);
+          if (!want) fail(k2 + ': Лик недели платит 0 осколков');
+          else if (open.length && (!got || got.n !== want)) fail(`${k2}: Лик недели дал ${got ? got.n : 0} осколков, а по правилам — ${want}`);
+          else if (open.length && sh0 === JSON.stringify(S.rs.shards) && S.wallet.dust === dust0) fail(k2 + ': осколки Лика не легли в коллекцию и не ушли в прах');
+        }
         h = draw(); scan(k2 + ' · победа', h);
         if (!h.includes(fb.name)) fail(k2 + ': итог победы не назвал босса');
       }

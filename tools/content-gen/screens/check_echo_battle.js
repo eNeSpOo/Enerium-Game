@@ -26,6 +26,8 @@
    12. «Спуск»: вход к рунному стражу — после босса биома, демо-вход — всегда; в бою видно, что удар стража отнимает раунд.
    13. Девять Убер-боссов против своих отрядов недели (герои Эхо echo-foes.js) на циклах II, IV и VI: бой идёт, Убер срабатывает
        каждым приёмом набора и обычной атакой по всем, если она у него есть.
+   14. Многоликий при призыве — бросок manySummonBp сверх лестницы; «Лик недели» — likShards по циклу; биом Многоликого —
+       здоровье героев переходит с этажа на этаж, главный враг полный, попытка одна.
    Везде: без исключений, без undefined, NaN и [object. Числа проверки — не баланс.
    Запуск: node tools/content-gen/screens/check_echo_battle.js */
 'use strict';
@@ -610,6 +612,67 @@ function suite() {
     if (!S.runs.some(r => r.guard)) fail('сценарий стража не начал бой');
   }
 
+
+  /* 14. Многоликий при призыве (ADR-0025, ответ автора): отдельный бросок с шансом manySummonBp сверх лестницы, без «раз в неделю»;
+     «Лик недели» платит likShards по циклу; биом Многоликого — здоровье и павшие героев переходят с этажа на этаж, главный враг
+     этажа всегда полный — осады нет, попытка одна */
+  {
+    const R0 = window.EN_ECHO_RULES, count = (bp, n) => {
+      window.EN_ECHO_RULES = bp == null ? R0 : Object.assign({}, R0 || {}, { manySummonBp: bp });
+      let hit = 0; for (let k = 0; k < n; k++) { const o = E.draw(TOP, 3, 'проверка|призыв|' + k); if (o.includes(TOP + 1)) hit++; if (o.some(st => st < 1 || st > TOP + 1) || new Set(o).size !== o.length) fail('призыв: варианты ' + o.join(', ')); }
+      return hit;
+    };
+    try {
+      const half = count(5000, 400), none = count(0, 400), real = count(null, 100000), bp = E.manyBp();
+      if (half < 140 || half > 260) fail(`призыв: при шансе 50 % Многоликий выпал ${half} раз из 400`);
+      if (none) fail(`призыв: при шансе 0 Многоликий выпал ${none} раз`);
+      if (real > bp * 100000 / 10000 * 4 + 5) fail(`призыв: при шансе ${bp} б. п. Многоликий выпал ${real} раз из 100 000`);
+      out.manyDraw = `${real} из 100 000 при ${bp} б. п.`;
+      const lik = RX.drops.craftBosses.find(b => b.id === 'lik');
+      window.EN_ECHO_RULES = Object.assign({}, R0 || {}, { likShards: { '2': 7, '3': 11 } });
+      if (E.likShards(2, lik) !== 7 || E.likShards(3, lik) !== 11) fail('Лик недели: осколки не из likShards по циклу');
+      window.EN_ECHO_RULES = Object.assign({}, R0 || {}, { likShards: undefined });
+      for (let c = 2; c <= 6; c++) {   // без likShards — доля heroShardsWeekBp от недельных осколков Эхо увлечённого (lootboxes.js, в сотых)
+        const wk = LBX.week.echo[String(c)], want = lik.heroShardsWeekBp ? Math.floor(wk.fan.shards * lik.heroShardsWeekBp / 1000000) : lik.heroShardsWeek;
+        if (E.likShards(c, lik) !== want || !(want > 0)) fail(`Лик недели · цикл ${ROMAN[c]}: без likShards ${E.likShards(c, lik)} осколков, а доля недельных — ${want}`);
+      }
+    } finally { window.EN_ECHO_RULES = R0; }
+    /* биом Многоликого */
+    CK.reset('Эльфы', 3); S.heroes.forEach(h => { h.lvl = Math.max(h.lvl, 3 * E.lvl(TOP, 3)); });   // отряд сильнее биома: этажей должно быть несколько — проверяем переход здоровья
+    S.ech.biomes = []; S.runs = []; S.ech.manyWk = {}; BAG.add('many', 1);
+    ACTIVATE.echo('many'); if (S.overlay && S.overlay.op) ACT.echactdo(S.overlay.op);
+    const mb = S.ech.biomes.find(b => b.many);
+    if (!mb) fail('биом Многоликого: не открылся из запасов');
+    else {
+      ACT.echmany(mb.uid);
+      const R = S.runs.find(r => r.kind === 'many');
+      if (!R) fail('биом Многоликого: забег не начался');
+      else {
+        if (R.b.u[1][0].hp !== R.b.u[1][0].maxHp) fail('биом Многоликого: главный враг этажа 1 не полный');
+        const nx = R.scene.next; let floors = 1, carried = 0;
+        R.scene.next = r => {
+          const before = r.heroes.map(h => [h.key, h.hp, !!h.dead]);   // герои после прошлого этажа — через carry
+          nx(r); floors++;
+          for (const [key, hp, dead] of before) {
+            const u = r.b.u[0].find(v => v.key === key);
+            if (!u || u.alive === dead || (!dead && u.hp !== Math.min(hp, u.maxHp))) fail(`биом Многоликого · этаж ${r.floor}: ${key} пришёл не со своим здоровьем`);
+            else if (!dead && hp < u.maxHp) carried++;
+          }
+          if (r.b.u[1][0].hp !== r.b.u[1][0].maxHp) fail(`биом Многоликого · этаж ${r.floor}: главный враг не полный — это осада`);
+        };
+        S.route = 'descent';
+        for (let n = 0; !R.over && n < 40000; n++) advance(R, 500);
+        if (!R.over) fail('биом Многоликого: забег не кончился');
+        if (floors < 3) fail(`биом Многоликого: этажей ${floors} — переход здоровья не проверить`);
+        else if (!carried) fail('биом Многоликого: здоровье героев между этажами восстановилось');
+        if (S.ech.biomes.some(b => b.uid === mb.uid)) fail('биом Многоликого: после забега биом остался — попытка не одна');
+        const runs0 = S.runs.length; ACT.echmany(mb.uid);
+        if (S.runs.length !== runs0) fail('биом Многоликого: началась вторая попытка');
+        out.manyFloors = `${R.taken.length} из ${TOP} этажей, ${R.end ? R.end.kind : '—'}`;
+      }
+    }
+  }
+
   /* 13. девять Убер-боссов против своих отрядов недели на циклах II, IV и VI: бой идёт без мусора, Убер срабатывает всеми приёмами.
      Здоровье Убера на входе — полное, 55 % и 3 %: так случаются и реакции на половину здоровья, и смертельный удар */
   {
@@ -666,6 +729,7 @@ err.push(...(res.errors || []));
 console.log(`Бой Эхо проверен за ${Math.round((Date.now() - t0) / 1000)} с: боёв ядра ${res.core}, сборок боя ${res.specs}, боёв прототипа ${res.battles}, атак ${res.attacks}, пропусков ${res.skips}, Многоликих ${res.many}; `
   + `двух ульт сработало ${res.ults2}, ударов атакой по всем ${res.allHits}, сидов неприязни ${res.avers}, раундов отнято стражем ${res.cuts}, способностей по реакции ${res.casts}, остановок мимо иммунитета ${res.bypass}.`);
 if (res.ubers) console.log('Уберы против отрядов недели, побед над Убером из боёв: ' + res.ubers.join(' · ') + '.');
+if (res.manyDraw) console.log(`Многоликий при призыве: ${res.manyDraw}; биом Многоликого — ${res.manyFloors}.`);
 done();
 
 function done() {

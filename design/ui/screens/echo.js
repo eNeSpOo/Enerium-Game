@@ -31,7 +31,8 @@ const ECH = {
   craft: { hp: 120000, bm: 90000 },                     // крафтовый босс — по своему циклу (§12.3)
   cycMul: 3,                                            // здоровье и мощь — ×3 за цикл
   lifeH: { o: 72, e: 48, b: 36, u: 24, m: 24, craft: 48 },   // срок существования цели, часы; окончательные сроки — баланс (§17.1)
-  pickW: [30, 28, 26, 24, 22, 20, 12, 11, 10, 9, 5, 4, 3, 2, 2],   // вес ступени в призыве: слабые чаще, сильные реже (§17.4); пятнадцатая — Многоликий
+  pickW: [30, 28, 26, 24, 22, 20, 12, 11, 10, 9, 5, 4, 3, 2],   // вес ступени в призыве: слабые чаще, сильные реже (§17.4)
+  manySummonBp: 1,                                      // Многоликий выпадает при призыве с шансом 1 б. п. — около 0,01 %, без ограничения «раз в неделю» (ADR-0025)
   /* арт недели, одобренный автором (ADR-0025): фон арены Эхо и портреты ступеней 1–15 по порядку врагов ECH; другие недели — заглушки */
   art: { 'Эльфы': { arena: 'arena-echo-ishkantun.jpg', faces: 'echo/ik-' } },
   /* бой Эхо (ADR-0025) — демо, пока не подключены echo-rules.js и echo-foes.js. Характеристики карты — как у образца Мастерской
@@ -270,7 +271,21 @@ const ruleRow = (step, c) => { const R = XR(), cy = R && R.cycles ? R.cycles[Str
 const ruleOf = (step, k, c) => { const r = ruleRow(step, c), v = r ? r[k] : null; return Number.isInteger(v) ? v : null; };
 const typeRule = g => { const R = XR(); return R && R.types ? R.types[g] || null : null; };
 const lifeOf = g => { const t = typeRule(g); return t && Number.isInteger(t.lifeH) ? t.lifeH : ECH.lifeH[g]; };
-const pickW = () => XR() && Array.isArray(XR().pickW) && XR().pickW.length >= MANY ? XR().pickW : ECH.pickW;
+const pickW = () => XR() && Array.isArray(XR().pickW) && XR().pickW.length >= TOP ? XR().pickW : ECH.pickW;
+const pctBp2 = bp => `${Math.floor(bp / 100)}${bp % 100 ? ',' + String(bp % 100).padStart(2, '0') : ''} %`;
+/* шанс Многоликого при призыве, б. п.: правила (manySummonBp), иначе демо */
+const manyBp = () => { const v = XR() && XR().manySummonBp; return Number.isInteger(v) ? v : ECH.manySummonBp; };
+/* выплата «Лика недели» осколками по циклу (ADR-0025, ответ автора: 13,5 % недельных осколков): правила (likShards — по номеру
+   цикла или списком с цикла I); без них — доля heroShardsWeekBp записи босса от недельных осколков Эхо увлечённого
+   (lootboxes.js, week.echo — в сотых); прежняя запись с числом осколков — как есть */
+function likShards(c, fb) {
+  const v = XR() && XR().likShards, x = Array.isArray(v) ? v[c - 1] : v && typeof v === 'object' ? v[String(c)] : null;
+  if (Number.isInteger(x)) return x;
+  const wk = LBX.week && LBX.week.echo ? LBX.week.echo[String(c)] : null;
+  if (fb.heroShardsWeekBp && wk && wk.fan) return Math.floor(wk.fan.shards * fb.heroShardsWeekBp / (100 * BP));
+  return fb.heroShardsWeek || 0;
+}
+const isLik = fb => !!(fb && (fb.heroShardsWeekBp || fb.heroShardsWeek));   // крафтовый босс, что платит осколками героев недели
 const bmOf = (step, c) => at(step === MANY ? ECH.many.bm : ECH.bm[step - 1], c);
 /* здоровье цели Эхо: по правилам — здоровье главного врага в бою (ядро: образец класса, уровень, bossHpPct); иначе демо-шкала */
 function hpOf(step, c, race) {
@@ -494,9 +509,11 @@ function sync() {
   E.slots.forEach((x, i) => { if (x && x.left <= 0) { E.slots[i] = null; S.ech.note = `Срок цели в слоте ${i + 1} вышел: она ушла без очков, души не вернулись.`; } });
   if (!(E.sel >= 0 && E.sel < E.slots.length)) E.sel = 0;
 }
-/* призыв: N разных ступеней из открытых, вес по ступени (§17.4); после Убер-босса открыта пятнадцатая — Многоликий */
+/* призыв: N разных ступеней из открытых 1–14, вес по ступени (§17.4); Многоликий выпадает сверх лестницы с шансом manySummonBp —
+   около 0,01 %, без ограничения «раз в неделю» (ADR-0025, ответ автора): тогда он один из вариантов */
 function draw(avail, n, key) {
-  const roll = rng(key), pool = Array.from({ length: Math.min(avail, MANY) }, (_, j) => j + 1), out = [];
+  const roll = rng(key), pool = Array.from({ length: Math.min(avail, TOP) }, (_, j) => j + 1), out = [];
+  if (n > 0 && roll(BP) < manyBp()) out.push(MANY);   // первый бросок призыва: Многоликий — сверх лестницы, редкий
   while (out.length < n && pool.length) {
     const W = pickW();
     let r = roll(pool.reduce((a, st) => a + W[st - 1], 0)), k = 0;
@@ -548,7 +565,7 @@ function summonHtml(i) {
     <div class="info">
       <span class="eyebrow">Слот ${i + 1} · свободен</span>
       <h2 class="serif ech-name">Призвать цель</h2>
-      <p class="muted ech-p">Эхо предложит ${n} ${plural(n, 'вариант', 'варианта', 'вариантов')} ${a > 1 ? `из открытых ступеней 1–${a}: слабые чаще, сильные реже` : 'с первой ступени — пока открыта только она'}. Выбранную цель не отменить, у каждой свой срок.</p>
+      <p class="muted ech-p">Эхо предложит ${n} ${plural(n, 'вариант', 'варианта', 'вариантов')} ${a > 1 ? `из открытых ступеней 1–${a}: слабые чаще, сильные реже` : 'с первой ступени — пока открыта только она'}; с шансом ${pctBp2(manyBp())} — Многоликий. Выбранную цель не отменить, у каждой свой срок.</p>
       <div class="row ech-wide"><span class="eyebrow">вариантов</span><div class="tabs" role="tablist" aria-label="Вариантов призыва">${[[false, ECH.offer.base], [true, ECH.offer.wide]].map(([w, k]) => `<button role="tab" aria-selected="${S.ech.wide === w}" data-a="echwide" data-v="${w ? 1 : 0}">${k}</button>`).join('')}</div><span class="faint ech-s">${ECH.offer.wide} — с артефактом выбора, демо</span></div>
       ${S.ech.note ? `<p class="reason warn">${S.ech.note}</p>` : ''}
       <div class="e-foot">
@@ -600,8 +617,8 @@ function ladderHtml(W) {
   const cells = STEPS.map((g, j) => { const st = j + 1, f = stepFoe(fidOf(W.race, st)), k = kn(f.fid); return `<i class="${g === 'o' ? '' : g} ${st <= S.ech.avail ? 'av' : ''} ${st === S.ech.avail ? 'top' : ''} ${k ? 'kn' : ''} ${inSlot.has(st) ? 'on' : ''}" title="Ступень ${st} · ${ECH.rank[g]}${k ? ' · ' + f.n : ''}${st > S.ech.avail ? ' · закрыта' : ''}"></i>`; }).join('');
   const nk = STEPS.filter((g, j) => kn(fidOf(W.race, j + 1))).length + (kn('many') ? 1 : 0);
   return `<div class="pnl ladder14 ech-ladder"><span class="eyebrow" style="white-space:nowrap">Лестница недели</span>
-    <div class="l14" aria-label="Открыто ступеней: ${S.ech.avail} из ${TOP}">${cells}<span class="sep"></span><i class="m ${MANY <= S.ech.avail ? 'av' : ''} ${MANY === S.ech.avail ? 'top' : ''} ${kn('many') ? 'kn' : ''} ${inSlot.has(MANY) ? 'on' : ''}" title="Ступень ${MANY} · Многоликий — лёгкий бой один на один, за победу — ресурс «Многоликий»${MANY > S.ech.avail ? ' · откроется после Убер-босса' : ''}"></i></div>
-    <span class="faint num ech-lt">${Math.min(S.ech.avail, TOP)} / ${TOP}${S.ech.avail >= MANY ? ' · Многоликий открыт' : ' · победа над верхней открывает следующую'}</span>
+    <div class="l14" aria-label="Открыто ступеней: ${S.ech.avail} из ${TOP}">${cells}<span class="sep"></span><i class="m ${kn('many') ? 'kn' : ''} ${inSlot.has(MANY) ? 'on' : ''}" title="Ступень ${MANY} · Многоликий — выпадает при призыве с шансом ${pctBp2(manyBp())}, без ограничения «раз в неделю»; лёгкий бой один на один, за победу — ресурс «Многоликий»"></i></div>
+    <span class="faint num ech-lt">${S.ech.avail} / ${TOP} · победа над верхней открывает следующую · Многоликий — ${pctBp2(manyBp())} призыва</span>
     <button class="link" data-a="echbest">${ic('book')}Бестиарий ${nk}/${MANY}</button></div>`;
 }
 SCREENS.echo = function () {
@@ -634,7 +651,7 @@ function winApply(i, x, L) {
   S.ech.known[x.fid] = true;
   L.pts = x.kind === 'craft' ? 0 : ptsOf(x.step, c);
   S.echo.score += L.pts;
-  if (x.kind === 'step' && x.race === S.ech.wk && x.step === S.ech.avail && S.ech.avail < MANY) L.opened = ++S.ech.avail;   // лестница растёт после сильнейшего доступного (§17.4); после Убер-босса — Многоликий
+  if (x.kind === 'step' && x.race === S.ech.wk && x.step === S.ech.avail && S.ech.avail < TOP) L.opened = ++S.ech.avail;   // лестница растёт после сильнейшего доступного (§17.4)
   if (x.g === 'm') {   // победа над Многоликим — ресурс «Многоликий», привязанный к своей неделе (ADR-0025)
     const md = manyDrop(); BAG.add(md.item, md.count); S.ech.manyWk[x.race] = (S.ech.manyWk[x.race] || 0) + md.count;
     L.loot.push({ k: 'item', id: md.item, n: md.count });
@@ -678,10 +695,10 @@ function craftLoot(x, f, loot) {
   ['spirit', 'gold', 'enerium'].forEach(k => { if (fb[k]) { S.wallet[k] += fb[k]; loot.push({ k: 'cur', id: k, n: fb[k], stub: k === 'enerium' }); } });
   if (fb.runeKeyBp) { const hit = roll(BP) < fb.runeKeyBp; if (hit) S.wallet.keys += fb.runeKeys; loot.push({ k: 'rune', n: fb.runeKeys, bp: fb.runeKeyBp, hit }); }
   if (fb.workerBoxRarity) { const spec = { box: 'craft', r: fb.workerBoxRarity, cyc: fb.cyc, win: 'step', src: 'Крафтовый босс · ' + fb.name }; BAG.addChest(spec); loot.push({ k: 'chest', spec }); }
-  if (fb.heroShardsWeek) {
-    const W = RS.weeks.find(w => w.race === x.race) || weekOf(S), open = W.squad.map(id => RSI[id]).filter(h => h && h.c <= S.acc.cycle);
-    if (!open.length) { loot.push({ k: 'none' }); return; }
-    const h = open[roll(open.length)], n = fb.heroShardsWeek;
+  if (isLik(fb)) {
+    const W = RS.weeks.find(w => w.race === x.race) || weekOf(S), open = W.squad.map(id => RSI[id]).filter(h => h && h.c <= S.acc.cycle), n = likShards(S.acc.cycle, fb);
+    if (!open.length || !n) { loot.push({ k: 'none' }); return; }
+    const h = open[roll(open.length)];
     if (rsHas(h)) { const d = n * rsDustOf(h); S.wallet.dust += d; loot.push({ k: 'shards', id: h.id, n, dust: d }); }   // §15.2: повторные осколки — в прах
     else { S.rs.shards[h.id] = (S.rs.shards[h.id] || 0) + n; loot.push({ k: 'shards', id: h.id, n }); }
   }
@@ -925,7 +942,9 @@ Object.assign(ACT, {
   /* §17.6, §23.1: сундуки за планки забирают только в «Дарах путешествия» — один сундук не выдаётся через два экрана */
   echplank() { ACT.sheet('gifts'); },
   echcyc(v) { S.acc.cycle = +v; render(); },
-  echopen() { sync(); S.ech.avail = MANY; toast(`Демо: открыты все ${TOP} ступеней недели и Многоликий`); },
+  echopen() { sync(); S.ech.avail = TOP; toast(`Демо: открыты все ${TOP} ступеней недели`); },
+  /* демо: Многоликий в свободный слот — при призыве его шанс около 0,01 % */
+  echmdemo() { sync(); const i = freeSlot(); if (i < 0) return toast('Демо: свободного слота Эхо нет'); const x = target(S, 'many'); S.echo.slots[i] = x; S.echo.sel = i; S.overlay = null; S.route = 'echo'; toast(`Демо: Многоликий в слоте ${i + 1} — при призыве его шанс ${pctBp2(manyBp())}`); },
   /* демо: атаки Эхо отрядом недели — герои Эхо этой цивилизации (echo-foes.js) против её нашествия */
   echwsq() { sync(); S.ech.weekSquad = !S.ech.weekSquad; toast(S.ech.weekSquad ? 'Демо: атаки Эхо — отрядом недели' : 'Атаки Эхо — сохранённым отрядом'); },
   /* подтверждение активации: расход один раз на операцию */
@@ -994,7 +1013,7 @@ Object.assign(OV, {
       <span class="eyebrow">Демо прототипа</span>
       <div class="row ech-demo"><select class="rs-sel" data-a="sweek" aria-label="Неделя расы, демо">${RS.weeks.map(w => `<option value="${w.race}" ${w === W ? 'selected' : ''}>Неделя ${w.gen}</option>`).join('')}</select>
         <div class="tabs rs-cyc" role="tablist" aria-label="Цикл аккаунта, демо">${ROMAN.slice(1).map((r, j) => `<button role="tab" aria-selected="${c === j + 1}" data-a="echcyc" data-v="${j + 1}">${r}</button>`).join('')}</div>
-        <button class="btn sm" data-a="echopen" ${S.ech.avail >= MANY ? 'disabled' : ''}>Открыть все ${TOP} ступеней и Многоликого</button>
+        <button class="btn sm" data-a="echopen" ${S.ech.avail >= TOP ? 'disabled' : ''}>Открыть все ${TOP} ступеней</button><button class="btn sm" data-a="echmdemo" ${freeCount() ? '' : 'disabled'} title="При призыве Многоликий выпадает с шансом ${pctBp2(manyBp())}">Многоликий в слот</button>
         ${weekSquad(W.race) ? `<button class="btn sm" data-a="echwsq" aria-pressed="${!!S.ech.weekSquad}" title="Атаки Эхо — отрядом недели: пятеро героев Эхо этой цивилизации, наборы из echo-foes.js, уровень врагов цели">Бой отрядом недели${S.ech.weekSquad ? ' · вкл' : ''}</button>` : ''}</div>
       <p class="reason">Неделя и цикл аккаунта — переключатели прототипа. Новая неделя сбрасывает лестницу.</p>`;
     return sheet('Неделя Эхо', body, '', true);
@@ -1127,5 +1146,5 @@ setInterval(() => {
 /* для автопроверки tools/content-gen/screens/check_echo.js и консоли */
 window.EN_ECHO = { data: ECH, steps: STEPS, foe, stepFoe, fidOf, sync, draw, checks, planks: () => planks(weekOf(S), S.acc.cycle), bio: () => ({ cap: bioCap(), used: bioUsed() }), target: (kind, x, o) => target(S, kind, x, o),
   cost: x => atkCost(x), pts: ptsOf, floorPts, rounds: roundsOf, lvl: lvlOf, hp: hpOf, fight: (x, ids, no) => fightOf(x, ids, no || x.atk + 1), kit: demoKit,
-  manyFree, face: faceArt, arena: arenaOf };
+  manyFree, face: faceArt, arena: arenaOf, manyBp, likShards };
 })();

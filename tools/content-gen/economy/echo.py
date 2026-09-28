@@ -56,7 +56,7 @@ MANY_LVL_BP = 0                   # Многоликий — на уровне �
 
 # --- раунды §17.3 ---
 ROUNDS_DEMO = {'o': 5, 'e': 8, 'b': 12, 'u': 25}
-ROUNDS = {'o': 10, 'e': 15, 'b': 20, 'u': 25, 'm': 10}   # предложение: рядовой — как этаж биома, дальше +5 за ранг; Многоликий — лёгкий
+ROUNDS = {'o': 10, 'e': 15, 'b': 20, 'u': 25, 'm': 10}   # принято (ADR-0025): рядовой — как этаж биома, дальше +5 за ранг; Многоликий — лёгкий
 ROUNDS_TRY = {'o': [5, 8, 10, 12], 'e': [8, 10, 12, 15], 'b': [12, 15, 18, 20], 'u': [20, 25]}
 
 # --- здоровье: «свой» отряд ступени и атаки на убийство ---
@@ -80,7 +80,7 @@ SLOTS_EXTRA = S.SLOTS_EXTRA
 
 # --- рейтинговые очки: §17.5 — около +20 % очков на душу за ступень, §17.6 — ×3 за цикл, разброс не больше ×8 ---
 POINTS_STEP1 = 100            # ступень 1 цикла II — как в прежней сетке §17.5
-POINTS_GROWTH_BP = 11600      # предложение: +16 % очков на душу за ступень — разброс 1-й и 15-й ступени ровно ×8
+POINTS_GROWTH_BP = 11600      # принято (ADR-0025): +16 % очков на душу за ступень — разброс 1-й и 15-й ступени ровно ×8
 GROWTH_TRY_BP = [12000, 11800, 11700, 11600, 11500]
 POINTS_CYCLE_MUL = 3          # §17.6: очки ×3 за цикл
 SPREAD_MAX = 8                # §17.6
@@ -89,12 +89,16 @@ SPREAD_MAX = 8                # §17.6
 MANY_FLOOR_PTS_BP = 10000     # предложение: этаж даёт очки убийства своей ступени
 MANY_FLOOR_HP_BP = 3000       # предложение: главный враг этажа — 30 % одной атаки «своего» отряда (bossHpPct / DESIGN):
                               # попытка одна, здоровье отряда переходит с этажа на этаж — при 100 % отряд Убера падает к 5-му этажу
-LIK_SHARDS = 20               # крафт: Многоликий → Маска недели → Лик недели, 20 осколков героев недели (recipes.js, лутбоксы.md)
 ECHO_SHARDS_X10 = {2: (606, 990), 3: (849, 1485), 4: (1485, 2509), 5: (2328, 3830), 6: (3341, 5565)}   # осколков Эхо в неделю × 10,
                                                                         # обычный / увлечённый — docs/content/лутбоксы.md
 BALANCE_BP = (7500, 13333)    # «ни то ни другое не сильнее очевидно»: биом к крафту — от ×0,75 до ×1,33
-LIK_SHARE_BP = 1350           # предложение для крафта: рецепт с Многоликим платит 13,5 % осколков Эхо недели увлечённого —
-                              # столько 20 осколков Лика в цикле III; в поздних циклах — больше осколков или сильнее босс
+# крафт: Многоликий → Маска недели → Лик недели. Принято (ADR-0025): Лик платит 13,5 % недельных осколков героев недели.
+# Доля — поле heroShardsWeekBp записи lik в recipes.js: источник правды один. Нет поля — запасное число ниже
+RECIPES_JS = 'design/ui/recipes.js'
+LIK_SHARE_BP = 1350           # запасная доля, если в recipes.js её нет
+LIK_BASIS = 1                 # от чьих недельных осколков Эхо: 0 — обычного, 1 — увлечённого. Как в принятом предложении — увлечённого:
+                              # Многоликого берёт тот, кто прошёл Убера, а это увлечённый
+LIK_BASIS_NAME = ['обычного игрока', 'увлечённого игрока']
 
 # --- бюджет душ ---
 ECHO_SHARE_BP = S.ECHO_SPEND_BP   # доля душ дня, что уходит в Эхо — допущение сет-бонусов: 50 %
@@ -102,9 +106,9 @@ WEEK = 7
 TEMPLATE = 3                      # циклы IV–VI — по образцу цикла III: калькулятор экономики ведёт дни циклов II и III
 
 # --- лестница §17.4 в прототипе (design/ui/screens/echo.js, ECH): числа — демонстрация ---
-PICK_W = [30, 28, 26, 24, 22, 20, 12, 11, 10, 9, 5, 4, 3, 2, 2]   # вес ступени в призыве: слабые чаще; 15-й — предложение, как у Убера
-MANY_ONCE = True                      # предложение: Многоликий — раз в неделю, после победы уходит из пула; иначе с артефактом выбора
-                                      # увлечённый берёт его до 6 раз в неделю и биомы дают +40 % очков недели
+PICK_W = [30, 28, 26, 24, 22, 20, 12, 11, 10, 9, 5, 4, 3, 2]   # вес ступеней 1–14 в призыве: слабые чаще
+MANY_SUMMON_BP = 1                    # автор (ADR-0025): Многоликий выпадает при призыве с шансом около 0,01 % — когда лестница
+                                      # открыта до 15-й ступени, после первого Убера; остальные ступени делят остаток по весам. Предела нет
 OFFERS = [1, 3]                       # вариантов призыва: исходно один, с артефактом — три (§17.1)
 LIFE_H = {'o': 72, 'e': 48, 'b': 36, 'u': 24, 'm': 24}   # срок цели, часы
 DAY_H = 24
@@ -332,6 +336,21 @@ def many_points(c, L_h):
     return many_full(c) * many_share(ratio(L_h, c, UBER)) // BP
 
 
+def lik_share():
+    """Доля недельных осколков, которую платит Лик недели, б. п., и откуда она: recipes.js или запасное число."""
+    path = E.ROOT / RECIPES_JS
+    if path.exists():
+        m = re.search(r'id:\s*["\']lik["\'][^}]*?heroShardsWeekBp:\s*(\d+)', path.read_text(encoding='utf-8'))
+        if m:
+            return int(m.group(1)), RECIPES_JS
+    return LIK_SHARE_BP, 'запасное число echo.py'
+
+
+def lik_shards(c):
+    """Осколков героев недели за Лика в цикле c: доля от недельных осколков Эхо игрока LIK_BASIS."""
+    return ECHO_SHARDS_X10[c][LIK_BASIS] * lik_share()[0] // (10 * BP)
+
+
 # --- бюджет и отряд по дням ---
 
 _DAYS = {}
@@ -380,29 +399,39 @@ def step_info(c, s, L_h, budget, base):
     return {'att': a * 10, 'cost': cost, 'pts': points(c, s) * 1000, 'biome': many_points(c, L_h) * 1000 if s == MANY else 0}
 
 
+def summon_weights(pool):
+    """Веса призыва: ступени 1–14 — PICK_W; открыт Многоликий — он выпадает с шансом MANY_SUMMON_BP, остальные делят остаток."""
+    if MANY not in pool:
+        return {j: PICK_W[j - 1] for j in pool}
+    rest = sum(PICK_W[j - 1] for j in pool if j != MANY)
+    out = {j: PICK_W[j - 1] * (BP - MANY_SUMMON_BP) for j in pool if j != MANY}
+    out[MANY] = rest * MANY_SUMMON_BP
+    return out
+
+
 def offer_probs(pool, n):
     """Предложения призыва: n разных ступеней из pool по весам, без повторов. Список (набор, вероятность × 10^9)."""
-    out = []
+    out, W = [], summon_weights(pool)
 
     def rec(chosen, left, p):
         if len(chosen) == n or not left:
             out.append((chosen, p))
             return
-        w = sum(PICK_W[j - 1] for j in left)
+        w = sum(W[j] for j in left)
         for j in left:
-            rec(chosen + [j], [x for x in left if x != j], p * PICK_W[j - 1] // w)
+            rec(chosen + [j], [x for x in left if x != j], p * W[j] // w)
     rec([], list(pool), 10 ** 9)
     return out
 
 
-def per_summon(state, info, n, once=MANY_ONCE):
-    """Ожидания одного призыва: открыты ступени 1..min(state, 15); state 16 — Многоликий уже пал, при once он уходит из пула.
+def per_summon(state, info, n):
+    """Ожидания одного призыва: открыты ступени 1..min(state, 15); 15-я, Многоликий, — после первого Убера, с шансом MANY_SUMMON_BP.
     Лестница растёт после победы над сильнейшим открытым (§17.4). Игрок берёт вершину, если она в предложении и по силам,
     иначе — старшую по силам.
-    Возвращает вероятность подняться (× 10^9) и ожидания на призыв (× 1000): души, очки, атаки, убийства, Уберы, Многоликие,
-    очки биомов Многоликого."""
+    Возвращает вероятность подняться (× 10^9) и ожидания на призыв (× 1000): души, очки, атаки, убийства, Уберы, очки биомов
+    Многоликого; Многоликие — × 10^6: он редок."""
     top = min(state, MANY)
-    pool = range(1, UBER + 1) if (state > MANY and once) else range(1, top + 1)
+    pool = range(1, top + 1)
     up, acc = 0, dict.fromkeys(('cost', 'pts', 'att', 'kills', 'uber', 'many', 'biome'), 0)   # суммы p × величина
     for offer, p in offer_probs(pool, n):
         ok = [j for j in offer if info[j]]
@@ -419,11 +448,11 @@ def per_summon(state, info, n, once=MANY_ONCE):
         if pick == UBER:
             acc['uber'] += p * 1000
         if pick == MANY:
-            acc['many'] += p * 1000
+            acc['many'] += p * 10 ** 6
     return up, {k: v // 10 ** 9 for k, v in acc.items()}
 
 
-def ladder_week(week_days, c, n=1, base=ROUND_SOULS, once=MANY_ONCE):
+def ladder_week(week_days, c, n=1, base=ROUND_SOULS):
     """Неделя Эхо: лестница с нуля (§17.4), души дня — ECHO_SHARE_BP дохода. Ожидания — средние по сидам призыва.
     Возвращает вершину недели (последняя ступень, после которой лестница выросла; 15 — пал Многоликий), и итоги × 1000."""
     state, done = 1, 0
@@ -441,7 +470,7 @@ def ladder_week(week_days, c, n=1, base=ROUND_SOULS, once=MANY_ONCE):
         while B > 0:
             key = (state, L_h, budget)
             if key not in cache:
-                cache[key] = per_summon(state, info, n, once)
+                cache[key] = per_summon(state, info, n)
             up, x = cache[key]
             if state <= MANY and up:
                 need = 10 ** 12 // up - done          # призывов × 1000 до подъёма
@@ -466,10 +495,10 @@ def ladder_week(week_days, c, n=1, base=ROUND_SOULS, once=MANY_ONCE):
 _WEEKS = {}
 
 
-def week_results(prof, c, n=1, base=ROUND_SOULS, once=MANY_ONCE):
-    key = (prof, c, n, base, once)
+def week_results(prof, c, n=1, base=ROUND_SOULS):
+    key = (prof, c, n, base)
     if key not in _WEEKS:
-        _WEEKS[key] = [ladder_week(w, c, n, base, once) for w in weeks(prof, c)]
+        _WEEKS[key] = [ladder_week(w, c, n, base) for w in weeks(prof, c)]
     return _WEEKS[key]
 
 
@@ -505,8 +534,8 @@ def plank_of(pts, p1):
 
 def many_value(prof, c):
     """Биом Многоликого против крафта в последнюю неделю цикла, когда отряд сильнее всего: очки биома за одну попытку,
-    их цена в душах по очкам на душу этой недели, и 20 осколков Лика недели в душах по осколкам Эхо за неделю (лутбоксы.md).
-    Возвращает словарь; души — целые."""
+    их цена в душах по очкам на душу этой недели, и осколки Лика недели в душах по осколкам Эхо игрока за неделю (лутбоксы.md).
+    Возвращает словарь; души — целые, Многоликих с лестницы в неделю — × 10^6."""
     w = weeks(prof, c)[-1]
     _, _, t = week_results(prof, c)[-1]
     souls = sum(echo_souls(s) for s, _ in w)
@@ -516,9 +545,9 @@ def many_value(prof, c):
     week_pts = t['pts'] // 1000
     biome_souls = pts * souls // week_pts
     shards = ECHO_SHARDS_X10[c][[p for p, _ in E.PROFILES].index(prof)]
-    craft_souls = LIK_SHARDS * souls * 10 // shards
+    craft_souls = lik_shards(c) * souls * 10 // shards
     return {'r': r, 'share': many_share(r), 'pts': pts, 'week_pts': week_pts, 'souls': souls, 'biome_souls': biome_souls,
-            'craft_souls': craft_souls, 'k': biome_souls * BP // craft_souls, 'many': t['many']}
+            'craft_souls': craft_souls, 'k': biome_souls * BP // craft_souls, 'many': t['many'], 'biome_week': t['biome'] // 1000}
 
 
 # ======================= ВЫВОД =======================
@@ -550,7 +579,7 @@ def e2_rounds():
     rows = []
     for t in 'oebu':
         for R, avg, alive in SIM_ROUNDS[t]:
-            mark = 'предложение' if R == ROUNDS[t] else 'демо' if R == ROUNDS_DEMO[t] else ''
+            mark = 'принято' if R == ROUNDS[t] else 'демо' if R == ROUNDS_DEMO[t] else ''
             rows.append([TYPE_NAME[t], R, mark, fmt(avg), fmt(avg // R), dec1(alive, 10)])
     return table(['Главный враг', 'Раундов', '', f'Урон по главному за атаку, % базы, отношение {dec1(ON_LEVEL, 100)}',
                   'За раунд', f'Героев живо после атаки, отношение {dec1(ROUNDS_DANGER, 100)}'], rows)
@@ -633,7 +662,7 @@ def e8_ladder(n):
             for prof, _ in E.PROFILES:
                 top, _, t = week_results(prof, c, n)[i]
                 cells += [top_label(top, t), fmt(t['kills'] // 1000), fmt(t['att'] // 1000), fmt(t['pts'] // 1000),
-                          dec1(t['many'], 1000), fmt(t['biome'] // 1000)]
+                          S.num1000(t['many'] // 1000), fmt(t['biome'] // 1000)]
             rows.append(cells)
     head = ['Цикл, неделя']
     for prof, _ in E.PROFILES:
@@ -682,7 +711,7 @@ def e10_spread():
         e14 = points(FIRST, UBER, g) * 10 ** 6 // design_souls(FIRST, UBER)
         e15 = points(FIRST, MANY, g) * 10 ** 6 // design_souls(FIRST, MANY)
         ok = lambda a: 'да' if a <= SPREAD_MAX * e1 else 'нет'
-        rows.append([f'+{pct(g - BP)}' + (' — предложение' if g == POINTS_GROWTH_BP else ''), mult(e14, e1), ok(e14), mult(e15, e1), ok(e15)])
+        rows.append([f'+{pct(g - BP)}' + (' — принято' if g == POINTS_GROWTH_BP else ''), mult(e14, e1), ok(e14), mult(e15, e1), ok(e15)])
     return table(['Рост очков на душу за ступень', 'Разброс: Убер к 1-й', f'Не больше ×{SPREAD_MAX}', 'Многоликий к 1-й',
                   f'Не больше ×{SPREAD_MAX}'], rows)
 
@@ -748,24 +777,29 @@ def verdict(k):
     return 'крафт сильнее' if k < lo else 'биом сильнее' if k > hi else 'не очевидно'
 
 
+def weeks_per(many):
+    """Раз в сколько недель выпадает Многоликий; many — Многоликих в неделю × 10^6."""
+    return f'раз в {fmt((10 ** 6 + many // 2) // many)} нед.' if many else ''
+
+
 def e15_many_value():
-    """Хозяин Многоликого — увлечённый: он доходит до пятнадцатой ступени. Обычный — если Многоликий выпал из сундука."""
+    """Многоликий — только с 15-й ступени (в сундуках его нет, лутбоксы.md), с шансом MANY_SUMMON_BP за призыв после первого
+    Убера. Сравнение — на одну попытку биома в последнюю неделю цикла, когда отряд сильнее всего."""
+    share, src = lik_share()
     rows = []
     for c in CYCLES:
-        v, reg = many_value('увлечённый', c), many_value('обычный', c)
-        n3 = week_results('увлечённый', c, OFFERS[-1])[-1][2]['many']
-        free = week_results('увлечённый', c, OFFERS[-1], once=False)[-1][2]
-        shards = ECHO_SHARDS_X10[c][1] * LIK_SHARE_BP // (10 * BP)
-        k2 = v['k'] * LIK_SHARDS // shards
-        rows.append([ROMAN[c - 1], f"{dec1(v['many'], 1000)} / {dec1(n3, 1000)}; без предела — {dec1(free['many'], 1000)}, "
-                     f"биомы +{pct(free['biome'] * BP // free['pts'])} очков", dec1(v['r'], 100), f"{fmt(v['pts'])} · {pct(v['share'])}",
-                     f"{fmt(v['biome_souls'])} · {pct(v['biome_souls'] * BP // v['souls'])}", fmt(v['craft_souls']),
-                     f"{mult(v['k'], BP)} — {verdict(v['k'])}", f"{shards} → {mult(k2, BP)} — {verdict(k2)}",
-                     f"{pct(reg['share'])} · {pct(reg['biome_souls'] * BP // reg['souls'])}"])
-    return table(['Цикл', 'Многоликих у увлечённого в последнюю неделю: вариантов 1 / 3, раз в неделю', 'Отношение отряда к Уберу',
-                  'Биом: очков · доля полного', 'Биом в душах · доля душ Эхо недели', f'Крафт: {LIK_SHARDS} осколков Лика в душах',
-                  'Биом к крафту сейчас', f'Предложение: осколков крафта ({pct(LIK_SHARE_BP)} недели) → биом к крафту',
-                  'Обычный, Многоликий из сундука: доля биома · в душах недели'], rows)
+        for prof, _ in E.PROFILES:
+            v = many_value(prof, c)
+            n3 = week_results(prof, c, OFFERS[-1])[-1][2]['many']
+            got = f"{S.num1000(v['many'] // 1000)} / {S.num1000(n3 // 1000)}"
+            if v['many']:
+                got += f" — {weeks_per(v['many'])}"
+            rows.append([ROMAN[c - 1], prof, got, pct(v['biome_week'] * BP // v['week_pts']), dec1(v['r'], 100),
+                         f"{fmt(v['pts'])} · {pct(v['share'])}", f"{fmt(v['biome_souls'])} · {pct(v['biome_souls'] * BP // v['souls'])}",
+                         f"{lik_shards(c)} → {fmt(v['craft_souls'])}", f"{mult(v['k'], BP)} — {verdict(v['k'])}"])
+    return table(['Цикл', 'Игрок', f'Многоликих с лестницы в неделю: вариантов {OFFERS[0]} / {OFFERS[-1]}',
+                  'Биомы в очках недели, в среднем', 'Отношение отряда к Уберу', 'Биом за попытку: очков · доля полного',
+                  'Биом в душах · доля душ Эхо недели', f'Лик: осколков ({pct(share)} недели, {src}) → в душах', 'Биом к Лику'], rows)
 
 
 def tables():
@@ -790,7 +824,7 @@ def tables():
              ('Э12. Риск недобивания: души на убийство против душ Эхо за срок цели', e12_life()),
              ('Э13. Чувствительность к цене раунда: вершина лестницы по неделям цикла II', e13_sens()),
              ('Э14. Биом Многоликого: одна попытка, 14 этажей', e14_many_run()),
-             ('Э15. Биом Многоликого против атак за души и против крафта: последняя неделя цикла', e15_many_value())]
+             ('Э15. Биом Многоликого против атак за души и против Лика недели: последняя неделя цикла', e15_many_value())]
 
 
 def main():
@@ -827,7 +861,11 @@ JS_HEAD = """/* Энериум · правила боя в Эхо (ADR-0025, §1
        design — атак на убийство у «своего» отряда: отношение уровней onLevel;
        lifeH — срок цели, часы (как в прототипе экрана, демо).
    - summonSouls — цена призыва, 1 душа на всех циклах (§17.1, §36.4); Многоликий — пятнадцатая ступень, его зовёт тот же призыв.
-   - pickW — вес ступени в призыве (веса прототипа экрана; 15-й — предложение). Лестница растёт после победы над верхней (§17.4).
+   - pickW — веса ступеней 1–14 в призыве (веса прототипа экрана): слабые чаще. Лестница растёт после победы над верхней (§17.4).
+   - manySummonBp — шанс, что призыв даст Многоликого, б. п. (ADR-0025: около 0,01 %). Он в пуле, когда лестница открыта до 15-й
+       ступени, то есть после первой победы над Убером; остальные ступени делят остаток по pickW. Предела за неделю нет.
+   - likShards — выплата Лика недели по циклам I–VI (индекс — цикл − 1), осколков героев недели: доля heroShardsWeekBp записи lik
+       из recipes.js от недельных осколков Эхо LIK_BASIS_TEXT (лутбоксы.md). В цикле I Лика нет — null.
    - onLevel — отношение (12 + уровень отряда) / (12 + foeLvl) × 100, при котором ступень «по силам»: на нём мерили здоровье.
    - statsFrom — откуда карта врага Эхо берёт характеристики st и hpPct: в echo-foes.js их нет. По классу — образец Мастерской
        (EB.FOES): o — у рядовых, x — у элит, боссов, Убер-боссов и Многоликого. Так шёл замер; иначе здоровье перемерить echo.py --sim.
@@ -843,13 +881,16 @@ JS_HEAD = """/* Энериум · правила боя в Эхо (ADR-0025, §1
        у ступеней 1–14 ещё этаж биома Многоликого: manyHpPct — здоровье главного врага этажа (попытка одна), manyPoints — очки за взятый этаж.
    - many — биом Многоликого (ADR-0025): ресурс с пятнадцатой ступени активирует его на своей неделе или уходит в крафт.
        floors — этажи: ступени 1–14 недели по порядку, их составы, уровни и раунды; attempts — попыток; souls — душ на атаки;
-       этаж взят, когда пал главный враг; здоровье и павшие переходят дальше, как в биоме (ADR-0007).
+       этаж взят, когда пал главный враг; здоровье и павшие переходят дальше, как в биоме (ADR-0007): лечения между этажами нет;
+       осады нет — этаж не взят, и попытка кончилась.
    Замер — отрядом прототипа (economy.SIM_JS) на врагах недели: SIM_SRC_TEXT. */
 """
 
 
 def rules_obj():
-    out = {'bp': BP, 'onLevel': ON_LEVEL, 'ladder': list(LADDER), 'summonSouls': SUMMON_SOULS, 'pickW': PICK_W, 'statsFrom': TEMPLATES,
+    out = {'bp': BP, 'onLevel': ON_LEVEL, 'ladder': list(LADDER), 'summonSouls': SUMMON_SOULS, 'pickW': PICK_W,
+           'manySummonBp': MANY_SUMMON_BP, 'likShards': [lik_shards(c) if c in CYCLES else None for c in range(1, len(ROMAN) + 1)],
+           'statsFrom': TEMPLATES,
            'types': {t: {'name': TYPE_NAME[t], 'foes': FOES_N[t], 'rounds': ROUNDS[t], 'rank': RANK[t], 'design': DESIGN[t],
                          'lifeH': LIFE_H[t]} for t in TYPES},
            'many': {'floors': UBER, 'attempts': 1, 'souls': 0},
@@ -870,9 +911,10 @@ def rules_obj():
 def write_js():
     o = rules_obj()
     J = lambda v: json.dumps(v, ensure_ascii=False, separators=(',', ':'))
-    lines = [JS_HEAD.replace('SIM_SRC_TEXT', SIM_SRC or 'нет замера') + 'window.EN_ECHO_RULES = {',
-             f'  bp: {o["bp"]}, onLevel: {o["onLevel"]}, summonSouls: {o["summonSouls"]},',
-             f'  ladder: {J(o["ladder"])},', f'  pickW: {J(o["pickW"])},', f'  many: {J(o["many"])},',
+    head = JS_HEAD.replace('SIM_SRC_TEXT', SIM_SRC or 'нет замера').replace('LIK_BASIS_TEXT', LIK_BASIS_NAME[LIK_BASIS])
+    lines = [head + 'window.EN_ECHO_RULES = {',
+             f'  bp: {o["bp"]}, onLevel: {o["onLevel"]}, summonSouls: {o["summonSouls"]}, manySummonBp: {o["manySummonBp"]},',
+             f'  ladder: {J(o["ladder"])},', f'  pickW: {J(o["pickW"])},', f'  likShards: {J(o["likShards"])},', f'  many: {J(o["many"])},',
              f'  statsFrom: {J(o["statsFrom"])},', '  types: {']
     lines += [f'    {t}: {J(v)},' for t, v in o['types'].items()]
     lines += ['  },', '  cycles: {']
