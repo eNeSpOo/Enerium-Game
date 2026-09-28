@@ -159,12 +159,9 @@ module.exports = function tables({ items, recipes, byId, CYC, ROMAN, places, dro
   block('craft drops');
   L.push('| Крафтовый биом | Цикл | Этажей | Ресурс за этаж | Находки | Дух / золото / души / осколки сборных героев | Рунный ключ |', '|---|---|---|---|---|---|---|');
   for (const b of drops.craftBiomes) L.push(`| ${b.name} | ${ROMAN[b.cyc]} | ${b.floors} | ${pct(b.resPerFloorBp)} | ${b.finds} + ${pct(b.secondFindBp)} | ${fmt(b.spirit)} / ${fmt(b.gold)} / ${b.souls} / ${b.heroShards} | ${pct(b.runeKeyBp)} × ${b.runeKeys} |`);
-  L.push('', '| Крафтовый босс | Цикл | Раса | Ремесло | Ресурсы: трофей / ключи ремесла | Валюта: дух / золото / Энериум — заглушка | Рунный ключ | Лутбокс: ларец рабочих | Иммунитет к контролю |', '|---|---|---|---|---|---|---|---|---|');
+  L.push('', '| Крафтовый босс | Цикл | Раса | Ремесло | Ресурсы: трофей / ключи ремесла | Валюта: дух / золото / Энериум — заглушка | Рунный ключ | Сундук крафтового босса | Иммунитет к контролю |', '|---|---|---|---|---|---|---|---|---|');
   for (const s of drops.craftBosses) L.push(`| ${s.name} | ${ROMAN[s.cyc]} | ${s.race} | ${s.spec ? C.SPECS[s.spec].n.toLowerCase() : '—'} | ${s.trophy ? nm(s.trophy) + ' ×' + s.trophies : '20 осколков героев недели'} / ${s.specKeys} | ${fmt(s.spirit)} / ${fmt(s.gold)} / ${s.enerium} | ${s.runeKeyBp ? pct(s.runeKeyBp) + ' × ' + s.runeKeys : '—'} | ${s.workerBoxRarity ? 'редкость ' + s.workerBoxRarity : '—'} | ${pct(s.immunityBp)} |`);
 
-  block('lootbox categories');
-  L.push('| Режим | Лутбокс по §23 |', '|---|---|');
-  for (const [mode, cat] of drops.lootboxes.categories) L.push(`| ${mode} | ${cat} |`);
   block('pools');
   L.push('| Цикл | Ключи | Уникальные | Ресурсы руин | Находки | Трофеи | Награды мастерской |', '|---|---|---|---|---|---|---|');
   for (const p of drops.lootboxes.pools) L.push(`| ${cyLabel(CYC[p.cyc - 1])} | ${p.key.length} | ${p.unique.length} | ${p.craftres.length} | ${p.find.length} | ${p.trophy.length} | ${p.products.map(nm).join(', ') || '—'} |`);

@@ -171,7 +171,7 @@ function buildDrops(CYC, places, items, recipes, byId) {
   const M = C.MARKET;
   const market = { basic: cyc6.map(c => M.basic * c), key: cyc6.map(c => M.key * c), craftres: cyc6.map(c => M.craftres * c), unique: cyc6.map(c => M.unique * c),
     find: cyc6.map(c => M.find * c), trophy: cyc6.map(c => M.trophy * c), commissionPct: M.commissionPct, soulsTradable: false };
-  /* для лутбоксов (следующая задача): общий пул базовых и наборы по циклам и ярусам. Скрытых рецептов лутбокс не выдаёт (ADR-0023, п. 7). */
+  /* для сборщика сундуков (tools/content-gen/lootboxes): общий пул базовых и наборы по циклам и ярусам. Что делается по рецепту, сундук не выдаёт (ADR-0023, п. 7). */
   const pools = cyc6.map(c => {
     const its = items.filter(i => i.cyc === c && !i.pool), ids = t => its.filter(i => i.tier === t).map(i => i.id);
     return { cyc: c, key: ids('key'), unique: ids('unique'), craftres: ids('craftres'), find: ids('find'), trophy: ids('trophy'), products: ids('product') };
@@ -181,8 +181,8 @@ function buildDrops(CYC, places, items, recipes, byId) {
     rituals: { workers: C.RITUALS.workers,
       heroes: { minutes: H.minutes, byCycle: cyc6.map(c => ({ cyc: c, gold: H.minutes.map(m => H.perHour.gold * m / 60 * c), spirit: H.minutes.map(m => H.perHour.spirit * m / 60 * c), souls: H.minutes.map(m => H.perHour.souls * m / 60 * c) })) } },
     contracts: { taskPoints: CT.taskPoints, certifyMul: CT.certifyMul, byCycle: cyc6.map(c => ({ cyc: c, day: contract('day', c), week: contract('week', c) })) },
-    echo: C.ECHO, clanBoss: C.CLAN, event: C.EVENT,
-    lootboxes: { categories: C.BOXES.categories, mixed: C.BOXES.mixed, basicPool: items.filter(i => i.pool).map(i => i.id), pools },
+    echo: C.ECHO, payouts: 'design/ui/lootboxes.js',
+    lootboxes: { basicPool: items.filter(i => i.pool).map(i => i.id), pools },
     activeSlots: { shared: true, byCycle: C.CRAFT.activeCap },
     craftBiomes, craftBosses, market,
   };
