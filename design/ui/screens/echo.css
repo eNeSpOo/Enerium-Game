@@ -1,1 +1,152 @@
-/* screens/echo.css — стили экрана screens/echo.js */
+/* screens/echo.css — «Неделя → Эхо» на древних цивилизациях, активации из запасов и руины в «Спуске» (screens/echo.js).
+   Стиль «Свет снизу»: экран собран из классов index.html (.ec, .eslot, .etarget, .ladder14, .rs-ph, .mail, .well), свои — с префиксом ech-. */
+
+/* шапка недели: цивилизация, очки, отряд недели */
+.ech-head{display:flex;align-items:center;gap:12px;padding:5px 8px 5px 12px;flex:none;min-width:0}
+.ech-civ{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 auto}
+.ech-civ b{font:600 19px/1 var(--f-d);color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ech-civ small{font-size:12px;line-height:1.2;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ech-kpi{display:flex;align-items:center;gap:14px;flex:none}
+.ech-kpi .stat b{font-size:20px}
+.ech-rank{appearance:none;border:0;background:none;padding:0;text-align:left;color:inherit}
+.ech-rank:hover b{color:var(--gold)}
+.ech-week{position:relative;display:flex;align-items:center;gap:8px;flex:none;padding:3px 8px 3px 4px;border-radius:10px;border:1px solid rgba(221,188,122,.3);background:#0e1114;color:var(--parch);text-align:left}
+.ech-week:hover{border-color:rgba(221,188,122,.55)}
+.ech-week .tx{display:flex;flex-direction:column;gap:2px}
+.ech-week b{font:600 15px/1.05 var(--f-d);color:var(--gold)}
+.ech-week small{font-size:11.5px;color:var(--parch-3);white-space:nowrap}
+.ech-week>.i{color:var(--gold-2)}
+.ech-week .bdg{position:absolute;top:-6px;right:-6px}
+.ech-faces{display:flex;gap:3px}
+.ech-face{position:relative;width:21px;height:26px;border-radius:6px;overflow:hidden;box-shadow:inset 0 -2px 0 var(--rc),0 0 0 1px #242a30}
+.ech-face .rs-ph{position:absolute;inset:0}
+.ech-face .rs-ph b{font-size:10px}
+.ech-face img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ech-face.lock{opacity:.35}
+.ech-face i{position:absolute;left:2px;right:2px;bottom:3px;height:3px;border-radius:2px;background:rgba(0,0,0,.75);overflow:hidden}
+.ech-face i::before{content:"";position:absolute;left:0;top:0;bottom:0;width:calc(var(--v)*1%);background:var(--spirit)}
+
+/* облик врага до арта: свет стихии снизу, рамка — по рангу; неизвестный — знак вопроса */
+.ech-ph{position:relative;display:grid;place-items:center;aspect-ratio:4/5;border-radius:10px;overflow:hidden;border:1px solid #262b31;background:radial-gradient(120% 70% at 50% 112%,color-mix(in srgb,var(--c,#8a9098) 55%,transparent),transparent 62%),linear-gradient(180deg,#101418,#0a0c0e)}
+.ech-ph[data-el="Воздух"]{--c:var(--air)}.ech-ph[data-el="Земля"]{--c:var(--earth)}.ech-ph[data-el="Огонь"]{--c:var(--fire)}.ech-ph[data-el="Вода"]{--c:var(--water)}.ech-ph[data-el="Время"]{--c:var(--time)}
+.ech-ph b{font:600 32px/1 var(--f-d);color:color-mix(in srgb,var(--c,#aaa) 55%,var(--parch-2));text-shadow:0 2px 10px #000}
+.ech-ph.unk{border-color:rgba(72,229,212,.45)}
+.ech-ph.unk b{color:var(--spirit);text-shadow:0 0 10px var(--spirit)}
+.ech-ph[data-g="e"]{box-shadow:inset 0 0 0 1px var(--gold-3)}
+.ech-ph[data-g="b"],.ech-ph[data-g="craft"]{box-shadow:inset 0 0 0 1px var(--gold-2),inset 0 -14px 20px -12px var(--gold-2)}
+.ech-ph[data-g="u"]{box-shadow:inset 0 0 0 2px var(--gold),inset 0 -18px 24px -12px var(--gold)}
+.ech-ph[data-g="m"]{box-shadow:inset 0 0 0 2px var(--amber),inset 0 -18px 24px -12px var(--amber)}
+.ech-ph.sm b{font-size:15px}
+.ech-ph.lg b{font-size:42px}
+.ech-ph.empty{border-style:dashed;background:#0b0d10;color:var(--parch-3)}
+.ech-ph.empty .i{width:28px;height:28px}
+
+/* слоты и цель: высоты сверены с рабочей областью 932×430 и 844×390 — кнопка атаки не уходит под край */
+.ech .eslot{padding:5px 8px}
+.eslot .ph .ech-ph{height:100%;border-radius:6px}
+.eslot .ph>.i{width:22px;height:22px;color:var(--spirit);align-self:center}
+.eslot.empty .i{vertical-align:-3px}
+.eslot.ech-pend{border-color:rgba(72,229,212,.35)}
+.eslot.ech-pend small{color:var(--spirit-2)}
+.ech .etarget{grid-template-columns:minmax(0,.5fr) minmax(0,1.5fr)}
+.ech .etarget .stage{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:10px 6px 10px 10px}
+.ech .etarget .stage .ech-ph{width:100%;max-width:150px}
+.ech-cap{font-size:11.5px;line-height:1.25;color:var(--parch-3);text-align:center;max-width:150px}
+.ech .etarget .info{gap:6px;padding:10px 12px 10px 6px}
+.ech-chips{flex-wrap:wrap;gap:5px}
+.ech-name{font-size:24px;line-height:1}
+.ech-hp{justify-content:space-between;font-size:12px}
+.ech-stats{gap:16px}
+.ech-stats .stat b{font-size:19px}
+.ech .e-foot{gap:6px}
+.ech .e-foot .btn.big{min-height:44px}
+.ech-inv{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ech-sq{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ech-why{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ech-p{font-size:13px;line-height:1.35}
+.ech-wide{gap:8px}
+.ech-wide .tabs button{height:24px;padding:0 10px}
+.ech-s{font-size:11.5px}
+
+/* выбор из вариантов призыва */
+.ech .etarget.ech-pick{display:flex;flex-direction:column;gap:8px;padding:10px 12px}
+.ech-pick-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;flex:none}
+.ech-pick-h h2{font-size:22px;color:var(--gold);line-height:1}
+.ech-offers{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:6px;overflow:auto;scrollbar-width:thin;scrollbar-color:#2c3238 transparent}
+.ech-offer{display:grid;grid-template-columns:36px minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:5px 8px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;flex:none}
+.ech-offer .ech-ph{width:36px}
+.ech-offer b{font:600 16px/1.05 var(--f-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ech-om{display:flex;flex-direction:column;align-items:flex-end;gap:1px;font-size:11.5px;color:var(--parch-3);white-space:nowrap}
+
+/* лестница: 14 ступеней недели и пятнадцатая */
+.ech-ladder{padding:5px 12px;gap:10px;flex:none}
+.ech-ladder .l14 i.kn::after{content:"";position:absolute;left:50%;top:-6px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--spirit);box-shadow:0 0 5px var(--spirit)}
+.ech-ladder .l14 i.on{outline:1px solid var(--spirit);outline-offset:1px}
+.ech-ladder .l14 i.m{height:24px;background:#2a2217;box-shadow:inset 0 0 0 1px rgba(230,168,75,.35)}
+.ech-ladder .l14 i.m.kn,.ech-ladder .l14 i.m.on{background:var(--amber)}
+.ech-ladder .l14 .sep{flex:none;width:1px;height:22px;background:var(--iron-2);margin:0 2px}
+.ech-ladder .link{white-space:nowrap}
+.ech-lt{font-size:12px;white-space:nowrap}
+
+/* листы: проверки активации, правила, итог, бестиарий, неделя */
+.ech-itrow{gap:14px;align-items:center}
+.ech-itn{font-size:22px;line-height:1.05}
+.well.ech-it .i{width:46%;height:46%;color:color-mix(in srgb,var(--rc,#aaa) 70%,var(--parch))}
+.well.ech-it .gl{font:600 18px/1 var(--f-d);color:var(--gold)}
+.ech-checks,.ech-rules{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.ech-checks li{display:grid;grid-template-columns:18px 1fr;gap:6px;align-items:start;font-size:13px;color:var(--parch-2)}
+.ech-checks li .i{width:15px;height:15px;margin-top:2px}
+.ech-checks li.ok .i{color:var(--spirit)}
+.ech-checks li.no{color:var(--amber)}
+.ech-rules li{position:relative;padding-left:14px;font-size:13px;line-height:1.35;color:var(--parch-2)}
+.ech-rules li::before{content:"";position:absolute;left:2px;top:7px;width:5px;height:5px;transform:rotate(45deg);background:var(--gold-3)}
+.ech-loot{gap:8px;font-size:13.5px;flex-wrap:wrap}
+.ech-got{display:grid;grid-template-columns:96px minmax(0,1fr);gap:14px;align-items:start}
+.ech-got .ech-ph{width:96px}
+.newfoe .ech-ph{height:84px;flex:none}
+.ech-bgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.ech-fig{appearance:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px;border-radius:8px;border:1px solid transparent;background:#0c0f12;color:var(--parch-3)}
+.ech-fig:hover{border-color:var(--iron-2)}
+.ech-fig .ech-ph{width:100%}
+.ech-fig small{font:700 10.5px/1 var(--f-u)}
+.ech-brow{width:100%;text-align:left;color:var(--parch)}
+.ech-foehero{display:flex;justify-content:center;padding:8px;border-radius:12px;border:1px solid var(--iron);background:radial-gradient(60% 60% at 50% 100%,rgba(72,229,212,.1),transparent 70%),#0a0c0e;flex:none}
+.ech-foehero .ech-ph{height:170px}
+.ech-civn{font-size:26px;line-height:1;color:var(--gold)}
+.ech-plank.got{opacity:.65}
+.ech-need{font-size:12px;white-space:nowrap}
+.ech-demo{flex-wrap:wrap;gap:6px}
+.ech-demo .rs-cyc button{padding:0 9px}
+
+/* «Спуск»: активные руины в шахте и карточка руины */
+.ech-rs .ech-slots{display:block;font-size:11px;line-height:1.25;color:var(--parch-3);padding:3px 7px}
+.bnode.ruin::before{background:var(--amber);filter:drop-shadow(0 0 5px var(--amber))}
+.ech-ruin .banner .quote{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ech-cta{position:absolute;right:12px;bottom:12px;z-index:2;display:flex;flex-direction:column;align-items:flex-end;gap:6px;max-width:250px;text-align:right}
+.ech-rbody{display:flex;flex-direction:column;gap:8px;padding:10px 12px;min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:#2c3238 transparent}
+.ech-where{font-size:13.5px;line-height:1.35;flex:none}
+.ech-rgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-content:start}
+.ech-rgrid .col{gap:5px}
+.ech-rgrid small{font-size:12px;line-height:1.3}
+.ech-irow{display:flex;align-items:center;gap:8px;font-size:13px;line-height:1.2}
+.ech-bn{font-size:16px;line-height:1.1}
+.ech-pay{gap:10px;flex-wrap:wrap}
+
+/* низкий экран (844×390): цель без подписи под кнопкой, слоты и варианты ниже */
+@container main (max-height: 360px){
+  .ech-head{padding:4px 8px 4px 10px}
+  .ech-civ b{font-size:18px}
+  .ech-kpi .stat b{font-size:18px}
+  .ech-name{font-size:22px}
+  .ech-stats .stat b{font-size:17px}
+  .ech .etarget .info{gap:5px;padding:8px 10px 8px 4px}
+  .ech .e-foot{gap:5px}
+  .ech .e-foot .btn.big{min-height:40px}
+  .ech .eslot .ph{height:38px}
+  .ech-why,.ech-om3,.ech-pick-h .ech-s{display:none}
+  .ech-p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .ech-wide .tabs button{height:22px}
+  .ech-ladder{padding:4px 12px}
+  .ech-pick-h h2{font-size:19px}
+  .ech-offer{padding:3px 8px}
+}

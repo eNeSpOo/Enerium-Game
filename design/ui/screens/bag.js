@@ -243,7 +243,8 @@ const zpNewChip = e => zpIsNewShown(e) ? '<span class="chip spirit">новое</
 function zpCardItem(e) {
   const it = e.it, T = RX.tiers[it.tier] || { n: '' }, sp = zpSpec(it.spec), act = zpTabOf(it) === 'act';
   const uses = zpKnown(it.id), src = it.team ? [] : zpSrc(it);
-  const opens = !it.team && it.opens ? `<p class="muted zp-p">${it.tier === 'act' ? 'Открывает крафтовый биом' : 'Призывает в Эхо'} «${trEsc(it.opens)}».${it.opensLore ? ' ' + trEsc(it.opensLore) : ''}</p>` : '';
+  /* §12.5: до активации карточка не называет будущий биом или врага — имя видно только в режиме «для команды» */
+  const opens = it.opens ? `<p class="muted zp-p">${it.tier === 'act' ? 'Призывает крафтовый биом в «Биомах», если есть свободный слот. Какой — станет ясно после активации.' : 'Призывает врага в Эхо за предмет и 1 душу. Кто это — станет ясно после первой победы.'}${KH.team ? ` <span class="faint">Для команды: «${trEsc(it.opens)}».</span>` : ''}</p>` : '';
   const fn = act && typeof ACTIVATE[it.tier] === 'function';
   const acts = !act ? `<button class="btn" data-a="toCraft" data-v="${it.id}" title="Положить на стол мастерской">${ic('arrow')}На стол мастера</button>`
     : fn ? `<button class="btn go" data-a="zpact" data-v="${it.id}">Активировать</button>`
