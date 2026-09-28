@@ -1,0 +1,270 @@
+{
+  "name": "Значки атрибутов интерфейса — вся категория по одобренной пробе (jobs/ui-attributes-probe.json; стиль пробы автор одобрил 28.09.2026): характеристики, производные, редкости, классы, доблесть. Стиль — одобренный стиль меток карт (art/style/style.md, «Метки карт»), формат — строка «Иконка интерфейса»: 1:1, прозрачный фон, эмблема — около 80 % кадра с полем по краям, читается с 24 px. Боевая мощь, физическая и магическая защита одобрены в пробе и здесь не рисуются",
+  "plan": {
+    "Одобрено в пробе, не перерисовываем": {
+      "Боевая мощь (БМ)": "art/generated/attributes/attr-power__nb2.png",
+      "Физическая защита": "art/generated/attributes/attr-def-phys__nb2.png",
+      "Магическая защита": "art/generated/attributes/attr-def-mag__nb2.png"
+    },
+    "Характеристики, GDD §3.2": {
+      "Сила": "латная перчатка, сжатая в кулак",
+      "Интеллект": "древний том, из-под страниц бирюзовый свет",
+      "Ловкость": "перо из старого золота",
+      "Выносливость": "закрытый шлем из кованого железа",
+      "Скорость": "молния из старого золота"
+    },
+    "Производные, GDD §3.2": {
+      "Здоровье": "сердце из красного кристалла карста, токен --hp",
+      "Физический урон": "меч из кованой стали — пара с магическим уроном, как щиты защит",
+      "Магический урон": "тот же меч, клинок из бирюзового кристалла",
+      "Уклонение": "крылатый сапог",
+      "Шанс крита": "мишень со стрелой в центре",
+      "Урон крита": "вспышка критического удара, неровные лучи"
+    },
+    "Редкости, GDD §3.1; цвета — токены --r1…--r7 прототипа": {
+      "обычная": "#A4A8AD — тусклый треснувший камень, без света",
+      "редкая": "#66C275 — мутный, в трещинах, слабый свет",
+      "уникальная": "#5A94F7 — грани почти чистые, мягкий свет",
+      "эпическая": "#A986EE — чистые грани, ровный свет; перерисована в форме серии, проба заменена",
+      "древняя": "#EB9D40 — без трещин, сильный свет",
+      "первородная": "#E85A4E — безупречный, яркий свет",
+      "вневременная": "#F3E6B8 — чистый кристалл, полный света"
+    },
+    "Классы — на плитке доблести; схема автора из style.md, «Метки карт»; классы — GDD §3.1, прототип": {
+      "физ ДД силы": "боевой меч",
+      "физ ДД ловкости": "лук",
+      "маг ДД": "посох с кристаллом",
+      "танк": "щит",
+      "лекарь (Хилер в прототипе)": "чаша живой воды",
+      "контроль (дебаффер, ADR-0022)": "оковы",
+      "фармер — фармящий класс героя": "кирка с мешком"
+    },
+    "Доблесть": "шестигранная плитка из базальта с золотой кромкой, на ней сплошная четырёхлучевая звезда — как stars() в прототипе; style.md: «Звезда доблести — сплошная»"
+  },
+  "notes": [
+    "Плитка: модель держит ширину шестигранника 68–77 % кадра, высота выходит 79–90 %. Танк и доблесть — 88 и 90 %, перегенерация у них истрачена: поле — при выгрузке или новая попытка по решению автора",
+    "Звезда доблести дважды вышла розой ветров: четыре длинных луча и четыре коротких диагональных, хотя промт просил ровно четыре",
+    "Фон: модель дважды заменила чёрный белым — доблесть v1 и шлем выносливости v1. После фразы «never white or grey» в рамке фон чёрный",
+    "Том интеллекта: часть тёмной обложки ушла в прозрачность ключом black — просвет около 22×22 px из 1024, на тёмном интерфейсе не виден",
+    "Запись «древней» редкости в манифест упала: файл держал другой процесс (OSError 22). Запись восстановлена по файлам, цена — оценка по среднему партии"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.",
+  "negative": "No text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+  "cutout_rule": "The background is solid pure black ({hex}), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance. The whole icon with its glow fits inside the central 80% of the canvas in both width and height: an empty black margin of at least a tenth of the canvas stays on every side — top, bottom, left and right.",
+  "categories": {
+    "attributes": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Format: game UI icon of a hero attribute, square, no border around the picture. One bold emblem, centered, about 80% of the canvas, seen straight on. The emblem floats on pitch black: everything around it is solid pure black to the very edges of the canvas, never white or grey, no frame. It must stay readable at a tiny size, 24 px: one simple, strong, instantly recognizable silhouette built from a few large shapes with clear contrast between them. All the painterly detail lives inside the silhouette — worn metal, facets, light — never as small separate pieces around it: no sparks, embers, shards or particles floating around the emblem. A crisp bright rim light runs along the whole outline and cleanly separates it from the black. No runes, glyphs or symbols drawn on it. The attribute icons are one set: the same painting style and the same size in the frame; only the emblem, its material and the color of its light tell them apart."
+    },
+    "attr-rarity": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black-glow",
+      "refs": [],
+      "frame": "Format: game UI icon of a rarity, square, no border around the picture. One carst crystal — the magic crystal of this world — upright, centered, floating in the dark, about 80% of the canvas high. All seven rarity icons show the same crystal shape: a broad, stubby, double-pointed hexagonal crystal — a short thick body with a pointed top and a pointed bottom, as wide as two thirds of its height — so that even at 24 px it reads as a solid spot of color, not a thin sliver. A bare crystal: no setting, no metal caps or bands, no stand, no base, no floating shards. The seven rarities form a ladder from a dull cracked stone to a flawless crystal full of light: the higher the rarity, the cleaner the facets and the brighter the light inside. All the detail lives inside the silhouette — facets, cracks, light. A crisp rim light runs along the whole outline and cleanly separates the crystal from the black. No runes, glyphs or symbols."
+    },
+    "attr-tiles": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Format: game UI icon, square, no border around the picture. The base is a thick hexagonal tile of dark basalt, pointy-topped — one corner at the top, one at the bottom, straight vertical sides — seen straight on, with a thick bevelled rim of old gold and faint hairline cracks in the basalt. The tile is compact and centered: its width is only about two thirds of the canvas width, and from its top corner to its bottom corner it spans about three quarters of the canvas height, with wide empty black space above it, below it and at its sides. The tile floats on pitch black: everything outside the tile is solid pure black, never white or grey. Every icon of this set stands on the very same tile — the same shape, size, basalt and gold rim; only the emblem on its face changes. The emblem rests on the face of the tile, large and bold, filling most of the face, and glows with its own light. It must stay readable at a tiny size, 24 px: one simple, strong, instantly recognizable silhouette; all the painterly detail lives inside it — worn metal, wood, light — never as small separate pieces: no sparks, embers or particles floating around. A crisp bright rim light runs along the gold rim and cleanly separates the tile from the black. No runes, glyphs or symbols drawn on the tile."
+    }
+  },
+  "jobs": [
+    {
+      "id": "attr-str",
+      "category": "attributes",
+      "title": "Атрибут: сила",
+      "source": "GDD §3.2 — характеристика: физ. урон, физ. защита",
+      "subject": "Strength — raw physical might. The emblem: a clenched fist in a heavy armored gauntlet, upright, seen straight on, knuckles toward the viewer. Plates of dark forged iron with old-gold knuckle guards and an old-gold cuff; warm golden light (#DDBC7A) glows between the plates and catches the knuckles from below. Heavy, unstoppable."
+    },
+    {
+      "id": "attr-int",
+      "category": "attributes",
+      "title": "Атрибут: интеллект",
+      "source": "GDD §3.2 — характеристика: маг. урон, маг. защита",
+      "subject": "Intellect — the power of the mind and of magic. The emblem: an ancient closed tome standing upright, seen almost straight on and turned slightly so the thick block of its pages shows on one side. A cover of dark leather with heavy old-gold corners and an old-gold clasp; cold turquoise light (#48E5D4) seeps from between the pages along their edges. No symbols on the cover. Deep, wise, secret."
+    },
+    {
+      "id": "attr-agi",
+      "category": "attributes",
+      "title": "Атрибут: ловкость",
+      "source": "GDD §3.2 — характеристика: уклонение, шанс крита",
+      "subject": "Agility — deftness and lightness of movement. The emblem: a single long feather standing upright with a gentle curve, its quill at the bottom. The feather is forged of old gold, fine and light, its vane cut into a few large smooth barbs; a bright warm light runs along its edge. Light, swift, precise."
+    },
+    {
+      "id": "attr-end",
+      "category": "attributes",
+      "title": "Атрибут: выносливость",
+      "source": "GDD §3.2 — характеристика: здоровье, агро",
+      "subject": "Endurance — the stamina to take blow after blow. The emblem: a closed great helm seen straight on, perfectly symmetric: a heavy helmet of dark forged iron with a narrow dark visor slit, a band of old gold along the brow and down the middle, dented by countless blows; warm golden light catches its edges from below. The slit stays dark: no eyes inside. Unyielding."
+    },
+    {
+      "id": "attr-spd",
+      "category": "attributes",
+      "title": "Атрибут: скорость",
+      "source": "GDD §3.2 — характеристика: скорость атаки",
+      "cutout": "black-glow",
+      "subject": "Speed — how fast the hero strikes. The emblem: one bold lightning bolt running diagonally from the upper right down to the lower left: a thick zigzag with three sharp bends, pointed at both ends, forged of old gold, its core blazing with warm white-gold light. Swift, sharp, electric."
+    },
+    {
+      "id": "attr-hp",
+      "category": "attributes",
+      "title": "Атрибут: здоровье",
+      "source": "GDD §3.2 — здоровье: 100 × (1 + Выносливость / 100); цвет — токен --hp прототипа",
+      "cutout": "black-glow",
+      "subject": "Health — the life a hero can lose before falling. The emblem: a heart — the simple symbolic heart shape, not anatomical — carved from deep red carst crystal (#CF4D3D) and framed by a thin rim of old gold; warm red light pulses from deep inside it, and a soft red aura hugs the outline. Alive, precious."
+    },
+    {
+      "id": "attr-patk",
+      "category": "attributes",
+      "title": "Атрибут: физический урон",
+      "source": "GDD §3.2 — физ. урон: 10 × (1 + Сила / 100); пара с магическим уроном — одна форма, разный материал",
+      "subject": "Physical Damage — the force of weapon blows. The emblem: a single heavy broadsword, diagonal, its hilt at the lower left and its point at the upper right. A broad blade of dark forged steel with bright honed edges; a heavy crossguard and a round pommel of old gold; warm golden light (#DDBC7A) runs along the cutting edges. Sharp, brutal."
+    },
+    {
+      "id": "attr-matk",
+      "category": "attributes",
+      "title": "Атрибут: магический урон",
+      "source": "GDD §3.2 — маг. урон: 10 × (1 + Интеллект / 100); пара с физическим уроном — одна форма, разный материал",
+      "cutout": "black-glow",
+      "subject": "Magical Damage — the force of spells. The emblem: a single heavy broadsword, diagonal, its hilt at the lower left and its point at the upper right. Its broad blade is one piece of translucent turquoise carst crystal (#48E5D4) glowing from within, brightest along the edges and at the point; a heavy crossguard and a round pommel of old gold. A soft turquoise aura hugs the blade. Sharp, arcane."
+    },
+    {
+      "id": "attr-eva",
+      "category": "attributes",
+      "title": "Атрибут: уклонение",
+      "source": "GDD §3.2 — уклонение: Ловкость / 400, кап 25 %",
+      "subject": "Evasion — slipping away from a blow. The emblem: a winged boot seen from the side, its toe pointing right: a tall boot of dark leather with plates of blackened iron, and one swept wing of old gold rising from its heel. Warm golden light catches the wing and the edges. Light, elusive, quick."
+    },
+    {
+      "id": "attr-crit",
+      "category": "attributes",
+      "title": "Атрибут: шанс крита",
+      "source": "GDD §3.2 — шанс крита: Ловкость / 400, кап 25 %",
+      "subject": "Critical Chance — the chance that a blow finds the weak spot. The emblem: a round archery target seen straight on — dark wood bound with rings of blackened iron and old gold — with a single arrow struck dead in its center, the shaft angled toward the upper right with the fletching at its end. A sharp flare of golden light blazes where the arrowhead bites. Precise, deadly."
+    },
+    {
+      "id": "attr-critdmg",
+      "category": "attributes",
+      "title": "Атрибут: урон крита",
+      "source": "GDD §3.2 — крит. урон без капа, старт ×1,5",
+      "cutout": "black-glow",
+      "subject": "Critical Damage — how much harder a critical blow strikes. The emblem: a violent starburst, the flash of a critical hit: a white-hot core with sharp uneven rays of different lengths, gold near the core and red-orange (#DC6A52) at the tips, their edges crisp like shards of hot metal. Irregular, not a symbol, one connected shape. The burst is compact: even its longest rays stop well short of the canvas edges, inside the central 80%, leaving a wide black margin all around. Explosive."
+    },
+    {
+      "id": "attr-rar-common",
+      "category": "attr-rarity",
+      "title": "Редкость: обычная (1 из 7)",
+      "source": "GDD §3.1 — семь редкостей; цвет — токен --r1; схема автора: от тусклого треснувшего камня до чистого кристалла, полного света",
+      "cutout": "black",
+      "subject": "Rarity: Common, the first of seven — the lowest step. The crystal is dull grey (#A4A8AD), almost a stone: rough matte facets, chipped edges and deep cracks, no light inside — only a cold glint along its edges."
+    },
+    {
+      "id": "attr-rar-rare",
+      "category": "attr-rarity",
+      "title": "Редкость: редкая (2 из 7)",
+      "source": "GDD §3.1 — семь редкостей; цвет — токен --r2; схема автора: от тусклого треснувшего камня до чистого кристалла, полного света",
+      "cutout": "black",
+      "subject": "Rarity: Rare, the second of seven. The crystal is green (#66C275) and still rough: cloudy facets and a few cracks; a faint green light glimmers deep inside."
+    },
+    {
+      "id": "attr-rar-unique",
+      "category": "attr-rarity",
+      "title": "Редкость: уникальная (3 из 7)",
+      "source": "GDD §3.1 — семь редкостей; цвет — токен --r3; схема автора: от тусклого треснувшего камня до чистого кристалла, полного света",
+      "subject": "Rarity: Unique, the third of seven. The crystal is blue (#5A94F7): its facets mostly clean, with a couple of fine cracks; a soft blue light glows inside, and a faint blue aura hugs it."
+    },
+    {
+      "id": "attr-rar-epic",
+      "category": "attr-rarity",
+      "title": "Редкость: эпическая (4 из 7)",
+      "source": "GDD §3.1 — семь редкостей; цвет — токен --r4; схема автора: от тусклого треснувшего камня до чистого кристалла, полного света; форма серии вместо узкого кристалла пробы",
+      "subject": "Rarity: Epic, the fourth of seven — the middle step. The crystal is violet (#A986EE): clean facets with one faint healed crack; a steady violet light glows inside — bright, but not yet blazing; a soft violet aura hugs it."
+    },
+    {
+      "id": "attr-rar-ancient",
+      "category": "attr-rarity",
+      "title": "Редкость: древняя (5 из 7)",
+      "source": "GDD §3.1 — семь редкостей; цвет — токен --r5; схема автора: от тусклого треснувшего камня до чистого кристалла, полного света",
+      "subject": "Rarity: Ancient, the fifth of seven. The crystal is amber-orange (#EB9D40): flawless clean facets, no cracks; a strong warm light fills it, and a soft amber aura hugs it."
+    },
+    {
+      "id": "attr-rar-primordial",
+      "category": "attr-rarity",
+      "title": "Редкость: первородная (6 из 7)",
+      "source": "GDD §3.1 — семь редкостей; цвет — токен --r6; схема автора: от тусклого треснувшего камня до чистого кристалла, полного света",
+      "subject": "Rarity: Primordial, the sixth of seven. The crystal is deep red (#E85A4E): flawless, its facets sharp and clear; an intense red light burns inside, and a bright red aura hugs it."
+    },
+    {
+      "id": "attr-rar-timeless",
+      "category": "attr-rarity",
+      "title": "Редкость: вневременная (7 из 7)",
+      "source": "GDD §3.1 — семь редкостей; цвет — токен --r7; схема автора: от тусклого треснувшего камня до чистого кристалла, полного света",
+      "subject": "Rarity: Timeless, the seventh of seven — the highest step. The crystal is pale gold-white (#F3E6B8): flawless and full of light, blazing from within — the brightest of all; a radiant pale-gold aura hugs it."
+    },
+    {
+      "id": "attr-cls-str",
+      "category": "attr-tiles",
+      "title": "Класс: физ ДД силы — меч",
+      "source": "GDD §3.1 — классы; схема автора (style.md, «Метки карт»): боевой меч; плитка — строка «Иконка интерфейса»",
+      "subject": "Class: Strength fighter — a warrior who crushes foes in close combat. On the tile: a heavy battle sword laid diagonally across the face, its point to the upper right: a broad blade of dark forged steel with bright edges, an old-gold crossguard and pommel; warm golden light runs along the edge."
+    },
+    {
+      "id": "attr-cls-agi",
+      "category": "attr-tiles",
+      "title": "Класс: физ ДД ловкости — лук",
+      "source": "GDD §3.1 — классы; схема автора (style.md, «Метки карт»): лук; плитка — строка «Иконка интерфейса»",
+      "subject": "Class: Agility fighter — a rogue and archer who strikes from afar. On the tile: a recurve bow laid diagonally across the face, of dark wood bound with old gold at the grip and the tips, its string drawn taut with one arrow nocked; warm golden light catches the curve of the limbs."
+    },
+    {
+      "id": "attr-cls-mage",
+      "category": "attr-tiles",
+      "title": "Класс: маг ДД — посох с кристаллом",
+      "source": "GDD §3.1 — классы; схема автора (style.md, «Метки карт»): посох с кристаллом; плитка — строка «Иконка интерфейса»",
+      "subject": "Class: Mage — a caster of destructive spells. On the tile: a staff laid diagonally across the face — a shaft of dark wood bound with old gold, crowned at the top with a carst crystal that blazes with cold turquoise light (#48E5D4)."
+    },
+    {
+      "id": "attr-cls-tank",
+      "category": "attr-tiles",
+      "title": "Класс: танк — щит",
+      "source": "GDD §3.1 — классы; схема автора (style.md, «Метки карт»): щит; плитка — строка «Иконка интерфейса»",
+      "subject": "Class: Tank — the one who takes the blows for the whole squad. On the tile: a heavy battered heater shield of dark oak planks bound with blackened iron, with a big round boss of old gold in its center, seen straight on; warm golden light catches the boss and the iron bands."
+    },
+    {
+      "id": "attr-cls-healer",
+      "category": "attr-tiles",
+      "title": "Класс: лекарь — чаша живой воды",
+      "source": "GDD §3.1 — классы; схема автора (style.md, «Метки карт»): чаша живой воды; плитка — строка «Иконка интерфейса»",
+      "subject": "Class: Healer — the one who mends wounds with living water. On the tile: a chalice of old gold, seen straight on, brimming with living water that glows soft turquoise (#48E5D4); its light rises gently above the rim and lights the gold from within."
+    },
+    {
+      "id": "attr-cls-control",
+      "category": "attr-tiles",
+      "title": "Класс: контроль (дебаффер) — оковы",
+      "source": "GDD §3.1 — классы; ADR-0022 — контроль и дебаффер один класс; схема автора (style.md, «Метки карт»): оковы; плитка — строка «Иконка интерфейса»",
+      "subject": "Class: Control — the one who binds, weakens and silences the enemy. On the tile: a pair of heavy iron shackles joined by a short chain of a few thick links; a dull rust-red light (#DC6A52) smoulders inside the iron of the cuffs."
+    },
+    {
+      "id": "attr-cls-farmer",
+      "category": "attr-tiles",
+      "title": "Класс: фармер — кирка с мешком",
+      "source": "GDD §3.1 — фармящий класс есть только у героя игрока; схема автора (style.md, «Метки карт»): кирка с мешком; плитка — строка «Иконка интерфейса»",
+      "subject": "Class: Gatherer — the hero who mines and gathers resources. On the tile: a miner's pickaxe of dark iron on an old wooden haft, laid diagonally in front of a bulging leather sack tied at the neck; warm golden light glints on the edge of the pick."
+    },
+    {
+      "id": "attr-valor",
+      "category": "attr-tiles",
+      "title": "Доблесть",
+      "source": "GDD §3.3 — доблесть; прототип: stars() — сплошная четырёхлучевая золотая звезда; style.md: плитка из базальта с золотой кромкой, «Звезда доблести — сплошная»",
+      "subject": "Valor — the rank a hero earns by breaking past their limits. On the tile: one solid star of old gold in raised relief with exactly four long sharp points — up, down, left and right — and nothing between them: no smaller diagonal points, no rays. Filled and solid, not outlined, not a pentagram, no occult sign. The star glows warm gold (#DDBC7A) from within, and the hairline cracks in the basalt leak the same golden light."
+    }
+  ]
+}
