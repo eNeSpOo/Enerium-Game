@@ -56,11 +56,11 @@ KEYS_PER_UNIT = 1         # черновик «Дроп»: за каждые 10 
 # вариант: имя, шанс ключа с элиты и с босса (за срабатывание — цикл биома, §11), вход у стража пределов и доблести,
 # рост цены с циклом РБ: 'c' — × цикл, 'tri' — × цикл × (цикл + 1) / 2
 KEY_VARIANTS = [
-    ('сейчас, §11', 500, 1000, 1, 2, 'c'),
-    ('А: только цена', 500, 1000, 3, 5, 'tri'),
-    ('Б: цена и ключ без элит', 0, 1000, 1, 3, 'c'),
+    ('прежний §11', 500, 1000, 1, 2, 'c'),
+    ('А: только цена, справка', 500, 1000, 3, 5, 'tri'),
+    ('Б: принят, ключ без элит', 0, 1000, 1, 3, 'c'),
 ]
-KEY_PICK = 2              # предложение — вариант Б
+KEY_PICK = 2              # вариант Б — принят (ADR-0023, п. 16), в §11
 T12_CASES = [(1, 1, 2), (7, 2, 3), (14, 2, 3), (25, 3, 4)]   # Т12 черновика экономики: день, отрядов у свободного и у плательщика
 PAYER_WHATIF = {'v5_for_A': 155, 'v2_for_B': 10}   # проверки «что если»: N сета V в варианте А, N сета II в варианте Б
 
@@ -83,15 +83,16 @@ CHEST_ITEMS, CHEST_KEYS_PER_ITEM = 4, 2  # черновик «Дроп»: лар
 CHEST_BASE = 3            # «Стёртые Ступени»: сундук — 3 базовых ресурса биома, где взят N-й этаж
 CARGO_BASE = 36           # «Спящие Караваны»: груз — добыча ритуала рабочих редкости 4 (черновик «Дроп»): 36 базовых
 
-# --- герои за золото: ADR-0022 — 70 % героев, цена растёт от героя к герою (предложение) ---
-GOLD_FIRST = 10000        # ADR-0014: первый герой за золото — 10 000
-GOLD_STEP_BP = 300        # предложение: каждый следующий герой цикла дороже первого ещё на 3 %
-# сценарии: имя и рост цены первого героя цикла — 'c': × c, как в ADR-0014; 'tri': × c(c + 1) / 2.
-# Героев за золото по циклам скрипт считает сам по `состав-героев.csv`
-GOLD_SCENARIOS = [
-    ('предложение: база × c', 'c'),
-    ('для сравнения: база × c(c + 1) / 2', 'tri'),
+# --- герои за золото: ADR-0022 — 70 % героев, цена растёт от героя к герою; ADR-0023, «Второй круг», п. 1 — +30 % линейно ---
+GOLD_FIRST = 10000        # ADR-0014: первый герой за золото цикла c стоит 10 000 × c
+# варианты цены k-го героя, купленного в цикле: имя, рост, шаг — 'lin': × (1 + шаг × (k − 1)), 'pow': × (1 + шаг)^(k − 1).
+# Первый — принятый, остальные — справка
+GOLD_VARIANTS = [
+    ('+30 % линейно — принято', 'lin', 3000),
+    ('+3 % линейно — справка, прежнее предложение', 'lin', 300),
+    ('×1,3 сложным процентом — справка, отклонено', 'pow', 3000),
 ]
+GOLD_BUDGET_BP = 8000     # допущение: на героев идёт 80 % золота, остальное — артефакты, лавка, рынок, заверение
 GOLD_TUTOR = 5            # пачка обучения — пятеро за золото в цикле I (ADR-0018)
 
 # --- сеты: № таблицы автора, цикл, имя, счётчик, N автора, N предложения по ступеням I / II / III, что даёт ---
@@ -118,8 +119,8 @@ ORDERS = [
 ORDER_NAMES = {'Орден Багровой Арены': 'Песка Сеймура', 'Орден Равного Суда': 'Выслушавших'}
 # братства черновика, которые могут стать орденами (состав героев): их суммы — для справки, бонусов у них нет
 EX_BROTHERHOODS = ['Хранители Песочных Часов', 'Ключники Безвременья', 'Прозревшие', 'Собиратели Осколков']
-KEEP_DONAT_IN_ORDERS = False   # донатный герой остаётся в ордене черновика? Состав: «из ордена ушёл Ялен» — нет
 # донатные сеты: цикл, пятеро, счётчик, N автора, N предложения; личный максимум героя — номер цикла − 1 (ADR-0022)
+DONAT_NAMES = {2: 'Менялы', 3: 'Под песком', 4: 'Снявшие Обод', 5: 'Оставшиеся', 6: 'Отмеченные'}   # ADR-0023, п. 9
 DONAT = [
     (2, 'пять фармеров', 'boss', (100, 50, 25), (15, 10, 5), 'рунный ключ, штук — цикл биома'),
     (3, 'фармер, два героя контроля, танк, лекарь', 'rf', (300, 150, 100), (300, 150, 100), 'души элиты биома или её дух'),
@@ -195,15 +196,18 @@ def tiers_of(total):
     return next((t for lo, t in TIER_BY_SUM if total >= lo), 0)
 
 
-def roster(keep_donat=KEEP_DONAT_IN_ORDERS):
-    """Ордены по составу героев: герой черновика сохраняет орден; донатные герои — в своих сетах, если не keep_donat."""
+def roster():
+    """Сеты по составу героев: герой черновика сохраняет орден черновика, донатный — только свой сет.
+    Столбец «также в сете» добавляет героя ещё в один сет (ADR-0023, п. 11): это данные, а не код."""
     old = {r['id']: r for r in csv.DictReader((HEROES_DIR / 'герои.csv').open(encoding='utf-8-sig'))}
     out = {}
     for r in csv.DictReader((HEROES_DIR / 'состав-героев.csv').open(encoding='utf-8-sig')):
         d, src = r['из черновика'], r['источник']
-        if d in old and (keep_donat or not src.startswith('донат')):
-            kind = src.replace(',', ' ').replace(':', ' ').split()[0]
-            out.setdefault(old[d]['орден'], []).append((r['имя'], kind, int(r['максимум доблести']), r['цикл']))
+        hero = (r['имя'], src.replace(',', ' ').replace(':', ' ').split()[0], int(r['максимум доблести']), r['цикл'])
+        if d in old and not src.startswith('донат'):
+            out.setdefault(old[d]['орден'], []).append(hero)
+        if r.get('также в сете'):
+            out.setdefault(r['также в сете'], []).append(hero)
     return out
 
 
@@ -300,13 +304,45 @@ def split(kills):
 
 # --- золото ---
 
-def gold_price(c, k, mode='tri'):
-    base = GOLD_FIRST * (c * (c + 1) // 2 if mode == 'tri' else c)
-    return base * (BP + (k - 1) * GOLD_STEP_BP) // BP
+def gold_price(c, k, variant):
+    """Цена k-го героя за золото, купленного в цикле c: первый — GOLD_FIRST × c, дальше шаг варианта."""
+    _, mode, step = variant
+    base = GOLD_FIRST * c
+    if mode == 'lin':
+        return base * (BP + (k - 1) * step) // BP
+    return base * (BP + step) ** (k - 1) // BP ** (k - 1)
 
 
-def gold_sum(c, lo, hi, mode='tri'):
-    return sum(gold_price(c, k, mode) for k in range(lo, hi + 1))
+def gold_income(days):
+    """Доход золотом по дням: [0] — цикл I, уровни аккаунта и биом 2; дальше — дни с начала цикла II, биомы и стражи."""
+    out = {}
+    for p, _ in E.PROFILES:
+        inc = [E.account_gold() + tutor_b2()['gold'] // 100]
+        for _, c, x in days[p]:
+            k = kills_x100(KEY_PICK, keys_x100(KEY_PICK, x, c), c)
+            inc.append(x['gold'] // 100 + k * E.RATES_NEW['guard'][0] * E.mult_new(c) // (BP * 100))
+        out[p] = inc
+    return out
+
+
+def gold_buy(variant, income, heroes):
+    """Покупки по дням: на героев идёт GOLD_BUDGET_BP золота, каждый раз — самый дешёвый следующий герой открытых циклов.
+    Возвращает по дням: куплено героев по циклам, потрачено, получено."""
+    bought, wallet, spent, got, log = {1: 0, 2: 0, 3: 0}, 0, 0, 0, []
+    for d, g in enumerate(income):
+        got += g
+        wallet += g * GOLD_BUDGET_BP // BP
+        open_c = (1,) if d == 0 else (1, 2) if d <= CYCLE_LEN[2] else (1, 2, 3)
+        while True:
+            cand = [(gold_price(c, bought[c] + 1, variant), c) for c in open_c if bought[c] < heroes[c]]
+            if not cand or min(cand)[0] > wallet:
+                break
+            price, c = min(cand)
+            wallet -= price
+            spent += price
+            bought[c] += 1
+        log.append((dict(bought), spent, got))
+    return log
 
 
 # ======================= ВЫВОД =======================
@@ -448,8 +484,8 @@ def tutor_table(tut):
 
 def layouts_table():
     """Составы орденов по составу героев: максимумы, сумма и ступени по ADR-0022; кто не за золото — источник, цикл.
-    Ниже — если донатный герой остаётся в ордене черновика, и братства черновика, если станут орденами."""
-    ros, ros_d = roster(), roster(True)
+    Ниже — братства черновика, если станут орденами."""
+    ros = roster()
     rows = []
 
     def row(label, hs):
@@ -459,8 +495,6 @@ def layouts_table():
                 '; '.join(f'{h[0]} — {h[1]}, {h[3]}' for h in hs if h[2] > 1) or '—']
     for no, cyc, name, *_ in ORDERS:
         rows.append(row(short(name), ros[name]))
-        if len(ros_d[name]) != len(ros[name]):
-            rows.append(row(short(name) + ', если донатный герой остаётся в ордене', ros_d[name]))
     for name in EX_BROTHERHOODS:
         rows.append(row(name + ' — братство черновика, если станет орденом', ros[name]))
     return table(['Сет', 'Героев', 'Максимумы', 'Ступеней', 'Не за золото: источник, цикл'], rows)
@@ -484,7 +518,7 @@ def tiers_table(kills):
     for c, *_ in DONAT:
         total = donat_sum(c)
         need = (*TIER_HEROES, total)[:tiers_of(total)]
-        rows.append([f'донатный {ROMAN[c - 1]}', c, total, tiers_of(total), ' / '.join(map(str, need)),
+        rows.append([f'донатный {ROMAN[c - 1]} «{DONAT_NAMES[c]}»', c, total, tiers_of(total), ' / '.join(map(str, need)),
                      days(need, 0, full), days(need, 0, low)])
     return table(['Сет', 'Цикл', 'Сумма максимумов', 'Ступеней', 'Рун доблести на ступени',
                   f'Дней: полный кап, {num1000(split(RB_CAP * 100)[1] * 10)} победы у стража доблести',
@@ -503,7 +537,8 @@ def donat_rows(c2, c3, days, pick):
                 fr = [rate3(d['boss'], ns) for d in dd]
                 d = dd[0]
                 share = tri(lambda n: pct(d['boss'] * cc * BP // (n * keys_x100(v, d, cc))), ns) + ' ключей'
-                rows.append([f'{ROMAN[c - 1]}, в цикле {ROMAN[cc - 1]}', who, what, f'{donat_sum(c)} → {cut}', tri(str, ns)]
+                rows.append([f'{ROMAN[c - 1]} «{DONAT_NAMES[c]}», в цикле {ROMAN[cc - 1]}', who, what, f'{donat_sum(c)} → {cut}',
+                             tri(str, ns)]
                             + fr + [share])
             continue
         if cnt == 'rf':
@@ -523,7 +558,7 @@ def donat_rows(c2, c3, days, pick):
                 limit, _ = split(k3[0])
                 share = tri(lambda n: pct(k3[0] * BP // (n * limit * E.RUNES_PER_WIN * E.RUNE_WEIGHT_BP[-1] // BP)), ns) + \
                     ' рун V предела, если брать V'
-        rows.append([ROMAN[c - 1], who, what, f'{donat_sum(c)} → {cut}', tri(str, ns)] + fr + [share])
+        rows.append([f'{ROMAN[c - 1]} «{DONAT_NAMES[c]}»', who, what, f'{donat_sum(c)} → {cut}', tri(str, ns)] + fr + [share])
     return rows
 
 
@@ -628,57 +663,34 @@ def runes_pace_table(days):
 
 
 def gold_table(days):
-    """Цена героев за золото против дохода: обучение и уровни аккаунта, биомы и стражи по дням калькулятора."""
-    inc = {1: {p: E.account_gold() + tutor_b2()['gold'] // 100 for p, _ in E.PROFILES}}
-    for c in (2, 3):
-        inc[c] = {}
+    """Сколько героев за золото выкуплено к концу циклов II и III и какую долю дохода это забрало (ADR-0023, п. 18).
+    Правило автора держится, если к концу цикла не выкуплены все герои за золото этого цикла."""
+    heroes, inc = gold_heroes(), gold_income(days)
+    end2, end3 = CYCLE_LEN[2], CYCLE_LEN[2] + CYCLE_LEN[3]
+    rows = []
+    for variant in GOLD_VARIANTS:
         for p, _ in E.PROFILES:
-            g = 0
-            for _, cc, x in days[p]:
-                if cc == c:
-                    k = kills_x100(KEY_PICK, keys_x100(KEY_PICK, x, cc), cc)
-                    g += x['gold'] // 100 + k * E.RATES_NEW['guard'][0] * E.mult_new(cc) // (BP * 100)
-            inc[c][p] = g
+            log = gold_buy(variant, inc[p], heroes)
+            (b2, s2, g2), (b3, s3, g3) = log[end2], log[end3]
+            full = [f'{ROMAN[c - 1]} — {"да" if b[c] == heroes[c] else "нет"}' for c, b in ((2, b2), (3, b3))]
+            rows.append([variant[0] if p == E.PROFILES[0][0] else '', p,
+                         f'{b2[1]} / {b2[2]}', pct(s2 * BP // g2), f'{b3[1]} / {b3[2]} / {b3[3]}', pct(s3 * BP // g3),
+                         '; '.join(full)])
+    return table(['Вариант', 'Игрок', 'Конец цикла II: героев I / II', 'Доля дохода', 'Конец цикла III: героев I / II / III',
+                  'Доля дохода', 'Все герои цикла выкуплены к его концу'], rows)
+
+
+def gold_prices_table():
+    """Цены героев за золото по вариантам: первый, 10-й, 20-й, последний и все герои цикла."""
     heroes = gold_heroes()
     rows = []
-    for name, mode in GOLD_SCENARIOS:
-        cum_i = cum_c = 0
-        for c in range(1, 7):
+    for variant in GOLD_VARIANTS:
+        for c in (1, 2, 3):
             n = heroes[c]
-            total = gold_sum(c, 1, n, mode)
-            cells = [name if c == 1 else '', ROMAN[c - 1], n, fmt(gold_price(c, 1, mode)), fmt(gold_price(c, n, mode)), fmt(total)]
-            if c in inc:
-                cum_i += inc[c]['обычный']
-                cum_c += total
-                cells += [fmt(inc[c]['обычный']), pct(total * BP // inc[c]['обычный']), pct(cum_c * BP // cum_i),
-                          fmt(inc[c]['увлечённый'])]
-            else:
-                cells += ['—'] * 4
-            rows.append(cells)
-    return table(['Сценарий', 'Цикл', 'Героев за золото', 'Первый', 'Последний', 'Все', 'Доход обычного за цикл',
-                  'Все герои — доля дохода', 'Нарастающим итогом', 'Доход увлечённого'], rows)
-
-
-def gold_notes(days):
-    """Когда выкуплены все герои за золото циклов I–II и сколько героев цикла II у обычного к концу цикла II."""
-    heroes, mode = gold_heroes(), GOLD_SCENARIOS[0][1]
-    cost = gold_sum(1, 1, heroes[1], mode) + gold_sum(2, 1, heroes[2], mode)
-    tutor = gold_sum(1, 1, GOLD_TUTOR, mode)
-    out = [f'- Пачка обучения из {GOLD_TUTOR} героев — {fmt(tutor)}; все герои за золото циклов I–II — {fmt(cost)}.']
-    for p, _ in E.PROFILES:
-        cum, hit, end2 = E.account_gold() + tutor_b2()['gold'] // 100, None, 0
-        for d, c, x in days[p]:
-            k = kills_x100(KEY_PICK, keys_x100(KEY_PICK, x, c), c)
-            cum += x['gold'] // 100 + k * E.RATES_NEW['guard'][0] * E.mult_new(c) // (BP * 100)
-            if hit is None and cum >= cost:
-                hit = d
-            if d == CYCLE_LEN[2]:
-                end2 = cum
-        left = end2 - gold_sum(1, 1, heroes[1], mode)
-        k2 = next((k for k in range(heroes[2] + 1) if gold_sum(2, 1, k + 1, mode) > left), heroes[2])
-        out.append(f'- {p.capitalize()}: все герои циклов I–II выкуплены на {hit}-й день от начала цикла II; '
-                   f'к концу цикла II — все {heroes[1]} цикла I и {k2} из {heroes[2]} цикла II.')
-    return '\n'.join(out)
+            rows.append([variant[0] if c == 1 else '', ROMAN[c - 1], n] +
+                        [fmt(gold_price(c, k, variant)) if k <= n else '—' for k in (1, 10, 20, n)] +
+                        [fmt(sum(gold_price(c, k, variant) for k in range(1, n + 1)))])
+    return table(['Вариант', 'Цикл', 'Героев', 'Первый', '10-й', '20-й', 'Последний', 'Все'], rows)
 
 
 def main():
@@ -699,7 +711,8 @@ def main():
              ('С8а. Ключи против капа: средний день, покрытие по дням, победы у РБ', keys_table(days)),
              ('С8б. Темп рун обычного игрока при ключах-горлышке', runes_pace_table(days)),
              ('С9. Правило ×1,7: донатные сеты на высшей ступени с учётом входа', payer_table(days)),
-             ('С10. Герои за золото: цена против дохода', gold_table(days) + '\n\n' + gold_notes(days))]
+             ('С10. Герои за золото: сколько выкуплено к концу циклов II и III', gold_table(days)),
+             ('С10а. Герои за золото: цены по вариантам', gold_prices_table())]
     for title, body in parts:
         print(f'\n### {title}\n\n{body}')
 

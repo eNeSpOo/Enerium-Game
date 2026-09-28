@@ -38,9 +38,9 @@ ROMAN = ['I', 'II', 'III', 'IV', 'V']
 HEROES_VALOR = {1: {1: 1, 2: 7, 3: 11, 4: 3, 5: 3}, 2: {1: 2, 2: 4, 3: 14, 4: 2, 5: 3},
                 3: {1: 1, 2: 2, 3: 9, 4: 2, 5: 1}, 4: {1: 2, 2: 1, 3: 9, 4: 1, 5: 2},
                 5: {1: 3, 2: 3, 3: 14, 4: 1, 5: 4}, 6: {3: 5}}          # цикл -> {максимум: героев}
-GOLD_HEROES = {1: {1: 5, 2: 7, 3: 4}, 2: {1: 4, 2: 7, 3: 3}, 3: {1: 2, 2: 4, 3: 1},
-               4: {1: 2, 2: 2, 3: 2, 4: 1}, 5: {1: 1, 2: 3, 3: 1, 4: 7}}  # цикл -> {редкость: золотых героев}
-RARITY = ['', 'обычная', 'редкая', 'уникальная', 'эпическая']
+# --- герои за золото: docs/content/герои/состав-героев.csv (при запуске сверяется) ---
+GOLD_HEROES = {1: 17, 2: 40, 3: 40, 4: 40, 5: 47, 6: 40}   # цикл -> героев за золото
+CYCLE_NAMES = ['I', 'II', 'III', 'IV', 'V', 'VI']
 
 # --- колода Мастерской форм, design/ui/battle.js FLOORS: 104 рядовых, 12 элит (ADR-0011: на 15-м и 20-м по две, на 25-м и 30-м по три), босс ---
 DECK = {'rf': 104, 'elite': 12, 'boss': 1, 'floors': 35}
@@ -138,8 +138,9 @@ PAYER_CASES = [('Цикл II, 1-й день: второй отряд ещё не
                ('Цикл II, 14-й день: 2 отряда из 3', 14, 2, 3), ('Цикл III, 25-й день: 3 отряда из 4', 25, 3, 4),
                ('Если бы слоты давали герои: 2 против 4, 14-й день', 14, 2, 4)]
 
-# --- цена героя за золото в цикле I, × номер цикла героя (предложение) ---
-HERO_PRICE = {1: 10000, 2: 20000, 3: 40000, 4: 80000}
+# --- цена героя за золото: ADR-0023, «Второй круг», п. 1 — k-й герой цикла c стоит 10 000 × c × (1 + 30 % × (k − 1)) ---
+HERO_FIRST = 10000                          # первый герой за золото цикла I (ADR-0014)
+HERO_STEP_BP = 3000                         # каждый следующий герой цикла, по счёту покупки, дороже первого ещё на 30 %
 
 # --- темп цикла I — решение автора 27.09.2026 (ADR-0018): цикл I — обучение, цикл II — испытание на дни ---
 PACE_I = [('Биом 1 цикла I', 1), ('Биом 2 цикла I', 3)]   # часов игры на биом: первый — за час, второй — ещё около трёх
@@ -461,16 +462,35 @@ def t9_rates():
                   'Круг героя цикла, дух', 'Круг в полных забегах своего цикла: ×3 без цены цикла / предложение'], rows)
 
 
-def hero_total(cycle):
-    return sum(HERO_PRICE[r] * cycle * n for r, n in GOLD_HEROES[cycle].items())
+def hero_price(cycle, k):
+    """Цена k-го героя за золото, купленного в цикле cycle (ADR-0023)."""
+    return HERO_FIRST * cycle * (BP + (k - 1) * HERO_STEP_BP) // BP
+
+
+def hero_total(cycle, n=None):
+    """Первые n героев за золото цикла, по умолчанию все."""
+    return sum(hero_price(cycle, k) for k in range(1, (GOLD_HEROES[cycle] if n is None else n) + 1))
+
+
+def heroes_buy(budget, cycles, bought, limit=None):
+    """Покупает на budget самых дешёвых следующих героев этих циклов, не больше limit штук; bought — уже куплено.
+    Возвращает купленное по циклам и потраченное."""
+    bought, spent = dict(bought), 0
+    while limit is None or sum(bought.values()) < limit:
+        cand = [(hero_price(c, bought.get(c, 0) + 1), c) for c in cycles if bought.get(c, 0) < GOLD_HEROES[c]]
+        if not cand or spent + min(cand)[0] > budget:
+            break
+        price, c = min(cand)
+        spent += price
+        bought[c] = bought.get(c, 0) + 1
+    return bought, spent
 
 
 def t10_prices():
-    cycles = sorted(GOLD_HEROES)
-    rows = [[RARITY[r]] + [fmt(HERO_PRICE[r] * c) for c in cycles] for r in sorted(HERO_PRICE)]
-    rows.append(['Все золотые герои цикла'] + [fmt(hero_total(c)) for c in cycles])
-    rows.append(['Их число'] + [sum(GOLD_HEROES[c].values()) for c in cycles])
-    return table(['Редкость', 'Цикл I'] + ROMAN[1:len(cycles)], rows)
+    marks = [1, 5, 10, 20]
+    rows = [[CYCLE_NAMES[c - 1], n] + [fmt(hero_price(c, k)) if k <= n else '—' for k in marks] + [fmt(hero_price(c, n)),
+            fmt(hero_total(c))] for c, n in sorted(GOLD_HEROES.items())]
+    return table(['Цикл', 'Героев за золото'] + [f'{k}-й' for k in marks] + ['Последний', 'Все'], rows)
 
 
 def t11_plan():
@@ -478,8 +498,8 @@ def t11_plan():
     reg, gold, lv = timeline(RATES_NEW, mult_new, PROFILES[0][1])
     hc, _, _ = timeline(RATES_NEW, mult_new, PROFILES[1][1])
     acc = account_gold()
-    first5 = HERO_PRICE[1] * SQUAD           # первый отряд — обычные
-    next5 = HERO_PRICE[2] * SQUAD            # второй — редкие
+    first5 = hero_total(1, SQUAD)            # первый отряд — пачка обучения, первые пятеро цикла I
+    _, next5 = heroes_buy(10 ** 12, (1, 2), {1: SQUAD}, 2 * SQUAD)   # второй — пятеро самых дешёвых следующих, циклы I и II
     vd, vw = valor_day()
     rows = []
     for i, L in enumerate(LIMITS):
@@ -488,7 +508,7 @@ def t11_plan():
         lock = 'дух' if (i == 0 or reg.get(L, 0) > rd[i - 1]) else 'руны ' + ROMAN[i - 1]
         rows.append([f'Отряд пяти на {L}-м', TARGETS[L], reg.get(L), hc.get(L), lock])
     rows.append(['Второй отряд: ещё 5 героев', TARGET_SQUAD2, day_reaches(gold, first5 + next5 - acc), '—', 'золото'])
-    rows.append([f'{sum(GOLD_HEROES[1].values())} золотых героев цикла I', TARGET_GOLD_ALL,
+    rows.append([f'{GOLD_HEROES[1]} героев за золото цикла I', TARGET_GOLD_ALL,
                  day_reaches(gold, hero_total(1) - acc), '—', 'золото'])
     rows.append(['Доблесть со стража доблести', f'цикл II, до {CYCLE_DAYS}-го дня', vd, vd, f'руна доблести: {vw} побед'])
     return table(['Веха', 'Цель', 'День: обычный', 'День: увлечённый', 'Замок у обычного'], rows)
@@ -515,21 +535,24 @@ def t12_payer():
 
 
 def t13_gold():
-    """Золото до конца цикла II: обучение цикла I и CYCLE_DAYS дней цикла II. Стоки — золотые герои циклов I и II и артефакты
-    цикла I: в обучении на них времени нет. Цен артефактов цикла II в расчёте нет."""
+    """Золото до конца цикла II: обучение цикла I и CYCLE_DAYS дней цикла II. Стоки — артефакты цикла I и герои за золото
+    циклов I и II по цене ADR-0023: пачка обучения в цикле I, дальше каждый раз — самый дешёвый следующий герой.
+    Цен артефактов цикла II в расчёте нет."""
     acc = account_gold()
-    heroes = hero_total(1) + hero_total(2)
+    all12 = hero_total(1) + hero_total(2)
     rows = []
     for rb, name in GOLD_RATIO:
         rates = with_gold(RATES_NEW, rb)
         _, g, _ = timeline(rates, mult_new, PROFILES[0][1])
         inc = g[CYCLE_DAYS] + acc
-        rest = inc - heroes - ARTIFACTS_GOLD_C1
-        rows.append([name, fmt(g[CYCLE_DAYS]), fmt(acc), fmt(heroes), fmt(ARTIFACTS_GOLD_C1), fmt(rest),
-                     dec1(rest * 100, inc) + ' %'])
-    return table(['Золото за врага', 'Биомы и страж, цикл II', 'Обучение, уровни аккаунта',
-                  f'{sum(GOLD_HEROES[1].values()) + sum(GOLD_HEROES[2].values())} золотых героев циклов I–II', 'Артефакты цикла I',
-                  'Остаток: лавка и запас к рынку', 'Доля остатка'], rows)
+        pack = hero_total(1, SQUAD)
+        bought, spent = heroes_buy(inc - ARTIFACTS_GOLD_C1 - pack, (1, 2), {1: SQUAD})
+        rest = inc - ARTIFACTS_GOLD_C1 - pack - spent
+        rows.append([name, fmt(g[CYCLE_DAYS]), fmt(acc), fmt(ARTIFACTS_GOLD_C1), f'{bought[1]} / {bought.get(2, 0)}',
+                     fmt(pack + spent), fmt(rest), dec1((pack + spent) * 100, all12) + ' %'])
+    return table(['Золото за врага', 'Биомы и страж, цикл II', 'Обучение, уровни аккаунта', 'Артефакты цикла I',
+                  f'Героев за золото: цикла I из {GOLD_HEROES[1]} / цикла II из {GOLD_HEROES[2]}', 'Потрачено на героев',
+                  'Остаток', f'Доля цены всех {GOLD_HEROES[1] + GOLD_HEROES[2]} героев циклов I–II, {fmt(all12)}'], rows)
 
 
 def tutor_pace(rates=RATES_NEW, start_spirit=TUTORIAL_SPIRIT):
@@ -593,7 +616,7 @@ def main():
              ('Т7. Другие каналы: числа черновика «Дроп»', t7_other()),
              ('Т8. Разрыв: вехи на числах §9.1, цикл II', t8_gap()),
              ('Т9. Предложение: дух за врага по циклам', t9_rates()),
-             ('Т10. Предложение: цена героя за золото', t10_prices()),
+             ('Т10. Цена героя за золото: k-й герой цикла — 10 000 × цикл × (1 + 30 % × (k − 1)), ADR-0023', t10_prices()),
              ('Т11. Предложение: темп по вехам, цикл II', t11_plan()),
              (f'Т12. Правило ×1,7: дух в день при равном времени, {h} ч', t12_payer()),
              ('Т13. Золото обычного игрока до конца цикла II', t13_gold()),
@@ -606,18 +629,20 @@ def main():
 
 
 def check_csv():
+    """HEROES_VALOR берётся из черновика герои.csv, GOLD_HEROES — из состава героев состав-героев.csv."""
     path = ROOT / 'docs' / 'content' / 'герои' / 'герои.csv'
-    if not path.exists():
-        return
-    val, gold = {}, {}
-    rn = {n: i for i, n in enumerate(RARITY) if n}
-    for r in csv.DictReader(path.open(encoding='utf-8-sig')):
-        c, v = int(r['цикл']), int(r['максимум доблести'])
-        val.setdefault(c, Counter())[v] += 1
-        if r['получение'] == 'золото':
-            gold.setdefault(c, Counter())[rn[r['редкость']]] += 1
-    if {c: dict(m) for c, m in val.items()} != HEROES_VALOR or {c: dict(m) for c, m in gold.items()} != GOLD_HEROES:
-        print('!! HEROES_VALOR или GOLD_HEROES разошлись с герои.csv — обновите данные', file=sys.stderr)
+    if path.exists():
+        val = {}
+        for r in csv.DictReader(path.open(encoding='utf-8-sig')):
+            val.setdefault(int(r['цикл']), Counter())[int(r['максимум доблести'])] += 1
+        if {c: dict(m) for c, m in val.items()} != HEROES_VALOR:
+            print('!! HEROES_VALOR разошлись с герои.csv — обновите данные', file=sys.stderr)
+    path = ROOT / 'docs' / 'content' / 'герои' / 'состав-героев.csv'
+    if path.exists():
+        gold = Counter(CYCLE_NAMES.index(r['цикл']) + 1 for r in csv.DictReader(path.open(encoding='utf-8-sig'))
+                       if r['источник'].startswith('золото'))
+        if dict(gold) != GOLD_HEROES:
+            print('!! GOLD_HEROES разошлись с состав-героев.csv — обновите данные', file=sys.stderr)
 
 
 # ======================= ПРОГОН БОЯ (--sim) =======================
