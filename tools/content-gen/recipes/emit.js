@@ -2,18 +2,21 @@
    Проверки (любая ошибка — сборка не пишет файлы):
    - у рецепта 1–6 ячеек, количество целое 1–100, вход не повторяется и не из будущего цикла, спойлерный вход — только в рецепте для команды;
    - в рецепте не больше двух ресурсов одного ремесла (§9.2): считаются базовые, ключи и ресурсы крафтовых биомов;
-   - у рецепта цикла N есть хотя бы один вход цикла N;
+   - у рецепта цикла N есть хотя бы один вход цикла N (базовые общего пула за вход цикла не считаются);
    - достижимость (§12): предмет или падает, или создаётся рецептом, все входы которого достижимы, — считается до неподвижной точки;
    - всё, что падает, нужно хотя бы в одном рецепте; у заготовки и изделия есть выход дальше;
-   - призыв крафтового босса несёт находку своего биома и уникальный ресурс босса биома — входной билет (§12.3);
-   - герой с максимумом доблести 4–5 требует трофея, уникального ресурса или двух находок: самые желанные — самые дорогие. */
+   - призыв крафтового босса несёт находку своей руины и уникальный ресурс босса биома (§12.3);
+   - руины идут цепочкой: активация руины не требует добычи руины, которая открывается позже, — в цикле I их проходят по одной,
+     в том же активном слоте, что и обычные забеги (ADR-0014, ADR-0023, п. 5);
+   - герой с максимумом доблести 4–5 требует трофея, уникального ресурса или двух находок.
+   Предупреждения (файлы пишутся): расхождения героя с составом — id, имя, источник «крафт». */
 const fs = require('fs'), path = require('path');
 const C = require('./common');
 const OUT_JS = path.join(__dirname, '..', '..', '..', 'design', 'ui', 'recipes.js');
 const OUT_MD = path.join(__dirname, 'tables.md');
 
 module.exports = function emit(D) {
-  const { items, recipes, byId, CYC, ROMAN, places } = D;
+  const { items, recipes, byId, CYC, ROMAN, places, warnings } = D;
   const T = C.TIERS, err = [];
   const isDrop = it => !!T[it.tier].drop || (it.tier === 'rune' && /_1$/.test(it.id));
   const names = {};
@@ -38,7 +41,7 @@ module.exports = function emit(D) {
       if (id === r.out[0]) err.push(`${r.id}: выход среди входов`);
       if (!Number.isInteger(q) || q < 1 || q > 100) err.push(`${r.id}: количество ${q} вне 1–100`);
       if (it.cyc > r.cyc) err.push(`${r.id}: вход ${id} из будущего цикла ${it.cyc}`);
-      if (it.cyc === r.cyc) cur = true;
+      if (it.cyc === r.cyc && !it.pool) cur = true;
       if (it.team && !r.team) err.push(`${r.id}: спойлерный вход ${id} в открытом рецепте`);
       if (T[it.tier].res && it.spec) perSpec[it.spec] = (perSpec[it.spec] || 0) + 1;
     }
@@ -58,9 +61,9 @@ module.exports = function emit(D) {
   for (const p of places) {
     const r = (OUT[p.boss.call] || [])[0]; if (!r) { err.push(`${p.boss.call}: нет рецепта призыва`); continue; }
     if (!r.in.some(([id]) => byId[id] && byId[id].tier === 'unique')) err.push(`${r.id}: призыв без уникального ресурса босса биома (§12.3)`);
-    if (!r.in.some(([id]) => id === p.find)) err.push(`${r.id}: призыв без находки своего биома «${p.n}»`);
+    if (!r.in.some(([id]) => id === p.find)) err.push(`${r.id}: призыв без находки своей руины «${p.n}»`);
   }
-  if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exitCode = 1; return; }
+  if (err.length) return fail(err, warnings);
 
   /* полная цена: во что обходится одно создание рецепта в ресурсах добычи (первый рецепт каждого промежуточного узла) */
   function need(id, q, acc) {
@@ -78,38 +81,53 @@ module.exports = function emit(D) {
     const h = byId[r.out[0]], b = r.bom, rare = Object.keys(b).filter(id => ['trophy', 'unique'].includes(byId[id].tier)).length, finds = Object.keys(b).filter(id => byId[id].tier === 'find').reduce((a, id) => a + b[id], 0);
     if (h.maxV >= 4 && !rare && finds < 2) err.push(`${r.id}: герой с максимумом доблести ${h.maxV} без трофея, уникального ресурса или двух находок`);
   }
-  if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exitCode = 1; return; }
+  /* руины цепочкой: какие руины нужны активации (по её полной цене), без циклов и без руин, открытых позже */
+  const order = Object.fromEntries(places.map((p, i) => [p.id, i]));
+  for (const p of places) {
+    const r = OUT[p.act][0], needs = [...new Set(Object.keys(r.bom).map(id => byId[id].b).filter(b => b && order[b] !== undefined))];
+    p.needs = needs;
+    for (const b of needs) if (order[b] >= order[p.id]) err.push(`${r.id}: активация руины «${p.n}» требует добычи руины «${places[order[b]].n}», которая открывается не раньше`);
+  }
+  if (err.length) return fail(err, warnings);
 
   const stats = buildStats(items, recipes, CYC, places, USE, byId, isDrop);
   const drops = buildDrops(CYC, places, items, recipes, byId);
   const ints = (o, p) => { if (typeof o === 'number') { if (!Number.isInteger(o)) err.push('не целое: ' + p); } else if (o && typeof o === 'object') for (const k in o) ints(o[k], p + '.' + k); };
   ints(drops, 'drops'); ints(stats, 'stats'); ints(recipes.map(r => [r.in, r.out, r.bom, r.weight]), 'recipes');
-  if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exitCode = 1; return; }
+  if (err.length) return fail(err, warnings);
   writeJs({ items, recipes, drops, stats, CYC, ROMAN, places });
   require('./tables')({ items, recipes, byId, CYC, ROMAN, places, drops, stats, USE, OUT, isDrop, OUT_MD });
-  console.log('Готово:', items.length, 'предметов,', recipes.length, 'рецептов');
-  console.log('По циклам — предметы:', stats.byCycle.map(s => s.items).join(' / '), '· ресурсы добычи:', stats.byCycle.map(s => s.resources).join(' / '), '· рецепты:', stats.byCycle.map(s => s.recipes).join(' / '));
+  if (warnings.length) console.log('Предупреждения:\n' + warnings.join('\n'));
+  console.log('Готово:', items.length, 'предметов,', recipes.length, 'рецептов; общий пул базовых —', stats.total.pool);
+  console.log('По циклам — ресурсы без пула:', stats.byCycle.map(s => s.resources).join(' / '), '· рецепты:', stats.byCycle.map(s => s.recipes).join(' / '));
   console.log('Развилки по циклам:', stats.byCycle.map(s => s.forks).join(' / '), '· биомов в цепочках:', stats.byCycle.map(s => s.biomesInChains).join(' / '));
 };
 
+function fail(err, warnings) {
+  if (warnings && warnings.length) console.log('Предупреждения:\n' + warnings.join('\n'));
+  console.log('ОШИБКИ:\n' + err.join('\n')); process.exitCode = 1;
+}
+
 function buildStats(items, recipes, CYC, places, USE, byId, isDrop) {
   const tiers = Object.keys(C.TIERS), kinds = ['part', 'made', 'act', 'call', 'hero', 'product', 'story', 'rune', 'valor'];
+  const RES = ['basic', 'key', 'unique', 'craftres', 'find', 'trophy'];
   const byCycle = CYC.map(cy => {
-    const c = cy.n, its = items.filter(i => i.cyc === c), recs = recipes.filter(r => r.cyc === c);
+    const c = cy.n, its = items.filter(i => i.cyc === c && !i.pool), recs = recipes.filter(r => r.cyc === c);
     const tierCount = Object.fromEntries(tiers.map(t => [t, its.filter(i => i.tier === t).length]));
     const kindCount = Object.fromEntries(kinds.map(k => [k, recs.filter(r => r.kind === k).length]));
     /* развилка — предмет, который открытые к этому циклу рецепты (циклы 1…N) тянут хотя бы в два места */
     const open = recipes.filter(r => r.cyc <= c), uses = {};
     for (const r of open) for (const [id] of r.in) uses[id] = (uses[id] || 0) + 1;
     const forks = Object.values(uses).filter(n => n >= 2).length, edges = Object.values(uses).reduce((a, n) => a + n, 0);
-    /* биомы, чья добыча входит в полную цену рецептов этого цикла */
+    /* биомы и руины, чья собственная добыча входит в полную цену рецептов этого цикла; общий пул падает везде и не считается */
     const src = new Set(); for (const r of recs) for (const id of Object.keys(r.bom)) { const it = byId[id]; if (it.b) src.add(it.b); }
-    return { cyc: c, items: its.length, resources: its.filter(i => isDrop(i) && ['basic', 'key', 'unique', 'craftres', 'find', 'trophy'].includes(i.tier)).length,
+    const poolUsed = new Set(); for (const r of recs) for (const [id] of r.in) if (byId[id].pool) poolUsed.add(id);
+    return { cyc: c, items: its.length, resources: its.filter(i => RES.includes(i.tier)).length, poolUsed: poolUsed.size,
       recipes: recs.length, recipesNoRunes: recs.filter(r => r.kind !== 'rune' && r.kind !== 'valor').length,
-      tiers: tierCount, kinds: kindCount, forks, edges, biomesInChains: src.size, crossCycleInputs: recs.reduce((a, r) => a + r.in.filter(([id]) => byId[id].cyc < c).length, 0) };
+      tiers: tierCount, kinds: kindCount, forks, edges, biomesInChains: src.size, crossCycleInputs: recs.reduce((a, r) => a + r.in.filter(([id]) => byId[id].cyc < c && !byId[id].pool).length, 0) };
   });
-  const total = { items: items.length, recipes: recipes.length,
-    resources: items.filter(i => ['basic', 'key', 'unique', 'craftres', 'find', 'trophy'].includes(i.tier)).length,
+  const total = { items: items.length, recipes: recipes.length, pool: items.filter(i => i.pool).length,
+    resources: items.filter(i => RES.includes(i.tier)).length,
     tiers: Object.fromEntries(tiers.map(t => [t, items.filter(i => i.tier === t).length])),
     craftBiomes: places.length, craftBosses: places.length + 1 };
   return { byCycle, total };
@@ -118,42 +136,45 @@ function buildStats(items, recipes, CYC, places, USE, byId, isDrop) {
 function buildDrops(CYC, places, items, recipes, byId) {
   const E = C.ENEMY, S = E.spirit, cyc6 = [1, 2, 3, 4, 5, 6];
   const mulHalf = (base, c, second) => base * (2 * c + (second ? 1 : 0)) / 2;   // × (цикл + 0,5) во втором биоме; базы чётные — результат целый
+  /* базовых за забег × 100: этажей × шанс × среднее за срабатывание (1 + номер биома) / 2 */
+  const basicsX100 = (floors, bn) => floors * E.basePerFloorBp * (1 + bn) / 200;
+  const perRun = (deck, bn, c) => ({ basicsX100: basicsX100(deck.floors, bn), specKeys: deck.elites, souls: deck.elites * C.ENEMY.soulsElitePerBiome * bn + C.ENEMY.soulsBossPerBiome * bn,
+    runeKeysPer100: E.bossRuneKeyBp / 100 * c, uniquePer100: E.uniqueBp / 100 });
   const enemies = [];
   for (const cy of CYC) cy.biomes.forEach((b, i) => {
-    const c = cy.n, bn = +b.id.slice(1), deck = C.DECKS[b.deck], bp = E.basePerFloorBpByCycle[c - 1];
+    const c = cy.n, bn = +b.id.slice(1), deck = C.DECKS[b.deck];
     const sp = k => mulHalf(S[k], c, i === 1), rank = k => ({ spirit: sp(k), gold: Math.floor(sp(k) / 2) });
     enemies.push({ biome: b.id, name: b.n, cyc: c, team: !!cy.team, deck: b.deck, floors: deck.floors, elites: deck.elites,
-      ordinary: rank('ordinary'), elite: Object.assign(rank('elite'), { souls: C.ENEMY.soulsElitePerBiome * bn, specKeys: 1, runeKeyBp: E.eliteRuneKeyBp, runeKeys: c }),
+      ordinary: rank('ordinary'), elite: Object.assign(rank('elite'), { souls: C.ENEMY.soulsElitePerBiome * bn, specKeys: 1, runeKeyBp: 0 }),
       boss: Object.assign(rank('boss'), { souls: C.ENEMY.soulsBossPerBiome * bn, uniqueBp: E.uniqueBp, runeKeyBp: E.bossRuneKeyBp, runeKeys: c }),
-      guard: rank('guard'), basePerFloorBp: bp,
-      perRun: { basicsX10: Math.floor(deck.floors * bp / 1000), specKeys: deck.elites, souls: deck.elites * bn + C.ENEMY.soulsBossPerBiome * bn, uniquePer100: E.uniqueBp / 100 } });
+      guard: rank('guard'), basePerFloorBp: E.basePerFloorBp, basicsPerTriggerMax: bn,
+      perRun: perRun(deck, bn, c), perRunAfterTutorial: c === 1 ? perRun(C.DECKS.sample, bn, c) : null });
   });
   const guardians = [];
   for (const cy of CYC) {
     const [A, B] = cy.biomes, c = cy.n;
-    guardians.push({ id: A.id + 'g', name: A.guard, biome: A.id, cyc: c, kind: 'limits', entryKeys: c, runesPerKill: C.GUARD.limits.runesPerKill, weightsBp: C.GUARD.limits.weightsBp, team: !!cy.team });
-    guardians.push({ id: B.id + 'g', name: B.guard, biome: B.id, cyc: c, kind: 'valor', entryKeys: 2 * c, shardsBp: C.GUARD.valor.shardsBp, undefinedBp: C.GUARD.valor.undefinedBp, team: !!cy.team });
+    guardians.push({ id: A.id + 'g', name: A.guard, biome: A.id, cyc: c, kind: 'limits', entryKeys: C.GUARD.limits.entryKeysPerCycle * c, runesPerKill: C.GUARD.limits.runesPerKill, weightsBp: C.GUARD.limits.weightsBp, team: !!cy.team });
+    guardians.push({ id: B.id + 'g', name: B.guard, biome: B.id, cyc: c, kind: 'valor', entryKeys: C.GUARD.valor.entryKeysPerCycle * c, shardsBp: C.GUARD.valor.shardsBp, undefinedBp: C.GUARD.valor.undefinedBp, team: !!cy.team });
   }
   const H = C.RITUALS.heroes, CT = C.CONTRACTS, per = CT.per10Points;
   const contract = (k, c) => { const x = CT[k], t = x.points / 10;
     return { points: x.points, tasks: x.tasks, runeKeys: per.runeKeys * t * c, gold: per.gold * t * c, spirit: per.spirit * t * c, basics: per.basics * t, enerium: CT.eneriumPerEpicTask * x.epic, stakeGold: CT.stakeGoldPerPoint * x.points * c }; };
   const CB = C.CRAFT.biome, CS = C.CRAFT.boss;
-  const craftBiomes = places.map(p => ({ id: p.id, name: p.n, cyc: p.cyc, act: p.act, res: p.res, find: p.find, floors: CB.floors, resPerFloorBp: CB.resPerFloorBp,
+  const craftBiomes = places.map(p => ({ id: p.id, name: p.n, cyc: p.cyc, act: p.act, needs: p.needs, res: p.res, find: p.find, floors: CB.floors, resPerFloorBp: CB.resPerFloorBp,
     finds: CB.finds, secondFindBp: CB.secondFindBp, spirit: CB.spirit * p.cyc, gold: CB.spirit * p.cyc / 2, souls: CB.souls * p.cyc, heroShards: CB.heroShards * p.cyc,
     eventPoints: CB.eventPoints, runeKeyBp: CB.runeKeyBp, runeKeys: p.cyc, team: p.team }));
-  const craftBosses = places.map(p => ({ id: p.boss.id, name: p.boss.label, cyc: p.cyc, spec: p.boss.spec, race: 'Забытые', call: p.boss.call, trophy: p.boss.trophy,
-    trophies: CS.trophies, specKeys: CS.specKeys, enerium: CS.enerium * p.cyc, runeKeyBp: CS.runeKeyBp, runeKeys: p.cyc, workerBoxRarity: Math.min(7, p.cyc + 1),
-    summonSouls: CS.summonSouls, immunityBp: CS.immunityBp, team: p.team }))
-    .concat([{ id: 'lik', name: 'Лик недели', cyc: 2, spec: null, race: 'раса недели', call: 'mask', trophy: null, trophies: 0, heroShardsWeek: 20, specKeys: 0, enerium: 0,
-      runeKeyBp: 0, runeKeys: 0, workerBoxRarity: 0, summonSouls: 1, immunityBp: CS.immunityBp, team: false }]);
+  const craftBosses = places.map(p => ({ id: p.boss.id, name: p.boss.label, cyc: p.cyc, spec: p.boss.spec, race: p.boss.race, call: p.boss.call, trophy: p.boss.trophy,
+    trophies: CS.trophies, specKeys: CS.specKeys, spirit: CS.spirit * p.cyc, gold: CS.spirit * p.cyc / 2, enerium: CS.enerium * p.cyc, runeKeyBp: CS.runeKeyBp, runeKeys: p.cyc,
+    workerBoxRarity: Math.min(7, p.cyc + 1), summonSouls: CS.summonSouls, immunityBp: CS.immunityBp, team: p.team }))
+    .concat([{ id: 'lik', name: 'Лик недели', cyc: 2, spec: null, race: 'раса недели', call: 'mask', trophy: null, trophies: 0, heroShardsWeek: 20, specKeys: 0, spirit: 0, gold: 0, enerium: 0,
+      runeKeyBp: 0, runeKeys: 0, workerBoxRarity: 0, summonSouls: CS.summonSouls, immunityBp: CS.immunityBp, team: false }]);
   const M = C.MARKET;
   const market = { basic: cyc6.map(c => M.basic * c), key: cyc6.map(c => M.key * c), craftres: cyc6.map(c => M.craftres * c), unique: cyc6.map(c => M.unique * c),
     find: cyc6.map(c => M.find * c), trophy: cyc6.map(c => M.trophy * c), commissionPct: M.commissionPct, soulsTradable: false };
-  /* для лутбоксов (следующий шаг): пулы по циклам и редкостям, скрытые рецепты героев */
+  /* для лутбоксов (следующая задача): общий пул базовых и наборы по циклам и ярусам. Скрытых рецептов лутбокс не выдаёт (ADR-0023, п. 7). */
   const pools = cyc6.map(c => {
-    const its = items.filter(i => i.cyc === c), ids = t => its.filter(i => i.tier === t).map(i => i.id);
-    return { cyc: c, basic: ids('basic'), key: ids('key'), unique: ids('unique'), craftres: ids('craftres'), find: ids('find'), trophy: ids('trophy'),
-      hiddenRecipes: recipes.filter(r => r.cyc === c && r.hidden).map(r => r.id), products: ids('product') };
+    const its = items.filter(i => i.cyc === c && !i.pool), ids = t => its.filter(i => i.tier === t).map(i => i.id);
+    return { cyc: c, key: ids('key'), unique: ids('unique'), craftres: ids('craftres'), find: ids('find'), trophy: ids('trophy'), products: ids('product') };
   });
   return {
     enemies, guardians, dailyGuardianCap: C.GUARD.dailyCap,
@@ -161,8 +182,8 @@ function buildDrops(CYC, places, items, recipes, byId) {
       heroes: { minutes: H.minutes, byCycle: cyc6.map(c => ({ cyc: c, gold: H.minutes.map(m => H.perHour.gold * m / 60 * c), spirit: H.minutes.map(m => H.perHour.spirit * m / 60 * c), souls: H.minutes.map(m => H.perHour.souls * m / 60 * c) })) } },
     contracts: { taskPoints: CT.taskPoints, certifyMul: CT.certifyMul, byCycle: cyc6.map(c => ({ cyc: c, day: contract('day', c), week: contract('week', c) })) },
     echo: C.ECHO, clanBoss: C.CLAN, event: C.EVENT,
-    lootboxes: { items: C.BOXES.items, perSlot: C.BOXES.perSlot, categories: C.BOXES.categories,
-      rarityFrom: [1, 2, 3, 4, 5, 6, 7].map(n => Math.max(1, n - 2)), goldByCycle: cyc6.map(c => C.BOXES.goldBase.map(g => g * c)), pools },
+    lootboxes: { categories: C.BOXES.categories, mixed: C.BOXES.mixed, basicPool: items.filter(i => i.pool).map(i => i.id), pools },
+    activeSlots: { shared: true, byCycle: C.CRAFT.activeCap },
     craftBiomes, craftBosses, market,
   };
 }
@@ -176,8 +197,8 @@ function writeJs({ items, recipes, drops, stats, CYC, ROMAN, places }) {
     craft: places.filter(p => p.cyc === cy.n).map(p => p.id),
     craftBiome: places.filter(p => p.cyc === cy.n).map(p => p.n).join(', '),
     craftBoss: places.filter(p => p.cyc === cy.n).map(p => p.boss.label).join(', ') }));
-  const keysOrder = ['id', 'n', 'cyc', 'b', 'place', 'tier', 'spec', 'r', 'img', 'glyph', 'elite', 'boss', 'foe', 'opens', 'opensLore', 'heroId', 'cls', 'race', 'school', 'maxV', 'team', 'lore', 'src'];
-  const clean = it => { const o = {}; for (const k of keysOrder) if (it[k] !== undefined && it[k] !== null && !(k === 'team' && !it[k])) o[k] = it[k]; return o; };
+  const keysOrder = ['id', 'n', 'cyc', 'b', 'pool', 'place', 'tier', 'spec', 'r', 'img', 'glyph', 'boss', 'foe', 'opens', 'opensLore', 'heroId', 'cls', 'race', 'school', 'maxV', 'team', 'lore', 'src'];
+  const clean = it => { const o = {}; for (const k of keysOrder) if (it[k] !== undefined && it[k] !== null && !(['team', 'pool'].includes(k) && !it[k])) o[k] = it[k]; return o; };
   const rkeys = ['id', 'cyc', 'n', 'kind', 'out', 'in', 'known0', 'hidden', 'team', 'why', 'weight'];
   const rclean = r => { const o = {}; for (const k of rkeys) if (r[k] !== undefined && !(['team', 'known0', 'hidden'].includes(k) && !r[k])) o[k] = r[k]; return o; };
   const out = `/* Энериум · ресурсы и древо рецептов — данные прототипа «Свет снизу».
@@ -185,7 +206,8 @@ function writeJs({ items, recipes, drops, stats, CYC, ROMAN, places }) {
    Все числа — демонстрация, под прогоны; шансы — в базисных пунктах (10 000 = 100 %).
    Обоснование и летопись — docs/content/ресурсы-рецепты-дроп.md; его таблицы собраны из этих же данных.
    В игре рецепты и таблицы наград живут только на сервере (CLAUDE.md, инварианты; GDD §12, §36.16): клиент получает
-   лишь рецепты, уже открытые игроком. Здесь полный набор — для проектирования. Записи с team: true — спойлеры (§38), только для команды. */
+   лишь рецепты, уже открытые игроком. Здесь полный набор — для проектирования. Записи с team: true — спойлеры (§38), только для команды.
+   pool: true — базовый ресурс общего пула: падает во всех биомах с первого (ADR-0023, п. 1). */
 window.EN_RECIPES = {
   specs: ${J(C.SPECS)},
   specOrder: ${J(C.SPEC_ORDER)},

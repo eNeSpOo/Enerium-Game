@@ -1263,8 +1263,10 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 .rz-scroll{overflow-x:auto;scrollbar-width:thin;scrollbar-color:#2c3238 transparent;border:1px solid #1b1f24;border-radius:10px}
 .rz-grid{display:grid;grid-template-columns:118px repeat(6,minmax(152px,1fr));min-width:1040px}
 .rz-grid>div{padding:8px;border-top:1px solid #16191c;border-left:1px solid #16191c;min-width:0}
-.rz-grid>div:nth-child(-n+7){border-top:0}
-.rz-grid>div:nth-child(7n+1){border-left:0}
+.rz-grid>.rz-h{border-top:0}
+.rz-grid>.rz-h:first-child,.rz-grid>.rz-t{border-left:0}
+.rz-grid>.rz-pool{grid-column:span 6;display:flex;flex-wrap:wrap;gap:6px 18px;align-content:flex-start}
+.rz-grp{display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start;max-width:240px}
 .rz-h{font:700 11px/1.2 var(--f-u);letter-spacing:.12em;text-transform:uppercase;color:var(--gold-2);background:#0b0e10}
 .rz-h small{display:block;margin-top:3px;font:italic 500 13px/1.15 var(--f-d);letter-spacing:0;text-transform:none;color:var(--parch-3)}
 .rz-t{font:700 12.5px/1.2 var(--f-u);color:var(--parch);background:#0b0e10}
@@ -2198,17 +2200,23 @@ function trIcon(it) {
   const sp = it.spec && RX.specs[it.spec.split('+')[0]];
   return ic(TR_IC[it.tier] || (sp ? sp.icon : 'gem'));
 }
-/* Колонки цикла: добыча биомов, ключи мастерской и творения, заготовки, изделия, крафтовые биомы и Эхо, герои и награды.
-   Входы из прошлых циклов стоят в колонке своего яруса под чертой «из прошлых циклов». */
+/* Колонки цикла: базовые общего пула и добыча, ключи мастерской и творения, заготовки, изделия, крафтовые биомы и Эхо, герои и награды.
+   Базовые — общий пул на все циклы (ADR-0023): в первой колонке те, что берут рецепты цикла, без пометки «из прошлых циклов».
+   Остальные входы из прошлых циклов стоят в колонке своего яруса под чертой «из прошлых циклов». */
 const TR_COL = it => ['basic', 'unique', 'vshard', 'rune', 'echo'].includes(it.tier) ? 0 : it.tier === 'key' ? 1 : it.tier === 'part' ? 3 : it.tier === 'made' ? 4
   : ['act', 'call', 'craftres', 'find', 'trophy'].includes(it.tier) ? 5 : 6;
+/* раса в строке: Забытые и Перворождённые — с заглавной, как в своде */
+const trRace = r => ['Забытые', 'Перворождённые'].includes(r) ? r : String(r).toLowerCase();
+/* цикл, где узел виден: у базового пула — первый цикл, чьи рецепты его берут */
+const trHome = it => it.pool ? Math.min(...(RX_USE[it.id] || [{ cyc: 1 }]).map(r => r.cyc)) : it.cyc;
 function trLayout(c) {
-  const cy = RX.cycles[c - 1], [A, B] = cy.biomes, its = RX.items.filter(i => i.cyc === c);
+  const cy = RX.cycles[c - 1], [A, B] = cy.biomes, its = RX.items.filter(i => i.cyc === c && !i.pool);
   const pick = f => its.filter(f).map(i => i.id), byB = (b, t) => pick(i => i.b === b && i.tier === t);
   const recs = RX.recipes.filter(r => r.cyc === c);
-  const far = [...new Set(recs.flatMap(r => r.in.filter(([id]) => RXI[id].cyc !== c).map(([id]) => id)))];
+  const pool = RX.items.filter(i => i.pool && recs.some(r => r.in.some(([id]) => id === i.id))).map(i => i.id);
+  const far = [...new Set(recs.flatMap(r => r.in.filter(([id]) => RXI[id].cyc !== c && !RXI[id].pool).map(([id]) => id)))];
   const craft = (cy.craft || []).flatMap(pid => { const p = RX.places.find(x => x.id === pid); return [p.act, ...p.res, p.find, p.boss.call, p.boss.trophy]; });
-  const cols = [['Добыча биомов', [...byB(A.id, 'basic'), ...byB(B.id, 'basic'), ...byB(A.id, 'unique'), ...byB(B.id, 'unique'), ...pick(i => i.tier === 'echo')]],
+  const cols = [['Базовые пула и добыча', [...pool, ...byB(A.id, 'unique'), ...byB(B.id, 'unique'), ...pick(i => i.tier === 'echo')]],
     ['Ключи · ' + A.n, byB(A.id, 'key')], ['Ключи · ' + B.n, byB(B.id, 'key')], ['Заготовки', pick(i => i.tier === 'part')],
     ['Изделия', pick(i => i.tier === 'made')], ['Руины и Эхо', craft.concat(pick(i => i.tier === 'call' && !craft.includes(i.id)))],
     ['Герои и награды', pick(i => i.tier === 'hero' || i.tier === 'product')]];
@@ -2228,7 +2236,7 @@ const TR_SHORT = { rune: it => 'Предел ' + it.glyph, vshard: () => 'Оск
 function tnHtml(id, ch, o = {}) {
   const it = RXI[id], sel = S.tree.sel;
   const st = sel === id ? 'sel' : ch.up.has(id) ? 'up' : ch.down.has(id) ? 'down' : '';
-  const later = o.far ? [] : (RX_USE[id] || []).filter(r => r.cyc > it.cyc).map(r => r.cyc);
+  const later = o.far || it.pool ? [] : (RX_USE[id] || []).filter(r => r.cyc > it.cyc).map(r => r.cyc);   // у общего пула нет «своего» цикла — порт не нужен
   const port = o.far ? `<span class="port">${ROMAN[it.cyc]}</span>` : later.length ? `<span class="port">→${ROMAN[Math.min(...later)]}</span>` : '';
   const label = o.short && TR_SHORT[it.tier] ? TR_SHORT[it.tier](it) : it.n;
   const cls = ['tn', it.tier === 'key' ? 'key' : '', it.tier === 'unique' ? 'uniq' : '', TR_CRAFT.includes(it.tier) ? 'cr' : '', TR_MADE.includes(it.tier) ? 'made' : '', o.far ? 'far' : '', trHit(it) ? 'hit' : '', st];
@@ -2279,11 +2287,11 @@ function trChainList(ids, own) {
 function trCard(id) {
   const it = RXI[id], T = RX.tiers[it.tier] || { n: '' };
   const cy = RX.cycles[it.cyc - 1], bm = it.b ? cy.biomes.find(b => b.id === it.b) : null;
-  const where = bm ? `${bm.n} · цикл ${cy.roman}` : it.place ? `${it.place} · цикл ${cy.roman}` : `цикл ${cy.roman}`;
+  const where = it.pool ? 'Общий пул · любой биом с первого' : bm ? `${bm.n} · цикл ${cy.roman}` : it.place ? `${it.place} · цикл ${cy.roman}` : `цикл ${cy.roman}`;
   const sp = it.spec ? it.spec.split('+').map(x => RX.specs[x].n.toLowerCase()).join(' + ') : '';
   const recs = RX_OUT[id] || [], uses = RX_USE[id] || [], ch = trChain(id);
-  const opens = it.opens ? `<p class="muted" style="font-size:12.5px">${it.tier === 'act' ? 'Активирует крафтовый биом' : 'Призывает в Эхо крафтового босса'} «${it.opens}». ${it.opensLore}</p>` : '';
-  const who = it.elite ? ' · элита «' + it.elite + '»' : it.boss && it.tier === 'unique' ? ' · босс «' + it.boss + '»' : it.foe ? ' · «' + it.foe + '»' : '';
+  const opens = it.opens ? `<p class="muted" style="font-size:12.5px">${it.tier === 'act' ? 'Призывает крафтовый биом в «Биомах», в свободный активный слот:' : `Призывает в Эхо крафтового босса за себя и 1 душу${it.race ? ' · ' + trRace(it.race) : ''}:`} «${it.opens}». ${it.opensLore}</p>` : '';
+  const who = it.boss && it.tier === 'unique' ? ' · босс «' + it.boss + '»' : it.foe ? ' · «' + it.foe + '»' : '';
   const hero = it.tier === 'hero' ? `<div class="row" style="gap:8px;flex-wrap:wrap"><span class="chip">${it.cls}</span><span class="chip">${it.race} · ${it.school}</span><span class="chip gold">максимум доблести ${it.maxV}</span></div>` : '';
   return `<div class="row" style="gap:10px;align-items:center"><span class="tr-big" data-r="${it.r}">${trIcon(it)}</span><div class="col" style="gap:3px;min-width:0"><span class="eyebrow">${T.n}${sp ? ' · ' + sp : ''}</span><b class="serif" style="font-size:20px;line-height:1.05">${it.n}</b><span class="faint" style="font-size:12px">${where}${who}</span></div></div>
     ${it.team ? '<span class="chip warn" style="align-self:flex-start">спойлер §38 · игроку до цикла VI не показывать</span>' : ''}
@@ -2301,17 +2309,18 @@ function trSummary(c, L) {
     <b class="serif" style="font-size:19px;line-height:1.1">${cy.biomes.map(b => b.n).join(' · ')}</b>
     <p class="muted" style="font-size:13px">${cy.about}</p>
     <dl class="kv"><dt>Рецептов в цикле</dt><dd>${L.recs.length}</dd>
-      ${st ? `<dt>Ресурсов добычи</dt><dd>${st.resources}: ${t.basic} базовых · ${t.key} ключей · ${t.unique} уникальных · ${t.craftres + t.find + t.trophy} крафтовых</dd><dt>Развилок в древе</dt><dd>${st.forks}</dd>` : ''}
+      ${st ? `<dt>Ресурсов цикла</dt><dd>${st.resources}: ${t.key} ключей · ${t.unique} уникальных · ${t.craftres + t.find + t.trophy} крафтовых</dd><dt>Базовых общего пула</dt><dd>${st.poolUsed} из ${RX.stats.total.pool} в рецептах цикла</dd><dt>Развилок в древе</dt><dd>${st.forks}</dd>` : ''}
       <dt>${places.length > 1 ? 'Крафтовые биомы' : 'Крафтовый биом'}</dt><dd>${places.map(p => p.n).join(', ')}</dd>
-      <dt>${places.length > 1 ? 'Крафтовые боссы' : 'Крафтовый босс'}</dt><dd>${places.map(p => p.boss.label).join(', ')}</dd></dl>
+      <dt>${places.length > 1 ? 'Крафтовые боссы' : 'Крафтовый босс'}</dt><dd>${places.map(p => `${p.boss.label} · ${trRace(p.boss.race)}`).join(', ')}</dd></dl>
     <div class="tr-leg"><span><i></i>что нужно выбранному</span><span><i class="d"></i>куда оно идёт</span><span><i class="s"></i>выбранный узел</span><span><b class="gold" style="font:700 10px var(--f-u)">→III</b>&nbsp;уходит в рецепт цикла III</span><span><i class="q"></i>из прошлых циклов</span></div>
-    <p class="reason">Нажмите узел: золотом подсветится, что для него нужно, пунктиром — куда он идёт. Справа — вся цепочка по циклам. Все числа — демонстрация. Слои цикла: добыча → заготовки → изделия → активация руины → её ресурсы и находка → призыв Забытого в Эхо → трофей → герои и ларцы. Каждая руина подсказывает дорогу к следующей.</p>`;
+    <p class="reason">Нажмите узел: золотом подсветится, что для него нужно, пунктиром — куда он идёт. Справа — вся цепочка по циклам. Все числа — демонстрация. Слои цикла: базовые пула и ключи → заготовки → изделия → активация руины в «Биомах» → её ресурсы и находка → призыв крафтового босса в Эхо → трофей → герои и ларцы. Каждая руина подсказывает дорогу к следующей.</p>`;
 }
 function treePage() {
   if (!RX.cycles.length) return '<p class="faint">Нет данных: рядом с index.html должен лежать recipes.js.</p>';
   const T = S.tree, c = T.cyc, cy = RX.cycles[c - 1];
   const tabs = RX.cycles.map(x => `<button role="tab" aria-selected="${x.n === c}" data-a="tcyc" data-v="${x.n}">${x.roman}</button>`).join('');
-  const res = `<select id="trRes" aria-label="Фильтр по ресурсу"><option value="">Фильтр по ресурсу…</option>${RX.cycles.map(x => `<optgroup label="Цикл ${x.roman}">${RX.items.filter(i => i.cyc === x.n && TR_RES.includes(i.tier)).map(i => `<option value="${i.id}" ${T.sel === i.id ? 'selected' : ''}>${trEsc(i.n)}</option>`).join('')}</optgroup>`).join('')}</select>`;
+  const opt = i => `<option value="${i.id}" ${T.sel === i.id ? 'selected' : ''}>${trEsc(i.n)}</option>`;
+  const res = `<select id="trRes" aria-label="Фильтр по ресурсу"><option value="">Фильтр по ресурсу…</option><optgroup label="Общий пул базовых">${RX.items.filter(i => i.pool).map(opt).join('')}</optgroup>${RX.cycles.map(x => `<optgroup label="Цикл ${x.roman}">${RX.items.filter(i => i.cyc === x.n && !i.pool && TR_RES.includes(i.tier)).map(opt).join('')}</optgroup>`).join('')}</select>`;
   const find = `<div class="tr-find"><input type="search" id="trQ" placeholder="Поиск по названию" value="${trEsc(T.q)}" autocomplete="off" aria-label="Поиск по названию"><div class="tr-hits" id="trHits" hidden></div></div>`;
   const bar = `<div class="tr-bar"><div class="tabs" role="tablist" aria-label="Циклы">${tabs}</div><span class="tr-cy">${cy.god} · ${cy.el.toLowerCase()} · ${cy.karst}</span>${cy.team ? '<span class="chip warn">спойлер</span>' : ''}<span class="g-spacer"></span>${find}${res}<label class="tr-only-l"><input type="checkbox" id="trOnly" ${T.only ? 'checked' : ''}>только связи выбранного</label></div>`;
   const L = trLayout(c), ch = trChain(T.sel);
@@ -2327,7 +2336,7 @@ function paintTreeHits() {
   const box = document.getElementById('trHits'); if (!box) return;
   const q = trNorm(S.tree.q.trim());
   const hits = q.length > 1 ? RX.items.filter(it => trNorm(it.n).includes(q)).slice(0, 14) : [];
-  box.innerHTML = hits.map(it => `<button data-a="tsel" data-v="${it.id}"><span>${trEsc(it.n)}</span><small>${(RX.tiers[it.tier] || { n: '' }).n} · цикл ${ROMAN[it.cyc]}</small></button>`).join('') || (q.length > 1 ? '<small class="faint" style="padding:6px 8px">Ничего не найдено</small>' : '');
+  box.innerHTML = hits.map(it => `<button data-a="tsel" data-v="${it.id}"><span>${trEsc(it.n)}</span><small>${(RX.tiers[it.tier] || { n: '' }).n} · ${it.pool ? 'общий пул' : 'цикл ' + ROMAN[it.cyc]}</small></button>`).join('') || (q.length > 1 ? '<small class="faint" style="padding:6px 8px">Ничего не найдено</small>' : '');
   box.hidden = !box.innerHTML;
   document.querySelectorAll('#trCanvas [data-tn]').forEach(e => e.classList.toggle('hit', trHit(RXI[e.dataset.tn])));
 }
@@ -2345,7 +2354,7 @@ function bindTree() {
     else if (b.dataset.a === 'tsel') {
       const v = b.dataset.v, it = RXI[v]; if (!it) return;
       const fromHits = !!b.closest('#trHits');
-      if (!trLayoutIds(S.tree.cyc).has(v)) S.tree.cyc = it.cyc;
+      if (!trLayoutIds(S.tree.cyc).has(v)) S.tree.cyc = trHome(it);
       S.tree.sel = fromHits || S.tree.sel !== v ? v : null;
       if (fromHits) S.tree.q = '';
       renderTree();
@@ -2353,7 +2362,7 @@ function bindTree() {
   });
   root.addEventListener('input', e => { if (e.target.id === 'trQ') { S.tree.q = e.target.value; paintTreeHits(); } });
   root.addEventListener('change', e => {
-    if (e.target.id === 'trRes') { const v = e.target.value; if (v && RXI[v]) { S.tree.sel = v; S.tree.cyc = RXI[v].cyc; S.tree.only = true; } else { S.tree.sel = null; S.tree.only = false; } renderTree(); }
+    if (e.target.id === 'trRes') { const v = e.target.value; if (v && RXI[v]) { S.tree.sel = v; S.tree.cyc = trHome(RXI[v]); S.tree.only = true; } else { S.tree.sel = null; S.tree.only = false; } renderTree(); }
     else if (e.target.id === 'trOnly') { S.tree.only = e.target.checked; renderTree(); }
   });
 }
@@ -3451,7 +3460,7 @@ function renderKit() {
   <section class="k-box"><h3>Иконки путей</h3><div class="k-row">${[[12, 'Убежище'], [10, 'Спуск'], [24, 'Герои'], [11, 'Ремесло'], [6, 'Неделя'], [18, 'Эхо'], [38, 'Контракты'], [33, 'Ритуалы'], [3, 'Арена'], [26, 'Клан'], [21, 'Событие'], [29, 'Странник']].map(([p, n]) => `<figure style="margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;width:64px"><img src="${PATH(p)}" alt="" style="width:48px;height:48px;border-radius:12px;box-shadow:0 0 0 1px #262c32"><figcaption style="font-size:11px;color:var(--parch-2);text-align:center;line-height:1.1">${n}</figcaption></figure>`).join('')}</div><p class="k-note">Авторский набор. Иконка узнаётся, подпись остаётся всегда.</p></section>
   <section class="k-box"><h3>Слой поверх: лист и диалог</h3><div class="k-demo" style="height:170px;position:relative;overflow:hidden;border:1px solid var(--iron)"><div style="position:absolute;inset:0;background:rgba(3,4,5,.55)"></div><div class="sheet" style="width:52%;animation:none"><div class="sheet-h" style="min-height:40px;padding:6px 8px 6px 12px"><h2 style="font-size:17px">Сведения</h2><span class="iconbtn x" style="width:26px;height:26px">${ic('x')}</span></div><div class="sheet-b" style="padding:8px 12px;gap:6px"><span class="faint" style="font-size:12px">уточняет работу, не уводит с экрана</span>${bar(60)}</div><div class="sheet-f" style="padding:6px 12px"><button class="btn go sm" style="margin-left:auto">Действие</button></div></div></div><p class="k-note">Лист справа — сведения и настройка. Диалог по центру — только цена, последствия и итог.</p></section>
   ${RX.stats ? `<section class="k-box" style="grid-column:1/-1"><h3>Ресурсы Этериоса · ${RX.stats.total.resources}</h3>
-    <p class="k-note">Все ресурсы игры по шести циклам и ярусам: базовые падают с этажей, ключи — с каждой элиты, уникальные — с боссов биомов, крафтовые — в руинах и у Забытых в Эхо. Иконка — заглушка: ремесло или ярус, нижняя кромка — редкость. Наведите или выберите клавиатурой — подсказка с загадкой и источником; нажмите — узел откроется в «Древе рецептов». Данные — <code>recipes.js</code>, обоснование и летопись Этриона — <code>docs/content/ресурсы-рецепты-дроп.md</code>. Цикл VI — спойлер, только для команды.</p>
+    <p class="k-note">Все ресурсы игры по шести циклам и ярусам. Базовые — общий пул на все циклы: падают в каждом биоме с первого. Ключи — по биомам, любая элита роняет один из шести наугад. Уникальные — с боссов биомов, крафтовые — в руинах и у крафтовых боссов в Эхо. Иконка — заглушка: ремесло или ярус, нижняя кромка — редкость. Наведите или выберите клавиатурой — подсказка с загадкой и источником; нажмите — узел откроется в «Древе рецептов». Данные — <code>recipes.js</code>, обоснование и летопись Этриона — <code>docs/content/ресурсы-рецепты-дроп.md</code>. Цикл VI — спойлер, только для команды.</p>
     <div id="kitRes" class="rz"></div></section>` : ''}
   ${RXI.sand ? `<section class="k-box"><h3>Древо рецептов · узлы</h3><div class="k-demo tr-cols">${[['sand', ''], ['k1_ench', 'up'], ['u4', ''], ['p_clay', 'sel'], ['act_cb1', 'down'], ['k4_hunt', '', 1]].map(([id, st, unk]) => { const it = RXI[id]; if (!it) return ''; return `<span class="tn ${it.tier === 'key' ? 'key' : it.tier === 'unique' ? 'uniq' : TR_MADE.includes(it.tier) ? 'made' : ''} ${unk ? 'unk' : ''} ${st}"><span class="ti" data-r="${unk ? 1 : it.r}">${unk ? '<span class="gl">?</span>' : trIcon(it)}</span><b>${unk ? 'Не найдено' : it.n}</b></span>`; }).join('')}</div>
     <div class="tr-leg"><span><i></i>что нужно выбранному</span><span><i class="d"></i>куда оно идёт</span><span><i class="s"></i>выбранный узел</span></div>
@@ -3459,43 +3468,48 @@ function renderKit() {
 }
 
 /* ================== UI-кит · ресурсы Этериоса ==================
-   Градация всех ресурсов по шести циклам и ярусам: базовые, ключи элит, уникальные боссов, ресурсы руин, находки, трофеи.
-   Данные — recipes.js (window.EN_RECIPES). Иконки — заглушки из ic(): ремесло или ярус; кромка — редкость. */
+   Градация всех ресурсов по шести циклам и ярусам. Базовые — один общий пул на все циклы (ADR-0023, п. 1): строка во всю ширину по ремёслам.
+   Ключи — по биомам, остальное — по циклам. Данные — recipes.js (window.EN_RECIPES). Иконки — заглушки из ic(): ремесло или ярус; кромка — редкость. */
 const RZ_ROWS = [
-  ['basic', 'Базовые', 'этаж биома, по шансу'],
-  ['key', 'Ключи элит', 'каждая элита, один'],
+  ['key', 'Ключи биомов', 'любая элита — один из шести наугад'],
   ['unique', 'Уникальные', 'босс биома, 5 %'],
   ['craftres', 'Ресурсы руин', 'этаж крафтового биома'],
   ['find', 'Находки', 'закрытие крафтового биома'],
-  ['trophy', 'Трофеи', 'Забытый в Эхо, за победу'],
+  ['trophy', 'Трофеи', 'крафтовый босс в Эхо, за победу'],
 ];
 function rzIt(it) {
   return `<button class="well rz-it" data-rz="${it.id}" data-r="${it.r}" aria-label="${trEsc(it.n)}">${trIcon(it)}${it.tier === 'key' ? `<span class="rz-k">${ic('key')}</span>` : ''}</button>`;
 }
 function rzCell(cy, tier) {
-  const its = RX.items.filter(i => i.cyc === cy.n && i.tier === tier);
+  const its = RX.items.filter(i => i.cyc === cy.n && i.tier === tier && !i.pool);
   if (!its.length) return '<span class="faint" style="font-size:12px">—</span>';
-  if (['basic', 'key', 'unique'].includes(tier)) return cy.biomes.map(b => { const g = its.filter(i => i.b === b.id); return g.length ? `<span class="rz-sub">${b.id.slice(1)} · ${b.n}</span>${g.map(rzIt).join('')}` : ''; }).join('');
+  if (['key', 'unique'].includes(tier)) return cy.biomes.map(b => { const g = its.filter(i => i.b === b.id); return g.length ? `<span class="rz-sub">${b.id.slice(1)} · ${b.n}</span>${g.map(rzIt).join('')}` : ''; }).join('');
   return (cy.craft || []).map(pid => { const p = RX.places.find(x => x.id === pid), g = its.filter(i => i.b === pid); return g.length ? `<span class="rz-sub">${tier === 'trophy' ? p.boss.label : p.n}</span>${g.map(rzIt).join('')}` : ''; }).join('');
+}
+/* общий пул базовых — одна ячейка на все шесть циклов, по ремёслам */
+function rzPool() {
+  const pool = RX.items.filter(i => i.pool), order = RX.specOrder || Object.keys(RX.specs);
+  return order.map(s => `<span class="rz-grp"><span class="rz-sub">${RX.specs[s].n}</span>${pool.filter(i => i.spec === s).map(rzIt).join('')}</span>`).join('');
 }
 function rzPaint() {
   const root = document.getElementById('kitRes'); if (!root || !RX.cycles.length) return;
   const specs = (RX.specOrder || Object.keys(RX.specs)).map(s => `<span>${ic(RX.specs[s].icon)}${RX.specs[s].n}</span>`).join('');
   const head = `<div class="rz-h">Ярус</div>${RX.cycles.map(cy => `<div class="rz-h">${cy.roman} · ${cy.god}<small>${cy.el} · ${cy.karst}${cy.team ? ' · для команды' : ''}</small></div>`).join('')}`;
+  const poolRow = `<div class="rz-t">Базовые · общий пул<small>любой биом с первого, 10 % за этаж; за срабатывание — от 1 до номера биома</small></div><div class="rz-cell rz-pool">${rzPool()}</div>`;
   const rows = RZ_ROWS.map(([t, n, d]) => `<div class="rz-t">${n}<small>${d}</small></div>${RX.cycles.map(cy => `<div class="rz-cell ${cy.team ? 'team' : ''}">${rzCell(cy, t)}</div>`).join('')}`).join('');
-  const totals = `<div class="rz-t">Всего</div>${RX.stats.byCycle.map(s => `<div class="rz-n">${s.resources}</div>`).join('')}`;
+  const totals = `<div class="rz-t">Всего в цикле<small>и ${RX.stats.total.pool} базовых общего пула</small></div>${RX.stats.byCycle.map(s => `<div class="rz-n">${s.resources}</div>`).join('')}`;
   root.innerHTML = `<div class="rz-leg">${specs}<span>${ic('key')}ключ элиты</span><span>${ic('crown')}уникальный</span><span>${ic('search')}находка</span><span>${ic('flag')}трофей</span></div>
-    <div class="rz-scroll"><div class="rz-grid">${head}${rows}${totals}</div></div>
+    <div class="rz-scroll"><div class="rz-grid">${head}${poolRow}${rows}${totals}</div></div>
     <div class="rz-tip" id="rzTip" role="tooltip" hidden></div>`;
 }
 function rzTipHtml(it) {
   const T = RX.tiers[it.tier] || { n: '' }, cy = RX.cycles[it.cyc - 1];
   const bm = it.b ? cy.biomes.find(b => b.id === it.b) : null;
-  const where = bm ? bm.n : it.place || '';
-  const who = it.elite ? `элита «${it.elite}»` : it.tier === 'unique' ? `босс «${it.boss}»` : it.foe ? `«${it.foe}»` : '';
+  const where = it.pool ? 'общий пул · любой биом' : bm ? bm.n : it.place || '';
+  const who = it.tier === 'unique' ? `босс «${it.boss}»` : it.foe ? `«${it.foe}»` : '';
   const sp = it.spec ? RX.specs[it.spec.split('+')[0]].n.toLowerCase() : '';
   const uses = [...new Set((RX_USE[it.id] || []).map(r => r.out[0]))];
-  return `<span class="e">${T.n}${sp ? ' · ' + sp : ''} · цикл ${cy.roman}</span><b>${trEsc(it.n)}</b>
+  return `<span class="e">${T.n}${sp ? ' · ' + sp : ''} · ${it.pool ? 'все циклы' : 'цикл ' + cy.roman}</span><b>${trEsc(it.n)}</b>
     <span class="faint" style="font-size:12px">${[where, who].filter(Boolean).join(' · ')}</span>
     ${it.team ? '<span class="chip warn" style="align-self:flex-start">спойлер · только команде</span>' : ''}
     <p>${trEsc(it.lore)}</p>
