@@ -121,6 +121,21 @@ python tools/content-gen/economy/economy.py
 python tools/content-gen/economy/economy.py --sim
 ```
 
+`economy/echo.py` — калькулятор боя в Эхо к `docs/content/эхо-экономика.md` (ADR-0025). Считает:
+- уровень и здоровье врагов по ступеням и циклам, раунды по типу врага;
+- души за атаку, вершину лестницы за неделю, рейтинговые очки, планки;
+- Многоликого и его биом.
+
+Доход душ и уровни отряда он берёт из `economy.py` и `sets.py` через importlib и их не меняет. Числа — данными в начале файла, только целые.
+- `--sim` меряет бой ядром через Node на врагах недели из `design/ui/echo-foes.js`; вывод вставить в `SIM_*`.
+- `--js` собирает `design/ui/echo-rules.js` — `window.EN_ECHO_RULES`, руками не править, формат — в шапке файла.
+
+```bash
+python tools/content-gen/economy/echo.py
+python tools/content-gen/economy/echo.py --sim
+python tools/content-gen/economy/echo.py --js
+```
+
 ## Враги Эхо
 
 Папка `echo/`, нужен Node. Черновик `docs/content/эхо-враги.md` — враги девяти недель, Убер-боссы и отряды недели (ADR-0025, ADR-0024, ADR-0016).
