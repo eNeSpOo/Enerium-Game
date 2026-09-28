@@ -166,16 +166,14 @@ function suite() {
       scan(key + ' · срок вышел', draw());
       if (S.echo.slots[1] || S.echo.score !== sc || !S.ech.note) fail(key + ': цель с вышедшим сроком не ушла');
 
-      /* планки недели → сундуки осколков, один раз */
+      /* планки недели: сундуки забирают только в «Дарах» (§17.6, §23.1) — кнопка планки открывает Дары и ничего не выдаёт */
       const pk = E.planks();
       if (c < FROM) { if (pk.length) fail(key + ': планки в цикле обучения'); }
       else {
-        S.echo.score = pk[pk.length - 1].need; const ch0 = S.bag.chests.length, want = pk.reduce((a, r) => a + r.pay.reduce((b, g) => b + g.count, 0), 0);
-        pk.forEach(r => ACT.echplank(String(r.k))); pk.forEach(r => ACT.echplank(String(r.k)));
-        const got = S.bag.chests.slice(ch0);
-        if (got.length !== want) fail(`${key}: планки дали ${got.length} сундуков вместо ${want}`);
-        got.forEach(ch => { if (ch.box !== LBX.modes.echo.box || ch.week !== w.race || ch.cyc !== c) fail(key + ': сундук планки ' + JSON.stringify(ch)); try { EnLoot.resolve(LBX, ch); } catch (x2) { fail(key + ': сундук не открывается — ' + x2.message); } });
-        out.chests += got.length;
+        S.echo.score = pk[pk.length - 1].need; const ch0 = S.bag.chests.length;
+        pk.forEach(r => ACT.echplank(String(r.k)));
+        if (S.bag.chests.length !== ch0) fail(`${key}: планка выдала сундук мимо «Даров»`);
+        if (!S.overlay || S.overlay.t !== 'gifts') fail(`${key}: планка не открыла «Дары»`);
         S.overlay = { t: 'echweek' }; scan(key + ' · планки забраны', draw());
       }
 

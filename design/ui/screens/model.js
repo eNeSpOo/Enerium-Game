@@ -21,7 +21,7 @@ const DEMO_BAG = {
     k1_ench: 5, k1_smith: 1, k2_hunt: 2, k2_tail: 3, k2_eng: 4, k2_alch: 5, k2_ench: 1, k2_smith: 2, k3_hunt: 3,
     k3_tail: 4, k3_eng: 5, k3_alch: 1, k3_ench: 2, k3_smith: 3, k4_hunt: 4, k4_tail: 5, k4_eng: 1, k4_alch: 2,
     k4_ench: 3, k4_smith: 4, u1: 1, u2: 1, cr_stone: 2, cr_harness: 5, cr_shoe: 8, cr_karst: 4, cr_prop: 7,
-    cr_mold: 3, find_cb1: 1, act_cb1: 1, call_fb1: 1, p_fang: 2, p_waxthread: 3, p_frame: 1, a_lamp: 1, rn1_1: 3,
+    cr_mold: 3, find_cb1: 1, act_cb1: 1, call_fb1: 1, p_fang: 2, p_waxthread: 3, p_frame: 1, a_lamp: 1, rn1_1: 12,
     rn1_2: 1, vs1: 2, many: 1
   },
   /* найденные рецепты: пять заготовок цикла I, активация Заброшенной дороги и призыв её босса */

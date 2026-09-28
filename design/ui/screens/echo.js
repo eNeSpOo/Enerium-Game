@@ -594,15 +594,8 @@ Object.assign(ACT, {
   echweek() { open('echweek'); },
   echbest() { open('echbest'); },
   echfoe(v) { open('echfoe', v); },
-  /* личная планка → сундук осколков в запасы (spec как в DEMO_BAG.chests); забирается один раз */
-  echplank(v) {
-    sync(); const W = weekOf(S), c = S.acc.cycle, r = planks(W, c).find(x => x.k === +v);
-    if (!r || !r.reached || r.claimed) return;
-    S.ech.claimed[r.k] = true;
-    let n = 0;
-    r.pay.forEach(g => { for (let j = 0; j < g.count; j++) { BAG.addChest({ box: EM.box, r: g.r, cyc: c, win: g.win, week: W.race, src: `Эхо · личная планка ${r.k}` }); n++; } });
-    toast(`${LBX.boxes[EM.box].n} ×${n} — в запасах, открывается там`, CHEST);
-  },
+  /* §17.6, §23.1: сундуки за планки забирают только в «Дарах путешествия» — один сундук не выдаётся через два экрана */
+  echplank() { ACT.sheet('gifts'); },
   echcyc(v) { S.acc.cycle = +v; render(); },
   echopen() { sync(); S.ech.avail = TOP; toast(`Демо: открыты все ${TOP} ступеней недели`); },
   /* подтверждение активации: расход один раз на операцию */
@@ -639,7 +632,7 @@ Object.assign(OV, {
     sync();
     const W = weekOf(S), civ = ECH.civ[W.race], c = S.acc.cycle, squad = W.squad.map(id => RSI[id]).filter(Boolean), open = squad.filter(h => h.c <= c), av = squad.find(h => h.avers && h.avers.race);
     const rows = squad.map(h => { const on = h.c <= c; return rsRow(h, { act: 'rhero', dim: !on, sub: on ? `цикл ${ROMAN[h.c]} · ${h.cls}` : `откроется в цикле ${ROMAN[h.c]}`, right: on ? rsShardTag(h) : ic('lock') }); }).join('');
-    const pk = planks(W, c).map(r => `<div class="mail ech-plank ${r.claimed ? 'got' : ''}"><div class="col" style="gap:2px;min-width:0"><b>Личная планка ${r.k} · ${fmt(r.need)} очков</b><small class="faint">${r.pay.map(g => `${g.count > 1 ? g.count + ' × ' : ''}${boxName(EM.box, g.r)}`).join(', ')}</small></div>${r.claimed ? `<span class="chip spirit">${ic('check')}в запасах</span>` : r.reached ? `<button class="btn sm go" data-a="echplank" data-v="${r.k}">Забрать</button>` : `<span class="faint num ech-need">ещё ${fmt(r.need - S.echo.score)}</span>`}</div>`).join('');
+    const pk = planks(W, c).map(r => `<div class="mail ech-plank ${r.claimed ? 'got' : ''}"><div class="col" style="gap:2px;min-width:0"><b>Личная планка ${r.k} · ${fmt(r.need)} очков</b><small class="faint">${r.pay.map(g => `${g.count > 1 ? g.count + ' × ' : ''}${boxName(EM.box, g.r)}`).join(', ')}</small></div>${r.claimed ? `<span class="chip spirit">${ic('check')}в запасах</span>` : r.reached ? `<button class="btn sm" data-a="sheet" data-v="gifts">В «Дарах»</button>` : `<span class="faint num ech-need">ещё ${fmt(r.need - S.echo.score)}</span>`}</div>`).join('');
     const body = `<div class="col" style="gap:4px"><span class="eyebrow">Неделя ${W.gen} · древняя цивилизация</span><b class="serif ech-civn">${W.civ}</b><p class="muted" style="font-size:14px">${civ.look}</p><p class="quote"><b>Нашествие «${W.raid}»</b>${civ.raid}</p><p class="reason">Жила на Этериосе задолго до этеров. Враги недели — её нашествие: ${TOP} ступеней лестницы и Многоликий.</p></div>
       <span class="eyebrow">Отряд недели · открыто ${open.length} из ${squad.length} к циклу ${ROMAN[c]}</span>
       <p class="reason">Пятеро, кто отбил это нашествие: по герою за цикл, с ${ROMAN[squad.length ? squad[0].c : EM.from]} по ${ROMAN[squad.length ? squad[squad.length - 1].c : EM.from]}.</p>

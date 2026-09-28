@@ -915,6 +915,26 @@ button.well:hover{border-color:var(--iron-3)}
 .good.sold{opacity:.45}
 .lot{display:grid;grid-template-columns:40px 1fr 70px 90px auto;gap:10px;align-items:center;padding:6px 10px;border-radius:10px;border:1px solid var(--iron);background:#0e1114}
 .lot b{font-size:14px}
+/* запасы игрока на прежних экранах: колодец предмета recipes.js, лавка, рынок, ритуалы, итог забега */
+.well.bw .i{width:46%;height:46%;color:color-mix(in srgb,var(--rc,#aaa) 70%,var(--parch))}
+.well.bw .gl{font:600 calc(var(--s,56px) * .34)/1 var(--f-d);color:var(--gold)}
+.lot .col small{font-size:12px}
+.lot .row{gap:6px}
+.lot.sold{border-color:rgba(72,229,212,.4)}
+.mk-mine{display:grid;grid-template-columns:292px minmax(0,1fr);gap:10px;flex:1 1 0;min-height:0}
+.mk-form{display:flex;flex-direction:column;gap:8px;padding:10px;min-height:0}
+.mk-form .rs-sel{width:100%}
+.mk-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.mk-row .eyebrow{min-width:64px}
+.mk-row .qty button:disabled{opacity:.4}
+.mk-sum{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:12.5px;margin:0}
+.mk-sum dt{color:var(--parch-3)}
+.mk-sum dd{margin:0;text-align:right;color:var(--parch);font-variant-numeric:tabular-nums}
+.rw{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rw .row{gap:4px}
+.hd-it{all:unset;cursor:pointer;color:var(--gold-2);text-decoration:underline dotted;text-underline-offset:2px}
+.hd-it:hover,.hd-it:focus-visible{color:var(--gold)}
+.ev-note{display:flex;align-items:center;gap:10px;justify-content:space-between}
 
 /* Неделя */
 .wk-head{display:flex;align-items:center;gap:14px;padding:10px 12px;flex:none}
@@ -1562,6 +1582,36 @@ const STAT_HINT = ['физ. урон и защита', 'маг. урон и за
 const GRADE = { 1: '×2', 2: '×1,5', 3: '×1,25' };
 const CLS_ICON = { 'Танк': 'shield', 'Физ. ДД': 'sword', 'Маг. ДД': 'staff', 'Хилер': 'heal', 'Контроль': 'chain' };
 
+/* ================== запасы игрока на экранах index.html: данные ==================
+   Один инвентарь: запасы — S.bag, только через BAG (договор — screens/model.js), предметы — EN_RECIPES (recipes.js).
+   Числа добычи, цен и ритуалов — в EN_RECIPES.drops. Здесь — только то, чего там нет; такие числа помечены «нет в recipes.js».
+   Всё — демонстрация, не баланс. */
+const INV = {
+  /* развитие героя (§10, ADR-0014): руны предела, осколки и руна доблести — ярусы rune, vshard, valor цикла героя */
+  hero: {
+    capByLim: [50, 150, 350, 700, 1200, 1200],   // §10.1: потолок уровня по числу пробитых пределов — 50 / 150 / 350 / 700 / 1200
+    runesPerLimit: 10,                          // §10.1: предел — 10 рун своего цикла; нет в recipes.js
+    valorAtLim: 5,                              // ADR-0014: доблесть — только на пятом пределе текущего круга
+    valorPct: 30,                               // §10.2: доблесть даёт +30 %
+    valorBmPct: 62,                             // боевая мощь после доблести: уровень в 0 — показ прототипа, не расчёт
+  },
+  /* лавка (§14.2): десять товаров — [предмет, количество, валюта, цена в Энериуме]. За золото — минимальная цена рынка
+     drops.market за штуку × количество. Цены в Энериуме в recipes.js нет — заглушка. Руны пределов лавка не продаёт (ADR-0014) */
+  shop: {
+    refreshSec: 5 * 3600 + 42 * 60, free: 2,   // до автообновления и бесплатных обновлений — демо
+    goods: [['resin', 20, 'gold'], ['fang', 20, 'gold'], ['spring', 20, 'gold'], ['k1_hunt', 2, 'gold'], ['k3_ench', 1, 'gold'],
+      ['cr_stone', 3, 'gold'], ['cr_clasp', 2, 'gold'], ['find_cb1', 1, 'gold'], ['u1', 1, 'enerium', 30], ['u3', 1, 'enerium', 45]],
+  },
+  /* рынок (§13): цена за штуку — не ниже минимальной drops.market, комиссия — drops.market.commissionPct с выручки.
+     Лоты — [предмет, количество, цена в % от минимальной, у своих — состояние: на рынке или продан] */
+  market: {
+    lots: [['bone', 20, 120], ['k1_smith', 3, 140], ['cr_karst', 4, 100], ['find_cb2', 1, 110], ['u2', 1, 100]],
+    mine: [['k2_eng', 2, 150, 'wait'], ['cr_shoe', 3, 120, 'sold']],
+    pricePct: [100, 120, 150, 200],   // цена своего лота — доли минимальной
+    qtySteps: [-10, -1, 1, 10],
+  },
+};
+
 const EB = window.EnBattle;
 /* Прежняя библиотека ядра — для модели темпа. В модели «10 раундов» герой прототипа берёт набор из распределения: поле draft —
    его черновик в docs/content/герои/, набор — kits.js (ADR-0016), способности — abilities.js (ADR-0015). */
@@ -1602,7 +1652,7 @@ function initialState() {
       { id: 's4', name: 'Авангард', m: ['h1', 'h2', 'h4', null, null] },
       { id: 's5', name: 'Тени', m: ['h3', 'h5', null, null, null] },
     ],
-    selSquad: 's1', prepSquad: 's1', echoSquad: 's1', act: null, selItem: 'crown',
+    selSquad: 's1', prepSquad: 's1', echoSquad: 's1', act: null,
     biomes: [
       { id: 'b1', cyc: 1, name: 'Мастерская форм', state: 'done' },
       { id: 'b2', cyc: 1, name: 'Подземный лес', state: 'done' },
@@ -1627,36 +1677,13 @@ function initialState() {
       { id: 'g1', g: 'b', name: 'Мастер', type: 'Рунный страж', tag: 'Страж дороги вниз', cls: 'Страж', el: 'Земля', race: 'Эльфы', hp: 78000, bm: 64500, desc: 'Единственный законченный во всей Мастерской. Решает, можно ли пустить чужого дальше.', tip: 'Он ждёт и отвечает. Мастер не любит суеты.' },
     ],
     known: ['o1', 'o2', 'o3', 'o4', 'o5', 'e1', 'e2', 'e3', 'e4', 'e5', 'e6', 'b1', 'g1'],
-    items: [
-      { id: 'cinder', n: 'Пепельное сердце', r: 2, q: 24, cat: 'res', spec: 'Алхимия', img: ART('item-cinder-heart.png'), riddle: 'Тёплое, пока его держат. Остывает, если положить к ключу.', from: 'Рядовые Мастерской форм', recipes: ['Связующее'] },
-      { id: 'crown', n: 'Полая корона', r: 4, q: 8, cat: 'res', spec: 'Уникальный ресурс', img: ART('item-hollow-crown.png'), riddle: 'Внутри пусто. Кто-то думал, что корону делает голова.', from: 'Босс биома, редко', recipes: ['Активация биома'], rare: true },
-      { id: 'seal', n: 'Пепельная печать', r: 4, q: 12, cat: 'res', spec: 'Уникальный ресурс', img: ART('item-ashen-seal.png'), riddle: 'Печать без оттиска. Её ещё никто не приложил.', from: 'Босс биома, редко', recipes: ['Призыв крафтового босса'], rare: true },
-      { id: 'bloom', n: 'Могильный цвет', r: 4, q: 32, cat: 'res', spec: 'Уникальный ресурс', img: ART('item-gravebloom.png'), riddle: 'Цветёт там, где долго лежал камень.', from: 'Ритуалы рабочих', recipes: [], rare: true, isNew: true },
-      { id: 'storm', n: 'Грозовое стекло', r: 4, q: 18, cat: 'res', spec: 'Уникальный ресурс', img: ART('item-stormglass.png'), riddle: 'В стекле застыл порыв. Мех узнал бы его.', from: 'Элиты, редко', recipes: [], rare: true },
-      { id: 'bell', n: 'Безмолвный колокол', r: 4, q: 4, cat: 'res', spec: 'Уникальный ресурс', img: ART('item-silent-bell.png'), riddle: 'Звонит только для тех, кто не слышит.', from: 'Лавка, изредка', recipes: [], rare: true },
-      { id: 'key', n: 'Рунический ключ', r: 2, q: 20, cat: 'key', spec: 'Вход к рунному стражу', img: ART('rune-key.png'), riddle: 'Ключ богов открывает дорогу вниз, но не обещает её.', from: 'Контракты, элиты', recipes: ['Связующее'] },
-      { id: 'rune50', n: 'Руна предела · 50', r: 2, q: 10, cat: 'key', spec: 'Развитие героя', img: null, glyph: 'I', riddle: 'Десять рун одного цикла пробивают предел.', from: 'Мастер (рунный страж)', recipes: ['Руна предела 150'] },
-      { id: 'vfrag', n: 'Осколки руны доблести', r: 2, q: 112, cat: 'key', spec: 'Развитие героя', img: null, glyph: 'V', riddle: 'Сто осколков собираются в одну руну.', from: 'Второй рунный страж цикла', recipes: ['Руна доблести'] },
-      { id: 'hfrag', n: 'Осколки: Лаэйра', r: 3, q: 42, cat: 'frag', spec: 'Сборный герой', img: AV('heroes/h3.jpg'), riddle: '42 из 50. Остальное — у Эхо.', from: 'Эхо, Возрождение душ', recipes: [] },
-      { id: 'act', n: 'Активация биома', r: 4, q: 1, cat: 'act', spec: 'Экземпляр крафтового биома', img: PATH(22), riddle: 'Что внутри — узнаешь, когда откроешь.', from: 'Мастерская', recipes: [], action: 'Активировать' },
-      { id: 'many', n: 'Многоликий', r: 4, q: 1, cat: 'act', spec: 'Крафт или биом недели', img: PATH(18), riddle: 'Носит лица тех, кого победили на этой неделе.', from: 'Эхо: Убер-босс недели', recipes: [], action: 'Активировать' },
-      { id: 'chest', n: 'Сундук рабочих', r: 3, q: 3, cat: 'act', spec: 'Лутбокс События', img: CHEST, riddle: 'Шарды рабочих и гарантированная валюта.', from: 'Дары путешествия', recipes: [], action: 'Открыть' },
-    ],
-    craft: [null, null, null, null, null, null], craftSel: 0, book: false, invCat: 'all', invQ: '',
+    /* запасы игрока — S.bag: его заводит screens/model.js из DEMO_BAG, здесь инвентаря нет */
     tree: { cyc: 1, sel: null, q: '', only: false },   // вкладка «Древо рецептов» — инструмент команды
-    recipes: [
-      { id: 'bind', n: 'Связующее', out: 'Связующее', outImg: ART('item-cinder-heart.png'), outQ: '1–3', in: [['cinder', 3], ['key', 1]], fav: true, cyc: 1 },
-      { id: 'call', n: 'Активация биома', out: 'Активация биома', outImg: PATH(22), outQ: '1', in: [['bind', 2], ['crown', 1]], fav: false, cyc: 1, chain: true, unique: 'Полая корона' },
-      { id: 'boss', n: 'Призыв крафтового босса', out: 'Призыв босса', outImg: PATH(18), outQ: '1', in: [['bind', 3], ['seal', 1]], fav: false, cyc: 2, chain: true, unique: 'Пепельная печать' },
-      { id: 'valor', n: 'Руна доблести', out: 'Руна доблести', outImg: null, outQ: '1', in: [['vfrag', 100]], fav: true, cyc: 1 },
-    ],
-    shop: [
-      ['cinder', 5, 'gold', 1250], ['crown', 1, 'enerium', 30], ['seal', 2, 'gold', 2400], ['bloom', 3, 'gold', 3200], ['storm', 2, 'gold', 1800],
-      ['key', 2, 'gold', 900], ['cinder', 10, 'gold', 2300], ['bell', 1, 'enerium', 45], ['rune50', 1, 'gold', 5200], ['vfrag', 10, 'gold', 1500],
-    ], sold: [],
-    market: [
-      ['cinder', 20, 65], ['storm', 1, 2600], ['bloom', 2, 1900], ['key', 3, 420], ['seal', 1, 25000],
-    ],
+    /* лавка и рынок: товары и лоты — из INV, цены — EN_RECIPES.drops.market */
+    shop: INV.shop.goods.map(g => g.slice()), sold: [],
+    market: { lots: INV.market.lots.map(([id, q, pct], i) => ({ uid: 'l' + (i + 1), id, q, pct })),
+      mine: INV.market.mine.map(([id, q, pct, st], i) => ({ uid: 'my' + (i + 1), id, q, pct, st })),
+      seq: INV.market.mine.length, sel: { id: '', q: 1, pct: INV.market.pricePct[0] }, q: '', ops: {} },
     echo: { score: 38240, place: 146, sel: 0, avail: 7,
       slots: [{ foe: 'o1', step: 1, hp: 3210, max: 4800, left: 86 * 3600 }, { foe: 'e1', step: 7, hp: 18500, max: 18500, left: 44 * 3600 }, null, null] },
     contracts: {
@@ -1670,20 +1697,23 @@ function initialState() {
         { n: 'Пройти 60 ступеней', r: 2, pts: 20, goal: 60, p: 60 },
         { n: 'Победить рунного стража', r: 5, pts: 160, goal: 2, p: 0 } ], pool: { gold: 9800, spirit: 600, keys: 14, enerium: 20 } },
     },
+    /* ритуалы (§19): время и награда — по редкости из EN_RECIPES.drops.rituals. Рабочие — базовые общего пула, с эпической
+       редкости ещё ключи биома; уникальный ритуал — уникальный ресурс босса биома; герои — золото, дух и души цикла.
+       Слот хранит ритуал с циклом на момент старта: награда решена при старте, ресурсы — на сиде ритуала при выдаче */
     rituals: {
       slots: [
-        { st: 'ready', n: 'Завершённый сбор', who: 'Рабочие · 2', rew: ['cinder', 6] },
-        { st: 'run', n: 'Тихая выработка', who: 'Рабочие · 3', left: 42 * 60 },
+        { st: 'ready', uid: 'rt1', n: 'Завершённый сбор', kind: 'work', r: 1, ppl: 2, biome: 'b1', cyc: 2 },
+        { st: 'run', uid: 'rt2', n: 'Тихая выработка', kind: 'work', r: 4, ppl: 3, biome: 'b1', cyc: 2, left: 42 * 60 },
         { st: 'free' } ],
       work: [
-        { n: 'Сбор у древнего кряжа', r: 2, t: '2 ч', ppl: 2, rew: [['cinder', 8]], biome: 'Мастерская форм' },
-        { n: 'Следы погребённого', r: 3, t: '6 ч', ppl: 5, rew: [['crown', 1]], biome: 'Подземный лес' },
-        { n: 'Тихая выработка', r: 1, t: '30 мин', ppl: 1, rew: [['cinder', 2]], biome: 'Мастерская форм' } ],
+        { n: 'Сбор у древнего кряжа', r: 2, ppl: 2, biome: 'b1' },
+        { n: 'Следы погребённого', r: 3, ppl: 5, biome: 'b2', unique: true },
+        { n: 'Тихая выработка', r: 4, ppl: 3, biome: 'b1' } ],
       hero: [
-        { n: 'Бдение у колыбели', r: 4, t: '8 ч', ppl: 3, rew: [['souls', 12], ['gold', 2400]] },
-        { n: 'Счёт песка', r: 2, t: '2 ч', ppl: 1, rew: [['spirit', 300]] },
-        { n: 'Долгая дорога', r: 3, t: '5 ч', ppl: 2, rew: [['gold', 1800], ['souls', 4]] } ],
-      rolls: 3, workers: 7,
+        { n: 'Бдение у колыбели', r: 4, ppl: 3 },
+        { n: 'Счёт песка', r: 2, ppl: 1 },
+        { n: 'Долгая дорога', r: 3, ppl: 2 } ],
+      rolls: 3, workers: 7, seq: 2,
     },
     arena: { rating: 1260, att: 20, max: 40,
       opp: [
@@ -1695,7 +1725,9 @@ function initialState() {
     clan: { n: 'Пепельный круг', type: 'Средний', lvl: 12, mem: 18, cap: 26, res: 62,
       goals: [['Сегодня', 'Завершить контракты'], ['Эта неделя', 'Поднять ступень Кланового босса'], ['Этот месяц', 'Развить древо клана']],
       boss: { circle: 1, att: 5, elites: [['Земля', 124000, 240000], ['Огонь', 142000, 320000], ['Время', 160000, 400000]] } },
-    event: { pts: 3840, ms: [1000, 2500, 5000, 10000, 20000],
+    /* Событие: личные планки — пороги ms, сундуки планок — EN_LOOTBOXES.modes.event; получают их в Дарах путешествия.
+       Очков — на три планки из пяти, как у обычного игрока в Дарах (ZP_DEMO.gifts.who) */
+    event: { pts: 5140, ms: [1000, 2500, 5000, 10000, 20000],
       src: [['Контракты', 'полностью выполненный контракт', 40], ['Путешествия', 'закрытый биом', 60], ['Ритуалы', 'завершённый ритуал', 25], ['Эхо', 'побеждённая цель', 30], ['Арена', 'победа', 15]] },
     arts: [
       { n: 'Дар изобилия', lv: 2, max: 3, d: '+4% золота за убийства', cost: 60 },
@@ -1714,10 +1746,13 @@ function initialState() {
       offer: [{ n: 'Сговорчивый купец', r: 2, cat: 'Магазин', d: 'Цены товаров лавки за золото −5%' }, { n: 'Пыль побед', r: 3, cat: 'Дух', d: 'Дух после закрытия биома +5%' }, { n: 'Старшины каравана', r: 5, cat: 'Ритуалы', d: '+2 слота ритуалов' }],
       alt: [{ n: 'Жадное ухо', r: 1, cat: 'Дух', d: '5% шанс двойного духа с обычного врага' }, { n: 'Хозяин лавки', r: 4, cat: 'Магазин', d: 'Цены товаров лавки за золото −15%' }, { n: 'Полный жребий', r: 5, cat: 'Контракты', d: '+3 бесплатных реролла заданий в день' }],
       pick: 1 },
+    /* Входящие: rew — валюта кошелька или предмет запасов [id, количество]; chests — сундуки для BAG.addChest;
+       rit — готовый ритуал: письмо забирает его награду, и ритуал, и письмо закрываются вместе */
     inbox: [
-      { id: 'm1', k: 'away', t: 'Ритуал «Завершённый сбор» готов', s: 'Рабочие вернулись с добычей', rew: [['cinder', 6]], go: 'rituals' },
+      { id: 'm1', k: 'away', t: 'Ритуал «Завершённый сбор» готов', s: 'Рабочие вернулись с добычей', rit: 'rt1', rew: [], go: 'rituals' },
       { id: 'm2', k: 'away', t: 'Оборона выстояла', s: 'Отряд отразил 2 нападения · Арена +14', rew: [], go: 'arena' },
-      { id: 'm3', k: 'mail', t: 'Итоги контракта', s: 'Вчера · исполнен · 35 очков клану', rew: [['keys', 6], ['gold', 1200]] },
+      { id: 'm3', k: 'mail', t: 'Итоги контракта', s: 'Вчера · исполнен · 35 очков клану', rew: [['keys', 6], ['gold', 1200], ['ink', 4], ['thread', 3], ['bone', 3]] },
+      { id: 'm5', k: 'mail', t: 'Достижение «Тихое ремесло»', s: 'Персональное достижение · сундук странника', rew: [], chests: [{ box: 'wander', r: 2, cyc: 2, win: 'step', src: 'Достижения · Тихое ремесло' }] },
       { id: 'm4', k: 'mail', t: 'Письмо проводника', s: 'Энцо: «Внизу всё ещё ждут. Не заставляй»', rew: [] },
     ],
     gift: { day: 4, got: 3 },
@@ -1736,21 +1771,38 @@ const clock = s => { s = Math.max(0, Math.round(s)); return String(Math.floor(s 
 const ic = (n, c = '') => `<svg class="i ${c}" aria-hidden="true"><use href="#i-${n}"></use></svg>`;
 const H = id => S.heroes.find(h => h.id === id);
 const F = id => S.foes.find(f => f.id === id);
-const I = id => S.items.find(i => i.id === id);
 const known = id => S.known.includes(id);
 const stars = (v, m) => Array.from({ length: m }, (_, i) => `<i class="${i < v ? 'on' : ''}"></i>`).join('');
 const limits = n => Array.from({ length: 5 }, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('');
 const el = (e, bare) => `<span class="el ${bare ? 'bare' : ''}" data-el="${e}" title="Стихия: ${e}">${bare ? '' : e}</span>`;
 const rar = r => `<span class="rar" data-r="${r}">${RAR[r]}</span>`;
 const bar = (v, cls = '', extra = '') => `<div class="bar ${cls}" style="--v:${Math.max(0, Math.min(100, v))}">${extra}<i></i></div>`;
-const curImg = k => CUR[k] ? CUR[k].img : (I(k) ? I(k).img : '');
+const curImg = k => CUR[k] ? CUR[k].img : '';
 const money = (k, n) => `<span class="row" style="gap:4px;display:inline-flex"><img src="${curImg(k)}" alt="${CUR[k] ? CUR[k].n : ''}" width="18" height="18" style="object-fit:contain"><b class="num">${fmt(n)}</b></span>`;
 const costTag = (k, n) => `<span class="cost"><img src="${curImg(k)}" alt="${CUR[k] ? CUR[k].n : ''}">${fmt(n)}</span>`;
 const lvlCost = (from, q) => { let c = 0; for (let l = from; l < from + q; l++) c += Math.ceil(Math.pow(l, 1.2)); return c; };
 function well(it, { act = 'item', val, q, sel, size, extra = '', dis } = {}) {
   const inner = it ? (it.img ? `<img src="${it.img}" alt="">` : `<span class="serif gold" style="font-size:22px;font-weight:600">${it.glyph || '?'}</span>`) : ic('plus');
-  return `<button class="well ${it ? '' : 'empty'} ${sel ? 'sel' : ''}" ${it ? `data-r="${it.r}"` : ''} ${size ? `style="--s:${size}px"` : ''} data-a="${act}" data-v="${val ?? (it ? it.id : '')}" aria-label="${it ? it.n + (q != null ? ', ' + q + ' шт.' : '') : 'Пустая ячейка'}" ${dis ? 'disabled' : ''}>${inner}${q != null ? `<span class="q">${fmt(q)}</span>` : ''}${it && it.isNew ? '<span class="new dot"></span>' : ''}${extra}</button>`;
+  return `<button class="well ${it ? '' : 'empty'} ${sel ? 'sel' : ''}" ${it ? `data-r="${it.r}"` : ''} ${size ? `style="--s:${size}px"` : ''} data-a="${act}" data-v="${val ?? (it && it.id != null ? it.id : '')}" aria-label="${it ? it.n + (q != null ? ', ' + q + ' шт.' : '') : 'Пустая ячейка'}" ${dis ? 'disabled' : ''}>${inner}${q != null ? `<span class="q">${fmt(q)}</span>` : ''}${it && it.isNew ? '<span class="new dot"></span>' : ''}${extra}</button>`;
 }
+/* ================== предметы запасов (recipes.js) ==================
+   Запасы — только через BAG (screens/model.js). Он подключается после этого скрипта, поэтому BAG, RX и trIcon
+   зовутся лишь при отрисовке и в действиях. Иконка — как в «Древе рецептов», кромка — редкость. */
+const itTeam = it => !!it && !!it.team && !KH.team;   // спойлер цикла VI игроку не называется
+const itName = it => !it ? '—' : itTeam(it) ? `${(RX.tiers[it.tier] || { n: 'Предмет' }).n} · цикл ${ROMAN[it.cyc]}` : it.n;
+function itWell(id, { act = 'item', val, q, size, dis, sel } = {}) {
+  const it = BAG.item(id); if (!it) return '';
+  const nm = trEsc(itName(it));
+  return `<button class="well bw${sel ? ' sel' : ''}" data-r="${it.r}"${size ? ` style="--s:${size}px"` : ''} data-a="${act}" data-v="${val ?? id}" title="${nm}" aria-label="${nm}${q != null ? ', ' + q + ' шт.' : ''}"${dis ? ' disabled' : ''}>${itTeam(it) ? ic('lock') : trIcon(it)}${q != null ? `<span class="q">${fmt(q)}</span>` : ''}</button>`;
+}
+const poolItems = () => RX.items.filter(i => i.pool && !i.team);                     // 36 базовых общего пула (ADR-0023, п. 1)
+const biomeItems = (tier, b) => RX.items.filter(i => i.tier === tier && i.b === b);   // ключи и уникальные биома
+const cycItems = (tier, c) => RX.items.filter(i => i.tier === tier && i.cyc === c);   // руны и осколки цикла
+const limitRune = (c, k) => cycItems('rune', c).find(i => i.glyph === ROMAN[k]) || null;   // руна предела k (I–V) цикла c
+const biomeName = b => { for (const c of RX.cycles) { const x = c.biomes.find(y => y.id === b); if (x) return x.n; } return b; };
+/* рынок (§13): минимальная цена за штуку — по ярусу и циклу предмета, у общего пула — цикл I */
+const mkMin = id => { const it = BAG.item(id), p = it && RX.drops.market[it.tier]; return Array.isArray(p) && !it.team ? p[it.cyc - 1] || 0 : 0; };
+const mkUnit = (id, pct) => Math.floor(mkMin(id) * pct / 100);
 function heroCard(h, o = {}) {
   const { sel, act = 'hero', val = h.id, dim, note } = o;
   return `<button class="hc ${sel ? 'sel' : ''} ${dim ? 'dim' : ''}" data-r="${h.r}" data-a="${act}" data-v="${val}" aria-label="${h.name}, уровень ${h.lvl}, боевая мощь ${h.bm}">
@@ -2323,6 +2375,17 @@ function heroHead(h, bmLabel = 'боевая мощь') {
     <div class="hd-bm"><b>${fmt(h.bm)}</b><span class="eyebrow">${bmLabel}</span><span class="row" style="gap:6px"><span class="stars lg" title="Доблесть ${h.valor} из ${h.maxV}">${stars(h.valor, h.maxV)}</span><span class="faint num" style="font-size:12px">${h.valor}/${h.maxV}</span></span></div>
   </div>`;
 }
+/* развитие героя на запасах (§10, ADR-0014): предел — INV.hero.runesPerLimit рун своего предела цикла героя;
+   доблесть — одна руна доблести цикла героя и только на пятом пределе; руну собирают из осколков в мастерской (рецепт — recipes.js) */
+function heroDev(h) {
+  const D = INV.hero, top = D.capByLim.length - 1, c = h.cycle;
+  const rune = h.lim < top ? limitRune(c, h.lim + 1) : null;
+  const vr = cycItems('valor', c)[0] || null, vs = cycItems('vshard', c)[0] || null;
+  const rec = vr ? (RX_OUT[vr.id] || []).find(r => !r.team) || null : null, part = rec && vs ? rec.in.find(([id]) => id === vs.id) : null;
+  return { top, atCap: h.lvl >= h.cap, rune, have: rune ? BAG.qty(rune.id) : 0, need: D.runesPerLimit,
+    vr, vrHave: vr ? BAG.qty(vr.id) : 0, vs, vsHave: vs ? BAG.qty(vs.id) : 0, vsNeed: part ? part[1] : 0, rec, open: h.lim >= D.valorAtLim };
+}
+const hdIt = (it, txt) => it ? `<button class="hd-it" data-a="item" data-v="${it.id}" title="${trEsc(itName(it))}">${txt}</button>` : txt;
 function heroDetail(h) {
   const t = S.seg.hero;
   let body = '';
@@ -2330,7 +2393,7 @@ function heroDetail(h) {
     const atCap = h.lvl >= h.cap, maxV = h.valor >= h.maxV;
     const q = Math.min(S.qty === 'max' ? h.cap - h.lvl : S.qty, h.cap - h.lvl);
     const cost = q > 0 ? lvlCost(h.lvl, q) : 0;
-    const vfr = I('vfrag').q;
+    const d = heroDev(h), limDone = h.lim >= d.top, canLim = d.atCap && !!d.rune && d.have >= d.need;
     body = `<div class="hd-cols">
       <div class="col" style="gap:6px">
         <div class="stats">${h.st.map((v, i) => `<div class="srow" title="${STATS[i]}: ${STAT_HINT[i]}"><span class="n">${STATS[i]}</span><span class="v">${v}</span><span class="grade" title="Степень роста ${h.gr[i]}: ${GRADE[h.gr[i]]} за уровень">${[1, 2, 3].map(g => `<i class="${4 - h.gr[i] >= g ? 'on' : ''}"></i>`).join('')}</span></div>`).join('')}</div>
@@ -2341,13 +2404,14 @@ function heroDetail(h) {
           <div style="min-width:0"><b>Уровень <span class="num">${h.lvl}</span> / ${h.cap}</b>${bar(h.lvl / h.cap * 100)}</div>
           ${atCap ? '<span class="chip gold">предел</span>' : `<span></span><div class="step-act"><div class="qty" role="group" aria-label="Сколько уровней">${[[1, '+1'], [5, '+5'], ['max', 'Макс']].map(([v, l]) => `<button aria-pressed="${S.qty === v}" data-a="qty" data-v="${v}">${l}</button>`).join('')}</div><button class="btn go sm" data-a="lvlup" ${cost > S.wallet.spirit ? 'disabled' : ''}>Поднять${costTag('spirit', cost)}</button></div>`}
         </div>
-        <div class="step ${atCap && h.lim < 5 ? 'now' : h.lim >= 5 ? 'done' : ''}"><span class="ic">${ic('gem')}</span>
-          <div style="min-width:0"><b>Предел <span class="limits" style="margin-left:4px">${limits(h.lim)}</span></b><small>${atCap ? `10 рун цикла ${ROMAN[h.cycle]} · есть ${I('rune50').q}` : 'откроется на уровне ' + h.cap}</small></div>
-          <button class="btn sm ${atCap ? 'go' : ''}" data-a="limit" ${atCap ? '' : 'disabled'}>Пробить</button>
+        <div class="step ${limDone ? 'done' : atCap ? 'now' : ''}"><span class="ic">${ic('gem')}</span>
+          <div style="min-width:0"><b>Предел <span class="limits" style="margin-left:4px">${limits(h.lim)}</span></b><small>${limDone ? 'все пределы пройдены' : `${hdIt(d.rune, 'руны предела ' + (d.rune ? d.rune.glyph : ''))} цикла ${ROMAN[h.cycle]}: ${fmt(d.have)} из ${d.need}${atCap ? '' : ' · с уровня ' + h.cap}`}</small></div>
+          ${limDone ? '<span class="chip gold">пройдено</span>' : `<button class="btn sm ${canLim ? 'go' : ''}" data-a="limit" ${canLim ? '' : 'disabled'}>Пробить</button>`}
         </div>
-        <div class="step ${maxV ? 'done' : ''}"><span class="ic">${ic('star')}</span>
-          <div style="min-width:0"><b>Доблесть ${h.valor} / ${h.maxV}</b><small>${maxV ? 'личный максимум достигнут' : `осколки руны ${vfr}/100`}</small></div>
-          ${maxV ? '<span class="chip gold">максимум</span>' : `<button class="btn sm" data-a="valor">${vfr >= 100 ? 'Собрать' : 'Где взять'}</button>`}
+        <div class="step ${maxV ? 'done' : d.open && d.vrHave ? 'now' : ''}"><span class="ic">${ic('star')}</span>
+          <div style="min-width:0"><b>Доблесть ${h.valor} / ${h.maxV}</b><small>${maxV ? 'личный максимум достигнут' : `${hdIt(d.vr, 'руна')} ${fmt(d.vrHave)} · ${hdIt(d.vs, 'осколки')} ${fmt(d.vsHave)} из ${d.vsNeed}${d.open ? '' : ' · с предела ' + ROMAN[INV.hero.valorAtLim]}`}</small></div>
+          ${maxV ? '<span class="chip gold">максимум</span>' : d.vrHave ? `<button class="btn sm ${d.open ? 'go' : ''}" data-a="valor" ${d.open ? '' : 'disabled'}>Взять</button>`
+            : d.rec && d.vsNeed && d.vsHave >= d.vsNeed ? `<button class="btn sm" data-a="valorcraft" data-v="${d.rec.id}">Собрать руну</button>` : `<button class="btn sm" data-a="item" data-v="${d.vs ? d.vs.id : ''}">Где взять</button>`}
         </div>
       </div>
     </div>`;
@@ -2525,75 +2589,70 @@ function rsDustCol() {
   </div>`;
 }
 
-/* ================== Ремесло ================== */
-const CATS = [['all', 'Всё'], ['res', 'Ресурсы'], ['key', 'Ключи'], ['frag', 'Осколки'], ['act', 'Предметы']];
-function invList() {
-  const q = S.invQ.trim().toLowerCase();
-  return S.items.filter(i => (S.invCat === 'all' || i.cat === S.invCat) && (!q || i.n.toLowerCase().includes(q)));
-}
-function invPanel(mode) {
-  const list = invList();
-  return `<div class="pnl inv">
-    <div class="row" style="gap:6px"><div class="tabs" role="tablist" aria-label="Категории">${CATS.map(([k, l]) => `<button role="tab" aria-selected="${S.invCat === k}" data-a="cat" data-v="${k}">${l}</button>`).join('')}</div></div>
-    <label class="search">${ic('search')}<input id="invq" type="search" placeholder="Поиск по запасам" value="${S.invQ}" autocomplete="off"></label>
-    <div class="inv-grid scroll grow">${list.map(i => well(i, { act: mode === 'work' ? 'put' : 'isel', q: i.q, sel: mode !== 'work' && S.selItem === i.id })).join('') || '<p class="faint" style="grid-column:1/-1">Ничего не найдено</p>'}</div>
-    ${mode === 'work' ? '<p class="reason">Нажмите ресурс — он ляжет в выбранную ячейку стола.</p>' : ''}
-  </div>`;
-}
-function craftMatch() {
-  const used = S.craft.filter(Boolean);
-  if (!used.length) return { st: 'empty' };
-  for (const r of S.recipes) {
-    const ok = r.in.every(([id, n]) => used.some(c => c.id === id && c.q >= n));
-    if (ok) { const extra = used.filter(c => !r.in.some(([id]) => id === c.id)).length; return { st: 'known', r, extra }; }
-  }
-  return { st: 'unknown' };
-}
-const RES = id => I(id) || { id, n: id === 'bind' ? 'Связующее' : id, img: ART('item-cinder-heart.png'), r: 2 };
+/* ================== Ремесло ==================
+   «Мастерская» и «Запасы» — файлы экранов: CRAFT_SEGS.work (screens/craft.js) и CRAFT_SEGS.stock (screens/bag.js), их выбирает
+   SCREENS.craft из screens/model.js. Здесь — «Лавка» и «Рынок» на общих запасах: покупка кладёт предмет в BAG, лот забирает его из BAG.
+   Товары — предметы EN_RECIPES, цены — EN_RECIPES.drops.market; в игре цены, лоты и сделки решает сервер (§36.16). */
+const CRAFT_META = { title: 'Ремесло', seg: { key: 'craft', items: [['work', 'Мастерская'], ['stock', 'Запасы'], ['shop', 'Лавка'], ['market', 'Рынок']] } };
 function craftView() {
   const seg = S.seg.craft;
-  const meta = { title: 'Ремесло', seg: { key: 'craft', items: [['work', 'Мастерская'], ['stock', 'Запасы'], ['shop', 'Лавка'], ['market', 'Рынок']] } };
-  if (seg === 'stock') { const it = I(S.selItem) || S.items[0]; return { ...meta, html: `<section class="scr"><div class="stock">${invPanel('stock')}<div class="pnl icard fit">${itemCard(it)}<div class="acts2">${itemActs(it)}</div></div></div></section>` }; }
-  if (seg === 'shop') return { ...meta, html: shopView() };
-  if (seg === 'market') return { ...meta, html: marketView() };
-  const m = craftMatch();
-  const pos = [[118, 28], [196, 73], [196, 163], [118, 208], [40, 163], [40, 73]];
-  const table = S.book ? recipeBook() : `<div class="hex"><div class="hex-in">
-      ${S.craft.map((c, i) => { const it = c ? RES(c.id) : null; return `<div style="position:absolute;left:${pos[i][0]}px;top:${pos[i][1]}px">${well(it, { act: 'cslot', val: i, q: c ? c.q : null, sel: S.craftSel === i, size: 58 })}${c && S.craftSel === i ? `<div class="slotq"><button data-a="cq" data-v="${i}:-1" aria-label="Меньше">−</button><button data-a="cq" data-v="${i}:1" aria-label="Больше">+</button><button data-a="cq" data-v="${i}:x" aria-label="Убрать">×</button></div>` : ''}</div>`; }).join('')}
-      <div class="well core ${m.st === 'known' ? 'known' : ''}" style="position:absolute;left:118px;top:118px;--s:74px;transform:translate(-50%,-50%)">${m.st === 'known' ? `<img src="${m.r.outImg || ART('item-cinder-heart.png')}" alt="${m.r.out}">` : '<span>?</span>'}</div>
-    </div></div>
-    <div class="craft-hint ${m.st}">${m.st === 'empty' ? 'Шесть ячеек, до 100 единиц в каждой. Порядок не важен.' : m.st === 'known' ? `Совпадает с рецептом «${m.r.n}»${m.extra ? ' · лишнее сгорит' : ''}` : 'Сочетание неизвестно. При неудаче сгорит всё положенное.'}</div>`;
-  return { ...meta, html: `<section class="scr"><div class="cr">
-    ${invPanel('work')}
-    <div class="pnl table">
-      <div class="pnl-h"><h2>${S.book ? 'Книга рецептов' : 'Стол мастера'}</h2><div class="aside row"><button class="btn sm ${S.book ? '' : ''}" data-a="book">${ic('book')}${S.book ? 'К столу' : 'Книга рецептов'}</button></div></div>
-      ${table}
-      ${S.book ? '' : `<div class="row" style="justify-content:flex-end;gap:6px"><button class="btn ghost sm" data-a="cclear" ${S.craft.some(Boolean) ? '' : 'disabled'}>Очистить</button><button class="btn go" data-a="ccreate" ${S.craft.some(Boolean) ? '' : 'disabled'}>Создать</button></div>`}
-    </div>
-  </div></section>` };
+  if (seg === 'shop') return { ...CRAFT_META, html: shopView() };
+  if (seg === 'market') return { ...CRAFT_META, html: marketView() };
+  return { ...CRAFT_META, html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран не подключён: рядом с index.html должны лежать screens/model.js, craft.js и bag.js.</p></div></section>' };
 }
-function recipeBook() {
-  return `<div class="col grow" style="gap:8px;min-height:0">
-    <div class="row" style="gap:6px"><label class="search grow">${ic('search')}<input type="search" placeholder="Найти рецепт" autocomplete="off"></label><div class="tabs"><button aria-selected="true">Все · ${S.recipes.length}</button><button aria-selected="false">${ic('star')}</button></div></div>
-    <div class="rc-list scroll grow">${S.recipes.map(r => `<div class="rc"><div class="col" style="gap:6px;min-width:0"><div class="row"><b>${r.n}</b>${r.fav ? `<span class="gold">${ic('star')}</span>` : ''}${r.chain ? '<span class="chip">цепочка</span>' : ''}</div>
-      <div class="ing">${r.in.map(([id, n]) => well(RES(id), { act: 'item', val: id, q: n, size: 34 })).join('')}<span class="arrow">${ic('arrow')}</span>${well({ n: r.out, img: r.outImg, r: 3, glyph: 'V' }, { act: 'noop', val: r.id, q: null, size: 34 })}<span class="faint" style="font-size:12px">×${r.outQ}</span></div></div>
-      <button class="btn sm go" data-a="autocraft" data-v="${r.id}">Создать</button></div>`).join('')}</div>
-  </div>`;
-}
+/* лавка (§14.2): за золото — минимальная цена рынка × количество, за Энериум — цена из INV.shop (заглушка) */
+const shopCost = g => g[2] === 'gold' ? ['gold', mkMin(g[0]) * g[1]] : [g[2], g[3] || 0];
 function shopView() {
+  const F = INV.shop;
   return `<section class="scr">
-    <div class="row"><span class="eyebrow">Обновление через ${dur(5 * 3600 + 42 * 60)}</span><span class="g-spacer"></span><span class="faint" style="font-size:12.5px">Уникальное — редко и по одной</span><button class="btn sm" data-a="toast" data-v="Лавка обновлена · осталось 1 бесплатное">${ic('swap')}Обновить · бесплатно 2</button></div>
-    <div class="shop grow">${S.shop.map(([id, q, c, p], i) => { const it = I(id); const sold = S.sold.includes(i); return `<div class="good ${sold ? 'sold' : ''}">${well(it, { act: 'item', q })}<b>${it.n}</b><button class="btn sm ${sold ? '' : ''}" data-a="buy" data-v="${i}" ${sold ? 'disabled' : ''}>${sold ? 'Куплено' : `${ic('plus')}${costTag(c, p).replace('class="cost"', 'class="cost" style="border:0;padding:0"')}`}</button></div>`; }).join('')}</div>
+    <div class="row"><span class="eyebrow">Обновление через ${dur(F.refreshSec)}</span><span class="g-spacer"></span><span class="faint" style="font-size:12.5px">Уникальное — редко и по одной · покупка — в запасы</span><button class="btn sm" data-a="toast" data-v="Лавка обновлена · бесплатно осталось ${Math.max(0, F.free - 1)}">${ic('swap')}Обновить · бесплатно ${F.free}</button></div>
+    <div class="shop grow">${S.shop.map((g, i) => {
+      const it = BAG.item(g[0]); if (!it) return '';
+      const [c, p] = shopCost(g), sold = S.sold.includes(i);
+      return `<div class="good ${sold ? 'sold' : ''}">${itWell(it.id, { q: g[1] })}<b>${trEsc(itName(it))}</b><button class="btn sm" data-a="buy" data-v="${i}" ${sold ? 'disabled' : ''}>${sold ? 'Куплено' : `${ic('plus')}${costTag(c, p).replace('class="cost"', 'class="cost" style="border:0;padding:0"')}`}</button></div>`;
+    }).join('')}</div>
   </section>`;
+}
+/* рынок (§13): лоты других игроков — за золото, имена скрыты; свой лот забирает предмет из запасов сразу, снятый — возвращает,
+   выручка проданного — за вычетом комиссии drops.market.commissionPct */
+const mkFeePct = () => RX.drops.market.commissionPct || 0;
+const mkFee = total => Math.floor(total * mkFeePct() / 100);
+const mkLotTotal = x => mkUnit(x.id, x.pct) * x.q;
+const mkPctTxt = p => p === INV.market.pricePct[0] ? 'мин.' : '×' + Math.floor(p / 100) + (p % 100 ? ',' + String(p % 100).replace(/0+$/, '') : '');
+const mkSellable = () => RX.items.filter(it => !it.team && BAG.qty(it.id) > 0 && mkMin(it.id) > 0);
+/* выбранное для продажи: предмет есть в запасах, количество — от 1 до остатка */
+function mkPick() {
+  const M = S.market, list = mkSellable(), id = list.some(it => it.id === M.sel.id) ? M.sel.id : list[0] ? list[0].id : '';
+  const have = id ? BAG.qty(id) : 0, n = Math.max(1, Math.min(M.sel.q || 1, have || 1)), pct = INV.market.pricePct.includes(M.sel.pct) ? M.sel.pct : INV.market.pricePct[0];
+  return { list, id, have, n, pct, unit: id ? mkUnit(id, pct) : 0 };
 }
 function marketView() {
-  const t = S.seg.market;
-  return `<section class="scr">
-    <div class="row"><div class="tabs" role="tablist"><button role="tab" aria-selected="${t === 'buy'}" data-a="seg" data-v="market:buy">Купить</button><button role="tab" aria-selected="${t === 'mine'}" data-a="seg" data-v="market:mine">Мои лоты · 1</button></div>
-      <label class="search grow" style="max-width:280px">${ic('search')}<input type="search" placeholder="Название предмета" autocomplete="off"></label><span class="g-spacer"></span><span class="faint" style="font-size:12.5px">Имена продавцов скрыты · комиссия 10% золотом</span></div>
-    <div class="col scroll grow" style="gap:6px">${t === 'buy' ? S.market.map(([id, q, p], i) => { const it = I(id); return `<div class="lot">${well(it, { act: 'item', size: 40 })}<span class="col" style="gap:2px"><b>${it.n}</b>${rar(it.r)}</span><span class="num muted">×${q}</span><span class="col" style="gap:2px;align-items:flex-end">${money('gold', p * q)}<small class="faint num">${fmt(p)} за шт.</small></span><button class="btn sm" data-a="toast" data-v="Покупка на рынке: демо">Купить</button></div>`; }).join('')
-      : `<div class="lot">${well(I('storm'), { act: 'item', size: 40 })}<span class="col" style="gap:2px"><b>Грозовое стекло</b><small class="faint">выставлено 2 ч назад</small></span><span class="num muted">×2</span>${money('gold', 5400)}<button class="btn sm ghost" data-a="toast" data-v="Лот снят">Снять</button></div>`}</div>
-  </section>`;
+  const t = S.seg.market === 'mine' ? 'mine' : 'buy', M = S.market, q = trNorm(M.q.trim());
+  const head = `<div class="row"><div class="tabs" role="tablist"><button role="tab" aria-selected="${t === 'buy'}" data-a="seg" data-v="market:buy">Купить · ${M.lots.length}</button><button role="tab" aria-selected="${t === 'mine'}" data-a="seg" data-v="market:mine">Мои лоты · ${M.mine.length}</button></div>
+      ${t === 'buy' ? `<label class="search grow" style="max-width:280px">${ic('search')}<input id="mkq" type="search" placeholder="Название предмета" value="${trEsc(M.q)}" autocomplete="off" aria-label="Поиск лотов"></label>` : ''}<span class="g-spacer"></span><span class="faint" style="font-size:12.5px">Имена продавцов скрыты · комиссия ${mkFeePct()}% с выручки</span></div>`;
+  if (t === 'buy') {
+    const lots = M.lots.filter(x => { const it = BAG.item(x.id); return it && (!q || trNorm(itName(it)).includes(q)); });
+    const rows = lots.map(x => {
+      const it = BAG.item(x.id), u = mkUnit(x.id, x.pct);
+      return `<div class="lot">${itWell(x.id, { size: 40 })}<span class="col" style="gap:2px;min-width:0"><b>${trEsc(itName(it))}</b><span class="row">${rar(it.r)}<small class="faint num">в запасах ${fmt(BAG.qty(x.id))}</small></span></span><span class="num muted">×${fmt(x.q)}</span><span class="col" style="gap:2px;align-items:flex-end">${money('gold', u * x.q)}<small class="faint num">${fmt(u)} за шт.</small></span><button class="btn sm" data-a="mkbuy" data-v="${x.uid}">Купить</button></div>`;
+    }).join('');
+    return `<section class="scr">${head}<div class="col scroll grow" style="gap:6px">${rows || `<p class="faint">${M.lots.length ? 'Ничего не найдено.' : 'Лотов нет.'}</p>`}</div></section>`;
+  }
+  const P = mkPick(), it = P.id ? BAG.item(P.id) : null, total = P.unit * P.n, fee = mkFee(total);
+  const form = it ? `<div class="pnl mk-form"><span class="eyebrow">Выставить лот</span>
+      <select class="rs-sel" data-a="mkid" aria-label="Предмет из запасов">${P.list.map(x => `<option value="${x.id}" ${x.id === P.id ? 'selected' : ''}>${trEsc(itName(x))} · ${fmt(BAG.qty(x.id))}</option>`).join('')}</select>
+      <div class="mk-row"><span class="eyebrow">количество</span><div class="qty" role="group" aria-label="Сколько выставить">${INV.market.qtySteps.map(s => `<button data-a="mkq" data-v="${s}" ${(s < 0 ? P.n <= 1 : P.n >= P.have) ? 'disabled' : ''}>${s > 0 ? '+' + s : '−' + -s}</button>`).join('')}<button data-a="mkq" data-v="max" aria-pressed="${P.n === P.have}">все</button></div><b class="num">${fmt(P.n)}</b></div>
+      <div class="mk-row"><span class="eyebrow">цена</span><div class="qty" role="group" aria-label="Цена за штуку">${INV.market.pricePct.map(p => `<button data-a="mkp" data-v="${p}" aria-pressed="${p === P.pct}">${mkPctTxt(p)}</button>`).join('')}</div></div>
+      <dl class="mk-sum"><dt>За штуку</dt><dd>${fmt(P.unit)} · мин. ${fmt(mkMin(P.id))}</dd><dt>Лот</dt><dd>${fmt(total)}</dd><dt>Комиссия ${mkFeePct()}%</dt><dd>−${fmt(fee)}</dd><dt>Выручка</dt><dd>${fmt(total - fee)}</dd></dl>
+      <button class="btn go" data-a="mksell">Выставить · ${fmt(P.n)} шт.</button>
+      <p class="reason">Предмет уходит из запасов сразу. Снятый лот возвращается в запасы.</p></div>`
+    : '<div class="pnl mk-form"><span class="eyebrow">Выставить лот</span><p class="faint">В запасах нет того, что продают на рынке: базовые, ключи, уникальные, добыча руин и трофеи.</p></div>';
+  const mine = M.mine.map(x => {
+    const it2 = BAG.item(x.id); if (!it2) return '';
+    const u = mkUnit(x.id, x.pct), tot = u * x.q, f = mkFee(tot), sold = x.st === 'sold';
+    return `<div class="lot ${sold ? 'sold' : ''}">${itWell(x.id, { size: 40 })}<span class="col" style="gap:2px;min-width:0"><b>${trEsc(itName(it2))}</b><small class="${sold ? 'gold' : 'faint'}">${sold ? `продан · выручка ${fmt(tot - f)}` : `на рынке · ${fmt(u)} за шт.`}</small></span><span class="num muted">×${fmt(x.q)}</span>${money('gold', tot)}${sold ? `<button class="btn sm go" data-a="mkcash" data-v="${x.uid}">Забрать</button>` : `<button class="btn sm ghost" data-a="mkcancel" data-v="${x.uid}">Снять</button>`}</div>`;
+  }).join('');
+  return `<section class="scr">${head}<div class="mk-mine">${form}<div class="col scroll" style="gap:6px;min-height:0">${mine || '<p class="faint">Своих лотов нет.</p>'}</div></div></section>`;
 }
 
 /* ================== Древо рецептов ==================
@@ -2793,7 +2852,7 @@ const WEEKLY = () => [
   { r: 'rituals', p: 33, n: 'Ритуалы', l1: `${S.rituals.slots.filter(s => s.st === 'ready').length} готов · ${S.rituals.slots.filter(s => s.st === 'run').length} идёт`, l2: `свободно слотов: ${S.rituals.slots.filter(s => s.st === 'free').length}`, act: 'Забрать', hot: S.rituals.slots.some(s => s.st === 'ready') },
   { r: 'arena', p: 3, n: 'Арена', l1: `Рейтинг ${fmt(S.arena.rating)}`, l2: `атак ${S.arena.att} из ${S.arena.max} · оборона цела`, act: 'Соперники' },
   { r: 'clan', p: 26, n: 'Клан', l1: S.clan.n, l2: `Клановый босс · атак ${S.clan.boss.att}/5`, act: 'Открыть' },
-  { r: 'event', p: 21, n: 'Событие', l1: `${fmt(S.event.pts)} очков`, l2: `до следующей планки ${fmt(5000 - S.event.pts)}`, act: 'Планки' },
+  { r: 'event', p: 21, n: 'Событие', l1: `${fmt(S.event.pts)} очков`, l2: (n => n ? `до следующей планки ${fmt(n - S.event.pts)}` : 'все планки взяты')(S.event.ms.find(m => m > S.event.pts)), act: 'Планки' },
 ];
 const weekChip = () => `<span class="chip" style="margin-left:6px">${ic('hour')}Неделя ${S.week.race} · <span class="num" data-cd="week">${dur(S.week.left)}</span></span>`;
 function weekView() {
@@ -2872,18 +2931,50 @@ function contractsView() {
   </section>` };
 }
 
-/* ================== Ритуалы ================== */
+/* ================== Ритуалы ==================
+   Время и награда — по редкости ритуала из EN_RECIPES.drops.rituals (§19.3, §19.4): рабочие — базовые общего пула, с эпической
+   редкости ещё ключи биома; уникальный ритуал — уникальный ресурс босса биома, бригада полная; герои — золото, дух и души цикла.
+   Предметы ложатся в запасы (BAG). Какие именно базовые и ключи — генератор ядра на сиде ритуала при выдаче; в игре — сервер (§36.16). */
+function ritSpec(x, kind = x.kind) {
+  const R = RX.drops.rituals, i = x.r - 1;
+  if (kind === 'hero') {
+    const C = R.heroes.byCycle.find(b => b.cyc === (x.cyc || S.acc.cycle)) || R.heroes.byCycle[0];
+    return { min: R.heroes.minutes[i], ppl: x.ppl, cur: [['gold', C.gold[i]], ['spirit', C.spirit[i]], ['souls', C.souls[i]]].filter(([, n]) => n > 0), basics: 0, keys: 0, uniq: 0 };
+  }
+  const W = R.workers;
+  if (x.unique) return { min: W.unique.minutes, ppl: W.unique.crew, cur: [], basics: 0, keys: 0, uniq: W.unique.uniques };
+  return { min: W.minutes[i], ppl: x.ppl, cur: [], basics: W.basics[i], keys: W.keys[i], uniq: 0 };
+}
+const ritTime = min => min < 60 ? `${min} мин` : `${Math.floor(min / 60)} ч${min % 60 ? ' ' + min % 60 + ' мин' : ''}`;
+const ritWho = s => `${s.kind === 'hero' ? 'Герои' : 'Рабочие'} · ${ritSpec(s).ppl}`;
+function ritRewHtml(x, kind, act = 'item') {
+  const sp = ritSpec(x, kind), out = sp.cur.map(([k, n]) => money(k, n));
+  if (sp.basics) out.push(`<span class="chip" title="Вперемешку из ${poolItems().length} базовых общего пула">${ic('gem')}базовые ×${fmt(sp.basics)}</span>`);
+  if (sp.keys) out.push(`<span class="chip" title="Наугад из шести ключей биома «${biomeName(x.biome)}»">${ic('key')}ключи биома ×${fmt(sp.keys)}</span>`);
+  if (sp.uniq) { const u = biomeItems('unique', x.biome)[0]; out.push(u ? `<span class="row">${itWell(u.id, { act, size: 30 })}<b class="num">×${fmt(sp.uniq)}</b></span>` : `<span class="chip">${ic('crown')}уникальный ×${fmt(sp.uniq)}</span>`); }
+  return out.join('');
+}
+/* выдача награды готового ритуала: валюта — в кошелёк, ресурсы — в запасы; возвращает, что выдано */
+function ritGive(s) {
+  const sp = ritSpec(s), roll = EB.makeRng(EB.seedOf('ритуал|' + s.uid)), items = {};
+  const add = list => { if (!list.length) return; const it = list[roll(list.length)]; BAG.add(it.id, 1); items[it.id] = (items[it.id] || 0) + 1; };
+  sp.cur.forEach(([k, n]) => { S.wallet[k] += n; });
+  const pool = poolItems(), keys = biomeItems('key', s.biome), un = biomeItems('unique', s.biome);
+  for (let k = 0; k < sp.basics; k++) add(pool);
+  for (let k = 0; k < sp.keys; k++) add(keys);
+  for (let k = 0; k < sp.uniq; k++) add(un);
+  return { cur: sp.cur, items };
+}
 function ritualsView() {
-  const R = S.rituals, tab = S.seg.rituals;
-  const list = tab === 'work' ? R.work : R.hero;
+  const R = S.rituals, tab = S.seg.rituals === 'hero' ? 'hero' : 'work', list = tab === 'work' ? R.work : R.hero;
   return { title: 'Ритуалы', back: 'week', seg: { key: 'rituals', items: [['work', 'Рабочие'], ['hero', 'Герои']] }, html: `<section class="scr">
-    <div class="rt-slots">${R.slots.map((s, i) => s.st === 'ready' ? `<div class="rslot ready"><span class="dot"></span><span><b>${s.n}</b><small class="faint" style="display:block">${s.who} · награда готова</small></span><button class="btn go sm" data-a="rclaim" data-v="${i}">Забрать</button></div>`
-      : s.st === 'run' ? `<div class="rslot"><span class="faint">${ic('hour')}</span><span><b>${s.n}</b><small class="faint" style="display:block">${s.who} заняты</small></span><span class="chip num">${dur(s.left)}</span></div>`
+    <div class="rt-slots">${R.slots.map((s, i) => s.st === 'ready' ? `<div class="rslot ready"><span class="dot"></span><span><b>${s.n}</b><small class="faint" style="display:block">${ritWho(s)} · награда готова</small></span><button class="btn go sm" data-a="rclaim" data-v="${i}">Забрать</button></div>`
+      : s.st === 'run' ? `<div class="rslot"><span class="faint">${ic('hour')}</span><span><b>${s.n}</b><small class="faint" style="display:block">${ritWho(s)} · заняты</small></span><span class="chip num">${dur(s.left)}</span></div>`
         : `<div class="rslot free"><span class="faint">${ic('plus')}</span><span><b class="faint">Свободный слот</b><small class="faint" style="display:block">общий для рабочих и героев</small></span></div>`).join('')}</div>
-    <div class="row"><span class="eyebrow">Доступные ритуалы · ${tab === 'work' ? 'ресурсы открытых биомов' : 'золото, дух и души'}</span><span class="g-spacer"></span>${tab === 'work' ? `<button class="link" data-a="toast" data-v="Рабочих: ${R.workers}, свободны все">${ic('users')}Рабочие · ${R.workers}</button>` : ''}<button class="btn sm" data-a="toast" data-v="Пул ритуалов обновлён · бесплатно осталось 2">${ic('swap')}Обновить · бесплатно ${R.rolls}</button></div>
-    <div class="rcards grow">${list.map((x, i) => `<div class="rcard" data-r="${x.r}"><div class="row" style="justify-content:space-between">${rar(x.r)}<span class="chip">${ic('hour')}${x.t}</span></div><b>${x.n}</b><small class="faint">${x.biome ? x.biome + ' · ' : ''}участников: ${x.ppl}</small>
-      <div class="row" style="gap:10px">${x.rew.map(([id, n]) => CUR[id] ? money(id, n) : `<span class="row" style="gap:4px">${well(I(id), { act: 'item', size: 30 })}<b class="num">×${n}</b></span>`).join('')}</div>
-      <button class="btn sm" style="margin-top:auto" data-a="sheet" data-v="ritual:${tab}:${i}">Назначить</button></div>`).join('')}</div>
+    <div class="row"><span class="eyebrow">Доступные ритуалы · ${tab === 'work' ? 'ресурсы открытых биомов — в запасы' : 'золото, дух и души'}</span><span class="g-spacer"></span>${tab === 'work' ? `<button class="link" data-a="toast" data-v="Рабочих: ${R.workers}, свободны все">${ic('users')}Рабочие · ${R.workers}</button>` : ''}<button class="btn sm" data-a="toast" data-v="Пул ритуалов обновлён · бесплатно осталось ${Math.max(0, R.rolls - 1)}">${ic('swap')}Обновить · бесплатно ${R.rolls}</button></div>
+    <div class="rcards grow">${list.map((x, i) => { const sp = ritSpec(x, tab); return `<div class="rcard" data-r="${x.r}"><div class="row" style="justify-content:space-between">${rar(x.r)}<span class="chip">${ic('hour')}${ritTime(sp.min)}</span></div><b>${x.n}</b><small class="faint">${x.biome ? biomeName(x.biome) + ' · ' : ''}${x.unique ? 'уникальный ритуал · ' : ''}участников: ${sp.ppl}</small>
+      <div class="rw">${ritRewHtml(x, tab)}</div>
+      <button class="btn sm" style="margin-top:auto" data-a="sheet" data-v="ritual:${tab}:${i}">Назначить</button></div>`; }).join('')}</div>
     <p class="reason">Награда гарантирована. Участники заняты до конца таймера; Арена и Лига их не ждут.</p>
   </section>` };
 }
@@ -2931,14 +3022,31 @@ function clanView() {
   </div></section>` };
 }
 
-/* ================== Событие ================== */
+/* ================== Событие ==================
+   Личные планки — пороги S.event.ms; сундук каждой — строка планки EN_LOOTBOXES.modes.event в цикле игрока.
+   Планка подтверждается сразу, а получают сундуки в «Дарах путешествия» (§23.1, §36.11): там они уходят в запасы через BAG.addChest,
+   и один сундук нельзя получить второй раз через другой экран. */
+function evPlanks() {
+  const E = S.event, c = S.acc.cycle, M = LBX ? LBX.modes.event : null, ly = M ? M.layers.find(l => l.kind === 'plank' && !l.clan) : null;
+  return E.ms.map((need, i) => { const row = ly && ly.rows[i]; return { k: i + 1, need, box: M ? M.box : '', pay: row && c >= M.from ? row.cyc[c] || [] : [], got: E.pts >= need }; });
+}
 function eventView() {
-  const E = S.event, max = E.ms[E.ms.length - 1];
+  const E = S.event, P = evPlanks(), M = LBX ? LBX.modes.event : null, reached = P.filter(p => p.got).length;
+  /* шкала идёт от планки к планке: планки стоят через равные промежутки, пороги — нет */
+  const prev = reached ? E.ms[reached - 1] : 0, next = E.ms[reached], track = Math.min(100, Math.floor((reached * 100 + (next ? Math.floor((E.pts - prev) * 100 / (next - prev)) : 0)) / P.length));
+  const cell = p => {
+    const top = p.pay.length ? Math.max(...p.pay.map(g => g.r)) : 0, n = p.pay.reduce((a, g) => a + g.count, 0);
+    const name = p.pay.length ? p.pay.map(g => `${g.count > 1 ? g.count + ' × ' : ''}${lbBoxName(p.box, g.r, g.win)}`).join(', ') : 'без сундука в этом цикле';
+    return `<div class="m ${p.got ? 'got' : ''}"><button class="well" ${top ? `data-r="${top}"` : ''} style="--s:44px" data-a="sheet" data-v="gifts:me" title="Планка ${p.k} · ${name}" aria-label="Планка ${p.k}: ${name}"><img src="${CHEST}" alt="">${n > 1 ? `<span class="q">${n}</span>` : ''}</button><small class="num">${fmt(p.need)}</small></div>`;
+  };
+  const note = P.some(p => p.pay.length) ? `Взято планок: ${reached} из ${P.length}. Сундуки планок получают в Дарах путешествия, открывают — в запасах.`
+    : M ? `Сундуки за планки — с цикла ${ROMAN[M.from]}.` : 'Нет данных: рядом с index.html должен лежать lootboxes.js.';
   return { title: 'Событие недели', back: 'week', chip: weekChip(), html: `<section class="scr">
     <div class="pnl pad col" style="gap:8px">
       <div class="row"><div class="stat"><b style="font-size:32px">${fmt(E.pts)}</b><small>личных очков</small></div><span class="g-spacer"></span><span class="chip spirit">РП1 коллекции +0,05%</span><button class="btn sm" data-a="sheet" data-v="rank:Событие">Место 212</button></div>
-      <div class="ms">${E.ms.map((m, i) => `<div class="m ${E.pts >= m ? 'got' : ''}">${well(i < 3 ? I('chest') : { n: 'Сундук', img: CHEST, r: 5 }, { act: 'item', val: 'chest', size: 44 })}<small class="num">${fmt(m)}</small></div>`).join('')}</div>
-      <div class="track" style="--v:${Math.min(100, E.pts / max * 100 * 1.6)}"><i></i></div>
+      <div class="ms">${P.map(cell).join('')}</div>
+      <div class="track" style="--v:${track}"><i></i></div>
+      <div class="ev-note"><p class="reason">${note}</p><button class="btn sm" data-a="sheet" data-v="gifts:me">Дары ${ic('chev')}</button></div>
     </div>
     <div class="col scroll grow" style="gap:6px"><span class="eyebrow">Откуда очки</span>${E.src.map(([n, d, p]) => `<div class="opp"><span class="col" style="gap:2px"><b>${n}</b><small class="faint">${d}</small></span><b class="num serif gold" style="font-size:20px">+${p}</b><button class="link" data-a="go" data-v="${n === 'Контракты' ? 'contracts' : n === 'Путешествия' ? 'descent' : n === 'Ритуалы' ? 'rituals' : n === 'Эхо' ? 'echo' : 'arena'}">Перейти ${ic('chev')}</button></div>`).join('')}</div>
   </section>` };
@@ -3005,16 +3113,39 @@ const SCREENS = { shelter, descent, battle, heroes, craft: craftView, week: week
 const busyNote = id => { const r = runOf(id); if (r) return 'Забег · ' + EB.BIOMES[r.biome].name; const h = H(id); return h.busy; };
 const shelterTags = () => '';
 
-/* ================== карточка предмета: лист и панель Запасов ================== */
-function itemCard(it) {
-  return `<div class="row" style="gap:14px;align-items:center">${well(it, { act: 'noop', size: 76 })}<div class="col" style="gap:5px;min-width:0">${rar(it.r || 2)}<b class="serif" style="font-size:23px;line-height:1">${it.n}</b><span class="faint" style="font-size:13px">${it.spec || ''}</span></div><span class="g-spacer"></span><div class="stat" style="align-items:flex-end"><b>${fmt(it.q || 0)}</b><small>в запасах</small></div></div>
-    ${it.riddle ? `<p class="quote"><b>Загадка</b>${it.riddle}</p>` : ''}
-    <dl class="kv"><dt>Где найти</dt><dd>${it.from || '—'}</dd><dt>Известные рецепты</dt><dd>${(it.recipes && it.recipes.length) ? it.recipes.join(', ') : 'нет'}</dd>${it.rare ? '<dt>Особый ресурс</dt><dd class="gold">расход только с согласия</dd>' : ''}</dl>
-    ${it.cat === 'act' ? '<p class="reason">Содержимое откроется после подтверждения. Просмотр не расходует предмет.</p>' : ''}`;
+/* ================== сведения о предмете запасов (§14.3, §14.4) ==================
+   Лист поверх любого экрана: загадка, ремесло, ярус, цикл, количество, найденные рецепты, откуда падает.
+   Полная карточка с фильтрами — «Ремесло → Запасы» (screens/bag.js). Спойлеры цикла VI — только «для команды». */
+const itSrc = it => (it.src || []).filter(s => !/предложени/.test(s)).map(s => String(s).replace(/\s*\((?:ADR|§)[^)]*\)/g, '').replace(/,?\s*(?:число\s+)?—\s*заглушка/g, '').trim()).filter(Boolean);
+function itemCard(id) {
+  const it = BAG.item(id);
+  if (!it) return '<p class="faint">Такого предмета в данных нет.</p>';
+  const hide = itTeam(it), T = RX.tiers[it.tier] || { n: '' }, sp = it.spec ? it.spec.split('+').map(x => RX.specs[x] ? RX.specs[x].n : x).join(' + ') : '';
+  const uses = BAG.knownUses(id).filter(Boolean), src = hide ? [] : itSrc(it), min = mkMin(id);
+  return `<div class="row" style="gap:14px;align-items:center"><span class="tr-big" data-r="${it.r}">${hide ? ic('lock') : trIcon(it)}</span><div class="col" style="gap:5px;min-width:0">${rar(it.r)}<b class="serif" style="font-size:23px;line-height:1">${trEsc(itName(it))}</b><span class="faint" style="font-size:13px">${T.n}${sp ? ' · ' + sp.toLowerCase() : ''}</span></div><span class="g-spacer"></span><div class="stat" style="align-items:flex-end"><b>${fmt(BAG.qty(id))}</b><small>в запасах</small></div></div>
+    ${hide ? '<p class="reason">Сведения откроются в своём цикле.</p>' : `<p class="quote"><b>Загадка</b>${trEsc(it.lore)}</p>`}
+    <dl class="kv"><dt>Цикл</dt><dd>${it.pool ? 'все циклы · общий пул' : 'цикл ' + ROMAN[it.cyc]}</dd><dt>Найденные рецепты</dt><dd>${uses.length ? uses.map(r => trEsc(r.n)).join(', ') : 'нет'}</dd>${min ? `<dt>Мин. цена рынка</dt><dd>${fmt(min)} за шт.</dd>` : ''}</dl>
+    ${src.length ? `<span class="eyebrow">Откуда падает</span><ul class="tr-src">${src.map(s => `<li>${trEsc(s)}</li>`).join('')}</ul>` : ''}
+    ${typeof ACTIVATE[it.tier] === 'function' ? '<p class="reason">Что внутри — откроется после подтверждения. Просмотр не расходует предмет.</p>' : ''}`;
 }
-function itemActs(it) {
-  const main = it.action ? `<button class="btn go" data-a="use" data-v="${it.id}">${it.action}</button>` : it.cat === 'res' || it.cat === 'key' ? `<button class="btn go" data-a="toCraft" data-v="${it.id}">На стол мастера</button>` : '';
-  return `<button class="btn ghost" data-a="toast" data-v="Выставлено на рынок: демо">Продать</button>${main}`;
+/* действия: продать на рынке, активировать из запасов (ACTIVATE — screens/echo.js), на стол мастерской (screens/craft.js) */
+function itemActs(id) {
+  const it = BAG.item(id); if (!it) return '';
+  const has = BAG.has(id), acts = [];
+  if (has && mkMin(id)) acts.push(`<button class="btn ghost" data-a="mkfrom" data-v="${id}">Продать</button>`);
+  if (typeof ACTIVATE[it.tier] === 'function') acts.push(`<button class="btn go" data-a="itact" data-v="${id}" ${has ? '' : 'disabled'}>Активировать</button>`);
+  else if (has && typeof ACT.toCraft === 'function') acts.push(`<button class="btn go" data-a="toCraft" data-v="${id}">На стол мастера</button>`);
+  return acts.join('');
+}
+/* письмо Входящих: награда — валюта, предметы и сундуки; у письма о готовом ритуале — награда ритуала */
+const mailRit = m => m.rit ? S.rituals.slots.find(s => s.uid === m.rit && s.st === 'ready') || null : null;
+const mailHas = m => !!((m.rew && m.rew.length) || (m.chests && m.chests.length) || mailRit(m));
+function mailRewHtml(m) {
+  const r = mailRit(m), out = [];
+  if (r) out.push(ritRewHtml(r, r.kind, 'noop'));
+  for (const [id, n] of m.rew || []) out.push(CUR[id] ? money(id, n) : BAG.item(id) ? `<span class="row">${itWell(id, { act: 'noop', size: 26 })}<b class="num">×${fmt(n)}</b></span>` : '');
+  for (const sp of m.chests || []) out.push(`<span class="row"><span class="well" data-r="${sp.r}" style="--s:26px"><img src="${CHEST}" alt=""></span><small>${LBX && LBX.boxes[sp.box] ? lbBoxName(sp.box, sp.r, sp.win) : 'Сундук'}</small></span>`);
+  return out.join('');
 }
 
 /* ================== слои поверх ================== */
@@ -3059,18 +3190,16 @@ const OV = {
         : `<div class="pnl pad" style="background:#0e1114"><b class="serif" style="font-size:18px">Запись закрыта</b><p class="faint" style="font-size:13px;margin-top:4px">До первой подтверждённой победы видны только мощь, здоровье, стихия и тип. Встреча и просмотр боя запись не открывают.</p></div>`}`;
     return sheet(k ? f.name : 'Неизвестный противник', body, `<button class="link" data-a="lorego" data-v="${f.id}">${ic('book')}В Летописи</button>`);
   },
-  item(o) {
-    const it = I(o.arg) || RES(o.arg);
-    return sheet('Сведения', itemCard(it), itemActs(it));
-  },
+  /* сведения о предмете запасов: из лавки, рынка, ритуалов, развития героя */
+  item(o) { return sheet('Сведения', itemCard(o.arg), itemActs(o.arg)); },
   inbox() {
     const g = k => S.inbox.filter(m => m.k === k);
-    const row = m => `<div class="mail"><div class="col" style="gap:2px;min-width:0"><b>${m.t}</b><small class="faint">${m.s}</small>${m.rew.length ? `<span class="row" style="gap:10px;margin-top:4px">${m.rew.map(([id, n]) => CUR[id] ? money(id, n) : `<span class="row" style="gap:4px">${well(I(id), { act: 'noop', size: 26 })}<b class="num">×${n}</b></span>`).join('')}</span>` : ''}</div>${m.rew.length ? `<button class="btn sm go" data-a="claim" data-v="${m.id}">Забрать</button>` : m.go ? `<button class="btn sm" data-a="claimgo" data-v="${m.id}">Открыть</button>` : `<button class="btn sm ghost" data-a="claim" data-v="${m.id}">Прочитано</button>`}</div>`;
+    const row = m => { const rew = mailRewHtml(m), has = mailHas(m); return `<div class="mail"><div class="col" style="gap:2px;min-width:0"><b>${m.t}</b><small class="faint">${m.s}</small>${rew ? `<span class="rw" style="margin-top:4px">${rew}</span>` : ''}</div>${has ? `<button class="btn sm go" data-a="claim" data-v="${m.id}">Забрать</button>` : m.go ? `<button class="btn sm" data-a="claimgo" data-v="${m.id}">Открыть</button>` : `<button class="btn sm ghost" data-a="claim" data-v="${m.id}">Прочитано</button>`}</div>`; };
     const body = `${g('away').length ? `<span class="eyebrow">Пока вас не было</span>${g('away').map(row).join('')}` : ''}
       ${g('mail').length ? `<span class="eyebrow">Почта</span>${g('mail').map(row).join('')}` : ''}
       ${!S.inbox.length ? '<p class="faint">Пусто. Всё забрано.</p>' : ''}
       <span class="eyebrow">Дар дня</span><button class="mail" data-a="dlg" data-v="gift" style="text-align:left;width:100%;color:var(--parch)"><div class="col" style="gap:2px"><b>День ${S.gift.day} из 30</b><small class="faint">главный дар — на двадцатый день</small></div><span class="chip ${S.gift.got < S.gift.day ? 'spirit' : ''}">${S.gift.got < S.gift.day ? 'можно забрать' : 'получено'}</span></button>`;
-    return sheet('Входящие', body, S.inbox.some(m => m.rew.length) ? `<span class="faint" style="font-size:12px">Передача ресурсов почтой запрещена</span><button class="btn go" data-a="claimall">Забрать всё</button>` : '');
+    return sheet('Входящие', body, S.inbox.some(mailHas) ? `<span class="faint" style="font-size:12px">Передача ресурсов почтой запрещена · предметы — в запасы</span><button class="btn go" data-a="claimall">Забрать всё</button>` : '');
   },
   cur(o) {
     const k = o.arg, c = CUR[k];
@@ -3094,13 +3223,8 @@ const OV = {
       <div class="col" style="gap:4px">${top.map(([n, v], i) => `<div class="rkrow"><b class="serif">${i + 1}</b><span>${n}</span><span class="num">${fmt(v)}</span><button class="link">Профиль</button></div>`).join('')}<div class="rkrow faint" style="justify-content:center">···</div><div class="rkrow me"><b class="serif">${me[0]}</b><span>Странник</span><span class="num">${fmt(me[1])}</span><span class="chip spirit">вы</span></div></div>
       <p class="reason">Цикл ${ROMAN[S.acc.cycle]} · неделя ${S.week.race}. Итоговые места станут наградой после подсчёта.</p>`);
   },
-  gifts() {
-    const rows = [['Эхо', 'Личный рейтинг', 'планка 25 000 очков', 2, 'Сундук осколков'], ['Контракты', 'Личный рейтинг', 'вчерашний контракт', 1, 'Сундук ключей'], ['Клановый босс', 'Клановые награды', 'доля по вкладу', 16, 'Сундук талисманов']];
-    return sheet('Дары путешествия', `<div class="tabs"><button aria-selected="true">Личный рейтинг</button><button aria-selected="false">Клановые награды</button></div>
-      <div class="row" style="gap:10px"><img src="${CHEST}" alt="" style="width:56px;height:56px;border-radius:10px;object-fit:cover"><div class="stat"><b>59</b><small>сундуков доступно</small></div><span class="g-spacer"></span><button class="link" data-a="toast" data-v="Состав: осколки героев недели, ключи, талисманы">Состав ${ic('chev')}</button></div>
-      ${rows.map(([m, c, b, n, box]) => `<div class="mail"><div class="col" style="gap:2px"><b>${m} · ${box}</b><small class="faint">${c} · ${b} · неделя ${S.week.race}</small></div><span class="chip">×${n}</span></div>`).join('')}
-      <p class="reason">Сундуки переходят в запасы и открываются там. Итоги текущей недели ждут подсчёта.</p>`, `<button class="btn go" data-a="giftsclaim">Забрать в запасы</button>`);
-  },
+  /* «Дары путешествия» — лист screens/bag.js (OV.gifts): выплаты недели, сундуки — в запасы через BAG.addChest */
+  gifts() { return sheet('Дары путешествия', '<p class="faint">Экран не подключён: рядом с index.html должны лежать screens/model.js и bag.js.</p>'); },
   chat() {
     const msgs = [['Тихий ветер', 'Кто уже прошёл Мастера? Какой состав брали?'], ['Северный странник', 'Танк вперёд, контроль на него не работает — только урон.'], ['Собиратель искр', 'Съёмщик снимает силу. Не копите на один удар.']];
     return sheet('Чат', `<div class="tabs"><button aria-selected="true">Общий</button><button aria-selected="false">Клановый</button></div>${msgs.map(([n, t]) => `<div class="msg"><b>${n}</b><span>${t}</span></div>`).join('')}`, `<label class="search grow">${ic('chat')}<input type="text" placeholder="Сообщение" autocomplete="off"></label><button class="btn sm" data-a="toast" data-v="Отправлено">Отправить</button>`);
@@ -3113,12 +3237,15 @@ const OV = {
       <p class="reason">Сид закреплён парой составов на сезон: исход решает только подбор отряда.</p>`, `<span class="faint" style="font-size:12.5px">атак: ${S.arena.att} / ${S.arena.max}</span><button class="btn go" data-a="arenago" data-v="${o.arg}">Атаковать</button>`);
   },
   ritual(o) {
-    const [tab, i] = o.arg.split(':'), R = S.rituals, x = (tab === 'work' ? R.work : R.hero)[+i];
-    const free = R.slots.some(s => s.st === 'free');
-    const body = `<div class="row" style="justify-content:space-between">${rar(x.r)}<span class="chip">${ic('hour')}${x.t}</span></div><b class="serif" style="font-size:24px">${x.n}</b>
-      <span class="eyebrow">Награда гарантирована</span><div class="row" style="gap:12px">${x.rew.map(([id, n]) => CUR[id] ? money(id, n) : `<span class="row" style="gap:4px">${well(I(id), { act: 'noop', size: 34 })}<b class="num">×${n}</b></span>`).join('')}</div>
-      <span class="eyebrow">Участники · ${x.ppl}</span>
-      ${tab === 'work' ? `<div class="row" style="gap:6px">${Array.from({ length: x.ppl }, () => `<span class="worker">${ic('users')}</span>`).join('')}<span class="faint" style="font-size:12.5px">назначатся из свободных рабочих</span></div>` : `<div class="row" style="gap:6px">${S.heroes.slice(0, x.ppl).map(h => `<img src="${h.img}" alt="${h.name}" style="width:44px;height:44px;border-radius:9px;object-fit:cover">`).join('')}</div><p class="reason warn">Эти герои будут заняты ${x.t}: биомы и Эхо их не получат. Арена — получит.</p>`}
+    const [tab, i] = String(o.arg).split(':'), R = S.rituals, x = (tab === 'hero' ? R.hero : R.work)[+i];
+    if (!x) return sheet('Ритуал', '<p class="faint">Ритуала больше нет в пуле.</p>');
+    const free = R.slots.some(s => s.st === 'free'), sp = ritSpec(x, tab), t = ritTime(sp.min);
+    const how = tab === 'hero' ? '' : x.unique ? `<p class="reason">Уникальный ресурс босса биома «${biomeName(x.biome)}» — наверняка. Бригада — полная.</p>`
+      : `<p class="reason">Базовые — вперемешку из общего пула${sp.keys ? `, ключи — наугад из шести ключей биома «${biomeName(x.biome)}»` : ''}. Какие именно — станет ясно при выдаче: всё ляжет в запасы.</p>`;
+    const body = `<div class="row" style="justify-content:space-between">${rar(x.r)}<span class="chip">${ic('hour')}${t}</span></div><b class="serif" style="font-size:24px">${x.n}</b>
+      <span class="eyebrow">Награда гарантирована</span><div class="rw">${ritRewHtml(x, tab, 'noop')}</div>${how}
+      <span class="eyebrow">Участники · ${sp.ppl}</span>
+      ${tab === 'work' ? `<div class="row" style="gap:6px">${Array.from({ length: sp.ppl }, () => `<span class="worker">${ic('users')}</span>`).join('')}<span class="faint" style="font-size:12.5px">назначатся из свободных рабочих</span></div>` : `<div class="row" style="gap:6px">${S.heroes.slice(0, sp.ppl).map(h => `<img src="${h.img}" alt="${h.name}" style="width:44px;height:44px;border-radius:9px;object-fit:cover">`).join('')}</div><p class="reason warn">Эти герои будут заняты ${t}: биомы и Эхо их не получат. Арена — получит.</p>`}
       ${free ? '' : '<p class="reason warn">Все слоты заняты. Заберите готовый ритуал.</p>'}`;
     return sheet('Ритуал', body, `<button class="btn go" data-a="rstart" data-v="${o.arg}" ${free ? '' : 'disabled'}>Начать ритуал</button>`);
   },
@@ -3144,8 +3271,9 @@ const OV = {
     const body = `<p class="muted" style="font-size:15px">${head} Отряд поднялся порталом наверх, как ото сна.</p>
       <div class="row" style="gap:18px;flex-wrap:wrap">${R.guard ? '' : `<div class="stat"><b>${passed}</b><small>этажей пройдено</small></div>`}<div class="stat"><b>${R.kills}</b><small>побед</small></div><div class="stat"><b>${clock(R.runMs / 1000)}</b><small>время забега</small></div>${R.mode === 'rounds' ? '<div class="stat"><b>10 раундов</b><small>модель боя</small></div>' : ''}${B.siege !== false && (E.kind === 'boss' || sg) ? `<div class="stat"><b>${E.kind === 'boss' ? 100 : sg}%</b><small>осада босса</small></div>` : ''}</div>
       ${R.curve.length ? `<div class="col" style="gap:3px"><span class="eyebrow">Здоровье отряда после каждого этажа</span><div class="curve">${R.curve.map((v, i) => `<i class="${B.floors[R.startFloor + i - 1].g !== 'o' ? 'el' : ''}" style="--v:${Math.max(3, v)}" title="Этаж ${R.startFloor + i}: ${v}%"></i>`).join('')}</div><small class="faint">Золотые столбики — элиты и босс. Здоровье не восстанавливалось.</small></div>` : ''}
-      <span class="eyebrow">Добыча</span>
-      <div class="row" style="gap:14px;flex-wrap:wrap">${money('gold', L.gold)}${money('spirit', L.spirit)}${money('souls', L.souls)}<span class="row" style="gap:4px">${well(I('cinder'), { act: 'noop', size: 30 })}<b class="num">×${L.cinder}</b></span><span class="chip" title="Ключи ремёсел биома — с элит, по одному (ADR-0010)">${ic('gem')}ключей ремёсел ×${L.keys}</span>${L.unique ? `<span class="chip gold">${ic('crown')}уникальный ×${L.unique}</span>` : ''}</div>
+      <span class="eyebrow">Добыча · ресурсы — в запасах</span>
+      <div class="row" style="gap:14px;flex-wrap:wrap">${money('gold', L.gold)}${money('spirit', L.spirit)}${money('souls', L.souls)}${lootHtml(L.items)}</div>
+      ${Object.keys(L.items || {}).length ? '' : `<p class="reason">Ресурсов не выпало: базовый — за взятый этаж с шансом ${pctBp(EB.RULES.drop.basePerFloorBp)}, ключ ремесла — с каждой элиты.</p>`}
       ${nk.length ? `<div class="newfoe">${nk.map(f => `<img src="${FA(f)}" alt="" style="object-position:${FPOS(f)}">`).join('')}<div class="col" style="gap:3px"><span class="eyebrow" style="color:var(--spirit)">Новое в бестиарии</span><b class="serif" style="font-size:20px">${nk.map(f => f.name).join(', ')}</b><small class="faint">Запись открыта во всех режимах</small></div><button class="link" data-a="foe" data-v="${nk[0].id}" style="margin-left:auto">Прочитать ${ic('chev')}</button></div>` : ''}
       ${E.kind === 'boss' ? '' : '<p class="reason">Сид — сам биом: тот же отряд с той же ротацией пройдёт его так же. Чтобы пройти дальше, поменяй состав, порядок способностей или стихии.</p>'}`;
     return dialog(title, body, `<button class="btn ghost" data-a="leave" data-v="${R.id}">В Убежище</button><button class="btn" data-a="resquad" data-v="${R.id}">${ic('users')}Сменить отряд</button><button class="btn go" data-a="again" data-v="${R.id}">${ic('down')}Ещё забег</button>`);
@@ -3161,19 +3289,6 @@ const OV = {
     return dialog('Полный сброс Памяти', `<p class="muted">Все закреплённые пассивки во всех открытых циклах пропадут. Выбор придётся пройти заново с места цикла II. Цикл, уровень и герои не меняются.</p><p class="reason warn">Сброс доступен один раз за неделю расы.</p>`, `<button class="btn ghost" data-a="close">Отмена</button><button class="btn warn" data-a="mreset">Сбросить${costTag('enerium', 100)}</button>`);
   },
   confirm(o) { return dialog(o.title, `<p class="muted" style="font-size:15px">${o.text}</p>${o.warn ? `<p class="reason warn">${o.warn}</p>` : ''}`, `<button class="btn ghost" data-a="close">Отмена</button><button class="btn ${o.danger ? 'warn' : 'go'}" data-a="${o.act}" data-v="${o.v || ''}">${o.ok}${o.cost ? costTag(o.cost[0], o.cost[1]) : ''}</button>`); },
-  autocraft(o) {
-    const r = S.recipes.find(x => x.id === o.arg);
-    const need = {}; const add = (id, n) => { need[id] = (need[id] || 0) + n; };
-    r.in.forEach(([id, n]) => { if (id === 'bind') { add('cinder', 3 * n); add('key', n); } else add(id, n); });
-    const uniq = Object.keys(need).filter(id => I(id) && I(id).rare);
-    const lack = Object.entries(need).filter(([id, n]) => (I(id) ? I(id).q : 0) < n);
-    const body = `<p class="muted" style="font-size:14px">Цепочка развёрнута до базовых ресурсов по известным рецептам.</p>
-      <div class="row" style="gap:10px;flex-wrap:wrap">${Object.entries(need).map(([id, n]) => `<span class="row" style="gap:6px">${well(I(id), { act: 'noop', size: 40 })}<span class="col" style="gap:1px"><b class="num">×${n}</b><small class="faint num">есть ${I(id).q}</small></span></span>`).join('')}<span class="faint">${ic('arrow')}</span><span class="row" style="gap:6px">${well({ n: r.out, img: r.outImg, r: 3, glyph: 'V' }, { act: 'noop', size: 40 })}<b>${r.out}</b></span></div>
-      ${r.chain ? '<p class="reason">Этапы: Связующее ×2 → ' + r.out + '</p>' : ''}
-      ${uniq.length ? `<label class="cert"><input type="checkbox" id="acUnique" checked><span><b>Разрешить расход: ${uniq.map(id => I(id).n).join(', ')}</b><small>Особый ресурс не восполнить. Без согласия не списывается.</small></span></label>` : ''}
-      ${lack.length ? `<p class="reason warn">Не хватает: ${lack.map(([id]) => I(id).n).join(', ')}</p>` : ''}`;
-    return dialog('Создать · ' + r.n, body, `<button class="btn ghost" data-a="close">Отмена</button><button class="btn go" data-a="acdo" data-v="${r.id}" ${lack.length ? 'disabled' : ''}>Создать</button>`);
-  },
   gift() {
     const d = S.gift;
     const cell = i => { const day = i + 1, got = day <= d.got, now = day === d.day && !got, big = day === 20; return `<div class="gday ${got ? 'got' : ''} ${now ? 'now' : ''} ${big ? 'big' : ''}"><small>${day}</small>${big ? `<img src="${CHEST}" alt="">` : `<img src="${[CUR.gold.img, CUR.spirit.img, CUR.souls.img, CUR.enerium.img, ART('rune-key.png')][i % 5]}" alt="">`}${got ? `<span class="ck">${ic('check')}</span>` : ''}</div>`; };
@@ -3287,36 +3402,110 @@ const ACT = {
     toast(`${h.n} пробуждён душами${d ? ' · лишние осколки → прах +' + fmt(d) : ''}`);
   },
   item(v) { open('item', v); },
-  isel(v) { S.selItem = v; const it = I(v); if (it && it.isNew) it.isNew = false; render(); },
+  /* активация из листа сведений — тем же обработчиком, что и в запасах (ACTIVATE — screens/model.js, регистрирует screens/echo.js) */
+  itact(v) { const it = BAG.item(v), f = it && ACTIVATE[it.tier]; if (typeof f !== 'function' || !BAG.has(v)) return toast('Активация пока недоступна'); S.overlay = null; f(v); render(); },
   npc(v) { S.overlay = { t: 'npc', arg: v, i: 0 }; NPCS[v].isNew = false; render(); focusOverlay(); },
   talkmore() { S.overlay.i++; render(); },
   talkgo(v) { if (v === 'mem') { S.overlay = null; open('mem'); return; } ACT.go(v); },
   qty(v) { S.qty = v === 'max' ? 'max' : +v; render(); },
   lvlup() { const h = H(S.selHero); const q = Math.min(S.qty === 'max' ? h.cap - h.lvl : S.qty, h.cap - h.lvl); const c = lvlCost(h.lvl, q); if (!spend('spirit', c)) return; h.lvl += q; h.bm += Math.round(h.bm * 0.012 * q); toast(`${h.name}: уровень ${h.lvl}`); },
-  limit() { const h = H(S.selHero); S.overlay = { t: 'confirm', title: 'Пробить рунный предел', text: `${h.name} израсходует 10 рун предела цикла ${ROMAN[h.cycle]}. Потолок уровня станет ${[150, 350, 700, 1200, 1200][h.lim]}.`, ok: 'Пробить', act: 'limitdo' }; render(); focusOverlay(); },
-  limitdo() { const h = H(S.selHero); const r = I('rune50'); if (r.q < 10) { toast('Не хватает рун предела'); return close(); } r.q -= 10; h.lim++; h.cap = [50, 150, 350, 700, 1200, 1200][h.lim]; S.overlay = null; toast(`${h.name}: предел пробит, потолок ${h.cap}`); },
-  valor() { const h = H(S.selHero); if (I('vfrag').q >= 100) { S.overlay = { t: 'confirm', title: 'Доблесть · ' + h.name, text: `Руна доблести (100 осколков) даст +30% к силе и откроет главу ${ROMAN[h.valor + 1]}. Уровень героя сбросится в 0, рунные пределы придётся пройти заново.`, warn: 'Пассивки коллекции сохраняются.', ok: 'Взять доблесть', act: 'valordo' }; render(); focusOverlay(); } else toast('Осколки руны доблести падают со второго рунного стража цикла'); },
-  valordo() { const h = H(S.selHero); I('vfrag').q -= 100; h.valor++; h.lvl = 0; h.lim = 0; h.cap = 50; h.bm = Math.round(h.bm * 0.62); S.overlay = null; toast(`${h.name}: доблесть ${h.valor} из ${h.maxV}. Открыта глава ${ROMAN[h.valor]}`); },
+  /* развитие героя на запасах: руны предела и руна доблести списываются из BAG; проверка и расход — в одном действии, повтор не спишет второй раз */
+  limit() {
+    const h = H(S.selHero); if (!h) return;
+    const d = heroDev(h);
+    if (!d.rune) return toast('Все пределы пройдены');
+    if (!d.atCap) return toast(`Предел откроется на уровне ${h.cap}`);
+    if (d.have < d.need) return toast(`Не хватает: ${itName(d.rune)} — есть ${d.have} из ${d.need}`);
+    S.overlay = { t: 'confirm', title: 'Пробить рунный предел', text: `${h.name} израсходует ${itName(d.rune)} ×${d.need} из запасов. Потолок уровня станет ${INV.hero.capByLim[h.lim + 1]}.`, ok: 'Пробить', act: 'limitdo', v: h.id };
+    render(); focusOverlay();
+  },
+  limitdo(v) {
+    const h = H(v || S.selHero); if (!h) return close();
+    const d = heroDev(h);
+    if (!d.rune || !d.atCap || !BAG.take(d.rune.id, d.need)) { toast('Не хватает рун предела'); return close(); }
+    h.lim++; h.cap = INV.hero.capByLim[h.lim]; S.overlay = null;
+    toast(`${h.name}: предел пробит, потолок ${h.cap}`);
+  },
+  valor() {
+    const h = H(S.selHero); if (!h) return;
+    const d = heroDev(h), D = INV.hero;
+    if (h.valor >= h.maxV) return toast('Личный максимум доблести достигнут');
+    if (!d.vr || d.vrHave < 1) return toast(d.vs ? `Руну доблести собирают из ${d.vsNeed} осколков: ${itSrc(d.vs)[0] || 'осколки — с рунного стража доблести'}` : 'Руны доблести этого цикла нет в данных');
+    if (!d.open) return toast(`Доблесть — на пределе ${ROMAN[D.valorAtLim]}: сначала пройдите все пределы`);
+    S.overlay = { t: 'confirm', title: 'Доблесть · ' + h.name, text: `${itName(d.vr)} ×1 из запасов даст +${D.valorPct}% к силе и откроет главу ${ROMAN[h.valor + 1]}. Уровень героя сбросится в 0, рунные пределы придётся пройти заново.`, warn: 'Пассивки коллекции сохраняются.', ok: 'Взять доблесть', act: 'valordo', v: h.id };
+    render(); focusOverlay();
+  },
+  valordo(v) {
+    const h = H(v || S.selHero); if (!h) return close();
+    const d = heroDev(h), D = INV.hero;
+    if (h.valor >= h.maxV || !d.open || !d.vr || !BAG.take(d.vr.id, 1)) { toast('Доблесть недоступна'); return close(); }
+    h.valor++; h.lvl = 0; h.lim = 0; h.cap = D.capByLim[0]; h.bm = Math.round(h.bm * D.valorBmPct / 100); S.overlay = null;
+    toast(`${h.name}: доблесть ${h.valor} из ${h.maxV}. Открыта глава ${ROMAN[h.valor]}`);
+  },
+  /* руна доблести из осколков — автодокрафт мастерской (screens/craft.js), рецепт известен с первого осколка */
+  valorcraft(v) { if (typeof ACT.wsmake === 'function' && BAG.recipe(v)) ACT.wsmake(v); else { S.seg.craft = 'work'; go('craft'); } },
   sq(v) { S.selSquad = v; render(); },
   sqnew() { if (S.squads.length >= 10) return toast('Библиотека полна: 10 отрядов'); const id = 's' + Date.now(); S.squads.push({ id, name: 'Отряд ' + ROMAN[S.squads.length + 1], m: [null, null, null, null, null] }); S.selSquad = id; render(); },
   sqrem(v) { sq(S.selSquad).m[+v] = null; render(); },
   sqadd(v) { const s = sq(S.selSquad), i = s.m.indexOf(null); if (i < 0) return toast('В отряде уже пятеро'); s.m[i] = v; render(); },
   sqslot() { toast('Нажмите героя ниже, чтобы поставить его сюда'); },
-  cat(v) { S.invCat = v; render(); },
-  put(v) { const it = I(v); let i = S.craft[S.craftSel] && S.craft[S.craftSel].id !== v ? S.craft.findIndex(c => !c) : S.craftSel; const ex = S.craft.findIndex(c => c && c.id === v); if (ex >= 0) i = ex; if (i < 0) return toast('Все шесть ячеек заняты'); const c = S.craft[i]; if (c && c.id === v) { if (c.q < Math.min(100, it.q)) c.q++; } else S.craft[i] = { id: v, q: 1 }; S.craftSel = i; render(); },
-  cslot(v) { S.craftSel = +v; render(); },
-  cq(v) { const [i, d] = v.split(':'); const c = S.craft[+i]; if (!c) return; if (d === 'x') S.craft[+i] = null; else { c.q = Math.max(1, Math.min(100, I(c.id).q, c.q + +d)); } render(); },
-  cclear() { S.craft = [null, null, null, null, null, null]; render(); },
-  ccreate() { const m = craftMatch(); if (m.st === 'known') { const r = m.r; r.in.forEach(([id, n]) => { const it = I(id); if (it) it.q -= n; }); S.craft = [null, null, null, null, null, null]; toast(`Создано: ${r.out}`, r.outImg); } else { S.overlay = { t: 'confirm', title: 'Неизвестное сочетание', text: 'Такого рецепта вы ещё не знаете. Если сочетание неверно, всё положенное на стол сгорит.', warn: 'Верное сочетание создаёт предмет всегда.', ok: 'Попробовать', act: 'cburn', danger: true }; render(); focusOverlay(); } },
-  cburn() { S.craft.filter(Boolean).forEach(c => { const it = I(c.id); if (it) it.q -= c.q; }); S.craft = [null, null, null, null, null, null]; S.overlay = null; toast('Неудача. Ресурсы сгорели — но двое из трёх угаданы верно'); },
-  book() { S.book = !S.book; render(); },
-  autocraft(v) { open('autocraft', v); },
-  acdo(v) { const r = S.recipes.find(x => x.id === v); const u = document.getElementById('acUnique'); if (u && !u.checked) return toast('Без согласия особый ресурс не списывается'); S.overlay = null; toast(`Создано: ${r.out}`, r.outImg); },
-  toCraft(v) { S.seg.craft = 'work'; S.book = false; S.overlay = null; S.route = 'craft'; ACT.put(v); },
-  use(v) { const it = I(v); S.overlay = { t: 'confirm', title: it.action + ' · ' + it.n, text: it.id === 'chest' ? 'Сундук откроется здесь, в запасах. Содержимое станет известно после подтверждения.' : 'Экземпляр появится в Спуске. Что внутри — станет известно после активации.', ok: it.action, act: 'usedo', v }; render(); focusOverlay(); },
-  usedo(v) { const it = I(v); it.q--; if (it.q <= 0) S.items = S.items.filter(x => x !== it); S.overlay = null; toast(v === 'chest' ? 'Сундук открыт: шарды рабочих ×3, золото 800' : 'Экземпляр активирован (демо)'); },
-  buy(v) { const [id, q, c, p] = S.shop[+v]; S.overlay = { t: 'confirm', title: 'Купить в лавке', text: `${I(id).n} ×${q}`, ok: 'Купить', act: 'buydo', v, cost: [c, p] }; render(); focusOverlay(); },
-  buydo(v) { const [id, q, c, p] = S.shop[+v]; if (!spend(c, p)) return close(); I(id).q += q; S.sold.push(+v); S.overlay = null; toast(`Куплено: ${I(id).n} ×${q}`, I(id).img); },
+  /* лавка: покупка кладёт предмет в запасы; товар продаётся один раз */
+  buy(v) {
+    const i = +v, g = S.shop[i], it = g && BAG.item(g[0]); if (!it || S.sold.includes(i)) return;
+    const [c, p] = shopCost(g);
+    S.overlay = { t: 'confirm', title: 'Купить в лавке', text: `${itName(it)} ×${g[1]}. Покупка ляжет в запасы.`, ok: 'Купить', act: 'buydo', v, cost: [c, p] };
+    render(); focusOverlay();
+  },
+  buydo(v) {
+    const i = +v, g = S.shop[i], it = g && BAG.item(g[0]); if (!it || S.sold.includes(i)) return close();
+    const [c, p] = shopCost(g); if (!spend(c, p)) return close();
+    S.sold.push(i); BAG.add(it.id, g[1]); S.overlay = null;
+    toast(`Куплено: ${itName(it)} ×${g[1]} — в запасах`);
+  },
+  /* рынок: чужой лот — в запасы за золото; свой лот забирает предмет из запасов, снятый возвращает, выручка — без комиссии */
+  mkbuy(v) {
+    const x = S.market.lots.find(l => l.uid === v), it = x && BAG.item(x.id); if (!it) return;
+    S.overlay = { t: 'confirm', title: 'Купить на рынке', text: `${itName(it)} ×${x.q} по ${fmt(mkUnit(x.id, x.pct))} за штуку. Покупка ляжет в запасы.`, ok: 'Купить', act: 'mkbuydo', v, cost: ['gold', mkLotTotal(x)] };
+    render(); focusOverlay();
+  },
+  mkbuydo(v) {
+    const M = S.market, x = M.lots.find(l => l.uid === v); if (!x) return close();
+    if (!spend('gold', mkLotTotal(x))) return close();
+    M.lots = M.lots.filter(l => l !== x); BAG.add(x.id, x.q); S.overlay = null;
+    toast(`Куплено на рынке: ${itName(BAG.item(x.id))} ×${x.q} — в запасах`);
+  },
+  mkfrom(v) { if (!BAG.has(v) || !mkMin(v)) return; S.overlay = null; S.market.sel = { id: v, q: 1, pct: S.market.sel.pct }; S.seg.craft = 'market'; S.seg.market = 'mine'; go('craft'); },
+  mkid(v, t) { const id = t ? t.value : v; if (!BAG.has(id) || !mkMin(id)) return; S.market.sel = { id, q: 1, pct: S.market.sel.pct }; render(); },
+  mkq(v) {
+    const P = mkPick(); if (!P.id) return;
+    S.market.sel = { id: P.id, q: v === 'max' ? P.have : Math.max(1, Math.min(P.have, P.n + (+v || 0))), pct: P.pct }; render();
+  },
+  mkp(v) { if (!INV.market.pricePct.includes(+v)) return; S.market.sel.pct = +v; render(); },
+  mksell() {
+    const M = S.market, P = mkPick(), it = P.id ? BAG.item(P.id) : null; if (!it) return;
+    const total = P.unit * P.n, fee = mkFee(total);
+    S.overlay = { t: 'confirm', title: 'Выставить на рынок', text: `${itName(it)} ×${P.n} по ${fmt(P.unit)} за штуку — лот ${fmt(total)} золота. Предмет уйдёт из запасов сразу; снятый лот вернёт его.`,
+      warn: `Комиссия ${mkFeePct()}% — с выручки: ${fmt(fee)} золота.`, ok: 'Выставить', act: 'mkselldo', v: ['op' + (++M.seq), P.id, P.n, P.pct].join(':') };
+    render(); focusOverlay();
+  },
+  mkselldo(v) {
+    const M = S.market, [op, id, n, pct] = String(v).split(':'), q = +n;
+    if (!op || M.ops[op] || !(q >= 1) || !INV.market.pricePct.includes(+pct) || !mkMin(id)) return close();
+    if (!BAG.take(id, q)) { toast('Столько нет в запасах'); return close(); }
+    M.ops[op] = 1; M.mine.push({ uid: 'my' + (++M.seq), id, q, pct: +pct, st: 'wait' }); S.overlay = null;
+    toast(`Лот выставлен: ${itName(BAG.item(id))} ×${q}`);
+  },
+  mkcancel(v) {
+    const M = S.market, x = M.mine.find(l => l.uid === v && l.st === 'wait'); if (!x) return;
+    M.mine = M.mine.filter(l => l !== x); BAG.add(x.id, x.q);
+    toast(`Лот снят: ${itName(BAG.item(x.id))} ×${x.q} — снова в запасах`);
+  },
+  mkcash(v) {
+    const M = S.market, x = M.mine.find(l => l.uid === v && l.st === 'sold'); if (!x) return;
+    const total = mkLotTotal(x), fee = mkFee(total);
+    M.mine = M.mine.filter(l => l !== x); S.wallet.gold += total - fee;
+    toast(`Выручка: ${fmt(total - fee)} золота · комиссия ${fmt(fee)}`);
+  },
   esel(v) { S.echo.sel = +v; render(); },
   summon(v) { if (!spend('souls', 1)) return; S.echo.slots[+v] = { foe: 'o3', step: 3, hp: 6000, max: 6000, left: 72 * 3600 }; S.echo.sel = +v; toast('Призвана цель: Пустотелый образец · 1 душа'); },
   esq(v) { S.echoSquad = v; render(); },
@@ -3336,19 +3525,40 @@ const ACT = {
   cert(v, t) { const C = S.contracts[S.seg.contracts]; C.cert = t.checked; render(); },
   tsign() { const C = S.contracts[S.seg.contracts], pts = C.tasks.reduce((a, t) => a + t.pts, 0); S.overlay = { t: 'confirm', title: 'Подписать контракт', text: `Заданий: ${C.tasks.length}, очков: ${pts}. Состав больше не изменить. Всё или ничего: провал одного задания к сроку обнуляет награду${C.cert ? ' и сжигает ставку' : ''}.`, ok: 'Подписать', act: 'tsigndo', cost: C.cert ? ['gold', pts * 20] : null }; render(); focusOverlay(); },
   tsigndo() { const C = S.contracts[S.seg.contracts], pts = C.tasks.reduce((a, t) => a + t.pts, 0); if (C.cert && !spend('gold', pts * 20)) return close(); C.signed = true; S.overlay = null; toast('Контракт подписан. Прогресс пошёл'); },
-  rclaim(v) { const s = S.rituals.slots[+v]; I(s.rew[0]).q += s.rew[1]; S.rituals.slots[+v] = { st: 'free' }; toast(`Получено: ${I(s.rew[0]).n} ×${s.rew[1]}`, I(s.rew[0]).img); },
-  rstart(v) { const [tab, i] = v.split(':'); const x = (tab === 'work' ? S.rituals.work : S.rituals.hero)[+i]; const k = S.rituals.slots.findIndex(s => s.st === 'free'); if (k < 0) return; S.rituals.slots[k] = { st: 'run', n: x.n, who: tab === 'work' ? 'Рабочие · ' + x.ppl : 'Герои · ' + x.ppl, left: 2 * 3600 }; S.overlay = null; toast(`Ритуал «${x.n}» начат`); },
+  /* ритуал: слот освобождается до выдачи — повтор ничего не выдаст; письмо о готовом ритуале уходит вместе с ним */
+  rclaim(v) {
+    const i = +v, s = S.rituals.slots[i]; if (!s || s.st !== 'ready') return;
+    S.rituals.slots[i] = { st: 'free' };
+    S.inbox = S.inbox.filter(m => m.rit !== s.uid);
+    const g = ritGive(s), n = Object.values(g.items).reduce((a, x) => a + x, 0);
+    toast(`«${s.n}»: ${g.cur.map(([k, x]) => `${CUR[k].n.toLowerCase()} ${fmt(x)}`).concat(n ? [`ресурсы ×${fmt(n)} — в запасах`] : []).join(', ') || 'награда получена'}`);
+  },
+  rstart(v) {
+    const [tab, i] = String(v).split(':'), x = (tab === 'hero' ? S.rituals.hero : S.rituals.work)[+i]; if (!x) return;
+    const k = S.rituals.slots.findIndex(s => s.st === 'free'); if (k < 0) return toast('Все слоты заняты');
+    const sp = ritSpec(x, tab);
+    S.rituals.slots[k] = { st: 'run', uid: 'rt' + (++S.rituals.seq), n: x.n, kind: tab, r: x.r, ppl: sp.ppl, biome: x.biome || null, unique: !!x.unique, cyc: S.acc.cycle, left: sp.min * 60 };
+    S.overlay = null; toast(`Ритуал «${x.n}» начат · ${ritTime(sp.min)}`);
+  },
   arenago(v) { if (S.arena.att <= 0) return toast('Атаки кончились. Новые придут завтра'); S.arena.att--; const o = S.arena.opp[+v]; const win = o.rt < 1275; S.arena.rating += win ? 14 : -9; S.arena.opp.splice(+v, 1); S.overlay = null; toast(win ? `Победа над «${o.n}»: +14 рейтинга` : `Поражение от «${o.n}»: −9 рейтинга. Смотрите запись в почте`); },
   artup(v) { const a = S.arts[+v]; if (!spend('souls', a.cost)) return; a.lv++; a.cost = Math.round(a.cost * 1.5); toast(`${a.n}: уровень ${ROMAN[a.lv]}`); },
   mpick(v) { S.mem.pick = +v; render(); },
   mreroll() { const M = S.mem; if (M.free > 0) M.free--; else if (!spend('enerium', 50)) return; [M.offer, M.alt] = [M.alt, M.offer]; M.pick = 1; render(); },
   mset() { const M = S.mem; M.slots[0] = { c: 2, st: 'set', p: M.offer[M.pick] }; S.overlay = null; S.seg.profile = 'mem'; S.route = 'profile'; toast(`Вспомнено: ${M.offer[M.pick].n}`); },
   mreset() { if (!spend('enerium', 100)) return close(); S.mem.slots[0] = { c: 2, st: 'open' }; S.overlay = null; toast('Память сброшена. Место цикла II снова открыто'); },
-  claim(v) { const m = S.inbox.find(x => x.id === v); m.rew.forEach(([id, n]) => { if (CUR[id]) S.wallet[id] += n; else I(id).q += n; }); S.inbox = S.inbox.filter(x => x !== m); render(); },
-  claimgo(v) { const m = S.inbox.find(x => x.id === v); S.inbox = S.inbox.filter(x => x !== m); go(m.go); },
-  claimall() { S.inbox.filter(m => m.rew.length).forEach(m => ACT.claim(m.id)); toast('Всё забрано'); },
+  /* письмо: уходит из Входящих до выдачи — повтор ничего не выдаст. Валюта — в кошелёк, предметы — в запасы, сундуки — BAG.addChest */
+  claim(v) {
+    const m = S.inbox.find(x => x.id === v); if (!m) return;
+    const r = mailRit(m);
+    S.inbox = S.inbox.filter(x => x !== m);
+    if (r) ACT.rclaim(String(S.rituals.slots.indexOf(r)));
+    for (const [id, n] of m.rew || []) { if (CUR[id]) S.wallet[id] += n; else if (BAG.item(id)) BAG.add(id, n); }
+    for (const sp of m.chests || []) BAG.addChest({ ...sp });
+    render();
+  },
+  claimgo(v) { const m = S.inbox.find(x => x.id === v); if (!m) return; S.inbox = S.inbox.filter(x => x !== m); go(m.go); },
+  claimall() { S.inbox.filter(mailHas).forEach(m => ACT.claim(m.id)); toast('Всё забрано: предметы и сундуки — в запасах'); },
   giftget() { S.gift.got = S.gift.day; S.wallet.enerium += 50; S.overlay = null; toast('Дар дня: Энериум ×50', ART('enerium.png')); },
-  giftsclaim() { I('chest').q += 19; S.overlay = null; toast('19 сундуков перенесены в запасы', CHEST); },
   psq(v) { S.prepSquad = v; render(); },
   start() { startRun(S.prepSquad, 'b1'); },
   again(v) { const R = runById(v) || focusRun(), sqId = R ? R.squadId : S.prepSquad; prune(v); S.overlay = null; startRun(sqId, R ? R.biome : 'b1'); },
@@ -3385,8 +3595,9 @@ function startRun(squadId, biome = 'b1', demoFloor, guard) {
   const ids = s.m.filter(id => id && !H(id).busy && !runOf(id));
   if (!ids.length) return toast('Все герои этого отряда уже в забеге');
   const R = { id: 'r' + (++S.runNo), runNo: S.runNo, biome, squadId, squad: ids, heroes: ids.map(id => EB.heroSrc(H(id))), floor: demoFloor || 1, startFloor: demoFloor || 1, demo: !!demoFloor, guard: !!guard, mode: devModel, acted: [], fired: null,
-    view: 0, runMs: 0, kills: 0, loot: { gold: 0, spirit: 0, souls: 0, cinder: 0, keys: 0, unique: 0 }, newKnown: [], over: false, seen: false, gap: 0, feed: [], banner: null,
-    siegeFrom: siegeDone(biome), end: null, flyN: 0, disp: {}, curve: [], lastActor: null, pending: 0, endAt: null };
+    view: 0, runMs: 0, kills: 0, loot: { gold: 0, spirit: 0, souls: 0, items: {} }, newKnown: [], over: false, seen: false, gap: 0, feed: [], banner: null,
+    siegeFrom: siegeDone(biome), end: null, flyN: 0, disp: {}, curve: [], lastActor: null, pending: 0, endAt: null,
+    lootSeed: EB.seedOf(`${biome}|добыча|${S.runNo}`) };   // сид добычи забега — заглушка серверного (§34): в игре его выдаёт сервер при старте
   S.runs.push(R);
   newFloor(R);
   S.focus = R.id; S.insp = null; S.overlay = null; S.route = 'battle'; render();
@@ -3448,16 +3659,51 @@ function farmText(F) {
   if (F.keySure) parts.push('второй ключ с каждой элиты');
   return parts.join(', ');
 }
+/* ================== добыча забега в запасы ==================
+   Сработал ли базовый ресурс, сколько ключей с элит и выпал ли уникальный с босса — решает ядро (EB.floorLoot, свой поток генератора этажа).
+   Какие именно — здесь, на генераторе ядра (EB.makeRng) с сидом забега и номером этажа. Порядок бросков — базовые, ключи, уникальный, добыча стража.
+   Числа — EN_RECIPES.drops: за срабатывание — от 1 до basicsPerTriggerMax базовых из общих 36, это номер биома (ADR-0023, п. 1);
+   ключ — один из шести ключей биома наугад (п. 2); стражи — drops.guardians. Всё ложится в запасы через BAG. */
+const dropOf = biome => (RX.drops.enemies || []).find(e => e.biome === biome) || null;
+const guardOf = biome => (RX.drops.guardians || []).find(g => g.biome === biome) || null;
+function lootItems(biome, floor, got, seed, guardWin) {
+  const roll = EB.makeRng(EB.floorSeed(seed >>> 0, floor)), out = {}, put = (id, n) => { out[id] = (out[id] || 0) + n; };
+  const add = list => { if (list.length) put(list[roll(list.length)].id, 1); };
+  const D = dropOf(biome), max = D ? D.basicsPerTriggerMax : EB.BIOMES[biome] ? EB.BIOMES[biome].n : 1, pool = poolItems();
+  for (let t = 0; t < (got.base || 0); t++) { const n = 1 + roll(max); for (let k = 0; k < n; k++) add(pool); }
+  const keys = biomeItems('key', biome); for (let k = 0; k < (got.keys || 0); k++) add(keys);
+  const un = biomeItems('unique', biome); for (let k = 0; k < (got.unique || 0); k++) add(un);
+  const g = guardWin ? guardOf(biome) : null;
+  if (g && g.kind === 'limits') {   // страж пределов: runesPerKill рун своего цикла, какой предел — по весам weightsBp
+    const W = g.weightsBp, sum = W.reduce((a, x) => a + x, 0);
+    for (let k = 0; k < g.runesPerKill; k++) { let r = roll(sum), j = 0; while (r >= W[j]) { r -= W[j]; j++; } const rn = limitRune(g.cyc, j + 1); if (rn) put(rn.id, 1); }
+  } else if (g && g.kind === 'valor') {   // страж доблести: осколки по таблице shardsBp; остаток undefinedBp не описан (§11.1) — ничего
+    const vs = cycItems('vshard', g.cyc)[0], sum = g.shardsBp.reduce((a, x) => a + x[1], 0) + (g.undefinedBp || 0);
+    let r = roll(sum); const row = g.shardsBp.find(([, bp]) => { if (r < bp) return true; r -= bp; return false; });
+    if (vs && row) put(vs.id, row[0]);
+  }
+  return out;
+}
+/* предметы добычи в итоге забега: по ярусам, как в «Древе рецептов» */
+function lootHtml(items) {
+  const ord = Object.keys(RX.tiers), at = new Map(RX.items.map((it, i) => [it.id, i]));
+  return Object.entries(items || {}).filter(([id]) => BAG.item(id))
+    .sort(([a], [b]) => ord.indexOf(BAG.item(a).tier) - ord.indexOf(BAG.item(b).tier) || at.get(a) - at.get(b))
+    .map(([id, n]) => `<span class="row" style="gap:4px">${itWell(id, { act: 'noop', size: 30 })}<b class="num">×${fmt(n)}</b></span>`).join('');
+}
 function floorDone(R, vis) {
   const b = R.b, B = EB.BIOMES[R.biome], g = deckOf(R).g;
   R.runMs += b.t;
   R.heroes = EB.carry(R.heroes, b);
   R.curve.push(partyPctOf(b));
-  const got = EB.floorLoot(R.biome, R.guard ? B.floors.length + 1 : R.floor, b, 0), L = R.loot;   // 0 — прибавка артефактов к шансу ресурса
-  L.gold += got.gold; L.spirit += got.spirit; L.souls += got.souls; L.keys += got.keys; L.cinder += got.base; L.unique += got.unique;
-  // добыча этажа — в кошелёк сразу, как убиты все враги этажа: валюта летит в панель, как магнитом (§5.6)
-  S.wallet.gold += got.gold; S.wallet.spirit += got.spirit; S.wallet.souls += got.souls; I('cinder').q += got.base;
+  const fl = R.guard ? B.floors.length + 1 : R.floor, got = EB.floorLoot(R.biome, fl, b, 0), L = R.loot;   // 0 — прибавка артефактов к шансу ресурса
+  const items = lootItems(R.biome, fl, got, R.lootSeed || 0, R.guard && b.win);
+  L.gold += got.gold; L.spirit += got.spirit; L.souls += got.souls;
+  // добыча этажа — сразу, как убиты все враги этажа: валюта летит в панель, как магнитом (§5.6), ресурсы ложатся в запасы
+  S.wallet.gold += got.gold; S.wallet.spirit += got.spirit; S.wallet.souls += got.souls;
+  for (const [id, n] of Object.entries(items)) { BAG.add(id, n); L.items[id] = (L.items[id] || 0) + n; }
   if (vis) magnet(got);
+  if (vis && Object.keys(items).length) feed(R, `<span class="gd">Добыча</span> · ${Object.entries(items).map(([id, n]) => `${itName(BAG.item(id))} ×${n}`).join(', ')}`);
   const fm = farmText(got.farm); if (vis && fm) feed(R, `<span class="gd">Фарм</span> · ${fm}`);
   if (R.guard) { R.end = { kind: b.win ? 'guardWin' : 'guardLose', why: b.why, rounds: b.maxRounds }; if (b.why === 'sand' && vis) feed(R, `<span class="gd">Время скоротечно…</span> · ${b.maxRounds} ${roundWord(b.maxRounds)} прошли`); return endRun(R, vis); }
   let bossDead = false;
@@ -3757,7 +4003,7 @@ function toastHtml() { const t = S.toast; return `<div class="toast" role="statu
 function render() {
   const g = $game(); if (!g) return;
   const scr = SCREENS[S.route]();
-  const act = document.activeElement, q = act && act.id === 'invq' ? { id: 'invq', s: act.selectionStart } : null;
+  const act = document.activeElement, q = act && act.id === 'mkq' ? { id: 'mkq', s: act.selectionStart } : null;   // поиск лотов рынка не теряет фокус
   const keep = {}; g.querySelectorAll('[data-keep]').forEach(e => { keep[e.dataset.keep] = e.scrollTop; });   // §33.3: положение списка сохраняется
   g.innerHTML = topBar(scr) + rail() + `<main class="g-main" id="gmain" data-route="${S.route}">${scr.html}</main>` + overlay() + (S.toast ? toastHtml() : '');
   g.querySelectorAll('[data-keep]').forEach(e => { if (keep[e.dataset.keep]) e.scrollTop = keep[e.dataset.keep]; });
@@ -3782,10 +4028,10 @@ function bindGame() {
     const f = ACT[t.dataset.a]; if (f) { e.preventDefault(); f(t.dataset.v || '', t, e); }
   });
   g.addEventListener('change', e => { const t = e.target; if (t.matches('input[data-a], select[data-a]')) { const f = ACT[t.dataset.a]; f && f(t.dataset.v || '', t, e); } });
-  g.addEventListener('input', e => { if (e.target.id === 'invq') { S.invQ = e.target.value; render(); } });
+  g.addEventListener('input', e => { if (e.target.id === 'mkq') { S.market.q = e.target.value; render(); } });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && S.overlay) { e.preventDefault(); close(); } });
   setInterval(() => {
-    S.week.left--; S.echo.slots.forEach(s => s && s.left--); S.rituals.slots.forEach(s => s.left && s.left--); S.contracts.day.left--; S.contracts.week.left--;
+    S.week.left--; S.echo.slots.forEach(s => s && s.left--); S.rituals.slots.forEach(s => { if (s.left) s.left--; if (s.st === 'run' && s.left <= 0) s.st = 'ready'; }); S.contracts.day.left--; S.contracts.week.left--;
     document.querySelectorAll('[data-cd="week"]').forEach(e => e.textContent = dur(S.week.left));
   }, 1000);
 }
@@ -3801,7 +4047,9 @@ const FLOWS = [
   ['Ротация перетаскиванием', 'Порядок способностей в карточке героя', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.seg.hero = 'skills'; S.selHero = 'h2'; S.overlay = null; }],
   ['Коллекция · состав героев', 'Все герои игры: фильтры по циклу, источнику и классу; орден скрыт до последней доблести', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'all'; S.seg.rhero = 'who'; S.overlay = null; }],
   ['Призыв · три способа', 'За золото, за Энериум, за души; цикл I–VI — переключатель для демо', () => { S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'gold'; S.overlay = null; }],
-  ['Мастерская', 'Шесть ячеек вокруг результата и книга рецептов', () => { S.route = 'craft'; S.seg.craft = 'work'; S.book = false; S.craft = [{ id: 'cinder', q: 3 }, { id: 'key', q: 1 }, null, null, null, null]; S.craftSel = 0; S.overlay = null; }],
+  ['Мастерская', 'Шесть ячеек вокруг результата и книга рецептов', () => { S.route = 'craft'; S.seg.craft = 'work'; S.overlay = null; }],
+  ['Лавка и рынок', 'Покупка кладёт предмет в запасы, свой лот забирает его оттуда, снятый — возвращает', () => { S.route = 'craft'; S.seg.craft = 'shop'; S.overlay = null; }],
+  ['Ритуалы', 'Готовый ритуал: базовые общего пула и ключи биома — в запасы, золото и души — в кошелёк', () => { S.route = 'rituals'; S.seg.rituals = 'work'; S.overlay = null; }],
   ['Неделя → Эхо', 'Шесть недельных режимов на одном экране, цель и атака', () => { S.route = 'echo'; S.echo.sel = 0; S.overlay = null; }],
   ['Контракт', 'Составить, заверить золотом, подписать', () => { S.route = 'contracts'; S.seg.contracts = 'day'; S.overlay = null; }],
   ['Память Странника', 'Одна из трёх, переброс и закрепление', () => { S.route = 'profile'; S.seg.profile = 'mem'; S.overlay = S.mem.slots[0].st === 'open' ? { t: 'mem' } : null; }],
