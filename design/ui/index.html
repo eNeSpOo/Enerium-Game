@@ -319,6 +319,7 @@ html.team .g .team-only{outline:1px dashed rgba(169,134,238,.55);outline-offset:
 .el[data-el="Воздух"]{--c:var(--air)}.el[data-el="Земля"]{--c:var(--earth)}.el[data-el="Огонь"]{--c:var(--fire)}.el[data-el="Вода"]{--c:var(--water)}.el[data-el="Время"]{--c:var(--time)}.el[data-el="Свет"]{--c:var(--light)}.el[data-el="Тьма"]{--c:var(--dark)}
 /* редкость */
 [data-r="1"]{--rc:var(--r1)}[data-r="2"]{--rc:var(--r2)}[data-r="3"]{--rc:var(--r3)}[data-r="4"]{--rc:var(--r4)}[data-r="5"]{--rc:var(--r5)}[data-r="6"]{--rc:var(--r6)}[data-r="7"]{--rc:var(--r7)}
+.ico{display:inline-block;vertical-align:middle;flex:none;object-fit:contain}
 .rar{display:inline-flex;align-items:center;gap:5px;font:700 11px/1 var(--f-u);letter-spacing:.08em;text-transform:uppercase;color:var(--rc)}
 .rar::before{content:"";width:7px;height:7px;transform:rotate(45deg);background:var(--rc);box-shadow:0 0 6px var(--rc)}
 /* звёзды доблести: позиций ровно столько, сколько личный максимум */
@@ -1610,8 +1611,12 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 const ASSET = window.EN_ASSET || '../enerium/assets/';
 const A = p => ASSET + p;
 const ART = n => A('art/' + n);
-const ART_V = '9bd3f9f4';   // версия выгрузки арта — её ставит tools/art-gen/export_ui.py, чтобы браузер не брал старые картинки из кэша
+const ART_V = '7f973f96';   // версия выгрузки арта — её ставит tools/art-gen/export_ui.py, чтобы браузер не брал старые картинки из кэша
 const AV = n => ART(n) + '?v=' + ART_V;
+/* значки атрибутов, редкостей, классов и доблести — одобрены автором 28.09.2026, выгрузка tools/art-gen/export_ui.py → assets/art/icons/:
+   power, hp, patk, matk, def-phys, def-mag, eva, crit, critdmg; str, int, agi, end, spd; r1…r7 — редкости (ADR-0027);
+   cls-tank, cls-healer, cls-str, cls-agi, cls-mage, cls-control, cls-farmer; valor. ICON(имя, px, подпись) — <img>, alt — подпись */
+const ICON = (n, px = 20, alt = '') => `<img class="ico" src="${AV('icons/' + n + '.png')}" width="${px}" height="${px}" alt="${alt}" loading="lazy" decoding="async">`;
 const PATH = n => A('path-icons/path-' + String(n).padStart(2, '0') + '.jpg');
 /* Арт врагов — основа ADR-0013, арена — вторая раскладка; выгрузка tools/art-gen/export_ui.py */
 const FA = f => AV('foes/' + f.id + '.jpg');
