@@ -4,10 +4,14 @@
    2. Скрипты прототипа выполняются в песочнице Node по порядку, как в браузере, с заглушкой DOM; boot() не запускается.
       Соседние экраны (craft.js, bag.js) пишут параллельно: их ошибки — предупреждения; ошибки остальных скриптов — провал.
    3. Девять недель × шесть циклов: экран, листы недели, бестиария и сведений о каждом враге; призыв за одну душу с выбором
-      из вариантов и повтором без второго расхода; атаки до победы на каждой из 14 ступеней — очки, бестиарий, рост лестницы;
-      Убер-босс даёт Многоликого; цель с вышедшим сроком уходит; планки недели → сундуки осколков в запасах, один раз.
-   4. Активации из запасов на каждой неделе и цикле: все крафтовые боссы (ACTIVATE.call), Многоликий (ACTIVATE.echo),
-      все руины (ACTIVATE.act). Лист подтверждения не называет будущего врага и руину; недоступная активация ничего не списывает;
+      из вариантов и повтором без второго расхода; атаки до победы на каждой из 14 ступеней — каждая атака бой ядром (ADR-0025):
+      цена один раз, повтор того же номера атаки ничего не списывает, здоровье цели — из итога боя, «Пропустить» открывает итог;
+      после первой атаки цели оставляем 1 здоровья — шкала Эхо растёт ×3 за цикл, а отряд прототипа нет; победа — очки, бестиарий,
+      рост лестницы; Убер-босс открывает пятнадцатую ступень — Многоликого, победа над ним даёт ресурс «Многоликий» своей недели;
+      цель с вышедшим сроком уходит; планки недели → сундуки осколков в запасах, один раз.
+   4. Активации из запасов на каждой неделе и цикле: все крафтовые боссы (ACTIVATE.call), биом Многоликого (ACTIVATE.echo) —
+      в слот биомов без душ, забег по 14 ступеням с одной попыткой и очками за взятые этажи, все руины (ACTIVATE.act).
+      Лист подтверждения не называет будущего врага и руину; недоступная активация ничего не списывает;
       повтор подтверждения не списывает второй раз; победа над крафтовым боссом — трофей, ключи, валюта, сундук или осколки;
       руина видна в «Спуске»; слоты биомов общие с забегами — сверх них не встать ни руине, ни забегу.
    Везде: без исключений, без undefined, NaN и [object; до первой победы имя врага не видно; тема недели «для команды» не видна.
@@ -31,11 +35,15 @@ if (!html.includes('href="screens/echo.css"')) err.push('index.html: не под
 for (const s of scripts) if (!s.src) { try { new vm.Script(s.code, { filename: 'index.html' }); } catch (e) { err.push('синтаксис встроенного скрипта: ' + e.message); } }
 if (err.length) done();
 
-/* 2. песочница */
-const stubEl = id => ({ id, innerHTML: '', textContent: '', value: '', style: { setProperty() {} }, dataset: {}, children: [],
-  classList: { add() {}, remove() {}, toggle() {}, contains: () => false }, addEventListener() {}, removeEventListener() {}, appendChild: x => x,
-  insertAdjacentHTML() {}, setAttribute() {}, getAttribute: () => null, querySelector: () => null, querySelectorAll: () => [], closest: () => null,
-  getBoundingClientRect: () => ({ left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 }), scrollIntoView() {}, focus() {}, remove() {}, animate: () => ({}), clientWidth: 1200, clientHeight: 800 });
+/* 2. песочница: у элемента querySelector отдаёт заглушку — экран боя рисует карты по ней */
+const stubEl = id => {
+  const e = { id, innerHTML: '', textContent: '', value: '', style: { setProperty() {} }, dataset: {}, children: [],
+    classList: { add() {}, remove() {}, toggle() {}, contains: () => false }, addEventListener() {}, removeEventListener() {}, appendChild: x => x,
+    insertAdjacentHTML() {}, setAttribute() {}, getAttribute: () => null, querySelectorAll: () => [], closest: () => null,
+    getBoundingClientRect: () => ({ left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 }), scrollIntoView() {}, focus() {}, remove() {}, animate: () => ({}), clientWidth: 1200, clientHeight: 800 };
+  e.querySelector = () => stubEl();
+  return e;
+};
 const els = {};
 const document = { readyState: 'loading', addEventListener() {}, getElementById: id => (els[id] = els[id] || stubEl(id)), querySelector: () => null, querySelectorAll: () => [],
   createElement: () => stubEl(), createElementNS: () => stubEl(), body: stubEl('body'), documentElement: stubEl('html'), activeElement: null, fonts: null };
@@ -65,28 +73,43 @@ function suite() {
     if (/(^|[^а-яё])мать([^а-яё]|$)/i.test(h)) fail(key + ': в тексте игрока — «мать»');
   };
   const ipow = (b, e) => { let r = 1; for (let i = 0; i < e; i++) r *= b; return r; };
-  const pts = (st, c) => c < FROM ? 0 : (st > TOP ? D.manyPoints : D.points[st - 1]) * ipow(XE.pointsCycleMul, c - FROM);
-  const atk = g => XE.oldAttackSouls[D.atk[g]];
-  const reset = (race, c) => { S = initialState(); rsSetWeek(race); S.acc.cycle = c; S.route = 'echo'; S.overlay = null; S.wallet.souls = 1e9; E.sync(); };
-  const clearEcho = () => { S.overlay = null; S.echo.slots = S.echo.slots.map(() => null); S.ech.pending = {}; S.echo.sel = 0; S.route = 'echo'; };
-  /* бьём цель в слоте i до победы; проверяем цену каждой атаки и сохранение урона */
+  const RULED = !!window.EN_ECHO_RULES;   // данные режима подключены: очки и цены — их, иначе прежняя сетка §17.5
+  const pts = (st, c) => RULED ? E.pts(st > TOP ? TOP + 1 : st, c) : c < FROM ? 0 : (st > TOP ? D.manyPoints : D.points[st - 1]) * ipow(XE.pointsCycleMul, c - FROM);
+  /* отряд прототипа — на уровне верхней ступени цикла: проверяем механику боя Эхо, а не баланс; числа проверки — не баланс */
+  const reset = (race, c) => { S = initialState(); rsSetWeek(race); S.acc.cycle = c; S.route = 'echo'; S.overlay = null; S.wallet.souls = 1e9; E.sync(); S.heroes.forEach(h => { h.lvl = Math.max(h.lvl, E.lvl(TOP, c)); }); };
+  const clearEcho = () => { S.overlay = null; S.echo.slots = S.echo.slots.map(() => null); S.ech.pending = {}; S.echo.sel = 0; S.route = 'echo'; S.runs = []; };
+  /* бьём цель в слоте i до победы. Атака — бой ядром (ADR-0025): цена один раз, повтор того же номера ничего не меняет,
+     здоровье цели — из итога боя, «Пропустить» открывает итог. После первой атаки цели оставляем 1 здоровья — проверяем победу */
   const kill = (key, i) => {
-    const x = S.echo.slots[i]; S.echo.sel = i; let n = 0, last = x.hp;
-    while (S.echo.slots[i] === x && n < 3000) {
-      const s0 = S.wallet.souls; ACT.echatk(); n++;
-      if (S.wallet.souls !== s0 - atk(x.g)) { fail(`${key}: атака стоила ${s0 - S.wallet.souls}, а не ${atk(x.g)}`); break; }
-      if (S.echo.slots[i] === x) { if (x.hp >= last) { fail(key + ': атака не сняла здоровья'); break; } last = x.hp; }
+    const x = S.echo.slots[i]; S.echo.sel = i; S.route = 'echo'; let n = 0;
+    while (S.echo.slots[i] === x && n < 60) {
+      const s0 = S.wallet.souls, hp0 = x.hp, cost = E.cost(x), no = x.atk + 1;
+      if (!RULED && cost !== XE.oldAttackSouls[D.atk[x.g]]) fail(`${key}: цена атаки ${cost} — не прежняя сетка §17.5`);
+      ACT.echatk(x.uid + ':' + no); n++;
+      if (S.wallet.souls !== s0 - cost) { fail(`${key}: атака стоила ${s0 - S.wallet.souls}, а не ${cost}`); break; }
+      const R = S.runs.find(r => r.kind === 'echo' && !r.over);
+      if (!R || S.route !== 'battle' || !R.res) { fail(key + ': атака не открыла бой'); break; }
+      const res = R.res.res;
+      if (res.main.hp0 !== hp0 || (S.echo.slots[i] === x ? x.hp !== res.main.hp : !res.killed)) fail(`${key}: здоровье цели не из итога боя`);
+      scan(key + ' · бой', draw());
+      const s1 = S.wallet.souls, sc1 = S.echo.score, a1 = x.atk; ACT.echatk(x.uid + ':' + no);
+      if (S.wallet.souls !== s1 || S.echo.score !== sc1 || x.atk !== a1 || S.runs.filter(r => r.kind === 'echo').length !== 1) fail(key + ': повтор атаки списал или начислил второй раз');
+      ACT.echskip(R.id);
+      if (!S.overlay || S.overlay.t !== 'echres' || S.route !== 'echo' || !R.over) { fail(key + ': «Пропустить» не открыло итог'); break; }
+      scan(key + ' · итог атаки ' + n, draw());
+      if (S.echo.slots[i] === x) { S.overlay = null; if (x.hp > 1) x.hp = 1; }
     }
     if (S.echo.slots[i] === x) { fail(key + ': цель не пала за ' + n + ' атак'); return false; }
     out.kills++;
-    if (!S.overlay || S.overlay.t !== 'echwin') fail(key + ': нет итога победы');
+    if (!S.overlay || S.overlay.t !== 'echres') fail(key + ': нет итога победы');
     return true;
   };
 
   /* данные экрана */
   const EL = ['Воздух', 'Земля', 'Огонь', 'Вода', 'Время'], CLS = ['Танк', 'Физ. ДД силы', 'Физ. ДД ловкости', 'Маг. ДД', 'Лекарь', 'Дебаффер'], names = new Set();
   if (TOP !== 14) fail('ступеней лестницы ' + TOP + ', а не 14');
-  for (const k of ['points', 'hp', 'bm', 'pickW']) if (D[k].length !== TOP) fail(`данные: ${k} — ${D[k].length} чисел на ${TOP} ступеней`);
+  for (const k of ['points', 'hp', 'bm']) if (D[k].length !== TOP) fail(`данные: ${k} — ${D[k].length} чисел на ${TOP} ступеней`);
+  if (D.pickW.length !== TOP + 1) fail(`данные: pickW — ${D.pickW.length} чисел на ${TOP} ступеней и Многоликого`);
   for (const w of RS.weeks) {
     const c = D.civ[w.race];
     if (!c) { fail('нет цивилизации недели ' + w.race); continue; }
@@ -146,18 +169,21 @@ function suite() {
       scan(key + ' · цель', draw());
       S.ech.wide = false; clearEcho(); ACT.echsum('0'); if (!S.ech.pending[0] || S.ech.pending[0].offers.length !== D.offer.base) fail(key + ': без артефакта вариантов не ' + D.offer.base); S.ech.wide = true;
 
-      /* каждая ступень до победы: очки, бестиарий, рост лестницы; Убер-босс даёт Многоликого */
-      for (let st = 1; st <= TOP; st++) {
+      /* каждая ступень до победы: очки, бестиарий, рост лестницы; Убер-босс открывает пятнадцатую — Многоликого,
+         победа над Многоликим (лёгкий бой один на один) даёт ресурс «Многоликий» (ADR-0025) */
+      for (let st = 1; st <= TOP + 1; st++) {
         clearEcho(); S.ech.avail = st;
         const t = E.target('step', st), score0 = S.echo.score, many0 = BAG.qty(XE.uber.item);
+        if (st > TOP && (t.kind !== 'many' || t.fid !== 'many')) { fail(`${key}: пятнадцатая ступень — не Многоликий`); continue; }
         S.echo.slots[0] = t; scan(`${key} · ступень ${st}`, draw());
         if (!kill(`${key} · ступень ${st}`, 0)) continue;
         if (!S.ech.known[t.fid]) fail(`${key}: ступень ${st} не открыла запись бестиария`);
         if (S.echo.score - score0 !== pts(st, c)) fail(`${key}: ступень ${st} дала ${S.echo.score - score0} очков вместо ${pts(st, c)}`);
-        if (S.ech.avail !== Math.min(st + 1, TOP)) fail(`${key}: после ступени ${st} открыто ${S.ech.avail}`);
-        if ((BAG.qty(XE.uber.item) - many0) !== (st === TOP ? XE.uber.count : 0)) fail(`${key}: ступень ${st} — Многоликий ${BAG.qty(XE.uber.item) - many0}`);
+        if (S.ech.avail !== Math.min(st + 1, TOP + 1)) fail(`${key}: после ступени ${st} открыто ${S.ech.avail}`);
+        if ((BAG.qty(XE.uber.item) - many0) !== (st > TOP ? XE.uber.count : 0)) fail(`${key}: ступень ${st} — Многоликий ${BAG.qty(XE.uber.item) - many0}`);
+        if (st > TOP && (S.ech.manyWk[w.race] || 0) < XE.uber.count) fail(`${key}: Многоликий не привязан к своей неделе`);
         h = draw(); scan(`${key} · победа ${st}`, h);
-        if (!h.includes(E.stepFoe(t.fid).n)) fail(`${key}: итог победы не назвал врага ступени ${st}`);
+        if (!h.includes(E.foe(t.fid, t).n)) fail(`${key}: итог победы не назвал врага ступени ${st}`);
       }
       S.overlay = { t: 'echbest' }; scan(key + ' · бестиарий после побед', draw());
 
@@ -212,19 +238,42 @@ function suite() {
         if (!h.includes(fb.name)) fail(k2 + ': итог победы не назвал босса');
       }
 
-      /* Многоликий из запасов — пятнадцатая ступень */
-      clearEcho(); BAG.add('many', 1);
+      /* Многоликий из запасов — биом Многоликого своей недели в слот биомов (ADR-0025): души не тратятся, попытка одна,
+         очки Эхо — за каждый взятый этаж; этажи — ступени 1–14 */
+      clearEcho(); S.ech.biomes = []; S.ech.cb = null; BAG.add('many', 1);
       const qm = BAG.qty('many'), sm = S.wallet.souls, it = BAG.item('many');
       ACTIVATE.echo('many'); h = draw(); scan(key + ' · Многоликий · подтверждение', h);
       ACT.echactdo(S.overlay.op);
-      if (it.cyc > c) { if (BAG.qty('many') !== qm || S.wallet.souls !== sm) fail(key + ': недоступный Многоликий списан'); }
+      const mb = S.ech.biomes.find(b => b.many);
+      if (it.cyc > c) { if (BAG.qty('many') !== qm || S.wallet.souls !== sm || mb) fail(key + ': недоступный Многоликий списан'); }
+      else if (!mb || mb.race !== w.race || BAG.qty('many') !== qm - 1 || S.wallet.souls !== sm || S.echo.slots.some(Boolean)) fail(key + ': биом Многоликого не встал в слот биомов или списал души');
       else {
-        const i = S.echo.slots.findIndex(Boolean), x = S.echo.slots[i];
-        if (!x || x.kind !== 'many' || x.step !== TOP + 1 || BAG.qty('many') !== qm - 1) fail(key + ': Многоликий не встал пятнадцатой ступенью');
+        h = draw(); scan(key + ' · биом Многоликого открыт', h);
+        ACT.echgo('descent:' + mb.uid); h = draw(); scan(key + ' · биом Многоликого в «Спуске»', h);
+        if (!h.includes('Биом Многоликого') || !h.includes(`data-a="echmany" data-v="${mb.uid}"`)) fail(key + ': биома Многоликого нет в «Спуске»');
+        const sc2 = S.echo.score, known0 = Object.keys(S.ech.known).length;
+        ACT.echmany(mb.uid);
+        const R = S.runs.find(r => r.kind === 'many');
+        if (!R || S.ech.biomes.includes(mb) || S.route !== 'battle') fail(key + ': забег по биому Многоликого не начался');
         else {
-          scan(key + ' · Многоликий в слоте', draw()); S.overlay = null; const sc2 = S.echo.score;
-          if (kill(key + ' · Многоликий', i)) { out.many++; if (!S.ech.known.many || S.echo.score - sc2 !== pts(TOP + 1, c)) fail(key + ': победа над Многоликим без записи или не те очки'); scan(key + ' · Многоликий пал', draw()); }
+          scan(key + ' · биом Многоликого · бой', draw());
+          if (E.bio().used !== 1) fail(`${key}: забег по биому Многоликого держит ${E.bio().used} слотов биомов`);
+          S.route = 'descent';
+          for (let n = 0; !R.over && n < 40000; n++) advance(R, 500);
+          if (!R.over || !R.end) fail(key + ': забег по биому Многоликого не кончился');
+          else {
+            const want = R.taken.reduce((a, x) => a + x.pts, 0);
+            if (S.echo.score - sc2 !== want || R.pts !== want) fail(`${key}: биом Многоликого дал ${S.echo.score - sc2} очков, а за этажи — ${want}`);
+            if (R.taken.some((x, j) => x.step !== j + 1 || x.pts !== E.floorPts(x.step, c))) fail(key + ': очки этажей биома Многоликого не из правил');
+            if (R.end.kind === 'clear' ? R.taken.length !== TOP : R.taken.length !== R.end.floor - 1) fail(`${key}: этажей взято ${R.taken.length}, итог «${R.end.kind}» на ${R.end.floor}`);
+            if (Object.keys(S.ech.known).length < known0 + R.newKnown.length) fail(key + ': взятые этажи не открыли записи бестиария');
+            if (E.bio().used !== 0) fail(key + ': после забега биом Многоликого держит слот');
+            ACT.focus(R.id);
+            if (!S.overlay || S.overlay.t !== 'echmanyres') fail(key + ': нет итога биома Многоликого'); else scan(key + ' · итог биома Многоликого', draw());
+            out.many++;
+          }
         }
+        S.runs = []; S.overlay = null;
       }
 
       /* руины из запасов: «Спуск», общие слоты биомов */

@@ -23,6 +23,11 @@
    фарм — метки на врагах и бонусы добычи в floorLoot. Автопроверка библиотеки — tools/content-gen/abilities/check_core.js.
    Иммунитет к контролю — по рангу карты (RULES.resist, ADR-0010). Рунный страж — пять карт: страж и четыре элиты.
    Добыча этажа считается здесь же (floorLoot): её решает сервер, шанс ресурса — отдельный поток генератора.
+   Бой в Эхо (ADR-0025) — тот же бой на одном этаже: главный враг и четыре защитника, раунды по типу врага (RULES.echo),
+   здоровье главного врага приходит на вход и уходит в итог (echoBattle, echoStats). Расовая неприязнь героя Эхо (ADR-0024) —
+   поправка в формуле урона, как иммунитет по рангу. Приёмы Убер-боссов включаются данными: две ульты в наборе,
+   обычная атака по всем (basic), реакция со способностью вне очереди (cast), контроль мимо иммунитета (ctrlBypass);
+   уникальные способности Убер-боссов — addLib из echo-foes.js.
 
    Инварианты ядра соблюдены и в прототипе:
    - только целые числа: время в мс, доли — в процентах или базисных пунктах (10 000 = 100 %);
@@ -74,6 +79,13 @@ const RULES = {
     rune: { gold: 250, spirit: 500 },                           // рунный страж за победу; руны пределов — отдельно (§11); его свита — элиты
     basePerFloorBp: 1000,               // шанс базового ресурса за взятый этаж; артефакты прибавляют свои б. п.
   },
+  echo: {                               // бой в Эхо (ADR-0025, §17.3); числа — демонстрация, данные режима могут дать свой предел раундов
+    rounds: { o: 5, e: 8, b: 12, u: 25, m: 12, craft: 12 },   // раундов по типу главного врага: рядовой, элита, босс недели, Убер-босс, Многоликий, крафтовый босс
+    guards: { o: 4, e: 4, b: 4, u: 4, m: 0, craft: 4 },      // защитников у главного врага: врагов пятеро; Многоликий — лёгкий бой один на один
+    endOnMain: true,                    // бой кончается, когда пал главный враг: цель взята, защитников добивать незачем
+  },
+  aversionBp: 2000,                     // расовая неприязнь героя Эхо: +20 % урона по врагам расы своей недели (ADR-0024); у героя может быть своя
+  basicAllPct: 100,                     // обычная атака по всем (basicAll: true) — доля главного стата по каждой цели, %
 };
 
 /* ================== библиотека способностей ==================
@@ -223,11 +235,18 @@ function makeRng(seed) {  // mulberry32: целые 32 бита; roll(n) — ц�
    Способности — выгрузка tools/content-gen/abilities/library.py (window.EN_ABILITIES), наборы героев и врагов —
    выгрузка assign.py (window.EN_KITS). Без них — например, в прогоне экономики через Node — карта берёт LIB. */
 let LIB2 = null;
+const libEntry = x => Object.assign({ id: x.id, n: x.n, d: x.d, school: x.set, t: x.t, kind: x.k, tier: x.tier, trig: x.trig }, x.data);
 function lib2() {
   if (LIB2) return LIB2;
   const A = root.EN_ABILITIES; if (!A) return {};
   LIB2 = {};
-  for (const s of A.sets) for (const x of s.items) LIB2[x.id] = Object.assign({ id: x.id, n: x.n, d: x.d, school: x.set, t: x.t, kind: x.k, tier: x.tier, trig: x.trig }, x.data);
+  for (const s of A.sets) for (const x of s.items) LIB2[x.id] = libEntry(x);
+  return LIB2;
+}
+/* Способности вне общей библиотеки — уникальные наборы Убер-боссов (echo-foes.js, ADR-0025): запись того же вида, что в abilities.js */
+function addLib(items) {
+  if (!LIB2) { lib2(); if (!LIB2) LIB2 = {}; }
+  for (const x of items || []) LIB2[x.id] = libEntry(x);
   return LIB2;
 }
 const KITS = () => root.EN_KITS || { heroes: {}, foes: {} };
@@ -235,7 +254,9 @@ const schoolEntry = (school, kind, tier) => lib2()[school + '.' + kind + '.' + t
 const schoolDebuffSt = school => { const e = schoolEntry(school, 'debuff', 'one'); return e ? e.st : null; };
 const SKIP_ST = ['stun', 'freeze', 'terror', 'knock', 'iceblock'];   // эти пропускают ход; паралич, безмолвие, ослепление и остановка — ограничивают
 const GOOD_ST = ['dmgUp', 'guard', 'evade', 'lifesteal', 'healTaken', 'defUp', 'chanceUp', 'critUp', 'greed', 'iceblock'];
-const libPas = (u, kind) => u.lpas ? u.lpas.find(p => p.pas === kind) : null;
+/* «Срезанное имя» (echo-foes.js): пока оно на карте, её пассивки и реакции молчат, спасение от смерти тоже; ходит она как обычно */
+const mute = u => u.st.some(s => s.k === 'nameless');
+const libPas = (u, kind) => u.lpas && !mute(u) ? u.lpas.find(p => p.pas === kind) : null;
 const opened = (u, x) => x.v == null || x.v <= u.valor;
 /* пассивки и реакции набора, открытые доблестью; chR — шанс реакции по редкости героя (ADR-0016) */
 function kitPassives(u) {
@@ -244,14 +265,15 @@ function kitPassives(u) {
 }
 /* Таблица шансов карты с набором: доли хода по редкости героя или рангу врага (ADR-0016).
    Активные делят долю способностей по весу — базовому шансу библиотеки — внутри полного набора: пока способность закрыта
-   доблестью, её часть идёт в обычную атаку. Ульты делят долю ульты поровну. Имя врага и его правило цели — из набора. */
+   доблестью, её часть идёт в обычную атаку. Ульты делят долю ульты поровну. Имя врага и его правило цели — из набора.
+   Своя доля ch у места набора (б. п.) — мимо деления: так данные дают Убер-боссу две ульты, каждую со своим шансом (ADR-0025). */
 function kitTable(u) {
   const K = u.kit, L = lib2(), acts = K.kit.filter(x => x.slot === 'act' && L[x.id]), ults = K.kit.filter(x => x.slot === 'ult' && L[x.id]);
-  const w = acts.reduce((a, x) => a + L[x.id].ch, 0), out = [];
+  const w = acts.filter(x => x.ch == null).reduce((a, x) => a + L[x.id].ch, 0), shared = ults.filter(x => x.ch == null).length, out = [];
   const up = (u.lpas || kitPassives(u)).filter(p => p.pas === 'ultUp').reduce((a, p) => a + p.pct, 0);   // «Неспешность»: доля своей ульты выше
   const take = (x, ch) => Object.assign({}, L[x.id], x.as ? { n: x.as, lib: L[x.id].n } : {}, x.tgt ? { tgt: x.tgt, targets: 1 } : {}, { ch });
-  for (const x of acts) if (opened(u, x)) out.push(take(x, fl(K.actPct * L[x.id].ch, w)));
-  for (const x of ults) if (opened(u, x)) out.push(take(x, fl(fl(K.ultPct, ults.length) * (100 + up), 100)));
+  for (const x of acts) if (opened(u, x)) out.push(take(x, x.ch != null ? x.ch : fl(K.actPct * L[x.id].ch, w)));
+  for (const x of ults) if (opened(u, x)) out.push(take(x, x.ch != null ? x.ch : fl(fl(K.ultPct, shared) * (100 + up), 100)));
   return out;
 }
 
@@ -260,16 +282,16 @@ function kitTable(u) {
    Бросок делается, только когда событие случилось и реакции есть что сделать, — это часть порядка обращений к генератору (§5.9).
    Спасение от смерти — раз за биом, «Упорство» — раз за этаж. Эффекты «до конца этажа» — отдельно от эффектов на раунды (u.aura),
    чтобы жар на 4 раунда не продлился до конца этажа. b.cov считает срабатывания каждой пассивки и реакции — для автопроверки библиотеки. */
-const pasOf = (u, kind) => u.lpas ? u.lpas.filter(p => p.pas === kind) : [];
-const reacts = (u, trig) => u.lpas && u.alive ? u.lpas.filter(p => p.kind === 'reaction' && p.trig === trig) : [];
+const pasOf = (u, kind) => u.lpas && !mute(u) ? u.lpas.filter(p => p.pas === kind) : [];
+const reacts = (u, trig) => u.lpas && u.alive && !mute(u) ? u.lpas.filter(p => p.kind === 'reaction' && p.trig === trig) : [];
 const trigPct = k => { const A = root.EN_ABILITIES; return A && A.rules.trigPct ? A.rules.trigPct[k] : null; };   // пороги здоровья триггеров — в данных библиотеки
 const cov = (b, p) => { b.cov[p.id] = (b.cov[p.id] || 0) + 1; };
 const foeDot = (b, u, school) => alive(b.u[1 - u.side]).some(v => periodicOf(v, 'dot', school));
 const below = (u, pctOfMax) => u.hp * 100 < u.maxHp * pctOfMax;
 function rolled(b, p) { const ch = p.chR != null ? p.chR : p.ch; return !ch || b.rng(10000) < ch; }
 function react(b, u, p, t) { cov(b, p); emit(b, { k: 'react', s: u, n: p.n, id: p.id, t: t || null }); }
-function once(u, p) {   // «раз за биом» и «раз за этаж»: false — уже было
-  const box = p.once === 'biome' ? u.usedBiome : p.once === 'floor' ? u.usedFloor : null;
+function once(u, p) {   // «раз за биом», «раз за жизнь» цели Эхо — помнится между боями, как здоровье; «раз за этаж»: false — уже было
+  const box = p.once === 'biome' || p.once === 'life' ? u.usedBiome : p.once === 'floor' ? u.usedFloor : null;
   if (!box) return true;
   if (box.includes(p.id)) return false;
   box.push(p.id); return true;
@@ -278,7 +300,8 @@ function once(u, p) {   // «раз за биом» и «раз за этаж»:
 function dmgPct(b, src, t) {
   let add = 0;
   for (const p of pasOf(src, 'dmgWhileDot')) if (foeDot(b, src, p.school)) { add += p.pct; cov(b, p); }                        // «Жар в крови»
-  for (const p of pasOf(src, 'dmgVsDebuff')) { const sd = schoolDebuffSt(p.school); if (sd && has(t, sd)) { add += p.pct; cov(b, p); } }   // по цели под дебаффом своей школы
+  for (const p of pasOf(src, 'dmgVsDebuff')) { const sd = p.st || schoolDebuffSt(p.school); if (sd && has(t, sd)) { add += p.pct; cov(b, p); } }   // по цели под дебаффом своей школы или под своим эффектом st (dmgVsSt)
+  for (const p of pasOf(src, 'guardPerAlly')) { const n = b.u[src.side].filter(v => v !== src && !v.alive).length; if (n) { add += p.dmgPct * n; cov(b, p); } }   // сила от союзников: за каждого павшего
   for (const p of pasOf(src, 'dmgVsDot')) if (periodicOf(t, 'dot', p.school)) { add += p.pct; cov(b, p); }                     // «Мясник»
   for (const p of pasOf(src, 'dmgVsLow')) if (below(t, p.belowPct)) { add += p.pct; cov(b, p); }                               // «Хищник»
   const lo = trigPct('low'); if (lo != null) for (const p of reacts(src, 'low')) if (below(src, lo)) { add += p.pct; cov(b, p); }   // «Злость раненого»
@@ -338,12 +361,16 @@ function onCrit(b, src, t) {
     react(b, v, p, t); addShield(b, v, t, fl(t.maxHp * p.shieldPct, 100));
   }
 }
-/* Смертельный удар: «Тень смерти», «Ледяной панцирь», «Отмена» — раз за биом. Возвращает спасшую реакцию и здоровье после неё. */
+/* Смертельный удар: «Тень смерти», «Ледяной панцирь», «Отмена» — раз за биом. Возвращает спасшую реакцию и здоровье после неё.
+   lifeSave (echo-foes.js): survivePct — доля здоровья после спасения, раз за жизнь цели Эхо; под уроном по времени школы unlessDot — не спасает.
+   Реакция без здоровья спасения не срабатывает */
 function lethalSave(b, src, t) {
   for (const p of reacts(t, 'lethal')) {
+    const hp = p.rewindRound ? Math.max(1, t.hpRound.length ? t.hpRound[t.hpRound.length - 1] : 1) : p.survive != null ? p.survive : p.survivePct ? Math.max(1, fl(t.maxHp * p.survivePct, 100)) : null;
+    if (hp == null || p.unlessDot && periodicOf(t, 'dot', p.unlessDot)) continue;
     if (!once(t, p)) continue;
     react(b, t, p, src);
-    return { p, hp: p.rewindRound ? Math.max(1, t.hpRound.length ? t.hpRound[t.hpRound.length - 1] : 1) : p.survive };
+    return { p, hp };
   }
   return null;
 }
@@ -376,7 +403,8 @@ function onLow(b, t, hp0) {
   const half = trigPct('half'), low = trigPct('allyLow');
   if (half != null && !below({ hp: hp0, maxHp: t.maxHp }, half) && below(t, half)) for (const p of reacts(t, 'half')) {
     if (!once(t, p)) continue;
-    react(b, t, p, t); addStatus(b, t, t, { st: p.st, left: p.left, pow: p.pow }, false);
+    react(b, t, p, t);
+    if (p.cast) castNow(b, t, p.cast); else addStatus(b, t, t, { st: p.st, left: p.left, pow: p.pow }, false);
   }
   if (low != null && !below({ hp: hp0, maxHp: t.maxHp }, low) && below(t, low)) for (const v of alive(b.u[t.side])) if (v !== t) for (const p of reacts(v, 'allyLow')) {
     if (v.reactRound[p.id] === b.round) continue;
@@ -384,14 +412,28 @@ function onLow(b, t, hp0) {
     react(b, v, p, t); addPeriodicLib(b, v, t, schoolEntry(p.school, 'hot', 'one'), v.main, 1);
   }
 }
+/* Реакция с cast (echo-foes.js): способность своего набора — сразу, вне очереди, без броска таблицы шансов. Запреты — как в ходе:
+   пропуск хода и безмолвие гасят её, под «Остановкой» ульта не срабатывает; реакция всё равно считается сработавшей.
+   Ульта по реакции вызывает ответы противников на ульту — через castLib */
+function castNow(b, u, id, opt) {
+  if (!u.alive || SKIP_ST.some(k => has(u, k)) || has(u, 'silence')) return;
+  const ab = typeof id === 'object' ? id : (u.table || []).find(x => x.id === id) || (lib2()[id] ? Object.assign({}, lib2()[id]) : null);
+  if (!ab || ab.ult && has(u, 'stop')) return;
+  castLib(b, u, ab, !!ab.ult, opt);
+}
 /* Враг применил ульту: «Уклон от бури» — до её действия, «Слепящий ответ» и «Задержка» — после */
 function dodgeUlt(b, u, t) {
   if (t.side === u.side) return false;
   for (const p of reacts(t, 'foeUlt')) if (p.dodge && rolled(b, p)) { react(b, t, p, u); return true; }
   return false;
 }
-function ultAnswers(b, u) {
+function ultAnswers(b, u, ab, opt) {
   for (const v of alive(b.u[1 - u.side])) for (const p of reacts(v, 'foeUlt')) {
+    if (p.mirror) {   // повтор чужой ульты (echo-foes.js): та же ульта своими характеристиками, цели — по её правилу со своей стороны; повторённая не повторяется
+      if (!ab || opt && opt.mirrored || !v.alive || !rolled(b, p)) continue;
+      react(b, v, p, u); castNow(b, v, ab, { mirrored: true });
+      continue;
+    }
     if (p.dodge || !p.then || !u.alive) continue;
     if (!rolled(b, p)) continue;
     react(b, v, p, u); addStatus(b, v, u, { st: p.then.st, left: p.then.left }, CTL_ST.includes(p.then.st));
@@ -471,15 +513,28 @@ const pct = u => fl(u.hp * 10000, u.maxHp);
 
 /* Защита — физическая (от силы) или магическая (от интеллекта): удар выносливостью или ловкостью физический (§5.2) */
 const DEF_OF = { str: 'str', sta: 'str', agi: 'str', int: 'int' };
+/* Обычная атака по всем — свойство врага в данных (ADR-0025): у карты или в её наборе — basic: { tgt: 'all', coef } (echo-foes.js)
+   или basicAll: true — доля RULES.basicAllPct, число — своя доля главного стата по каждой цели, % */
+function basicAllOf(src) {
+  const bs = src.basic || src.kit && src.kit.basic;
+  if (bs && bs.tgt === 'all') return bs.coef != null ? bs.coef : RULES.basicAllPct;
+  const v = src.basicAll != null ? src.basicAll : src.kit && src.kit.basicAll != null ? src.kit.basicAll : 0;
+  return v === true ? RULES.basicAllPct : v || 0;
+}
+/* Расовая неприязнь героя Эхо (ADR-0024): раса врага и прибавка, б. п.; без своей — RULES.aversionBp */
+const aversOf = src => src.avers && src.avers.race ? { race: src.avers.race, bp: src.avers.bp != null ? src.avers.bp : RULES.aversionBp } : null;
+const aversBp = (src, t) => src.avers && t.race && src.avers.race === t.race ? src.avers.bp : 0;
 function mkUnit(src, side, i) {
   const s = RULES.stat, L = s.lvlDiv + src.lvl;
   const [str, int, agi, sta, spd] = src.st;
   const A = v => fl(s.atk * (100 + v) * L, 100 * s.lvlDiv);
-  const maxHp = fl(s.hp * (100 + sta) * L * (src.hpPct || 100), 100 * s.lvlDiv * 100);
+  // здоровье — от выносливости и уровня; режим с собственной шкалой здоровья (Эхо) даёт его данными как есть
+  const maxHp = src.maxHp != null ? Math.max(1, src.maxHp) : fl(s.hp * (100 + sta) * L * (src.hpPct || 100), 100 * s.lvlDiv * 100);
   const as = clamp(RULES.caps.asMin + spd, RULES.caps.asMin, RULES.caps.asMax);
   const C = RULES.cls[src.cls] || { main: 'str', fx: 'melee' };
   const u = {
     key: src.key, id: src.id, name: src.name, side, i, cls: src.cls, el: src.el, lvl: src.lvl, lead: !!src.lead, rank: src.rank || null,
+    race: src.race || null, avers: aversOf(src), basicAll: basicAllOf(src),   // раса — для неприязни героев Эхо (ADR-0024)
     main: src.main || C.main, fx: src.fx || C.fx,
     maxHp, hp: src.dead ? 0 : src.hp != null ? clamp(src.hp, 1, maxHp) : maxHp, sh: 0,
     atk: { str: A(str), int: A(int), agi: A(agi), sta: A(sta) },   // обычная атака — от главного стата, способность — от своей характеристики
@@ -494,17 +549,18 @@ function mkUnit(src, side, i) {
     ptr: 0, cnt: 0, uses: 0, spent: 0, phase: 'rot', charge: 0, chargeMax: 0, nAbil: 0,
     st: [], th: [], cur: -1, alive: !src.dead, next: 0, lowUsed: false,
     kit: src.kit || null, valor: src.valor != null ? src.valor : 99, nBasic: 0, lpas: [],
-    dealt: 0, healed: 0, taken: 0,
+    dealt: 0, dealtLead: 0, healed: 0, taken: 0,         // dealtLead — урон по лидеру колоды: в Эхо это главный враг
     usedBiome: (src.used || []).slice(), usedFloor: [],   // реакции «раз за биом» переходят с этажа на этаж, «раз за этаж» — нет
     aura: { dmgUp: 0, evade: 0, lifesteal: 0 },           // эффекты реакций до конца этажа, б. п.
-    hpRound: [], nTurn: 0, haste: false, nextDmg: 0, nextHeal: 0, hit1: false, reactRound: {},
+    hpRound: [], nTurn: 0, nAct: 0, haste: false, nextDmg: 0, nextHeal: 0, hit1: false, reactRound: {},
     shThorns: null, shWhile: null,                        // щит с шипами и щит с уклонением — пока щит цел
     lootPct: 0, lootGold: 0, lootSpirit: 0, lootBase: 0,  // добыча с павшего от фарма, %; lootBase — к шансу базового ресурса, б. п.
   };
   for (const p of u.pas) if (p.kind === 'crit') u.crit = Math.min(RULES.caps.critBp, u.crit + p.bp);
   if (u.kit) u.lpas = kitPassives(u);
-  for (const p of pasOf(u, 'evade')) u.eva += p.pct * 100;       // «Лёгкая поступь»: уклонение, с эффектами — не выше RULES.buffCaps
-  for (const p of pasOf(u, 'critDmg')) u.critDmg += p.pct;       // «Выучка»: сильнее крит
+  u.evaPas = 0; u.critPas = 0;                                   // доля пассивок — её гасит «срезанное имя»
+  for (const p of pasOf(u, 'evade')) { u.eva += p.pct * 100; u.evaPas += p.pct * 100; }   // «Лёгкая поступь»: уклонение, с эффектами — не выше RULES.buffCaps
+  for (const p of pasOf(u, 'critDmg')) { u.critDmg += p.pct; u.critPas += p.pct; }       // «Выучка»: сильнее крит
   return u;
 }
 
@@ -512,11 +568,12 @@ function heroSrc(h) {
   return { key: h.id, id: h.id, name: h.name, cls: h.cls, fx: h.fx, el: h.el, lvl: h.lvl, st: h.st,
     abs: h.ab.map(a => a.n), ult: h.ult && h.valor >= h.ult.at ? h.ult.n : null,
     pas: h.pas.filter(p => p.t === 'боевая').map(p => p.n),
-    kit: h.draft && KITS().heroes[h.draft] || null, valor: h.valor || 0 };   // набор из распределения (ADR-0016): черновик героя h.draft
+    kit: h.draft && KITS().heroes[h.draft] || null, valor: h.valor || 0,   // набор из распределения (ADR-0016): черновик героя h.draft
+    avers: h.avers || null };                                               // неприязнь героя Эхо: { race, bp } (ADR-0024)
 }
 function foeSrc(id, lvl, k, lead, hp, hpPct) {
   const f = FOES[id];
-  return { key: id + '#' + k, id, name: f.name, cls: f.cls, el: f.el, lvl, st: f.st,
+  return { key: id + '#' + k, id, name: f.name, cls: f.cls, el: f.el, lvl, st: f.st, race: f.race,
     hpPct: hpPct || f.hpPct, main: f.main, fx: f.fx, abs: f.abs, ult: f.ult, pas: f.pas, rank: f.rank, lead, hp, kit: KITS().foes[id] || null };
 }
 const foeLvlOf = (B, floor) => { const L = B.foeLvl || RULES.foeLvl; return L.base + floor * L.perFloor; };
@@ -532,7 +589,7 @@ const foeHpOf = (B, id) => B.foeHpPct ? fl(FOES[id].hpPct * B.foeHpPct, 100) : n
 function create(o) {
   const mode = o.mode === 'tempo' ? 'tempo' : 'rounds';   // основная модель — «10 раундов» (ADR-0010)
   const b = { mode, t: 0, limit: mode === 'rounds' ? Infinity : o.limitMs, rng: makeRng(o.seed), seed: o.seed, u: [[], []], over: false, win: false, why: '', ev: [],
-    round: 0, maxRounds: o.maxRounds || RULES.rounds.max, queue: [], farm: [], cov: {} };
+    round: 0, maxRounds: o.maxRounds || RULES.rounds.max, queue: [], farm: [], cov: {}, deaths: 0 };
   // порядок героев в отряде на бой не влияет: иначе перестановка отряда перебрасывала бы случайность
   const heroCard = mode === 'rounds' ? s => s : s => Object.assign({}, s, { kit: null });   // прежняя модель темпа — на прежней библиотеке, без наборов
   o.heroes.slice().sort((x, y) => x.key < y.key ? -1 : x.key > y.key ? 1 : 0).forEach((s, i) => b.u[0].push(mkUnit(heroCard(s), 0, i)));
@@ -558,7 +615,7 @@ function chanceTable(u) {
   });
 }
 const emit = (b, e) => { e.at = b.t; b.ev.push(e); };
-const CTL_ST = ['stun', 'silence', 'stop', 'paralyze', 'freeze', 'terror', 'knock', 'blind'];   // контроль: на него действует иммунитет по рангу; дебафы — не контроль (ADR-0010)
+const CTL_ST = ['stun', 'silence', 'stop', 'paralyze', 'freeze', 'terror', 'knock', 'blind', 'nameless'];   // контроль: на него действует иммунитет по рангу; дебафы — не контроль (ADR-0010)
 const has = (u, k) => u.st.find(s => s.k === k);
 const rmSt = (u, s) => { u.st.splice(u.st.indexOf(s), 1); };
 const alive = arr => arr.filter(v => v.alive);
@@ -632,8 +689,10 @@ function stepRound(b) {
   const dur = RULES.rounds.act[a.kind];
   b.t = at + dur;
   const a0 = b.u[0].some(v => v.alive), a1 = b.u[1].some(v => v.alive);
-  if (!a1) finish(b, true, 'win'); else if (!a0) finish(b, false, 'wipe');
-  return { at, dur, s: u, kind: a.kind, ab: a.ab || null, fx: a.fx || null, school: a.school || null, round: b.round, roll: a.roll, ch: a.ch || 0, st: a.st || null, ev: b.ev.splice(0) };
+  if (!a1) finish(b, true, 'win');
+  else if (b.echo && b.echo.endOnMain && !b.echo.main.alive) finish(b, true, 'kill');   // Эхо: главный враг пал — цель взята (ADR-0025)
+  else if (!a0) finish(b, false, 'wipe');
+  return { at, dur, s: u, kind: a.kind, ab: a.ab || null, fx: a.fx || null, school: a.school || null, round: b.round, roll: a.roll, ch: a.ch || 0, st: a.st || null, all: !!a.all, ev: b.ev.splice(0) };
 }
 function actRound(b, u) {
   tickPeriodic(b, u); if (!u.alive) return { kind: 'skip' };
@@ -641,7 +700,7 @@ function actRound(b, u) {
     u.st = u.st.filter(s => !CTL_ST.includes(s.k)); react(b, u, p, u); emit(b, { k: 'unstatus', t: u, st: 'ctl' }); break;
   }
   const sk = SKIP_ST.map(k => has(u, k)).find(Boolean);   // оглушение, заморозка, ужас, сброс, ледяной панцирь — пропуск хода
-  if (sk) { sk.left--; if (sk.left <= 0) rmSt(u, sk); emit(b, { k: 'skip', s: u, st: sk.k }); endTurn(u); return { kind: 'skip', st: sk.k }; }
+  if (sk) { sk.left--; if (sk.left <= 0) rmSt(u, sk); emit(b, { k: 'skip', s: u, st: sk.k }); endTurn(b, u); return { kind: 'skip', st: sk.k }; }
   const roll = b.rng(10000);   // один бросок на ход, даже под безмолвием: порядок обращений к генератору не зависит от эффектов
   let ab = null;
   if (!has(u, 'silence')) {
@@ -651,18 +710,34 @@ function actRound(b, u) {
   }
   if (ab && ab.ult && has(u, 'stop')) ab = null;   // остановка: ульта не срабатывает
   if (ab && ab.oncePerFloor && u.usedFloor.includes(ab.id)) ab = null;   // фарм «раз за этаж» уже был — обычная атака
+  if (ab && ab.kind === 'revive' && !reviveTargets(b, u, ab).length) ab = null;   // поднимать некого — ход уходит в обычную атаку
   let out;
   if (ab) { (u.kit ? castLib : cast)(b, u, ab, !!ab.ult); out = { kind: ab.ult ? 'ult' : ab.tgt === 'all' || ab.tgt === 'allies' ? 'mass' : 'cast', ab, fx: abFx(u, ab), school: ab.school, roll, ch: ab.ch }; }
-  else if (has(u, 'paralyze')) { emit(b, { k: 'skip', s: u, st: 'paralyze' }); endTurn(u); return { kind: 'skip', st: 'paralyze', roll }; }   // паралич: без обычной атаки
-  else { attack(b, u); out = { kind: 'attack', fx: fxOf(u, u.main), roll }; }
+  else if (has(u, 'paralyze')) { emit(b, { k: 'skip', s: u, st: 'paralyze' }); endTurn(b, u); return { kind: 'skip', st: 'paralyze', roll }; }   // паралич: без обычной атаки
+  else { attack(b, u); out = { kind: 'attack', fx: fxOf(u, u.main), roll, all: u.basicAll > 0 }; }
+  everyN(b, u);
   patience(b, u);
-  endTurn(u);
+  endTurn(b, u);
   return out;
 }
-/* Длительности считают ходы носителя: в модели раундов это и есть раунды. Пропуск хода тает, когда карта пропускает ход. */
-function endTurn(u) {
-  for (const s of u.st.slice()) if (s.k !== 'dot' && s.k !== 'hot' && !SKIP_ST.includes(s.k)) { s.left--; if (s.left <= 0) rmSt(u, s); }
+/* Каждый N-й ход (echo-foes.js): каждый every-й ход, в котором карта действовала, — после действия способность cast вне очереди.
+   Пропущенный ход не считается; запреты — как у cast, счёт ходов идёт и под ними */
+function everyN(b, u) {
+  u.nAct++;
+  for (const p of pasOf(u, 'everyN')) if (u.alive && u.nAct % p.every === 0) { cov(b, p); castNow(b, u, p.cast); }
+}
+/* Длительности считают ходы носителя: в модели раундов это и есть раунды. Пропуск хода тает, когда карта пропускает ход.
+   Отложенный удар (doom) спадает так же — и бьёт носителя ударом наложившего */
+function endTurn(b, u) {
+  for (const s of u.st.slice()) if (s.k !== 'dot' && s.k !== 'hot' && !SKIP_ST.includes(s.k)) { s.left--; if (s.left <= 0 && u.st.includes(s)) { rmSt(u, s); if (s.k === 'doom') doomHit(b, u, s); } }
   decay(u);
+}
+/* Отложенный удар (echo-foes.js): метка спала — носитель получает удар наложившего, coef % его главного стата по формуле удара,
+   с бросками уклонения и крита. Наложивший пал — метка спадает без удара */
+function doomHit(b, u, s) {
+  if (!u.alive || !s.src || !s.src.alive) return;
+  emit(b, { k: 'doom', s: s.src, t: u });
+  hit(b, s.src, u, s.src.main, s.coef, { doom: true });
 }
 /* «Самый готовый» в модели раундов — кто ходит раньше всех из ещё не ходивших; если все сходили — самый быстрый. */
 function readyRound(b, v) {
@@ -698,6 +773,8 @@ function decay(u) { for (let j = 0; j < u.th.length; j++) u.th[j] = fl(u.th[j] *
 /* ---------- цели ---------- */
 function byThreat(b, u) {
   const opp = b.u[1 - u.side]; let best = -1;
+  const fc = opp.find(v => v.alive && v.st.some(s => s.focus && s.src && s.src.side === u.side));   // цель для всех (echo-foes.js): метка с focus
+  if (fc) return fc;
   for (let j = 0; j < opp.length; j++) if (opp[j].alive && (best < 0 || u.th[j] > u.th[best])) best = j;
   if (best < 0) return null;
   const cur = u.cur;
@@ -742,31 +819,35 @@ function pickN(b, u, rule, n) {
 }
 
 /* ---------- действия ---------- */
+/* Обычная атака: 100 % главного стата в цель по угрозе. Враг с basicAll бьёт ею всех противников, по своей доле на каждого (ADR-0025):
+   такая атака — массовая, угрозы не создаёт. Броски — по целям в порядке карт. */
 function attack(b, u) {
   const t = pick(b, u, 'threat')[0]; if (!t) return;
-  emit(b, { k: 'swing', s: u, t, fx: fxOf(u, u.main) });
+  const all = u.basicAll ? alive(b.u[1 - u.side]) : [t];
+  for (const v of all) emit(b, { k: 'swing', s: u, t: v, fx: fxOf(u, u.main), all: !!u.basicAll });
   if (u.rank === 'rune' && b.mode === 'rounds' && b.maxRounds > b.round) {   // РБ: обычная атака отнимает у боя раунд, но не текущий
     b.maxRounds = Math.max(b.round, b.maxRounds - RULES.rounds.runeCut); emit(b, { k: 'cut', s: u, n: b.maxRounds });
   }
-  const d = hit(b, u, t, mainStat(u), 100, { basic: true });
+  let d = 0;
+  for (const v of all) if (v.alive) { const x = hit(b, u, v, mainStat(u), u.basicAll || 100, { basic: true, mass: !!u.basicAll }); if (v === t) d = x; }
   u.nBasic++;
   const nb = libPas(u, 'nthBasicDot');   // «Тлеющий след»: каждая N-я обычная атака — стак урона по времени своей школы
   if (nb && d > 0 && u.nBasic % nb.every === 0 && t.alive) { cov(b, nb); addPeriodicLib(b, u, t, schoolEntry(nb.school, 'dot', 'one'), u.main, 1); }
 }
 const periodicOf = (t, kind, school) => t.st.find(s => s.k === kind && s.school === school);
 /* Способность из общей библиотеки (ADR-0015): ступень целей, характеристика — главный стат наложившего, связки школы. */
-function castLib(b, u, ab, isUlt) {
+function castLib(b, u, ab, isUlt, opt) {
   const self = ab.kind === 'farm' && !ab.coef && !ab.targets;   // фарм на весь этаж и «Жадный взгляд» — на себя
-  let tg = self ? [u] : pickN(b, u, ab.tgt || 'threat', ab.targets);
+  let tg = self ? [u] : ab.kind === 'revive' ? reviveTargets(b, u, ab) : pickN(b, u, ab.tgt || 'threat', ab.targets);
   const mass = ab.tgt === 'all' || ab.tgt === 'allies';
   emit(b, { k: 'cast', s: u, n: ab.n, ult: isUlt, mass, school: ab.school, t: tg });
   if (!mass) { const fix = isUlt ? RULES.threat.ult : RULES.threat.cast; for (const v of b.u[1 - u.side]) if (v.alive) v.th[u.i] += fl(fix * thrMul(u), 100); }
   if (isUlt) tg = tg.filter(t => !dodgeUlt(b, u, t));   // «Уклон от бури»
   const stat = !ab.stat || ab.stat === 'main' ? u.main : ab.stat;
   switch (ab.kind) {
-    case 'dmg': for (const t of tg) for (let h = 0; h < (ab.hits || 1); h++) {
+    case 'dmg': for (const t of tg) for (let h = 0; h < (ab.hits || 1); h++) {   // coef — на все удары: «пять ударов по 120 %» — это 600 % на пять
       if (!t.alive) break;
-      const d = hit(b, u, t, stat, libCoef(u, t, ab), { mass, drain: ab.drain });
+      const d = hit(b, u, t, stat, fl(libCoef(u, t, ab), ab.hits || 1), { mass, drain: ab.drain });
       if (d > 0) libAfterHit(b, u, t, ab, mass);
     } break;
     case 'heal': for (const t of tg) libHeal(b, u, t, ab, stat, mass); break;
@@ -778,13 +859,47 @@ function castLib(b, u, ab, isUlt) {
       if (ab.whileShield) t.shWhile = { pow: ab.whileShield.pow, ab };                                // пока щит цел — уклонение
       if (ab.cleanseCtl) t.st = t.st.filter(s => !CTL_ST.includes(s.k));
     } break;
-    case 'dot': case 'hot': for (const t of tg) { addPeriodicLib(b, u, t, ab, stat, ab.stacks || 1); if (ab.kind === 'hot' && !mass) buffThreat(b, u, fl(u.atk[stat] * ab.coef, 100)); } break;
+    case 'dot': case 'hot': for (const t of tg) { addPeriodicLib(b, u, t, ab, stat, ab.stacks || 1); if (ab.kind === 'hot' && typeof ab.cleanse === 'string') cleanseOf(b, t, ab.cleanse); if (ab.kind === 'hot' && !mass) buffThreat(b, u, fl(u.atk[stat] * ab.coef, 100)); } break;
     case 'ctrl': for (const t of tg) { addStatus(b, u, t, { st: ab.st, left: ab.left, breakPct: ab.breakPct }, true); if (!mass) debuffThreat(u, t); } break;
-    case 'debuff': for (const t of tg) { addStatus(b, u, t, { st: ab.st, left: ab.left, pow: ab.pow, evadeDown: ab.evadeDown }, false); if (!mass) debuffThreat(u, t); } break;
+    case 'debuff': for (const t of tg) { addStatus(b, u, t, { st: ab.st, left: ab.left, pow: ab.pow, evadeDown: ab.evadeDown, coef: ab.coef, focus: ab.focus }, false); if (!mass) debuffThreat(u, t); } break;
     case 'buff': for (const t of tg) { addStatus(b, u, t, { st: ab.st, left: ab.left, pow: ab.pow }, false); if (!mass) buffThreat(b, u, ab.pow); } break;
     case 'farm': farmCast(b, u, ab, tg); break;
+    case 'revive': for (const t of tg) revive(b, u, t, ab); break;
   }
-  if (isUlt) ultAnswers(b, u);   // «Слепящий ответ», «Задержка»
+  if (ab.steal) for (const t of tg) if (t.alive && t.side !== u.side) steal(b, u, t, ab.steal);   // забрать эффекты — после действия
+  if (isUlt) ultAnswers(b, u, ab, opt);   // «Слепящий ответ», «Задержка», повтор чужой ульты
+}
+/* Поднять павшего (echo-foes.js): павшие союзники — последние павшие первыми, targets — сколько, null — все. Каждая карта встаёт
+   раз за бой; сгоревший — на ком в миг гибели был урон по времени школы unlessDot — не встаёт */
+function reviveTargets(b, u, ab) {
+  const dead = b.u[u.side].filter(v => !v.alive && v.deathNo && !v.revived && !(ab.unlessDot && (v.deathDots || []).includes(ab.unlessDot)));
+  dead.sort((x, y) => y.deathNo - x.deathNo);
+  return ab.targets ? dead.slice(0, ab.targets) : dead;
+}
+function revive(b, u, t, ab) {   // встаёт с pct % здоровья, без эффектов; ходит со следующего раунда — в очереди этого раунда его нет
+  if (t.alive || t.revived) return;
+  t.alive = true; t.revived = true; t.hp = Math.max(1, fl(t.maxHp * ab.pct, 100)); t.sh = 0; t.st = []; t.shThorns = null; t.shWhile = null;
+  emit(b, { k: 'revive', s: u, t, hp: t.hp });
+}
+/* Забрать эффекты (echo-foes.js): до n положительных эффектов — сначала баффы GOOD_ST с их силой и остатком длительности, затем щит
+   целиком, не выше предела щита забравшего. 'all' — все. Бросков нет */
+function steal(b, u, t, n) {
+  let k = n === 'all' ? Infinity : n;
+  for (const s of t.st.slice()) {
+    if (k <= 0) break;
+    if (!GOOD_ST.includes(s.k)) continue;
+    rmSt(t, s); k--;
+    const ex = has(u, s.k);
+    if (ex) { ex.left = Math.max(ex.left, s.left); ex.left0 = Math.max(ex.left0, s.left); ex.pow = Math.max(ex.pow, s.pow); } else u.st.push(Object.assign({}, s));
+    emit(b, { k: 'steal', s: u, t, st: s.k });
+  }
+  if (k > 0 && t.sh > 0) { const v = t.sh; t.sh = 0; t.shThorns = null; t.shWhile = null; emit(b, { k: 'steal', s: u, t, st: 'shield', v }); addShield(b, u, u, v); }
+}
+/* Снятие: число — столько вредных эффектов; имя эффекта — только его («тепло» Огня снимает стужу) */
+function cleanseOf(b, t, c) {
+  if (!t.alive || !c) return;
+  if (typeof c === 'string') { const s = has(t, c); if (s) { rmSt(t, s); emit(b, { k: 'unstatus', t, st: c }); } return; }
+  let n = c; t.st = t.st.filter(s => { if (n > 0 && s.k !== 'dot' && s.k !== 'hot' && !GOOD_ST.includes(s.k)) { n--; return false; } return true; });
 }
 /* Коэффициент удара со связками школы: по цели с уроном по времени или дебаффом школы, за стак, расход стаков, добивание. */
 function libCoef(u, t, ab) {
@@ -820,7 +935,7 @@ function libHeal(b, u, t, ab, stat, mass) {
   if (ab.over && over > 0) addShield(b, u, t, over);
   if (ab.atStacks && ab.atStacks.shieldPct) { const p = periodicOf(t, 'hot', ab.school); if (p && p.stacks >= ab.atStacks.n) addShield(b, u, t, fl(t.maxHp * ab.atStacks.shieldPct, 100)); }
   if (ab.cleanseBleed) t.st = t.st.filter(s => !(s.k === 'dot' && s.bleed));
-  if (ab.cleanse) { let n = ab.cleanse; t.st = t.st.filter(s => { if (n > 0 && s.k !== 'dot' && s.k !== 'hot' && !GOOD_ST.includes(s.k)) { n--; return false; } return true; }); }
+  if (ab.cleanse) cleanseOf(b, t, ab.cleanse);
   if (ab.refresh) for (const s of t.st) if (s.k === 'hot') s.left = s.left0;
   if (ab.then && ab.then.st) addStatus(b, u, t, { st: ab.then.st, left: ab.then.left, pow: ab.then.pow }, false);
 }
@@ -828,14 +943,15 @@ function libHeal(b, u, t, ab, stat, mass) {
 function addPeriodicLib(b, src, t, ab, stat, n) {
   if (!t.alive || !ab) return;
   let per = fl(src.atk[stat] * ab.coef, 100);
-  if (ab.kind === 'dot') per = fl(per * elemMul(src.el, t.el), 100);
+  if (ab.kind === 'dot') { per = fl(per * elemMul(src.el, t.el), 100); const av = aversBp(src, t); if (av) per = fl(per * (10000 + av), 10000); }   // неприязнь — и в уроне по времени
   const left = ab.left + periodicAdd(b, src, ab);
   let drain = ab.drain || 0;
   if (drain) for (const q of pasOf(src, 'dotDrain')) if (q.school === ab.school && q.pow > drain) { drain = q.pow; cov(b, q); }   // «Питьё тьмы»
   const p = periodicOf(t, ab.kind, ab.school), max = ab.max || 1;
   if (p) { p.max = Math.max(p.max, max); p.stacks = Math.min(p.max, p.stacks + n); p.left = Math.max(p.left, left); p.left0 = Math.max(p.left0, left); if (per > p.per) { p.per = per; p.coef = ab.coef; } p.src = src; p.drain = Math.max(p.drain, drain); }
   else t.st.push({ k: ab.kind, school: ab.school, per, coef: ab.coef, stacks: Math.min(max, n), max, left, left0: left, src, drain, over: !!ab.over,
-    grow: ab.grow || 0, n: 0, bleed: !!ab.bleed, pure: !!ab.pure, lowBoost: ab.lowBoost || null, vsDebuff: ab.vsDebuff || 0 });
+    grow: ab.grow || 0, n: 0, bleed: !!ab.bleed, pure: !!ab.pure, lowBoost: ab.lowBoost || null, vsDebuff: ab.vsDebuff || 0,
+    cleanse: ab.kind === 'hot' && typeof ab.cleanse === 'string' ? ab.cleanse : null });   // «тепло» Огня: снимает стужу в каждый ход носителя
   emit(b, { k: 'status', s: src, t, st: ab.kind, school: ab.school });
   const q = periodicOf(t, ab.kind, ab.school);
   if (ab.atMax && q && q.stacks >= q.max) { const e = schoolEntry(ab.school, 'debuff', 'one'); if (e) addStatus(b, src, t, { st: ab.atMax, left: e.left, pow: e.pow }, false); }   // обморожение на пределе — стужа
@@ -874,7 +990,7 @@ function debuffThreat(u, t) { if (t.alive) t.th[u.i] += fl(RULES.threat.debuff *
 function hit(b, src, t, stat, coef, o) {
   const r = b.rng(10000);   // бросок уклонения делается всегда: порядок обращений к генератору не зависит от эффектов
   const ms = has(src, 'miss'), ev = has(t, 'evade'), br = has(t, 'break'), sw = t.sh > 0 && t.shWhile;
-  const eva = clamp(t.eva + (ms ? ms.pow : 0) + (ev ? ev.pow : 0) + t.aura.evade + (sw ? sw.pow : 0) - (br ? br.evadeDown : 0), 0, RULES.buffCaps.evaBp);
+  const eva = clamp(t.eva - (mute(t) ? t.evaPas : 0) + (ms ? ms.pow : 0) + (ev ? ev.pow : 0) + t.aura.evade + (sw ? sw.pow : 0) - (br ? br.evadeDown : 0), 0, RULES.buffCaps.evaBp);
   if (has(src, 'blind')) { emit(b, { k: 'miss', s: src, t }); return 0; }   // ослепление: удары мимо
   if (r < eva) { if (sw) cov(b, sw.ab); emit(b, { k: 'miss', s: src, t }); onDodge(b, src, t, o); return 0; }
   let base = fl(src.atk[stat] * coef, 100);
@@ -886,7 +1002,7 @@ function hit(b, src, t, stat, coef, o) {
   if (src.nextDmg) { base = fl(base * (100 + src.nextDmg), 100); src.nextDmg = 0; }   // «Кураж»
   let crit = false;
   const cu = has(src, 'critUp'), sb = has(src, 'break');
-  if (b.rng(10000) < Math.min(RULES.buffCaps.critBp, src.crit + (cu ? cu.pow : 0))) { base = fl(base * (src.critDmg - (sb ? fl(sb.pow, 100) : 0)), 100); crit = true; }
+  if (b.rng(10000) < Math.min(RULES.buffCaps.critBp, src.crit + (cu ? cu.pow : 0))) { base = fl(base * (src.critDmg - (mute(src) ? src.critPas : 0) - (sb ? fl(sb.pow, 100) : 0)), 100); crit = true; }
   const dk = DEF_OF[stat] || stat;
   let def = t.def[dk]; const pr = dk === 'str' && has(t, 'pierce'); if (pr) def = fl(def * (10000 - pr.pow), 10000);
   const rd = dk === 'int' && has(t, 'rend'); if (rd) def = fl(def * (10000 - rd.pow), 10000);
@@ -897,10 +1013,11 @@ function hit(b, src, t, stat, coef, o) {
   let d = fl(base * kl, kl + def);
   const least = fl(base * (100 - RULES.caps.defPct), 100); if (d < least) d = least;
   d = fl(d * elemMul(src.el, t.el), 100);
+  const av = aversBp(src, t); if (av) d = fl(d * (10000 + av), 10000);   // расовая неприязнь героя Эхо — по расе цели (ADR-0024)
   const mk = has(t, 'mark'); if (mk) d = fl(d * (10000 + mk.pow), 10000);
   if (dk === 'str') for (const p of pasOf(t, 'physReduce')) { d = fl(d * (100 - p.pct), 100); cov(b, p); }   // «Корни»
   if (d < 1) d = 1;
-  d = damage(b, src, t, d, { crit, mass: o.mass });
+  d = damage(b, src, t, d, { crit, mass: o.mass, av: av > 0 });
   if (!d) return 0;   // во льду «Ледяного панциря» урон не проходит
   if (o.drain && src.alive) heal(b, src, src, fl(d * o.drain, 10000), true, true);
   const ls = has(src, 'lifesteal'), lsPow = (ls ? ls.pow : 0) + src.aura.lifesteal;   // кровожадность и «Пир на костях»
@@ -919,11 +1036,15 @@ function damage(b, src, t, d, o) {
     if (!t.hit1) { t.hit1 = true; for (const p of reacts(t, 'firstHit')) { d = Math.max(1, fl(d * (100 - p.pct), 100)); react(b, t, p, src); } }   // «Готовность»
   }
   if (o.dot) for (const p of pasOf(t, 'dotReduce')) { d = Math.max(1, fl(d * (100 - p.pct), 100)); cov(b, p); }   // «Закалка»
+  if (foe) for (const p of pasOf(t, 'guardPerAlly')) { const n = b.u[t.side].filter(v => v !== t && v.alive).length; if (n) { d = Math.max(1, fl(d * Math.max(0, 100 - p.guardPct * n), 100)); cov(b, p); } }   // сила от союзников: за каждого живого
+  const wards = [];   // защита до метки (echo-foes.js): пока на носителе нет эффекта unless — удар слабее, часть прошедшего — атакующему
+  if (foe && !o.dot && !o.reflected) for (const p of pasOf(t, 'ward')) if (!(p.unless && has(t, p.unless))) { if (p.reduce) d = Math.max(1, fl(d * (100 - p.reduce), 100)); if (p.reflect) wards.push(p); cov(b, p); }
   const th = foe && !o.dot && t.sh > 0 ? t.shThorns : null, hp0 = t.hp;
   let left = d;
   if (t.sh > 0) { const a = Math.min(t.sh, left); t.sh -= a; left -= a; if (t.sh <= 0) { t.shThorns = null; t.shWhile = null; } }
-  t.hp -= left; t.taken += d; if (src) src.dealt += d;
-  emit(b, { k: o.dot ? 'dot' : 'hit', s: src, t, v: d, crit: !!o.crit, school: o.school, sh: d - left });
+  t.hp -= left; t.taken += d; if (src) { src.dealt += d; if (foe && t.lead) src.dealtLead += d; }
+  emit(b, { k: o.dot ? 'dot' : 'hit', s: src, t, v: d, crit: !!o.crit, school: o.school, sh: d - left, av: !!o.av });
+  for (const p of wards) if (src.alive) { const r = fl(d * p.reflect, 100); if (r > 0) damage(b, t, src, r, { dot: true, reflected: true, school: p.school }); }   // возврат — как урон по времени, без бросков и защиты
   if (foe && !o.mass) {   // массовые способности агро не трогают; крит срывает агро (§5.3)
     const cm = o.crit ? RULES.threat.critPct : 100;
     t.th[src.i] += fl(d * RULES.threat.dealt * thrMul(src) * cm, 1000000);
@@ -935,6 +1056,7 @@ function damage(b, src, t, d, o) {
     const sv = lethalSave(b, src, t);
     if (!sv) {
       const was = t.st;
+      t.deathNo = ++b.deaths; t.deathDots = was.filter(s => s.k === 'dot').map(s => s.school);   // для «Поднять павшего»: кто пал последним, и сгоревший не встаёт
       t.hp = 0; t.alive = false; t.st = []; t.sh = 0; t.shThorns = null; t.shWhile = null; emit(b, { k: 'die', t });
       onDeath(b, src, t, was);
       return d;
@@ -983,9 +1105,14 @@ function addShield(b, src, t, v) {
   t.sh = Math.min(t.sh + v, fl(t.maxHp * RULES.shieldCapPct, 100));
   emit(b, { k: 'shield', s: src, t, v });
 }
+/* Пассивка ctrlBypass (echo-foes.js): контроль из её списка ложится на носителя без броска иммунитета по рангу */
+function ctrlBypass(b, t, st) {
+  for (const p of pasOf(t, 'ctrlBypass')) if (p.st && p.st.includes(st)) { cov(b, p); return true; }
+  return false;
+}
 function addStatus(b, src, t, s, isCtrl, reflected) {
   if (!t.alive) return;
-  const imm = isCtrl && t.rank ? RULES.resist[t.rank] || 0 : 0;   // иммунитет к контролю по рангу; дебафы — не контроль
+  const imm = isCtrl && t.rank && !ctrlBypass(b, t, s.st) ? RULES.resist[t.rank] || 0 : 0;   // иммунитет к контролю по рангу; дебафы — не контроль
   if (imm > 0 && b.rng(10000) < imm) { emit(b, { k: 'resist', s: src, t, st: s.st }); return; }
   const foe = src.side !== t.side;
   if (foe && !isCtrl && !reflected) for (const p of reacts(t, 'debuffed')) {   // «Отражение порчи», «Чистый поток»; отражённый дебафф не отражается снова
@@ -999,8 +1126,9 @@ function addStatus(b, src, t, s, isCtrl, reflected) {
   if (dl && dl.id) cov(b, dl);
   if (s.st === 'miss' || s.st === 'blind') { const bs = alive(b.u[t.side]).map(v => libPas(v, 'blindShorter')).find(Boolean); if (bs) { left = Math.max(1, left + bs.add); cov(b, bs); } }   // «Незамутнённость»
   const ex = has(t, s.st);                       // одинаковые обновляют длительность, разные стакаются (§5.4)
-  if (ex) { ex.left = Math.max(ex.left, left); ex.left0 = Math.max(ex.left, ex.left0); ex.pow = Math.max(ex.pow, s.pow || 0); }
-  else t.st.push({ k: s.st, left, left0: left, pow: s.pow || 0, breakPct: s.breakPct || 0, evadeDown: s.evadeDown || 0 });
+  const tie = Object.assign({}, s.coef ? { coef: s.coef, src } : {}, s.focus ? { focus: true, src } : {});   // отложенный удар и цель для всех помнят наложившего
+  if (ex) { ex.left = Math.max(ex.left, left); ex.left0 = Math.max(ex.left, ex.left0); ex.pow = Math.max(ex.pow, s.pow || 0); Object.assign(ex, tie); }
+  else t.st.push(Object.assign({ k: s.st, left, left0: left, pow: s.pow || 0, breakPct: s.breakPct || 0, evadeDown: s.evadeDown || 0 }, tie));
   if (s.st === 'knock') { const opp = b.u[1 - t.side]; for (let j = 0; j < t.th.length; j++) t.th[j] = fl(RULES.threat.base * thrMul(opp[j]), 100); t.cur = -1; }   // сброс: угроза цели ко всем обнуляется
   if (s.st === 'stop') {
     if (b.mode === 'rounds') { const q = b.queue.indexOf(t); if (q >= 0) { b.queue.splice(q, 1); b.queue.push(t); } }   // ходит последней в раунде
@@ -1011,7 +1139,7 @@ function addStatus(b, src, t, s, isCtrl, reflected) {
 function addPeriodic(b, src, t, ab) {
   if (!t.alive) return;
   let per = fl(src.atk[ab.stat] * ab.coef, 100);
-  if (ab.kind === 'dot') per = fl(per * elemMul(src.el, t.el), 100);
+  if (ab.kind === 'dot') { per = fl(per * elemMul(src.el, t.el), 100); const av = aversBp(src, t); if (av) per = fl(per * (10000 + av), 10000); }
   const p = t.st.find(s => s.k === ab.kind && s.school === ab.school);
   if (p) { p.stacks = Math.min(ab.max, p.stacks + 1); p.left = ab.left; p.left0 = ab.left; if (per > p.per) p.per = per; p.src = src; }
   else t.st.push({ k: ab.kind, school: ab.school, per, stacks: 1, max: ab.max, left: ab.left, left0: ab.left, src, drain: ab.drain || 0, over: !!ab.over });
@@ -1031,6 +1159,7 @@ function tickPeriodic(b, u) {
     } else {
       const over = heal(b, p.src, u, v, true, true);
       if (p.over && over > 0) addShield(b, p.src, u, over);
+      if (p.cleanse) cleanseOf(b, u, p.cleanse);
     }
     p.left--; if (p.left <= 0 && u.st.includes(p)) rmSt(u, p);
   }
@@ -1049,6 +1178,41 @@ function guardBattle(heroes, biome, mode) {
   const B = BIOMES[biome], G = B.guard, lvl = B.floors.length + 1;
   const foes = G.m.map((id, k) => foeSrc(id, foeLvlOf(B, lvl), k, k === 0, null, k === 0 ? B.guardHpPct : foeHpOf(B, id)));
   return create({ heroes, foes, seed: floorSeed(B.seed, lvl), limitMs: RULES.floor.limitMs.b, mode, maxRounds: RULES.rounds.rune });
+}
+/* Бой в Эхо (ADR-0025, §17.3) — тот же детерминированный бой «10 раундов» на сиде от сервера, этаж один, перехода нет.
+   Врагов пятеро: главный враг ступени и RULES.echo.guards[тип] защитников; Многоликий — лёгкий бой один на один.
+   Предел раундов — по типу главного врага (RULES.echo.rounds) или свой из данных режима (o.maxRounds). Здоровье главного врага
+   приходит на вход — hp и maxHp — и после боя уходит в итог: оно сохраняется между атаками. Защитники всегда полные.
+   Этаж биома Многоликого — тот же бой, только отряд приходит со своим здоровьем и павшими (carry), а главный враг — полный.
+   o: { seed, g — тип главного врага: o, e, b, u, m или craft; main — его карта; guards — карты защитников; maxRounds }.
+   Карты — как у этажа: key, id, name, cls, el, lvl, st, rank, race, kit, hpPct или maxHp, basic. Порядок героев на бой не влияет. */
+function echoBattle(heroes, o) {
+  const E = RULES.echo, foes = o && o.main ? [o.main].concat(o.guards || []) : [], need = o ? E.guards[o.g] : null;
+  if (need == null) throw new Error('Эхо: нет правил для врага типа «' + (o && o.g) + '»');
+  if (foes.length !== need + 1) throw new Error(`Эхо: врагов ${foes.length}, а нужно ${need + 1} — главный враг и защитников ${need}`);
+  const maxRounds = o.maxRounds || E.rounds[o.g];
+  if (!maxRounds) throw new Error('Эхо: нет предела раундов для врага типа «' + o.g + '»');
+  const b = create({ heroes, foes: foes.map((f, k) => Object.assign({}, f, { lead: k === 0, hp: k === 0 ? f.hp : null, dead: false })), seed: o.seed >>> 0, mode: 'rounds', maxRounds });
+  const m = b.u[1][0];
+  b.echo = { g: o.g, main: m, hp0: m.hp, endOnMain: !!E.endOnMain };
+  return b;
+}
+/* Здоровье карты врага в бою модели раундов — ровно как посчитает create (hpPct × RULES.rounds.foeHpPct): режим со своей шкалой
+   здоровья (Эхо) знает его до боя и хранит между атаками. src — { st, lvl, hpPct } */
+function foeMaxHp(src) { return mkUnit({ st: src.st, lvl: src.lvl, cls: src.cls, hpPct: fl((src.hpPct || 100) * RULES.rounds.foeHpPct, 100) }, 1, 0).maxHp; }
+/* Итог атаки Эхо — ради него и кнопка «Пропустить»: кто что сделал, сколько отнято у главного врага, кто пал, раунды и исход.
+   why: kill — главный враг пал, win — пали все пятеро, wipe — пал отряд, sand — раунды вышли. taken — сколько здоровья отнято:
+   бывает и меньше нуля, если защитники вылечили главного врага. Всё — целые числа ядра. */
+function echoStats(b) {
+  const E = b.echo, m = E.main;
+  return {
+    seed: b.seed, g: E.g, over: b.over, win: b.win, why: b.why, rounds: b.round, maxRounds: b.maxRounds,
+    killed: !m.alive,
+    main: { key: m.key, id: m.id, name: m.name, hp0: E.hp0, hp: m.hp, maxHp: m.maxHp, taken: E.hp0 - m.hp, dead: !m.alive, used: m.usedBiome.slice() },   // used — сработавшее «раз за жизнь»: помнится между атаками
+    heroes: b.u[0].map(u => ({ key: u.key, id: u.id, name: u.name, dealt: u.dealt, toMain: u.dealtLead, healed: u.healed, taken: u.taken, alive: u.alive })),
+    foes: b.u[1].map(u => ({ key: u.key, id: u.id, name: u.name, lead: u.lead, hp: u.hp, maxHp: u.maxHp, dealt: u.dealt, healed: u.healed, dead: !u.alive })),
+    kills: b.u[1].filter(u => !u.alive).length, fallen: b.u[0].filter(u => !u.alive).length,
+  };
 }
 /* Добыча этажа по рангам убитых карт. Шансы — свой поток генератора от сида этажа,
    чтобы бросок добычи не сдвигал случайность боя. bonusBp — прибавка к шансу ресурса от артефактов.
@@ -1096,5 +1260,5 @@ function simRun(heroes, biome, siegeHp, mode) {
   return { floors, runMs, bossHp };
 }
 
-root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, FLOORS_TUTOR, BIOMES, lib: lib2, kitTable, GOOD_ST, SKIP_ST, seedOf, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, carry, simRun, guardBattle, floorLoot, elemMul, ready, readyRound, order, chanceTable, pct, fxOf };
+root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, FLOORS_TUTOR, BIOMES, lib: lib2, addLib, kitTable, GOOD_ST, SKIP_ST, seedOf, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, carry, simRun, guardBattle, echoBattle, echoStats, foeMaxHp, floorLoot, elemMul, ready, readyRound, order, chanceTable, pct, fxOf };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -420,6 +420,7 @@ button.well:hover{border-color:var(--iron-3)}
 .banner .quote{max-width:46ch;font-size:15px}
 .banner .facts{margin-top:auto;display:flex;gap:18px;align-items:flex-end}
 .banner .cta{position:absolute;right:12px;bottom:12px;z-index:2;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.banner .cta .ds-guard{gap:6px;flex-wrap:nowrap}
 .ds-low{display:grid;grid-template-columns:250px minmax(0,1fr);gap:10px;min-height:0}
 .seal{display:grid;grid-template-columns:46px 1fr;gap:10px;align-items:center;padding:8px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;text-align:left;color:var(--parch);width:100%}
 .seal .ph{width:46px;height:54px;border-radius:8px;overflow:hidden;background:radial-gradient(80% 90% at 50% 100%,rgba(72,229,212,.2),transparent),#0a0c0e;display:flex;align-items:flex-end;justify-content:center}
@@ -541,6 +542,11 @@ button.well:hover{border-color:var(--iron-3)}
 .bt-queue i.done{opacity:.35}
 .bt-rflash{position:absolute;left:50%;top:34%;z-index:6;font:600 26px/1 var(--f-d);color:var(--gold);text-shadow:0 0 16px rgba(221,188,122,.35),0 2px 6px #000;pointer-events:none;animation:rflash .7s ease both}
 @keyframes rflash{0%{opacity:0;transform:translate(-50%,-30%)}25%{opacity:1;transform:translate(-50%,-50%)}100%{opacity:0;transform:translate(-50%,-70%)}}
+/* рунный страж отнял раунд (ADR-0020): часы вспыхивают, чип напоминает правило */
+.bt-clock.cut{animation:cutflash .9s ease}
+.bt-clock.cut #btClock{color:#ffb08a}
+@keyframes cutflash{0%,100%{filter:none}20%{filter:drop-shadow(0 0 7px #ff7a5c) brightness(1.35)}}
+.bt-cutchip{flex:none}
 .p-cmp{width:100%;border-collapse:collapse;margin-top:8px;font-size:12.5px}
 .p-cmp th,.p-cmp td{padding:4px 6px 4px 0;border-bottom:1px solid #1e2328;text-align:left;vertical-align:top}
 .p-cmp th{color:var(--parch-3);font-weight:400}
@@ -1550,6 +1556,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <script src="kits.js"></script>
 <script src="roster.js"></script>
 <script src="lootboxes.js"></script>
+<script src="echo-foes.js"></script>
 <script>
 'use strict';
 /* Все числа ниже — демонстрационные фикстуры: взяты из текущего UIKit
@@ -1959,7 +1966,7 @@ function descent() {
             <div class="stat"><b>${k}<span class="faint">/14</span></b><small>изучено</small></div>
           </div>
         </div>
-        <div class="cta"><button class="btn go big" data-a="sheet" data-v="prep">${ic('down')}Начать забег</button></div>
+        <div class="cta">${guardHtml()}<button class="btn go big" data-a="sheet" data-v="prep">${ic('down')}Начать забег</button></div>
       </div>
       <div class="pnl shelf">
         <div class="pnl-h"><h2>Обитатели</h2><span class="faint" style="font-size:12.5px">до первой победы враг показывает только мощь, здоровье, стихию и тип</span></div>
@@ -1983,6 +1990,12 @@ function descent() {
   }
   return { title: 'Спуск', sub: 'цикл ' + ROMAN[S.acc.cycle], html: `<section class="scr"><div class="ds">${shaft}${main}</div></section>` };
 }
+/* вход к рунному стражу на «Спуске»: страж ждёт за боссом биома (§11, ADR-0018); демо-вход прототипа — в любой момент.
+   Бой — 25 раундов, каждая обычная атака стража отнимает раунд (ADR-0020) */
+function guardHtml() {
+  const open = G('b1').killed, n = EB.BIOMES.b1.guard.m.length;
+  return `<div class="row ds-guard"><button class="btn sm${open ? '' : ' off'}" data-a="guard" ${open ? '' : 'disabled'} title="${open ? `Мастер ждёт: ${guardCards()}, ${EB.RULES.rounds.rune} раундов, каждая его обычная атака отнимает раунд` : 'Страж ждёт за боссом биома: откроется после победы над ним'}">${ic('crown')}Рунный страж</button><button class="btn sm ghost" data-a="guard" data-v="demo" title="Демо прототипа: сразу к стражу, ${n} ${plural(n, 'карта', 'карты', 'карт')}; босс и стена не меняются">демо-вход</button></div>`;
+}
 function figBtn(f, seal) {
   const k = known(f.id);
     return `<button class="fig ${k ? '' : 'unk'} ${f.g === 'b' ? 'boss' : ''}" data-a="foe" data-v="${f.id}" aria-label="${k ? f.name : 'Не изучен'}" title="${k ? f.name : 'Не изучен'}"><img src="${FA(f)}" alt="" style="object-position:${FPOS(f)}">${k ? '' : '<span class="qm">?</span>'}${seal ? `<span class="seal-tag">${ic('check')}${seal}</span>` : ''}</button>`;
@@ -1998,17 +2011,21 @@ const ST_ICON = { stun: ['chain', 'Оглушение: пропускает хо
   paralyze: ['chain', 'Паралич: без обычной атаки'], freeze: ['drop', 'Заморозка: пропускает ходы, лёд спадает от крупного удара'], terror: ['skull', 'Ужас: не действует, спадает от удара'], knock: ['wave', 'Сброс: пропускает ход, угроза обнулена'], blind: ['eye', 'Ослепление: удары мимо'],
   slow: ['hour', 'Стужа: ходит позже'], miss: ['eye', 'Слепота: чаще промахивается'], rend: ['crack', 'Засветка: ниже маг. защита'], chanceDown: ['down', 'Истечение: реже способности'], break: ['crack', 'Слом строя: слабее криты, реже уклоняется'],
   dmgUp: ['up', 'Жар: больше урона'], guard: ['shield', 'Каменная кожа: меньше получаемого урона'], evade: ['ff', 'Попутный ветер: выше уклонение'], lifesteal: ['drop', 'Кровожадность: вампиризм'], healTaken: ['heal', 'Живая вода: больше получаемого лечения'], defUp: ['shield', 'Освящение: выше защита'], chanceUp: ['up', 'Ускорение: чаще способности'], critUp: ['star', 'Боевой дух: чаще криты'],
-  iceblock: ['drop', 'Ледяной панцирь: урон не проходит, пропускает ход'], trophy: ['target', 'Метка трофея: больше добычи при гибели'], greed: ['star', 'Жадный взгляд: павшие враги дают больше добычи'] };
+  iceblock: ['drop', 'Ледяной панцирь: урон не проходит, пропускает ход'], doom: ['skull', 'Отложенный удар: спадёт — ударит наложивший'], nameless: ['lock', 'Срезанное имя: пассивки и реакции молчат'], trophy: ['target', 'Метка трофея: больше добычи при гибели'], greed: ['star', 'Жадный взгляд: павшие враги дают больше добычи'] };
 const AURA_TXT = { dmgUp: ['up', 'Урон'], evade: ['ff', 'Уклонение'], lifesteal: ['drop', 'Вампиризм'] };   // эффекты реакций до конца этажа
 const DOT_ICON = { 'Огонь': 'flame', 'Земля': 'drop', 'Воздух': 'cut', 'Тьма': 'skull', 'Вода': 'drop', 'Время': 'hour', 'Свет': 'spark', 'класс': 'flame' };
 const CTL = ['stun', 'silence', 'stop', 'paralyze', 'freeze', 'terror', 'knock', 'blind'];
 const GOOD_ST = EB.GOOD_ST || [];   // баффы — среди полезных эффектов, слева
 const SKIP_TXT = { stun: 'оглушён', freeze: 'во льду', terror: 'в ужасе', knock: 'сбит с ног', paralyze: 'парализован', iceblock: 'в ледяном панцире' };
 const CLS_OF = { 'Физ. ДД силы': 'Физ. ДД', 'Физ. ДД ловкости': 'Физ. ДД', 'Лекарь': 'Хилер', 'Дебаффер': 'Контроль', 'Босс': 'Танк', 'Страж': 'Танк' };
-const unitKnown = u => u.side === 0 || known(u.id);
+/* облик карт других режимов: Эхо кладёт сюда по id карты изученность и портрет — face: врагов недели и героев Эхо (screens/echo.js) */
+const FOE_LOOK = {};
+const lookOf = u => FOE_LOOK[u.id] || null;
+const unitKnown = u => u.side === 0 || (lookOf(u) ? lookOf(u).known : known(u.id));
 const uName = u => unitKnown(u) ? u.name : 'Неизвестный';
 const unitImg = u => u.side === 0 ? H(u.id).img : FA(F(u.id));
 const unitPos = u => u.side === 0 ? '50% 18%' : FPOS(F(u.id));
+const unitFace = (u, pos) => lookOf(u) ? lookOf(u).face : `<img src="${unitImg(u)}" alt=""${pos ? ` style="object-position:${unitPos(u)}"` : ''}>`;
 const runById = id => S.runs.find(r => r.id === id);
 const focusRun = () => runById(S.focus);
 const abIcon = ab => ab.kind === 'dmg' ? (ab.tgt === 'all' ? 'wave' : ab.stat === 'int' ? 'staff' : 'sword') : ab.kind === 'heal' || ab.kind === 'hot' ? 'heal' : ab.kind === 'shield' ? 'shield' : ab.kind === 'taunt' ? 'target'
@@ -2060,7 +2077,7 @@ function chanceHtml(u, fired) {
 function queueHtml(R) {
   const b = R.b; if (!b || b.mode !== 'rounds') return '';
   const acted = R.acted || [], now = acted[acted.length - 1];
-  return acted.concat(b.queue.filter(u => u.alive)).map(u => `<i class="${u.side ? 'f' : ''} ${u === now ? 'now' : acted.includes(u) ? 'done' : ''}" title="${uName(u)}"><img src="${unitImg(u)}" alt=""></i>`).join('');
+  return acted.concat(b.queue.filter(u => u.alive)).map(u => `<i class="${u.side ? 'f' : ''} ${u === now ? 'now' : acted.includes(u) ? 'done' : ''}" title="${uName(u)}">${unitFace(u)}</i>`).join('');
 }
 function rotHtml(u) {
   if (!u.abs || !u.abs.length) return '';
@@ -2096,30 +2113,48 @@ function legendHtml(mode) {
 function cardHtml(R, u, n, k) {
   const [col, row] = SLOT[n][k], kn = unitKnown(u), d = R.disp[dkey(u)] || { hp: u.hp, sh: u.sh, dead: !u.alive };
   return `<div class="bc ${u.side ? 'foe' : ''} ${u.lead ? 'lead' : ''} ${kn ? '' : 'unk'} ${d.dead ? 'dead' : ''} ${S.insp === dkey(u) ? 'sel' : ''}" id="bc${u.side}${u.i}" data-a="insp" data-v="${dkey(u)}" data-el="${u.el}" style="--k:${col};--r:${row}" title="${kn ? u.name + ' · ' + u.cls + ' · ' + u.el : 'Не изучен: имя и способности откроет первая победа'}">
-    <div class="face"><img src="${unitImg(u)}" alt="" style="object-position:${unitPos(u)}"><div class="buffs"></div><div class="debuffs"></div><span class="cls">${CLS(CLS_OF[u.cls] || u.cls)}</span><span class="tgt"></span><span class="ctl"></span>${u.side ? '' : '<span class="fell">пал</span>'}</div>
+    <div class="face">${unitFace(u, true)}<div class="buffs"></div><div class="debuffs"></div><span class="cls">${CLS(CLS_OF[u.cls] || u.cls)}</span><span class="tgt"></span><span class="ctl"></span>${u.side ? '' : '<span class="fell">пал</span>'}</div>
     <span class="nm">${kn ? u.name : 'Не изучен'}</span>
     ${bar(d.hp / u.maxHp * 100, 'hp', `<span class="sh" style="left:0;width:${Math.min(100, d.sh * 100 / u.maxHp)}%"></span>`)}
     <div class="rot"></div>
   </div>`;
 }
+/* Один просмотрщик на все режимы: забег по биому, рунный страж, Эхо. Бой не биома несёт сцену R.scene: заголовок, значок, чип,
+   фон, куда вернуться, действие «Пропустить» и лист итога. Сцена одна — без перехода между комнатами. */
 function battle() {
   const R = focusRun();
   if (!R || !R.b) return { title: 'Бой', html: '<section class="scr"></section>' };
-  const b = R.b, B = EB.BIOMES[R.biome], FL = deckOf(R), lead = FL.g !== 'o' ? b.u[1][0] : null;
-  const typ = FL.g === 'o' ? 'Рядовые' : FL.g === 'e' ? 'Элита' : FL.g === 'r' ? 'Рунный страж' : 'Босс биома';
-  const side = sd => b.u[sd].map((u, k) => cardHtml(R, u, b.u[sd].length, k)).join('');
-  return { title: B.name, sub: `забег ${R.runNo}${R.demo ? ' · демо' : ''}`, back: 'descent', html: `<section class="scr flush"><div class="bt" id="bt">
-    <div class="bt-bgs"><img class="bg${R.floor % 2 ? '' : ' flip'}" src="${ARENA}" alt=""><img class="bg bg2${R.floor % 2 ? ' flip' : ''}" src="${ARENA}" alt=""></div>
+  const b = R.b, sc = R.scene, side = sd => b.u[sd].map((u, k) => cardHtml(R, u, b.u[sd].length, k)).join('');
+  let title, sub, back = 'descent', badge, chip, bgs, row2 = ['Забег идёт', 'btRun', clock((R.runMs + R.view) / 1000)];
+  if (sc) {
+    const val = v => typeof v === 'function' ? v(R) : v || '';   // сцена с этажами (биом Многоликого) считает значок и чип по текущему этажу
+    title = sc.title; sub = val(sc.sub); back = sc.back; badge = val(sc.badge); chip = val(sc.chip);
+    if (!sc.floors) row2 = ['Бой идёт', 'btRun', clock(R.view / 1000)];
+    const bg = sc.bg || ARENA;
+    bgs = sc.floors ? `<img class="bg${R.floor % 2 ? '' : ' flip'}" src="${bg}" alt=""><img class="bg bg2${R.floor % 2 ? ' flip' : ''}" src="${bg}" alt="">` : `<img class="bg" src="${bg}" alt="">`;
+  } else {
+    const B = EB.BIOMES[R.biome], FL = deckOf(R), lead = FL.g !== 'o' ? b.u[1][0] : null;
+    const typ = FL.g === 'o' ? 'Рядовые' : FL.g === 'e' ? 'Элита' : FL.g === 'r' ? 'Рунный страж' : 'Босс биома';
+    title = B.name; sub = `забег ${R.runNo}${R.demo ? ' · демо' : ''}`;
+    badge = R.guard ? `<b>${ic('crown')}</b><span>страж</span>` : `<b>${R.floor}</b><span>/ ${B.floors.length}</span>`;
+    // рунный страж: его обычная атака отнимает у боя раунд (ADR-0020) — видно в чипе, в часах и в ленте
+    chip = `<span class="chip ${FL.g !== 'o' ? 'gold' : ''}">${FL.g === 'e' ? ic('gem') : FL.g === 'b' || FL.g === 'r' ? ic('crown') : ''}${typ}${lead ? ' · ' + uName(lead) : ''}${FL.g === 'b' && B.siege !== false ? ` · осада ${siegeDone(R.biome)}%` : ''}</span>`
+      + (R.guard && b.mode === 'rounds' ? `<span class="chip warn bt-cutchip" title="Особенность каждого рунного босса: его обычная атака отнимает у предела раунд, текущий бой доигрывается (ADR-0020)">${ic('hour')}удар стража · −${EB.RULES.rounds.runeCut} раунд</span>` : '');
+    if (R.guard && b.mode === 'rounds') row2 = ['Отнял страж', 'btCut', guardCut(R)];
+    bgs = `<img class="bg${R.floor % 2 ? '' : ' flip'}" src="${ARENA}" alt=""><img class="bg bg2${R.floor % 2 ? ' flip' : ''}" src="${ARENA}" alt="">`;
+  }
+  return { title, sub, back, html: `<section class="scr flush"><div class="bt" id="bt">
+    <div class="bt-bgs">${bgs}</div>
     <div class="bt-hud">
-      <div class="bt-floor">${R.guard ? `<b>${ic('crown')}</b><span>страж</span>` : `<b>${R.floor}</b><span>/ ${B.floors.length}</span>`}</div>
-      <span class="chip ${FL.g !== 'o' ? 'gold' : ''}">${FL.g === 'e' ? ic('gem') : FL.g === 'b' ? ic('crown') : ''}${typ}${lead ? ' · ' + uName(lead) : ''}${FL.g === 'b' && B.siege !== false ? ` · осада ${siegeDone(R.biome)}%` : ''}</span>
+      <div class="bt-floor">${badge}</div>
+      ${chip}
       ${b.mode === 'rounds'
-        ? `<div class="bt-clock"><div class="row"><span>${ic('hour')} Раунд</span><span class="num" id="btClock">${b.round} / ${b.maxRounds}</span></div>${bar(b.round * 100 / b.maxRounds, 'sand')}<div class="row"><span>Забег идёт</span><span class="num" id="btRun">${clock((R.runMs + R.view) / 1000)}</span></div></div>`
+        ? `<div class="bt-clock" id="btClockBox"><div class="row"><span>${ic('hour')} Раунд</span><span class="num" id="btClock">${b.round} / ${b.maxRounds}</span></div>${bar(b.round * 100 / b.maxRounds, 'sand')}<div class="row"><span>${row2[0]}</span><span class="num" id="${row2[1]}">${row2[2]}</span></div></div>`
         : `<div class="bt-clock"><div class="row"><span>${ic('hour')} Бой</span><span class="num" id="btClock">${clock(R.view / 1000)} / ${clock(b.limit / 1000)}</span></div>${bar(Math.min(100, R.view * 100 / b.limit), 'sand')}<div class="row"><span>Забег идёт</span><span class="num" id="btRun">${clock((R.runMs + R.view) / 1000)}</span></div></div>`}
-      <span class="chip" title="Сид — сам биом: тот же отряд с той же ротацией всегда получает тот же сценарий">${ic('lock')}сценарий ${seedTag(R)}</span>${b.mode === 'rounds' ? `<span class="chip spirit" title="Модель боя для сравнения, ADR-0008">10 раундов</span>` : ''}
+      <span class="chip" title="${sc ? 'Сид атаки выдаёт сервер: бой посчитан целиком до показа, исход известен' : 'Сид — сам биом: тот же отряд с той же ротацией всегда получает тот же сценарий'}">${ic('lock')}сценарий ${seedTag(R)}</span>${b.mode === 'rounds' && !sc && !R.guard ? `<span class="chip spirit" title="Модель боя для сравнения, ADR-0008">10 раундов</span>` : ''}
       <div class="bt-ctrl">
         <button class="btn sm" data-a="legend" aria-pressed="${!!S.legend}" title="Что значат знаки на картах">${ic('info')}Знаки</button>
-        <button class="btn sm ghost warn" data-a="endact">Прервать</button>
+        ${sc ? (sc.skip ? `<button class="btn go" data-a="${sc.skip}" data-v="${R.id}" title="${sc.skipTip || 'Сразу к итогу: исход уже решён'}">${ic('ff')}Пропустить</button>` : '') + (sc.abort ? `<button class="btn sm ghost warn" data-a="${sc.abort}" data-v="${R.id}">Прервать</button>` : '') : `<button class="btn sm ghost warn" data-a="endact">Прервать</button>`}
         <button class="btn" data-a="minimize" title="Бой продолжится, его видно в верхней строке">${ic('down')}Свернуть</button>
       </div>
     </div>
@@ -2132,16 +2167,22 @@ function battle() {
       <div class="bt-legend" id="btLegend" ${S.legend ? '' : 'hidden'}>${legendHtml(b.mode)}</div>
     </div>
     ${R.banner ? `<div class="bt-banner"><b>${R.banner[0]}</b><small>${R.banner[1]}</small></div>` : ''}
-    <div class="ruler" aria-hidden="true">${R.guard ? '' : rulerHtml(R)}</div>
+    <div class="ruler" aria-hidden="true">${sc ? (sc.ruler ? sc.ruler(R) : '') : R.guard ? '' : rulerHtml(R)}</div>
   </div></section>` };
 }
+/* сколько раундов отнял рунный страж своими обычными атаками: от предела на старте боя (ADR-0020) */
+const guardCut = R => Math.max(0, (R.max0 || R.b.maxRounds) - R.b.maxRounds);
 function rulerHtml(R) {
   const sg = siegeDone(R.biome), last = S.lastRun[R.biome], wall = last && last.wall;
   return EB.BIOMES[R.biome].floors.map((x, i) => { const f = i + 1; return `<i class="${x.g === 'e' ? 'el5' : ''} ${x.g === 'b' ? 'boss' : ''} ${f < R.floor ? 'past' : ''} ${f === R.floor ? 'cur' : ''} ${wall === f && f > R.floor ? 'wall' : ''}" ${x.g === 'b' ? `style="--sg:${sg}"` : ''}></i>`; }).join('');
 }
+/* чип боя в верхней строке: забег — биом и этаж, бой со сценой (Эхо) — его имя и раунд */
+const runTitle = R => R.scene ? R.scene.title : `${EB.BIOMES[R.biome].name} · забег ${R.runNo}`;
+const runShort = R => R.scene ? R.scene.short : `${EB.BIOMES[R.biome].name.split(' ')[0]} · ${R.runNo}`;
+const runWhere = R => R.over ? 'итог' : R.scene && !R.scene.floors ? 'раунд ' + (R.b ? R.b.round : 0) : 'этаж ' + R.floor;
 function trayHtml() {
   const list = S.runs.filter(r => !r.over || !r.seen); if (!list.length) return '';
-  return `<div class="g-runs">${list.map(R => `<button class="g-run ${R.over ? 'done' : ''} ${S.route === 'battle' && S.focus === R.id ? 'cur' : ''}" data-a="focus" data-v="${R.id}" id="run-${R.id}" title="${EB.BIOMES[R.biome].name} · забег ${R.runNo}"><span class="ic">${ic(R.over ? 'flag' : 'eye')}</span><span class="tx"><b>${EB.BIOMES[R.biome].name.split(' ')[0]} · ${R.runNo}</b><small>${R.over ? 'итог' : 'этаж ' + R.floor}</small></span><i class="hpm" style="--v:${partyPct(R)}"></i></button>`).join('')}</div>`;
+  return `<div class="g-runs">${list.map(R => `<button class="g-run ${R.over ? 'done' : ''} ${S.route === 'battle' && S.focus === R.id ? 'cur' : ''}" data-a="focus" data-v="${R.id}" id="run-${R.id}" title="${runTitle(R)}"><span class="ic">${ic(R.over ? 'flag' : 'eye')}</span><span class="tx"><b>${runShort(R)}</b><small>${runWhere(R)}</small></span><i class="hpm" style="--v:${partyPct(R)}"></i></button>`).join('')}</div>`;
 }
 
 /* ================== Герои ==================
@@ -3110,7 +3151,7 @@ function storeView() {
 const SCREENS = { shelter, descent, battle, heroes, craft: craftView, week: weekView, echo: echoView, contracts: contractsView, rituals: ritualsView, arena: arenaView, clan: clanView, event: eventView, profile: profileView, chronicle: chronicleView, store: storeView };
 
 /* ================== занятость ================== */
-const busyNote = id => { const r = runOf(id); if (r) return 'Забег · ' + EB.BIOMES[r.biome].name; const h = H(id); return h.busy; };
+const busyNote = id => { const r = runOf(id); if (r) return 'Забег · ' + (r.scene ? r.scene.title : EB.BIOMES[r.biome].name); const h = H(id); return h.busy; };
 const shelterTags = () => '';
 
 /* ================== сведения о предмете запасов (§14.3, §14.4) ==================
@@ -3563,8 +3604,14 @@ const ACT = {
   start() { startRun(S.prepSquad, 'b1'); },
   again(v) { const R = runById(v) || focusRun(), sqId = R ? R.squadId : S.prepSquad; prune(v); S.overlay = null; startRun(sqId, R ? R.biome : 'b1'); },
   resquad(v) { prune(v); S.overlay = null; S.route = 'descent'; S.selBiome = 'b1'; open('prep'); },
-  focus(v) { const R = runById(v); if (!R) return; S.focus = v; S.insp = null; if (R.over) { R.seen = true; S.overlay = { t: 'result', arg: v }; render(); focusOverlay(); } else go('battle'); },
-  minimize() { S.insp = null; go('descent'); },
+  focus(v) { const R = runById(v); if (!R) return; S.focus = v; S.insp = null; if (R.over) { R.seen = true; if (R.scene) S.route = R.scene.back; S.overlay = { t: R.scene ? R.scene.result : 'result', arg: v }; render(); focusOverlay(); } else go('battle'); },
+  minimize() { const R = focusRun(); S.insp = null; go(R && R.scene ? R.scene.back : 'descent'); },
+  /* рунный страж со «Спуска» (§11, ADR-0018): после босса биома; демо-вход — в любой момент, осаду и стену не трогает */
+  guard(v) {
+    const demo = v === 'demo';
+    if (!demo && !G('b1').killed) return toast('Рунный страж ждёт за боссом биома: сначала победите его в забеге');
+    S.overlay = null; startRun(S.prepSquad, 'b1', null, true);
+  },
   legend() { S.legend = !S.legend; if (S.legend) S.insp = null; const lg = document.getElementById('btLegend'); lg && (lg.hidden = !S.legend); const b = document.querySelector('[data-a="legend"]'); b && b.setAttribute('aria-pressed', S.legend); document.querySelectorAll('.bc.sel').forEach(e => e.classList.remove('sel')); const R = focusRun(); R && paintInsp(R); },
   insp(v) { S.insp = S.insp === v ? null : v; S.legend = false; const lg = document.getElementById('btLegend'); lg && (lg.hidden = true); document.querySelectorAll('.bc.sel').forEach(e => e.classList.remove('sel')); if (S.insp) { const e = document.querySelector(`.bc[data-v="${S.insp}"]`); e && e.classList.add('sel'); } const R = focusRun(); R && paintInsp(R); },
   leave(v) { prune(v); S.overlay = null; go('shelter'); },
@@ -3584,7 +3631,7 @@ const dkey = u => u.side + ':' + u.i;
 const G = biome => S.siege[biome] || (S.siege[biome] = { hp: null, max: null, killed: false });
 const guardCards = () => { const n = EB.BIOMES.b1.guard.m.length; return { 3: 'три карты', 4: 'четыре карты', 5: 'пять карт' }[n] || n + ' карт'; };   // страж обучения — три карты (ADR-0018)
 const siegeDone = biome => { const g = G(biome); return g.hp == null || !g.max ? 0 : Math.round(100 - g.hp * 100 / g.max); };
-const seedTag = R => (EB.BIOMES[R.biome].seed >>> 16).toString(16).toUpperCase().padStart(4, '0');
+const seedTag = R => ((R.scene ? R.seed : EB.BIOMES[R.biome].seed) >>> 16).toString(16).toUpperCase().padStart(4, '0');
 const runOf = id => S.runs.find(r => !r.over && r.squad.includes(id));
 const partyPctOf = b => { const max = b.u[0].reduce((a, u) => a + u.maxHp, 0) || 1; return Math.round(b.u[0].reduce((a, u) => a + u.hp, 0) * 100 / max); };
 const partyPct = R => { if (!R.b) return 0; const us = R.b.u[0], max = us.reduce((a, u) => a + u.maxHp, 0) || 1; return Math.round(us.reduce((a, u) => a + (R.disp[dkey(u)] ? R.disp[dkey(u)].hp : u.hp), 0) * 100 / max); };
@@ -3605,12 +3652,15 @@ function startRun(squadId, biome = 'b1', demoFloor, guard) {
 }
 /* колода текущего боя: этаж биома или рунный страж */
 const deckOf = R => R.guard ? EB.BIOMES[R.biome].guard : EB.BIOMES[R.biome].floors[R.floor - 1];
+/* показ нового боя с чистого листа: лента, анимации, очередь; предел раундов на старте — для счёта раундов, отнятых стражем */
+function resetView(R) { R.view = 0; R.feed = []; R.disp = {}; R.lastActor = null; R.pending = 0; R.endAt = null; R.acted = []; R.fired = null; R.max0 = R.b.maxRounds; syncDisp(R); }
 function newFloor(R) {
+  if (R.scene && R.scene.next) { R.scene.next(R); resetView(R); R.enter = R.floor > R.startFloor; return; }   // этажи сцены (биом Многоликого) собирает её режим
   const B = EB.BIOMES[R.biome];
   R.b = R.guard ? EB.guardBattle(R.heroes, R.biome, R.mode)
     : EB.floorBattle(R.heroes, R.biome, R.floor, R.floor === B.floors.length && !R.demo ? G(R.biome).hp : null, R.mode);   // демо-прыжок не трогает осаду
-  R.view = 0; R.feed = []; R.disp = {}; R.lastActor = null; R.pending = 0; R.endAt = null; R.acted = []; R.fired = null; syncDisp(R);
-  if (R.guard) { R.banner = ['Рунный страж · ' + uName(R.b.u[1][0]), guardCards() + ' · иммунитет стража к контролю ' + Math.round((EB.RULES.resist.rune || 0) / 100) + ' %']; return; }
+  resetView(R);
+  if (R.guard) { R.banner = ['Рунный страж · ' + uName(R.b.u[1][0]), guardCards() + ' · иммунитет к контролю ' + Math.round((EB.RULES.resist.rune || 0) / 100) + ' %' + (R.mode === 'rounds' ? ' · его обычная атака отнимает раунд' : '')]; return; }
   const g = B.floors[R.floor - 1].g, lead = R.b.u[1][0];
   R.enter = R.floor > R.startFloor;   // новая колода въезжает справа — камера пришла в следующую «комнату»
   R.banner = [`Этаж ${R.floor}`, g === 'o' ? 'рядовые' : g === 'e' ? 'элита · ' + uName(lead)
@@ -3634,7 +3684,7 @@ function advance(R, ms) {
   while (!b.over && EB.nextAt(b) <= R.view) onAction(R, EB.step(b), vis);
   if (!b.over && R.view > b.limit) onAction(R, EB.step(b), vis);   // время боя вышло
   if (vis) paintHud(R);
-  if (b.over) { if (R.endAt == null) R.endAt = R.view + 1400; if (!vis || R.view >= R.endAt) floorDone(R, vis); }   // дать доиграть последний удар
+  if (b.over) { if (R.endAt == null) R.endAt = R.view + 1400; if (!vis || R.view >= R.endAt) (R.done || floorDone)(R, vis); }   // дать доиграть последний удар; у боя со сценой — свой итог
 }
 function onAction(R, a, vis) {
   if (!a) return;
@@ -3643,7 +3693,7 @@ function onAction(R, a, vis) {
   else if (a.round && a.s) { R.acted.push(a.s); R.fired = a.ab ? { key: dkey(a.s), n: a.ab.n, until: R.view + a.dur } : null; }
   for (const e of a.ev) if (e.k === 'die' && e.t.side === 1) {   // добычу этажа считает ядро в конце этажа (floorLoot)
     R.kills++;
-    if (!known(e.t.id)) { S.known.push(e.t.id); R.newKnown.push(e.t.id); }
+    if (!R.scene && !known(e.t.id)) { S.known.push(e.t.id); R.newKnown.push(e.t.id); }   // у Эхо запись бестиария открывает подтверждённая победа, а не просмотр
   }
   if (vis) playAction(R, a); else syncDisp(R);
 }
@@ -3773,7 +3823,8 @@ function applyEv(R, e) {
     case 'shield': d.sh = Math.min(e.t.maxHp, d.sh + (e.v || 0)); break;
     case 'dispel': d.sh = 0; break;
     case 'die': d.dead = true; d.hp = 0; d.sh = 0; break;
-    case 'survive': d.hp = e.hp; d.dead = false; break;   // спасение от смерти — раз за биом
+    case 'survive': case 'revive': d.hp = e.hp; d.dead = false; break;   // спасение от смерти — раз за биом; поднятый павший
+    case 'steal': if (e.st === 'shield') d.sh = 0; break;   // забрали щит
   }
 }
 function targetOf(b, u) {
@@ -3797,9 +3848,15 @@ function playAction(R, a) {
   const side = e => {
     if (e.k === 'react') { flyAt(R, e.s, e.n, 'abil', -26); feed(R, `<b>${uName(e.s)}</b> · <span class="gd">${e.n}</span>${e.t && e.t !== e.s ? ' → ' + uName(e.t) : ''}`); }
     else if (e.k === 'survive') flyAt(R, e.t, 'на волоске', 'info');
+    else if (e.k === 'revive') { flyAt(R, e.t, 'встал', 'heal'); feed(R, `<b>${uName(e.s)}</b> · <span class="sp">поднял</span> → ${uName(e.t)}`); }
+    else if (e.k === 'steal') flyAt(R, e.t, e.st === 'shield' ? 'щит забран' : 'бафф забран', 'info');
+    else if (e.k === 'doom') { flyAt(R, e.t, 'отложенный удар', 'info', -26); feed(R, `<b>${uName(e.s)}</b> · <span class="gd">отложенный удар</span> → ${uName(e.t)}`); }
     else if (e.k === 'unhurt') flyAt(R, e.t, 'лёд', 'info');
     else if (e.k === 'unstatus') flyAt(R, e.t, e.st === 'freeze' ? 'лёд спал' : 'очнулся', 'info');
-    else if (e.k === 'cut') { flyAt(R, e.s, '−1 раунд', 'info', -26); feed(R, `<b>${uName(e.s)}</b> · <span class="gd">время скоротечно</span> · раундов в бою: ${e.n}`); }   // РБ отнимает раунд (ADR-0020)
+    else if (e.k === 'cut') {   // РБ отнимает раунд (ADR-0020): надпись над стражем, строка ленты и вспышка часов
+      flyAt(R, e.s, `−${EB.RULES.rounds.runeCut} раунд`, 'info', -26); feed(R, `<b>${uName(e.s)}</b> · обычная атака · <span class="gd">время скоротечно</span> · раундов в бою: ${e.n}`);
+      const ck = document.getElementById('btClockBox'); if (ck) { ck.classList.remove('cut'); void ck.offsetWidth; ck.classList.add('cut'); }
+    }
   };
   // 1. горение, яд и лечение со временем срабатывают в начале хода носителя
   for (const e of pre) {
@@ -3832,7 +3889,7 @@ function playAction(R, a) {
         case 'status': if (el(e.t)) { if (e.st === 'dot') fx.dot(el(e.t), e.school); else if (e.st === 'hot') fx.hot(el(e.t)); else if (CTL.includes(e.st)) fx.ctrl(el(e.t), e.st); else fx.debuff(el(e.t), e.st); } break;
         case 'resist': el(e.t) && fx.resist(el(e.t), e.st); flyAt(R, e.t, 'иммунитет', 'info'); break;
         case 'dispel': el(e.t) && fx.dispel(el(e.t)); break;
-        case 'unstatus': case 'react': case 'survive': case 'unhurt': case 'cut': side(e); break;
+        case 'unstatus': case 'react': case 'survive': case 'unhurt': case 'cut': case 'revive': case 'steal': case 'doom': side(e); break;
         case 'die': el(e.t) && fx.death(el(e.t)); feed(R, `<span class="bd">✝</span> <b>${uName(e.t)}</b>`); break;
       }
     }
@@ -3841,6 +3898,13 @@ function playAction(R, a) {
   };
   setTimeout(impact, T(a.dur * .9));   // страховка: к концу действия его итог показан всегда
   if (a.kind === 'skip') { fx.ctrl(actor, a.st || 'stun'); flyAt(R, a.s, SKIP_TXT[a.st] || 'оглушён', 'info'); impact(); return; }
+  if (a.kind === 'attack' && a.all) {   // обычная атака по всем — приём Убер-босса (ADR-0025): волна по всему отряду
+    const tEl = main.filter(e => e.k === 'swing').map(e => el(e.t)).filter(Boolean);
+    feed(R, `<b>${uName(a.s)}</b> · <span class="gd">обычная атака по всем</span>`);
+    if (!tEl.length) return impact();
+    fx.wave(actor, tEl, C[a.s.el] || C.steel, i => { if (i === tEl.length - 1) impact(); });
+    return;
+  }
   if (a.kind === 'attack') {
     const t = sw && el(sw.t);
     if (!t) return impact();
@@ -3886,7 +3950,8 @@ function paintHud(R) {
     q('btClock').textContent = `${clock(R.view / 1000)} / ${clock(b.limit / 1000)}`;
     cb && cb.style.setProperty('--v', Math.min(100, R.view * 100 / b.limit));
   }
-  q('btRun').textContent = clock((R.runMs + R.view) / 1000);
+  if (q('btRun')) q('btRun').textContent = clock(((R.scene ? 0 : R.runMs) + R.view) / 1000);
+  if (q('btCut')) q('btCut').textContent = guardCut(R);
   paintCards(R); paintInsp(R);
 }
 const setHtml = (e, h) => { if (e && e.__h !== h) { e.innerHTML = h; e.__h = h; } };   // DOM трогаем, только если знак изменился
@@ -3917,7 +3982,7 @@ function stText(x, rounds) {
   const per = rounds ? 'в каждый ход' : 'в каждую атаку', word = rounds ? roundWord : atkWord;
   if (x.k === 'dot') return `<span>${x.school}: ${fmt(x.per * x.stacks)} урона ${per} · стаков ${x.stacks} · ещё ${x.left} ${word(x.left)}</span>`;
   if (x.k === 'hot') return `<span style="color:#9ff0c0">${x.school}: +${fmt(x.per * x.stacks)} здоровья ${per} · ещё ${x.left} ${word(x.left)}</span>`;
-  const n = { stun: 'Оглушение: пропускает ход', silence: rounds ? 'Безмолвие: только обычная атака' : 'Безмолвие: без способностей', stop: rounds ? 'Остановка: ходит последней в раунде, ульта не срабатывает' : 'Остановка: не копит атаки', weak: `Ослабление: −${x.pow / 100}% урона`, mark: `Метка: +${x.pow / 100}% получаемого урона`, pierce: `Осыпание: −${x.pow / 100}% физ. защиты`, paralyze: 'Паралич: без обычной атаки', freeze: 'Заморозка: пропускает ход, лёд спадает от крупного удара', terror: 'Ужас: не действует, спадает от удара', knock: 'Сброс: пропускает ход', blind: 'Ослепление: удары мимо', slow: `Стужа: −${x.pow / 100}% скорости`, miss: `Слепота: +${x.pow / 100}% промахов`, rend: `Засветка: −${x.pow / 100}% маг. защиты`, chanceDown: 'Истечение: реже способности', break: 'Слом строя: слабее криты, реже уклоняется', dmgUp: `Жар: +${x.pow / 100}% урона`, guard: `Каменная кожа: −${x.pow / 100}% получаемого урона`, evade: `Уклонение +${x.pow / 100}%`, lifesteal: `Вампиризм ${x.pow / 100}%`, healTaken: `Лечение по нему +${x.pow / 100}%`, defUp: `Защита +${x.pow / 100}%`, chanceUp: 'Ускорение: чаще способности', critUp: `Крит +${x.pow / 100}%`, iceblock: 'Ледяной панцирь: урон не проходит', trophy: `Метка трофея: +${x.pow}% добычи при гибели`, greed: `Жадный взгляд: павшие враги дают +${x.pow}% добычи` }[x.k];
+  const n = { stun: 'Оглушение: пропускает ход', silence: rounds ? 'Безмолвие: только обычная атака' : 'Безмолвие: без способностей', stop: rounds ? 'Остановка: ходит последней в раунде, ульта не срабатывает' : 'Остановка: не копит атаки', weak: `Ослабление: −${x.pow / 100}% урона`, mark: `Метка: +${x.pow / 100}% получаемого урона`, pierce: `Осыпание: −${x.pow / 100}% физ. защиты`, paralyze: 'Паралич: без обычной атаки', freeze: 'Заморозка: пропускает ход, лёд спадает от крупного удара', terror: 'Ужас: не действует, спадает от удара', knock: 'Сброс: пропускает ход', blind: 'Ослепление: удары мимо', slow: `Стужа: −${x.pow / 100}% скорости`, miss: `Слепота: +${x.pow / 100}% промахов`, rend: `Засветка: −${x.pow / 100}% маг. защиты`, chanceDown: 'Истечение: реже способности', break: 'Слом строя: слабее криты, реже уклоняется', dmgUp: `Жар: +${x.pow / 100}% урона`, guard: `Каменная кожа: −${x.pow / 100}% получаемого урона`, evade: `Уклонение +${x.pow / 100}%`, lifesteal: `Вампиризм ${x.pow / 100}%`, healTaken: `Лечение по нему +${x.pow / 100}%`, defUp: `Защита +${x.pow / 100}%`, chanceUp: 'Ускорение: чаще способности', critUp: `Крит +${x.pow / 100}%`, iceblock: 'Ледяной панцирь: урон не проходит', doom: `Отложенный удар: спадёт — удар ${x.src ? uName(x.src) : 'наложившего'}`, nameless: 'Срезанное имя: пассивки и реакции молчат', trophy: `Метка трофея: +${x.pow}% добычи при гибели`, greed: `Жадный взгляд: павшие враги дают +${x.pow}% добычи` }[x.k];
   return n ? `<span>${n} · ещё ${x.left} ${word(x.left)}</span>` : '';
 }
 function paintInsp(R) {
@@ -3940,9 +4005,12 @@ function paintInsp(R) {
     ult = u.ult ? `<span class="ult" title="${u.ult.d || ''}">${u.ult.n} · ${u.phase === 'ult' ? 'готова' : u.phase === 'charge' ? 'зарядка ' + (u.chargeMax - u.charge) + '/' + u.chargeMax : 'после ' + (EB.RULES.ultAfter - u.uses) + ' применений'}</span>` : '';
   }
   const th = opp.map((v, k) => [v, u.th[k]]).filter(([v]) => v.alive).sort((x, y) => y[1] - x[1]).slice(0, 3).map(([v, t]) => `<span>${uName(v)} <b class="num">${fmt(t)}</b></span>`).join('');
-  box.innerHTML = `<div class="h"><b>${u.name}</b><span class="faint">${u.cls} · ${u.el}</span>${close}</div>
+  // особенности по рангу и расе (§5.4): иммунитет к контролю, раунд за удар рунного стража, неприязнь героя Эхо, обычная атака по всем
+  const trait = (u.rank === 'rune' && rounds ? ' · обычная атака отнимает раунд' : '') + (u.basicAll ? ` · обычная атака по всем, по ${u.basicAll} %` : '')
+    + (u.avers ? ` · неприязнь <b class="num">+${pctBp(u.avers.bp)}</b> урона по расе «${u.avers.race}»` : '');
+  box.innerHTML = `<div class="h"><b>${u.name}</b><span class="faint">${u.cls} · ${u.el}${u.side && u.race ? ' · ' + u.race : ''}</span>${close}</div>
     <span>Здоровье <b class="num">${fmt(d.hp)}</b> / ${fmt(u.maxHp)}${d.sh ? ` · щит <b class="num">${fmt(d.sh)}</b>` : ''} · атака ${fmt(u.atk[u.main])} · защита ${fmt(u.def.str)} / ${fmt(u.def.int)}</span>
-    <span>Цель: <b>${!d.dead && j >= 0 ? uName(opp[j]) : '—'}</b> · выбирает угроза${u.rank && EB.RULES.resist[u.rank] ? ` · иммунитет к контролю <b class="num">${Math.round(EB.RULES.resist[u.rank] / 100)} %</b>` : ''}</span>
+    <span>Цель: <b>${!d.dead && j >= 0 ? uName(opp[j]) : '—'}</b> · выбирает угроза${u.rank && EB.RULES.resist[u.rank] ? ` · иммунитет к контролю <b class="num">${Math.round(EB.RULES.resist[u.rank] / 100)} %</b>` : ''}${trait}</span>
     ${abs || ult ? `<div class="bi-ab">${abs}${ult}</div>` : ''}
     ${u.lpas && u.lpas.length ? `<div class="bi-ab">${u.lpas.map(p => `<span title="${p.d || ''}">${p.n} · ${p.kind === 'reaction' ? 'реакция' : 'пассивка'}${u.usedBiome.includes(p.id) ? ' · уже сработала' : ''}</span>`).join('')}</div>` : ''}
     ${u.st.length ? `<div class="bi-st">${u.st.map(stT).join('')}</div>` : ''}
@@ -3972,7 +4040,7 @@ function compareModels() {
   </table><p class="p-note" style="margin-top:6px">${s.name} · ${heroes.length} героев · Мастерская форм с первого этажа, босс со свежим здоровьем. В модели раундов здоровье врагов — ${EB.RULES.rounds.foeHpPct} % от основной: за 10 раундов каждая карта ходит только 10 раз.</p>`;
 }
 function paintTray() {
-  for (const R of S.runs) { const e = document.getElementById('run-' + R.id); if (!e) continue; e.querySelector('small').textContent = R.over ? 'итог' : 'этаж ' + R.floor; e.querySelector('.hpm').style.setProperty('--v', partyPct(R)); e.classList.toggle('done', R.over); }
+  for (const R of S.runs) { const e = document.getElementById('run-' + R.id); if (!e) continue; e.querySelector('small').textContent = runWhere(R); e.querySelector('.hpm').style.setProperty('--v', partyPct(R)); e.classList.toggle('done', R.over); }
 }
 function pulse(u, cls, ms = 150) {
   const el = document.getElementById('bc' + u.side + u.i); if (!el) return;
@@ -4018,7 +4086,7 @@ function focusOverlay() { requestAnimationFrame(() => { const x = document.query
 function decorateActivation() {
   const cta = document.querySelector('.banner .cta'); if (!cta || S.selBiome !== 'b1') return;
   const live = S.runs.filter(r => !r.over && r.biome === 'b1'); if (!live.length) return;
-  cta.innerHTML = `<span class="chip spirit">${ic('users')}Забегов идёт: ${live.length}</span><div class="row" style="gap:6px"><button class="btn" data-a="sheet" data-v="prep">${ic('plus')}Ещё отряд</button><button class="btn go big" data-a="focus" data-v="${live[0].id}">${ic('eye')}К бою</button></div>`;
+  cta.innerHTML = `${guardHtml()}<span class="chip spirit">${ic('users')}Забегов идёт: ${live.length}</span><div class="row" style="gap:6px"><button class="btn" data-a="sheet" data-v="prep">${ic('plus')}Ещё отряд</button><button class="btn go big" data-a="focus" data-v="${live[0].id}">${ic('eye')}К бою</button></div>`;
 }
 function bindGame() {
   const g = $game();
@@ -4041,7 +4109,7 @@ const FLOWS = [
   ['Убежище и следующий шаг', 'Проводники, текущие занятия и одна главная кнопка', () => { S.route = 'shelter'; S.overlay = null; }],
   ['Забег по Мастерской форм', 'Бой на истощение: здоровье не восстанавливается. Эффекты, цели, карточка бойца', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = { t: 'prep', arg: '' }; }],
   ['Бой с боссом · демо-прыжок', 'Отряд I сразу на последнем этаже: босс, ульты, массовые удары', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = null; startRun('s1', 'b1', EB.BIOMES.b1.floors.length); }],
-  ['Рунный страж · ' + guardCards(), 'Мастер и две элиты — страж обучения цикла I, иммунитет к контролю 25 %', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = null; startRun('s1', 'b1', null, true); }],
+  ['Рунный страж · ' + guardCards(), 'Мастер и две элиты — страж обучения цикла I: 25 раундов, каждая обычная атака Мастера отнимает раунд. Вход — со «Спуска»', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = null; S.prepSquad = 's1'; ACT.guard('demo'); }],
   ['Бестиарий: известный и неизвестный', 'Скрыт до первой победы, картина и совет старика после', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = { t: 'foe', arg: known('o6') ? 'e3' : 'o6' }; }],
   ['Развитие героя', 'Уровень, рунный предел и доблесть — одна лестница', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.seg.hero = 'power'; S.selHero = 'h2'; S.overlay = null; }],
   ['Ротация перетаскиванием', 'Порядок способностей в карточке героя', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.seg.hero = 'skills'; S.selHero = 'h2'; S.overlay = null; }],
@@ -4051,6 +4119,7 @@ const FLOWS = [
   ['Лавка и рынок', 'Покупка кладёт предмет в запасы, свой лот забирает его оттуда, снятый — возвращает', () => { S.route = 'craft'; S.seg.craft = 'shop'; S.overlay = null; }],
   ['Ритуалы', 'Готовый ритуал: базовые общего пула и ключи биома — в запасы, золото и души — в кошелёк', () => { S.route = 'rituals'; S.seg.rituals = 'work'; S.overlay = null; }],
   ['Неделя → Эхо', 'Шесть недельных режимов на одном экране, цель и атака', () => { S.route = 'echo'; S.echo.sel = 0; S.overlay = null; }],
+  ['Эхо · бой и итог', 'Атака — бой ядром: главный враг ступени и четыре защитника на одной арене. «Пропустить» — сразу итог', () => { S.route = 'echo'; S.echo.sel = 0; S.overlay = null; if (ACT.echatk) ACT.echatk(); }],
   ['Контракт', 'Составить, заверить золотом, подписать', () => { S.route = 'contracts'; S.seg.contracts = 'day'; S.overlay = null; }],
   ['Память Странника', 'Одна из трёх, переброс и закрепление', () => { S.route = 'profile'; S.seg.profile = 'mem'; S.overlay = S.mem.slots[0].st === 'open' ? { t: 'mem' } : null; }],
   ['Входящие', 'Всё, что пришло, пока вас не было, в одном листе', () => { S.route = 'shelter'; S.overlay = { t: 'inbox' }; }],

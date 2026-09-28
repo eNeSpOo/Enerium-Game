@@ -6,8 +6,12 @@
    крафтовые боссы, руины, слоты и цены Эхо — EN_RECIPES.drops (recipes.js); сундуки — EN_LOOTBOXES (lootboxes.js).
    Враги недели — по строкам «Враги недели» в docs/content/герои/состав-героев.md, «Отряды Эхо — древние цивилизации»:
    имена и облик — черновик прототипа. Игроку — только «древняя цивилизация задолго до этеров»; поля team не показываем.
-   Все числа ECH — демонстрация, не баланс. Ядра боя для Эхо нет: исход атаки — демо-урон на сиде.
-   В игре варианты призыва, урон, награды и итог решает сервер (§36.16); сид здесь — заглушка серверного. */
+   Атака — бой ядром (battle.js, EB.echoBattle, ADR-0025): один этаж, главный враг и четыре защитника, раунды по типу врага;
+   здоровье главного врага сохраняется между атаками. Исход решён при оплате, просмотр — только показ: «Пропустить» сразу
+   открывает итог, повтор атаки с тем же номером ничего не списывает и не начисляет.
+   Данные боя — EN_ECHO_RULES (echo-rules.js) и EN_ECHO_FOES (echo-foes.js), если подключены; без них — демо ECH.fight.
+   Все числа ECH — демонстрация, не баланс. В игре варианты призыва, бой, награды и итог решает сервер (§36.16);
+   сид здесь — заглушка серверного. */
 (function () {
 'use strict';
 
@@ -18,17 +22,46 @@ const ECH = {
   ladder: [['o', 6], ['e', 4], ['b', 3], ['u', 1]],     // §17.4: 6 рядовых, 4 элиты, 3 босса, Убер-босс; пятнадцатая — Многоликий
   rank: { o: 'Рядовой', e: 'Элита', b: 'Босс недели', u: 'Убер-босс недели', m: 'Многоликий', craft: 'Крафтовый босс' },
   short: { o: 'Рядовой', e: 'Элита', b: 'Босс', u: 'Убер-босс', m: 'Многоликий' },
-  atk: { o: 'ordinary', e: 'elite', b: 'boss', u: 'uber', m: 'uber', craft: 'boss' },   // ключи drops.echo.oldAttackSouls: прежняя сетка §17.5
+  atk: { o: 'ordinary', e: 'elite', b: 'boss', u: 'uber', m: 'ordinary', craft: 'boss' },   // ключи drops.echo.oldAttackSouls: прежняя сетка §17.5; Многоликий — лёгкий бой, демо
   points: [100, 120, 144, 173, 207, 249, 598, 717, 860, 1032, 2478, 2973, 3568, 26750],   // прежние базовые очки §17.5, цикл II
-  manyPoints: 32100,                                    // Многоликий — черновик: Убер-босс × 1,2, около 20 % роста за ступень (§17.5)
+  manyPoints: 0,                                        // Многоликий: за победу — ресурс «Многоликий», очки — за этажи его биома (ADR-0025, ответ автора)
   hp: [4800, 5400, 6000, 6600, 7200, 7800, 18500, 19200, 19900, 20600, 86000, 92000, 98000, 240000],   // здоровье ступеней, цикл I
   bm: [12400, 13100, 13800, 14500, 15200, 15900, 32600, 33000, 33400, 33800, 76200, 79000, 82000, 150000],
-  many: { hp: 300000, bm: 170000 },
+  many: { hp: 4800, bm: 12400 },                        // Многоликий — лёгкий бой один на один: как первая ступень, демо
   craft: { hp: 120000, bm: 90000 },                     // крафтовый босс — по своему циклу (§12.3)
   cycMul: 3,                                            // здоровье и мощь — ×3 за цикл
   lifeH: { o: 72, e: 48, b: 36, u: 24, m: 24, craft: 48 },   // срок существования цели, часы; окончательные сроки — баланс (§17.1)
-  dmgBp: { o: [3000, 5000], e: [1800, 3000], b: [1000, 1800], u: [400, 800], m: [300, 600], craft: [900, 1600] },   // демо-урон атаки — доля здоровья цели
-  pickW: [30, 28, 26, 24, 22, 20, 12, 11, 10, 9, 5, 4, 3, 2],   // вес ступени в призыве: слабые чаще, сильные реже (§17.4)
+  pickW: [30, 28, 26, 24, 22, 20, 12, 11, 10, 9, 5, 4, 3, 2, 2],   // вес ступени в призыве: слабые чаще, сильные реже (§17.4); пятнадцатая — Многоликий
+  /* арт недели, одобренный автором (ADR-0025): фон арены Эхо и портреты ступеней 1–15 по порядку врагов ECH; другие недели — заглушки */
+  art: { 'Эльфы': { arena: 'arena-echo-ishkantun.jpg', faces: 'echo/ik-' } },
+  /* бой Эхо (ADR-0025) — демо, пока не подключены echo-rules.js и echo-foes.js. Характеристики карты — как у образца Мастерской
+     того же класса (EB.FOES: рядовой — у рядовых, остальные — у элит); здоровье главного врага — шкала hp выше, защитники — по своему hpPct */
+  fight: {
+    lvl: { first: [12, 40, 110, 260, 520, 850], last: [45, 120, 280, 560, 900, 1250] },   // уровень врагов ступени 1 и 14 по циклам I–VI; между ними — поровну
+    rank: { o: 'o', e: 'e', b: 'b', u: 'uber', m: 'b', craft: 'forgotten' },   // ранг карты в ядре — иммунитет к контролю (ADR-0010); Многоликого в таблице рангов нет — как босс
+    share: { o: [2900, 100], e: [3600, 400], b: [3950, 550], uber: [4650, 850], forgotten: [5000, 1000] },   // доли хода способностей и ульты по рангу, б. п. (ADR-0016)
+    acts: { o: 1, e: 2, b: 2, uber: 3, forgotten: 5 }, ults: { o: 0, e: 0, b: 1, uber: 2, forgotten: 1 },   // способностей по рангу (ADR-0016): у Убер-босса пять, из них две ульты
+    kinds: {   // приёмы класса из общей библиотеки по порядку — «вид.ступень», школа — стихия врага; ульты — «ult.вид»
+      'Танк': ['dmg.grp', 'shield.all', 'debuff.one', 'ctrl.one', 'buff.all', 'ult.shield', 'ult.ctrl'],
+      'Физ. ДД силы': ['dmg.one', 'dmg.grp', 'debuff.one', 'dot.one', 'buff.one', 'ult.dmg', 'ult.debuff'],
+      'Физ. ДД ловкости': ['dmg.one', 'dot.one', 'dmg.grp', 'debuff.one', 'ctrl.one', 'ult.dmg', 'ult.dot'],
+      'Маг. ДД': ['dmg.all', 'dmg.one', 'dot.grp', 'ctrl.one', 'debuff.grp', 'ult.dmg', 'ult.ctrl'],
+      'Лекарь': ['heal.one', 'heal.all', 'hot.one', 'shield.one', 'buff.grp', 'ult.heal', 'ult.shield'],
+      'Дебаффер': ['debuff.grp', 'ctrl.one', 'debuff.one', 'dot.grp', 'ctrl.grp', 'ult.debuff', 'ult.ctrl'],
+      'Босс': ['dmg.one', 'dmg.all', 'debuff.grp', 'ctrl.one', 'dot.all', 'ult.dmg', 'ult.ctrl'],
+    },
+    guards: { o: 'oooo', e: 'eooo', b: 'eeoo', u: 'beee', m: '', craft: 'eeee' },   // ранги защитников по типу главного врага; у Многоликого их нет
+    uberAll: 60,                        // Убер-босс демо бьёт обычной атакой всех — по 60 % главного стата (приём ADR-0025)
+    craftCls: 'Босс', noSchool: 'Без школы',   // крафтовый босс без лица: класс и школа способностей
+    manyLvlStep: 1,                     // Многоликий — лёгкий бой: уровень первой ступени своего цикла
+    /* герои Эхо (echo-foes.js) в демо «отряд недели»: класс состава → класс ядра, характеристики — как у героя прототипа того же
+       класса (S.heroes), у физ ДД силы — как у ловкача, сила и ловкость местами; уровень — уровень врагов цели */
+    heroCls: { 'танк': 'Танк', 'лекарь': 'Лекарь', 'физ ДД силы': 'Физ. ДД силы', 'физ ДД ловкости': 'Физ. ДД ловкости', 'маг ДД': 'Маг. ДД', 'контроль (на контроль)': 'Контроль', 'контроль (на дебаффы)': 'Дебаффер' },
+    heroSt: { 'Танк': [128, 54, 72, 246, 62], 'Физ. ДД ловкости': [128, 54, 245, 72, 62], 'Физ. ДД силы': [245, 54, 128, 72, 62], 'Маг. ДД': [72, 246, 54, 62, 128],
+      'Лекарь': [62, 246, 54, 128, 72], 'Контроль': [62, 246, 54, 128, 72], 'Дебаффер': [62, 246, 54, 128, 72] },
+    /* биом Многоликого (ADR-0025): этажи — ступени 1–14, главный враг и защитники; главный враг — полный, без шкалы здоровья Эхо */
+    biome: { mainHpPct: 300 },          // здоровье главного врага этажа — × к hpPct его образца, %
+  },
   offer: { base: 1, wide: 3 },                          // вариантов призыва: исходно один, артефакт расширяет (§17.1)
   plankBase: 10000,                                     // очки первой личной планки в цикле II, дальше ×2 (лутбоксы.md) — пороги ждут баланса очков
   hour: 3600,                                           // секунд в часе
@@ -228,8 +261,30 @@ const CLOSED = '<div class="pnl pad" style="background:#0e1114"><b class="serif"
 
 const ipow = (b, e) => { let r = 1; for (let i = 0; i < e; i++) r *= b; return r; };
 const at = (base, c) => base * ipow(ECH.cycMul, c - 1);
-const ptsOf = (step, c) => c < EM.from ? 0 : (step === MANY ? ECH.manyPoints : ECH.points[step - 1]) * ipow(XE.pointsCycleMul, c - EM.from);
-const atkCost = g => XE.oldAttackSouls[ECH.atk[g]];
+/* данные режима: echo-rules.js (EN_ECHO_RULES) — раунды, ранг и срок по типу врага (types), уровень врагов, здоровье главного врага
+   и защитников, души за атаку и очки по ступеням и циклам (cycles), этажи биома Многоликого; echo-foes.js (EN_ECHO_FOES) — враги недели
+   с наборами, защитники, составы этажей биома Многоликого, герои Эхо, уникальные способности Убер-боссов. Подключены — берём их;
+   чего нет (цикл I, крафтовые боссы, ранний прототип без файлов) — демо ECH. */
+const XR = () => window.EN_ECHO_RULES || null, XF = () => window.EN_ECHO_FOES || null;
+const ruleRow = (step, c) => { const R = XR(), cy = R && R.cycles ? R.cycles[String(c)] : null; return cy ? cy.find(r => r.step === step) || null : null; };
+const ruleOf = (step, k, c) => { const r = ruleRow(step, c), v = r ? r[k] : null; return Number.isInteger(v) ? v : null; };
+const typeRule = g => { const R = XR(); return R && R.types ? R.types[g] || null : null; };
+const lifeOf = g => { const t = typeRule(g); return t && Number.isInteger(t.lifeH) ? t.lifeH : ECH.lifeH[g]; };
+const pickW = () => XR() && Array.isArray(XR().pickW) && XR().pickW.length >= MANY ? XR().pickW : ECH.pickW;
+const bmOf = (step, c) => at(step === MANY ? ECH.many.bm : ECH.bm[step - 1], c);
+/* здоровье цели Эхо: по правилам — здоровье главного врага в бою (ядро: образец класса, уровень, bossHpPct); иначе демо-шкала */
+function hpOf(step, c, race) {
+  const r = ruleRow(step, c), f = r ? stepFoe(fidOf(race, step)) : null;
+  if (f && Number.isInteger(r.bossHpPct)) { const cls = clsOf(f, dataFoe(f)); return EB.foeMaxHp({ cls, st: tplOf(cls, f.g).st, lvl: r.foeLvl, hpPct: r.bossHpPct }); }
+  return at(step === MANY ? ECH.many.hp : ECH.hp[step - 1], c);
+}
+const ptsOf = (step, c) => { if (c < EM.from) return 0; const v = ruleOf(step, 'points', c); return v != null ? v : (step === MANY ? ECH.manyPoints : ECH.points[step - 1]) * ipow(XE.pointsCycleMul, c - EM.from); };
+/* очки этажа биома Многоликого: правила (manyPoints), иначе демо — очки победы над этой ступенью в Эхо */
+const floorPts = (step, c) => { if (c < EM.from) return 0; const v = ruleOf(step, 'manyPoints', c); return v != null ? v : ptsOf(step, c); };
+/* цена атаки в душах: правила по ступени и циклу (раунды × цена раунда цикла), иначе прежняя сетка §17.5 по типу цели */
+const atkCost = x => (x.step ? ruleOf(x.step, 'souls', x.cyc || S.acc.cycle) : null) || XE.oldAttackSouls[ECH.atk[x.g]];
+/* Многоликий — награда за пятнадцатую ступень; drops.echo.uber — прежняя запись той же выдачи */
+const manyDrop = () => XE.many || XE.uber || { item: 'many', count: 1 };
 const souls = n => plural(n, 'душа', 'души', 'душ');
 const rng = key => LOOT.makeRng(LOOT.seedOf(key));   // заглушка серверного сида
 const fidOf = (race, step) => race + '#' + step;
@@ -244,20 +299,24 @@ const boxName = (box, r) => `${LBX.boxes[box].n} · ${LBX.boxRarity[r - 1]}`;
 const freeCount = () => S.echo.slots.filter((x, i) => !x && !S.ech.pending[i]).length;
 const freeSlot = () => S.echo.slots.findIndex((x, i) => !x && !S.ech.pending[i]);
 const bioCap = () => RX.drops.activeSlots.byCycle[S.acc.cycle - 1] || RX.drops.activeSlots.byCycle[0];   // по одному на цикл (ADR-0014)
-const bioRuns = () => S.runs.filter(r => !r.over).length;
-const bioUsed = () => bioRuns() + S.ech.biomes.length;   // руины и забеги делят одни слоты (ADR-0023, п. 5)
+const bioRuns = () => S.runs.filter(r => !r.over && r.kind !== 'echo').length;   // атака Эхо — не забег: слот биомов не занимает; забег биома Многоликого — занимает
+const bioUsed = () => bioRuns() + S.ech.biomes.length;   // руины, биомы Многоликого и забеги делят одни слоты (ADR-0023, п. 5)
 
 /* ================== враги ================== */
 function stepFoe(fid) {
-  const [race, n] = String(fid).split('#'), civ = ECH.civ[race], step = +n, row = civ && civ.foes[step - 1];
+  const [race, n] = String(fid).split('#'), civ = ECH.civ[race], step = +n;
+  if (step === MANY) return civ ? manyFoe(race) : null;
+  const row = civ && civ.foes[step - 1];
   return row ? { fid, race, step, g: STEPS[step - 1], n: row[0], el: row[1], cls: row[2], look: row[3] } : null;
+}
+/* Многоликий — пятнадцатая ступень: лёгкий бой один на один, за победу — ресурс «Многоликий» (ADR-0025). Имя видно всегда — это предмет */
+function manyFoe(race, el) {
+  const it = BAG.item('many'), u = stepFoe(fidOf(race, TOP)), d = dataFoe({ fid: 'many', race }) || {};
+  return { fid: 'many', race, step: MANY, g: 'm', n: it ? it.n : ECH.rank.m, el: el || d.el || u.el, cls: d.cls || ECH.rank.m, look: d.look || (it ? it.lore : ''), named: true };
 }
 /* враг по id: ступень «раса#N», 'many' — Многоликий, id крафтового босса; sl — цель в слоте, если есть */
 function foe(fid, sl) {
-  if (fid === 'many') {
-    const it = BAG.item('many'), race = sl ? sl.race : weekOf(S).race, u = stepFoe(fidOf(race, TOP));
-    return { fid, race, step: MANY, g: 'm', n: it.n, el: sl ? sl.el : u.el, cls: ECH.rank.m, look: it.lore, named: true };
-  }
+  if (fid === 'many') return manyFoe(sl ? sl.race : weekOf(S).race, sl && sl.el);
   const fb = CBOSS[fid];
   if (fb) {
     const face = sl && sl.face ? stepFoe(sl.face) : null, call = BAG.item(fb.call);
@@ -268,23 +327,134 @@ function foe(fid, sl) {
 const nameOf = f => f.named || kn(f.fid) ? f.n : 'Неизвестный противник';
 const shortOf = f => f.named || kn(f.fid) ? f.n : 'Неизвестный';
 const rankIc = g => g === 'e' ? ic('gem') : g === 'm' ? ic('users') : g === 'o' ? '' : ic('crown');
-const rankOf = f => f.g === 'craft' ? `${ECH.rank.craft} · цикл ${ROMAN[f.cyc]}` : `${ECH.rank[f.g]} · ступень ${f.step}`;
-/* заглушка облика: свет стихии снизу, рамка — по рангу; до первой победы — знак вопроса */
-const ph = (f, cls = '') => `<span class="ech-ph ${cls} ${kn(f.fid) ? '' : 'unk'}" data-el="${f.el || ''}" data-g="${f.g}"><b>${kn(f.fid) ? rsInit(f.n) : '?'}</b></span>`;
+const rankOf = f => f.g === 'craft' ? `${ECH.rank.craft} · цикл ${ROMAN[f.cyc]}${f.fb && f.fb.powerCycleStep ? ` · сила цикла ${ROMAN[f.cyc + f.fb.powerCycleStep] || f.cyc + f.fb.powerCycleStep}` : ''}` : `${ECH.rank[f.g]} · ступень ${f.step}`;
+/* арт недели (ADR-0025): портреты ступеней 1–15 и фон арены; нет арта — заглушка */
+const artOf = race => ECH.art[race] || null;
+const faceArt = f => { const A = artOf(f.race), st = f.fid === 'many' ? MANY : f.step; return A && f.g !== 'craft' && st >= 1 && st <= MANY ? AV(A.faces + String(st).padStart(2, '0') + '.jpg') : ''; };
+const arenaOf = race => artOf(race) ? AV(artOf(race).arena) : null;
+/* облик врага: портрет недели или заглушка — свет стихии снизу, рамка по рангу; до первой победы — знак вопроса, портрет в тумане */
+const ph = (f, cls = '') => {
+  const k = kn(f.fid) || f.named, img = faceArt(f);
+  return `<span class="ech-ph ${cls} ${k ? '' : 'unk'} ${img ? 'art' : ''}" data-el="${f.el || ''}" data-g="${f.g}">${img ? `<img src="${img}" alt="">` : ''}<b>${k ? rsInit(f.n) : '?'}</b></span>`;
+};
+
+/* ================== бой Эхо (ADR-0025) ==================
+   Атака — бой ядром (EB.echoBattle): главный враг и защитники на одной арене, раунды по типу главного врага; Многоликий — один.
+   Карты — из echo-foes.js, если он подключён: ранг, набор, обычная атака по всем, защитники. Чего там нет — демо ECH.fight:
+   характеристики образца Мастерской того же класса, набор из общей библиотеки по классу, стихии и рангу (ADR-0016).
+   Раса врага — раса его цивилизации: по ней работает расовая неприязнь героев Эхо (ADR-0024). */
+const FT = ECH.fight;
+let libAdded = null;
+const ensureLib = () => { const X = XF(); if (X && X.abilities && libAdded !== X) { EB.addLib(X.abilities); libAdded = X; } };   // уникальные способности Убер-боссов
+const roundsOf = g => { const t = typeRule(g); return t && Number.isInteger(t.rounds) ? t.rounds : EB.RULES.echo.rounds[g]; };
+const coreRank = g => { const t = typeRule(g); return t && t.rank || FT.rank[g] || 'o'; };
+const immOf = g => EB.RULES.resist[coreRank(g)] || 0;   // иммунитет к контролю по рангу (ADR-0010)
+/* уровень врагов: данные режима по ступени и циклу, иначе демо — от первой до последней ступени цикла поровну; Многоликий — лёгкий */
+function lvlOf(step, c) {
+  const v = ruleOf(step, 'foeLvl', c); if (v) return v;
+  const cyc = (arr, k) => k <= arr.length ? arr[k - 1] : arr[arr.length - 1] + (arr[arr.length - 1] - arr[arr.length - 2]) * (k - arr.length);
+  const L = FT.lvl, a = cyc(L.first, c), z = cyc(L.last, c), s = step === MANY ? FT.manyLvlStep : Math.min(step || TOP, TOP);
+  return a + Math.floor((z - a) * (s - 1) / (TOP - 1));
+}
+/* образец Мастерской того же класса: рядовой — у рядовых, остальные — у элит; без класса — босс биома */
+const tplOf = (cls, g) => {
+  const sf = XR() && XR().statsFrom, id = sf && sf[g === 'o' ? 'o' : 'x'] ? sf[g === 'o' ? 'o' : 'x'][cls] : null;
+  if (id && EB.FOES[id]) return EB.FOES[id];
+  const r = g === 'o' ? 'o' : 'e'; return Object.values(EB.FOES).find(f => f.cls === cls && f.rank === r) || EB.FOES.b1;
+};
+/* демо-набор врага из общей библиотеки: школа — стихия, приёмы — по классу, число и доли хода — по рангу (ADR-0016) */
+function demoKit(cls, el, rank) {
+  const L = EB.lib(), school = el && L[el + '.dmg.one'] ? el : FT.noSchool, K = FT.kinds[cls] || FT.kinds[FT.craftCls];
+  const [actPct, ultPct] = FT.share[rank] || FT.share.o, pick = (list, n) => list.map(k => school + '.' + k).filter(id => L[id]).slice(0, n);
+  const acts = pick(K.filter(k => !k.startsWith('ult.')), FT.acts[rank] || 0), ults = pick(K.filter(k => k.startsWith('ult.')), FT.ults[rank] || 0);
+  return { rank, actPct, ultPct, kit: acts.map(id => ({ v: 0, slot: 'act', id })).concat(ults.map(id => ({ v: 0, slot: 'ult', id }))) };
+}
+/* карта врага из echo-foes.js: «раса#ступень», Многоликий — ступень 15; крафтовых боссов там нет */
+function dataFoe(f) {
+  const X = XF(), st = f.fid === 'many' ? MANY : f.step;
+  return X && X.foes && st ? X.foes[fidOf(f.race, st)] || null : null;
+}
+/* класс карты в ядре: из данных; у Многоликого без данных — класс Убер-босса недели, у крафтового босса — класс его лица или «Босс» */
+function clsOf(f, d) {
+  if (d && EB.RULES.cls[d.cls]) return d.cls;
+  if (EB.RULES.cls[f.cls]) return f.cls;
+  if (f.g === 'm') { const u = stepFoe(fidOf(f.race, TOP)); return u ? u.cls : FT.craftCls; }
+  return f.face && EB.RULES.cls[f.face.cls] ? f.face.cls : FT.craftCls;
+}
+/* карта ядра: f — враг экрана, k — место в колоде, 0 — главный враг. hp — { max, hp } главного врага цели Эхо: шкала здоровья Эхо;
+   без неё главный враг полный — этаж биома Многоликого: здоровье по образцу × FT.biome.mainHpPct */
+function unitOf(f, k, lvl, hp) {
+  const d = dataFoe(f) || {}, cls = clsOf(f, d), tp = tplOf(cls, f.g), rank = d.rank || coreRank(f.g), main = k === 0;
+  const kit = d.kit ? { rank, actPct: d.actPct, ultPct: d.ultPct, kit: d.kit } : demoKit(cls, d.el || f.el, rank);
+  const u = { key: `ech:${f.fid}#${k}`, id: 'ech:' + f.fid, name: f.n, cls, el: d.el || f.el, lvl, st: d.st || tp.st, race: f.race, rank, kit };
+  if (d.basic) u.basic = d.basic; else if (main && f.g === 'u' && !d.kit) u.basicAll = FT.uberAll;   // Убер-босс демо: атака по всем
+  if (main && hp) { u.maxHp = hp.max; u.hp = hp.hp; u.used = (hp.used || []).slice(); }   // «раз за жизнь» цели — между атаками, как здоровье
+  else u.hpPct = main ? Math.floor((d.hpPct || tp.hpPct) * FT.biome.mainHpPct / 100) : d.hpPct || tp.hpPct;
+  return u;
+}
+/* защитники: из echo-foes.js (def) или демо — ранги по типу главного врага, ступени — по кругу от его ступени, без повторов.
+   Сколько — правило ядра по типу врага: у Многоликого их нет */
+function guardsOf(x, main, lvl) {
+  const need = EB.RULES.echo.guards[x.g] || 0, race = ECH.civ[main.race] ? main.race : weekOf(S).race;
+  if (!need) return [];
+  const d = dataFoe(main);
+  if (d && Array.isArray(d.def) && d.def.length === need && d.def.every(fid => stepFoe(fid))) return d.def.map((fid, k) => unitOf(stepFoe(fid), k + 1, lvl));
+  const used = new Set([x.step]), out = [];
+  [...(FT.guards[x.g] || FT.guards.o)].slice(0, need).forEach((g, k) => {
+    const all = STEPS.map((gg, j) => j + 1).filter(st => STEPS[st - 1] === g), free = all.filter(st => !used.has(st));
+    const st = free.length ? free[((x.step || TOP) + k) % free.length] : all[k % all.length];
+    used.add(st); out.push(unitOf(stepFoe(fidOf(race, st)), k + 1, lvl));
+  });
+  return out;
+}
+/* неприязнь героя Эхо (ADR-0024): его раса недели и прибавка из состава героев; у героя прототипа — своя, если задана */
+function heroAvers(h) {
+  if (h.avers) return h.avers;
+  const r = h.draft ? RS.heroes.find(e => e.src === 'echo' && e.team && e.team.draft === h.draft) : null;
+  return r && r.avers && r.avers.race ? { race: r.avers.race, bp: r.avers.bp != null ? r.avers.bp : RS.rules.aversionBp } : null;
+}
+/* герой отряда: герой прототипа (S.heroes) или герой Эхо из echo-foes.js — демо-режим «отряд недели» */
+const echoHero = id => { const X = XF(); return X && X.heroes ? X.heroes[id] || null : null; };
+function echoHeroSrc(id, lvl, valor) {
+  const h = echoHero(id), cls = FT.heroCls[h.cls] || h.cls;
+  return { key: id, id, name: h.name, cls, el: h.el, lvl, st: FT.heroSt[cls] || FT.heroSt['Танк'], valor: valor != null ? valor : h.maxV,
+    kit: { actPct: h.actPct, ultPct: h.ultPct, rarity: h.rarity, kit: h.kit }, avers: h.avers || null };
+}
+const heroesOf = (ids, lvl) => ids.map(id => H(id) ? Object.assign(EB.heroSrc(H(id)), { avers: heroAvers(H(id)) }) : echoHeroSrc(id, lvl));
+/* облик героев Эхо в бою: у них нет портретов прототипа — лицо из состава героев */
+function lookHeroes(ids) { for (const id of ids) if (!H(id) && RSI[id]) FOE_LOOK[id] = { known: true, face: rsFace(RSI[id]) }; }
+/* отряд атаки Эхо: сохранённый отряд или, в демо, отряд недели — пятеро героев Эхо своей цивилизации (ADR-0024) */
+const weekSquad = race => { const W = RS.weeks.find(w => w.race === race); return W && W.squad.every(id => echoHero(id)) ? W.squad.slice() : null; };
+const attackIds = x => S.ech.weekSquad && weekSquad(x.race) ? weekSquad(x.race) : sq(S.echoSquad).m.filter(Boolean);
+/* всё для боя одной атаки: герои отряда, главный враг, защитники, предел раундов и сид (заглушка серверного).
+   Сила пробуждённого крафтового босса — как у крафтового босса на powerCycleStep циклов выше (recipes.js) */
+function fightOf(x, ids, no) {
+  ensureLib();
+  const main = foe(x.fid, x), c = x.pcyc || x.cyc || S.acc.cycle, lvl = lvlOf(x.step || TOP, c);
+  const m = unitOf(main, 0, lvl, { max: x.max, hp: x.hp, used: x.used });
+  return { main, heroes: heroesOf(ids, lvl), o: { seed: EB.seedOf(`эхо|${x.race}|бой|${x.uid}|${no}`), g: x.g, maxRounds: roundsOf(x.g), main: m, guards: guardsOf(x, main, lvl) } };
+}
+/* облик врагов в бою: изученность — на момент боя, чтобы просмотр не выдал исход; портрет — арт недели или заглушка */
+function lookUp(o, main) {
+  const put = (u, f) => { FOE_LOOK[u.id] = { known: !!(f.named || kn(f.fid)), face: ph(f, 'bt') }; };
+  put(o.main, main);
+  o.guards.forEach(u => put(u, stepFoe(u.id.slice(4)) || main));
+}
 
 /* ================== состояние ================== */
 function target(s, kind, x, o = {}) {
+  if (kind === 'step' && x === MANY) kind = 'many';   // пятнадцатая ступень лестницы — Многоликий
   const W = weekOf(s), c = s.acc.cycle, base = { uid: 'ech' + (++s.ech.seq), kind, race: W.race, cyc: c, atk: 0 };
   if (kind === 'step') {
-    const f = stepFoe(fidOf(W.race, x)), max = at(ECH.hp[x - 1], c);
+    const f = stepFoe(fidOf(W.race, x)), max = hpOf(x, c);
     return { ...base, fid: f.fid, step: x, g: f.g, el: f.el, bm: at(ECH.bm[x - 1], c), max, hp: o.hpBp ? Math.max(1, Math.floor(max * o.hpBp / BP)) : max, left: (o.leftH || ECH.lifeH[f.g]) * ECH.hour };
   }
   if (kind === 'many') {
-    const u = stepFoe(fidOf(W.race, TOP)), max = at(ECH.many.hp, c);
+    const u = manyFoe(W.race), max = hpOf(MANY, c);
     return { ...base, fid: 'many', step: MANY, g: 'm', el: u.el, bm: at(ECH.many.bm, c), max, hp: max, left: ECH.lifeH.m * ECH.hour };
   }
-  const fb = x, face = fb.id === 'lik' ? likFace(s, W, base.uid) : '', max = at(ECH.craft.hp, fb.cyc);
-  return { ...base, fid: fb.id, step: 0, g: 'craft', race: face ? W.race : fb.race, el: face ? stepFoe(face).el : '', face, cyc: fb.cyc, bm: at(ECH.craft.bm, fb.cyc), max, hp: max, left: ECH.lifeH.craft * ECH.hour };
+  const fb = x, pc = fb.cyc + (fb.powerCycleStep || 0), face = fb.id === 'lik' ? likFace(s, W, base.uid) : '', max = at(ECH.craft.hp, pc);   // пробуждённый — сила цикла выше
+  return { ...base, fid: fb.id, step: 0, g: 'craft', race: face ? W.race : fb.race, el: face ? stepFoe(face).el : '', face, cyc: fb.cyc, pcyc: pc, bm: at(ECH.craft.bm, pc), max, hp: max, left: ECH.lifeH.craft * ECH.hour };
 }
 /* Лик недели носит лицо врага недели: из изученных, иначе из всех четырнадцати */
 function likFace(s, W, uid) {
@@ -293,7 +463,7 @@ function likFace(s, W, uid) {
 }
 function fresh(s) {
   const W = weekOf(s), dm = ECH.demo;
-  s.ech = { wk: W.race, avail: 1, seq: 0, known: {}, pending: {}, biomes: [], cb: null, claimed: {}, ops: {}, wide: true, last: null, note: '' };
+  s.ech = { wk: W.race, avail: 1, seq: 0, known: {}, pending: {}, biomes: [], cb: null, claimed: {}, ops: {}, wide: true, last: null, note: '', manyWk: {} };
   s.echo.slots = Array.from({ length: ECH.slots }, () => null); s.echo.sel = 0; s.echo.score = 0;
   if (W.race !== dm.week) return;
   s.ech.avail = dm.avail; s.echo.score = dm.score; s.echo.place = dm.place;
@@ -303,18 +473,21 @@ function fresh(s) {
 /* новая неделя сбрасывает лестницу и цели недели (§17.4); цель с вышедшим сроком уходит без очков (§17.3) */
 function sync() {
   if (!S.ech) fresh(S);
+  S.ech.manyWk = S.ech.manyWk || {};
   const W = weekOf(S), E = S.echo;
   if (S.ech.wk !== W.race) {
     S.ech.wk = W.race; S.ech.avail = 1; E.score = 0; S.ech.claimed = {}; S.ech.pending = {};
     E.slots = E.slots.map(x => x && x.kind === 'craft' ? x : null);
+    S.ech.biomes = S.ech.biomes.filter(b => !b.many);   // биом Многоликого привязан к своей неделе
+    if (S.ech.cb && !S.ech.biomes.some(b => b.uid === S.ech.cb)) S.ech.cb = null;
     S.ech.note = `Неделя ${W.gen}: лестница сброшена, цели прошлой недели ушли.`;
   }
   E.slots.forEach((x, i) => { if (x && x.left <= 0) { E.slots[i] = null; S.ech.note = `Срок цели в слоте ${i + 1} вышел: она ушла без очков, души не вернулись.`; } });
   if (!(E.sel >= 0 && E.sel < E.slots.length)) E.sel = 0;
 }
-/* призыв: N разных ступеней из открытых, вес по ступени (§17.4) */
+/* призыв: N разных ступеней из открытых, вес по ступени (§17.4); после Убер-босса открыта пятнадцатая — Многоликий */
 function draw(avail, n, key) {
-  const roll = rng(key), pool = STEPS.slice(0, avail).map((g, j) => j + 1), out = [];
+  const roll = rng(key), pool = Array.from({ length: Math.min(avail, MANY) }, (_, j) => j + 1), out = [];
   while (out.length < n && pool.length) {
     let r = roll(pool.reduce((a, st) => a + ECH.pickW[st - 1], 0)), k = 0;
     while (r >= ECH.pickW[pool[k] - 1]) { r -= ECH.pickW[pool[k] - 1]; k++; }
@@ -328,13 +501,10 @@ function planks(W, c) {
   if (!ly || c < EM.from) return [];
   return ly.rows.map((row, j) => { const need = ECH.plankBase * row.x * ipow(XE.pointsCycleMul, c - EM.from); return { k: j + 1, need, pay: row.cyc[c] || [], reached: S.echo.score >= need, claimed: !!S.ech.claimed[j + 1] }; });
 }
-/* расовая неприязнь героев Эхо в отряде: +N % урона по расе своей недели (ADR-0024, п. 4) */
+/* расовая неприязнь героев Эхо в отряде: +N % урона по расе своей недели (ADR-0024, п. 4) — та же, что уходит в бой (heroAvers) */
 function aversIn(s, race) {
   let n = 0, bp = 0;
-  s.m.filter(Boolean).forEach(id => {
-    const h = H(id), r = h && h.draft ? RS.heroes.find(x => x.src === 'echo' && x.team && x.team.draft === h.draft) : null;
-    if (r && r.avers && r.avers.race === race) { n++; bp = r.avers.bp != null ? r.avers.bp : RS.rules.aversionBp; }
-  });
+  s.m.filter(Boolean).forEach(id => { const a = H(id) ? heroAvers(H(id)) : null; if (a && a.race === race) { n++; bp = a.bp != null ? a.bp : RS.rules.aversionBp; } });
   return { n, bp };
 }
 
@@ -379,9 +549,9 @@ function summonHtml(i) {
 }
 function pickHtml(i, p, c) {
   const rows = p.offers.map(st => {
-    const f = stepFoe(fidOf(S.ech.wk, st)), a = atkCost(f.g);
+    const f = stepFoe(fidOf(S.ech.wk, st)), a = atkCost({ step: st, g: f.g, cyc: c });
     return `<div class="ech-offer">${ph(f, 'sm')}<span class="col" style="gap:3px;min-width:0"><b class="serif">${shortOf(f)}</b><span class="row" style="gap:4px"><span class="chip ${f.g === 'o' ? '' : 'gold'}">${rankIc(f.g)}${ECH.short[f.g]} · ${st}</span>${el(f.el)}</span></span>
-      <span class="ech-om"><small class="num">мощь ${fmt(at(ECH.bm[st - 1], c))}</small><small class="num">здоровье ${fmt(at(ECH.hp[st - 1], c))}</small><small class="ech-om3">${ECH.lifeH[f.g]} ч · атака ${a} ${souls(a)}</small></span>
+      <span class="ech-om"><small class="num">мощь ${fmt(bmOf(st, c))}</small><small class="num">здоровье ${fmt(hpOf(st, c))}</small><small class="ech-om3">${ECH.lifeH[f.g]} ч · атака ${a} ${souls(a)} · ${roundsOf(f.g)} ${plural(roundsOf(f.g), 'раунд', 'раунда', 'раундов')}</small></span>
       <button class="btn sm go" data-a="echpick" data-v="${i}:${st}">Выбрать</button></div>`;
   }).join('');
   return `<div class="pnl etarget ech-pick">
@@ -390,8 +560,8 @@ function pickHtml(i, p, c) {
   </div>`;
 }
 function foeHtml(i, x, c) {
-  const f = foe(x.fid, x), cost = atkCost(x.g), s = sq(S.echoSquad), av = aversIn(s, x.race);
-  const chips = `<span class="chip ${x.g === 'o' ? '' : 'gold'}">${rankIc(x.g)}${rankOf(f)}</span>${x.el ? el(x.el) : ''}${f.fb ? `<span class="chip" title="Иммунитет к контролю по рангу крафтового босса">иммунитет ${pctBp(f.fb.immunityBp)}</span>` : ''}${x.g === 'm' ? '<span class="chip warn">правила — черновик</span>' : ''}<span class="chip warn" title="Ядра боя для Эхо ещё нет: урон атаки — демо на сиде">демо-урон</span>`;
+  const f = foe(x.fid, x), cost = atkCost(x), s = sq(S.echoSquad), av = aversIn(s, x.race), rn = roundsOf(x.g), imm = f.fb ? f.fb.immunityBp : immOf(x.g);
+  const chips = `<span class="chip ${x.g === 'o' ? '' : 'gold'}">${rankIc(x.g)}${rankOf(f)}</span>${x.el ? el(x.el) : ''}${imm ? `<span class="chip" title="Иммунитет к контролю по рангу (ADR-0010)">иммунитет ${pctBp(imm)}</span>` : ''}${x.g === 'm' ? '<span class="chip warn">правила — черновик</span>' : ''}<span class="chip" title="Бой ядром, как в биомах: один этаж, главный враг и четыре защитника (ADR-0025)">${ic('hour')}${rn} ${plural(rn, 'раунд', 'раунда', 'раундов')}</span>`;
   const reward = x.g === 'craft' ? `<div class="stat"><b>лут</b><small>${f.fb.workerBoxRarity ? 'ресурсы и сундук' : 'осколки героев'}</small></div>`
     : c >= EM.from ? `<div class="stat"><b>${fmt(ptsOf(x.step, c))}</b><small>очков за победу</small></div>` : '<div class="stat"><b>—</b><small>обучение без очков</small></div>';
   return `<div class="pnl etarget">
@@ -402,19 +572,26 @@ function foeHtml(i, x, c) {
       <div class="col" style="gap:3px">${bar(hpPct(x), 'hp lg')}<div class="row faint ech-hp"><span class="num">${fmt(x.hp)} / ${fmt(x.max)}</span><span>здоровье сохраняется между атаками</span></div></div>
       <div class="row ech-stats"><div class="stat"><b>${fmt(x.bm)}</b><small>боевая мощь</small></div><div class="stat"><b class="num" data-ech-t="${i}">${dur(x.left)}</b><small>до исчезновения</small></div>${reward}<button class="link" data-a="echfoe" data-v="${x.fid}" style="margin-left:auto">Сведения ${ic('chev')}</button></div>
       <div class="e-foot">
-        <div class="row"><div class="faces">${s.m.filter(Boolean).map(id => `<img src="${H(id).img}" alt="${H(id).name}">`).join('')}</div><span class="faint num ech-sq">${s.name} · ${fmt(sqBM(s))}${av.n ? ' · неприязнь +' + pctBp(av.bp) : ''}</span><button class="link" data-a="sheet" data-v="prep:echo" style="margin-left:auto">Изменить</button></div>
-        <button class="btn go big" data-a="echatk" title="Цена атаки — прежняя сетка §17.5, ждёт баланса">Атаковать${costTag('souls', cost)}</button>
-        <p class="reason ech-why">Цена атаки — прежняя сетка §17.5, ждёт баланса. Урон — демо: ядра боя для Эхо нет.</p>
+        ${squadLine(x, s, av)}
+        <button class="btn go big" data-a="echatk" data-v="${x.uid}:${x.atk + 1}" title="Бой ядром: исход решён при оплате, просмотр можно пропустить">Атаковать${costTag('souls', cost)}</button>
+        <p class="reason ech-why">Бой ядром: ${rn} ${plural(rn, 'раунд', 'раунда', 'раундов')}, ${EB.RULES.echo.guards[x.g] ? 'главный враг и защитников ' + EB.RULES.echo.guards[x.g] : 'один на один'}; «Пропустить» — сразу итог. ${XR() ? 'Цена атаки — данные режима.' : 'Цена атаки — прежняя сетка §17.5, ждёт баланса.'}</p>
       </div>
     </div></div>`;
+}
+/* отряд атаки у цели: сохранённый отряд прототипа или, в демо, отряд недели — герои Эхо своей цивилизации с неприязнью */
+function squadLine(x, s, av) {
+  const wk = S.ech.weekSquad && weekSquad(x.race);
+  if (!wk) return `<div class="row"><div class="faces">${s.m.filter(Boolean).map(id => `<img src="${H(id).img}" alt="${H(id).name}">`).join('')}</div><span class="faint num ech-sq">${s.name} · ${fmt(sqBM(s))}${av.n ? ' · неприязнь +' + pctBp(av.bp) : ''}</span><button class="link" data-a="sheet" data-v="prep:echo" style="margin-left:auto">Изменить</button></div>`;
+  const hs = wk.map(id => RSI[id]).filter(Boolean), a = hs.find(h => h.avers && h.avers.race === x.race);
+  return `<div class="row"><div class="faces ech-wf">${hs.map(h => `<span class="rs-av" title="${h.n}">${rsFace(h)}</span>`).join('')}</div><span class="faint num ech-sq">Отряд недели · демо · уровень врагов${a ? ' · неприязнь +' + pctBp(a.avers.bp != null ? a.avers.bp : RS.rules.aversionBp) : ''}</span><button class="link" data-a="echwsq" style="margin-left:auto">Свой отряд</button></div>`;
 }
 function ladderHtml(W) {
   const inSlot = new Set(S.echo.slots.filter(x => x && x.kind !== 'craft' && x.race === W.race).map(x => x.step));
   const cells = STEPS.map((g, j) => { const st = j + 1, f = stepFoe(fidOf(W.race, st)), k = kn(f.fid); return `<i class="${g === 'o' ? '' : g} ${st <= S.ech.avail ? 'av' : ''} ${st === S.ech.avail ? 'top' : ''} ${k ? 'kn' : ''} ${inSlot.has(st) ? 'on' : ''}" title="Ступень ${st} · ${ECH.rank[g]}${k ? ' · ' + f.n : ''}${st > S.ech.avail ? ' · закрыта' : ''}"></i>`; }).join('');
   const nk = STEPS.filter((g, j) => kn(fidOf(W.race, j + 1))).length + (kn('many') ? 1 : 0);
   return `<div class="pnl ladder14 ech-ladder"><span class="eyebrow" style="white-space:nowrap">Лестница недели</span>
-    <div class="l14" aria-label="Открыто ступеней: ${S.ech.avail} из ${TOP}">${cells}<span class="sep"></span><i class="m ${kn('many') ? 'kn' : ''} ${inSlot.has(MANY) ? 'on' : ''}" title="Ступень ${MANY} · Многоликий — из запасов, правила — черновик"></i></div>
-    <span class="faint num ech-lt">${S.ech.avail} / ${TOP} · победа над верхней открывает следующую</span>
+    <div class="l14" aria-label="Открыто ступеней: ${S.ech.avail} из ${TOP}">${cells}<span class="sep"></span><i class="m ${MANY <= S.ech.avail ? 'av' : ''} ${MANY === S.ech.avail ? 'top' : ''} ${kn('many') ? 'kn' : ''} ${inSlot.has(MANY) ? 'on' : ''}" title="Ступень ${MANY} · Многоликий — лёгкий бой один на один, за победу — ресурс «Многоликий»${MANY > S.ech.avail ? ' · откроется после Убер-босса' : ''}"></i></div>
+    <span class="faint num ech-lt">${Math.min(S.ech.avail, TOP)} / ${TOP}${S.ech.avail >= MANY ? ' · Многоликий открыт' : ' · победа над верхней открывает следующую'}</span>
     <button class="link" data-a="echbest">${ic('book')}Бестиарий ${nk}/${MANY}</button></div>`;
 }
 SCREENS.echo = function () {
@@ -424,19 +601,60 @@ SCREENS.echo = function () {
   return { title: 'Эхо', back: 'week', chip: weekChip(), html: `<section class="scr ech">${headHtml(W, c)}<div class="ec">${slotsHtml()}${tgt}</div>${ladderHtml(W)}</section>` };
 };
 
-/* ================== победа и добыча ================== */
-function win(i, x) {
-  const f = foe(x.fid, x), c = S.acc.cycle, first = !kn(x.fid), loot = [];
+/* ================== атака: бой, итог, победа ==================
+   Как на сервере (§17.3, §36): оплата → бой ядром целиком на сиде → здоровье цели, очки, бестиарий, лестница и добыча —
+   всё решено до показа. Просмотр идёт на экране боя одной сценой; «Пропустить» и конец просмотра только открывают итог.
+   Атака имеет номер: повтор того же номера ничего не списывает и не начисляет. */
+function resolveAttack(i, x, ids, no) {
+  const F = fightOf(x, ids, no);
+  lookUp(F.o, F.main); lookHeroes(ids);   // изученность — до итога: просмотр не выдаёт, кто падёт
+  const res = EB.echoStats(EB.run(EB.echoBattle(F.heroes, F.o)));
+  const L = { run: '', uid: x.uid, slot: i, no, fid: x.fid, sl: { race: x.race, el: x.el, face: x.face }, g: x.g, step: x.step, kind: x.kind, cyc: S.acc.cycle,
+    cost: atkCost(x), hp0: x.hp, max: x.max, res, kill: res.killed, pts: 0, first: false, opened: 0, loot: [], ids: ids.slice() };
+  x.hp = res.main.hp; x.used = res.main.used;   // здоровье и сработавшее «раз за жизнь» сохраняются между атаками (§17.3)
+  if (res.killed) winApply(i, x, L);
+  L.score = S.echo.score;
+  S.ech.last = L;
+  return { F, L };
+}
+/* победа: очки, запись бестиария, ступень лестницы, добыча; слот освобождается */
+function winApply(i, x, L) {
+  const f = foe(x.fid, x), c = S.acc.cycle;
+  L.first = !kn(x.fid);
   S.ech.known[x.fid] = true;
-  const pts = x.kind === 'craft' ? 0 : ptsOf(x.step, c);
-  S.echo.score += pts;
-  let opened = 0;
-  if (x.kind === 'step' && x.race === S.ech.wk && x.step === S.ech.avail && S.ech.avail < TOP) opened = ++S.ech.avail;   // лестница растёт после сильнейшего доступного (§17.4)
-  if (x.g === 'u') { BAG.add(XE.uber.item, XE.uber.count); loot.push({ k: 'item', id: XE.uber.item, n: XE.uber.count }); }   // пятнадцатая ступень — добыча Убер-босса
-  if (x.kind === 'craft') craftLoot(x, f, loot);
+  L.pts = x.kind === 'craft' ? 0 : ptsOf(x.step, c);
+  S.echo.score += L.pts;
+  if (x.kind === 'step' && x.race === S.ech.wk && x.step === S.ech.avail && S.ech.avail < MANY) L.opened = ++S.ech.avail;   // лестница растёт после сильнейшего доступного (§17.4); после Убер-босса — Многоликий
+  if (x.g === 'm') {   // победа над Многоликим — ресурс «Многоликий», привязанный к своей неделе (ADR-0025)
+    BAG.add(XE.uber.item, XE.uber.count); S.ech.manyWk[x.race] = (S.ech.manyWk[x.race] || 0) + XE.uber.count;
+    L.loot.push({ k: 'item', id: XE.uber.item, n: XE.uber.count });
+  }
+  if (x.kind === 'craft') craftLoot(x, f, L.loot);
   S.echo.slots[i] = null;
-  S.ech.last = { uid: x.uid, slot: i, fid: x.fid, sl: { race: x.race, el: x.el, face: x.face }, g: x.g, step: x.step, cyc: c, pts, first, opened, loot };
-  S.overlay = { t: 'echwin', arg: x.uid }; render(); focusOverlay();
+}
+/* просмотр: тот же бой вторым экземпляром на том же сиде — ядро детерминировано, показ сходится с итогом. Сцена одна, арена биома */
+function play(F, L) {
+  S.runs = S.runs.filter(r => r.kind !== 'echo');   // просмотр Эхо один: прежний уже ничего не решает
+  const f = F.main, rn = F.o.maxRounds, b = EB.echoBattle(F.heroes, F.o), nm = nameOf(f);
+  const scene = { title: 'Эхо · ' + (L.kind === 'craft' ? 'крафтовый босс' : L.g === 'm' ? 'Многоликий' : 'ступень ' + L.step), sub: `атака ${L.no} · ${rn} ${plural(rn, 'раунд', 'раунда', 'раундов')}`,
+    short: 'Эхо · ' + (L.step || '★'), back: 'echo', skip: 'echskip', result: 'echres', bg: arenaOf(L.sl.race),   // арена недели, если её арт одобрен
+    badge: `<b>${ic('spark')}</b><span>Эхо</span>`,
+    chip: `<span class="chip ${L.g === 'o' ? '' : 'gold'}">${rankIc(L.g)}${nm}</span>${immOf(L.g) ? `<span class="chip" title="Иммунитет к контролю по рангу">иммунитет ${pctBp(L.kind === 'craft' && f.fb ? f.fb.immunityBp : immOf(L.g))}</span>` : ''}` };
+  const R = { id: 'r' + (++S.runNo), runNo: S.runNo, kind: 'echo', scene, seed: F.o.seed, squadId: S.echoSquad, squad: [], heroes: F.heroes, b,
+    floor: 1, startFloor: 1, demo: false, guard: false, mode: 'rounds', acted: [], fired: null, view: 0, runMs: 0, kills: 0,
+    loot: { gold: 0, spirit: 0, souls: 0, items: {} }, newKnown: [], over: false, seen: false, gap: 0, feed: [], disp: {}, curve: [],
+    lastActor: null, pending: 0, endAt: null, max0: b.maxRounds, done: echoDone, res: L,
+    banner: [nm, `${rankOf(f)} · ${F.o.guards.length ? 'защитников ' + F.o.guards.length : 'один на один'} · ${rn} ${plural(rn, 'раунд', 'раунда', 'раундов')}`] };
+  L.run = R.id;
+  syncDisp(R);
+  S.runs.push(R); S.focus = R.id; S.insp = null; S.overlay = null; S.route = 'battle';
+  render(); ensureLoop();
+}
+/* конец просмотра: итог поверх экрана Эхо — следующее действие рядом (§17.7) */
+function echoDone(R, vis) {
+  R.over = true;
+  if (vis) { R.seen = true; S.route = 'echo'; S.overlay = { t: 'echres', arg: R.id }; render(); focusOverlay(); }
+  else toast(`Эхо · атака ${R.res.no}: итог — в верхней строке`);
 }
 /* крафтовый босс: трофей, ключи своего ремесла, валюта, рунный ключ по шансу, сундук крафтового босса; Лик — осколки героев недели */
 function craftLoot(x, f, loot) {
@@ -475,13 +693,24 @@ function notReady(s, m, busy) {
 }
 
 /* ================== активации из запасов (§12.5, §17.1) ================== */
+/* Многоликий привязан к своей неделе (ADR-0025): победа записывает неделю, активировать можно только на ней.
+   Многоликие без записи — демо-запасы и крафт — считаются многоликими текущей недели */
+function manyFree(race) {
+  const it = BAG.item('many'); if (!it || !it.week) return BAG.qty('many');
+  const W = S.ech.manyWk || {}, other = Object.keys(W).filter(r => r !== race).reduce((a, r) => a + W[r], 0);
+  return Math.max(0, BAG.qty('many') - other);
+}
+function manyUse(race) { const W = S.ech.manyWk || (S.ech.manyWk = {}); if (W[race] > 0) W[race]--; }
 function checks(kind, it) {
   const c = S.acc.cycle, have = BAG.qty(it.id), cost = XE.summonSouls, out = [];
-  out.push({ ok: have > 0, t: have > 0 ? `В запасах: ${fmt(have)}` : 'В запасах нет' });
+  if (kind === 'echo') {
+    const W = weekOf(S), mine = manyFree(W.race);
+    out.push({ ok: mine > 0, t: mine > 0 ? `В запасах: ${fmt(have)} · этой недели: ${fmt(mine)}` : have > 0 ? `Многоликий другой недели: активируется только на своей` : 'В запасах нет' });
+  } else out.push({ ok: have > 0, t: have > 0 ? `В запасах: ${fmt(have)}` : 'В запасах нет' });
   out.push({ ok: it.cyc <= c, t: it.cyc <= c ? `Цикл ${ROMAN[it.cyc]} открыт — у вас ${ROMAN[c]}` : `Откроется в цикле ${ROMAN[it.cyc]} — у вас ${ROMAN[c]}` });
-  if (kind === 'act') {
+  if (kind === 'act' || kind === 'echo') {
     const cap = bioCap(), used = bioUsed();
-    out.push({ ok: used < cap, t: used < cap ? `Свободный слот биомов: занято ${used} из ${cap}` : `Слоты биомов заняты: ${used} из ${cap} — руины и забеги делят одни слоты` });
+    out.push({ ok: used < cap, t: used < cap ? `Свободный слот биомов: занято ${used} из ${cap}` : `Слоты биомов заняты: ${used} из ${cap} — руины, биомы Многоликого и забеги делят одни слоты` });
   } else {
     const free = freeCount();
     out.push({ ok: free > 0, t: free > 0 ? `Свободных слотов Эхо: ${free} из ${ECH.slots}` : `Все ${ECH.slots} ${plural(ECH.slots, 'слот', 'слота', 'слотов')} Эхо заняты` });
@@ -492,9 +721,10 @@ function checks(kind, it) {
 const RULES = {
   act: () => [`Руина займёт слот биомов, общий с забегами: по одному на цикл, сейчас ${bioCap()}.`, 'Этажи, враги и добыча откроются после активации.', 'Слот освободится, когда руину пройдут или покинут. Предмет не вернётся.'],
   call: () => ['Цель займёт слот Эхо; отменить её нельзя.', 'Кого зовёт предмет, станет известно после призыва; имя и повадки откроет первая победа.', `Срок цели — ${ECH.lifeH.craft} ч: не успели победить — уйдёт, предмет и душа не вернутся.`, 'В лестнице недели её нет.'],
-  echo: () => [`Встанет в слот Эхо пятнадцатой ступенью — после ${TOP} врагов недели.`, `Срок — ${ECH.lifeH.m} ч, отменить нельзя.`, 'Правила Многоликого — черновик: цена атаки и очки ждут решения автора.'],
+  echo: () => [`Биом встанет в слот биомов, общий с забегами: по одному на цикл, сейчас ${bioCap()}.`, `Этажи — ${TOP} врагов лестницы недели по ступеням: главный враг и защитники, раунды — по типу врага.`,
+    'Попытка одна: отряд пал или раунды вышли — биом закрыт. Души на атаки не тратятся, очки Эхо — за каждый взятый этаж.', 'Многоликий привязан к своей неделе. Его можно и не активировать, а отдать в крафт.'],
 };
-const ACT_T = { act: ['Активация руины', 'Активировать'], call: ['Призыв в Эхо', 'Призвать'], echo: ['Многоликий в Эхо', 'Призвать'] };
+const ACT_T = { act: ['Активация руины', 'Активировать'], call: ['Призыв в Эхо', 'Призвать'], echo: ['Биом Многоликого', 'Активировать'] };
 function ask(kind, id) {
   const it = BAG.item(id);
   if (!it || it.tier !== kind) return toast('Этот предмет так не активируется');
@@ -505,7 +735,7 @@ ACTIVATE.act = id => ask('act', id);
 ACTIVATE.call = id => ask('call', id);
 ACTIVATE.echo = id => ask('echo', id);
 
-/* ================== руины в «Спуске» ================== */
+/* ================== руины и биомы Многоликого в «Спуске» ================== */
 function ruinParts(cb) {
   const p = PLACE[cb.id], fb = CBOSS[p.boss.id], call = BAG.item(fb.call), k = kn(fb.id), row = it => `<div class="ech-irow">${itIcon(it, 32)}<span>${it.n}</span></div>`;
   return `<div class="ech-rgrid">
@@ -515,12 +745,17 @@ function ruinParts(cb) {
     <div class="col"><span class="eyebrow">За закрытие</span><div class="row ech-pay">${money('spirit', cb.spirit)}${money('gold', cb.gold)}${money('souls', cb.souls)}</div><small class="faint">осколков сборных героев ${cb.heroShards} · очков События ${cb.eventPoints} · рунный ключ ${pctBp(cb.runeKeyBp)} × ${cb.runeKeys}</small></div>
   </div>`;
 }
+const weekGen = race => { const W = RS.weeks.find(w => w.race === race); return W ? W.gen : race; };
 function ruinShaft() {
   const cap = bioCap(), runs = bioRuns(), used = runs + S.ech.biomes.length;
-  const nodes = S.ech.biomes.map(x => { const cb = CBIOME[x.cb]; return `<button class="bnode ruin" data-a="echcb" data-v="${x.uid}" aria-current="${x.uid === S.ech.cb}"><span>${cb.name}<small>руина · цикл ${ROMAN[cb.cyc]}</small></span></button>`; }).join('');
+  const nodes = S.ech.biomes.map(x => {
+    const lbl = x.many ? `Биом Многоликого<small>неделя ${weekGen(x.race)} · попытка одна</small>` : `${CBIOME[x.cb].name}<small>руина · цикл ${ROMAN[CBIOME[x.cb].cyc]}</small>`;
+    return `<button class="bnode ruin ${x.many ? 'ech-mb' : ''}" data-a="echcb" data-v="${x.uid}" aria-current="${x.uid === S.ech.cb}"><span>${lbl}</span></button>`;
+  }).join('');
   return `<div class="cyc ech-rs"><b title="Активные биомы">${ic('door')}</b><div><small class="ech-slots">Слоты биомов · ${used} из ${cap}${runs ? ` · ${runs} ${plural(runs, 'забег', 'забега', 'забегов')}` : ''}</small>${nodes || '<small class="ech-slots">Руин нет: их активируют из запасов</small>'}</div></div>`;
 }
 function ruinMain(x) {
+  if (x.many) return manyMain(x);
   const cb = CBIOME[x.cb], p = PLACE[cb.id];
   return `<div class="biome ech-ruin">
     <div class="banner plain">
@@ -534,6 +769,78 @@ function ruinMain(x) {
     </div>
     <div class="pnl ech-rbody"><p class="muted ech-where">${p.lore}</p>${ruinParts(cb)}</div>
   </div>`;
+}
+
+/* ================== биом Многоликого (ADR-0025, ответ автора 28.09.2026) ==================
+   Ресурс «Многоликий» активирует биом своей недели в слот биомов, как руину. Этажи — ступени лестницы 1–14: главный враг
+   и защитники, раунды — по типу врага; главный враг полный, отряд идёт на истощение, как в биоме. Попытка одна: этаж не взят —
+   отряд пал или раунды вышли — биом закрыт. Души на атаки не тратятся, очки Эхо — за каждый взятый этаж. Этаж взят, когда пал
+   главный враг — как цель в бою Эхо. */
+const manyStepFoe = (race, step) => stepFoe(fidOf(race, step));
+function manyMain(x) {
+  const W = RS.weeks.find(w => w.race === x.race) || weekOf(S), s = sq(S.prepSquad), free = s.m.filter(id => id && !busyNote(id)), c = x.cyc;
+  const total = STEPS.reduce((a, g, j) => a + floorPts(j + 1, c), 0), bg = arenaOf(x.race);
+  const rows = STEPS.map((g, j) => { const st = j + 1, f = manyStepFoe(x.race, st), rn = roundsOf(g); return `<div class="ech-mfl">${ph(f, 'sm')}<span class="col" style="gap:2px;min-width:0"><b>${shortOf(f)}</b><small class="faint">${ECH.short[g]} · ступень ${st} · ${rn} ${plural(rn, 'раунд', 'раунда', 'раундов')}</small></span><small class="num">${c >= EM.from ? '+' + fmt(floorPts(st, c)) : '—'}</small></div>`; }).join('');
+  return `<div class="biome ech-ruin ech-many">
+    <div class="banner ${bg ? '' : 'plain'}">${bg ? `<img src="${bg}" alt="" style="object-position:50% 40%">` : ''}
+      <div class="in">
+        <span class="eyebrow">Биом Многоликого · неделя ${W.gen} · занимает слот биомов</span>
+        <h2>${W.civ ? 'Многоликий · ' + W.civ : 'Многоликий'}</h2>
+        <p class="quote">Все враги лестницы недели, от первой ступени до Убер-босса. Попытка одна.</p>
+        <div class="facts"><div class="stat"><b>${TOP}</b><small>этажей</small></div><div class="stat"><b>${c >= EM.from ? fmt(total) : '—'}</b><small>очков за все этажи</small></div><div class="stat"><b>0</b><small>душ на атаки</small></div></div>
+      </div>
+      <div class="ech-cta"><button class="btn go big" data-a="echmany" data-v="${x.uid}" ${free.length ? '' : 'disabled'}>${ic('down')}Начать забег</button><span class="reason">${free.length ? `${s.name}: ${free.length} ${plural(free.length, 'герой', 'героя', 'героев')} · попытка одна` : `Весь «${s.name}» занят`}</span><button class="link" data-a="echcbx" data-v="${x.uid}">Покинуть биом ${ic('x')}</button></div>
+    </div>
+    <div class="pnl ech-rbody"><p class="muted ech-where">${c >= EM.from ? 'Очки Эхо — за каждый взятый этаж, сразу.' : `Цикл ${ROMAN[c]} — обучение: очков Эхо нет, они с цикла ${ROMAN[EM.from]}.`} Этаж взят, когда пал главный враг. Отряд идёт на истощение: здоровье и павшие переходят с этажа на этаж.</p><div class="ech-mfls">${rows}</div></div>
+  </div>`;
+}
+/* этаж биома: ступень лестницы — главный враг полный, защитники, раунды по типу; сид — заглушка серверного */
+function manyFloor(R) {
+  ensureLib();
+  const X = XF(), comp = X && X.manyBiome && X.manyBiome[R.week] ? X.manyBiome[R.week][R.floor - 1] : null;
+  const f = comp && stepFoe(comp.lead) || manyStepFoe(R.week, R.floor), step = f.step, lvl = lvlOf(step, R.cyc), x = { step, g: f.g, race: R.week, cyc: R.cyc };
+  const guards = comp && comp.foes.length === 1 + EB.RULES.echo.guards[f.g] && comp.foes.slice(1).every(fid => stepFoe(fid))
+    ? comp.foes.slice(1).map((fid, k) => unitOf(stepFoe(fid), k + 1, lvl)) : guardsOf(x, f, lvl);
+  const o = { seed: EB.seedOf(`эхо|${R.week}|многоликий|${R.uid}|${R.floor}`), g: f.g, maxRounds: roundsOf(f.g), main: unitOf(f, 0, lvl, null), guards };
+  lookUp(o, f);
+  R.b = EB.echoBattle(R.heroes, o); R.fl = f;   // отряд — со здоровьем и павшими прошлого этажа (carry)
+  R.banner = [`Этаж ${step}`, `${ECH.rank[f.g]} · ${nameOf(f)} · ${o.maxRounds} ${plural(o.maxRounds, 'раунд', 'раунда', 'раундов')}`];
+}
+function manyRun(x, ids) {
+  const W = RS.weeks.find(w => w.race === x.race) || weekOf(S);
+  const R = { id: 'r' + (++S.runNo), runNo: S.runNo, kind: 'many', week: x.race, cyc: x.cyc, uid: x.uid, squadId: S.prepSquad, squad: ids.slice(), heroes: heroesOf(ids),
+    floor: 1, startFloor: 1, demo: false, guard: false, mode: 'rounds', acted: [], fired: null, view: 0, runMs: 0, kills: 0,
+    loot: { gold: 0, spirit: 0, souls: 0, items: {} }, newKnown: [], over: false, seen: false, gap: 0, feed: [], disp: {}, curve: [],
+    lastActor: null, pending: 0, endAt: null, max0: 0, done: manyDone, pts: 0, taken: [], end: null, seed: EB.seedOf(`эхо|${x.race}|многоликий|${x.uid}`) };
+  R.scene = { title: 'Биом Многоликого', short: 'Многоликий', back: 'descent', abort: 'echmanyx', result: 'echmanyres', floors: TOP, bg: arenaOf(x.race),
+    sub: r => `неделя ${W.gen} · попытка одна · очки ${fmt(r.pts)}`,
+    badge: r => `<b>${r.floor}</b><span>/ ${TOP}</span>`,
+    chip: r => { const f = r.fl; return f ? `<span class="chip ${f.g === 'o' ? '' : 'gold'}">${rankIc(f.g)}${ECH.short[f.g]} · ${nameOf(f)}</span>` : ''; },
+    ruler: r => STEPS.map((g, j) => `<i class="${g === 'e' ? 'el5' : g !== 'o' ? 'boss' : ''} ${j + 1 < r.floor ? 'past' : ''} ${j + 1 === r.floor ? 'cur' : ''}"></i>`).join(''),
+    next: manyFloor };
+  newFloor(R);
+  S.runs.push(R); S.focus = R.id; S.insp = null; S.overlay = null; S.route = 'battle';
+  render(); ensureLoop();
+  return R;
+}
+/* конец этажа: взят — очки Эхо сразу, запись бестиария, следующий этаж; не взят или последний — биом закрыт, итог */
+function manyDone(R, vis) {
+  const b = R.b, st = EB.echoStats(b), step = R.floor, f = R.fl, won = st.killed;
+  R.runMs += b.t; R.heroes = EB.carry(R.heroes, b); R.curve.push(partyPctOf(b));
+  if (won) {
+    const pts = floorPts(step, R.cyc);
+    S.echo.score += pts; R.pts += pts; R.taken.push({ step, pts });
+    if (!kn(f.fid)) { S.ech.known[f.fid] = true; R.newKnown.push(f.fid); }
+    if (vis) feed(R, `<span class="sp">Этаж ${step} взят</span> за ${b.round} ${plural(b.round, 'раунд', 'раунда', 'раундов')}${pts ? ` · <span class="gd">+${fmt(pts)} очков Эхо</span>` : ''}`);
+  }
+  if (won && step < TOP) { R.gap = EB.RULES.floor.gapMs; R.runMs += R.gap; if (vis) camPan(); return; }
+  R.end = { kind: won ? 'clear' : 'fail', floor: step, why: st.why };
+  manyEnd(R, vis);
+}
+function manyEnd(R, vis) {
+  R.over = true;
+  if (vis) { R.seen = true; S.route = 'descent'; S.overlay = { t: 'echmanyres', arg: R.id }; render(); focusOverlay(); }
+  else toast(`Биом Многоликого: ${R.end.kind === 'clear' ? 'пройден' : 'закрыт на этаже ' + R.end.floor}, очков ${fmt(R.pts)}. Итог — в верхней строке`);
 }
 const descentBase = SCREENS.descent;
 SCREENS.descent = function () {
@@ -574,21 +881,32 @@ Object.assign(ACT, {
     const x = target(S, 'step', st); S.echo.slots[i] = x; delete S.ech.pending[i]; S.echo.sel = i;
     toast(`Цель в слоте ${i + 1}: ${nameOf(foe(x.fid, x))} · ступень ${st} · ${ECH.lifeH[x.g]} ч`);
   },
-  /* атака: цена по типу цели, здоровье сохраняется (§17.3); урон — демо на сиде */
-  echatk() {
+  /* атака: цена в душах один раз, бой ядром, здоровье цели сохраняется (§17.3, ADR-0025). v — «uid:номер атаки»:
+     повтор с тем же номером ничего не списывает и не начисляет; без v — следующая атака по выбранной цели */
+  echatk(v) {
     sync();
     const i = S.echo.sel, x = S.echo.slots[i]; if (!x) return;
-    const s = sq(S.echoSquad), m = s.m.filter(Boolean), busy = m.filter(id => busyNote(id));
+    const [uid, no] = v ? String(v).split(':') : [], n = no ? +no : x.atk + 1;
+    if ((uid && uid !== x.uid) || n !== x.atk + 1) return;
+    const s = sq(S.echoSquad), m = attackIds(x), busy = S.ech.weekSquad && weekSquad(x.race) ? [] : m.filter(id => busyNote(id));   // отряд недели в демо — вне занятости прототипа
     if (m.length < ECH.squad || busy.length) return notReady(s, m, busy);
-    if (!spend('souls', atkCost(x.g))) return;
-    x.atk++;
-    const roll = rng(`эхо|${x.race}|атака|${x.uid}|${x.atk}`), [lo, hi] = ECH.dmgBp[x.g], av = aversIn(s, x.race);
-    let dmg = Math.floor(x.max * (lo + roll(hi - lo + 1)) / BP);
-    if (av.n) dmg = Math.floor(dmg * (BP * m.length + av.bp * av.n) / (BP * m.length));
-    dmg = Math.max(1, Math.min(x.hp, dmg));
-    x.hp -= dmg;
-    if (x.hp > 0) return toast(`Атака: −${fmt(dmg)} здоровья, осталось ${fmt(x.hp)}. Урон сохранён до следующей атаки · демо-урон`);
-    win(i, x);
+    if (!spend('souls', atkCost(x))) return;
+    x.atk = n;
+    const { F, L } = resolveAttack(i, x, m, n);
+    play(F, L);
+  },
+  /* «Пропустить»: просмотр кончается сразу, итог уже решён при оплате */
+  echskip(v) {
+    const R = runById(v) || focusRun(); if (!R || R.kind !== 'echo') return;
+    R.over = true; R.seen = true; S.focus = R.id; S.insp = null; S.route = 'echo'; S.overlay = { t: 'echres', arg: R.id };
+    render(); focusOverlay();
+  },
+  /* из итога — ещё одна атака по той же цели: номер следующей атаки, повтор не спишет второй раз */
+  echagain(v) {
+    const [a, uid, n] = String(v).split(':'), i = +a, x = S.echo.slots[i];
+    S.overlay = null;
+    if (!x || x.uid !== uid) return render();
+    S.echo.sel = i; S.route = 'echo'; ACT.echatk(uid + ':' + n);
   },
   echnext(v) { S.overlay = null; ACT.echsum(v); },
   echweek() { open('echweek'); },
@@ -597,7 +915,9 @@ Object.assign(ACT, {
   /* §17.6, §23.1: сундуки за планки забирают только в «Дарах путешествия» — один сундук не выдаётся через два экрана */
   echplank() { ACT.sheet('gifts'); },
   echcyc(v) { S.acc.cycle = +v; render(); },
-  echopen() { sync(); S.ech.avail = TOP; toast(`Демо: открыты все ${TOP} ступеней недели`); },
+  echopen() { sync(); S.ech.avail = MANY; toast(`Демо: открыты все ${TOP} ступеней недели и Многоликий`); },
+  /* демо: атаки Эхо отрядом недели — герои Эхо этой цивилизации (echo-foes.js) против её нашествия */
+  echwsq() { sync(); S.ech.weekSquad = !S.ech.weekSquad; toast(S.ech.weekSquad ? 'Демо: атаки Эхо — отрядом недели' : 'Атаки Эхо — сохранённым отрядом'); },
   /* подтверждение активации: расход один раз на операцию */
   echactdo(v) {
     const o = S.overlay;
@@ -607,17 +927,37 @@ Object.assign(ACT, {
     const it = BAG.item(o.arg), kind = o.kind;
     const cb = kind === 'act' && it ? RX.drops.craftBiomes.find(b => b.act === it.id) : null, fb = kind === 'call' && it ? RX.drops.craftBosses.find(b => b.call === it.id) : null;
     if (!it || (kind === 'act' && !cb) || (kind === 'call' && !fb) || !checks(kind, it).every(x => x.ok)) return toast('Активация недоступна: условия — в листе');
+    if (kind === 'call' && S.wallet.souls < XE.summonSouls) return toast('Цена названа. Платить пока нечем.');
     S.ech.ops[v] = true;
-    if (kind !== 'act' && !spend('souls', XE.summonSouls)) return;
+    if (kind === 'call') spend('souls', XE.summonSouls);   // руина и биом Многоликого — только предмет, без душ
     BAG.take(it.id, 1);
     if (kind === 'act') { const x = { uid: 'ech' + (++S.ech.seq), cb: cb.id }; S.ech.biomes.push(x); S.overlay = { t: 'echgot', kind, arg: x.uid }; }
-    else { const i = freeSlot(), x = target(S, fb ? 'craft' : 'many', fb); S.echo.slots[i] = x; S.echo.sel = i; S.overlay = { t: 'echgot', kind, arg: x.uid, slot: i }; }
+    else if (kind === 'echo') {   // биом Многоликого своей недели — в слот биомов (ADR-0025)
+      const W = weekOf(S); manyUse(W.race);
+      const x = { uid: 'ech' + (++S.ech.seq), many: true, race: W.race, cyc: S.acc.cycle }; S.ech.biomes.push(x); S.overlay = { t: 'echgot', kind, arg: x.uid };
+    } else { const i = freeSlot(), x = target(S, 'craft', fb); S.echo.slots[i] = x; S.echo.sel = i; S.overlay = { t: 'echgot', kind, arg: x.uid, slot: i }; }
     render(); focusOverlay();
   },
+  /* забег по биому Многоликого: попытка одна — биом уходит в забег, слот биомов держит сам забег */
+  echmany(v) {
+    sync();
+    const x = S.ech.biomes.find(b => b.uid === v && b.many); if (!x) return;
+    const ids = sq(S.prepSquad).m.filter(id => id && !busyNote(id));
+    if (!ids.length) return toast('Все герои этого отряда заняты');
+    S.ech.biomes = S.ech.biomes.filter(b => b !== x); if (S.ech.cb === v) S.ech.cb = null;
+    manyRun(x, ids);
+  },
+  echmanyx(v) { const R = runById(v); if (!R || R.kind !== 'many' || R.over) return; S.overlay = { t: 'confirm', title: 'Прервать забег', text: 'Отряд поднимется наверх. Очки за взятые этажи останутся, биом Многоликого закроется: попытка одна.', ok: 'Прервать', act: 'echmanyxdo', v, danger: true }; render(); focusOverlay(); },
+  echmanyxdo(v) { const R = runById(v); S.overlay = null; if (!R || R.kind !== 'many' || R.over) return render(); R.end = { kind: 'abort', floor: R.floor }; manyEnd(R, true); },
   echgo(v) { const [r, a] = v.split(':'); S.overlay = null; if (r === 'descent') { S.ech.cb = a; S.route = 'descent'; } else { S.echo.sel = +a; S.route = 'echo'; } render(); },
   echcb(v) { S.ech.cb = v; render(); },
-  echcbx(v) { S.overlay = { t: 'confirm', title: 'Покинуть руину', text: 'Руина закроется и освободит слот биомов. Добычи за неё не будет, предмет активации не вернётся.', warn: 'Демо: забег по руинам появится вместе с их ядром боя.', ok: 'Покинуть', act: 'echcbxdo', v, danger: true }; render(); focusOverlay(); },
-  echcbxdo(v) { S.ech.biomes = S.ech.biomes.filter(x => x.uid !== v); if (S.ech.cb === v) S.ech.cb = null; S.overlay = null; toast('Руина покинута: слот биомов свободен'); },
+  echcbx(v) {
+    const x = S.ech.biomes.find(b => b.uid === v);
+    S.overlay = x && x.many ? { t: 'confirm', title: 'Покинуть биом Многоликого', text: 'Биом закроется и освободит слот биомов. Очков за него не будет, Многоликий не вернётся.', ok: 'Покинуть', act: 'echcbxdo', v, danger: true }
+      : { t: 'confirm', title: 'Покинуть руину', text: 'Руина закроется и освободит слот биомов. Добычи за неё не будет, предмет активации не вернётся.', warn: 'Демо: забег по руинам появится вместе с их ядром боя.', ok: 'Покинуть', act: 'echcbxdo', v, danger: true };
+    render(); focusOverlay();
+  },
+  echcbxdo(v) { const x = S.ech.biomes.find(b => b.uid === v); S.ech.biomes = S.ech.biomes.filter(b => b.uid !== v); if (S.ech.cb === v) S.ech.cb = null; S.overlay = null; toast(`${x && x.many ? 'Биом Многоликого покинут' : 'Руина покинута'}: слот биомов свободен`); },
   biome(v) { if (S.ech) S.ech.cb = null; S.selBiome = v; render(); },
   /* прежние действия экрана Эхо — на новые: старые ждали цели из S.foes */
   esel(v) { ACT.echsel(v); },
@@ -644,7 +984,8 @@ Object.assign(OV, {
       <span class="eyebrow">Демо прототипа</span>
       <div class="row ech-demo"><select class="rs-sel" data-a="sweek" aria-label="Неделя расы, демо">${RS.weeks.map(w => `<option value="${w.race}" ${w === W ? 'selected' : ''}>Неделя ${w.gen}</option>`).join('')}</select>
         <div class="tabs rs-cyc" role="tablist" aria-label="Цикл аккаунта, демо">${ROMAN.slice(1).map((r, j) => `<button role="tab" aria-selected="${c === j + 1}" data-a="echcyc" data-v="${j + 1}">${r}</button>`).join('')}</div>
-        <button class="btn sm" data-a="echopen" ${S.ech.avail >= TOP ? 'disabled' : ''}>Открыть все ${TOP} ступеней</button></div>
+        <button class="btn sm" data-a="echopen" ${S.ech.avail >= MANY ? 'disabled' : ''}>Открыть все ${TOP} ступеней и Многоликого</button>
+        ${weekSquad(W.race) ? `<button class="btn sm" data-a="echwsq" aria-pressed="${!!S.ech.weekSquad}" title="Атаки Эхо — отрядом недели: пятеро героев Эхо этой цивилизации, наборы из echo-foes.js, уровень врагов цели">Бой отрядом недели${S.ech.weekSquad ? ' · вкл' : ''}</button>` : ''}</div>
       <p class="reason">Неделя и цикл аккаунта — переключатели прототипа. Новая неделя сбрасывает лестницу.</p>`;
     return sheet('Неделя Эхо', body, '', true);
   },
@@ -662,7 +1003,7 @@ Object.assign(OV, {
     sync();
     const sl = S.echo.slots.find(x => x && x.fid === o.arg) || null, f = foe(o.arg, sl); if (!f) return '';
     const c = S.acc.cycle, rec = kn(f.fid), W = RS.weeks.find(w => w.race === f.race);
-    const hp = sl ? sl.max : f.g === 'craft' ? at(ECH.craft.hp, f.cyc) : f.g === 'm' ? at(ECH.many.hp, c) : at(ECH.hp[f.step - 1], c);
+    const hp = sl ? sl.max : f.g === 'craft' ? at(ECH.craft.hp, f.cyc) : hpOf(f.step, c);
     const bm = sl ? sl.bm : f.g === 'craft' ? at(ECH.craft.bm, f.cyc) : f.g === 'm' ? at(ECH.many.bm, c) : at(ECH.bm[f.step - 1], c);
     const faces = f.g === 'm' ? STEPS.map((g, j) => stepFoe(fidOf(f.race, j + 1))).filter(x => kn(x.fid)).map(x => x.n) : [];
     const body = `<div class="ech-foehero">${ph(f, 'lg')}</div>
@@ -680,13 +1021,22 @@ Object.assign(OV, {
       ${hide ? '' : `<p class="quote">${it.lore}</p>`}
       <p class="reason">Что внутри — откроется после подтверждения. Просмотр предмет не расходует.</p>
       <span class="eyebrow">Доступность</span><ul class="ech-checks">${ck.map(x => `<li class="${x.ok ? 'ok' : 'no'}">${ic(x.ok ? 'check' : 'x')}<span>${x.t}</span></li>`).join('')}</ul>
-      <span class="eyebrow">Расход</span><div class="row" style="gap:10px">${itIcon(it, 34, hide)}<b class="num">×1</b>${kind === 'act' ? '' : `<span class="faint">и</span>${money('souls', cost)}`}</div>
+      <span class="eyebrow">Расход</span><div class="row" style="gap:10px">${itIcon(it, 34, hide)}<b class="num">×1</b>${kind === 'call' ? `<span class="faint">и</span>${money('souls', cost)}` : ''}</div>
       <span class="eyebrow">Ограничения</span><ul class="ech-rules">${RULES[kind]().map(r => `<li>${r}</li>`).join('')}</ul>
-      ${kind === 'echo' ? '<span class="chip warn" style="align-self:flex-start">правила Многоликого — черновик</span>' : ''}`;
-    return sheet(T[0], body, `<button class="btn ghost" data-a="close">Отмена</button><button class="btn go" data-a="echactdo" data-v="${o.op}" ${ok ? '' : 'disabled'}>${T[1]}${kind === 'act' ? '' : costTag('souls', cost)}</button>`);
+      ${kind === 'echo' ? '<span class="chip warn" style="align-self:flex-start" title="ADR-0025: этаж — состав ступени, биом — в слот биомов, как руина">как понят ответ автора — поправит автор</span>' : ''}`;
+    return sheet(T[0], body, `<button class="btn ghost" data-a="close">Отмена</button><button class="btn go" data-a="echactdo" data-v="${o.op}" ${ok ? '' : 'disabled'}>${T[1]}${kind === 'call' ? costTag('souls', cost) : ''}</button>`);
   },
   /* экземпляр открыт после операции (§12.5) */
   echgot(o) {
+    if (o.kind === 'echo') {   // биом Многоликого открыт
+      const x = S.ech.biomes.find(b => b.uid === o.arg); if (!x) return '';
+      const W = RS.weeks.find(w => w.race === x.race) || weekOf(S), total = STEPS.reduce((a, g, j) => a + floorPts(j + 1, x.cyc), 0);
+      const body = `<span class="eyebrow">Биом Многоликого · неделя ${W.gen}</span><b class="serif ech-civn">${W.civ ? 'Многоликий · ' + W.civ : 'Многоликий'}</b>
+        <p class="quote">Все враги лестницы недели — от первой ступени до Убер-босса.</p>
+        <div class="row" style="gap:18px;flex-wrap:wrap"><div class="stat"><b>${TOP}</b><small>этажей</small></div><div class="stat"><b>${x.cyc >= EM.from ? fmt(total) : '—'}</b><small>очков за все этажи</small></div><div class="stat"><b>1</b><small>попытка</small></div><div class="stat"><b>${bioUsed()} / ${bioCap()}</b><small>слоты биомов</small></div></div>
+        <p class="reason">Биом стоит в «Спуске» и занимает слот биомов. Души на атаки не тратятся, очки Эхо — за каждый взятый этаж. Этаж не взят — биом закрыт.</p>`;
+      return dialog('Биом Многоликого открыт', body, `<button class="btn ghost" data-a="close">Остаться</button><button class="btn go" data-a="echgo" data-v="descent:${x.uid}">${ic('down')}В Спуск</button>`, 'wide');
+    }
     if (o.kind === 'act') {
       const x = S.ech.biomes.find(b => b.uid === o.arg); if (!x) return '';
       const cb = CBIOME[x.cb], p = PLACE[cb.id];
@@ -698,26 +1048,56 @@ Object.assign(OV, {
     }
     const x = S.echo.slots[o.slot];
     if (!x || x.uid !== o.arg) return dialog('Цель в Эхо', '<p class="faint">Цели уже нет в слоте.</p>', '<button class="btn" data-a="close">Закрыть</button>');
-    const f = foe(x.fid, x), a = atkCost(x.g);
+    const f = foe(x.fid, x), a = atkCost(x);
     const body = `<div class="ech-got">${ph(f)}<div class="col" style="gap:6px;min-width:0">
-        <div class="row" style="flex-wrap:wrap;gap:5px"><span class="chip gold">${rankIc(x.g)}${rankOf(f)}</span>${x.el ? el(x.el) : ''}${f.fb ? `<span class="chip">иммунитет к контролю ${pctBp(f.fb.immunityBp)}</span>` : ''}${x.g === 'm' ? '<span class="chip warn">правила — черновик</span>' : ''}</div>
+        <div class="row" style="flex-wrap:wrap;gap:5px"><span class="chip gold">${rankIc(x.g)}${rankOf(f)}</span>${x.el ? el(x.el) : ''}${f.fb ? `<span class="chip">иммунитет к контролю ${pctBp(f.fb.immunityBp)}</span>` : ''}</div>
         <b class="serif ech-itn">${nameOf(f)}</b>
         ${f.face ? `<small class="faint">лицо: ${kn(f.face.fid) ? f.face.n : 'врага недели, ещё не изученного'}</small>` : ''}
         <div class="row" style="gap:16px;flex-wrap:wrap"><div class="stat"><b>${fmt(x.bm)}</b><small>боевая мощь</small></div><div class="stat"><b>${fmt(x.max)}</b><small>здоровье</small></div><div class="stat"><b>${dur(x.left)}</b><small>срок</small></div><div class="stat"><b>${a}</b><small>${souls(a)} за атаку</small></div></div>
       </div></div>
       <p class="reason">${kn(x.fid) ? 'Запись в бестиарии уже открыта.' : 'Имя и повадки откроет первая победа.'} Слот ${o.slot + 1} Эхо, отменить нельзя. Цена атаки — прежняя сетка, ждёт баланса.</p>`;
-    return dialog(x.g === 'm' ? 'Многоликий в Эхо' : 'Призван крафтовый босс', body, `<button class="btn ghost" data-a="close">Остаться</button><button class="btn go" data-a="echgo" data-v="echo:${o.slot}">В Эхо ${ic('chev')}</button>`);
+    return dialog('Призван крафтовый босс', body, `<button class="btn ghost" data-a="close">Остаться</button><button class="btn go" data-a="echgo" data-v="echo:${o.slot}">В Эхо ${ic('chev')}</button>`);
   },
-  /* итог победы: очки, запись бестиария, ступень лестницы, добыча; следующее действие — новый призыв (§17.7) */
-  echwin(o) {
-    const L = S.ech.last; if (!L || L.uid !== o.arg) return '';
-    const f = foe(L.fid, L.sl), cost = XE.summonSouls, loot = L.loot.map(lootHtml).join('');
-    const body = `${L.first ? `<div class="newfoe">${ph(f)}<div class="col" style="gap:3px;min-width:0"><span class="eyebrow" style="color:var(--spirit)">Новое в бестиарии</span><b class="serif" style="font-size:20px">${f.n}</b><small class="faint">${f.look}</small></div></div>` : ''}
-      <div class="row" style="gap:18px;flex-wrap:wrap">${L.g === 'craft' ? '<div class="stat"><b>—</b><small>крафтовый босс без очков</small></div>' : `<div class="stat"><b>${L.cyc >= EM.from ? '+' + fmt(L.pts) : '—'}</b><small>${L.cyc >= EM.from ? 'очков недели' : 'обучение без очков'}</small></div>`}<div class="stat"><b>${fmt(S.echo.score)}</b><small>всего за неделю</small></div>${L.opened ? `<div class="stat"><b>${L.opened} / ${TOP}</b><small>открыта ступень</small></div>` : ''}</div>
-      ${loot ? `<span class="eyebrow">Добыча</span><div class="col" style="gap:6px">${loot}</div>` : '<p class="reason">Враги лестницы душ и добычи не дают — только очки и запись бестиария.</p>'}
-      <p class="reason">Исход — демо-урон на сиде: ядра боя для Эхо ещё нет. Слот ${L.slot + 1} свободен.</p>`;
-    const again = !S.echo.slots[L.slot] && !S.ech.pending[L.slot];
-    return dialog(`${f.n} — победа`, body, `<button class="btn ghost" data-a="close">К целям</button>${again ? `<button class="btn go" data-a="echnext" data-v="${L.slot}">Призвать новую${costTag('souls', cost)}</button>` : ''}`);
+  /* итог атаки (ADR-0025): исход, отнятое здоровье, очки, раунды, кто что сделал; при победе — бестиарий, лестница и добыча.
+     Открывают «Пропустить» и конец просмотра — итог решён при оплате. Следующее действие — ещё атака по цели или новый призыв (§17.7) */
+  echres(o) {
+    const R = runById(o.arg), L = R && R.res; if (!L) return '';
+    const r = L.res, f = foe(L.fid, L.sl), x = S.echo.slots[L.slot], live = !!x && x.uid === L.uid, craft = L.kind === 'craft';
+    const WHY = { kill: 'Главный враг пал — цель взята', win: 'Пали все пятеро — цель взята', wipe: 'Отряд пал — нанесённый урон сохранён', sand: 'Раунды вышли — нанесённый урон сохранён' };
+    const t = r.main.taken, rw = n => plural(n, 'раунд', 'раунда', 'раундов');
+    const kpi = [[t >= 0 ? '−' + fmt(t) : '+' + fmt(-t), t >= 0 ? 'отнято здоровья' : 'защитники вылечили'], [`${fmt(r.main.hp)} / ${fmt(L.max)}`, 'здоровье цели'],
+      L.kill ? (L.g === 'm' ? ['—', 'за победу — ресурс «Многоликий»'] : [craft || L.cyc < EM.from ? '—' : '+' + fmt(L.pts), craft ? 'крафтовый босс без очков' : L.cyc < EM.from ? 'обучение без очков' : 'очков недели']) : ['0', L.g === 'm' ? 'ресурс — за победу' : 'очки — за победу'],
+      [`${r.rounds} / ${r.maxRounds}`, rw(r.maxRounds)], [`${r.kills} / ${r.foes.length}`, 'врагов пало'], [`${r.fallen} / ${r.heroes.length}`, 'героев пало']];
+    const rows = r.heroes.map(h => { const hh = H(h.id); return `<tr class="${h.alive ? '' : 'fell'}"><td><span class="ech-rf">${hh ? `<img src="${hh.img}" alt="">` : RSI[h.id] ? `<span class="rs-av">${rsFace(RSI[h.id])}</span>` : ''}<b>${h.name}</b>${h.alive ? '' : '<small>пал</small>'}</span></td><td class="num">${fmt(h.dealt)}</td><td class="num">${fmt(h.toMain)}</td><td class="num">${fmt(h.healed)}</td></tr>`; }).join('');
+    const foesTxt = r.foes.map((u, k) => { const sf = k === 0 ? f : stepFoe(u.id.slice(4)), nm = sf ? (k === 0 ? nameOf(sf) : shortOf(sf)) : u.name; return `${k === 0 ? '<b>' + nm + '</b>' : nm}${u.dead ? ' ✝' : ` · ${Math.floor(u.hp * 100 / u.maxHp)} %`}`; }).join(' · ');
+    const loot = L.loot.map(lootHtml).join('');
+    const won = !L.kill ? '' : `${L.first ? `<div class="newfoe">${ph(f)}<div class="col" style="gap:3px;min-width:0"><span class="eyebrow" style="color:var(--spirit)">Новое в бестиарии</span><b class="serif" style="font-size:20px">${f.n}</b><small class="faint">${f.look}</small></div></div>` : ''}
+      <div class="row" style="gap:18px;flex-wrap:wrap"><div class="stat"><b>${fmt(L.score)}</b><small>очков за неделю</small></div>${L.opened ? `<div class="stat"><b>${L.opened} / ${TOP}</b><small>открыта ступень</small></div>` : ''}</div>
+      ${loot ? `<span class="eyebrow">Добыча</span><div class="col" style="gap:6px">${loot}</div>` : craft ? '' : '<p class="reason">Враги лестницы душ и добычи не дают — только очки и запись бестиария.</p>'}`;
+    const body = `<p class="ech-res-why ${L.kill ? 'win' : ''}">${WHY[r.why] || r.why}</p>
+      <div class="row ech-res-kpi">${kpi.map(([v, s]) => `<div class="stat"><b class="num">${v}</b><small>${s}</small></div>`).join('')}</div>
+      <table class="ech-res-t"><thead><tr><th>Герой</th><th>урон</th><th>по главному</th><th>лечение</th></tr></thead><tbody>${rows}</tbody></table>
+      <p class="reason ech-res-foes">${foesTxt}</p>
+      ${won}
+      <p class="reason">Атака ${L.no} · ${fmt(L.cost)} ${souls(L.cost)} · бой посчитан целиком при оплате: просмотр и «Пропустить» итог не меняют.${L.kill ? ` Слот ${L.slot + 1} свободен.` : ''}</p>`;
+    const next = live ? `<button class="btn go" data-a="echagain" data-v="${L.slot}:${x.uid}:${x.atk + 1}">Атаковать ещё${costTag('souls', atkCost(x))}</button>`
+      : !S.echo.slots[L.slot] && !S.ech.pending[L.slot] ? `<button class="btn go" data-a="echnext" data-v="${L.slot}">Призвать новую${costTag('souls', XE.summonSouls)}</button>` : '';
+    return dialog(`${nameOf(f)} — ${L.kill ? 'победа' : 'атака ' + L.no}`, body, `<button class="btn ghost" data-a="close">К целям</button>${next}`, 'wide');
+  },
+  /* итог биома Многоликого: взятые этажи и очки Эхо, здоровье отряда, новые записи бестиария; биом закрыт — попытка одна */
+  echmanyres(o) {
+    const R = runById(o.arg); if (!R || R.kind !== 'many') return '';
+    const E = R.end || { kind: 'abort', floor: R.floor }, W = RS.weeks.find(w => w.race === R.week) || weekOf(S), n = R.taken.length;
+    const title = E.kind === 'clear' ? 'Биом Многоликого пройден' : E.kind === 'fail' ? `Биом закрыт на этаже ${E.floor}` : 'Забег прерван';
+    const why = E.kind === 'clear' ? `Все ${TOP} этажей взяты.` : E.kind === 'fail' ? (E.why === 'sand' ? 'Раунды вышли, главный враг этажа устоял.' : 'Отряд пал.') : `Отряд поднялся с этажа ${E.floor}.`;
+    const rows = STEPS.map((g, j) => { const st = j + 1, t = R.taken.find(x => x.step === st), f = manyStepFoe(R.week, st); return `<i class="${t ? 'ok' : st === E.floor && E.kind !== 'clear' ? 'no' : ''} ${g}" title="Этаж ${st} · ${shortOf(f)}${t ? ' · +' + fmt(t.pts) + ' очков' : ''}"></i>`; }).join('');
+    const nk = R.newKnown.map(fid => stepFoe(fid)).filter(Boolean);
+    const body = `<p class="muted" style="font-size:15px">${why} Попытка одна: биом Многоликого недели ${W.gen} закрыт. Души на атаки не тратились.</p>
+      <div class="row" style="gap:18px;flex-wrap:wrap"><div class="stat"><b>${n} / ${TOP}</b><small>этажей взято</small></div><div class="stat"><b>${R.cyc >= EM.from ? '+' + fmt(R.pts) : '—'}</b><small>${R.cyc >= EM.from ? 'очков Эхо' : 'обучение без очков'}</small></div><div class="stat"><b>${fmt(S.echo.score)}</b><small>очков за неделю</small></div><div class="stat"><b>${clock(R.runMs / 1000)}</b><small>время забега</small></div></div>
+      <div class="col" style="gap:3px"><span class="eyebrow">Этажи</span><div class="ech-mruler">${rows}</div></div>
+      ${R.curve.length ? `<div class="col" style="gap:3px"><span class="eyebrow">Здоровье отряда после каждого этажа</span><div class="curve">${R.curve.map((v, i) => `<i class="${STEPS[i] !== 'o' ? 'el' : ''}" style="--v:${Math.max(3, v)}" title="Этаж ${i + 1}: ${v}%"></i>`).join('')}</div></div>` : ''}
+      ${nk.length ? `<div class="newfoe">${ph(nk[0])}<div class="col" style="gap:3px;min-width:0"><span class="eyebrow" style="color:var(--spirit)">Новое в бестиарии</span><b class="serif" style="font-size:18px">${nk.map(f => f.n).join(', ')}</b></div></div>` : ''}`;
+    return dialog(title, body, `<button class="btn ghost" data-a="close">Закрыть</button><button class="btn go" data-a="go" data-v="echo">В Эхо ${ic('chev')}</button>`, 'wide');
   },
 });
 
@@ -735,5 +1115,7 @@ setInterval(() => {
 }, 1000);
 
 /* для автопроверки tools/content-gen/screens/check_echo.js и консоли */
-window.EN_ECHO = { data: ECH, steps: STEPS, foe, stepFoe, fidOf, sync, draw, checks, planks: () => planks(weekOf(S), S.acc.cycle), bio: () => ({ cap: bioCap(), used: bioUsed() }), target: (kind, x, o) => target(S, kind, x, o) };
+window.EN_ECHO = { data: ECH, steps: STEPS, foe, stepFoe, fidOf, sync, draw, checks, planks: () => planks(weekOf(S), S.acc.cycle), bio: () => ({ cap: bioCap(), used: bioUsed() }), target: (kind, x, o) => target(S, kind, x, o),
+  cost: x => atkCost(x), pts: ptsOf, floorPts, rounds: roundsOf, lvl: lvlOf, hp: hpOf, fight: (x, ids, no) => fightOf(x, ids, no || x.atk + 1), kit: demoKit,
+  manyFree, face: faceArt, arena: arenaOf };
 })();

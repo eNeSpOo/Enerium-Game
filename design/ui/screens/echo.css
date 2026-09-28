@@ -150,3 +150,47 @@
   .ech-pick-h h2{font-size:19px}
   .ech-offer{padding:3px 8px}
 }
+
+/* бой Эхо (ADR-0025): заглушка облика врага на карте боя и в очереди раунда — та же, что на экране Эхо */
+.bc .face .ech-ph.bt,.bt-queue i .ech-ph.bt{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;border:0;border-radius:0}
+.bc .face .ech-ph.bt b{font-size:22px}
+.bt-queue i .ech-ph.bt b{font-size:8px}
+/* итог атаки: исход, отнятое здоровье и очки, кто что сделал */
+.ech-res-why{margin:0;font:600 19px/1.15 var(--f-d);color:var(--parch)}
+.ech-res-why.win{color:var(--gold)}
+.ech-res-kpi{gap:16px;flex-wrap:wrap}
+.ech-res-kpi .stat b{font-size:19px}
+.ech-res-t{width:100%;border-collapse:collapse;font-size:12.5px}
+.ech-res-t th{padding:3px 6px;color:var(--parch-3);font-weight:400;text-align:right;border-bottom:1px solid #1e2328}
+.ech-res-t td{padding:3px 6px;text-align:right;border-bottom:1px solid #161a1e;color:var(--parch-2);font-variant-numeric:tabular-nums}
+.ech-res-t th:first-child,.ech-res-t td:first-child{text-align:left}
+.ech-res-t tr.fell td{opacity:.6}
+.ech-rf{display:inline-flex;align-items:center;gap:6px;min-width:0}
+.ech-rf img{width:24px;height:24px;border-radius:6px;object-fit:cover;object-position:50% 18%}
+.ech-rf b{color:var(--parch);font-weight:700}
+.ech-rf small{color:#ff9b8a;font-size:11px}
+.ech-res-foes{font-size:12px}
+/* арт недели (ADR-0025): портрет вместо заглушки; до первой победы — в тумане, поверх знак вопроса */
+.ech-ph.art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+.ech-ph.art b{display:none}
+.ech-ph.art.unk img{filter:blur(5px) brightness(.4) saturate(.6)}
+.ech-ph.art.unk b{display:block;position:relative}
+/* биом Многоликого в «Спуске»: этажи — ступени лестницы; итог — какие этажи взяты */
+.bnode.ech-mb{border-color:rgba(221,188,122,.4)}
+.ech-many .banner>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.5) saturate(.9)}
+.ech-mfls{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:4px 10px}
+.ech-mfl{display:flex;align-items:center;gap:7px;min-width:0;padding:2px 0}
+.ech-mfl .ech-ph{width:30px;flex:none}
+.ech-mfl b{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ech-mfl small.num{margin-left:auto;color:var(--gold-2)}
+.ech-mruler{display:flex;gap:3px}
+.ech-mruler i{flex:1 1 0;height:8px;border-radius:2px;background:#262c32}
+.ech-mruler i.e,.ech-mruler i.b,.ech-mruler i.u{box-shadow:inset 0 -2px 0 var(--gold-3)}
+.ech-mruler i.ok{background:var(--spirit)}
+.ech-mruler i.no{background:#ff7a5c}
+/* отряд недели (демо): герои Эхо в строке отряда и на картах боя — лицо из состава героев */
+.ech-wf .rs-av{width:30px;height:30px}
+.ech-rf .rs-av{width:24px;height:24px;border-radius:6px}
+.bc .face>.rs-ph,.bt-queue i>.rs-ph{position:absolute;inset:0;width:100%;height:100%;border-radius:0}
+.bc .face>.rs-ph b{font-size:20px}
+.bt-queue i>.rs-ph b{font-size:8px}
