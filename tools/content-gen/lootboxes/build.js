@@ -10,6 +10,7 @@
    - design/ui/recipes.js — ресурсы, пулы по циклам, цены рынка, крафтовые боссы и редкость их сундуков;
    - docs/content/герои/состав-героев.csv — герои Эхо по неделям и циклам;
    - source-data/Enerium_Талисманы_Финал.xlsx — талисманы и их веса;
+   - docs/lore/дайджест.md — раздел «Нельзя показывать раннему игроку», чтобы найти спойлеры в именах талисманов;
    - design/ui/battle.js — только чтобы сверить генератор.
    Любая ошибка — файлы не пишутся. Пересборка даёт те же байты: нет времени, случайности без сида и зависимости от порядка обхода.
    Запуск: cd tools/content-gen/lootboxes && node build.js */
@@ -153,6 +154,30 @@ const ASSUME = {
   },
 };
 
+/* Спойлеры в таблице талисманов автора. Имена в таблицах автора — заглушки (ADR-0022, п. 3). Талисман со спойлером в имени
+   или в описании помечается «для команды» и в сундуках есть только с цикла «для команды» — как ресурсы цикла VI в recipes.js.
+   Слова — из раздела дайджеста «Нельзя показывать раннему игроку» (docs/lore/дайджест.md): сборщик проверяет, что каждое там есть.
+   Ещё — имена собственные цикла «для команды» из recipes.js: биомы, боссы, стражи.
+   «Демон» — прежнее имя Перворождённых (§3.1), в дайджесте они названы новым именем — поле seen.
+   Не спойлер: «Печать …» — нарицательное слово, на печать Эуклида не указывает; «Покров Пятерых» — боги, которых игрок знает. */
+const SPOILERS = [
+  { stem: 'иридиум', why: 'мать мира Иридиум' },
+  { stem: 'марионетк', why: 'Этрион как антагонист и его марионетки' },
+  { stem: 'эуклид', why: 'Эуклид' },
+  { stem: 'оболочк', why: 'Оболочка' },
+  { stem: 'шестой элемент', why: 'шестой элемент' },
+  { stem: 'колыбел', why: '«сломанные колыбели»' },
+  { stem: 'перворожд', why: 'Перворождённые — не раньше 11-го биома' },
+  { stem: 'демон', seen: 'перворожд', why: 'Демоны — прежнее имя Перворождённых (§3.1), их не показываем раньше 11-го биома' },
+];
+/* Предложение автору: как переименовать спойлерные талисманы, n — имя, d — описание (ADR-0022, п. 3). Таблицу автора не правим. */
+const TAL_RENAME = {
+  'Оковы Иридиум': { n: 'Оковы непокорного', d: 'Носящего оковы не согнёт ничья воля. И почти ничего не может сам.' },
+  'Дневник Коллекционера': { d: 'Коллекционер записывал всё. Записи убивают.' },
+  'Бич Демонов': { n: 'Бич Перворождённых' },
+  'Оберег от Демонов': { n: 'Оберег от Перворождённых' },
+};
+
 /* Законы и пороги проверок. */
 const RULES = {
   itemsMax: 10,                    // §23: 1–10 предметов
@@ -174,6 +199,7 @@ const ROOT = path.join(__dirname, '..', '..', '..');
 const FILES = {
   recipes: path.join(ROOT, 'design', 'ui', 'recipes.js'), battle: path.join(ROOT, 'design', 'ui', 'battle.js'),
   heroes: path.join(ROOT, 'docs', 'content', 'герои', 'состав-героев.csv'), tal: path.join(ROOT, 'source-data', 'Enerium_Талисманы_Финал.xlsx'),
+  digest: path.join(ROOT, 'docs', 'lore', 'дайджест.md'),
   outJs: path.join(ROOT, 'design', 'ui', 'lootboxes.js'), outDoc: path.join(ROOT, 'docs', 'content', 'лутбоксы.md'),
   tables: path.join(__dirname, 'tables.md'), doc: path.join(__dirname, 'doc.md'), open: path.join(__dirname, 'open.js'),
 };
@@ -258,18 +284,29 @@ for (const w of WEEKS) {
 
 /* талисманы — таблица автора: редкость и вес внутри редкости (правило 5 листа «Правила пула») */
 const TAL = readSheet(FILES.tal, 'Талисманы'), TH = TAL[0], tcol = n => { const i = TH.indexOf(n); if (i < 0) err.push(`таблица талисманов: нет столбца «${n}»`); return i; };
-const [tNo, tCat, tR, tName, tW] = ['№', 'Категория', 'Редкость', 'Название', 'Вес (авто)'].map(tcol);
+const [tNo, tCat, tR, tName, tW, tDesc] = ['№', 'Категория', 'Редкость', 'Название', 'Вес (авто)', 'Описание'].map(tcol);
 /* спойлеры: имена собственные цикла «для команды» из recipes.js — биомы, боссы, стражи. Талисман с таким именем — тоже для команды (§38) */
 const TEAM_WORDS = [...new Set(REC.cycles.filter(c => c.team).flatMap(c => c.biomes.flatMap(b => [b.n, b.boss, b.guard])).join(' ').split(/[^А-Яа-яЁё-]+/).filter(w => /^[А-ЯЁ]/.test(w) && w.length >= 5))];
-const talByR = {}, talInfo = {}, talCat = {};
+const TEAM_FROM = Math.min(...REC.cycles.filter(c => c.team).map(c => c.n));
+const DIGEST = (() => {
+  const t = fs.readFileSync(FILES.digest, 'utf8').replace(/\r\n/g, '\n'), i = t.indexOf('## Нельзя показывать раннему игроку');
+  if (i < 0) { err.push('дайджест: нет раздела «Нельзя показывать раннему игроку»'); return ''; }
+  const j = t.indexOf('\n## ', i + 3);
+  return t.slice(i, j < 0 ? t.length : j).toLowerCase();
+})();
+for (const sp of SPOILERS) if (!DIGEST.includes(sp.seen || sp.stem)) err.push(`спойлер «${sp.stem}»: слова «${sp.seen || sp.stem}» нет в разделе дайджеста`);
+const spoilOf = text => { const low = String(text).toLowerCase(); return SPOILERS.filter(sp => low.includes(sp.stem)).map(sp => sp.why).concat(TEAM_WORDS.filter(w => String(text).includes(w) && !SPOILERS.some(sp => w.toLowerCase().includes(sp.stem))).map(w => `имя цикла «для команды» — ${w}`)); };
+const talByR = {}, talInfo = {}, talCat = {}, talSpoil = {};
 for (const row of TAL.slice(1)) {
   if (!row[tNo]) continue;
   const r = RARITY.indexOf(String(row[tR]).toLowerCase()) + 1, w = +row[tW], no = +row[tNo];
   if (r < 1) { err.push(`талисман №${row[tNo]}: редкость «${row[tR]}»`); continue; }
   if (!Number.isInteger(w) || w < 1) { err.push(`талисман №${row[tNo]}: вес «${row[tW]}» не целый`); continue; }
   if (talInfo[no]) { err.push(`талисман №${no} дважды`); continue; }
-  (talByR[r] = talByR[r] || []).push([no, w]);
-  talInfo[no] = [row[tName], row[tCat], TEAM_WORDS.some(w => row[tName].includes(w)) ? 1 : 0];
+  const inName = spoilOf(row[tName]), inDesc = spoilOf(row[tDesc]), team = inName.length || inDesc.length ? 1 : 0;
+  if (team) talSpoil[no] = { where: inName.length && inDesc.length ? 'имя и описание' : inName.length ? 'имя' : 'описание', why: [...new Set(inName.concat(inDesc))].join('; '), d: row[tDesc] };
+  (talByR[r] = talByR[r] || []).push([no, w, team]);
+  talInfo[no] = [row[tName], row[tCat], team];
   talCat[r] = talCat[r] || {}; talCat[r][row[tCat]] = (talCat[r][row[tCat]] || 0) + 1;
 }
 
@@ -283,8 +320,10 @@ for (const c of Object.keys(pools.key)) for (const id of pools.key[c].concat(poo
 for (const ln of Object.values(LINES)) if (ln.kind === 'item') for (const b of ln.by) if (b) useItem(b[0]);
 
 /* данные для алгоритма открытия — то же, что уйдёт в lootboxes.js */
-const L = { bpTotal: 10000, rarity: RARITY, boxRarity: BOX_RARITY, rvalue: RVALUE, weeks: WEEKS, windows: WINDOWS, winNames: WIN_NAMES,
+const L = { bpTotal: 10000, teamFrom: TEAM_FROM, rarity: RARITY, boxRarity: BOX_RARITY, rvalue: RVALUE, weeks: WEEKS, windows: WINDOWS, winNames: WIN_NAMES,
   currencies: CURRENCY, dust: DUST, lines: LINES, boxes: BOXES, pools };
+for (const name of Object.keys(TAL_RENAME)) if (!Object.values(talInfo).some(t => t[0] === name)) err.push(`TAL_RENAME: талисмана «${name}» нет в таблице автора`);
+for (const [no, sp] of Object.entries(talSpoil)) if (!TAL_RENAME[talInfo[no][0]]) warn.push(`талисман №${no} «${talInfo[no][0]}»: спойлер (${sp.why}), а предложения, как переименовать, нет`);
 
 /* ---------- проверки данных ---------- */
 const isInt = x => Number.isInteger(x);
@@ -800,7 +839,6 @@ for (const mid of Object.keys(WEEK)) T.push(`| ${MODES[mid].n} | ${posLabel(mid,
   inline.curShare = `${fx(shares.reduce((a, q) => q.cmp(a) < 0 ? q : a).mul(new Q(100)), 0)}–${fx(shares.reduce((a, q) => q.cmp(a) > 0 ? q : a, Q0).mul(new Q(100)), 0)} %`;
   const lik = REC.drops.craftBosses.find(b => b.id === 'lik');
   inline.likShards = lik ? lik.heroShardsWeek : '—';
-  inline.teamTal = Object.values(talInfo).filter(t => t[2]).length;
   inline.boxesFreeRange = [2, 3, 4, 5, 6].map(c => Object.keys(WEEK).reduce((a, mid) => a + WEEK[mid][c].free.boxes, 0)).filter((v, i, a) => a.indexOf(v) === i).join('–');
 }
 
@@ -840,11 +878,28 @@ for (let c = 3; c <= 6; c++) {
   if (c === 6) { inline.dust6 = fmt(dust.int(0)); inline.bought6 = fx(bought, 1); inline.per6 = fx(per, 1); }
 }
 
+/* спойлеры в таблице талисманов */
+block('spoilers');
+T.push('| Талисман в таблице автора | Штук: редкости | Где спойлер | Почему — раздел дайджеста | Предложение |', '|---|---|---|---|---|');
+{
+  const groups = new Map();
+  for (const [no, sp] of Object.entries(talSpoil)) { const n = talInfo[no][0]; if (!groups.has(n)) groups.set(n, { sp, nos: [] }); groups.get(n).nos.push(+no); }
+  for (const [n, g] of groups) {
+    const rs = [...new Set(g.nos.map(no => Object.keys(talByR).find(r => talByR[r].some(t => t[0] === no))))].map(Number).sort((a, b) => a - b);
+    const P = TAL_RENAME[n] || {};
+    const prop = [P.n ? `имя — «${P.n}»` : '', P.d ? `описание — «${P.d}»` : ''].filter(Boolean).join('; ') || '—';
+    T.push(`| ${n} | ${g.nos.length}: ${rs.length === 7 ? 'все семь' : rs.map(rn).join(', ')} | ${g.sp.where}${g.sp.where !== 'имя' ? `: «${g.sp.d}»` : ''} | ${g.sp.why} | ${prop} |`);
+  }
+  inline.spoilTal = Object.keys(talSpoil).length;
+  inline.spoilNames = groups.size;
+  inline.teamRoman = ROMAN[TEAM_FROM];
+}
+
 /* проверки */
 block('checks');
 const heroCount = Object.values(heroesByWeek).reduce((a, l) => a + l.length, 0);
 const talCount = Object.values(talByR).reduce((a, l) => a + l.length, 0);
-T.push(`- окна: у каждого окна и редкости сундука сумма — 10 000 б. п.; ни в одной выплате нет редкости без записей — развёрнуто сундуков: ${DEF.size};`);
+T.push(`- окна: у каждого окна и редкости сундука сумма — 10 000 б. п.; ни в одном сундуке нет редкости без записей — развёрнуто сундуков: ${DEF.size}, это все виды, редкости, окна и циклы, а у сундука осколков — ещё все недели выплат;`);
 T.push(`- пул: ресурсов из \`recipes.js\` — ${Object.keys(itemsOut).length}, все падают, а не создаются рецептом; героев Эхо из \`состав-героев.csv\` — ${heroCount}; талисманов из таблицы автора — ${talCount};`);
 T.push(`- достижимость: каждый герой Эхо, все семь редкостей талисманов, рабочих и снаряжения выпадают хотя бы из одного сундука${unreached.res.length ? `; не выпадают ${unreached.res.length} ресурсов — уникальные ранних циклов: окна сундуков этих циклов не доходят до первородной` : ''};`);
 T.push(`- запреты: ни душ, ни Энериума, ни рун, ни предметов из рецептов, ни героев крафта;`);
@@ -880,15 +935,15 @@ const ev100 = v => Object.fromEntries(['shards', 'keys', 'tal', 'talV', 'wsh', '
 const evTable = {};
 for (const id of Object.keys(BOXES)) {
   evTable[id] = {};
-  for (let c = 1; c <= 6; c++) evTable[id][c] = BOX_RARITY.map((_, i) => ev100(evOf({ box: id, r: i + 1, win: 'step', cyc: c, week: id === 'shards' ? WEEKS[0] : null })));
+  for (let c = 1; c <= 6; c++) evTable[id][c] = Object.fromEntries(Object.keys(WIN_NAMES).map(win => [win, BOX_RARITY.map((_, i) => ev100(evOf({ box: id, r: i + 1, win, cyc: c, week: id === 'shards' ? WEEKS[0] : null })))]));
 }
 const modesOut = {};
-for (const [mid, m] of Object.entries(MODES)) modesOut[mid] = { n: m.n, box: m.box, basis: m.basis, from: m.from, proposal: !!m.proposal,
-  layers: PAY[mid].layers.map(ly => ({ id: ly.id, n: ly.n, kind: ly.kind, clan: !!ly.clan, rows: ly.rows.map(r => ({ label: r.label, x: r.x, top: r.top, team: r.team, cyc: r.cyc })) })) };
+for (const [mid, m] of Object.entries(MODES)) modesOut[mid] = { n: m.n, box: m.box, basis: m.basis, from: m.from, proposal: !!m.proposal, weekly: !!m.weekly, typical: m.typical || null,
+  layers: PAY[mid].layers.map(ly => ({ id: ly.id, n: ly.n, one: ly.one || ly.n, kind: ly.kind, clan: !!ly.clan, rows: ly.rows.map(r => ({ label: r.label, x: r.x, top: r.top, team: r.team, cyc: r.cyc })) })) };
 const weekOut = {};
 for (const mid of Object.keys(WEEK)) { weekOut[mid] = {}; for (const c of Object.keys(WEEK[mid])) weekOut[mid][c] = { free: Object.assign({ boxes: WEEK[mid][c].free.boxes }, ev100(WEEK[mid][c].free.ev)), fan: Object.assign({ boxes: WEEK[mid][c].fan.boxes }, ev100(WEEK[mid][c].fan.ev)) }; }
 const DATA = Object.assign({}, L, {
-  items: itemsOut, heroInfo, talInfo,
+  items: itemsOut, heroInfo, talInfo, talSpoil: Object.fromEntries(Object.entries(talSpoil).map(([no, sp]) => [no, sp.why])),
   workers: RARITY.map(r => 'Рабочий · ' + r), equip: RARITY.map(r => 'Предмет снаряжения · ' + r + ' · заглушка'),
   modes: modesOut, ev: evTable, week: weekOut, assume: ASSUME,
 });

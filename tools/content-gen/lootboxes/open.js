@@ -5,6 +5,7 @@
      1) редкость предмета — из окна сундука, бросок из 10 000;
      2) линия пула — среди линий, у которых на этой редкости есть записи, бросок из суммы их весов;
      3) запись линии — бросок из суммы весов записей (герой недели, талисман по весу таблицы автора, ресурс).
+   Талисман со спойлером (третье поле записи — 1) есть в пуле только с цикла «для команды», L.teamFrom, — как ресурсы цикла VI.
    Пересчёт осколков пробуждённого героя в прах — после розыгрыша, по коллекции игрока, без бросков (§15.2). */
 (function (root) {
 'use strict';
@@ -30,7 +31,7 @@ function entriesOf(L, lineId, x, c, week) {
   switch (ln.kind) {
     case 'shards': return (P.heroes[week] || []).filter(h => h.cyc <= c).map(h => ({ kind: 'shard', id: h.id, q: ln.pack[x - 1], w: 1 }));
     case 'workers': return [{ kind: 'wshard', id: 'w' + x, q: ln.qty[x - 1], w: 1 }];
-    case 'tal': return (P.tal[x] || []).map(t => ({ kind: 'tal', id: t[0], q: 1, w: t[1] }));
+    case 'tal': return (P.tal[x] || []).filter(t => !t[2] || c >= L.teamFrom).map(t => ({ kind: 'tal', id: t[0], q: 1, w: t[1] }));
     case 'equip': return [{ kind: 'equip', id: 'e' + x, q: 1, w: 1 }];
     case 'cur': return [{ kind: 'cur', id: ln.cur, q: ln.qty[x - 1] * (ln.perCycle ? c : 1), w: 1 }];
     case 'res': {
@@ -70,17 +71,19 @@ function pick(list, roll, weightOf) {
   throw new Error('бросок вне суммы весов');
 }
 
-/* Розыгрыш развёрнутого сундука по сиду сервера. */
-function roll(def, seed) {
+/* Розыгрыш развёрнутого сундука по сиду сервера. trace — необязательный массив: в него ложатся три броска каждого предмета
+   и суммы, из которых они брошены, — для показа пробного открытия. На порядок обращений к генератору trace не влияет. */
+function roll(def, seed, trace) {
   const rng = makeRng(seed), items = [];
   const bpSum = def.window.reduce((a, x) => a + x[1], 0);
   for (let i = 0; i < def.n; i++) {
-    const x = pick(def.window, rng(bpSum), v => v[1])[0];
+    const a = rng(bpSum), x = pick(def.window, a, v => v[1])[0];
     const lines = def.byR[x];
     if (!lines || !lines.length) throw new Error('пустая редкость ' + x + ' в окне');
-    const ln = pick(lines, rng(lines.reduce((a, l) => a + l.w, 0)), l => l.w);
-    const e = pick(ln.entries, rng(ln.entries.reduce((a, v) => a + v.w, 0)), v => v.w);
+    const W = lines.reduce((s, l) => s + l.w, 0), b = rng(W), ln = pick(lines, b, l => l.w);
+    const E = ln.entries.reduce((s, v) => s + v.w, 0), c = rng(E), e = pick(ln.entries, c, v => v.w);
     items.push({ line: ln.line, r: x, kind: e.kind, id: e.id, q: e.q });
+    if (trace) trace.push({ rolls: [a, b, c], of: [bpSum, W, E] });
   }
   return { cur: def.cur.map(x => x.slice()), items };
 }

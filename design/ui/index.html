@@ -1360,6 +1360,54 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 .rz-tip ul{margin:0;padding-left:15px;color:var(--parch-2);font-size:12px}
 .rz-tip .faint{color:var(--parch-3)}
 .rz-tip .chip{height:auto;padding:2px 7px;font-size:11px}
+/* UI-кит · лутбоксы */
+#kitLoot{display:flex;flex-direction:column;gap:12px;min-width:0}
+#kitLoot p{margin:0}
+#kitLoot .num{font-variant-numeric:lining-nums tabular-nums}
+#kitLoot .serif{font-family:var(--f-d)}
+#kitLoot .faint{color:var(--parch-3)}
+#kitLoot .eyebrow{display:inline-flex;align-items:center;gap:6px;font:700 10.5px/1.2 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--gold-2)}
+#kitLoot .eyebrow .i{width:13px;height:13px}
+#kitLoot .kh-top{margin-bottom:0}
+#kitLoot .kh-top input[type="text"]{height:30px;width:112px;border-radius:8px;border:1px solid var(--iron-2);background:#0c0f11;color:var(--parch);font:14px var(--f-u);padding:0 8px}
+#kitLoot select[disabled]{opacity:.45}
+.lb-seed{gap:6px}
+.lb-scroll{overflow-x:auto;scrollbar-width:thin;scrollbar-color:#2c3238 transparent;border:1px solid #1b1f24;border-radius:10px;padding:8px}
+.lb-grid{display:grid;grid-template-columns:200px repeat(7,minmax(78px,1fr));gap:5px;min-width:780px}
+.lb-h{align-self:end;padding:2px 4px;font:700 10px/1.2 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--rc,var(--gold-2))}
+.lb-t{display:flex;align-items:center;gap:8px;min-width:0;font:700 12.5px/1.2 var(--f-u);color:var(--parch)}
+.lb-t .i{flex:none;width:16px;height:16px;color:var(--gold-2)}
+.lb-t small{display:block;margin-top:2px;font-weight:400;font-size:11px;line-height:1.2;color:var(--parch-3)}
+.lb-c{appearance:none;display:flex;flex-direction:column;justify-content:center;gap:3px;min-height:50px;padding:6px 8px;border-radius:9px;border:1px solid #1b2025;background:#0d1013;color:var(--parch-3);text-align:left;cursor:pointer;opacity:.5}
+.lb-c b{font:600 16px/1 var(--f-d);color:var(--rc)}
+.lb-c small{font-size:10px;line-height:1.1}
+.lb-c.paid{opacity:1;border-color:color-mix(in srgb,var(--rc) 40%,#1b2025);background:radial-gradient(90% 90% at 50% 110%,color-mix(in srgb,var(--rc) 20%,transparent),transparent 70%),#0d1013}
+.lb-c:hover,.lb-c:focus-visible{opacity:1;outline:none;border-color:var(--spirit)}
+.lb-c[aria-pressed="true"]{opacity:1;border-color:var(--spirit);box-shadow:0 0 0 1px var(--spirit),0 8px 16px -8px var(--spirit)}
+.lb-main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+.lb-card{display:flex;flex-direction:column;gap:9px;min-width:0;padding:12px;border-radius:12px;border:1px solid var(--iron);background:#0c0f12}
+.lb-name{font-size:22px;line-height:1.1;color:var(--parch)}
+.lb-win{display:flex;height:38px;border-radius:9px;overflow:hidden;border:1px solid #1b2025}
+.lb-win span{display:flex;flex-direction:column;justify-content:center;gap:3px;min-width:0;padding:0 7px;border-right:1px solid #0a0c0e;background:color-mix(in srgb,var(--rc) 18%,#0d1013);font:600 12px/1 var(--f-u);color:var(--parch);white-space:nowrap;overflow:hidden}
+.lb-win span:last-child{border-right:0}
+.lb-win b{overflow:hidden;text-overflow:ellipsis;font:700 9px/1.1 var(--f-u);letter-spacing:.06em;text-transform:uppercase;color:var(--rc)}
+.lb-tab th{width:1%}
+.lb-tab th small{margin-top:4px;font-weight:400}
+.lb-ln{display:block;margin-bottom:5px;color:var(--parch-2)}
+.lb-ln:last-child{margin-bottom:0}
+.lb-ln b{color:var(--parch)}
+.lb-ln small{display:block}
+.lb-ul{display:grid;gap:2px;margin:0;padding-left:16px;font-size:12.5px;color:var(--parch-2)}
+.lb-items{display:grid;gap:7px;margin:0;padding-left:20px;color:var(--parch-3)}
+.lb-it{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;color:var(--parch)}
+.lb-it b{font-weight:600}
+.lb-roll{display:block;margin-top:2px;font-size:11.5px;color:var(--parch-3);font-variant-numeric:tabular-nums}
+.lb-gcols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;align-items:start}
+.lb-gcols>div{display:flex;flex-direction:column;gap:6px;min-width:0}
+.lb-gift{appearance:none;width:100%;font:inherit;text-align:left;color:var(--parch);cursor:pointer}
+.lb-gift:hover,.lb-gift:focus-visible{outline:none;border-color:var(--spirit)}
+.lb-gift b{font-size:13px}
+@media (max-width:1200px){.lb-main{grid-template-columns:minmax(0,1fr)}}
 @container main (max-height: 360px){
   .tr-main{grid-template-columns:minmax(0,1fr) 208px}
   .tr-cols{gap:5px}
@@ -1478,6 +1526,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <script src="abilities.js"></script>
 <script src="kits.js"></script>
 <script src="roster.js"></script>
+<script src="lootboxes.js"></script>
 <script>
 'use strict';
 /* Все числа ниже — демонстрационные фикстуры: взяты из текущего UIKit
@@ -1588,7 +1637,7 @@ function initialState() {
       { id: 'hfrag', n: 'Осколки: Лаэйра', r: 3, q: 42, cat: 'frag', spec: 'Сборный герой', img: AV('heroes/h3.jpg'), riddle: '42 из 50. Остальное — у Эхо.', from: 'Эхо, Возрождение душ', recipes: [] },
       { id: 'act', n: 'Активация биома', r: 4, q: 1, cat: 'act', spec: 'Экземпляр крафтового биома', img: PATH(22), riddle: 'Что внутри — узнаешь, когда откроешь.', from: 'Мастерская', recipes: [], action: 'Активировать' },
       { id: 'many', n: 'Многоликий', r: 4, q: 1, cat: 'act', spec: 'Крафт или биом недели', img: PATH(18), riddle: 'Носит лица тех, кого победили на этой неделе.', from: 'Эхо: Убер-босс недели', recipes: [], action: 'Активировать' },
-      { id: 'chest', n: 'Ларец рабочих', r: 3, q: 3, cat: 'act', spec: 'Лутбокс События', img: CHEST, riddle: 'Шарды рабочих и гарантированная валюта.', from: 'Дары путешествия', recipes: [], action: 'Открыть' },
+      { id: 'chest', n: 'Сундук рабочих', r: 3, q: 3, cat: 'act', spec: 'Лутбокс События', img: CHEST, riddle: 'Шарды рабочих и гарантированная валюта.', from: 'Дары путешествия', recipes: [], action: 'Открыть' },
     ],
     craft: [null, null, null, null, null, null], craftSel: 0, book: false, invCat: 'all', invQ: '',
     tree: { cyc: 1, sel: null, q: '', only: false },   // вкладка «Древо рецептов» — инструмент команды
@@ -2885,7 +2934,7 @@ function eventView() {
   return { title: 'Событие недели', back: 'week', chip: weekChip(), html: `<section class="scr">
     <div class="pnl pad col" style="gap:8px">
       <div class="row"><div class="stat"><b style="font-size:32px">${fmt(E.pts)}</b><small>личных очков</small></div><span class="g-spacer"></span><span class="chip spirit">РП1 коллекции +0,05%</span><button class="btn sm" data-a="sheet" data-v="rank:Событие">Место 212</button></div>
-      <div class="ms">${E.ms.map((m, i) => `<div class="m ${E.pts >= m ? 'got' : ''}">${well(i < 3 ? I('chest') : { n: 'Ларец', img: CHEST, r: 5 }, { act: 'item', val: 'chest', size: 44 })}<small class="num">${fmt(m)}</small></div>`).join('')}</div>
+      <div class="ms">${E.ms.map((m, i) => `<div class="m ${E.pts >= m ? 'got' : ''}">${well(i < 3 ? I('chest') : { n: 'Сундук', img: CHEST, r: 5 }, { act: 'item', val: 'chest', size: 44 })}<small class="num">${fmt(m)}</small></div>`).join('')}</div>
       <div class="track" style="--v:${Math.min(100, E.pts / max * 100 * 1.6)}"><i></i></div>
     </div>
     <div class="col scroll grow" style="gap:6px"><span class="eyebrow">Откуда очки</span>${E.src.map(([n, d, p]) => `<div class="opp"><span class="col" style="gap:2px"><b>${n}</b><small class="faint">${d}</small></span><b class="num serif gold" style="font-size:20px">+${p}</b><button class="link" data-a="go" data-v="${n === 'Контракты' ? 'contracts' : n === 'Путешествия' ? 'descent' : n === 'Ритуалы' ? 'rituals' : n === 'Эхо' ? 'echo' : 'arena'}">Перейти ${ic('chev')}</button></div>`).join('')}</div>
@@ -3043,7 +3092,7 @@ const OV = {
       <p class="reason">Цикл ${ROMAN[S.acc.cycle]} · неделя ${S.week.race}. Итоговые места станут наградой после подсчёта.</p>`);
   },
   gifts() {
-    const rows = [['Эхо', 'Личный рейтинг', 'планка 25 000 очков', 2, 'Ларец осколков'], ['Контракты', 'Личный рейтинг', 'вчерашний контракт', 1, 'Ларец ключей'], ['Клановый босс', 'Клановые награды', 'доля по вкладу', 16, 'Ларец талисманов']];
+    const rows = [['Эхо', 'Личный рейтинг', 'планка 25 000 очков', 2, 'Сундук осколков'], ['Контракты', 'Личный рейтинг', 'вчерашний контракт', 1, 'Сундук ключей'], ['Клановый босс', 'Клановые награды', 'доля по вкладу', 16, 'Сундук талисманов']];
     return sheet('Дары путешествия', `<div class="tabs"><button aria-selected="true">Личный рейтинг</button><button aria-selected="false">Клановые награды</button></div>
       <div class="row" style="gap:10px"><img src="${CHEST}" alt="" style="width:56px;height:56px;border-radius:10px;object-fit:cover"><div class="stat"><b>59</b><small>сундуков доступно</small></div><span class="g-spacer"></span><button class="link" data-a="toast" data-v="Состав: осколки героев недели, ключи, талисманы">Состав ${ic('chev')}</button></div>
       ${rows.map(([m, c, b, n, box]) => `<div class="mail"><div class="col" style="gap:2px"><b>${m} · ${box}</b><small class="faint">${c} · ${b} · неделя ${S.week.race}</small></div><span class="chip">×${n}</span></div>`).join('')}
@@ -3180,7 +3229,7 @@ const ACT = {
   rsmine(v) { S.hview = 'mine'; S.selHero = v; S.seg.hero = 'power'; render(); },
   rsf(v, t) { S.rs.f[v] = t.value; render(); },
   rsval(v) { const [id, n] = v.split(':'); S.rs.val = { id, v: +n }; render(); },
-  rsteam() { KH.team = !KH.team; render(); khPaint(); rkPaint(); },
+  rsteam() { KH.team = !KH.team; render(); khPaint(); rkPaint(); lbPaint(); },
   rsgo(v) {
     const h = RSI[v]; if (!h) return;
     const lift = h.src !== 'gold' && h.c > rsCyc();   // сет и осколки видны только открытым циклам — демо поднимает цикл
@@ -3261,8 +3310,8 @@ const ACT = {
   autocraft(v) { open('autocraft', v); },
   acdo(v) { const r = S.recipes.find(x => x.id === v); const u = document.getElementById('acUnique'); if (u && !u.checked) return toast('Без согласия особый ресурс не списывается'); S.overlay = null; toast(`Создано: ${r.out}`, r.outImg); },
   toCraft(v) { S.seg.craft = 'work'; S.book = false; S.overlay = null; S.route = 'craft'; ACT.put(v); },
-  use(v) { const it = I(v); S.overlay = { t: 'confirm', title: it.action + ' · ' + it.n, text: it.id === 'chest' ? 'Ларец откроется здесь, в запасах. Содержимое станет известно после подтверждения.' : 'Экземпляр появится в Спуске. Что внутри — станет известно после активации.', ok: it.action, act: 'usedo', v }; render(); focusOverlay(); },
-  usedo(v) { const it = I(v); it.q--; if (it.q <= 0) S.items = S.items.filter(x => x !== it); S.overlay = null; toast(v === 'chest' ? 'Ларец открыт: шарды рабочих ×3, золото 800' : 'Экземпляр активирован (демо)'); },
+  use(v) { const it = I(v); S.overlay = { t: 'confirm', title: it.action + ' · ' + it.n, text: it.id === 'chest' ? 'Сундук откроется здесь, в запасах. Содержимое станет известно после подтверждения.' : 'Экземпляр появится в Спуске. Что внутри — станет известно после активации.', ok: it.action, act: 'usedo', v }; render(); focusOverlay(); },
+  usedo(v) { const it = I(v); it.q--; if (it.q <= 0) S.items = S.items.filter(x => x !== it); S.overlay = null; toast(v === 'chest' ? 'Сундук открыт: шарды рабочих ×3, золото 800' : 'Экземпляр активирован (демо)'); },
   buy(v) { const [id, q, c, p] = S.shop[+v]; S.overlay = { t: 'confirm', title: 'Купить в лавке', text: `${I(id).n} ×${q}`, ok: 'Купить', act: 'buydo', v, cost: [c, p] }; render(); focusOverlay(); },
   buydo(v) { const [id, q, c, p] = S.shop[+v]; if (!spend(c, p)) return close(); I(id).q += q; S.sold.push(+v); S.overlay = null; toast(`Куплено: ${I(id).n} ×${q}`, I(id).img); },
   esel(v) { S.echo.sel = +v; render(); },
@@ -3900,6 +3949,9 @@ function renderKit() {
   ${RX.stats ? `<section class="k-box" style="grid-column:1/-1"><h3>Ресурсы Этериоса · ${RX.stats.total.resources}</h3>
     <p class="k-note">Все ресурсы игры по шести циклам и ярусам. Базовые — общий пул на все циклы: падают в каждом биоме с первого. Ключи — по биомам, любая элита роняет один из шести наугад. Уникальные — с боссов биомов, крафтовые — в руинах и у крафтовых боссов в Эхо. Иконка — заглушка: ремесло или ярус, нижняя кромка — редкость. Наведите или выберите клавиатурой — подсказка с загадкой и источником; нажмите — узел откроется в «Древе рецептов». Данные — <code>recipes.js</code>, обоснование и летопись Этриона — <code>docs/content/ресурсы-рецепты-дроп.md</code>. Цикл VI — спойлер, только для команды.</p>
     <div id="kitRes" class="rz"></div></section>` : ''}
+  ${window.EN_LOOTBOXES ? `<section class="k-box" style="grid-column:1/-1"><h3>Лутбоксы · ${Object.keys(EN_LOOTBOXES.boxes).length} сундуков · ${Object.keys(EN_LOOTBOXES.modes).length} источников</h3>
+    <p class="k-note">Черновик <code>docs/content/лутбоксы.md</code>, данные и алгоритм открытия — <code>lootboxes.js</code>, сборка — <code>tools/content-gen/lootboxes/</code>. Числа — демонстрация, ждут автора. Сетка — «вид сундука × редкость»: в клетке ожидаемое главной меры в выбранном цикле и окне, яркие клетки в этом цикле кто-то выдаёт. Карточка — по §14.4. Пробное открытие — не выдача: в игре таблицы наград и итог открытия — на сервере (§36.16).</p>
+    <div id="kitLoot"></div></section>` : ''}
   ${RXI.sand ? `<section class="k-box"><h3>Древо рецептов · узлы</h3><div class="k-demo tr-cols">${[['sand', ''], ['k1_ench', 'up'], ['u4', ''], ['p_clay', 'sel'], ['act_cb1', 'down'], ['k4_hunt', '', 1]].map(([id, st, unk]) => { const it = RXI[id]; if (!it) return ''; return `<span class="tn ${it.tier === 'key' ? 'key' : it.tier === 'unique' ? 'uniq' : TR_MADE.includes(it.tier) ? 'made' : ''} ${unk ? 'unk' : ''} ${st}"><span class="ti" data-r="${unk ? 1 : it.r}">${unk ? '<span class="gl">?</span>' : trIcon(it)}</span><b>${unk ? 'Не найдено' : it.n}</b></span>`; }).join('')}</div>
     <div class="tr-leg"><span><i></i>что нужно выбранному</span><span><i class="d"></i>куда оно идёт</span><span><i class="s"></i>выбранный узел</span></div>
     <p class="k-note">Вкладка «Древо рецептов» рядом с «Картой экранов» — инструмент команды и конструктора, игрок древо не видит (ADR-0008). Узлы стоят по слоям: добыча, ключи мастерской и творения, заготовки, изделия, руины и Эхо, герои и награды; внизу — руны стражей. Цвет узла — редкость, пунктир — вход из прошлого цикла.</p></section>` : ''}`;
@@ -3975,6 +4027,205 @@ function bindKitRes() {
     hide(); S.tree.sel = it.id; S.tree.cyc = it.cyc; S.tree.only = false; S.tree.q = '';
     showPage('tree'); try { history.replaceState(null, '', '#tree'); } catch (_) { }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+/* ================== UI-кит · лутбоксы ==================
+   Сундуки всех режимов — черновик docs/content/лутбоксы.md. Данные и алгоритм открытия — lootboxes.js: window.EN_LOOTBOXES и window.EnLoot,
+   собирает tools/content-gen/lootboxes/ (node build.js). Карточка — по §14.4: тип, редкость, количество, возможное содержимое и шансы.
+   Пробное открытие — не выдача: в игре сид выдаёт сервер вместе с сундуком, итог открытия — тоже его (§34.1, §36.16).
+   Ресурсы цикла VI и талисманы со спойлером прячет флажок «для команды» — KH.team, общий с разделами героев.
+   Ожидаемое в данных — целые сотые доли; здесь только показ. Автопроверка — tools/content-gen/lootboxes/check_ui.js. */
+const LBX = window.EN_LOOTBOXES || null;
+const LB = { box: 'shards', r: 3, win: 'step', cyc: 3, week: 'Эльфы', seed: 'проба-1', awake: false, who: 'free' };
+const LB_IC = { shards: 'users', keys: 'key', equip: 'shield', talisman: 'gem', workers: 'gear', craft: 'crown', wander: 'star' };
+const LB_UNIT = { shards: 'осколков', keys: 'рунных ключей', equipV: 'очков редкости', talV: 'очков редкости', wshV: 'очков редкости', craftV: 'очков редкости', dust: 'праха' };
+const LB_MAIN = { shards: 'осколков героев недели', keys: 'рунных ключей', equipV: 'очков редкости снаряжения', talV: 'очков редкости талисманов', wshV: 'очков редкости рабочих', craftV: 'очков редкости: рабочие и талисманы', dust: 'праха' };
+const LB_RES = { basic: 'базовый', key: 'ключ ремесла', unique: 'уникальный' };
+const lbH = v => { const t = Math.round((v || 0) / 10), f = t % 10; return fmt((t - f) / 10) + (f ? ',' + f : ''); };   // сотые → «12,5»: до десятых, как в черновике
+const lbPct = (a, b) => { const t = Math.round(a * 1000 / b), f = t % 10; return ((t - f) / 10) + (f ? ',' + f : '') + ' %'; };
+const lbMain = (B, ev) => B.main === 'craftV' ? (ev.talV || 0) + (ev.wshV || 0) : ev[B.main] || 0;
+const lbFrom = id => Math.min(...Object.values(LBX.modes).filter(m => m.box === id).map(m => m.from));
+const lbRowLabel = (ly, row) => ly.kind === 'plank' ? `${ly.one} ${row.label.replace('планка ', '')}` : ly.kind === 'place' ? `${ly.one}: ${row.label}` : row.label;
+const lbBoxName = (id, r, win) => `${LBX.boxes[id].n} · ${LBX.boxRarity[r - 1]}${win && win !== 'step' ? ' · ' + LBX.winNames[win] : ''}`;
+function lbNextSeed(s) { const m = String(s).match(/^(.*?)(\d+)$/); return m ? m[1] + (+m[2] + 1) : s + '-2'; }
+/* кто выдаёт этот сундук в цикле: «режим · основание» */
+function lbWhere(box, r, win, c) {
+  const out = [];
+  for (const m of Object.values(LBX.modes)) {
+    if (m.box !== box) continue;
+    for (const ly of m.layers) for (const row of ly.rows) for (const g of row.cyc[c] || []) if (g.r === r && g.win === win)
+      out.push(`${m.n}${m.proposal ? ' — предложение' : ''} · ${lbRowLabel(ly, row)}${g.count > 1 ? ' · ' + g.count + ' шт.' : ''}${ly.clan ? ' · на участника' : ''}`);
+  }
+  return out;
+}
+function lbPaid(box, c) {
+  const s = new Set();
+  for (const m of Object.values(LBX.modes)) if (m.box === box) for (const ly of m.layers) for (const row of ly.rows) for (const g of row.cyc[c] || []) s.add(g.r + ':' + g.win);
+  return s;
+}
+function lbItemName(kind, id, r) {
+  const L = LBX;
+  if (kind === 'shard') { const h = L.heroInfo[id]; return `Осколки героя: ${h ? h.n : id}`; }
+  if (kind === 'tal') { const t = L.talInfo[id]; return !t ? 'Духовный талисман' : t[2] && !KH.team ? 'Духовный талисман · только команде' : `${t[0]} · ${t[1].toLowerCase()}`; }
+  if (kind === 'wshard') return `Шарды рабочего · ${RAR[r].toLowerCase()}`;
+  if (kind === 'equip') return L.equip[r - 1];
+  if (kind === 'cur') return L.currencies[id] || id;
+  const it = L.items[id];
+  return !it ? id : it.team && !KH.team ? 'Ресурс цикла VI · для команды' : it.n;
+}
+function lbLineSum(l, x) {
+  const ln = LBX.lines[l.line], e = l.entries;
+  switch (ln.kind) {
+    case 'shards': return `×${ln.pack[x - 1]} одного из ${e.length} ${plural(e.length, 'героя', 'героев', 'героев')}, поровну`;
+    case 'workers': return `×${ln.qty[x - 1]}, рабочий этой редкости`;
+    case 'tal': return `${e.length} ${plural(e.length, 'талисман', 'талисмана', 'талисманов')}, по весу таблицы автора`;
+    case 'equip': return 'слот случайный из девяти · заглушка до §21';
+    case 'cur': return `×${fmt(e[0].q)}`;
+    case 'res': { const by = ln.by[x - 1]; return `${LB_RES[by[0]]} ×${by[1]} · ${e.length} ${plural(e.length, 'вид', 'вида', 'видов')}`; }
+    case 'item': return `×${e[0].q}`;
+  }
+  return '';
+}
+function lbTopHtml() {
+  const L = LBX, opt = (v, t, cur) => `<option value="${v}" ${String(cur) === String(v) ? 'selected' : ''}>${t}</option>`;
+  return `<div class="kh-top">
+    <select data-lb="cyc" aria-label="Цикл">${ROMAN.slice(1).map((r, i) => opt(i + 1, 'Цикл ' + r, LB.cyc)).join('')}</select>
+    <select data-lb="week" aria-label="Неделя Эхо" ${LB.box === 'shards' ? '' : 'disabled title="Неделя важна только сундуку осколков"'}>${L.weeks.map(w => opt(w, 'Неделя: ' + w, LB.week)).join('')}</select>
+    <div class="tabs" role="tablist" aria-label="Окно редкостей">${Object.keys(L.winNames).map(w => `<button role="tab" data-lb="win" data-v="${w}" aria-selected="${LB.win === w}">${L.winNames[w]}</button>`).join('')}</div>
+    <label class="lb-seed">сид<input type="text" data-lb="seed" value="${trEsc(LB.seed)}" aria-label="Сид пробного открытия" spellcheck="false"></label>
+    <button class="btn sm" data-lb="next">${ic('swap')}Следующий сид</button>
+    <label><input type="checkbox" data-lb="awake" ${LB.awake ? 'checked' : ''}>герои отряда пробуждены</label>
+    <select data-lb="who" aria-label="Игрок для недели и Даров">${opt('free', 'Обычный игрок', LB.who)}${opt('fan', 'Увлечённый игрок', LB.who)}</select>
+    <label><input type="checkbox" data-lb="team" ${KH.team ? 'checked' : ''}>для команды</label>
+  </div>`;
+}
+/* сетка «вид сундука × редкость»: в клетке — ожидаемое главной меры в выбранном цикле и окне; яркие — те, что в цикле кто-то выдаёт */
+function lbGridHtml() {
+  const L = LBX, c = LB.cyc;
+  const head = `<div class="lb-h">Сундук · окно «${L.winNames[LB.win]}»</div>${L.boxRarity.map((n, i) => `<div class="lb-h" data-r="${i + 1}">${n}</div>`).join('')}`;
+  const rows = Object.entries(L.boxes).map(([id, B]) => {
+    const paid = lbPaid(id, c), from = lbFrom(id), who = [...new Set(Object.values(L.modes).filter(m => m.box === id).map(m => m.n))].join(', ');
+    const cells = L.boxRarity.map((n, i) => {
+      const r = i + 1, v = lbMain(B, L.ev[id][c][LB.win][i]), on = paid.has(r + ':' + LB.win);
+      return `<button class="lb-c ${on ? 'paid' : ''}" data-r="${r}" data-lb="pick" data-v="${id}:${r}" aria-pressed="${LB.box === id && LB.r === r}" title="${B.n} · ${n}${on ? ' · выдаётся в цикле ' + ROMAN[c] : ' · в цикле ' + ROMAN[c] + ' не выдаётся'}"><b class="num">${lbH(v)}</b><small>${LB_UNIT[B.main]}</small></button>`;
+    }).join('');
+    return `<div class="lb-t">${ic(LB_IC[id])}<span>${B.n}<small>${who}${c < from ? ' · с цикла ' + ROMAN[from] : ''}</small></span></div>${cells}`;
+  }).join('');
+  return `<div class="lb-scroll"><div class="lb-grid">${head}${rows}</div></div>`;
+}
+function lbEvHtml(B, ev) {
+  const rows = [[LB_MAIN[B.main], lbMain(B, ev)], ['талисманов', B.main === 'talV' || B.main === 'craftV' ? ev.tal : 0], ['шардов рабочих', B.main === 'wshV' || B.main === 'craftV' ? ev.wsh : 0],
+    ['предметов снаряжения', B.main === 'equipV' ? ev.eq : 0], ['рунных ключей', B.main === 'keys' ? 0 : ev.keys], ['праха', B.main === 'dust' ? 0 : ev.dust],
+    ['Многоликий, штук', ev.many], ['ресурсы, золото по цене рынка', ev.resGold], ['золото, гарантированно', ev.gold], ['дух, гарантированно', ev.spirit]].filter(([, v]) => v);
+  return `<table class="rk-tab">${rows.map(([n, v]) => `<tr><th>${n}</th><td class="n">${lbH(v)}</td></tr>`).join('')}</table>`;
+}
+function lbCardHtml(def) {
+  const L = LBX, B = L.boxes[LB.box], i = LB.r - 1, ev = L.ev[LB.box][LB.cyc][LB.win][i], stub = B.lines.some(([l]) => L.lines[l].stub);
+  const bpSum = def.window.reduce((a, x) => a + x[1], 0);
+  const win = `<div class="lb-win">${def.window.map(([x, bp]) => `<span data-r="${x}" style="flex:${bp}" title="${RAR[x]} · ${lbPct(bp, bpSum)}"><b>${RAR[x]}</b>${lbPct(bp, bpSum)}</span>`).join('')}</div>`;
+  const rows = def.window.map(([x, bp]) => {
+    const W = def.byR[x].reduce((a, l) => a + l.w, 0);
+    return `<tr><th>${rar(x)}<small>${lbPct(bp, bpSum)} предметов</small></th><td>${def.byR[x].map(l => `<span class="lb-ln"><b>${L.lines[l.line].n.replace(' — заглушка', '')}</b> · ${lbPct(l.w, W)}<small>${lbLineSum(l, x)}</small></span>`).join('')}</td></tr>`;
+  }).join('');
+  const heroes = LB.box === 'shards' ? (L.pools.heroes[LB.week] || []).filter(h => h.cyc <= LB.cyc) : [];
+  const where = lbWhere(LB.box, LB.r, LB.win, LB.cyc);
+  return `<div class="lb-card">
+    <div class="row" style="gap:12px;align-items:center"><span class="well" data-r="${LB.r}" style="--s:64px"><img src="${CHEST}" alt=""></span>
+      <div class="col" style="gap:5px;min-width:0"><span class="eyebrow">${ic(LB_IC[LB.box])}Карточка сундука · §14.4</span><b class="serif lb-name">${lbBoxName(LB.box, LB.r)}</b>
+        <div class="k-row" style="gap:6px">${rar(LB.r)}<span class="chip">окно: ${L.winNames[LB.win]}</span><span class="chip">цикл ${ROMAN[LB.cyc]}</span>${LB.box === 'shards' ? `<span class="chip">неделя: ${LB.week}</span>` : ''}<span class="chip">предметов: ${def.n}</span>${stub ? '<span class="chip warn">снаряжение — заглушка до §21</span>' : ''}</div></div></div>
+    <span class="eyebrow">Гарантированная валюта</span><div class="k-row">${def.cur.map(([k, a]) => money(k, a)).join('')}</div>
+    <span class="eyebrow">Окно редкостей · шанс каждого предмета</span>${win}
+    <span class="eyebrow">Возможное содержимое · доли линий на редкости</span><table class="rk-tab lb-tab">${rows}</table>
+    ${LB.box === 'shards' ? `<span class="eyebrow">Отряд недели в пуле · ${heroes.length} из 5</span>${heroes.length ? `<div class="k-row" style="gap:6px">${heroes.map(h => `<span class="chip">${trEsc(L.heroInfo[h.id].n)} · ${RAR[h.r].toLowerCase()} · ${ROMAN[h.cyc]}</span>`).join('')}</div>` : '<p class="k-note">Эхо открывается с цикла II: героев в пуле нет.</p>'}` : ''}
+    <span class="eyebrow">Кто выдаёт в цикле ${ROMAN[LB.cyc]}</span>${where.length ? `<ul class="lb-ul">${where.map(w => `<li>${w}</li>`).join('')}</ul>` : '<p class="k-note">В этом цикле такой сундук не выдаёт ни один источник — карточка для сравнения.</p>'}
+    <span class="eyebrow">Ожидаемое в одном сундуке</span>${lbEvHtml(B, ev)}
+  </div>`;
+}
+/* пробное открытие: тот же алгоритм, что у сервера, три броска на предмет; перевод лишних осколков в прах — без бросков */
+function lbTrialHtml(def) {
+  const L = LBX, E = window.EnLoot, seed = E.seedOf(LB.seed), trace = [], res = E.roll(def, seed, trace);
+  const awake = {}; if (LB.awake) res.items.forEach(it => { if (it.kind === 'shard') awake[it.id] = true; });
+  const conv = LB.awake ? E.toDust(L, res, awake) : null;
+  const items = res.items.map((it, i) => {
+    const t = trace[i], d = conv && conv.items[i].dust;
+    return `<li data-r="${it.r}"><span class="lb-it">${rar(it.r)}<b>${trEsc(lbItemName(it.kind, it.id, it.r))}</b>${KH.team && (it.kind === 'tal' ? (L.talInfo[it.id] || [])[2] : it.kind === 'item' && L.items[it.id] && L.items[it.id].team) ? '<span class="chip warn">спойлер · только команде</span>' : ''}${it.q > 1 || it.kind === 'cur' ? `<span class="num">×${fmt(it.q)}</span>` : ''}${d ? `<span class="chip warn">→ прах ×${fmt(d)}</span>` : ''}</span>
+      <span class="lb-roll">1) ${fmt(t.rolls[0])} из ${fmt(t.of[0])} → ${RAR[it.r].toLowerCase()} · 2) ${t.rolls[1]} из ${t.of[1]} → ${L.lines[it.line].n.replace(' — заглушка', '').toLowerCase()} · 3) ${fmt(t.rolls[2])} из ${fmt(t.of[2])} → запись</span></li>`;
+  }).join('');
+  return `<div class="lb-card">
+    <div class="row" style="gap:8px;flex-wrap:wrap"><span class="eyebrow">Пробное открытие на сиде</span><span class="chip warn">проба — не выдача</span><span class="faint" style="font-size:12px">«${trEsc(LB.seed)}» → ${fmt(seed)}</span></div>
+    <div class="k-row">${res.cur.map(([k, a]) => money(k, a)).join('')}<span class="faint" style="font-size:12px">гарантированно, без бросков</span></div>
+    <ol class="lb-items">${items}</ol>
+    ${conv ? `<p class="k-note">Герои отряда уже пробуждены: осколки ушли в прах — всего ${fmt(conv.dust)} (§15.2; курс — демо-таблица §15.3).</p>` : LB.box === 'shards' ? '<p class="k-note">Включите «герои отряда пробуждены» — покажет перевод лишних осколков в прах.</p>' : ''}
+    <p class="k-note">На предмет — три броска: редкость из окна, линия пула, запись. Порядок бросков не зависит от содержимого. В игре сид выдаёт сервер вместе с сундуком, открытие — операция с одним итогом (§34.1).</p>
+  </div>`;
+}
+function lbWeekHtml() {
+  const L = LBX, c = LB.cyc;
+  const rows = Object.entries(L.modes).filter(([, m]) => m.weekly).map(([mid, m]) => {
+    const B = L.boxes[m.box], w = L.week[mid] && L.week[mid][c];
+    if (!w) return `<tr><th>${m.n}</th><td colspan="4" class="faint">с цикла ${ROMAN[m.from]}</td></tr>`;
+    return `<tr><th>${m.n}</th><td class="n">${w.free.boxes} / ${w.fan.boxes}</td><td class="n">${lbH(lbMain(B, w.free))} / ${lbH(lbMain(B, w.fan))}</td><td>${LB_UNIT[B.main]}</td><td class="n">${lbH(w.free.gold)} / ${lbH(w.free.spirit)}</td></tr>`;
+  }).join('');
+  return `<table class="rk-tab"><tr><th>Режим</th><th>Сундуков</th><th colspan="2">Главное: обычный / увлечённый</th><th>Золото / дух, обычный</th></tr>${rows}</table>
+    <p class="k-note">Где заканчивают неделю обычный и увлечённый — допущение черновика до баланса очков режимов.</p>`;
+}
+/* превью «Даров путешествия» (§23.1): неделя обычного или увлечённого игрока по допущениям черновика */
+function lbGiftRows(who, c) {
+  const out = { me: [], clan: [] };
+  for (const m of Object.values(LBX.modes)) {
+    if (!m.weekly || c < m.from || !m.typical) continue;
+    const t = m.typical[who] || {};
+    for (const ly of m.layers) {
+      if (!(ly.id in t)) continue;
+      const v = t[ly.id], rows = ly.kind === 'plank' ? ly.rows.slice(0, v) : ly.rows.filter(r => r.top === v);
+      for (const row of rows) for (const g of row.cyc[c] || []) (ly.clan ? out.clan : out.me).push({ mode: m.n, box: m.box, g, label: lbRowLabel(ly, row), done: ly.kind === 'plank' && !ly.clan });
+    }
+  }
+  return out;
+}
+function lbGiftsHtml() {
+  const c = LB.cyc;
+  if (c < 2) return '<p class="k-note">Рейтинговые режимы открываются с цикла II — на 10-м уровне аккаунта (§16). В цикле I Даров нет.</p>';
+  const R = lbGiftRows(LB.who, c), total = R.me.concat(R.clan).reduce((a, x) => a + x.g.count, 0);
+  const row = x => `<button class="mail lb-gift" data-lb="pick" data-v="${x.box}:${x.g.r}:${x.g.win}"><span class="well" data-r="${x.g.r}" style="--s:36px"><img src="${CHEST}" alt=""></span><span class="col" style="gap:2px;min-width:0;flex:1"><b>${x.mode} · ${lbBoxName(x.box, x.g.r, x.g.win)}</b><small class="faint">${x.label} · ${x.done ? 'подтверждено' : 'ждёт подсчёта недели'}</small></span><span class="chip">×${x.g.count}</span></button>`;
+  return `<div class="row" style="gap:10px;align-items:center"><img src="${CHEST}" alt="" style="width:48px;height:48px;border-radius:10px;object-fit:cover"><div class="stat"><b>${total}</b><small>${plural(total, 'сундук доступен', 'сундука доступно', 'сундуков доступно')}</small></div><span class="faint" style="font-size:12px">${LB.who === 'free' ? 'обычный' : 'увлечённый'} игрок · цикл ${ROMAN[c]} · неделя ${LB.week}</span></div>
+    <div class="lb-gcols"><div><span class="eyebrow">Личный рейтинг · ${R.me.length}</span>${R.me.map(row).join('')}</div>
+      <div><span class="eyebrow">Клановые награды · ${R.clan.length}</span>${R.clan.map(row).join('') || '<p class="faint">—</p>'}<p class="k-note">Доля участника: половину клановых сундуков делит сервер по вкладу, половину — глава (§24.4).</p></div></div>
+    <p class="k-note">Сундуки переходят в запасы и открываются там (§36.11). Планки подтверждены сразу, места и клановые награды ждут подсчёта недели (§23.1). Нажатие открывает карточку сундука.</p>`;
+}
+function lbHtml() {
+  if (!LBX || !window.EnLoot) return '<p class="faint">Нет данных: рядом с index.html должен лежать lootboxes.js.</p>';
+  const def = window.EnLoot.resolve(LBX, { box: LB.box, r: LB.r, win: LB.win, cyc: LB.cyc, week: LB.box === 'shards' ? LB.week : null });
+  return `${lbTopHtml()}${lbGridHtml()}<div class="lb-main"><div class="col" style="gap:12px">${lbCardHtml(def)}</div>
+    <div class="col" style="gap:12px">${lbTrialHtml(def)}
+      <div class="lb-card"><span class="eyebrow">Неделя · цикл ${ROMAN[LB.cyc]} · ожидаемое</span>${lbWeekHtml()}</div>
+      <div class="lb-card"><span class="eyebrow">Дары путешествия · превью §23.1</span>${lbGiftsHtml()}</div></div></div>`;
+}
+function lbPaint() {
+  const root = document.getElementById('kitLoot'); if (root) root.innerHTML = lbHtml();
+}
+function bindKitLoot() {
+  const root = document.getElementById('kitGrid'); if (!root) return;
+  root.addEventListener('click', e => {
+    const b = e.target.closest('[data-lb]'); if (!b || !b.closest('#kitLoot') || b.tagName === 'SELECT' || b.tagName === 'INPUT') return;
+    const a = b.dataset.lb, v = b.dataset.v || '';
+    if (a === 'pick') { const [box, r, win] = v.split(':'); LB.box = box; LB.r = +r; if (win) LB.win = win; }
+    else if (a === 'win') LB.win = v;
+    else if (a === 'next') LB.seed = lbNextSeed(LB.seed);
+    else return;
+    lbPaint();
+  });
+  root.addEventListener('change', e => {
+    const t = e.target, a = t.dataset && t.dataset.lb; if (!a || !t.closest('#kitLoot')) return;
+    if (a === 'cyc') LB.cyc = +t.value;
+    else if (a === 'week') LB.week = t.value;
+    else if (a === 'who') LB.who = t.value;
+    else if (a === 'awake') LB.awake = t.checked;
+    else if (a === 'seed') LB.seed = t.value.trim() || 'проба-1';
+    else if (a === 'team') { KH.team = t.checked; khPaint(); rkPaint(); render(); }   // флажок общий с разделами героев и прототипом
+    else return;
+    lbPaint();
   });
 }
 
@@ -4124,7 +4375,7 @@ function bindKitHeroes() {
   });
   root.addEventListener('change', e => {
     const t = e.target, a = t.dataset && t.dataset.kh; if (!a || !t.closest('#kitHeroes')) return;
-    if (a === 'team') { KH.team = t.checked; rkPaint(); render(); }   // флажок общий: состав героев и прототип тоже
+    if (a === 'team') { KH.team = t.checked; rkPaint(); lbPaint(); render(); }   // флажок общий: состав героев, лутбоксы и прототип тоже
     else if (['cyc', 'set', 'cls', 'el'].includes(a)) { KH[a] = t.value; if (a === 'cyc') KH.set = ''; }
     else return;
     khPaint();
@@ -4239,7 +4490,7 @@ function bindKitRoster() {
   });
   root.addEventListener('change', e => {
     const t = e.target, a = t.dataset && t.dataset.rk; if (!a || !t.closest('#kitRoster')) return;
-    if (a === 'team') { KH.team = t.checked; khPaint(); render(); }
+    if (a === 'team') { KH.team = t.checked; khPaint(); lbPaint(); render(); }
     else if (['cyc', 'src', 'cls', 'sch'].includes(a)) RK[a] = t.value;
     else return;
     rkPaint();
@@ -4406,7 +4657,7 @@ function boot() {
   const g = $game();
   bindGame();
   render();
-  renderMap(); renderKit(); rkPaint(); khPaint(); klPaint(); rzPaint();
+  renderMap(); renderKit(); rkPaint(); khPaint(); klPaint(); rzPaint(); lbPaint();
   const fl = document.getElementById('flows');
   fl.innerHTML = FLOWS.map(([t, d], i) => `<li><button class="p-flow" data-flow="${i}"><span><b>${t}</b><small>${d}</small></span></button></li>`).join('');
   fl.addEventListener('click', e => { const b = e.target.closest('[data-flow]'); if (!b) return; FLOWS[+b.dataset.flow][2](); render(); if (S.overlay) focusOverlay(); if (window.innerWidth < 1200) document.getElementById('devWrap').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
@@ -4421,6 +4672,7 @@ function boot() {
   bindKitRoster();
   bindKitLib();
   bindKitRes();
+  bindKitLoot();
   document.getElementById('kitGrid').addEventListener('click', e => { const b = e.target.closest('[data-fx]'); if (b) kitFx(b.dataset.fx); });
   document.getElementById('btnFull').addEventListener('click', () => { const d = document.getElementById('device'); const req = d.requestFullscreen || d.webkitRequestFullscreen; if (req) Promise.resolve(req.call(d)).catch(() => { }); });
   document.addEventListener('fullscreenchange', () => { const on = !!document.fullscreenElement; g.classList.toggle('full', on); document.getElementById('device').classList.toggle('fs', on); fitDevice(); });
