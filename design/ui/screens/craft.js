@@ -1,6 +1,8 @@
 /* Энериум · прототип «Свет снизу» — «Ремесло → Мастерская» на данных крафта (GDD §12, §36.12, §36.16).
    Подключается после screens/model.js, до boot(). Договор — screens/model.js: запасы только через BAG, найденные рецепты — BAG.known и BAG.learn.
    Экран разделён на подписанные зоны «Инвентарь» и «Крафт» (§12.4); крафт — стол из шести ячеек или книга рецептов.
+   Вид — по «Правилам воздуха» UI-кита: на столе и в книге нет лишних подписей, сведения о ресурсе — лист по нажатию:
+   на имени ресурса выбранной ячейки и на значках ингредиентов в книге.
    - Ресурс в ячейке из запасов не списан. Списание — при попытке, и со стола уходит всё.
    - Совпадение по вхождению: лишнее сгорает, неудача сжигает всё положенное, верный набор создаёт предмет всегда.
    - Подсказки — по §12, у рецептов от четырёх ингредиентов. Частичное знание рецепта — S.ws.part.
@@ -256,7 +258,7 @@ const wsStepHtml = (r, t, fin) => `<li${fin ? ' class="fin"' : ''}>${wsWell(BAG.
 function wsView() {
   return `<section class="scr"><div class="ws">${wsInvHtml()}${wsCraftHtml()}</div></section>`;
 }
-/* зона «Инвентарь»: запасы по ярусам, поиск, последний тронутый ресурс — количество и сведения */
+/* зона «Инвентарь»: запасы по ярусам и поиск. Нажатие или перенос кладёт ресурс в выбранную ячейку; сведения — на столе, по имени */
 function wsInvHtml() {
   const W = S.ws, q = trNorm(W.inv.q.trim()), g = WS_DATA.groups.find(x => x[0] === W.inv.cat) || WS_DATA.groups[0];
   const list = wsStock().filter(it => (!g[2] || g[2].includes(it.tier)) && (!q || trNorm(it.n).includes(q)));
@@ -266,14 +268,7 @@ function wsInvHtml() {
     <div class="pnl-h"><h2>Инвентарь</h2><label class="search grow">${ic('search')}<input id="wsInvQ" type="search" placeholder="Поиск по запасам" value="${trEsc(W.inv.q)}" autocomplete="off" aria-label="Поиск по запасам"></label></div>
     <div class="tabs" role="tablist" aria-label="Запасы по ярусам">${tabs}</div>
     <div class="ws-grid scroll grow" data-keep="wsinv:${g[0]}">${wells || '<p class="faint ws-none">Ничего не найдено</p>'}</div>
-    ${wsPickHtml()}
   </div>`;
-}
-function wsPickHtml() {
-  const it = S.ws.pick ? BAG.item(S.ws.pick) : null;
-  if (!it) return '<p class="reason ws-pick-e">Нажмите ресурс — он ляжет в выбранную ячейку стола. Можно и перетащить.</p>';
-  const on = wsOn(it.id);
-  return `<div class="ws-pick">${wsWell(it, { stat: true })}<span class="col ws-pick-t"><b>${trEsc(it.n)}</b><small class="faint">${wsTier(it)} · в запасах ${fmt(BAG.qty(it.id))}${on ? ' · на столе ' + fmt(on) : ''}</small></span><button class="link" data-a="wsinfo" data-v="${it.id}">Сведения ${ic('chev')}</button></div>`;
 }
 /* зона «Крафт»: стол или книга рецептов */
 function wsCraftHtml() {
@@ -291,19 +286,19 @@ function wsTableHtml() {
   const core = out ? `<span class="well ws-core known" data-r="${out.r}" title="${trEsc(out.n)}">${trIcon(out)}</span>` : '<span class="well ws-core"><span>?</span></span>';
   return `<div class="ws-hex"><div class="ws-hex-in">${S.ws.cells.map(wsCellHtml).join('')}${core}</div></div>${wsQtyHtml()}${wsFootHtml(g)}`;
 }
-/* количество в выбранной ячейке: до 100 и не больше, чем в запасах */
+/* количество в выбранной ячейке: до 100 и не больше, чем в запасах. Имя ресурса — кнопка сведений; пустая ячейка — пустая строка */
 function wsQtyHtml() {
   const W = S.ws, c = W.cells[W.sel], it = c ? BAG.item(c.id) : null;
-  if (!it) return `<div class="ws-qty"><span class="faint ws-qe">Ячейка ${W.sel + 1} пуста: нажмите ресурс в инвентаре или перетащите его сюда.</span></div>`;
+  if (!it) return '<div class="ws-qty"></div>';
   const max = wsCellMax(c.id), b = (v, l, dis, lbl) => `<button class="ws-qb" data-a="wsq" data-v="${v}"${dis ? ' disabled' : ''} aria-label="${lbl}">${l}</button>`;
   const minus = WS_DATA.steps.filter(s => s < 0).map(s => b(s, '−' + -s, c.q <= 1, 'Меньше на ' + -s)).join('');
   const plus = WS_DATA.steps.filter(s => s > 0).map(s => b(s, '+' + s, c.q >= max, 'Больше на ' + s)).join('');
-  return `<div class="ws-qty"><span class="ws-qn"><b>${trEsc(it.n)}</b><small class="faint num">ячейка ${W.sel + 1} · в запасах ${fmt(BAG.qty(c.id))}</small></span>${minus}<input class="ws-qin num" type="number" inputmode="numeric" min="1" max="${Math.max(1, max)}" value="${c.q}" data-a="wsqset" aria-label="Количество в ячейке ${W.sel + 1}">${plus}${b('max', 'Макс', c.q >= max, 'Сколько можно')}${b('x', ic('x'), false, 'Убрать из ячейки')}</div>`;
+  return `<div class="ws-qty"><button class="ws-qn" data-a="wsinfo" data-v="${it.id}" title="Сведения: ${trEsc(it.n)} · в запасах ${fmt(BAG.qty(c.id))}"><span>${trEsc(it.n)}</span>${ic('info')}</button>${minus}<input class="ws-qin num" type="number" inputmode="numeric" min="1" max="${Math.max(1, max)}" value="${c.q}" data-a="wsqset" aria-label="Количество в ячейке ${W.sel + 1}">${plus}${b('max', 'Макс', c.q >= max, 'Сколько можно')}${b('x', ic('x'), false, 'Убрать из ячейки')}</div>`;
 }
 function wsFootHtml(g) {
   const any = g.st !== 'empty';
   let st, cls = g.st;
-  if (!any) st = `${WS_DATA.cells} ячеек, до ${WS_DATA.cellMax} единиц в каждой. Порядок не важен.`;
+  if (!any) st = 'Положите ресурсы в ячейки — порядок не важен.';
   else if (g.lack.length) { cls = 'bad'; st = 'Не хватает в запасах: ' + trEsc(wsNames(g.lack.map(c => [c.id, c.q - BAG.qty(c.id)]))); }
   else if (g.st === 'known') st = g.owned ? `«${trEsc(g.r.n)}»: ${trEsc(wsHero(g.r).n)} уже в коллекции` : `Совпадает с рецептом «${trEsc(g.r.n)}»${g.extra.length ? ' · лишнее сгорит: ' + trEsc(wsNames(g.extra)) : ''}`;
   else { const t = wsTrail(); st = t ? `На столе все открытые позиции «${trEsc(t.r.n)}»: ${t.n} из ${t.r.in.length}. Остальное — угадать.` : 'Сочетание неизвестно. При неудаче сгорит всё положенное.'; }
@@ -325,13 +320,15 @@ function wsBookHit(x, q) {
   const ids = x.r.in.map(([id]) => id).filter(id => !x.part || x.part.pos.includes(id));
   return [x.r.n, wsName(x.r.out[0])].concat(ids.map(wsName)).some(s => trNorm(s).includes(q));
 }
+/* строка книги: избранное, название и одно состояние, компактный состав, одно действие. Особый ресурс — ромб на значке,
+   значки ингредиентов и результата — кнопки сведений */
 function wsRowHtml(x) {
   const r = x.r, out = BAG.item(r.out[0]), fav = S.ws.fav.includes(r.id);
   const star = `<button class="ws-star" data-a="wsfav" data-v="${r.id}" aria-pressed="${fav}" aria-label="${fav ? 'Убрать из избранного' : 'В избранное'}: ${trEsc(r.n)}">${ic('star')}</button>`;
-  const outW = `<span class="arr">${ic('arrow')}</span>${wsWell(out, { stat: true, q: r.out[1] > 1 ? r.out[1] : null })}`;
+  const outW = `<span class="arr">${ic('arrow')}</span>${wsWell(out, { q: r.out[1] > 1 ? r.out[1] : null })}`;
   if (x.part) {
     const shown = r.in.map(([id]) => id).filter(id => x.part.pos.includes(id)), hid = r.in.length - shown.length;
-    const ing = shown.map(id => wsWell(BAG.item(id), { stat: true, q: '?' })).join('') + '<span class="well empty" title="Позиция не открыта">?</span>'.repeat(hid);
+    const ing = shown.map(id => wsWell(BAG.item(id), { q: '?' })).join('') + '<span class="well empty" title="Позиция не открыта">?</span>'.repeat(hid);
     const chip = `<span class="chip spirit">${ic('eye')}${hid ? `верно ${shown.length} из ${r.in.length}` : 'без количеств'}</span>`;
     return `<div class="ws-rc part">${star}<div class="ws-rc-m"><div class="ws-rc-t"><b>${trEsc(r.n)}</b>${chip}</div><div class="ws-ing">${ing}${outW}</div></div><button class="btn sm" data-a="wsload" data-v="${r.id}">На стол</button></div>`;
   }
@@ -339,9 +336,8 @@ function wsRowHtml(x) {
   const state = p.owned ? `<span class="chip gold">${ic('check')}в коллекции</span>`
     : p.ok ? `<span class="chip spirit">${ic('check')}${k ? `через ${k} ${plural(k, 'этап', 'этапа', 'этапов')}` : 'можно создать'}</span>`
     : p.stop.length ? `<span class="chip warn">${ic('lock')}неизвестный этап</span>` : '<span class="chip">не хватает</span>';
-  const sp = p.special.length || r.in.some(([id]) => wsSpecial(id)) ? `<span class="chip gold" title="Особый ресурс — только с согласия">${ic('crown')}особое</span>` : '';
-  const ing = r.in.map(([id, q]) => wsWell(BAG.item(id), { stat: true, q, cls: BAG.qty(id) < q ? 'ws-short' : '' })).join('');
-  return `<div class="ws-rc">${star}<div class="ws-rc-m"><div class="ws-rc-t"><b>${trEsc(r.n)}</b>${state}${sp}</div><div class="ws-ing">${ing}${outW}</div></div><button class="btn sm go" data-a="wsmake" data-v="${r.id}"${p.owned ? ' disabled' : ''}>Создать</button></div>`;
+  const ing = r.in.map(([id, q]) => wsWell(BAG.item(id), { q, cls: BAG.qty(id) < q ? 'ws-short' : '' })).join('');
+  return `<div class="ws-rc">${star}<div class="ws-rc-m"><div class="ws-rc-t"><b>${trEsc(r.n)}</b>${state}</div><div class="ws-ing">${ing}${outW}</div></div><button class="btn sm go" data-a="wsmake" data-v="${r.id}"${p.owned ? ' disabled' : ''}>Создать</button></div>`;
 }
 function wsBookHtml() {
   const B = S.ws.book, q = trNorm(B.q.trim()), rows = wsBookRows(), K = WS_DATA.kinds.find(k => k[0] === B.kind);
@@ -351,7 +347,7 @@ function wsBookHtml() {
   const opts = '<option value="">Все виды</option>' + WS_DATA.kinds.filter(k => k[0] === B.kind || rows.some(x => k[2].includes(x.r.kind)))
     .map(k => `<option value="${k[0]}"${k[0] === B.kind ? ' selected' : ''}>${k[1]}</option>`).join('');
   const empty = cur[0] === 'hint' && !rows.some(x => x.part)
-    ? `<p class="reason">Подсказок пока нет. Они бывают у рецептов от ${WS_DATA.hintFrom} ингредиентов: если на столе все ресурсы верны и их не меньше ${WS_DATA.hintMin}, рецепт появится здесь.</p>`
+    ? `<p class="reason">Подсказок пока нет. Они появляются, когда на столе не меньше ${WS_DATA.hintMin} верных ресурсов рецепта от ${WS_DATA.hintFrom} ингредиентов.</p>`
     : '<p class="faint ws-none">Ничего не найдено</p>';
   return `<div class="ws-bh"><label class="search grow">${ic('search')}<input id="wsBookQ" type="search" placeholder="Рецепт или ресурс" value="${trEsc(B.q)}" autocomplete="off" aria-label="Поиск по книге рецептов"></label><select class="rs-sel" data-a="wsbkind" aria-label="Вид рецепта">${opts}</select><button class="iconbtn ws-favt" data-a="wsbfav" aria-pressed="${B.fav}" aria-label="Только избранное" title="Только избранное">${ic('star')}</button></div>
     <div class="tabs" role="tablist" aria-label="Книга рецептов">${tabs.map(([k, l, list]) => `<button role="tab" aria-selected="${cur[0] === k}" data-a="wsbtab" data-v="${k}">${l} · ${list.length}</button>`).join('')}</div>
@@ -367,7 +363,7 @@ Object.assign(OV, {
     const uses = WS_SRV.known().filter(r => r.in.some(([id]) => id === it.id));
     const trails = wsParts().filter(x => x.part.pos.includes(it.id)), on = wsOn(it.id);
     const body = `<div class="ws-o">
-      <div class="row" style="gap:12px">${wsWell(it, { stat: true, size: 64 })}<div class="col" style="gap:4px;min-width:0"><span class="eyebrow">${wsTier(it)}${sp ? ' · ' + sp : ''}</span><b class="serif" style="font-size:22px;line-height:1.05">${trEsc(it.n)}</b>${rar(it.r)}</div><span class="g-spacer"></span><div class="stat" style="align-items:flex-end"><b>${fmt(BAG.qty(it.id))}</b><small>в запасах</small></div></div>
+      <div class="row" style="gap:12px">${wsWell(it, { stat: true, size: 64 })}<div class="col" style="gap:4px;min-width:0"><span class="eyebrow">${wsTier(it)}${sp ? ' · ' + sp : ''}</span><b class="serif" style="font-size:22px;line-height:1.05">${trEsc(it.n)}</b><span class="ws-rar" data-r="${it.r}">${ICON('r' + it.r, 16)}${RAR[it.r]}</span></div><span class="g-spacer"></span><div class="stat" style="align-items:flex-end"><b>${fmt(BAG.qty(it.id))}</b><small>в запасах</small></div></div>
       <p class="quote"><b>Загадка</b>${trEsc(it.lore)}</p>
       <dl class="kv"><dt>Цикл</dt><dd>${it.pool ? 'общий пул' : ROMAN[it.cyc] || '—'}</dd><dt>На столе</dt><dd>${on ? fmt(on) : 'нет'}</dd>${wsSpecial(it.id) ? '<dt>Особый ресурс</dt><dd class="gold">расход только с согласия</dd>' : ''}</dl>
       <span class="eyebrow">Найденные рецепты</span>${uses.length ? `<div class="tr-use">${uses.map(r => `<button class="chip" data-a="wsmake" data-v="${r.id}">${trEsc(r.n)}</button>`).join('')}</div>` : '<p class="faint" style="font-size:12.5px">Пока ни одного. Рецепты ищут на столе, загадка подсказывает дорогу.</p>'}

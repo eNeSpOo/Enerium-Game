@@ -534,7 +534,7 @@ function suite() {
         ACT.echskip(Ry.id); if (S.echo.slots[1] === y) S.overlay = null;
       }
       if (S.echo.slots[1] === y) fail(key + ': цель с 1 здоровья не пала за 40 атак');
-      else { const g2 = scan(key + ' · победа', draw()); if (S.echo.score - sc !== E.pts(3, c) || !g2.includes('победа') || (c >= LBX.modes.echo.from && !g2.includes('+' + fmt(E.pts(3, c))))) fail(key + ': итог победы без очков'); }
+      else { const g2 = scan(key + ' · победа', draw()); if (S.echo.score - sc !== E.pts(3, c) || !g2.includes('>Победа<') || (c >= LBX.modes.echo.from && !g2.includes('+' + fmt(E.pts(3, c))))) fail(key + ': итог победы без очков'); }
       /* Многоликий: лёгкий бой один на один; ресурс — своей недели */
       clear(); const m = E.target('step', TOP + 1); S.echo.slots[2] = m; S.echo.sel = 2; m.hp = 1;
       const many0 = BAG.qty('many');

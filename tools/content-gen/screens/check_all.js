@@ -13,6 +13,8 @@
       — сундук: письмо кладёт его через BAG.addChest, «Запасы» открывают, итог сходится с запасами и кошельком; второй раз не открыть.
    6. Листы поверх: сведения о каждом предмете recipes.js (спойлеры цикла VI — только «для команды»), ритуалы, Входящие, итог забега,
       подтверждения, Событие; все сценарии презентации.
+   7. Значки и правила воздуха: у героев отряда БМ, класс и пять характеристик — значками, в листе «Атрибуты» — атрибуты ядра;
+      в карточке бойца — атрибуты значками; иммунитет Мастера к контролю — из RULES.resist по рангу; длинный лор героя свёрнут.
    Запуск: node tools/content-gen/screens/check_all.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -21,7 +23,7 @@ const read = f => fs.readFileSync(path.join(UI, f), 'utf8');
 const html = read('index.html');
 const err = [];
 const say = m => { if (err.length < 80) err.push(m); else if (err.length === 80) err.push('… и ещё ошибки'); };
-const cnt = { routes: 0, views: 0, sheets: 0, items: 0, flows: 0, floors: 0, buys: 0, rituals: 0 };
+const cnt = { routes: 0, views: 0, sheets: 0, items: 0, flows: 0, floors: 0, buys: 0, rituals: 0, icons: 0 };
 
 /* 1. файлы */
 {
@@ -73,7 +75,7 @@ if (err.length) done();
 /* доступ к именам скриптов: верхнеуровневые const и let — не свойства window */
 const T = vm.runInContext(`({
   get S() { return S; }, set S(v) { S = v; },
-  BAG, ACT, OV, SCREENS, ACTIVATE, INV, RX, EB, LBX, KH, FLOWS, render, initialState, startRun, advance,
+  BAG, ACT, OV, SCREENS, ACTIVATE, INV, RX, EB, LBX, KH, RS, FLOWS, render, initialState, startRun, advance,
   heroDev, lootItems, ritSpec, shopCost, mkMin, mkUnit, mkFee, mkPick, poolItems, biomeItems, cycItems, evPlanks,
   zpChestGroups: typeof zpChestGroups === 'function' ? zpChestGroups : null, zpOpenOne: typeof zpOpenOne === 'function' ? zpOpenOne : null,
 })`, ctx);
@@ -537,9 +539,40 @@ reset();
   /* сценарии презентации */
   for (const [t, , f] of T.FLOWS) { reset(); run('сценарий ' + t, () => f()); draw('сценарий ' + t); cnt.flows++; T.S.runs = []; }
 }
+/* 7. значки и правила воздуха */
+reset();
+{
+  const ICO = n => `icons/${n}.png`;
+  T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'mine'; T.S.seg.hero = 'power';
+  for (const h of T.S.heroes) {
+    T.S.selHero = h.id; const g = draw(`значки · ${h.name}`); cnt.icons++;
+    for (const n of ['power', 'str', 'int', 'agi', 'end', 'spd']) if (!g.includes(ICO(n))) say(`значки · ${h.name}: нет значка ${n}`);
+    if (!/icons\/cls-[a-z]+\.png/.test(g)) say(`значки · ${h.name}: нет значка класса`);
+    T.S.overlay = { t: 'hattr', arg: h.id }; const ga = draw(`лист «Атрибуты» · ${h.name}`); T.S.overlay = null;
+    for (const n of ['hp', 'def-phys', 'def-mag', 'eva', 'crit', 'critdmg']) if (!ga.includes(ICO(n))) say(`лист «Атрибуты» · ${h.name}: нет значка ${n}`);
+  }
+  /* Мастер — рунный страж: иммунитет к контролю из RULES.resist по рангу карты (ADR-0010), числом в разметке его не пишут */
+  T.S.overlay = { t: 'foe', arg: 'g1' }; const gm = draw('лист Мастера');
+  const want = Math.round(T.EB.RULES.resist[T.EB.FOES.g1.rank] / 100) + ' %';
+  if (!gm.includes(`<b>${want}</b><small>иммунитет к контролю`)) say(`лист Мастера: иммунитет к контролю не ${want} из RULES.resist`);
+  if (/сопр\. контролю/.test(gm)) say('лист Мастера: осталось «сопр. контролю» с числом из разметки');
+  /* лор героя состава на экране — две строки и «ещё», полный текст — в листе «Подробнее» */
+  T.S.overlay = null; T.S.hview = 'all';
+  const long = T.RS.heroes.find(h => h.who && h.who.length > 150);
+  if (long) { T.S.rs.sel = long.id; T.S.seg.rhero = 'who'; if (!draw('лор героя').includes('<details class="lore">')) say(`лор героя ${long.n}: не свёрнут в две строки`); }
+  /* карточка бойца: атрибуты значками */
+  reset(); run('бой: старт', () => T.startRun('s1', 'b1'));
+  const R = T.S.runs[0];
+  if (R) {
+    T.S.route = 'battle'; T.S.focus = R.id; T.S.insp = '0:0'; draw('карточка бойца');
+    const gi = els.btInsp ? els.btInsp.innerHTML : '';
+    if (!gi.includes(ICO('hp')) || !/icons\/(patk|matk)\.png/.test(gi) || !gi.includes(ICO('def-phys'))) say('карточка бойца: атрибуты без значков');
+  }
+  T.S.runs = [];
+}
 if ('items' in T.S) say('после всех действий появился S.items');
 
-console.log(`Прототип целиком: маршрутов ${cnt.routes}, отрисовок ${cnt.views}, листов ${cnt.sheets}, сведений о предметах ${cnt.items}, сценариев ${cnt.flows}. Этажей с добычей ${cnt.floors}, покупок ${cnt.buys}, выдач ритуалов ${cnt.rituals}.`);
+console.log(`Прототип целиком: маршрутов ${cnt.routes}, отрисовок ${cnt.views}, листов ${cnt.sheets}, сведений о предметах ${cnt.items}, сценариев ${cnt.flows}. Этажей с добычей ${cnt.floors}, покупок ${cnt.buys}, выдач ритуалов ${cnt.rituals}. Героев со значками ${cnt.icons}.`);
 done();
 
 function done() {

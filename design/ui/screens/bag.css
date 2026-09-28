@@ -1,72 +1,158 @@
-/* screens/bag.css — «Ремесло → Запасы» и «Дары путешествия» (screens/bag.js). Свои классы — zp-* и dar-*;
-   остальное — общие классы прототипа: .stock, .inv, .icard, .rs-row, .rs-sel, .tabs, .well, .lb-win, .rk-tab, .mail, .gifts */
+/* screens/bag.css — «Ремесло → Запасы» и «Дары путешествия» (screens/bag.js) по «Правилам воздуха» UI-кита:
+   одна рамка — панель или лист, внутри строки, отступы и разделители; отступы — токены --sp-l, --sp-m, --sp-s.
+   Свои классы — zp-* и dar-*; общие — .stock, .inv, .icard, .tabs, .well, .qty, .search, .lb-win, .rk-tab, .gifts, .chip, .btn */
 
 /* каркас: вкладки сверху, список слева, карточка справа */
-.zp-bar{flex:none;gap:8px}
+.zp-bar{flex:none;gap:var(--sp-s)}
 .zp-bar .tabs button{display:inline-flex;align-items:center;gap:5px}
 .zp-bar .tabs .dot{width:6px;height:6px}
+.zp-gb{gap:6px}
+.zp-gb img{width:20px;height:20px;border-radius:5px}
+.zp-gb b{color:var(--spirit);letter-spacing:0}
 .zp-stock{flex:1 1 0;min-height:0;height:auto}
 .zp-inv{min-width:0}
-.zp-find{flex:none;gap:8px}
-.zp-un{display:inline-flex;align-items:center;gap:5px;flex:none;font-size:12.5px;color:var(--parch-2);white-space:nowrap;cursor:pointer}
-.zp-un input{margin:0;accent-color:var(--spirit)}
-.zp-un.off{opacity:.45;cursor:default}
-.zp-inv .rs-sel[disabled]{opacity:.45}
+.zp-find{flex:none}
+.zp-fb{flex:none;min-height:30px;height:30px;gap:6px}
+.zp-fb b{min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--spirit-2);color:#021614;font:700 10.5px/16px var(--f-u);letter-spacing:0;text-align:center}
+.zp-fb[aria-pressed="true"]{border-color:rgba(72,229,212,.45)}
 
-/* список: группы по ярусу, две колонки у предметов, одна — у осколков и сундуков */
-.zp-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:max-content;gap:4px;align-content:start}
+/* список: одна строка на запись, без рамок; группы по ярусу, две колонки у предметов, одна — у осколков и сундуков */
+.zp-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:max-content;gap:2px var(--sp-s);align-content:start}
 .zp-list.one{grid-template-columns:minmax(0,1fr)}
-.zp-gh{grid-column:1/-1;margin-top:6px}
+.zp-gh{grid-column:1/-1;display:flex;align-items:baseline;gap:6px;margin-top:var(--sp-s);padding:0 4px 2px}
 .zp-gh:first-child{margin-top:0}
-.zp-row b{font-size:14px}
-.zp-row .num{font-size:12px;color:var(--parch-2)}
-.zp-ic{display:grid;place-items:center;background:#0d1013;color:var(--rc,var(--parch-2))}
-.zp-ic>img{position:static;width:82%;height:82%;object-fit:contain;border-radius:4px}
-.zp-ic .i{width:16px;height:16px}
-.zp-ic .gl{font:600 13px/1 var(--f-d);color:var(--gold)}
-.zp-dot{position:absolute;left:2px;top:2px;width:6px;height:6px;z-index:1}
-.zp-k{position:absolute;right:1px;bottom:1px;display:grid;color:var(--gold-2)}
+.zp-gh i{font-style:normal;color:var(--parch-3);letter-spacing:.06em}
+.zp-row{appearance:none;display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;width:100%;min-height:36px;padding:3px 8px 3px 3px;border:0;border-radius:8px;background:none;color:var(--parch);text-align:left}
+.zp-row:hover{background:rgba(255,255,255,.028)}
+.zp-row[aria-current="true"]{background:rgba(72,229,212,.07);box-shadow:inset 2px 0 0 var(--spirit)}
+.zp-rt{display:flex;align-items:baseline;gap:var(--sp-s);min-width:0}
+.zp-row b{flex:0 1 auto;min-width:0;font:600 15px/1.1 var(--f-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zp-rt small{flex:0 1 auto;min-width:0;font-size:11.5px;line-height:1.1;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zp-row .num{font:700 12px/1 var(--f-u);color:var(--parch-3)}
+.zp-empty{grid-column:1/-1;display:flex;flex-direction:column;align-items:flex-start;gap:var(--sp-s);padding:6px 4px}
+
+/* плитка предмета: без рамки, редкость — нижняя кромка; крупная — в шапке карточки и в итоге открытия */
+.zp-ic{--z:30px;position:relative;display:grid;place-items:center;flex:none;width:var(--z);height:var(--z);border-radius:7px;overflow:hidden;background:radial-gradient(80% 80% at 50% 100%,color-mix(in srgb,var(--rc,#2b3036) 20%,transparent),transparent 70%),#0d1013;color:var(--rc,var(--parch-2))}
+.zp-ic::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--rc,#2b3036);opacity:.85}
+.zp-ic>img{width:82%;height:82%;object-fit:contain;border-radius:4px}
+.zp-ic>.i{width:16px;height:16px}
+.zp-ic>.gl{font:600 13px/1 var(--f-d);color:var(--gold)}
+.zp-ic.face>img,.zp-ic.face>.rs-ph{position:absolute;inset:0;width:100%;height:100%;border-radius:0;object-fit:cover;object-position:50% 20%}
+.zp-ic.face .rs-ph b{font-size:calc(var(--z) * .4)}
+.zp-ic.lg{--z:48px;border-radius:10px}
+.zp-ic.lg>.i{width:24px;height:24px}
+.zp-ic.lg>.gl{font-size:22px}
+.zp-ic .q{position:absolute;right:4px;bottom:4px;z-index:1;font:700 12px/1 var(--f-u);color:var(--parch);text-shadow:0 1px 2px #000,0 0 4px #000;font-variant-numeric:tabular-nums}
+.zp-dot{position:absolute;left:3px;top:3px;width:6px;height:6px;z-index:1}
+.zp-k{position:absolute;right:1px;bottom:3px;z-index:1;display:grid;color:var(--gold-2)}
 .zp-k .i{width:10px;height:10px}
+.zp-ic.lg .zp-k{right:3px;bottom:5px}
+.zp-ic.lg .zp-k .i{width:13px;height:13px}
 .well .zp-k{right:3px;bottom:2px}
 .well .zp-k .i{width:12px;height:12px}
-.zp-empty{grid-column:1/-1;display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:6px 2px}
 
-/* карточка */
-.zp-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;flex:none}
-.zp-name{font-size:20px;line-height:1.05;color:var(--parch)}
-.zp-q{align-items:flex-end}
-.zp-q b{color:var(--gold)}
-.zp-body{gap:8px}
-.zp-p{font-size:12.5px;line-height:1.35}
-.zp-card .quote{font-size:14px}
-.zp-card .rk-tab{font-size:12px}
-.zp-card .lb-win{height:34px;flex:none}
-.zp-cur{gap:10px;flex-wrap:wrap}
-.zp-hero .hd-top{flex:none}
-.zp-hero .rs-aside{gap:4px}
-.zp-foot{display:flex;flex-direction:column;gap:6px;flex:none}
-.zp-open{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.zp-open .qty span{display:grid;place-items:center;min-width:30px;height:28px;padding:0 6px;background:#1b2126;color:var(--gold);font:700 12px/1 var(--f-u)}
-.zp-open .qty button[disabled]{opacity:.4;cursor:default}
+/* карточка: плитка, имя с кристаллом редкости, количество; ниже — загадка, строки-ссылки на листы, одно действие */
+.zp-card{min-width:0}
+.zp-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:var(--sp-m);align-items:center;flex:none}
+.zp-ht{display:flex;flex-direction:column;gap:4px;min-width:0}
+.zp-eb{display:flex;align-items:center;gap:var(--sp-s);min-width:0}
+.zp-eb .eyebrow{min-width:0;letter-spacing:.1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zp-eb .chip{flex:none;height:18px;padding:0 6px;font-size:10px}
+.zp-nm{display:flex;align-items:center;gap:6px;min-width:0}
+.zp-name{min-width:0;font-size:21px;line-height:1.05;color:var(--parch);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.zp-cr{display:inline-grid;place-items:center;flex:none}
+.zp-cr .ico{filter:drop-shadow(0 0 4px color-mix(in srgb,var(--rc) 55%,transparent))}
+.zp-q{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.zp-q b{font:600 24px/1 var(--f-d);color:var(--gold)}
+.zp-q small{font:700 10px/1.2 var(--f-u);letter-spacing:.12em;text-transform:uppercase;color:var(--parch-3)}
+.zp-of{font-size:15px;color:var(--parch-3)}
+.zp-hn{appearance:none;display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:0;color:inherit;font:inherit;text-align:left}
+.zp-hn .i{width:15px;height:15px;color:var(--gold-2)}
+.zp-hn:hover{color:var(--gold)}
+.zp-body{gap:var(--sp-m)}
+.zp-p{font-size:13px;line-height:1.35;color:var(--parch-2)}
+
+/* загадка и лор — две строки, остальное по «ещё» */
+.zp-lt{font:italic 500 15px/1.35 var(--f-d);color:var(--parch-2)}
+.zp-lt b{margin-right:6px;font:700 10px/1 var(--f-u);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-2);vertical-align:1px}
+.zp-lore{flex:none}
+.zp-lore summary{list-style:none;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.zp-lore summary::-webkit-details-marker{display:none}
+.zp-lore .zp-lt{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.zp-lore[open] .zp-lt{display:block}
+.zp-more{align-self:flex-start;font:700 10.5px/1 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--gold-2)}
+.zp-lore[open] .zp-more{display:none}
+
+/* строки-ссылки на листы подробностей: разделители, а не коробки */
+.zp-links{display:flex;flex-direction:column;flex:none;border-top:1px solid var(--iron)}
+.zp-link{appearance:none;display:flex;align-items:center;gap:var(--sp-s);width:100%;min-height:38px;padding:4px 2px;border:0;border-bottom:1px solid var(--iron);background:none;color:var(--parch);font:700 13px/1.2 var(--f-u);letter-spacing:.04em;text-align:left}
+.zp-link>span{flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zp-link>b{color:var(--gold);font:700 13px/1 var(--f-u)}
+.zp-link>.i{flex:none;width:15px;height:15px;color:var(--parch-3)}
+button.zp-link:hover{color:var(--gold)}
+button.zp-link:hover>.i{color:var(--gold-2)}
+.zp-none{display:flex;align-items:center;min-height:38px;border-bottom:1px solid var(--iron);font-size:12.5px;color:var(--parch-3)}
+
+/* сундук: внутри — валюта, число предметов и кристаллы редкостей; открытие — внизу карточки */
+.zp-in{display:flex;flex-direction:column;gap:6px;flex:none}
+.zp-cur{gap:var(--sp-m);flex-wrap:wrap}
+.zp-crs{display:inline-flex;gap:1px;margin-left:auto}
+.zp-foot{flex:none}
+.zp-open{display:flex;align-items:center;gap:var(--sp-s)}
+.zp-open .btn.go{flex:1 1 0}
+.zp-n span{display:grid;place-items:center;min-width:30px;height:28px;padding:0 6px;background:#1b2126;color:var(--gold);font:700 12px/1 var(--f-u)}
+.zp-n button[disabled]{opacity:.4;cursor:default}
 .zp-later{flex:1 1 0}
 
-/* итог открытия — в той же карточке */
-.zp-res{display:flex;flex-direction:column;gap:6px;flex:none;padding:8px 10px;border-radius:10px;border:1px solid rgba(72,229,212,.35);background:rgba(72,229,212,.04)}
-.zp-rl{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:8px;align-items:center;font-size:12.5px;color:var(--parch)}
-.zp-rl .rs-av{width:24px;height:24px;border-radius:6px}
-.zp-rc{color:var(--rc)}
+/* итог открытия — крупно, в той же карточке: сколько открыто, валюта, плитки полученного */
+.zp-res{display:flex;flex-direction:column;gap:var(--sp-m);flex:none}
+.zp-rh{display:flex;align-items:center;gap:var(--sp-s);flex-wrap:wrap}
+.zp-rh b{font-size:23px;line-height:1.05;color:var(--parch);text-shadow:0 0 16px rgba(72,229,212,.3)}
+.zp-rh .chip{margin-left:auto}
+.zp-rcs{display:flex;flex-wrap:wrap;gap:var(--sp-s) var(--sp-l)}
+.zp-rc{display:inline-flex;align-items:center;gap:6px}
+.zp-rc img{width:26px;height:26px;object-fit:contain}
+.zp-rc b{font:600 22px/1 var(--f-d);color:var(--gold)}
+.zp-rg{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:var(--sp-m) var(--sp-s)}
+.zp-rl{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.zp-rl small{max-width:100%;font-size:11px;line-height:1.2;color:var(--parch-2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zp-rl.zp-dust .zp-ic>img,.zp-rl.zp-dust .zp-ic>.rs-ph{filter:grayscale(.8) brightness(.6)}
+.zp-rl.zp-dust .q{color:var(--sand)}
 
-/* Дары путешествия */
+/* лист «Фильтры»: значения — чипы, список за листом меняется сразу */
+.zp-fcs{display:flex;flex-wrap:wrap;gap:6px}
+.zp-fc{appearance:none;cursor:pointer;height:30px;padding:0 10px;font-size:12px;gap:6px}
+.zp-fc .i{width:14px;height:14px}
+.zp-fc[aria-pressed="true"]{color:var(--gold);border-color:var(--gold-3);background:#15130e;box-shadow:inset 0 -2px 0 var(--spirit)}
+.zp-src li{font-size:13px}
+
+/* Дары путешествия: сумма сверху, две категории, строка — режим и планка, период, состав кристаллами и одно действие */
 .dar-sum{margin-left:0;width:100%;flex:none}
+.dar-sum>span{flex:1 1 0;min-width:0}
+.dar-sum>.i{color:var(--gold-2)}
 .dar-sum[disabled]{opacity:.6;cursor:default}
-.dar-row{align-items:center;flex:none}
-.dar-row>.well{align-self:flex-start}
-.dar-tx{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 0}
-.dar-tx b{font-size:13.5px;line-height:1.2}
-.dar-tx small{line-height:1.3}
-.dar-wait{color:var(--amber)}
-.dar-cmp{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
-.dar-row>.btn,.dar-row>.chip{flex:none}
-.dar-grid{display:flex;flex-wrap:wrap;gap:8px}
+.dar-sec{margin-bottom:-4px}
+.dar-list{display:flex;flex-direction:column;border-top:1px solid var(--iron)}
+.dar-row{display:grid;grid-template-columns:34px minmax(0,1fr) auto auto;gap:var(--sp-s) var(--sp-m);align-items:center;min-height:50px;padding:6px 0;border-bottom:1px solid var(--iron)}
+.dar-row .well{--s:34px;border-radius:8px}
+.dar-tx{display:flex;flex-direction:column;gap:2px;min-width:0}
+.dar-tx b{font-size:14px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dar-tx small{font-size:12px;line-height:1.25;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dar-cmp{display:flex;align-items:center;gap:var(--sp-s)}
+.dar-g{display:inline-flex;align-items:center;gap:2px;font:700 12px/1 var(--f-u);color:var(--parch-2);font-variant-numeric:tabular-nums}
+.dar-row>.btn,.dar-row>.chip{justify-self:end}
+.dar-grid{display:flex;flex-wrap:wrap;gap:var(--sp-s)}
 .dar-box{--s:54px}
 .dar-fnote{margin-right:auto;font-size:12px}
+
+/* компактный режим низких экранов (844×390 и ниже) — по высоте рабочей области */
+@container main (max-height: 360px){
+  .zp-row{min-height:32px;padding:2px 6px 2px 2px}
+  .zp-ic{--z:28px}
+  .zp-ic.lg{--z:42px}
+  .zp-card,.zp-body{gap:var(--sp-s)}
+  .zp-name{font-size:18px}
+  .zp-q b{font-size:20px}
+  .zp-link,.zp-none{min-height:34px}
+  .zp-rh b{font-size:20px}
+}

@@ -3,17 +3,21 @@
    2. Скрипты прототипа выполняются в песочнице Node по порядку, как в браузере, с заглушкой DOM; boot() не запускается.
    3. Запасы: все вкладки, все значения фильтров (цикл, ремесло, редкость), «не в рецептах», поиск с вводом в поле; карточка каждой записи.
       Видимые записи подходят под фильтры. Нигде нет исключений, undefined, NaN и объектов в разметке.
+      «Правила воздуха»: над списком одна строка — поиск и «Фильтры», сами фильтры — в листе; у карточки ресурса одно действие,
+      «Найденные рецепты» и «Откуда падает» — листы по нажатию, в листах — те же рецепты и источники без ссылок на ADR и §.
    4. Активации: без обработчика — «недоступно»; с обработчиком кнопка зовёт ACTIVATE[ярус](id).
-   5. Сундуки: каждый демо-сундук открывается по одному и пачкой; итог сходится с запасами, кошельком и осколками;
-      тот же сундук второй раз не открывается. Все виды × редкости × окна × циклы (× недели у осколков) — карточка и открытие,
+   5. Сундуки: каждый демо-сундук открывается по одному и пачкой; итог — крупно в той же карточке — сходится с запасами,
+      кошельком и осколками; тот же сундук второй раз не открывается. Состав и шансы — лист по нажатию.
+      Все виды × редкости × окна × циклы (× недели у осколков) — карточка, лист состава и открытие,
       осколки пробуждённых героев уходят в прах, без флажка «для команды» — ни одного спойлерного имени.
-   6. Дары: типичная неделя сходится с EN_LOOTBOXES.week; вкладки и попап сундуков; «Получить» по строке и «Получить всё»;
-      ждущее и полученное второй раз не выдаётся; полученное — в истории; кнопка «Дары» на экране недели; цикл I — без Даров.
+   6. Дары: типичная неделя сходится с EN_LOOTBOXES.week; две категории, история и попап сундуков; одно действие на строку;
+      «Получить» по строке и «Получить всё»; ждущее и полученное второй раз не выдаётся; полученное — в истории;
+      кнопка «Дары» на экране недели; цикл I — без Даров.
    7. Экран не читает прежний демо-инвентарь S.items; сброс состояния и сценарии презентации работают.
    Запуск: node tools/content-gen/screens/check_bag.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
-const { strip } = require('./check_player_view.js');   // вид игрока: без элементов team-only (режим «Игрок / Команда»)
+const { strip, playerText, SERVICE } = require('./check_player_view.js');   // вид игрока: без элементов team-only (режим «Игрок / Команда»)
 const UI = path.join(__dirname, '..', '..', '..', 'design', 'ui');
 const html = fs.readFileSync(path.join(UI, 'index.html'), 'utf8');
 const err = [];
@@ -58,16 +62,30 @@ if (err.length) done();
 const T = vm.runInContext(`({
   get S() { return S; }, set S(v) { S = v; },
   BAG, ACT, OV, SCREENS, CRAFT_SEGS, ACTIVATE, LBX, RSI, RS, RX, KH, FLOWS, EnLoot: window.EnLoot, render, initialState,
-  zpEntries, zpView, zpChestGroups, zpOpenOne, zpCard, darRows, darCount, lbGiftRows, ZP_DEMO, trNorm,
+  zpEntries, zpView, zpChestGroups, zpOpenOne, zpCard, zpSrc, darRows, darCount, lbGiftRows, ZP_DEMO, ZP_FILT, trNorm, trEsc,
 })`, ctx);
 const BAD = /undefined|NaN|\[object /;
-const clean = (h, where) => { if (typeof h !== 'string') { say(`${where}: разметка не строка`); return ''; } if (BAD.test(h)) say(`${where}: в разметке undefined, NaN или объект — «${(h.match(/.{0,60}(?:undefined|NaN|\[object ).{0,40}/) || [''])[0]}»`); return h; };
+/* служебное глазами игрока — те же слова и шаблоны, что у check_player_view.js; обход там ограничен, здесь — каждая отрисовка
+   экрана «Запасы» и его листов. Смотрим рабочую область и лист поверх: шапка и шахта — чужие */
+const seenSvc = new Set();
+function service(h, where) {
+  if (T.KH.team) return;
+  const i = h.indexOf('<main'), part = i < 0 ? h : h.slice(i), v = strip(part);
+  const txt = playerText(part).split('\n').concat([...v.matchAll(/\s(?:title|placeholder)="([^"]*)"/g)].map(m => m[1]));
+  for (const t of txt) for (const [what, re] of SERVICE) {
+    const k = what + '|' + t; if (!re.test(t) || seenSvc.has(k)) continue;
+    seenSvc.add(k); say(`${where}: игроку видно служебное (${what}) — «${t.slice(0, 100)}»`);
+  }
+}
+const clean = (h, where) => { if (typeof h !== 'string') { say(`${where}: разметка не строка`); return ''; } if (BAD.test(h)) say(`${where}: в разметке undefined, NaN или объект — «${(h.match(/.{0,60}(?:undefined|NaN|\[object ).{0,40}/) || [''])[0]}»`); service(h, where); return h; };
 const game = where => clean(els.game ? els.game.innerHTML : '', where);
 const run = (where, f) => { try { return f(); } catch (e) { say(`${where}: ${e.message}`); return undefined; } };
 const reset = () => { T.S = T.initialState(); T.S.route = 'craft'; T.S.seg.craft = 'stock'; };
 const stock = (tab, where) => { T.S.route = 'craft'; T.S.seg.craft = 'stock'; T.S.overlay = null; T.S.zp.tab = tab; run(where, () => T.render()); return game(where); };
+/* лист поверх запасов: разметка листа — из OV, как её рисует overlay() */
+const sheetOf = (t, arg, where) => clean(run(where, () => T.OV[t]({ t, arg })) || '', where);
 const snap = () => JSON.parse(JSON.stringify({ wallet: T.S.wallet, items: T.S.bag.items, shards: T.S.rs.shards, extra: T.S.zp.extra, chests: T.S.bag.chests.length }));
-const cnt = { tabs: 0, cards: 0, filters: 0, open: 0, synth: 0, dust: 0, gifts: 0, claimed: 0 };
+const cnt = { tabs: 0, cards: 0, sheets: 0, filters: 0, open: 0, synth: 0, dust: 0, gifts: 0, claimed: 0 };
 
 /* всё, что может выпасть из сундука, есть в recipes.js и roster.js — иначе оно легло бы в запасы невидимым */
 {
@@ -90,6 +108,9 @@ for (const tab of ['res', 'rune', 'shard', 'act', 'chest', 'art']) {
   if (!h.includes('zp-bar')) say(`вкладка ${tab}: нет строки вкладок`);
   if (tab === 'art' && !h.includes('позже')) say('вкладка «Артефакты»: нет пометки «позже»');
   if (tab === 'art') continue;
+  /* воздух: над списком одна строка — поиск и «Фильтры»; выпадающих списков фильтров на экране нет */
+  if (!h.includes('id="zpq"') || !h.includes('data-v="zpfilt"')) say(`вкладка ${tab}: над списком нет поиска или кнопки «Фильтры»`);
+  if (/<select[^>]*data-a="zpf"/.test(h)) say(`вкладка ${tab}: фильтры снова выпадающими списками на экране — им место в листе`);
   const list = T.zpEntries(tab);
   if (!list.length && tab !== 'chest') say(`вкладка ${tab}: пусто в демо`);
   for (const e of list) {
@@ -97,11 +118,46 @@ for (const tab of ['res', 'rune', 'shard', 'act', 'chest', 'art']) {
     const g = game(`${tab} · карточка ${e.key}`); cnt.cards++;
     if (!g.includes('zp-card')) say(`${tab} · ${e.key}: нет карточки`);
     if (T.S.zp.sel[tab] !== e.key) say(`${tab} · ${e.key}: выбор не запомнен`);
-    if (e.kind === 'item' && !g.includes('Найденные рецепты')) say(`${tab} · ${e.key}: в карточке нет найденных рецептов`);
-    if (e.kind === 'item' && !e.it.team && e.it.lore && !g.includes('Загадка')) say(`${tab} · ${e.key}: в карточке нет загадки`);
-    if (e.kind === 'item' && /ADR-|\(§/.test(strip(g.slice(g.indexOf('zp-card'))))) say(`${tab} · ${e.key}: игроку видна ссылка на ADR или §`);
+    if (e.kind === 'item') {
+      const card = g.slice(g.indexOf('zp-card')), uses = T.BAG.knownUses(e.id).filter(Boolean), src = e.it.team ? [] : T.zpSrc(e.it);
+      /* воздух: у карточки ресурса одно главное действие; рецепты и источники — листы по нажатию */
+      const acts = card.slice(card.indexOf('class="acts2"'));
+      if ((acts.match(/class="btn go"/g) || []).length !== 1) say(`${tab} · ${e.key}: у карточки не одно главное действие`);
+      if (uses.length && !card.includes(`data-v="zpuse:${e.id}"`)) say(`${tab} · ${e.key}: нет строки «Найденные рецепты»`);
+      if (!uses.length && tab !== 'act' && !card.includes('Ни в одном найденном рецепте')) say(`${tab} · ${e.key}: не сказано, что в найденных рецептах ресурса нет`);
+      if (src.length && !card.includes(`data-v="zpsrc:${e.id}"`)) say(`${tab} · ${e.key}: нет строки «Откуда падает»`);
+      if (!e.it.team && e.it.lore && !card.includes('Загадка')) say(`${tab} · ${e.key}: в карточке нет загадки`);
+      if (/ADR-|\(§/.test(strip(card))) say(`${tab} · ${e.key}: игроку видна ссылка на ADR или §`);
+      const su = sheetOf('zpuse', e.id, `${tab} · ${e.key} · лист рецептов`), ss = sheetOf('zpsrc', e.id, `${tab} · ${e.key} · лист источников`); cnt.sheets += 2;
+      for (const r of uses) if (!su.includes(T.trEsc(r.n))) say(`${tab} · ${e.key}: в листе рецептов нет «${r.n}»`);
+      for (const s of src) if (!ss.includes(T.trEsc(s))) say(`${tab} · ${e.key}: в листе источников нет «${s}»`);
+      if (/ADR-|\(§/.test(strip(su) + strip(ss))) say(`${tab} · ${e.key}: в листе игроку видна ссылка на ADR или §`);
+      leak(su + ss, `${tab} · ${e.key} · листы`);
+    }
   }
   leak(game(`вкладка ${tab}`), `вкладка ${tab}`);
+}
+/* лист «Фильтры»: значения каждой вкладки — чипы; нажатие ставит фильтр, повторное — снимает; «Сбросить» чистит всё */
+reset();
+for (const tab of ['res', 'rune', 'shard', 'act', 'chest']) {
+  T.S.zp.tab = tab;
+  const O = T.zpView(tab).O, on = T.ZP_FILT[tab], h = sheetOf('zpfilt', '', `фильтры ${tab}`); cnt.sheets++;
+  const want = [].concat(on.includes('cyc') ? O.cyc.map(v => 'cyc:' + v) : [], on.includes('spec') ? O.spec.map(v => 'spec:' + v) : [], on.includes('r') ? O.r.map(v => 'r:' + v) : []);
+  for (const v of want) if (!h.includes(`data-a="zpf" data-v="${v}"`)) say(`фильтры ${tab}: нет значения ${v}`);
+  if (on.includes('un') !== h.includes('data-a="zpun"')) say(`фильтры ${tab}: «не в найденных рецептах» ${on.includes('un') ? 'пропал' : 'лишний'}`);
+  if (!h.includes('data-a="zpclr"')) say(`фильтры ${tab}: нет «Сбросить»`);
+  const [k, x] = (want[0] || ':').split(':');
+  if (k) {
+    run(`фильтры ${tab} · ${want[0]}`, () => T.ACT.zpf(want[0]));
+    if (T.S.zp.f[k] !== x) say(`фильтры ${tab}: ${want[0]} не поставился`);
+    run(`фильтры ${tab} · ${want[0]} снова`, () => T.ACT.zpf(want[0]));
+    if (T.S.zp.f[k] !== '') say(`фильтры ${tab}: повторное ${want[0]} не снял фильтр`);
+    run(`фильтры ${tab} · ${want[0]}`, () => T.ACT.zpf(want[0]));
+    if (!stock(tab, `фильтры ${tab} · кнопка`).includes('data-v="zpfilt" aria-pressed="true"')) say(`фильтры ${tab}: кнопка «Фильтры» не показывает, что фильтр стоит`);
+  }
+  if (on.includes('un')) { run(`фильтры ${tab} · un`, () => T.ACT.zpun()); if (!T.S.zp.f.un) say(`фильтры ${tab}: «не в найденных рецептах» не поставился`); }
+  run(`фильтры ${tab} · сбросить`, () => T.ACT.zpclr());
+  if (T.S.zp.f.cyc || T.S.zp.f.spec || T.S.zp.f.r || T.S.zp.f.un) say(`фильтры ${tab}: «Сбросить» не сбросил`);
 }
 /* «На стол мастера» из карточки ресурса — действие toCraft; если мастерская подключена (CRAFT_SEGS.work), предмет уходит на её стол */
 reset();
@@ -228,10 +284,14 @@ function openGroup(key, n, where) {
   if (L.sum.n !== want) say(`${where}: открыто ${L.sum.n}, ждали ${want}`);
   sumCheck(before, after, L.sum, where);
   const h = game(where + ' · итог');
-  if (!h.includes('Итог · открыто')) say(`${where}: итог не в карточке`);
+  /* итог — крупно в той же карточке (§14.4), состав и шансы — лист по нажатию */
+  if (!h.includes('class="zp-res"') || !h.includes('Открыто: ')) say(`${where}: итог не в карточке`);
+  if (!h.includes(`data-v="zpbox:${key}"`)) say(`${where}: после открытия нет «Состав и шансы»`);
+  const box = sheetOf('zpbox', key, where + ' · состав'); cnt.sheets++;
+  if (!box.includes('Возможное содержимое')) say(`${where}: в листе состава нет возможного содержимого`);
   /* пометка прототипа «в игре итог решает сервер» — команде; игроку — «каждый сундук открывается один раз» */
-  if (!h.includes('решает сервер') || strip(h).includes('решает сервер')) say(`${where}: пометка «в игре итог решает сервер» — не только для команды`);
-  if (!strip(h).includes('открывается один раз')) say(`${where}: игроку не видно «каждый сундук открывается один раз»`);
+  if (!box.includes('решает сервер') || strip(box).includes('решает сервер')) say(`${where}: пометка «в игре итог решает сервер» — не только для команды`);
+  if (!strip(box).includes('открывается один раз')) say(`${where}: игроку не видно «каждый сундук открывается один раз»`);
   cnt.open += L.sum.n;
   return ids.slice(0, want);
 }
@@ -269,8 +329,12 @@ reset();
     const where = `${box} · ${r} · ${win} · цикл ${cyc}${week ? ' · ' + week : ''}`;
     T.S.zp.tab = 'chest'; T.S.zp.sel.chest = g.key; T.S.zp.n = 1;
     const card = clean(run(where, () => T.zpCard(T.zpView('chest').sel, 'chest')) || '', where + ' · карточка');
-    if (!card.includes('Возможное содержимое')) say(`${where}: нет возможного содержимого`);
-    leak(card, where + ' · карточка');
+    /* карточка §14.4: тип, редкость, количество и «Открыть»; состав и шансы — лист по нажатию */
+    if (!card.includes('data-a="zpopen"') || !card.includes(`data-v="zpbox:${g.key}"`)) say(`${where}: в карточке нет «Открыть» или «Состав и шансы»`);
+    if (card.includes('Возможное содержимое')) say(`${where}: состав снова на карточке — ему место в листе`);
+    const info = sheetOf('zpbox', g.key, where + ' · состав'); cnt.sheets++;
+    if (!info.includes('Возможное содержимое')) say(`${where}: нет возможного содержимого`);
+    leak(card + info, where + ' · карточка');
     const before = snap();
     run(where, () => T.ACT.zpopen(g.key));
     const L = T.S.zp.last, after = snap();
@@ -278,9 +342,11 @@ reset();
     sumCheck(before, after, L.sum, where);
     if (Object.keys(L.sum.dust).length) cnt.dust++;
     const res = clean(run(where, () => T.zpCard(T.zpView('chest').sel, 'chest')) || '', where + ' · итог');
-    if (!res.includes('Итог · открыто')) say(`${where}: итог не показан`);
-    const kinds = ['items', 'shards', 'dust', 'extra'].reduce((a, k) => a + Object.keys(L.sum[k]).length, 0), rl = (res.match(/class="zp-rl"/g) || []).length;
-    if (rl !== kinds) say(`${where}: в итоге строк ${rl}, получено видов ${kinds}`);
+    if (!res.includes('class="zp-res"') || !res.includes('Открыто: ')) say(`${where}: итог не показан`);
+    const kinds = ['items', 'shards', 'dust', 'extra'].reduce((a, k) => a + Object.keys(L.sum[k]).length, 0), rl = (res.match(/class="zp-rl[ "]/g) || []).length;
+    if (rl !== kinds) say(`${where}: в итоге плиток ${rl}, получено видов ${kinds}`);
+    const curN = Object.keys(L.sum.cur).length, rc = (res.match(/class="zp-rc"/g) || []).length;
+    if (rc !== curN) say(`${where}: в итоге валют ${rc}, получено ${curN}`);
     leak(res, where + ' · итог');
     T.S.bag.chests = T.S.bag.chests.filter(c => c.src !== 'проверка');
     cnt.synth++;
@@ -313,10 +379,19 @@ reset();
   const N = T.darCount(rows.filter(p => p.st === 'ok'));
   for (const tab of ['me', 'clan', 'hist']) {
     T.S.zp.gifts.tab = tab;
-    const h = sheet(`Дары · ${tab}`);
+    const h = sheet(`Дары · ${tab}`, tab);
     if (!h.includes(`${N} сундук`)) say(`Дары · ${tab}: нет «Доступно ${N} сундуков»`);
     if (tab !== 'hist' && (!h.includes('Подтверждено') || !h.includes('Ждёт подсчёта'))) say(`Дары · ${tab}: подтверждённое и ждущее не разделены`);
     if (/Открыть вс/i.test(h)) say(`Дары · ${tab}: есть «Открыть всё»`);
+    /* §23.1 и воздух: две категории, история — не третья; одно действие на строку */
+    const cats = (h.match(/role="tab"[^>]*data-a="dartab"/g) || []).length;
+    if (cats !== 2) say(`Дары · ${tab}: категорий ${cats}, по §23.1 — две`);
+    if (T.S.zp.gifts.tab !== tab) say(`Дары · ${tab}: открылось на «${T.S.zp.gifts.tab}»`);
+    if (tab === 'hist' ? !/data-a="dartab" data-v="(?:me|clan)">[\s\S]{0,120}К наградам/.test(h) : !h.includes('data-a="dartab" data-v="hist"')) say(`Дары · ${tab}: нет перехода ${tab === 'hist' ? 'назад к наградам' : 'к истории'}`);
+    for (const row of h.split('class="dar-row"').slice(1).map(s => s.split('class="dar-row"')[0])) {
+      const acts = (row.slice(0, row.indexOf('</div>')).match(/data-a="/g) || []).length;
+      if (acts > 1) { say(`Дары · ${tab}: в строке ${acts} действия`); break; }
+    }
   }
   T.S.overlay = { t: 'darbox', arg: '' }; run('попап', () => T.render());
   const pop = game('попап сундуков');
@@ -338,8 +413,11 @@ reset();
   const after = T.darRows(T.S);
   if (after.some(p => p.st === 'ok')) say('Дары: после получения остались подтверждённые');
   if (after.filter(p => p.st === 'wait').length !== rows.filter(p => p.st === 'wait').length) say('Дары: ждущее изменилось от «Получить»');
-  T.S.zp.gifts.tab = 'hist'; const hist = sheet('Дары · история после получения');
+  const hist = sheet('Дары · история после получения', 'hist');
   if ((hist.match(/получено<\/span>/g) || []).length !== after.filter(p => p.st === 'got').length) say('Дары: история не совпадает с полученным');
+  /* история — вид, не категория: «Дары» без аргумента после истории открываются на наградах */
+  sheet('Дары · снова без аргумента');
+  if (T.S.zp.gifts.tab === 'hist') say('Дары: открылись на истории, а не на наградах');
   T.S.zp.gifts.tab = 'me'; if (!sheet('Дары · всё получено').includes('Всё подтверждённое уже')) say('Дары: нет пометки «всё получено»');
   T.S.overlay = { t: 'darbox', arg: '' }; run('попап пустой', () => T.render()); if (!game('попап пустой').includes('Доступных сундуков нет')) say('попап: пустое состояние');
   /* выбор количества: «+», «+», «−» — открывается ровно столько */
@@ -395,7 +473,7 @@ if (!T.S.zp || !T.S.bag || !Object.keys(T.S.rs.shards).length) say('сброс: 
 for (const [t, , f] of T.FLOWS.filter(([t]) => /Запасы|Дары/.test(t))) { run(`сценарий ${t}`, () => { f(); T.render(); }); game(`сценарий ${t}`); }
 if (T.FLOWS.filter(([t]) => /Запасы|Дары/.test(t)).length !== 2) say('сценарии презентации: нет «Запасы · сундуки» и «Дары путешествия»');
 
-console.log(`Запасы: вкладок ${cnt.tabs}, карточек ${cnt.cards}, наборов фильтров ${cnt.filters}. Сундуков открыто: демо и Дары ${cnt.open}, всех видов ${cnt.synth}, с переводом осколков в прах ${cnt.dust}. Дары: отрисовок ${cnt.gifts}, получено выплат ${cnt.claimed}.`);
+console.log(`Запасы: вкладок ${cnt.tabs}, карточек ${cnt.cards}, листов подробностей ${cnt.sheets}, наборов фильтров ${cnt.filters}. Сундуков открыто: демо и Дары ${cnt.open}, всех видов ${cnt.synth}, с переводом осколков в прах ${cnt.dust}. Дары: отрисовок ${cnt.gifts}, получено выплат ${cnt.claimed}.`);
 done();
 
 function done() {

@@ -6,13 +6,15 @@
       (появление, новая позиция, послабление по количеству), случайное открытие, герой из рецепта, книга (вкладки, вид,
       избранное, поиск), автодокрафт (остановка на неизвестном этапе, согласие на невосполнимое, количество), сведения о ресурсе.
       В разметке — ни исключений, ни undefined, NaN, [object; ни полей «для команды»: обоснований рецептов, спойлеров цикла VI,
-      будущих биомов и боссов (§12.5).
+      будущих биомов и боссов (§12.5); в режиме «Игрок» — ни одного служебного слова из check_player_view.js.
+      «Правила воздуха»: у стола и книги нет лишних подписей, сведения о ресурсе — лист по нажатию.
    4. Запасы меняются как положено: попытка списывает весь стол, неудача ничего не создаёт, повторное нажатие не повторяет расход,
       особый ресурс без согласия не списывается, герой приходит в коллекцию с 0 ур., 0 РП и 0 Добл.
    5. Все классы ws-* из craft.js описаны в craft.css.
    Запуск: node tools/content-gen/screens/check_craft.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
+const { strip, playerText, SERVICE } = require('./check_player_view.js');   // вид игрока: без элементов team-only, служебные слова
 const UI = path.join(__dirname, '..', '..', '..', 'design', 'ui');
 const html = fs.readFileSync(path.join(UI, 'index.html'), 'utf8');
 const JS = fs.readFileSync(path.join(UI, 'screens', 'craft.js'), 'utf8');
@@ -76,12 +78,24 @@ const leaks = [
   ...R.places.map(p => ['крафтовый босс до призыва (§12.5)', p.boss.n]),
 ].filter(([, s]) => s && !legit.includes(s));
 
+/* служебное глазами игрока — слова и шаблоны check_player_view.js; обход там ограничен, здесь — каждое состояние мастерской.
+   Смотрим рабочую область и лист поверх: шапка и шахта — чужие */
+const seenSvc = new Set();
+function service(label, h) {
+  const i = h.indexOf('<main'), part = i < 0 ? h : h.slice(i), v = strip(part);
+  const txt = playerText(part).split('\n').concat([...v.matchAll(/\s(?:title|placeholder)="([^"]*)"/g)].map(m => m[1]));
+  for (const t of txt) for (const [what, re] of SERVICE) {
+    const k = what + '|' + t; if (!re.test(t) || seenSvc.has(k)) continue;
+    seenSvc.add(k); err.push(`${label}: игроку видно служебное (${what}) — «${t.slice(0, 100)}»`);
+  }
+}
 function look(label, h) {
   drawn++;
   if (typeof h !== 'string' || !h) { err.push(label + ': пустая разметка'); return ''; }
   const bad = h.match(/undefined|NaN|\[object /);
   if (bad) err.push(`${label}: в разметке «${bad[0]}» — …${h.slice(Math.max(0, bad.index - 90), bad.index + 30).replace(/\s+/g, ' ')}…`);
   for (const [why, s] of leaks) if (h.includes(s)) err.push(`${label}: ${why} — «${s}»`);
+  service(label, h);
   return h;
 }
 const view = label => look(label, W.html());
@@ -128,8 +142,11 @@ scene('пустой стол', () => {
   ok('пустой стол: нет зоны «Инвентарь»', h.includes('<h2>Инвентарь</h2>'));
   ok('пустой стол: нет зоны «Крафт»', h.includes('<h2>Крафт</h2>'));
   eq('пустой стол: ячеек', (h.match(/data-wscell="/g) || []).length, W.WS_DATA.cells);
-  ok('пустой стол: нет подписи «Порядок не важен»', h.includes('Порядок не важен'));
+  ok('пустой стол: нет подсказки «порядок не важен»', h.includes('порядок не важен'));
   ok('пустой стол: «Попробовать» должна быть недоступна', disabled(h, 'wstry'));
+  /* воздух: у инвентаря нет строки-подсказки под сеткой, у пустой ячейки — подписи; сведения — по нажатию */
+  ok('пустой стол: под инвентарём снова строка-подсказка', !/Нажмите ресурс|Можно и перетащить/.test(h));
+  ok('пустой стол: у пустой ячейки снова подпись', !/Ячейка \d+ пуста/.test(h));
   const stock = R.items.filter(i => !i.team && q(i.id) > 0);
   for (const [k, , tiers] of W.WS_DATA.groups) {
     A.wscat(k);
@@ -150,6 +167,7 @@ scene('найденный рецепт на столе', () => {
   let h = view('найденный рецепт на столе');
   ok('нет «Совпадает с рецептом «Точёный клык»»', h.includes('Совпадает с рецептом «Точёный клык»'));
   ok('кнопка — «Создать»', />Создать<\/button>/.test(h));
+  ok('имя ресурса в выбранной ячейке — не кнопка сведений', h.includes('class="ws-qn" data-a="wsinfo" data-v="k1_hunt"'));
   A.wscell('0'); A.wsq('max'); eq('«Макс» — всё, что есть', W.S.ws.cells[0].q, Math.min(W.WS_DATA.cellMax, q('fang')));
   ok('лишнее: нет «лишнее сгорит»', view('лишнее на столе').includes('лишнее сгорит'));
   A.wsq('-10'); eq('минимум — 1', W.S.ws.cells[0].q, 1);
@@ -345,6 +363,10 @@ scene('книга рецептов', () => {
   const known = W.WS_SRV.known().length, parts = Object.keys(W.S.ws.part).length;
   let h = view('книга');
   eq('книга: строк', rows(h), known + parts); ok('книга: вкладка «Все»', h.includes(`Все · ${known + parts}`));
+  /* воздух: у строки книги одно состояние, особый ресурс — ромб на значке; значки ингредиентов — кнопки сведений */
+  ok('книга: снова чип «особое» рядом с состоянием', !h.includes('особое</span>'));
+  ok('книга: значки ингредиентов — не кнопки сведений', /class="ws-rc[ "][\s\S]*?<button class="well[^"]*" data-r="\d" data-a="wsinfo"/.test(h));
+  A.wsinfo('fang'); ok('сведения из книги: лист не открылся', !!W.S.overlay && W.S.overlay.t === 'wsitem'); view('сведения из книги'); A.close();
   for (const t of ['all', 'can', 'hint']) { A.wsbtab(t); view('книга · ' + t); }
   A.wsbtab('hint'); eq('подсказки: строк', rows(view('книга · подсказки')), parts);
   A.wsbtab('all');

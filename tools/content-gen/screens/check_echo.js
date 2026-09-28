@@ -14,7 +14,8 @@
       Лист подтверждения не называет будущего врага и руину; недоступная активация ничего не списывает;
       повтор подтверждения не списывает второй раз; победа над крафтовым боссом — трофей, ключи, валюта, сундук или осколки;
       руина видна в «Спуске»; слоты биомов общие с забегами — сверх них не встать ни руине, ни забегу.
-   Везде: без исключений, без undefined, NaN и [object; до первой победы имя врага не видно; тема недели «для команды» не видна.
+   Везде: без исключений, без undefined, NaN и [object; до первой победы имя врага не видно — и в просмотре боя, который её принёс;
+   тема недели «для команды» не видна. На карточке цели отряд атаки на виду: мощь, «Сменить», неполный отряд помечен на месте.
    Запуск: node tools/content-gen/screens/check_echo.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -89,9 +90,10 @@ function suite() {
       if (S.wallet.souls !== s0 - cost) { fail(`${key}: атака стоила ${s0 - S.wallet.souls}, а не ${cost}`); break; }
       const R = S.runs.find(r => r.kind === 'echo' && !r.over);
       if (!R || S.route !== 'battle' || !R.res) { fail(key + ': атака не открыла бой'); break; }
-      const res = R.res.res;
+      const res = R.res.res, fx = E.foe(x.fid, x), hb = draw();
       if (res.main.hp0 !== hp0 || (S.echo.slots[i] === x ? x.hp !== res.main.hp : !res.killed)) fail(`${key}: здоровье цели не из итога боя`);
-      scan(key + ' · бой', draw());
+      scan(key + ' · бой', hb);
+      if (R.res.first && !fx.named && hb.includes(fx.n)) fail(key + ': просмотр первой победы называет врага до итога');
       const s1 = S.wallet.souls, sc1 = S.echo.score, a1 = x.atk; ACT.echatk(x.uid + ':' + no);
       if (S.wallet.souls !== s1 || S.echo.score !== sc1 || x.atk !== a1 || S.runs.filter(r => r.kind === 'echo').length !== 1) fail(key + ': повтор атаки списал или начислил второй раз');
       ACT.echskip(R.id);
@@ -129,7 +131,12 @@ function suite() {
   if (S.echo.slots.filter(Boolean).length !== D.demo.slots.filter(Boolean).length || S.ech.avail !== D.demo.avail) fail('старт: не демо-состояние недели');
   for (const r of ['week', 'shelter', 'descent']) { S.route = r; scan('экран ' + r, draw()); }
   const flow = FLOWS.find(f => f[0] === 'Неделя → Эхо'); if (flow) { flow[2](); scan('сценарий «Неделя → Эхо»', draw()); } else fail('нет сценария «Неделя → Эхо»');
-  S.route = 'echo'; S.echoSquad = S.squads.find(s => s.m.filter(Boolean).length < D.squad).id; ACT.echatk();
+  /* отряд атаки на виду (§17.2, слово автора): на карточке цели — «Сменить» и мощь отряда; неполный отряд помечен на месте */
+  S.route = 'echo'; S.overlay = null; S.echo.sel = S.echo.slots.findIndex(Boolean); h = draw();
+  if (!h.includes('class="ech-vs"') || !h.includes('data-a="sheet" data-v="prep:echo"') || !h.includes(`<b class="num">${fmt(sqBM(sq(S.echoSquad)))}</b>`)) fail('цель: не видно отряда атаки, его мощи или «Сменить»');
+  const part = S.squads.find(s => s.m.filter(Boolean).length < D.squad); S.echoSquad = part.id; h = draw();
+  if (!h.includes(`${part.m.filter(Boolean).length} из ${D.squad}</span>`) || !h.includes('ech-sf empty')) fail('цель: неполный отряд не помечен на месте');
+  ACT.echatk();
   if (!S.overlay || S.overlay.title !== 'Отряд не готов') fail('неполный отряд атакует'); scan('отряд не готов', draw());
 
   for (const w of RS.weeks) for (let c = 1; c <= 6; c++) {
@@ -144,7 +151,7 @@ function suite() {
       for (const t of ['echweek', 'echbest']) { S.overlay = { t }; h = draw(); out.sheets++; scan(`${key} · лист ${t}`, h); }
       S.overlay = { t: 'echweek' }; h = draw();
       for (const id of w.squad) { const hr = RSI[id]; if (!h.includes(hr.n)) fail(`${key}: в отряде недели нет ${hr.n}`); }
-      if (c >= FROM && !h.includes('Личная планка')) fail(key + ': нет планок недели');
+      if (c >= FROM && !h.includes('class="ech-plank')) fail(key + ': нет планок недели');
       for (let st = 1; st <= TOP + 1; st++) {
         const fid = st > TOP ? 'many' : E.fidOf(w.race, st), f = E.foe(fid);
         S.overlay = { t: 'echfoe', arg: fid }; h = draw(); out.sheets++; scan(`${key} · сведения ${st}`, h);

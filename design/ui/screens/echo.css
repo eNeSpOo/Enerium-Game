@@ -1,20 +1,18 @@
 /* screens/echo.css — «Неделя → Эхо» на древних цивилизациях, активации из запасов и руины в «Спуске» (screens/echo.js).
-   Стиль «Свет снизу»: экран собран из классов index.html (.ec, .eslot, .etarget, .ladder14, .rs-ph, .mail, .well), свои — с префиксом ech-. */
+   Стиль «Свет снизу»: экран собран из классов index.html (.ec, .eslot, .etarget, .ladder14, .rs-ph, .mail, .well), свои — с префиксом ech-.
+   Правила воздуха (UI-кит): отступы — токены --sp-l, --sp-m, --sp-s; одна рамка, внутри — строки и разделители. */
 
-/* шапка недели: цивилизация, очки, отряд недели */
-.ech-head{display:flex;align-items:center;gap:12px;padding:5px 8px 5px 12px;flex:none;min-width:0}
-.ech-civ{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 auto}
-.ech-civ b{font:600 19px/1 var(--f-d);color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ech-civ small{font-size:12px;line-height:1.2;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ech-kpi{display:flex;align-items:center;gap:14px;flex:none}
+/* шапка недели — одна строка: цивилизация, очки и место, отряд недели лицами */
+.ech-head{display:flex;align-items:center;gap:var(--sp-m);padding:6px var(--sp-s) 6px var(--sp-m);flex:none;min-width:0}
+.ech-civ{flex:1 1 auto;min-width:0;font:600 21px/1.1 var(--f-d);color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ech-kpi{display:flex;align-items:center;gap:var(--sp-l);flex:none}
+.ech-kpi .stat{flex-direction:row;align-items:baseline;gap:6px}
 .ech-kpi .stat b{font-size:20px}
 .ech-rank{appearance:none;border:0;background:none;padding:0;text-align:left;color:inherit}
 .ech-rank:hover b{color:var(--gold)}
-.ech-week{position:relative;display:flex;align-items:center;gap:8px;flex:none;padding:3px 8px 3px 4px;border-radius:10px;border:1px solid rgba(221,188,122,.3);background:#0e1114;color:var(--parch);text-align:left}
+.ech-week{position:relative;display:flex;align-items:center;gap:var(--sp-s);flex:none;padding:3px var(--sp-s) 3px 4px;border-radius:10px;border:1px solid rgba(221,188,122,.3);background:#0e1114;color:var(--parch);text-align:left}
 .ech-week:hover{border-color:rgba(221,188,122,.55)}
-.ech-week .tx{display:flex;flex-direction:column;gap:2px}
-.ech-week b{font:600 15px/1.05 var(--f-d);color:var(--gold)}
-.ech-week small{font-size:11.5px;color:var(--parch-3);white-space:nowrap}
+.ech-week>b{font:600 15px/1 var(--f-d);color:var(--gold);white-space:nowrap}
 .ech-week>.i{color:var(--gold-2)}
 .ech-week .bdg{position:absolute;top:-6px;right:-6px}
 .ech-faces{display:flex;gap:3px}
@@ -40,6 +38,16 @@
 .ech-ph.lg b{font-size:42px}
 .ech-ph.empty{border-style:dashed;background:#0b0d10;color:var(--parch-3)}
 .ech-ph.empty .i{width:28px;height:28px}
+/* арт недели (ADR-0025): портрет вместо заглушки; до первой победы — в тумане, поверх знак вопроса */
+.ech-ph.art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+.ech-ph.art b{display:none}
+.ech-ph.art.unk img{filter:blur(5px) brightness(.4) saturate(.6)}
+.ech-ph.art.unk b{display:block;position:relative}
+
+/* число со значком: здоровье, боевая мощь */
+.ech-n{display:inline-flex;align-items:center;gap:6px;min-width:0;white-space:nowrap}
+.ech-n b{font:600 19px/1 var(--f-d);color:var(--parch)}
+.ech-n small{font-size:12px;color:var(--parch-3)}
 
 /* слоты и цель: высоты сверены с рабочей областью 932×430 и 844×390 — кнопка атаки не уходит под край */
 .ech .eslot{padding:5px 8px}
@@ -49,59 +57,131 @@
 .eslot.ech-pend{border-color:rgba(72,229,212,.35)}
 .eslot.ech-pend small{color:var(--spirit-2)}
 .ech .etarget{grid-template-columns:minmax(0,.5fr) minmax(0,1.5fr)}
-.ech .etarget .stage{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:10px 6px 10px 10px}
-.ech .etarget .stage .ech-ph{width:100%;max-width:150px}
-.ech-cap{font-size:11.5px;line-height:1.25;color:var(--parch-3);text-align:center;max-width:150px}
-.ech .etarget .info{gap:6px;padding:10px 12px 10px 6px}
-.ech-chips{flex-wrap:wrap;gap:5px}
-.ech-name{font-size:24px;line-height:1}
-.ech-hp{justify-content:space-between;font-size:12px}
-.ech-stats{gap:16px}
-.ech-stats .stat b{font-size:19px}
-.ech .e-foot{gap:6px}
+.ech .etarget .stage{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--sp-m) 0 var(--sp-m) var(--sp-m)}
+.ech .etarget .stage>.ech-ph{width:100%;max-width:150px}
+.ech .etarget .info{gap:var(--sp-s);padding:var(--sp-m)}
+.ech-name{font-size:26px;line-height:1.05;min-width:0}
+.ech-p{font-size:13.5px;line-height:1.35}
+.ech .e-foot{gap:var(--sp-s)}
 .ech .e-foot .btn.big{min-height:44px}
 .ech-inv{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ech-sq{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.ech-why{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ech-p{font-size:13px;line-height:1.35}
-.ech-wide{gap:8px}
+.ech-wide{gap:var(--sp-s)}
 .ech-wide .tabs button{height:24px;padding:0 10px}
 .ech-s{font-size:11.5px}
+/* карточка цели (правила воздуха): портрет — кнопка «Сведений», имя, полоса здоровья, здоровье и мощь, «Атаковать» */
+/* портрет недели в сцене цели: правило index.html «.etarget .stage img» (сдвиг на половину, рамка, тень) — для прежней картинки врага, не для облика Эхо */
+.ech .etarget .stage .ech-ph img{transform:none;max-width:100%;border:0;border-radius:0;box-shadow:none}
+.ech-phb{appearance:none;display:block;width:100%;max-width:150px;padding:0;border:0;border-radius:10px;background:none}
+.ech-phb .ech-ph{width:100%;transition:filter .15s}
+.ech-phb:hover .ech-ph{filter:brightness(1.12)}
+.ech-nm{align-items:flex-start;gap:var(--sp-m)}
+.ech-nm .link{margin-left:auto;margin-top:6px;flex:none}
+.ech-life{gap:var(--sp-s)}
+.ech-nums{justify-content:space-between;gap:var(--sp-m);flex-wrap:wrap}
+.ech-tgt .ech-n b{font-size:21px}
+/* отряд атаки на виду: под разделителем — лица и «Сменить» одной кнопкой, справа мощь отряда ровно под мощью цели и оценка.
+   Бирюза — только у выбора и главного действия, поэтому «сильнее» — золото, «слабее» — ржавчина, «наравне» — пергамент */
+.ech-vs{display:flex;align-items:center;gap:var(--sp-s);padding-top:var(--sp-s);border-top:1px solid var(--iron);min-width:0}
+.ech-sqb{appearance:none;display:flex;align-items:center;gap:var(--sp-s);padding:0;border:0;background:none;color:inherit;min-width:0}
+.ech-sqb:hover .link{color:var(--gold)}
+.ech-sqb:hover .ech-sf{box-shadow:0 0 0 1px var(--iron-2)}
+.ech-sqf{display:flex;gap:3px;flex:none}
+.ech-sf{position:relative;width:28px;height:28px;border-radius:7px;overflow:hidden;background:#191d21;box-shadow:0 0 0 1px #2a3036;flex:none}
+.ech-sf img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 18%}
+.ech-sf .rs-ph{position:absolute;inset:0}
+.ech-sf .rs-ph b{font-size:11px}
+.ech-sf.empty{background:#0b0d10;box-shadow:none;outline:1px dashed #3a4148;outline-offset:-1px}
+.ech-sf.busy img{filter:grayscale(1) brightness(.45)}
+.ech-sf.busy::after{content:"";position:absolute;right:3px;bottom:3px;width:6px;height:6px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 1px #000}
+.ech-vs-r{margin-left:auto;display:flex;align-items:center;gap:6px;flex:none;white-space:nowrap}
+.ech-vs-r.up .ech-n b{color:var(--gold)}
+.ech-vs-r.down .ech-n b{color:var(--rust)}
+.ech-vk{display:inline-grid;place-items:center;width:20px;height:20px}
+.ech-vk .i{width:16px;height:16px;stroke-width:2.2}
+.ech-vk .i.dn{transform:rotate(180deg)}
+.ech-vk.up{color:var(--gold)}
+.ech-vk.even{color:var(--parch-2)}
+.ech-vk.down{color:var(--rust)}
 
-/* выбор из вариантов призыва */
-.ech .etarget.ech-pick{display:flex;flex-direction:column;gap:8px;padding:10px 12px}
-.ech-pick-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;flex:none}
+/* выбор из вариантов призыва: строка — облик, имя с рангом и стихией, мощь и здоровье, «Выбрать» */
+.ech .etarget.ech-pick{display:flex;flex-direction:column;gap:var(--sp-s);padding:var(--sp-m)}
+.ech-pick-h{display:flex;align-items:baseline;gap:var(--sp-m);flex-wrap:wrap;flex:none}
 .ech-pick-h h2{font-size:22px;color:var(--gold);line-height:1}
-.ech-offers{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:6px;overflow:auto;scrollbar-width:thin;scrollbar-color:#2c3238 transparent}
-.ech-offer{display:grid;grid-template-columns:36px minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:5px 8px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;flex:none}
+.ech-offers{flex:1 1 0;min-height:0;display:flex;flex-direction:column;overflow:auto;scrollbar-width:thin;scrollbar-color:#2c3238 transparent}
+.ech-offer{display:grid;grid-template-columns:36px minmax(0,1fr) auto auto;gap:var(--sp-m);align-items:center;padding:6px 0;border-bottom:1px solid var(--iron);flex:none}
+.ech-offer:last-child{border-bottom:0}
 .ech-offer .ech-ph{width:36px}
-.ech-offer b{font:600 16px/1.05 var(--f-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ech-om{display:flex;flex-direction:column;align-items:flex-end;gap:1px;font-size:11.5px;color:var(--parch-3);white-space:nowrap}
+.ech-on{gap:4px}
+.ech-on b{font:600 16px/1.05 var(--f-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ech-oc{gap:4px}
+.ech-om{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.ech-om .ech-n b{font-size:15px}
 
-/* лестница: 14 ступеней недели и пятнадцатая */
-.ech-ladder{padding:5px 12px;gap:10px;flex:none}
-.ech-ladder .l14 i.kn::after{content:"";position:absolute;left:50%;top:-6px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--spirit);box-shadow:0 0 5px var(--spirit)}
-.ech-ladder .l14 i.on{outline:1px solid var(--spirit);outline-offset:1px}
-.ech-ladder .l14 i.m{height:24px;background:#2a2217;box-shadow:inset 0 0 0 1px rgba(230,168,75,.35)}
+/* лестница без подписей: ступени растут по рангу, между рангами — зазор; вся полоса — кнопка бестиария */
+.ech-ladder{appearance:none;width:100%;display:flex;align-items:center;gap:var(--sp-m);padding:6px var(--sp-m);flex:none;text-align:left;color:var(--parch-3)}
+.ech-ladder:hover{border-color:var(--iron-2);color:var(--gold-2)}
+.ech-ladder .l14{height:24px;align-items:flex-end}
+.ech-ladder .l14 i{height:8px}
+.ech-ladder .l14 i.e{height:13px}.ech-ladder .l14 i.b{height:18px}.ech-ladder .l14 i.u{height:24px}
+.ech-ladder .l14 i.gs{margin-left:7px}
+.ech-ladder .l14 i.on{outline:1px solid var(--spirit);outline-offset:2px}
+.ech-ladder .l14 i.m{flex:0 0 18px;height:24px;background:#2a2217;box-shadow:inset 0 0 0 1px rgba(230,168,75,.45)}
 .ech-ladder .l14 i.m.kn,.ech-ladder .l14 i.m.on{background:var(--amber)}
-.ech-ladder .l14 .sep{flex:none;width:1px;height:22px;background:var(--iron-2);margin:0 2px}
-.ech-ladder .link{white-space:nowrap}
-.ech-lt{font-size:12px;white-space:nowrap}
+.ech-ladder .l14 .sep{flex:none;width:1px;height:22px;background:var(--iron-2);margin:0 6px}
+.ech-ladder>.i{width:18px;height:18px}
 
-/* листы: проверки активации, правила, итог, бестиарий, неделя */
-.ech-itrow{gap:14px;align-items:center}
+/* лор свёрнут: две строки и «ещё» (UI-кит, «Правила воздуха») */
+.ech-lore summary{list-style:none;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.ech-lore summary::-webkit-details-marker{display:none}
+.ech-clamp{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.ech-lore[open] .ech-clamp{display:block}
+.ech-more{align-self:flex-start;color:var(--gold-2);font:700 11px/1 var(--f-u);letter-spacing:.1em;text-transform:uppercase}
+.ech-lore[open] .ech-more{display:none}
+/* свёрнутые подробности: «Подробности боя» в итоге атаки */
+.ech-det>summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;color:var(--gold-2);font:700 12px/1 var(--f-u);letter-spacing:.1em;text-transform:uppercase}
+.ech-det>summary::-webkit-details-marker{display:none}
+.ech-det>summary:hover{color:var(--gold)}
+.ech-det>summary .i{transition:transform .15s}
+.ech-det[open]>summary{margin-bottom:var(--sp-s)}
+.ech-det[open]>summary .i{transform:rotate(90deg)}
+
+/* листы: неделя, сведения, подтверждение активации, бестиарий */
+.ech-civb{gap:var(--sp-s)}
+.ech-civn{font-size:26px;line-height:1;color:var(--gold)}
+.ech-prog{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--sp-m);align-items:center;font-size:12.5px;color:var(--parch-2)}
+.ech-planks{display:flex;flex-direction:column}
+.ech-plank{display:grid;grid-template-columns:82px minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;min-height:38px;padding:4px 0;border-bottom:1px solid var(--iron)}
+.ech-plank:last-child{border-bottom:0}
+.ech-plank>b{font:600 17px/1 var(--f-d);color:var(--parch-3)}
+.ech-plank.ready>b{color:var(--gold)}
+.ech-plank.got{opacity:.6}
+.ech-pk{font-size:12.5px;color:var(--parch-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ech-need{font-size:12px;white-space:nowrap}
+.ech-demo{flex-wrap:wrap;gap:6px}
+.ech-demo .rs-cyc button{padding:0 9px}
+.ech-fhead{display:grid;grid-template-columns:96px minmax(0,1fr);gap:var(--sp-m);align-items:center;flex:none}
+.ech-fhead .ech-ph{width:96px}
+.ech-fside{gap:var(--sp-s);align-items:flex-start}
+.ech-chips{flex-wrap:wrap;gap:5px}
+.ech-kv{display:flex;flex-direction:column}
+.ech-kv>div{display:flex;justify-content:space-between;align-items:baseline;gap:var(--sp-m);padding:7px 0;border-bottom:1px solid var(--iron);font-size:13px;color:var(--parch-3)}
+.ech-kv>div:last-child{border-bottom:0}
+.ech-kv b{color:var(--parch);font-weight:700;text-align:right}
+.ech-itrow{gap:var(--sp-m);align-items:center}
 .ech-itn{font-size:22px;line-height:1.05}
+.ech-itm{gap:var(--sp-s);flex-wrap:wrap;font-size:12.5px}
 .well.ech-it .i{width:46%;height:46%;color:color-mix(in srgb,var(--rc,#aaa) 70%,var(--parch))}
 .well.ech-it .gl{font:600 18px/1 var(--f-d);color:var(--gold)}
 .ech-checks,.ech-rules{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
-.ech-checks li{display:grid;grid-template-columns:18px 1fr;gap:6px;align-items:start;font-size:13px;color:var(--parch-2)}
+.ech-checks li{display:grid;grid-template-columns:18px 1fr;gap:6px;align-items:start;font-size:13px;color:var(--amber)}
 .ech-checks li .i{width:15px;height:15px;margin-top:2px}
-.ech-checks li.ok .i{color:var(--spirit)}
-.ech-checks li.no{color:var(--amber)}
 .ech-rules li{position:relative;padding-left:14px;font-size:13px;line-height:1.35;color:var(--parch-2)}
 .ech-rules li::before{content:"";position:absolute;left:2px;top:7px;width:5px;height:5px;transform:rotate(45deg);background:var(--gold-3)}
-.ech-loot{gap:8px;font-size:13.5px;flex-wrap:wrap}
-.ech-got{display:grid;grid-template-columns:96px minmax(0,1fr);gap:14px;align-items:start}
+.ech-spend{gap:var(--sp-s)}
+.ech-spend .eyebrow{margin-right:4px}
+.ech-stats{gap:var(--sp-l);flex-wrap:wrap}
+.ech-stats .stat.win b{color:var(--gold)}
+.ech-got{display:grid;grid-template-columns:96px minmax(0,1fr);gap:var(--sp-m);align-items:start}
 .ech-got .ech-ph{width:96px}
 .newfoe .ech-ph{height:84px;flex:none}
 .ech-bgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
@@ -110,13 +190,36 @@
 .ech-fig .ech-ph{width:100%}
 .ech-fig small{font:700 10.5px/1 var(--f-u)}
 .ech-brow{width:100%;text-align:left;color:var(--parch)}
-.ech-foehero{display:flex;justify-content:center;padding:8px;border-radius:12px;border:1px solid var(--iron);background:radial-gradient(60% 60% at 50% 100%,rgba(72,229,212,.1),transparent 70%),#0a0c0e;flex:none}
-.ech-foehero .ech-ph{height:170px}
-.ech-civn{font-size:26px;line-height:1;color:var(--gold)}
-.ech-plank.got{opacity:.65}
-.ech-need{font-size:12px;white-space:nowrap}
-.ech-demo{flex-wrap:wrap;gap:6px}
-.ech-demo .rs-cyc button{padding:0 9px}
+
+/* итог атаки: исход — заголовком, здоровье цели полосой с отнятым куском, отнятое и очки, отметки и добыча; подробности свёрнуты */
+.ech-res-top{display:grid;grid-template-columns:44px minmax(0,1fr);gap:var(--sp-m);align-items:center}
+.ech-res-top .ech-ph{width:44px}
+.ech-res-top .col{gap:3px}
+.ech-res-top b{font-size:19px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ech-res-top small{font-size:12.5px}
+.ech-res-hp{gap:4px}
+.ech-res-hp .row{justify-content:space-between;font-size:12px;color:var(--parch-3)}
+.ech-res-hp .bar .ghost{background:rgba(255,120,100,.35)}
+.ech-res-kpi{gap:var(--sp-l);flex-wrap:wrap}
+.ech-res-kpi .stat b{font-size:24px}
+.ech-res-kpi .stat.win b{color:var(--gold)}
+.ech-res-kpi.sm .stat b{font-size:17px}
+.ech-res-marks{flex-wrap:wrap;gap:6px}
+.ech-loot{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-s) var(--sp-l)}
+.ech-li{display:flex;align-items:center;gap:var(--sp-s);min-width:0;font-size:13px}
+.ech-li>span:not(.well):not(.rs-av):not(.row):not(.chip){min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ech-li>b{flex:none}
+.ech-li>small{flex:none;font-size:11.5px}
+.ech-res-t{width:100%;border-collapse:collapse;font-size:12.5px}
+.ech-res-t th{padding:3px 6px;color:var(--parch-3);font-weight:400;text-align:right;border-bottom:1px solid #1e2328}
+.ech-res-t td{padding:3px 6px;text-align:right;border-bottom:1px solid #161a1e;color:var(--parch-2);font-variant-numeric:tabular-nums}
+.ech-res-t th:first-child,.ech-res-t td:first-child{text-align:left}
+.ech-res-t tr.fell td{opacity:.6}
+.ech-rf{display:inline-flex;align-items:center;gap:6px;min-width:0}
+.ech-rf img{width:24px;height:24px;border-radius:6px;object-fit:cover;object-position:50% 18%}
+.ech-rf b{color:var(--parch);font-weight:700}
+.ech-rf small{color:#ff9b8a;font-size:11px}
+.ech-res-foes{font-size:12px}
 
 /* «Спуск»: активные руины в шахте и карточка руины */
 .ech-rs .ech-slots{display:block;font-size:11px;line-height:1.25;color:var(--parch-3);padding:3px 7px}
@@ -131,50 +234,6 @@
 .ech-irow{display:flex;align-items:center;gap:8px;font-size:13px;line-height:1.2}
 .ech-bn{font-size:16px;line-height:1.1}
 .ech-pay{gap:10px;flex-wrap:wrap}
-
-/* низкий экран (844×390): цель без подписи под кнопкой, слоты и варианты ниже */
-@container main (max-height: 360px){
-  .ech-head{padding:4px 8px 4px 10px}
-  .ech-civ b{font-size:18px}
-  .ech-kpi .stat b{font-size:18px}
-  .ech-name{font-size:22px}
-  .ech-stats .stat b{font-size:17px}
-  .ech .etarget .info{gap:5px;padding:8px 10px 8px 4px}
-  .ech .e-foot{gap:5px}
-  .ech .e-foot .btn.big{min-height:40px}
-  .ech .eslot .ph{height:38px}
-  .ech-why,.ech-om3,.ech-pick-h .ech-s{display:none}
-  .ech-p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .ech-wide .tabs button{height:22px}
-  .ech-ladder{padding:4px 12px}
-  .ech-pick-h h2{font-size:19px}
-  .ech-offer{padding:3px 8px}
-}
-
-/* бой Эхо (ADR-0025): заглушка облика врага на карте боя и в очереди раунда — та же, что на экране Эхо */
-.bc .face .ech-ph.bt,.bt-queue i .ech-ph.bt{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;border:0;border-radius:0}
-.bc .face .ech-ph.bt b{font-size:22px}
-.bt-queue i .ech-ph.bt b{font-size:8px}
-/* итог атаки: исход, отнятое здоровье и очки, кто что сделал */
-.ech-res-why{margin:0;font:600 19px/1.15 var(--f-d);color:var(--parch)}
-.ech-res-why.win{color:var(--gold)}
-.ech-res-kpi{gap:16px;flex-wrap:wrap}
-.ech-res-kpi .stat b{font-size:19px}
-.ech-res-t{width:100%;border-collapse:collapse;font-size:12.5px}
-.ech-res-t th{padding:3px 6px;color:var(--parch-3);font-weight:400;text-align:right;border-bottom:1px solid #1e2328}
-.ech-res-t td{padding:3px 6px;text-align:right;border-bottom:1px solid #161a1e;color:var(--parch-2);font-variant-numeric:tabular-nums}
-.ech-res-t th:first-child,.ech-res-t td:first-child{text-align:left}
-.ech-res-t tr.fell td{opacity:.6}
-.ech-rf{display:inline-flex;align-items:center;gap:6px;min-width:0}
-.ech-rf img{width:24px;height:24px;border-radius:6px;object-fit:cover;object-position:50% 18%}
-.ech-rf b{color:var(--parch);font-weight:700}
-.ech-rf small{color:#ff9b8a;font-size:11px}
-.ech-res-foes{font-size:12px}
-/* арт недели (ADR-0025): портрет вместо заглушки; до первой победы — в тумане, поверх знак вопроса */
-.ech-ph.art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
-.ech-ph.art b{display:none}
-.ech-ph.art.unk img{filter:blur(5px) brightness(.4) saturate(.6)}
-.ech-ph.art.unk b{display:block;position:relative}
 /* биом Многоликого в «Спуске»: этажи — ступени лестницы; итог — какие этажи взяты */
 .bnode.ech-mb{border-color:rgba(221,188,122,.4)}
 .ech-many .banner>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.5) saturate(.9)}
@@ -188,9 +247,34 @@
 .ech-mruler i.e,.ech-mruler i.b,.ech-mruler i.u{box-shadow:inset 0 -2px 0 var(--gold-3)}
 .ech-mruler i.ok{background:var(--spirit)}
 .ech-mruler i.no{background:#ff7a5c}
-/* отряд недели (демо): герои Эхо в строке отряда и на картах боя — лицо из состава героев */
-.ech-wf .rs-av{width:30px;height:30px}
+
+/* бой Эхо (ADR-0025): заглушка облика врага на карте боя и в очереди раунда — та же, что на экране Эхо */
+.bc .face .ech-ph.bt,.bt-queue i .ech-ph.bt{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;border:0;border-radius:0}
+.bc .face .ech-ph.bt b{font-size:22px}
+.bt-queue i .ech-ph.bt b{font-size:8px}
+/* отряд недели (демо): герои Эхо в итоге атаки и на картах боя — лицо из состава героев */
 .ech-rf .rs-av{width:24px;height:24px;border-radius:6px}
 .bc .face>.rs-ph,.bt-queue i>.rs-ph{position:absolute;inset:0;width:100%;height:100%;border-radius:0}
 .bc .face>.rs-ph b{font-size:20px}
 .bt-queue i>.rs-ph b{font-size:8px}
+
+/* низкий экран (844×390): шапка, карточка цели и варианты плотнее */
+@container main (max-height: 360px){
+  .ech-head{padding:4px var(--sp-s) 4px 10px}
+  .ech-civ{font-size:19px}
+  .ech-kpi .stat b{font-size:18px}
+  .ech-name{font-size:22px}
+  .ech-n b,.ech-tgt .ech-n b{font-size:18px}
+  .ech-sf{width:24px;height:24px}
+  .ech-vs{padding-top:6px}
+  .ech .etarget .stage{padding:10px 0 10px 10px}
+  .ech .etarget .info{gap:6px;padding:10px}
+  .ech .e-foot .btn.big{min-height:40px}
+  .ech .eslot .ph{height:38px}
+  .ech-pick-h .ech-s{display:none}
+  .ech-p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .ech-wide .tabs button{height:22px}
+  .ech-ladder{padding:4px var(--sp-m)}
+  .ech-pick-h h2{font-size:19px}
+  .ech-offer{padding:4px 0}
+}
