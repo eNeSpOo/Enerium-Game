@@ -28,6 +28,8 @@
    поправка в формуле урона, как иммунитет по рангу. Приёмы Убер-боссов включаются данными: две ульты в наборе,
    обычная атака по всем (basic), реакция со способностью вне очереди (cast), контроль мимо иммунитета (ctrlBypass);
    уникальные способности Убер-боссов — addLib из echo-foes.js.
+   Биомы 2–4 — данные biome-foes.js (tools/content-gen/biomes): карты и колоды регистрирует addFoes и addBiome, уникальное — addLib;
+   золото и дух биома — dropPct, уровень врагов этажа — foeLvl с дробным шагом.
 
    Инварианты ядра соблюдены и в прототипе:
    - только целые числа: время в мс, доли — в процентах или базисных пунктах (10 000 = 100 %);
@@ -249,6 +251,10 @@ function addLib(items) {
   for (const x of items || []) LIB2[x.id] = libEntry(x);
   return LIB2;
 }
+/* Биомы из данных (biome-foes.js, биомы 2–4): карты врагов — в FOES, набор — поле kit карты, если его нет в kits.js;
+   биом — в BIOMES, сид — от имени биома, как у Мастерской. Уникальные способности набора — addLib */
+function addFoes(foes) { Object.assign(FOES, foes); return FOES; }
+function addBiome(id, B) { BIOMES[id] = Object.assign({ seed: seedOf(B.name) }, B); return BIOMES[id]; }
 const KITS = () => root.EN_KITS || { heroes: {}, foes: {} };
 const schoolEntry = (school, kind, tier) => lib2()[school + '.' + kind + '.' + tier] || null;
 const schoolDebuffSt = school => { const e = schoolEntry(school, 'debuff', 'one'); return e ? e.st : null; };
@@ -574,9 +580,10 @@ function heroSrc(h) {
 function foeSrc(id, lvl, k, lead, hp, hpPct) {
   const f = FOES[id];
   return { key: id + '#' + k, id, name: f.name, cls: f.cls, el: f.el, lvl, st: f.st, race: f.race,
-    hpPct: hpPct || f.hpPct, main: f.main, fx: f.fx, abs: f.abs, ult: f.ult, pas: f.pas, rank: f.rank, lead, hp, kit: KITS().foes[id] || null };
+    hpPct: hpPct || f.hpPct, main: f.main, fx: f.fx, abs: f.abs, ult: f.ult, pas: f.pas, rank: f.rank, lead, hp, kit: KITS().foes[id] || f.kit || null };
 }
-const foeLvlOf = (B, floor) => { const L = B.foeLvl || RULES.foeLvl; return L.base + floor * L.perFloor; };
+/* уровень врагов этажа: base + этаж × perFloor / div — div даёт биому дробный шаг, например 1,6 уровня за этаж */
+const foeLvlOf = (B, floor) => { const L = B.foeLvl || RULES.foeLvl; return L.base + fl(floor * L.perFloor, L.div || 1); };
 /* Колода этажа. Осада — только в биоме с осадой: иначе босс каждый забег со свежим здоровьем. */
 function floorFoes(biome, floor, siegeHp) {
   const B = BIOMES[biome], F = B.floors[floor - 1], boss = k => F.g === 'b' && k === 0;
@@ -1228,9 +1235,10 @@ function floorLoot(biome, floor, b, bonusBp) {
   if (rng(10000) < baseBp || F.baseSure) L.base = 1;
   const boss = b.u[1].find(u => u.rank === 'b');
   if (boss && !boss.alive && rng(10000) < fl((D.b.uniqueBp + F.uniqueAdd) * (100 + F.rarePct), 100)) L.unique = 1;
+  const M = BIOMES[biome].dropPct || 100;   // золото и дух биома, % ставок: × номер цикла, во втором биоме цикла ещё +0,5 (ADR-0014)
   for (const u of dead) {
     const d = D[u.rank] || {};
-    let gold = fl((d.gold || 0) * (100 + u.lootPct + u.lootGold), 100), spirit = fl((d.spirit || 0) * (100 + u.lootPct + u.lootSpirit), 100);
+    let gold = fl(fl((d.gold || 0) * M, 100) * (100 + u.lootPct + u.lootGold), 100), spirit = fl(fl((d.spirit || 0) * M, 100) * (100 + u.lootPct + u.lootSpirit), 100);
     let souls = (d.soulsPerBiome || 0) * BIOMES[biome].n; if (souls) souls = fl((souls + (F.souls[u.rank] || 0)) * (100 + u.lootPct), 100);   // «Ловец душ» — там, где души положены
     let keys = d.keys || 0;
     if (F.doubleCh && rng(10000) < F.doubleCh) { gold *= 2; spirit *= 2; souls *= 2; keys *= 2; }   // «Удачливый»: двойная добыча
@@ -1260,5 +1268,5 @@ function simRun(heroes, biome, siegeHp, mode) {
   return { floors, runMs, bossHp };
 }
 
-root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, FLOORS_TUTOR, BIOMES, lib: lib2, addLib, kitTable, GOOD_ST, SKIP_ST, seedOf, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, carry, simRun, guardBattle, echoBattle, echoStats, foeMaxHp, floorLoot, elemMul, ready, readyRound, order, chanceTable, pct, fxOf };
+root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, FLOORS_TUTOR, BIOMES, lib: lib2, addLib, addFoes, addBiome, kitTable, GOOD_ST, SKIP_ST, seedOf, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, carry, simRun, guardBattle, echoBattle, echoStats, foeMaxHp, floorLoot, elemMul, ready, readyRound, order, chanceTable, pct, fxOf };
 })(typeof window !== 'undefined' ? window : globalThis);

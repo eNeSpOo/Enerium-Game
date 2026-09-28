@@ -1,0 +1,25 @@
+/* Энериум · прототип — биомы 2–4 (screens/biomes.js). Экран «Спуска» берёт общие классы index.html (.biome, .banner, .shelf);
+   здесь — раздел UI-кита «Биомы спуска». Отступы — токены воздуха --sp-l / --sp-m / --sp-s. */
+.bk-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-m)}
+.bk-b{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0;padding:var(--sp-s);border:1px solid var(--iron);border-radius:12px;background:#0c0f12}
+.bk-ar{position:relative;height:120px;border-radius:9px;overflow:hidden;border:1px solid #262b31}
+.bk-ar>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.bk-ar::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(7,9,11,.92),rgba(7,9,11,.35) 60%,transparent),linear-gradient(0deg,rgba(7,9,11,.8),transparent 55%)}
+.bk-ar-in{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;justify-content:flex-end;gap:4px;padding:var(--sp-s) var(--sp-m)}
+.bk-ar-in b{font-size:21px;line-height:1.05;color:var(--parch)}
+.bk-facts{display:flex;flex-wrap:wrap;gap:4px var(--sp-m);font-size:12.5px;color:var(--parch-2)}
+.bk-facts b{color:var(--parch);font-variant-numeric:tabular-nums}
+.bk-foes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;max-height:360px;overflow:auto;scrollbar-width:thin}
+.bk-f{display:grid;grid-template-columns:38px minmax(0,1fr);gap:var(--sp-s);align-items:center;padding:3px;border-radius:7px;background:rgba(255,255,255,.02)}
+.bk-f img{width:38px;height:48px;object-fit:cover;border-radius:5px;border:1px solid #262b31}
+.bk-f[data-r="e"] img{border-color:rgba(221,188,122,.45)}
+.bk-f[data-r="b"] img,.bk-f[data-r="rune"] img{border-color:var(--gold)}
+.bk-f span{display:flex;flex-direction:column;gap:1px;min-width:0}
+.bk-f b{font-size:12.5px;color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bk-f small{font-size:10.5px;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bk-f .bk-ab{color:var(--parch-2);white-space:normal}
+.bk-stubs{display:grid;grid-template-columns:auto minmax(0,1fr);gap:var(--sp-m);align-items:center;margin-top:var(--sp-m)}
+.bk-st{display:flex;gap:4px;align-items:flex-end}
+.bk-st img{width:46px;height:57px;border-radius:5px;border:1px solid #262b31}
+.bk-st img.wide{width:136px;height:57px;object-fit:cover}
+@media (max-width:1100px){.bk-grid{grid-template-columns:minmax(0,1fr)}.bk-stubs{grid-template-columns:minmax(0,1fr)}}

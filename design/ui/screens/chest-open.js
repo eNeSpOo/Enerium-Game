@@ -1,0 +1,494 @@
+/* screens/chest-open.js — окно открытия сундука: одна анимация на все сундуки прототипа. Договор — screens/model.js.
+   Регистрирует: coShow(итог, { host, trial }) — показ итога открытия, его зовёт zpOpen в screens/bag.js после выдачи; OV.co — окно поверх
+   игры; ACT.coreveal, ACT.coskip; раздел UI-кита «Открытие сундука» (KIT_EXTRA) — живая проба и раскадровка четырёх моментов;
+   кнопку «С анимацией» у пробного открытия раздела
+   «Лутбоксы»; два сценария презентации. Своё состояние — S.co, заводится как S.bag в model.js.
+   Где открываются сундуки: только в запасах (§14.4, §36.11) — «Ремесло → Запасы → Сундуки», по одному и пачкой. Дары путешествия,
+   Входящие и добыча режимов кладут закрытые сундуки в запасы (§23.1) — открывают их там, этой же анимацией. UI-кит показывает ту же
+   анимацию пробой: проба — не выдача.
+   Сервер решает, клиент показывает. Итог выдаёт zpOpen (bag.js) одной операцией с номером: EnLoot.roll на сиде каждого сундука, прах
+   за осколки пробуждённых героев, выдача через BAG — и только потом зовёт coShow. Анимация итог не меняет: закрыть окно, пропустить
+   анимацию или нажать на сцену — итог тот же и второй раз не выдаётся. Повтор номера операции zpOpen не выдаёт и не показывает.
+   Анимация — CSS по времени: разметка рисуется из момента от начала показа (задержки --d…), поэтому перерисовка экрана посреди
+   анимации её не рвёт. Сундук опускается и дрожит, из щелей бьёт свет цвета редкости; крышка откидывается — вспышка и частицы EnFx
+   (fx.js): чем реже сундук, тем богаче всплеск, с эпического — лучи, с древнего — золотая оковка, кольца и лёгкая дрожь экрана.
+   Предметы вылетают карточками по одной — у каждой своя редкость и своя искра; самый ценный — последним и крупнее. Итог — одной сеткой.
+   Пачка (×N и «Открыть все») — короткая анимация на сундуке этого вида с самым ценным предметом пачки, затем сводка по редкостям.
+   Редкость карточки — выпавшая из окна сундука: ступень ценности записи (docs/content/лутбоксы.md, принцип 4), как в «Состав и шансы».
+   «Пропустить анимацию» — итог сразу; выбор помнит localStorage (en-co-skip), без него всё работает; при prefers-reduced-motion
+   анимации нет. Числа вида — CO_VIEW, демо сценариев — CO_DEMO. Служебное — только команде: TM из index.html.
+   Автопроверка — tools/content-gen/screens/check_chest_open.js. */
+'use strict';
+
+/* ================== вид: числа анимации, не баланс ================== */
+const CO_VIEW = {
+  drop: 380,                                       // сундук опускается на место, мс
+  wait: [700, 800, 900, 1050, 1200, 1400, 1600],   // ожидание по редкости сундука: дрожь и свет из щелей, мс
+  waitMany: 520,                                   // пачка — короткое ожидание, мс
+  seamTail: 240,                                   // свет щелей гаснет при открытии: столько мс после конца ожидания
+  lid: 540,                                        // крышка откидывается, мс
+  first: 380,                                      // от открытия до первой карточки, мс
+  step: 440,                                       // между карточками, мс
+  bestPause: 280,                                  // пауза перед самой ценной, мс
+  fly: 560, flyBest: 780,                          // полёт карточки, мс
+  hold: 820, holdMany: 980,                        // от посадки последней карточки до итога, мс
+  coin: 160, coinStep: 110,                        // монеты гарантированной валюты: после открытия и между монетами, мс
+  shake: 150,                                      // период дрожи сундука в ожидании, мс
+  amp: [8, 10, 12, 15, 18, 22, 26],                // размах дрожи по редкости сундука, десятые доли градуса
+  halo: [30, 38, 46, 56, 66, 76, 86],              // яркость ореола за сундуком по редкости, %
+  ray: [0, 0, 0, 34, 46, 58, 70],                  // яркость лучей за сундуком по редкости, %
+  rays: 4, gild: 5,                                // с какой редкости сундука: лучи, золотая оковка
+  gold: ['#e3c27c', '#8e6b35'],                    // золотая оковка: светлая и тёмная
+  kitMany: 10,                                     // UI-кит: сундуков в пробной пачке
+  /* UI-кит, раскадровка: ожидание — такая доля ожидания, %; крышка — столько мс после открытия; карточки — такая доля полёта
+     самой ценной, %; итог — столько мс после конца */
+  board: { wait: 75, open: 180, fly: 60, hold: 2000 },
+  /* сцена: ширина и высота, сундук [ш, в], щель крышки от верха сундука, отступ снизу, верх ряда карточек,
+     карточка и самая ценная [ш, в], промежуток, монеты [отступ от сундука, верх, шаг] — px */
+  geo: { w: 540, h: 316, chest: [160, 136], seam: 71, pad: 4, top: 6, card: [76, 100], best: [96, 124], gap: 14, coin: [12, 196, 34] },
+  /* частицы EnFx. Искры, полосы и золото — [сколько, скорость, жизнь мс, размер]; кольца — [[радиус в % ширины сундука, мс, толщина,
+     задержка мс]]; огоньки — [серий, шаг мс, сколько, скорость, жизнь мс, размер, подъём]; вспышка — [масштаб %, мс]; дрожь — [px, мс] */
+  fx: {
+    open: [
+      { sparks: [16, 170, 650, 4], streaks: [6, 220, 360, 2], flash: [110, 520] },
+      { sparks: [22, 190, 720, 4], streaks: [10, 240, 400, 2], flash: [125, 560] },
+      { sparks: [28, 210, 800, 5], streaks: [14, 260, 440, 2], flash: [140, 600] },
+      { sparks: [36, 230, 900, 5], streaks: [18, 290, 480, 2], gold: [14, 220, 900, 4], flash: [160, 700] },
+      { sparks: [44, 250, 1100, 6], streaks: [24, 330, 560, 3], gold: [26, 260, 1100, 5], rings: [[110, 700, 3, 0], [170, 950, 2, 140]], flash: [185, 820], shake: [3, 320] },
+      { sparks: [52, 270, 1300, 6], streaks: [30, 360, 620, 3], gold: [38, 300, 1300, 6], rings: [[120, 760, 3, 0], [190, 1000, 2, 140], [90, 600, 2, 300]], motes: [5, 160, 9, 70, 1300, 4, 150], flash: [210, 920], shake: [4, 380] },
+      { sparks: [60, 290, 1500, 7], streaks: [36, 400, 700, 3], gold: [52, 340, 1500, 7], rings: [[130, 820, 3, 0], [210, 1100, 2, 140], [100, 650, 2, 300]], motes: [7, 160, 10, 70, 1500, 4, 160], flash: [240, 1040], shake: [5, 420] },
+    ],
+    card: [[10, 140, 520, 3], [12, 150, 560, 3], [14, 160, 600, 4], [18, 180, 680, 4], [22, 200, 760, 5], [26, 220, 840, 5], [30, 240, 920, 6]],   // искра карточки — по её редкости
+    /* самая ценная: вспышка по её редкости; полосы; кольцо [радиус в % ширины карточки, мс, толщина] и золото — с этих редкостей */
+    best: { flash: [[80, 560], [90, 600], [100, 660], [115, 740], [130, 840], [150, 940], [170, 1040]], streaks: [16, 260, 460, 2], ringFrom: 4, ring: [120, 760, 2], goldFrom: 5, gold: [24, 260, 1000, 5] },
+  },
+};
+/* сундук своего вида: материал и оковка; эмблема — значок вида из LB_IC (index.html). Цвета вида, не баланс */
+const CO_KINDS = {
+  shards: { n: 'Осколки', ic: 'users', wood: '#28303c', wood2: '#161b23', metal: '#9aa6b6', metal2: '#56606c' },     // реликварий Эхо: тёмный камень и серебро
+  keys: { n: 'Ключи', ic: 'key', wood: '#373c42', wood2: '#1f2327', metal: '#b48a4f', metal2: '#6d5230' },          // окованный ларь: железо и бронза
+  equip: { n: 'Снаряжение', ic: 'shield', wood: '#5a3526', wood2: '#35201a', metal: '#8e969d', metal2: '#565c61' },  // оружейный ящик: дуб и сталь
+  talisman: { n: 'Талисманы', ic: 'gem', wood: '#2e2238', wood2: '#1a1322', metal: '#cfae6a', metal2: '#7b6437' },   // шкатулка: лак и золото
+  workers: { n: 'Рабочие', ic: 'gear', wood: '#6a5137', wood2: '#46341f', metal: '#6f6c66', metal2: '#44423e' },     // рабочий короб: светлое дерево и железо
+  craft: { n: 'Крафт', ic: 'crown', wood: '#48483f', wood2: '#2c2c27', metal: '#7f8b7c', metal2: '#4d564b' },        // каменный сундук руин
+  wander: { n: 'Странник', ic: 'star', wood: '#4c3423', wood2: '#2e1f15', metal: '#c09858', metal2: '#735a33' },     // дорожный сундук: кожа и латунь
+};
+/* сценарии презентации: какой сундук кладётся в запасы и сколько — демо, не выдача режима */
+const CO_DEMO = {
+  one: { box: 'talisman', r: 6, cyc: 3, win: 'step', src: 'Клановый босс · доля клана', count: 1 },
+  many: { box: 'shards', r: 4, cyc: 3, win: 'step', week: 'Эльфы', src: 'Эхо · личная планка', count: 10 },
+};
+/* ценность вида записи при равной редкости: кто вылетает позже и стоит выше в итоге */
+const CO_KIND_W = { shard: 6, tal: 5, equip: 4, wshard: 3, item: 2, cur: 1 };
+
+/* ================== помощники ================== */
+const CO_KEY = 'en-co-skip';   // localStorage: «Пропустить анимацию» у сундуков — свой выбор, не общий с рулеткой
+const coSaved = () => { try { return localStorage.getItem(CO_KEY) === '1'; } catch (_) { return false; } };
+const coReduced = () => { try { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (_) { return false; } };
+const coSkipOn = () => !!(S.co && S.co.skip) || coReduced();
+const coNow = () => { try { return Math.round(performance.now()); } catch (_) { return 0; } };
+const coVal = c => c.r * 10 + (CO_KIND_W[c.kind] || 0);
+const coChests = n => `${fmt(n)} ${plural(n, 'сундук', 'сундука', 'сундуков')}`;
+const coCurName = k => (LBX && LBX.currencies[k]) || (CUR[k] ? CUR[k].n : k);
+const coBoxName = cs => LBX && cs && LBX.boxes[cs.box] ? lbBoxName(cs.box, cs.r, cs.win) : 'Сундук';
+const coNextOp = () => 'zo' + ((typeof zpV === 'function' && zpV().op) || 1);   // номер следующей операции открытия: его несут кнопки
+/* цвет редкости — из токенов --r1…--r7 (ADR-0027) */
+const coColor = r => { try { return getComputedStyle(document.documentElement).getPropertyValue('--r' + r).trim() || EnFx.COL.gold; } catch (_) { return '#ddbc7a'; } };
+
+/* одна выпавшая запись — для карточки и плитки: значок, имя, количество, редкость — выпавшая из окна сундука */
+function coView(it) {
+  const k = it.kind, o = { kind: k, id: it.id, r: it.r, q: it.q, dust: it.dust || 0, face: false, name: '', hn: '', icon: '', tip: '' };
+  if (k === 'shard') {
+    const h = RSI[it.id], n = h ? h.n : LBX && LBX.heroInfo[it.id] ? LBX.heroInfo[it.id].n : 'Герой';
+    o.face = !!h; o.icon = h ? rsFace(h) : ic('users'); o.hn = n; o.name = o.dust ? `${n} → прах` : n;
+    o.tip = o.dust ? `${n} уже пробуждён: осколки ×${fmt(it.q)} → прах +${fmt(o.dust)}` : `Осколки героя: ${n} ×${fmt(it.q)}`;
+  } else if (k === 'item') {
+    const x = BAG.item(it.id);
+    o.icon = !x ? ic('gem') : x.team ? ic('lock') : trIcon(x); o.name = x ? zpName(x) : 'Предмет'; o.tip = `${o.name} ×${fmt(it.q)}`;
+  } else if (k === 'cur') {
+    o.icon = `<img src="${curImg(it.id)}" alt="">`; o.name = coCurName(it.id); o.tip = `${o.name} ×${fmt(it.q)}`;
+  } else {   // tal, wshard, equip — «из сундуков» в запасах; спойлеры в именах талисманов прячет zpExtraName
+    const xk = k === 'tal' ? 'tal' : k === 'wshard' ? 'wsh' : 'eq';
+    o.icon = ic(ZP_EXTRA_IC[xk] || 'gem'); o.name = zpExtraName(xk, it.id, it.r); o.tip = `${o.name} ×${fmt(it.q)}`;
+  }
+  return o;
+}
+/* записи итога по сундукам: журнал zpOpenOne (sum.log); без журнала — из сумм итога одним сундуком */
+function coLog(last) {
+  const s = last.sum || {};
+  if (Array.isArray(s.log) && s.log.length) return s.log;
+  const items = [], cur = Object.entries(s.cur || {});
+  for (const [id, q] of Object.entries(s.items || {})) { const x = BAG.item(id); items.push({ kind: 'item', id, q, r: x ? x.r : 1 }); }
+  for (const [id, q] of Object.entries(s.shards || {})) items.push({ kind: 'shard', id, q, r: RSI[id] ? RSI[id].r : 1 });
+  for (const [id, d] of Object.entries(s.dust || {})) items.push({ kind: 'shard', id, q: (s.dustQ || {})[id] || 0, dust: d, r: RSI[id] ? RSI[id].r : 1 });
+  for (const [key, q] of Object.entries(s.extra || {})) { const [xk, id, r] = key.split(':'); items.push({ kind: xk === 'tal' ? 'tal' : xk === 'wsh' ? 'wshard' : 'equip', id, q, r: +r || 1 }); }
+  return [{ cur, items }];
+}
+
+/* ================== показ ==================
+   R — один показ: host — 'game' (окно поверх игры) или 'kit' (сцена раздела UI-кита); phase — 'anim', 'res' (итог) или 'idle' (сундук
+   раздела до пробы); items — все выпавшие записи, cards — что вылетает карточками, cur — гарантированная валюта; T — моменты от начала, мс */
+let coSeq = 0;
+function coRun(last, host, o) {
+  const log = coLog(last), cs = last.cs, items = [], cur = {};
+  log.forEach((L, ci) => {
+    for (const [k, a] of L.cur || []) cur[k] = (cur[k] || 0) + a;
+    (L.items || []).forEach((it, i) => items.push(Object.assign(coView(it), { ci, i })));
+  });
+  const n = (last.sum && last.sum.n) || log.length;
+  const sorted = items.slice().sort((a, b) => coVal(a) - coVal(b) || a.ci - b.ci || a.i - b.i);
+  const R = { id: ++coSeq, host, key: last.key || '', op: last.op || '', cs, box: cs.box, r: cs.r, n, items, cur, cards: n > 1 ? sorted.slice(-1) : sorted,
+    trial: !!o.trial, phase: 'anim', t0: coNow(), tr: null, timers: [] };
+  R.T = coTimes(R);
+  return R;
+}
+/* моменты анимации от начала, мс: ожидание (дрожь и свет из щелей), открытие, вылет каждой карточки, итог */
+function coTimes(R) {
+  const V = CO_VIEW, many = R.n > 1, wait = many ? V.waitMany : V.wait[R.r - 1] || V.wait[0], tW = V.drop, tO = tW + wait, cards = [];
+  let t = tO + V.first;
+  R.cards.forEach((c, i) => { if (i && i === R.cards.length - 1) t += V.bestPause; cards.push(t); t += V.step; });
+  const land = cards.length ? cards[cards.length - 1] + V.flyBest : tO + V.lid;
+  return { tW, tO, wait, cards, end: land + (many ? V.holdMany : V.hold) };
+}
+const coFly = (R, i) => i === R.cards.length - 1 ? CO_VIEW.flyBest : CO_VIEW.fly;
+const coCur = host => host === 'kit' ? CO_KIT.run : S.co ? S.co.run : null;
+const coLive = R => !!R && R.phase === 'anim' && coCur(R.host) === R;
+function coStop(R) { if (!R) return; for (const t of R.timers) clearTimeout(t); R.timers = []; }
+function coPaint(R) { if (R.host === 'kit') coKitPaint(); else render(); }
+/* показ итога: одна функция на все места. last — { key, cs, sum: { n, log }, op } от zpOpen или пробы UI-кита */
+function coShow(last, o = {}) {
+  if (!last || !last.cs || !LBX) return null;
+  const host = o.host === 'kit' ? 'kit' : 'game';
+  coStop(coCur(host));
+  const R = coRun(last, host, o);
+  if (host === 'kit') CO_KIT.run = R; else { S.co.run = R; S.overlay = { t: 'co', arg: String(R.id) }; }
+  if (coSkipOn()) { R.phase = 'res'; R.tr = R.t0; } else coSchedule(R);
+  coPaint(R);
+  if (R.phase === 'res') coFocus(R);
+  return R;
+}
+/* таймеры одного показа: частицы открытия, искры карточек и итог. Каждый проверяет, что показ ещё идёт */
+function coSchedule(R) {
+  const T = R.T, at = (ms, f) => { R.timers.push(setTimeout(() => { if (coLive(R)) { try { f(); } catch (_) { } } }, Math.max(0, ms))); };
+  at(T.tO, () => coBurstOpen(R));
+  R.cards.forEach((c, i) => at(T.cards[i] + coFly(R, i), () => coBurstCard(R, i)));
+  at(T.end, () => coReveal(R));
+}
+/* итог: после анимации, сразу при «Пропустить анимацию», по нажатию на сцену или если галочку поставили посреди анимации */
+function coReveal(R) {
+  if (!coLive(R)) return;
+  coStop(R); R.phase = 'res'; R.tr = coNow();
+  coPaint(R); coFocus(R);
+}
+function coFocus(R) {
+  if (R.host !== 'game') return;
+  try { requestAnimationFrame(() => { const b = document.querySelector('#game .co-res .co-main'); if (b) b.focus({ preventScroll: true }); }); } catch (_) { }
+}
+/* одна строка об итоге: когда окно закрыли посреди анимации — выдача уже сделана */
+const coSay = R => `${R.n > 1 ? `Открыто: ${coChests(R.n)}` : 'Сундук открыт'} — всё в запасах`;
+/* после каждой перерисовки: окно закрыли — показ остановлен; закрыли посреди анимации — итог приходит сообщением */
+function coSync() {
+  const R = S.co && S.co.run; if (!R) return;
+  if (S.overlay && S.overlay.t === 'co') return;
+  coStop(R); S.co.run = null;
+  if (R.phase === 'anim') setTimeout(() => toast(coSay(R), CHEST), 0);
+}
+window.addEventListener('en-render', coSync);
+
+/* ================== частицы: слой рядом с #game — перерисовка экрана его не сносит; у UI-кита — свой слой в сцене ================== */
+const CO_FXI = { game: null, kit: null };
+function coRoot(R) { return document.getElementById(R.host === 'kit' ? 'coKit' : 'game'); }
+function coFxHost(host) {
+  if (host === 'kit') { const k = document.getElementById('coKit'); return k && k.querySelector ? k.querySelector(':scope > .co-fxl') : null; }
+  const g = document.getElementById('game'), p = g && g.parentElement;
+  if (!p || !p.querySelector) return null;
+  let L = p.querySelector(':scope > .co-fxl');
+  if (!L) { L = document.createElement('div'); L.className = 'co-fxl'; L.setAttribute('aria-hidden', 'true'); p.appendChild(L); }
+  return L;
+}
+function coFx(host) {
+  if (!window.EnFx) return null;
+  const L = coFxHost(host); if (!L) return null;
+  let I = CO_FXI[host];
+  if (!I || I.host !== L) { if (I) I.destroy(); I = CO_FXI[host] = EnFx.create(L); }
+  return I;
+}
+const coEl = (R, sel) => { const root = coRoot(R); return root && root.querySelector ? root.querySelector(`[data-co-run="${R.id}"] ${sel}`) : null; };
+/* крышка откинулась: искры цвета редкости, полосы света, с эпического — золото, с древнего — кольца, огоньки и лёгкая дрожь */
+function coBurstOpen(R) {
+  const fx = coFx(R.host), pt = coEl(R, '.co-mpt'), ch = coEl(R, '.co-chest');
+  if (!fx || !pt || !ch) return;
+  const P = CO_VIEW.fx.open[R.r - 1], C = EnFx.COL, b = fx.center(pt), w = fx.center(ch).w, c = coColor(R.r);
+  fx.burst(b.x, b.y, c, ...P.sparks);
+  fx.burst(b.x, b.y, C.steel, ...P.streaks, { shape: 'streak', w: 1.4 });
+  if (P.gold) fx.burst(b.x, b.y, C.gold, ...P.gold);
+  for (const [k, ms, th, d] of P.rings || []) setTimeout(() => { if (coLive(R)) fx.ring(b.x, b.y, c, w * k / 100, ms, th); }, d);
+  if (P.motes) {
+    const [n, step, k, sp, life, size, up] = P.motes;
+    for (let i = 0; i < n; i++) setTimeout(() => { if (coLive(R)) fx.burst(b.x, b.y, i % 2 ? C.gold : c, k, sp, life, size, { ay: -up, drag: 1, fade: 'in' }); }, i * step);
+  }
+  if (P.shake) fx.shake(...P.shake);
+}
+/* карточка села: искра цвета её редкости; у самой ценной — ещё полосы, кольцо и золото по редкости */
+function coBurstCard(R, i) {
+  const fx = coFx(R.host), el = coEl(R, `.co-card[data-i="${i}"] .co-cb`);
+  if (!fx || !el) return;
+  const c = R.cards[i], B = CO_VIEW.fx.best, C = EnFx.COL, b = fx.center(el), col = coColor(c.r);
+  fx.burst(b.x, b.y, col, ...CO_VIEW.fx.card[c.r - 1]);
+  if (i !== R.cards.length - 1) return;
+  fx.burst(b.x, b.y, C.steel, ...B.streaks, { shape: 'streak', w: 1.3 });
+  if (c.r >= B.ringFrom) fx.ring(b.x, b.y, col, b.w * B.ring[0] / 100, B.ring[1], B.ring[2]);
+  if (c.r >= B.goldFrom) fx.burst(b.x, b.y, C.gold, ...B.gold);
+}
+
+/* ================== разметка ================== */
+/* сундук — SVG: корпус, оковка, замок с эмблемой вида; крышка — отдельная группа, её откидывает CSS. u — префикс id градиентов */
+function coChestSvg(box, u) {
+  const K = CO_KINDS[box] || CO_KINDS.wander, emb = (typeof LB_IC !== 'undefined' && LB_IC[box]) || K.ic;
+  const lid = 'M26 90V61C26 43 60 34 100 34C140 34 174 43 174 61V90Z';
+  return `<svg class="co-sv" viewBox="0 0 200 170" aria-hidden="true" focusable="false"><defs>
+    <linearGradient id="${u}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".14"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".44"/></linearGradient>
+    <radialGradient id="${u}m" cx=".5" cy=".82" r=".62"><stop offset="0" style="stop-color:#fffaf0"/><stop offset=".42" style="stop-color:var(--rc)"/><stop offset="1" style="stop-color:var(--rc);stop-opacity:0"/></radialGradient>
+    <filter id="${u}g" x="-20%" y="-400%" width="140%" height="900%"><feGaussianBlur stdDeviation="2.6"/></filter></defs>
+  <ellipse class="co-shd" cx="100" cy="159" rx="84" ry="7"/>
+  <g class="co-body"><rect class="w" x="30" y="86" width="140" height="66" rx="5"/><path class="w2" d="M32 108.5H168M32 130.5H168"/>
+    <rect class="m" x="46" y="86" width="12" height="66"/><rect class="m" x="142" y="86" width="12" height="66"/>
+    <rect class="m2" x="26" y="146" width="148" height="9" rx="2.5"/>
+    <g class="rv"><circle cx="52" cy="97" r="1.7"/><circle cx="52" cy="138" r="1.7"/><circle cx="148" cy="97" r="1.7"/><circle cx="148" cy="138" r="1.7"/></g>
+    <rect x="30" y="86" width="140" height="66" rx="5" fill="url(#${u}s)"/>
+    <path class="m" d="M86 92H114V112L100 122L86 112Z"/><path class="m2" d="M89 95H111V110.5L100 118.5L89 110.5Z" opacity=".5"/>
+    <use class="co-emb" href="#i-${emb}" x="92" y="95" width="16" height="16"/><circle class="co-kh" cx="100" cy="114" r="2.3"/></g>
+  <g class="co-lid"><path class="w" d="${lid}"/><path class="w2" d="M27 63C54 52 146 52 173 63"/>
+    <path class="m" d="M46 41.6L58 38.1V90H46Z M154 41.6L142 38.1V90H154Z"/><rect class="m2" x="24" y="79" width="152" height="11" rx="3"/>
+    <rect class="m" x="94" y="81" width="12" height="15" rx="2"/><path d="${lid}" fill="url(#${u}s)"/><path class="co-lidin" d="${lid}"/></g>
+  <ellipse class="co-mouth" cx="100" cy="84" rx="66" ry="17" fill="url(#${u}m)"/>
+  <rect class="co-seam co-seamb" x="28" y="87" width="144" height="5" rx="2.5" filter="url(#${u}g)"/><rect class="co-seam" x="31" y="88.6" width="138" height="1.8" rx=".9"/>
+</svg>`;
+}
+/* шапка окна: вид, имя сундука с кристаллом редкости, маленькое окно с галочкой и крестик */
+function coTopHtml(R) {
+  const red = coReduced(), many = R.n > 1;
+  const eb = R.trial ? (many ? `Проба · ${coChests(R.n)}` : 'Проба') : many ? `Открытие · ${coChests(R.n)}` : 'Открытие сундука';
+  return `<div class="co-top"><div class="co-tt"><span class="co-eb">${eb}</span><b class="co-nm" data-r="${R.r}">${ICON('r' + R.r, 18, RAR[R.r])}<span>${trEsc(coBoxName(R.cs))}</span></b></div>
+    <label class="co-skip"${red ? ' title="В системе включено «меньше движения»"' : ''}><input type="checkbox" data-a="coskip"${coSkipOn() ? ' checked' : ''}${red ? ' disabled' : ''}><span>Пропустить анимацию</span></label>
+    ${R.phase === 'idle' ? '' : `<button class="iconbtn x co-x" data-a="close" aria-label="Закрыть">${ic('x')}</button>`}</div>`;
+}
+/* карточки: вылетают из щели сундука к своему месту в ряду; самая ценная — последней и крупнее. e — мс от начала показа */
+function coCardsHtml(R, e) {
+  const V = CO_VIEW, G = V.geo, T = R.T, n = R.cards.length; if (!n) return '';
+  const size = i => i === n - 1 ? G.best : G.card, mx = G.w / 2, my = G.h - G.chest[1] - G.pad + G.seam;
+  let x = Math.round((G.w - R.cards.reduce((a, c, i) => a + size(i)[0], 0) - G.gap * (n - 1)) / 2);
+  return R.cards.map((c, i) => {
+    const [w, h] = size(i), best = i === n - 1, top = G.top + G.best[1] - h, t = T.cards[i], fly = coFly(R, i);
+    const fx = Math.round(mx - x - w / 2), fy = Math.round(my - top - h / 2), fl = V.fx.best.flash[c.r - 1];
+    const s = `left:${x}px;top:${top}px;--w:${w}px;--h:${h}px;--fx:${fx}px;--fy:${fy}px;--dc:${t - e}ms;--tf:${fly}ms;--dl:${t + fly - e}ms${best ? `;--fs:${fl[0]};--tfb:${fl[1]}ms` : ''}`;
+    x += w + G.gap;
+    return `<div class="co-card co-a${best ? ' best' : ''}${c.dust ? ' dust' : ''}" data-r="${c.r}" data-i="${i}" title="${trEsc(c.tip)}" style="${s}">${best ? '<i class="co-cfl"></i>' : ''}<span class="co-cb"><i class="co-cr"></i><span class="co-ci${c.face ? ' face' : ''}">${c.icon}</span><b class="co-cq">${c.dust ? '+' + fmt(c.dust) : '×' + fmt(c.q)}</b>${best ? '<i class="co-csh"></i>' : ''}</span><small class="co-cn">${trEsc(c.name)}</small></div>`;
+  }).join('');
+}
+/* монеты гарантированной валюты: вылетают из щели при открытии и встают справа от сундука */
+function coCoinsHtml(R, e) {
+  const V = CO_VIEW, G = V.geo, list = Object.entries(R.cur).filter(([, a]) => a > 0);
+  const left = Math.round((G.w + G.chest[0]) / 2) + G.coin[0], mx = G.w / 2, my = G.h - G.chest[1] - G.pad + G.seam;
+  return list.map(([k, a], i) => {
+    const top = G.coin[1] + i * G.coin[2];
+    return `<span class="co-coin co-a" style="left:${left}px;top:${top}px;--fx:${Math.round(mx - left)}px;--fy:${Math.round(my - top)}px;--dk:${R.T.tO + V.coin + i * V.coinStep - e}ms"><img src="${curImg(k)}" alt="${coCurName(k)}"><b>+${fmt(a)}</b></span>`;
+  }).join('');
+}
+/* итог — одной сеткой: одинаковые записи слиты, редкие сверху; у пачки — по редкостям. Прах — плиткой героя и строкой суммы */
+function coGroups(R) {
+  const m = new Map();
+  for (const c of R.items) {
+    const k = [c.kind, c.id, c.dust ? 'прах' : ''].join(':'), x = m.get(k);
+    if (x) { x.q += c.q; x.dust += c.dust; x.n++; if (c.r > x.r) x.r = c.r; } else m.set(k, Object.assign({}, c, { n: 1 }));
+  }
+  return [...m.values()].sort((a, b) => b.r - a.r || (CO_KIND_W[b.kind] || 0) - (CO_KIND_W[a.kind] || 0) || b.q - a.q || a.name.localeCompare(b.name, 'ru'));
+}
+function coTile(g, i) {
+  const tip = g.kind === 'shard' ? (g.dust ? `${g.hn} уже пробуждён: осколки ×${fmt(g.q)} → прах +${fmt(g.dust)}` : `Осколки героя: ${g.hn} ×${fmt(g.q)}`) : `${g.name} ×${fmt(g.q)}`;
+  return `<div class="co-t${g.dust ? ' dust' : ''}" data-r="${g.r}" title="${trEsc(tip)}" style="--i:${i}"><span class="co-ti${g.face ? ' face' : ''}">${g.icon}<b class="co-tq">${g.dust ? '+' + fmt(g.dust) : '×' + fmt(g.q)}</b></span><small>${trEsc(g.name)}</small></div>`;
+}
+/* кнопки итога: «Открыть ещё» — один такой же сундук с полной анимацией, «Открыть все» — оставшиеся пачкой; номер операции — на кнопках */
+function coActs(R) {
+  if (R.trial) return `<button class="btn sm go co-main" data-co="again">Открыть ещё</button><button class="btn sm" data-co="many">Пачкой ×${fmt(CO_VIEW.kitMany)}</button><button class="btn sm ghost co-close" data-a="close">Закрыть</button>`;
+  const g = R.key && typeof zpChestGroups === 'function' ? zpChestGroups().find(x => x.key === R.key) : null, left = g ? g.q : 0, op = coNextOp(), k = trEsc(R.key);
+  return (left ? `<button class="btn sm go co-main" data-a="zpopen" data-v="${k}" data-op="${op}" data-n="1">Открыть ещё</button>` : '')
+    + (left > 1 ? `<button class="btn sm" data-a="zpopen" data-v="${k}" data-op="${op}" data-n="all">Открыть все · ${fmt(left)}</button>` : '')
+    + `<button class="btn sm ghost co-close${left ? '' : ' co-main'}" data-a="close">Закрыть</button>`;
+}
+function coResHtml(R, e) {
+  const many = R.n > 1, G = coGroups(R), dr = `${(R.tr != null ? R.tr - R.t0 : 0) - e}ms`, cur = Object.entries(R.cur).filter(([, a]) => a > 0);
+  const head = `<div class="co-res-h"><h3>${many ? `Открыто: ${coChests(R.n)}` : 'Сундук открыт'}</h3>${R.trial ? '<span class="chip warn">проба — не выдача</span>' : `<span class="chip spirit">${ic('check')}в запасах</span>`}</div>`;
+  const coins = cur.length ? `<div class="co-rcs">${cur.map(([k, a]) => `<span class="co-rc" title="${coCurName(k)}"><img src="${curImg(k)}" alt="${coCurName(k)}"><b>+${fmt(a)}</b></span>`).join('')}</div>` : '';
+  let i = 0;
+  const grid = list => `<div class="co-grid">${list.map(g => coTile(g, i++)).join('')}</div>`;
+  let body = '';
+  if (!many) body = G.length ? grid(G) : '';
+  else for (const r of [...new Set(G.map(g => g.r))]) body += `<div class="co-rg"><span class="co-rh">${rar(r)}</span>${grid(G.filter(g => g.r === r))}</div>`;
+  const dust = G.reduce((a, g) => a + g.dust, 0);
+  const dl = dust ? `<p class="co-dust"><img src="${curImg('dust')}" alt="${coCurName('dust')}"><span>Осколки пробуждённых героев ушли в прах: <b>+${fmt(dust)}</b></span></p>` : '';
+  const note = R.trial ? TM('Проба тем же алгоритмом, что у запасов (EnLoot на сиде пробы): запасы и кошелёк не меняются.', 'p', 'reason')
+    : TM(`Итог выдан до анимации одной операцией${R.op ? ' ' + R.op : ''}: у каждого сундука свой сид, выданный вместе с ним. Анимация только показывает: закрыть окно или пропустить её — итог тот же, повтор номера операции ничего не выдаёт. Числа вида — CO_VIEW.`, 'p', 'reason');
+  return `<button class="co-scrim2" data-a="close" aria-label="Закрыть итог" tabindex="-1" style="--dr:${dr}"></button>
+    <section class="co-res${many ? ' wide' : ''}" role="dialog" aria-label="Итог открытия" style="--dr:${dr}">${head}<div class="co-res-b">${coins}${body}${dl}${note}</div><div class="co-res-f">${coActs(R)}</div></section>`;
+}
+/* сцена целиком: фон со светом редкости, сундук, вспышка, лучи, монеты, карточки, шапка и итог.
+   Все задержки — от начала показа минус e: перерисовка посреди анимации продолжает её с того же места */
+function coStageHtml(R, e) {
+  e = Math.max(0, Math.round(e || 0));
+  const V = CO_VIEW, G = V.geo, T = R.T, anim = R.phase === 'anim', idle = R.phase === 'idle', K = CO_KINDS[R.box] || CO_KINDS.wander;
+  const [cw, chh] = G.chest, cx = Math.round((G.w - cw) / 2), cy = G.h - chh - G.pad, mx = G.w / 2, my = cy + G.seam;
+  const metal = R.r >= V.gild ? V.gold : [K.metal, K.metal2], P = V.fx.open[R.r - 1] || V.fx.open[0], d = t => `${t - e}ms`;
+  const vars = `--d0:${-e}ms;--dw:${d(T.tW)};--do:${d(T.tO)};--wait:${T.wait}ms;--tseam:${T.wait + V.seamTail}ms;--tlid:${V.lid}ms;--tdrop:${V.drop}ms;--tsh:${V.shake}ms;--nsh:${Math.max(1, Math.floor(T.wait / V.shake))};--amp:${V.amp[R.r - 1]};--ha:${V.halo[R.r - 1]};--ra:${V.ray[R.r - 1]};--fs:${P.flash[0]};--tfl:${P.flash[1]}ms`;
+  const chest = `<div class="co-chest co-a" data-g="${R.r >= V.gild ? 1 : 0}" style="left:${cx}px;top:${cy}px;width:${cw}px;height:${chh}px;--wood:${K.wood};--wood2:${K.wood2};--metal:${metal[0]};--metal2:${metal[1]}">
+      <div class="co-rock co-a"><div class="co-swell co-a"><div class="co-pop co-a">${coChestSvg(R.box, `co${R.host}${R.id}`)}<i class="co-leak co-a" style="top:${G.seam - 36}px"></i></div></div></div>
+      ${R.n > 1 ? `<b class="co-n">×${fmt(R.n)}</b>` : ''}<i class="co-mpt" style="top:${G.seam}px"></i></div>`;
+  const scene = `<div class="co-halo co-a" style="left:${mx}px;top:${my}px"></div>${R.r >= V.rays ? `<div class="co-rays" style="left:${mx}px;top:${my}px"></div>` : ''}${chest}
+    ${idle ? '' : `<div class="co-flash co-a" style="left:${mx}px;top:${my}px"></div>${coCoinsHtml(R, e)}${coCardsHtml(R, e)}`}`;
+  const tap = anim ? ' data-a="coreveal"' : '';
+  return `<div class="co-st${anim ? '' : idle ? ' co-idle' : ' co-done'}" data-co-run="${R.id}" data-r="${R.r}" data-box="${R.box}" style="${vars}">
+    <div class="co-bg"${tap}></div>
+    <div class="co-scene"${tap} style="width:${G.w}px;height:${G.h}px">${scene}</div>
+    ${coTopHtml(R)}${R.phase === 'res' ? coResHtml(R, e) : ''}</div>`;
+}
+
+/* ================== окно поверх игры ================== */
+Object.assign(OV, {
+  co() {
+    const R = S.co && S.co.run; if (!R) return '';
+    return `<div class="ov co-ov" role="dialog" aria-modal="true" aria-label="${R.n > 1 ? 'Открытие сундуков' : 'Открытие сундука'}">${coStageHtml(R, coNow() - R.t0)}</div>`;
+  },
+});
+/* «Пропустить анимацию»: выбор помнит localStorage, без него всё работает; галочка посреди анимации — итог сразу */
+function coSetSkip(on, host) {
+  S.co.skip = !!on;
+  try { localStorage.setItem(CO_KEY, S.co.skip ? '1' : '0'); } catch (_) { }
+  const R = coCur(host);
+  if (S.co.skip && coLive(R)) { coReveal(R); return; }
+  if (host === 'kit') coKitPaint(); else render();
+}
+Object.assign(ACT, {
+  coreveal() { const R = S.co.run; if (coLive(R)) coReveal(R); },   // нажатие на сцену посреди анимации — итог сразу
+  coskip(v, t) { coSetSkip(!!(t && t.checked), 'game'); },
+});
+
+/* ================== UI-кит: раздел «Открытие сундука» ==================
+   Своя сцена в разделе: семь редкостей выбранного вида — проба тем же показом, что в запасах; проба — не выдача (S не меняется).
+   Кнопка «С анимацией» пробного открытия раздела «Лутбоксы» играет его сундук на его сиде — предметы те же, что в списке бросков */
+const CO_KIT = { run: null, box: 'shards', r: 4, cyc: 3, week: 'Эльфы', win: 'step', n: 0, last: null };
+/* проба: те же EnLoot.resolve и roll, что у запасов; awake — чьи осколки идут в прах: 'owned' — коллекция игрока, 'all', 'none' */
+function coTrial(spec, count, seedOf, awake) {
+  if (!LBX || !window.EnLoot) return null;
+  let def; try { def = EnLoot.resolve(LBX, spec); } catch (_) { return null; }
+  const log = [];
+  for (let i = 0; i < count; i++) {
+    const res = EnLoot.roll(def, seedOf(i)), aw = {};
+    for (const it of res.items) if (it.kind === 'shard' && (awake === 'all' || (awake === 'owned' && RSI[it.id] && rsHas(RSI[it.id])))) aw[it.id] = true;
+    const conv = EnLoot.toDust(LBX, res, aw);
+    log.push({ id: 'проба-' + i, cur: conv.cur, items: conv.items });
+  }
+  CO_KIT.last = { spec, awake };
+  return coShow({ key: '', cs: { box: spec.box, r: spec.r, cyc: spec.cyc, win: spec.win, week: spec.week || null }, sum: { n: count, log }, op: '' }, { host: 'kit', trial: true });
+}
+const coKitSeeds = (spec, n) => i => EnLoot.seedOf(['проба-анимации', spec.box, spec.r, spec.cyc, spec.win, spec.week || '', n, i].join('|'));
+function coKitSpec(r) { const K = CO_KIT; return { box: K.box, r, cyc: K.cyc, win: K.win, week: K.box === 'shards' ? K.week : null }; }
+function coKitStop() { coStop(CO_KIT.run); CO_KIT.run = null; }
+function coKitAct(v) {
+  const K = CO_KIT, s = String(v), i = s.indexOf(':'), a = i < 0 ? s : s.slice(0, i), x = i < 0 ? '' : s.slice(i + 1);
+  if (a === 'box') { if (LBX && LBX.boxes[x]) { K.box = x; K.last = null; coKitStop(); coKitTabs(); coKitPaint(); coKitBoardPaint(); } return; }
+  if (a === 'r') { K.r = Math.min(7, Math.max(1, +x || 1)); coKitTabs(); coKitBoardPaint(); const sp = coKitSpec(K.r); coTrial(sp, 1, coKitSeeds(sp, ++K.n), 'owned'); return; }
+  if (a === 'again' || a === 'many') {
+    const L = K.last || { spec: coKitSpec(K.r), awake: 'owned' }, n = a === 'many' ? CO_VIEW.kitMany : 1;
+    coTrial(L.spec, n, coKitSeeds(L.spec, ++K.n), L.awake); return;
+  }
+  if (a === 'lb' && typeof LB !== 'undefined') {   // сундук и сид пробного открытия раздела «Лутбоксы»: предметы — те же, что в его списке
+    const sp = { box: LB.box, r: LB.r, cyc: LB.cyc, win: LB.win, week: LB.box === 'shards' ? LB.week : null };
+    K.box = LB.box; K.r = LB.r; coKitTabs(); coKitBoardPaint();
+    coTrial(sp, 1, () => EnLoot.seedOf(LB.seed), LB.awake ? 'all' : 'none');
+    const k = document.getElementById('coKit'); if (k && k.scrollIntoView) try { k.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) { }
+  }
+}
+function coKitClose() { coKitStop(); coKitPaint(); }
+function coKitTabs() {
+  const box = document.getElementById('coKitCtl'); if (!box || !box.querySelectorAll) return;
+  box.querySelectorAll('[data-co^="box:"]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.co === 'box:' + CO_KIT.box)));
+  box.querySelectorAll('[data-co^="r:"]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.co === 'r:' + CO_KIT.r)));
+}
+/* сундук раздела до пробы: закрыт и дышит светом своей редкости */
+function coIdle() {
+  const K = CO_KIT;
+  return { id: 0, host: 'kit', phase: 'idle', box: K.box, r: K.r, n: 1, cs: { box: K.box, r: K.r, cyc: K.cyc, win: K.win }, items: [], cards: [], cur: {}, trial: true, t0: coNow(), T: { tW: 0, tO: 0, wait: CO_VIEW.wait[0], cards: [], end: 0 } };
+}
+function coKitPaint() {
+  const el = document.getElementById('coKitStage'); if (!el) return;
+  const R = CO_KIT.run || coIdle();
+  el.innerHTML = coStageHtml(R, coNow() - R.t0);
+}
+/* раскадровка: та же сцена, остановленная в свои моменты — анимации на паузе, задержки отсчитаны от начала, поэтому кадр стоит
+   ровно в своём моменте. Сундук — выбранного вида и редкости, сид раскадровки постоянный */
+const CO_BOARD = [['1 · Ожидание', 'сундук дрожит, из щелей бьёт свет редкости'], ['2 · Крышка', 'вспышка, всплеск, монеты'],
+  ['3 · Карточки', 'по одной, самая ценная — последней и крупнее'], ['4 · Итог', 'одной сеткой, редкие сверху']];
+function coBoardHtml() {
+  if (!LBX || !window.EnLoot) return '';
+  const sp = coKitSpec(CO_KIT.r), B = CO_VIEW.board;
+  let def; try { def = EnLoot.resolve(LBX, sp); } catch (_) { return ''; }
+  const conv = EnLoot.toDust(LBX, EnLoot.roll(def, EnLoot.seedOf(['раскадровка', sp.box, sp.r, sp.cyc, sp.win, sp.week || ''].join('|'))), {});
+  const base = coRun({ key: '', cs: sp, sum: { n: 1, log: [{ cur: conv.cur, items: conv.items }] }, op: '' }, 'kit', { trial: true }), T = base.T;
+  if (!T.cards.length) return '';
+  const at = [T.tW + Math.round(T.wait * B.wait / 100), T.tO + B.open, T.cards[T.cards.length - 1] + Math.round(CO_VIEW.flyBest * B.fly / 100), T.end + B.hold];
+  return CO_BOARD.map(([n, d], i) => {
+    const R = Object.assign({}, base, { id: ++coSeq, phase: i === CO_BOARD.length - 1 ? 'res' : 'anim', tr: base.t0 + T.end });
+    return `<figure class="co-still"><div class="co-frame" aria-hidden="true"><div class="co-fst">${coStageHtml(R, at[i])}</div></div><figcaption><b>${n}</b> — ${d}</figcaption></figure>`;
+  }).join('');
+}
+function coKitBoardPaint() { const el = document.getElementById('coKitBoard'); if (el) el.innerHTML = coBoardHtml(); }
+/* нажатия раздела: data-co — пробы и выбор вида; data-a внутри сцены раздела — крестик, нажатие на сцену и галочка */
+function coKitBind() {
+  const k = document.getElementById('kitGrid');
+  if (!k || !k.addEventListener || !k.dataset || k.dataset.coBound) return;
+  k.dataset.coBound = '1';
+  k.addEventListener('click', e => {
+    const t = e.target && e.target.closest ? e.target.closest('[data-co],[data-a]') : null;
+    if (!t || !k.contains(t)) return;
+    if (t.dataset.co) { e.preventDefault(); coKitAct(t.dataset.co); return; }
+    if (!t.closest('#coKit')) return;   // data-a других разделов — не наши
+    if (t.dataset.a === 'close') coKitClose();
+    else if (t.dataset.a === 'coreveal' && coLive(CO_KIT.run)) coReveal(CO_KIT.run);
+  });
+  k.addEventListener('change', e => { const t = e.target; if (t && t.dataset && t.dataset.a === 'coskip' && t.closest && t.closest('#coKit')) coSetSkip(t.checked, 'kit'); });
+}
+function coKitHtml() {
+  if (!LBX || !window.EnLoot) return '<section class="k-box" style="grid-column:1/-1"><h3>Открытие сундука</h3><p class="k-note">Нет данных: рядом с index.html должен лежать lootboxes.js.</p></section>';
+  const kinds = Object.keys(LBX.boxes).map(k => `<button role="tab" data-co="box:${k}" aria-selected="${CO_KIT.box === k}" title="${LBX.boxes[k].n}">${ic((typeof LB_IC !== 'undefined' && LB_IC[k]) || (CO_KINDS[k] || CO_KINDS.wander).ic)}${(CO_KINDS[k] || { n: k }).n}</button>`).join('');
+  const rars = [1, 2, 3, 4, 5, 6, 7].map(r => `<button class="btn sm co-kb" data-r="${r}" data-co="r:${r}" aria-pressed="${CO_KIT.r === r}">${ICON('r' + r, 16, RAR[r])}${RAR[r]}</button>`).join('');
+  return `<section class="k-box co-kbox" style="grid-column:1/-1"><h3>Открытие сундука · одна анимация на все сундуки</h3>
+    <p class="k-note">Сундук своего вида и редкости: дрожит, из щелей бьёт свет цвета редкости, крышка откидывается — вспышка и частицы, с эпического — лучи, с древнего — золотая оковка, кольца и лёгкая дрожь. Предметы вылетают карточками по одной, самый ценный — последним и крупнее; итог — одной сеткой. Пачка — короткая анимация на самом ценном и сводка по редкостям. «Пропустить анимацию» — сразу итог; нажатие на сцену — тоже. В игре окно открывают «Запасы → Сундуки»: итог выдан до анимации одной операцией с номером, анимация только показывает (§34.1). Здесь — проба на цикле ${ROMAN[CO_KIT.cyc]}, неделя ${typeof zpWeekGen === 'function' ? zpWeekGen(CO_KIT.week) : CO_KIT.week}: проба — не выдача. Числа вида — <code>CO_VIEW</code> в <code>screens/chest-open.js</code>.</p>
+    <div class="co-kctl" id="coKitCtl"><div class="tabs" role="tablist" aria-label="Вид сундука">${kinds}</div><div class="co-kr">${rars}<button class="btn sm" data-co="many">Пачкой ×${fmt(CO_VIEW.kitMany)}</button></div></div>
+    <div class="co-kit" id="coKit"><div class="co-kst" id="coKitStage"></div><div class="co-fxl" aria-hidden="true"></div></div>
+    <p class="k-note">Раскадровка — та же сцена, остановленная в свои моменты; частицы в кадре не видны, они рисуются поверх сцены.</p>
+    <div class="co-board" id="coKitBoard"></div></section>`;
+}
+KIT_EXTRA.push({ html: coKitHtml, paint: () => { coKitBind(); coKitTabs(); coKitPaint(); coKitBoardPaint(); } });
+
+/* ================== сценарии презентации ================== */
+/* демо-сундук кладётся в запасы, как его принесли бы Дары, и открывается кнопкой карточки — с номером операции */
+function coFlow(d) {
+  S.route = 'craft'; S.seg.craft = 'stock'; S.overlay = null;
+  const V = zpV(), sp = { box: d.box, r: d.r, cyc: d.cyc, win: d.win, week: d.box === 'shards' ? d.week || null : null };
+  V.tab = 'chest';
+  for (let i = 0; i < d.count; i++) BAG.addChest(Object.assign({ src: d.src }, sp));
+  const key = 'g:' + zpChestKey(sp);
+  V.sel.chest = key; V.n = 1;
+  zpOpen(key, coNextOp(), d.count > 1 ? Infinity : 1);
+}
+FLOWS.push(
+  ['Сундук · открытие', 'Первородный сундук талисманов: дрожит, из щелей бьёт свет его редкости, крышка откидывается — вспышка, лучи, кольца, предметы вылетают по одному, самый ценный последним; итог одной сеткой. «Пропустить анимацию» — сразу итог', () => coFlow(CO_DEMO.one)],
+  ['Сундуки · пачкой', 'Десять сундуков осколков одним нажатием: короткая анимация на самом ценном, затем сводка по редкостям — сколько открыто и что выпало', () => coFlow(CO_DEMO.many)],
+);
+
+/* ================== состояние ==================
+   S.co: run — текущий показ в окне поверх игры; skip — «Пропустить анимацию» из localStorage */
+function coState(s) { s.co = { run: null, skip: coSaved() }; return s; }
+const coInitBase = initialState;
+initialState = function () { return coState(coInitBase()); };
+coState(S);

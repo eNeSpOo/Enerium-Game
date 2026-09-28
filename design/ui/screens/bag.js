@@ -8,6 +8,8 @@
    Сундук — карточка §14.4: тип, редкость, количество и «Открыть»; выбор количества и итог — в ней же, итог крупно.
    Состав и шансы — лист по нажатию (EnLoot.resolve). Открытие — EnLoot.roll на сиде сундука. В игре сид выдаёт сервер
    вместе с сундуком, итог открытия — тоже его (§34.1, §36.16). Осколки пробуждённых героев уходят в прах (§15.2) — EnLoot.toDust.
+   Открытие — операция с номером (zpOpen, S.zp.ops): выдача до показа, повтор номера ничего не выдаёт; показывает итог окно
+   открытия screens/chest-open.js — анимация, пачка, «Пропустить анимацию»; после окна итог остаётся в карточке.
    Талисманы, шарды рабочих и снаряжение — отдельный список S.zp.extra, пока у них нет своих экранов.
    Дары путешествия по §23.1: две категории — личный рейтинг и клановые награды; история полученного — отдельным видом.
    Строка выплаты — режим и планка или место, период, состав и одно действие; основание выплаты — в подсказке строки,
@@ -382,7 +384,7 @@ function zpCardChest(e) {
   const inside = !def ? '<p class="reason warn">Состав этого сундука неизвестен — открыть его нельзя.</p>'
     : `<div class="zp-in"><span class="eyebrow">Внутри</span><div class="row zp-cur">${def.cur.map(([k, a]) => money(k, a)).join('')}<span class="zp-p">+ ${def.n} ${plural(def.n, 'предмет', 'предмета', 'предметов')}</span><span class="zp-crs" title="Редкость предметов">${def.window.map(([x]) => zpCr(x, 15)).join('')}</span></div></div>`;
   const step = count > 1 ? `<div class="qty zp-n" role="group" aria-label="Сколько открыть"><button data-a="zpn" data-v="-1" aria-label="Меньше" ${n <= 1 ? 'disabled' : ''}>−</button><span class="num">${n}</span><button data-a="zpn" data-v="1" aria-label="Больше" ${n >= count ? 'disabled' : ''}>+</button><button data-a="zpn" data-v="max" aria-pressed="${n === count}">все</button></div>` : '';
-  const ctl = !def ? '' : count ? `<div class="zp-open">${step}<button class="btn go" data-a="zpopen" data-v="${trEsc(e.key)}">Открыть${n > 1 ? ' ' + n : ''}</button></div>`
+  const ctl = !def ? '' : count ? `<div class="zp-open">${step}<button class="btn go" data-a="zpopen" data-v="${trEsc(e.key)}" data-op="zo${V.op || 1}">Открыть${n > 1 ? ' ' + n : ''}</button></div>`
     : '<p class="faint zp-p">Сундуков этого вида больше нет.</p>';
   return `<div class="pnl icard fit zp-card">
     ${zpHead({ tile: zpTile(zpIcon(e), sp.r, { lg: true }), eb, name, cr: zpCr(sp.r), q: count ? '×' + fmt(count) : null, ql: 'в запасах', e })}
@@ -485,18 +487,25 @@ function zpOpenOne(c, sum) {
       else { S.rs.shards[it.id] = (S.rs.shards[it.id] || 0) + it.q; sum.shards[it.id] = (sum.shards[it.id] || 0) + it.q; }
     } else { const k = zpExtraKey(it); V.extra[k] = (V.extra[k] || 0) + it.q; sum.extra[k] = (sum.extra[k] || 0) + it.q; }
   }
+  if (sum.log) sum.log.push({ id: c.id, cur: conv.cur, items: conv.items });   // по сундуку, в порядке бросков — для окна открытия
   sum.n++;
   return true;
 }
-function zpOpen(key) {
-  const V = zpV(), g = zpChestGroups().find(x => x.key === key);
+/* открытие — операция с номером (§34.1): номер несут кнопки «Открыть», «Открыть ещё» и «Открыть все»; повтор того же номера
+   ничего не выдаёт и не показывает. want — сколько открыть (Infinity — все этого вида), иначе — выбор в карточке.
+   Выдача — здесь, до показа; показывает итог окно открытия screens/chest-open.js (coShow): анимация, пропуск, пачка */
+function zpOpen(key, op, want) {
+  const V = zpV(), ops = V.ops || (V.ops = {}), g = zpChestGroups().find(x => x.key === key);
+  if (op && ops[op]) return;
   if (!g || !LBX || !window.EnLoot) return;
-  const n = Math.max(1, Math.min(V.n || 1, g.q)), sum = { n: 0, cur: {}, items: {}, shards: {}, dust: {}, dustQ: {}, extra: {} };
+  const n = Math.max(1, Math.min(want || V.n || 1, g.q)), sum = { n: 0, cur: {}, items: {}, shards: {}, dust: {}, dustQ: {}, extra: {}, log: [] };
   for (const c of g.list.slice(0, n)) zpOpenOne(c, sum);
   if (!sum.n) { toast('Эти сундуки уже открыты'); return; }
-  V.last = { key, cs: g.cs, sum, no: (V.last ? V.last.no : 0) + 1 };
-  V.sel.chest = key; V.n = 1;
-  toast(`Открыто: ${darChests(sum.n)} · итог — в карточке`, CHEST);
+  V.last = { key, cs: g.cs, sum, no: (V.last ? V.last.no : 0) + 1, op: op || '' };
+  if (op) ops[op] = V.last;
+  V.op = (V.op || 1) + 1; V.sel.chest = key; V.n = 1;
+  if (typeof coShow === 'function') coShow(V.last);
+  else toast(`Открыто: ${darChests(sum.n)} · итог — в карточке`, CHEST);
 }
 
 /* ================== Дары путешествия ================== */
@@ -643,7 +652,8 @@ Object.assign(ACT, {
     V.n = v === 'max' ? count : Math.max(1, Math.min(count, (V.n || 1) + (+v || 0)));
     render();
   },
-  zpopen(v) { zpOpen(v); },
+  /* «Открыть»: v — вид сундука; номер операции и сколько (data-n: число или all) — с кнопки; без кнопки — выбор в карточке */
+  zpopen(v, t) { const d = (t && t.dataset) || {}; zpOpen(v, d.op || '', d.n === 'all' ? Infinity : +d.n || 0); },
   zpact(v) {
     const it = BAG.item(v), f = it && ACTIVATE[it.tier];
     if (typeof f !== 'function' || !BAG.has(v)) { toast('Активация пока недоступна'); return; }
@@ -688,7 +698,7 @@ function zpState(s) {
   s.bag.chests.forEach((c, i) => { if (!F.chests.includes(i + 1)) seen['c:' + c.id] = 1; });
   if (!Object.keys(s.rs.shards).length) for (const [id, n] of Object.entries(ZP_DEMO.shards)) if (RSI[id]) s.rs.shards[id] = n;
   for (const id of Object.keys(s.rs.shards)) if (!F.heroes.includes(id)) seen['h:' + id] = 1;
-  s.zp = { tab: 'res', f: { cyc: '', spec: '', r: '', un: false }, q: '', sel: {}, seen, pick: '', n: 1, last: null, opened: {}, extra: {}, gifts: { tab: 'me', cat: 'me', got: {}, seq: 0, box: '' } };
+  s.zp = { tab: 'res', f: { cyc: '', spec: '', r: '', un: false }, q: '', sel: {}, seen, pick: '', n: 1, last: null, opened: {}, ops: {}, op: 1, extra: {}, gifts: { tab: 'me', cat: 'me', got: {}, seq: 0, box: '' } };
   for (const p of darRows(s)) if (p.wk.id === 'prev' && p.kind === 'plank') s.zp.gifts.got[p.key] = ++s.zp.gifts.seq;   // прошлая неделя: личные планки уже получены
   return s;
 }

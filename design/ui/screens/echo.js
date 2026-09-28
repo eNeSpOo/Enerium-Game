@@ -448,7 +448,8 @@ function echoHeroSrc(id, lvl, valor) {
   return { key: id, id, name: h.name, cls, el: h.el, lvl, st: FT.heroSt[cls] || FT.heroSt['Танк'], valor: valor != null ? valor : h.maxV,
     kit: { actPct: h.actPct, ultPct: h.ultPct, rarity: h.rarity, kit: h.kit }, avers: h.avers || null };
 }
-const heroesOf = (ids, lvl) => ids.map(id => H(id) ? Object.assign(EB.heroSrc(H(id)), { avers: heroAvers(H(id)) }) : echoHeroSrc(id, lvl));
+/* своя неприязнь героя Эхо важнее; без неё — расовая прибавка из источника героя: «Бич» духовного талисмана (screens/talismans.js) */
+const heroesOf = (ids, lvl) => ids.map(id => { if (!H(id)) return echoHeroSrc(id, lvl); const src = EB.heroSrc(H(id)); return Object.assign(src, { avers: heroAvers(H(id)) || src.avers || null }); });
 /* облик героев Эхо в бою: у них нет портретов прототипа — лицо из состава героев */
 function lookHeroes(ids) { for (const id of ids) if (!H(id) && RSI[id]) FOE_LOOK[id] = { known: true, face: rsFace(RSI[id]) }; }
 /* отряд атаки Эхо: сохранённый отряд или, в демо, отряд недели — пятеро героев Эхо своей цивилизации (ADR-0024) */

@@ -10,6 +10,8 @@
    - design/ui/recipes.js — ресурсы, пулы по циклам, цены рынка, крафтовые боссы и редкость их сундуков;
    - docs/content/герои/состав-героев.csv — герои Эхо по неделям и циклам;
    - source-data/Enerium_Талисманы_Финал.xlsx — талисманы и их веса;
+   - design/ui/talismans.js — имена, описания и виды талисманов после переработки, линейки «для команды» (собирает
+     tools/content-gen/talismans/build.js — его пересобрать первым);
    - docs/lore/дайджест.md — раздел «Нельзя показывать раннему игроку», чтобы найти спойлеры в именах талисманов;
    - design/ui/battle.js — только чтобы сверить генератор.
    Любая ошибка — файлы не пишутся. Пересборка даёт те же байты: нет времени, случайности без сида и зависимости от порядка обхода.
@@ -154,10 +156,12 @@ const ASSUME = {
   },
 };
 
-/* Спойлеры в таблице талисманов автора. Имена в таблицах автора — заглушки (ADR-0022, п. 3). Талисман со спойлером в имени
-   или в описании помечается «для команды» и в сундуках есть только с цикла «для команды» — как ресурсы цикла VI в recipes.js.
-   Слова — из раздела дайджеста «Нельзя показывать раннему игроку» (docs/lore/дайджест.md): сборщик проверяет, что каждое там есть.
-   Ещё — имена собственные цикла «для команды» из recipes.js: биомы, боссы, стражи.
+/* Спойлеры в таблице талисманов автора. Имена в таблицах автора — заглушки (ADR-0022, п. 3). Как их переименовать, решено
+   в данных талисманов (design/ui/talismans.js, черновик docs/content/талисманы.md): имя, описание и вид сундук берёт оттуда.
+   Линейка с пометкой «для команды» в talismans.js в сундуках есть только с цикла «для команды» — как ресурсы цикла VI в recipes.js.
+   Сборщик ещё раз сверяет итоговые имена и описания со словами раздела дайджеста «Нельзя показывать раннему игроку»
+   (docs/lore/дайджест.md; каждое слово там есть) и с именами собственными цикла «для команды» из recipes.js — биомы, боссы,
+   стражи: спойлер без пометки — ошибка. Спойлеры таблицы автора и что с ними решено — таблица документа.
    «Демон» — прежнее имя Перворождённых (§3.1), в дайджесте они названы новым именем — поле seen.
    Не спойлер: «Печать …» — нарицательное слово, на печать Эуклида не указывает; «Покров Пятерых» — боги, которых игрок знает. */
 const SPOILERS = [
@@ -170,13 +174,6 @@ const SPOILERS = [
   { stem: 'перворожд', why: 'Перворождённые — не раньше 11-го биома' },
   { stem: 'демон', seen: 'перворожд', why: 'Демоны — прежнее имя Перворождённых (§3.1), их не показываем раньше 11-го биома' },
 ];
-/* Предложение автору: как переименовать спойлерные талисманы, n — имя, d — описание (ADR-0022, п. 3). Таблицу автора не правим. */
-const TAL_RENAME = {
-  'Оковы Иридиум': { n: 'Оковы непокорного', d: 'Носящего оковы не согнёт ничья воля. И почти ничего не может сам.' },
-  'Дневник Коллекционера': { d: 'Коллекционер записывал всё. Записи убивают.' },
-  'Бич Демонов': { n: 'Бич Перворождённых' },
-  'Оберег от Демонов': { n: 'Оберег от Перворождённых' },
-};
 
 /* Законы и пороги проверок. */
 const RULES = {
@@ -199,6 +196,7 @@ const ROOT = path.join(__dirname, '..', '..', '..');
 const FILES = {
   recipes: path.join(ROOT, 'design', 'ui', 'recipes.js'), battle: path.join(ROOT, 'design', 'ui', 'battle.js'),
   heroes: path.join(ROOT, 'docs', 'content', 'герои', 'состав-героев.csv'), tal: path.join(ROOT, 'source-data', 'Enerium_Талисманы_Финал.xlsx'),
+  talData: path.join(ROOT, 'design', 'ui', 'talismans.js'),
   digest: path.join(ROOT, 'docs', 'lore', 'дайджест.md'),
   outJs: path.join(ROOT, 'design', 'ui', 'lootboxes.js'), outDoc: path.join(ROOT, 'docs', 'content', 'лутбоксы.md'),
   tables: path.join(__dirname, 'tables.md'), doc: path.join(__dirname, 'doc.md'), open: path.join(__dirname, 'open.js'),
@@ -296,18 +294,33 @@ const DIGEST = (() => {
 })();
 for (const sp of SPOILERS) if (!DIGEST.includes(sp.seen || sp.stem)) err.push(`спойлер «${sp.stem}»: слова «${sp.seen || sp.stem}» нет в разделе дайджеста`);
 const spoilOf = text => { const low = String(text).toLowerCase(); return SPOILERS.filter(sp => low.includes(sp.stem)).map(sp => sp.why).concat(TEAM_WORDS.filter(w => String(text).includes(w) && !SPOILERS.some(sp => w.toLowerCase().includes(sp.stem))).map(w => `имя цикла «для команды» — ${w}`)); };
-const talByR = {}, talInfo = {}, talCat = {}, talSpoil = {};
+/* данные талисманов после переработки: имя, описание, вид и пометка «для команды» — design/ui/talismans.js */
+const TLD = (() => {
+  try { const c = {}; c.window = c; vm.createContext(c); vm.runInContext(fs.readFileSync(FILES.talData, 'utf8'), c); return c.EN_TALISMANS || null; }
+  catch (e) { err.push(`talismans.js не читается — ${e.message}: собрать tools/content-gen/talismans/build.js`); return null; }
+})();
+const TAL_CATS = TLD ? ['fight', 'hunt', 'farm', 'seal'].map(k => TLD.rules.cats[k]) : [];
+/* talSpoil — спойлер в итоговом имени или описании: такие линейки только «для команды»; talAuthor — спойлеры таблицы автора и решение по ним */
+const talByR = {}, talInfo = {}, talCat = {}, talSpoil = {}, talAuthor = {};
 for (const row of TAL.slice(1)) {
   if (!row[tNo]) continue;
   const r = RARITY.indexOf(String(row[tR]).toLowerCase()) + 1, w = +row[tW], no = +row[tNo];
   if (r < 1) { err.push(`талисман №${row[tNo]}: редкость «${row[tR]}»`); continue; }
   if (!Number.isInteger(w) || w < 1) { err.push(`талисман №${row[tNo]}: вес «${row[tW]}» не целый`); continue; }
   if (talInfo[no]) { err.push(`талисман №${no} дважды`); continue; }
-  const inName = spoilOf(row[tName]), inDesc = spoilOf(row[tDesc]), team = inName.length || inDesc.length ? 1 : 0;
-  if (team) talSpoil[no] = { where: inName.length && inDesc.length ? 'имя и описание' : inName.length ? 'имя' : 'описание', why: [...new Set(inName.concat(inDesc))].join('; '), d: row[tDesc] };
+  const it = TLD && TLD.items[no], f = it && TLD.fams[it[0]];
+  if (!f) { err.push(`талисман №${no}: нет в talismans.js — собрать tools/content-gen/talismans/build.js`); continue; }
+  if (it[1] !== r || f.w[r - 1] !== w) err.push(`талисман №${no}: в talismans.js редкость ${it[1]} и вес ${f.w[r - 1]}, в таблице автора — ${r} и ${w}`);
+  if (f.team && f.team !== TEAM_FROM) err.push(`талисман №${no}: в talismans.js «для команды» с цикла ${f.team}, а цикл «для команды» — ${TEAM_FROM}`);
+  const aName = spoilOf(row[tName]), aDesc = spoilOf(row[tDesc]);
+  if (aName.length || aDesc.length) talAuthor[no] = { n: row[tName], where: aName.length && aDesc.length ? 'имя и описание' : aName.length ? 'имя' : 'описание', why: [...new Set(aName.concat(aDesc))].join('; '), d: row[tDesc] };
+  const spoil = [...new Set(spoilOf(f.n).concat(spoilOf(f.d)))], team = f.team ? 1 : 0;
+  if (spoil.length && !team) err.push(`талисман №${no} «${f.n}»: спойлер (${spoil.join('; ')}), а в talismans.js нет пометки «для команды»`);
+  if (team) talSpoil[no] = spoil.join('; ') || 'линейка «для команды» в talismans.js';
+  const cat = TLD.rules.cats[f.cat];
   (talByR[r] = talByR[r] || []).push([no, w, team]);
-  talInfo[no] = [row[tName], row[tCat], team];
-  talCat[r] = talCat[r] || {}; talCat[r][row[tCat]] = (talCat[r][row[tCat]] || 0) + 1;
+  talInfo[no] = [f.n, cat, team];
+  talCat[r] = talCat[r] || {}; talCat[r][cat] = (talCat[r][cat] || 0) + 1;
 }
 
 /* ресурсы: общий пул базовых и наборы по циклам — drops.lootboxes в recipes.js */
@@ -322,8 +335,6 @@ for (const ln of Object.values(LINES)) if (ln.kind === 'item') for (const b of l
 /* данные для алгоритма открытия — то же, что уйдёт в lootboxes.js */
 const L = { bpTotal: 10000, teamFrom: TEAM_FROM, rarity: RARITY, boxRarity: BOX_RARITY, rvalue: RVALUE, weeks: WEEKS, windows: WINDOWS, winNames: WIN_NAMES,
   currencies: CURRENCY, dust: DUST, lines: LINES, boxes: BOXES, pools };
-for (const name of Object.keys(TAL_RENAME)) if (!Object.values(talInfo).some(t => t[0] === name)) err.push(`TAL_RENAME: талисмана «${name}» нет в таблице автора`);
-for (const [no, sp] of Object.entries(talSpoil)) if (!TAL_RENAME[talInfo[no][0]]) warn.push(`талисман №${no} «${talInfo[no][0]}»: спойлер (${sp.why}), а предложения, как переименовать, нет`);
 
 /* ---------- проверки данных ---------- */
 const isInt = x => Number.isInteger(x);
@@ -755,8 +766,8 @@ block('heroes');
 T.push('| Неделя | II | III | IV | V | VI |', '|---|---|---|---|---|---|');
 for (const w of WEEKS) T.push(`| ${w} | ${[2, 3, 4, 5, 6].map(c => { const h = heroesByWeek[w].find(x => x.cyc === c); return h ? `${heroInfo[h.id].n} · ${rn(h.r)}` : '—'; }).join(' | ')} |`);
 block('talismans');
-T.push('| Редкость | Талисманов | Боевые / охотничьи / фарм / иммунитеты | Сумма весов |', '|---|---|---|---|');
-for (let r = 1; r <= 7; r++) { const cat = talCat[r] || {}; T.push(`| ${rn(r)} | ${(talByR[r] || []).length} | ${['Боевые', 'Охотничьи', 'Фарм', 'Иммунитеты'].map(k => cat[k] || 0).join(' / ')} | ${fmt((talByR[r] || []).reduce((a, t) => a + t[1], 0))} |`); }
+T.push(`| Редкость | Талисманов | ${TAL_CATS.map((k, i) => i ? k.toLowerCase() : k).join(' / ')} | Сумма весов |`, '|---|---|---|---|');
+for (let r = 1; r <= 7; r++) { const cat = talCat[r] || {}; T.push(`| ${rn(r)} | ${(talByR[r] || []).length} | ${TAL_CATS.map(k => cat[k] || 0).join(' / ')} | ${fmt((talByR[r] || []).reduce((a, t) => a + t[1], 0))} |`); }
 
 /* ожидаемое в одном сундуке — цикл III */
 block('ev_box');
@@ -881,18 +892,21 @@ for (let c = 3; c <= 6; c++) {
 
 /* спойлеры в таблице талисманов */
 block('spoilers');
-T.push('| Талисман в таблице автора | Штук: редкости | Где спойлер | Почему — раздел дайджеста | Предложение |', '|---|---|---|---|---|');
+T.push('| Талисман в таблице автора | Штук: редкости | Где спойлер | Почему — раздел дайджеста | Решение — `talismans.js` |', '|---|---|---|---|---|');
 {
   const groups = new Map();
-  for (const [no, sp] of Object.entries(talSpoil)) { const n = talInfo[no][0]; if (!groups.has(n)) groups.set(n, { sp, nos: [] }); groups.get(n).nos.push(+no); }
+  for (const [no, sp] of Object.entries(talAuthor)) { if (!groups.has(sp.n)) groups.set(sp.n, { sp, nos: [] }); groups.get(sp.n).nos.push(+no); }
   for (const [n, g] of groups) {
     const rs = [...new Set(g.nos.map(no => Object.keys(talByR).find(r => talByR[r].some(t => t[0] === no))))].map(Number).sort((a, b) => a - b);
-    const P = TAL_RENAME[n] || {};
-    const prop = [P.n ? `имя — «${P.n}»` : '', P.d ? `описание — «${P.d}»` : ''].filter(Boolean).join('; ') || '—';
-    T.push(`| ${n} | ${g.nos.length}: ${rs.length === 7 ? 'все семь' : rs.map(rn).join(', ')} | ${g.sp.where}${g.sp.where !== 'имя' ? `: «${g.sp.d}»` : ''} | ${g.sp.why} | ${prop} |`);
+    const f = TLD.fams[TLD.items[g.nos[0]][0]], team = g.nos.some(no => talInfo[no][2]);
+    const dec = [f.n !== n ? `имя — «${f.n}»` : '', f.d !== g.sp.d ? `описание — «${f.d}»` : '', team ? `в сундуках с цикла ${ROMAN[TEAM_FROM]}` : 'в сундуках всегда'].filter(Boolean).join('; ');
+    T.push(`| ${n} | ${g.nos.length}: ${rs.length === 7 ? 'все семь' : rs.map(rn).join(', ')} | ${g.sp.where}${g.sp.where !== 'имя' ? `: «${g.sp.d}»` : ''} | ${g.sp.why} | ${dec} |`);
   }
-  inline.spoilTal = Object.keys(talSpoil).length;
+  const teamNames = new Set(Object.keys(talSpoil).map(no => talInfo[no][0]));
+  inline.spoilTal = Object.keys(talAuthor).length;
   inline.spoilNames = groups.size;
+  inline.teamTal = Object.keys(talSpoil).length;
+  inline.teamNames = [...teamNames].map(x => `«${x}»`).join(' и ');
   inline.teamRoman = ROMAN[TEAM_FROM];
 }
 
@@ -944,7 +958,7 @@ for (const [mid, m] of Object.entries(MODES)) modesOut[mid] = { n: m.n, box: m.b
 const weekOut = {};
 for (const mid of Object.keys(WEEK)) { weekOut[mid] = {}; for (const c of Object.keys(WEEK[mid])) weekOut[mid][c] = { free: Object.assign({ boxes: WEEK[mid][c].free.boxes }, ev100(WEEK[mid][c].free.ev)), fan: Object.assign({ boxes: WEEK[mid][c].fan.boxes }, ev100(WEEK[mid][c].fan.ev)) }; }
 const DATA = Object.assign({}, L, {
-  items: itemsOut, heroInfo, talInfo, talSpoil: Object.fromEntries(Object.entries(talSpoil).map(([no, sp]) => [no, sp.why])),
+  items: itemsOut, heroInfo, talInfo, talSpoil,
   workers: RARITY.map(r => 'Рабочий · ' + r), equip: RARITY.map(r => 'Предмет снаряжения · ' + r + ' · заглушка'),
   modes: modesOut, ev: evTable, week: weekOut, assume: ASSUME,
 });
@@ -959,7 +973,8 @@ const js = `/* Энериум · лутбоксы — данные протот�
    Обоснование — docs/content/лутбоксы.md; его таблицы собраны из этих же данных.
    В игре таблицы наград живут только на сервере (CLAUDE.md, инварианты; GDD §34, §36.16): клиент получает карточку сундука —
    тип, редкость, количество, возможное содержимое и шансы, — а итог открытия присылает сервер. Здесь полный набор — для проектирования.
-   Спойлеры цикла VI — только для команды: у ресурсов team: true, у талисманов третье поле talInfo — 1, если в названии имя цикла VI.
+   Спойлеры цикла VI — только для команды: у ресурсов team: true, у талисманов третье поле talInfo — 1: линейка «для команды»
+   в talismans.js, в сундуках — только с цикла VI. Имена, описания и виды талисманов — из talismans.js.
    Ниже данных — алгоритм открытия (window.EnLoot), тот же, что в сборщике. */
 window.EN_LOOTBOXES = {
 ${Object.entries(DATA).map(([k, v]) => `  ${k}: ${J(v)}`).join(',\n')},

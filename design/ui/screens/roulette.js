@@ -446,3 +446,19 @@ function rlState(s) {
 const rlInitBase = initialState;
 initialState = function () { return rlState(rlInitBase()); };
 rlState(S);
+
+/* ================== UI-кит ==================
+   Раздел «Возрождение душ · рулетка»: карточки ленты на героях цикла II, шансы и числа вида — из RL_DATA и RL_VIEW */
+KIT_EXTRA.push({
+  html: () => {
+    const pool = RS.heroes.filter(h => h.src === 'roulette' && h.c === 2);
+    if (pool.length < 4) return '';
+    const cards = [[0, 5], [1, 15], [2, 0], [3, 25]].map(([i, q]) => rlCard(q ? { id: pool[i].id, q } : { id: pool[i].id, full: true }, '')).join('');
+    const odds = RL_DATA.shards.map(([q, w]) => `×${q} — ${rlPct(rlShare(w))}`).join(', ');
+    return `<section class="k-box" style="grid-column:1/-1"><h3>Возрождение душ · рулетка</h3>
+      <div class="k-demo row" style="gap:8px;justify-content:center;flex-wrap:wrap">${cards}</div>
+      <p class="k-note">Лента: полный герой — лицо во всю карточку, золотая рамка и «Герой»; осколки — лицо поменьше и «×N». Кристалл — редкость героя. Итог решает «сервер» на сиде до анимации: лента разгоняется и ${RL_VIEW.ms[0] / 1000}–${RL_VIEW.ms[1] / 1000} с тормозит ровно на выпавшей карточке. Частицы — цвета редкости; у полного героя золотая вспышка, три кольца и дрожь.</p>
+      <p class="k-note">×10 и ×100 — короткая лента на самом ценном итоге, затем сводка: полные герои первыми, осколки по героям, прах, расход. «Пропустить анимацию» — маленькое окошко с галочкой, выбор запоминается; при системном «меньше движения» анимации нет. Полный чертёж пробуждают души (§15.1).</p>
+      <p class="k-note">Шансы — демонстрация: полный чертёж ${rlPct(RL_DATA.fullBp)}, иначе осколки ${odds}. Золотые карточки ленты — оформление, а не шанс. Окно — сценарий «Возрождение душ · рулетка».</p></section>`;
+  },
+});

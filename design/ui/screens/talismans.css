@@ -1,0 +1,78 @@
+/* screens/talismans.css — духовные талисманы: ряд мест в карточке героя, лист «Духовные талисманы», раздел UI-кита.
+   Отступы — токены воздуха --sp-l / --sp-m / --sp-s, цвет редкости — --rc от [data-r] (ADR-0027). */
+
+/* медальон талисмана: огранённый шестигранник цвета редкости, внутри значок эффекта. Заглушка CSS до арта */
+.tl-t{position:relative;display:inline-grid;place-items:center;width:var(--ts,30px);height:calc(var(--ts,30px) * 1.14);flex:none;isolation:isolate;color:var(--parch)}
+.tl-t::before,.tl-t::after{content:"";position:absolute;clip-path:polygon(50% 0,100% 23%,100% 77%,50% 100%,0 77%,0 23%)}
+.tl-t::before{inset:0;z-index:-2;background:linear-gradient(160deg,color-mix(in srgb,var(--rc,#6b7178) 88%,#fff),color-mix(in srgb,var(--rc,#6b7178) 50%,#000))}
+.tl-t::after{inset:2px;z-index:-1;background:radial-gradient(75% 60% at 50% 88%,color-mix(in srgb,var(--rc,#6b7178) 42%,transparent),transparent 72%),#0d1013}
+.tl-t .ico,.tl-t .i{width:56%;height:56%;object-fit:contain}
+.tl-t .i{stroke:currentColor;fill:none;stroke-width:1.8}
+.tl-t.lg{--ts:44px}
+.tl-t[data-r="5"],.tl-t[data-r="6"],.tl-t[data-r="7"]{filter:drop-shadow(0 0 5px color-mix(in srgb,var(--rc) 55%,transparent))}
+.tl-t[data-r="7"]{filter:drop-shadow(0 0 9px color-mix(in srgb,var(--rc) 70%,transparent))}
+
+/* ряд мест во вкладке «Сила» */
+.tl-row{display:flex;flex-direction:column;gap:var(--sp-s)}
+.tl-row .chip .ico{margin-right:1px}
+.tl-slots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--sp-s)}
+.tl-slot{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:52px;padding:4px 2px;border-radius:10px;border:1px dashed var(--iron-2);background:#0d1013;color:var(--parch-3);font:inherit}
+.tl-slot.on{border-style:solid;border-color:color-mix(in srgb,var(--rc) 45%,var(--iron));background:radial-gradient(90% 70% at 50% 100%,color-mix(in srgb,var(--rc) 16%,transparent),transparent 70%),#0d1013;color:var(--parch)}
+.tl-slot b{font:700 11px/1 var(--f-u);letter-spacing:.02em;color:var(--parch)}
+.tl-slot:hover{border-color:var(--gold-3)}
+.tl-slot.sel{box-shadow:0 0 0 1px var(--spirit),0 0 14px -4px var(--spirit)}
+.tl-slots.in .tl-slot{min-height:58px}
+
+/* лист «Духовные талисманы» */
+.tl-hero{display:flex;align-items:center;gap:var(--sp-m)}
+.tl-hero img{width:40px;height:48px;border-radius:9px;object-fit:cover;object-position:50% 18%;border:1px solid var(--iron)}
+.tl-hero b{font:600 18px/1 var(--f-d);color:var(--parch)}
+.tl-hero .row{font-size:12.5px}
+.tl-sumd>summary{list-style:none;cursor:pointer}
+.tl-sumd>summary::-webkit-details-marker{display:none}
+.tl-sumd[open]>summary{margin-bottom:var(--sp-s)}
+.tl-sum{display:flex;flex-direction:column;gap:6px}
+.tl-fx{display:grid;grid-template-columns:auto minmax(0,1fr);gap:var(--sp-s);align-items:center}
+.tl-fx b{display:block;font-size:13px;color:var(--parch)}
+.tl-fx small{display:block;font-size:12px;line-height:1.3;color:var(--parch-2)}
+.tl-card{display:flex;flex-direction:column;gap:var(--sp-s);padding:var(--sp-m);border-radius:12px;border:1px solid color-mix(in srgb,var(--rc) 35%,var(--iron));background:radial-gradient(90% 60% at 50% 110%,color-mix(in srgb,var(--rc) 12%,transparent),transparent 70%),var(--stone)}
+.tl-ch{display:flex;align-items:center;gap:var(--sp-m)}
+.tl-ch b.serif{font-size:20px;line-height:1.05;color:var(--parch)}
+.tl-eff{margin:0;font-size:14px;line-height:1.35;color:var(--parch)}
+.tl-list{display:flex;flex-direction:column;gap:2px}
+.tl-li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;width:100%;padding:6px var(--sp-s);border:1px solid transparent;border-radius:9px;background:none;color:inherit;text-align:left;font:inherit}
+.tl-li:hover{background:rgba(255,255,255,.03)}
+.tl-li[aria-current="true"]{border-color:color-mix(in srgb,var(--rc) 45%,var(--iron));background:rgba(255,255,255,.035)}
+.tl-li.off{opacity:.5}
+.tl-li .tx{min-width:0}
+.tl-li .tx b{display:block;font-size:13px;color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-li .tx small{display:block;font-size:11.5px;line-height:1.25;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-li .rt{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.tl-li .rt .chip{height:18px;padding:0 5px}
+.tl-forge{display:flex;flex-direction:column;gap:0}
+.tl-fr{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;padding:var(--sp-s) 2px;border-top:1px solid var(--iron)}
+.tl-fr:first-child{border-top:0}
+.tl-fr b{display:block;font-size:13px;color:var(--parch)}
+.tl-fr small{display:block;font-size:12px;color:var(--parch-3)}
+.tl-got{display:flex;align-items:center;gap:var(--sp-m);padding:var(--sp-m);border-radius:12px;background:radial-gradient(90% 70% at 50% 110%,rgba(72,229,212,.1),transparent 70%),var(--stone);border:1px solid rgba(72,229,212,.3)}
+.tl-got b.serif{font-size:19px;color:var(--parch)}
+
+/* раздел UI-кита */
+.tl-kit .tl-kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--sp-m)}
+.tl-kit .tl-lad figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px}
+.tl-kit .tl-lad figcaption{font-size:11px;line-height:1.2;color:var(--parch-3);text-align:center}
+.tl-kit .tl-lad figcaption b{color:var(--parch);font-size:12px}
+.tl-kit .tl-slot{cursor:default}
+.tl-kit .tl-kt td,.tl-kit .tl-kt th{padding:4px 8px}
+.tl-kit .tl-kcat{display:flex;flex-direction:column;gap:var(--sp-s)}
+.tl-kd{border:1px solid #1b1f24;border-radius:10px;background:#0b0e10;padding:var(--sp-s) var(--sp-m)}
+.tl-kd>summary{cursor:pointer;color:var(--parch)}
+.tl-kf{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:var(--sp-m);align-items:center;padding:6px 0;border-top:1px solid #171b20}
+.tl-kf:first-of-type{border-top:0;margin-top:var(--sp-s)}
+.tl-kn{display:flex;align-items:center;gap:var(--sp-s);min-width:0}
+.tl-kn b{display:block;font-size:13px;color:var(--parch)}
+.tl-kn small{display:block;font-size:11.5px;color:var(--parch-3);line-height:1.3}
+.tl-kv{display:grid;grid-template-columns:repeat(7,28px);gap:3px}
+.tl-kv i{font-style:normal;text-align:center;font:700 11.5px/22px var(--f-u);border-radius:5px;color:var(--parch);background:color-mix(in srgb,var(--rc) 18%,#0d1013);box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--rc) 70%,transparent);font-variant-numeric:tabular-nums}
+.tl-kv i.no{background:#0d1013;box-shadow:none;color:var(--parch-3)}
+.tl-kc{display:flex;align-items:center;gap:4px;min-width:60px;justify-content:flex-end}

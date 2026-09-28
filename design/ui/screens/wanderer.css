@@ -1,0 +1,207 @@
+/* screens/wanderer.css — «Странник»: Память, Артефакты, Достижения (screens/wanderer.js) и раздел UI-кита «Память Странника».
+   Стиль «Свет снизу»: редкость — цвет --rc и кристалл (ADR-0027) и сила света: --wn-glow — сияние кристалла, --wn-lit — свет снизу карты.
+   Выбор — бирюзовое кольцо, как везде. Правила воздуха: отступы --sp-l, --sp-m, --sp-s; на карточке — имя, до двух чисел, одно действие.
+   Свои классы — wn-*; общие — .pf, .idc, .dlg, .sheet, .btn, .chip, .kv, .rar, .bar, .tabs, .search. */
+
+/* свет редкости: чем реже, тем ярче (переменные — только для классов wn-*) */
+[data-r="1"]{--wn-glow:2px;--wn-lit:8%}[data-r="2"]{--wn-glow:4px;--wn-lit:12%}[data-r="3"]{--wn-glow:6px;--wn-lit:16%}[data-r="4"]{--wn-glow:9px;--wn-lit:21%}
+[data-r="5"]{--wn-glow:12px;--wn-lit:26%}[data-r="6"]{--wn-glow:16px;--wn-lit:32%}[data-r="7"]{--wn-glow:22px;--wn-lit:40%}
+
+/* колонка Странника: демо-цикл команды */
+.wn-demo{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--parch-3)}
+.wn-demo .row{gap:3px}
+.wn-dc{appearance:none;height:22px;min-width:24px;padding:0 5px;border-radius:6px;border:1px solid var(--iron);background:#0f1215;color:var(--parch-3);font:700 11px/1 var(--f-u)}
+.wn-dc[aria-pressed="true"]{color:var(--gold);border-color:var(--gold-3)}
+
+/* кристалл памяти: огранённая капля, свет изнутри; сияние — снаружи, поэтому фильтр на обёртке, огранка — на кристалле */
+.wn-gem{position:relative;z-index:1;display:inline-block;flex:none;width:34px;height:48px;filter:drop-shadow(0 0 var(--wn-glow,6px) color-mix(in srgb,var(--rc,var(--spirit)) 72%,transparent))}
+.wn-crys{display:block;width:100%;height:100%;clip-path:polygon(50% 0,80% 24%,95% 56%,72% 93%,50% 100%,28% 93%,5% 56%,20% 24%);
+  background:linear-gradient(118deg,transparent 44%,rgba(255,255,255,.45) 46%,transparent 50%),linear-gradient(62deg,transparent 55%,rgba(0,0,0,.3) 57%,transparent 61%),
+    linear-gradient(180deg,transparent 58%,rgba(0,0,0,.22) 59%,transparent 63%),
+    radial-gradient(55% 42% at 50% 62%,#fff 0,color-mix(in srgb,var(--rc,var(--spirit)) 68%,#fff) 20%,var(--rc,var(--spirit)) 46%,color-mix(in srgb,var(--rc,var(--spirit)) 36%,#050607) 100%)}
+.wn-gem.lock{filter:none;opacity:.5}
+.wn-gem.lock .wn-crys{background:linear-gradient(118deg,transparent 44%,rgba(255,255,255,.2) 46%,transparent 50%),linear-gradient(160deg,#8c8f92,#4b4f53 60%,#2e3134)}
+.wn-gem.open{--rc:var(--spirit);--wn-glow:10px;animation:wn-breath 2.8s ease-in-out infinite}
+@keyframes wn-breath{50%{filter:drop-shadow(0 0 18px var(--spirit)) brightness(1.12)}}
+
+/* лучи и живые огоньки — у редких карт и мест */
+.wn-rays{display:none;position:absolute;left:50%;top:34%;width:280px;height:280px;margin:-140px 0 0 -140px;border-radius:50%;pointer-events:none;opacity:.7;
+  background:repeating-conic-gradient(from 0deg,color-mix(in srgb,var(--rc) 28%,transparent) 0deg 7deg,transparent 7deg 20deg);
+  -webkit-mask:radial-gradient(circle,#000 16%,transparent 62%);mask:radial-gradient(circle,#000 16%,transparent 62%);animation:wn-spin 18s linear infinite}
+[data-r="6"]>.wn-rays{display:block}
+[data-r="7"]>.wn-rays{display:block;opacity:1;animation-duration:11s}
+@keyframes wn-spin{to{transform:rotate(360deg)}}
+.wn-motes{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.wn-motes i{position:absolute;left:var(--x);bottom:-6px;width:4px;height:4px;border-radius:50%;opacity:0;background:radial-gradient(circle,#fff,var(--rc) 55%,transparent 72%);
+  animation:wn-mote var(--t) linear var(--d) infinite}
+@keyframes wn-mote{12%{opacity:.95}78%{opacity:.55}100%{opacity:0;transform:translate(7px,-160px) scale(.6)}}
+
+/* карта варианта: кромка и свет снизу — редкость, кольцо — выбор */
+.wn-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;min-height:170px;padding:var(--sp-m) var(--sp-s);border-radius:12px;overflow:hidden;text-align:center;color:var(--parch);
+  border:1px solid color-mix(in srgb,var(--rc) 45%,#262b31);
+  background:radial-gradient(95% 70% at 50% 110%,color-mix(in srgb,var(--rc) var(--wn-lit,10%),transparent),transparent 72%),linear-gradient(180deg,#14181c,#0d1013);
+  box-shadow:inset 0 -3px 0 color-mix(in srgb,var(--rc) 78%,transparent),0 14px 30px -20px var(--rc)}
+button.wn-card{appearance:none;font:inherit}
+.wn-card>.rar,.wn-card>b,.wn-card>small{position:relative;z-index:1}
+.wn-card .wn-gem{margin:2px 0}
+.wn-cn{font:600 17px/1.08 var(--f-d);text-wrap:balance}
+.wn-cc{margin-top:auto;font:700 10.5px/1.2 var(--f-u);letter-spacing:.12em;text-transform:uppercase;color:var(--parch-3)}
+.wn-card[aria-pressed="true"]{border-color:var(--spirit);box-shadow:0 0 0 1px var(--spirit),inset 0 -3px 0 var(--rc),0 14px 30px -14px var(--spirit)}
+button.wn-card:hover{filter:brightness(1.1)}
+/* выход карты: снизу, из света; у древней и выше по карте проходит блик */
+.wn-card.in{animation:wn-in 480ms cubic-bezier(.2,.8,.2,1) var(--dl,0ms) both;pointer-events:none}
+@keyframes wn-in{0%{opacity:0;transform:translateY(30px) scale(.84) rotateX(38deg);filter:brightness(2.3) saturate(.4)}55%{opacity:1;transform:translateY(-5px) scale(1.04) rotateX(0);filter:brightness(1.5)}100%{opacity:1;transform:none;filter:none}}
+.wn-card.in:is([data-r="5"],[data-r="6"],[data-r="7"])::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(105deg,transparent 30%,color-mix(in srgb,var(--rc) 35%,rgba(255,248,226,.85)) 50%,transparent 70%);transform:translateX(-130%);
+  animation:wn-shine 1s ease-out calc(var(--dl,0ms) + 280ms) forwards}
+@keyframes wn-shine{to{transform:translateX(130%)}}
+
+/* окно «одна из трёх» */
+.wn-dlg{width:min(600px,calc(100% - 30px))}
+.wn-ov.still>.ov-scrim,.wn-ov.still>.wn-dlg{animation:none}
+.wn-b{gap:var(--sp-m);padding-bottom:var(--sp-s)}
+.wn-tocat{margin-left:auto;align-self:center}
+.wn-tocat+.x{margin-left:var(--sp-s)}
+.wn-three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-m);perspective:900px}
+.wn-det{display:flex;flex-direction:column;gap:4px;min-height:64px;padding:var(--sp-s) var(--sp-m);border-radius:10px;border:1px solid var(--iron);background:#0e1114;box-shadow:inset 3px 0 0 var(--rc,var(--iron-2))}
+.wn-wait{justify-content:center;align-items:center}
+.wn-dn{font-size:19px;line-height:1.05}
+.wn-dd{font-size:14px;color:var(--parch-2)}
+.wn-f{align-items:center}
+.wn-skip{display:inline-flex;align-items:center;gap:var(--sp-s);flex:none;padding:6px 10px;border:1px solid var(--iron);border-radius:9px;background:#0c0f11;font-size:12.5px;color:var(--parch-2);cursor:pointer}
+.wn-skip input{width:16px;height:16px;margin:0;accent-color:var(--spirit);cursor:pointer}
+.wn-skip input:disabled{cursor:not-allowed}
+.wn-lack{padding:0 var(--sp-l) var(--sp-m);text-align:right}
+.btn .cost:not(:has(img)){font-size:12px;letter-spacing:.04em}
+/* подтверждение цены поверх окна */
+.wn-askscrim{position:absolute;inset:0;z-index:21;border:0;padding:0;background:rgba(3,4,5,.55);cursor:default;animation:fade .18s ease}
+.wn-ask{position:absolute;left:50%;top:50%;z-index:22;transform:translate(-50%,-50%);width:min(370px,calc(100% - 40px));display:flex;flex-direction:column;gap:var(--sp-s);padding:var(--sp-l);
+  border-radius:14px;border:1px solid var(--gold-3);background:radial-gradient(90% 60% at 50% 115%,rgba(221,188,122,.1),transparent 70%),linear-gradient(180deg,#191d21,#111417);box-shadow:0 30px 80px rgba(0,0,0,.8);animation:pop .22s cubic-bezier(.2,.8,.2,1)}
+.wn-ask h3{font:600 22px/1.05 var(--f-d);color:var(--gold)}
+.wn-askf{display:flex;gap:var(--sp-s);justify-content:flex-end;padding-top:var(--sp-s)}
+
+/* пять мест Памяти */
+.wn-pf{min-height:0}
+.wn-mem{gap:var(--sp-m)}
+.wn-slots{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--sp-s)}
+.wn-slot{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;min-height:176px;padding:var(--sp-m) var(--sp-s);border-radius:12px;border:1px solid var(--iron);background:#0e1114;text-align:center;color:var(--parch)}
+button.wn-slot{appearance:none;font:inherit}
+.wn-slot>.rar,.wn-slot>b,.wn-slot>small,.wn-slot>.btn{position:relative;z-index:1}
+.wn-slot small{display:inline-flex;align-items:center;gap:4px;font-size:11.5px}
+.wn-slot small .i{width:12px;height:12px}
+.wn-slot .btn{margin-top:auto;max-width:100%;min-width:0;padding:0 7px;font-size:11px;letter-spacing:.04em}
+.wn-slot .rar{font-size:9.5px;letter-spacing:.03em;max-width:100%}
+.wn-slot.open{border-color:rgba(72,229,212,.5);box-shadow:inset 0 -18px 22px -20px var(--spirit)}
+.wn-slot.set{border-color:color-mix(in srgb,var(--rc) 50%,#262b31);background:radial-gradient(95% 70% at 50% 110%,color-mix(in srgb,var(--rc) var(--wn-lit,10%),transparent),transparent 72%),#0e1114;box-shadow:inset 0 -3px 0 var(--rc)}
+button.wn-slot.set:hover{filter:brightness(1.1)}
+.wn-slot.lock{background:#0b0d10}
+.wn-sn{font:600 16px/1.1 var(--f-d);text-wrap:balance}
+.wn-mfoot{flex-wrap:wrap}
+.wn-mfoot .reason{flex:1 1 220px}
+
+/* каталог и лист пассивки */
+.wn-q{width:100%}
+.wn-rfs{display:flex;flex-wrap:wrap;gap:4px}
+.wn-rf{appearance:none;display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 8px;border-radius:7px;border:1px solid var(--iron);background:#0f1215;color:var(--parch-2);font:700 11px/1 var(--f-u);letter-spacing:.04em}
+.wn-rf[aria-pressed="true"]{border-color:var(--spirit);color:var(--parch);box-shadow:0 0 0 1px var(--spirit)}
+.wn-rf .rar{gap:0}
+.wn-cat{gap:0}
+.g .wn-gh{margin:var(--sp-s) 0 2px;color:var(--rc)}
+.wn-row{border-top:1px solid var(--iron)}
+.wn-row>summary{list-style:none;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;padding:6px 0;cursor:pointer}
+.wn-row>summary::-webkit-details-marker{display:none}
+.wn-row .wn-gem{width:16px;height:23px}
+.wn-rn{display:flex;flex-direction:column;min-width:0}
+.wn-rn b{font:600 15px/1.1 var(--f-d)}
+.wn-rn small{font-size:11px;color:var(--parch-3)}
+.wn-rc{font-size:12.5px;color:var(--parch-2)}
+.wn-row>p{padding:0 0 3px 24px;font-size:13px;color:var(--parch)}
+.wn-row>small{display:block;padding:0 0 8px 24px;font-size:11.5px}
+.wn-row>small.wn-free{padding-bottom:3px;color:var(--amber)}
+.wn-ph{display:flex;align-items:center;gap:var(--sp-m)}
+.wn-pd{font-size:15px;color:var(--parch)}
+
+/* сброс: что пропадёт */
+.wn-was{display:flex;flex-wrap:wrap;gap:var(--sp-s)}
+.wn-wasp{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:8px;border:1px solid color-mix(in srgb,var(--rc) 40%,#262b31);background:#0e1114}
+.wn-wasp .wn-gem{width:13px;height:19px}
+.wn-wasp b{font:600 14px/1 var(--f-d)}
+.wn-wasp small{font-size:11px;color:var(--parch-3)}
+
+/* сетки артефактов и достижений */
+.wn-arts,.wn-ach{min-height:0}
+.wn-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-s);align-content:start}
+.wn-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.wn-art{display:flex;flex-direction:column;gap:6px;min-width:0;padding:var(--sp-s) var(--sp-m) var(--sp-m);border-radius:10px;border:1px solid var(--iron);background:#0e1114}
+.wn-art.new{border-style:dashed}
+.wn-art.lock{opacity:.55}
+.wn-an,.wn-fh{appearance:none;border:0;background:none;padding:0;text-align:left;display:flex;flex-direction:column;gap:2px;min-width:0;color:var(--parch);font:inherit}
+.wn-an b{font:600 17px/1.05 var(--f-d)}
+.wn-ad{font-size:12px;line-height:1.25;color:var(--parch-3);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.wn-an:hover b,.wn-fh:hover .wn-fn{color:var(--gold)}
+.wn-alv{min-height:20px}
+.wn-pips{display:inline-flex;gap:3px}
+.wn-pips i{width:12px;height:5px;border-radius:2px;background:#30363c}
+.wn-pips i.can{box-shadow:inset 0 0 0 1px var(--gold-2)}
+.wn-pips i.on{background:var(--gold);box-shadow:0 0 5px rgba(221,188,122,.6)}
+.wn-now{font:600 18px/1 var(--f-d);color:var(--parch)}
+.wn-aft{margin-top:auto}
+.wn-aft .btn{width:100%}
+.wn-aft .chip{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.wn-lvs{display:flex;flex-direction:column}
+.wn-lvr{display:grid;grid-template-columns:26px minmax(0,1fr) auto auto;gap:var(--sp-s);align-items:center;padding:5px 0;border-top:1px solid var(--iron);font-size:13px}
+.wn-lvr b{font:600 16px/1 var(--f-d);color:var(--parch-3)}
+.wn-lvr.on b{color:var(--gold)}
+.wn-ach .tabs button{padding:0 8px;letter-spacing:.05em}
+.wn-tc{margin-left:5px;font-size:11px;color:var(--parch-3);letter-spacing:0}
+.wn-feat{display:flex;flex-direction:column;gap:6px;min-width:0;padding:var(--sp-s) var(--sp-m);border-radius:10px;border:1px solid var(--iron);background:#0e1114}
+.wn-feat.ready{border-color:rgba(72,229,212,.45);box-shadow:inset 0 -14px 18px -16px var(--spirit)}
+.wn-feat.got{border-color:var(--gold-3)}
+.wn-feat.hid{appearance:none;align-items:flex-start;text-align:left;border-style:dashed;color:var(--parch-2);font:inherit}
+.wn-feat.hid .quote{font-size:14px}
+.wn-fn{font:600 16px/1.1 var(--f-d)}
+.wn-fd{font-size:12px;color:var(--parch-3);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1;overflow:hidden}
+.wn-fp{font-size:12px;color:var(--spirit)}
+.wn-ff{justify-content:flex-end;margin-top:auto}
+.wn-firsts{display:flex;flex-direction:column;gap:var(--sp-s)}
+.wn-first{display:flex;align-items:center;gap:var(--sp-m);padding:var(--sp-s) var(--sp-m);border-radius:10px;border:1px solid var(--iron);background:#0e1114}
+.wn-first .wn-fh{flex:1 1 auto}
+.wn-first .wn-fd{-webkit-line-clamp:2}
+.wn-first .wn-ff{margin-top:0}
+.wn-first.mine{border-color:var(--gold-3);box-shadow:inset 3px 0 0 var(--gold)}
+.wn-fame{display:flex;justify-content:space-between;gap:var(--sp-s);padding:5px 0;border-top:1px solid var(--iron);font-size:13px}
+.wn-fame.mine b{color:var(--gold)}
+.wn-pr{display:flex;flex-direction:column;gap:2px;padding:6px 0;border-top:1px solid var(--iron);font-size:13.5px}
+.wn-pr small{font-size:11.5px}
+
+/* частицы: слой рядом с #game — перерисовка экрана его не сносит */
+.wn-fxl{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
+.wn-flash{position:absolute;left:0;top:0;width:190px;height:190px;border-radius:50%;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(circle,rgba(255,250,236,.95),color-mix(in srgb,var(--c) 65%,transparent) 32%,transparent 70%)}
+
+/* UI-кит: карты всех редкостей, места, таблица частиц */
+.wn-kit .eyebrow{font:700 10.5px/1.2 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--gold-2)}
+.wn-kit .faint{color:var(--parch-3)}
+.wn-kit .spirit{color:var(--spirit)}
+.wn-kit .col{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0}
+.wn-kstage{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--iron);padding:var(--sp-l);perspective:900px;
+  background:radial-gradient(60% 80% at 50% 115%,rgba(72,229,212,.08),transparent),#07090a}
+.wn-krow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:var(--sp-s)}
+.wn-kgrid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:var(--sp-l);align-items:start}
+.wn-kslots{grid-template-columns:repeat(3,minmax(0,1fr))}
+.wn-kfx{width:100%;border-collapse:collapse;font-size:12.5px;color:var(--parch-2)}
+.wn-kfx td{padding:5px 8px;border-top:1px solid #1b1f24;vertical-align:middle}
+.wn-kfx td:first-child{white-space:nowrap}
+.wn-kcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:var(--sp-s);align-items:start}
+.wn-kc{margin:0;display:flex;flex-direction:column;gap:6px;min-width:0}
+.wn-kc figcaption{font-size:11.5px;color:var(--parch-3);text-align:center}
+.wn-kit .wn-fh,.wn-kit .wn-an{color:var(--parch)}
+.wn-kfix ul{margin:6px 0 0;padding-left:18px;font-size:12.5px;line-height:1.4;color:var(--parch-2)}
+.wn-kfix li{margin-bottom:4px}
+.wn-kfix summary{cursor:pointer}
+
+@media (prefers-reduced-motion:reduce){
+  .wn-card.in,.wn-card.in::after,.wn-motes i,.wn-rays,.wn-gem.open{animation:none!important}
+  .wn-card.in{opacity:1;transform:none}
+  .wn-motes{display:none}
+}
