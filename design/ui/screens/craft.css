@@ -1,1 +1,150 @@
-/* screens/craft.css — стили экрана screens/craft.js */
+/* screens/craft.css — «Ремесло → Мастерская» (screens/craft.js): зоны «Инвентарь» и «Крафт», стол из шести ячеек,
+   книга рецептов, автодокрафт (GDD §12.4). Свои классы — на ws-, остальное — общие классы «Света снизу»: pnl, tabs, chip, well, btn. */
+.ws{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:10px;height:100%}
+.ws-inv,.ws-craft{display:flex;flex-direction:column;gap:8px;min-width:0;min-height:0;padding:10px}
+.ws-craft{padding:10px 12px}
+.ws .pnl-h{flex:none;min-height:30px}
+.ws .search{height:28px}
+.ws .tabs button{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 9px}
+.ws .tabs .i{width:14px;height:14px}
+.ws-none{grid-column:1/-1;font-size:13px}
+
+/* колодец на данных recipes.js: иконка ремесла или яруса, глиф руны; нижняя кромка — редкость */
+.ws .well .i,.ws-o .well .i{width:20px;height:20px;color:var(--rc,var(--parch-2))}
+.ws .well .gl,.ws-o .well .gl{font:600 18px/1 var(--f-d);color:var(--gold)}
+/* особый ресурс — золотой ромб в углу: расход только с согласия (§12.1) */
+.ws .well.ws-sp::before,.ws-o .well.ws-sp::before{content:"";position:absolute;left:4px;top:4px;width:5px;height:5px;transform:rotate(45deg);background:var(--gold);box-shadow:0 0 5px var(--gold)}
+/* сколько лежит на столе — из запасов ещё не списано */
+.ws-on{position:absolute;right:2px;top:2px;min-width:15px;height:14px;padding:0 3px;border-radius:7px;background:rgba(72,229,212,.16);color:var(--spirit);font:700 9.5px/14px var(--f-u);text-align:center}
+
+/* ===== Инвентарь ===== */
+.ws-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:6px;align-content:start;justify-items:center;padding:2px}
+.ws-grid .well{--s:48px}
+.ws-grid .well[draggable="true"]{cursor:grab}
+.ws-pick{display:flex;align-items:center;gap:8px;flex:none;min-width:0;padding:4px 8px 4px 4px;border-radius:9px;border:1px solid var(--iron);background:#0e1114}
+.ws-pick .well{--s:32px;border-radius:7px}
+.ws .ws-pick .well .i{width:16px;height:16px}
+.ws-pick-t{gap:1px;min-width:0;flex:1 1 0}
+.ws-pick-t b{font:600 15px/1.1 var(--f-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ws-pick-t small{font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ws-pick .link{flex:none}
+.ws-pick-e{flex:none;min-height:34px;display:flex;align-items:center}
+
+/* ===== Крафт · стол: шесть ячеек вокруг результата ===== */
+.ws-hex{position:relative;flex:1 1 0;min-height:0;display:grid;place-items:center}
+.ws-hex-in{--hx:200px;position:relative;width:var(--hx);height:var(--hx)}
+.ws-hex-in::before{content:"";position:absolute;inset:15%;border-radius:50%;border:1px dashed #2b3137;background:radial-gradient(closest-side,rgba(72,229,212,.08),transparent)}
+.ws-cell{position:absolute;--s:50px;transform:translate(-50%,-50%)}
+.ws-cell[data-wscell="0"]{left:50%;top:13%}
+.ws-cell[data-wscell="1"]{left:84%;top:31.5%}
+.ws-cell[data-wscell="2"]{left:84%;top:68.5%}
+.ws-cell[data-wscell="3"]{left:50%;top:87%}
+.ws-cell[data-wscell="4"]{left:16%;top:68.5%}
+.ws-cell[data-wscell="5"]{left:16%;top:31.5%}
+.ws .ws-cell.empty .i{width:16px;height:16px;color:var(--parch-3)}
+.ws-cell.ws-lack{border-color:rgba(220,106,82,.6)}
+.ws-cell.ws-lack .q{color:var(--rust)}
+.ws-core{position:absolute;left:50%;top:50%;--s:64px;border-radius:50%;transform:translate(-50%,-50%);border-color:#3a4148;background:radial-gradient(circle at 50% 70%,rgba(72,229,212,.22),transparent 65%),#0c0f12}
+.ws-core.known{border-color:var(--spirit);box-shadow:0 0 0 1px var(--spirit),0 0 24px -4px var(--spirit)}
+.ws-core>span{font:600 24px/1 var(--f-d);color:var(--parch-3)}
+.ws .ws-core .i{width:28px;height:28px}
+/* количество в выбранной ячейке */
+.ws-qty{display:flex;align-items:center;gap:4px;flex:none;min-height:30px;min-width:0}
+.ws-qe{font-size:12.5px;line-height:1.25}
+.ws-qn{display:flex;flex-direction:column;flex:1 1 0;min-width:0}
+.ws-qn b{font:600 15px/1.1 var(--f-d);color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ws-qn small{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ws-qb{flex:none;display:inline-grid;place-items:center;min-width:30px;height:28px;padding:0 6px;border-radius:7px;border:1px solid var(--iron-2);background:#15191d;color:var(--gold);font:700 12px/1 var(--f-u)}
+.ws-qb:hover{border-color:var(--iron-3)}
+.ws-qb[disabled]{color:var(--parch-3);border-color:var(--iron);cursor:not-allowed}
+.ws-qb .i{width:14px;height:14px}
+.ws-qin{flex:none;width:48px;height:28px;border-radius:7px;border:1px solid var(--iron-2);background:#0b0d10;color:var(--parch);font:700 13px/1 var(--f-u);text-align:center;padding:0 2px;-moz-appearance:textfield;appearance:textfield}
+.ws-qin::-webkit-inner-spin-button,.ws-qin::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.ws-qin:focus{outline:none;border-color:var(--spirit)}
+/* что выйдет со стола и кнопки */
+.ws-foot{display:flex;align-items:center;gap:6px;flex:none;min-width:0}
+.ws-st{flex:1 1 0;min-width:0;font-size:12.5px;line-height:1.25;color:var(--parch-3);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ws-st.known{color:var(--spirit)}
+.ws-st.unknown{color:var(--amber)}
+.ws-st.bad{color:var(--rust)}
+
+/* ===== Крафт · книга рецептов: поиск и фильтры видны всегда, прокручивается только список ===== */
+.ws-bh{display:flex;align-items:center;gap:6px;flex:none;min-width:0}
+.ws-bh .rs-sel{flex:none;max-width:128px}
+.ws-favt{width:28px;height:28px}
+.ws-favt[aria-pressed="true"]{color:var(--gold);border-color:var(--gold-3)}
+.ws-favt[aria-pressed="true"] .i{fill:currentColor}
+.ws-list{display:flex;flex-direction:column;gap:5px;padding-right:2px}
+.ws-list>*{flex:none}
+.ws-rc{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:center;padding:5px 8px 5px 4px;border-radius:10px;border:1px solid var(--iron);background:#0e1114}
+.ws-rc.part{border-style:dashed;border-color:rgba(72,229,212,.32)}
+.ws-rc-m{display:flex;flex-direction:column;gap:4px;min-width:0}
+.ws-rc-t{display:flex;align-items:center;gap:6px;min-width:0}
+.ws-rc-t b{flex:0 1 auto;min-width:0;font:600 15px/1.1 var(--f-d);color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ws-rc .chip{flex:none;height:18px;padding:0 6px;font-size:10px;gap:4px}
+.ws-rc .chip .i{width:11px;height:11px}
+.ws-star{appearance:none;display:grid;place-items:center;width:22px;height:22px;border:0;border-radius:6px;background:none;padding:0;color:var(--parch-3)}
+.ws-star:hover{color:var(--gold-2)}
+.ws-star[aria-pressed="true"]{color:var(--gold)}
+.ws-star[aria-pressed="true"] .i{fill:currentColor}
+.ws-star .i{width:15px;height:15px}
+/* компактный состав: только настоящие места, без пустых квадратов */
+.ws-ing{display:flex;align-items:center;gap:3px;flex-wrap:wrap;min-width:0}
+.ws-ing .well{--s:26px;border-radius:6px}
+.ws .ws-ing .well .i,.ws-o .ws-ing .well .i{width:13px;height:13px}
+.ws .ws-ing .well .gl,.ws-o .ws-ing .well .gl{font-size:12px}
+.ws-ing .well .q{font-size:10px;right:2px;bottom:0}
+.ws-ing .well.empty{font:600 13px/1 var(--f-d);color:var(--spirit)}
+.ws-ing .well.ws-short .q{color:var(--rust)}
+.ws-ing .well.ws-sp::before{left:2px;top:2px;width:4px;height:4px}
+.ws-ing .arr{display:inline-grid;place-items:center;color:var(--parch-3)}
+.ws-ing .arr .i{width:13px;height:13px}
+
+/* ===== слои поверх: сведения, попытка, автодокрафт, итог ===== */
+.ws-o{display:contents}
+.ws-o>*{flex-shrink:0}
+.ws-o .reason .i{width:13px;height:13px;vertical-align:-2px;margin-right:3px}
+.ws-mk{display:flex;align-items:center;gap:12px;min-width:0}
+.ws-n{display:flex;align-items:center;gap:4px;flex:none}
+.ws-n b{min-width:30px;text-align:center;font:600 20px/1 var(--f-d);color:var(--parch)}
+.ws-steps{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:3px}
+.ws-steps li{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:3px 6px;border-radius:8px;background:rgba(255,255,255,.022);font-size:13px}
+.ws-steps li>b{font:600 14px/1.1 var(--f-d);color:var(--parch)}
+.ws-steps li>.well{border-radius:7px}
+.ws-steps li.fin{background:rgba(72,229,212,.06);box-shadow:inset 0 0 0 1px rgba(72,229,212,.28)}
+.ws-steps li.unk{background:none;border:1px dashed rgba(230,168,75,.4);color:var(--amber)}
+.ws-steps li.unk>b{color:var(--amber)}
+.ws-steps .ws-ing{margin-left:auto}
+.ws-sum{display:flex;flex-wrap:wrap;gap:6px 12px}
+.ws-need{display:flex;align-items:center;gap:6px;min-width:0}
+.ws-need .well{--s:36px;border-radius:8px}
+.ws-need .col{gap:1px}
+.ws-need b{max-width:128px;font:700 12.5px/1.15 var(--f-u);color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ws-need small{font-size:11px}
+.ws-need.sp b{color:var(--gold)}
+.ws-hint{display:flex;align-items:flex-start;gap:8px;padding:7px 9px;border-radius:9px;border:1px solid rgba(72,229,212,.35);background:rgba(72,229,212,.05);font-size:13.5px;line-height:1.3}
+.ws-hint .i{flex:none;margin-top:1px;color:var(--spirit)}
+.ws-hint b{color:var(--parch)}
+.ws-res{display:flex;align-items:center;gap:14px}
+
+/* компактный режим низких экранов (844×390 и ниже) — по высоте рабочей области, как у остальных экранов */
+@container main (max-height: 360px){
+  .ws-inv,.ws-craft{gap:6px;padding:8px}
+  .ws-hex-in{--hx:164px}
+  .ws-cell{--s:42px}
+  .ws-core{--s:52px}
+  .ws .well .i{width:17px;height:17px}
+  .ws .ws-core .i{width:22px;height:22px}
+  .ws-grid{grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:5px}
+  .ws-grid .well{--s:42px}
+  .ws-qn small,.ws-pick-t small{display:none}
+  .ws-pick{padding:3px 6px 3px 3px}
+  .ws-pick .well{--s:28px}
+  .ws-rc{padding:4px 6px 4px 3px}
+}
+@container main (max-height: 320px){
+  .ws-hex-in{--hx:138px}
+  .ws-cell{--s:36px}
+  .ws-core{--s:44px}
+  .ws-qn{display:none}
+}

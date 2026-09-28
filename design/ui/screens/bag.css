@@ -1,1 +1,72 @@
-/* screens/bag.css — стили экрана screens/bag.js */
+/* screens/bag.css — «Ремесло → Запасы» и «Дары путешествия» (screens/bag.js). Свои классы — zp-* и dar-*;
+   остальное — общие классы прототипа: .stock, .inv, .icard, .rs-row, .rs-sel, .tabs, .well, .lb-win, .rk-tab, .mail, .gifts */
+
+/* каркас: вкладки сверху, список слева, карточка справа */
+.zp-bar{flex:none;gap:8px}
+.zp-bar .tabs button{display:inline-flex;align-items:center;gap:5px}
+.zp-bar .tabs .dot{width:6px;height:6px}
+.zp-stock{flex:1 1 0;min-height:0;height:auto}
+.zp-inv{min-width:0}
+.zp-find{flex:none;gap:8px}
+.zp-un{display:inline-flex;align-items:center;gap:5px;flex:none;font-size:12.5px;color:var(--parch-2);white-space:nowrap;cursor:pointer}
+.zp-un input{margin:0;accent-color:var(--spirit)}
+.zp-un.off{opacity:.45;cursor:default}
+.zp-inv .rs-sel[disabled]{opacity:.45}
+
+/* список: группы по ярусу, две колонки у предметов, одна — у осколков и сундуков */
+.zp-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:max-content;gap:4px;align-content:start}
+.zp-list.one{grid-template-columns:minmax(0,1fr)}
+.zp-gh{grid-column:1/-1;margin-top:6px}
+.zp-gh:first-child{margin-top:0}
+.zp-row b{font-size:14px}
+.zp-row .num{font-size:12px;color:var(--parch-2)}
+.zp-ic{display:grid;place-items:center;background:#0d1013;color:var(--rc,var(--parch-2))}
+.zp-ic>img{position:static;width:82%;height:82%;object-fit:contain;border-radius:4px}
+.zp-ic .i{width:16px;height:16px}
+.zp-ic .gl{font:600 13px/1 var(--f-d);color:var(--gold)}
+.zp-dot{position:absolute;left:2px;top:2px;width:6px;height:6px;z-index:1}
+.zp-k{position:absolute;right:1px;bottom:1px;display:grid;color:var(--gold-2)}
+.zp-k .i{width:10px;height:10px}
+.well .zp-k{right:3px;bottom:2px}
+.well .zp-k .i{width:12px;height:12px}
+.zp-empty{grid-column:1/-1;display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:6px 2px}
+
+/* карточка */
+.zp-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;flex:none}
+.zp-name{font-size:20px;line-height:1.05;color:var(--parch)}
+.zp-q{align-items:flex-end}
+.zp-q b{color:var(--gold)}
+.zp-body{gap:8px}
+.zp-p{font-size:12.5px;line-height:1.35}
+.zp-card .quote{font-size:14px}
+.zp-card .rk-tab{font-size:12px}
+.zp-card .lb-win{height:34px;flex:none}
+.zp-cur{gap:10px;flex-wrap:wrap}
+.zp-hero .hd-top{flex:none}
+.zp-hero .rs-aside{gap:4px}
+.zp-foot{display:flex;flex-direction:column;gap:6px;flex:none}
+.zp-open{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.zp-open .qty span{display:grid;place-items:center;min-width:30px;height:28px;padding:0 6px;background:#1b2126;color:var(--gold);font:700 12px/1 var(--f-u)}
+.zp-open .qty button[disabled]{opacity:.4;cursor:default}
+.zp-later{flex:1 1 0}
+
+/* итог открытия — в той же карточке */
+.zp-res{display:flex;flex-direction:column;gap:6px;flex:none;padding:8px 10px;border-radius:10px;border:1px solid rgba(72,229,212,.35);background:rgba(72,229,212,.04)}
+.zp-rl{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:8px;align-items:center;font-size:12.5px;color:var(--parch)}
+.zp-rl .rs-av{width:24px;height:24px;border-radius:6px}
+.zp-rc{color:var(--rc)}
+
+/* Дары путешествия */
+.dar-sum{margin-left:0;width:100%;flex:none}
+.dar-sum[disabled]{opacity:.6;cursor:default}
+.dar-row{align-items:center;flex:none}
+.dar-row>.well{align-self:flex-start}
+.dar-tx{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 0}
+.dar-tx b{font-size:13.5px;line-height:1.2}
+.dar-tx small{line-height:1.3}
+.dar-wait{color:var(--amber)}
+.dar-cmp{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+.dar-row>.btn,.dar-row>.chip{flex:none}
+.dar-grid{display:flex;flex-wrap:wrap;gap:8px}
+.dar-box{--s:54px}
+.dar-fnote{margin-right:auto;font-size:12px}
