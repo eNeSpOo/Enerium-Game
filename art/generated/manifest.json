@@ -7647,6 +7647,238 @@
         1152
       ],
       "sha256": "8800d01b0db2869378d4a24136d815afa014f38164fe82fa1308e578c9c7e1f8"
+    },
+    {
+      "file": "art/generated/attributes/attr-power__nb2.png",
+      "category": "attributes",
+      "job": "attr-power",
+      "title": "Атрибут: боевая мощь (БМ)",
+      "source": "GDD §6 — БМ: сила героя одним числом, витринное число карточек и отряда",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T13:03:52+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.\n\nFormat: game UI icon of a hero attribute, square, no border around the picture. One bold emblem, centered, about 80% of the canvas, seen straight on. It must stay readable at a tiny size, 24 px: one simple, strong, instantly recognizable silhouette built from a few large shapes with clear contrast between them. All the painterly detail lives inside the silhouette — worn metal, facets, light — never as small separate pieces around it: no sparks, embers, shards or particles floating around the emblem. A crisp bright rim light runs along the whole outline and cleanly separates it from the black. No runes, glyphs or symbols drawn on it. The attribute icons are one set: the same painting style and the same size in the frame; only the emblem, its material and the color of its light tell them apart.\n\nCombat Power — the whole might of a hero. The emblem: two heavy broadswords crossed in a bold X, points up, perfectly symmetric. Broad blades of dark forged steel with bright honed edges; heavy crossguards and round pommels of old gold. At the crossing point warm golden light (#DDBC7A) blazes from inside the metal and runs up along both edges to the points, as if all the hero's power is gathered there. Heavy, confident, triumphant.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the emblem and fades into the black within a short distance. Leave a clear margin of black around the emblem on all sides.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 458,
+        "candidatesTokenCount": 1506,
+        "totalTokenCount": 1964,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 458
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0686,
+      "seconds": 10.5,
+      "status": "проба значков атрибутов — ждёт автора: боевая мощь",
+      "raw": "art/generated/attributes/attr-power__nb2.raw.jpg",
+      "cutout": {
+        "key": "black",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.65,
+        "opaque_share": 0.318,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "5df4b11d886956dbaae61716ca6bd0fa892f7c70f424b85f35b9d68655646b5d"
+    },
+    {
+      "file": "art/generated/attributes/attr-def-phys__nb2.png",
+      "category": "attributes",
+      "job": "attr-def-phys",
+      "title": "Атрибут: физическая защита",
+      "source": "GDD §3.2 — физ. защита: Сила × 2, кап 50 %; пара с магической защитой — один контур, разный материал",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T13:04:03+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.\n\nFormat: game UI icon of a hero attribute, square, no border around the picture. One bold emblem, centered, about 80% of the canvas, seen straight on. It must stay readable at a tiny size, 24 px: one simple, strong, instantly recognizable silhouette built from a few large shapes with clear contrast between them. All the painterly detail lives inside the silhouette — worn metal, facets, light — never as small separate pieces around it: no sparks, embers, shards or particles floating around the emblem. A crisp bright rim light runs along the whole outline and cleanly separates it from the black. No runes, glyphs or symbols drawn on it. The attribute icons are one set: the same painting style and the same size in the frame; only the emblem, its material and the color of its light tell them apart.\n\nPhysical Defense — how well the hero withstands blades and blows. The emblem: a single heater shield seen straight on, perfectly symmetric — a gently arched top edge and sides that curve down into a pointed bottom. This shield is forged: a face of dark blackened iron with a raised central ridge from the top edge down to the point, dents and scratches of countless blows, framed by a thick raised rim of old gold with a few heavy rivets. Warm golden light catches the rim and the ridge from below. No emblem on its face. Heavy, solid, unbreakable.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the emblem and fades into the black within a short distance. Leave a clear margin of black around the emblem on all sides.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 471,
+        "candidatesTokenCount": 1517,
+        "totalTokenCount": 1988,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 471
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0686,
+      "seconds": 10.2,
+      "status": "проба значков атрибутов — ждёт автора: физическая защита",
+      "raw": "art/generated/attributes/attr-def-phys__nb2.raw.jpg",
+      "cutout": {
+        "key": "black",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.465,
+        "opaque_share": 0.502,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "daec990aaff2faf439413b01c427432f11adbf285acda0e16bbb9305b566587b"
+    },
+    {
+      "file": "art/generated/attributes/attr-def-mag__nb2.png",
+      "category": "attributes",
+      "job": "attr-def-mag",
+      "title": "Атрибут: магическая защита",
+      "source": "GDD §3.2 — маг. защита: Интеллект × 2, кап 50 %; пара с физической защитой — один контур, разный материал",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T13:04:13+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.\n\nFormat: game UI icon of a hero attribute, square, no border around the picture. One bold emblem, centered, about 80% of the canvas, seen straight on. It must stay readable at a tiny size, 24 px: one simple, strong, instantly recognizable silhouette built from a few large shapes with clear contrast between them. All the painterly detail lives inside the silhouette — worn metal, facets, light — never as small separate pieces around it: no sparks, embers, shards or particles floating around the emblem. A crisp bright rim light runs along the whole outline and cleanly separates it from the black. No runes, glyphs or symbols drawn on it. The attribute icons are one set: the same painting style and the same size in the frame; only the emblem, its material and the color of its light tell them apart.\n\nMagical Defense — how well the hero withstands spells and elemental power. The emblem: a single heater shield seen straight on, perfectly symmetric — a gently arched top edge and sides that curve down into a pointed bottom. This shield is made of magic: one solid piece of translucent turquoise carst crystal (#48E5D4), cut into a few large clean facets that meet in a central ridge from the top edge down to the point, framed by a thick raised rim of old gold. Cold turquoise light glows from deep inside the crystal, brightest at its heart, and lights the gold rim from within; a soft turquoise aura hugs the outline. No emblem on its face. Clear, radiant, impenetrable.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the emblem and fades into the black within a short distance. Leave a clear margin of black around the emblem on all sides.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 501,
+        "candidatesTokenCount": 1507,
+        "totalTokenCount": 2008,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 501
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0686,
+      "seconds": 9.2,
+      "status": "проба значков атрибутов — ждёт автора: магическая защита",
+      "raw": "art/generated/attributes/attr-def-mag__nb2.raw.jpg",
+      "cutout": {
+        "key": "black-glow",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.44,
+        "opaque_share": 0.518,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "ee717b101b64c1d80582b59a3b8d56ccd7efa441f7bc1b8fcac20e20e1ae58d8"
+    },
+    {
+      "file": "art/generated/attributes/attr-rar-epic__nb2.png",
+      "category": "attributes",
+      "job": "attr-rar-epic",
+      "title": "Атрибут: редкость «эпическая» (4 из 7)",
+      "source": "GDD §3.1 — семь редкостей; схема автора: редкость — кристалл карста, от тусклого треснувшего камня до чистого кристалла, полного света; цвет — токен --r4 интерфейса",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T13:04:26+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.\n\nFormat: game UI icon of a hero attribute, square, no border around the picture. One bold emblem, centered, about 80% of the canvas, seen straight on. It must stay readable at a tiny size, 24 px: one simple, strong, instantly recognizable silhouette built from a few large shapes with clear contrast between them. All the painterly detail lives inside the silhouette — worn metal, facets, light — never as small separate pieces around it: no sparks, embers, shards or particles floating around the emblem. A crisp bright rim light runs along the whole outline and cleanly separates it from the black. No runes, glyphs or symbols drawn on it. The attribute icons are one set: the same painting style and the same size in the frame; only the emblem, its material and the color of its light tell them apart.\n\nRarity: Epic, the fourth of seven. Rarity is shown as a carst crystal — the magic crystal of this world; the seven rarities form a ladder from a dull cracked stone to a flawless crystal full of light, and Epic is the middle step. The emblem: one upright carst crystal, about 80% of the canvas high — a long hexagonal prism with pointed ends, a strong simple shape. Clean violet facets (#A986EE) with one faint healed crack near the base; a steady violet light glows inside — bright, but not yet blazing; a soft violet aura hugs the crystal. No setting, no stand, no floating shards.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the emblem and fades into the black within a short distance. Leave a clear margin of black around the emblem on all sides.\n\nNo text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 495,
+        "candidatesTokenCount": 1444,
+        "totalTokenCount": 1939,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 495
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0684,
+      "seconds": 12.1,
+      "status": "проба значков атрибутов — ждёт автора: редкость «эпическая»",
+      "raw": "art/generated/attributes/attr-rar-epic__nb2.raw.jpg",
+      "cutout": {
+        "key": "black-glow",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.784,
+        "opaque_share": 0.193,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "84833cebb5f1f847d42f35b000ab6fee7f442ad795cc35673a3e9705b759b229"
     }
   ]
 }

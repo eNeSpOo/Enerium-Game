@@ -1,0 +1,56 @@
+{
+  "name": "Проба значков атрибутов интерфейса: боевая мощь, физическая и магическая защита, редкость «эпическая». Стиль — одобренный стиль меток карт (art/style/style.md, «Метки карт»): тёмное фэнтези, свет — главный акцент, кованое железо, старое золото, камень, сплошной чёрный фон. Формат — строка «Иконка интерфейса» таблицы кадров: 1:1, прозрачный фон, эмблема — 80 % кадра, читается с 24 px. Остальные атрибуты — после решения автора по пробе",
+  "plan": {
+    "Боевая мощь (БМ), GDD §6": "два скрещённых меча — X, золотой свет в перекрестье",
+    "Физическая защита, GDD §3.2": "кованый щит: чёрное железо, рант из старого золота",
+    "Магическая защита, GDD §3.2": "щит того же контура из бирюзового кристалла карста, рант тот же, свет изнутри",
+    "Редкость «эпическая», 4 из 7, GDD §3.1": "кристалл карста, токен --r4 #A986EE: чистые грани, ровный свет внутри; без парящих осколков — мелочь не читается с 24 px"
+  },
+  "models": [
+    "nb2"
+  ],
+  "style": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.",
+  "negative": "No text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+  "cutout_rule": "The background is solid pure black ({hex}), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the emblem and fades into the black within a short distance. Leave a clear margin of black around the emblem on all sides.",
+  "categories": {
+    "attributes": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Format: game UI icon of a hero attribute, square, no border around the picture. One bold emblem, centered, about 80% of the canvas, seen straight on. It must stay readable at a tiny size, 24 px: one simple, strong, instantly recognizable silhouette built from a few large shapes with clear contrast between them. All the painterly detail lives inside the silhouette — worn metal, facets, light — never as small separate pieces around it: no sparks, embers, shards or particles floating around the emblem. A crisp bright rim light runs along the whole outline and cleanly separates it from the black. No runes, glyphs or symbols drawn on it. The attribute icons are one set: the same painting style and the same size in the frame; only the emblem, its material and the color of its light tell them apart."
+    }
+  },
+  "jobs": [
+    {
+      "id": "attr-power",
+      "category": "attributes",
+      "title": "Атрибут: боевая мощь (БМ)",
+      "source": "GDD §6 — БМ: сила героя одним числом, витринное число карточек и отряда",
+      "subject": "Combat Power — the whole might of a hero. The emblem: two heavy broadswords crossed in a bold X, points up, perfectly symmetric. Broad blades of dark forged steel with bright honed edges; heavy crossguards and round pommels of old gold. At the crossing point warm golden light (#DDBC7A) blazes from inside the metal and runs up along both edges to the points, as if all the hero's power is gathered there. Heavy, confident, triumphant."
+    },
+    {
+      "id": "attr-def-phys",
+      "category": "attributes",
+      "title": "Атрибут: физическая защита",
+      "source": "GDD §3.2 — физ. защита: Сила × 2, кап 50 %; пара с магической защитой — один контур, разный материал",
+      "subject": "Physical Defense — how well the hero withstands blades and blows. The emblem: a single heater shield seen straight on, perfectly symmetric — a gently arched top edge and sides that curve down into a pointed bottom. This shield is forged: a face of dark blackened iron with a raised central ridge from the top edge down to the point, dents and scratches of countless blows, framed by a thick raised rim of old gold with a few heavy rivets. Warm golden light catches the rim and the ridge from below. No emblem on its face. Heavy, solid, unbreakable."
+    },
+    {
+      "id": "attr-def-mag",
+      "category": "attributes",
+      "title": "Атрибут: магическая защита",
+      "source": "GDD §3.2 — маг. защита: Интеллект × 2, кап 50 %; пара с физической защитой — один контур, разный материал",
+      "cutout": "black-glow",
+      "subject": "Magical Defense — how well the hero withstands spells and elemental power. The emblem: a single heater shield seen straight on, perfectly symmetric — a gently arched top edge and sides that curve down into a pointed bottom. This shield is made of magic: one solid piece of translucent turquoise carst crystal (#48E5D4), cut into a few large clean facets that meet in a central ridge from the top edge down to the point, framed by a thick raised rim of old gold. Cold turquoise light glows from deep inside the crystal, brightest at its heart, and lights the gold rim from within; a soft turquoise aura hugs the outline. No emblem on its face. Clear, radiant, impenetrable."
+    },
+    {
+      "id": "attr-rar-epic",
+      "category": "attributes",
+      "title": "Атрибут: редкость «эпическая» (4 из 7)",
+      "source": "GDD §3.1 — семь редкостей; схема автора: редкость — кристалл карста, от тусклого треснувшего камня до чистого кристалла, полного света; цвет — токен --r4 интерфейса",
+      "cutout": "black-glow",
+      "subject": "Rarity: Epic, the fourth of seven. Rarity is shown as a carst crystal — the magic crystal of this world; the seven rarities form a ladder from a dull cracked stone to a flawless crystal full of light, and Epic is the middle step. The emblem: one upright carst crystal, about 80% of the canvas high — a long hexagonal prism with pointed ends, a strong simple shape. Clean violet facets (#A986EE) with one faint healed crack near the base; a steady violet light glows inside — bright, but not yet blazing; a soft violet aura hugs the crystal. No setting, no stand, no floating shards."
+    }
+  ]
+}
