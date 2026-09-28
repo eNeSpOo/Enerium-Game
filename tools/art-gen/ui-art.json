@@ -38,6 +38,54 @@
     "foes/e6.jpg": "enemies/ws-remover__nb2-v2.jpg",
     "foes/b1.jpg": "enemies/wp-first-sketch__nb2.jpg",
     "foes/g1.jpg": "enemies/ws-master__nb2.jpg",
+    "foes/b2o1.jpg": {
+      "from": "enemies/b2-o1-yearling__nb2.jpg",
+      "mirror": true
+    },
+    "foes/b2o2.jpg": "enemies/b2-o2-beater__nb2.jpg",
+    "foes/b2o3.jpg": "enemies/b2-o3-duster__nb2.jpg",
+    "foes/b2o4.jpg": "enemies/b2-o4-forest-aurochs__nb2.jpg",
+    "foes/b2o5.jpg": "enemies/b2-o5-herbalist__nb2.jpg",
+    "foes/b2o6.jpg": {
+      "from": "enemies/b2-o6-pale-lynx__nb2.jpg",
+      "mirror": true
+    },
+    "foes/b2e1.jpg": "enemies/b2-e1-tusker__nb2.jpg",
+    "foes/b2e2.jpg": "enemies/b2-e2-elder-huntsman__nb2-v2.jpg",
+    "foes/b2e3.jpg": "enemies/b2-e3-decker__nb2.jpg",
+    "foes/b2e4.jpg": "enemies/b2-e4-leafwinder__nb2.jpg",
+    "foes/b2e5.jpg": "enemies/b2-e5-wisewoman__nb2.jpg",
+    "foes/b2e6.jpg": "enemies/b2-e6-bast-stripper__nb2.jpg",
+    "foes/b2b1.jpg": "enemies/b2-b1-pack-mother__nb2.jpg",
+    "foes/b2g1.jpg": "enemies/b2-g1-echo-of-vial__nb2.jpg",
+    "foes/b3o1.jpg": "enemies/b3-o1-unbending-puppet__nb2.jpg",
+    "foes/b3o2.jpg": "enemies/b3-o2-loose-puppet__nb2-v3.jpg",
+    "foes/b3o3.jpg": "enemies/b3-o3-whispering-rubble__nb2.jpg",
+    "foes/b3o4.jpg": "enemies/b3-o4-stone-beetle__nb2.jpg",
+    "foes/b3o5.jpg": "enemies/b3-o5-leaking-puppet__nb2.jpg",
+    "foes/b3o6.jpg": "enemies/b3-o6-erased-puppet__nb2.jpg",
+    "foes/b3e1.jpg": "enemies/b3-e1-fitter__nb2.jpg",
+    "foes/b3e2.jpg": "enemies/b3-e2-grinder__nb2.jpg",
+    "foes/b3e3.jpg": "enemies/b3-e3-binder__nb2.jpg",
+    "foes/b3e4.jpg": "enemies/b3-e4-reader__nb2.jpg",
+    "foes/b3e5.jpg": "enemies/b3-e5-oiler__nb2.jpg",
+    "foes/b3e6.jpg": "enemies/b3-e6-knot-tier__nb2.jpg",
+    "foes/b3b1.jpg": "enemies/b3-b1-keeper__nb2.jpg",
+    "foes/b3g1.jpg": "enemies/b3-g1-seer__nb2.jpg",
+    "foes/b4o1.jpg": "enemies/b4-o1-miner__nb2.jpg",
+    "foes/b4o2.jpg": "enemies/b4-o2-riveter__nb2.jpg",
+    "foes/b4o3.jpg": "enemies/b4-o3-pavement-sagan__nb2.jpg",
+    "foes/b4o4.jpg": "enemies/b4-o4-ore-cart__nb2.jpg",
+    "foes/b4o5.jpg": "enemies/b4-o5-tinker__nb2.jpg",
+    "foes/b4o6.jpg": "enemies/b4-o6-toll-taker__nb2.jpg",
+    "foes/b4e1.jpg": "enemies/b4-e1-hammerer__nb2.jpg",
+    "foes/b4e2.jpg": "enemies/b4-e2-chainman__nb2.jpg",
+    "foes/b4e3.jpg": "enemies/b4-e3-dray-lizard__nb2.jpg",
+    "foes/b4e4.jpg": "enemies/b4-e4-gutterman__nb2.jpg",
+    "foes/b4e5.jpg": "enemies/b4-e5-stoker__nb2.jpg",
+    "foes/b4e6.jpg": "enemies/b4-e6-founder__nb2.jpg",
+    "foes/b4b1.jpg": "enemies/b4-b1-city-head__nb2.jpg",
+    "foes/b4g1.jpg": "enemies/b4-g1-echo-of-ularion__nb2.jpg",
     "heroes/h1.jpg": {
       "from": "heroes/hero-garth__nb2.jpg",
       "mirror": true
@@ -86,6 +134,83 @@
         716
       ]
     },
+    "arena-echo-ankeshar.jpg": {
+      "from": "arenas/arena-echo-ankeshar__nb2-v2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-echo-hatunrumi.jpg": {
+      "from": "arenas/arena-echo-hatunrumi__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-echo-goldendeer.jpg": {
+      "from": "arenas/arena-echo-goldendeer__nb2-v2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-echo-itsal.jpg": {
+      "from": "arenas/arena-echo-itsal__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-echo-copperarchai.jpg": {
+      "from": "arenas/arena-echo-copperarchai__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-echo-meshengar.jpg": {
+      "from": "arenas/arena-echo-meshengar__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-echo-tanehem.jpg": {
+      "from": "arenas/arena-echo-tanehem__nb2-v2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-echo-nameless.jpg": {
+      "from": "arenas/arena-echo-nameless__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-b2.jpg": {
+      "from": "arenas/arena-b2-forest__nb2-v2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-b3.jpg": {
+      "from": "arenas/arena-b3-library__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-b4.jpg": {
+      "from": "arenas/arena-b4-stonehaim__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
     "echo/ik-01.jpg": "echo/ik-01-feather-archer__nb2.jpg",
     "echo/ik-02.jpg": "echo/ik-02-jaguar-pelt__nb2.jpg",
     "echo/ik-03.jpg": "echo/ik-03-cotton-shield__nb2-v2.jpg",
@@ -104,6 +229,141 @@
     "echo/ik-13.jpg": "echo/ik-13-jade-steps-lady__nb2-v3.jpg",
     "echo/ik-14.jpg": "echo/ik-14-last-day__nb2-v2.jpg",
     "echo/ik-15.jpg": "echo/ik-15-many-faced__nb2.jpg",
+    "echo/ak-01.jpg": "echo/ak-01-bronze-spearman__nb2.jpg",
+    "echo/ak-02.jpg": "echo/ak-02-rank-shield__nb2.jpg",
+    "echo/ak-03.jpg": "echo/ak-03-priest-in-blue__nb2.jpg",
+    "echo/ak-04.jpg": "echo/ak-04-chariot-driver__nb2.jpg",
+    "echo/ak-05.jpg": "echo/ak-05-tablet-scribe__nb2.jpg",
+    "echo/ak-06.jpg": "echo/ak-06-night-counter__nb2.jpg",
+    "echo/ak-07.jpg": "echo/ak-07-lion-standard__nb2.jpg",
+    "echo/ak-08.jpg": "echo/ak-08-scythed-charioteer__nb2.jpg",
+    "echo/ak-09.jpg": "echo/ak-09-upper-step-priestess__nb2.jpg",
+    "echo/ak-10.jpg": "echo/ak-10-star-seer__nb2-v2.jpg",
+    "echo/ak-11.jpg": "echo/ak-11-winged-lion__nb2.jpg",
+    "echo/ak-12.jpg": "echo/ak-12-high-priest-blue__nb2.jpg",
+    "echo/ak-13.jpg": {
+      "from": "echo/ak-13-star-king__nb2.jpg",
+      "mirror": true
+    },
+    "echo/ak-14.jpg": "echo/ak-14-named-night__nb2.jpg",
+    "echo/ak-15.jpg": "echo/ak-15-many-faced__nb2.jpg",
+    "echo/hr-01.jpg": "echo/hr-01-terrace-slinger__nb2-v2.jpg",
+    "echo/hr-02.jpg": {
+      "from": "echo/hr-02-stone-shield__nb2.jpg",
+      "mirror": true
+    },
+    "echo/hr-03.jpg": "echo/hr-03-bridge-runner__nb2-v2.jpg",
+    "echo/hr-04.jpg": "echo/hr-04-valley-mason__nb2.jpg",
+    "echo/hr-05.jpg": "echo/hr-05-debt-knotter__nb2.jpg",
+    "echo/hr-06.jpg": "echo/hr-06-terrace-herbalist__nb2.jpg",
+    "echo/hr-07.jpg": "echo/hr-07-wall-builder__nb2.jpg",
+    "echo/hr-08.jpg": "echo/hr-08-elder-slinger__nb2.jpg",
+    "echo/hr-09.jpg": "echo/hr-09-cord-priest__nb2.jpg",
+    "echo/hr-10.jpg": "echo/hr-10-bridge-warden__nb2.jpg",
+    "echo/hr-11.jpg": "echo/hr-11-tribute-counter__nb2.jpg",
+    "echo/hr-12.jpg": "echo/hr-12-road-down-lord__nb2.jpg",
+    "echo/hr-13.jpg": "echo/hr-13-sun-lord-knots__nb2.jpg",
+    "echo/hr-14.jpg": "echo/hr-14-knot-of-valleys__nb2.jpg",
+    "echo/hr-15.jpg": "echo/hr-15-many-faced__nb2.jpg",
+    "echo/gd-01.jpg": "echo/gd-01-plaque-wolf__nb2.jpg",
+    "echo/gd-02.jpg": "echo/gd-02-boar-guard__nb2.jpg",
+    "echo/gd-03.jpg": "echo/gd-03-saiga-driver__nb2.jpg",
+    "echo/gd-04.jpg": "echo/gd-04-marking-eagle__nb2.jpg",
+    "echo/gd-05.jpg": "echo/gd-05-elk-healer__nb2.jpg",
+    "echo/gd-06.jpg": {
+      "from": "echo/gd-06-snow-leopard__nb2.jpg",
+      "mirror": true
+    },
+    "echo/gd-07.jpg": "echo/gd-07-wolf-leader__nb2.jpg",
+    "echo/gd-08.jpg": "echo/gd-08-golden-boar__nb2.jpg",
+    "echo/gd-09.jpg": "echo/gd-09-steppe-griffin__nb2.jpg",
+    "echo/gd-10.jpg": "echo/gd-10-singing-stag__nb2.jpg",
+    "echo/gd-11.jpg": "echo/gd-11-chief-stag__nb2.jpg",
+    "echo/gd-12.jpg": "echo/gd-12-kurgan-griffin__nb2.jpg",
+    "echo/gd-13.jpg": "echo/gd-13-migration-keeper__nb2.jpg",
+    "echo/gd-14.jpg": "echo/gd-14-golden-stag__nb2.jpg",
+    "echo/gd-15.jpg": "echo/gd-15-many-faced__nb2.jpg",
+    "echo/it-01.jpg": "echo/it-01-coal-hound__nb2.jpg",
+    "echo/it-02.jpg": "echo/it-02-sun-disc-bearer__nb2.jpg",
+    "echo/it-03.jpg": "echo/it-03-spark-thrower__nb2.jpg",
+    "echo/it-04.jpg": "echo/it-04-smoke-dancer__nb2.jpg",
+    "echo/it-05.jpg": "echo/it-05-mirror-priest__nb2.jpg",
+    "echo/it-06.jpg": "echo/it-06-hearth-keeper__nb2.jpg",
+    "echo/it-07.jpg": "echo/it-07-fire-serpent__nb2.jpg",
+    "echo/it-08.jpg": "echo/it-08-two-discs__nb2.jpg",
+    "echo/it-09.jpg": "echo/it-09-mirror-maiden__nb2.jpg",
+    "echo/it-10.jpg": "echo/it-10-coal-leader__nb2.jpg",
+    "echo/it-11.jpg": "echo/it-11-high-mirror-master__nb2.jpg",
+    "echo/it-12.jpg": "echo/it-12-serpent-lord__nb2.jpg",
+    "echo/it-13.jpg": "echo/it-13-new-sun__nb2.jpg",
+    "echo/it-14.jpg": "echo/it-14-fifth-sun__nb2-v2.jpg",
+    "echo/it-15.jpg": "echo/it-15-many-faced__nb2.jpg",
+    "echo/ca-01.jpg": "echo/ca-01-clockwork-spearman__nb2.jpg",
+    "echo/ca-02.jpg": "echo/ca-02-clockwork-shield__nb2-v3.jpg",
+    "echo/ca-03.jpg": "echo/ca-03-copper-hound__nb2.jpg",
+    "echo/ca-04.jpg": "echo/ca-04-labyrinth-builder__nb2-v2.jpg",
+    "echo/ca-05.jpg": "echo/ca-05-oiler__nb2.jpg",
+    "echo/ca-06.jpg": "echo/ca-06-hot-ball-thrower__nb2.jpg",
+    "echo/ca-07.jpg": "echo/ca-07-fire-bull__nb2.jpg",
+    "echo/ca-08.jpg": "echo/ca-08-shore-walker__nb2.jpg",
+    "echo/ca-09.jpg": "echo/ca-09-labyrinth-master__nb2-v2.jpg",
+    "echo/ca-10.jpg": "echo/ca-10-clockwork-dancer__nb2-v2.jpg",
+    "echo/ca-11.jpg": "echo/ca-11-shore-giant__nb2.jpg",
+    "echo/ca-12.jpg": "echo/ca-12-forge-bull__nb2-v2.jpg",
+    "echo/ca-13.jpg": "echo/ca-13-labyrinth-architect__nb2.jpg",
+    "echo/ca-14.jpg": "echo/ca-14-first-guardian__nb2.jpg",
+    "echo/ca-15.jpg": "echo/ca-15-many-faced__nb2.jpg",
+    "echo/mg-01.jpg": "echo/mg-01-masked-dancer__nb2.jpg",
+    "echo/mg-02.jpg": "echo/mg-02-horned-gatekeeper__nb2.jpg",
+    "echo/mg-03.jpg": "echo/mg-03-winged-herald__nb2.jpg",
+    "echo/mg-04.jpg": "echo/mg-04-lesser-chimera__nb2.jpg",
+    "echo/mg-05.jpg": "echo/mg-05-two-faced-novice__nb2.jpg",
+    "echo/mg-06.jpg": "echo/mg-06-shape-taker__nb2.jpg",
+    "echo/mg-07.jpg": "echo/mg-07-winged-bull__nb2-v2.jpg",
+    "echo/mg-08.jpg": "echo/mg-08-two-faced-priest__nb2.jpg",
+    "echo/mg-09.jpg": {
+      "from": "echo/mg-09-gate-chimera__nb2.jpg",
+      "mirror": true
+    },
+    "echo/mg-10.jpg": "echo/mg-10-seven-masks-dancer__nb2-v2.jpg",
+    "echo/mg-11.jpg": "echo/mg-11-mask-high-priest__nb2-v2.jpg",
+    "echo/mg-12.jpg": "echo/mg-12-seven-gates-guard__nb2-v2.jpg",
+    "echo/mg-13.jpg": "echo/mg-13-queen-of-shapes__nb2.jpg",
+    "echo/mg-14.jpg": {
+      "from": "echo/mg-14-tide-of-shapes__nb2.jpg",
+      "mirror": true
+    },
+    "echo/mg-15.jpg": "echo/mg-15-many-faced__nb2.jpg",
+    "echo/tn-01.jpg": "echo/tn-01-wrapped-dead__nb2.jpg",
+    "echo/tn-02.jpg": "echo/tn-02-beetle-swarm__nb2-v2.jpg",
+    "echo/tn-03.jpg": "echo/tn-03-salt-spearman__nb2.jpg",
+    "echo/tn-04.jpg": "echo/tn-04-jackal-reaper__nb2.jpg",
+    "echo/tn-05.jpg": "echo/tn-05-embalmer__nb2.jpg",
+    "echo/tn-06.jpg": "echo/tn-06-mourner__nb2.jpg",
+    "echo/tn-07.jpg": "echo/tn-07-bone-chariot__nb2-v2.jpg",
+    "echo/tn-08.jpg": "echo/tn-08-jackal-guardian__nb2.jpg",
+    "echo/tn-09.jpg": "echo/tn-09-linen-priest__nb2.jpg",
+    "echo/tn-10.jpg": "echo/tn-10-beetle-lord__nb2.jpg",
+    "echo/tn-11.jpg": "echo/tn-11-gold-mask-king__nb2.jpg",
+    "echo/tn-12.jpg": "echo/tn-12-salt-vizier__nb2.jpg",
+    "echo/tn-13.jpg": "echo/tn-13-unfading-queen__nb2-v2.jpg",
+    "echo/tn-14.jpg": "echo/tn-14-unfading-king__nb2-v2.jpg",
+    "echo/tn-15.jpg": "echo/tn-15-many-faced__nb2-v2.jpg",
+    "echo/nm-01.jpg": "echo/nm-01-faceless-bearer__nb2-v2.jpg",
+    "echo/nm-02.jpg": "echo/nm-02-blank-shield-shadow__nb2.jpg",
+    "echo/nm-03.jpg": "echo/nm-03-cutter__nb2.jpg",
+    "echo/nm-04.jpg": "echo/nm-04-voiceless-whisperer__nb2.jpg",
+    "echo/nm-05.jpg": "echo/nm-05-dust-gatherer__nb2.jpg",
+    "echo/nm-06.jpg": "echo/nm-06-slab-thrower__nb2.jpg",
+    "echo/nm-07.jpg": "echo/nm-07-stone-head__nb2.jpg",
+    "echo/nm-08.jpg": "echo/nm-08-elder-cutter__nb2.jpg",
+    "echo/nm-09.jpg": "echo/nm-09-circle-shadow__nb2.jpg",
+    "echo/nm-10.jpg": "echo/nm-10-empty-circle-keeper__nb2.jpg",
+    "echo/nm-11.jpg": "echo/nm-11-first-cutter__nb2.jpg",
+    "echo/nm-12.jpg": "echo/nm-12-stone-circle__nb2.jpg",
+    "echo/nm-13.jpg": "echo/nm-13-nameless-guide__nb2.jpg",
+    "echo/nm-14.jpg": "echo/nm-14-clean-stone__nb2.jpg",
+    "echo/nm-15.jpg": "echo/nm-15-many-faced__nb2.jpg",
     "icons/power.png": {
       "from": "attributes/attr-power__nb2.png",
       "size": [

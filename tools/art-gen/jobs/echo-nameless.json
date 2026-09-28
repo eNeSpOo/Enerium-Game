@@ -1,0 +1,142 @@
+{
+  "name": "Арена Эхо целиком (ADR-0025, п. 8): неделя Забытых, древний народ Безымянные — фон арены 21:9 и 15 портретов: 14 врагов недели и Многоликий. Рецепт — одобренная неделя эльфов (jobs/echo-ishkantun.json): тот же стиль, запреты, кадр и раскладка арены; своя палитра и свой свет из материала — холодный серебристо-белый свет из свежих срезов камня и пыли срезанных имён, тёплый только торфяной огонь. Имён на камнях не рисуем: вместо имени — гладкий срез. Лица Безымянных — пустые: гладкая каменная маска или лицо без черт. Портреты — по правилам ADR-0012 и ADR-0013: по одному, ракурс словами, без картинки в запросе, враг в действии, по пояс, корпус развёрнут влево; каменная голова, каменный круг и Чистый Камень заполняют кадр, как ik-14",
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and fresh smooth cuts in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, drifting stone dust and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.",
+  "negative": "No text, no letters, no numbers, no glyphs, no runes, no ogham notches, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+  "cutout_rule": "",
+  "categories": {
+    "arenas": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [
+        "art/generated/arenas/arena-workshop-wide__nb2-v2.jpg"
+      ],
+      "frame": "Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the ground like a tabletop RPG battle map: no horizon, no perspective, no side view of stones or buildings, no sky. The attached image is our battle arena of a different place, the Workshop of Forms: take from it ONLY the straight-down camera, the scale, the layout of the zones and the painting style. Do NOT copy its objects, materials or colors: no worktables, no clay figures, no crystals, no sand. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit ground over their whole height: flat flagstones, short moor grass and moss in the seams and fine cracks only — no standing stones, no walls, no fires, no plants, no objects there. Unlike our biome arenas, this arena is a single scene: the fight begins and ends here, the camera never moves on to a next room, so nothing in the picture leads onward — no doorway, no road, no path, no stairway, no passage out of the picture. The moor appears only as a thin dark strip of heather along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there."
+    },
+    "echo": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [],
+      "frame": "Enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the Nameless, an ancient people who gave up their names. Their neighbours believed that a name cut into a standing stone holds a person in the world — so the Nameless went from stone circle to stone circle and cut the names off every stone. Their look is inspired by the ancient Celts and the builders of stone circles — moors, heather, mist, standing stones, cloaks of undyed wool, bronze chisels and wooden mallets — but they are clearly the NAMELESS: nothing on them bears a sign, a pattern or a mark; their faces are blank: they wear masks of pale stone that are completely smooth and featureless, like an egg — no eye holes, no nose, no mouth, no lips — or they have no face at all, only smooth blank skin like a river pebble; the hems of their grey cloaks fray into pale mist, as if they were being forgotten. Quiet and uncanny, never horrifying; they must not look like real-world people, monks or ghosts. The stones around them are plain: where a name was, there is only a smooth fresh cut — never letters, never runes, never notches in rows. Colors: muted and cold, like all our enemies — stone grey, undyed wool grey and brown, moss green, peat black, dull bronze, pale stone dust; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold silver-white light glowing from within fresh smooth cuts in old stone and from the pale dust of cut-off names rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of a peat fire is the only warm light. Background: its own place among the moors and stone circles of the Nameless, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting."
+    }
+  },
+  "jobs": [
+    {
+      "id": "arena-echo-nameless",
+      "category": "arenas",
+      "title": "Арена Эхо: Безымянные, неделя Забытых — 21:9, одна сцена без перехода",
+      "source": "ADR-0025, п. 8; ADR-0024; docs/content/герои/состав-героев.md, «Забытые — Безымянные»; рецепт — jobs/echo-ishkantun.json, раскладка — jobs/arena-02.json",
+      "subject": "Subject: the inside of a great stone circle of the Nameless on a moor at night, seen straight from above — the one place where the whole fight happens. It is night and the ground is dark, as dark as our Workshop arena: flat grey flagstones and short moor grass in deep shadow, and the light comes only from below — from glowing fresh cuts in the stone and heaps of pale dust. Ground: large flat, worn grey flagstones laid in the turf, dark moss and short grass in the seams; fine cracks glow from within with cold silver-white light. In the central half only: along the top edge, two great fallen standing stones lying flat on the ground side by side, seen straight from above — long rounded grey slabs whose upper faces have been freshly cut smooth and clean, the smooth cuts glowing faint silver-white — cut off by the top edge of the picture; along the bottom edge, a great flat round altar stone set into the ground, seen straight from above, only its upper half visible, its face scraped smooth and blank — no signs, no runes, no notches — with silver-white light glowing in the fine cracks around it and a ring of pale stone dust; near the fallen stones and near the altar stone, two small peat fires in rings of stones with warm amber embers and thin curls of smoke; a few bronze chisels, a wooden mallet, stone chips and small heaps of pale dust on the flagstones. Along the very top and bottom edges runs a thin strip of dark heather; no big stones in the corners, the left and right quarters stay clear. Near-black shadows, cold silver-white light; the only warm color is the amber glow of the peat fires. No characters, no animals, no bodies, no cards, no grid."
+    },
+    {
+      "id": "nm-01-faceless-bearer",
+      "category": "echo",
+      "title": "Безликий носильщик — Безымянные, ступень 1, рядовой, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Забытые», ступень 1: «Несёт на спине стоячий камень, с которого срезано имя. Лица у него нет»; правка своего варианта art/generated/echo/nm-01-faceless-bearer__nb2.jpg (в v1 у безликого нарисовано лицо)",
+      "refs": [
+        "art/generated/echo/nm-01-faceless-bearer__nb2.jpg"
+      ],
+      "subject": "EDIT MODE — this overrides everything above: do not draw a new picture, edit the attached image. The attached image is the current portrait of this enemy, the Faceless Bearer of the Nameless: a big man in a grey hood and cloak, raising his fist to the left, carrying a tall standing stone on his back with a glowing smooth cut. Keep the picture exactly as it is — the same figure, hood, cloak, raised fist, arm, straps, the stone on his back and its glowing cut, the flying chips, the stones and the small fire in the background, the light, the colors and the painting style. Change only this: he has no face — the face under his hood becomes a completely smooth, blank oval of pale grey stone, like an egg: no eyes, no eyelids, no brows, no nose, no mouth, no lips, no features at all, only soft light and shadow on the smooth surface."
+    },
+    {
+      "id": "nm-02-blank-shield-shadow",
+      "category": "echo",
+      "title": "Тень с пустым щитом — Безымянные, ступень 2, рядовой, физ ДД ловкости, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Забытые», ступень 2: «Щит без знака, лицо без черт. Её не видно, пока не ударит»",
+      "subject": "The enemy: the Shadow with the Blank Shield, a rank-and-file fighter of the Nameless. A lithe woman of the Nameless wrapped in a dark grey hooded cloak, half of her still dissolved into the shadow of a standing stone; a small round shield of plain dark wood with a bronze rim and nothing on it — no sign at all; her face is a smooth blank oval with no features. Action: she steps out of the shadow and strikes fast to the left with a short leaf-shaped bronze sword; a gust of wind (Air) tears at her cloak; the half of her body still in the shadow is barely visible. Background: the dark side of a tall standing stone on a moor at night, silver light in a fresh cut on the stone."
+    },
+    {
+      "id": "nm-03-cutter",
+      "category": "echo",
+      "title": "Срезатель — Безымянные, ступень 3, рядовой, физ ДД силы, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Забытые», ступень 3: «Резец и молоток. Срезает имя с камня за три удара»",
+      "subject": "The enemy: the Cutter, a rank-and-file fighter of the Nameless. A strong, thick-armed man in a leather apron over grey wool, sleeves rolled up, forearms white with stone dust; his face is hidden behind a smooth blank mask of pale stone tied with a cord. Action: he swings a heavy wooden mallet and strikes a long bronze chisel held out to the left, as if his enemy were a stone with a name to cut off; stone chips and pale glowing dust (Earth) burst from the chisel's point toward the left. Background: a stone circle at night, standing stones behind him with fresh smooth cuts glowing silver-white."
+    },
+    {
+      "id": "nm-04-voiceless-whisperer",
+      "category": "echo",
+      "title": "Шептун без голоса — Безымянные, ступень 4, рядовой, дебаффер, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Забытые», ступень 4: «Шевелит губами, но звука нет. Кто его услышал, тот забывает, куда шёл»",
+      "subject": "The enemy: the Voiceless Whisperer, a rank-and-file debuffer of the Nameless. A thin, old, hunched man in a long grey hooded cloak; a smooth blank half-mask of pale stone covers his eyes and brow, and below it his thin pale lips move in a whisper, but no sound comes out. Action: he leans toward the left and whispers, one long hand cupped by his mouth; the soundless whisper flows to the left as faint rings of green Time light that ripple the air, and the drifting dust in their path stops and turns back. Background: moor mist among standing stones at night, silver light in the fresh cuts of the stones."
+    },
+    {
+      "id": "nm-05-dust-gatherer",
+      "category": "echo",
+      "title": "Собиратель пыли — Безымянные, ступень 5, рядовой, лекарь, Вода",
+      "source": "design/ui/screens/echo.js, ECH.civ «Забытые», ступень 5: «Сметает пыль срезанных имён в мешок и присыпает ею раны своих»",
+      "subject": "The enemy: the Dust Gatherer, a rank-and-file healer of the Nameless. A small, stooped Nameless in a patched grey cloak with the hood up, his face a smooth blank mask of pale stone; a broom of heather twigs on his back and a leather bag full of pale glowing dust at his hip. Action: he scoops a handful of pale dust from the bag and casts it to the left: the dust flows through the air like a stream of water (Water), glittering blue-silver, to settle on the wounds of his own. Background: the foot of a standing stone at night, heaps of pale dust at its base glowing silver-white, heather."
+    },
+    {
+      "id": "nm-06-slab-thrower",
+      "category": "echo",
+      "title": "Метатель плит — Безымянные, ступень 6, рядовой, физ ДД ловкости, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Забытые», ступень 6: «Мечет плоские камни, как диски. На каждом чужое срезанное имя»",
+      "subject": "The enemy: the Slab Thrower, a rank-and-file fighter of the Nameless. A lean, wiry Nameless with long arms, a grey wool cloak tied back, a stack of flat round stone discs on a strap at his side; his face is a smooth blank mask of dark slate. Action: caught mid-throw — his arm whips forward toward the left and a flat round stone disc spins away to the left trailing sparks and fire (Fire); the disc's face is smooth and blank, with a pale glowing scar where a name was cut off; another disc waits in his other hand. Background: a hillside of the moor at night, a stone circle below, silver light in the fresh cuts."
+    },
+    {
+      "id": "nm-07-stone-head",
+      "category": "echo",
+      "title": "Каменная голова — Безымянные, ступень 7, элита, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Забытые», ступень 7: «Голова в человеческий рост, гладкая, как речной камень. Катится и давит»",
+      "subject": "The enemy: the Stone Head, an elite tank of the Nameless. It is not a person: here the rules about waist, head and arms do not apply — instead a huge head of grey stone as tall as a man fills the whole frame, seen from a low camera angle, its top near the top edge and its bottom cut by the bottom edge. It is smooth as a river pebble: only the soft shapes of a brow, a nose and a chin are there, and no eyes, no mouth, no ears — calm, blank and heavy; thin cracks on its surface glow silver-white. It rolls toward the LEFT, tilted in its roll, and the flagstones it crushes burst into chips and dust (Earth) that trail off to the right. No arms, no body. Background: the moor at night, heather, a stone circle in the mist."
+    },
+    {
+      "id": "nm-08-elder-cutter",
+      "category": "echo",
+      "title": "Старший срезатель — Безымянные, ступень 8, элита, физ ДД силы, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Забытые», ступень 8: «Резец длиной с меч. Срезает имя одним ударом»",
+      "subject": "The enemy: the Elder Cutter, an elite fighter of the Nameless. A tall, powerful Nameless with broad shoulders in grey wool and a heavy leather apron, his face a smooth blank mask of dark slate; he wields a bronze chisel as long as a sword with both hands. Action: he cuts with the long chisel in a single sweeping stroke toward the left; its edge glows red-hot and leaves an arc of fire and sparks (Fire) in the air. Background: a tall standing stone behind him with one long fresh smooth cut down its face, glowing silver-white, stone chips on the ground."
+    },
+    {
+      "id": "nm-09-circle-shadow",
+      "category": "echo",
+      "title": "Тень круга — Безымянные, ступень 9, элита, маг ДД, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Забытые», ступень 9: «Живёт в тени стоячего камня. Когда имя срезано, тень уходит вместе с ним»",
+      "subject": "The enemy: the Shadow of the Circle, an elite mage of the Nameless. A figure made of living shadow that rises out of the long shadow of a standing stone: a tall hooded silhouette of translucent darkness, its body grey mist, its face a pale blank oval; below the chest it still flows into the shadow on the ground. Action: it stretches one long shadowy arm toward the left and swings a curved blade of green Time light like a pendulum; the dust in the air ages and falls. Background: a moonlit stone circle at night, the long shadows of the stones on the grass, silver light in the fresh cuts."
+    },
+    {
+      "id": "nm-10-empty-circle-keeper",
+      "category": "echo",
+      "title": "Хранитель пустого круга — Безымянные, ступень 10, элита, лекарь, Вода",
+      "source": "design/ui/screens/echo.js, ECH.civ «Забытые», ступень 10: «Стережёт круг чистых камней. Пыль с них заживляет его раны»",
+      "subject": "The enemy: the Keeper of the Empty Circle, an elite healer of the Nameless. A tall, old keeper in heavy grey wool, his face a smooth blank mask of white stone, a long staff topped with a small smooth stone. Action: he raises the staff, and pale dust lifts off the clean stones behind him and flows around him like water (Water), glittering, closing his wounds; toward the left the dust forms a thin glittering wall in front of him. Background: a circle of clean standing stones without any marks, glowing silver-white at night."
+    },
+    {
+      "id": "nm-11-first-cutter",
+      "category": "echo",
+      "title": "Первый срезатель — Безымянные, ступень 11, босс недели, физ ДД силы, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Забытые», ступень 11: «Срезал самое первое имя. С тех пор не выпускает резец из руки»",
+      "subject": "The enemy: the First Cutter, a boss of the Nameless — ancient, huge and grim. A massive old Nameless, broad as a standing stone, in a cloak of grey wool gone green with lichen; his face is a smooth ancient mask of worn stone with a deep crack across it; his hand has held the bronze chisel for so long that his fingers have grown around its handle, grey as stone — he never lets it go; a heavy stone mallet in his other hand. Action: he raises chisel and mallet high and strikes down toward the left, and the ground splits in a glowing silver crack that runs to the left; stones burst (Earth). Background: the oldest stone circle on the moor at night, a huge stone behind him with the very first smooth cut glowing."
+    },
+    {
+      "id": "nm-12-stone-circle",
+      "category": "echo",
+      "title": "Каменный круг — Безымянные, ступень 12, босс недели, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Забытые», ступень 12: «Девять стоячих камней, ставших одним. Ни на одном нет имени»",
+      "subject": "The enemy: the Stone Circle, a boss of the Nameless — nine standing stones that have become one. It is not a person: like a colossus it fills the frame from a low angle, turned to the left, the bottom edge cuts it at the waist: nine tall grey standing stones have grown together into one hulking giant — two long stones form its arms, others its shoulders, chest and back, and one rounded stone its head, smooth and featureless; moss and lichen on the stones; silver-white light glows in the seams between them; not one stone bears a name or a mark. Action: it swings its stone arms together toward the LEFT to form a wall in front of it; the ground cracks and flagstones burst (Earth). Background: a ring of empty pits where the stones used to stand, on a moor at night, mist."
+    },
+    {
+      "id": "nm-13-nameless-guide",
+      "category": "echo",
+      "title": "Вожатая безымянных — Безымянные, ступень 13, босс недели, маг ДД, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Забытые», ступень 13: «Идёт впереди от круга к кругу. Зовёт своих без слов»",
+      "subject": "The enemy: the Guide of the Nameless, a boss of the Nameless — tall, proud and unsettling. A tall woman in a long grey cloak with a deep hood, her face a smooth blank mask of white stone, long pale hands, a staff of dark wood. Action: she strides forward and raises her open hand toward the left, calling her people without words — a silent wave of pale dust and green Time light rolls from her hand to the left; behind her a long procession of hooded Nameless follows her through the mist, from one stone circle to the next. Background: the moor at night, distant stone circles on the hills."
+    },
+    {
+      "id": "nm-14-clean-stone",
+      "category": "echo",
+      "title": "Чистый Камень — Безымянные, ступень 14, Убер-босс недели, дебаффер, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Забытые», ступень 14: «Стоячий камень выше башни. На нём никогда не было имени, и он хочет, чтобы не было ни одного»",
+      "subject": "The enemy: the Clean Stone, the uber-boss of the week — a standing stone taller than a tower that moves by itself; there has never been a name on it, and it wants there to be none. It is not a person: here the rules about waist, head and arms do not apply — the stone fills the whole frame, seen from a very low camera angle, rising high, its top near the top edge and its base cut by the bottom edge; it leans toward the LEFT as if bending over its enemies. Its surface is perfectly smooth, clean and pale — never carved, never marked, no face, no signs; cold silver-white light seeps from within it. Around its base, smaller standing stones are being wiped clean: their surfaces peel away into glowing silver dust that is drawn into the great stone; green Time light swirls in the dust. No arms, no legs. Background: a stone circle on a moor at night; a small stone hut at its foot shows how tall it is."
+    },
+    {
+      "id": "nm-15-many-faced",
+      "category": "echo",
+      "title": "Многоликий — пятнадцатая ступень недели Забытых, «враг тысячи лиц»",
+      "source": "design/ui/recipes.js, предмет many: «Носит лица тех, кого победили на этой неделе»; Маска недели — «маска, снятая с Многоликого»; §17.4 GDD; рамка — ik-15",
+      "subject": "The enemy: the Many-Faced, the fifteenth and last enemy of the week, the one with a thousand faces: it wears the faces of those who were defeated this week — and the Nameless had none. A tall, thin, long-armed figure in a long hooded cloak of grey wool; the cloak is covered with dozens of small masks sewn on row over row like scales — masks of the Nameless: smooth blank ovals of pale stone, dark slate and white chalk, all without features; a few are cracked. Under its hood there is no face of its own, only shadow; over the shadow it wears a smooth blank mask of white stone. Its long hands are grey as stone. Action: it glides forward toward the left and with one long hand lifts the blank mask aside — and underneath there is already another blank mask, exactly the same. Thin green light (Time) glows in the fine cracks of all the masks, and the hem of its cloak frays into pale mist. The masks are stone and chalk, never skin. Background: the dark stone circle at night, broken masks scattered among cut stones, silver light rising from the fresh cuts. Uncanny and unsettling, but not grotesque."
+    }
+  ]
+}

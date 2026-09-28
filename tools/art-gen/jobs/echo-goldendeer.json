@@ -1,0 +1,139 @@
+{
+  "name": "Арена Эхо целиком (ADR-0025, п. 8): неделя зверей, древняя цивилизация Орда Златого Оленя — фон арены 21:9 и 15 портретов: 14 врагов недели и Многоликий. Образец — одобренная неделя эльфов, jobs/echo-ishkantun.json: стиль, запреты, раскладка арены, кадр и манера описания взяты оттуда; свет снизу — свой, из материала цивилизации: тёплое золото из трещин степной земли, холодная луна по краю. Портреты — по правилам ADR-0012 и ADR-0013: по одному, ракурс словами, без картинки в запросе, враг в действии, голова, грудь и передние лапы (птицы и грифоны — с раскрытыми крыльями), корпус развёрнут влево. Имена и облик врагов — ECH.civ в design/ui/screens/echo.js",
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks in the dry steppe earth and old gold that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, grass seeds and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.",
+  "negative": "No text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque. No riders, no people leading or riding the beasts, no hunting scenes, no wounds.",
+  "cutout_rule": "",
+  "categories": {
+    "arenas": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [
+        "art/generated/arenas/arena-workshop-wide__nb2-v2.jpg"
+      ],
+      "frame": "Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the ground like a tabletop RPG battle map: no horizon, no perspective, no side view of buildings, no sky. The attached image is our battle arena of a different place, the Workshop of Forms: take from it ONLY the straight-down camera, the scale, the layout of the zones and the painting style. Do NOT copy its objects, materials or colors: no worktables, no clay figures, no crystals, no sand. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit ground over their whole height: trampled steppe earth, short dry grass and fine cracks only — no steps, no walls, no statues, no bowls, no plants, no objects there. Unlike our biome arenas, this arena is a single scene: the fight begins and ends here, the camera never moves on to a next room, so nothing in the picture leads onward — no doorway, no road, no stairway, no passage out of the picture. The tall steppe grass appears only as a thin dark strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there."
+    },
+    "echo": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [],
+      "frame": "Enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. The enemies of this set are beasts. Camera at chest height, close: the beast's head, chest and forelegs are in frame; the bottom edge of the picture cuts the body at the chest and forelegs, the rest of the body is cut off by the edge of the picture or hidden behind — never a full-body side view; a bird or a griffin — head, chest and spread wings. The beast is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its antlers, tusks, jaws, claws or the thing it is named after are thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a hunting trophy, not a statue. Its story reads from its body, its pose and the place around it. World: these are the Horde of the Golden Stag, an ancient steppe realm of intelligent beasts — great deer, wolves, boars, saigas, golden eagles, elks, snow leopards and griffins, who thought and spoke like people and crossed the steppe in great migrations. They wore gold: antlers and tusks sheathed and ringed in gold, gold plaques on the chest with stags and griffins, twisted gold neck rings, felt cloths with bold appliqué patterns, tassels of red wool, little gold bells. Their land is the endless night steppe with feather grass, great grassy mounds (kurgans) and tall standing stones. Their look is inspired by the animal style of the ancient steppe nomads, but they are clearly BEASTS: real animal bodies on four legs, animal heads, no human hands, no clothing except their gold and felt, never animal-headed people; what shows their mind is their eyes — intelligent, attentive and proud. Colors: muted and earthy, like all our enemies — dull old gold, burnt ochre, dark brown and grey fur, faded red wool, felt beige; everything else sinks into near-black shadow. Light, the same for the whole set: night on the steppe; the light comes from below — warm gold light glowing from within cracks in the dry earth and from the gold on their bodies rises onto the figure; crisp cold pale-blue moonlight rim light on the edges of the fur; the moonlight is the only cold light. Background: its own place in the steppe of the Horde, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting."
+    }
+  },
+  "jobs": [
+    {
+      "id": "arena-echo-goldendeer",
+      "category": "arenas",
+      "title": "Арена Эхо: Орда Златого Оленя, неделя зверей — 21:9, одна сцена без перехода",
+      "source": "ADR-0025, п. 8; ADR-0024; docs/content/герои/состав-героев.md, «Звери — Орда Златого Оленя»; раскладка — jobs/arena-02.json и образец jobs/echo-ishkantun.json",
+      "subject": "Subject: the flat top of the great royal kurgan in the steppe of the Horde of the Golden Stag at night, seen from exactly above like a map — the one place where the whole fight happens; nothing stands up toward the camera, everything lies flat on the ground. It is night and the ground is dark, as dark as our Workshop arena: dry earth and short dark grass in deep shadow, and the light comes only from below — from glowing cracks in the earth and from the gold. Ground: hard, dry, trampled steppe earth, cracked like old clay, patches of short dark grass and a few flat stones, many hoof prints and paw prints pressed into it; thin cracks glow from within with warm gold light. In the central half only: along the top edge, the stone rim of the kurgan — a curved row of big flat grey stones laid into the earth, seen from exactly above as flat shapes, with strips of red wool and small gold plaques lying on them, cut off by the top edge of the picture; along the bottom edge, a huge round gold plaque lying flat on the earth, seen from exactly above, only its upper half visible: beaten gold in the steppe animal style — a great stag lying with its legs tucked under it and its long branching antlers swept back along its back, big simple shapes, no small signs — with warm gold light glowing in its grooves; near the stones and near the plaque, two small ritual fires in rings of stones with warm embers and thin curls of smoke; a few shed antler tines tipped with gold, gold rings, small gold bells, tufts of grey fur and eagle feathers on the earth. Along the very top and bottom edges runs a thin strip of dark feather grass seen from above; no big plants in the corners, the left and right quarters stay clear. The painting fills the whole picture from edge to edge: no black bars, no dark vignette frame. Near-black shadows, warm gold light from the cracks and the gold; the only cold color is the pale moonlight on the edges of the stones. No living characters, no living animals, no bodies, no cards, no grid."
+    },
+    {
+      "id": "gd-01-plaque-wolf",
+      "category": "echo",
+      "title": "Волк с бляхой — Орда Златого Оленя, ступень 1, рядовой, физ ДД ловкости, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Звери», ступень 1: «Серый волк с золотой бляхой на груди, на бляхе — олень. Кусает и отходит»",
+      "subject": "The enemy: the Plaque Wolf, a rank-and-file hunter of the Horde. A lean grey steppe wolf with intelligent amber eyes; a gold plaque hangs on a leather cord on its chest, and on the plaque a curled stag in simple raised relief. Action: it has just snapped at an enemy to the left and is already springing back — jaws open in a snarl, fangs bared, forelegs braced, ears flat; a gust of wind (Air) ruffles its fur and swirls dust and dry grass. Background: the night steppe, tall feather grass silvered by the moon, a dark kurgan on the horizon; warm gold light glowing in the cracks of the dry earth."
+    },
+    {
+      "id": "gd-02-boar-guard",
+      "category": "echo",
+      "title": "Кабан-страж — Орда Златого Оленя, ступень 2, рядовой, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Звери», ступень 2: «Клыки в золотых кольцах, на загривке войлочная попона. Стоит, где поставили»",
+      "subject": "The enemy: the Boar Guard, a rank-and-file tank of the Horde. A massive, bristly dark boar with small, stubborn, intelligent eyes, its tusks ringed with gold rings, a thick felt cloth on its hump with a bold appliqué pattern in red and ochre. Action: it braces its forelegs into the earth, head lowered and tusks toward the LEFT, and takes a charge head-on — it stands where it was put and does not give a step; clods of earth and dust (Earth) burst up around its forelegs. Background: the night steppe by a dark kurgan, a standing stone behind it; warm gold light in the cracks of the dry earth."
+    },
+    {
+      "id": "gd-03-saiga-driver",
+      "category": "echo",
+      "title": "Сайгак-загонщик — Орда Златого Оленя, ступень 3, рядовой, физ ДД силы, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Звери», ступень 3: «Горбоносый, витые рога в золоте. Гонит перед собой, пока не собьёт»",
+      "subject": "The enemy: the Saiga Driver, a rank-and-file fighter of the Horde. A saiga antelope with its strange big hooked nose, pale sandy fur and sharp determined eyes, its ridged lyre-shaped horns sheathed in gold. Action: it charges toward the left at full gallop, head lowered, horns forward, driving its enemy before it until it falls; clods of earth and dust (Earth) fly from its front hooves. Behind it, the dark shapes of the running herd. Background: the night steppe, dust clouds in the moonlight; warm gold light in the cracks of the earth."
+    },
+    {
+      "id": "gd-04-marking-eagle",
+      "category": "echo",
+      "title": "Беркут-метчик — Орда Златого Оленя, ступень 4, рядовой, дебаффер, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Звери», ступень 4: «Кружит над перегоном. На кого упала его тень, того стадо не отпустит»",
+      "subject": "The enemy: the Marking Eagle, a rank-and-file debuffer of the Horde. A huge golden eagle with dark brown plumage and a golden nape, fierce intelligent eyes, a narrow gold band with a tiny griffin plaque around its neck. Its head, chest and spread wings fill the frame. Action: it circles above the migration and swoops down toward the left, wings spread wide, talons forward; its dark shadow falls on the ground far below to the left — whoever the shadow touches, the herd will not let go; wisps of wind (Air) curl from its wingtips. Background: the night sky over the steppe, the herd below as dark shapes, the moon; warm gold light glowing in the cracks of the earth far below."
+    },
+    {
+      "id": "gd-05-elk-healer",
+      "category": "echo",
+      "title": "Лосиха-знахарка — Орда Златого Оленя, ступень 5, рядовой, лекарь, Вода",
+      "source": "design/ui/screens/echo.js, ECH.civ «Звери», ступень 5: «Рога обмотаны красной шерстью, на шее бубенцы. Зализывает раны стаду на ходу»",
+      "subject": "The enemy: the Elk Healer, a rank-and-file healer of the Horde. A big old female moose with a long gentle face, a heavy drooping muzzle, a dewlap under the chin and wise dark eyes; unlike other cows she has small flat antlers, and they are wrapped in red wool; little gold bells hang on a cord around her neck. Action: walking with the herd, she lowers her head toward the left and breathes out a soft stream of cool blue water mist (Water) that flows to the left and licks the wounds of the herd closed; the bells on her neck swing. Background: the night steppe with a shallow stream, the herd moving in the darkness behind her; warm gold light in the cracks of the earth."
+    },
+    {
+      "id": "gd-06-snow-leopard",
+      "category": "echo",
+      "title": "Ирбис-лазутчик — Орда Златого Оленя, ступень 6, рядовой, физ ДД ловкости, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Звери», ступень 6: «Пятнистый, с золотой серьгой в ухе. Заходит со спины»",
+      "subject": "The enemy: the Snow Leopard Scout, a rank-and-file hunter of the Horde. A snow leopard with thick pale grey fur with dark rosettes, cold pale green intelligent eyes and a gold ring earring in one ear. Action: it springs out from behind a rock toward the left — it comes at you from behind — forepaws stretched out with claws bared, jaws open; a gust of wind (Air) flattens the grass. Background: rocky outcrops at the edge of the night steppe, moonlight; warm gold light in the cracks of the rocks."
+    },
+    {
+      "id": "gd-07-wolf-leader",
+      "category": "echo",
+      "title": "Волчий вожак — Орда Златого Оленя, ступень 7, элита, физ ДД силы, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Звери», ступень 7: «Золотая гривна на шее, шрам через морду. Ведёт стаю туда, где слабее»",
+      "subject": "The enemy: the Wolf Pack Leader, an elite fighter of the Horde. A huge dark grey wolf, heavier than any other, with a thick ruff, a scar across its muzzle, fierce amber eyes and a heavy twisted gold neck ring. Action: it charges toward the left, snarling, leading the pack to where the enemy is weakest; embers and sparks (Fire) fly from its fur and its breath glows hot. Behind it in the darkness, the eyes of its pack glow and their dark silhouettes follow. Background: the night steppe, dark kurgans under the moon; warm gold light in the cracks of the earth."
+    },
+    {
+      "id": "gd-08-golden-boar",
+      "category": "echo",
+      "title": "Кабан в золоте — Орда Златого Оленя, ступень 8, элита, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Звери», ступень 8: «Бивни целиком в золоте, по бокам бляхи с грифонами. Его не сдвинуть даже перегону»",
+      "subject": "The enemy: the Golden Boar, an elite tank of the Horde. An enormous old boar as big as an ox, with heavy tusks entirely sheathed in gold, gold plaques with griffins on the felt armor on its flanks and shoulders, a crest of stiff bristles and small, wise, furious eyes. Action: it stands like a rock in the middle of a stampede — dark shapes of the herd stream past it on both sides — and it lowers its golden tusks toward the left and braces; the earth cracks (Earth) under its forelegs, dust rising. Background: the night steppe in dust clouds; warm gold light in the cracks."
+    },
+    {
+      "id": "gd-09-steppe-griffin",
+      "category": "echo",
+      "title": "Грифон степи — Орда Златого Оленя, ступень 9, элита, маг ДД, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Звери», ступень 9: «Орлиная голова, львиное тело, крылья в золотой чешуе. Бьёт с неба ветром»",
+      "subject": "The enemy: the Steppe Griffin, an elite mage of the Horde. A griffin with the head of an eagle crowned with a curled gold crest, the body of a lion, great wings covered in gold scales, fierce intelligent eyes. Its head, chest, forelegs and spread wings fill the frame. Action: it hangs in the air and beats its golden wings toward the left, and a blast of wind (Air) full of dust and torn grass strikes from the sky to the left. Background: the night sky over the steppe, kurgans below; warm gold light glowing in the cracks of the earth far below and on its gold scales."
+    },
+    {
+      "id": "gd-10-singing-stag",
+      "category": "echo",
+      "title": "Олень-певчий — Орда Златого Оленя, ступень 10, элита, лекарь, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Звери», ступень 10: «Рога в золотых листах, на рогах колокольцы перегона. Позовёт — и стадо встаёт»",
+      "subject": "The enemy: the Singing Stag, an elite healer of the Horde. A graceful red deer stag with huge branching antlers covered in thin gold leaf, small gold bells hanging from the tines, a proud gentle face with intelligent eyes. Action: it lifts its head and calls — mouth open in a long call, the bells ringing — and rings of green light of Time (Time) spread from its antlers toward the left, and in the darkness to the left the fallen of the herd rise again. Background: the night steppe, the herd in the darkness, a big moon; warm gold light in the cracks of the earth."
+    },
+    {
+      "id": "gd-11-chief-stag",
+      "category": "echo",
+      "title": "Олень-вождь в золоте — Орда Златого Оленя, ступень 11, босс недели, физ ДД силы, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Звери», ступень 11: «Рога в золоте до самых кончиков, на груди бляха размером со щит. Водит свою сотню»",
+      "subject": "The enemy: the Golden Chief Stag, a boss of the Horde — menacing, heavy and powerful, filling the frame. A massive stag, far bigger than a horse, with enormous antlers sheathed in gold to the very tips, a gold plaque as big as a shield on its chest with a curled stag in simple relief, a thick dark mane on its neck, scars on its face, fierce, proud, intelligent eyes. Action: it charges toward the left, head lowered, gold antlers forward, leading its hundred — behind it in the darkness, a hundred antlered silhouettes follow; the earth cracks and stones and dust (Earth) burst up under its front hooves. Background: the night steppe, dust clouds under the moon; warm gold light in the cracks of the earth."
+    },
+    {
+      "id": "gd-12-kurgan-griffin",
+      "category": "echo",
+      "title": "Грифон царского кургана — Орда Златого Оленя, ступень 12, босс недели, маг ДД, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Звери», ступень 12: «Самый большой из грифонов. Свил гнездо на царском кургане и считает курган своим»",
+      "subject": "The enemy: the Griffin of the Royal Kurgan, a boss of the Horde — the biggest of the griffins, huge and possessive. An eagle's head crowned with a curled gold crest, a lion's body, great wings of gold scales tipped with fiery red, gold talons. Action: it rears up on its nest on top of the royal kurgan, wings spread wide, and screams toward the left, and a torrent of fire (Fire) pours from its beak toward the left; one foreleg grips the rim of its nest — a nest woven of branches and gold: plaques, neck rings and bells. Background: the top of the great kurgan at night, the steppe far below, the moon; warm gold light from the gold in the nest and from the cracks of the mound."
+    },
+    {
+      "id": "gd-13-migration-keeper",
+      "category": "echo",
+      "title": "Хранительница перегона — Орда Златого Оленя, ступень 13, босс недели, дебаффер, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Звери», ступень 13: «Старая олениха в войлочной попоне, вся в бубенцах. Её звон сбивает шаг чужакам»",
+      "subject": "The enemy: the Keeper of the Migration, a boss of the Horde — ancient and eerie. A very old hind, a female deer without antlers, grey-muzzled, with deep wise eyes, draped in a heavy felt cloth with bold appliqué patterns of stags and griffins in red and ochre, and covered all over with hundreds of small gold bells — on the cloth, on cords around her neck, on her ears. Action: she shakes her head and the bells ring — rings of green light of Time (Time) spread from the bells toward the left, bending the air, and the enemy's steps falter. Background: the night steppe with the herd moving slowly behind her, a trail of dust in the moonlight; warm gold light in the cracks of the earth."
+    },
+    {
+      "id": "gd-14-golden-stag",
+      "category": "echo",
+      "title": "Златой Олень — Орда Златого Оленя, ступень 14, Убер-босс недели, физ ДД силы, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Звери», ступень 14: «Олень из чистого золота, рога ветвятся до неба. Где он проходит, степь ложится под копыта»",
+      "subject": "The enemy: the Golden Stag, the uber-boss of the week — a colossal stag of pure gold. It is not an ordinary beast: its whole body is solid living gold, polished and glowing warm from within, shaped in big simple planes like the steppe animal style; its antlers branch up and up in curls and tines until the top edge of the picture cuts them — they reach to the sky. Seen from a low camera angle, its head, chest and forelegs fill the frame; it towers over everything. Action: it rears and strikes down toward the left with its golden front hooves; where it passes, the steppe lies down under its hooves — the grass flattens in waves, the earth cracks and bursts into fire and embers (Fire). Its eyes burn like two small suns. Behind it, the herd of the great migration pours after it in a flood of dark shapes and dust. Background: the night steppe under a huge sky; the gold of its body lights everything from below."
+    },
+    {
+      "id": "gd-15-many-faced",
+      "category": "echo",
+      "title": "Многоликий — пятнадцатая ступень недели зверей, «враг тысячи лиц»",
+      "source": "design/ui/recipes.js, предмет many: «Носит лица всех, кого одолели на этой неделе»; §17.4 GDD; docs/content/эхо-враги.md, неделя зверей, ступень 15: физ. ДД силы · Огонь",
+      "subject": "The enemy: the Many-Faced, the fifteenth and last enemy of the week, the one with a thousand faces: it wears the faces of those who were defeated this week. It is not one of them — it only wears their faces. A tall, thin, long-armed figure in a long hooded cloak; the cloak is covered with dozens of small masks sewn on row over row like scales — faces of the Horde: beast faces of beaten gold in the steppe animal style — stags with curled antlers, snarling wolves, boars with gold tusks, griffins, eagles, snow leopards and saigas. Under its hood there is no face of its own, only shadow; over the shadow it wears a gold stag mask with small branching antlers. Action: it glides forward toward the left and with one long hand lifts the stag mask aside — and underneath there is already another face, a snarling gold wolf mask. Thin orange light of Fire glows in the empty eye holes of all the masks. The Many-Faced is not a beast: it stands upright like a tall thin shadow of a man and is framed waist-up — head, shoulders, arms and the cloak of masks in frame, no legs. The masks are beaten gold, bronze and carved wood, never skin. Background: the dark top of a kurgan at night, broken masks scattered on the cracked earth, warm gold light rising from the cracks. Uncanny and unsettling, but not grotesque."
+    }
+  ]
+}

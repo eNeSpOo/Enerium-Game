@@ -1,0 +1,139 @@
+{
+  "name": "Арена Эхо целиком (ADR-0025, п. 8): неделя дворфов, древняя цивилизация Хатун-Руми — фон арены 21:9 и 15 портретов: 14 врагов недели и Многоликий. Образец — одобренная неделя эльфов, jobs/echo-ishkantun.json: стиль, запреты, раскладка арены, кадр и манера описания взяты оттуда; свет снизу — свой, из материала цивилизации: холодный серебристо-белый свет кварцевых жил в граните. Портреты — по правилам ADR-0012 и ADR-0013: по одному, ракурс словами, без картинки в запросе, враг в действии, по пояс, корпус развёрнут влево. Имена и облик врагов — ECH.civ в design/ui/screens/echo.js",
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and veins of white quartz in old granite that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, frost glitter and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.",
+  "negative": "No text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque. No inscriptions and no letter-like patterns on walls, cloth or cords.",
+  "cutout_rule": "",
+  "categories": {
+    "arenas": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [
+        "art/generated/arenas/arena-workshop-wide__nb2-v2.jpg"
+      ],
+      "frame": "Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the ground like a tabletop RPG battle map: no horizon, no perspective, no side view of buildings, no sky. The attached image is our battle arena of a different place, the Workshop of Forms: take from it ONLY the straight-down camera, the scale, the layout of the zones and the painting style. Do NOT copy its objects, materials or colors: no worktables, no clay figures, no crystals, no sand. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit ground over their whole height: fitted granite stones, frost in the seams and fine cracks only — no steps, no walls, no statues, no bowls, no plants, no objects there. Unlike our biome arenas, this arena is a single scene: the fight begins and ends here, the camera never moves on to a next room, so nothing in the picture leads onward — no doorway, no road, no stairway, no passage out of the picture. The mountain rock appears only as a thin dark strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there."
+    },
+    "echo": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [],
+      "frame": "Enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. Dwarves are short, but the camera is just as close: the bottom edge of the picture cuts the dwarf at the belt — no legs, no boots, no feet in the picture. World: these are the people of Hatun-Rumi, an ancient mountain civilization of dwarves: terraces cut into steep mountainsides, walls of huge many-sided stones fitted together without mortar so tightly that no blade fits between them, roads carved along the cliffs, swaying rope bridges of braided grass over deep gorges; instead of writing they kept long cords with knots; their lords carried the roads down into the valleys and bound every valley to their terraces. Their look is inspired by the ancient Andes, but they are clearly DWARVES, not humans and not real-world people: short, very stocky and broad, heavy-boned, with big hands, large noses, deep-set eyes and long thick beards braided and bound with knotted colored cords. They wear tunics and cloaks of thick dyed wool with bold stepped zigzag bands and stripes, knitted caps with ear flaps, gold ear plugs, feathers of the mountain condor; they fight with slings of braided wool, stone hammers, bronze axes and maces with star-shaped heads. Colors: muted and earthy, like all our enemies — cold grey granite, dark slate, muted brick-red and ochre wool, dull old gold, a little faded dark green; everything else sinks into near-black shadow. Light, the same for the whole set: night high in the mountains; the light comes from below — cold silvery-white light, like moonlight on snow, glowing from within cracks and veins of white quartz in the old granite rises onto the figure; crisp cold silver rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Hatun-Rumi, darker and softer than the figure, with depth: terraces, fitted stone walls, cliffs, gorges and snowy peaks. All fifteen portraits of this set share the same framing, painting style, palette and lighting."
+    }
+  },
+  "jobs": [
+    {
+      "id": "arena-echo-hatunrumi",
+      "category": "arenas",
+      "title": "Арена Эхо: Хатун-Руми, неделя дворфов — 21:9, одна сцена без перехода",
+      "source": "ADR-0025, п. 8; ADR-0024; docs/content/герои/состав-героев.md, «Дворфы — Хатун-Руми»; раскладка — jobs/arena-02.json и образец jobs/echo-ishkantun.json",
+      "subject": "Subject: the high plaza of Hatun-Rumi at night, a wide terrace cut into a mountainside, seen straight from above — the one place where the whole fight happens. It is night and the plaza is dark, as dark as our Workshop arena: the stones are dark grey granite in deep shadow, and the light comes only from below — from glowing quartz veins and cracks and from the braziers. Ground: large many-sided granite stones fitted together without mortar in a tight irregular pattern, their edges softly rounded, so tight that no blade fits between them; frost and a few tufts of dry mountain grass in the seams; thin veins of white quartz and fine cracks glow from within with cold silvery-white light. In the central half only: along the top edge, the top of a massive terrace wall of fitted many-sided stones, rising in two tiers, seen straight from above and cut off by the top edge of the picture; along the bottom edge, a great knot-record laid out flat on the stones, seen straight from above, only its upper half visible: a thick main cord bent into a wide circle, and from it hundreds of thinner cords of dyed wool — muted red, ochre, white, black and dark green — spread outward like rays, each tied with a few simple knots; near the wall and near the cords, two wide stone braziers with warm amber embers and thin curls of pale smoke; a few round sling stones, a dropped wool sling and a gold ear plug on the stones. Along the very top and bottom edges runs a thin strip of dark mountain rock and frost; no big rocks in the corners, the left and right quarters stay clear. Near-black shadows, cold silvery-white light; the only warm color is the amber glow of the braziers. No characters, no animals, no bodies, no cards, no grid."
+    },
+    {
+      "id": "hr-01-terrace-slinger",
+      "category": "echo",
+      "title": "Пращник уступов — Хатун-Руми, ступень 1, рядовой, физ ДД ловкости, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Дворфы», ступень 1: «Праща из крашеной шерсти, мешок камней на поясе. Бьёт с уступа выше тебя»",
+      "subject": "The enemy: the Terrace Slinger, a rank-and-file skirmisher of Hatun-Rumi. A young, stocky dwarf with a short braided red-brown beard tied with colored cords, a knitted wool cap with ear flaps, a brick-red wool tunic with a zigzag band, a leather pouch of round stones at his belt. Action: he leans out over the edge of a high terrace, above his enemies, and whirls a sling of braided dyed wool; he is caught at the moment of release, his arm whipping forward and down toward the left, a round stone flying from the sling to the left with a streak of wind (Air) behind it; he looks down to the left — he strikes from above. Background: stone terraces on a steep mountainside at night, a dark valley far below; silver-white light glowing in the quartz veins of the terrace stones."
+    },
+    {
+      "id": "hr-02-stone-shield",
+      "category": "echo",
+      "title": "Щитоносец с каменным щитом — Хатун-Руми, ступень 2, рядовой, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Дворфы», ступень 2: «Щит — плита, подогнанная без зазора, как их стены»",
+      "subject": "The enemy: the Stone-Shield Bearer, a rank-and-file tank of Hatun-Rumi. A very broad, heavy dwarf with a thick black beard in two braids, a helmet of woven cane bound with bronze, a quilted wool tunic. Action: a heavy blow has just landed — he leans hard into a massive shield braced in front of him toward the LEFT, his shoulder against its back, teeth clenched, not moving an inch; the shield is a slab made of several many-sided grey stones fitted together without a gap, like their walls, bound in a wooden frame; stone dust and chips (Earth) burst off its face. His other hand grips a short club with a star-shaped bronze head. The shield is on the left side of the picture, between him and his enemies. Background: a wall of the same fitted many-sided stones behind him at night, silver-white light in the quartz veins."
+    },
+    {
+      "id": "hr-03-bridge-runner",
+      "category": "echo",
+      "title": "Бегун верёвочных мостов — Хатун-Руми, ступень 3, рядовой, физ ДД ловкости, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Дворфы», ступень 3: «Босой, лёгкий, нож у пояса. Мост под ним не качается»",
+      "subject": "The enemy: the Rope-Bridge Runner, a rank-and-file skirmisher of Hatun-Rumi. A young dwarf — the lightest of his people, yet still short, very broad and heavy-boned — with a big head, a thick neck, a large nose and a thick braided beard tied with colored cords that reaches down his chest; bare, thick arms; a sleeveless ochre wool tunic with a zigzag band; his hair tied back with a colored cord. The camera is close, at chest height: we see him from the belt up, the thick rope handrail of the bridge runs across the bottom of the picture in front of his belt, and his legs are hidden below it. Action: he runs straight at his enemy along a rope bridge of braided grass, and the bridge under him does not sway; he leans forward to the left, one hand sliding along the rope handrail, the other drawing a short bronze knife with a half-moon blade toward the left, his eyes on the target to the left. The wind (Air) tugs at his tunic, his beard and the ropes. Background: a deep gorge at night far below, the rope handrails of the bridge running back behind him to a cliff with fitted stone walls; silver-white light glowing in the quartz veins of the cliff."
+    },
+    {
+      "id": "hr-04-valley-mason",
+      "category": "echo",
+      "title": "Каменщик долины — Хатун-Руми, ступень 4, рядовой, физ ДД силы, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Дворфы», ступень 4: «Тяжёлый каменный молот. Вписывает долину в уступ, а тебя — в стену»",
+      "subject": "The enemy: the Valley Mason, a rank-and-file warrior of Hatun-Rumi. A massive, hunched, heavily muscled dwarf with a grey-streaked beard braided and tucked into his belt, a leather apron over a dyed wool tunic, forearms like tree trunks white with stone dust. Action: he swings a heavy stone hammer — a round river stone lashed to a thick wooden handle — high over his shoulder and brings it down toward the left, to set his enemy into the wall; stone chips and dust (Earth) burst from the stones he strikes. Background: a half-built terrace wall of huge many-sided stones fitted without mortar, a valley in darkness below; silver-white light in the quartz veins of the stones."
+    },
+    {
+      "id": "hr-05-debt-knotter",
+      "category": "echo",
+      "title": "Вязальщик долга — Хатун-Руми, ступень 5, рядовой, дебаффер, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Дворфы», ступень 5: «Шнур с узлами через плечо. Каждый узел — чей-то долг, твой он вяжет сейчас»",
+      "subject": "The enemy: the Debt Knotter, a rank-and-file debuffer of Hatun-Rumi. A small, old, sly dwarf with a long thin white beard braided with dozens of tiny knotted cords, sharp narrow eyes, a dark wool cloak; a long cord with many knots hangs over his shoulder and down his chest. Action: he holds a length of colored cord out toward the left in his gnarled fingers and pulls a new knot tight — every knot is someone's debt, and this one is yours: a thin thread of green light of Time (Time) runs from the knot to the left, binding his enemy; faint green motes of Time swirl around it; his lips move, counting. Background: a narrow stone lane between fitted walls at night, knotted cords hanging from pegs in the wall; silver-white light in the cracks."
+    },
+    {
+      "id": "hr-06-terrace-herbalist",
+      "category": "echo",
+      "title": "Травник уступов — Хатун-Руми, ступень 6, рядовой, лекарь, Вода",
+      "source": "design/ui/screens/echo.js, ECH.civ «Дворфы», ступень 6: «Тыква с тёплым настоем и мешочек листьев. Поднимает упавших на узкой тропе»",
+      "subject": "The enemy: the Terrace Herbalist, a rank-and-file healer of Hatun-Rumi. A round-bellied old dwarf with a kind, weathered face and a white braided beard tied with green cords, a wool cap with ear flaps, bunches of dried herbs hanging from his shoulder bag and a pouch of leaves at his belt. Action: seen waist-up, he pours a warm infusion from a dried gourd toward the left, and the steam and the infusion flow to the left like a stream of shimmering water (Water), reaching the fallen on the narrow path and lifting them. Background: a narrow mountain path along a cliff at night, small terraced fields, a tiny warm fire in a stone niche; silver-white light in the quartz veins of the path."
+    },
+    {
+      "id": "hr-07-wall-builder",
+      "category": "echo",
+      "title": "Строитель стены — Хатун-Руми, ступень 7, элита, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Дворфы», ступень 7: «Кладёт камень к камню так, что не пройдёт лезвие. Сам сложен так же»",
+      "subject": "The enemy: the Wall Builder, an elite tank of Hatun-Rumi. A colossal, block-shaped dwarf, almost as wide as he is tall, and built just like their walls: his shoulders, arms and chest are armored with plates of many-sided grey stone fitted so tightly that no blade fits between them; a thick grey beard in heavy braids. Action: he heaves a huge many-sided stone block and slams it into place in front of him to the left — a wall is rising between him and his enemies, stone to stone; dust and chips (Earth) burst from the joints. Background: massive terrace walls of fitted stones at night; silver-white light in the quartz veins."
+    },
+    {
+      "id": "hr-08-elder-slinger",
+      "category": "echo",
+      "title": "Старший пращник — Хатун-Руми, ступень 8, элита, физ ДД ловкости, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Дворфы», ступень 8: «Праща в его рост. Камень с верхнего уступа долетает до реки»",
+      "subject": "The enemy: the Elder Slinger, an elite skirmisher of Hatun-Rumi. A grizzled, broad dwarf with a long iron-grey beard in many braids, a crest of condor feathers on his wool cap, a cloak of dark wool with a bold stepped zigzag border. Action: he whirls a very long sling — as long as he is tall — in a wide circle, and a stone glowing red-hot with fire (Fire) flies from it far to the left, trailing sparks and smoke; his eyes follow it far down. Background: the highest terrace at night, a vast drop behind him with a river glinting far below in the valley; silver-white light in the quartz veins of the terrace edge."
+    },
+    {
+      "id": "hr-09-cord-priest",
+      "category": "echo",
+      "title": "Жрец узлового шнура — Хатун-Руми, ступень 9, элита, маг ДД, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Дворфы», ступень 9: «Держит связку шнуров длиной в долину. Затянет узел — и перехватывает дыхание»",
+      "subject": "The enemy: the Priest of the Knotted Cord, an elite mage of Hatun-Rumi. A gaunt old dwarf priest with a very long white beard braided into a single thick rope, a headdress of condor feathers, a gold ear plug in each ear, a long dark wool robe with bands of stepped zigzags. Action: he holds a great bundle of cords so long that they trail away behind him into the darkness of the valley, and with both hands he pulls one knot tight, jerking it toward himself — and a loop of green light of Time (Time) tightens in the air to the left, catching the breath of his enemy. Green motes of Time drift along the cords. Background: a temple of fitted stones at night with trapezoid niches in the walls; silver-white light in the quartz veins."
+    },
+    {
+      "id": "hr-10-bridge-warden",
+      "category": "echo",
+      "title": "Сторож моста — Хатун-Руми, ступень 10, элита, физ ДД силы, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Дворфы», ступень 10: «Бронзовый топор для верёвок. Кого не пустит, тот пойдёт по мосту, которого уже нет»",
+      "subject": "The enemy: the Bridge Warden, an elite warrior of Hatun-Rumi. A grim, heavily built dwarf with a black beard in two thick braids tied with red cords, a crested bronze helmet, a padded wool coat. Action: seen waist-up at the stone anchor of a rope bridge, he swings a heavy bronze axe with a broad half-moon blade down toward the left, cutting the thick braided ropes of the bridge; the cut ropes snap and whip away into the gorge on the left, and splinters and stone dust (Earth) spray from the anchor. Background: a deep gorge at night, the stone anchor posts of the bridge, fitted stone walls; silver-white light in the quartz veins."
+    },
+    {
+      "id": "hr-11-tribute-counter",
+      "category": "echo",
+      "title": "Счётчик податей — Хатун-Руми, ступень 11, босс недели, дебаффер, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Дворфы», ступень 11: «Весь в шнурах: на каждом — долина, на каждом узле — дом. Помнит, сколько ты должен»",
+      "subject": "The enemy: the Tribute Counter, a boss of Hatun-Rumi — imposing and cold. A fat, heavy old dwarf with small cold eyes and a long silver beard braided with knotted cords, wrapped all over in thousands of knotted cords of many dyed colors — they hang from his shoulders, arms and belt like a heavy cloak: every cord a valley, every knot a house; gold ear plugs. Action: he lifts one cord toward the left, runs his thick fingers along its knots and pulls one tight — and green threads of Time (Time) stretch from all his cords toward the left like a closing net; he remembers exactly how much you owe. Background: a storehouse of fitted stone at night, rows of knotted cords hanging in the dark; silver-white light glowing in the quartz veins of the walls."
+    },
+    {
+      "id": "hr-12-road-down-lord",
+      "category": "echo",
+      "title": "Владыка дороги вниз — Хатун-Руми, ступень 12, босс недели, физ ДД силы, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Дворфы», ступень 12: «Провёл дорогу по обрыву в долины. Идёт по ней первым, в плаще из перьев горного орла»",
+      "subject": "The enemy: the Lord of the Road Down, a boss of Hatun-Rumi — menacing, heavy and powerful, filling the frame. A huge, broad dwarf warlord with a great black-and-grey beard in braids bound with gold rings, a cloak of dark mountain-eagle feathers spreading from his shoulders like wings, a bronze helmet crowned with condor feathers, a heavy bronze mace with a star-shaped head in his fist. Action: seen waist-up, he leads the way down a steep road carved along a cliff, swinging the star-headed mace forward toward the left; rocks break loose and crash down (Earth) around him, dust rising. Behind him, dark ranks of dwarves follow him down the road. Background: the road cut along the cliff face at night, a vast valley below in darkness; silver-white light in the quartz veins of the cliff."
+    },
+    {
+      "id": "hr-13-sun-lord-knots",
+      "category": "echo",
+      "title": "Солнечный владыка узлов — Хатун-Руми, ступень 13, босс недели, маг ДД, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Дворфы», ступень 13: «Золотые серьги до плеч, пояс из шнуров. В руке — главный шнур, на нём все долины»",
+      "subject": "The enemy: the Sun Lord of Knots, a boss of Hatun-Rumi — imposing and proud. A stately old dwarf ruler with a magnificent white beard braided with gold threads, great gold earrings hanging down to his shoulders, a headband with a plain gold sun disc with simple rays and no face on it, a belt made of knotted cords, a fine wool tunic with stepped zigzag bands. Action: he holds up the main cord — a thick golden cord from which hang countless knotted cords, all the valleys — and fire (Fire) runs along it: the cords burn, and he casts a wave of flame toward the left from the burning cord. Background: a temple of fitted stones at night with walls sheathed in gold plates; silver-white light in the quartz veins, warm firelight on the gold."
+    },
+    {
+      "id": "hr-14-knot-of-valleys",
+      "category": "echo",
+      "title": "Узел Всех Долин — Хатун-Руми, ступень 14, Убер-босс недели, дебаффер, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Дворфы», ступень 14: «Узел из тысячи шнуров размером с дом. Его несут двадцать носильщиков, и он тянет к себе всё, что рядом»",
+      "subject": "The enemy: the Knot of All Valleys, the uber-boss of the week — a colossal knot of a thousand cords, as big as a house. It is not a person: here the rules about waist, head and arms do not apply — instead the knot fills the whole frame, seen from a low camera angle, its top near the top edge. It rests on thick wooden poles carried on the shoulders of a row of stocky dwarf porters, bent under the weight along the bottom edge of the picture — only their heads, shoulders and the poles are visible. The knot itself is a huge tangled mass of thick cords of dyed wool — muted red, ochre, white, black and dark green — wound and knotted over and over, thousands of knots, loose cord ends hanging down; green light of Time (Time) glows from deep inside it, through the gaps between the cords. Action: it pulls everything nearby toward itself: loose cords shoot out from it to the left like grasping tendrils, and dust, pebbles and torn cloth are dragged through the air into it from the left. No face, no eyes, no mouth on the knot. Background: the dark terraces of Hatun-Rumi at night; silver-white light in the quartz veins of the walls."
+    },
+    {
+      "id": "hr-15-many-faced",
+      "category": "echo",
+      "title": "Многоликий — пятнадцатая ступень недели дворфов, «враг тысячи лиц»",
+      "source": "design/ui/recipes.js, предмет many: «Носит лица всех, кого одолели на этой неделе»; §17.4 GDD; docs/content/эхо-враги.md, неделя дворфов, ступень 15: дебаффер · Время",
+      "subject": "The enemy: the Many-Faced, the fifteenth and last enemy of the week, the one with a thousand faces: it wears the faces of those who were defeated this week. It is not one of them — it only wears their faces. A tall, thin, long-armed figure in a long hooded cloak; the cloak is covered with dozens of small masks sewn on row over row like scales — faces of Hatun-Rumi: bearded dwarf faces of grey stone with braided stone beards, gold faces with long gold earrings, dark wooden faces crowned with condor feathers, masks hung with knotted cords. Under its hood there is no face of its own, only shadow; over the shadow it wears a gold mask of a bearded dwarf face. Action: it glides forward toward the left and with one long hand lifts the gold mask aside — and underneath there is already another face, a stern grey stone dwarf face with a braided stone beard. Thin green light (Time) glows in the empty eye holes of all the masks. Knotted cords of dyed wool hang from the hem of its cloak. The masks are gold, stone and carved wood, never skin. Background: the dark stone plaza of Hatun-Rumi at night, broken masks scattered on the fitted stones, silver-white light rising from the quartz veins. Uncanny and unsettling, but not grotesque."
+    }
+  ]
+}

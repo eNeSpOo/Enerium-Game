@@ -1,0 +1,139 @@
+{
+  "name": "Арена Эхо целиком (ADR-0025, п. 8): неделя людей, древняя цивилизация Ан-Кешар — фон арены 21:9 и 15 портретов: 14 врагов недели и Многоликий. Образец — одобренная неделя эльфов, jobs/echo-ishkantun.json: стиль, запреты, раскладка арены, кадр и манера описания взяты оттуда; свет снизу — свой, из материала цивилизации: холодный синий лазурит с золотыми искрами, как звёзды. Портреты — по правилам ADR-0012 и ADR-0013: по одному, ракурс словами, без картинки в запросе, враг в действии, по пояс (крылатый лев — голова, грудь и передние лапы), корпус развёрнут влево. Имена и облик врагов — ECH.civ в design/ui/screens/echo.js",
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and lapis-lazuli inlays in old brick and stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and tiny sparks like stars float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.",
+  "negative": "No text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque. No cuneiform, no wedge-shaped marks, no inscriptions on tablets, banners, walls or clothing.",
+  "cutout_rule": "",
+  "categories": {
+    "arenas": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [
+        "art/generated/arenas/arena-workshop-wide__nb2-v2.jpg"
+      ],
+      "frame": "Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the ground like a tabletop RPG battle map: no horizon, no perspective, no side view of buildings, no sky. The attached image is our battle arena of a different place, the Workshop of Forms: take from it ONLY the straight-down camera, the scale, the layout of the zones and the painting style. Do NOT copy its objects, materials or colors: no worktables, no clay figures, no crystals, no sand. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit ground over their whole height: brick paving, dust in the seams and fine cracks only — no steps, no walls, no statues, no bowls, no plants, no objects there. Unlike our biome arenas, this arena is a single scene: the fight begins and ends here, the camera never moves on to a next room, so nothing in the picture leads onward — no doorway, no road, no stairway, no passage out of the picture. The river reeds appear only as a thin dark strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there."
+    },
+    "echo": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [],
+      "frame": "Enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. A beast is framed the same way: its head, chest and forelegs in frame, the rest of its body cut off by the edge of the picture. World: these are the people of An-Keshar, an ancient civilization of star-gazers who lived along great slow rivers: stepped towers of fired brick faced with glazed blue bricks and gold, bronze ranks of spearmen, light chariots drawn by wild asses, banners with winged lions; they gave every night its own name, read the sky and marched when the sky said it was time. Their look is inspired by ancient Mesopotamia, but they are a people of this world, not real-world people. They are clearly HUMANS: ordinary human proportions and faces, round human ears, never pointed; the men wear long black beards curled into rows of tight ringlets, the women long braided hair; dark kohl-lined eyes, warm olive-brown skin. They wear long wool robes and fringed shawls, conical bronze helmets, bronze scale armor, collars of lapis-lazuli beads and small gold star rosettes. Colors: muted and earthy, like all our enemies — deep lapis-lazuli blue, burnt-brick red-brown, dark bronze, bone-white wool, dull old gold; everything else sinks into near-black shadow. Light, the same for the whole set: night under a sky full of stars; the light comes from below — cold deep-blue light glowing from within cracks and lapis-lazuli inlays in old brick and stone rises onto the figure, with tiny gold specks glittering in it like stars; crisp cold blue rim light on its edges; a small warm amber glow of oil lamps and bronze braziers is the only warm light. Background: its own place in An-Keshar, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting."
+    }
+  },
+  "jobs": [
+    {
+      "id": "arena-echo-ankeshar",
+      "category": "arenas",
+      "title": "Арена Эхо: Ан-Кешар, неделя людей — 21:9, одна сцена без перехода",
+      "source": "ADR-0025, п. 8; ADR-0024; docs/content/герои/состав-героев.md, «Люди — Ан-Кешар»; раскладка — jobs/arena-02.json и образец jobs/echo-ishkantun.json",
+      "subject": "Subject: the great terrace at the foot of a star-gazers' stepped tower in An-Keshar at night, seen straight from above — the one place where the whole fight happens. It is night and the terrace is dark, as dark as our Workshop arena: the paving is dark fired brick in deep shadow, and the light comes only from below — from glowing cracks and lapis inlays and from the braziers. Ground: large square bricks of dark burnt clay laid in straight rows, worn and cracked, dust and river sand in the seams, here and there a small inlaid tile of blue lapis lazuli; thin cracks glow from within with cold deep-blue light, with tiny gold specks glittering in it like stars. In the central half only: along the top edge, the lowest tiers of a dark stepped tower of fired brick, seen straight from above — straight parallel step edges, the faces of the tiers set with bands of dark blue glazed bricks and a few small gold eight-pointed star rosettes, cut off by the top edge of the picture; along the bottom edge, a great round basin of still black water set into the terrace and rimmed with blue glazed bricks, seen straight from above, only its upper half visible — the water mirrors a scatter of small bright star points, the sky the star-gazers read; only two small bronze braziers, one on each side of the foot of the tower, with warm amber embers and thin curls of pale smoke — their warm glow is small and stays close to them; a few broken bronze spearheads and scattered lapis beads on the bricks. Along the very top and bottom edges runs a thin strip of dark river reeds, very low; no reeds or plants in the corners, the left and right quarters stay clear. The whole terrace is bathed in cold deep-blue night light, so the old bricks look dark blue-grey, not warm brown. Near-black shadows, cold deep-blue light; the only warm color is the small amber glow of the two braziers. No characters, no animals, no bodies, no cards, no grid."
+    },
+    {
+      "id": "ak-01-bronze-spearman",
+      "category": "echo",
+      "title": "Бронзовый копейщик — Ан-Кешар, ступень 1, рядовой, физ ДД силы, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Люди», ступень 1: «Бронзовый шлем, копьё в два роста. Идёт в ряду и из ряда не выходит»",
+      "subject": "The enemy: the Bronze Spearman, a rank-and-file warrior of An-Keshar. A broad-shouldered man with a black beard curled in tight ringlets, a conical bronze helmet with a short nose guard, a leather cape sewn with small bronze discs over a wool tunic. Action: he marches in a tight rank and thrusts a very long spear — twice his height — forward to the left with both hands, the leaf-shaped bronze spearhead close in front; his face is grim and fixed, he never steps out of the rank: beside and behind him, the dark silhouettes of the same bronze helmets and a forest of spears go on into the darkness. Dust and grit (Earth) rise around him. Background: a broad road of fired brick before a dark stepped tower at night, deep-blue light glowing in the cracks between the bricks, stars above."
+    },
+    {
+      "id": "ak-02-rank-shield",
+      "category": "echo",
+      "title": "Щитоносец ряда — Ан-Кешар, ступень 2, рядовой, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Люди», ступень 2: «Щит из тростника, обтянутый кожей, со звездой из бронзы. Держит строй за двоих»",
+      "subject": "The enemy: the Rank Shield-bearer, a rank-and-file tank of An-Keshar. A heavy, thick-necked man as wide as two, with a black ringleted beard, a scar across his cheek, a round bronze helmet and a padded leather coat. Action: a heavy blow has just landed — he leans hard into a tall shield braced in front of him toward the LEFT, his shoulder pressed against its back, teeth clenched, holding the line for two; the shield is woven reed covered with hide, with a bronze eight-pointed star in its center; dust and stone chips (Earth) burst off its face. In his other hand, low, a short curved bronze sword. The shield is on the left side of the picture, between him and his enemies. Background: the rank behind him — more shields and spears in the darkness; a brick wall with a band of blue glazed bricks, deep-blue light in its cracks."
+    },
+    {
+      "id": "ak-03-priest-in-blue",
+      "category": "echo",
+      "title": "Жрец в синем — Ан-Кешар, ступень 3, рядовой, маг ДД, Вода",
+      "source": "design/ui/screens/echo.js, ECH.civ «Люди», ступень 3: «Синяя накидка в звёздах. Считает вслух и бьёт тем, что насчитал»",
+      "subject": "The enemy: the Priest in Blue, a rank-and-file mage of An-Keshar. A thin man with a shaved head, a long narrow black beard curled in ringlets and kohl-lined eyes, a deep-blue mantle scattered with small gold stars wrapped over one shoulder, a string of lapis counting beads in one hand. Action: he counts aloud, his mouth open mid-word; around him hang small drops of cold water, each shining like a star — he has counted them all — and with a sweep of his other arm he hurls them to the left as a spinning stream of icy water (Water). Background: a dark temple courtyard with a pool of still water that mirrors the stars, deep-blue light glowing in the cracks of the paving."
+    },
+    {
+      "id": "ak-04-chariot-driver",
+      "category": "echo",
+      "title": "Возница колесницы — Ан-Кешар, ступень 4, рядовой, физ ДД ловкости, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Люди», ступень 4: «Лёгкая колесница, два онагра в упряжке. Проносится вдоль строя и не останавливается»",
+      "subject": "The enemy: the Chariot Driver, a rank-and-file skirmisher of An-Keshar. A young, lean man with a short curled beard, his hair bound with a cloth band, a quiver of javelins at his side. Action: he races past in a light two-wheeled chariot and never stops, leaning forward over its front rail — the rail and the wicker side of the chariot cut him at the waist; the chariot charges toward the left, pulled by two wild asses whose heads and manes reach the left edge of the picture; the reins are wrapped around one fist, and his other hand raises a javelin to throw to the left. Wind (Air) whips his hair, the manes and the dust behind him. Background: a blur of the brick road and the dark rank he passes, deep-blue light in the cracks of the road, stars above."
+    },
+    {
+      "id": "ak-05-tablet-scribe",
+      "category": "echo",
+      "title": "Писец таблиц — Ан-Кешар, ступень 5, рядовой, лекарь, Вода",
+      "source": "design/ui/screens/echo.js, ECH.civ «Люди», ступень 5: «Глиняные таблички и тростниковое перо. Записывает раны своих — и стирает их»",
+      "subject": "The enemy: the Tablet Scribe, a rank-and-file healer of An-Keshar. A plump, balding middle-aged man with a short curled beard, a bone-white wool robe with a fringed shawl, a reed pen tucked behind his ear, a leather satchel of clay tablets at his side. Action: he holds a soft wet clay tablet out toward the left and wipes its face smooth with his thumb — as the marks vanish from the clay, the wounds of his comrades close: ripples of cool blue water (Water) spread from the tablet toward the left. The tablet in his hand is blank and freshly smoothed, with no marks on it at all. Background: a scribes' room of fired brick at night, shelves of stacked clay tablets seen only edge-on, a small oil lamp with a warm amber flame, deep-blue light from the cracks in the floor."
+    },
+    {
+      "id": "ak-06-night-counter",
+      "category": "echo",
+      "title": "Счётчик ночей — Ан-Кешар, ступень 6, рядовой, дебаффер, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Люди», ступень 6: «Табличка с именами ночей на груди. Вычеркнет твою — и силы уходят»",
+      "subject": "The enemy: the Counter of Nights, a rank-and-file debuffer of An-Keshar. A gaunt old man with deep-set eyes and a long grey ringleted beard, in a dark blue robe; on his chest hangs a clay tablet on a cord, covered only with rows of small star-shaped dots — one star for each named night — no writing. Action: he lifts a sharp reed stylus and strikes one star off the tablet with a hard stroke, and at that moment a thin thread of green light of Time (Time) is torn from the left toward him, draining the strength of his enemy; he stares to the left, cold and satisfied. Background: the flat roof of a stepped tower at night under a sky full of stars, deep-blue light rising from the cracks of the brick roof."
+    },
+    {
+      "id": "ak-07-lion-standard",
+      "category": "echo",
+      "title": "Знаменосец льва — Ан-Кешар, ступень 7, элита, танк, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Люди», ступень 7: «Знамя с крылатым львом. Пока оно поднято, ряд не ломается»",
+      "subject": "The enemy: the Lion Standard-bearer, an elite tank of An-Keshar. A towering, heavily built man with a thick ringleted black beard, a high conical bronze helmet, bronze scale armor and a cloak of dark blue wool. Action: with one fist he holds high a tall standard — a bronze pole topped with a winged lion of beaten gold, and below it a long banner of dark blue cloth with a golden winged lion on it, streaming to the left; with his other arm he thrusts a round bronze shield forward toward the left, bracing against the enemy — while the banner is raised, the rank does not break. Sparks and embers (Fire) blow off the edges of the banner like off a torch. Background: the rank standing firm behind him, spears in the darkness, a stepped tower with deep-blue light in its cracks."
+    },
+    {
+      "id": "ak-08-scythed-charioteer",
+      "category": "echo",
+      "title": "Колесничий с серпами — Ан-Кешар, ступень 8, элита, физ ДД силы, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Люди», ступень 8: «Тяжёлая колесница, на осях бронзовые серпы. За ней остаётся просека»",
+      "subject": "The enemy: the Scythed Charioteer, an elite warrior of An-Keshar. A huge man with a thick ringleted beard, a crested bronze helmet and bronze scale armor, standing in a heavy war chariot faced with bronze plates. Action: the chariot thunders toward the left; he stands in its box — its high front cuts him at the waist — the reins wound around one fist, a heavy bronze axe raised high in the other; at the bottom of the picture a long curved bronze scythe blade juts out from the hub of the heavy wheel, spinning; the team that pulls the chariot is beyond the left edge of the picture, only the taut reins lead out of the frame to the left. A gale of wind (Air) and cut reeds fly in its wake; behind it, a cleared path through tall reeds. Background: a field of tall reeds cut flat behind the chariot, the night sky full of stars, deep-blue light in the cracks of the ground."
+    },
+    {
+      "id": "ak-09-upper-step-priestess",
+      "category": "echo",
+      "title": "Жрица верхней ступени — Ан-Кешар, ступень 9, элита, лекарь, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Люди», ступень 9: «Спускается с башни только ночью. Под её звёздами раны затягиваются»",
+      "subject": "The enemy: the Priestess of the Upper Step, an elite healer of An-Keshar. A tall, stately woman with long black braided hair under a gold diadem of small star rosettes, kohl-lined eyes, a long deep-blue robe with a fringed shawl and a collar of lapis beads. Action: she comes down from the tower only at night — seen waist-up on its upper steps, she raises one hand high: above her palm hangs a small cluster of bright stars, and their soft green light of Time (Time) falls in streams toward the left like a gentle rain, and under it wounds close; her other hand is held out to the left, open. Her face is calm and severe. Background: the upper steps of the stepped tower behind her and the night sky full of stars; deep-blue light glowing in the cracks of the steps."
+    },
+    {
+      "id": "ak-10-star-seer",
+      "category": "echo",
+      "title": "Звездочёт-прорицатель — Ан-Кешар, ступень 10, элита, маг ДД, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Люди», ступень 10: «Прочёл в небе, куда ты встанешь, и бьёт туда заранее»",
+      "subject": "The enemy: the Star-reading Seer, an elite mage of An-Keshar. An old man with a sharp hooked nose, a bald head with long white hair falling behind his ears and a long white beard curled in tight ringlets, one eye pale and milky from years of staring at the stars; no hat — only a thin gold band with small star rosettes around his head; a dark blue wool robe with a fringed shawl and a collar of lapis beads. He carries no staff. Action: he does not look at his enemies — he looks up at the sky, where he has already read where you will stand: with one hand he holds a small bronze sighting ring up to his milky eye, and with the other arm he points to the left, and there, on the ground at the left edge, a ring of green light of Time (Time) already burns where his blow will fall. Background: the flat roof of the tower at night under a sky full of stars; deep-blue light in the cracks of the roof."
+    },
+    {
+      "id": "ak-11-winged-lion",
+      "category": "echo",
+      "title": "Крылатый лев знамён — Ан-Кешар, ступень 11, босс недели, физ ДД силы, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Люди», ступень 11: «Лев с орлиными крыльями сошёл со знамени. Грива из бронзы, глаза из синего камня»",
+      "subject": "The enemy: the Winged Lion of the Banners, a boss of An-Keshar — menacing, heavy and powerful, filling the frame. It is a beast, not a person: a huge lion with the wings of an eagle that has stepped down from a banner — its mane is made of curled bronze ringlets, like the beards of the people of An-Keshar, its eyes are polished blue lapis-lazuli stones glowing with cold blue light, its hide is dark gold. Its head, chest and forelegs fill the frame, the rest of its body is cut off by the right edge; its great eagle wings are spread wide behind it, cut by the edges of the picture. Action: it lunges forward to the left with a roar, one huge forepaw with bronze claws raised to strike; hot embers and sparks (Fire) stream from its bronze mane and its wing feathers. Background: an empty blue banner hanging torn on its pole behind it — the lion is gone from the cloth; the stepped tower at night, deep-blue light in the cracks of the plaza."
+    },
+    {
+      "id": "ak-12-high-priest-blue",
+      "category": "echo",
+      "title": "Верховный жрец в синем — Ан-Кешар, ступень 12, босс недели, маг ДД, Вода",
+      "source": "design/ui/screens/echo.js, ECH.civ «Люди», ступень 12: «Его накидка темнее ночи, которую он назвал. Звёзды на ней горят по-настоящему»",
+      "subject": "The enemy: the High Priest in Blue, a boss of An-Keshar — imposing and dangerous. A tall, gaunt old man with a long black-and-silver ringleted beard and fierce kohl-lined eyes, a tall cylindrical crown of dark blue felt with gold bands; his vast mantle is darker than the night he named, and the stars on it truly burn — real tiny stars glow and twinkle in the dark cloth. Action: he spreads his arms and the mantle wide; from his raised hand a great wave of cold dark water (Water), full of reflected stars, rises and rolls toward the left. Background: the top of the stepped tower at night under a starry sky; deep-blue light glowing in the cracks of the brick below."
+    },
+    {
+      "id": "ak-13-star-king",
+      "category": "echo",
+      "title": "Царь-звездочёт — Ан-Кешар, ступень 13, босс недели, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Люди», ступень 13: «Корона из обожжённой глины и золота, посох с семью звёздами. Повёл ряды, когда небо сказало»",
+      "subject": "The enemy: the Star-gazer King, a boss of An-Keshar — imposing, heavy and unshakable. A massive, broad old king with a magnificent long beard of tight black-and-grey ringlets, a heavy crown of red fired clay banded with gold, kohl-lined eyes; a heavy gold-fringed cloak over bronze scale armor. Action: he holds before him a tall staff crowned with seven gold stars and raises his other hand toward the left in a commanding gesture — the order to march, because the sky has spoken; the seven stars on the staff blaze; the ground cracks and heavy chunks of brick and stone dust (Earth) rise around him. Behind him in the darkness, rows of bronze helmets and spears wait for his word. Background: the great stairway of the tallest tower at night, stars above; deep-blue light in the cracks."
+    },
+    {
+      "id": "ak-14-named-night",
+      "category": "echo",
+      "title": "Названная Ночь — Ан-Кешар, ступень 14, Убер-босс недели, маг ДД, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Люди», ступень 14: «Ночь, которой звёзды дали имя, в облике великана. Созвездия лежат на ней, как доспех»",
+      "subject": "The enemy: the Named Night, the uber-boss of the week — the night to which the stars gave a name, in the shape of a giantess. She is colossal: seen from a low camera angle, from the waist up she rises high above the stepped towers of An-Keshar, which stand tiny at the bottom of the picture; her head is near the top edge. Her body is made of the dark night sky itself — deep blue-black, with faint star-dust drifting inside; constellations lie on her like armor: bright gold-white stars joined by thin lines of light form her shoulder plates, her breastplate and a crown of stars. Her face is calm, vast and ancient, with two bright stars for eyes. Action: she leans toward the left and reaches out one enormous hand; from her fingertip a single star falls toward the left, trailing green light of Time (Time); green motes of Time swirl around her. Background: the night sky over An-Keshar, the tops of the towers far below with thin lines of deep-blue light."
+    },
+    {
+      "id": "ak-15-many-faced",
+      "category": "echo",
+      "title": "Многоликий — пятнадцатая ступень недели людей, «враг тысячи лиц»",
+      "source": "design/ui/recipes.js, предмет many: «Носит лица всех, кого одолели на этой неделе»; §17.4 GDD; docs/content/эхо-враги.md, неделя людей, ступень 15: маг. ДД · Время",
+      "subject": "The enemy: the Many-Faced, the fifteenth and last enemy of the week, the one with a thousand faces: it wears the faces of those who were defeated this week. It is not one of them — it only wears their faces. A tall, thin, long-armed figure in a long hooded cloak; the cloak is covered with dozens of small masks sewn on row over row like scales — faces of An-Keshar: bearded bronze faces with beards curled in ringlets, faces of baked clay with blue lapis-lazuli eyes, snarling golden lion faces, stern faces under conical bronze helmets, calm faces crowned with gold stars. Under its hood there is no face of its own, only shadow; over the shadow it wears a bearded bronze mask with blue lapis-lazuli eyes. Action: it glides forward toward the left and with one long hand lifts the bronze mask aside — and underneath there is already another face, a snarling golden lion mask. Thin green light (Time) glows in the empty eye holes of all the masks. The masks are bronze, gold, baked clay and stone, never skin. Background: the dark brick terrace of An-Keshar at night under the stars, broken masks scattered on the cracked bricks, deep-blue light rising from the cracks. Uncanny and unsettling, but not grotesque."
+    }
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "name": "Биом 3 «Библиотека Улариона» (Уларион · мастерская · земля · Рубидиум): фон арены 21:9 и 14 портретов врагов — шесть рядовых, шесть элит, Смотритель и Провидец. Облик — docs/content/враги-биомов.md, раздел 3. Портреты — по правилам ADR-0012 и ADR-0013 и образцу jobs/echo-ishkantun.json: по одному, ракурс словами, без картинки в запросе, враг в действии, по пояс, корпус развёрнут влево; звери — голова, грудь и передние лапы. Свет — янтарный карст Улариона, фиолетового нет, капюшонов нет. Руны на плитах и цилиндрах — только фактура тонких линий: текст в арте — брак. Арена — раскладка jobs/arena-02.json, но с дорогой дальше: после этажа камера едет вправо. С элиты «Точильщик» (e2) в рамке портрета — «один проход» и мягче правило ног: на Подгонщике (e1) модель ушла в цикл самоисправления, 16 картинок в одном ответе, ,10 по счётчикам; противоречие «ног не видно никогда» и «у зверя передние лапы» она сама называла причиной перерисовки",
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — the sand of hourglasses, cracks in the stone floor and fine grooves in old stone that glow from within — throw warm amber light upward, the light comes from below. Warm and cold light contrast. Dust motes and fine stone grit float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.",
+  "negative": "No text, no letters, no numbers, no glyphs, no runes that look like letters, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. Tablets, cylinders, cords and walls carry no writing and no signs: only fine worn grooves and texture. No gore, no blood, no skulls, no horror grotesque. No purple, no violet, no magenta light.",
+  "cutout_rule": "",
+  "categories": {
+    "arenas": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [
+        "art/generated/arenas/arena-workshop-wide__nb2-v2.jpg"
+      ],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective walls, no side view of bookcases, no ceiling, no sky. The attached image is our battle arena of a different place, the Workshop of Forms: take from it ONLY the straight-down camera, the scale, the layout of the zones, its darkness and the painting style. Do NOT copy its objects, materials or colors: no wooden worktables, no clay works, no sand, no white-green crystals, no green light — here all the light is warm amber. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit floor over their whole height: stone slabs, dust and fine glowing cracks only — no shelves, no tables, no tablets, no objects there. The zones are invisible: no lines, no seams, no panels and no change of color or texture where the quarters meet the central half — the floor is one continuous surface. This arena is one stretch of a long way down: after each fight the camera moves on to the right into the next stretch of the same hall, so the floor continues beyond the left and right edges of the picture — no side walls, nothing closes the sides. Bookcases appear only as a thin strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there."
+    },
+    "enemies": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary, so the enemy must read as one bold, simple, well-lit silhouette against a darker background. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame; keep the hips and legs out of the frame. A beast or a machine is framed like a bust too: its head, chest and front legs fill the frame, and the bottom edge cuts it behind the shoulders. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. No one in this set wears a hood. World: the Library of Ularion, the workshop of the god of knowledge deep under the city of Endalor — a real ancient library cut in dark stone. Its halls go down and down; on long stone shelves lie stone tablets and stone cylinders covered with fine engraved grooves — the writing that only Ularion can read; it shows only as a worn texture of fine lines, never as letters or signs. On the worktables, parts of dwarves and parts of mechanisms lie mixed together: the god made the people and the machine with the same hands. At every work place stands an hourglass of bronze and glass with glowing amber sand. Its servants are dwarf-puppets: short, stocky and broad like dwarves, with blocky carved stone beards, made of grey stone and dull bronze and moved by bronze ball joints at the neck, shoulders, elbows and wrists; their hands know the work, but their blank eyes of dull stone do not understand what is written. They are made things, not living people. Stone beetles live in the shelves; the stone sagans are rock that has noticed itself. Colors: muted, like all our enemies — dark grey basalt, dull bronze and old brass, soot black, dusty ochre; everything else sinks into near-black shadow. Light, the same for the whole set: the light comes from below — warm amber light glowing from the sand of the hourglasses, from cracks in the stone floor and from the grooves of the tablets rises onto the figure and lights it from underneath; crisp cool grey-blue rim light on its edges is the only cold light. Background: its own place in the Library, darker and softer than the figure, with depth. All fourteen portraits of this set share the same framing, painting style, palette and lighting."
+    }
+  },
+  "jobs": [
+    {
+      "id": "arena-b3-library",
+      "category": "arenas",
+      "title": "Арена биома 3 «Библиотека Улариона» — 21:9, дорога дальше вправо",
+      "source": "docs/content/враги-биомов.md, раздел 3, абзац места; раскладка — jobs/arena-02.json; шестерня в полу — «Первая шестерня», дроп Смотрителя",
+      "subject": "Subject: an aisle of the Library of Ularion, the stone library of the god of knowledge, seen straight from above. It is dark, as dark as the attached arena: the floor lies in deep shadow and the light comes only from below — from amber-glowing cracks in the floor, from the amber sand of hourglasses and from a great bronze gear set into the floor. Floor: large, precisely fitted slabs of dark grey basalt, worn smooth, fine dust and a few chips of stone on them; thin cracks glow from within with warm amber light. Along the very top and bottom edges, the tops of long stone bookcases, seen straight from above, form a thin strip no more than 7% of the height, stacked with plain stone tablets and stone cylinders lying on their sides; the bookcases run on through the left and right edges of the picture. In the central half only: near the top edge, one long, heavy stone worktable seen straight from above, and on it, mixed together, parts of stone dwarf-puppets and of mechanisms — a stone hand with bronze ball joints, a bronze elbow hinge, a stone forearm, a few small bronze gears, bronze tools, a small oil can — and one bronze hourglass whose amber sand glows. Near the bottom edge, a great bronze gear wheel set flat into the floor, seen straight from above, only its upper half visible above the bottom edge, amber light glowing between its teeth and spokes; beside it, a short stack of plain stone tablets and a second glowing hourglass. The tablets and cylinders are plain: smooth faces with only fine worn grooves, no letters, no signs. Dark grey stone, dull bronze and warm amber light; the only cold notes are the grey-blue shadows. No characters, no bodies, no cards, no grid."
+    },
+    {
+      "id": "b3-o1-unbending-puppet",
+      "category": "enemies",
+      "title": "Негнущаяся кукла — Библиотека Улариона, рядовой 1, физ ДД силы, дворфы, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 3, рядовые, № 1: «Каменный дворф без шарниров в локтях и коленях; ходит прямо и бьёт всем телом»; способность «Каменный осколок»",
+      "subject": "The enemy: the Unbending Puppet, a rank-and-file brawler of the Library — a dwarf-puppet of grey stone that was made without joints at the elbows: each arm is one straight, rigid piece of stone from the bronze ball joint at the shoulder down to the heavy square fist. Short and broad, a blocky carved stone beard, blank eyes of dull stone, a flat, stubborn face. Action: it cannot bend, so it strikes with its whole body — it swings its rigid torso and both straight stone arms together like one battering ram, fists first, toward the left; stone chips and dust burst from its fists and shoulders (Earth). Background: a narrow aisle between tall stone shelves stacked with plain stone tablets and cylinders, an hourglass with glowing amber sand on a shelf, amber light glowing in the cracks of the floor below."
+    },
+    {
+      "id": "b3-o2-loose-puppet",
+      "category": "enemies",
+      "title": "Разболтанная кукла — Библиотека Улариона, рядовой 2, физ ДД ловкости, дворфы, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 3, рядовые, № 2: «Бронзовые шарниры разболтаны; руки раскладываются, как складной аршин»; способность «Длинная рука» — достаёт самого раненого; правка своего варианта art/generated/enemies/b3-o2-loose-puppet__nb2.jpg (в v1 — три руки: две висят, складная растёт из груди; длинная правка v2 вернула картинку без изменений, v3 — короткая правка с указанием места)",
+      "refs": [
+        "art/generated/enemies/b3-o2-loose-puppet__nb2.jpg"
+      ],
+      "subject": "EDIT MODE — this overrides everything above: do not draw a new picture, edit the attached image and change only one thing. The stone puppet in the attached image has one arm too many. In the lower left part of its body there is a stone arm hanging straight down, with an open stone hand at the height of its hips, below and to the right of the hourglass — erase this whole hanging arm, from the bronze ball at its shoulder down to its fingers, and paint the dark floor and the edge of the worktable in its place. Keep the folding arm that zigzags far out to the left, keep the arm that hangs down on the right side of the picture, and keep everything else exactly as it is."
+    },
+    {
+      "id": "b3-o3-whispering-rubble",
+      "category": "enemies",
+      "title": "Шепчущий щебень — Библиотека Улариона, рядовой 3, маг ДД, саганы, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 3, рядовые, № 3: «Рой каменной крошки, заметивший себя; шепчет, осыпаясь и собираясь снова»; способность «Щебень» — крошка по всему отряду",
+      "subject": "The enemy: the Whispering Rubble, a rank-and-file mage of the Library — a stone sagan: a swarm of grey stone grit and small sharp chips that has noticed itself and holds together in the rough shape of a stooped dwarf — head, shoulders and two arms of hovering, swirling crumbs, with warm amber light glowing in the gaps between the stones. Its face is only a hollow in the swarm with a darker mouth-like gap, from which grit keeps pouring out and gathering again, as if it whispers. Action: it flings one arm toward the left, and the arm breaks into a stream of sharp stone crumbs that rains to the left over its enemies (Earth); its body crumbles and re-forms as it moves. Background: a collapsed stone shelf and a heap of broken plain tablets, dust hanging in the amber light from the cracks of the floor below."
+    },
+    {
+      "id": "b3-o4-stone-beetle",
+      "category": "enemies",
+      "title": "Каменный жук — Библиотека Улариона, рядовой 4, танк, звери, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 3, рядовые, № 4: «Жук размером с сундук; панцирь в рунных царапинах, по швам светится янтарь»; способность «Напор»",
+      "subject": "The enemy: the Stone Beetle, a rank-and-file tank of the Library — a beetle as big as a traveling chest that lives in the stone shelves. It is a beast: its head, the front of its domed shell and its front legs fill the frame, seen from a low angle close to the floor; its head points to the left side of the picture. Its shell is grey stone, scratched all over with fine, worn, meaningless scratches, and warm amber light glows from the seams between its shell plates. Action: it braces itself toward the LEFT, head low, the front edge of its shell raised like a shield, short mandibles open wide; it scrapes the floor with its thick stone front legs, and stone grit and dust jump around it (Earth) — it will not let anyone past. Background: the bottom shelf of a huge stone bookcase where it lives, rows of plain stone cylinders and tablets, amber light glowing in the cracks of the floor below."
+    },
+    {
+      "id": "b3-o5-leaking-puppet",
+      "category": "enemies",
+      "title": "Протекающая кукла — Библиотека Улариона, рядовой 5, лекарь, дворфы, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 3, рядовые, № 5: «Из каждого шарнира течёт масло; смазывает чужие суставы, пока своё не кончится»; способность «Смазка»",
+      "subject": "The enemy: the Leaking Puppet, a rank-and-file healer of the Library — a dwarf-puppet of grey stone and bronze with a kind, sorrowful carved face, blank stone eyes and a carved stone beard; dark, glowing amber oil seeps from every one of its bronze joints — neck, shoulders, elbows, wrists — and runs down its stone body in shining streaks. Action: it holds out toward the left its cupped stone palm full of glowing amber oil, offering it, dripping, to oil someone else's joint, even though its own oil is running out; with its other hand it presses a rag to its own leaking shoulder. Background: a worktable with an hourglass whose amber sand has almost run out, puppet parts and oil stains on the stone, amber light from the cracks of the floor below."
+    },
+    {
+      "id": "b3-o6-erased-puppet",
+      "category": "enemies",
+      "title": "Стёртая кукла — Библиотека Улариона, рядовой 6, редкий убийца, дворфы, Воздух",
+      "source": "docs/content/враги-биомов.md, раздел 3, рядовые, № 6: «С неё соскоблили все руны; гладкая, без знаков, ходит неслышно»; способность «Подчистка» — удар по лекарю и разрыв покрова; запись сказителя",
+      "subject": "The enemy: the Erased Puppet, a rare and deadly assassin of the Library — a slim dwarf-puppet of pale grey stone from which every mark has been scraped off: its whole surface is smooth and bare, polished by long even scrape marks, without a single sign; its calm face is scraped smooth too, with only shallow eyes and a thin mouth, and its short beard is worn down to a smooth stub. Its bronze joints are wrapped in dark cloth so they make no sound. Action: it slips silently out of the narrow gap between two tall stone shelves and lunges low toward the left, a thin bronze scraping blade thrust forward in one hand, aimed at the healer at the back of the enemy line; a cold draught (Air) stirs the dust behind it. Background: the dark gap between two stone shelves stacked with plain tablets, a faint amber glow rising from the floor below."
+    },
+    {
+      "id": "b3-e1-fitter",
+      "category": "enemies",
+      "title": "Подгонщик — Библиотека Улариона, элита, физ ДД силы, дворфы, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 3, элиты: «Кукла с бронзовым молотком и ящиком шарниров; подгоняет части на столах»; способности «Бронзовый молоток», «Разобрать»",
+      "subject": "The enemy: the Fitter, an elite brawler of the Library — a broad dwarf-puppet of grey stone and bronze, heavier than the others, with a square carved stone beard, blank stone eyes and thick stone forearms; a leather strap across his chest holds a wooden box full of bronze hinges and spare joints at his side. Action: he raises a heavy bronze hammer high and brings it down toward the left, as if knocking a part into place — or knocking it out; bronze hinges and pins jump out of the box, stone chips fly (Earth). Background: a long worktable with stone arms, hands and gears laid out in rows waiting to be fitted, an hourglass with glowing amber sand, amber light glowing in the cracks of the floor below."
+    },
+    {
+      "id": "b3-e2-grinder",
+      "category": "enemies",
+      "title": "Точильщик — Библиотека Улариона, элита, физ ДД ловкости, звери, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 3, элиты: «Каменный жук размером с телегу; жвалы стёрты до блеска о плиты»; способности «Жвалы», «Подрез»; запись сказителя: сыплется рунная стружка",
+      "subject": "The enemy: the Grinder, an elite striker of the Library — a stone beetle as big as a cart. It is a beast: its head, its huge mandibles and its front legs fill the frame, the bottom edge cuts it behind the front legs; its head points to the left side of the picture. Its shell is dark grey stone with amber light glowing in the seams; its great curved mandibles are worn to a mirror shine from gnawing the stone slabs. Action: it lunges toward the left with its mandibles wide open, about to bite twice in the same place; a spray of pale stone shavings and chips flies from its jaws (Earth). Background: a gnawed stone shelf with a bitten-through plain tablet, piles of stone shavings on the floor, amber light rising from the cracks below."
+    },
+    {
+      "id": "b3-e3-binder",
+      "category": "enemies",
+      "title": "Оковщик — Библиотека Улариона, элита, танк, дворфы, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 3, элиты: «Широкий дворф; вместо щита — плита в бронзовой оковке»; способности «Плита» — щит всем своим, «Удар щитом»",
+      "subject": "The enemy: the Binder, an elite tank of the Library — a very wide dwarf-puppet of grey stone with heavy bronze joints, a thick square carved stone beard and blank stone eyes. Instead of a shield he carries a heavy stone slab bound around its edges with thick bronze bands and big rivets; the face of the slab is smooth and bare. Action: he braces the slab in front of him toward the LEFT with both arms and is about to slam it forward into the enemy — a burst of stone dust flies from its edge (Earth); the slab is on the left side of the picture, between him and his enemies, and his broad shoulders and head show above and beside it. Background: a hall of the Library with a wall of stone shelves, an hourglass on a stone pedestal, amber light glowing from the cracks of the floor below."
+    },
+    {
+      "id": "b3-e4-reader",
+      "category": "enemies",
+      "title": "Чтец — Библиотека Улариона, элита, маг ДД, дворфы, Воздух",
+      "source": "docs/content/враги-биомов.md, раздел 3, элиты: «Кукла с рунным цилиндром в руках; читает вслух, не понимая ни слова»; способности «Чтение вслух» — голос по всему отряду, «Разряд»",
+      "subject": "The enemy: the Reader, an elite mage of the Library — a thin dwarf-puppet of grey stone and bronze with a long carved stone beard and blank stone eyes that do not understand. In both hands he holds up a long stone cylinder wound with fine engraved grooves that glow amber — only lines, no letters. Action: he reads it aloud without understanding a single word — his stone mouth is wide open, and his voice bursts out toward the left as rings of pale wind and dust (Air) that shake the air and crack the stone; his eyes stay empty. Background: a reading hall with rows of plain stone cylinders on the shelves, an hourglass with glowing amber sand on a stone lectern, amber light rising from the cracks of the floor below."
+    },
+    {
+      "id": "b3-e5-oiler",
+      "category": "enemies",
+      "title": "Смазчик — Библиотека Улариона, элита, лекарь, дворфы, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 3, элиты: «Кукла с маслёнкой на длинном носике и связкой тряпок; пахнет маслом»; способности «Масло в шарниры», «Смазка»",
+      "subject": "The enemy: the Oiler, an elite healer of the Library — a small, busy dwarf-puppet of grey stone and bronze with a carved stone beard and blank stone eyes, its bronze joints gleaming with oil; a bundle of oily rags hangs from its belt. Action: it holds out toward the left a bronze oil can with a very long thin spout and squeezes it: a thin arc of glowing amber oil streams from the spout to the left, to oil the joints of its kin; glowing drops of oil fall. Background: a workshop corner of the Library with jars of oil, a rack of spare bronze joints and an hourglass, amber light glowing from the cracks of the floor below."
+    },
+    {
+      "id": "b3-e6-knot-tier",
+      "category": "enemies",
+      "title": "Узловяз — Библиотека Улариона, элита, дебаффер, дворфы, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 3, элиты: «Кукла со шнуром на поясе; на шнуре сотни узлов, каждый — запись»; способности «Счётный узел», «Глухой узел»; запись сказителя: сила уходит в шнур",
+      "subject": "The enemy: the Knot-Tier, an elite debuffer of the Library — a dwarf-puppet of grey stone and bronze with a carved stone beard, nimble stone fingers and blank stone eyes. A thick cord is wound around its belt, and hundreds of knotted cords hang from it, each knot a record. Action: it stretches one long cord toward the left, pulled taut toward its target, and quickly ties a knot in it with its stone fingers; a thin thread of amber light is drawn out of the air from the left along the cord and tied into the knot — someone's strength goes into the cord. Background: a hall of the Library with bundles of knotted cords hanging from the shelves like curtains, an hourglass, amber light from the cracks of the floor below."
+    },
+    {
+      "id": "b3-b1-keeper",
+      "category": "enemies",
+      "title": "Смотритель — босс биома «Библиотека Улариона», аппараты, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 3, босс биома: «бронзовый аппарат выше стеллажей на четырёх коленчатых ногах. В груди видно, как ходят шестерни; самая большая — первая шестерня мира. Вместо лица — янтарная линза»; способности «Шаг механизма», «Преграда», «Полный оборот»",
+      "subject": "The enemy: the Keeper, the boss of the Library — the first mechanism of the world, a bronze apparatus taller than the shelves, menacing and heavy, filling the frame. It is not a person: here the rules about waist, head and arms do not apply. The frame shows its upper body: a massive round bronze body like a great clock case, open in front — inside its chest gears turn, and the largest one at the center, a heavy ancient gear, glows faintly amber: the first gear of the world. Instead of a face it has one large round amber lens that glows. It walks on four long knee-jointed bronze legs like the legs of a giant insect; the upper parts of its two front legs rise at its sides. Thousand-year-old oil gleams on its bronze. Action: it lifts one jointed front leg and steps forward toward the left over the shelves, the amber lens glaring down; stone dust (Earth) pours from the shelves as it passes. Background: the tops of tall stone shelves that reach only to its chest, the dark vault above, amber light from below."
+    },
+    {
+      "id": "b3-g1-seer",
+      "category": "enemies",
+      "title": "Провидец — рунный босс «Библиотеки Улариона», страж пределов, дворфы, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 3, рунный босс: «единственный законченный дворф Библиотеки — гладкий камень, спокойное лицо, в руках раскрытая плита. Когда он читает, руны на плите загораются янтарём»; способности «Прочтено: обвал», «Прочтено: тишина», «Прочтено: оковы»",
+      "subject": "The enemy: the Seer, the rune guardian at the road down — the only finished dwarf of the Library. Not a puppet: his body is smooth, polished dark stone without any joints or hinges, like a finished statue come to life; a long carved beard, the calm, still face of someone who has read one book for a long time, calm open eyes; no hood. In his hands he holds an opened stone tablet — two stone leaves hinged like an open book. Action: he reads aloud and holds the open tablet up toward the left; its inner faces blaze with amber light so bright that no marks on them can be seen, and in the air on the left the stone vault cracks and falls in a shower of stones (Earth) — what is read comes true. Background: the deepest hall of the Library, rows of shelves going down into darkness, amber light rising from below."
+    }
+  ]
+}

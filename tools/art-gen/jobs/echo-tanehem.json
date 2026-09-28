@@ -1,0 +1,148 @@
+{
+  "name": "Арена Эхо целиком (ADR-0025, п. 8): неделя нежити, древняя цивилизация Та-Нехем — фон арены 21:9 и 15 портретов: 14 врагов недели и Многоликий. Рецепт — одобренная неделя эльфов (jobs/echo-ishkantun.json): тот же стиль, запреты, кадр и раскладка арены; своя палитра и свой свет из материала — холодный бирюзовый свет из соли и трещин камня, тёплые только масляные лампы и золото. Без черепов, крови, гнили и ужасов. Портреты — по правилам ADR-0012 и ADR-0013: по одному, ракурс словами, без картинки в запросе, враг в действии, по пояс, корпус развёрнут влево; рой, колесница и великан заполняют кадр, как ik-14",
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and salt crystals in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, grains of sand and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.",
+  "negative": "No text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no skeletons of people, no rotting flesh, no decay, no sacrifice, no horror grotesque.",
+  "cutout_rule": "",
+  "categories": {
+    "arenas": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [
+        "art/generated/arenas/arena-workshop-wide__nb2-v2.jpg"
+      ],
+      "frame": "Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the ground like a tabletop RPG battle map: no horizon, no perspective, no side view of buildings, no sky. The attached image is our battle arena of a different place, the Workshop of Forms: take from it ONLY the straight-down camera, the scale, the layout of the zones and the painting style. Do NOT copy its objects, materials or colors: no worktables, no clay figures, no crystals, no flowing streams of sand. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit ground over their whole height: sandstone slabs, a little salt crust, fine sand in the seams and fine cracks only — no steps, no walls, no statues, no lamps, no plants, no objects there. Unlike our biome arenas, this arena is a single scene: the fight begins and ends here, the camera never moves on to a next room, so nothing in the picture leads onward — no doorway, no road, no stairway, no passage out of the picture. The desert appears only as a thin strip of drifted sand along the very top edge and the river only as a thin strip of dark reeds along the very bottom edge, each no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there."
+    },
+    "echo": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [],
+      "frame": "Enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, moving and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the dead of Ta-Nehem, an ancient kingdom by a river of reeds and sand. They dried their dead with salt and wrapped them in linen so that the form would not leave them, and a dead king went on ruling; then the dead kings rose with their army and marched on the living to lead them into their eternal kingdom. Their look is inspired by ancient Egypt — linen wrappings, gold masks, broad collars of gold and blue-green faience beads, striped royal headcloths, jackal-headed guards, golden scarabs, reeds and sand — but they are clearly the risen DEAD: bodies wrapped in stiff linen crusted with white salt, dark dry hands like old polished wood where the linen has slipped, and calm eyes that glow pale turquoise; dignified, eerie and ancient, never rotting, never skeletal, never gory; they must not look like real-world people or like a horror-film mummy. Walls, columns and objects are plain or carry only broad simple ornament — lotus petals, reeds, stripes, zigzags, feathers — never hieroglyphs, never rows of small signs or little pictures. Colors: muted and dry, like all our enemies — salt white, pale linen, sand ochre, dull old gold, faded turquoise and lapis faience, dark river green, near-black; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold pale turquoise light glowing from within salt crystals and cracks in old stone rises onto the figure; crisp cold turquoise rim light on its edges; a small warm amber glow of oil lamps, caught by the gold, is the only warm light. Background: its own place in Ta-Nehem, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting."
+    }
+  },
+  "jobs": [
+    {
+      "id": "arena-echo-tanehem",
+      "category": "arenas",
+      "title": "Арена Эхо: Та-Нехем, неделя нежити — 21:9, одна сцена без перехода",
+      "source": "ADR-0025, п. 8; ADR-0024; docs/content/герои/состав-героев.md, «Нежить — Та-Нехем»; рецепт — jobs/echo-ishkantun.json, раскладка — jobs/arena-02.json; правка своего варианта art/generated/arenas/arena-echo-tanehem__nb2.jpg (в v1 высокий тростник в нижних углах, где лежат карты, и сцена светлее ночной)",
+      "refs": [
+        "art/generated/arenas/arena-echo-tanehem__nb2.jpg"
+      ],
+      "subject": "EDIT MODE — this overrides everything above: do not draw a new picture, edit the attached image. The attached image is NOT the Workshop of Forms: it is the current arena of this week, the salt court of Ta-Nehem, seen straight from above. Keep the picture exactly as it is — the same straight-down camera, the sandstone slabs and their layout, the closed sarcophagus on its bier at the top, the round glowing salt basin at the bottom, the oil lamps, the scarab amulets, linen strips and faience beads, the turquoise glowing cracks and the painting style. Change only this: 1) remove the tall reeds and cattails from the bottom-left and bottom-right corners — there continue the same flat sandstone slabs; along the very bottom edge keep only a thin, low strip of dark reeds, no taller than 5% of the picture height, and no plants at all in the left and right quarters; 2) make the whole scene darker, like deep night, as dark as a night battle map: the sandstone slabs sink into deep shadow, and the light comes only from the turquoise cracks, the glowing salt and the small lamp flames."
+    },
+    {
+      "id": "tn-01-wrapped-dead",
+      "category": "echo",
+      "title": "Спелёнутый мертвец — Та-Нехем, ступень 1, рядовой, физ ДД силы, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Нежить», ступень 1: «Пелены пропитаны солью. Идёт медленно, падает и встаёт»",
+      "subject": "The enemy: the Wrapped Dead, a rank-and-file warrior of Ta-Nehem. A broad, heavy dead man wrapped from head to waist in strips of old linen, stiff and white with crusted salt, salt crystals glittering on the wrappings; one strip has come loose and hangs from his arm; through a gap in the wrappings of his face two calm pale turquoise lights glow as eyes; a broad collar of faded blue-green faience beads. Action: he has just risen again from the sand where he fell — sand and salt pour off his shoulders — and he swings a heavy wrapped fist toward the left; sand and stone chips (Earth) burst up around him. Background: the night desert by the river of reeds, the dark doorway of a tomb cut into a cliff, pale turquoise light in the salt-crusted cracks."
+    },
+    {
+      "id": "tn-02-beetle-swarm",
+      "category": "echo",
+      "title": "Рой жуков — Та-Нехем, ступень 2, рядовой, физ ДД ловкости, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Нежить», ступень 2: «Живое облако скарабеев с золотыми спинками»; перерисовка: в v1 белая рамка вокруг картинки",
+      "subject": "The painting fills the whole canvas edge to edge: no white margin, no border, no frame, no inset. The enemy: the Beetle Swarm, a rank-and-file swarm of Ta-Nehem. It is not a person: a living cloud of hundreds of scarab beetles with golden backs fills the frame — a dense swirling swarm that rears up like a wave and rushes toward the LEFT; in the foreground a few large scarabs are shown in detail — shining gold wing cases, dark legs, thin wings open in flight; the swarm glitters in the pale turquoise light; wind (Air) streams through it, lifting sand. Background: the dark entrance hall of a tomb at night, massive plain columns, a gold funeral mask lying face-up in the sand."
+    },
+    {
+      "id": "tn-03-salt-spearman",
+      "category": "echo",
+      "title": "Солевой копейщик — Та-Нехем, ступень 3, рядовой, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Нежить», ступень 3: «Сухой, как дерево, со щитом из крокодиловой кожи»",
+      "subject": "The enemy: the Salt Spearman, a rank-and-file tank of Ta-Nehem. A tall, lean dead soldier, dry and hard as old wood: his body is wrapped in salt-crusted linen, his face wrapped too, with only a narrow gap where two calm turquoise lights glow; a striped linen headcloth; his bare forearms are dark and polished like driftwood. Action: a blow has just landed — he braces a tall shield of crocodile hide, ridged and scaly with a bronze rim, in front of him toward the LEFT, and holds a bronze spear ready above it; sand bursts around him (Earth). The shield is on the left side of the picture, between him and his enemies. Background: the reed banks of the dark river at night, a line of wrapped soldiers standing behind him in dark silhouette."
+    },
+    {
+      "id": "tn-04-jackal-reaper",
+      "category": "echo",
+      "title": "Шакалоглавый серпоносец — Та-Нехем, ступень 4, рядовой, физ ДД ловкости, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Нежить», ступень 4: «Голова шакала, серп на длинной рукояти. Режет и пелены, и живых»",
+      "subject": "The enemy: the Jackal-Headed Reaper, a rank-and-file fighter of Ta-Nehem. A lean, fast warrior with the head of a black jackal — long muzzle, tall pointed ears, pale turquoise eyes; his body wrapped in strips of salt-white linen, gold armbands and a narrow gold collar. Action: he swings a long-handled bronze sickle — a curved blade on a pole as tall as he is — in a wide arc toward the left; the blade trails fire and sparks (Fire) and cuts through a loose strip of linen in the air. Background: an avenue of plain stone columns in the desert at night, pale turquoise light in the cracks of the slabs."
+    },
+    {
+      "id": "tn-05-embalmer",
+      "category": "echo",
+      "title": "Бальзамировщик — Та-Нехем, ступень 5, рядовой, лекарь, Вода",
+      "source": "design/ui/screens/echo.js, ECH.civ «Нежить», ступень 5: «Кувшины с маслами на поясе. Кого помажет, тот не распадается»",
+      "subject": "The enemy: the Embalmer, a rank-and-file healer of Ta-Nehem. A gaunt dead priest in a white linen robe with a leopard skin over one shoulder; his face is covered by a calm painted mask of gilded plaster with long dark painted eyes; many small alabaster jars of oil with stoppers hang from his belt. Action: he dips his fingers into an open jar and flicks a stream of shining oil to the left — it flows through the air like a ribbon of clear blue water (Water), glinting gold, to anoint the fallen so they will not fall apart. Background: a quiet embalming hall at night, shelves of jars and rolls of linen, pale turquoise light from the salt in the floor."
+    },
+    {
+      "id": "tn-06-mourner",
+      "category": "echo",
+      "title": "Плакальщица — Та-Нехем, ступень 6, рядовой, дебаффер, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Нежить», ступень 6: «Посыпает голову пеплом и воет. От её плача тяжелеют руки»",
+      "subject": "The enemy: the Mourner, a rank-and-file debuffer of Ta-Nehem. A dead woman in a long linen dress of pale blue-grey, long black braided hair, her face dry and grey like ash, calm eyes glowing pale turquoise, her mouth open in a long wail — sorrowful, not horrifying. Action: with one hand she throws a handful of ash over her head, with the other arm she reaches toward the left; her wail rolls to the left as a heavy grey wave of ash and dust with faint green motes of Time in it, and everything it touches grows heavy. Background: a funeral procession of dark silhouettes on the riverbank at night, reeds, pale turquoise light."
+    },
+    {
+      "id": "tn-07-bone-chariot",
+      "category": "echo",
+      "title": "Колесница из костей — Та-Нехем, ступень 7, элита, физ ДД силы, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Нежить», ступень 7: «Колесница из рёбер и позвонков, в упряжке мёртвые кони»",
+      "subject": "The enemy: the Chariot of Bones, an elite fighter of Ta-Nehem. It is not a person: here the rules about waist, head and arms do not apply — a war chariot with its two horses fills the frame, seen from the side in a three-quarter view, galloping toward the LEFT: the two horses run in front, on the left side of the picture, their heads toward the left edge, and the chariot rolls behind them on the right. The chariot is EMPTY: no one rides in it — no driver, no rider, no king; it drives itself. It is a light two-wheeled chariot built of huge clean bones like old polished ivory: its curved side rail is a row of long ribs, its pole is a line of vertebrae, its wheels have spokes of bone — only a chariot, not the skeleton of anyone, no skulls; its wheels throw fire and sparks (Fire) from the stones. The two horses are dead horses of Ta-Nehem, wrapped in salt-white linen, with gold plates on their faces and glowing turquoise eyes; loose strips of linen stream behind them. Background: a paved road through the desert at night, dust and embers."
+    },
+    {
+      "id": "tn-08-jackal-guardian",
+      "category": "echo",
+      "title": "Страж с головой шакала — Та-Нехем, ступень 8, элита, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Нежить», ступень 8: «Выше всех, в золотом воротнике. Стережёт дверь гробницы, где бы та ни стояла»",
+      "subject": "The enemy: the Jackal-Headed Guardian, an elite tank of Ta-Nehem — taller than all the others, seen from a low angle. A huge, broad dead guardian with the head of a black jackal — long muzzle, tall ears, gold-rimmed eyes glowing pale turquoise; a broad collar of gold and turquoise faience across his chest; his arms wrapped in linen with gold armbands; a tall bronze staff. Action: he steps in front of the tomb door to bar the way, planting his staff toward the LEFT, his stare fixed on his enemy, freezing them; the slabs crack under the staff (Earth). Behind him stands a lone stone tomb door frame in the open desert, with no walls around it, its door shut: wherever it stands, he guards it. Background: the night desert, dunes, pale turquoise light."
+    },
+    {
+      "id": "tn-09-linen-priest",
+      "category": "echo",
+      "title": "Жрец пелён — Та-Нехем, ступень 9, элита, маг ДД, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Нежить», ступень 9: «Наматывает пелены на живых. Под пеленами время останавливается»",
+      "subject": "The enemy: the Priest of Linens, an elite mage of Ta-Nehem. A tall, thin dead priest in layers of fine white linen and a tall white headdress, his face wrapped in linen with only two calm turquoise lights for eyes; long strips of linen hang from his sleeves. Action: he flings his arms toward the left, and long strips of linen fly from his sleeves like snakes and wind around the air to the left; where they wrap, time stops — grains of sand hang still in the air, frozen in green Time light. Background: a temple hall of massive plain columns at night, pale turquoise light from the floor."
+    },
+    {
+      "id": "tn-10-beetle-lord",
+      "category": "echo",
+      "title": "Повелитель жуков — Та-Нехем, ступень 10, элита, дебаффер, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Нежить», ступень 10: «Жуки ползут из его рукавов. Куда он укажет, туда идёт рой»",
+      "subject": "The enemy: the Lord of Beetles, an elite debuffer of Ta-Nehem. A dead nobleman in a long pleated linen robe with very wide sleeves, a large gold scarab pectoral on his chest, a striped headcloth; his face is wrapped in linen with two pale turquoise lights for eyes. Action: he points to the left with one long finger, and out of his wide sleeves pours a stream of golden scarabs that flies through the air to the left, exactly where he points; a gust of wind and sand (Air) swirls around them. Background: a tomb gallery at night, rows of sealed jars, pale turquoise light."
+    },
+    {
+      "id": "tn-11-gold-mask-king",
+      "category": "echo",
+      "title": "Царь в золотой маске — Та-Нехем, ступень 11, босс недели, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Нежить», ступень 11: «Маска из чистого золота, под ней давно сухое лицо. Правил при жизни — правит и после»",
+      "subject": "The enemy: the King in the Golden Mask, a boss of Ta-Nehem — regal, heavy and powerful, filling the frame. A dead king wrapped in fine linen; his face is a mask of pure gold — a calm, stern face with long dark painted eyes under a striped royal headcloth of gold and lapis blue, like the gold masks of ancient Egypt but not a copy; a broad collar of gold and turquoise; he ruled in life and rules after death. Action: he raises a heavy golden sceptre toward the left and commands; around him the air hardens into stone for his soldiers; sand and stone rise from the floor (Earth). Background: the throne hall of his tomb at night, a gold throne, massive plain columns, pale turquoise light from the salt in the floor."
+    },
+    {
+      "id": "tn-12-salt-vizier",
+      "category": "echo",
+      "title": "Визирь соли — Та-Нехем, ступень 12, босс недели, маг ДД, Вода",
+      "source": "design/ui/screens/echo.js, ECH.civ «Нежить», ступень 12: «Держит весы: на одной чаше соль, на другой твоя жизнь»",
+      "subject": "The enemy: the Vizier of Salt, a boss of Ta-Nehem — wise, cold and imposing. A tall, gaunt dead vizier in a long white linen robe tied high on the chest and a simple gold collar; his face is lean and dark like a carved wooden statue, calm, with glowing turquoise eyes. Action: he holds out toward the left a great bronze balance scale: on one pan lies a heap of white salt, on the other a small warm flame — the life of his enemy; the salt pan sinks, and a cold swirling wave of water and salt crystals (Water) flows from the scales to the left. Background: a hall of salt pillars at night, glittering white crystals, pale turquoise light from below."
+    },
+    {
+      "id": "tn-13-unfading-queen",
+      "category": "echo",
+      "title": "Царица Неувядающих — Та-Нехем, ступень 13, босс недели, лекарь, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Нежить», ступень 13: «Пелены из тончайшего льна, в волосах золотые жуки. Поднимает мёртвых, и те не устают»; правка своего варианта art/generated/echo/tn-13-unfading-queen__nb2.jpg (в v1 на двери справа знаки, похожие на буквы)",
+      "subject": "EDIT MODE — this overrides everything above: do not draw a new picture, edit the attached image. The attached image is the current portrait of this enemy, the Queen of the Unfading of Ta-Nehem: a dead queen in thin linen with golden scarabs in her braided hair, green Time light in her hands, wrapped dead rising behind her by the tomb doors. Keep the picture exactly as it is — the queen, her face, hair, hands, the green light, the rising dead, the cliff with tomb doors, the lamps, the crystals, the light, the colors and the painting style. Change only this: on the tomb door at the right edge of the picture there are dark painted marks that look like letters — remove them; that door is plain, dark and smooth, with no marks at all.",
+      "refs": [
+        "art/generated/echo/tn-13-unfading-queen__nb2.jpg"
+      ]
+    },
+    {
+      "id": "tn-14-unfading-king",
+      "category": "echo",
+      "title": "Неувядающий Царь — Та-Нехем, ступень 14, Убер-босс недели, физ ДД силы, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Нежить», ступень 14: «Первый из мёртвых царей: обёрнут столько раз, что вдвое выше живого. Ведёт поход, не глядя под ноги»; перерисовка: в v1 фигура в рост обычного роста, не великан",
+      "subject": "The enemy: the Unfading King, the uber-boss of the week — the first of the dead kings, wrapped so many times that he is twice as tall as a living man. He is a giant: his head, shoulders, chest and arms fill the whole frame from a low camera angle, the bottom edge cuts him at the waist, his legs are not visible; the wrapped dead soldiers marching beside him reach only to his waist. Layer upon layer of thick salt-crusted linen makes him huge and heavy, bands of gold across his chest, a broad collar of gold and turquoise, the tall crown of a dead king; his face is wrapped in linen, with two cold turquoise lights for eyes. Action: he strides forward toward the left without looking down, one enormous arm raised forward, leading the march; loose strips of linen stream from him; sand and stone (Earth) crack and rise around him. Background: the night desert, the river of reeds far behind, his army of the dead in dark silhouettes, pale turquoise light rising from the cracks."
+    },
+    {
+      "id": "tn-15-many-faced",
+      "category": "echo",
+      "title": "Многоликий — пятнадцатая ступень недели нежити, «враг тысячи лиц»",
+      "source": "design/ui/recipes.js, предмет many: «Носит лица тех, кого победили на этой неделе»; Маска недели — «маска, снятая с Многоликого»; §17.4 GDD; рамка — ik-15; правка своего варианта art/generated/echo/tn-15-many-faced__nb2.jpg (в v1 на бледных масках красные пятна, похожие на раны)",
+      "subject": "EDIT MODE — this overrides everything above: do not draw a new picture, edit the attached image. The attached image is the current portrait of this enemy, the Many-Faced of Ta-Nehem: a hooded figure with a jackal face under the hood, a cloak covered with rows of masks, lifting a gold mask aside with a linen-wrapped hand. Keep the picture exactly as it is — the figure, the hood and jackal face, the gold mask in its hand, the cloak and every mask on it, the glowing turquoise eyes, the sand, the floor with broken masks, the lamps, the light, the colors and the painting style. Change only this: several pale masks on the cloak have red-brown patches on the forehead and red streaks on the cheeks that look like wounds — repaint those masks as clean painted plaster masks with smooth pale faces and black painted hair, with no red on them at all.",
+      "refs": [
+        "art/generated/echo/tn-15-many-faced__nb2.jpg"
+      ]
+    }
+  ]
+}

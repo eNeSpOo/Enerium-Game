@@ -1,0 +1,145 @@
+{
+  "name": "Арена Эхо целиком (ADR-0025, п. 8): неделя аппаратов, древняя цивилизация Медный Архай — фон арены 21:9 и 15 портретов: 14 врагов недели и Многоликий. Рецепт — одобренная неделя эльфов (jobs/echo-ishkantun.json): тот же стиль, запреты, кадр и раскладка арены; своя палитра и свой свет из материала — огонь в меди, раскалённое оранжевое свечение снизу, холодный морской контровой свет и ярь-медянка. Портреты — по правилам ADR-0012 и ADR-0013: по одному, ракурс словами, без картинки в запросе, враг в действии, по пояс, корпус развёрнут влево; машины и великаны заполняют кадр, как ik-14",
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — the seams of copper plates and fire grates in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.",
+  "negative": "No text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no Greek letters, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+  "cutout_rule": "",
+  "categories": {
+    "arenas": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [
+        "art/generated/arenas/arena-workshop-wide__nb2-v2.jpg"
+      ],
+      "frame": "Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the ground like a tabletop RPG battle map: no horizon, no perspective, no side view of buildings, no sky. The attached image is our battle arena of a different place, the Workshop of Forms: take from it ONLY the straight-down camera, the scale, the layout of the zones and the painting style. Do NOT copy its objects, materials or colors: no worktables, no clay figures, no crystals, no sand. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit ground over their whole height: stone slabs, thin copper strips in the seams and fine cracks only — no steps, no walls, no statues, no bowls, no machines, no objects there. Unlike our biome arenas, this arena is a single scene: the fight begins and ends here, the camera never moves on to a next room, so nothing in the picture leads onward — no doorway, no road, no stairway, no passage out of the picture. The labyrinth walls appear only as a thin dark strip of flat wall tops along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there."
+    },
+    "echo": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [],
+      "frame": "Enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, moving and caught in action — not a model posing, not a statue on a plinth. Its story reads from its body, its pose and the place around it. World: these are the guardians of Copper Archai, an ancient island civilization: islands ringed by copper giants, cities built as labyrinths of pale stone and copper, red columns that taper downward, fire-breathing copper bulls, and clockwork guards that walk the shore three times a day; the guards came down from the shores deep into the land and turned the valleys into labyrinths. Every enemy of this set is a MACHINE, an automaton — not a person in armor: a body of hammered copper and bronze plates held by big rivets, hinged joints with small gears showing in the gaps, winding keys and coiled springs; fire burns inside them instead of blood and glows through the seams of their plates and the slits of their eyes; their faces are calm, stern copper masks in an archaic style — almond eyes, a faint closed smile, beards and hair of fine curled copper wire. Their look is inspired by ancient Crete and archaic Greek bronzes, but they must not look like real-world statues, knights, robots, steampunk or science fiction: no glass, no pipes, no dials, no screens, no modern bolts. Ornament is only broad and simple — waves, spirals, meander bands, rosettes — never letters. Colors: muted metal and stone, like all our enemies — dull copper, dark bronze, blue-green verdigris patina, bone-white stone, soot black, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — hot molten-orange light: the fire inside the machines shines through their seams, and fire grates and cracks in the stone floor glow beneath them, rising onto the figure; crisp cold sea-teal rim light of the moonlit sea on its edges; the teal rim light and the green verdigris are the only cold colors. Background: its own place in Copper Archai, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting."
+    }
+  },
+  "jobs": [
+    {
+      "id": "arena-echo-copperarchai",
+      "category": "arenas",
+      "title": "Арена Эхо: Медный Архай, неделя аппаратов — 21:9, одна сцена без перехода",
+      "source": "ADR-0025, п. 8; ADR-0024; docs/content/герои/состав-героев.md, «Аппараты — Медный Архай»; рецепт — jobs/echo-ishkantun.json, раскладка — jobs/arena-02.json",
+      "subject": "Subject: the heart of the copper labyrinth of Copper Archai on an island at night, seen straight from above — a wide square courtyard in the center of the labyrinth, the one place where the whole fight happens. It is night and the courtyard is dark, as dark as our Workshop arena: the slabs are dark grey stone in deep shadow, and the light comes only from below — from glowing seams and grates. Ground: large worn, tightly fitted dark stone slabs; thin strips of copper, green with verdigris, run along the seams between the slabs, and in some of them molten orange fire glows from within; fine cracks glow orange. In the central half only: along the top edge, a long low bronze furnace grate set flat into the floor, seen straight from above — straight parallel bars glowing red-orange with the fire of a forge beneath, thin smoke rising — cut off by the top edge of the picture; along the bottom edge, a great round bronze plate set flat into the courtyard, seen straight from above, only its upper half visible, engraved with a simple labyrinth of a few broad winding concentric paths — no signs, no letters — with molten orange light glowing in its grooves; near the grate and near the plate, two wide bronze fire bowls on low tripods with glowing coals and thin curls of smoke; a few scattered copper gears, big rivets, a broken bronze spring and a dropped copper winding key on the slabs. Along the very top and bottom edges runs a thin strip of the flat tops of dark stone labyrinth walls capped with green-patinated copper; the left and right quarters stay clear. Near-black shadows, hot molten-orange light from below; a faint cold sea-teal moonlight on the verdigris is the only cold color. No characters, no animals, no bodies, no cards, no grid."
+    },
+    {
+      "id": "ca-01-clockwork-spearman",
+      "category": "echo",
+      "title": "Заводной копейщик — Медный Архай, ступень 1, рядовой, физ ДД силы, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Аппараты», ступень 1: «Медный, с ключом завода в спине. Колет ровно трижды, потом заводится снова»",
+      "subject": "The enemy: the Clockwork Spearman, a rank-and-file soldier of Copper Archai. A soldier-automaton of hammered copper: a calm archaic copper face with almond eyes that glow orange from the fire inside, a crested copper helmet, riveted plates on the chest and shoulders, hinged elbows with small gears showing in the joints; a big copper winding key sticks out of his back behind the shoulder. Action: he thrusts a long bronze spear straight to the left with both hands, caught in the middle of his three thrusts — the leaf-shaped spear point is shown large in front of him; the key in his back is still turning. Dust and stone chips (Earth) jump up around him. Background: a narrow corridor of the labyrinth at night, walls of pale stone blocks with copper-capped tops, a fire grate in the floor glowing orange beneath him."
+    },
+    {
+      "id": "ca-02-clockwork-shield",
+      "category": "echo",
+      "title": "Заводной щитник — Медный Архай, ступень 2, рядовой, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Аппараты», ступень 2: «Щит приклёпан к руке. Шагает, пока не кончится завод, и не отступает»; перерисовка: в v1 щит с дальней стороны, справа, и лишний меч; третья попытка: в v2 щит снова справа, поза статична",
+      "subject": "The enemy: the Clockwork Shield-bearer, a rank-and-file tank of Copper Archai. Composition: the big round bronze shield is on the LEFT side of the picture and covers the lower left third of it; the automaton stands behind it on the right, turned in a three-quarter view to the left, leaning his shoulder into the back of the shield, his stern bearded copper face looking over its upper rim toward the left. He is a squat, heavy automaton of thick dented copper plates, broad as a door, with a low rounded helmet and glowing eye slits; the shield is riveted straight onto his forearm with a ring of large rivets — arm and shield are one piece; he carries no sword and no other weapon; a winding key sticks out of his back. Action: a blow has just landed on the shield — sparks and stone dust (Earth) burst off its dented face toward the left, and he keeps marching forward into it, never stepping back. Background: a stone quay on the shore of the island at night, dark waves with pale foam, fire grates glowing orange in the stones of the quay."
+    },
+    {
+      "id": "ca-03-copper-hound",
+      "category": "echo",
+      "title": "Медная гончая — Медный Архай, ступень 3, рядовой, физ ДД ловкости, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Аппараты», ступень 3: «Гончая из меди с горящими глазами. Обходит берег и чует чужих»",
+      "subject": "The enemy: the Copper Hound, a rank-and-file hunter of Copper Archai. It is not a person: its head, neck and chest fill the frame, turned in a three-quarter view to the left, the bottom edge cuts it at the chest. A lean hunting hound made of hammered copper plates, a long narrow muzzle with bronze teeth, ears like thin copper blades laid back, a collar with a small winding key; its eyes burn orange with the fire inside, and hot light glows through the seams of its neck. Action: it has caught the scent of strangers — head low, nose forward, it lunges to the left with its jaws open; a gust of wind (Air) streams along its body, throwing sand and sea foam. Background: the night shore of the island, wet dark sand and surf, far away the dark silhouette of a copper giant standing in the sea."
+    },
+    {
+      "id": "ca-04-labyrinth-builder",
+      "category": "echo",
+      "title": "Строитель лабиринта — Медный Архай, ступень 4, рядовой, дебаффер, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Аппараты», ступень 4: «Ставит стены там, куда ты собирался шагнуть»; перерисовка: в v1 лицо робота с забралом, выпадает из серии",
+      "subject": "The enemy: the Labyrinth Builder, a rank-and-file debuffer of Copper Archai. A thin, stooped automaton of copper and bronze with long jointed arms; his head is a narrow copper head with the same calm archaic face as the other guardians of Copper Archai — almond eyes glowing orange, a faint closed smile, a thin curled beard of copper wire — not a robot with a visor; a bronze mason's rod in one hand. Waist-up: the bottom edge cuts him at the waist. Action: he strikes the floor with the rod and sweeps his other hand to the left — and to the left of him, stone blocks and copper sheets burst up out of the ground by themselves and stack into a wall, right where someone was about to step; faint green motes of Time swirl around the rising wall. Background: a half-built labyrinth at night, rows of unfinished walls, fire grates glowing orange in the floor."
+    },
+    {
+      "id": "ca-05-oiler",
+      "category": "echo",
+      "title": "Смазчик — Медный Архай, ступень 5, рядовой, лекарь, Вода",
+      "source": "design/ui/screens/echo.js, ECH.civ «Аппараты», ступень 5: «Маслёнка на длинном носике. Зальёт трещину — и медь снова держит»",
+      "subject": "The enemy: the Oiler, a rank-and-file healer of Copper Archai. A small, round-bellied automaton with a simple, kindly copper face, a leather apron over his copper body and a belt hung with little bronze oil flasks. Action: he holds out toward the left a copper oil can with a very long, thin, curved spout and pours a thin shining stream of oil; the stream flows through the air to the left like a ribbon of water (Water), glinting blue and gold, to seal the cracks in copper so that it holds again. Background: a repair niche inside the labyrinth at night, gears and copper parts hanging on hooks, a fire grate glowing orange in the floor."
+    },
+    {
+      "id": "ca-06-hot-ball-thrower",
+      "category": "echo",
+      "title": "Метатель раскалённых шаров — Медный Архай, ступень 6, рядовой, маг ДД, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Аппараты», ступень 6: «Чаша на плече, в ней медные шары докрасна. Мечет их через стену»",
+      "subject": "The enemy: the Thrower of Red-Hot Balls, a rank-and-file caster of Copper Archai. A tall automaton with long jointed arms; a deep bronze bowl is fixed on his shoulder, full of copper balls glowing red-hot and smoking. Action: caught mid-throw — his long arm whips forward over his head toward the left and hurls a red-hot copper ball high over a stone wall; the ball flies away to the left trailing fire and sparks (Fire); his other hand already reaches back into the bowl for the next ball. Background: the top of a labyrinth wall at night, the maze of walls below him, the glow of forges."
+    },
+    {
+      "id": "ca-07-fire-bull",
+      "category": "echo",
+      "title": "Огненный бык — Медный Архай, ступень 7, элита, физ ДД силы, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Аппараты», ступень 7: «Бык из меди, в брюхе горн. Дышит огнём и топчет»",
+      "subject": "The enemy: the Fire Bull, an elite fighter of Copper Archai. It is not a person: its head, horns, neck and chest fill the frame, turned in a three-quarter view to the left, the bottom edge cuts it at the chest. A bull of hammered copper plates with a massive neck and shoulders and long curved horns tipped with bronze; its belly is a forge — through the seams of its chest and a grate in its side the fire inside glows white-orange. Action: it lowers its horns and charges to the left, breathing a jet of fire from its nostrils and open mouth toward the left; sparks fly and the slabs crack under its weight (Fire). Background: a courtyard of the labyrinth at night, red columns that taper downward, smoke."
+    },
+    {
+      "id": "ca-08-shore-walker",
+      "category": "echo",
+      "title": "Береговой обходчик — Медный Архай, ступень 8, элита, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Аппараты», ступень 8: «Высокий, как маяк. Обходит берег трижды в день и не пропускает никого»",
+      "subject": "The enemy: the Shore Walker, an elite tank of Copper Archai. Very tall, seen from a low angle so that he looks as tall as a lighthouse: a tall, narrow automaton of copper plates whose head is a round copper lantern cage with a fire burning inside it, throwing a beam of orange light across the night; a long bronze pole in one hand, a big round copper shield on the other arm. Action: he stops in his round of the shore, turns the beam of his lantern head to the left and bars the way — the shield raised toward the LEFT, the pole planted in the sand; sea spray and stones (Earth) burst around him. Background: the rocky shore of the island at night, the dark sea with pale surf."
+    },
+    {
+      "id": "ca-09-labyrinth-master",
+      "category": "echo",
+      "title": "Мастер лабиринта — Медный Архай, ступень 9, элита, дебаффер, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Аппараты», ступень 9: «Держит план лабиринта в медной голове. Поворот — и ты снова у входа»; правка своего варианта art/generated/echo/ca-09-labyrinth-master__nb2.jpg (в v1 бородка ключа на посохе читается как цифры «35»)",
+      "subject": "EDIT MODE — this overrides everything above: do not draw a new picture, edit the attached image. The attached image is the current portrait of this enemy, the Master of the Labyrinth of Copper Archai: a bearded copper automaton with an open dome on his head showing a glowing labyrinth, one fist raised to the left inside rings of green Time light, a tall staff in his other hand. Keep the picture exactly as it is — the same automaton, face, beard, open dome with the labyrinth, raised fist, the green rings, the robe of copper plates, the walls, the floor grates, the light, the colors and the painting style. Change only this: the top of his staff is a key whose notched bits look like numbers — replace the whole key head with a simple round copper disc engraved with a small plain labyrinth of a few broad concentric paths, like the one in his head; no notches, no shapes that look like numbers or letters.",
+      "refs": [
+        "art/generated/echo/ca-09-labyrinth-master__nb2.jpg"
+      ]
+    },
+    {
+      "id": "ca-10-clockwork-dancer",
+      "category": "echo",
+      "title": "Заводная плясунья — Медный Архай, ступень 10, элита, физ ДД ловкости, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Аппараты», ступень 10: «Лезвия вместо пальцев, пружина вместо сердца. Кружится, пока не кончится завод»; правка своего варианта art/generated/echo/ca-10-clockwork-dancer__nb2.jpg (в v1 у плясуньи бородка)",
+      "subject": "EDIT MODE — this overrides everything above: do not draw a new picture, edit the attached image. The attached image is the current portrait of this enemy, the Clockwork Dancer of Copper Archai: a slender female automaton of copper with curled copper hair, blade-fingers, a glowing spring in her body and a winding key, spinning in a hall of red columns. Keep the picture exactly as it is — the same body, pose, hair, blade-fingers, the glowing spring, the key, the arcs of wind, the columns, the floor grates, the light, the colors and the painting style. Change only this: remove the small curled beard from her chin and jaw — her face is a smooth, serene, beardless feminine copper face, like an archaic statue of a young woman.",
+      "refs": [
+        "art/generated/echo/ca-10-clockwork-dancer__nb2.jpg"
+      ]
+    },
+    {
+      "id": "ca-11-shore-giant",
+      "category": "echo",
+      "title": "Медный великан берега — Медный Архай, ступень 11, босс недели, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Аппараты», ступень 11: «Великан из листовой меди, в жилах огонь. Единственная жила на пятке закрыта медным гвоздём»",
+      "subject": "The enemy: the Copper Giant of the Shore, a boss of Copper Archai — enormous, heavy and powerful, filling the frame, seen from a low angle. A giant built of hammered sheets of copper riveted together, green verdigris in the seams, a stern archaic face with a beard of curled copper wire, eyes like two furnace mouths; fire flows in his veins: one thick glowing vein of fire runs from his neck down across his chest and out of the frame, and fire shines through every seam. Action: he wades out of the surf toward the left and brings one enormous open copper palm down onto his enemies; waves break against his body, stones of the shore burst upward (Earth). Background: the night shore of the island, the dark sea, a lighthouse-tall walker far away on the rocks."
+    },
+    {
+      "id": "ca-12-forge-bull",
+      "category": "echo",
+      "title": "Бык-горн — Медный Архай, ступень 12, босс недели, маг ДД, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Аппараты», ступень 12: «Огненный бык величиной с дом. Его дыхание плавит медь»; перерисовка: в v1 на быке лишняя фигура — медный всадник",
+      "subject": "The enemy: the Forge Bull, a boss of Copper Archai — a copper bull as big as a house. It is only a bull: no rider, no person, no human torso, no automaton on its back or behind it. It is not a person: its huge horned head, neck and chest fill the whole frame, seen from a low angle and turned to the left; the bottom edge cuts it at the chest. Its body is dark, soot-blackened old copper riveted in great plates; its chest is an open furnace behind a heavy bronze grate, blazing white-hot; its horns are great bronze crescents; it is so big that the walls of the labyrinth reach only to its chest. Action: it raises its head and breathes a torrent of white-orange fire to the left — so hot that the copper shields and plates in its path melt and drip as glowing molten copper; sparks and heat haze (Fire). Background: a burning courtyard of the labyrinth at night, broken walls, smoke."
+    },
+    {
+      "id": "ca-13-labyrinth-architect",
+      "category": "echo",
+      "title": "Зодчий лабиринтов — Медный Архай, ступень 13, босс недели, лекарь, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Аппараты», ступень 13: «Строил первый лабиринт острова. Чинит своих быстрее, чем их ломают»",
+      "subject": "The enemy: the Architect of Labyrinths, a boss of Copper Archai — ancient and wise, the builder of the first labyrinth of the island. A tall, old automaton of dark bronze and copper worn to a soft shine, a long beard of fine curled copper wire, a calm, deep-set face, a long robe of hinged plates; bronze compasses hang at his belt. Action: he stretches one hand toward the left, and green threads of Time light pour from his fingers: broken copper plates, gears and rivets fly back together in the air to the left, mending his own faster than they are broken; in his other hand he holds a small bronze hammer. Background: the first labyrinth of the island at night, walls of pale stone in concentric rings behind him, orange light in the seams of the floor."
+    },
+    {
+      "id": "ca-14-first-guardian",
+      "category": "echo",
+      "title": "Первый страж острова — Медный Архай, ступень 14, Убер-босс недели, физ ДД силы, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Аппараты», ступень 14: «Самый старый медный великан. Обходил остров одним шагом, и огня в нём больше, чем во всех остальных»",
+      "subject": "The enemy: the First Guardian of the Island, the uber-boss of the week — the oldest copper giant, who walked around the whole island in a single step, with more fire in him than in all the others together. He is a colossus: his head, shoulders, chest and arms fill the whole frame from a very low camera angle, the bottom edge cuts him at the waist; far below at the bottom edge, the walls of a whole labyrinth city look like tiny toy blocks around his hips. His ancient copper body is dark, crusted with thick green verdigris and cracked everywhere, and white-orange fire blazes out through every crack and seam, from his eyes and from his open mouth; a crested helmet, a stern archaic face with a curled beard. Action: he strides toward the left and reaches forward with one enormous hand, and a wave of fire and heat rolls from him to the left (Fire). Background: the night sea and the island far below him, smoke and embers in the air."
+    },
+    {
+      "id": "ca-15-many-faced",
+      "category": "echo",
+      "title": "Многоликий — пятнадцатая ступень недели аппаратов, «враг тысячи лиц»",
+      "source": "design/ui/recipes.js, предмет many: «Носит лица тех, кого победили на этой неделе»; Маска недели — «маска, снятая с Многоликого»; §17.4 GDD; рамка — ik-15",
+      "subject": "The enemy: the Many-Faced, the fifteenth and last enemy of the week, the one with a thousand faces: it wears the faces of those who were defeated this week. A tall, thin, long-armed figure in a long hooded cloak; the cloak is covered with dozens of small masks sewn on row over row like scales — faces of Copper Archai: calm archaic copper faces with almond eyes, copper bull faces with bronze horns, faces with beards of curled copper wire, faces under crested helmets. Under its hood there is no face of its own, only shadow; over the shadow it wears a calm archaic copper mask. Its long hands are jointed copper. Action: it glides forward toward the left and with one long hand lifts the copper mask aside — and underneath there is already another face, a copper bull mask. Thin orange fire (Fire) glows in the empty eye holes of all the masks. The masks are hammered copper and bronze, never skin. Background: the dark heart of the labyrinth at night, broken masks and gears scattered on cracked slabs, orange light rising from the floor grates. Uncanny and unsettling, but not grotesque."
+    }
+  ]
+}

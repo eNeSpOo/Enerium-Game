@@ -33,8 +33,19 @@ const ECH = {
   lifeH: { o: 72, e: 48, b: 36, u: 24, m: 24, craft: 48 },   // срок существования цели, часы; окончательные сроки — баланс (§17.1)
   pickW: [1332, 1234, 1139, 1045, 950, 856, 761, 667, 572, 478, 383, 289, 194, 100],   // запасные, как в echo-rules.js: Убер — 1 %, ниже линейно (ADR-0025, «Шансы призыва»);   // вес ступени в призыве: слабые чаще, сильные реже (§17.4)
   manySummonBp: 10,                                      // Многоликий выпадает при призыве с шансом 10 б. п. — 0,10 %, без ограничения «раз в неделю» (ADR-0025)
-  /* арт недели, одобренный автором (ADR-0025): фон арены Эхо и портреты ступеней 1–15 по порядку врагов ECH; другие недели — заглушки */
-  art: { 'Эльфы': { arena: 'arena-echo-ishkantun.jpg', faces: 'echo/ik-' } },
+  /* арт недели: фон арены Эхо и портреты ступеней 1–15 по порядку врагов ECH. Иш-Кантун одобрен автором (ADR-0025);
+     остальные восемь недель нарисованы 28.09.2026 по его образцу и ждут взгляда автора (tools/art-gen/jobs/echo-*.json) */
+  art: {
+    'Эльфы': { arena: 'arena-echo-ishkantun.jpg', faces: 'echo/ik-' },
+    'Люди': { arena: 'arena-echo-ankeshar.jpg', faces: 'echo/ak-' },
+    'Дворфы': { arena: 'arena-echo-hatunrumi.jpg', faces: 'echo/hr-' },
+    'Звери': { arena: 'arena-echo-goldendeer.jpg', faces: 'echo/gd-' },
+    'Саганы': { arena: 'arena-echo-itsal.jpg', faces: 'echo/it-' },
+    'Аппараты': { arena: 'arena-echo-copperarchai.jpg', faces: 'echo/ca-' },
+    'Искажённые': { arena: 'arena-echo-meshengar.jpg', faces: 'echo/mg-' },
+    'Нежить': { arena: 'arena-echo-tanehem.jpg', faces: 'echo/tn-' },
+    'Забытые': { arena: 'arena-echo-nameless.jpg', faces: 'echo/nm-' },
+  },
   /* бой Эхо (ADR-0025) — демо, пока не подключены echo-rules.js и echo-foes.js. Характеристики карты — как у образца Мастерской
      того же класса (EB.FOES: рядовой — у рядовых, остальные — у элит); здоровье главного врага — шкала hp выше, защитники — по своему hpPct */
   fight: {

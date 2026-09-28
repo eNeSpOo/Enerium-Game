@@ -94,7 +94,20 @@ def ref_bytes(p):
         return buf.getvalue(), "image/png"
 
 
-def call(key, model_id, prompt, refs, aspect, size):
+# Предохранитель: модель иногда перерисовывает картинку десятки раз в одном ответе
+# (28.09.2026: 31 картинка в ответе, $2,13 за запрос). Потолок вывода — столько токенов,
+# сколько по прайсу стоят OUT_IMAGES картинок этого размера, плюс OUT_TEXT на текст и размышления.
+# С запасом 2000 в ответ влезала третья картинка 1K (28.09.2026, hr-14), поэтому запас — 1000.
+OUT_IMAGES = 2
+OUT_TEXT = 1000
+
+
+def max_out(model, size):
+    image = model["per_image"][size] * 1_000_000 // model["per_million"]["image_out"]
+    return int(image) * OUT_IMAGES + OUT_TEXT
+
+
+def call(key, model_id, prompt, refs, aspect, size, max_tokens):
     parts = [{"text": prompt}]
     for ref in refs:
         data, mime = ref_bytes(ROOT / ref)
@@ -104,6 +117,7 @@ def call(key, model_id, prompt, refs, aspect, size):
         "generationConfig": {
             "responseModalities": ["TEXT", "IMAGE"],
             "imageConfig": {"aspectRatio": aspect, "imageSize": size},
+            "maxOutputTokens": max_tokens,
         },
     }
     for attempt in range(RETRIES + 1):
@@ -182,7 +196,15 @@ def add_to_manifest(item):
         manifest["items"].append(item)
         tmp = MANIFEST.with_name(f"manifest.{os.getpid()}.tmp")
         tmp.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        os.replace(tmp, MANIFEST)
+        # в Windows замена не проходит, пока манифест открыт на чтение другим процессом: ждём и повторяем
+        for attempt in range(100):
+            try:
+                os.replace(tmp, MANIFEST)
+                break
+            except PermissionError:
+                if attempt == 99:
+                    raise
+                time.sleep(0.2)
     finally:
         os.close(fd)
         try:
@@ -226,7 +248,7 @@ def main():
                 continue
             t0 = time.time()
             try:
-                resp = call(key, m["id"], b["prompt"], b["refs"], b["aspect"], size)
+                resp = call(key, m["id"], b["prompt"], b["refs"], b["aspect"], size, max_out(m, size))
                 data, mime, text = pick_image(resp)
             except RuntimeError as e:
                 print(f"    ошибка: {e}")
@@ -271,6 +293,8 @@ def main():
             total += item["cost_usd"]
             note = f", альфа: {'да' if item['cutout']['ok'] else 'НЕТ — ' + item['cutout'].get('why', '')}" if b["cutout"] else ""
             print(f"    → {item['file']} {item['px'][0]}×{item['px'][1]}, ${item['cost_usd']}, {item['seconds']} с{note}")
+            if item["cost_usd"] > m["per_image"][size] * 1.5:
+                print(f"    ! дороже прайса ${m['per_image'][size]}: модель перерисовывала в ответе, finishReason={(resp.get('candidates') or [{}])[0].get('finishReason')}")
     print(f"Итого: ${total:.3f}" + (" (по прайсу, без запросов)" if a.dry_run else " (по счётчикам токенов)"))
 
 

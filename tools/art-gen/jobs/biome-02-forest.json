@@ -1,0 +1,135 @@
+{
+  "name": "Биом 2 «Подземный лес» (Виал · творение · воздух · Элазиум): фон арены 21:9 и 14 портретов врагов — шесть рядовых, шесть элит, Матерь стаи и Отголосок Виала. Облик — docs/content/враги-биомов.md, раздел 2. Портреты — по правилам ADR-0012 и ADR-0013 и образцу jobs/echo-ishkantun.json: по одному, ракурс словами, без картинки в запросе, враг в действии, по пояс, корпус развёрнут влево; звери — голова, грудь и передние лапы. Свет — бело-зелёный карст Виала, фиолетового нет; капюшон — только у Отголоска. Арена — раскладка jobs/arena-02.json, но с дорогой дальше: после этажа камера едет вправо",
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — veins of crystal in the earth, pale roots and fallen leaves that glow from within — throw cold white-green light upward, the light comes from below. Cold and warm light contrast. Glowing spores, pollen and tiny motes float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.",
+  "negative": "No text, no letters, no numbers, no glyphs, no runes, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no wounds, no skulls, no horror grotesque. No purple, no violet, no magenta light.",
+  "cutout_rule": "",
+  "categories": {
+    "arenas": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [
+        "art/generated/arenas/arena-workshop-wide__nb2-v2.jpg"
+      ],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the ground like a tabletop RPG battle map: no horizon, no perspective, no side view of trees, no standing trunks, no sky. The attached image is our battle arena of a different place, the Workshop of Forms: take from it ONLY the straight-down camera, the scale, the layout of the zones, its darkness and the painting style. Do NOT copy its objects or materials: no worktables, no clay works, no sand, no stone floor slabs. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit ground over their whole height: moss, earth, fallen leaves and fine glowing cracks only — no trunks, no big roots, no bushes, no mushrooms, no rocks, no objects there. The zones are invisible: no lines, no seams, no panels and no change of color or texture where the quarters meet the central half — the ground is one continuous surface. This arena is one stretch of a long way down: after each fight the camera moves on to the right into the next stretch of the same forest, so the ground continues beyond the left and right edges of the picture — no side walls, nothing closes the sides. The forest appears only as a thin dark strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there."
+    },
+    "enemies": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [],
+      "frame": "Enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary, so the enemy must read as one bold, simple, well-lit silhouette against a darker background. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. A beast is framed the same way: its head, chest and front legs fill the frame and the bottom edge cuts it behind the shoulders. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. No one in this set wears a hood unless its own description says so. World: the Underground Forest, the finished creation of the god Vial deep under the city of Endalor — what his Workshop of Forms left half-done is finished here. A forest without a sun: giant trees with pale, almost white trunks drink white-green light from glowing veins of crystal deep in the earth; their leaves glow cold white-green, the air is thick with drifting glowing spores, and a dark cave vault is lost high above the canopy. Its hunters are finished elves: tall and lean, long pointed ears, fine narrow faces, both hands, clothes of woven bast and bark strips; their skin is pale as the trunks, smooth and matte like fine dense clay — they are the god's finished work, not living people, calm and unhurried. Its beasts are bigger than the beasts of the surface and move in packs. Colors: muted and cold, like all our enemies — bone-white bark, pale grey-green moss, dark bottle green, ash grey, a little honey-tan bast and dull ochre; everything else sinks into near-black shadow. Light, the same for the whole set: the light comes from below — cold white-green light glowing from within veins of crystal in the earth, pale roots and fallen leaves rises onto the figure and lights it from underneath; crisp cold white-green rim light on its edges; the only warm colors are the honey-tan of bast and a dull ochre. Background: its own place in the Underground Forest, darker and softer than the figure, with depth. All fourteen portraits of this set share the same framing, painting style, palette and lighting."
+    }
+  },
+  "jobs": [
+    {
+      "id": "arena-b2-forest",
+      "category": "arenas",
+      "title": "Арена биома 2 «Подземный лес» — 21:9, дорога дальше вправо",
+      "source": "docs/content/враги-биомов.md, раздел 2, абзац места; раскладка — jobs/arena-02.json; поваленный ствол с содранным лыком — запись сказителя о Лыкодёре. Выбран v2 — правка v1 (её промт — в манифесте): в v1 модель нарисовала слабые прямые вертикальные швы на границах зон карт, у 27 % и 73 % ширины; правка их ослабила, но не убрала. v3 — этот рецепт, заново с правилом «зоны невидимы» и без тропы: зоны вышли явными рамками, хуже",
+      "subject": "Subject: a hunters' clearing in the Underground Forest, the finished creation of the god Vial, seen straight from above. It is dark, as dark as the attached arena: the ground lies in deep shadow and the light comes only from below — from glowing veins and cracks in the earth, glowing fallen leaves and glowing fungi. Ground: one continuous surface of dark soft earth covered with short pale grey-green moss and a litter of fallen pale leaves, some of them still glowing faintly white-green; fine cracks in the earth glow from within with cold white-green light. In the central half only: along the top edge, one giant fallen tree trunk with pale, almost white bark lies across, seen straight from above, both of its broken ends inside the central half; part of its bark is stripped off in long, even, honey-tan ribbons, and pale shelf fungi glowing white-green grow on it. Along the bottom edge, massive pale roots come in from the bottom edge and wrap around a vein of white-green crystal that breaks through the earth and glows from within — the tree drinks its light; the roots stay inside the central half. Small clusters of glowing white-green mushrooms beside the trunk and the roots; glowing spores drift above the ground. Along the very top and bottom edges runs a thin strip of dark roots and pale leaves, no more than 7% of the height; no ferns, no big leaves and no roots in the left and right quarters. Near-black shadows, cold white-green light; the only warm color is the honey-tan of the stripped bark ribbons. No characters, no animals, no bodies, no cards, no grid."
+    },
+    {
+      "id": "b2-o1-yearling",
+      "category": "enemies",
+      "title": "Переярок — Подземный лес, рядовой 1, физ ДД силы, звери, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 2, рядовые, № 1: «Волк второй зимы ростом с телёнка; шерсть бледная, как стволы, в глазах бело-зелёный отсвет»; запись сказителя: «где переярок, там и стая»",
+      "subject": "The enemy: the Yearling, a rank-and-file brawler of the Underground Forest — a young wolf in its second winter, as big as a calf. It is a beast: its head, chest and front legs fill the frame, the bottom edge cuts it behind the shoulders. A long narrow muzzle, a thick ruff, long legs; its fur is pale, almost white, like the trunks of the forest, with grey-green shadows; its eyes shine with a cold white-green glint. Action: it springs forward toward the left, low and fast, jaws wide open to seize its prey; its front paws reach out and tear up clods of moss and dark earth (Earth) that fly around it. Behind it in the darkness between the trunks, several pairs of white-green eyes glow — where there is one yearling, there is a pack. Background: pale glowing trunks of the forest, the ground covered with pale moss and fallen glowing leaves, white-green veins of light in the earth below."
+    },
+    {
+      "id": "b2-o2-beater",
+      "category": "enemies",
+      "title": "Загонщик — Подземный лес, рядовой 2, физ ДД ловкости, эльфы, Воздух",
+      "source": "docs/content/враги-биомов.md, раздел 2, рядовые, № 2: «Эльф-егерь в лыковой куртке с коротким луком; ступает по корням без звука»; способность «Стрела в подранка»",
+      "subject": "The enemy: the Beater, a rank-and-file archer of the Underground Forest — a young elf hunter who drives the game toward the pack. Lean and light, long pointed ears, a narrow, calm face, pale skin like the trunks, ash-grey hair tied back with a strip of bast; a short jacket of woven bast strips, a bast quiver of arrows on his back. Action: he has crept up without a sound and crouches low behind a thick pale root that runs across the bottom of the picture in front of his waist; he draws a short curved bow to full draw and aims to the left and slightly down, at a wounded prey trying to crawl away; his eyes are fixed on it, patient and cold. A thin thread of white-green wind (Air) curls around the arrowhead. Background: a tangle of huge pale roots in the dark forest, glowing leaves on the ground, white-green light rising from a crack in the earth below him."
+    },
+    {
+      "id": "b2-o3-duster",
+      "category": "enemies",
+      "title": "Пыльник — Подземный лес, рядовой 3, маг ДД, эльфы, Воздух",
+      "source": "docs/content/враги-биомов.md, раздел 2, рядовые, № 3: «Худой эльф с мешком спор у пояса; выдыхает светящуюся пыль»; способность «Порыв» — споры и ветер по всему отряду",
+      "subject": "The enemy: the Duster, a rank-and-file mage of the Underground Forest — a thin, narrow-shouldered elf with long pointed ears and hollow cheeks, pale skin like the trunks, long straight ash-pale hair; a sleeveless tunic of woven bast; at his belt hangs a bulging bast sack of spores that glows faintly through its weave. Action: he leans toward the left and exhales a long stream of glowing white-green spore dust from his lips, and with a sweep of his open hand he sends it on — a gust of wind (Air) catches the dust and carries it to the left in a wide swirling cloud that fills the left side of the picture. His eyes are half-closed, calm. Background: a glade of huge pale puffball mushrooms bursting with glowing spores, pale trunks behind, white-green light rising from the ground below."
+    },
+    {
+      "id": "b2-o4-forest-aurochs",
+      "category": "enemies",
+      "title": "Лесной тур — Подземный лес, рядовой 4, танк, звери, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 2, рядовые, № 4: «Бык выше человека; рога в мху и светящихся грибах»; способность «Напор» — все герои бьют его",
+      "subject": "The enemy: the Forest Aurochs, a rank-and-file tank of the Underground Forest — a wild bull taller than a man. It is a beast: its massive head, huge chest and front legs fill the frame, the bottom edge cuts it behind the shoulders. Dark grey-brown shaggy hide, a thick pale mane on its neck and hump; long forward-curving horns overgrown with pale moss, with clusters of small glowing white-green mushrooms growing on them. Action: it has lowered its head and turned its horns toward the left, stamps with a front hoof and snorts two jets of pale steam; clods of earth and moss jump around its hooves (Earth). It stands like a wall and dares everyone to strike it. Background: a clearing between pale trunks, trampled moss, white-green light rising from veins in the ground below it."
+    },
+    {
+      "id": "b2-o5-herbalist",
+      "category": "enemies",
+      "title": "Травник — Подземный лес, рядовой 5, лекарь, эльфы, Воздух",
+      "source": "docs/content/враги-биомов.md, раздел 2, рядовые, № 5: «Эльф с пучками бледных трав; руки в зелёном соке»; способность «Припарка» — лечит самого раненого из своих",
+      "subject": "The enemy: the Herbalist, a rank-and-file healer of the Underground Forest — an elf of middle years with long pointed ears, a gentle, focused face, pale skin like the trunks, long hair bound with a band of bast; a bast apron with pockets stuffed with bunches of pale herbs, more bunches tied at his belt. His hands are stained bright green to the wrists with herb juice. Action: he holds out toward the left a poultice of crushed pale herbs wrapped in a broad glowing leaf, pressing it forward as if onto a wound, while his other hand wrings a bunch of pale herbs and green juice drips between his fingers; a soft white-green breeze (Air) carries a glowing vapor from the poultice to the left. Background: his herb store among the roots — bunches of pale herbs drying on bast cords strung between two trunks, white-green light from the ground below."
+    },
+    {
+      "id": "b2-o6-pale-lynx",
+      "category": "enemies",
+      "title": "Бледная рысь — Подземный лес, рядовой 6, редкий убийца, звери, Воздух",
+      "source": "docs/content/враги-биомов.md, раздел 2, рядовые, № 6: «Крупная рысь; кисточки на ушах светятся бело-зелёным; прыгает с кроны»; способность «Прыжок с кроны» — удар по лекарю и метка",
+      "subject": "The enemy: the Pale Lynx, a rare and deadly hunter of the Underground Forest — a big lynx, larger than a wolf. It is a beast: its head, chest and front legs fill the frame, the bottom edge cuts it behind the shoulders. Pale, almost white fur with faint grey spots, a ruff of long fur on its cheeks; the long tufts on the tips of its ears glow white-green like the leaves; cold pale eyes. Action: it is caught in the middle of a leap from the canopy, diving down toward the left, front paws flung forward with claws out, mouth open in a hiss, aiming for the healer at the back of the enemy line. Leaves and glowing spores whirl in the wind of its jump (Air). Background: the branches of the canopy around it, glowing white-green leaves, pale trunks falling away into the dark depth below, lit from below."
+    },
+    {
+      "id": "b2-e1-tusker",
+      "category": "enemies",
+      "title": "Секач — Подземный лес, элита, физ ДД силы, звери, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 2, элиты: «Старый кабан; в клыках застряли корни, проросшие сквозь руду; щетина как проволока»; способности «Клык», «Натиск»",
+      "subject": "The enemy: the Tusker, an elite brawler of the Underground Forest — an old wild boar, huge and heavy. It is a beast: its head, chest and front legs fill the frame, the bottom edge cuts it behind the shoulders. Its bristles stand up along its neck and back like dark iron wire; its long curved tusks are tangled with old pale roots that grew right through lumps of dark grey ore, and the ore glints on the tusks. Small, furious, knowing eyes. Action: it charges straight toward the left with its head low and tusks up, about to hook and toss; its hooves throw up earth, moss and stones (Earth). Background: a gully of pale roots and broken grey rock, a crack in the earth glowing white-green below."
+    },
+    {
+      "id": "b2-e2-elder-huntsman",
+      "category": "enemies",
+      "title": "Старший егерь — Подземный лес, элита, физ ДД ловкости, эльфы, Воздух",
+      "source": "docs/content/враги-биомов.md, раздел 2, элиты: «Высокий эльф с длинным луком и костяным рогом на ремне; взгляд пастуха, а не охотника»; способности «Двойной выстрел», «Зов рога»; запись сказителя; правка своего варианта art/generated/enemies/b2-e2-elder-huntsman__nb2.jpg (в v1 — два скрещённых лука на уровне пояса)",
+      "refs": [
+        "art/generated/enemies/b2-e2-elder-huntsman__nb2.jpg"
+      ],
+      "subject": "EDIT MODE — this overrides everything above: do not draw a new picture, edit the attached image. The attached image is the current portrait of this enemy, the Elder Huntsman of the Underground Forest: a tall pale elf in a woven bast coat who blows a horn and points to the left, pale wolves behind him. Keep the picture exactly as it is — the same elf, his face, ears and grey hair, the horn at his lips, the woven bast coat, the pointing hand, the three wolves, the pale trunks, the roots, the glowing crystal, the light, the colors and the painting style. Change only this: now two bows cross in front of him at the height of his waist — that is a mistake. There must be exactly one bow. Remove completely the second, lower bow with its string — the long curved stave that runs across the picture from the left edge, next to the head of the lower-left wolf, over his coat to the right edge; in its place continue his bast coat, the dark roots and the wolf. Keep only the one bow held in his pointing hand, with one string. After the edit there is exactly one bow in the picture."
+    },
+    {
+      "id": "b2-e3-decker",
+      "category": "enemies",
+      "title": "Настильщик — Подземный лес, элита, танк, эльфы, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 2, элиты: «Коренастый эльф; держит перед собой сплетённый из суков настил, как щит»; способности «Напор», «Настил» — щит всем своим",
+      "subject": "The enemy: the Decker, an elite tank of the Underground Forest — a stocky, heavy-set elf, broad as a door, with long pointed ears, pale skin like the trunks, a stubborn, set face and short ash-grey hair; a thick jacket of layered bast. Action: he braces in front of him, toward the LEFT, a big deck of springy pale boughs woven tightly together like a raft, gripping it by its crossbars like a shield; a blow has just landed on it — the woven deck bends and springs back, two broken arrows are stuck in it, splinters and leaves fly off its face; his shoulder is pressed against its back and his teeth are clenched. The deck is on the left side of the picture, between him and his enemies. Clods of earth jump at its lower edge (Earth). Background: a narrow passage between two giant pale trunks that he blocks completely, white-green light glowing from the roots below."
+    },
+    {
+      "id": "b2-e4-leafwinder",
+      "category": "enemies",
+      "title": "Листовей — Подземный лес, элита, маг ДД, эльфы, Воздух",
+      "source": "docs/content/враги-биомов.md, раздел 2, элиты: «Эльф в плаще из светящихся листьев; вокруг него всегда кружит листва»; способности «Листопад», «Слепящий лист»",
+      "subject": "The enemy: the Leafwinder, an elite mage of the Underground Forest — a tall, slender elf with long pointed ears, pale skin like the trunks, long pale hair lifted by the wind and a sharp, dreamy face; his head is bare, no hood. He wears a long cloak made of hundreds of glowing white-green leaves stitched onto bast, and leaves keep peeling off it. Action: he sweeps one arm toward the left and a storm of glowing white-green leaves whirls off his cloak and pours to the left in a wide spiral, sharp-edged and bright (Air); in his other raised hand a single leaf blazes with blinding white-green light. Leaves circle around him all the time. Background: a pale grove of the Underground Forest in a thick fall of glowing leaves, white-green light rising from the ground below."
+    },
+    {
+      "id": "b2-e5-wisewoman",
+      "category": "enemies",
+      "title": "Знахарка — Подземный лес, элита, лекарь, эльфы, Воздух",
+      "source": "docs/content/враги-биомов.md, раздел 2, элиты: «Эльфийка с чашей из коры; в чаше светится Элазиум из жилы под корнями»; способности «Отвар», «Оберег»",
+      "subject": "The enemy: the Wisewoman, an elite healer of the Underground Forest — an elven woman with long pointed ears, pale skin like the trunks, a long calm face with narrowed wise eyes, long ash-pale hair braided with strips of bast and small pale leaves; a long dress of woven bast, a string of dried pale herbs across her chest. Action: in both hands she holds out toward the left a deep bowl of curved bark full of liquid white-green light — Elazium drawn from a vein under the roots; the glow of the bowl lights her face from below; a glowing vapor rises from it and flows to the left like a soft wind (Air), spreading into a faint shimmering veil that shields her kin. Background: the hollow under the roots of a giant tree where a vein of glowing white-green crystal breaks through the earth — her source; pale roots arch above her."
+    },
+    {
+      "id": "b2-e6-bast-stripper",
+      "category": "enemies",
+      "title": "Лыкодёр — Подземный лес, элита, дебаффер, эльфы, Воздух",
+      "source": "docs/content/враги-биомов.md, раздел 2, элиты: «Сухой эльф со скобелем; на плечах ленты содранного лыка»; способности «Содрать лыко», «Лыковые путы»; запись сказителя",
+      "subject": "The enemy: the Bast-Stripper, an elite debuffer of the Underground Forest — a dry, gaunt, sinewy elf with long pointed ears, pale skin like the trunks, a narrow, patient, unhurried face and short grey hair; long ribbons of freshly stripped honey-tan bast hang over both his shoulders like scarves. Action: with one hand he throws a long ribbon of bast toward the left; it twists through the air into a loop, like a snare, to bind someone's feet; his other hand holds a bark-stripping drawknife — a curved blade with a wooden handle at each end — low at his side. A draught of air (Air) lifts the ribbons. Background: a fallen pale giant trunk behind him, stripped of its bark in long, even ribbons, white-green light glowing from the bare wood and from the ground below."
+    },
+    {
+      "id": "b2-b1-pack-mother",
+      "category": "enemies",
+      "title": "Матерь стаи — босс биома «Подземный лес», звери, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 2, босс биома: «зверица размером с дом — волчья стать, медвежьи плечи, рысьи кисточки на ушах. Бледная грива светится вдоль хребта бело-зелёным. Рядом всегда кто-то из выводка»; способности «Тяжёлая лапа», «Вой», «Гон»",
+      "subject": "The enemy: the Mother of the Pack, the boss of the Underground Forest — a she-beast as big as a house, menacing and powerful, barely fitting the frame. It is a beast: her head, chest and front legs fill the frame, the bottom edge cuts her behind the shoulders. In her there is a little of every beast of the forest: the build and muzzle of a wolf, the massive humped shoulders of a bear, the long tufted ears of a lynx; her fur is pale like the trunks, and a long pale mane along her neck and spine glows cold white-green from within. Action: she lowers her huge head toward the left and draws back her lips in a deep snarl, one enormous front paw raised to strike down to the left; the ground cracks under her other paw (Earth). At her side, under her chest, a young pale wolf of her litter crouches and snarls toward the left too. Background: her den among giant pale roots, glowing white-green veins in the earth, more pale eyes of her litter in the dark."
+    },
+    {
+      "id": "b2-g1-echo-of-vial",
+      "category": "enemies",
+      "title": "Отголосок Виала — рунный босс «Подземного леса», страж доблести, саганы, Воздух",
+      "source": "docs/content/враги-биомов.md, раздел 2, рунный босс: «вихрь из спор, листвы и светящейся пыльцы. Держит форму, только пока движется. В середине на миг проступает путник в рясе с капюшоном и луком»; способности «Вихрь листвы», «Пыльца», «Стрела ветра»; капюшон — только у Отголосков (общие правила, п. 7)",
+      "subject": "The enemy: the Echo of Vial, the rune guardian at the road down — the trace of the god himself: a whirlwind of spores, leaves and glowing pollen that keeps its shape only while it moves. It is not a body of flesh: a tall spinning vortex of pale leaves, glowing white-green spores and pale pollen fills the frame from the bottom edge to the top. In the heart of the vortex, for a moment, the upper half of a figure shows through, made of the same leaves and light: a wanderer in a long robe with a deep hood — the hood hides the face in shadow, with only a faint white-green glow where the eyes would be. The figure is turned toward the left and draws a long bow, aiming to the left, and the arrow on the string is a streak of pure wind (Air). The figure is only half there, its edges dissolving into the whirling leaves. Background: the dark Underground Forest bending under its wind — pale trunks leaning, leaves torn from the branches and drawn into the vortex, white-green light from the ground below."
+    }
+  ]
+}

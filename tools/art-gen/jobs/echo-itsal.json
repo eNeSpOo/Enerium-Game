@@ -1,0 +1,139 @@
+{
+  "name": "Арена Эхо целиком (ADR-0025, п. 8): неделя саганов, древняя цивилизация Ицаль — фон арены 21:9 и 15 портретов: 14 врагов недели и Многоликий. Образец — одобренная неделя эльфов, jobs/echo-ishkantun.json: стиль, запреты, раскладка арены, кадр и манера описания взяты оттуда; свет снизу — свой, из материала цивилизации: живой огонь в трещинах обсидиана, холодные блики в зеркалах. Портреты — по правилам ADR-0012 и ADR-0013: по одному, ракурс словами, без картинки в запросе, враг в действии, по пояс (псы — голова, грудь и передние лапы, змеи — голова и передние кольца), корпус развёрнут влево. Имена и облик врагов — ECH.civ в design/ui/screens/echo.js",
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks in black obsidian and basalt that glow from within with living fire — throw colored light upward, the light comes from below. Cold and warm light contrast. Ash flakes, dust motes and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.",
+  "negative": "No text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque. No horns, no devils, no demons.",
+  "cutout_rule": "",
+  "categories": {
+    "arenas": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [
+        "art/generated/arenas/arena-workshop-wide__nb2-v2.jpg"
+      ],
+      "frame": "Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the ground like a tabletop RPG battle map: no horizon, no perspective, no side view of buildings, no sky. The attached image is our battle arena of a different place, the Workshop of Forms: take from it ONLY the straight-down camera, the scale, the layout of the zones and the painting style. Do NOT copy its objects, materials or colors: no worktables, no clay figures, no crystals, no sand. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit ground over their whole height: basalt slabs, ash in the seams and fine cracks only — no steps, no walls, no statues, no bowls, no plants, no objects there. Unlike our biome arenas, this arena is a single scene: the fight begins and ends here, the camera never moves on to a next room, so nothing in the picture leads onward — no doorway, no road, no stairway, no passage out of the picture. Cooled black lava appears only as a thin dark strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there."
+    },
+    "echo": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [],
+      "frame": "Enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. A beast is framed the same way: its head, chest and forelegs in frame, the rest of its body cut off by the edge of the picture; a serpent — its head and the front coils of its body. World: these are the people of Itsal, an ancient civilization of sagans — beings of living fire. They lived in cities of black obsidian mirrors: walls and towers of polished black volcanic glass that reflect their fire again and again, on a plain of ash and black basalt; every generation of them called itself a new sun. They wore sun discs of beaten gold, collars of obsidian and gold, crests of feathers made of flame; feathered fire serpents flew over their cities, and dogs of smoldering coal guarded them. Their look is inspired by the ancient Aztecs, but they are clearly SAGANS, not people: their bodies are living fire held in a human-like shape — a skin like a dark crust of cooling charcoal and obsidian, cracked all over, with orange-gold fire glowing through every crack; hair and beards of flame; eyes of white-gold fire; no human skin, no ordinary hair, no horns, no tails. No jade, no jungle, no stepped pyramids: their world is black glass, ash and fire. Colors: muted and smoky, like all our enemies — obsidian black, charcoal grey, ash white, dull old gold, deep ember red and orange; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — hot orange-red light of living fire glowing from within cracks in black obsidian and basalt, and from their own bodies, rises onto the figure; crisp cold pale-blue reflections gleam on the polished obsidian mirrors — the only cold light. Background: its own place in Itsal, darker and softer than the figure, with depth: walls and towers of polished black obsidian that mirror the fire, ash drifting in the air, a night sky dark with smoke. All fifteen portraits of this set share the same framing, painting style, palette and lighting."
+    }
+  },
+  "jobs": [
+    {
+      "id": "arena-echo-itsal",
+      "category": "arenas",
+      "title": "Арена Эхо: Ицаль, неделя саганов — 21:9, одна сцена без перехода",
+      "source": "ADR-0025, п. 8; ADR-0024; docs/content/герои/состав-героев.md, «Саганы — Ицаль»; раскладка — jobs/arena-02.json и образец jobs/echo-ishkantun.json",
+      "subject": "Subject: the mirror plaza of Itsal at night, a court in a city of black obsidian mirrors, seen straight from above — the one place where the whole fight happens. It is night and the plaza is dark, as dark as our Workshop arena: the slabs are black basalt and obsidian in deep shadow, and the light comes only from below — from glowing cracks and from the bowls of living fire. Ground: large slabs of black basalt, their surface polished almost like a mirror, grey ash in the seams; thin cracks glow from within with hot orange-red light of living fire. In the central half only: along the top edge, the base of a mirror tower seen straight from above — two tiers of polished black obsidian with sharp straight edges, their glassy tops reflecting the fire, cut off by the top edge of the picture; along the bottom edge, a great round mirror of polished black obsidian set flat into the plaza, seen straight from above, only its upper half visible, ringed with a broad band of beaten gold sun rays — simple ray shapes, no face, no signs — the fire of the plaza reflected in its black surface; near the tower and near the mirror, two wide obsidian bowls of living fire with flames and thin curls of smoke; a few broken shards of obsidian mirror reflecting the fire and drifts of grey ash on the slabs. Along the very top and bottom edges runs a thin strip of cooled black lava and ash; nothing in the corners, the left and right quarters stay clear. Near-black shadows, hot orange-red light from the cracks and the fire; the only cold color is the pale reflections in the polished obsidian. No characters, no animals, no bodies, no cards, no grid."
+    },
+    {
+      "id": "it-01-coal-hound",
+      "category": "echo",
+      "title": "Угольный пёс — Ицаль, ступень 1, рядовой, физ ДД ловкости, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Саганы», ступень 1: «Пёс из тлеющих углей. Где ляжет, там земля прожжена»",
+      "subject": "The enemy: the Coal Hound, a rank-and-file hunter of Itsal. It is a beast, not a person: a lean, fast hound made of smoldering coals — its body is lumps of black charcoal fitted together like muscles, glowing orange in every gap, sparks trailing from its ears, eyes of white-gold fire. Its head, chest and forelegs fill the frame. Action: it lunges low toward the left, jaws open, teeth glowing; embers and sparks (Fire) scatter from its paws, and the ground where it lay is burned black. Background: a street between black obsidian walls at night that mirror its fire, ash in the air; hot orange light in the cracks of the basalt pavement."
+    },
+    {
+      "id": "it-02-sun-disc-bearer",
+      "category": "echo",
+      "title": "Носитель солнечного диска — Ицаль, ступень 2, рядовой, танк, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Саганы», ступень 2: «Диск из чеканного золота вместо щита. На солнце на него больно смотреть»",
+      "subject": "The enemy: the Sun Disc Bearer, a rank-and-file tank of Itsal. A broad, heavy sagan with a body of cracked dark ember-crust glowing orange through the cracks, a short crest of flame on its head and eyes of white fire. Action: it braces behind a great round disc of beaten gold held as a shield toward the LEFT — the disc blazes so brightly that it hurts to look at: blinding rays burst from its face toward the left, heat shimmering (Fire); the disc has simple rays around its rim, no face and no signs. Its other hand holds a short club edged with obsidian. The disc is on the left side of the picture, between it and its enemies. Background: an obsidian mirror wall behind it reflecting the blaze; hot orange light in the cracks of the pavement."
+    },
+    {
+      "id": "it-03-spark-thrower",
+      "category": "echo",
+      "title": "Искрометатель — Ицаль, ступень 3, рядовой, маг ДД, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Саганы», ступень 3: «Мечет искры горстями. Вокруг него всегда светло и душно»",
+      "subject": "The enemy: the Spark Thrower, a rank-and-file mage of Itsal. A wiry, restless sagan, its ember-crust body cracked with bright orange light, flame hair flaring, a collar of obsidian beads. Action: it hurls a handful of sparks toward the left — a spray of bright sparks and small fireballs flies from its open palm — while its other hand is already scooping more sparks from the fire that burns in its own chest. The air around it is bright and stifling, full of heat haze and smoke (Fire). Background: a smoky obsidian courtyard at night; hot orange light in the cracks."
+    },
+    {
+      "id": "it-04-smoke-dancer",
+      "category": "echo",
+      "title": "Плясунья в дыму — Ицаль, ступень 4, рядовой, физ ДД ловкости, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Саганы», ступень 4: «Танцует в дыму с обсидиановыми ножами. Видно только ножи»",
+      "subject": "The enemy: the Smoke Dancer, a rank-and-file fighter of Itsal. A slender female sagan, seen waist-up, dancing inside thick grey smoke — her body is almost lost in the smoke, only the dim orange glow of her ember-crust and her white-gold eyes show through; what is clearly visible are her two black obsidian knives, gleaming with reflected fire, flashing toward the left in a spinning dance. Swirls of wind (Air) twist the smoke into spirals around her. Background: a smoke-filled obsidian street at night; hot orange light in the cracks."
+    },
+    {
+      "id": "it-05-mirror-priest",
+      "category": "echo",
+      "title": "Жрец зеркала — Ицаль, ступень 5, рядовой, дебаффер, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Саганы», ступень 5: «Ловит тебя в обсидиановое зеркало. В зеркале ты медленнее, чем здесь»",
+      "subject": "The enemy: the Mirror Priest, a rank-and-file debuffer of Itsal. A tall, thin sagan priest with a dark ember-crust body, a crown of flame feathers and a long ash-grey cloak. Action: it holds up a round, polished obsidian mirror in a gold frame toward the left; in the black mirror there is only a dim, blurred, slowed reflection, and green light of Time (Time) spirals slowly out of the mirror toward the left like a slow whirlpool — in the mirror you are slower than here. Background: a hall of obsidian mirrors at night reflecting its fire again and again; hot orange light in the cracks."
+    },
+    {
+      "id": "it-06-hearth-keeper",
+      "category": "echo",
+      "title": "Хранитель очага — Ицаль, ступень 6, рядовой, лекарь, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Саганы», ступень 6: «Несёт в ладонях живой огонь. Прижмёт к ране своего — и рана закроется»",
+      "subject": "The enemy: the Hearth Keeper, a rank-and-file healer of Itsal. An old, calm, heavy sagan whose ember-crust is thick and dark like old basalt, with a warm glow deep in its cracks and a beard of low, slow flames. Action: it carries a small living fire cupped in both palms and holds it out toward the left, to press it to a comrade's wound; the fire in its hands is soft and golden, and small glowing pebbles and ash (Earth) circle around it. Background: a hearth niche in an obsidian wall at night with a great fire bowl behind; hot orange light in the cracks."
+    },
+    {
+      "id": "it-07-fire-serpent",
+      "category": "echo",
+      "title": "Пернатый огненный змей — Ицаль, ступень 7, элита, маг ДД, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Саганы», ступень 7: «Змей в перьях из пламени, длиной в улицу. Летит низко и жжёт всё под собой»",
+      "subject": "The enemy: the Feathered Fire Serpent, an elite mage of Itsal. It is not a person: a great serpent as long as a street, covered in feathers made of flame — orange and red flame feathers along its body, a crest and ruff of fire around its head, obsidian-black scales under the flames, eyes of white-gold fire. Its head and the front coils of its body fill the frame, the rest of its long body trails away behind it into the distance. Action: it flies low toward the left with its jaws wide open, breathing a wave of fire (Fire) down to the left; everything under it burns. Background: a street of obsidian walls at night lit by its fire, the flames mirrored in the black glass; hot orange light in the cracks of the pavement."
+    },
+    {
+      "id": "it-08-two-discs",
+      "category": "echo",
+      "title": "Воин двух дисков — Ицаль, ступень 8, элита, физ ДД силы, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Саганы», ступень 8: «По солнечному диску в каждой руке. Бьёт ими, как крыльями»",
+      "subject": "The enemy: the Warrior of Two Discs, an elite fighter of Itsal. A powerful, broad sagan warrior with a body of cracked ember-crust blazing orange at the joints, a crest of flame feathers and eyes of white fire. Action: it holds a round gold sun disc with sharpened, rayed edges in each hand and swings both forward toward the left like wings beating together, the discs trailing arcs of fire (Fire); the discs have simple rays, no faces, no signs. Background: an obsidian plaza at night, mirrors reflecting the arcs of fire; hot orange light in the cracks."
+    },
+    {
+      "id": "it-09-mirror-maiden",
+      "category": "echo",
+      "title": "Зеркальщица — Ицаль, ступень 9, элита, дебаффер, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Саганы», ступень 9: «Держит два зеркала лицом друг к другу. Кто попал между ними, тот теряется»",
+      "subject": "The enemy: the Mirror Maiden, an elite debuffer of Itsal. A tall, elegant female sagan with a body of dark ember-crust traced with thin lines of glowing fire, long hair of slow-burning flame, a collar of obsidian and gold. Action: she holds two round obsidian mirrors in gold frames facing each other, stretched out to the left, and between them opens an endless corridor of reflections spiraling with green light of Time (Time) — whoever is caught between them is lost. Background: a maze of obsidian mirrors at night reflecting her fire; hot orange light in the cracks."
+    },
+    {
+      "id": "it-10-coal-leader",
+      "category": "echo",
+      "title": "Угольный вожак — Ицаль, ступень 10, элита, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Саганы», ступень 10: «Огромный пёс из остывающего угля: снаружи чёрный, внутри жар»",
+      "subject": "The enemy: the Coal Pack Leader, an elite tank of Itsal. It is a beast, not a person: a huge hound as big as a bull, made of cooling coal — outside a thick crust of matte black coal and ash, cracked, with a deep glowing heat inside the cracks, eyes of dull red fire. Its head, chest and forelegs fill the frame. Action: it plants its forelegs and braces toward the LEFT, head lowered, blocking the way; a heavy blow has just landed and flakes of black crust and ash (Earth) spray off its shoulder, showing the heat beneath; it growls. Background: a field of cooled black lava at the edge of the city, obsidian towers behind; hot orange light in the cracks."
+    },
+    {
+      "id": "it-11-high-mirror-master",
+      "category": "echo",
+      "title": "Верховный зеркальщик — Ицаль, ступень 11, босс недели, маг ДД, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Саганы», ступень 11: «Обсидиановые зеркала висят вокруг него на цепях. В каждом горит своё солнце»",
+      "subject": "The enemy: the High Mirror Master, a boss of Itsal — imposing and dangerous. A tall, gaunt sagan lord with a dark ember-crust body, a tall crown of flame feathers and a long gold-edged ash-grey mantle; round obsidian mirrors hang around him on gold chains from a gold yoke on his shoulders, and in each mirror burns its own small sun. Action: he raises his hands and all the mirrors turn toward the left and flare together — beams of green light of Time (Time) strike from them to the left. Background: the top of an obsidian mirror tower at night; hot orange light in the cracks."
+    },
+    {
+      "id": "it-12-serpent-lord",
+      "category": "echo",
+      "title": "Владыка пернатых змеев — Ицаль, ступень 12, босс недели, физ ДД силы, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Саганы», ступень 12: «Змей, у которого перья горят белым. Остальные летят за ним клином»",
+      "subject": "The enemy: the Lord of the Feathered Serpents, a boss of Itsal — menacing and powerful, filling the frame. It is not a person: a giant feathered serpent whose feathers burn with white flame — white-hot feathers along its body and a great ruff of white fire around its head, obsidian-black scales, blinding white eyes. Its head and the front coils of its body fill the frame. Action: it dives toward the left, jaws wide, and a gale of wind (Air) tears white flames off its feathers; behind it, smaller orange-feathered fire serpents fly in a wedge. Background: the night sky over the obsidian city; hot orange light rising from the city below."
+    },
+    {
+      "id": "it-13-new-sun",
+      "category": "echo",
+      "title": "Новое Солнце — Ицаль, ступень 13, босс недели, лекарь, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Саганы», ступень 13: «Правитель своего поколения, назвавший себя солнцем. Свита ходит в копоти, а он светит»",
+      "subject": "The enemy: the New Sun, a boss of Itsal — the ruler of his generation who named himself a sun: radiant and proud. A tall sagan ruler whose whole body blazes bright gold-white, the brightest thing in the picture; a crown of golden rays, a great gold collar, eyes like two small suns. Action: he raises one hand and warm golden healing light (Fire) pours from him toward the left in rays, onto his own; behind him his retinue — dim sagans covered in soot, their fire dull — bow in the smoke, while he shines. Background: a throne hall of obsidian mirrors reflecting his blaze; hot orange light in the cracks."
+    },
+    {
+      "id": "it-14-fifth-sun",
+      "category": "echo",
+      "title": "Пятое Солнце — Ицаль, ступень 14, Убер-босс недели, маг ДД, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Саганы», ступень 14: «Огненный великан в кольце обсидиановых зеркал. Горит ярче всех, потому что после него — никого»",
+      "subject": "The enemy: the Fifth Sun, the uber-boss of the week — a colossal fire giant in a ring of obsidian mirrors, the last and brightest of the suns of Itsal. Seen from a low camera angle, from the waist up it towers over the obsidian city, which stands tiny at the bottom of the picture; its head is near the top edge. Its body is blazing white-gold fire in a giant human-like shape, armored with big plates of cracked black obsidian, and its head is crowned with rays of fire. Around it floats a ring of six big round obsidian mirrors, each reflecting its blaze. Action: it spreads its arms wide and a great wave of fire (Fire) rolls toward the left. Background: the dark smoky night sky over Itsal, where a few dim, burnt-out suns hang behind the giant — dark discs with a faint red rim."
+    },
+    {
+      "id": "it-15-many-faced",
+      "category": "echo",
+      "title": "Многоликий — пятнадцатая ступень недели саганов, «враг тысячи лиц»",
+      "source": "design/ui/recipes.js, предмет many: «Носит лица всех, кого одолели на этой неделе»; §17.4 GDD; docs/content/эхо-враги.md, неделя саганов, ступень 15: маг. ДД · Огонь",
+      "subject": "The enemy: the Many-Faced, the fifteenth and last enemy of the week, the one with a thousand faces: it wears the faces of those who were defeated this week. It is not one of them — it only wears their faces. A tall, thin, long-armed figure in a long hooded cloak; the cloak is covered with dozens of small masks sewn on row over row like scales — faces of Itsal: polished black obsidian faces, gold sun faces ringed with rays, faces of cracked ember-crust with fire in their eyes, feathered serpent faces. Under its hood there is no face of its own, only shadow; over the shadow it wears a polished black obsidian mask. Action: it glides forward toward the left and with one long hand lifts the obsidian mask aside — and underneath there is already another face, a gold sun mask ringed with rays. Thin orange light of Fire glows in the empty eye holes of all the masks. The masks are obsidian, gold and stone, never skin. Background: the dark mirror plaza of Itsal at night, broken obsidian masks scattered on cracked basalt, hot orange light rising from the cracks. Uncanny and unsettling, but not grotesque."
+    }
+  ]
+}

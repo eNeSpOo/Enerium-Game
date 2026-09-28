@@ -1,0 +1,132 @@
+{
+  "name": "Биом 4 «Искусственный Стоун-Хейм» (Уларион · творение · земля · Рубидиум): фон арены 21:9 и 14 портретов врагов — шесть рядовых, шесть элит, Глава города и Отголосок Улариона. Облик — docs/content/враги-биомов.md, раздел 4. Портреты — по правилам ADR-0012 и ADR-0013 и образцу jobs/echo-ishkantun.json: по одному, ракурс словами, без картинки в запросе, враг в действии, по пояс, корпус развёрнут влево; звери и аппараты — голова или перед, грудь и передние лапы. Свет — янтарный карст Улариона, фиолетового нет; капюшон — только у Отголоска. Дворфы здесь законченные, не куклы: гладкий тёплый камень без шарниров — этим они отличаются от кукол Библиотеки. Арена — раскладка jobs/arena-02.json, но с дорогой дальше: после этажа камера едет вправо",
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — glowing coals, forge mouths, molten lava in stone gutters and cracks in the stone that glow from within — throw warm amber light upward, the light comes from below. Warm and cold light contrast. Sparks, ash and dust float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.",
+  "negative": "No text, no letters, no numbers, no glyphs, no runes, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no heraldry, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no wounds, no skulls, no horror grotesque. No purple, no violet, no magenta light.",
+  "cutout_rule": "",
+  "categories": {
+    "arenas": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [
+        "art/generated/arenas/arena-workshop-wide__nb2-v2.jpg"
+      ],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the pavement like a tabletop RPG battle map: no horizon, no perspective, no side view of houses or walls, no roofs, no sky. The attached image is our battle arena of a different place, the Workshop of Forms: take from it ONLY the straight-down camera, the scale, the layout of the zones, its darkness and the painting style. Do NOT copy its objects, materials or colors: no worktables, no clay works, no sand, no white-green crystals, no green light — here all the light is warm amber and molten orange. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit pavement over their whole height: paving blocks, soot, ash and fine glowing cracks only — no forges, no lava, no anvils, no chains, no carts, no objects there. The zones are invisible: no lines, no seams, no panels and no change of color or texture where the quarters meet the central half — the pavement is one continuous surface. This arena is one stretch of a long way down: after each fight the camera moves on to the right into the next stretch of the same street, so the pavement continues beyond the left and right edges of the picture — no side walls, nothing closes the sides. The walls of the street appear only as a thin strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there."
+    },
+    "enemies": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [],
+      "frame": "Enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary, so the enemy must read as one bold, simple, well-lit silhouette against a darker background. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. A beast or a machine is framed the same way: its head or front, chest and front legs fill the frame and the bottom edge cuts it behind the shoulders. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. No one in this set wears a hood unless its own description says so. World: Artificial Stoneheim, the finished creation of the god Ularion deep under the city of Endalor — a full-size sketch of a dwarven city, and it is alive: forges, hammers, hoists, tiers and bridges, molten lava running in stone gutters. For a thousand years everything here has worked without a quarrel and without a mistake. The forges burn Rubidium, and its light is amber. Its dwarves are finished, not puppets: short, broad and strong, with braided carved stone beards, and their skin is smooth, warm stone the color of sandstone and baked clay, without joints or seams; each has his own craft, his leather apron, cap or caftan and his tools; they do not tire and do not argue, their faces are calm and busy. They are the god's finished work, not living people. Beside them work machines of iron and brass, work beasts in collars and stone sagans. Colors: muted, like all our enemies — warm sandstone and baked-clay stone, soot black, dark iron, dull brass, worn brown leather; the light is amber and molten orange; everything else sinks into near-black shadow. Light, the same for the whole set: the light comes from below — warm amber light from Rubidium coals, forge mouths and lava gutters rises onto the figure and lights it from underneath; crisp cool grey-blue rim light on its edges and cold blue-grey smoke are the only cold notes. Background: its own place in Stoneheim, darker and softer than the figure, with depth. All fourteen portraits of this set share the same framing, painting style, palette and lighting."
+    }
+  },
+  "jobs": [
+    {
+      "id": "arena-b4-stonehaim",
+      "category": "arenas",
+      "title": "Арена биома 4 «Искусственный Стоун-Хейм» — 21:9, дорога дальше вправо",
+      "source": "docs/content/враги-биомов.md, раздел 4, абзац места: горны, молоты, подъёмники, лава в желобах; раскладка — jobs/arena-02.json",
+      "subject": "Subject: a working street of Artificial Stoneheim, the full-size living sketch of a dwarven city made by the god Ularion, seen straight from above. It is dark, as dark as the attached arena: the pavement lies in deep shadow, darkened by soot, and the light comes only from below — from the forge, the lava gutter and amber-glowing cracks. Pavement: big, precisely fitted square blocks of warm sandstone-colored stone, worn smooth and darkened by soot, soot in the seams, a few iron rivets and flakes of ash on them; thin cracks glow from within with warm amber light. Along the very top and bottom edges runs a thin dark strip of the foot of stone walls and iron railings, no more than 7% of the height, running on through the left and right edges of the picture. In the central half only: near the top edge, a round forge hearth set into the pavement, seen straight from above, full of glowing amber Rubidium coals, with a heavy iron anvil beside it, a hammer and a pair of tongs lying next to it, a few sparks. Near the bottom edge, a short stone gutter of glowing molten orange lava comes out of the bottom edge, runs a short way along it and goes back into it, crossed by a small iron plate bridge; beside it, a coil of heavy iron chain with a hook and a few lumps of amber ore. Thin curls of blue-grey smoke. Near-black shadows, warm amber and molten orange light; the only cold notes are the blue-grey smoke and shadows. No characters, no animals, no carts, no cards, no grid."
+    },
+    {
+      "id": "b4-o1-miner",
+      "category": "enemies",
+      "title": "Рудокоп — Искусственный Стоун-Хейм, рядовой 1, физ ДД силы, дворфы, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 4, рядовые, № 1: «Каменный дворф в кожаном шлеме с киркой»; способность «Удар кирки» — удар и пробитие брони",
+      "subject": "The enemy: the Miner, a rank-and-file brawler of Stoneheim — a stone dwarf in a battered leather helmet and a leather jerkin, with a thick braided stone beard and calm, tireless eyes. Action: he swings a heavy iron pickaxe down toward the left with both hands, about to strike through armor; chips of rock and glowing amber ore burst out where it bites (Earth). Background: a mine face deep in Stoneheim, veins of glowing amber Rubidium ore in the dark rock, a rail track and an empty ore cart behind him, amber light from below."
+    },
+    {
+      "id": "b4-o2-riveter",
+      "category": "enemies",
+      "title": "Клепальщик — Искусственный Стоун-Хейм, рядовой 2, физ ДД ловкости, дворфы, Огонь",
+      "source": "docs/content/враги-биомов.md, раздел 4, рядовые, № 2: «Дворф с клещами и поясом раскалённых заклёпок»; способность «Горячая заклёпка» — в самого раненого",
+      "subject": "The enemy: the Riveter, a rank-and-file striker of Stoneheim — a lean, quick stone dwarf with a short braided stone beard, a leather cap and a scorched leather apron; a belt of glowing red-hot rivets crosses his chest like a bandolier. Action: with long iron tongs he flings a red-hot rivet toward the left like a dart, aimed at the wounded; it flies trailing sparks and a streak of scarlet heat (Fire); with his other hand he already pulls the next glowing rivet from the belt. Background: an iron bridge being riveted high above a lava gutter, falling sparks, amber light from below."
+    },
+    {
+      "id": "b4-o3-pavement-sagan",
+      "category": "enemies",
+      "title": "Мостовой саган — Искусственный Стоун-Хейм, рядовой 3, маг ДД, саганы, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 4, рядовые, № 3: «Кусок мостовой, вставший на ноги; между камнями светится янтарь»; способность «Щебень»",
+      "subject": "The enemy: the Pavement Sagan, a rank-and-file mage of Stoneheim — a piece of the city's pavement that has stood up: a hunched, heavy shape with a head, broad shoulders and two thick arms, made entirely of fitted square paving blocks and cobbles, with warm amber light glowing in the seams between the stones; two short seams glow brighter where the eyes would be. It has no face, no beard and no clothes. Action: it tears paving stones out of its own shoulder and hurls a hail of cobbles and gravel toward the left (Earth); the stones fly in a glowing spray, and new ones slide into their place. Background: a street of Stoneheim with a torn-up patch of pavement where it lay, forges glowing behind, amber light from below."
+    },
+    {
+      "id": "b4-o4-ore-cart",
+      "category": "enemies",
+      "title": "Гружёная вагонетка — Искусственный Стоун-Хейм, рядовой 4, танк, аппараты, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 4, рядовые, № 4: «Рудничная вагонетка на кованых ножках; въезжает в строй и встаёт»; способность «Напор»",
+      "subject": "The enemy: the Loaded Cart, a rank-and-file tank of Stoneheim — a heavy iron mine cart that walks: instead of wheels it stands on four short, thick forged-iron legs. It is not a person: here the rules about waist, head and arms do not apply — the cart fills the frame, seen from a low three-quarter angle, its front end turned toward the LEFT; its two front legs are visible and cut by the bottom edge. It is heaped high with lumps of ore that glow amber from within; riveted iron plates, dents and soot. It has no face and no eyes — it is a machine. Action: it has just driven into the enemy line and stopped dead, braced on its forged legs; lumps of ore bounce off its heap, sparks and stone dust spray around its feet (Earth). Background: rails and a mine gallery of Stoneheim, a hoist chain hanging, amber light from below."
+    },
+    {
+      "id": "b4-o5-tinker",
+      "category": "enemies",
+      "title": "Лудильщик — Искусственный Стоун-Хейм, рядовой 5, лекарь, дворфы, Огонь",
+      "source": "docs/content/враги-биомов.md, раздел 4, рядовые, № 5: «Дворф с паяльной лампой и котелком олова; латает и дворфов, и машины»; способность «Лужение» — щит самому раненому из своих",
+      "subject": "The enemy: the Tinker, a rank-and-file healer of Stoneheim — a stout stone dwarf with a braided stone beard tucked into his leather apron, a leather cap, a small iron pot of molten silver tin hanging from his belt; he patches both dwarves and machines. Action: he points a brass blowtorch toward the left, its tongue of flame roaring (Fire); in the flame he melts a stick of tin held in his other hand, and the molten tin sprays to the left as a bright silver film that spreads in the air like a gleaming shield. Background: a repair corner of Stoneheim, a half-mended iron machine with fresh silver seams of tin, amber light from below."
+    },
+    {
+      "id": "b4-o6-toll-taker",
+      "category": "enemies",
+      "title": "Пошлинник — Искусственный Стоун-Хейм, рядовой 6, редкий убийца, дворфы, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 4, рядовые, № 6: «Дворф в чистом кафтане с весами у пояса; подходит сам и берёт своё»; способность «Пошлина» — удар по лекарю, часть урона лечит его; запись сказителя",
+      "subject": "The enemy: the Toll-Taker, a rare and deadly assassin of Stoneheim — a neat stone dwarf in a clean, dark, long caftan with brass buttons, his stone beard combed and bound with a brass ring; a small pair of brass scales hangs at his belt. He comes up by himself and takes his due. Action: he steps forward toward the left and reaches out his open palm, as if for payment, while his other hand drives a short, broad knife forward low toward the left, aimed at the healer at the back of the enemy line; a thin stream of amber light flows from the left into his open palm (Earth). His face is polite and cold. Background: the gate of a Stoneheim quarter with a heavy iron toll barrier, forges glowing behind, amber light from below."
+    },
+    {
+      "id": "b4-e1-hammerer",
+      "category": "enemies",
+      "title": "Молотобоец — Искусственный Стоун-Хейм, элита, физ ДД силы, дворфы, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 4, элиты: «Дворф с молотом, боёк которого стёрт ровно: тысячу лет в одну отметку»; способности «В одну отметку», «Тяжкий молот»",
+      "subject": "The enemy: the Hammerer, an elite brawler of Stoneheim — a huge-shouldered stone dwarf, bare stone arms thick as logs, a braided stone beard tucked into a leather apron. His great sledgehammer has struck the same mark for a thousand years, and its striking face is worn perfectly flat and smooth as a mirror. Action: he brings the sledgehammer down in a great arc toward the left, about to strike; sparks and amber light burst around it (Earth). Background: his forge — a massive anvil with one deep, perfectly round dent worn into it in the same place, glowing forge mouths behind, amber light from below."
+    },
+    {
+      "id": "b4-e2-chainman",
+      "category": "enemies",
+      "title": "Цепник — Искусственный Стоун-Хейм, элита, физ ДД ловкости, дворфы, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 4, элиты: «Дворф с подъёмной цепью, намотанной на руку»; способности «Цепная серия» — три удара, «Подрез»",
+      "subject": "The enemy: the Chainman, an elite striker of Stoneheim — a wiry, quick stone dwarf with a short braided stone beard and a leather cap; a heavy iron hoisting chain is wound many times around his forearm like a bandage of iron. Action: he lashes the chain toward the left — its free end with a heavy iron hook whips out in a wide, fast curve, striking three times in one blow; links clatter, sparks and stone dust fly (Earth). Background: the hoists of Stoneheim — great chains and hooks hanging from winches above a deep shaft, tiers and bridges in the amber haze below."
+    },
+    {
+      "id": "b4-e3-dray-lizard",
+      "category": "enemies",
+      "title": "Ломовой ящер — Искусственный Стоун-Хейм, элита, танк, звери, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 4, элиты: «Тяжёлый ящер в ошейнике, стёртом до блеска; тянет вагонетки»; способности «Напор», «Толстая шкура»; запись сказителя",
+      "subject": "The enemy: the Dray Lizard, an elite tank of Stoneheim — a heavy work beast, a huge lizard that pulls the ore carts. It is a beast: its head, chest and front legs fill the frame, the bottom edge cuts it behind the shoulders; its head points to the left side of the picture. Its thick hide is made of plates like warm grey stone; a broad iron collar, worn to a mirror shine by a thousand years of work, sits around its neck, with a broken harness strap hanging from it. Action: it plants itself across the road facing the LEFT, head lowered and jaws open in a hiss, front legs spread wide, as immovable as a loaded train; dust and grit jump from under its claws (Earth). Background: rails and a line of ore carts behind it, forges glowing in the distance, amber light from below."
+    },
+    {
+      "id": "b4-e4-gutterman",
+      "category": "enemies",
+      "title": "Желобник — Искусственный Стоун-Хейм, элита, маг ДД, дворфы, Огонь",
+      "source": "docs/content/враги-биомов.md, раздел 4, элиты: «Дворф с длинным крюком, которым правит лаву в желобах; в бороде искры»; способности «Разлив лавы», «Жар жёлоба»",
+      "subject": "The enemy: the Gutterman, an elite mage of Stoneheim — a stone dwarf with a long braided stone beard in which sparks glow and crackle, in a thick leather apron and heavy leather gloves. With a long iron hook he steers the lava in the gutters. Action: he sweeps his long iron hook through the molten lava in a stone gutter in front of him and flings a wave of glowing orange lava toward the left (Fire); glowing drops and sparks fly. Background: stone gutters of lava running along the tiers of Stoneheim, a bridge above them, amber and orange light from below."
+    },
+    {
+      "id": "b4-e5-stoker",
+      "category": "enemies",
+      "title": "Истопник — Искусственный Стоун-Хейм, элита, лекарь, дворфы, Огонь",
+      "source": "docs/content/враги-биомов.md, раздел 4, элиты: «Дворф с совком янтарных крупиц: подкидывает Рубидиум в горны и в своих»; способности «Янтарный жар» — лечит всех своих, «Оберег»",
+      "subject": "The enemy: the Stoker, an elite healer of Stoneheim — a stocky stone dwarf with a soot-streaked face, a braided stone beard singed at the tips, a leather apron and thick gloves; he feeds Rubidium to the forges and to his own. Action: with a broad iron scoop he tosses a glittering arc of glowing amber grains toward the left; the grains shine warm amber as they fly and settle on his kin like healing sparks (Fire); his face is lit from below by their glow. Background: a row of forge mouths blazing amber, heaps of amber grains, rising sparks."
+    },
+    {
+      "id": "b4-e6-founder",
+      "category": "enemies",
+      "title": "Литейщик — Искусственный Стоун-Хейм, элита, дебаффер, дворфы, Огонь",
+      "source": "docs/content/враги-биомов.md, раздел 4, элиты: «Фартук прожжён в сотне мест и ни разу не порван; у пояса кувшин кислоты»; способности «Травление», «Снять форму»; запись сказителя",
+      "subject": "The enemy: the Founder, an elite debuffer of Stoneheim — a stone dwarf with a braided stone beard and a stern, careful face, in a heavy leather apron burned through in a hundred small places and never torn, heavy leather gloves; a stoneware jug of acid hangs from his belt. Action: he flings acid from a second stoneware jug toward the left in a hissing, smoking arc of pale yellow liquid that eats into whatever it touches (Fire); in his other hand he holds long tongs. Background: a foundry of Stoneheim, molten metal glowing in open moulds, amber light from below."
+    },
+    {
+      "id": "b4-b1-city-head",
+      "category": "enemies",
+      "title": "Глава города — босс биома «Искусственный Стоун-Хейм», дворфы, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 4, босс биома: «дворф не выше других, в тяжёлом кафтане, с цепью главы и полой янтарной короной. За ним всегда стоят свои»; способности «Указ», «Квартал встаёт», «Весь квартал»",
+      "subject": "The enemy: the Head of the City, the boss of Stoneheim — a stone dwarf no taller and no broader than the others, yet commanding: a heavy dark caftan, a heavy chain of office of brass links across his chest, and on his head a hollow crown of amber — a thin shell of glowing amber with nothing inside. A braided stone beard, a calm, heavy face. Action: he stretches one hand toward the left and points — a decree: the whole quarter must strike there; behind him his own people rise out of the darkness — silhouettes of stone dwarves with hammers, chains and hooks, their eyes glowing amber, all turning to where he points (Earth: dust rises from the pavement). Background: the square of a Stoneheim quarter, tiers and bridges above, forges glowing, amber light from below."
+    },
+    {
+      "id": "b4-g1-echo-of-ularion",
+      "category": "enemies",
+      "title": "Отголосок Улариона — рунный босс «Искусственного Стоун-Хейма», страж доблести, саганы, Земля",
+      "source": "docs/content/враги-биомов.md, раздел 4, рунный босс: «глыба камня, заметившая себя, с янтарными жилами Рубидиума. В очертаниях — путник в рясе с капюшоном и посохом»; способности «Сомнение», «Тяжесть основания», «Удар посохом»; капюшон — только у Отголосков (общие правила, п. 7)",
+      "subject": "The enemy: the Echo of Ularion, the rune guardian at the road down — the trace of the god himself: a great boulder of stone that has noticed itself. It is not a body of flesh: a massive rough rock that has taken the outline of a wanderer in a long robe with a deep hood — the hood and the robe are the rock itself, cracked and heavy; under the hood there is no face, only darkness with an amber glow deep inside. Veins of Rubidium run through the whole rock and glow amber-orange. One arm of rock grips a staff — a long, rough pillar of stone. Action: he swings the stone staff toward the left in a heavy blow; the ground splits and heaves, stones rise from it (Earth). Background: a dark hall on the road down below Stoneheim, amber light rising from cracks in the ground."
+    }
+  ]
+}

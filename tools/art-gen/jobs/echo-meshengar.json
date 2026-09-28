@@ -1,0 +1,145 @@
+{
+  "name": "Арена Эхо целиком (ADR-0025, п. 8): неделя искажённых, древняя цивилизация Мешен-Гар — фон арены 21:9 и 15 портретов: 14 врагов недели и Многоликий. Рецепт — одобренная неделя эльфов (jobs/echo-ishkantun.json): тот же стиль, запреты, кадр и раскладка арены; своя палитра и свой свет из материала — холодный фиолетовый свет из трещин алебастра и лазуритовых вставок, тёплые только масляные лампы. Фиолетовый — цвет искажения (art/style/style.md). Портреты — по правилам ADR-0012 и ADR-0013: по одному, ракурс словами, без картинки в запросе, враг в действии, по пояс, корпус развёрнут влево; звери и великаны заполняют кадр, как ik-14. Многоликий здесь — часть нашествия («Многоликие растекались по земле»), поэтому он выразительнее, но в рамке ik-15",
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and lapis inlays in old alabaster that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.",
+  "negative": "No text, no letters, no numbers, no glyphs, no hieroglyphs, no cuneiform, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+  "cutout_rule": "",
+  "categories": {
+    "arenas": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [
+        "art/generated/arenas/arena-workshop-wide__nb2-v2.jpg"
+      ],
+      "frame": "Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the ground like a tabletop RPG battle map: no horizon, no perspective, no side view of buildings, no sky. The attached image is our battle arena of a different place, the Workshop of Forms: take from it ONLY the straight-down camera, the scale, the layout of the zones and the painting style. Do NOT copy its objects, materials or colors: no worktables, no clay figures, no crystals, no sand. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit ground over their whole height: alabaster slabs and fine cracks only — no steps, no walls, no statues, no lamps, no masks, no objects there. Unlike our biome arenas, this arena is a single scene: the fight begins and ends here, the camera never moves on to a next room, so nothing in the picture leads onward — no doorway, no gate, no road, no stairway, no passage out of the picture. The walls of the court appear only as a thin dark strip of glazed-brick wall tops along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there."
+    },
+    "echo": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [],
+      "frame": "Enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Meshen-Gar, an ancient civilization that changed their own bodies at will — they grew wings, horns, stone skin, scales, a second face. Winged bulls with the faces of bearded men guard their temple gates, and their priests wear masks over masks. When they came out of their gates, they spread over the land like a tide and took the shape of everyone they touched. Their look is inspired by ancient Assyria and Babylon — long, tightly curled beards and hair, fringed robes, gold bands and rosettes, walls of glazed lapis-blue bricks, alabaster, bronze — but every one of them is clearly CHANGED: each bears a change of the body — curved horns, feathered wings, a second face, patches of scales or stone skin — and many wear masks; strange and uncanny, but deliberate and beautiful, never diseased or grotesque; they must not look like real-world people. Ornament is only broad and simple — rosettes, feathers, zigzags, wings — never letters, never cuneiform, never rows of small marks. Colors: muted and deep, like all our enemies — deep lapis blue, dull old gold, pale alabaster, dark bronze, bitumen black, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold violet light glowing from within cracks in old alabaster and from lapis inlays rises onto the figure; crisp cold violet rim light on its edges; a small warm amber glow of oil lamps is the only warm light. Background: its own place in Meshen-Gar, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting."
+    }
+  },
+  "jobs": [
+    {
+      "id": "arena-echo-meshengar",
+      "category": "arenas",
+      "title": "Арена Эхо: Мешен-Гар, неделя искажённых — 21:9, одна сцена без перехода",
+      "source": "ADR-0025, п. 8; ADR-0024; docs/content/герои/состав-героев.md, «Искажённые — Мешен-Гар»; рецепт — jobs/echo-ishkantun.json, раскладка — jobs/arena-02.json",
+      "subject": "Subject: the gate-court of a great temple of Meshen-Gar at night, seen straight from above — the one place where the whole fight happens. It is night and the court is dark, as dark as our Workshop arena: the slabs are dark, time-worn alabaster in deep shadow, and the light comes only from below — from glowing cracks and inlays. Ground: large, tightly fitted square slabs of old alabaster, dark and cracked; thin cracks glow from within with cold violet light. In the central half only: along the top edge, the front of a wide low dais faced with glazed lapis-blue bricks, with a band of simple white-and-gold rosettes along its edge, seen straight from above, cut off by the top edge of the picture; on the dais, two tall bronze lamp stands with bowls of oil burning with small warm amber flames and thin curls of smoke; along the bottom edge, a great round mosaic set flat into the floor, seen straight from above, only its upper half visible — broad concentric rings of large simple ornament: a ring of rosettes, a ring of spread feathered wings, a ring of calm mask-faces around the center — with violet light glowing in its grooves; a few cast-off masks of gold and alabaster, a broken bronze horn and scattered feathers lie on the slabs near the dais and near the mosaic. Along the very top and bottom edges runs a thin strip of dark glazed-brick wall tops; the left and right quarters stay clear. Near-black shadows, cold violet light; the only warm color is the amber glow of the oil lamps. No characters, no animals, no bodies, no cards, no grid."
+    },
+    {
+      "id": "mg-01-masked-dancer",
+      "category": "echo",
+      "title": "Танцор в маске — Мешен-Гар, ступень 1, рядовой, физ ДД ловкости, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Искажённые», ступень 1: «Маска на маске, под ней ещё одна. Танцует, пока не поверишь, что лица у него нет»",
+      "subject": "The enemy: the Masked Dancer, a rank-and-file fighter of Meshen-Gar. A lithe, long-limbed young dancer with small curved horns growing through his curled black hair, bare arms with gold bands, a fringed sash across his chest; his face is covered by a smooth gold mask, and at its edges you can see the rims of two more masks under it — a mask over a mask over a mask. Action: he whirls toward the left in a dance, two curved bronze sickle-swords in his hands cutting arcs of wind (Air) through the air in front of him; the top mask has slipped a little aside, showing another mask beneath. Background: a temple courtyard at night, walls of glazed lapis-blue bricks with bands of gold rosettes, violet light from the cracks of the floor."
+    },
+    {
+      "id": "mg-02-horned-gatekeeper",
+      "category": "echo",
+      "title": "Рогатый привратник — Мешен-Гар, ступень 2, рядовой, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Искажённые», ступень 2: «Отрастил рога и каменную кожу, чтобы стоять у ворот вечно»",
+      "subject": "The enemy: the Horned Gatekeeper, a rank-and-file tank of Meshen-Gar. A massive, broad man who grew great curling ram's horns and a skin of grey stone to stand at the gate forever: his shoulders, arms and chest are stone skin, cracked like old alabaster, with violet light in the cracks; a long square beard in tight curls; a bronze belt with a rosette. Action: a blow has just landed — he lowers his head and braces his great horns toward the LEFT like a shield, arms spread wide to bar the way; chips of stone (Earth) fly off his shoulders where the blows hit. Background: a great closed gate of glazed lapis-blue bricks with bronze-studded doors right behind him, violet light seeping from the cracks of the threshold."
+    },
+    {
+      "id": "mg-03-winged-herald",
+      "category": "echo",
+      "title": "Крылатый вестник — Мешен-Гар, ступень 3, рядовой, физ ДД ловкости, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Искажённые», ступень 3: «Крылья выросли у него за одну ночь. С тех пор он не ходит пешком»; выбран v1 по этому промту (ноги в кадре); v2 — перерисовка «по пояс» и v3 — правка v2 вышли с белым полем и рамкой вокруг картинки",
+      "subject": "The enemy: the Winged Herald, a rank-and-file fighter of Meshen-Gar. A slim young man with great feathered wings that grew from his shoulder blades in a single night — long, dark, with bronze-tinted tips — curled black hair bound by a gold band with a rosette, a short fringed tunic, a long bronze dagger. Action: he dives from the night sky toward the left, wings half-folded behind him, the dagger thrust forward; a rush of wind (Air) whistles through his feathers. Background: the night sky over the flat roofs and walls of a city of Meshen-Gar, violet light rising from the streets far below."
+    },
+    {
+      "id": "mg-04-lesser-chimera",
+      "category": "echo",
+      "title": "Малая химера — Мешен-Гар, ступень 4, рядовой, физ ДД силы, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Искажённые», ступень 4: «Лев спереди, козёл посередине, змей позади. Все трое спорят, куда бить»",
+      "subject": "The enemy: the Lesser Chimera, a rank-and-file beast of Meshen-Gar. It is not a person: its three heads and its chest fill the frame, turned in a three-quarter view to the left, the bottom edge cuts it at the chest. A chimera the size of a pony: a lion in front with a mane of tight curls like on old reliefs and a gold collar; a goat's head with curved horns grows from the middle of its back; its tail is a long serpent that rears over its back with open jaws. The three heads snarl in three different directions — the lion toward the left, the goat up, the serpent to the right — arguing where to strike; small flames and sparks (Fire) spit from the lion's jaws. Background: the steps before a temple of glazed bricks at night, violet light in the cracks."
+    },
+    {
+      "id": "mg-05-two-faced-novice",
+      "category": "echo",
+      "title": "Двуликий послушник — Мешен-Гар, ступень 5, рядовой, лекарь, Вода",
+      "source": "design/ui/screens/echo.js, ECH.civ «Искажённые», ступень 5: «Одно лицо плачет, другое поёт. От пения у своих затягиваются раны»",
+      "subject": "The enemy: the Two-Faced Novice, a rank-and-file healer of Meshen-Gar. A young novice priest whose shaved head has two faces, back to back like on an old coin: the face turned toward the LEFT sings with an open mouth, the face turned toward the right weeps with closed eyes; both faces are calm and beautiful, not monstrous. He wears a plain white fringed robe and a necklace of lapis beads and holds a small bronze bowl. Action: he sings toward the left, and the song flows out of his mouth as a ribbon of shimmering blue water (Water) that curls through the air to the left; the tears of the weeping face drip into the bowl. Background: a dim temple hall with alabaster walls carved only with rosettes and feathered wings, violet light from the floor."
+    },
+    {
+      "id": "mg-06-shape-taker",
+      "category": "echo",
+      "title": "Сниматель обличий — Мешен-Гар, ступень 6, рядовой, дебаффер, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Искажённые», ступень 6: «Снимает с тебя облик, как маску. Без него ты слабее»",
+      "subject": "The enemy: the Shape-Taker, a rank-and-file debuffer of Meshen-Gar. A tall, thin, stooped man whose arms grew too long, with very long fingers, a long curled beard and a dark fringed robe; his own face is hidden behind a plain smooth bronze mask. Action: he reaches out to the left with his long hand and pulls a thin glowing likeness off his enemy, like peeling off a mask — a translucent mask of light shaped like a face, trailing green motes of Time; the taken likeness is made of light, never of skin. Background: a narrow passage between alabaster walls at night, violet light in the cracks."
+    },
+    {
+      "id": "mg-07-winged-bull",
+      "category": "echo",
+      "title": "Крылатый бык-страж — Мешен-Гар, ступень 7, элита, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Искажённые», ступень 7: «Бык с крыльями и лицом бородатого человека. Стоит у ворот — и ворота держатся»",
+      "subject": "The enemy: the Winged Bull Guard, an elite tank of Meshen-Gar — a living winged BULL with the head of a bearded man, like the great winged bull guardians of the gates of ancient Assyria, but alive and moving. It is not a person and has no human arms and no human body: its body is the body of a huge bull — a massive deep chest, heavy shoulders and thick front legs with hooves, covered with rows of tight curls of hair; great feathered wings grow from its shoulders; only its head is human — a stern, calm bearded face with a long square beard of tight curls and a tall cap ringed with horns. For this beast the rule about legs does not apply: its head, its wings, its bull chest and its front legs fill the frame, seen in a three-quarter view turned to the left. Action: it steps forward toward the left, one front hoof raised, and spreads its wings wide like a wall to hold the gate behind it; its heavy stare pins its enemy to the spot; the slabs crack under its hooves and stone dust (Earth) rises. Background: a huge gate of glazed lapis-blue bricks with rows of gold rosettes, violet light from the cracks of the threshold."
+    },
+    {
+      "id": "mg-08-two-faced-priest",
+      "category": "echo",
+      "title": "Двуликий жрец — Мешен-Гар, ступень 8, элита, маг ДД, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Искажённые», ступень 8: «Одно лицо спереди, другое сзади. Одно колдует, другое смотрит, кто подходит»",
+      "subject": "The enemy: the Two-Faced Priest, an elite mage of Meshen-Gar. A tall, gaunt old priest in a long fringed robe of dark blue and gold and a tall rounded cap; his head has two faces — one in front and one at the back: the front face, turned toward the left, chants a spell with glowing violet eyes; the face at the back of his head, turned to the right, watches with wide open eyes who comes up behind him. Action: he raises one open palm toward the left and casts: rings of green Time light and a whirl of sand spin from his palm to the left. Background: the dark sanctum of a temple, a tall alabaster altar, violet light from the floor."
+    },
+    {
+      "id": "mg-09-gate-chimera",
+      "category": "echo",
+      "title": "Химера ворот — Мешен-Гар, ступень 9, элита, физ ДД силы, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Искажённые», ступень 9: «Три головы и одно тело. Каждая голова бьёт по-своему»",
+      "subject": "The enemy: the Gate Chimera, an elite beast of Meshen-Gar. It is not a person: its three heads and its chest fill the frame, turned in a three-quarter view to the left, the bottom edge cuts it at the chest. A great chimera bigger than a horse, three heads on one powerful body covered with gold scales, feathers and mane: in the middle a lion's head, on one side an eagle's head with a hooked beak, on the other a horned serpent-dragon's head like the dragons on the glazed gates of ancient Babylon; a heavy gold harness with rosettes. Action: all three heads strike toward the left, each in its own way — the lion roars fire, the eagle stabs with its beak, the serpent spits sparks (Fire). Background: tall gate towers of glazed lapis-blue brick at night, violet light, drifting embers."
+    },
+    {
+      "id": "mg-10-seven-masks-dancer",
+      "category": "echo",
+      "title": "Плясунья семи масок — Мешен-Гар, ступень 10, элита, дебаффер, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Искажённые», ступень 10: «Каждая маска — чужой облик. Сменит маску — и бьёт по-другому»; перерисовка: в v1 фигура в рост, ноги в кадре",
+      "subject": "The enemy: the Dancer of Seven Masks, an elite debuffer of Meshen-Gar. A tall, graceful woman with long curled black hair and small feathered wings growing at her temples, in a fringed dress of dark blue and gold; seven masks circle around her head in the air on thin gold chains — a lion mask, a bull mask, an eagle mask, a bearded mask, a weeping mask, a laughing mask, a blank gold mask — and her face is covered by one of them. Waist-up: the bottom edge cuts her at the waist — no skirt hem, no legs in the frame; her head, the ring of masks and her arms fill the frame. Action: spinning toward the left, she snatches another mask out of the air to put on, and a blinding whirl of dust and wind (Air) flies from her to the left. Background: a moonlit temple courtyard, alabaster pillars, violet light from the cracks."
+    },
+    {
+      "id": "mg-11-mask-high-priest",
+      "category": "echo",
+      "title": "Верховный жрец масок — Мешен-Гар, ступень 11, босс недели, маг ДД, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Искажённые», ступень 11: «Масок на нём столько, что лица под ними давно нет»; правка своего варианта art/generated/echo/mg-11-mask-high-priest__nb2.jpg (в v1 не видно заклинания)",
+      "subject": "EDIT MODE — this overrides everything above: do not draw a new picture, edit the attached image. The attached image is the current portrait of this enemy, the High Priest of Masks of Meshen-Gar: a priest in dark blue and gold fringed robes with a tall tower of stacked masks on his head, both hands raised to the left. Keep the picture exactly as it is — the tower of masks, the pale stone face with violet eyes, the curled beard, the robes, the cracked alabaster on his arm and chest, the raised hands, the city, the light, the colors and the painting style. Change only this: between his two raised hands, in front of him on the left, a large glowing mask made of green Time light is forming and flying toward the left, trailing green motes and thin rings of green light.",
+      "refs": [
+        "art/generated/echo/mg-11-mask-high-priest__nb2.jpg"
+      ]
+    },
+    {
+      "id": "mg-12-seven-gates-guard",
+      "category": "echo",
+      "title": "Страж семи ворот — Мешен-Гар, ступень 12, босс недели, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Искажённые», ступень 12: «Шестикрылый бык с тремя лицами. Каждое лицо смотрит на свои ворота»; правка своего варианта art/generated/echo/mg-12-seven-gates-guard__nb2.jpg (в v1 лишняя бычья голова на груди)",
+      "subject": "EDIT MODE — this overrides everything above: do not draw a new picture, edit the attached image. The attached image is the current portrait of this enemy, the Guardian of the Seven Gates of Meshen-Gar: a colossal six-winged bull with one great head of three bearded human faces under a tall horned cap. Keep the picture exactly as it is — the three bearded faces, the horned cap, the six wings, the curly-haired bull body and its legs, the cracked floor and flying chips, the gates, the violet light, the colors and the painting style. Change only this: the lowered horned BULL head at the front of its chest is a mistake — the creature has only one head, the one with three bearded faces. Remove that bull head, its horns and its curly forelock completely; in its place paint the massive curly-haired chest of the bull, matching the rest of the body.",
+      "refs": [
+        "art/generated/echo/mg-12-seven-gates-guard__nb2.jpg"
+      ]
+    },
+    {
+      "id": "mg-13-queen-of-shapes",
+      "category": "echo",
+      "title": "Царица обличий — Мешен-Гар, ступень 13, босс недели, лекарь, Вода",
+      "source": "design/ui/screens/echo.js, ECH.civ «Искажённые», ступень 13: «Меняет тело на ходу: то крылья, то чешуя, то второе лицо. Свои меняются вслед за ней»",
+      "subject": "The enemy: the Queen of Shapes, a boss of Meshen-Gar — regal and strange. A tall queen with long, tightly curled black hair and a gold crown of rosettes, in a gown of lapis blue with gold fringes; she is changing her body as she moves: one arm is turning into a great feathered wing, a sheen of blue scales ripples across her shoulder and neck, and on the back of her head a calm second face is opening its eyes — elegant, not grotesque. Action: she raises her other hand toward the left and a wave of shimmering water (Water) flows from it to the left; behind her, her own warriors change with her — dark silhouettes sprouting wings and horns. Background: a throne hall of glazed bricks and alabaster at night, violet light from below."
+    },
+    {
+      "id": "mg-14-tide-of-shapes",
+      "category": "echo",
+      "title": "Прилив Обличий — Мешен-Гар, ступень 14, Убер-босс недели, физ ДД силы, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Искажённые», ступень 14: «Волна плоти и масок. Катится вперёд и берёт облик каждого, кого коснётся»",
+      "subject": "The enemy: the Tide of Shapes, the uber-boss of the week — a colossal wave of masks and living shapes that rolls forward by itself and takes the shape of everyone it touches. It is not a person: here the rules about waist, head and arms do not apply — instead the wave fills the whole frame, rearing up from a low camera angle, its crest near the top edge curling over toward the LEFT, its base cut by the bottom edge. It is made of hundreds of masks and shapes flowing like water: gold and alabaster masks, bearded faces, horns, feathered wings, lion manes, bull heads, scales — all in bronze, gold, lapis and alabaster tones, never raw flesh; at its crest one great calm mask with glowing eyes; along its front edge the foam is turning into new faces and wings. Green Time light glows from deep inside it; broken slabs and dust fly where it rolls. No arms, no legs, no blood, no gore. Background: the gate-court of Meshen-Gar at night, dark gates."
+    },
+    {
+      "id": "mg-15-many-faced",
+      "category": "echo",
+      "title": "Многоликий — пятнадцатая ступень недели искажённых, «враг тысячи лиц»",
+      "source": "design/ui/recipes.js, предмет many: «Носит лица тех, кого победили на этой неделе»; Маска недели — «маска, снятая с Многоликого»; §17.4 GDD; ECH.civ «Искажённые», нашествие: «Многоликие растекались по земле и брали облик всех, кого касались»; рамка — ik-15",
+      "subject": "The enemy: the Many-Faced, the fifteenth and last enemy of the week, the one with a thousand faces: it wears the faces of those who were defeated this week — and in Meshen-Gar the many-faced were the tide itself. A tall, thin, long-armed figure in a long hooded cloak; the cloak is covered with dozens of small masks sewn on row over row like scales — faces of Meshen-Gar: bearded faces with curled beards, gold masks, horned masks, two-faced masks, lion and bull faces, calm alabaster faces. Under its hood there is no face of its own, only shadow; small curved horns have grown through the hood and a pair of feathered wings through the back of the cloak — it changes as it wears. Over the shadow it wears a gold bearded mask. Action: it glides forward toward the left and with one long hand lifts the gold mask aside — underneath there is already another face, a two-faced alabaster mask. Its shadow on the glazed-brick wall behind it is not its own: it is the shadow of a winged bull with a human face. Thin green light (Time) glows in the empty eye holes of all the masks. The masks are gold, bronze, wood and alabaster, never skin. Background: the gate-court of Meshen-Gar at night, broken masks scattered on the cracked slabs, violet light rising from the cracks. Uncanny and unsettling, but not grotesque."
+    }
+  ]
+}
