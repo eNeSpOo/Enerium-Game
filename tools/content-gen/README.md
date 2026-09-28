@@ -129,11 +129,13 @@ python tools/content-gen/economy/economy.py --sim
 Доход душ и уровни отряда он берёт из `economy.py` и `sets.py` через importlib и их не меняет. Числа — данными в начале файла, только целые.
 - `--sim` меряет бой ядром через Node на врагах недели из `design/ui/echo-foes.js`; вывод вставить в `SIM_*`.
 - `--js` собирает `design/ui/echo-rules.js` — `window.EN_ECHO_RULES`, руками не править, формат — в шапке файла.
+- `--doc` заменяет таблицы Э1–Э15 в черновике выводом скрипта; повторная сборка даёт те же байты.
 
 ```bash
 python tools/content-gen/economy/echo.py
 python tools/content-gen/economy/echo.py --sim
 python tools/content-gen/economy/echo.py --js
+python tools/content-gen/economy/echo.py --doc
 ```
 
 ## Враги Эхо

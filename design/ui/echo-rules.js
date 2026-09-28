@@ -28,8 +28,7 @@
    - many — биом Многоликого (ADR-0025): ресурс с пятнадцатой ступени активирует его на своей неделе или уходит в крафт.
        floors — этажи: ступени 1–14 недели по порядку, их составы, уровни и раунды; attempts — попыток; souls — душ на атаки;
        этаж взят, когда пал главный враг; здоровье и павшие переходят дальше, как в биоме (ADR-0007).
-   Замер — отрядом прототипа (economy.SIM_JS) на врагах недели: design/ui/echo-foes.js, недель 9: oebum; вне замера — Саганы#14.
-   Вне замера — наборы, которые не умирают при здоровье между атаками (SIM_SKIP в echo.py): их нужно править, а не балансировать. */
+   Замер — отрядом прототипа (economy.SIM_JS) на врагах недели: design/ui/echo-foes.js, недель 9: oebum; режим Эхо ядра — echoBattle. */
 window.EN_ECHO_RULES = {
   bp: 10000, onLevel: 240, summonSouls: 1,
   ladder: ["o","o","o","o","o","o","e","e","e","e","b","b","b","u","m"],
@@ -58,7 +57,7 @@ window.EN_ECHO_RULES = {
       {"step":11,"g":"b","foeLvl":159,"bossHpPct":8250,"foeHpPct":100,"souls":60,"points":2646,"manyHpPct":850,"manyPoints":2646},
       {"step":12,"g":"b","foeLvl":161,"bossHpPct":8250,"foeHpPct":100,"souls":60,"points":3069,"manyHpPct":850,"manyPoints":3069},
       {"step":13,"g":"b","foeLvl":161,"bossHpPct":8250,"foeHpPct":100,"souls":60,"points":3560,"manyHpPct":850,"manyPoints":3560},
-      {"step":14,"g":"u","foeLvl":162,"bossHpPct":17650,"foeHpPct":100,"souls":75,"points":10326,"manyHpPct":900,"manyPoints":10326},
+      {"step":14,"g":"u","foeLvl":162,"bossHpPct":18000,"foeHpPct":100,"souls":75,"points":10326,"manyHpPct":900,"manyPoints":10326},
       {"step":15,"g":"m","foeLvl":162,"bossHpPct":1850,"foeHpPct":null,"souls":30,"points":798},
     ],
     '3': [
@@ -75,7 +74,7 @@ window.EN_ECHO_RULES = {
       {"step":11,"g":"b","foeLvl":259,"bossHpPct":8250,"foeHpPct":100,"souls":140,"points":7939,"manyHpPct":850,"manyPoints":7939},
       {"step":12,"g":"b","foeLvl":260,"bossHpPct":8250,"foeHpPct":100,"souls":140,"points":9209,"manyHpPct":850,"manyPoints":9209},
       {"step":13,"g":"b","foeLvl":261,"bossHpPct":8250,"foeHpPct":100,"souls":140,"points":10682,"manyHpPct":850,"manyPoints":10682},
-      {"step":14,"g":"u","foeLvl":262,"bossHpPct":17650,"foeHpPct":100,"souls":175,"points":30978,"manyHpPct":900,"manyPoints":30978},
+      {"step":14,"g":"u","foeLvl":262,"bossHpPct":18000,"foeHpPct":100,"souls":175,"points":30978,"manyHpPct":900,"manyPoints":30978},
       {"step":15,"g":"m","foeLvl":262,"bossHpPct":1850,"foeHpPct":null,"souls":70,"points":2395},
     ],
     '4': [
@@ -92,7 +91,7 @@ window.EN_ECHO_RULES = {
       {"step":11,"g":"b","foeLvl":424,"bossHpPct":8250,"foeHpPct":100,"souls":240,"points":23817,"manyHpPct":850,"manyPoints":23817},
       {"step":12,"g":"b","foeLvl":427,"bossHpPct":8250,"foeHpPct":100,"souls":240,"points":27627,"manyHpPct":850,"manyPoints":27627},
       {"step":13,"g":"b","foeLvl":429,"bossHpPct":8250,"foeHpPct":100,"souls":240,"points":32047,"manyHpPct":850,"manyPoints":32047},
-      {"step":14,"g":"u","foeLvl":430,"bossHpPct":17650,"foeHpPct":100,"souls":300,"points":92936,"manyHpPct":900,"manyPoints":92936},
+      {"step":14,"g":"u","foeLvl":430,"bossHpPct":18000,"foeHpPct":100,"souls":300,"points":92936,"manyHpPct":900,"manyPoints":92936},
       {"step":15,"g":"m","foeLvl":430,"bossHpPct":1850,"foeHpPct":null,"souls":120,"points":7187},
     ],
     '5': [
@@ -109,7 +108,7 @@ window.EN_ECHO_RULES = {
       {"step":11,"g":"b","foeLvl":683,"bossHpPct":8250,"foeHpPct":100,"souls":360,"points":71451,"manyHpPct":850,"manyPoints":71451},
       {"step":12,"g":"b","foeLvl":687,"bossHpPct":8250,"foeHpPct":100,"souls":360,"points":82882,"manyHpPct":850,"manyPoints":82882},
       {"step":13,"g":"b","foeLvl":690,"bossHpPct":8250,"foeHpPct":100,"souls":360,"points":96142,"manyHpPct":850,"manyPoints":96142},
-      {"step":14,"g":"u","foeLvl":691,"bossHpPct":17650,"foeHpPct":100,"souls":450,"points":278810,"manyHpPct":900,"manyPoints":278810},
+      {"step":14,"g":"u","foeLvl":691,"bossHpPct":18000,"foeHpPct":100,"souls":450,"points":278810,"manyHpPct":900,"manyPoints":278810},
       {"step":15,"g":"m","foeLvl":691,"bossHpPct":1850,"foeHpPct":null,"souls":180,"points":21561},
     ],
     '6': [
@@ -126,7 +125,7 @@ window.EN_ECHO_RULES = {
       {"step":11,"g":"b","foeLvl":1100,"bossHpPct":8250,"foeHpPct":100,"souls":520,"points":214355,"manyHpPct":850,"manyPoints":214355},
       {"step":12,"g":"b","foeLvl":1107,"bossHpPct":8250,"foeHpPct":100,"souls":520,"points":248647,"manyHpPct":850,"manyPoints":248647},
       {"step":13,"g":"b","foeLvl":1111,"bossHpPct":8250,"foeHpPct":100,"souls":520,"points":288426,"manyHpPct":850,"manyPoints":288426},
-      {"step":14,"g":"u","foeLvl":1113,"bossHpPct":17650,"foeHpPct":100,"souls":650,"points":836430,"manyHpPct":900,"manyPoints":836430},
+      {"step":14,"g":"u","foeLvl":1113,"bossHpPct":18000,"foeHpPct":100,"souls":650,"points":836430,"manyHpPct":900,"manyPoints":836430},
       {"step":15,"g":"m","foeLvl":1113,"bossHpPct":1850,"foeHpPct":null,"souls":260,"points":64683},
     ],
   },
