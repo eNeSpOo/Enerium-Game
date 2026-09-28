@@ -6495,6 +6495,1158 @@
         928
       ],
       "sha256": "51eed9a0c827a66cdfe3d5f4e68a34c34eb0e67caa2efd01ad30064696d4daef"
+    },
+    {
+      "file": "art/generated/arenas/arena-echo-ishkantun__nb2.jpg",
+      "category": "arenas",
+      "job": "arena-echo-ishkantun",
+      "title": "Арена Эхо: Иш-Кантун, неделя эльфов — 21:9, одна сцена без перехода",
+      "source": "ADR-0025, п. 8; ADR-0024; docs/content/герои/состав-героев.md, «Эльфы — Иш-Кантун»; раскладка — jobs/arena-02.json",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:05:46+03:00",
+      "params": {
+        "aspectRatio": "21:9",
+        "imageSize": "2K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/arenas/arena-workshop-wide__nb2-v2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nFormat: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the ground like a tabletop RPG battle map: no horizon, no perspective, no side view of buildings, no sky. The attached image is our battle arena of a different place, the Workshop of Forms: take from it ONLY the straight-down camera, the scale, the layout of the zones and the painting style. Do NOT copy its objects, materials or colors: no worktables, no clay figures, no crystals, no sand. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit ground over their whole height: plaza slabs, moss in the seams and fine cracks only — no steps, no walls, no statues, no bowls, no plants, no objects there. Unlike our biome arenas, this arena is a single scene: the fight begins and ends here, the camera never moves on to a next room, so nothing in the picture leads onward — no doorway, no road, no stairway, no passage out of the picture. The forest appears only as a thin dark strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there.\n\nSubject: the great plaza of Ish-Kantun at night, at the foot of a jade stepped pyramid deep in an ancient forest, seen straight from above — the one place where the whole fight happens. Ground: large worn slabs of pale grey stone with a faint jade tint, tightly fitted, some lifted and cracked by roots; dark moss in the seams, a few fallen leaves and scattered green feathers; thin cracks glow from within with cold jade-green light. In the central half only: along the top edge, the lowest tiers of a jade-green stepped pyramid seen straight from above — straight parallel step edges running across the central half, cut off by the top edge of the picture; along the bottom edge, a great round stone calendar disc set flat into the plaza, seen straight from above, only its upper half visible, carved with concentric rings of abstract ornament — notches, spirals, feather and jaguar-spot patterns, nothing like writing or numbers — with jade-green light glowing in its grooves; near the pyramid and near the disc, two wide stone bowls of smoldering copal resin with warm amber embers and thin curls of pale smoke; a few black obsidian shards and jade beads on the slabs. Along the very top and bottom edges, giant dark forest leaves and roots crowd in over the edge as a thin strip. The plaza is cold: near-black shadows, jade-green light; the only warm color is the amber glow of the copal embers. No characters, no animals, no bodies, no cards, no grid.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1133,
+        "candidatesTokenCount": 2323,
+        "totalTokenCount": 3456,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 875
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1680
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1033,
+      "seconds": 21.9,
+      "status": "заменён: площадь светлая, дневная, а не ночная; мелкие знаки на календаре, листья в зонах карт — перерисована (v2)",
+      "px": [
+        3168,
+        1344
+      ],
+      "sha256": "cc630f58420a1fc63b39264804e49b5acaa1a8af1dd417420895b2629c098e61"
+    },
+    {
+      "file": "art/generated/echo/ik-01-feather-archer__nb2.jpg",
+      "category": "echo",
+      "job": "ik-01-feather-archer",
+      "title": "Лучник в перьях — Иш-Кантун, ступень 1, рядовой, физ ДД ловкости, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 1: «Перья в волосах и на колчане. Стреляет из листвы, откуда его не видно»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:05:57+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nThe enemy: the Feathered Archer, a rank-and-file archer of Ish-Kantun. A lean young elf with long pointed ears, long black hair tied up with bunches of dark green and grey feathers, a stripe of dark green paint across his eyes, a simple cotton wrap and a collar of bone beads; on his back a quiver of arrows fletched with the same feathers, and more feathers hang from the quiver. Action: he shoots from the foliage where no one can see him — half-hidden among giant dark leaves, only his face, arms and bow come out of them; he draws a long bow to full draw and aims to the left, the arrowhead a black obsidian point; his narrowed eyes are fixed on a target to the left. A breath of wind (Air) stirs the feathers and the leaves around him. Background: the dense night canopy of the forest of Ish-Kantun, huge leaves and hanging lianas; far below behind him, the dim shape of a stepped pyramid with a jade-green glow at its base.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 898,
+        "candidatesTokenCount": 1779,
+        "totalTokenCount": 2677,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 898
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0696,
+      "seconds": 10.9,
+      "status": "ждёт автора: отобран для арены Иш-Кантуна (ADR-0025, п. 8)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "b223ffe39a26ae0e9c33aa613c34d8d106f389fdf68625868d3e56a4ca095b7d"
+    },
+    {
+      "file": "art/generated/echo/ik-02-jaguar-pelt__nb2.jpg",
+      "category": "echo",
+      "job": "ik-02-jaguar-pelt",
+      "title": "Воин в шкуре ягуара — Иш-Кантун, ступень 2, рядовой, физ ДД силы, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 2: «Пятнистая шкура на плечах, дубина с обсидиановыми зубьями»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:06:08+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nThe enemy: the Jaguar-Pelt Warrior, a rank-and-file fighter of Ish-Kantun. A strong, broad-shouldered elf with long pointed ears and jade ear spools, black hair bound in a high knot, bare arms painted with dark stripes; a spotted jaguar pelt is thrown over his shoulders like a cape, the jaguar's front paws knotted across his chest. Action: he swings a heavy flat wooden war club edged on both sides with rows of black obsidian teeth — the club is raised high over his shoulder and about to come down to the left; his mouth is open in a war cry. Stone chips and dust (Earth) jump up around him. Background: the foot of a jade stepped pyramid at night, its first steps behind him, jade-green light glowing from the cracks between the steps.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 851,
+        "candidatesTokenCount": 1609,
+        "totalTokenCount": 2460,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 851
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0691,
+      "seconds": 10.5,
+      "status": "ждёт автора: отобран для арены Иш-Кантуна (ADR-0025, п. 8)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "defdb69ac7ca7e144cd8c96691616a3a7b7b2f04fb9c644f3532617dcf947e27"
+    },
+    {
+      "file": "art/generated/echo/ik-03-cotton-shield__nb2.jpg",
+      "category": "echo",
+      "job": "ik-03-cotton-shield",
+      "title": "Щитоносец в стёганом хлопке — Иш-Кантун, ступень 3, рядовой, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 3: «Доспех из стёганого хлопка, круглый щит в перьях. Держит тропу между деревьями»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:06:17+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nThe enemy: the Quilted Shield-bearer, a rank-and-file tank of Ish-Kantun. A stocky, calm, heavy elf with long pointed ears and a stubborn face, in thick armor of quilted white cotton, padded and stitched in squares, stained by the forest. Action: he braces a big round shield forward toward the left with his shoulder behind it — the shield is woven reed covered with hide, painted with simple jaguar spots, its lower rim hung with a fringe of feathers; a short spear is held low in his other hand. An arrow is stuck in the shield and torn feathers fly off it: he has just taken a blow and has not moved. Background: a narrow forest path between two giant tree trunks wrapped in lianas; he blocks it completely; old path stones under the moss glow jade-green in their cracks.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 855,
+        "candidatesTokenCount": 1680,
+        "totalTokenCount": 2535,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 855
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0693,
+      "seconds": 9.1,
+      "status": "заменён: стоит неподвижно, щит справа — не в действии (v2)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "5ffb59a5a0d4fb8533b39f3356cd53949ac856705ad3ad36e9db0660825fe64d"
+    },
+    {
+      "file": "art/generated/echo/ik-04-dart-thrower__nb2.jpg",
+      "category": "echo",
+      "job": "ik-04-dart-thrower",
+      "title": "Метатель дротиков — Иш-Кантун, ступень 4, рядовой, физ ДД ловкости, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 4: «Копьеметалка из резного дерева. Дротик летит дальше, чем кажется»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:06:27+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nThe enemy: the Dart Thrower, a rank-and-file skirmisher of Ish-Kantun. A wiry, light elf with long pointed ears, his head shaved except for one long tail of black hair, bands of feathers on his upper arms, red and black paint across his chest. Action: caught mid-throw — his arm whips forward toward the left holding a carved wooden spear-thrower shaped like a feathered serpent, and a long feathered dart is just leaving it and flying away to the left, a streak of wind (Air) behind it; two more darts are gripped in his other hand. Background: an overgrown causeway of white stone running through the night forest; far behind, a stepped pyramid dark against the trees, jade-green light glowing in the cracks of the causeway.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 846,
+        "candidatesTokenCount": 1547,
+        "totalTokenCount": 2393,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 846
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0689,
+      "seconds": 10.6,
+      "status": "ждёт автора: отобран для арены Иш-Кантуна (ADR-0025, п. 8)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "db10cff9082da7a5e5709a03241e0c6c17cdb3befb366f7504bec5f10bc4c70a"
+    },
+    {
+      "file": "art/generated/echo/ik-05-breath-gatherer__nb2.jpg",
+      "category": "echo",
+      "job": "ik-05-breath-gatherer",
+      "title": "Сборщик дыхания — Иш-Кантун, ступень 5, рядовой, дебаффер, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 5: «Глиняный сосуд у пояса. Поднесёт к лицу — и дышать становится нечем»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:06:38+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nThe enemy: the Breath Gatherer, a rank-and-file debuffer of Ish-Kantun. A thin, stooped, very old elf with an ageless narrow face and long pointed ears pulled down by heavy jade spools, in a plain dark cloak of grey feathers. Action: he holds out a small round clay vessel with a narrow neck toward the left, as if to someone's face, and a thin pale thread of breath, like mist, is drawn out of the air on the left into the mouth of the vessel; faint green motes of Time swirl in the thread. More small sealed clay vessels hang from his belt. His eyes are calm and hungry. Background: a stone terrace of a pyramid lined with rows of sealed clay jars, jade-green light seeping up from the cracks between the slabs.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 851,
+        "candidatesTokenCount": 1899,
+        "totalTokenCount": 2750,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 851
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.07,
+      "seconds": 10.9,
+      "status": "ждёт автора: отобран для арены Иш-Кантуна (ADR-0025, п. 8)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "afece0e34a89224ef279d8b6ac6f3893e997f7640ba9fecd8f0b0b1ec81c6478"
+    },
+    {
+      "file": "art/generated/echo/ik-06-copal-keeper__nb2.jpg",
+      "category": "echo",
+      "job": "ik-06-copal-keeper",
+      "title": "Хранительница копала — Иш-Кантун, ступень 6, рядовой, лекарь, Вода",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 6: «Чаша с тлеющей смолой. Кого коснётся дым, тот снова встаёт»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:06:49+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nThe enemy: the Copal Keeper, a rank-and-file healer of Ish-Kantun. An elven woman with a long neck and a calm, stern face, long pointed ears with jade spools, long black hair braided with white cotton cords, a white cotton dress with a woven border and a shawl of dark feathers. Action: she lifts a shallow clay bowl of smoldering copal resin in both hands and blows across it toward the left: thick pale blue-white smoke pours from the bowl and flows to the left, curling and rippling like water (Water) — where it touches the fallen, they rise. The embers light her face from below with a warm amber glow, the only warm light. Background: a small forest shrine at night, a stone altar with more smoking bowls, jade-green light in the carved grooves of the stone below.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 859,
+        "candidatesTokenCount": 1654,
+        "totalTokenCount": 2513,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 859
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0692,
+      "seconds": 11.0,
+      "status": "ждёт автора: отобран для арены Иш-Кантуна (ADR-0025, п. 8)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "ea38182e102e5b81fd1497f30d85054c5a006b72acf08b08f9b265ec760bacb7"
+    },
+    {
+      "file": "art/generated/echo/ik-07-jaguar-warrior__nb2.jpg",
+      "category": "echo",
+      "job": "ik-07-jaguar-warrior",
+      "title": "Воин-ягуар — Иш-Кантун, ступень 7, элита, физ ДД силы, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 7: «Голова ягуара вместо шлема, обсидиановый клинок-дубина. Бросается первым»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:07:01+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nThe enemy: the Jaguar Warrior, an elite fighter of Ish-Kantun. A powerful elf warrior whose helmet is the whole head of a jaguar: his face looks out from between the open jaws, the upper fangs above his brow, his long pointed ears showing beside it; a spotted jaguar-skin suit on his arms and chest, a collar of jade beads. Action: he throws himself forward first, lunging toward the left, a sword-club raised high behind his head — a wide wooden blade lined along both edges with black obsidian shards — about to strike; hot sparks and embers (Fire) trail from the obsidian edges. His eyes blaze. Background: a temple stairway at night flanked by carved stone jaguar heads, jade-green light burning in their eyes and in the cracks of the steps.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 844,
+        "candidatesTokenCount": 1636,
+        "totalTokenCount": 2480,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 844
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0692,
+      "seconds": 11.5,
+      "status": "ждёт автора: отобран для арены Иш-Кантуна (ADR-0025, п. 8)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "ab326034aa3f832cf559605132bbab02d3cb974ac172b4592fe413430c5a3eac"
+    },
+    {
+      "file": "art/generated/echo/ik-08-quetzal-archer__nb2.jpg",
+      "category": "echo",
+      "job": "ik-08-quetzal-archer",
+      "title": "Лучник кецаля — Иш-Кантун, ступень 8, элита, физ ДД ловкости, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 8: «Плащ из зелёных перьев кецаля. Его стрела не падает, пока не найдёт цель»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:07:11+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nThe enemy: the Quetzal Archer, an elite archer of Ish-Kantun. A tall, graceful elf with long pointed ears ringed with small gold rings, a band of dull gold on his brow, a long face with calm, merciless eyes; a long cloak of iridescent emerald-green quetzal feathers with long tail plumes. Action: he has just loosed an arrow to the left, the bowstring still trembling; the arrow, fletched with one long green quetzal feather, flies away to the left and curves in the air, leaving a spiraling trail of wind (Air), as if it is still searching for its target. His feather cloak flares in the gust. Background: the high terrace at the top of a stepped pyramid, the dark sea of the forest canopy far below, jade-green light rising from the edge of the terrace.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 860,
+        "candidatesTokenCount": 1693,
+        "totalTokenCount": 2553,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 860
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0693,
+      "seconds": 10.6,
+      "status": "ждёт автора: отобран для арены Иш-Кантуна (ADR-0025, п. 8)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "965fea58318d1c278246c0d2bb529699a8b03f7cfa4734f846575c0b9ea69329"
+    },
+    {
+      "file": "art/generated/echo/ik-09-jade-mask-priest__nb2.jpg",
+      "category": "echo",
+      "job": "ik-09-jade-mask-priest",
+      "title": "Жрец в нефритовой маске — Иш-Кантун, ступень 9, элита, маг ДД, Вода",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 9: «Маска из нефритовых пластин, глаза из перламутра. Колдует тем, что вычитает из дня»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:07:21+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nThe enemy: the Jade-Masked Priest, an elite mage of Ish-Kantun. A tall, thin elf priest whose whole face is covered by a mask of small fitted jade plates, with eyes of mother-of-pearl that shine pale and empty; his long pointed ears come out beside the mask, hung with jade spools; a headdress of dark green feathers, a white cotton mantle, a collar of jade beads. Action: he thrusts one open palm toward the left and casts — a spiral of cold blue-green water droplets and mist (Water) streams from his palm to the left, and the light around it dims, as if he takes away part of the day; in his other hand he holds a small carved jade disc. Background: the inner sanctum of a temple, dark stone walls set with jade mosaic panels of plain geometric ornament, jade-green light from the grooves of the floor.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 869,
+        "candidatesTokenCount": 1565,
+        "totalTokenCount": 2434,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 869
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.069,
+      "seconds": 9.8,
+      "status": "ждёт автора: отобран для арены Иш-Кантуна (ADR-0025, п. 8)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "761fe9deaeba194873f42822b57c2accc0c81c078a2838191c389e1b159ab7a1"
+    },
+    {
+      "file": "art/generated/echo/ik-10-calendar-keeper__nb2.jpg",
+      "category": "echo",
+      "job": "ik-10-calendar-keeper",
+      "title": "Хранитель календаря — Иш-Кантун, ступень 10, элита, дебаффер, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 10: «Несёт на спине каменное колесо дней. Повернёт — и твой ход придётся на чужой день»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:07:32+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nThe enemy: the Calendar Keeper, an elite debuffer of Ish-Kantun. A broad-backed, bowed elf with long pointed ears, a weathered patient face and a plain feather mantle; on his back, in a wooden frame with leather straps, he carries a heavy round stone wheel of days almost as big as himself; its round face, rising behind his head and shoulders, is carved with rings of abstract ornament — notches, spirals, small stylized faces — nothing like writing or numbers. Action: he reaches back over his shoulder with one hand and turns the stone wheel with effort, grinding, and points at the left with the other hand — rings of green Time light ripple from the turning wheel toward the left. His face is certain. Background: a courtyard of tall worn stone pillars in the night forest, jade-green light glowing in the carved grooves of the pillars.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 858,
+        "candidatesTokenCount": 1695,
+        "totalTokenCount": 2553,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 858
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0694,
+      "seconds": 10.8,
+      "status": "заменён: два каменных колеса вместо одного (v2)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "8151dd59d2c03176fbb0a6fa42f0685721132128b177900dec220fa4ee34cf20"
+    },
+    {
+      "file": "art/generated/echo/ik-11-jaguar-lord__nb2.jpg",
+      "category": "echo",
+      "job": "ik-11-jaguar-lord",
+      "title": "Владыка ягуаров — Иш-Кантун, ступень 11, босс недели, физ ДД силы, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 11: «Шкура чёрного ягуара, ожерелье из нефрита. Ведёт воинов-ягуаров, не оглядываясь»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:07:44+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nThe enemy: the Lord of Jaguars, a boss of Ish-Kantun — menacing, heavy and powerful, filling the frame. A huge, heavily built elven warlord with long pointed ears and old scars, in the pelt of a BLACK jaguar: the black jaguar's head covers his head like a hood, its paws hang across his chest; a heavy necklace of large jade beads; a war club lined with black obsidian in his fist. Action: he strides forward toward the left without looking back, his free arm swept forward, leading the charge; behind him in the darkness, the eyes of jaguar warriors glow and their dark silhouettes follow him. Stone dust (Earth) rises around him. Background: the great plaza before a jade pyramid at night, jade-green light rising from the cracks of the plaza below.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 847,
+        "candidatesTokenCount": 1741,
+        "totalTokenCount": 2588,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 847
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0695,
+      "seconds": 11.6,
+      "status": "ждёт автора: отобран для арены Иш-Кантуна (ADR-0025, п. 8); корпус развёрнут вправо — при выгрузке отразить (mirror)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "66111a4bac96b4e04914d9160934622d7f33f1c8a8e68e8e649db9a22ec39057"
+    },
+    {
+      "file": "art/generated/echo/ik-12-great-count-priest__nb2.jpg",
+      "category": "echo",
+      "job": "ik-12-great-count-priest",
+      "title": "Верховный жрец Большого счёта — Иш-Кантун, ступень 12, босс недели, маг ДД, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 12: «Убор из перьев в его рост, на груди нефритовый круг дат. Знает, какой сегодня день, лучше тебя»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:07:54+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nThe enemy: the High Priest of the Great Count, a boss of Ish-Kantun — imposing and ancient. A very old, tall elf with long pointed ears and an ageless, sharp, proud face, dark paint around the eyes; a towering headdress of long green and white feathers as tall as he is rises far above his head and is cut by the top edge of the picture; on his chest hangs a large round jade disc carved with concentric rings of abstract ornament — the circle of dates, nothing like writing or numbers. Action: he raises both hands, the jade disc on his chest glows green, and between his hands turn rings of green Time light shaped like calendar rings, which he hurls toward the left. He looks down at the viewer: he knows what day it is better than you. Background: the summit of the great pyramid at night, a huge carved stone calendar disc standing behind him, the black forest far below.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 873,
+        "candidatesTokenCount": 1663,
+        "totalTokenCount": 2536,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 873
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0693,
+      "seconds": 10.7,
+      "status": "заменён: за спиной копия ацтекского Камня Солнца с глифами; жрец не старый (v2)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "e7c1834558d6be8ae28e1cd9bea5e7483c73d8c523a866a5d933abc4875ab2d9"
+    },
+    {
+      "file": "art/generated/echo/ik-13-jade-steps-lady__nb2.jpg",
+      "category": "echo",
+      "job": "ik-13-jade-steps-lady",
+      "title": "Владычица нефритовых ступеней — Иш-Кантун, ступень 13, босс недели, лекарь, Вода",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 13: «Нефритовый воротник, посох в перьях. Поднимает своих по ступеням, как по дням»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:08:06+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nThe enemy: the Lady of the Jade Steps, a boss of Ish-Kantun — regal, serene and dangerous. A tall elven queen with a long neck and a calm, severe face, long pointed ears with large jade spools; a wide collar of jade plates and beads covers her shoulders; a long cloak of white and blue-green feathers; a tall staff crowned with a spray of feathers. Action: she raises her feathered staff toward the left, and a ribbon of clear water and blue-green light (Water) flows around her and up the jade steps; behind her, faint fallen warriors are rising, lifted step by step, as if day by day. Background: the wide jade-green steps of the pyramid behind and below her, each step glowing faintly from within.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 841,
+        "candidatesTokenCount": 1761,
+        "totalTokenCount": 2602,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 841
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0695,
+      "seconds": 11.7,
+      "status": "заменён: на ступенях воины в европейских шлемах — не тот народ (v2)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "a61dcf150e501bf7541c46c9721a02e5e7bae3641932c8668bbba224343fe0b3"
+    },
+    {
+      "file": "art/generated/echo/ik-14-last-day__nb2.jpg",
+      "category": "echo",
+      "job": "ik-14-last-day",
+      "title": "Последний день Круга — Иш-Кантун, ступень 14, Убер-босс недели, танк, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 14: «Каменное колесо Большого счёта катится само. На ободе все дни, кроме одного»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:08:16+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nThe enemy: the Last Day of the Circle, the uber-boss of the week — a colossal round stone wheel of the Great Count that rolls by itself. It is not a person: here the rules about waist, head and arms do not apply — instead the wheel fills the whole frame, seen from a low camera angle in a three-quarter view, rolling toward the left and slightly toward the viewer, its top near the top edge, its bottom cut by the bottom edge. Its face is a huge carved calendar: concentric rings of abstract carved ornament (notches, spirals, tiny stylized faces — nothing like writing or numbers) around a central carved stone face with heavy closed eyes and an open mouth breathing out green mist. Around its thick rim runs a ring of carved cells, one for every day of the circle — and exactly one cell, at the top of the rim, clearly visible and lit, is empty: smooth bare stone, like a missing tooth. Cold jade-green light of Time blazes from every carved groove; the plaza slabs crack and burst under its weight, chips and dust fly. No arms, no legs. Background: the plaza at the foot of the pyramid at night, broken slabs, the dark forest behind.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 932,
+        "candidatesTokenCount": 1611,
+        "totalTokenCount": 2543,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 932
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0691,
+      "seconds": 10.0,
+      "status": "заменён: кольца из псевдоглифов, среди них череп (v2)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "042234f1d9749f89396c3593e2387c0cfa734b236df2b9f4f02619013ce2a56f"
+    },
+    {
+      "file": "art/generated/echo/ik-15-many-faced__nb2.jpg",
+      "category": "echo",
+      "job": "ik-15-many-faced",
+      "title": "Многоликий — пятнадцатая ступень недели эльфов, «враг тысячи лиц»",
+      "source": "design/ui/recipes.js, предмет many: «Носит лица тех, кого победили на этой неделе»; Маска недели — «маска, снятая с Многоликого»; §17.4 GDD",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:08:28+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nThe enemy: the Many-Faced, the fifteenth and last enemy of the week, the one with a thousand faces: it wears the faces of those who were defeated this week. A tall, thin, long-armed figure in a long hooded cloak; the cloak is covered with dozens of small carved masks sewn on row over row like scales — faces of Ish-Kantun: jade mosaic faces with pearl eyes, snarling jaguar faces, calm painted faces crowned with feathers, stern stone faces. Under its hood there is no face of its own, only shadow; over the shadow it wears a jade mosaic mask with pale mother-of-pearl eyes. Action: it glides forward toward the left and with one long hand lifts the jade mask aside — and underneath there is already another face, a snarling jaguar mask. Thin green light (Time) glows in the empty eye holes of all the masks. The masks are carved wood, stone and jade, never skin. Background: the dark plaza of Ish-Kantun at night, broken masks scattered on cracked slabs, jade-green light rising from the cracks. Uncanny and unsettling, but not grotesque.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 916,
+        "candidatesTokenCount": 1734,
+        "totalTokenCount": 2650,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 916
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0695,
+      "seconds": 11.5,
+      "status": "ждёт автора: отобран для арены Иш-Кантуна (ADR-0025, п. 8)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "d35fe9418110bef6ed8ccfc5df4c6ce27ccd31fc2904b916c717f3a1ab7f6af1"
+    },
+    {
+      "file": "art/generated/arenas/arena-echo-ishkantun__nb2-v2.jpg",
+      "category": "arenas",
+      "job": "arena-echo-ishkantun",
+      "title": "Арена Эхо: Иш-Кантун, неделя эльфов — 21:9, одна сцена без перехода",
+      "source": "ADR-0025, п. 8; ADR-0024; docs/content/герои/состав-героев.md, «Эльфы — Иш-Кантун»; раскладка — jobs/arena-02.json",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:11:58+03:00",
+      "params": {
+        "aspectRatio": "21:9",
+        "imageSize": "2K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/arenas/arena-workshop-wide__nb2-v2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nFormat: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the ground like a tabletop RPG battle map: no horizon, no perspective, no side view of buildings, no sky. The attached image is our battle arena of a different place, the Workshop of Forms: take from it ONLY the straight-down camera, the scale, the layout of the zones and the painting style. Do NOT copy its objects, materials or colors: no worktables, no clay figures, no crystals, no sand. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit ground over their whole height: plaza slabs, moss in the seams and fine cracks only — no steps, no walls, no statues, no bowls, no plants, no objects there. Unlike our biome arenas, this arena is a single scene: the fight begins and ends here, the camera never moves on to a next room, so nothing in the picture leads onward — no doorway, no road, no stairway, no passage out of the picture. The forest appears only as a thin dark strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there.\n\nSubject: the great plaza of Ish-Kantun at night, at the foot of a jade stepped pyramid deep in an ancient forest, seen straight from above — the one place where the whole fight happens. It is night and the plaza is dark, as dark as our Workshop arena: the slabs are dark grey-green stone in deep shadow, and the light comes only from below — from glowing cracks and grooves and from the copal embers. Ground: large worn, tightly fitted stone slabs, some lifted and cracked by roots; dark moss in the seams, a few fallen leaves and scattered green feathers; thin cracks glow from within with cold jade-green light. In the central half only: along the top edge, the lowest tiers of a dark jade-green stepped pyramid seen straight from above — straight parallel step edges, cut off by the top edge of the picture; along the bottom edge, a great round stone calendar disc set flat into the plaza, seen straight from above, only its upper half visible, carved with a few broad concentric rings of large simple ornament — notches, spirals, feathers, jaguar spots; no small signs, no glyphs — with jade-green light glowing in its grooves; near the pyramid and near the disc, two wide stone bowls of smoldering copal resin with warm amber embers and thin curls of pale smoke; a few black obsidian shards and jade beads on the slabs. Along the very top and bottom edges runs a thin strip of dark forest leaves and roots; no big leaves in the corners, the left and right quarters stay clear. Near-black shadows, cold jade-green light; the only warm color is the amber glow of the copal embers. No characters, no animals, no bodies, no cards, no grid.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1178,
+        "candidatesTokenCount": 2284,
+        "totalTokenCount": 3462,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 920
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1680
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1032,
+      "seconds": 16.8,
+      "status": "ждёт автора: отобран для арены Иш-Кантуна (ADR-0025, п. 8) — ночная площадь у нефритовой пирамиды, зоны карт свободны, центр спокоен",
+      "px": [
+        3168,
+        1344
+      ],
+      "sha256": "c3dcd7eb252b6367240a1fad1cab3924fd2b45ddb15223c9c097a81fae227517"
+    },
+    {
+      "file": "art/generated/echo/ik-03-cotton-shield__nb2-v2.jpg",
+      "category": "echo",
+      "job": "ik-03-cotton-shield",
+      "title": "Щитоносец в стёганом хлопке — Иш-Кантун, ступень 3, рядовой, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 3: «Доспех из стёганого хлопка, круглый щит в перьях. Держит тропу между деревьями»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:12:09+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nThe enemy: the Quilted Shield-bearer, a rank-and-file tank of Ish-Kantun. A stocky, heavy elf with long pointed ears, jade ear spools and a stubborn, set face, in thick armor of quilted white cotton, padded and stitched in squares, stained by the forest. Action: a blow has just landed — he leans hard into a big round shield braced in front of him toward the LEFT, his shoulder pressed against its back, teeth clenched, holding his ground; the shield is woven reed covered with hide, painted with simple jaguar spots, its lower rim hung with a fringe of feathers; two arrows are stuck in it, torn feathers and splinters fly off its face. His other hand holds a short spear low, ready. The shield is on the left side of the picture, between him and his enemies. Background: a narrow forest path between two giant tree trunks wrapped in lianas; he blocks it completely; old path stones under the moss glow jade-green in their cracks.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 890,
+        "candidatesTokenCount": 1774,
+        "totalTokenCount": 2664,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 890
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0696,
+      "seconds": 10.5,
+      "status": "ждёт автора: отобран для арены Иш-Кантуна (ADR-0025, п. 8) — упёрся в щит со стрелами, щит к героям",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "e7b3830818e653a019d6ee039cefd5cc8931ea2d69c5af7e8e858efa21b0fe78"
+    },
+    {
+      "file": "art/generated/echo/ik-10-calendar-keeper__nb2-v2.jpg",
+      "category": "echo",
+      "job": "ik-10-calendar-keeper",
+      "title": "Хранитель календаря — Иш-Кантун, ступень 10, элита, дебаффер, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 10: «Несёт на спине каменное колесо дней. Повернёт — и твой ход придётся на чужой день»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:12:19+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nThe enemy: the Calendar Keeper, an elite debuffer of Ish-Kantun. A broad-backed, bowed elf seen in profile turned to the left, with long pointed ears, a jade ear spool, a weathered, patient, certain face and a plain feather mantle. On his back, strapped into a wooden carrying frame, he carries exactly ONE heavy round stone wheel of days, standing upright, as tall as his torso; its carved face rises behind his head and shoulders like a great halo, carved with broad concentric rings of simple ornament — notches, spirals and feathers, large simple shapes, nothing like writing, numbers or faces. There is only one wheel in the whole picture. Action: he reaches up over his shoulder with one hand, grips the rim of that same wheel and turns it with effort, grinding; with his other hand he points to the left — and rings of green Time light ripple out from the turning wheel toward the left, where his enemies stand. Background: a courtyard of tall worn stone pillars in the night forest, jade-green light glowing in the plain grooves of the pillars.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 904,
+        "candidatesTokenCount": 1698,
+        "totalTokenCount": 2602,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 904
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0694,
+      "seconds": 10.4,
+      "status": "заменён: снова второй диск над головой — исправлен правкой (v3)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "937706df4bb37b20ba620fe1d581fdb180ef5667dcf1bb7e38c10e7dfff8b5e1"
+    },
+    {
+      "file": "art/generated/echo/ik-12-great-count-priest__nb2-v2.jpg",
+      "category": "echo",
+      "job": "ik-12-great-count-priest",
+      "title": "Верховный жрец Большого счёта — Иш-Кантун, ступень 12, босс недели, маг ДД, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 12: «Убор из перьев в его рост, на груди нефритовый круг дат. Знает, какой сегодня день, лучше тебя»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:12:30+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nThe enemy: the High Priest of the Great Count, a boss of Ish-Kantun — imposing and ancient. A very old, tall, gaunt elf with long pointed ears, deep wrinkles and an ageless, sharp, proud face, dark paint around the eyes; a towering headdress of long green and white feathers as tall as he is rises far above his head and is cut by the top edge of the picture; a jaguar-pelt mantle; on his chest hangs a large round jade disc carved only with plain concentric rings of notches around a glowing center — the circle of dates. Action: he raises both hands, the jade disc on his chest glows green, and between his hands spin rings of green Time light shaped like calendar rings, which he hurls toward the left. He looks down at the viewer: he knows what day it is better than you. Background: the summit of the great pyramid at night — the dark doorway of the top temple in a plain stone frame, the night sky, the black forest far below; there are no carved discs, no calendars and no reliefs behind him.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 906,
+        "candidatesTokenCount": 1656,
+        "totalTokenCount": 2562,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 906
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0693,
+      "seconds": 10.7,
+      "status": "ждёт автора: отобран для арены Иш-Кантуна (ADR-0025, п. 8)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "bef92bfe540d5d590a42d5db28beb935ba584899744233e2959e57503f263be8"
+    },
+    {
+      "file": "art/generated/echo/ik-13-jade-steps-lady__nb2-v2.jpg",
+      "category": "echo",
+      "job": "ik-13-jade-steps-lady",
+      "title": "Владычица нефритовых ступеней — Иш-Кантун, ступень 13, босс недели, лекарь, Вода",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 13: «Нефритовый воротник, посох в перьях. Поднимает своих по ступеням, как по дням»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:12:50+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nThe enemy: the Lady of the Jade Steps, a boss of Ish-Kantun — regal, serene and dangerous, seen waist-up. A tall elven queen with a long neck and a calm, severe face, long pointed ears with large jade spools; a wide collar of jade plates and beads covers her shoulders; a long cloak of white and blue-green feathers; a tall staff crowned with a spray of feathers. Action: she raises her feathered staff toward the left, and a ribbon of clear water and blue-green light (Water) flows from it down around her and up the jade steps. On the steps behind her, two fallen warriors of her own people are being lifted to their feet by the glowing water, step by step, as if day by day — elves of Ish-Kantun in jaguar pelts and feather headdresses, with long pointed ears; no metal helmets, no metal armor. Background: the wide jade-green steps of the pyramid behind and below her, each step glowing faintly from within.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "Here is the Lady of the Jade Steps, boss of Ish-Kantun. For this piece, I focused on the specific \"light from below\" requirement, using the internal glow of the ancient jade steps to cast cold green highlights up onto her and the fallen warriors she is resurrecting. The water ribbon flowing from her staff was a great element for introducing motion while highlighting the stylized, planar forms that define this hand-painted dark-fantasy aesthetic.",
+      "usage": {
+        "promptTokenCount": 891,
+        "candidatesTokenCount": 3677,
+        "totalTokenCount": 4568,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 891
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 2240
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1392,
+      "seconds": 20.3,
+      "status": "заменён: лишний наконечник копья у левого края — исправлен правкой (v3)",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "311d355e0753cc4ce0cdd33b3452964f5e496a6a52b40adf5eabb11dedf145a3"
+    },
+    {
+      "file": "art/generated/echo/ik-14-last-day__nb2-v2.jpg",
+      "category": "echo",
+      "job": "ik-14-last-day",
+      "title": "Последний день Круга — Иш-Кантун, ступень 14, Убер-босс недели, танк, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 14: «Каменное колесо Большого счёта катится само. На ободе все дни, кроме одного»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:13:01+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nThe enemy: the Last Day of the Circle, the uber-boss of the week — a colossal round stone wheel of the Great Count that rolls by itself. It is not a person: here the rules about waist, head and arms do not apply — instead the wheel fills the whole frame, seen from a low camera angle, its top near the top edge and its bottom cut by the bottom edge; it leans into its roll toward the left, and the dust and broken slabs it leaves behind trail off to the right. Its face is carved with only a few broad concentric rings of large simple ornament — notches, spirals, stepped frets and feathers — no small signs, no glyphs, no pictograms, no skulls; the only face on it is one big carved stone face at the center, with heavy closed eyes and an open mouth breathing out green mist. Around its thick rim runs a ring of square cells, one for every day of the circle, each carved with the same simple spiral — and exactly one cell, at the top of the rim, clearly visible and lit, is empty: smooth bare stone, like a missing tooth. Cold jade-green light of Time blazes from every groove; the plaza slabs crack and burst under its weight, chips and dust fly. No arms, no legs. Background: the plaza at the foot of the pyramid at night, broken slabs, the dark forest behind.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 967,
+        "candidatesTokenCount": 1751,
+        "totalTokenCount": 2718,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 967
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0696,
+      "seconds": 11.1,
+      "status": "ждёт автора: отобран для арены Иш-Кантуна (ADR-0025, п. 8) — на ободе все дни, кроме одного",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "2adcfc170909cf74014b00b5367b5262e8505b3b1bc8ace0e8f0c61fc6ac769f"
+    },
+    {
+      "file": "art/generated/echo/ik-10-calendar-keeper__nb2-v3.jpg",
+      "category": "echo",
+      "job": "ik-10-calendar-keeper",
+      "title": "Хранитель календаря — Иш-Кантун, ступень 10, элита, дебаффер, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 10: «Несёт на спине каменное колесо дней. Повернёт — и твой ход придётся на чужой день»; правка своего варианта art/generated/echo/ik-10-calendar-keeper__nb2-v2.jpg (v1 и v2 — второй диск над головой)",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:16:24+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/echo/ik-10-calendar-keeper__nb2-v2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nEDIT MODE — this overrides everything above: do not draw a new picture, edit the attached image. The attached image is the current portrait of this enemy, the Calendar Keeper of Ish-Kantun: an old elf in profile turned to the left, pointing to the left, carrying one stone wheel of days on his back in a wooden frame. Keep the picture exactly as it is — the same elf, face, ears, jade ear spool, feather mantle, pointing hand, the wheel on his back with its carvings, the rings of green Time light, the pillars, the floor, the light, the colors and the painting style. Change only this: the second, upper stone disc behind his head is a mistake — remove it completely, together with the knob his raised hand is holding; in its place paint the dark courtyard with the glowing pillars, matching the rest of the background. His raised arm now bends down behind his shoulder, and his hand grips the top of the rim of the one wheel on his back, turning it. After the edit there is exactly one stone wheel in the picture.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1160,
+        "candidatesTokenCount": 1554,
+        "totalTokenCount": 2714,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 902
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0691,
+      "seconds": 9.5,
+      "status": "ждёт автора: отобран для арены Иш-Кантуна (ADR-0025, п. 8) — правка v2: одно колесо, рука на ободе",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "4b98af73be70f15355b4597ad6abf814ee37e5ff7d3318c3c2c778cbc8f4f551"
+    },
+    {
+      "file": "art/generated/echo/ik-13-jade-steps-lady__nb2-v3.jpg",
+      "category": "echo",
+      "job": "ik-13-jade-steps-lady",
+      "title": "Владычица нефритовых ступеней — Иш-Кантун, ступень 13, босс недели, лекарь, Вода",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 13: «Нефритовый воротник, посох в перьях. Поднимает своих по ступеням, как по дням»; правка своего варианта art/generated/echo/ik-13-jade-steps-lady__nb2-v2.jpg (в v2 — лишний наконечник копья у левого края)",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-28T11:16:35+03:00",
+      "params": {
+        "aspectRatio": "4:5",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/echo/ik-13-jade-steps-lady__nb2-v2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.\n\nEnemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting.\n\nEDIT MODE — this overrides everything above: do not draw a new picture, edit the attached image. The attached image is the current portrait of this enemy, the Lady of the Jade Steps of Ish-Kantun. Keep the picture exactly as it is — the same elven queen, her face, ears, jade collar, feather cloak and feathered staff, the ribbon of water, the two warriors rising on the steps behind her, the steps, the light, the colors and the painting style. Change only this: remove the black spear point and its dark shaft that stick into the picture from the left edge at the height of her hand — they are a mistake; in their place continue the glowing ribbon of water and the dark jade steps, matching the surroundings.\n\nNo text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1092,
+        "candidatesTokenCount": 1421,
+        "totalTokenCount": 2513,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 834
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0686,
+      "seconds": 11.0,
+      "status": "ждёт автора: отобран для арены Иш-Кантуна (ADR-0025, п. 8) — правка v2: убран лишний наконечник копья",
+      "px": [
+        928,
+        1152
+      ],
+      "sha256": "8800d01b0db2869378d4a24136d815afa014f38164fe82fa1308e578c9c7e1f8"
     }
   ]
 }

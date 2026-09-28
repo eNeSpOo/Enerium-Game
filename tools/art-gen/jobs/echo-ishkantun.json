@@ -1,0 +1,145 @@
+{
+  "name": "Арена Эхо целиком (ADR-0025, п. 8): неделя эльфов, древняя цивилизация Иш-Кантун — фон арены 21:9 и 15 портретов: 14 врагов недели и Многоликий. Портреты — по правилам ADR-0012 и ADR-0013: по одному, ракурс эталона словами, без картинки в запросе, враг в действии, по пояс, корпус развёрнут влево. Задания ik-10 и ik-13 — правки своих вариантов v2: модель дважды рисовала лишнее (второе колесо, чужой наконечник копья)",
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — cracks and jade inlays in old stone that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes, pollen and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.",
+  "negative": "No text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no sacrifice, no horror grotesque.",
+  "cutout_rule": "",
+  "categories": {
+    "arenas": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [
+        "art/generated/arenas/arena-workshop-wide__nb2-v2.jpg"
+      ],
+      "frame": "Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the ground like a tabletop RPG battle map: no horizon, no perspective, no side view of buildings, no sky. The attached image is our battle arena of a different place, the Workshop of Forms: take from it ONLY the straight-down camera, the scale, the layout of the zones and the painting style. Do NOT copy its objects, materials or colors: no worktables, no clay figures, no crystals, no sand. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit ground over their whole height: plaza slabs, moss in the seams and fine cracks only — no steps, no walls, no statues, no bowls, no plants, no objects there. Unlike our biome arenas, this arena is a single scene: the fight begins and ends here, the camera never moves on to a next room, so nothing in the picture leads onward — no doorway, no road, no stairway, no passage out of the picture. The forest appears only as a thin dark strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there."
+    },
+    "echo": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [],
+      "frame": "Enemy card portrait, 4:5, shown small on the battle field (about 74 px wide) and large in the bestiary. Camera at chest height, waist-up: the bottom edge of the picture cuts the body at the waist — head, torso and arms in frame, no hips, no legs; the legs are never visible, whatever the pose. The figure is centered and fills most of the frame; the head sits in the upper third with a little space above it. The body is turned in a three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left and clearly shown in front of the body. It is an enemy: dangerous, alive and caught in action — not a model posing, not a statue. Its story reads from its body, its pose and the place around it. World: these are the people of Ish-Kantun, an ancient, long-lived forest civilization of elves: jade stepped pyramids in a dark forest, cloaks and headdresses of feathers, obsidian blades, quilted cotton armor, jaguar pelts, great carved stone calendars; they counted their days in the circles of the Great Count, and when the circle ended they came out of the forest to take other people's breath and start the count anew. Their look is inspired by the ancient Maya, but they are clearly ELVES: tall and slender, long pointed ears, ageless narrow faces, warm bronze skin with dark painted patterns, heavy jade ear spools; they must not look like real-world people, orcs or goblins. Colors: muted and earthy, like all our enemies — deep jade green, dark bronze, bone white, obsidian black, dull old gold, a little faded red; everything else sinks into near-black shadow. Light, the same for the whole set: night; the light comes from below — cold jade-green light glowing from within cracks and jade inlays in old stone rises onto the figure; crisp cold rim light on its edges; a small warm amber glow of embers is the only warm light. Background: its own place in Ish-Kantun, darker and softer than the figure, with depth. All fifteen portraits of this set share the same framing, painting style, palette and lighting."
+    }
+  },
+  "jobs": [
+    {
+      "id": "arena-echo-ishkantun",
+      "category": "arenas",
+      "title": "Арена Эхо: Иш-Кантун, неделя эльфов — 21:9, одна сцена без перехода",
+      "source": "ADR-0025, п. 8; ADR-0024; docs/content/герои/состав-героев.md, «Эльфы — Иш-Кантун»; раскладка — jobs/arena-02.json",
+      "subject": "Subject: the great plaza of Ish-Kantun at night, at the foot of a jade stepped pyramid deep in an ancient forest, seen straight from above — the one place where the whole fight happens. It is night and the plaza is dark, as dark as our Workshop arena: the slabs are dark grey-green stone in deep shadow, and the light comes only from below — from glowing cracks and grooves and from the copal embers. Ground: large worn, tightly fitted stone slabs, some lifted and cracked by roots; dark moss in the seams, a few fallen leaves and scattered green feathers; thin cracks glow from within with cold jade-green light. In the central half only: along the top edge, the lowest tiers of a dark jade-green stepped pyramid seen straight from above — straight parallel step edges, cut off by the top edge of the picture; along the bottom edge, a great round stone calendar disc set flat into the plaza, seen straight from above, only its upper half visible, carved with a few broad concentric rings of large simple ornament — notches, spirals, feathers, jaguar spots; no small signs, no glyphs — with jade-green light glowing in its grooves; near the pyramid and near the disc, two wide stone bowls of smoldering copal resin with warm amber embers and thin curls of pale smoke; a few black obsidian shards and jade beads on the slabs. Along the very top and bottom edges runs a thin strip of dark forest leaves and roots; no big leaves in the corners, the left and right quarters stay clear. Near-black shadows, cold jade-green light; the only warm color is the amber glow of the copal embers. No characters, no animals, no bodies, no cards, no grid."
+    },
+    {
+      "id": "ik-01-feather-archer",
+      "category": "echo",
+      "title": "Лучник в перьях — Иш-Кантун, ступень 1, рядовой, физ ДД ловкости, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 1: «Перья в волосах и на колчане. Стреляет из листвы, откуда его не видно»",
+      "subject": "The enemy: the Feathered Archer, a rank-and-file archer of Ish-Kantun. A lean young elf with long pointed ears, long black hair tied up with bunches of dark green and grey feathers, a stripe of dark green paint across his eyes, a simple cotton wrap and a collar of bone beads; on his back a quiver of arrows fletched with the same feathers, and more feathers hang from the quiver. Action: he shoots from the foliage where no one can see him — half-hidden among giant dark leaves, only his face, arms and bow come out of them; he draws a long bow to full draw and aims to the left, the arrowhead a black obsidian point; his narrowed eyes are fixed on a target to the left. A breath of wind (Air) stirs the feathers and the leaves around him. Background: the dense night canopy of the forest of Ish-Kantun, huge leaves and hanging lianas; far below behind him, the dim shape of a stepped pyramid with a jade-green glow at its base."
+    },
+    {
+      "id": "ik-02-jaguar-pelt",
+      "category": "echo",
+      "title": "Воин в шкуре ягуара — Иш-Кантун, ступень 2, рядовой, физ ДД силы, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 2: «Пятнистая шкура на плечах, дубина с обсидиановыми зубьями»",
+      "subject": "The enemy: the Jaguar-Pelt Warrior, a rank-and-file fighter of Ish-Kantun. A strong, broad-shouldered elf with long pointed ears and jade ear spools, black hair bound in a high knot, bare arms painted with dark stripes; a spotted jaguar pelt is thrown over his shoulders like a cape, the jaguar's front paws knotted across his chest. Action: he swings a heavy flat wooden war club edged on both sides with rows of black obsidian teeth — the club is raised high over his shoulder and about to come down to the left; his mouth is open in a war cry. Stone chips and dust (Earth) jump up around him. Background: the foot of a jade stepped pyramid at night, its first steps behind him, jade-green light glowing from the cracks between the steps."
+    },
+    {
+      "id": "ik-03-cotton-shield",
+      "category": "echo",
+      "title": "Щитоносец в стёганом хлопке — Иш-Кантун, ступень 3, рядовой, танк, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 3: «Доспех из стёганого хлопка, круглый щит в перьях. Держит тропу между деревьями»",
+      "subject": "The enemy: the Quilted Shield-bearer, a rank-and-file tank of Ish-Kantun. A stocky, heavy elf with long pointed ears, jade ear spools and a stubborn, set face, in thick armor of quilted white cotton, padded and stitched in squares, stained by the forest. Action: a blow has just landed — he leans hard into a big round shield braced in front of him toward the LEFT, his shoulder pressed against its back, teeth clenched, holding his ground; the shield is woven reed covered with hide, painted with simple jaguar spots, its lower rim hung with a fringe of feathers; two arrows are stuck in it, torn feathers and splinters fly off its face. His other hand holds a short spear low, ready. The shield is on the left side of the picture, between him and his enemies. Background: a narrow forest path between two giant tree trunks wrapped in lianas; he blocks it completely; old path stones under the moss glow jade-green in their cracks."
+    },
+    {
+      "id": "ik-04-dart-thrower",
+      "category": "echo",
+      "title": "Метатель дротиков — Иш-Кантун, ступень 4, рядовой, физ ДД ловкости, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 4: «Копьеметалка из резного дерева. Дротик летит дальше, чем кажется»",
+      "subject": "The enemy: the Dart Thrower, a rank-and-file skirmisher of Ish-Kantun. A wiry, light elf with long pointed ears, his head shaved except for one long tail of black hair, bands of feathers on his upper arms, red and black paint across his chest. Action: caught mid-throw — his arm whips forward toward the left holding a carved wooden spear-thrower shaped like a feathered serpent, and a long feathered dart is just leaving it and flying away to the left, a streak of wind (Air) behind it; two more darts are gripped in his other hand. Background: an overgrown causeway of white stone running through the night forest; far behind, a stepped pyramid dark against the trees, jade-green light glowing in the cracks of the causeway."
+    },
+    {
+      "id": "ik-05-breath-gatherer",
+      "category": "echo",
+      "title": "Сборщик дыхания — Иш-Кантун, ступень 5, рядовой, дебаффер, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 5: «Глиняный сосуд у пояса. Поднесёт к лицу — и дышать становится нечем»",
+      "subject": "The enemy: the Breath Gatherer, a rank-and-file debuffer of Ish-Kantun. A thin, stooped, very old elf with an ageless narrow face and long pointed ears pulled down by heavy jade spools, in a plain dark cloak of grey feathers. Action: he holds out a small round clay vessel with a narrow neck toward the left, as if to someone's face, and a thin pale thread of breath, like mist, is drawn out of the air on the left into the mouth of the vessel; faint green motes of Time swirl in the thread. More small sealed clay vessels hang from his belt. His eyes are calm and hungry. Background: a stone terrace of a pyramid lined with rows of sealed clay jars, jade-green light seeping up from the cracks between the slabs."
+    },
+    {
+      "id": "ik-06-copal-keeper",
+      "category": "echo",
+      "title": "Хранительница копала — Иш-Кантун, ступень 6, рядовой, лекарь, Вода",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 6: «Чаша с тлеющей смолой. Кого коснётся дым, тот снова встаёт»",
+      "subject": "The enemy: the Copal Keeper, a rank-and-file healer of Ish-Kantun. An elven woman with a long neck and a calm, stern face, long pointed ears with jade spools, long black hair braided with white cotton cords, a white cotton dress with a woven border and a shawl of dark feathers. Action: she lifts a shallow clay bowl of smoldering copal resin in both hands and blows across it toward the left: thick pale blue-white smoke pours from the bowl and flows to the left, curling and rippling like water (Water) — where it touches the fallen, they rise. The embers light her face from below with a warm amber glow, the only warm light. Background: a small forest shrine at night, a stone altar with more smoking bowls, jade-green light in the carved grooves of the stone below."
+    },
+    {
+      "id": "ik-07-jaguar-warrior",
+      "category": "echo",
+      "title": "Воин-ягуар — Иш-Кантун, ступень 7, элита, физ ДД силы, Огонь",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 7: «Голова ягуара вместо шлема, обсидиановый клинок-дубина. Бросается первым»",
+      "subject": "The enemy: the Jaguar Warrior, an elite fighter of Ish-Kantun. A powerful elf warrior whose helmet is the whole head of a jaguar: his face looks out from between the open jaws, the upper fangs above his brow, his long pointed ears showing beside it; a spotted jaguar-skin suit on his arms and chest, a collar of jade beads. Action: he throws himself forward first, lunging toward the left, a sword-club raised high behind his head — a wide wooden blade lined along both edges with black obsidian shards — about to strike; hot sparks and embers (Fire) trail from the obsidian edges. His eyes blaze. Background: a temple stairway at night flanked by carved stone jaguar heads, jade-green light burning in their eyes and in the cracks of the steps."
+    },
+    {
+      "id": "ik-08-quetzal-archer",
+      "category": "echo",
+      "title": "Лучник кецаля — Иш-Кантун, ступень 8, элита, физ ДД ловкости, Воздух",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 8: «Плащ из зелёных перьев кецаля. Его стрела не падает, пока не найдёт цель»",
+      "subject": "The enemy: the Quetzal Archer, an elite archer of Ish-Kantun. A tall, graceful elf with long pointed ears ringed with small gold rings, a band of dull gold on his brow, a long face with calm, merciless eyes; a long cloak of iridescent emerald-green quetzal feathers with long tail plumes. Action: he has just loosed an arrow to the left, the bowstring still trembling; the arrow, fletched with one long green quetzal feather, flies away to the left and curves in the air, leaving a spiraling trail of wind (Air), as if it is still searching for its target. His feather cloak flares in the gust. Background: the high terrace at the top of a stepped pyramid, the dark sea of the forest canopy far below, jade-green light rising from the edge of the terrace."
+    },
+    {
+      "id": "ik-09-jade-mask-priest",
+      "category": "echo",
+      "title": "Жрец в нефритовой маске — Иш-Кантун, ступень 9, элита, маг ДД, Вода",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 9: «Маска из нефритовых пластин, глаза из перламутра. Колдует тем, что вычитает из дня»",
+      "subject": "The enemy: the Jade-Masked Priest, an elite mage of Ish-Kantun. A tall, thin elf priest whose whole face is covered by a mask of small fitted jade plates, with eyes of mother-of-pearl that shine pale and empty; his long pointed ears come out beside the mask, hung with jade spools; a headdress of dark green feathers, a white cotton mantle, a collar of jade beads. Action: he thrusts one open palm toward the left and casts — a spiral of cold blue-green water droplets and mist (Water) streams from his palm to the left, and the light around it dims, as if he takes away part of the day; in his other hand he holds a small carved jade disc. Background: the inner sanctum of a temple, dark stone walls set with jade mosaic panels of plain geometric ornament, jade-green light from the grooves of the floor."
+    },
+    {
+      "id": "ik-10-calendar-keeper",
+      "category": "echo",
+      "title": "Хранитель календаря — Иш-Кантун, ступень 10, элита, дебаффер, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 10: «Несёт на спине каменное колесо дней. Повернёт — и твой ход придётся на чужой день»; правка своего варианта art/generated/echo/ik-10-calendar-keeper__nb2-v2.jpg (v1 и v2 — второй диск над головой)",
+      "refs": [
+        "art/generated/echo/ik-10-calendar-keeper__nb2-v2.jpg"
+      ],
+      "subject": "EDIT MODE — this overrides everything above: do not draw a new picture, edit the attached image. The attached image is the current portrait of this enemy, the Calendar Keeper of Ish-Kantun: an old elf in profile turned to the left, pointing to the left, carrying one stone wheel of days on his back in a wooden frame. Keep the picture exactly as it is — the same elf, face, ears, jade ear spool, feather mantle, pointing hand, the wheel on his back with its carvings, the rings of green Time light, the pillars, the floor, the light, the colors and the painting style. Change only this: the second, upper stone disc behind his head is a mistake — remove it completely, together with the knob his raised hand is holding; in its place paint the dark courtyard with the glowing pillars, matching the rest of the background. His raised arm now bends down behind his shoulder, and his hand grips the top of the rim of the one wheel on his back, turning it. After the edit there is exactly one stone wheel in the picture."
+    },
+    {
+      "id": "ik-11-jaguar-lord",
+      "category": "echo",
+      "title": "Владыка ягуаров — Иш-Кантун, ступень 11, босс недели, физ ДД силы, Земля",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 11: «Шкура чёрного ягуара, ожерелье из нефрита. Ведёт воинов-ягуаров, не оглядываясь»",
+      "subject": "The enemy: the Lord of Jaguars, a boss of Ish-Kantun — menacing, heavy and powerful, filling the frame. A huge, heavily built elven warlord with long pointed ears and old scars, in the pelt of a BLACK jaguar: the black jaguar's head covers his head like a hood, its paws hang across his chest; a heavy necklace of large jade beads; a war club lined with black obsidian in his fist. Action: he strides forward toward the left without looking back, his free arm swept forward, leading the charge; behind him in the darkness, the eyes of jaguar warriors glow and their dark silhouettes follow him. Stone dust (Earth) rises around him. Background: the great plaza before a jade pyramid at night, jade-green light rising from the cracks of the plaza below."
+    },
+    {
+      "id": "ik-12-great-count-priest",
+      "category": "echo",
+      "title": "Верховный жрец Большого счёта — Иш-Кантун, ступень 12, босс недели, маг ДД, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 12: «Убор из перьев в его рост, на груди нефритовый круг дат. Знает, какой сегодня день, лучше тебя»",
+      "subject": "The enemy: the High Priest of the Great Count, a boss of Ish-Kantun — imposing and ancient. A very old, tall, gaunt elf with long pointed ears, deep wrinkles and an ageless, sharp, proud face, dark paint around the eyes; a towering headdress of long green and white feathers as tall as he is rises far above his head and is cut by the top edge of the picture; a jaguar-pelt mantle; on his chest hangs a large round jade disc carved only with plain concentric rings of notches around a glowing center — the circle of dates. Action: he raises both hands, the jade disc on his chest glows green, and between his hands spin rings of green Time light shaped like calendar rings, which he hurls toward the left. He looks down at the viewer: he knows what day it is better than you. Background: the summit of the great pyramid at night — the dark doorway of the top temple in a plain stone frame, the night sky, the black forest far below; there are no carved discs, no calendars and no reliefs behind him."
+    },
+    {
+      "id": "ik-13-jade-steps-lady",
+      "category": "echo",
+      "title": "Владычица нефритовых ступеней — Иш-Кантун, ступень 13, босс недели, лекарь, Вода",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 13: «Нефритовый воротник, посох в перьях. Поднимает своих по ступеням, как по дням»; правка своего варианта art/generated/echo/ik-13-jade-steps-lady__nb2-v2.jpg (в v2 — лишний наконечник копья у левого края)",
+      "refs": [
+        "art/generated/echo/ik-13-jade-steps-lady__nb2-v2.jpg"
+      ],
+      "subject": "EDIT MODE — this overrides everything above: do not draw a new picture, edit the attached image. The attached image is the current portrait of this enemy, the Lady of the Jade Steps of Ish-Kantun. Keep the picture exactly as it is — the same elven queen, her face, ears, jade collar, feather cloak and feathered staff, the ribbon of water, the two warriors rising on the steps behind her, the steps, the light, the colors and the painting style. Change only this: remove the black spear point and its dark shaft that stick into the picture from the left edge at the height of her hand — they are a mistake; in their place continue the glowing ribbon of water and the dark jade steps, matching the surroundings."
+    },
+    {
+      "id": "ik-14-last-day",
+      "category": "echo",
+      "title": "Последний день Круга — Иш-Кантун, ступень 14, Убер-босс недели, танк, Время",
+      "source": "design/ui/screens/echo.js, ECH.civ «Эльфы», ступень 14: «Каменное колесо Большого счёта катится само. На ободе все дни, кроме одного»",
+      "subject": "The enemy: the Last Day of the Circle, the uber-boss of the week — a colossal round stone wheel of the Great Count that rolls by itself. It is not a person: here the rules about waist, head and arms do not apply — instead the wheel fills the whole frame, seen from a low camera angle, its top near the top edge and its bottom cut by the bottom edge; it leans into its roll toward the left, and the dust and broken slabs it leaves behind trail off to the right. Its face is carved with only a few broad concentric rings of large simple ornament — notches, spirals, stepped frets and feathers — no small signs, no glyphs, no pictograms, no skulls; the only face on it is one big carved stone face at the center, with heavy closed eyes and an open mouth breathing out green mist. Around its thick rim runs a ring of square cells, one for every day of the circle, each carved with the same simple spiral — and exactly one cell, at the top of the rim, clearly visible and lit, is empty: smooth bare stone, like a missing tooth. Cold jade-green light of Time blazes from every groove; the plaza slabs crack and burst under its weight, chips and dust fly. No arms, no legs. Background: the plaza at the foot of the pyramid at night, broken slabs, the dark forest behind."
+    },
+    {
+      "id": "ik-15-many-faced",
+      "category": "echo",
+      "title": "Многоликий — пятнадцатая ступень недели эльфов, «враг тысячи лиц»",
+      "source": "design/ui/recipes.js, предмет many: «Носит лица тех, кого победили на этой неделе»; Маска недели — «маска, снятая с Многоликого»; §17.4 GDD",
+      "subject": "The enemy: the Many-Faced, the fifteenth and last enemy of the week, the one with a thousand faces: it wears the faces of those who were defeated this week. A tall, thin, long-armed figure in a long hooded cloak; the cloak is covered with dozens of small carved masks sewn on row over row like scales — faces of Ish-Kantun: jade mosaic faces with pearl eyes, snarling jaguar faces, calm painted faces crowned with feathers, stern stone faces. Under its hood there is no face of its own, only shadow; over the shadow it wears a jade mosaic mask with pale mother-of-pearl eyes. Action: it glides forward toward the left and with one long hand lifts the jade mask aside — and underneath there is already another face, a snarling jaguar mask. Thin green light (Time) glows in the empty eye holes of all the masks. The masks are carved wood, stone and jade, never skin. Background: the dark plaza of Ish-Kantun at night, broken masks scattered on cracked slabs, jade-green light rising from the cracks. Uncanny and unsettling, but not grotesque."
+    }
+  ]
+}
