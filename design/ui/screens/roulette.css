@@ -1,0 +1,114 @@
+/* screens/roulette.css — рулетка «Возрождения душ» (screens/roulette.js): колонка во вкладке «За души», окно с лентой, итог и сводка.
+   Стиль «Свет снизу»: лента светится снизу, метка — золото, редкость — цвет --rc и кристалл --rico из [data-r] (ADR-0027).
+   Правила воздуха: в окне — лента, цена, три кнопки и галочка; одна рамка, внутри — строки и разделители; отступы — --sp-l, --sp-m, --sp-s.
+   Свои классы — rl-*; общие — .dlg, .ov-scrim, .rs-col, .rs-ph, .rs-av, .btn, .chip, .kv, .rar. */
+
+/* колонка: подвал — «Шансы» и одно главное действие */
+.rl-cf{flex-wrap:nowrap}
+
+/* окно рулетки; при перерисовке открытого окна оно не всплывает заново */
+.rl-dlg{width:min(800px,calc(100% - 30px))}
+.rl-ov.still>.ov-scrim,.rl-ov.still>.rl-dlg{animation:none}
+.rl-hd{display:flex;flex-direction:column;gap:2px;min-width:0}
+.rl-b{padding-bottom:var(--sp-l)}
+
+/* лента: окно с затуханием по краям, дорожка карточек, метка по центру */
+.rl-stage{position:relative;flex:none;padding:var(--sp-s) 0}
+.rl-win{position:relative;height:132px;overflow:hidden;border-radius:12px;border:1px solid var(--iron);
+  background:radial-gradient(55% 85% at 50% 125%,rgba(72,229,212,.16),transparent 70%),linear-gradient(180deg,#0b0e11,#06080a);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.rl-track{position:absolute;left:0;top:11px;display:flex;gap:var(--sp-s);padding:0 var(--sp-s);will-change:transform;backface-visibility:hidden}
+.rl-mark{position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,var(--gold),rgba(221,188,122,.12) 16%,rgba(221,188,122,.12) 84%,var(--gold))}
+.rl-mark::before,.rl-mark::after{content:"";position:absolute;left:50%;margin-left:-7px;border:7px solid transparent;filter:drop-shadow(0 0 5px rgba(221,188,122,.8))}
+.rl-mark::before{top:0;border-top:9px solid var(--gold);border-bottom:0}
+.rl-mark::after{bottom:0;border-bottom:9px solid var(--gold);border-top:0}
+.rl-mark.hit{background:linear-gradient(180deg,#fff3d0,rgba(221,188,122,.4) 18%,rgba(221,188,122,.4) 82%,#fff3d0)}
+
+/* карточка ленты: рамка и полоса снизу — цвет редкости, кристалл — в углу */
+.rl-card{position:relative;flex:none;display:block;width:84px;height:110px;border-radius:10px;overflow:hidden;background:#0c0f12;
+  border:1px solid color-mix(in srgb,var(--rc) 38%,#262b31);box-shadow:inset 0 -3px 0 color-mix(in srgb,var(--rc) 75%,transparent);transition:border-color .12s,box-shadow .12s}
+.rl-cr{position:absolute;left:5px;top:5px;z-index:3;width:16px;height:16px;background:var(--rico) center/contain no-repeat;filter:drop-shadow(0 0 3px color-mix(in srgb,var(--rc) 60%,transparent))}
+/* полный герой: лицо во всю карточку, золотая рамка и «Герой» */
+.rl-card.full{border:2px solid var(--gold);box-shadow:0 0 14px -4px var(--gold),inset 0 0 0 1px rgba(0,0,0,.6)}
+.rl-face,.rl-face>.rs-ph,.rl-face>img{position:absolute;inset:0;width:100%;height:100%}
+.rl-face>img{object-fit:cover;object-position:50% 20%}
+.rl-card.full .rs-ph b{font-size:30px}
+.rl-card.full::after,.rl-big::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.3),transparent 30%,transparent 55%,rgba(6,8,10,.94))}
+.rl-lbl{position:absolute;left:0;right:0;bottom:7px;z-index:2;text-align:center;font:700 10.5px/1 var(--f-u);font-style:normal;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);text-shadow:0 0 8px rgba(221,188,122,.7)}
+/* осколки: лицо поменьше, огранка осколка и «×N» */
+.rl-sf{position:absolute;left:50%;top:20px;width:52px;height:52px;margin-left:-26px;filter:drop-shadow(0 0 1.5px var(--rc)) drop-shadow(0 6px 10px rgba(0,0,0,.6))}
+.rl-sf>.rs-ph,.rl-sf>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;clip-path:polygon(24% 0,100% 0,100% 76%,76% 100%,0 100%,0 24%)}
+.rl-card.shard .rs-ph b{font-size:18px}
+.rl-q{position:absolute;left:0;right:0;bottom:9px;z-index:2;text-align:center;font:600 21px/1 var(--f-d);color:var(--parch);font-variant-numeric:lining-nums tabular-nums;text-shadow:0 0 10px color-mix(in srgb,var(--rc) 45%,transparent),0 1px 2px #000}
+/* под меткой карточка вспыхивает; на остановке — подсветка, вздрог и у полного героя — блик */
+.rl-card.on{border-color:color-mix(in srgb,var(--rc) 85%,#fff);box-shadow:0 0 16px -2px var(--rc),inset 0 -3px 0 var(--rc)}
+.rl-card.full.on{border-color:#f6dfa6;box-shadow:0 0 20px -2px var(--gold)}
+.rl-card.won{z-index:1;transform:scale(1.05);border-color:#fff;box-shadow:0 0 0 2px var(--rc),0 0 28px 2px color-mix(in srgb,var(--rc) 65%,transparent)}
+.rl-card.full.won{border-color:#fff3d0;box-shadow:0 0 0 2px var(--gold),0 0 36px 6px rgba(221,188,122,.6)}
+.rl-card.hit{animation:rl-hit .6s cubic-bezier(.2,.8,.2,1)}
+.rl-card.full.hit::before{content:"";position:absolute;inset:0;z-index:4;background:linear-gradient(105deg,transparent 30%,rgba(255,246,220,.8) 50%,transparent 70%);transform:translateX(-130%);animation:rl-shine 1.2s .15s ease-out forwards}
+@keyframes rl-hit{0%{transform:scale(1)}40%{transform:scale(1.16)}100%{transform:scale(1.05)}}
+@keyframes rl-shine{to{transform:translateX(130%)}}
+
+/* цена, три кнопки и маленькое окно с галочкой */
+.rl-ctl{display:flex;align-items:flex-end;gap:var(--sp-m);flex-wrap:wrap}
+.rl-go{display:flex;flex-direction:column;gap:var(--sp-s);flex:1 1 auto;min-width:0}
+.rl-price{display:flex;align-items:center;gap:var(--sp-s);font-size:13px;color:var(--parch-2)}
+.rl-btns{display:flex;gap:var(--sp-s);flex-wrap:wrap}
+.rl-skip{display:inline-flex;align-items:center;gap:var(--sp-s);flex:none;padding:6px 10px;border:1px solid var(--iron);border-radius:9px;background:#0c0f11;font-size:12.5px;color:var(--parch-2);cursor:pointer}
+.rl-skip input{width:16px;height:16px;margin:0;accent-color:var(--spirit);cursor:pointer}
+.rl-skip input:disabled{cursor:not-allowed}
+.rl-team{display:flex;align-items:center;gap:var(--sp-s) var(--sp-m);flex-wrap:wrap;font-size:12px;line-height:1.3;color:var(--parch-3)}
+.rl-team .link[aria-pressed="true"]{color:var(--amber)}
+
+/* окно итога поверх рулетки */
+.rl-scrim2{position:absolute;inset:0;z-index:1;border:0;padding:0;background:rgba(3,4,5,.55);cursor:default;animation:fade .18s ease}
+.rl-res{position:absolute;left:50%;top:50%;z-index:2;transform:translate(-50%,-50%);width:min(430px,calc(100% - 40px));max-height:calc(100% - 24px);display:flex;flex-direction:column;
+  background:radial-gradient(90% 60% at 50% 115%,rgba(221,188,122,.1),transparent 70%),linear-gradient(180deg,#191d21,#111417);border:1px solid var(--gold-3);border-radius:14px;
+  box-shadow:0 30px 80px rgba(0,0,0,.8);animation:pop .24s cubic-bezier(.2,.8,.2,1)}
+.rl-res.wide{width:min(620px,calc(100% - 40px))}
+.rl-res.still,.rl-scrim2.still{animation:none}
+.rl-res-h{display:flex;align-items:baseline;gap:var(--sp-m);padding:var(--sp-m) var(--sp-l) 4px}
+.rl-res-h h3{font:600 23px/1.05 var(--f-d);color:var(--gold)}
+.rl-spent{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--parch-2);white-space:nowrap}
+.rl-res-b{display:flex;flex-direction:column;gap:var(--sp-s);padding:4px var(--sp-l) var(--sp-m);min-height:0}
+.rl-res-b>*{flex-shrink:0}
+.rl-res-f{display:flex;gap:var(--sp-s);align-items:center;flex-wrap:wrap;padding:var(--sp-m) var(--sp-l);border-top:1px solid var(--iron)}
+.rl-res-f .rl-close{margin-left:auto}
+/* один итог: лицо крупно, имя, редкость, одна строка и пробуждение */
+.rl-one{display:grid;grid-template-columns:auto minmax(0,1fr);gap:var(--sp-m);align-items:center}
+.rl-big{position:relative;display:block;flex:none;width:92px;height:118px;border-radius:12px;overflow:hidden;border:1px solid color-mix(in srgb,var(--rc) 50%,#262b31);box-shadow:inset 0 -3px 0 var(--rc),0 10px 26px -12px var(--rc)}
+.rl-big>.rs-ph,.rl-big>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+.rl-big .rs-ph b{font-size:32px}
+.rl-big.full{border:2px solid var(--gold);box-shadow:0 0 24px -4px var(--gold)}
+.rl-big .rl-q{bottom:8px}
+.rl-k{position:absolute;right:6px;top:6px;z-index:2;font:700 12px/1 var(--f-u);color:var(--gold);text-shadow:0 1px 2px #000}
+.rl-one-tx{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0}
+.rl-nm{font:600 22px/1.05 var(--f-d);color:var(--parch)}
+.rl-line{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px;color:var(--parch-2)}
+/* сводка ×10 и ×100: полные — первыми и крупно, осколки — строками по героям с разделителем, прах — строкой */
+.rl-fulls{display:flex;gap:var(--sp-m);flex-wrap:wrap}
+.rl-fc{display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:124px;animation:rl-up .42s calc(var(--i) * 90ms) both cubic-bezier(.2,.8,.2,1)}
+.rl-res.still .rl-fc{animation:none}
+.rl-fc .rl-nm{font-size:16px}
+.rl-fc .btn{min-height:28px}
+.rl-grp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 var(--sp-m)}
+.rl-gr{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;padding:6px 0;border-top:1px solid var(--iron)}
+.rl-gr .tx{display:flex;flex-direction:column;min-width:0}
+.rl-gr .tx b{font:600 15px/1.1 var(--f-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rl-gr small{font-size:11.5px;color:var(--parch-3)}
+.rl-plus{font:600 17px/1 var(--f-d);color:var(--parch);font-variant-numeric:lining-nums tabular-nums}
+.rl-dust{display:flex;align-items:center;gap:var(--sp-s);flex-wrap:wrap;font-size:12.5px;color:var(--parch-2)}
+.rl-kv{grid-template-columns:auto minmax(0,1fr);font-size:13px}
+.rl-p{font-size:13px;color:var(--parch-2)}
+@keyframes rl-up{from{opacity:0;transform:translateY(10px) scale(.94)}}
+
+/* частицы на остановке: слой рядом с #game — перерисовка экрана его не сносит */
+.rl-fxl{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
+.rl-flash{position:absolute;left:0;top:0;width:200px;height:200px;border-radius:50%;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(circle,rgba(255,250,236,.95),color-mix(in srgb,var(--c) 65%,transparent) 32%,transparent 70%)}
+
+@media (prefers-reduced-motion:reduce){
+  .rl-card,.rl-card.hit,.rl-card.full.hit::before,.rl-fc,.rl-res,.rl-scrim2{animation:none!important;transition:none!important}
+}

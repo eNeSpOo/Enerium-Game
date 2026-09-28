@@ -158,6 +158,39 @@ def rel(p):
     return p.relative_to(ROOT).as_posix()
 
 
+LOCK = OUT / ".manifest.lock"
+
+
+def add_to_manifest(item):
+    """Запись в манифест под замком: несколько запусков могут рисовать одновременно.
+    Манифест перечитывается перед записью, иначе параллельный запуск затрёт чужие записи."""
+    t0 = time.time()
+    while True:
+        try:
+            fd = os.open(LOCK, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            break
+        except FileExistsError:
+            if time.time() - t0 > 120:  # замок старше двух минут — брошен упавшим запуском
+                try:
+                    os.remove(LOCK)
+                except OSError:
+                    pass
+                t0 = time.time()
+            time.sleep(0.2)
+    try:
+        manifest = load_json(MANIFEST, {"items": []})
+        manifest["items"].append(item)
+        tmp = MANIFEST.with_name(f"manifest.{os.getpid()}.tmp")
+        tmp.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        os.replace(tmp, MANIFEST)
+    finally:
+        os.close(fd)
+        try:
+            os.remove(LOCK)
+        except OSError:
+            pass
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -165,6 +198,7 @@ def main():
     ap.add_argument("--only", help="id заданий через запятую")
     ap.add_argument("--models", help="модели через запятую: nb2 (по умолчанию), pro, lite")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--budget", type=float, help="потолок трат запуска в долларах: дальше задания не идут")
     a = ap.parse_args()
 
     jobs_path = (TOOL / a.jobs) if (TOOL / a.jobs).exists() else (ROOT / a.jobs)
@@ -175,7 +209,6 @@ def main():
     only = set(a.only.split(",")) if a.only else None
     todo = [j for j in spec["jobs"] if not only or j["id"] in only]
     key = None if a.dry_run else load_key()
-    manifest = load_json(MANIFEST, {"items": []})
 
     total = 0.0
     for job in todo:
@@ -183,6 +216,10 @@ def main():
         for alias in use:
             m = models[alias]
             size = fit_size(b["size"], m)
+            if a.budget is not None and not a.dry_run and total + m["per_image"][size] > a.budget:
+                print(f"Потолок ${a.budget} — {job['id']} и дальше не рисуются")
+                print(f"Итого: ${total:.3f} (по счётчикам токенов)")
+                return
             print(f"{job['id']} · {m['name']} · {b['aspect']} · {size}")
             if a.dry_run:
                 total += m["per_image"][size]
@@ -230,8 +267,7 @@ def main():
             with Image.open(final) as im:
                 item["px"] = list(im.size)
             item["sha256"] = hashlib.sha256(final.read_bytes()).hexdigest()
-            manifest["items"].append(item)
-            MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            add_to_manifest(item)
             total += item["cost_usd"]
             note = f", альфа: {'да' if item['cutout']['ok'] else 'НЕТ — ' + item['cutout'].get('why', '')}" if b["cutout"] else ""
             print(f"    → {item['file']} {item['px'][0]}×{item['px'][1]}, ${item['cost_usd']}, {item['seconds']} с{note}")

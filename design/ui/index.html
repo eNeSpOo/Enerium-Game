@@ -1567,6 +1567,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <link rel="stylesheet" href="screens/craft.css">
 <link rel="stylesheet" href="screens/bag.css">
 <link rel="stylesheet" href="screens/echo.css">
+<link rel="stylesheet" href="screens/roulette.css">
 </head>
 <body>
 <div class="p-app">
@@ -1694,11 +1695,12 @@ const AV = n => ART(n) + '?v=' + ART_V;
    power, hp, patk, matk, def-phys, def-mag, eva, crit, critdmg; str, int, agi, end, spd; r1…r7 — редкости (ADR-0027);
    cls-tank, cls-healer, cls-str, cls-agi, cls-mage, cls-control, cls-farmer; valor. ICON(имя, px, подпись) — <img>, alt — подпись */
 const ICON = (n, px = 20, alt = '') => `<img class="ico" src="${AV('icons/' + n + '.png')}" width="${px}" height="${px}" alt="${alt}" loading="lazy" decoding="async">`;
-/* кристаллы редкости (.rar::before) и доблесть (.stars i) рисует CSS: адреса с версией выгрузки — в переменные <html> --ico-r1…7 и --ico-valor */
+/* кристаллы редкости (.rar::before) и доблесть (.stars i) рисует CSS: адреса с версией выгрузки — в переменные <html> --ico-r1…7 и --ico-valor.
+   Адрес полный: url() из переменной браузер разрешает от файла стилей, где её подставили, — у screens/*.css это была бы папка screens/ */
 {
-  const st = document.documentElement.style;
-  for (let r = 1; r <= 7; r++) st.setProperty('--ico-r' + r, `url("${AV('icons/r' + r + '.png')}")`);
-  st.setProperty('--ico-valor', `url("${AV('icons/valor.png')}")`);
+  const st = document.documentElement.style, abs = p => { try { return new URL(AV(p), document.baseURI).href; } catch (_) { return AV(p); } };
+  for (let r = 1; r <= 7; r++) st.setProperty('--ico-r' + r, `url("${abs('icons/r' + r + '.png')}")`);
+  st.setProperty('--ico-valor', `url("${abs('icons/valor.png')}")`);
 }
 const PATH = n => A('path-icons/path-' + String(n).padStart(2, '0') + '.jpg');
 /* Арт врагов — основа ADR-0013, арена — вторая раскладка; выгрузка tools/art-gen/export_ui.py */
@@ -2789,9 +2791,9 @@ function rsDonatCard(h, s, open) {
   return `<div class="pnl hd">${rsHead(h, 0, aside)}
     <div class="hd-body">${rsBrief(h, '')}</div></div>`;
 }
-/* за души: возрождение душ, отряд Эхо недели, каталог праха; собранного героя пробуждают души */
+/* за души: возрождение душ — рулетка screens/roulette.js (rlCol; без файла — прежняя колонка), отряд Эхо недели, каталог праха; собранного героя пробуждают души */
 function rsSoulsView() {
-  return `<div class="rs-souls">${rsRouletteCol()}${rsEchoCol()}${rsDustCol()}</div>`;
+  return `<div class="rs-souls">${typeof rlCol === 'function' ? rlCol() : rsRouletteCol()}${rsEchoCol()}${rsDustCol()}</div>`;
 }
 const rsShardTag = h => rsHas(h) ? `<span class="chip gold">${ic('check')}есть</span>` : `<span class="faint num">${S.rs.shards[h.id] || 0}/${RS.rules.stub.shards}</span>`;
 function rsRouletteCol() {
@@ -4484,6 +4486,9 @@ function kitIconsHtml() {
     <div class="k-ico">${G.map(([t, x]) => `<div class="grp"><span class="eyebrow">${t}</span><div class="k-row">${x.map(([n, c]) => `<figure>${ICON(n, 36, c)}<figcaption>${c}</figcaption></figure>`).join('')}</div></div>`).join('')}</div>
     <p class="k-note">Значок — <code>ICON(имя, px)</code>; кристалл редкости рисует <code>.rar</code>, доблесть — <code>.stars</code>, класс — <code>CLS(класс)</code>, боевую мощь — <code>bmHtml(число)</code>, число со значком — <code>icoNum(имя, число, подпись)</code>. Выгрузка — <code>tools/art-gen/export_ui.py</code> в <code>assets/art/icons/</code>.</p></section>`;
 }
+/* разделы UI-кита из файлов экранов: KIT_EXTRA.push({ html: () => '<section class="k-box">…</section>', paint: () => {…} }) —
+   screens/*.js дописывают свои разделы сюда, не трогая renderKit; paint вызывается после вставки разметки */
+const KIT_EXTRA = [];
 function renderKit() {
   const k = document.getElementById('kitGrid'); if (!k) return;
   const sw = (c, n, s) => `<div><i style="background:${c}"></i><span><b>${n}</b>${s}</span></div>`;
@@ -4539,7 +4544,9 @@ function renderKit() {
     <div id="kitLoot"></div></section>` : ''}
   ${RXI.sand ? `<section class="k-box"><h3>Древо рецептов · узлы</h3><div class="k-demo tr-cols">${[['sand', ''], ['k1_ench', 'up'], ['u4', ''], ['p_clay', 'sel'], ['act_cb1', 'down'], ['k4_hunt', '', 1]].map(([id, st, unk]) => { const it = RXI[id]; if (!it) return ''; return `<span class="tn ${it.tier === 'key' ? 'key' : it.tier === 'unique' ? 'uniq' : TR_MADE.includes(it.tier) ? 'made' : ''} ${unk ? 'unk' : ''} ${st}"><span class="ti" data-r="${unk ? 1 : it.r}">${unk ? '<span class="gl">?</span>' : trIcon(it)}</span><b>${unk ? 'Не найдено' : it.n}</b></span>`; }).join('')}</div>
     <div class="tr-leg"><span><i></i>что нужно выбранному</span><span><i class="d"></i>куда оно идёт</span><span><i class="s"></i>выбранный узел</span></div>
-    <p class="k-note">Вкладка «Древо рецептов» рядом с «Картой экранов» — инструмент команды и конструктора, игрок древо не видит (ADR-0008). Узлы стоят по слоям: добыча, ключи мастерской и творения, заготовки, изделия, руины и Эхо, герои и награды; внизу — руны стражей. Цвет узла — редкость, пунктир — вход из прошлого цикла.</p></section>` : ''}`;
+    <p class="k-note">Вкладка «Древо рецептов» рядом с «Картой экранов» — инструмент команды и конструктора, игрок древо не видит (ADR-0008). Узлы стоят по слоям: добыча, ключи мастерской и творения, заготовки, изделия, руины и Эхо, герои и награды; внизу — руны стражей. Цвет узла — редкость, пунктир — вход из прошлого цикла.</p></section>` : ''}
+  ${KIT_EXTRA.map(x => { try { return x.html(); } catch (e) { console.error(e); return ''; } }).join('')}`;
+  for (const x of KIT_EXTRA) if (x.paint) try { x.paint(); } catch (e) { console.error(e); }
 }
 
 /* ================== UI-кит · ресурсы Этериоса ==================
@@ -5280,5 +5287,6 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 <script src="screens/craft.js"></script>
 <script src="screens/bag.js"></script>
 <script src="screens/echo.js"></script>
+<script src="screens/roulette.js"></script>
 </body>
 </html>

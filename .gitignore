@@ -42,3 +42,7 @@ desktop.ini
 # Python
 __pycache__/
 *.pyc
+
+# генерация арта: замок манифеста на время записи
+art/generated/.manifest.lock
+art/generated/manifest.*.tmp
