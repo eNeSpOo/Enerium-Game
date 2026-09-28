@@ -120,7 +120,11 @@ for (const cy of CYC) {
       maxV, lore: row['кто он'], team, src: ['Мастерская · скрытый рецепт (ADR-0019): находят перебором, как любой рецепт (§12)'] });
     addRecipe({ id: 'r_' + id, cyc: c, n: row['имя'], kind: 'hero', out: [id, 1], in: h.in, why: `${h.why} Максимум доблести — ${maxV}.`, team, hidden: true });
   }
-  for (const it of cy.echo) addItem(Object.assign({ cyc: c, tier: 'echo', team }, it));
+  /* Многоликий: «где падает» и флаг недели — из записи добычи Эхо (common.js, ECHO.many), чтобы данные и строка не расходились */
+  const M = C.ECHO.many;
+  for (const it of cy.echo) addItem(Object.assign({ cyc: c, tier: 'echo', team }, it, it.id !== M.item ? {} : { week: M.week || undefined,
+    src: [`Эхо · ступень ${M.step} недели — Многоликий, ${M.count} за победу (§17.4, ADR-0025)`]
+      .concat(M.week ? ['Ресурс своей недели: активировать его биом или отдать в рецепт можно только на этой неделе'] : []) }));
   for (const it of cy.products) addItem(Object.assign({ cyc: c, team, src: ['Мастерская · рецепт'] }, it));
   for (const r of cy.recipes) addRecipe(Object.assign({ cyc: c, team }, r));
   /* Руны пределов и доблести: страж пределов роняет руны I–V, перековка три к одной с ключом ремесла; руна доблести — из 100 осколков. */

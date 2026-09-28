@@ -193,7 +193,8 @@ function buildDrops(CYC, places, items, recipes, byId) {
     rituals: { workers: C.RITUALS.workers,
       heroes: { minutes: H.minutes, byCycle: cyc6.map(c => ({ cyc: c, gold: H.minutes.map(m => H.perHour.gold * m / 60 * c), spirit: H.minutes.map(m => H.perHour.spirit * m / 60 * c), souls: H.minutes.map(m => H.perHour.souls * m / 60 * c) })) } },
     contracts: { taskPoints: CT.taskPoints, certifyMul: CT.certifyMul, byCycle: cyc6.map(c => ({ cyc: c, day: contract('day', c), week: contract('week', c) })) },
-    echo: C.ECHO, payouts: 'design/ui/lootboxes.js',
+    echo: Object.assign({}, C.ECHO, { uber: C.ECHO.many }),   // uber — прежнее имя той же записи: его читают экран Эхо и его проверки; снять, когда перейдут на echo.many
+    payouts: 'design/ui/lootboxes.js',
     lootboxes: { basicPool: items.filter(i => i.pool).map(i => i.id), pools },
     activeSlots: { shared: true, byCycle: C.CRAFT.activeCap },
     craftBiomes, craftBosses, market,
