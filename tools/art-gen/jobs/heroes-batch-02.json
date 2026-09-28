@@ -1,0 +1,180 @@
+{
+  "name": "Герои, партия 2: десять героев рулетки цикла II (c2-41…c2-46, c2-66…c2-69) и десять героев золота цикла I после сета 1 (c1-06…c1-15). Рецепт принятых h1…h5 (heroes-set1.json): тот же стиль, кадр и три референса стиля из art/style. Кадр уточнён: по пояс, без ног, корпус развёрнут вправо — к врагам. Редкость не рисуем, класс — по оружию или предмету, школа — по цвету свечения. У зверицы c2-69 без ref-04: на нём зверь, модель перерисовала бы его",
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no real-world alphabets, no runes or markings that look like writing, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No bodies, no skulls, no blood. Only one character in the foreground; exactly two arms and two hands.",
+  "cutout_rule": "",
+  "categories": {
+    "heroes": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [
+        "art/style/ref-04-beast-gold-cracks.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-03-cave-teal-runes.webp"
+      ],
+      "frame": "Format: vertical hero card portrait, 4:5. Half-body portrait from the waist or hips up, three-quarter view; no knees, no legs, no feet in the frame. The hero's body is turned toward the right side of the picture, toward unseen enemies beyond the right edge, and the face is seen in three-quarter view looking to the right. Head in the upper third, the face large, well lit and readable at small size; the lower quarter may be darker because the card puts the name there. Rich atmospheric background that tells where the hero lived, with depth and soft focus, darker than the character. Light comes from below and from glowing crystals; rim light separates the figure from the background."
+    }
+  },
+  "jobs": [
+    {
+      "id": "hero-c1-06-torbin",
+      "category": "heroes",
+      "title": "Торбин Мешок — дворф, танк, Земля (c1-06, золото)",
+      "source": "docs/content/герои/состав-героев.csv c1-06; главы/цикл-1.md «Счёт не сошёлся»; цикл-1.md h02_3",
+      "subject": "Subject: Torbin the Sack, a dwarf tank of the Earth school; for thirty years he carried sacks of empty karst stone down the mountain road to an elven outpost and never took a single stone too many, and later he walked the roads beside a wandering elven healer, guarding her companions as if it were a fair deal. A stocky, broad-shouldered dwarf in his fifties with a sun-browned, honest face, a thick chestnut-brown beard tied with a leather cord, bushy brows, calm dependable eyes. A dusty travel jerkin of thick leather over a padded shirt, leather straps across the chest. Over his right shoulder he carries a heavy canvas sack; through its open neck show dull matte grey-white stones that do not glow at all. On his left arm a round shield of thick planks with an iron rim, worn by the road. Background: a dusty mountain road winding down from grey dwarven peaks toward the dark edge of an elven forest at dusk; road dust hangs in the air. Warm amber light of the Earth school rises from cracks in the road stones and glows along the shield's rim."
+    },
+    {
+      "id": "hero-c1-07-mirel",
+      "category": "heroes",
+      "title": "Мирель из Гавани — человек запада, контроль, Вода (c1-07, золото)",
+      "source": "docs/content/герои/состав-героев.csv c1-07; главы/цикл-1.md «Держать»; цикл-1.md h02_4",
+      "subject": "Subject: Mirel of the Harbour, a young woman of the western lands, a controller of the Water school: a harbour girl whom a wandering elven healer once nursed; she never learned to heal, but she learned to hold — the sick while a bone is set, a wounded beast, an enemy. About seventeen, slight but strong, a serious freckled face, dark hair tied back under a faded kerchief, grey-blue eyes that do not look away. A plain harbour dress of faded blue wool with rolled sleeves, a travelling shawl dusty from the roads, a small bundle of herbs tied at her belt. She holds both hands forward toward the right, fingers spread, and from her palms thin chains of clear blue water and ice stretch out, taut, holding something unseen in place. Background: the harbour of a great western trading city at dusk: a crowded stone quay, tall masts and furled sails, lanterns reflected in dark water. Cold blue light of the Water school rises from the wet stones below her, mist drifts over the water."
+    },
+    {
+      "id": "hero-c1-08-ilsar",
+      "category": "heroes",
+      "title": "Ильсар Слышащий — человек Эндалора, контроль, Время (c1-08, золото)",
+      "source": "docs/content/герои/состав-героев.csv c1-08; главы/цикл-1.md «Под ступенью»; цикл-1.md h04_4 (по лор-аудиту — человек, не эльф)",
+      "subject": "Subject: Ilsar the Hearer, a young man of Endalor, the city of mages, a controller of the Time school; a student of Time who could hear charged stone humming deep in the rock better than his teachers, and who went down the mine to find the vein he had heard beneath a notched stair. About twenty, a thin attentive face, dark curly hair, a faint shadow of beard, eyes half-closed in concentration. A dark student's robe with thin green trim of the Time school, dusty at the hem, a small miner's lamp hanging from his belt. He stands close to the rock wall at the right side of the picture, turned toward it, one open palm pressed flat against the stone, head tilted, listening; under his palm thin veins of green light glow inside the rock. Around his other hand faint green rings of slowed time spread, and specks of dust hang motionless in the air. Background: a steep stone stairway going down inside a mine shaft, its steps worn hollow by generations of feet; far below, deep in the rock, a green glow. Soft green light of the Time school rises from below."
+    },
+    {
+      "id": "hero-c1-09-dorn",
+      "category": "heroes",
+      "title": "Дорн Вечный Подмастерье — дворф, физ ДД силы, Огонь (c1-09, золото)",
+      "source": "docs/content/герои/состав-героев.csv c1-09; главы/цикл-1.md «Незаконченный клинок»; цикл-1.md h05_2",
+      "subject": "Subject: Dorn the Eternal Apprentice, a dwarf warrior of great strength of the Fire school; every workshop of the dwarven mountain wanted him, so he never became a master anywhere, and he finished other masters' work so well that they could not find the seam. An older dwarf around sixty, a short soot-black beard shot with grey and singed at the ends, a broad nose, burn scars on thick forearms, kind stubborn eyes. A scorched leather smith's apron over a sleeveless tunic, a belt hung with tools of many crafts: tongs, a file, a small casting ladle, a wrench. He grips a heavy forge hammer in his right hand, ready to strike; on the anvil in front of him lies an unfinished sword blade, still glowing red, forged from parts of different metals joined together. Background: a vast dwarven forge hall carved in the rock, with many workshops along the walls — a foundry, an armoury, a hall of mechanisms — chimneys and chains in smoky gloom. Scarlet-red firelight of the Fire school rises from the forge below, sparks and embers drift in the air."
+    },
+    {
+      "id": "hero-c1-10-brann",
+      "category": "heroes",
+      "title": "Бранн Изгнанник — дворф, танк, Земля (c1-10, золото)",
+      "source": "docs/content/герои/состав-героев.csv c1-10; главы/цикл-1.md «Одно дерево»; цикл-1.md h03_3. v2: в v1 дворф в полный рост, с ногами и сапогами — кадр прописан теснее",
+      "subject": "Subject: Brann the Exile, a dwarf tank of the Earth school; cast out of his mountain for carrying out what was not his, he became the best mercenary of the north; in a southern elven forest he was the first to feel that the path was lying, and he cut down one tree to lead his comrades to the water. Close half-body portrait: the picture is cut at his belt, and his head and broad shoulders fill the upper half of the frame — dwarves are short, so the camera comes close; no legs and no boots are visible. A hard dwarf in his prime, a scarred face with a broken nose, a black beard braided with iron rings, shaved temples, wary deep-set eyes. Dwarven mail under a northern fur cloak; on a cord at his throat hangs half of a coin, broken in two with a jagged edge. He holds a heavy rectangular iron shield, dented and scratched, high on his left arm, and raises a woodcutter's axe with pale wood chips on its blade in his right hand. Background: a dark primeval elven forest in mist, huge twisted trees crowding close, the path between them vanishing; behind him a freshly cut tree stump, pale and bright in the gloom. Warm amber light of the Earth school glows in the cracked earth and among the roots below, mist and spores drift in the light."
+    },
+    {
+      "id": "hero-c1-11-samir",
+      "category": "heroes",
+      "title": "Самир Недоучка — человек Эндалора, маг ДД, Огонь (c1-11, золото)",
+      "source": "docs/content/герои/состав-героев.csv c1-11; главы/цикл-1.md «Три ступени»; цикл-1.md h04_2. v2 — правка своего варианта art/generated/heroes/hero-c1-11-samir__nb2.jpg: в v1 на перчатке четыре камня, а третье гнездо должно быть пустым. v3 — правка v2 (art/generated/heroes/hero-c1-11-samir__nb2-v2.jpg): гнёзд осталось четыре, два пустых — лишнее нижнее убрать",
+      "refs": [
+        "art/generated/heroes/hero-c1-11-samir__nb2-v2.jpg"
+      ],
+      "subject": "EDIT MODE — this overrides everything above: do not draw a new picture, edit the attached image. The attached image is the current portrait of this hero, Samir the Dropout: a young man in a torn grey student's robe with scarlet trim, holding a tongue of scarlet fire over his gloved hand in a mine tunnel. Keep the picture exactly as it is — the same young man, his face, hair, robe, bandaged sleeve, both hands, the flame, the glove, the tunnel, the stairway, the light, the colors and the painting style. Change only this: on the back of the leather glove there are four metal sockets; the lowest one, the small empty ring nearest the edge of the hand, below the other empty ring, is a mistake — remove it completely and paint plain dark leather in its place. After the edit the glove has exactly three sockets: two with glowing red stones and one empty. Nothing else changes.",
+      "subject_v1": "Subject: Samir the Dropout, a young man of Endalor, the city of mages, a battle mage of the Fire school; a student of the fire wing, expelled the same day he went down where students may not go, and sent down to work in the mine. About twenty, a lean face with warm brown skin, dark eyes and a thin black beard, black hair tangled and dusty, a proud stubborn look. A torn student's robe with scarlet trim of the fire wing, grey with mine dust, sleeves bound with rags. On his right hand a mage's leather glove with three metal sockets across the back: two hold small glowing red stones, the third socket is empty. A tongue of scarlet fire curls up from his gloved palm, and he warms his other hand over it. Background: the bottom of a mine under the city: a rough rock face, wooden pit props, a smoky narrow tunnel, a worn stairway leading up into the dark. Scarlet firelight of the Fire school rises from below, embers and rock dust drift in the air.",
+      "subject_v2": "EDIT MODE — this overrides everything above: do not draw a new picture, edit the attached image. The attached image is the current portrait of this hero, Samir the Dropout: a young man in a torn grey student's robe with scarlet trim, holding a tongue of scarlet fire over his gloved hand in a mine tunnel. Keep the picture exactly as it is — the same young man, his face, hair, robe, bandaged sleeve, both hands, the flame, the tunnel, the stairway, the light, the colors and the painting style. Change only the back of the leather glove: it must carry exactly three round metal sockets in one row across the knuckles; the first two sockets hold small glowing red stones, the third socket is empty — a dark hollow metal ring with nothing inside. Remove the other stones. Nothing else changes."
+    },
+    {
+      "id": "hero-c1-12-ingeborg",
+      "category": "heroes",
+      "title": "Ингеборг Клеть — дворфийка, танк, Земля (c1-12, золото)",
+      "source": "docs/content/герои/состав-героев.csv c1-12; главы/цикл-1.md «Противовес»; цикл-1.md h04_3 (Хальдис → Ингеборг)",
+      "subject": "Subject: Ingeborg of the Cage, a dwarf woman, a tank of the Earth school; for half a century she worked the mine cage that lowers workers into the shaft under the city of mages, and she counted how many went down each morning and how many came back each evening. An elderly dwarf woman around seventy, short and very broad, beardless, a strong square jaw, a weathered stern face, iron-grey hair in two thick braids wound around her head, thick muscular forearms, worn leather gauntlets. A heavy leather work coat over riveted iron plates. A heavy iron chain is wound around her right forearm and hangs down; on her left arm she bears a square shield made from a riveted iron plate of the cage door, battered and scraped. Background: the top of a deep mine shaft inside a stone cavern: a wooden-and-iron mine cage hangs on chains over the dark drop, big gear wheels and a stone counterweight on thick chains beside it. Warm amber light of the Earth school rises from the shaft below and from cracks in the stone floor, dust hangs in the air."
+    },
+    {
+      "id": "hero-c1-13-lusil",
+      "category": "heroes",
+      "title": "Люсиль Штопальщица — человек запада, лекарь, Вода (c1-13, золото)",
+      "source": "docs/content/герои/состав-героев.csv c1-13; главы/цикл-1.md «Игла в шве»; цикл-1.md h05_3 (Одилия → Люсиль)",
+      "subject": "Subject: Lucille the Mender, a woman of the western harbour city, a healer of the Water school; she mended sails so well that her seams never parted, until one day she had to stitch people. A sturdy woman in her mid-forties, a round, calm, capable face with laugh lines, auburn hair going grey tucked under a linen cap, strong salt-roughened hands. A plain grey linen dress with rolled sleeves, a canvas apron with pockets full of thread and needles, a sailmaker's leather palm guard on her right hand. She pulls a long curved sail needle through heavy sailcloth draped over her arm; the thread shines with cool blue light, and droplets of glowing water run along the seam — the Water school. Background: a sail loft by the harbour: vast pale sails hanging from the ceiling beams, coils of rope, a tall window over the sea with masts beyond it. Cold blue light of the Water school rises from below, fine lint and dust float in the light."
+    },
+    {
+      "id": "hero-c1-14-sverr",
+      "category": "heroes",
+      "title": "Сверр Мехоноша — северянин, маг ДД, Огонь (c1-14, золото)",
+      "source": "docs/content/герои/состав-героев.csv c1-14; главы/цикл-1.md «На вдохе»; цикл-1.md h05_4",
+      "subject": "Subject: Sverr the Bellows-keeper, a northern man, a battle mage of the Fire school; the fire temple found him too weak for a warrior and too quiet for a mage, so he was put to the forge bellows, and there he learned to hold fire with his breath. Lean and wiry, in his thirties, a quiet, focused, gentle face, pale straw-blond hair tied back, a short fair beard, soot on one cheek, sinewy arms with rolled-up sleeves, a scorched leather apron over a plain wool tunic. His left hand rests on the handle of a huge leather forge bellows; his right hand is raised, palm up, and he breathes out slowly toward it — above his palm the fire rises and twists obediently into a spiral of scarlet flame. Background: a smoky forge in a stone vault beneath a northern fire temple: a great glowing hearth, a sword blade lying in the coals, chains and tongs, dark stone. Scarlet-red light of the Fire school rises from the hearth below, sparks swirl in his breath."
+    },
+    {
+      "id": "hero-c1-15-nuael",
+      "category": "heroes",
+      "title": "Нуаэль Странница — эльфийка, лекарь, Воздух (c1-15, золото)",
+      "source": "docs/content/герои/состав-героев.csv c1-15; главы/цикл-1.md «Себя не посчитала»; цикл-1.md h02_1. v2 — правка своего варианта art/generated/heroes/hero-c1-15-nuael__nb2.jpg: в v1 не видно эльфийских ушей, она читается человеком",
+      "refs": [
+        "art/generated/heroes/hero-c1-15-nuael__nb2.jpg"
+      ],
+      "subject": "EDIT MODE — this overrides everything above: do not draw a new picture, edit the attached image. The attached image is the current portrait of this hero, Nuael the Wanderer: a woman in a hooded brown travel cloak with a long honey-brown braid, holding a small wooden cup with white-green vapour, on an old road among dark hills at dusk. Keep the picture exactly as it is — the same woman, her face, braid, cloak, satchel, herbs, scroll, bedrolls, cup and vapour, the road, the crystals, the light, the colors and the painting style. Change only this: she is an elf, so she must have a clearly visible pointed elven ear. On the visible side of her head, between her temple and the braid, a long slender pointed elven ear comes out through her hair, its tip rising above the hair, softly lit by the white-green light. Nothing else changes.",
+      "subject_v1": "Subject: Nuael the Wanderer, an elven woman, a healer of the Air school; for ten years she walked the old roads from the south to the west healing people, and every evening she counted her companions — the count never failed. Ageless and grave, looking about forty by human measure, a fine sun-browned face with a few lines of road and care, honey-brown hair in one long practical braid, pointed elven ears, kind watchful eyes. A hooded travel cloak of dusty brown wool pushed back from her head, its hem grey with road dust, a healer's satchel of herbs across her body, a rolled scroll tied with a stem of grass tucked into her belt. In her hands she holds a small wooden cup of a healing infusion; white-green vapour rises from it and curls in the air — the Air school. Background: an ancient paved road at dusk winding between dry hills, the dark shapes of her companions' bedrolls in the shadows behind her, the first stars. Pale white-green light of the Air school rises from below and from small crystals by the roadside; road dust drifts in the light."
+    },
+    {
+      "id": "hero-c2-41-ulva",
+      "category": "heroes",
+      "title": "Ульва Смазчица — дворфийка, лекарь, Земля (c2-41, рулетка)",
+      "source": "docs/content/герои/состав-героев.csv c2-41; главы/цикл-2.md «Масло и бинт», «Обведённая строка»; цикл-2.md h06_2. v2: в v1 она читалась обычной женщиной, а не дворфийкой — дворфские черты прописаны прямо",
+      "subject": "Subject: Ulva the Oiler, a dwarf woman, a healer of the Earth school; like her mother and grandmother she oils the gears of the great dwarven machine that holds a flying city in the sky, and she carries gear oil and bandages for the workers' torn hands in the same bag. She is unmistakably a dwarf: very short and very broad, stocky and powerful, with shoulders as wide as a blacksmith's, a thick neck, a broad face with a wide nose, ruddy cheeks and a strong jaw, big hard-working hands; beardless. In her late forties, a smudge of oil on one cheek, thick reddish-brown hair in two heavy braids bound with small iron rings, a work scarf over her head, sleeves rolled up on thick forearms. A leather work apron stained with oil, a heavy shoulder bag full of rolled linen bandages; a big iron key hangs on her belt. In her right hand a long-spouted brass oil can, in her left a roll of clean bandage glowing with the warm amber healing light of the Earth school. Background: deep inside the heart of a colossal machine: huge brass and iron gear wheels, shafts and rivets, pipes, steam and narrow catwalks. Warm amber light of the Earth school rises from below, dust and drops of oil glint in the light."
+    },
+    {
+      "id": "hero-c2-42-taviel",
+      "category": "heroes",
+      "title": "Тавиэль Невидимая — эльфийка, физ ДД ловкости, Воздух (c2-42, рулетка)",
+      "source": "docs/content/герои/состав-героев.csv c2-42; главы/цикл-2.md «Рядом», «Чужие половины», «Отдать долг»; цикл-1.md h03_4. v2: в v1 чёрный прямоугольник внизу, фигура спиной, лицо мелкое на карте — кадр прописан теснее",
+      "subject": "Subject: Taviel the Unseen, an elven woman, a tracker of the southern elven forest, a swift warrior of the Air school; for six days she walked right beside a northern war band in the forest, and none of them ever saw her. Close half-body portrait: the picture is cut at her waist; her head and shoulders fill the upper half of the frame, her face turned toward the right in three-quarter view, large and clearly lit. A lean young elven woman with sharp calm features, keen grey eyes, pale skin, dark hair tied back, long pointed ears, a green-grey hood pushed back from her head. Tracker's clothing of soft leather and a long mottled cloak of grey and moss green whose edges seem to dissolve into the mist and the leaves; a worn leather purse hangs at her belt. She holds two long elven knives, one in each hand, crossed low in front of her. Pale white-green wind of the Air school curls around her, carrying leaves and hiding her. Background: a misty primeval forest of colossal trees; far behind her, small between the trunks, a column of northern warriors passes by, unaware of her. Pale white-green light of the Air school rises from below and from the mossy roots, mist and spores drift in the light."
+    },
+    {
+      "id": "hero-c2-43-korvin",
+      "category": "heroes",
+      "title": "Корвин Перевозчик — человек, физ ДД силы / контроль, Земля (c2-43, рулетка)",
+      "source": "docs/content/герои/состав-героев.csv c2-43; главы/цикл-2.md «Перевозчик», «Не тот зал», «Свеча наверх»; цикл-2.md h09_5 (по лор-аудиту — Земля)",
+      "subject": "Subject: Korvin the Carrier, a human man, a strong warrior of the Earth school who also weakens his foes; a haulier who carried goods into the dwarven mountain and never asked who paid, and who, on the night the dead stirred in the deep hall, stood beside its guard and carried a fallen candle-keeper's candle back up to the gates. A rugged man in his forties, a weathered unshaven face with a scar on the chin, dark hair tied back, tired steady eyes. A heavy road-worn coat of oiled leather, a thick scarf, fingerless gloves, a coil of haulier's rope over one shoulder. In his right hand he holds a heavy iron crowbar, his weapon; in his left hand a lit tallow candle, shielding its flame, wax dripping onto his glove. Background: a vast deep hall carved in the rock of the dwarven mountain: tall dark niches line the walls, a small candle burns at the foot of each, and whatever stands inside the niches is lost in deep shadow; behind him a hand cart with closed iron-bound crates, a thin sliver of cold violet light leaking from a gap in one of them. Warm amber light of the Earth school rises from cracks in the stone floor, dust hangs in the air."
+    },
+    {
+      "id": "hero-c2-44-fiena",
+      "category": "heroes",
+      "title": "Фиэна Смотрящая — эльфийка, контроль / лекарь, Воздух (c2-44, рулетка)",
+      "source": "docs/content/герои/состав-героев.csv c2-44; главы/цикл-2.md «Глазами цапли», «Поднять лес», «Над тем же заливом»; цикл-1.md h03_5 (Ильва → Фиэна)",
+      "subject": "Subject: Fiena the Watcher, an elven woman of the southern elven forest, a Watcher of the Air school who binds foes and heals friends with the wind; Watchers see through the eyes of forest creatures, and through the eyes of a heron she was the first to see the sails of a northern fleet. A young elven woman with a fine, still face, long ash-blond hair lifted by the wind, pointed ears; her eyes glow softly white-green — she is seeing through other eyes. A long grey robe with a mantle of grey heron feathers over her shoulders, a thin circlet of woven twigs. A grey heron stands on her raised left forearm with its wings half open; her right hand is lifted, and white-green wind of the Air school spirals from her fingers. Background: the edge of the forest on a cliff above a wide southern bay at dusk; far below on the water, many ships with pale sails stand at anchor. Pale white-green light of the Air school rises from below, feathers and leaves drift in the wind."
+    },
+    {
+      "id": "hero-c2-45-horsa",
+      "category": "heroes",
+      "title": "Хорса Взломщица — человек запада, физ ДД ловкости / контроль, Огонь (c2-45, рулетка)",
+      "source": "docs/content/герои/состав-героев.csv c2-45; главы/цикл-2.md «Замки на чертежах», «Внутри», «Вниз»; цикл-2.md h08_5",
+      "subject": "Subject: Horsa the Burglar, a woman of the western lands, a swift fighter of the Fire school who also cripples her foes; a lock-breaker who opened locks that dwarves call unbreakable, and who got inside the dwarven mountain without paying — through a foundry pipe, under the shift horn. A wiry woman of about thirty, a sharp clever face smeared with soot, quick dark eyes, short-cropped black hair, a thin scar through one eyebrow. A close-fitting dark leather jacket with many small pockets, a roll of lockpicks open on her forearm, a small pouch of powder at her belt. She leans in close to the lock of a massive round dwarven vault door at the right side of the picture, listening to it; the lock is a plain mechanism of interlocking iron rings and bolts without any markings. In her left hand a thin lockpick, in her right a short knife whose edge glows red-hot. Background: the hot interior of a dwarven foundry: huge pipes, a channel of molten metal glowing below, iron gratings, drifting smoke. Scarlet-red light of the Fire school rises from the molten metal below, sparks drift in the heat."
+    },
+    {
+      "id": "hero-c2-46-brokk",
+      "category": "heroes",
+      "title": "Брокк Первый Ключ — дворф, танк, Земля (c2-46, рулетка)",
+      "source": "docs/content/герои/состав-героев.csv c2-46; главы/цикл-2.md «Машина на земле», «Первый полёт», «Кто остался внизу»; цикл-2.md h06_1",
+      "subject": "Subject: Brokk the First Key, a very old dwarf, a tank of the Earth school; for twenty years he riveted a great machine beneath a city that still stood on the ground, then he turned its first key and the whole city rose into the sky, and he held that key for sixty years. A very old dwarf, stooped but still immensely broad, a long snow-white beard braided with small iron rivets, a bald weathered head, deep wrinkles, fierce pale eyes that have seen the ground fall away. A riveter's leather coat over old dark armour plates, heavy riveting gauntlets. A huge old iron key, as long as his forearm, hangs on a chain around his neck, and he grips it at his chest with his right hand; on his left arm a round shield of riveted iron plates, its rim studded with rivets like the machine. Background: the heart of a colossal dwarven machine, gears and riveted beams in the gloom; through a great opening behind him, far below, clouds and the distant ground. Warm amber light of the Earth school rises from below and glows along the rivets; dust hangs in the air."
+    },
+    {
+      "id": "hero-c2-66-haldur",
+      "category": "heroes",
+      "title": "Хальдур Под Завалом — дворф, танк / лекарь, Земля (c2-66, рулетка)",
+      "source": "docs/content/герои/состав-героев.csv c2-66; главы/цикл-2.md «Когда тряхнуло», «Запись», «Другой рукой»; цикл-2.md h07_2 (без пометок «Для команды»). v2: в v1 дворф в полный рост, с ногами и сапогами — кадр прописан теснее. v3 — правка v2 (art/generated/heroes/hero-c2-66-haldur__nb2-v2.jpg): кожа вышла серой, как камень, — вернуть живой цвет, пыль лёгкая",
+      "subject": "EDIT MODE — this overrides everything above: do not draw a new picture, edit the attached image. The attached image is the current portrait of this hero, Haldur Under the Rubble, a dwarf miner in a collapsed tunnel. Keep the picture exactly as it is — the same dwarf, his pose, face, half-closed eyes, beard, leather cap, jerkin, belt, the hand on his chest, the timber shield, the broken props, the rubble, the crystals, the light and the painting style. Change only this: his skin is painted flat grey like stone, which is a mistake — give his face, arms and hands the natural warm, ruddy skin tone of a living dwarf, only lightly powdered with grey rock dust on the forehead, cheeks and forearms. Nothing else changes.",
+      "refs": [
+        "art/generated/heroes/hero-c2-66-haldur__nb2-v2.jpg"
+      ],
+      "subject_v2": "Subject: Haldur Under the Rubble, a dwarf miner, a tank of the Earth school who can also heal himself; in the year the earth shook he lay buried under a rockfall for five days and survived by breathing slowly and counting. Close half-body portrait: the picture is cut at his belt, and his head and broad shoulders fill the upper half of the frame — dwarves are short, so the camera comes close; no legs and no boots are visible. A dwarf of middle age, grey with rock dust from head to toe, a ragged dark-brown beard, a bruised, calm face, eyes half-closed as he breathes slowly, his right hand pressed flat on his chest. A torn miner's jerkin and a leather cap. On his left arm a heavy shield made of a thick slab of mine-prop timber bound with iron bands, scarred by falling rock, raised to shoulder height. Background: a collapsed tunnel deep in a dwarven mine: broken timber props and a cracked, sagging beam above him, heaps of fallen rock, dust hanging in thin shafts of light. Warm amber light of the Earth school glows from the cracks in the rubble below and softly around his chest as he breathes."
+    },
+    {
+      "id": "hero-c2-67-kaelin",
+      "category": "heroes",
+      "title": "Кэалин — эльф, лекарь / контроль, Воздух (c2-67, рулетка)",
+      "source": "docs/content/герои/состав-героев.csv c2-67; главы/цикл-2.md «Настои и дыхание», «Присказка»; цикл-2.md h07_4",
+      "subject": "Subject: Kaelin, an elven man, a healer of the Air school who also weakens foes; he came to the dwarven mountain with a caravan of elven remedies and taught the miners to breathe in bad air, and he lived thirty years among the dwarves, a stranger they needed. A tall slender elven man who looks about forty by human measure, a calm gentle face, long straight dark-auburn hair tied back, pointed ears, quiet eyes. A travelling healer's coat of muted sage green, a bandolier of small glass vials with pale green infusions across his chest, a cloth breathing mask lowered around his neck. His left hand rests on his chest; his right hand is raised, palm up, and he breathes out slowly: a stream of clean white-green air flows from his palm and pushes back the heavy haze. Background: a lower tunnel of a dwarven mine full of heavy, murky, yellow-grey air, pit props, dim miners' lamps. Pale white-green light of the Air school rises from below and surrounds him with clear air; dust hangs in the murk beyond."
+    },
+    {
+      "id": "hero-c2-68-gorm",
+      "category": "heroes",
+      "title": "Горм Факельщик — дворф, танк, Огонь (c2-68, рулетка)",
+      "source": "docs/content/герои/состав-героев.csv c2-68; главы/цикл-2.md «Страж зала», «Огонь», «Выжженный зал»; цикл-2.md h09_2",
+      "subject": "Subject: Gorm the Torchbearer, a dwarf, a tank of the Fire school, guardian of the deepest hall of the dwarven mountain, where the dead are stood in niches facing their work; on the night the dead stepped out of the niches he took up a torch, though for a dwarf fire near the dead is a disgrace. A dwarf in his fifties, broad and grim, a copper-red beard in two heavy braids streaked with soot, a heavy brow, eyes full of grief and resolve. Dark iron armour and a guardian's heavy cloak. On his left arm a tall dark iron shield; in his raised right hand a blazing torch, scarlet flames streaming. Background: a vast, deep, ancient hall: rows of tall niches carved in the walls, the nearest niches blackened and scorched by fire, the others lost in darkness, nothing visible inside them; behind him a narrow archway that he guards. Scarlet-red light of the Fire school from the torch and from embers on the floor below, smoke and sparks in the air."
+    },
+    {
+      "id": "hero-c2-69-she-who-leaves",
+      "category": "heroes",
+      "title": "Та, что уходит — зверь (разумная зверица), физ ДД ловкости / контроль, Воздух (c2-69, рулетка)",
+      "source": "docs/content/герои/состав-героев.csv c2-69; главы/цикл-2.md «Ручей — нельзя», «Нож», «Сама»; цикл-2.md h10_5. Облик — серая зверица; вид — решение агента: большая серая рысь",
+      "refs": [
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-03-cave-teal-runes.webp"
+      ],
+      "subject": "Subject: She Who Leaves, a sentient beast, a swift hunter of the Air school who knocks her foes off their feet: an old grey she-beast of the dangerous stony lands at the foot of the dwarven mountain; for forty years she escaped every net of the dwarven trappers, and she drank only rainwater from the rocks, so she stayed herself. She is a great grey mountain lynx, larger than a wolf, with smoky grey fur faintly marked with darker spots, long black ear tufts, a grizzled muzzle, a notch torn in one ear, and wise, calm pale-gold eyes of a thinking creature. For this beast the half-body frame shows her head, chest and forelegs resting on a rock; her hindquarters are out of the frame. She is turned toward the right side of the picture, alert, about to leave. White-green wind of the Air school swirls around her paws and lifts her fur. Background: a grey stony wasteland under a rainy dusk sky, a hollow in the rock holding clear rainwater, an old hemp net cut through and left snagged on the rocks, the dark mass of a mountain far behind. Pale white-green light of the Air school rises from the rainwater and the wet stones below."
+    }
+  ]
+}

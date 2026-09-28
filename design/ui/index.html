@@ -2437,9 +2437,14 @@ function rsSetWeek(race) {
   S.week.race = cap1(RS.weeks[i].gen); S.week.next = cap1(RS.weeks[(i + 1) % RS.weeks.length].gen);
 }
 function rsAdd(h, how) { S.rs.owned[h.id] = { lvl: 0, lim: 0, valor: 0, how }; }   // ADR-0019: любой герой приходит с 0 ур., 0 РП и 0 Добл
+/* портреты героев состава — выгрузка tools/art-gen/export_ui.py в assets/art/heroes/<id>.jpg (ui-art.json); сет 1 рисуют герои отряда (rsOld).
+   28.09.2026: десять героев рулетки цикла II и десять героев каталога золота цикла I после сета 1 */
+const RS_ART = new Set(['c1-06', 'c1-07', 'c1-08', 'c1-09', 'c1-10', 'c1-11', 'c1-12', 'c1-13', 'c1-14', 'c1-15',
+  'c2-41', 'c2-42', 'c2-43', 'c2-44', 'c2-45', 'c2-46', 'c2-66', 'c2-67', 'c2-68', 'c2-69']);
 function rsFace(h) {
   const o = rsOld(h);
   if (o) return `<img src="${o.img}" alt="">`;
+  if (RS_ART.has(h.id)) return `<img src="${AV('heroes/' + h.id + '.jpg')}" alt="" loading="lazy" decoding="async">`;
   if (h.src === 'donat') return `<span class="rs-ph faceless" data-el="${h.sch}"><img src="${FACELESS}" alt=""></span>`;
   return `<span class="rs-ph" data-el="${h.sch}"><b>${rsInit(h.n)}</b></span>`;
 }

@@ -6,6 +6,7 @@ mirror: true — отразить по горизонтали: на карте �
 Путь в прототипе на .png — значок с прозрачностью: пустые поля обрезаются по альфе, fit: N вписывает эмблему в N % кадра по центру.
 
   python tools/art-gen/export_ui.py
+  python tools/art-gen/export_ui.py --no-stamp    # только картинки, index.html не трогать: его правят параллельно
 """
 import hashlib
 import json
@@ -43,6 +44,9 @@ def main():
         total += kb
         print(f"{dst:22} ← {src['from']}  {size[0]}×{size[1]}{', отражён' if src.get('mirror') else ''}, {kb} КБ")
     print(f"Итого {len(spec['items'])} картинок, {total} КБ → {spec['out']}")
+    if "--no-stamp" in sys.argv[1:]:
+        print("Версия выгрузки не записана (--no-stamp): новые пути браузер и так возьмёт свежими")
+        return
     stamp_version(out, spec)
 
 
