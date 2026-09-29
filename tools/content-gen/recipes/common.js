@@ -55,18 +55,10 @@ const GUARD = {
 };
 /* Перековка рун предела: три младшие + ключ ремесла. Ключи по ступеням: зачарование A, кузнечество A, алхимия B, зачарование B (A — мастерская, B — творение). */
 const RUNE_KEYS = [null, null, ['ench', 0], ['smith', 0], ['alch', 1], ['ench', 1]];
-const RITUALS = {
-  workers: { minutes: [30, 60, 120, 180, 240, 300, 360], basics: [6, 12, 24, 36, 48, 60, 72], keys: [0, 0, 0, 1, 1, 2, 3],
-    unique: { chanceBp: 100, minutes: 360, crew: 5, uniques: 1 } },
-  heroes: { minutes: [60, 120, 240, 360, 480, 600, 720], perHour: { gold: 150, spirit: 75, souls: 1 } },
-};
-const CONTRACTS = {   // награды контрактов — заглушки (ADR-0023, п. 6)
-  taskPoints: [10, 20, 40, 80, 160, 320, 640],
-  per10Points: { runeKeys: 1, gold: 300, spirit: 100, basics: 10 },  // ключи, золото, дух — × цикл; базовые — без множителя
-  eneriumPerEpicTask: 5, certifyMul: 2, stakeGoldPerPoint: 20,
-  day: { points: 70, tasks: [1, 2, 3], epic: 0 },
-  week: { points: 300, tasks: [2, 3, 4, 5], epic: 2 },
-};
+/* Ритуалы здесь не считаются: сетку, награды и пул собирает сборщик ритуалов tools/content-gen/rituals/ в design/ui/rituals.js
+   (правила и таблицы — docs/content/ритуалы.md). Прежняя заглушка drops.rituals убрана. */
+/* Награды контрактов здесь не считаются: их собирает сборщик контрактов tools/content-gen/contracts/ в design/ui/contracts.js
+   (правила и таблицы — docs/content/контракты.md). Прежняя заглушка «за каждые 10 очков» убрана. */
 /* Эхо: цены призыва и атак, добыча пятнадцатой ступени. Выплаты режимов — планки и места Эхо, клановый босс, Событие — сундуки:
    design/ui/lootboxes.js, сборщик tools/content-gen/lootboxes, правила — docs/content/лутбоксы.md. */
 const ECHO = {
@@ -94,4 +86,4 @@ const CRAFT = {
   awake: { item: ECHO.many.item, callR: 5, trophies: 2, specKeys: 4, currencyMul: 2, runeKeyBp: 4000, chestStep: 1, powerCycleStep: 1 },
 };
 const MARKET = { basic: 5, key: 300, craftres: 150, unique: 25000, find: 2500, trophy: 50000, commissionPct: 10 };
-module.exports = { SPECS, SPEC_ORDER, TIERS, RARITY, ENEMY, DECKS, GUARD, RUNE_KEYS, RITUALS, CONTRACTS, ECHO, CRAFT, MARKET };
+module.exports = { SPECS, SPEC_ORDER, TIERS, RARITY, ENEMY, DECKS, GUARD, RUNE_KEYS, ECHO, CRAFT, MARKET };

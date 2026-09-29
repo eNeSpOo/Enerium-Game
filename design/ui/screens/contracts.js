@@ -57,6 +57,9 @@ function ctFreeRer(s = S) {
 const ctMod = (s, map) => Math.min(2000, Object.entries(map).reduce((x, [id, bp]) => x + (ctPins(s).has(id) ? bp : 0), 0));
 const ctDisc = (s = S) => Object.entries(CT.rules.cert.disc).reduce((x, [id, bp]) => ctPins(s).has(id) ? Math.max(x, bp) : x, 0);
 const ctBoth = (s = S) => ctPins(s).has(CT.rules.cert.both);
+/* Лига открыта — одно правило экранов Лиги, контрактов и События (leagueOpen, index.html): данные Арены EN_ARENA.league —
+   цикл рейтинга и 15 разных героев аккаунта */
+const ctLeagueOpen = s => typeof leagueOpen === 'function' && leagueOpen(s);
 /* условие игрока: сервер выдаёт вид, только если его можно выполнить */
 function ctOk(s) {
   const c = ctCyc(s), known = new Set((s.bag && s.bag.known) || []);
@@ -64,9 +67,9 @@ function ctOk(s) {
   return (k, v) => {
     switch (ctK(k).need) {
       case 'recipes': return left >= v;
-      case 'league': return (s.heroes || []).length >= 15;
+      case 'league': return ctLeagueOpen(s);
       case 'dust': return (s.wallet.dust || 0) > 0;
-      case 'clan': return !!s.clan;
+      case 'clan': return !!(s.clan && s.clan.in);   // S.clan есть и без клана (screens/clan.js: in — игрок в клане)
       default: return true;
     }
   };

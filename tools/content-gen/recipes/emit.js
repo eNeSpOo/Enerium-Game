@@ -160,9 +160,6 @@ function buildDrops(CYC, places, items, recipes, byId) {
     guardians.push({ id: A.id + 'g', name: A.guard, biome: A.id, cyc: c, kind: 'limits', entryKeys: C.GUARD.limits.entryKeysPerCycle * c, runesPerKill: C.GUARD.limits.runesPerKill, weightsBp: C.GUARD.limits.weightsBp, team: !!cy.team });
     guardians.push({ id: B.id + 'g', name: B.guard, biome: B.id, cyc: c, kind: 'valor', entryKeys: C.GUARD.valor.entryKeysPerCycle * c, shardsBp: C.GUARD.valor.shardsBp, undefinedBp: C.GUARD.valor.undefinedBp, team: !!cy.team });
   }
-  const H = C.RITUALS.heroes, CT = C.CONTRACTS, per = CT.per10Points;
-  const contract = (k, c) => { const x = CT[k], t = x.points / 10;
-    return { points: x.points, tasks: x.tasks, runeKeys: per.runeKeys * t * c, gold: per.gold * t * c, spirit: per.spirit * t * c, basics: per.basics * t, enerium: CT.eneriumPerEpicTask * x.epic, stakeGold: CT.stakeGoldPerPoint * x.points * c }; };
   const CB = C.CRAFT.biome, CS = C.CRAFT.boss;
   const craftBiomes = places.map(p => ({ id: p.id, name: p.n, cyc: p.cyc, act: p.act, needs: p.needs, res: p.res, find: p.find, floors: CB.floors, resPerFloorBp: CB.resPerFloorBp,
     finds: CB.finds, secondFindBp: CB.secondFindBp, spirit: CB.spirit * p.cyc, gold: CB.spirit * p.cyc / 2, souls: CB.souls * p.cyc, heroShards: CB.heroShards * p.cyc,
@@ -190,9 +187,6 @@ function buildDrops(CYC, places, items, recipes, byId) {
   });
   return {
     enemies, guardians, dailyGuardianCap: C.GUARD.dailyCap,
-    rituals: { workers: C.RITUALS.workers,
-      heroes: { minutes: H.minutes, byCycle: cyc6.map(c => ({ cyc: c, gold: H.minutes.map(m => H.perHour.gold * m / 60 * c), spirit: H.minutes.map(m => H.perHour.spirit * m / 60 * c), souls: H.minutes.map(m => H.perHour.souls * m / 60 * c) })) } },
-    contracts: { taskPoints: CT.taskPoints, certifyMul: CT.certifyMul, byCycle: cyc6.map(c => ({ cyc: c, day: contract('day', c), week: contract('week', c) })) },
     echo: Object.assign({}, C.ECHO, { uber: C.ECHO.many }),   // uber — прежнее имя той же записи: его читают экран Эхо и его проверки; снять, когда перейдут на echo.many
     payouts: 'design/ui/lootboxes.js',
     lootboxes: { basicPool: items.filter(i => i.pool).map(i => i.id), pools },

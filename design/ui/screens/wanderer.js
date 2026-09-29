@@ -2,7 +2,8 @@
    ADR-0003, ADR-0014, ADR-0023, ADR-0026, ADR-0027). Договор — screens/model.js. Данные — wanderer.js (window.EN_WANDERER): его собирает
    tools/content-gen/wanderer/build.js из таблиц автора source-data/ и черновика достижений, руками не править.
    Регистрирует: SCREENS.profile — «Обзор» остаётся прежним profileView, три вкладки — отсюда; OV.mem — окно «одна из трёх», OV.memreset —
-   полный сброс, листы OV.wnp, wncat, wnart, wnfeat, wnpas, wnfame; действия ACT.wn*; раздел UI-кита «Память Странника» (KIT_EXTRA); сценарии.
+   полный сброс, листы OV.wnp, wncat, wnart, wnfeat, wnpas, wnfame; действия ACT.wn*; разделы UI-кита «Память Странника» и «Достижения Странника»
+   (KIT_EXTRA); сценарии.
    Своё состояние: S.mem — Память (места, тройки, анимация), S.wn — артефакты, достижения, номера операций. S.mem.slots[i].st — как раньше:
    'open', 'set' или 'lock' — его читает Убежище.
    Сервер решает, клиент показывает. Тройка Памяти решена «сервером» WN_SRV до анимации: wnRoll — чистая функция сида места и исключённых
@@ -90,34 +91,37 @@ const WN_ART = {
 
 /* ================== демо-состояние: данные, не код ==================
    Аккаунт прототипа — цикл II, уровень 24 (initialState). Артефакты: уровень по id, 0 — куплен без уровней; нет в списке — не куплен.
-   Достижения: got — получены, p — прогресс, где его не считает живое состояние прототипа (WN_LIVE); first — первенства: «@» — твоё. */
+   Достижения: счётчики, которых нет в живом состоянии прототипа (WN_LIVE), — прогон обычного игрока на демо-день (WN.ach.demo, его
+   считает build.js); получено — всё, что обычный получает раньше этого дня; myst — находки демо-аккаунта, которые ещё не получены
+   (раскрытая тайна ждёт «Получить»); first — первенства: «@» — твоё, имя — чужое. */
 const WN_DEMO = {
   art: { a1: 1, a2: 2, a3: 1, a4: 2, a5: 1, a7: 1, a12: 0, a14: 1, a19: 2, a20: 1 },
   ach: {
-    got: ['pers01', 'pers02', 'pers06', 'pers09', 'pers23', 'pers27', 'pers33', 'pers38', 'pers46', 'rev01', 'rev02', 'rev06', 'rev09', 'myst03', 'myst16', 'first-recipe-1'],
-    p: { pers01: 5, pers04: 2, pers05: 2, pers06: 100, pers07: 640, pers08: 640, pers09: 1000, pers10: 4210, pers11: 4210, pers12: 100, pers13: 312,
-      pers14: 11, pers15: 4, pers16: 380, pers17: 122, pers18: 214, pers19: 96, pers20: 58, pers21: 12, pers22: 9, pers23: 1, pers24: 0, pers25: 64,
-      pers26: 64, pers30: 412, pers33: 10, pers34: 0, pers37: 38, pers38: 10, pers39: 2, pers40: 50, pers41: 50, pers42: 17, pers43: 41, pers44: 6,
-      pers46: 1, pers47: 12, pers49: 17, pers50: 0, rev15: 0, rev17: 0, rev18: 0, rev19: 36, rev20: 1, rev22: 7,
-      myst02: 1, myst03: 10, myst09: 23, myst16: 1, myst20: 13 },
-    first: { 'first-guard-1': 'Светлый пепел', 'first-valor-1': 'Искатель', 'first-recipe-1': '@', 'first-guard-2': 'Тихий шаг', 'first-recipe-2': '@' },
+    myst: { echoLastHour: 1 },
+    first: { 'first-guard-1': 'Светлый пепел', 'first-valor-1': 'Искатель', 'first-recipe-1': '@', 'first-enter-2': 'Светлый пепел', 'first-guard-2': 'Тихий шаг', 'first-recipe-2': '@' },
   },
   give: 1000,               // демо команды: «+Энериум»
   search: 3000,             // демо команды: «вневременная в следующей тройке» — сколько сидов перебрать
 };
-/* прогресс из живого состояния прототипа — те же числа, что на других экранах */
+/* счётчики из живого состояния прототипа — те же числа, что на других экранах; остальные — демо-счётчики аккаунта S.wn.ach.n.
+   Нет состояния экрана — undefined, и берётся счётчик аккаунта: экраны Арены, События, ритуалов и снаряжения подключаются позже этого
+   файла, их состояние появляется после wnState */
 const WN_LIVE = {
   biomes: s => s.biomes.filter(b => b.state === 'done').length,
+  cycle: s => (s.mem && s.mem.cyc) || s.acc.cycle,   // цикл аккаунта; демо команды — цикл экрана «Странник», как wnCyc
   recipes: s => (s.bag && s.bag.known ? s.bag.known.length : 0),
   heroes: s => s.heroes.length + Object.keys((s.rs && s.rs.owned) || {}).length,
-  valor: s => s.heroes.filter(h => h.valor > 0).length,
-  valorMax: s => s.heroes.filter(h => h.maxV > 0 && h.valor >= h.maxV).length,
-  valorSum: s => s.heroes.reduce((a, h) => a + h.valor, 0),
   chapters: s => s.heroes.reduce((a, h) => a + h.valor, 0),   // глава — за каждую доблесть (§30)
-  limit: s => s.heroes.filter(h => h.lim > 0).length,
-  limit5: s => s.heroes.filter(h => h.lim >= 5).length,
-  lvlMax: s => s.heroes.reduce((a, h) => Math.max(a, h.lvl), 0),
-  bestiaryBiome: s => (s.foes.length && s.foes.every(f => s.known.includes(f.id)) ? 1 : 0),
+  limitHero: s => s.heroes.reduce((a, h) => Math.max(a, h.lim), 0),
+  memory: s => s.mem.slots.filter(x => x.p).length,
+  artifacts: s => Object.keys(s.wn.art).length,
+  rituals: s => (s.rituals ? s.rituals.done || 0 : undefined),   // завершённые ритуалы — экран «Ритуалы» (screens/rituals.js)
+  equip: s => (s.eq ? s.eq.count || 0 : undefined),              // пришедшие предметы снаряжения — экран «Снаряжение» (screens/equipment.js)
+  /* Арена и Лига (screens/arena.js): побед за всё время прототип не хранит — нынешний сезон и прошлый; сервер ведёт свой счётчик */
+  arena: s => (s.arena ? (s.arena.wins || 0) + ((s.arena.past && s.arena.past.wins) || 0) : undefined),
+  league: s => (s.arena && s.arena.lg ? (s.arena.lg.wins || 0) + ((s.arena.lg.past && s.arena.lg.past.wins) || 0) : undefined),
+  /* планка События этой недели — пороги цикла и очки недели (event.js, screens/event.js); планка засчитывается сразу */
+  plank: s => (s.event && window.EnEvent && window.EN_EVENT ? window.EnEvent.reached(window.EnEvent.planks(window.EN_EVENT, s.acc.cycle), s.event.pts || 0) : undefined),
 };
 
 /* ================== помощники ================== */
@@ -243,8 +247,10 @@ const wnCap = a => Math.max(0, Math.min(a.lv, wnCyc() - a.from + 1));   // ур�
 const wnLv = id => (S.wn.art[id] == null ? -1 : S.wn.art[id]);           // −1 — не куплен
 const wnUpCost = a => a.soul * (wnLv(a.id) + 1);                         // цена уровня = база × номер уровня (правила автора, п. 2)
 const wnArtOpen = () => S.acc.level >= WN.art.rules.openLevel;            // §16: артефакты — с 4-го уровня Странника
-/* прогресс достижения: живое состояние прототипа или демо */
-const wnProg = a => (WN_LIVE[a.m] ? WN_LIVE[a.m](S) : S.wn.ach.p[a.id] || 0);
+/* прогресс достижения — его счётчик: живое состояние прототипа или счётчик аккаунта; у таинственного — отметка находки */
+const wnLiveOf = (m, s) => (WN_LIVE[m] ? WN_LIVE[m](s) : undefined);
+const wnCount = m => { const v = wnLiveOf(m, S); return v == null ? S.wn.ach.n[m] || 0 : v; };
+const wnProg = a => wnCount(a.m);
 const wnGot = id => !!S.wn.ach.got[id];
 const wnReady = a => !wnGot(a.id) && (a.cat === 'first' ? S.wn.ach.first[a.id] === '@' : wnProg(a) >= a.goal);
 /* сундук за достижение: строка режима «Достижения» lootboxes.js по категории и циклу игрока (ADR-0023, третий круг) */
@@ -694,45 +700,98 @@ function wnArtTab() {
     </div>`;
 }
 
-/* ================== Достижения ================== */
+/* ================== Достижения ==================
+   Вкладка с воздухом (правила воздуха UI-кита): категории — вкладками; наверху — что можно получить, затем три ближайших; дальше — остальное
+   по темам; полученное — одной строкой, раскрывается по нажатию. Серия — одна карточка её ближайшей ступени, ступени — отметками.
+   Карточка — значок темы, имя, условие в строку, полоса прогресса; внизу — редкость, отметки ступеней и два числа или одно действие.
+   Подробности — в листе: условие, прогресс, награда, когда обычно получают, ступени серии. Таинственное до выполнения — только подсказка:
+   условие и прогресс скрыты (§29). Когда получают — прогон темпа по калькуляторам экономики (at: день обычного и увлечённого, WN.ach.pace) */
+const WN_ACH_VIEW = { near: 3 };   // ближайших на виду
 const wnCat = id => WN.ach.cats.find(c => c.id === id) || WN.ach.cats[0];
-const wnList = cat => (cat === 'first' ? WN.ach.firsts.filter(f => f.c === wnCyc()) : WN.ach.list.filter(a => a.cat === cat));
-const wnHidden = a => a.cat === 'myst' && !wnGot(a.id) && !wnReady(a);   // таинственное: условие и прогресс скрыты до получения (§29)
+const wnHidden = a => a.cat === 'myst' && !wnGot(a.id) && !wnReady(a);   // таинственное: условие и прогресс скрыты до выполнения (§29)
 const wnPas = a => (WN.ach.kinds[a.pk] ? wnForm(WN.ach.kinds[a.pk].t, a.v) : '');
-/* карточка достижения — чистый вид: hidden — таинственное до получения, got, ready, p — прогресс, op — номер операции для «Получить» */
-function wnFeatView(a, { hidden, got, ready, p, op }) {
-  if (hidden) return `<button class="wn-feat hid" data-a="sheet" data-v="wnfeat:${a.id}"><b class="wn-fn">???</b><span class="quote">${a.hint}</span><span class="chip">${ic('lock')}тайна</span></button>`;
-  const act = got ? `<span class="chip spirit">${ic('check')}действует</span>` : ready ? `<button class="btn go sm" data-a="wnclaim" data-v="${a.id}:${op}">Получить</button>` : `<span class="num faint">${fmt(p)} / ${fmt(a.goal)}</span>`;
-  return `<div class="wn-feat${got ? ' got' : ready ? ' ready' : ''}">
-    <button class="wn-fh" data-a="sheet" data-v="wnfeat:${a.id}"><b class="wn-fn">${a.n}</b><small class="wn-fd">${a.d}</small></button>
+const wnUnit = (a, n) => { const M = WN.ach.metrics[a.m]; return M ? plural(n, ...M.u) : ''; };
+/* значок темы: из набора значков (ICON), где он есть, иначе знак интерфейса */
+const wnGrpIco = g => { const G = WN.ach.groups[g] || {}; return G.icon ? ICON(G.icon, 18, '') : ic(G.ic || 'star'); };
+/* серии категории: ступени по порядку; текущая — первая не полученная, у пройденной серии — последняя */
+function wnSeries(cat) {
+  const by = new Map();
+  for (const a of WN.ach.list) if (a.cat === cat) { if (!by.has(a.s)) by.set(a.s, []); by.get(a.s).push(a); }
+  return [...by.values()].map(steps => {
+    steps.sort((x, y) => x.k - y.k);
+    return { steps, cur: steps.find(a => !wnGot(a.id)) || steps[steps.length - 1], done: steps.every(a => wnGot(a.id)) };
+  });
+}
+/* день прогона → «цикл II, 6-й день»; день 0 — обучение */
+function wnDayTxt(d) {
+  const P = WN.ach.pace; let c = 1;
+  for (let k = 2; k <= 6; k++) if (d >= P.start[k]) c = k;
+  return d === 0 ? 'в обучении, цикл I' : `цикл ${ROMAN[c]}, ${d - P.start[c] + 1}-й день`;
+}
+/* когда обычно получают: у таинственного — с какого цикла возможно */
+function wnWhen(a) {
+  const { o, e } = a.at, h1 = WN.ach.pace.hours.o, h2 = WN.ach.pace.hours.e;   // часов игры в день у обычного и увлечённого
+  if (a.est) return `находка — возможна с цикла ${ROMAN[a.from]}`;
+  if (o == null && e == null) return 'дальше шестого цикла';
+  if (o == null) return `только при долгой игре: при ${h2} ч в день — ${wnDayTxt(e)}`;
+  return o === e ? wnDayTxt(o) : `при ${h1} ч в день — ${wnDayTxt(o)}; при ${h2} ч — ${wnDayTxt(e)}`;
+}
+/* числа карточки: «сделано / цель»; цель уже в условии — только «сделано»; у первого шага и у ступени (цикл, предел) — без чисел, хватает полосы */
+function wnNums(a, p) {
+  const M = WN.ach.metrics[a.m] || {};
+  if (a.goal <= 1 || M.t) return '';
+  return `<span class="num faint">${a.d.replace(/\s/g, '').includes(String(a.goal)) ? fmt(p) : `${fmt(p)} / ${fmt(a.goal)}`}</span>`;
+}
+/* отметки ступеней серии: золотые — получены, в рамке — текущая */
+const wnSteps = (steps, cur, gotOf = a => wnGot(a.id)) => `<span class="wn-steps" title="Ступень ${cur.k} из ${steps.length}">${steps.map(a => `<i class="${gotOf(a) ? 'on' : a === cur ? 'cur' : ''}"></i>`).join('')}</span>`;
+/* карточка достижения — чистый вид: hidden — тайна до выполнения, got, ready, p — прогресс, op — номер операции для «Получить»,
+   steps — ступени серии (у одиночного — нет), gotOf — какие ступени получены (по умолчанию — состояние аккаунта). Не больше двух чисел, двух меток и одного действия (правила воздуха) */
+function wnFeatView(a, { hidden, got, ready, p, op, steps, gotOf }) {
+  if (hidden) return `<button class="wn-feat hid" data-a="sheet" data-v="wnfeat:${a.id}"><span class="wn-fh"><span class="wn-fi">${ic('lock')}</span><span class="col"><b class="wn-fn">Тайна</b><span class="quote">${a.hint}</span></span></span></button>`;
+  const act = got ? `<span class="chip gold">${ic('check')}получено</span>` : ready ? `<button class="btn go sm" data-a="wnclaim" data-v="${a.id}:${op}">Получить</button>` : wnNums(a, p);
+  return `<div class="wn-feat${got ? ' got' : ready ? ' ready' : ''}" data-r="${a.r}">
+    <button class="wn-fh" data-a="sheet" data-v="wnfeat:${a.id}"><span class="wn-fi">${wnGrpIco(a.g)}</span><span class="col"><b class="wn-fn">${a.n}</b><small class="wn-fd">${a.d}</small></span></button>
     ${got ? `<small class="wn-fp">${wnPas(a)}</small>` : bar(p * 100 / a.goal, ready ? 'sp' : '')}
-    <div class="row wn-ff">${act}</div></div>`;
+    <div class="row wn-ff">${rar(a.r)}${steps && steps.length > 1 ? wnSteps(steps, a, gotOf) : ''}<span class="g-spacer"></span>${act}</div></div>`;
 }
-function wnFeatCard(a) {
-  if (a.cat === 'first') return wnFirstRow(a);
-  return wnFeatView(a, { hidden: wnHidden(a), got: wnGot(a.id), ready: wnReady(a), p: Math.min(wnProg(a), a.goal), op: wnOp() });
-}
+const wnSeriesCard = x => wnFeatView(x.cur, { hidden: wnHidden(x.cur), got: wnGot(x.cur.id), ready: wnReady(x.cur), p: Math.min(wnProg(x.cur), x.cur.goal), op: wnOp(), steps: x.steps });
+/* полученное — строка: редкость, имя, пассивка; нажатие — лист */
+const wnGotRow = a => `<button class="wn-gotr" data-r="${a.r}" data-a="sheet" data-v="wnfeat:${a.id}"><span class="rar" data-r="${a.r}"></span><b>${a.n}</b><small>${wnPas(a)}</small></button>`;
 /* строка первенства — чистый вид: h — кто первый («@» — ты), got — сундук забран */
 function wnFirstView(f, h, got, op) {
   const mine = h === '@';
   const st = mine ? (got ? `<span class="chip gold">${ic('crown')}твоё</span>` : `<button class="btn go sm" data-a="wnclaim" data-v="${f.id}:${op}">Забрать сундук</button>`)
     : h ? `<span class="chip">${ic('flag')}${wnEsc(h)}</span>` : '<span class="chip spirit">свободно</span>';
-  return `<div class="wn-first${mine ? ' mine' : h ? ' taken' : ''}"><button class="wn-fh" data-a="sheet" data-v="wnfeat:${f.id}"><b class="wn-fn">${f.n}</b><small class="wn-fd">${f.d}</small></button><div class="row wn-ff">${st}</div></div>`;
+  return `<div class="wn-first${mine ? ' mine' : h ? ' taken' : ''}"><button class="wn-fh" data-a="sheet" data-v="wnfeat:${f.id}"><span class="wn-fi">${ic('crown')}</span><span class="col"><b class="wn-fn">${f.n}</b><small class="wn-fd">${f.d}</small></span></button><div class="row wn-ff">${st}</div></div>`;
 }
 const wnFirstRow = f => wnFirstView(f, S.wn.ach.first[f.id], wnGot(f.id), wnOp());
 function wnAchTab() {
-  const cur = wnCat(S.seg.wnach).id, list = wnList(cur), all = WN.ach.list;
+  const cur = wnCat(S.seg.wnach).id, all = WN.ach.list;
   const tab = c => { const l = c.id === 'first' ? WN.ach.firsts.filter(f => f.c <= wnCyc()) : all.filter(a => a.cat === c.id), got = l.filter(a => c.id === 'first' ? S.wn.ach.first[a.id] === '@' : wnGot(a.id)).length;
     return `<button role="tab" aria-selected="${c.id === cur}" data-a="seg" data-v="wnach:${c.id}">${c.n}<span class="wn-tc">${got}/${l.length}</span></button>`; };
-  const past = cur === 'first' && wnCyc() > 1 ? `<button class="link" data-a="sheet" data-v="wnfame">Слава прошлых циклов ${ic('chev')}</button>` : '';
-  const body = cur === 'first'
-    ? `<div class="wn-firsts scroll grow" data-keep="wnach:first">${list.map(wnFirstRow).join('')}</div>`
-    : `<div class="wn-grid scroll grow" data-keep="wnach:${cur}">${list.map(wnFeatCard).join('')}</div>`;
-  return `<div class="col wn-ach">
-      <div class="row"><div class="tabs" role="tablist" aria-label="Достижения">${WN.ach.cats.map(tab).join('')}</div><span class="g-spacer"></span><button class="link" data-a="sheet" data-v="wnpas">Пассивки ${ic('chev')}</button></div>
-      <div class="row"><p class="reason">${wnCat(cur).d}${cur === 'first' ? ` · цикл ${ROMAN[wnCyc()]}` : ''}</p><span class="g-spacer"></span>${past}</div>
-      ${body}
-      ${TM('<p class="reason">Каталог достижений — черновик, таблицы автора нет (§29). Сундук — строка режима «Достижения» в lootboxes.js по циклу получения. Эффекты — показ.</p>')}
+  const head = `<div class="row"><div class="tabs" role="tablist" aria-label="Достижения">${WN.ach.cats.map(tab).join('')}</div><span class="g-spacer"></span><button class="link" data-a="sheet" data-v="wnpas">Пассивки ${ic('chev')}</button></div>`;
+  const team = TM('<p class="reason">Каталог — черновик: tools/content-gen/wanderer/achievements.js, когда получают — прогон achievements-pace.js по калькуляторам экономики; таблицы — docs/content/достижения.md. Сундук — строка режима «Достижения» в lootboxes.js по циклу получения. Эффекты — показ, в расчёты не входят.</p>');
+  if (cur === 'first') {
+    const past = wnCyc() > 1 ? `<button class="link" data-a="sheet" data-v="wnfame">Слава прошлых циклов ${ic('chev')}</button>` : '';
+    return `<div class="col wn-ach">${head}
+      <div class="row"><p class="reason">${wnCat(cur).d} · цикл ${ROMAN[wnCyc()]}</p><span class="g-spacer"></span>${past}</div>
+      <div class="wn-firsts scroll grow" data-keep="wnach:first">${WN.ach.firsts.filter(f => f.c === wnCyc()).map(wnFirstRow).join('')}</div>${team}</div>`;
+  }
+  const S2 = wnSeries(cur), open = S2.filter(x => !x.done), ready = open.filter(x => wnReady(x.cur));
+  /* ближайшие — по доле пути; у ступеней (цикл, предел) доля не показательна — они уступают счётчикам, дальше — кто раньше по прогону */
+  const frac = x => ((WN.ach.metrics[x.cur.m] || {}).t ? 0 : Math.floor(Math.min(wnProg(x.cur), x.cur.goal) * 1000 / x.cur.goal));
+  const soon = x => (x.cur.at.o == null ? 1e9 : x.cur.at.o);
+  const near = cur === 'myst' ? [] : open.filter(x => !ready.includes(x)).sort((x, y) => frac(y) - frac(x) || soon(x) - soon(y)).slice(0, WN_ACH_VIEW.near);
+  const rest = open.filter(x => !ready.includes(x) && !near.includes(x));
+  const grid = l => `<div class="wn-grid">${l.map(wnSeriesCard).join('')}</div>`;
+  const sec = (t, l) => (l.length ? `<section class="wn-sec"><span class="eyebrow">${t}</span>${grid(l)}</section>` : '');
+  const groups = [...new Set(rest.map(x => x.cur.g))];
+  const got = all.filter(a => a.cat === cur && wnGot(a.id)), unfold = S.seg.wngot === '1';
+  const gotBox = got.length ? `<section class="wn-sec"><button class="wn-gotbar" data-a="seg" data-v="wngot:${unfold ? 0 : 1}" aria-expanded="${unfold}">${ic('check')}<span>Получено · ${got.length}</span><span class="g-spacer"></span>${ic(unfold ? 'up' : 'down')}</button>${unfold ? `<div class="wn-gotl">${got.map(wnGotRow).join('')}</div>` : ''}</section>` : '';
+  const body = sec('Можно получить', ready) + sec('Ближайшие', near) + (cur === 'myst' ? sec('Тайны', rest) : groups.map(g => sec(WN.ach.groups[g].n, rest.filter(x => x.cur.g === g))).join('')) + gotBox;
+  return `<div class="col wn-ach">${head}
+      <p class="reason">${wnCat(cur).d}</p>
+      <div class="wn-achb scroll grow" data-keep="wnach:${cur}">${body || '<p class="faint">Всё получено.</p>'}</div>${team}
     </div>`;
 }
 
@@ -810,35 +869,37 @@ Object.assign(OV, WN ? {
       ${a.fix ? TM(`<p class="reason warn">Правка под систему: ${a.fix}</p>`) : ''}
       ${TM(`<p class="reason">№ ${a.no} таблицы автора. Души на все уровни — ${fmt(a.total)}.</p>`)}`, act);
   },
-  /* достижение или первенство: условие, прогресс, пассивка, сундук по циклу; таинственное — подсказка до получения */
+  /* достижение или первенство: условие, прогресс, награда, когда обычно получают, ступени серии; тайна — только подсказка */
   wnfeat(o) {
     const a = WNF.get(o.arg); if (!a) return '';
     const c = wnCyc(), chest = wnChest(a, c).map(x => lbBoxName(x.box, x.r, x.win)).join(', ') || '—', op = wnOp(), got = wnGot(a.id), ready = wnReady(a);
     const foot = ready ? `<button class="btn go" data-a="wnclaim" data-v="${a.id}:${op}">${a.cat === 'first' ? 'Забрать сундук' : 'Получить'}</button>` : '';
     if (a.cat === 'first') {
       const h = S.wn.ach.first[a.id];
-      return sheet(a.n, `<p class="wn-pd">${a.d}.</p><dl class="kv"><dt>Кто первый</dt><dd>${h === '@' ? 'ты' : h ? wnEsc(h) : 'пока никто'}</dd><dt>Награда</dt><dd>${chest}</dd><dt>Титул</dt><dd>остаётся навсегда</dd></dl>
+      return sheet(a.n, `<p class="wn-pd">${a.d}.</p><dl class="kv"><dt>Кто первый</dt><dd>${h === '@' ? 'ты' : h ? wnEsc(h) : 'пока никто'}</dd><dt>Сундук</dt><dd>${chest}</dd><dt>Титул</dt><dd>${a.title} — навсегда</dd></dl>
         <p class="reason">Каждый цикл приносит новые первенства: слава прошлых остаётся, а в новом цикле первым может стать любой.</p>
         ${TM('<p class="reason">Первенство даёт сундук и титул, пассивки нет — толкование §29, чтобы первые не копили силу.</p>')}`, foot);
     }
-    const cat = wnCat(a.cat);
-    if (wnHidden(a)) return sheet('Таинственное достижение', `<p class="quote">${a.hint}</p><p class="reason">Условие и пассивка откроются, когда достижение будет получено.</p><dl class="kv"><dt>Награда</dt><dd>${chest}</dd></dl>
-      ${TM(`<p class="reason">${a.n}: ${a.d}. Пассивка: ${wnPas(a)}.</p>`)}`);
-    const p = Math.min(wnProg(a), a.goal);
-    return sheet(a.n, `<span class="eyebrow">${cat.n}</span><p class="wn-pd">${a.d}.</p>
-      ${got ? '' : `<div class="col" style="gap:4px">${bar(p * 100 / a.goal, ready ? 'sp' : '')}<span class="num faint" style="font-size:12.5px">${fmt(p)} / ${fmt(a.goal)}</span></div>`}
-      <dl class="kv"><dt>Пассивка аккаунта</dt><dd>${wnPas(a)}</dd><dt>Награда</dt><dd>${chest}</dd><dt>Состояние</dt><dd>${got ? 'получено · действует' : ready ? 'можно получить' : 'в пути'}</dd></dl>
+    const cat = wnCat(a.cat), G = WN.ach.groups[a.g] || { n: '' };
+    if (wnHidden(a)) return sheet('Тайна', `<p class="quote">${a.hint}</p><p class="reason">Условие и пассивка откроются, когда тайна будет разгадана.</p><dl class="kv"><dt>Награда</dt><dd>${chest} и пассивка аккаунта</dd></dl>
+      ${TM(`<p class="reason">${a.n}: ${a.d}. Пассивка: ${wnPas(a)}. Отметка сервера — ${a.m}; оценка находки — день ${a.at.o == null ? '—' : a.at.o} у обычного, ${a.at.e == null ? '—' : a.at.e} у увлечённого.</p>`)}`);
+    const p = Math.min(wnProg(a), a.goal), steps = a.ks > 1 ? WN.ach.list.filter(x => x.s === a.s).sort((x, y) => x.k - y.k) : null;
+    const prog = got ? '' : `<div class="col" style="gap:4px">${bar(p * 100 / a.goal, ready ? 'sp' : '')}<span class="num faint" style="font-size:12.5px">${fmt(p)} из ${fmt(a.goal)} ${wnUnit(a, a.goal)}</span></div>`;
+    const list = steps ? `<span class="eyebrow">Ступени</span><div class="wn-stl">${steps.map(x => `<button class="wn-str${x.id === a.id ? ' on' : ''}${wnGot(x.id) ? ' got' : ''}" data-r="${x.r}" data-a="sheet" data-v="wnfeat:${x.id}"><span class="rar" data-r="${x.r}"></span><b>${x.n}</b><span class="num">${fmt(x.goal)}</span><small>${wnGot(x.id) ? 'получено' : wnPas(x)}</small></button>`).join('')}</div>` : '';
+    return sheet(a.n, `<span class="eyebrow">${cat.n} · ${G.n}</span><p class="wn-pd">${a.d}.</p>${prog}
+      <dl class="kv"><dt>Пассивка аккаунта</dt><dd>${wnPas(a)}</dd><dt>Сундук</dt><dd>${chest}</dd><dt>Редкость</dt><dd>${rar(a.r)}</dd><dt>Когда получают</dt><dd>${wnWhen(a)}</dd><dt>Состояние</dt><dd>${got ? 'получено · действует' : ready ? 'можно получить' : 'в пути'}</dd></dl>
+      ${list}
       <p class="reason">Пассивки достижений — фарм и экономика, не бой. Одинаковые складываются. Редкость сундука — по циклу, в котором получено.</p>
-      ${TM(`<p class="reason">Счётчик сервера — ${a.m}. Эффект — показ, в расчёты прототипа не входит.</p>`)}`, foot);
+      ${TM(`<p class="reason">Счётчик сервера — ${a.m}${a.est ? '' : `; прогон: день ${a.at.o == null ? '—' : a.at.o} у обычного, ${a.at.e == null ? '—' : a.at.e} у увлечённого`}. Эффект — показ, в расчёты прототипа не входит.</p>`)}`, foot);
   },
-  /* пассивки аккаунта от достижений: сумма по видам */
+  /* пассивки аккаунта от достижений: сумма по видам и её потолок */
   wnpas() {
     const got = WN.ach.list.filter(a => wnGot(a.id)), by = {};
     for (const a of got) (by[a.pk] = by[a.pk] || []).push(a);
     const rows = Object.entries(by).map(([k, l]) => { const K = WN.ach.kinds[k], v = wnSum(l, a => a.v);
-      return `<div class="wn-pr"><b>${K.n}</b><span>${wnForm(K.t, v)}</span><small class="faint">${l.map(a => a.n).join(', ')}</small></div>`; }).join('');
+      return `<div class="wn-pr"><b>${K.n}</b><span>${wnForm(K.t, v)}</span><small class="faint">${l.map(a => a.n).join(', ')} · все достижения вида вместе: ${wnForm(K.t, K.cap)}</small></div>`; }).join('');
     return sheet('Пассивки достижений', `<p class="reason">Каждое полученное достижение навсегда даёт пассивку аккаунта. Одинаковые складываются.</p>${rows || '<p class="faint">Пока ни одного достижения.</p>'}
-      <p class="reason">Получено ${got.length} из ${WN.ach.list.length}.</p>${TM('<p class="reason">Эффекты — показ, в расчёты прототипа не входят.</p>')}`);
+      <p class="reason">Получено ${got.length} из ${WN.ach.list.length}.</p>${TM('<p class="reason">Потолок вида — сумма всех достижений каталога с этой пассивкой (kinds.cap). Эффекты — показ, в расчёты прототипа не входят.</p>')}`);
   },
   /* слава прошлых циклов: кто был первым; твои титулы — золотом */
   wnfame() {
@@ -958,9 +1019,9 @@ function wnKitSlot(st, r, o = {}) {
 /* сцена «Вспомнить»: три карты и открытое место */
 const wnKitPickHtml = () => `<div class="wn-three">${WN_KIT_PICK.map((r, k) => wnCard(wnKitSample(r), { id: 'wnKitP' + k, sel: k === 1, cls: k === 1 ? '' : ' dim' })).join('')}</div>
   <div class="wn-kslot">${wnKitSlot('open', 0, { id: 'wnKitSlot' })}</div>`;
-/* карточки артефактов, достижений и первенств во всех состояниях — те же функции вида, что на экране, состояние задано примером */
+/* карточки артефактов во всех состояниях — те же функции вида, что на экране, состояние задано примером. Достижения — свой раздел UI-кита */
 function wnKitCards() {
-  const A = id => WNA.get(id), F = id => WNF.get(id), fig = (h, t) => `<figure class="wn-kc">${h}<figcaption>${t}</figcaption></figure>`;
+  const A = id => WNA.get(id), fig = (h, t) => `<figure class="wn-kc">${h}<figcaption>${t}</figcaption></figure>`;
   const arts = [
     [A('a6'), -1, 1, false, `<button class="btn sm" type="button">Купить${costTag('gold', A('a6').gold)}</button>`, 'не куплен'],
     [A('a3'), 1, 2, false, `<button class="btn sm" type="button">Улучшить${costTag('souls', A('a3').soul * 2)}</button>`, 'можно улучшить'],
@@ -968,17 +1029,44 @@ function wnKitCards() {
     [A('a19'), 4, 4, false, '<span class="chip gold">максимум</span>', 'последний уровень'],
     [A('a9'), -1, 0, true, `<span class="chip">${ic('lock')}с цикла III</span>`, 'цикл не наступил'],
   ].map(([a, L, cap, lock, act, t]) => fig(wnArtView(a, L, cap, lock, act), t)).join('');
+  return `<span class="eyebrow">Артефакты</span><div class="wn-kcards">${arts}</div>
+    <p class="k-note">Карточка — режим, имя, эффект за уровень, отметки уровней (золотые — взяты, в рамке — доступны в этом цикле) и сейчас; одно действие: купить золотом или улучшить душами. Подробности — лист артефакта: уровни с ценой, потолок цикла. Достижения и первенства — раздел «Достижения Странника».</p>`;
+}
+/* ================== UI-кит: «Достижения Странника» ==================
+   Те же функции вида, что на вкладке, состояние задано примером: карточка серии — в пути, можно получить, получено; тайна и разгаданная тайна;
+   строка полученного; первенство во всех состояниях. Порядок вкладки и редкость по трудности — из данных */
+function wnKitAch() {
+  const F = id => WNF.get(id), fig = (h, t) => `<figure class="wn-kc">${h}<figcaption>${t}</figcaption></figure>`;
+  const ser = s => WN.ach.list.filter(a => a.s === s).sort((x, y) => x.k - y.k);
+  const fl = ser('floors'), cy = ser('cycles'), my = WN.ach.list.filter(a => a.cat === 'myst');
+  const gotFirst = a => a.k === 1;   // пример: получена первая ступень серии
   const feats = [
-    [F('pers07'), { p: 640 }, 'в пути'], [F('pers12'), { ready: true, p: 100, op: 'kit' }, 'можно получить'],
-    [F('pers01'), { got: true }, 'получено — действует'], [F('myst05'), { hidden: true }, 'таинственное до получения'],
+    [fl[1], { p: Math.floor(fl[1].goal * 64 / 100), op: 'kit', steps: fl, gotOf: gotFirst }, 'серия в пути: ступени — отметками'],
+    [cy[1], { ready: true, p: cy[1].goal, op: 'kit', steps: cy, gotOf: gotFirst }, 'можно получить'],
+    [F('pers06'), { got: true }, 'получено — пассивка действует'],
+    [my[0], { hidden: true }, 'тайна: только подсказка'],
+    [my[1], { ready: true, p: 1, op: 'kit' }, 'тайна разгадана'],
   ].map(([a, st, t]) => fig(wnFeatView(a, st), t)).join('');
   const firsts = [[F('first-valor-2'), '', false, 'свободно'], [F('first-guard-2'), 'Тихий шаг', false, 'взято другим'], [F('first-recipe-2'), '@', false, 'твоё, сундук ждёт'], [F('first-recipe-1'), '@', true, 'твоё — титул']]
     .map(([f, h, got, t]) => fig(wnFirstView(f, h, got, 'kit'), t)).join('');
-  return `<span class="eyebrow">Артефакты</span><div class="wn-kcards">${arts}</div>
-    <p class="k-note">Карточка — режим, имя, эффект за уровень, отметки уровней (золотые — взяты, в рамке — доступны в этом цикле) и сейчас; одно действие: купить золотом или улучшить душами. Подробности — лист артефакта: уровни с ценой, потолок цикла.</p>
-    <span class="eyebrow">Достижения и первенства</span><div class="wn-kcards">${feats}</div><div class="wn-kcards">${firsts}</div>
-    <p class="k-note">Достижение — имя, условие в строку, прогресс или пассивка, одно действие «Получить»: сундук странника ложится в запасы, пассивка начинает действовать. Таинственное до получения — только подсказка. Первенство — кто первый на сервере в этом цикле; своё — сундук и титул.</p>`;
+  const P = WN.ach.pace, band = r => (r === 1 ? 'в обучении, цикл I' : r === 7 ? 'дальше горизонта или только при долгой игре' : `не позже: ${wnDayTxt(P.rarDays[r - 1])}`);
+  const rars = [1, 2, 3, 4, 5, 6, 7].map(r => `<div class="wn-krr" data-r="${r}">${rar(r)}<span class="num">${WN.ach.list.filter(a => a.r === r).length}</span><small class="faint">${band(r)}</small></div>`).join('');
+  const gotRows = [F('pers06'), F('pers14'), F('rev01')].map(wnGotRow).join('');
+  return `<section class="k-box wn-kit" style="grid-column:1/-1" id="wnKitAch"><h3>Достижения Странника</h3>
+    <p class="k-note">Вкладка «Странник → Достижения»: категории — вкладками, у каждой «получено / всего». Наверху — что можно получить, затем три ближайших, дальше — остальное по темам; полученное свёрнуто в одну строку. Серия — одна карточка её ближайшей ступени. На карточке не больше двух чисел, двух меток и одного действия; значок темы — из набора значков, редкость — кристалл и цвет --r1…--r7. Подробности — лист: условие, прогресс, пассивка, сундук, когда обычно получают, ступени серии.</p>
+    <span class="eyebrow">Карточки</span><div class="wn-kcards">${feats}</div>
+    <div class="wn-kgrid">
+      <div class="col"><span class="eyebrow">Полученное — свёрнуто</span><section class="wn-sec"><button class="wn-gotbar" type="button" tabindex="-1" aria-expanded="true">${ic('check')}<span>Получено · 3</span><span class="g-spacer"></span>${ic('up')}</button><div class="wn-gotl">${gotRows}</div></section>
+        <p class="k-note">Строка полученного — редкость, имя и пассивка; нажатие открывает лист.</p></div>
+      <div class="col"><span class="eyebrow">Редкость по трудности</span><div class="wn-krar">${rars}</div>
+        <p class="k-note">Редкость достижения — по дню, когда его получает обычный игрок (3 ч в день): прогон по калькуляторам экономики. Сундук за достижение — по категории и циклу получения.</p></div>
+    </div>
+    <span class="eyebrow">Первенства сервера</span><div class="wn-kcards">${firsts}</div>
+    <p class="k-note">Первенство — кто первым на сервере в этом цикле; своё — сундук и титул, пассивки нет. Каждый цикл — новые первенства, слава прошлых — отдельным листом.</p>
+    <p class="k-note">Данные — <code>wanderer.js</code>, каталог — <code>tools/content-gen/wanderer/achievements.js</code>, когда получают — <code>achievements-pace.js</code>, таблицы — <code>docs/content/достижения.md</code>: ${WN.ach.list.length} ${plural(WN.ach.list.length, 'достижение', 'достижения', 'достижений')} и ${WN.ach.firsts.length} ${plural(WN.ach.firsts.length, 'первенство', 'первенства', 'первенств')}.</p>
+  </section>`;
 }
+if (WN) KIT_EXTRA.push({ html: wnKitAch });
 if (WN) KIT_EXTRA.push({
   html: () => {
     const R7 = [1, 2, 3, 4, 5, 6, 7], ready = [0, ...R7].filter(wnArtOn).length;
@@ -1063,7 +1151,7 @@ if (WN) FLOWS.push(
     () => { S.route = 'profile'; S.seg.profile = 'mem'; S.mem.cyc = 6; S.mem.pick = 0; S.mem.ask = ''; S.mem.still = false; const i = S.mem.slots.map(x => x.st).lastIndexOf('open'); S.overlay = { t: 'mem', arg: i < 0 ? '' : String(i) }; }],
   ['Артефакты Странника', 'Восемнадцать артефактов из таблицы автора: покупка золотом, уровни душами, не выше одного за цикл',
     () => { S.route = 'profile'; S.seg.profile = 'arts'; S.overlay = null; }],
-  ['Достижения и первенства', 'Три категории, пассивки аккаунта и сундук за каждое; таинственные скрыты до получения; первенства сервера по циклам',
+  ['Достижения и первенства', 'Три категории и первенства: наверху — что можно получить и три ближайших, дальше — по темам, полученное свёрнуто; серия — одна карточка; лист — условие, награда и когда обычно получают',
     () => { S.route = 'profile'; S.seg.profile = 'ach'; S.seg.wnach = 'pers'; S.overlay = null; }],
 );
 
@@ -1083,10 +1171,24 @@ function wnMemState() {
   });
   return M;
 }
+/* достижения демо-аккаунта: счётчики — прогон обычного на демо-день (WN.ach.demo) и находки WN_DEMO.ach.myst; получено — всё, что обычный
+   получает раньше демо-дня, если счётчик аккаунта это подтверждает; тайны с оценкой раньше демо-дня — разгаданы, кроме тех, что ждут
+   «Получить» (WN_DEMO.ach.myst) */
+function wnAchState(s) {
+  const D = WN ? WN.ach.demo : { day: 0, n: {} }, A = { got: {}, n: Object.assign({}, D.n, WN_DEMO.ach.myst), first: Object.assign({}, WN_DEMO.ach.first) };
+  if (WN) for (const a of WN.ach.list) {
+    if (a.at.o == null || a.at.o >= D.day) continue;
+    if (a.est) { if (!WN_DEMO.ach.myst[a.m]) A.got[a.id] = true; continue; }
+    const v = wnLiveOf(a.m, s);
+    if ((v == null ? A.n[a.m] || 0 : v) >= a.goal) A.got[a.id] = true;
+  }
+  return A;
+}
 function wnState(s) {
   s.mem = wnMemState();
-  s.wn = { art: Object.assign({}, WN_DEMO.art), ach: { got: Object.fromEntries(WN_DEMO.ach.got.map(id => [id, true])), p: Object.assign({}, WN_DEMO.ach.p), first: Object.assign({}, WN_DEMO.ach.first) }, ops: {}, seq: 1 };
-  s.seg.wnach = s.seg.wnach || 'pers'; s.seg.wnrar = s.seg.wnrar || '0';
+  s.wn = { art: Object.assign({}, WN_DEMO.art), ach: null, ops: {}, seq: 1 };
+  s.wn.ach = wnAchState(s);
+  s.seg.wnach = s.seg.wnach || 'pers'; s.seg.wnrar = s.seg.wnrar || '0'; s.seg.wngot = s.seg.wngot || '0';
   return s;
 }
 const wnInitBase = initialState;

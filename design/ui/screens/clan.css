@@ -1,0 +1,198 @@
+/* screens/clan.css — «Неделя → Клан» (screens/clan.js): паспорт с резервуаром, клановый босс, участники, древо, поиск.
+   Правила воздуха (ADR-0026): одна мысль на экран; на карточке — не больше двух чисел, двух чипов и одного действия; подробности — в листах.
+   Отступы — токены --sp-l / --sp-m / --sp-s; стихия — --c от [data-el]; свои классы — с префиксом cl-. Эмблема и облик врагов — заглушки до арта. */
+
+.cl-scr{gap:var(--sp-m)}
+.cl-card[data-el="Воздух"],.cl-ph[data-el="Воздух"]{--c:var(--air)}.cl-card[data-el="Земля"],.cl-ph[data-el="Земля"]{--c:var(--earth)}.cl-card[data-el="Огонь"],.cl-ph[data-el="Огонь"]{--c:var(--fire)}.cl-card[data-el="Вода"],.cl-ph[data-el="Вода"]{--c:var(--water)}.cl-card[data-el="Время"],.cl-ph[data-el="Время"]{--c:var(--time)}.cl-card[data-el="Свет"],.cl-ph[data-el="Свет"]{--c:var(--light)}.cl-card[data-el="Тьма"],.cl-ph[data-el="Тьма"]{--c:var(--dark)}
+
+/* эмблема клана — заглушка: щит с золотым знаком */
+.cl-emb{display:inline-grid;place-items:center;flex:none;width:34px;height:38px;clip-path:polygon(50% 0,100% 18%,100% 70%,50% 100%,0 70%,0 18%);background:linear-gradient(160deg,#2a2f35,#14171a);color:var(--gold)}
+.cl-emb svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.cl-emb.lg{width:64px;height:72px}
+.cl-emb.lg svg{width:30px;height:30px}
+
+/* облик врага клана — заглушка: свет стихии снизу, знак класса; до первой победы — знак вопроса */
+.cl-ph{position:relative;display:grid;place-items:center;aspect-ratio:4/5;width:100%;border-radius:10px;overflow:hidden;border:1px solid #262b31;
+  background:radial-gradient(120% 70% at 50% 112%,color-mix(in srgb,var(--c,#8a9098) 55%,transparent),transparent 62%),linear-gradient(180deg,#101418,#0a0c0e);color:color-mix(in srgb,var(--c,#aaa) 60%,var(--parch-2))}
+.cl-ph .ico{filter:drop-shadow(0 2px 8px #000)}
+.cl-ph .i{width:30px;height:30px;color:var(--gold)}
+.cl-ph b{font:600 30px/1 var(--f-d);color:var(--spirit);text-shadow:0 0 10px var(--spirit)}
+.cl-ph.unk{border-color:rgba(72,229,212,.4)}
+.cl-ph[data-g="e"]{box-shadow:inset 0 0 0 1px var(--gold-3)}
+.cl-ph[data-g="b"]{box-shadow:inset 0 0 0 2px var(--gold-2),inset 0 -18px 24px -12px var(--gold-2)}
+.cl-ph.sm{width:44px;border-radius:8px}.cl-ph.sm b{font-size:18px}.cl-ph.sm .i{width:18px;height:18px}.cl-ph.sm .ico{width:20px;height:20px}
+.cl-ph.lg{width:96px}.cl-ph.lg b{font-size:40px}
+.cl-ph.bt{width:100%;height:100%;aspect-ratio:auto;border:0;border-radius:0}
+
+/* паспорт */
+.cl-pass{flex:1 1 0;min-height:0;display:grid;grid-template-columns:220px minmax(0,1fr);gap:var(--sp-m)}
+.cl-id{display:flex;flex-direction:column;align-items:center;gap:var(--sp-s);padding:var(--sp-m);text-align:center}
+.cl-name{font-size:24px;line-height:1.05}
+.cl-stats{gap:var(--sp-l);flex-wrap:wrap;align-items:flex-end}
+.cl-stats .stat.win b{color:var(--spirit)}
+.cl-id .link{margin-top:auto}
+.cl-pmain{gap:var(--sp-m);min-height:0}
+.cl-res{display:flex;flex-direction:column;gap:var(--sp-s);padding:var(--sp-m);text-align:left;color:inherit}
+.cl-res:hover{border-color:var(--gold-3)}
+.cl-res-n{display:flex;align-items:baseline;gap:6px}
+.cl-res-n b{font:600 40px/1 var(--f-d);color:var(--spirit)}
+.cl-res-n small{font:600 18px/1 var(--f-d);color:var(--spirit)}
+.cl-res-n span{margin-left:6px;font-size:13px;color:var(--parch-2)}
+.cl-res small .i{width:13px;height:13px;margin-right:4px;vertical-align:-2px;color:var(--spirit)}
+.cl-call{display:flex;align-items:center;gap:var(--sp-m);width:100%;padding:var(--sp-s) var(--sp-m);border-radius:12px;border:1px solid rgba(72,229,212,.4);background:rgba(72,229,212,.06);color:var(--parch);text-align:left}
+.cl-call>.i{width:20px;height:20px;color:var(--spirit);flex:none}
+.cl-call span{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.cl-call b{font-size:14px}
+.cl-call small{font-size:12px;color:var(--parch-3)}
+.cl-call:hover{background:rgba(72,229,212,.1)}
+.cl-goal{display:flex;align-items:baseline;gap:var(--sp-s);padding:0 2px}
+.cl-goal span:last-child{font:600 17px/1.2 var(--f-d);color:var(--parch)}
+.cl-foot{margin-top:auto;flex-wrap:wrap;row-gap:var(--sp-s)}
+.cl-att{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;margin-left:4px;border-radius:10px;background:rgba(72,229,212,.25);font-size:11px;letter-spacing:0}
+
+/* клановый босс */
+.cl-bhead{flex:none;flex-wrap:wrap;row-gap:6px}
+.cl-bhead .eyebrow{font-size:11.5px;color:var(--gold)}
+.cl-targets{flex:1 1 0;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--sp-m);align-content:stretch}
+.cl-targets.one{grid-template-columns:minmax(0,560px);justify-content:center}
+.cl-card{display:grid;grid-template-columns:86px minmax(0,1fr);gap:var(--sp-m);padding:var(--sp-m);border-radius:12px;border:1px solid var(--iron);min-width:0;min-height:0;
+  background:radial-gradient(120% 80% at 50% 115%,color-mix(in srgb,var(--c,#8a9098) 14%,transparent),transparent 60%),var(--stone)}
+.cl-card[data-g="b"]{border-color:var(--gold-3);box-shadow:inset 0 -18px 30px -24px var(--gold-2)}
+.cl-card.big{grid-template-columns:150px minmax(0,1fr)}
+.cl-card-ph{border:0;padding:0;background:none;align-self:start}
+.cl-card-ph:hover .cl-ph{border-color:var(--gold-3)}
+.cl-card-b{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0}
+.cl-card-n{font-size:17px;line-height:1.1;color:var(--parch);text-wrap:balance}
+.cl-card.big .cl-card-n{font-size:24px}
+.cl-chips{flex-wrap:wrap;gap:6px}
+.cl-nums{gap:var(--sp-m);flex-wrap:wrap;font-size:13px}
+.cl-card-b>.btn{align-self:flex-start;margin-top:auto}
+.cl-card.dead,.cl-card.burned{opacity:.55}
+.cl-card.dead .cl-ph,.cl-card.burned .cl-ph{filter:grayscale(.8)}
+.cl-first{display:flex;align-items:center;gap:var(--sp-m);padding:var(--sp-l);flex:1 1 0;align-self:stretch;justify-content:center}
+.cl-first .col{max-width:360px}
+.cl-first b{font-size:20px}
+.cl-first-i{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:rgba(72,229,212,.08);color:var(--spirit);flex:none}
+.cl-first-i .i{width:24px;height:24px}
+.cl-bfoot{flex:none;gap:var(--sp-m)}
+.cl-mine{display:flex;align-items:center;gap:var(--sp-l);padding:4px 10px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;color:var(--parch)}
+.cl-mine:hover{border-color:var(--gold-3)}
+.cl-mine .stat b{font-size:18px}
+
+/* участники */
+.cl-mhead{flex:none;gap:var(--sp-s)}
+.cl-mhead .btn .bdg{margin-left:6px}
+.cl-mlist{gap:4px;padding-right:2px}
+.cl-mrow,.cl-arow,.cl-srow{display:flex;align-items:center;gap:var(--sp-m);padding:6px 10px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;color:var(--parch);text-align:left;min-width:0}
+.cl-mrow{width:100%}
+.cl-mrow:hover{border-color:var(--iron-2)}
+.cl-mrow.me{border-color:rgba(72,229,212,.35)}
+.cl-av{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;flex:none;background:#181c20;box-shadow:inset 0 0 0 1px #2c3238;font:700 12px/1 var(--f-u);letter-spacing:.04em;color:var(--parch-2)}
+.cl-av[data-role="head"]{color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold-2)}
+.cl-av[data-role="treasurer"]{color:var(--gold-2);box-shadow:inset 0 0 0 1px var(--gold-3)}
+.cl-av.lg{width:52px;height:52px;font-size:16px}
+.cl-mt{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.cl-mt b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cl-mt small{font-size:12px;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cl-mv{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex:none}
+.cl-mv b{font:600 18px/1 var(--f-d)}
+.cl-mv small{font:700 9.5px/1.2 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--parch-3)}
+
+/* древо */
+.cl-thead{flex:none;gap:var(--sp-m);flex-wrap:wrap;row-gap:6px}
+.cl-ctabs button{padding:0 10px}
+.cl-tree{display:flex;flex-direction:column;gap:var(--sp-s);flex:none}
+.cl-br{display:grid;grid-template-columns:170px minmax(0,1fr) 44px;gap:var(--sp-m);align-items:center}
+.cl-br b{font-size:16px;line-height:1.1}
+.cl-br small{text-align:right}
+.cl-knots{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cl-k{display:inline-grid;place-items:center;width:18px;height:18px;padding:0;border:0;border-radius:50%;background:#262b30;box-shadow:inset 0 0 0 1px #33393f;color:var(--parch-3)}
+.cl-k .i{width:12px;height:12px}
+.cl-k.big{width:24px;height:24px}
+.cl-k.on{background:var(--gold);box-shadow:0 0 6px rgba(221,188,122,.5);color:#1a1510}
+.cl-k.now{background:#0e1114;box-shadow:0 0 0 2px var(--spirit),0 0 12px -2px var(--spirit);color:var(--spirit)}
+.cl-k:hover{filter:brightness(1.25)}
+.cl-why{flex:none}
+
+/* поиск клана — пустое состояние */
+.cl-fhead{display:flex;align-items:center;gap:var(--sp-m);padding:var(--sp-m);flex:none}
+.cl-fhead .col{flex:1;min-width:0}
+.cl-fhead b{font-size:19px}
+.cl-frow{flex:none;gap:var(--sp-m)}
+.cl-slist{gap:6px}
+.cl-sinfo{display:flex;align-items:center;gap:var(--sp-m);flex:1;min-width:0;border:0;background:none;padding:0;color:inherit;text-align:left}
+.cl-sinfo:hover b{color:var(--gold)}
+.cl-srow>.btn,.cl-srow>.chip{flex:none}
+
+/* листы */
+.cl-kv{grid-template-columns:auto minmax(0,1fr);gap:6px var(--sp-m)}
+.cl-kv dd{text-align:right}
+.cl-sel{height:30px;border-radius:8px;border:1px solid var(--iron-2);background:#0e1114;color:var(--parch);font:13px var(--f-u);padding:0 6px}
+.cl-req{gap:6px;justify-content:flex-end}
+.cl-ptabs{align-self:flex-end}
+.cl-in{width:100%;min-height:30px;border-radius:8px;border:1px solid var(--iron-2);background:#0e1114;color:var(--parch);font:13px/1.3 var(--f-u);padding:4px 8px;text-align:left}
+.cl-note{min-height:34px}
+.cl-embs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.cl-embb{display:grid;place-items:center;padding:4px;border-radius:8px;border:1px solid var(--iron);background:#0e1114}
+.cl-embb[aria-pressed="true"]{border-color:var(--spirit);box-shadow:0 0 10px -4px var(--spirit)}
+.cl-phead{gap:var(--sp-m)}
+.cl-rrow{display:flex;flex-direction:column;gap:3px;padding:8px 0;border-top:1px solid var(--iron)}
+.cl-rrow:first-child{border-top:0}
+.cl-rrow b{font-size:15px;color:var(--parch)}
+.cl-rrow span{font-size:13px;color:var(--parch-2)}
+.cl-laws{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.35;color:var(--parch)}
+.cl-list{display:flex;flex-direction:column}
+.cl-lrow{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-m);padding:5px 0;border-top:1px solid var(--iron);font-size:13.5px}
+.cl-lrow:first-child{border-top:0}
+.cl-lrow.me span{color:var(--spirit)}
+.cl-thd{gap:var(--sp-m);align-items:flex-start}
+.cl-thd .col{gap:var(--sp-s)}
+.cl-abs{display:flex;flex-direction:column;gap:6px}
+.cl-ab{display:flex;flex-direction:column;gap:2px;padding:6px 8px;border-radius:8px;background:#0e1114;border:1px solid var(--iron)}
+.cl-ab b{font-size:13.5px}
+.cl-ab small{font-size:12px;color:var(--parch-2)}
+.cl-det summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;color:var(--gold-2);font:700 12px/1 var(--f-u);letter-spacing:.1em;text-transform:uppercase}
+.cl-det summary::-webkit-details-marker{display:none}
+.cl-det[open] summary .i{transform:rotate(90deg)}
+.cl-det>.col{margin-top:var(--sp-s)}
+.cl-t{width:100%;border-collapse:collapse;font-size:12.5px}
+.cl-t th{font:700 10px/1.2 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--gold-2);text-align:left;padding:4px 6px}
+.cl-t td{padding:4px 6px;border-top:1px solid var(--iron)}
+.cl-t td.num{text-align:right}
+.cl-t td.c{text-align:center;color:var(--gold)}
+.cl-t tr.fell td{color:var(--parch-3)}
+.cl-rtop{gap:var(--sp-m)}
+.cl-rhp .bar .ghost{background:rgba(255,120,100,.35)}
+.cl-rhp .row{justify-content:space-between;font-size:12.5px;color:var(--parch-2)}
+.cl-kpi{gap:var(--sp-l)}
+.cl-kpi .stat.win b{color:var(--spirit)}
+.cl-marks{gap:6px;flex-wrap:wrap}
+.cl-gtop{gap:var(--sp-m)}
+.cl-fills{gap:6px;flex-wrap:wrap}
+.cl-glist{gap:4px}
+.cl-grow{display:flex;align-items:center;gap:var(--sp-m);padding:5px 8px;border-radius:9px;background:#0e1114;border:1px solid var(--iron)}
+.cl-grow.me{border-color:rgba(72,229,212,.35)}
+.cl-step{display:inline-flex;align-items:center;gap:6px;flex:none}
+.cl-step .iconbtn{width:26px;height:26px}
+.cl-step b{min-width:22px;text-align:center}
+.cl-ltabs{align-self:stretch}
+.cl-log{gap:2px}
+.cl-lg{display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:var(--sp-s);align-items:start;padding:6px 0;border-top:1px solid var(--iron);font-size:13px;line-height:1.35}
+.cl-lg:first-child{border-top:0}
+.cl-lg .i{width:15px;height:15px;margin-top:2px;color:var(--gold-2)}
+.cl-lg small{white-space:nowrap}
+.cl-alts{gap:6px}
+.cl-alt{display:flex;align-items:center;gap:var(--sp-m);padding:8px 10px;border-radius:10px;border:1px solid var(--iron);background:#0e1114}
+.cl-alt .col{gap:2px;flex:1;min-width:0}
+.cl-alt b{font-size:14px}
+.cl-alt small{font-size:12.5px;color:var(--parch-2)}
+.cl-alt.on{border-color:rgba(72,229,212,.45)}
+.cl-kr{display:flex;flex-direction:column;gap:6px;margin-top:var(--sp-s)}
+.cl-name-in{width:100%}
+.cl-team{flex:none;flex-wrap:wrap;gap:6px}
+
+/* раздел UI-кита */
+.cl-kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:var(--sp-l);margin-top:var(--sp-m)}
+.cl-kit-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-m)}
+.cl-knots.static .cl-k{cursor:default}
+.cl-t.k td,.cl-t.k th{padding:3px 6px}

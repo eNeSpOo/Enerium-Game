@@ -4,7 +4,8 @@
    экранов окно отмечено готовым полем ready карточки «Герои» (MAP в index.html). Своё состояние — S.tal, заводится как S.bag.
    Данные — EN_TALISMANS (design/ui/talismans.js, собирает tools/content-gen/talismans/build.js): линейки, значения по редкостям,
    привязка к классу, как эффект ложится в ядро боя и в БМ. Черновик — docs/content/талисманы.md.
-   Запасы талисманов — там же, куда их кладёт открытие сундука (screens/bag.js): S.zp.extra, ключ «tal:номер:редкость».
+   Запасы талисманов — там же, куда их кладёт открытие сундука (screens/bag.js): S.zp.extra, ключ «tal:номер:редкость». Их показывает
+   своя вкладка «Запасы → Талисманы» (bag.js): карточки, фильтр «подходит классу», «К герою» — переход сюда, в лист OV.tal с выбранным.
    Правила §26 и таблицы автора: четыре места; до древней редкости талисман носит только свой класс, с древней — любой; одна линейка —
    одно место на героя; спасение от смерти — одно на героя; перековка §22: 10 одной редкости → 1 случайный редкостью выше.
    Сервер решает, клиент показывает: надеть, снять и перековать — операции TL_SRV с номером: проверка и итог одним вызовом, повтор того же
@@ -12,7 +13,8 @@
    Бой: источник героя для боя — герой и его талисманы. EB.heroSrc обёрнут здесь: талисманы, чей эффект есть в ядре прототипа, ложатся
    в набор героя записями библиотеки (EB.addLib) — как пассивки и реакции (ADR-0017); «Бич» — расовая прибавка героя; «Беглое слово» —
    доля способностей набора. Ядро боя не правится. Идущий забег досчитывается с тем набором, с которым начался.
-   БМ (§6, слой 2): БМ героя × √(УВС × ЭЗ) талисманов, целыми. h.bm — витрина: при смене талисманов она пересчитывается от своей базы.
+   БМ (§6, слой 2): множитель талисманов √(УВС × ЭЗ), целыми, — слой общей функции BM (index.html, BM_LAYERS). h.bm не хранится:
+   его считает BM.hero от уровня, доблести и вещей героя.
    Служебное — только команде: TM, PL, tmT из index.html. Автопроверка — tools/content-gen/screens/check_talismans.js. */
 'use strict';
 
@@ -78,10 +80,11 @@ const TB = {
 };
 const tlEq = hid => (S.tal.eq[hid] = S.tal.eq[hid] || Array(TL.rules.slots).fill(null));
 const tlWorn = hid => tlEq(hid).filter(Boolean);
+const tlWornRO = hid => ((S.tal && S.tal.eq[hid]) || []).filter(Boolean);   // без записи в S.tal: мощь спрашивают и у соперников Арены
 /* множитель БМ героя от талисманов, б. п.: √(УВС × ЭЗ) — стороны складывают доли значений линеек */
 function tlSides(hid) {
   let off = 0, def = 0;
-  for (const no of tlWorn(hid)) {
+  for (const no of tlWornRO(hid)) {
     const f = tlFam(no); if (!f || !f.bm) continue;
     const v = tlV(no) || 0;
     for (const b of Array.isArray(f.bm[0]) ? f.bm : [f.bm]) { const add = b[1] === 'fix' ? b[2] : tlFl(v * 100 * b[1], TLB); if (b[0] === 'off') off += add; else def += add; }
@@ -89,13 +92,8 @@ function tlSides(hid) {
   return { off, def };
 }
 const tlMul = hid => { const { off, def } = tlSides(hid); return tlIsqrt(Math.max(1, TLB + off) * Math.max(1, TLB + def)); };
-/* витрина БМ: база — БМ без талисманов; если БМ поменяли снаружи (уровень, доблесть), база берётся заново из текущей */
-function tlBm(h) {
-  const B = S.tal.bm[h.id] || (S.tal.bm[h.id] = { base: h.bm, mul: TLB, shown: h.bm });
-  if (B.shown !== h.bm) { B.base = tlFl(h.bm * TLB, B.mul); B.shown = h.bm; }
-  const m = tlMul(h.id); B.mul = m; h.bm = tlFl(B.base * m, TLB); B.shown = h.bm;
-  return B;
-}
+/* слой БМ «талисманы» общей функции BM (index.html): отпечаток — надетые номера, множитель — tlMul */
+if (typeof BM_LAYERS !== 'undefined') BM_LAYERS.push({ id: 'tal', key: h => tlWornRO(h.id).join(','), mul: h => tlWornRO(h.id).length ? tlMul(h.id) : TLB });
 /* почему талисман нельзя надеть в это место; '' — можно */
 function tlWhy(h, no, slot) {
   const f = tlFam(no); if (!f) return 'none';
@@ -138,7 +136,7 @@ const TL_SRV = {
       const why = tlWhy(h, no, slot); if (why) return { refuse: why, no };
       const eq = tlEq(hid), prev = eq[slot];
       TB.take(no); if (prev) TB.add(prev);
-      eq[slot] = no; tlBm(h);
+      eq[slot] = no;   // мощь героя пересчитает BM по новому набору
       return { ok: 'put', hid, slot, no, prev };
     });
   },
@@ -146,7 +144,7 @@ const TL_SRV = {
     return TL_SRV.run(op, () => {
       const h = H(hid), eq = h ? tlEq(hid) : null, no = eq && eq[slot];
       if (!no) return { refuse: 'none' };
-      eq[slot] = null; TB.add(no); tlBm(h);
+      eq[slot] = null; TB.add(no);
       return { ok: 'out', hid, slot, no };
     });
   },
@@ -222,9 +220,8 @@ function tlSlotBtn(h, i, no, sel) {
 function talRow(h) {
   if (!TL || !S.tal) return '';
   if (!tlOpen()) return `<div class="tl-row"><span class="eyebrow">Духовные талисманы</span><p class="reason">${ic('lock')} Откроются во втором цикле — вместе с кланами.</p></div>`;
-  tlBm(h);
-  const B = S.tal.bm[h.id], d = B.mul - TLB;
-  const chip = tlWorn(h.id).length ? `<span class="chip${d > 0 ? ' spirit' : ''}" title="${tmT('Боевая мощь от талисманов', `Боевая мощь от талисманов: база ${fmt(B.base)} × ${tlX(B.mul)}`)}">${ICON('power', 13, 'Боевая мощь')}${tlPct(d)}</span>` : '';
+  const P = BM.parts(h), m = P.mul.tal || TLB, d = m - TLB;
+  const chip = tlWorn(h.id).length ? `<span class="chip${d > 0 ? ' spirit' : ''}" title="${tmT('Боевая мощь от талисманов', `Боевая мощь от талисманов: база ${fmt(P.base)} × ${tlX(m)}`)}">${ICON('power', 13, 'Боевая мощь')}${tlPct(d)}</span>` : '';
   return `<div class="tl-row"><div class="row"><span class="eyebrow">Духовные талисманы</span><span class="g-spacer"></span>${chip}</div>
     <div class="tl-slots">${tlEq(h.id).map((no, i) => tlSlotBtn(h, i, no)).join('')}</div></div>`;
 }
@@ -251,9 +248,9 @@ function tlCard(no, h, lead) {
 /* сумма бонусов героя: эффекты надетых и боевая мощь */
 function tlSum(h) {
   const worn = tlWorn(h.id); if (!worn.length) return '<p class="reason">Места пусты. Нажмите место, затем талисман из запасов.</p>';
-  const B = S.tal.bm[h.id] || tlBm(h), { off, def } = tlSides(h.id);
+  const P = BM.parts(h), m = P.mul.tal || TLB, eq = P.mul.eq && P.mul.eq !== TLB ? P.mul.eq : 0, { off, def } = tlSides(h.id);
   return `<div class="tl-sum">${worn.map(tlFxRow).join('')}</div>
-    <p class="reason">${ICON('power', 14, 'Боевая мощь')} Боевая мощь ${tlPct(B.mul - TLB)} — ${fmt(h.bm)}.${TM(` Формула §6, слой 2: база ${fmt(B.base)} × √(УВС ${tlX(TLB + off)} × ЭЗ ${tlX(TLB + def)}) = ${fmt(h.bm)}. Охота, добыча и печати в БМ не входят.`)}</p>`;
+    <p class="reason">${ICON('power', 14, 'Боевая мощь')} Боевая мощь ${tlPct(m - TLB)} — ${fmt(P.bm)}.${TM(` Формула §6, слой 2: база ${fmt(P.base)} × √(УВС ${tlX(TLB + off)} × ЭЗ ${tlX(TLB + def)})${eq ? ` × снаряжение ${tlX(eq)}` : ''} = ${fmt(P.bm)} — общая функция BM. Охота, добыча и печати в БМ не входят.`)}</p>`;
 }
 /* список запасов на вкладке: «Подходят» — можно надеть в это место; «Все» — с причинами */
 function tlListHtml(h, slot, tab) {
@@ -283,7 +280,6 @@ Object.assign(OV, {
     const slot = Math.max(0, Math.min(TL.rules.slots - 1, +s || 0)), eq = tlEq(h.id), cur = eq[slot], tab = S.seg.tal || 'fit';
     if (S.tal.pickFor !== `${h.id}:${slot}`) { S.tal.pick = null; S.tal.pickFor = `${h.id}:${slot}`; }
     const pick = S.tal.pick && TB.qty(S.tal.pick) ? S.tal.pick : null;
-    tlBm(h);
     const slots = `<div class="tl-slots in">${eq.map((no, i) => tlSlotBtn(h, i, no, i === slot)).join('')}</div>`;
     const top = `<div class="tl-hero"><img src="${h.img}" alt=""><span class="col" style="gap:3px"><b>${h.name}</b><span class="row faint">${CLS(h.cls, 14)}${h.cls}</span></span><span class="g-spacer"></span>${bmHtml(h.bm, 16)}</div>`;
     const busy = busyNote(h.id) ? PL('<p class="reason">Герой в забеге: новый набор — со следующего боя.</p>', '<p class="reason">Герой в забеге: идущий забег досчитывается с тем набором, с которым начался (сервер считает забег при старте, §5.6). Новый набор — со следующего боя.</p>') : '';
@@ -384,10 +380,10 @@ FLOWS.push(
 
 /* ================== состояние ==================
    S.tal: eq — места героев (номер талисмана или null); srv — итоги операций по номерам; seq — номер следующей; pick — выбранный в листе;
-   bm — база БМ героя без талисманов; last — итог последней перековки; loose — запасы, если нет S.zp (без screens/bag.js).
+   last — итог последней перековки; loose — запасы, если нет S.zp (без screens/bag.js). Мощь героя не хранится — её считает BM.
    Демо-запасы кладутся туда же, куда сундуки, и не помечаются новыми */
 function tlState(s) {
-  s.tal = { eq: {}, srv: {}, seq: 1, pick: null, pickFor: '', bm: {}, last: null, loose: {} };
+  s.tal = { eq: {}, srv: {}, seq: 1, pick: null, pickFor: '', last: null, loose: {} };
   if (!TL) return s;
   const store = s.zp && s.zp.extra ? s.zp.extra : s.tal.loose;
   for (const [no, n] of TL_DEMO.stock) if (TL.items[no]) {

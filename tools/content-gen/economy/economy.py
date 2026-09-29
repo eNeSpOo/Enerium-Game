@@ -3,6 +3,7 @@
 
 Печатает таблицы Т1–Т15 для docs/content/экономика-золото-дух.md. Цикл I — обучение на часы (ADR-0018): Т15 считает
 обучающий биом забег за забегом. Дни (Т4, Т8, Т11–Т13) — цикл II на образце длинного биома `BIOMES.c2`.
+Т7 берёт доход контрактов из прогона их сборщика — design/ui/contracts.js: после пересборки контрактов перезапустить.
 
     python tools/content-gen/economy/economy.py        # все таблицы, markdown
     python tools/content-gen/economy/economy.py --sim  # перемерить прогон боя (нужен Node); вывод вставить в SIM
@@ -107,9 +108,14 @@ VALOR_FRAGS_X100 = 204                      # 2,04 осколка за побе�
 VALOR_FRAGS = 100
 VALOR_OPEN_DAY, VALOR_WINS = 1, 3           # страж доблести в цикле II — с первого дня; 7 + 3 = кап 10
 
-# --- другие каналы, цикл I (черновик «Дроп»; контракты — с 10-го уровня аккаунта, §18) ---
-CONTRACT_UNIT, CONTRACT_PER_UNIT = 10, (300, 100)   # золото, дух за каждые 10 очков
-CONTRACT_DAY_PTS, CONTRACT_WEEK_PTS, WEEK_DAYS = 70, 300, 7
+# --- другие каналы (черновик «Дроп»); контракты — не заглушка, а прогон их сборщика ---
+WEEK_DAYS = 7
+# контракты открывает 10-й уровень аккаунта — начало цикла II (§16, §18). Доход — итог прогона tools/content-gen/contracts/build.js:
+# design/ui/contracts.js, econ[цикл][профиль] — золото наград и сундуков, ставки заверения, дух. Файл читается при первом обращении:
+# калькуляторы, что импортируют этот модуль (sets.py, echo.py, contracts/capacity.py), его не трогают — круга сборки нет
+CONTRACTS_JS = ROOT / 'design' / 'ui' / 'contracts.js'
+CONTRACT_CYCLE = 2
+CONTRACT_PROFILES = (('обычный', 'o'), ('увлечённый', 'e'))
 RITUAL_PER_HOUR, RITUAL_HOURS = (150, 75, 1), 12    # ритуал героев: золото, дух, души за час; верх сетки §19.4
 CRAFT_BIOME = (3000, 1500, 2)               # закрытие крафтового биома
 ACCOUNT_GOLD = 6000                         # предложение: база золота за уровень аккаунта
@@ -418,19 +424,39 @@ def t6_income(rates, hours, max_slots=4):
                   f'Дух за день, {hours} ч: 1 забег'] + [f'{k} забега' for k in range(2, max_slots + 1)], rows)
 
 
+_CT = {}
+
+
+def contracts_econ():
+    """Итог прогона сборщика контрактов по циклам (contracts.js, econ). Читается при первом обращении."""
+    if not _CT:
+        text = CONTRACTS_JS.read_text(encoding='utf-8')
+        head = 'window.EN_CONTRACTS = '
+        line = next((x for x in text.splitlines() if x.startswith(head)), None)
+        if line is None:
+            sys.exit(f'{CONTRACTS_JS}: нет данных EN_CONTRACTS — собрать tools/content-gen/contracts/build.js')
+        _CT.update(json.loads(line[len(head):].rstrip().rstrip(';')))
+    return _CT['econ']
+
+
+def pct_bp(bp):
+    return f'{bp // 100} %' if bp % 100 == 0 else f'{bp // 100},{bp % 100 // 10} %'
+
+
 def t7_other():
-    g_u, s_u = CONTRACT_PER_UNIT
-    wk, dy = CONTRACT_WEEK_PTS // CONTRACT_UNIT, CONTRACT_DAY_PTS // CONTRACT_UNIT
-    rh = RITUAL_HOURS
-    rows = [[f'Контракт дня, {CONTRACT_DAY_PTS} очков', fmt(dy * g_u), fmt(dy * s_u), '—', 'с 10-го уровня аккаунта'],
-            [f'Контракт недели, {CONTRACT_WEEK_PTS} очков', fmt(wk * g_u), fmt(wk * s_u), '—',
-             f'в день — {fmt(wk * s_u // WEEK_DAYS)} духа'],
-            [f'Ритуал героев, {rh} ч', fmt(rh * RITUAL_PER_HOUR[0]), fmt(rh * RITUAL_PER_HOUR[1]), rh * RITUAL_PER_HOUR[2],
+    rh, E = RITUAL_HOURS, contracts_econ()[str(CONTRACT_CYCLE)]
+    rows = []
+    for name, pk in CONTRACT_PROFILES:
+        x = E[pk]
+        rows.append([f'Контракты, цикл {ROMAN[CONTRACT_CYCLE - 1]}, {name}: неделя', fmt(x['gold'] - x['stake']), fmt(x['spirit']), '—',
+                     f"дневной исполнен в {pct_bp(x['dayDoneBp'])} дней, недельный — в {pct_bp(x['weekDoneBp'])}; "
+                     f"в день — {fmt(x['spirit'] // WEEK_DAYS)} духа" + ('; золото — за вычетом ставки заверения' if x['stake'] else '')])
+    rows += [[f'Ритуал героев, {rh} ч', fmt(rh * RITUAL_PER_HOUR[0]), fmt(rh * RITUAL_PER_HOUR[1]), rh * RITUAL_PER_HOUR[2],
              'занимает героев'],
             ['Крафтовый биом, закрытие', fmt(CRAFT_BIOME[0]), fmt(CRAFT_BIOME[1]), CRAFT_BIOME[2], 'нужен рецепт и уникальный'],
             ['Рунный страж', 0, 0, 0, 'только руны и осколки'],
             ['Уровень аккаунта', '—', '—', '—', '§16: «даёт валюту», чисел нет']]
-    return table(['Источник, цикл I', 'Золото', 'Дух', 'Души', 'Замечание'], rows)
+    return table(['Источник', 'Золото', 'Дух', 'Души', 'Замечание'], rows)
 
 
 def t8_gap():
@@ -613,7 +639,7 @@ def main():
              ('Т4. Чувствительность к показателю: обычный игрок, ставки предложения', t4_sens()),
              ('Т5. Прогон «10 раундов», образец биома цикла II', t5_sim()),
              ('Т6. Доход по §9.1 сейчас; 2–4 забега — на уровне того же отряда', t6_income(RATES_NOW, h)),
-             ('Т7. Другие каналы: числа черновика «Дроп»', t7_other()),
+             ('Т7. Другие каналы: контракты — прогон их сборщика, остальное — черновик «Дроп»', t7_other()),
              ('Т8. Разрыв: вехи на числах §9.1, цикл II', t8_gap()),
              ('Т9. Предложение: дух за врага по циклам', t9_rates()),
              ('Т10. Цена героя за золото: k-й герой цикла — 10 000 × цикл × (1 + 30 % × (k − 1)), ADR-0023', t10_prices()),

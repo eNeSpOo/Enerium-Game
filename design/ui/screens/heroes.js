@@ -70,8 +70,6 @@ const HR_VIEW = {
 const hrEsc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 const HR_ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
 const hrFl = (a, b) => Math.floor(a / b);
-/* целый квадратный корень — метод Ньютона на целых */
-function hrIsqrt(n) { if (n < 2) return n; let x = n, y = hrFl(x + 1, 2); while (y < x) { x = y; y = hrFl(x + hrFl(n, x), 2); } return x; }
 
 /* ================== герои аккаунта ==================
    Герой аккаунта — герой боя прототипа (S.heroes) или купленный и пробуждённый герой состава (S.rs.owned). Для героя состава hrOwn
@@ -102,19 +100,7 @@ function hrImg(h) {
   const c = HR_VIEW.el[h.sch] || HR_VIEW.el['без стихии'];
   return 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 100"><defs><radialGradient id="g" cx="50%" cy="112%" r="80%"><stop offset="0" stop-color="${c}" stop-opacity=".55"/><stop offset=".62" stop-color="${c}" stop-opacity="0"/></radialGradient><linearGradient id="b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#101418"/><stop offset="1" stop-color="#0a0c0e"/></linearGradient></defs><rect width="80" height="100" fill="url(#b)"/><rect width="80" height="100" fill="url(#g)"/><text x="40" y="58" text-anchor="middle" font-family="Georgia,serif" font-size="30" font-weight="600" fill="${c}" fill-opacity=".8">${hrEsc(rsInit(h.n))}</text></svg>`);
 }
-/* §6, слой 0: БМ = C × √(УВС × ЭЗ) по карте ядра; целыми, как у бестиария биомов */
-function hrBmOf(u) {
-  const R = EB.RULES, kl = R.K * u.lvl, cap = R.caps.defPct * 100;
-  const mit = k => Math.min(cap, hrFl(u.def[k] * 10000, Math.max(1, kl + u.def[k])));
-  const m = hrFl(mit('str') + mit('int'), 2);
-  const dps = hrFl(u.atk[u.main] * u.as * (1000000 + u.crit * (u.critDmg - 100)), 100000000);
-  const ehp = hrFl(hrFl(u.maxHp * 10000, 10000 - m) * 10000, 10000 - u.eva);
-  const C = (window.EN_BIOME_FOES && EN_BIOME_FOES.rules && EN_BIOME_FOES.rules.bmC) || HR_DATA.bmC;
-  return hrFl(C * hrIsqrt(dps * ehp), 100);
-}
-function hrBm(x) {
-  try { const u = EB.create({ mode: 'rounds', heroes: [EB.heroSrc(x)], foes: [], seed: 1 }).u[0][0]; return u ? hrBmOf(u) : 0; } catch (_) { return 0; }
-}
+/* боевая мощь героя аккаунта — общая функция BM (index.html, §6): h.bm — свойство только для чтения (bmProp) */
 function hrBuild(h) {
   const id = h.id, core = hrCore(h), T = HR_DATA.st[core] || HR_DATA.st['Танк'];
   const rec = () => S.rs.owned[id] || { lvl: 0, lim: 0, valor: 0 };
@@ -128,8 +114,7 @@ function hrBuild(h) {
     valor: { enumerable: true, get: () => rec().valor, set: put('valor') },
     cap: { enumerable: true, get: () => INV.hero.capByLim[Math.min(rec().lim, INV.hero.capByLim.length - 1)], set() { } },   // потолок — от предела
   });
-  x.bm = hrBm(x);
-  return x;
+  return bmProp(x);   // мощь — BM.hero(x): растёт с уровнем, доблестью и вещами
 }
 /* все герои аккаунта: отряд боя прототипа и купленные; герои сета 1 уже есть в S.heroes (rsOld) */
 function hrMine() {
@@ -292,7 +277,7 @@ const SQM = SQ_DATA.modes;
 const sqFind = id => (id && S.squads.find(s => s.id === id)) || null;
 /* пресет по id; удалённого нет — первый в библиотеке: режим, забег и «Ещё забег» не остаются без отряда */
 const sq = id => sqFind(id) || S.squads[0];
-const sqBM = s => s.m.filter(Boolean).reduce((a, id) => { const h = H(id); return a + (h ? h.bm : 0); }, 0);
+const sqBM = s => BM.squad(s.m);   // мощь отряда — сумма BM.hero (index.html, §6)
 const sqKey = m => SQM[m] ? m : 'descent';   // лист «prep» без режима — спуск
 const sqOp = () => 'q' + S.sq.seq;           // номер следующей операции: его несут кнопки
 function sqGet(mode) {
@@ -476,7 +461,7 @@ const sqGone = n => ['', 'один', 'вдвоём', 'втроём', 'вчетв
 const sqNames = ids => ids.map(id => H(id).name).join(', ');
 /* под отрядом: мощь тех, кто пойдёт, стихии и одна строка о готовности */
 function sqInfo(mode, s, r) {
-  const bm = r.go.reduce((a, id) => a + H(id).bm, 0), els = [...new Set(r.go.map(id => H(id).el))];
+  const bm = BM.squad(r.go), els = [...new Set(r.go.map(id => H(id).el))];
   const hall = mode === 'descent' ? ((BIOME_UI[selRunBiome()] || BIOME_UI.b1).els || []) : els;
   const stat = `<div class="row hr-sqi"><div class="stat"><b class="bm">${ICON('power', 20, 'Боевая мощь')}<span class="num">${fmt(bm)}</span></b><small>боевая мощь</small></div><span class="g-spacer"></span>${hall.length ? `<div class="col" style="gap:4px;align-items:flex-end"><span class="eyebrow">${mode === 'descent' ? 'В зале чаще всего' : 'Стихии отряда'}</span><span class="row" style="gap:4px">${hall.map(e => el(e)).join('')}</span></div>` : ''}</div>`;
   const M = SQM[mode];

@@ -1,0 +1,82 @@
+{
+  "name": "Баннеры Событий недели (GDD §27; docs/content/событие.md, «Девять Событий»): девять широких картинок 21:9 для карточки темы на экране «Событие недели» — по одной на расу и её древнюю цивилизацию Эхо (ADR-0024). Событие — счёт всех дел недели, а приводит он рабочих: простые, не героические души (§19.1). Поэтому на баннере не битва и не герои, а будничная жизнь цивилизации — мастерские, дороги, стоянки, — вечером, со светом снизу. Цивилизация и облик — ECH.civ в design/ui/screens/echo.js и арены jobs/echo-*.json: материалы и свет недели те же. Не запускалось: в прототипе баннер пока — арена Эхо недели. Текст ложится на левый нижний угол — там тёмная спокойная зона.",
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources glow from below — cracks, inlays, embers, water, crystals — and throw colored light upward; the light comes from below. Cold and warm light contrast. Dust motes and tiny sparks float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon.",
+  "negative": "No text, no letters, no numbers, no glyphs, no hieroglyphs, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No gore, no blood, no skulls, no corpses, no sacrifice, no horror grotesque. No battle, no weapons raised, no heroes posing. No close-up faces: people are small figures in the middle distance.",
+  "cutout_rule": "",
+  "categories": {
+    "banners": {
+      "aspect": "21:9",
+      "size": "1K",
+      "refs": [],
+      "frame": "Format: wide horizontal banner, 21:9, shown small at the top of a card on a landscape phone (about 320 × 96 px) and cropped to a strip through its middle, so the key shapes sit in the middle two thirds of the height. Eye-level establishing view at dusk or night, a calm everyday scene of the place, not a fight. Composition: the left 40 % of the picture is dark and quiet — deep shadow, soft ground, a little sky — because the event title is written over the lower left corner; the right 60 % holds the place itself and the light. A few small figures of ordinary people at their daily work in the middle distance, seen as silhouettes lit from below: carrying, building, tending fires, leading animals; nobody looks at the viewer, no faces are readable. One strong source of light from below, in the color of the civilization, lifts the scene; everything else stays near-black. Nothing in the picture is written, and no symbol looks like a letter or a number."
+    }
+  },
+  "jobs": [
+    {
+      "id": "event-ankeshar",
+      "category": "banners",
+      "title": "Событие недели людей — «Названные ночи», Ан-Кешар",
+      "source": "docs/content/событие.md, «Девять Событий»; design/ui/screens/echo.js, ECH.civ «Люди»; свет — jobs/echo-ankeshar.json",
+      "subject": "Subject: evening at the foot of a stepped tower of fired brick faced with glazed dark-blue bricks and small gold stars, beside a great slow river. On the lowest terrace, star-gazers' servants set out clay tablets to dry and carry baskets of river reeds; a scribe's lamp burns on a low wall. The sky above the tower is deep night blue with the first stars. Light from below: cold deep-blue glow from lapis inlays and from the still water of a brick-rimmed basin that mirrors the stars; the only warm color is a small amber lamp. Inspired by ancient Mesopotamia, but a people of this world, clearly human."
+    },
+    {
+      "id": "event-hatunrumi",
+      "category": "banners",
+      "title": "Событие недели дворфов — «Дорога по уступам», Хатун-Руми",
+      "source": "docs/content/событие.md, «Девять Событий»; design/ui/screens/echo.js, ECH.civ «Дворфы»; свет — jobs/echo-hatunrumi.json",
+      "subject": "Subject: a mountain road cut along a cliff, going down in terraces of fitted stone laid without mortar; a rope bridge crosses a dark gorge. Short, broad dwarven porters in woven ponchos carry loads of stone down the road; one ties knotted cords to a post. Light from below: pale quartz veins in the grey granite glow cold white from the cracks of the terraces and the gorge; a small warm fire at a waystation. Inspired by the high Andes, but a people of this world, clearly dwarves."
+    },
+    {
+      "id": "event-ishkantun",
+      "category": "banners",
+      "title": "Событие недели эльфов — «Большой счёт», Иш-Кантун",
+      "source": "docs/content/событие.md, «Девять Событий»; design/ui/screens/echo.js, ECH.civ «Эльфы»; свет — jobs/echo-ishkantun.json (одобрен автором)",
+      "subject": "Subject: a jade stepped pyramid half hidden in a night rainforest, a great round stone calendar wheel standing at its foot. Tall slender elves in feather cloaks sweep the steps, carry bundles of copal and set out bowls of smoking resin before the wheel. Light from below: warm green glow of jade inlays and of the carved rings of the calendar wheel, smoke catching the light; the forest around is near-black. Inspired by the ancient Maya, but a people of this world, clearly elves."
+    },
+    {
+      "id": "event-goldendeer",
+      "category": "banners",
+      "title": "Событие недели зверей — «Общий перегон», Орда Златого Оленя",
+      "source": "docs/content/событие.md, «Девять Событий»; design/ui/screens/echo.js, ECH.civ «Звери»; свет — jobs/echo-goldendeer.json",
+      "subject": "Subject: a nomad camp on the night steppe before a great migration: felt tents, carts with tall wheels, a long line of the horde already moving toward the horizon. The people are intelligent four-legged beasts — great deer, elk and horses with gold-sheathed horns and gold plaques shaped like deer and griffins — loading carts and walking together; no beast-headed humans. Light from below: molten gold glowing from cracks in the dark earth along the road and from the gold on horns and harness; a low campfire. Inspired by the Scythian animal style, but a people of this world."
+    },
+    {
+      "id": "event-itsal",
+      "category": "banners",
+      "title": "Событие недели саганов — «Обсидиановые зеркала», Ицаль",
+      "source": "docs/content/событие.md, «Девять Событий»; design/ui/screens/echo.js, ECH.civ «Саганы»; свет — jobs/echo-itsal.json",
+      "subject": "Subject: a street of a city of black obsidian at night, walls polished like mirrors that reflect small living fires. Sagans — beings of thinking energy with bodies of soft flame inside dark stone shells — polish the mirror walls and tend fire bowls along the street. Light from below: living orange-red fire in bowls and in cracks of the obsidian, doubled in the mirror walls; the sky is black. A people of this world, not real-world people."
+    },
+    {
+      "id": "event-copperarchai",
+      "category": "banners",
+      "title": "Событие недели аппаратов — «Медные мастерские», Медный Архай",
+      "source": "docs/content/событие.md, «Девять Событий»; design/ui/screens/echo.js, ECH.civ «Аппараты»; свет — jobs/echo-copperarchai.json",
+      "subject": "Subject: a harbour workshop on an island at night: a giant copper figure half cast in a pit of sand, scaffolding around it, a labyrinth of white walls behind, the dark sea beyond. Small clockwork workers of copper and bronze carry ladles and gears; one pours molten metal. Light from below: molten copper glowing orange in the casting pit and in thin runnels, with a cold sea-turquoise sheen on the wet stones of the quay. Inspired by the Bronze Age Aegean, but a people of this world."
+    },
+    {
+      "id": "event-meshengar",
+      "category": "banners",
+      "title": "Событие недели искажённых — «Тысяча обличий», Мешен-Гар",
+      "source": "docs/content/событие.md, «Девять Событий»; design/ui/screens/echo.js, ECH.civ «Искажённые»; свет — jobs/echo-meshengar.json",
+      "subject": "Subject: the courtyard of a temple at night, guarded at the gate by two great winged bulls carved in dark stone. Priests and craftsmen whose bodies are strange — a pair of horns here, folded wings there — hang rows of masks to dry on wooden racks and carry more masks in baskets. Light from below: violet distortion glowing from cracks in the paving and from inside the empty masks; everything else near-black. A people of this world, uncanny but calm, no horror."
+    },
+    {
+      "id": "event-tanehem",
+      "category": "banners",
+      "title": "Событие недели нежити — «Неувядающие стражи», Та-Нехем",
+      "source": "docs/content/событие.md, «Девять Событий»; design/ui/screens/echo.js, ECH.civ «Нежить»; свет — jobs/echo-tanehem.json",
+      "subject": "Subject: a river of reeds and sand at night; on the bank a long causeway of pale stone leads to a tomb gate. Tall wrapped guardians in linen and faience collars stand still along the causeway, while small living workers carry jars of salt and bolts of linen past them. Light from below: pale salt-white and turquoise faience glow from the causeway cracks and from glazed tiles; a warm lamp at the gate. Inspired by ancient Egypt, but a people of this world; no bodies, no skulls, calm and dignified."
+    },
+    {
+      "id": "event-nameless",
+      "category": "banners",
+      "title": "Событие недели Забытых — «Стоячие камни», Безымянные",
+      "source": "docs/content/событие.md, «Девять Событий»; design/ui/screens/echo.js, ECH.civ «Забытые»; свет — jobs/echo-nameless.json",
+      "subject": "Subject: a moor at night with a long row of tall standing stones leading to a low hill. Hooded people with no faces visible raise another stone with ropes and wooden rollers; others walk along the row with lanterns. The stones are smooth and blank — nothing is carved on them. Light from below: fresh silver cuts in the stone glow cold silver-white at the bases of the stones; the sky is overcast and near-black. A people of this world, quiet and solemn."
+    }
+  ]
+}

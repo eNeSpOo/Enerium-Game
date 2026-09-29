@@ -1,0 +1,103 @@
+{
+  "name": "Значки слотов снаряжения — девять, по одному на слот (GDD §21.1, docs/content/снаряжение.md). Задание на одобрение автора — НЕ ЗАПУСКАЛОСЬ. Стиль и формат — одобренные значки атрибутов (jobs/ui-attributes.json): 1:1, чёрный фон, прозрачность ключом, предмет — около 80 % кадра, читается с 24 px. Редкость значок не рисует: её дают кромка и свет плитки в интерфейсе (--r1…--r7, ADR-0027), поэтому свет предмета нейтральный. Образец словами, картинку в запрос не прикладываем (ADR-0012). Выгрузка после одобрения — design/ui/assets/art/equipment/<слот>.png, 256×256, fit 80; до неё в прототипе — заглушки CSS (EQ_VIEW.glyph, screens/equipment.js). Оценка: 9 генераций nb2 1K — около $0,60",
+  "plan": {
+    "Серия": "девять предметов одной серии: одна манера, один размер в кадре, один нейтральный свет; различает их только силуэт",
+    "Свет": "бледное старое золото снизу, приглушённое — цвет редкости добавит интерфейс вокруг значка, поэтому своего цветного свечения у предмета нет",
+    "Материал": "тёмное кованое железо, старое золото, потёртая кожа — как у одобренных значков атрибутов",
+    "Слоты, GDD §21.1": {
+      "Шлем": "закрытый шлем с узкой прорезью, вид спереди — не путать со значком выносливости: у того гребень и нащёчники, здесь — открытая корона-обод и прорезь",
+      "Доспех": "кираса: грудь и плечи, вид спереди",
+      "Перчатки": "латная перчатка раскрытой ладонью — не кулак: кулак занят значком силы",
+      "Поножи": "пара поножей-наголенников, вид спереди",
+      "Сапоги": "окованный сапог в профиль",
+      "Оружие": "меч рукоятью вниз, клинок наискось — основное оружие любого класса",
+      "Щит": "щит-оберег: круглый щит с умбоном — вторая рука, защита",
+      "Кольцо": "перстень с тёмным камнем, вид на три четверти",
+      "Амулет": "амулет на короткой цепи, камень в оправе"
+    }
+  },
+  "notes": [
+    "Не рисовать по значку на редкость: 63 шаблона различает кромка и свет плитки, как у сундуков (screens/chest-open.js)",
+    "После одобрения: строки в tools/art-gen/ui-art.json и путь выгрузки в EQ_VIEW (screens/equipment.js); заглушки CSS уходят"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.",
+  "negative": "No text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+  "cutout_rule": "The background is solid pure black ({hex}), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance. The whole icon with its glow fits inside the central 80% of the canvas in both width and height: an empty black margin of at least a tenth of the canvas stays on every side — top, bottom, left and right.",
+  "categories": {
+    "equipment-slots": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Format: game UI icon of an equipment slot, square, no border around the picture. One item of equipment, centered, about 80% of the canvas, seen straight on or in a clear three-quarter view. The item floats on pitch black: everything around it is solid pure black to the very edges of the canvas, never white or grey, no frame. It must stay readable at a tiny size, 24 px: one simple, strong, instantly recognizable silhouette built from a few large shapes with clear contrast between them. All the painterly detail lives inside the silhouette — worn metal, leather, facets, light — never as small separate pieces around it: no sparks, embers, shards or particles floating around the item. A crisp pale rim light runs along the whole outline and cleanly separates it from the black. The light on the item is neutral: pale old gold from below, subdued, never a strong colored glow — the interface adds the color of rarity around the icon. No runes, glyphs or symbols drawn on it. The nine icons are one set: the same painting style, the same neutral light and the same size in the frame; only the silhouette tells them apart."
+    }
+  },
+  "jobs": [
+    {
+      "id": "eq-head",
+      "category": "equipment-slots",
+      "title": "Снаряжение: шлем",
+      "source": "GDD §21.1 — голова, главная строка — Интеллект",
+      "subject": "A helmet: a closed helm of dark forged iron seen straight on, a narrow horizontal eye slit, a plain old-gold circlet around the brow; no crest, no cheek plates. Heavy and simple."
+    },
+    {
+      "id": "eq-chest",
+      "category": "equipment-slots",
+      "title": "Снаряжение: доспех",
+      "source": "GDD §21.1 — грудь, главная строка — Выносливость",
+      "subject": "Body armor: a cuirass of dark forged iron seen straight on, broad shoulder plates, a central ridge down the chest, old-gold edging along the neck and the shoulders. Sturdy and plain."
+    },
+    {
+      "id": "eq-hands",
+      "category": "equipment-slots",
+      "title": "Снаряжение: перчатки",
+      "source": "GDD §21.1 — перчатки, главная строка — Сила",
+      "subject": "Gloves: one armored gauntlet with an open hand, fingers spread, palm toward the viewer — never a clenched fist. Articulated plates of dark forged iron over worn leather, an old-gold cuff."
+    },
+    {
+      "id": "eq-legs",
+      "category": "equipment-slots",
+      "title": "Снаряжение: поножи",
+      "source": "GDD §21.1 — поножи, главная строка — Ловкость",
+      "subject": "Greaves: a pair of leg guards of dark forged iron standing side by side, seen straight on, knee cops with old-gold rims, leather straps. Light and agile."
+    },
+    {
+      "id": "eq-feet",
+      "category": "equipment-slots",
+      "title": "Снаряжение: сапоги",
+      "source": "GDD §21.1 — обувь, главная строка — Скорость",
+      "subject": "Boots: one tall leather boot in profile, toe pointing right, an iron-shod toe and heel, an old-gold buckle at the ankle. Swift."
+    },
+    {
+      "id": "eq-main",
+      "category": "equipment-slots",
+      "title": "Снаряжение: оружие",
+      "source": "GDD §21.1 — основное оружие, главная строка — урон",
+      "subject": "A weapon: a straight sword of dark steel set diagonally, hilt down-left and point up-right, a wrapped leather grip, an old-gold crossguard and pommel. Plain, deadly."
+    },
+    {
+      "id": "eq-off",
+      "category": "equipment-slots",
+      "title": "Снаряжение: щит",
+      "source": "GDD §21.1 — вторичное оружие, главная строка — защита",
+      "subject": "A shield: a round shield of dark forged iron seen straight on, a raised central boss, an old-gold rim, rivets along the rim. Protective."
+    },
+    {
+      "id": "eq-ring",
+      "category": "equipment-slots",
+      "title": "Снаряжение: кольцо",
+      "source": "GDD §21.1 — украшение, главная строка — урон крита",
+      "subject": "A ring: a heavy signet ring of old gold in a three-quarter view, a single dark faceted stone set on top, catching a pale highlight. Small, precious."
+    },
+    {
+      "id": "eq-amulet",
+      "category": "equipment-slots",
+      "title": "Снаряжение: амулет",
+      "source": "GDD §21.1 — украшение, главная строка — здоровье",
+      "subject": "An amulet: a teardrop pendant of old gold with a dark polished stone inside, hanging on a short chain that ends at the top of the frame. Precious, ancient."
+    }
+  ]
+}

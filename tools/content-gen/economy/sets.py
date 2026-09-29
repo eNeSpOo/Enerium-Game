@@ -8,6 +8,7 @@
 - правило ×1,7 для донатных сетов с учётом входа;
 - цену героев за золото против дохода обычного игрока (Т13 черновика экономики).
 Доход, прогон боя и руны берёт из калькулятора экономики `economy.py` через importlib и его не меняет.
+Ключи контрактов — из прогона сборщика контрактов `design/ui/contracts.js`: после его пересборки — перезапустить.
 Составы орденов — из `docs/content/герои/состав-героев.csv` и `герои.csv`: после пересборки состава — перезапустить.
 
     python tools/content-gen/economy/sets.py         # все таблицы, markdown
@@ -19,6 +20,7 @@
 import csv
 import importlib.util
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -52,7 +54,11 @@ RB_CAP = 10               # общий кап побед у РБ в день н�
 RB_SPLIT_BP = 7000        # доля побед у стража пределов, как в калькуляторе: 7 из 10; остальное — страж доблести
 
 # --- рунные ключи ---
-KEYS_PER_UNIT = 1         # черновик «Дроп»: за каждые 10 очков контракта — 1 ключ × цикл; день — 70 очков, неделя — 300
+# ключи контрактов — прогон сборщика контрактов, а не прежняя заглушка «1 ключ × цикл за 10 очков»: ключи режима «Контракты»
+# в неделю — награды заданий, сундук недельного контракта и сундуки планок рейтинга, без ключей с боссов (их считает этот калькулятор).
+# Данные — design/ui/contracts.js, econ[цикл][профиль].ctKeys; обоснование — docs/content/контракты.md, «Прогон»
+CONTRACTS_JS = E.ROOT / 'design' / 'ui' / 'contracts.js'
+CONTRACT_PROFILE = {'обычный': 'o', 'увлечённый': 'e'}   # профиль калькулятора → профиль прогона контрактов
 # вариант: имя, шанс ключа с элиты и с босса (за срабатывание — цикл биома, §11), вход у стража пределов и доблести,
 # рост цены с циклом РБ: 'c' — × цикл, 'tri' — × цикл × (цикл + 1) / 2
 KEY_VARIANTS = [
@@ -237,14 +243,29 @@ def price(v, c, rank):
     return (p1, p2)[rank] * (c * (c + 1) // 2 if mode == 'tri' else c)
 
 
-def contracts_x100(c):
-    return (E.CONTRACT_DAY_PTS * E.WEEK_DAYS + E.CONTRACT_WEEK_PTS) * KEYS_PER_UNIT * c * 100 // (E.CONTRACT_UNIT * E.WEEK_DAYS)
+_CT = {}
 
 
-def keys_x100(v, d, c, n2=0):
-    """Ключей за день, в сотых: контракты дня и недели без заверения, дроп элит и боссов, сет II."""
+def contract_keys_week(c, prof='обычный'):
+    """Ключей режима «Контракты» за неделю у профиля калькулятора в цикле c — прогон сборщика контрактов (contracts.js).
+    Файл читается при первом обращении: калькулятор контрактов (contracts/capacity.py) импортирует этот модуль без него."""
+    if not _CT:
+        m = re.search(r'^window\.EN_CONTRACTS = (\{.*\});$', CONTRACTS_JS.read_text(encoding='utf-8'), re.M)
+        if not m:
+            sys.exit(f'{CONTRACTS_JS}: нет данных EN_CONTRACTS — собрать tools/content-gen/contracts/build.js')
+        _CT.update(json.loads(m.group(1)))
+    return _CT['econ'][str(c)][CONTRACT_PROFILE[prof]]['ctKeys']
+
+
+def contracts_x100(c, prof='обычный'):
+    """Ключей из контрактов за день, в сотых: неделя прогона контрактов на семь дней."""
+    return contract_keys_week(c, prof) * 100 // E.WEEK_DAYS
+
+
+def keys_x100(v, d, c, n2=0, prof='обычный'):
+    """Ключей за день, в сотых: контракты по прогону (награды, сундуки недели и рейтинга), дроп элит и боссов, сет II."""
     _, e_bp, b_bp = KEY_VARIANTS[v][:3]
-    return contracts_x100(c) + (d['el'] * e_bp + d['boss'] * b_bp) * c // BP + (d['boss'] * c // n2 if n2 else 0)
+    return contracts_x100(c, prof) + (d['el'] * e_bp + d['boss'] * b_bp) * c // BP + (d['boss'] * c // n2 if n2 else 0)
 
 
 def avg_price_x100(v, c):
@@ -256,8 +277,8 @@ def kills_x100(v, keys, c):
     return min(RB_CAP * 100, keys * 100 // avg_price_x100(v, c))
 
 
-def kills_avg(v, days, c, n2=0):
-    sel = [kills_x100(v, keys_x100(v, x, cc, n2), cc) for _, cc, x in days if cc == c]
+def kills_avg(v, days, c, n2=0, prof='обычный'):
+    sel = [kills_x100(v, keys_x100(v, x, cc, n2, prof), cc) for _, cc, x in days if cc == c]
     return sum(sel) // len(sel)
 
 
@@ -319,7 +340,7 @@ def gold_income(days):
     for p, _ in E.PROFILES:
         inc = [E.account_gold() + tutor_b2()['gold'] // 100]
         for _, c, x in days[p]:
-            k = kills_x100(KEY_PICK, keys_x100(KEY_PICK, x, c), c)
+            k = kills_x100(KEY_PICK, keys_x100(KEY_PICK, x, c, prof=p), c)
             inc.append(x['gold'] // 100 + k * E.RATES_NEW['guard'][0] * E.mult_new(c) // (BP * 100))
         out[p] = inc
     return out
@@ -432,9 +453,9 @@ def order_share(cnt, n, d, cyc):
         return ECHO_LOST_BP // 2 // n, 'траты душ в Эхо'
     if cnt in ('arena', 'league'):
         return None, 'снаряжение: чисел нет (§21, §23)'
-    if cnt == 'streak':
-        week = (E.CONTRACT_DAY_PTS * E.WEEK_DAYS + E.CONTRACT_WEEK_PTS) // E.CONTRACT_UNIT * KEYS_PER_UNIT
-        return STREAK['обычный'] // n * CHEST_ITEMS * CHEST_KEYS_PER_ITEM * BP // week, 'ключи контрактов за неделю, обычный'
+    if cnt == 'streak':      # сундук: предметов × ключей за предмет × цикл ордена; неделя — ключи контрактов обычного по прогону
+        c = max(cyc, E.FIRST_CYCLE)
+        return STREAK['обычный'] // n * CHEST_ITEMS * CHEST_KEYS_PER_ITEM * c * BP // contract_keys_week(c), 'ключи контрактов за неделю, обычный'
     names = {'kills': 'золото с врагов', 'el': 'ключи ремёсел с элит', 'rituals': 'награды ритуалов',
              'rb_fail': 'ключи, сожжённые на провалах', 'spins': 'награды Возрождения душ',
              'summons': 'траты на призыв: 1 душа', 'clan': 'личные очки клана', 'echo_boss': 'личные очки с боссов Эхо'}
@@ -528,7 +549,7 @@ def tiers_table(kills):
 def donat_rows(c2, c3, days, pick):
     rows = []
     v = KEY_PICK
-    k3 = [kills_avg(v, days[p], 3) for p, _ in E.PROFILES]      # победы в день у РБ, средний день цикла III
+    k3 = [kills_avg(v, days[p], 3, prof=p) for p, _ in E.PROFILES]      # победы в день у РБ, средний день цикла III
     for c, who, cnt, author, prop, what in DONAT:
         cut = tiers_of(donat_sum(c))
         ns = (author if pick == 'author' else prop)[:cut]
@@ -580,11 +601,11 @@ def keys_table(days):
         for c in (2, 3):
             cells = [name, ROMAN[c - 1]]
             for p, _ in E.PROFILES:
-                sel = [(x, keys_x100(v, x, cc)) for _, cc, x in days[p] if cc == c]
+                sel = [(x, keys_x100(v, x, cc, prof=p)) for _, cc, x in days[p] if cc == c]
                 need = (RB_SPLIT_BP * price(v, c, 0) + (BP - RB_SPLIT_BP) * price(v, c, 1)) * RB_CAP * 100 // BP
                 cov = [k * BP // need for _, k in sel]
                 cells += [dec1(sum(k for _, k in sel) // len(sel), 100), f'{pct(min(cov))} — {pct(max(cov))}',
-                          num1000(kills_avg(v, days[p], c) * 10)]
+                          num1000(kills_avg(v, days[p], c, prof=p) * 10)]
             rows.append(cells)
     head = ['Вариант', 'Цикл']
     for p, _ in E.PROFILES:
@@ -595,6 +616,7 @@ def keys_table(days):
 def payer_table(days):
     """Правило ×1,7 по ресурсам: плательщик с донатными сетами на высшей ступени против свободного, время равное.
     Плательщик раньше набирает отряд на все слоты (Т12): у него на отряд больше; ключи — по варианту цен.
+    Ключи контрактов у обоих — обычного по прогону контрактов: время равное, разница — только сеты и лишний отряд.
     Ниже каждого варианта — проверки «что если» из PAYER_WHATIF."""
     h = E.PROFILES[0][1]
     lv = levels(h)

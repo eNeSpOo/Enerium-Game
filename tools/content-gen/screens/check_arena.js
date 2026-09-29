@@ -1,0 +1,382 @@
+/* Автопроверка Арены и Лиги (design/ui/arena.js, design/ui/screens/arena.js) — без браузера.
+   1. Файлы: index.html подключает arena.js до основного скрипта, arena.css и screens/arena.js — после heroes.js; прежнего экрана
+      arenaView, листа opp, действия arenago и состояния S.arena в initialState в index.html нет; карта экранов отмечает готовыми
+      arena, opponent, pvp-setup, defence и league.
+   2. Данные свежие: сборщик tools/content-gen/arena/build.js без ошибок даёт ровно design/ui/arena.js и таблицы черновика; все числа
+      EN_ARENA — целые; прогон (model.json): выгода равной атаки около нуля, пороги планок — typical лутбоксов.
+   3. Алгоритм EnArena: таблица Эло, ожидание симметрично, сдвиг защиты, K по боям и рейтингу, удачная оборона — половина,
+      поражений обороны в сутки — не больше пяти, выгода равной атаки при честном шансе — ноль; сброс сезона; матч Лиги — третий раунд
+      только при равном счёте; подбор — окно, расширение, без атакованных, тот же сид — тот же список; Энериум за место.
+   4. Бой PvP ядром: у защитников здоровье героя, порядок отряда на бой не влияет, тот же сид — тот же бой, исход по гибели или по
+      снятой доле здоровья; просмотр — тот же бой, что решил исход.
+   5. «Сервер» экрана: атака — попытка, рейтинг обеим сторонам, соперник выбывает, повтор номера ничего не меняет, отказы ничего не
+      меняют; список кончился — новый сразу; обновление бесплатно и за Энериум с лимитом; сутки — попытки до предела, Энериум топа
+      письмом, нападения на оборону; сезон — сброс; оборона из последней атаки, пока не выбрана.
+   6. Лига: в демо закрыта — нужно 15 героев; «Дары» не платят Лиге ни за эту, ни за прошлую неделю; сценарий открывает её — три отряда
+      без повторов, матч из двух или трёх боёв.
+   7. Вид: три вкладки, все листы, бой и итог — без исключений, undefined и NaN. Правила воздуха на карточке соперника: не больше двух
+      чисел, одного чипа, одно действие. Режим «Игрок»: служебных слов нет; «Команда» — служебное есть.
+   8. Неделя: строки «Арена» и «Лига» в WEEK_MODES — настоящие, целые, планки — порог × x, Энериум прошлой недели — суточные срезы.
+   9. UI-кит, сценарии презентации.
+   Запуск: node tools/content-gen/screens/check_arena.js */
+'use strict';
+const fs = require('fs'), path = require('path'), vm = require('vm');
+const { SERVICE, strip, playerText } = require('./check_player_view.js');
+const ROOT = path.join(__dirname, '..', '..', '..'), UI = path.join(ROOT, 'design', 'ui');
+const read = f => fs.readFileSync(path.join(UI, f), 'utf8');
+const html = read('index.html');
+const err = [], note = [];
+const cnt = { views: 0, player: 0, ops: 0, cards: 0, fights: 0 };
+const say = m => { if (err.length < 60) err.push(m); else if (err.length === 60) err.push('… и ещё ошибки'); };
+function done() {
+  for (const n of note) console.log('предупреждение: ' + n);
+  if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
+  console.log(`Арена и Лига: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; карточек ${cnt.cards}; операций ${cnt.ops}; боёв ${cnt.fights}.`);
+  console.log('Проверка пройдена: данные свежие и целые, Эло и подбор — по правилам, бой решён на сиде и показ его не меняет, операции не повторяются, Лига закрыта до 15 героев и «Дары» ей не платят, итоги недели — в реестре, игроку служебного не видно.');
+  process.exit(0);
+}
+
+/* ================== 1. файлы ================== */
+const scripts = [...html.matchAll(/<script(?:\s+src="([^"]+)")?>([\s\S]*?)<\/script>/g)].map(m => ({ src: m[1], code: m[2] }));
+{
+  const i = src => scripts.findIndex(s => s.src === src), iMain = scripts.findIndex(s => !s.src && /const EB = window\.EnBattle/.test(s.code));
+  if (i('arena.js') < 0) say('index.html: не подключены данные arena.js');
+  else if (iMain >= 0 && i('arena.js') > iMain) say('index.html: arena.js подключён после основного скрипта');
+  if (i('screens/arena.js') < 0) say('index.html: не подключён screens/arena.js');
+  else if (i('screens/arena.js') < i('screens/heroes.js')) say('index.html: screens/arena.js подключён раньше heroes.js — нет SQ и листа отрядов');
+  if (!/<link rel="stylesheet" href="screens\/arena\.css">/.test(html)) say('index.html: не подключён screens/arena.css');
+  for (const old of ['function arenaView', 'arena: arenaView', 'arenago(', 'const p = S.arena.opp', '.oprow{', "arena: { rating: 1260"])
+    if (html.includes(old)) say(`index.html: остался прежний код Арены — «${old}»`);
+  const card = html.match(/\{ n: 'Арена'[\s\S]*?\},\r?\n/);
+  for (const id of ['arena', 'opponent', 'pvp-setup', 'defence', 'league']) if (!card || !new RegExp(`ready:\\s*\\[[^\\]]*'${id}'`).test(card[0])) say(`карта экранов: у «Арены» нет ready: ${id}`);
+  for (const f of ['arena.js', 'screens/arena.js']) try { new vm.Script(read(f), { filename: f }); } catch (e) { say(`${f}: синтаксис — ${e.message}`); }
+}
+if (err.length) done();
+
+/* ================== 2. данные ================== */
+const B = require('../arena/build.js');
+const built = B.build();
+if (built.err.length) say('сборщик Арены: ' + built.err.slice(0, 5).join('; '));
+else {
+  if (read('arena.js') !== B.render(built.data)) say('design/ui/arena.js устарел — пересобрать: node tools/content-gen/arena/build.js');
+  const doc = fs.existsSync(B.FILES.doc) ? fs.readFileSync(B.FILES.doc, 'utf8') : null;
+  if (!doc) say('нет черновика docs/content/арена-и-лига.md');
+  else {
+    if (B.withTables(doc, built.tables) !== doc) say('docs/content/арена-и-лига.md: таблицы устарели — пересобрать');
+    for (const k of Object.keys(built.tables)) if (!doc.includes(B.markA(k))) say(`черновик: нет таблицы ${k}`);
+  }
+}
+/* прогон (model.json) — по тем же ядру, наборам, составу и правилам: иначе предупреждение, пересчитать model.js и собрать */
+try {
+  const have = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'arena', 'model.json'), 'utf8')).meta.inputs, now = require('../arena/model.js').inputsSha();
+  if (have !== now) note.push('прогон Арены устарел: входы изменились — node tools/content-gen/arena/model.js, затем build.js');
+} catch (e) { note.push('прогон Арены не сверен: ' + e.message); }
+const ctxD = { window: {} }; ctxD.window = ctxD; vm.createContext(ctxD); vm.runInContext(read('arena.js'), ctxD);
+const D = ctxD.EN_ARENA, AE = ctxD.EnArena;
+if (!D || !AE) { say('arena.js: нет window.EN_ARENA или window.EnArena'); done(); }
+{
+  const walk = (x, p) => { if (typeof x === 'number') { if (!Number.isInteger(x)) say(`EN_ARENA: не целое ${p} = ${x}`); } else if (x && typeof x === 'object') for (const [k, v] of Object.entries(x)) walk(v, p + '.' + k); };
+  walk(D, 'EN_ARENA');
+  if (!D.model || Math.abs(D.model.shifts.find(x => x.shift === D.elo.def.shift).eqGain) > 50) say('прогон: выгода равной атаки при принятом сдвиге — не около нуля');
+  if (!(D.pool.arena.length >= 30 && D.pool.league.length >= 10)) say('демо-сервер: мало соперников');
+}
+
+/* ================== 3. алгоритм ================== */
+{
+  const T = D.elo.table, BP = AE.BP;
+  if (T[0] !== 5000 || T[400] !== 909 || T.some((v, i) => i && v > T[i - 1])) say('Эло: таблица не 50 % в нуле, не 1/11 на 400 или не убывает');
+  for (const d of [0, 7, 50, 150, 400, 900]) if (AE.expect(D, 1000, 1000 + d, 0) + AE.expect(D, 1000 + d, 1000, 0) !== BP) say(`Эло: ожидание несимметрично при разнице ${d}`);
+  if (AE.expect(D, 1000, 1000, D.elo.def.shift) <= 5000) say('Эло: сдвиг защиты не в пользу атакующего');
+  const K = D.elo.k;
+  if (AE.kOf(D, 0, 1000) !== K.new || AE.kOf(D, K.newGames, 1000) !== K.base || AE.kOf(D, K.newGames, K.highFrom + 1) !== K.high || AE.kOf(D, K.newGames, K.highFrom) !== K.base) say('Эло: K не по правилам — новичок, база, выше порога');
+  const A0 = { r: 1200, g: 99 }, B0 = { r: 1200, g: 99, lost: 0 };
+  const w = AE.attack(D, A0, B0, 2), l = AE.attack(D, A0, B0, 0), dr = AE.attack(D, A0, B0, 1);
+  if (!(w.da > 0 && w.dd < 0 && l.da < 0 && l.dd > 0)) say('Эло: знаки сдвигов при победе и поражении');
+  if (l.dd !== AE.divRound(l.raw * D.elo.def.winBp, BP)) say('Эло: удачная оборона — не доля расчётного');
+  if (AE.attack(D, A0, Object.assign({}, B0, { lost: D.elo.def.lossCap }), 2).dd !== 0 || AE.attack(D, A0, Object.assign({}, B0, { lost: D.elo.def.lossCap - 1 }), 2).dd >= 0) say('Эло: потери обороны не ограничены поражениями за сутки');
+  if (!(dr.da < 0 || dr.da === 0) || dr.lost) say('Эло: ничья — не поражение обороны, атакующему со сдвигом — не выигрыш');
+  /* выгода равной атаки при честном шансе (шанс = ожидание со сдвигом): ноль с точностью до округления */
+  for (const r of [1000, 1300, 1700]) {
+    const p = AE.expect(D, r, r, D.elo.def.shift), a = AE.attack(D, { r, g: 99 }, { r, g: 99 }, 2).da, b = AE.attack(D, { r, g: 99 }, { r, g: 99 }, 0).da;
+    if (Math.abs(p * a + (BP - p) * b) > BP) say(`Эло: выгода равной атаки на ${r} — не ноль`);
+  }
+  if (AE.reset(D, 1500) !== 1250 || AE.reset(D, 700) !== 850 || AE.reset(D, 1000) !== 1000 || AE.reset(D, 1001) !== 1000) say('сезон: сброс не 1000 + (Р − 1000) × 0,5 к старту');
+  /* Лига: все исходы двух и трёх раундов */
+  for (const a of [0, 1, 2]) for (const b of [0, 1, 2]) {
+    const need = a + b === 2;
+    if (AE.leagueNext([a, b]) !== need) say(`Лига: третий раунд при ${a}:${b} — ${!need}`);
+    const s2 = AE.leagueScore([a, b]);
+    if (!need && s2.half !== (a + b > 2 ? 2 : 0)) say(`Лига: матч ${a}+${b} — не тот исход`);
+    for (const c of [0, 1, 2]) { const s3 = AE.leagueScore([a, b, c]); if (need && s3.half !== (2 + c > 3 ? 2 : 2 + c < 3 ? 0 : 1)) say(`Лига: матч ${a}+${b}+${c} — не тот исход`); }
+  }
+  /* подбор */
+  const pool = D.pool.arena.filter(o => o.c === 2).map(o => ({ id: o.id, r: o.r })), Mk = D.arena;
+  const L1 = AE.pickList(Mk, pool, 1300, AE.makeRng(7), []), L2 = AE.pickList(Mk, pool, 1300, AE.makeRng(7), []);
+  if (L1.ids.join() !== L2.ids.join()) say('подбор: тот же сид — другой список');
+  if (L1.ids.length !== Mk.list || L1.ids.some(id => Math.abs(pool.find(x => x.id === id).r - 1300) > L1.w)) say('подбор: список не из окна');
+  const L3 = AE.pickList(Mk, pool, 1300, AE.makeRng(7), L1.ids);
+  if (L3.ids.some(id => L1.ids.includes(id))) say('подбор: вернул тех, кого надо пропустить');
+  const far = AE.pickList(Mk, pool, 2600, AE.makeRng(3), []);
+  if (far.w !== Mk.maxWindow) say('подбор: окно не расширяется до предела при недоборе');
+  if (AE.dailyEn(D, 1) !== 100 || AE.dailyEn(D, 10) !== 50 || AE.dailyEn(D, 11) !== 25 || AE.dailyEn(D, 100) !== 10 || AE.dailyEn(D, 101) !== 0) say('Энериум за место: не таблица §20.6');
+  if (AE.attemptsAfter(Mk, 35, 1) !== Mk.att.cap || AE.attemptsAfter(Mk, 0, 1) !== Mk.att.day) say('попытки: не копятся до предела');
+}
+if (err.length) done();
+
+/* ================== песочница ================== */
+function load() {
+  const stubEl = id => {
+    const e = { id, innerHTML: '', textContent: '', value: '', hidden: false, style: { setProperty() {} }, dataset: {}, children: [],
+      classList: { add() {}, remove() {}, toggle() {}, contains: () => false }, addEventListener() {}, removeEventListener() {}, appendChild: x => x, append() {}, prepend() {}, remove() {},
+      animate: () => ({}), insertAdjacentHTML() {}, setAttribute() {}, getAttribute: () => null, querySelectorAll: () => [], closest: () => null,
+      getBoundingClientRect: () => ({ left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 }), scrollIntoView() {}, focus() {}, select() {}, clientWidth: 1200, clientHeight: 800 };
+    e.querySelector = () => stubEl();
+    return e;
+  };
+  const rootCls = new Set(), root = stubEl('html');
+  root.classList = { add: c => rootCls.add(c), remove: c => rootCls.delete(c), toggle: (c, on) => { const v = on === undefined ? !rootCls.has(c) : !!on; if (v) rootCls.add(c); else rootCls.delete(c); return v; }, contains: c => rootCls.has(c) };
+  const els = {};
+  const document = { readyState: 'loading', addEventListener() {}, getElementById: id => (els[id] = els[id] || stubEl(id)),
+    querySelector: () => null, querySelectorAll: () => [], createElement: () => stubEl(), createElementNS: () => stubEl(), body: stubEl('body'),
+    documentElement: root, activeElement: null, fonts: null };
+  const noStore = () => { throw new Error('localStorage недоступен'); };
+  const win = { document, console, navigator: { userAgent: 'node' }, location: { hash: '', href: '' }, history: { replaceState() {} },
+    localStorage: { getItem: noStore, setItem: noStore, removeItem: noStore }, innerWidth: 1400, innerHeight: 900, devicePixelRatio: 1,
+    addEventListener() {}, removeEventListener() {}, dispatchEvent() {}, matchMedia: () => ({ matches: false, addEventListener() {}, addListener() {} }),
+    requestAnimationFrame: () => 0, cancelAnimationFrame() {}, setTimeout: () => 0, clearTimeout() {}, setInterval: () => 0, clearInterval() {},
+    getComputedStyle: () => ({ getPropertyValue: () => '' }), CustomEvent: function CustomEvent() {}, performance: { now: () => 0 } };
+  win.window = win; win.self = win;
+  const ctx = vm.createContext(win);
+  for (const s of scripts) {
+    try { vm.runInContext(s.src ? read(s.src) : s.code, ctx, { filename: s.src || 'index.html' }); }
+    catch (e) { say(`выполнение ${s.src || 'встроенного скрипта'}: ${e.message}`); }
+  }
+  const T = vm.runInContext(`({
+    get S() { return S; }, set S(v) { S = v; },
+    ACT, OV, FLOWS, KH, KIT_EXTRA, MAP, RS, RSI, EB, H, SQ, SQ_DATA, ZP_DEMO: typeof ZP_DEMO !== 'undefined' ? ZP_DEMO : null, render, initialState, setTeam, advance,
+    darRows: typeof darRows === 'function' ? darRows : null, WEEK: window.EN_WEEK, UIA: window.EN_ARENA_UI, AD: window.EN_ARENA, AE: window.EnArena,
+  })`, ctx);
+  return { T, els, game: () => (els.game ? els.game.innerHTML : '') };
+}
+const P = load(), T = P.T;
+if (!T.UIA || !T.AD) { say('screens/arena.js не отработал: нет EN_ARENA_UI'); done(); }
+const U = T.UIA;
+const run = (where, f) => { try { return f(); } catch (e) { say(`${where}: исключение — ${e.message} | ${(e.stack || '').split('\n').slice(1, 3).join(' | ').trim()}`); return undefined; } };
+const ENT = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', '#39': "'" };
+const decode = s => s.replace(/&(#\d+|#x[\da-f]+|[a-z]+);/gi, (x, k) => ENT[k] || (k[0] === '#' ? String.fromCodePoint(k[1] === 'x' ? parseInt(k.slice(2), 16) : +k.slice(1)) : x));
+const tips = h => [...h.matchAll(/\s(?:title|placeholder|aria-label)="([^"]*)"/g)].map(m => decode(m[1]).replace(/\s+/g, ' ').trim()).filter(Boolean);
+function view(where) {
+  cnt.views++;
+  run(where, () => T.render());
+  const h = P.game();
+  if (typeof h !== 'string' || !h) { say(`${where}: пустая разметка`); return ''; }
+  const bad = h.match(/.{0,60}(?:undefined|NaN|\[object ).{0,40}/);
+  if (bad) say(`${where}: в разметке undefined, NaN или [object — «${bad[0].replace(/\s+/g, ' ')}»`);
+  if (!T.KH.team) {
+    cnt.player++;
+    const v = strip(h), txt = playerText(h).split('\n').concat(tips(v));
+    for (const t of txt) for (const [what, re] of SERVICE) { const m = t.match(re); if (m) say(`${where}: игроку видно служебное (${what}) — «${t.slice(Math.max(0, m.index - 40), m.index + 60)}»`); }
+  }
+  return h;
+}
+const ovOf = h => { const i = h.indexOf('<div class="ov'); return i < 0 ? '' : h.slice(i); };
+const fresh = () => { T.S = T.initialState(); T.S.overlay = null; T.S.route = 'arena'; T.S.seg.arena = 'arena'; T.S.runs = []; };
+const act = (a, v, where) => { cnt.ops++; return run(where || `${a} ${v}`, () => T.ACT[a](v)); };
+const btn = (h, a) => { const m = h.match(new RegExp(`data-a="${a}" data-v="([^"]+)"`)); return m ? decode(m[1]) : null; };
+/* бой до конца вне экрана боя: так просмотр не рисует частицы */
+const finish = R => { const was = T.S.route; T.S.route = 'week'; for (let n = 0; n < 40000 && !R.over; n++) run('просмотр', () => T.advance(R, 500)); T.S.route = was; };
+
+/* ================== 4. бой PvP ядром ================== */
+{
+  fresh();
+  const o = T.AD.pool.arena.find(x => x.c === 2), mine = T.SQ.ids('arena');
+  const my = mine.map(id => T.EB.heroSrc(T.H(id))), th = o.f.map(x => T.EB.heroSrc(U.oppHero(x)));
+  const seed = T.AE.battleSeed('арена', 'проба', 0, T.AE.teamKey(mine), T.AE.teamKey(o.f.map(x => x[0])));
+  const b1 = T.EB.run(T.AE.pvpBattle(T.EB, my, th, seed, D.arena.rounds)), b2 = T.EB.run(T.AE.pvpBattle(T.EB, my, th.slice().reverse(), seed, D.arena.rounds));
+  const r1 = T.AE.pvpResult(b1), r2 = T.AE.pvpResult(b2); cnt.fights += 2;
+  if (JSON.stringify(r1) !== JSON.stringify(r2)) say('бой: порядок отряда защитника меняет исход');
+  const probe = T.EB.create({ mode: 'rounds', heroes: th.map(s => Object.assign({}, s)), foes: [], seed: 1 }).u[0];
+  for (const u of b1.u[1]) { const p = probe.find(x => 'b:' + x.key === u.key); if (!p || p.maxHp !== u.maxHp) say(`бой: у защитника ${u.name} здоровье не героя`); }
+  if (r1.why === 'win' ? r1.half !== 2 : r1.why === 'wipe' ? r1.half !== 0 : r1.half !== (r1.shA > r1.shB ? 2 : r1.shA < r1.shB ? 0 : 1)) say('бой: исход не по правилу §20.2');
+  if (b1.maxRounds !== D.arena.rounds) say('бой: предел раундов не из данных');
+}
+
+/* ================== 5. «сервер» Арены ================== */
+fresh();
+{
+  const A = () => T.S.arena;
+  if (A().opp.length !== D.arena.list) say(`список: соперников ${A().opp.length}, ждали ${D.arena.list}`);
+  for (const id of A().opp) { const o = T.AD.pool.arena.find(x => x.id === id); if (!o || o.c !== T.S.acc.cycle || Math.abs(o.r - A().rating) > D.arena.maxWindow) say(`список: ${id} не из цикла или вне окна`); }
+  const pl = (T.S.ranks.find(x => x[0] === 'Арена') || [])[1];
+  if (pl !== U.arPlace(A().rating)) say('место Арены в S.ranks не сходится с рейтингом');
+  /* атака: подготовка, «В бой», итог */
+  const oid = A().opp[0]; T.S.overlay = { t: 'opp', arg: oid };
+  let h = view('витрина соперника');
+  if (!h.includes('data-a="arprep"')) say('витрина: нет «Выбрать отряд»');
+  if ((ovOf(h).match(/class="hc/g) || []).length < 5) say('витрина: не пять героев соперника');
+  act('arprep', oid);
+  if (!T.S.overlay || T.S.overlay.t !== 'prep' || T.S.overlay.arg !== 'pvp') say('подготовка: не открылся лист атаки');
+  h = view('подготовка атаки');
+  const go = btn(ovOf(h), 'aratk'); if (!go) say('подготовка: нет «В бой»');
+  const r0 = A().rating, att0 = A().att, n0 = A().games;
+  act('aratk', go);
+  const L = A().last, R = T.S.runs.find(r => r.kind === 'pvp');
+  if (!L || !R) say('атака: нет итога или просмотра');
+  else {
+    cnt.fights++;
+    if (A().att !== att0 - 1 || A().games !== n0 + 1 || A().rating !== r0 + L.e.da) say('атака: попытка, боёв или рейтинг не сходятся');
+    if (A().opp.includes(oid) || !A().hit[oid]) say('атака: соперник не выбыл');
+    if (T.S.route !== 'battle') say('атака: не открылся бой');
+    view('бой Арены');
+    /* показ — тот же бой: исход просмотра совпадает с решённым */
+    const shown = T.AE.pvpResult(T.EB.run(T.AE.pvpBattle(T.EB, L.fights[0].a, L.fights[0].b, L.fights[0].seed, L.fights[0].rounds)));
+    if (JSON.stringify(shown) !== JSON.stringify(L.fights[0].res)) say('просмотр: бой не тот, что решил исход');
+    T.S.route = 'arena'; act('arskip', R.id);
+    h = view('итог боя');
+    if (!/Победа|Поражение|Ничья/.test(ovOf(h))) say('итог: нет исхода');
+    const r1 = A().rating;
+    act('aratk', go);   // повтор того же номера
+    if (A().rating !== r1 || A().att !== att0 - 1) say('атака: повтор номера что-то изменил');
+    /* повтор атаки того же соперника — отказ */
+    const r2 = U.SRV.attack('a' + A().seq, oid, (U.mySquad() || {}).id);
+    if (!r2.refuse) say('атака: того же соперника атаковали дважды за неделю');
+    /* «Смотреть бой» из итога */
+    act('arwatch', R.id); const R2 = T.S.runs.find(r => r.kind === 'pvp');
+    if (!R2) say('«Смотреть бой»: нет просмотра'); else { finish(R2); if (!R2.over) say('«Смотреть бой»: просмотр не кончился'); }
+  }
+  /* отказ: неполный отряд — ничего не меняется */
+  const s5 = T.S.squads.find(s => s.m.filter(Boolean).length < 5);
+  if (s5) { const before = JSON.stringify([A().rating, A().att, A().opp]); const r = U.SRV.attack('a' + A().seq, A().opp[0], s5.id); if (!r.refuse || JSON.stringify([A().rating, A().att, A().opp]) !== before) say('атака неполным отрядом: не отказ или что-то изменилось'); }
+  /* попытки кончились */
+  const keep = A().att; A().att = 0;
+  { const r = U.SRV.attack('a' + A().seq, A().opp[0], (U.mySquad() || {}).id); if (!r.refuse || r.refuse !== 'att') say('атака без попыток: не отказ'); }
+  A().att = keep;
+  /* список кончился — новый сразу */
+  const list0 = A().listNo;
+  while (A().opp.length) { const id = A().opp[0]; const r = U.SRV.attack('a' + A().seq, id, (U.mySquad() || {}).id); cnt.ops++; cnt.fights++; if (r.refuse) { say('атака подряд: отказ ' + r.refuse); break; } if (A().listNo !== list0) break; }
+  if (A().listNo === list0 || A().opp.length !== D.arena.list) say('список: после последнего соперника новый не пришёл');
+  /* обновление: бесплатно — по таймеру; иначе за Энериум по цене суток, до лимита */
+  A().freeAt = T.S.week.left - 3600; A().paid = 0;
+  const en0 = T.S.wallet.enerium;
+  let r = U.SRV.refresh('a' + A().seq, 'arena', false); if (!r.refuse || r.refuse !== 'free') say('обновление: бесплатное до таймера');
+  const prices = [];
+  for (let k = 0; k < D.arena.refresh.price.length + 1; k++) { const op = 'a' + A().seq; r = U.SRV.refresh(op, 'arena', true); cnt.ops++; if (!r.refuse) { prices.push(r.price); const again = U.SRV.refresh(op, 'arena', true); if (!again.again) say('обновление: повтор номера — новая операция'); } }
+  if (prices.join() !== D.arena.refresh.price.join() || T.S.wallet.enerium !== en0 - prices.reduce((a, x) => a + x, 0)) say(`обновление: цены ${prices.join('/')} или расход Энериума не сходятся`);
+  if (!r.refuse || r.refuse !== 'limit') say('обновление: нет лимита суток');
+  A().freeAt = T.S.week.left + 1; r = U.SRV.refresh('a' + A().seq, 'arena', false); if (r.refuse) say('обновление: бесплатное по таймеру — отказ ' + r.refuse);
+  /* сутки: попытки до предела, Энериум топа письмом, нападения на оборону */
+  A().att = D.arena.att.cap - 3; A().rating = 1500; const inbox0 = T.S.inbox.length, day0 = A().day;
+  T.S.route = 'arena'; T.S.seg.arena = 'def'; T.S.overlay = null;
+  let hd = view('оборона');
+  act('arday', btn(hd, 'arday') || 'a' + A().seq);
+  if (A().att !== D.arena.att.cap) say('сутки: попытки не дошли до предела');
+  if (A().day !== Math.min(7, day0 + 1)) say('сутки: день не сменился');
+  if (!T.S.inbox.some(m => m.rew && m.rew.some(x => x[0] === 'enerium'))) say('сутки: на месте в топ-100 нет Энериума письмом');
+  if (T.S.inbox.length <= inbox0) say('сутки: писем нет');
+  const defs = A().log.filter(x => x.k === 'def' && x.fight);
+  if (!defs.length) say('сутки: нападений на оборону нет');
+  T.S.route = 'arena'; T.S.overlay = null; hd = view('оборона после суток');
+  const eye = btn(hd, 'ardefplay'); if (!eye) say('оборона: у свежего нападения нет «Смотреть бой»'); else {
+    act('ardefplay', eye); const R3 = T.S.runs.find(x => x.kind === 'pvp');
+    if (R3) { view('бой обороны'); finish(R3); T.S.route = 'arena'; T.S.overlay = { t: R3.scene.result, arg: R3.id }; const ho = ovOf(view('итог обороны')); if (!/Оборона выстояла|Оборону пробили|Ничья/.test(ho)) say('итог обороны: нет исхода глазами защитника'); }
+  }
+  /* оборона из последней атаки, пока игрок её не выбрал */
+  const s2 = T.S.squads.find(s => s.m.filter(Boolean).length === 5 && s.id !== T.SQ.of('arena')) || null;
+  if (s2) { A().defAuto = true; T.SQ.set('pvp', s2.id); const id = A().opp[0]; U.SRV.attack('a' + A().seq, id, s2.id); if (T.SQ.of('arena') !== s2.id) say('оборона: не назначилась из последней атаки'); }
+  /* сезон: сброс рейтинга */
+  const rs = A().rating; act('arseason', 'a' + A().seq);
+  if (A().rating !== T.AE.reset(D, rs) || A().wins !== 0 || Object.keys(A().hit).length) say('сезон: сброс рейтинга, побед или атакованных не по правилам');
+}
+
+/* ================== 6. Лига ================== */
+fresh();
+{
+  if (U.lgOpen()) say('Лига: в демо открыта, а героев меньше 15');
+  T.S.seg.arena = 'league'; let h = view('Лига · закрыта');
+  if (!h.includes('Нужно 15 разных героев')) say('Лига: закрытая вкладка не говорит «Нужно 15 разных героев»');
+  const W = T.WEEK;
+  if (W) { const st = W.state('league', 'now'), sp = W.state('league', 'past'); if (!st.lock || !sp.lock) say('Неделя: Лига не закрыта в демо'); }
+  if (T.darRows && T.darRows(T.S).some(p => p.id === 'league')) say('«Дары»: у демо-аккаунта есть сундуки Лиги, а Лига закрыта');
+  /* сценарий: коллекция на 15 героев, три отряда без повторов */
+  run('сценарий Лиги', () => U.lgDemo());
+  if (!U.lgOpen()) say('Лига: сценарий не открыл Лигу');
+  const L = T.SQ.ready('league'); if (!L.ok) say('Лига: сценарий не собрал три отряда — ' + L.why);
+  if (T.darRows && !T.darRows(T.S).some(p => p.id === 'league')) say('«Дары»: Лига открыта, а сундуков Лиги нет');
+  T.S.overlay = null; h = view('Лига · открыта');
+  if ((h.match(/class="ar-card"/g) || []).length !== D.league.list) say('Лига: не три соперника');
+  const oid = T.S.arena.lg.opp[0]; T.S.overlay = { t: 'lgopp', arg: oid }; h = view('матч Лиги · доска');
+  if ((ovOf(h).match(/class="lg-row"/g) || []).length !== 3) say('матч Лиги: не три раунда на доске');
+  const go = btn(ovOf(h), 'lgplay'); if (!go) say('матч Лиги: нет «Сыграть матч»');
+  const G = T.S.arena.lg, r0 = G.rating, a0 = G.att;
+  act('lgplay', go);
+  const R = T.S.runs.find(r => r.kind === 'pvp'), Lm = T.S.arena.last;
+  if (!R || !Lm || Lm.mode !== 'league') say('матч Лиги: нет просмотра или итога');
+  else {
+    cnt.fights += Lm.fights.length;
+    const halves = Lm.fights.map(F => F.res.half);
+    if (Lm.fights.length === 3 && halves[0] + halves[1] !== 2) say('матч Лиги: третий раунд без равного счёта');
+    if (Lm.fights.length === 2 && halves[0] + halves[1] === 2) say('матч Лиги: при равном счёте нет третьего раунда');
+    if (new Set(Lm.fights.flatMap(F => F.mine)).size !== Lm.fights.length * 5) say('матч Лиги: герой повторился');
+    if (G.rating !== r0 + Lm.e.da || G.att !== a0 - 1) say('матч Лиги: рейтинг или попытки');
+    view('бой Лиги'); finish(R);
+    if (!R.over) say('матч Лиги: просмотр не кончился');
+    T.S.route = 'arena'; T.S.overlay = { t: 'lgres', arg: R.id }; h = view('итог матча');
+    if (!/Победа|Поражение|Ничья/.test(ovOf(h))) say('итог матча: нет исхода');
+    act('lgplay', go); if (G.rating !== r0 + Lm.e.da) say('матч Лиги: повтор номера что-то изменил');
+  }
+}
+
+/* ================== 7. вид и правила воздуха ================== */
+for (const team of [false, true]) {
+  const tag = team ? ' [команда]' : '';
+  fresh(); run('режим', () => T.setTeam(team));
+  for (const seg of ['arena', 'league', 'def']) {
+    T.S.seg.arena = seg; const h = view(`вкладка ${seg}${tag}`);
+    if (seg === 'arena') for (const c of h.split('<button class="ar-card"').slice(1).map(x => x.slice(0, x.indexOf('</button>')))) {
+      cnt.cards++;
+      const txt = playerText('<b ' + c + '</b>'), nums = txt.match(/\d[\d\s ]*/g) || [];
+      if (nums.length > 2) say(`карточка соперника: ${nums.length} чисел — «${txt.replace(/\s+/g, ' ').slice(0, 90)}»`);
+      if ((c.match(/class="chip/g) || []).length > 1) say('карточка соперника: больше одного чипа');
+      if (/<button/.test(c)) say('карточка соперника: больше одного действия');
+    }
+  }
+  if (team) { const h = view('команда · вкладка'); if (!/team-only/.test(h)) say('режим «Команда»: нет служебного'); }
+  const oid = T.S.arena.opp[0];
+  const sheets = [['opp', oid], ['opp', '0'], ['arhero', `arena:${oid}:0`], ['arrew', 'arena'], ['arrew', 'league'], ['arrules', 'arena'], ['arrules', 'league'], ['arpay', 'arena'], ['arpay', 'league'], ['ardef', ''], ['rank', 'Арена'], ['rank', 'Лига']];
+  for (const [t, arg] of sheets) { T.S.seg.arena = 'arena'; T.S.overlay = { t, arg }; const h = view(`лист ${t} ${arg}${tag}`); if (!h.includes('class="ov"')) say(`лист ${t} ${arg} не открылся`); }
+  T.S.arena.pick = oid; T.S.overlay = { t: 'prep', arg: 'pvp', back: 'arena' }; view(`подготовка${tag}`);
+  T.S.overlay = null; T.S.acc.cycle = 1; view(`Арена в цикле I${tag}`); T.S.acc.cycle = 2;
+  run('режим', () => T.setTeam(false));
+}
+
+/* ================== 8. неделя ================== */
+fresh();
+{
+  const W = T.WEEK; if (!W) say('нет EN_WEEK'); else {
+    const M = W.modes(), ar = M.find(m => m.id === 'arena'), lg = M.find(m => m.id === 'league');
+    if (!ar || ar.demo || !lg || lg.demo) say('Неделя: строки Арены и Лиги — не настоящие, а демо');
+    const st = W.state('arena', 'now');
+    if (st.lock) say('Неделя: Арена закрыта в цикле II');
+    else {
+      if (st.points !== T.S.arena.rating || st.have !== T.S.arena.wins || st.place !== U.arPlace(T.S.arena.rating)) say('Неделя: Арена — не рейтинг, победы или место экрана');
+      st.planks.forEach((p, i) => { if (p.need !== D.arena.plank * [1, 2, 4, 8][i]) say(`Неделя: планка Арены ${i + 1} — ${p.need}`); });
+    }
+    const past = W.state('arena', 'past'), en = (T.S.arena.past.days || []).reduce((a, p) => a + T.AE.dailyEn(D, p), 0);
+    if ((past.cur.find(x => x[0] === 'enerium') || [0, 0])[1] !== en) say('Неделя: Энериум Арены прошлой недели — не суточные срезы');
+    T.S.route = 'week'; T.S.seg.week = 'now'; view('Неделя · эта'); T.S.seg.week = 'past'; view('Неделя · прошлая');
+    for (const t of ['now', 'past']) for (const id of ['arena', 'league']) { T.S.overlay = { t: 'wkmode', arg: `${id}:${t}` }; view(`Неделя · лист ${id} ${t}`); }
+  }
+}
+
+/* ================== 9. UI-кит и сценарии ================== */
+{
+  const x = T.KIT_EXTRA.find(k => { try { return /id="kitArena"/.test(k.html()); } catch (_) { return false; } });
+  if (!x) say('UI-кит: нет раздела «Арена и Лига»');
+  else { const h = run('UI-кит', () => x.html()) || ''; if (/undefined|NaN|\[object /.test(h)) say('UI-кит: undefined или NaN'); if (!h.includes('ar-card')) say('UI-кит: нет карточки соперника'); }
+  for (const n of ['Арена · соперник целиком', 'Арена · атака и итог', 'Арена · оборона', 'Лига · матч']) {
+    const f = T.FLOWS.find(y => y[0] === n); if (!f) { say(`нет сценария «${n}»`); continue; }
+    fresh(); run('сценарий ' + n, () => f[2]()); view(`сценарий «${n}»`);
+    const R = T.S.runs.find(r => r.kind === 'pvp'); if (R) { finish(R); T.S.runs = []; }
+  }
+}
+done();

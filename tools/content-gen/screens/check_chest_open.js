@@ -5,8 +5,9 @@
       всплеск, искра, самая ценная; растут с редкостью. Лучи — с эпической, кольца и дрожь всплеска — с древней. У каждого вида
       сундука из EN_LOOTBOXES — свой материал заглушки и рамка рисунка: крышка над швом, корпус под ним, размеры — как у слоёв
       tools/art-gen/chest_layers.py (PNG в art/generated, если они есть).
-   3. Операция: кнопка «Открыть» карточки несёт номер операции. Выдача — до анимации: запасы, кошелёк, осколки и «из сундуков»
-      изменились ровно на итог, итог — EnLoot.roll на сиде каждого сундука с прахом по коллекции (пересчёт независимый). Повтор того же
+   3. Операция: кнопка «Открыть» карточки несёт номер операции. Выдача — до анимации: запасы, кошелёк, осколки, «из сундуков» и
+      снаряжение (предметами — screens/equipment.js) изменились ровно на итог, итог — EnLoot.roll на сиде каждого сундука с прахом по
+      коллекции (пересчёт независимый). Повтор того же
       номера ничего не выдаёт и показа не меняет; две свежие сессии с одними номерами получают одни итоги.
    4. Анимация по часам песочницы: карточки — все выпавшие записи по возрастанию ценности, самая ценная последней и крупнее, у каждой —
       выпавшая редкость; карточка поднимается из щели сундука к своему месту. Свет поднимается от нижней ступени окна сундука до
@@ -164,7 +165,7 @@ function fresh(P, o = {}) {
   T.S = T.initialState(); T.S.overlay = null; T.S.route = 'craft'; T.S.seg.craft = 'stock'; T.S.zp.tab = 'chest';
   if (o.skip != null) T.S.co.skip = o.skip;
 }
-const snap = T => JSON.parse(JSON.stringify({ wallet: T.S.wallet, items: T.S.bag.items, shards: T.S.rs.shards, extra: T.S.zp.extra, chests: T.S.bag.chests.map(c => c.id), op: T.S.zp.op }));
+const snap = T => JSON.parse(JSON.stringify({ wallet: T.S.wallet, items: T.S.bag.items, shards: T.S.rs.shards, extra: T.S.zp.extra, eq: T.S.eq ? Object.keys(T.S.eq.items).length : 0, chests: T.S.bag.chests.map(c => c.id), op: T.S.zp.op }));
 const grp = (T, key) => T.zpChestGroups().find(g => g.key === key) || null;
 /* ожидаемый итог — независимо: EnLoot.roll на сиде каждого сундука, прах по коллекции на момент открытия */
 function expect(T, chests) {
@@ -175,15 +176,17 @@ function expect(T, chests) {
     return { cur: conv.cur, items: conv.items };
   });
 }
-/* сдвиг запасов по ожидаемому итогу: валюта — в кошелёк, ресурсы — в запасы, осколки — героям, прах — в кошелёк, прочее — «из сундуков» */
+/* сдвиг запасов по ожидаемому итогу: валюта — в кошелёк, ресурсы — в запасы, осколки — героям, прах — в кошелёк, снаряжение — предметами
+   в запасы снаряжения (screens/equipment.js: сервер создаёт предмет на сиде сундука), прочее — «из сундуков» */
 function delta(T, log) {
-  const d = { wallet: {}, items: {}, shards: {}, extra: {} }, add = (m, k, q) => { m[k] = (m[k] || 0) + q; };
+  const d = { wallet: {}, items: {}, shards: {}, extra: {}, eq: 0 }, add = (m, k, q) => { m[k] = (m[k] || 0) + q; };
   for (const L of log) {
     for (const [k, a] of L.cur) add(d.wallet, k, a);
     for (const it of L.items) {
       if (it.kind === 'item') add(d.items, it.id, it.q);
       else if (it.kind === 'cur') add(d.wallet, it.id, it.q);
       else if (it.kind === 'shard') { if (it.dust) add(d.wallet, 'dust', it.dust); else add(d.shards, it.id, it.q); }
+      else if (it.kind === 'equip' && T.S.eq) d.eq += it.q;
       else add(d.extra, T.zpExtraKey(it), it.q);
     }
   }
@@ -214,6 +217,7 @@ function checkOp(P, where, s0, key, chests, op, skip) {
   if (!eq(sorted(diff(s0.items, s1.items)), sorted(d.items))) say(`${where}: запасы изменились не на итог`);
   if (!eq(sorted(diff(s0.shards, s1.shards)), sorted(d.shards))) say(`${where}: осколки изменились не на итог`);
   if (!eq(sorted(diff(s0.extra, s1.extra)), sorted(d.extra))) say(`${where}: «из сундуков» изменилось не на итог`);
+  if (s1.eq - s0.eq !== d.eq) say(`${where}: снаряжения прибавилось ${s1.eq - s0.eq}, по итогу — ${d.eq}`);
   const gone = s0.chests.filter(id => !s1.chests.includes(id));
   if (!eq(gone.sort(), chests.map(c => c.id).sort())) say(`${where}: из запасов ушли не те сундуки`);
   if (!R || R.key !== key || R.n !== chests.length) { say(`${where}: показ не начат или не тот`); return null; }

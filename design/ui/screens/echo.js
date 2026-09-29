@@ -28,7 +28,7 @@ const ECH = {
   points: [100, 120, 144, 173, 207, 249, 598, 717, 860, 1032, 2478, 2973, 3568, 26750],   // прежние базовые очки §17.5, цикл II
   manyPoints: 0,                                        // Многоликий: за победу — ресурс «Многоликий», очки — за этажи его биома (ADR-0025, ответ автора)
   hp: [4800, 5400, 6000, 6600, 7200, 7800, 18500, 19200, 19900, 20600, 86000, 92000, 98000, 240000],   // здоровье ступеней, цикл I
-  bm: [12400, 13100, 13800, 14500, 15200, 15900, 32600, 33000, 33400, 33800, 76200, 79000, 82000, 150000],
+  bm: [12400, 13100, 13800, 14500, 15200, 15900, 32600, 33000, 33400, 33800, 76200, 79000, 82000, 150000],   // мощь ступеней, цикл I — запасная шкала: с правилами режима мощь считает BM.unit по карте цели
   many: { hp: 4800, bm: 12400 },                        // Многоликий — лёгкий бой один на один: как первая ступень, демо
   craft: { hp: 120000, bm: 90000 },                     // крафтовый босс — по своему циклу (§12.3)
   cycMul: 3,                                            // здоровье и мощь — ×3 за цикл
@@ -301,6 +301,23 @@ function likShards(c, fb) {
 }
 const isLik = fb => !!(fb && (fb.heroShardsWeekBp || fb.heroShardsWeek));   // крафтовый босс, что платит осколками героев недели
 const bmOf = (step, c) => at(step === MANY ? ECH.many.bm : ECH.bm[step - 1], c);
+/* мощь цели — та же формула §6, что у героев и врагов биомов (BM.unit, index.html): карта главного врага в ядре — образец класса,
+   уровень ступени и здоровье цели по правилам режима, как в бою (fightOf). Без правил (цикл I) и у Многоликого и крафтового босса —
+   демо-шкала ECH, как и их здоровье */
+const POW = new Map();
+function powOf(race, step, c) {
+  const row = step >= 1 && step <= TOP ? ruleRow(step, c) : null;
+  if (!row || typeof BM === 'undefined') return bmOf(step, c);
+  const k = `${race}|${step}|${c}`; if (POW.has(k)) return POW.get(k);
+  let v = bmOf(step, c);
+  try {
+    ensureLib();
+    const f = stepFoe(fidOf(race, step)), max = hpOf(step, c, race);
+    const u = EB.create({ mode: 'rounds', heroes: [], foes: [unitOf(f, 0, lvlOf(step, c), { max, hp: max }, row)], seed: 1 }).u[1][0];
+    if (u) v = BM.unit(u);
+  } catch (_) { v = bmOf(step, c); }
+  POW.set(k, v); return v;
+}
 /* здоровье цели Эхо: по правилам — здоровье главного врага в бою (ядро: образец класса, уровень, bossHpPct); иначе демо-шкала */
 function hpOf(step, c, race) {
   const r = ruleRow(step, c), f = r ? stepFoe(fidOf(race, step)) : null;
@@ -486,7 +503,7 @@ function target(s, kind, x, o = {}) {
   const W = weekOf(s), c = s.acc.cycle, base = { uid: 'ech' + (++s.ech.seq), kind, race: W.race, cyc: c, atk: 0 };
   if (kind === 'step') {
     const f = stepFoe(fidOf(W.race, x)), max = hpOf(x, c, W.race);
-    return { ...base, fid: f.fid, step: x, g: f.g, el: f.el, bm: at(ECH.bm[x - 1], c), max, hp: o.hpBp ? Math.max(1, Math.floor(max * o.hpBp / BP)) : max, left: (o.leftH || lifeOf(f.g)) * ECH.hour };
+    return { ...base, fid: f.fid, step: x, g: f.g, el: f.el, bm: powOf(W.race, x, c), max, hp: o.hpBp ? Math.max(1, Math.floor(max * o.hpBp / BP)) : max, left: (o.leftH || lifeOf(f.g)) * ECH.hour };
   }
   if (kind === 'many') {
     const u = manyFoe(W.race), max = hpOf(MANY, c, W.race);
@@ -612,7 +629,7 @@ function summonHtml(i) {
 function pickHtml(i, p, c) {
   const mine = S.ech.weekSquad ? 0 : sqBM(sq(S.echoSquad));
   const rows = p.offers.map(st => {
-    const f = stepFoe(fidOf(S.ech.wk, st)), a = atkCost({ step: st, g: f.g, cyc: c }), rn = roundsOf(f.g), bm = bmOf(st, c), pts = ptsOf(st, c), k = mine ? vsOf(mine, bm) : '';
+    const f = stepFoe(fidOf(S.ech.wk, st)), a = atkCost({ step: st, g: f.g, cyc: c }), rn = roundsOf(f.g), bm = powOf(S.ech.wk, st, c), pts = ptsOf(st, c), k = mine ? vsOf(mine, bm) : '';
     const tip = `Здоровье ${fmt(hpOf(st, c, S.ech.wk))} · срок ${lifeOf(f.g)} ч · ${rn} ${plural(rn, 'раунд', 'раунда', 'раундов')}${pts ? ` · за победу ${fmt(pts)} ${plural(pts, 'очко', 'очка', 'очков')}` : ''}`;
     const per = rn && a % rn === 0 ? ` · атака = ${rn} ${plural(rn, 'раунд', 'раунда', 'раундов')} × ${a / rn} ${souls(a / rn)} (данные режима)` : '';
     return `<div class="ech-offer" data-step="${st}" title="${tmT(tip, tip + per)}">${ph(f, 'sm')}<span class="col ech-on"><b class="serif">${shortOf(f)}</b><span class="row ech-oc"><span class="chip ${f.g === 'o' ? '' : 'gold'}">${rankIc(f.g)}${ECH.short[f.g]} · ${st}</span>${el(f.el)}</span></span>
@@ -1098,7 +1115,7 @@ Object.assign(OV, {
     const cur = S.echo.slots[S.echo.sel], sl = cur && cur.fid === o.arg ? cur : S.echo.slots.find(x => x && x.fid === o.arg) || null, f = foe(o.arg, sl); if (!f) return '';
     const c = S.acc.cycle, rec = kn(f.fid);
     const hp = sl ? sl.max : f.g === 'craft' ? at(ECH.craft.hp, f.cyc + (f.fb && f.fb.powerCycleStep || 0)) : hpOf(f.step, c, f.race);
-    const bm = sl ? sl.bm : f.g === 'craft' ? at(ECH.craft.bm, f.cyc) : f.g === 'm' ? at(ECH.many.bm, c) : at(ECH.bm[f.step - 1], c);
+    const bm = sl ? sl.bm : f.g === 'craft' ? at(ECH.craft.bm, f.cyc) : f.g === 'm' ? at(ECH.many.bm, c) : powOf(f.race, f.step, c);
     const chips = `<span class="chip ${f.g === 'o' ? '' : 'gold'}">${rankIc(f.g)}${rankOf(f)}</span>${f.el ? el(f.el) : ''}${rec && !f.fb && f.g !== 'm' ? `<span class="chip">${f.cls}</span>` : ''}${rec && f.fb ? `<span class="chip">${trRace(f.race)}</span>` : ''}${f.fb && f.fb.spec ? `<span class="chip">${specOf(f.fb.spec)}</span>` : ''}`;
     const nums = numIc('hp', sl ? sl.hp : hp, 18, sl ? `<small class="num">/ ${fmt(hp)}</small>` : '') + numIc('power', bm);
     let tgt = '';

@@ -298,7 +298,7 @@ function rowHtml(st) {
   const nums = lock ? '' : `<span class="wk-nums"><b title="${cap1(st.placeLabel)}">${placeTxt(st.place)}</b><span><b>${st.points != null ? fmt(st.points) : '—'}</b> <small>${unitOf(st, st.points)}</small></span></span>`;
   const label = `${m.n}: ${lock || `${st.place ? 'место ' + st.place : 'без места'}, ${st.points != null ? st.points : 0} ${unitOf(st, st.points)}`} — подробности`;
   return `<div class="wk-row ${lock ? 'lock' : ''}" data-mode="${m.id}">
-    <button class="wk-main" data-a="sheet" data-v="wkmode:${m.id}:${st.t}" aria-label="${trEsc(label)}"><span class="wk-pic">${pic(m)}${now && st.alert ? `<span class="bdg" title="${trEsc(st.alert)}">!</span>` : ''}</span>
+    <button class="wk-main" data-a="sheet" data-v="wkmode:${m.id}:${st.t}" aria-label="${trEsc(label)}"><span class="wk-pic">${pic(m)}${now && st.alert ? `<span class="dot" title="${trEsc(st.alert)}"></span>` : ''}</span>
       <span class="wk-tx"><b>${m.n}</b><span class="wk-sub">${sub}</span></span>${nums}</button>
     ${now && m.go ? `<button class="iconbtn wk-go" data-a="go" data-v="${m.go}" aria-label="Открыть «${m.n}»" title="Открыть">${ic('chev')}</button>` : ''}
   </div>`;

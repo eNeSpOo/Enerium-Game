@@ -77,7 +77,7 @@ for (const cy of CYC) {
     }
     const [uid, un, ulore, uimg] = b.unique;
     addItem({ id: uid, n: un, cyc: c, b: b.id, tier: 'unique', r: 4, img: uimg || null, boss: b.boss, lore: ulore, team,
-      src: [`Босс биома «${b.boss}» · ${pct(C.ENEMY.uniqueBp)} за победу`, 'Уникальный ритуал рабочих · 1 % в ролле пула'] });
+      src: [`Босс биома «${b.boss}» · ${pct(C.ENEMY.uniqueBp)} за победу`, 'Уникальный ритуал рабочих · 1 % на карточку пула'] });
   }
   /* Крафтовые биомы и боссы: активация, ресурсы, находка, призыв, трофей. */
   for (const cb of cy.craft) {

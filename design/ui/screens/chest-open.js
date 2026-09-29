@@ -205,6 +205,9 @@ function coView(it) {
   } else {   // tal, wshard, equip — «из сундуков» в запасах; спойлеры в именах талисманов прячет zpExtraName
     const xk = k === 'tal' ? 'tal' : k === 'wshard' ? 'wsh' : 'eq';
     o.icon = ic(ZP_EXTRA_IC[xk] || 'gem'); o.name = zpExtraName(xk, it.id, it.r); o.tip = `${o.name} ×${fmt(it.q)}`;
+    /* снаряжение: предмет, который создал сервер при открытии (screens/equipment.js) — его слот и главная строка */
+    const v = k === 'equip' && typeof eqView === 'function' ? eqView(it) : null;
+    if (v) { o.icon = v.icon; o.name = v.name; o.tip = v.tip; }
   }
   return o;
 }

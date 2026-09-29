@@ -1,0 +1,109 @@
+/* screens/equipment.css — снаряжение: девять мест в карточке героя, листы «Снаряжение», «Свойства и сравнение», «Кому надеть»,
+   «Перековка снаряжения», раздел UI-кита. Отступы — токены воздуха --sp-l / --sp-m / --sp-s, цвет редкости — --rc от [data-r] (ADR-0027).
+   Значки слотов — заглушки: контур слота и свет редкости снизу, до арта (tools/art-gen/jobs/equipment.json). */
+
+/* плитка предмета: квадрат, свет редкости снизу и кромка; внутри — значок слота */
+.eq-t{position:relative;display:inline-grid;place-items:center;flex:none;width:var(--es,30px);height:var(--es,30px);border-radius:8px;border:1px solid color-mix(in srgb,var(--rc,#2b3036) 45%,var(--iron));background:radial-gradient(85% 75% at 50% 100%,color-mix(in srgb,var(--rc,#2b3036) 26%,transparent),transparent 72%),#0d1013;box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--rc,#2b3036) 80%,transparent);color:var(--parch)}
+.eq-t .i{width:60%;height:60%;stroke-width:1.6}
+.eq-t.lg{--es:46px;border-radius:11px}
+.eq-t.none{border-style:dashed;background:#0d1013;box-shadow:none;color:var(--parch-3)}
+.eq-t[data-r="5"],.eq-t[data-r="6"]{box-shadow:inset 0 -2px 0 var(--rc),0 0 10px -4px var(--rc)}
+.eq-t[data-r="7"]{box-shadow:inset 0 -2px 0 var(--rc),0 0 14px -3px var(--rc)}
+
+/* девять мест во вкладке «Сила» — одна строка, рядом с талисманами */
+.hd-st:has(.eq-row){overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:#2c3238 transparent}
+.eq-row{display:flex;flex-direction:column;gap:var(--sp-s)}
+.eq-row .chip .ico{margin-right:1px}
+.eq-slots{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px}
+.eq-slot{position:relative;display:grid;place-items:center;aspect-ratio:1;min-width:0;padding:0;border-radius:8px;border:1px dashed var(--iron-2);background:#0d1013;color:var(--parch-3);font:inherit}
+.eq-slot .i{width:62%;height:62%;max-width:22px;max-height:22px;opacity:.55}
+.eq-slot.on{border-style:solid;border-color:color-mix(in srgb,var(--rc) 50%,var(--iron));background:radial-gradient(90% 75% at 50% 100%,color-mix(in srgb,var(--rc) 24%,transparent),transparent 72%),#0d1013;box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--rc) 80%,transparent);color:var(--parch)}
+.eq-slot.on .i{opacity:1}
+.eq-slot:hover{border-color:var(--gold-3)}
+.eq-slot.sel{box-shadow:0 0 0 1px var(--spirit),0 0 14px -4px var(--spirit)}
+.eq-slot.on.sel{box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--rc) 80%,transparent),0 0 0 1px var(--spirit),0 0 14px -4px var(--spirit)}
+
+/* пять характеристик с прибавкой снаряжения: число светится, разбивка — в подсказке и в листе «Атрибуты» */
+.s5.eqd b{color:var(--spirit);text-shadow:0 0 10px rgba(72,229,212,.35)}
+.srow .eqd{margin-left:4px;font:700 11px/1 var(--f-u);color:var(--spirit)}
+
+/* лист «Снаряжение» */
+.eq-hero{display:flex;align-items:center;gap:var(--sp-m)}
+.eq-hero img{width:40px;height:48px;border-radius:9px;object-fit:cover;object-position:50% 18%;border:1px solid var(--iron)}
+.eq-hero b{font:600 18px/1 var(--f-d);color:var(--parch)}
+.eq-hero .row{font-size:12.5px}
+.eq-doll{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:6px}
+.eq-doll .eq-slot .i{max-width:24px;max-height:24px}
+.eq-card{display:flex;flex-direction:column;gap:var(--sp-s);padding:var(--sp-m);border-radius:12px;border:1px solid color-mix(in srgb,var(--rc) 35%,var(--iron));background:radial-gradient(90% 60% at 50% 110%,color-mix(in srgb,var(--rc) 12%,transparent),transparent 70%),var(--stone)}
+.eq-ch{display:flex;align-items:center;gap:var(--sp-m);min-width:0}
+.eq-ch b.serif{font-size:20px;line-height:1.05;color:var(--parch)}
+.eq-ch .chip{height:20px;padding:0 6px;font-size:10.5px}
+.eq-lns{display:flex;flex-direction:column}
+.eq-ln{display:grid;grid-template-columns:minmax(0,1fr) auto 44px;gap:var(--sp-s);align-items:center;min-height:28px;border-top:1px solid #1a1e22}
+.eq-ln:first-child{border-top:0}
+.eq-ln .k{display:flex;align-items:center;gap:6px;min-width:0;font-size:13px;color:var(--parch-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.eq-ln .k .i{width:15px;height:15px;color:var(--parch-3)}
+.eq-ln b{font:600 16px/1 var(--f-d);color:var(--parch);text-align:right}
+.eq-ln.main .k{color:var(--parch)}
+.eq-ln.main b{font-size:19px;color:var(--gold)}
+.eq-ln.lost .k,.eq-ln.lost b{color:var(--parch-3)}
+.eq-ln:not(:has(.eq-d)){grid-template-columns:minmax(0,1fr) auto}
+.eq-d{font:700 11.5px/1 var(--f-u);text-align:right;color:var(--parch-3);font-variant-numeric:tabular-nums}
+.eq-d.up{color:#7ef0a8}
+.eq-d.down{color:#ff8a74}
+.eq-list{display:flex;flex-direction:column;gap:2px}
+.eq-li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;width:100%;padding:5px var(--sp-s);border:1px solid transparent;border-radius:9px;background:none;color:inherit;text-align:left;font:inherit}
+.eq-li:hover{background:rgba(255,255,255,.03)}
+.eq-li[aria-current="true"]{border-color:color-mix(in srgb,var(--rc) 45%,var(--iron));background:rgba(255,255,255,.035)}
+.eq-li .tx{min-width:0}
+.eq-li .tx b{display:flex;align-items:center;gap:5px;font:600 15px/1.1 var(--f-d);color:var(--parch)}
+.eq-li .tx small{display:block;font-size:11.5px;line-height:1.25;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.eq-li .chip,.eq-who .chip{height:20px;padding:0 6px}
+.eq-sumd>summary{list-style:none;cursor:pointer}
+.eq-sumd>summary::-webkit-details-marker{display:none}
+.eq-sumd[open]>summary{margin-bottom:var(--sp-s)}
+.eq-sum{display:flex;flex-wrap:wrap;gap:var(--sp-s) var(--sp-m)}
+.eq-s{display:inline-flex;align-items:center;gap:5px}
+.eq-s b{font:600 16px/1 var(--f-d);color:var(--parch)}
+.eq-s .i{width:15px;height:15px;color:var(--parch-3)}
+
+/* «Свойства и сравнение»: герои для сравнения — лица в строку */
+.eq-hcs{display:flex;flex-wrap:wrap;gap:6px}
+.eq-hc{appearance:none;padding:2px;border:1px solid transparent;border-radius:10px;background:none;cursor:pointer}
+.eq-hc.on{border-color:var(--spirit);box-shadow:0 0 12px -4px var(--spirit)}
+.eq-hc img{width:34px;height:40px;border-radius:8px;object-fit:cover;object-position:50% 18%}
+
+/* «Кому надеть»: герой, нынешний предмет слота, прибавка БМ */
+.eq-whos{display:flex;flex-direction:column;border-top:1px solid var(--iron)}
+.eq-who{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:var(--sp-s) var(--sp-m);align-items:center;width:100%;min-height:52px;padding:6px 2px;border:0;border-bottom:1px solid var(--iron);background:none;color:inherit;text-align:left;font:inherit;cursor:pointer}
+.eq-who:hover{background:rgba(255,255,255,.025)}
+.eq-who[disabled]{cursor:default;opacity:.7}
+.eq-who .tx{min-width:0}
+.eq-who .tx b{display:block;font-size:14px;color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.eq-who .tx small{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--parch-3)}
+.eq-who>img{width:34px;height:40px;border-radius:8px;object-fit:cover}
+
+/* перековка */
+.eq-forge{display:flex;flex-direction:column}
+.eq-fr{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;padding:var(--sp-s) 2px;border-top:1px solid var(--iron)}
+.eq-fr:first-child{border-top:0}
+.eq-fr b{display:block;font-size:13px;color:var(--parch)}
+.eq-fr small{display:block;font-size:12px;color:var(--parch-3)}
+.eq-got{display:flex;align-items:center;gap:var(--sp-m);padding:var(--sp-m);border-radius:12px;background:radial-gradient(90% 70% at 50% 110%,rgba(72,229,212,.1),transparent 70%),var(--stone);border:1px solid rgba(72,229,212,.3)}
+.eq-got b.serif{font-size:19px;color:var(--parch)}
+
+/* раздел UI-кита */
+.eq-kit .eq-kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--sp-m)}
+.eq-kit .eq-slot{cursor:default}
+.eq-kit .eq-lad figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px}
+.eq-kit .eq-lad figcaption{font-size:11px;line-height:1.25;color:var(--parch-3);text-align:center}
+.eq-kit .eq-lad figcaption b{color:var(--parch);font-size:12px}
+.eq-kit .eq-kt td,.eq-kit .eq-kt th{padding:4px 8px}
+.eq-kit .eq-kt td .i{width:14px;height:14px;margin-right:4px;vertical-align:-2px}
+.eq-kit .eq-kt td .ico{margin-right:4px;vertical-align:-3px}
+
+/* компактный режим низких экранов (844×390 и ниже) */
+@container main (max-height: 360px){
+  .eq-slots{gap:3px}
+  .eq-slot{border-radius:7px}
+}

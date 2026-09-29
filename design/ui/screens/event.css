@@ -1,0 +1,138 @@
+/* screens/event.css — «Неделя → Событие недели» (screens/event.js).
+   Правила воздуха (ADR-0026): одна мысль на экран; на карточке — не больше двух чисел, двух чипов и одного действия; подробности — в листах.
+   Отступы — токены --sp-l / --sp-m / --sp-s; редкость — --rc и кристалл от [data-r] (ADR-0027). Свои классы — с префиксом ev-.
+   Правила без .g — чтобы те же карточки рисовал раздел UI-кита. */
+
+/* экран: слева — тема недели с очками и рейтинг, справа — где брать очки */
+.ev{display:grid;grid-template-columns:minmax(0,318px) minmax(0,1fr);grid-template-rows:minmax(0,1fr);grid-auto-rows:auto;gap:var(--sp-m)}
+.ev-l{display:flex;flex-direction:column;gap:var(--sp-m);min-width:0;min-height:0}
+
+/* тема недели: баннер цивилизации, мои очки, ближайшая планка, «Награды» */
+.ev-hero{position:relative;display:flex;flex-direction:column;flex:1 1 auto;min-height:0;overflow:hidden;padding:0}
+.ev-ban{position:relative;flex:none;height:96px;overflow:hidden;background:radial-gradient(90% 120% at 50% 120%,rgba(221,188,122,.18),transparent 70%),#0d1013}
+.ev-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 55%;opacity:.5}
+.ev-ban::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,12,14,.05) 0%,rgba(10,12,14,.55) 55%,rgba(12,14,17,.96) 100%)}
+.ev-id{position:absolute;left:var(--sp-m);right:var(--sp-m);bottom:var(--sp-s);z-index:1;display:flex;flex-direction:column;gap:3px;min-width:0}
+.ev-id .eyebrow{font:700 10px/1.2 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--gold-2)}
+.ev-id>b{font:600 25px/1.05 var(--f-d);color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev-id>small{font-size:12.5px;color:var(--parch-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev-body{display:flex;flex-direction:column;gap:var(--sp-s);padding:var(--sp-s) var(--sp-m) var(--sp-m);flex:1 1 auto;min-height:0}
+.ev-pts{display:flex;align-items:baseline;gap:var(--sp-s);min-width:0}
+.ev-pts>b{font:600 36px/1 var(--f-d);color:var(--parch);font-variant-numeric:lining-nums tabular-nums}
+.ev-pts>small{font-size:12.5px;color:var(--parch-3)}
+.ev-next{display:flex;align-items:center;gap:var(--sp-s);min-width:0}
+.ev-next .bar{flex:1 1 auto;min-width:40px}
+.well.ev-chest img{width:86%;height:86%}
+.ev-why{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:var(--parch-2);min-width:0}
+.ev-why b{color:var(--parch);font-weight:700}
+.ev-why .i{width:14px;height:14px;flex:none}
+.ev-why.ok{color:var(--spirit)}
+.ev-foot{display:flex;align-items:center;gap:var(--sp-s);margin-top:auto;min-width:0}
+.ev-acc{min-width:0;max-width:100%}
+.ev-acc>span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev-acc .i{width:13px;height:13px;flex:none}
+.ev-rew{margin-left:auto;flex:none}
+
+/* рейтинг: лидер и я, весь блок — кнопка листа «Рейтинг» */
+.ev-rank{appearance:none;display:flex;flex-direction:column;gap:6px;flex:none;padding:var(--sp-s) var(--sp-m);color:var(--parch);text-align:left;font:inherit}
+.ev-rank:hover{border-color:var(--iron-2)}
+.ev-rank .eyebrow{font:700 10px/1.2 var(--f-u);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-2)}
+.ev-rk{display:flex;align-items:center;gap:var(--sp-s);min-width:0;font-size:13px;color:var(--parch-2)}
+.ev-rk .i{width:15px;height:15px;flex:none;color:var(--gold-2)}
+.ev-rkn{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev-rk>b{font:600 16px/1 var(--f-d);color:var(--gold)}
+.ev-rk.me{color:var(--parch)}
+.ev-rk.me .i{color:var(--spirit)}
+.ev-rkp{font-size:12.5px;color:var(--parch-2);white-space:nowrap}
+.ev-rkp b{font:600 16px/1 var(--f-d);color:var(--spirit)}
+
+/* где брать очки: строка — значок режима, имя, что засчитывается, очки недели; «›» — в режим */
+.ev-src{display:flex;flex-direction:column;gap:var(--sp-s);padding:var(--sp-m);min-width:0;min-height:0}
+.ev-sh{display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-s);flex:none}
+.ev-sh .eyebrow{font:700 10.5px/1.2 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--gold-2)}
+.ev-sh small{font-size:11.5px;color:var(--parch-3)}
+.ev-rows{display:flex;flex-direction:column;gap:5px;flex:1 1 auto;min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:#2c3238 transparent}
+.ev-row{position:relative;display:flex;align-items:center;flex:none;min-width:0;min-height:38px;border-radius:10px;border:1px solid var(--iron);background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),#0e1114}
+.ev-row:hover{border-color:var(--iron-2)}
+.ev-row.acc{border-color:rgba(72,229,212,.35);box-shadow:inset 0 -12px 16px -14px var(--spirit)}
+.ev-main{appearance:none;flex:1 1 auto;align-self:stretch;display:grid;grid-template-columns:32px minmax(0,1fr) auto auto;align-items:center;gap:var(--sp-m);min-width:0;padding:2px var(--sp-s) 2px 3px;border:0;border-radius:10px;background:none;color:var(--parch);text-align:left;font:inherit}
+.ev-pic{width:32px;height:32px;border-radius:8px;object-fit:cover;box-shadow:0 0 0 1px #262c32}
+.ev-pic.lg{width:52px;height:52px;border-radius:12px}
+.ev-tx{display:flex;flex-direction:column;gap:3px;min-width:0}
+.ev-tx>b{font:600 16px/1.05 var(--f-d);color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev-tx>small{font-size:11.5px;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev-main:hover .ev-tx>b{color:var(--gold)}
+.ev-x{flex:none}
+.ev-v{font:600 18px/1 var(--f-d);color:var(--gold);white-space:nowrap;font-variant-numeric:lining-nums tabular-nums;min-width:44px;text-align:right}
+.ev-go{margin-right:4px;flex:none}
+
+/* закрыто до второго цикла */
+.ev-lock{display:flex;flex-direction:column;align-items:center;gap:var(--sp-s);text-align:center}
+.ev-lock b{font-size:20px;color:var(--parch)}
+.ev-lock .i{width:28px;height:28px;color:var(--gold-2)}
+
+/* команде: демо-кнопки — внизу панели источников, строки над ними прокручиваются */
+.ev-team{flex:none;flex-wrap:wrap;gap:6px;padding-top:6px;border-top:1px solid var(--iron)}
+.ev-tnote{font-size:11px;line-height:1.3;flex:1 1 100%;min-width:0}
+
+/* листы: вкладки слоёв, планки, места, цены источника */
+.ev-tabs{flex:none}
+.ev-shead{font-size:12.5px;color:var(--parch-3)}
+.ev-shead b{font-size:16px;color:var(--gold)}
+.ev-pks{display:flex;flex-direction:column}
+.ev-pk{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;min-height:40px;padding:4px 0;border-bottom:1px solid var(--iron)}
+.ev-pk:last-child{border-bottom:0}
+.ev-pkt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ev-pkt>b{font:600 17px/1 var(--f-d);color:var(--parch-3)}
+.ev-pkt>small{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--parch-2)}
+.ev-pk.got .ev-pkt>b{color:var(--gold)}
+.ev-pk.next .ev-pkt>b{color:var(--parch)}
+.ev-pkl{font-size:12px;white-space:nowrap}
+.ev-cr{display:inline-flex;align-items:center;gap:2px;color:var(--rc)}
+.ev-cr b{font-size:12px;color:var(--parch)}
+.ev-cn{display:flex;align-items:center;gap:var(--sp-s);font-size:13px}
+.ev-cn .i{width:16px;height:16px;color:var(--gold-2)}
+.ev-cn .faint{margin-left:auto;font-size:12px}
+.ev-line{font-family:var(--f-d);font-style:italic;font-size:14px;line-height:1.35;color:var(--parch-2)}
+.ev-trs{display:flex;flex-direction:column}
+.ev-tr{display:grid;grid-template-columns:74px 30px minmax(0,1fr);gap:var(--sp-s);align-items:center;min-height:36px;border-bottom:1px solid var(--iron)}
+.ev-tr:last-child{border-bottom:0}
+.ev-tr>span:first-child{font:600 14px/1 var(--f-d);color:var(--parch)}
+.ev-tr>small{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--parch-2)}
+.ev-sh2{display:flex;align-items:center;gap:var(--sp-m)}
+.ev-us{display:flex;flex-direction:column}
+.ev-u{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:var(--sp-m);align-items:center;padding:7px 0;border-bottom:1px solid var(--iron)}
+.ev-u:last-child{border-bottom:0}
+.ev-u.lock{opacity:.55}
+.ev-un{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ev-un b{font:600 15px/1.1 var(--f-d);color:var(--parch)}
+.ev-un small{font-size:11.5px;line-height:1.3;color:var(--parch-3)}
+.ev-upc,.ev-uc{display:flex;flex-direction:column;align-items:flex-end;gap:2px;white-space:nowrap}
+.ev-up{font:600 17px/1 var(--f-d);color:var(--gold)}
+.ev-upc small,.ev-uc small{font-size:11px;color:var(--parch-3)}
+.ev-uc b{font:600 15px/1 var(--f-d);color:var(--parch)}
+.ev-accl{color:var(--spirit)}
+
+/* раздел UI-кита: те же карточки вне кадра телефона */
+.ev-kit{display:grid;grid-template-columns:minmax(0,318px) minmax(0,1fr);gap:var(--sp-m);align-items:start}
+.ev-kit .ev-hero{min-height:260px}
+.ev-kit .ev-rows{overflow:visible}
+.ev-kweeks{margin:0;padding-left:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:2px var(--sp-m)}
+.ev-kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:var(--sp-m)}
+.ev-kt td.n{text-align:right;font-variant-numeric:tabular-nums}
+
+/* низкий экран (844×390): баннер ниже, числа меньше, строки плотнее */
+@container main (max-height: 360px){
+  .ev-ban{height:78px}
+  .ev-id>b{font-size:21px}
+  .ev-pts>b{font-size:29px}
+  .ev-body{gap:6px;padding:6px var(--sp-m) var(--sp-s)}
+  .ev-rank{padding:6px var(--sp-m);gap:4px}
+  .ev-src{padding:var(--sp-s) var(--sp-m)}
+  .ev-rows{gap:4px}
+  .ev-row{min-height:34px}
+  .ev-main{grid-template-columns:28px minmax(0,1fr) auto auto;gap:10px}
+  .ev-pic{width:28px;height:28px;border-radius:7px}
+  .ev-tx>b{font-size:15px}
+  .ev-v{font-size:16px}
+}

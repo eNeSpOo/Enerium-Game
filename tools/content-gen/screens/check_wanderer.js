@@ -4,6 +4,11 @@
       10 000 б. п.; цены §0 — переброс 50, сброс 100; места — циклы II–VI; «+1 активный биом» — ровно одна пассивка, это № mem.slot (ADR-0014);
       рунный ключ с элит нигде не обещан (ADR-0023, вариант Б); 18 артефактов, уровней не больше циклов, души на все уровни — по правилу автора;
       с «Печатью открытых троп» и пассивкой — семь забегов; достижения — около 50 / 22 / 22 и первенства по циклам; все числа целые.
+   2б. Достижения: входы темпа pace-inputs.json свежие — tools/content-gen/wanderer/pace_inputs.py --check (sets.py, economy.py);
+      wanderer.js и таблицы docs/content/достижения.md свежие — сборщик tools/content-gen/wanderer/build.js без ошибок даёт
+      ровно их; у каждого — редкость 1–7, день обычного и увлечённого в прогоне или за горизонтом, тема, счётчик и пассивка; серии — ступени
+      по порядку, цель растёт, ступень не раньше прошлой; сумма вида пассивок не выше потолка; в цикле I и каждый день цикла II — хоть одно
+      достижение у обоих профилей; подсказка тайны — без имени и чисел; контракты читают те же достижения с бесплатными заменами.
    3. «Сервер» Памяти: wnRoll — чистая функция; независимый пересчёт тем же генератором (mulberry32, FNV-1a) — те же тройки, ровно шесть
       бросков на тройку; в тройке нет повторов, закреплённых и прошлой тройки; на 40 000 вариантов доли редкостей и весов сходятся с данными;
       сумма шансов каталога — 100 %.
@@ -28,9 +33,15 @@
    6. Артефакты: покупка золотом, уровень душами — база × номер уровня, не выше цикла; уровень аккаунта для открытия; повтор и нехватка.
    7. Достижения: сундук по строке режима «Достижения» lootboxes.js на цикл получения, в запасы — один раз; таинственные скрыты до получения;
       первенства — только свои.
+   7б. Вкладка «Достижения» с воздухом: разделы «Можно получить» и «Ближайшие» (не больше трёх), остальное — по темам; серия — одна
+      карточка; полученное свёрнуто одной строкой и раскрывается; на карточке не больше двух чисел, двух меток и одного действия;
+      лист — условие, награда и «когда получают»; тайна до выполнения — без условия.
+   7в. Живые счётчики: ритуалы, снаряжение, Арена, Лига и планка События на вкладке — те же числа, что на экранах режимов; полученное
+      по демо-дню этими числами подтверждено.
    8. Вид: вкладки, окно, листы и каталог рисуются в режимах «Игрок» и «Команда» без исключений, undefined и NaN; игроку — без служебных слов.
    9. UI-кит: раздел «Память Странника» — карты всех семи редкостей, сцена «Вспомнить», состояния карты и мест, восемь значков,
       лестница сборки; кнопки раздела проигрывают сборку, переброс и «Вспомнить» без исключений; карта экранов отмечает готовое.
+      Раздел «Достижения Странника» — карточка серии во всех состояниях, тайна, строка полученного, первенства, семь редкостей.
    Запуск: node tools/content-gen/screens/check_wanderer.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -104,10 +115,53 @@ const WD = (() => { const ctx = { window: {} }; vm.createContext(ctx); vm.runInC
   const L = WD.ach.list, byCat = c => L.filter(a => a.cat === c).length;
   if (byCat('pers') < 45 || byCat('pers') > 55 || byCat('rev') < 18 || byCat('rev') > 26 || byCat('myst') < 18 || byCat('myst') > 26) say('достижения: не около 50 / 22 / 22 (§29)');
   for (const a of L) { if (!WD.ach.kinds[a.pk]) say(`${a.id}: вид пассивки «${a.pk}»`); if (a.cat === 'myst' && !a.hint) say(`${a.id}: у таинственного нет подсказки`); }
-  for (let c = 1; c <= 6; c++) { const n = WD.ach.firsts.filter(f => f.c === c).length; if (n !== (c === 1 ? 3 : 4)) say(`первенства цикла ${c}: ${n}`); }
+  /* первенства: виды со своего цикла — в цикле I три (вход в цикл и нашествие Эхо — с цикла II), дальше по пять */
+  for (let c = 1; c <= 6; c++) { const n = WD.ach.firsts.filter(f => f.c === c).length; if (n !== (c === 1 ? 3 : 5)) say(`первенства цикла ${c}: ${n}`); }
   if (!WD.fixes.length || WD.fixes.some(f => !f.what || !f.why)) say('правки под систему: пусто или без «почему»');
   const nums = []; (function walkNum(x) { if (typeof x === 'number') nums.push(x); else if (x && typeof x === 'object') Object.values(x).forEach(walkNum); })(WD);
   if (nums.some(x => !Number.isInteger(x))) say('wanderer.js: есть нецелые числа');
+}
+
+/* ================== 2б. достижения: свежесть, темп, серии, потолки, кривая ================== */
+{
+  /* входы темпа из калькуляторов экономики — свежие: pace_inputs.py --check (как capacity.py у контрактов) */
+  const py = require('child_process').spawnSync('python', [path.join(__dirname, '..', 'wanderer', 'pace_inputs.py'), '--check'], { encoding: 'utf8', env: Object.assign({}, process.env, { PYTHONIOENCODING: 'utf-8' }) });
+  if (py.error) console.log('Python не найден — свежесть pace-inputs.json не проверена.');
+  else if (py.status !== 0) say('pace-inputs.json устарел: ' + (py.stdout || py.stderr || '').trim().split('\n').pop());
+  const B = require('../wanderer/build.js'), R = B.build();
+  if (R.err.length) say('сборщик Странника: ' + R.err.slice(0, 5).join('; '));
+  else {
+    if (R.js !== read('wanderer.js')) say('wanderer.js устарел: пересобрать — node tools/content-gen/wanderer/build.js');
+    if (R.doc == null) say('нет черновика docs/content/достижения.md с метками таблиц');
+    else if (R.doc !== fs.readFileSync(B.FILES.doc, 'utf8')) say('docs/content/достижения.md: таблицы устарели — пересобрать');
+  }
+  const A = WD.ach, P = A.pace, byS = {};
+  if (!P || P.start.length !== 7 || P.start.some((d, c) => c > 1 && d <= P.start[c - 1])) say('темп: первые дни циклов не по порядку');
+  for (const a of A.list) {
+    if (!(a.r >= 1 && a.r <= 7)) say(`${a.id}: редкость ${a.r}`);
+    for (const x of [a.at.o, a.at.e]) if (x != null && (!Number.isInteger(x) || x < 0 || x > P.horizon)) say(`${a.id}: день получения вне прогона`);
+    if (a.cat !== 'myst' && !A.metrics[a.m]) say(`${a.id}: счётчик «${a.m}» не описан`);
+    if (!A.groups[a.g]) say(`${a.id}: тема «${a.g}»`);
+    if (!Number.isInteger(a.v) || a.v < 1) say(`${a.id}: величина пассивки`);
+    (byS[a.s] = byS[a.s] || []).push(a);
+  }
+  for (const [s, l] of Object.entries(byS)) {
+    l.sort((x, y) => x.k - y.k);
+    l.forEach((a, i) => {
+      if (a.k !== i + 1 || a.ks !== l.length) say(`серия ${s}: ступени не по порядку`);
+      if (i && (a.goal <= l[i - 1].goal || a.m !== l[i - 1].m)) say(`серия ${s}: цель не растёт или счётчик другой`);
+      if (i && a.at.o != null && (l[i - 1].at.o == null || a.at.o < l[i - 1].at.o)) say(`серия ${s}: ступень ${a.k} у обычного раньше прошлой`);
+    });
+  }
+  const sum = {};
+  for (const a of A.list) sum[a.pk] = (sum[a.pk] || 0) + a.v;
+  for (const [k, v] of Object.entries(sum)) if (v > A.kinds[k].cap) say(`пассивки «${A.kinds[k].n}»: ${v} больше потолка ${A.kinds[k].cap}`);
+  for (const pr of ['o', 'e']) for (let d = 0; d <= 14; d++) if (!A.list.some(a => !a.est && a.at[pr] === d)) say(`кривая: у ${pr === 'o' ? 'обычного' : 'увлечённого'} в день ${d} нет достижения`);
+  for (const a of A.list.filter(x => x.cat === 'myst')) if (!a.hint || a.hint.toLowerCase().includes(a.n.toLowerCase()) || /\d/.test(a.hint)) say(`${a.id}: подсказка выдаёт имя или число`);
+  const ctx = { window: {} }; ctx.window = ctx; vm.createContext(ctx); vm.runInContext(read('contracts.js'), ctx);
+  const want = A.list.filter(a => a.pk === 'reroll').map(a => ({ id: a.id, n: a.n, v: a.v }));
+  if (!ctx.EN_CONTRACTS || JSON.stringify(ctx.EN_CONTRACTS.rules.rer.ach) !== JSON.stringify(want)) say('contracts.js: достижения с бесплатными заменами не совпадают с каталогом');
+  for (const [m, v] of Object.entries(A.demo.n)) if (!Number.isInteger(v) || v < 0) say(`демо-счётчик ${m}: ${v}`);
 }
 
 /* ================== песочница ==================
@@ -157,7 +211,7 @@ function load(o = {}) {
     get S() { return S; }, set S(v) { S = v; },
     ACT, OV, SCREENS, FLOWS, KH, KIT_EXTRA, MAP, BAG, LBX, render, initialState, setTeam, fmt, EnLoot: window.EnLoot, doc: document,
     WN, WN_VIEW, WN_DEMO, WN_SRV, WN_ART, wnRoll, wnChance, wnSync, wnBurst, wnShatter, wnPlan, wnCuts, wnCard, wnSpeed, wnChest, wnProg, wnReady, wnCap, wnLv, wnCyc,
-    wnMemTab, wnArtTab, wnAchTab,
+    wnMemTab, wnArtTab, wnAchTab, wnSeries, wnWhen, WN_ACH_VIEW, evPlanks: window.evPlanks || null,
   })`, ctx);
   const advance = ms => {
     const end = clock.now + ms;
@@ -692,13 +746,13 @@ function openAnim(P, where) { run('Вспомнить', () => P.T.ACT.wnmem('0')
   let h = view(P, 'достижения · таинственные'), txt = playerText(h);
   const hid = W.ach.list.filter(x => x.cat === 'myst' && !T.S.wn.ach.got[x.id] && !T.wnReady(x));
   for (const x of hid) if (txt.includes(x.n) || txt.includes(x.d)) say(`таинственное «${x.id}» видно игроку до получения`);
-  const m = hid[0]; T.S.wn.ach.p[m.id] = m.goal;
+  const m = hid[0]; T.S.wn.ach.n[m.m] = m.goal;   // сервер отметил находку
   h = view(P, 'достижения · таинственное выполнено');
   if (!playerText(h).includes(m.n)) say('выполненное таинственное не раскрылось');
-  /* первенства: только свои; в цикле II — четыре */
+  /* первенства: только свои; в цикле II — пять */
   T.S.seg.wnach = 'first';
   h = view(P, 'достижения · первенства');
-  if ((h.match(/class="wn-first[ "]/g) || []).length !== 4) say('первенств цикла II на экране не четыре');
+  if ((h.match(/class="wn-first[ "]/g) || []).length !== 5) say('первенств цикла II на экране не пять');
   const mine = W.ach.firsts.find(f => T.S.wn.ach.first[f.id] === '@' && !T.S.wn.ach.got[f.id]), other = W.ach.firsts.find(f => T.S.wn.ach.first[f.id] && T.S.wn.ach.first[f.id] !== '@');
   if (T.WN_SRV.claim(uop(), other.id).refuse !== 'goal') say('чужое первенство можно забрать');
   const n0 = T.S.bag.chests.length;
@@ -706,6 +760,77 @@ function openAnim(P, where) { run('Вспомнить', () => P.T.ACT.wnmem('0')
   const fr = T.LBX.modes.feats.layers.flatMap(l => l.rows).find(r => r.label === 'Первенство сервера').cyc[2][0];
   const c = T.S.bag.chests[n0];
   if (!c || c.r !== fr.r || c.win !== fr.win) say('сундук первенства не по строке «Первенство сервера»');
+}
+
+/* ================== 7б. вкладка «Достижения» с воздухом ==================
+   Разделы и их порядок, ближайшие, одна карточка на серию, полученное свёрнуто, правила воздуха карточки, лист «когда получают» */
+{
+  const P = load(), T = P.T;
+  fresh(P); T.S.seg.profile = 'ach';
+  /* карточки по порядку: от начала карточки до начала следующей — первый лист, который она открывает */
+  const cardIds = h => { const st = [...h.matchAll(/<(?:div|button) class="wn-feat/g)].map(x => x.index);
+    return st.map((s, k) => (h.slice(s, k + 1 < st.length ? st[k + 1] : h.length).match(/data-v="wnfeat:([^"]+)"/) || [])[1]).filter(Boolean); };
+  const secOf = (h, t) => { const i = h.indexOf(`<span class="eyebrow">${t}</span>`); if (i < 0) return null; const j = h.indexOf('</section>', i); return h.slice(i, j); };
+  for (const cat of ['pers', 'rev', 'myst']) {
+    T.S.seg.wnach = cat; T.S.seg.wngot = '0';
+    const h = view(P, `вкладка · ${cat} · полученное свёрнуто`), body = h.slice(h.indexOf('wn-achb'));
+    const ids = cardIds(body), series = ids.map(id => W.ach.list.find(a => a.id === id).s);
+    if (new Set(series).size !== series.length) say(`вкладка ${cat}: у серии больше одной карточки`);
+    const openS = T.wnSeries(cat).filter(x => !x.done);
+    if (ids.length !== openS.length) say(`вкладка ${cat}: карточек ${ids.length}, серий в пути ${openS.length}`);
+    const near = secOf(body, 'Ближайшие');
+    if (cat !== 'myst' && !near) say(`вкладка ${cat}: нет раздела «Ближайшие»`);
+    if (near && cardIds(near).length > T.WN_ACH_VIEW.near) say(`вкладка ${cat}: ближайших больше ${T.WN_ACH_VIEW.near}`);
+    const ready = openS.filter(x => T.wnReady(x.cur));
+    if (ready.length && !secOf(body, 'Можно получить')) say(`вкладка ${cat}: готовые не наверху`);
+    if (ready.length && body.indexOf('Можно получить') > body.indexOf('Ближайшие') && body.includes('Ближайшие')) say(`вкладка ${cat}: «Можно получить» ниже «Ближайших»`);
+    const got = W.ach.list.filter(a => a.cat === cat && T.S.wn.ach.got[a.id]);
+    if (got.length && !/class="wn-gotbar"[^>]*aria-expanded="false"/.test(body)) say(`вкладка ${cat}: полученное не свёрнуто`);
+    if (/class="wn-gotr"/.test(body)) say(`вкладка ${cat}: полученное видно, хотя свёрнуто`);
+    /* правила воздуха: карточка — не больше двух чисел, двух меток (кристалл редкости, метка), одного действия */
+    const starts = [...body.matchAll(/<(?:div|button) class="wn-feat/g)].map(x => x.index);
+    starts.forEach((s, k) => {
+      const card = body.slice(s, k + 1 < starts.length ? starts[k + 1] : body.indexOf('</section>', s)), t = playerText(card);
+      const nums = (t.match(/\d[\d\s ]*/g) || []).filter(x => x.trim()).length;
+      const chips = (card.match(/class="(?:chip|rar)[" ]/g) || []).length, acts = (card.match(/<button class="btn/g) || []).length;
+      if (nums > 2 || chips > 2 || acts > 1) say(`вкладка ${cat}: карточка ${cardIds(card)[0] || k} — чисел ${nums}, меток ${chips}, действий ${acts}`);
+    });
+    T.S.seg.wngot = '1';
+    const h2 = view(P, `вкладка · ${cat} · полученное раскрыто`);
+    if ((h2.match(/class="wn-gotr"/g) || []).length !== got.length) say(`вкладка ${cat}: раскрыто не всё полученное`);
+  }
+  /* лист: условие, награда, «когда получают»; тайна до выполнения — без условия */
+  const a = W.ach.list.find(x => x.cat === 'pers' && x.ks > 1 && !T.S.wn.ach.got[x.id]);
+  T.S.overlay = { t: 'wnfeat', arg: a.id };
+  let h = view(P, 'лист достижения'), t = playerText(h);
+  if (!t.includes(a.d) || !t.includes('Когда получают') || !t.includes(T.wnWhen(a)) || !/class="wn-str/.test(h)) say('лист достижения: нет условия, «когда получают» или ступеней серии');
+  const hid = W.ach.list.find(x => x.cat === 'myst' && !T.S.wn.ach.got[x.id] && !T.wnReady(x));
+  T.S.overlay = { t: 'wnfeat', arg: hid.id }; t = playerText(view(P, 'лист тайны'));
+  if (t.includes(hid.d) || !t.includes(hid.hint)) say('лист тайны: условие видно или нет подсказки');
+  T.S.overlay = null;
+}
+
+/* ================== 7в. живые счётчики: те же числа, что на экранах ритуалов, снаряжения, Арены и События ================== */
+{
+  const P = load(), T = P.T;
+  fresh(P); T.S.seg.profile = 'ach';
+  const S = T.S, cnt = m => T.wnProg({ m });
+  const want = {
+    rituals: S.rituals ? S.rituals.done : null,
+    equip: S.eq ? S.eq.count : null,
+    arena: S.arena ? S.arena.wins + (S.arena.past ? S.arena.past.wins : 0) : null,   // побед за всё время прототип не хранит: сезон и прошлый
+    league: S.arena && S.arena.lg ? S.arena.lg.wins + (S.arena.lg.past ? S.arena.lg.past.wins : 0) : null,
+    plank: S.event && T.evPlanks ? T.evPlanks().filter(x => x.got).length : null,
+  };
+  for (const [m, v] of Object.entries(want)) {
+    if (!W.ach.list.some(a => a.m === m)) { say(`7в: счётчика ${m} нет в каталоге`); continue; }
+    if (v == null) { if (!MISSING.size) say(`7в: нет состояния экрана для счётчика ${m}`); continue; }
+    if (cnt(m) !== v) say(`7в: счётчик ${m} на вкладке — ${cnt(m)}, на экране режима — ${v}`);
+  }
+  for (const a of W.ach.list) {
+    if (a.cat === 'myst' || !S.wn.ach.got[a.id] || want[a.m] == null) continue;
+    if (want[a.m] < a.goal) say(`7в: «${a.n}» получено, а на экране режима ${want[a.m]} из ${a.goal}`);
+  }
 }
 
 /* ================== 8. вид: «Игрок» и «Команда» ================== */
@@ -718,7 +843,7 @@ for (const team of [false, true]) {
     for (const t of ['over', 'mem', 'arts', 'ach']) {
       T.S.route = 'profile'; T.S.seg.profile = t; T.S.overlay = null;
       if (t !== 'ach') { const h = view(P, `Странник · ${t} · цикл ${cyc}${tag}`); if (team) teamSeen.push(teamCount(h)); continue; }
-      for (const c of W.ach.cats) { T.S.seg.wnach = c.id; view(P, `достижения · ${c.id} · цикл ${cyc}${tag}`); }
+      for (const c of W.ach.cats) for (const g of ['0', '1']) { T.S.seg.wnach = c.id; T.S.seg.wngot = g; view(P, `достижения · ${c.id} · цикл ${cyc}${g === '1' ? ' · полученное раскрыто' : ''}${tag}`); }
     }
     /* окна и листы */
     T.S.route = 'profile'; T.S.seg.profile = 'mem';
@@ -775,6 +900,17 @@ for (const team of [false, true]) {
       P.advance(5000);
       if (k !== 'back' && !P.fxLog.some(x => x.k === 'burst')) say(`UI-кит: «${k}» — без частиц`);
     }
+  }
+  /* раздел «Достижения Странника»: карточка серии во всех состояниях, тайна, полученное, первенства, семь редкостей */
+  const ka = T.KIT_EXTRA.find(x => { try { return /Достижения Странника/.test(x.html()); } catch (_) { return false; } });
+  if (!ka) say('UI-кит: нет раздела «Достижения Странника» в KIT_EXTRA');
+  else {
+    const h = run('UI-кит · достижения', () => ka.html()) || '';
+    if (/undefined|NaN/.test(h)) say('UI-кит, достижения: undefined или NaN');
+    for (const [re, t] of [[/class="wn-feat hid"/, 'тайна'], [/class="wn-feat ready"/, 'можно получить'], [/class="wn-feat got"/, 'получено'], [/class="wn-feat" data-r/, 'в пути'],
+      [/class="wn-steps"/, 'ступени серии'], [/class="wn-gotbar"/, 'полученное свёрнуто'], [/class="wn-gotr"/, 'строка полученного']]) if (!re.test(h)) say(`UI-кит, достижения: нет «${t}»`);
+    if ((h.match(/class="wn-first[ "]/g) || []).length !== 4) say('UI-кит, достижения: первенства не во всех четырёх состояниях');
+    if ((h.match(/class="wn-krr"/g) || []).length !== 7) say('UI-кит, достижения: не все семь редкостей');
   }
   const m = T.MAP.find(x => x.n === 'Странник');
   if (!m || !m.ready || !['wanderer-passives', 'artifacts', 'achievements', 'server-firsts'].every(id => m.ready.includes(id))) say('карта экранов: «Странник» не отмечен готовым');

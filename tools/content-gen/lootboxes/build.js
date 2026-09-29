@@ -58,7 +58,7 @@ const LINES = {
   shards: { n: 'Осколки героя недели', kind: 'shards', pack: [6, 12, 16, 24, 36, 54, 80] },    // связка осколков одного героя; герой — поровну из отряда недели, открытого к циклу
   workers: { n: 'Шарды рабочего', kind: 'workers', qty: [3, 3, 3, 3, 3, 3, 3] },               // рабочий этой редкости (§19.1)
   tal: { n: 'Духовный талисман', kind: 'tal' },                                                 // какой — по весу таблицы автора внутри редкости (правило 5)
-  equip: { n: 'Предмет снаряжения — заглушка', kind: 'equip', stub: true },                   // снаряжения в игре ещё нет (§21): слот случайный из девяти
+  equip: { n: 'Предмет снаряжения', kind: 'equip' },   // §21, снаряжение.md: сундук разыгрывает редкость, предмет создаёт EnEquip на сиде сундука и номере записи, слот — из девяти
   keys: { n: 'Рунные ключи', kind: 'cur', cur: 'keys', qty: [2, 3, 4, 6, 8, 10, 12] },          // редкость сундука растёт с циклом — ключей больше вместе с ценой входа к стражу
   dust: { n: 'Прах душ', kind: 'cur', cur: 'dust', qty: [5, 10, 20, 40, 80, 160, 320], perCycle: true, from: 2 },  // × цикл: ровно цена одного осколка героя этой редкости (§15.3)
   res: { n: 'Ресурсы', kind: 'res', by: [['basic', 3], ['basic', 6], ['key', 1], ['key', 2], ['key', 3], ['unique', 1], ['unique', 2]] },  // один ресурс × штук; ключи и уникальные — своего цикла
@@ -91,7 +91,8 @@ const BOXES = {
    Планки: x — во сколько раз больше очков, чем на первой планке; соседние — не ближе ×2 (правило ×1,7). Платят при достижении.
    Места: top — не ниже этого места, 0 — любой участник с очками; игрок получает одну строку — лучшую. Платят по итогу недели.
    clan — штук на каждого участника в общий пул клана: половину делит сервер по вкладу, половину — глава (§24.4).
-   typical — где неделю заканчивают обычный и увлечённый игрок: номер планки или место. Допущение до баланса очков режимов. */
+   typical — где неделю заканчивают обычный и увлечённый игрок: номер планки или место. Допущение до баланса очков режимов;
+   у контрактов — итог прогона сборщика контрактов (design/ui/contracts.js, econ и planks): сборка сверяет его во всех циклах. */
 const MODES = {
   echo: { n: 'Эхо', box: 'shards', from: 2, base: [0, 1, 2, 3, 4, 5], weekly: true, basis: 'очки Эхо недели (§17.6)',
     layers: [
@@ -105,7 +106,7 @@ const MODES = {
       { id: 'me', n: 'Личные планки', one: 'Личная планка', kind: 'plank', rows: [{ x: 1, get: [[0, 2]] }, { x: 2, get: [[0, 1]] }, { x: 4, get: [[0, 1]] }, { x: 8, get: [[1, 1]] }, { x: 16, get: [[1, 1]] }] },
       { id: 'top', n: 'Личные места', one: 'Личное место', kind: 'place', rows: [{ top: 1, get: [[2, 1, 'pure']] }, { top: 10, get: [[2, 1]] }, { top: 100, get: [[1, 1]] }, { top: 1000, get: [[0, 1]] }] },
     ],
-    typical: { free: { me: 3 }, fan: { me: 5 } } },
+    typical: { free: { me: 4 }, fan: { me: 5 } } },   // прогон контрактов: обычный — 4-я планка, увлечённый — 5-я (docs/content/контракты.md)
   arena: { n: 'Арена', box: 'equip', from: 2, base: [0, 1, 2, 3, 4, 5], weekly: true, basis: 'победы сезона — планки, рейтинг — места (§20)',
     layers: [
       { id: 'me', n: 'Планки побед', one: 'Планка побед', kind: 'plank', rows: [{ x: 1, get: [[0, 2]] }, { x: 2, get: [[0, 1]] }, { x: 4, get: [[0, 1]] }, { x: 8, get: [[1, 1]] }] },
@@ -197,6 +198,7 @@ const FILES = {
   recipes: path.join(ROOT, 'design', 'ui', 'recipes.js'), battle: path.join(ROOT, 'design', 'ui', 'battle.js'),
   heroes: path.join(ROOT, 'docs', 'content', 'герои', 'состав-героев.csv'), tal: path.join(ROOT, 'source-data', 'Enerium_Талисманы_Финал.xlsx'),
   talData: path.join(ROOT, 'design', 'ui', 'talismans.js'),
+  contracts: path.join(ROOT, 'design', 'ui', 'contracts.js'),
   digest: path.join(ROOT, 'docs', 'lore', 'дайджест.md'),
   outJs: path.join(ROOT, 'design', 'ui', 'lootboxes.js'), outDoc: path.join(ROOT, 'docs', 'content', 'лутбоксы.md'),
   tables: path.join(__dirname, 'tables.md'), doc: path.join(__dirname, 'doc.md'), open: path.join(__dirname, 'open.js'),
@@ -443,6 +445,21 @@ for (const [mid, m] of Object.entries(MODES)) {
     if (!ly) err.push(`${m.n}: typical ${k}.${lid} — нет слоя`);
     else if (ly.kind === 'plank' && (v < 0 || v > ly.rows.length)) err.push(`${m.n}: typical ${k}.${lid} — нет планки ${v}`);
     else if (ly.kind === 'place' && !ly.rows.some(r => r.top === v)) err.push(`${m.n}: typical ${k}.${lid} — нет места ${v}`);
+  }
+}
+/* контракты: typical — не допущение, а прогон сборщика контрактов. Планка профиля — сколько порогов недели (planks) не выше его
+   средних очков (econ.o — обычный, econ.e — увлечённый); должна совпасть во всех циклах. Сборщик контрактов читает lootboxes.js,
+   но не typical — круга нет. Нет contracts.js — предупреждение: сверить нечем */
+const CT_RUN = (() => {
+  if (!fs.existsSync(FILES.contracts)) { warn.push('contracts.js нет — typical контрактов не сверен с прогоном: собрать tools/content-gen/contracts/build.js'); return null; }
+  try { const c = {}; c.window = c; vm.createContext(c); vm.runInContext(fs.readFileSync(FILES.contracts, 'utf8'), c); return c.EN_CONTRACTS || null; }
+  catch (e) { err.push(`contracts.js не читается — ${e.message}`); return null; }
+})();
+if (CT_RUN) {
+  const T = MODES.contract.typical, who = { free: 'o', fan: 'e' };
+  for (const c of CT_RUN.rules.cycles) for (const [k, p] of Object.entries(who)) {
+    const pts = CT_RUN.econ[c][p].pts, got = CT_RUN.planks[c].filter(x => pts >= x).length;
+    if (got !== T[k].me) err.push(`Контракты, цикл ${ROMAN[c]}: typical ${k}.me = ${T[k].me}, а прогон контрактов даёт ${got}-ю планку (${fmt(pts)} очков недели)`);
   }
 }
 const used = new Set(Object.values(MODES).map(m => m.box));
@@ -936,6 +953,7 @@ Object.assign(inline, {
   keysFree6: fx(WEEK.contract[6].free.ev.keys, 1), keysShare6: pctQ(WEEK.contract[6].free.ev.keys.div(new Q(capKeysWeek(6)))),
   keysFree2: fx(WEEK.contract[2].free.ev.keys, 1), keysCap2: fmt(capKeysWeek(2)),
   keysShare2: pctQ(WEEK.contract[2].free.ev.keys.div(new Q(capKeysWeek(2)))),
+  ctFree: MODES.contract.typical.free.me, ctFan: MODES.contract.typical.fan.me,
   mcOpens: fmt(RULES.mcOpens), mcCount: fmt(mcCount), mcDev: pct(mcWorst.dev), defs: fmt(DEF.size),
   winStep: WINDOWS.step[4].map(([x, bp]) => pct(bp)).join(' / '), winWild: WINDOWS.wild.map(([, bp]) => pct(bp).replace(' %', '')).join(' / ') + ' %',
 });
@@ -959,7 +977,7 @@ const weekOut = {};
 for (const mid of Object.keys(WEEK)) { weekOut[mid] = {}; for (const c of Object.keys(WEEK[mid])) weekOut[mid][c] = { free: Object.assign({ boxes: WEEK[mid][c].free.boxes }, ev100(WEEK[mid][c].free.ev)), fan: Object.assign({ boxes: WEEK[mid][c].fan.boxes }, ev100(WEEK[mid][c].fan.ev)) }; }
 const DATA = Object.assign({}, L, {
   items: itemsOut, heroInfo, talInfo, talSpoil,
-  workers: RARITY.map(r => 'Рабочий · ' + r), equip: RARITY.map(r => 'Предмет снаряжения · ' + r + ' · заглушка'),
+  workers: RARITY.map(r => 'Рабочий · ' + r), equip: RARITY.map(r => 'Предмет снаряжения · ' + r),
   modes: modesOut, ev: evTable, week: weekOut, assume: ASSUME,
 });
 const ints = (o, p) => { if (typeof o === 'number') { if (!Number.isInteger(o)) err.push('не целое в выводе: ' + p); } else if (o && typeof o === 'object') for (const k in o) ints(o[k], p + '.' + k); };

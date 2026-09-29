@@ -145,6 +145,38 @@ button.zp-link:hover>.i{color:var(--gold-2)}
 .dar-box{--s:54px}
 .dar-fnote{margin-right:auto;font-size:12px}
 
+/* рисованный сундук своего вида: корпус и крышка — слоями по рамке (CO_ART, screens/chest-open.js); размеры слоёв — в разметке */
+.zp-cp{position:relative;display:block;width:92%;flex:none}
+.zp-cp img{position:absolute;display:block;max-width:none;border-radius:0;object-fit:fill;filter:drop-shadow(0 2px 3px rgba(0,0,0,.55))}
+.zp-ic.chest,.zp-well{background:radial-gradient(80% 70% at 50% 100%,color-mix(in srgb,var(--rc,#2b3036) 30%,transparent),transparent 72%),#0d1013}
+.zp-ic.chest>.zp-cp{width:96%}
+.zp-ic.eq>.i{width:62%;height:62%;stroke-width:1.6;color:var(--parch)}
+.zp-ic.bare{overflow:visible;background:none}
+.zp-ic.bare::after{display:none}
+.zp-ic.bare .tl-t{--ts:26px}
+.zp-ic.lg.bare .tl-t{--ts:40px}
+.zp-gb .zp-cp{width:26px}
+.gifts .zp-cp{width:54px}
+.well>.zp-cp{width:88%}
+
+/* талисманы и снаряжение в запасах: эффект — строкой, чипы — не больше двух, выбор героя — строки */
+.zp-eff{font-size:14px;color:var(--parch)}
+.zp-chips{gap:var(--sp-s);flex-wrap:wrap}
+.zp-q .ico{vertical-align:-3px;margin-right:2px}
+.zp-rt small .i{width:11px;height:11px;margin-right:2px;vertical-align:-1px}
+.zp-whos{display:flex;flex-direction:column;border-top:1px solid var(--iron)}
+.zp-who{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:var(--sp-s) var(--sp-m);align-items:center;width:100%;min-height:52px;padding:6px 2px;border:0;border-bottom:1px solid var(--iron);background:none;color:inherit;text-align:left;font:inherit;cursor:pointer}
+.zp-who:hover{background:rgba(255,255,255,.025)}
+.zp-who.off{opacity:.5;cursor:default}
+.zp-who .tx{min-width:0}
+.zp-who .tx b{display:block;font-size:14px;color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zp-who .tx small{display:flex;align-items:center;gap:4px;font-size:12px;line-height:1.25;color:var(--parch-3)}
+.zp-who>.i{width:15px;height:15px;color:var(--parch-3)}
+
+/* раздел UI-кита: вкладки и плитки сундуков */
+.zp-kit .zp-kch figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px}
+.zp-kit .zp-kch figcaption{font-size:11px;color:var(--parch-3)}
+
 /* компактный режим низких экранов (844×390 и ниже) — по высоте рабочей области */
 @container main (max-height: 360px){
   .zp-row{min-height:32px;padding:2px 6px 2px 2px}

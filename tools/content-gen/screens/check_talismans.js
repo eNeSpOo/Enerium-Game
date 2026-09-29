@@ -8,6 +8,7 @@
       одно место; спасение от смерти — одно на героя; надетый уходит из запасов, снятый и заменённый — возвращаются; повтор операции
       с тем же номером ничего не меняет; отказ ничего не меняет.
    4. БМ: после каждой смены БМ героя = база × √(УВС × ЭЗ) по долям линеек — пересчёт здесь, независимо; всё снято — БМ ровно прежняя.
+      БМ не хранится: h.bm только читается, его считает общая функция BM (index.html); вырос уровень — выросла база, множитель тот же.
    5. Бой: без талисманов источник героя тот же; с талисманами — записи ядра в наборе, расовая прибавка, доля способностей;
       в бою прототипа срабатывают щит «Сердца Кароксорра», «Щит павшего знаменосца», фарм «Сосуда шёпотов» в добыче этажа.
    6. Перековка: 10 одной редкости → 1 редкостью выше, золото списано один раз, итог — генератор на сиде операции (две свежие
@@ -101,7 +102,7 @@ function load() {
     get S() { return S; }, set S(v) { S = v; },
     ACT, OV, FLOWS, KH, MAP, KIT_EXTRA, H, EB, render, initialState, setTeam, EnLoot: window.EnLoot, TL: window.EN_TALISMANS,
     E: window.EN_ECHO || null, rsSetWeek: typeof rsSetWeek === 'function' ? rsSetWeek : null,
-    TB, TL_SRV, TL_DEMO, tlEq, tlMul, tlSides, tlWhy, tlSrc, tlLibOf, tlPool, tlForgePick, talRow, tlKitHtml,
+    TB, TL_SRV, TL_DEMO, tlEq, tlMul, tlSides, tlWhy, tlSrc, tlLibOf, tlPool, tlForgePick, talRow, tlKitHtml, BM: typeof BM !== 'undefined' ? BM : null,
   })`, ctx);
   return { T, els, rootCls, game: () => (els.game ? els.game.innerHTML : '') };
 }
@@ -213,9 +214,19 @@ const out = (hid, slot) => { cnt.ops++; return T.TL_SRV.out(`tl${S().tal.seq}`, 
   if (h.bm <= base) say('БМ: боевые талисманы не подняли БМ');
   [3, 2, 1, 0].forEach(i => out('h1', i));
   if (h.bm !== base) say(`БМ: всё снято — ${h.bm}, а было ${base}`);
-  /* БМ выросла снаружи (уровень), пока талисман надет: база берётся из витрины, снятие отдаёт БМ без талисманов */
-  put('h1', 0, byFam('heart', 2)); const mul = S().tal.bm.h1.mul; h.bm += 1000; const up = h.bm; out('h1', 0);
-  if (h.bm !== fl(up * BP, mul)) say(`БМ: после внешнего роста и снятия — ${h.bm}, ждали ${fl(up * BP, mul)}`);
+  /* мощь не хранится — её считает общая функция BM (index.html): h.bm только читается. Уровень вырос, пока талисман надет: база — формула
+     на новом уровне, множитель талисманов тот же; снятие отдаёт ровно новую базу */
+  const d = Object.getOwnPropertyDescriptor(h, 'bm');
+  if (!d || !d.get || d.set || 'value' in d) say('БМ: h.bm — не свойство только для чтения, а число в состоянии');
+  if (!T.BM) say('БМ: нет общей функции BM');
+  else {
+    put('h1', 0, byFam('heart', 2)); const mul = T.tlMul('h1'), b0 = T.BM.parts(h).base; h.lvl += 5;
+    const P = T.BM.parts(h);
+    if (P.base <= b0) say(`БМ: уровень вырос, а база не выросла — ${b0} → ${P.base}`);
+    if (P.mul.tal !== mul || h.bm !== fl(P.base * mul, BP)) say(`БМ: после роста уровня — ${h.bm}, ждали ${fl(P.base * mul, BP)} (база ${P.base} × ${mul})`);
+    out('h1', 0);
+    if (h.bm !== P.base) say(`БМ: после роста уровня и снятия — ${h.bm}, ждали базу ${P.base}`);
+  }
 }
 
 /* ---------- 5. бой ---------- */

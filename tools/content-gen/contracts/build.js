@@ -17,7 +17,14 @@
    - design/ui/contracts.js — данные прототипа (window.EN_CONTRACTS) и алгоритм пула (window.EnContracts из offer.js), руками не править;
    - docs/content/контракты.md — только таблицы: каждая между метками «<!-- @таблица имя -->» и «<!-- /таблица имя -->»; текст — ручной.
    Читает: capacity.json (python tools/content-gen/contracts/capacity.py), design/ui/lootboxes.js (сундук ключей, сундуки рейтинга,
-   шарды рабочих), design/ui/recipes.js (ключ с босса, вход к стражам), design/ui/wanderer.js (артефакты и Память о контрактах).
+   шарды рабочих), design/ui/recipes.js (ключ с босса, вход к стражам), design/ui/wanderer.js (артефакты и Память о контрактах),
+   design/ui/echo-rules.js (раунды атак Эхо — для очков События), правила сборщика События tools/content-gen/event/build.js — цены единиц,
+   дневные потолки и ёмкость дня (dayUnits, dayPoints100) без контрактов. event.js не читается: Событие собирается после контрактов
+   и само читает их прогон — круга нет.
+   Лига — одно правило в данных: tools/content-gen/arena/rules.js, league (цикл рейтинга и порог 15 разных героев, как на экране Лиги).
+   Когда обычный и увлечённый его набирают — одно место: leagueOpen в tools/content-gen/wanderer/achievements-pace.js (герои за золото —
+   wanderer/pace-inputs.json, герои Эхо — lootboxes.js, каталог за золото — design/ui/roster.js). В прогоне недели до открытия Лиги
+   заданий Лиги не выдаются: доля недель — доля дней цикла с открытой Лигой.
    Любая ошибка — файлы не пишутся. Пересборка даёт те же байты.
    Запуск: node tools/content-gen/contracts/build.js           — собрать и записать;
            node tools/content-gen/contracts/build.js --check   — только проверить, что файлы свежие.
@@ -25,6 +32,9 @@
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm'), crypto = require('crypto');
 const OC = require('./offer.js');
+const EVB = require('../event/build.js');   // только правила События: цены, потолки, ёмкость дня — не его вывод event.js
+const LEAGUE = require('../arena/rules.js').RULES_SRC.league;   // Лига: цикл рейтинга и порог героев — одно правило в данных
+const ACH = require('../wanderer/achievements.js'), AP = require('../wanderer/achievements-pace.js');   // темп героев: когда открыта Лига
 const ROOT = path.join(__dirname, '..', '..', '..');
 const FILES = {
   cap: path.join(__dirname, 'capacity.json'),
@@ -32,6 +42,9 @@ const FILES = {
   loot: path.join(ROOT, 'design', 'ui', 'lootboxes.js'),
   recipes: path.join(ROOT, 'design', 'ui', 'recipes.js'),
   wanderer: path.join(ROOT, 'design', 'ui', 'wanderer.js'),
+  echo: path.join(ROOT, 'design', 'ui', 'echo-rules.js'),
+  roster: path.join(ROOT, 'design', 'ui', 'roster.js'),
+  paceIn: path.join(ROOT, 'tools', 'content-gen', 'wanderer', 'pace-inputs.json'),
   out: path.join(ROOT, 'design', 'ui', 'contracts.js'),
   doc: path.join(ROOT, 'docs', 'content', 'контракты.md'),
 };
@@ -100,7 +113,7 @@ const KINDS = [
   { id: 'echoPts', grp: 'echo', n: 'Набрать очки Эхо', u: ['очко', 'очка', 'очков'], g: ['очка', 'очков'], t: 'w', w: 6, pace: 'time', go: 'echo', p: 18, cap: { src: 'echoPtsWeek', week: true }, what: 'Рейтинговые очки Эхо этой недели.' },
   { id: 'arena', grp: 'arena', n: 'Сразиться на Арене', u: ['бой', 'боя', 'боёв'], g: ['боя', 'боёв'], t: 'dw', w: 8, pace: 'tries', go: 'arena:arena', p: 3, cap: { fix: 'arena' }, what: 'Атаки на Арене, победа или нет.' },
   { id: 'arenaWin', grp: 'arena', n: 'Победить на Арене', u: ['победа', 'победы', 'побед'], g: ['победы', 'побед'], t: 'dw', w: 6, pace: 'tries', go: 'arena:arena', p: 3, cap: { fix: 'arenaWin' }, what: 'Победы в атаках на Арене.' },
-  { id: 'league', grp: 'league', n: 'Сыграть матчи Лиги', u: ['матч', 'матча', 'матчей'], g: ['матча', 'матчей'], t: 'dw', w: 6, pace: 'tries', go: 'arena:league', p: 3, from: 3, cap: { fix: 'league' }, need: 'league', what: 'Сыгранные матчи Лиги.' },
+  { id: 'league', grp: 'league', n: 'Сыграть матчи Лиги', u: ['матч', 'матча', 'матчей'], g: ['матча', 'матчей'], t: 'dw', w: 6, pace: 'tries', go: 'arena:league', p: 3, from: LEAGUE.from, cap: { fix: 'league' }, need: 'league', what: 'Сыгранные матчи Лиги.' },
   { id: 'ritual', grp: 'rit', n: 'Завершить ритуалы', u: ['ритуал', 'ритуала', 'ритуалов'], g: ['ритуала', 'ритуалов'], t: 'dw', w: 10, pace: 'tries', go: 'rituals', p: 33, cap: { slot: 'ritual' }, what: 'Ритуалы рабочих и героев: награда забрана.' },
   { id: 'workers', grp: 'rit', n: 'Пробудить рабочих', u: ['рабочий', 'рабочих', 'рабочих'], g: ['рабочего', 'рабочих'], t: 'w', w: 4, pace: 'week', go: 'rituals', p: 33, cap: { workers: true }, what: 'Рабочий, собранный из шардов и пробуждённый.' },
   { id: 'shop', grp: 'gold', n: 'Купить в лавке', u: ['золота', 'золота', 'золота'], g: ['золота', 'золота'], t: 'dw', w: 8, pace: 'time', go: 'craft:shop', p: 11, cap: { src: 'gold', bp: 1000 }, what: 'Золото, отданное за товары лавки. Покупки за Энериум не в счёт.' },
@@ -120,7 +133,7 @@ const ASSUME = {
   craft: { o: 1200, e: 3000 },       // созданных предметов: рецепты цикла просят 1–3 базовых (recipes.js), горлышко — знание и ресурсы
   arena: { o: 1500, e: 2000 },       // атак: 20 в день (§20.2), обычный тратит не все
   arenaWin: { o: 750, e: 1000 },     // побед: половина атак — Эло при равных (§20.5)
-  league: { o: 400, e: 600 },        // матчей: 6 в день (§20.4); Лига — с 15 героев, с цикла III
+  league: { o: 400, e: 600 },        // матчей в день открытой Лиги: 6 (§20.4); открыта — с порога героев (arena/rules.js, league), день — leagueOpen
   ritualSlot: { o: 200, e: 300 },    // ритуалов на слот в день — sets.py RITUALS; слотов — номер цикла и ещё один
   clan: { o: 400, e: 500 },          // атак по клановым врагам: 5 в день (§25.1)
   // лавка и рынок меряются золотом, а не штуками: одна дешёвая сделка стоит минуты, награда за неё была бы даром.
@@ -132,7 +145,7 @@ const ASSUME = {
   },
   workerShards: 10,                  // лутбоксы: шардов на рабочего (в GDD числа нет, §19.1)
   dustWeek: { 3: 49500, 4: 251000, 5: 713400, 6: 1261200 },   // × 100: праха из лишних осколков Эхо у обычного — лутбоксы.md, «Неделя Эхо в поздних циклах»
-  eventPts: { boss: 60, ritual: 25, echoKill: 30, arenaWin: 15 },   // заглушка таблицы «активность → очки» §27 — как в прототипе «Событие»
+  // очки События — не допущение: цены единиц и ёмкость дня сборщика События (event/build.js, dayUnits без контрактов) на ёмкости выше
 };
 
 /* Цели наград: доля недельного дохода обычного игрока, которую дают его исполненные контракты. */
@@ -156,13 +169,14 @@ const SIM = {
   weeks: 200, seed: 'прогон контрактов', tau: [40, 140],
   typical: { artPool: { 2: 1, 3: 2, 4: 3, 5: 4, 6: 4 }, artRer: { 2: 1, 3: 2, 4: 2, 5: 2, 6: 2 } },   // уровень «Доски объявлений» и «Костей писаря»: не выше одного за цикл (ADR-0028)
   prof: {
-    o: { n: 'обычный', cap: 'o', off: 1, keepDayBp: 6000, keepWeekBp: 42000, below: 3, paid: 0, cert: '' },
-    e: { n: 'увлечённый', cap: 'e', off: 0, keepDayBp: 10000, keepWeekBp: 70000, below: 3, paid: 0, cert: 'w' },
-    p: { n: 'плательщик, время обычного', cap: 'o', off: 1, keepDayBp: 10000, keepWeekBp: 70000, below: 7, paid: 'cap', cert: '' },
-    q: { n: 'тот же риск без платных замен', cap: 'o', off: 1, keepDayBp: 10000, keepWeekBp: 70000, below: 7, paid: 0, cert: '' },
+    o: { n: 'обычный', cap: 'o', lg: 'o', off: 1, keepDayBp: 6000, keepWeekBp: 42000, below: 3, paid: 0, cert: '' },
+    e: { n: 'увлечённый', cap: 'e', lg: 'e', off: 0, keepDayBp: 10000, keepWeekBp: 70000, below: 3, paid: 0, cert: 'w' },
+    p: { n: 'плательщик, время обычного', cap: 'o', lg: 'p', off: 1, keepDayBp: 10000, keepWeekBp: 70000, below: 7, paid: 'cap', cert: '' },
+    q: { n: 'тот же риск без платных замен', cap: 'o', lg: 'p', off: 1, keepDayBp: 10000, keepWeekBp: 70000, below: 7, paid: 0, cert: '' },
   },
   // o — оставляет задания не больше 60 % своего дня и 4,2 дня недели, меняет обычные и редкие; e — берёт всё и заверяет недельный;
-  // p — берёт всё и ловит редкость всеми платными заменами; q — p без платных замен: разница p и q — чистый вклад Энериума
+  // p — берёт всё и ловит редкость всеми платными заменами; q — p без платных замен: разница p и q — чистый вклад Энериума.
+  // lg — чей темп героев открывает Лигу (leagueOpen: o, e, p — плательщик с донатным сетом); у q — тот же, что у p
 };
 
 /* Законы и пороги проверок. */
@@ -183,10 +197,22 @@ function nice(x100) {
 }
 const niceDown = v => { const step = v < 20 ? 1 : v < 100 ? 5 : v < 1000 ? 10 : v < 10000 ? 100 : v < 100000 ? 1000 : 10000; return Math.max(step, Math.floor(v / step) * step); };
 
+/* Лига у профилей: день открытия и доля дней цикла, б. п. — leagueOpen (одно место: темп героев прогона достижений) по правилу LEAGUE */
+function leagueShare(CAP, LB, RO, err) {
+  const IN = fs.existsSync(FILES.paceIn) ? JSON.parse(fs.readFileSync(FILES.paceIn, 'utf8')) : null;
+  if (!IN || !RO) { err.push('Лига: нет tools/content-gen/wanderer/pace-inputs.json или roster.js — python tools/content-gen/wanderer/pace_inputs.py'); return null; }
+  const R = AP.leagueOpen(ACH, { cap: CAP, lb: LB, inputs: IN, goldHeroes: AP.goldHeroesOf(RO) }, LEAGUE);
+  for (const e of R.err) err.push('Лига: ' + e);
+  return R.err.length ? null : R;
+}
+
 function build() {
   const err = [], warn = [];
   const CAP = JSON.parse(fs.readFileSync(FILES.cap, 'utf8'));
-  const LB = loadJs(FILES.loot, 'EN_LOOTBOXES'), RX = loadJs(FILES.recipes, 'EN_RECIPES'), WN = loadJs(FILES.wanderer, 'EN_WANDERER');
+  const LB = loadJs(FILES.loot, 'EN_LOOTBOXES'), RX = loadJs(FILES.recipes, 'EN_RECIPES'), WN = loadJs(FILES.wanderer, 'EN_WANDERER'), ER = loadJs(FILES.echo, 'EN_ECHO_RULES');
+  if (!ER) err.push('echo-rules.js: нет EN_ECHO_RULES — очки События не посчитать (python tools/content-gen/economy/echo.py --js)');
+  /* Лига: доля дней цикла, когда у профиля открыта Лига, б. п. — одно место, leagueOpen (темп героев прогона достижений) */
+  const LO = leagueShare(CAP, LB, loadJs(FILES.roster, 'EN_ROSTER'), err);
   const KI = Object.fromEntries(KINDS.map(k => [k.id, k]));
   for (const K of KINDS) { if (!GROUPS[K.grp]) err.push(`вид ${K.id}: нет группы ${K.grp}`); K.from = K.from || RULES.openCycle; }
 
@@ -202,14 +228,19 @@ function build() {
       const base = ASSUME.dustWeek[c] || 0, E = LB.week.echo[c];
       return Math.floor((pk === 'o' ? base : base * E.fan.shards / E.free.shards) / 7);
     }
-    if (cp.event) {
-      const P = ASSUME.eventPts, rit = ASSUME.ritualSlot[pk] * CAP.slots[c], aw = ASSUME.arenaWin[pk];
-      return C.boss * P.boss + rit * P.ritual + C.echoKill * P.echoKill + aw * P.arenaWin;
-    }
     throw new Error('ёмкость вида ' + K.id);
   }
+  /* очки События в средний день, × 100: цены единиц и потолки сборщика События на той же ёмкости — этажи, элиты, боссы, Эхо из
+     capacity.json, стражи, ритуалы, Арена, Лига, клан и мастерская — ёмкость видов выше. Контракты в счёт не идут: задание не копит
+     очки само себе, а их прогон ещё не готов */
+  const eventCap = (c, pk) => EVB.dayPoints100(EVB.dayUnits(CAP, Object.fromEntries(Object.entries(caps[c]).map(([k, x]) => [k, [x.o, x.e]])), ER, c, pk, null,
+    LO && LO.share[c] ? LO.share[c][pk] : RULES.bp));
   const caps = {};
-  for (const c of RULES.cycles) { caps[c] = {}; for (const K of KINDS) caps[c][K.id] = { o: capOf(K, c, 'o'), e: capOf(K, c, 'e') }; }
+  for (const c of RULES.cycles) {
+    caps[c] = {};
+    for (const K of KINDS) if (!K.cap.event) caps[c][K.id] = { o: capOf(K, c, 'o'), e: capOf(K, c, 'e') };
+    for (const K of KINDS) if (K.cap.event) caps[c][K.id] = { o: eventCap(c, 'o'), e: eventCap(c, 'e') };   // после остальных: берёт их ёмкость
+  }
 
   /* --- объём по редкости: сетка времени × ёмкость обычного, округление, допуск --- */
   const vol = { d: {}, w: {} }, share = { d: {}, w: {} };
@@ -281,14 +312,17 @@ function build() {
       else { st.weekDone++; if (top) { st.chest[top - 1]++; if (cert) st.chestCert[top - 1]++; } }
       return pts;
     };
+    const lgBp = LO && LO.share[c] ? LO.share[c][P.lg] : RULES.bp;   // доля дней цикла с открытой Лигой у профиля
     for (let w = 0; w < SIM.weeks; w++) {
       const tau = []; for (let d = 0; d < 7; d++) tau.push(SIM.tau[0] + rng(SIM.tau[1] - SIM.tau[0] + 1));
       if (P.off) tau[rng(7)] = 0;
       const wf = Math.floor(free / 2), wp = Math.floor(paid / 2);
-      let pts = run('w', { t: 'w', c, seed: pid, period: 'w' + w }, wf, wp, tau.reduce((a, x) => a + x, 0));
+      /* до открытия Лиги сервер её заданий не выдаёт (условие игрока need): такие недели — первыми, их доля — доля закрытых дней */
+      const ok = w * RULES.bp >= SIM.weeks * (RULES.bp - lgBp) ? null : k => k !== 'league';
+      let pts = run('w', { t: 'w', c, seed: pid, period: 'w' + w, ok }, wf, wp, tau.reduce((a, x) => a + x, 0));
       for (let d = 0; d < 7; d++) {
         if (!tau[d]) continue;   // день без игры — контракт не взят
-        pts += run('d', { t: 'd', c, seed: pid, period: `w${w}d${d}` }, free - (d ? 0 : wf), paid - (d ? 0 : wp), tau[d]);
+        pts += run('d', { t: 'd', c, seed: pid, period: `w${w}d${d}`, ok }, free - (d ? 0 : wf), paid - (d ? 0 : wp), tau[d]);
       }
       st.pts += pts; st.ptsWeek.push(pts);
     }
@@ -442,7 +476,7 @@ function build() {
   const round1 = x => Math.round(x * 10) / 10;
   const data = {
     meta: { builder: 'tools/content-gen/contracts/build.js', capacity: 'tools/content-gen/contracts/capacity.json', capSha: crypto.createHash('sha256').update(fs.readFileSync(FILES.cap)).digest('hex').slice(0, 12),
-      sources: ['GDD §18', 'ADR-0014', 'ADR-0022', 'ADR-0023', 'ADR-0028', 'design/ui/lootboxes.js', 'design/ui/recipes.js', 'design/ui/wanderer.js'] },
+      sources: ['GDD §18', 'ADR-0014', 'ADR-0022', 'ADR-0023', 'ADR-0028', 'design/ui/lootboxes.js', 'design/ui/recipes.js', 'design/ui/wanderer.js', 'design/ui/echo-rules.js', 'tools/content-gen/event/build.js'] },
     rules: {
       bp: RULES.bp, openLevel: RULES.openLevel, openCycle: RULES.openCycle, cycles: RULES.cycles, tables: RULES.tables, tableName: RULES.tableName,
       pool: Object.assign({}, RULES.pool, { artInfo: art(RULES.pool.art), memInfo: pas(RULES.pool.mem) }),
@@ -456,12 +490,17 @@ function build() {
     hours: CAP.hours,
     typical: Object.fromEntries(RULES.cycles.map(c => [c, { pool: poolOf(c), rer: rerOf(c) }])),
     planks,
+    /* econ — итог прогона в неделю: keys — ключи со всех источников, ctKeys — только режима «Контракты» (награды заданий, сундук
+       недельного контракта, сундуки планок рейтинга, без ключей с боссов) — их берёт калькулятор сет-бонусов economy/sets.py;
+       gold — золото наград и сундуков, stake — ставки заверения, spirit — дух наград: их берёт калькулятор экономики economy/economy.py (Т7) */
     econ: Object.fromEntries(RULES.cycles.map(c => [c, {
       capKeys: Math.round(capKeysWeek(c)),
       o: { dayDoneBp: Math.round(sims[c].o.dayDone * RULES.bp / sims[c].o.dayTry), weekDoneBp: Math.round(sims[c].o.weekDone * RULES.bp / sims[c].o.weekTry),
-        keys: Math.round(income[c].o.keysAll), pts: Math.round(meanPts(c, 'o')), en: Math.round(income[c].o.en), gold: Math.round(income[c].o.gold) },
+        keys: Math.round(income[c].o.keysAll), ctKeys: Math.round(income[c].o.keys + income[c].o.chestKeys + income[c].o.rating),
+        pts: Math.round(meanPts(c, 'o')), en: Math.round(income[c].o.en), gold: Math.round(income[c].o.gold), stake: Math.round(income[c].o.stake), spirit: Math.round(income[c].o.spirit) },
       e: { dayDoneBp: Math.round(sims[c].e.dayDone * RULES.bp / sims[c].e.dayTry), weekDoneBp: Math.round(sims[c].e.weekDone * RULES.bp / sims[c].e.weekTry),
-        keys: Math.round(income[c].e.keysAll), pts: Math.round(meanPts(c, 'e')), en: Math.round(income[c].e.en), gold: Math.round(income[c].e.gold) },
+        keys: Math.round(income[c].e.keysAll), ctKeys: Math.round(income[c].e.keys + income[c].e.chestKeys + income[c].e.rating),
+        pts: Math.round(meanPts(c, 'e')), en: Math.round(income[c].e.en), gold: Math.round(income[c].e.gold), stake: Math.round(income[c].e.stake), spirit: Math.round(income[c].e.spirit) },
       x17: Math.round(x17[c].worst * 100),
     }])),
   };
@@ -499,7 +538,7 @@ function build() {
 
   // каталог
   T = head(['Задание', 'Группа', 'С цикла', 'Дневной', 'Недельный', 'Ёмкость, цикл II: обычный / увлечённый', 'Что засчитывается']);
-  for (const K of KINDS) T.push(cells([K.n, GROUPS[K.grp], ROMAN[K.from], K.t.includes('d') ? tag('d', Math.max(2, K.from), K.id) : '—', K.t.includes('w') ? tag('w', Math.max(2, K.from), K.id) : '—', capTxt(K, Math.max(2, K.from)), K.what + (K.need ? ' Выдаётся, если ' + { recipes: 'в открытых циклах остались ненайденные рецепты', league: 'у игрока 15 героев для Лиги', hire: 'в каталоге есть герои за золото', dust: 'в запасах есть прах', clan: 'игрок в клане' }[K.need] + '.' : '')]));
+  for (const K of KINDS) T.push(cells([K.n, GROUPS[K.grp], ROMAN[K.from], K.t.includes('d') ? tag('d', Math.max(2, K.from), K.id) : '—', K.t.includes('w') ? tag('w', Math.max(2, K.from), K.id) : '—', capTxt(K, Math.max(2, K.from)), K.what + (K.need ? ' Выдаётся, если ' + { recipes: 'в открытых циклах остались ненайденные рецепты', league: `у игрока ${LEAGUE.heroes} разных героев — Лига открыта`, hire: 'в каталоге есть герои за золото', dust: 'в запасах есть прах', clan: 'игрок в клане' }[K.need] + '.' : '')]));
   TBL.kinds = T.join('\n');
 
   // объёмы цикла II и цикла, где вид открывается

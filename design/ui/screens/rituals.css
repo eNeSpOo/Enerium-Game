@@ -1,0 +1,153 @@
+/* screens/rituals.css — «Неделя → Ритуалы» (screens/rituals.js).
+   Правила воздуха (ADR-0026): слоты сверху — одна мысль на слот; на карточке — кристалл и время, имя, бригада, одно-два числа
+   награды и одно действие; подробности — в листах. Отступы — токены --sp-l / --sp-m / --sp-s; цвет редкости — --rc от [data-r]
+   (ADR-0027). Движение — только transform и opacity. Свои классы — с префиксом rt-. */
+
+.rt-scr{gap:var(--sp-m)}
+
+/* слоты сверху: плитки одной высоты, общие на обе вкладки */
+/* до семи слотов и плитка артефакта — одной строкой: плитка сжимается, но не уже 96 px */
+.rt-slots{display:flex;gap:var(--sp-s);flex:none;min-width:0;overflow-x:auto;scrollbar-width:none}
+.rt-slot{position:relative;flex:1 1 0;min-width:96px;max-width:230px;display:grid;grid-template-columns:22px minmax(0,1fr);align-items:center;gap:var(--sp-s);min-height:50px;padding:6px 10px;
+  border-radius:11px;border:1px solid var(--iron);background:#0e1114;color:inherit;text-align:left;font:inherit;overflow:hidden}
+.rt-slot.lock{flex:0 1 auto;min-width:96px}
+.rt-sx small .i{width:12px;height:12px;vertical-align:-2px;margin-right:3px}
+.rt-slot.ready{cursor:pointer}
+.rt-slot.ready:hover b{color:var(--spirit)}
+.rt-si{display:grid;place-items:center;width:22px;height:26px;color:var(--parch-3)}
+.rt-si .i{width:18px;height:18px}
+.rt-sx{display:flex;flex-direction:column;gap:2px;min-width:0}
+.rt-sx b{font:600 15px/1.1 var(--f-d);color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt-sx small{font-size:12px;color:var(--parch-3);white-space:nowrap}
+.rt-slot.run{cursor:pointer;border-color:color-mix(in srgb,var(--rc) 30%,var(--iron))}
+.rt-slot.run:hover b{color:var(--gold)}
+.rt-slot.run .rt-si{color:var(--sand)}
+.rt-slot.run .bar{position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:0}
+.rt-slot.ready{border-color:rgba(72,229,212,.5);background:radial-gradient(90% 120% at 50% 130%,rgba(72,229,212,.14),transparent 70%),#0e1114}
+.rt-slot.ready .rt-sx small{color:var(--spirit)}
+.rt-slot.free{border-style:dashed;background:transparent}
+.rt-slot.free b{color:var(--parch-2)}
+.rt-slot.lock{border-style:dashed;border-color:#23282d;background:transparent;opacity:.8;cursor:pointer}
+.rt-slot.lock b{color:var(--parch-3)}
+.rt-slot.lock:hover{opacity:1}
+.rt-slot.lock:hover b{color:var(--gold)}
+
+/* кристалл редкости: значок r1…r7 со свечением своего цвета */
+.rt-cr{display:inline-grid;place-items:center;flex:none}
+.rt-cr .ico{filter:drop-shadow(0 0 5px color-mix(in srgb,var(--rc) 60%,transparent))}
+.rt-cr.none{width:26px;height:26px;border-radius:8px;border:1px dashed var(--iron-2);color:var(--parch-3)}
+
+/* строка вкладки */
+.rt-bar{display:flex;align-items:center;gap:var(--sp-s);flex:none;min-width:0}
+.rt-bar>.eyebrow{font-size:11.5px;color:var(--gold)}
+.rt-art{cursor:pointer}
+.rt-art:hover{color:var(--gold);border-color:var(--gold-3)}
+
+/* карточки дневного пула */
+.rt-grid{flex:1 1 0;min-height:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));grid-auto-rows:minmax(186px,auto);gap:var(--sp-m);align-content:start;padding:2px}
+.rt-card{position:relative;display:flex;flex-direction:column;min-width:0;border-radius:12px;overflow:hidden;
+  border:1px solid color-mix(in srgb,var(--rc) 34%,var(--iron));
+  background:radial-gradient(110% 70% at 50% 112%,color-mix(in srgb,var(--rc) 16%,transparent),transparent 65%),var(--stone);
+  box-shadow:inset 0 3px 0 -1px color-mix(in srgb,var(--rc) 85%,transparent)}
+.rt-card.uniq{border-color:color-mix(in srgb,var(--gold) 55%,var(--iron));box-shadow:inset 0 3px 0 -1px var(--gold),0 0 20px -8px var(--gold)}
+.rt-cm{flex:1 1 auto;display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0;padding:var(--sp-m) var(--sp-m) 4px;border:0;background:none;color:inherit;text-align:left;font:inherit}
+.rt-cm:hover .rt-cn{color:var(--gold)}
+.rt-ct{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%}
+.rt-cn{font:600 18px/1.05 var(--f-d);color:var(--parch);text-wrap:balance}
+.rt-crown{display:inline-grid;vertical-align:-2px;margin-right:4px;color:var(--gold)}
+.rt-crown .i{width:15px;height:15px}
+.rt-bio{margin-top:-3px;font-size:12px;color:var(--parch-3)}
+.rt-cb{display:flex;gap:6px;flex-wrap:wrap}
+.rt-cr2{display:flex;align-items:center;gap:12px;margin-top:auto;min-width:0}
+.rt-num{display:inline-flex;align-items:center;gap:5px;color:var(--parch-2)}
+.rt-num>img{width:22px;height:22px;object-fit:contain}
+.rt-num .i{width:18px;height:18px}
+.rt-num b{font:600 24px/1 var(--f-d);color:var(--parch)}
+.rt-also{display:inline-flex;gap:3px;opacity:.75}
+.rt-also img{width:16px;height:16px;object-fit:contain}
+.rt-ca{display:flex;justify-content:flex-end;align-items:center;min-height:40px;padding:0 var(--sp-s) var(--sp-s)}
+.rt-card.taken{opacity:.55;box-shadow:none;padding:var(--sp-m);gap:6px}
+.rt-card.taken .rt-cn{color:var(--parch-2)}
+.rt-cz{margin:auto 0 0;font-size:12.5px;color:var(--parch-3)}
+.rt-time .i,.rt-crew .i{width:14px;height:14px}
+.rt-line{flex:none;margin-top:calc(var(--sp-s) * -1)}
+.rt-team{flex-wrap:wrap;gap:6px;flex:none}
+.rt-tn{font-size:11.5px}
+.rt-empty{flex:1 1 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:var(--sp-l);text-align:center}
+.rt-empty b{font-size:20px;color:var(--parch)}
+.rt-lock{display:flex;flex-direction:column;align-items:center;gap:var(--sp-s);text-align:center}
+.rt-lock b{font-size:20px;color:var(--parch)}
+.rt-lock .i{width:28px;height:28px;color:var(--gold-2)}
+
+/* листы: старт, идущий ритуал */
+.rt-sh-top{display:flex;align-items:center;gap:var(--sp-m)}
+.rt-sh-n{font-size:22px;line-height:1.05;color:var(--parch)}
+.rt-lore{margin:0;font:italic 500 15.5px/1.35 var(--f-d);color:var(--parch-2)}
+.rt-rlist{display:flex;flex-direction:column;gap:6px}
+.rt-rrow{display:grid;grid-template-columns:32px minmax(0,1fr) auto;align-items:center;gap:var(--sp-s)}
+.rt-rrow .n{display:flex;flex-direction:column;min-width:0;font-size:14px;color:var(--parch)}
+.rt-rrow .n small{font-size:12px;color:var(--parch-3)}
+.rt-rrow>b{font:600 22px/1 var(--f-d);color:var(--parch)}
+.rt-rimg{width:28px;height:28px;object-fit:contain}
+.rt-rimg.v{display:grid;place-items:center;border-radius:8px;background:#0e1114;box-shadow:0 0 0 1px var(--iron);color:var(--gold-2)}
+.rt-crew-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rt-cut{margin-left:6px;font:700 13px/1 var(--f-u);letter-spacing:.03em;color:var(--spirit)}
+.rt-heroes{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:6px}
+.rt-hero{position:relative;width:100%;aspect-ratio:1;padding:0;border-radius:10px;overflow:hidden;border:1px solid var(--iron);background:#07090a;cursor:pointer;opacity:.62;transition:opacity .15s,transform .15s}
+.rt-hero img{display:block;width:100%;height:100%;object-fit:cover}
+.rt-hero::after{content:"";position:absolute;inset:auto 0 0 0;height:3px;background:var(--rc)}
+.rt-hero:hover{opacity:.9}
+.rt-hero.on{opacity:1;box-shadow:0 0 0 2px var(--spirit),0 0 12px -2px var(--spirit)}
+.rt-hero.static{cursor:default;opacity:1;box-shadow:none}
+.rt-sq{position:absolute;top:2px;right:2px;display:grid;place-items:center;width:17px;height:17px;border-radius:5px;background:rgba(8,10,12,.85);color:var(--amber);font-style:normal}
+.rt-sq .i{width:11px;height:11px}
+.rt-why{flex:1 1 auto;margin:0;font-size:12.5px}
+
+/* артель */
+.rt-alist{display:flex;flex-direction:column;gap:6px}
+.rt-arow{display:grid;grid-template-columns:28px minmax(0,1fr) 34px auto auto;align-items:center;gap:var(--sp-s);padding:6px 8px;border-radius:10px;background:#0e1114;box-shadow:inset 3px 0 0 -1px var(--rc)}
+.rt-arow .n{display:flex;flex-direction:column;min-width:0}
+.rt-arow .n b{font-size:14px;color:var(--parch)}
+.rt-arow .n small{font-size:11.5px;color:var(--parch-3)}
+.rt-an{font:600 22px/1 var(--f-d);color:var(--parch);text-align:right}
+.rt-ash{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;color:var(--parch-2)}
+.rt-ash .i{width:14px;height:14px}
+
+/* сбор: песочные часы переворачиваются, свет, награда поднимается по одной. Задержки — от начала показа (rituals.js) */
+.rt-dlg{max-width:520px}
+.rt-fx{position:relative;display:flex;flex-direction:column;align-items:center;gap:var(--sp-m);width:100%;padding:var(--sp-m) 0 var(--sp-s);border:0;background:none;color:inherit;font:inherit;cursor:pointer}
+.rt-glass{display:block;width:64px;height:80px;transform-origin:50% 50%;animation:rtFlip .52s cubic-bezier(.5,0,.3,1) both}
+.rt-glass svg{width:100%;height:100%;overflow:visible}
+.rt-glass .fr{fill:none;stroke:var(--gold-2);stroke-width:3;stroke-linecap:round}
+.rt-glass .gl{fill:rgba(236,228,211,.05);stroke:var(--gold);stroke-width:1.6;stroke-linejoin:round}
+.rt-glass .sa{fill:var(--sand);opacity:.9}
+.rt-glass .sb{fill:var(--rc);opacity:.95;filter:drop-shadow(0 0 6px var(--rc))}
+.rt-gl{position:absolute;top:18px;left:50%;width:140px;height:140px;margin-left:-70px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--rc) 45%,transparent),transparent);animation:rtLight .7s ease-out both}
+.rt-gg{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 14px;min-height:44px}
+.rt-gi{display:inline-flex;align-items:center;gap:5px;animation:rtRise .34s cubic-bezier(.2,.8,.2,1) both}
+.rt-gi>img{width:26px;height:26px;object-fit:contain}
+.rt-gi b{font:600 22px/1 var(--f-d);color:var(--parch)}
+.rt-fx.done .rt-glass,.rt-fx.done .rt-gi{animation:none}
+.rt-fx.done .rt-glass{transform:rotate(180deg)}
+.rt-fx.done .rt-gl{animation:none;opacity:0}
+.rt-sum{margin:0;text-align:center;font-size:14.5px}
+@keyframes rtFlip{from{transform:rotate(0)}to{transform:rotate(180deg)}}
+@keyframes rtLight{0%{opacity:0;transform:scale(.4)}40%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.25)}}
+@keyframes rtRise{from{opacity:0;transform:translateY(12px) scale(.9)}to{opacity:1;transform:none}}
+
+/* UI-кит */
+.rt-kit .rt-kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:var(--sp-l)}
+.rt-kit-lad{gap:10px}
+.rt-kit-lad figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;width:74px;text-align:center}
+.rt-kit-lad figcaption{font-size:11px;line-height:1.25;color:var(--parch-2)}
+.rt-kit-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,210px));gap:var(--sp-m)}
+.rt-kit-cards .rt-card{min-height:190px}
+.rt-kit-sp{display:inline-flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;color:var(--parch-2)}
+.rt-kit-sp b{font:600 18px/1 var(--f-d);color:var(--parch)}
+.rt-kit-fx{width:48px;height:60px}
+.rt-kit-fx svg{width:100%;height:100%}
+.rt-kit-fx .fr{fill:none;stroke:var(--gold-2);stroke-width:3;stroke-linecap:round}
+.rt-kit-fx .gl{fill:rgba(236,228,211,.05);stroke:var(--gold);stroke-width:1.6}
+.rt-kit-fx .sa{fill:var(--sand)}
+.rt-kit-fx .sb{fill:var(--spirit)}

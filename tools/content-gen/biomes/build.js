@@ -54,7 +54,7 @@ const TEMPLATE = {
 /* Обычный рядовой-стрелок: у Мастерской ловкий рядовой только один — редкий убийца. Стрелок — медленнее и крепче его */
 const ARCHER_ST = [60, 25, 100, 90, 70];
 /* Боевая мощь карточки бестиария — §6: БМ = C × √(УВС × ЭЗ), слой 0 (К_ротации = 1). C — косметическая, × 100 */
-const BM_C_X100 = 4000;   // C = 40: витринная мощь героев прототипа (фикстуры S.heroes в index.html) ≈ 40 × √(УВС × ЭЗ)
+const BM_C_X100 = 4000;   // C = 40 — косметическая ручка §6; её же берёт общая функция мощи героев BM (design/ui/index.html) и клан
 /* Поля уникальной способности, которые ядро понимает (как в abilities.js и echo-foes.js). Чужое поле — ошибка сборки */
 const UNIQUE_FIELDS = ['tgt', 'targets', 'ch', 'coef', 'stat', 'ult', 'st', 'pow', 'left', 'focus', 'steal', 'pas', 'dmgPct', 'guardPct', 'every', 'cast', 'then', 'drain'];
 const TGT = ['threat', 'danger', 'lowest', 'healer', 'ally_lowest', 'ally_strong', 'all', 'allies', 'self'];

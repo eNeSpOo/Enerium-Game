@@ -1,0 +1,537 @@
+/* Автопроверка клана (design/ui/clan.js, design/ui/screens/clan.js) — без браузера.
+   1. Файлы: index.html подключает clan.js до основного скрипта, clan.css и screens/clan.js — после model.js и heroes.js; прежнего экрана
+      clanView, его состояния и стилей в index.html нет; карта экранов отмечает окна клана готовыми, «Неделя» — раздачу наград.
+   2. Данные свежие: калькулятор tools/content-gen/clan/build.js без ошибок даёт ровно EN_CLAN и таблицы черновика docs/content/клан.md;
+      capacity.json совпадает с калькуляторами экономики (если есть Python). Все числа целые.
+   3. Алгоритмы EnClan: требование резервуара растёт, первое очко — за пару дней, сотое — к концу второго года; круги растут;
+      доля по весам сходится с суммой; элиты круга — на сиде, тот же сид — те же элиты.
+   4. «Сервер» экрана:
+      — атака: без отряда — лист выбора; одна атака из кошелька, бой ядром на сиде — повтор того же боя даёт тот же итог; повтор номера
+        ничего не списывает; пустой кошелёк — отказ; урон копится, выплата — в момент смерти по снятому здоровью, сумма — очки врага;
+        три элиты — босс, висящие элиты сгорают; босс — новый круг; анти-прыгун — очки клану со следующей недели;
+      — древо: пассивка — только следующий уровень и только со свободным очком; сброс — Энериум, раз в неделю, уровень остаётся;
+      — резервуар: очки контрактов игрока → очки навыков;
+      — раздача: пул места на каждого участника, половина по вкладу — сразу, половина главы — ровно её размер, запись в журнал, повтор
+        ничего не меняет, участник раздать не может; срок вышел — раздаёт сервер по вкладу;
+      — подсчёт недели, роли с капами, исключение только с причиной, заявки, паспорт, выход без штрафа, вход, заявка, создание клана.
+   5. Вид: четыре вкладки, поиск, все листы и диалоги, бой и итог атаки, сценарии, раздел UI-кита — без исключений, undefined и NaN.
+      Правила воздуха: на карточке цели — не больше двух чисел, двух чипов и одного действия. Режим «Игрок»: служебных слов нет.
+   6. Неделя: строка «Клановый босс» в WEEK_MODES — не демо: место и очки клана, вклад, выплата за место; прошлая — выплаты из «Даров».
+      «Дары» берут клановую долю Кланового босса из журнала раздачи: половина сервера по вкладу, доля главы — ждёт, после раздачи —
+      ровно расписанное, «Получить» выдаёт её; эта неделя — место клана сейчас на участника; без клана — клановой доли этой недели нет.
+   Запуск: node tools/content-gen/screens/check_clan.js [--dump] */
+'use strict';
+const fs = require('fs'), path = require('path'), vm = require('vm'), cp = require('child_process');
+const { SERVICE, strip, playerText } = require('./check_player_view.js');
+const ROOT = path.join(__dirname, '..', '..', '..'), UI = path.join(ROOT, 'design', 'ui');
+const read = f => fs.readFileSync(path.join(UI, f), 'utf8');
+const html = read('index.html');
+const DUMP = process.argv.includes('--dump');
+const err = [], note = [];
+const cnt = { views: 0, player: 0, ops: 0, cards: 0, fights: 0 };
+const say = m => { if (err.length < 80) err.push(m); else if (err.length === 80) err.push('… и ещё ошибки'); };
+function done() {
+  for (const n of note) console.log('предупреждение: ' + n);
+  if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
+  console.log(`Клан: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; карточек целей ${cnt.cards}; боёв ${cnt.fights}; операций ${cnt.ops}.`);
+  console.log('Проверка пройдена: данные свежие и целые, бой клана решается ядром на сиде, операции не повторяются, выплаты сходятся с очками врага, раздача — ровно половина, игроку служебного не видно.');
+  process.exit(0);
+}
+
+/* ================== 1. файлы ================== */
+const scripts = [...html.matchAll(/<script(?:\s+src="([^"]+)")?>([\s\S]*?)<\/script>/g)].map(m => ({ src: m[1], code: m[2] }));
+{
+  const crlf = (html.match(/\r\n/g) || []).length, lf = (html.match(/\n/g) || []).length;
+  if (crlf !== lf) say(`index.html: концы строк не чистый CRLF — CRLF ${crlf}, LF ${lf}`);
+  const i = src => scripts.findIndex(s => s.src === src), iMain = scripts.findIndex(s => !s.src && /const EB = window\.EnBattle/.test(s.code));
+  if (i('clan.js') < 0) say('index.html: не подключены данные clan.js');
+  else if (iMain >= 0 && i('clan.js') > iMain) say('index.html: clan.js подключён после основного скрипта');
+  if (i('screens/clan.js') < 0) say('index.html: не подключён screens/clan.js');
+  else { if (i('screens/clan.js') < i('screens/model.js')) say('index.html: screens/clan.js раньше model.js'); if (i('screens/heroes.js') >= 0 && i('screens/clan.js') < i('screens/heroes.js')) say('index.html: screens/clan.js раньше heroes.js — нет общего листа отряда SQ'); }
+  if (!/<link rel="stylesheet" href="screens\/clan\.css">/.test(html)) say('index.html: не подключён screens/clan.css');
+  for (const old of ['function clanView', 'clan: clanView', "clan: { n: 'Пепельный круг'", '.knots{', '.branch{', '.emblem{', '.goals{', "ic('bolt')}атак"])
+    if (html.includes(old)) say(`index.html: остался прежний код клана — «${old}»`);
+  const card = html.match(/\{ n: 'Клан'[\s\S]*?\},\r?\n/);
+  const want = ['clan', 'clans', 'clan-members', 'clan-tree', 'clan-tree-reset', 'clan-reservoir', 'clan-boss', 'clan-boss-setup', 'clan-boss-ledger'];
+  if (!card) say('index.html: на карте экранов нет карточки «Клан»');
+  else { const r = card[0].match(/ready:\s*\[([^\]]*)\]/); const got = r ? r[1] : ''; for (const id of want) if (!got.includes(`'${id}'`)) say(`карта экранов: окно клана «${id}» не отмечено готовым`); }
+  const wk = html.match(/\{ n: 'Неделя'[\s\S]*?\},\r?\n/);
+  if (!wk || !/ready:\s*\[[^\]]*'clan-rewards'/.test(wk[0])) say('карта экранов: «Распределение наград» (clan-rewards) не отмечено готовым');
+  for (const f of ['clan.js', 'screens/clan.js']) try { new vm.Script(read(f), { filename: f }); } catch (e) { say(`${f}: синтаксис — ${e.message}`); }
+}
+if (err.length) done();
+
+/* ================== 2. данные ================== */
+const B = require('../clan/build.js');
+const built = B.calc();
+if (B.err.length) say('калькулятор клана: ' + B.err.slice(0, 6).join('; '));
+{
+  if (B.render(built.data) !== read('clan.js')) say('clan.js устарел: пересобрать — node tools/content-gen/clan/build.js');
+  const doc = fs.existsSync(B.FILES.doc) ? fs.readFileSync(B.FILES.doc, 'utf8') : null;
+  if (!doc) say('нет черновика docs/content/клан.md');
+  else { const fresh = B.withTables(doc, built.tables); if (fresh == null) say('клан.md: нет меток таблиц'); else if (fresh !== doc) say('клан.md: таблицы устарели — пересобрать'); if (!/## Вопросы автору/.test(doc)) say('клан.md: нет раздела «Вопросы автору»'); }
+  const py = cp.spawnSync('python', [path.join(ROOT, 'tools', 'content-gen', 'clan', 'capacity.py'), '--check'], { encoding: 'utf8', env: Object.assign({}, process.env, { PYTHONIOENCODING: 'utf-8' }) });
+  if (py.error) note.push('Python не найден — свежесть capacity.json не проверена');
+  else if (py.status !== 0) say('capacity.json устарел: ' + (py.stdout || py.stderr || '').trim().split('\n').pop());
+}
+if (err.length) done();
+
+/* ================== песочница ==================
+   Скрипты прототипа — по порядку, как в браузере, с заглушкой DOM; boot() не запускается; localStorage недоступен.
+   Файл, на который index.html уже ссылается, но которого ещё нет (экран другой задачи в работе), пропускается с предупреждением */
+function load() {
+  const stubEl = id => {
+    const e = { id, innerHTML: '', textContent: '', value: '', hidden: false, style: { setProperty() {} }, dataset: {}, children: [],
+      classList: { add() {}, remove() {}, toggle() {}, contains: () => false }, addEventListener() {}, removeEventListener() {}, appendChild: x => x, append() {}, prepend() {}, remove() {},
+      animate: () => ({}), insertAdjacentHTML() {}, setAttribute() {}, getAttribute: () => null, querySelectorAll: () => [], closest: () => null,
+      getBoundingClientRect: () => ({ left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 }), scrollIntoView() {}, focus() {}, clientWidth: 1200, clientHeight: 800 };
+    e.querySelector = () => stubEl();
+    return e;
+  };
+  const rootCls = new Set(), root = stubEl('html');
+  root.classList = { add: c => rootCls.add(c), remove: c => rootCls.delete(c), toggle: (c, on) => { const v = on === undefined ? !rootCls.has(c) : !!on; if (v) rootCls.add(c); else rootCls.delete(c); return v; }, contains: c => rootCls.has(c) };
+  const els = {};
+  const document = { readyState: 'loading', addEventListener() {}, getElementById: id => (els[id] = els[id] || stubEl(id)),
+    querySelector: () => null, querySelectorAll: () => [], createElement: () => stubEl(), createElementNS: () => stubEl(), body: stubEl('body'),
+    documentElement: root, activeElement: null, fonts: null };
+  const noStore = () => { throw new Error('localStorage недоступен'); };
+  const win = { document, console, navigator: { userAgent: 'node' }, location: { hash: '', href: '' }, history: { replaceState() {} },
+    localStorage: { getItem: noStore, setItem: noStore, removeItem: noStore }, innerWidth: 1400, innerHeight: 900, devicePixelRatio: 1,
+    addEventListener() {}, removeEventListener() {}, dispatchEvent() {}, matchMedia: () => ({ matches: false, addEventListener() {}, addListener() {} }),
+    requestAnimationFrame: () => 0, cancelAnimationFrame() {}, setTimeout: () => 0, clearTimeout() {}, setInterval: () => 0, clearInterval() {},
+    getComputedStyle: () => ({ getPropertyValue: () => '' }), CustomEvent: function CustomEvent() {}, performance: { now: () => 0 } };
+  win.window = win; win.self = win;
+  const ctx = vm.createContext(win);
+  for (const s of scripts) {
+    if (s.src && !fs.existsSync(path.join(UI, s.src))) { note.push(`index.html ссылается на ${s.src}, файла ещё нет — пропущен`); continue; }
+    try { vm.runInContext(s.src ? read(s.src) : s.code, ctx, { filename: s.src || 'index.html' }); }
+    catch (e) { say(`выполнение ${s.src || 'встроенного скрипта'}: ${e.message}`); }
+  }
+  if (err.length) done();
+  const T = vm.runInContext(`({
+    get S() { return S; }, set S(v) { S = v; },
+    ACT, OV, FLOWS, KH, MAP, KIT_EXTRA, SCREENS, SQ, EB, render, initialState, setTeam, advance, runById,
+    rsSetWeek: typeof rsSetWeek === 'function' ? rsSetWeek : null, darRows: typeof darRows === 'function' ? darRows : null,
+    D: window.EN_CLAN, EC: window.EnClan, UI: window.EN_CLAN_UI, W: window.EN_WEEK || null, LB: window.EN_LOOTBOXES,
+  })`, ctx);
+  return { T, ctx, els, game: () => (els.game ? els.game.innerHTML : '') };
+}
+const run = (where, f) => { try { return f(); } catch (e) { say(`${where}: исключение — ${e.message} | ${(e.stack || '').split('\n').slice(1, 3).join(' | ').trim()}`); return undefined; } };
+const ENT = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', '#39': "'" };
+const decode = s => s.replace(/&(#\d+|#x[\da-f]+|[a-z]+);/gi, (x, k) => ENT[k] || (k[0] === '#' ? String.fromCodePoint(k[1] === 'x' ? parseInt(k.slice(2), 16) : +k.slice(1)) : x));
+const tips = h => [...h.matchAll(/\s(?:title|placeholder|aria-label)="([^"]*)"/g)].map(m => decode(m[1]).replace(/\s+/g, ' ').trim()).filter(Boolean);
+const toasts = h => [...h.matchAll(/\sdata-a="toast"\s+data-v="([^"]*)"/g)].map(m => decode(m[1]).trim()).filter(Boolean);
+const dumped = new Set();
+function scan(P, h, where) {
+  cnt.views++;
+  if (typeof h !== 'string' || !h) { say(`${where}: пустая разметка`); return ''; }
+  const bad = h.match(/.{0,60}(?:undefined|NaN|\[object ).{0,40}/);
+  if (bad) say(`${where}: в разметке undefined, NaN или [object — «${bad[0].replace(/\s+/g, ' ')}»`);
+  if (!P.T.KH.team) {
+    cnt.player++;
+    const v = strip(h), txt = playerText(h).split('\n').concat(tips(v), toasts(v));
+    if (P.T.S.toast) txt.push(P.T.S.toast.t);
+    for (const t of txt) for (const [what, re] of SERVICE) { const m = t.match(re); if (m) say(`${where}: игроку видно служебное (${what}) — «${t.slice(Math.max(0, m.index - 40), m.index + 60)}»`); }
+    if (DUMP && !dumped.has(where)) { dumped.add(where); console.log(`\n== ${where}\n` + playerText(h)); }
+  }
+  return h;
+}
+const view = (P, where) => { run(where, () => P.T.render()); return scan(P, P.game(), where); };
+/* блоки разметки по классу: сбалансированные <div class="cls …"> … </div> */
+function blocks(h, cls) {
+  const out = [], re = /<(\/?)div\b[^>]*>/g, open = new RegExp(`^<div\\b[^>]*\\sclass="${cls}[ "]`);
+  let m, depth = 0, start = -1;
+  while ((m = re.exec(h))) {
+    if (start < 0) { if (!m[1] && open.test(m[0])) { start = m.index; depth = 1; } continue; }
+    depth += m[1] ? -1 : 1;
+    if (!depth) { out.push(h.slice(start, re.lastIndex)); start = -1; }
+  }
+  return out;
+}
+/* правила воздуха на карточке цели: два числа, два чипа, одно действие */
+function airCards(h, where) {
+  for (const c of blocks(h, 'cl-card')) {
+    cnt.cards++;
+    const text = playerText(c.replace(/\s(?:title|aria-label)="[^"]*"/g, ''));
+    const nums = (text.match(/\d[\d\s ]*/g) || []).filter(s => s.trim()).length;
+    if (nums > 2) say(`${where}: на карточке цели больше двух чисел — «${text.replace(/\n/g, ' · ')}»`);
+    const chips = (c.match(/class="(?:chip|el )/g) || []).length;
+    if (chips > 2) say(`${where}: на карточке цели ${chips} чипа`);
+    const acts = (c.match(/<button class="btn/g) || []).length;
+    if (acts > 1) say(`${where}: на карточке цели больше одного действия`);
+  }
+}
+const walkInt = (x, where, seen = new Set()) => {
+  if (typeof x === 'number') { if (!Number.isInteger(x)) say(`не целое: ${where} = ${x}`); return; }
+  if (!x || typeof x !== 'object' || seen.has(x)) return; seen.add(x);
+  for (const [k, v] of Object.entries(x)) if (typeof v !== 'function') walkInt(v, where + '.' + k, seen);
+};
+
+const P = load(), T = P.T, D = T.D, EC = T.EC, CU = T.UI;
+const S = () => T.S, C = () => T.S.clan;
+const op = () => 'c' + T.S.clOps.seq;
+const reset = () => { T.S = T.initialState(); T.S.overlay = null; T.S.route = 'clan'; };
+if (!D || !EC || !CU) { say('нет EN_CLAN, EnClan или EN_CLAN_UI в песочнице'); done(); }
+walkInt(D, 'EN_CLAN');
+
+/* ================== 3. алгоритмы ================== */
+{
+  for (let n = 2; n <= D.tree.levels.length; n++) if (EC.need(D, n) < EC.need(D, n - 1)) say(`резервуар: требование ${n}-го очка меньше ${n - 1}-го`);
+  const ref = Object.fromEntries(D.res.ref.o);
+  if (!(ref[1] <= D.res.targets.firstDays)) say(`резервуар: первое очко на ${ref[1]}-й день, цель — ${D.res.targets.firstDays}`);
+  if (!ref[100] || Math.abs(ref[100] - D.res.targets.lastDays) * D.bp > D.res.targets.lastDays * D.res.targets.tolBp) say(`резервуар: сотое очко на ${ref[100]}-й день, цель — ${D.res.targets.lastDays}`);
+  for (let k = 2; k <= 40; k++) if (!(EC.circlePow(D, k) > EC.circlePow(D, k - 1) && EC.points(D, k, 'b') > EC.points(D, k - 1, 'b') && EC.points(D, k, 'e') < EC.points(D, k, 'b'))) say(`круг ${k}: сила или очки не растут, или элита платит не меньше босса`);
+  const w = [5, 0, 3, 7, 1], s = EC.share(101, w);
+  if (s.reduce((a, x) => a + x, 0) !== 101 || s[1] !== 0) say(`доля по весам: ${s.join(', ')} — не 101 или доля без веса`);
+  const a = EC.roll(D, 'проверка|круг', 5), b = EC.roll(D, 'проверка|круг', 5), z = EC.roll(D, 'проверка|другой', 5);
+  if (JSON.stringify(a) !== JSON.stringify(b)) say('элиты круга: тот же сид — другие элиты');
+  if (JSON.stringify(a) === JSON.stringify(z)) say('элиты круга: разные сиды — те же элиты');
+  if (a.some(x => !D.lists.els.includes(x.el) || !D.boss.classes.includes(x.cls))) say('элиты круга: стихия или класс не из списков');
+  /* стихия — чистый случай из семи: на тысяче кругов каждая стихия выпадает */
+  const seen = new Set(); for (let i = 0; i < 1000; i++) for (const x of EC.roll(D, 'частота|' + i, 3)) seen.add(x.el);
+  if (seen.size !== D.lists.els.length) say(`элиты круга: за тысячу кругов выпали стихии ${[...seen].join(', ')}`);
+  if (EC.capacity(D, 0) !== 25 || EC.capacity(D, 100) !== 35) say('вместимость: не 25 → 35');
+  if (EC.attacksDay(D, 40) !== D.boss.attacks.day + 4) say('атаки: вехи первого круга дают не +4');
+  if (EB0().RULES.resist[D.boss.rank.b.core] !== 10000) say('клановый босс: иммунитет к контролю не 100 %');
+}
+function EB0() { return T.EB; }
+
+/* ================== 4. «сервер» экрана ================== */
+reset();
+{
+  const c = C();
+  if (!c.in || c.members.length !== CU.data.members.length || c.role !== 'head') say('демо: игрок не глава «Пепельного круга» или состав не из данных');
+  if (c.n !== CU.data.clan.n) say('демо: S.clan.n — не имя клана (его читают профиль и Неделя)');
+  if (c.boss.att !== EC.attacksDay(D, c.lvl) || c.boss.att !== c.members.find(m => m.me).atk) say(`демо: атак в кошельке ${c.boss.att}, по древу — ${EC.attacksDay(D, c.lvl)}`);
+  if (c.boss.targets.length !== EC.elitePool(D, c.lvl) || c.boss.targets.filter(x => x.dead).length !== CU.data.boss.killsIn) say('демо: круг не из данных — элит или павших не столько');
+  if (CU.pointsFree() !== c.earned - c.lvl || CU.nextPick() !== c.lvl + 1) say('демо: свободных очков навыков нет или следующий уровень не тот');
+  if (!c.past || c.past.done || !c.past.groups.length) say('демо: прошлая неделя не ждёт раздачи главы');
+  walkInt(c, 'S.clan');
+}
+
+/* атака: без отряда — лист выбора; с отрядом — бой, итог, повтор номера */
+reset();
+{
+  T.S.seg.clan = 'boss';
+  const x = C().boss.targets.find(t => !t.dead && !t.burned), n = C().boss.n + 1;
+  run('атака без отряда', () => T.ACT.clatk(`${x.uid}:${n}`));
+  if (!T.S.overlay || T.S.overlay.t !== 'prep' || T.S.overlay.arg !== 'clan') say('атака без отряда: не открылся лист выбора отряда (§25.1: установка при первом входе)');
+  if (C().boss.n !== 0) say('атака без отряда: атака списана');
+  T.S.overlay = null; T.SQ.set('clan', 's1');
+  const att0 = C().boss.att, hp0 = x.hp, uid = x.uid;
+  run('атака', () => T.ACT.clatk(`${uid}:${n}`)); cnt.ops++; cnt.fights++;
+  const L = C().boss.last;
+  if (!L || C().boss.att !== att0 - 1 || C().boss.n !== 1) say(`атака: кошелёк ${att0} → ${C().boss.att}, атак за неделю ${C().boss.n}`);
+  const R = T.S.runs.find(r => r.kind === 'clan');
+  if (!R || T.S.route !== 'battle') say('атака: нет просмотра боя');
+  if (L) {
+    const y = C().boss.targets.find(t => t.uid === uid) || x;
+    if (L.hp0 !== hp0 || (!L.kill && y.hp !== L.hp) || L.removed !== Math.max(0, hp0 - L.hp)) say('атака: здоровье цели и снятое не сходятся с итогом');
+    const b2 = T.EB.run(CU.battleOf(L.F));
+    if (b2.u[1][0].hp !== L.hp || b2.round !== L.rounds) say('атака: тот же бой на том же сиде дал другой итог — исход не детерминирован');
+    if (L.removed && (y.dmg.m1 || 0) < L.removed && !L.kill) say('атака: урон игрока не записан в счёт цели');
+  }
+  if (R) {
+    T.S.focus = R.id; view(P, 'бой клана');
+    T.S.route = 'clan';   // просмотр свёрнут: бой идёт без отрисовки, как у забегов в других проверках
+    for (let k = 0; k < 400 && !R.over; k++) run('ход боя', () => T.advance(R, 500));
+    if (!R.over) say('просмотр боя не закончился');
+    else if (T.S.route !== 'clan' || !T.S.toast || !/Клан · атака/.test(T.S.toast.t)) say('конец свёрнутого боя: нет строки об итоге');
+    T.S.route = 'battle';
+  }
+  const att1 = C().boss.att;
+  run('повтор атаки', () => T.ACT.clatk(`${uid}:${n}`));
+  if (C().boss.att !== att1 || C().boss.n !== 1) say('повтор атаки с тем же номером списал атаку');
+  const again = CU.srv.attack(`atk:${C().id}:${C().boss.no}:${n}`, uid, ['h1']);
+  if (!again.again || C().boss.att !== att1) say('сервер: повтор номера операции атаки не вернул прежний итог');
+  if (R) { run('пропустить', () => T.ACT.clskip(R.id)); if (!T.S.overlay || T.S.overlay.t !== 'clres') say('«Пропустить»: нет итога атаки'); else view(P, 'итог атаки'); }
+  /* добить третью элиту: выплата по снятому здоровью, сумма — очки врага; три победы — босс */
+  T.S.overlay = null; T.S.route = 'clan';
+  const e3 = C().boss.targets.find(t => !t.dead && !t.burned && t.g === 'e');
+  if (e3) {
+    e3.hp = 1; e3.dmg.m2 = (e3.dmg.m2 || 0) + 1000;
+    const mine0 = C().boss.mine, my0 = C().members.find(m => m.me).boss;
+    run('добить элиту', () => T.ACT.clatk(`${e3.uid}:${C().boss.n + 1}`)); cnt.ops++; cnt.fights++;
+    const L2 = C().boss.last;
+    if (!L2 || !L2.kill) say('добить элиту: элита с 1 здоровья не пала');
+    else {
+      const sum = Object.values(L2.pay).reduce((a, v) => a + v, 0);
+      if (sum !== EC.points(D, L2.k, 'e')) say(`выплата: ${sum} очков, а элита круга ${L2.k} стоит ${EC.points(D, L2.k, 'e')}`);
+      if (C().boss.mine - mine0 !== (L2.pay.m1 || 0) || C().members.find(m => m.me).boss - my0 !== (L2.pay.m1 || 0)) say('выплата: личные очки игрока не по доле');
+      if (!C().boss.targets.some(t => t.g === 'b' && !t.dead) || C().boss.kills !== D.boss.kills || !L2.summoned) say('три победы над элитами не призвали босса');
+      const Rr = T.S.runs.find(r => r.kind === 'clan'); if (Rr) { run('итог', () => T.ACT.clskip(Rr.id)); view(P, 'итог: элита пала, босс призван'); }
+    }
+    T.S.overlay = null; T.S.route = 'clan'; T.S.seg.clan = 'boss';
+    airCards(view(P, 'клан · босс призван'), 'клан · босс призван');
+  }
+  /* босс пал: новый круг, элиты — на сиде круга */
+  const bs = C().boss.targets.find(t => t.g === 'b' && !t.dead);
+  if (bs) {
+    const k0 = C().boss.circle; bs.hp = 1;
+    run('добить босса', () => T.ACT.clatk(`${bs.uid}:${C().boss.n + 1}`)); cnt.ops++; cnt.fights++;
+    const L3 = C().boss.last;
+    if (!L3 || !L3.kill || C().boss.circle !== k0 + 1 || C().boss.kills !== 0) say('босс пал, а новый круг не открылся');
+    const want = EC.roll(D, `клан|${C().id}|неделя|${C().boss.no}|круг|${k0 + 1}`, EC.elitePool(D, C().lvl));
+    if (JSON.stringify(C().boss.targets.map(t => [t.el, t.cls])) !== JSON.stringify(want.map(t => [t.el, t.cls]))) say('новый круг: элиты не с сида круга');
+    if (L3 && Object.values(L3.pay).reduce((a, v) => a + v, 0) !== EC.points(D, L3.k, 'b')) say('выплата за босса не сходится с его очками');
+  }
+  /* пул элит больше трёх: после трёх побед висящие элиты сгорают */
+  C().lvl = 45; C().earned = Math.max(C().earned, 45);
+  const boss2 = C().boss.targets.find(t => !t.dead);
+  C().boss.targets = CU.circleTargets(C(), C().boss.circle);
+  if (C().boss.targets.length !== 4) say(`пул элит на 45-м уровне — ${C().boss.targets.length}, ждали 4`);
+  C().boss.att = 99;
+  for (let j = 0; j < 3; j++) { const t = C().boss.targets.filter(x => !x.dead && !x.burned && x.g === 'e')[0]; t.hp = 1; run('элита', () => T.ACT.clatk(`${t.uid}:${C().boss.n + 1}`)); cnt.fights++; }
+  if (C().boss.targets.filter(x => x.burned).length !== 1 || !C().boss.targets.some(x => x.g === 'b')) say('три победы при пуле из четырёх: висящая элита не сгорела или босс не пришёл');
+  C().boss.att = 0; const n0 = C().boss.n;
+  const tb = C().boss.targets.find(x => x.g === 'b');
+  run('пустой кошелёк', () => T.ACT.clatk(`${tb.uid}:${n0 + 1}`));
+  if (C().boss.n !== n0) say('пустой кошелёк: атака прошла');
+  if (boss2 === undefined) note.push('проверка сгорания шла без прежнего босса');
+}
+
+/* анти-прыгун: бил врагов своего клана — ушёл — в новом клане очки клану со следующей недели */
+reset();
+{
+  T.SQ.set('clan', 's1');
+  const x = C().boss.targets.find(t => !t.dead); run('атака до выхода', () => T.ACT.clatk(`${x.uid}:${C().boss.n + 1}`));
+  const att = C().boss.att;
+  run('выход', () => T.ACT.clleavedo(op())); cnt.ops++;
+  if (C().in || !C().hopFrom) say('выход: игрок остался в клане или не помечен как бивший врагов на этой неделе');
+  if (C().boss.att !== att) say('выход: атаки кошелька пропали — выход без штрафа');
+  T.S.route = 'clan'; view(P, 'поиск клана');
+  run('вход в открытый клан', () => T.ACT.cljoin(`tg:${op()}`)); cnt.ops++;
+  if (!C().in || C().id !== 'tg' || !C().hop) say('вход: не в «Тихой гавани» или нет пометки анти-прыгуна');
+  const t = C().boss.targets.find(y => !y.dead); t.hp = 1;
+  const me = C().members.find(m => m.me);
+  run('атака в новом клане', () => T.ACT.clatk(`${t.uid}:${C().boss.n + 1}`));
+  const L = C().boss.last;
+  if (!L || !L.kill || me.boss !== 0 || C().boss.mine < (L.pay.me || 0) || !(L.pay.me > 0)) say('анти-прыгун: очки прыгуна попали клану или не дошли до него лично');
+  view(P, 'новый клан · паспорт'); T.S.seg.clan = 'boss'; view(P, 'новый клан · босс');
+  /* вернуться в прежний клан: он в поиске первым */
+  run('выход 2', () => T.ACT.clleavedo(op()));
+  const back = CU.searchList()[0];
+  if (!back || back.id !== 'tg') say('поиск: покинутый клан не первым в списке');
+  run('заявка', () => T.ACT.cljoin(`nk:${op()}`));
+  if (C().in || !C().srch.applied.nk) say('вход по заявке: вошёл без заявки или заявка не записана');
+  run('клан по заявке', () => T.ACT.cljoin(`sd:${op()}`));
+  if (C().in || C().srch.applied.sd) say('требования клана не проверены: вошёл или подал заявку без 40-го уровня');
+  /* создать свой клан: золото × цикл, игрок — глава */
+  const gold = S().wallet.gold; C().newName = 'Новый круг';
+  run('создать клан', () => T.ACT.clnewdo(op())); cnt.ops++;
+  if (!C().in || C().n !== 'Новый круг' || C().role !== 'head' || S().wallet.gold !== gold - D.passport.createGoldPerCycle * Math.max(D.open.cycle, S().acc.cycle)) say('создание клана: не глава, не то имя или не та цена');
+  for (const tab of ['pass', 'boss', 'mem', 'tree']) { T.S.seg.clan = tab; view(P, 'свой клан · ' + tab); }
+}
+
+/* древо: пассивка только следующего уровня и со свободным очком; сброс — раз в неделю за Энериум */
+reset();
+{
+  const c = C(), L = CU.nextPick(), lvl0 = c.lvl;
+  const o1 = op();
+  run('пассивка', () => T.ACT.clpick(`${L}:0:${o1}`)); cnt.ops++;
+  if (c.picks[L - 1] !== 0 || c.lvl !== Math.max(lvl0, L)) say('древо: пассивка не выбрана');
+  const logN = c.log.length;
+  run('повтор пассивки', () => T.ACT.clpick(`${L}:1:${o1}`));
+  if (c.picks[L - 1] !== 0 || c.log.length !== logN) say('древо: повтор номера сменил выбор');
+  run('пассивка без очка', () => T.ACT.clpick(`${L + 1}:0:${op()}`));
+  if (c.picks[L] != null) say('древо: выбрана пассивка без свободного очка');
+  const en = S().wallet.enerium, R = D.tree.reset;
+  run('сброс', () => T.ACT.clresetdo(op())); cnt.ops++;
+  if (S().wallet.enerium !== en - R.price || c.picks.some(x => x != null) || c.lvl !== Math.max(lvl0, L)) say('сброс древа: цена, выбор или уровень — не так');
+  run('второй сброс', () => T.ACT.clresetdo(op()));
+  if (S().wallet.enerium !== en - R.price) say('сброс древа: второй раз за неделю списал Энериум');
+  if (CU.nextPick() !== 1) say('сброс древа: выбор не начинается с первого уровня');
+  T.S.seg.clan = 'tree'; view(P, 'древо после сброса');
+  for (const Lx of [1, 5, 10, 45, 100]) { T.S.overlay = { t: 'cllvl', arg: String(Lx) }; view(P, `уровень древа ${Lx}`); }
+  T.S.overlay = { t: 'clbonus' }; view(P, 'бонусы клана');
+}
+
+/* резервуар: очки контрактов игрока → очки навыков */
+reset();
+{
+  const c = C(), e0 = c.earned, me = c.members.find(m => m.me), r0 = me.res, add = EC.need(D, e0 + 1) * 2;
+  S().contracts.clan = (S().contracts.clan || 0) + add;
+  run('сверка', () => CU.sync());
+  if (me.res !== r0 + add) say('резервуар: очки контрактов не записаны во вклад игрока');
+  if (c.earned <= e0) say('резервуар: полный резервуар не дал очка навыков');
+  if (!c.log.some(l => /Резервуар наполнился/.test(l.t))) say('резервуар: нет записи в журнале');
+  T.S.overlay = { t: 'clresv' }; view(P, 'резервуар');
+}
+
+/* раздача наград: половина по вкладу, половина главы — ровно */
+reset();
+{
+  const c = C(), P0 = c.past, M = T.LB.modes.clan, cyc = Math.max(M.from, S().acc.cycle);
+  const row = EC.tier(T.LB, P0.place, P0.pts), per = (row.cyc[cyc] || []).reduce((a, g) => a + g.count, 0);
+  const total = P0.groups.reduce((a, g) => a + g.count, 0);
+  if (total !== per * P0.members.length) say(`пул: ${total} сундуков, а на участника ${per} × ${P0.members.length}`);
+  P0.groups.forEach((g, gi) => {
+    if (P0.server[gi].reduce((a, x) => a + x, 0) !== g.server || g.server + g.head !== g.count || g.server !== Math.floor(g.count * D.rewards.splitBp / D.bp)) say('пул: половина сервера не половина');
+  });
+  T.S.overlay = { t: 'clgifts' }; view(P, 'раздача · до');
+  run('роль участника', () => T.ACT.clrolev('member'));
+  run('участник раздаёт', () => T.ACT.clfill('even'));
+  if (P0.groups.some((g, gi) => Object.values(P0.plan[gi]).some(v => v))) say('раздача: участник расписал половину главы');
+  const r = CU.srv.gifts(op()); if (!r.refuse) say('раздача: участник раздал награды');
+  T.S.overlay = { t: 'clgifts' }; view(P, 'раздача · глазами участника');
+  run('роль главы', () => T.ACT.clrolev('head'));
+  run('поровну', () => T.ACT.clfill('even'));
+  if (!CU.planFull(P0)) say('раздача: «Поровну» не расписала всю половину главы');
+  const logN = c.log.length, o = op();
+  run('раздать', () => T.ACT.clgive(o)); cnt.ops++;
+  if (!P0.done || c.log.length !== logN + 1 || !/раздал/.test(c.log[0].t)) say('раздача: не отмечена или нет записи в журнале');
+  run('повтор раздачи', () => T.ACT.clgive(o));
+  if (c.log.length !== logN + 1) say('раздача: повтор номера записал второй раз');
+  T.S.overlay = { t: 'clgifts' }; view(P, 'раздача · после');
+  /* срок вышел: половину главы раздаёт сервер по вкладу */
+  reset();
+  const c2 = C(), P2 = c2.past;
+  run('срок раздачи', () => T.ACT.clauto());
+  if (!P2.done || !P2.auto || P2.groups.some((g, gi) => Object.values(P2.plan[gi]).reduce((a, x) => a + x, 0) !== g.head)) say('срок раздачи: сервер раздал не всю половину главы');
+}
+/* «Дары» берут клановую долю Кланового босса из журнала раздачи, а не из типичной недели (§24.4): прошлая неделя — половина сервера
+   по вкладу сразу, доля главы — ждёт раздачи, после неё — ровно расписанное главой; эта неделя — место клана сейчас на участника */
+if (T.darRows) {
+  reset();
+  const c = C(), P0 = c.past, i = P0.members.findIndex(m => m.id === P0.me), cyc = S().acc.cycle, N = P0.members.length;
+  const dar = () => T.darRows(T.S).filter(p => p.id === 'clan' && p.cat === 'clan'), sum = rs => rs.reduce((a, p) => a + p.groups.reduce((b, g) => b + g.count, 0), 0);
+  const prev = () => dar().filter(p => p.wk.id === 'prev'), by = s => prev().filter(p => p.label.endsWith(s));
+  if (i < 0) say('«Дары»: в подсчёте прошлой недели нет самого игрока');
+  const srvWant = P0.groups.reduce((a, g, gi) => a + (P0.server[gi][i] || 0), 0), headAvg = P0.groups.reduce((a, g) => a + Math.floor(g.head / N), 0);
+  if (sum(by('по вкладу')) !== srvWant || by('по вкладу').some(p => p.st !== 'ok')) say(`«Дары»: доля по вкладу ${sum(by('по вкладу'))}, в журнале — ${srvWant}`);
+  if (sum(by('от главы')) !== headAvg || by('от главы').some(p => p.st !== 'wait')) say(`«Дары»: до раздачи доля главы — ${sum(by('от главы'))}, ${by('от главы').map(p => p.st).join('/')}; ждали ориентир ${headAvg}, «ждёт»`);
+  if (prev().some(p => !/ · (?:по вкладу|от главы)$/.test(p.label))) say('«Дары»: у Кланового босса осталась строка типичной недели');
+  run('поровну', () => T.ACT.clfill('even')); run('раздать', () => T.ACT.clgive(op())); cnt.ops++;
+  const mine = P0.groups.reduce((a, g, gi) => a + (P0.plan[gi][P0.me] || 0), 0);
+  if (!P0.done || sum(by('от главы')) !== mine || by('от главы').some(p => p.st !== 'ok')) say(`«Дары»: после раздачи доля главы ${sum(by('от главы'))}, расписано игроку ${mine}`);
+  for (const p of by('от главы')) { const n0 = T.S.bag.chests.length; run('получить долю главы', () => T.ACT.darget(p.key)); if (T.S.bag.chests.length - n0 !== sum([p])) say('«Дары»: «Получить» выдало не долю из журнала'); }
+  const now = dar().filter(p => p.wk.id === 'now'), pts = CU.weekPts(c), row = EC.tier(T.LB, CU.placeOf(pts), pts);
+  const nowWant = row ? (row.cyc[cyc] || []).reduce((a, g) => a + g.count, 0) : 0;
+  if (sum(now) !== nowWant || now.some(p => p.st !== 'wait')) say(`«Дары»: эта неделя — ${sum(now)} сундуков, по месту клана сейчас — ${nowWant}`);
+  run('выйти', () => CU.srv.leave(op())); cnt.ops++;
+  if (T.S.clan.in) say('«Дары»: выход из клана не прошёл');
+  else if (dar().some(p => p.wk.id === 'now')) say('«Дары»: без клана — клановая доля этой недели');
+}
+
+/* подсчёт недели и смена недели расы */
+reset();
+{
+  const c = C(), pts = CU.weekPts(), no = c.boss.no;
+  run('подсчёт недели', () => T.ACT.clweek());
+  if (c.past.pts !== pts || c.boss.circle !== 1 || c.boss.no !== no + 1 || c.members.some(m => m.res || m.boss) || c.boss.targets.length !== EC.elitePool(D, c.lvl)) say('подсчёт недели: очки, круг или вклад не сброшены');
+  if (!c.past.groups.length || c.past.done) say('подсчёт недели: нет пула или раздача уже отмечена');
+  reset();
+  if (T.rsSetWeek) {
+    const i = D.lists.races.indexOf(C().boss.wk), race = D.lists.races[(i + 1) % D.lists.races.length];
+    run('новая неделя расы', () => { T.rsSetWeek(race); CU.sync(); });
+    if (C().boss.wk !== race || C().boss.circle !== 1 || !C().past || C().past.race !== D.lists.races[i]) say('смена недели расы: лестница не сбросилась или неделя не подсчитана');
+  }
+}
+
+/* роли, заявки, исключение, паспорт */
+reset();
+{
+  const c = C(), m = c.members.find(x => x.role === 'member'), tr = c.members.find(x => x.role === 'treasurer');
+  run('третий казначей', () => T.ACT.clrole(`${m.id}:treasurer:${op()}`));
+  if (m.role !== 'member') say('роли: казначеев больше потолка');
+  run('снять казначея', () => T.ACT.clrole(`${tr.id}:member:${op()}`)); cnt.ops++;
+  run('назначить казначея', () => T.ACT.clrole(`${m.id}:treasurer:${op()}`)); cnt.ops++;
+  if (tr.role !== 'member' || m.role !== 'treasurer') say('роли: снять или назначить не вышло');
+  const k = c.members.find(x => x.role === 'member' && !x.me), n0 = c.members.length;
+  c.kickR = '';
+  run('исключить без причины', () => T.ACT.clkickdo(`${k.id}:${op()}`));
+  if (c.members.length !== n0) say('исключение без причины прошло');
+  c.kickR = D.kickReasons[0];
+  T.S.overlay = { t: 'clkick', arg: k.id }; view(P, 'исключение');
+  run('исключить', () => T.ACT.clkickdo(`${k.id}:${op()}`)); cnt.ops++;
+  if (c.members.length !== n0 - 1 || !c.log[0].t.includes(D.kickReasons[0].toLowerCase())) say('исключение: не вышло или причины нет в журнале');
+  const a = c.apps[0], n1 = c.members.length;
+  run('принять заявку', () => T.ACT.clacc(`${a.id}:${op()}`)); cnt.ops++;
+  if (c.members.length !== n1 + 1 || c.apps.includes(a)) say('заявки: не принята');
+  run('паспорт: тип', () => T.ACT.clpset(`type:hard:${op()}`)); cnt.ops++;
+  if (c.type !== 'hard' || !/паспорт/.test(c.log[0].t)) say('паспорт: тип не изменён или нет записи');
+  run('паспорт: цель', () => T.ACT.clgoal('week', { value: 'Круг 9' }));
+  if (c.goals.week !== 'Круг 9') say('паспорт: цель недели не изменена');
+  run('роль участника', () => T.ACT.clrolev('member'));
+  run('участник правит паспорт', () => T.ACT.clpset(`type:chill:${op()}`));
+  if (c.type !== 'hard') say('паспорт: участник сменил тип клана');
+  run('роль главы', () => T.ACT.clrolev('head'));
+  const heir = c.members.find(x => x.role === 'treasurer');
+  run('передать главенство', () => T.ACT.clleaddo(`${heir.id}:${op()}`)); cnt.ops++;
+  if (heir.role !== 'head' || c.role === 'head') say('главенство не передано');
+}
+
+/* ================== 5. вид ================== */
+function tour(team) {
+  const tag = team ? ' [команда]' : '';
+  run('режим', () => T.setTeam(team));
+  reset(); T.SQ.set('clan', 's1');
+  for (const tab of ['pass', 'boss', 'mem', 'tree']) {
+    T.S.seg.clan = tab; const h = view(P, `клан · ${tab}${tag}`);
+    if (!h.includes(`data-a="seg" data-v="clan:${tab}"`)) say(`клан · ${tab}: нет вкладки в шапке`);
+    if (tab === 'boss') airCards(h, `клан · босс${tag}`);
+  }
+  const c = C(), m = c.members.find(x => !x.me), x = c.boss.targets[0];
+  const sheets = [['clpass'], ['clroles'], ['clresv'], ['cltgt', x.uid], ['clledger'], ['clrules'], ['clmem', m.id], ['clmem', c.members.find(y => y.me).id], ['clapps'], ['clgifts'], ['cllog'],
+    ['cllvl', '13'], ['clbonus'], ['clreset'], ['cllead', m.id], ['clkick', m.id], ['clleave'], ['gifts', 'clan'], ['rank', 'Клановый босс']];
+  for (const [t, arg] of sheets) { reset(); T.SQ.set('clan', 's1'); T.S.overlay = { t, arg }; view(P, `лист ${t} ${arg || ''}${tag}`); }
+  for (const f of ['gifts', 'tree', 'join', 'boss', 'roles']) { reset(); T.S.clan.logF = f; T.S.overlay = { t: 'cllog' }; view(P, `журнал · ${f}${tag}`); }
+  reset(); T.S.seg.clan = 'boss'; view(P, `клан · босс без отряда${tag}`);
+  reset(); run('выход', () => T.ACT.clleavedo(op()));
+  view(P, `поиск${tag}`);
+  for (const f of ['hard', 'mid', 'chill']) { T.S.clan.srch.f = f; view(P, `поиск · ${f}${tag}`); }
+  T.S.clan.srch.f = '';
+  for (const sx of CU.searchList()) { T.S.overlay = { t: 'clfind', arg: sx.id }; view(P, `клан из поиска · ${sx.n}${tag}`); }
+  T.S.overlay = { t: 'clnew' }; view(P, `создать клан${tag}`); T.S.overlay = null;
+  /* сценарии презентации клана */
+  for (const [t, , f] of T.FLOWS.filter(x => /^Клан ·/.test(x[0]))) { reset(); run('сценарий ' + t, () => f()); view(P, `сценарий «${t}»${tag}`); T.S.runs = []; }
+  /* цикл I — кланов ещё нет: объяснение вместо поиска */
+  reset(); T.S.acc.cycle = 1; const hl = view(P, `клан · цикл I${tag}`);
+  if (!/Кланы — с цикла II/.test(hl) || hl.includes('data-a="cljoin"')) say('цикл I: экран клана не закрыт');
+  /* профиль и Неделя читают S.clan.n */
+  reset(); T.S.route = 'profile'; T.S.seg.profile = 'over'; const hp = view(P, `профиль${tag}`);
+  if (!hp.includes(C().n)) say('профиль: нет имени клана');
+  T.S.route = 'week'; T.S.seg.week = 'now'; view(P, `неделя${tag}`);
+}
+tour(false);
+if (!FLOWS_OK()) say('сценарии презентации клана не зарегистрированы');
+function FLOWS_OK() { return T.FLOWS.filter(x => /^Клан ·/.test(x[0])).length >= 4; }
+tour(true);
+run('режим «Игрок»', () => T.setTeam(false));
+/* раздел UI-кита */
+{
+  const K = T.KIT_EXTRA.map(x => run('UI-кит', () => x.html()) || '').find(h => /Клан ·/.test(h));
+  if (!K) say('UI-кит: нет раздела «Клан»');
+  else { cnt.views++; if (/undefined|NaN|\[object /.test(K)) say('UI-кит, «Клан»: undefined или NaN'); airCards(K, 'UI-кит · карточки'); }
+}
+
+/* ================== 6. Неделя ================== */
+reset();
+{
+  const W = T.W;
+  if (!W) say('нет EN_WEEK: Неделя не подключена');
+  else {
+    const m = W.modes().find(x => x.id === 'clan');
+    if (!m || m.demo) say('Неделя: строка «Клановый босс» — демо, а не экран клана');
+    const st = W.state('clan', 'now');
+    if (st.lock) say(`Неделя: строка клана закрыта — «${st.lock}»`);
+    else {
+      if (st.points !== CU.weekPts() || st.mine !== C().boss.mine || st.place !== CU.placeOf(CU.weekPts())) say('Неделя: очки, вклад или место клана не с экрана клана');
+      if (!st.tier || !st.tier.pay.length) say('Неделя: нет выплаты за место клана');
+    }
+    const ps = W.state('clan', 'past'), rows = T.darRows ? T.darRows(T.S).filter(p => p.id === 'clan' && p.wk && p.wk.id === 'prev') : [];
+    if (ps.lock) say(`Неделя: прошлая неделя клана закрыта — «${ps.lock}»`);
+    else {
+      const got = ps.rewards.reduce((a, r) => a + r.groups.reduce((b, g) => b + g.count, 0), 0), want = rows.reduce((a, p) => a + p.groups.reduce((b, g) => b + g.count, 0), 0);
+      if (got !== want) say(`Неделя: прошлая — ${got} сундуков, в «Дарах» — ${want}`);
+      if (ps.place !== C().past.place || ps.points !== C().past.pts) say('Неделя: место или очки прошлой недели не из подсчёта клана');
+    }
+    T.S.acc.cycle = 1;
+    if (!W.state('clan', 'now').lock) say('Неделя: в цикле I клановый рейтинг не закрыт');
+    T.S.acc.cycle = 2;
+    run('выход', () => T.ACT.clleavedo(op()));
+    if (!W.state('clan', 'now').lock) say('Неделя: без клана строка не закрыта');
+  }
+}
+walkInt(T.S.clan, 'S.clan (после проверок)');
+done();

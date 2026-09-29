@@ -9,7 +9,8 @@
       — забег: базовые общего пула по срабатываниям ядра (от 1 до номера биома), ключи биома с элит, уникальный с босса, руны стража;
         запасы и кошелёк прибавились ровно на добычу итога;
       — лавка и рынок: покупка кладёт в запасы, лот забирает из запасов, снятый возвращает, выручка — без комиссии; повтор не повторяет;
-      — ритуалы и Входящие: награда по редкости из EN_RECIPES.drops.rituals; письмо о ритуале и сам ритуал закрываются вместе;
+      — ритуалы и Входящие: исход решён при старте на сиде карточки (EN_RITUALS, EnRitual), сбор выдаёт ровно его;
+        письмо о ритуале и сам ритуал закрываются вместе (подробно — check_rituals.js);
       — сундук: письмо кладёт его через BAG.addChest, «Запасы» открывают, итог сходится с запасами и кошельком; второй раз не открыть.
    6. Листы поверх: сведения о каждом предмете recipes.js (спойлеры цикла VI — только «для команды»), ритуалы, Входящие, итог забега,
       подтверждения, Событие; все сценарии презентации.
@@ -76,7 +77,8 @@ if (err.length) done();
 const T = vm.runInContext(`({
   get S() { return S; }, set S(v) { S = v; },
   BAG, ACT, OV, SCREENS, ACTIVATE, INV, RX, EB, LBX, KH, RS, FLOWS, render, initialState, startRun, advance,
-  heroDev, lootItems, ritSpec, shopCost, mkMin, mkUnit, mkFee, mkPick, poolItems, biomeItems, cycItems, evPlanks,
+  heroDev, lootItems, shopCost, mkMin, mkUnit, mkFee, mkPick, poolItems, biomeItems, cycItems, evPlanks,
+  RT_SRV: typeof RT_SRV !== 'undefined' ? RT_SRV : null, RT: typeof RT !== 'undefined' ? RT : null, RTE: typeof RTE !== 'undefined' ? RTE : null,
   zpChestGroups: typeof zpChestGroups === 'function' ? zpChestGroups : null, zpOpenOne: typeof zpOpenOne === 'function' ? zpOpenOne : null,
 })`, ctx);
 
@@ -368,68 +370,60 @@ reset();
   draw('рынок · после сделок');
 }
 
-/* 5д. ритуалы и Входящие */
-const Wr = () => T.RX.drops.rituals.workers;
-function claimSlot(where, i, expect) {
-  const s = T.S.rituals.slots[i], s0 = snap();
+/* 5д. ритуалы и Входящие: исход решён при старте на сиде карточки (EnRitual.resolve), сбор выдаёт ровно его; подробно — check_rituals.js */
+const ritGot = s => ({ items: s.got.items, cur: Object.fromEntries(s.got.cur) });
+function claimSlot(where, i) {
+  const s = T.S.rituals.slots[i], s0 = snap(), want = ritGot(s);
   run(where, () => T.ACT.rclaim(String(i)));
   const s1 = snap(), di = diff(s0.items, s1.items), dw = diff(s0.wallet, s1.wallet);
   if (T.S.rituals.slots[i].st !== 'free') say(`${where}: слот не освободился`);
   if (T.S.inbox.some(m => m.rit === s.uid)) say(`${where}: письмо о ритуале осталось во Входящих`);
-  expect(di, dw, s);
+  eqMap(where + ': запасы', di, want.items); eqMap(where + ': кошелёк', dw, want.cur);
+  if (s.kind === 'work' && Object.keys(dw).length) say(where + ': рабочие дали валюту');
+  if (s.kind === 'hero' && Object.keys(di).length) say(where + ': герои принесли ресурсы');
   run(where + ' · повтор', () => T.ACT.rclaim(String(i)));
   if (!same(snap(), s1)) say(`${where}: повтор выдал второй раз`);
   cnt.rituals++;
 }
-const byTier = (di, set) => Object.entries(di).filter(([id]) => set.has(id)).reduce((a, [, q]) => a + q, 0);
 reset();
-{
+if (!T.RT_SRV || !T.RT || !T.RTE) say('ритуалы: экран screens/rituals.js или данные rituals.js не подключены');
+else {
   T.S.route = 'rituals';
   for (const tab of ['work', 'hero']) {
     T.S.seg.rituals = tab; T.S.overlay = null; draw('ритуалы · ' + tab);
     (tab === 'work' ? T.S.rituals.work : T.S.rituals.hero).forEach((x, i) => { T.S.overlay = { t: 'ritual', arg: `${tab}:${i}` }; draw(`лист ритуала ${tab}:${i}`); cnt.sheets++; });
   }
   T.S.overlay = null;
-  /* готовый ритуал демо: базовые общего пула по редкости */
+  /* готовый ритуал демо */
   const r0 = T.S.rituals.slots.findIndex(s => s.st === 'ready');
   if (r0 < 0) say('ритуалы: в демо нет готового ритуала');
-  else claimSlot('ритуалы · готовый', r0, (di, dw, s) => {
-    if (sum(di) !== Wr().basics[s.r - 1] + Wr().keys[s.r - 1] || byTier(di, pool) !== Wr().basics[s.r - 1]) say(`ритуалы · готовый: ресурсов ${JSON.stringify(di)}`);
-    if (Object.keys(dw).length) say('ритуалы · готовый: рабочие дали валюту');
-  });
-  /* каждый ритуал пула: старт, срок по данным, выдача по редкости */
+  else claimSlot('ритуалы · готовый', r0);
+  /* каждый ритуал пула: старт, срок по данным и бригаде, исход на сиде, выдача */
   for (const tab of ['work', 'hero']) {
     const list = tab === 'work' ? T.S.rituals.work : T.S.rituals.hero;
     list.forEach((x, i) => {
-      const where = `ритуал ${tab} · ${x.n}`, sp = T.ritSpec(x, tab);
-      T.S.rituals.slots = T.S.rituals.slots.map(s => s.st === 'free' ? s : { st: 'free' });
+      const where = `ритуал ${tab} · ${x.n}`, R = T.S.rituals;
+      R.slots = R.slots.map(s => s.st === 'free' ? s : { st: 'free' });
+      R.now = R.day * 86400000 + 60000;   // начало того же дня: самый долгий ритуал кончится до смены пула
       run(where + ' · старт', () => T.ACT.rstart(`${tab}:${i}`));
-      const k = T.S.rituals.slots.findIndex(s => s.st === 'run');
+      const k = R.slots.findIndex(s => s.st === 'run');
       if (k < 0) { say(where + ': не начался'); return; }
-      const s = T.S.rituals.slots[k];
-      const min = tab === 'hero' ? T.RX.drops.rituals.heroes.minutes[x.r - 1] : x.unique ? Wr().unique.minutes : Wr().minutes[x.r - 1];
-      if (s.left !== min * 60 || sp.min !== min) say(`${where}: срок ${s.left} с, по данным ${min} мин`);
+      const s = R.slots[k], crewR = tab === 'work' ? s.crew.map(id => R.artel.find(w => w.id === id).r) : [];
+      if (s.t1 - s.t0 !== T.RTE.time(T.RT, x, crewR) || !Number.isInteger(s.t1)) say(`${where}: срок ${s.t1 - s.t0} мс, по данным ${T.RTE.time(T.RT, x, crewR)}`);
+      const lists = tab === 'work' ? { basic: T.poolItems().map(it => it.id), key: T.biomeItems('key', x.biome).map(it => it.id), unique: T.biomeItems('unique', x.biome).map(it => it.id) } : { basic: [], key: [], unique: [] };
+      const want = T.RTE.resolve(T.RT, x, T.S.acc.cycle, T.RTE.seedOf(`${R.seed}|${x.id}|исход`), lists);
+      if (!same(want, s.got)) say(`${where}: исход старта не тот, что на сиде карточки`);
       T.S.route = 'rituals'; draw(where + ' · идёт');
-      s.st = 'ready'; s.left = 0;
-      claimSlot(where, k, (di, dw) => {
-        if (tab === 'hero') {
-          const C = T.RX.drops.rituals.heroes.byCycle.find(b => b.cyc === T.S.acc.cycle);
-          eqMap(where + ': кошелёк', dw, Object.fromEntries([['gold', C.gold[x.r - 1]], ['spirit', C.spirit[x.r - 1]], ['souls', C.souls[x.r - 1]]].filter(([, q]) => q)));
-          if (Object.keys(di).length) say(where + ': герои принесли ресурсы');
-        } else if (x.unique) {
-          eqMap(where + ': уникальный', di, { [T.biomeItems('unique', x.biome)[0].id]: Wr().unique.uniques });
-        } else {
-          const keys = new Set(T.biomeItems('key', x.biome).map(it => it.id));
-          if (byTier(di, pool) !== Wr().basics[x.r - 1] || byTier(di, keys) !== Wr().keys[x.r - 1] || sum(di) !== Wr().basics[x.r - 1] + Wr().keys[x.r - 1]) say(`${where}: ресурсов ${JSON.stringify(di)}`);
-          if (Object.keys(dw).length) say(where + ': рабочие дали валюту');
-        }
-      });
+      R.now = s.t1; T.RT_SRV.tick();
+      if (s.st !== 'ready') say(where + ': к концу срока не готов');
+      claimSlot(where, k);
     });
   }
   /* нет свободного слота — ритуал не начинается */
-  T.S.rituals.slots = T.S.rituals.slots.map((s, i) => ({ st: 'run', uid: 'x' + i, n: 'занят', kind: 'work', r: 1, ppl: 1, biome: 'b1', cyc: 2, left: 60 }));
-  const busy = JSON.stringify(T.S.rituals.slots); run('ритуалы · слотов нет', () => T.ACT.rstart('work:0'));
-  if (JSON.stringify(T.S.rituals.slots) !== busy) say('ритуалы: начался без свободного слота');
+  const R = T.S.rituals, j = R.work.findIndex(x => !x.taken);
+  R.slots = R.slots.map((s, i) => ({ st: 'run', uid: 'x' + i, n: 'занят', kind: 'work', r: 1, ppl: 1, biome: 'b1', cyc: 2, card: 'x', crew: [], t0: R.now, t1: R.now + 60000, ms: 60000, nominal: 60000, got: { cur: [], items: {} } }));
+  const busy = JSON.stringify(R.slots); if (j >= 0) run('ритуалы · слотов нет', () => T.ACT.rstart('work:' + j));
+  if (JSON.stringify(R.slots) !== busy) say('ритуалы: начался без свободного слота');
   T.S.route = 'rituals'; draw('ритуалы · все слоты заняты');
 }
 reset();
@@ -437,7 +431,7 @@ reset();
   T.S.route = 'shelter'; T.S.overlay = { t: 'inbox' }; let g = draw('Входящие'); cnt.sheets++;
   if (!g.includes('data-a="claimall"')) say('Входящие: нет «Забрать всё»');
   for (const m of T.S.inbox.slice()) {
-    const where = 'Входящие · ' + m.id, rit = m.rit ? T.S.rituals.slots.find(s => s.uid === m.rit && s.st === 'ready') : null, s0 = snap();
+    const where = 'Входящие · ' + m.id, rit = m.rit ? T.S.rituals.slots.find(s => s.uid === m.rit && s.st === 'ready') : null, s0 = snap(), ritWant = rit ? ritGot(rit) : null;
     const has = (m.rew || []).length || (m.chests || []).length || rit;
     if (!has) continue;
     run(where, () => T.ACT.claim(m.id));
@@ -445,7 +439,7 @@ reset();
     if (T.S.inbox.some(x => x.id === m.id)) say(where + ': письмо осталось');
     if (rit) {
       if (T.S.rituals.slots.some(s => s.uid === rit.uid)) say(where + ': ритуал не закрылся вместе с письмом');
-      if (sum(di) !== Wr().basics[rit.r - 1] + Wr().keys[rit.r - 1]) say(`${where}: награда ритуала ${JSON.stringify(di)}`);
+      eqMap(where + ': награда ритуала', di, ritWant.items); eqMap(where + ': валюта ритуала', dw, ritWant.cur);
     } else {
       const wi = {}, ww = {};
       for (const [id, q] of m.rew || []) (T.BAG.item(id) ? wi : ww)[id] = ((T.BAG.item(id) ? wi : ww)[id] || 0) + q;
@@ -530,11 +524,13 @@ reset();
   if (T.ACT.toCraft) { run('сведения · на стол', () => T.ACT.toCraft('resin')); if (T.S.route !== 'craft' || T.S.seg.craft !== 'work') say('сведения: «На стол мастера» не открыло мастерскую'); }
   const act = T.RX.items.find(i => typeof T.ACTIVATE[i.tier] === 'function' && T.BAG.has(i.id));
   if (act) { T.S.overlay = { t: 'item', arg: act.id }; if (!draw('сведения · активация').includes(`data-a="itact" data-v="${act.id}"`)) say('сведения: нет «Активировать»'); run('сведения · активировать', () => T.ACT.itact(act.id)); if (!T.S.overlay || T.S.overlay.t !== 'echact') say('сведения: «Активировать» не открыло подтверждение запасов'); draw('сведения · подтверждение активации'); }
-  /* Событие: планки с сундуками режима, получение — в Дарах */
-  T.S.overlay = null; T.S.route = 'event'; const g = draw('Событие');
+  /* Событие (screens/event.js): личные планки с сундуками режима — в листе наград, получение — в Дарах; подробно — check_event.js */
+  T.S.overlay = null; T.S.route = 'event'; draw('Событие');
   const P = T.evPlanks();
-  if (P.length !== T.S.event.ms.length || (g.match(/data-v="gifts:me"/g) || []).length < P.length) say('Событие: планки не ведут в Дары');
+  if (T.S.acc.cycle >= T.LBX.modes.event.from && (!P.length || P.some((p, i) => i && p.need <= P[i - 1].need))) say('Событие: нет личных планок или они не по возрастанию');
   if (T.S.acc.cycle >= T.LBX.modes.event.from && P.some(p => !p.pay.length)) say('Событие: у планки нет сундука из EN_LOOTBOXES.modes.event');
+  T.S.overlay = { t: 'evrew', arg: 'me' }; const g = draw('Событие · награды');
+  if (T.S.acc.cycle >= T.LBX.modes.event.from && !g.includes('data-v="gifts:me"')) say('Событие: из листа наград нет пути в Дары');
   T.S.overlay = { t: 'gifts', arg: 'me' }; draw('Событие → Дары');
   /* сценарии презентации */
   for (const [t, , f] of T.FLOWS) { reset(); run('сценарий ' + t, () => f()); draw('сценарий ' + t); cnt.flows++; T.S.runs = []; }

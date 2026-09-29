@@ -269,15 +269,43 @@ button.wn-slot{appearance:none;font:inherit;cursor:pointer}
 .wn-lvr.on b{color:var(--gold)}
 .wn-ach .tabs button{padding:0 8px;letter-spacing:.05em}
 .wn-tc{margin-left:5px;font-size:11px;color:var(--parch-3);letter-spacing:0}
+/* вкладка «Достижения»: разделы — можно получить, ближайшие, темы; полученное свёрнуто одной строкой */
+.wn-achb{display:flex;flex-direction:column;gap:var(--sp-m);align-content:start}
+.wn-sec{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0}
 .wn-feat{display:flex;flex-direction:column;gap:6px;min-width:0;padding:var(--sp-s) var(--sp-m);border-radius:10px;border:1px solid var(--iron);background:#0e1114}
 .wn-feat.ready{border-color:rgba(72,229,212,.45);box-shadow:inset 0 -14px 18px -16px var(--spirit)}
-.wn-feat.got{border-color:var(--gold-3)}
-.wn-feat.hid{appearance:none;align-items:flex-start;text-align:left;border-style:dashed;color:var(--parch-2);font:inherit}
+.wn-feat.got{border-color:color-mix(in srgb,var(--rc,var(--gold)) 45%,var(--iron))}
+.wn-feat.hid{appearance:none;align-items:stretch;text-align:left;border-style:dashed;color:var(--parch-2);font:inherit;cursor:pointer}
 .wn-feat.hid .quote{font-size:14px}
+.wn-feat .wn-fh,.wn-first .wn-fh{flex-direction:row;align-items:flex-start;gap:var(--sp-s)}
+.wn-fh>.col{gap:2px;min-width:0}
+.wn-fi{flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:8px;border:1px solid var(--iron);background:#14181c;color:var(--gold-2)}
+.wn-fi .i{width:16px;height:16px}
+.wn-fi .ico{width:18px;height:18px}
+.wn-feat.got .wn-fi{border-color:color-mix(in srgb,var(--rc,var(--gold)) 50%,var(--iron));color:var(--rc,var(--gold))}
 .wn-fn{font:600 16px/1.1 var(--f-d)}
 .wn-fd{font-size:12px;color:var(--parch-3);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1;overflow:hidden}
 .wn-fp{font-size:12px;color:var(--spirit)}
-.wn-ff{justify-content:flex-end;margin-top:auto}
+.wn-ff{justify-content:flex-end;margin-top:auto;gap:var(--sp-s)}
+.wn-steps{display:inline-flex;gap:3px}
+.wn-steps i{width:10px;height:5px;border-radius:2px;background:#30363c}
+.wn-steps i.cur{box-shadow:inset 0 0 0 1px var(--gold-2)}
+.wn-steps i.on{background:var(--gold);box-shadow:0 0 5px rgba(221,188,122,.6)}
+.wn-gotbar{appearance:none;display:flex;align-items:center;gap:var(--sp-s);width:100%;padding:var(--sp-s) var(--sp-m);border-radius:10px;border:1px solid var(--iron);background:#0e1114;color:var(--parch-2);font:700 11.5px/1 var(--f-u);letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.wn-gotbar:hover{color:var(--gold);border-color:var(--gold-3)}
+.wn-gotbar .i{width:15px;height:15px}
+.wn-gotl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-s)}
+.wn-gotr{appearance:none;display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:var(--sp-s);row-gap:2px;align-items:center;min-width:0;padding:6px var(--sp-m);border-radius:8px;border:1px solid color-mix(in srgb,var(--rc,var(--gold)) 30%,var(--iron));background:#0c0f12;color:var(--parch);font:inherit;text-align:left;cursor:pointer}
+.wn-gotr b{font:600 14px/1.1 var(--f-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wn-gotr small{grid-column:2;font-size:11.5px;color:var(--spirit);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wn-gotr:hover b{color:var(--gold)}
+/* лист достижения: ступени серии */
+.wn-stl{display:flex;flex-direction:column}
+.wn-str{appearance:none;display:grid;grid-template-columns:auto minmax(0,1fr) auto;column-gap:var(--sp-s);row-gap:2px;align-items:center;padding:6px 0;border:0;border-top:1px solid var(--iron);background:none;color:var(--parch-2);font:inherit;font-size:13px;text-align:left;cursor:pointer}
+.wn-str b{font:600 14.5px/1.1 var(--f-d);color:var(--parch)}
+.wn-str small{grid-column:2/4;font-size:11.5px;color:var(--parch-3)}
+.wn-str.got small{color:var(--spirit)}
+.wn-str.on b{color:var(--gold)}
 .wn-firsts{display:flex;flex-direction:column;gap:var(--sp-s)}
 .wn-first{display:flex;align-items:center;gap:var(--sp-m);padding:var(--sp-s) var(--sp-m);border-radius:10px;border:1px solid var(--iron);background:#0e1114}
 .wn-first .wn-fh{flex:1 1 auto}
@@ -322,6 +350,8 @@ button.wn-slot{appearance:none;font:inherit;cursor:pointer}
 .wn-kc{margin:0;display:flex;flex-direction:column;gap:6px;min-width:0}
 .wn-kc figcaption{font-size:11.5px;color:var(--parch-3);text-align:center}
 .wn-kit .wn-fh,.wn-kit .wn-an{color:var(--parch)}
+.wn-krar{display:flex;flex-direction:column}
+.wn-krr{display:grid;grid-template-columns:150px 36px minmax(0,1fr);gap:var(--sp-s);align-items:center;padding:5px 0;border-top:1px solid #1b1f24;font-size:12.5px}
 .wn-kfix ul{margin:6px 0 0;padding-left:18px;font-size:12.5px;line-height:1.4;color:var(--parch-2)}
 .wn-kfix li{margin-bottom:4px}
 .wn-kfix summary{cursor:pointer}

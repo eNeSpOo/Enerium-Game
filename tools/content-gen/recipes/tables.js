@@ -158,15 +158,6 @@ module.exports = function tables({ items, recipes, byId, CYC, ROMAN, places, dro
   for (const cy of CYC) { const g = drops.guardians.filter(x => x.cyc === cy.n);
     L.push(cy.team ? `| ${ROMAN[cy.n]} | для команды | ${g[0].entryKeys} | для команды | ${g[1].entryKeys} |` : `| ${ROMAN[cy.n]} | ${g[0].name} | ${g[0].entryKeys} | ${g[1].name} | ${g[1].entryKeys} |`); }
 
-  block('rituals heroes');
-  const W = drops.rituals.workers, HR = drops.rituals.heroes;
-  L.push('| Редкость | Рабочие: время | Базовые | Ключи ремёсел | Герои: время | Золото | Дух | Души |', '|---|---|---|---|---|---|---|---|');
-  for (let r = 0; r < 7; r++) L.push(`| ${r + 1} | ${W.minutes[r]} мин | ${W.basics[r]} | ${W.keys[r]} | ${HR.minutes[r] / 60} ч | ${fmt(HR.byCycle[0].gold[r])} | ${fmt(HR.byCycle[0].spirit[r])} | ${HR.byCycle[0].souls[r]} |`);
-
-  block('contracts');
-  L.push('| Цикл | День, 70 очков: ключи / золото / дух / базовые | Неделя, 300 очков: ключи / золото / дух / базовые / Энериум | Заверение дня / недели, золото |', '|---|---|---|---|');
-  for (const x of drops.contracts.byCycle) L.push(`| ${ROMAN[x.cyc]} | ${x.day.runeKeys} / ${fmt(x.day.gold)} / ${fmt(x.day.spirit)} / ${x.day.basics} | ${x.week.runeKeys} / ${fmt(x.week.gold)} / ${fmt(x.week.spirit)} / ${x.week.basics} / ${x.week.enerium} | ${fmt(x.day.stakeGold)} / ${fmt(x.week.stakeGold)} |`);
-
   block('craft drops');
   L.push('| Крафтовый биом | Цикл | Этажей | Ресурс за этаж | Находки | Дух / золото / души / осколки сборных героев | Рунный ключ |', '|---|---|---|---|---|---|---|');
   for (const b of drops.craftBiomes) L.push(`| ${b.name} | ${ROMAN[b.cyc]} | ${b.floors} | ${pct(b.resPerFloorBp)} | ${b.finds} + ${pct(b.secondFindBp)} | ${fmt(b.spirit)} / ${fmt(b.gold)} / ${b.souls} / ${b.heroShards} | ${pct(b.runeKeyBp)} × ${b.runeKeys} |`);
