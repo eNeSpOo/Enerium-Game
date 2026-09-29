@@ -10,11 +10,20 @@
      у каждого режима свой сохранённый выбор. API для экранов режимов — SQ (описан в screens/README.md);
    — «Призыв»: hireView и вкладки «За золото», «За Энериум», «За души». Во вкладке «За души» главное — вход рулетки (rlCol,
      screens/roulette.js; вкладку собирает rsSoulsView в index.html), отряд Эхо недели и каталог праха — входами, списки — в листах
-     OV.hrecho и OV.hrdust. Сет донатных героев — лист OV.hrset;
-   — действия ACT.sq*, лист имени OV.sqname, раздел UI-кита «Отряды» через KIT_EXTRA, сценарии презентации.
-   Своё состояние — S.sq, заводится как S.bag. Сервер решает, клиент показывает: изменение отрядов — операция SQ_SRV с номером, номер
-   несёт кнопка, повтор того же номера ничего не меняет. Числа — в блоке данных SQ_DATA, HR_DATA и HR_VIEW. Служебное — только команде:
-   TM, PL, tmT из index.html. Автопроверки — tools/content-gen/screens/check_heroes.js и check_squads.js. */
+     OV.hrecho и OV.hrdust. Героев Эхо прахом не собрать (слово автора 29.09.2026): каталог праха продаёт осколки только героев из
+     EN_ROSTER.rules.dustSrc (rsDustable, index.html), героя Эхо собирают осколки из сундуков Эхо, пробуждают — души (лист отряда
+     недели). Герой, которого собирают из осколков, в списках — призрачный осколок (shardGhost, screens/art-icons.js), собранный — портрет;
+   — «За Энериум» — витрина донатного сета (dnView): зал, пятеро Безликих на ступенях цены — дороже герой, выше ступень и ярче свет;
+     сет — коллекция: сколько из пяти уже в коллекции и какую ступень сет-бонуса это даёт (лист OV.hrset — ступени наглядно).
+     Справа — выбранный герой, что он даёт и одна кнопка покупки с ценой. Честно (§1.2, §32): цена и с чем герой приходит видны
+     до покупки, подтверждение OV.dnbuy называет остаток Энериума. Покупка — операция DN_SRV с номером, после неё — окно получения
+     героя OV.hrgot: свет снизу, песок времени, рама и имя; нажатие — сразу итог. Арт витрины — DN_ART: пока путь не выгружен,
+     зал, раму и эмблемы рисует CSS;
+   — действия ACT.sq*, ACT.d*, ACT.dn*, лист имени OV.sqname, разделы UI-кита «Отряды» и «За Энериум» через KIT_EXTRA, сценарии.
+   Своё состояние — S.sq и S.dn, заводятся как S.bag. Сервер решает, клиент показывает: изменение отрядов — операция SQ_SRV, покупка
+   за Энериум — DN_SRV; номер несёт кнопка, повтор того же номера ничего не меняет и не списывает. Числа — в блоках данных SQ_DATA,
+   HR_DATA, HR_VIEW и DN_VIEW, цены героев — EN_ROSTER.rules. Служебное — только команде: TM, PL, tmT из index.html.
+   Автопроверки — tools/content-gen/screens/check_heroes.js и check_squads.js. */
 'use strict';
 
 /* ================== данные: числа — здесь, в функциях только алгоритм ================== */
@@ -64,6 +73,25 @@ const HR_DATA = {
 /* числа вида: цвета стихий для заглушки портрета — те же, что токены --air…--dark в index.html */
 const HR_VIEW = {
   el: { 'Воздух': '#dff4e5', 'Земля': '#eb9d40', 'Огонь': '#f0564a', 'Вода': '#5a94f7', 'Время': '#4fdc8b', 'Свет': '#f4e6ae', 'Тьма': '#a986ee', 'без стихии': '#8a9098' },
+};
+/* «За Энериум»: числа вида витрины, не баланс. Цены героев — EN_ROSTER.rules.stub.donatPrice, ступени сета — EN_ROSTER.rules и N сета */
+const DN_VIEW = {
+  step: [14, 6],        // ступень цены под героем: высота, px — step[0] + место × step[1]: пятый стоит выше всех
+  grow: [40, 4],        // высота рамы, % высоты помоста — grow[0] + место × grow[1] (не шире колонки): дороже герой — крупнее рама
+  motes: 12,            // песчинок времени над помостом
+  ring: [0, 'одна', 'две', 'три'],   // слова для «ступеней у сета» в листе сет-бонуса
+  titles: ['Жрец'],     // слова звания перед именем: на табличке под рамой — имя, а не звание
+  /* окно получения героя — мс от покупки: трещина света, столп, рама, вспышка, имя, строки, всё на месте */
+  got: { crack: 0, pillar: 300, frame: 850, flash: 1400, name: 1600, text: 2000, end: 2500 },
+};
+/* арт витрины — tools/art-gen/jobs/donat-*.json, выгрузка export_ui.py в assets/art/donat/. ready — выгруженные пути: пока пути
+   нет, зал, раму и эмблемы рисует CSS, битых картинок нет. Портреты донатных героев — общий RS_ART (index.html) */
+const DN_ART = {
+  ready: ['donat/hall.jpg', 'donat/frame.png', 'donat/emblem-d2.png', 'donat/emblem-d3.png', 'donat/emblem-d4.png',
+    'donat/emblem-d5.png', 'donat/emblem-d6.png'],   // выгрузка 29.09.2026
+  hall: 'donat/hall.jpg',
+  frame: 'donat/frame.png',
+  emblem: key => 'donat/emblem-' + key + '.png',
 };
 
 /* ================== помощники ================== */
@@ -244,7 +272,7 @@ function rsGetHtml(h) {
     gold: `Следующий найм цикла ${ROMAN[h.c]} — ${fmt(rsGold(h.c, rsBought(h.c) + 1))} золота`,
     donat: 'Любой из пятерых за Энериум',
     roulette: 'Осколки — в возрождении душ и за прах',
-    echo: 'Осколки — в сундуках Эхо и за прах',
+    echo: 'Осколки — только в сундуках Эхо',
     craft: 'Скрытый рецепт: его находят перебором в Мастерской',
   }[h.src] || '';
   const go = h.src === 'craft' ? '' : `<button class="btn go sm" data-a="rsgo" data-v="${h.id}">${ic('arrow')}${h.src === 'gold' ? 'К найму' : h.src === 'donat' ? 'В витрину' : 'К душам'}</button>`;
@@ -499,7 +527,7 @@ function hireView() {
     <div class="row rs-hbar"><div class="tabs" role="tablist" aria-label="Способ получить героя">${tabs.map(([k, l]) => `<button role="tab" aria-selected="${t === k}" data-a="seg" data-v="hire:${k}">${l}</button>`).join('')}</div>
       <span class="g-spacer"></span><span class="eyebrow team-only">цикл · демо</span>
       <div class="tabs rs-cyc team-only" role="tablist" aria-label="Текущий цикл, демо">${ROMAN.slice(1).map((r, i) => `<button role="tab" aria-selected="${c === i + 1}" data-a="rscyc" data-v="${i + 1}">${r}</button>`).join('')}</div></div>
-    ${t === 'donat' ? rsDonatView() : t === 'souls' ? rsSoulsView() : rsGoldView()}
+    ${t === 'donat' ? dnView() : t === 'souls' ? rsSoulsView() : rsGoldView()}
   </section>`;
 }
 /* за золото: каталог цикла, «№» — только порядок; цена k-й покупки цикла растёт линейно, максимум доблести — 1 */
@@ -534,49 +562,144 @@ function rsGoldCard(h, c, k, open) {
   return `<div class="pnl hd">${rsHead(h, 0, aside)}
     <div class="hd-body">${rsBrief(h, '<span class="reason">Цена растёт с каждым наймом в цикле</span>', team)}</div></div>`;
 }
-/* за Энериум: донатный сет цикла — пятеро Безликих, любой из пяти, цена растёт от первого к пятому; в цикле I — обучение.
-   Сет-бонус и ступени — лист «Сет» по нажатию: в списке только пятеро */
-function rsDonatView() {
-  const cur = rsCyc(), from = rsFrom('donat'), sets = RS.sets.filter(s => s.kind === 'donat').sort((a, b) => a.cycle - b.cycle);
-  if (!sets.length) return '<div class="pnl pad rs-closed"><p class="faint">Донатных сетов нет в данных.</p></div>';
-  if (cur < from) return `<div class="pnl rs-closed fit"><span class="eyebrow">Цикл ${ROMAN[cur]} · обучение</span><h2>Донатных сетов в цикле ${ROMAN[cur]} нет</h2>
-    <p class="muted">С цикла ${ROMAN[from]} каждый новый цикл открывает донатный сет — пятерых Безликих. Первый — «${sets[0].name}».</p>
-    <p class="reason">Первый из пятерых дешевле всех. Сила донатных героев — в пользе для аккаунта, а не в бою.</p></div>`;
-  const s = sets.find(x => x.cycle === (S.rs.dcyc || cur)) || sets.filter(x => x.cycle <= cur).pop() || sets[0], open = s.cycle <= cur;
-  const sel = RSI[s.members.find(id => id === S.rs.dsel) || s.members.find(id => !rsHas(RSI[id])) || s.members[0]];
-  const opts = sets.map(x => `<option value="${x.cycle}" ${x === s ? 'selected' : ''}>Сет цикла ${ROMAN[x.cycle]} · «${x.name}»${x.cycle > cur ? ' · закрыт' : ''}</option>`).join('');
-  const rows = s.members.map(id => { const h = RSI[id]; return rsRow(h, { act: 'dsel', sel: h === sel, sub: rsSub(h, `${h.place}-й · ${h.cls}`), right: rsHas(h) ? `<span class="chip gold">${ic('check')}есть</span>` : money('enerium', rsDonatPrice(h)) }); }).join('');
-  const n = rsTiers(s.sum);
-  return `<div class="hs rs-hs">
-    <div class="pnl coll">
-      <select class="rs-sel" data-a="dcyc" aria-label="Донатный сет">${opts}</select>
-      <p class="rs-next">Цена растёт от первого к пятому<span class="chip warn team-only" title="Цен героев за Энериум в источниках нет — заглушка прототипа">цены — заглушка</span></p>
-      <div class="rs-list scroll grow" data-keep="dset:${s.cycle}">${rows}</div>
-      <button class="hr-setb" data-a="sheet" data-v="hrset:${s.key}"><span class="col" style="gap:2px;min-width:0"><span class="eyebrow">Сет-бонус</span><b>«${s.name}» · ${n ? n + ' ' + plural(n, 'ступень', 'ступени', 'ступеней') : 'ступеней нет'}</b></span>${ic('chev')}</button>
-    </div>
-    ${rsDonatCard(sel, s, open)}
+/* ================== «За Энериум»: витрина донатного сета ==================
+   Слова автора 29.09.2026: «сделать интереснее и дорого-богато, это всё-таки окно для донатных игроков… чтобы игрок хотел купить
+   героев». Дорого — это свет, материал и крупные формы, а не туча цифр: зал, пятеро Безликих в рамах на ступенях цены (ADR-0021:
+   первый дешевле всех, пятый дороже всех — выше ступень, крупнее рама, ярче свет), сет-бонус одной строкой со ступенями (ADR-0022,
+   §30), справа — выбранный герой и одна кнопка покупки. Сила донатного героя — в пользе для аккаунта, поэтому сет-бонус на виду.
+   В цикле I витрина — обещание: сет цикла II виден, купить нельзя. Сеты будущих циклов — витрина до перехода (§33.1) */
+const dnArt = p => DN_ART.ready.includes(p);
+const dnSets = () => RS.sets.filter(s => s.kind === 'donat').sort((a, b) => a.cycle - b.cycle);
+const dnOp = () => 'dn' + S.dn.seq;                 // номер следующей покупки: его несут кнопка и подтверждение
+const dnPrice = h => rsDonatPrice(h);
+const dnOpen = s => !!s && s.cycle <= rsCyc();
+/* сет на витрине: выбранный, иначе сет текущего цикла, иначе последний открытый, иначе первый (в цикле I — первый) */
+function dnSet() {
+  const L = dnSets(), cur = rsCyc();
+  return L.find(x => x.cycle === S.rs.dcyc) || L.find(x => x.cycle === cur) || L.filter(x => x.cycle <= cur).pop() || L[0] || null;
+}
+/* имя на табличке: первое слово имени, звание перед именем пропускается («Жрец Бранд» — «Бранд») */
+const dnShort = n => String(n).split(/\s+/).find(w => !DN_VIEW.titles.includes(w)) || String(n);
+/* эмблема сета: выгруженный рисунок или медальон с цифрой цикла */
+function dnEmblem(s, px) {
+  const p = DN_ART.emblem(s.key);
+  return dnArt(p) ? `<img class="dn-em" src="${AV(p)}" width="${px}" height="${px}" alt="" loading="lazy" decoding="async">`
+    : `<span class="dn-em dn-emf" style="--px:${px}px" aria-hidden="true">${ROMAN[s.cycle]}</span>`;
+}
+/* Безликий или Безликая — по полу героя (sex в roster.js); себя вспомнит на последней доблести */
+const dnFaceless = h => h.sex === 'f' ? 'Безликая: лица нет — стёрлось. Себя она вспомнит на последней доблести.' : RS_FACELESS;
+/* сет-бонус словами: N ступени — числом, «РБ» — полностью. Без N — общая формулировка */
+const dnBonus = (s, n) => cap1(String(s.bonus || '').replace(/N-го/g, n != null ? `${fmt(n)}-го` : 'N-го').replace(/РБ/g, 'рунного босса'));
+/* ступени сет-бонуса: сколько их — по сумме доблестей пятерых (ADR-0022, п. 6), условие ступени — §30 из данных: один или трое героев
+   с доблестью от tierValor, последняя — все на личных максимумах. have — сколько героев сета уже подходят */
+function dnTiers(s) {
+  const R = RS.rules, hs = s.members.map(id => RSI[id]).filter(Boolean), val = h => S.rs.owned[h.id] ? S.rs.owned[h.id].valor : 0;
+  const withV = hs.filter(h => rsHas(h) && val(h) >= R.tierValor).length, atMax = hs.filter(h => rsHas(h) && val(h) >= h.maxV).length;
+  return Array.from({ length: rsTiers(s.sum) }, (_, i) => {
+    const need = R.tierNeed[i], all = need == null, want = all ? hs.length : need, have = all ? atMax : withV;
+    return { k: i + 1, need: want, all, have: Math.min(have, want), ok: have >= want, n: s.n && s.n[i] != null ? s.n[i] : null };
+  });
+}
+/* песчинки над помостом: места и задержки — от номера, без случайности */
+const dnMotes = (n, cls) => `<span class="${cls}" aria-hidden="true">${Array.from({ length: n }, (_, i) => `<i style="--x:${(i * 37 + 11) % 100}%;--d:${(i * 613) % 5000}ms;--s:${5200 + (i * 331) % 2600}ms"></i>`).join('')}</span>`;
+/* рама героя: рисунок рамы, когда выгружен, иначе золото CSS с кристаллом в гребне */
+function dnFrame(h, cls = '', extra = '') {
+  const art = dnArt(DN_ART.frame);
+  return `<span class="dn-fr${art ? ' art' : ''}${cls ? ' ' + cls : ''}" data-r="${h.r}"><span class="dn-ph">${rsFace(h)}</span>${art ? `<img class="dn-fi" src="${AV(DN_ART.frame)}" alt="">` : '<i class="dn-crest" aria-hidden="true"></i>'}${extra}</span>`;
+}
+/* герой на ступени: рама, имя, ступень с ценой; в коллекции — отметка вместо цены */
+function dnNiche(h, s, sel, open) {
+  const own = rsHas(h), p = dnPrice(h);
+  const price = own ? `<span class="dn-pr own">${ic('check')}есть</span>` : `<span class="dn-pr"><img src="${curImg('enerium')}" alt=""><b class="num">${fmt(p)}</b></span>`;
+  const say = `${h.n}, ${h.place}-й из ${s.members.length}${own ? ', в коллекции' : `, ${fmt(p)} Энериума`}`;
+  return `<button class="dn-ni${h === sel ? ' sel' : ''}${own ? ' own' : ''}${open ? '' : ' shut'}" style="--k:${h.place}" data-a="dsel" data-v="${h.id}" aria-pressed="${h === sel}" aria-label="${hrEsc(say)}">
+    ${dnFrame(h, '', own ? `<i class="dn-own" aria-hidden="true">${ic('check')}</i>` : '')}
+    <span class="dn-nm">${hrEsc(dnShort(h.n))}</span>
+    <span class="dn-pd">${price}</span>
+  </button>`;
+}
+/* сет-бонус строкой: эмблема, эффект первой невзятой (или взятой) ступени, ступени значками; подробности — лист OV.hrset */
+function dnBonusPlate(s) {
+  const T = dnTiers(s), last = T.filter(t => t.ok).pop(), txt = dnBonus(s, (last || T[0] || {}).n);
+  return `<button class="dn-bonus" data-a="sheet" data-v="hrset:${s.key}" aria-label="${hrEsc(`Сет-бонус «${s.name}»: ${txt}. Ступени — подробнее`)}">
+    ${dnEmblem(s, 30)}<span class="dn-bt"><span class="eyebrow">Сет-бонус${T.length > 1 ? ' · по ступеням' : ''}</span><b>${txt}</b></span>
+    <span class="dn-tp">${T.map(t => `<i class="${t.ok ? 'on' : ''}" title="Ступень ${ROMAN[t.k]}${t.ok ? ' — действует' : ''}">${ROMAN[t.k]}</i>`).join('')}</span>${ic('chev')}</button>`;
+}
+/* выбранный герой: кто он, что даёт, одно действие. Цена — на кнопке; не хватает Энериума — сказано сколько и где пополнить */
+function dnCard(h, s, open) {
+  const cur = rsCyc(), from = rsFrom('donat'), own = rsHas(h), p = dnPrice(h), lack = Math.max(0, p - S.wallet.enerium);
+  let act;
+  if (own) act = `<span class="chip gold">${ic('check')}в коллекции</span><button class="btn go" data-a="dngo" data-v="${h.id}">${ic('up')}К развитию</button>`;
+  else if (cur < from) act = `<span class="chip warn">${ic('lock')}с цикла ${ROMAN[from]}</span><small class="reason">Цикл ${ROMAN[cur]} — обучение. Донатные сеты открываются с цикла ${ROMAN[from]}, первый — «${dnSets()[0].name}».</small>`;
+  else if (!open) act = `<span class="chip warn">${ic('lock')}цикл ${ROMAN[s.cycle]}</span><small class="reason">Сет откроется при переходе на цикл ${ROMAN[s.cycle]}.</small>`;
+  else act = `<button class="btn go big dn-cta" data-a="dbuy" data-v="${dnOp()}|${h.id}"${lack ? ' disabled' : ''}>Купить${costTag('enerium', p)}</button>
+      ${lack ? `<span class="reason warn dn-lack">Не хватает ${fmt(lack)} Энериума <button class="link" data-a="go" data-v="store">Лавка ${ic('chev')}</button></span>` : `<small class="reason">${dnFaceless(h)}</small>`}`;
+  return `<div class="dn-card" data-r="${h.r}">
+    <span class="eyebrow">${h.place}-й из ${s.members.length} · ${h.cls}</span>
+    <h2 class="dn-name">${hrEsc(h.n)}</h2>
+    <div class="dn-tags">${rar(h.r)}<span class="stars" title="Доблесть до ${h.maxV}">${stars(0, h.maxV)}</span></div>
+    ${foldLore(h.who)}
+    <button class="link dn-more" data-a="rhero" data-v="${h.id}">Подробнее ${ic('chev')}</button>
+    <div class="dn-act">${act}</div>
   </div>`;
 }
-function rsDonatCard(h, s, open) {
-  const price = rsDonatPrice(h);
-  const aside = rsHas(h) ? `<span class="chip gold">${ic('check')}в коллекции</span><button class="link" data-a="rsopen" data-v="${h.id}">Открыть ${ic('chev')}</button>`
-    : open ? `<button class="btn go" data-a="dbuy" data-v="${h.id}">Купить${costTag('enerium', price)}</button><small class="faint">${h.place}-й из ${s.members.length}${TM(' · заглушка')}</small>`
-    : `<span class="chip warn">${ic('lock')}цикл ${ROMAN[s.cycle]}</span><small class="faint">откроется при переходе</small>`;
-  return `<div class="pnl hd">${rsHead(h, 0, aside)}
-    <div class="hd-body">${rsBrief(h, '')}</div></div>`;
+/* витрина: слева — сет (имя, сеты циклов, пятеро на ступенях, сет-бонус), справа — выбранный герой */
+function dnView() {
+  const L = dnSets(), s = dnSet();
+  if (!s) return '<div class="pnl pad rs-closed"><p class="faint">Донатных сетов нет в данных.</p></div>';
+  const cur = rsCyc(), open = dnOpen(s), hs = s.members.map(id => RSI[id]).filter(Boolean);
+  const sel = hs.find(h => h.id === S.rs.dsel) || hs.find(h => !rsHas(h)) || hs[0], own = hs.filter(rsHas).length;
+  const hall = dnArt(DN_ART.hall);
+  const tab = x => { const shut = x.cycle > cur; return `<button role="tab" class="dn-tab" aria-selected="${x === s}" data-a="dcyc" data-v="${x.cycle}" aria-label="${hrEsc(`Сет цикла ${ROMAN[x.cycle]} «${x.name}»${shut ? ', откроется при переходе' : ''}`)}" title="${hrEsc(`Цикл ${ROMAN[x.cycle]} · «${x.name}»`)}">${dnEmblem(x, 26)}${shut ? `<i class="dn-lk">${ic('lock')}</i>` : ''}</button>`; };
+  const sub = open ? `Цикл ${ROMAN[s.cycle]} · в коллекции ${own} из ${hs.length}` : `Цикл ${ROMAN[s.cycle]} · витрина до перехода`;
+  const G = DN_VIEW, vars = `--s0:${G.step[0]}px;--s1:${G.step[1]}px;--g0:${G.grow[0]};--g1:${G.grow[1]}`;
+  return `<div class="dn${hall ? ' art' : ''}" style="${vars}">
+    ${hall ? `<img class="dn-hall" src="${AV(DN_ART.hall)}" alt="">` : '<i class="dn-arch" aria-hidden="true"></i>'}
+    <div class="dn-l">
+      <div class="dn-top">
+        <div class="dn-title">${dnEmblem(s, 40)}<span class="col"><h2>«${s.name}»</h2><small>${sub}</small></span></div>
+        <div class="dn-tabs" role="tablist" aria-label="Донатные сеты по циклам">${L.map(tab).join('')}</div>
+      </div>
+      <div class="dn-alt" role="group" aria-label="${hrEsc(`Пятеро «${s.name}»: цена растёт от первого к пятому`)}">${dnMotes(G.motes, 'dn-mo')}${hs.map(h => dnNiche(h, s, sel, open)).join('')}</div>
+      ${dnBonusPlate(s)}
+    </div>
+    ${dnCard(sel, s, open)}
+  </div>`;
 }
-/* за души: справа от рулетки — два входа: отряд Эхо недели и каталог праха; их списки — листы OV.hrecho и OV.hrdust */
-const hrDustCat = () => RS.heroes.filter(h => RS_SHARD.includes(h.src) && h.c <= rsCyc() && !rsHas(h));
+
+/* ================== «За души» ==================
+   Справа от рулетки — два входа: отряд Эхо недели и каталог праха; их списки — листы OV.hrecho и OV.hrdust. Каталог праха — только
+   герои из rules.dustSrc (rsDustable): героев Эхо прахом не собрать, их осколки — сундуки Эхо, пробуждение — души */
+const hrDustCat = () => RS.heroes.filter(h => rsDustable(h) && h.c <= rsCyc() && !rsHas(h));
+const hrNeed = () => RS.rules.stub.shards;
+/* герой, которого собирают из осколков, — призрачный осколок: лицо проступает по доле собранного (shardGhost, screens/art-icons.js);
+   собранный и пробуждённый — портрет. Нет арта осколка — null, строка берёт портрет */
+function hrGhost(h, px) {
+  if (!h || rsHas(h) || typeof shardGhost !== 'function') return null;
+  return shardGhost(h, S.rs.shards[h.id] || 0, hrNeed(), px) || null;
+}
+/* строка героя, которого собирают: та же анатомия, что rsRow (index.html), лицо — осколок */
+function hrShardRow(h, o = {}) {
+  const g = hrGhost(h, 30);
+  if (!g) return rsRow(h, o);
+  return `<button class="rs-row hr-srow ${o.dim ? 'dim' : ''}" data-r="${h.r}" data-a="${o.act}" data-v="${h.id}" aria-current="${!!o.sel}"><span class="hr-sg">${g}</span><span class="tx"><b>${h.n}</b><small>${o.sub != null ? o.sub : h.cls}</small></span>${o.right || ''}</button>`;
+}
+/* выбранный в листе: имя, осколок крупно и полоса собранного */
+function hrShardPick(h) {
+  const n = S.rs.shards[h.id] || 0, need = hrNeed(), g = hrGhost(h, 46);
+  return `<div class="hr-dsel">${g ? `<span class="hr-sgl">${g}</span>` : ''}<div class="col" style="gap:6px;min-width:0;flex:1 1 auto"><div class="row"><b class="serif">${h.n}</b><span class="g-spacer"></span><button class="link" data-a="rhero" data-v="${h.id}">Карточка ${ic('chev')}</button></div>${bar(Math.min(100, hrFl(n * 100, need)), n >= need ? 'sp' : '')}<small class="faint num">осколков ${n} / ${need}${TM(' · число — заглушка')}</small></div></div>`;
+}
 function hrSoulsSide() {
   const cur = rsCyc(), from = rsFrom('echo'), W = rsWeek(), squad = W ? W.squad.map(id => RSI[id]).filter(Boolean) : [];
-  const cat = hrDustCat(), need = RS.rules.stub.shards, ready = cat.filter(h => (S.rs.shards[h.id] || 0) >= need).length;
+  const cat = hrDustCat(), need = hrNeed(), ready = cat.filter(h => (S.rs.shards[h.id] || 0) >= need).length, dfrom = rsFrom('roulette');
+  const face = h => { const on = h.c <= cur, g = on ? hrGhost(h, 30) : null; return g ? `<span class="hr-sgf">${g}</span>` : `<span class="rs-av${on ? '' : ' off'}" data-r="${h.r}">${rsFace(h)}</span>`; };
   const echo = `<button class="pnl hr-entry" data-a="sheet" data-v="hrecho" aria-label="Эхо: отряд недели">
       <span class="eyebrow">Эхо · отряд недели</span><b>${W && W.civ ? W.civ : 'Отряд недели'}</b>
-      <span class="hr-ef">${squad.map(h => `<span class="rs-av${h.c <= cur ? '' : ' off'}" data-r="${h.r}">${rsFace(h)}</span>`).join('')}</span>
-      <small class="faint">${cur < from ? `Откроется с цикла ${ROMAN[from]}` : 'Осколки — в сундуках Эхо и за прах'}</small><span class="hr-go">${ic('chev')}</span></button>`;
+      <span class="hr-ef">${squad.map(face).join('')}</span>
+      <small class="faint">${cur < from ? `Откроется с цикла ${ROMAN[from]}` : 'Осколки — только в сундуках Эхо'}</small><span class="hr-go">${ic('chev')}</span></button>`;
   const dust = `<button class="pnl hr-entry" data-a="sheet" data-v="hrdust" aria-label="Каталог праха">
       <span class="eyebrow">Каталог праха</span><b>${money('dust', S.wallet.dust)}</b>
-      <small class="faint">${cat.length ? `${cat.length} ${plural(cat.length, 'герой', 'героя', 'героев')} · осколки за прах` : cur < from ? `Откроется с цикла ${ROMAN[from]}` : 'Все герои собраны'}</small>
+      <small class="faint">${cat.length ? `${cat.length} ${plural(cat.length, 'герой', 'героя', 'героев')} · осколки за прах` : cur < dfrom ? `Откроется с цикла ${ROMAN[dfrom]}` : 'Все герои собраны'}</small>
       ${ready ? `<span class="chip spirit">${ic('check')}можно пробудить: ${ready}</span>` : ''}<span class="hr-go">${ic('chev')}</span></button>`;
   return `<div class="hr-side">${echo}${dust}</div>`;
 }
@@ -601,38 +724,137 @@ Object.assign(OV, {
     return dialog('Имя отряда', `<label class="search hr-name"><input id="sqName" type="text" maxlength="${SQ_DATA.nameMax}" value="${hrEsc(v)}" autocomplete="off" spellcheck="false" aria-label="Имя отряда"></label><p class="reason">До ${SQ_DATA.nameMax} знаков. Имя видно только вам.</p>`,
       `<button class="btn ghost" data-a="close">Отмена</button><button class="btn go" data-a="sqrendo" data-v="${sqOp()}|${s.id}">Сохранить</button>`);
   },
-  /* отряд Эхо недели: цивилизация, пятеро по циклам с осколками, неприязнь; осколки — сундуки Эхо и прах */
+  /* отряд Эхо недели: цивилизация, пятеро по циклам, неприязнь. Героя Эхо собирают только осколки из сундуков Эхо — прахом нельзя;
+     собранного пробуждают души — здесь же: выбрать героя, «Пробудить» */
   hrecho() {
     const cur = rsCyc(), from = rsFrom('echo'), W = rsWeek(), squad = W ? W.squad.map(id => RSI[id]).filter(Boolean) : [];
-    const to = squad.length ? squad[squad.length - 1].c : from, av = squad.find(h => h.avers && h.avers.race);
-    const rows = squad.map(h => { const on = h.c <= cur; return rsRow(h, { act: 'rhero', dim: !on, sub: rsSub(h, on ? `цикл ${ROMAN[h.c]} · доблесть до ${h.maxV}` : `откроется в цикле ${ROMAN[h.c]}`), right: on ? rsShardTag(h) : ic('lock') }); }).join('');
+    const to = squad.length ? squad[squad.length - 1].c : from, av = squad.find(h => h.avers && h.avers.race), need = hrNeed();
+    const sel = squad.find(h => h.id === S.rs.ssel && h.c <= cur) || null;
+    const rows = squad.map(h => h.c <= cur
+      ? hrShardRow(h, { act: 'ssel', sel: h === sel, sub: rsSub(h, `цикл ${ROMAN[h.c]} · доблесть до ${h.maxV}`), right: rsShardTag(h) })
+      : rsRow(h, { act: 'rhero', dim: true, sub: rsSub(h, `откроется в цикле ${ROMAN[h.c]}`), right: ic('lock') })).join('');
     const wsel = `<select class="rs-sel team-only" data-a="sweek" aria-label="Неделя расы, демо">${RS.weeks.map(w => `<option value="${w.race}" ${w === W ? 'selected' : ''}>Неделя ${w.gen}</option>`).join('')}</select>`;
+    let pick = cur < from ? '' : '<p class="reason">Выберите героя — сколько осколков собрано и пробуждение.</p>', foot = `<button class="btn go" data-a="sheet" data-v="gifts">Дары путешествия</button>`;
+    if (sel) {
+      const n = S.rs.shards[sel.id] || 0;
+      pick = rsHas(sel) ? `<div class="hr-dsel"><div class="row"><b class="serif">${sel.n}</b><span class="g-spacer"></span><span class="chip gold">${ic('check')}в коллекции</span></div></div>` : hrShardPick(sel);
+      foot = rsHas(sel) ? `<button class="btn go" data-a="rhero" data-v="${sel.id}">Карточка героя</button>`
+        : `<button class="btn" data-a="sheet" data-v="gifts">Дары</button><button class="btn go" data-a="activate" data-v="${sel.id}" ${n >= need ? '' : 'disabled'}>Пробудить${costTag('souls', RS.rules.stub.activateSouls)}</button>`;
+    }
     const body = `${W && W.civ ? `<div class="col" style="gap:3px"><b class="serif hr-civ">${W.civ}</b><small class="faint">нашествие «${W.raid}» · по герою за цикл, ${ROMAN[from]}–${ROMAN[to]}</small></div>` : `<small class="faint">по герою за цикл, ${ROMAN[from]}–${ROMAN[to]}</small>`}
       ${cur < from ? `<p class="rs-line">${ic('lock')}Эхо откроется с цикла ${ROMAN[from]}.</p>` : ''}
       ${av ? `<p class="rs-line">${ic('target')}Неприязнь: ${rsAversShort(av)}</p>` : ''}
-      <div class="rs-list">${rows}</div>
-      <p class="reason">Осколки — в сундуках Эхо за места и за прах.</p>${wsel}`;
-    return sheet('Отряд недели', body, `<button class="btn" data-a="sheet" data-v="hrdust">Каталог праха</button><button class="btn go" data-a="sheet" data-v="gifts">Дары путешествия</button>`, true);
+      ${pick}<div class="rs-list">${rows}</div>
+      <p class="reason">Осколки героев Эхо — только из сундуков Эхо за места: прахом их не собрать. Собранного героя пробуждают души.</p>${wsel}`;
+    return sheet('Отряд недели', body, foot, true);
   },
-  /* каталог праха: герои рулетки и Эхо доступных циклов, осколок за прах (§15.3), собранного пробуждают души (§15.2) */
+  /* каталог праха (§15.1): герои из rules.dustSrc доступных циклов — осколок за прах (§15.3), собранного пробуждают души (§15.2).
+     Героев Эхо здесь нет — и сказано почему */
   hrdust() {
-    const R = RS.rules, need = R.stub.shards, cat = hrDustCat(), sel = cat.find(h => h.id === S.rs.ssel) || null;
-    const rows = cat.map(h => rsRow(h, { act: 'ssel', sel: !!sel && sel.id === h.id, sub: rsSub(h, `${RS_SRC_ONE[h.src]} · осколок ${fmt(rsShardPrice(h))} праха`), right: rsShardTag(h) })).join('')
+    const R = RS.rules, need = hrNeed(), cat = hrDustCat(), sel = cat.find(h => h.id === S.rs.ssel) || null;
+    const rows = cat.map(h => hrShardRow(h, { act: 'ssel', sel: !!sel && sel.id === h.id, sub: rsSub(h, `${RS_SRC_ONE[h.src]} · осколок ${fmt(rsShardPrice(h))} праха`), right: rsShardTag(h) })).join('')
       || `<p class="faint">${rsCyc() < rsFrom('roulette') ? `Каталог откроется с цикла ${ROMAN[rsFrom('roulette')]}.` : 'Все герои доступных циклов собраны.'}</p>`;
     let pick = '<p class="reason">Выберите героя — осколки за прах.</p>', foot = '';
     if (sel) {
       const n = S.rs.shards[sel.id] || 0;
-      pick = `<div class="hr-dsel"><div class="row"><b class="serif">${sel.n}</b><span class="g-spacer"></span><button class="link" data-a="rhero" data-v="${sel.id}">Карточка ${ic('chev')}</button></div>${bar(Math.min(100, hrFl(n * 100, need)))}<small class="faint num">осколков ${n} / ${need}${TM(' · число — заглушка')}</small></div>`;
+      pick = hrShardPick(sel);
       foot = `<button class="btn" data-a="dustbuy" data-v="${sel.id}">Осколок${costTag('dust', rsShardPrice(sel))}</button><button class="btn go" data-a="activate" data-v="${sel.id}" ${n >= need ? '' : 'disabled'}>Пробудить${costTag('souls', R.stub.activateSouls)}</button>`;
     }
-    return sheet('Каталог праха', `<div class="row hr-dh">${money('dust', S.wallet.dust)}<span class="faint">цена осколка — по редкости и циклу героя</span></div>${pick}<div class="rs-list">${rows}</div>`, foot, true);
+    return sheet('Каталог праха', `<div class="row hr-dh">${money('dust', S.wallet.dust)}<span class="faint">цена осколка — по редкости и циклу героя</span></div>${pick}<div class="rs-list">${rows}</div>
+      <p class="reason">${ic('lock')} Героев Эхо здесь нет: их осколки — только из сундуков Эхо.</p>`, foot, true);
   },
-  /* сет донатных героев: участники, бонус и ступени — по нажатию, а не в списке */
+  /* сет-бонус донатного сета — ступени наглядно (ADR-0022, §30): на каждой ступени — условие фишками героев и эффект; горит взятая.
+     Ниже — пятеро сета: в коллекции отмечены, нажатие — герой в витрине */
   hrset(o) {
     const s = RSS[o.arg]; if (!s) return '';
-    return sheet(`«${s.name}»`, rsSetBox(s, null, { pick: id => `data-a="dsel" data-v="${id}"` }), '', true);
+    const T = dnTiers(s), hs = s.members.map(id => RSI[id]).filter(Boolean), own = hs.filter(rsHas).length;
+    const pips = t => Array.from({ length: hs.length }, (_, i) => `<i class="${i < t.have ? 'on' : i < t.need ? 'need' : ''}"></i>`).join('');
+    const steps = T.map(t => `<div class="dn-st${t.ok ? ' on' : ''}" style="--i:${t.k}">
+        <span class="dn-stk">${ROMAN[t.k]}</span>
+        <b class="dn-stn">${dnBonus(s, t.n)}</b>
+        <span class="dn-cond"><span class="dn-pips" title="${hrEsc(`Подходят ${t.have} из ${t.need}`)}">${pips(t)}</span><small>${t.all ? `все ${hs.length} на максимуме доблести` : `${t.need} ${plural(t.need, 'герой', 'героя', 'героев')} сета с доблестью`}</small>${t.ok ? `<span class="chip spirit">${ic('check')}действует</span>` : ''}</span>
+      </div>`).join('');
+    const mem = hs.map(h => `<button class="dn-mf${rsHas(h) ? ' own' : ''}" data-a="dsel" data-v="${h.id}" aria-label="${hrEsc(h.n + (rsHas(h) ? ', в коллекции' : ''))}" title="${hrEsc(h.n)}"><span class="rs-av" data-r="${h.r}">${rsFace(h)}</span>${rsHas(h) ? `<i>${ic('check')}</i>` : ''}<small>${hrEsc(dnShort(h.n))}</small></button>`).join('');
+    const by = [...RS.rules.tierBySum].sort((a, b) => a[0] - b[0]);
+    const sums = by.map(([lo, n], i) => `${by[i + 1] ? `${lo}–${by[i + 1][0] - 1}` : `${lo} и больше`} — ${DN_VIEW.ring[n] || n}`).join(', ');
+    const body = `<div class="dn-sh">${dnEmblem(s, 52)}<span class="col"><b class="serif">«${s.name}»</b><small class="faint">донатный сет цикла ${ROMAN[s.cycle]} · в коллекции ${own} из ${hs.length}</small></span></div>
+      <div class="dn-steps">${steps}</div>
+      <span class="eyebrow">Пятеро сета</span><div class="dn-mems">${mem}</div>
+      <p class="reason">Ступеней у сета столько, сколько даёт сумма доблестей пятерых: ${sums}. У «${s.name}» сумма ${s.sum}.</p>`;
+    return sheet('Сет-бонус', body, '', true);
+  },
+  /* подтверждение покупки: кто, что приходит, цена и сколько Энериума останется. Кнопка несёт номер операции */
+  dnbuy(o) {
+    const [op, id] = String(o.arg || '').split('|'), h = RSI[id]; if (!h || !RSS[h.dset]) return '';
+    const s = RSS[h.dset], p = dnPrice(h), left = S.wallet.enerium - p;
+    const body = `<div class="dn-cf">${dnFrame(h, 'sm')}<div class="col" style="gap:4px;min-width:0"><b class="serif dn-cfn">${hrEsc(h.n)}</b><small class="faint">${h.place}-й из «${s.name}» · ${h.cls}</small>${rar(h.r)}</div></div>
+      <ul class="dn-get">
+        <li>${ic('check')}Вневременная редкость, доблесть до ${h.maxV}</li>
+        <li>${ic('check')}Приходит с 0 уровнем, 0 рунных пределов и 0 доблести</li>
+        <li>${ic('check')}Сет «${s.name}»: сет-бонус растёт с доблестью его героев</li>
+      </ul>
+      <p class="reason">${left >= 0 ? `После покупки останется ${fmt(left)} Энериума.` : `Не хватает ${fmt(-left)} Энериума.`}</p>
+      ${TM(`<p class="reason warn">Цена — заглушка прототипа: цен героев за Энериум в источниках нет. Операция ${op}: повтор ничего не спишет.</p>`)}`;
+    return dialog('Купить героя', body, `<button class="btn ghost" data-a="close">Отмена</button><button class="btn go" data-a="dbuydo" data-v="${op}|${h.id}"${left < 0 ? ' disabled' : ''}>Купить${costTag('enerium', p)}</button>`, 'dn-dlg');
+  },
+  /* получение героя: трещина света, столп, рама проступает из песка времени, вспышка, имя. Время сцены — от покупки (S.dn.got.at):
+     перерисовка продолжает с того же места; нажатие — сразу итог; при «меньше движения» — сразу итог (общее правило index.html) */
+  hrgot(o) {
+    const R = S.dn.ops[o.arg], h = R && RSI[R.id]; if (!h) return '';
+    const s = RSS[h.dset], G = DN_VIEW.got, at = S.dn.got && S.dn.got.op === R.op ? S.dn.got.at : 0;
+    const t = at ? Math.max(0, Math.min(G.end, Date.now() - at)) : G.end, done = t >= G.end;
+    const vars = `--t0:-${t}ms;` + Object.entries(G).map(([k, v]) => `--g-${k}:${v}ms`).join(';');
+    return `<div class="ov dn-got${done ? ' done' : ''}" role="dialog" aria-modal="true" aria-label="${hrEsc(`${h.n} — в коллекции`)}" style="${vars}">
+      <button class="ov-scrim" data-a="${done ? 'close' : 'dnskip'}" aria-label="${done ? 'Закрыть' : 'Показать сразу'}" tabindex="-1"></button>
+      <div class="dn-gs" data-a="${done ? 'noop' : 'dnskip'}">
+        <i class="dn-gcrack" aria-hidden="true"></i><i class="dn-gpillar" aria-hidden="true"></i><i class="dn-gring" aria-hidden="true"></i>
+        ${dnMotes(DN_VIEW.motes + DN_VIEW.motes, 'dn-gmo')}
+        <div class="dn-ghero">${dnFrame(h, 'big')}</div>
+        <div class="dn-gsay">
+          <span class="dn-gset">${dnEmblem(s, 26)}«${s.name}» · ${h.place}-й из ${s.members.length}</span>
+          <h2>${hrEsc(h.n)}</h2>
+          <p>${dnFaceless(h)}</p>
+          <small class="faint">В коллекции · ${h.cls} · доблесть до ${h.maxV}</small>
+        </div>
+      </div>
+      <div class="dn-gacts"><button class="btn" data-a="close">В витрину</button><button class="btn go" data-a="dngo" data-v="${h.id}">${ic('up')}К развитию</button></div>
+      <button class="iconbtn x dn-gx" data-a="close" aria-label="Закрыть">${ic('x')}</button>
+    </div>`;
   },
 });
+
+/* ================== «сервер» покупки за Энериум ==================
+   Покупка донатного героя — операция с номером (§34, §36): проверка, расход и выдача — одним вызовом. Повтор того же номера
+   возвращает прежний ответ и ничего не списывает и не выдаёт; отказ номер не тратит. В игре цену, выдачу и номер подтверждает сервер */
+const DN_WHY = {
+  none: () => 'Такого героя нет в витрине',
+  own: h => `${h.n} уже в коллекции`,
+  shut: h => `Сет «${RSS[h.dset].name}» откроется в цикле ${ROMAN[RSS[h.dset].cycle]}`,
+  enerium: h => `Не хватает Энериума: нужно ${fmt(dnPrice(h))}, есть ${fmt(S.wallet.enerium)}`,
+  op: () => 'Действие устарело',
+};
+function dnWhy(h) {
+  if (!h || h.src !== 'donat' || !RSS[h.dset]) return 'none';
+  if (rsHas(h)) return 'own';
+  if (!dnOpen(RSS[h.dset])) return 'shut';
+  if (S.wallet.enerium < dnPrice(h)) return 'enerium';
+  return '';
+}
+const DN_SRV = {
+  buy(op, id) {
+    const O = S.dn.ops;
+    if (!op) return { refuse: 'op' };
+    if (O[op]) return { again: true, res: O[op] };
+    const h = RSI[id], why = dnWhy(h);
+    if (why) return { refuse: why, id };
+    const cost = dnPrice(h);
+    S.wallet.enerium -= cost; rsAdd(h, 'donat');   // ADR-0019: герой приходит с 0 ур., 0 РП и 0 Добл
+    const res = { op, id: h.id, cost, set: h.dset, place: h.place };
+    O[op] = res; S.dn.seq++;
+    return { res };
+  },
+};
+const dnSay = r => toast(DN_WHY[r.refuse] ? DN_WHY[r.refuse](RSI[r.id]) : 'Не вышло');
 
 /* ================== действия ================== */
 const sqParse = v => String(v || '').split('|');
@@ -722,6 +944,35 @@ Object.assign(ACT, {
   /* «Изменить отряд» из подтверждения Эхо (screens/echo.js) — тот же лист */
   echoprep() { S.overlay = null; SQ.pick('echo'); },
 });
+/* «За Энериум»: выбор сета и героя — вид; покупка — подтверждение и операция DN_SRV; после неё — окно получения героя */
+Object.assign(ACT, {
+  /* сет цикла: номер цикла — на кнопке сета (у прежнего выпадающего списка — в value) */
+  dcyc(v, t) { S.rs.dcyc = +(v || (t && t.value) || 0); S.rs.dsel = ''; render(); },
+  /* герой витрины; из листа сет-бонуса — выбрать и вернуться к витрине */
+  dsel(v) { if (!RSI[v]) return; S.rs.dsel = v; if (S.overlay && S.overlay.t === 'hrset') S.overlay = null; render(); },
+  /* «Купить»: «номер|герой» (старый вызов — просто герой: номер — следующий). Отказ — сразу словами, иначе — подтверждение */
+  dbuy(v) {
+    const [a, b] = sqParse(v), id = b != null ? b : a, op = b != null ? a : dnOp(), why = dnWhy(RSI[id]);
+    if (why) return dnSay({ refuse: why, id });
+    S.overlay = { t: 'dnbuy', arg: `${op}|${id}` }; render(); focusOverlay();
+  },
+  dbuydo(v) {
+    const [op, id] = sqParse(v), r = DN_SRV.buy(op, id);
+    if (r.refuse) { S.overlay = null; dnSay(r); return; }
+    if (r.again) { S.overlay = null; render(); return; }   // повтор той же покупки: ничего не списано и не выдано
+    S.rs.dsel = r.res.id; S.dn.got = { op: r.res.op, at: Date.now() };
+    S.overlay = { t: 'hrgot', arg: r.res.op }; render(); focusOverlay();
+  },
+  /* окно получения: нажатие — сразу итог */
+  dnskip() { if (S.dn.got) S.dn.got.at = Date.now() - DN_VIEW.got.end; render(); focusOverlay(); },
+  /* «К развитию»: герой в «Моих», вкладка «Сила» */
+  dngo(v) {
+    const h = RSI[v]; if (!h) return;
+    const acc = rsOld(h) || H(h.id);
+    S.overlay = null; S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.selHero = acc ? acc.id : v; S.seg.hero = 'power';
+    render();
+  },
+});
 /* окно имени: фокус и выделение; черновик — в S.sq.name, чтобы перерисовка его не стёрла; Enter — «Сохранить» */
 function sqFocusName() {
   requestAnimationFrame(() => { const i = document.getElementById('sqName'); if (i) { i.focus(); try { i.select(); } catch (_) { } } });
@@ -741,6 +992,8 @@ document.addEventListener('keydown', e => {
 function sqState(s) {
   const D = SQ_DATA.demo;
   s.sq = { seq: 1, ops: {}, sel: { arena: D.arena, league: D.league.slice(), clan: D.clan }, slot: -1, round: 0, from: null, name: null };
+  /* S.dn — «сервер» покупок за Энериум: seq — номер следующей, ops — итоги по номерам; got — окно получения: номер и время покупки */
+  s.dn = { seq: 1, ops: {}, got: null };
   return s;
 }
 const sqInitBase = initialState;
@@ -755,6 +1008,17 @@ FLOWS.push(
     () => { S.route = 'echo'; S.overlay = { t: 'prep', arg: 'echo', back: 'echo' }; }],
   ['Лига · три отряда', 'Три отряда по пять, герой не повторяется: повторы и нехватка героев видны до боя',
     () => { S.route = 'arena'; S.seg.arena = 'league'; S.sq.round = 0; S.overlay = { t: 'prep', arg: 'league', back: 'arena' }; }],
+  ['За Энериум · витрина', 'Пятеро Безликих на ступенях цены: дороже — выше и ярче; сет-бонус по ступеням; покупка с подтверждением',
+    () => { S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'donat'; S.rs.dcyc = 0; S.rs.dsel = ''; S.overlay = null; }],
+  ['За Энериум · получение героя', 'Операция с номером: Энериум списан один раз, герой пришёл с 0 ур. — окно получения, свет снизу и имя',
+    () => {
+      S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'donat'; S.rs.dcyc = 0; S.overlay = null;
+      const s = dnSet(), h = s && s.members.map(id => RSI[id]).find(x => x && !dnWhy(x)); if (!h) return;
+      const r = DN_SRV.buy(dnOp(), h.id); if (!r.res) return;
+      S.rs.dsel = h.id; S.dn.got = { op: r.res.op, at: Date.now() }; S.overlay = { t: 'hrgot', arg: r.res.op };
+    }],
+  ['За души · отряд Эхо недели', 'Героя Эхо собирают только осколки из сундуков Эхо — прахом нельзя; собранного пробуждают души',
+    () => { S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'souls'; S.overlay = { t: 'hrecho' }; }],
 );
 
 /* ================== UI-кит ==================
@@ -774,5 +1038,20 @@ KIT_EXTRA.push({
       <p class="k-note">Библиотека «Отряды» (§2.1): до ${SQ_DATA.max} пресетов с именами, в каждом до ${SQ_DATA.size} героев; пресет героев не занимает. Создать, переименовать, удалить, собрать и переставить — операции с номером: повтор ничего не меняет. Один лист выбора на все режимы — <code>OV.prep</code>, у каждого режима свой выбор:</p>
       <table class="rk-tab"><tr><th>Режим</th><th>Героев</th><th>Занятые</th><th>Где выбор</th></tr>${rows}</table>
       <p class="k-note">API для экранов режимов: <code>SQ.pick(режим, { back })</code> — лист выбора, <code>SQ.of(режим)</code> — выбранный отряд (у Лиги — три), <code>SQ.ready(режим)</code> — готовность и причина, <code>SQ.ids(режим)</code> — кто пойдёт, <code>SQ.set</code>, <code>SQ.pool</code>, <code>SQ.hero</code>. Подробно — <code>design/ui/screens/README.md</code>.</p></section>`;
+  },
+});
+
+/* Раздел «За Энериум»: витрина донатного сета — анатомия, правила честной покупки, операция DN_SRV, арт и что выгружено */
+KIT_EXTRA.push({
+  html: () => {
+    const s = dnSet(); if (!s) return '';
+    const demo = dnView().replace(/data-a="[^"]*"/g, 'data-a="noop"');
+    const need = [DN_ART.hall, DN_ART.frame].concat(dnSets().map(x => DN_ART.emblem(x.key))), got = need.filter(dnArt).length;
+    const faces = dnSets().reduce((a, x) => a.concat(x.members), []).filter(id => typeof RS_ART !== 'undefined' && RS_ART.has(id)).length;
+    return `<section class="k-box" style="grid-column:1/-1"><h3>«За Энериум» · витрина донатного сета</h3>
+      <div class="k-demo dn-kit">${demo}</div>
+      <p class="k-note">${TM('Слова автора: «дорого-богато… чтобы игрок хотел купить героев». ')}Дорого — свет, материал и крупные формы, а не числа: зал, пятеро Безликих в рамах на ступенях цены — первый дешевле всех, пятый дороже всех, стоит выше и светится ярче (ADR-0021). Сет — коллекция: «в коллекции N из 5», сет-бонус строкой, его ступени — лист: условие фишками героев и эффект с N ступени (ADR-0022, §30). Справа — выбранный герой и одна кнопка покупки с ценой.</p>
+      <p class="k-note">Честно (§1.2, §32): цена видна на ступени и на кнопке; не хватает Энериума — сказано сколько, ссылка в лавку; подтверждение называет, с чем герой приходит (0 ур., 0 РП, 0 Добл) и сколько останется. Покупка — операция <code>DN_SRV.buy(номер, герой)</code>: номер несут кнопка и подтверждение, повтор ничего не списывает и не выдаёт. После покупки — окно получения: трещина света, столп, рама из песка времени, вспышка, имя; нажатие — сразу итог, «меньше движения» — без анимации.</p>
+      <p class="k-note">Арт — <code>tools/art-gen/jobs/donat-*.json</code>: зал, рама, пять эмблем, портреты сетов II и III. Выгружено для витрины ${got} из ${need.length} (<code>DN_ART.ready</code>), портретов донатных героев — ${faces} (<code>RS_ART</code>). Пока пути нет, зал, раму и эмблемы рисует CSS — битых картинок нет.</p></section>`;
   },
 });

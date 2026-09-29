@@ -5,6 +5,9 @@
 /* плитка предмета: квадрат, свет редкости снизу и кромка; внутри — значок слота */
 .eq-t{position:relative;display:inline-grid;place-items:center;flex:none;width:var(--es,30px);height:var(--es,30px);border-radius:8px;border:1px solid color-mix(in srgb,var(--rc,#2b3036) 45%,var(--iron));background:radial-gradient(85% 75% at 50% 100%,color-mix(in srgb,var(--rc,#2b3036) 26%,transparent),transparent 72%),#0d1013;box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--rc,#2b3036) 80%,transparent);color:var(--parch)}
 .eq-t .i{width:60%;height:60%;stroke-width:1.6}
+.eq-t .eq-ico{width:86%;height:86%}
+.eq-slot .eq-ico{width:84%;height:84%}
+.eq-slot:not(.on) .eq-ico{opacity:.25;filter:grayscale(1)}
 .eq-t.lg{--es:46px;border-radius:11px}
 .eq-t.none{border-style:dashed;background:#0d1013;box-shadow:none;color:var(--parch-3)}
 .eq-t[data-r="5"],.eq-t[data-r="6"]{box-shadow:inset 0 -2px 0 var(--rc),0 0 10px -4px var(--rc)}
@@ -82,15 +85,6 @@
 .eq-who .tx b{display:block;font-size:14px;color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .eq-who .tx small{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--parch-3)}
 .eq-who>img{width:34px;height:40px;border-radius:8px;object-fit:cover}
-
-/* перековка */
-.eq-forge{display:flex;flex-direction:column}
-.eq-fr{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;padding:var(--sp-s) 2px;border-top:1px solid var(--iron)}
-.eq-fr:first-child{border-top:0}
-.eq-fr b{display:block;font-size:13px;color:var(--parch)}
-.eq-fr small{display:block;font-size:12px;color:var(--parch-3)}
-.eq-got{display:flex;align-items:center;gap:var(--sp-m);padding:var(--sp-m);border-radius:12px;background:radial-gradient(90% 70% at 50% 110%,rgba(72,229,212,.1),transparent 70%),var(--stone);border:1px solid rgba(72,229,212,.3)}
-.eq-got b.serif{font-size:19px;color:var(--parch)}
 
 /* раздел UI-кита */
 .eq-kit .eq-kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--sp-m)}

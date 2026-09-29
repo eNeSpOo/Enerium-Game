@@ -11,7 +11,10 @@
       (pool.js), на сидах. Рабочие приходят шардами из сундуков События и крафтовых боссов (lootboxes.js).
    4. Сравнение с доходом забегов (capacity.json калькулятора контрактов): доля ритуалов в золоте, духе, душах, базовых и ключах;
       души против атак Эхо (echo-rules.js); уникальные против боссов биомов; правило ×1,7 (§1.2).
-   5. Проверки: целые числа и миллисекунды, сетка и потолки, законы §19.5, цели долей, ×1,7, генератор совпадает с сундуками.
+   5. Перековку рабочих (слова автора 29.09.2026): RULES.forge — сколько одной редкости, цена золотом по циклу; прогон тех же дней
+      с перековкой избытка (SIM.forge) против прогона без неё — артель, лучшая пятёрка, средняя бригада, базовые, золото; вариант «2 → 1».
+   6. Проверки: целые числа и миллисекунды, сетка и потолки, законы §19.5, цели долей, ×1,7, генератор совпадает с сундуками;
+      перековка — избыток не копится, золото — сток в своих пределах, бригадам не хуже.
 
    Пишет:
    - design/ui/rituals.js — данные прототипа (window.EN_RITUALS) и алгоритм tools/content-gen/rituals/pool.js как есть, руками не править;
@@ -42,6 +45,7 @@ const FILES = {
 /* ================================ ДАННЫЕ ================================ */
 
 const RARITY = ['обычная', 'редкая', 'уникальная', 'эпическая', 'древняя', 'первородная', 'вневременная'];
+const RARITY_M = ['', 'обычный', 'редкий', 'уникальный', 'эпический', 'древний', 'первородный', 'вневременной'];   // рабочий — по редкости 1–7
 const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI'];
 const H = 3600000;   // мс в часе
 
@@ -64,6 +68,10 @@ const RULES = {
   awaken: { soulsPerPct: 25 },              // цена пробуждения рабочего: 25 душ за процент его ускорения — 50 × редкость
   starter: [5, 0, 0, 0, 0, 0, 0],           // первая артель на открытии: пять обычных рабочих
   shardsPer: null,                          // шардов на рабочего — из lootboxes.js (assume.workerShards)
+  /* перековка рабочих — слова автора 29.09.2026: «пусть люди их перекрафчивают в более крутую версию, если их становится избыток; цены
+     в золоте». need свободных одной редкости → один рабочий редкостью выше; gold — золото за вход редкости 1…6, × cyc[цикл аккаунта].
+     Рабочие одной редкости одинаковы (§19.1: специализаций нет), поэтому итог без случайности. Занятые в ритуале не перековываются */
+  forge: { need: 3, gold: [1000, 2000, 4000, 8000, 16000, 32000], cyc: [0, 0, 1, 2, 3, 4, 5] },
 };
 
 /* Вкладки §19.3. ms — длительность по редкостям; unitMs — единица награды; crew — бригада lo…hi по редкостям. */
@@ -123,6 +131,10 @@ const SIM = {
   rollIfBelowBp: 6000,             // роллить, если лучшая подходящая карточка короче 60 % того, что влезает в зазор до следующего захода
   rollsPerPick: 2,
   echoBp: 5000,                    // в Эхо уходит половина душ дня — как в калькуляторе Эхо и сет-бонусов (эхо-экономика, Э5)
+  /* перековка в прогоне: после каждой недели притока игрок держит под бригады keep лучших рабочих, остальных — по RULES.forge.need
+     одной редкости, от младших к старшим — перековывает, пока хватает. keep — две бригады по пять: столько рабочих у обычного занято
+     одновременно в пике. alt — вариант «2 → 1» для сравнения, вопрос автору. Профили — обычный и увлечённый, плательщик — для ×1,7 */
+  forge: { keep: 10, alt: 2, prof: ['o', 'e', 'p'] },
 };
 let ECHO_BP = SIM.echoBp, PAYER_BP = 0;   // PAYER_BP — лишний отряд плательщика в забегах: lootboxes.js, assume.payerPts
 
@@ -135,6 +147,9 @@ const TARGET = {
   x17: 17000,
   uniqOfBoss: 5000,         // уникальных с ритуалов — не больше половины уникальных с боссов у обычного (с цикла III)
   awakenOfHero: 5000,       // рабочий дороже половины героя не бывает: «заметно дешевле героев» (§19.1)
+  /* перековка рабочих: избыток не копится — артель к концу любого цикла не больше artelMax; золото на неё — не больше goldMaxBp дохода
+     забегов дня; базовых с перековкой — не меньше basicsMinBp того, что без неё: перековка не отнимает рабочих у бригад */
+  forge: { artelMax: 20, goldMaxBp: 300, basicsMinBp: 9900 },
 };
 
 /* ================================ ЗАГРУЗКА ================================ */
@@ -227,7 +242,8 @@ function craftWeek(I, c, who) {
 const cycIdx = c => c - SIM.cycles[0];
 function artLv(D, k, c) { const a = D.art[k]; return a ? Math.max(0, Math.min(a.lv, c - a.from + 1)) : 0; }   // один уровень за цикл (wnCap)
 
-function simulate(D, I, pk, c, seedNo, lists) {
+/* F — перековка в прогоне (SIM.forge): { need, gold, cyc, keep }; без F — прогон без перековки, как раньше */
+function simulate(D, I, pk, c, seedNo, lists, F) {
   const pr = SIM.prof[pk], R = D.rules, days = SIM.days[c];
   const nSlots = P.slots(D, artLv(D, 'slots', c)), nFree = P.freeRolls(D, artLv(D, 'rolls', c)), nCards = P.cardsN(D, artLv(D, 'cards', c));
   const heroSlots = Math.max(1, nSlots - Math.floor(nSlots * (SIM.heroShare.den - SIM.heroShare.num) / SIM.heroShare.den));
@@ -236,19 +252,35 @@ function simulate(D, I, pk, c, seedNo, lists) {
   /* артель к началу цикла: первая артель и приток прошлых циклов; дальше — по неделям этого */
   const workers = [];
   const shards = [0, 0, 0, 0, 0, 0, 0];
-  const tot = { gold: 0, spirit: 0, souls: 0, basics: 0, keys: 0, uniq: 0, rituals: 0, hWork: 0, hHero: 0, freeRolls: 0, paidRolls: 0, en: 0, awakenSouls: 0, uniqRituals: 0 };
-  const weekIn = (cc, doAwaken) => {
+  const tot = { gold: 0, spirit: 0, souls: 0, basics: 0, keys: 0, uniq: 0, rituals: 0, hWork: 0, hHero: 0, freeRolls: 0, paidRolls: 0, en: 0, awakenSouls: 0, uniqRituals: 0,
+    forges: 0, forgeGold: 0, wRituals: 0, speedBp: 0 };
+  /* перековка: keep лучших — под бригады; из остальных свободных — по F.need одной редкости, от младших к старшим, пока хватает.
+     Перековки и золото считаются только внутри цикла прогона */
+  const forgeNow = (cc, now, count) => {
+    if (!F) return;
+    for (;;) {
+      const keep = new Set(workers.slice().sort((a, b) => b.r - a.r).slice(0, F.keep));
+      let r = 1, ex = [];
+      for (; r < 7; r++) { ex = workers.filter(w => w.r === r && !keep.has(w) && w.until <= now); if (ex.length >= F.need) break; }
+      if (r >= 7) return;
+      for (const w of ex.slice(0, F.need)) workers.splice(workers.indexOf(w), 1);
+      workers.push({ r: r + 1, until: 0 });
+      if (count) { tot.forges++; tot.forgeGold += F.gold[r - 1] * F.cyc[cc]; }
+    }
+  };
+  const weekIn = (cc, doAwaken, now) => {
     const ev = shardsWeek(I, cc, pr.event), cr = craftWeek(I, cc, pr.craft);
     for (let r = 0; r < 7; r++) shards[r] += ev[r] + cr[r];
     for (let r = 0; r < 7; r++) while (shards[r] >= R.shardsPer * 100) { shards[r] -= R.shardsPer * 100; workers.push({ r: r + 1, until: 0 }); if (doAwaken) tot.awakenSouls += P.awaken(D, r + 1); }
+    forgeNow(cc, now, doAwaken);
   };
   R.starter.forEach((n, i) => { for (let k = 0; k < n; k++) workers.push({ r: i + 1, until: 0 }); });
-  for (let cc = SIM.cycles[0]; cc < c; cc++) for (let w = 0; w < Math.ceil(SIM.days[cc] / 7); w++) weekIn(cc, false);
+  for (let cc = SIM.cycles[0]; cc < c; cc++) for (let w = 0; w < Math.ceil(SIM.days[cc] / 7); w++) weekIn(cc, false, 0);
   const slots = Array.from({ length: nSlots }, () => null);
   const visits = pr.visits.map(h => h * H);
   let heroBusy = [];   // [{ until, n }]
   for (let d = 0; d < days; d++) {
-    if (d % 7 === 0) weekIn(c, true);
+    if (d % 7 === 0) weekIn(c, true, d * 24 * H);
     const open = Object.keys(D.biomes).filter(id => D.biomes[id].cyc < c || (D.biomes[id].cyc === c && (D.biomes[id].n % 2 === 1 || d >= days / 2)));
     const openW = P.openW(D, open);
     const pools = {}, rollNo = { work: 0, hero: 0 };
@@ -310,11 +342,41 @@ function simulate(D, I, pk, c, seedNo, lists) {
         for (const [k, n] of A.cur) tot[k] += n;
         tot.basics += A.basics; tot.keys += A.keys; tot.uniq += A.uniq; if (x.unique) tot.uniqRituals++;
         tot.rituals++;
-        if (tab === 'hero') tot.hHero += x.ms; else tot.hWork += x.ms;
+        if (tab === 'hero') tot.hHero += x.ms; else { tot.hWork += x.ms; tot.wRituals++; tot.speedBp += P.speedBp(D, x, crewW.map(w => w.r)); }
       }
     }
   }
-  return { tot, days, nSlots, heroSlots, nFree, nCards, roster, workers: workers.length, workersR: workers.reduce((a, w) => a + w.r, 0) };
+  const hist = [0, 0, 0, 0, 0, 0, 0]; workers.forEach(w => { hist[w.r - 1]++; });
+  return { tot, days, nSlots, heroSlots, nFree, nCards, roster, workers: workers.length, workersR: workers.reduce((a, w) => a + w.r, 0), hist };
+}
+/* ускорение лучшей пятёрки артели, б. п.: пять самых редких, не больше капа — полная бригада долгого и уникального ритуала */
+function top5Bp(D, hist) {
+  let left = D.rules.unique.crew, s = 0;
+  for (let r = 7; r >= 1 && left; r--) { const n = Math.min(left, hist[r - 1]); s += n * r; left -= n; }
+  return Math.min(D.rules.speed.capBp, s * D.rules.speed.perRBp);
+}
+/* прогон с перековкой и без: по профилю и циклу — артель к концу цикла, её редкости, лучшая пятёрка, средняя бригада, базовые в день,
+   перековок за цикл и золото на них в день. Всё в сотых, как у доходов дня */
+function forgeSim(D, I, lists, need) {
+  const R = D.rules.forge, F = { need, gold: R.gold, cyc: R.cyc, keep: SIM.forge.keep }, out = {};
+  for (const c of SIM.cycles) {
+    out[c] = {};
+    for (const pk of SIM.forge.prof) {
+      const acc = [null, F].map(f => {
+        const a = { artel: 0, hist: [0, 0, 0, 0, 0, 0, 0], t5: 0, speed: 0, wr: 0, basics: 0, forges: 0, gold: 0, days: 0 };
+        for (let s = 0; s < SIM.seeds; s++) {
+          const r = simulate(D, I, pk, c, s, lists, f);
+          a.artel += r.workers; r.hist.forEach((x, i) => { a.hist[i] += x; }); a.t5 += top5Bp(D, r.hist);
+          a.speed += r.tot.speedBp; a.wr += r.tot.wRituals; a.basics += r.tot.basics; a.forges += r.tot.forges; a.gold += r.tot.forgeGold; a.days = r.days;
+        }
+        const n = SIM.seeds;
+        return { artel: Math.round(a.artel * 100 / n), hist: a.hist.map(x => Math.round(x * 100 / n)), t5: Math.round(a.t5 / n), speed: a.wr ? Math.round(a.speed / a.wr) : 0,
+          basics: Math.round(a.basics * 100 / (n * a.days)), forges: Math.round(a.forges * 100 / n), gold: Math.round(a.gold * 100 / (n * a.days)) };
+      });
+      out[c][pk] = { off: acc[0], on: acc[1] };
+    }
+  }
+  return out;
 }
 
 /* ================================ СБОРКА ================================ */
@@ -408,9 +470,30 @@ function build() {
     if (c >= 3) { const u = sim[c].o.day.uniq, b = capOf('o', c).uniq; if (u * RULES.bp > b * TARGET.uniqOfBoss) err.push(`цикл ${ROMAN[c]}: уникальных с ритуалов ${u / 100} в день при ${b / 100} с боссов`); }
   }
 
-  const tables = makeTables(D, I, sim, capOf, share, lists);
-  const data = Object.assign({}, D, { sim: slimSim(sim, capOf) });
-  return { data, tables, sim, err, warn, D, I };
+  /* перековка рабочих: правило данных и вариант для автора; избыток не копится, золото — сток, бригадам не хуже */
+  const FR = D.rules.forge;
+  if (!(FR.need >= 2) || FR.gold.length !== 6 || FR.cyc.length !== 7) err.push('перековка рабочих: нужно от двух, цена на шесть редкостей входа, множитель на циклы 0–6');
+  for (let i = 1; i < FR.gold.length; i++) if (FR.gold[i] <= FR.gold[i - 1]) err.push('перековка рабочих: цена не растёт с редкостью');
+  for (let c = D.rules.open.cycle; c < FR.cyc.length; c++) if (!(FR.cyc[c] > 0) || (c > D.rules.open.cycle && FR.cyc[c] <= FR.cyc[c - 1])) err.push(`перековка рабочих: множитель цикла ${ROMAN[c]} не растёт`);
+  if (FR.cyc.slice(0, D.rules.open.cycle).some(x => x)) err.push('перековка рабочих: цена до открытия ритуалов');
+  const fsim = forgeSim(D, I, lists, FR.need), falt = forgeSim(D, I, lists, SIM.forge.alt);
+  for (const c of SIM.cycles) for (const pk of ['o', 'e']) {
+    const x = fsim[c][pk], g = capOf(pk, c).gold;
+    if (x.on.artel > TARGET.forge.artelMax * 100) err.push(`перековка, цикл ${ROMAN[c]}, ${SIM.prof[pk].n}: артель ${x.on.artel / 100} — избыток копится`);
+    if (x.on.gold * RULES.bp > g * TARGET.forge.goldMaxBp) err.push(`перековка, цикл ${ROMAN[c]}, ${SIM.prof[pk].n}: золото ${Math.round(x.on.gold * RULES.bp / g) / 100} % дохода дня`);
+    if (x.on.basics * RULES.bp < x.off.basics * TARGET.forge.basicsMinBp) err.push(`перековка, цикл ${ROMAN[c]}, ${SIM.prof[pk].n}: базовых меньше, чем без неё`);
+  }
+  for (const c of SIM.cycles) { const o = fsim[c].o.on.basics, p = fsim[c].p.on.basics; if (o && p * RULES.bp > o * TARGET.payer) err.push(`перековка, цикл ${ROMAN[c]}: плательщик ×${(p / o).toFixed(2)} по базовым`); }
+
+  const tables = makeTables(D, I, sim, capOf, share, lists, fsim, falt);
+  const data = Object.assign({}, D, { sim: slimSim(sim, capOf), forge: slimForge(fsim) });
+  return { data, tables, sim, fsim, falt, err, warn, D, I };
+}
+/* в данные прототипа — прогон перековки для UI-кита команде: артель, лучшая пятёрка и золото дня у обычного и увлечённого */
+function slimForge(fsim) {
+  const out = {};
+  for (const c of SIM.cycles) { out[c] = {}; for (const pk of ['o', 'e']) { const x = fsim[c][pk]; out[c][pk] = { artel: [x.off.artel, x.on.artel], t5: [x.off.t5, x.on.t5], speed: [x.off.speed, x.on.speed], forges: x.on.forges, gold: x.on.gold }; } }
+  return out;
 }
 
 /* в данные прототипа — только то, что показывает UI-кит команде: доход дня и доли */
@@ -431,7 +514,7 @@ const hrs = ms => { const m = ms / 60000; return m < 60 ? `${m} мин` : m % 60
 const head = cols => [`| ${cols.join(' | ')} |`, `|${cols.map(() => '---').join('|')}|`];
 const cells = a => `| ${a.join(' | ')} |`;
 
-function makeTables(D, I, sim, capOf, share, lists) {
+function makeTables(D, I, sim, capOf, share, lists, fsim, falt) {
   const TBL = {}, TW = D.tabs.work, TH = D.tabs.hero;
   let T;
 
@@ -469,6 +552,28 @@ function makeTables(D, I, sim, capOf, share, lists) {
     T.push(cells([ROMAN[c], o.map(x => dec(x)).join(' / '), dec(so / D.rules.shardsPer), dec(se), dec(se / D.rules.shardsPer), `${sim[c].o.workers} / ${sim[c].e.workers}`, `${dec(sim[c].o.day.awakenSouls)} / ${dec(sim[c].e.day.awakenSouls)}`]));
   }
   TBL.workers = T.join('\n');
+
+  // перековка рабочих: правило и цена по циклу
+  const FR = D.rules.forge, openC = SIM.cycles;
+  T = head(['Рабочие на входе', 'Сколько', 'Выйдет', 'Ускорение за участника: было → стало', `Цена, золото: цикл ${openC.map(c => ROMAN[c]).join(' / ')}`]);
+  for (let r = 1; r < 7; r++) T.push(cells([RARITY[r - 1], FR.need, `рабочий ${RARITY_M[r + 1]}`, `${pctBp(D.rules.speed.perRBp * r, 0)} → ${pctBp(D.rules.speed.perRBp * (r + 1), 0)}`, openC.map(c => fmt(FR.gold[r - 1] * FR.cyc[c])).join(' / ')]));
+  TBL.forgeRule = T.join('\n');
+  // прогон с перековкой: избыток не копится
+  const arrow = (a, b, f) => `${f(a)} → ${f(b)}`;
+  T = head(['Цикл', 'Игрок', 'Артель к концу цикла: без перековки → с ней', 'С перековкой, по редкостям 1–7', 'Перековок за цикл', 'Золото на перековку в день · доля дохода забегов', 'Лучшая пятёрка: без → с', 'Средняя бригада: без → с', 'Базовые в день: без → с']);
+  for (const c of SIM.cycles) for (const pk of ['o', 'e']) {
+    const x = fsim[c][pk], g = capOf(pk, c).gold;
+    T.push(cells([pk === 'o' ? ROMAN[c] : '', SIM.prof[pk].n, arrow(x.off.artel, x.on.artel, v => dec(v)), x.on.hist.map(v => dec(v)).join(' / '), dec(x.on.forges), `${fmt(x.on.gold / 100)} · ${pctBp(Math.round(x.on.gold * RULES.bp / g))}`,
+      arrow(x.off.t5, x.on.t5, v => pctBp(v, 0)), arrow(x.off.speed, x.on.speed, v => pctBp(v)), arrow(x.off.basics, x.on.basics, v => dec(v))]));
+  }
+  TBL.forge = T.join('\n');
+  // вариант «2 → 1» — для решения автора
+  T = head(['Цикл', 'Игрок', 'Артель к концу цикла', 'Лучшая пятёрка', 'Средняя бригада', 'Базовые в день: без → с', 'Золото на перековку в день · доля дохода забегов']);
+  for (const c of SIM.cycles) for (const pk of ['o', 'e']) {
+    const x = falt[c][pk], g = capOf(pk, c).gold;
+    T.push(cells([pk === 'o' ? ROMAN[c] : '', SIM.prof[pk].n, dec(x.on.artel), pctBp(x.on.t5, 0), pctBp(x.on.speed), arrow(x.off.basics, x.on.basics, v => dec(v)), `${fmt(x.on.gold / 100)} · ${pctBp(Math.round(x.on.gold * RULES.bp / g))}`]));
+  }
+  TBL.forgeAlt = T.join('\n');
 
   // доход в день
   T = head(['Цикл', 'Игрок', 'Ритуалов в день', 'Золото', 'Дух', 'Души', 'Базовые', 'Ключи ремёсел', 'Доля забегов обычного того же дня: золото / дух / души / базовые']);
@@ -543,7 +648,7 @@ function withTables(doc, tables) {
   return doc;
 }
 
-module.exports = { build, render, withTables, markA, markB, FILES, RULES, TABS, SIM, TARGET };
+module.exports = { build, render, withTables, markA, markB, FILES, RULES, TABS, SIM, TARGET, top5Bp };
 
 if (require.main === module) {
   const R = build();

@@ -1,9 +1,10 @@
 /* screens/wanderer.js — «Странник»: вкладки «Память», «Артефакты» и «Достижения» на данных автора (§2.2, §2.4–§2.8, §14.1, §16, §29, §33.4 GDD;
    ADR-0003, ADR-0014, ADR-0023, ADR-0026, ADR-0027). Договор — screens/model.js. Данные — wanderer.js (window.EN_WANDERER): его собирает
    tools/content-gen/wanderer/build.js из таблиц автора source-data/ и черновика достижений, руками не править.
-   Регистрирует: SCREENS.profile — «Обзор» остаётся прежним profileView, три вкладки — отсюда; OV.mem — окно «одна из трёх», OV.memreset —
+   Регистрирует: SCREENS.profile — «Обзор» и три вкладки — отсюда; OV.mem — окно «одна из трёх», OV.memreset —
    полный сброс, листы OV.wnp, wncat, wnart, wnfeat, wnpas, wnfame; действия ACT.wn*; разделы UI-кита «Память Странника» и «Достижения Странника»
-   (KIT_EXTRA); сценарии.
+   (KIT_EXTRA); сценарии. Облик Странника — в конце файла: «Обзор» (lkOverview), лист «Облик» (OV.look), выбор пола (OV.lksex), одна
+   анатомия облика lkAva для всех экранов, «сервер» LK_SRV, состояние S.look.
    Своё состояние: S.mem — Память (места, тройки, анимация), S.wn — артефакты, достижения, номера операций. S.mem.slots[i].st — как раньше:
    'open', 'set' или 'lock' — его читает Убежище.
    Сервер решает, клиент показывает. Тройка Памяти решена «сервером» WN_SRV до анимации: wnRoll — чистая функция сида места и исключённых
@@ -554,15 +555,16 @@ function wnCard(p, o = {}) {
     ${old}<span class="wn-lit" aria-hidden="true"></span><span class="wn-rays" aria-hidden="true"></span>${bray}${wnMotes(p.r)}${ico}
     ${rar(p.r)}<b class="wn-cn">${p.n}</b><small class="wn-cc">${p.cat}</small>${mfl}<span class="wn-gl" aria-hidden="true"></span></${tag}>`;
 }
-/* колонка Странника — та же, что у «Обзора»: портрет, уровень, цикл, опыт, клан, облик и настройки. Команде — демо-цикл экрана */
+/* колонка Странника — та же, что у «Обзора»: облик и имя (лист «Облик» — ниже, lkIdHead), уровень, цикл, опыт, клан, облик, друзья
+   и настройки. Команде — демо-цикл экрана. У «Друзей» — число входящих заявок (screens/social.js) */
 function wnIdCol() {
-  const pct = Math.round(S.acc.xp / S.acc.next * 100), c = wnCyc();
+  const pct = Math.round(S.acc.xp / S.acc.next * 100), c = wnCyc(), fr = typeof socIncoming === 'function' ? socIncoming() : 0;
   const demo = TM(`<div class="wn-demo"><span>Демо: цикл экрана</span><div class="row">${[1, 2, 3, 4, 5, 6].map(k => `<button class="wn-dc" data-a="wncyc" data-v="${k}" aria-pressed="${k === c}">${ROMAN[k]}</button>`).join('')}</div></div>`);
-  return `<div class="pnl idc"><div class="big" style="--p:${pct}"><img src="${ART('wanderer.png')}" alt=""></div><h2 class="serif" style="font-size:26px">Странник</h2>
+  return `<div class="pnl idc">${lkIdHead()}
     <div class="row" style="gap:6px"><span class="chip gold">уровень ${S.acc.level}</span><span class="chip">цикл ${ROMAN[c]}</span></div>
     <button class="lvlbtn" data-a="sheet" data-v="level"><span class="row" style="justify-content:space-between;width:100%"><span class="faint" style="font-size:12px">опыт</span><span class="num" style="font-size:12px">${fmt(S.acc.xp)} / ${fmt(S.acc.next)}</span></span>${bar(pct)}</button>
     <button class="link" data-a="go" data-v="clan">${ic('shield')}${S.clan.n}</button>${demo}
-    <div class="row" style="gap:6px;margin-top:auto"><button class="iconbtn" data-a="toast" data-v="Облик: портрет и рамка" aria-label="Облик">${ic('eye')}</button><button class="iconbtn" data-a="toast" data-v="Друзья: 12" aria-label="Друзья">${ic('users')}</button><button class="iconbtn" data-a="dlg" data-v="settings" aria-label="Настройки">${ic('gear')}</button><button class="iconbtn" data-a="go" data-v="chronicle" aria-label="Летопись">${ic('book')}</button></div></div>`;
+    <div class="row" style="gap:6px;margin-top:auto"><button class="iconbtn" data-a="sheet" data-v="look" aria-label="Облик" title="Облик">${ic('eye')}</button><button class="iconbtn lk-frb" data-a="sheet" data-v="friends" aria-label="Друзья${fr ? `: заявок ${fr}` : ''}" title="Друзья">${ic('users')}${bdgN(fr)}</button><button class="iconbtn" data-a="dlg" data-v="settings" aria-label="Настройки">${ic('gear')}</button><button class="iconbtn" data-a="go" data-v="chronicle" aria-label="Летопись">${ic('book')}</button></div></div>`;
 }
 
 /* ================== Память: пять мест ==================
@@ -799,7 +801,8 @@ function wnAchTab() {
 const WN_TABS = { mem: wnMemTab, arts: wnArtTab, ach: wnAchTab };
 const wnMemBadge = () => (S.mem.slots.some(x => x.st === 'open') ? '!' : '');
 const wnAchBadge = () => { const n = WN.ach.list.concat(WN.ach.firsts).filter(a => wnReady(a)).length; return n ? String(n) : ''; };
-const wnSeg = () => ({ key: 'profile', items: [['over', 'Обзор'], ['mem', 'Память', wnMemBadge()], ['arts', 'Артефакты'], ['ach', 'Достижения', wnAchBadge()]] });
+const WN_SEG_MORE = [];   // вкладки других экранов: [ключ, подпись, бейдж()] — «Летопись» кладёт screens/chronicle.js
+const wnSeg = () => ({ key: 'profile', items: [['over', 'Обзор'], ['mem', 'Память', wnMemBadge()], ['arts', 'Артефакты'], ['ach', 'Достижения', wnAchBadge()]].concat(WN_SEG_MORE.map(([k, n, b]) => [k, n, b ? b() : ''])) });
 const wnProfileBase = SCREENS.profile;
 SCREENS.profile = () => {
   if (!WN) return wnProfileBase();
@@ -1194,3 +1197,394 @@ function wnState(s) {
 const wnInitBase = initialState;
 initialState = function () { return wnState(wnInitBase()); };
 wnState(S);
+
+/* ================== Облик Странника: рамка, портрет, частицы, имя ==================
+   Слова автора 29.09.2026: «В Страннике возможно сменить рамку, никнейм, портрет из тех героев, что есть у игрока, но только по тому
+   полу, что выбрал сам игрок — мужской или женский — при начале игры, и партиклы, что будут показываться за рамкой, но такие, чтобы
+   не вредили оптимизации». §32 GDD: облик — знак отличия, а не товар: рамки и частицы зарабатываются, а не продаются.
+   Одна анатомия облика везде, где виден игрок, — lkAva: «Обзор», профиль игрока, чат, друзья, письма, клан, рейтинги (screens/social.js).
+   Своё — S.look; чужое — облик из профиля игрока.
+   Сервер решает, клиент показывает: рамка, частицы, портрет, имя и пол — операции LK_SRV с номером; повтор номера ничего не меняет.
+   Что открыто — решает сервер по достижениям, уровню, Арене, клану и пропуску (lkMet) и запоминает навсегда (S.look.got).
+   Портрет — капюшон Странника или герой аккаунта своего пола: пол героя — поле sex в roster.js (сборщик состава). Пол игрок выбирает
+   один раз, в начале пути; вступления в прототипе нет — выбор при первом входе в «Странника» (OV.lksex).
+   Частицы за рамкой — CSS, не больше LK_VIEW.fxMax точек, движутся только transform и opacity; в чате живые — только у последних
+   сообщений; их можно выключить (S.look.view), при «меньше движения» они стоят.
+   Рамки — задание tools/art-gen/jobs/frames.json, выгрузка assets/art/frames/<id>.png; путь берётся, только когда он в LK_DATA.ready,
+   до выгрузки — кольцо CSS цвета рамки. Окно картинки совмещается с кругом портрета по геометрии art (промилле кадра выгрузки).
+   Стили — screens/social.css (.lk-*). Автопроверка — tools/content-gen/screens/check_social.js. */
+const LK_DATA = {
+  /* рамки: r — редкость (ADR-0027: кристалл в листе), how — откуда, c — цвет кольца CSS до арта; art — окно картинки после выгрузки
+     (ui-art.json: size 512, fit 96): win — диаметр окна, cx, cy — его центр, промилле кадра; измерено по art/generated/portrait-frames */
+  frames: [
+    { id: 'iron', n: 'Кованое железо', r: 1, how: { k: 'base' }, c: '#8c949c', art: { win: 716, cx: 501, cy: 479 } },
+    { id: 'bronze', n: 'Бронза Эндалора', r: 2, how: { k: 'ach', id: 'pers08' }, c: '#c9954f', art: { win: 627, cx: 499, cy: 497 } },
+    { id: 'karst', n: 'Живой карст', r: 3, how: { k: 'ach', id: 'pers07' }, c: '#1fb8d0', art: { win: 605, cx: 499, cy: 508 } },
+    { id: 'forge', n: 'Горн', r: 4, how: { k: 'ach', id: 'pers21' }, c: '#f07a3a', art: { win: 646, cx: 500, cy: 471 } },
+    { id: 'clan', n: 'Стяг клана', r: 4, how: { k: 'clan', top: 10 }, c: '#5a7fd6', art: { win: 620, cx: 499, cy: 510 } },
+    { id: 'arena', n: 'Песок Арены', r: 5, how: { k: 'arena', top: 100 }, c: '#c8423a', art: { win: 599, cx: 497, cy: 499 } },
+    { id: 'pass', n: 'Осенний путь', r: 5, how: { k: 'pass' }, c: '#e6a84b', art: { win: 591, cx: 493, cy: 442 } },
+    { id: 'first', n: 'Первенство', r: 6, how: { k: 'first' }, c: '#ddbc7a', art: { win: 562, cx: 500, cy: 502 } },
+    { id: 'timeless', n: 'Вневременная', r: 7, how: { k: 'ach', id: 'pers33' }, c: '#5fd67a', art: { win: 542, cx: 500, cy: 502 } },
+  ],
+  art: 'frames/{id}.png',
+  ready: ['frames/iron.png', 'frames/bronze.png', 'frames/karst.png', 'frames/forge.png', 'frames/clan.png', 'frames/arena.png',
+    'frames/pass.png', 'frames/first.png', 'frames/timeless.png'],   // выгруженные рамки (29.09.2026); без пути — кольцо CSS
+  /* частицы за рамкой: q — точек, kind — движение: rise — поднимаются, float — парят, orbit — кружат, fall — падают; c — цвет */
+  fx: [
+    { id: 'none', n: 'Без частиц', r: 1, how: { k: 'base' }, q: 0 },
+    { id: 'ember', n: 'Искры', r: 1, how: { k: 'base' }, q: 6, kind: 'rise', c: '#f2a65a' },
+    { id: 'dust', n: 'Пыль карста', r: 2, how: { k: 'level', v: 10 }, q: 8, kind: 'float', c: '#48e5d4' },
+    { id: 'ash', n: 'Пепел', r: 3, how: { k: 'ach', id: 'pers24' }, q: 10, kind: 'fall', c: '#cfc6b4' },
+    { id: 'spirit', n: 'Кольцо духа', r: 4, how: { k: 'clan', top: 10 }, q: 8, kind: 'orbit', c: '#48e5d4' },
+    { id: 'gold', n: 'Золотые искры', r: 6, how: { k: 'first' }, q: 12, kind: 'rise', c: '#ddbc7a' },
+    { id: 'time', n: 'Песок времени', r: 7, how: { k: 'ach', id: 'pers33' }, q: 12, kind: 'orbit', c: '#5fd67a' },
+  ],
+  /* имя: длина в знаках, буквы и цифры, между словами — пробел или дефис; первая смена — free раз бесплатно, дальше — price Энериума
+     и не чаще раза в days дней. Пол — выбор один раз */
+  nick: { min: 3, max: 16, re: '^[0-9A-Za-zА-Яа-яЁё]+(?:[ -][0-9A-Za-zА-Яа-яЁё]+)*$', free: 1, price: 300, days: 30 },
+  day: 86400000,   // мс в сутках
+  sexN: { m: 'Мужской', f: 'Женский' },
+  base: { nick: 'Странник', frame: 'iron', fx: 'ember', face: '' },   // новый Странник: лицо под капюшоном
+  hood: 'wanderer.png',
+};
+/* вид: размеры слота облика по местам, частицы — точек не больше fxMax, места и задержки — детерминированно */
+const LK_VIEW = {
+  fxMax: 12,
+  sizes: { chat: 44, row: 44, rank: 26, strip: 48, tile: 64, sheet: 104, id: 96, kit: 72 },
+  css: { win: 700, cx: 500, cy: 500 },   // окно кольца CSS до арта, промилле слота
+  dots: { a: 137, d: 430, t: [2600, 3200, 3800], s: [2, 3, 2, 4] },   // шаг угла, градусы; шаг задержки, мс; длительности, мс; размеры, px
+};
+/* демо-аккаунт: пол выбран в начале пути, рамка за цикл II, лицо под капюшоном; пропуск сезона — как в «Лавке Энериума» */
+const LK_DEMO = { sex: 'm', frame: 'bronze', face: '', fx: 'ember', pass: { n: 'Осенний путь', pts: 620, goal: 1200 } };
+const LK_TAKEN = [];   // занятые имена: сервер знает всех игроков — проверки имён дописывают экраны общения (screens/social.js)
+const LK_TABS = [['frame', 'Рамка'], ['face', 'Портрет'], ['fx', 'Частицы'], ['nick', 'Имя']];
+const LK_KEY = 'en-lk-fx';   // localStorage: показывать частицы в чате и профилях
+
+/* ================== облик: помощники ================== */
+const LKF = new Map(LK_DATA.frames.map(f => [f.id, f])), LKX = new Map(LK_DATA.fx.map(x => [x.id, x]));
+const LK_NICK_RE = new RegExp(LK_DATA.nick.re);
+const lkFrame = id => LKF.get(id) || LKF.get(LK_DATA.base.frame);
+const lkFx = id => LKX.get(id) || LKX.get('none');
+const lkArtOf = f => LK_DATA.art.replace('{id}', f.id);
+const lkArtOn = f => LK_DATA.ready.includes(lkArtOf(f));
+const lkEsc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const lkOp = () => 'lk' + S.look.seq;   // номер следующей операции: его несут кнопки
+const lkNow = () => Date.now();
+const lkViewSaved = () => { try { const v = localStorage.getItem(LK_KEY); return v == null ? true : v === '1'; } catch (_) { return true; } };
+const lkSexOfId = id => (id && typeof RSI !== 'undefined' && RSI[id] ? RSI[id].sex || '' : '');
+/* лицо облика: герой состава (id roster.js) — его портрет; пусто — капюшон Странника. Без аргумента — своё */
+function lkFaceSrc(face) {
+  if (face === undefined) face = S.look ? S.look.face : '';
+  const h = face && typeof RSI !== 'undefined' ? RSI[face] : null;
+  if (h && typeof hrImg === 'function') return hrImg(h);
+  return ART(LK_DATA.hood);
+}
+/* портреты на выбор: герои аккаунта своего пола — id героя состава; героя отряда прототипа ведёт его двойник в составе */
+function lkFaces() {
+  const sx = S.look.sex; if (!sx || typeof RSI === 'undefined') return [];
+  const mine = typeof hrMine === 'function' ? hrMine() : S.heroes, out = [];
+  for (const h of mine) {
+    const r = RSI[h.id] || (typeof hrTwin === 'function' ? hrTwin(h) : null);
+    if (r && r.sex === sx && !out.includes(r.id)) out.push(r.id);
+  }
+  return out;
+}
+/* откуда: base — у каждого; level — уровень Странника; ach — достижение получено; first — своё первенство сервера; arena — неделя
+   Арены в первой сотне; clan — клан в первой десятке Кланового босса за неделю; pass — последняя награда бесплатного ряда пропуска */
+function lkMet(how, s = S) {
+  switch (how.k) {
+    case 'base': return true;
+    case 'level': return s.acc.level >= how.v;
+    case 'ach': return !!(s.wn && s.wn.ach && s.wn.ach.got[how.id]);
+    case 'first': return !!(s.wn && s.wn.ach && Object.values(s.wn.ach.first).includes('@'));
+    case 'arena': { const p = s.arena && s.arena.past ? s.arena.past.place : 0; return !!p && p <= how.top; }
+    case 'clan': { const P = s.clan && s.clan.in ? s.clan.past : null; return !!(P && P.place && P.place <= how.top); }
+    case 'pass': return !!(s.look && s.look.pass && s.look.pass.pts >= s.look.pass.goal);
+  }
+  return false;
+}
+/* открыто ли: сервер запоминает навсегда — прошлая неделя Арены или клана, взятая однажды, остаётся */
+function lkOwn(kind, x) {
+  if (!x) return false;
+  const key = kind + ':' + x.id, G = S.look.got;
+  if (G[key]) return true;
+  if (!lkMet(x.how)) return false;
+  G[key] = 1;
+  return true;
+}
+function lkHowTxt(how) {
+  switch (how.k) {
+    case 'base': return 'есть у каждого Странника';
+    case 'level': return `${how.v}-й уровень Странника`;
+    case 'ach': { const a = WNF.get(how.id); return a ? `достижение «${a.n}»` : 'достижение'; }
+    case 'first': return 'первенство сервера';
+    case 'arena': return `неделя Арены в первой сотне`;
+    case 'clan': return `клан в первой десятке Кланового босса за неделю`;
+    case 'pass': return `последняя награда пропуска «${S.look.pass.n}»`;
+  }
+  return '';
+}
+/* где сейчас: одна строка к условию закрытого */
+function lkHowNow(how) {
+  switch (how.k) {
+    case 'level': return `сейчас ${S.acc.level}-й`;
+    case 'ach': { const a = WNF.get(how.id); if (!a || wnHidden(a) || a.goal <= 1) return ''; return `${fmt(Math.min(wnProg(a), a.goal))} из ${fmt(a.goal)} ${wnUnit(a, a.goal)}`; }   // одно дело — без счёта
+    case 'arena': { const p = S.arena && S.arena.past ? S.arena.past.place : 0; return p ? `прошлая неделя — ${fmt(p)}-е место` : ''; }
+    case 'clan': { const P = S.clan && S.clan.in ? S.clan.past : null; return !S.clan || !S.clan.in ? 'нужен клан' : P && P.place ? `прошлая неделя — ${fmt(P.place)}-е место` : ''; }
+    case 'pass': return `${fmt(S.look.pass.pts)} из ${fmt(S.look.pass.goal)} очков`;
+  }
+  return '';
+}
+/* точки частиц: места по кругу, задержки и размеры — от номера точки, без случайности в разметке */
+const lkDots = q => Array.from({ length: q }, (_, k) => { const D = LK_VIEW.dots;
+  return `<i style="--a:${(k * D.a) % 360}deg;--d:-${(k * D.d) % D.t[0]}ms;--t:${D.t[k % D.t.length]}ms;--s:${D.s[k % D.s.length]}px"></i>`; }).join('');
+/* облик: L — { frame, face, fx }; слот px — кадр рамки; лицо — круг окна рамки; частицы — за рамкой.
+   o: px; fx — 'live' (по умолчанию), 'rest' — точки стоят, 'off' — без частиц; force — частицы и при выключенной настройке зрителя
+   (примерка в «Облике», UI-кит); act, val, label — кнопка */
+function lkAva(L, o = {}) {
+  const px = o.px || LK_VIEW.sizes.row, f = lkFrame(L && L.frame), art = lkArtOn(f), g = art ? f.art : LK_VIEW.css;
+  const x = lkFx(L && L.fx), mode = o.fx || 'live', on = mode !== 'off' && (o.force || !S.look || S.look.view !== false);
+  const q = on ? Math.min(x.q || 0, LK_VIEW.fxMax) : 0;
+  const dots = q ? `<span class="lk-fx${mode === 'rest' ? ' rest' : ''}" data-k="${x.kind}" style="--fc:${x.c}" aria-hidden="true">${lkDots(q)}</span>` : '';
+  const ring = art ? `<img class="lk-fr" src="${AV(lkArtOf(f))}" alt="" loading="lazy" decoding="async" draggable="false">` : '<span class="lk-ring" aria-hidden="true"></span>';
+  const ava = `<span class="lk-ava${art ? ' art' : ''}" data-f="${f.id}" data-r="${f.r}" style="--px:${px}px;--w:${g.win};--cx:${g.cx};--cy:${g.cy};--fc0:${f.c}">${dots}<span class="lk-face"><img src="${lkFaceSrc(L ? L.face || '' : '')}" alt="" loading="lazy" decoding="async" draggable="false"></span>${ring}</span>`;
+  if (!o.act) return ava;
+  const lb = lkEsc(o.label || '');
+  return `<button class="lk-btn" data-a="${o.act}" data-v="${lkEsc(o.val == null ? '' : o.val)}"${lb ? ` aria-label="${lb}" title="${lb}"` : ''}>${ava}</button>`;
+}
+/* имя: что скажет сервер — пусто, если можно сменить */
+function lkNickWhy(raw) {
+  const N = LK_DATA.nick, L = S.look, n = String(raw == null ? '' : raw).trim();
+  if (!n) return '';
+  if ([...n].length < N.min) return `Имя — от ${N.min} знаков`;
+  if ([...n].length > N.max) return `Имя — до ${N.max} знаков`;
+  if (!LK_NICK_RE.test(n)) return 'Только буквы и цифры, между словами — пробел или дефис';
+  if (n.toLowerCase() === String(L.nick).toLowerCase()) return 'Это и есть ваше имя';
+  if (LK_TAKEN.some(f => { try { return f(n); } catch (_) { return false; } })) return 'Это имя уже занято';
+  const wait = lkNickWait();
+  if (wait > 0) return `Следующая смена имени — через ${dur(Math.ceil(wait / 1000))}`;
+  const cost = lkNickCost();
+  if (cost && S.wallet.enerium < cost) return `Не хватает Энериума: нужно ${fmt(cost)}, есть ${fmt(S.wallet.enerium)}`;
+  return '';
+}
+const lkNickCost = () => (S.look.nickN >= LK_DATA.nick.free ? LK_DATA.nick.price : 0);
+const lkNickWait = () => (S.look.nickN >= LK_DATA.nick.free && S.look.nickAt ? Math.max(0, S.look.nickAt + LK_DATA.nick.days * LK_DATA.day - lkNow()) : 0);
+
+/* ================== облик: «сервер» ==================
+   Операция с номером: проверка и изменение — одним шагом; повтор того же номера ничего не меняет и отвечает тем же; отказ ничего
+   не меняет и номер не тратит */
+const LK_REFUSE = {
+  lock: 'Ещё не открыто', sex: 'Сначала выберите пол Странника', face: 'Портрет — только из ваших героев вашего пола', once: 'Пол выбирают один раз',
+  nick: '', none: 'Нечего менять',
+};
+const LK_SRV = {
+  run(op, f) {
+    const O = S.look.ops;
+    if (O[op]) return { again: true, res: O[op] };
+    const r = f();
+    if (r.res) O[op] = r.res;
+    return r;
+  },
+  frame(op, id) { return this.run(op, () => { const f = LKF.get(id); if (!lkOwn('f', f)) return { refuse: 'lock' }; S.look.frame = id; return { res: { t: 'frame', id } }; }); },
+  fx(op, id) { return this.run(op, () => { const x = LKX.get(id); if (!lkOwn('x', x)) return { refuse: 'lock' }; S.look.fx = id; return { res: { t: 'fx', id } }; }); },
+  face(op, id) {
+    return this.run(op, () => {
+      if (!S.look.sex) return { refuse: 'sex' };
+      if (id && !lkFaces().includes(id)) return { refuse: 'face' };
+      S.look.face = id || '';
+      return { res: { t: 'face', id: id || '' } };
+    });
+  },
+  sex(op, k) {
+    return this.run(op, () => {
+      if (S.look.sex) return { refuse: 'once' };
+      if (!LK_DATA.sexN[k]) return { refuse: 'sex' };
+      S.look.sex = k;
+      if (S.look.face && lkSexOfId(S.look.face) !== k) S.look.face = '';
+      return { res: { t: 'sex', k } };
+    });
+  },
+  nick(op, raw) {
+    return this.run(op, () => {
+      const n = String(raw == null ? '' : raw).trim(), why = n ? lkNickWhy(n) : 'Введите новое имя';
+      if (why) return { refuse: 'nick', why };
+      const cost = lkNickCost(), was = S.look.nick;
+      S.wallet.enerium -= cost;
+      S.look.nick = n; S.look.nickN++; S.look.nickAt = lkNow();
+      /* сервер разносит имя: в клане игрок — под новым именем */
+      const me = S.clan && S.clan.members ? S.clan.members.find(m => m.me) : null;
+      if (me) me.n = n;
+      return { res: { t: 'nick', nick: n, was, cost } };
+    });
+  },
+};
+function lkDo(r, ok) {
+  if (r.again) { render(); return false; }
+  if (r.refuse) { toast(r.why || LK_REFUSE[r.refuse] || 'Нельзя'); return false; }
+  S.look.seq++;
+  if (ok) ok(r.res);
+  return true;
+}
+
+/* ================== облик: вид ================== */
+/* голова колонки Странника: облик — вход в лист «Облик», имя; пол не выбран — кнопка выбора */
+function lkIdHead() {
+  const L = S.look;
+  return `<button class="lk-idb" data-a="sheet" data-v="look" aria-label="Облик: рамка, портрет, частицы и имя" title="Облик">${lkAva(L, { px: LK_VIEW.sizes.id })}</button>
+    <h2 class="serif lk-idn">${lkEsc(L.nick)}</h2>${L.sex ? '' : '<button class="btn sm go" data-a="dlg" data-v="lksex">Кто вы?</button>'}`;
+}
+/* «Обзор»: колонка Странника, пятёрка сильнейших и рейтинги недели (§2.2, §33.4) */
+function lkOverview() {
+  const top5 = [...(typeof hrMine === 'function' ? hrMine() : S.heroes)].sort((a, b) => b.bm - a.bm).slice(0, 5);   // все герои аккаунта, мощь — BM.hero
+  const body = `<div class="col" style="min-height:0">
+      <div class="pnl pad col" style="gap:8px"><div class="row"><h2 class="serif gold" style="font-size:20px">Пятёрка сильнейших</h2><span class="g-spacer"></span><b class="bm sq-bm" title="Сумма боевой мощи пятёрки">${ICON('power', 20, 'Боевая мощь')}<span class="num">${fmt(BM.squad(top5.map(h => h.id)))}</span></b></div>
+        <div class="sq-slots">${top5.map(h => heroCard(h, { act: 'hero-open' })).join('')}</div></div>
+      <div class="pnl pad col grow" style="gap:6px;min-height:0"><div class="row"><h2 class="serif gold" style="font-size:20px">Рейтинги недели</h2><span class="g-spacer"></span><span class="faint" style="font-size:12px">текущий период</span></div>
+        <div class="ranks">${S.ranks.map(([n, p, s]) => `<button class="rk" data-a="sheet" data-v="rank:${n}" ${p ? '' : 'disabled'}><span>${n}</span><b class="num">${p ? '#' + p : '—'}</b><small>${s}</small></button>`).join('')}</div></div>
+    </div>`;
+  return { title: 'Странник', seg: wnSeg(), html: `<section class="scr"><div class="pf wn-pf">${wnIdCol()}${body}</div></section>` };
+}
+const lkProfileBase = SCREENS.profile;
+SCREENS.profile = () => (WN && S.seg.profile === 'over' ? lkOverview() : lkProfileBase());
+/* выбранное для примерки во вкладке: своё, пока ничего не выбрано */
+function lkPick(t) {
+  const p = S.look.pick[t];
+  if (t === 'frame') return LKF.has(p) ? p : S.look.frame;
+  if (t === 'fx') return LKX.has(p) ? p : S.look.fx;
+  if (t === 'face') return p === '' || (p && lkFaces().includes(p)) ? p : S.look.face;
+  return '';
+}
+const lkFaceName = id => (id && typeof RSI !== 'undefined' && RSI[id] ? RSI[id].n : 'Капюшон Странника');
+function lkTile(t, id, L, o) {
+  const cur = S.look[t] === id, sel = o.sel;
+  const name = t === 'frame' ? lkFrame(id).n : t === 'fx' ? lkFx(id).n : lkFaceName(id), r = t === 'frame' ? lkFrame(id).r : t === 'fx' ? lkFx(id).r : 0;
+  const st = cur ? `<small class="spirit">${ic('check')}сейчас</small>` : o.lock ? `<small class="faint">${ic('lock')}закрыто</small>` : '';
+  return `<button class="lk-tile${sel ? ' sel' : ''}${o.lock ? ' lock' : ''}" data-a="lkpick" data-v="${t}:${id}" aria-pressed="${sel}" aria-label="${lkEsc(name)}${o.lock ? ', закрыто' : cur ? ', сейчас' : ''}">
+    ${lkAva(L, { px: LK_VIEW.sizes.tile, fx: t === 'fx' ? 'rest' : 'off', force: true })}<span class="lk-tn">${r ? `<span class="rar" data-r="${r}"></span>` : ''}${lkEsc(name)}</span>${st}</button>`;
+}
+function lkTabHtml(t, pick) {
+  const L = S.look;
+  if (t === 'frame') return `<div class="lk-grid">${LK_DATA.frames.slice().sort((a, b) => a.r - b.r).map(f => lkTile('frame', f.id, Object.assign({}, L, { frame: f.id, fx: 'none' }), { sel: pick === f.id, lock: !lkOwn('f', f) })).join('')}</div>`;
+  if (t === 'fx') return `<div class="lk-grid">${LK_DATA.fx.map(x => lkTile('fx', x.id, Object.assign({}, L, { fx: x.id }), { sel: pick === x.id, lock: !lkOwn('x', x) })).join('')}</div>
+    <label class="lk-view"><input type="checkbox" data-a="lkview"${L.view ? ' checked' : ''}><span>Показывать частицы в чате и профилях</span></label>`;
+  if (t === 'face') {
+    if (!L.sex) return `<p class="muted">Портрет выбирают из своих героев своего пола. Сначала — кто вы.</p>${lkSexOpts(lkOp())}`;
+    const ids = [''].concat(lkFaces());
+    return `<div class="lk-grid">${ids.map(id => lkTile('face', id, Object.assign({}, L, { face: id, fx: 'none' }), { sel: pick === id })).join('')}</div>
+      <p class="reason">Портреты — ваши ${L.sex === 'f' ? 'героини' : 'герои'}. Новый ${L.sex === 'f' ? 'героиня' : 'герой'} в коллекции — новый портрет.</p>`;
+  }
+  const N = LK_DATA.nick, cost = lkNickCost(), why = lkNickWhy(L.nd), wait = lkNickWait();
+  const price = wait ? `Следующая смена — через ${dur(Math.ceil(wait / 1000))}.` : cost ? `Смена — ${fmt(cost)} Энериума, не чаще раза в ${N.days} ${plural(N.days, 'день', 'дня', 'дней')}.` : 'Первая смена — бесплатно, дальше — за Энериум.';
+  return `<label class="search lk-nick">${ic('users')}<input id="lkNick" type="text" value="${lkEsc(L.nd)}" maxlength="${N.max}" placeholder="${lkEsc(L.nick)}" autocomplete="off" spellcheck="false" aria-label="Новое имя"></label>
+    <p class="reason">${N.min}–${N.max} знаков: буквы и цифры, между словами — пробел или дефис.</p>
+    <p class="reason${why ? ' warn' : ''}">${why || price}</p>`;
+}
+/* пол: два варианта; лицо варианта — первый свой герой этого пола, иначе капюшон */
+function lkSexOpts(op) {
+  const L = S.look, mine = typeof hrMine === 'function' ? hrMine() : S.heroes;
+  const faceOf = k => { for (const h of mine) { const r = RSI[h.id] || (typeof hrTwin === 'function' ? hrTwin(h) : null); if (r && r.sex === k) return r.id; } return ''; };
+  return `<div class="lk-sexes">${Object.keys(LK_DATA.sexN).map(k => `<button class="lk-sex" data-a="lksex" data-v="${k}:${op}">${lkAva({ frame: L.frame, face: faceOf(k), fx: 'none' }, { px: LK_VIEW.sizes.sheet, fx: 'off' })}<b class="serif">${LK_DATA.sexN[k]}</b></button>`).join('')}</div>`;
+}
+function lkFoot(t, pick, op) {
+  const L = S.look;
+  if (t === 'nick') { const why = lkNickWhy(L.nd), cost = lkNickCost(); return `<button class="btn go" data-a="lknick" data-v="${op}"${why || !String(L.nd || '').trim() ? ' disabled' : ''}>Сменить имя${cost ? costTag('enerium', cost) : ''}</button>`; }
+  if (t === 'face' && !L.sex) return '';
+  if (pick === L[t]) return `<span class="faint">${t === 'frame' ? 'Эта рамка сейчас на портрете' : t === 'fx' ? 'Эти частицы сейчас за рамкой' : 'Этот портрет сейчас в рамке'}</span>`;
+  if (t !== 'face') {
+    const x = t === 'frame' ? LKF.get(pick) : LKX.get(pick);
+    if (!lkOwn(t === 'frame' ? 'f' : 'x', x)) { const now = lkHowNow(x.how); return `<p class="reason">Откроет ${lkHowTxt(x.how)}${now ? ` · ${now}` : ''}.</p>`; }
+  }
+  return `<button class="btn go" data-a="lkset" data-v="${t}:${pick}:${op}">${t === 'frame' ? 'Надеть рамку' : t === 'fx' ? 'Выбрать частицы' : 'Выбрать портрет'}</button>`;
+}
+Object.assign(OV, {
+  /* «Облик»: примерка — выбор в сетке, надеть — операция с номером. Вкладки — S.seg.lkt */
+  look() {
+    const L = S.look, t = LK_TABS.some(([k]) => k === S.seg.lkt) ? S.seg.lkt : 'frame', op = lkOp(), pick = lkPick(t);
+    const prev = t === 'nick' ? L : Object.assign({}, L, { [t]: pick });
+    const tabs = `<div class="tabs lk-tabs" role="tablist" aria-label="Облик">${LK_TABS.map(([k, n]) => `<button role="tab" aria-selected="${t === k}" data-a="seg" data-v="lkt:${k}">${n}</button>`).join('')}</div>`;
+    const sub = t === 'frame' ? lkFrame(pick).n : t === 'fx' ? lkFx(pick).n : t === 'face' ? lkFaceName(pick) : (String(L.nd || '').trim() ? 'новое имя' : 'имя сейчас');
+    const nick = t === 'nick' && String(L.nd || '').trim() ? L.nd.trim() : L.nick;
+    const head = `<div class="lk-prev">${lkAva(prev, { px: LK_VIEW.sizes.sheet, force: true })}<b class="serif lk-pn">${lkEsc(nick)}</b><small class="faint">${lkEsc(sub)}</small></div>`;
+    return sheet('Облик', `${tabs}<div class="lk-body">${head}<div class="col lk-pane">${lkTabHtml(t, pick)}</div></div>`, lkFoot(t, pick, op), true);
+  },
+  /* пол Странника — один раз, в начале пути: от него портреты */
+  lksex() {
+    const L = S.look;
+    if (L.sex) return dialog('Кто вы?', `<p class="muted">Выбрано в начале пути: ${LK_DATA.sexN[L.sex].toLowerCase()}. Портреты — из героев этого пола.</p>`, '<button class="btn go" data-a="close">Понятно</button>');
+    return dialog('Кто вы?', `<p class="muted">От этого зависят портреты: их выбирают из своих героев своего пола. Выбор — один раз.</p>${lkSexOpts(lkOp())}`, '', 'lk-sexdlg');
+  },
+});
+Object.assign(ACT, {
+  lkpick(v) { const i = String(v).indexOf(':'), t = String(v).slice(0, i), id = String(v).slice(i + 1); S.look.pick[t] = id; render(); },
+  lkset(v) {
+    const [t, id, op] = String(v).split(':'); if (!LK_SRV[t] || t === 'nick' || t === 'sex') return;
+    lkDo(LK_SRV[t](op, id), res => { delete S.look.pick[t]; toast(t === 'frame' ? `Рамка: ${lkFrame(res.id).n}` : t === 'fx' ? `Частицы: ${lkFx(res.id).n}` : `Портрет: ${lkFaceName(res.id)}`); });
+  },
+  lknick(v) { lkDo(LK_SRV.nick(v, S.look.nd), res => { S.look.nd = ''; toast(`Теперь вас зовут ${res.nick}${res.cost ? ` · −${fmt(res.cost)} Энериума` : ''}`); }); },
+  lksex(v) {
+    const [k, op] = String(v).split(':');
+    lkDo(LK_SRV.sex(op, k), res => { if (S.overlay && S.overlay.t === 'lksex') S.overlay = null; toast(`${LK_DATA.sexN[res.k]} · портреты — из героев этого пола`); });
+  },
+  lkview(v, t) { S.look.view = !!(t && t.checked); try { localStorage.setItem(LK_KEY, S.look.view ? '1' : '0'); } catch (_) { } render(); },
+});
+/* первый вход в «Странника» без выбранного пола — сначала выбор (вступления в прототипе нет) */
+const lkGoBase = ACT.go;
+ACT.go = function (v, t) {
+  lkGoBase(v, t);
+  if (S.route === 'profile' && S.look && !S.look.sex && !S.overlay) open('lksex');
+};
+/* имя: ввод не теряет фокус — после отрисовки курсор там же */
+if (typeof document !== 'undefined' && document.addEventListener) document.addEventListener('input', e => {
+  const t = e.target; if (!t || t.id !== 'lkNick') return;
+  S.look.nd = t.value; S.look.ndPos = t.selectionStart; S.look.ndFocus = true; render();
+});
+window.addEventListener('en-render', () => {
+  if (!S.look || !S.look.ndFocus) return;
+  S.look.ndFocus = false;
+  const e = document.getElementById('lkNick');
+  if (e && e.focus) { e.focus(); try { e.setSelectionRange(S.look.ndPos, S.look.ndPos); } catch (_) { } }
+});
+
+/* ================== UI-кит: «Облик Странника» ================== */
+KIT_EXTRA.push({
+  html: () => {
+    const face = typeof RSI !== 'undefined' && RSI['c1-15'] ? 'c1-15' : '', px = LK_VIEW.sizes.kit;
+    const fig = (h, t, s) => `<figure class="lk-kf">${h}<figcaption>${t}${s ? `<small>${s}</small>` : ''}</figcaption></figure>`;
+    const frames = LK_DATA.frames.map(f => fig(lkAva({ frame: f.id, face, fx: 'none' }, { px, force: true }), `<span class="rar" data-r="${f.r}"></span>${f.n}`, lkHowTxt(f.how))).join('');
+    const fxs = LK_DATA.fx.map(x => fig(lkAva({ frame: 'iron', face, fx: x.id }, { px, force: true }), `<span class="rar" data-r="${x.r}"></span>${x.n}`, `${x.q ? `${x.q} ${plural(x.q, 'точка', 'точки', 'точек')}` : 'выключено'} · ${lkHowTxt(x.how)}`)).join('');
+    const sizes = Object.entries({ chat: 'чат', row: 'друзья, письма', strip: 'витрина соперника', tile: 'сетка «Облика»', id: 'колонка Странника', sheet: 'профиль, примерка' })
+      .map(([k, t]) => fig(lkAva({ frame: 'first', face, fx: 'gold' }, { px: LK_VIEW.sizes[k], force: true }), `${LK_VIEW.sizes[k]} px`, t)).join('');
+    const ready = LK_DATA.frames.filter(lkArtOn).length;
+    return `<section class="k-box lk-kit" style="grid-column:1/-1" id="lkKit"><h3>Облик Странника</h3>
+      <p class="k-note">Рамка, портрет, частицы за рамкой и имя — лист «Облик» из колонки Странника. Одна анатомия везде, где виден игрок: «Обзор», профиль игрока, чат, друзья, письма, клан, рейтинги. Облик — знак отличия, а не товар: рамки и частицы дают достижения, уровень, Арена, клан, пропуск и первенство. Портрет — капюшон Странника или свой герой своего пола; пол выбирают один раз, в начале пути. Имя: первая смена бесплатно, дальше — ${fmt(LK_DATA.nick.price)} Энериума и не чаще раза в ${LK_DATA.nick.days} дней.</p>
+      <span class="eyebrow">Рамки · ${LK_DATA.frames.length}</span><div class="lk-krow">${frames}</div>
+      <span class="eyebrow">Частицы за рамкой · не больше ${LK_VIEW.fxMax} точек</span><div class="lk-krow">${fxs}</div>
+      <p class="k-note">Частицы — CSS: движутся только transform и opacity, стоят при «меньше движения», выключаются настройкой зрителя. В чате живые — только у последних сообщений, в сетках — стоят.</p>
+      <span class="eyebrow">Размеры облика</span><div class="lk-krow">${sizes}</div>
+      ${TM(`<p class="k-note">Картинки рамок в прототипе: ${ready} из ${LK_DATA.frames.length}${ready < LK_DATA.frames.length ? ' — до выгрузки кольцо CSS цвета рамки' : ''}. Задание — tools/art-gen/jobs/frames.json, выгрузка — assets/art/frames/&lt;id&gt;.png (512 × 512, fit 96); окно картинки совмещается с кругом портрета по LK_DATA.frames[].art — промилле кадра. Пол героя — поле sex в roster.js, выводит сборщик состава по «кто он» и главам.</p>`)}
+    </section>`;
+  },
+});
+
+/* ================== сценарии презентации ================== */
+FLOWS.push(
+  ['Облик Странника', 'Рамка, портрет, частицы за рамкой и имя: примерка и «Надеть». Портреты — свои герои своего пола; рамки — за достижения, Арену, клан и пропуск',
+    () => { S.route = 'profile'; S.seg.profile = 'over'; S.seg.lkt = 'frame'; S.look.pick = {}; S.overlay = { t: 'look' }; }],
+  ['Странник · начало пути', 'Пол выбирают один раз: портреты — из героев своего пола',
+    () => { S.look.sex = ''; S.look.face = ''; S.route = 'profile'; S.seg.profile = 'over'; S.overlay = { t: 'lksex' }; }],
+);
+
+/* ================== облик: состояние ==================
+   S.look: nick — имя; sex — пол ('m', 'f', '' — ещё не выбран); frame, face, fx — облик; got — открытое навсегда; pick — примерка по
+   вкладкам; nd — новое имя в поле ввода; nickN — смен имени, nickAt — когда была последняя, мс; view — показывать частицы (настройка
+   зрителя, localStorage); pass — пропуск сезона; ops, seq — «сервер»: ответы по номерам операций и номер следующей */
+function lkState(s) {
+  s.look = { nick: LK_DATA.base.nick, sex: LK_DEMO.sex, frame: LK_DEMO.frame, face: LK_DEMO.face, fx: LK_DEMO.fx, got: {}, pick: {}, nd: '', ndPos: 0, ndFocus: false,
+    nickN: 0, nickAt: 0, view: lkViewSaved(), pass: Object.assign({}, LK_DEMO.pass), ops: {}, seq: 1 };
+  s.seg.lkt = s.seg.lkt || 'frame';
+  return s;
+}
+const lkInitBase = initialState;
+initialState = function () { return lkState(lkInitBase()); };
+lkState(S);

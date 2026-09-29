@@ -1,15 +1,16 @@
-/* screens/talismans.js — «Герои → Сила»: духовные талисманы героя (§26 GDD). Договор — screens/model.js.
-   Регистрирует: talRow — ряд из четырёх мест в карточке героя (его зовёт heroDetail в index.html, вкладка «Сила»); OV.tal — лист
-   «Духовные талисманы»: места, сумма бонусов, запасы, перековка; действия ACT.tal*; раздел UI-кита через KIT_EXTRA; сценарий презентации. На карте
+/* screens/talismans.js — «Герои → Снаряжение»: духовные талисманы героя (§26 GDD). Договор — screens/model.js.
+   Регистрирует: talRow — ряд из четырёх мест в карточке героя (его зовёт heroDetail в index.html, вкладка «Снаряжение»); OV.tal — открывает
+   одно окно «Снаряжение героя» (grWin, screens/hero-dev.js) на месте талисмана: места героя слева, запасы справа, перетаскивание и нажатие;
+   действия ACT.tal*; tlMulOf — множитель мощи для любого набора; раздел UI-кита через KIT_EXTRA; сценарий презентации. На карте
    экранов окно отмечено готовым полем ready карточки «Герои» (MAP в index.html). Своё состояние — S.tal, заводится как S.bag.
    Данные — EN_TALISMANS (design/ui/talismans.js, собирает tools/content-gen/talismans/build.js): линейки, значения по редкостям,
    привязка к классу, как эффект ложится в ядро боя и в БМ. Черновик — docs/content/талисманы.md.
    Запасы талисманов — там же, куда их кладёт открытие сундука (screens/bag.js): S.zp.extra, ключ «tal:номер:редкость». Их показывает
    своя вкладка «Запасы → Талисманы» (bag.js): карточки, фильтр «подходит классу», «К герою» — переход сюда, в лист OV.tal с выбранным.
    Правила §26 и таблицы автора: четыре места; до древней редкости талисман носит только свой класс, с древней — любой; одна линейка —
-   одно место на героя; спасение от смерти — одно на героя; перековка §22: 10 одной редкости → 1 случайный редкостью выше.
-   Сервер решает, клиент показывает: надеть, снять и перековать — операции TL_SRV с номером: проверка и итог одним вызовом, повтор того же
-   номера ничего не повторяет. Перековка бросает генератор на сиде операции (EnLoot.makeRng); в игре сид и итог присылает сервер.
+   одно место на героя; спасение от смерти — одно на героя. Перековка §22 — своё окно «Ремесло → Перековка» (screens/reforge.js).
+   Сервер решает, клиент показывает: надеть и снять — операции TL_SRV с номером: проверка и итог одним вызовом, повтор того же
+   номера ничего не повторяет. TL_SRV.forge — вход в «сервер» перековки RF_SRV (screens/reforge.js).
    Бой: источник героя для боя — герой и его талисманы. EB.heroSrc обёрнут здесь: талисманы, чей эффект есть в ядре прототипа, ложатся
    в набор героя записями библиотеки (EB.addLib) — как пассивки и реакции (ADR-0017); «Бич» — расовая прибавка героя; «Беглое слово» —
    доля способностей набора. Ядро боя не правится. Идущий забег досчитывается с тем набором, с которым начался.
@@ -27,8 +28,6 @@ const TL_DEMO = {
   /* сценарий презентации: кому и что надеть — по местам */
   flow: { hero: 'h1', put: [86, 170, 15, 355] },
 };
-/* числа вида */
-const TL_VIEW = { list: 60 };   // строк в списке запасов не больше: остальное — поиском по вкладкам
 
 /* ================== помощники ================== */
 const TL = window.EN_TALISMANS || null;
@@ -67,7 +66,11 @@ function tlIco(f, px) {
   return ic(v);
 }
 /* талисман — огранённый медальон цвета редкости, внутри — значок эффекта. Заглушка до арта */
-const tlTile = (no, o = {}) => { const f = tlFam(no); return `<span class="tl-t${o.lg ? ' lg' : ''}" data-r="${tlR(no)}" aria-hidden="true">${!f || tlHide(f) ? ic('lock') : tlIco(f, o.lg ? 24 : 17)}</span>`; };
+/* внутри — арт семейства (talIcon, screens/art-icons.js: боевые, охотничьи, добыча, печати), без арта — значок эффекта */
+const tlTile = (no, o = {}) => {
+  const f = tlFam(no), art = f && !tlHide(f) && typeof talIcon === 'function' ? talIcon(f.cat, o.lg ? 48 : 32, '') : '';
+  return `<span class="tl-t${o.lg ? ' lg' : ''}${art ? ' art' : ''}" data-r="${tlR(no)}" aria-hidden="true">${!f || tlHide(f) ? ic('lock') : art || tlIco(f, o.lg ? 24 : 17)}</span>`;
+};
 
 /* ================== запасы, места и БМ ================== */
 const TB = {
@@ -81,17 +84,20 @@ const TB = {
 const tlEq = hid => (S.tal.eq[hid] = S.tal.eq[hid] || Array(TL.rules.slots).fill(null));
 const tlWorn = hid => tlEq(hid).filter(Boolean);
 const tlWornRO = hid => ((S.tal && S.tal.eq[hid]) || []).filter(Boolean);   // без записи в S.tal: мощь спрашивают и у соперников Арены
-/* множитель БМ героя от талисманов, б. п.: √(УВС × ЭЗ) — стороны складывают доли значений линеек */
-function tlSides(hid) {
+/* множитель БМ героя от талисманов, б. п.: √(УВС × ЭЗ) — стороны складывают доли значений линеек. tlSidesOf и tlMulOf — для любого
+   набора номеров: окно снаряжения (screens/hero-dev.js) примеряет талисман, не надевая его */
+function tlSidesOf(nos) {
   let off = 0, def = 0;
-  for (const no of tlWornRO(hid)) {
+  for (const no of nos) {
     const f = tlFam(no); if (!f || !f.bm) continue;
     const v = tlV(no) || 0;
     for (const b of Array.isArray(f.bm[0]) ? f.bm : [f.bm]) { const add = b[1] === 'fix' ? b[2] : tlFl(v * 100 * b[1], TLB); if (b[0] === 'off') off += add; else def += add; }
   }
   return { off, def };
 }
-const tlMul = hid => { const { off, def } = tlSides(hid); return tlIsqrt(Math.max(1, TLB + off) * Math.max(1, TLB + def)); };
+const tlSides = hid => tlSidesOf(tlWornRO(hid));
+const tlMulOf = nos => { const { off, def } = tlSidesOf(nos); return tlIsqrt(Math.max(1, TLB + off) * Math.max(1, TLB + def)); };
+const tlMul = hid => tlMulOf(tlWornRO(hid));
 /* слой БМ «талисманы» общей функции BM (index.html): отпечаток — надетые номера, множитель — tlMul */
 if (typeof BM_LAYERS !== 'undefined') BM_LAYERS.push({ id: 'tal', key: h => tlWornRO(h.id).join(','), mul: h => tlWornRO(h.id).length ? tlMul(h.id) : TLB });
 /* почему талисман нельзя надеть в это место; '' — можно */
@@ -113,14 +119,12 @@ const TL_WHY = {
   cls: no => `До древней редкости его носит только ${tlOr(tlFam(no).cls.map(tlClsName))}. С древней — любой герой.`,
   fam: () => 'Такой талисман на герое уже есть: одинаковые не складываются.',
   grp: () => 'Спасение от смерти у героя уже есть: второе не сработает.',
-  gold: () => 'Не хватает золота.',
-  few: () => `Нужно ${TL.rules.reforge.need} талисманов одной редкости в запасах.`,
-  top: () => 'Вневременные не перековываются: выше редкости нет.',
 };
 
 /* ================== «сервер» ==================
-   Надеть, снять, перековать — одним вызовом: проверка, изменение запасов и мест, итог. Номер операции несут кнопки: повтор того же номера
-   возвращает прежний итог и ничего не меняет. Отказ не записывается — следующая попытка идёт с тем же номером. */
+   Надеть и снять — одним вызовом: проверка, изменение запасов и мест, итог. Номер операции несут кнопки: повтор того же номера
+   возвращает прежний итог и ничего не меняет. Отказ не записывается — следующая попытка идёт с тем же номером.
+   Перековка — «сервер» окна «Ремесло → Перековка» (RF_SRV, screens/reforge.js); TL_SRV.forge он ставит своим входом */
 const TL_SRV = {
   run(op, f) {
     const O = S.tal.srv;
@@ -148,35 +152,9 @@ const TL_SRV = {
       return { ok: 'out', hid, slot, no };
     });
   },
-  /* перековка §22: 10 талисманов редкости r из запасов → 1 случайный редкостью выше, по весам пула (правило 5 автора).
-     Какие десять — сначала повторы; в игре их выбирает игрок */
-  forge(op, r) {
-    return TL_SRV.run(op, () => {
-      if (!tlOpen()) return { refuse: 'lock' };
-      if (r >= 7) return { refuse: 'top' };
-      const R = TL.rules.reforge, took = tlForgePick(r);
-      if (!took) return { refuse: 'few' };
-      const gold = R.gold[r - 1];
-      if (S.wallet.gold < gold) return { refuse: 'gold' };
-      const pool = tlPool(r + 1), W = pool.reduce((a, x) => a + x[1], 0);
-      if (!W) return { refuse: 'top' };
-      let k = EnLoot.makeRng(EnLoot.seedOf('перековка|' + op))(W), got = pool[0][0];
-      for (const [no, w] of pool) { if (k < w) { got = no; break; } k -= w; }
-      for (const [no, n] of took) TB.take(no, n);
-      S.wallet.gold -= gold; TB.add(got);
-      return { ok: 'forge', r, took, got, gold };
-    });
-  },
 };
-/* пул редкости: [номер, вес] — спойлерные линейки только с цикла «для команды», как в сундуках */
+/* пул редкости: [номер, вес] — спойлерные линейки только с цикла «для команды», как в сундуках. Его берут перековка и ларцы */
 const tlPool = r => Object.entries(TL.items).filter(([no, [id, x]]) => x === r && (!TL.fams[id].team || S.acc.cycle >= TL.fams[id].team)).map(([no, [id]]) => [+no, TL.fams[id].w[r - 1]]);
-/* десять на перековку: сначала повторы, затем самые частые по весу; null — не набирается */
-function tlForgePick(r) {
-  const need = TL.rules.reforge.need, list = TB.list().filter(x => tlR(x.no) === r).sort((a, b) => b.q - a.q || tlFam(b.no).w[r - 1] - tlFam(a.no).w[r - 1] || a.no - b.no);
-  const out = []; let left = need;
-  for (const x of list) { if (!left) break; const n = Math.min(x.q, left); out.push([x.no, n]); left -= n; }
-  return left ? null : out;
-}
 
 /* ================== бой: источник героя с талисманами ==================
    Запись библиотеки для талисмана с эффектом в ядре: значение редкости — в поле vKey, × vMul. Регистрируются один раз при загрузке */
@@ -211,12 +189,13 @@ if (TL && window.EnBattle) {
 const tlCore = f => f.lib ? 'В бою прототипа действует.' : `В бою прототипа пока не действует: нужен примитив ядра «${f.need}» — ${TL.rules.needs[f.need]}.`;
 
 /* ================== вид ================== */
-/* место в карточке героя: медальон и короткое значение; пустое — плюс */
+/* место в карточке героя: медальон с артом семейства (tlTile) и короткое значение; пустое — плюс.
+   Нажатие открывает окно «Снаряжение героя» на этом месте */
 function tlSlotBtn(h, i, no, sel) {
   const t = no ? `${tlName(no)} · ${RAR[tlR(no)].toLowerCase()}: ${tlFx(no)}` : `Место ${i + 1}: пусто`;
   return `<button class="tl-slot${no ? ' on' : ''}${sel ? ' sel' : ''}" ${no ? `data-r="${tlR(no)}"` : ''} data-a="sheet" data-v="tal:${h.id}:${i}" aria-label="${trEsc(t)}" title="${trEsc(t)}">${no ? `${tlTile(no)}<b class="num">${tlShort(no)}</b>` : ic('plus')}</button>`;
 }
-/* ряд из четырёх мест во вкладке «Сила»: зовёт heroDetail в index.html */
+/* ряд из четырёх мест во вкладке «Снаряжение» карточки героя: зовёт heroDetail в index.html */
 function talRow(h) {
   if (!TL || !S.tal) return '';
   if (!tlOpen()) return `<div class="tl-row"><span class="eyebrow">Духовные талисманы</span><p class="reason">${ic('lock')} Откроются во втором цикле — вместе с кланами.</p></div>`;
@@ -227,14 +206,6 @@ function talRow(h) {
 }
 /* строка эффекта со значком — сумма бонусов, карточка талисмана */
 const tlFxRow = no => `<div class="tl-fx">${tlTile(no)}<span><b>${tlName(no)}</b><small>${tlFx(no)}</small></span></div>`;
-/* строка запасов: медальон, имя и эффект, кристалл редкости и сколько штук; нельзя надеть — приглушена, причина в подсказке */
-function tlLi(h, slot, x, cur) {
-  const why = tlWhy(h, x.no, slot), f = tlFam(x.no);
-  const tip = why ? TL_WHY[why](x.no) : tlFx(x.no);
-  return `<button class="tl-li${why ? ' off' : ''}" data-r="${tlR(x.no)}" data-a="talpick" data-v="${x.no}" aria-current="${cur === x.no}" title="${trEsc(tip)}">
-    ${tlTile(x.no)}<span class="tx"><b>${tlName(x.no)}</b><small>${tlFx(x.no)}</small></span>
-    <span class="rt">${rar(tlR(x.no))}${x.q > 1 ? `<span class="num faint">×${x.q}</span>` : ''}${why === 'cls' ? `<span class="chip" title="${trEsc(TL_WHY.cls(x.no))}">${CLS(tlClsName(f.cls[0]), 12)}</span>` : ''}</span></button>`;
-}
 /* карточка талисмана: крупно, эффект, привязка, лор в две строки; служебное — команде */
 function tlCard(no, h, lead) {
   const f = tlFam(no), r = tlR(no), hide = tlHide(f);
@@ -245,59 +216,12 @@ function tlCard(no, h, lead) {
     <p class="tl-eff">${tlFx(no)}</p>
     ${hide ? '' : `<p class="reason">${bind}</p>${foldLore(f.d, 'quote')}`}${team}</div>`;
 }
-/* сумма бонусов героя: эффекты надетых и боевая мощь */
-function tlSum(h) {
-  const worn = tlWorn(h.id); if (!worn.length) return '<p class="reason">Места пусты. Нажмите место, затем талисман из запасов.</p>';
-  const P = BM.parts(h), m = P.mul.tal || TLB, eq = P.mul.eq && P.mul.eq !== TLB ? P.mul.eq : 0, { off, def } = tlSides(h.id);
-  return `<div class="tl-sum">${worn.map(tlFxRow).join('')}</div>
-    <p class="reason">${ICON('power', 14, 'Боевая мощь')} Боевая мощь ${tlPct(m - TLB)} — ${fmt(P.bm)}.${TM(` Формула §6, слой 2: база ${fmt(P.base)} × √(УВС ${tlX(TLB + off)} × ЭЗ ${tlX(TLB + def)})${eq ? ` × снаряжение ${tlX(eq)}` : ''} = ${fmt(P.bm)} — общая функция BM. Охота, добыча и печати в БМ не входят.`)}</p>`;
-}
-/* список запасов на вкладке: «Подходят» — можно надеть в это место; «Все» — с причинами */
-function tlListHtml(h, slot, tab) {
-  const all = TB.list().sort((a, b) => tlR(b.no) - tlR(a.no) || tlName(a.no).localeCompare(tlName(b.no), 'ru') || a.no - b.no);
-  const fit = all.filter(x => !tlWhy(h, x.no, slot)), list = (tab === 'all' ? all : fit).slice(0, TL_VIEW.list);
-  if (!all.length) return '<p class="reason">Запасы пусты: талисманы приходят в сундуках за кланового босса.</p>';
-  if (!list.length) return `<p class="reason">Сюда подходящих нет. На вкладке «Все» — почему.</p>`;
-  return `<div class="tl-list">${list.map(x => tlLi(h, slot, x, S.tal.pick)).join('')}</div>`;
-}
-/* перековка: по редкостям — сколько в запасах и чем заплатить; итог прошлой — сверху */
-function tlForgeHtml() {
-  const R = TL.rules.reforge, L = S.tal.last, rows = [];
-  for (let r = 1; r < 7; r++) {
-    const n = TB.list().filter(x => tlR(x.no) === r).reduce((a, x) => a + x.q, 0), can = n >= R.need && S.wallet.gold >= R.gold[r - 1];
-    rows.push(`<div class="tl-fr" data-r="${r}"><span class="tl-t" data-r="${r}">${ic('gem')}</span><span class="tx"><b>${RAR[r]} → ${RAR[r + 1].toLowerCase()}</b><small>${fmt(n)} в запасах · нужно ${R.need}</small></span>
-      <button class="btn sm${can ? ' go' : ''}" data-a="talforge" data-v="tl${S.tal.seq}:${r}" ${n >= R.need ? '' : 'disabled'}>Перековать${costTag('gold', R.gold[r - 1])}</button></div>`);
-  }
-  const last = L ? `<div class="tl-got">${tlTile(L.got, { lg: true })}<span class="col" style="gap:4px"><span class="eyebrow">Перековка дала</span><b class="serif">${tlName(L.got)}</b><small class="faint">${tlFx(L.got)}</small></span></div>` : '';
-  return `${last}<p class="reason">${R.need} талисманов одной редкости сплавляются в один редкостью выше. Какой выйдет — решает случай.</p><div class="tl-forge">${rows.join('')}</div>
-    ${TM('Правило §22: 10 → 1, результат всегда выше. Цена — золото, удваивается с редкостью: сток золота (ADR-0022, п. 4). Какие десять — сначала повторы; в игре их выбирает игрок. Итог — генератор на сиде операции, пул и веса — как у сундуков.', 'p', 'reason')}`;
-}
-/* ================== лист «Духовные талисманы» ================== */
+/* ================== лист «Духовные талисманы» ==================
+   Надевают талисманы в одном окне со снаряжением — «Снаряжение героя» (grWin, screens/hero-dev.js): места героя слева, запасы справа,
+   перетаскивание и нажатие, сравнение со стрелками. Лист открывает это окно на своём месте; выбранный талисман (S.tal.pick) сохраняется,
+   если он выбран для этого места (S.tal.pickFor) — так «К герою» из «Запасов» приходит с выбранным */
 Object.assign(OV, {
-  tal(o) {
-    if (!TL) return '';
-    const [hid, s] = String(o.arg || '').split(':'), h = H(hid) || H(S.selHero); if (!h) return '';
-    const slot = Math.max(0, Math.min(TL.rules.slots - 1, +s || 0)), eq = tlEq(h.id), cur = eq[slot], tab = S.seg.tal || 'fit';
-    if (S.tal.pickFor !== `${h.id}:${slot}`) { S.tal.pick = null; S.tal.pickFor = `${h.id}:${slot}`; }
-    const pick = S.tal.pick && TB.qty(S.tal.pick) ? S.tal.pick : null;
-    const slots = `<div class="tl-slots in">${eq.map((no, i) => tlSlotBtn(h, i, no, i === slot)).join('')}</div>`;
-    const top = `<div class="tl-hero"><img src="${h.img}" alt=""><span class="col" style="gap:3px"><b>${h.name}</b><span class="row faint">${CLS(h.cls, 14)}${h.cls}</span></span><span class="g-spacer"></span>${bmHtml(h.bm, 16)}</div>`;
-    const busy = busyNote(h.id) ? PL('<p class="reason">Герой в забеге: новый набор — со следующего боя.</p>', '<p class="reason">Герой в забеге: идущий забег досчитывается с тем набором, с которым начался (сервер считает забег при старте, §5.6). Новый набор — со следующего боя.</p>') : '';
-    const card = pick ? tlCard(pick, h, 'Выбран') : cur ? tlCard(cur, h, `Место ${slot + 1} · надет`) : '';
-    const tabs = [['fit', 'Подходят'], ['all', 'Все'], ['forge', 'Перековка']];
-    const body = `${top}${slots}${busy}
-      <details class="tl-sumd"${tlWorn(h.id).length ? ' open' : ''}><summary><span class="eyebrow">Сумма бонусов</span></summary>${tlSum(h)}</details>
-      ${card}
-      <div class="tabs" role="tablist" aria-label="Запасы талисманов">${tabs.map(([k, l]) => `<button role="tab" aria-selected="${tab === k}" data-a="seg" data-v="tal:${k}">${l}</button>`).join('')}</div>
-      ${tab === 'forge' ? tlForgeHtml() : tlListHtml(h, slot, tab)}
-      ${foldLore(['Духовный талисман хранит черту чужой души: как она била, берегла, выживала. Надетый, он отдаёт эту черту герою.', 'Слабая черта приживается только у родственной души — до древней редкости талисман носит свой класс. Древняя сильнее души носителя и приживается у любого. Больше четырёх чужих черт душа героя не удержит.'], 'reason')}
-      ${TM('Места — §26: четыре, до древней — привязка к классу, с древней — свободно. Одна линейка — одно место (правило 1 автора), спасение от смерти — одно на героя. Запасы — S.zp.extra, как у сундуков. Демо-запасы — TL_DEMO.', 'p', 'reason')}`;
-    const why = pick ? tlWhy(h, pick, slot) : '';
-    const op = `tl${S.tal.seq}`;
-    const foot = pick ? `${why ? `<span class="reason warn">${TL_WHY[why](pick)}</span>` : ''}<button class="btn go" data-a="talput" data-v="${op}:${h.id}:${slot}:${pick}" ${why ? 'disabled' : ''}>${cur ? 'Заменить' : 'Надеть'}</button>`
-      : cur ? `<button class="btn" data-a="talout" data-v="${op}:${h.id}:${slot}">Снять</button>` : '<span class="reason">Выберите талисман из запасов.</span>';
-    return sheet(`Духовные талисманы`, body, foot, true);
-  },
+  tal(o) { return TL && typeof grWin === 'function' ? grWin(o, 'tal') : ''; },
 });
 
 /* ================== действия ================== */
@@ -315,12 +239,6 @@ Object.assign(ACT, {
     if (r.again) return;
     if (r.refuse) { toast(TL_WHY[r.refuse]()); return; }
     toast(`${tlName(r.no)} — в запасах`);
-  },
-  talforge(v) {
-    const [op, r] = String(v).split(':'), res = TL_SRV.forge(op, +r);
-    if (res.again) return;
-    if (res.refuse) { toast(TL_WHY[res.refuse]()); return; }
-    S.tal.last = res; toast(`Перековка: ${tlName(res.got)} · ${RAR[tlR(res.got)].toLowerCase()}`);
   },
 });
 
@@ -340,10 +258,10 @@ function tlKitHtml() {
     return `<div class="tl-kf"><span class="tl-kn">${tlTile(first)}<span><b>${f.n}</b><small>${f.fx.replace('{v}', 'N')}</small></span></span><span class="tl-kv">${f.no.map((no, i) => `<i data-r="${i + 1}" class="${no ? '' : 'no'}">${no ? (f.v[i] == null ? '✓' : f.v[i]) : '·'}</i>`).join('')}</span><span class="tl-kc">${f.cls ? f.cls.map(c => CLS(R.classes[c], 14, R.classes[c])).join('') : ''}${TM(f.lib ? '<span class="chip spirit">в бою</span>' : `<span class="chip">${f.need}</span>`)}</span></div>`; };
   const cat = c => `<details class="tl-kd"><summary><b>${R.cats[c]}</b><small class="faint"> · ${Object.values(TL.fams).filter(f => f.cat === c).length} линеек</small></summary>${Object.keys(TL.fams).filter(id => TL.fams[id].cat === c).map(famRow).join('')}${c === 'farm' ? `<p class="k-note">И ещё ${Object.values(TL.fams).filter(f => f.type === 'collector').length} знаков сборщика — по одному на базовый ресурс: «Когда падает базовый ресурс, этот выпадает на 25 % чаще».</p>` : ''}</details>`;
   return `<section class="k-box tl-kit" style="grid-column:1/-1" id="kitTal"><h3>Духовные талисманы</h3>
-    <p class="k-note">Четыре места на героя. До древней редкости талисман носит только свой класс, с древней — любой герой. Одна линейка — одно место. ${R.reforge.need} одной редкости перековываются в один редкостью выше. Значок в медальоне — что делает талисман, цвет — редкость.${TM(' §26, таблица автора, черновик docs/content/талисманы.md. Данные — design/ui/talismans.js, сборщик tools/content-gen/talismans/build.js. Экран — screens/talismans.js: ряд мест во вкладке «Сила», лист OV.tal. Медальон — заглушка CSS до арта.')}</p>
+    <p class="k-note">Четыре места на героя. До древней редкости талисман носит только свой класс, с древней — любой герой. Одна линейка — одно место. ${R.reforge.need} одной редкости перековываются в один редкостью выше. Значок в медальоне — что делает талисман, цвет — редкость.${TM(' §26, таблица автора, черновик docs/content/талисманы.md. Данные — design/ui/talismans.js, сборщик tools/content-gen/talismans/build.js. Экран — screens/talismans.js: ряд мест во вкладке «Снаряжение»; надевают в одном окне со снаряжением — OV.tal открывает его (screens/hero-dev.js). В местах и окне — арт семейства (screens/art-icons.js), свет — редкость; медальон CSS — если арта нет.')}</p>
     <div class="tl-kg">
       <div class="k-air-r"><b>Редкость — сила одной линейки</b><div class="k-row tl-lad">${ladder}</div><small>«Слёзы Виала»: лечение героя +N %. Чем выше редкость, тем ярче свет изнутри.</small></div>
-      <div class="k-air-r"><b>Места в карточке героя</b>${slotsDemo}<small>Надетое — медальон и короткое значение; пустое — плюс; выбранное место — подсвечено. Нажатие открывает лист: места, сумма бонусов, запасы, перековка.</small></div>
+      <div class="k-air-r"><b>Места в карточке героя</b>${slotsDemo}<small>Надетое — медальон и короткое значение; пустое — плюс; выбранное место — подсвечено. Нажатие открывает лист: места, сумма бонусов, запасы. Перековка — своё окно в «Ремесле».</small></div>
       <div class="k-air-r"><b>Строка запасов</b><div class="tl-list">${[nosOf('tears')[4], nosOf('tears')[0], nosOf('dance')[0]].map(no => `<span class="tl-li${no === nosOf('dance')[0] ? ' off' : ''}" data-r="${tlR(no)}">${tlTile(no)}<span class="tx"><b>${tlName(no)}</b><small>${tlFx(no)}</small></span><span class="rt">${rar(tlR(no))}</span></span>`).join('')}</div><small>Нельзя надеть — строка приглушена, причина — в подсказке и под кнопкой.</small></div>
     </div>
     <div class="tl-kg">
@@ -368,13 +286,13 @@ if (typeof KIT_EXTRA !== 'undefined') KIT_EXTRA.push({ html: tlKitHtml, paint: t
 
 /* ================== сценарий презентации ================== */
 FLOWS.push(
-  ['Духовные талисманы', 'Четыре места у героя, привязка к классу до древней, сумма бонусов и боевая мощь, перековка 10 → 1',
+  ['Духовные талисманы', 'Четыре места у героя в окне снаряжения: привязка к классу до древней — значком класса, боевая мощь — стрелкой',
     () => {
-      S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.seg.hero = 'power';
+      S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.seg.hero = 'gear';
       const F = TL_DEMO.flow, h = H(F.hero); if (!h || !TL) return;
       S.selHero = h.id;
       F.put.forEach((no, i) => { if (!tlEq(h.id)[i] && TB.qty(no)) TL_SRV.put(`tl${S.tal.seq}`, h.id, i, no); });
-      S.seg.tal = 'fit'; S.overlay = { t: 'tal', arg: `${h.id}:0` };
+      S.overlay = { t: 'tal', arg: `${h.id}:0` };
     }],
 );
 

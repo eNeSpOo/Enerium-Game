@@ -162,7 +162,29 @@ const TREE = {
 const BOSS = {
   attacks: { day: 5, carryDays: 1 },     // §25.1: 5 атак в день, растёт древом; общий кошелёк на элит и босса; копится ещё одна дневная норма — беречь для КБ
   pool: 3, poolMax: 5, kills: 3,         // §25.2: 3 элиты в пуле, пул растёт древом; три победы — автопризыв КБ, висящие элиты сгорают
-  rounds: { e: 10, b: 15 },              // §25.1: лимит атаки — раунды; у босса дольше: контроль на него не действует, только дебаффы
+  // §25.1: лимит атаки — раунды; тип боя в таблице ядра RULES.rounds.by — одна таблица на все режимы (решение автора 29.09.2026):
+  // элита со свитой — 10 раундов, клановый босс — 100: бой на достойном враге длится дольше
+  rounds: { e: 'e', b: 'clan' },
+  /* Свита элиты (решение автора 29.09.2026): бой с элитой — один этаж, пятеро врагов — элита и четыре приспешника её стихии.
+     Классы четырёх — по классу элиты: у каждой своя «партия» без двойников элиты; характеристики — рядовые Мастерской того же класса,
+     набор — одна способность школы стихии элиты (ранг рядовой, ADR-0016). Свита в каждой атаке — свежая, урон копится только
+     у элиты; бой кончается, когда пала элита — как в Эхо */
+  retinue: {
+    n: 4,                                              // слово автора: «у элиты 1 этаж и 5 врагов с ним — он и 4 свиты»
+    rank: { core: 'o', acts: 1, share: [2900, 0] },   // рядовой: одна способность без ульты, доля хода — как у обычной редкости
+    hpPct: 100,                                        // здоровье приспешника — % hpPct его образца, как защитники Эхо
+    by: {
+      'Танк': ['Физ. ДД силы', 'Маг. ДД', 'Лекарь', 'Дебаффер'],
+      'Лекарь': ['Танк', 'Физ. ДД силы', 'Физ. ДД ловкости', 'Маг. ДД'],
+      'Физ. ДД силы': ['Танк', 'Физ. ДД ловкости', 'Маг. ДД', 'Лекарь'],
+      'Физ. ДД ловкости': ['Танк', 'Физ. ДД силы', 'Лекарь', 'Дебаффер'],
+      'Маг. ДД': ['Танк', 'Физ. ДД ловкости', 'Лекарь', 'Дебаффер'],
+      'Дебаффер': ['Танк', 'Физ. ДД силы', 'Маг. ДД', 'Лекарь'],
+    },
+    tplO: { 'Физ. ДД силы': 'o1', 'Дебаффер': 'o2', 'Маг. ДД': 'o3', 'Танк': 'o4', 'Лекарь': 'o5', 'Физ. ДД ловкости': 'o6' },   // рядовые Мастерской
+    kinds: { 'Танк': 'dmg.grp', 'Физ. ДД силы': 'dmg.one', 'Физ. ДД ловкости': 'dot.one', 'Маг. ДД': 'dmg.all', 'Лекарь': 'heal.one', 'Дебаффер': 'debuff.one' },
+    names: { 'Танк': 'Щитоносец свиты', 'Физ. ДД силы': 'Мечник свиты', 'Физ. ДД ловкости': 'Стрелок свиты', 'Маг. ДД': 'Заклинатель свиты', 'Лекарь': 'Лекарь свиты', 'Дебаффер': 'Проклинатель свиты' },
+  },
   circle: { xBp: 12500, from: { prof: 'o', c: 2, day: 1 } },   // §25.2: статы × X за круг — ×1,25; круг 1 — отряд обычного игрока в 1-й день цикла II
   points: { elite: 100, boss: 600, yBp: 12500 },               // §25.3: элита платит меньше КБ, очки растут с кругом — как сила врагов, очко за атаку не зависит от круга
   design: { eliteAtk: 6, bossAtk: 30, seeds: [11, 29] },       // на равной силе элита падает за 6 атак, босс — за 30 (калибровка круга 1)
@@ -243,9 +265,14 @@ function build() {
   D.passport = RULES.passport;
   D.roles = RULES.roles; D.rights = RULES.rights; D.laws = RULES.laws; D.headAwayDays = RULES.headAwayDays; D.kickReasons = RULES.kickReasons;
   D.tree = buildTree(D);
-  D.boss = { attacks: BOSS.attacks, pool: BOSS.pool, poolMax: BOSS.poolMax, kills: BOSS.kills, rounds: BOSS.rounds, points: BOSS.points, classes: BOSS.classes,
+  const RT = BOSS.retinue;
+  D.boss = { attacks: BOSS.attacks, pool: BOSS.pool, poolMax: BOSS.poolMax, kills: BOSS.kills, points: BOSS.points, classes: BOSS.classes,
+    rounds: { e: EB.roundsOf(BOSS.rounds.e), b: EB.roundsOf(BOSS.rounds.b) }, roundsKind: BOSS.rounds,   // раунды — из таблицы ядра
     bossCls: BOSS.bossCls, rank: BOSS.rank, kinds: BOSS.kinds, single: BOSS.single, bmC: BOSS.bmC, antiHop: BOSS.antiHop,
     tpl: { e: Object.fromEntries(BOSS.classes.map(c => [c, EB.FOES[BOSS.tplE[c]].st.slice()])), b: EB.FOES[BOSS.tplB].st.slice() },
+    retinue: { n: RT.n, rank: RT.rank, by: RT.by, kinds: RT.kinds, names: RT.names,
+      tpl: Object.fromEntries(BOSS.classes.map(c => [c, EB.FOES[RT.tplO[c]].st.slice()])),
+      hp: Object.fromEntries(BOSS.classes.map(c => [c, fl(EB.FOES[RT.tplO[c]].hpPct * RT.hpPct, 100)])) },
     races: Object.fromEntries(races.map((r, i) => [r, { el: RULES.lists.els[i % RULES.lists.els.length], stub: true }])),
     roundsCap: { roundB: TREE.caps.roundB, roundE: TREE.caps.roundE } };
   const F = BOSS.circle.from, pow1 = CAP.power[F.prof][String(F.c)][F.day - 1];
@@ -311,10 +338,10 @@ function solveRes(D) {
   return { base, first, rows, best };
 }
 
-/* бой клана: отряд прототипа силы p против карты врага, урон одной атаки */
-const heroesAt = p => SQUAD.map(h => EB.heroSrc(Object.assign({}, h, { lvl: p - CAP.lvlDiv })));
-function hit(p, src, seed, rounds) {
-  const b = EB.run(EB.create({ heroes: heroesAt(p), foes: [src], seed, mode: 'rounds', maxRounds: rounds }));
+/* бой клана: отряд прототипа силы p против цели — элиты со свитой или босса (EnClan.battle, как в прототипе), урон одной атаки по цели */
+const heroesAt = p => SQUAD.map(h => EB.heroSrcValor(Object.assign({}, h, { lvl: p - CAP.lvlDiv })));   // доблесть — правило ядра, как в прототипе
+function hit(p, src, seed, rounds, D) {
+  const b = EB.run(EC.battle(D, heroesAt(p), src, seed, rounds));
   const u = b.u[1][0];
   return { dmg: Math.max(0, u.maxHp - u.hp), max: u.maxHp, fallen: b.u[0].filter(x => !x.alive).length, rounds: b.round };
 }
@@ -325,7 +352,7 @@ function bossCards(D, k) { return D.lists.els.map(el => EC.card(D, { g: 'b', uid
 function attacks(p, cards, g, D) {
   let sum = 0, n = 0, fallen = 0;
   for (const src of cards) for (const s of BOSS.design.seeds) {
-    const r = hit(p, src, s + n, D.boss.rounds[g]);
+    const r = hit(p, src, s + n, D.boss.rounds[g], D);
     sum += r.dmg >= r.max ? 100 : Math.max(100, Math.ceil(r.max * 100 / Math.max(1, r.dmg)));
     fallen += r.fallen; n++;
   }
@@ -339,7 +366,7 @@ function calibrate(D) {
     const cards = g === 'e' ? eliteCards(huge, 1) : bossCards(huge, 1);
     let q = 0, n = 0;   // атак на убийство цели со здоровьем 1 % образца, × 1 000 000: здоровье единицы hpPct / урон одной атаки
     for (const src of cards) for (const s of BOSS.design.seeds) {
-      const r = hit(pow1, src, s + n, D.boss.rounds[g]), unit = EB.foeMaxHp(Object.assign({}, src, { hpPct: 100 }));
+      const r = hit(pow1, src, s + n, D.boss.rounds[g], huge), unit = EB.foeMaxHp(Object.assign({}, src, { hpPct: 100 }));
       q += fl(unit * 1000000, 100 * Math.max(1, r.dmg)); n++;
     }
     const want = g === 'e' ? BOSS.design.eliteAtk : BOSS.design.bossAtk;
@@ -531,6 +558,25 @@ function checks(D, S, circles, weeks, ly, M) {
     if ((EB.RULES.resist[D.boss.rank.b.core] || 0) !== 10000) fail('клановый босс: иммунитет к контролю не 100 % (ADR-0010)');
   }
   for (const r of D.lists.races) if (!D.boss.races[r] || !D.lists.els.includes(D.boss.races[r].el)) fail(`босс недели «${r}»: нет стихии`);
+  // раунды — из таблицы ядра, одна таблица на все режимы (решение автора 29.09.2026): элита со свитой — как этаж с элитой, босс — свой тип
+  if (D.boss.rounds.e !== EB.roundsOf(BOSS.rounds.e) || D.boss.rounds.b !== EB.roundsOf(BOSS.rounds.b)) fail(`раунды клана не из таблицы ядра: элита ${D.boss.rounds.e}, босс ${D.boss.rounds.b}`);
+  // свита элиты: четыре приспешника стихии элиты, боевые классы, ранг рядовой, набор — в библиотеке; бой — пятеро врагов, у босса свиты нет
+  const R0 = D.boss.retinue;
+  for (const cls of D.boss.classes) {
+    if (!R0.by[cls] || R0.by[cls].length !== R0.n) fail(`свита элиты «${cls}»: классов ${R0.by[cls] ? R0.by[cls].length : 0}, нужно ${R0.n}`);
+    for (const el of D.lists.els) {
+      const src = EC.card(D, { g: 'e', uid: 'e', cls, el, race: D.lists.races[0], k: 1 }), R = EC.retinue(D, src);
+      if (R.length !== R0.n) { fail(`элита ${cls} · ${el}: свита — ${R.length}, нужно ${R0.n}`); continue; }
+      for (const u of R) {
+        if (u.el !== el) fail(`элита ${cls} · ${el}: приспешник «${u.name}» другой стихии — ${u.el}`);
+        if (!EB.RULES.cls[u.cls] || u.rank !== R0.rank.core) fail(`элита ${cls} · ${el}: приспешник «${u.name}» — класс ${u.cls}, ранг ${u.rank}`);
+        for (const x of u.kit.kit) if (!L[x.id]) fail(`элита ${cls} · ${el}: у приспешника «${u.name}» нет в библиотеке «${x.id}»`);
+      }
+      const b = EC.battle(D, heroesAt(D.boss.circle.pow1), src, 1, D.boss.rounds.e);
+      if (b.u[1].length !== R0.n + 1 || b.maxRounds !== D.boss.rounds.e) fail(`элита ${cls} · ${el}: в бою врагов ${b.u[1].length}, раундов ${b.maxRounds}`);
+    }
+  }
+  if (EC.retinue(D, EC.card(D, { g: 'b', uid: 'b', el: D.lists.els[0], race: D.lists.races[0], k: 1 })).length) fail('у кланового босса свиты нет — бой один на один');
   // резервуар: цели §24.3
   const g = S.best ? S.best.got : {};
   if (!(g[1] <= RES.targets.firstDays)) fail(`резервуар: первое очко на ${g[1]}-й день, цель — ${RES.targets.firstDays}`);

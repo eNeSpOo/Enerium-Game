@@ -6,7 +6,9 @@
    сценарии презентации. Глобал window.WEEK_MODES — реестр итогов режимов, window.EN_WEEK — для проверки check_week.js.
    Три времени — сегменты шапки (S.seg.week): «Прошлая», «Эта неделя», «Следующая».
    - Эта неделя: раса и цивилизация Эхо недели, срок до отсечки, «Дары»; шесть режимов строкой — место, очки, полоса до ближайшей
-     планки с её сундуком; подробности, планки и лидеры — лист; «›» — в режим. Ритуалы — одной строкой ниже: у них нет рейтинга.
+     планки с её сундуком. Слово автора 29.09.2026: переход в режим был неочевиден — поменяли местами. Строка и её «›» открывают
+     сведения (лист: подробности, планки, лидеры); в режим ведёт явная кнопка «Войти» справа в строке и такая же в листе.
+     Ритуалы — одной строкой ниже, у них нет рейтинга и листа: строка сама ведёт в ритуалы, справа — то же «Войти».
    - Прошлая: итог — сундуки и Энериум недели; по режимам место и очки, лучший сундук и где он; лидеры и награды — лист; «Дары» — ссылка.
    - Следующая: раса и цивилизация, герои Эхо недели и их неприязнь, стихии нашествия, что готовить.
    Режимы сообщают Неделе своё состояние сами: WEEK_MODES.push({ id, n, icon, go, order, unit, now, past }) — договор в screens/README.md.
@@ -282,8 +284,12 @@ function giftsBtn() {
 const TIMES = [['past', 'Прошлая'], ['now', 'Эта неделя'], ['next', 'Следующая']];
 const seg = () => { const v = S.seg.week; return TIMES.some(([k]) => k === v) ? v : 'now'; };
 const pic = m => typeof m.icon === 'number' ? `<img src="${PATH(m.icon)}" alt="">` : m.icon ? ICON(m.icon, 40, '') : '';
-/* строка режима. Эта неделя: значок, имя, полоса до ближайшей планки и её сундук; справа место и очки; «›» — в режим.
-   Прошлая: вместо полосы — лучший сундук недели и где он. Два числа, два чипа, одно действие (правила воздуха) */
+/* «Войти» — явный переход в режим: дверь и слово, цвет действия. «›» — сведения, это другое */
+const ENTER = 'Войти';
+const goBtn = m => `<button class="wk-go" data-a="go" data-v="${m.go}" aria-label="${ENTER} в «${m.n}»" title="${ENTER} в «${m.n}»">${ic('door')}<small>${ENTER}</small></button>`;
+/* строка режима. Эта неделя: значок, имя, полоса до ближайшей планки и её сундук; справа место и очки. Строка со «›» — сведения
+   (лист), «Войти» — в режим. Прошлая: вместо полосы — лучший сундук недели и где он, «Войти» нет. Два числа, два чипа, строка
+   и одно действие (правила воздуха) */
 function rowHtml(st) {
   const m = st.m, now = st.t === 'now', lock = st.lock;
   let sub = '';
@@ -296,18 +302,18 @@ function rowHtml(st) {
     sub = n ? `${chestTok(st.box, g, `${fmt(n)} ${plural(n, 'сундук', 'сундука', 'сундуков')}`)}<span class="wk-why ${wait ? 'wait' : ''}">${wait ? 'ждёт в «Дарах»' : got ? 'получено' : 'подсчитано'}</span>` : `<span class="wk-why">без наград</span>`;
   } else sub = `<span class="wk-why">${st.note || 'без планок'}</span>`;
   const nums = lock ? '' : `<span class="wk-nums"><b title="${cap1(st.placeLabel)}">${placeTxt(st.place)}</b><span><b>${st.points != null ? fmt(st.points) : '—'}</b> <small>${unitOf(st, st.points)}</small></span></span>`;
-  const label = `${m.n}: ${lock || `${st.place ? 'место ' + st.place : 'без места'}, ${st.points != null ? st.points : 0} ${unitOf(st, st.points)}`} — подробности`;
+  const label = `${m.n}: ${lock || `${st.place ? 'место ' + st.place : 'без места'}, ${st.points != null ? st.points : 0} ${unitOf(st, st.points)}`} — сведения`;
   return `<div class="wk-row ${lock ? 'lock' : ''}" data-mode="${m.id}">
-    <button class="wk-main" data-a="sheet" data-v="wkmode:${m.id}:${st.t}" aria-label="${trEsc(label)}"><span class="wk-pic">${pic(m)}${now && st.alert ? `<span class="dot" title="${trEsc(st.alert)}"></span>` : ''}</span>
-      <span class="wk-tx"><b>${m.n}</b><span class="wk-sub">${sub}</span></span>${nums}</button>
-    ${now && m.go ? `<button class="iconbtn wk-go" data-a="go" data-v="${m.go}" aria-label="Открыть «${m.n}»" title="Открыть">${ic('chev')}</button>` : ''}
+    <button class="wk-main" data-a="sheet" data-v="wkmode:${m.id}:${st.t}" aria-label="${trEsc(label)}" title="Сведения"><span class="wk-pic">${pic(m)}${now && st.alert ? `<span class="dot" title="${trEsc(st.alert)}"></span>` : ''}</span>
+      <span class="wk-tx"><b>${m.n}</b><span class="wk-sub">${sub}</span></span>${nums}<span class="wk-more" aria-hidden="true">${ic('chev')}</span></button>
+    ${now && m.go ? goBtn(m) : ''}
   </div>`;
 }
 /* ритуалы — не рейтинговый режим: одна строка под режимами, с готовыми наградами */
 function ritHtml() {
   const R = S.rituals.slots, ready = R.filter(s => s.st === 'ready').length, run = R.filter(s => s.st === 'run').length, free = R.filter(s => s.st === 'free').length;
   const txt = [ready ? `готово: ${ready}` : '', run ? `идёт: ${run}` : '', !ready && !run ? `свободно слотов: ${free}` : ''].filter(Boolean).join(' · ');
-  return `<button class="wk-rit${ready ? ' hot' : ''}" data-a="go" data-v="${WK.rituals[1]}"><img src="${PATH(WK.rituals[0])}" alt=""><b>Ритуалы</b><span class="wk-why">${txt}</span>${ic('chev')}</button>`;
+  return `<button class="wk-rit${ready ? ' hot' : ''}" data-a="go" data-v="${WK.rituals[1]}" aria-label="${ENTER} в «Ритуалы»: ${txt}"><img src="${PATH(WK.rituals[0])}" alt=""><b>Ритуалы</b><span class="wk-why">${txt}</span><span class="wk-enter">${ic('door')}${ENTER}</span></button>`;
 }
 function nowHtml() {
   const W = weeks().cur, L = leftS(), rows = modes().map(m => stateOf(m, 'now'));
@@ -415,7 +421,7 @@ Object.assign(OV, {
     const body = st.lock ? `<p class="rs-line">${ic('lock')}${cap1(st.lock)}.</p>${team}`
       : `${statsHtml(st)}${t === 'now' ? planksHtml(st) + tierHtml(st) : rewardsHtml(st)}${boardHtml(st)}${team}`;
     const cat = st.rewards.some(r => r.cat === 'me') || !st.rewards.length ? 'me' : 'clan';
-    const foot = t === 'now' ? (m.go ? `<button class="btn go" data-a="go" data-v="${m.go}">${m.n} ${ic('chev')}</button>` : '')
+    const foot = t === 'now' ? (m.go ? `<button class="btn go" data-a="go" data-v="${m.go}">${ic('door')}${ENTER} в «${m.n}»</button>` : '')
       : `<button class="btn" data-a="sheet" data-v="gifts:${cat}">Дары ${ic('chev')}</button>`;
     return sheet(title, body, foot);
   },
@@ -490,7 +496,7 @@ if (typeof KIT_EXTRA !== 'undefined') KIT_EXTRA.push({
     return `<section class="k-box" style="grid-column:1/-1"><h3>Неделя · три времени</h3>
       <p class="k-note">Сегменты шапки: «Прошлая», «Эта неделя», «Следующая». Эта — раса и цивилизация Эхо, срок до отсечки, «Дары» и шесть режимов строкой; прошлая — итог: сундуки и Энериум, по режимам место и очки; следующая — раса, цивилизация, герои Эхо с неприязнью, стихии нашествия. Подробности, планки, лидеры и награды — листы.</p>
       <div class="k-demo wk-kit"><span class="eyebrow">Эта неделя</span><div class="wk-list">${now}</div><span class="eyebrow">Прошлая</span><div class="wk-list">${past}</div></div>
-      <p class="k-note">Строка режима: значок, имя; место и очки — два числа; полоса до ближайшей планки и её сундук цвета редкости — на этой неделе, лучший сундук недели и «получено» или «ждёт в „Дарах“» — на прошлой; «›» — одно действие, переход в режим. Нажатие на строку — лист.</p>
+      <p class="k-note">Строка режима: значок, имя; место и очки — два числа; полоса до ближайшей планки и её сундук цвета редкости — на этой неделе, лучший сундук недели и «получено» или «ждёт в „Дарах“» — на прошлой. Нажатие на строку и её «›» — сведения, лист. Переход в режим — явная кнопка «Войти» с дверью справа в строке и в листе${TM(' — слово автора 29.09.2026: переход был неочевиден')}. У прошлой недели «Войти» нет.</p>
       <p class="k-note">Реестр итогов: <code>(window.WEEK_MODES = window.WEEK_MODES || []).push({ id, n, icon, go, order, unit, now: () =&gt; ({ place, points, planks, next, top }), past: () =&gt; ({ place, points, top, rewards, cur }) })</code>. Строка с тем же <code>id</code> заменяет демо. Договор — <code>design/ui/screens/README.md</code>.</p>
       <ul class="k-note wk-kreg">${reg}</ul></section>`;
   },

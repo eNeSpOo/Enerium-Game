@@ -47,7 +47,8 @@ TUTOR_B2_LEVEL = 43       # допущение: пачка у стены обр�
 TUTOR_BOSSES = 2          # боссы биомов 1 и 2, по разу; оба закрытия — чистые (допущение)
 
 # --- чистое закрытие: замер прототипа (--sim) на образце цикла II, отряд прототипа ---
-CLEAN_FROM = 180          # с этого уровня прогона закрывающий забег идёт без павших; на 175-м павший один
+CLEAN_FROM = 100          # с этого уровня прогона закрывающий забег идёт без павших: с доблестью в характеристиках (29.09.2026) —
+                          # со 100-го, где босс образца впервые падает; без неё было со 180-го
 
 # --- рунные боссы: ADR-0022 ---
 RB_CAP = 10               # общий кап побед у РБ в день на все циклы; какого РБ и какого цикла бить — выбирает игрок
@@ -744,7 +745,7 @@ def main():
 CLEAN_JS = r"""
 // закрывающий забег отряда прототипа на образце цикла II: сколько героев пало (ADR-0014: сид тот же, итог детерминирован)
 function run(heroes, siege) {
-  const B = EB.BIOMES.c2; let cur = heroes.map(h => EB.heroSrc(h)), wall = 0, hp = siege, boss = 0;
+  const B = EB.BIOMES.c2; let cur = heroes.map(h => EB.heroSrcValor(h)), wall = 0, hp = siege, boss = 0;
   for (let f = 1; f <= B.floors.length; f++) {
     const b = EB.run(EB.floorBattle(cur, 'c2', f, hp, 'rounds')), g = B.floors[f - 1].g;
     b.u[1].forEach(u => { if (!u.alive && u.rank === 'b') boss++; });
@@ -766,7 +767,7 @@ console.log(JSON.stringify(out));
 
 def measure():
     head = E.SIM_JS.split('// один забег')[0]
-    js = head + CLEAN_JS.replace('LEVELS', json.dumps(list(range(150, 255, 5))))
+    js = head + CLEAN_JS.replace('LEVELS', json.dumps(list(range(100, 255, 5))))
     res = subprocess.run(['node', '-e', js], cwd=E.ROOT, capture_output=True, text=True, encoding='utf-8')
     if res.returncode:
         sys.exit(res.stderr)

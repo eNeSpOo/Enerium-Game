@@ -91,6 +91,8 @@ try {
     for (const f of [1, B.floors.length]) {
       const b = EB.run(EB.floorBattle(hs, id, f, null, 'rounds')); out.battles++;
       const b2 = EB.run(EB.floorBattle(hs.slice().reverse(), id, f, null, 'rounds')); out.battles++;
+      // раунды этажа — таблица ядра по старшему врагу колоды (слово автора 29.09.2026): рядовые 5, элита 10, босс 20
+      if (b.maxRounds !== EB.RULES.rounds.by[B.floors[f - 1].g]) fail(`${id} · этаж ${f}: раундов ${b.maxRounds}, по таблице ядра — ${EB.RULES.rounds.by[B.floors[f - 1].g]}`);
       if (b.win !== b2.win || b.round !== b2.round || b.u[1].map(u => u.hp).join() !== b2.u[1].map(u => u.hp).join()) fail(`${id} · этаж ${f}: порядок героев изменил бой`);
       for (const side of [0, 1]) for (const u of b.u[side]) if (!Number.isInteger(u.hp) || !Number.isInteger(u.sh)) fail(`${id} · этаж ${f}: не целое здоровье у ${u.name}`);
       if (!b.win) { fail(`${id} · этаж ${f}: отряд на 700-м не взял этаж`); continue; }
@@ -103,6 +105,12 @@ try {
     const g1 = EB.run(EB.guardBattle(hs, id, 'rounds')), g2 = EB.run(EB.guardBattle(hs, id, 'rounds')); out.battles += 2;
     if (g1.win !== g2.win || g1.round !== g2.round) fail(`${id}: бой со стражем не детерминирован`);
     if (g1.maxRounds > EB.RULES.rounds.rune) fail(`${id}: у стража больше ${EB.RULES.rounds.rune} раундов`);
+    /* осада (слово автора 29.09.2026): босс приходит с остатком здоровья — остаток и есть его максимум в забеге, прежний — max0 */
+    if (B.siege !== false) {
+      const last = B.floors.length, full = EB.floorBattle(hs, id, last, null, 'rounds').u[1][0], left = Math.floor(full.maxHp / 3);
+      const sg = EB.floorBattle(hs, id, last, left, 'rounds').u[1][0];
+      if (sg.hp !== left || sg.maxHp !== left || sg.max0 !== full.maxHp) fail(`${id}: босс в осаде — ${sg.hp} / ${sg.maxHp} (прежний ${sg.max0}), а остаток ${left} из ${full.maxHp}`);
+    }
   }
 
   /* 6. уникальные способности срабатывают: владелец против отряда, сиды по кругу */

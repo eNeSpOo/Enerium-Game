@@ -1,0 +1,65 @@
+{
+  "name": "Витрина «За Энериум»: правка своих картинок первого прогона jobs/donat-showcase.json в режиме EDIT (art/style/style.md: удачную картинку правим, а не рисуем заново). Зал: модель поставила в центр человека и нарисовала пять рамок интерфейса — убрать. Мэлин: лицо вышло бледной маской с тенями глаз — у Безликих лица нет (ADR-0023, п. 10). Гест: капюшон с волчьей головой читается как зверь с глазами — оставить мех без головы. Эйтри: у него лицо и третья рука с ключом — лицо убрать, руку убрать.",
+  "models": [
+    "nb2"
+  ],
+  "style": "Keep the painterly style of the attached picture: the same brush strokes, light, colors and background.",
+  "negative": "No text, no letters, no numbers, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+  "cutout_rule": "",
+  "categories": {
+    "donat-hall": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [],
+      "frame": "Edit the attached background picture. Keep the architecture, the arches, the curtains, the hourglasses, the coffers, the crystals, the lamps, the dais, the light, the colors and the framing exactly as they are. Change only what is listed below."
+    },
+    "heroes": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [],
+      "frame": "Edit the attached hero portrait. Keep the pose, the hands, the clothes, the objects, the background, the light and the framing exactly as they are. Change only what is listed below."
+    }
+  },
+  "jobs": [
+    {
+      "id": "donat-hall",
+      "category": "donat-hall",
+      "title": "Зал Безликих — правка: пустой зал без человека и без рамок",
+      "source": "Правка art/generated/donat-hall/donat-hall__nb2.jpg. К выгрузке — design/ui/assets/art/donat/hall.jpg, 1688×716.",
+      "refs": [
+        "art/generated/donat-hall/donat-hall__nb2.jpg"
+      ],
+      "subject": "1. Remove the person who stands in the center of the hall with a raised hand: nobody is there, the floor and the dais in the center are empty black marble with golden veins.\n2. Remove the five dark rectangular frames and the dark horizontal band behind them in the middle of the picture. In their place continue the dim, open depth of the hall: far arches in soft darkness, a faint green glow deep inside, a few floating golden motes.\nThe hall must be completely empty: no people, no figures, no frames, no panels."
+    },
+    {
+      "id": "hero-c2-61-maelin",
+      "category": "heroes",
+      "title": "Мэлин с Аванпоста — правка: вместо бледной маски — тьма",
+      "source": "Правка art/generated/heroes/hero-c2-61-maelin__nb2.jpg. К выгрузке — design/ui/assets/art/heroes/c2-61.jpg, без mirror.",
+      "refs": [
+        "art/generated/heroes/hero-c2-61-maelin__nb2.jpg"
+      ],
+      "subject": "1. Her face: the pale smooth face with dark eye hollows must go completely. Inside the green hood there is only a smooth, soft, deep darkness, as dark as a night sky — no pale surface, no mask, no eyes, no eye hollows, no nose, no mouth, no features at all. The tips of her long pointed elven ears still show at the sides of the hood, and the green hood keeps its shape and folds."
+    },
+    {
+      "id": "hero-c2-62-gest",
+      "category": "heroes",
+      "title": "Гест Продавец Огня — правка: мех без волчьей головы",
+      "source": "Правка art/generated/heroes/hero-c2-62-gest__nb2.jpg. К выгрузке — design/ui/assets/art/heroes/c2-62.jpg, без mirror.",
+      "refs": [
+        "art/generated/heroes/hero-c2-62-gest__nb2.jpg"
+      ],
+      "subject": "1. His hood: remove the wolf's head entirely — no wolf muzzle, no wolf eyes, no wolf ears, no nose, no teeth. The hood is simply a deep hood of thick grey wolf fur, rimed with frost and snow, draped over his head and shoulders.\n2. Inside the hood there is only a smooth, soft, deep darkness — no eyes, no face, no features at all.\nKeep his raised arm with the blazing red stone, the burn scars, the pack of glowing stones, the coat, the knife, the snow and the background exactly as they are."
+    },
+    {
+      "id": "hero-c2-63-eitri",
+      "category": "heroes",
+      "title": "Эйтри Замочник — правка: без лица и без третьей руки",
+      "source": "Правка art/generated/heroes/hero-c2-63-eitri__nb2.jpg. К выгрузке — design/ui/assets/art/heroes/c2-63.jpg, без mirror.",
+      "refs": [
+        "art/generated/heroes/hero-c2-63-eitri__nb2.jpg"
+      ],
+      "subject": "1. His face: remove the eyes, the nose, the brows and the cheeks. Inside the brown leather hood, above the beard, there is only a smooth, soft, deep darkness — no eyes, no nose, no brows, no face at all. Keep his long braided beard with the iron rings exactly as it is: it hangs down from that darkness.\n2. Remove the extra hand at the right side of the picture that holds a single long key in front of the forge: there is no hand and no key there, only the glowing forge behind. He has exactly two hands: the raised hand that holds the ring of keys, and the hand that rests on the chest."
+    }
+  ]
+}

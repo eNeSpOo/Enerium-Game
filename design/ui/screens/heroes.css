@@ -121,11 +121,201 @@
 .hr-dh{gap:8px;flex-wrap:wrap;font-size:12.5px}
 .hr-dsel{display:flex;flex-direction:column;gap:6px;padding-bottom:var(--sp-s);border-bottom:1px solid var(--iron)}
 .hr-dsel b{font-size:18px;color:var(--parch)}
-/* «За Энериум»: сет-бонус — строкой-входом под пятью героями, подробности — в листе */
-.hr-setb{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;color:var(--parch);text-align:left;flex:none;width:100%}
-.hr-setb b{font:600 15px/1.15 var(--f-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hr-setb:hover{border-color:var(--iron-2)}
-.hr-setb>.i{margin-left:auto;flex:none;color:var(--gold-2)}
+/* призрачный осколок героя в строках и входах «За души» (shardGhost, screens/art-icons.js): тот же размер, что лицо .rs-av */
+.hr-srow .hr-sg,.hr-sgf{display:grid;place-items:center;width:30px;height:30px;flex:none}
+.hr-sgl{display:grid;place-items:center;flex:none}
+.hr-dsel:has(.hr-sgl){flex-direction:row;align-items:center;gap:10px}
+
+/* ---------- «За Энериум»: витрина-алтарь ----------
+   Зал (рисунок или CSS), слева — сет: имя, сеты циклов, пятеро на ступенях цены, сет-бонус; справа — выбранный герой и покупка.
+   Дорого — свет, материал и крупные формы: старое золото, чёрный мрамор, зелёный свет Энериума снизу (время, --time).
+   Ступень цены и ширина рамы растут с местом героя: --k — место 1…5, --s0/--s1 и --g0/--g1 — из DN_VIEW (screens/heroes.js) */
+.dn,.dn-got,.dn-dlg,.dn-kit{--dn-en:79,220,139;--dn-au:221,188,122}
+.dn{position:relative;flex:1 1 0;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 262px;gap:var(--sp-m);padding:var(--sp-m);border-radius:14px;overflow:hidden;isolation:isolate;
+  border:1px solid rgba(var(--dn-au),.3);
+  background:
+    radial-gradient(62% 58% at 34% 112%,rgba(var(--dn-en),.24),transparent 70%),
+    radial-gradient(26% 70% at 0% 30%,rgba(var(--dn-au),.10),transparent 70%),
+    radial-gradient(22% 60% at 64% 0%,rgba(var(--dn-au),.08),transparent 70%),
+    linear-gradient(180deg,#0c1412 0%,#070b0a 60%,#040605 100%);
+  box-shadow:inset 0 1px 0 rgba(255,236,190,.08),inset 0 0 70px rgba(0,0,0,.65),0 18px 40px -26px rgba(var(--dn-en),.55)}
+/* зал без рисунка: колонны с золотой нитью по краям, арка и занавеси — светом */
+.dn-arch{position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:
+    linear-gradient(90deg,rgba(9,34,24,.95),rgba(9,34,24,0) 7%,transparent 58%,rgba(9,34,24,.55) 64%,transparent 70%),
+    linear-gradient(90deg,transparent 3.2%,rgba(var(--dn-au),.28) 3.4%,transparent 3.6%,transparent 60.4%,rgba(var(--dn-au),.18) 60.6%,transparent 60.8%),
+    radial-gradient(38% 80% at 31% -18%,transparent 62%,rgba(var(--dn-au),.16) 63%,transparent 65%),
+    radial-gradient(14% 110% at 0% 45%,rgba(22,78,52,.5),transparent 72%),
+    radial-gradient(12% 100% at 63% 45%,rgba(22,78,52,.35),transparent 72%)}
+.dn-hall{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:50% 72%}
+.dn.art::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(3,6,5,.55),rgba(3,6,5,.08) 30%,rgba(3,6,5,.1) 70%,rgba(3,6,5,.5)),linear-gradient(90deg,transparent 55%,rgba(3,6,5,.55) 72%)}
+.dn-l{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0;min-height:0}
+.dn-top{display:flex;align-items:center;gap:var(--sp-m);flex:none;min-width:0}
+.dn-title{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto}
+.dn-title .col{gap:4px;min-width:0}
+.dn-title h2{font:600 27px/1 var(--f-d);color:var(--gold);text-shadow:0 0 18px rgba(var(--dn-au),.35),0 2px 0 rgba(0,0,0,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dn-title small{font:700 10.5px/1.2 var(--f-u);letter-spacing:.12em;text-transform:uppercase;color:var(--parch-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #000}
+/* эмблема сета: рисунок или медальон с цифрой цикла */
+.dn-em{flex:none;width:var(--px,28px);height:var(--px,28px);object-fit:contain;filter:drop-shadow(0 0 6px rgba(var(--dn-en),.35))}
+.dn-emf{display:grid;place-items:center;border-radius:50%;font:700 calc(var(--px,28px) * .36)/1 var(--f-d);color:#fbe7b0;letter-spacing:.02em;
+  background:radial-gradient(circle at 50% 34%,#2a7351,#0d2a1d 64%);box-shadow:inset 0 0 0 2px #c29a53,inset 0 0 0 3px #3a2a10,inset 0 -6px 10px rgba(var(--dn-en),.35),0 0 10px rgba(var(--dn-en),.3)}
+.dn-tabs{display:flex;gap:5px;flex:none}
+.dn-tab{position:relative;display:grid;place-items:center;width:34px;height:34px;padding:0;border-radius:50%;border:1px solid rgba(var(--dn-au),.22);background:radial-gradient(circle at 50% 30%,#18211d,#080c0b);opacity:.66;transition:opacity .2s,box-shadow .2s}
+.dn-tab:hover{opacity:.9}
+.dn-tab[aria-selected="true"]{opacity:1;border-color:rgba(var(--dn-au),.85);box-shadow:0 0 0 1px rgba(var(--dn-au),.35),0 0 14px rgba(var(--dn-en),.45)}
+.dn-lk{position:absolute;right:-4px;bottom:-4px;display:grid;place-items:center;width:15px;height:15px;border-radius:50%;background:#0b0d10;color:var(--parch-3);box-shadow:0 0 0 1px var(--iron-2)}
+.dn-lk .i{width:9px;height:9px}
+
+/* помост и пятеро на ступенях цены */
+.dn-alt{container-type:size;position:relative;flex:1 1 0;min-height:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--sp-s);align-items:end;padding:0 6px}
+.dn-alt::after{content:"";position:absolute;left:-14px;right:-14px;bottom:-3px;height:9px;z-index:0;border-top:1px solid rgba(var(--dn-au),.5);background:linear-gradient(180deg,#151c19,#060807);box-shadow:0 -12px 30px -10px rgba(var(--dn-en),.4)}
+.dn-ni{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;min-width:0;height:100%;padding:0;border:0;background:none;color:var(--parch)}
+.dn-ni::before{content:"";position:absolute;left:14%;right:14%;top:8%;bottom:calc((var(--s0) + var(--k) * var(--s1)) * var(--sq,1));z-index:-1;pointer-events:none;opacity:calc(var(--k) * .09);
+  background:radial-gradient(60% 90% at 50% 100%,rgba(var(--dn-en),.55),transparent 72%);filter:blur(5px);transition:opacity .25s}
+.dn-ni.sel::before{opacity:1;background:linear-gradient(0deg,rgba(var(--dn-en),.42),rgba(var(--dn-en),.1) 60%,transparent),radial-gradient(60% 90% at 50% 100%,rgba(var(--dn-en),.55),transparent 72%)}
+/* рама без рисунка: старое золото, кристалл в гребне; свет растёт с местом */
+.dn-fr{--ar:.8;position:relative;display:block;flex:none;width:min(100%,calc((var(--g0) + var(--k) * var(--g1)) * var(--ar) * 1cqh));aspect-ratio:4/5;padding:3px;border-radius:9px 9px 6px 6px;
+  background:linear-gradient(160deg,#f7e5ad,#9c7535 30%,#f2d18a 50%,#6a4d1d 76%,#d8b46a);
+  box-shadow:0 0 0 1px #2a1f0c,0 12px 22px -12px rgba(0,0,0,.95),0 0 calc(var(--k) * 4px) rgba(var(--dn-en),calc(var(--k) * .08));transition:transform .25s,box-shadow .25s}
+.dn-ph{position:absolute;inset:3px;display:block;border-radius:7px 7px 4px 4px;overflow:hidden;background:#07090a;box-shadow:inset 0 0 0 1px rgba(0,0,0,.85)}
+.dn-ph>img,.dn-ph>.rs-ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 16%}
+.dn-ph::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 55%,rgba(4,8,6,.6)),radial-gradient(90% 45% at 50% 112%,rgba(var(--dn-en),.32),transparent 70%)}
+.dn-crest{position:absolute;left:50%;top:-6px;z-index:2;width:12px;height:12px;border-radius:2px;transform:translateX(-50%) rotate(45deg);background:linear-gradient(135deg,#c6ffe0,#34c77a 52%,#0d5a36);box-shadow:0 0 0 2px #c9a258,0 0 0 3px #2a1f0c,0 0 12px rgba(var(--dn-en),.85)}
+/* рама-рисунок: окно прозрачное, портрет — под ним; окно — доли выгруженной рамы 320 × 447 */
+.dn-fr.art{--ar:.716;padding:0;background:none;border-radius:0;aspect-ratio:320/447;box-shadow:none;filter:drop-shadow(0 10px 14px rgba(0,0,0,.8)) drop-shadow(0 0 calc(var(--k) * 3px) rgba(var(--dn-en),.5))}
+.dn-fr.art .dn-ph{inset:19% 13.5% 13.9% 13.2%;border-radius:3px}
+.dn-fi{position:absolute;inset:0;z-index:1;width:100%;height:100%;pointer-events:none}
+.dn-ni:hover .dn-fr{transform:translateY(-3px)}
+.dn-ni.sel .dn-fr{transform:translateY(-7px)}
+.dn-ni.sel .dn-fr:not(.art){box-shadow:0 0 0 1px #2a1f0c,0 0 0 2px rgba(var(--dn-en),.75),0 0 28px rgba(var(--dn-en),.6)}
+.dn-ni.sel .dn-fr.art{filter:drop-shadow(0 10px 14px rgba(0,0,0,.8)) drop-shadow(0 0 16px rgba(var(--dn-en),.85))}
+.dn-ni.shut .dn-ph>*{filter:grayscale(.55) brightness(.6)}
+.dn-own{position:absolute;right:-5px;top:-5px;z-index:3;display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:#0b2724;color:var(--spirit);box-shadow:0 0 0 1px rgba(72,229,212,.6),0 0 8px rgba(72,229,212,.5)}
+.dn-own .i{width:11px;height:11px;stroke-width:2.4}
+.dn-nm{position:relative;z-index:1;max-width:100%;font:600 14px/1 var(--f-d);color:var(--parch-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 3px #000}
+.dn-ni.sel .dn-nm{color:var(--gold)}
+/* ступень цены: чёрный мрамор с золотой кромкой, выше с местом героя */
+.dn-pd{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:center;width:100%;height:calc((var(--s0) + var(--k) * var(--s1)) * var(--sq,1));padding-top:3px;border-radius:5px 5px 0 0;
+  border-top:1px solid rgba(var(--dn-au),.6);background:linear-gradient(180deg,#1c2521,#0b0f0e 72%);
+  box-shadow:inset 0 1px 0 rgba(255,240,200,.16),inset 0 12px 14px -12px rgba(var(--dn-en),calc(.2 + var(--k) * .08)),0 -4px 16px -8px rgba(var(--dn-en),calc(var(--k) * .09))}
+.dn-pr{display:inline-flex;align-items:center;gap:4px;font:700 14px/1 var(--f-u);color:#f3dfa6;text-shadow:0 1px 2px #000}
+.dn-pr img{width:15px;height:15px;object-fit:contain}
+.dn-pr.own{gap:3px;color:var(--spirit);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase}
+.dn-pr.own .i{width:11px;height:11px}
+.dn-ni.sel .dn-pd{border-top-color:rgba(var(--dn-en),.9)}
+/* песчинки времени над помостом */
+.dn-mo,.dn-gmo{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.dn-mo i,.dn-gmo i{position:absolute;left:var(--x);bottom:-6px;width:3px;height:3px;border-radius:50%;background:#c8f7dc;box-shadow:0 0 6px rgba(var(--dn-en),.95);opacity:0;animation:dn-mote var(--s) linear var(--d) infinite}
+@keyframes dn-mote{0%{transform:translate(0,0);opacity:0}15%{opacity:.85}100%{transform:translate(8px,-260px);opacity:0}}
+
+/* сет-бонус строкой: эмблема, эффект, ступени значками */
+.dn-bonus{position:relative;z-index:1;display:flex;align-items:center;gap:10px;flex:none;min-width:0;padding:7px 10px;border-radius:10px;border:1px solid rgba(var(--dn-au),.32);background:linear-gradient(90deg,rgba(9,20,15,.94),rgba(9,13,12,.8));color:var(--parch);text-align:left}
+.dn-bonus:hover{border-color:rgba(var(--dn-au),.65)}
+.dn-bt{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1 1 auto}
+.dn-bt b{font:600 15px/1.15 var(--f-d);color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dn-tp{display:flex;gap:3px;flex:none}
+.dn-tp i{display:grid;place-items:center;min-width:22px;height:18px;padding:0 4px;border-radius:5px;font:700 10px/1 var(--f-u);font-style:normal;color:var(--parch-3);border:1px solid var(--iron-2);background:#0b0e0d}
+.dn-tp i.on{color:#06140d;border-color:transparent;background:linear-gradient(180deg,#9cf5c7,#3fcf86);box-shadow:0 0 8px rgba(var(--dn-en),.6)}
+.dn-bonus>.i{flex:none;color:var(--gold-2)}
+
+/* выбранный герой: тёмное стекло с золотой нитью; одна главная кнопка */
+.dn-card{position:relative;z-index:1;display:flex;flex-direction:column;gap:7px;min-width:0;min-height:0;padding:var(--sp-m);border-radius:12px;
+  border:1px solid rgba(var(--dn-au),.34);background:linear-gradient(180deg,rgba(17,24,21,.95),rgba(7,10,9,.97));box-shadow:inset 0 1px 0 rgba(255,236,190,.08),0 16px 30px -16px rgba(0,0,0,.9)}
+.dn-card::before{content:"";position:absolute;left:16px;right:16px;top:-1px;height:1px;background:linear-gradient(90deg,transparent,rgba(243,221,160,.95),transparent)}
+.dn-card .eyebrow{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dn-name{font:600 25px/1.02 var(--f-d);color:var(--gold);text-shadow:0 0 16px rgba(var(--dn-au),.3)}
+.dn-tags{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dn-card .quote{margin:0;font-size:13px;line-height:1.4;color:var(--parch-2)}
+.dn-card .lore{flex:0 1 auto;min-height:0;overflow:hidden}   /* мало места — сжимается лор, кнопка покупки всегда на виду */
+.dn-more{align-self:flex-start}
+.dn-act{margin-top:auto;display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.dn-act>.chip{align-self:flex-start}
+.dn-cta{width:100%;overflow:hidden}
+.dn-cta::after{content:"";position:absolute;top:0;bottom:0;left:-45%;width:30%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);transform:skewX(-20deg);animation:dn-sheen 4s ease-in-out 1.5s infinite;pointer-events:none}
+.dn-cta[disabled]{opacity:.55;filter:saturate(.5)}
+.dn-cta[disabled]::after{display:none}
+@keyframes dn-sheen{0%,72%{left:-45%}100%{left:135%}}
+.dn-lack{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+
+/* лист сет-бонуса: ступени лестницей, фишки героев, пятеро сета */
+.dn-sh{display:flex;align-items:center;gap:12px}
+.dn-sh .col{gap:3px;min-width:0}
+.dn-sh b{font-size:22px;line-height:1.05;color:var(--gold)}
+.dn-steps{display:flex;flex-direction:column;gap:6px}
+.dn-st{display:grid;grid-template-columns:28px minmax(0,1fr);grid-template-areas:"k n" "k c";column-gap:10px;row-gap:6px;align-items:center;padding:9px 10px;margin-left:calc((var(--i) - 1) * 16px);border-radius:10px;
+  border:1px solid rgba(221,188,122,.22);background:linear-gradient(90deg,#141a18,#0a0d0c)}   /* ступени лестницей: каждая следующая — на шаг правее */
+.dn-st.on{border-color:rgba(79,220,139,.6);background:linear-gradient(90deg,rgba(79,220,139,.14),#0a0d0c 70%);box-shadow:0 0 18px -6px rgba(79,220,139,.6)}
+.dn-stk{grid-area:k;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;font:700 11px/1 var(--f-u);color:#fbe7b0;background:radial-gradient(circle at 50% 34%,#2a7351,#0d2a1d 64%);box-shadow:inset 0 0 0 1.5px #c29a53}
+.dn-stn{grid-area:n;font:600 15.5px/1.2 var(--f-d);color:var(--parch)}
+.dn-cond{grid-area:c;display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+.dn-cond small{font-size:11.5px;line-height:1.25;color:var(--parch-3)}
+.dn-cond .chip{margin-left:auto}
+.dn-pips{display:flex;gap:4px}
+.dn-pips i{width:12px;height:12px;border-radius:3px;transform:rotate(45deg);background:#0c100f;box-shadow:inset 0 0 0 1px var(--iron-2)}
+.dn-pips i.need{box-shadow:inset 0 0 0 1px rgba(221,188,122,.75)}
+.dn-pips i.on{background:linear-gradient(135deg,#c6ffe0,#34c77a);box-shadow:0 0 6px rgba(79,220,139,.8)}
+.dn-mems{display:flex;gap:8px;flex-wrap:wrap}
+.dn-mf{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;width:52px;padding:0;border:0;background:none;color:var(--parch-2)}
+.dn-mf .rs-av{width:44px;height:44px}
+.dn-mf .rs-av>img,.dn-mf .rs-av>.rs-ph{width:100%;height:100%;object-fit:cover}
+.dn-mf>i{position:absolute;right:0;top:-3px;display:grid;place-items:center;width:15px;height:15px;border-radius:50%;background:#0b2724;color:var(--spirit);box-shadow:0 0 0 1px rgba(72,229,212,.5)}
+.dn-mf>i .i{width:10px;height:10px}
+.dn-mf small{max-width:100%;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dn-mf:hover small,.dn-mf.own small{color:var(--gold)}
+
+/* подтверждение покупки */
+.dn-dlg{width:min(460px,calc(100% - 40px))}
+.dn-cf{display:flex;align-items:center;gap:14px}
+.dn-fr.sm{--k:3;width:76px}
+.dn-cfn{font-size:21px;line-height:1.05;color:var(--gold)}
+.dn-get{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px}
+.dn-get li{display:flex;align-items:flex-start;gap:7px;font-size:13.5px;line-height:1.3;color:var(--parch)}
+.dn-get .i{flex:none;margin-top:1px;width:14px;height:14px;color:var(--spirit)}
+
+/* окно получения героя: время сцены — --t0 (минус сколько прошло от покупки), шаги — --g-* из DN_VIEW.got */
+.dn-got{overflow:hidden;background:radial-gradient(60% 80% at 34% 100%,rgba(79,220,139,.16),transparent 70%),rgba(2,4,3,.94)}
+.dn-got>.ov-scrim{background:transparent}
+.dn-gs{position:absolute;inset:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:var(--sp-l);padding:24px 48px 64px 24px}
+.dn-gcrack{position:absolute;left:5%;width:40%;bottom:64px;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,#d8ffe9 30%,#fff 50%,#d8ffe9 70%,transparent);box-shadow:0 0 18px rgba(79,220,139,.9);
+  animation:dn-crack 600ms cubic-bezier(.2,.8,.2,1) calc(var(--t0) + var(--g-crack)) both}
+.dn-gpillar{position:absolute;left:13%;width:24%;bottom:64px;top:4%;transform-origin:50% 100%;pointer-events:none;
+  background:radial-gradient(50% 100% at 50% 100%,rgba(79,220,139,.55),rgba(79,220,139,.12) 55%,transparent 75%),linear-gradient(0deg,rgba(221,188,122,.18),transparent 70%);filter:blur(4px);
+  animation:dn-pillar 900ms cubic-bezier(.2,.8,.2,1) calc(var(--t0) + var(--g-pillar)) both}
+.dn-gring{position:absolute;left:25%;top:46%;width:160px;height:160px;margin:-80px 0 0 -80px;border-radius:50%;pointer-events:none;border:2px solid rgba(221,188,122,.9);box-shadow:0 0 24px rgba(79,220,139,.8),inset 0 0 24px rgba(79,220,139,.6);opacity:0;
+  animation:dn-ring 900ms ease-out calc(var(--t0) + var(--g-flash)) both}
+.dn-gmo{left:8%;right:58%}
+.dn-ghero{position:relative;z-index:1;display:grid;place-items:center;animation:dn-rise 750ms cubic-bezier(.2,.8,.2,1) calc(var(--t0) + var(--g-frame)) both}
+.dn-fr.big{--k:5;width:220px}
+.g.sm .dn-fr.big{width:196px}
+.dn-gsay{position:relative;z-index:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+.dn-gset{display:inline-flex;align-items:center;gap:8px;font:700 11px/1.2 var(--f-u);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-2);animation:dn-up 500ms ease-out calc(var(--t0) + var(--g-name)) both}
+.dn-gsay h2{font:600 38px/1 var(--f-d);color:var(--gold);text-shadow:0 0 22px rgba(221,188,122,.45),0 2px 0 #000;animation:dn-name 700ms cubic-bezier(.2,.8,.2,1) calc(var(--t0) + var(--g-name)) both}
+.dn-gsay p{margin:0;max-width:40ch;font-size:15px;line-height:1.4;color:var(--parch);animation:dn-up 600ms ease-out calc(var(--t0) + var(--g-text)) both}
+.dn-gsay small{animation:dn-up 600ms ease-out calc(var(--t0) + var(--g-text)) both}
+.dn-gacts{position:absolute;right:20px;bottom:16px;z-index:2;display:flex;gap:8px;animation:dn-up 500ms ease-out calc(var(--t0) + var(--g-text)) both}
+.dn-gx{position:absolute;right:10px;top:10px;z-index:3}
+@keyframes dn-crack{0%{transform:scaleX(0);opacity:0}40%{opacity:1}100%{transform:scaleX(1);opacity:.85}}
+@keyframes dn-pillar{0%{transform:scaleY(0);opacity:0}100%{transform:scaleY(1);opacity:1}}
+@keyframes dn-ring{0%{transform:scale(.2);opacity:1}100%{transform:scale(2.4);opacity:0}}
+@keyframes dn-rise{0%{opacity:0;transform:translateY(26px) scale(.9);filter:blur(8px) brightness(3)}60%{opacity:1;filter:blur(0) brightness(1.4)}100%{opacity:1;transform:none;filter:none}}
+@keyframes dn-name{0%{opacity:0;letter-spacing:.3em;filter:blur(6px)}100%{opacity:1;letter-spacing:0;filter:none}}
+@keyframes dn-up{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}
+
+/* раздел UI-кита: витрина вне кадра телефона */
+.dn-kit{display:flex;height:330px;max-width:860px}
+
+/* низкий экран (844×390): витрина плотнее — ниже ступени, мельче имя сета */
+@container main (max-height: 360px){
+  .dn{--sq:.8;padding:var(--sp-s) var(--sp-m);gap:var(--sp-s)}
+  .dn-title h2{font-size:23px}
+  .dn-name{font-size:22px}
+  .dn-tab{width:30px;height:30px}
+  .dn-bonus{padding:5px 9px}
+  .dn-nm{font-size:12.5px}
+  .dn-pd{padding-top:1px}
+  .dn-card{gap:5px}
+  .dn-act>small.reason{display:none}
+}
 
 /* компактный режим низкого экрана (844×390): рабочая область ниже 360 */
 @container main (max-height: 360px){

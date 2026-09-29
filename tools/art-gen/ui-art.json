@@ -811,6 +811,353 @@
         480,
         198
       ]
-    }
+    },
+    "equip/head.png": {
+      "from": "equipment-slots/eq-head__nb2.fix.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "equip/chest.png": {
+      "from": "equipment-slots/eq-chest__nb2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "equip/hands.png": {
+      "from": "equipment-slots/eq-hands__nb2-v2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "equip/legs.png": {
+      "from": "equipment-slots/eq-legs__nb2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "equip/feet.png": {
+      "from": "equipment-slots/eq-feet__nb2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "equip/main.png": {
+      "from": "equipment-slots/eq-main__nb2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "equip/off.png": {
+      "from": "equipment-slots/eq-off__nb2.fix.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "equip/ring.png": {
+      "from": "equipment-slots/eq-ring__nb2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "equip/amulet.png": {
+      "from": "equipment-slots/eq-amulet__nb2.fix.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "talismans/fight.png": {
+      "from": "talisman-families/tl-fam-fight__nb2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "talismans/hunt.png": {
+      "from": "talisman-families/tl-fam-hunt__nb2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "talismans/farm.png": {
+      "from": "talisman-families/tl-fam-farm__nb2.fix.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "talismans/seal.png": {
+      "from": "talisman-families/tl-fam-seal__nb2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "shards/ghost-frame.png": {
+      "from": "hero-shard/hero-shard-ghost__nb2-v2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "shards/ghost-mask.png": {
+      "from": "hero-shard/hero-shard-ghost__nb2-v2.mask.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "lore/city-endalor.jpg": {
+      "from": "lore-places/lore-city-endalor__nb2-v3.jpg",
+      "size": [
+        1584,
+        672
+      ]
+    },
+    "lore/city-elaizis.jpg": {
+      "from": "lore-places/lore-city-elaizis__nb2-v2.jpg",
+      "size": [
+        1584,
+        672
+      ]
+    },
+    "lore/city-stoneheim.jpg": {
+      "from": "lore-places/lore-city-stoneheim__nb2.jpg",
+      "size": [
+        1584,
+        672
+      ]
+    },
+    "lore/city-nordenvild.jpg": {
+      "from": "lore-places/lore-city-nordenvild__nb2.jpg",
+      "size": [
+        1584,
+        672
+      ]
+    },
+    "lore/city-laitengard.jpg": {
+      "from": "lore-places/lore-city-laitengard__nb2.jpg",
+      "size": [
+        1584,
+        672
+      ]
+    },
+    "lore/god-vial.jpg": {
+      "from": "lore-gods/lore-god-vial__nb2.jpg",
+      "size": [
+        1584,
+        672
+      ]
+    },
+    "lore/god-ularion.jpg": {
+      "from": "lore-gods/lore-god-ularion__nb2.jpg",
+      "size": [
+        1584,
+        672
+      ]
+    },
+    "lore/god-keron.jpg": {
+      "from": "lore-gods/lore-god-keron__nb2.jpg",
+      "size": [
+        1584,
+        672
+      ]
+    },
+    "lore/god-armont.jpg": {
+      "from": "lore-gods/lore-god-armont__nb2-v2.jpg",
+      "size": [
+        1584,
+        672
+      ]
+    },
+    "lore/god-redmund.jpg": {
+      "from": "lore-gods/lore-god-redmund__nb2.jpg",
+      "size": [
+        1584,
+        672
+      ]
+    },
+    "lore/descent-strike.jpg": {
+      "from": "lore-places/lore-descent-strike__nb2.jpg",
+      "size": [
+        1584,
+        672
+      ]
+    },
+    "lore/descent-portal.jpg": {
+      "from": "lore-places/lore-descent-portal__nb2.jpg",
+      "size": [
+        1584,
+        672
+      ]
+    },
+    "lore/still-karst.jpg": {
+      "from": "lore-still/lore-still-karst__nb2-v2.jpg",
+      "size": [
+        1584,
+        672
+      ]
+    },
+    "frames/iron.png": {
+      "from": "portrait-frames/frame-iron__nb2.png",
+      "size": [
+        512,
+        512
+      ],
+      "fit": 96
+    },
+    "frames/bronze.png": {
+      "from": "portrait-frames/frame-bronze__nb2.png",
+      "size": [
+        512,
+        512
+      ],
+      "fit": 96
+    },
+    "frames/karst.png": {
+      "from": "portrait-frames/frame-karst__nb2.png",
+      "size": [
+        512,
+        512
+      ],
+      "fit": 96
+    },
+    "frames/forge.png": {
+      "from": "portrait-frames/frame-forge__nb2.png",
+      "size": [
+        512,
+        512
+      ],
+      "fit": 96
+    },
+    "frames/clan.png": {
+      "from": "portrait-frames/frame-clan__nb2.png",
+      "size": [
+        512,
+        512
+      ],
+      "fit": 96
+    },
+    "frames/arena.png": {
+      "from": "portrait-frames/frame-arena__nb2.png",
+      "size": [
+        512,
+        512
+      ],
+      "fit": 96
+    },
+    "frames/pass.png": {
+      "from": "portrait-frames/frame-pass__nb2.png",
+      "size": [
+        512,
+        512
+      ],
+      "fit": 96
+    },
+    "frames/first.png": {
+      "from": "portrait-frames/frame-first__nb2-v2.png",
+      "size": [
+        512,
+        512
+      ],
+      "fit": 96
+    },
+    "frames/timeless.png": {
+      "from": "portrait-frames/frame-timeless__nb2.png",
+      "size": [
+        512,
+        512
+      ],
+      "fit": 96
+    },
+    "donat/hall.jpg": {
+      "from": "donat-hall/donat-hall__nb2-v2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "donat/frame.png": {
+      "from": "donat-frames/donat-frame__nb2.png",
+      "size": [
+        320,
+        447
+      ]
+    },
+    "donat/emblem-d2.png": {
+      "from": "donat-emblems/donat-emblem-d2__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 96
+    },
+    "donat/emblem-d3.png": {
+      "from": "donat-emblems/donat-emblem-d3__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 96
+    },
+    "donat/emblem-d4.png": {
+      "from": "donat-emblems/donat-emblem-d4__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 96
+    },
+    "donat/emblem-d5.png": {
+      "from": "donat-emblems/donat-emblem-d5__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 96
+    },
+    "donat/emblem-d6.png": {
+      "from": "donat-emblems/donat-emblem-d6__nb2-v2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 96
+    },
+    "heroes/c2-59.jpg": "heroes/hero-c2-59-arno__nb2.jpg",
+    "heroes/c2-60.jpg": "heroes/hero-c2-60-renar__nb2.jpg",
+    "heroes/c2-61.jpg": "heroes/hero-c2-61-maelin__nb2-v2.jpg",
+    "heroes/c2-62.jpg": "heroes/hero-c2-62-gest__nb2-v2.jpg",
+    "heroes/c2-63.jpg": "heroes/hero-c2-63-eitri__nb2-v2.jpg",
+    "heroes/c3-59.jpg": "heroes/hero-c3-59-kolbein__nb2-v2.jpg",
+    "heroes/c3-60.jpg": "heroes/hero-c3-60-ranva__nb2.jpg",
+    "heroes/c3-61.jpg": "heroes/hero-c3-61-brand__nb2.jpg",
+    "heroes/c3-62.jpg": "heroes/hero-c3-62-ketil__nb2-v2.jpg",
+    "heroes/c3-63.jpg": "heroes/hero-c3-63-asdis__nb2.jpg"
   }
 }

@@ -1,0 +1,39 @@
+{
+  "name": "Витрина «За Энериум»: правка портретов сета III первого прогона jobs/donat-set3.json в режиме EDIT (art/style/style.md: удачную картинку правим, а не рисуем заново). У Кольбейна и Кетиля лицо вышло гладкой бледной личиной — у Безликих сетов II–III на витрине одна примета: в капюшоне гладкая тьма (ADR-0023, п. 10). У Кетиля щит висел в воздухе, а в центре груди — лишний кулак: щит — на ближней руке.",
+  "models": [
+    "nb2"
+  ],
+  "style": "Keep the painterly style of the attached picture: the same brush strokes, light, colors and background.",
+  "negative": "No text, no letters, no numbers, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+  "cutout_rule": "",
+  "categories": {
+    "heroes": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [],
+      "frame": "Edit the attached hero portrait. Keep the pose, the hands, the clothes, the objects, the background, the light and the framing exactly as they are. Change only what is listed below."
+    }
+  },
+  "jobs": [
+    {
+      "id": "hero-c3-59-kolbein",
+      "category": "heroes",
+      "title": "Кольбейн Сборщик Дани — правка: вместо бледной личины — тьма",
+      "source": "Правка art/generated/heroes/hero-c3-59-kolbein__nb2.jpg. К выгрузке — design/ui/assets/art/heroes/c3-59.jpg, без mirror.",
+      "refs": [
+        "art/generated/heroes/hero-c3-59-kolbein__nb2.jpg"
+      ],
+      "subject": "1. His face: the smooth brown face-like surface with shadowed eye hollows must go completely. Inside the red hood there is only a smooth, soft, deep darkness, as dark as a night sky — no surface, no mask, no eyes, no eye hollows, no nose, no mouth, no features at all. The hood keeps its shape, its golden trim and its folds."
+    },
+    {
+      "id": "hero-c3-62-ketil",
+      "category": "heroes",
+      "title": "Кетиль у Колыбели — правка: тьма вместо личины, щит на руке",
+      "source": "Правка art/generated/heroes/hero-c3-62-ketil__nb2.jpg. К выгрузке — design/ui/assets/art/heroes/c3-62.jpg, без mirror.",
+      "refs": [
+        "art/generated/heroes/hero-c3-62-ketil__nb2.jpg"
+      ],
+      "subject": "1. His face: the smooth pale face-like surface must go completely. Inside the grey hood there is only a smooth, soft, deep darkness, as dark as a night sky — no surface, no mask, no eyes, no nose, no mouth, no features at all.\n2. His arms: remove the lone fist in the middle of his chest. The flaming round shield is strapped to his near forearm: his near arm reaches from his shoulder forward to the back of the shield, and his gauntleted hand grips the shield behind its rim, so the shield is clearly held and driven forward. He has exactly two hands: the hand on the shield and the hand that holds the axe low at the left."
+    }
+  ]
+}

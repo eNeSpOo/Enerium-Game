@@ -50,7 +50,7 @@ const scripts = [...html.matchAll(/<script(?:\s+src="([^"]+)")?>([\s\S]*?)<\/scr
     if (html.includes(old)) say(`index.html: остался прежний код ритуалов — «${old}»`);
   const card = html.match(/\{ n: 'Ритуалы'[\s\S]*?\},\r?\n/);
   if (!card || !/ready:\s*\[[^\]]*'rituals'[^\]]*'workers'/.test(card[0])) say('index.html: на карте экранов ритуалы и рабочие не отмечены готовыми (ready карточки «Ритуалы»)');
-  if (!/\['Входящие',[^\n]*\['offline-rewards'\]\]/.test(html)) say('index.html: шаблон «Входящие» не отмечает «пока вас не было» готовым');
+  if (!/\['Входящие',[^\n]*\[[^\]\[]*'offline-rewards'[^\]\[]*\]\]/.test(html)) say('index.html: шаблон «Входящие» не отмечает «пока вас не было» готовым');   // готовое — четвёртое поле шаблона, в нём может быть и почта
   if (!/const busyNote = [^\n]*rtBusyNote/.test(html)) say('index.html: busyNote не спрашивает занятость ритуалом (rtBusyNote)');
   for (const f of ['rituals.js', 'screens/rituals.js']) try { new vm.Script(read(f), { filename: f }); } catch (e) { say(`${f}: синтаксис — ${e.message}`); }
   /* анимация сбора — только transform и opacity */

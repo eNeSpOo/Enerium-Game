@@ -10,7 +10,9 @@
    4. Экран: три времени на девяти неделях и шести циклах. Эта — раса и цивилизация Эхо, срок до отсечки, «Дары» с числом сундуков,
       как в bag.js, шесть строк режимов и ритуалы; прошлая — прошлая раса, сундуки и Энериум итога; следующая — следующая раса,
       цивилизация, нашествие, герои Эхо недели и их неприязнь.
-   5. Правила воздуха (ADR-0026): на строке режима — не больше двух чисел, двух чипов и двух кнопок (сама строка и «›»).
+   5. Правила воздуха (ADR-0026): на строке режима — не больше двух чисел, двух чипов и двух кнопок. Переход в режим — явный (слово
+      автора 29.09.2026): строка со «›» открывает сведения — лист режима, в режим ведёт кнопка «Войти» с дверью в строке этой недели и
+      в листе; «›» на «Войти» нет, у прошлой недели «Войти» нет; ритуалы — строка «Войти» без листа.
    6. Листы: режим на эту и прошлую неделю, итог, сроки, следующая неделя, «Рейтинг» с других экранов и его вкладки.
    7. Везде: без исключений, undefined, NaN и [object; в режиме «Игрок» — ни служебных слов (SERVICE из check_player_view.js),
       ни тем «для команды» из «Отрядов Эхо», ни спойлеров.
@@ -170,12 +172,16 @@ function suite() {
       const ok = darRows(S).filter(p => p.st === 'ok');
       if (!h.includes(`<small>${chests(darCount(ok))}</small>`)) fail(`${key}: у «Даров» не ${chests(darCount(ok))}`);
       if (!/class="wk-rit[ "]/.test(h) || !h.includes('data-v="rituals"')) fail(`${key}: нет строки ритуалов`);
+      else if (!/<button class="wk-rit[^"]*" data-a="go" data-v="rituals"[\s\S]*?class="wk-enter">[\s\S]*?Войти<\/span><\/button>/.test(h)) fail(`${key}: у ритуалов нет «Войти»`);
       let rows = rowsOf(h);
       if (rows.length !== ORDER.length) fail(`${key}: строк режимов ${rows.length}`);
       rows.forEach((r, i) => {
         const id = ORDER[i];
         if (!r.includes(`data-mode="${id}"`) || !r.includes(`data-v="wkmode:${id}:now"`)) fail(`${key}: строка ${i + 1} — не ${id}`);
         if (!r.includes(`data-a="go" data-v="${M[i].go}"`)) fail(`${key}: у строки ${id} нет перехода в режим`);
+        const main = (r.match(/<button class="wk-main"[\s\S]*?<\/button>/) || [''])[0], go = (r.match(/<button class="wk-go"[\s\S]*?<\/button>/) || [''])[0];
+        if (!main.includes(`data-v="wkmode:${id}:now"`) || !main.includes('#i-chev')) fail(`${key}: у строки ${id} «›» не ведёт к сведениям`);
+        if (!go.includes('data-a="go"') || !go.includes('#i-door') || !/>Войти</.test(go) || go.includes('#i-chev')) fail(`${key}: у строки ${id} нет явной кнопки «Войти»`);
         checkRow(`${key} · ${id} · эта`, r);
       });
       const e = W.state('echo', 'now'), re = rows[ORDER.indexOf('echo')] || '';
@@ -194,7 +200,7 @@ function suite() {
       if (!h.includes(`<b class="num">${fmt(T.chests)}</b>`) || !h.includes(`<b class="num">${fmt(en)}</b><small>Энериума</small>`)) fail(`${key}: в итоге не видно сундуков или Энериума`);
       rows = rowsOf(h);
       if (rows.length !== ORDER.length) fail(`${key}: строк прошлой недели ${rows.length}`);
-      rows.forEach((r, i) => { if (!r.includes(`data-v="wkmode:${ORDER[i]}:past"`)) fail(`${key}: прошлая, строка ${i + 1} — не ${ORDER[i]}`); if (r.includes('data-a="go"')) fail(`${key}: у прошлой недели — переход в режим`); checkRow(`${key} · ${ORDER[i]} · прошлая`, r); });
+      rows.forEach((r, i) => { if (!r.includes(`data-v="wkmode:${ORDER[i]}:past"`)) fail(`${key}: прошлая, строка ${i + 1} — не ${ORDER[i]}`); if (r.includes('data-a="go"') || r.includes('>Войти<')) fail(`${key}: у прошлой недели — переход в режим`); if (!r.includes('#i-chev')) fail(`${key}: прошлая, строка ${ORDER[i]} без «›» к сведениям`); checkRow(`${key} · ${ORDER[i]} · прошлая`, r); });
 
       /* следующая неделя */
       S.seg.week = 'next';
@@ -213,6 +219,8 @@ function suite() {
         h = draw(`${key} · лист ${t} ${arg || ''} ${rt || ''}`); out.sheets++;
         if (!h.includes('class="ov"')) fail(`${key}: лист ${t} ${arg || ''} не открылся`);
       }
+      for (const m of M) { S.overlay = { t: 'wkmode', arg: m.id + ':now' }; const s = draw(`${key} · ${m.id} · лист · вход`), f = s.slice(s.indexOf('class="sheet-f"'));
+        if (!f.includes(`data-a="go" data-v="${m.go}"`) || !f.includes(`Войти в «${m.n}»`)) fail(`${key}: в листе ${m.id} нет «Войти в «${m.n}»»`); }
       S.overlay = { t: 'wkmode', arg: 'echo:now' }; h = draw(key + ' · Эхо · эта');
       if (!e.lock && (h.match(/class="wk-pk[ "]/g) || []).length !== e.planks.length) fail(`${key}: в листе Эхо не все планки`);
       S.overlay = { t: 'wkpast' }; h = draw(key + ' · итог');

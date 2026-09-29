@@ -32,7 +32,8 @@ const ECH = {
   many: { hp: 4800, bm: 12400 },                        // Многоликий — лёгкий бой один на один: как первая ступень, демо
   craft: { hp: 120000, bm: 90000 },                     // крафтовый босс — по своему циклу (§12.3)
   cycMul: 3,                                            // здоровье и мощь — ×3 за цикл
-  lifeH: { o: 72, e: 48, b: 36, u: 24, m: 24, craft: 48 },   // срок существования цели, часы; окончательные сроки — баланс (§17.1)
+  lifeH: { o: 72, e: 48, b: 1, u: 1, m: 24, craft: 1 },   // срок существования цели, часы (§17.1): боссы, Убер и крафтовый босс — час, потом исчезают (решение автора 29.09.2026)
+  lifeWarnH: 1,                                         // цель на столько часов и меньше — таймер на карточке цели, не только в слоте
   pickW: [1332, 1234, 1139, 1045, 950, 856, 761, 667, 572, 478, 383, 289, 194, 100],   // запасные, как в echo-rules.js: Убер — 1 %, ниже линейно (ADR-0025, «Шансы призыва»);   // вес ступени в призыве: слабые чаще, сильные реже (§17.4)
   manySummonBp: 10,                                      // Многоликий выпадает при призыве с шансом 10 б. п. — 0,10 %, без ограничения «раз в неделю» (ADR-0025)
   /* арт недели: фон арены Эхо и портреты ступеней 1–15 по порядку врагов ECH. Иш-Кантун одобрен автором (ADR-0025);
@@ -327,8 +328,16 @@ function hpOf(step, c, race) {
 const ptsOf = (step, c) => { if (c < EM.from) return 0; const v = ruleOf(step, 'points', c); return v != null ? v : (step === MANY ? ECH.manyPoints : ECH.points[step - 1]) * ipow(XE.pointsCycleMul, c - EM.from); };
 /* очки этажа биома Многоликого: правила (manyPoints), иначе демо — очки победы над этой ступенью в Эхо */
 const floorPts = (step, c) => { if (c < EM.from) return 0; const v = ruleOf(step, 'manyPoints', c); return v != null ? v : ptsOf(step, c); };
-/* цена атаки в душах: правила по ступени и циклу (раунды × цена раунда цикла), иначе прежняя сетка §17.5 по типу цели */
-const atkCost = x => (x.step ? ruleOf(x.step, 'souls', x.cyc || S.acc.cycle) : null) || XE.oldAttackSouls[ECH.atk[x.g]];
+/* цена раунда атаки по циклу: правила (roundSouls, с цикла I), иначе нет */
+const roundSouls = c => { const v = XR() && XR().roundSouls; return Array.isArray(v) ? v[Math.max(1, Math.min(c, v.length)) - 1] : null; };
+/* цена атаки в душах — раунды × цена раунда цикла: правила по ступени и циклу (циклы со II); иначе — раунды типа цели × roundSouls
+   цикла (цикл I, крафтовый босс — по циклу силы); без правил режима — прежняя сетка §17.5 по типу цели */
+const atkCost = x => {
+  const c = x.pcyc || x.cyc || S.acc.cycle, v = x.step ? ruleOf(x.step, 'souls', c) : null;
+  if (v) return v;
+  const rs = roundSouls(c);
+  return rs ? roundsOf(x.g) * rs : XE.oldAttackSouls[ECH.atk[x.g]];
+};
 /* Многоликий — награда за пятнадцатую ступень; drops.echo.uber — прежняя запись той же выдачи */
 const manyDrop = () => XE.many || XE.uber || { item: 'many', count: 1 };
 const souls = n => plural(n, 'душа', 'души', 'душ');
@@ -463,8 +472,9 @@ function heroAvers(h) {
 /* герой отряда: герой прототипа (S.heroes) или герой Эхо из echo-foes.js — демо-режим «отряд недели» */
 const echoHero = id => { const X = XF(); return X && X.heroes ? X.heroes[id] || null : null; };
 function echoHeroSrc(id, lvl, valor) {
-  const h = echoHero(id), cls = FT.heroCls[h.cls] || h.cls;
-  return { key: id, id, name: h.name, cls, el: h.el, lvl, st: FT.heroSt[cls] || FT.heroSt['Танк'], valor: valor != null ? valor : h.maxV,
+  const h = echoHero(id), cls = FT.heroCls[h.cls] || h.cls, v = valor != null ? valor : h.maxV;
+  // доблесть — +30 % к характеристикам за ступень, правило ядра (EB.valorSt), как у героев аккаунта
+  return { key: id, id, name: h.name, cls, el: h.el, lvl, st: EB.valorSt(FT.heroSt[cls] || FT.heroSt['Танк'], v), valor: v,
     kit: { actPct: h.actPct, ultPct: h.ultPct, rarity: h.rarity, kit: h.kit }, avers: h.avers || null };
 }
 /* своя неприязнь героя Эхо важнее; без неё — расовая прибавка из источника героя: «Бич» духовного талисмана (screens/talismans.js) */
@@ -481,6 +491,14 @@ function fightOf(x, ids, no) {
   const main = foe(x.fid, x), c = x.pcyc || x.cyc || S.acc.cycle, row = x.step ? ruleRow(x.step, c) : null, lvl = x.kind === 'craft' ? craftLvl(c) : lvlOf(x.step || TOP, c);
   const m = unitOf(main, 0, lvl, { max: x.max, hp: x.hp, used: x.used }, row);
   return { main, heroes: heroesOf(ids, lvl), o: { seed: EB.seedOf(`эхо|${x.race}|бой|${x.uid}|${no}`), g: x.g, maxRounds: roundsOf(x.g), main: m, guards: guardsOf(x, main, lvl, row) } };
+}
+/* здоровье крафтового босса: правила (types.craft.bossHpPct, echo-rules.js) — карта ядра: класс лица или «Босс», образец класса,
+   уровень — как у Убер-босса цикла силы; без правил — демо-шкала ECH.craft */
+function craftHpOf(pc, faceFid) {
+  const t = typeRule('craft');
+  if (!t || !Number.isInteger(t.bossHpPct)) return at(ECH.craft.hp, pc);
+  const fc = faceFid ? stepFoe(faceFid) : null, cls = fc && EB.RULES.cls[fc.cls] ? fc.cls : FT.craftCls;
+  return EB.foeMaxHp({ cls, st: tplOf(cls, 'craft').st, lvl: craftLvl(pc), hpPct: t.bossHpPct });
 }
 /* уровень крафтового босса: как у Убер-босса его цикла силы по правилам (за циклом VI — шаг последнего цикла), иначе демо */
 function craftLvl(c) {
@@ -509,8 +527,18 @@ function target(s, kind, x, o = {}) {
     const u = manyFoe(W.race), max = hpOf(MANY, c, W.race);
     return { ...base, fid: 'many', step: MANY, g: 'm', el: u.el, bm: at(ECH.many.bm, c), max, hp: max, left: lifeOf('m') * ECH.hour };
   }
-  const fb = x, pc = fb.cyc + (fb.powerCycleStep || 0), face = fb.id === 'lik' ? likFace(s, W, base.uid) : '', max = at(ECH.craft.hp, pc);   // пробуждённый — сила цикла выше
-  return { ...base, fid: fb.id, step: 0, g: 'craft', race: face ? W.race : fb.race, el: face ? stepFoe(face).el : '', face, cyc: fb.cyc, pcyc: pc, bm: at(ECH.craft.bm, pc), max, hp: max, left: ECH.lifeH.craft * ECH.hour };
+  const fb = x, pc = fb.cyc + (fb.powerCycleStep || 0), face = fb.id === 'lik' ? likFace(s, W, base.uid) : '', max = craftHpOf(pc, face);   // пробуждённый — сила цикла выше
+  const race = face ? W.race : fb.race;
+  return { ...base, fid: fb.id, step: 0, g: 'craft', race, el: face ? stepFoe(face).el : '', face, cyc: fb.cyc, pcyc: pc, bm: craftPowOf(fb, race, face, pc, max), max, hp: max, left: lifeOf('craft') * ECH.hour };
+}
+/* мощь крафтового босса — та же формула §6 по карте ядра, что у ступеней (powOf); без правил режима или BM — демо-шкала */
+function craftPowOf(fb, race, face, pc, max) {
+  if (typeof BM === 'undefined' || !typeRule('craft')) return at(ECH.craft.bm, pc);
+  try {
+    ensureLib();
+    const f = foe(fb.id, { race, face }), u = EB.create({ mode: 'rounds', heroes: [], foes: [unitOf(f, 0, craftLvl(pc), { max, hp: max }, null)], seed: 1 }).u[1][0];
+    return u ? BM.unit(u) : at(ECH.craft.bm, pc);
+  } catch (_) { return at(ECH.craft.bm, pc); }
 }
 /* Лик недели носит лицо врага недели: из изученных, иначе из всех четырнадцати */
 function likFace(s, W, uid) {
@@ -538,7 +566,11 @@ function sync() {
     if (S.ech.cb && !S.ech.biomes.some(b => b.uid === S.ech.cb)) S.ech.cb = null;
     S.ech.note = `Неделя ${W.gen}: лестница сброшена, цели прошлой недели ушли.`;
   }
-  E.slots.forEach((x, i) => { if (x && x.left <= 0) { E.slots[i] = null; S.ech.note = `Срок цели в слоте ${i + 1} вышел: она ушла без очков, души не вернулись.`; } });
+  E.slots.forEach((x, i) => {
+    if (!x || x.left > 0) return;
+    E.slots[i] = null; S.ech.note = `Срок цели в слоте ${i + 1} вышел: она ушла без очков, души не вернулись.`;
+    if (typeof document !== 'undefined' && S.route === 'echo') toast(`Цель исчезла: срок вышел · ${nameOf(foe(x.fid, x))}`);   // исчезновение видно сразу, не только запиской
+  });
   if (!(E.sel >= 0 && E.sel < E.slots.length)) E.sel = 0;
 }
 /* призыв: N разных ступеней из открытых 1–14, вес по ступени (§17.4); Многоликий выпадает сверх лестницы с шансом manySummonBp —
@@ -643,13 +675,16 @@ function pickHtml(i, p, c) {
 }
 /* карточка цели (правила воздуха): портрет, имя, здоровье, мощь цели и под ней — отряд атаки, «Атаковать» с ценой. Ранг, стихия,
    раунды, срок, награда, неприязнь и лор — в листе «Сведения» (OV.echfoe): по портрету или ссылке. Ступень и срок видны в слоте слева */
+/* цель на час (боссы, Убер, крафтовый босс — решение автора 29.09.2026): обратный отсчёт и на карточке — срок решает, успеть ли */
+const shortLife = x => lifeOf(x.g) <= ECH.lifeWarnH;
+const lifeChip = x => `<span class="chip warn ech-left" title="Через этот срок цель исчезнет — без очков, души не вернутся">${ic('hour')}<span class="num" data-ech-t="${S.echo.slots.indexOf(x)}">${dur(x.left)}</span></span>`;
 function foeHtml(x) {
   const f = foe(x.fid, x), cost = atkCost(x);
   return `<div class="pnl etarget ech-tgt">
     <div class="stage"><button class="ech-phb" data-a="echfoe" data-v="${x.fid}" aria-label="Сведения о цели">${ph(f, 'lg')}</button></div>
     <div class="info">
       <div class="row ech-nm"><h2 class="serif ech-name">${nameOf(f)}</h2><button class="link" data-a="echfoe" data-v="${x.fid}">Сведения ${ic('chev')}</button></div>
-      <div class="col ech-life">${bar(hpPct(x), 'hp lg')}<div class="row ech-nums">${numIc('hp', x.hp, 20, `<small class="num">/ ${fmt(x.max)}</small>`)}${numIc('power', x.bm, 20, '', 'Боевая мощь цели')}</div></div>
+      <div class="col ech-life">${bar(hpPct(x), 'hp lg')}<div class="row ech-nums">${numIc('hp', x.hp, 20)}${numIc('power', x.bm, 20, '', 'Боевая мощь цели')}${shortLife(x) ? lifeChip(x) : ''}</div></div>
       ${squadVs(x)}
       <div class="e-foot">
         <button class="btn go big" data-a="echatk" data-v="${x.uid}:${x.atk + 1}" title="${tmT('Исход решён при оплате, просмотр можно пропустить', 'Бой ядром: исход решён при оплате, просмотр можно пропустить')}">Атаковать${costTag('souls', cost)}</button>
@@ -824,7 +859,7 @@ function checks(kind, it) {
 /* ограничения активации — не больше двух строк: что займёт и что не вернётся */
 const RULES = {
   act: () => [`Займёт слот биомов — их ${bioCap()}, общие с забегами.`, 'Предмет не вернётся.'],
-  call: () => [`Займёт слот Эхо на ${ECH.lifeH.craft} ч, отменить нельзя.`, 'Кого зовёт предмет, откроется после призыва.'],
+  call: () => [`Займёт слот Эхо на ${lifeOf('craft')} ч, потом исчезнет — души на атаки держите наготове.`, 'Кого зовёт предмет, откроется после призыва.'],
   echo: () => [`Займёт слот биомов — их ${bioCap()}, общие с забегами.`, `Попытка одна: ${TOP} этажей, очки — за каждый взятый.`],
 };
 const ACT_T = { act: ['Активация руины', 'Активировать'], call: ['Призыв в Эхо', 'Призвать'], echo: ['Биом Многоликого', 'Активировать'] };
@@ -1114,10 +1149,12 @@ Object.assign(OV, {
     sync();
     const cur = S.echo.slots[S.echo.sel], sl = cur && cur.fid === o.arg ? cur : S.echo.slots.find(x => x && x.fid === o.arg) || null, f = foe(o.arg, sl); if (!f) return '';
     const c = S.acc.cycle, rec = kn(f.fid);
-    const hp = sl ? sl.max : f.g === 'craft' ? at(ECH.craft.hp, f.cyc + (f.fb && f.fb.powerCycleStep || 0)) : hpOf(f.step, c, f.race);
-    const bm = sl ? sl.bm : f.g === 'craft' ? at(ECH.craft.bm, f.cyc) : f.g === 'm' ? at(ECH.many.bm, c) : powOf(f.race, f.step, c);
+    const pc = f.g === 'craft' ? f.cyc + (f.fb && f.fb.powerCycleStep || 0) : c, faceFid = f.face ? f.face.fid : '';
+    const hp = sl ? sl.max : f.g === 'craft' ? craftHpOf(pc, faceFid) : hpOf(f.step, c, f.race);
+    const bm = sl ? sl.bm : f.g === 'craft' ? craftPowOf(f.fb, f.race, faceFid, pc, hp) : f.g === 'm' ? at(ECH.many.bm, c) : powOf(f.race, f.step, c);
     const chips = `<span class="chip ${f.g === 'o' ? '' : 'gold'}">${rankIc(f.g)}${rankOf(f)}</span>${f.el ? el(f.el) : ''}${rec && !f.fb && f.g !== 'm' ? `<span class="chip">${f.cls}</span>` : ''}${rec && f.fb ? `<span class="chip">${trRace(f.race)}</span>` : ''}${f.fb && f.fb.spec ? `<span class="chip">${specOf(f.fb.spec)}</span>` : ''}`;
-    const nums = numIc('hp', sl ? sl.hp : hp, 18, sl ? `<small class="num">/ ${fmt(hp)}</small>` : '') + numIc('power', bm);
+    // осада: остаток здоровья — максимум цели в следующей атаке; прежний максимум — только здесь, в «Сведениях»
+    const nums = numIc('hp', sl ? sl.hp : hp, 18, sl && sl.hp < hp ? `<small class="num" title="Здоровье при призыве">из ${fmt(hp)}</small>` : '') + numIc('power', bm);
     let tgt = '';
     if (sl) {
       const i = S.echo.slots.indexOf(sl), rn = roundsOf(sl.g), gd = EB.RULES.echo.guards[sl.g] || 0, imm = f.fb ? f.fb.immunityBp : immOf(sl.g), av = attackAvers(sl);
@@ -1126,7 +1163,7 @@ Object.assign(OV, {
         ['Исчезнет через', `<span class="num" data-ech-t="${i}">${dur(sl.left)}</span>`], ['За победу', rewardOf(sl, f, c)]].concat(imm ? [['Иммунитет к контролю', pctBp(imm)]] : [],
         av.n ? [['Неприязнь отряда', `+${pctBp(av.bp)} урона · ${av.n} ${plural(av.n, 'герой', 'героя', 'героев')}`]] : []);
       tgt = `<div class="ech-kv">${kv.map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join('')}</div>
-        <p class="reason">Здоровье цели сохраняется между атаками.${TM(` Бой ядром, как в биомах: исход решён при оплате, «Пропустить» — сразу итог. ${XR() ? 'Цена атаки — данные режима.' : 'Цена атаки — прежняя сетка §17.5, ждёт баланса.'}`)}</p>
+        <p class="reason">Урон по цели сохраняется между атаками: в бой она выходит с остатком здоровья, и он — её полное здоровье в этом бою.${TM(` Бой ядром, как в биомах: исход решён при оплате, «Пропустить» — сразу итог. ${XR() ? 'Цена атаки — данные режима.' : 'Цена атаки — прежняя сетка §17.5, ждёт баланса.'}`)}</p>
         ${sl.g === 'm' ? '<span class="chip warn team-only" style="align-self:flex-start">правила — черновик</span>' : ''}`;
     }
     const faces = f.g === 'm' ? STEPS.map((g, j) => stepFoe(fidOf(f.race, j + 1))).filter(x => kn(x.fid)).map(x => x.n) : [];
@@ -1172,7 +1209,7 @@ Object.assign(OV, {
     const f = foe(x.fid, x);
     const body = `<div class="ech-got">${ph(f)}<div class="col" style="gap:var(--sp-s);min-width:0">
         <b class="serif ech-itn">${nameOf(f)}</b>${numIc('hp', x.max)}${numIc('power', x.bm)}
-        <p class="reason">Слот ${o.slot + 1} · исчезнет через ${dur(x.left)}${TM(' · цена атаки — прежняя сетка, ждёт баланса')}</p>
+        <p class="reason">Слот ${o.slot + 1} · исчезнет через ${dur(x.left)}${TM(XR() ? ` · атака — ${roundsOf('craft')} раундов, ${fmt(atkCost(x))} ${souls(atkCost(x))}` : ' · цена атаки — прежняя сетка, ждёт баланса')}</p>
       </div></div>`;
     return dialog('Призван крафтовый босс', body, `<button class="btn ghost" data-a="close">Остаться</button><button class="btn go" data-a="echgo" data-v="echo:${o.slot}">В Эхо ${ic('chev')}</button>`);
   },
@@ -1197,7 +1234,7 @@ Object.assign(OV, {
         <p class="reason">Атака ${L.no} · ${fmt(L.cost)} ${souls(L.cost)}${TM(' · бой посчитан целиком при оплате: просмотр и «Пропустить» итог не меняют')}.</p>
       </div></details>`;
     const body = `<div class="ech-res-top">${ph(f, 'sm')}<div class="col"><b class="serif">${nameOf(f)}</b><small class="faint">${WHY[r.why] || r.why}</small></div></div>
-      <div class="col ech-res-hp">${bar(pc(r.main.hp), 'hp lg', `<span class="ghost" style="--g:${pc(L.hp0)}"></span>`)}<div class="row"><span>здоровье цели</span><span class="num">${fmt(r.main.hp)} / ${fmt(L.max)}</span></div></div>
+      <div class="col ech-res-hp">${bar(pc(r.main.hp), 'hp lg', `<span class="ghost" style="--g:${pc(L.hp0)}"></span>`)}<div class="row"><span>здоровье цели</span><span class="num">${fmt(r.main.hp)}</span></div></div>
       <div class="row ech-res-kpi">${kpi.map(([v, s, w]) => `<div class="stat ${w}"><b class="num">${v}</b><small>${s}</small></div>`).join('')}</div>
       ${marks ? `<div class="row ech-res-marks">${marks}</div>` : ''}
       ${loot ? `<span class="eyebrow">Добыча</span><div class="ech-loot">${loot}</div>` : ''}
@@ -1243,6 +1280,18 @@ FLOWS.push(['Эхо · выбор цели', 'Призыв за душу: у к�
   if (k < 0) return;
   S.echo.sel = k;
   if (!S.ech.pending[k]) ACT.echsum(String(k));
+}]);
+
+/* сценарий презентации: босс живёт час (решение автора 29.09.2026) — отсчёт в слоте и на карточке цели; срок вышел — цель исчезает
+   без очков, записка и всплывающая строка. Демо: первый босс лестницы с отнятым здоровьем и полутора минутами срока */
+FLOWS.push(['Эхо · босс на час', 'Боссы, Убер и крафтовый босс живут час: отсчёт на карточке цели; срок вышел — цель исчезает без очков', () => {
+  sync(); S.route = 'echo'; S.overlay = null;
+  let k = S.echo.slots.findIndex(x => x && shortLife(x));
+  if (k < 0) {
+    k = freeSlot(); if (k < 0) k = ECH.slots - 1;
+    const x = target(S, 'step', STEPS.indexOf('b') + 1, { hpBp: 6200 }); x.left = 90; S.echo.slots[k] = x;
+  }
+  S.echo.sel = k;
 }]);
 
 /* для автопроверки tools/content-gen/screens/check_echo.js и консоли */

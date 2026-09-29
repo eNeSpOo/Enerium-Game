@@ -1,0 +1,69 @@
+{
+  "name": "Витрина «За Энериум»: рама донатного героя и эмблемы пяти донатных сетов (ADR-0021, ADR-0023, п. 9). Стиль меток карт одобрен автором 27.09.2026 (art/style/style.md, «Метки карт»; jobs/card-marks.json): тёмное фэнтези, кованое железо, старое золото, свет изнутри, сплошной чёрный фон — прозрачность вырезается из чёрного, ключ black. Рама — «дорого»: старое золото и чернёная бронза, зелёный кристалл времени (Энериум) в гребне; окно пустое и чёрное. Эмблемы — одна оправа на все пять сетов, внутри знак сета: так сеты читаются одной коллекцией. Имена сетов: II «Менялы», III «Под песком», IV «Снявшие Обод», V «Оставшиеся», VI «Отмеченные». Знаки — решение агента по лору сетов в docs/content/герои/состав-героев.md, раздел «Донатные сеты II–VI: Безликие».",
+  "models": [
+    "nb2"
+  ],
+  "style": "Dark fantasy game art with a mystical, precious atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and fine golden motes, light that comes from inside the subject and from below. Rich worn materials: blackened bronze, old gold, dark enamel, green time-crystals glowing from within. Regal, precious, dramatic, high contrast.",
+  "negative": "No text, no letters, no numbers, no real-world alphabets, no runes or markings that look like writing, no watermark, no signature, no logo, no UI elements. No faces, no skulls, no pentagrams, no occult signs.",
+  "cutout_rule": "The background is solid pure black ({hex}), flat, edge to edge: no gradient, no texture, no floor, no vignette, no checkerboard. Glow and magical light around the subject are welcome and fade into the black. Leave a clear margin of black around the subject on all sides.",
+  "categories": {
+    "donat-frames": {
+      "aspect": "4:5",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no text in the reply. Format: an ornate portrait frame for a legendary hero card in a dark fantasy mobile game, vertical 4:5, seen straight on, perfectly symmetric. The whole canvas is solid pure black — outside the frame and inside its window alike; only the frame itself is painted. The frame line is slender — about 4% of the frame width — and the window is large, empty and gently arched at the top. Ornament gathers at the top center, the bottom center and the four corners and may reach slightly outward beyond the line."
+    },
+    "donat-emblems": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no text in the reply. Format: game emblem of a hero set, square, no border around the picture. A round medallion about 72% of the canvas, centered, seen straight on: a rim of blackened bronze and old gold with a small faceted green time-crystal set at the top of the rim; inside the rim, one symbol in raised old gold on a field of dark green enamel, lit from below by soft green light. All five set emblems share exactly the same rim, so they read as one collection; only the symbol inside makes each one unique. A strong, simple symbol that still reads when the emblem is 24 pixels wide."
+    }
+  },
+  "jobs": [
+    {
+      "id": "donat-frame",
+      "category": "donat-frames",
+      "title": "Рама донатного героя — старое золото и зелёный кристалл Энериума",
+      "source": "Слова автора 29.09.2026: «дорого-богато». Решение агента: одна рама на всех донатных героев, её «дороговизну» по месту в сете добавляет интерфейс — светом. К выгрузке — design/ui/assets/art/donat/frame.png, 464×580, окно — прозрачное.",
+      "subject": "A frame for a timeless hero bought with Enerium, the green crystal of time: a slender line of old gold over blackened bronze, with fine filigree of hourglass and falling-sand motifs along it. At the top center a crest of gold leaves and wings holds a faceted green time-crystal glowing from within, with thin golden rays around it; at the bottom center a small pedestal ornament with a tiny golden hourglass; a small green crystal stud at each of the four corners. Regal, precious and timeless — the most valuable frame in the game."
+    },
+    {
+      "id": "donat-emblem-d2",
+      "category": "donat-emblems",
+      "title": "Эмблема сета II «Менялы»",
+      "source": "Сет II — пять торгашей, картотека сохранила их сделки, а не память о себе. Знак — весы с одной стёртой монетой. К выгрузке — design/ui/assets/art/donat/emblem-d2.png, 128×128, fit 80.",
+      "subject": "Symbol inside the medallion: a pair of merchant's balance scales, perfectly level, with a single worn coin resting on one pan."
+    },
+    {
+      "id": "donat-emblem-d3",
+      "category": "donat-emblems",
+      "title": "Эмблема сета III «Под песком»",
+      "source": "Сет III — служили песку под Ареной: ключи клеток, Храм Огня. Знак — связка ключей от клеток на песке с алым угольком. К выгрузке — design/ui/assets/art/donat/emblem-d3.png, 128×128, fit 80.",
+      "subject": "Symbol inside the medallion: an iron ring of heavy cage keys lying on a small mound of arena sand, with one scarlet ember glowing among the keys."
+    },
+    {
+      "id": "donat-emblem-d4",
+      "category": "donat-emblems",
+      "title": "Эмблема сета IV «Снявшие Обод»",
+      "source": "Сет IV — скреплённые Лайтен-Гарда, снявшие долговой обод; у Йорена синий камень обода стал серым. Знак — раскрытый обод с погасшим камнем. К выгрузке — design/ui/assets/art/donat/emblem-d4.png, 128×128, fit 80.",
+      "subject": "Symbol inside the medallion: a heavy wrist-ring of iron, broken open into two halves that fall apart; the stone set in it has gone from blue to dull grey."
+    },
+    {
+      "id": "donat-emblem-d5",
+      "category": "donat-emblems",
+      "title": "Эмблема сета V «Оставшиеся»",
+      "source": "Сет V — позванные в Башню вневремени: у Башни стоит кристалл, который читает жизнь; «Дверь без ручки». Знак — высокая дверь без ручки и кристалл перед ней. К выгрузке — design/ui/assets/art/donat/emblem-d5.png, 128×128, fit 80.",
+      "subject": "Symbol inside the medallion: a tall narrow arched door without a handle, set in a stone wall, with a faceted crystal standing before it and glowing softly."
+    },
+    {
+      "id": "donat-emblem-d6",
+      "category": "donat-emblems",
+      "title": "Эмблема сета VI «Отмеченные»",
+      "source": "Сет VI — лучшие своего поколения, на которых посмотрел бог; взор был предложением, от которого нельзя отказаться. Знак — одинокий клинок под лучом сверху, луч раскалывает золотой обруч. К выгрузке — design/ui/assets/art/donat/emblem-d6.png, 128×128, fit 80.",
+      "subject": "Symbol inside the medallion: a single upright sword, struck from above by one fierce narrow beam of light; the beam splits a thin golden circlet that hangs around the blade."
+    }
+  ]
+}

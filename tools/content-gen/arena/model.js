@@ -34,7 +34,7 @@ const { RULES } = require('./rules.js');
 /* ================================ ДАННЫЕ ПРОГОНА ================================ */
 const SIM = {
   cyc: 2,                                  // герои состава циклов I–II — цикл демо-аккаунта
-  rounds: [10, 12, 15, 20],                // пределы раундов на пробу; таймер §20.2 — 90 с
+  rounds: [15, 20, 25, 30],                // пределы раундов на пробу: 25 — решение автора 29.09.2026 (RULES.rounds.by.pvp); таймер §20.2 — 90 с
   timerMs: 90000,
   level: 60, samples: 300,                 // бой на пробу: средний уровень отряда, боёв на точку
   gaps: [2, 5, 10],                        // сила: отряд на столько уровней выше
@@ -53,7 +53,10 @@ const SIM = {
     },
     bad: 5000,                             // обновить список, если лучший соперник по оценке ниже этого шанса, б. п.
     equalBand: 25,                         // «равная» атака: разница рейтингов и сил не больше, очков
-    shifts: [0, 50, -50],                  // сдвиг защиты на пробу: 50 — наше прочтение, −50 — буквальное «+50 защитнику»
+    /* полоса силы для сравнения плательщика с увлечённым — не меньше стольких игроков каждого профиля: при трёх плательщиках полоса —
+       шум (с 25 раундами верхняя полоса из трёх плательщиков дала «+18,66 Энериума при расходе 16,66» — случай одного места) */
+    bandMin: { fan: 5, payer: 5 },
+    shifts: [0, 25, 50, -50],              // сдвиг защиты на пробу: 25 — принято (с доблестью в ядре), 50 — прежнее прочтение, −50 — буквальное «+50 защитнику»
   },
   league: {
     players: 2000, spreadT: 300, depth: [0, 140, 300], depthNoise: 60,   // сила трёх отрядов: лучший, второй, третий — разница от лучшего
@@ -78,7 +81,7 @@ function draftOf(h) {
 }
 const srcOf = (h, lvl, valor) => {
   const c = coreCls(h), T = HR.st[c] || HR.st['Танк'];
-  return EB.heroSrc({ id: h.id, name: h.n, cls: c, el: h.sch, lvl, st: T[0].slice(), ab: [], pas: [], ult: null, draft: draftOf(h), valor });
+  return EB.heroSrcValor({ id: h.id, name: h.n, cls: c, el: h.sch, lvl, st: T[0].slice(), ab: [], pas: [], ult: null, draft: draftOf(h), valor });   // доблесть — правило ядра, как в прототипе
 };
 const POOL = RS.heroes.filter(h => h.c <= SIM.cyc && draftOf(h));
 const byCls = c => POOL.filter(h => coreCls(h) === c);
@@ -243,7 +246,7 @@ function server(D, C, shift, tag) {
   const bands = [];
   for (let lo = 0; lo <= 3 * S0.spreadT; lo += S0.spreadT / 2) {
     const inB = k => P.filter(p => p.kind === k && p.T >= lo && p.T < lo + S0.spreadT / 2), f = inB('fan'), y = inB('payer');
-    if (f.length < 5 || y.length < 3) continue;
+    if (f.length < S0.bandMin.fan || y.length < S0.bandMin.payer) continue;
     const avg = (xs, g) => Math.floor(xs.reduce((a, p) => a + g(p), 0) * 100 / xs.length);
     bands.push({ lo, hi: lo + S0.spreadT / 2, fan: { n: f.length, r: avg(f, p => p.r) / 100 | 0, wins: avg(f, p => p.wins), en: avg(f, p => p.en), place: avg(f, p => p.place) / 100 | 0 },
       payer: { n: y.length, r: avg(y, p => p.r) / 100 | 0, wins: avg(y, p => p.wins), en: avg(y, p => p.en), place: avg(y, p => p.place) / 100 | 0, spent: avg(y, p => p.spent) } });
@@ -311,7 +314,7 @@ if (require.main === module) {
   const txt = JSON.stringify(R, null, 1);
   if (process.argv.includes('--print')) { console.log(txt); process.exit(0); }
   fs.writeFileSync(OUT, txt + '\n');
-  const S = R.server.find(x => x.shift === 50) || R.server[0];
+  const S = R.server.find(x => x.shift === RULES().elo.def.shift) || R.server[0];
   console.log(`model.json: калибровка ${R.calib.pool} героев, сервер ${SIM.server.players} игроков × ${SIM.server.seasons} сезона, отпечаток входов ${R.meta.inputs}.`);
   console.log(`Выгода равной атаки (сдвиг ${S.shift}): ${S.eqGain} сотых рейтинга на ${S.eq} атаках; выбор отряда под соперника — ${R.calib.puzzle.pts} очк. Эло.`);
 }

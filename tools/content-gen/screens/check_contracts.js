@@ -12,6 +12,7 @@
       (S.clan.in), задание Лиги — только с открытой Лигой по правилу экрана Лиги (15 разных героев, EN_ARENA.league).
    5. Наблюдатель: траты золота и духа, победы Эхо и завершённый ритуал двигают задания; ставка — не трата; до подписи — не в счёт.
    6. Вид: оба сегмента во всех состояниях, все листы, закрытый экран, сценарии, раздел UI-кита — без исключений, undefined и NaN.
+      Раскладка (слово автора 29.09.2026): задания строками слева под шапкой статуса, сведения справа — награда, заверение, главное действие.
       Правила воздуха на карточке: не больше двух чисел и одного действия. Режим «Игрок»: служебных слов нет; «Команда» — есть служебное.
    7. Неделя: строка «Контракты» в реестре WEEK_MODES — настоящая, пороги планок и валюта прошлой недели из данных контрактов.
    Запуск: node tools/content-gen/screens/check_contracts.js [--dump] */
@@ -28,7 +29,7 @@ const say = m => { if (err.length < 60) err.push(m); else if (err.length === 60)
 function done() {
   for (const n of note) console.log('предупреждение: ' + n);
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
-  console.log(`Контракты: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; карточек ${cnt.cards}; операций ${cnt.ops}.`);
+  console.log(`Контракты: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; строк заданий ${cnt.cards}, раскладок «слева — справа» ${cnt.layouts || 0}; операций ${cnt.ops}.`);
   console.log('Проверка пройдена: данные свежие и целые, пул решается на сиде, операции не повторяются, прогресс — с подписи, награда — один раз, игроку служебного не видно.');
   process.exit(0);
 }
@@ -154,7 +155,7 @@ function load() {
   const T = vm.runInContext(`({
     get S() { return S; }, set S(v) { S = v; },
     ACT, OV, FLOWS, KH, MAP, KIT_EXTRA, SCREENS, BAG, render, initialState, setTeam, CT: window.EN_CONTRACTS, CTE: window.EnContracts,
-    CT_SRV, CT_DEMO, ctObserve, ctPoolSize, ctFreeRer, ctPool, ctStake, ctKitHtml, WEEK_MODES: window.WEEK_MODES || [],
+    CT_SRV, CT_DEMO, ctObserve, ctPoolSize, ctFreeRer, ctPool, ctStake, ctKitHtml, ctOpen, WEEK_MODES: window.WEEK_MODES || [],
   })`, ctx);
   return { T, ctx, els, rootCls, game: () => (els.game ? els.game.innerHTML : '') };
 }
@@ -333,9 +334,27 @@ reset();
 }
 
 /* ================== 6. вид ================== */
+/* раскладка — слово автора 29.09.2026: «контракты списком слева и информацией справа были лучшим решением». Слева — шапка статуса
+   и задания строками, справа — сведения: награда, заверение и главное действие */
+function layout(h, where) {
+  if (!T.ctOpen() || /class="[^"]*ct-lock/.test(h)) return;
+  const X = T.S.contracts[T.S.seg.contracts === 'week' ? 'week' : 'day'], t = X.t;
+  const iL = h.indexOf('<div class="ct-l">'), iS = h.indexOf('<div class="pnl ct-side">');
+  if (!h.includes('<div class="ct">') || iL < 0 || iS < 0 || iS < iL) { say(`${where}: не «задания слева, сведения справа»`); return; }
+  const left = h.slice(iL, iS), side = h.slice(iS);
+  if (!left.includes('class="ct-head"')) say(`${where}: над списком нет шапки статуса`);
+  const rows = (left.match(/<div class="ct-card[ "]/g) || []).length;
+  if (rows !== X.tasks.length) say(`${where}: строк заданий слева ${rows}, заданий ${X.tasks.length}`);
+  if (/<div class="ct-card[ "]/.test(side)) say(`${where}: задания — справа`);
+  if (!side.includes(`data-v="cpool:${t}"`)) say(`${where}: справа нет награды`);
+  if (X.st === 'draft' && (!side.includes('data-a="ctsign"') || !side.includes(`data-v="ccert:${t}"`))) say(`${where}: справа нет заверения и «Подписать»`);
+  if (X.st === 'done' && !side.includes('data-a="ctclaim"')) say(`${where}: справа нет «Получить награду»`);
+  if (/class="ct-grid|class="pnl ct-foot/.test(h)) say(`${where}: осталась сетка карточек или низ экрана`);
+  cnt.layouts = (cnt.layouts || 0) + 1;
+}
 const both = f => { for (const team of [false, true]) { reset(); run('режим', () => T.setTeam(team)); f(team ? ' [команда]' : ''); } run('режим', () => T.setTeam(false)); };
 both(tag => {
-  const draw = (where, prep) => { if (prep) run(where, prep); T.S.route = 'contracts'; const h = view(P, where + tag); if (!tag) airCards(h, where); return h; };
+  const draw = (where, prep) => { if (prep) run(where, prep); T.S.route = 'contracts'; const h = view(P, where + tag); if (!tag) { airCards(h, where); if (!T.S.overlay) layout(h, where); } return h; };
   for (const seg of ['day', 'week']) {
     reset(); T.S.seg.contracts = seg; const key = seg, t = seg === 'week' ? 'w' : 'd';
     draw(`${seg} · старт`);

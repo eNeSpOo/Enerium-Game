@@ -2,33 +2,44 @@
    одна рамка — панель или лист, внутри строки, отступы и разделители; отступы — токены --sp-l, --sp-m, --sp-s.
    Свои классы — zp-* и dar-*; общие — .stock, .inv, .icard, .tabs, .well, .qty, .search, .lb-win, .rk-tab, .gifts, .chip, .btn */
 
-/* каркас: вкладки сверху, список слева, карточка справа */
+/* каркас: вкладки сверху, сетка слева, карточка справа */
 .zp-bar{flex:none;gap:var(--sp-s)}
 .zp-bar .tabs button{display:inline-flex;align-items:center;gap:5px}
 .zp-bar .tabs .dot{width:6px;height:6px}
 .zp-gb{gap:6px}
 .zp-gb img{width:20px;height:20px;border-radius:5px}
 .zp-gb b{color:var(--spirit);letter-spacing:0}
-.zp-stock{flex:1 1 0;min-height:0;height:auto}
+/* слова автора 29.09.2026: сетка 6 столбцов, видно 5 рядов, дальше прокрутка. Клетка — --zt, зазор — --zg; ширина списка — ровно шесть
+   клеток, поля панели и полоса прокрутки (--zpad), карточка справа получает остальное. Пять рядов входят в 932 × 430 и 844 × 390 */
+.zp-stock{--zt:44px;--zg:6px;--zpad:30px;flex:1 1 0;min-height:0;height:auto;grid-template-columns:calc(6 * var(--zt) + 5 * var(--zg) + var(--zpad)) minmax(0,1fr)}
 .zp-inv{min-width:0}
 .zp-find{flex:none}
 .zp-fb{flex:none;min-height:30px;height:30px;gap:6px}
 .zp-fb b{min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--spirit-2);color:#021614;font:700 10.5px/16px var(--f-u);letter-spacing:0;text-align:center}
 .zp-fb[aria-pressed="true"]{border-color:rgba(72,229,212,.45)}
 
-/* список: одна строка на запись, без рамок; группы по ярусу, две колонки у предметов, одна — у осколков и сундуков */
-.zp-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:max-content;gap:2px var(--sp-s);align-content:start}
-.zp-list.one{grid-template-columns:minmax(0,1fr)}
-.zp-gh{grid-column:1/-1;display:flex;align-items:baseline;gap:6px;margin-top:var(--sp-s);padding:0 4px 2px}
-.zp-gh:first-child{margin-top:0}
-.zp-gh i{font-style:normal;color:var(--parch-3);letter-spacing:.06em}
-.zp-row{appearance:none;display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;width:100%;min-height:36px;padding:3px 8px 3px 3px;border:0;border-radius:8px;background:none;color:var(--parch);text-align:left}
-.zp-row:hover{background:rgba(255,255,255,.028)}
-.zp-row[aria-current="true"]{background:rgba(72,229,212,.07);box-shadow:inset 2px 0 0 var(--spirit)}
-.zp-rt{display:flex;align-items:baseline;gap:var(--sp-s);min-width:0}
-.zp-row b{flex:0 1 auto;min-width:0;font:600 15px/1.1 var(--f-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.zp-rt small{flex:0 1 auto;min-width:0;font-size:11.5px;line-height:1.1;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.zp-row .num{font:700 12px/1 var(--f-u);color:var(--parch-3)}
+/* сетка: клетка — значок и число; имя и подробности — в карточке справа. Редкость — рамкой и кромкой цвета --r1…--r7 */
+.zp-grid{display:grid;grid-template-columns:repeat(6,var(--zt));grid-auto-rows:var(--zt);gap:var(--zg);align-content:start;justify-content:start}
+.zp-cell{appearance:none;position:relative;display:grid;place-items:center;width:var(--zt);height:var(--zt);padding:0;border-radius:9px;overflow:hidden;cursor:pointer;
+  border:1px solid color-mix(in srgb,var(--rc,#2b3036) 45%,var(--iron));background:radial-gradient(80% 80% at 50% 100%,color-mix(in srgb,var(--rc,#2b3036) 24%,transparent),transparent 70%),#0d1013;
+  box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--rc,#2b3036) 80%,transparent);color:var(--rc,var(--parch-2))}
+.zp-cell:hover{border-color:var(--iron-3)}
+.zp-cell[aria-current="true"]{border-color:var(--spirit);box-shadow:0 0 0 1px var(--spirit),0 6px 14px -8px var(--spirit),inset 0 -2px 0 color-mix(in srgb,var(--rc,#2b3036) 80%,transparent)}
+.zp-cell>.i{width:48%;height:48%}
+.zp-cell>img{width:80%;height:80%;object-fit:contain}
+.zp-cell>.gl{font:600 17px/1 var(--f-d);color:var(--gold)}
+.zp-cell.art>img{width:90%;height:90%}
+.zp-cell.face>img,.zp-cell.face>.rs-ph{position:absolute;inset:0;width:100%;height:100%;border-radius:0;object-fit:cover;object-position:50% 20%}
+.zp-cell.face .rs-ph b{font-size:calc(var(--zt) * .4)}
+.zp-cell.ghost>.hsg,.zp-ic.ghost>.hsg{width:100%;height:100%}
+.zp-cell.tal>.tl-t{--ts:28px}
+.zp-cell.chest>.zp-cp{width:92%}
+.zp-cell.eq>.i{width:60%;height:60%;stroke-width:1.6;color:var(--parch)}
+.zp-cell .q{position:absolute;right:3px;bottom:3px;z-index:2;font:700 11px/1 var(--f-u);color:var(--parch);text-shadow:0 1px 2px #000,0 0 4px #000;font-variant-numeric:tabular-nums}
+.zp-cell .q.full{color:var(--spirit)}
+.zp-cell .zp-k{left:3px;right:auto;bottom:3px}
+.zp-worn{position:absolute;right:2px;top:2px;z-index:2;display:grid;place-items:center;width:15px;height:15px;border-radius:50%;background:rgba(9,11,13,.82);color:var(--spirit)}
+.zp-worn .i{width:10px;height:10px}
 .zp-empty{grid-column:1/-1;display:flex;flex-direction:column;align-items:flex-start;gap:var(--sp-s);padding:6px 4px}
 
 /* плитка предмета: без рамки, редкость — нижняя кромка; крупная — в шапке карточки и в итоге открытия */
@@ -163,7 +174,7 @@ button.zp-link:hover>.i{color:var(--gold-2)}
 .zp-eff{font-size:14px;color:var(--parch)}
 .zp-chips{gap:var(--sp-s);flex-wrap:wrap}
 .zp-q .ico{vertical-align:-3px;margin-right:2px}
-.zp-rt small .i{width:11px;height:11px;margin-right:2px;vertical-align:-1px}
+.zp-ic.art>img{width:90%;height:90%}
 .zp-whos{display:flex;flex-direction:column;border-top:1px solid var(--iron)}
 .zp-who{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:var(--sp-s) var(--sp-m);align-items:center;width:100%;min-height:52px;padding:6px 2px;border:0;border-bottom:1px solid var(--iron);background:none;color:inherit;text-align:left;font:inherit;cursor:pointer}
 .zp-who:hover{background:rgba(255,255,255,.025)}
@@ -173,13 +184,15 @@ button.zp-link:hover>.i{color:var(--gold-2)}
 .zp-who .tx small{display:flex;align-items:center;gap:4px;font-size:12px;line-height:1.25;color:var(--parch-3)}
 .zp-who>.i{width:15px;height:15px;color:var(--parch-3)}
 
-/* раздел UI-кита: вкладки и плитки сундуков */
+/* раздел UI-кита: вкладки, образец сетки и плитки сундуков */
+.zp-kgrid{--zt:44px;--zg:6px}
 .zp-kit .zp-kch figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px}
 .zp-kit .zp-kch figcaption{font-size:11px;color:var(--parch-3)}
 
 /* компактный режим низких экранов (844×390 и ниже) — по высоте рабочей области */
 @container main (max-height: 360px){
-  .zp-row{min-height:32px;padding:2px 6px 2px 2px}
+  .zp-stock{--zt:38px;--zg:5px}
+  .zp-cell .q{font-size:10px;right:2px;bottom:2px}
   .zp-ic{--z:28px}
   .zp-ic.lg{--z:42px}
   .zp-card,.zp-body{gap:var(--sp-s)}

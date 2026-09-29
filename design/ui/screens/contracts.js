@@ -1,5 +1,6 @@
 /* screens/contracts.js — «Неделя → Контракты» (§18 GDD). Договор — screens/model.js.
-   Регистрирует: SCREENS.contracts — день и неделя сегментами шапки; листы OV.ctask (задание), OV.cpool (награда), OV.ccert (заверение),
+   Регистрирует: SCREENS.contracts — день и неделя сегментами шапки; раскладка — задания списком слева, сведения справа (награда,
+   заверение, главное действие; слово автора 29.09.2026); листы OV.ctask (задание), OV.cpool (награда), OV.ccert (заверение),
    OV.codds (шансы и замены), OV.ctgot (итог); действия ACT.ct*; итоги недели — в реестр WEEK_MODES (screens/week.js); раздел UI-кита
    через KIT_EXTRA; сценарии презентации. На карте экранов экран отмечен готовым — поле ready карточки «Контракты» (MAP в index.html).
    Своё состояние — S.contracts (заводится как S.bag); поля signed, tasks[].p, tasks[].goal и left читают Убежище, шахта и тик index.html.
@@ -340,7 +341,8 @@ function ctLeftChip(X) {
   const lab = X.t === 'w' ? 'до отсечки недели' : 'до конца дня';
   return `<span class="chip" title="${tmT('Срок', `Срок: ${X.t === 'w' ? 'приём закрывается за час до подсчёта недели' : 'конец серверного дня'}. Сдать позже — ничего`)}">${ic('hour')}${lab} · <span class="num">${dur(X.left)}</span></span>`;
 }
-/* карточка задания: картинка раздела, кристалл редкости, имя, цель — одно-два числа и одно действие */
+/* задание — строка списка: картинка раздела с кристаллом редкости, имя, цель — не больше двух чисел; справа одно действие.
+   Нажатие на строку — лист задания (подробности, замена и отмена) */
 function ctCard(X, x, i) {
   const K = ctK(x.kind), op = `ct${S.contracts.seq}`, d = X.st !== 'draft', done = d && ctDone(x);
   /* два числа: до подписи — цель и очки; после — сделано из цели и полоса */
@@ -357,13 +359,12 @@ function ctCard(X, x, i) {
   return `<div class="ct-card${done ? ' done' : ''}${X.st === 'failed' && !done ? ' miss' : ''}" data-r="${x.r}">
     <button class="ct-main" data-a="sheet" data-v="ctask:${X.t}:${i}" aria-label="${trEsc(`${K.n}: ${fmt(x.goal)} ${ctUnit(x.kind, x.goal)}, ${RAR[x.r].toLowerCase()}`)}">
       <span class="ct-top"><img class="ct-pic" src="${PATH(K.p)}" alt=""><span class="ct-cr" title="${RAR[x.r]}">${ICON('r' + x.r, CT_VIEW.crystal, RAR[x.r])}</span></span>
-      <b class="ct-n">${K.n}</b>
-      ${goal}
+      <span class="ct-tx"><b class="ct-n">${K.n}</b><span class="ct-gl">${goal}</span></span>
     </button>
     <div class="ct-act">${act}</div>
   </div>`;
 }
-/* шапка экрана: одна мысль — что сейчас с контрактом */
+/* шапка списка: одна мысль — что сейчас с контрактом; срок, замены или очки недели */
 function ctHead(X) {
   const C = S.contracts, n = X.tasks.length, k = X.tasks.filter(ctDone).length, next = X.t === 'w' ? 'на следующей неделе' : 'завтра';
   const R = CT.rules.rer, rr = C.rer.free > 0 ? `<span class="chip" title="Бесплатные замены на сегодня — на оба контракта">${ic('swap')}замен: ${C.rer.free}</span>`
@@ -371,7 +372,7 @@ function ctHead(X) {
   const pts = `<button class="chip ct-wk" data-a="sheet" data-v="rank:Контракты" title="Рейтинг контрактов недели">${ic('flag')}неделя · ${fmt(C.pts)} ${plural(C.pts, 'очко', 'очка', 'очков')}</button>`;
   const L = {
     draft: [`Составьте контракт · ${n} ${plural(n, 'задание', 'задания', 'заданий')}`, ctLeftChip(X) + `<span class="g-spacer"></span>${rr}<button class="link" data-a="sheet" data-v="codds:${X.t}">Шансы ${ic('chev')}</button>`],
-    signed: [`Подписан · выполнено ${k} из ${n}`, ctLeftChip(X) + (X.cert ? `<span class="chip spirit" title="Заверен: награда ×2">×${CT.rules.cert.mul}</span>` : '') + `<span class="g-spacer"></span>${pts}`],
+    signed: [`Подписан · выполнено ${k} из ${n}`, ctLeftChip(X) + `<span class="g-spacer"></span>${pts}`],
     done: ['Контракт исполнен', `<span class="chip spirit">${ic('check')}награда ждёт</span><span class="g-spacer"></span>${pts}`],
     paid: ['Награда получена', `<span class="chip">новый контракт — ${next}</span><span class="g-spacer"></span>${pts}`],
     failed: ['Контракт сорван', `<span class="chip bad">срок вышел</span><span class="chip">новый — ${next}</span><span class="g-spacer"></span>${pts}`],
@@ -379,25 +380,27 @@ function ctHead(X) {
   }[X.st];
   return `<div class="ct-head"><span class="eyebrow">${L[0]}</span>${L[1]}</div>`;
 }
-/* низ экрана: награда, заверение и одно главное действие */
-function ctFoot(X) {
-  const P = ctPool(S, X), op = `ct${S.contracts.seq}`;
-  const rew = `<button class="ct-rew" data-a="sheet" data-v="cpool:${X.t}"><span class="eyebrow">Награда${X.cert ? ' ×' + CT.rules.cert.mul : ''}</span><span class="row">${ctRewShort(P)}</span></button>`;
+/* сведения справа: награда за всё, очки, заверение и одно главное действие; строка — всё или ничего */
+function ctSide(X) {
+  const P = X.st === 'paid' && X.got ? X.got.P : ctPool(S, X), op = `ct${S.contracts.seq}`, pts = X.st === 'paid' && X.got ? X.got.pts : ctPts(X.tasks);
+  const cap = X.st === 'paid' ? 'Получено' : X.cert ? `Награда ×${CT.rules.cert.mul} · заверено` : 'Если выполнить всё';
+  const rew = `<button class="ct-rew" data-a="sheet" data-v="cpool:${X.t}" aria-label="Награда контракта: подробно"><span class="eyebrow">${cap}</span><span class="row ct-rewi">${ctRewShort(P)}</span><small class="ct-more">Вся награда ${ic('chev')}</small></button>`;
+  const stat = X.tasks.length ? `<div class="ct-ptsb"><b class="num">+${fmt(pts)}</b><small>${plural(pts, 'очко', 'очка', 'очков')} рейтинга · половина — в резервуар клана</small></div>` : '';
   let mid = '', main = '', line = '';
   if (X.st === 'draft') {
-    mid = `<button class="ct-cb${X.cert ? ' on' : ''}" data-a="sheet" data-v="ccert:${X.t}">${ic('shield')}<span><b>${X.cert ? 'Заверено' : 'Заверение'}</b><small>${X.cert ? `ставка ${fmt(X.stake)}` : 'награда ×' + CT.rules.cert.mul}</small></span></button>`;
-    main = `<button class="btn go big" data-a="ctsign" data-v="${op}:${X.t}" ${X.left > 0 ? '' : 'disabled'}>Подписать${X.cert ? costTag('gold', X.stake) : ''}</button>`;
+    mid = `<button class="ct-cb${X.cert ? ' on' : ''}" data-a="sheet" data-v="ccert:${X.t}">${ic('shield')}<span><b>${X.cert ? 'Заверено' : 'Заверение золотом'}</b><small>${X.cert ? `ставка ${fmt(X.stake)} золота` : 'награда ×' + CT.rules.cert.mul + ', очки те же'}</small></span>${ic('chev')}</button>`;
+    main = `<button class="btn go big ct-sign" data-a="ctsign" data-v="${op}:${X.t}" ${X.left > 0 ? '' : 'disabled'}>Подписать${X.cert ? costTag('gold', X.stake) : ''}</button>`;
     line = 'Прогресс пойдёт с подписи. Всё или ничего: не выполните одно задание к сроку — не будет ничего.';
   } else if (X.st === 'signed') {
     const left = X.tasks.filter(x => !ctDone(x)).length;
     line = `Всё или ничего: осталось ${left} ${plural(left, 'задание', 'задания', 'заданий')}.${X.cert ? ` Ставка ${fmt(X.stake)} золота сгорит при срыве.` : ''}`;
   } else if (X.st === 'done') {
-    main = `<button class="btn go big" data-a="ctclaim" data-v="${op}:${X.t}">${ic('check')}${X.tasks.length ? 'Получить награду' : 'Закрыть контракт'}</button>`;
+    main = `<button class="btn go big ct-sign" data-a="ctclaim" data-v="${op}:${X.t}">${ic('check')}${X.tasks.length ? 'Получить награду' : 'Закрыть контракт'}</button>`;
     line = X.tasks.length ? 'Всё исполнено в срок. Награда — в кошелёк и запасы, сундук — в запасы.' : 'Пустой контракт: наград и очков нет.';
   } else if (X.st === 'paid') line = X.tasks.length ? `Получено: ${fmt(X.got.pts)} ${plural(X.got.pts, 'очко', 'очка', 'очков')} — половина в рейтинг, половина в резервуар клана.` : 'Пустой контракт закрыт.';
   else if (X.st === 'failed') line = `Не выполнено: ${X.tasks.filter(x => !ctDone(x)).map(x => ctK(x.kind).n.toLowerCase()).join(', ')}. Наград и очков нет${X.cert ? ', ставка сгорела' : ''}.`;
   else line = X.t === 'w' ? 'Неделя подсчитывается. Новый контракт — после подсчёта.' : 'Контракт не подписан — день прошёл без него.';
-  return `<div class="pnl ct-foot">${rew}${mid}<span class="g-spacer"></span>${main}</div><p class="reason ct-line">${line}</p>`;
+  return `<div class="pnl ct-side">${rew}${X.st === 'paid' ? '' : stat}${mid}<div class="ct-go">${main}<p class="reason ct-line">${line}</p></div></div>`;
 }
 /* команде: прогресс, срок и новый период — без наблюдателя */
 function ctTeam(X) {
@@ -414,9 +417,11 @@ SCREENS.contracts = function () {
   if (!ctOpen()) return { title: 'Контракты', back: 'week', html: `<section class="scr"><div class="pnl pad ct-lock">${ic('lock')}<b class="serif">Контракты откроются на ${CT.rules.openLevel}-м уровне Странника</b><p class="reason">Вместе со вторым циклом, Эхо, кланами и рынком.</p></div></section>` };
   CT_SRV.expire();
   const X = S.contracts[key];
-  const grid = X.tasks.length ? `<div class="ct-grid scroll">${X.tasks.map((x, i) => ctCard(X, x, i)).join('')}</div>`
-    : `<div class="ct-empty pnl"><b class="serif">Пустой контракт</b><p class="reason">Подписать можно и его — наград и очков не будет. Задания вернутся ${X.t === 'w' ? 'на следующей неделе' : 'завтра'}.</p></div>`;
-  return { title: 'Контракты', back: 'week', seg, chip: '', html: `<section class="scr ct-scr">${ctHead(X)}${grid}${ctFoot(X)}${ctTeam(X)}</section>` };
+  /* слово автора 29.09.2026: «контракты списком слева и информацией справа были лучшим решением» — задания списком слева,
+     награда, заверение и главное действие — справа */
+  const list = X.tasks.length ? `<div class="ct-list scroll grow" data-keep="ctlist:${X.t}">${X.tasks.map((x, i) => ctCard(X, x, i)).join('')}</div>`
+    : `<div class="ct-empty"><b class="serif">Пустой контракт</b><p class="reason">Подписать можно и его — наград и очков не будет. Задания вернутся ${X.t === 'w' ? 'на следующей неделе' : 'завтра'}.</p></div>`;
+  return { title: 'Контракты', back: 'week', seg, chip: '', html: `<section class="scr ct-scr"><div class="ct"><div class="ct-l">${ctHead(X)}${list}</div>${ctSide(X)}</div>${ctTeam(X)}</section>` };
 };
 
 /* ================== листы ================== */
@@ -596,14 +601,14 @@ function ctKitHtml() {
   const demoX = { t: 'd', st: 'draft', tasks: [] }, mk = (kind, r, p) => ({ kind, r, goal: CT.vol.d[c][kind] ? CT.vol.d[c][kind][r - 1] || 1 : 1, p, pts: CT.rules.points[r - 1], slot: 0, n: 0 });
   const sample = [['floors', 1, 0], ['echoAtk', 4, 0], ['guard', 7, 0]].filter(([k]) => CT.vol.d[c][k]).map(([k, r]) => mk(k, r, 0));
   const cardOf = (x, st) => { const X = Object.assign({}, demoX, { st, tasks: [x] }); return ctCard(X, x, 0).replace(/data-a="[^"]*"/g, 'data-a="noop"'); };
-  const states = sample.length ? `<div class="ct-kit-cards">${cardOf(sample[0], 'draft')}${cardOf(Object.assign({}, sample[1] || sample[0], { p: Math.floor((sample[1] || sample[0]).goal / 2) }), 'signed')}${cardOf(Object.assign({}, sample[2] || sample[0], { p: (sample[2] || sample[0]).goal }), 'signed')}</div>` : '';
+  const states = sample.length ? `<div class="ct-kit-rows">${cardOf(sample[0], 'draft')}${cardOf(Object.assign({}, sample[1] || sample[0], { p: Math.floor((sample[1] || sample[0]).goal / 2) }), 'signed')}${cardOf(Object.assign({}, sample[2] || sample[0], { p: (sample[2] || sample[0]).goal }), 'signed')}</div>` : '';
   const rew = t => `<table class="p-table ct-kt"><thead><tr><th>Редкость</th><th>Ключи</th><th>Золото</th><th>Дух</th><th>Базовые</th><th>Энериум</th></tr></thead><tbody>${CT.rew[t][c].map((w, i) => `<tr><td>${rar(i + 1)}</td><td class="n">${w.keys}</td><td class="n">${fmt(w.gold)}</td><td class="n">${fmt(w.spirit)}</td><td class="n">${w.base}</td><td class="n">${w.en || '—'}</td></tr>`).join('')}</tbody></table>`;
   const kinds = Object.values(CT.groups).map(g => `<span class="chip">${g}</span>`).join('');
   return `<section class="k-box ct-kit" style="grid-column:1/-1" id="kitContracts"><h3>Контракты</h3>
     <p class="k-note">День и неделя: по одному контракту за период. Пул заданий — ${CT.rules.pool.base} по умолчанию, растёт «Доской объявлений» и Памятью. Каждое задание выпадает само по себе: редкость, потом дело; замена — рыбалка за редкостью. Подпись фиксирует состав, прогресс — с подписи, всё или ничего. Заверение золотом — награда ×${CT.rules.cert.mul}, очки те же.${TM(' §18, ADR-0028 и таблицы автора. Данные — design/ui/contracts.js, сборщик tools/content-gen/contracts/build.js, черновик docs/content/контракты.md. Экран — screens/contracts.js.')}</p>
     <div class="ct-kg">
       <div class="k-air-r"><b>Редкость — шанс и очки</b><div class="k-row ct-kit-lad">${ladder}</div><small>Выше редкость — дольше дело: неделя — от 1 до 5 дней обычной игры, день — те же седьмые доли дня. С эпической — Энериум.</small></div>
-      <div class="k-air-r"><b>Карточка задания</b>${states}<small>Картинка раздела, кристалл редкости, цель. До подписи — одно действие «Заменить»; после — полоса прогресса и «К делу». Подробности — лист.</small></div>
+      <div class="k-air-r"><b>Строка задания</b>${states}<small>Задания — списком слева, сведения — справа: награда за всё, очки, заверение, «Подписать»${TM(' — слово автора 29.09.2026')}. В строке — картинка раздела, кристалл редкости, цель; до подписи одно действие «Заменить», после — полоса прогресса и «К делу». Подробности — лист.</small></div>
     </div>
     <div class="ct-kg">
       <div class="k-air-r"><b>Награда задания · день, цикл ${ROMAN[c]}</b>${rew('d')}<small>Контракт платит суммой наград своих заданий, когда исполнены все.</small></div>

@@ -8,6 +8,10 @@
       «Правила воздуха»: над списком одна строка — поиск и «Фильтры», сами фильтры — в листе; у карточки ресурса одно действие,
       «Найденные рецепты» и «Откуда падает» — листы по нажатию, в листах — те же рецепты и источники без ссылок на ADR и §.
       Шарды рабочих: карточка ведёт «В артель» — «Ритуалы», вкладка «Рабочие», лист «Артель» (screens/rituals.js).
+   3а. Сетка (слова автора 29.09.2026): в каждой вкладке записи — клетками 6 столбцов, в клетке только значок и число, без имени;
+      пять рядов видно целиком на 932 × 430 и 844 × 390 (расчёт по CSS), шестой — прокрутка; выбор — карточка справа с именем.
+      Значки талисманов, снаряжения и осколков героев — арт screens/art-icons.js, редкость — рамкой; у талисмана и предмета —
+      переход в окно «Перековка» своим режимом и редкостью. Большие числа — коротко: «124К», «1,2М».
    4. Призывы: без обработчика — «недоступно»; с обработчиком кнопка зовёт ACTIVATE[ярус](id).
    5. Сундуки: во вкладке — только сундуки; каждый демо-сундук открывается по одному и пачкой; итог — крупно в той же карточке —
       сходится с запасами, кошельком, осколками и снаряжением; тот же сундук второй раз не открывается. Состав и шансы — лист по нажатию.
@@ -67,6 +71,7 @@ const T = vm.runInContext(`({
   get S() { return S; }, set S(v) { S = v; },
   BAG, ACT, OV, SCREENS, CRAFT_SEGS, ACTIVATE, LBX, RSI, RS, RX, KH, FLOWS, EnLoot: window.EnLoot, render, initialState,
   zpEntries, zpView, zpChestGroups, zpOpenOne, zpCard, zpSrc, darRows, darCount, lbGiftRows, ZP_DEMO, ZP_FILT, trNorm, trEsc, DAR_CLAN: window.DAR_CLAN || {},
+  zpNum, zpCell, eqIcon: typeof eqIcon === 'function' ? eqIcon : null, talIcon: typeof talIcon === 'function' ? talIcon : null, shardGhost: typeof shardGhost === 'function' ? shardGhost : null,
 })`, ctx);
 const BAD = /undefined|NaN|\[object /;
 /* служебное глазами игрока — те же слова и шаблоны, что у check_player_view.js; обход там ограничен, здесь — каждая отрисовка
@@ -142,6 +147,62 @@ for (const tab of ['res', 'rune', 'shard', 'call', 'chest', 'tal', 'eq']) {
     }
   }
   leak(game(`вкладка ${tab}`), `вкладка ${tab}`);
+}
+/* 3а. сетка: клетка — значок и число, имя — в карточке; 6 столбцов, пять рядов видно целиком, дальше прокрутка */
+reset();
+{
+  const CSS = fs.readFileSync(path.join(UI, 'screens', 'bag.css'), 'utf8').replace(/\s+/g, ' '), IH = html.replace(/\s+/g, ' ');
+  const cssVar = (src, sel, name) => { const m = src.match(new RegExp(sel.replace(/[.[\]()]/g, '\\$&') + '\\{[^}]*?' + name + ':(\\d+)px')); return m ? +m[1] : NaN; };
+  if (!/\.zp-grid\{[^}]*grid-template-columns:repeat\(6,var\(--zt\)\)/.test(CSS)) say('bag.css: сетка запасов не в шесть столбцов');
+  /* высота сетки по CSS: кадр − шапка − поля экрана − строка вкладок − зазор − рамка и поля панели − поиск − зазор */
+  const frames = [['.g', false], ['.g.sm', true]].map(([sel, sm]) => ({ sm, w: cssVar(IH, sel, 'width'), h: cssVar(IH, sel, 'height'), top: cssVar(IH, sel, '--top') }));
+  const spM = cssVar(IH, ':root', '--sp-m'), tabH = cssVar(IH, '.tabs button', 'height'), tabPad = 3, bord = 1;
+  const invGap = cssVar(IH, '.inv', 'gap'), invPad = cssVar(IH, '.inv', 'padding'), findH = cssVar(IH, '.search', 'height');
+  const zt = { false: cssVar(CSS, '.zp-stock', '--zt'), true: +((CSS.match(/@container main \(max-height: 360px\)\{[^@]*?\.zp-stock\{--zt:(\d+)px/) || [])[1]) };
+  const zg = { false: cssVar(CSS, '.zp-stock', '--zg'), true: +((CSS.match(/@container main \(max-height: 360px\)\{[^@]*?\.zp-stock\{[^}]*--zg:(\d+)px/) || [])[1]) };
+  const nums = [spM, tabH, invGap, invPad, findH, zt.false, zt.true, zg.false, zg.true].concat(...frames.map(f => [f.w, f.h, f.top]));
+  if (nums.some(x => !Number.isFinite(x))) say(`сетка запасов: не прочитаны размеры из CSS — ${JSON.stringify(nums)}`);
+  else for (const f of frames) {
+    const bar = tabH + 2 * tabPad + 2 * bord, list = f.h - f.top - 2 * spM - bar - spM - 2 * bord - 2 * invPad - findH - invGap;
+    const t = zt[f.sm], g = zg[f.sm], five = 5 * t + 4 * g, six = 6 * t + 5 * g;
+    if (five > list) say(`сетка запасов ${f.w} × ${f.h}: пять рядов (${five} px) не входят в ${list} px`);
+    if (six <= list) say(`сетка запасов ${f.w} × ${f.h}: видно шесть рядов — просили пять`);
+    if (t < 36) say(`сетка запасов ${f.w} × ${f.h}: клетка ${t} px — мельче зоны нажатия`);
+  }
+  for (const tab of ['res', 'rune', 'shard', 'call', 'chest', 'tal', 'eq']) {
+    const h = stock(tab, `сетка · ${tab}`), W = T.zpView(tab);
+    const grid = (h.match(/<div class="zp-grid[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/) || [])[1] || '';
+    const cells = (grid.match(/<button class="zp-cell[ "]/g) || []).length;
+    if (cells !== W.shown.length) say(`сетка · ${tab}: клеток ${cells}, записей ${W.shown.length}`);
+    /* в клетке только значок и число: видимый текст сетки — числа, «/», «К», «М» */
+    const txt = playerText(grid.replace(/<span class="(?:hsg-init|rs-ph|gl)"[^>]*>[\s\S]*?<\/span>/g, '')).replace(/\s+/g, ' ').trim();   // инициалы вместо лица и знак руны — значок, не имя
+    if (/[A-Za-zА-Яа-яЁё]/.test(txt.replace(/[КМ]/g, ''))) say(`сетка · ${tab}: в клетках снова слова — «${txt.slice(0, 80)}»`);
+    if (/zp-row|zp-gh/.test(h)) say(`сетка · ${tab}: остались строки или заголовки групп прежнего списка`);
+    const e = W.shown[0]; if (!e) continue;
+    run('сетка · выбор', () => T.ACT.zpsel(e.key));
+    const g = game(`сетка · ${tab} · карточка`);
+    if (!g.includes('aria-current="true"')) say(`сетка · ${tab}: выбранная клетка не отмечена`);
+    if (!g.includes('class="serif zp-name"')) say(`сетка · ${tab}: у карточки справа нет имени`);
+  }
+  /* арт значков: талисманы, снаряжение, осколки героев — если выгружен */
+  const art = [['tal', 'tal', T.talIcon], ['eq', 'equip', T.eqIcon], ['shard', 'hero', T.shardGhost]];
+  for (const [tab, kind, f] of art) {
+    const e = T.zpEntries(tab).find(x => x.kind === kind); if (!e) { say(`арт · ${tab}: в демо нет записи вида ${kind}`); continue; }
+    const cell = T.zpCell(e, false), probe = !f ? '' : kind === 'tal' ? f('fight', 40) : kind === 'equip' ? f('main', 40) : f(e.h, 1, 2, 40);
+    if (probe && !/ art"/.test(cell.match(/class="[^"]*"/)[0] + '"')) say(`арт · ${tab}: арт выгружен, а клетка без него`);
+    if (probe && kind === 'hero' && !cell.includes('class="hsg"')) say('арт · осколки: нет призрачного осколка героя');
+    if (!new RegExp(`data-r="${e.r}"`).test(cell)) say(`арт · ${tab}: у клетки нет редкости`);
+  }
+  /* переход в окно перековки из карточек талисмана и предмета */
+  for (const [tab, kind] of [['tal', 'tal'], ['eq', 'equip']]) {
+    const e = T.zpEntries(tab).find(x => x.kind === kind && x.r < 7); if (!e) continue;
+    stock(tab, `перековка · ${tab}`); T.ACT.zpsel(e.key);
+    const g = game(`перековка · ${tab} · карточка`);
+    if (T.ACT.rfgo && !g.includes(`data-a="rfgo" data-v="${tab === 'tal' ? 'tal' : 'eq'}:${e.r}"`)) say(`перековка · ${tab}: у карточки нет перехода в окно перековки`);
+    if (/data-v="(?:zptalforge|eqforge)"/.test(g)) say(`перековка · ${tab}: снова прежний лист перековки`);
+  }
+  /* большие числа — коротко */
+  for (const [n, want] of [[9999, '9'], [12345, '12К'], [1234567, '1,2М']]) { const s = T.zpNum(n); if (!s.startsWith(want)) say(`коротко: ${n} → «${s}», ждали «${want}…»`); }
 }
 /* лист «Фильтры»: значения каждой вкладки — чипы; нажатие ставит фильтр, повторное — снимает; «Сбросить» чистит всё */
 reset();

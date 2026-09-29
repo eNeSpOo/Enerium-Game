@@ -28,6 +28,9 @@
        каждым приёмом набора и обычной атакой по всем, если она у него есть.
    14. Многоликий при призыве — бросок manySummonBp сверх лестницы; «Лик недели» — likShards по циклу; биом Многоликого —
        здоровье героев переходит с этажа на этаж, главный враг полный, попытка одна.
+   15. Раунды — одна таблица ядра RULES.rounds.by на все режимы (решение автора 29.09.2026). Срок жизни: боссы, Убер и крафтовый
+       босс — час, отсчёт на карточке цели, срок вышел — цель исчезает. Осада: остаток здоровья на входе — максимум в атаке,
+       прежний — max0; лечение и доли от максимума — от нового (lifeSave, лекарь-защитник).
    Везде: без исключений, без undefined, NaN и [object. Числа проверки — не баланс.
    Запуск: node tools/content-gen/screens/check_echo_battle.js */
 'use strict';
@@ -139,6 +142,7 @@ function suite() {
   const draw = CK.draw, scan = (k, h) => CK.scan(fail, k, h), ints = (k, x) => CK.ints(fail, k, x);
   const events = b => { const ev = []; while (!b.over) { const a = EB.step(b); if (a) for (const e of a.ev) ev.push(e); } return ev; };
 
+  const GUARD_LVL = 25;   // уровень отряда в проверках стража: на нём Мастер обучения успевает ударить обычной атакой
   /* ---------- ядро: карты для проверки ---------- */
   const L = () => EB.lib();
   const kitOf = (ids, actPct, ultPct, extra) => Object.assign({ actPct, ultPct, kit: ids.map(id => ({ v: 0, slot: id.includes('.ult') ? 'ult' : id.includes('.react') ? 'react' : id.includes('.pas') ? 'pas' : 'act', id })) }, extra || {});
@@ -154,13 +158,19 @@ function suite() {
 
   /* 1. состав по типу, раунды, вход здоровья, детерминизм, итог сходится с боем */
   for (const [g, n] of [['o', 0], ['o', 3], ['e', 5], ['m', 1], ['m', 4]]) { let threw = false; try { EB.echoBattle(HEROES(), { seed: 1, g, main: MAIN(), guards: GUARDS().concat(GUARDS()).slice(0, n) }); } catch (e) { threw = true; } if (!threw) fail(`ядро: бой Эхо «${g}» собрался с ${n} защитниками`); }
-  const WANT = { o: 5, e: 8, b: 12, u: 25, m: 12 }, GW = { o: 4, e: 4, b: 4, u: 4, m: 0 };
+  /* раунды — одна таблица ядра на все режимы (решение автора 29.09.2026): RULES.rounds.by; Эхо — выборка по типу главного врага.
+     Многоликий — 10, как элита: лёгкий бой с набором элиты (решение исполнителя) */
+  const BY = { o: 5, e: 10, b: 20, rune: 25, uber: 50, many: 10, forgotten: 75, clan: 100, pvp: 25 };
+  for (const k in BY) if (RU.rounds.by[k] !== BY[k]) fail(`ядро: RULES.rounds.by.${k} = ${RU.rounds.by[k]}, по слову автора — ${BY[k]}`);
+  const WANT = { o: BY.o, e: BY.e, b: BY.b, u: BY.uber, m: BY.many, craft: BY.forgotten }, GW = { o: 4, e: 4, b: 4, u: 4, m: 0, craft: 4 };
   for (const g in WANT) { if (RU.echo.rounds[g] !== WANT[g]) fail(`ядро: RULES.echo.rounds.${g} = ${RU.echo.rounds[g]}, по заданию — ${WANT[g]}`); if (RU.echo.guards[g] !== GW[g]) fail(`ядро: RULES.echo.guards.${g} = ${RU.echo.guards[g]}, а нужно ${GW[g]}`); }
+  if (RU.rounds.rune !== BY.rune) fail(`ядро: RULES.rounds.rune = ${RU.rounds.rune}, а в таблице — ${BY.rune}`);
   for (const g of Object.keys(RU.echo.rounds)) for (let seed = 1; seed <= 12; seed++) {
     const key = `ядро · ${g} · сид ${seed}`, sp = spec(g, seed * 7919, MAIN({ hp: 40000 + seed * 1000 }), RU.echo.guards[g] ? GUARDS().map(x => Object.assign(x, { hp: 1 })) : []);
     const b0 = EB.echoBattle(HEROES(), sp), n = 1 + RU.echo.guards[g];
     if (b0.u[1].length !== n || b0.maxRounds !== RU.echo.rounds[g]) fail(`${key}: врагов ${b0.u[1].length}, раундов ${b0.maxRounds}`);
-    if (b0.u[1][0].hp !== 40000 + seed * 1000 || b0.u[1][0].maxHp !== 90000 || !b0.u[1][0].lead) fail(`${key}: здоровье главного врага не с входа`);
+    // осада (RULES.siege, решение автора 29.09.2026): остаток здоровья на входе — максимум главного врага в этой атаке, прежний — max0
+    if (b0.u[1][0].hp !== 40000 + seed * 1000 || b0.u[1][0].maxHp !== b0.u[1][0].hp || b0.u[1][0].max0 !== 90000 || !b0.u[1][0].lead) fail(`${key}: здоровье главного врага не с входа`);
     if (b0.u[1].slice(1).some(u => u.hp !== u.maxHp)) fail(`${key}: защитник не полный`);
     const b = EB.run(b0), st = EB.echoStats(b), st2 = EB.echoStats(EB.run(EB.echoBattle(HEROES(), sp)));
     out.core++;
@@ -186,7 +196,8 @@ function suite() {
     let hp = 30000, total = 0, n = 0;
     while (hp > 0 && n < 60) {
       const st = EB.echoStats(EB.run(EB.echoBattle(HEROES(), spec('u', 500 + n, MAIN({ hp }), guards()))));
-      if (st.main.hp0 !== hp || st.main.maxHp !== 90000) { fail('ядро: атака начала не с сохранённого здоровья'); break; }
+      if (st.main.hp0 !== hp || st.main.maxHp !== hp || st.main.max0 !== 90000) { fail('ядро: атака начала не с сохранённого здоровья'); break; }
+      if (st.main.hp > st.main.hp0) { fail('ядро: осада — защитник вылечил главного врага выше остатка на входе, а это его максимум в атаке'); break; }
       total += st.main.taken; hp = st.main.hp; n++;
     }
     if (total !== 30000 - hp) fail(`ядро: за цепочку атак отнято ${total}, а здоровье ушло на ${30000 - hp}`);
@@ -278,7 +289,8 @@ function suite() {
 
   /* 7. рунный страж: удар отнимает раунд (ADR-0020) */
   {
-    const hs = S.squads[0].m.filter(Boolean).map(id => EB.heroSrc(H(id)));
+    /* правило ядра, а не баланс: отряд проверки — не выше GUARD_LVL, иначе отряд прототипа с доблестью валит стража обучения раньше его хода */
+    const hs = S.squads[0].m.filter(Boolean).map(id => EB.heroSrc(Object.assign({}, H(id), { lvl: Math.min(H(id).lvl, GUARD_LVL) })));
     const b = EB.guardBattle(hs, 'b1', 'rounds'), max0 = b.maxRounds;
     if (max0 !== RU.rounds.rune) fail(`страж: предел ${max0}, а не ${RU.rounds.rune}`);
     let cut = 0;
@@ -324,13 +336,15 @@ function suite() {
     if (!bypass[0] || resist[0]) fail(`ядро: ctrlBypass — остановка легла ${bypass[0]} раз, иммунитет сработал ${resist[0]} раз`);
     if (bypass[1] || !resist[1]) fail(`ядро: без ctrlBypass остановка легла на клановый ранг ${bypass[1]} раз`);
     out.bypass = bypass[0];
-    /* lifeSave: смертельный удар оставляет 30 %, раз за жизнь цели — второй бой с сохранённым used уже не спасает */
-    const saveMain = used => MAIN({ hp: 1, maxHp: 90000, used, kit: { actPct: 0, ultPct: 0, kit: [{ v: 0, slot: 'react', id: 'Проверка.save' }] } });
+    /* lifeSave: смертельный удар оставляет 30 % — от максимума в этой атаке: остаток на входе (осада, RULES.siege), а не прежние 90 000;
+       раз за жизнь цели — второй бой с сохранённым used уже не спасает */
+    const SAVE_HP = 3000;
+    const saveMain = used => MAIN({ hp: SAVE_HP, maxHp: 90000, used, kit: { actPct: 0, ultPct: 0, kit: [{ v: 0, slot: 'react', id: 'Проверка.save' }] } });
     let saved = null;
     for (let seed = 1; seed <= 30 && !saved; seed++) {
       const b = EB.echoBattle(HEROES(), spec('u', seed, saveMain([]))), ev = events(b), sv = ev.find(e => e.k === 'survive' && e.t === b.u[1][0]);
       if (!sv) continue;
-      if (sv.hp !== Math.floor(90000 * 30 / 100)) fail(`ядро: lifeSave оставил ${sv.hp} здоровья, а не 30 %`);
+      if (sv.hp !== Math.floor(SAVE_HP * 30 / 100)) fail(`ядро: lifeSave оставил ${sv.hp} здоровья, а не 30 % остатка на входе`);
       saved = EB.echoStats(b);
       if (!saved.main.used.includes('Проверка.save')) fail('ядро: сработавшее «раз за жизнь» не попало в итог');
     }
@@ -589,6 +603,7 @@ function suite() {
     if (!/class="[^"]*\bteam-only\b[^"]*" data-a="guard" data-v="demo"/.test(h)) fail('Спуск: демо-вход к стражу — не только для команды (режим «Игрок / Команда»)');
     ACT.guard('');
     if (S.runs.length) fail('Спуск: страж впустил до победы над боссом');
+    S.heroes.forEach(x => { if (x.lvl > GUARD_LVL) x.lvl = GUARD_LVL; });   // правило, а не баланс: страж обучения должен успеть ударить
     ACT.guard('demo');
     let R = S.runs[S.runs.length - 1];
     if (!R || !R.guard || S.route !== 'battle') fail('Спуск: демо-вход не начал бой со стражем');
@@ -674,8 +689,34 @@ function suite() {
     }
   }
 
+  /* 15. срок жизни и осада (решение автора 29.09.2026): боссы, Убер и крафтовый босс живут час, рядовые и элиты — как было;
+     у цели на час — отсчёт на карточке; срок вышел — цель исчезает. Атака: остаток здоровья цели — её полное здоровье в бою,
+     прежний максимум — только в «Сведениях»; цена атаки крафтового босса — его раунды × цена раунда цикла силы */
+  {
+    const R0 = window.EN_ECHO_RULES, hour = E.data.hour;
+    CK.reset('Эльфы', 2);
+    for (const [st, h] of [[1, 72], [7, 48], [11, 1], [TOP, 1]]) { const x = E.target('step', st); if (x.left !== h * hour) fail(`срок: ступень ${st} живёт ${x.left / hour} ч, а нужно ${h}`); }
+    for (const fb of RX.drops.craftBosses) {
+      const x = E.target('craft', fb), c = x.pcyc || x.cyc;
+      if (x.left !== hour) fail(`срок: крафтовый босс ${fb.id} живёт ${x.left / hour} ч, а нужно 1`);
+      if (R0 && R0.roundSouls && E.cost(x) !== E.rounds('craft') * R0.roundSouls[Math.min(c, R0.roundSouls.length) - 1]) fail(`крафтовый босс ${fb.id}: цена атаки ${E.cost(x)} — не раунды × цена раунда`);
+    }
+    CK.reset('Эльфы', 2); S.echo.slots = [E.target('step', 11), E.target('step', 2), null, null]; S.echo.sel = 0;
+    let h = scan('Эхо · босс на час', draw());
+    if (!h.includes('ech-left')) fail('Эхо: у босса на час нет отсчёта на карточке цели');
+    S.echo.sel = 1; h = scan('Эхо · рядовой', draw());
+    if (h.includes('ech-left')) fail('Эхо: отсчёт на карточке у цели не на час');
+    S.echo.slots[0].left = 0; E.sync();
+    if (S.echo.slots[0] || !/срок цели в слоте 1 вышел/i.test(S.ech.note)) fail('Эхо: босс с вышедшим сроком не исчез');
+    /* осада на экране: вторая атака по той же цели — в бой она выходит с остатком, и он — её максимум */
+    const x = E.target('step', 11); S.echo.slots[0] = x; S.echo.sel = 0; x.hp = Math.floor(x.max / 2);
+    const F = E.fight(x, CK.ids(), 1), b = EB.echoBattle(F.heroes, F.o), m = b.u[1][0];
+    if (m.hp !== x.hp || m.maxHp !== x.hp || m.max0 !== x.max) fail(`осада: цель вышла в бой с ${m.hp} / ${m.maxHp} (прежний ${m.max0}), а на входе ${x.hp} из ${x.max}`);
+  }
+
   /* 13. девять Убер-боссов против своих отрядов недели на циклах II, IV и VI: бой идёт без мусора, Убер срабатывает всеми приёмами.
-     Здоровье Убера на входе — полное, 55 % и 3 %: так случаются и реакции на половину здоровья, и смертельный удар */
+     Здоровье Убера на входе — полное, 55 %, 3 % и 1 %: так случаются и реакции на половину здоровья, и смертельный удар. 1 % — с доблестью
+     в ядре (29.09.2026): отряд недели Нежити при 3 % всегда добивает Царя горящим, а горящего его спасение «раз за жизнь» не держит */
   {
     const X = window.EN_ECHO_FOES, lib = L();
     if (!X) fail('Уберы: echo-foes.js не подключён');
@@ -687,7 +728,7 @@ function suite() {
       for (const c of [2, 4, 6]) {
         CK.reset(w.race, c);
         const x = E.target('step', TOP);
-        for (const frac of [100, 55, 3]) for (let n = 1; n <= 6; n++) {
+        for (const frac of [100, 55, 3, 1]) for (let n = 1; n <= 6; n++) {
           const key = `Убер ${w.race} · цикл ${ROMAN[c]} · ${frac} % · ${n}`;
           try {
             const y = Object.assign({}, x, { hp: Math.max(1, Math.floor(x.max * frac / 100)), used: [] });

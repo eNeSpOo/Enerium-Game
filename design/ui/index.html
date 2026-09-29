@@ -1098,8 +1098,7 @@ button.well:hover{border-color:var(--iron-3)}
 /* Профиль */
 .pf{display:grid;grid-template-columns:250px minmax(0,1fr);gap:10px;height:100%}
 .idc{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 12px;text-align:center}
-.idc .big{width:94px;height:94px;border-radius:50%;padding:3px;background:conic-gradient(var(--gold) calc(var(--p)*1%),#2a2f35 0)}
-.idc .big img{width:100%;height:100%;border-radius:50%;object-fit:cover;background:#07090a}
+/* облик в колонке Странника — screens/social.css (.lk-*) */
 /* Память, Артефакты и Достижения — screens/wanderer.css */
 
 /* Летопись */
@@ -1229,9 +1228,7 @@ button.well:hover{border-color:var(--iron-3)}
 .rkrow{display:grid;grid-template-columns:34px 1fr auto auto;gap:10px;align-items:center;padding:7px 10px;border-radius:9px;background:#0e1114;border:1px solid var(--iron)}
 .rkrow b.serif{font-size:20px;color:var(--gold);text-align:center}
 .rkrow.me{border-color:rgba(72,229,212,.45);box-shadow:inset 0 -10px 14px -12px var(--spirit)}
-.msg{display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:10px;background:#0e1114;border:1px solid var(--iron)}
-.msg b{font-size:12.5px;color:var(--gold-2)}
-.msg span{font-size:14px}
+/* чат, почта, друзья и профиль игрока — screens/social.css */
 .newfoe{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;border:1px solid rgba(72,229,212,.45);background:radial-gradient(60% 120% at 10% 100%,rgba(72,229,212,.14),transparent 70%),#0e1114}
 .newfoe img{height:84px;width:auto;aspect-ratio:4/5;object-fit:cover;border-radius:8px;border:1px solid #262b31;box-shadow:0 6px 10px -6px #000}
 .foe-art{height:150px;width:auto;aspect-ratio:4/5;object-fit:cover;border-radius:10px;border:1px solid #262b31;box-shadow:0 8px 14px -6px #000}
@@ -1494,6 +1491,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 }
 
 </style>
+<link rel="stylesheet" href="screens/art-icons.css">
 <link rel="stylesheet" href="screens/week.css">
 <link rel="stylesheet" href="screens/arena.css">
 <link rel="stylesheet" href="screens/craft.css">
@@ -1506,11 +1504,15 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <link rel="stylesheet" href="screens/biomes.css">
 <link rel="stylesheet" href="screens/talismans.css">
 <link rel="stylesheet" href="screens/equipment.css">
+<link rel="stylesheet" href="screens/hero-dev.css">
 <link rel="stylesheet" href="screens/heroes.css">
 <link rel="stylesheet" href="screens/contracts.css">
 <link rel="stylesheet" href="screens/clan.css">
 <link rel="stylesheet" href="screens/event.css">
 <link rel="stylesheet" href="screens/rituals.css">
+<link rel="stylesheet" href="screens/reforge.css">
+<link rel="stylesheet" href="screens/chronicle.css">
+<link rel="stylesheet" href="screens/social.css">
 </head>
 <body>
 <div class="p-app">
@@ -1549,8 +1551,8 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
         <p style="margin-top:6px">Тестовая сцена по ADR-0005, ADR-0007 и ADR-0010. Враги — такие же карты, как герои, этаж — готовая колода, способности из одной библиотеки. Карты ходят по очереди по скорости, способность срабатывает по шансу, у каждого действия свой эффект. Красная рамка показывает, в кого целятся, кнопка «Знаки» объясняет индикаторы, а нажатие на карту открывает её способности, эффекты и угрозу. Биом — испытание на выносливость: здоровье и павшие переходят на следующий этаж, 10 раундов на этаж — проверка урона. Рунный страж — Мастер и его свита. Сид — сам биом. Забег можно свернуть, забегов может идти несколько.</p>
         <div class="p-ctrls" id="devSpeed" style="margin-top:10px;align-items:center"><span class="p-note">Скорость прототипа:</span><button class="p-chip" data-speed="1" aria-pressed="true">×1</button><button class="p-chip" data-speed="2" aria-pressed="false">×2</button><button class="p-chip" data-speed="4" aria-pressed="false">×4</button><button class="p-chip" data-speed="8" aria-pressed="false">×8</button></div>
         <p class="p-note" style="margin-top:6px">В игре ускорения нет: бой идёт в реальном времени сервера. Переключатель — только чтобы быстрее проверить прототип.</p>
-        <div class="p-ctrls" id="devModel" style="margin-top:12px;align-items:center"><span class="p-note">Модель боя:</span><button class="p-chip" data-model="rounds" aria-pressed="true">10 раундов</button><button class="p-chip" data-model="tempo" aria-pressed="false">Прежняя · темп</button></div>
-        <p class="p-note" style="margin-top:6px">Основная модель — «10 раундов» (ADR-0010). Карты ходят по очереди по скорости, способность срабатывает по шансу, иначе — обычная атака. Биом — испытание на выносливость, 10 раундов — проверка урона: после десятого — «Время скоротечно…», этаж не взят. Прежняя модель темпа (ADR-0007) — для справки.</p>
+        <div class="p-ctrls" id="devModel" style="margin-top:12px;align-items:center"><span class="p-note">Модель боя:</span><button class="p-chip" data-model="rounds" aria-pressed="true">Раунды</button><button class="p-chip" data-model="tempo" aria-pressed="false">Прежняя · темп</button></div>
+        <p class="p-note" style="margin-top:6px">Основная модель — раунды (ADR-0010). Карты ходят по очереди по скорости, способность срабатывает по шансу, иначе — обычная атака. Биом — испытание на выносливость, раунды — проверка урона: после последнего — «Время скоротечно…», этаж не взят. Раундов — по типу боя, одна таблица на все режимы (<code>RULES.rounds.by</code>, решение автора 29.09.2026): этаж с рядовыми — 5, с элитой — 10, с боссом — 20, рунный страж — 25. Прежняя модель темпа (ADR-0007) — для справки.</p>
         <div class="p-ctrls" style="margin-top:8px"><button class="p-chip" id="devCompare">Сравнить на отряде I</button></div>
         <div id="devCmp"></div>
       </div>
@@ -1634,6 +1636,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <script src="clan.js"></script>
 <script src="event.js"></script>
 <script src="rituals.js"></script>
+<script src="chronicle.js"></script>
 <script>
 'use strict';
 /* Все числа ниже — демонстрационные фикстуры: взяты из текущего UIKit
@@ -1641,7 +1644,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 const ASSET = window.EN_ASSET || '../enerium/assets/';
 const A = p => ASSET + p;
 const ART = n => A('art/' + n);
-const ART_V = 'cc6af8c8';   // версия выгрузки арта — её ставит tools/art-gen/export_ui.py, чтобы браузер не брал старые картинки из кэша
+const ART_V = 'c56bac8a';   // версия выгрузки арта — её ставит tools/art-gen/export_ui.py, чтобы браузер не брал старые картинки из кэша
 const AV = n => ART(n) + '?v=' + ART_V;
 /* значки атрибутов, редкостей, классов и доблести — одобрены автором 28.09.2026, выгрузка tools/art-gen/export_ui.py → assets/art/icons/:
    power, hp, patk, matk, def-phys, def-mag, eva, crit, critdmg; str, int, agi, end, spd; r1…r7 — редкости (ADR-0027);
@@ -1698,7 +1701,7 @@ const INV = {
     capByLim: [50, 150, 350, 700, 1200, 1200],   // §10.1: потолок уровня по числу пробитых пределов — 50 / 150 / 350 / 700 / 1200
     runesPerLimit: 10,                          // §10.1: предел — 10 рун своего цикла; нет в recipes.js
     valorAtLim: 5,                              // ADR-0014: доблесть — только на пятом пределе текущего круга
-    valorPct: 30,                               // §10.2: доблесть даёт +30 %
+    valorPct: window.EnBattle.RULES.valorPct,   // §10.2: доблесть даёт +30 % — число ядра (battle.js, RULES.valorPct): одно на прототип и калькуляторы
   },
   /* лавка (§14.2) — данные витрины LV_DATA в screens/shop.js */
   /* рынок (§13): цена за штуку — не ниже минимальной drops.market, комиссия — drops.market.commissionPct с выручки.
@@ -1861,6 +1864,13 @@ const attrList = u => [['hp', fmt(u.maxHp)], [u.main === 'int' ? 'matk' : 'patk'
   ['eva', pctBp(u.eva)], ['crit', pctBp(u.crit)], ['critdmg', u.critDmg + ' %']];
 /* герой отряда как карта ядра — атрибуты карточки те же, что в бою (одно ядро расчётов) */
 const heroUnit = h => { try { return EB.create({ mode: 'rounds', heroes: [EB.heroSrc(h)], foes: [], seed: 1 }).u[0][0] || null; } catch (_) { return null; } };
+/* ================== доблесть: +30 % к базовым характеристикам (§3.3, §10.2, ADR-0016) ==================
+   Каждая взятая ступень — +INV.hero.valorPct % к пяти базовым характеристикам героя, накопительно: пять ступеней — ×3,7. Целыми:
+   ⌊база × (100 + %)^доблесть / 100^доблесть⌋. Источник героя для боя и мощи собирает «сервер»: база героя и доблесть — ядро получает
+   готовые характеристики. heroSt(h) — характеристики героя сейчас: их показывают карточка, лист «Характеристики» и превью доблести */
+const valorSt = (st, v) => EB.valorSt(st, v, INV.hero.valorPct);   // правило — в ядре (battle.js, valorSt): прогоны калькуляторов считают героя так же
+const heroSt = h => valorSt(h.st, h.valor || 0);
+{ const src0 = EB.heroSrc; EB.heroSrc = h => { const s = src0(h); return s && h && h.valor ? Object.assign({}, s, { st: valorSt(s.st, h.valor) }) : s; }; }
 /* ================== Боевая мощь (§6) — одна функция на весь прототип ==================
    БМ героя = C × √(УВС × ЭЗ) по карте ядра. Слой 0 — только характеристики, К_ротации = 1; источник героя — без вещей (BM_SRC0:
    талисманы и снаряжение оборачивают EB.heroSrc позже, в своих экранах). Слой 2 — множители вещей в б. п. (BM_LAYERS): их кладут
@@ -2037,7 +2047,7 @@ function navTodo() {
 /* герои с делом: предел или доблесть можно взять сейчас — руны на руках; пробуждение — комплект осколков собран */
 function navHeroes() {
   const mine = typeof hrMine === 'function' ? hrMine() : S.heroes;
-  const grow = mine.filter(h => { const d = heroDev(h); return (d.atCap && !!d.rune && d.have >= d.need) || (d.open && h.valor < h.maxV && d.vrHave > 0); }).length;
+  const grow = typeof heroDev !== 'function' ? 0 : mine.filter(h => { const d = heroDev(h); return (d.atCap && !!d.rune && d.have >= d.need) || (d.open && h.valor < h.maxV && d.vrHave > 0); }).length;   // heroDev — screens/hero-dev.js
   const need = RS.rules ? RS.rules.stub.shards : 0;
   const wake = need ? RS.heroes.filter(h => (S.rs.shards[h.id] || 0) >= need && !rsHas(h) && h.c <= rsCyc()).length : 0;
   return { grow, wake };
@@ -2067,10 +2077,10 @@ function navItem([k, l, p], o = {}) {
   return `<button class="g-nav${lvl ? ' lock' : ''}${cur && (mv.d || mv.lit) ? ' lit' : ''}${o.cls ? ' ' + o.cls : ''}" data-k="${k}" data-a="${lvl ? 'toast' : 'go'}" data-v="${lvl ? `${l} ${why}` : k}"${cur ? ' aria-current="page"' : ''} aria-label="${name}" title="${name}">`
     + `<span class="nv"><span class="pic"><img src="${PATH(p)}" alt="">${lvl ? `<span class="lk">${ic('lock')}</span>` : ''}</span>${bdgN(n)}</span><span class="lbl" aria-hidden="true">${l}</span>${lamp}</button>`;
 }
-/* портрет Странника над шахтой — быстрый вход в «Странника»; бейдж — места Памяти, ждущие выбора */
+/* портрет Странника над шахтой — быстрый вход в «Странника»; лицо — выбранный портрет облика (screens/wanderer.js), бейдж — места Памяти, ждущие выбора */
 function avaHtml(sec, todo) {
-  const pct = Math.round(S.acc.xp / S.acc.next * 100), mem = todo.wanderer, why = trEsc(todoText(mem));
-  return `<button class="g-ava" data-k="wanderer" data-a="go" data-v="profile" aria-label="Странник, уровень ${S.acc.level}${why ? ': ' + why : ''}" title="Странник${why ? ': ' + why : ''}"${sec === 'wanderer' ? ' aria-current="page"' : ''}><span class="ring" style="--p:${pct}"><img src="${ART('wanderer.png')}" alt=""><span class="lv">${S.acc.level}</span></span>${bdgN(todoN(mem))}</button>`;
+  const pct = Math.round(S.acc.xp / S.acc.next * 100), mem = todo.wanderer, why = trEsc(todoText(mem)), face = typeof lkFaceSrc === 'function' ? lkFaceSrc() : ART('wanderer.png');
+  return `<button class="g-ava" data-k="wanderer" data-a="go" data-v="profile" aria-label="Странник, уровень ${S.acc.level}${why ? ': ' + why : ''}" title="Странник${why ? ': ' + why : ''}"${sec === 'wanderer' ? ' aria-current="page"' : ''}><span class="ring" style="--p:${pct}"><img src="${face}" alt=""><span class="lv">${S.acc.level}</span></span>${bdgN(todoN(mem))}</button>`;
 }
 const bellHtml = () => { const n = inboxN(); return `<button class="g-icon" data-a="sheet" data-v="inbox" aria-label="Входящие: ${n}" title="Входящие${n ? ': ' + n : ''}">${ic('bell')}${bdgN(n)}</button>`; };
 function topBar(m, sec = navSection(S.route, m), todo = navTodo()) {
@@ -2139,7 +2149,7 @@ function shelter() {
     <div class="sh-ui">
       <div class="sh-toprow">
         <div class="sh-acts">${acts.map(([r, p, t, s, hot]) => `<button class="sh-act ${hot ? 'hot' : ''}" data-a="go" data-v="${r}"><img src="${PATH(p)}" alt=""><span><b>${t}</b><small>${s}</small></span></button>`).join('')}</div>
-        <div class="row"><button class="btn sm" data-a="sheet" data-v="chat">${ic('chat')}Чат<span class="bdg">3</span></button><button class="btn sm" data-a="dlg" data-v="gift">Дар дня · ${S.gift.day}/30</button></div>
+        <div class="row"><button class="btn sm" data-a="sheet" data-v="chat">${ic('chat')}Чат${typeof socChatN === 'function' ? bdgN(socChatN()) : ''}</button><button class="btn sm" data-a="dlg" data-v="gift">Дар дня · ${S.gift.day}/30</button></div>
       </div>
       <div class="sh-bottom">
         <div class="pnl flat next fit">
@@ -2323,7 +2333,7 @@ function legendHtml(mode) {
     <span class="ex">${si('heal', 2, 70, 'good', '')}${si('shield', '', 100, 'good', '')}</span><span>Слева — полезные: лечение, щит, баффы.</span>
     <span class="ex">${si('flame', 3, 60, 'bad', '', 'var(--fire)')}${si('down', 2, 40, 'bad', '')}</span><span>Справа — вредные: урон со временем, дебаффы.</span>
     <span class="ex">${si('hour', 2, 45, 'bad', '')}</span><span>Кольцо тает — столько ${word} осталось.</span>`;
-  if (mode === 'rounds') return `<span class="h">Карта · 10 раундов</span>
+  if (mode === 'rounds') return `<span class="h">Карта · раунды</span>
     <span class="ex"><span class="rot"><span class="ch" style="--sc:var(--earth)">${ic('target')}<b>20</b></span><span class="ch on" style="--sc:var(--earth)">${ic('crack')}<b>20</b></span><span class="ch u" style="--sc:var(--gold)">${ic('crown')}<b>8</b></span></span></span><span>Шанс способности в свой ход, %. Сработавшая светится.</span>
     <span class="ex"><span class="bt-queue static"><i class="done"></i><i class="now"></i><i class="f"></i><i></i></span></span><span>Очередь раунда: золото — ходит, бледные — сходили.</span>
     <span class="ex">${ic('hour')}<b class="num">3 / 10</b></span><span>Раунд. После последнего — «Время скоротечно…»: этаж не взят.</span>
@@ -2440,6 +2450,10 @@ const rsTiers = sum => { const t = RS.rules.tierBySum.find(([lo]) => sum >= lo);
 const rsDonatPrice = h => RS.rules.stub.donatPrice[h.place - 1];
 const rsShardPrice = h => RS.rules.dust[h.r - 1][1] * h.c;   // §15.3: цена осколка в прахе × номер цикла героя
 const rsDustOf = h => RS.rules.dust[h.r - 1][0] * h.c;       // §15.3: прах за повторный осколок × номер цикла героя
+/* каталог праха продаёт осколки только героев из RS.rules.dustSrc (слово автора 29.09.2026): героев Эхо прахом не собрать — только
+   осколки из сундуков Эхо, пробуждение — за души. Правило проверяет и «сервер» (ACT.dustbuy), и все кнопки «Осколок» */
+const rsDustable = h => !!h && !!RS.rules && (RS.rules.dustSrc || []).includes(h.src);
+const RS_NODUST = 'Героев Эхо прахом не собрать: их осколки — только из сундуков Эхо';
 const rsPool = () => RS.heroes.filter(h => h.src === 'roulette' && h.c === rsCyc());   // §15.1: пул прокрутки привязан к циклу; прошлые циклы — в каталоге праха
 const rsWeek = () => RS.weeks.find(w => w.gen.toLowerCase() === String(S.week.race).toLowerCase()) || RS.weeks[0];
 const rsChTitle = (h, i) => h.ch && h.ch[i] ? h.ch[i][0] : h.chT[i];
@@ -2453,7 +2467,8 @@ function rsAdd(h, how) { S.rs.owned[h.id] = { lvl: 0, lim: 0, valor: 0, how }; }
 /* портреты героев состава — выгрузка tools/art-gen/export_ui.py в assets/art/heroes/<id>.jpg (ui-art.json); сет 1 рисуют герои отряда (rsOld).
    28.09.2026: десять героев рулетки цикла II и десять героев каталога золота цикла I после сета 1; 29.09.2026 — ещё пятеро каталога цикла I */
 const RS_ART = new Set(['c1-06', 'c1-07', 'c1-08', 'c1-09', 'c1-10', 'c1-11', 'c1-12', 'c1-13', 'c1-14', 'c1-15', 'c1-16', 'c1-17', 'c1-19', 'c1-21', 'c1-22',
-  'c2-41', 'c2-42', 'c2-43', 'c2-44', 'c2-45', 'c2-46', 'c2-66', 'c2-67', 'c2-68', 'c2-69']);
+  'c2-41', 'c2-42', 'c2-43', 'c2-44', 'c2-45', 'c2-46', 'c2-66', 'c2-67', 'c2-68', 'c2-69',
+  'c2-59', 'c2-60', 'c2-61', 'c2-62', 'c2-63', 'c3-59', 'c3-60', 'c3-61', 'c3-62', 'c3-63']);   // + Безликие донатных сетов II и III, 29.09
 function rsFace(h) {
   const o = rsOld(h);
   if (o) return `<img src="${o.img}" alt="">`;
@@ -2548,51 +2563,18 @@ function rsSetHtml(h, v, o = {}) {
   return out.join('');
 }
 /* карточка героя: шапка (heroHead, rsHead), карточка героя состава (rsDetail) и коллекция — screens/heroes.js */
-/* развитие героя на запасах (§10, ADR-0014): предел — INV.hero.runesPerLimit рун своего предела цикла героя;
-   доблесть — одна руна доблести цикла героя и только на пятом пределе; руну собирают из осколков в мастерской (рецепт — recipes.js) */
-function heroDev(h) {
-  const D = INV.hero, top = D.capByLim.length - 1, c = h.cycle;
-  const rune = h.lim < top ? limitRune(c, h.lim + 1) : null;
-  const vr = cycItems('valor', c)[0] || null, vs = cycItems('vshard', c)[0] || null;
-  const rec = vr ? (RX_OUT[vr.id] || []).find(r => !r.team) || null : null, part = rec && vs ? rec.in.find(([id]) => id === vs.id) : null;
-  return { top, atCap: h.lvl >= h.cap, rune, have: rune ? BAG.qty(rune.id) : 0, need: D.runesPerLimit,
-    vr, vrHave: vr ? BAG.qty(vr.id) : 0, vs, vsHave: vs ? BAG.qty(vs.id) : 0, vsNeed: part ? part[1] : 0, rec, open: h.lim >= D.valorAtLim };
-}
-const hdIt = (it, txt) => it ? `<button class="hd-it" data-a="item" data-v="${it.id}" title="${trEsc(itName(it))}">${txt}</button>` : txt;
-/* пять характеристик значками: число и степень роста; что даёт характеристика — в подсказке и в листе «Атрибуты».
-   Прибавка снаряжения (eqStatAdd, screens/equipment.js) — уже в числе, число светится; разбивка — в подсказке */
-const statStrip = h => { const add = typeof eqStatAdd === 'function' ? eqStatAdd(h) : null; return `<div class="st5">${h.st.map((v, i) => { const x = add ? add[i] : 0; return `<div class="s5${x ? ' eqd' : ''}" title="${STATS[i]}: ${STAT_HINT[i]} · рост ${GRADE[h.gr[i]]} за уровень${x ? ` · ${v} и снаряжение +${x}` : ''}">${ICON(STAT_IC[i], 24, STATS[i])}<b class="num">${v + x}</b><span class="grade">${[1, 2, 3].map(g => `<i class="${4 - h.gr[i] >= g ? 'on' : ''}"></i>`).join('')}</span></div>`; }).join('')}</div>`; };
+/* развитие героя — screens/hero-dev.js: heroDev (что нужно для предела и доблести), вкладка «Развитие» (hdPower), листы предела
+   и доблести, анимации, окно снаряжения и низ вкладки «Снаряжение» (hdGearFoot). Здесь — характеристики строкой и сама карточка */
+/* пять характеристик значками: число и степень роста; что даёт характеристика — в подсказке и в листе «Атрибуты». Число — с доблестью
+   (heroSt) и прибавкой снаряжения (eqStatAdd, screens/equipment.js): такое число светится, разбивка — в подсказке */
+const statStrip = h => { const add = typeof eqStatAdd === 'function' ? eqStatAdd(h) : null; return `<div class="st5">${heroSt(h).map((v, i) => { const x = add ? add[i] : 0; return `<div class="s5${x ? ' eqd' : ''}" title="${STATS[i]}: ${STAT_HINT[i]} · рост ${GRADE[h.gr[i]]} за уровень${x ? ` · ${v} и снаряжение +${x}` : ''}">${ICON(STAT_IC[i], 24, STATS[i])}<b class="num">${v + x}</b><span class="grade">${[1, 2, 3].map(g => `<i class="${4 - h.gr[i] >= g ? 'on' : ''}"></i>`).join('')}</span></div>`; }).join('')}</div>`; };
 function heroDetail(h) {
   const t = S.seg.hero;
   let body = '';
   if (t === 'power') {
-    const atCap = h.lvl >= h.cap, maxV = h.valor >= h.maxV;
-    const q = Math.min(S.qty === 'max' ? h.cap - h.lvl : S.qty, h.cap - h.lvl);
-    const cost = q > 0 ? lvlCost(h.lvl, q) : 0;
-    const d = heroDev(h), limDone = h.lim >= d.top, canLim = d.atCap && !!d.rune && d.have >= d.need;
-    body = `<div class="hd-cols">
-      <div class="col hd-st">
-        ${statStrip(h)}
-        <button class="link" data-a="sheet" data-v="hattr:${h.id}">${ic('info')}Атрибуты</button>
-        ${typeof eqRow === 'function' ? eqRow(h) : ''}
-        ${typeof talRow === 'function' ? talRow(h) : ''}
-      </div>
-      <div class="ladder">
-        <div class="step ${!atCap ? 'now' : 'done'}"><span class="ic">${ic('up')}</span>
-          <div style="min-width:0"><b>Уровень <span class="num">${h.lvl}</span> / ${h.cap}</b>${bar(h.lvl / h.cap * 100)}</div>
-          ${atCap ? '<span class="chip gold">предел</span>' : `<span></span><div class="step-act"><div class="qty" role="group" aria-label="Сколько уровней">${[[1, '+1'], [5, '+5'], ['max', 'Макс']].map(([v, l]) => `<button aria-pressed="${S.qty === v}" data-a="qty" data-v="${v}">${l}</button>`).join('')}</div><button class="btn go sm" data-a="lvlup" ${cost > S.wallet.spirit ? 'disabled' : ''}>Поднять${costTag('spirit', cost)}</button></div>`}
-        </div>
-        <div class="step ${limDone ? 'done' : atCap ? 'now' : ''}"><span class="ic">${ic('gem')}</span>
-          <div style="min-width:0"><b>Предел <span class="limits" style="margin-left:4px">${limits(h.lim)}</span></b><small>${limDone ? 'все пределы пройдены' : `${hdIt(d.rune, 'руны предела ' + (d.rune ? d.rune.glyph : ''))} цикла ${ROMAN[h.cycle]}: ${fmt(d.have)} из ${d.need}${atCap ? '' : ' · с уровня ' + h.cap}`}</small></div>
-          ${limDone ? '<span class="chip gold">пройдено</span>' : `<button class="btn sm ${canLim ? 'go' : ''}" data-a="limit" ${canLim ? '' : 'disabled'}>Пробить</button>`}
-        </div>
-        <div class="step ${maxV ? 'done' : d.open && d.vrHave ? 'now' : ''}"><span class="ic">${ICON('valor', 18)}</span>
-          <div style="min-width:0"><b>Доблесть ${h.valor} / ${h.maxV}</b><small>${maxV ? 'личный максимум достигнут' : `${hdIt(d.vr, 'руна')} ${fmt(d.vrHave)} · ${hdIt(d.vs, 'осколки')} ${fmt(d.vsHave)} из ${d.vsNeed}${d.open ? '' : ' · с предела ' + ROMAN[INV.hero.valorAtLim]}`}</small></div>
-          ${maxV ? '<span class="chip gold">максимум</span>' : d.vrHave ? `<button class="btn sm ${d.open ? 'go' : ''}" data-a="valor" ${d.open ? '' : 'disabled'}>Взять</button>`
-            : d.rec && d.vsNeed && d.vsHave >= d.vsNeed ? `<button class="btn sm" data-a="valorcraft" data-v="${d.rec.id}">Собрать руну</button>` : `<button class="btn sm" data-a="item" data-v="${d.vs ? d.vs.id : ''}">Где взять</button>`}
-        </div>
-      </div>
-    </div>`;
+    body = typeof hdPower === 'function' ? hdPower(h) : '<p class="faint">Экран развития не подключён: рядом с index.html должен лежать screens/hero-dev.js.</p>';
+  } else if (t === 'gear') {   // места снаряжения и талисманов, низ — «Надеть лучшее» или окно снаряжения (screens/hero-dev.js)
+    body = `<div class="hd-gear">${typeof eqRow === 'function' ? eqRow(h) : ''}${typeof talRow === 'function' ? talRow(h) : ''}${typeof hdGearFoot === 'function' ? hdGearFoot(h) : ''}</div>`;
   } else if (t === 'skills' && heroKit(h)) {
     body = heroKitHtml(h);
   } else if (t === 'skills') {
@@ -2621,7 +2603,7 @@ function heroDetail(h) {
   }
   return `<div class="pnl hd">${heroHead(h)}
     <div class="hd-body">
-      <div class="tabs" role="tablist" aria-label="Разделы героя">${[['power', 'Сила'], ['skills', 'Навыки'], ['path', 'Путь']].map(([k, l]) => `<button role="tab" aria-selected="${t === k}" data-a="seg" data-v="hero:${k}">${l}</button>`).join('')}</div>
+      <div class="tabs" role="tablist" aria-label="Разделы героя">${[['power', 'Развитие'], ['gear', 'Снаряжение'], ['skills', 'Навыки'], ['path', 'Путь']].map(([k, l]) => `<button role="tab" aria-selected="${t === k}" data-a="seg" data-v="hero:${k}">${l}${k === 'gear' && typeof hdGearDot === 'function' && hdGearDot(h) ? '<i class="tdot" title="В запасах есть лучше"></i>' : ''}</button>`).join('')}</div>
       ${body}
     </div></div>`;
 }
@@ -2905,40 +2887,23 @@ const weekChip = () => `<span class="chip" style="margin-left:6px">${ic('hour')}
 
 /* «Событие недели» — свой экран screens/event.js: очки, три слоя наград, где брать очки; личные планки — evPlanks там же */
 
-/* ================== Странник ================== */
-function profileView() {
-  const t = S.seg.profile, pct = Math.round(S.acc.xp / S.acc.next * 100);
-  const meta = { title: 'Странник', seg: { key: 'profile', items: [['over', 'Обзор'], ['mem', 'Память', S.mem.slots[0].st === 'open' ? '!' : ''], ['arts', 'Артефакты'], ['ach', 'Достижения']] } };
-  const top5 = [...(typeof hrMine === 'function' ? hrMine() : S.heroes)].sort((a, b) => b.bm - a.bm).slice(0, 5);   // все герои аккаунта, мощь — BM.hero
-  const id = `<div class="pnl idc"><div class="big" style="--p:${pct}"><img src="${ART('wanderer.png')}" alt=""></div><h2 class="serif" style="font-size:26px">Странник</h2>
-    <div class="row" style="gap:6px"><span class="chip gold">уровень ${S.acc.level}</span><span class="chip">цикл ${ROMAN[S.acc.cycle]}</span></div>
-    <button class="lvlbtn" data-a="sheet" data-v="level"><span class="row" style="justify-content:space-between;width:100%"><span class="faint" style="font-size:12px">опыт</span><span class="num" style="font-size:12px">${fmt(S.acc.xp)} / ${fmt(S.acc.next)}</span></span>${bar(pct)}</button>
-    <button class="link" data-a="go" data-v="clan">${ic('shield')}${S.clan.n}</button>
-    <div class="row" style="gap:6px;margin-top:auto"><button class="iconbtn" data-a="toast" data-v="Облик: портрет и рамка" aria-label="Облик">${ic('eye')}</button><button class="iconbtn" data-a="toast" data-v="Друзья: 12" aria-label="Друзья">${ic('users')}</button><button class="iconbtn" data-a="dlg" data-v="settings" aria-label="Настройки">${ic('gear')}</button><button class="iconbtn" data-a="go" data-v="chronicle" aria-label="Летопись">${ic('book')}</button></div></div>`;
-  let body = '';
-  if (t === 'over') body = `<div class="col" style="min-height:0">
-      <div class="pnl pad col" style="gap:8px"><div class="row"><h2 class="serif gold" style="font-size:20px">Пятёрка сильнейших</h2><span class="g-spacer"></span><b class="bm sq-bm" title="Сумма боевой мощи пятёрки">${ICON('power', 20, 'Боевая мощь')}<span class="num">${fmt(BM.squad(top5.map(h => h.id)))}</span></b></div>
-        <div class="sq-slots">${top5.map(h => heroCard(h, { act: 'hero-open' })).join('')}</div></div>
-      <div class="pnl pad col grow" style="gap:6px;min-height:0"><div class="row"><h2 class="serif gold" style="font-size:20px">Рейтинги недели</h2><span class="g-spacer"></span><span class="faint" style="font-size:12px">текущий период</span></div>
-        <div class="ranks">${S.ranks.map(([n, p, s]) => `<button class="rk" data-a="sheet" data-v="rank:${n}" ${p ? '' : 'disabled'}><span>${n}</span><b class="num">${p ? '#' + p : '—'}</b><small>${s}</small></button>`).join('')}</div></div>
-    </div>`;
-  /* вкладки «Память», «Артефакты» и «Достижения» рисует screens/wanderer.js — он перехватывает SCREENS.profile, «Обзор» берёт отсюда */
-  return { ...meta, html: `<section class="scr"><div class="pf">${id}${body}</div></section>` };
-}
+/* ================== Странник ==================
+   Экран «Странник» целиком — screens/wanderer.js: «Обзор» с обликом (рамка, портрет, частицы, имя — лист «Облик»), Память, Артефакты,
+   Достижения. Профиль другого игрока, друзья, почта и чат — screens/social.js */
 
-/* ================== Летопись ================== */
+/* ================== Летопись ==================
+   Книгу рисует screens/chronicle.js: вкладка «Летопись» у Странника — главы лора, механики и бестиарий в одной книге (§28.3),
+   маршрут chronicle ведёт туда же. Отсюда — только бестиарий: страницы pages и счёт count для оглавления книги */
 function chronicleView() {
   const L = S.lore, f = F(L.foe) || S.foes[0], k = known(f.id);
   /* бестиарий по биомам: открытые биомы «Спуска», закрытый — только команде */
   const open = S.biomes.filter(b => BIOME_UI[b.id] && (b.state !== 'lock' || KH.team)), seen = open.flatMap(b => bioFoes(b.id));
-  const sec = [['best', 'Бестиарий', `${seen.filter(x => known(x.id)).length}/${seen.length}`], ['world', 'Мир', '3'], ['mech', 'Механики', '12'], ['self', 'История Странника', '1']];
-  let pages;
-  if (L.sec === 'best') pages = `<div class="page">${open.map(b => `<span class="eyebrow">${b.name} · цикл ${ROMAN[b.cyc]}</span><div class="bgrid">${bioFoes(b.id).map(x => `<button class="fig ${known(x.id) ? '' : 'unk'}" data-a="lorefoe" data-v="${x.id}" aria-current="${x.id === f.id}" title="${known(x.id) ? x.name : 'Не изучен'}"><img src="${FA(x)}" alt="" style="object-position:${FPOS(x)}">${known(x.id) ? '' : '<span class="qm">?</span>'}</button>`).join('')}</div>`).join('')}
+  const count = `${seen.filter(x => known(x.id)).length}/${seen.length}`;
+  const pages = `<div class="page">${open.map(b => `<span class="eyebrow">${b.name} · цикл ${ROMAN[b.cyc]}</span><div class="bgrid">${bioFoes(b.id).map(x => `<button class="fig ${known(x.id) ? '' : 'unk'}" data-a="lorefoe" data-v="${x.id}" aria-current="${x.id === f.id}" title="${known(x.id) ? x.name : 'Не изучен'}"><img src="${FA(x)}" alt="" style="object-position:${FPOS(x)}">${known(x.id) ? '' : '<span class="qm">?</span>'}</button>`).join('')}</div>`).join('')}
       <p class="reason">Знание одного противника действует во всех режимах: биомах, Эхо и у Кланового босса.</p></div>
     <div class="page">${k ? `<div class="row" style="gap:12px;align-items:flex-start"><img class="foe-art" src="${FA(f)}" alt="" style="object-position:${FPOS(f)}"><div class="col" style="gap:6px"><span class="eyebrow">${f.type} · ${f.tag}</span><h2 class="serif" style="font-size:26px">${f.name}</h2><div class="row" style="gap:6px;flex-wrap:wrap">${el(f.el)}<span class="hd-cls">${CLS(f.cls, 18)}${f.cls}</span><span class="faint">${f.race}</span></div><p class="muted" style="font-size:14px">${f.desc}</p></div></div>${f.tip ? `<p class="quote"><b>Совет старика</b>${f.tip}</p>` : ''}` : `<div class="col" style="align-items:center;text-align:center;gap:8px;justify-content:center;flex:1"><div class="fig unk" style="height:150px"><img src="${FA(f)}" alt="" style="object-position:${FPOS(f)}"><span class="qm">?</span></div><h2 class="serif" style="font-size:24px">Неизвестный противник</h2><p class="row faint" style="gap:12px;justify-content:center">${f.type}${bmHtml(f.bm, 16)}${icoNum('hp', fmt(f.hp), 'Здоровье')}${el(f.el)}</p><p class="reason">Запись откроет первая подтверждённая победа.</p></div>`}</div>`;
-  else pages = `<div class="page"><span class="eyebrow">${sec.find(s => s[0] === L.sec)[1]}</span><h2 class="serif" style="font-size:26px">${L.sec === 'world' ? 'Пролом богов' : L.sec === 'mech' ? 'Шесть циклов' : 'Обрывки'}</h2><p class="muted">${L.sec === 'world' ? 'Эндалор парит над проломом. Под городом — портал в шахту и спуск, который зовут экзаменом богов.' : L.sec === 'mech' ? 'Спуск разбит на шесть циклов по два биома. Новый цикл открывает биомы, героев, рецепты и место Памяти.' : 'Память о пещере возвращается кусками, как сон. Остальное откроется по мере пути.'}</p><p class="reason">Статьи открываются по мере прохождения${TM(' и не раскрывают будущий сюжет')}.</p></div><div class="page"><div class="col" style="flex:1;justify-content:center;align-items:center;text-align:center;gap:6px"><span class="faint">${ic('lock')}</span><p class="faint">Следующая запись закрыта</p></div></div>`;
-  return { title: 'Летопись', html: `<section class="scr"><div class="ch">
-    <div class="pnl toc">${sec.map(([k2, n, c]) => `<button aria-current="${L.sec === k2}" data-a="lore" data-v="${k2}"><span>${n}</span><span class="faint num" style="font-size:12px">${c}</span></button>`).join('')}</div>
+  return { title: 'Летопись', pages, count, html: `<section class="scr"><div class="ch">
+    <div class="pnl toc"><button aria-current="true" data-a="lore" data-v="best"><span>Бестиарий</span><span class="faint num" style="font-size:12px">${count}</span></button></div>
     <div class="pnl book">${pages}</div>
   </div></section>` };
 }
@@ -2952,11 +2917,12 @@ function storeView() {
   else if (t === 'pass') body = `<div class="pnl pad col" style="gap:8px"><div class="row"><h2 class="serif gold" style="font-size:22px">Осенний путь</h2><span class="chip">620 очков</span><span class="g-spacer"></span><button class="btn go sm" data-a="toast" data-v="${tmT('Платный ряд пока недоступен', 'Платный ряд: демо')}">Открыть платный ряд</button></div>
       <div class="ms">${[0, 100, 250, 500, 800, 1200].map((m, i) => `<div class="m ${620 >= m ? 'got' : ''}">${well({ n: 'Награда', img: i % 2 ? ART('spirit.png') : ART('gold.png'), r: i < 3 ? 2 : 4 }, { act: 'noop', size: 44 })}<small class="num">${m}</small></div>`).join('')}</div><div class="track" style="--v:62"><i></i></div>
       <p class="reason">Очки пропуска даёт только активность — купить прогресс нельзя.</p></div>`;
-  else body = `<div class="rcards grow" style="grid-template-columns:repeat(4,minmax(0,1fr))">${['Рамка «Пепел»', 'Портрет героя', 'Рамка «Карст»', 'Шрифт имени'].map((n, i) => `<div class="rcard" data-r="${i + 2}"><b>${n}</b><small class="faint">${i === 1 ? 'из полученных героев' : 'за достижения'}</small><button class="btn sm" style="margin-top:auto" data-a="toast" data-v="${tmT('Облик пока недоступен', 'Облик: демо')}">${i === 1 ? 'Выбрать' : 'Условие'}</button></div>`).join('')}</div>`;
+  /* облик — знак отличия, а не товар (§32): рамки и частицы зарабатываются, лист «Облик» — в «Страннике» (screens/wanderer.js) */
+  else body = `<div class="pnl pad col" style="gap:8px;align-items:flex-start;max-width:540px"><h2 class="serif gold" style="font-size:22px">Облик не продаётся</h2><p class="muted">Рамки и частицы за рамкой дают достижения, Арена, клан, пропуск и первенства. Портрет — ваш герой. Первая смена имени — бесплатно.</p><button class="btn go" data-a="sheet" data-v="look">${ic('eye')}Открыть облик</button></div>`;
   return { ...meta, html: `<section class="scr">${body}</section>` };
 }
 
-const SCREENS = { shelter, descent, battle, craft: craftView,week: () => ({ title: 'Неделя', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран недели не подключён.</p></div></section>' }), echo: () => ({ title: 'Эхо', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран Эхо не подключён.</p></div></section>' }), contracts: () => ({ title: 'Контракты', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран контрактов не подключён.</p></div></section>' }), rituals: () => ({ title: 'Ритуалы', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран ритуалов не подключён.</p></div></section>' }), arena: () => ({ title: 'Арена', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран Арены не подключён.</p></div></section>' }), clan: () => ({ title: 'Клан', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран клана не подключён.</p></div></section>' }), event: () => ({ title: 'Событие недели', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран События не подключён.</p></div></section>' }), profile: profileView, chronicle: chronicleView, store: storeView };
+const SCREENS = { shelter, descent, battle, craft: craftView,week: () => ({ title: 'Неделя', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран недели не подключён.</p></div></section>' }), echo: () => ({ title: 'Эхо', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран Эхо не подключён.</p></div></section>' }), contracts: () => ({ title: 'Контракты', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран контрактов не подключён.</p></div></section>' }), rituals: () => ({ title: 'Ритуалы', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран ритуалов не подключён.</p></div></section>' }), arena: () => ({ title: 'Арена', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран Арены не подключён.</p></div></section>' }), clan: () => ({ title: 'Клан', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран клана не подключён.</p></div></section>' }), event: () => ({ title: 'Событие недели', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран События не подключён.</p></div></section>' }), profile: () => ({ title: 'Странник', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран Странника не подключён.</p></div></section>' }), chronicle: chronicleView, store: storeView };
 
 /* ================== занятость ==================
    забег; ритуал героев — rtBusyNote (screens/rituals.js): участники заняты до конца таймера, Арена и Лига их всё равно берут */
@@ -2987,16 +2953,7 @@ function itemActs(id) {
   else if (has && typeof ACT.toCraft === 'function') acts.push(`<button class="btn go" data-a="toCraft" data-v="${id}">На стол мастера</button>`);
   return acts.join('');
 }
-/* письмо Входящих: награда — валюта, предметы и сундуки; у письма о готовом ритуале — награда ритуала */
-const mailRit = m => m.rit ? S.rituals.slots.find(s => s.uid === m.rit && s.st === 'ready') || null : null;
-const mailHas = m => !!((m.rew && m.rew.length) || (m.chests && m.chests.length) || mailRit(m));
-function mailRewHtml(m) {
-  const r = mailRit(m), out = [];
-  if (r) out.push(ritRewHtml(r, r.kind, 'noop'));
-  for (const [id, n] of m.rew || []) out.push(CUR[id] ? money(id, n) : BAG.item(id) ? `<span class="row">${itWell(id, { act: 'noop', size: 26 })}<b class="num">×${fmt(n)}</b></span>` : '');
-  for (const sp of m.chests || []) out.push(`<span class="row"><span class="well" data-r="${sp.r}" style="--s:26px"><img src="${CHEST}" alt=""></span><small>${LBX && LBX.boxes[sp.box] ? lbBoxName(sp.box, sp.r, sp.win) : 'Сундук'}</small></span>`);
-  return out.join('');
-}
+/* письма Входящих (mailRit, mailHas, mailRewHtml), почта, чат и профиль игрока — screens/social.js */
 
 /* ================== слои поверх ================== */
 function sheet(title, body, foot = '', wide = false) {
@@ -3019,7 +2976,7 @@ const OV = {
   hattr(o) {
     const h = H(o.arg); if (!h) return '';
     const u = heroUnit(h), add = typeof eqStatAdd === 'function' ? eqStatAdd(h) : null;   // прибавка снаряжения — рядом с числом (screens/equipment.js)
-    const st = h.st.map((v, i) => `<div class="srow" title="Рост ${GRADE[h.gr[i]]} за уровень"><span class="n">${ICON(STAT_IC[i], 20, STATS[i])}${STATS[i]}<small class="faint">${STAT_HINT[i]}</small></span><span class="v">${v}${add && add[i] ? `<small class="eqd" title="Снаряжение">+${add[i]}</small>` : ''}</span><span class="grade">${[1, 2, 3].map(g => `<i class="${4 - h.gr[i] >= g ? 'on' : ''}"></i>`).join('')}</span></div>`).join('');
+    const st = heroSt(h).map((v, i) => `<div class="srow" title="Рост ${GRADE[h.gr[i]]} за уровень"><span class="n">${ICON(STAT_IC[i], 20, STATS[i])}${STATS[i]}<small class="faint">${STAT_HINT[i]}</small></span><span class="v">${v}${add && add[i] ? `<small class="eqd" title="Снаряжение">+${add[i]}</small>` : ''}</span><span class="grade">${[1, 2, 3].map(g => `<i class="${4 - h.gr[i] >= g ? 'on' : ''}"></i>`).join('')}</span></div>`).join('');
     const at = u ? `<span class="eyebrow">Атрибуты · уровень ${h.lvl}</span><div class="at-grid">${attrList(u).map(([k, x]) => `<div class="at">${ICON(k, 22, ATTR_T[k])}<span class="col"><b class="num">${x}</b><small>${ATTR_T[k]}</small></span></div>`).join('')}</div>` : '';
     return sheet(h.name, `${heroHead(h)}<span class="eyebrow">Характеристики</span><div class="stats">${st}</div>${at}<p class="reason">Столбики — степень роста: чем их больше, тем быстрее характеристика растёт с уровнем.</p>`);
   },
@@ -3040,15 +2997,7 @@ const OV = {
   },
   /* сведения о предмете запасов: из лавки, рынка, ритуалов, развития героя */
   item(o) { return sheet('Сведения', itemCard(o.arg), itemActs(o.arg)); },
-  inbox() {
-    const g = k => S.inbox.filter(m => m.k === k);
-    const row = m => { const rew = mailRewHtml(m), has = mailHas(m); return `<div class="mail"><div class="col" style="gap:2px;min-width:0"><b>${m.t}</b><small class="faint">${m.s}</small>${rew ? `<span class="rw" style="margin-top:4px">${rew}</span>` : ''}</div>${has ? `<button class="btn sm go" data-a="claim" data-v="${m.id}">Забрать</button>` : m.go ? `<button class="btn sm" data-a="claimgo" data-v="${m.id}">Открыть</button>` : `<button class="btn sm ghost" data-a="claim" data-v="${m.id}">Прочитано</button>`}</div>`; };
-    const body = `${g('away').length ? `<span class="eyebrow">Пока вас не было</span>${g('away').map(row).join('')}` : ''}
-      ${g('mail').length ? `<span class="eyebrow">Почта</span>${g('mail').map(row).join('')}` : ''}
-      ${!S.inbox.length ? '<p class="faint">Пусто. Всё забрано.</p>' : ''}
-      <span class="eyebrow">Дар дня</span><button class="mail" data-a="dlg" data-v="gift" style="text-align:left;width:100%;color:var(--parch)"><div class="col" style="gap:2px"><b>День ${S.gift.day} из 30</b><small class="faint">главный дар — на двадцатый день</small></div><span class="chip ${S.gift.got < S.gift.day ? 'spirit' : ''}">${S.gift.got < S.gift.day ? 'можно забрать' : 'получено'}</span></button>`;
-    return sheet('Входящие', body, S.inbox.some(mailHas) ? `<span class="faint" style="font-size:12px">Передача ресурсов почтой запрещена · предметы — в запасы</span><button class="btn go" data-a="claimall">Забрать всё</button>` : '');
-  },
+  /* «Входящие» — почта с вкладками, письма друзей, заявки — screens/social.js (OV.inbox) */
   cur(o) {
     const k = o.arg, c = CUR[k];
     const spend = { gold: 'Лавка, рынок (комиссия 10%), заверение контрактов, артефакты', spirit: 'Уровни героев', souls: 'Эхо, активация чертежей и рабочих, артефакты', enerium: 'Перебросы и сброс Памяти, обновления, прокрутка возрождения', keys: 'Вход к рунному стражу', dust: 'Осколки героев в Возрождении душ' }[k];
@@ -3068,15 +3017,12 @@ const OV = {
     const me = { 'Эхо': [146, S.echo.score], 'Событие': [212, S.event.pts], 'Арена': [88, S.arena.rating], 'Контракты': [57, 70], 'Клановый босс': [31, 1320] }[o.arg] || [99, 0];
     const top = [['Тихий ветер', 450000], ['Северный странник', 399000], ['Собиратель искр', 348000]];
     return sheet('Рейтинг · ' + o.arg, `<div class="row"><div class="tabs"><button aria-selected="true">Эта неделя</button><button aria-selected="false">Прошлая</button></div><div class="tabs"><button aria-selected="true">Личный</button><button aria-selected="false">Клановый</button></div></div>
-      <div class="col" style="gap:4px">${top.map(([n, v], i) => `<div class="rkrow"><b class="serif">${i + 1}</b><span>${n}</span><span class="num">${fmt(v)}</span><button class="link">Профиль</button></div>`).join('')}<div class="rkrow faint" style="justify-content:center">···</div><div class="rkrow me"><b class="serif">${me[0]}</b><span>Странник</span><span class="num">${fmt(me[1])}</span><span class="chip spirit">вы</span></div></div>
+      <div class="col" style="gap:4px">${top.map(([n, v], i) => `<div class="rkrow"><b class="serif">${i + 1}</b><span>${n}</span><span class="num">${fmt(v)}</span><span></span></div>`).join('')}<div class="rkrow faint" style="justify-content:center">···</div><div class="rkrow me"><b class="serif">${me[0]}</b><span>Странник</span><span class="num">${fmt(me[1])}</span><span class="chip spirit">вы</span></div></div>
       <p class="reason">Цикл ${ROMAN[S.acc.cycle]} · неделя ${S.week.race}. Итоговые места станут наградой после подсчёта.</p>`);
   },
   /* «Дары путешествия» — лист screens/bag.js (OV.gifts): выплаты недели, сундуки — в запасы через BAG.addChest */
   gifts() { return sheet('Дары путешествия', '<p class="faint">Экран не подключён: рядом с index.html должны лежать screens/model.js и bag.js.</p>'); },
-  chat() {
-    const msgs = [['Тихий ветер', 'Кто уже прошёл Мастера? Какой состав брали?'], ['Северный странник', 'Танк вперёд, контроль на него не работает — только урон.'], ['Собиратель искр', 'Съёмщик снимает силу. Не копите на один удар.']];
-    return sheet('Чат', `<div class="tabs"><button aria-selected="true">Общий</button><button aria-selected="false">Клановый</button></div>${msgs.map(([n, t]) => `<div class="msg"><b>${n}</b><span>${t}</span></div>`).join('')}`, `<label class="search grow">${ic('chat')}<input type="text" placeholder="Сообщение" autocomplete="off"></label><button class="btn sm" data-a="toast" data-v="Отправлено">Отправить</button>`);
-  },
+  /* «Чат» — общий и клановый, RU / EN, облик в сообщениях — screens/social.js (OV.chat); имя в рейтинге ведёт в профиль игрока — там же */
   /* витрина соперника Арены (opp), подготовка атаки, итог, матч Лиги, журнал обороны — screens/arena.js */
   /* лист старта ритуала (ritual), идущего ритуала (rtslot), артели (rtart) и окно сбора (rtgot) — screens/rituals.js */
   coll() {
@@ -3189,9 +3135,7 @@ const ACT = {
   /* Призыв: за золото, за Энериум, за души (ADR-0019) */
   rscyc(v) { S.rs.cyc = +v; S.rs.gcyc = 0; S.rs.dcyc = 0; render(); },
   gcyc(v, t) { S.rs.gcyc = +t.value; S.rs.gsel = ''; render(); },
-  dcyc(v, t) { S.rs.dcyc = +t.value; S.rs.dsel = ''; render(); },
   gsel(v) { S.rs.gsel = v; render(); },
-  dsel(v) { S.rs.dsel = v; render(); },
   ssel(v) { S.rs.ssel = v; render(); },
   sweek(v, t) { rsSetWeek(t.value); render(); },
   rhero(v) { open('rhero', v); },
@@ -3202,14 +3146,9 @@ const ACT = {
     render(); focusOverlay();
   },
   gbuydo(v) { const h = RSI[v]; if (!h || rsHas(h)) return close(); if (!spend('gold', rsGold(h.c, rsBought(h.c) + 1))) return close(); rsAdd(h, 'gold'); S.overlay = null; toast(`${h.n} в коллекции: 0 ур. · 0 РП · 0 Добл`); },
-  dbuy(v) {
-    const h = RSI[v]; if (!h || rsHas(h) || h.c > rsCyc()) return;
-    S.overlay = { t: 'confirm', title: 'Купить донатного героя', text: `${h.n} — ${h.place}-й из сета «${RSS[h.dset].name}». Придёт с 0 уровнем, 0 рунных пределов и 0 доблести; лица нет, себя он вспомнит на последней доблести.`, warnTeam: 'Цена — заглушка прототипа: цен героев за Энериум в источниках нет.', ok: 'Купить', act: 'dbuydo', v, cost: ['enerium', rsDonatPrice(h)] };
-    render(); focusOverlay();
-  },
-  dbuydo(v) { const h = RSI[v]; if (!h || rsHas(h)) return close(); if (!spend('enerium', rsDonatPrice(h))) return close(); rsAdd(h, 'donat'); S.overlay = null; toast(`${h.n} в коллекции: 0 ур. · 0 РП · 0 Добл`); },
+  /* «За Энериум»: сет и герой витрины, покупка — операция DN_SRV с номером, окно получения героя — screens/heroes.js (ACT.dcyc, dsel, dbuy) */
   /* прокрутка рулетки — операция RL_SRV в screens/roulette.js */
-  dustbuy(v) { const h = RSI[v]; if (!h || rsHas(h) || h.c > rsCyc() || !spend('dust', rsShardPrice(h))) return; S.rs.shards[v] = (S.rs.shards[v] || 0) + 1; render(); },
+  dustbuy(v) { const h = RSI[v]; if (h && !rsDustable(h)) return toast(RS_NODUST); if (!h || rsHas(h) || h.c > rsCyc() || !spend('dust', rsShardPrice(h))) return; S.rs.shards[v] = (S.rs.shards[v] || 0) + 1; render(); },
   activate(v) {
     const h = RSI[v], need = RS.rules.stub.shards; if (!h || rsHas(h) || (S.rs.shards[v] || 0) < need) return;
     S.overlay = { t: 'confirm', title: 'Пробудить героя', text: `${h.n} соберётся из ${need} осколков и придёт с 0 уровнем, 0 рунных пределов и 0 доблести. Лишние осколки уйдут в прах.`, warnTeam: 'Число осколков и цена в душах — заглушки: таблица не утверждена (§15.1).', ok: 'Пробудить', act: 'activatedo', v, cost: ['souls', RS.rules.stub.activateSouls] };
@@ -3228,43 +3167,7 @@ const ACT = {
   npc(v) { S.overlay = { t: 'npc', arg: v, i: 0 }; NPCS[v].isNew = false; render(); focusOverlay(); },
   talkmore() { S.overlay.i++; render(); },
   talkgo(v) { if (v === 'mem') { S.overlay = null; open('mem'); return; } ACT.go(v); },
-  qty(v) { S.qty = v === 'max' ? 'max' : +v; render(); },
-  lvlup() { const h = H(S.selHero); const q = Math.min(S.qty === 'max' ? h.cap - h.lvl : S.qty, h.cap - h.lvl); const c = lvlCost(h.lvl, q); if (!spend('spirit', c)) return; h.lvl += q; toast(`${h.name}: уровень ${h.lvl}`); },   // боевая мощь — BM.hero(h): растёт с уровнем сама
-  /* развитие героя на запасах: руны предела и руна доблести списываются из BAG; проверка и расход — в одном действии, повтор не спишет второй раз */
-  limit() {
-    const h = H(S.selHero); if (!h) return;
-    const d = heroDev(h);
-    if (!d.rune) return toast('Все пределы пройдены');
-    if (!d.atCap) return toast(`Предел откроется на уровне ${h.cap}`);
-    if (d.have < d.need) return toast(`Не хватает: ${itName(d.rune)} — есть ${d.have} из ${d.need}`);
-    S.overlay = { t: 'confirm', title: 'Пробить рунный предел', text: `${h.name} израсходует ${itName(d.rune)} ×${d.need} из запасов. Потолок уровня станет ${INV.hero.capByLim[h.lim + 1]}.`, ok: 'Пробить', act: 'limitdo', v: h.id };
-    render(); focusOverlay();
-  },
-  limitdo(v) {
-    const h = H(v || S.selHero); if (!h) return close();
-    const d = heroDev(h);
-    if (!d.rune || !d.atCap || !BAG.take(d.rune.id, d.need)) { toast('Не хватает рун предела'); return close(); }
-    h.lim++; h.cap = INV.hero.capByLim[h.lim]; S.overlay = null;
-    toast(`${h.name}: предел пробит, потолок ${h.cap}`);
-  },
-  valor() {
-    const h = H(S.selHero); if (!h) return;
-    const d = heroDev(h), D = INV.hero;
-    if (h.valor >= h.maxV) return toast('Личный максимум доблести достигнут');
-    if (!d.vr || d.vrHave < 1) return toast(d.vs ? `Руну доблести собирают из ${d.vsNeed} осколков: ${itSrc(d.vs)[0] || 'осколки — с рунного стража доблести'}` : 'Руны доблести этого цикла нет в данных');
-    if (!d.open) return toast(`Доблесть — на пределе ${ROMAN[D.valorAtLim]}: сначала пройдите все пределы`);
-    S.overlay = { t: 'confirm', title: 'Доблесть · ' + h.name, text: `${itName(d.vr)} ×1 из запасов даст +${D.valorPct}% к силе и откроет главу ${ROMAN[h.valor + 1]}. Уровень героя сбросится в 0, рунные пределы придётся пройти заново.`, warn: 'Пассивки коллекции сохраняются.', ok: 'Взять доблесть', act: 'valordo', v: h.id };
-    render(); focusOverlay();
-  },
-  valordo(v) {
-    const h = H(v || S.selHero); if (!h) return close();
-    const d = heroDev(h), D = INV.hero;
-    if (h.valor >= h.maxV || !d.open || !d.vr || !BAG.take(d.vr.id, 1)) { toast('Доблесть недоступна'); return close(); }
-    h.valor++; h.lvl = 0; h.lim = 0; h.cap = D.capByLim[0]; S.overlay = null;   // боевая мощь — BM.hero(h) от нового уровня и доблести
-    toast(`${h.name}: доблесть ${h.valor} из ${h.maxV}. Открыта глава ${ROMAN[h.valor]}`);
-  },
-  /* руна доблести из осколков — автодокрафт мастерской (screens/craft.js), рецепт известен с первого осколка */
-  valorcraft(v) { if (typeof ACT.wsmake === 'function' && BAG.recipe(v)) ACT.wsmake(v); else { S.seg.craft = 'work'; go('craft'); } },
+  /* развитие героя — ACT.qty, lvlup, limit, limitdo, valor, valordo, valorcraft в screens/hero-dev.js: операции HD_SRV с номером */
   /* отряды: библиотека и выбор отряда режима — ACT.sq* в screens/heroes.js */
   /* лавка: ACT.buy и ACT.buydo — в screens/shop.js, покупка — операция с номером */
   /* рынок: чужой лот — в запасы за золото; свой лот забирает предмет из запасов, снятый возвращает, выручка — без комиссии */
@@ -3316,18 +3219,7 @@ const ACT = {
   /* действия ритуалов — ACT.rt* и прежние rclaim, rstart в screens/rituals.js */
   /* действия Арены и Лиги — ACT.ar* и ACT.lg* в screens/arena.js */
   /* действия Памяти, артефактов и достижений — ACT.wn* в screens/wanderer.js */
-  /* письмо: уходит из Входящих до выдачи — повтор ничего не выдаст. Валюта — в кошелёк, предметы — в запасы, сундуки — BAG.addChest */
-  claim(v) {
-    const m = S.inbox.find(x => x.id === v); if (!m) return;
-    const r = mailRit(m);
-    S.inbox = S.inbox.filter(x => x !== m);
-    if (r) ACT.rclaim(String(S.rituals.slots.indexOf(r)));
-    for (const [id, n] of m.rew || []) { if (CUR[id]) S.wallet[id] += n; else if (BAG.item(id)) BAG.add(id, n); }
-    for (const sp of m.chests || []) BAG.addChest({ ...sp });
-    render();
-  },
-  claimgo(v) { const m = S.inbox.find(x => x.id === v); if (!m) return; S.inbox = S.inbox.filter(x => x !== m); go(m.go); },
-  claimall() { S.inbox.filter(mailHas).forEach(m => ACT.claim(m.id)); toast('Всё забрано: предметы и сундуки — в запасах'); },
+  /* письма Входящих: забрать (claim, claimgo, claimall), прочитать, написать, дружба, чат — ACT.* в screens/social.js */
   giftget() { S.gift.got = S.gift.day; S.wallet.enerium += 50; S.overlay = null; toast('Дар дня: Энериум ×50', ART('enerium.png')); },
   start() { startRun(S.prepSquad, selRunBiome()); },
   again(v) { const R = runById(v) || focusRun(), sqId = R ? R.squadId : S.prepSquad; prune(v); S.overlay = null; startRun(sqId, R ? R.biome : 'b1'); },
@@ -3486,7 +3378,7 @@ function floorDone(R, vis) {
   const fm = farmText(got.farm); if (vis && fm) feed(R, `<span class="gd">Фарм</span> · ${fm}`);
   if (R.guard) { R.end = { kind: b.win ? 'guardWin' : 'guardLose', why: b.why, rounds: b.maxRounds }; if (b.why === 'sand' && vis) feed(R, `<span class="gd">Время скоротечно…</span> · ${b.maxRounds} ${roundWord(b.maxRounds)} прошли`); return endRun(R, vis); }
   let bossDead = false;
-  if (g === 'b') { const boss = b.u[1][0], sg = G(R.biome); bossDead = !boss.alive; if (!R.demo) { sg.max = boss.maxHp; if (bossDead) { sg.hp = null; sg.killed = true; } else if (B.siege !== false) sg.hp = boss.hp; } }   // без осады урон по боссу не копится
+  if (g === 'b') { const boss = b.u[1][0], sg = G(R.biome); bossDead = !boss.alive; if (!R.demo) { sg.max = boss.max0 || boss.maxHp; if (bossDead) { sg.hp = null; sg.killed = true; } else if (B.siege !== false) sg.hp = boss.hp; } }   // без осады урон по боссу не копится
   if (b.win && R.floor < B.floors.length) { R.gap = EB.RULES.floor.gapMs; R.runMs += R.gap; if (vis) camPan(); if (vis) feed(R, `<span class="sp">Этаж ${R.floor} пройден</span>${b.mode === 'rounds' ? ` за ${b.round} ${roundWord(b.round)}` : ''} · здоровье отряда ${partyPctOf(b)}%`); return; }
   if (b.why === 'sand' && vis) feed(R, '<span class="gd">Время скоротечно…</span> · десять раундов прошли');
   R.end = bossDead ? { kind: 'boss' } : g === 'b' && B.siege !== false ? { kind: 'siege', why: b.why } : { kind: 'wall', floor: R.floor, why: b.why, foes: b.u[1].map(u => u.id) };
@@ -3759,7 +3651,7 @@ function roundFlash(n) {
 /* Сравнение моделей на одном забеге: тот же отряд, тот же биом и сид, свежий босс */
 function compareModels() {
   const s = sq('s1'), heroes = s.m.filter(Boolean).map(id => EB.heroSrc(H(id))), B = EB.BIOMES.b1;
-  const cols = [['10 раундов', EB.simRun(heroes, 'b1', null, 'rounds')], ['Прежняя · темп', EB.simRun(heroes, 'b1', null, 'tempo')]];
+  const cols = [['Раунды', EB.simRun(heroes, 'b1', null, 'rounds')], ['Прежняя · темп', EB.simRun(heroes, 'b1', null, 'tempo')]];
   const why = { wipe: 'отряд пал', time: 'время вышло', sand: 'время скоротечно' };
   const row = (name, f) => `<tr><th>${name}</th>${cols.map(([, r]) => `<td>${f(r)}</td>`).join('')}</tr>`;
   const last = r => r.floors[r.floors.length - 1];
@@ -3771,7 +3663,7 @@ function compareModels() {
     ${row('Забег', r => clock(r.runMs / 1000))}
     ${row('Средний бой', r => Math.round(fights(r) / r.floors.length / 1000) + ' с')}
     ${row('По этажам', r => `<div class="curve">${r.floors.map(x => `<i class="${B.floors[x.floor - 1].g !== 'o' ? 'el' : ''}" style="--v:${Math.max(3, x.pct)}" title="Этаж ${x.floor}: здоровье ${x.pct} %${x.rounds ? ' · раундов ' + x.rounds : ''}"></i>`).join('')}</div>`)}
-  </table><p class="p-note" style="margin-top:6px">${s.name} · ${heroes.length} героев · Мастерская форм с первого этажа, босс со свежим здоровьем. В модели раундов здоровье врагов — ${EB.RULES.rounds.foeHpPct} % от основной: за 10 раундов каждая карта ходит только 10 раз.</p>`;
+  </table><p class="p-note" style="margin-top:6px">${s.name} · ${heroes.length} героев · Мастерская форм с первого этажа, босс со свежим здоровьем. В модели раундов здоровье врагов — ${EB.RULES.rounds.foeHpPct} % от основной: карта ходит раз в раунд, а раундов на этаже — ${EB.RULES.rounds.by.o}, ${EB.RULES.rounds.by.e} или ${EB.RULES.rounds.by.b}.</p>`;
 }
 function paintTray() {
   for (const R of S.runs) { const e = document.getElementById('run-' + R.id); if (!e) continue; e.querySelector('small').textContent = runWhere(R); e.querySelector('.hpm').style.setProperty('--v', partyPct(R)); e.classList.toggle('done', R.over); }
@@ -3850,7 +3742,7 @@ const FLOWS = [
   ['Бой с боссом · демо-прыжок', 'Отряд I сразу на последнем этаже: босс, ульты, массовые удары', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = null; startRun('s1', 'b1', EB.BIOMES.b1.floors.length); }],
   ['Рунный страж · ' + guardCards(), 'Мастер и две элиты — страж обучения цикла I: 25 раундов, каждая обычная атака Мастера отнимает раунд. Вход — со «Спуска»', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = null; S.prepSquad = 's1'; ACT.guard('demo'); }],
   ['Бестиарий: известный и неизвестный', 'Скрыт до первой победы, картина и совет старика после', () => { S.route = 'descent'; S.selBiome = 'b1'; S.overlay = { t: 'foe', arg: known('o6') ? 'e3' : 'o6' }; }],
-  ['Развитие героя', 'Уровень, рунный предел и доблесть — одна лестница', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.seg.hero = 'power'; S.selHero = 'h2'; S.overlay = null; }],
+  ['Развитие героя', 'Путь героя — уровень, ворота рунных пределов и звезда доблести; одна главная кнопка — следующий шаг', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.seg.hero = 'power'; S.selHero = 'h2'; S.overlay = null; }],
   ['Ротация перетаскиванием', 'Порядок способностей в карточке героя', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.seg.hero = 'skills'; S.selHero = 'h2'; S.overlay = null; }],
   ['Коллекция · состав героев', 'Все герои игры: фильтры по циклу, источнику и классу; орден скрыт до последней доблести', () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'all'; S.seg.rhero = 'who'; S.overlay = null; }],
   ['Призыв · три способа', 'За золото, за Энериум, за души; цикл I–VI — переключатель для демо', () => { S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'gold'; S.overlay = null; }],
@@ -3916,9 +3808,9 @@ const MAP = [
   { n: 'Спуск', p: 10, where: 'Шахта · 2', d: 'Путь вниз по циклам, зал с обитателями, босс и страж как ворота. Бестиарий живёт в самом биоме. Биомы 1–4: у каждого своя арена, враги, забег, босс и рунный страж; бестиарий — по биомам.', o: ['biomes', 'runic', 'bestiary', 'biome-setup:s', 'runic-setup:s', 'crafted-biomes:d'],
     ready: ['biomes', 'runic', 'bestiary', 'biome-setup'] },
   { n: 'Бой', p: 27, where: 'Один на все режимы', d: 'Биом, страж, Эхо, Арена, Лига, Клановый босс — один просмотрщик. «К итогу» доступно всегда.', o: ['battle', 'echo-battle:d', 'pvp-battle:d', 'league-match:d', 'clan-boss-battle:d'] },
-  { n: 'Герои', p: 24, where: 'Шахта · 3', d: 'Коллекция и карточка рядом (screens/heroes.js): на плитке — кристалл редкости, доблесть, рунный предел, класс и уровень. Сила, Навыки, Путь — три вкладки вместо шести. Во вкладке «Сила» — девять мест снаряжения и четыре места духовных талисманов, их листы — поверх: «Снаряжение» с надетым, выбранным и сравнением, «Свойства и сравнение» (screens/equipment.js, screens/talismans.js). Отряды — библиотека до десяти и один лист выбора на все режимы. Призыв — три вкладки; в «За души» главное — рулетка «Возрождения душ» (screens/roulette.js), отряд Эхо и прах — листами.', o: ['heroes', 'hero', 'hero-story', 'orders', 'equipment', 'equipment-item:s', 'talismans', 'collection-passives:s', 'squads', 'recruitment', 'hire-preview', 'resurrection', 'blueprints'],
+  { n: 'Герои', p: 24, where: 'Шахта · 3', d: 'Коллекция и карточка рядом (screens/heroes.js): на плитке — кристалл редкости, доблесть, рунный предел, класс и уровень. Развитие, Снаряжение, Навыки, Путь — четыре вкладки вместо шести. «Развитие» (screens/hero-dev.js) — путь героя: уровень, ворота рунных пределов и звезда доблести, одна главная кнопка — следующий шаг; листы предела и доблести с честным превью, анимации пробития предела и доблести. «Снаряжение» — девять мест снаряжения и четыре места духовных талисманов, «Надеть лучшее»; одно окно поверх: места героя слева, запасы справа, перетаскивание и нажатие, сравнение стрелками; «Свойства и сравнение» (screens/equipment.js, screens/talismans.js). Отряды — библиотека до десяти и один лист выбора на все режимы. Призыв — три вкладки; в «За души» главное — рулетка «Возрождения душ» (screens/roulette.js), отряд Эхо и прах — листами.', o: ['heroes', 'hero', 'hero-story', 'orders', 'equipment', 'equipment-item:s', 'talismans', 'collection-passives:s', 'squads', 'recruitment', 'hire-preview', 'resurrection', 'blueprints'],
     ready: ['heroes', 'hero', 'squads', 'recruitment', 'talismans', 'resurrection', 'equipment', 'equipment-item'] },
-  { n: 'Ремесло', p: 11, where: 'Шахта · 4', d: 'Мастерская с запасами слева и столом справа. Книга рецептов открывается на месте стола. Попытка — анимация удачи и неудачи, автодокрафт — короткая (screens/craft.js). Лавка — витрина из десяти товаров, подробности и цена — в листе товара (screens/shop.js). Запасы — семь вкладок: ресурсы, руны и ключи, осколки, призывы, сундуки, талисманы, снаряжение; перековка талисманов и снаряжения — листом (screens/bag.js).', o: ['craft', 'recipes', 'inventory', 'shop', 'market', 'my-listings', 'reforge'],
+  { n: 'Ремесло', p: 11, where: 'Шахта · 4', d: 'Мастерская с запасами слева и столом справа: ресурсы — по пять в ряд, у каждого лупа карточки; нажатие — ползунок количества, потом ячейка. Книга рецептов открывается на месте стола. Попытка — анимация удачи и неудачи, автодокрафт — короткая (screens/craft.js). Лавка — витрина из десяти товаров, подробности и цена — в листе товара (screens/shop.js). Запасы — семь вкладок, сетка 6 × 5 — значок и число, подробности справа (screens/bag.js). Перековка — своё окно: талисманы, снаряжение, рабочие; лестница редкостей, наковальня, цена в золоте по циклу (screens/reforge.js).', o: ['craft', 'recipes', 'inventory', 'shop', 'market', 'my-listings', 'reforge'],
     ready: ['craft', 'recipes', 'shop', 'inventory', 'reforge'] },
   { n: 'Неделя', p: 6, where: 'Шахта · 5', d: 'Три времени сегментами. Эта неделя — раса и цивилизация Эхо, срок до отсечки и шесть режимов строкой: место, очки, полоса до планки. Прошлая — итог: сундуки и Энериум, место и очки по режимам, лидеры и награды в листе, ссылка в Дары. Следующая — раса, герои Эхо с неприязнью, стихии нашествия. Режимы сообщают итоги через WEEK_MODES (screens/week.js). Одна отсечка для всей игры.', o: ['week', 'lootboxes:s', 'rankings:s', 'echo-rewards:s', 'event-rewards:s', 'pvp-rewards:s', 'clan-rewards:s'],
     ready: ['week', 'lootboxes', 'rankings', 'echo-rewards', 'event-rewards', 'pvp-rewards', 'clan-rewards'] },
@@ -3934,22 +3826,23 @@ const MAP = [
     ready: ['clan', 'clans', 'clan-members', 'clan-tree', 'clan-tree-reset', 'clan-reservoir', 'clan-boss', 'clan-boss-setup', 'clan-boss-ledger'] },
   { n: 'Событие', p: 21, where: 'Неделя', d: 'Тема недели и мои очки с ближайшей планкой, рейтинг — лидер и я. Где брать очки — строки с переходом прямо в режим, цены дел — листом. Три слоя наград — личные планки, клан, места — вкладками одного листа. Очки начисляет «сервер» по подтверждённым делам (screens/event.js).', o: ['event', 'event-rewards:s'],
     ready: ['event', 'event-rewards'] },
-  { n: 'Странник', p: 29, where: 'Портрет над шахтой', d: 'Обзор, Память, Артефакты, Достижения. Память — пять мест-осколков зеркала и «одна из трёх»: карты собираются из осколков, свет, кружение и частицы — по редкости; переброс бьёт стекло, выбранный осколок летит в своё место. Артефакты и достижения с первенствами — на данных автора (screens/wanderer.js). Чужой профиль — тот же экран с другими действиями.', o: ['profile', 'public-profile', 'account-level:s', 'wanderer-passives', 'artifacts', 'achievements', 'server-firsts', 'friends:s'],
-    ready: ['profile', 'wanderer-passives', 'artifacts', 'achievements', 'server-firsts'] },
-  { n: 'Летопись', p: 19, where: 'Хранитель знаний, Странник', d: 'Одна книга знаний: бестиарий по биомам, мир, механики, история Странника.', o: ['cycles'] },
-  { n: 'Лавка Энериума', p: 30, where: '«+» у Энериума', d: 'Энериум, пропуск и облик. Подтверждение покупки — системное.', o: ['forbidden-shop', 'battle-pass', 'cosmetics', 'subscriptions', 'checkout:s', 'ad-reward'] },
+  { n: 'Странник', p: 29, where: 'Портрет над шахтой', d: 'Обзор, Память, Артефакты, Достижения. Память — пять мест-осколков зеркала и «одна из трёх»: карты собираются из осколков, свет, кружение и частицы — по редкости; переброс бьёт стекло, выбранный осколок летит в своё место. Артефакты и достижения с первенствами — на данных автора (screens/wanderer.js). Облик — лист из колонки Странника: рамка, портрет из своих героев своего пола, частицы за рамкой, имя; пол — один раз, в начале пути. Профиль игрока — по нажатию на его портрет в чате, клане, на Арене и в рейтингах: облик, уровень, клан, пятёрка сильнейших, главное из достижений; в друзья, написать, заблокировать, пожаловаться. Друзья — лист: друзья, заявки, чёрный список (screens/social.js).', o: ['profile', 'public-profile:s', 'account-level:s', 'wanderer-passives', 'artifacts', 'achievements', 'server-firsts', 'friends:s', 'cosmetics:s'],
+    ready: ['profile', 'wanderer-passives', 'artifacts', 'achievements', 'server-firsts', 'public-profile', 'friends', 'cosmetics'] },
+  { n: 'Летопись', p: 19, where: 'Странник · вкладка', d: 'Одна книга знаний во вкладке Странника: боги, мир, города, Спуск, Странник — главы лора; бестиарий и механики — справка. Глава — одна мысль: картинка сверху, две строки и «ещё». Закрытая глава — условие; новые — точка у вкладки и дело у портрета (screens/chronicle.js).', o: ['cycles'],
+    ready: ['cycles'] },
+  { n: 'Лавка Энериума', p: 30, where: '«+» у Энериума', d: 'Энериум и пропуск. Облик не продаётся: вкладка ведёт в лист «Облик» Странника. Подтверждение покупки — системное.', o: ['forbidden-shop', 'battle-pass', 'subscriptions', 'checkout:s', 'ad-reward'] },
 ];
 const TEMPLATES = [
   ['Итог', 'одно окно для всех режимов', ['travel-result', 'runic-result', 'echo-result', 'pvp-result', 'clan-boss-result', 'contract-results']],
   ['Открытие сундука', 'одна анимация на все сундуки: из запасов по одному и пачкой; проба в UI-ките', []],
-  ['Входящие', 'почта, «пока вас не было», дар дня', ['mail', 'offline-rewards', 'calendar'], ['offline-rewards']],   // четвёртое — готовое в прототипе, как ready у MAP
+  ['Входящие', 'награды и «пока вас не было», письма друзей, система; дар дня', ['mail', 'offline-rewards', 'calendar'], ['offline-rewards', 'mail']],   // четвёртое — готовое в прототипе, как ready у MAP
   ['Отряд', 'один выбор состава для всех режимов', []],
   ['Карточка', 'предмет, враг, герой — одна анатомия', []],
   ['Подтверждение', 'цена и последствия до действия', []],
   ['Разговор', 'текст слева, проводник справа', []],
   ['Память', 'одна из трёх', []],
   ['Рейтинг', 'из любого режима', []],
-  ['Чат', 'общий и клановый', ['chat']],
+  ['Чат', 'общий RU / EN и клановый; облик в сообщениях', ['chat'], ['chat']],
   ['Настройки', 'звук, текст, промокод', ['settings', 'promo']],
 ];
 const CUT = [
@@ -4069,7 +3962,7 @@ function renderKit() {
   <section class="k-box" style="grid-column:1/-1"><h3>Карта бойца · прежняя модель темпа (ADR-0007)</h3>
     <div class="card-demo">${kitCards()}</div>
     <div class="bt-legend static">${legendHtml()}</div></section>
-  <section class="k-box" style="grid-column:1/-1"><h3>Карта бойца: индикаторы и эффекты · 10 раундов (ADR-0010)</h3>
+  <section class="k-box" style="grid-column:1/-1"><h3>Карта бойца: индикаторы и эффекты · модель раундов (ADR-0010)</h3>
     <div class="card-demo">${kitCardsRounds()}</div>
     <p class="k-note">Основная модель: вместо сегментов и ромбов — шанс каждой способности в свой ход, сработавшая светится. Бледная карта уже сходила в этом раунде.</p>
     <div class="bt-legend static">${legendHtml('rounds')}</div></section>
@@ -4853,6 +4746,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 </script>
 <!-- экраны на общих запасах: договор — screens/model.js; грузятся до boot() -->
 <script src="screens/model.js"></script>
+<script src="screens/art-icons.js"></script>
 <script src="screens/week.js"></script>
 <script src="screens/craft.js"></script>
 <script src="screens/shop.js"></script>
@@ -4864,11 +4758,15 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 <script src="screens/biomes.js"></script>
 <script src="screens/talismans.js"></script>
 <script src="screens/equipment.js"></script>
+<script src="screens/hero-dev.js"></script>
 <script src="screens/rituals.js"></script>
 <script src="screens/contracts.js"></script>
 <script src="screens/event.js"></script>
 <script src="screens/heroes.js"></script>
 <script src="screens/arena.js"></script>
 <script src="screens/clan.js"></script>
+<script src="screens/reforge.js"></script>
+<script src="screens/chronicle.js"></script>
+<script src="screens/social.js"></script>
 </body>
 </html>

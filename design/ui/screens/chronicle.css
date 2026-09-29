@@ -1,0 +1,81 @@
+/* screens/chronicle.css — «Летопись» во вкладке «Странника»: оглавление разделов слева, страница главы справа —
+   картинка сверху, строка места, название, мысль в две строки и «ещё», листание внизу. Одна рамка, отступы 16 / 12 / 8.
+   Движение — только transform и opacity; «меньше движения» — без него */
+
+.chr{display:grid;grid-template-columns:168px minmax(0,1fr);gap:var(--sp-m);height:100%;min-height:0}
+
+/* оглавление: разделы книги, счёт «открыто из всех», точка — есть новые главы */
+.chr-toc{display:flex;flex-direction:column;gap:2px;padding:var(--sp-s);min-height:0;overflow:auto;scrollbar-width:none}
+.chr-toc::-webkit-scrollbar{display:none}
+.chr-tp{position:relative;display:flex;align-items:center;gap:6px;min-height:36px;padding:6px 10px;border:0;border-radius:8px;background:none;color:var(--parch-2);text-align:left;font:600 17px/1.1 var(--f-d);cursor:pointer}
+.chr-tp:hover{color:var(--parch)}
+.chr-tp[aria-current="true"]{background:var(--stone-2);color:var(--gold);box-shadow:inset 2px 0 0 var(--spirit)}
+.chr-tp small{margin-left:auto;color:var(--parch-3);font:700 11px/1 var(--f-u);letter-spacing:.04em}
+.chr-dot{flex:none;width:7px;height:7px;border-radius:50%;background:var(--spirit);box-shadow:0 0 8px var(--spirit)}
+.chr-hr{border:0;border-top:1px solid var(--iron);margin:var(--sp-s) 4px;flex:none}
+.chr-demo{display:flex;flex-direction:column;gap:4px;margin-top:auto;padding-top:var(--sp-s)}
+.chr-demo .link{text-align:left;font-size:12px}
+
+/* страница главы: свет своего карста */
+.chr-page{--tc:var(--gold);position:relative;display:flex;flex-direction:column;min-height:0;overflow:hidden;padding:0}
+.chr-page[data-tone="air"]{--tc:var(--air)}.chr-page[data-tone="earth"]{--tc:var(--earth)}.chr-page[data-tone="fire"]{--tc:var(--fire)}
+.chr-page[data-tone="water"]{--tc:var(--water)}.chr-page[data-tone="time"]{--tc:var(--time)}.chr-page[data-tone="gold"]{--tc:var(--gold)}
+
+/* картинка сверху: окно по середине кадра 21:9, фокус — поле главы; раскрытое «ещё» забирает место у картинки */
+.chr-fig{position:relative;flex:1 1 46%;min-height:84px;margin:0;overflow:hidden;background:#07090a}
+.chr-fig img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;animation:chr-in .42s cubic-bezier(.2,.8,.2,1)}
+.chr-fig::after{content:"";position:absolute;inset:auto 0 0 0;height:46%;background:linear-gradient(180deg,transparent,rgba(18,21,24,.72) 62%,var(--stone));pointer-events:none}
+.chr-mos{position:absolute;inset:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;background:#050607}
+.chr-mos img{position:relative;inset:auto}
+.chr-lk{position:absolute;left:50%;top:42%;z-index:1;display:grid;place-items:center;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:rgba(7,9,10,.72);border:1px solid var(--iron-2);color:var(--parch-2)}
+.chr-lk .i{width:20px;height:20px}
+.chr-page[data-lock] .chr-fig img{opacity:.42;animation:none}
+.chr-newtag{position:absolute;left:var(--sp-m);top:var(--sp-m);z-index:1}
+
+/* текст: строка места, название, мысль в две строки; «ещё» — до трёх абзацев */
+.chr-body{position:relative;z-index:1;flex:0 1 auto;min-height:0;display:flex;flex-direction:column;gap:4px;margin-top:-18px;padding:0 var(--sp-l) var(--sp-s);overflow:auto;scrollbar-width:thin}
+.chr-body .eyebrow{display:inline-flex;align-items:center;gap:4px;color:var(--tc)}
+.chr-body .eyebrow .i{width:12px;height:12px}
+.chr-body h2{font:600 26px/1.05 var(--f-d);color:var(--parch)}
+.chr-page[data-lock] .chr-body h2{color:var(--parch-2)}
+.chr-p{color:var(--parch-2);font-size:14px;line-height:1.45}
+.chr-body .lore>p{padding-top:var(--sp-s)}
+.chr-why{color:var(--parch-3);font-size:14px}
+.chr-team{margin-top:var(--sp-s);color:var(--parch-3);font-size:12px;line-height:1.4}
+
+/* листание: стрелки и точки глав раздела; точка светится у новой, у закрытой — тусклая */
+.chr-nav{flex:none;display:flex;align-items:center;gap:var(--sp-s);padding:4px var(--sp-m);border-top:1px solid var(--iron);background:rgba(10,12,14,.6)}
+.chr-arr{flex:none;display:grid;place-items:center;width:44px;height:32px;border:0;border-radius:8px;background:none;color:var(--parch-2);cursor:pointer}
+.chr-arr:hover:not(:disabled){color:var(--gold)}
+.chr-arr:disabled{opacity:.3;cursor:default}
+.chr-arr.pv .i{transform:rotate(180deg)}
+.chr-dots{flex:1;display:flex;align-items:center;justify-content:center;gap:2px;min-width:0}
+.chr-d{position:relative;flex:none;width:22px;height:32px;border:0;padding:0;background:none;cursor:pointer}
+.chr-d::before{content:"";position:absolute;left:50%;top:50%;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;border:1px solid var(--iron-3);background:#15191d;transition:transform .18s ease}
+.chr-d:hover::before{transform:scale(1.25)}
+.chr-d.on::before{background:var(--tc);border-color:var(--tc);box-shadow:0 0 8px var(--tc)}
+.chr-d.new::before{border-color:var(--spirit);box-shadow:0 0 7px var(--spirit)}
+.chr-d.lk::before{opacity:.4}
+.chr-pg{flex:none;color:var(--parch-3);font-size:11px;min-width:34px;text-align:center}
+
+/* бестиарий — прежние страницы книги справа */
+.chr-best{min-height:0}
+
+/* шапка «Странника» с пятью вкладками: уже, чтобы на 844 × 390 вкладки не заходили на кошелёк */
+.g-seg:has(> :nth-child(5)) button{padding:0 7px;font-size:16px}
+.g-seg:has(> :nth-child(5)) button[aria-selected="true"]{font-size:19px}
+.g-seg:has(> :nth-child(5)) button[aria-selected="true"]::after{left:6px;right:6px}
+
+/* UI-кит */
+.chr-kg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-m)}
+.chr-kit-page{height:300px;display:flex;border-radius:12px;overflow:hidden}
+.chr-kit-page .chr-page{flex:1}
+.chr-kit-stubs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:var(--sp-s)}
+.chr-kit-stubs figure{margin:0;display:flex;flex-direction:column;gap:4px}
+.chr-kit-stubs img{width:100%;aspect-ratio:1584/672;object-fit:cover;border-radius:8px;border:1px solid var(--iron)}
+.chr-kit-stubs figcaption{font-size:11px;color:var(--parch-3)}
+.chr-kt td,.chr-kt th{font-size:12px}
+@media (max-width:1100px){.chr-kg{grid-template-columns:minmax(0,1fr)}}
+
+@keyframes chr-in{from{opacity:0;transform:scale(1.03)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.chr-fig img{animation:none}.chr-d::before{transition:none}}

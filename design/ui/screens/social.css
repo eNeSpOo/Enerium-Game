@@ -1,0 +1,150 @@
+/* screens/social.css — облик Странника и общение: профиль игрока, друзья, почта, чат.
+   Облик — .lk-*: одна анатомия везде, где виден игрок (lkAva, screens/wanderer.js): лицо — круг окна рамки, рамка — картинка или кольцо CSS,
+   частицы — за рамкой, до 12 точек, движутся только transform и opacity; при «меньше движения» стоят.
+   Общение — .pp-* (профиль игрока), .fr-* (друзья), .ml-* (почта), .ch-* (чат), .soc-* (демо и UI-кит). Отступы — токены воздуха
+   --sp-l, --sp-m, --sp-s. Цвета — токены index.html. */
+
+/* ================== облик ================== */
+.lk-ava{position:relative;display:inline-block;flex:none;width:var(--px);height:var(--px);isolation:isolate;vertical-align:middle}
+.lk-face{position:absolute;z-index:1;left:calc(var(--px) * var(--cx) / 1000);top:calc(var(--px) * var(--cy) / 1000);width:calc(var(--px) * var(--w) / 1000);height:calc(var(--px) * var(--w) / 1000);transform:translate(-50%,-50%);border-radius:50%;overflow:hidden;background:#07090a}
+.lk-face img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 22%}
+.lk-fr{position:absolute;z-index:2;inset:0;width:100%;height:100%;pointer-events:none;user-select:none}
+/* кольцо CSS до выгрузки картинки: цвет рамки; у редких — второе кольцо и свет */
+.lk-ring{position:absolute;z-index:2;left:50%;top:50%;width:calc(var(--px) * var(--w) / 1000 + var(--px) * .1);height:calc(var(--px) * var(--w) / 1000 + var(--px) * .1);transform:translate(-50%,-50%);border-radius:50%;border:calc(var(--px) * .05) solid var(--fc0);box-shadow:inset 0 0 0 1px rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.6);pointer-events:none}
+.lk-ring::after{content:"";position:absolute;inset:calc(var(--px) * -.07);border-radius:50%;border:1px solid var(--fc0);opacity:0}
+.lk-ava[data-r="3"] .lk-ring,.lk-ava[data-r="4"] .lk-ring{box-shadow:inset 0 0 0 1px rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.6),0 0 calc(var(--px) * .1) calc(var(--px) * -.02) var(--fc0)}
+.lk-ava[data-r="5"] .lk-ring::after,.lk-ava[data-r="6"] .lk-ring::after,.lk-ava[data-r="7"] .lk-ring::after{opacity:.65}
+.lk-ava[data-r="6"] .lk-ring,.lk-ava[data-r="7"] .lk-ring{box-shadow:inset 0 0 0 1px rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.6),0 0 calc(var(--px) * .16) calc(var(--px) * -.01) var(--fc0)}
+/* частицы за рамкой: точка стоит на кольце (--a — угол, --rr — радиус), движение — по виду */
+.lk-fx{position:absolute;z-index:0;inset:0;pointer-events:none}
+.lk-fx i{--rr:calc(var(--px) * .44);position:absolute;left:50%;top:50%;width:var(--s);height:var(--s);margin:calc(var(--s) / -2) 0 0 calc(var(--s) / -2);border-radius:50%;background:var(--fc);box-shadow:0 0 calc(var(--s) * 2) var(--fc);opacity:0;transform:rotate(var(--a)) translateX(var(--rr));animation:lk-orbit var(--t) linear var(--d) infinite}
+.lk-fx[data-k="rise"] i{animation-name:lk-rise;animation-timing-function:ease-out}
+.lk-fx[data-k="float"] i{animation-name:lk-float;animation-timing-function:ease-in-out}
+.lk-fx[data-k="fall"] i{animation-name:lk-fall}
+.lk-fx.rest i{animation:none;opacity:.7}
+/* у картинки рамки кольцо шире — точки идут по краю кадра, за украшением */
+.lk-ava.art .lk-fx i{--rr:calc(var(--px) * .5)}
+@keyframes lk-rise{0%{opacity:0;transform:rotate(var(--a)) translateX(var(--rr)) rotate(calc(-1 * var(--a))) translateY(0) scale(.7)}15%{opacity:.95}100%{opacity:0;transform:rotate(var(--a)) translateX(var(--rr)) rotate(calc(-1 * var(--a))) translateY(calc(var(--px) * -.28)) scale(.3)}}
+@keyframes lk-float{0%,100%{opacity:.25;transform:rotate(var(--a)) translateX(var(--rr)) translateY(0)}50%{opacity:.9;transform:rotate(var(--a)) translateX(calc(var(--rr) * 1.08)) translateY(calc(var(--px) * -.04))}}
+@keyframes lk-orbit{0%{opacity:.2;transform:rotate(var(--a)) translateX(var(--rr))}50%{opacity:.9}100%{opacity:.2;transform:rotate(calc(var(--a) + 360deg)) translateX(var(--rr))}}
+@keyframes lk-fall{0%{opacity:0;transform:rotate(var(--a)) translateX(calc(var(--rr) * .9)) rotate(calc(-1 * var(--a))) translateY(calc(var(--px) * -.12))}20%{opacity:.8}100%{opacity:0;transform:rotate(var(--a)) translateX(calc(var(--rr) * .9)) rotate(calc(-1 * var(--a))) translateY(calc(var(--px) * .22))}}
+@media (prefers-reduced-motion:reduce){.lk-fx i{animation:none;opacity:.6}}
+/* облик-кнопка: профиль по нажатию на портрет */
+.lk-btn{appearance:none;border:0;background:none;padding:0;margin:0;border-radius:50%;display:inline-grid;place-items:center;flex:none;line-height:0;cursor:pointer}
+.lk-btn:hover .lk-face{filter:brightness(1.12)}
+.lk-btn:focus-visible{outline:2px solid var(--spirit);outline-offset:1px}
+
+/* колонка Странника: облик — вход в «Облик», имя; у «Друзей» — число заявок */
+.lk-idb{appearance:none;border:0;background:none;padding:0;border-radius:50%;line-height:0;cursor:pointer}
+.lk-idb:focus-visible{outline:2px solid var(--spirit);outline-offset:2px}
+.lk-idn{font-size:24px;line-height:1.05;max-width:100%;overflow-wrap:anywhere}
+.lk-frb{position:relative}
+.lk-frb .bdg{position:absolute;top:-6px;right:-6px}
+
+/* лист «Облик»: вкладки, примерка слева, сетка справа */
+.lk-tabs{align-self:flex-start}
+.lk-body{display:grid;grid-template-columns:128px minmax(0,1fr);gap:var(--sp-m);align-items:start}
+.lk-prev{position:sticky;top:0;display:flex;flex-direction:column;align-items:center;gap:var(--sp-s);text-align:center}
+.lk-pn{font-size:19px;line-height:1.1;overflow-wrap:anywhere}
+.lk-prev small{font-size:12px}
+.lk-pane{gap:var(--sp-m)}
+.lk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:var(--sp-s)}
+.lk-tile{appearance:none;display:flex;flex-direction:column;align-items:center;gap:4px;padding:var(--sp-s) 4px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;color:var(--parch);text-align:center;min-width:0}
+.lk-tile:hover{border-color:var(--iron-2)}
+.lk-tile.sel{border-color:rgba(72,229,212,.6);box-shadow:inset 0 -10px 14px -12px var(--spirit)}
+.lk-tile.lock .lk-ava{opacity:.45;filter:grayscale(.6)}
+.lk-tn{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;line-height:1.15}
+.lk-tn .rar{font-size:0}
+.lk-tile small{display:inline-flex;align-items:center;gap:3px;font-size:11px}
+.lk-tile small .i{width:12px;height:12px}
+.lk-view{display:flex;align-items:center;gap:var(--sp-s);font-size:13px;color:var(--parch-2)}
+.lk-nick{max-width:320px}
+.lk-sexes{display:flex;gap:var(--sp-m);justify-content:center;flex-wrap:wrap}
+.lk-sex{appearance:none;display:flex;flex-direction:column;align-items:center;gap:var(--sp-s);padding:var(--sp-m) var(--sp-l);border-radius:12px;border:1px solid var(--iron-2);background:#0e1114;color:var(--parch)}
+.lk-sex:hover{border-color:rgba(72,229,212,.55)}
+.lk-sex b{font-size:19px}
+
+/* UI-кит: облик */
+.lk-krow{display:flex;flex-wrap:wrap;gap:var(--sp-m);align-items:flex-end}
+.lk-kf{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;max-width:120px}
+.lk-kf figcaption{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12.5px;color:var(--parch)}
+.lk-kf figcaption small{font-size:11px;color:var(--parch-3);line-height:1.25}
+.lk-kf .rar{font-size:0}
+
+/* ================== профиль игрока ================== */
+.pp-head{display:flex;align-items:center;gap:var(--sp-m)}
+.pp-id{gap:6px;min-width:0}
+.pp-chips{flex-wrap:wrap;gap:6px}
+.pp-clan{display:inline-flex;align-items:center;gap:5px;font-size:13px}
+.pp-clan .i{width:15px;height:15px}
+.pp-five{grid-template-columns:repeat(5,minmax(0,1fr))}
+.pp-ach{display:flex;flex-direction:column;gap:4px}
+.pp-a{display:flex;align-items:center;gap:8px;font-size:13.5px;padding:5px 8px;border-radius:8px;background:#0e1114;border:1px solid var(--iron)}
+.pp-a .rar{font-size:0}
+.pp-titles{flex-wrap:wrap;gap:6px}
+.pp-strip{display:flex;align-items:center;gap:var(--sp-s)}
+.pp-nm{appearance:none;border:0;background:none;padding:0;display:inline-flex;align-items:center;gap:8px;min-width:0;color:var(--parch);font:inherit;text-align:left;cursor:pointer}
+.pp-nm span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pp-nm:hover span{color:var(--gold)}
+.pp-dh{gap:var(--sp-s)}
+.pp-cons{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;color:var(--parch-2);font-size:14px}
+.pp-rsns{display:flex;flex-wrap:wrap;gap:6px}
+.pp-rsn{appearance:none;height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--iron-2);background:#0e1114;color:var(--parch-2);font:700 12px/1 var(--f-u);letter-spacing:.04em}
+.pp-rsn[aria-pressed="true"]{color:var(--gold);border-color:var(--gold-3);background:#15130e}
+.cl-av.pp-ca{background:none;border:0;box-shadow:none;width:auto;height:auto;padding:0;display:inline-grid;place-items:center}
+
+/* ================== друзья ================== */
+.fr-find{max-width:100%}
+.fr-list{gap:6px}
+.fr-row{display:flex;align-items:center;gap:var(--sp-s);padding:6px 8px;border-radius:10px;border:1px solid var(--iron);background:#0e1114}
+.fr-t{appearance:none;border:0;background:none;padding:0;display:flex;flex-direction:column;gap:1px;flex:1;min-width:0;text-align:left;color:var(--parch);cursor:pointer}
+.fr-t b{font-size:14px}
+.fr-t small{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ================== почта ================== */
+.ml-list{gap:6px}
+.ml-pm,.ml-fr{justify-content:flex-start}
+.ml-pm.new{border-color:rgba(72,229,212,.35)}
+.ml-t{appearance:none;border:0;background:none;padding:0;display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;text-align:left;color:var(--parch);cursor:pointer}
+.ml-t small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ml-pm .dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--spirit);box-shadow:0 0 8px var(--spirit)}
+.ml-sent summary{cursor:pointer;list-style:none}
+.ml-sent[open]{display:flex;flex-direction:column;gap:6px}
+.ml-from{gap:var(--sp-m)}
+.ml-fn{font-size:20px}
+.ml-text{display:flex;flex-direction:column;gap:var(--sp-s);font-size:15px;line-height:1.45;color:var(--parch)}
+.ml-tos{display:flex;flex-wrap:wrap;gap:6px}
+.ml-to{appearance:none;display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 10px 0 4px;border-radius:999px;border:1px solid var(--iron-2);background:#0e1114;color:var(--parch-2);font:700 12px/1 var(--f-u)}
+.ml-to[aria-pressed="true"]{color:var(--gold);border-color:rgba(72,229,212,.55)}
+.ml-area{width:100%;min-height:120px;resize:vertical;padding:10px 12px;border-radius:10px;border:1px solid var(--iron-2);background:#0a0c0e;color:var(--parch);font:15px/1.45 var(--f-u)}
+.ml-area:focus{outline:2px solid var(--spirit);outline-offset:0}
+
+/* ================== чат ================== */
+.ch-top{gap:var(--sp-s)}
+.ch-list{display:flex;flex-direction:column-reverse;gap:var(--sp-s);flex:1 1 auto;min-height:120px;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#2c3238 transparent}
+/* в листе чата прокручивается сам список: column-reverse держит последние сообщения внизу */
+.sheet-b>.ch-list{flex:1 1 0;min-height:0}
+.ch-msg{display:grid;grid-template-columns:auto minmax(0,1fr);gap:var(--sp-s);align-items:start}
+.ch-b{display:flex;flex-direction:column;gap:2px;padding:6px 10px;border-radius:10px;background:#0e1114;border:1px solid var(--iron);min-width:0}
+.ch-nk{font-size:12.5px;color:var(--gold-2)}
+.ch-b p{font-size:14px;overflow-wrap:anywhere}
+.ch-msg.me .ch-b{border-color:rgba(72,229,212,.3)}
+.ch-msg.me .ch-nk{color:var(--spirit)}
+.ch-hid{text-align:center}
+.ch-gate{display:flex;flex-direction:column;align-items:center;gap:var(--sp-s);padding:var(--sp-l);text-align:center}
+.ch-in{min-width:0}
+.ch-mute{gap:2px;flex:1;min-width:0}
+.ch-mute b{font-size:14px;color:var(--amber)}
+.ch-mute small{font-size:12px;line-height:1.3}
+
+/* точка «есть новое» на вкладке листа — как у вкладок шапки */
+.soc-dot{display:inline-block;min-width:0;width:7px;height:7px;padding:0;margin-left:6px;vertical-align:middle;font-size:0;background:var(--spirit);box-shadow:0 0 8px var(--spirit)}
+
+/* ================== демо и UI-кит ================== */
+.soc-demo{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:12px;color:var(--parch-3)}
+.soc-kgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--sp-l)}
+.soc-kpp,.soc-kch{gap:var(--sp-m)}
+.soc-kch .ch-list{min-height:0}
+.soc-kmu{gap:var(--sp-m);align-items:center}
+.soc-rules{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+@media (max-width:900px){.soc-kgrid{grid-template-columns:minmax(0,1fr)}}

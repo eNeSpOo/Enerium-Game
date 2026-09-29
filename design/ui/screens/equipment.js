@@ -1,13 +1,15 @@
 /* screens/equipment.js — снаряжение героя (GDD §21, §22, §6). Договор — screens/model.js.
-   Регистрирует: eqRow(h) — девять мест в карточке героя, рядом с талисманами (его зовёт heroDetail в index.html, вкладка «Сила»);
-   eqStatAdd(h) — прибавка к пяти характеристикам (карточка героя и лист «Атрибуты»); OV.eq — лист «Снаряжение»: места, надетый
-   или выбранный предмет со сравнением, запасы слота, одно действие; OV.eqitem — «Свойства и сравнение» (карта экранов: equipment-item);
-   OV.eqwho — кому надеть; OV.eqforge — перековка; ACT.eq*; eqView(it) — предмет в окне открытия сундука (screens/chest-open.js);
+   Регистрирует: eqRow(h) — девять мест в карточке героя, рядом с талисманами (его зовёт heroDetail в index.html, вкладка «Снаряжение»);
+   eqStatAdd(h) — прибавка к пяти характеристикам (карточка героя и лист «Атрибуты»); OV.eq — открывает одно окно «Снаряжение героя»
+   (grWin, screens/hero-dev.js) на месте слота: места героя слева, запасы справа, перетаскивание и нажатие, сравнение со стрелками;
+   OV.eqitem — «Свойства и сравнение» (карта экранов: equipment-item);
+   OV.eqwho — кому надеть; ACT.eq*; eqView(it) — предмет в окне открытия сундука (screens/chest-open.js). Перековка — своё окно
+   «Ремесло → Перековка» (screens/reforge.js): EQ_SRV.forge — вход в его «сервер» RF_SRV;
    EQ_SRV.fromChest — предмет из сундука, его зовёт открытие в screens/bag.js; раздел UI-кита (KIT_EXTRA); сценарии презентации.
    Своё состояние — S.eq, заводится как S.bag. Данные и алгоритм — EN_EQUIPMENT и EnEquip (design/ui/equipment.js, собирает
    tools/content-gen/equipment/build.js). Черновик — docs/content/снаряжение.md. Запасы снаряжения — «Ремесло → Запасы → Снаряжение».
    Сервер решает, клиент показывает. Предмет создаёт EQ_SRV на сиде: сундук — сид сундука и номер записи, перековка и ларец — сид
-   операции. Надеть, снять, перековать и открыть ларец — операции с номером: проверка и итог одним вызовом, повтор номера ничего не повторяет.
+   операции. Надеть, снять и открыть ларец — операции с номером: проверка и итог одним вызовом, повтор номера ничего не повторяет.
    Бой: источник героя — герой, его талисманы и снаряжение. EB.heroSrc обёрнут здесь, поверх талисманов: характеристики — в st, здоровье —
    множитель hpPct, вторичные свойства — пассивки библиотеки (EB.addLib), по записи на вид с суммой значений. Ядро боя не правится.
    Идущий забег досчитывается с тем набором, с которым начался.
@@ -28,9 +30,8 @@ const EQ_DEMO = {
   /* сценарий презентации: кому надеть — по слотам лучшее из запасов; какой слот открыть и какой предмет сравнить */
   flow: { hero: 'h1', slots: ['head', 'chest', 'hands', 'legs', 'feet', 'off', 'ring', 'amulet'], open: 'main', casket: 'chest_eq4' },
 };
-/* числа и знаки вида: строк в списке запасов слота не больше; значки слотов — заглушки до арта (tools/art-gen/jobs/equipment.json) */
+/* знаки вида: контуры слотов — заглушки, пока нет арта слота (eqIcon, screens/art-icons.js; задание — tools/art-gen/jobs/equipment.json) */
 const EQ_VIEW = {
-  list: 40,
   glyph: {
     head: '<path d="M4.5 16v-3.5a7.5 7.5 0 0 1 15 0V16z"/><path d="M4.5 16h15M9.5 16v3.5h5V16M12 5v6"/>',
     chest: '<path d="M8 3.5 4.5 6l1.5 5-1 9h14l-1-9 1.5-5L16 3.5l-2 2h-4z"/><path d="M12 5.5V20M8.5 11h7"/>',
@@ -73,12 +74,12 @@ const eqMainTxt = (it, h) => `${eqKindName(it.lines[0][0], h)} ${eqNum(it.lines[
 const eqPct = bp => { const s = bp < 0 ? '−' : '+', a = Math.abs(bp), i = eqFl(a, 100), f = eqFl(a % 100, 10); return `${s}${i}${f ? ',' + f : ''} %`; };
 const eqGlyph = slot => `<svg class="i eq-g" viewBox="0 0 24 24" aria-hidden="true">${EQ_VIEW.glyph[slot] || EQ_VIEW.glyph.main}</svg>`;
 /* плитка предмета: значок слота, кромка и свет — редкость (ADR-0027). Заглушка CSS до арта */
-const eqTile = (it, o = {}) => `<span class="eq-t${o.lg ? ' lg' : ''}" data-r="${it.r}" aria-hidden="true">${eqGlyph(it.slot)}</span>`;
+/* значок слота: арт (eqIcon, screens/art-icons.js) — предмет нейтральный, редкость рисует рамка; нет арта — контур-заглушка */
+const eqPic = (slot, px = 32) => (typeof eqIcon === 'function' ? eqIcon(slot, px, '') : '') || eqGlyph(slot);
+const eqTile = (it, o = {}) => `<span class="eq-t${o.lg ? ' lg' : ''}" data-r="${it.r}" aria-hidden="true">${eqPic(it.slot, o.lg ? 48 : 32)}</span>`;
 const eqCr = (r, px = 16) => `<span class="zp-cr" data-r="${r}" title="${RAR[r]}">${ICON('r' + r, px, RAR[r])}</span>`;
 /* порядок в списках: редкость выше, главная строка больше, цикл новее, раньше пришёл */
 const eqSort = (a, b) => b.r - a.r || b.lines[0][1] - a.lines[0][1] || b.cyc - a.cyc || a.n - b.n;
-/* перековка: сначала самые слабые — ранний цикл, меньшая главная строка */
-const eqWeak = (a, b) => a.cyc - b.cyc || a.lines[0][1] - b.lines[0][1] || a.n - b.n;
 
 /* ================== запасы ================== */
 /* новый предмет в запасах: номер экземпляра — от сида, второй такой же номер получает суффикс */
@@ -92,9 +93,10 @@ const eqMint = (spec, seed) => Object.assign(EnEquip.mint(EQD, spec, seed >>> 0)
 const eqFree = () => Object.values(S.eq.items).filter(it => !it.on);
 
 /* ================== «сервер» ==================
-   Надеть, снять, перековать, открыть ларец — одним вызовом: проверка, изменение запасов и мест, итог. Номер операции несут кнопки:
+   Надеть, снять, открыть ларец — одним вызовом: проверка, изменение запасов и мест, итог. Номер операции несут кнопки:
    повтор того же номера возвращает прежний итог и ничего не меняет. Отказ не записывается — следующая попытка идёт с тем же номером.
-   Предмет из сундука создаётся внутри операции открытия (zpOpen, screens/bag.js): сид сундука и номер записи в его итоге */
+   Предмет из сундука создаётся внутри операции открытия (zpOpen, screens/bag.js): сид сундука и номер записи в его итоге.
+   Перековка — «сервер» окна «Ремесло → Перековка» (RF_SRV, screens/reforge.js); EQ_SRV.forge он ставит своим входом */
 const EQ_SRV = {
   run(op, f) {
     const O = S.eq.srv;
@@ -129,21 +131,6 @@ const EQ_SRV = {
       return { ok: 'out', hid, uid, slot };
     });
   },
-  /* перековка §22: десять свободных одной редкости → один случайный редкостью выше; слот — случайный, цикл — самый ранний из десяти */
-  forge(op, r) {
-    return EQ_SRV.run(op, () => {
-      if (!eqOpen()) return { refuse: 'lock' };
-      if (r >= 7) return { refuse: 'top' };
-      const R = EQD.rules.reforge, took = eqForgePick(r);
-      if (!took) return { refuse: 'few' };
-      const cyc = Math.min(...took.map(it => it.cyc)), gold = R.gold[r - 1] * cyc;
-      if (S.wallet.gold < gold) return { refuse: 'gold' };
-      for (const it of took) delete S.eq.items[it.uid];
-      S.wallet.gold -= gold;
-      const got = eqAdd(S, eqMint({ r: r + 1, cyc }, EnEquip.seedOf('перековка-снаряжения|' + op)), 'Перековка');
-      return { ok: 'forge', r, took: took.map(it => it.uid), got: got.uid, gold, cyc };
-    });
-  },
   /* ларец крафта: один предмет своей редкости, слот случайный, цикл — цикл рецепта */
   casket(op, id) {
     return EQ_SRV.run(op, () => {
@@ -156,18 +143,11 @@ const EQ_SRV = {
     });
   },
 };
-function eqForgePick(r) {
-  const need = EQD.rules.reforge.need, list = eqFree().filter(it => it.r === r).sort(eqWeak);
-  return list.length >= need ? list.slice(0, need) : null;
-}
 const EQ_WHY = {
   hero: () => 'Такого героя нет.',
   none: () => 'Этого предмета нет в запасах.',
   lock: () => 'Снаряжение откроется во втором цикле — вместе с Ареной.',
   same: () => 'Этот предмет уже на герое.',
-  gold: () => 'Не хватает золота.',
-  few: () => `Нужно ${EQD.rules.reforge.need} свободных предметов одной редкости.`,
-  top: () => 'Вневременные не перековываются: выше редкости нет.',
 };
 
 /* ================== бой: источник героя со снаряжением ================== */
@@ -219,12 +199,13 @@ function eqGain(h, it, m0) {
 }
 
 /* ================== вид ================== */
-/* место в карточке героя и в листе: значок слота, у надетого — кромка и свет редкости; пустое — бледный контур */
+/* место в карточке героя: значок слота (арт — eqPic), у надетого — кромка и свет редкости; пустое — бледный
+   значок. Нажатие открывает окно «Снаряжение героя» на этом месте */
 function eqSlotBtn(h, slot, uid, sel) {
   const it = uid ? eqItem(uid) : null, t = it ? `${eqSlotName(slot)} · ${RAR[it.r].toLowerCase()}: ${eqMainTxt(it, h)}` : `${eqSlotName(slot)}: пусто`;
-  return `<button class="eq-slot${it ? ' on' : ''}${sel ? ' sel' : ''}" ${it ? `data-r="${it.r}"` : ''} data-a="sheet" data-v="eq:${h.id}:${slot}" aria-label="${trEsc(t)}" title="${trEsc(t)}">${eqGlyph(slot)}</button>`;
+  return `<button class="eq-slot${it ? ' on' : ''}${sel ? ' sel' : ''}" ${it ? `data-r="${it.r}"` : ''} data-a="sheet" data-v="eq:${h.id}:${slot}" aria-label="${trEsc(t)}" title="${trEsc(t)}">${eqPic(slot, 32)}</button>`;
 }
-/* девять мест во вкладке «Сила», рядом с талисманами: зовёт heroDetail в index.html */
+/* девять мест во вкладке «Снаряжение» карточки героя, рядом с талисманами: зовёт heroDetail в index.html */
 function eqRow(h) {
   if (!EQD || !S.eq || !h) return '';
   if (!eqOpen()) return `<div class="eq-row"><span class="eyebrow">Снаряжение</span><p class="reason">${ic('lock')} Откроется во втором цикле — вместе с Ареной.</p></div>`;
@@ -250,27 +231,7 @@ function eqHead(it, lead) {
     <span class="row" style="gap:6px"><b class="serif">${eqSlotName(it.slot)}</b>${eqCr(it.r)}</span>
     <span class="row" style="gap:6px">${o ? `<span class="chip">${ic('users')}${trEsc(o.name)}</span>` : '<span class="chip">свободен</span>'}${old ? '<span class="chip warn">прошлый цикл</span>' : ''}</span></span></div>`;
 }
-/* сравнение: выбранный против надетого в том же месте — строки с разницей и прибавка БМ */
-function eqCmp(h, it, cur) {
-  const g = eqGain(h, it);
-  return `<div class="eq-card" data-r="${it.r}">${eqHead(it, cur ? 'Сравнить с надетым' : 'Выбран')}${eqLines(it, h, cur)}
-    <p class="reason">${ICON('power', 14, 'Боевая мощь')} Боевая мощь ${eqPct(g)}${cur ? ` против «${eqSlotName(cur.slot)} · ${RAR[cur.r].toLowerCase()}»` : ''}.</p></div>`;
-}
-const eqCard = (it, h, lead) => `<div class="eq-card" data-r="${it.r}">${eqHead(it, lead)}${eqLines(it, h)}</div>`;
-/* запасы слота в листе героя: плитка, слот и кристалл, главная строка, на ком надет; справа — прибавка БМ этому герою */
-function eqSlotList(h, slot, pick) {
-  const mine = (S.eq.worn[h.id] || {})[slot];
-  const list = Object.values(S.eq.items).filter(it => it.slot === slot && it.uid !== mine).sort(eqSort).slice(0, EQ_VIEW.list);
-  if (!list.length) return `<p class="reason">В запасах нет предметов этого слота. Их приносят сундуки Арены и Лиги.</p>`;
-  const m0 = eqMulOf(h, eqWornList(h.id));
-  return `<div class="eq-list">${list.map(it => {
-    const g = eqGain(h, it, m0), o = eqOwner(it);
-    return `<button class="eq-li" data-r="${it.r}" data-a="eqpick" data-v="${it.uid}" aria-current="${!!pick && pick.uid === it.uid}" title="${trEsc(`${eqSlotName(it.slot)} · ${RAR[it.r].toLowerCase()} · цикл ${ROMAN[it.cyc]}${o ? ' · на ' + o.name : ''}`)}">
-      ${eqTile(it)}<span class="tx"><b>${eqIco(it.lines[0][0], 14, h)}${eqNum(it.lines[0][0], it.lines[0][1])}</b><small>${RAR[it.r]} · цикл ${ROMAN[it.cyc]}${o ? ` · на ${trEsc(o.name)}` : ''}</small></span>
-      <span class="chip${g > 0 ? ' spirit' : ''}">${ICON('power', 12, 'Боевая мощь')}${eqPct(g)}</span></button>`;
-  }).join('')}</div>`;
-}
-/* сумма бонусов героя: характеристики и вторичные свойства всех надетых */
+/* сумма бонусов героя: характеристики и вторичные свойства всех надетых — окно снаряжения, когда ничего не выбрано */
 function eqSum(h) {
   const worn = eqWornList(h.id); if (!worn.length) return '<p class="reason">Места пусты. Нажмите место, затем предмет из запасов.</p>';
   const add = eqAddOf(h, worn), rows = [];
@@ -278,29 +239,13 @@ function eqSum(h) {
   for (const [k, v] of Object.entries(add.sec)) rows.push(`<span class="eq-s" title="${trEsc(eqKind(k).n)}">${eqIco(k, 16, h)}<b class="num">+${v} %</b></span>`);
   return `<div class="eq-sum">${rows.join('')}</div>`;
 }
-const eqHeroTop = h => `<div class="eq-hero"><img src="${h.img}" alt=""><span class="col" style="gap:3px"><b>${trEsc(h.name)}</b><span class="row faint">${CLS(h.cls, 14)}${h.cls}</span></span><span class="g-spacer"></span>${bmHtml(h.bm, 16)}</div>`;
 
 /* ================== листы ================== */
 Object.assign(OV, {
-  /* «Снаряжение» героя: места, надетый или выбранный со сравнением, запасы слота, одно действие */
-  eq(o) {
-    if (!EQD || !S.eq) return '';
-    const [hid, s] = String(o.arg || '').split(':'), h = H(hid) || H(S.selHero); if (!h) return '';
-    const slots = EQD.rules.slots, slot = slots.includes(s) ? s : slots[0], w = S.eq.worn[h.id] || {}, cur = w[slot] ? eqItem(w[slot]) : null;
-    if (S.eq.pickFor !== `${h.id}:${slot}`) { S.eq.pick = null; S.eq.pickFor = `${h.id}:${slot}`; }
-    const pk = eqItem(S.eq.pick), pick = pk && pk.slot === slot && pk.uid !== (cur && cur.uid) ? pk : null;
-    if (!eqOpen()) return sheet('Снаряжение', `${eqHeroTop(h)}<p class="reason">${EQ_WHY.lock()}</p>`);
-    const busy = busyNote(h.id) ? '<p class="reason">Герой в забеге: новый набор — со следующего боя.</p>' : '';
-    const card = pick ? eqCmp(h, pick, cur) : cur ? eqCard(cur, h, `${eqSlotName(slot)} · надет`) : `<p class="reason">${eqSlotName(slot)}: место пусто. Выберите предмет из запасов.</p>`;
-    const body = `${eqHeroTop(h)}<div class="eq-doll">${slots.map(x => eqSlotBtn(h, x, w[x], x === slot)).join('')}</div>${busy}${card}
-      <span class="eyebrow">Запасы · ${eqSlotName(slot).toLowerCase()}</span>${eqSlotList(h, slot, pick)}
-      <details class="eq-sumd"><summary><span class="eyebrow">Сумма бонусов</span></summary>${eqSum(h)}</details>
-      ${TM('§21.3: ограничений по классу нет, предмет — на одном герое за раз. Надеть чужой — снять с прежнего. Прибавка БМ — §6, слой 2: √(УВС′/УВС × ЭЗ′/ЭЗ) по карте бойца. Сервер: EQ_SRV, операции с номером.', 'p', 'reason')}`;
-    const op = `eq${S.eq.seq}`, from = pick && eqOwner(pick);
-    const foot = pick ? `${from ? `<span class="reason">Снимется с героя ${trEsc(from.name)}.</span>` : ''}<button class="btn go" data-a="eqput" data-v="${op}:${h.id}:${pick.uid}">${cur ? 'Заменить' : 'Надеть'}</button>`
-      : cur ? `<button class="btn" data-a="eqout" data-v="${op}:${h.id}:${slot}">Снять</button>` : '<span class="reason">Выберите предмет из запасов.</span>';
-    return sheet('Снаряжение', body, foot, true);
-  },
+  /* «Снаряжение» героя — одно окно со снаряжением и талисманами (grWin, screens/hero-dev.js): места героя слева, запасы справа,
+     перетаскивание и нажатие, сравнение со стрелками. Лист открывает его на своём месте; выбранный предмет (S.eq.pick) сохраняется,
+     если он выбран для этого места (S.eq.pickFor) */
+  eq(o) { return EQD && S.eq && typeof grWin === 'function' ? grWin(o, 'eq') : ''; },
   /* «Свойства и сравнение» (карта экранов: equipment-item): все строки; против предмета выбранного героя в том же слоте */
   eqitem(o) {
     if (!EQD || !S.eq) return '';
@@ -334,22 +279,6 @@ Object.assign(OV, {
     const body = `${eqHead(it)}<p class="reason">Нажмите героя — предмет наденется. ${it.on ? 'С прежнего героя он снимется.' : ''}</p><div class="eq-whos">${list}</div>`;
     return sheet('Кому надеть', body, `<button class="link" data-a="sheet" data-v="eqitem:${it.uid}">${ic('info')}Свойства и сравнение</button>`, true);
   },
-  /* перековка §22: по редкостям — сколько свободных, цена, итог прошлой */
-  eqforge() {
-    if (!EQD || !S.eq) return '';
-    const R = EQD.rules.reforge, L = S.eq.last && eqItem(S.eq.last.got), op = `eq${S.eq.seq}`, rows = [];
-    for (let r = 1; r < 7; r++) {
-      const free = eqFree().filter(it => it.r === r), pick = free.length >= R.need ? free.slice().sort(eqWeak).slice(0, R.need) : null;
-      const cyc = pick ? Math.min(...pick.map(it => it.cyc)) : S.acc.cycle, gold = R.gold[r - 1] * cyc, can = !!pick && S.wallet.gold >= gold;
-      rows.push(`<div class="eq-fr" data-r="${r}"><span class="eq-t" data-r="${r}">${ic('gem')}</span><span class="tx"><b>${RAR[r]} → ${RAR[r + 1].toLowerCase()}</b><small>${fmt(free.length)} ${plural(free.length, 'свободный', 'свободных', 'свободных')} · нужно ${R.need}</small></span>
-        <button class="btn sm${can ? ' go' : ''}" data-a="eqforge" data-v="${op}:${r}" ${pick && eqOpen() ? '' : 'disabled'}>Перековать${costTag('gold', gold)}</button></div>`);
-    }
-    const last = L ? `<div class="eq-got">${eqTile(L, { lg: true })}<span class="col" style="gap:4px"><span class="eyebrow">Перековка дала</span><span class="row" style="gap:6px"><b class="serif">${eqSlotName(L.slot)}</b>${eqCr(L.r)}</span><small class="faint">${eqMainTxt(L)} · цикл ${ROMAN[L.cyc]}</small></span></div>` : '';
-    const body = `${last}<p class="reason">${R.need} свободных предметов одной редкости сплавляются в один редкостью выше. Слот выпадет случайно, цикл — самый ранний из десяти. Надетые не перековываются.</p>
-      <div class="eq-forge">${rows.join('')}</div>
-      ${TM('§22: 10 → 1, итог всегда выше, только внутри снаряжения. Цена — золото за вход × цикл итога. Какие десять — сначала самые слабые; в игре их выбирает игрок. Итог — EnEquip.mint на сиде операции.', 'p', 'reason')}`;
-    return sheet('Перековка снаряжения', body, `<button class="link" data-a="zpto" data-v="eq">${ic('back')}К запасам</button>`, true);
-  },
 });
 
 /* ================== действия ================== */
@@ -368,14 +297,6 @@ Object.assign(ACT, {
     if (r.refuse) { toast(EQ_WHY[r.refuse]()); return; }
     toast(`${eqSlotName(r.slot)} — в запасах`);
   },
-  eqforge(v) {
-    const [op, r] = String(v).split(':'), res = EQ_SRV.forge(op, +r);
-    if (res.again) return;
-    if (res.refuse) { toast(EQ_WHY[res.refuse]()); return; }
-    S.eq.last = res; const it = eqItem(res.got);
-    if (typeof zpV === 'function') zpV().sel.eq = 'q:' + res.got;
-    toast(`Перековка: ${eqSlotName(it.slot)} · ${RAR[it.r].toLowerCase()}`);
-  },
   /* ларец крафта: v — «операция:id предмета» */
   eqcasket(v) {
     const [op, id] = String(v).split(':'), res = EQ_SRV.casket(op, id);
@@ -386,10 +307,10 @@ Object.assign(ACT, {
     toast(`Из ларца: ${eqSlotName(it.slot)} · ${RAR[it.r].toLowerCase()}`);
   },
   eqwhosel(v) { S.eq.who = v; render(); },
-  /* к герою: карточка героя, вкладка «Сила», лист «Снаряжение» на месте предмета */
+  /* к герою: карточка героя, вкладка «Снаряжение», окно снаряжения на месте предмета */
   eqgo(v) {
     const [hid, slot] = String(v).split(':'); if (!H(hid)) return;
-    S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.seg.hero = 'power'; S.selHero = hid;
+    S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.seg.hero = 'gear'; S.selHero = hid;
     S.overlay = { t: 'eq', arg: `${hid}:${slot || ''}` }; render();
   },
 });
@@ -417,7 +338,7 @@ function eqKitHtml() {
   const dec = v => String(Math.round(v * 10 / EQD.econ.x) / 10).replace('.', ',');
   const econ = `<table class="p-table eq-kt"><thead><tr><th>Цикл</th><th>В неделю</th><th>К концу цикла</th><th>Отрядов по ${EQD.econ.squad} мест</th></tr></thead><tbody>${EQD.econ.rows.map(x => `<tr><td>${ROMAN[x.c]}</td><td class="n">${dec(x.free.week.reduce((a, y) => a + y, 0))} / ${dec(x.fan.week.reduce((a, y) => a + y, 0))}</td><td class="n">${dec(x.free.cum.reduce((a, y) => a + y, 0))} / ${dec(x.fan.cum.reduce((a, y) => a + y, 0))}</td><td class="n">${dec(x.free.cum.reduce((a, y) => a + y, 0) / EQD.econ.squad)} / ${dec(x.fan.cum.reduce((a, y) => a + y, 0) / EQD.econ.squad)}</td></tr>`).join('')}</tbody></table>`;
   return `<section class="k-box eq-kit" style="grid-column:1/-1" id="kitEq"><h3>Снаряжение</h3>
-    <p class="k-note">Девять слотов героя: пять брони, два оружия, два украшения. Главная строка слота — первая и самая широкая, число строк — ступень редкости. Ограничений по классу нет, предмет — на одном герое за раз. Цвет кромки — редкость.${TM(' §21, §22, черновик docs/content/снаряжение.md. Данные и генерация — design/ui/equipment.js, сборщик tools/content-gen/equipment/build.js. Экран — screens/equipment.js: места в «Силе», листы OV.eq, OV.eqitem, OV.eqwho, OV.eqforge. Значки слотов — заглушки CSS, задание арта — tools/art-gen/jobs/equipment.json.')}</p>
+    <p class="k-note">Девять слотов героя: пять брони, два оружия, два украшения. Главная строка слота — первая и самая широкая, число строк — ступень редкости. Ограничений по классу нет, предмет — на одном герое за раз. Цвет кромки — редкость.${TM(' §21, §22, черновик docs/content/снаряжение.md. Данные и генерация — design/ui/equipment.js, сборщик tools/content-gen/equipment/build.js. Экран — screens/equipment.js: места во вкладке «Снаряжение», листы OV.eqitem, OV.eqwho; надевают в одном окне с талисманами — OV.eq открывает его (screens/hero-dev.js); перековка — окно screens/reforge.js. В местах и окне — арт слота (screens/art-icons.js), свет — редкость; контур CSS — если арта нет.')}</p>
     <div class="eq-kg">
       <div class="k-air-r"><b>Места в карточке героя</b>${slots}<small>Надетое — значок слота с кромкой редкости, пустое — бледный контур, выбранное — подсвечено. Нажатие открывает лист «Снаряжение».</small></div>
       <div class="k-air-r"><b>Карточка предмета</b>${card}<small>Слот, цикл, редкость, на ком надет; строки — главная первой.</small></div>
@@ -445,10 +366,10 @@ function eqFlowDress() {
   return h;
 }
 FLOWS.push(
-  ['Снаряжение · герой', 'Девять мест рядом с талисманами, лист «Снаряжение»: надетый и выбранный предмет, разница строк и прибавка боевой мощи',
+  ['Снаряжение · герой', 'Девять мест рядом с талисманами, окно снаряжения: выбранный предмет против надетого — стрелки у строк и прибавка боевой мощи',
     () => {
       const h = eqFlowDress(); if (!h) return;
-      S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.seg.hero = 'power'; S.selHero = h.id;
+      S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.seg.hero = 'gear'; S.selHero = h.id;
       const slot = EQ_DEMO.flow.open, best = eqFree().filter(x => x.slot === slot).sort(eqSort)[0];
       S.eq.pickFor = `${h.id}:${slot}`; S.eq.pick = best ? best.uid : null;
       S.overlay = { t: 'eq', arg: `${h.id}:${slot}` };
@@ -460,8 +381,8 @@ FLOWS.push(
       const it = eqFree().sort(eqSort)[0]; S.eq.who = EQ_DEMO.flow.hero;
       S.overlay = it ? { t: 'eqitem', arg: it.uid } : null;
     }],
-  ['Снаряжение · перековка', 'Десять свободных одной редкости — в один редкостью выше: слот случайный, цикл — самый ранний',
-    () => { S.route = 'craft'; S.seg.craft = 'stock'; if (typeof zpV === 'function') zpV().tab = 'eq'; S.overlay = { t: 'eqforge', arg: '' }; }],
+  ['Снаряжение · перековка', 'Своё окно «Ремесло → Перековка»: десять свободных одной редкости — в один редкостью выше, слот случайный, цикл — самый ранний',
+    () => { S.route = 'craft'; S.seg.craft = 'reforge'; S.seg.rf = 'eq'; S.overlay = null; }],
 );
 
 /* ================== состояние ==================

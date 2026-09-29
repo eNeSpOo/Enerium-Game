@@ -15,7 +15,14 @@
       и цель клана — та же формула, C одна у героев, бестиария и клана; у клана видна мощь отряда атаки.
    5. «Призыв → За души» (правила воздуха): главное — вход рулетки с лицами героев пула и «К рулетке»; отряд Эхо недели и каталог праха —
       входами, списки — в листах hrecho и hrdust; в самой вкладке строк-списков нет. Каталог праха: осколок за прах и пробуждение из листа.
-      «За Энериум»: сет-бонус — входом и листом hrset, в списке только пятеро.
+   5б. Дыра праха закрыта (слово автора 29.09.2026): правило в данных — rules.dustSrc без героев Эхо; каталог праха на всех циклах без
+      героев Эхо и с объяснением; ACT.dustbuy отказывает героям Эхо словами и ничего не списывает; в листе отряда недели — «Пробудить» за
+      души и никакого праха, лишние осколки — в прах (§15.2); в запасах у героя Эхо нет «Осколка» за прах. Герой, которого собирают, —
+      призрачный осколок (shardGhost).
+   5в. «За Энериум» — витрина: пятеро на ступенях цены по местам, цены растут и видны; входы всех сетов; сет-бонус строкой и листом со
+      ступенями по сумме доблестей, N ступеней и пятерыми; кнопка покупки с номером и ценой. Покупка — подтверждение с остатком,
+      одна операция DN_SRV (списано ровно цена, герой — 0 ур., 0 РП, 0 Добл), окно получения и «сразу итог», повтор номера ничего
+      не меняет, отказы — без расхода, нехватка — сколько и где пополнить, цикл I — купить нельзя. В режиме «Игрок» — без служебного.
    6. Режим «Игрок»: на всех видах нет служебных слов (SERVICE из check_player_view.js), нет undefined и NaN; режим «Команда» рисуется.
    Запуск: node tools/content-gen/screens/check_heroes.js */
 'use strict';
@@ -30,7 +37,7 @@ const say = m => { if (err.length < 60) err.push(m); else if (err.length === 60)
 function done() {
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
   console.log(`«Герои»: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; плиток ${cnt.tiles}, шапок ${cnt.heads}, циклов «Призыва» ${cnt.cycles}; мощь сверена с формулой §6 ${cnt.bm} раз.`);
-  console.log('Проверка пройдена: плитка, строка и карточка героя — с одобренным кристаллом, доблестью, пределом, уровнем и классом; «За души» — рулетка крупно, остальное листами; в режиме «Игрок» служебного нет.');
+  console.log('Проверка пройдена: плитка, строка и карточка героя — с одобренным кристаллом, доблестью, пределом, уровнем и классом; «За души» — рулетка крупно, остальное листами; героев Эхо прахом не собрать; «За Энериум» — ступени цены, сет-бонус по ступеням, покупка с номером и окно получения; в режиме «Игрок» служебного нет.');
   process.exit(0);
 }
 
@@ -95,6 +102,8 @@ function load() {
     get S() { return S; }, set S(v) { S = v; },
     ACT, OV, SCREENS, FLOWS, KH, RS, RSI, EB, INV, H, SQ, render, initialState, setTeam, rsPool, rsCyc, rsHas, rsFrom, rsWeek, fmt, RAR, ROMAN,
     heroCard, rsCard, heroHead, rsHead, hrV, hrMine, hrOwn, hrDustCat, rsRow, heroDetail, rsSetWeek, sq, HR_DATA,
+    rsDustable, rsDustOf, rsTiers, dnSets, dnSet, DN_SRV, DN_ART, zpCardHero: typeof zpCardHero === 'function' ? zpCardHero : null,
+    ART_READY: typeof ART_ICONS !== 'undefined' && ART_ICONS.ready.includes(ART_ICONS.frame) && ART_ICONS.ready.includes(ART_ICONS.mask),
     BM: typeof BM !== 'undefined' ? BM : null, BM_SRC0: typeof BM_SRC0 !== 'undefined' ? BM_SRC0 : null, bmInit0: typeof bmInit0 === 'function' ? bmInit0 : null,
     BF: window.EN_BIOME_FOES || null, CLAN: window.EN_CLAN || null, EC: window.EnClan || null, AD: window.EN_ARENA || null, ARU: window.EN_ARENA_UI || null, ECHO: window.EN_ECHO || null,
     TB: typeof TB !== 'undefined' ? TB : null, TL_SRV: typeof TL_SRV !== 'undefined' ? TL_SRV : null, tlMul: typeof tlMul === 'function' ? tlMul : null, tlWhy: typeof tlWhy === 'function' ? tlWhy : null,
@@ -173,7 +182,7 @@ for (let c = 1; c <= 6; c++) {
 fresh();
 for (const x of T.S.heroes) {
   T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'mine'; T.S.selHero = x.id;
-  for (const tab of ['power', 'skills', 'path']) {
+  for (const tab of ['power', 'gear', 'skills', 'path']) {
     T.S.seg.hero = tab; const h = view(`карточка · ${x.name} · ${tab}`), i = h.indexOf('<div class="hd-top">'), top = i < 0 ? '' : h.slice(i, h.indexOf('<div class="hd-body">', i));
     if (tab !== 'power') continue;
     cnt.heads++;
@@ -208,7 +217,17 @@ fresh();
     if (h !== T.H(x.id)) say('купленный герой: H(id) каждый раз даёт новый объект');
     if (!T.hrMine().includes(h)) say('купленный герой: его нет в «Моих»');
     T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'mine'; T.S.selHero = x.id;
-    for (const tab of ['power', 'skills', 'path']) { T.S.seg.hero = tab; const g = view(`купленный · ${tab}`); if (tab === 'power' && !g.includes('data-a="limit"')) say('купленный герой: нет лестницы развития'); if (tab === 'path' && !g.includes(T.RSI[x.id].chT[0])) say('купленный герой: во вкладке «Путь» нет его главы'); }
+    for (const tab of ['power', 'gear', 'skills', 'path']) {
+      T.S.seg.hero = tab; const g = view(`купленный · ${tab}`);
+      if (tab === 'power' && (!g.includes('data-a="limit"') || !/class="hdv-next"/.test(g))) say('купленный герой: во вкладке «Развитие» нет пути с воротами предела или следующего шага');
+      if (tab === 'gear' && (g.match(/class="eq-slot[ "]/g) || []).length !== 9) say('купленный герой: во вкладке «Снаряжение» не девять мест');
+      if (tab === 'path' && !g.includes(T.RSI[x.id].chT[0])) say('купленный герой: во вкладке «Путь» нет его главы');
+    }
+    /* превью доблести купленного героя называет его главу из состава (screens/hero-dev.js) */
+    { const rh = T.RSI[x.id], ch1 = rh.ch && rh.ch[0] ? rh.ch[0][0] : rh.chT[0];
+      T.S.overlay = null; run('купленный · превью доблести', () => T.ACT.valor(x.id));
+      if (!view('купленный · превью доблести').includes(`«${ch1}»`)) say(`купленный герой: превью доблести не называет его главу «${ch1}»`);
+      T.S.overlay = null; }
     T.S.seg.hero = 'power';
     const t = tilesOf(view('купленный · плитка')).find(y => y.includes(`data-v="${x.id}"`));
     if (!t) say('купленный герой: нет плитки в «Моих»'); else checkTile(t, 'купленный · плитка', { r: x.r, maxV: x.maxV, valor: 0, own: true, lim: 0, lvl: 0 });
@@ -348,15 +367,176 @@ run('режим «Игрок»', () => T.setTeam(false));
   if (!T.rsHas(x) || !T.H(x.id)) say('каталог праха: пробуждённый герой не пришёл в коллекцию');
   T.S.wallet.dust = d0;
 }
-/* «За Энериум»: пятеро в списке, сет-бонус — входом и листом */
+/* ================== 5б. дыра праха закрыта: героев Эхо прахом не собрать ==================
+   Правило — в данных (EN_ROSTER.rules.dustSrc), его проверяет и «сервер» (ACT.dustbuy), и каждая кнопка «Осколок». Пробудить героя Эхо
+   из осколков сундуков Эхо за души — можно: из листа отряда недели и из запасов */
+{
+  const R = T.RS.rules, src = R && R.dustSrc;
+  if (!Array.isArray(src) || !src.length) say('прах: в данных нет правила rules.dustSrc — чьи осколки продаёт каталог праха');
+  else {
+    if (src.includes('echo')) say('прах: rules.dustSrc разрешает героев Эхо — дыра в обход Эхо');
+    if (src.some(k => !['roulette'].includes(k) && !T.RS.sources.includes(k))) say(`прах: в rules.dustSrc неизвестный источник — ${src.join(', ')}`);
+  }
+  /* другие источники осколков: осколки героя дают только рулетка и сундук осколков Эхо (EN_LOOTBOXES: линии kind: 'shards').
+     Каталог праха не продаёт героев, у которых осколков нет вовсе (золото, Энериум, крафт) */
+  for (const h of T.RS.heroes) if (T.rsDustable(h) !== !!(src && src.includes(h.src))) { say(`прах: rsDustable(${h.id}) расходится с rules.dustSrc`); break; }
+  for (const k of ['gold', 'donat', 'craft', 'echo']) if (src && src.includes(k)) say(`прах: каталог продаёт осколки героев «${k}»`);
+  for (let c = 1; c <= 6; c++) {
+    fresh(); T.S.rs.cyc = c;
+    const cat = T.hrDustCat(), bad = cat.filter(h => !T.rsDustable(h) || h.src === 'echo');
+    if (bad.length) say(`каталог праха · цикл ${c}: в нём герои Эхо — ${bad.slice(0, 3).map(h => h.n).join(', ')}`);
+    T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = 'souls'; T.S.overlay = { t: 'hrdust' };
+    const o = ovOf(view(`каталог праха · цикл ${c}`));
+    const echoIn = T.RS.heroes.filter(h => h.src === 'echo' && o.includes(`data-v="${h.id}"`));
+    if (echoIn.length) say(`каталог праха · цикл ${c}: в листе строки героев Эхо — ${echoIn.slice(0, 3).map(h => h.n).join(', ')}`);
+    if (c >= 2 && !/Героев Эхо здесь нет/.test(o)) say(`каталог праха · цикл ${c}: не объяснено, почему в нём нет героев Эхо`);
+    if (T.ART_READY && cat.length && (o.match(/class="hsg"/g) || []).length < cat.length) say(`каталог праха · цикл ${c}: не у каждого собираемого героя призрачный осколок`);
+  }
+  /* «сервер»: осколок героя Эхо за прах — отказ, прах и осколки не тронуты */
+  fresh(); T.S.acc.cycle = 6;
+  const e = T.RS.heroes.find(h => h.src === 'echo' && h.c <= 6 && !T.rsHas(h));
+  T.S.wallet.dust = 1e6; const d0 = T.S.wallet.dust, s0 = T.S.rs.shards[e.id] || 0;
+  run('прах · осколок героя Эхо', () => T.ACT.dustbuy(e.id));
+  if (T.S.wallet.dust !== d0 || (T.S.rs.shards[e.id] || 0) !== s0) say(`прах: ACT.dustbuy продал осколок героя Эхо ${e.n}`);
+  if (!T.S.toast || !/Эхо/.test(T.S.toast.t)) say('прах: отказ по герою Эхо не объяснён игроку');
+  /* лист отряда недели: выбор героя, «Пробудить» за души, «Осколка» за прах нет; осколки — призрачным осколком */
+  fresh(); T.S.acc.cycle = 6; T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = 'souls';
+  const W = T.rsWeek(), sq5 = W.squad.map(id => T.RSI[id]).filter(Boolean), x = sq5.find(h => !T.rsHas(h)), need = T.RS.rules.stub.shards;
+  T.S.overlay = { t: 'hrecho' };
+  let o = ovOf(view('отряд недели'));
+  if (/data-a="dustbuy"/.test(o) || /data-v="hrdust"/.test(o)) say('отряд недели: в листе прах — осколки героев Эхо за прах');
+  if (!/только из сундуков Эхо/.test(o)) say('отряд недели: не сказано, что осколки героев Эхо — только из сундуков Эхо');
+  if (T.ART_READY && !/class="hsg"/.test(o)) say('отряд недели: у героев, которых собирают, нет призрачного осколка (shardGhost)');
+  run('отряд недели · выбор', () => T.ACT.ssel(x.id));
+  o = ovOf(view('отряд недели · выбран'));
+  if (!o.includes(`data-a="activate" data-v="${x.id}"`)) say('отряд недели: у выбранного героя Эхо нет «Пробудить»');
+  if (o.includes(`data-a="dustbuy" data-v="${x.id}"`)) say('отряд недели: у героя Эхо есть «Осколок» за прах');
+  T.S.rs.shards[x.id] = need + 3; T.S.wallet.souls = 1e6;
+  const dust0 = T.S.wallet.dust;
+  run('отряд недели · пробудить', () => T.ACT.activate(x.id)); run('отряд недели · подтверждение', () => T.ACT.activatedo(x.id));
+  if (!T.rsHas(x) || !T.H(x.id)) say('отряд недели: пробуждённый душами герой Эхо не пришёл в коллекцию');
+  if (T.S.wallet.dust !== dust0 + 3 * T.rsDustOf(x)) say('отряд недели: лишние осколки героя Эхо не ушли в прах (§15.2)');
+  /* запасы: карточка осколков героя Эхо — без «Осколка» за прах и с объяснением, «Пробудить» есть */
+  if (typeof T.zpCardHero === 'function') {
+    fresh(); T.S.acc.cycle = 6;
+    const y = T.RS.heroes.find(h => h.src === 'echo' && h.c <= 6 && !T.rsHas(h)), r0 = T.RS.heroes.find(h => h.src === 'roulette' && h.c <= 6 && !T.rsHas(h));
+    const cardE = run('запасы · осколки героя Эхо', () => T.zpCardHero({ h: y, q: 7, key: 'hero:' + y.id })) || '';
+    const cardR = run('запасы · осколки героя рулетки', () => T.zpCardHero({ h: r0, q: 7, key: 'hero:' + r0.id })) || '';
+    if (/data-a="dustbuy"/.test(cardE)) say('запасы: у героя Эхо есть «Осколок» за прах');
+    if (!/только из сундуков Эхо/.test(cardE) || !cardE.includes(`data-a="activate" data-v="${y.id}"`)) say('запасы: у героя Эхо нет объяснения или «Пробудить»');
+    if (!cardR.includes(`data-a="dustbuy" data-v="${r0.id}"`)) say('запасы: у героя рулетки пропал «Осколок» за прах');
+  }
+}
+
+/* ================== 5в. «За Энериум»: витрина донатного сета ==================
+   Пятеро Безликих на ступенях цены: места 1…5 слева направо, цены растут и видны; сеты циклов; сет-бонус строкой и листом со ступенями;
+   выбранный герой и одна кнопка покупки с номером операции. Покупка — DN_SRV: Энериум списывается один раз, герой приходит с 0 ур.,
+   0 РП и 0 Добл; повтор номера ничего не меняет; отказ — без расхода. Окно получения героя; цикл I — витрина без покупки */
+const priceOf = h => T.RS.rules.stub.donatPrice[h.place - 1];
+const niches = h => [...h.matchAll(/<button class="dn-ni[^"]*" style="--k:(\d)"[^>]*data-v="([^"]+)"[\s\S]*?<\/button>/g)].map(m => ({ k: +m[1], id: m[2], html: m[0] }));
+for (const team of [false, true]) {
+  run('режим', () => T.setTeam(team));
+  for (let c = 1; c <= 6; c++) {
+    fresh(); T.S.acc.cycle = c; T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = 'donat';
+    const tag = `«За Энериум» · цикл ${c}${team ? ' [команда]' : ''}`, h = view(tag), sets = T.dnSets(), s = T.dnSet(), open = s.cycle <= c;
+    const N = niches(h);
+    if (N.length !== s.members.length) { say(`${tag}: героев на ступенях ${N.length}, в сете ${s.members.length}`); continue; }
+    N.forEach((n, i) => {
+      const x = T.RSI[n.id];
+      if (!x || x.dset !== s.key || n.k !== x.place || x.place !== i + 1) say(`${tag}: ступень ${i + 1} — не ${i + 1}-й герой сета`);
+      else if (!n.html.includes(`<b class="num">${T.fmt(priceOf(x))}</b>`)) say(`${tag}: у ${x.n} на ступени нет цены ${priceOf(x)}`);
+    });
+    for (let i = 1; i < N.length; i++) if (priceOf(T.RSI[N[i].id]) <= priceOf(T.RSI[N[i - 1].id])) say(`${tag}: цена не растёт от первого к пятому`);
+    if (sets.some(x => !h.includes(`data-a="dcyc" data-v="${x.cycle}"`))) say(`${tag}: не у всех донатных сетов есть вход`);
+    if (!h.includes(`data-a="sheet" data-v="hrset:${s.key}"`)) say(`${tag}: нет сет-бонуса строкой`);
+    if (/class="kh-set/.test(h)) say(`${tag}: сет-бонус со ступенями — на витрине, а не в листе`);
+    const buy = h.match(/data-a="dbuy" data-v="(dn\d+)\|([^"]+)"/);
+    if (open && !buy) say(`${tag}: нет кнопки покупки с номером операции`);
+    if (!open && buy) say(`${tag}: сет закрыт, а купить можно`);
+    if (buy && !h.includes(`Купить<span class="cost">`)) say(`${tag}: на кнопке покупки нет цены`);
+    /* воздух: на витрине — не больше 14 чисел: пять цен, сет-бонус, «в коллекции N из 5», доблесть и цикл */
+    const txt = playerText(h.slice(h.indexOf('<div class="dn'))), nums = (txt.match(/\d[\d\s ]*/g) || []).filter(x => x.trim()).length;
+    if (!team && nums > 14) say(`${tag}: на витрине ${nums} чисел — тесно`);
+    /* лист сет-бонуса: ступеней — по сумме доблестей, у каждой — фишки героев и эффект с N ступени */
+    T.S.overlay = { t: 'hrset', arg: s.key };
+    const o = ovOf(view(`${tag} · сет-бонус`)), st = (o.match(/class="dn-st[ "]/g) || []).length, tiers = T.rsTiers(s.sum);
+    if (st !== tiers) say(`${tag} · сет-бонус: ступеней ${st}, по сумме доблестей ${s.sum} — ${tiers}`);
+    (s.n || []).slice(0, tiers).forEach(n => { if (!o.includes(`${T.fmt(n)}-го`)) say(`${tag} · сет-бонус: нет N = ${n}`); });
+    if (s.members.some(id => !o.includes(`data-a="dsel" data-v="${id}"`))) say(`${tag} · сет-бонус: нет пятерых сета`);
+    if (!/5–9 — одна, 10–14 — две, 15 и больше — три/.test(o)) say(`${tag} · сет-бонус: не сказано, сколько ступеней даёт сумма доблестей`);
+    T.S.overlay = null;
+    cnt.cycles++;
+  }
+}
+run('режим «Игрок»', () => T.setTeam(false));
+/* покупка: подтверждение, одна операция, повтор, отказы, окно получения */
 {
   fresh(); T.S.acc.cycle = 2; T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = 'donat';
-  const h = view('«За Энериум»'), m = h.match(/data-a="sheet" data-v="hrset:([^"]+)"/);
-  if (!m) say('«За Энериум»: нет входа сет-бонуса');
-  if (/class="kh-set/.test(h)) say('«За Энериум»: сет-бонус со ступенями — в списке, а не в листе');
-  if (m) { T.S.overlay = { t: 'hrset', arg: m[1] }; const o = ovOf(view('лист сета')); if (!o.includes('class="kh-set')) say('лист сета: нет состава и бонуса'); }
-  for (const t of ['gold', 'donat']) for (let c = 1; c <= 6; c++) { fresh(); T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = t; T.S.rs.cyc = c; view(`«Призыв» · ${t} · цикл ${c}`); }
+  const s = T.dnSet(), x = T.RSI[s.members[0]], p = priceOf(x);
+  T.S.wallet.enerium = p + 5;
+  const h = view('покупка · витрина'), m = h.match(/data-a="dbuy" data-v="(dn\d+)\|([^"]+)"/);
+  run('покупка · выбрать первого', () => T.ACT.dsel(x.id));
+  const h2 = view('покупка · первый выбран'), m2 = h2.match(/data-a="dbuy" data-v="(dn\d+)\|([^"]+)"/);
+  if (!m2 || m2[2] !== x.id) say('покупка: у выбранного героя нет своей кнопки «Купить»');
+  else {
+    const op = m2[1];
+    run('покупка · подтверждение', () => T.ACT.dbuy(`${op}|${x.id}`));
+    const o = ovOf(view('покупка · окно подтверждения'));
+    if (!T.S.overlay || T.S.overlay.t !== 'dnbuy') say('покупка: нет подтверждения');
+    if (!o.includes(`data-a="dbuydo" data-v="${op}|${x.id}"`) || !o.includes('0 уровнем') || !o.includes(`останется ${T.fmt(5)}`)) say('покупка: подтверждение без номера, без «с чем приходит» или без остатка Энериума');
+    const e0 = T.S.wallet.enerium;
+    run('покупка · купить', () => T.ACT.dbuydo(`${op}|${x.id}`));
+    if (T.S.wallet.enerium !== e0 - p) say(`покупка: списано ${e0 - T.S.wallet.enerium}, цена ${p}`);
+    if (JSON.stringify(T.S.rs.owned[x.id]) !== JSON.stringify({ lvl: 0, lim: 0, valor: 0, how: 'donat' })) say(`покупка: запись коллекции ${JSON.stringify(T.S.rs.owned[x.id])}`);
+    if (!T.S.overlay || T.S.overlay.t !== 'hrgot') say('покупка: нет окна получения героя');
+    const g = ovOf(view('получение героя'));
+    if (!g.includes(x.n) || !/class="dn-fr/.test(g) || !/--t0:-\d+ms/.test(g)) say('получение героя: нет имени, рамы или времени сцены');
+    if (!g.includes(`data-a="dngo" data-v="${x.id}"`)) say('получение героя: нет перехода к развитию');
+    run('получение · сразу итог', () => T.ACT.dnskip());
+    const g2 = ovOf(view('получение героя · итог'));
+    if (!/class="ov dn-got done"/.test(g2) || !/class="ov-scrim" data-a="close"/.test(g2)) say('получение героя: нажатие не ведёт сразу к итогу');
+    /* повтор той же операции — ничего не списывает и не выдаёт */
+    const e1 = T.S.wallet.enerium;
+    run('покупка · повтор номера', () => T.ACT.dbuydo(`${op}|${x.id}`));
+    if (T.S.wallet.enerium !== e1) say('покупка: повтор номера списал Энериум ещё раз');
+    const r = T.DN_SRV.buy(op, x.id); if (!r.again) say('покупка: повтор номера — не «повтор»');
+    /* отказы: уже в коллекции, не хватает Энериума, сет закрыт — без расхода */
+    const y = T.RSI[s.members[4]]; T.S.wallet.enerium = priceOf(y) - 1;
+    const e2 = T.S.wallet.enerium, r1 = T.DN_SRV.buy('dn' + T.S.dn.seq, y.id), r2 = T.DN_SRV.buy('dn' + T.S.dn.seq, x.id);
+    if (r1.refuse !== 'enerium' || r2.refuse !== 'own' || T.S.wallet.enerium !== e2 || T.rsHas(y)) say(`покупка: отказы ${r1.refuse}, ${r2.refuse} — или расход при отказе`);
+    run('покупка · не хватает', () => T.ACT.dsel(y.id));
+    const h3 = view('покупка · не хватает Энериума');
+    if (!/data-a="dbuy"[^>]*disabled/.test(h3) || !h3.includes(`Не хватает ${T.fmt(1)} Энериума`) || !h3.includes('data-a="go" data-v="store"')) say('покупка: при нехватке Энериума не сказано сколько и где пополнить');
+    const z = T.RS.heroes.find(q => q.src === 'donat' && q.c === 3); T.S.wallet.enerium = 1e6;
+    const r3 = T.DN_SRV.buy('dn' + T.S.dn.seq, z.id);
+    if (r3.refuse !== 'shut' || T.rsHas(z)) say('покупка: героя закрытого сета можно купить');
+    /* купленный — «в коллекции» и «К развитию» на витрине, на ступени — отметка вместо цены */
+    run('покупка · купленный', () => T.ACT.dsel(x.id));
+    const h4 = view('витрина · купленный');
+    if (!h4.includes(`data-a="dngo" data-v="${x.id}"`) || /data-a="dbuy"[^>]*\|c2/.test(h4.slice(h4.indexOf('<div class="dn-card')))) say('витрина: у купленного героя нет «К развитию» или снова «Купить»');
+    run('к развитию', () => T.ACT.dngo(x.id));
+    if (T.S.route !== 'heroes' || T.S.seg.heroes !== 'coll' || T.S.hview !== 'mine' || !T.H(T.S.selHero)) say('«К развитию»: не ведёт в «Мои» к купленному герою');
+  }
+  if (m && !/^dn\d+$/.test(m[1])) say('покупка: номер операции не вида dnN');
 }
+/* арт витрины: выгруженные пути (DN_ART.ready) лежат в assets/art — иначе битая картинка; невыгруженные на витрине не рисуются */
+{
+  const A = T.DN_ART, known = [A.hall, A.frame].concat(T.dnSets().map(s => A.emblem(s.key)));
+  for (const p of A.ready) { if (!known.includes(p)) say(`арт витрины: неизвестный путь ${p}`); if (!fs.existsSync(path.join(UI, 'assets', 'art', p))) say(`арт витрины: ${p} в DN_ART.ready, а файла нет`); }
+  fresh(); T.S.acc.cycle = 2; T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = 'donat';
+  const h = view('витрина · арт');
+  for (const p of known) if (!A.ready.includes(p) && h.includes(p)) say(`арт витрины: ${p} не выгружен, а на витрине есть`);
+}
+/* цикл I: витрина — обещание, купить нельзя; старый вызов ACT.dbuy(id) отказывает словами */
+{
+  fresh(); T.S.acc.cycle = 1; T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = 'donat';
+  const h = view('«За Энериум» · цикл I'), x = T.RSI[T.dnSet().members[0]], e0 = T.S.wallet.enerium;
+  if (/data-a="dbuy"/.test(h) || !/с цикла II/.test(h)) say('цикл I: на витрине можно купить или не сказано, с какого цикла');
+  run('цикл I · купить', () => T.ACT.dbuy(x.id));
+  if (T.S.wallet.enerium !== e0 || T.rsHas(x) || (T.S.overlay && T.S.overlay.t === 'dnbuy')) say('цикл I: покупка прошла');
+}
+/* сценарии витрины рисуются */
+for (const [n, , f] of T.FLOWS.filter(x => /Энериум|отряд Эхо недели/.test(x[0]))) { fresh(); run('сценарий ' + n, () => f()); view(`сценарий «${n}»`); }
 /* лист «Подробнее» героя состава — с новой шапкой */
 for (const x of [T.RS.heroes[0], T.RS.heroes.find(h => h.src === 'donat'), T.RS.heroes.find(h => h.src === 'echo')]) { fresh(); T.S.route = 'heroes'; T.S.overlay = { t: 'rhero', arg: x.id }; const o = ovOf(view(`лист героя · ${x.n}`)); if (!o.includes('class="hd-top"')) say(`лист героя ${x.n}: нет шапки`); }
 

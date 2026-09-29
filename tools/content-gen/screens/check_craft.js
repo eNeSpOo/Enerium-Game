@@ -11,6 +11,10 @@
    4. Запасы меняются как положено: попытка списывает весь стол, неудача ничего не создаёт, повторное нажатие не повторяет расход,
       особый ресурс без согласия не списывается, герой приходит в коллекцию с 0 ур., 0 РП и 0 Добл.
    5. Все классы ws-* из craft.js описаны в craft.css; ни в одном теге нет второго style или class.
+   5а. Ввод ресурса (слова автора 29.09.2026): запасы — по пять в ряд, плитки крупнее прежних 48 px; у каждой плитки справа сверху
+      лупа — карточка ресурса; нажатие — ползунок от 0 до min(100, запас), подтверждение кладёт ресурс в ячейку ровно в выбранном
+      количестве; ресурс на столе — ползунок на его количестве, 0 — убрать; перенос на ячейку и «На стол» из карточки и других
+      экранов — тот же ползунок; полный стол — отказ без ползунка; количество выбранной ячейки — ползунок под столом.
    6. Анимация удачи и неудачи: итог выдан сервером до анимации одной операцией с номером, повтор номера ничего не меняет;
       полная версия — новый рецепт с книгой и герой; короткая — известный рецепт, автодокрафт, серия; короткая без листа закрывается
       строкой; неудача — нити рвутся, трещины, пепел, что сгорело, подсказка только положенная; нажатие на сцену и галочка — сразу итог,
@@ -67,7 +71,7 @@ if (err.length) done();
 vm.runInContext(`globalThis.__ws = {
   get S() { return S; }, reset() { S = initialState(); S.route = 'craft'; S.seg.craft = 'work'; },
   html() { render(); return document.getElementById('game').innerHTML; },
-  ACT, BAG, WS_DATA, WS_SRV, RSI, rsHas, FLOWS, EN_RECIPES, wsPut, wsSetTable, wsToCraft,
+  ACT, BAG, WS_DATA, WS_SRV, RSI, rsHas, FLOWS, EN_RECIPES, wsPut, wsSetTable, wsToCraft, wsPick, wsPutQ, wsRangeLive, wsCellMax,
   WS_FX, WS_KIT, wsCracks, wsKitHtml, wsKitPlay, wsKitAct, wsKitBoardHtml, KIT_EXTRA,
   kitStage() { return document.getElementById('wsKitStage').innerHTML; },
 };`, ctx);
@@ -421,9 +425,88 @@ scene('перенос и полный стол', () => {
 scene('на стол из других экранов', () => {
   W.reset(); W.S.route = 'shelter';
   if (W.ACT.toCraft !== W.wsToCraft) { warn.push('ACT.toCraft переопределён другим экраном — проверка пропущена'); return; }
-  A.toCraft('resin'); eq('маршрут', W.S.route, 'craft'); ok('смола на столе', W.S.ws.cells.some(c => c && c.id === 'resin'));
+  A.toCraft('resin'); eq('маршрут', W.S.route, 'craft');
+  ok('«На стол мастера»: мастерская открылась с ползунком', !!W.S.overlay && W.S.overlay.t === 'wsqty' && W.S.overlay.arg === 'resin');
+  view('на стол из запасов: ползунок');
+  A.wsqdo(); ok('смола на столе после ползунка', W.S.ws.cells.some(c => c && c.id === 'resin'));
   view('на стол из запасов');
   A.toCraft('cinder'); view('прежний предмет прототипа');
+});
+
+/* 5а. ввод ресурса: плитки по пять в ряд с лупой, ползунок количества, ячейка */
+scene('ввод ресурса: плитки и лупа', () => {
+  W.reset();
+  const h = view('запасы мастерской'), inv = h.slice(h.indexOf('ws-grid'), h.indexOf('ws-craft'));
+  const tiles = (inv.match(/class="ws-tile[ "]/g) || []).length, lens = (inv.match(/class="ws-lens" data-a="wsinfo"/g) || []).length, picks = (inv.match(/data-a="wspick"/g) || []).length;
+  ok('плиток в запасах нет', tiles > 0);
+  eq('у каждой плитки — лупа карточки', lens, tiles); eq('у каждой плитки — нажатие на ползунок', picks, tiles);
+  ok('лупа — справа сверху плитки, после её кнопки', /<div class="ws-tile[^"]*" data-r="\d"><button class="well[\s\S]*?<\/button><button class="ws-lens"/.test(inv));
+  ok('в плитке снова прежнее «положить без ползунка»', !/data-a="wsput"/.test(inv));
+  /* пять в ряд, крупнее прежних 48 px: сетка — пять равных столбцов, плитка — квадрат во всю ширину столбца */
+  const flat = CSS.replace(/\s+/g, ' ');
+  ok('craft.css: запасы мастерской не по пять в ряд', /\.ws-grid\{[^}]*grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/.test(flat));
+  ok('craft.css: плитка не квадратная во всю ширину столбца', /\.ws-tile\{[^}]*aspect-ratio:1\/1/.test(flat) && /\.ws-tile>\.well\{[^}]*inset:0/.test(flat));
+  /* ширина плитки на экранах 932 × 430 и 844 × 390: панель «Инвентарь» — доля 1 из 2,1 рабочей области, поля и зазоры — из CSS */
+  const gap = +((flat.match(/\.ws-grid\{[^}]*gap:(\d+)px/) || [])[1] || 0), padIn = 10 + 1, padCompact = 8 + 1;
+  for (const [w, rail, compact] of [[932, 78, false], [844, 72, true]]) {
+    const main = w - rail - 2 * 12, panel = Math.floor((main - 10) * 10 / 21), inner = panel - 2 * (compact ? padCompact : padIn) - 6 - 6;
+    const tile = Math.floor((inner - 4 * (compact ? 6 : gap)) / 5);
+    ok(`${w}: плитка ${tile} px — не крупнее прежних 48`, tile > 48);
+  }
+  /* лупа открывает карточку, «На стол» в карточке — тот же ползунок */
+  const id = W.S.ws.cells[0] ? W.S.ws.cells[0].id : 'fang';
+  A.wsinfo(id); eq('лупа — карточка ресурса', W.S.overlay && W.S.overlay.t, 'wsitem');
+  ok('«На стол» в карточке — ползунок', /data-a="wspick" data-v="[^"]+"/.test(view('карточка ресурса')));
+  A.wspick(id); eq('«На стол» из карточки — ползунок', W.S.overlay && W.S.overlay.t, 'wsqty');
+});
+
+scene('ввод ресурса: ползунок', () => {
+  W.reset();
+  const range = h => { const m = h.match(/<input class="ws-range" id="wsQv" type="range" min="(\d+)" max="(\d+)" step="1" value="(\d+)"/); return m ? m.slice(1).map(Number) : null; };
+  /* запас меньше 100 — до запаса; ресурса нет на столе — стоит на одной */
+  const few = 'fang', n = q(few);
+  A.wspick(few); let h = view('ползунок: запас меньше 100');
+  let r = range(h);
+  ok('ползунка нет', !!r);
+  if (r) { eq('ползунок от 0', r[0], 0); eq('ползунок до запаса', r[1], Math.min(W.WS_DATA.cellMax, n)); eq('ползунок сразу на одной', r[2], Math.min(n, W.WS_DATA.pick.start)); }
+  ok('кнопка «В ячейку · N»', /id="wsQvGo" data-a="wsqdo">В ячейку · 1</.test(h));
+  A.wsqv('', { value: String(n) }); eq('ползунок до конца', W.S.overlay.v, n);
+  A.wsqv('', { value: '999' }); eq('ползунок не выше запаса', W.S.overlay.v, n);
+  A.wsqn('-1'); eq('«−» — на шаг меньше', W.S.overlay.v, n - W.WS_DATA.pick.step);
+  A.wsqv('', { value: '0' }); h = view('ползунок на нуле');
+  ok('на нуле нового ресурса «В ячейку» недоступна', /id="wsQvGo" data-a="wsqdo" disabled/.test(h));
+  A.wsqdo(); ok('на нуле ничего не легло', !W.S.ws.cells.some(c => c && c.id === few)); eq('на нуле лист не закрылся', W.S.overlay && W.S.overlay.t, 'wsqty');
+  A.wsqv('', { value: '4' }); A.wsqdo();
+  eq('легло ровно выбранное', cellsTxt(), 'fang×4'); ok('лист закрылся', !W.S.overlay); eq('в выбранную пустую ячейку', W.S.ws.cells[0] && W.S.ws.cells[0].id, few);
+  /* живой ввод: пока тянут — число и кнопка меняются без перерисовки */
+  A.wspick('salt'); W.wsRangeLive({ id: 'wsQv', value: '7', min: '0', max: '18', style: { setProperty() {} } });
+  eq('живой ввод меняет число ползунка', W.S.overlay.v, 7); A.wsqdo(); eq('живой ввод — ячейка', W.S.ws.cells[1] && W.S.ws.cells[1].q, 7);
+  /* запас больше 100 — ползунок до 100 */
+  W.BAG.add('sand', 150);
+  A.wspick('sand'); r = range(view('ползунок: запас больше 100'));
+  ok('ползунок до 100 при запасе больше 100', !!r && r[1] === W.WS_DATA.cellMax);
+  A.close();
+  /* ресурс на столе: ползунок на его количестве, кнопка «Готово», ноль — убрать со стола */
+  A.wspick('fang'); r = range(h = view('ползунок: ресурс на столе'));
+  ok('ползунок стоит на количестве со стола', !!r && r[2] === 4); ok('кнопка «Готово · 4»', /id="wsQvGo" data-a="wsqdo">Готово · 4</.test(h));
+  A.wsqv('', { value: '2' }); A.wsqdo(); eq('на столе — новое количество', W.S.ws.cells[0] && W.S.ws.cells[0].q, 2);
+  A.wspick('fang'); A.wsqv('', { value: '0' }); h = view('ползунок: убрать со стола');
+  ok('на нуле — «Убрать со стола»', /id="wsQvGo" data-a="wsqdo">Убрать со стола</.test(h));
+  A.wsqdo(); ok('ноль убрал со стола', !W.S.ws.cells.some(c => c && c.id === 'fang'));
+  /* перенос на ячейку — ползунок для этой ячейки */
+  W.reset(); W.wsPutQ('salt', 3); W.wsPick('fang', 4); eq('перенос — ползунок', W.S.overlay && W.S.overlay.t, 'wsqty'); eq('перенос помнит ячейку', W.S.overlay.at, 4);
+  A.wsqv('', { value: '5' }); A.wsqdo(); eq('перенос — в свою ячейку и ровно выбранное', W.S.ws.cells[4] && `${W.S.ws.cells[4].id}×${W.S.ws.cells[4].q}`, 'fang×5');
+  /* полный стол: новый ресурс — отказ без ползунка */
+  W.reset(); ['resin', 'mushroom', 'acid', 'ash', 'salt', 'vial'].forEach(x => W.wsPutQ(x, 1));
+  A.wspick('sand'); ok('полный стол: без ползунка', !W.S.overlay); ok('полный стол: строка про занятые ячейки', !!W.S.toast && /заняты/.test(W.S.toast.t));
+  A.wspick('salt'); eq('полный стол: ресурс со стола — ползунок', W.S.overlay && W.S.overlay.t, 'wsqty'); A.close();
+  /* количество выбранной ячейки — ползунок под столом: от 1 до min(100, запас) */
+  A.wscell('4'); h = view('ползунок ячейки');
+  const c = h.match(/<input class="ws-range" id="wsQc" type="range" min="(\d+)" max="(\d+)" step="1" value="(\d+)"/);
+  ok('под столом нет ползунка ячейки', !!c);
+  if (c) { eq('ползунок ячейки от 1', +c[1], 1); eq('ползунок ячейки до запаса', +c[2], W.wsCellMax('salt')); }
+  A.wsqset('', { value: '9' }); eq('ползунок ячейки меняет количество', W.S.ws.cells[4].q, Math.min(9, W.wsCellMax('salt')));
+  W.wsRangeLive({ id: 'wsQc', value: '3', min: '1', max: '18', style: { setProperty() {} } }); eq('живой ввод ячейки', W.S.ws.cells[4].q, 3);
 });
 
 scene('потоки презентации', () => {
@@ -588,6 +671,9 @@ scene('UI-кит: крафт — удача и неудача', () => {
   ok('проба героя — лицо', (W.wsKitPlay('hero'), W.kitStage()).includes('ws-fx-hero'));
   ok('проба с подсказкой — подсказка', (W.wsKitPlay('hint'), W.kitStage()).includes('появился в книге'));
   for (let r = 1; r <= 7; r++) { W.wsKitAct('r:' + r); const hh = look('UI-кит · редкость ' + r, W.kitStage()); ok(`проба редкости ${r} — в её цвете`, hh.includes(`data-r="${r}"`)); }
+  const inKit = W.KIT_EXTRA.find(x => x.html && x.html.name === 'wsInKitHtml');
+  ok('UI-кит: нет раздела «Мастерская: ввод ресурса»', !!inKit);
+  if (inKit) { const kh = look('UI-кит · ввод ресурса', inKit.html()); ok('UI-кит · ввод ресурса: нет лупы и ползунка', kh.includes('class="ws-lens"') && kh.includes('class="ws-range"')); ok('UI-кит · ввод ресурса: нажатия живые', !/data-a="(?:wspick|wsinfo)"/.test(kh)); }
   const board = look('UI-кит · раскадровка', W.wsKitBoardHtml());
   eq('раскадровка: кадров', (board.match(/class="ws-still"/g) || []).length, 8);
   eq('проба — не выдача', JSON.stringify({ bag: W.S.bag, wallet: W.S.wallet, part: W.S.ws.part, owned: W.S.rs.owned }), before);

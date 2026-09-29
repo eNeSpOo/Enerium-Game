@@ -1,0 +1,41 @@
+{
+  "name": "Осколок героя — призрачный кусок зеркала, рамка под лицо собираемого героя. Слова автора 29.09.2026: «По осколкам: это тоже должно быть по сути другой кусок зеркала, только уже призрачный, где будет показываться условно герой, который и собирается, а не полная его картинка». Родня осколков Памяти (jobs/memory-shards.json): то же зеркальное стекло и серебряная изнанка по сколу, но призрачное — только туманная кромка, внутри пустота. Лицо героя кладёт интерфейс маской под рамку. Стиль и формат — одобренные значки (jobs/ui-attributes.json): 1:1, чёрный фон, прозрачность ключом, осколок — около 80 % кадра. Выгрузка — design/ui/assets/art/shards/ghost-frame.png и маска ghost-mask.png, обе 256×256, fit 80",
+  "plan": {
+    "Форма": "шире осколка Памяти — около 4/5 ширины к высоте, шире всего посередине: там ложится лицо. Острый верх чуть правее центра, почти прямой левый край, правый — в два излома с зазубриной, низ — косой скол. Другой силуэт, чтобы не спутать с Памятью",
+    "Материал": "зеркало-призрак: видна только кромка — тонкий скошенный край бледного потускневшего серебра, по нему туман, рвущийся в дымку; от краёв — редкие тонкие трещины",
+    "Внутри": "чистая чёрная пустота, как фон: в зеркале пока ничего не отражается. Ключ black-glow вырезает её в прозрачность (закрытая тёмная область больше 2 % кадра, cutout.py BIG_HOLE), туман у кромки выходит полупрозрачным",
+    "Свет": "холодное бледное серебро с лёгкой бирюзой. Не зелёный: зелёное призрачное пламя у нас — время (style.md). Без цвета редкости: редкость героя показывает интерфейс",
+    "Маска": "ghost-mask — белый силуэт внутреннего поля на прозрачном: альфа = маска, цвет белый. Считается из альфы готовой рамки, поэтому совпадает с ней пиксель в пиксель"
+  },
+  "notes": [
+    "Запуск 29.09.2026: две картинки, $0,14. v1 (hero-shard-ghost__nb2.png) вышла наклонным узким параллелограммом. В рамку добавлено «stands upright and straight… never a slanted rhombus or parallelogram» и «a large calm middle». v2 прямая и шире, пустота 138 тыс. px против 110 тыс. — к выгрузке v2",
+    "К выгрузке: shards/ghost-frame.png ← hero-shard/hero-shard-ghost__nb2-v2.png, shards/ghost-mask.png ← hero-shard/hero-shard-ghost__nb2-v2.mask.png; обе 256×256, fit 80 — size и fit обязаны совпадать",
+    "Маска — производная, записи в манифесте нет; для v1 лежит такая же, …__nb2.mask.png. Как построена: силуэт — заливка дыр в «альфа > 8»; растушёвка F — медиана расстояния от внешнего края силуэта до края пустоты (альфа < 40), у v2 84,9 px; маска = smoothstep(расстояние внутрь / F), на всём силуэте не ниже 14/255; цвет белый, альфа — маска. Рамка по альфе > 8 у маски и осколка одна — 243, 51, 769, 960, — поэтому fit выгрузки совмещает их пиксель в пиксель",
+    "Сборка в интерфейсе, снизу вверх: тёмное стекло #080E11 по маске; лицо героя по маске — без цвета, холодный оттенок, режим screen, непрозрачность — доля собранных осколков; сверху ghost-frame обычным наложением. Проверено макетом на портрете c1-16 при 25, 50 и 85 %",
+    "На светлом фоне туманная кромка темнее, чем на тёмном: ключ black-glow оставляет туман ярче 56 непрозрачным. Осколок рассчитан на тёмный интерфейс"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.",
+  "negative": "No text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+  "cutout_rule": "The background is solid pure black ({hex}), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance. The whole icon with its glow fits inside the central 80% of the canvas in both width and height: an empty black margin of at least a tenth of the canvas stays on every side — top, bottom, left and right.",
+  "categories": {
+    "hero-shard": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black-glow",
+      "refs": [],
+      "frame": "Format: game UI frame of a hero shard, square, no border around the picture. One shard of a broken magic mirror, centered, seen straight on, floating in the dark, about 80% of the canvas high. It stands upright and straight: its long axis is vertical — not tilted, not leaning, never a slanted rhombus or parallelogram. Everything around it is solid pure black to the very edges of the canvas, never white or grey. The silhouette: a broad jagged piece of mirror glass, about four fifths as wide as it is tall and widest in its middle, with a large calm middle where a face could be reflected — one sharp point at the top, a little right of the center; a long, almost straight left edge; a right edge broken into two straight segments with a small notch between them; a jagged bottom edge that rises from the lower left corner to the lower right. Straight fracture lines and sharp corners, never rounded, never drop- or almond-shaped. It is the ghost of a mirror: the same broken mirror glass as a shard of Memory, but not quite there — spectral and translucent, made of cold pale light and mist. Only its contour is solid: a thin bevelled edge of pale tarnished silver, the backing of the mirror, runs along the whole broken contour and catches a crisp cold light. Soft pale mist clings to this rim and frays into faint smoky wisps along the broken edges, drifting a little inward over the glass; within a short distance the mist fades into black. A few faint hairline cracks run in from the edges. The whole middle of the shard is empty: a pure black void, as black as the background, where nothing is reflected yet — no face, no figure, no eyes, no reflection, no light and no haze in the middle. The ghost light is a cold pale silver with a faint turquoise tint (#BFEFEA): never green, never warm, never golden. No glow, aura or halo spreading outside the shard; no other shards, splinters, sparks or particles around it. A bare shard: no frame, no setting, no metal caps, no stand, no base. It must stay readable at a small size, 32 px: one bold jagged outline with a clear pale edge."
+    }
+  },
+  "jobs": [
+    {
+      "id": "hero-shard-ghost",
+      "category": "hero-shard",
+      "title": "Осколок героя: призрачная рамка",
+      "source": "Слова автора 29.09.2026 — другой, призрачный кусок зеркала, внутри условно собираемый герой; GDD §17 — осколки героев из Эхо, §14.3 — вкладка «Осколки»; родня — jobs/memory-shards.json; выгрузка shards/ghost-frame.png, маска — shards/ghost-mask.png",
+      "subject": "A hero shard, empty: a hero's soul is being gathered into this mirror piece by piece, but for now the mirror still holds nothing. The pale silver rim is thin and even along the whole contour; the mist is thickest at the corners and thinnest along the straight edges; the black void inside is large and clean, taking up most of the shard."
+    }
+  ]
+}

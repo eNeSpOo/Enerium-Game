@@ -1,0 +1,66 @@
+{
+  "name": "Значки духовных талисманов — по одному на семейство, четыре: боевые, охотничьи, добыча, печати (EN_TALISMANS.rules.cats: fight, hunt, farm, seal — 35, 26, 45 и 12 линеек из 118). Слова автора 29.09.2026: «на каждую из них должна быть своя иконка талисмана, связанная с семейством. То есть не на каждый духовный талисман своя картинка, а по 1 на семейство». Лор — docs/content/талисманы.md: талисман хранит черту чужой души, «как она била, берегла, выживала». Стиль и формат — одобренные значки атрибутов (jobs/ui-attributes.json): 1:1, чёрный фон, прозрачность ключом black, талисман — около 80 % кадра, читается с 24 px. Редкость рисует интерфейс — медальоном и кромкой цвета редкости (ADR-0027). Образец словами (ADR-0012). Выгрузка — design/ui/assets/art/talismans/<семейство>.png по ключам cats: fight, hunt, farm, seal; 256×256, fit 80",
+  "plan": {
+    "Серия": "четыре амулета одной серии: одни материалы, один размер, одна манера. Общее у всех — петля узлового шнурка сверху (талисман носят на себе) и лунный камень в сердце амулета: в нём светится пойманная черта чужой души — клубок призрачного света своего цвета. Лунный камень — тот же знак, что на шкатулке духа, сундуке талисманов (jobs/chests.json, chest-talisman)",
+    "Различает": "силуэт амулета — символ семейства — и цвет света в камне",
+    "Семейства": {
+      "fight — Боевые": "ярость и защита — два коротких меча накрест и круглый щиток на скрещении, камень — умбон щитка; свет — яростный угольно-алый",
+      "hunt — Охотничьи": "след и добыча — отпечаток лапы зверя с длинными когтями, из тёмной кости, камень — в подушке лапы; свет — холодный лунный, серебристо-голубой",
+      "farm — Добыча": "удача и находка — туго набитый кошель из тёмной кожи, завязанный шнуром, из горловины выглядывают монеты, камень — застёжка на брюшке; свет — тёплое золото удачи",
+      "seal — Печати": "запрет и оберег — квадратная плита-печать тёмного камня, поставленная на угол ромбом, в центре круглая печать с волнистым краем, камень — лик печати; свет — холодная бирюза оберега"
+    },
+    "Не спутать": "кристаллы редкости — миндаль-капля без оправы; осколки Памяти — зеркальное стекло; амулет снаряжения — кулон на цепи; щит физической защиты и танка — треугольный. Здесь — фигурные амулеты на шнурке с лунным камнем"
+  },
+  "notes": [
+    "Свет семейств пересекается с цветами редкостей — у семи редкостей весь круг цветов. Поэтому свет живёт только в камне и на кромках, а корпус тёмный: цвет редкости даёт медальон интерфейса",
+    "Фиолетовый не берём: по style.md он только для дикого карста и искажения. Зелёный не берём: он время и вневременная редкость",
+    "Запуск 29.09.2026: все четыре с первого раза, $0,28. К выгрузке: fight — tl-fam-fight__nb2.png, hunt — tl-fam-hunt__nb2.png, farm — tl-fam-farm__nb2.fix.png, seal — tl-fam-seal__nb2.png",
+    "Кошель: сердцевина петли шнура, 10 795 px, меньше BIG_HOLE и осталась непрозрачно-чёрной — вырезана как фон по исходнику по правилу remove_black, порог 24 (.fix.png, производный, записи в манифесте нет)",
+    "Печать: дыру под шнур в верхнем углу оставили тёмной. Её тёмная область срастается с бороздкой вдоль золотой кромки, вырез дал бы щели в кромке. Дыра в камне и так читается тёмной"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.",
+  "negative": "No text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+  "cutout_rule": "The background is solid pure black ({hex}), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance. The whole icon with its glow fits inside the central 80% of the canvas in both width and height: an empty black margin of at least a tenth of the canvas stays on every side — top, bottom, left and right.",
+  "categories": {
+    "talisman-families": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Format: game UI icon of a spirit talisman, square, no border around the picture. One talisman, centered, seen straight on, about 80% of the canvas. A spirit talisman is a small charm that holds a trait of someone else's soul — how that soul fought, guarded or survived — and gives it to the one who wears it. The talisman floats on pitch black: everything around it is solid pure black to the very edges of the canvas, never white or grey, no frame. All four talismans of this set are one series: the same materials, the same painting style, the same size in the frame; only the shape of the charm and the color of its inner light tell them apart. Every talisman of the series is a flat carved charm of dark materials — dark forged iron, dark carved bone, dark leather or dark stone — with fittings of worn old gold; a short loop of knotted dark cord rises from its top, for wearing it on the body; and in its heart sits one smooth oval cabochon of milky moonstone lit from inside by the captured soul-trait: a small ghostly swirl of colored light, like a wisp of smoke, turning inside the stone. The same inner light catches the nearest edges of the charm from within. The light stays inside the charm: no glow, aura or halo outside it, no embers, sparks or particles floating around. It must stay readable at a tiny size, 24 px: one simple, strong, instantly recognizable silhouette built from a few large shapes; all the painterly detail lives inside the silhouette. A crisp bright rim light runs along the whole outline and cleanly separates it from the black. Dark materials are never pitch black: they keep a visible dark tone with worn highlights, clearly lighter than the background. No runes, letters, glyphs, sigils or occult signs anywhere on it."
+    }
+  },
+  "jobs": [
+    {
+      "id": "tl-fam-fight",
+      "category": "talisman-families",
+      "title": "Талисманы: боевые",
+      "source": "EN_TALISMANS.rules.cats.fight — 35 линеек: урон, лечение, защита, проки, спасение; docs/content/талисманы.md, «Боевые»; выгрузка talismans/fight.png",
+      "subject": "Family: Combat talismans — traits of fury and protection, of how a soul struck and shielded. The charm: two short swords crossed in a bold X, points up, their blades of dark forged steel and their hilts of old gold, with a small round buckler of dark iron fixed at their crossing; the moonstone is set as the boss of the buckler. The soul-light is a fierce ember red-orange (#E8603C) — fury — burning inside the moonstone, and a thin line of the same red light runs along the sword edges."
+    },
+    {
+      "id": "tl-fam-hunt",
+      "category": "talisman-families",
+      "title": "Талисманы: охотничьи",
+      "source": "EN_TALISMANS.rules.cats.hunt — 26 линеек: урон по расе, рангу, режиму и защита от расы; docs/content/талисманы.md, «Охотничьи»; выгрузка talismans/hunt.png",
+      "subject": "Family: Hunting talismans — traits of the tracker, of how a soul followed a trail and brought down its prey. The charm: the print of a big beast's paw — one broad heart-shaped pad and four oval toes above it, each toe tipped with a long hooked claw of old gold — carved from dark bone and rimmed with old gold; the moonstone is set in the broad pad. The soul-light is a cold pale silver-blue moonlight (#BFD8F0) — the light of a night hunt — glowing inside the moonstone and along the claws."
+    },
+    {
+      "id": "tl-fam-farm",
+      "category": "talisman-families",
+      "title": "Талисманы: добыча",
+      "source": "EN_TALISMANS.rules.cats.farm — 45 линеек: золото, дух, души, ресурсы, ритуалы, знаки сборщика; docs/content/талисманы.md, «Добыча»; выгрузка talismans/farm.png",
+      "subject": "Family: Loot talismans — traits of luck and finding, of how a soul always found what others missed. The charm: a small, tightly stuffed pouch of stiff dark leather, round-bellied, tied at its neck with a cord and an old-gold ring; the rims of a few old coins peek out of its mouth as part of the same shape, not separate pieces; the moonstone is set in the belly of the pouch like a clasp, framed in old gold. The soul-light is a warm lucky gold (#F0CC4F) glowing inside the moonstone and glinting on the coin rims."
+    },
+    {
+      "id": "tl-fam-seal",
+      "category": "talisman-families",
+      "title": "Талисманы: печати",
+      "source": "EN_TALISMANS.rules.cats.seal — 12 линеек: защита от одного эффекта, он не ложится на героя; docs/content/талисманы.md, «Печати»; выгрузка talismans/seal.png",
+      "subject": "Family: Seal talismans — traits of refusal and warding, of how a soul would not let a curse take hold. The charm: a square seal-plaque of dark stone standing on one corner like a diamond, with a thick bevelled rim of old gold; in its center a round seal of old gold with a wavy edge, like metal pressed while molten; the moonstone is set as the face of the seal. The soul-light is a cold turquoise (#48E5D4) — a ward — glowing inside the moonstone and in a few fine cracks of the dark stone around it."
+    }
+  ]
+}

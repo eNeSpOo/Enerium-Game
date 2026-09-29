@@ -1,0 +1,102 @@
+{
+  "name": "Рамки портрета Странника — облик игрока в профиле, чате, друзьях и рейтингах. Слова автора 29.09.2026: «в Страннике возможно сменить рамку, никнейм, портрет… и партиклы, что будут показываться за рамкой». Девять рамок одной серии — от простой к редким за достижения, Арену, клан и пропуск: знак отличия, а не товар (§32). Стиль — одобренные метки карт и значки (art/style/style.md): тёмное фэнтези, живопись, свет изнутри и снизу, сплошной чёрный фон, прозрачность ключом black. Окно — ровный круг: портрет под рамкой круглый. Образец словами, картинку в запрос не прикладываем (ADR-0012). Выгрузка — design/ui/assets/art/frames/<id>.png, 512×512, без подрезки поля: окно рамки в прототипе совмещается с кругом портрета по доле окна (LK_FRAMES, поле win)",
+  "plan": {
+    "Форма — одна на серию": "круглое пустое окно в центре, около двух третей холста; вокруг — кольцо рамки около 6 % холста; украшение собирается сверху и снизу, по бокам — мало; всё внутри центральных 92 % холста",
+    "Лестница": {
+      "iron — Кованое железо": "у каждого Странника: простое кольцо тёмного кованого железа, заклёпки, холодный блик",
+      "bronze — Бронза Эндалора": "достижение «Непрошеный гость», цикл II: старая бронза, насечки, гребень сверху, тёплый свет снизу",
+      "karst — Живой карст": "достижение «Долгая осада»: тёмный камень, бирюзовые кристаллы карста растут снизу",
+      "forge — Горн": "достижение «Книга рецептов»: чёрное железо из горна, трещины раскалены, клещи снизу, угли",
+      "arena — Песок Арены": "Арена: неделя в первой сотне — алая ткань на железе, скрещённые клинки снизу, струйка золотого песка",
+      "clan — Стяг клана": "клан в десятке Кланового босса за неделю — старое серебро, синяя эмаль, пустой геральдический щит сверху, два стяга",
+      "pass — Осенний путь": "пропуск: последняя награда бесплатного ряда сезона — кольцо из тёмных ветвей, медные и янтарные листья, фонарик снизу",
+      "first — Первенство": "первенство сервера — старое золото, корона с пятью зубцами и лучи сверху, крылья снизу",
+      "timeless — Вневременная": "достижение «Девять нашествий» — камень и старое золото, из трещин льётся зелёный свет времени, песочные часы сверху, осколки кружат"
+    }
+  },
+  "notes": [
+    "Категория — portrait-frames: папка art/generated/frames занята рамками рангов врагов (card-marks.json)",
+    "Окно — большой закрытый тёмный круг: cutout.py (ключ black, BIG_HOLE) вырезает его в прозрачность вместе с фоном",
+    "Свечение за кольцом — коротко и близко к металлу: частицы за рамкой рисует интерфейс (CSS, до 12 точек), в картинке их нет"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.",
+  "negative": "No text, no letters, no numbers, no real-world alphabets, no runes that look like writing, no watermark, no signature, no logo, no UI elements. Nothing inside the round window: no face, no figure, no portrait, no eye, no pattern, no reflection, no glow — the window is pure black.",
+  "cutout_rule": "The background is solid pure black ({hex}), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the metal and stone of the frame and fades into the black within a short distance. The whole frame with its ornament fits inside the central 92% of the canvas: a thin empty black margin stays on every side.",
+  "categories": {
+    "portrait-frames": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Format: a round frame for a player's portrait in a dark fantasy mobile game, square canvas, seen straight on, perfectly symmetric from left to right. In the exact center is a perfectly round empty window — a true circle about two thirds of the canvas wide — and it is pure black inside: nothing is painted in it. Around the window runs the frame itself: a ring about one sixteenth of the canvas wide, hugging the window closely along its whole circumference, so the circle of the window stays clean and unbroken. Ornament grows from the ring mostly at the top center and the bottom center and may reach outward from the ring; at the left and right sides the ring stays slim. All nine frames of this set are one series: the same round window of the same size in the same place, the same ring width; only the material, ornament and light of the ring differ, and the rarer the frame, the richer its ornament and the brighter its light. It must stay readable at a small size, 48 px: a bold clear ring with one strong accent."
+    }
+  },
+  "jobs": [
+    {
+      "id": "frame-iron",
+      "category": "portrait-frames",
+      "title": "Рамка «Кованое железо» — у каждого Странника",
+      "source": "Слова автора 29.09.2026 — рамка в облике Странника; §32 — косметика зарабатывается",
+      "subject": "Frame: Forged Iron — the plainest frame of the set, the one every Wanderer starts with. A simple ring of dark forged iron, hammer marks on its face, eight small round rivets evenly spaced around it. No other ornament: only a small forged iron knot at the top center and a matching one at the bottom center. A cold pale white glint (#E6E8EA) runs along the upper edge of the metal; faint cold light from below."
+    },
+    {
+      "id": "frame-bronze",
+      "category": "portrait-frames",
+      "title": "Рамка «Бронза Эндалора» — достижение «Непрошеный гость»",
+      "source": "Каталог достижений (wanderer.js): pers08 — дойти до цикла II",
+      "subject": "Frame: Bronze of Endalor — earned by reaching the second cycle. A ring of old warm bronze with a worn engraved band of simple geometric notches running around it (notches only, never letters or symbols). At the top center a small bronze crest shaped like a stylised flame on a short stem; at the bottom center a bronze clasp with two small studs. A warm golden-yellow light (#F0CC4F) glows from below and catches the lower half of the ring."
+    },
+    {
+      "id": "frame-karst",
+      "category": "portrait-frames",
+      "title": "Рамка «Живой карст» — достижение «Долгая осада»",
+      "source": "Каталог достижений (wanderer.js): pers07 — выдержать осаду биома",
+      "subject": "Frame: Living Karst — earned by outlasting a siege deep below. A ring of dark weathered stone with fine cracks. At the bottom center a cluster of five turquoise carst crystals (#1FB8D0) grows out of the stone, glowing from within and lighting the ring from below; one small crystal grows at the left side and one at the right side of the ring. At the top center the stone rises into a small rough stone arch. Tiny turquoise dust sparkles in the light of the crystals right next to them."
+    },
+    {
+      "id": "frame-forge",
+      "category": "portrait-frames",
+      "title": "Рамка «Горн» — достижение «Книга рецептов»",
+      "source": "Каталог достижений (wanderer.js): pers21 — найти десять рецептов",
+      "subject": "Frame: The Forge — earned by discovering ten recipes. A ring of blackened iron just pulled from the forge: thin glowing orange cracks run through the metal like cooling lava, brightest along the bottom. At the bottom center a pair of crossed blacksmith's tongs lies under the ring, and a few glowing embers rest on them. At the top center a small anvil-shaped iron cap. Heat shimmers close above the hot cracks; warm orange light from below."
+    },
+    {
+      "id": "frame-arena",
+      "category": "portrait-frames",
+      "title": "Рамка «Песок Арены» — неделя Арены в первой сотне",
+      "source": "§20 — Арена; награда — место сезона в первой сотне",
+      "subject": "Frame: Sand of the Arena — earned by finishing an Arena week among the hundred best. A ring of dark iron bound with a band of worn crimson cloth wrapped around it at four places. At the bottom center two short swords cross under the ring, blades up, their hilts wound with red leather. At the top center a small iron boss with a round dark red gem. A thin stream of golden sand pours down along the right side of the ring and gathers at the crossed blades. Warm golden light from below, deep red accents."
+    },
+    {
+      "id": "frame-clan",
+      "category": "portrait-frames",
+      "title": "Рамка «Стяг клана» — клан в десятке Кланового босса",
+      "source": "§24, §25 — клан; награда — место клана за неделю в первой десятке",
+      "subject": "Frame: Clan Banner — earned when your clan finishes a week among the ten best against the Clan Boss. A ring of old silver inlaid with deep blue enamel. At the top center a small heraldic shield of silver with a plain deep blue field — a blank shield, no emblem, no sign, no letters on it. From the left and right sides of the ring hang two short narrow banners of deep blue cloth with silver fringe. At the bottom center a small silver clasp. Cold blue-white light along the silver."
+    },
+    {
+      "id": "frame-pass",
+      "category": "portrait-frames",
+      "title": "Рамка «Осенний путь» — пропуск, последняя награда сезона",
+      "source": "§32 — боевой пропуск: прогресс только активностью; рамка — на бесплатном ряду",
+      "subject": "Frame: Autumn Road — the last reward of a season of the road, earned by activity alone. A ring woven of dark twisted branches and roots, with small copper and amber autumn leaves growing along it, gathered more thickly at the bottom and the top. At the bottom center a tiny iron lantern hangs from the branches, glowing warm amber (#E6A84B). Two leaves drift loose just below the ring. Warm amber light from the lantern below."
+    },
+    {
+      "id": "frame-first",
+      "category": "portrait-frames",
+      "title": "Рамка «Первенство» — первенство сервера",
+      "source": "§29 — первенства сервера; каталог первенств (wanderer.js)",
+      "subject": "Frame: The First — earned by being the first on the server. A ring of old gold with a fine braided edge. At the top center a pointed crown of old gold with five sharp points rises from the ring, and short golden rays fan out behind the crown. At the bottom center two small golden wings spread left and right from a round gold clasp. Bright warm golden light glows from within the metal and from below."
+    },
+    {
+      "id": "frame-timeless",
+      "category": "portrait-frames",
+      "title": "Рамка «Вневременная» — достижение «Девять нашествий»",
+      "source": "Каталог достижений (wanderer.js): pers33 — победить Убер-боссов девяти нашествий",
+      "subject": "Frame: Timeless — the rarest frame of the set. A ring of dark stone set in old gold, split by cracks from which bright green time-light (#5FD67A) pours out. At the top center a small hourglass of old gold stands on the ring, its falling sand glowing green. At the bottom center a cluster of small green crystal shards. Three small green crystal shards float in orbit close around the ring. A bright green aura hugs the ring closely, and the whole frame shines stronger than any other of the set."
+    }
+  ]
+}

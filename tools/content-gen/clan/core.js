@@ -79,6 +79,21 @@ function card(D, o) {
   return src;
 }
 
+/* свита элиты (решение автора 29.09.2026): четыре приспешника стихии элиты — классы по её классу (D.boss.retinue.by), характеристики —
+   рядовые Мастерской того же класса, набор — одна способность школы стихии элиты. src — карта элиты (card); у босса свиты нет */
+function retinue(D, src) {
+  const R = D.boss.retinue;
+  if (!R || src.rank !== D.boss.rank.e.core || !R.by[src.cls]) return [];
+  return R.by[src.cls].map((cls, j) => ({ key: src.id + '#' + (j + 1), id: src.id + ':' + (j + 1), name: R.names[cls], cls, el: src.el, lvl: src.lvl,
+    st: R.tpl[cls].slice(), hpPct: R.hp[cls], rank: R.rank.core, race: src.race,
+    kit: { rank: R.rank.core, actPct: R.rank.share[0], ultPct: R.rank.share[1], kit: [{ v: 0, slot: 'act', id: src.el + '.' + R.kinds[cls] }] } }));
+}
+/* бой одной атаки клана: цель — первая карта, её здоровье копится между атаками; свита элиты — свежая; бой кончается, когда цель пала.
+   src — карта цели с hp и maxHp цели, если она уже ранена: остаток — её максимум в этой атаке (осада ядра, RULES.siege) */
+function battle(D, heroes, src, seed, maxRounds) {
+  return EB().targetBattle(heroes, { seed, g: src.rank === D.boss.rank.b.core ? 'b' : 'e', main: src, guards: retinue(D, src), maxRounds, endOnMain: true });
+}
+
 /* ---------- очки и вклад ---------- */
 /* целая доля по весам: сумма ровно total; остаток — наибольшим дробным остаткам, при равенстве — большему весу, затем порядку */
 function share(total, w) {
@@ -142,5 +157,5 @@ function bm(D, u) {
 function cardBm(D, src) { const b = EB().create({ mode: 'rounds', seed: 1, heroes: [], foes: [src] }); return bm(D, b.u[1][0]); }
 
 root.EnClan = { iroot, need, capacity, milestones, attacksDay, walletCap, elitePool, resSpeedBp, picked, bonus, rounds,
-  circlePow, circleLvl, points, roll, kit, bossOf, card, share, payout, tier, stepsOf, rOf, pool, halves, contrib, serverSplit, bm, cardBm };
+  circlePow, circleLvl, points, roll, kit, bossOf, card, retinue, battle, share, payout, tier, stepsOf, rOf, pool, halves, contrib, serverSplit, bm, cardBm };
 })(typeof window !== 'undefined' ? window : globalThis);

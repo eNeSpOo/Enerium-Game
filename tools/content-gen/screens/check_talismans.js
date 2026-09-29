@@ -1,6 +1,6 @@
 /* Автопроверка духовных талисманов (design/ui/talismans.js, design/ui/screens/talismans.js) — без браузера.
    1. Файлы: index.html подключает talismans.js до основного скрипта, talismans.css и screens/talismans.js — после model.js;
-      вкладка «Сила» карточки героя зовёт talRow; карта экранов отмечает окно talismans готовым (поле ready карточки «Герои»).
+      вкладка «Снаряжение» карточки героя зовёт talRow; карта экранов отмечает окно talismans готовым (поле ready карточки «Герои»).
    2. Данные свежие: сборщик tools/content-gen/talismans/build.js без ошибок даёт ровно EN_TALISMANS. Все числа целые;
       359 талисманов, у каждого — линейка, редкость и вес; номера, редкости и веса совпадают с пулом сундуков (lootboxes.js).
       Запись для ядра понятна ядру: вид пассивки и триггер реакции есть в design/ui/battle.js, поле значения — в записи.
@@ -13,8 +13,8 @@
       в бою прототипа срабатывают щит «Сердца Кароксорра», «Щит павшего знаменосца», фарм «Сосуда шёпотов» в добыче этажа.
    6. Перековка: 10 одной редкости → 1 редкостью выше, золото списано один раз, итог — генератор на сиде операции (две свежие
       сессии дают одно и то же), повтор ничего не меняет; меньше 10, нехватка золота, вневременная — отказ без расхода.
-   7. Вид: ряд мест и лист на каждом герое и месте, вкладки «Подходят», «Все», «Перековка», сценарий презентации, раздел UI-кита —
-      без исключений, undefined и NaN. Режим «Игрок»: служебных слов нет (SERVICE из check_player_view.js), спойлерная линейка
+   7. Вид: ряд мест во вкладке «Снаряжение» и одно окно снаряжения героя (screens/hero-dev.js) на каждом герое и месте талисмана,
+      выбранный талисман с «Надеть», сценарий презентации, раздел UI-кита — без исключений, undefined и NaN. Режим «Игрок»: служебных слов нет (SERVICE из check_player_view.js), спойлерная линейка
       не называется; режим «Команда» — пометки о ядре и БМ на месте.
    Чужой незаконченный файл, на который index.html уже ссылается, пропускается с предупреждением: его проверяют свои проверки.
    Запуск: node tools/content-gen/screens/check_talismans.js */
@@ -321,22 +321,23 @@ const out = (hid, slot) => { cnt.ops++; return T.TL_SRV.out(`tl${S().tal.seq}`, 
 {
   for (const team of [false, true]) {
     reset(); run('режим', () => T.setTeam(team));
-    T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'mine'; T.S.seg.hero = 'power';
+    T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'mine'; T.S.seg.hero = 'gear';
     for (const h of T.S.heroes) {
       T.S.selHero = h.id; T.S.overlay = null;
-      const g = view(P, `${team ? 'Команда' : 'Игрок'} · ${h.name} · Сила`);
+      const g = view(P, `${team ? 'Команда' : 'Игрок'} · ${h.name} · Снаряжение`);
       if ((g.match(/class="tl-slot[ "]/g) || []).length !== 4) say(`${h.name}: в карточке не четыре места`);
-      for (let i = 0; i < 4; i++) for (const tab of ['fit', 'all', 'forge']) {
-        T.S.seg.tal = tab; T.S.overlay = { t: 'tal', arg: `${h.id}:${i}` };
-        const s = view(P, `${team ? 'Команда' : 'Игрок'} · лист · ${h.name} · место ${i + 1} · ${tab}`);
-        if (!/Духовные талисманы/.test(s)) say(`${h.name}: лист не открылся`);
+      /* место открывает одно окно снаряжения героя (screens/hero-dev.js) на этом месте: четыре места талисманов слева, запасы справа */
+      for (let i = 0; i < 4; i++) {
+        T.S.overlay = { t: 'tal', arg: `${h.id}:${i}` };
+        const s = view(P, `${team ? 'Команда' : 'Игрок'} · окно · ${h.name} · место ${i + 1}`);
+        if (!/class="gw"/.test(s) || (s.match(/data-gslot="tal:/g) || []).length !== 4 || T.S.gear.focus !== `tal:${i}` || T.S.gear.tab !== 'tal') say(`${h.name}: окно снаряжения не открылось на месте талисмана ${i + 1}`);
       }
       /* выбранный талисман: карточка и кнопка */
-      T.S.seg.tal = 'all'; T.S.overlay = { t: 'tal', arg: `${h.id}:0` }; view(P, 'выбор');
+      T.S.overlay = { t: 'tal', arg: `${h.id}:0` }; view(P, 'выбор');
       const first = T.TB.list()[0]; if (first) { run('выбор', () => T.ACT.talpick(String(first.no))); const s = view(P, `${h.name} · выбран №${first.no}`); if (!/data-a="talput"/.test(s)) say(`${h.name}: у выбранного нет кнопки «Надеть»`); if (team && !/team-only/.test(s)) say('Команда: в карточке талисмана нет служебного'); }
     }
     /* спойлерная линейка: игроку не называется */
-    const fb = byFam('bane_firstborn', 3); T.TB.add(fb); T.S.seg.tal = 'all'; T.S.overlay = { t: 'tal', arg: 'h1:0' };
+    const fb = byFam('bane_firstborn', 3); T.TB.add(fb); T.S.overlay = { t: 'tal', arg: 'h1:0' };
     const s = view(P, 'спойлер в запасах'); const name = TL.fams.bane_firstborn.n;
     if (!team && playerText(s).includes(name)) say(`игроку видно имя спойлерной линейки «${name}»`);
     if (team && !s.includes(name)) say(`команде не видно имя спойлерной линейки «${name}»`);

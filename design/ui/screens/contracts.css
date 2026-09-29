@@ -8,55 +8,79 @@
 .ct-wk{cursor:pointer}
 .ct-wk:hover{color:var(--gold);border-color:var(--gold-3)}
 
-/* задания: карточки в сетку, лишние — прокруткой */
-.ct-grid{flex:1 1 0;min-height:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));grid-auto-rows:minmax(180px,auto);gap:var(--sp-m);align-content:start;padding:2px}
-.ct-card{position:relative;display:flex;flex-direction:column;min-width:0;border-radius:12px;overflow:hidden;
-  border:1px solid color-mix(in srgb,var(--rc) 38%,var(--iron));
-  background:radial-gradient(110% 70% at 50% 112%,color-mix(in srgb,var(--rc) 18%,transparent),transparent 65%),var(--stone);
-  box-shadow:inset 0 3px 0 -1px color-mix(in srgb,var(--rc) 85%,transparent)}
-.ct-card[data-r="5"],.ct-card[data-r="6"]{box-shadow:inset 0 3px 0 -1px var(--rc),0 0 16px -8px var(--rc)}
-.ct-card[data-r="7"]{box-shadow:inset 0 3px 0 -1px var(--rc),0 0 22px -6px var(--rc)}
-.ct-main{flex:1 1 auto;display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0;padding:var(--sp-m) var(--sp-m) 4px;border:0;background:none;color:inherit;text-align:left;font:inherit}
+/* раскладка: задания списком слева, сведения справа — слово автора 29.09.2026: «контракты списком слева и информацией справа были
+   лучшим решением» */
+.ct{flex:1 1 0;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 272px;gap:var(--sp-m)}
+.ct-l{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0;min-height:0}
+.ct-list{display:flex;flex-direction:column;gap:6px;min-height:0;padding:1px}
+
+/* строка задания: полоска и свет редкости слева, картинка раздела с кристаллом, имя и цель; справа — одно действие */
+.ct-card{position:relative;display:flex;align-items:center;flex:none;min-width:0;border-radius:10px;overflow:hidden;
+  border:1px solid color-mix(in srgb,var(--rc) 34%,var(--iron));
+  background:radial-gradient(60% 140% at 0% 50%,color-mix(in srgb,var(--rc) 14%,transparent),transparent 60%),#0e1114;
+  box-shadow:inset 3px 0 0 color-mix(in srgb,var(--rc) 85%,transparent)}
+.ct-card[data-r="5"],.ct-card[data-r="6"]{box-shadow:inset 3px 0 0 var(--rc),0 0 14px -8px var(--rc)}
+.ct-card[data-r="7"]{box-shadow:inset 3px 0 0 var(--rc),0 0 20px -6px var(--rc)}
+.ct-main{flex:1 1 auto;display:grid;grid-template-columns:40px minmax(0,1fr);gap:10px;align-items:center;min-width:0;padding:7px 8px 7px 12px;border:0;background:none;color:inherit;text-align:left;font:inherit}
 .ct-main:hover .ct-n{color:var(--gold)}
-.ct-top{display:flex;align-items:flex-start;justify-content:space-between;width:100%}
-.ct-pic{width:34px;height:34px;border-radius:9px;object-fit:cover;box-shadow:0 0 0 1px #262b31;flex:none}
+.ct-top{position:relative;width:40px;height:40px}
+.ct-pic{width:40px;height:40px;border-radius:9px;object-fit:cover;box-shadow:0 0 0 1px #262b31;flex:none}
 .ct-pic.lg{width:52px;height:52px;border-radius:12px}
-.ct-cr .ico{filter:drop-shadow(0 0 6px color-mix(in srgb,var(--rc) 60%,transparent))}
-.ct-n{font:600 17px/1.1 var(--f-d);color:var(--parch);text-wrap:balance}
-.ct-goal{display:flex;align-items:baseline;gap:5px;margin-top:auto;min-width:0}
-.ct-goal b{font:600 30px/1 var(--f-d);color:var(--parch)}
-.ct-goal small{font-size:12.5px;color:var(--parch-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ct-pts{font:700 12px/1 var(--f-u);letter-spacing:.04em;color:var(--gold-2)}
-.ct-prog{display:flex;flex-direction:column;gap:3px;width:100%}
-.ct-prog small{font-size:11.5px;color:var(--parch-3)}
-.ct-act{display:flex;justify-content:flex-end;align-items:center;min-height:38px;padding:0 var(--sp-s) var(--sp-s)}
+.ct-cr{position:absolute;right:-5px;bottom:-5px;line-height:0}
+.ct-cr .ico{filter:drop-shadow(0 1px 1px #000) drop-shadow(0 0 5px color-mix(in srgb,var(--rc) 60%,transparent))}
+.ct-tx{display:flex;flex-direction:column;gap:5px;min-width:0}
+.ct-n{font:600 16.5px/1.1 var(--f-d);color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ct-gl{display:flex;align-items:center;gap:10px;min-width:0}
+.ct-gl .bar{flex:1 1 auto;min-width:40px;max-width:200px}
+.ct-goal{display:flex;align-items:baseline;gap:5px;min-width:0;flex:none}
+.ct-goal b{font:600 19px/1 var(--f-d);color:var(--parch)}
+.ct-goal small{font-size:12px;color:var(--parch-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ct-pts{font:700 11.5px/1 var(--f-u);letter-spacing:.04em;color:var(--gold-2);white-space:nowrap}
+.ct-act{display:flex;justify-content:flex-end;align-items:center;flex:none;min-width:44px;padding:0 10px 0 4px}
 .ct-act .btn.sm .cost{font-size:12px;padding-left:6px}
 .ct-card.done{border-color:rgba(72,229,212,.35)}
 .ct-card.done .ct-goal b{color:var(--spirit)}
 .ct-card.miss{border-color:rgba(220,106,82,.45);opacity:.85}
 
-/* низ: награда, заверение, главное действие */
-.ct-foot{display:flex;align-items:center;gap:var(--sp-m);padding:var(--sp-s) var(--sp-m);flex:none;min-height:60px}
-.ct-rew{display:flex;flex-direction:column;align-items:flex-start;gap:5px;border:0;background:none;padding:0;color:inherit;text-align:left;min-width:0}
-.ct-rew:hover .eyebrow{color:var(--gold)}
+/* сведения справа: награда за всё, очки, заверение и одно главное действие внизу */
+.ct-side{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0;min-height:0;padding:var(--sp-m)}
+.ct-rew{display:flex;flex-direction:column;align-items:flex-start;gap:7px;border:0;background:none;padding:0;color:inherit;text-align:left;min-width:0}
+.ct-rew:hover .eyebrow,.ct-rew:hover .ct-more{color:var(--gold)}
+.ct-rewi{flex-wrap:wrap;row-gap:6px}
+.ct-more{display:inline-flex;align-items:center;gap:3px;font:700 10.5px/1 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--gold-2)}
+.ct-more .i{width:12px;height:12px}
 .ct-ri{display:inline-flex;align-items:center;gap:4px;margin-right:10px}
 .ct-ri:last-child{margin-right:0}
 .ct-ri>img{width:20px;height:20px;object-fit:contain}
 .ct-ri b{font:700 15px/1 var(--f-u);color:var(--parch)}
 .ct-chest img{width:78%;height:78%;object-fit:contain}
-.ct-cb{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;color:var(--parch-2);text-align:left;flex:none}
+.ct-ptsb{display:flex;align-items:baseline;gap:8px;padding-top:var(--sp-s);border-top:1px solid var(--iron)}
+.ct-ptsb b{font:600 24px/1 var(--f-d);color:var(--gold);flex:none}
+.ct-ptsb small{font-size:11.5px;line-height:1.25;color:var(--parch-3)}
+.ct-cb{display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;color:var(--parch-2);text-align:left;flex:none}
+.ct-cb>span{flex:1 1 auto;min-width:0}
+.ct-cb>.i:last-child{flex:none;color:var(--gold-2)}
 .ct-cb b{display:block;font-size:13px;color:var(--parch)}
 .ct-cb small{display:block;font-size:11.5px;color:var(--parch-3)}
 .ct-cb:hover{border-color:var(--gold-3)}
 .ct-cb.on{border-color:rgba(72,229,212,.45);background:rgba(72,229,212,.06);color:var(--spirit)}
 .ct-cb.on b{color:var(--spirit)}
-.ct-line{margin-top:calc(var(--sp-s) * -1);flex:none}
+.ct-go{margin-top:auto;display:flex;flex-direction:column;gap:6px}
+.ct-sign{width:100%}
+.ct-line{margin:0}
 .ct-team{flex-wrap:wrap;gap:6px;flex:none}
-.ct-empty{flex:1 1 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:var(--sp-l);text-align:center}
+.ct-empty{flex:1 1 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:var(--sp-l);text-align:center;border-radius:12px;border:1px dashed var(--iron-2)}
 .ct-empty b{font-size:20px;color:var(--parch)}
 .ct-lock{display:flex;flex-direction:column;align-items:center;gap:var(--sp-s);text-align:center}
 .ct-lock b{font-size:20px;color:var(--parch)}
 .ct-lock .i{width:28px;height:28px;color:var(--gold-2)}
+
+/* низкий экран (844×390): сведения уже, строки плотнее */
+@container main (max-height: 360px){
+  .ct{grid-template-columns:minmax(0,1fr) 248px}
+  .ct-main{padding:5px 8px 5px 12px}
+  .ct-ptsb b{font-size:21px}
+}
 
 /* лист задания */
 .ct-sh-top{display:flex;align-items:center;gap:var(--sp-m)}
@@ -95,7 +119,6 @@
 
 /* раздел UI-кита */
 .ct-kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:var(--sp-l);margin-top:var(--sp-m)}
-.ct-kit-cards{display:grid;grid-template-columns:repeat(3,minmax(0,160px));gap:var(--sp-m)}
-.ct-kit-cards .ct-card{min-height:180px}
+.ct-kit-rows{display:flex;flex-direction:column;gap:6px;max-width:520px}
 .ct-kit-lad figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11.5px;text-align:center;color:var(--parch-2)}
 .ct-kt td.n{text-align:right}

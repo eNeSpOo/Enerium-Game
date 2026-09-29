@@ -1,7 +1,7 @@
 /* Автопроверка снаряжения (design/ui/equipment.js, design/ui/screens/equipment.js) и вкладок «Запасов» «Талисманы» и «Снаряжение»
    (design/ui/screens/bag.js) — без браузера.
    1. Файлы: index.html подключает данные equipment.js до основного скрипта, screens/equipment.css и screens/equipment.js — после
-      talismans.js (источник героя оборачивается поверх талисманов); вкладка «Сила» зовёт eqRow рядом с talRow; пять характеристик и
+      talismans.js (источник героя оборачивается поверх талисманов); вкладка «Снаряжение» зовёт eqRow рядом с talRow; пять характеристик и
       лист «Атрибуты» берут прибавку eqStatAdd; на карте экранов готовы inventory, equipment и equipment-item. Концы строк экрана — CRLF.
    2. Данные свежие: сборщик tools/content-gen/equipment/build.js без ошибок даёт ровно design/ui/equipment.js и таблицы документа;
       63 шаблона, число строк = ступень редкости, все числа целые. Генератор прототипа (EnEquip) и сборщика — один: те же предметы.
@@ -18,7 +18,7 @@
       своей редкости на сиде операции, повтор ничего не выдаёт.
    8. «Запасы»: семь вкладок; «Сундуки» — только сундуки, рисованные корпуса своего вида; «Талисманы» — фильтр «подходит классу» по §26,
       «К герою» ведёт в лист талисманов героя с выбранным талисманом; «Снаряжение» — фильтр слота, карточка — одно действие.
-   9. Вид: места в карточке каждого героя, лист «Снаряжение» на каждом месте, «Свойства и сравнение», «Кому надеть», перековка, UI-кит,
+   9. Вид: места в карточке каждого героя, окно снаряжения героя (screens/hero-dev.js) на каждом месте, «Свойства и сравнение», «Кому надеть», перековка, UI-кит,
       сценарии — без исключений, undefined и NaN; режим «Игрок» — без служебных слов (SERVICE из check_player_view.js).
    10. Задание арта tools/art-gen/jobs/equipment.json — девять слотов, не запускалось: картинок снаряжения в art/generated нет.
    Чужой незаконченный файл, на который index.html уже ссылается, пропускается с предупреждением: его проверяют свои проверки.
@@ -51,7 +51,7 @@ const scripts = [...html.matchAll(/<script(?:\s+src="([^"]+)")?>([\s\S]*?)<\/scr
   else if (i('screens/equipment.js') < i('screens/bag.js')) say('index.html: screens/equipment.js подключён раньше bag.js');
   if (!/<link rel="stylesheet" href="screens\/equipment\.css">/.test(html)) say('index.html: не подключён screens/equipment.css');
   const hd = html.match(/function heroDetail\(h\)[\s\S]*?\n\}/);
-  if (!hd || !/eqRow\(h\)[\s\S]{0,120}talRow\(h\)/.test(hd[0])) say('index.html: вкладка «Сила» (heroDetail) не зовёт eqRow рядом с talRow');
+  if (!hd || !/eqRow\(h\)[\s\S]{0,120}talRow\(h\)/.test(hd[0])) say('index.html: вкладка «Снаряжение» (heroDetail) не зовёт eqRow рядом с talRow');
   if (!/const statStrip = [^\n]*eqStatAdd/.test(html)) say('index.html: пять характеристик (statStrip) без прибавки снаряжения');
   if (!/hattr\(o\) \{[\s\S]{0,400}eqStatAdd/.test(html)) say('index.html: лист «Атрибуты» без прибавки снаряжения');
   const card = n => (html.match(new RegExp(`\\{ n: '${n}'[\\s\\S]*?\\},\\r?\\n`)) || [''])[0];
@@ -117,7 +117,7 @@ function load() {
   const T = vm.runInContext(`({
     get S() { return S; }, set S(v) { S = v; },
     ACT, OV, FLOWS, KH, KIT_EXTRA, H, EB, BAG, LBX, RAR, render, initialState, setTeam, EnLoot: window.EnLoot, EnEquip: window.EnEquip, EQD: window.EN_EQUIPMENT,
-    TL: window.EN_TALISMANS, CO_ART: typeof CO_ART !== 'undefined' ? CO_ART : null, EQ_SRV, EQ_DEMO, eqRow, eqStatAdd, eqMulOf, eqWornList, eqItem, eqView, eqKitHtml,
+    TL: window.EN_TALISMANS, CO_ART: typeof CO_ART !== 'undefined' ? CO_ART : null, EQ_SRV, EQ_DEMO, eqRow, eqStatAdd, eqMulOf, eqWornList, eqItem, eqView, eqKitHtml, heroSt: typeof heroSt === 'function' ? heroSt : null,
     zpEntries, zpView, zpChestGroups, zpOpenOne, zpSeed, zpTalCasket: typeof zpTalCasket === 'function' ? zpTalCasket : null, zpKitHtml: typeof zpKitHtml === 'function' ? zpKitHtml : null,
     tlWhy: typeof tlWhy === 'function' ? tlWhy : null, tlEq: typeof tlEq === 'function' ? tlEq : null, tlPool: typeof tlPool === 'function' ? tlPool : null, TB: typeof TB !== 'undefined' ? TB : null,
     coRun: typeof coRun === 'function' ? coRun : null,
@@ -229,9 +229,10 @@ reset();
   const add = T.eqStatAdd(h), want = [0, 0, 0, 0, 0];
   for (const [k, v] of it.lines) if (D.kinds[k].st != null) want[D.kinds[k].st] += v;
   if (JSON.stringify(add) !== JSON.stringify(want)) say(`прибавка характеристик перчаток: ${add.join(', ')}, ждали ${want.join(', ')}`);
-  T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'mine'; T.S.seg.hero = 'power'; T.S.selHero = 'h1'; T.S.overlay = null;
+  T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'mine'; T.S.seg.hero = 'power'; T.S.selHero = 'h1'; T.S.overlay = null;   // характеристики — тихой строкой во вкладке «Развитие»
   const g = view(P, 'карточка с перчатками');
-  if (want[0] && !g.includes(`<b class="num">${h.st[0] + want[0]}</b>`)) say('карточка героя: сила без прибавки снаряжения');
+  const st0 = T.heroSt ? T.heroSt(h)[0] : h.st[0];   // с доблестью: +INV.hero.valorPct % за ступень (index.html, valorSt)
+  if (want[0] && !g.includes(`<b class="num">${st0 + want[0]}</b>`)) say('карточка героя: сила без прибавки снаряжения');
   T.S.overlay = { t: 'hattr', arg: 'h1' }; if (want[0] && !view(P, 'лист «Атрибуты»').includes(`+${want[0]}</small>`)) say('лист «Атрибуты»: нет прибавки снаряжения'); T.S.overlay = null;
 }
 
@@ -392,14 +393,14 @@ reset();
 for (const team of [false, true]) {
   reset(); run('режим', () => T.setTeam(team));
   const tag = team ? 'Команда' : 'Игрок';
-  T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'mine'; T.S.seg.hero = 'power';
+  T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'mine'; T.S.seg.hero = 'gear';
   for (const h of T.S.heroes) {
     T.S.selHero = h.id; T.S.overlay = null;
-    const g = view(P, `${tag} · ${h.name} · Сила`);
+    const g = view(P, `${tag} · ${h.name} · Снаряжение`);
     if ((g.match(/class="eq-slot[ "]/g) || []).length !== 9) say(`${h.name}: в карточке не девять мест снаряжения`);
     if ((g.match(/class="tl-slot[ "]/g) || []).length !== 4) say(`${h.name}: в карточке не четыре места талисманов`);
-    for (const s of D.rules.slots) { T.S.overlay = { t: 'eq', arg: `${h.id}:${s}` }; const x = view(P, `${tag} · лист · ${h.name} · ${s}`); if (!/Снаряжение/.test(x)) say(`${h.name} · ${s}: лист не открылся`); }
-    /* выбор и сравнение в листе */
+    for (const s of D.rules.slots) { T.S.overlay = { t: 'eq', arg: `${h.id}:${s}` }; const x = view(P, `${tag} · окно · ${h.name} · ${s}`); if (!/class="gw"/.test(x) || T.S.gear.focus !== 'eq:' + s || (x.match(/data-gslot="eq:/g) || []).length !== 9) say(`${h.name} · ${s}: окно снаряжения не открылось на своём месте`); }
+    /* выбор и сравнение в окне: выбранный для этого места сохраняется (pickFor), у него — «Надеть» и прибавка мощи */
     const cand = items().find(it => !it.on);
     T.S.eq.pickFor = `${h.id}:${cand.slot}`; T.S.eq.pick = cand.uid; T.S.overlay = { t: 'eq', arg: `${h.id}:${cand.slot}` };
     const x = view(P, `${tag} · выбран · ${h.name}`); if (!/data-a="eqput"/.test(x)) say(`${h.name}: у выбранного нет «Надеть»`); if (!/Боевая мощь/.test(x)) say(`${h.name}: у сравнения нет прибавки боевой мощи`);

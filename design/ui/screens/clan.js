@@ -456,15 +456,18 @@ const CL_WHY = { op: 'Действие устарело', noclan: 'Вы не в 
 const say = r => { if (r && r.refuse) { toast(r.why || CL_WHY[r.refuse] || 'Не вышло'); return false; } return !!(r && r.res && !r.again); };
 
 /* ================== бой клана ================== */
-/* карта цели для ядра: здоровье и «раз за жизнь» — между атаками, как у целей Эхо; раунды — режим и древо */
+/* карта цели для ядра: здоровье и «раз за жизнь» — между атаками, как у целей Эхо; остаток здоровья — максимум цели в этой атаке
+   (осада ядра, RULES.siege). Раунды — таблица ядра через данные режима (элита — 10, босс — 100) и древо.
+   У элиты — свита из четырёх приспешников её стихии (EnClan.retinue, решение автора 29.09.2026): свежая в каждой атаке */
 function fightOf(x, ids, n) {
   const C = S.clan, src = EC.card(D, { g: x.g, uid: x.uid, cls: x.cls, el: x.el, race: x.race, k: x.k, name: nameOf(x) });
   src.maxHp = x.max; src.hp = x.hp; src.used = (x.used || []).slice();
   const cap = x.g === 'b' ? D.boss.roundsCap.roundB : D.boss.roundsCap.roundE, base = D.boss.rounds[x.g];
   const maxRounds = Math.min(base + cap, EC.rounds(D, x.g, C.picks, C.lvl));
-  return { src, heroes: ids.map(id => EB.heroSrc(H(id))), o: { seed: EB.seedOf(`клан|${C.id}|неделя|${C.boss.no}|${x.uid}|атака|${n}`), maxRounds } };
+  return { src, guards: EC.retinue(D, src), heroes: ids.map(id => EB.heroSrc(H(id))), o: { seed: EB.seedOf(`клан|${C.id}|неделя|${C.boss.no}|${x.uid}|атака|${n}`), maxRounds } };
 }
-const battleOf = F => EB.create({ heroes: F.heroes, foes: [F.src], seed: F.o.seed, mode: 'rounds', maxRounds: F.o.maxRounds });
+/* бой одной атаки: цель и её свита, бой кончается, когда цель пала (EnClan.battle — тот же, что у калькулятора клана) */
+const battleOf = F => EC.battle(D, F.heroes, F.src, F.o.seed, F.o.maxRounds);
 /* цель пала: выплата по снятому здоровью (§25.3), бестиарий, круг — дальше */
 function kill(C, x, L) {
   x.dead = true; x.hp = 0; L.kill = true;
@@ -492,6 +495,7 @@ function play(L) {
   S.runs = S.runs.filter(r => r.kind !== 'clan');
   const F = L.F, b = battleOf(F), x = { g: L.g, cls: L.cls, el: L.el, race: L.race };
   FOE_LOOK[F.src.id] = { known: L.known0, face: ph(x, 'bt', L.known0) };
+  for (const u of F.guards || []) FOE_LOOK[u.id] = { known: true, face: ph({ g: 'o', cls: u.cls, el: u.el, race: u.race }, 'bt', true) };   // свита — знак класса в свете стихии
   const arena = window.EN_ECHO && EN_ECHO.arena ? EN_ECHO.arena(L.race) : null;
   const scene = { title: `Клан · круг ${L.k}`, sub: `атака ${L.n} · ${F.o.maxRounds} ${roundWord(F.o.maxRounds)}`, short: `Клан · ${L.k}`, back: 'clan', skip: 'clskip', result: 'clres', bg: arena || undefined,
     badge: `<b>${ic('shield')}</b><span>Клан</span>`,
@@ -500,7 +504,7 @@ function play(L) {
     floor: 1, startFloor: 1, demo: false, guard: false, mode: 'rounds', acted: [], fired: null, view: 0, runMs: 0, kills: 0,
     loot: { gold: 0, spirit: 0, souls: 0, items: {} }, newKnown: [], over: false, seen: false, gap: 0, feed: [], disp: {}, curve: [],
     lastActor: null, pending: 0, endAt: null, max0: b.maxRounds, done: clDone, res: L,
-    banner: [nameOf(x, L.known0), `${L.g === 'b' ? 'Клановый босс' : 'Элита'} · ${F.o.maxRounds} ${roundWord(F.o.maxRounds)} · здоровье цели сохраняется`] };
+    banner: [nameOf(x, L.known0), `${L.g === 'b' ? 'Клановый босс' : 'Элита и свита'} · ${F.o.maxRounds} ${roundWord(F.o.maxRounds)} · урон по цели сохраняется`] };
   L.run = R.id;
   syncDisp(R);
   S.runs.push(R); S.focus = R.id; S.insp = null; S.overlay = null; S.route = 'battle';
@@ -742,7 +746,7 @@ Object.assign(OV, {
     const rounds = fightOf(x, [], 0).o.maxRounds;
     const body = `<div class="row cl-thd">${ph(x, 'lg')}<div class="col"><div class="row cl-chips">${rankChip(x)}${el(x.el)}${k && x.g === 'e' ? `<span class="chip">${CLS(clsName(x.cls), 14)}${clsName(x.cls)}</span>` : ''}</div>
         <div class="row cl-nums">${icoNum('hp', `${fmt(x.hp)} / ${fmt(x.max)}`, 'Здоровье')}${bmHtml(bm, 16)}</div></div></div>
-      ${kv([['Раса', x.race], ['Бой', `${rounds} ${roundWord(rounds)} · один на один`], ['За победу', `${fmt(pts)} ${ptsWord(pts)} — по снятому здоровью`],
+      ${kv([['Раса', x.race], ['Бой', `${rounds} ${roundWord(rounds)} · ${x.g === 'b' ? 'один на один' : `со свитой: ${D.boss.retinue.n} ${plural(D.boss.retinue.n, 'приспешник', 'приспешника', 'приспешников')} её стихии`}`], ['За победу', `${fmt(pts)} ${ptsWord(pts)} — по снятому здоровью`],
         x.g === 'b' ? ['Контроль', 'не действует — только дебаффы'] : ['Сопротивлений', 'нет: решает подбор отряда'], mine ? ['Ваш урон', `${fmt(mine)} · ≈${fmt(est)} ${ptsWord(est)}, когда цель падёт`] : null])}
       ${k ? `<span class="eyebrow">Приёмы</span><div class="cl-abs">${abil.map(a => `<div class="cl-ab"><b>${a.n}</b><small>${a.d}</small></div>`).join('')}</div>` : '<p class="reason">Класс и приёмы откроет первая победа.</p>'}
       ${x.dead || x.burned ? '' : `<p class="reason">Не добьёте до конца недели — счёт сгорит.</p>`}`;
@@ -765,7 +769,7 @@ Object.assign(OV, {
         ${pay ? `<span class="eyebrow">Очки по снятому здоровью · ${fmt(L.pts)}</span><div class="cl-list">${pay}</div>` : ''}
       </div></details>`;
     const body = `<div class="row cl-rtop">${ph({ g: L.g, cls: L.cls, el: L.el, race: L.race }, 'sm', L.kill || L.known0)}<div class="col"><b class="serif">${nameOf({ g: L.g, cls: L.cls, el: L.el, race: L.race }, L.kill || L.known0)}</b><small class="faint">круг ${L.k}</small></div></div>
-      <div class="col cl-rhp">${bar(pc(L.hp), 'hp lg', `<span class="ghost" style="--g:${pc(L.hp0)}"></span>`)}<div class="row"><span>здоровье цели</span><span class="num">${fmt(L.hp)} / ${fmt(L.max)}</span></div></div>
+      <div class="col cl-rhp">${bar(pc(L.hp), 'hp lg', `<span class="ghost" style="--g:${pc(L.hp0)}"></span>`)}<div class="row"><span>здоровье цели</span><span class="num">${fmt(L.hp)}</span></div></div>
       <div class="row cl-kpi">${kpi.map(([v, s, w]) => `<div class="stat ${w}"><b class="num">${v}</b><small>${s}</small></div>`).join('')}</div>
       ${marks ? `<div class="row cl-marks">${marks}</div>` : ''}
       ${L.kill ? '' : '<p class="reason">Очки придут, когда цель падёт: по снятому здоровью, без бонуса за добивание.</p>'}

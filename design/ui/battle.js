@@ -16,6 +16,10 @@
    - длительность эффектов — в ходах носителя, то есть в раундах;
    - после последнего раунда — «Время скоротечно…»: этаж не взят, как при пределе времени в прежней модели.
    Числа модели — в RULES.rounds. Режим по умолчанию — 'rounds'.
+   Раундов в бою — по типу боя, одна таблица на все режимы: RULES.rounds.by (решение автора 29.09.2026, заменяет «10 раундов»):
+   этаж с рядовыми — 5, с элитой — 10, с боссом — 20, рунный босс — 25, Убер — 50, забытый босс — 75, клановый — 100, PvP — 25.
+   Осада (решение автора 29.09.2026): враг, которого бьют за несколько попыток, приходит в попытку с остатком здоровья — этот остаток
+   и есть его максимум в попытке (RULES.siege); лечение, доли от максимума и пороги — от него, прежний максимум — max0.
    Способности модели «10 раундов» — из общей библиотеки (ADR-0015): выгрузка abilities.js, наборы героев и врагов — kits.js (ADR-0016).
    Доля хода — по редкости героя и рангу врага: способности делят долю по весу, ульты — поровну, закрытые доблестью отдают свою часть
    обычной атаке. LIB ниже — прежняя библиотека: на ней идёт модель темпа, а в модели раундов — карта без набора.
@@ -65,15 +69,29 @@ const RULES = {
   tempoPct: 250,                        // скорость атаки из §3.2, растянутая для экрана: интервал ×2,5
   act: { attack: 900, cast: 1300, mass: 1700, ult: 2400, skip: 600 },  // сколько действие идёт на экране; раньше карта снова не ходит
   floor: { limitMs: { o: 150000, e: 240000, b: 360000 }, gapMs: 2500 }, // предел боя этажа и переход к следующему, мс
-  rounds: {                             // модель «10 раундов»
-    max: 10,                            // раундов в бою; после последнего — «Время скоротечно…»
-    rune: 25,                           // бой с рунным боссом — 25 раундов на всех циклах (решение автора 28.09.2026, ADR-0020)
+  rounds: {                             // модель раундов (ADR-0010)
+    /* раундов в бою — по типу боя, одна таблица на все режимы (решение автора 29.09.2026, заменяет «10 раундов» ADR-0010):
+       чем достойнее враг, тем дольше бой. Этаж биома — по старшему врагу колоды (FLOORS: g), Эхо — по главному врагу (echo.kind),
+       клан, Арена и Лига — своим ключом. После последнего раунда — «Время скоротечно…» */
+    by: {
+      o: 5,                             // этаж только с рядовыми; рядовой Эхо
+      e: 10,                            // этаж с элитой; элита Эхо; элита кланового босса со свитой
+      b: 20,                            // этаж с боссом биома; босс Эхо
+      rune: 25,                         // рунный босс — страж, на всех циклах (ADR-0020)
+      uber: 50,                         // Убер-босс Эхо
+      many: 10,                         // Многоликий — лёгкий бой один на один с набором элиты: как элита (решение исполнителя 29.09.2026)
+      forgotten: 75,                    // крафтовый «забытый» босс, призванный с ресурсов
+      clan: 100,                        // клановый босс
+      pvp: 25,                          // Арена и Лига — каждый бой
+    },
+    base: 'e',                          // бой без своего типа — как этаж с элитой
     runeCut: 1,                         // особенность каждого РБ: его обычная атака отнимает у предела раунд
     capBp: 6000,                        // сумма шансов способностей карты не выше 60 %: больше — сжимается пропорционально
     act: { attack: 600, cast: 900, mass: 1100, ult: 1600, skip: 400 },   // сколько ход идёт на экране, мс
     gapMs: 700,                         // надпись «Раунд N» между раундами, мс
-    foeHpPct: 60,                       // здоровье врагов в этой модели: за 10 раундов каждая карта ходит только 10 раз
+    foeHpPct: 60,                       // здоровье врагов в модели раундов, % их hpPct: карта ходит раз в раунд; сила врагов биома — в его данных
   },
+  siege: { startIsMax: true },          // осада (решение автора 29.09.2026): здоровье цели на начало попытки — её максимум в попытке; прежний — max0
   drop: {                               // добыча по рангу убитой карты (§5.8): ставки ADR-0014, золото — половина духа; только за взятый этаж
     o: { gold: 5, spirit: 10 },
     e: { gold: 25, spirit: 50, soulsPerBiome: 1, keys: 1 },     // элита: душ = номер биома × 1 (ADR-0011) и ключ ремесла своего биома
@@ -81,14 +99,22 @@ const RULES = {
     rune: { gold: 250, spirit: 500 },                           // рунный страж за победу; руны пределов — отдельно (§11); его свита — элиты
     basePerFloorBp: 1000,               // шанс базового ресурса за взятый этаж; артефакты прибавляют свои б. п.
   },
-  echo: {                               // бой в Эхо (ADR-0025, §17.3); числа — демонстрация, данные режима могут дать свой предел раундов
-    rounds: { o: 5, e: 8, b: 12, u: 25, m: 12, craft: 12 },   // раундов по типу главного врага: рядовой, элита, босс недели, Убер-босс, Многоликий, крафтовый босс
+  echo: {                               // бой в Эхо (ADR-0025, §17.3); числа — демонстрация
+    // тип главного врага → тип боя в таблице раундов RULES.rounds.by: рядовой, элита, босс недели, Убер-босс, Многоликий, крафтовый босс
+    kind: { o: 'o', e: 'e', b: 'b', u: 'uber', m: 'many', craft: 'forgotten' },
     guards: { o: 4, e: 4, b: 4, u: 4, m: 0, craft: 4 },      // защитников у главного врага: врагов пятеро; Многоликий — лёгкий бой один на один
     endOnMain: true,                    // бой кончается, когда пал главный враг: цель взята, защитников добивать незачем
   },
   aversionBp: 2000,                     // расовая неприязнь героя Эхо: +20 % урона по врагам расы своей недели (ADR-0024); у героя может быть своя
+  valorPct: 30,                         // доблесть: +30 % к пяти базовым характеристикам за ступень, накопительно — пять ступеней ×3,7 (§3.3, §10.2, ADR-0016);
+                                        // одно число на прототип и калькуляторы: INV.hero.valorPct прототипа берёт его отсюда
   basicAllPct: 100,                     // обычная атака по всем (basicAll: true) — доля главного стата по каждой цели, %
 };
+/* раундов в бою по типу боя — только из таблицы RULES.rounds.by; неизвестный тип — как бой без типа (base) */
+const roundsOf = kind => RULES.rounds.by[kind] || RULES.rounds.by[RULES.rounds.base];
+/* прежние имена для экранов и калькуляторов — выборки из той же таблицы, своих чисел у них нет */
+RULES.rounds.rune = roundsOf('rune');
+RULES.echo.rounds = Object.fromEntries(Object.entries(RULES.echo.kind).map(([g, k]) => [g, roundsOf(k)]));
 
 /* ================== библиотека способностей ==================
    Каждая способность — набор примитивов: kind (что делает), tgt (правило цели), stat и coef
@@ -173,7 +199,8 @@ const FOES = {
   e4: { rank: 'e', name: 'Мех', cls: 'Маг. ДД', el: 'Воздух', st: [25, 135, 30, 150, 70], hpPct: 325, abs: ['Меха', 'Сквозняк'] },
   e5: { rank: 'e', name: 'Штопарь', cls: 'Лекарь', el: 'Земля', st: [25, 124, 20, 180, 60], hpPct: 325, abs: ['Заплата', 'Шов'] },
   e6: { rank: 'e', name: 'Съёмщик', cls: 'Дебаффер', el: 'Земля', st: [31, 119, 40, 160, 70], hpPct: 350, abs: ['Съём', 'Снять форму'] },
-  b1: { rank: 'b', name: 'Первый набросок', cls: 'Босс', el: 'Земля', st: [156, 52, 30, 300, 60], hpPct: 1500, abs: ['Правка', 'Глиняный вал'], ult: 'Последний штрих', pas: ['Незавершённость'] },
+  // босс — образец для осады длинных биомов: бой с ним — 20 раундов, вдвое дольше этажа, и здоровья вдвое больше (было 1500 при 10 раундах)
+  b1: { rank: 'b', name: 'Первый набросок', cls: 'Босс', el: 'Земля', st: [156, 52, 30, 300, 60], hpPct: 3000, abs: ['Правка', 'Глиняный вал'], ult: 'Последний штрих', pas: ['Незавершённость'] },
   g1: { rank: 'rune', name: 'Мастер', cls: 'Страж', el: 'Земля', st: [150, 60, 60, 320, 70], hpPct: 1800, abs: ['Резец Мастера', 'Остановись'] },
 };
 
@@ -222,7 +249,8 @@ function floorSeed(biomeSeed, floor) { return mix32((biomeSeed ^ Math.imul(floor
    foeHpPct — здоровье врагов биома, % от их hpPct: этажи и свита стража; bossHpPct и guardHpPct — здоровье босса и стража этого биома. */
 const BIOMES = {
   b1: { n: 1, cycle: 1, name: 'Мастерская форм', seed: seedOf('Мастерская форм'), floors: FLOORS_TUTOR,
-    foeLvl: { base: 1, perFloor: 1 }, foeHpPct: 50, bossHpPct: 400, guardHpPct: 175, siege: false,
+    // босс — 675 %: бой с ним 20 раундов, и пара берёт его с 40-го уровня, как прежде при 10 раундах и 400 % (с 39-го), — дольше, а не проще
+    foeLvl: { base: 1, perFloor: 1 }, foeHpPct: 50, bossHpPct: 675, guardHpPct: 175, siege: false,
     // рунный страж обучения — три карты (ADR-0018): Мастер и две элиты, по силам двум героям. Подмастерье бьёт, Мех — по всем
     guard: { g: 'r', m: ['g1', 'e1', 'e4'] } },
   // образец длинного биома цикла II — для калькулятора экономики; сид прежней Мастерской, чтобы прогоны были сравнимы
@@ -535,14 +563,16 @@ function mkUnit(src, side, i) {
   const [str, int, agi, sta, spd] = src.st;
   const A = v => fl(s.atk * (100 + v) * L, 100 * s.lvlDiv);
   // здоровье — от выносливости и уровня; режим с собственной шкалой здоровья (Эхо) даёт его данными как есть
-  const maxHp = src.maxHp != null ? Math.max(1, src.maxHp) : fl(s.hp * (100 + sta) * L * (src.hpPct || 100), 100 * s.lvlDiv * 100);
+  const max0 = src.maxHp != null ? Math.max(1, src.maxHp) : fl(s.hp * (100 + sta) * L * (src.hpPct || 100), 100 * s.lvlDiv * 100);
+  // осада (RULES.siege): враг пришёл с остатком здоровья прошлых попыток — остаток и есть его максимум в этой попытке; max0 — прежний
+  const maxHp = side === 1 && src.hp != null && !src.dead && RULES.siege.startIsMax ? clamp(src.hp, 1, max0) : max0;
   const as = clamp(RULES.caps.asMin + spd, RULES.caps.asMin, RULES.caps.asMax);
   const C = RULES.cls[src.cls] || { main: 'str', fx: 'melee' };
   const u = {
     key: src.key, id: src.id, name: src.name, side, i, cls: src.cls, el: src.el, lvl: src.lvl, lead: !!src.lead, rank: src.rank || null,
     race: src.race || null, avers: aversOf(src), basicAll: basicAllOf(src),   // раса — для неприязни героев Эхо (ADR-0024)
     main: src.main || C.main, fx: src.fx || C.fx,
-    maxHp, hp: src.dead ? 0 : src.hp != null ? clamp(src.hp, 1, maxHp) : maxHp, sh: 0,
+    maxHp, max0, hp: src.dead ? 0 : src.hp != null ? clamp(src.hp, 1, maxHp) : maxHp, sh: 0,
     atk: { str: A(str), int: A(int), agi: A(agi), sta: A(sta) },   // обычная атака — от главного стата, способность — от своей характеристики
     def: { str: fl(s.def * str * L, s.lvlDiv), int: fl(s.def * int * L, s.lvlDiv) },
     eva: Math.min(RULES.caps.evaBp, fl(agi * 10000, s.evaDiv)),
@@ -577,6 +607,15 @@ function heroSrc(h) {
     kit: h.draft && KITS().heroes[h.draft] || null, valor: h.valor || 0,   // набор из распределения (ADR-0016): черновик героя h.draft
     avers: h.avers || null };                                               // неприязнь героя Эхо: { race, bp } (ADR-0024)
 }
+/* Доблесть (§3.3, §10.2, ADR-0016): каждая ступень — +pct % к пяти базовым характеристикам, накопительно, целыми:
+   ⌊база × (100 + pct)^доблесть / 100^доблесть⌋. Число — RULES.valorPct; прототип зовёт то же правило (index.html, valorSt) */
+function valorSt(st, v, pct) {
+  const p = 100 + (pct != null ? pct : RULES.valorPct), n = Math.max(0, v | 0);
+  return (st || []).map(x => Math.floor(x * p ** n / 100 ** n));
+}
+/* Источник героя с доблестью — как у «сервера» прототипа (index.html оборачивает heroSrc тем же правилом): калькуляторы зовут его,
+   чтобы прогоны и прототип считали героя одинаково. Снаряжение и талисманы — слои экранов, в прогоны не входят */
+function heroSrcValor(h) { const s = heroSrc(h); return h.valor ? Object.assign({}, s, { st: valorSt(h.st, h.valor) }) : s; }
 function foeSrc(id, lvl, k, lead, hp, hpPct) {
   const f = FOES[id];
   return { key: id + '#' + k, id, name: f.name, cls: f.cls, el: f.el, lvl, st: f.st, race: f.race,
@@ -596,7 +635,7 @@ const foeHpOf = (B, id) => B.foeHpPct ? fl(FOES[id].hpPct * B.foeHpPct, 100) : n
 function create(o) {
   const mode = o.mode === 'tempo' ? 'tempo' : 'rounds';   // основная модель — «10 раундов» (ADR-0010)
   const b = { mode, t: 0, limit: mode === 'rounds' ? Infinity : o.limitMs, rng: makeRng(o.seed), seed: o.seed, u: [[], []], over: false, win: false, why: '', ev: [],
-    round: 0, maxRounds: o.maxRounds || RULES.rounds.max, queue: [], farm: [], cov: {}, deaths: 0 };
+    round: 0, maxRounds: o.maxRounds || roundsOf(o.kind), queue: [], farm: [], cov: {}, deaths: 0 };
   // порядок героев в отряде на бой не влияет: иначе перестановка отряда перебрасывала бы случайность
   const heroCard = mode === 'rounds' ? s => s : s => Object.assign({}, s, { kit: null });   // прежняя модель темпа — на прежней библиотеке, без наборов
   o.heroes.slice().sort((x, y) => x.key < y.key ? -1 : x.key > y.key ? 1 : 0).forEach((s, i) => b.u[0].push(mkUnit(heroCard(s), 0, i)));
@@ -1175,21 +1214,24 @@ function tickPeriodic(b, u) {
 /* ================== забег ==================
    Этажи идут подряд, здоровье и павшие переходят дальше: биом — испытание на истощение.
    Щиты, эффекты и зарядка способностей обнуляются между этажами. mode — 'tempo' (ADR-0007) или 'rounds'. */
+/* Раундов на этаже — по старшему врагу колоды (RULES.rounds.by: g — o, e или b). Босс в осаде приходит с остатком здоровья,
+   и этот остаток — его максимум в попытке (RULES.siege) */
 function floorBattle(heroes, biome, floor, siegeHp, mode) {
   const B = BIOMES[biome], g = B.floors[floor - 1].g;
-  return create({ heroes, foes: floorFoes(biome, floor, siegeHp), seed: floorSeed(B.seed, floor), limitMs: RULES.floor.limitMs[g], mode });
+  return create({ heroes, foes: floorFoes(biome, floor, siegeHp), seed: floorSeed(B.seed, floor), limitMs: RULES.floor.limitMs[g], mode, maxRounds: roundsOf(g) });
 }
 /* Рунный страж — отдельный бой после биома (§8.6, §11, ADR-0010): страж и свита, в обучении цикла I — три карты (ADR-0018).
-   Бой идёт до RULES.rounds.rune раундов, каждая обычная атака рунного босса отнимает раунд (ADR-0020). */
+   Бой идёт до RULES.rounds.by.rune раундов, каждая обычная атака рунного босса отнимает раунд (ADR-0020). */
 function guardBattle(heroes, biome, mode) {
   const B = BIOMES[biome], G = B.guard, lvl = B.floors.length + 1;
   const foes = G.m.map((id, k) => foeSrc(id, foeLvlOf(B, lvl), k, k === 0, null, k === 0 ? B.guardHpPct : foeHpOf(B, id)));
-  return create({ heroes, foes, seed: floorSeed(B.seed, lvl), limitMs: RULES.floor.limitMs.b, mode, maxRounds: RULES.rounds.rune });
+  return create({ heroes, foes, seed: floorSeed(B.seed, lvl), limitMs: RULES.floor.limitMs.b, mode, maxRounds: roundsOf('rune') });
 }
 /* Бой в Эхо (ADR-0025, §17.3) — тот же детерминированный бой «10 раундов» на сиде от сервера, этаж один, перехода нет.
    Врагов пятеро: главный враг ступени и RULES.echo.guards[тип] защитников; Многоликий — лёгкий бой один на один.
-   Предел раундов — по типу главного врага (RULES.echo.rounds) или свой из данных режима (o.maxRounds). Здоровье главного врага
-   приходит на вход — hp и maxHp — и после боя уходит в итог: оно сохраняется между атаками. Защитники всегда полные.
+   Предел раундов — по типу главного врага (RULES.echo.kind → RULES.rounds.by) или свой из данных режима (o.maxRounds). Здоровье
+   главного врага приходит на вход — hp и maxHp — и после боя уходит в итог: оно сохраняется между атаками. Остаток на входе — его
+   максимум в этой атаке (осада, RULES.siege), прежний максимум — max0. Защитники всегда полные.
    Этаж биома Многоликого — тот же бой, только отряд приходит со своим здоровьем и павшими (carry), а главный враг — полный.
    o: { seed, g — тип главного врага: o, e, b, u, m или craft; main — его карта; guards — карты защитников; maxRounds }.
    Карты — как у этажа: key, id, name, cls, el, lvl, st, rank, race, kit, hpPct или maxHp, basic. Порядок героев на бой не влияет. */
@@ -1199,9 +1241,16 @@ function echoBattle(heroes, o) {
   if (foes.length !== need + 1) throw new Error(`Эхо: врагов ${foes.length}, а нужно ${need + 1} — главный враг и защитников ${need}`);
   const maxRounds = o.maxRounds || E.rounds[o.g];
   if (!maxRounds) throw new Error('Эхо: нет предела раундов для врага типа «' + o.g + '»');
-  const b = create({ heroes, foes: foes.map((f, k) => Object.assign({}, f, { lead: k === 0, hp: k === 0 ? f.hp : null, dead: false })), seed: o.seed >>> 0, mode: 'rounds', maxRounds });
+  return targetBattle(heroes, { seed: o.seed, g: o.g, main: o.main, guards: o.guards, maxRounds, endOnMain: !!E.endOnMain });
+}
+/* Бой с целью, которую бьют за несколько попыток, — Эхо и клан: главный враг — первая карта, его здоровье приходит на вход
+   и уходит в итог (echoStats); свита — полные карты. endOnMain — бой кончается, когда пал главный враг: добивать свиту незачем.
+   o: { seed, g — тип цели для итога, main, guards, maxRounds, endOnMain } */
+function targetBattle(heroes, o) {
+  const foes = [o.main].concat(o.guards || []);
+  const b = create({ heroes, foes: foes.map((f, k) => Object.assign({}, f, { lead: k === 0, hp: k === 0 ? f.hp : null, dead: false })), seed: o.seed >>> 0, mode: 'rounds', maxRounds: o.maxRounds });
   const m = b.u[1][0];
-  b.echo = { g: o.g, main: m, hp0: m.hp, endOnMain: !!E.endOnMain };
+  b.echo = { g: o.g, main: m, hp0: m.hp, endOnMain: !!o.endOnMain };
   return b;
 }
 /* Здоровье карты врага в бою модели раундов — ровно как посчитает create (hpPct × RULES.rounds.foeHpPct): режим со своей шкалой
@@ -1215,7 +1264,7 @@ function echoStats(b) {
   return {
     seed: b.seed, g: E.g, over: b.over, win: b.win, why: b.why, rounds: b.round, maxRounds: b.maxRounds,
     killed: !m.alive,
-    main: { key: m.key, id: m.id, name: m.name, hp0: E.hp0, hp: m.hp, maxHp: m.maxHp, taken: E.hp0 - m.hp, dead: !m.alive, used: m.usedBiome.slice() },   // used — сработавшее «раз за жизнь»: помнится между атаками
+    main: { key: m.key, id: m.id, name: m.name, hp0: E.hp0, hp: m.hp, maxHp: m.maxHp, max0: m.max0, taken: E.hp0 - m.hp, dead: !m.alive, used: m.usedBiome.slice() },   // used — сработавшее «раз за жизнь»: помнится между атаками; max0 — максимум до осады
     heroes: b.u[0].map(u => ({ key: u.key, id: u.id, name: u.name, dealt: u.dealt, toMain: u.dealtLead, healed: u.healed, taken: u.taken, alive: u.alive })),
     foes: b.u[1].map(u => ({ key: u.key, id: u.id, name: u.name, lead: u.lead, hp: u.hp, maxHp: u.maxHp, dealt: u.dealt, healed: u.healed, dead: !u.alive })),
     kills: b.u[1].filter(u => !u.alive).length, fallen: b.u[0].filter(u => !u.alive).length,
@@ -1262,11 +1311,11 @@ function simRun(heroes, biome, siegeHp, mode) {
     if (boss) bossHp = boss.alive ? boss.hp : 0;
     cur = carry(cur, b);
     const hp = b.u[0].reduce((a, u) => a + u.hp, 0), max = b.u[0].reduce((a, u) => a + u.maxHp, 0);
-    floors.push({ floor: f, win: b.win, why: b.why, ms: b.t, rounds: b.round, alive: b.u[0].filter(v => v.alive).length, pct: fl(hp * 100, max), bossHp: boss ? boss.hp : null, bossMax: boss ? boss.maxHp : null });
+    floors.push({ floor: f, win: b.win, why: b.why, ms: b.t, rounds: b.round, alive: b.u[0].filter(v => v.alive).length, pct: fl(hp * 100, max), bossHp: boss ? boss.hp : null, bossMax: boss ? boss.max0 : null });
     if (!b.win) break;
   }
   return { floors, runMs, bossHp };
 }
 
-root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, FLOORS_TUTOR, BIOMES, lib: lib2, addLib, addFoes, addBiome, kitTable, GOOD_ST, SKIP_ST, seedOf, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, carry, simRun, guardBattle, echoBattle, echoStats, foeMaxHp, floorLoot, elemMul, ready, readyRound, order, chanceTable, pct, fxOf };
+root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, FLOORS_TUTOR, BIOMES, lib: lib2, addLib, addFoes, addBiome, kitTable, GOOD_ST, SKIP_ST, seedOf, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, carry, simRun, guardBattle, echoBattle, targetBattle, echoStats, foeMaxHp, roundsOf, valorSt, heroSrcValor, floorLoot, elemMul, ready, readyRound, order, chanceTable, pct, fxOf };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -18,10 +18,23 @@
 /* сколько лежит на столе — из запасов ещё не списано */
 .ws-on{position:absolute;right:2px;top:2px;min-width:15px;height:14px;padding:0 3px;border-radius:7px;background:rgba(72,229,212,.16);color:var(--spirit);font:700 9.5px/14px var(--f-u);text-align:center}
 
-/* ===== Инвентарь ===== */
-.ws-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:6px;align-content:start;justify-items:center;padding:2px}
-.ws-grid .well{--s:48px}
-.ws-grid .well[draggable="true"]{cursor:grab}
+/* ===== Инвентарь: по пять в ряд, плитки крупнее; справа сверху — лупа карточки ресурса (слова автора 29.09.2026) ===== */
+.ws-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:max-content;gap:8px;align-content:start;padding:2px 4px 2px 2px}
+.ws-tile{position:relative;aspect-ratio:1/1;min-width:0}
+.ws-tile>.well{position:absolute;inset:0;width:auto;height:auto;border-radius:12px}
+.ws-tile>.well[draggable="true"]{cursor:grab}
+.ws .ws-tile>.well .i{width:42%;height:42%}
+.ws .ws-tile>.well .gl{font-size:26px}
+.ws-tile>.well>img{width:70%;height:70%}
+.ws-tile>.well .q{right:6px;bottom:5px;font-size:13px}
+/* на столе: плитка светится, сколько на столе — слева сверху; особый ресурс — ромб слева снизу */
+.ws-tile.on>.well{border-color:rgba(72,229,212,.55);box-shadow:inset 0 0 0 1px rgba(72,229,212,.22),inset 0 -2px 0 color-mix(in srgb,var(--rc,#2b3036) 70%,transparent)}
+.ws-tile .ws-on{left:4px;right:auto;top:4px}
+.ws .ws-tile>.well.ws-sp::before{top:auto;left:7px;bottom:8px}
+.ws-lens{appearance:none;position:absolute;top:3px;right:3px;z-index:2;display:grid;place-items:center;width:22px;height:22px;padding:0;border-radius:50%;border:1px solid var(--iron-2);background:rgba(9,11,13,.8);color:var(--parch-2);cursor:pointer}
+.ws-lens::before{content:"";position:absolute;inset:-6px}
+.ws-lens .i{width:13px;height:13px}
+.ws-lens:hover,.ws-lens:focus-visible{color:var(--gold);border-color:var(--gold-3)}
 
 /* ===== Крафт · стол: шесть ячеек вокруг результата ===== */
 .ws-hex{position:relative;flex:1 1 0;min-height:0;display:grid;place-items:center}
@@ -41,19 +54,27 @@
 .ws-core.known{border-color:var(--spirit);box-shadow:0 0 0 1px var(--spirit),0 0 24px -4px var(--spirit)}
 .ws-core>span{font:600 24px/1 var(--f-d);color:var(--parch-3)}
 .ws .ws-core .i{width:28px;height:28px}
-/* количество в выбранной ячейке; имя ресурса — кнопка сведений. У пустой ячейки строка пуста, но держит высоту */
-.ws-qty{display:flex;align-items:center;gap:4px;flex:none;min-height:30px;min-width:0}
-.ws-qn{appearance:none;display:flex;align-items:center;gap:5px;flex:1 1 0;min-width:0;height:28px;padding:0 2px;border:0;background:none;color:var(--parch);font:600 15px/1.1 var(--f-d);text-align:left}
+/* количество в выбранной ячейке: имя — кнопка карточки, ползунок, число, «убрать». У пустой ячейки строка пуста, но держит высоту */
+.ws-qty{display:flex;align-items:center;gap:8px;flex:none;min-height:30px;min-width:0}
+.ws-qn{appearance:none;display:flex;align-items:center;gap:5px;flex:0 1 auto;max-width:42%;min-width:0;height:28px;padding:0 2px;border:0;background:none;color:var(--parch);font:600 15px/1.1 var(--f-d);text-align:left}
 .ws-qn span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ws-qn .i{flex:none;width:14px;height:14px;color:var(--parch-3)}
 .ws-qn:hover,.ws-qn:hover .i{color:var(--gold)}
+.ws-qv{flex:none;min-width:30px;text-align:right;font:600 19px/1 var(--f-d);color:var(--parch)}
 .ws-qb{flex:none;display:inline-grid;place-items:center;min-width:30px;height:28px;padding:0 6px;border-radius:7px;border:1px solid var(--iron-2);background:#15191d;color:var(--gold);font:700 12px/1 var(--f-u)}
 .ws-qb:hover{border-color:var(--iron-3)}
 .ws-qb[disabled]{color:var(--parch-3);border-color:var(--iron);cursor:not-allowed}
 .ws-qb .i{width:14px;height:14px}
-.ws-qin{flex:none;width:48px;height:28px;border-radius:7px;border:1px solid var(--iron-2);background:#0b0d10;color:var(--parch);font:700 13px/1 var(--f-u);text-align:center;padding:0 2px;-moz-appearance:textfield;appearance:textfield}
-.ws-qin::-webkit-inner-spin-button,.ws-qin::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
-.ws-qin:focus{outline:none;border-color:var(--spirit)}
+/* ползунок количества: дорожка светится до бегунка (--p из разметки, пока тянут — из ввода) */
+.ws-range{-webkit-appearance:none;appearance:none;flex:1 1 0;min-width:60px;height:28px;margin:0;padding:0;background:none;cursor:pointer}
+.ws-range::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--spirit) var(--p,0%),#232a30 var(--p,0%))}
+.ws-range::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;margin-top:-7px;border-radius:50%;border:2px solid var(--spirit);background:#0b1f1d;box-shadow:0 0 10px -2px var(--spirit)}
+.ws-range::-moz-range-track{height:6px;border-radius:3px;background:#232a30}
+.ws-range::-moz-range-progress{height:6px;border-radius:3px;background:var(--spirit)}
+.ws-range::-moz-range-thumb{width:16px;height:16px;border-radius:50%;border:2px solid var(--spirit);background:#0b1f1d;box-shadow:0 0 10px -2px var(--spirit)}
+.ws-range:focus{outline:none}
+.ws-range:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(72,229,212,.35)}
+.ws-range:focus-visible::-moz-range-thumb{box-shadow:0 0 0 3px rgba(72,229,212,.35)}
 /* что выйдет со стола и кнопки */
 .ws-foot{display:flex;align-items:center;gap:6px;flex:none;min-width:0}
 .ws-st{flex:1 1 0;min-width:0;font-size:12.5px;line-height:1.25;color:var(--parch-3);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -122,6 +143,23 @@
 .ws-hint b{color:var(--parch)}
 /* редкость в сведениях — одобренный кристалл r1…r7 (ADR-0027) */
 .ws-rar{display:inline-flex;align-items:center;gap:5px;font:700 11px/1 var(--f-u);letter-spacing:.08em;text-transform:uppercase;color:var(--rc)}
+/* ввод ресурса: сколько положить — крупное число, ползунок от 0 до min(100, запас) с «−» и «+», края шкалы; одно действие */
+.dlg.ws-qdlg{width:min(430px,calc(100% - 40px))}
+.ws-qh{display:flex;align-items:center;gap:12px;min-width:0}
+.ws-qt{font-size:20px;line-height:1.05;color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ws-qbig{margin-left:auto;min-width:56px;text-align:right;font:600 36px/1 var(--f-d);color:var(--gold)}
+.ws-qs{display:flex;align-items:center;gap:8px}
+.ws-qs .ws-qb{min-width:36px;height:36px;border-radius:9px}
+.ws-qs .ws-range{height:36px}
+.ws-qe{display:flex;justify-content:space-between;margin:-6px 46px 0;font:700 11px/1 var(--f-u);color:var(--parch-3)}
+.ws-qd{display:contents}
+/* раздел UI-кита «Мастерская: ввод ресурса»: образцы плиток и ползунка */
+.ws-kin{display:flex;flex-wrap:wrap;align-items:flex-start;gap:var(--sp-l)}
+.ws-kt{margin:0;width:78px;display:flex;flex-direction:column;gap:6px}
+.ws-kt figcaption{font-size:11.5px;line-height:1.25;color:var(--parch-3)}
+.ws-kq{display:flex;flex-direction:column;gap:var(--sp-m);width:min(380px,100%);padding:var(--sp-m);border-radius:12px;border:1px solid var(--iron-2);background:linear-gradient(180deg,#171b1f,#111417)}
+.ws-kq .well .i{width:20px;height:20px;color:var(--rc,var(--parch-2))}
+.ws-kq>.btn{align-self:flex-end;pointer-events:none}
 
 /* компактный режим низких экранов (844×390 и ниже) — по высоте рабочей области, как у остальных экранов */
 @container main (max-height: 360px){
@@ -131,8 +169,8 @@
   .ws-core{--s:52px}
   .ws .well .i{width:17px;height:17px}
   .ws .ws-core .i{width:22px;height:22px}
-  .ws-grid{grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:5px}
-  .ws-grid .well{--s:42px}
+  .ws-grid{gap:6px}
+  .ws-tile>.well .q{right:5px;bottom:4px;font-size:12px}
   .ws-rc{padding:4px 4px 4px 2px}
 }
 @container main (max-height: 320px){

@@ -199,6 +199,8 @@ const finish = R => { const was = T.S.route; T.S.route = 'week'; for (let n = 0;
   for (const u of b1.u[1]) { const p = probe.find(x => 'b:' + x.key === u.key); if (!p || p.maxHp !== u.maxHp) say(`бой: у защитника ${u.name} здоровье не героя`); }
   if (r1.why === 'win' ? r1.half !== 2 : r1.why === 'wipe' ? r1.half !== 0 : r1.half !== (r1.shA > r1.shB ? 2 : r1.shA < r1.shB ? 0 : 1)) say('бой: исход не по правилу §20.2');
   if (b1.maxRounds !== D.arena.rounds) say('бой: предел раундов не из данных');
+  // одна таблица раундов на все режимы (слово автора 29.09.2026): Арена и Лига — каждый бой по RULES.rounds.by.pvp
+  if (D.arena.rounds !== T.EB.RULES.rounds.by.pvp || D.league.rounds !== T.EB.RULES.rounds.by.pvp) say(`бой: раунды Арены ${D.arena.rounds} и Лиги ${D.league.rounds} — не из таблицы ядра (${T.EB.RULES.rounds.by.pvp})`);
 }
 
 /* ================== 5. «сервер» Арены ================== */

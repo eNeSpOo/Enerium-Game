@@ -24,7 +24,7 @@ const SQUAD = [
   { id: 'h4', name: 'Ильмерра', cls: 'Хилер', el: 'Воздух', draft: 'h01_1', lvl: 46, valor: 1, st: [62, 246, 54, 128, 72], ab: A(['Живая вода', 'Лёгкая поступь', 'Оберег']), pas: P(['Отклик']), ult: null },
   { id: 'h5', name: 'Мирт Переписчик', cls: 'Контроль', el: 'Вода', draft: 'h01_4', lvl: 35, valor: 3, st: [62, 246, 54, 128, 72], ab: A(['Оковы', 'Стужа', 'Ослабление']), pas: P(['Тень']), ult: { n: 'Ледяные оковы', at: 2 } },
 ];
-const hero = (id, lvl, valor) => EB.heroSrc(Object.assign({}, SQUAD.find(h => h.id === id), { lvl, valor }));
+const hero = (id, lvl, valor) => EB.heroSrcValor(Object.assign({}, SQUAD.find(h => h.id === id), { lvl, valor }));   // доблесть — +30 % за ступень, правило ядра
 const RANK_OF = u => u.rank === 'e' ? 'e' : u.rank === 'b' ? 'b' : u.rank === 'rune' ? 'rune' : 'o';
 
 /* Один забег: этажи подряд, здоровье и павшие переходят дальше (ADR-0007), осада — hp босса на входе.

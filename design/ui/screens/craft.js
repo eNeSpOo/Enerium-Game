@@ -2,7 +2,10 @@
    Подключается после screens/model.js, до boot(). Договор — screens/model.js: запасы только через BAG, найденные рецепты — BAG.known и BAG.learn.
    Экран разделён на подписанные зоны «Инвентарь» и «Крафт» (§12.4); крафт — стол из шести ячеек или книга рецептов.
    Вид — по «Правилам воздуха» UI-кита: на столе и в книге нет лишних подписей, сведения о ресурсе — лист по нажатию:
-   на имени ресурса выбранной ячейки и на значках ингредиентов в книге.
+   на лупе ресурса, на имени ресурса выбранной ячейки и на значках ингредиентов в книге.
+   - Ввод ресурса — слова автора 29.09.2026: запасы по пять в ряд, плитки крупнее; нажатие на ресурс — ползунок количества от 0 до
+     min(100, сколько есть), подтверждение — ресурс ложится в ячейку (OV.wsqty). Справа сверху на плитке — лупа: карточка ресурса.
+     Перенос на ячейку — тот же ползунок для этой ячейки. Количество выбранной ячейки — ползунок под столом.
    - Ресурс в ячейке из запасов не списан. Списание — при попытке, и со стола уходит всё.
    - Совпадение по вхождению: лишнее сгорает, неудача сжигает всё положенное, верный набор создаёт предмет всегда.
    - Подсказки — по §12, у рецептов от четырёх ингредиентов. Частичное знание рецепта — S.ws.part.
@@ -21,7 +24,7 @@
 const WS_DATA = {
   cells: 6, cellMax: 100,          // §12: шесть ячеек, до 100 единиц в каждой
   hintFrom: 4, hintMin: 3,         // §12: подсказки — у рецептов от четырёх ингредиентов, верных на столе не меньше трёх
-  steps: [-10, -1, 1, 10],         // кнопки количества в выбранной ячейке
+  pick: { start: 1, step: 1 },     // ввод ресурса: сколько стоит на ползунке, если ресурса ещё нет на столе; шаг кнопок «−» и «+»
   makeCap: 100,                    // сколько раз можно создать за одно подтверждение автодокрафта — потолок прототипа
   depth: 12,                       // глубина разворота цепочки — защита от петли в данных
   /* невосполнимое (§12.1): уникальные, руны, Энериум. Трофеи, находки и Многоликий — открытый вопрос автору
@@ -261,6 +264,57 @@ function wsSetTable(list) {
   const free = S.ws.cells.findIndex(c => !c);
   S.ws.sel = free < 0 ? 0 : free; S.ws.view = 'table';
 }
+/* куда ляжет ресурс без переноса: его ячейка, если он уже на столе; иначе выбранная, если пуста, иначе первая свободная; -1 — некуда */
+function wsSlotFor(id) {
+  const W = S.ws, ex = W.cells.findIndex(c => c && c.id === id);
+  return ex >= 0 ? ex : !W.cells[W.sel] ? W.sel : W.cells.findIndex(c => !c);
+}
+/* ресурс на стол ровно в количестве q (0 — убрать со стола): q не больше, чем можно в ячейку. at — ячейка переноса */
+function wsPutQ(id, q, at) {
+  const W = S.ws, n = Math.max(0, Math.min(wsCellMax(id), Math.floor(q) || 0)), ex = W.cells.findIndex(c => c && c.id === id);
+  if (!n) { if (ex >= 0) { W.cells[ex] = null; W.sel = ex; } return ex >= 0; }
+  if (at != null && at >= 0 && at < WS_DATA.cells) {
+    if (ex !== at) { const moved = ex >= 0 ? W.cells[ex] : { id, q: n }; if (ex >= 0) W.cells[ex] = W.cells[at]; W.cells[at] = moved; }
+    W.cells[at].q = n; W.sel = at; W.pick = id; return true;
+  }
+  const i = wsSlotFor(id);
+  if (i < 0) { toast(`Все ${WS_DATA.cells} ячеек заняты`); return false; }
+  if (W.cells[i] && W.cells[i].id === id) W.cells[i].q = n; else W.cells[i] = { id, q: n };
+  W.sel = i; W.pick = id; return true;
+}
+/* нажатие на ресурс: ползунок количества от 0 до min(100, запас), потом — ячейка (слова автора 29.09.2026). at — ячейка переноса */
+function wsPick(id, at) {
+  const it = BAG.item(id);
+  if (!it || it.team) return false;
+  if (wsCellMax(id) < 1) { toast(`${it.n}: в запасах нет`); return false; }
+  const on = wsOn(id), to = at != null ? at : wsSlotFor(id);
+  if (to < 0) { toast(`Все ${WS_DATA.cells} ячеек заняты`); return false; }
+  S.ws.pick = id;
+  open('wsqty', id, { v: on || Math.min(wsCellMax(id), WS_DATA.pick.start), at: at != null ? at : null });
+  return true;
+}
+/* доля ползунка для подсветки дорожки, целые проценты */
+const wsPct = (v, lo, hi) => Math.floor(Math.max(0, v - lo) * 100 / Math.max(1, hi - lo));
+/* кнопка ползунка: новый ресурс — «В ячейку · N»; уже на столе — «Готово · N», на нуле — «Убрать со стола»; ноль и не на столе — недоступна */
+const wsQGoTxt = (on, v) => !v ? (on ? 'Убрать со стола' : 'В ячейку') : `${on ? 'Готово' : 'В ячейку'} · ${fmt(v)}`;
+const wsQGo = (on, v) => `<button class="btn go" id="wsQvGo" data-a="wsqdo"${!v && !on ? ' disabled' : ''}>${wsQGoTxt(on, v)}</button>`;
+/* ползунок тянут — число, дорожка и кнопка меняются сразу, без перерисовки экрана; отпустили — перерисовка (change → действие) */
+function wsRangeLive(t) {
+  const v = Math.floor(Number(t.value)) || 0, lo = Math.floor(Number(t.min)) || 0, hi = Math.floor(Number(t.max)) || 1;
+  try { t.style.setProperty('--p', wsPct(v, lo, hi) + '%'); } catch (_) { }
+  const n = document.getElementById(t.id + 'N'); if (n) n.textContent = fmt(v);
+  if (t.id === 'wsQv') {
+    const o = S.overlay; if (!o || o.t !== 'wsqty') return;
+    o.v = v;
+    const b = document.getElementById('wsQvGo'), on = wsOn(o.arg);
+    if (b) { b.textContent = wsQGoTxt(on, v); b.disabled = !v && !on; }
+    return;
+  }
+  const W = S.ws, c = W.cells[W.sel];
+  if (c && v >= 1) { c.q = Math.min(v, wsCellMax(c.id)); const q = document.querySelector && document.querySelector(`#game [data-wscell="${W.sel}"] .q`); if (q) q.textContent = fmt(c.q); }
+}
+/* после перерисовки фокус остаётся на ползунке: клавиши-стрелки двигают его дальше */
+function wsRefocus(id) { try { const x = document.getElementById(id); if (x && x.focus) x.focus({ preventScroll: true }); } catch (_) { } }
 
 /* разворот цепочки по найденным рецептам (§12.1, §12.4): сначала запасы, затем остаток уже созданного в этой цепочке, затем новый этап.
    Неизвестный этап — предмет, который создаётся рецептом, но рецепт не найден: автодокрафт останавливается */
@@ -348,12 +402,20 @@ const wsStepHtml = (r, t, fin) => `<li${fin ? ' class="fin"' : ''}>${wsWell(BAG.
 function wsView() {
   return `<section class="scr"><div class="ws">${wsInvHtml()}${wsCraftHtml()}</div></section>`;
 }
-/* зона «Инвентарь»: запасы по ярусам и поиск. Нажатие или перенос кладёт ресурс в выбранную ячейку; сведения — на столе, по имени */
+/* плитка запасов: значок и количество; справа сверху — лупа карточки ресурса. Нажатие — ползунок количества, перенос — на ячейку.
+   На столе — свет плитки и число на столе слева сверху; особый ресурс — ромб слева снизу */
+function wsTile(it, o = {}) {
+  const q = o.q != null ? o.q : BAG.qty(it.id), on = o.on != null ? o.on : wsOn(it.id), sp = wsSpecial(it.id), sel = !o.kit && S.ws.pick === it.id;
+  const lbl = `${trEsc(it.n)}, ${q} шт.${on ? ', на столе ' + on : ''}${sp ? ', особый ресурс' : ''}`;
+  const a = x => o.kit ? 'noop' : x;
+  return `<div class="ws-tile${on ? ' on' : ''}" data-r="${it.r}"><button class="well${sp ? ' ws-sp' : ''}${sel ? ' sel' : ''}" data-r="${it.r}" data-a="${a('wspick')}" data-v="${it.id}"${o.kit ? '' : ` draggable="true" data-wsdrag="${it.id}"`} aria-label="${lbl}" title="${trEsc(it.n)}">${trIcon(it)}<span class="q">${fmt(q)}</span>${on ? `<span class="ws-on">${fmt(on)}</span>` : ''}</button><button class="ws-lens" data-a="${a('wsinfo')}" data-v="${it.id}" aria-label="Карточка ресурса: ${trEsc(it.n)}" title="Карточка ресурса">${ic('search')}</button></div>`;
+}
+/* зона «Инвентарь»: запасы по ярусам и поиск, по пять в ряд. Нажатие — ползунок количества, потом ячейка; лупа — карточка ресурса */
 function wsInvHtml() {
   const W = S.ws, q = trNorm(W.inv.q.trim()), g = WS_DATA.groups.find(x => x[0] === W.inv.cat) || WS_DATA.groups[0];
   const list = wsStock().filter(it => (!g[2] || g[2].includes(it.tier)) && (!q || trNorm(it.n).includes(q)));
   const tabs = WS_DATA.groups.map(([k, l]) => `<button role="tab" aria-selected="${g[0] === k}" data-a="wscat" data-v="${k}">${l}</button>`).join('');
-  const wells = list.map(it => wsWell(it, { act: 'wsput', q: BAG.qty(it.id), on: wsOn(it.id), drag: true, sel: W.pick === it.id })).join('');
+  const wells = list.map(it => wsTile(it)).join('');
   return `<div class="pnl ws-inv">
     <div class="pnl-h"><h2>Инвентарь</h2><label class="search grow">${ic('search')}<input id="wsInvQ" type="search" placeholder="Поиск по запасам" value="${trEsc(W.inv.q)}" autocomplete="off" aria-label="Поиск по запасам"></label></div>
     <div class="tabs" role="tablist" aria-label="Запасы по ярусам">${tabs}</div>
@@ -376,14 +438,13 @@ function wsTableHtml() {
   const core = out ? `<span class="well ws-core known" data-r="${out.r}" title="${trEsc(out.n)}">${trIcon(out)}</span>` : '<span class="well ws-core"><span>?</span></span>';
   return `<div class="ws-hex"><div class="ws-hex-in">${S.ws.cells.map(wsCellHtml).join('')}${core}</div></div>${wsQtyHtml()}${wsFootHtml(g)}`;
 }
-/* количество в выбранной ячейке: до 100 и не больше, чем в запасах. Имя ресурса — кнопка сведений; пустая ячейка — пустая строка */
+/* количество в выбранной ячейке: ползунок от 1 до min(100, запас), число и «убрать». Имя ресурса — кнопка карточки; пустая ячейка —
+   пустая строка, которая держит высоту */
 function wsQtyHtml() {
   const W = S.ws, c = W.cells[W.sel], it = c ? BAG.item(c.id) : null;
   if (!it) return '<div class="ws-qty"></div>';
-  const max = wsCellMax(c.id), b = (v, l, dis, lbl) => `<button class="ws-qb" data-a="wsq" data-v="${v}"${dis ? ' disabled' : ''} aria-label="${lbl}">${l}</button>`;
-  const minus = WS_DATA.steps.filter(s => s < 0).map(s => b(s, '−' + -s, c.q <= 1, 'Меньше на ' + -s)).join('');
-  const plus = WS_DATA.steps.filter(s => s > 0).map(s => b(s, '+' + s, c.q >= max, 'Больше на ' + s)).join('');
-  return `<div class="ws-qty"><button class="ws-qn" data-a="wsinfo" data-v="${it.id}" title="Сведения: ${trEsc(it.n)} · в запасах ${fmt(BAG.qty(c.id))}"><span>${trEsc(it.n)}</span>${ic('info')}</button>${minus}<input class="ws-qin num" type="number" inputmode="numeric" min="1" max="${Math.max(1, max)}" value="${c.q}" data-a="wsqset" aria-label="Количество в ячейке ${W.sel + 1}">${plus}${b('max', 'Макс', c.q >= max, 'Сколько можно')}${b('x', ic('x'), false, 'Убрать из ячейки')}</div>`;
+  const max = Math.max(1, wsCellMax(c.id)), v = Math.max(1, Math.min(max, c.q));
+  return `<div class="ws-qty"><button class="ws-qn" data-a="wsinfo" data-v="${it.id}" title="Карточка: ${trEsc(it.n)} · в запасах ${fmt(BAG.qty(c.id))}"><span>${trEsc(it.n)}</span>${ic('search')}</button><input class="ws-range" id="wsQc" type="range" min="1" max="${max}" step="1" value="${v}" data-a="wsqset" style="--p:${wsPct(v, 1, max)}%" aria-label="Количество в ячейке ${W.sel + 1}: от 1 до ${max}"><b class="num ws-qv" id="wsQcN">${fmt(v)}</b><button class="ws-qb" data-a="wsq" data-v="x" aria-label="Убрать из ячейки">${ic('x')}</button></div>`;
 }
 function wsFootHtml(g) {
   const any = g.st !== 'empty';
@@ -824,7 +885,19 @@ Object.assign(OV, {
       <span class="eyebrow">Найденные рецепты</span>${uses.length ? `<div class="tr-use">${uses.map(r => `<button class="chip" data-a="wsmake" data-v="${r.id}">${trEsc(r.n)}</button>`).join('')}</div>` : '<p class="faint" style="font-size:12.5px">Пока ни одного. Рецепты ищут на столе, загадка подсказывает дорогу.</p>'}
       ${trails.length ? `<span class="eyebrow">Подсказки</span><div class="tr-use">${trails.map(x => `<span class="chip spirit">${trEsc(x.r.n)}</span>`).join('')}</div>` : ''}
     </div>`;
-    return sheet('Сведения', body, `<button class="btn go" data-a="wsput" data-v="${it.id}"${wsCellMax(it.id) ? '' : ' disabled'}>${ic('plus')}На стол</button>`);
+    return sheet('Карточка ресурса', body, `<button class="btn go" data-a="wspick" data-v="${it.id}"${wsCellMax(it.id) ? '' : ' disabled'}>${ic('plus')}На стол</button>`);
+  },
+  /* ввод ресурса: ползунок от 0 до min(100, запас) — сколько положить; подтверждение кладёт в ячейку. Ресурс уже на столе — ползунок
+     стоит на его количестве, 0 — убрать со стола. Особый ресурс — строкой: расход только с согласия при попытке */
+  wsqty(o) {
+    const it = BAG.item(o.arg); if (!it || it.team) return '';
+    const max = wsCellMax(it.id), on = wsOn(it.id), v = Math.max(0, Math.min(max, o.v == null ? 0 : o.v)), step = WS_DATA.pick.step;
+    const body = `<div class="ws-o ws-qd">
+      <div class="ws-qh">${wsWell(it, { stat: true, size: 52 })}<div class="col" style="gap:3px;min-width:0"><span class="eyebrow">${wsTier(it)}</span><b class="serif ws-qt">${trEsc(it.n)}</b><small class="faint num">в запасах ${fmt(BAG.qty(it.id))}${on ? ' · на столе ' + fmt(on) : ''}</small></div><b class="num ws-qbig" id="wsQvN">${fmt(v)}</b></div>
+      <div class="ws-qs"><button class="ws-qb" data-a="wsqn" data-v="${-step}"${v <= 0 ? ' disabled' : ''} aria-label="Меньше">${ic('minus')}</button><input class="ws-range" id="wsQv" type="range" min="0" max="${max}" step="1" value="${v}" data-a="wsqv" style="--p:${wsPct(v, 0, max)}%" aria-label="Сколько положить: от 0 до ${max}"><button class="ws-qb" data-a="wsqn" data-v="${step}"${v >= max ? ' disabled' : ''} aria-label="Больше">${ic('plus')}</button></div>
+      <div class="ws-qe num"><span>0</span><span>${fmt(max)}</span></div>
+      ${wsSpecial(it.id) ? '<p class="reason">Особый ресурс: при попытке спишется только с вашего согласия.</p>' : ''}</div>`;
+    return dialog('Сколько положить', body, `<button class="btn ghost" data-a="close">Отмена</button>${wsQGo(on, v)}`, 'ws-qdlg');
   },
   /* подтверждение попытки: со стола уйдёт всё; особый ресурс — только с согласия. Номер операции несёт кнопка */
   wstry(o) {
@@ -871,7 +944,30 @@ Object.assign(OV, {
 /* ================== действия ================== */
 Object.assign(ACT, {
   wscat(v) { S.ws.inv.cat = v; render(); },
+  /* без ползунка: одна штука или +1 к своей ячейке — для сценариев и подсказок; плитка запасов зовёт wspick */
   wsput(v) { if (S.overlay) S.overlay = null; if (wsPut(v)) S.ws.view = 'table'; render(); },
+  /* нажатие на ресурс — ползунок количества; из карточки ресурса — тот же ползунок */
+  wspick(v) { if (S.overlay) S.overlay = null; if (!wsPick(v)) render(); },
+  /* ползунок отпустили: v — значение с поля */
+  wsqv(v, t) {
+    const o = S.overlay; if (!o || o.t !== 'wsqty') return;
+    o.v = Math.max(0, Math.min(wsCellMax(o.arg), Math.floor(Number(t && t.value)) || 0));
+    render(); wsRefocus('wsQv');
+  },
+  wsqn(v) {
+    const o = S.overlay; if (!o || o.t !== 'wsqty') return;
+    o.v = Math.max(0, Math.min(wsCellMax(o.arg), (o.v || 0) + (Math.floor(Number(v)) || 0)));
+    render();
+  },
+  /* подтверждение ползунка: ресурс ложится в ячейку ровно в выбранном количестве; 0 — убрать со стола */
+  wsqdo() {
+    const o = S.overlay; if (!o || o.t !== 'wsqty') return;
+    const id = o.arg, v = o.v || 0, on = wsOn(id);
+    if (!v && !on) return;
+    S.overlay = null;
+    if (wsPutQ(id, v, o.at)) S.ws.view = 'table';
+    render();
+  },
   wscell(v) { const i = +v; if (!(i >= 0 && i < WS_DATA.cells)) return; S.ws.sel = i; const c = S.ws.cells[i]; if (c) S.ws.pick = c.id; render(); },
   wsq(v) {
     const W = S.ws, c = W.cells[W.sel]; if (!c) return;
@@ -882,7 +978,7 @@ Object.assign(ACT, {
   wsqset(v, t) {
     const W = S.ws, c = W.cells[W.sel], n = Math.floor(Number(t && t.value));
     if (c && Number.isFinite(n)) { c.q = Math.max(1, Math.min(wsCellMax(c.id), n)); if (c.q < 1) W.cells[W.sel] = null; }
-    render();
+    render(); wsRefocus('wsQc');
   },
   wsclear() { S.ws.cells = wsEmpty(); S.ws.sel = 0; render(); },
   wsview(v) { S.ws.view = v === 'book' ? 'book' : 'table'; render(); },
@@ -936,12 +1032,13 @@ Object.assign(ACT, {
   wsfxreveal() { const R = S.ws.fx; if (wsFxLive(R)) wsFxReveal(R); },   // нажатие на сцену посреди анимации — итог сразу
   wsfxskip(v, t) { wsFxSetSkip(!!(t && t.checked), 'game'); },
 });
-/* «На стол мастера» из других экранов: предмет запасов ложится на стол этой мастерской, прежние предметы прототипа — по-старому */
+/* «На стол мастера» из других экранов: мастерская открывается с ползунком количества этого ресурса — как нажатие на него в запасах;
+   прежние предметы прототипа — по-старому */
 const wsToCraftBase = ACT.toCraft;
 function wsToCraft(v, t, e) {
   if (!BAG.item(v)) return wsToCraftBase ? wsToCraftBase(v, t, e) : undefined;
   S.route = 'craft'; S.seg.craft = 'work'; S.ws.view = 'table'; S.overlay = null;
-  wsPut(v); render();
+  if (!wsPick(v)) render();
 }
 ACT.toCraft = wsToCraft;
 
@@ -1056,6 +1153,21 @@ function wsKitHtml() {
     <div class="ws-board" id="wsKitBoard"></div>${team}</section>`;
 }
 KIT_EXTRA.push({ html: wsKitHtml, paint: () => { wsKitBind(); wsKitTabs(); wsKitPaint(); wsKitBoardPaint(); } });
+/* раздел «Мастерская: ввод ресурса» — плитки запасов и ползунок количества, те же классы, что на экране; нажатий в разделе нет */
+function wsInKitHtml() {
+  const pick = [WS_DATA.demo.table[0][0], WS_DATA.demo.table[1][0], 'u1'].map(id => BAG.item(id)).filter(Boolean);
+  if (pick.length < 3) return '';
+  const tiles = [wsTile(pick[0], { kit: true, q: 14 }), wsTile(pick[1], { kit: true, q: 3, on: 2 }), wsTile(pick[2], { kit: true, q: 1 })]
+    .map((t, i) => `<figure class="ws-kt">${t}<figcaption>${['в запасах', 'на столе — свет и число слева', 'особый — ромб'][i]}</figcaption></figure>`).join('');
+  const it = pick[0], max = 14, v = 4;
+  const slider = `<div class="ws-kq"><div class="ws-qh">${wsWell(it, { stat: true, size: 44 })}<div class="col" style="gap:3px;min-width:0"><span class="eyebrow">${wsTier(it)}</span><b class="serif ws-qt">${trEsc(it.n)}</b></div><b class="num ws-qbig">${v}</b></div>
+    <div class="ws-qs"><span class="ws-qb">${ic('minus')}</span><input class="ws-range" type="range" min="0" max="${max}" value="${v}" tabindex="-1" aria-label="Образец ползунка" style="--p:${wsPct(v, 0, max)}%"><span class="ws-qb">${ic('plus')}</span></div>
+    <div class="ws-qe num"><span>0</span><span>${max}</span></div><span class="btn go">В ячейку · ${v}</span></div>`;
+  return `<section class="k-box" style="grid-column:1/-1" id="kitCraftIn"><h3>Мастерская: ввод ресурса</h3>
+    <p class="k-note">Запасы — по пять в ряд, плитки крупнее. Справа сверху — лупа: карточка ресурса. Нажатие — ползунок от 0 до ста или до запаса, если его меньше; подтверждение кладёт ресурс в ячейку.${TM(' Слова автора 29.09.2026. Экран — screens/craft.js: плитка wsTile, ползунок OV.wsqty, ячейка — wsPutQ.')}</p>
+    <div class="ws-kin">${tiles}${slider}</div></section>`;
+}
+KIT_EXTRA.push({ html: wsInKitHtml });
 
 /* ================== регистрация, состояние, ввод ================== */
 CRAFT_SEGS.work = wsView;
@@ -1065,14 +1177,16 @@ const wsInitBase = initialState;
 initialState = function () { const s = wsInitBase(); s.ws = wsFresh(); return s; };
 S.ws = wsFresh();
 
-/* поиск: поле не теряет фокус при перерисовке */
+/* поиск: поле не теряет фокус при перерисовке; ползунки количества — число и дорожка меняются сразу, без перерисовки */
 document.addEventListener('input', e => {
-  const t = e.target; if (!t || (t.id !== 'wsInvQ' && t.id !== 'wsBookQ')) return;
+  const t = e.target; if (!t) return;
+  if (t.id === 'wsQv' || t.id === 'wsQc') { wsRangeLive(t); return; }
+  if (t.id !== 'wsInvQ' && t.id !== 'wsBookQ') return;
   if (t.id === 'wsInvQ') S.ws.inv.q = t.value; else S.ws.book.q = t.value;
   const pos = t.selectionStart; render();
   const n = document.getElementById(t.id); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (_) { } }
 });
-/* перенос ресурса из инвентаря в ячейку стола (§12.4) */
+/* перенос ресурса из инвентаря в ячейку стола (§12.4): ползунок количества — для этой ячейки */
 document.addEventListener('dragstart', e => {
   const w = e.target && e.target.closest && e.target.closest('[data-wsdrag]'); if (!w || !e.dataTransfer) return;
   e.dataTransfer.setData('text/plain', w.dataset.wsdrag); e.dataTransfer.effectAllowed = 'copy';
@@ -1082,7 +1196,7 @@ document.addEventListener('drop', e => {
   const c = e.target && e.target.closest && e.target.closest('[data-wscell]'); if (!c || !e.dataTransfer) return;
   e.preventDefault();
   const id = e.dataTransfer.getData('text/plain');
-  if (BAG.item(id) && wsPut(id, +c.dataset.wscell)) { S.ws.view = 'table'; render(); }
+  if (BAG.item(id)) { S.ws.view = 'table'; wsPick(id, +c.dataset.wscell); }
 });
 
 /* потоки презентации: «Мастерская» показывает найденный рецепт на столе, рядом — подсказки, автодокрафт, удача и неудача */

@@ -87,7 +87,7 @@ fresh(S);
   for (const [id, B] of Object.entries(X.biomes)) {
     const name = B.core.name, U = B.ui, g = X.foes[B.core.guard.m[0]].name, fl = U.demoFloor;
     flows.push([`${name} · быстрый бой`, `Забег с ${fl}-го этажа на арене биома: его враги, элиты и стена`, () => { S.route = 'descent'; S.selBiome = id; S.overlay = null; startRun('s1', id, fl); }]);
-    flows.push([`${name} · рунный страж`, `${g} и четыре элиты: 25 раундов, каждая обычная атака стража отнимает раунд`, () => { S.route = 'descent'; S.selBiome = id; S.overlay = null; S.prepSquad = 's1'; ACT.guard('demo'); }]);
+    flows.push([`${name} · рунный страж`, `${g} и четыре элиты: ${EB.RULES.rounds.by.rune} раундов, каждая обычная атака стража отнимает раунд`, () => { S.route = 'descent'; S.selBiome = id; S.overlay = null; S.prepSquad = 's1'; ACT.guard('demo'); }]);
   }
   const at = FLOWS.findIndex(x => x[0].startsWith('Бестиарий'));
   FLOWS.splice(at < 0 ? FLOWS.length : at + 1, 0, ...flows);
@@ -112,7 +112,7 @@ function kitBiome(id) {
       <span class="row" style="gap:6px;flex-wrap:wrap"><span class="chip ${arena ? 'spirit' : 'warn'}">арена ${arena ? 'выгружена' : '— заглушка'}</span><span class="chip ${ready === ids.length ? 'spirit' : 'warn'}">портреты ${ready}/${ids.length}</span></span></div></div>
     <div class="bk-facts"><span><b>${C.floors.length}</b> этажей</span><span><b>${el}</b> элит</span><span>враги <b>${lv(1)}–${lv(C.floors.length)}</b> ур.</span><span>${C.siege === false ? 'без осады' : 'осада босса'}</span><span>золото и дух <b>×${mul(C.dropPct)}</b></span><span>души с элиты <b>${C.n}</b></span></div>
     <div class="bk-foes">${ids.map(foe).join('')}</div>
-    <p class="k-note">Страж: ${C.guard.m.map(m => X.foes[m].name).join(', ')} — ${C.guard.m.length} карт, 25 раундов.${pace && id === 'b2' && pace.b2.guard ? ` Прогон темпа: первая полная пачка берёт босса и стража за ${Math.round(pace.b2.guard.ms / 60000)} мин забегов, ${pace.b2.guard.runs} забегов.` : ''}${pace && pace.days && id !== 'b2' ? ` Цикл II по дням, обычный игрок: ${(() => { const d = (pace.days['обычный'] || {})[id] || {}; return `босс — ${d.boss ? d.boss.day + '-й день' : 'не пал'}, страж — ${d.guard ? d.guard.day + '-й день' : 'не пал'}`; })()}.` : ''}</p>
+    <p class="k-note">Страж: ${C.guard.m.map(m => X.foes[m].name).join(', ')} — ${C.guard.m.length} карт, ${EB.RULES.rounds.by.rune} раундов; этаж с рядовыми — ${EB.RULES.rounds.by.o}, с элитой — ${EB.RULES.rounds.by.e}, с боссом — ${EB.RULES.rounds.by.b}.${C.siege === false ? '' : ' Осада: остаток здоровья босса — его максимум в следующем забеге.'}${pace && id === 'b2' && pace.b2.guard ? ` Прогон темпа: первая полная пачка берёт босса и стража за ${Math.round(pace.b2.guard.ms / 60000)} мин забегов, ${pace.b2.guard.runs} забегов.` : ''}${pace && pace.days && id !== 'b2' ? ` Цикл II по дням, обычный игрок: ${(() => { const d = (pace.days['обычный'] || {})[id] || {}; return `босс — ${d.boss ? d.boss.day + '-й день' : 'не пал'}, страж — ${d.guard ? d.guard.day + '-й день' : 'не пал'}`; })()}.` : ''}</p>
   </article>`;
 }
 KIT_EXTRA.push({
