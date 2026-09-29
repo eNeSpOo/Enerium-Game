@@ -1,0 +1,96 @@
+{
+  "name": "Значки Памяти Странника — осколки условного зеркала: семь по редкостям и пустое место. Слова автора 29.09.2026: «очень слабые иконки самой Памяти. Пусть это будут как осколки условного зеркала». Стиль и формат — одобренные значки атрибутов (jobs/ui-attributes.json): 1:1, чёрный фон, прозрачность ключом, предмет — около 80 % кадра, читается с 24 px. Цвета — ADR-0027. Образец словами, картинку в запрос не прикладываем (ADR-0012). Выгрузка — design/ui/assets/art/memory/shard-r1…r7.png и shard-empty.png, 256×256, fit 80",
+  "plan": {
+    "Форма — одна на серию": "неровный скол зеркального стекла: острый верх, почти прямой левый край, правый — в два излома, низ — косой скол. Плоское толстое стекло, а не огранённый камень: иначе спутать с кристаллом редкости",
+    "Материал": "гладкая глянцевая грань, толстая скошенная кромка ловит свет, по всему контуру — серебряная изнанка зеркала, от краёв — тонкие трещины",
+    "Внутри": "отражение-воспоминание: размытый свет и дымка цвета редкости. Без лиц, фигур, текста и знаков",
+    "Лестница света, ADR-0027": {
+      "обычная": "белая — почти пусто, бледный холодный отблеск в глубине",
+      "редкая": "жёлтая — тёплая дымка, как свеча в тумане",
+      "уникальная": "бирюзовая — холодный свет из точки, расходится по трещинам звездой",
+      "эпическая": "фиолетовая — вихрь дымки вокруг яркой сердцевины",
+      "древняя": "красная — вихрь пламени за стеклом",
+      "первородная": "оранжевая — огонь в глубине, свет льётся по трещинам и кромке",
+      "вневременная": "зелёная — самая яркая: свет заполняет весь осколок, ореол"
+    },
+    "Пустое место": "тот же осколок без памяти: тёмное дымчатое стекло, тусклое серебро, тонкий холодный блик по контуру — место ещё не вспомнено"
+  },
+  "notes": [
+    "Ключ у всей серии — black. Первая партия шла на black-glow: тёмное стекло внутри скола — большое закрытое тёмное окно, cutout.py (BIG_HOLE) вырезал его в полупрозрачность, дыры — 16–35 % силуэта у уникальной, древней, первородной и вневременной. На black дыр нет ни у одной (проверка тех же исходников)",
+    "Свечение снаружи осколка не рисуем — его даёт интерфейс слоем .wn-glow по редкости (art/style/style.md, «Фон и прозрачность»). Поэтому ключ black не теряет ауру",
+    "Эпическая v1 вышла на белом фоне; первородная v1 — с искрами вокруг: рамка значка по альфе растёт, осколок мельчает. Отсюда «no embers» в рамке задания"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.",
+  "negative": "No text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+  "cutout_rule": "The background is solid pure black ({hex}), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance. The whole icon with its glow fits inside the central 80% of the canvas in both width and height: an empty black margin of at least a tenth of the canvas stays on every side — top, bottom, left and right.",
+  "categories": {
+    "memory-shards": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Format: game UI icon of a Memory of the Wanderer, square, no border around the picture. One shard of a broken magic mirror, upright, centered, floating in the dark, about 80% of the canvas high. The shard floats on pitch black: everything around it is solid pure black to the very edges of the canvas, never white or grey. All eight icons of this set are one series with one and the same shard: the same silhouette, size and angle; only the light inside tells them apart. The silhouette: a broad jagged piece of mirror glass, about two thirds as wide as it is tall — one long sharp point at the top, a long almost straight left edge, a right edge broken into two straight segments with a small notch between them, and a jagged bottom edge that rises from the lower left corner to the lower right; straight fracture lines and sharp corners, never rounded, never drop- or almond-shaped. It is mirror glass, not a gemstone: a flat pane of thick polished glass seen straight on, its face smooth and glossy with no cut facets like a jewel; the broken edges are thick bevelled glass that catches crisp bright light, and behind the glass a thin layer of old tarnished silver — the backing of the mirror — shows along the whole broken contour as a bright silver rim. Fine hairline cracks run in from the broken edges. The face of the glass is dark and deep, like a mirror hanging in a dark room: never pale, never silvery or white — the bright silver shows only as the thin rim along the broken contour. Deep inside the glass, as if far behind its surface, lives a reflection that is a memory: blurred light and soft haze of its own color, like something remembered through mist. The eight icons form a ladder of inner light: the higher the rarity, the more of the glass this light fills and the brighter it burns — at the top of the ladder it fills the whole shard. No faces, no figures, no eyes, no text, no runes or symbols in it. The glass is never pitch black inside: even its darkest depths keep a visible tone. All the light stays inside the glass: no glow, aura or halo outside the shard, no embers — right outside its silver rim the background is pure black. A bare shard: no frame, no setting, no metal caps, no stand, no base; no other shards, splinters, sparks or particles floating around it. All the detail lives inside the silhouette. It must stay readable at a tiny size, 24 px: one bold solid shape with a clear bright outline."
+    }
+  },
+  "jobs": [
+    {
+      "id": "mem-shard-r1",
+      "category": "memory-shards",
+      "title": "Память: осколок обычной редкости (1 из 7)",
+      "source": "Слова автора 29.09.2026 — осколки условного зеркала; ADR-0027 — обычная: белая; GDD §2.4–§2.6",
+      "subject": "Memory: Common, the first of seven — the faintest step. The glass holds almost no light: only a pale cold white glimmer (#E6E8EA) far in its depth, a small patch of faint white mist near the center, while the rest of the glass stays dark; the silver rim and the hairline cracks catch a cool pale light."
+    },
+    {
+      "id": "mem-shard-r2",
+      "category": "memory-shards",
+      "title": "Память: осколок редкой редкости (2 из 7)",
+      "source": "Слова автора 29.09.2026 — осколки условного зеркала; ADR-0027 — редкая: жёлтая; GDD §2.4–§2.6",
+      "subject": "Memory: Rare, the second of seven. Deep in the glass glows a warm golden-yellow light (#F0CC4F) — yellow through and through like citrine, clearly yellow, never white or grey — a soft yellow haze like a candle-lit memory in the mist that lights about a third of the glass; the cracks near it shine yellow."
+    },
+    {
+      "id": "mem-shard-r3",
+      "category": "memory-shards",
+      "title": "Память: осколок уникальной редкости (3 из 7)",
+      "source": "Слова автора 29.09.2026 — осколки условного зеркала; ADR-0027 — уникальная: бирюзовая; GDD §2.4–§2.6",
+      "subject": "Memory: Unique, the third of seven. Cold turquoise light (#1FB8D0) shines from a bright point deep inside the glass and fans out through the hairline cracks like a star, lighting about half of the glass; the memory is turquoise through and through, with no warm or orange tones anywhere, no embers."
+    },
+    {
+      "id": "mem-shard-r4",
+      "category": "memory-shards",
+      "title": "Память: осколок эпической редкости (4 из 7)",
+      "source": "Слова автора 29.09.2026 — осколки условного зеркала; ADR-0027 — эпическая: фиолетовая; GDD §2.4–§2.6",
+      "subject": "Memory: Epic, the fourth of seven. Violet light (#A986EE) fills more than half of the glass: a slow swirl of violet haze around a bright core deep inside, and the hairline cracks glow violet."
+    },
+    {
+      "id": "mem-shard-r5",
+      "category": "memory-shards",
+      "title": "Память: осколок древней редкости (5 из 7)",
+      "source": "Слова автора 29.09.2026 — осколки условного зеркала; ADR-0027 — древняя: красная; GDD §2.4–§2.6",
+      "subject": "Memory: Ancient, the fifth of seven. Strong deep red light (#E85A4E) fills most of the glass: far behind the surface a whirl of bright crimson flame swirls around the center and lights the whole shard red from within; the hairline cracks glow red."
+    },
+    {
+      "id": "mem-shard-r6",
+      "category": "memory-shards",
+      "title": "Память: осколок первородной редкости (6 из 7)",
+      "source": "Слова автора 29.09.2026 — осколки условного зеркала; ADR-0027 — первородная: оранжевая; GDD §2.4–§2.6",
+      "subject": "Memory: Primordial, the sixth of seven. Orange (#EB9D40): fire burns in the depth of the reflection and fills almost the whole glass; strong warm light spills out through the hairline cracks and along the broken edges, yet no sparks or embers fly outside the glass."
+    },
+    {
+      "id": "mem-shard-r7",
+      "category": "memory-shards",
+      "title": "Память: осколок вневременной редкости (7 из 7)",
+      "source": "Слова автора 29.09.2026 — осколки условного зеркала; ADR-0027 — вневременная: зелёная; GDD §2.4–§2.6",
+      "subject": "Memory: Timeless, the seventh of seven — the highest step, the brightest of all. Vivid green (#5FD67A): pure green light pours from deep inside and fills the whole shard from its point to its base, with no dark areas left in the glass; the hairline cracks blaze almost white-green."
+    },
+    {
+      "id": "mem-shard-empty",
+      "category": "memory-shards",
+      "title": "Память: пустое место — осколок без памяти",
+      "source": "Слова автора 29.09.2026 — осколки условного зеркала; GDD §2.4 — место ещё закрыто или ждёт воспоминания",
+      "subject": "An empty place of Memory: the same shard with no memory in it yet. Dark smoky grey glass — clearly lighter than the black background, a dull slate grey — that reflects nothing: no inner light at all, only a faint cold grey sheen across its face. Its silver rim is dull and tarnished, yet a thin cold highlight still runs along the whole broken contour, so the shape stays readable. Quiet, dim, waiting."
+    }
+  ]
+}

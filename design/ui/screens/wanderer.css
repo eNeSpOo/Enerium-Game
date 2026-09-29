@@ -1,11 +1,20 @@
 /* screens/wanderer.css — «Странник»: Память, Артефакты, Достижения (screens/wanderer.js) и раздел UI-кита «Память Странника».
-   Стиль «Свет снизу»: редкость — цвет --rc и кристалл (ADR-0027) и сила света: --wn-glow — сияние кристалла, --wn-lit — свет снизу карты.
-   Выбор — бирюзовое кольцо, как везде. Правила воздуха: отступы --sp-l, --sp-m, --sp-s; на карточке — имя, до двух чисел, одно действие.
+   Стиль «Свет снизу»: редкость — цвет --rc (ADR-0027) и сила света: --wn-halo — свет за осколком, --wn-lit — свет снизу карты,
+   --wn-mf — зеркальная вспышка сборки, --wn-glow — сияние прежнего кристалла. Значок Памяти — осколок условного зеркала .wn-ico:
+   картинка .wn-shi, до выгрузки — прежний кристалл .wn-gem. Выбор — бирюзовое кольцо, как везде. Правила воздуха: отступы --sp-l,
+   --sp-m, --sp-s; на карточке — имя, до двух чисел, одно действие.
+   Движение — только transform и opacity: сборка, бой стекла, полёт, живые состояния не анимируют фильтры и смешение слоёв.
+   Задержки приходят из разметки (--dl, --land, --bk…) и отсчитаны от «сейчас»: перерисовка посреди анимации её не рвёт.
    Свои классы — wn-*; общие — .pf, .idc, .dlg, .sheet, .btn, .chip, .kv, .rar, .bar, .tabs, .search. */
 
 /* свет редкости: чем реже, тем ярче (переменные — только для классов wn-*) */
-[data-r="1"]{--wn-glow:2px;--wn-lit:8%}[data-r="2"]{--wn-glow:4px;--wn-lit:12%}[data-r="3"]{--wn-glow:6px;--wn-lit:16%}[data-r="4"]{--wn-glow:9px;--wn-lit:21%}
-[data-r="5"]{--wn-glow:12px;--wn-lit:26%}[data-r="6"]{--wn-glow:16px;--wn-lit:32%}[data-r="7"]{--wn-glow:22px;--wn-lit:40%}
+[data-r="1"]{--wn-glow:2px;--wn-lit:8%;--wn-halo:.24;--wn-mf:.36}
+[data-r="2"]{--wn-glow:4px;--wn-lit:12%;--wn-halo:.32;--wn-mf:.44}
+[data-r="3"]{--wn-glow:6px;--wn-lit:16%;--wn-halo:.42;--wn-mf:.52}
+[data-r="4"]{--wn-glow:9px;--wn-lit:21%;--wn-halo:.54;--wn-mf:.62}
+[data-r="5"]{--wn-glow:12px;--wn-lit:26%;--wn-halo:.66;--wn-mf:.72}
+[data-r="6"]{--wn-glow:16px;--wn-lit:32%;--wn-halo:.8;--wn-mf:.84}
+[data-r="7"]{--wn-glow:22px;--wn-lit:40%;--wn-halo:.95;--wn-mf:.95}
 
 /* колонка Странника: демо-цикл команды */
 .wn-demo{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--parch-3)}
@@ -13,56 +22,151 @@
 .wn-dc{appearance:none;height:22px;min-width:24px;padding:0 5px;border-radius:6px;border:1px solid var(--iron);background:#0f1215;color:var(--parch-3);font:700 11px/1 var(--f-u)}
 .wn-dc[aria-pressed="true"]{color:var(--gold);border-color:var(--gold-3)}
 
-/* кристалл памяти: огранённая капля, свет изнутри; сияние — снаружи, поэтому фильтр на обёртке, огранка — на кристалле */
+/* значок Памяти — осколок зеркала в своей рамке: свет за ним (.wn-glow) и картинка (.wn-shi). Размер — --ico: у карты 76, у места 58 */
+.wn-ico{position:relative;z-index:1;display:grid;place-items:center;flex:none;width:var(--ico,64px);height:var(--ico,64px)}
+.wn-ico.xs{--ico:22px}
+.wn-ico.sm{--ico:18px}
+.wn-ico.md{--ico:52px}
+.wn-ico.sl{--ico:58px}
+.wn-glow{position:absolute;inset:-26%;border-radius:50%;pointer-events:none;opacity:var(--wn-halo,.45);
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--rc,var(--spirit)) 62%,transparent),color-mix(in srgb,var(--rc,var(--spirit)) 20%,transparent) 56%,transparent)}
+.wn-ico.xs>.wn-glow,.wn-ico.sm>.wn-glow{display:none}
+.wn-whole,.wn-frs,.wn-deb,.wn-fr,.wn-db{position:absolute;inset:0;display:grid;place-items:center}
+.wn-shi{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;-webkit-user-drag:none;user-select:none}
+/* прежний кристалл CSS — пока осколок не выгружен: огранённая капля, свет изнутри. Сияние — статичный фильтр на обёртке, в кадре не меняется;
+   в осколках сборки его нет */
 .wn-gem{position:relative;z-index:1;display:inline-block;flex:none;width:34px;height:48px;filter:drop-shadow(0 0 var(--wn-glow,6px) color-mix(in srgb,var(--rc,var(--spirit)) 72%,transparent))}
+.wn-ico .wn-gem{width:56%;height:79%}
+.wn-fr .wn-gem,.wn-db .wn-gem{filter:none}
 .wn-crys{display:block;width:100%;height:100%;clip-path:polygon(50% 0,80% 24%,95% 56%,72% 93%,50% 100%,28% 93%,5% 56%,20% 24%);
   background:linear-gradient(118deg,transparent 44%,rgba(255,255,255,.45) 46%,transparent 50%),linear-gradient(62deg,transparent 55%,rgba(0,0,0,.3) 57%,transparent 61%),
     linear-gradient(180deg,transparent 58%,rgba(0,0,0,.22) 59%,transparent 63%),
     radial-gradient(55% 42% at 50% 62%,#fff 0,color-mix(in srgb,var(--rc,var(--spirit)) 68%,#fff) 20%,var(--rc,var(--spirit)) 46%,color-mix(in srgb,var(--rc,var(--spirit)) 36%,#050607) 100%)}
 .wn-gem.lock{filter:none;opacity:.5}
 .wn-gem.lock .wn-crys{background:linear-gradient(118deg,transparent 44%,rgba(255,255,255,.2) 46%,transparent 50%),linear-gradient(160deg,#8c8f92,#4b4f53 60%,#2e3134)}
-.wn-gem.open{--rc:var(--spirit);--wn-glow:10px;animation:wn-breath 2.8s ease-in-out infinite}
-@keyframes wn-breath{50%{filter:drop-shadow(0 0 18px var(--spirit)) brightness(1.12)}}
+.wn-gem.open{--rc:var(--spirit);--wn-glow:10px}
 
-/* лучи и живые огоньки — у редких карт и мест */
-.wn-rays{display:none;position:absolute;left:50%;top:34%;width:280px;height:280px;margin:-140px 0 0 -140px;border-radius:50%;pointer-events:none;opacity:.7;
+/* лучи и живые огоньки — у редких карт и мест; лучи — вокруг значка (--icy — его центр по высоте) */
+.wn-rays{display:none;position:absolute;left:50%;top:var(--icy,34%);width:280px;height:280px;margin:-140px 0 0 -140px;border-radius:50%;pointer-events:none;opacity:.7;
   background:repeating-conic-gradient(from 0deg,color-mix(in srgb,var(--rc) 28%,transparent) 0deg 7deg,transparent 7deg 20deg);
   -webkit-mask:radial-gradient(circle,#000 16%,transparent 62%);mask:radial-gradient(circle,#000 16%,transparent 62%);animation:wn-spin 18s linear infinite}
 [data-r="6"]>.wn-rays{display:block}
 [data-r="7"]>.wn-rays{display:block;opacity:1;animation-duration:11s}
-@keyframes wn-spin{to{transform:rotate(360deg)}}
 .wn-motes{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.wn-motes i{position:absolute;left:var(--x);bottom:-6px;width:4px;height:4px;border-radius:50%;opacity:0;background:radial-gradient(circle,#fff,var(--rc) 55%,transparent 72%);
+.wn-motes i{position:absolute;left:var(--x);bottom:-6px;width:4px;height:4px;border-radius:50%;opacity:0;background:radial-gradient(circle,#fff,var(--rc,var(--spirit)) 55%,transparent 72%);
   animation:wn-mote var(--t) linear var(--d) infinite}
+@keyframes wn-spin{to{transform:rotate(360deg)}}
 @keyframes wn-mote{12%{opacity:.95}78%{opacity:.55}100%{opacity:0;transform:translate(7px,-160px) scale(.6)}}
+@keyframes wn-bob{50%{transform:translateY(-3px)}}
+@keyframes wn-breathe{50%{opacity:1}}
 
-/* карта варианта: кромка и свет снизу — редкость, кольцо — выбор */
-.wn-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;min-height:170px;padding:var(--sp-m) var(--sp-s);border-radius:12px;overflow:hidden;text-align:center;color:var(--parch);
-  border:1px solid color-mix(in srgb,var(--rc) 45%,#262b31);
-  background:radial-gradient(95% 70% at 50% 110%,color-mix(in srgb,var(--rc) var(--wn-lit,10%),transparent),transparent 72%),linear-gradient(180deg,#14181c,#0d1013);
-  box-shadow:inset 0 -3px 0 color-mix(in srgb,var(--rc) 78%,transparent),0 14px 30px -20px var(--rc)}
-button.wn-card{appearance:none;font:inherit}
+/* карта варианта: рамка — тёмное стекло с отблеском; свет редкости — слой .wn-lit: кромка, полоса и свет снизу */
+.wn-card{--ico:76px;--icy:46px;position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0;min-height:172px;padding:8px var(--sp-s) 10px;
+  border:0;border-radius:12px;overflow:hidden;text-align:center;color:var(--parch);
+  background:linear-gradient(118deg,rgba(236,228,211,.045),rgba(236,228,211,0) 38%),linear-gradient(180deg,#14181c,#0d1013);
+  box-shadow:inset 0 0 0 1px #2a3037,0 14px 30px -20px var(--rc);transition:transform .2s cubic-bezier(.2,.8,.2,1),opacity .2s ease}
+button.wn-card{appearance:none;font:inherit;cursor:pointer}
+.wn-lit{position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(95% 70% at 50% 110%,color-mix(in srgb,var(--rc) var(--wn-lit,10%),transparent),transparent 72%);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--rc) 45%,#262b31),inset 0 -3px 0 color-mix(in srgb,var(--rc) 78%,transparent)}
 .wn-card>.rar,.wn-card>b,.wn-card>small{position:relative;z-index:1}
-.wn-card .wn-gem{margin:2px 0}
+.wn-card .wn-ico{margin-bottom:2px;animation:wn-bob 3.6s ease-in-out infinite}
 .wn-cn{font:600 17px/1.08 var(--f-d);text-wrap:balance}
 .wn-cc{margin-top:auto;font:700 10.5px/1.2 var(--f-u);letter-spacing:.12em;text-transform:uppercase;color:var(--parch-3)}
-.wn-card[aria-pressed="true"]{border-color:var(--spirit);box-shadow:0 0 0 1px var(--spirit),inset 0 -3px 0 var(--rc),0 14px 30px -14px var(--spirit)}
-button.wn-card:hover{filter:brightness(1.1)}
-/* выход карты: снизу, из света; у древней и выше по карте проходит блик */
-.wn-card.in{animation:wn-in 480ms cubic-bezier(.2,.8,.2,1) var(--dl,0ms) both;pointer-events:none}
-@keyframes wn-in{0%{opacity:0;transform:translateY(30px) scale(.84) rotateX(38deg);filter:brightness(2.3) saturate(.4)}55%{opacity:1;transform:translateY(-5px) scale(1.04) rotateX(0);filter:brightness(1.5)}100%{opacity:1;transform:none;filter:none}}
-.wn-card.in:is([data-r="5"],[data-r="6"],[data-r="7"])::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:linear-gradient(105deg,transparent 30%,color-mix(in srgb,var(--rc) 35%,rgba(255,248,226,.85)) 50%,transparent 70%);transform:translateX(-130%);
-  animation:wn-shine 1s ease-out calc(var(--dl,0ms) + 280ms) forwards}
-@keyframes wn-shine{to{transform:translateX(130%)}}
+/* зеркальная вспышка, блик по стеклу, лучи сплавления, сердцевина — слои карты */
+.wn-mfl{position:absolute;inset:0;z-index:3;border-radius:inherit;pointer-events:none;opacity:0;
+  background:radial-gradient(120% 85% at 50% 30%,rgba(255,252,242,.95),color-mix(in srgb,var(--rc,#fff) 45%,rgba(255,252,242,.3)) 46%,transparent 82%)}
+.wn-gl{position:absolute;top:-10%;bottom:-10%;left:-60%;right:-60%;z-index:3;pointer-events:none;transform:translateX(-45%);
+  background:linear-gradient(104deg,transparent 40%,rgba(255,250,236,.06) 45%,rgba(255,250,236,.5) 49.4%,rgba(255,255,255,.85) 50%,rgba(255,250,236,.45) 50.6%,rgba(255,250,236,.06) 55%,transparent 60%)}
+.wn-bray{position:absolute;left:50%;top:var(--icy,34%);width:300px;height:300px;margin:-150px 0 0 -150px;border-radius:50%;pointer-events:none;opacity:0;
+  background:repeating-conic-gradient(from 0deg,color-mix(in srgb,var(--rc) 60%,transparent) 0deg 4deg,transparent 4deg 15deg);
+  -webkit-mask:radial-gradient(circle,#000 10%,transparent 64%);mask:radial-gradient(circle,#000 10%,transparent 64%)}
+.wn-core{position:absolute;left:18%;top:24%;width:64%;height:64%;border-radius:50%;pointer-events:none;opacity:0;
+  background:radial-gradient(circle,#fff 0,color-mix(in srgb,var(--rc) 65%,#fff) 20%,color-mix(in srgb,var(--rc) 45%,transparent) 46%,transparent 70%)}
+
+/* сборка (.in): рамка проступает, осколки слетаются к точке удара (у высших — кружат), замирают на миг и сплавляются: вспышка, блик,
+   лучи, свет редкости, поднимаются подписи. --dl — начало карты от «сейчас», --land — сплавление от начала карты */
+.wn-card.in{pointer-events:none;box-shadow:inset 0 0 0 1px #2a3037;animation:wn-frame var(--in,200ms) cubic-bezier(.2,.8,.2,1) var(--dl,0ms) both}
+.wn-card.in.re{animation:none}
+.wn-card.in>.wn-lit:not(.old),.wn-card.in .wn-glow{animation:wn-on 420ms ease-out calc(var(--dl,0ms) + var(--land,0ms) - 40ms) both}
+.wn-card.in>.wn-rays{animation:wn-on 700ms ease-out calc(var(--dl,0ms) + var(--land,0ms)) both,wn-spin 18s linear infinite}
+.wn-card.in>.wn-motes{animation:wn-on 700ms ease-out calc(var(--dl,0ms) + var(--land,0ms)) both}
+.wn-card.in .wn-fr{animation:wn-gather var(--ga,420ms) cubic-bezier(.16,.84,.3,1) calc(var(--dl,0ms) + var(--in,200ms)) both,
+  wn-fuse var(--ho,0ms) cubic-bezier(.8,0,.9,.45) calc(var(--dl,0ms) + var(--in,200ms) + var(--ga,420ms)) forwards,
+  wn-frout 220ms linear calc(var(--dl,0ms) + var(--land,0ms)) forwards}
+.wn-card.in .wn-frs{animation:wn-trm var(--ho,0ms) linear calc(var(--dl,0ms) + var(--in,200ms) + var(--ga,420ms)) both}
+.wn-card.in .wn-whole{animation:wn-whole 260ms cubic-bezier(.2,.8,.2,1) calc(var(--dl,0ms) + var(--land,0ms)) both}
+.wn-card.in .wn-core{animation:wn-cgrow var(--ho,0ms) ease-in calc(var(--dl,0ms) + var(--in,200ms) + var(--ga,420ms)) both,
+  wn-cpop 460ms cubic-bezier(.2,.8,.2,1) calc(var(--dl,0ms) + var(--land,0ms)) forwards}
+.wn-card.in .wn-bray{animation:wn-bray 1000ms cubic-bezier(.2,.7,.3,1) calc(var(--dl,0ms) + var(--land,0ms) - 60ms) both}
+.wn-card.in .wn-mfl{animation:wn-mfl 480ms ease-out calc(var(--dl,0ms) + var(--land,0ms)) both}
+.wn-card.in .wn-gl{animation:wn-gl 780ms cubic-bezier(.3,.55,.35,1) calc(var(--dl,0ms) + var(--land,0ms) + 70ms) both}
+.wn-card.in>.rar,.wn-card.in>.wn-cn,.wn-card.in>.wn-cc{animation:wn-rise var(--rv,320ms) cubic-bezier(.2,.8,.2,1) calc(var(--dl,0ms) + var(--land,0ms) + 40ms) both}
+/* бой стекла: прежний осколок (переброс) или невыбранный (после «Вспомнить») трескается и разлетается, падая; свет прежней редкости гаснет */
+.wn-card.in>.wn-lit.old{animation:wn-off var(--brk,380ms) ease-in var(--bk,0ms) both}
+.wn-card .wn-db{animation:wn-burst var(--brk,380ms) cubic-bezier(.15,.7,.35,1) var(--bk,0ms) both}
+.wn-deb::after{content:"";position:absolute;left:14%;top:20%;width:72%;height:72%;border-radius:50%;pointer-events:none;opacity:0;
+  background:radial-gradient(circle,rgba(255,255,255,.95),rgba(255,255,255,.35) 30%,transparent 66%);animation:wn-crk 260ms ease-out var(--bk,0ms) both}
+.wn-card.brk{pointer-events:none;animation:wn-fade var(--brk,380ms) cubic-bezier(.5,0,.75,.4) var(--bk,0ms) both}
+/* выбранная отдала осколок: он летит в слое частиц, карта чуть поднимается */
+.wn-card.go{pointer-events:none;animation:wn-go var(--brk,380ms) cubic-bezier(.2,.8,.2,1) var(--bk,0ms) both}
+.wn-card.go .wn-ico{opacity:0}
+
+/* живые состояния: наведение, выбор, неактивное. Выбор — бирюзовое кольцо; выбранная поднимается и время от времени ловит блик */
+.wn-card.on{transform:translateY(-5px);box-shadow:inset 0 0 0 1px #2a3037,0 0 0 1px var(--spirit),0 0 26px -6px var(--spirit),0 16px 30px -16px var(--spirit)}
+.wn-card.on .wn-glow{opacity:calc(var(--wn-halo,.45) + .2)}
+.wn-card.on.in{box-shadow:inset 0 0 0 1px #2a3037}
+.wn-card.on:not(.in):not(.go) .wn-gl{animation:wn-gl2 3.6s cubic-bezier(.3,.55,.35,1) .6s infinite}
+.wn-card.on.pk{animation:wn-pk 260ms cubic-bezier(.2,.9,.3,1.25) var(--pk,0ms) both}
+.wn-card.dim{opacity:.62;transform:scale(.97)}
+.wn-card.hov{transform:translateY(-3px)}
+.wn-card.hov .wn-glow{opacity:calc(var(--wn-halo,.45) + .2)}
+.wn-card.hov .wn-gl{animation:wn-gl2 2.8s cubic-bezier(.3,.55,.35,1) .3s infinite}
+@media (hover:hover){
+  button.wn-card:not(.in):hover{transform:translateY(-3px);opacity:1}
+  button.wn-card.on:not(.in):hover{transform:translateY(-6px)}
+  button.wn-card:not(.in):hover .wn-glow{opacity:calc(var(--wn-halo,.45) + .2)}
+  button.wn-card:not(.in):not(.on):hover .wn-gl{animation:wn-gl 900ms cubic-bezier(.3,.55,.35,1) both}
+}
+button.wn-card:focus-visible{outline:2px solid var(--spirit);outline-offset:2px}
+
+@keyframes wn-frame{from{opacity:0;transform:translateY(12px) scale(.95)}}
+@keyframes wn-on{from{opacity:0}}
+@keyframes wn-off{to{opacity:0}}
+@keyframes wn-gather{
+  0%{opacity:0;transform:rotate(calc(var(--fo) * 1deg)) translate(calc(var(--fx) * 1%),calc(var(--fy) * 1%)) rotate(calc(var(--fr) * 1deg)) scale(.72)}
+  30%{opacity:1}
+  100%{opacity:1;transform:rotate(calc(var(--fo) * var(--near) * .01deg)) translate(calc(var(--fx) * var(--near) * .01%),calc(var(--fy) * var(--near) * .01%)) rotate(calc(var(--fr) * var(--near) * .01deg)) scale(calc(1 - var(--near) * .002))}}
+@keyframes wn-fuse{
+  from{transform:rotate(calc(var(--fo) * var(--near) * .01deg)) translate(calc(var(--fx) * var(--near) * .01%),calc(var(--fy) * var(--near) * .01%)) rotate(calc(var(--fr) * var(--near) * .01deg)) scale(calc(1 - var(--near) * .002))}
+  to{transform:rotate(0deg) translate(0%,0%) rotate(0deg) scale(1)}}
+@keyframes wn-frout{to{opacity:0}}
+@keyframes wn-trm{0%,100%{transform:translate(0,0)}12%{transform:translate(1px,-1px)}25%{transform:translate(-1px,1px)}37%{transform:translate(1px,1px)}50%{transform:translate(-1px,-1px)}62%{transform:translate(1px,0)}75%{transform:translate(-1px,1px)}87%{transform:translate(0,-1px)}}
+@keyframes wn-whole{from{opacity:0;transform:scale(1.1)}}
+@keyframes wn-cgrow{from{opacity:0;transform:scale(.2)}to{opacity:var(--wn-mf,.6);transform:scale(.9)}}
+@keyframes wn-cpop{from{opacity:var(--wn-mf,.6);transform:scale(.9)}to{opacity:0;transform:scale(2.4)}}
+@keyframes wn-bray{0%{opacity:0;transform:scale(.35) rotate(-12deg)}25%{opacity:1}100%{opacity:0;transform:scale(1.25) rotate(18deg)}}
+@keyframes wn-mfl{0%{opacity:0}16%{opacity:var(--wn-mf,.6)}100%{opacity:0}}
+@keyframes wn-gl{from{transform:translateX(-45%)}to{transform:translateX(45%)}}
+@keyframes wn-gl2{0%{transform:translateX(-45%)}32%,100%{transform:translateX(45%)}}
+@keyframes wn-rise{from{opacity:0;transform:translateY(7px)}}
+@keyframes wn-burst{0%{opacity:1;transform:translate(0%,0%) rotate(0deg) scale(1)}14%{opacity:1;transform:translate(0%,0%) rotate(0deg) scale(1.04)}
+  100%{opacity:0;transform:translate(calc(var(--fx) * 1.4%),calc(var(--fy) * 1.4% + 28%)) rotate(calc(var(--fr) * 2.2deg)) scale(.8)}}
+@keyframes wn-crk{0%{opacity:0;transform:scale(.4)}25%{opacity:1}100%{opacity:0;transform:scale(1.5)}}
+@keyframes wn-fade{to{opacity:0;transform:scale(.94)}}
+@keyframes wn-go{to{transform:translateY(-10px)}}
+@keyframes wn-pk{from{opacity:.7;transform:translateY(0) scale(.97)}}
 
 /* окно «одна из трёх» */
 .wn-dlg{width:min(600px,calc(100% - 30px))}
 .wn-ov.still>.ov-scrim,.wn-ov.still>.wn-dlg{animation:none}
+/* после «Вспомнить»: окно гаснет, пока осколок в пути */
+.wn-ov.leave>.ov-scrim,.wn-ov.leave>.wn-dlg{animation:wn-dlgout 200ms ease-in calc(var(--bk,0ms) + var(--brk,380ms) - 200ms) both}
+@keyframes wn-dlgout{to{opacity:0}}
 .wn-b{gap:var(--sp-m);padding-bottom:var(--sp-s)}
 .wn-tocat{margin-left:auto;align-self:center}
 .wn-tocat+.x{margin-left:var(--sp-s)}
-.wn-three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-m);perspective:900px}
+.wn-three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-m);padding-top:6px}
 .wn-det{display:flex;flex-direction:column;gap:4px;min-height:64px;padding:var(--sp-s) var(--sp-m);border-radius:10px;border:1px solid var(--iron);background:#0e1114;box-shadow:inset 3px 0 0 var(--rc,var(--iron-2))}
 .wn-wait{justify-content:center;align-items:center}
 .wn-dn{font-size:19px;line-height:1.05}
@@ -80,21 +184,34 @@ button.wn-card:hover{filter:brightness(1.1)}
 .wn-ask h3{font:600 22px/1.05 var(--f-d);color:var(--gold)}
 .wn-askf{display:flex;gap:var(--sp-s);justify-content:flex-end;padding-top:var(--sp-s)}
 
-/* пять мест Памяти */
+/* пять мест Памяти — тоже осколки: закрыто — тёмное пустое стекло; можно вспомнить — в нём дышит свет духа; закреплено — осколок редкости */
 .wn-pf{min-height:0}
 .wn-mem{gap:var(--sp-m)}
 .wn-slots{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--sp-s)}
-.wn-slot{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;min-height:176px;padding:var(--sp-m) var(--sp-s);border-radius:12px;border:1px solid var(--iron);background:#0e1114;text-align:center;color:var(--parch)}
-button.wn-slot{appearance:none;font:inherit}
+.wn-slot{--icy:43px;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;min-height:176px;padding:var(--sp-m) var(--sp-s);border-radius:12px;border:1px solid var(--iron);background:#0e1114;text-align:center;color:var(--parch)}
+button.wn-slot{appearance:none;font:inherit;cursor:pointer}
 .wn-slot>.rar,.wn-slot>b,.wn-slot>small,.wn-slot>.btn{position:relative;z-index:1}
 .wn-slot small{display:inline-flex;align-items:center;gap:4px;font-size:11.5px}
 .wn-slot small .i{width:12px;height:12px}
 .wn-slot .btn{margin-top:auto;max-width:100%;min-width:0;padding:0 7px;font-size:11px;letter-spacing:.04em}
 .wn-slot .rar{font-size:9.5px;letter-spacing:.03em;max-width:100%}
+.wn-slot .wn-ico{margin:1px 0 2px}
+.wn-slot.set .wn-ico,.wn-slot.open .wn-ico{animation:wn-bob 3.6s ease-in-out infinite}
 .wn-slot.open{border-color:rgba(72,229,212,.5);box-shadow:inset 0 -18px 22px -20px var(--spirit)}
+.wn-slot.open .wn-glow{--rc:var(--spirit);opacity:.42;animation:wn-breathe 2.8s ease-in-out infinite}
 .wn-slot.set{border-color:color-mix(in srgb,var(--rc) 50%,#262b31);background:radial-gradient(95% 70% at 50% 110%,color-mix(in srgb,var(--rc) var(--wn-lit,10%),transparent),transparent 72%),#0e1114;box-shadow:inset 0 -3px 0 var(--rc)}
-button.wn-slot.set:hover{filter:brightness(1.1)}
+@media (hover:hover){button.wn-slot.set:hover .wn-glow{opacity:calc(var(--wn-halo,.45) + .2)}}
 .wn-slot.lock{background:#0b0d10}
+.wn-slot.lock .wn-ico{opacity:.42}
+.wn-slot.lock .wn-glow{display:none}
+/* осколок в пути: место ждёт его пустым; село — вспышка, отскок, поднимаются подписи */
+.wn-slot.set.wait{border-color:var(--iron);background:#0e1114;box-shadow:none}
+.wn-slot.wait>*{opacity:0}
+.wn-slot.land .wn-whole{animation:wn-landpop 560ms cubic-bezier(.2,.9,.3,1.35) var(--dl,0ms) both}
+.wn-slot.land .wn-glow{animation:wn-on 480ms ease-out var(--dl,0ms) both}
+.wn-slot.land .wn-mfl{animation:wn-mfl 520ms ease-out var(--dl,0ms) both}
+.wn-slot.land>.wn-sn,.wn-slot.land>.rar,.wn-slot.land>small{animation:wn-rise 360ms cubic-bezier(.2,.8,.2,1) calc(var(--dl,0ms) + 80ms) both}
+@keyframes wn-landpop{0%{opacity:.3;transform:scale(1.3)}60%{opacity:1;transform:scale(.94)}100%{opacity:1;transform:scale(1)}}
 .wn-sn{font:600 16px/1.1 var(--f-d);text-wrap:balance}
 .wn-mfoot{flex-wrap:wrap}
 .wn-mfoot .reason{flex:1 1 220px}
@@ -110,13 +227,12 @@ button.wn-slot.set:hover{filter:brightness(1.1)}
 .wn-row{border-top:1px solid var(--iron)}
 .wn-row>summary{list-style:none;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;padding:6px 0;cursor:pointer}
 .wn-row>summary::-webkit-details-marker{display:none}
-.wn-row .wn-gem{width:16px;height:23px}
 .wn-rn{display:flex;flex-direction:column;min-width:0}
 .wn-rn b{font:600 15px/1.1 var(--f-d)}
 .wn-rn small{font-size:11px;color:var(--parch-3)}
 .wn-rc{font-size:12.5px;color:var(--parch-2)}
-.wn-row>p{padding:0 0 3px 24px;font-size:13px;color:var(--parch)}
-.wn-row>small{display:block;padding:0 0 8px 24px;font-size:11.5px}
+.wn-row>p{padding:0 0 3px 30px;font-size:13px;color:var(--parch)}
+.wn-row>small{display:block;padding:0 0 8px 30px;font-size:11.5px}
 .wn-row>small.wn-free{padding-bottom:3px;color:var(--amber)}
 .wn-ph{display:flex;align-items:center;gap:var(--sp-m)}
 .wn-pd{font-size:15px;color:var(--parch)}
@@ -124,7 +240,6 @@ button.wn-slot.set:hover{filter:brightness(1.1)}
 /* сброс: что пропадёт */
 .wn-was{display:flex;flex-wrap:wrap;gap:var(--sp-s)}
 .wn-wasp{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:8px;border:1px solid color-mix(in srgb,var(--rc) 40%,#262b31);background:#0e1114}
-.wn-wasp .wn-gem{width:13px;height:19px}
 .wn-wasp b{font:600 14px/1 var(--f-d)}
 .wn-wasp small{font-size:11px;color:var(--parch-3)}
 
@@ -174,24 +289,35 @@ button.wn-slot.set:hover{filter:brightness(1.1)}
 .wn-pr{display:flex;flex-direction:column;gap:2px;padding:6px 0;border-top:1px solid var(--iron);font-size:13.5px}
 .wn-pr small{font-size:11.5px}
 
-/* частицы: слой рядом с #game — перерисовка экрана его не сносит */
+/* частицы: слой рядом с #game — перерисовка экрана его не сносит; в нём же вспышки, свет на всё окно и летящий осколок */
 .wn-fxl{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
-.wn-flash{position:absolute;left:0;top:0;width:190px;height:190px;border-radius:50%;pointer-events:none;mix-blend-mode:screen;
-  background:radial-gradient(circle,rgba(255,250,236,.95),color-mix(in srgb,var(--c) 65%,transparent) 32%,transparent 70%)}
+.wn-flash{position:absolute;left:0;top:0;width:190px;height:190px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(255,250,236,.9),color-mix(in srgb,var(--c) 60%,transparent) 32%,transparent 70%)}
+.wn-veil{position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0;
+  background:radial-gradient(70% 80% at 50% 50%,color-mix(in srgb,var(--c) 45%,rgba(255,252,240,.5)),transparent 75%)}
+.wn-ghost{position:absolute;z-index:7;display:grid;place-items:center;pointer-events:none;will-change:transform}
+.wn-ghost>.wn-glow{opacity:calc(var(--wn-halo,.45) + .25)}
+.wn-ghost .wn-gem{width:56%;height:79%}
 
-/* UI-кит: карты всех редкостей, места, таблица частиц */
+/* UI-кит: сцены сборки и «Вспомнить», состояния карты, места, значки, лестница сборки */
 .wn-kit .eyebrow{font:700 10.5px/1.2 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--gold-2)}
 .wn-kit .faint{color:var(--parch-3)}
 .wn-kit .spirit{color:var(--spirit)}
 .wn-kit .col{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0}
-.wn-kstage{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--iron);padding:var(--sp-l);perspective:900px;
+.wn-kstage{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--iron);padding:var(--sp-l);
   background:radial-gradient(60% 80% at 50% 115%,rgba(72,229,212,.08),transparent),#07090a}
-.wn-krow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:var(--sp-s)}
+.wn-krow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:var(--sp-s);padding-top:6px}
 .wn-kgrid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:var(--sp-l);align-items:start}
 .wn-kslots{grid-template-columns:repeat(3,minmax(0,1fr))}
+.wn-kprow{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,1fr);gap:var(--sp-m);align-items:center}
+.wn-kpick .wn-card{--ico:64px;--icy:40px;min-height:160px}
+.wn-kpick .wn-cn{font-size:15px}
+.wn-kstates{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--sp-s);padding-top:6px}
+.wn-kicons{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:var(--sp-s)}
+.wn-ki{align-items:center}
 .wn-kfx{width:100%;border-collapse:collapse;font-size:12.5px;color:var(--parch-2)}
 .wn-kfx td{padding:5px 8px;border-top:1px solid #1b1f24;vertical-align:middle}
-.wn-kfx td:first-child{white-space:nowrap}
+.wn-kfx td:first-child,.wn-kfx td:last-child{white-space:nowrap}
 .wn-kcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:var(--sp-s);align-items:start}
 .wn-kc{margin:0;display:flex;flex-direction:column;gap:6px;min-width:0}
 .wn-kc figcaption{font-size:11.5px;color:var(--parch-3);text-align:center}
@@ -200,8 +326,8 @@ button.wn-slot.set:hover{filter:brightness(1.1)}
 .wn-kfix li{margin-bottom:4px}
 .wn-kfix summary{cursor:pointer}
 
+/* меньше движения: всё на местах, частицы и сборки нет */
 @media (prefers-reduced-motion:reduce){
-  .wn-card.in,.wn-card.in::after,.wn-motes i,.wn-rays,.wn-gem.open{animation:none!important}
-  .wn-card.in{opacity:1;transform:none}
-  .wn-motes{display:none}
+  .wn-card,.wn-card *,.wn-slot,.wn-slot *,.wn-ov,.wn-ov *,.wn-ghost,.wn-ghost *{animation:none!important;transition:none!important}
+  .wn-motes,.wn-frs,.wn-deb,.wn-core,.wn-bray,.wn-mfl,.wn-lit.old{display:none}
 }

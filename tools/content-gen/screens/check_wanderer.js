@@ -14,14 +14,23 @@
    4б. «Право владыки» (onlyFree) — только в бесплатных тройках: в тройках за Энериум (платный переброс, после сброса) его нет ни на одном
       из 60 000 сидов и ни в одной из сотен троек пути «сервера»; в бесплатных — с долей данных; бесплатных троек у места не больше двух;
       игроку — строка в каталоге, в листе пассивки и в подтверждении платного переброса.
-   5. Анимация: тройка решена до анимации; карты выходят по очереди, вспышка — у каждой, по её редкости; чем реже, тем богаче частицы;
-      перерисовка посреди анимации не сбрасывает её; «Пропустить анимацию», prefers-reduced-motion и закрытие окна — тройка сразу;
+   5. Анимация: тройка решена до анимации; карты собираются из осколков по расписанию wnPlan: осколков, кружения и замедления —
+      по лестнице редкостей, миг замедления и лучи — с древней, дрожь и свет на окно — с первородной; сколы дают весь значок без щелей;
+      сплавление — у каждой карты в свой миг, частицы её редкости, чем реже — тем богаче; до сплавления карту не выбрать; перерисовка
+      посреди анимации не сбрасывает её; живые состояния — выбор, притушенные, подъём выбранной. Переброс: сервер отдал новую тройку
+      сразу, прежние осколки бьются стеклом, затем собираются новые. «Вспомнить»: закреплено сразу; невыбранные бьются, выбранный
+      осколок летит, окно закрывается в пути, место ждёт его пустым и принимает вспышкой; повтор ничего не меняет; закрыли окно раньше —
+      осколок всё равно долетает. «Пропустить анимацию», prefers-reduced-motion и закрытие окна — тройка сразу, без боя стекла и полёта;
       без localStorage всё работает.
+   5б. Значки-осколки: пути memory/shard-r1…r7.png и shard-empty.png; до выгрузки — ни одной ссылки на картинку, прежний кристалл;
+      после — через AV() с версией выгрузки, закреплённое место — своя редкость, открытое и закрытое — пустое стекло.
+   5в. CSS: в кадрах анимаций и переходах — только transform и opacity, без смешения слоёв и фильтров на наведении; есть «меньше движения».
    6. Артефакты: покупка золотом, уровень душами — база × номер уровня, не выше цикла; уровень аккаунта для открытия; повтор и нехватка.
    7. Достижения: сундук по строке режима «Достижения» lootboxes.js на цикл получения, в запасы — один раз; таинственные скрыты до получения;
       первенства — только свои.
    8. Вид: вкладки, окно, листы и каталог рисуются в режимах «Игрок» и «Команда» без исключений, undefined и NaN; игроку — без служебных слов.
-   9. UI-кит: раздел «Память Странника» — карты всех семи редкостей; карта экранов отмечает готовое.
+   9. UI-кит: раздел «Память Странника» — карты всех семи редкостей, сцена «Вспомнить», состояния карты и мест, восемь значков,
+      лестница сборки; кнопки раздела проигрывают сборку, переброс и «Вспомнить» без исключений; карта экранов отмечает готовое.
    Запуск: node tools/content-gen/screens/check_wanderer.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -37,7 +46,7 @@ function done() {
   if (MISSING.size) console.log(`Пропущены подключённые, но ещё не написанные чужие экраны: ${[...MISSING].join(', ')}.`);
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
   console.log(`«Странник»: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; операций ${cnt.ops}, троек пересчитано ${cnt.triples}, вспышек ${cnt.bursts}.`);
-  console.log('Проверка пройдена: тройку решает «сервер» на сиде до анимации, расход один раз, частицы растут с редкостью, артефакты и достижения по правилам, в режиме «Игрок» служебного нет.');
+  console.log('Проверка пройдена: тройку решает «сервер» на сиде до анимации, расход один раз, карты собираются из осколков по лестнице редкостей, переброс бьёт стекло, выбранный осколок долетает до места, движение — transform и opacity, артефакты и достижения по правилам, в режиме «Игрок» служебного нет.');
   process.exit(0);
 }
 const run = (where, f) => { try { return f(); } catch (e) { say(`${where}: исключение — ${e.message} | ${(e.stack || '').split('\n').slice(1, 3).join(' | ').trim()}`); return undefined; } };
@@ -143,11 +152,12 @@ function load(o = {}) {
   if (err.length) done();
   /* частицы: запись вызовов вместо холста */
   const fxLog = [];
-  win.EnFx.create = host => { const rec = k => (...a) => fxLog.push({ k, a }); return { host, center: () => ({ x: 10, y: 10, w: 150, h: 170 }), ring: rec('ring'), burst: rec('burst'), shake: rec('shake'), destroy() {} }; };
+  win.EnFx.create = host => { const rec = k => (...a) => fxLog.push({ k, a, t: clock.now }); return { host, center: () => ({ x: 10, y: 10, w: 150, h: 170 }), ring: rec('ring'), burst: rec('burst'), shake: rec('shake'), destroy() {} }; };
   const T = vm.runInContext(`({
     get S() { return S; }, set S(v) { S = v; },
-    ACT, OV, SCREENS, FLOWS, KH, KIT_EXTRA, MAP, BAG, LBX, render, initialState, setTeam, fmt, EnLoot: window.EnLoot,
-    WN, WN_VIEW, WN_DEMO, WN_SRV, wnRoll, wnChance, wnSync, wnBurst, wnChest, wnProg, wnReady, wnCap, wnLv, wnCyc, wnMemTab, wnArtTab, wnAchTab,
+    ACT, OV, SCREENS, FLOWS, KH, KIT_EXTRA, MAP, BAG, LBX, render, initialState, setTeam, fmt, EnLoot: window.EnLoot, doc: document,
+    WN, WN_VIEW, WN_DEMO, WN_SRV, WN_ART, wnRoll, wnChance, wnSync, wnBurst, wnShatter, wnPlan, wnCuts, wnCard, wnSpeed, wnChest, wnProg, wnReady, wnCap, wnLv, wnCyc,
+    wnMemTab, wnArtTab, wnAchTab,
   })`, ctx);
   const advance = ms => {
     const end = clock.now + ms;
@@ -366,33 +376,102 @@ function roll2(seed, excl, paid) {
   if (!playerText(view(P, 'подтверждение · за Энериум')).includes('за Энериум не выпадает')) say('подтверждение платного переброса: нет строки о «только бесплатно»');
 }
 
-/* ================== 5. анимация: тройка решена до неё, частицы по редкости ================== */
+/* ================== 5. анимация: тройка решена до неё; сборка из осколков, бой стекла, полёт в место; частицы по редкости ================== */
+const cardOf = (h, k) => { const m = h.match(new RegExp(`<(button|div) class="wn-card[^"]*" data-r="\\d" id="wnCard${k}"[\\s\\S]*?</\\1>`)); return m ? m[0] : ''; };
+const clsOf = h => Object.fromEntries([...h.matchAll(/class="(wn-card[^"]*)" data-r="\d" id="wnCard(\d)"/g)].map(m => [m[2], m[1].split(/\s+/)]));
+const dlOf = h => [...h.matchAll(/id="wnCard(\d)"[^>]*style="--dl:(-?\d+)ms[;"]/g)].map(m => [+m[1], +m[2]]);
+const rOf = id => WD.passives.find(p => p.id === id).r;
+/* открыть окно места 0 и запустить сборку в миг 1: t0 анимации = часы, таймеры — от них же */
+function openAnim(P, where) { run('Вспомнить', () => P.T.ACT.wnmem('0')); const h = view(P, where); P.advance(1); run('en-render', () => P.T.wnSync()); return h; }
 {
-  const P = load(), T = P.T;
+  const P = load(), T = P.T, V = T.WN_VIEW, B = V.build;
+  /* лестница сборки: чем реже, тем больше осколков, кружения, слёта и замедления; миг замедления и лучи — с древней */
+  for (let r = 2; r <= 7; r++) for (const f of ['frag', 'spread', 'orbit', 'gather', 'hold']) if (B[r][f] < B[r - 1][f]) say(`сборка: у редкости ${r} ${f} меньше, чем у ${r - 1}`);
+  if (B[1].orbit || B[1].hold || B[1].rays) say('обычная: кружение, замедление или лучи — должен быть прямой слёт');
+  for (let r = 1; r <= 7; r++) {
+    if (!!B[r].hold !== r >= 5 || !!B[r].near !== r >= 5 || !!B[r].rays !== r >= 5) say(`редкость ${r}: миг замедления и лучи — с древней`);
+    if (Object.values(B[r]).some(x => !Number.isInteger(x))) say(`сборка ${r}: не целые числа`);
+  }
+  if (B[7].orbit < 360 || B[7].hold <= B[6].hold) say('вневременная: меньше полного оборота или замедление не дольше первородной');
+  if (!V.fx[7].veil || !V.fx[6].veil || V.fx[5].veil || !V.fx[6].shake || V.fx[5].shake) say('свет на всё окно и дрожь — с первородной');
+  /* сколы: клинья от точки удара дают весь значок без щелей, целые проценты в квадрате 0–100 */
+  const area2 = pts => Math.abs(pts.reduce((a, p, i) => { const q = pts[(i + 1) % pts.length]; return a + p[0] * q[1] - q[0] * p[1]; }, 0));
+  for (let K = 3; K <= 12; K++) for (const hh of [0, 1, -1, 0x2545f491, 123456789, seedOf('сколы'), seedOf('ещё')]) {
+    const c = T.wnCuts(K, hh), s = c.reduce((a, pts) => a + area2(pts), 0);
+    if (c.length !== K || s !== 20000) { say(`сколы ${K} / ${hh}: клиньев ${c.length}, двойная площадь ${s} вместо 20000 — не весь значок`); break; }
+    if (c.some(pts => pts.some(([x, y]) => !Number.isInteger(x) || !Number.isInteger(y) || x < 0 || x > 100 || y < 0 || y > 100))) say('сколы: не целые проценты или за краем значка');
+  }
+  /* карта каждой редкости в сборке: осколков — по лестнице, лучи сплавления — с древней; при бое стекла — осколки прежней редкости */
+  for (let r = 1; r <= 7; r++) {
+    const p = WD.passives.find(q => q.r === r), c = T.wnCard(p, { a: { dl: 0, bk: 0, h: seedOf('карта|' + r), old: { r: 8 - r } } });
+    if ((c.match(/class="wn-fr"/g) || []).length !== B[r].frag || (c.match(/class="wn-db"/g) || []).length !== B[8 - r].frag) say(`карта редкости ${r}: осколков не по лестнице сборки`);
+    if (!!B[r].rays !== /class="wn-bray"/.test(c) || !new RegExp(`--land:${V.inMs + B[r].gather + B[r].hold}ms`).test(c)) say(`карта редкости ${r}: лучи или миг сплавления не по лестнице`);
+    if (/undefined|NaN/.test(c)) say(`карта редкости ${r}: undefined или NaN в разметке сборки`);
+  }
+  /* открытие: сборка по расписанию wnPlan */
   fresh(P, { skip: false });
-  run('Вспомнить', () => T.ACT.wnmem('0'));
-  let h = view(P, 'окно · анимация начата');
-  const o = T.S.mem.offer[0], A = T.S.mem.anim;
-  if (!A) say('анимация не началась'); else if (!eq(A.rs, o.ids.map(id => WD.passives.find(p => p.id === id).r))) say('анимация показывает не ту тройку, что решил сервер');
-  const dl = [...h.matchAll(/id="wnCard(\d)"[^>]*style="--dl:(-?\d+)ms"/g)].map(m => +m[2]);
-  if (dl.length !== 3 || !(dl[0] < dl[1] && dl[1] < dl[2])) say(`карты выходят не по очереди: задержки ${dl}`);
-  if (!/data-a="wnpin"[^>]*disabled/.test(h)) say('пока карты выходят, «Вспомнить» доступно');
+  let h = openAnim(P, 'окно · сборка начата');
+  const o = T.S.mem.offer[0], A = T.S.mem.anim, rs = o.ids.map(rOf), plan = T.wnPlan(rs, 0);
+  if (!A) { say('анимация не началась'); done(); }
+  if (!eq(A.rs, rs)) say('анимация показывает не ту тройку, что решил сервер');
+  if (!eq(A.plan, plan) || A.lead || A.old) say('расписание открытия не из wnPlan или с боем прежней тройки');
+  if (!A.t0) say('анимация не взяла время старта');
+  const dl = dlOf(h).map(x => x[1]);
+  if (!eq(dl, plan.start) || !(dl[0] < dl[1] && dl[1] < dl[2])) say(`карты начинают сборку не по очереди: ${dl}, по расписанию ${plan.start}`);
+  for (let k = 0; k < 3; k++) {
+    const c = cardOf(h, k), r = rs[k], n = (c.match(/class="wn-fr"/g) || []).length;
+    if (n !== B[r].frag) say(`карта ${k}: осколков ${n}, у редкости ${r} — ${B[r].frag}`);
+    if (!/class="wn-whole"/.test(c) || !/class="wn-core"/.test(c) || !/class="wn-mfl"/.test(c) || !/class="wn-gl"/.test(c) || !/class="wn-lit"/.test(c)) say(`карта ${k}: нет слоя сборки`);
+    if (!!B[r].rays !== /class="wn-bray"/.test(c)) say(`карта ${k}: лучи сплавления не по редкости`);
+    const land = (c.match(/--land:(\d+)ms/) || [])[1];
+    if (+land !== plan.land[k] - plan.start[k]) say(`карта ${k}: сплавление ${land} мс, по расписанию ${plan.land[k] - plan.start[k]}`);
+    if (/\bwn-db\b/.test(c) || /\bre\b/.test(clsOf(h)[k].join(' '))) say(`карта ${k}: бой стекла при первом открытии`);
+  }
+  if (!/data-a="wnpin"[^>]*disabled/.test(h) || !/data-a="wnroll"[^>]*disabled/.test(h)) say('пока карты собираются, «Вспомнить» или «Перебросить» доступны');
+  const again = view(P, 'окно · та же разметка');
+  if (dlOf(again).map(x => x[1]).join() !== plan.start.map(s => s - (P.clock.now - A.t0)).join()) say('перерисовка без хода времени сдвинула сборку');
+  /* выбрать карту, пока она не сплавилась, нельзя */
+  const pick0 = T.S.mem.pick;
+  run('выбор до сплавления', () => T.ACT.wnpick('2'));
+  if (T.S.mem.pick !== pick0) say('карту выбрали до того, как её осколки сплавились');
+  /* посреди сборки второй карты: перерисовка не начинает анимацию заново — отрицательная задержка по прошедшему времени */
+  const mid = Math.floor((plan.start[1] + plan.done[1]) / 2);
+  P.fxLog.length = 0;
+  P.advance(mid - 1);
+  h = view(P, 'окно · посреди сборки');
+  const el = P.clock.now - A.t0, cls = clsOf(h), dl2 = Object.fromEntries(dlOf(h));
+  for (let k = 0; k < 3; k++) {
+    const live = el < plan.done[k];
+    if (!cls[k] || cls[k].includes('in') !== live) say(`посреди сборки: карта ${k} ${live ? 'не собирается' : 'всё ещё собирается'} — ${cls[k]}`);
+    if (live && dl2[k] !== plan.start[k] - el) say(`посреди сборки: карта ${k} с задержкой ${dl2[k]}, а не ${plan.start[k] - el} — анимация начата заново`);
+  }
   run('en-render', () => T.wnSync());
-  if (!T.S.mem.anim || !T.S.mem.anim.t0) say('анимация не взяла время старта');
-  P.advance(700);
-  h = view(P, 'окно · посреди анимации');
-  const dl2 = [...h.matchAll(/id="wnCard(\d)"[^>]*style="--dl:(-?\d+)ms"/g)].map(m => [+m[1], +m[2]]);
-  const cls = Object.fromEntries([...h.matchAll(/class="(wn-card[^"]*)" data-r="\d" id="wnCard(\d)"/g)].map(m => [m[2], m[1].split(/\s+/)]));
-  if (!cls[0] || cls[0].includes('in') || !cls[1] || !cls[1].includes('in') || !dl2.some(([k, d]) => k === 1 && d < 0)) say(`перерисовка посреди анимации начала её заново: ${JSON.stringify(cls)} ${JSON.stringify(dl2)}`);
-  run('en-render', () => T.wnSync());
-  P.advance(3000);
-  const bursts = P.fxLog.filter(x => x.k === 'burst').length;
-  cnt.bursts += bursts;
-  if (!bursts) say('вспышек появления нет');
+  P.advance(plan.end + 20 - el);
+  /* сплавление — у каждой карты в свой миг: частицы её редкости; слёт искр — с эпической; дрожь — только у первородной и выше */
+  const at = t => P.fxLog.filter(x => x.t === A.t0 + t);
+  for (let k = 0; k < 3; k++) {
+    const r = rs[k], hits = at(plan.land[k]).filter(x => x.k === 'burst');
+    if (hits.length < 2) say(`карта ${k}: нет частиц сплавления в миг ${plan.land[k]}`);
+    if (V.converge[r] && at(plan.start[k] + V.inMs).filter(x => x.k === 'burst').length !== V.converge[r][0]) say(`карта ${k}: искры не слетаются к точке удара`);
+  }
+  cnt.bursts += P.fxLog.filter(x => x.k === 'burst').length;
+  const shakes = P.fxLog.filter(x => x.k === 'shake').map(x => x.t - A.t0), wantShake = rs.map((r, k) => (V.fx[r].shake ? plan.land[k] : -1)).filter(x => x >= 0);
+  if (!eq(shakes, wantShake)) say(`дрожь: ${shakes}, ждали ${wantShake} — только у первородной и вневременной`);
   if (T.S.mem.anim || !T.S.mem.shown[o.i + ':' + o.n]) say('анимация не закончилась');
   h = view(P, 'окно · тройка показана');
-  if (/class="wn-card[^"]*\bin\b/.test(h) || /data-a="wnpin"[^>]*disabled/.test(h)) say('после анимации карты не на месте или «Вспомнить» недоступно');
-  /* богаче с редкостью: по каждой редкости — число вызовов частиц */
+  if (/class="wn-card[^"]*\bin\b/.test(h) || /data-a="wnpin"[^>]*disabled/.test(h)) say('после сборки карты не на месте или «Вспомнить» недоступно');
+  if (/class="wn-fr"|class="wn-core"|class="wn-mfl"/.test(h)) say('после сборки в разметке остались осколки и слои сборки');
+  /* живые состояния: выбранная — кольцо, остальные притушены; только что выбранная поднимается */
+  let c2 = clsOf(h), pk = T.S.mem.pick;
+  if (!c2[pk].includes('on') || [0, 1, 2].some(k => k !== pk && !c2[k].includes('dim'))) say(`состояния карт: выбранная ${pk} без кольца или остальные не притушены — ${JSON.stringify(c2)}`);
+  const other = (pk + 1) % 3;
+  run('выбор', () => T.ACT.wnpick(String(other)));
+  h = view(P, 'окно · только что выбрана');
+  c2 = clsOf(h);
+  if (T.S.mem.pick !== other || !c2[other].includes('on') || !c2[other].includes('pk') || !new RegExp(`id="wnCard${other}"[^>]*--pk:-?\\d+ms`).test(h)) say('выбор: карта не выделилась или не поднялась');
+  P.advance(V.pickMs + 10);
+  if (clsOf(view(P, 'окно · выбрана давно'))[other].includes('pk')) say('подъём выбранной не закончился');
+  /* богаче с редкостью: по каждой редкости — число частиц сплавления */
   const calls = [];
   const fxRec = { host: { appendChild() {} }, center: () => ({ x: 0, y: 0, w: 100, h: 100 }), ring: () => P.fxLog.push({ k: 'ring' }), burst: (x, y, c, n) => P.fxLog.push({ k: 'burst', n }), shake: () => P.fxLog.push({ k: 'shake' }) };
   for (let r = 1; r <= 7; r++) {
@@ -402,19 +481,86 @@ function roll2(seed, excl, paid) {
   for (let i = 1; i < 7; i++) if (calls[i].n <= calls[i - 1].n || calls[i].rings < calls[i - 1].rings) say(`частицы: редкость ${i + 1} не богаче ${i} — ${calls[i].n} против ${calls[i - 1].n}`);
   if (T.WN_VIEW.fx[1].flash || T.WN_VIEW.fx[1].shake || calls[0].n > 6) say('у обычной — вспышка, дрожь или много искр: должно быть почти ничего');
   if (!T.WN_VIEW.fx[7].flash || !T.WN_VIEW.fx[7].shake || !calls[6].shake) say('у вневременной нет полного всплеска: вспышки и дрожи');
-  /* закрыли посреди анимации — тройка считается показанной */
+
+  /* переброс: новая тройка — от сервера сразу; показ — прежние осколки бьются стеклом, на их месте собираются новые */
+  fresh(P, { skip: false });
+  openAnim(P, 'окно · перед перебросом'); P.advance(5000);
+  const oA = T.S.mem.offer[0];
+  run('переброс', () => T.ACT.wnroll(`0:${oA.n}:${op(T)}`)); cnt.ops++;
+  const oB = T.S.mem.offer[0], R = T.S.mem.anim;
+  if (!oB || oB.n !== oA.n + 1) say('переброс с анимацией: сервер не выдал новую тройку сразу');
+  if (!R || !eq(R.old, oA.ids) || R.lead !== V.breakMs || !eq(R.plan, T.wnPlan(oB.ids.map(rOf), V.breakMs))) say('переброс: прежняя тройка не бьётся перед сборкой новой');
+  h = view(P, 'окно · переброс');
+  for (let k = 0; k < 3; k++) {
+    const c = cardOf(h, k), rOld = rOf(oA.ids[k]), n = (c.match(/class="wn-db"/g) || []).length;
+    if (!clsOf(h)[k].includes('re') || n !== B[rOld].frag || !new RegExp(`class="wn-lit old" data-r="${rOld}"`).test(c) || !/--bk:-?\d+ms/.test(c)) say(`переброс: карта ${k} — нет осколков прежней редкости ${rOld} или её света`);
+  }
+  if (T.S.mem.brk) say('переброс: прежняя тройка осталась в состоянии после начала сборки');
+  P.fxLog.length = 0; P.advance(1); run('en-render', () => T.wnSync()); P.advance(1);
+  if (P.fxLog.filter(x => x.k === 'ring').length < 3) say('переброс: прежние осколки не бьются стеклом (кольца)');
+  P.advance(R.plan.end + 20);
+  if (T.S.mem.anim || /class="wn-db"/.test(view(P, 'окно · после переброса'))) say('переброс: сборка не закончилась или остался бой стекла');
+
+  /* «Вспомнить»: сервер закрепляет сразу; показ — невыбранные бьются, выбранный осколок летит в место, окно гаснет в пути, место принимает */
+  fresh(P, { skip: false });
+  openAnim(P, 'окно · перед выбором'); P.advance(5000);
+  const oC = T.S.mem.offer[0]; T.S.mem.pick = 1;
+  const vp = `0:${oC.n}:1:${op(T)}`;
+  run('Вспомнить', () => T.ACT.wnpin(vp)); cnt.ops++;
+  const L = T.S.mem.leave;
+  if (T.S.mem.slots[0].p !== oC.ids[1] || T.S.mem.slots[0].st !== 'set') say('«Вспомнить» с анимацией: сервер не закрепил сразу');
+  if (!L || L.k !== 1 || !eq(L.ids, oC.ids) || !T.S.overlay || T.S.overlay.t !== 'mem') say('«Вспомнить» с анимацией: нет показа выбора или окно закрылось сразу');
+  h = view(P, 'окно · выбор улетает');
+  const lc = clsOf(h);
+  if (!lc[1] || !lc[1].includes('go') || ![0, 2].every(k => lc[k] && lc[k].includes('brk') && (cardOf(h, k).match(/class="wn-db"/g) || []).length === B[rOf(oC.ids[k])].frag)) say(`выбор: невыбранные не бьются или выбранная не отдала осколок — ${JSON.stringify(lc)}`);
+  if (/data-a="wnpin"|data-a="wnroll"|data-a="wnpick"|<button class="ov-scrim" data-a="close"/.test(h)) say('выбор: в окне ухода можно снова выбрать, перебросить или закрыть фоном');
+  if (!/class="wn-slot set wait" id="wnSlot0"/.test(h)) say('место не ждёт осколок: закреплённое видно раньше, чем он долетел');
+  const s1 = snap(T);
+  run('повтор «Вспомнить»', () => T.ACT.wnpin(vp));
+  if (!eq(snap(T), s1) || T.S.mem.leave !== L) say('повтор «Вспомнить» во время полёта что-то изменил');
+  P.fxLog.length = 0; P.advance(1); run('en-render', () => T.wnSync());
+  if (!L.t0 || P.fxLog.filter(x => x.k === 'ring').length !== 2) say('выбор: невыбранные не бьются стеклом');
+  P.advance(V.breakMs);
+  if (T.S.overlay || !T.S.mem.leave || T.S.mem.leave.phase !== 'fly') say('окно не закрылось, когда осколок в пути');
+  h = view(P, 'место ждёт осколок');
+  if (!/class="wn-slot set wait" id="wnSlot0"/.test(h)) say('в пути: место не ждёт осколок');
+  P.fxLog.length = 0; P.advance(V.flyMs + 1);
+  if (T.S.mem.leave || !T.S.mem.land || T.S.mem.land.i !== 0) say('осколок не сел в место');
+  if (P.fxLog.filter(x => x.k === 'burst' && x.a[3] === V.trail[1]).length < 3) say('полёт: нет следа искр');
+  if (!P.fxLog.some(x => x.k === 'burst' && x.t === P.clock.now - 1)) say('место приняло осколок без частиц');
+  if (!T.S.toast || !/Вспомнено/.test(T.S.toast.t)) say('нет сообщения «Вспомнено»');
+  h = view(P, 'место приняло осколок');
+  if (!/class="wn-slot set land" id="wnSlot0"[^>]*style="--dl:-?\d+ms"/.test(h)) say('место не вспыхнуло, приняв осколок');
+  P.advance(V.landMs + 10);
+  if (T.S.mem.land || /wn-slot set land/.test(view(P, 'место после вспышки'))) say('вспышка места не закончилась');
+  /* закрыли окно, пока невыбранные бьются: закреплено, осколок всё равно долетает */
+  fresh(P, { skip: false });
+  openAnim(P, 'окно'); P.advance(5000);
+  const oD = T.S.mem.offer[0];
+  run('Вспомнить', () => T.ACT.wnpin(`0:${oD.n}:0:${op(T)}`)); view(P, 'окно · выбор'); P.advance(1); run('en-render', () => T.wnSync());
+  P.advance(100); run('закрыть', () => T.ACT.close()); run('en-render', () => T.wnSync());
+  if (!T.S.mem.leave || T.S.mem.leave.phase !== 'fly') say('окно закрыли посреди выбора — осколок не полетел');
+  P.advance(V.breakMs + V.flyMs + 10);
+  if (T.S.mem.leave || T.S.mem.slots[0].p !== oD.ids[0] || T.S.overlay) say('окно закрыли посреди выбора — место не приняло осколок или окно открылось снова');
+
+  /* закрыли посреди сборки — тройка считается показанной */
   fresh(P, { skip: false });
   run('Вспомнить', () => T.ACT.wnmem('0')); view(P, 'окно'); run('en-render', () => T.wnSync());
   run('закрыть', () => T.ACT.close()); run('en-render', () => T.wnSync());
   if (T.S.mem.anim) say('окно закрыли посреди анимации — анимация осталась');
   run('открыть снова', () => T.ACT.wnmem('0'));
   if (T.S.mem.anim) say('повторное открытие проиграло ту же тройку заново');
-  /* пропуск: галочка посреди анимации — тройка сразу; localStorage помнит, без него работает */
+  /* пропуск: галочка посреди анимации — тройка сразу; localStorage помнит, без него работает; с пропуском — ни боя стекла, ни полёта */
   const store = new Map(), P2 = load({ storage: store }), T2 = P2.T;
   fresh(P2, { skip: false });
   run('Вспомнить', () => T2.ACT.wnmem('0')); run('en-render', () => T2.wnSync());
   run('пропустить', () => T2.ACT.wnskip('', { checked: true }));
   if (T2.S.mem.anim || store.get('en-wn-skip') !== '1') say('«Пропустить анимацию» посреди анимации: тройка не сразу или выбор не запомнен');
+  const oS = T2.S.mem.offer[0];
+  run('переброс с пропуском', () => T2.ACT.wnroll(`0:${oS.n}:${op(T2)}`));
+  if (T2.S.mem.brk || T2.S.mem.anim || /class="wn-card[^"]*\bin\b/.test(view(P2, 'окно · переброс с пропуском'))) say('с пропуском переброс всё равно показывает бой стекла или сборку');
+  run('Вспомнить с пропуском', () => T2.ACT.wnpin(`0:${T2.S.mem.offer[0].n}:0:${op(T2)}`));
+  if (T2.S.mem.leave || T2.S.overlay) say('с пропуском «Вспомнить» показывает полёт или окно не закрылось сразу');
   const P3 = load({ storage: store });
   if (!P3.T.S.mem.skip) say('«Пропустить анимацию» не прочитано из localStorage');
   const P4 = load({ reduced: true }), T4 = P4.T;
@@ -422,10 +568,74 @@ function roll2(seed, excl, paid) {
   run('Вспомнить', () => T4.ACT.wnmem('0'));
   const h4 = view(P4, 'окно · меньше движения');
   if (T4.S.mem.anim || /class="wn-card[^"]*\bin\b/.test(h4) || !/data-a="wnskip"[^>]*checked[^>]*disabled/.test(h4)) say('prefers-reduced-motion: анимация есть или галочка не заблокирована');
+  /* миг замедления: пока осколки вневременной замерли перед сплавлением, частицы на слое идут медленнее; после сборки — как обычно */
+  fresh(P, { skip: false }); T.S.mem.demoHigh = true;
+  openAnim(P, 'окно · вневременная');
+  const H = T.S.mem.anim, k7 = H ? H.rs.indexOf(7) : -1;
+  if (k7 < 0) say('демо «вневременная в следующей тройке»: в сборке её нет');
+  else {
+    P.advance(H.t0 + H.plan.land[k7] - B[7].hold + 10 - P.clock.now);
+    if (T.wnSpeed() !== V.slow / 100) say(`миг замедления: скорость частиц ${T.wnSpeed()}, а не ${V.slow / 100}`);
+    P.advance(H.plan.end + 20);
+    if (T.wnSpeed() !== 1) say('после сборки частицы остались замедленными');
+  }
   /* демо команды: вневременная в следующей тройке */
   fresh(P, { skip: true }); T.S.mem.demoHigh = true;
   run('Вспомнить', () => T.ACT.wnmem('0'));
   if (!T.S.mem.offer[0].ids.some(id => WD.passives.find(p => p.id === id).r === 7)) say('демо «вневременная в следующей тройке» не сработало');
+}
+
+/* ================== 5б. значки-осколки: пути, до и после выгрузки ==================
+   До выгрузки — ни одной ссылки на картинки осколков (нет битой картинки), на месте — прежний кристалл CSS. После — осколки по путям
+   memory/shard-r1…r7.png и shard-empty.png через AV(): с версией выгрузки; закрытое и открытое место — пустое стекло, закреплённое — своя редкость */
+{
+  const P = load(), T = P.T, A = T.WN_ART;
+  const want = [1, 2, 3, 4, 5, 6, 7].map(r => `memory/shard-r${r}.png`).concat('memory/shard-empty.png');
+  if (!eq([1, 2, 3, 4, 5, 6, 7].map(r => A.shard.replace('{r}', r)).concat(A.empty), want)) say('пути осколков не memory/shard-r1…r7.png и shard-empty.png');
+  if (A.ready.some(p => !want.includes(p))) say(`в списке выгруженных — чужой путь: ${A.ready}`);
+  fresh(P, { cyc: 4, skip: true });
+  const pin = () => { run('тройка', () => T.ACT.wnmem('0')); const o = T.S.mem.offer[0]; run('Вспомнить', () => T.ACT.wnpin(`0:${o.n}:0:${op(T)}`)); return rOf(o.ids[0]); };
+  const r0 = pin();
+  const saved = A.ready.slice();
+  A.ready.length = 0;
+  let h = view(P, 'Память · до выгрузки');
+  T.S.overlay = { t: 'wncat' }; h += view(P, 'каталог · до выгрузки'); T.S.overlay = null;
+  if (/memory\/shard-/.test(h)) say('до выгрузки в разметке ссылки на картинки осколков — будет битая картинка');
+  if (!/class="wn-gem /.test(h)) say('до выгрузки нет прежнего кристалла');
+  A.ready.push(...want);
+  h = view(P, 'Память · после выгрузки');
+  const srcs = [...h.matchAll(/src="([^"]*memory\/shard-[^"]*)"/g)].map(m => m[1]);
+  if (!srcs.length || srcs.some(s => !/\?v=\w+/.test(s))) say('картинки осколков не через AV(): без версии выгрузки');
+  const slotImg = i => { const m = h.match(new RegExp(`id="wnSlot${i}"[\\s\\S]*?src="[^"]*(memory/shard-[\\w-]+\\.png)`)); return m && m[1]; };
+  if (slotImg(0) !== `memory/shard-r${r0}.png`) say(`закреплённое место — не осколок своей редкости: ${slotImg(0)}`);
+  if (slotImg(1) !== 'memory/shard-empty.png' || slotImg(4) !== 'memory/shard-empty.png') say('открытое или закрытое место — не пустое стекло');
+  if (/class="wn-gem /.test(h)) say('после выгрузки остался прежний кристалл');
+  T.S.overlay = { t: 'wncat' };
+  if (!/memory\/shard-r7\.png/.test(view(P, 'каталог · после выгрузки'))) say('каталог: нет осколков');
+  A.ready.length = 0; A.ready.push(...saved);
+}
+
+/* ================== 5в. CSS: движение — только transform и opacity ==================
+   В кадрах анимаций и переходах экрана — только transform и opacity: без фильтров и смешения слоёв (телефон) */
+{
+  const css = read('screens/wanderer.css');
+  const blocks = [];
+  for (let i = css.indexOf('@keyframes'); i >= 0; i = css.indexOf('@keyframes', i + 1)) {
+    const open = css.indexOf('{', i); let d = 0, j = open;
+    for (; j < css.length; j++) { if (css[j] === '{') d++; else if (css[j] === '}' && --d === 0) break; }
+    blocks.push({ name: css.slice(i + 10, open).trim(), body: css.slice(open + 1, j) });
+  }
+  if (blocks.length < 10) say(`wanderer.css: кадров анимаций ${blocks.length} — не разобраны`);
+  for (const b of blocks) {
+    const props = [...b.body.matchAll(/([a-z-]+)\s*:/g)].map(m => m[1]).filter(p => p !== 'var');
+    const bad = props.filter(p => p !== 'transform' && p !== 'opacity');
+    if (bad.length) say(`@keyframes ${b.name}: анимирует ${[...new Set(bad)]} — только transform и opacity`);
+  }
+  const topSplit = v => { const out = ['']; let d = 0; for (const ch of v) { if (ch === '(') d++; if (ch === ')') d--; if (ch === ',' && !d) out.push(''); else out[out.length - 1] += ch; } return out; };
+  for (const m of css.matchAll(/transition\s*:\s*([^;}]+)/g)) for (const part of topSplit(m[1])) { const p = part.trim().split(/\s+/)[0].replace('!important', ''); if (p !== 'transform' && p !== 'opacity' && p !== 'none') say(`wanderer.css: переход по «${p}» — только transform и opacity`); }
+  if (/mix-blend-mode/.test(css)) say('wanderer.css: смешение слоёв (mix-blend-mode) — тяжело для телефона');
+  if (/:hover[^{]*\{[^}]*filter/.test(css)) say('wanderer.css: фильтр на наведении');
+  if (!/@media \(prefers-reduced-motion:reduce\)/.test(css)) say('wanderer.css: нет правил «меньше движения»');
 }
 
 /* ================== 6. артефакты ================== */
@@ -526,6 +736,13 @@ for (const team of [false, true]) {
   fresh(P, { skip: false });
   T.S.overlay = { t: 'mem', arg: '' }; view(P, `окно · анимация${tag}`);
   T.S.mem.anim = null; T.S.mem.shown = { '0:0': true }; T.S.mem.slots[0].free = 0; T.S.mem.ask = 'roll'; view(P, `окно · подтверждение${tag}`);
+  /* сборка, переброс с боем стекла, окно ухода после «Вспомнить», место ждёт и принимает осколок */
+  fresh(P, { skip: false });
+  run('Вспомнить', () => T.ACT.wnmem('0')); view(P, `окно · сборка${tag}`); P.advance(1); run('en-render', () => T.wnSync()); P.advance(5000);
+  run('переброс', () => T.ACT.wnroll(`0:${T.S.mem.offer[0].n}:${op(T)}`)); view(P, `окно · переброс${tag}`); P.advance(1); run('en-render', () => T.wnSync()); P.advance(5000);
+  const oo = T.S.mem.offer[0];
+  run('Вспомнить', () => T.ACT.wnpin(`0:${oo.n}:0:${op(T)}`)); view(P, `окно ухода${tag}`); P.advance(1); run('en-render', () => T.wnSync());
+  P.advance(T.WN_VIEW.breakMs); view(P, `место ждёт осколок${tag}`); P.advance(T.WN_VIEW.flyMs + 1); view(P, `место приняло осколок${tag}`); P.advance(3000);
   /* сценарии «Странника» */
   for (const [t, , f] of T.FLOWS.filter(x => /Памят|Артефакт|Достижени/.test(x[0]))) { fresh(P, { skip: true }); run('сценарий ' + t, () => f()); view(P, `сценарий «${t}»${tag}`); }
   if (team && !teamSeen.some(Boolean)) say('режим «Команда»: на экране «Странник» нет служебного — демо и пояснения не размечены');
@@ -540,7 +757,24 @@ for (const team of [false, true]) {
     const h = kit.html();
     for (let r = 1; r <= 7; r++) if (!new RegExp(`id="wnKit${r}"`).test(h) || !new RegExp(`class="wn-card[^"]*" data-r="${r}"`).test(h)) say(`UI-кит: нет карты редкости ${r}`);
     if (/undefined|NaN/.test(h)) say('UI-кит: undefined или NaN');
+    /* новые состояния: сцена «Вспомнить», наведение, выбор, неактивное, места-осколки, восемь значков, лестница сборки по редкостям */
+    if (!/id="wnKitPick"/.test(h) || !/id="wnKitSlot"/.test(h)) say('UI-кит: нет сцены «Вспомнить» с местом Памяти');
+    for (const [c, t] of [['hov', 'наведение'], ['on', 'выбрано'], ['dim', 'неактивное']]) if (!new RegExp(`class="wn-card[^"]*\\b${c}\\b`).test(h)) say(`UI-кит: нет состояния карты «${t}»`);
+    if (!['lock', 'open', 'set'].every(s => new RegExp(`class="wn-slot ${s}`).test(h))) say('UI-кит: места Памяти не во всех трёх состояниях');
+    if ((h.match(/<figure class="wn-kc wn-ki">/g) || []).length !== 8) say('UI-кит: значков-осколков не восемь — семь редкостей и пустое место');
+    if ((h.match(/<tr data-r="\d">/g) || []).length !== 7) say('UI-кит: в лестнице сборки не все семь редкостей');
+    for (const k of ['all', 'reroll', 'pick', 'back', '1', '7']) if (!h.includes(`data-wnkit="${k}"`)) say(`UI-кит: нет кнопки «${k}»`);
+    /* кнопки раздела: сборка редкости, все по очереди, переброс, «Вспомнить», «Сначала» — без исключений и с частицами */
+    const box = T.doc.getElementById('wnKit'); let click = null;
+    box.addEventListener = (t, f) => { if (t === 'click') click = f; };
     run('UI-кит · paint', () => kit.paint());
+    if (!click) say('UI-кит: кнопки раздела не слушаются');
+    else for (const k of ['7', 'all', 'reroll', 'pick', 'back', 'pick']) {
+      P.fxLog.length = 0;
+      run('UI-кит · ' + k, () => click({ target: { closest: () => ({ dataset: { wnkit: k } }) } }));
+      P.advance(5000);
+      if (k !== 'back' && !P.fxLog.some(x => x.k === 'burst')) say(`UI-кит: «${k}» — без частиц`);
+    }
   }
   const m = T.MAP.find(x => x.n === 'Странник');
   if (!m || !m.ready || !['wanderer-passives', 'artifacts', 'achievements', 'server-firsts'].every(id => m.ready.includes(id))) say('карта экранов: «Странник» не отмечен готовым');

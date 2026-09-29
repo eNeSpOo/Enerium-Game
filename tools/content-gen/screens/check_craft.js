@@ -10,7 +10,13 @@
       «Правила воздуха»: у стола и книги нет лишних подписей, сведения о ресурсе — лист по нажатию.
    4. Запасы меняются как положено: попытка списывает весь стол, неудача ничего не создаёт, повторное нажатие не повторяет расход,
       особый ресурс без согласия не списывается, герой приходит в коллекцию с 0 ур., 0 РП и 0 Добл.
-   5. Все классы ws-* из craft.js описаны в craft.css.
+   5. Все классы ws-* из craft.js описаны в craft.css; ни в одном теге нет второго style или class.
+   6. Анимация удачи и неудачи: итог выдан сервером до анимации одной операцией с номером, повтор номера ничего не меняет;
+      полная версия — новый рецепт с книгой и герой; короткая — известный рецепт, автодокрафт, серия; короткая без листа закрывается
+      строкой; неудача — нити рвутся, трещины, пепел, что сгорело, подсказка только положенная; нажатие на сцену и галочка — сразу итог,
+      «меньше движения» — без анимации; таймеры показа — в свои моменты; моменты и задержки — целые мс; трещины и дым — от сида
+      операции; места круга совпадают со столом; раздел UI-кита — пробы и раскадровка, проба — не выдача; ключевые кадры — только
+      transform и opacity.
    Запуск: node tools/content-gen/screens/check_craft.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -62,6 +68,8 @@ vm.runInContext(`globalThis.__ws = {
   get S() { return S; }, reset() { S = initialState(); S.route = 'craft'; S.seg.craft = 'work'; },
   html() { render(); return document.getElementById('game').innerHTML; },
   ACT, BAG, WS_DATA, WS_SRV, RSI, rsHas, FLOWS, EN_RECIPES, wsPut, wsSetTable, wsToCraft,
+  WS_FX, WS_KIT, wsCracks, wsKitHtml, wsKitPlay, wsKitAct, wsKitBoardHtml, KIT_EXTRA,
+  kitStage() { return document.getElementById('wsKitStage').innerHTML; },
 };`, ctx);
 const W = win.__ws, R = W.EN_RECIPES, A = W.ACT;
 
@@ -94,6 +102,8 @@ function look(label, h) {
   if (typeof h !== 'string' || !h) { err.push(label + ': пустая разметка'); return ''; }
   const bad = h.match(/undefined|NaN|\[object /);
   if (bad) err.push(`${label}: в разметке «${bad[0]}» — …${h.slice(Math.max(0, bad.index - 90), bad.index + 30).replace(/\s+/g, ' ')}…`);
+  const dup = h.match(/<[a-z]+\b[^>]*?\s(style|class)="[^"]*"[^>]*?\s\1="/);   // второй style или class в теге браузер молча отбросит
+  if (dup) err.push(`${label}: в теге дважды ${dup[1]} — ${dup[0].slice(0, 120)}`);
   for (const [why, s] of leaks) if (h.includes(s)) err.push(`${label}: ${why} — «${s}»`);
   service(label, h);
   return h;
@@ -175,10 +185,17 @@ scene('найденный рецепт на столе', () => {
   A.wsqset('', { value: '2' }); eq('ввод числа', W.S.ws.cells[0].q, 2);
   const b = snap(['fang', 'k1_hunt', 'p_fang']);
   A.wstry();
-  ok('чистое совпадение — без подтверждения', !W.S.overlay);
+  /* чистый найденный рецепт — без подтверждения, сразу короткая анимация без листа; итог выдан до неё */
+  const fx = W.S.ws.fx;
+  ok('чистое совпадение — без подтверждения, сразу короткая анимация', !!W.S.overlay && W.S.overlay.t === 'wsres' && !!fx && fx.tempo === 'short' && fx.auto && fx.phase === 'anim');
   eq('клык списан', q('fang'), b.fang - 2); eq('ключ списан', q('k1_hunt'), b.k1_hunt - 1); eq('заготовка создана', q('p_fang'), b.p_fang + 1);
   ok('стол очищен', W.S.ws.cells.every(c => !c));
+  h = view('короткая анимация');
+  ok('короткая без листа: нет листа итога', !h.includes('ws-fx-pn')); ok('короткая: круг и итог', h.includes('ws-fx-short') && h.includes('ws-fx-res'));
+  A.wsfxreveal();
+  ok('нажатие на сцену: короткая без листа закрывается', !W.S.overlay && !W.S.ws.fx);
   ok('тост «Создано»', !!W.S.toast && /Создано/.test(W.S.toast.t));
+  eq('пропуск не выдаёт второй раз', q('p_fang'), b.p_fang + 1);
   view('после создания');
 });
 
@@ -206,7 +223,11 @@ scene('неудача', () => {
   eq('гриб сгорел', q('mushroom'), b.mushroom - 1); eq('соль сгорела', q('salt'), b.salt - 2);
   eq('итог — неудача', W.S.overlay && W.S.overlay.res && W.S.overlay.res.kind, 'fail');
   const h = view('итог неудачи');
-  ok('нет «Подсказки нет»', h.includes('Подсказки нет')); ok('нет «Повторить набор»', h.includes('data-a="wsrepeat"'));
+  /* неудача честно: что сгорело по §12; подсказки нет — нет и строки о ней */
+  ok('нет «Сгорело всё положенное»', h.includes('Сгорело всё положенное')); ok('подсказки не положено — а строка есть', !h.includes('class="ws-hint"'));
+  ok('нет «Повторить набор»', h.includes('data-a="wsrepeat"'));
+  ok('неудача: нет трещин', (h.match(/class="ws-fx-ck"/g) || []).length > 0); eq('неудача: предметов на круге', (h.match(/class="ws-fx-it"/g) || []).length, 2);
+  eq('неудача: нити рвутся надвое', (h.match(/class="ws-fx-t1"/g) || []).length, 2);
   A.wsrepeat(); eq('повтор набора', cellsTxt(), 'mushroom×1,salt×2');
   view('повтор набора');
 });
@@ -241,6 +262,7 @@ scene('подсказки и герой', () => {
   ok('рецепт героя найден', W.BAG.known(rid)); ok('подсказка снята', !W.S.ws.part[rid]); eq('герой не лёг в запасы', q('h_c1_20'), 0);
   h = view('герой создан');
   ok('итог: нет «0 ур. · 0 РП · 0 Добл»', h.includes('0 ур. · 0 РП · 0 Добл')); ok('итог: нет карточки героя', h.includes('data-a="rhero"'));
+  ok('итог героя — лицо в свете редкости, полная версия', h.includes('class="ws-fx-hero"') && W.S.ws.fx && W.S.ws.fx.tempo === 'full');
   /* повтор героя */
   A.close(); A.wsview('book'); A.wsbtab('all');
   ok('книга: нет «в коллекции»', view('книга: герой в коллекции').includes('в коллекции'));
@@ -405,17 +427,187 @@ scene('на стол из других экранов', () => {
 });
 
 scene('потоки презентации', () => {
-  for (const nm of ['Мастерская', 'Мастерская · подсказки', 'Мастерская · автодокрафт']) {
+  for (const nm of ['Мастерская', 'Мастерская · удача', 'Мастерская · неудача', 'Мастерская · подсказки', 'Мастерская · автодокрафт']) {
     const f = W.FLOWS.find(x => x[0] === nm);
     if (!f) { err.push(`нет потока «${nm}»`); continue; }
     W.reset(); f[2]();
     const h = view('поток · ' + nm);
     if (nm === 'Мастерская') ok('поток «Мастерская»: найденный рецепт на столе', h.includes('Совпадает с рецептом'));
+    if (nm === 'Мастерская · удача') ok('поток «удача»: полная анимация и новая запись', !!W.S.ws.fx && W.S.ws.fx.tempo === 'full' && W.S.ws.fx.isNew && h.includes('ws-fx-bk'));
+    if (nm === 'Мастерская · неудача') ok('поток «неудача»: анимация неудачи', !!W.S.ws.fx && W.S.ws.fx.kind === 'fail' && h.includes('ws-fx-ck'));
     if (nm === 'Мастерская · автодокрафт') ok('поток автодокрафта: согласие на уникальный', h.includes('data-a="wsok"'));
   }
 });
 
-console.log(`Разметок проверено: ${drawn}. Состояния: пустой стол, найденный рецепт, лишнее, неудача, подсказки (появление, позиция, послабление), случайное открытие, герои из рецептов, книга, автодокрафт, сведения, перенос, потоки.`);
+/* 6. анимация крафта: исход решает сервер до анимации, темпы, пропуск нажатием и галочкой, «меньше движения», повтор номера,
+   таймеры показа, трещины от сида, UI-кит, стили — только transform и opacity */
+const timers = [];
+const fakeTimers = on => { timers.length = 0; win.setTimeout = on ? (f, ms) => { timers.push({ f, ms: ms | 0 }); return timers.length; } : () => 0; };
+const flush = () => { timers.splice(0).sort((a, b) => a.ms - b.ms).forEach(t => { try { t.f(); } catch (e) { err.push('таймер показа: ' + e.message); } }); };
+const styleNums = h => [...h.matchAll(/--(?:dt|dk|dp|da|d0|dx|tt|tp|tsh|tpn|tfd):(-?[\d.]+)ms/g)].map(m => m[1]);
+const madeIds = ['p_fang', 'plank', 'dye', 'a_arrow'];
+
+scene('анимация: удача и новая запись', () => {
+  W.reset();
+  const D = W.WS_DATA.demo, F = W.WS_FX;
+  W.wsSetTable(D.made);
+  const b = snap(madeIds);
+  A.wstry(); eq('неизвестное сочетание — подтверждение', W.S.overlay && W.S.overlay.t, 'wstry');
+  const op = W.S.overlay.op;
+  ok('номер операции у подтверждения', /^ws\d+$/.test(op || '') && view('подтверждение').includes(`data-a="wstrydo" data-v="${op}"`));
+  A.wstrydo();
+  const R = W.S.ws.fx;
+  ok('удача: полная версия, новая запись', !!R && R.kind === 'made' && R.tempo === 'full' && R.isNew);
+  /* итог решает сервер до анимации: запасы и книга изменились в миг нажатия, анимация их не трогает */
+  eq('стрелы созданы до анимации', q('a_arrow'), b.a_arrow + 1); eq('заготовки списаны до анимации', q('p_fang'), b.p_fang - 2);
+  ok('рецепт в книге до анимации', W.BAG.known('r_a_arrow'));
+  let h = view('удача: анимация');
+  ok('удача: книга и чернила', h.includes('ws-fx-full') && h.includes('ws-fx-new') && h.includes('class="ws-fx-bk"') && h.includes('ws-fx-ink'));
+  eq('удача: нитей', (h.match(/class="ws-fx-th"/g) || []).length, 3); eq('удача: предметов', (h.match(/class="ws-fx-it"/g) || []).length, 3);
+  ok('удача: ядро раскаляется и вспыхивает', h.includes('ws-fx-heat') && h.includes('ws-fx-fl'));
+  ok('удача: итог поднимается в цвете редкости', /class="ws-fx-res ws-in" data-r="\d"/.test(h));
+  ok('удача: нажатие на сцену — к итогу', h.includes('data-a="wsfxreveal"'));
+  ok('лист итога во время анимации неактивен', /class="ws-fx-pn"[^>]*\sinert/.test(h));
+  ok('нет «Новая запись в книге»', h.includes('Новая запись в книге'));
+  /* моменты — целые мс; задержки в разметке — целые */
+  const T = R.T, all = [].concat(...Object.values(T).map(v => Array.isArray(v) ? v : [v]));
+  ok('моменты показа — целые мс', all.every(Number.isInteger));
+  eq('конец с книгой', T.end, F.full.end + F.book.end);
+  ok('задержки в разметке — целые мс', styleNums(h).length > 20 && styleNums(h).every(s => /^-?\d+$/.test(s)));
+  /* повтор номера операции ничего не меняет */
+  const s1 = JSON.stringify(snap(madeIds));
+  const again = W.WS_SRV.attempt(op, [{ id: 'p_fang', q: 2, pos: 0 }, { id: 'plank', q: 2, pos: 1 }, { id: 'dye', q: 1, pos: 2 }], false);
+  ok('повтор номера — прежний ответ', !!again.again && again.res === R.res);
+  A.wstrydo(op);
+  eq('повтор не списывает и не выдаёт', JSON.stringify(snap(madeIds)), s1);
+  /* итог: мимолётного нет, лист активен, «В книгу» */
+  A.wsfxreveal();
+  eq('нажатие на сцену — итог', R.phase, 'res');
+  eq('пропуск не меняет итог', JSON.stringify(snap(madeIds)), s1);
+  h = view('удача: итог');
+  ok('итог: без мимолётного', h.includes('ws-fx-done') && !h.includes('class="ws-fx-th"') && !h.includes('class="ws-fx-it"') && !h.includes('wsfxreveal'));
+  ok('итог: лист активен', !/class="ws-fx-pn"[^>]*\sinert/.test(h));
+  ok('итог: «В книгу»', h.includes('data-a="wsbookgo" data-v="r_a_arrow"'));
+  A.wsbookgo('r_a_arrow');
+  eq('«В книгу» — книга', W.S.ws.view, 'book'); eq('«В книгу» — строка нового рецепта', rows(view('книга: новая запись')), 1);
+});
+
+scene('анимация: таймеры показа', () => {
+  W.reset(); fakeTimers(true);
+  W.wsSetTable(W.WS_DATA.demo.made); A.wstry(); A.wstrydo();
+  const R = W.S.ws.fx, T = R.T, P = W.WS_FX.full, at = timers.map(t => t.ms);
+  ok('таймер вспышки', at.includes(T.flash)); ok('таймер огоньков', at.includes(T.rise + P.riseDur));
+  ok('таймер книги', at.includes(T.book + W.WS_FX.book.light)); ok('таймер итога', at.includes(T.end));
+  flush();
+  eq('после таймеров — итог', R.phase, 'res'); ok('окно итога открыто', !!W.S.overlay && W.S.overlay.t === 'wsres');
+  view('итог по таймеру');
+  /* короткая без листа закрывается сама и говорит строкой */
+  A.close(); W.wsSetTable(W.WS_DATA.demo.table); timers.length = 0; A.wstry();
+  const Q = W.S.ws.fx;
+  ok('короткая: таймер закрытия', !!Q && Q.auto && timers.some(t => t.ms === Q.T.close));
+  flush();
+  ok('короткая закрылась сама', !W.S.overlay && !W.S.ws.fx); ok('короткая: строка «Создано»', !!W.S.toast && /Создано/.test(W.S.toast.t));
+  /* неудача: разрыв нитей, пепел у каждого предмета, итог */
+  W.wsSetTable(W.WS_DATA.demo.fail); timers.length = 0; A.wstry(); A.wstrydo();
+  const N = W.S.ws.fx;
+  ok('неудача: таймер разрыва', timers.some(t => t.ms === N.T.snap));
+  eq('неудача: таймеров пепла', N.T.crumble.filter(ms => timers.some(t => t.ms === ms)).length, N.cells.length);
+  flush(); eq('неудача: итог по таймеру', N.phase, 'res');
+  fakeTimers(false);
+});
+
+scene('анимация: пропуск и «меньше движения»', () => {
+  W.reset();
+  W.S.ws.skip = true;
+  W.wsSetTable(W.WS_DATA.demo.fail); A.wstry(); A.wstrydo();
+  eq('«Пропустить анимацию» — сразу итог', W.S.ws.fx && W.S.ws.fx.phase, 'res');
+  ok('галочка стоит', /data-a="wsfxskip" checked/.test(view('пропуск: итог')));
+  A.close(); W.wsSetTable(W.WS_DATA.demo.table); A.wstry();
+  ok('пропуск: короткая без листа — сразу строкой', !W.S.overlay && !!W.S.toast && /Создано/.test(W.S.toast.t));
+  W.S.ws.skip = false;
+  /* галочка посреди анимации — итог сразу, выбор запомнен */
+  W.wsSetTable(W.WS_DATA.demo.fail); A.wstry(); A.wstrydo();
+  const R = W.S.ws.fx; eq('без пропуска — анимация', R && R.phase, 'anim');
+  A.wsfxskip('', { checked: true }); eq('галочка посреди анимации — итог', R.phase, 'res'); ok('выбор запомнен', W.S.ws.skip === true);
+  A.wsfxskip('', { checked: false });
+  /* «меньше движения» в системе: анимации нет, галочка недоступна */
+  const mm = win.matchMedia;
+  win.matchMedia = qq => ({ matches: /reduce/.test(qq), addEventListener() {}, addListener() {} });
+  A.close(); W.wsSetTable(W.WS_DATA.demo.fail); A.wstry(); A.wstrydo();
+  eq('«меньше движения» — сразу итог', W.S.ws.fx && W.S.ws.fx.phase, 'res');
+  ok('«меньше движения»: галочка недоступна', /data-a="wsfxskip" checked disabled/.test(view('меньше движения')));
+  win.matchMedia = mm;
+});
+
+scene('анимация: автодокрафт и серия — короткая', () => {
+  W.reset();
+  A.wsmake('r_p_frame'); A.wsn('max'); const n = W.S.overlay.n;
+  const b = snap(['p_frame']);
+  A.wsmakedo();
+  const R = W.S.ws.fx;
+  eq('автодокрафт выдан до анимации', q('p_frame'), b.p_frame + n);
+  ok('автодокрафт: короткая с листом', !!R && R.kind === 'make' && R.tempo === 'short' && !R.auto);
+  const h = view('автодокрафт: анимация');
+  ok('автодокрафт: «Автодокрафт ×N» в шапке', n === 1 || h.includes('Автодокрафт ×' + n));
+  ok('серия: удары ядра', n < 2 || /class="ws-fx-thump"[^>]*--n:\d/.test(h));
+  ok('автодокрафт: «Списано» — в подробностях', /<details class="ws-fx-det"><summary>Списано/.test(h));
+  eq('автодокрафт: ингредиентов на круге', (h.match(/class="ws-fx-it"/g) || []).length, W.BAG.recipe('r_p_frame').in.length);
+  ok('короткая короче полной', R.T.end < W.WS_FX.full.end);
+  A.wsmakedo(); eq('повторное нажатие не повторяет автодокрафт', q('p_frame'), b.p_frame + n);
+});
+
+scene('анимация: трещины и дым — от сида операции', () => {
+  const G = W.WS_FX.geo, c = G.circ / 2;
+  const s1 = W.wsCracks(W.WS_SRV.seed('ws7')), s2 = W.wsCracks(W.WS_SRV.seed('ws7')), s3 = W.wsCracks(W.WS_SRV.seed('ws8'));
+  ok('та же операция — те же трещины', JSON.stringify(s1) === JSON.stringify(s2)); ok('другая операция — другие трещины', JSON.stringify(s1) !== JSON.stringify(s3));
+  ok('трещины есть', s1.length >= W.WS_FX.crack.from);
+  ok('трещины в круге', s1.every(x => (x.x - c) ** 2 + (x.y - c) ** 2 <= c * c));
+  ok('трещины — целые px и градусы', s1.every(x => [x.x, x.y, x.a, x.l].every(Number.isInteger)));
+  /* места круга совпадают со столом: шесть мест, нить смотрит в центр */
+  eq('мест на круге', G.hex.length, W.WS_DATA.cells);
+  G.hex.forEach(([x, y], i) => { const a = (Math.round(Math.atan2(-y, -x) * 180 / Math.PI) + 360) % 360; ok(`нить места ${i} смотрит в центр: ${G.ang[i]}° против ${a}°`, Math.abs(((G.ang[i] - a + 540) % 360) - 180) <= 1); });
+  /* раскладка итога помещается в кадр телефона 932 × 430 и 844 × 390: круг слева, лист справа, не заходят друг на друга и под шапку */
+  const top = 44;   // шапка окна: подпись, галочка, крестик
+  for (const [w, h] of [[932, 430], [844, 390]]) {
+    const cx = w / 2 - G.shift, cy = h / 2 + G.top, pl = w / 2 + G.paneX, pr = pl + Math.min(G.pane, w / 2 - 24);
+    ok(`${w}×${h}: круг в кадре`, cx - c >= 0 && cy - c >= top && cy + c <= h);
+    ok(`${w}×${h}: лист в кадре`, pr <= w - 8);
+    ok(`${w}×${h}: круг и лист не заходят друг на друга`, cx + c + 8 <= pl);
+    ok(`${w}×${h}: круг в середине до итога`, h / 2 + G.top - c >= top);
+  }
+  const cellR = Math.max(...G.hex.map(([x, y]) => Math.round(Math.sqrt(x * x + y * y)))) + G.cell / 2;
+  ok('места внутри круга', cellR <= c);
+});
+
+scene('UI-кит: крафт — удача и неудача', () => {
+  W.reset();
+  const before = JSON.stringify({ bag: W.S.bag, wallet: W.S.wallet, part: W.S.ws.part, owned: W.S.rs.owned });
+  ok('раздел в KIT_EXTRA', W.KIT_EXTRA.some(x => x.html === W.wsKitHtml));
+  ok('раздел UI-кита есть', look('UI-кит · раздел', W.wsKitHtml()).includes('Крафт: удача и неудача'));
+  for (const k of ['made', 'new', 'hero', 'make', 'fail', 'hint']) { W.wsKitPlay(k); look('UI-кит · проба ' + k, W.kitStage()); }
+  ok('проба героя — лицо', (W.wsKitPlay('hero'), W.kitStage()).includes('ws-fx-hero'));
+  ok('проба с подсказкой — подсказка', (W.wsKitPlay('hint'), W.kitStage()).includes('появился в книге'));
+  for (let r = 1; r <= 7; r++) { W.wsKitAct('r:' + r); const hh = look('UI-кит · редкость ' + r, W.kitStage()); ok(`проба редкости ${r} — в её цвете`, hh.includes(`data-r="${r}"`)); }
+  const board = look('UI-кит · раскадровка', W.wsKitBoardHtml());
+  eq('раскадровка: кадров', (board.match(/class="ws-still"/g) || []).length, 8);
+  eq('проба — не выдача', JSON.stringify({ bag: W.S.bag, wallet: W.S.wallet, part: W.S.ws.part, owned: W.S.rs.owned }), before);
+});
+
+scene('стили анимации: только transform и opacity', () => {
+  const kf = [...CSS.matchAll(/@keyframes\s+(ws-[a-z0-9-]+)\s*\{((?:[^{}]*\{[^{}]*\})*)\s*\}/g)];
+  ok('ключевые кадры анимации найдены', kf.length >= 20);
+  for (const [, name, body] of kf) {
+    const props = [...body.matchAll(/([a-z-]+)\s*:/g)].map(m => m[1]).filter(p => p !== 'offset');
+    const bad = props.filter(p => p !== 'transform' && p !== 'opacity');
+    if (bad.length) err.push(`@keyframes ${name}: анимирует не только transform и opacity — ${[...new Set(bad)].join(', ')}`);
+  }
+  const used = new Set([...CSS.matchAll(/animation:\s*(ws-[a-z0-9-]+)/g)].map(m => m[1])), defined = new Set(kf.map(m => m[1]));
+  for (const u of used) if (!defined.has(u)) err.push(`craft.css: анимация ${u} без ключевых кадров`);
+  ok('«меньше движения» выключает анимацию сцены', /@media \(prefers-reduced-motion:reduce\)\{[^}]*\.ws-fx,\.ws-fx \*/.test(CSS.replace(/\s+/g, ' ').replace(/\{ /g, '{')));
+  ok('итог без анимации — правило ws-fx-done', CSS.includes('.ws-fx-done .ws-fx-sc *'));
+});
+
+console.log(`Разметок проверено: ${drawn}. Состояния: пустой стол, найденный рецепт, лишнее, неудача, подсказки (появление, позиция, послабление), случайное открытие, герои из рецептов, книга, автодокрафт, сведения, перенос, потоки; анимация — удача и новая запись, неудача, короткая, серия, пропуск, «меньше движения», таймеры, трещины от сида, UI-кит.`);
 done();
 
 function done() {

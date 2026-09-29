@@ -1,43 +1,52 @@
 /* Автопроверка окна открытия сундука (design/ui/screens/chest-open.js) — без браузера.
    1. index.html подключает chest-open.css и chest-open.js после bag.js; концы строк файлов окна — только CRLF; файл компилируется.
-   2. Числа вида CO_VIEW — целые; по семи редкостям — ожидание, размах дрожи, ореол, лучи, всплеск, искра, вспышка; ожидание и
-      размах растут с редкостью. У каждого вида сундука из EN_LOOTBOXES — свой материал и эмблема.
+      Стили: каждая анимация объявлена в @keyframes, а кадры двигают только transform и opacity (60 кадров на телефоне).
+   2. Числа вида CO_VIEW и арта CO_ART — целые; по семи редкостям — первый свет, дрожь, подскок крышки, ореол, лучи, столп, дымка,
+      всплеск, искра, самая ценная; растут с редкостью. Лучи — с эпической, кольца и дрожь всплеска — с древней. У каждого вида
+      сундука из EN_LOOTBOXES — свой материал заглушки и рамка рисунка: крышка над швом, корпус под ним, размеры — как у слоёв
+      tools/art-gen/chest_layers.py (PNG в art/generated, если они есть).
    3. Операция: кнопка «Открыть» карточки несёт номер операции. Выдача — до анимации: запасы, кошелёк, осколки и «из сундуков»
       изменились ровно на итог, итог — EnLoot.roll на сиде каждого сундука с прахом по коллекции (пересчёт независимый). Повтор того же
       номера ничего не выдаёт и показа не меняет; две свежие сессии с одними номерами получают одни итоги.
    4. Анимация по часам песочницы: карточки — все выпавшие записи по возрастанию ценности, самая ценная последней и крупнее, у каждой —
-      выпавшая редкость; карточка летит из щели сундука к своему месту; итог — ровно в конце, не раньше; ожидание растёт с редкостью;
-      лучи — с эпического, золотая оковка — с древнего; перерисовка посреди анимации продолжает её с того же места.
+      выпавшая редкость; карточка поднимается из щели сундука к своему месту. Свет поднимается от нижней ступени окна сундука до
+      редкости самой ценной (не больше CO_VIEW.climb ступеней), ступени — в разметке по порядку, свет щели гаснет при открытии.
+      Моменты целые и растут; итог — ровно в конце, не раньше; крышка — 3D с осью у задней кромки; лучи — с эпической, кольцо под
+      сундуком — с эпического сундука, золотой отблеск — с древнего; перерисовка посреди анимации продолжает её с того же места.
    5. Итог: одна сетка, каждая запись один раз, редкие сверху; валюта — сумма по сундукам; «Открыть ещё» — если есть такие же,
       «Открыть все · N» — если осталось два и больше, «Закрыть»; номера операций на них открывают следующие сундуки.
-   6. Пачка: ×N из карточки и «Открыть все» — короткое ожидание и одна карточка — самый ценный предмет пачки; сводка по редкостям.
-   7. «Пропустить анимацию» — итог сразу; галочка посреди анимации и нажатие на сцену — итог сразу; выбор помнит localStorage, без него
-      всё работает; при prefers-reduced-motion галочка стоит и заблокирована. Окно закрыли посреди анимации — итог сообщением, выдачи
-      второй раз нет, таймеры стоят.
-   8. Все виды × редкости × окна × циклы (× недели у осколков): показ без исключений, undefined и NaN, служебного игроку не видно.
-   9. UI-кит: раздел «Открытие сундука» — семь видов, семь редкостей, пачка; проба не меняет S; «С анимацией» раздела «Лутбоксы» —
-      те же предметы, что его список бросков. Карта экранов: шаблон «Открытие сундука», число шаблонов в сводке и в README совпадает.
-   10. Режим «Игрок»: на всех видах окна нет служебных слов (SERVICE из check_player_view.js); в режиме «Команда» — пометка о выдаче.
-   11. Сценарии презентации «Сундук · открытие» и «Сундуки · пачкой».
+   6. Пачка: ×N из карточки и «Открыть все» — короткие моменты CO_VIEW.many и одна карточка — самый ценный предмет пачки; сводка по
+      редкостям.
+   7. Нажатие на сцену ведёт к следующему моменту: замок, самая ценная, её переворот, итог — итог и выдача не меняются. «Пропустить
+      анимацию» — итог сразу; галочка посреди анимации — итог сразу; выбор помнит localStorage, без него всё работает; при
+      prefers-reduced-motion галочка стоит и заблокирована. Окно закрыли посреди анимации — итог сообщением, выдачи второй раз нет.
+   8. Арт: пока путь не выгружен — заглушка SVG и градиенты, ни одной картинки из assets/art/chests; все пути выгружены — рисунок
+      корпуса и крышки, замок и текстуры света; сундук без одного из слоёв остаётся заглушкой.
+   9. Все виды × редкости × окна × циклы (× недели у осколков): показ без исключений, undefined и NaN, служебного игроку не видно.
+   10. UI-кит: раздел «Открытие сундука» — семь видов, семь редкостей, пачка; проба не меняет S; раскадровка — пять моментов;
+       «С анимацией» раздела «Лутбоксы» — те же предметы, что его список бросков. Карта экранов: шаблон «Открытие сундука».
+   11. Режим «Игрок»: на всех видах окна нет служебных слов (SERVICE из check_player_view.js); в режиме «Команда» — пометка о выдаче.
+   12. Сценарии презентации «Сундук · открытие» и «Сундуки · пачкой».
    Запуск: node tools/content-gen/screens/check_chest_open.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const { SERVICE, strip, playerText, teamCount } = require('./check_player_view.js');
-const UI = path.join(__dirname, '..', '..', '..', 'design', 'ui');
+const ROOT = path.join(__dirname, '..', '..', '..'), UI = path.join(ROOT, 'design', 'ui');
 const read = f => fs.readFileSync(path.join(UI, f), 'utf8');
 const html = read('index.html');
 const err = [];
-const cnt = { views: 0, player: 0, ops: 0, chests: 0, synth: 0, trials: 0 };
+const cnt = { views: 0, player: 0, ops: 0, chests: 0, synth: 0, trials: 0, taps: 0, art: 0 };
 const say = m => { if (err.length < 60) err.push(m); else if (err.length === 60) err.push('… и ещё ошибки'); };
 function done() {
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
-  console.log(`Открытие сундука: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; операций ${cnt.ops}, сундуков открыто ${cnt.chests}, всех видов ${cnt.synth}, проб UI-кита ${cnt.trials}.`);
-  console.log('Проверка пройдена: итог выдан до анимации на сиде каждого сундука, повтор номера ничего не выдаёт, анимация и итог рисуются, пропуск работает, в режиме «Игрок» служебного нет.');
+  console.log(`Открытие сундука: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; операций ${cnt.ops}, сундуков открыто ${cnt.chests}, всех видов ${cnt.synth}, нажатий на сцену ${cnt.taps}, проб UI-кита ${cnt.trials}, показов с артом ${cnt.art}.`);
+  console.log('Проверка пройдена: итог выдан до анимации на сиде каждого сундука, повтор номера ничего не выдаёт, свет поднимается до самой ценной, анимация и итог рисуются, нажатие ведёт по моментам, пропуск работает, арт — по выгрузке, в режиме «Игрок» служебного нет.');
   process.exit(0);
 }
 
-/* ================== 1. файлы ================== */
+/* ================== 1. файлы и стили ================== */
 const scripts = [...html.matchAll(/<script(?:\s+src="([^"]+)")?>([\s\S]*?)<\/script>/g)].map(m => ({ src: m[1], code: m[2] }));
+const CSS = read('screens/chest-open.css');
 {
   const iB = scripts.findIndex(s => s.src === 'screens/bag.js'), iC = scripts.findIndex(s => s.src === 'screens/chest-open.js');
   if (iC < 0) say('index.html: не подключён screens/chest-open.js');
@@ -48,12 +57,27 @@ const scripts = [...html.matchAll(/<script(?:\s+src="([^"]+)")?>([\s\S]*?)<\/scr
     if (crlf !== lf || cr !== crlf) say(`${f}: концы строк не чистый CRLF — CRLF ${crlf}, LF ${lf}, CR ${cr}`);
   }
   try { new vm.Script(read('screens/chest-open.js'), { filename: 'screens/chest-open.js' }); } catch (e) { say('screens/chest-open.js: синтаксис — ' + e.message); }
+  /* кадры: только transform и opacity; каждая анимация — объявлена */
+  const css = CSS.replace(/\/\*[\s\S]*?\*\//g, ''), frames = new Map();
+  for (const m of css.matchAll(/@keyframes\s+([\w-]+)\s*\{/g)) {
+    let i = m.index + m[0].length, depth = 1; const from = i;
+    while (depth && i < css.length) { if (css[i] === '{') depth++; else if (css[i] === '}') depth--; i++; }
+    frames.set(m[1], css.slice(from, i - 1));
+  }
+  for (const [name, body] of frames) for (const p of body.matchAll(/([a-z-]+)\s*:/g)) if (!['transform', 'opacity', 'animation-timing-function'].includes(p[1])) say(`chest-open.css: @keyframes ${name} двигает ${p[1]} — только transform и opacity`);
+  const own = new Set(frames.keys()), ext = new Set(['fade']);
+  for (const m of css.matchAll(/animation(?:-name)?\s*:\s*([^;}]+)/g)) for (const part of m[1].split(',')) {
+    const name = part.trim().split(/\s+/).find(w => /^[a-z][\w-]*$/.test(w) && !/^(ease|ease-in|ease-out|ease-in-out|linear|both|forwards|backwards|none|infinite|alternate|reverse|normal|paused|running|step-start|step-end)$/.test(w));
+    if (name && !own.has(name) && !ext.has(name)) say(`chest-open.css: анимация ${name} не объявлена в @keyframes`);
+  }
+  if (/transition\s*:/.test(css.replace(/@media \(prefers-reduced-motion[\s\S]*$/, ''))) say('chest-open.css: переходы transition — движение только анимациями по времени');
 }
 if (err.length) done();
 
 /* ================== песочница ==================
    Скрипты прототипа — по порядку, как в браузере, с заглушкой DOM; boot() не запускается. Часы свои: setTimeout ставит задачу в очередь,
-   tick(мс) двигает время и выполняет задачи по порядку — так видно, когда наступает итог. storage — 'throw' или Map; reduced — меньше движения */
+   tick(мс) двигает время и выполняет задачи по порядку — так видно, когда наступает итог. storage — 'throw' или Map; reduced — меньше
+   движения; ready — выгруженные пути арта (CO_ART.ready) */
 function load(o = {}) {
   const stubEl = id => {
     const e = { id, innerHTML: '', textContent: '', value: '', hidden: false, style: { setProperty() {} }, dataset: {}, children: [],
@@ -80,7 +104,7 @@ function load(o = {}) {
     requestAnimationFrame: () => 0, cancelAnimationFrame() {}, setInterval: () => 0, clearInterval() {},
     setTimeout: (f, ms) => { const id = ++clock.id; clock.q.push({ id, at: clock.now + Math.max(0, +ms || 0), f }); return id; },
     clearTimeout: id => { clock.q = clock.q.filter(t => t.id !== id); },
-    getComputedStyle: () => ({ getPropertyValue: () => '' }), CustomEvent: function CustomEvent() {}, performance: { now: () => clock.now } };
+    getComputedStyle: () => ({ getPropertyValue: () => '' }), CustomEvent: function CustomEvent() {}, Image: function Image() {}, performance: { now: () => clock.now } };
   win.window = win; win.self = win;
   const ctx = vm.createContext(win);
   for (const s of scripts) {
@@ -92,8 +116,9 @@ function load(o = {}) {
     get S() { return S; }, set S(v) { S = v; },
     ACT, OV, FLOWS, KH, BAG, LBX, RSI, RX, LB, TEMPLATES, KIT_EXTRA, render, initialState, setTeam, fmt, rsHas, lbHtml, EnLoot: window.EnLoot,
     zpChestGroups, zpChestKey, zpV, zpDef, zpSeed, zpExtraKey,
-    CO_VIEW, CO_KINDS, CO_DEMO, CO_KIT, coShow, coReveal, coGroups, coVal, coSync, coKitAct, coKitHtml, coStageHtml,
+    CO_VIEW, CO_ART, CO_KINDS, CO_DEMO, CO_KIT, coShow, coReveal, coGroups, coVal, coSync, coKitAct, coKitHtml, coStageHtml, coChestGeo, coWinMin,
   })`, ctx);
+  if (o.ready) { T.CO_ART.ready.length = 0; T.CO_ART.ready.push(...o.ready); }   // свой набор выгруженного: [] — «без арта»
   /* время вперёд: задачи — по порядку их моментов */
   const tick = ms => {
     const end = clock.now + ms;
@@ -115,6 +140,7 @@ const decode = s => s.replace(/&(#\d+|#x[\da-f]+|[a-z]+);/gi, (x, k) => ENT[k] |
 const tips = h => [...h.matchAll(/\s(?:title|placeholder|aria-label)="([^"]*)"/g)].map(m => decode(m[1]).replace(/\s+/g, ' ').trim()).filter(Boolean);
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 const reEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const num = (sty, k) => +((sty.match(new RegExp(`(?:^|;)${reEsc(k)}:(-?\\d+)(?:px|ms|deg)?(?:;|$)`)) || [])[1]);
 /* разметка без исключений, undefined и NaN; в режиме «Игрок» — без служебных слов в тексте и подсказках */
 function clean(P, h, where) {
   cnt.views++;
@@ -131,6 +157,7 @@ function clean(P, h, where) {
 function view(P, where) { run(where, () => P.T.render()); return clean(P, P.game(), where); }
 const ovOf = h => { const i = h.indexOf('<div class="ov co-ov'); return i < 0 ? '' : h.slice(i); };
 const resOf = h => { const i = h.indexOf('<section class="co-res'); return i < 0 ? '' : h.slice(i, h.indexOf('</section>', i)); };
+const stOf = h => { const i = h.indexOf('<div class="co-st'); return i < 0 ? '' : h.slice(i); };
 /* свежая сессия: «Запасы → Сундуки», «Пропустить анимацию» — как задано */
 function fresh(P, o = {}) {
   const T = P.T;
@@ -201,9 +228,9 @@ function checkAgain(P, where, key, op, n) {
   if (!eq(s0, snap(T))) say(`${where}: повтор операции ${op} изменил запасы или кошелёк`);
   if (T.S.co.run !== r0) say(`${where}: повтор операции ${op} начал новый показ`);
 }
-/* показ по существу: карточки по ценности, самая ценная последней и крупнее, выпавшие редкости, полёт из щели, моменты */
+/* показ по существу: карточки по ценности, самая ценная последней и крупнее, выпавшие редкости, подъём из щели, ступени света, моменты */
 function checkRun(P, where, R, h) {
-  const T = P.T, V = T.CO_VIEW, G = V.geo, many = R.n > 1;
+  const T = P.T, V = T.CO_VIEW, G = V.geo, many = R.n > 1, M = V.many;
   const all = R.items, best = all.reduce((b, c) => T.coVal(c) > T.coVal(b) ? c : b, all[0]);
   if (!all.length) { say(`${where}: в показе нет выпавших записей`); return; }
   if (many ? R.cards.length !== 1 : R.cards.length !== all.length) say(`${where}: карточек ${R.cards.length}, ждали ${many ? 1 : all.length}`);
@@ -217,27 +244,59 @@ function checkRun(P, where, R, h) {
     const want = L && L.op === R.op ? [].concat(...L.sum.log.map(x => x.items)).map(rec).sort() : null;
     if (want && !eq(R.items.map(rec).sort(), want)) say(`${where}: записи показа не те, что выданы`);
   }
-  const t = R.T, ts = [t.tW, t.tO].concat(t.cards, [t.end]);
+  /* свет: от нижней ступени окна сундука до редкости самой ценной, подряд, не больше CO_VIEW.climb ступеней вверх */
+  const lo = T.coWinMin(R.cs), up = many ? M.climb : V.climb, cl = R.climb;
+  if (R.b !== last.r) say(`${where}: свет поднимается не до редкости самой ценной — ${R.b} против ${last.r}`);
+  if (!cl.length || cl[cl.length - 1] !== R.b || cl[0] !== Math.min(R.b, Math.max(lo, R.b - up)) || cl.some((x, i) => i && x !== cl[i - 1] + 1)) say(`${where}: ступени света ${cl.join('→')} при окне от ${lo} и самой ценной ${R.b}`);
+  /* моменты: целые, растут; длительности — из CO_VIEW */
+  const t = R.T, s = cl.length - 1, H = t.H;
+  const ts = [t.land, t.climb0].concat(t.lv.slice(1), [t.lock, t.open], t.cards, [t.hero.hover, t.hero.flip, t.hero.shown, t.end]);
   if (ts.some(x => !Number.isInteger(x))) say(`${where}: моменты анимации не целые`);
-  for (let i = 1; i < ts.length; i++) if (ts[i] <= ts[i - 1]) say(`${where}: моменты анимации не растут — ${ts.join(', ')}`);
-  if (t.wait !== (many ? V.waitMany : V.wait[R.r - 1])) say(`${where}: ожидание ${t.wait}, ждали ${many ? V.waitMany : V.wait[R.r - 1]}`);
+  for (let i = 1; i < ts.length; i++) if (ts[i] <= ts[i - 1]) { say(`${where}: моменты анимации не растут — ${ts.join(', ')}`); break; }
+  const charge = many ? M.charge : V.charge[R.r - 1], step = many ? M.step : V.step, fin = many ? M.final : V.final;
+  if (t.open - t.climb0 !== charge + (s ? (s - 1) * step + fin : 0)) say(`${where}: предвкушение ${t.open - t.climb0} мс, ждали ${charge + (s ? (s - 1) * step + fin : 0)}`);
+  const want = many ? [M.rise, M.hover, M.flip, M.hold] : [V.hero.rise, V.hero.hover, V.hero.flip, V.hero.hold].map(a => a[R.b - 1]);
+  if (!eq([H.rise, H.hover, H.flip, H.hold], want) || t.hero.hover - t.hero.start !== H.rise || t.end - t.hero.shown !== H.hold) say(`${where}: моменты самой ценной не из CO_VIEW`);
+  if (!eq(t.beats, [t.lock, t.hero.start, t.hero.flip, t.end])) say(`${where}: нажатие ведёт не по моментам замок → самая ценная → переворот → итог`);
   if (!h) return;
-  const st = h.slice(h.indexOf('<div class="co-st'));
+  const st = stOf(h);
+  /* щель сундука — точка, откуда поднимаются карточки */
+  const chest = st.match(/<div class="co-chest co-a( art)?" data-g="(\d)" style="([^"]*)"/), mpt = st.match(/<i class="co-mpt" style="([^"]*)"/);
+  if (!chest || !mpt) { say(`${where}: нет сундука или точки щели`); return; }
+  const mx = num(chest[3], 'left') + num(mpt[1], 'left'), my = num(chest[3], 'top') + num(mpt[1], 'top');
+  if (Math.abs(mx - G.w / 2) > 1) say(`${where}: щель сундука не посередине сцены`);
+  if (+chest[2] !== (R.r >= V.gild ? 1 : 0)) say(`${where}: золотой отблеск не по редкости сундука`);
+  if (num(chest[3], 'top') + num(chest[3], 'height') !== G.h - G.ground) say(`${where}: сундук стоит не на земле`);
   const cards = [...st.matchAll(/<div class="co-card co-a( best)?[^"]*" data-r="(\d)" data-i="(\d+)"[^>]*style="([^"]*)"/g)];
   if (cards.length !== R.cards.length) say(`${where}: карточек в разметке ${cards.length}, в показе ${R.cards.length}`);
-  const mx = G.w / 2, my = G.h - G.chest[1] - G.pad + G.seam;
   cards.forEach((m, i) => {
-    const c = R.cards[+m[3]], sty = m[4], num = k => +((sty.match(new RegExp(`(?:^|;)${k}:(-?\\d+)(?:px|ms)?`)) || [])[1]);
+    const c = R.cards[+m[3]], sty = m[4];
     if (!!m[1] !== (i === cards.length - 1)) say(`${where}: «самая ценная» — не у последней карточки`);
     if (c && +m[2] !== c.r) say(`${where}: у карточки редкость ${m[2]}, выпало ${c.r}`);
-    const L = num('left'), Tp = num('top'), w = num('--w'), hh = num('--h'), fx = num('--fx'), fy = num('--fy');
-    if (Math.abs(L + w / 2 + fx - mx) > 1 || Math.abs(Tp + hh / 2 + fy - my) > 1) say(`${where}: карточка ${i} вылетает не из щели сундука`);
-    if (i === cards.length - 1 && (w !== G.best[0] || hh !== G.best[1])) say(`${where}: самая ценная карточка не крупнее`);
+    const L = num(sty, 'left'), Tp = num(sty, 'top'), w = num(sty, '--w'), hh = num(sty, '--h'), fx = num(sty, '--fx'), fy = num(sty, '--fy');
+    if (Math.abs(L + w / 2 + fx - mx) > 1 || Math.abs(Tp + hh / 2 + fy - my) > 1) say(`${where}: карточка ${i} поднимается не из щели сундука`);
+    if (L < 0 || L + w > G.w || Tp < 0) say(`${where}: карточка ${i} за краем сцены`);
+    const big = i === cards.length - 1;
+    if (big ? (w !== G.hero[0] || hh !== G.hero[1]) : (w !== G.card[0] || hh !== G.card[1])) say(`${where}: размер карточки ${i} не из CO_VIEW.geo`);
+    if (!/--tp:\d+ms/.test(sty) || !/--ta:-?\d+deg/.test(sty)) say(`${where}: у карточки ${i} нет переворота или шлейфа`);
   });
-  if (/style="[^"]*\d\.\d/.test(st.replace(/<svg[\s\S]*?<\/svg>/g, ''))) say(`${where}: в стилях сцены дробные числа`);
-  const chest = st.match(/<div class="co-chest co-a" data-g="(\d)"/);
-  if (!chest || +chest[1] !== (R.r >= V.gild ? 1 : 0)) say(`${where}: золотая оковка не по редкости`);
-  if (st.includes('class="co-rays"') !== (R.r >= V.rays)) say(`${where}: лучи ${R.r >= V.rays ? 'пропали' : 'лишние'} у редкости ${R.r}`);
+  if (/style="[^"]*\d\.\d/.test(st.replace(/<svg[\s\S]*?<\/svg>/g, '').replace(/url\('[^']*'\)/g, ''))) say(`${where}: в стилях сцены дробные числа`);
+  /* ступени света — по порядку: ореол, изнанка крышки и щель; последняя ступень щели гаснет при открытии */
+  const lvOf = cls => [...st.matchAll(new RegExp(`<(?:div|i) class="${cls} co-lvx( z)?" data-r="(\\d)" style="([^"]*)"`, 'g'))];
+  for (const cls of ['co-lv', 'co-ulv', 'co-crk']) {
+    const L = lvOf(cls);
+    if (!eq(L.map(x => +x[2]), cl)) { say(`${where}: ступени ${cls} — ${L.map(x => x[2]).join('→')}, ждали ${cl.join('→')}`); continue; }
+    if (cls === 'co-crk') { const z = L[L.length - 1]; if (z[1] || !z[3].includes(`--l1:${num(st.match(/style="([^"]*)"/)[1], '--do')}ms`)) say(`${where}: свет щели не гаснет при открытии`); }
+    else if (!L[L.length - 1][1] || L.slice(0, -1).some(x => x[1])) say(`${where}: у ${cls} последней остаётся не последняя ступень`);
+  }
+  /* крышка — 3D с осью у задней кромки; замок; лучи — с эпической; кольцо под сундуком — с эпического сундука */
+  const lid = st.match(/<div class="co-lid co-a" style="[^"]*transform-origin:50% 100% -(\d+)px"/);
+  if (!lid || !(+lid[1] > 0)) say(`${where}: у крышки нет оси у задней кромки`);
+  if (!/<div class="co-lock co-a"/.test(st)) say(`${where}: нет замка`);
+  if (st.includes('class="co-rays co-a"') !== (R.b >= V.rays)) say(`${where}: лучи ${R.b >= V.rays ? 'пропали' : 'лишние'} у редкости ${R.b}`);
+  if (st.includes('class="co-hrays co-a"') !== (R.b >= V.rays)) say(`${where}: лучи самой ценной ${R.b >= V.rays ? 'пропали' : 'лишние'} у редкости ${R.b}`);
+  if (st.includes('class="co-rune co-a"') !== (R.r >= V.rune)) say(`${where}: кольцо под сундуком ${R.r >= V.rune ? 'пропало' : 'лишнее'} у сундука ${R.r}`);
+  if (!st.includes(`data-co-run="${R.id}"`)) say(`${where}: сцена не помечена своим показом`);
 }
 /* итог: сетка, редкие сверху, валюта, кнопки по остатку; номер операции на кнопках — следующий */
 function checkRes(P, where, R, h) {
@@ -265,31 +324,62 @@ function checkRes(P, where, R, h) {
   if (!/data-a="close">Закрыть</.test(r)) say(`${where}: в итоге нет «Закрыть»`);
 }
 
-/* ================== 2. данные вида ================== */
+/* ================== 2. данные вида и арта ================== */
 const P = load({ storage: new Map() });
 const { T } = P;
-const V = T.CO_VIEW;
+const V = T.CO_VIEW, ART = T.CO_ART;
 {
   const bad = [];
-  (function walk(x, k) { if (typeof x === 'number') { if (!Number.isInteger(x)) bad.push(k); } else if (x && typeof x === 'object') for (const [kk, v] of Object.entries(x)) walk(v, k + '.' + kk); })(V, 'CO_VIEW');
-  if (bad.length) say('CO_VIEW: не целые числа — ' + bad.slice(0, 8).join(', '));
-  for (const k of ['wait', 'amp', 'halo', 'ray']) if (!Array.isArray(V[k]) || V[k].length !== 7) say(`CO_VIEW.${k}: не семь значений по редкостям`);
-  for (const k of ['open', 'card']) if (!Array.isArray(V.fx[k]) || V.fx[k].length !== 7) say(`CO_VIEW.fx.${k}: не семь значений по редкостям`);
-  if (V.fx.best.flash.length !== 7) say('CO_VIEW.fx.best.flash: не семь значений');
-  for (const k of ['wait', 'amp', 'halo']) for (let i = 1; i < 7; i++) if (V[k][i] < V[k][i - 1]) say(`CO_VIEW.${k}: у редкости ${i + 1} меньше, чем у ${i}`);
+  const walk = (x, k) => { if (typeof x === 'number') { if (!Number.isInteger(x)) bad.push(k); } else if (x && typeof x === 'object') for (const [kk, v] of Object.entries(x)) walk(v, k + '.' + kk); };
+  walk(V, 'CO_VIEW'); walk(ART, 'CO_ART');
+  if (bad.length) say('CO_VIEW и CO_ART: не целые числа — ' + bad.slice(0, 8).join(', '));
+  const seven = (a, k) => { if (!Array.isArray(a) || a.length !== 7) { say(`${k}: не семь значений по редкостям`); return false; } return true; };
+  const grows = (a, k) => { if (seven(a, k)) for (let i = 1; i < 7; i++) if (a[i] < a[i - 1]) { say(`${k}: у редкости ${i + 1} меньше, чем у ${i}`); break; } };
+  for (const k of ['charge', 'amp', 'lift', 'halo', 'ray', 'beam', 'haze']) grows(V[k], 'CO_VIEW.' + k);
+  for (const k of ['rise', 'hover', 'flip', 'hold', 'zoom', 'dim']) grows(V.hero[k], 'CO_VIEW.hero.' + k);
+  seven(V.fx.open, 'CO_VIEW.fx.open'); seven(V.fx.card, 'CO_VIEW.fx.card');
+  if (V.rays !== 4) say('CO_VIEW.rays: лучи — с эпической (ADR-0028, п. 13)');
+  if (V.gild !== 5) say('CO_VIEW.gild: золотой отблеск — с древнего сундука (ADR-0028, п. 13)');
   for (let i = 0; i < 7; i++) {
     const O = V.fx.open[i];
     if (!O.sparks || !O.streaks || !O.flash) say(`CO_VIEW.fx.open[${i}]: нет искр, полос или вспышки`);
-    if (i + 1 >= V.rays && !V.ray[i]) say(`CO_VIEW.ray[${i}]: лучей нет с эпического`);
-    if (!!O.rings !== (i + 1 >= 5) || !!O.shake !== (i + 1 >= 5)) say(`CO_VIEW.fx.open[${i}]: кольца и дрожь — не с древнего`);
+    if (!!V.ray[i] !== (i + 1 >= V.rays)) say(`CO_VIEW.ray[${i}]: лучи — ровно с эпической`);
+    if (!!O.rings !== (i + 1 >= 5) || !!O.shake !== (i + 1 >= 5)) say(`CO_VIEW.fx.open[${i}]: кольца и дрожь — не с древней`);
     if (i && O.sparks[0] <= V.fx.open[i - 1].sparks[0]) say(`CO_VIEW.fx.open[${i}]: всплеск не богаче, чем у редкости ниже`);
+    if (i && V.fx.card[i][0] <= V.fx.card[i - 1][0]) say(`CO_VIEW.fx.card[${i}]: искра не богаче, чем у редкости ниже`);
   }
+  if (!(V.climb >= 1 && V.many.climb >= 1 && V.many.climb <= V.climb)) say('CO_VIEW: ступеней света у пачки больше, чем у одного сундука');
+  if (!(V.many.charge < V.charge[0] && V.many.hold <= V.hero.hold[6])) say('CO_VIEW.many: пачка не короче одного сундука');
+  if (!(V.lockLead < V.final && V.lockLead < V.many.final)) say('CO_VIEW.lockLead: замок рвётся раньше последней ступени света');
+  /* виды: материал заглушки и рамка рисунка — крышка над швом, корпус под ним, обе внутри рамки */
+  const gen = path.join(ROOT, 'art', 'generated'), layers = JSON.parse(fs.readFileSync(path.join(ROOT, 'tools', 'art-gen', 'jobs', 'chests.json'), 'utf8')).layers;
+  const pngSize = f => { try { const b = fs.readFileSync(f); return b.toString('ascii', 12, 16) === 'IHDR' ? [b.readUInt32BE(16), b.readUInt32BE(20)] : null; } catch (_) { return null; } };
+  const geo = (k, g) => {
+    const [fx, fy, fw, fh] = g.frame, [lx, ly, lw, lh] = g.lid, [bx, by, bw, bh] = g.body;
+    if (!(ly + lh >= g.seam && ly + lh <= g.seam + 4 && by <= g.seam && by >= g.seam - 4)) say(`CO_ART.${k}: крышка и корпус не сходятся на шве ${g.seam}`);
+    if (lx < fx || ly !== fy || lx + lw > fx + fw || bx < fx || bx + bw > fx + fw || by + bh !== fy + fh) say(`CO_ART.${k}: крышка или корпус вне рамки`);
+  };
   for (const k of Object.keys(T.LBX.boxes)) {
-    const K = T.CO_KINDS[k];
+    const K = T.CO_KINDS[k], g = ART.chests[k];
     if (!K) { say(`CO_KINDS: нет вида ${k}`); continue; }
     for (const c of ['wood', 'wood2', 'metal', 'metal2']) if (!/^#[0-9a-f]{6}$/i.test(K[c] || '')) say(`CO_KINDS.${k}.${c}: не цвет #rrggbb`);
     if (!K.n || !K.ic) say(`CO_KINDS.${k}: нет подписи или эмблемы`);
+    if (!g) { say(`CO_ART.chests: нет рамки вида ${k}`); continue; }
+    geo(k, g);
+    const L = layers.chests[k];
+    if (!L || L.seam !== g.seam) say(`CO_ART.${k}: шов не тот, что в jobs/chests.json`);
+    else for (const part of ['body', 'lid']) {
+      const f = path.join(gen, L.from.replace(/\.png$/, `.${part}.png`)), px = pngSize(f);
+      if (px && (px[0] !== g[part][2] || px[1] !== g[part][3])) say(`CO_ART.${k}.${part}: ${g[part][2]}×${g[part][3]}, а слой ${px[0]}×${px[1]}`);
+    }
   }
+  geo('svg', ART.svg);
+  const lockPx = pngSize(path.join(gen, layers.items.lock.from.replace(/\.png$/, '.clean.png')));
+  if (lockPx && !eq(lockPx, ART.lock)) say(`CO_ART.lock: ${ART.lock.join('×')}, а замок ${lockPx.join('×')}`);
+  if (!eq([...ART.fx].sort(), Object.keys(layers.fx).sort())) say('CO_ART.fx: не те текстуры, что в jobs/chests.json');
+  const paths = Object.keys(ART.chests).flatMap(k => [`chests/${k}-body.png`, `chests/${k}-lid.png`]).concat('chests/lock.png', ART.fx.map(n => `chests/fx-${n}.png`));
+  for (const p of ART.ready) if (!paths.includes(p)) say(`CO_ART.ready: лишний путь ${p}`);
+  for (const p of ART.ready) if (!fs.existsSync(path.join(UI, 'assets', 'art', p))) say(`CO_ART.ready: ${p} отмечен, а файла в design/ui/assets/art нет`);
 }
 
 /* ================== 3–5. одна операция: выдача до анимации, пересчёт, повтор, анимация, итог ================== */
@@ -307,13 +397,13 @@ const V = T.CO_VIEW;
     const h1 = view(P, 'анимация · начало');
     checkRun(P, 'анимация', R, h1);
     if (resOf(h1)) say('анимация: итог открыт сразу, до конца анимации');
-    if (!/data-a="coreveal"/.test(ovOf(h1))) say('анимация: сцену нельзя нажать, чтобы сразу увидеть итог');
+    if (!/data-a="coreveal"/.test(ovOf(h1))) say('анимация: сцену нельзя нажать');
     /* перерисовка посреди анимации: задержки отсчитаны от начала — анимация продолжается с того же места */
-    P.tick(R.T.tO + 100);
+    P.tick(R.T.open + 100);
     const hm = view(P, 'анимация · перерисовка посреди');
-    if (!hm.includes(`--do:${R.T.tO - (R.T.tO + 100)}ms`)) say('перерисовка посреди анимации: задержка открытия не отсчитана от начала');
+    if (!hm.includes(`--do:${R.T.open - (R.T.open + 100)}ms`)) say('перерисовка посреди анимации: задержка открытия не отсчитана от начала');
     if (R.phase !== 'anim') say('анимация: итог наступил раньше конца');
-    P.tick(R.T.end - (R.T.tO + 100) - 1);
+    P.tick(R.T.end - (R.T.open + 100) - 1);
     if (R.phase !== 'anim' || resOf(view(P, 'анимация · за миг до итога'))) say('анимация: итог наступил раньше конца');
     P.tick(1);
     if (R.phase !== 'res') say(`анимация: в конце (${R.T.end} мс) итог не наступил`);
@@ -339,8 +429,20 @@ const V = T.CO_VIEW;
     if (R) { checkRun(P, 'ещё · второй', R, view(P, 'ещё · второй')); if (b) checkAgain(P, 'ещё · «Открыть ещё»', key, b.op, b.n); }
   }
   if (R) {
-    run('ещё · нажатие на сцену', () => T.ACT.coreveal());
-    if (R.phase !== 'res') say('нажатие на сцену посреди анимации: итог не открылся сразу');
+    /* нажатия на сцену: замок → самая ценная → её переворот → итог; итог и выдача не меняются */
+    const s1 = snap(T), T0 = R.T, now = () => P.clock.now - R.t0;
+    P.tick(300);
+    for (const [k, want] of [[1, T0.lock], [2, T0.hero.start], [3, T0.hero.flip]]) {
+      run('нажатие ' + k, () => T.ACT.coreveal()); cnt.taps++;
+      if (R.phase !== 'anim' || now() !== want) say(`нажатие ${k} на сцену: показ в ${now()} мс (${R.phase}), ждали момент ${want}`);
+      const hv = view(P, 'после нажатия ' + k);
+      if (!hv.includes(`--do:${T0.open - want}ms`)) say(`нажатие ${k}: разметка нарисована не из нового момента`);
+    }
+    P.tick(T0.end - T0.hero.flip - 1);
+    if (R.phase !== 'anim') say('нажатия: итог наступил раньше конца');
+    run('нажатие 4', () => T.ACT.coreveal()); cnt.taps++;
+    if (R.phase !== 'res') say('нажатие на сцену после переворота самой ценной: итог не открылся');
+    if (!eq(s1, snap(T))) say('нажатия на сцену изменили запасы или кошелёк');
     const h = view(P, 'ещё · итог второго');
     s0 = snap(T); g = grp(T, key);
     b = press(P, 'ещё · «Открыть все»', h, key, x => x.n === 'all');
@@ -437,7 +539,41 @@ const V = T.CO_VIEW;
   if (D.T.S.overlay) say('закрыть посреди анимации: окно открылось снова');
 }
 
-/* ================== 8. все виды × редкости × окна × циклы (× недели) ==================
+/* ================== 8. арт: пока путь не выгружен — заглушка; выгружены — рисунок ================== */
+{
+  const all = Object.keys(ART.chests).flatMap(k => [`chests/${k}-body.png`, `chests/${k}-lid.png`]).concat('chests/lock.png', ART.fx.map(n => `chests/fx-${n}.png`));
+  const scene = (Q, box, r, where) => {
+    fresh(Q, { skip: false });
+    const sp = { box, r, cyc: 3, win: 'step' }; if (box === 'shards') sp.week = 'Эльфы';
+    Q.T.BAG.addChest(Object.assign({ src: 'проверка', seed: Q.T.EnLoot.seedOf(`проверка-арт-${box}-${r}`) }, sp));
+    const key = 'g:' + Q.T.zpChestKey(sp);
+    run(where, () => Q.T.ACT.zpopen(key, { dataset: { op: 'zo' + Q.T.S.zp.op } }));
+    const R = Q.T.S.co.run; if (!R) { say(`${where}: показа нет`); return ''; }
+    const h = clean(Q, run(where, () => Q.T.OV.co()) || '', where);
+    checkRun(Q, where, R, h);
+    return h;
+  };
+  const none = load({ ready: [] });
+  for (const box of Object.keys(ART.chests)) {
+    const h = scene(none, box, 6, `без арта · ${box}`);
+    if (/chests\//.test(h)) say(`без арта · ${box}: в сцене есть путь к невыгруженному арту`);
+    if ((h.match(/<svg class="co-sv"/g) || []).length < 3) say(`без арта · ${box}: крышка, корпус или замок — не заглушкой SVG`);
+  }
+  const full = load({ ready: all });
+  for (const box of Object.keys(ART.chests)) for (const r of [2, 6]) {
+    const h = scene(full, box, r, `с артом · ${box} · ${r}`); cnt.art++;
+    for (const p of [`chests/${box}-body.png`, `chests/${box}-lid.png`, 'chests/lock.png']) if (!new RegExp(`<img src="[^"]*${reEsc(p)}\\?v=`).test(h)) say(`с артом · ${box}: нет картинки ${p}`);
+    if (/<svg class="co-sv"/.test(h)) say(`с артом · ${box}: осталась заглушка SVG`);
+    for (const n of ['haze', 'beam', 'dust', 'flash']) if (!new RegExp(`--tex:url\\('[^']*chests/fx-${n}\\.png\\?v=`).test(h)) say(`с артом · ${box}: нет текстуры ${n}`);
+    if (r >= V.gild && !/class="co-shn co-a" style="--m:url\('/.test(h)) say(`с артом · ${box} · ${r}: нет золотого отблеска по рисунку`);
+    if (!/class="co-lit co-lvx/.test(h)) say(`с артом · ${box}: нет света ступени на корпусе`);
+  }
+  /* сундук без одного слоя — заглушка целиком, пути нет */
+  const half = load({ ready: ['chests/keys-body.png'] }), hh = scene(half, 'keys', 4, 'арт без крышки');
+  if (/chests\/keys/.test(hh) || (hh.match(/<svg class="co-sv"/g) || []).length < 3) say('арт без крышки: сундук не остался заглушкой целиком');
+}
+
+/* ================== 9. все виды × редкости × окна × циклы (× недели) ==================
    Спойлеры игроку не называются: талисманы со спойлером в имени, ресурсы цикла VI и записи recipes.js с team — как в check_bag.js */
 {
   fresh(P, { skip: false });
@@ -469,7 +605,7 @@ const V = T.CO_VIEW;
   if (!spoil.length) say('спойлеры: список пуст — проверка утечек ничего не сторожит');
 }
 
-/* ================== 9. UI-кит и карта экранов ================== */
+/* ================== 10. UI-кит и карта экранов ================== */
 {
   const K = load();
   fresh(K, {});
@@ -482,18 +618,21 @@ const V = T.CO_VIEW;
     for (let r = 1; r <= 7; r++) if (!h.includes(`data-co="r:${r}"`)) say(`UI-кит: нет кнопки пробы редкости ${r}`);
     for (const b of Object.keys(K.T.LBX.boxes)) if (!h.includes(`data-co="box:${b}"`)) say(`UI-кит: нет вида ${b}`);
     if (!h.includes('data-co="many"') || !h.includes('id="coKit"') || !h.includes('id="coKitStage"')) say('UI-кит: нет пачки или сцены');
+    if (!/Арт: сундуки рисунком — \d+ из 7/.test(h)) say('UI-кит: нет строки о готовности арта');
     run('UI-кит · paint', () => entry.paint());
-    if (!/co-st co-idle/.test(K.els.coKitStage ? K.els.coKitStage.innerHTML : '')) say('UI-кит: до пробы на сцене нет закрытого сундука');
-    /* раскадровка: четыре кадра — ожидание, крышка, карточки, итог; кадр стоит в своём моменте (задержки от начала показа) */
+    const idle = K.els.coKitStage ? K.els.coKitStage.innerHTML : '';
+    if (!/co-st co-idle/.test(idle) || !/class="co-lock co-a"/.test(idle)) say('UI-кит: до пробы на сцене нет закрытого сундука под замком');
+    /* раскадровка: пять кадров — предвкушение, замок и крышка, карточки, самая ценная, итог; кадр стоит в своём моменте */
     const board = clean(K, K.els.coKitBoard ? K.els.coKitBoard.innerHTML : '', 'UI-кит · раскадровка');
     const frames = board.split('<figure class="co-still">').slice(1);
-    if (frames.length !== 4) say(`UI-кит · раскадровка: кадров ${frames.length}, ждали 4`);
+    if (frames.length !== 5) say(`UI-кит · раскадровка: кадров ${frames.length}, ждали 5`);
     else {
-      const V0 = K.T.CO_VIEW, d = f => +((f.match(/--do:(-?\d+)ms/) || [])[1]);
-      if (!(d(frames[0]) > 0)) say('раскадровка: первый кадр не до открытия крышки');
-      if (!(d(frames[1]) < 0 && d(frames[1]) === -V0.board.open)) say('раскадровка: второй кадр не сразу после открытия');
-      if (!/class="co-card co-a best"/.test(frames[2])) say('раскадровка: в третьем кадре нет карточек');
-      if (!/<section class="co-res/.test(frames[3]) || !/co-st co-done/.test(frames[3])) say('раскадровка: четвёртый кадр — не итог');
+      const B = K.T.CO_VIEW.board, d = (f, k) => num((f.match(/<div class="co-st[^"]*"[^>]*style="([^"]*)"/) || [])[1] || '', k);
+      if (!(d(frames[0], '--dk') > 0 && d(frames[0], '--dc0') < 0)) say('раскадровка: первый кадр не в предвкушении, до замка');
+      if (d(frames[1], '--do') !== -B.open) say('раскадровка: второй кадр не сразу после открытия');
+      if (!/class="co-card co-a/.test(frames[2]) || !(d(frames[2], '--do') < 0)) say('раскадровка: в третьем кадре нет карточек');
+      if (d(frames[3], '--dhs') !== -B.hero) say('раскадровка: четвёртый кадр — не самая ценная после переворота');
+      if (!/<section class="co-res/.test(frames[4]) || !/co-st co-done/.test(frames[4])) say('раскадровка: пятый кадр — не итог');
     }
     const s0 = snap(K.T), T0 = K.T;
     for (let r = 1; r <= 7; r++) {
@@ -515,7 +654,7 @@ const V = T.CO_VIEW;
     run('вид ключей', () => T0.coKitAct('box:keys'));
     if (T0.CO_KIT.box !== 'keys' || T0.CO_KIT.run) say('UI-кит: выбор вида не сбросил пробу');
     if (!/data-box="keys"/.test(K.els.coKitStage.innerHTML)) say('UI-кит: сцена не показала выбранный вид');
-    if ((K.els.coKitBoard.innerHTML.match(/data-box="keys"/g) || []).length !== 4) say('UI-кит: раскадровка не показала выбранный вид');
+    if ((K.els.coKitBoard.innerHTML.match(/data-box="keys"/g) || []).length !== 5) say('UI-кит: раскадровка не показала выбранный вид');
     if (!eq(s0, snap(T0))) say('UI-кит: проба изменила запасы, кошелёк или сундуки');
     /* «С анимацией» раздела «Лутбоксы»: тот же сундук на том же сиде — предметы из его списка бросков */
     for (const [box, r, win, cyc, week, awake, seed] of [['shards', 3, 'step', 3, 'Эльфы', false, 'проба-7'], ['shards', 5, 'wild', 4, 'Люди', true, 'проба-3'], ['talisman', 6, 'pure', 5, 'Эльфы', false, 'проба-1'], ['wander', 2, 'step', 2, 'Эльфы', false, 'проба-9']]) {
@@ -539,7 +678,7 @@ const V = T.CO_VIEW;
   if (!readme || +readme[1] !== tpl.length) say(`design/ui/README.md: ${readme ? readme[1] : '—'} шаблонов окон, в TEMPLATES ${tpl.length}`);
 }
 
-/* ================== 10–11. режим «Игрок» и «Команда», сценарии ================== */
+/* ================== 11–12. режим «Игрок» и «Команда», сценарии ================== */
 function tour(team) {
   const tag = team ? ' [команда]' : '';
   const Q = load();
@@ -552,7 +691,7 @@ function tour(team) {
       const op = 'zo' + Q.T.S.zp.op;
       run('открыть', () => Q.T.ACT.zpopen(g.key, { dataset: { op, n: 'all' } }));
       const R = Q.T.S.co.run; if (!R) continue;
-      if (!skip) { v(`${g.key} · начало`); Q.tick(R.T.tO + 50); v(`${g.key} · крышка`); Q.tick(R.T.end); }
+      if (!skip) { v(`${g.key} · начало`); Q.tick(R.T.open + 50); v(`${g.key} · крышка`); Q.tick(R.T.hero.flip - R.T.open); v(`${g.key} · самая ценная`); Q.tick(R.T.end); }
       v(`${g.key} · итог${skip ? ' сразу' : ''}`);
     }
   }

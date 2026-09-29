@@ -1,9 +1,29 @@
-/* screens/roulette.css — рулетка «Возрождения душ» (screens/roulette.js): колонка во вкладке «За души», окно с лентой, итог и сводка.
+/* screens/roulette.css — рулетка «Возрождения душ» (screens/roulette.js): вход во вкладке «За души», окно с лентой, итог и сводка.
    Стиль «Свет снизу»: лента светится снизу, метка — золото, редкость — цвет --rc и кристалл --rico из [data-r] (ADR-0027).
    Правила воздуха: в окне — лента, цена, три кнопки и галочка; одна рамка, внутри — строки и разделители; отступы — --sp-l, --sp-m, --sp-s.
-   Свои классы — rl-*; общие — .dlg, .ov-scrim, .rs-col, .rs-ph, .rs-av, .btn, .chip, .kv, .rar. */
+   Свои классы — rl-*; общие — .dlg, .ov-scrim, .pnl, .rs-ph, .rs-av, .btn, .chip, .kv, .rar. */
 
-/* колонка: подвал — «Шансы» и одно главное действие */
+/* вход во вкладке «За души» — главное вкладки: лица героев пула с кристаллом редкости, прошлая прокрутка, «Шансы» и «К рулетке» */
+.rl-entry{display:flex;flex-direction:column;justify-content:space-between;gap:var(--sp-m);padding:var(--sp-l);min-height:0;min-width:0;
+  background:radial-gradient(70% 90% at 50% 120%,rgba(72,229,212,.14),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.018),transparent 40%),var(--stone)}
+.rl-eh{display:flex;flex-direction:column;gap:3px}
+.rl-eh h2{font-size:26px;line-height:1.05;color:var(--gold)}
+/* лица — одним веером карт: карта наползает на соседку, наведённая поднимается */
+.rl-faces{display:flex;justify-content:center;align-items:flex-end;padding:4px 10px 0;min-height:0}
+/* наползание — чтобы веер из --n карт (его ставит rlCol) уместился в ширину; малый пул лежит почти вплотную */
+.rl-ef{--w:64px;position:relative;flex:none;width:var(--w);height:calc(var(--w) * 5 / 4);margin-left:min(-6px,calc((100% - var(--n,10) * var(--w)) / (var(--n,10) - 1)));padding:0;border-radius:9px;overflow:hidden;
+  background:#0c0f12;border:1px solid color-mix(in srgb,var(--rc) 45%,#262b31);box-shadow:-6px 0 12px -6px rgba(0,0,0,.9);transition:transform .15s ease,border-color .15s ease}
+.rl-ef:first-child{margin-left:0}
+.rl-ef:hover,.rl-ef:focus-visible{z-index:4;transform:translateY(-4px);border-color:color-mix(in srgb,var(--rc) 85%,#fff);outline:none}
+@container main (max-height: 360px){ .rl-entry{padding:var(--sp-m)} .rl-ef{--w:56px} .rl-eh h2{font-size:22px} }
+@media (prefers-reduced-motion: reduce){ .rl-ef{transition:none} .rl-ef:hover,.rl-ef:focus-visible{transform:none} }
+.rl-ef .rl-cr{left:3px;top:3px;width:15px;height:15px}
+.rl-ef .rs-ph b{font-size:18px}
+.rl-em{position:absolute;right:3px;bottom:3px;z-index:3;display:grid;place-items:center;width:15px;height:15px;border-radius:50%}
+.rl-em.own{background:var(--spirit-3);color:var(--spirit);box-shadow:0 0 0 1px rgba(72,229,212,.4)}
+.rl-em.own .i{width:10px;height:10px}
+.rl-em.ready{width:10px;height:10px;background:var(--spirit);box-shadow:0 0 8px var(--spirit)}
+.rl-ef-f{display:flex;flex-direction:column;gap:var(--sp-s)}
 .rl-cf{flex-wrap:nowrap}
 
 /* окно рулетки; при перерисовке открытого окна оно не всплывает заново */

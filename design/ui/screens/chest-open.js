@@ -1,69 +1,132 @@
 /* screens/chest-open.js — окно открытия сундука: одна анимация на все сундуки прототипа. Договор — screens/model.js.
    Регистрирует: coShow(итог, { host, trial }) — показ итога открытия, его зовёт zpOpen в screens/bag.js после выдачи; OV.co — окно поверх
-   игры; ACT.coreveal, ACT.coskip; раздел UI-кита «Открытие сундука» (KIT_EXTRA) — живая проба и раскадровка четырёх моментов;
-   кнопку «С анимацией» у пробного открытия раздела
-   «Лутбоксы»; два сценария презентации. Своё состояние — S.co, заводится как S.bag в model.js.
+   игры; ACT.coreveal (нажатие на сцену), ACT.coskip; раздел UI-кита «Открытие сундука» (KIT_EXTRA) — живая проба, раскадровка пяти
+   моментов и готовность арта; кнопку «С анимацией» у пробного открытия раздела «Лутбоксы»; два сценария презентации.
+   Своё состояние — S.co, заводится как S.bag в model.js.
    Где открываются сундуки: только в запасах (§14.4, §36.11) — «Ремесло → Запасы → Сундуки», по одному и пачкой. Дары путешествия,
    Входящие и добыча режимов кладут закрытые сундуки в запасы (§23.1) — открывают их там, этой же анимацией. UI-кит показывает ту же
    анимацию пробой: проба — не выдача.
    Сервер решает, клиент показывает. Итог выдаёт zpOpen (bag.js) одной операцией с номером: EnLoot.roll на сиде каждого сундука, прах
    за осколки пробуждённых героев, выдача через BAG — и только потом зовёт coShow. Анимация итог не меняет: закрыть окно, пропустить
-   анимацию или нажать на сцену — итог тот же и второй раз не выдаётся. Повтор номера операции zpOpen не выдаёт и не показывает.
+   анимацию или нажимать на сцену — итог тот же и второй раз не выдаётся. Повтор номера операции zpOpen не выдаёт и не показывает.
+   Режиссура (слова автора 29.09.2026: «анимация лутбокса очень деревянная»):
+   1. Предвкушение: сундук падает, приземляется с пылью; из щели под крышкой бьёт свет, крышка подпрыгивает, дрожь нарастает. Свет
+      поднимается по редкостям — от нижней ступени окна сундука до редкости самой ценной записи: уже решённый итог, показанный честно.
+   2. Замок срывается и падает, крышка откидывается назад по-настоящему (3D, ось у задней кромки) — вспышка, столп света, лучи, искры.
+   3. Записи поднимаются из сундука карточками рубашкой вверх, со шлейфом цвета редкости, встают по бокам и переворачиваются.
+   4. Самая ценная — героический момент: вокруг темнеет, камера приближается, карточка медленно поднимается, висит и переворачивается
+      со вспышкой своей редкости; с древней — кольца, золото и дрожь.
+   5. Итог — одной сеткой. Нажатие на сцену переносит к следующему моменту: к замку, к самой ценной, к перевороту, к итогу.
+   Пачка (×N и «Открыть все») — то же коротко: один сундук с «×N», свет до самой ценной записи пачки, фонтан искр цветов всех выпавших
+   редкостей, одна карточка — самая ценная, затем сводка по редкостям.
    Анимация — CSS по времени: разметка рисуется из момента от начала показа (задержки --d…), поэтому перерисовка экрана посреди
-   анимации её не рвёт. Сундук опускается и дрожит, из щелей бьёт свет цвета редкости; крышка откидывается — вспышка и частицы EnFx
-   (fx.js): чем реже сундук, тем богаче всплеск, с эпического — лучи, с древнего — золотая оковка, кольца и лёгкая дрожь экрана.
-   Предметы вылетают карточками по одной — у каждой своя редкость и своя искра; самый ценный — последним и крупнее. Итог — одной сеткой.
-   Пачка (×N и «Открыть все») — короткая анимация на сундуке этого вида с самым ценным предметом пачки, затем сводка по редкостям.
-   Редкость карточки — выпавшая из окна сундука: ступень ценности записи (docs/content/лутбоксы.md, принцип 4), как в «Состав и шансы».
+   анимации её не рвёт. Движется только transform и opacity; частицы — EnFx (fx.js) в своём слое рядом с #game.
+   Арт — tools/art-gen/jobs/chests.json: сундук вида рисунком, корпус и крышка — отдельные слои (tools/art-gen/chest_layers.py), замок,
+   текстуры света. Выгруженные пути перечислены в CO_ART.ready: пока пути нет — прежний SVG и CSS-градиенты, битых картинок нет.
+   Редкость — светом и цветом токенов --r1…--r7 (ADR-0027), а не отдельными картинками.
    «Пропустить анимацию» — итог сразу; выбор помнит localStorage (en-co-skip), без него всё работает; при prefers-reduced-motion
-   анимации нет. Числа вида — CO_VIEW, демо сценариев — CO_DEMO. Служебное — только команде: TM из index.html.
+   анимации нет. Числа вида — CO_VIEW, арт — CO_ART, демо сценариев — CO_DEMO. Служебное — только команде: TM из index.html.
    Автопроверка — tools/content-gen/screens/check_chest_open.js. */
 'use strict';
 
 /* ================== вид: числа анимации, не баланс ================== */
 const CO_VIEW = {
-  drop: 380,                                       // сундук опускается на место, мс
-  wait: [700, 800, 900, 1050, 1200, 1400, 1600],   // ожидание по редкости сундука: дрожь и свет из щелей, мс
-  waitMany: 520,                                   // пачка — короткое ожидание, мс
-  seamTail: 240,                                   // свет щелей гаснет при открытии: столько мс после конца ожидания
-  lid: 540,                                        // крышка откидывается, мс
-  first: 380,                                      // от открытия до первой карточки, мс
-  step: 440,                                       // между карточками, мс
-  bestPause: 280,                                  // пауза перед самой ценной, мс
-  fly: 560, flyBest: 780,                          // полёт карточки, мс
-  hold: 820, holdMany: 980,                        // от посадки последней карточки до итога, мс
-  coin: 160, coinStep: 110,                        // монеты гарантированной валюты: после открытия и между монетами, мс
-  shake: 150,                                      // период дрожи сундука в ожидании, мс
-  amp: [8, 10, 12, 15, 18, 22, 26],                // размах дрожи по редкости сундука, десятые доли градуса
-  halo: [30, 38, 46, 56, 66, 76, 86],              // яркость ореола за сундуком по редкости, %
-  ray: [0, 0, 0, 34, 46, 58, 70],                  // яркость лучей за сундуком по редкости, %
-  rays: 4, gild: 5,                                // с какой редкости сундука: лучи, золотая оковка
-  gold: ['#e3c27c', '#8e6b35'],                    // золотая оковка: светлая и тёмная
-  kitMany: 10,                                     // UI-кит: сундуков в пробной пачке
-  /* UI-кит, раскадровка: ожидание — такая доля ожидания, %; крышка — столько мс после открытия; карточки — такая доля полёта
-     самой ценной, %; итог — столько мс после конца */
-  board: { wait: 75, open: 180, fly: 60, hold: 2000 },
-  /* сцена: ширина и высота, сундук [ш, в], щель крышки от верха сундука, отступ снизу, верх ряда карточек,
-     карточка и самая ценная [ш, в], промежуток, монеты [отступ от сундука, верх, шаг] — px */
-  geo: { w: 540, h: 316, chest: [160, 136], seam: 71, pad: 4, top: 6, card: [76, 100], best: [96, 124], gap: 14, coin: [12, 196, 34] },
-  /* частицы EnFx. Искры, полосы и золото — [сколько, скорость, жизнь мс, размер]; кольца — [[радиус в % ширины сундука, мс, толщина,
+  /* сцена: ширина и высота, земля — от низа; сундук-рисунок — px сцены на 1000 px исходника; ось крышки — у задней кромки, глубина
+     сундука — ‰ высоты крышки: откинутая крышка встаёт позади во весь рост; перспектива — ‰ ширины крышки; замок — ширина, ‰ ширины
+     крышки, и сколько % его высоты висит ниже шва; карточка и самая ценная [ш, в]; карточки по бокам сундука: зазор от сундука, между
+     столбцами и рядами; верх самой ценной; монеты справа от сундука: зазор и шаг; столп света [ширина, высота], ‰ ширины крышки — px */
+  geo: { w: 720, h: 356, ground: 34, scale: 228, depth: 1000, persp: 3000, lock: 190, lockDrop: 64, card: [84, 112], hero: [124, 166],
+    side: 28, colGap: 14, rowGap: 14, heroTop: 14, coin: [18, 36], beam: [760, 1500] },
+  /* моменты, мс */
+  drop: 460,                                      // сундук падает на место
+  settle: 220,                                    // от приземления до первого света в щели
+  charge: [560, 600, 640, 700, 760, 840, 920],    // первый свет держится — по редкости сундука
+  step: 560,                                      // шаг света: свет в щели поднимается на редкость
+  final: 560,                                     // последний свет: дрожь сильнее всего, крышка рвётся
+  climb: 3,                                       // свет поднимается не больше чем на столько редкостей
+  lockLead: 220, lock: 900, lockPop: 200,         // замок: рвётся за столько до крышки; срыв и падение; искры — через столько от начала
+  lid: 900,                                       // крышка откидывается: удар, перелёт, покачивание
+  first: 460, cardStep: 380,                      // от открытия до первой карточки; между карточками
+  fly: 580, flip: 380,                            // карточка поднимается из сундука; переворот
+  heroGap: 200,                                   // пауза перед самой ценной
+  coin: 220, coinStep: 130,                       // монеты гарантированной валюты: после открытия и между монетами
+  leak: 190,                                      // искры из щели в предвкушении — раз в столько мс
+  trail: [20, 45, 70],                            // шлейф карточки: искры на таких % полёта
+  tapGap: 40,                                     // нажатие ведёт к следующему моменту, до которого больше стольких мс
+  hint: 1300,                                     // подсказка «нажмите — быстрее» появляется через столько мс
+  /* самая ценная — по её редкости: подъём, висит рубашкой вверх, переворот, от переворота до итога — мс; приближение — ‰ сверх 1;
+     затемнение вокруг — % */
+  hero: {
+    rise: [620, 680, 780, 900, 1020, 1120, 1220],
+    hover: [140, 180, 260, 380, 500, 620, 760],
+    flip: [420, 440, 480, 520, 560, 600, 640],
+    hold: [760, 820, 900, 980, 1060, 1140, 1240],
+    zoom: [0, 0, 40, 70, 90, 110, 130],
+    dim: [0, 18, 32, 46, 56, 62, 68],
+  },
+  /* пачка: коротко — первый свет, шаг, последний свет, редкостей вверх; самая ценная: подъём, висит, переворот, до итога, мс */
+  many: { charge: 360, step: 340, final: 320, climb: 2, rise: 620, hover: 220, flip: 460, hold: 900 },
+  amp: [10, 12, 14, 17, 20, 24, 28],              // дрожь предвкушения к концу, десятые доли градуса — по редкости сундука
+  lift: [4, 5, 6, 7, 8, 10, 12],                  // крышка подпрыгивает в предвкушении, градусы — по редкости сундука
+  halo: [34, 42, 50, 60, 70, 80, 90],             // ореол за сундуком по редкости света, %
+  ray: [0, 0, 0, 38, 50, 62, 74],                 // лучи после открытия — по редкости света, %
+  beam: [42, 50, 58, 68, 78, 88, 96],             // столп света из сундука — по редкости света, %
+  haze: [8, 9, 10, 12, 14, 16, 18],               // дымка вокруг — по редкости сундука, %
+  rays: 4, rune: 4, gild: 5,                      // с какой редкости: лучи (свет), кольцо под сундуком (сундук), золотой отблеск (сундук)
+  kitMany: 10,                                    // UI-кит: сундуков в пробной пачке
+  /* UI-кит, раскадровка: предвкушение — такая доля последнего света, %; крышка — столько мс после открытия; карточки — такая доля
+     переворота первой, %; самая ценная — столько мс после переворота; итог — столько мс после конца */
+  board: { wait: 60, open: 200, card: 50, hero: 260, hold: 2000 },
+  /* частицы EnFx. Искры, полосы и золото — [сколько, скорость, жизнь мс, размер]; кольца — [[радиус в % ширины крышки, мс, толщина,
      задержка мс]]; огоньки — [серий, шаг мс, сколько, скорость, жизнь мс, размер, подъём]; вспышка — [масштаб %, мс]; дрожь — [px, мс] */
   fx: {
+    land: { dust: [14, 110, 900, 4], shake: [2, 200] },                 // приземление: пыль у углов, лёгкая дрожь
+    step: { ring: [150, 620, 2], motes: [8, 70, 900, 4, 120] },         // шаг света: кольцо; огоньки [сколько, скорость, жизнь, размер, подъём]
+    leak: [1, 30, 700, 3, 90],                                          // искра из щели: [сколько, скорость, жизнь, размер, подъём]
+    lock: { sparks: [18, 200, 620, 3], shards: [9, 160, 900, 5] },      // замок сорвался
     open: [
-      { sparks: [16, 170, 650, 4], streaks: [6, 220, 360, 2], flash: [110, 520] },
-      { sparks: [22, 190, 720, 4], streaks: [10, 240, 400, 2], flash: [125, 560] },
-      { sparks: [28, 210, 800, 5], streaks: [14, 260, 440, 2], flash: [140, 600] },
-      { sparks: [36, 230, 900, 5], streaks: [18, 290, 480, 2], gold: [14, 220, 900, 4], flash: [160, 700] },
-      { sparks: [44, 250, 1100, 6], streaks: [24, 330, 560, 3], gold: [26, 260, 1100, 5], rings: [[110, 700, 3, 0], [170, 950, 2, 140]], flash: [185, 820], shake: [3, 320] },
-      { sparks: [52, 270, 1300, 6], streaks: [30, 360, 620, 3], gold: [38, 300, 1300, 6], rings: [[120, 760, 3, 0], [190, 1000, 2, 140], [90, 600, 2, 300]], motes: [5, 160, 9, 70, 1300, 4, 150], flash: [210, 920], shake: [4, 380] },
-      { sparks: [60, 290, 1500, 7], streaks: [36, 400, 700, 3], gold: [52, 340, 1500, 7], rings: [[130, 820, 3, 0], [210, 1100, 2, 140], [100, 650, 2, 300]], motes: [7, 160, 10, 70, 1500, 4, 160], flash: [240, 1040], shake: [5, 420] },
+      { sparks: [16, 170, 650, 4], streaks: [6, 220, 360, 2], flash: [120, 560] },
+      { sparks: [22, 190, 720, 4], streaks: [10, 240, 400, 2], flash: [135, 600] },
+      { sparks: [28, 210, 800, 5], streaks: [14, 260, 440, 2], flash: [150, 640] },
+      { sparks: [36, 230, 900, 5], streaks: [18, 290, 480, 2], gold: [14, 220, 900, 4], flash: [170, 740] },
+      { sparks: [44, 250, 1100, 6], streaks: [24, 330, 560, 3], gold: [26, 260, 1100, 5], rings: [[110, 700, 3, 0], [170, 950, 2, 140]], flash: [195, 860], shake: [3, 320] },
+      { sparks: [52, 270, 1300, 6], streaks: [30, 360, 620, 3], gold: [38, 300, 1300, 6], rings: [[120, 760, 3, 0], [190, 1000, 2, 140], [90, 600, 2, 300]], motes: [5, 160, 9, 70, 1300, 4, 150], flash: [220, 960], shake: [4, 380] },
+      { sparks: [60, 290, 1500, 7], streaks: [36, 400, 700, 3], gold: [52, 340, 1500, 7], rings: [[130, 820, 3, 0], [210, 1100, 2, 140], [100, 650, 2, 300]], motes: [7, 160, 10, 70, 1500, 4, 160], flash: [250, 1080], shake: [5, 420] },
     ],
-    card: [[10, 140, 520, 3], [12, 150, 560, 3], [14, 160, 600, 4], [18, 180, 680, 4], [22, 200, 760, 5], [26, 220, 840, 5], [30, 240, 920, 6]],   // искра карточки — по её редкости
-    /* самая ценная: вспышка по её редкости; полосы; кольцо [радиус в % ширины карточки, мс, толщина] и золото — с этих редкостей */
-    best: { flash: [[80, 560], [90, 600], [100, 660], [115, 740], [130, 840], [150, 940], [170, 1040]], streaks: [16, 260, 460, 2], ringFrom: 4, ring: [120, 760, 2], goldFrom: 5, gold: [24, 260, 1000, 5] },
+    fountain: [6, 150, 1200, 5, 200],                                   // пачка: фонтан — на каждую выпавшую запись [сколько, скорость, жизнь, размер, подъём]
+    launch: [8, 120, 420, 3],                                           // карточка вылетела из сундука
+    trail: [3, 40, 520, 3],                                             // шлейф карточки
+    card: [[10, 140, 520, 3], [12, 150, 560, 3], [14, 160, 600, 4], [18, 180, 680, 4], [22, 200, 760, 5], [26, 220, 840, 5], [30, 240, 920, 6]],   // переворот — по редкости карточки
+    cardRing: [3, 120, 520, 2],                                         // кольцо переворота: с какой редкости, радиус % ширины карточки, мс, толщина
+    /* самая ценная: огоньки вокруг сундука, пока поднимается; при перевороте — полосы, кольца с redFrom, золото с goldFrom, дрожь с shakeFrom */
+    hero: { motes: [4, 180, 8, 60, 1200, 4, 140], streaks: [20, 280, 520, 2], ringFrom: 4, rings: [[130, 760, 3, 0], [220, 1000, 2, 160]], goldFrom: 5, gold: [30, 280, 1100, 5], shakeFrom: 5, shake: [4, 360] },
   },
 };
-/* сундук своего вида: материал и оковка; эмблема — значок вида из LB_IC (index.html). Цвета вида, не баланс */
+
+/* ================== арт ==================
+   tools/art-gen/jobs/chests.json → tools/art-gen/chest_layers.py → выгрузка export_ui.py в assets/art/chests/. ready — выгруженные
+   пути: отмечаются после выгрузки. Пока пути нет — прежний SVG и CSS-градиенты. Сундук берёт рисунок, только когда выгружены оба слоя.
+   chests — рамка сундука [x, y, ш, в], шов, крышка и корпус [x, y, ш, в] в px исходника 1200 × 896 (вывод chest_layers.py);
+   svg — то же у заглушки SVG, с её масштабом ‰; lock — размер замка в исходнике; fx — текстуры света */
+const CO_ART = {
+  ready: ['chests/shards-body.png', 'chests/shards-lid.png', 'chests/keys-body.png', 'chests/keys-lid.png', 'chests/equip-body.png',
+    'chests/equip-lid.png', 'chests/talisman-body.png', 'chests/talisman-lid.png', 'chests/workers-body.png', 'chests/workers-lid.png',
+    'chests/craft-body.png', 'chests/craft-lid.png', 'chests/wander-body.png', 'chests/wander-lid.png', 'chests/lock.png',
+    'chests/fx-rays.png', 'chests/fx-flash.png', 'chests/fx-ring.png', 'chests/fx-haze.png', 'chests/fx-beam.png', 'chests/fx-dust.png'],   // выгрузка 29.09.2026
+  chests: {
+    shards: { frame: [85, 47, 1030, 778], seam: 460, lid: [86, 47, 1027, 415], body: [85, 458, 1030, 367] },
+    keys: { frame: [95, 88, 1009, 742], seam: 446, lid: [95, 88, 1009, 360], body: [99, 444, 1000, 386] },
+    equip: { frame: [72, 82, 1057, 745], seam: 444, lid: [72, 82, 1057, 364], body: [84, 442, 1032, 385] },
+    talisman: { frame: [112, 98, 976, 747], seam: 450, lid: [112, 98, 976, 354], body: [118, 448, 963, 397] },
+    workers: { frame: [46, 84, 1102, 748], seam: 353, lid: [104, 84, 992, 271], body: [46, 351, 1102, 481] },
+    craft: { frame: [79, 86, 1041, 730], seam: 429, lid: [79, 86, 1041, 345], body: [84, 427, 1033, 389] },
+    wander: { frame: [106, 94, 988, 711], seam: 453, lid: [106, 94, 988, 361], body: [108, 451, 984, 354] },
+  },
+  svg: { scale: 1500, frame: [22, 32, 156, 124], seam: 88, lid: [22, 32, 156, 58], body: [22, 86, 156, 70] },
+  lock: [738, 899],
+  fx: ['rays', 'flash', 'ring', 'haze', 'beam', 'dust'],
+};
+/* сундук своего вида у заглушки SVG: материал и оковка; эмблема — значок вида из LB_IC (index.html). Цвета вида, не баланс */
 const CO_KINDS = {
   shards: { n: 'Осколки', ic: 'users', wood: '#28303c', wood2: '#161b23', metal: '#9aa6b6', metal2: '#56606c' },     // реликварий Эхо: тёмный камень и серебро
   keys: { n: 'Ключи', ic: 'key', wood: '#373c42', wood2: '#1f2327', metal: '#b48a4f', metal2: '#6d5230' },          // окованный ларь: железо и бронза
@@ -73,6 +136,7 @@ const CO_KINDS = {
   craft: { n: 'Крафт', ic: 'crown', wood: '#48483f', wood2: '#2c2c27', metal: '#7f8b7c', metal2: '#4d564b' },        // каменный сундук руин
   wander: { n: 'Странник', ic: 'star', wood: '#4c3423', wood2: '#2e1f15', metal: '#c09858', metal2: '#735a33' },     // дорожный сундук: кожа и латунь
 };
+const CO_GOLD = ['#e3c27c', '#8e6b35'];            // золотая оковка заглушки SVG с редкости CO_VIEW.gild: светлая и тёмная
 /* сценарии презентации: какой сундук кладётся в запасы и сколько — демо, не выдача режима */
 const CO_DEMO = {
   one: { box: 'talisman', r: 6, cyc: 3, win: 'step', src: 'Клановый босс · доля клана', count: 1 },
@@ -94,6 +158,37 @@ const coBoxName = cs => LBX && cs && LBX.boxes[cs.box] ? lbBoxName(cs.box, cs.r,
 const coNextOp = () => 'zo' + ((typeof zpV === 'function' && zpV().op) || 1);   // номер следующей операции открытия: его несут кнопки
 /* цвет редкости — из токенов --r1…--r7 (ADR-0027) */
 const coColor = r => { try { return getComputedStyle(document.documentElement).getPropertyValue('--r' + r).trim() || EnFx.COL.gold; } catch (_) { return '#ddbc7a'; } };
+const coPct = (a, k) => Math.round(a * k / 100);
+
+/* арт: выгружен ли путь; полный адрес для CSS — url() из переменной браузер разрешает от файла стилей, где её подставили */
+const coArtOk = p => CO_ART.ready.includes(p);
+const coAbs = p => { const u = AV(p); try { return new URL(u, document.baseURI).href; } catch (_) { return u; } };
+/* текстура света: класс и переменная --tex, если выгружена; иначе пусто — элемент рисует CSS-градиент */
+function coTex(n) {
+  const p = `chests/fx-${n}.png`;
+  return coArtOk(p) ? { cls: ' co-tex', st: `--tex:url('${coAbs(p)}')` } : { cls: '', st: '' };
+}
+/* сундук вида рисунком — если выгружены оба слоя */
+function coChestArt(box) {
+  const g = CO_ART.chests[box], b = `chests/${box}-body.png`, l = `chests/${box}-lid.png`;
+  return g && coArtOk(b) && coArtOk(l) ? { g, s: CO_VIEW.geo.scale, body: AV(b), lid: AV(l), bodyAbs: coAbs(b), lidAbs: coAbs(l) } : null;
+}
+/* раскладка сундука в px сцены: рамка, шов, крышка и корпус [x, y, ш, в], середина по крышке, глубина, перспектива, замок */
+function coChestGeo(box) {
+  const A = coChestArt(box), G = A ? A.g : CO_ART.svg, s = A ? A.s : CO_ART.svg.scale, V = CO_VIEW.geo;
+  const px = v => Math.round(v * s / 1000), [fx, fy, fw, fh] = G.frame;
+  const part = ([x, y, w, h]) => [px(x - fx), px(y - fy), px(w), px(h)];
+  const lid = part(G.lid), body = part(G.body), seam = px(G.seam - fy), inner = Math.min(lid[2], body[2]);
+  const cx = lid[0] + Math.round(lid[2] / 2), lw = Math.round(inner * V.lock / 1000), lh = Math.round(lw * CO_ART.lock[1] / CO_ART.lock[0]);
+  return { A, w: px(fw), h: px(fh), seam, lid, body, inner, cx, depth: Math.round(lid[3] * V.depth / 1000), persp: Math.round(inner * V.persp / 1000),
+    lock: [cx - Math.round(lw / 2), seam - lh + coPct(lh, V.lockDrop), lw, lh] };
+}
+/* картинки сундука и текстуры — заранее, чтобы к падению сундука они были готовы */
+const CO_PRE = new Set();
+function coPreload(box) {
+  const A = coChestArt(box), list = (A ? [A.body, A.lid] : []).concat(coArtOk('chests/lock.png') ? [AV('chests/lock.png')] : [], CO_ART.fx.filter(n => coArtOk(`chests/fx-${n}.png`)).map(n => AV(`chests/fx-${n}.png`)));
+  for (const u of list) if (!CO_PRE.has(u)) { CO_PRE.add(u); try { const im = new Image(); im.decoding = 'async'; im.src = u; } catch (_) { } }
+}
 
 /* одна выпавшая запись — для карточки и плитки: значок, имя, количество, редкость — выпавшая из окна сундука */
 function coView(it) {
@@ -127,8 +222,18 @@ function coLog(last) {
 
 /* ================== показ ==================
    R — один показ: host — 'game' (окно поверх игры) или 'kit' (сцена раздела UI-кита); phase — 'anim', 'res' (итог) или 'idle' (сундук
-   раздела до пробы); items — все выпавшие записи, cards — что вылетает карточками, cur — гарантированная валюта; T — моменты от начала, мс */
+   раздела до пробы); items — все выпавшие записи, cards — что вылетает карточками (последняя — самая ценная), cur — гарантированная
+   валюта; b — редкость самой ценной, climb — ступени света от нижней ступени окна до b; T — моменты от начала, мс */
 let coSeq = 0;
+/* нижняя ступень окна сундука: с неё свет начинает подниматься */
+function coWinMin(cs) {
+  try { const w = EnLoot.windowOf(LBX, cs.win || 'step', cs.r).filter(x => x[1] > 0).map(x => x[0]); return w.length ? Math.min(...w) : cs.r; } catch (_) { return cs.r; }
+}
+function coClimb(R) {
+  const up = R.n > 1 ? CO_VIEW.many.climb : CO_VIEW.climb, from = Math.min(R.b, Math.max(coWinMin(R.cs), R.b - up)), out = [];
+  for (let x = from; x <= R.b; x++) out.push(x);
+  return out;
+}
 function coRun(last, host, o) {
   const log = coLog(last), cs = last.cs, items = [], cur = {};
   log.forEach((L, ci) => {
@@ -139,18 +244,32 @@ function coRun(last, host, o) {
   const sorted = items.slice().sort((a, b) => coVal(a) - coVal(b) || a.ci - b.ci || a.i - b.i);
   const R = { id: ++coSeq, host, key: last.key || '', op: last.op || '', cs, box: cs.box, r: cs.r, n, items, cur, cards: n > 1 ? sorted.slice(-1) : sorted,
     trial: !!o.trial, phase: 'anim', t0: coNow(), tr: null, timers: [] };
+  R.b = R.cards.length ? R.cards[R.cards.length - 1].r : R.r;
+  R.climb = coClimb(R);
   R.T = coTimes(R);
   return R;
 }
-/* моменты анимации от начала, мс: ожидание (дрожь и свет из щелей), открытие, вылет каждой карточки, итог */
-function coTimes(R) {
-  const V = CO_VIEW, many = R.n > 1, wait = many ? V.waitMany : V.wait[R.r - 1] || V.wait[0], tW = V.drop, tO = tW + wait, cards = [];
-  let t = tO + V.first;
-  R.cards.forEach((c, i) => { if (i && i === R.cards.length - 1) t += V.bestPause; cards.push(t); t += V.step; });
-  const land = cards.length ? cards[cards.length - 1] + V.flyBest : tO + V.lid;
-  return { tW, tO, wait, cards, end: land + (many ? V.holdMany : V.hold) };
+/* самая ценная: подъём, висит, переворот, до итога; приближение и затемнение — по её редкости; у пачки — коротко */
+function coHero(R) {
+  const H = CO_VIEW.hero, M = CO_VIEW.many, i = R.b - 1;
+  if (R.n > 1) return { rise: M.rise, hover: M.hover, flip: M.flip, hold: M.hold, zoom: H.zoom[i], dim: H.dim[i] };
+  return { rise: H.rise[i], hover: H.hover[i], flip: H.flip[i], hold: H.hold[i], zoom: H.zoom[i], dim: H.dim[i] };
 }
-const coFly = (R, i) => i === R.cards.length - 1 ? CO_VIEW.flyBest : CO_VIEW.fly;
+/* моменты от начала, мс: приземление, ступени света lv, замок, крышка, вылет каждой карточки (последняя — самая ценная), самая ценная:
+   подъём, висит, переворот, открыта; итог. beats — куда ведёт нажатие на сцену */
+function coTimes(R) {
+  const V = CO_VIEW, M = V.many, many = R.n > 1, land = V.drop, climb0 = land + V.settle;
+  const charge = many ? M.charge : V.charge[R.r - 1] || V.charge[0], step = many ? M.step : V.step, fin = many ? M.final : V.final;
+  const s = R.climb.length - 1, lv = R.climb.map((x, k) => k ? climb0 + charge + (k - 1) * step : climb0);
+  const open = s ? lv[s] + fin : climb0 + charge, lock = open - V.lockLead;
+  const reg = Math.max(0, R.cards.length - 1), cards = [];
+  let t = open + V.first;
+  for (let i = 0; i < reg; i++) { cards.push(t); t += V.cardStep; }
+  const H = coHero(R), start = reg ? cards[reg - 1] + V.fly + V.flip + V.heroGap : open + V.first;
+  if (R.cards.length) cards.push(start);
+  const hover = start + H.rise, flip = hover + H.hover, shown = flip + H.flip, end = shown + H.hold;
+  return { land, climb0, lv, open, lock, cards, H, hero: { start, hover, flip, shown }, end, beats: [lock, start, flip, end] };
+}
 const coCur = host => host === 'kit' ? CO_KIT.run : S.co ? S.co.run : null;
 const coLive = R => !!R && R.phase === 'anim' && coCur(R.host) === R;
 function coStop(R) { if (!R) return; for (const t of R.timers) clearTimeout(t); R.timers = []; }
@@ -161,24 +280,48 @@ function coShow(last, o = {}) {
   const host = o.host === 'kit' ? 'kit' : 'game';
   coStop(coCur(host));
   const R = coRun(last, host, o);
+  coPreload(R.box);
   if (host === 'kit') CO_KIT.run = R; else { S.co.run = R; S.overlay = { t: 'co', arg: String(R.id) }; }
   if (coSkipOn()) { R.phase = 'res'; R.tr = R.t0; } else coSchedule(R);
   coPaint(R);
   if (R.phase === 'res') coFocus(R);
   return R;
 }
-/* таймеры одного показа: частицы открытия, искры карточек и итог. Каждый проверяет, что показ ещё идёт */
+/* таймеры показа от текущего момента: частицы, итог. Каждый проверяет, что показ ещё идёт; прошедшие моменты не повторяются */
 function coSchedule(R) {
-  const T = R.T, at = (ms, f) => { R.timers.push(setTimeout(() => { if (coLive(R)) { try { f(); } catch (_) { } } }, Math.max(0, ms))); };
-  at(T.tO, () => coBurstOpen(R));
-  R.cards.forEach((c, i) => at(T.cards[i] + coFly(R, i), () => coBurstCard(R, i)));
+  const T = R.T, V = CO_VIEW, e = coNow() - R.t0;
+  const at = (ms, f) => { if (ms < e) return; R.timers.push(setTimeout(() => { if (coLive(R)) { try { f(); } catch (_) { } } }, Math.max(0, ms - e))); };
+  at(T.land, () => coBurstLand(R));
+  T.lv.forEach((t, k) => { if (k) at(t, () => coBurstStep(R, k)); });
+  for (let t = T.climb0 + V.leak; t < T.lock; t += V.leak) { const tt = t; at(tt, () => coBurstLeak(R, tt)); }
+  at(T.lock + V.lockPop, () => coBurstLock(R));
+  at(T.open, () => coBurstOpen(R));
+  const last = R.cards.length - 1;
+  R.cards.forEach((c, i) => {
+    if (i < last) {
+      at(T.cards[i], () => coBurstLaunch(R, i));
+      for (const k of V.trail) at(T.cards[i] + coPct(V.fly, k), () => coBurstTrail(R, i));
+      at(T.cards[i] + V.fly + Math.round(V.flip / 2), () => coBurstCard(R, i));
+    } else {
+      at(T.hero.start, () => coBurstRise(R));
+      at(T.hero.flip + Math.round(T.H.flip / 2), () => coBurstHero(R));
+    }
+  });
   at(T.end, () => coReveal(R));
 }
-/* итог: после анимации, сразу при «Пропустить анимацию», по нажатию на сцену или если галочку поставили посреди анимации */
+/* итог: после анимации, сразу при «Пропустить анимацию», после последнего нажатия на сцену или если галочку поставили посреди анимации */
 function coReveal(R) {
   if (!coLive(R)) return;
   coStop(R); R.phase = 'res'; R.tr = coNow();
   coPaint(R); coFocus(R);
+}
+/* нажатие на сцену посреди анимации — к следующему моменту: замок, самая ценная, её переворот; после — итог.
+   Время показа сдвигается, разметка рисуется из нового момента, частицы прошедших моментов не повторяются */
+function coTap(R) {
+  if (!coLive(R)) return;
+  const e = coNow() - R.t0, next = R.T.beats.find(b => b > e + CO_VIEW.tapGap);
+  if (next == null || next >= R.T.end) { coReveal(R); return; }
+  coStop(R); R.t0 = coNow() - next; coSchedule(R); coPaint(R);
 }
 function coFocus(R) {
   if (R.host !== 'game') return;
@@ -214,56 +357,108 @@ function coFx(host) {
   return I;
 }
 const coEl = (R, sel) => { const root = coRoot(R); return root && root.querySelector ? root.querySelector(`[data-co-run="${R.id}"] ${sel}`) : null; };
-/* крышка откинулась: искры цвета редкости, полосы света, с эпического — золото, с древнего — кольца, огоньки и лёгкая дрожь */
-function coBurstOpen(R) {
-  const fx = coFx(R.host), pt = coEl(R, '.co-mpt'), ch = coEl(R, '.co-chest');
-  if (!fx || !pt || !ch) return;
-  const P = CO_VIEW.fx.open[R.r - 1], C = EnFx.COL, b = fx.center(pt), w = fx.center(ch).w, c = coColor(R.r);
-  fx.burst(b.x, b.y, c, ...P.sparks);
-  fx.burst(b.x, b.y, C.steel, ...P.streaks, { shape: 'streak', w: 1.4 });
-  if (P.gold) fx.burst(b.x, b.y, C.gold, ...P.gold);
-  for (const [k, ms, th, d] of P.rings || []) setTimeout(() => { if (coLive(R)) fx.ring(b.x, b.y, c, w * k / 100, ms, th); }, d);
-  if (P.motes) {
-    const [n, step, k, sp, life, size, up] = P.motes;
-    for (let i = 0; i < n; i++) setTimeout(() => { if (coLive(R)) fx.burst(b.x, b.y, i % 2 ? C.gold : c, k, sp, life, size, { ay: -up, drag: 1, fade: 'in' }); }, i * step);
-  }
-  if (P.shake) fx.shake(...P.shake);
+/* что нужно почти каждой вспышке: слой частиц, середина щели, ширина крышки */
+function coAt(R) {
+  const fx = coFx(R.host), pt = coEl(R, '.co-mpt'), lid = coEl(R, '.co-lidf');
+  if (!fx || !pt) return null;
+  const m = fx.center(pt);
+  return { fx, x: m.x, y: m.y, w: lid ? fx.center(lid).w : 160, C: EnFx.COL };
 }
-/* карточка села: искра цвета её редкости; у самой ценной — ещё полосы, кольцо и золото по редкости */
+const coLvAt = (R, t) => { let k = 0; R.T.lv.forEach((x, i) => { if (x <= t) k = i; }); return R.climb[k]; };
+/* огоньки, что поднимаются: серия из n всплесков с подъёмом */
+function coMotes(R, fx, x, y, col, [n, step, k, sp, life, size, up]) {
+  for (let i = 0; i < n; i++) setTimeout(() => { if (coLive(R)) fx.burst(x, y, i % 2 ? EnFx.COL.gold : col, k, sp, life, size, { ay: -up, drag: 1, fade: 'in' }); }, i * step);
+}
+/* приземление: пыль у углов сундука, лёгкая дрожь */
+function coBurstLand(R) {
+  const a = coAt(R), ch = coEl(R, '.co-chest'); if (!a || !ch) return;
+  const b = a.fx.center(ch), F = CO_VIEW.fx.land, y = b.y + b.h / 2 - 4;
+  for (const x of [b.x - b.w / 2 + 10, b.x + b.w / 2 - 10]) a.fx.burst(x, y, EnFx.COL.dust, ...F.dust, { ay: 60, blend: 'normal', fade: 'in' });
+  a.fx.shake(...F.shake);
+}
+/* свет поднялся на ступень: кольцо и огоньки цвета новой редкости */
+function coBurstStep(R, k) {
+  const a = coAt(R); if (!a) return;
+  const F = CO_VIEW.fx.step, c = coColor(R.climb[k]), [n, sp, life, size, up] = F.motes;
+  a.fx.ring(a.x, a.y, c, a.w * F.ring[0] / 100, F.ring[1], F.ring[2]);
+  a.fx.burst(a.x, a.y, c, n + k * 2, sp, life, size, { ay: -up, drag: 1, fade: 'in' });
+}
+/* искра из щели: цвета текущей ступени света, к открытию — чаще; место по щели — от момента, без случайности */
+function coBurstLeak(R, t) {
+  const a = coAt(R); if (!a) return;
+  const [n, sp, life, size, up] = CO_VIEW.fx.leak, span = Math.max(1, R.T.lock - R.T.climb0), k = Math.floor((t - R.T.climb0) * 3 / span);
+  const x = a.x + ((t * 7919 % 1000) - 500) * a.w * 4 / 5000;
+  a.fx.burst(x, a.y, coColor(coLvAt(R, t)), n + k, sp, life, size, { ay: -up, drag: 1, fade: 'in' });
+}
+/* замок сорвался: искры и обломки */
+function coBurstLock(R) {
+  const fx = coFx(R.host), el = coEl(R, '.co-lock'); if (!fx || !el) return;
+  const b = fx.center(el), F = CO_VIEW.fx.lock, C = EnFx.COL;
+  fx.burst(b.x, b.y, C.gold, ...F.sparks, { shape: 'streak', w: 1.3 });
+  fx.burst(b.x, b.y, '#8d8f93', ...F.shards, { shape: 'shard', blend: 'normal', vr: 7, ay: 260 });
+}
+/* крышка откинулась: всплеск цвета самой ценной, полосы света, с эпической — золото, с древней — кольца, огоньки и дрожь. Пачка — фонтан
+   искр цветов всех выпавших редкостей */
+function coBurstOpen(R) {
+  const a = coAt(R); if (!a) return;
+  const P = CO_VIEW.fx.open[R.b - 1], C = a.C, c = coColor(R.b), { fx, x, y, w } = a;
+  fx.burst(x, y, c, ...P.sparks);
+  fx.burst(x, y, C.steel, ...P.streaks, { shape: 'streak', w: 1.4 });
+  if (P.gold) fx.burst(x, y, C.gold, ...P.gold);
+  for (const [k, ms, th, d] of P.rings || []) setTimeout(() => { if (coLive(R)) fx.ring(x, y, c, w * k / 100, ms, th); }, d);
+  if (P.motes) coMotes(R, fx, x, y, c, P.motes);
+  if (P.shake) fx.shake(...P.shake);
+  if (R.n > 1) {
+    const by = {}; R.items.forEach(it => { by[it.r] = (by[it.r] || 0) + 1; });
+    const [k, sp, life, size, up] = CO_VIEW.fx.fountain;
+    for (const [r, q] of Object.entries(by)) fx.burst(x, y, coColor(+r), Math.min(60, k * q), sp, life, size, { ay: -up, drag: 1.2 });
+  }
+}
+/* карточка вылетела из сундука; её шлейф; переворот — искра цвета её редкости, с уникальной — кольцо */
+function coBurstLaunch(R, i) { const a = coAt(R); if (a) a.fx.burst(a.x, a.y, coColor(R.cards[i].r), ...CO_VIEW.fx.launch, { shape: 'streak', w: 1.2 }); }
+function coBurstTrail(R, i) {
+  const fx = coFx(R.host), el = coEl(R, `.co-card[data-i="${i}"] .co-flip`); if (!fx || !el) return;
+  const b = fx.center(el); fx.burst(b.x, b.y, coColor(R.cards[i].r), ...CO_VIEW.fx.trail, { fade: 'in' });
+}
 function coBurstCard(R, i) {
-  const fx = coFx(R.host), el = coEl(R, `.co-card[data-i="${i}"] .co-cb`);
-  if (!fx || !el) return;
-  const c = R.cards[i], B = CO_VIEW.fx.best, C = EnFx.COL, b = fx.center(el), col = coColor(c.r);
+  const fx = coFx(R.host), el = coEl(R, `.co-card[data-i="${i}"] .co-flip`); if (!fx || !el) return;
+  const c = R.cards[i], b = fx.center(el), col = coColor(c.r), [from, k, ms, th] = CO_VIEW.fx.cardRing;
   fx.burst(b.x, b.y, col, ...CO_VIEW.fx.card[c.r - 1]);
-  if (i !== R.cards.length - 1) return;
-  fx.burst(b.x, b.y, C.steel, ...B.streaks, { shape: 'streak', w: 1.3 });
-  if (c.r >= B.ringFrom) fx.ring(b.x, b.y, col, b.w * B.ring[0] / 100, B.ring[1], B.ring[2]);
+  if (c.r >= from) fx.ring(b.x, b.y, col, b.w * k / 100, ms, th);
+}
+/* самая ценная поднимается: огоньки её цвета вокруг сундука; переворот — вспышка, полосы, кольца, золото и дрожь по её редкости */
+function coBurstRise(R) { const a = coAt(R); if (a) coMotes(R, a.fx, a.x, a.y, coColor(R.b), CO_VIEW.fx.hero.motes); }
+function coBurstHero(R) {
+  const fx = coFx(R.host), el = coEl(R, '.co-card.best .co-flip'); if (!fx || !el) return;
+  const c = R.cards[R.cards.length - 1], B = CO_VIEW.fx.hero, b = fx.center(el), col = coColor(c.r), C = EnFx.COL;
+  fx.burst(b.x, b.y, col, ...CO_VIEW.fx.card[c.r - 1]);
+  fx.burst(b.x, b.y, C.steel, ...B.streaks, { shape: 'streak', w: 1.4 });
+  if (c.r >= B.ringFrom) for (const [k, ms, th, d] of B.rings) setTimeout(() => { if (coLive(R)) fx.ring(b.x, b.y, col, b.w * k / 100, ms, th); }, d);
   if (c.r >= B.goldFrom) fx.burst(b.x, b.y, C.gold, ...B.gold);
+  if (c.r >= B.shakeFrom) fx.shake(...B.shake);
 }
 
 /* ================== разметка ================== */
-/* сундук — SVG: корпус, оковка, замок с эмблемой вида; крышка — отдельная группа, её откидывает CSS. u — префикс id градиентов */
-function coChestSvg(box, u) {
-  const K = CO_KINDS[box] || CO_KINDS.wander, emb = (typeof LB_IC !== 'undefined' && LB_IC[box]) || K.ic;
+/* заглушка SVG, пока рисунка вида нет: крышка и корпус — отдельные SVG, их рамки — CO_ART.svg. u — префикс id градиентов */
+function coSvgPart(part, box, u) {
+  const K = CO_KINDS[box] || CO_KINDS.wander, emb = (typeof LB_IC !== 'undefined' && LB_IC[box]) || K.ic, G = CO_ART.svg[part];
+  const shade = `<linearGradient id="${u}${part}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".14"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".46"/></linearGradient>`;
   const lid = 'M26 90V61C26 43 60 34 100 34C140 34 174 43 174 61V90Z';
-  return `<svg class="co-sv" viewBox="0 0 200 170" aria-hidden="true" focusable="false"><defs>
-    <linearGradient id="${u}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".14"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".44"/></linearGradient>
-    <radialGradient id="${u}m" cx=".5" cy=".82" r=".62"><stop offset="0" style="stop-color:#fffaf0"/><stop offset=".42" style="stop-color:var(--rc)"/><stop offset="1" style="stop-color:var(--rc);stop-opacity:0"/></radialGradient>
-    <filter id="${u}g" x="-20%" y="-400%" width="140%" height="900%"><feGaussianBlur stdDeviation="2.6"/></filter></defs>
-  <ellipse class="co-shd" cx="100" cy="159" rx="84" ry="7"/>
-  <g class="co-body"><rect class="w" x="30" y="86" width="140" height="66" rx="5"/><path class="w2" d="M32 108.5H168M32 130.5H168"/>
-    <rect class="m" x="46" y="86" width="12" height="66"/><rect class="m" x="142" y="86" width="12" height="66"/>
-    <rect class="m2" x="26" y="146" width="148" height="9" rx="2.5"/>
-    <g class="rv"><circle cx="52" cy="97" r="1.7"/><circle cx="52" cy="138" r="1.7"/><circle cx="148" cy="97" r="1.7"/><circle cx="148" cy="138" r="1.7"/></g>
-    <rect x="30" y="86" width="140" height="66" rx="5" fill="url(#${u}s)"/>
-    <path class="m" d="M86 92H114V112L100 122L86 112Z"/><path class="m2" d="M89 95H111V110.5L100 118.5L89 110.5Z" opacity=".5"/>
-    <use class="co-emb" href="#i-${emb}" x="92" y="95" width="16" height="16"/><circle class="co-kh" cx="100" cy="114" r="2.3"/></g>
-  <g class="co-lid"><path class="w" d="${lid}"/><path class="w2" d="M27 63C54 52 146 52 173 63"/>
-    <path class="m" d="M46 41.6L58 38.1V90H46Z M154 41.6L142 38.1V90H154Z"/><rect class="m2" x="24" y="79" width="152" height="11" rx="3"/>
-    <rect class="m" x="94" y="81" width="12" height="15" rx="2"/><path d="${lid}" fill="url(#${u}s)"/><path class="co-lidin" d="${lid}"/></g>
-  <ellipse class="co-mouth" cx="100" cy="84" rx="66" ry="17" fill="url(#${u}m)"/>
-  <rect class="co-seam co-seamb" x="28" y="87" width="144" height="5" rx="2.5" filter="url(#${u}g)"/><rect class="co-seam" x="31" y="88.6" width="138" height="1.8" rx=".9"/>
-</svg>`;
+  const body = part === 'lid'
+    ? `<path class="w" d="${lid}"/><path class="w2" d="M27 63C54 52 146 52 173 63"/><path class="m" d="M46 41.6L58 38.1V90H46Z M154 41.6L142 38.1V90H154Z"/>
+      <rect class="m2" x="24" y="79" width="152" height="11" rx="3"/><circle class="m2" cx="100" cy="60" r="11"/><use class="co-emb" href="#i-${emb}" x="92" y="52" width="16" height="16"/><path d="${lid}" fill="url(#${u}lid)"/>`
+    : `<rect class="w" x="30" y="86" width="140" height="66" rx="5"/><path class="w2" d="M32 108.5H168M32 130.5H168"/>
+      <rect class="m" x="46" y="86" width="12" height="66"/><rect class="m" x="142" y="86" width="12" height="66"/><rect class="m2" x="26" y="146" width="148" height="9" rx="2.5"/>
+      <g class="rv"><circle cx="52" cy="97" r="1.7"/><circle cx="52" cy="138" r="1.7"/><circle cx="148" cy="97" r="1.7"/><circle cx="148" cy="138" r="1.7"/></g>
+      <rect x="30" y="86" width="140" height="66" rx="5" fill="url(#${u}body)"/>`;
+  return `<svg class="co-sv" viewBox="${G.join(' ')}" preserveAspectRatio="none" aria-hidden="true" focusable="false"><defs>${shade}</defs>${body}</svg>`;
+}
+/* замок: рисунок или заглушка SVG; скважина светится */
+function coLockArt() {
+  if (coArtOk('chests/lock.png')) return `<img src="${AV('chests/lock.png')}" alt="" draggable="false">`;
+  return `<svg class="co-sv" viewBox="0 0 82 100" aria-hidden="true" focusable="false"><path d="M19 42V28C19 14 29 6 41 6S63 14 63 28V42" fill="none" stroke="#3a3f45" stroke-width="10"/>
+    <path d="M19 42V28C19 14 29 6 41 6S63 14 63 28V42" fill="none" stroke="#6b7078" stroke-width="3" stroke-opacity=".55"/><rect x="6" y="38" width="70" height="58" rx="14" fill="#b08c4e"/>
+    <rect x="12" y="44" width="58" height="46" rx="10" fill="#2a2e33"/><path d="M41 55a7 7 0 0 1 4 12.7V78h-8V67.7A7 7 0 0 1 41 55z" fill="#07090b"/></svg>`;
 }
 /* шапка окна: вид, имя сундука с кристаллом редкости, маленькое окно с галочкой и крестик */
 function coTopHtml(R) {
@@ -273,26 +468,46 @@ function coTopHtml(R) {
     <label class="co-skip"${red ? ' title="В системе включено «меньше движения»"' : ''}><input type="checkbox" data-a="coskip"${coSkipOn() ? ' checked' : ''}${red ? ' disabled' : ''}><span>Пропустить анимацию</span></label>
     ${R.phase === 'idle' ? '' : `<button class="iconbtn x co-x" data-a="close" aria-label="Закрыть">${ic('x')}</button>`}</div>`;
 }
-/* карточки: вылетают из щели сундука к своему месту в ряду; самая ценная — последней и крупнее. e — мс от начала показа */
-function coCardsHtml(R, e) {
+/* места карточек: самая ценная — в воздухе над сундуком; остальные — по бокам сундука, по очереди слева и справа, изнутри наружу */
+function coSlots(R, C) {
+  const G = CO_VIEW.geo, n = R.cards.length, reg = Math.max(0, n - 1), mx = Math.round(G.w / 2), out = [];
+  const per = Math.ceil(reg / 2), rows = Math.max(1, Math.ceil(per / 2)), k = rows > 2 ? Math.floor(2000 / rows) : 1000;
+  const cw = Math.round(G.card[0] * k / 1000), ch = Math.round(G.card[1] * k / 1000);
+  const half = Math.round(Math.max(C.w - C.cx, C.cx)), heroY = G.heroTop + Math.round(G.hero[1] / 2);
+  const top0 = heroY - Math.round(ch / 2) - (rows > 1 ? Math.round((ch + G.rowGap) * (rows - 1) / 2) : 0);
+  for (let i = 0; i < reg; i++) {
+    const side = i % 2 ? 1 : -1, j = Math.floor(i / 2), col = j % 2, row = Math.floor(j / 2);
+    const cx = mx + side * (half + G.side + Math.round(cw / 2) + col * (cw + G.colGap));
+    out.push({ x: cx - Math.round(cw / 2), y: top0 + row * (ch + G.rowGap), w: cw, h: ch });
+  }
+  if (n) out.push({ x: mx - Math.round(G.hero[0] / 2), y: G.heroTop, w: G.hero[0], h: G.hero[1] });
+  return out;
+}
+/* карточки: поднимаются из щели рубашкой вверх со шлейфом, встают на место и переворачиваются; самая ценная — медленно, в воздух над
+   сундуком, висит и переворачивается со вспышкой. e — мс от начала показа */
+function coCardsHtml(R, e, C, my) {
   const V = CO_VIEW, G = V.geo, T = R.T, n = R.cards.length; if (!n) return '';
-  const size = i => i === n - 1 ? G.best : G.card, mx = G.w / 2, my = G.h - G.chest[1] - G.pad + G.seam;
-  let x = Math.round((G.w - R.cards.reduce((a, c, i) => a + size(i)[0], 0) - G.gap * (n - 1)) / 2);
+  const slots = coSlots(R, C), mx = Math.round(G.w / 2), H = T.H;
   return R.cards.map((c, i) => {
-    const [w, h] = size(i), best = i === n - 1, top = G.top + G.best[1] - h, t = T.cards[i], fly = coFly(R, i);
-    const fx = Math.round(mx - x - w / 2), fy = Math.round(my - top - h / 2), fl = V.fx.best.flash[c.r - 1];
-    const s = `left:${x}px;top:${top}px;--w:${w}px;--h:${h}px;--fx:${fx}px;--fy:${fy}px;--dc:${t - e}ms;--tf:${fly}ms;--dl:${t + fly - e}ms${best ? `;--fs:${fl[0]};--tfb:${fl[1]}ms` : ''}`;
-    x += w + G.gap;
-    return `<div class="co-card co-a${best ? ' best' : ''}${c.dust ? ' dust' : ''}" data-r="${c.r}" data-i="${i}" title="${trEsc(c.tip)}" style="${s}">${best ? '<i class="co-cfl"></i>' : ''}<span class="co-cb"><i class="co-cr"></i><span class="co-ci${c.face ? ' face' : ''}">${c.icon}</span><b class="co-cq">${c.dust ? '+' + fmt(c.dust) : '×' + fmt(c.q)}</b>${best ? '<i class="co-csh"></i>' : ''}</span><small class="co-cn">${trEsc(c.name)}</small></div>`;
+    const best = i === n - 1, { x, y, w, h } = slots[i], t = T.cards[i];
+    const fx = Math.round(mx - x - w / 2), fy = Math.round(my - y - h / 2), ta = Math.round(Math.atan2(fy, fx) * 180 / Math.PI) - 90;
+    const fly = best ? H.rise : V.fly, fl = best ? T.hero.flip : t + V.fly, fp = best ? H.flip : V.flip;
+    const s = `left:${x}px;top:${y}px;--w:${w}px;--h:${h}px;--fx:${fx}px;--fy:${fy}px;--dc:${t - e}ms;--tf:${fly}ms;--dl:${fl - e}ms;--tp:${fp}ms;--ta:${ta}deg`
+      + (best ? `;--dv:${T.hero.hover - e}ms;--tv:${H.hover}ms` : '');
+    const face = `<span class="co-cb co-face"><i class="co-cr"></i><span class="co-ci${c.face ? ' face' : ''}">${c.icon}</span><b class="co-cq">${c.dust ? '+' + fmt(c.dust) : '×' + fmt(c.q)}</b>${best ? '<i class="co-csh co-a"></i>' : ''}</span>`;
+    const back = `<span class="co-back"><i class="co-bk"></i></span>`;
+    const inner = `<i class="co-tail co-a"></i>${best ? '<i class="co-aura co-a"></i>' : ''}<span class="co-flip co-a">${face}${back}</span>`;
+    return `<div class="co-card co-a${best ? ' best' : ''}${c.dust ? ' dust' : ''}" data-r="${c.r}" data-i="${i}" title="${trEsc(c.tip)}" style="${s}">`
+      + (best ? `<div class="co-bob co-a">${inner}</div>` : inner) + `<small class="co-cn co-a">${trEsc(c.name)}</small></div>`;
   }).join('');
 }
-/* монеты гарантированной валюты: вылетают из щели при открытии и встают справа от сундука */
-function coCoinsHtml(R, e) {
-  const V = CO_VIEW, G = V.geo, list = Object.entries(R.cur).filter(([, a]) => a > 0);
-  const left = Math.round((G.w + G.chest[0]) / 2) + G.coin[0], mx = G.w / 2, my = G.h - G.chest[1] - G.pad + G.seam;
+/* монеты гарантированной валюты: вылетают из щели при открытии и встают справа от сундука, у земли */
+function coCoinsHtml(R, e, C, my, gy) {
+  const V = CO_VIEW, G = V.geo, list = Object.entries(R.cur).filter(([, a]) => a > 0), mx = Math.round(G.w / 2);
+  const left = mx - C.cx + C.w + G.coin[0];
   return list.map(([k, a], i) => {
-    const top = G.coin[1] + i * G.coin[2];
-    return `<span class="co-coin co-a" style="left:${left}px;top:${top}px;--fx:${Math.round(mx - left)}px;--fy:${Math.round(my - top)}px;--dk:${R.T.tO + V.coin + i * V.coinStep - e}ms"><img src="${curImg(k)}" alt="${coCurName(k)}"><b>+${fmt(a)}</b></span>`;
+    const top = gy - G.coin[1] * (i + 1);
+    return `<span class="co-coin co-a" style="left:${left}px;top:${top}px;--fx:${mx - left}px;--fy:${my - top}px;--dq:${R.T.open + V.coin + i * V.coinStep - e}ms"><img src="${curImg(k)}" alt="${coCurName(k)}"><b>+${fmt(a)}</b></span>`;
   }).join('');
 }
 /* итог — одной сеткой: одинаковые записи слиты, редкие сверху; у пачки — по редкостям. Прах — плиткой героя и строкой суммы */
@@ -328,28 +543,64 @@ function coResHtml(R, e) {
   const dust = G.reduce((a, g) => a + g.dust, 0);
   const dl = dust ? `<p class="co-dust"><img src="${curImg('dust')}" alt="${coCurName('dust')}"><span>Осколки пробуждённых героев ушли в прах: <b>+${fmt(dust)}</b></span></p>` : '';
   const note = R.trial ? TM('Проба тем же алгоритмом, что у запасов (EnLoot на сиде пробы): запасы и кошелёк не меняются.', 'p', 'reason')
-    : TM(`Итог выдан до анимации одной операцией${R.op ? ' ' + R.op : ''}: у каждого сундука свой сид, выданный вместе с ним. Анимация только показывает: закрыть окно или пропустить её — итог тот же, повтор номера операции ничего не выдаёт. Числа вида — CO_VIEW.`, 'p', 'reason');
+    : TM(`Итог выдан до анимации одной операцией${R.op ? ' ' + R.op : ''}: у каждого сундука свой сид, выданный вместе с ним. Анимация только показывает: закрыть окно, пропустить её или нажимать на сцену — итог тот же, повтор номера операции ничего не выдаёт. Числа вида — CO_VIEW.`, 'p', 'reason');
   return `<button class="co-scrim2" data-a="close" aria-label="Закрыть итог" tabindex="-1" style="--dr:${dr}"></button>
     <section class="co-res${many ? ' wide' : ''}" role="dialog" aria-label="Итог открытия" style="--dr:${dr}">${head}<div class="co-res-b">${coins}${body}${dl}${note}</div><div class="co-res-f">${coActs(R)}</div></section>`;
 }
-/* сцена целиком: фон со светом редкости, сундук, вспышка, лучи, монеты, карточки, шапка и итог.
-   Все задержки — от начала показа минус e: перерисовка посреди анимации продолжает её с того же места */
+/* сцена целиком: дымка, кольцо под сундуком, ореол ступеней света, лучи, столп, сундук с крышкой и замком, пыль, вспышка, монеты,
+   карточки, затемнение и самая ценная; шапка, подсказка и итог. Все задержки — от начала показа минус e: перерисовка посреди анимации
+   продолжает её с того же места */
 function coStageHtml(R, e) {
   e = Math.max(0, Math.round(e || 0));
-  const V = CO_VIEW, G = V.geo, T = R.T, anim = R.phase === 'anim', idle = R.phase === 'idle', K = CO_KINDS[R.box] || CO_KINDS.wander;
-  const [cw, chh] = G.chest, cx = Math.round((G.w - cw) / 2), cy = G.h - chh - G.pad, mx = G.w / 2, my = cy + G.seam;
-  const metal = R.r >= V.gild ? V.gold : [K.metal, K.metal2], P = V.fx.open[R.r - 1] || V.fx.open[0], d = t => `${t - e}ms`;
-  const vars = `--d0:${-e}ms;--dw:${d(T.tW)};--do:${d(T.tO)};--wait:${T.wait}ms;--tseam:${T.wait + V.seamTail}ms;--tlid:${V.lid}ms;--tdrop:${V.drop}ms;--tsh:${V.shake}ms;--nsh:${Math.max(1, Math.floor(T.wait / V.shake))};--amp:${V.amp[R.r - 1]};--ha:${V.halo[R.r - 1]};--ra:${V.ray[R.r - 1]};--fs:${P.flash[0]};--tfl:${P.flash[1]}ms`;
-  const chest = `<div class="co-chest co-a" data-g="${R.r >= V.gild ? 1 : 0}" style="left:${cx}px;top:${cy}px;width:${cw}px;height:${chh}px;--wood:${K.wood};--wood2:${K.wood2};--metal:${metal[0]};--metal2:${metal[1]}">
-      <div class="co-rock co-a"><div class="co-swell co-a"><div class="co-pop co-a">${coChestSvg(R.box, `co${R.host}${R.id}`)}<i class="co-leak co-a" style="top:${G.seam - 36}px"></i></div></div></div>
-      ${R.n > 1 ? `<b class="co-n">×${fmt(R.n)}</b>` : ''}<i class="co-mpt" style="top:${G.seam}px"></i></div>`;
-  const scene = `<div class="co-halo co-a" style="left:${mx}px;top:${my}px"></div>${R.r >= V.rays ? `<div class="co-rays" style="left:${mx}px;top:${my}px"></div>` : ''}${chest}
-    ${idle ? '' : `<div class="co-flash co-a" style="left:${mx}px;top:${my}px"></div>${coCoinsHtml(R, e)}${coCardsHtml(R, e)}`}`;
+  const V = CO_VIEW, G = V.geo, T = R.T, anim = R.phase === 'anim', idle = R.phase === 'idle', d = t => `${t - e}ms`;
+  const C = coChestGeo(R.box), A = C.A, mx = Math.round(G.w / 2), gy = G.h - G.ground, top = gy - C.h, my = top + C.seam, cl = mx - C.cx;
+  const lv = idle ? [R.r] : R.climb, s = lv.length - 1, lt = k => idle ? 0 : T.lv[k], gild = R.r >= V.gild, H = T.H;
+  const lvx = (k, out) => `${k === s && out == null ? ' z' : ''}" data-r="${lv[k]}" style="--l0:${d(lt(k))}${k < s ? `;--l1:${d(lt(k + 1))}` : out != null ? `;--l1:${d(out)}` : ''}`;
+  const tex = n => coTex(n), rays = tex('rays'), ring = tex('ring'), haze = tex('haze'), beam = tex('beam'), dust = tex('dust'), flash = tex('flash');
+  /* сундук: крышка — 3D, ось у задней кромки; её изнанка светится ступенями света; корпус — со светом снизу; щель, замок */
+  const [lx, ly, lw, lh] = C.lid, [bx, by, bw, bh] = C.body, gold = gild && !A;
+  const lidArt = A ? `<img src="${A.lid}" alt="" draggable="false">${gild ? `<i class="co-shn co-a" style="--m:url('${A.lidAbs}')"></i>` : ''}` : coSvgPart('lid', R.box, `co${R.host}${R.id}`);
+  const bodyArt = A ? `<img src="${A.body}" alt="" draggable="false">${lv.map((x, k) => `<i class="co-lit co-lvx${lvx(k)};--m:url('${A.bodyAbs}')"></i>`).join('')}${gild ? `<i class="co-shn co-a" style="--m:url('${A.bodyAbs}')"></i>` : ''}`
+    : coSvgPart('body', R.box, `co${R.host}${R.id}`);
+  const K = CO_KINDS[R.box] || CO_KINDS.wander, metal = gold ? CO_GOLD : [K.metal, K.metal2];
+  const hops = idle ? [] : lv.slice(1).map((x, k) => `<div class="co-hop co-a" style="--dh:${d(T.lv[k + 1])}">`);
+  const chest = `<div class="co-chest co-a${A ? ' art' : ''}" data-g="${gild ? 1 : 0}" style="left:${cl}px;top:${top}px;width:${C.w}px;height:${C.h}px;--wood:${K.wood};--wood2:${K.wood2};--metal:${metal[0]};--metal2:${metal[1]}">
+      <div class="co-land co-a">${hops.join('')}<div class="co-shake co-a"><div class="co-recoil co-a"><div class="co-c3" style="perspective:${C.persp}px">
+        <div class="co-lid co-a" style="left:${lx}px;top:${ly}px;width:${lw}px;height:${lh}px;transform-origin:50% 100% -${C.depth}px"><div class="co-lidr co-a" style="transform-origin:50% 100% -${C.depth}px">
+          <div class="co-lidu${A ? ' art' : ''}" style="height:${C.depth}px${A ? `;--m:url('${A.lidAbs}')` : ''}">${A ? `<img class="co-lui" src="${A.lid}" alt="" draggable="false">` : ''}${lv.map((x, k) => `<i class="co-ulv co-lvx${lvx(k)}"></i>`).join('')}</div>
+          <div class="co-lidf">${lidArt}</div></div></div>
+        <div class="co-mouth co-a" data-r="${R.b}" style="left:${C.cx - Math.round(C.inner / 2)}px;top:${C.seam}px;width:${C.inner}px"><i class="co-a"></i></div>
+        <div class="co-body" style="left:${bx}px;top:${by}px;width:${bw}px;height:${bh}px">${bodyArt}</div>
+        <div class="co-bloom co-a" data-r="${R.b}" style="left:${C.cx - Math.round(C.inner / 2)}px;top:${C.seam}px;width:${C.inner}px"><i class="co-a"></i></div>
+        ${lv.map((x, k) => `<div class="co-crk co-lvx${lvx(k, idle ? null : T.open)};left:${C.cx - Math.round(C.inner / 2)}px;top:${C.seam}px;width:${C.inner}px"><i class="co-a"></i><b class="co-leak co-a"></b></div>`).join('')}
+        <div class="co-lock co-a" style="left:${C.lock[0]}px;top:${C.lock[1]}px;width:${C.lock[2]}px;height:${C.lock[3]}px">${coLockArt()}<i class="co-kh co-a"></i></div>
+      </div></div></div>${hops.map(() => '</div>').join('')}</div>
+      ${R.n > 1 ? `<b class="co-n">×${fmt(R.n)}</b>` : ''}<i class="co-mpt" style="left:${C.cx}px;top:${C.seam}px"></i></div>`;
+  /* фон сцены: дымка, кольцо под сундуком, ореол каждой ступени света, лучи и столп — после открытия */
+  const back = `<div class="co-haze co-a" data-r="${R.r}" style="left:${mx}px;top:${my}px;--hz:${V.haze[R.r - 1]}"><i class="co-a${haze.cls}" style="${haze.st}"></i></div>`
+    + (R.r >= V.rune ? `<div class="co-rune co-a" data-r="${R.r}" style="left:${mx}px;top:${gy}px"><i class="co-a${ring.cls}" style="${ring.st}"></i></div>` : '')
+    + `<div class="co-shd co-a" style="left:${mx}px;top:${gy}px;width:${C.w}px"></div>`
+    + lv.map((x, k) => `<div class="co-lv co-lvx${lvx(k)};--ha:${V.halo[x - 1]}"><i class="co-halo co-a" style="left:${mx}px;top:${my}px;--dp:${d(lt(k))}"></i></div>`).join('')
+    + (idle ? '' : (R.b >= V.rays ? `<div class="co-rays co-a" data-r="${R.b}" style="left:${mx}px;top:${my}px;--ra:${V.ray[R.b - 1]}"><i class="co-a${rays.cls}" style="${rays.st}"></i></div>` : '')
+      + `<div class="co-beam co-a" data-r="${R.b}" style="left:${mx}px;top:${my}px;width:${Math.round(C.inner * G.beam[0] / 1000)}px;height:${Math.round(C.inner * G.beam[1] / 1000)}px;--bm:${V.beam[R.b - 1]}"><i class="${beam.cls.trim()}" style="${beam.st}"></i></div>`);
+  /* перед сундуком: пыль приземления, вспышка открытия, монеты, карточки; самая ценная — над затемнением, с лучами и вспышкой */
+  const P = V.fx.open[R.b - 1] || V.fx.open[0], hs = coSlots(R, C), hb = hs[hs.length - 1];
+  const hx = hb ? hb.x + Math.round(hb.w / 2) : mx, hy = hb ? hb.y + Math.round(hb.h / 2) : my;
+  const front = idle ? '' : `<div class="co-puff co-a" style="left:${mx}px;top:${gy}px;--dw:${C.w}px"><i class="co-a${dust.cls} l" style="${dust.st}"></i><i class="co-a${dust.cls} r" style="${dust.st}"></i></div>
+    <div class="co-flash co-a" data-r="${R.b}" style="left:${mx}px;top:${my}px;--fs:${P.flash[0]};--tfl:${P.flash[1]}ms"><i class="${flash.cls.trim()}" style="${flash.st}"></i></div>
+    ${coCoinsHtml(R, e, C, my, gy)}
+    <div class="co-dim co-a" style="--dim:${H.dim}"></div>
+    ${hb && R.b >= V.rays ? `<div class="co-hrays co-a" data-r="${R.b}" style="left:${hx}px;top:${hy}px;--ra:${V.ray[R.b - 1]}"><i class="co-a${rays.cls}" style="${rays.st}"></i></div>` : ''}
+    ${coCardsHtml(R, e, C, my)}
+    ${hb ? `<div class="co-hflash co-a" data-r="${R.b}" style="left:${hx}px;top:${hy}px;--fs:${P.flash[0]};--tfl:${P.flash[1]}ms"><i class="${flash.cls.trim()}" style="${flash.st}"></i></div>` : ''}`;
+  const vars = `--d0:${-e}ms;--dg:${d(T.land)};--dc0:${d(T.climb0)};--wait:${Math.max(1, T.lock - T.climb0)}ms;--dk:${d(T.lock)};--do:${d(T.open)};--tlock:${V.lock}ms;--tlid:${V.lid}ms;--tdrop:${V.drop}ms`
+    + `;--amp:${V.amp[R.r - 1]};--lift:${V.lift[R.r - 1]};--dh0:${d(T.hero.start)};--dhv:${d(T.hero.hover)};--dhf:${d(T.hero.flip)};--thf:${H.flip}ms;--dhs:${d(T.hero.shown)}`
+    + `;--tcam:${Math.max(1, T.hero.shown - T.hero.start + 400)}ms;--zm:${H.zoom};--dhint:${d(V.hint)};--thint:${Math.max(1, T.hero.start - V.hint)}ms`;
   const tap = anim ? ' data-a="coreveal"' : '';
   return `<div class="co-st${anim ? '' : idle ? ' co-idle' : ' co-done'}" data-co-run="${R.id}" data-r="${R.r}" data-box="${R.box}" style="${vars}">
     <div class="co-bg"${tap}></div>
-    <div class="co-scene"${tap} style="width:${G.w}px;height:${G.h}px">${scene}</div>
-    ${coTopHtml(R)}${R.phase === 'res' ? coResHtml(R, e) : ''}</div>`;
+    <div class="co-scene"${tap} style="width:${G.w}px;height:${G.h}px"><div class="co-cam co-a" style="transform-origin:${hx}px ${hy}px">${back}${chest}${front}</div></div>
+    ${coTopHtml(R)}${anim ? '<div class="co-hint co-a" aria-hidden="true">Нажмите — быстрее</div>' : ''}${R.phase === 'res' ? coResHtml(R, e) : ''}</div>`;
 }
 
 /* ================== окно поверх игры ================== */
@@ -368,7 +619,7 @@ function coSetSkip(on, host) {
   if (host === 'kit') coKitPaint(); else render();
 }
 Object.assign(ACT, {
-  coreveal() { const R = S.co.run; if (coLive(R)) coReveal(R); },   // нажатие на сцену посреди анимации — итог сразу
+  coreveal() { const R = S.co.run; if (coLive(R)) coTap(R); },   // нажатие на сцену посреди анимации — к следующему моменту, в конце — итог
   coskip(v, t) { coSetSkip(!!(t && t.checked), 'game'); },
 });
 
@@ -414,10 +665,11 @@ function coKitTabs() {
   box.querySelectorAll('[data-co^="box:"]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.co === 'box:' + CO_KIT.box)));
   box.querySelectorAll('[data-co^="r:"]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.co === 'r:' + CO_KIT.r)));
 }
-/* сундук раздела до пробы: закрыт и дышит светом своей редкости */
+/* сундук раздела до пробы: закрыт, под замком, дышит светом своей редкости */
 function coIdle() {
   const K = CO_KIT;
-  return { id: 0, host: 'kit', phase: 'idle', box: K.box, r: K.r, n: 1, cs: { box: K.box, r: K.r, cyc: K.cyc, win: K.win }, items: [], cards: [], cur: {}, trial: true, t0: coNow(), T: { tW: 0, tO: 0, wait: CO_VIEW.wait[0], cards: [], end: 0 } };
+  return { id: 0, host: 'kit', phase: 'idle', box: K.box, r: K.r, b: K.r, n: 1, cs: { box: K.box, r: K.r, cyc: K.cyc, win: K.win }, items: [], cards: [], cur: {}, trial: true, t0: coNow(),
+    climb: [K.r], T: { land: 0, climb0: 0, lv: [0], open: 0, lock: 0, cards: [], H: coHero({ n: 1, b: K.r }), hero: { start: 0, hover: 0, flip: 0, shown: 0 }, end: 0, beats: [] } };
 }
 function coKitPaint() {
   const el = document.getElementById('coKitStage'); if (!el) return;
@@ -426,8 +678,8 @@ function coKitPaint() {
 }
 /* раскадровка: та же сцена, остановленная в свои моменты — анимации на паузе, задержки отсчитаны от начала, поэтому кадр стоит
    ровно в своём моменте. Сундук — выбранного вида и редкости, сид раскадровки постоянный */
-const CO_BOARD = [['1 · Ожидание', 'сундук дрожит, из щелей бьёт свет редкости'], ['2 · Крышка', 'вспышка, всплеск, монеты'],
-  ['3 · Карточки', 'по одной, самая ценная — последней и крупнее'], ['4 · Итог', 'одной сеткой, редкие сверху']];
+const CO_BOARD = [['1 · Предвкушение', 'свет из щели поднимается к самой ценной, крышка подпрыгивает'], ['2 · Замок и крышка', 'замок сорван, крышка откинута, вспышка и столп света'],
+  ['3 · Карточки', 'поднимаются из сундука и переворачиваются'], ['4 · Самая ценная', 'приближение, лучи, вспышка её редкости'], ['5 · Итог', 'одной сеткой, редкие сверху']];
 function coBoardHtml() {
   if (!LBX || !window.EnLoot) return '';
   const sp = coKitSpec(CO_KIT.r), B = CO_VIEW.board;
@@ -435,7 +687,9 @@ function coBoardHtml() {
   const conv = EnLoot.toDust(LBX, EnLoot.roll(def, EnLoot.seedOf(['раскадровка', sp.box, sp.r, sp.cyc, sp.win, sp.week || ''].join('|'))), {});
   const base = coRun({ key: '', cs: sp, sum: { n: 1, log: [{ cur: conv.cur, items: conv.items }] }, op: '' }, 'kit', { trial: true }), T = base.T;
   if (!T.cards.length) return '';
-  const at = [T.tW + Math.round(T.wait * B.wait / 100), T.tO + B.open, T.cards[T.cards.length - 1] + Math.round(CO_VIEW.flyBest * B.fly / 100), T.end + B.hold];
+  const s = T.lv.length - 1, lastLv = T.lv[s], wait = lastLv + coPct(T.lock - lastLv, B.wait);
+  const card = T.cards.length > 1 ? T.cards[0] + CO_VIEW.fly + coPct(CO_VIEW.flip, B.card) : T.hero.start + coPct(T.H.rise, B.card);
+  const at = [wait, T.open + B.open, card, T.hero.shown + B.hero, T.end + B.hold];
   return CO_BOARD.map(([n, d], i) => {
     const R = Object.assign({}, base, { id: ++coSeq, phase: i === CO_BOARD.length - 1 ? 'res' : 'anim', tr: base.t0 + T.end });
     return `<figure class="co-still"><div class="co-frame" aria-hidden="true"><div class="co-fst">${coStageHtml(R, at[i])}</div></div><figcaption><b>${n}</b> — ${d}</figcaption></figure>`;
@@ -453,16 +707,22 @@ function coKitBind() {
     if (t.dataset.co) { e.preventDefault(); coKitAct(t.dataset.co); return; }
     if (!t.closest('#coKit')) return;   // data-a других разделов — не наши
     if (t.dataset.a === 'close') coKitClose();
-    else if (t.dataset.a === 'coreveal' && coLive(CO_KIT.run)) coReveal(CO_KIT.run);
+    else if (t.dataset.a === 'coreveal' && coLive(CO_KIT.run)) coTap(CO_KIT.run);
   });
   k.addEventListener('change', e => { const t = e.target; if (t && t.dataset && t.dataset.a === 'coskip' && t.closest && t.closest('#coKit')) coSetSkip(t.checked, 'kit'); });
+}
+/* готовность арта — команде: какие виды нарисованы, замок, текстуры; остальное рисует заглушка SVG и CSS */
+function coArtNote() {
+  const kinds = Object.keys(CO_ART.chests), drawn = kinds.filter(k => coChestArt(k)), fx = CO_ART.fx.filter(n => coArtOk(`chests/fx-${n}.png`));
+  return `Арт: сундуки рисунком — ${drawn.length} из ${kinds.length}${drawn.length && drawn.length < kinds.length ? ` (${drawn.map(k => CO_KINDS[k].n).join(', ')})` : ''}; замок — ${coArtOk('chests/lock.png') ? 'рисунок' : 'заглушка SVG'}; текстуры света — ${fx.length} из ${CO_ART.fx.length}. Задание — <code>tools/art-gen/jobs/chests.json</code>, слои — <code>chest_layers.py</code>, выгруженные пути — <code>CO_ART.ready</code>.`;
 }
 function coKitHtml() {
   if (!LBX || !window.EnLoot) return '<section class="k-box" style="grid-column:1/-1"><h3>Открытие сундука</h3><p class="k-note">Нет данных: рядом с index.html должен лежать lootboxes.js.</p></section>';
   const kinds = Object.keys(LBX.boxes).map(k => `<button role="tab" data-co="box:${k}" aria-selected="${CO_KIT.box === k}" title="${LBX.boxes[k].n}">${ic((typeof LB_IC !== 'undefined' && LB_IC[k]) || (CO_KINDS[k] || CO_KINDS.wander).ic)}${(CO_KINDS[k] || { n: k }).n}</button>`).join('');
   const rars = [1, 2, 3, 4, 5, 6, 7].map(r => `<button class="btn sm co-kb" data-r="${r}" data-co="r:${r}" aria-pressed="${CO_KIT.r === r}">${ICON('r' + r, 16, RAR[r])}${RAR[r]}</button>`).join('');
   return `<section class="k-box co-kbox" style="grid-column:1/-1"><h3>Открытие сундука · одна анимация на все сундуки</h3>
-    <p class="k-note">Сундук своего вида и редкости: дрожит, из щелей бьёт свет цвета редкости, крышка откидывается — вспышка и частицы, с эпического — лучи, с древнего — золотая оковка, кольца и лёгкая дрожь. Предметы вылетают карточками по одной, самый ценный — последним и крупнее; итог — одной сеткой. Пачка — короткая анимация на самом ценном и сводка по редкостям. «Пропустить анимацию» — сразу итог; нажатие на сцену — тоже. В игре окно открывают «Запасы → Сундуки»: итог выдан до анимации одной операцией с номером, анимация только показывает (§34.1). Здесь — проба на цикле ${ROMAN[CO_KIT.cyc]}, неделя ${typeof zpWeekGen === 'function' ? zpWeekGen(CO_KIT.week) : CO_KIT.week}: проба — не выдача. Числа вида — <code>CO_VIEW</code> в <code>screens/chest-open.js</code>.</p>
+    <p class="k-note">Сундук своего вида падает с пылью; свет из щели под крышкой поднимается по редкостям — от нижней ступени окна сундука до самой ценной записи, крышка подпрыгивает, дрожь нарастает. Замок срывается, крышка откидывается назад — вспышка, столп света, с эпической — лучи, с древней — кольца, золото и дрожь. Записи поднимаются карточками рубашкой вверх со шлейфом цвета редкости и переворачиваются; самая ценная — медленно, с приближением и вспышкой своей редкости. Итог — одной сеткой. Нажатие на сцену ведёт к следующему моменту, «Пропустить анимацию» — сразу итог. Пачка — коротко: фонтан искр всех выпавших редкостей и одна карточка. В игре окно открывают «Запасы → Сундуки»: итог выдан до анимации одной операцией с номером, анимация только показывает (§34.1). Здесь — проба на цикле ${ROMAN[CO_KIT.cyc]}, неделя ${typeof zpWeekGen === 'function' ? zpWeekGen(CO_KIT.week) : CO_KIT.week}: проба — не выдача. Числа вида — <code>CO_VIEW</code> в <code>screens/chest-open.js</code>.</p>
+    <p class="k-note">${coArtNote()}</p>
     <div class="co-kctl" id="coKitCtl"><div class="tabs" role="tablist" aria-label="Вид сундука">${kinds}</div><div class="co-kr">${rars}<button class="btn sm" data-co="many">Пачкой ×${fmt(CO_VIEW.kitMany)}</button></div></div>
     <div class="co-kit" id="coKit"><div class="co-kst" id="coKitStage"></div><div class="co-fxl" aria-hidden="true"></div></div>
     <p class="k-note">Раскадровка — та же сцена, остановленная в свои моменты; частицы в кадре не видны, они рисуются поверх сцены.</p>
@@ -482,8 +742,8 @@ function coFlow(d) {
   zpOpen(key, coNextOp(), d.count > 1 ? Infinity : 1);
 }
 FLOWS.push(
-  ['Сундук · открытие', 'Первородный сундук талисманов: дрожит, из щелей бьёт свет его редкости, крышка откидывается — вспышка, лучи, кольца, предметы вылетают по одному, самый ценный последним; итог одной сеткой. «Пропустить анимацию» — сразу итог', () => coFlow(CO_DEMO.one)],
-  ['Сундуки · пачкой', 'Десять сундуков осколков одним нажатием: короткая анимация на самом ценном, затем сводка по редкостям — сколько открыто и что выпало', () => coFlow(CO_DEMO.many)],
+  ['Сундук · открытие', 'Первородный сундук талисманов: падает с пылью, свет из щели поднимается к самой ценной записи, замок срывается, крышка откидывается — вспышка, столп света, лучи; карточки поднимаются и переворачиваются, самая ценная — с приближением и вспышкой; итог одной сеткой. Нажатие на сцену — к следующему моменту, «Пропустить анимацию» — сразу итог', () => coFlow(CO_DEMO.one)],
+  ['Сундуки · пачкой', 'Десять сундуков осколков одним нажатием: коротко — фонтан искр всех выпавших редкостей и одна карточка, самая ценная; затем сводка по редкостям — сколько открыто и что выпало', () => coFlow(CO_DEMO.many)],
 );
 
 /* ================== состояние ==================

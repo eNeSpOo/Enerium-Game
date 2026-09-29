@@ -1,5 +1,5 @@
 /* screens/roulette.js — «Герои → Призыв → За души»: рулетка Возрождения душ (§15 GDD, ADR-0019). Договор — screens/model.js.
-   Регистрирует: rlCol — колонку рулетки во вкладке «За души» (её зовёт rsSoulsView в index.html); OV.rl — окно рулетки с лентой
+   Регистрирует: rlCol — вход рулетки во вкладке «За души», главное вкладки (его зовёт rsSoulsView в index.html); OV.rl — окно рулетки с лентой
    и итогом поверх, OV.rlodds — лист «Шансы»; действия ACT.rl*; сценарий презентации. Своё состояние — S.rl, заводится как S.bag.
    Правила §15: пул прокрутки привязан к циклу — герои рулетки текущего цикла (rsPool; у них доблесть 2–3, ADR-0019). Выпадают осколки
    или, с малым шансом, полный чертёж. Осколки и чертёж героя из коллекции уходят в прах (§15.2, демо-таблица §15.3 — rsDustOf).
@@ -293,21 +293,21 @@ function rlBurst(card, full, r) {
 }
 
 /* ================== вид ================== */
-/* колонка рулетки во вкладке «За души»: пул цикла с осколками, прошлая прокрутка, «Шансы» и одно действие — «К рулетке» */
-function rlTag(h) {
-  if (rsHas(h)) return `<span class="chip gold">${ic('check')}есть</span>`;
-  const n = S.rs.shards[h.id] || 0, need = rlNeed();
-  return n >= need ? '<span class="chip spirit">готов</span>' : `<span class="faint num">${fmt(n)}/${fmt(need)}</span>`;
+/* вход во вкладке «За души» — одна главная вещь вкладки (правила воздуха): лица героев пула цикла с кристаллом редкости, прошлая
+   прокрутка, «Шансы» и «К рулетке». Лицо открывает карточку героя; отметка — в коллекции или осколков хватает на пробуждение */
+function rlMark(h) {
+  if (rsHas(h)) return `<i class="rl-em own" title="В коллекции">${ic('check')}</i>`;
+  return (S.rs.shards[h.id] || 0) >= rlNeed() ? '<i class="rl-em ready" title="Осколков хватает на пробуждение"></i>' : '';
 }
 function rlCol() {
   const cur = rsCyc(), from = rsFrom('roulette'), I = RS.srcInfo.roulette;
-  const head = `<div class="rs-colh"><span class="eyebrow">Возрождение душ</span><b>Рулетка · цикл ${ROMAN[cur]}</b><small class="faint">${I ? `доблесть ${I.maxV[0]}–${I.maxV[1]} · ` : ''}осколки или полный чертёж</small></div>`;
-  if (cur < from) return `<div class="pnl rs-col">${head}<p class="rs-line">${ic('lock')}Откроется с цикла ${ROMAN[from]}.</p></div>`;
+  const head = `<div class="rl-eh"><span class="eyebrow">Возрождение душ</span><h2>Рулетка · цикл ${ROMAN[cur]}</h2><small class="faint">${I ? `доблесть ${I.maxV[0]}–${I.maxV[1]} · ` : ''}осколки или герой целиком</small></div>`;
+  if (cur < from) return `<div class="pnl rl-entry">${head}<p class="rs-line">${ic('lock')}Откроется с цикла ${ROMAN[from]}.</p></div>`;
   const pool = rsPool(), R = S.rl.srv.ops[S.rl.last];
-  const rows = pool.map(h => rsRow(h, { act: 'ssel', sel: S.rs.ssel === h.id, sub: rsSub(h, `${RAR[h.r]} · доблесть до ${h.maxV}`), right: rlTag(h) })).join('') || '<p class="faint">В пуле этого цикла героев нет.</p>';
-  return `<div class="pnl rs-col">${head}
-    <div class="rs-list scroll grow" data-keep="roul:${cur}">${rows}</div>
-    <div class="rs-colf">${R ? `<p class="reason">${rlSay(R, R.n === 1 ? 'Прошлая прокрутка' : 'Прошлая')}</p>` : ''}<div class="row rl-cf"><button class="link" data-a="sheet" data-v="rlodds">Шансы ${ic('chev')}</button><span class="g-spacer"></span><button class="btn go sm" data-a="dlg" data-v="rl"${pool.length ? '' : ' disabled'}>К рулетке</button></div></div>
+  const faces = pool.map(h => `<button class="rl-ef" data-r="${h.r}" data-a="rhero" data-v="${h.id}" title="${h.n} · ${RAR[h.r].toLowerCase()} · доблесть до ${h.maxV}"><span class="rl-face">${rsFace(h)}</span><i class="rl-cr"></i>${rlMark(h)}</button>`).join('');
+  return `<div class="pnl rl-entry">${head}
+    <div class="rl-faces" style="--n:${Math.max(2, pool.length)}">${faces || '<p class="faint">В пуле этого цикла героев нет.</p>'}</div>
+    <div class="rl-ef-f">${R ? `<p class="reason">${rlSay(R, R.n === 1 ? 'Прошлая прокрутка' : 'Прошлая')}</p>` : ''}<div class="row rl-cf"><button class="link" data-a="sheet" data-v="rlodds">Шансы ${ic('chev')}</button><span class="g-spacer"></span><button class="btn go big" data-a="dlg" data-v="rl"${pool.length ? '' : ' disabled'}>К рулетке</button></div></div>
   </div>`;
 }
 /* карточка ленты: полный герой — лицо во всю карточку, золотая рамка и «Герой»; осколки — лицо поменьше и «×N».

@@ -1,6 +1,6 @@
 /* screens/craft.css — «Ремесло → Мастерская» (screens/craft.js): зоны «Инвентарь» и «Крафт», стол из шести ячеек,
-   книга рецептов, автодокрафт (GDD §12.4). По «Правилам воздуха»: одна рамка — панель, внутри строки и разделители,
-   сведения о ресурсе — лист по нажатию. Свои классы — на ws-, остальное — общие классы «Света снизу»: pnl, tabs, chip, well, btn. */
+   книга рецептов, автодокрафт (GDD §12.4), анимация удачи и неудачи. По «Правилам воздуха»: одна рамка — панель, внутри строки
+   и разделители, сведения о ресурсе — лист по нажатию. Свои классы — на ws-, остальное — общие классы «Света снизу»: pnl, tabs, chip, well, btn. */
 .ws{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:10px;height:100%}
 .ws-inv,.ws-craft{display:flex;flex-direction:column;gap:8px;min-width:0;min-height:0;padding:10px}
 .ws-craft{padding:10px 12px}
@@ -11,10 +11,10 @@
 .ws-none{grid-column:1/-1;font-size:13px}
 
 /* колодец на данных recipes.js: иконка ремесла или яруса, глиф руны; нижняя кромка — редкость */
-.ws .well .i,.ws-o .well .i{width:20px;height:20px;color:var(--rc,var(--parch-2))}
-.ws .well .gl,.ws-o .well .gl{font:600 18px/1 var(--f-d);color:var(--gold)}
+.ws .well .i,.ws-o .well .i,.ws-fx .well .i{width:20px;height:20px;color:var(--rc,var(--parch-2))}
+.ws .well .gl,.ws-o .well .gl,.ws-fx .well .gl{font:600 18px/1 var(--f-d);color:var(--gold)}
 /* особый ресурс — золотой ромб в углу: расход только с согласия (§12.1) */
-.ws .well.ws-sp::before,.ws-o .well.ws-sp::before{content:"";position:absolute;left:4px;top:4px;width:5px;height:5px;transform:rotate(45deg);background:var(--gold);box-shadow:0 0 5px var(--gold)}
+.ws .well.ws-sp::before,.ws-o .well.ws-sp::before,.ws-fx .well.ws-sp::before{content:"";position:absolute;left:4px;top:4px;width:5px;height:5px;transform:rotate(45deg);background:var(--gold);box-shadow:0 0 5px var(--gold)}
 /* сколько лежит на столе — из запасов ещё не списано */
 .ws-on{position:absolute;right:2px;top:2px;min-width:15px;height:14px;padding:0 3px;border-radius:7px;background:rgba(72,229,212,.16);color:var(--spirit);font:700 9.5px/14px var(--f-u);text-align:center}
 
@@ -95,7 +95,7 @@
 .ws-ing .arr{display:inline-grid;place-items:center;color:var(--parch-3)}
 .ws-ing .arr .i{width:13px;height:13px}
 
-/* ===== слои поверх: сведения, попытка, автодокрафт, итог ===== */
+/* ===== слои поверх: сведения, попытка, автодокрафт ===== */
 .ws-o{display:contents}
 .ws-o>*{flex-shrink:0}
 .ws-o .reason .i{width:13px;height:13px;vertical-align:-2px;margin-right:3px}
@@ -117,10 +117,9 @@
 .ws-need b{max-width:128px;font:700 12.5px/1.15 var(--f-u);color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ws-need small{font-size:11px}
 .ws-need.sp b{color:var(--gold)}
-.ws-hint{display:flex;align-items:flex-start;gap:8px;padding:7px 9px;border-radius:9px;border:1px solid rgba(72,229,212,.35);background:rgba(72,229,212,.05);font-size:13.5px;line-height:1.3}
+.ws-hint{display:flex;align-items:flex-start;gap:8px;padding:7px 9px;border-radius:9px;border:1px solid rgba(72,229,212,.35);background:rgba(72,229,212,.05);font-size:13.5px;line-height:1.3;color:var(--parch-2)}
 .ws-hint .i{flex:none;margin-top:1px;color:var(--spirit)}
 .ws-hint b{color:var(--parch)}
-.ws-res{display:flex;align-items:center;gap:14px}
 /* редкость в сведениях — одобренный кристалл r1…r7 (ADR-0027) */
 .ws-rar{display:inline-flex;align-items:center;gap:5px;font:700 11px/1 var(--f-u);letter-spacing:.08em;text-transform:uppercase;color:var(--rc)}
 
@@ -141,4 +140,271 @@
   .ws-cell{--s:36px}
   .ws-core{--s:44px}
   .ws-qn{display:none}
+}
+
+/* ===================================================================================================================
+   Анимация крафта (craft.js, WS_FX): окно поверх игры, круг из шести мест вокруг центра — как на столе, лист итога справа.
+   Анимация идёт по времени: задержки (--d0 от начала, --dt и --dk свои у элемента, --dp и --da — лист и кнопки) приходят из разметки
+   и отсчитаны от начала показа, поэтому перерисовка посреди анимации её не рвёт. Базовый стиль элемента — его конечное состояние;
+   до своего момента элемент стоит в первом кадре (animation-fill-mode: both). Движение — только transform и opacity.
+   Итог (ws-fx-done): мимолётного в разметке нет, остальное — на местах без анимации; медленный ход круга, ореол и лучи продолжаются.
+   Цвет: удача — редкость --rc из [data-r] (ADR-0027); нити попытки — цвет стола, пока исход не открыт; неудача — тусклый жар.
+   =================================================================================================================== */
+.ws-fxov{overflow:hidden}
+.ws-fx{position:absolute;inset:0;overflow:hidden;font:14px/1.35 var(--f-u);color:var(--parch);text-align:left;-webkit-user-select:none;user-select:none}
+.ws-fx-fail{--rc:#d98a4a}
+.ws-fx-bg{position:absolute;inset:0;z-index:0;
+  background:radial-gradient(58% 52% at 50% 100%,color-mix(in srgb,var(--rc,var(--spirit)) 16%,transparent),transparent 72%),radial-gradient(120% 100% at 50% 55%,rgba(8,10,12,.82),rgba(3,4,5,.97));
+  animation:ws-fade .24s ease var(--d0) both}
+.ws-fx-short .ws-fx-bg{background:radial-gradient(58% 52% at 50% 100%,color-mix(in srgb,var(--rc,var(--spirit)) 14%,transparent),transparent 72%),radial-gradient(120% 100% at 50% 55%,rgba(8,10,12,.66),rgba(3,4,5,.9))}
+/* свет по всей сцене в миг вспышки — с редкой; сила — --sf, % */
+.ws-fx-sfl{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;
+  background:radial-gradient(70% 70% at 50% 55%,rgba(255,248,230,.9),color-mix(in srgb,var(--rc) 45%,transparent) 50%,transparent 80%);
+  animation:ws-sflash var(--tt) ease-out var(--dt) both}
+/* круг: стоит в середине, к итогу уходит влево — справа встаёт лист. Без листа (короткая) — остаётся в середине */
+.ws-fx-c{position:absolute;left:50%;top:calc(50% + var(--top));z-index:1;transform:translateX(var(--shift));animation:ws-shift var(--tsh) cubic-bezier(.3,.8,.3,1) var(--dp) both}
+.ws-fx-auto .ws-fx-c{transform:none;animation:none}
+.ws-fx-sc{position:absolute;inset:0;animation:ws-cin .3s cubic-bezier(.2,.8,.2,1) var(--d0) both}
+.ws-fx-sc>*{position:absolute}
+.ws-fx-mid{left:50%;top:50%;width:2px;height:2px;margin:-1px 0 0 -1px;pointer-events:none}
+/* плита круга: тёмный камень, снизу — свет стола */
+.ws-fx-disc{inset:4px;border-radius:50%;pointer-events:none;border:1px solid #20252a;
+  background:radial-gradient(closest-side,rgba(72,229,212,.07),transparent 70%),radial-gradient(90% 90% at 50% 80%,#161a1e,#0b0d0f 72%);box-shadow:inset 0 -18px 40px -24px rgba(72,229,212,.35),0 20px 50px -20px #000}
+.ws-fx-fail .ws-fx-disc{box-shadow:inset 0 -18px 40px -24px rgba(217,138,74,.3),0 20px 50px -20px #000}
+
+/* кольцо рун: обод, знаки, шестиугольник мест, кольцо ядра. База — тусклая бронза; свечение — поверх, цвет --rc */
+.ws-fx-spin{inset:0;animation:ws-spin 90s linear var(--d0) infinite}
+.ws-fx-sg{position:absolute;inset:0}
+.ws-fx-sg.ws-up{transform:rotate(40deg);animation:ws-surge var(--tt) cubic-bezier(.2,.7,.2,1) var(--dt) both}
+.ws-fx-sg.ws-qk{animation:ws-quake 420ms linear var(--dt) both}
+.ws-fx-rs,.ws-fx-rgl{position:absolute;inset:0;pointer-events:none}
+.ws-fx-rs svg,.ws-fx-rgl svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.ws-fx-rs{opacity:.75}
+.ws-fx-rs svg{stroke:#6d6554;stroke-width:1}
+.ws-fx-rs .d{stroke-dasharray:2 5}
+.ws-fx-rs .h{stroke:#3a4148}
+.ws-fx-rs .g{stroke:#8b7a57;stroke-width:1.3}
+.ws-fx-rs.ws-dim{opacity:.28;animation:ws-dimrs .7s ease var(--dt) both}
+.ws-fx-rgl{filter:drop-shadow(0 0 3px var(--rc)) drop-shadow(0 0 9px color-mix(in srgb,var(--rc) 70%,transparent))}
+.ws-fx-rgl svg{stroke:var(--rc);stroke-width:1.6}
+.ws-fx-rgl .d{stroke-dasharray:2 5}
+.ws-fx-rgl .h{stroke-width:1;opacity:.6}
+.ws-fx-rgl.ws-fl{opacity:.42;animation:ws-rflash var(--tt) ease-out var(--dt) both}
+.ws-fx-rgl.ws-fk{opacity:0;animation:ws-rflick var(--tt) linear var(--dt) both}
+
+/* ореол и лучи за итогом — цвет редкости; сила — --ha и --ra, лучи — с эпической */
+.ws-fx-halo{left:50%;top:50%;width:230px;height:230px;margin:-115px 0 0 -115px;opacity:calc(var(--ha,40) / 100);pointer-events:none}
+.ws-fx-halo>i{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--rc) 62%,transparent),color-mix(in srgb,var(--rc) 16%,transparent) 44%,transparent 70%);animation:ws-breath 2.8s ease-in-out var(--d0) infinite}
+.ws-fx-ry{left:50%;top:50%;width:440px;height:440px;margin:-220px 0 0 -220px;opacity:calc(var(--ra,0) / 100);pointer-events:none;
+  -webkit-mask-image:radial-gradient(circle,#000 8%,transparent 64%);mask-image:radial-gradient(circle,#000 8%,transparent 64%)}
+.ws-fx-ry>i{position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(from 0deg,color-mix(in srgb,var(--rc) 60%,transparent) 0deg 5deg,transparent 5deg 18deg);animation:ws-spin 22s linear var(--d0) infinite}
+.ws-fx-halo.ws-in,.ws-fx-ry.ws-in{animation:ws-appear .7s ease-out var(--dt) both}
+
+/* нити: от места к центру. Линия — ::before; удача стягивает нить к центру, неудача рвёт посередине — половины хлещут назад */
+.ws-fx-th{height:12px;margin-top:-6px;transform-origin:0 50%;pointer-events:none;--tc:var(--spirit)}
+.ws-fx-short .ws-fx-th{--tc:var(--rc)}
+.ws-fx-ta{position:absolute;inset:0;transform-origin:0 50%;animation:ws-draw var(--tt) cubic-bezier(.3,.7,.3,1) var(--dt) both}
+.ws-fx-tb,.ws-fx-t1,.ws-fx-t2{position:absolute;top:0;bottom:0}
+.ws-fx-tb{left:0;right:0;transform:scaleX(0);transform-origin:100% 50%;animation:ws-retract var(--tt) cubic-bezier(.55,0,.85,.35) var(--dt) both}
+.ws-fx-t1{left:0;right:50%;opacity:0;transform:scaleX(0);transform-origin:0 50%;animation:ws-snap1 var(--tt) cubic-bezier(.2,.8,.3,1) var(--dt) both}
+.ws-fx-t2{left:50%;right:0;opacity:0;transform:scaleX(0);transform-origin:100% 50%;animation:ws-snap2 var(--tt) cubic-bezier(.2,.8,.3,1) var(--dt) both}
+.ws-fx-tb::before,.ws-fx-t1::before,.ws-fx-t2::before{content:"";position:absolute;left:0;right:0;top:50%;height:2px;margin-top:-1px;border-radius:1px;
+  background:linear-gradient(90deg,color-mix(in srgb,var(--tc) 35%,transparent),#fffdf4 55%,var(--tc));box-shadow:0 0 5px var(--tc),0 0 12px color-mix(in srgb,var(--tc) 55%,transparent)}
+.ws-fx-t1::before,.ws-fx-t2::before{background-size:200% 100%;animation:ws-flick 140ms steps(1) var(--dk) 4}
+.ws-fx-t1::before{background-position:0 0}
+.ws-fx-t2::before{background-position:100% 0}
+.ws-fx-tk{position:absolute;left:50%;top:50%;width:2px;height:2px;margin:-1px 0 0 -1px}
+
+/* ядро: «?» попытки или значок известного итога. Удача — сгорает во вспышке; неудача — тускнеет, поверх трещина */
+.ws-fx-core{left:50%;top:50%;z-index:3;width:60px;height:60px;margin:-30px 0 0 -30px;border-radius:50%;display:grid;place-items:center;border:1px solid #3a4148;
+  background:radial-gradient(circle at 50% 70%,rgba(72,229,212,.22),transparent 65%),#0c0f12;color:var(--parch-3)}
+.ws-fx-core>b{font:600 24px/1 var(--f-d);color:var(--spirit);text-shadow:0 0 10px rgba(72,229,212,.5)}
+.ws-fx-core>.i{width:26px;height:26px;color:var(--rc,var(--parch-2))}
+.ws-fx-core>img{width:72%;height:72%;object-fit:contain}
+.ws-fx-core>.gl{font:600 22px/1 var(--f-d);color:var(--gold)}
+/* попытка, исход неизвестен: ядро светится цветом стола */
+.ws-fx-full .ws-fx-core,.ws-fx-fail .ws-fx-core{border-color:rgba(72,229,212,.5);box-shadow:0 0 22px -6px var(--spirit)}
+.ws-fx-fail.ws-fx-done .ws-fx-core{border-color:#3a4148;box-shadow:none}
+.ws-fx-core[data-r]{border-color:var(--rc);box-shadow:0 0 0 1px var(--rc),0 0 22px -4px var(--rc)}
+.ws-fx-core.ws-go{opacity:0;transform:scale(1.3);animation:ws-coreout .26s ease-in var(--dt) both}
+.ws-fx-core.ws-dm{opacity:.55;animation:ws-dimc .6s ease var(--dt) both}
+.ws-fx-cx{position:absolute;inset:0;display:grid;place-items:center;animation:ws-fadein .3s ease var(--dt) both}
+.ws-fx-cx .i{width:36px;height:36px;color:#c9855a}
+
+/* раскалённое ядро: белое в середине, жар, край — цвет редкости; серия — удары по числу созданий; во вспышке гаснет */
+.ws-fx-heat{left:50%;top:50%;z-index:3;width:170px;height:170px;margin:-85px 0 0 -85px;pointer-events:none;animation:ws-heat var(--tt) cubic-bezier(.5,0,.8,.5) var(--dt) both}
+.ws-fx-heat>i{position:absolute;inset:0;opacity:0;animation:ws-out .26s ease-in var(--dt) both}
+.ws-fx-heat b{position:absolute;inset:0;border-radius:50%;mix-blend-mode:screen;
+  background:radial-gradient(circle,#fffef6 0 7%,#ffe6ad 15%,#f5a24a 30%,color-mix(in srgb,var(--rc) 50%,#b8541e) 46%,transparent 68%)}
+.ws-fx-thump{animation:ws-thump var(--tp) ease-out var(--dt) var(--n)}
+.ws-fx-fl{left:50%;top:50%;z-index:5;width:300px;height:300px;margin:-150px 0 0 -150px;border-radius:50%;pointer-events:none;mix-blend-mode:screen;opacity:0;
+  background:radial-gradient(circle,rgba(255,250,236,.96),color-mix(in srgb,var(--rc) 70%,transparent) 30%,transparent 68%);
+  animation:ws-flash var(--tt) cubic-bezier(.2,.8,.2,1) var(--dt) both}
+
+/* итог: поднимается из центра, кромка и свечение — редкость; по нему проходит блеск */
+.ws-fx-res{left:50%;top:50%;z-index:4;display:grid;place-items:center}
+.ws-fx-res.ws-in{animation:ws-rise var(--tt) cubic-bezier(.2,.9,.25,1.15) var(--dt) both}
+.ws-fx-res>.well{--s:84px;overflow:hidden;border-radius:18px;border:2px solid color-mix(in srgb,var(--rc) 80%,#fff);
+  background:radial-gradient(80% 80% at 50% 100%,color-mix(in srgb,var(--rc) 40%,transparent),transparent 72%),#0d1013;
+  box-shadow:inset 0 -3px 0 var(--rc),0 0 30px -4px var(--rc),0 0 60px -20px var(--rc)}
+.ws-fx-res>.well .i{width:40px;height:40px;color:color-mix(in srgb,var(--rc) 70%,#fff)}
+.ws-fx-res>.well .gl{font-size:36px}
+.ws-fx-res>.well .q{right:8px;bottom:6px;font:700 15px/1 var(--f-u)}
+.ws-fx-hero{position:relative;width:100%;height:100%;overflow:hidden;border-radius:14px;border:2px solid color-mix(in srgb,var(--rc) 80%,#fff);background:#0d1013;
+  box-shadow:inset 0 -3px 0 var(--rc),0 0 30px -4px var(--rc),0 0 60px -20px var(--rc)}
+.ws-fx-hero>img,.ws-fx-hero>.rs-ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+.ws-fx-res>.well::after,.ws-fx-hero::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(105deg,transparent 30%,rgba(255,246,220,.7) 50%,transparent 70%);
+  transform:translateX(130%);animation:ws-shine 1.1s ease-out calc(var(--dt) + var(--tt)) both}
+
+/* неудача: трещины от обода к центру — сначала раскалённые (свет снизу), потом остывают до тусклого жара */
+.ws-fx-cks{inset:0;z-index:2;pointer-events:none}
+.ws-fx-ck{position:absolute;height:3px;margin-top:-1.5px;transform-origin:0 50%}
+.ws-fx-ck>i{position:absolute;inset:0;border-radius:2px;background:#5b3b29;box-shadow:0 0 0 1px #050607,0 0 5px rgba(0,0,0,.9);transform-origin:0 50%;
+  animation:ws-draw var(--tt) cubic-bezier(.3,.7,.3,1) var(--dt) both}
+.ws-fx-ck>i::after{content:"";position:absolute;inset:-1px 0;border-radius:3px;background:#ffc78a;box-shadow:0 0 6px #f0964a,0 0 12px rgba(240,150,70,.6);opacity:0;animation:ws-out .9s ease-out var(--dt) both}
+
+/* предметы на местах: появляются; удача — вздрагивают к центру и втягиваются; неудача — дрожат, покрываются пеплом и осыпаются */
+.ws-fx-it{z-index:4;animation:ws-pop .32s cubic-bezier(.2,.9,.3,1.3) var(--dt) both}
+.ws-fx-ip,.ws-fx-iq{position:absolute;inset:0}
+.ws-fx-ip.ws-pl{opacity:0;transform:translate(var(--tx),var(--ty)) scale(.2);animation:ws-pull var(--tt) cubic-bezier(.55,0,.85,.35) var(--dt) both}
+.ws-fx-ip.ws-dn{opacity:0;transform:translateY(16px) scale(.9);animation:ws-crumble var(--tt) ease-in var(--dt) both}
+.ws-fx-iq.ws-tg{animation:ws-tug var(--tt) ease-in-out var(--dt) both}
+.ws-fx-iq.ws-sv{animation:ws-shiver var(--tt) linear var(--dt) both}
+.ws-fx-it .well{--s:50px;border-radius:10px}
+.ws-fx-ash{position:absolute;inset:0;border-radius:10px;pointer-events:none;background:radial-gradient(circle at 40% 35%,rgba(128,118,104,.6),rgba(38,35,31,.94) 70%);
+  box-shadow:inset 0 0 8px rgba(0,0,0,.8);animation:ws-fadein .46s ease var(--dt) both}
+/* дым: клубы от сгоревшего и из центра — всплывают и тают; снос --sx, размер --sz */
+.ws-fx-sm{z-index:5;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;pointer-events:none;opacity:0;
+  background:radial-gradient(circle,rgba(176,166,150,.5),rgba(120,112,100,.22) 45%,transparent 70%);animation:ws-smoke var(--tt) cubic-bezier(.2,.6,.4,1) var(--dt) both}
+
+/* лист итога — одна рамка справа от круга: что вышло, что сгорело, подсказка, одно главное действие */
+.ws-fx-pn{position:absolute;left:calc(50% + var(--px));top:calc(50% + var(--top));z-index:3;width:var(--pw);max-width:calc(50% - 24px);max-height:calc(100% - 70px);
+  transform:translateY(-50%);display:flex;flex-direction:column;gap:var(--sp-m);padding:var(--sp-l);overflow:auto;border-radius:14px;border:1px solid var(--gold-3);
+  background:radial-gradient(90% 60% at 50% 115%,color-mix(in srgb,var(--rc,var(--spirit)) 14%,transparent),transparent 70%),linear-gradient(180deg,#191d21,#111417);
+  box-shadow:0 30px 80px rgba(0,0,0,.8);scrollbar-width:thin;scrollbar-color:#2c3238 transparent;animation:ws-pn var(--tpn) cubic-bezier(.2,.8,.2,1) var(--dp) both}
+.ws-fx-pn>*{flex-shrink:0}
+.ws-fx-ph{display:flex;flex-direction:column;gap:4px;min-width:0}
+.ws-fx-eb{font:700 10.5px/1.2 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--gold-2)}
+.ws-fx-tl{display:flex;align-items:baseline;gap:var(--sp-s);min-width:0}
+.ws-fx-nm{margin:0;min-width:0;font:600 26px/1.05 var(--f-d);color:var(--gold);text-wrap:balance}
+.ws-fx-fail .ws-fx-nm{color:var(--parch)}
+.ws-fx-q{flex:none;font:600 22px/1 var(--f-d);color:var(--parch)}
+.ws-fx-pb{display:flex;flex-direction:column;gap:var(--sp-m);min-height:0}
+.ws-fx-pb .reason{margin:0}
+.ws-fx-line{margin:0;font-size:13.5px;line-height:1.35;color:var(--parch-2)}
+.ws-fx-row{display:flex;flex-direction:column;gap:6px}
+.ws-fx-sub{font:700 10.5px/1.2 var(--f-u);letter-spacing:.14em;text-transform:uppercase;color:var(--parch-3)}
+.ws-fx-ws{display:flex;flex-wrap:wrap;gap:6px}
+.ws-fx-ws .well{--s:34px;border-radius:8px}
+.ws-fx-ws .well .i{width:16px;height:16px}
+.ws-fx-ws .well .q{font-size:10.5px;right:3px;bottom:2px}
+.ws-fx-det summary{cursor:pointer;list-style:none;font:700 10.5px/1.2 var(--f-u);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-2)}
+.ws-fx-det summary::-webkit-details-marker{display:none}
+.ws-fx-det[open] summary{margin-bottom:6px}
+.ws-fx-acts{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:var(--sp-s);animation:ws-fadein .3s ease var(--da) both}
+.ws-fx-acts .link{margin-right:auto}
+.ws-fx-main{min-width:112px}
+
+/* новая запись в книге: книга раскрывается, листы переворачиваются, свет снизу вверх, чернила пишут имя по букве */
+.ws-fx-bk{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:4px}
+.ws-fx-bl{position:absolute;left:50%;top:-26px;width:124px;height:96px;margin-left:-62px;pointer-events:none;transform-origin:50% 100%;opacity:.6;
+  background:radial-gradient(50% 100% at 50% 100%,rgba(255,236,190,.5),rgba(221,188,122,.16) 45%,transparent 72%);animation:ws-light var(--tt) ease-out var(--dt) both}
+.ws-fx-bb{position:relative;width:132px;height:50px;perspective:420px;animation:ws-bookin .52s cubic-bezier(.2,.9,.3,1.2) var(--dt) both}
+.ws-fx-bb::after{content:"";position:absolute;left:64px;top:0;width:4px;height:48px;border-radius:2px;background:#6a5534;box-shadow:0 0 8px rgba(221,188,122,.4)}
+.ws-fx-pgl,.ws-fx-pgr,.ws-fx-pf{position:absolute;top:2px;width:62px;height:44px;box-shadow:0 2px 0 #6a5534;
+  background:repeating-linear-gradient(180deg,transparent 0 7px,rgba(92,70,40,.26) 7px 8px),linear-gradient(90deg,#d9c9a3,#efe3c4)}
+.ws-fx-pgl{left:4px;border-radius:4px 0 0 4px;transform-origin:100% 50%;transform:rotateY(8deg);animation:ws-pgl .52s cubic-bezier(.3,.8,.3,1) var(--dt) both}
+.ws-fx-pgr{left:66px;border-radius:0 4px 4px 0;transform-origin:0 50%;transform:rotateY(-8deg);background:repeating-linear-gradient(180deg,transparent 0 7px,rgba(92,70,40,.26) 7px 8px),linear-gradient(90deg,#efe3c4,#d9c9a3)}
+.ws-fx-pf{left:66px;border-radius:0 4px 4px 0;transform-origin:0 50%;backface-visibility:hidden;transform:rotateY(-178deg);background:linear-gradient(90deg,#f3e9d0,#e4d6b3);
+  animation:ws-flip var(--tt) cubic-bezier(.4,.1,.3,1) var(--dt) both}
+.ws-fx-ink{display:block;max-width:100%;text-align:center;font:italic 600 18px/1.2 var(--f-d);color:var(--gold);text-shadow:0 0 12px rgba(221,188,122,.35)}
+.ws-fx-ink span{animation:ws-fadein .22s ease var(--dt) both}
+
+/* шапка окна: что идёт, маленькое окно с галочкой, крестик. Нажатие на сцену посреди анимации — сразу итог */
+.ws-fx-top{position:absolute;left:0;right:0;top:0;z-index:6;display:flex;align-items:center;gap:var(--sp-m);padding:var(--sp-s) var(--sp-s) 0 var(--sp-l)}
+.ws-fx-top .ws-fx-eb{margin-right:auto}
+.ws-skip{display:inline-flex;align-items:center;gap:var(--sp-s);flex:none;padding:6px 10px;border:1px solid var(--iron);border-radius:9px;background:rgba(12,15,17,.88);font-size:12.5px;color:var(--parch-2);cursor:pointer}
+.ws-skip input{width:16px;height:16px;margin:0;accent-color:var(--spirit);cursor:pointer}
+.ws-skip input:disabled{cursor:not-allowed}
+.ws-fx-x{flex:none}
+.ws-fx-tap{position:absolute;inset:0;z-index:4;border:0;padding:0;background:none;cursor:pointer}
+/* короткая без листа: итог держится и сцена гаснет перед закрытием */
+.ws-fx-auto.ws-fx-anim{animation:ws-gone var(--tfd) ease var(--dx) both}
+.ws-fx-new .ws-fx-pn{gap:var(--sp-s)}
+
+/* итог: мимолётное не рисуется, остальное — без анимации; ход круга, ореол и лучи — дальше */
+.ws-fx-done .ws-fx-sc *,.ws-fx-done .ws-fx-sc *::before,.ws-fx-done .ws-fx-sc *::after,
+.ws-fx-done .ws-fx-bk *,.ws-fx-done .ws-fx-bk *::before,.ws-fx-done .ws-fx-bk *::after{animation:none!important}
+.ws-fx-done .ws-fx-spin{animation:ws-spin 90s linear var(--d0) infinite!important}
+.ws-fx-done .ws-fx-halo>i{animation:ws-breath 2.8s ease-in-out var(--d0) infinite!important}
+.ws-fx-done .ws-fx-ry>i{animation:ws-spin 22s linear var(--d0) infinite!important}
+
+/* частицы: слой рядом с #game — перерисовка экрана его не сносит; у UI-кита — внутри сцены раздела */
+.ws-fxl{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
+
+/* раздел UI-кита «Крафт: удача и неудача»: пробы, редкость, сцена как окно в игре, раскадровка */
+.ws-kbox{gap:var(--sp-m)}
+.ws-kctl{display:flex;flex-direction:column;gap:var(--sp-s)}
+.ws-kr{display:flex;flex-wrap:wrap;gap:var(--sp-s)}
+.ws-kctl .btn[aria-pressed="true"]{box-shadow:0 0 0 1px var(--spirit),inset 0 -10px 16px -12px var(--spirit)}
+.ws-kb{gap:6px;color:var(--rc);border-color:color-mix(in srgb,var(--rc) 40%,var(--iron-2))}
+.ws-kctl .ws-kb[aria-pressed="true"]{box-shadow:0 0 0 1px var(--rc),inset 0 -10px 16px -12px var(--rc)}
+.ws-kit{position:relative;height:430px;border-radius:12px;overflow:hidden;border:1px solid var(--iron);background:var(--noise),#07090a;isolation:isolate}
+.ws-kst{position:absolute;left:50%;top:0;width:932px;height:430px;margin-left:-466px}
+.ws-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(317px,1fr));gap:var(--sp-m)}
+.ws-still{display:flex;flex-direction:column;gap:6px;min-width:0;margin:0}
+.ws-still figcaption{font-size:12px;line-height:1.3;color:var(--parch-3)}
+.ws-still figcaption b{font:700 11px/1.2 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--gold-2)}
+/* кадр — экран телефона 932 × 430 в масштабе, анимации на паузе в своём моменте */
+.ws-frame{position:relative;width:317px;height:146px;overflow:hidden;border-radius:10px;border:1px solid var(--iron);background:var(--noise),#07090a;pointer-events:none;isolation:isolate}
+.ws-fst{position:absolute;left:0;top:0;width:932px;height:430px;transform:scale(.34);transform-origin:0 0}
+.ws-frame .ws-fx,.ws-frame .ws-fx *,.ws-frame .ws-fx *::before,.ws-frame .ws-fx *::after{animation-play-state:paused!important}
+.ws-ktab td,.ws-ktab th{font-size:13px}
+@media (max-width:1000px){
+  .ws-kit{height:280px}
+  .ws-kst{transform:scale(.64);transform-origin:50% 0}
+  .ws-kit .ws-skip span{display:none}
+}
+
+@keyframes ws-fade{from{opacity:0}}
+@keyframes ws-cin{from{opacity:0;transform:scale(.9)}}
+@keyframes ws-fadein{from{opacity:0}}
+@keyframes ws-out{from{opacity:1}}
+@keyframes ws-gone{to{opacity:0}}
+@keyframes ws-shift{from{transform:none}}
+@keyframes ws-pn{from{opacity:0;transform:translate(16px,-50%)}}
+@keyframes ws-spin{to{transform:rotate(360deg)}}
+@keyframes ws-surge{from{transform:none}}
+@keyframes ws-quake{0%,100%{transform:none}15%{transform:translate(-4px,2px)}30%{transform:translate(4px,-2px)}45%{transform:translate(-3px,-1px)}60%{transform:translate(3px,2px)}80%{transform:translate(-1px,1px)}}
+@keyframes ws-dimrs{from{opacity:.75}}
+@keyframes ws-rflash{0%{opacity:0}22%{opacity:1}}
+@keyframes ws-rflick{0%{opacity:0}18%{opacity:.5}28%{opacity:.12}42%{opacity:.46}56%{opacity:.08}70%{opacity:.34}84%{opacity:.04}100%{opacity:0}}
+@keyframes ws-appear{from{opacity:0;transform:scale(.4)}}
+@keyframes ws-breath{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.06);opacity:.8}}
+@keyframes ws-draw{from{transform:scaleX(0)}}
+@keyframes ws-retract{from{transform:none}}
+@keyframes ws-snap1{0%{opacity:1;transform:none}35%{opacity:1;transform:scaleX(.62) rotate(-11deg)}}
+@keyframes ws-snap2{0%{opacity:1;transform:none}35%{opacity:1;transform:scaleX(.62) rotate(9deg)}}
+@keyframes ws-flick{0%{opacity:1}50%{opacity:.25}}
+@keyframes ws-coreout{from{opacity:1;transform:none}}
+@keyframes ws-dimc{from{opacity:1}}
+@keyframes ws-heat{from{opacity:0;transform:scale(.2)}}
+@keyframes ws-thump{0%,100%{transform:none}35%{transform:scale(1.16)}}
+@keyframes ws-flash{0%{opacity:0;transform:scale(.25)}18%{opacity:1;transform:scale(calc(var(--fs) / 100))}100%{opacity:0;transform:scale(calc(var(--fs) / 70))}}
+@keyframes ws-sflash{0%{opacity:0}14%{opacity:calc(var(--sf) / 100)}100%{opacity:0}}
+@keyframes ws-rise{0%{opacity:0;transform:translateY(24px) scale(.25)}50%{opacity:1}}
+@keyframes ws-shine{from{transform:translateX(-130%)}}
+@keyframes ws-pop{from{opacity:0;transform:scale(.6)}}
+@keyframes ws-pull{0%{opacity:1;transform:none}82%{opacity:1}}
+@keyframes ws-crumble{0%{opacity:1;transform:none}40%{opacity:1;transform:translateY(2px)}}
+@keyframes ws-tug{0%,100%{transform:none}45%{transform:translate(calc(var(--tx) * .07),calc(var(--ty) * .07)) scale(1.05)}75%{transform:translate(calc(var(--tx) * -.02),calc(var(--ty) * -.02))}}
+@keyframes ws-shiver{0%,100%{transform:none}12%{transform:translate(-2px,1px) rotate(-2deg)}24%{transform:translate(2px,-1px) rotate(2deg)}36%{transform:translate(-2px,0) rotate(-1deg)}48%{transform:translate(2px,1px) rotate(2deg)}60%{transform:translate(-1px,-1px)}72%{transform:translate(2px,0) rotate(1deg)}86%{transform:translate(-1px,1px)}}
+@keyframes ws-smoke{0%{opacity:0;transform:scale(.35)}22%{opacity:.85}100%{opacity:0;transform:translate(var(--sx),-50px) scale(calc(var(--sz) / 55))}}
+@keyframes ws-light{0%{opacity:0;transform:scaleY(.2)}35%{opacity:1}}
+@keyframes ws-bookin{from{opacity:0;transform:translateY(12px) scale(.7)}}
+@keyframes ws-pgl{from{opacity:0;transform:rotateY(100deg)}}
+@keyframes ws-flip{from{transform:rotateY(-8deg)}}
+
+@media (prefers-reduced-motion:reduce){
+  .ws-fx,.ws-fx *,.ws-fx *::before,.ws-fx *::after{animation:none!important;transition:none!important}
 }

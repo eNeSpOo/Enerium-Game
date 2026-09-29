@@ -368,23 +368,7 @@ html.team .g .team-only{outline:1px dashed rgba(169,134,238,.55);outline-offset:
 button.well:hover{border-color:var(--iron-3)}
 .well[disabled]{opacity:.45}
 
-/* карта героя */
-.hc{position:relative;display:block;border-radius:10px;overflow:hidden;background:#0c0f12;border:1px solid color-mix(in srgb,var(--rc) 45%,#262b31);box-shadow:inset 0 -3px 0 color-mix(in srgb,var(--rc) 80%,transparent);padding:0;text-align:left;aspect-ratio:4/5;width:100%}
-.hc>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
-.hc::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.45),transparent 26%,transparent 50%,rgba(6,8,10,.95) 92%)}
-.hc .top{position:absolute;left:6px;right:6px;top:5px;z-index:1;display:flex;justify-content:space-between;align-items:center}
-.hc .bot{position:absolute;left:7px;right:6px;bottom:6px;z-index:1;display:flex;flex-direction:column;gap:2px}
-.hc .nm{font:600 15px/1.05 var(--f-d);color:var(--parch)}
-.hc .meta{display:flex;justify-content:space-between;align-items:center;gap:4px;font:700 11px/1 var(--f-u);color:var(--parch-2);min-width:0}
-.hc .meta>span{display:inline-flex;align-items:center;gap:3px;min-width:0;white-space:nowrap}
-.hc .meta .bm{color:var(--parch);gap:3px}
-.hc .meta>span:first-child{overflow:hidden;text-overflow:ellipsis}
-.hc .stars i{width:11px;height:11px}
-.hc .busy{position:absolute;left:0;right:0;top:40%;z-index:2;text-align:center;font:700 10px/1 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--amber);background:rgba(10,8,4,.8);padding:4px 2px}
-.hc.sel{border-color:var(--spirit);box-shadow:0 0 0 1px var(--spirit),0 10px 22px -10px var(--spirit)}
-.hc.dim>img{filter:grayscale(.8) brightness(.55)}
-.hc.empty{border-style:dashed;border-color:#2c3238;box-shadow:none;background:#0b0d10;display:grid;place-items:center;color:var(--parch-3)}
-.hc.empty::after{display:none}
+/* плитка героя (.hc) — screens/heroes.css */
 
 /* арт врага: изученный — картина целиком; неизвестный — затемнён и размыт, поверх знак вопроса */
 .fig{position:relative;display:flex;align-items:flex-end;justify-content:center;border:0;background:none;padding:0}
@@ -928,8 +912,6 @@ button.well:hover{border-color:var(--iron-3)}
 .el[data-el="без стихии"]{--c:#8a9098}
 .hc .rs-ph,.hd-face .rs-ph,.rs-av .rs-ph{position:absolute;inset:0}
 .hd-face .rs-ph b{font-size:32px}
-.rs-own{position:absolute;right:5px;top:24px;z-index:1;display:grid;place-items:center;width:17px;height:17px;border-radius:50%;background:var(--spirit-3);color:var(--spirit);box-shadow:0 0 0 1px rgba(72,229,212,.4)}
-.rs-own .i{width:11px;height:11px}
 .chip.wr{white-space:normal;height:auto;min-height:22px;line-height:1.15;padding:3px 8px}
 .rs-team[aria-pressed="true"]{color:var(--amber);border-color:rgba(230,168,75,.45);background:rgba(230,168,75,.08)}
 .rs-sel{height:28px;min-width:0;border-radius:8px;border:1px solid var(--iron-2);background:#0c0f11;color:var(--parch);font:13px var(--f-u);padding:0 4px}
@@ -950,7 +932,7 @@ button.well:hover{border-color:var(--iron-3)}
 .rs-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
 .rs-av .rs-ph b{font-size:12px}
 .rs-tut{color:var(--spirit)}
-/* Призыв: три вкладки, переключатель цикла, колонки «За души» */
+/* Призыв: три вкладки, переключатель цикла; вкладка «За души» — screens/heroes.css и screens/roulette.css */
 .rs-hbar{flex:none;gap:8px}
 .rs-cyc button{padding:0 9px}
 .hs.rs-hs{flex:1 1 0;min-height:0;height:auto}
@@ -971,13 +953,6 @@ button.well:hover{border-color:var(--iron-3)}
 .kh-mem .me{border-color:rgba(72,229,212,.55)}
 .kh-mem small{color:var(--gold-2);font-size:11px;margin-left:2px}
 .rs-vp{justify-content:space-between;flex:none;flex-wrap:wrap}
-.rs-souls{flex:1 1 0;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-m)}
-.rs-col{display:flex;flex-direction:column;gap:var(--sp-s);min-height:0;min-width:0;padding:var(--sp-m)}
-.rs-colh{display:flex;flex-direction:column;gap:3px;flex:none}
-.rs-colh b{font:600 18px/1.1 var(--f-d);color:var(--gold)}
-.rs-colh .rs-sel{align-self:flex-start;max-width:100%}
-.rs-colf{display:flex;flex-direction:column;gap:6px;flex:none}
-.rs-colf .row{flex-wrap:wrap}
 .rs-line{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--parch-2);flex:none}
 .rs-closed{flex:1 1 0;display:flex;flex-direction:column;justify-content:center;gap:8px;padding:18px 22px}
 .rs-closed h2{font-size:26px;color:var(--gold)}
@@ -995,16 +970,7 @@ button.well:hover{border-color:var(--iron-3)}
 .rk-rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px;align-items:start}
 .rk-rules>div{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:12px;border:1px solid var(--iron);background:#0c0f12;min-width:0}
 
-/* Отряды */
-.sq{display:grid;grid-template-columns:230px minmax(0,1fr);gap:var(--sp-m);height:100%}
-.preset{display:flex;flex-direction:column;gap:5px;padding:8px 10px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;text-align:left;color:var(--parch);width:100%}
-.preset[aria-current="true"]{border-color:rgba(72,229,212,.5);box-shadow:inset 0 -12px 16px -14px var(--spirit)}
-.preset b{font:600 17px/1 var(--f-d)}
-.preset .bm{font:700 12px/1 var(--f-u);color:var(--parch-3)}
-.sq-bm{font:600 24px/1 var(--f-d);color:var(--gold);gap:6px}
-.preset .faces{display:flex;gap:3px}
-.preset .faces img,.preset .faces i{width:24px;height:24px;border-radius:6px;object-fit:cover;background:#191d21;display:block}
-.sq-slots{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+/* Отряды — screens/heroes.css */
 
 /* Ремесло */
 .cr{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:10px;height:100%}
@@ -1030,13 +996,9 @@ button.well:hover{border-color:var(--iron-3)}
 .rc .ing .well{--s:34px;border-radius:7px}
 .rc .ing .well .q{font-size:11px;right:2px;bottom:1px}
 .rc .arrow{color:var(--parch-3);margin:0 2px}
-.shop{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
-.good{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px 8px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;text-align:center;color:var(--parch)}
-.good b{font-size:13.5px;line-height:1.1;min-height:30px;display:flex;align-items:center}
-.good.sold{opacity:.45}
 .lot{display:grid;grid-template-columns:40px 1fr 70px 90px auto;gap:10px;align-items:center;padding:6px 10px;border-radius:10px;border:1px solid var(--iron);background:#0e1114}
 .lot b{font-size:14px}
-/* запасы игрока на прежних экранах: колодец предмета recipes.js, лавка, рынок, ритуалы, итог забега */
+/* запасы игрока на прежних экранах: колодец предмета recipes.js, рынок, ритуалы, итог забега */
 .well.bw .i{width:46%;height:46%;color:color-mix(in srgb,var(--rc,#aaa) 70%,var(--parch))}
 .well.bw .gl{font:600 calc(var(--s,56px) * .34)/1 var(--f-d);color:var(--gold)}
 .lot .col small{font-size:12px}
@@ -1057,30 +1019,7 @@ button.well:hover{border-color:var(--iron-3)}
 .hd-it:hover,.hd-it:focus-visible{color:var(--gold)}
 .ev-note{display:flex;align-items:center;gap:10px;justify-content:space-between}
 
-/* Неделя */
-.wk-head{display:flex;align-items:center;gap:14px;padding:10px 12px;flex:none}
-.wk-head>.col{flex:none}
-.wk-head h2{font-size:28px;color:var(--parch);line-height:1;white-space:nowrap}
-.wk-head .eyebrow,.wk-head .faint{white-space:nowrap}
-.phases{display:flex;align-items:center;gap:4px;flex:1 1 0;min-width:0}
-.phases>.faint{flex:none;display:grid}
-.phase{display:flex;flex-direction:column;gap:3px;padding:6px 10px;border-radius:8px;border:1px solid var(--iron);background:#0d1013;min-width:0;flex:1 1 0}
-.phase b{font-size:12.5px;line-height:1.1;white-space:nowrap}
-.phase small{font-size:11px;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.phase.now{border-color:rgba(72,229,212,.45);box-shadow:inset 0 -10px 14px -12px var(--spirit)}
-.phase.now b{color:var(--spirit)}
-.wk-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:1fr;gap:10px;flex:1 1 0;min-height:0}
-.mode{position:relative;display:grid;grid-template-columns:52px minmax(0,1fr);grid-template-rows:auto 1fr auto;gap:2px 12px;padding:12px;border-radius:12px;border:1px solid var(--iron);background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),#101316;text-align:left;color:var(--parch);overflow:hidden;min-height:0}
-.mode:hover{border-color:var(--iron-2)}
-.mode .pic{grid-row:1/3;width:52px;height:52px;border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px #262c32}
-.mode .pic img{width:100%;height:100%;object-fit:cover}
-.mode h3{font-size:21px;color:var(--gold);line-height:1.05}
-.mode .ln{font-size:13px;color:var(--parch-2);line-height:1.3}
-.mode .ft{grid-column:1/-1;display:flex;align-items:center;gap:8px;margin-top:6px}
-.mode .ft .go-lbl{margin-left:auto;font:700 11.5px/1 var(--f-u);letter-spacing:.12em;text-transform:uppercase;color:var(--spirit)}
-.mode.hot{border-color:rgba(72,229,212,.4);box-shadow:inset 0 -18px 24px -22px var(--spirit)}
-.mode.lock{opacity:.6}
-.mode.lock .go-lbl{color:var(--parch-3)}
+/* Неделя — screens/week.css */
 
 /* Эхо */
 .ec{display:grid;grid-template-columns:214px minmax(0,1fr);gap:10px;flex:1 1 0;min-height:0}
@@ -1104,14 +1043,7 @@ button.well:hover{border-color:var(--iron-3)}
 .l14 i.av{background:var(--gold-3)}
 .l14 i.av.top{background:var(--spirit);box-shadow:0 0 8px var(--spirit)}
 
-/* Контракты */
-.ct{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:10px;flex:1 1 0;min-height:0}
-.task{display:grid;grid-template-columns:8px 1fr auto;gap:12px;align-items:center;padding:9px 10px 9px 0;border-radius:10px;border:1px solid var(--iron);background:#0e1114;overflow:hidden}
-.task .rs{align-self:stretch;background:var(--rc);opacity:.85}
-.task b{display:block;font:600 17px/1.1 var(--f-d)}
-.task small{display:block;color:var(--parch-3);font-size:12.5px;line-height:1.3}
-.task .acts{display:flex;gap:6px;align-items:center}
-.task.done{opacity:.6}
+/* Контракты — screens/contracts.css */
 
 /* Профиль */
 .pf{display:grid;grid-template-columns:250px minmax(0,1fr);gap:10px;height:100%}
@@ -1216,9 +1148,6 @@ button.well:hover{border-color:var(--iron-3)}
 .collpow b{display:block;font-size:13.5px}
 .collpow small{display:block;font-size:11.5px;color:var(--parch-3)}
 .collpow:hover{border-color:var(--iron-2)}
-.mini{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;color:var(--parch);font-size:13px}
-.mini img{width:34px;height:34px;border-radius:8px;object-fit:cover}
-.mini:hover{border-color:rgba(72,229,212,.45)}
 .faces{display:flex;gap:3px}
 .faces img{width:30px;height:30px;border-radius:7px;object-fit:cover;box-shadow:0 0 0 1px #2a3036}
 
@@ -1229,13 +1158,6 @@ button.well:hover{border-color:var(--iron-3)}
 .gifts small{display:block;font-size:12px;color:var(--parch-2)}
 .gifts .bdg{position:absolute;top:-6px;right:-6px}
 .gifts:hover{border-color:rgba(221,188,122,.55)}
-
-/* ===== Контракты ===== */
-.cert{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;padding:9px 10px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;cursor:pointer}
-.cert input{margin-top:3px;width:17px;height:17px;accent-color:var(--spirit)}
-.cert b{display:block;font-size:14px}
-.cert small{display:block;font-size:12px;color:var(--parch-3);line-height:1.3}
-.cert.off{opacity:.6;cursor:default}
 
 /* ===== Клан ===== */
 .emblem{display:grid;place-items:center;width:64px;height:72px;clip-path:polygon(50% 0,100% 18%,100% 70%,50% 100%,0 70%,0 18%);background:linear-gradient(160deg,#2a2f35,#14171a);color:var(--gold)}
@@ -1314,7 +1236,6 @@ button.well:hover{border-color:var(--iron-3)}
 /* компактный режим для низких экранов (844×390 и ниже): по высоте рабочей области */
 .g-main{container-type:size;container-name:main}
 .hs{grid-template-columns:minmax(250px,34%) minmax(0,1fr)}
-.good .well{--s:54px}
 @container main (max-height: 360px){
   .hd{padding:8px 10px}
   .hd-top{grid-template-columns:60px minmax(0,1fr) auto;gap:10px}
@@ -1330,20 +1251,12 @@ button.well:hover{border-color:var(--iron-3)}
   .s5 b{font-size:17px}
   .s5 .ico{width:20px;height:20px}
   .ladder{gap:4px}
-  .good{padding:7px 6px 6px;gap:4px}
-  .good .well{--s:42px}
-  .good b{min-height:0;font-size:12.5px}
   .hex-in{transform:scale(.72);transform-origin:50% 42%}
   .craft-hint{position:relative;z-index:2;padding:2px 0 4px}
   .step-act .qty button{padding:0 5px}
   .tabs button{padding:0 9px}
   .banner{height:140px}
   .coll-grid{gap:6px}
-  .hc .stars{gap:0}
-  .hc .stars i{width:10px;height:10px}
-  .hc .meta>.ico,.hc .meta>span:first-child>.ico{display:none}
-  .wk-head{padding:8px 10px}
-  .mode{padding:10px}
 }
 /* лестница развития: всё помещается в узкую колонку */
 .step-act .qty button{padding:0 7px}
@@ -1365,7 +1278,6 @@ body.phone .p-device-wrap{position:fixed;inset:0;height:auto!important}
 body.phone .p-device{transform:none!important;padding:0;border-radius:0;box-shadow:none;width:100%;height:100%}
 body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 .kit-g{font:14px/1.35 var(--f-u);color:var(--parch)}
-.k-box .hc{max-width:110px}
 
 /* ===== Древо рецептов: шесть циклов, узлы по ярусам, связи — рецепты «входы → выход» ===== */
 /* вкладка «Древо рецептов» — инструмент команды во всю ширину, не экран телефона (ADR-0008) */
@@ -1551,7 +1463,9 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 }
 
 </style>
+<link rel="stylesheet" href="screens/week.css">
 <link rel="stylesheet" href="screens/craft.css">
+<link rel="stylesheet" href="screens/shop.css">
 <link rel="stylesheet" href="screens/bag.css">
 <link rel="stylesheet" href="screens/echo.css">
 <link rel="stylesheet" href="screens/roulette.css">
@@ -1559,6 +1473,8 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <link rel="stylesheet" href="screens/wanderer.css">
 <link rel="stylesheet" href="screens/biomes.css">
 <link rel="stylesheet" href="screens/talismans.css">
+<link rel="stylesheet" href="screens/heroes.css">
+<link rel="stylesheet" href="screens/contracts.css">
 </head>
 <body>
 <div class="p-app">
@@ -1676,6 +1592,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <script src="biome-foes.js"></script>
 <script src="wanderer.js"></script>
 <script src="talismans.js"></script>
+<script src="contracts.js"></script>
 <script>
 'use strict';
 /* Все числа ниже — демонстрационные фикстуры: взяты из текущего UIKit
@@ -1714,7 +1631,7 @@ const CUR = {
   spirit: { n: 'Дух', img: ART('spirit.png'), src: 'Враги биомов, ритуалы героев. Тратится на уровни героев' },
   souls: { n: 'Души', img: ART('souls.png'), src: 'Элиты и боссы, ритуалы героев. Только фармятся' },
   enerium: { n: 'Энериум', img: ART('enerium.png'), src: 'Контракты эпик+, Арена топ-100, лавка Энериума' },
-  keys: { n: 'Рунические ключи', img: ART('rune-key.png'), src: 'Контракты, элиты, крафтовые биомы' },
+  keys: { n: 'Рунические ключи', img: ART('rune-key.png'), src: 'Контракты — главный источник; боссы биомов, крафтовые биомы и боссы' },
   dust: { n: 'Прах душ', img: DUST, src: 'Повторные осколки пробуждённых героев' },
 };
 const RAR = ['', 'Обычная', 'Редкая', 'Уникальная', 'Эпическая', 'Древняя', 'Первородная', 'Вневременная'];
@@ -1743,13 +1660,7 @@ const INV = {
     valorPct: 30,                               // §10.2: доблесть даёт +30 %
     valorBmPct: 62,                             // боевая мощь после доблести: уровень в 0 — показ прототипа, не расчёт
   },
-  /* лавка (§14.2): десять товаров — [предмет, количество, валюта, цена в Энериуме]. За золото — минимальная цена рынка
-     drops.market за штуку × количество. Цены в Энериуме в recipes.js нет — заглушка. Руны пределов лавка не продаёт (ADR-0014) */
-  shop: {
-    refreshSec: 5 * 3600 + 42 * 60, free: 2,   // до автообновления и бесплатных обновлений — демо
-    goods: [['resin', 20, 'gold'], ['fang', 20, 'gold'], ['spring', 20, 'gold'], ['k1_hunt', 2, 'gold'], ['k3_ench', 1, 'gold'],
-      ['cr_stone', 3, 'gold'], ['cr_clasp', 2, 'gold'], ['find_cb1', 1, 'gold'], ['u1', 1, 'enerium', 30], ['u3', 1, 'enerium', 45]],
-  },
+  /* лавка (§14.2) — данные витрины LV_DATA в screens/shop.js */
   /* рынок (§13): цена за штуку — не ниже минимальной drops.market, комиссия — drops.market.commissionPct с выручки.
      Лоты — [предмет, количество, цена в % от минимальной, у своих — состояние: на рынке или продан] */
   market: {
@@ -1827,24 +1738,13 @@ function initialState() {
     known: ['o1', 'o2', 'o3', 'o4', 'o5', 'e1', 'e2', 'e3', 'e4', 'e5', 'e6', 'b1', 'g1'],
     /* запасы игрока — S.bag: его заводит screens/model.js из DEMO_BAG, здесь инвентаря нет */
     tree: { cyc: 1, sel: null, q: '', only: false },   // вкладка «Древо рецептов» — инструмент команды
-    /* лавка и рынок: товары и лоты — из INV, цены — EN_RECIPES.drops.market */
-    shop: INV.shop.goods.map(g => g.slice()), sold: [],
+    /* рынок: лоты — из INV, цены — EN_RECIPES.drops.market. Лавку — S.shop, S.sold, S.lv — заводит screens/shop.js */
     market: { lots: INV.market.lots.map(([id, q, pct], i) => ({ uid: 'l' + (i + 1), id, q, pct })),
       mine: INV.market.mine.map(([id, q, pct, st], i) => ({ uid: 'my' + (i + 1), id, q, pct, st })),
       seq: INV.market.mine.length, sel: { id: '', q: 1, pct: INV.market.pricePct[0] }, q: '', ops: {} },
     echo: { score: 38240, place: 146, sel: 0, avail: 7,
       slots: [{ foe: 'o1', step: 1, hp: 3210, max: 4800, left: 86 * 3600 }, { foe: 'e1', step: 7, hp: 18500, max: 18500, left: 44 * 3600 }, null, null] },
-    contracts: {
-      day: { signed: false, cert: false, rer: 3, left: 6 * 3600 + 18 * 60, tasks: [
-        { n: 'Победить врагов в биомах', r: 1, pts: 10, goal: 30, p: 0 },
-        { n: 'Одолеть элиту', r: 2, pts: 20, goal: 3, p: 0 },
-        { n: 'Завершить ритуал', r: 3, pts: 40, goal: 2, p: 0 } ], pool: { gold: 3700, spirit: 150, keys: 6 } },
-      week: { signed: true, cert: true, rer: 0, left: 3 * 86400 + 4 * 3600, tasks: [
-        { n: 'Закрыть биом', r: 3, pts: 40, goal: 1, p: 1 },
-        { n: 'Атаковать в Эхо', r: 4, pts: 80, goal: 12, p: 7 },
-        { n: 'Пройти 60 ступеней', r: 2, pts: 20, goal: 60, p: 60 },
-        { n: 'Победить рунного стража', r: 5, pts: 160, goal: 2, p: 0 } ], pool: { gold: 9800, spirit: 600, keys: 14, enerium: 20 } },
-    },
+    /* контракты — screens/contracts.js: он заводит S.contracts (день и неделя, пул на сиде, прогресс с подписи) */
     /* ритуалы (§19): время и награда — по редкости из EN_RECIPES.drops.rituals. Рабочие — базовые общего пула, с эпической
        редкости ещё ключи биома; уникальный ритуал — уникальный ресурс босса биома; герои — золото, дух и души цикла.
        Слот хранит ритуал с циклом на момент старта: награда решена при старте, ресурсы — на сиде ритуала при выдаче */
@@ -1933,7 +1833,8 @@ const fmt = n => Number(n).toLocaleString('ru-RU');
 const dur = s => { s = Math.max(0, Math.round(s)); const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60); return d ? `${d} д ${h} ч` : h ? `${h} ч ${String(m).padStart(2, '0')} мин` : `${m} мин`; };
 const clock = s => { s = Math.max(0, Math.round(s)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
 const ic = (n, c = '') => `<svg class="i ${c}" aria-hidden="true"><use href="#i-${n}"></use></svg>`;
-const H = id => S.heroes.find(h => h.id === id);
+/* герой аккаунта: отряд боя прототипа (S.heroes) или купленный и пробуждённый герой состава — его в той же форме собирает hrOwn (screens/heroes.js) */
+const H = id => S.heroes.find(h => h.id === id) || (typeof hrOwn === 'function' ? hrOwn(id) : undefined);
 const F = id => S.foes.find(f => f.id === id);
 const known = id => S.known.includes(id);
 const stars = (v, m) => Array.from({ length: m }, (_, i) => `<i class="${i < v ? 'on' : ''}"></i>`).join('');
@@ -1984,22 +1885,12 @@ const biomeName = b => { for (const c of RX.cycles) { const x = c.biomes.find(y 
 /* рынок (§13): минимальная цена за штуку — по ярусу и циклу предмета, у общего пула — цикл I */
 const mkMin = id => { const it = BAG.item(id), p = it && RX.drops.market[it.tier]; return Array.isArray(p) && !it.team ? p[it.cyc - 1] || 0 : 0; };
 const mkUnit = (id, pct) => Math.floor(mkMin(id) * pct / 100);
-function heroCard(h, o = {}) {
-  const { sel, act = 'hero', val = h.id, dim, note } = o;
-  return `<button class="hc ${sel ? 'sel' : ''} ${dim ? 'dim' : ''}" data-r="${h.r}" data-a="${act}" data-v="${val}" aria-label="${h.name}, ${h.cls}, уровень ${h.lvl}, боевая мощь ${h.bm}">
-    <img src="${h.img}" alt="">
-    <span class="top"><span class="stars" title="Доблесть ${h.valor} из ${h.maxV}">${stars(h.valor, h.maxV)}</span>${el(h.el, true)}</span>
-    ${note ? `<span class="busy">${note}</span>` : ''}
-    <span class="bot"><span class="nm">${h.name}</span><span class="meta">${CLS(h.cls, 14)}${bmHtml(h.bm, 12)}</span></span>
-  </button>`;
-}
-const sq = id => S.squads.find(s => s.id === id);
-const plural = (n, one, few, many) => { const a = n % 10, b = n % 100; return a === 1 && b !== 11 ? one : a >= 2 && a <= 4 && (b < 12 || b > 14) ? few : many; };
+/* плитка героя (heroCard), отряды (sq, sqBM, API SQ) — screens/heroes.js */
+const plural =(n, one, few, many) => { const a = n % 10, b = n % 100; return a === 1 && b !== 11 ? one : a >= 2 && a <= 4 && (b < 12 || b > 14) ? few : many; };
 const atkWord = n => plural(n, 'атака', 'атаки', 'атак');
 const roundWord = n => plural(n, 'раунд', 'раунда', 'раундов');
 const pctBp = bp => Math.round(bp / 100) + ' %';
 const schoolMark = sc => !sc || sc === 'класс' ? '' : `<span class="el bare" data-el="${sc}" title="Школа: ${sc}" style="margin-right:5px"></span>`;
-const sqBM = s => s.m.filter(Boolean).reduce((a, id) => a + H(id).bm, 0);
 
 /* ================== иконки ================== */
 const ICONS = {
@@ -2372,33 +2263,8 @@ function trayHtml() {
 }
 
 /* ================== Герои ==================
-   Коллекция: «Все герои» — состав игры (roster.js), «Мои» — герои аккаунта с фильтром «Свободные».
-   Отряд боя прототипа — прежние герои S.heroes с наборами способностей; купленные и пробуждённые в Призыве — из состава. */
-function heroes() {
-  const seg = S.seg.heroes;
-  const meta = { title: 'Герои', seg: { key: 'heroes', items: [['coll', 'Коллекция'], ['squads', 'Отряды'], ['hire', 'Призыв']] } };
-  if (seg === 'squads') return { ...meta, html: squadsView() };
-  if (seg === 'hire') return { ...meta, html: hireView() };
-  if (S.hview !== 'mine') return { ...meta, html: rsCollView() };
-  const own = Object.keys(S.rs.owned).map(id => RSI[id]).filter(Boolean);
-  let h = H(S.selHero);
-  const rh = h ? null : own.find(x => x.id === S.selHero);
-  if (!h && !rh) { h = S.heroes[0]; S.selHero = h.id; }
-  const hf = S.hfilter || 'all', sortBM = S.hsort === 'bm';
-  let list = S.heroes.filter(x => hf === 'all' || !busyNote(x.id));
-  if (sortBM) list = [...list].sort((a, b) => b.bm - a.bm);
-  const grid = list.map(x => heroCard(x, { sel: h && x.id === h.id, note: busyNote(x.id) })).join('') + own.map(x => rsCard(x, { act: 'hero', sel: rh && x.id === rh.id })).join('')
-    || '<p class="faint" style="grid-column:1/-1">Все герои заняты</p>';
-  return { ...meta, html: `<section class="scr"><div class="hs">
-    <div class="pnl coll">
-      ${rsViewTabs(RS.heroes.filter(rsFilter).length)}
-      <div class="row" style="justify-content:space-between"><div class="tabs" role="tablist"><button role="tab" aria-selected="${hf === 'all'}" data-a="hfilter" data-v="all">Все · ${S.heroes.length + own.length}</button><button role="tab" aria-selected="${hf === 'free'}" data-a="hfilter" data-v="free">Свободные · ${S.heroes.filter(x => !busyNote(x.id)).length + own.length}</button></div><button class="iconbtn" data-a="hsort" aria-pressed="${sortBM}" aria-label="Сортировать по боевой мощи" title="По боевой мощи">${ic('sort')}</button></div>
-      <div class="coll-grid scroll grow" data-keep="mine">${grid}</div>
-      <button class="collpow" data-a="sheet" data-v="coll" title="Рейтинговые пассивки всех героев коллекции"><span><b>Сила коллекции</b></span><span class="chip spirit">+0,05%</span>${ic('chev')}</button>
-    </div>
-    ${h ? heroDetail(h) : rsDetail(rh)}
-  </div></section>` };
-}
+   Экран «Герои» — screens/heroes.js: коллекция, одна анатомия героя (плитка, шапка карточки), отряды и Призыв.
+   Здесь — развитие героя аккаунта (heroDetail: «Сила», «Навыки», «Путь») и состав героев roster.js: данные, портреты, главы, ордены, цены. */
 
 /* ================== Герои · состав героев (roster.js) ==================
    Состав игры по источникам (ADR-0019, ADR-0021 — ADR-0024). Выгрузка tools/content-gen/heroes/export_roster.py, руками не править.
@@ -2436,8 +2302,8 @@ function rsSetWeek(race) {
 }
 function rsAdd(h, how) { S.rs.owned[h.id] = { lvl: 0, lim: 0, valor: 0, how }; }   // ADR-0019: любой герой приходит с 0 ур., 0 РП и 0 Добл
 /* портреты героев состава — выгрузка tools/art-gen/export_ui.py в assets/art/heroes/<id>.jpg (ui-art.json); сет 1 рисуют герои отряда (rsOld).
-   28.09.2026: десять героев рулетки цикла II и десять героев каталога золота цикла I после сета 1 */
-const RS_ART = new Set(['c1-06', 'c1-07', 'c1-08', 'c1-09', 'c1-10', 'c1-11', 'c1-12', 'c1-13', 'c1-14', 'c1-15',
+   28.09.2026: десять героев рулетки цикла II и десять героев каталога золота цикла I после сета 1; 29.09.2026 — ещё пятеро каталога цикла I */
+const RS_ART = new Set(['c1-06', 'c1-07', 'c1-08', 'c1-09', 'c1-10', 'c1-11', 'c1-12', 'c1-13', 'c1-14', 'c1-15', 'c1-16', 'c1-17', 'c1-19', 'c1-21', 'c1-22',
   'c2-41', 'c2-42', 'c2-43', 'c2-44', 'c2-45', 'c2-46', 'c2-66', 'c2-67', 'c2-68', 'c2-69']);
 function rsFace(h) {
   const o = rsOld(h);
@@ -2448,37 +2314,10 @@ function rsFace(h) {
 }
 const rsSrcChip = h => `<span class="chip ${h.src === 'donat' ? 'spirit' : h.src === 'echo' ? 'gold' : ''}">${RS_SRC_ONE[h.src]}${h.src === 'gold' ? ' · №' + h.no : h.src === 'donat' ? ' · ' + h.place + '-й' : ''}</span>`;
 const rsAversShort = h => `+${pctBp(h.avers.bp != null ? h.avers.bp : RS.rules.aversionBp)} урона по расе «${h.avers.race}»`;
-function rsCard(h, o = {}) {
-  const has = rsHas(h), own = S.rs.owned[h.id], v = own ? own.valor : 0;
-  return `<button class="hc rs-hc ${o.sel ? 'sel' : ''}" data-r="${h.r}" data-a="${o.act || 'rssel'}" data-v="${h.id}" aria-label="${h.n}, ${h.cls}, ${RS_SRC[h.src]}, цикл ${ROMAN[h.c]}${has ? ', в коллекции' : ''}">
-    ${rsFace(h)}
-    <span class="top"><span class="stars" title="Доблесть ${v} из ${h.maxV}">${stars(v, h.maxV)}</span>${el(h.sch, true)}</span>
-    ${has ? `<span class="rs-own" title="В коллекции">${ic('check')}</span>` : ''}
-    <span class="bot"><span class="nm">${h.n}</span><span class="meta"><span>${CLS(h.cl[0], 14)}${RS_SRC_ONE[h.src]}</span><span>${ROMAN[h.c]}</span></span></span>
-  </button>`;
-}
+/* плитка (rsCard), шапка карточки (rsHead) и карточка героя состава (rsDetail) — screens/heroes.js; строка списка — здесь.
+   Кристалл редкости у лица в строке рисует CSS (.rs-av, screens/heroes.css) */
 function rsRow(h, o = {}) {
   return `<button class="rs-row ${o.dim ? 'dim' : ''}" data-r="${h.r}" data-a="${o.act}" data-v="${h.id}" aria-current="${!!o.sel}"><span class="rs-av">${rsFace(h)}</span><span class="tx"><b>${h.n}</b><small>${o.sub != null ? o.sub : h.cls}</small></span>${o.right || ''}</button>`;
-}
-/* «Все герои» — состав игры с фильтрами, «Мои» — герои аккаунта */
-function rsViewTabs(all) {
-  const v = S.hview === 'mine' ? 'mine' : 'all', tabs = [['all', 'Все герои', all], ['mine', 'Мои', S.heroes.length + Object.keys(S.rs.owned).length]];
-  return `<div class="tabs" role="tablist" aria-label="Коллекция">${tabs.map(([k, l, n]) => `<button role="tab" aria-selected="${v === k}" data-a="hview" data-v="${k}">${l} · ${n}</button>`).join('')}</div>`;
-}
-/* шапка карточки героя состава: портрет, имя, класс значком, стихия и раса, кристалл редкости и цикл.
-   Справа — доблесть значками (у героя отряда боя — ещё БМ) или своё: цена и кнопка Призыва, осколки запасов */
-function rsHead(h, v, aside) {
-  const own = S.rs.owned[h.id], old = rsOld(h);
-  const def = `${old ? `<b class="bm" title="Боевая мощь">${ICON('power', 24, 'Боевая мощь')}<span class="num">${fmt(old.bm)}</span></b>` : ''}<span class="stars lg" title="Доблесть ${v} из ${h.maxV}">${stars(v, h.maxV)}</span>${own ? `<small class="faint num">ур. ${own.lvl} · РП ${own.lim}</small>` : ''}`;
-  return `<div class="hd-top">
-    <div class="hd-face" data-r="${h.r}">${rsFace(h)}</div>
-    <div class="hd-id">
-      <div class="hd-name"><h2>${h.n}</h2></div>
-      <div class="hd-line"><span class="hd-cls">${CLS(h.cl[0], 18)}${h.cls}</span>${el(h.sch)}<span>${h.race}</span></div>
-      <div class="hd-line">${rar(h.r)}<span class="faint caps">цикл ${ROMAN[h.c]}</span></div>
-    </div>
-    <div class="hd-bm${aside ? ' rs-aside' : ''}">${aside || def}</div>
-  </div>`;
 }
 /* личный максимум задаёт источник (ADR-0019): у Эхо и доната — по циклу героя */
 function rsMaxTxt(h) {
@@ -2503,16 +2342,6 @@ function rsWhoHtml(h) {
     ${foldLore(h.who)}
     <dl class="kv rs-kv">${facts.map(([k, x]) => `<dt>${k}</dt><dd>${x}</dd>`).join('')}</dl>
     ${KH.team && h.team ? rsTeamHtml(h) : ''}`;
-}
-/* карточка героя состава на экране — правила воздуха: лор в две строки, до двух чипов, одно действие; остальное — лист «Подробнее».
-   act — своё главное действие (в Призыве оно в шапке), по умолчанию — как получить героя; extra — перед действием (формула цены команде) */
-function rsBrief(h, act, extra = '') {
-  const chips = rsSrcChip(h) + (h.avers && h.avers.race ? `<span class="chip" title="Неприязнь героя Эхо">${ic('target')}${rsAversShort(h)}</span>` : '');
-  return `<div class="hd-sec">
-    ${foldLore(h.who)}
-    <div class="row hd-facts">${chips}</div>${extra}
-    <div class="hd-act">${act == null ? rsGetHtml(h) : act}<button class="link" data-a="rhero" data-v="${h.id}">Подробнее ${ic('chev')}</button></div>
-  </div>`;
 }
 function rsTeamHtml(h) {
   const T = h.team, sets = (T.sets || []).map(k => RSS[k]).filter(Boolean);
@@ -2569,61 +2398,7 @@ function rsSetHtml(h, v, o = {}) {
   } else out.push(`<div class="rs-none"><b class="serif">Орден не раскрыт</b><p class="faint">Откроет последняя доблесть — глава «${rsChTitle(h, h.maxV - 1)}».</p></div>`);
   return out.join('');
 }
-/* главное действие карточки героя состава: герой отряда — развитие, купленный — отметка, иначе — к своему способу получить */
-function rsGetHtml(h) {
-  const own = S.rs.owned[h.id], old = rsOld(h);
-  if (old) return `<button class="btn go sm" data-a="rsmine" data-v="${old.id}">${ic('up')}Развитие</button>${TM(`<span class="reason">В бою прототипа ${old.name} — на прежнем наборе способностей</span>`)}`;
-  if (own) return `<span class="chip gold">${ic('check')}в коллекции · ${RS_HOW[own.how] || ''}</span>`;
-  const how = {
-    gold: `Следующий найм цикла ${ROMAN[h.c]} — ${fmt(rsGold(h.c, rsBought(h.c) + 1))} золота`,
-    donat: 'Любой из пятерых за Энериум',
-    roulette: 'Осколки — в возрождении душ и за прах',
-    echo: 'Осколки — в сундуках Эхо и за прах',
-    craft: 'Скрытый рецепт: его находят перебором в Мастерской',
-  }[h.src] || '';
-  const go = h.src === 'craft' ? '' : `<button class="btn go sm" data-a="rsgo" data-v="${h.id}">${ic('arrow')}${h.src === 'gold' ? 'К найму' : h.src === 'donat' ? 'В витрину' : 'К душам'}</button>`;
-  return `${go}${h.c > rsCyc() ? `<span class="chip warn">${ic('lock')}цикл ${ROMAN[h.c]}</span>` : ''}<span class="reason">${how}</span>`;
-}
-function rsDetail(h) {
-  if (!h) return '<div class="pnl hd"><p class="faint">Выберите героя.</p></div>';
-  const t = S.seg.rhero || 'who', v = rsV(h);
-  const body = t === 'mem' ? `<div class="col scroll grow" style="gap:6px" data-keep="rsmem:${h.id}">${rsValorPick(h, v)}${rsChaptersHtml(h, v)}</div>`
-    : t === 'set' ? `<div class="col scroll grow" style="gap:8px" data-keep="rsset:${h.id}">${rsValorPick(h, v)}${rsSetHtml(h, v)}</div>`
-    : rsBrief(h);
-  const team = `<button class="iconbtn rs-team team-only" data-a="rsteam" aria-pressed="${!!KH.team}" aria-label="Режим «Команда»" title="Режим «Команда»: орден, черновик и заметки видны сразу. Нажать — вернуться к виду игрока">${ic('eye')}</button>`;
-  return `<div class="pnl hd">${rsHead(h, v)}<div class="hd-body"><div class="row" style="justify-content:space-between"><div class="tabs" role="tablist" aria-label="Разделы героя">${[['who', 'Герой'], ['mem', 'Воспоминания'], ['set', 'Орден']].map(([k, l]) => `<button role="tab" aria-selected="${t === k}" data-a="seg" data-v="rhero:${k}">${l}</button>`).join('')}</div>${team}</div>${body}</div></div>`;
-}
-const RS_NODATA = '<section class="scr"><div class="pnl pad"><p class="faint">Нет данных: рядом с index.html должен лежать roster.js.</p></div></section>';
-function rsCollView() {
-  if (!RS.heroes.length) return RS_NODATA;
-  const f = S.rs.f, list = RS.heroes.filter(rsFilter), sel = RSI[S.rs.sel] || list[0] || RS.heroes[0];
-  const opt = (v, t, cur) => `<option value="${v}" ${String(cur) === String(v) ? 'selected' : ''}>${t}</option>`;
-  const grid = list.map(h => rsCard(h, { sel: h.id === sel.id })).join('') || '<p class="faint" style="grid-column:1/-1">Никого: ослабьте фильтры</p>';
-  return `<section class="scr"><div class="hs">
-    <div class="pnl coll">
-      ${rsViewTabs(list.length)}
-      <div class="row rs-filters">
-        <select class="rs-sel" data-a="rsf" data-v="cyc" aria-label="Цикл">${opt('', 'Цикл', f.cyc)}${ROMAN.slice(1).map((r, i) => opt(i + 1, 'Цикл ' + r, f.cyc)).join('')}</select>
-        <select class="rs-sel" data-a="rsf" data-v="src" aria-label="Источник">${opt('', 'Откуда', f.src)}${RS.sources.map(k => opt(k, RS_SRC_ONE[k], f.src)).join('')}</select>
-        <select class="rs-sel" data-a="rsf" data-v="cls" aria-label="Класс">${opt('', 'Класс', f.cls)}${RS.classes.map(k => opt(k, k, f.cls)).join('')}</select>
-      </div>
-      <div class="coll-grid scroll grow" data-keep="rsgrid:${f.cyc}:${f.src}:${f.cls}">${grid}</div>
-    </div>
-    ${rsDetail(sel)}
-  </div></section>`;
-}
-/* шапка карточки героя отряда (§33.2): портрет, имя, класс значком, стихия и раса, кристалл редкости и цикл; справа — БМ значком и доблесть */
-function heroHead(h) {
-  return `<div class="hd-top">
-    <div class="hd-face" data-r="${h.r}"><img src="${h.img}" alt=""></div>
-    <div class="hd-id">
-      <div class="hd-name"><h2>${h.name}</h2></div>
-      <div class="hd-line"><span class="hd-cls">${CLS(h.cls, 18)}${h.cls}</span>${el(h.el)}<span>${h.race}</span></div>
-      <div class="hd-line">${rar(h.r)}<span class="faint caps">цикл ${ROMAN[h.cycle]}</span></div>
-    </div>
-    <div class="hd-bm"><b class="bm" title="Боевая мощь">${ICON('power', 24, 'Боевая мощь')}<span class="num">${fmt(h.bm)}</span></b><span class="stars lg" title="Доблесть ${h.valor} из ${h.maxV}">${stars(h.valor, h.maxV)}</span></div>
-  </div>`;
-}
+/* карточка героя: шапка (heroHead, rsHead), карточка героя состава (rsDetail) и коллекция — screens/heroes.js */
 /* развитие героя на запасах (§10, ADR-0014): предел — INV.hero.runesPerLimit рун своего предела цикла героя;
    доблесть — одна руна доблести цикла героя и только на пятом пределе; руну собирают из осколков в мастерской (рецепт — recipes.js) */
 function heroDev(h) {
@@ -2684,6 +2459,8 @@ function heroDetail(h) {
       </div>
       <div class="col" style="gap:6px"><span class="eyebrow">Пассивные</span><div class="chaps">${h.pas.map(p => `<div class="chap one"><div><b>${p.n}</b> <span class="chip" style="height:18px;margin-left:4px">${p.t}</span><small class="faint">${p.d}</small></div></div>`).join('')}</div></div>
     </div>`;
+  } else if (typeof hrPath === 'function' && hrPath(h)) {   // купленный герой состава: главы по доблести и орден — из roster.js (screens/heroes.js)
+    body = hrPath(h);
   } else {
     const ch = [`<div class="chap"><span class="n">·</span><div><b>Обрывки личности</b><small class="faint">Остались лишь обрывки: незнакомые голоса, дорога и ощущение утраты.</small></div></div>`];
     for (let i = 1; i <= h.maxV; i++) ch.push(i <= h.valor ? `<div class="chap"><span class="n">${ROMAN[i]}</span><div><b>Глава ${ROMAN[i]}</b><small class="faint">Открыта доблестью ${i}.${TM(' Текст главы задаёт автор.')}</small></div></div>` : `<div class="chap lock"><span class="n">${ROMAN[i]}</span><div><b>Глава ${ROMAN[i]}</b><small>Откроется на доблести ${i}</small></div></div>`);
@@ -2701,172 +2478,27 @@ function heroDetail(h) {
 function abRow({ icon, n, name, what = '', d = '', chip = '', lock = false }) {
   return `<details class="ab-d"><summary class="ab ${lock ? 'lock' : ''}"><span class="h">${icon}</span><span class="n">${n}</span><span><b>${name}</b>${what ? `<small>${what}</small>` : ''}</span>${chip}</summary>${d ? `<p class="ab-x">${d}</p>` : ''}</details>`;
 }
-function squadsView() {
-  const s = sq(S.selSquad);
-  const free = S.heroes.filter(h => !s.m.includes(h.id));
-  return `<section class="scr"><div class="sq">
-    <div class="pnl pad col">
-      <div class="row" style="justify-content:space-between"><span class="eyebrow">Отряды · ${S.squads.length} / 10</span><button class="link" data-a="sqnew">${ic('plus')}Новый</button></div>
-      <div class="col scroll grow" style="gap:6px">${S.squads.map(x => `<button class="preset" data-a="sq" data-v="${x.id}" aria-current="${x.id === s.id}"><span class="row" style="justify-content:space-between"><b>${x.name}</b>${bmHtml(sqBM(x), 13)}</span><span class="faces">${x.m.map(id => id ? `<img src="${H(id).img}" alt="">` : '<i></i>').join('')}</span></button>`).join('')}</div>
-      <p class="reason">Отряд не занимает героев, пока не ушёл в режим.</p>
-    </div>
-    <div class="pnl pad col">
-      <div class="row"><h2 class="serif gold" style="font-size:24px">${s.name}</h2><span class="chip">${s.m.filter(Boolean).length} / 5</span><span class="g-spacer"></span><b class="bm sq-bm" title="Боевая мощь отряда">${ICON('power', 22, 'Боевая мощь')}<span class="num">${fmt(sqBM(s))}</span></b></div>
-      <div class="sq-slots" title="Нажмите героя в отряде, чтобы убрать">${s.m.map((id, i) => id ? heroCard(H(id), { act: 'sqrem', val: i, note: busyNote(id) }) : `<button class="hc empty" data-a="sqslot" data-v="${i}" aria-label="Пустое место">${ic('plus')}</button>`).join('')}</div>
-      <div class="hr"></div>
-      <span class="eyebrow">${free.length ? 'Добавить в отряд' : 'Все герои в отряде'}</span>
-      ${free.length ? `<div class="row" style="gap:8px;flex-wrap:wrap">${free.map(h => `<button class="mini" data-a="sqadd" data-v="${h.id}"><img src="${h.img}" alt=""><span>${h.name}</span></button>`).join('')}</div>` : ''}
-    </div>
-  </div></section>`;
-}
-/* ================== Призыв: три способа получить героя (ADR-0019) ==================
-   За золото — каталог цикла, цена по счёту покупки (ADR-0023); за Энериум — донатный сет цикла, с цикла II (ADR-0021);
-   за души — возрождение душ, осколки отряда Эхо недели и каталог праха (§15, ADR-0023). Цикл I–VI переключается для демо. */
-function hireView() {
-  if (!RS.heroes.length) return RS_NODATA;
-  const t = S.seg.hire || 'gold', c = rsCyc();
-  const tabs = [['gold', 'За золото'], ['donat', 'За Энериум'], ['souls', 'За души']];
-  return `<section class="scr">
-    <div class="row rs-hbar"><div class="tabs" role="tablist" aria-label="Способ получить героя">${tabs.map(([k, l]) => `<button role="tab" aria-selected="${t === k}" data-a="seg" data-v="hire:${k}">${l}</button>`).join('')}</div>
-      <span class="g-spacer"></span><span class="eyebrow team-only">цикл · демо</span>
-      <div class="tabs rs-cyc team-only" role="tablist" aria-label="Текущий цикл, демо">${ROMAN.slice(1).map((r, i) => `<button role="tab" aria-selected="${c === i + 1}" data-a="rscyc" data-v="${i + 1}">${r}</button>`).join('')}</div></div>
-    ${t === 'donat' ? rsDonatView() : t === 'souls' ? rsSoulsView() : rsGoldView()}
-  </section>`;
-}
+/* ================== Призыв ==================
+   Отряды и вкладки Призыва (hireView: за золото, за Энериум, за души) — screens/heroes.js. Здесь — строки списков Призыва и вкладка
+   «За души»: её вход рулетки — rlCol (screens/roulette.js), входы отряда Эхо и каталога праха — hrSoulsSide (screens/heroes.js) */
 /* строка списка Призыва: класс значком и подпись */
 const rsSub = (h, t) => `${CLS(h.cl[0], 13)}${t}`;
-/* за золото: каталог цикла, «№» — только порядок; цена k-й покупки цикла растёт линейно, максимум доблести — 1 */
-function rsGoldView() {
-  const cur = rsCyc(), c = S.rs.gcyc || cur, open = c <= cur, k = rsBought(c) + 1;
-  const cat = RS.heroes.filter(h => h.src === 'gold' && h.c === c).sort((a, b) => a.no - b.no);
-  const sel = cat.find(h => h.id === S.rs.gsel) || cat.find(h => !rsHas(h)) || cat[0];
-  const opts = ROMAN.slice(1).map((r, i) => `<option value="${i + 1}" ${i + 1 === c ? 'selected' : ''}>Каталог цикла ${r}${i + 1 > cur ? ' · закрыт' : ''}</option>`).join('');
-  const rows = cat.map(h => rsRow(h, { act: 'gsel', sel: sel && h.id === sel.id, sub: rsSub(h, `${h.cls}${h.tut ? ' · <span class="rs-tut">обучение</span>' : ''}`), right: rsHas(h) ? `<span class="chip gold">${ic('check')}есть</span>` : `<span class="faint num">№${h.no}</span>` })).join('');
-  return `<div class="hs rs-hs">
-    <div class="pnl coll">
-      <div class="row"><select class="rs-sel grow" data-a="gcyc" aria-label="Каталог героев за золото">${opts}</select><span class="chip" title="Нанято героев этого каталога">${k - 1} / ${cat.length}</span></div>
-      <p class="rs-next">${open ? `Следующий найм — ${k}-й в цикле:${money('gold', rsGold(c, k))}` : `${ic('lock')}Каталог откроется в цикле ${ROMAN[c]}`}</p>
-      <div class="rs-list scroll grow" data-keep="gcat:${c}">${rows}</div>
-    </div>
-    ${sel ? rsGoldCard(sel, c, k, open) : '<div class="pnl hd"></div>'}
-  </div>`;
-}
-/* карточка найма: шапка с ценой на кнопке, лор в две строки, остальное — в листе «Подробнее»; формула цены — команде */
-function rsGoldCard(h, c, k, open) {
-  const g = RS.rules.gold, price = rsGold(c, k);
-  const aside = rsHas(h) ? `<span class="chip gold">${ic('check')}в коллекции</span><button class="link" data-a="rsopen" data-v="${h.id}">Открыть ${ic('chev')}</button>`
-    : open ? `<button class="btn go" data-a="gbuy" data-v="${h.id}">Нанять${costTag('gold', price)}</button><small class="faint">${k}-й найм цикла ${ROMAN[c]}</small>`
-    : `<span class="chip warn">${ic('lock')}цикл ${ROMAN[c]}</span><small class="faint">витрина до перехода</small>`;
-  const next = Array.from({ length: g.preview }, (_, i) => k + i).map(n => `<div class="srow"><span class="n">${n}-я покупка цикла ${ROMAN[c]}</span><span class="v">${fmt(rsGold(c, n))}</span><span></span></div>`).join('');
-  const team = `<div class="col team-only" style="gap:6px">
-      <span class="eyebrow">Цена — по счёту покупки</span>
-      <p class="reason num">${fmt(g.first)} × ${c} × (1 + ${pctBp(g.stepBp)} × (${k} − 1)) = ${fmt(price)}</p>
-      <div class="stats">${next}</div>
-      <p class="reason">№ в каталоге — только порядок. Цена растёт с каждой покупкой в цикле, и всех героев цикла к его концу не выкупить.</p>
-    </div>`;
-  return `<div class="pnl hd">${rsHead(h, 0, aside)}
-    <div class="hd-body">${rsBrief(h, '<span class="reason">Цена растёт с каждым наймом в цикле</span>', team)}</div></div>`;
-}
-/* за Энериум: донатный сет цикла — пятеро Безликих, любой из пяти, цена растёт от первого к пятому; в цикле I — обучение */
-function rsDonatView() {
-  const cur = rsCyc(), from = rsFrom('donat'), sets = RS.sets.filter(s => s.kind === 'donat').sort((a, b) => a.cycle - b.cycle);
-  if (!sets.length) return '<div class="pnl pad rs-closed"><p class="faint">Донатных сетов нет в данных.</p></div>';
-  if (cur < from) return `<div class="pnl rs-closed fit"><span class="eyebrow">Цикл ${ROMAN[cur]} · обучение</span><h2>Донатных сетов в цикле ${ROMAN[cur]} нет</h2>
-    <p class="muted">С цикла ${ROMAN[from]} каждый новый цикл открывает донатный сет — пятерых Безликих. Первый — «${sets[0].name}».</p>
-    <p class="reason">Первый из пятерых дешевле всех. Сила донатных героев — в пользе для аккаунта, а не в бою.</p></div>`;
-  const s = sets.find(x => x.cycle === (S.rs.dcyc || cur)) || sets.filter(x => x.cycle <= cur).pop() || sets[0], open = s.cycle <= cur;
-  const sel = RSI[s.members.find(id => id === S.rs.dsel) || s.members.find(id => !rsHas(RSI[id])) || s.members[0]];
-  const opts = sets.map(x => `<option value="${x.cycle}" ${x === s ? 'selected' : ''}>Сет цикла ${ROMAN[x.cycle]} · «${x.name}»${x.cycle > cur ? ' · закрыт' : ''}</option>`).join('');
-  const rows = s.members.map(id => { const h = RSI[id]; return rsRow(h, { act: 'dsel', sel: h === sel, sub: rsSub(h, `${h.place}-й · ${h.cls}`), right: rsHas(h) ? `<span class="chip gold">${ic('check')}есть</span>` : money('enerium', rsDonatPrice(h)) }); }).join('');
-  return `<div class="hs rs-hs">
-    <div class="pnl coll">
-      <select class="rs-sel" data-a="dcyc" aria-label="Донатный сет">${opts}</select>
-      <p class="rs-next">Цена растёт от первого к пятому<span class="chip warn team-only" title="Цен героев за Энериум в источниках нет — заглушка прототипа">цены — заглушка</span></p>
-      <div class="rs-list scroll grow" data-keep="dset:${s.cycle}">${rows}${rsSetBox(s, null, { pick: id => `data-a="dsel" data-v="${id}"` })}</div>
-    </div>
-    ${rsDonatCard(sel, s, open)}
-  </div>`;
-}
-function rsDonatCard(h, s, open) {
-  const price = rsDonatPrice(h);
-  const aside = rsHas(h) ? `<span class="chip gold">${ic('check')}в коллекции</span><button class="link" data-a="rsopen" data-v="${h.id}">Открыть ${ic('chev')}</button>`
-    : open ? `<button class="btn go" data-a="dbuy" data-v="${h.id}">Купить${costTag('enerium', price)}</button><small class="faint">${h.place}-й из ${s.members.length}${TM(' · заглушка')}</small>`
-    : `<span class="chip warn">${ic('lock')}цикл ${ROMAN[s.cycle]}</span><small class="faint">откроется при переходе</small>`;
-  return `<div class="pnl hd">${rsHead(h, 0, aside)}
-    <div class="hd-body">${rsBrief(h, '')}</div></div>`;
-}
-/* за души: возрождение душ — рулетка screens/roulette.js (rlCol; без файла — прежняя колонка), отряд Эхо недели, каталог праха; собранного героя пробуждают души */
+/* за души (правила воздуха): одна главная вещь — вход рулетки «Возрождения душ» крупно (rlCol, screens/roulette.js); отряд Эхо недели
+   и каталог праха — входами, их списки — в листах (hrSoulsSide, screens/heroes.js) */
 function rsSoulsView() {
-  return `<div class="rs-souls">${typeof rlCol === 'function' ? rlCol() : rsRouletteCol()}${rsEchoCol()}${rsDustCol()}</div>`;
+  return `<div class="hr-souls">${typeof rlCol === 'function' ? rlCol() : ''}${typeof hrSoulsSide === 'function' ? hrSoulsSide() : ''}</div>`;
 }
 const rsShardTag = h => rsHas(h) ? `<span class="chip gold">${ic('check')}есть</span>` : `<span class="faint num">${S.rs.shards[h.id] || 0}/${RS.rules.stub.shards}</span>`;
-function rsRouletteCol() {
-  const cur = rsCyc(), from = rsFrom('roulette'), I = RS.srcInfo.roulette, R = RS.rules, last = RSI[S.rs.last];
-  const head = `<div class="rs-colh"><span class="eyebrow">Возрождение душ</span><b>Рулетка · цикл ${ROMAN[cur]}</b><small class="faint">${I ? `доблесть ${I.maxV[0]}–${I.maxV[1]} · ` : ''}осколки или полный чертёж</small></div>`;
-  if (cur < from) return `<div class="pnl rs-col">${head}<p class="rs-line">${ic('lock')}Откроется с цикла ${ROMAN[from]}.</p></div>`;
-  const rows = rsPool().map(h => rsRow(h, { act: 'ssel', sel: S.rs.ssel === h.id, sub: rsSub(h, `${RAR[h.r]} · доблесть до ${h.maxV}`), right: rsShardTag(h) })).join('') || '<p class="faint">В пуле этого цикла героев нет.</p>';
-  return `<div class="pnl rs-col">${head}
-    <div class="rs-list scroll grow" data-keep="roul:${cur}">${rows}</div>
-    <div class="rs-colf"><p class="reason">${last ? `Прошлая прокрутка: <b>${last.n}</b> · осколков +${R.stub.spinShards}${TM(' (заглушка)')}` : TM('Результат решает сервер; в прототипе — по очереди из пула.')}</p><button class="btn go sm" data-a="spin">Прокрутка${costTag('enerium', R.spin)}</button></div>
-  </div>`;
-}
-function rsEchoCol() {
-  const cur = rsCyc(), from = rsFrom('echo'), W = rsWeek();
-  const squad = W ? W.squad.map(id => RSI[id]).filter(Boolean) : [];
-  const to = squad.length ? squad[squad.length - 1].c : from;
-  const wsel = `<select class="rs-sel team-only" data-a="sweek" aria-label="Неделя расы, демо">${RS.weeks.map(w => `<option value="${w.race}" ${w === W ? 'selected' : ''}>Неделя ${w.gen}</option>`).join('')}</select>`;
-  const head = `<div class="rs-colh"><span class="eyebrow">Эхо · отряд недели</span>${wsel}${W && W.civ ? `<b>${W.civ}</b><small class="faint">нашествие «${W.raid}» · по герою за цикл, ${ROMAN[from]}–${ROMAN[to]}</small>` : `<small class="faint">по герою за цикл, ${ROMAN[from]}–${ROMAN[to]}</small>`}</div>`;
-  if (cur < from) return `<div class="pnl rs-col">${head}<p class="rs-line">${ic('lock')}Эхо откроется с цикла ${ROMAN[from]}.</p></div>`;
-  const av = squad.find(h => h.avers && h.avers.race);
-  const rows = squad.map(h => { const open = h.c <= cur; return rsRow(h, { act: 'ssel', sel: S.rs.ssel === h.id, dim: !open, sub: rsSub(h, open ? `цикл ${ROMAN[h.c]} · доблесть до ${h.maxV}` : `откроется в цикле ${ROMAN[h.c]}`), right: open ? rsShardTag(h) : ic('lock') }); }).join('');
-  return `<div class="pnl rs-col">${head}
-    ${av ? `<p class="rs-line">${ic('target')}Неприязнь: ${rsAversShort(av)}</p>` : ''}
-    <div class="rs-list scroll grow">${rows}</div>
-    <div class="rs-colf"><p class="reason">Осколки — в сундуках Эхо за места и за прах.</p><button class="link" data-a="sheet" data-v="gifts">Дары путешествия ${ic('chev')}</button></div>
-  </div>`;
-}
-function rsDustCol() {
-  const cur = rsCyc(), R = RS.rules, need = R.stub.shards, sel = RSI[S.rs.ssel];
-  const cat = RS.heroes.filter(h => RS_SHARD.includes(h.src) && h.c <= cur && !rsHas(h));
-  const rows = cat.map(h => rsRow(h, { act: 'ssel', sel: !!sel && sel.id === h.id, sub: rsSub(h, `${RS_SRC_ONE[h.src]} · осколок ${fmt(rsShardPrice(h))} праха`), right: rsShardTag(h) })).join('') || '<p class="faint">Все герои доступных циклов собраны.</p>';
-  let foot = '<p class="reason">Выберите героя — осколки за прах.</p>';
-  if (sel && RS_SHARD.includes(sel.src)) {
-    const n = S.rs.shards[sel.id] || 0;
-    foot = rsHas(sel) ? `<p class="reason"><b>${sel.n}</b> уже в коллекции: повторный осколок — ${fmt(rsDustOf(sel))} праха.</p>`
-      : `<div class="row" style="gap:6px;justify-content:space-between"><b class="serif" style="font-size:15px">${sel.n}</b><button class="link" data-a="rhero" data-v="${sel.id}">Карточка ${ic('chev')}</button></div>
-        ${bar(Math.min(100, n * 100 / need))}<small class="faint num">осколков ${n} / ${need}${TM(' · число — заглушка')}</small>
-        <div class="row" style="gap:6px"><button class="btn sm" data-a="dustbuy" data-v="${sel.id}" ${sel.c <= cur ? '' : 'disabled'}>Осколок${costTag('dust', rsShardPrice(sel))}</button><button class="btn go sm" data-a="activate" data-v="${sel.id}" ${n >= need ? '' : 'disabled'}>Пробудить${costTag('souls', R.stub.activateSouls)}</button></div>`;
-  }
-  return `<div class="pnl rs-col">
-    <div class="rs-colh"><span class="eyebrow">Каталог праха</span><span class="row" style="gap:8px"><b>Прах душ</b>${money('dust', S.wallet.dust)}</span><small class="faint">цена осколка — по редкости и циклу героя</small></div>
-    <div class="rs-list scroll grow" data-keep="dust:${cur}">${rows}</div>
-    <div class="rs-colf">${foot}</div>
-  </div>`;
-}
 
 /* ================== Ремесло ==================
-   «Мастерская» и «Запасы» — файлы экранов: CRAFT_SEGS.work (screens/craft.js) и CRAFT_SEGS.stock (screens/bag.js), их выбирает
-   SCREENS.craft из screens/model.js. Здесь — «Лавка» и «Рынок» на общих запасах: покупка кладёт предмет в BAG, лот забирает его из BAG.
-   Товары — предметы EN_RECIPES, цены — EN_RECIPES.drops.market; в игре цены, лоты и сделки решает сервер (§36.16). */
+   «Мастерская», «Запасы» и «Лавка» — файлы экранов: CRAFT_SEGS.work (screens/craft.js), CRAFT_SEGS.stock (screens/bag.js),
+   CRAFT_SEGS.shop (screens/shop.js), их выбирает SCREENS.craft из screens/model.js. Здесь — «Рынок» на общих запасах: лот забирает
+   предмет из BAG, покупка кладёт в BAG. Цены — EN_RECIPES.drops.market; в игре цены, лоты и сделки решает сервер (§36.16). */
 const CRAFT_META = { title: 'Ремесло', seg: { key: 'craft', items: [['work', 'Мастерская'], ['stock', 'Запасы'], ['shop', 'Лавка'], ['market', 'Рынок']] } };
 function craftView() {
   const seg = S.seg.craft;
-  if (seg === 'shop') return { ...CRAFT_META, html: shopView() };
   if (seg === 'market') return { ...CRAFT_META, html: marketView() };
-  return { ...CRAFT_META, html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран не подключён: рядом с index.html должны лежать screens/model.js, craft.js и bag.js.</p></div></section>' };
-}
-/* лавка (§14.2): за золото — минимальная цена рынка × количество, за Энериум — цена из INV.shop (заглушка) */
-const shopCost = g => g[2] === 'gold' ? ['gold', mkMin(g[0]) * g[1]] : [g[2], g[3] || 0];
-function shopView() {
-  const F = INV.shop;
-  return `<section class="scr">
-    <div class="row"><span class="eyebrow">Обновление через ${dur(F.refreshSec)}</span><span class="g-spacer"></span><span class="faint" style="font-size:12.5px">Уникальное — редко и по одной · покупка — в запасы</span><button class="btn sm" data-a="toast" data-v="Лавка обновлена · бесплатно осталось ${Math.max(0, F.free - 1)}">${ic('swap')}Обновить · бесплатно ${F.free}</button></div>
-    <div class="shop grow">${S.shop.map((g, i) => {
-      const it = BAG.item(g[0]); if (!it) return '';
-      const [c, p] = shopCost(g), sold = S.sold.includes(i);
-      return `<div class="good ${sold ? 'sold' : ''}">${itWell(it.id, { q: g[1] })}<b>${trEsc(itName(it))}</b><button class="btn sm" data-a="buy" data-v="${i}" ${sold ? 'disabled' : ''}>${sold ? 'Куплено' : `${ic('plus')}${costTag(c, p).replace('class="cost"', 'class="cost" style="border:0;padding:0"')}`}</button></div>`;
-    }).join('')}</div>
-  </section>`;
+  return { ...CRAFT_META, html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран не подключён: рядом с index.html должны лежать screens/model.js, craft.js, shop.js и bag.js.</p></div></section>' };
 }
 /* рынок (§13): лоты других игроков — за золото, имена скрыты; свой лот забирает предмет из запасов сразу, снятый — возвращает,
    выручка проданного — за вычетом комиссии drops.market.commissionPct */
@@ -3100,33 +2732,9 @@ function bindTree() {
 }
 addEventListener('resize', () => { if (treeShown()) requestAnimationFrame(drawTree); });
 
-/* ================== Неделя ================== */
-const WEEKLY = () => [
-  { r: 'echo', p: 18, n: 'Эхо', l1: `${fmt(S.echo.score)} очков · место ${S.echo.place}`, l2: `${S.echo.slots.filter(Boolean).length} цели · души ${fmt(S.wallet.souls)}`, act: 'Атаковать', hot: true },
-  { r: 'contracts', p: 38, n: 'Контракты', l1: S.contracts.day.signed ? 'Дневной подписан' : 'Дневной не подписан', l2: 'Недельный: 3 из 4 заданий', act: S.contracts.day.signed ? 'Прогресс' : 'Составить', hot: !S.contracts.day.signed },
-  { r: 'rituals', p: 33, n: 'Ритуалы', l1: `${S.rituals.slots.filter(s => s.st === 'ready').length} готов · ${S.rituals.slots.filter(s => s.st === 'run').length} идёт`, l2: `свободно слотов: ${S.rituals.slots.filter(s => s.st === 'free').length}`, act: 'Забрать', hot: S.rituals.slots.some(s => s.st === 'ready') },
-  { r: 'arena', p: 3, n: 'Арена', l1: `Рейтинг ${fmt(S.arena.rating)}`, l2: `атак ${S.arena.att} из ${S.arena.max} · оборона цела`, act: 'Соперники' },
-  { r: 'clan', p: 26, n: 'Клан', l1: S.clan.n, l2: `Клановый босс · атак ${S.clan.boss.att}/5`, act: 'Открыть' },
-  { r: 'event', p: 21, n: 'Событие', l1: `${fmt(S.event.pts)} очков`, l2: (n => n ? `до следующей планки ${fmt(n - S.event.pts)}` : 'все планки взяты')(S.event.ms.find(m => m > S.event.pts)), act: 'Планки' },
-];
+/* ================== Неделя ==================
+   Экран «Неделя» — screens/week.js: три времени и реестр итогов режимов WEEK_MODES. Здесь — чип срока недели для экранов режимов */
 const weekChip = () => `<span class="chip" style="margin-left:6px">${ic('hour')}Неделя ${S.week.race} · <span class="num" data-cd="week">${dur(S.week.left)}</span></span>`;
-function weekView() {
-  const chests = 59;
-  return { title: 'Неделя', html: `<section class="scr">
-    <div class="pnl wk-head fit">
-      <div class="col" style="gap:3px"><span class="eyebrow">Раса недели</span><h2>Неделя ${S.week.race}</h2><span class="faint" style="font-size:12.5px">следующая — неделя ${S.week.next}</span></div>
-      <div class="phases" aria-label="Этапы недели">
-        <div class="phase now"><b>Приём результатов</b><small>ещё <span class="num" data-cd="week">${dur(S.week.left)}</span></small></div>
-        <span class="faint">${ic('chev')}</span>
-        <div class="phase"><b>Отсечка</b><small>за час до подсчёта</small></div>
-        <span class="faint">${ic('chev')}</span>
-        <div class="phase"><b>Подсчёт</b><small>один серверный час</small></div>
-      </div>
-      <button class="gifts" data-a="sheet" data-v="gifts"><img src="${CHEST}" alt=""><span><b>Дары</b><small>${chests} сундуков</small></span><span class="bdg">2</span></button>
-    </div>
-    <div class="wk-grid">${WEEKLY().map(w => `<button class="mode ${w.hot ? 'hot' : ''}" data-a="go" data-v="${w.r}"><span class="pic"><img src="${PATH(w.p)}" alt=""></span><h3>${w.n}</h3><span class="ln">${w.l1}<br>${w.l2}</span><span class="ft"><span class="go-lbl">${w.act} ${ic('chev')}</span></span></button>`).join('')}</div>
-  </section>` };
-}
 
 /* ================== Эхо ================== */
 const ECHO_COST = f => f.g === 'o' ? 1 : f.g === 'e' ? 2 : 4;
@@ -3159,32 +2767,8 @@ function echoView() {
   </section>` };
 }
 
-/* ================== Контракты ================== */
-function contractsView() {
-  const key = S.seg.contracts, C = S.contracts[key];
-  const pts = C.tasks.reduce((a, t) => a + t.pts, 0);
-  const done = C.tasks.filter(t => t.p >= t.goal).length;
-  const pool = C.pool;
-  return { title: 'Контракты', back: 'week', seg: { key: 'contracts', items: [['day', 'Дневной'], ['week', 'Недельный']] }, chip: '', html: `<section class="scr">
-    <div class="ct">
-      <div class="col" style="min-height:0">
-        <div class="row"><span class="eyebrow">${C.signed ? `Подписан · выполнено ${done} из ${C.tasks.length}` : `Составление · ${C.tasks.length} задания`}</span><span class="g-spacer"></span><span class="chip">${ic('hour')}<span class="num">${dur(C.left)}</span></span>${!C.signed ? `<span class="chip">${ic('swap')}замен бесплатно: ${C.rer}</span>` : ''}</div>
-        <div class="col scroll grow" style="gap:6px">${C.tasks.map((t, i) => `<div class="task ${C.signed && t.p >= t.goal ? 'done' : ''}" data-r="${t.r}"><span class="rs"></span>
-          <span style="min-width:0"><b>${t.n}</b><small>${RAR[t.r]} · ${t.pts} очков · цель ${t.goal}</small>${C.signed ? `<div class="row" style="gap:8px;margin-top:4px">${bar(t.p / t.goal * 100, t.p >= t.goal ? 'sp' : '')}<span class="num faint" style="font-size:12px;white-space:nowrap">${t.p} / ${t.goal}</span></div>` : ''}</span>
-          <span class="acts">${C.signed ? (t.p >= t.goal ? `<span class="chip spirit">${ic('check')}готово</span>` : '') : `<button class="iconbtn" data-a="treroll" data-v="${i}" aria-label="Заменить задание" title="Заменить">${ic('swap')}</button><button class="iconbtn" data-a="tdrop" data-v="${i}" aria-label="Убрать задание" title="Убрать">${ic('x')}</button>`}</span></div>`).join('')}</div>
-      </div>
-      <div class="pnl pad col fit" style="gap:10px">
-        <span class="eyebrow">Если выполнить всё</span>
-        <div class="row" style="gap:12px;flex-wrap:wrap">${money('gold', pool.gold * (C.cert ? 2 : 1))}${money('spirit', pool.spirit * (C.cert ? 2 : 1))}${money('keys', pool.keys * (C.cert ? 2 : 1))}${pool.enerium ? money('enerium', pool.enerium * (C.cert ? 2 : 1)) : ''}</div>
-        <div class="row" style="gap:14px"><div class="stat"><b>${pts}</b><small>очков</small></div><div class="stat"><b>${pts / 2}</b><small>личный рейтинг</small></div><div class="stat"><b>${pts / 2}</b><small>резервуар клана</small></div></div>
-        <label class="cert ${C.signed ? 'off' : ''}"><input type="checkbox" id="cert-${key}" data-a="cert" ${C.cert ? 'checked' : ''} ${C.signed ? 'disabled' : ''}><span><b>Заверение золотом</b><small>Ставка ${fmt(pts * 20)} золота. Награды ×2, очки — нет. При провале сгорает.</small></span></label>
-        <div class="col" style="gap:6px;margin-top:auto">
-          ${C.signed ? `<p class="reason">Всё или ничего: провал хотя бы одного задания к сроку — ноль всем.</p>` : `<p class="reason">Прогресс считается только после подписи. Подписанное не меняется.</p><button class="btn go" data-a="tsign">Подписать контракт${C.cert ? costTag('gold', pts * 20) : ''}</button>`}
-        </div>
-      </div>
-    </div>
-  </section>` };
-}
+/* ================== Контракты ==================
+   Экран «Контракты» — screens/contracts.js: SCREENS.contracts, листы, «сервер» операций и итоги в WEEK_MODES */
 
 /* ================== Ритуалы ==================
    Время и награда — по редкости ритуала из EN_RECIPES.drops.rituals (§19.3, §19.4): рабочие — базовые общего пула, с эпической
@@ -3238,13 +2822,14 @@ function ritualsView() {
 function arenaView() {
   const t = S.seg.arena, A2 = S.arena;
   const meta = { title: 'Арена', back: 'week', seg: { key: 'arena', items: [['arena', 'Арена'], ['league', 'Лига'], ['def', 'Оборона']] } };
-  if (t === 'league') return { ...meta, html: `<section class="scr"><div class="pnl pad col" style="flex:1;justify-content:center;align-items:center;text-align:center;gap:10px">
-      <span class="eyebrow">Лига · три отряда по пять</span><h2 class="serif" style="font-size:30px">Нужно 15 разных героев</h2>
-      <div style="width:320px">${bar(S.heroes.length / 15 * 100)}</div><p class="faint num">${S.heroes.length} из 15 в коллекции</p>
-      <button class="btn" data-a="seg" data-v="heroes:hire" data-go="heroes">К призыву</button></div></section>` };
-  if (t === 'def') { const s = sq('s1'); return { ...meta, html: `<section class="scr"><div class="pnl pad col" style="flex:1;gap:10px">
-      <div class="row"><h2 class="serif gold" style="font-size:24px">Оборонительный отряд</h2><span class="chip spirit">слепок · героев не занимает</span></div>
-      <div class="sq-slots" style="max-width:560px">${s.m.map(id => heroCard(H(id))).join('')}</div>
+  /* отряды Лиги и обороны — общий лист выбора отряда (SQ, screens/heroes.js): у каждого режима свой выбор */
+  if (t === 'league') { const L = SQ.ready('league'); return { ...meta, html: `<section class="scr"><div class="pnl pad col" style="flex:1;justify-content:center;align-items:center;text-align:center;gap:10px">
+      <span class="eyebrow">Лига · три отряда по пять</span><h2 class="serif" style="font-size:30px">${L.pool < L.need ? `Нужно ${L.need} разных героев` : L.ok ? 'Три отряда готовы' : 'Соберите три отряда'}</h2>
+      <div style="width:320px">${bar(Math.min(100, L.pool * 100 / L.need))}</div><p class="faint num">${L.pool} из ${L.need} в коллекции</p>
+      <div class="row" style="justify-content:center"><button class="btn" data-a="sqmode" data-v="league">${ic('users')}Отряды Лиги</button><button class="btn" data-a="seg" data-v="heroes:hire" data-go="heroes">К призыву</button></div></div></section>` }; }
+  if (t === 'def') { const s = SQ.squad('arena') || sq(''); return { ...meta, html: `<section class="scr"><div class="pnl pad col" style="flex:1;gap:10px">
+      <div class="row"><h2 class="serif gold" style="font-size:24px">Оборонительный отряд</h2><span class="chip spirit">слепок · героев не занимает</span><span class="g-spacer"></span><button class="btn sm" data-a="sqmode" data-v="arena">${ic('users')}Сменить</button></div>
+      <div class="sq-slots" style="max-width:560px">${s.m.map(id => id && H(id) ? heroCard(H(id)) : `<div class="hc empty">${ic('plus')}</div>`).join('')}</div>
       <p class="reason">Назначается из последнего состава атаки. Вас видят полностью — стройте отряд, устойчивый к разным ответам.</p></div></section>` }; }
   return { ...meta, html: `<section class="scr">
     <div class="row"><div class="stat"><b>${fmt(A2.rating)}</b><small>рейтинг</small></div><div class="stat" style="margin-left:14px"><b>${A2.att}<span class="faint"> / ${A2.max}</span></b><small>атак · +20 в день</small></div><span class="g-spacer"></span><span class="faint" style="font-size:12.5px">${PL('Каждого соперника атакуют один раз', 'Сид боя закреплён: каждого соперника атакуют один раз')}</span><button class="btn sm" data-a="toast" data-v="Список соперников обновлён">${ic('swap')}Обновить</button><button class="btn sm" data-a="sheet" data-v="rank:Арена">Место 88</button></div>
@@ -3257,7 +2842,7 @@ function clanView() {
   const C = S.clan, t = S.seg.clan;
   const meta = { title: 'Клан', back: 'week', seg: { key: 'clan', items: [['pass', 'Паспорт'], ['boss', 'Босс'], ['mem', 'Участники'], ['tree', 'Древо']] } };
   if (t === 'boss') return { ...meta, html: `<section class="scr">
-    <div class="row"><span class="eyebrow">Круг ${C.boss.circle} · элиты недели</span><span class="g-spacer"></span><span class="chip">${ic('bolt')}атак ${C.boss.att} / 5 · общий кошелёк</span><span class="chip">${ic('hour')}<span class="num" data-cd="week">${dur(S.week.left)}</span></span></div>
+    <div class="row"><span class="eyebrow">Круг ${C.boss.circle} · элиты недели</span><span class="g-spacer"></span><span class="chip">${ic('bolt')}атак ${C.boss.att} / 5 · общий кошелёк</span><span class="chip">${ic('hour')}<span class="num" data-cd="week">${dur(S.week.left)}</span></span><button class="btn sm" data-a="sqmode" data-v="clan">${ic('users')}${SQ.of('clan') ? 'Отряд' : 'Выбрать отряд'}</button></div>
     <div class="rcards grow">${C.boss.elites.map(([e, bm, hp]) => `<div class="rcard" data-r="4"><div class="row" style="justify-content:space-between"><span class="chip gold">${ic('gem')}Элита</span>${el(e)}</div><b>Неизученная элита</b><small class="faint">БМ <span class="num">${fmt(bm)}</span> · без сопротивлений</small>${bar(100, 'hp')}<small class="faint num">${fmt(hp)} / ${fmt(hp)}</small><button class="btn sm go" style="margin-top:auto" data-a="toast" data-v="${tmT('Атака элиты пока недоступна', 'Атака элиты: демо')}">Атаковать · 1 атака</button></div>`).join('')}</div>
     <p class="reason">Три победы над элитами призывают Кланового босса недели. Контроль на него не действует — только дебафы. Очки делятся по снятому здоровью в момент смерти врага.</p>
   </section>` };
@@ -3358,7 +2943,7 @@ function storeView() {
   return { ...meta, html: `<section class="scr">${body}</section>` };
 }
 
-const SCREENS = { shelter, descent, battle, heroes, craft: craftView, week: weekView, echo: echoView, contracts: contractsView, rituals: ritualsView, arena: arenaView, clan: clanView, event: eventView, profile: profileView, chronicle: chronicleView, store: storeView };
+const SCREENS = { shelter, descent, battle, craft: craftView,week: () => ({ title: 'Неделя', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран недели не подключён.</p></div></section>' }), echo: echoView, contracts: () => ({ title: 'Контракты', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран контрактов не подключён.</p></div></section>' }), rituals: ritualsView, arena: arenaView, clan: clanView, event: eventView, profile: profileView, chronicle: chronicleView, store: storeView };
 
 /* ================== занятость ================== */
 const busyNote = id => { const r = runOf(id); if (r) return 'Забег · ' + (r.scene ? r.scene.title : EB.BIOMES[r.biome].name); const h = H(id); return h.busy; };
@@ -3424,23 +3009,7 @@ const OV = {
     const at = u ? `<span class="eyebrow">Атрибуты · уровень ${h.lvl}</span><div class="at-grid">${attrList(u).map(([k, x]) => `<div class="at">${ICON(k, 22, ATTR_T[k])}<span class="col"><b class="num">${x}</b><small>${ATTR_T[k]}</small></span></div>`).join('')}</div>` : '';
     return sheet(h.name, `${heroHead(h)}<span class="eyebrow">Характеристики</span><div class="stats">${st}</div>${at}<p class="reason">Столбики — степень роста: чем их больше, тем быстрее характеристика растёт с уровнем.</p>`);
   },
-  prep(o) {
-    const echo = o.arg === 'echo';
-    const cur = echo ? S.echoSquad : S.prepSquad;
-    const s = sq(cur);
-    const members = s.m.filter(Boolean);
-    const busy = members.filter(id => busyNote(id));
-    const ready = members.length - busy.length;
-    const els = [...new Set(members.map(id => H(id).el))];
-    const last = S.lastRun[selRunBiome()], hall = (BIOME_UI[selRunBiome()] || BIOME_UI.b1).els;   // стихии зала — своего биома
-    const body = `<div class="row" style="flex-wrap:wrap;gap:6px">${S.squads.map(x => `<button class="p-chip" aria-pressed="${x.id === cur}" data-a="${echo ? 'esq' : 'psq'}" data-v="${x.id}" style="text-transform:none;letter-spacing:0;font-size:13px">${x.name}</button>`).join('')}</div>
-      <div class="sq-slots">${s.m.map(id => id ? heroCard(H(id), { act: 'noop', note: busy.includes(id) ? busyNote(id) : '', dim: busy.includes(id) }) : `<div class="hc empty">${ic('plus')}</div>`).join('')}</div>
-      <div class="row"><div class="stat"><b class="bm">${ICON('power', 20, 'Боевая мощь')}<span class="num">${fmt(sqBM(s))}</span></b><small>боевая мощь</small></div><span class="g-spacer"></span><div class="col" style="gap:4px;align-items:flex-end"><span class="eyebrow">${echo ? 'Стихии отряда' : 'В зале чаще всего'}</span><span class="row" style="gap:4px">${echo ? els.map(e => el(e)).join('') : hall.map(e => el(e)).join('')}</span></div></div>
-      ${echo ? (ready < 5 ? `<p class="reason warn">Для Эхо нужны ровно пять свободных героев. Свободно: ${ready}.</p>` : '<p class="reason">Отряд сохранится для следующих целей и повторных атак.</p>')
-        : `<p class="reason">${busy.length ? `${busy.map(id => H(id).name).join(', ')} заняты — отряд пойдёт ${['', 'один', 'вдвоём', 'втроём', 'вчетвером'][ready] || 'без них'}.` : `${TM('Этажи — готовые колоды, сид — сам биом: тот же отряд с той же ротацией пройдёт их так же. ')}Здоровье между этажами не восстанавливается.${last ? ` Прошлый забег: ${last.wall ? 'стена на этаже ' + last.wall : last.kind === 'boss' ? 'босс повержен' : last.kind === 'siege' ? 'дошёл до босса' : 'прерван'}.` : ''}`}</p>`}`;
-    const foot = `<button class="link" data-a="go" data-v="heroes" data-seg="heroes:squads">${ic('users')}Отряды</button>${echo ? `<button class="btn go" data-a="close">Сохранить</button>` : `<button class="btn go" data-a="start" ${ready ? '' : 'disabled'}>${ic('down')}Начать забег</button>`}`;
-    return sheet(echo ? 'Отряд для Эхо' : 'Отряд для спуска', body, foot, true);
-  },
+  /* выбор отряда для режима (prep) — один лист на все режимы, screens/heroes.js */
   /* враг Мастерской в бестиарии (§7): до первой победы — мощь, здоровье, стихия и тип; после — класс, раса, пять характеристик, лор.
      Иммунитет к контролю — по рангу карты из правил ядра (RULES.resist, ADR-0010), а не числом в разметке */
   foe(o) {
@@ -3643,13 +3212,7 @@ const ACT = {
     render(); focusOverlay();
   },
   dbuydo(v) { const h = RSI[v]; if (!h || rsHas(h)) return close(); if (!spend('enerium', rsDonatPrice(h))) return close(); rsAdd(h, 'donat'); S.overlay = null; toast(`${h.n} в коллекции: 0 ур. · 0 РП · 0 Добл`); },
-  spin() {
-    const pool = rsPool(); if (!pool.length || !spend('enerium', RS.rules.spin)) return;
-    const h = pool[S.rs.spins % pool.length], n = RS.rules.stub.spinShards;   // демо: по очереди из пула, в игре результат решает сервер
-    S.rs.spins++; S.rs.last = h.id; S.rs.ssel = h.id;
-    if (rsHas(h)) { const d = n * rsDustOf(h); S.wallet.dust += d; toast(`${h.n} уже в коллекции: осколки ×${n} ушли в прах · +${fmt(d)}`); }
-    else { S.rs.shards[h.id] = (S.rs.shards[h.id] || 0) + n; toast(`Возрождение душ: ${h.n} · осколков +${n}`); }
-  },
+  /* прокрутка рулетки — операция RL_SRV в screens/roulette.js */
   dustbuy(v) { const h = RSI[v]; if (!h || rsHas(h) || h.c > rsCyc() || !spend('dust', rsShardPrice(h))) return; S.rs.shards[v] = (S.rs.shards[v] || 0) + 1; render(); },
   activate(v) {
     const h = RSI[v], need = RS.rules.stub.shards; if (!h || rsHas(h) || (S.rs.shards[v] || 0) < need) return;
@@ -3706,24 +3269,8 @@ const ACT = {
   },
   /* руна доблести из осколков — автодокрафт мастерской (screens/craft.js), рецепт известен с первого осколка */
   valorcraft(v) { if (typeof ACT.wsmake === 'function' && BAG.recipe(v)) ACT.wsmake(v); else { S.seg.craft = 'work'; go('craft'); } },
-  sq(v) { S.selSquad = v; render(); },
-  sqnew() { if (S.squads.length >= 10) return toast('Библиотека полна: 10 отрядов'); const id = 's' + Date.now(); S.squads.push({ id, name: 'Отряд ' + ROMAN[S.squads.length + 1], m: [null, null, null, null, null] }); S.selSquad = id; render(); },
-  sqrem(v) { sq(S.selSquad).m[+v] = null; render(); },
-  sqadd(v) { const s = sq(S.selSquad), i = s.m.indexOf(null); if (i < 0) return toast('В отряде уже пятеро'); s.m[i] = v; render(); },
-  sqslot() { toast('Нажмите героя ниже, чтобы поставить его сюда'); },
-  /* лавка: покупка кладёт предмет в запасы; товар продаётся один раз */
-  buy(v) {
-    const i = +v, g = S.shop[i], it = g && BAG.item(g[0]); if (!it || S.sold.includes(i)) return;
-    const [c, p] = shopCost(g);
-    S.overlay = { t: 'confirm', title: 'Купить в лавке', text: `${itName(it)} ×${g[1]}. Покупка ляжет в запасы.`, ok: 'Купить', act: 'buydo', v, cost: [c, p] };
-    render(); focusOverlay();
-  },
-  buydo(v) {
-    const i = +v, g = S.shop[i], it = g && BAG.item(g[0]); if (!it || S.sold.includes(i)) return close();
-    const [c, p] = shopCost(g); if (!spend(c, p)) return close();
-    S.sold.push(i); BAG.add(it.id, g[1]); S.overlay = null;
-    toast(`Куплено: ${itName(it)} ×${g[1]} — в запасах`);
-  },
+  /* отряды: библиотека и выбор отряда режима — ACT.sq* в screens/heroes.js */
+  /* лавка: ACT.buy и ACT.buydo — в screens/shop.js, покупка — операция с номером */
   /* рынок: чужой лот — в запасы за золото; свой лот забирает предмет из запасов, снятый возвращает, выручка — без комиссии */
   mkbuy(v) {
     const x = S.market.lots.find(l => l.uid === v), it = x && BAG.item(x.id); if (!it) return;
@@ -3770,7 +3317,6 @@ const ACT = {
   },
   esel(v) { S.echo.sel = +v; render(); },
   summon(v) { if (!spend('souls', 1)) return; S.echo.slots[+v] = { foe: 'o3', step: 3, hp: 6000, max: 6000, left: 72 * 3600 }; S.echo.sel = +v; toast('Призвана цель: Пустотелый образец · 1 душа'); },
-  esq(v) { S.echoSquad = v; render(); },
   eattack() {
     const s = sq(S.echoSquad), m = s.m.filter(Boolean), busy = m.filter(id => busyNote(id));
     if (m.length < 5 || busy.length) { S.overlay = { t: 'confirm', title: 'Отряд не готов', text: m.length < 5 ? `В «${s.name}» ${m.length} из 5 героев. Эхо принимает ровно пятерых.` : (() => { const by = {}; busy.forEach(id => { (by[busyNote(id)] = by[busyNote(id)] || []).push(H(id).name); }); return Object.entries(by).map(([why, names]) => names.length === m.length ? `Весь «${s.name}» занят: ${why.toLowerCase()}.` : `${names.join(', ')} — ${why.toLowerCase()}.`).join(' '); })(), warn: busy.length && S.runs.some(r => !r.over) ? 'Дождитесь конца забега или прервите его, чтобы освободить отряд.' : '', ok: 'Изменить отряд', act: 'echoprep' }; render(); focusOverlay(); return; }
@@ -3781,12 +3327,7 @@ const ACT = {
     if (sl.hp <= 0) { S.echo.score += f.g === 'o' ? 100 : 598; S.echo.slots[S.echo.sel] = null; S.echo.sel = S.echo.slots.findIndex(Boolean); if (S.echo.sel < 0) S.echo.sel = 0; toast(`Цель повержена: +${f.g === 'o' ? 100 : 598} очков · слот свободен`); }
     else toast(`Атака: −${fmt(dmg)} здоровья. Урон сохранён до следующей атаки`);
   },
-  echoprep() { S.overlay = null; open('prep', 'echo'); },
-  treroll(v) { const C = S.contracts[S.seg.contracts]; if (C.rer <= 0) { if (!spend('enerium', 5)) return; } else C.rer--; const t = C.tasks[+v]; const pool = [['Закрыть элиту', 2, 20, 3], ['Убить босса биома', 4, 80, 1], ['Атаковать в Эхо', 3, 40, 5], ['Потратить 30 духа на уровни', 1, 10, 30]]; const n = pool[Math.floor(Math.random() * pool.length)]; C.tasks[+v] = { n: n[0], r: n[1], pts: n[2], goal: n[3], p: 0 }; toast(`Задание заменено: ${RAR[n[1]].toLowerCase()} · ${n[2]} очков`); },
-  tdrop(v) { const C = S.contracts[S.seg.contracts]; if (C.tasks.length <= 1) return toast('Можно подписать и пустой контракт — но одно задание оставьте для примера'); C.tasks.splice(+v, 1); render(); },
-  cert(v, t) { const C = S.contracts[S.seg.contracts]; C.cert = t.checked; render(); },
-  tsign() { const C = S.contracts[S.seg.contracts], pts = C.tasks.reduce((a, t) => a + t.pts, 0); S.overlay = { t: 'confirm', title: 'Подписать контракт', text: `Заданий: ${C.tasks.length}, очков: ${pts}. Состав больше не изменить. Всё или ничего: провал одного задания к сроку обнуляет награду${C.cert ? ' и сжигает ставку' : ''}.`, ok: 'Подписать', act: 'tsigndo', cost: C.cert ? ['gold', pts * 20] : null }; render(); focusOverlay(); },
-  tsigndo() { const C = S.contracts[S.seg.contracts], pts = C.tasks.reduce((a, t) => a + t.pts, 0); if (C.cert && !spend('gold', pts * 20)) return close(); C.signed = true; S.overlay = null; toast('Контракт подписан. Прогресс пошёл'); },
+  /* действия контрактов — ACT.ct* в screens/contracts.js */
   /* ритуал: слот освобождается до выдачи — повтор ничего не выдаст; письмо о готовом ритуале уходит вместе с ним */
   rclaim(v) {
     const i = +v, s = S.rituals.slots[i]; if (!s || s.st !== 'ready') return;
@@ -3817,7 +3358,6 @@ const ACT = {
   claimgo(v) { const m = S.inbox.find(x => x.id === v); if (!m) return; S.inbox = S.inbox.filter(x => x !== m); go(m.go); },
   claimall() { S.inbox.filter(mailHas).forEach(m => ACT.claim(m.id)); toast('Всё забрано: предметы и сундуки — в запасах'); },
   giftget() { S.gift.got = S.gift.day; S.wallet.enerium += 50; S.overlay = null; toast('Дар дня: Энериум ×50', ART('enerium.png')); },
-  psq(v) { S.prepSquad = v; render(); },
   start() { startRun(S.prepSquad, selRunBiome()); },
   again(v) { const R = runById(v) || focusRun(), sqId = R ? R.squadId : S.prepSquad; prune(v); S.overlay = null; startRun(sqId, R ? R.biome : 'b1'); },
   resquad(v) { const R = runById(v); prune(v); S.overlay = null; S.route = 'descent'; S.selBiome = R && EB.BIOMES[R.biome] ? R.biome : selRunBiome(); open('prep'); },
@@ -4341,9 +3881,8 @@ const FLOWS = [
   ['Мастерская', 'Шесть ячеек вокруг результата и книга рецептов', () => { S.route = 'craft'; S.seg.craft = 'work'; S.overlay = null; }],
   ['Лавка и рынок', 'Покупка кладёт предмет в запасы, свой лот забирает его оттуда, снятый — возвращает', () => { S.route = 'craft'; S.seg.craft = 'shop'; S.overlay = null; }],
   ['Ритуалы', 'Готовый ритуал: базовые общего пула и ключи биома — в запасы, золото и души — в кошелёк', () => { S.route = 'rituals'; S.seg.rituals = 'work'; S.overlay = null; }],
-  ['Неделя → Эхо', 'Шесть недельных режимов на одном экране, цель и атака', () => { S.route = 'echo'; S.echo.sel = 0; S.overlay = null; }],
+  ['Неделя → Эхо', 'Слоты, цель и сохранённый отряд; цена атаки — у кнопки, в слотах и у каждого варианта призыва', () => { S.route = 'echo'; S.echo.sel = 0; S.overlay = null; }],
   ['Эхо · бой и итог', 'Атака — бой ядром: главный враг ступени и четыре защитника на одной арене. «Пропустить» — сразу итог', () => { S.route = 'echo'; S.echo.sel = 0; S.overlay = null; if (ACT.echatk) ACT.echatk(); }],
-  ['Контракт', 'Составить, заверить золотом, подписать', () => { S.route = 'contracts'; S.seg.contracts = 'day'; S.overlay = null; }],
   ['Входящие', 'Всё, что пришло, пока вас не было, в одном листе', () => { S.route = 'shelter'; S.overlay = { t: 'inbox' }; }],
   ['Разговор с проводником', 'Текст слева, персонаж справа, три ответа', () => { S.route = 'shelter'; S.overlay = { t: 'npc', arg: 'enzo', i: 0 }; }],
 ];
@@ -4402,17 +3941,21 @@ const MAP = [
   { n: 'Спуск', p: 10, where: 'Шахта · 2', d: 'Путь вниз по циклам, зал с обитателями, босс и страж как ворота. Бестиарий живёт в самом биоме. Биомы 1–4: у каждого своя арена, враги, забег, босс и рунный страж; бестиарий — по биомам.', o: ['biomes', 'runic', 'bestiary', 'biome-setup:s', 'runic-setup:s', 'crafted-biomes:d'],
     ready: ['biomes', 'runic', 'bestiary', 'biome-setup'] },
   { n: 'Бой', p: 27, where: 'Один на все режимы', d: 'Биом, страж, Эхо, Арена, Лига, Клановый босс — один просмотрщик. «К итогу» доступно всегда.', o: ['battle', 'echo-battle:d', 'pvp-battle:d', 'league-match:d', 'clan-boss-battle:d'] },
-  { n: 'Герои', p: 24, where: 'Шахта · 3', d: 'Коллекция и карточка рядом. Сила, Навыки, Путь — три вкладки вместо шести. Во вкладке «Сила» — четыре места духовных талисманов, их лист — поверх (screens/talismans.js). Отряды и Призыв — соседние вкладки; в «Призыве за души» — рулетка «Возрождения душ» окном поверх (screens/roulette.js).', o: ['heroes', 'hero', 'hero-story', 'orders', 'equipment', 'equipment-item:s', 'talismans', 'collection-passives:s', 'squads', 'recruitment', 'hire-preview', 'resurrection', 'blueprints'],
-    ready: ['talismans', 'resurrection'] },
-  { n: 'Ремесло', p: 11, where: 'Шахта · 4', d: 'Мастерская с запасами слева и столом справа. Книга рецептов открывается на месте стола.', o: ['craft', 'recipes', 'inventory', 'shop', 'market', 'my-listings', 'reforge'] },
-  { n: 'Неделя', p: 6, where: 'Шахта · 5', d: 'Раса недели, этапы и шесть режимов с состоянием каждого. Одна отсечка для всей игры.', o: ['week', 'lootboxes:s', 'rankings:s', 'echo-rewards:s', 'event-rewards:s', 'pvp-rewards:s', 'clan-rewards:s'] },
-  { n: 'Эхо', p: 18, where: 'Неделя', d: 'Четыре слота, выбранная цель, сохранённый отряд и цена атаки у кнопки. Лестница — полоса внизу.', o: ['echo', 'echo-target:d', 'echo-ladder'] },
-  { n: 'Контракты', p: 38, where: 'Неделя', d: 'Составление, заверение и подпись на одном экране. Результаты приходят во Входящие.', o: ['contracts'] },
+  { n: 'Герои', p: 24, where: 'Шахта · 3', d: 'Коллекция и карточка рядом (screens/heroes.js): на плитке — кристалл редкости, доблесть, рунный предел, класс и уровень. Сила, Навыки, Путь — три вкладки вместо шести. Во вкладке «Сила» — четыре места духовных талисманов, их лист — поверх (screens/talismans.js). Отряды — библиотека до десяти и один лист выбора на все режимы. Призыв — три вкладки; в «За души» главное — рулетка «Возрождения душ» (screens/roulette.js), отряд Эхо и прах — листами.', o: ['heroes', 'hero', 'hero-story', 'orders', 'equipment', 'equipment-item:s', 'talismans', 'collection-passives:s', 'squads', 'recruitment', 'hire-preview', 'resurrection', 'blueprints'],
+    ready: ['heroes', 'hero', 'squads', 'recruitment', 'talismans', 'resurrection'] },
+  { n: 'Ремесло', p: 11, where: 'Шахта · 4', d: 'Мастерская с запасами слева и столом справа. Книга рецептов открывается на месте стола. Попытка — анимация удачи и неудачи, автодокрафт — короткая (screens/craft.js). Лавка — витрина из десяти товаров, подробности и цена — в листе товара (screens/shop.js).', o: ['craft', 'recipes', 'inventory', 'shop', 'market', 'my-listings', 'reforge'],
+    ready: ['craft', 'recipes', 'shop'] },
+  { n: 'Неделя', p: 6, where: 'Шахта · 5', d: 'Три времени сегментами. Эта неделя — раса и цивилизация Эхо, срок до отсечки и шесть режимов строкой: место, очки, полоса до планки. Прошлая — итог: сундуки и Энериум, место и очки по режимам, лидеры и награды в листе, ссылка в Дары. Следующая — раса, герои Эхо с неприязнью, стихии нашествия. Режимы сообщают итоги через WEEK_MODES (screens/week.js). Одна отсечка для всей игры.', o: ['week', 'lootboxes:s', 'rankings:s', 'echo-rewards:s', 'event-rewards:s', 'pvp-rewards:s', 'clan-rewards:s'],
+    ready: ['week', 'lootboxes', 'rankings', 'echo-rewards', 'event-rewards', 'pvp-rewards'] },
+  { n: 'Эхо', p: 18, where: 'Неделя', d: 'Четыре слота, выбранная цель, сохранённый отряд и цена атаки у кнопки. У вариантов призыва и в слотах — цена одной атаки в душах. Лестница — полоса внизу.', o: ['echo', 'echo-target:d', 'echo-ladder'],
+    ready: ['echo', 'echo-ladder'] },
+  { n: 'Контракты', p: 38, where: 'Неделя', d: 'День и неделя — сегментами. Задания карточками: кристалл редкости, цель и одно действие — «Заменить» или «К делу»; задание, награда, заверение и шансы — листы. Подпись фиксирует состав, прогресс — с подписи, всё или ничего. Итоги недели — в WEEK_MODES (screens/contracts.js).', o: ['contracts'],
+    ready: ['contracts'] },
   { n: 'Ритуалы', p: 33, where: 'Неделя', d: 'Общие слоты сверху, рабочие и герои — две вкладки.', o: ['rituals', 'workers'] },
   { n: 'Арена', p: 3, where: 'Неделя', d: 'Арена, Лига и Оборона — вкладки. Состав соперника — лист справа.', o: ['arena', 'league', 'defence', 'opponent:s', 'pvp-setup:s'] },
   { n: 'Клан', p: 26, where: 'Неделя', d: 'Паспорт с резервуаром, Босс, Участники, Древо. Поиск клана — пустое состояние.', o: ['clan', 'clans', 'clan-members', 'clan-tree', 'clan-tree-reset:s', 'clan-reservoir', 'clan-boss', 'clan-boss-setup:s', 'clan-boss-ledger'] },
   { n: 'Событие', p: 21, where: 'Неделя', d: 'Очки, планки и откуда их брать — с переходом прямо в режим.', o: ['event'] },
-  { n: 'Странник', p: 29, where: 'Портрет в шапке', d: 'Обзор, Память, Артефакты, Достижения. Память — пять мест и «одна из трёх»: карты выходят по очереди, свет и частицы — по редкости. Артефакты и достижения с первенствами — на данных автора (screens/wanderer.js). Чужой профиль — тот же экран с другими действиями.', o: ['profile', 'public-profile', 'account-level:s', 'wanderer-passives', 'artifacts', 'achievements', 'server-firsts', 'friends:s'],
+  { n: 'Странник', p: 29, where: 'Портрет в шапке', d: 'Обзор, Память, Артефакты, Достижения. Память — пять мест-осколков зеркала и «одна из трёх»: карты собираются из осколков, свет, кружение и частицы — по редкости; переброс бьёт стекло, выбранный осколок летит в своё место. Артефакты и достижения с первенствами — на данных автора (screens/wanderer.js). Чужой профиль — тот же экран с другими действиями.', o: ['profile', 'public-profile', 'account-level:s', 'wanderer-passives', 'artifacts', 'achievements', 'server-firsts', 'friends:s'],
     ready: ['profile', 'wanderer-passives', 'artifacts', 'achievements', 'server-firsts'] },
   { n: 'Летопись', p: 19, where: 'Хранитель знаний, Странник', d: 'Одна книга знаний: бестиарий по биомам, мир, механики, история Странника.', o: ['cycles'] },
   { n: 'Лавка Энериума', p: 30, where: '«+» у Энериума', d: 'Энериум, пропуск и облик. Подтверждение покупки — системное.', o: ['forbidden-shop', 'battle-pass', 'cosmetics', 'subscriptions', 'checkout:s', 'ad-reward'] },
@@ -4516,7 +4059,7 @@ function renderKit() {
   <section class="k-box"><h3>Действия</h3><div class="k-demo col" style="gap:10px"><div class="k-row"><button class="btn go">Атаковать${costTag('souls', 2)}</button><button class="btn">Изменить</button><button class="btn ghost">Отмена</button></div><div class="k-row"><button class="btn go big">${ic('down')}Спуститься</button></div><div class="k-row" style="align-items:flex-start"><button class="btn" disabled>Пробить</button><span class="reason">Откроется на уровне 50</span></div></div><p class="k-note">Главная кнопка одна на экран и светится снизу. Цена — на кнопке, причина недоступности — рядом.</p></section>
   <section class="k-box"><h3>Вкладки, чипы, метки</h3><div class="k-demo col" style="gap:10px"><div class="tabs"><button aria-selected="true">Сила</button><button aria-selected="false">Навыки</button><button aria-selected="false">Путь</button></div><div class="k-row"><span class="chip gold">${ic('gem')}Элита</span><span class="chip spirit">${ic('check')}готово</span><span class="chip warn">${ic('lock')}цикл III</span><span class="chip">${ic('hour')}3 д 5 ч</span></div><div class="k-row"><span class="stars lg">${stars(1, 3)}</span><span class="faint">доблесть: позиций = личный максимум</span></div><div class="k-row"><span class="limits">${limits(2)}</span><span class="faint">рунный предел: 5 отметок</span></div></div></section>
   <section class="k-box"><h3>Шкалы</h3><div class="k-demo col" style="gap:10px"><div class="col" style="gap:4px"><small class="faint">Здоровье и щит</small>${bar(64, 'hp lg', '<span class="sh" style="left:0;width:18%"></span>')}</div><div class="col" style="gap:4px"><small class="faint">Бюджет попытки — песок</small>${bar(46, 'sand')}</div><div class="col" style="gap:4px"><small class="faint">Опыт и прогресс</small>${bar(62)}</div><div class="col" style="gap:4px"><small class="faint">Резервуар и готовность</small>${bar(80, 'sp')}</div></div></section>
-  <section class="k-box"><h3>Герой</h3><div class="k-demo" style="display:grid;grid-template-columns:repeat(3,minmax(0,110px));gap:8px">${heroCard(S.heroes[0], { act: 'noop' })}${heroCard(h, { act: 'noop', sel: true })}${heroCard(S.heroes[3], { act: 'noop', note: 'Ритуал · 42 мин', dim: true })}</div><p class="k-note">Значков доблести ровно столько, сколько доблестей доступно герою; внизу — класс значком и боевая мощь. Занятость написана поверх портрета.</p></section>
+  <section class="k-box"><h3>Герой</h3><div class="k-demo" style="display:grid;grid-template-columns:repeat(3,minmax(0,110px));gap:8px">${heroCard(S.heroes[0], { act: 'noop' })}${heroCard(h, { act: 'noop', sel: true })}${heroCard(S.heroes[3], { act: 'noop', note: 'Ритуал · 42 мин', dim: true })}</div><p class="k-note">Кристалл в углу — редкость (значок r1…r7). Значков доблести ровно столько, сколько доблестей доступно герою, под ними — пять отметок рунного предела; внизу — имя, класс значком, уровень и у витрин боевая мощь. Занятость написана поверх портрета. Вся анатомия — раздел «Отряды и плитка героя» ниже.</p></section>
   <section class="k-box" style="grid-column:1/-1"><h3>Состав героев · ${RS.heroes.length} · по источникам</h3>
     <p class="k-note">Состав игры по ADR-0019 и ADR-0021 — ADR-0024: золото, донат за Энериум, возрождение душ, Эхо, крафт. Данные — <code>docs/content/герои/состав-героев.csv</code> и главы <code>docs/content/герои/главы/</code>, выгрузка <code>tools/content-gen/heroes/export_roster.py</code> в <code>roster.js</code>. Черновик, ждёт автора. Орден игрок видит на последней доблести героя; «для команды» показывает орден, черновик и заметки — флажок общий с разделом «Герои черновиков». Числа — демонстрация, заглушки прототипа помечены. Этот же состав — в прототипе: «Герои → Коллекция» и «Герои → Призыв».</p>
     <div id="kitRoster"></div></section>
@@ -5277,7 +4820,9 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 </script>
 <!-- экраны на общих запасах: договор — screens/model.js; грузятся до boot() -->
 <script src="screens/model.js"></script>
+<script src="screens/week.js"></script>
 <script src="screens/craft.js"></script>
+<script src="screens/shop.js"></script>
 <script src="screens/bag.js"></script>
 <script src="screens/echo.js"></script>
 <script src="screens/roulette.js"></script>
@@ -5285,5 +4830,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 <script src="screens/wanderer.js"></script>
 <script src="screens/biomes.js"></script>
 <script src="screens/talismans.js"></script>
+<script src="screens/contracts.js"></script>
+<script src="screens/heroes.js"></script>
 </body>
 </html>

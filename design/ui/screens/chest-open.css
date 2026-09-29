@@ -1,9 +1,15 @@
 /* screens/chest-open.css — окно открытия сундука (screens/chest-open.js): сцена с сундуком, карточки предметов, итог; сцена раздела UI-кита.
-   Стиль «Свет снизу»: свет редкости бьёт из щелей и снизу; цвет — --rc и кристалл --rico из [data-r] (ADR-0027).
-   Анимация идёт по времени: задержки (--d0, --dw, --do, --dc, --dl, --dk, --dr) приходят из разметки и отсчитаны от начала показа,
-   поэтому перерисовка экрана посреди анимации её не рвёт. Базовый стиль элемента — его конечное состояние; до своего момента элемент
-   стоит в первом кадре (animation-fill-mode: both). Итог и проба без анимации — класс co-done: анимаций нет, всё на местах.
-   co-a — метка элемента с разовой анимацией в разметке (по ней сцену читает автопроверка), стиля у неё нет.
+   Стиль «Свет снизу»: свет редкости бьёт из щели и снизу; цвет — --rc и кристалл --rico из [data-r] (ADR-0027).
+   Анимация идёт по времени: задержки приходят из разметки и отсчитаны от начала показа — у сцены --d0 начало, --dg приземление,
+   --dc0 первый свет, --dk замок, --do крышка, --dh0, --dhv, --dhf, --dhs самая ценная; у карточки --dc вылет, --dl переворот, --dv висит;
+   у монеты --dq, у итога --dr. Поэтому перерисовка экрана посреди анимации её не рвёт. Базовый стиль элемента — его конечное
+   состояние; до своего момента элемент стоит в первом кадре (animation-fill-mode: both). Итог и проба без анимации — класс co-done:
+   анимаций нет, всё на местах; сундук раздела до пробы — co-idle. Движется только transform и opacity.
+   Крышка — настоящее 3D: .co-c3 даёт перспективу, .co-lid откидывается вокруг задней кромки (transform-origin с глубиной из разметки),
+   лицо крышки прячет изнанку (backface-visibility), изнанка .co-lidu светится ступенями света. Свет смешивается экраном (screen)
+   на внешнем элементе: внутри группы с opacity или transform смешивать было бы не с чем.
+   Текстуры света (.co-tex, --tex) — белые на чёрном: форма — маской, яркость — своя, цвет — редкости (luminosity). Нет текстуры —
+   элемент рисует свой градиент. co-a — метка элемента с разовой анимацией (по ней сцену читает автопроверка), стиля у неё нет.
    Правила воздуха: итог — одна рамка, сетка плиток, одно главное действие; отступы — --sp-l, --sp-m, --sp-s. Свои классы — co-*;
    общие — .ov, .btn, .chip, .iconbtn, .rar, .tabs, .rs-ph. */
 
@@ -11,9 +17,11 @@
 .co-ov{overflow:hidden}
 .co-st{position:absolute;inset:0;overflow:hidden;font:14px/1.35 var(--f-u);color:var(--parch);text-align:left}
 .co-bg{position:absolute;inset:0;z-index:0;
-  background:radial-gradient(60% 55% at 50% 96%,color-mix(in srgb,var(--rc) 20%,transparent),transparent 72%),radial-gradient(130% 100% at 50% 60%,rgba(8,10,12,.8),rgba(3,4,5,.97));
-  animation:fade .26s ease var(--d0) both}
+  background:radial-gradient(60% 55% at 50% 96%,color-mix(in srgb,var(--rc) 18%,transparent),transparent 72%),radial-gradient(130% 100% at 50% 60%,rgba(8,10,12,.82),rgba(3,4,5,.97));
+  animation:fade .3s ease var(--d0) both}
 .co-scene{position:absolute;left:50%;top:calc(50% + 22px);z-index:1;transform:translate(-50%,-50%)}
+/* камера: к самой ценной приближается и возвращается */
+.co-cam{position:absolute;inset:0;animation:co-cam var(--tcam) cubic-bezier(.3,.1,.3,1) var(--dh0) both}
 
 /* шапка: вид и имя сундука с кристаллом редкости, маленькое окно с галочкой, крестик */
 .co-top{position:absolute;left:0;right:0;top:0;z-index:5;display:flex;align-items:center;gap:var(--sp-m);padding:var(--sp-s) var(--sp-s) 0 var(--sp-l)}
@@ -26,62 +34,128 @@
 .co-skip input{width:16px;height:16px;margin:0;accent-color:var(--spirit);cursor:pointer}
 .co-skip input:disabled{cursor:not-allowed}
 .co-x{flex:none}
+/* подсказка: нажатие ведёт к следующему моменту */
+.co-hint{position:absolute;left:50%;bottom:10px;z-index:5;transform:translateX(-50%);font-size:12px;letter-spacing:.06em;color:var(--parch-3);white-space:nowrap;pointer-events:none;opacity:0;
+  animation:co-hint var(--thint) ease var(--dhint) both}
 
-/* ореол и лучи за сундуком — цвет редкости; лучи — с эпического */
-.co-halo{position:absolute;z-index:0;width:330px;height:330px;margin:-170px 0 0 -165px;border-radius:50%;pointer-events:none;opacity:calc(var(--ha) / 100);
-  background:radial-gradient(circle,color-mix(in srgb,var(--rc) 60%,transparent),color-mix(in srgb,var(--rc) 16%,transparent) 42%,transparent 68%);
-  animation:co-halo var(--wait) ease-in var(--dw) both}
-.co-rays{position:absolute;z-index:0;width:470px;height:470px;margin:-240px 0 0 -235px;border-radius:50%;pointer-events:none;opacity:calc(var(--ra) / 100);
-  background:repeating-conic-gradient(from 0deg,color-mix(in srgb,var(--rc) 65%,transparent) 0deg 5deg,transparent 5deg 18deg);
-  -webkit-mask-image:radial-gradient(circle,#000 6%,transparent 66%);mask-image:radial-gradient(circle,#000 6%,transparent 66%);
-  animation:co-in .7s ease-out var(--do) both,co-spin 18s linear var(--do) infinite}
+/* текстура света: форма и яркость — своя, цвет — редкости */
+.co-st .co-tex{border-radius:0;background:var(--tex) center/100% 100% no-repeat,var(--rc);background-blend-mode:luminosity;
+  -webkit-mask:var(--tex) center/100% 100% no-repeat;mask:var(--tex) center/100% 100% no-repeat}
 
-/* сундук: опускается, дрожит в ожидании (размах — по редкости), набухает светом и вздрагивает, когда откидывается крышка */
-.co-chest{position:absolute;z-index:2;transform-origin:50% 100%;animation:co-drop var(--tdrop) cubic-bezier(.2,.9,.3,1.25) var(--d0) both}
-.co-rock,.co-swell,.co-pop{position:absolute;inset:0;transform-origin:50% 92%}
-.co-rock{animation:co-rattle var(--tsh) ease-in-out var(--dw) var(--nsh) both}
-.co-swell{animation:co-swell var(--wait) cubic-bezier(.5,0,.9,.6) var(--dw) both}
-.co-pop{animation:co-recoil .52s cubic-bezier(.2,.9,.3,1.3) var(--do) both}
+/* позади сундука: дымка редкости сундука, кольцо под ним — с эпического сундука, ореол каждой ступени света */
+.co-haze{position:absolute;z-index:0;width:480px;height:480px;margin:-270px 0 0 -240px;pointer-events:none;mix-blend-mode:screen;opacity:calc(var(--hz) / 100);animation:co-in 1.2s ease var(--d0) both}
+.co-haze>i{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--rc) 50%,transparent),transparent 66%);animation:co-spin 60s linear var(--d0) infinite}
+.co-rune{position:absolute;z-index:0;width:400px;height:400px;margin:-200px 0 0 -200px;pointer-events:none;mix-blend-mode:screen;opacity:.85;transform:scaleY(.3);animation:co-rune .8s cubic-bezier(.2,.8,.3,1) var(--dg) both}
+.co-rune>i{position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle,transparent 60%,color-mix(in srgb,var(--rc) 80%,#fff) 61% 62%,transparent 63% 71%,var(--rc) 72% 73.5%,transparent 74.5%);animation:co-spin 36s linear var(--d0) infinite}
+.co-shd{position:absolute;z-index:1;height:24px;margin-top:-13px;border-radius:50%;pointer-events:none;transform:translateX(-50%);background:radial-gradient(closest-side,rgba(0,0,0,.72),transparent);
+  animation:co-shd var(--tdrop) cubic-bezier(.55,0,1,.45) var(--d0) both}
+.co-lv{position:absolute;inset:0;z-index:0;pointer-events:none}
+.co-halo{position:absolute;width:380px;height:380px;margin:-200px 0 0 -190px;border-radius:50%;opacity:calc(var(--ha) / 100);
+  background:radial-gradient(circle,color-mix(in srgb,var(--rc) 62%,transparent),color-mix(in srgb,var(--rc) 16%,transparent) 42%,transparent 68%);
+  animation:co-halopop .55s cubic-bezier(.2,.8,.3,1) var(--dp) both}
+/* ступень света: появляется в свой момент, гаснет, когда свет поднялся выше; последняя остаётся (.z) */
+.co-lvx{animation:co-lvin .22s ease var(--l0) both,co-lvout .3s ease var(--l1,99999s) forwards}
+.co-lvx:not(.z){opacity:0}
+/* после открытия: лучи — с эпической, столп света из сундука */
+.co-rays,.co-hrays{position:absolute;z-index:0;width:500px;height:500px;margin:-250px 0 0 -250px;pointer-events:none;mix-blend-mode:screen;opacity:calc(var(--ra) / 100);
+  animation:co-raysin .9s cubic-bezier(.2,.8,.3,1) var(--do) both}
+.co-rays>i,.co-hrays>i{position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(from 0deg,color-mix(in srgb,var(--rc) 65%,transparent) 0deg 5deg,transparent 5deg 18deg);
+  -webkit-mask-image:radial-gradient(circle,#000 6%,transparent 66%);mask-image:radial-gradient(circle,#000 6%,transparent 66%);animation:co-spin 24s linear var(--do) infinite}
+.co-beam{position:absolute;z-index:0;pointer-events:none;mix-blend-mode:screen;transform:translate(-50%,-88%);transform-origin:50% 88%;opacity:calc(var(--bm) / 180);
+  animation:co-beam 1.8s cubic-bezier(.2,.8,.3,1) var(--do) both}
+.co-beam>i{position:absolute;inset:0;background:radial-gradient(16% 44% at 50% 64%,rgba(255,250,240,.95),transparent),radial-gradient(40% 58% at 50% 66%,color-mix(in srgb,var(--rc) 70%,transparent),transparent)}
+
+/* сундук: падает, приземляется со сжатием, подпрыгивает на каждой ступени света, дрожит всё сильнее, вздрагивает при открытии */
+.co-chest{position:absolute;z-index:2;transform-origin:50% 100%;animation:co-drop var(--tdrop) cubic-bezier(.55,0,1,.45) var(--d0) both}
+.co-land,.co-hop,.co-shake,.co-recoil,.co-c3{position:absolute;inset:0;transform-origin:50% 100%}
+.co-land{animation:co-land .46s ease-in-out var(--dg) both}
+.co-hop{animation:co-hop .36s ease-in-out var(--dh) both}
+.co-shake{transform-origin:50% 88%;animation:co-shake var(--wait) ease-in-out var(--dc0) both}
+.co-recoil{animation:co-recoil .56s ease-in-out var(--do) both}
+.co-c3{perspective-origin:50% 0}
 .co-sv{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .co-sv .w{fill:var(--wood)}
 .co-sv .w2{fill:none;stroke:var(--wood2);stroke-width:2}
 .co-sv .m{fill:var(--metal)}
 .co-sv .m2,.co-sv .rv{fill:var(--metal2)}
-.co-sv .co-shd{fill:rgba(0,0,0,.55)}
-.co-sv .co-emb{fill:none;stroke:var(--metal2);stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
-.co-sv .co-kh{fill:var(--rc)}
-/* свет из щелей: горит всё ярче к концу ожидания и гаснет, когда крышка откинута */
-.co-sv .co-seam{fill:var(--rc);opacity:0;animation:co-seam var(--tseam) ease-in var(--dw) both}
-.co-sv .co-seamb{fill:color-mix(in srgb,var(--rc) 80%,#fff)}
-.co-leak{position:absolute;left:15%;right:15%;height:36px;opacity:0;pointer-events:none;mix-blend-mode:screen;
-  background:repeating-linear-gradient(90deg,transparent 0 9px,color-mix(in srgb,var(--rc) 70%,#fff) 9px 10px,transparent 10px 23px);
-  -webkit-mask-image:linear-gradient(0deg,#000,transparent);mask-image:linear-gradient(0deg,#000,transparent);
-  animation:co-seam var(--tseam) ease-in var(--dw) both}
-/* крышка откидывается назад: поднимается, запрокидывается и показывает тёмную изнанку; из щели — свет */
-.co-sv .co-lid{transform-box:fill-box;transform-origin:50% 100%;transform:translate(0,-16px) scale(1,.42);animation:co-lid var(--tlid) cubic-bezier(.3,1.3,.45,1) var(--do) both}
-.co-sv .co-lidin{fill:#07090b;opacity:.72;animation:co-lidin var(--tlid) ease-in var(--do) both}
-.co-sv .co-mouth{opacity:1;animation:co-in .38s ease-out var(--do) both}
-.co-mpt{position:absolute;left:50%;width:2px;height:2px;margin:-1px 0 0 -1px;pointer-events:none}
-/* пачка: сколько сундуков открывается разом */
-.co-n{position:absolute;right:-10px;top:16px;z-index:3;padding:3px 8px;border-radius:8px;background:#0c0f12;border:1px solid color-mix(in srgb,var(--rc) 60%,var(--iron-2));
+.co-sv .co-emb{fill:none;stroke:var(--metal);stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
+/* крышка: откидывается назад вокруг задней кромки; лицо — рисунок или SVG, изнанка светится */
+.co-lid{position:absolute;z-index:1;transform-style:preserve-3d;transform:rotateX(104deg);animation:co-lid var(--tlid) ease-in-out var(--do) both}
+.co-lidr{position:absolute;inset:0;transform-style:preserve-3d;animation:co-rattle var(--wait) linear var(--dc0) both}
+.co-lidf{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.co-lidf>img,.co-body>img,.co-lock>img{position:absolute;inset:0;width:100%;height:100%;display:block;-webkit-user-drag:none;user-select:none}
+.co-lidu{position:absolute;left:0;right:0;bottom:0;transform-origin:50% 100%;transform:rotateX(90deg)}
+.co-lidu:not(.art){left:4%;right:4%;border-radius:8px 8px 0 0;background:linear-gradient(#0c0a08,#18130e)}
+/* изнанка у рисунка — сама крышка, тёмная и перевёрнутая: на экране она встаёт позади сундука во весь рост; свет — от петли, маской по крышке */
+.co-lui{position:absolute;inset:0;width:100%;height:100%;display:block;transform:scaleY(-1);filter:brightness(.34) saturate(.8)}
+.co-ulv{position:absolute;inset:0;border-radius:inherit;transform:scaleY(-1);background:linear-gradient(to top,color-mix(in srgb,var(--rc) 80%,#fff),color-mix(in srgb,var(--rc) 45%,transparent) 40%,transparent 86%)}
+.co-lidu.art .co-ulv{-webkit-mask:var(--m) center/100% 100% no-repeat;mask:var(--m) center/100% 100% no-repeat}
+/* свет внутри: встаёт, когда крышка откинута; перед корпусом — отсвет на кромке */
+.co-mouth,.co-bloom,.co-crk{position:absolute;height:0;pointer-events:none;mix-blend-mode:screen}
+.co-mouth{z-index:2}
+.co-mouth>i{position:absolute;left:-6%;right:-6%;top:-30px;height:60px;border-radius:50%;
+  background:radial-gradient(closest-side,#fffaf0,color-mix(in srgb,var(--rc) 80%,#fff) 30%,color-mix(in srgb,var(--rc) 55%,transparent) 62%,transparent);
+  animation:co-mouth .7s cubic-bezier(.2,.8,.3,1) var(--do) both}
+.co-bloom{z-index:4;animation:co-bloom .9s ease-out var(--do) both}
+.co-bloom>i{position:absolute;left:4%;right:4%;top:-8px;height:22px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--rc) 60%,#fff),color-mix(in srgb,var(--rc) 40%,transparent) 55%,transparent)}
+/* корпус: рисунок или SVG; свет ступени снизу — маской по рисунку; золотой отблеск по оковке — с древнего сундука */
+.co-body{position:absolute;z-index:3}
+.co-lit{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;background:linear-gradient(to top,color-mix(in srgb,var(--rc) 34%,transparent),transparent 58%);
+  -webkit-mask:var(--m) center/100% 100% no-repeat;mask:var(--m) center/100% 100% no-repeat}
+.co-shn{position:absolute;inset:0;overflow:hidden;pointer-events:none;mix-blend-mode:screen;-webkit-mask:var(--m) center/100% 100% no-repeat;mask:var(--m) center/100% 100% no-repeat}
+.co-shn::before{content:"";position:absolute;top:-10%;bottom:-10%;left:0;width:34%;transform:translateX(-120%);
+  background:linear-gradient(100deg,transparent 15%,rgba(255,226,150,.8) 50%,transparent 85%);animation:co-sweep calc(var(--wait) / 2) ease-in-out var(--dc0) 2}
+/* щель под крышкой: свет ступени пульсирует с подскоками крышки, лучики вверх; гаснет, когда крышка откинута */
+.co-crk{z-index:4}
+.co-crk>i{position:absolute;left:-3%;right:-3%;top:-10px;height:20px;border-radius:50%;
+  background:radial-gradient(closest-side,#fffaf0,color-mix(in srgb,var(--rc) 85%,#fff) 35%,color-mix(in srgb,var(--rc) 50%,transparent) 70%,transparent);
+  animation:co-crack var(--wait) linear var(--dc0) both}
+.co-leak{position:absolute;left:10%;right:10%;bottom:0;height:52px;
+  background:repeating-linear-gradient(90deg,transparent 0 9px,color-mix(in srgb,var(--rc) 70%,#fff) 9px 11px,transparent 11px 23px);
+  -webkit-mask-image:linear-gradient(0deg,#000,transparent);mask-image:linear-gradient(0deg,#000,transparent);animation:co-crack var(--wait) linear var(--dc0) both}
+/* замок: вздрагивает, рвётся и падает; скважина светится с подскоками крышки */
+.co-lock{position:absolute;z-index:5;opacity:0;transform-origin:50% 30%;animation:co-lock var(--tlock) linear var(--dk) both}
+.co-lock>svg{position:absolute;inset:0;width:100%;height:100%}
+.co-kh{position:absolute;left:24%;right:24%;top:46%;height:36%;border-radius:50%;mix-blend-mode:screen;background:radial-gradient(closest-side,#fff6dc,rgba(255,214,140,.55) 45%,transparent);
+  animation:co-crack var(--wait) linear var(--dc0) both}
+/* пачка: сколько сундуков открывается разом; точка щели — для частиц */
+.co-n{position:absolute;right:-12px;top:10px;z-index:3;padding:3px 8px;border-radius:8px;background:#0c0f12;border:1px solid color-mix(in srgb,var(--rc) 60%,var(--iron-2));
   font:700 13px/1 var(--f-u);letter-spacing:.04em;color:var(--parch);box-shadow:0 0 14px -4px var(--rc)}
-/* вспышка при открытии — масштаб по редкости сундука */
-.co-flash{position:absolute;z-index:3;width:260px;height:260px;margin:-130px 0 0 -130px;border-radius:50%;pointer-events:none;mix-blend-mode:screen;opacity:0;
-  background:radial-gradient(circle,rgba(255,250,236,.95),color-mix(in srgb,var(--rc) 70%,transparent) 30%,transparent 68%);
+.co-mpt{position:absolute;width:2px;height:2px;margin:-1px 0 0 -1px;pointer-events:none}
+
+/* перед сундуком: пыль приземления (.co-puff), вспышка открытия */
+.co-puff{position:absolute;z-index:3;width:0;height:0;pointer-events:none}
+.co-puff>i{position:absolute;bottom:-18px;width:calc(var(--dw) * .95);height:calc(var(--dw) * .4);opacity:0;
+  background:radial-gradient(50% 60% at 50% 80%,rgba(160,138,104,.75),rgba(120,104,82,.3) 55%,transparent 75%);animation:co-dustl 1s cubic-bezier(.2,.7,.3,1) var(--dg) both}
+.co-puff>i.l{right:-24px;transform-origin:100% 100%}
+.co-puff>i.r{left:-24px;transform-origin:0 100%;animation-name:co-dustr}
+.co-st .co-puff>i.co-tex{background:var(--tex) center/100% 100% no-repeat;background-blend-mode:normal;-webkit-mask:none;mask:none}
+.co-flash,.co-hflash{position:absolute;z-index:6;width:320px;height:320px;margin:-160px 0 0 -160px;pointer-events:none;mix-blend-mode:screen;opacity:0;
   animation:co-flash var(--tfl) cubic-bezier(.2,.8,.2,1) var(--do) both}
+.co-flash>i,.co-hflash>i{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(255,250,236,.95),color-mix(in srgb,var(--rc) 70%,transparent) 30%,transparent 68%)}
 
 /* монеты гарантированной валюты — вылетают из щели и встают справа от сундука */
-.co-coin{position:absolute;z-index:4;display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 6px;border-radius:999px;background:rgba(10,12,14,.84);border:1px solid var(--iron-2);
-  font:600 18px/1 var(--f-d);color:var(--gold);font-variant-numeric:lining-nums tabular-nums;white-space:nowrap;animation:co-coin .62s cubic-bezier(.2,.85,.25,1) var(--dk) both}
+.co-coin{position:absolute;z-index:7;display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 6px;border-radius:999px;background:rgba(10,12,14,.84);border:1px solid var(--iron-2);
+  font:600 18px/1 var(--f-d);color:var(--gold);font-variant-numeric:lining-nums tabular-nums;white-space:nowrap;animation:co-coin .62s cubic-bezier(.2,.85,.25,1) var(--dq) both}
 .co-coin img{width:22px;height:22px;object-fit:contain}
 
-/* карточки предметов: вылетают из щели к своему месту; рамка, полоса снизу и искра — цвет редкости, кристалл — в углу */
-.co-card{position:absolute;z-index:4;display:flex;flex-direction:column;align-items:center;gap:4px;width:var(--w);animation:co-fly var(--tf) cubic-bezier(.2,.85,.25,1) var(--dc) both}
-.co-cb{position:relative;display:grid;place-items:center;width:var(--w);height:var(--h);border-radius:11px;overflow:hidden;border:1px solid color-mix(in srgb,var(--rc) 55%,#262b31);
+/* карточки: поднимаются из щели рубашкой вверх со шлейфом, встают на место и переворачиваются (3D) */
+.co-card{position:absolute;z-index:7;display:flex;flex-direction:column;align-items:center;gap:4px;width:var(--w);perspective:600px;
+  animation:co-fly var(--tf) cubic-bezier(.2,.75,.25,1) var(--dc) both}
+.co-tail{position:absolute;left:50%;top:calc(var(--h) / 2);z-index:-1;width:16px;height:150px;margin-left:-8px;border-radius:8px;pointer-events:none;transform-origin:50% 0;opacity:0;transform:rotate(var(--ta)) scaleY(0);
+  background:linear-gradient(to bottom,color-mix(in srgb,var(--rc) 90%,#fff),color-mix(in srgb,var(--rc) 50%,transparent) 40%,transparent);animation:co-tail var(--tf) ease-out var(--dc) both}
+.co-flip{position:relative;display:block;width:var(--w);height:var(--h);transform-style:preserve-3d;animation:co-flip var(--tp) linear var(--dl) both}
+.co-cb,.co-back{position:absolute;inset:0;border-radius:11px;overflow:hidden;-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.co-cb{display:grid;place-items:center;border:1px solid color-mix(in srgb,var(--rc) 55%,#262b31);
   background:radial-gradient(90% 70% at 50% 112%,color-mix(in srgb,var(--rc) 34%,transparent),transparent 72%),linear-gradient(180deg,#12161a,#0a0c0e);
   box-shadow:inset 0 -3px 0 var(--rc),0 0 22px -6px var(--rc)}
+.co-back{transform:rotateY(180deg);border:1px solid color-mix(in srgb,var(--rc) 70%,#262b31);
+  background:radial-gradient(70% 55% at 50% 50%,color-mix(in srgb,var(--rc) 38%,transparent),transparent 70%),repeating-linear-gradient(45deg,rgba(255,255,255,.03) 0 6px,transparent 6px 12px),linear-gradient(180deg,#171b20,#0b0d0f);
+  box-shadow:inset 0 0 0 3px #0b0d0f,inset 0 0 0 4px color-mix(in srgb,var(--rc) 45%,transparent),0 0 24px -6px var(--rc)}
+.co-bk{position:absolute;left:28%;right:28%;top:50%;aspect-ratio:1;transform:translateY(-50%);background:var(--rico) center/contain no-repeat;filter:drop-shadow(0 0 8px var(--rc))}
 .co-cr{position:absolute;left:5px;top:5px;z-index:2;width:16px;height:16px;background:var(--rico) center/contain no-repeat;filter:drop-shadow(0 0 3px color-mix(in srgb,var(--rc) 60%,transparent))}
-.co-ci{display:grid;place-items:center;width:62%;aspect-ratio:1;color:var(--rc);animation:co-reveal var(--tf) ease-out var(--dc) both}
+.co-ci{display:grid;place-items:center;width:62%;aspect-ratio:1;color:var(--rc)}
 .co-ci>img{width:100%;height:100%;object-fit:contain}
 .co-ci>.i{width:62%;height:62%;stroke-width:1.5}
 .co-ci.face{position:absolute;inset:0;width:auto;aspect-ratio:auto}
@@ -89,19 +163,27 @@
 .co-ci.face .rs-ph b{font-size:26px}
 .co-card.dust .co-ci>img,.co-card.dust .co-ci>.rs-ph{filter:grayscale(.85) brightness(.55)}
 .co-cq{position:absolute;left:0;right:0;bottom:6px;z-index:2;text-align:center;font:600 20px/1 var(--f-d);color:var(--parch);font-variant-numeric:lining-nums tabular-nums;
-  text-shadow:0 0 10px color-mix(in srgb,var(--rc) 50%,transparent),0 1px 2px #000,0 0 6px #000;animation:co-reveal var(--tf) ease-out var(--dc) both}
+  text-shadow:0 0 10px color-mix(in srgb,var(--rc) 50%,transparent),0 1px 2px #000,0 0 6px #000}
 .co-card.dust .co-cq{color:var(--sand)}
 .co-cn{max-width:calc(var(--w) + 26px);font-size:11.5px;line-height:1.2;color:var(--parch-2);text-align:center;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
-  animation:co-reveal var(--tf) ease-out var(--dc) both}
-/* самая ценная — крупнее, с блеском, вспышкой и мерцанием рамки */
-.co-card.best .co-cb{border-width:2px;border-color:color-mix(in srgb,var(--rc) 80%,#fff);animation:co-glow 1.9s ease-in-out var(--dl) infinite}
-.co-card.best .co-cq{font-size:25px}
-.co-card.best .co-cn{font-size:12.5px;color:var(--parch)}
-.co-card.best .co-ci.face .rs-ph b{font-size:32px}
-.co-cfl{position:absolute;left:50%;top:calc(var(--h) / 2);z-index:-1;width:240px;height:240px;margin:-120px 0 0 -120px;border-radius:50%;pointer-events:none;mix-blend-mode:screen;opacity:0;
-  background:radial-gradient(circle,rgba(255,250,236,.9),color-mix(in srgb,var(--rc) 65%,transparent) 32%,transparent 68%);animation:co-flash var(--tfb) cubic-bezier(.2,.8,.2,1) var(--dl) both}
+  animation:co-in .3s ease calc(var(--dl) + var(--tp) / 2) both}
+/* самая ценная: поднимается медленно, висит и дышит, переворачивается со вспышкой; за ней — сияние её редкости */
+.co-card.best{z-index:9;perspective:760px;animation:co-rise var(--tf) cubic-bezier(.16,.7,.3,1) var(--dc) both}
+.co-bob{position:relative;display:flex;flex-direction:column;align-items:center;perspective:760px;animation:co-bob var(--tv) ease-in-out var(--dv) both}
+.co-aura{position:absolute;left:50%;top:50%;width:230%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,color-mix(in srgb,var(--rc) 55%,transparent),color-mix(in srgb,var(--rc) 14%,transparent) 45%,transparent 68%);animation:co-aura 1.7s ease-in-out var(--dc) infinite}
+.co-card.best .co-cb{border-width:2px;border-color:color-mix(in srgb,var(--rc) 80%,#fff)}
+.co-card.best .co-cq{font-size:26px}
+.co-card.best .co-cn{font-size:13px;color:var(--parch)}
+.co-card.best .co-ci.face .rs-ph b{font-size:34px}
 .co-csh{position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(105deg,transparent 30%,rgba(255,246,220,.75) 50%,transparent 70%);
-  transform:translateX(130%);animation:co-shine 1.1s ease-out var(--dl) both}
+  transform:translateX(130%);animation:co-shine 1.1s ease-out calc(var(--dl) + var(--tp)) both}
+/* вокруг самой ценной темнеет; её лучи и вспышка переворота */
+.co-dim{position:absolute;inset:-60px;z-index:8;pointer-events:none;background:radial-gradient(60% 60% at 50% 34%,rgba(3,4,5,.45),rgba(3,4,5,.94));opacity:calc(var(--dim) / 100);
+  animation:co-dim .6s ease var(--dh0) both}
+.co-hrays{z-index:8;width:380px;height:380px;margin:-190px 0 0 -190px;animation-delay:var(--dhv)}
+.co-hrays>i{animation-delay:var(--dhv)}
+.co-hflash{z-index:10;animation-delay:calc(var(--dhf) + var(--thf) / 2)}
 
 /* итог поверх сцены: затемнение закрывает окно; сетка плиток, у пачки — по редкостям */
 .co-scrim2{position:absolute;inset:0;z-index:3;border:0;padding:0;background:rgba(3,4,5,.58);cursor:default;animation:fade .2s ease var(--dr) both}
@@ -139,16 +221,21 @@
 .co-dust img{width:20px;height:20px;object-fit:contain}
 .co-dust b{color:var(--sand);font-weight:700}
 
-/* итог и проба без анимации: всё на местах; лучи продолжают медленно вращаться */
-.co-done .co-scene *{animation:none!important}
-.co-done .co-rays{animation:co-spin 18s linear infinite!important}
-.co-done .co-card.best .co-cb{animation:co-glow 1.9s ease-in-out infinite!important}
-/* сундук раздела UI-кита до пробы: закрыт и дышит светом своей редкости */
+/* итог и проба без анимации: всё на местах; лучи, дымка и кольцо продолжают медленно вращаться, сияние самой ценной — дышать */
+.co-done .co-scene *,.co-done .co-hint{animation:none!important}
+.co-done .co-rays>i,.co-done .co-hrays>i{animation:co-spin 24s linear infinite!important}
+.co-done .co-haze>i{animation:co-spin 60s linear infinite!important}
+.co-done .co-rune>i{animation:co-spin 36s linear infinite!important}
+.co-done .co-card.best .co-aura{animation:co-aura 1.7s ease-in-out infinite!important}
+/* сундук раздела UI-кита до пробы: закрыт, под замком, дышит светом своей редкости */
 .co-idle .co-scene *{animation:none!important}
-.co-idle .co-sv .co-lid{transform:none}
-.co-idle .co-sv .co-lidin,.co-idle .co-sv .co-mouth{opacity:0}
-.co-idle .co-sv .co-seam,.co-idle .co-leak{animation:co-breathe 2.6s ease-in-out infinite!important}
-.co-idle .co-halo{opacity:calc(var(--ha) / 200)}
+.co-idle .co-lid{transform:none}
+.co-idle .co-lock{opacity:1;transform:none}
+.co-idle .co-mouth,.co-idle .co-bloom{opacity:0}
+.co-idle .co-crk>i,.co-idle .co-crk>b,.co-idle .co-kh{animation:co-breathe 2.6s ease-in-out infinite!important}
+.co-idle .co-lv{opacity:.55}
+.co-idle .co-haze>i{animation:co-spin 60s linear infinite!important}
+.co-idle .co-rune>i{animation:co-spin 36s linear infinite!important}
 
 /* частицы: слой рядом с #game — перерисовка экрана его не сносит; у UI-кита — внутри сцены раздела */
 .co-fxl{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
@@ -160,7 +247,7 @@
 .co-kr{display:flex;flex-wrap:wrap;gap:var(--sp-s)}
 .co-kb{gap:6px;color:var(--rc);border-color:color-mix(in srgb,var(--rc) 40%,var(--iron-2))}
 .co-kb[aria-pressed="true"]{box-shadow:0 0 0 1px var(--rc),inset 0 -10px 16px -12px var(--rc)}
-.co-kit{position:relative;height:400px;border-radius:12px;overflow:hidden;border:1px solid var(--iron);background:var(--noise),#07090a;isolation:isolate}
+.co-kit{position:relative;height:430px;border-radius:12px;overflow:hidden;border:1px solid var(--iron);background:var(--noise),#07090a;isolation:isolate}
 .co-kst{position:absolute;inset:0}
 /* раскадровка: кадр — экран телефона 932 × 430 в масштабе, анимации на паузе в своём моменте */
 .co-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(317px,1fr));gap:var(--sp-m)}
@@ -169,29 +256,52 @@
 .co-still figcaption b{font:700 11px/1.2 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--gold-2)}
 .co-frame{position:relative;width:317px;height:146px;overflow:hidden;border-radius:10px;border:1px solid var(--iron);background:var(--noise),#07090a;pointer-events:none;isolation:isolate}
 .co-fst{position:absolute;left:0;top:0;width:932px;height:430px;transform:scale(.34);transform-origin:0 0}
-.co-frame .co-st,.co-frame .co-st *{animation-play-state:paused!important}
-@media (max-width:620px){
+.co-frame .co-st,.co-frame .co-st *,.co-frame .co-st *::before{animation-play-state:paused!important}
+@media (max-width:760px){
   .co-kit .co-scene{transform:translate(-50%,-50%) scale(.62)}
   .co-kit .co-skip span{display:none}
 }
 
-@keyframes co-drop{from{opacity:0;transform:translateY(-34px) scale(.92)}}
-@keyframes co-rattle{0%,100%{transform:none}25%{transform:rotate(calc(var(--amp) * .1deg)) translateX(1px)}75%{transform:rotate(calc(var(--amp) * -.1deg)) translateX(-1px)}}
-@keyframes co-swell{0%{transform:none}90%{transform:scale(1.045,1.03)}100%{transform:none}}
-@keyframes co-recoil{0%{transform:scale(1.07,.9)}45%{transform:scale(.97,1.04)}100%{transform:none}}
-@keyframes co-halo{from{opacity:.06;transform:scale(.55)}}
-@keyframes co-seam{0%{opacity:.06}80%{opacity:1}100%{opacity:0}}
-@keyframes co-lid{0%{transform:none}32%{transform:translate(0,-26px) rotate(-3deg) scale(1,.86)}100%{transform:translate(0,-16px) scale(1,.42)}}
-@keyframes co-lidin{0%,30%{opacity:0}}
 @keyframes co-in{from{opacity:0}}
 @keyframes co-spin{to{transform:rotate(360deg)}}
-@keyframes co-flash{0%{opacity:0;transform:scale(.25)}20%{opacity:1;transform:scale(calc(var(--fs) / 100))}100%{opacity:0;transform:scale(calc(var(--fs) / 74))}}
+@keyframes co-lvin{from{opacity:0}to{opacity:1}}
+@keyframes co-lvout{from{opacity:1}to{opacity:0}}
+@keyframes co-hint{0%{opacity:0}12%,85%{opacity:.75}100%{opacity:0}}
+@keyframes co-cam{0%{transform:none}28%,70%{transform:scale(calc(1 + var(--zm) / 1000))}100%{transform:none}}
+@keyframes co-rune{from{opacity:0;transform:scaleY(.3) scale(.55)}}
+@keyframes co-shd{from{opacity:.1;transform:translateX(-50%) scale(.4)}}
+@keyframes co-halopop{from{transform:scale(1.4)}}
+@keyframes co-raysin{from{opacity:0;transform:scale(.35)}}
+@keyframes co-beam{0%{opacity:0;transform:translate(-50%,-88%) scaleY(.06)}14%{opacity:calc(var(--bm) / 100);transform:translate(-50%,-88%) scaleY(1.14)}32%{transform:translate(-50%,-88%) scaleY(.98)}100%{opacity:calc(var(--bm) / 180);transform:translate(-50%,-88%)}}
+@keyframes co-drop{0%{opacity:0;transform:translateY(-300px) scaleY(1.06)}14%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes co-land{0%{transform:none;animation-timing-function:cubic-bezier(.2,.7,.4,1)}18%{transform:scale(1.1,.86)}42%{transform:scale(.96,1.05)}68%{transform:scale(1.02,.98)}100%{transform:none}}
+@keyframes co-hop{0%{transform:none;animation-timing-function:cubic-bezier(.2,.7,.4,1)}30%{transform:translateY(-8px) scale(1.03,.98)}62%{transform:translateY(1px) scale(1.02,.97)}100%{transform:none}}
+@keyframes co-recoil{0%{transform:scale(1.08,.9);animation-timing-function:cubic-bezier(.2,.7,.4,1)}40%{transform:scale(.97,1.05)}100%{transform:none}}
+/* дрожь предвкушения: размах растёт, качание учащается (--amp — десятые доли градуса по редкости сундука) */
+@keyframes co-shake{0%{transform:none}6%{transform:rotate(calc(var(--amp) * -.001deg))}11.7%{transform:rotate(calc(var(--amp) * .003deg))}17.1%{transform:rotate(calc(var(--amp) * -.005deg))}22.3%{transform:rotate(calc(var(--amp) * .008deg))}27.2%{transform:rotate(calc(var(--amp) * -.011deg))}31.9%{transform:rotate(calc(var(--amp) * .014deg))}36.3%{transform:rotate(calc(var(--amp) * -.018deg))}40.5%{transform:rotate(calc(var(--amp) * .022deg))}44.5%{transform:rotate(calc(var(--amp) * -.025deg))}48.4%{transform:rotate(calc(var(--amp) * .029deg))}52%{transform:rotate(calc(var(--amp) * -.033deg))}55.4%{transform:rotate(calc(var(--amp) * .037deg))}58.7%{transform:rotate(calc(var(--amp) * -.04deg))}61.8%{transform:rotate(calc(var(--amp) * .044deg))}64.8%{transform:rotate(calc(var(--amp) * -.048deg))}67.6%{transform:rotate(calc(var(--amp) * .051deg))}70.3%{transform:rotate(calc(var(--amp) * -.055deg))}72.9%{transform:rotate(calc(var(--amp) * .058deg))}75.3%{transform:rotate(calc(var(--amp) * -.062deg))}77.6%{transform:rotate(calc(var(--amp) * .065deg))}79.8%{transform:rotate(calc(var(--amp) * -.068deg))}81.9%{transform:rotate(calc(var(--amp) * .071deg))}83.9%{transform:rotate(calc(var(--amp) * -.074deg))}85.8%{transform:rotate(calc(var(--amp) * .077deg))}87.6%{transform:rotate(calc(var(--amp) * -.08deg))}89.3%{transform:rotate(calc(var(--amp) * .082deg))}90.9%{transform:rotate(calc(var(--amp) * -.085deg))}92.5%{transform:rotate(calc(var(--amp) * .088deg))}93.9%{transform:rotate(calc(var(--amp) * -.09deg))}95.3%{transform:rotate(calc(var(--amp) * .092deg))}96.7%{transform:rotate(calc(var(--amp) * -.094deg))}100%{transform:none}}
+/* крышка подпрыгивает всё выше и чаще (--lift — градусы по редкости сундука); щель вспыхивает в такт */
+@keyframes co-rattle{0%,28.6%{transform:none}30%{transform:rotateX(calc(var(--lift) * .35deg))}31.6%,44.6%{transform:none}46%{transform:rotateX(calc(var(--lift) * .45deg))}47.6%,56.6%{transform:none}58%{transform:rotateX(calc(var(--lift) * .55deg))}59.6%,66.6%{transform:none}68%{transform:rotateX(calc(var(--lift) * .62deg))}69.6%,74.6%{transform:none}76%{transform:rotateX(calc(var(--lift) * .7deg))}77.6%,81.6%{transform:none}83%{transform:rotateX(calc(var(--lift) * .78deg))}84.6%,87.1%{transform:none}88.5%{transform:rotateX(calc(var(--lift) * .86deg))}90.1%,91.6%{transform:none}93%{transform:rotateX(calc(var(--lift) * .93deg))}94.6%,95.6%{transform:none}97%{transform:rotateX(calc(var(--lift) * 1deg))}98.6%,100%{transform:none}}
+@keyframes co-crack{0%{opacity:.3}28.6%{opacity:.43}30%{opacity:1}32.4%{opacity:.48}44.6%{opacity:.51}46%{opacity:1}48.4%{opacity:.56}56.6%{opacity:.56}58%{opacity:1}60.4%{opacity:.61}66.6%{opacity:.61}68%{opacity:1}70.4%{opacity:.66}74.6%{opacity:.64}76%{opacity:1}78.4%{opacity:.69}81.6%{opacity:.67}83%{opacity:1}85.4%{opacity:.72}87.1%{opacity:.7}88.5%{opacity:1}90.9%{opacity:.75}91.6%{opacity:.72}93%{opacity:1}95.4%{opacity:.77}95.6%{opacity:.74}97%{opacity:1}99.4%{opacity:.79}100%{opacity:1}}
+/* крышка откидывается: рывок до упора за вертикаль (ease-out), отскок и покачивание (ease-in-out элемента) */
+@keyframes co-lid{0%{transform:none;animation-timing-function:cubic-bezier(.2,.8,.35,1)}36%{transform:rotateX(124deg)}58%{transform:rotateX(97deg)}78%{transform:rotateX(108deg)}100%{transform:rotateX(104deg)}}
+@keyframes co-mouth{0%{opacity:0;transform:scale(.4,.1)}25%{opacity:1;transform:scale(1.15,1.7)}100%{opacity:1;transform:none}}
+@keyframes co-bloom{0%{opacity:0}20%{opacity:1}100%{opacity:.7}}
+@keyframes co-sweep{from{transform:translateX(-120%)}to{transform:translateX(330%)}}
+@keyframes co-lock{0%{opacity:1;transform:none;animation-timing-function:ease-in-out}6%{transform:rotate(-10deg)}12%{transform:rotate(9deg)}18%{transform:rotate(-6deg) scale(1.05)}
+  23%{opacity:1;transform:translateY(-10px) scale(1.16);animation-timing-function:cubic-bezier(.45,0,1,.55)}72%{opacity:1}100%{opacity:0;transform:translate(56px,200px) rotate(112deg) scale(.86)}}
+@keyframes co-dustl{0%{opacity:0;transform:scale(.35)}22%{opacity:.95}100%{opacity:0;transform:translateX(-30px) scale(1.25,1.1)}}
+@keyframes co-dustr{0%{opacity:0;transform:scale(-.35,.35)}22%{opacity:.95}100%{opacity:0;transform:translateX(30px) scale(-1.25,1.1)}}
+@keyframes co-flash{0%{opacity:0;transform:scale(.25)}18%{opacity:1;transform:scale(calc(var(--fs) / 100))}100%{opacity:0;transform:scale(calc(var(--fs) / 70))}}
 @keyframes co-coin{0%{opacity:0;transform:translate(var(--fx),var(--fy)) scale(.3)}55%{opacity:1}100%{opacity:1;transform:none}}
-@keyframes co-fly{0%{opacity:0;transform:translate(var(--fx),var(--fy)) scale(.14) rotate(-10deg)}14%{opacity:1}72%{transform:translate(0,-8px) scale(1.07) rotate(1deg)}100%{opacity:1;transform:none}}
-@keyframes co-reveal{0%,55%{opacity:0;transform:scale(.7)}100%{opacity:1;transform:none}}
-@keyframes co-glow{0%,100%{box-shadow:inset 0 -4px 0 var(--rc),0 0 28px -6px var(--rc)}50%{box-shadow:inset 0 -4px 0 var(--rc),0 0 46px 0 var(--rc)}}
+@keyframes co-fly{0%{opacity:0;transform:translate(var(--fx),var(--fy)) scale(.2)}10%{opacity:1}58%{transform:translate(calc(var(--fx) * .1),calc(var(--fy) * .1 - 34px)) scale(1.06)}100%{opacity:1;transform:none}}
+@keyframes co-tail{0%{opacity:0;transform:rotate(var(--ta)) scaleY(.2)}18%{opacity:1;transform:rotate(var(--ta)) scaleY(1)}60%{opacity:.8;transform:rotate(var(--ta)) scaleY(.7)}100%{opacity:0;transform:rotate(var(--ta)) scaleY(0)}}
+@keyframes co-flip{0%{transform:rotateY(180deg);animation-timing-function:cubic-bezier(.55,0,.85,.6)}50%{transform:rotateY(90deg) scale(1.12);animation-timing-function:cubic-bezier(.15,.4,.35,1.2)}100%{transform:none}}
+@keyframes co-rise{0%{opacity:0;transform:translate(var(--fx),var(--fy)) scale(.3)}12%{opacity:1}72%{transform:translateY(-10px) scale(1.04)}100%{opacity:1;transform:none}}
+@keyframes co-bob{0%,100%{transform:none}50%{transform:translateY(-7px) scale(1.03)}}
+@keyframes co-aura{0%,100%{opacity:.7}50%{opacity:1}}
+@keyframes co-dim{from{opacity:0}}
 @keyframes co-shine{from{transform:translateX(-130%)}}
-@keyframes co-breathe{0%,100%{opacity:.18}50%{opacity:.55}}
+@keyframes co-breathe{0%,100%{opacity:.25}50%{opacity:.7}}
 @keyframes co-pop{from{opacity:0;transform:translate(-50%,-46%) scale(.97)}}
 @keyframes co-up{from{opacity:0;transform:translateY(8px) scale(.94)}}
 

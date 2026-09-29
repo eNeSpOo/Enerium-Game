@@ -4,7 +4,8 @@
    2. Скрипты прототипа выполняются в песочнице Node по порядку, как в браузере, с заглушкой DOM; boot() не запускается.
       Соседние экраны (craft.js, bag.js) пишут параллельно: их ошибки — предупреждения; ошибки остальных скриптов — провал.
    3. Девять недель × шесть циклов: экран, листы недели, бестиария и сведений о каждом враге; призыв за одну душу с выбором
-      из вариантов и повтором без второго расхода; атаки до победы на каждой из 14 ступеней — каждая атака бой ядром (ADR-0025):
+      из вариантов и повтором без второго расхода; у каждого варианта крупно цена одной атаки из правил Эхо — раньше мощи, чисел
+      на варианте два; та же цена — в слоте и в «Сведениях» цели; атаки до победы на каждой из 14 ступеней — каждая атака бой ядром (ADR-0025):
       цена один раз, повтор того же номера атаки ничего не списывает, здоровье цели — из итога боя, «Пропустить» открывает итог;
       после первой атаки цели оставляем 1 здоровья — шкала Эхо растёт ×3 за цикл, а отряд прототипа нет; победа — очки, бестиарий,
       рост лестницы до Убер-босса; Многоликий выпадает при призыве с шансом manySummonBp, победа над ним даёт ресурс «Многоликий» своей недели;
@@ -169,11 +170,31 @@ function suite() {
       if (p.offers.length !== Math.min(D.offer.wide, S.ech.avail) || new Set(p.offers).size !== p.offers.length || p.offers.some(st => st < 1 || st > S.ech.avail && st !== TOP + 1)) fail(`${key}: варианты ${p.offers.join(', ')} при открытых 1–${S.ech.avail}`);
       out.offers += p.offers.length;
       h = draw(); scan(key + ' · выбор цели', h);
+      /* цена одной атаки — главное число выбора цели (слово автора): крупно у каждого варианта и раньше мощи; число — правила Эхо,
+         раунды × цена раунда цикла (echo-rules.js, ADR-0025), без них — прежняя сетка §17.5. Чисел на варианте два: цена и мощь */
+      for (const st of p.offers) {
+        const g = st > TOP ? 'm' : E.stepFoe(E.fidOf(w.race, st)).g, cost = E.cost({ step: st, g, cyc: c });
+        const row = h.split('class="ech-offer"').find(y => y.includes(`data-v="2:${st}"`)) || '', R = window.EN_ECHO_RULES;
+        const rule = RULED && R.cycles[String(c)] ? R.cycles[String(c)].find(r => r.step === st) : null;
+        if (!Number.isInteger(cost) || cost < 1) fail(`${key}: цена атаки ступени ${st} — ${cost}`);
+        else if (rule && rule.souls !== cost) fail(`${key}: цена атаки ступени ${st} — ${cost}, а в правилах Эхо — ${rule.souls}`);
+        const ci = row.indexOf('class="ech-cost"'), pi = row.indexOf('Боевая мощь цели');
+        if (ci < 0 || !row.includes(`<b class="num">${fmt(cost)}</b><small>за атаку</small>`)) fail(`${key}: у варианта ${st} не видно цены одной атаки ${cost}`);
+        else if (pi >= 0 && pi < ci) fail(`${key}: у варианта ${st} мощь стоит раньше цены атаки`);
+        if ((row.match(/class="ech-n"/g) || []).length > 1) fail(`${key}: у варианта ${st} больше двух чисел`);
+      }
       ACT.echpick('2:' + p.offers[p.offers.length - 1]);
       const x = S.echo.slots[2];
       if (!x || x.step !== p.offers[p.offers.length - 1] || S.ech.pending[2]) fail(key + ': выбор не занял слот');
       else if (x.left !== D.lifeH[x.g] * D.hour || x.hp !== x.max) fail(key + ': у новой цели не тот срок или здоровье');
-      scan(key + ' · цель', draw());
+      h = draw(); scan(key + ' · цель', h);
+      /* та же цена — в слоте рядом с именем и в «Сведениях» цели */
+      if (x) {
+        const cost = E.cost(x), sl = h.split('class="eslot').find(y => y.includes('data-v="2"')) || '';
+        if (!sl.includes('class="ech-sc"') || !sl.includes(`<b class="num">${fmt(cost)}</b>`)) fail(`${key}: в слоте не видно цены одной атаки ${cost}`);
+        S.overlay = { t: 'echfoe', arg: x.fid }; const hf = draw(); S.overlay = null;
+        if (!hf.includes(`<span>Цена атаки</span><b>${fmt(cost)} `)) fail(`${key}: в «Сведениях» цели нет цены атаки ${cost}`);
+      }
       S.ech.wide = false; clearEcho(); ACT.echsum('0'); if (!S.ech.pending[0] || S.ech.pending[0].offers.length !== D.offer.base) fail(key + ': без артефакта вариантов не ' + D.offer.base); S.ech.wide = true;
 
       /* каждая ступень до победы: очки, бестиарий, рост лестницы до Убер-босса; Многоликий — не ступень лестницы, выпадает при призыве,

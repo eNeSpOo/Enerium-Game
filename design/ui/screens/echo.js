@@ -9,6 +9,8 @@
    Атака — бой ядром (battle.js, EB.echoBattle, ADR-0025): один этаж, главный враг и четыре защитника, раунды по типу врага;
    здоровье главного врага сохраняется между атаками. Исход решён при оплате, просмотр — только показ: «Пропустить» сразу
    открывает итог, повтор атаки с тем же номером ничего не списывает и не начисляет.
+   Цена одной атаки в душах — главный довод при выборе цели (слово автора): крупно у каждого варианта призыва, в слоте рядом с именем,
+   в «Сведениях» и на кнопке атаки. Число — atkCost: данные режима, раунды × цена раунда цикла (echo-rules.js, ADR-0025).
    Данные боя — EN_ECHO_RULES (echo-rules.js) и EN_ECHO_FOES (echo-foes.js), если подключены; без них — демо ECH.fight.
    Все числа ECH — демонстрация, не баланс. В игре варианты призыва, бой, награды и итог решает сервер (§36.16);
    сид здесь — заглушка серверного. */
@@ -557,6 +559,10 @@ const NUM_T = { hp: 'Здоровье', power: 'Боевая мощь' };
 const numIc = (k, v, px = 18, tail = '', t = NUM_T[k]) => `<span class="ech-n" title="${t}">${ICON(k, px, t)}<b class="num">${fmt(v)}</b>${tail}</span>`;
 /* лор свёрнут: две строки и «ещё»; раскрывается по нажатию, без перерисовки экрана */
 const loreHtml = t => t ? `<details class="ech-lore"><summary><span class="quote ech-clamp">${t}</span><span class="ech-more">ещё</span></summary></details>` : '';
+/* цена одной атаки в душах — главный довод при выборе цели (слово автора): крупно у вариантов призыва, рядом с именем в слоте.
+   Число — atkCost: данные режима, раунды × цена раунда цикла (echo-rules.js, ADR-0025) */
+const atkHtml = a => `<span class="ech-cost" title="Цена одной атаки"><img src="${curImg('souls')}" alt="Души"><b class="num">${fmt(a)}</b><small>за атаку</small></span>`;
+const atkMini = a => `<span class="ech-sc" title="Цена одной атаки: ${fmt(a)} ${souls(a)}"><img src="${curImg('souls')}" alt=""><b class="num">${fmt(a)}</b></span>`;
 /* что даёт победа над целью: очки недели, ресурс «Многоликий» или добыча крафтового босса */
 function rewardOf(x, f, c) {
   if (x.g === 'craft') return f.fb.workerBoxRarity ? 'ресурсы и сундук' : isLik(f.fb) ? 'осколки героев недели' : 'ресурсы';
@@ -582,7 +588,7 @@ function slotsHtml() {
     if (!x && p) return `<button class="eslot ech-pend" data-a="echsel" data-v="${i}" ${cur}><span class="ph">${ic('spark')}</span><span style="min-width:0"><b>Выбор цели</b><small><span>${p.offers.length} ${plural(p.offers.length, 'вариант', 'варианта', 'вариантов')}</span></small></span></button>`;
     if (!x) return `<button class="eslot empty" data-a="echsel" data-v="${i}" ${cur}><span>${ic('plus')} Призвать цель<br><b class="num" style="color:var(--parch)">${cost} ${souls(cost)}</b></span></button>`;
     const f = foe(x.fid, x);
-    return `<button class="eslot" data-a="echsel" data-v="${i}" ${cur}><span class="ph">${ph(f, 'sm')}</span><span style="min-width:0"><b>${shortOf(f)}</b>${bar(hpPct(x), 'hp')}<small><span>${x.kind === 'craft' ? 'крафтовый босс' : 'ступень ' + x.step}</span><span class="num">${ic('hour')} <span data-ech-t="${i}">${dur(x.left)}</span></span></small></span></button>`;
+    return `<button class="eslot" data-a="echsel" data-v="${i}" ${cur}><span class="ph">${ph(f, 'sm')}</span><span style="min-width:0"><span class="ech-sn"><b>${shortOf(f)}</b>${atkMini(atkCost(x))}</span>${bar(hpPct(x), 'hp')}<small><span>${x.kind === 'craft' ? 'крафтовый босс' : 'ступень ' + x.step}</span><span class="num">${ic('hour')} <span data-ech-t="${i}">${dur(x.left)}</span></span></small></span></button>`;
   }).join('')}</div>`;
 }
 function summonHtml(i) {
@@ -600,12 +606,17 @@ function summonHtml(i) {
       </div>
     </div></div>`;
 }
-/* варианты призыва — строки-карточки: облик, имя, ранг и стихия, мощь и здоровье, «Выбрать». Срок, цена атаки и раунды — в подсказке */
+/* варианты призыва — строки-карточки: облик, имя, ранг и стихия; справа — цена одной атаки в душах крупно (главный довод выбора),
+   под ней мощь цели и оценка отряда: сильнее, наравне или слабее; «Выбрать». Два числа на строку (правила воздуха): здоровье, срок,
+   раунды и очки за победу — в подсказке строки */
 function pickHtml(i, p, c) {
+  const mine = S.ech.weekSquad ? 0 : sqBM(sq(S.echoSquad));
   const rows = p.offers.map(st => {
-    const f = stepFoe(fidOf(S.ech.wk, st)), a = atkCost({ step: st, g: f.g, cyc: c }), rn = roundsOf(f.g);
-    return `<div class="ech-offer" title="Срок ${lifeOf(f.g)} ч · атака ${a} ${souls(a)} · ${rn} ${plural(rn, 'раунд', 'раунда', 'раундов')}">${ph(f, 'sm')}<span class="col ech-on"><b class="serif">${shortOf(f)}</b><span class="row ech-oc"><span class="chip ${f.g === 'o' ? '' : 'gold'}">${rankIc(f.g)}${ECH.short[f.g]} · ${st}</span>${el(f.el)}</span></span>
-      <span class="ech-om">${numIc('power', bmOf(st, c), 16)}${numIc('hp', hpOf(st, c, S.ech.wk), 16)}</span>
+    const f = stepFoe(fidOf(S.ech.wk, st)), a = atkCost({ step: st, g: f.g, cyc: c }), rn = roundsOf(f.g), bm = bmOf(st, c), pts = ptsOf(st, c), k = mine ? vsOf(mine, bm) : '';
+    const tip = `Здоровье ${fmt(hpOf(st, c, S.ech.wk))} · срок ${lifeOf(f.g)} ч · ${rn} ${plural(rn, 'раунд', 'раунда', 'раундов')}${pts ? ` · за победу ${fmt(pts)} ${plural(pts, 'очко', 'очка', 'очков')}` : ''}`;
+    const per = rn && a % rn === 0 ? ` · атака = ${rn} ${plural(rn, 'раунд', 'раунда', 'раундов')} × ${a / rn} ${souls(a / rn)} (данные режима)` : '';
+    return `<div class="ech-offer" data-step="${st}" title="${tmT(tip, tip + per)}">${ph(f, 'sm')}<span class="col ech-on"><b class="serif">${shortOf(f)}</b><span class="row ech-oc"><span class="chip ${f.g === 'o' ? '' : 'gold'}">${rankIc(f.g)}${ECH.short[f.g]} · ${st}</span>${el(f.el)}</span></span>
+      <span class="ech-om">${atkHtml(a)}<span class="ech-opw">${numIc('power', bm, 14, '', 'Боевая мощь цели')}${k ? `<span class="ech-vk ${k}" title="${VS_T[k]}">${vsIc(k)}<span class="sr">${VS_T[k]}</span></span>` : ''}</span></span>
       <button class="btn sm go" data-a="echpick" data-v="${i}:${st}">Выбрать</button></div>`;
   }).join('');
   return `<div class="pnl etarget ech-pick">
@@ -1093,7 +1104,8 @@ Object.assign(OV, {
     let tgt = '';
     if (sl) {
       const i = S.echo.slots.indexOf(sl), rn = roundsOf(sl.g), gd = EB.RULES.echo.guards[sl.g] || 0, imm = f.fb ? f.fb.immunityBp : immOf(sl.g), av = attackAvers(sl);
-      const kv = [['Бой', `${rn} ${plural(rn, 'раунд', 'раунда', 'раундов')} · ${gd ? `${gd} ${plural(gd, 'защитник', 'защитника', 'защитников')}` : 'один на один'}`],
+      const a = atkCost(sl);
+      const kv = [['Цена атаки', `${fmt(a)} ${souls(a)}`], ['Бой', `${rn} ${plural(rn, 'раунд', 'раунда', 'раундов')} · ${gd ? `${gd} ${plural(gd, 'защитник', 'защитника', 'защитников')}` : 'один на один'}`],
         ['Исчезнет через', `<span class="num" data-ech-t="${i}">${dur(sl.left)}</span>`], ['За победу', rewardOf(sl, f, c)]].concat(imm ? [['Иммунитет к контролю', pctBp(imm)]] : [],
         av.n ? [['Неприязнь отряда', `+${pctBp(av.bp)} урона · ${av.n} ${plural(av.n, 'герой', 'героя', 'героев')}`]] : []);
       tgt = `<div class="ech-kv">${kv.map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join('')}</div>
@@ -1206,6 +1218,15 @@ setInterval(() => {
   S.echo.slots.forEach((x, i) => { if (!x) return; if (x.left <= 0) gone = true; document.querySelectorAll(`[data-ech-t="${i}"]`).forEach(e => { e.textContent = dur(x.left); }); });
   if (gone && !S.overlay) render();
 }, 1000);
+
+/* сценарий презентации: призыв — выбор из вариантов, у каждого цена одной атаки в душах крупно; оплаченный выбор не призывает второй раз */
+FLOWS.push(['Эхо · выбор цели', 'Призыв за душу: у каждого варианта — цена одной атаки в душах крупно, мощь цели и оценка отряда', () => {
+  sync(); S.route = 'echo'; S.overlay = null; S.ech.wide = true;
+  const i = S.echo.slots.findIndex((x, j) => !x && S.ech.pending[j]), k = i >= 0 ? i : freeSlot();
+  if (k < 0) return;
+  S.echo.sel = k;
+  if (!S.ech.pending[k]) ACT.echsum(String(k));
+}]);
 
 /* для автопроверки tools/content-gen/screens/check_echo.js и консоли */
 window.EN_ECHO = { data: ECH, steps: STEPS, foe, stepFoe, fidOf, sync, draw, checks, planks: () => planks(weekOf(S), S.acc.cycle), bio: () => ({ cap: bioCap(), used: bioUsed() }), target: (kind, x, o) => target(S, kind, x, o),

@@ -103,7 +103,7 @@
 .ech-vk.even{color:var(--parch-2)}
 .ech-vk.down{color:var(--rust)}
 
-/* выбор из вариантов призыва: строка — облик, имя с рангом и стихией, мощь и здоровье, «Выбрать» */
+/* выбор из вариантов призыва: строка — облик, имя с рангом и стихией, цена одной атаки и мощь, «Выбрать» */
 .ech .etarget.ech-pick{display:flex;flex-direction:column;gap:var(--sp-s);padding:var(--sp-m)}
 .ech-pick-h{display:flex;align-items:baseline;gap:var(--sp-m);flex-wrap:wrap;flex:none}
 .ech-pick-h h2{font-size:22px;color:var(--gold);line-height:1}
@@ -116,6 +116,21 @@
 .ech-oc{gap:4px}
 .ech-om{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 .ech-om .ech-n b{font-size:15px}
+/* цена одной атаки — главное число выбора цели: крупно золотом, «за атаку» мелко; под ней мощь цели и оценка отряда */
+.ech-cost{display:inline-flex;align-items:baseline;gap:5px;white-space:nowrap}
+.ech-cost img{width:22px;height:22px;object-fit:contain;align-self:center}
+.ech-cost b{font:600 26px/1 var(--f-d);color:var(--gold)}
+.ech-cost small{font-size:11px;color:var(--parch-3)}
+.ech-opw{display:inline-flex;align-items:center;gap:4px}
+.ech-om .ech-opw .ech-n b{font-size:14px;color:var(--parch-2)}
+.ech-opw .ech-vk{width:16px;height:16px}
+.ech-opw .ech-vk .i{width:13px;height:13px}
+/* слот: имя и цена одной атаки в одной строке */
+.ech-sn{display:flex;align-items:center;gap:6px;min-width:0}
+.eslot .ech-sn>b{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ech-sc{display:inline-flex;align-items:center;gap:3px;flex:none}
+.ech-sc img{width:14px;height:14px;object-fit:contain}
+.eslot .ech-sc b{display:inline;font:700 12.5px/1 var(--f-u);color:var(--gold);font-variant-numeric:lining-nums tabular-nums}
 
 /* лестница без подписей: ступени растут по рангу, между рангами — зазор; вся полоса — кнопка бестиария */
 .ech-ladder{appearance:none;width:100%;display:flex;align-items:center;gap:var(--sp-m);padding:6px var(--sp-m);flex:none;text-align:left;color:var(--parch-3)}
@@ -277,4 +292,5 @@
   .ech-ladder{padding:4px var(--sp-m)}
   .ech-pick-h h2{font-size:19px}
   .ech-offer{padding:4px 0}
+  .ech-cost b{font-size:22px}
 }

@@ -7,8 +7,14 @@
    - Совпадение по вхождению: лишнее сгорает, неудача сжигает всё положенное, верный набор создаёт предмет всегда.
    - Подсказки — по §12, у рецептов от четырёх ингредиентов. Частичное знание рецепта — S.ws.part.
    - Автодокрафт — только по найденным рецептам; невосполнимое списывается лишь с явного согласия (§12.1).
-   - Сервер решает: набор проверяет и автодокрафт утверждает WS_SRV. В игре это запросы, а клиент знает только найденные рецепты.
-   Состояние экрана — S.ws. Числа — в WS_DATA: демонстрация, не баланс. Автопроверка — tools/content-gen/screens/check_craft.js. */
+   - Сервер решает: попытку и автодокрафт проверяет и проводит WS_SRV — одной операцией с номером, повтор номера ничего не меняет.
+     В игре это запросы, а клиент знает только найденные рецепты.
+   - Анимация удачи и неудачи только показывает итог, который сервер уже выдал: окно поверх (OV.wsres), круг из шести ячеек вокруг
+     центра, как на столе. Удача — нити, втягивание, раскалённое ядро, вспышка, итог поднимается в свете своей редкости; впервые
+     найденный рецепт — «новая запись в книге». Неудача — нити рвутся, круг трескается, дым и пепел. Автодокрафт, серия ×N и известный
+     рецепт со стола — короткая версия. Пропуск — нажатием на сцену или галочкой, prefers-reduced-motion — сразу итог.
+     Движение — transform и opacity, частицы — EnFx (fx.js). Рисунок трещин и дыма — от сида операции, чтобы перерисовка не меняла кадр.
+   Состояние экрана — S.ws. Числа — в WS_DATA (демонстрация, не баланс) и WS_FX (вид). Автопроверка — tools/content-gen/screens/check_craft.js. */
 'use strict';
 
 /* ================== данные экрана: демонстрация, не баланс ================== */
@@ -47,6 +53,57 @@ const WS_DATA = {
     table: [['fang', 2], ['k1_hunt', 1]],                                 // поток «Мастерская»: найденный рецепт на столе
     hint: [['find_cb1', 1], ['p_waxthread', 2], ['cr_mold', 3]],          // поток «подсказки»: три верных из четырёх у рецепта героя
     chain: { learn: ['r_a_cast', 'r_p_lure'], make: 'r_call_fb1' },       // поток «автодокрафт»: цепочка и уникальный ресурс
+    made: [['p_fang', 2], ['plank', 2], ['dye', 1]],                      // поток «удача»: Стрелы егеря — рецепт, которого нет в книге
+    fail: [['mushroom', 1], ['salt', 2], ['ash', 1]],                     // поток «неудача»: сочетание без рецепта и без подсказки
+    kit: { hero: 'r_h_c1_20', make: 'r_p_frame', n: 10 },                 // UI-кит: проба героя и серии ×N — не выдача
+  },
+};
+
+/* ================== анимация крафта: числа вида, не баланс ==================
+   Моменты — целые мс от начала показа, размеры — px. Три темпа: full — попытка, исход которой игрок не знал; short — известный рецепт
+   со стола, автодокрафт, серия ×N; fail — неудача. До расхождения (tug / shiver) полная удача и неудача идут одинаково: нити цвета
+   стола, круг тёмный — исход открывается в свой момент */
+const WS_FX = {
+  geo: {
+    circ: 300,                                                                // круг, px
+    hex: [[0, -100], [87, -50], [87, 50], [0, 100], [-87, 50], [-87, -50]],   // центры шести мест от центра круга — порядок стола: 0 — верх, по часовой
+    ang: [90, 150, 210, 270, 330, 30],                                        // нить от места к центру, градусы
+    cell: 50, core: 60, res: 84, card: [80, 104],                             // место, ядро, итог, карточка героя [ш, в]
+    rim: [146, 126, 40], runeR: 136, runes: 24,                               // обод, внутренний обод, кольцо ядра; руны — радиус и сколько
+    shift: 182, pane: 340, paneX: -8, top: 16,                                // итог: круг уходит влево, лист справа — ширина и левый край от середины; круг ниже середины
+  },
+  spread: [[0], [0, 3], [0, 2, 4], [1, 2, 4, 5], [0, 1, 2, 4, 5], [0, 1, 2, 3, 4, 5]],   // места ингредиентов автодокрафта и проб — симметрично
+  full: { in: 240, inStep: 40, thr: 260, thrDur: 420, thrStep: 70, tug: 720, tugDur: 240, pull: 920, pullDur: 460, pullStep: 60,
+    ring: 1340, ringDur: 900, heat: 1240, heatDur: 820, flash: 2060, flashDur: 660, rise: 2100, riseDur: 700, end: 2900 },
+  short: { in: 120, inStep: 20, thr: 160, thrDur: 220, thrStep: 30, tug: 0, tugDur: 0, pull: 300, pullDur: 280, pullStep: 25,
+    ring: 520, ringDur: 560, heat: 460, heatDur: 320, flash: 780, flashDur: 520, rise: 800, riseDur: 420, end: 1280,
+    pulses: 3, pulse: 120, auto: 640 },                                       // серия — удары ядра, не больше pulses; auto — сколько итог держится без листа
+  fail: { in: 240, inStep: 40, thr: 260, thrDur: 420, thrStep: 70, shiver: 720, shiverDur: 420, snap: 980, snapDur: 300,
+    crack: 1010, crackStep: 55, crackDur: 170, crumble: 1150, crumbleDur: 760, crumbleStep: 55, smokeDur: 1500, end: 2050 },
+  /* трещины от обода к центру: начал, ветвей у начала [от, до], отрезков в ветви [от, до], длина отрезка [от, до] px, излом и развилка, градусы */
+  crack: { from: 2, branch: [2, 3], seg: [3, 4], len: [14, 24], bend: 32, fork: 28, edge: 12 },
+  smoke: { perCell: 2, core: 3, spread: 18, drift: 20, size: [80, 130], lag: 220 },   // клубов у места и в центре; разброс и снос, px; размер, %; разнобой, мс
+  /* новая запись в книге — после удачи, от конца полной версии: книга раскрывается, листы, свет, чернила пишут имя рецепта */
+  book: { open: 520, flip: 3, flipAt: 280, flipStep: 150, flipDur: 560, light: 360, lightDur: 1200, ink: 860, inkStep: 34, end: 1640 },
+  pane: 320, shiftDur: 480, fade: 220,                                        // лист итога, уход круга влево, затухание короткой без листа, мс
+  /* по редкости итога: ореол, лучи (с эпической), свет по всей сцене при вспышке — %; масштаб вспышки, % */
+  halo: [30, 36, 44, 54, 64, 74, 84], rays: [0, 0, 0, 30, 42, 54, 66], sflash: [0, 0, 8, 14, 22, 30, 38], flashScale: [100, 108, 116, 126, 138, 150, 164],
+  /* частицы EnFx. Искры, полосы, золото — [сколько, скорость, жизнь мс, размер]; кольца — [радиус в % круга, мс, толщина, задержка мс];
+     огоньки — [серий, шаг мс, сколько, скорость, жизнь мс, размер, подъём]; дрожь — [px, мс]. Короткая версия — shortPct % частиц, без дрожи */
+  fx: {
+    flash: [
+      { sparks: [14, 160, 600, 4], streaks: [6, 210, 340, 2] },
+      { sparks: [18, 180, 680, 4], streaks: [9, 230, 380, 2] },
+      { sparks: [24, 200, 760, 5], streaks: [12, 250, 420, 2], motes: [3, 170, 6, 60, 1100, 3, 110] },
+      { sparks: [30, 220, 860, 5], streaks: [16, 280, 460, 2], gold: [12, 210, 860, 4], motes: [4, 170, 7, 64, 1200, 3, 120] },
+      { sparks: [38, 240, 1000, 6], streaks: [20, 310, 520, 3], gold: [22, 250, 1000, 5], rings: [[70, 700, 3, 0], [110, 950, 2, 140]], motes: [5, 170, 8, 68, 1300, 4, 140], shake: [3, 300] },
+      { sparks: [46, 260, 1200, 6], streaks: [26, 340, 580, 3], gold: [32, 290, 1200, 6], rings: [[76, 760, 3, 0], [120, 1000, 2, 140], [56, 600, 2, 300]], motes: [6, 160, 9, 70, 1400, 4, 150], shake: [4, 360] },
+      { sparks: [54, 280, 1400, 7], streaks: [32, 380, 660, 3], gold: [44, 330, 1400, 7], rings: [[82, 820, 3, 0], [130, 1100, 2, 140], [60, 650, 2, 300]], motes: [7, 160, 10, 70, 1500, 4, 160], shake: [5, 400] },
+    ],
+    shortPct: 55,
+    failCol: '#e6a84b', ashCol: ['#8f8577', '#5f574d', '#b2a794'],
+    snap: [5, 120, 380, 2], ash: [10, 46, 1100, 3], ember: [4, 60, 800, 2], ay: 220,   // нить рвётся — искры; пепел и угольки от сгоревшего; тяжесть пепла
+    book: [4, 180, 6, 44, 1300, 3, 80],                                                  // огоньки над книгой
   },
 };
 
@@ -62,10 +119,12 @@ const wsSum = r => r.in.reduce((a, [, q]) => a + q, 0);
 const wsSpecific = (a, b) => b.in.length - a.in.length || wsSum(b) - wsSum(a) || wsOrd.get(a.id) - wsOrd.get(b.id);
 const WS_SRV = {
   recipes: () => EN_RECIPES.recipes.filter(r => !r.team),
+  /* сид операции — заглушка серверного: исход крафта случайности не имеет (§12), по сиду рисуются только трещины и дым неудачи */
+  seed: op => EB.seedOf('мастерская|' + op),
   /* найденный: открыт игроком или известен по правилу данных — рецепт руны доблести известен с первого осколка (known0) */
   isKnown: r => !!r && (BAG.known(r.id) || (!!r.known0 && r.in.some(([id]) => BAG.has(id)))),
   known: () => WS_SRV.recipes().filter(WS_SRV.isKnown),
-  /* попытка на столе (§12): какой рецепт сработает и какие подсказки откроются. Ничего не меняет — итог применяет wsAttempt */
+  /* попытка на столе (§12): какой рецепт сработает и какие подсказки откроются. Ничего не меняет — итог проводит attempt */
   check(cells) {
     const have = new Map(cells.map(c => [c.id, c.q])), pool = WS_SRV.recipes();
     const fit = pool.filter(r => r.in.every(([id, q]) => (have.get(id) || 0) >= q)).sort(wsSpecific)[0];
@@ -83,15 +142,51 @@ const WS_SRV = {
     }
     return { made: null, hints };
   },
-  /* автодокрафт (§12.1): сервер сам разворачивает цепочку по найденным рецептам и проверяет согласие на невосполнимое */
-  make(rid, n, ok) {
+  /* попытка со стола — одна операция с номером: проверка, расход всего стола, выдача, подсказки. Ответ: { res } — итог;
+     { again, res } — повтор того же номера, ничего не меняет; { refuse } — отказ без расхода. cells — [{ id, q, pos }], pos — ячейка стола */
+  attempt(op, cells, consent) {
+    const V = S.ws.ops;
+    if (V[op]) return { again: true, res: V[op] };
+    if (!cells.length) return { refuse: 'empty' };
+    if (!cells.every(c => BAG.has(c.id, c.q))) return { refuse: 'lack' };
+    if (!consent && cells.some(c => wsSpecial(c.id))) return { refuse: 'consent' };
+    const v = WS_SRV.check(cells);
+    if (v.refuse) return { refuse: 'owned', hero: v.hero };
+    const isNew = !!v.made && !WS_SRV.isKnown(v.made), put = cells.map(c => [c.id, c.q, c.pos]);
+    cells.forEach(c => BAG.take(c.id, c.q));   // со стола уходит всё: рецепт расходует своё, лишнее и неудача сгорают
+    let res;
+    if (v.made) {
+      const r = v.made, h = wsHero(r);
+      BAG.learn(r.id); delete S.ws.part[r.id];
+      wsGive(r.out[0], r.out[1]);
+      res = { op, kind: 'made', rid: r.id, out: r.out[1], isNew, burn: wsExtra(cells, r), hero: h ? h.id : '', cells: put, seed: WS_SRV.seed(op) };
+    } else {
+      v.hints.forEach(x => { S.ws.part[x.r.id] = { pos: x.pos }; });
+      res = { op, kind: 'fail', burn: cells.map(c => [c.id, c.q]), hints: v.hints.map(x => ({ rid: x.r.id, fresh: x.fresh, all: x.all, first: x.first, n: x.pos.length })),
+        cells: put, seed: WS_SRV.seed(op) };
+    }
+    S.ws.seq++; V[op] = res;
+    return { res };
+  },
+  /* автодокрафт (§12.1) — одна операция с номером: сервер сам разворачивает цепочку по найденным рецептам, проверяет согласие на
+     невосполнимое, списывает и выдаёт. Ответ — как у attempt */
+  make(op, rid, n, ok) {
+    const V = S.ws.ops;
+    if (V[op]) return { again: true, res: V[op] };
     const r = BAG.recipe(rid);
     if (!r || r.team || !WS_SRV.isKnown(r)) return { refuse: 'unknown' };
     const p = wsPlan(r, n);
     if (p.owned) return { refuse: 'owned', p };
     if (!p.ok) return { refuse: p.stop.length ? 'stop' : 'lack', p };
     if (p.special.length && !ok) return { refuse: 'consent', p };
-    return { plan: p };
+    if (!p.spend.every(([id, q]) => BAG.has(id, q))) return { refuse: 'changed', p };
+    p.spend.forEach(([id, q]) => BAG.take(id, q));
+    p.extra.forEach(([id, q]) => wsGive(id, q));
+    wsGive(r.out[0], p.out);
+    BAG.learn(r.id);
+    const res = { op, kind: 'make', rid: r.id, n: p.n, out: p.out, steps: p.steps.length, spend: p.spend, hero: p.hero ? p.hero.id : '', seed: WS_SRV.seed(op) };
+    S.ws.seq++; V[op] = res;
+    return { res };
   },
 };
 const WS_REFUSE = {
@@ -100,15 +195,20 @@ const WS_REFUSE = {
   stop: 'Неизвестный этап: автодокрафт остановлен',
   lack: 'Не хватает ресурсов',
   consent: 'Без согласия особый ресурс не списывается',
+  changed: 'Запасы изменились — пересчитайте',
 };
 
 /* ================== помощники ================== */
 const wsEmpty = () => Array.from({ length: WS_DATA.cells }, () => null);
+const WS_SKIP_KEY = 'en-craft-skip';   // localStorage: «Пропустить анимацию» мастерской — свой выбор, не общий с сундуками и рулеткой
+const wsSkipSaved = () => { try { return localStorage.getItem(WS_SKIP_KEY) === '1'; } catch (_) { return false; } };
 function wsFresh() {
   const D = WS_DATA.demo, part = {};
   for (const [id, p] of Object.entries(D.part)) part[id] = { pos: p.pos.slice() };
-  return { cells: wsEmpty(), sel: 0, pick: '', view: 'table', inv: { cat: 'all', q: '' }, book: { tab: 'all', kind: '', fav: false, q: '' }, part, fav: D.fav.slice(), last: null };
+  return { cells: wsEmpty(), sel: 0, pick: '', view: 'table', inv: { cat: 'all', q: '' }, book: { tab: 'all', kind: '', fav: false, q: '' }, part, fav: D.fav.slice(), last: null,
+    ops: {}, seq: 1, fx: null, skip: wsSkipSaved() };
 }
+const wsOp = () => 'ws' + S.ws.seq;   // номер следующей операции: его несут кнопки «Попробовать», «Создать» и подтверждения
 const wsItemOrd = new Map(EN_RECIPES.items.map((it, i) => [it.id, i]));
 const wsGroupOf = it => Math.max(0, WS_DATA.groups.findIndex(g => g[2] && g[2].includes(it.tier)));
 const wsSpecial = id => { const it = BAG.item(id); return !!it && (WS_DATA.special.tiers.includes(it.tier) || WS_DATA.special.items.includes(id)); };
@@ -215,28 +315,18 @@ function wsTrail() {
   }
   return null;
 }
-/* попытка со стола: сервер решает, итог — в демо-состояние */
-function wsAttempt(consent) {
-  const cells = wsCells().map(c => ({ id: c.id, q: c.q }));
+/* попытка со стола: сервер решает и выдаёт одной операцией, затем анимация показывает итог. Повтор номера ничего не меняет */
+function wsAttempt(consent, op) {
+  const cells = S.ws.cells.map((c, i) => c && { id: c.id, q: c.q, pos: i }).filter(Boolean);
   if (!cells.length) return close();
-  if (!cells.every(c => BAG.has(c.id, c.q))) { S.overlay = null; return toast('Не хватает в запасах — поправьте стол'); }
-  if (!consent && cells.some(c => wsSpecial(c.id))) return toast(WS_REFUSE.consent);
-  const v = WS_SRV.check(cells);
-  if (v.refuse) { S.overlay = null; return toast(`${v.hero.n} уже в коллекции.${TM(' Что даёт повтор рецепта героя, не решено — заглушка прототипа')}`); }
-  const isNew = !!v.made && !WS_SRV.isKnown(v.made);
-  cells.forEach(c => BAG.take(c.id, c.q));   // со стола уходит всё: рецепт расходует своё, лишнее и неудача сгорают
-  S.ws.last = cells; S.ws.cells = wsEmpty(); S.ws.sel = 0;
-  if (v.made) {
-    const r = v.made, burn = wsExtra(cells, r), h = wsHero(r);
-    BAG.learn(r.id); delete S.ws.part[r.id];
-    wsGive(r.out[0], r.out[1]);
-    if (!isNew && !burn.length && !h) { S.overlay = null; return toast(`Создано: ${wsName(r.out[0])} ×${r.out[1]}`); }
-    S.overlay = { t: 'wsres', res: { kind: 'made', rid: r.id, out: r.out[1], isNew, burn, hero: h ? h.id : '' } };
-  } else {
-    v.hints.forEach(x => { S.ws.part[x.r.id] = { pos: x.pos }; });
-    S.overlay = { t: 'wsres', res: { kind: 'fail', burn: cells.map(c => [c.id, c.q]), hints: v.hints.map(x => ({ rid: x.r.id, fresh: x.fresh, all: x.all, first: x.first, n: x.pos.length })) } };
-  }
-  render(); focusOverlay();
+  const v = WS_SRV.attempt(op || wsOp(), cells, consent);
+  if (v.again) return;
+  if (v.refuse === 'lack') { S.overlay = null; return toast('Не хватает в запасах — поправьте стол'); }
+  if (v.refuse === 'consent') return toast(WS_REFUSE.consent);
+  if (v.refuse === 'owned') { S.overlay = null; return toast(`${v.hero.n} уже в коллекции.${TM(' Что даёт повтор рецепта героя, не решено — заглушка прототипа')}`); }
+  if (v.refuse) return;
+  S.ws.last = cells.map(c => ({ id: c.id, q: c.q })); S.ws.cells = wsEmpty(); S.ws.sel = 0;
+  wsFxStart(v.res);
 }
 
 /* ================== разметка ================== */
@@ -303,7 +393,7 @@ function wsFootHtml(g) {
   else if (g.st === 'known') st = g.owned ? `«${trEsc(g.r.n)}»: ${trEsc(wsHero(g.r).n)} уже в коллекции` : `Совпадает с рецептом «${trEsc(g.r.n)}»${g.extra.length ? ' · лишнее сгорит: ' + trEsc(wsNames(g.extra)) : ''}`;
   else { const t = wsTrail(); st = t ? `На столе все открытые позиции «${trEsc(t.r.n)}»: ${t.n} из ${t.r.in.length}. Остальное — угадать.` : 'Сочетание неизвестно. При неудаче сгорит всё положенное.'; }
   const go = any && !g.lack.length && !g.owned;
-  return `<div class="ws-foot"><p class="ws-st ${cls}" role="status">${st}</p><button class="btn ghost sm" data-a="wsclear"${any ? '' : ' disabled'}>Очистить</button><button class="btn go" data-a="wstry"${go ? '' : ' disabled'}>${g.st === 'known' ? 'Создать' : 'Попробовать'}</button></div>`;
+  return `<div class="ws-foot"><p class="ws-st ${cls}" role="status">${st}</p><button class="btn ghost sm" data-a="wsclear"${any ? '' : ' disabled'}>Очистить</button><button class="btn go" data-a="wstry" data-v="${wsOp()}"${go ? '' : ' disabled'}>${g.st === 'known' ? 'Создать' : 'Попробовать'}</button></div>`;
 }
 
 /* ================== книга рецептов (§12.4) ==================
@@ -354,6 +444,371 @@ function wsBookHtml() {
     <div class="ws-list scroll grow" data-keep="wsbook:${cur[0]}">${cur[2].map(wsRowHtml).join('') || empty}</div>`;
 }
 
+/* ================== анимация крафта: показ итога ==================
+   R — один показ: host — 'game' (окно поверх игры) или 'kit' (сцена раздела UI-кита); phase — 'anim' или 'res' (итог); tempo — full,
+   short или fail; cells — предметы на своих местах круга; T — моменты от начала, мс. Итог уже выдан сервером: показ его не меняет,
+   закрыть окно, пропустить анимацию или нажать на сцену — итог тот же.
+   Анимация — CSS по времени: задержки (--dt, --dp, --da) отсчитаны от начала показа минус прошедшее, поэтому перерисовка экрана посреди
+   анимации её не рвёт. Базовый стиль элемента — его конечное состояние; до своего момента элемент стоит в первом кадре. В итоге (res)
+   мимолётного — нитей, предметов, жара, дыма — в разметке нет, остальное стоит на местах без анимации */
+const wsReduced = () => { try { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (_) { return false; } };
+const wsFxSkipOn = () => !!(S.ws && S.ws.skip) || wsReduced();
+const wsNow = () => { try { return Math.round(performance.now()); } catch (_) { return 0; } };
+/* цвет редкости — из токенов --r1…--r7 (ADR-0027) */
+const wsColor = r => { try { return getComputedStyle(document.documentElement).getPropertyValue('--r' + r).trim() || EnFx.COL.gold; } catch (_) { return '#ddbc7a'; } };
+let wsFxSeq = 0;
+/* места предметов на круге: со стола — свои ячейки, у автодокрафта — ингредиенты рецепта симметрично, на всю серию */
+function wsFxCells(res, r) {
+  if (res.kind !== 'make') return (res.cells || []).filter(c => c[2] >= 0 && c[2] < WS_DATA.cells).map(([id, q, pos]) => ({ id, q, pos }));
+  const list = r ? r.in.slice(0, WS_DATA.cells) : [], at = WS_FX.spread[list.length - 1] || [];
+  return list.map(([id, q], i) => ({ id, q: q * (res.n || 1), pos: at[i] }));
+}
+function wsFxRun(res, host, o = {}) {
+  const r = res.rid ? BAG.recipe(res.rid) : null, out = r ? BAG.item(r.out[0]) : null, fail = res.kind === 'fail';
+  const hero = res.hero ? RSI[res.hero] || null : null, isNew = !fail && res.kind !== 'make' && !!res.isNew;
+  const R = { id: ++wsFxSeq, host, res, kind: res.kind, tempo: fail ? 'fail' : isNew ? 'full' : 'short', rec: r, out, hero, isNew,
+    r: fail ? 0 : Math.min(7, Math.max(1, o.r || (out ? out.r : 1))), q: fail ? 0 : res.out || 1, n: res.kind === 'make' ? res.n || 1 : 1,
+    cells: wsFxCells(res, r), trial: !!o.trial, phase: 'anim', t0: wsNow(), tr: null, timers: [] };
+  /* короткая без листа: известный рецепт со стола без лишнего, не герой — итог держится и окно закрывается само, строкой */
+  R.auto = !R.trial && res.kind === 'made' && !isNew && !(res.burn || []).length && !hero;
+  R.T = wsFxTimes(R);
+  if (fail) { R.cracks = wsCracks(res.seed || WS_SRV.seed(res.op || 'проба')); R.smoke = wsSmoke(R, res.seed || WS_SRV.seed(res.op || 'проба')); }
+  return R;
+}
+/* моменты показа от начала, мс: у каждого предмета свои — нить, втягивание или распад; дальше круг, жар, вспышка, итог */
+function wsFxTimes(R) {
+  const P = WS_FX[R.tempo], B = WS_FX.book, fail = R.kind === 'fail', T = { in: [], thr: [], pull: [], crumble: [] };
+  R.cells.forEach((c, i) => {
+    T.in.push(P.in + i * P.inStep); T.thr.push(P.thr + i * P.thrStep);
+    if (fail) T.crumble.push(P.crumble + i * P.crumbleStep); else T.pull.push(P.pull + i * P.pullStep);
+  });
+  if (fail) return Object.assign(T, { shiver: P.shiver, snap: P.snap, crack: P.crack, pane: P.end, end: P.end });
+  Object.assign(T, { tug: P.tug, ring: P.ring, heat: P.heat, flash: P.flash, rise: P.rise, pane: P.end, end: P.end, book: P.end });
+  if (R.isNew) T.end = P.end + B.end;
+  if (R.auto) T.close = P.end + P.auto;
+  return T;
+}
+/* трещины неудачи: от обода внутрь круга, ветвями с изломом. Рисунок — от сида операции: та же операция — те же трещины */
+const wsRad = a => a * Math.PI / 180;
+function wsCracks(seed) {
+  const G = WS_FX.geo, C = WS_FX.crack, rng = EB.makeRng(seed), c = G.circ / 2, lim = c - C.edge / 2, out = [];
+  const pick = ([a, b]) => a + rng(b - a + 1);
+  for (let k = 0; k < C.from; k++) {
+    const a0 = rng(360), sx = c + Math.round(Math.cos(wsRad(a0)) * (c - C.edge)), sy = c + Math.round(Math.sin(wsRad(a0)) * (c - C.edge)), nb = pick(C.branch);
+    for (let b = 0; b < nb; b++) {
+      let x = sx, y = sy, a = (a0 + 180 + rng(2 * C.fork + 1) - C.fork + 360) % 360;
+      const ns = pick(C.seg);
+      for (let j = 0; j < ns; j++) {
+        const l = pick(C.len), nx = x + Math.round(Math.cos(wsRad(a)) * l), ny = y + Math.round(Math.sin(wsRad(a)) * l);
+        if ((nx - c) * (nx - c) + (ny - c) * (ny - c) > lim * lim) break;
+        out.push({ x, y, a, l, j, k });
+        x = nx; y = ny; a = (a + rng(2 * C.bend + 1) - C.bend + 360) % 360;
+      }
+    }
+  }
+  return out;
+}
+/* дым неудачи: клубы у каждого сгоревшего места и в центре — место, снос, размер и разнобой от сида операции */
+function wsSmoke(R, seed) {
+  const G = WS_FX.geo, M = WS_FX.smoke, rng = EB.makeRng((seed ^ 0x534D4F4B) >>> 0), c = G.circ / 2, out = [];
+  const jit = v => rng(2 * v + 1) - v, size = () => M.size[0] + rng(M.size[1] - M.size[0] + 1);
+  R.cells.forEach((cell, i) => {
+    const [hx, hy] = G.hex[cell.pos];
+    for (let k = 0; k < M.perCell; k++) out.push({ x: c + hx + jit(M.spread), y: c + hy + jit(M.spread), sx: jit(M.drift), s: size(), t: R.T.crumble[i] + rng(M.lag) });
+  });
+  for (let k = 0; k < M.core; k++) out.push({ x: c + jit(M.spread), y: c + jit(M.spread), sx: jit(M.drift), s: size(), t: R.T.crack + rng(M.lag) });
+  return out;
+}
+/* круг Мастерской: обод, руны, шестиугольник мест, кольцо ядра. Руны — постоянный сид, круг всегда один и тот же */
+let wsRuneCache = '';
+function wsRuneSvg() {
+  if (wsRuneCache) return wsRuneCache;
+  const G = WS_FX.geo, c = G.circ / 2, rng = EB.makeRng(EB.seedOf('Мастерская форм · круг')), step = Math.floor(360 / G.runes);
+  const P = [[-3, -6], [3, -6], [-3, 0], [3, 0], [-3, 6], [3, 6], [0, -6], [0, 6]];   // узлы знака
+  let g = '';
+  for (let k = 0; k < G.runes; k++) {
+    let d = 'M0 -6V6';
+    for (let s = 1 + rng(2); s > 0; s--) { const a = P[rng(P.length)], b = P[rng(P.length)]; if (a !== b) d += `M${a[0]} ${a[1]}L${b[0]} ${b[1]}`; }
+    g += `<path transform="rotate(${k * step} ${c} ${c}) translate(${c} ${c - G.runeR})" d="${d}"/>`;
+  }
+  const hex = G.hex.map(([x, y], i) => `${i ? 'L' : 'M'}${c + x} ${c + y}`).join('') + 'Z', [r1, r2, r3] = G.rim;
+  wsRuneCache = `<svg viewBox="0 0 ${G.circ} ${G.circ}" aria-hidden="true" focusable="false"><circle cx="${c}" cy="${c}" r="${r1}"/><circle class="d" cx="${c}" cy="${c}" r="${r2}"/><path class="h" d="${hex}"/><circle cx="${c}" cy="${c}" r="${r3}"/><g class="g">${g}</g></svg>`;
+  return wsRuneCache;
+}
+const wsSty = list => { const s = list.filter(Boolean).join(';'); return s ? ` style="${s}"` : ''; };
+/* круг сцены. e — мс от начала показа: все задержки — момент минус e */
+function wsFxCircleHtml(R, e) {
+  const G = WS_FX.geo, T = R.T, P = WS_FX[R.tempo], anim = R.phase === 'anim', fail = R.kind === 'fail', c = G.circ / 2;
+  const d = t => `${Math.round(t - e)}ms`, h = [];
+  /* кольцо рун: медленный ход всегда; удача — рывок и вспышка свечения в цвете редкости; неудача — свечение мерцает, круг вздрагивает и тускнеет */
+  const sg = anim ? (fail ? ['ws-fx-sg ws-qk', wsSty([`--dt:${d(T.crack)}`])] : ['ws-fx-sg ws-up', wsSty([`--dt:${d(T.ring)}`, `--tt:${P.ringDur}ms`])]) : ['ws-fx-sg' + (fail ? '' : ' ws-up'), ''];
+  const rs = fail && anim ? ` class="ws-fx-rs ws-dim"${wsSty([`--dt:${d(T.crack)}`])}` : ` class="ws-fx-rs${fail ? ' ws-dim' : ''}"`;
+  const gl = anim ? (fail ? ` class="ws-fx-rgl ws-fk"${wsSty([`--dt:${d(T.snap - WS_FX.fail.snapDur)}`, `--tt:${WS_FX.fail.snapDur * 2}ms`])}` : ` class="ws-fx-rgl ws-fl"${wsSty([`--dt:${d(T.ring)}`, `--tt:${P.ringDur}ms`])}`)
+    : ` class="ws-fx-rgl${fail ? ' ws-fk' : ' ws-fl'}"`;
+  h.push('<i class="ws-fx-disc"></i>');
+  h.push(`<div class="ws-fx-spin"><div class="${sg[0]}"${sg[1]}><span${rs}>${wsRuneSvg()}</span><span${gl}>${wsRuneSvg()}</span></div></div>`);
+  /* удача: ореол и лучи за итогом — с его подъёма */
+  if (!fail) {
+    const up = anim ? wsSty([`--dt:${d(T.rise)}`]) : '';
+    h.push(`<div class="ws-fx-halo${anim ? ' ws-in' : ''}"${up}><i></i></div>`);
+    if (WS_FX.rays[R.r - 1]) h.push(`<div class="ws-fx-ry${anim ? ' ws-in' : ''}"${up}><i></i></div>`);
+  }
+  /* неудача: трещины от обода к центру; в итоге — нарисованы */
+  if (fail) {
+    const cs = (R.cracks || []).map(s => `<i class="ws-fx-ck" style="left:${s.x}px;top:${s.y}px;width:${s.l}px;transform:rotate(${s.a}deg)"><i${anim ? wsSty([`--dt:${d(T.crack + (s.j + s.k * 2) * P.crackStep)}`]) : ''}></i></i>`).join('');
+    h.push(`<div class="ws-fx-cks"${anim ? wsSty([`--tt:${P.crackDur}ms`]) : ''}>${cs}</div>`);
+  }
+  /* нити: от места к центру. Удача — стягиваются к центру вместе с предметом; неудача — рвутся посередине, половины хлещут назад */
+  if (anim) R.cells.forEach((cell, i) => {
+    const [hx, hy] = G.hex[cell.pos], len = Math.round(Math.sqrt(hx * hx + hy * hy));
+    const draw = wsSty([`--dt:${d(T.thr[i])}`, `--tt:${P.thrDur}ms`]);
+    const inner = fail
+      ? `<i class="ws-fx-t1"${wsSty([`--dt:${d(T.snap)}`, `--tt:${P.snapDur}ms`, `--dk:${d(T.shiver)}`])}></i><i class="ws-fx-t2"${wsSty([`--dt:${d(T.snap)}`, `--tt:${P.snapDur}ms`, `--dk:${d(T.shiver)}`])}></i><i class="ws-fx-tk"></i>`
+      : `<i class="ws-fx-tb"${wsSty([`--dt:${d(T.pull[i])}`, `--tt:${P.pullDur}ms`])}></i>`;
+    h.push(`<i class="ws-fx-th" data-i="${i}" style="left:${c + hx}px;top:${c + hy}px;width:${len}px;transform:rotate(${G.ang[cell.pos]}deg)"><i class="ws-fx-ta"${draw}>${inner}</i></i>`);
+  });
+  /* ядро: «?» попытки или значок известного итога; удача — сгорает во вспышке, неудача — тускнеет с трещиной */
+  const coreIn = R.tempo === 'short' && R.out ? trIcon(R.out) : '<b>?</b>';
+  if (fail) h.push(`<div class="ws-fx-core ws-dm"${anim ? wsSty([`--dt:${d(T.crack)}`]) : ''}>${coreIn}<i class="ws-fx-cx">${ic('crack')}</i></div>`);
+  else if (anim) h.push(`<div class="ws-fx-core ws-go"${wsSty([`--dt:${d(T.flash)}`])}${R.tempo === 'short' && R.out ? ` data-r="${R.out.r}"` : ''}>${coreIn}</div>`);
+  /* удача: раскалённое ядро растёт; у серии — удары по числу созданий; во вспышке жар гаснет */
+  if (!fail && anim) {
+    const pulses = R.n > 1 ? Math.min(R.n, WS_FX.short.pulses) : 0;
+    const b = pulses ? `<b class="ws-fx-thump"${wsSty([`--dt:${d(T.heat)}`, `--n:${pulses}`, `--tp:${WS_FX.short.pulse}ms`])}></b>` : '<b></b>';
+    h.push(`<div class="ws-fx-heat"${wsSty([`--dt:${d(T.heat)}`, `--tt:${P.heatDur}ms`])}><i${wsSty([`--dt:${d(T.flash)}`])}>${b}</i></div>`);
+    h.push(`<i class="ws-fx-fl"${wsSty([`--dt:${d(T.flash)}`, `--tt:${P.flashDur}ms`, `--fs:${WS_FX.flashScale[R.r - 1]}`])}></i>`);
+  }
+  /* итог поднимается из центра в свете своей редкости: колодец предмета или лицо героя */
+  if (!fail) {
+    const [cw, ch] = R.hero ? G.card : [G.res, G.res], up = anim ? [`--dt:${d(T.rise)}`, `--tt:${P.riseDur}ms`] : [];
+    const body = R.hero ? `<span class="ws-fx-hero" data-r="${R.r}">${rsFace(R.hero)}</span>`
+      : R.out ? wsWell(R.out, { stat: true, size: G.res, q: R.q > 1 ? '×' + fmt(R.q) : null }) : '';
+    h.push(`<div class="ws-fx-res${anim ? ' ws-in' : ''}" data-r="${R.r}"${wsSty([`width:${cw}px`, `height:${ch}px`, `margin:${-ch / 2}px 0 0 ${-cw / 2}px`].concat(up))}>${body}</div>`);
+  }
+  /* предметы на своих местах: появляются; удача — вздрагивают к центру и втягиваются; неудача — дрожат, покрываются пеплом и осыпаются */
+  if (anim) R.cells.forEach((cell, i) => {
+    const it = BAG.item(cell.id); if (!it) return;
+    const [hx, hy] = G.hex[cell.pos], half = G.cell / 2;
+    const ip = fail ? ['ws-fx-ip ws-dn', [`--dt:${d(T.crumble[i])}`, `--tt:${P.crumbleDur}ms`]] : ['ws-fx-ip ws-pl', [`--dt:${d(T.pull[i])}`, `--tt:${P.pullDur}ms`]];
+    const iq = fail ? ['ws-fx-iq ws-sv', [`--dt:${d(T.shiver)}`, `--tt:${P.shiverDur}ms`]] : P.tugDur ? ['ws-fx-iq ws-tg', [`--dt:${d(T.tug)}`, `--tt:${P.tugDur}ms`]] : ['ws-fx-iq', []];
+    const ash = fail ? `<i class="ws-fx-ash"${wsSty([`--dt:${d(T.crumble[i])}`])}></i>` : '';
+    h.push(`<div class="ws-fx-it" data-i="${i}" style="left:${c + hx - half}px;top:${c + hy - half}px;width:${G.cell}px;height:${G.cell}px;--dt:${d(T.in[i])}"><div class="${ip[0]}" style="--tx:${-hx}px;--ty:${-hy}px;${ip[1].join(';')}"><div class="${iq[0]}"${wsSty(iq[1])}>${wsWell(it, { stat: true, q: cell.q, size: G.cell })}${ash}</div></div></div>`);
+  });
+  /* неудача: дым от сгоревшего и из центра */
+  if (fail && anim) h.push((R.smoke || []).map(s => `<i class="ws-fx-sm" style="left:${s.x}px;top:${s.y}px;--sx:${s.sx}px;--sz:${s.s};--dt:${d(s.t)};--tt:${P.smokeDur}ms"></i>`).join(''));
+  h.push('<i class="ws-fx-mid"></i>');
+  return `<div class="ws-fx-c" style="width:${G.circ}px;height:${G.circ}px;margin:${-c}px 0 0 ${-c}px"><div class="ws-fx-sc">${h.join('')}</div></div>`;
+}
+/* книга рецептов в листе итога: раскрывается, листы, свет снизу вверх, чернила пишут имя рецепта по букве */
+function wsFxBookHtml(R, e) {
+  const B = WS_FX.book, T = R.T, anim = R.phase === 'anim', d = t => `${Math.round(t - e)}ms`, at = t => (anim ? wsSty([`--dt:${d(T.book + t)}`]) : '');
+  const flips = Array.from({ length: B.flip }, (_, k) => `<i class="ws-fx-pf"${anim ? wsSty([`--dt:${d(T.book + B.flipAt + k * B.flipStep)}`, `--tt:${B.flipDur}ms`]) : ''}></i>`).join('');
+  const name = R.rec ? R.rec.n : R.out ? R.out.n : '';
+  const ink = [...name].map((ch, k) => `<span${anim ? wsSty([`--dt:${d(T.book + B.ink + k * B.inkStep)}`]) : ''}>${ch === ' ' ? ' ' : trEsc(ch)}</span>`).join('');
+  return `<div class="ws-fx-bk"><i class="ws-fx-bl"${anim ? wsSty([`--dt:${d(T.book + B.light)}`, `--tt:${B.lightDur}ms`]) : ''}></i>
+    <div class="ws-fx-bb"${at(0)}><i class="ws-fx-pgl"${at(0)}></i><i class="ws-fx-pgr"></i>${flips}</div>
+    <b class="ws-fx-ink" aria-label="${trEsc(name)}">${ink}</b></div>`;
+}
+/* строка предметов итога: колодцы с количеством, имя — в подсказке */
+const wsFxWells = list => `<div class="ws-fx-ws">${(list || []).map(([id, q]) => { const it = BAG.item(id); return it ? wsWell(it, { stat: true, q, size: 34 }) : ''; }).join('')}</div>`;
+function wsFxHints(list) {
+  return (list || []).map(x => {
+    const r = BAG.recipe(x.rid); if (!r) return '';
+    const txt = x.all ? 'все ресурсы верны, количество — нет: рецепт открыт без количеств'
+      : x.first ? `появился в книге: верно ${x.n} из ${r.in.length}` : `открыта позиция «${trEsc(x.fresh.map(wsName).join('», «'))}»: верно ${x.n} из ${r.in.length}`;
+    return `<div class="ws-hint">${ic('eye')}<span><b>«${trEsc(r.n)}»</b> — ${txt}</span></div>`;
+  }).join('');
+}
+/* лист итога справа от круга: одна мысль — что вышло; что сгорело и подсказка — если положена по §12; одно главное действие */
+function wsFxPaneHtml(R, e) {
+  const res = R.res, anim = R.phase === 'anim', rows = [], acts = [], game = !R.trial;
+  let eb, nm, q = '';
+  if (R.kind === 'fail') {
+    eb = 'Попытка'; nm = 'Не вышло';
+    rows.push(`<div class="ws-fx-row"><span class="ws-fx-sub">Сгорело всё положенное</span>${wsFxWells(res.burn)}</div>`);
+    const hints = wsFxHints(res.hints);
+    if (hints) rows.push(hints);
+    if (game && wsCanRepeat()) acts.push('<button class="btn sm ghost" data-a="wsrepeat">Повторить набор</button>');
+    if (game && hints) acts.push('<button class="btn sm" data-a="wshints">К подсказкам</button>');
+  } else {
+    const out = R.out;
+    nm = trEsc(out ? out.n : '—');
+    if (!R.hero && (R.q > 1 || R.kind === 'make')) q = `<b class="ws-fx-q num">×${fmt(R.q)}</b>`;
+    if (R.kind === 'make') {
+      eb = `Автодокрафт${res.steps ? ' · этапов ' + res.steps : ''}`;
+      if ((res.spend || []).length) rows.push(`<details class="ws-fx-det"><summary>Списано · ${fmt(res.spend.length)} ${plural(res.spend.length, 'вид', 'вида', 'видов')}</summary>${wsFxWells(res.spend)}</details>`);
+    } else if (R.isNew) {
+      eb = 'Новая запись в книге';
+      rows.push(`<p class="ws-fx-line">Новый рецепт: дальше его можно создать из книги, со всей цепочкой.</p>`);
+    } else eb = out ? wsTier(out) : '';
+    if (R.hero) rows.push(`<p class="ws-fx-line">${trEsc(R.hero.n)} в коллекции: 0 ур. · 0 РП · 0 Добл.</p>`);
+    if ((res.burn || []).length) rows.push(`<div class="ws-fx-row"><span class="ws-fx-sub">Лишнее сгорело</span>${wsFxWells(res.burn)}</div>`);
+    if (game && R.hero) acts.push(`<button class="link" data-a="rhero" data-v="${R.hero.id}">${ic('users')}Карточка героя</button>`);
+    if (game && R.isNew && R.rec) acts.push(`<button class="btn sm ghost" data-a="wsbookgo" data-v="${R.rec.id}">${ic('book')}В книгу</button>`);
+    else if (game && R.kind === 'made' && wsCanRepeat()) acts.push('<button class="btn sm ghost" data-a="wsrepeat">Повторить набор</button>');
+  }
+  acts.push(`<button class="btn go ws-fx-main" data-a="close">${R.trial ? 'Закрыть' : 'Готово'}</button>`);
+  const note = TM(R.trial ? 'Проба — не выдача: запасы и книга не меняются. Итог — тот же показ, что в мастерской.'
+    : `Итог выдан до анимации одной операцией ${trEsc(res.op || '')}: сервер проверил стол, списал и выдал. Анимация только показывает — пропуск и закрытие итог не меняют, повтор номера ничего не делает. Числа вида — WS_FX.`, 'p', 'reason');
+  return `<section class="ws-fx-pn" aria-label="Итог"${anim ? ' inert' : ''}>${R.isNew ? wsFxBookHtml(R, e) : ''}
+    <div class="ws-fx-ph"><span class="ws-fx-eb">${eb}</span><div class="ws-fx-tl"><h3 class="ws-fx-nm">${nm}</h3>${q}</div></div>
+    ${rows.length || note ? `<div class="ws-fx-pb">${rows.join('')}${note}</div>` : ''}<div class="ws-fx-acts">${acts.join('')}</div></section>`;
+}
+/* шапка окна: что идёт, маленькое окно с галочкой «Пропустить анимацию» и крестик */
+function wsFxTopHtml(R) {
+  const red = wsReduced(), lbl = R.kind === 'make' ? `Автодокрафт${R.n > 1 ? ' ×' + fmt(R.n) : ''}` : R.tempo === 'short' ? 'Мастерская' : 'Попытка';
+  return `<div class="ws-fx-top"><span class="ws-fx-eb">${R.trial ? 'Проба · ' : ''}${lbl}</span>
+    <label class="ws-skip"${red ? ' title="В системе включено «меньше движения»"' : ''}><input type="checkbox" data-a="wsfxskip"${wsFxSkipOn() ? ' checked' : ''}${red ? ' disabled' : ''}><span>Пропустить анимацию</span></label>
+    <button class="iconbtn x ws-fx-x" data-a="close" aria-label="Закрыть">${ic('x')}</button></div>`;
+}
+/* сцена целиком. e — мс от начала показа */
+function wsFxStageHtml(R, e) {
+  e = Math.max(0, Math.round(e || 0));
+  const T = R.T, anim = R.phase === 'anim', tr = (R.tr == null ? R.t0 : R.tr) - R.t0, G = WS_FX.geo;
+  const dp = (anim ? T.pane : Math.min(T.pane, tr)) - e, da = (anim ? T.end : Math.min(T.end, tr)) - e;
+  const vars = [`--d0:${-e}ms`, `--dp:${dp}ms`, `--da:${da}ms`, `--tsh:${WS_FX.shiftDur}ms`, `--tpn:${WS_FX.pane}ms`, `--shift:${-G.shift}px`, `--pw:${G.pane}px`, `--px:${G.paneX}px`, `--top:${G.top}px`];
+  if (R.r) vars.push(`--ha:${WS_FX.halo[R.r - 1]}`, `--ra:${WS_FX.rays[R.r - 1]}`, `--sf:${WS_FX.sflash[R.r - 1]}`);
+  if (R.auto && anim) vars.push(`--dx:${T.close - WS_FX.fade - e}ms`, `--tfd:${WS_FX.fade}ms`);
+  const cls = ['ws-fx', { full: 'ws-fx-full', short: 'ws-fx-short', fail: 'ws-fx-fail' }[R.tempo], anim ? 'ws-fx-anim' : 'ws-fx-done', R.auto ? 'ws-fx-auto' : '', R.isNew ? 'ws-fx-new' : ''].filter(Boolean).join(' ');
+  const sfl = anim && R.kind !== 'fail' && WS_FX.sflash[R.r - 1] ? `<i class="ws-fx-sfl"${wsSty([`--dt:${Math.round(T.flash - e)}ms`, `--tt:${WS_FX[R.tempo].flashDur}ms`])}></i>` : '';
+  return `<div class="${cls}" data-k="${R.kind}" data-wsrun="${R.id}"${R.r ? ` data-r="${R.r}"` : ''} style="${vars.join(';')}">
+    <div class="ws-fx-bg"></div>${sfl}${wsFxCircleHtml(R, e)}${R.auto ? '' : wsFxPaneHtml(R, e)}
+    ${anim ? '<button class="ws-fx-tap" data-a="wsfxreveal" aria-label="Сразу к итогу" tabindex="-1"></button>' : ''}${wsFxTopHtml(R)}</div>`;
+}
+
+/* ================== показ: запуск, таймеры, итог ================== */
+const wsFxCur = host => host === 'kit' ? WS_KIT.run : S.ws ? S.ws.fx : null;
+const wsFxLive = R => !!R && R.phase === 'anim' && wsFxCur(R.host) === R;
+const wsFxOn = R => !!R && wsFxCur(R.host) === R;
+function wsFxStop(R) { if (!R) return; for (const t of R.timers) clearTimeout(t); R.timers = []; }
+function wsFxPaint(R) { if (R.host === 'kit') wsKitPaint(); else render(); }
+/* итог сервера → показ в окне поверх игры. При «Пропустить анимацию» и «меньше движения» — сразу итог, короткая без листа — строкой */
+function wsFxStart(res) {
+  wsClamp();
+  wsFxStop(S.ws.fx);
+  const R = wsFxRun(res, 'game');
+  S.ws.fx = R; S.overlay = { t: 'wsres', res };
+  if (wsFxSkipOn()) {
+    if (R.auto) { S.ws.fx = null; S.overlay = null; return toast(wsFxSay(R)); }
+    R.phase = 'res'; R.tr = R.t0;
+  } else wsFxSchedule(R);
+  render();
+  if (R.phase === 'res') wsFxFocus(R); else focusOverlay();
+}
+/* таймеры одного показа: частицы вспышки, огоньки, разрыв нитей, пепел, итог. Каждый проверяет, что показ ещё идёт */
+function wsFxSchedule(R) {
+  const T = R.T, P = WS_FX[R.tempo], at = (ms, f) => { R.timers.push(setTimeout(() => { if (wsFxLive(R)) { try { f(); } catch (_) { } } }, Math.max(0, ms))); };
+  if (R.kind === 'fail') {
+    at(T.snap, () => wsBurstSnap(R));
+    R.cells.forEach((c, i) => at(T.crumble[i], () => wsBurstAsh(R, i)));
+  } else {
+    at(T.flash, () => wsBurstFlash(R));
+    at(T.rise + P.riseDur, () => wsBurstMotes(R));
+    if (R.isNew) at(T.book + WS_FX.book.light, () => wsBurstBook(R));
+  }
+  if (R.auto) at(T.close, () => wsFxDone(R)); else at(T.end, () => wsFxReveal(R));
+}
+function wsFxFocus(R) {
+  if (R.host !== 'game') return;
+  try { requestAnimationFrame(() => { const b = document.querySelector('#game .ws-fx-pn .ws-fx-main'); if (b) b.focus({ preventScroll: true }); }); } catch (_) { }
+}
+/* итог: после анимации, по нажатию на сцену, галочкой посреди анимации. Короткая без листа — закрывается строкой */
+function wsFxReveal(R) {
+  if (!wsFxLive(R)) return;
+  if (R.auto) return wsFxDone(R);
+  wsFxStop(R); R.phase = 'res'; R.tr = wsNow();
+  wsFxPaint(R); wsFxFocus(R);
+}
+const wsFxSay = R => R.kind === 'fail' ? 'Не вышло — всё положенное сгорело' : `Создано: ${R.out ? R.out.n : '—'} ×${fmt(R.q)} — в запасах`;
+function wsFxDone(R) {
+  wsFxStop(R);
+  if (R.host === 'kit') { WS_KIT.run = null; wsKitPaint(); return; }
+  if (S.ws.fx === R) S.ws.fx = null;
+  if (S.overlay && S.overlay.t === 'wsres' && S.overlay.res === R.res) S.overlay = null;
+  toast(wsFxSay(R));
+}
+/* после каждой перерисовки: окно закрыли — показ остановлен; закрыли посреди анимации — итог приходит строкой */
+function wsFxSync() {
+  const R = S.ws && S.ws.fx; if (!R) return;
+  if (S.overlay && S.overlay.t === 'wsres' && S.overlay.res === R.res) return;
+  wsFxStop(R); S.ws.fx = null;
+  if (R.phase === 'anim') setTimeout(() => toast(wsFxSay(R)), 0);
+}
+window.addEventListener('en-render', wsFxSync);
+/* «Пропустить анимацию»: выбор помнит localStorage, без него всё работает; галочка посреди анимации — итог сразу */
+function wsFxSetSkip(on, host) {
+  S.ws.skip = !!on;
+  try { localStorage.setItem(WS_SKIP_KEY, S.ws.skip ? '1' : '0'); } catch (_) { }
+  const R = wsFxCur(host);
+  if (S.ws.skip && wsFxLive(R)) { if (R.host === 'kit' && R.auto) return wsFxDone(R); return wsFxReveal(R); }
+  if (host === 'kit') wsKitPaint(); else render();
+}
+/* показ для overlay: текущий или — если окно открыто без показа — итог без анимации, один на это окно */
+function wsFxFor(o) {
+  const cur = S.ws.fx;
+  if (cur && cur.res === o.res) return cur;
+  if (!o.res || !o.res.kind) return null;
+  const R = wsFxRun(o.res, 'game'); R.phase = 'res'; R.tr = R.t0; R.auto = false;
+  S.ws.fx = R;
+  return R;
+}
+
+/* ================== частицы: слой рядом с #game — перерисовка экрана его не сносит; у UI-кита — свой слой в сцене ================== */
+const WS_FXI = { game: null, kit: null };
+function wsFxLayer(host) {
+  if (host === 'kit') { const k = document.getElementById('wsKit'); return k && k.querySelector ? k.querySelector(':scope > .ws-fxl') : null; }
+  const g = document.getElementById('game'), p = g && g.parentElement;
+  if (!p || !p.querySelector) return null;
+  let L = p.querySelector(':scope > .ws-fxl');
+  if (!L) { L = document.createElement('div'); L.className = 'ws-fxl'; L.setAttribute('aria-hidden', 'true'); p.appendChild(L); }
+  return L;
+}
+function wsFxI(host) {
+  if (!window.EnFx) return null;
+  const L = wsFxLayer(host); if (!L) return null;
+  let I = WS_FXI[host];
+  if (!I || I.host !== L) { if (I) I.destroy(); I = WS_FXI[host] = EnFx.create(L); }
+  return I;
+}
+const wsFxEl = (R, sel) => { const root = document.getElementById(R.host === 'kit' ? 'wsKit' : 'game'); return root && root.querySelector ? root.querySelector(`[data-wsrun="${R.id}"] ${sel}`) : null; };
+const wsCut = (a, k) => a ? [Math.max(1, Math.floor(a[0] * k / 100))].concat(a.slice(1)) : a;
+/* вспышка удачи: искры цвета редкости, полосы света, с эпической — золото, с древней — кольца и лёгкая дрожь; короткая — меньше и без дрожи */
+function wsBurstFlash(R) {
+  const fx = wsFxI(R.host), el = wsFxEl(R, '.ws-fx-mid'); if (!fx || !el) return;
+  const F = WS_FX.fx, P = F.flash[R.r - 1] || F.flash[0], k = R.tempo === 'short' ? F.shortPct : 100, C = EnFx.COL, b = fx.center(el), col = wsColor(R.r);
+  fx.burst(b.x, b.y, col, ...wsCut(P.sparks, k));
+  fx.burst(b.x, b.y, C.steel, ...wsCut(P.streaks, k), { shape: 'streak', w: 1.4 });
+  if (P.gold) fx.burst(b.x, b.y, C.gold, ...wsCut(P.gold, k));
+  const rad = WS_FX.geo.circ / 2;
+  for (const [pr, ms, th, dl] of P.rings || []) setTimeout(() => { if (wsFxOn(R)) fx.ring(b.x, b.y, col, Math.floor(rad * pr / 100), ms, th); }, dl);
+  if (P.shake && R.tempo !== 'short') fx.shake(...P.shake);
+}
+/* итог поднялся: огоньки его редкости и золото медленно всплывают */
+function wsBurstMotes(R) {
+  const fx = wsFxI(R.host), el = wsFxEl(R, '.ws-fx-mid'), P = WS_FX.fx.flash[R.r - 1]; if (!fx || !el || !P || !P.motes) return;
+  const [n, step, k, sp, life, size, up] = P.motes, b = fx.center(el), col = wsColor(R.r), C = EnFx.COL;
+  for (let i = 0; i < n; i++) setTimeout(() => { if (wsFxOn(R)) fx.burst(b.x, b.y, i % 2 ? C.gold : col, k, sp, life, size, { ay: -up, drag: 1, fade: 'in' }); }, i * step);
+}
+/* нити рвутся: искры в месте разрыва */
+function wsBurstSnap(R) {
+  const fx = wsFxI(R.host); if (!fx) return;
+  const F = WS_FX.fx;
+  R.cells.forEach((c, i) => { const el = wsFxEl(R, `.ws-fx-th[data-i="${i}"] .ws-fx-tk`); if (el) { const b = fx.center(el); fx.burst(b.x, b.y, F.failCol, ...F.snap, { shape: 'streak', w: 1.1 }); } });
+}
+/* предмет сгорел: пепел осыпается, угольки гаснут вверх */
+function wsBurstAsh(R, i) {
+  const fx = wsFxI(R.host), el = wsFxEl(R, `.ws-fx-it[data-i="${i}"]`); if (!fx || !el) return;
+  const F = WS_FX.fx, b = fx.center(el);
+  fx.burst(b.x, b.y, F.ashCol[i % F.ashCol.length], ...F.ash, { shape: 'shard', blend: 'normal', vr: 5, ay: F.ay, rot: 0 });
+  fx.burst(b.x, b.y, F.failCol, ...F.ember, { ay: -Math.floor(F.ay / 3), fade: 'in' });
+}
+/* новая запись: над книгой всплывают золотые огоньки */
+function wsBurstBook(R) {
+  const fx = wsFxI(R.host), el = wsFxEl(R, '.ws-fx-bb'); if (!fx || !el) return;
+  const [n, step, k, sp, life, size, up] = WS_FX.fx.book, b = fx.center(el), C = EnFx.COL;
+  for (let i = 0; i < n; i++) setTimeout(() => { if (wsFxOn(R)) fx.burst(b.x, b.y, i % 2 ? C.gold : C.steel, k, sp, life, size, { ay: -up, drag: 1, fade: 'in' }); }, i * step);
+}
+
 /* ================== листы поверх ================== */
 Object.assign(OV, {
   /* сведения о ресурсе: ярус, загадка-подсказка к рецептам (§12), запасы, найденные рецепты. Будущий биом и босс не раскрываются (§12.5) */
@@ -371,7 +826,7 @@ Object.assign(OV, {
     </div>`;
     return sheet('Сведения', body, `<button class="btn go" data-a="wsput" data-v="${it.id}"${wsCellMax(it.id) ? '' : ' disabled'}>${ic('plus')}На стол</button>`);
   },
-  /* подтверждение попытки: со стола уйдёт всё; особый ресурс — только с согласия */
+  /* подтверждение попытки: со стола уйдёт всё; особый ресурс — только с согласия. Номер операции несёт кнопка */
   wstry(o) {
     const cells = wsCells(), g = wsGuess(), sp = g.special;
     const guess = g.st === 'known'
@@ -380,7 +835,7 @@ Object.assign(OV, {
     const cert = sp.length ? `<label class="cert"><input type="checkbox" data-a="wsok"${o.ok ? ' checked' : ''}><span><b>Разрешить расход: ${trEsc(wsNames(sp.map(c => [c.id, c.q])))}</b><small>Особый ресурс не восполнить. Без согласия он не списывается.</small></span></label>` : '';
     const body = `<div class="ws-o"><span class="eyebrow">Со стола уйдёт всё</span>${wsList(cells.map(c => [c.id, c.q]))}${guess}${cert}</div>`;
     const ok = g.st === 'known' ? 'Создать' : 'Попробовать';
-    return dialog(g.st === 'known' ? 'Создать со стола' : 'Попробовать сочетание', body, `<button class="btn ghost" data-a="close">Отмена</button><button class="btn go" data-a="wstrydo"${sp.length && !o.ok ? ' disabled' : ''}>${ok}</button>`);
+    return dialog(g.st === 'known' ? 'Создать со стола' : 'Попробовать сочетание', body, `<button class="btn ghost" data-a="close">Отмена</button><button class="btn go" data-a="wstrydo" data-v="${o.op || ''}"${sp.length && !o.ok ? ' disabled' : ''}>${ok}</button>`);
   },
   /* автодокрафт: количество, этапы по найденным рецептам, суммарный расход, согласие на невосполнимое (§12.1, §12.4) */
   wsmake(o) {
@@ -403,31 +858,13 @@ Object.assign(OV, {
     const can = p.ok && !p.owned && (!p.special.length || !!o.ok);
     const body = `<div class="ws-o">${top}<span class="eyebrow">Этапы · по найденным рецептам</span><ol class="ws-steps">${stages}</ol>
       <span class="eyebrow">Суммарный расход</span>${p.spend.length ? `<div class="ws-sum">${p.spend.map(wsNeedHtml).join('')}</div>` : '<p class="faint" style="font-size:12.5px">Из запасов — ничего.</p>'}${extra}${warn.join('')}${cert}</div>`;
-    return dialog('Создать · ' + trEsc(r.n), body, `<button class="btn ghost" data-a="close">Отмена</button><button class="btn go" data-a="wsmakedo"${can ? '' : ' disabled'}>Создать${n > 1 ? ' ×' + n : ''}</button>`, 'wide');
+    return dialog('Создать · ' + trEsc(r.n), body, `<button class="btn ghost" data-a="close">Отмена</button><button class="btn go" data-a="wsmakedo" data-v="${o.op || ''}"${can ? '' : ' disabled'}>Создать${n > 1 ? ' ×' + n : ''}</button>`, 'wide');
   },
-  /* итог операции: создано, новый рецепт, герой в коллекции; неудача — что сгорело и какие подсказки открылись */
+  /* итог операции — окно анимации: удача, новая запись, неудача, автодокрафт; после анимации — лист итога справа от круга */
   wsres(o) {
-    const x = o.res || {};
-    if (x.kind === 'fail') {
-      const hints = (x.hints || []).map(h => {
-        const r = BAG.recipe(h.rid); if (!r) return '';
-        const txt = h.all ? 'все ресурсы верны, количество — нет: рецепт открыт без количеств'
-          : h.first ? `появился в книге: верно ${h.n} из ${r.in.length}` : `открыта позиция «${trEsc(h.fresh.map(wsName).join('», «'))}»: верно ${h.n} из ${r.in.length}`;
-        return `<div class="ws-hint">${ic('eye')}<span><b>«${trEsc(r.n)}»</b> — ${txt}</span></div>`;
-      }).join('');
-      const body = `<div class="ws-o"><p class="muted" style="font-size:14px">Сочетание не сработало — всё положенное сгорело.</p>${wsList(x.burn || [])}
-        ${hints ? '<span class="eyebrow">Подсказки</span>' + hints : `<p class="reason">Подсказки нет. Она бывает у рецептов от ${WS_DATA.hintFrom} ингредиентов, когда все положенные ресурсы верны и их не меньше ${WS_DATA.hintMin}.</p>`}</div>`;
-      return dialog('Неудача', body, `${wsCanRepeat() ? '<button class="btn ghost" data-a="wsrepeat">Повторить набор</button>' : ''}${hints ? '<button class="btn" data-a="wshints">К подсказкам</button>' : ''}<button class="btn go" data-a="close">Готово</button>`);
-    }
-    const r = BAG.recipe(x.rid), out = r ? BAG.item(r.out[0]) : null; if (!out) return '';
-    const h = x.hero ? RSI[x.hero] : null, lines = [];
-    if (x.isNew) lines.push(`<p class="reason">Рецепт «${trEsc(r.n)}» теперь в книге: оттуда его можно создать сразу, с разворотом цепочки.</p>`);
-    if (h) lines.push(`<p class="muted" style="font-size:14px">${trEsc(h.n)} в коллекции: 0 ур. · 0 РП · 0 Добл.</p>`);
-    if (x.kind === 'make') lines.push(`<span class="eyebrow">Списано${x.steps ? ' · этапов ' + x.steps : ''}</span>${wsList(x.spend || [])}`);
-    if (x.burn && x.burn.length) lines.push(`<span class="eyebrow">Лишнее сгорело</span>${wsList(x.burn)}`);
-    const head = `<div class="ws-res">${wsWell(out, { stat: true, size: 64 })}<div class="col" style="gap:4px;min-width:0"><span class="eyebrow">${x.isNew ? 'Новый рецепт найден' : wsTier(out)}</span><b class="serif" style="font-size:24px;line-height:1.05">${trEsc(out.n)}</b><span class="faint num">×${fmt(x.out)}</span></div></div>`;
-    const foot = `${h ? `<button class="link" data-a="rhero" data-v="${h.id}">${ic('users')}Карточка героя</button>` : ''}${x.kind === 'made' && wsCanRepeat() ? '<button class="btn ghost" data-a="wsrepeat">Повторить набор</button>' : ''}<button class="btn go" data-a="close">Готово</button>`;
-    return dialog(x.kind === 'make' ? 'Автодокрафт' : x.isNew ? 'Новый рецепт' : 'Создано', `<div class="ws-o">${head}${lines.join('')}</div>`, foot);
+    const R = wsFxFor(o); if (!R) return '';
+    const aria = R.kind === 'fail' ? 'Неудача' : R.isNew ? 'Новый рецепт' : R.kind === 'make' ? 'Автодокрафт' : 'Создано';
+    return `<div class="ov ws-fxov" role="dialog" aria-modal="true" aria-label="${aria}">${wsFxStageHtml(R, wsNow() - R.t0)}</div>`;
   },
 });
 
@@ -450,20 +887,24 @@ Object.assign(ACT, {
   wsclear() { S.ws.cells = wsEmpty(); S.ws.sel = 0; render(); },
   wsview(v) { S.ws.view = v === 'book' ? 'book' : 'table'; render(); },
   wsinfo(v) { if (BAG.item(v)) open('wsitem', v); },
-  wstry() {
+  /* «Попробовать» / «Создать» стола: номер операции несёт кнопка */
+  wstry(v) {
     const g = wsGuess(); if (g.st === 'empty') return;
     if (g.lack.length) return toast('Не хватает в запасах: ' + wsNames(g.lack.map(c => [c.id, c.q - BAG.qty(c.id)])));
     if (g.owned) return toast(`${wsHero(g.r).n} уже в коллекции`);
-    if (g.st === 'known' && !g.extra.length && !g.special.length) return wsAttempt(false);   // чистый найденный рецепт — без лишнего вопроса
-    open('wstry', '', { ok: false });
+    const op = v || wsOp();
+    if (g.st === 'known' && !g.extra.length && !g.special.length) return wsAttempt(false, op);   // чистый найденный рецепт — без лишнего вопроса
+    open('wstry', '', { ok: false, op });
   },
-  wstrydo() { const o = S.overlay; if (!o || o.t !== 'wstry') return; wsAttempt(!!o.ok); },   // повторное нажатие не повторяет расход
+  wstrydo(v) { const o = S.overlay; if (!o || o.t !== 'wstry') return; wsAttempt(!!o.ok, v || o.op); },   // повторное нажатие не повторяет расход
   wsrepeat() {
     const L = S.ws.last || [];
     wsSetTable(L.map(c => [c.id, c.q]));
     S.overlay = null; render();
   },
   wshints() { S.ws.view = 'book'; S.ws.book.tab = 'hint'; S.overlay = null; render(); },
+  /* новая запись: книга открыта на этом рецепте — поиск по его имени */
+  wsbookgo(v) { const r = BAG.recipe(v); S.overlay = null; S.ws.view = 'book'; Object.assign(S.ws.book, { tab: 'all', kind: '', fav: false, q: r ? r.n : '' }); render(); },
   wsbtab(v) { S.ws.book.tab = v; render(); },
   wsbkind(v, t) { S.ws.book.kind = t ? t.value : ''; render(); },
   wsbfav() { S.ws.book.fav = !S.ws.book.fav; render(); },
@@ -476,7 +917,7 @@ Object.assign(ACT, {
     const miss = ids.filter(id => !BAG.has(id));
     if (miss.length) toast('Нет в запасах: ' + miss.map(wsName).join(', ')); else render();
   },
-  wsmake(v) { if (BAG.recipe(v)) open('wsmake', v, { n: 1, ok: false }); },
+  wsmake(v) { if (BAG.recipe(v)) open('wsmake', v, { n: 1, ok: false, op: wsOp() }); },
   wsn(v) {
     const o = S.overlay, r = o && o.t === 'wsmake' ? BAG.recipe(o.arg) : null; if (!r) return;
     const cap = wsHero(r) ? 1 : WS_DATA.makeCap;
@@ -484,19 +925,16 @@ Object.assign(ACT, {
     render();
   },
   wsok(v, t) { if (!S.overlay) return; S.overlay.ok = !!(t && t.checked); render(); },
-  wsmakedo() {
-    const o = S.overlay; if (!o || o.t !== 'wsmake') return;   // повторное нажатие не повторяет расход и выдачу
-    const v = WS_SRV.make(o.arg, o.n || 1, !!o.ok);            // сервер решает
-    if (v.refuse) return toast(WS_REFUSE[v.refuse]);
-    const p = v.plan;
-    if (!p.spend.every(([id, q]) => BAG.has(id, q))) return toast('Запасы изменились — пересчитайте');
-    p.spend.forEach(([id, q]) => BAG.take(id, q));
-    p.extra.forEach(([id, q]) => wsGive(id, q));
-    wsGive(p.r.out[0], p.out);
-    BAG.learn(p.r.id); wsClamp();
-    S.overlay = { t: 'wsres', res: { kind: 'make', rid: p.r.id, out: p.out, steps: p.steps.length, spend: p.spend, hero: p.hero ? p.hero.id : '' } };
-    render(); focusOverlay();
+  /* автодокрафт: сервер проводит одной операцией с номером, повторное нажатие не повторяет расход и выдачу */
+  wsmakedo(v) {
+    const o = S.overlay; if (!o || o.t !== 'wsmake') return;
+    const x = WS_SRV.make(v || o.op || wsOp(), o.arg, o.n || 1, !!o.ok);
+    if (x.again) return;
+    if (x.refuse) return toast(WS_REFUSE[x.refuse]);
+    wsFxStart(x.res);
   },
+  wsfxreveal() { const R = S.ws.fx; if (wsFxLive(R)) wsFxReveal(R); },   // нажатие на сцену посреди анимации — итог сразу
+  wsfxskip(v, t) { wsFxSetSkip(!!(t && t.checked), 'game'); },
 });
 /* «На стол мастера» из других экранов: предмет запасов ложится на стол этой мастерской, прежние предметы прототипа — по-старому */
 const wsToCraftBase = ACT.toCraft;
@@ -506,6 +944,118 @@ function wsToCraft(v, t, e) {
   wsPut(v); render();
 }
 ACT.toCraft = wsToCraft;
+
+/* ================== UI-кит: раздел «Крафт: удача и неудача» ==================
+   Своя сцена в разделе: пробы тем же показом, что в мастерской; проба — не выдача (S не меняется). Под сценой — раскадровка:
+   та же сцена, остановленная в свои моменты */
+const WS_KIT = { run: null, r: 3, n: 0, last: 'made' };
+const WS_KIT_CASES = [['made', 'Удача'], ['new', 'Новая запись'], ['hero', 'Герой'], ['make', 'Серия ×' + WS_DATA.demo.kit.n], ['fail', 'Неудача'], ['hint', 'С подсказкой']];
+/* рецепт пробы редкости r: первый в данных с итогом этой редкости, иначе ближайшей — тогда редкость пробы только вид */
+function wsKitRecipe(r) {
+  let best = null, dist = 99;
+  for (const x of EN_RECIPES.recipes) {
+    const it = x.team || x.kind === 'hero' ? null : BAG.item(x.out[0]);
+    if (!it || it.team) continue;
+    const dd = Math.abs(it.r - r); if (dd < dist) { dist = dd; best = x; } if (!dd) break;
+  }
+  return best;
+}
+const wsKitCells = list => { const at = WS_FX.spread[Math.min(list.length, WS_DATA.cells) - 1] || []; return list.slice(0, WS_DATA.cells).map(([id, q], i) => [id, q, at[i]]); };
+/* итог пробы — тем же видом, что у сервера, без выдачи */
+function wsKitRes(kind) {
+  const D = WS_DATA.demo, K = D.kit;
+  if (kind === 'fail' || kind === 'hint') {
+    const list = kind === 'fail' ? D.fail : D.hint, r = BAG.recipe(K.hero);
+    const hints = kind === 'hint' && r ? [{ rid: r.id, fresh: list.map(([id]) => id), all: false, first: true, n: list.length }] : [];
+    return { op: 'проба-' + kind, kind: 'fail', burn: list.map(([id, q]) => [id, q]), hints, cells: wsKitCells(list) };
+  }
+  if (kind === 'hero') {
+    const r = BAG.recipe(K.hero), it = r && BAG.item(r.out[0]);
+    return { op: 'проба-герой', kind: 'made', rid: r.id, out: 1, isNew: true, burn: [], hero: it ? it.heroId : '', cells: wsKitCells(r.in) };
+  }
+  if (kind === 'make') {
+    const r = BAG.recipe(K.make);
+    return { op: 'проба-серия', kind: 'make', rid: r.id, n: K.n, out: r.out[1] * K.n, steps: 0, spend: r.in.map(([id, q]) => [id, q * K.n]), hero: '' };
+  }
+  const r = wsKitRecipe(WS_KIT.r);
+  return { op: 'проба-' + kind, kind: 'made', rid: r.id, out: r.out[1], isNew: kind === 'new', burn: [], hero: '', cells: wsKitCells(r.in) };
+}
+function wsKitRun(kind, still) {
+  const res = wsKitRes(kind), R = wsFxRun(res, 'kit', { trial: true, r: kind === 'hero' || kind === 'fail' || kind === 'hint' ? 0 : WS_KIT.r });
+  if (still) { R.phase = 'res'; R.tr = R.t0; }
+  return R;
+}
+function wsKitPlay(kind) {
+  wsFxStop(WS_KIT.run);
+  WS_KIT.last = kind;
+  const R = wsKitRun(kind, wsFxSkipOn());
+  WS_KIT.run = R;
+  if (R.phase === 'anim') wsFxSchedule(R);
+  wsKitPaint();
+}
+function wsKitPaint() {
+  const el = document.getElementById('wsKitStage'); if (!el) return;
+  const R = WS_KIT.run || wsKitRun(WS_KIT.last, true);
+  el.innerHTML = wsFxStageHtml(R, wsNow() - R.t0);
+}
+/* раскадровка: удача, новая запись и неудача в свои моменты — анимации на паузе, кадр стоит ровно в своём моменте */
+function wsKitBoardHtml() {
+  const frames = [];
+  const add = (kind, n, txt, at) => { const R = wsKitRun(kind, at == null); R.id = ++wsFxSeq; frames.push([n, txt, R, at == null ? R.T.end + 2000 : at(R.T)]); };
+  const F = WS_FX.full, L = WS_FX.fail;
+  add('new', '1 · Нити', 'от каждой ячейки к центру — цвет стола, исход ещё не виден', () => F.thr + F.thrDur);
+  add('new', '2 · Втягивание', 'предметы вздрагивают и уходят в центр, круг вспыхивает', () => F.ring + 160);
+  add('new', '3 · Вспышка', 'раскалённое ядро, итог поднимается в свете редкости', () => F.rise + 260);
+  add('new', '4 · Запись в книге', 'впервые найденный рецепт: книга, листы, свет, чернила', T => T.book + WS_FX.book.ink + 300);
+  add('fail', '1 · Разрыв', 'предметы дрожат, нити рвутся посередине', () => L.snap + 90);
+  add('fail', '2 · Трещины', 'круг трескается от обода к центру и тускнеет', () => L.crack + 330);
+  add('fail', '3 · Пепел', 'предметы осыпаются, дым поднимается', () => L.crumble + 520);
+  add('fail', '4 · Итог', 'что сгорело и подсказка, если положена');
+  return frames.map(([n, txt, R, at]) => `<figure class="ws-still"><div class="ws-frame" aria-hidden="true"><div class="ws-fst">${wsFxStageHtml(R, at)}</div></div><figcaption><b>${n}</b> — ${txt}</figcaption></figure>`).join('');
+}
+function wsKitBoardPaint() { const el = document.getElementById('wsKitBoard'); if (el) el.innerHTML = wsKitBoardHtml(); }
+function wsKitTabs() {
+  const box = document.getElementById('wsKitCtl'); if (!box || !box.querySelectorAll) return;
+  box.querySelectorAll('[data-wk^="r:"]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.wk === 'r:' + WS_KIT.r)));
+  box.querySelectorAll('[data-wk^="play:"]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.wk === 'play:' + WS_KIT.last)));
+}
+function wsKitAct(v) {
+  const s = String(v), i = s.indexOf(':'), a = s.slice(0, i), x = s.slice(i + 1);
+  if (a === 'r') { WS_KIT.r = Math.min(7, Math.max(1, +x || 1)); wsKitTabs(); wsKitBoardPaint(); wsKitPlay(['made', 'new', 'make'].includes(WS_KIT.last) ? WS_KIT.last : 'made'); return; }
+  if (a === 'play' && WS_KIT_CASES.some(c => c[0] === x)) { wsKitPlay(x); wsKitTabs(); }
+}
+/* нажатия раздела: data-wk — пробы и редкость; data-a внутри сцены раздела — крестик, нажатие на сцену и галочка */
+function wsKitBind() {
+  const k = document.getElementById('kitGrid');
+  if (!k || !k.addEventListener || !k.dataset || k.dataset.wsBound) return;
+  k.dataset.wsBound = '1';
+  k.addEventListener('click', e => {
+    const t = e.target && e.target.closest ? e.target.closest('[data-wk],[data-a]') : null;
+    if (!t || !k.contains(t)) return;
+    if (t.dataset.wk) { e.preventDefault(); wsKitAct(t.dataset.wk); return; }
+    if (!t.closest('#wsKit')) return;   // data-a других разделов — не наши
+    if (t.dataset.a === 'close') { wsFxStop(WS_KIT.run); WS_KIT.run = null; wsKitPaint(); }
+    else if (t.dataset.a === 'wsfxreveal' && wsFxLive(WS_KIT.run)) wsFxReveal(WS_KIT.run);
+  });
+  k.addEventListener('change', e => { const t = e.target; if (t && t.dataset && t.dataset.a === 'wsfxskip' && t.closest && t.closest('#wsKit')) wsFxSetSkip(t.checked, 'kit'); });
+}
+function wsKitHtml() {
+  const plays = WS_KIT_CASES.map(([k, n]) => `<button class="btn sm" data-wk="play:${k}" aria-pressed="${WS_KIT.last === k}">${n}</button>`).join('');
+  const rars = [1, 2, 3, 4, 5, 6, 7].map(r => `<button class="btn sm ws-kb" data-r="${r}" data-wk="r:${r}" aria-pressed="${WS_KIT.r === r}">${ICON('r' + r, 16, RAR[r])}${RAR[r]}</button>`).join('');
+  const F = WS_FX.full, SH = WS_FX.short, L = WS_FX.fail;
+  const team = TM(`<table class="p-table ws-ktab"><tr><th>Темп</th><th>Когда</th><th>Нити</th><th>Исход</th><th>Итог</th></tr>
+      <tr><td>Полная удача</td><td>исход не был известен: новый рецепт, герой</td><td class="n">${F.thr} мс</td><td class="n">вспышка ${F.flash} мс</td><td class="n">${F.end} мс, с книгой ${F.end + WS_FX.book.end} мс</td></tr>
+      <tr><td>Короткая</td><td>известный рецепт со стола, автодокрафт, серия ×N</td><td class="n">${SH.thr} мс</td><td class="n">вспышка ${SH.flash} мс</td><td class="n">${SH.end} мс; без листа — закрытие через ${SH.auto} мс</td></tr>
+      <tr><td>Неудача</td><td>рецепта нет</td><td class="n">${L.thr} мс</td><td class="n">разрыв ${L.snap} мс</td><td class="n">${L.end} мс</td></tr></table>
+    <p class="k-note">Итог решает сервер до анимации: <code>WS_SRV.attempt</code> и <code>WS_SRV.make</code> — одна операция с номером, повтор номера ничего не меняет. Случайности в исходе нет (§12): верный набор создаёт предмет всегда. Сид операции рисует только трещины и дым — перерисовка не меняет кадр. Числа вида — <code>WS_FX</code> в <code>screens/craft.js</code>, частицы — EnFx.</p>`, 'div');
+  return `<section class="k-box ws-kbox" style="grid-column:1/-1"><h3>Крафт: удача и неудача</h3>
+    <p class="k-note">Шесть ячеек вокруг центра, как на столе мастерской. До момента истины удача и неудача идут одинаково: нити цвета стола тянутся к центру. Удача — предметы втягиваются, круг вспыхивает цветом редкости, ядро раскаляется, вспышка — итог поднимается в своём свете. Впервые найденный рецепт — книга раскрывается и записывает его. Неудача — предметы дрожат, нити рвутся, круг трескается, предметы осыпаются пеплом; итог честно называет, что сгорело, и подсказку, если она положена. Известный рецепт, автодокрафт и серия — короткая версия. Нажатие на сцену — сразу итог. Проба — не выдача; редкость пробы — вид.</p>
+    <div class="ws-kctl" id="wsKitCtl"><div class="ws-kr">${plays}</div><div class="ws-kr">${rars}</div></div>
+    <div class="ws-kit" id="wsKit"><div class="ws-kst" id="wsKitStage"></div><div class="ws-fxl" aria-hidden="true"></div></div>
+    <p class="k-note">Раскадровка — та же сцена, остановленная в свои моменты; частицы рисуются поверх сцены и в кадре не видны.</p>
+    <div class="ws-board" id="wsKitBoard"></div>${team}</section>`;
+}
+KIT_EXTRA.push({ html: wsKitHtml, paint: () => { wsKitBind(); wsKitTabs(); wsKitPaint(); wsKitBoardPaint(); } });
 
 /* ================== регистрация, состояние, ввод ================== */
 CRAFT_SEGS.work = wsView;
@@ -535,14 +1085,16 @@ document.addEventListener('drop', e => {
   if (BAG.item(id) && wsPut(id, +c.dataset.wscell)) { S.ws.view = 'table'; render(); }
 });
 
-/* потоки презентации: «Мастерская» показывает найденный рецепт на столе, рядом — подсказки и автодокрафт */
+/* потоки презентации: «Мастерская» показывает найденный рецепт на столе, рядом — подсказки, автодокрафт, удача и неудача */
 (() => {
   const i = FLOWS.findIndex(f => f[0] === 'Мастерская'); if (i < 0) return;
   const base = FLOWS[i][2], D = WS_DATA.demo;
   FLOWS[i] = ['Мастерская', 'Инвентарь и стол из шести ячеек: на столе найденный рецепт, рядом книга рецептов', () => { base(); wsSetTable(D.table); }];
   FLOWS.splice(i + 1, 0,
+    ['Мастерская · удача', 'Сочетание, которого нет в книге: нити, вспышка, итог в свете своей редкости и новая запись в книге', () => { base(); wsSetTable(D.made); wsAttempt(false, wsOp()); }],
+    ['Мастерская · неудача', 'Неверное сочетание: нити рвутся, круг трескается, всё положенное сгорает — итог говорит, что именно', () => { base(); wsSetTable(D.fail); wsAttempt(false, wsOp()); }],
     ['Мастерская · подсказки', 'Три верных ресурса из четырёх: после попытки рецепт появится в книге, а ресурсы сгорят', () => { base(); wsSetTable(D.hint); }],
-    ['Мастерская · автодокрафт', 'Демо: найдены два рецепта цепочки. Разворот до базовых и согласие на уникальный ресурс', () => {
-      base(); D.chain.learn.forEach(id => BAG.learn(id)); S.ws.view = 'book'; S.overlay = { t: 'wsmake', arg: D.chain.make, n: 1, ok: false };
+    ['Мастерская · автодокрафт', 'Найдены два рецепта цепочки. Разворот до базовых и согласие на уникальный ресурс', () => {
+      base(); D.chain.learn.forEach(id => BAG.learn(id)); S.ws.view = 'book'; S.overlay = { t: 'wsmake', arg: D.chain.make, n: 1, ok: false, op: wsOp() };
     }]);
 })();

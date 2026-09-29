@@ -1,0 +1,257 @@
+{
+ "meta": {
+  "builder": "tools/content-gen/contracts/capacity.py",
+  "sources": [
+   "tools/content-gen/economy/economy.py",
+   "tools/content-gen/economy/sets.py",
+   "tools/content-gen/economy/echo.py"
+  ],
+  "x": 100,
+  "note": "средний день цикла, все отряды; счётчики — в сотых; echoPtsWeek — очки Эхо за неделю; циклы IV–VI у биомов — по образцу III"
+ },
+ "hours": {
+  "o": 3,
+  "e": 8
+ },
+ "slots": {
+  "2": 3,
+  "3": 4,
+  "4": 5,
+  "5": 6,
+  "6": 7
+ },
+ "cycleDays": {
+  "2": 14,
+  "3": 21
+ },
+ "cycles": {
+  "2": {
+   "o": {
+    "base": 32566,
+    "boss": 707,
+    "clean": 707,
+    "echoAtk": 2189,
+    "echoKill": 1007,
+    "echoPtsWeek": 1816265,
+    "echoSoulsDay": 75328,
+    "echoTop": [
+     6,
+     11
+    ],
+    "el": 46717,
+    "floors": 162830,
+    "gold": 6397042,
+    "kills": 435847,
+    "rf": 388421,
+    "runs": 7433,
+    "souls": 150768,
+    "spirit": 12794085
+   },
+   "e": {
+    "base": 87799,
+    "boss": 2097,
+    "clean": 2097,
+    "echoAtk": 5862,
+    "echoKill": 2450,
+    "echoPtsWeek": 6141657,
+    "echoSoulsDay": 209171,
+    "echoTop": [
+     6,
+     13
+    ],
+    "el": 128978,
+    "floors": 438998,
+    "gold": 17592998,
+    "kills": 1193039,
+    "rf": 1061963,
+    "runs": 18971,
+    "souls": 418398,
+    "spirit": 35186000
+   }
+  },
+  "3": {
+   "o": {
+    "base": 47482,
+    "boss": 2129,
+    "clean": 2083,
+    "echoAtk": 2387,
+    "echoKill": 1848,
+    "echoPtsWeek": 13184154,
+    "echoSoulsDay": 199552,
+    "echoTop": [
+     10,
+     11,
+     12
+    ],
+    "el": 69199,
+    "floors": 237414,
+    "gold": 14559066,
+    "kills": 642671,
+    "rf": 571341,
+    "runs": 10516,
+    "souls": 399261,
+    "spirit": 29118132
+   },
+   "e": {
+    "base": 130256,
+    "boss": 6454,
+    "clean": 6454,
+    "echoAtk": 6203,
+    "echoKill": 4868,
+    "echoPtsWeek": 54269551,
+    "echoSoulsDay": 557314,
+    "echoTop": [
+     13,
+     14,
+     14
+    ],
+    "el": 190676,
+    "floors": 651283,
+    "gold": 40376971,
+    "kills": 1774179,
+    "rf": 1577048,
+    "runs": 28556,
+    "souls": 1114744,
+    "spirit": 80753943
+   }
+  },
+  "4": {
+   "o": {
+    "base": 59352,
+    "boss": 2661,
+    "clean": 2603,
+    "echoAtk": 2440,
+    "echoKill": 1863,
+    "echoPtsWeek": 40079766,
+    "echoSoulsDay": 349247,
+    "echoTop": [
+     10,
+     11,
+     12
+    ],
+    "el": 86498,
+    "floors": 296767,
+    "gold": 24265110,
+    "kills": 803338,
+    "rf": 714176,
+    "runs": 13145,
+    "souls": 698706,
+    "spirit": 48530220
+   },
+   "e": {
+    "base": 162820,
+    "boss": 8067,
+    "clean": 8067,
+    "echoAtk": 6344,
+    "echoKill": 4954,
+    "echoPtsWeek": 166496249,
+    "echoSoulsDay": 975285,
+    "echoTop": [
+     13,
+     14,
+     14
+    ],
+    "el": 238345,
+    "floors": 814103,
+    "gold": 67294951,
+    "kills": 2217723,
+    "rf": 1971310,
+    "runs": 35695,
+    "souls": 1950802,
+    "spirit": 134589905
+   }
+  },
+  "5": {
+   "o": {
+    "base": 71223,
+    "boss": 3193,
+    "clean": 3124,
+    "echoAtk": 2508,
+    "echoKill": 1920,
+    "echoPtsWeek": 126102495,
+    "echoSoulsDay": 538880,
+    "echoTop": [
+     10,
+     12,
+     12
+    ],
+    "el": 103798,
+    "floors": 356121,
+    "gold": 36397665,
+    "kills": 964006,
+    "rf": 857011,
+    "runs": 15774,
+    "souls": 1078004,
+    "spirit": 72795330
+   },
+   "e": {
+    "base": 195384,
+    "boss": 9681,
+    "clean": 9681,
+    "echoAtk": 6527,
+    "echoKill": 5101,
+    "echoPtsWeek": 518440423,
+    "echoSoulsDay": 1504738,
+    "echoTop": [
+     13,
+     14,
+     14
+    ],
+    "el": 286014,
+    "floors": 976924,
+    "gold": 100942427,
+    "kills": 2661268,
+    "rf": 2365572,
+    "runs": 42834,
+    "souls": 3009808,
+    "spirit": 201884857
+   }
+  },
+  "6": {
+   "o": {
+    "base": 83093,
+    "boss": 3725,
+    "clean": 3645,
+    "echoAtk": 2481,
+    "echoKill": 1896,
+    "echoPtsWeek": 370813074,
+    "echoSoulsDay": 768395,
+    "echoTop": [
+     10,
+     12,
+     12
+    ],
+    "el": 121098,
+    "floors": 415474,
+    "gold": 50956731,
+    "kills": 1124674,
+    "rf": 999846,
+    "runs": 18403,
+    "souls": 1537154,
+    "spirit": 101913462
+   },
+   "e": {
+    "base": 227948,
+    "boss": 11294,
+    "clean": 11294,
+    "echoAtk": 6454,
+    "echoKill": 5041,
+    "echoPtsWeek": 1532268071,
+    "echoSoulsDay": 2145690,
+    "echoTop": [
+     13,
+     14,
+     14
+    ],
+    "el": 333683,
+    "floors": 1139745,
+    "gold": 141319398,
+    "kills": 3104813,
+    "rf": 2759834,
+    "runs": 49973,
+    "souls": 4291764,
+    "spirit": 282638800
+   }
+  }
+ }
+}

@@ -600,6 +600,217 @@
         128
       ],
       "fit": 80
+    },
+    "memory/shard-r1.png": {
+      "from": "memory-shards/mem-shard-r1__nb2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "memory/shard-r2.png": {
+      "from": "memory-shards/mem-shard-r2__nb2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "memory/shard-r3.png": {
+      "from": "memory-shards/mem-shard-r3__nb2-v2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "memory/shard-r4.png": {
+      "from": "memory-shards/mem-shard-r4__nb2-v2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "memory/shard-r5.png": {
+      "from": "memory-shards/mem-shard-r5__nb2-v3.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "memory/shard-r6.png": {
+      "from": "memory-shards/mem-shard-r6__nb2-v2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "memory/shard-r7.png": {
+      "from": "memory-shards/mem-shard-r7__nb2-v2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "memory/shard-empty.png": {
+      "from": "memory-shards/mem-shard-empty__nb2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "chests/shards-body.png": {
+      "from": "chests/chest-shards__nb2.body.png",
+      "size": [
+        515,
+        184
+      ]
+    },
+    "chests/shards-lid.png": {
+      "from": "chests/chest-shards__nb2.lid.png",
+      "size": [
+        514,
+        208
+      ]
+    },
+    "chests/keys-body.png": {
+      "from": "chests/chest-keys__nb2.body.png",
+      "size": [
+        500,
+        193
+      ]
+    },
+    "chests/keys-lid.png": {
+      "from": "chests/chest-keys__nb2.lid.png",
+      "size": [
+        504,
+        180
+      ]
+    },
+    "chests/equip-body.png": {
+      "from": "chests/chest-equip__nb2.body.png",
+      "size": [
+        516,
+        192
+      ]
+    },
+    "chests/equip-lid.png": {
+      "from": "chests/chest-equip__nb2.lid.png",
+      "size": [
+        528,
+        182
+      ]
+    },
+    "chests/talisman-body.png": {
+      "from": "chests/chest-talisman__nb2.body.png",
+      "size": [
+        482,
+        198
+      ]
+    },
+    "chests/talisman-lid.png": {
+      "from": "chests/chest-talisman__nb2.lid.png",
+      "size": [
+        488,
+        177
+      ]
+    },
+    "chests/workers-body.png": {
+      "from": "chests/chest-workers__nb2.body.png",
+      "size": [
+        551,
+        240
+      ]
+    },
+    "chests/workers-lid.png": {
+      "from": "chests/chest-workers__nb2.lid.png",
+      "size": [
+        496,
+        136
+      ]
+    },
+    "chests/craft-body.png": {
+      "from": "chests/chest-craft__nb2.body.png",
+      "size": [
+        516,
+        194
+      ]
+    },
+    "chests/craft-lid.png": {
+      "from": "chests/chest-craft__nb2.lid.png",
+      "size": [
+        520,
+        172
+      ]
+    },
+    "chests/wander-body.png": {
+      "from": "chests/chest-wander__nb2.body.png",
+      "size": [
+        492,
+        177
+      ]
+    },
+    "chests/wander-lid.png": {
+      "from": "chests/chest-wander__nb2.lid.png",
+      "size": [
+        494,
+        180
+      ]
+    },
+    "chests/lock.png": {
+      "from": "chest-lock/chest-lock__nb2.clean.png",
+      "size": [
+        184,
+        225
+      ]
+    },
+    "chests/fx-rays.png": {
+      "from": "chest-fx/chest-fx-rays__nb2.fx.png",
+      "size": [
+        320,
+        320
+      ]
+    },
+    "chests/fx-flash.png": {
+      "from": "chest-fx/chest-fx-flash__nb2.fx.png",
+      "size": [
+        320,
+        316
+      ]
+    },
+    "chests/fx-ring.png": {
+      "from": "chest-fx/chest-fx-ring__nb2.fx.png",
+      "size": [
+        400,
+        400
+      ]
+    },
+    "chests/fx-haze.png": {
+      "from": "chest-fx/chest-fx-haze__nb2.fx.png",
+      "size": [
+        320,
+        326
+      ]
+    },
+    "chests/fx-beam.png": {
+      "from": "chest-fx/chest-fx-beam__nb2.fx.png",
+      "size": [
+        150,
+        451
+      ]
+    },
+    "chests/fx-dust.png": {
+      "from": "chest-fx/chest-fx-dust__nb2.fx.png",
+      "size": [
+        480,
+        198
+      ]
     }
   }
 }

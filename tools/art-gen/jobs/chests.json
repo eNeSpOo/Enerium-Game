@@ -1,0 +1,184 @@
+{
+  "name": "Сундуки для окна открытия (design/ui/screens/chest-open.js): семь видов по §23 и docs/content/лутбоксы.md — осколки, ключи, снаряжение, талисманы, рабочие, крафт, странник; замок; текстуры света. Слова автора 29.09.2026: «Анимация лутбокса очень деревянная… сделать красивую, хорошую анимацию, которую действительно хотелось бы смотреть». Стиль — одобренные значки и предметы прототипа: тёмное фэнтези, свет снизу, крупные читаемые формы. Редкость сундука рисует интерфейс светом и цветом --r1…--r7, поэтому сундук один на все семь редкостей и сам не светится",
+  "plan": {
+    "Сундук — один рисунок, два слоя": "сундук рисуется закрытым, спереди и чуть сверху, с прямым горизонтальным швом между крышкой и корпусом; ничего не пересекает шов. tools/art-gen/chest_layers.py режет его по шву (раздел layers ниже) на корпус и крышку — слои совпадают пиксель в пиксель, крышка откидывается по-настоящему",
+    "Узнаётся по виду и материалу": {
+      "Осколки — Эхо": "реликварий: тёмный базальт, серебро, гребень бледных кристаллов на крышке",
+      "Ключи — контракты": "железный ларь, бронзовые оковки, три замочные накладки, петли-ключи",
+      "Снаряжение — Арена и Лига": "оружейный ящик: дуб, сталь, щит с мечом на крышке",
+      "Талисманы — клановый босс": "шкатулка: чёрный лак, золотая скань, лунный камень",
+      "Рабочие — Событие": "рабочий короб: светлое дерево, железо, верёвочные ручки, шестерни",
+      "Крафт — крафтовые боссы": "каменный сундук руин: серый камень, мох, бронзовые скобы, корона в рельефе",
+      "Странник — первые победы, достижения, календарь": "дорожный сундук: кожа, латунь, ремни, звезда"
+    },
+    "Замок": "один тяжёлый навесной замок на все виды: «замок срывается» — отдельным слоем; скважину подсвечивает интерфейс цветом редкости",
+    "Свет": "шесть текстур на чёрном — лучи, вспышка, кольцо без знаков, столп света, пыль приземления, дымка. Бесцветные: цвет редкости даёт интерфейс. Искры и частицы — EnFx"
+  },
+  "notes": [
+    "29.09.2026: 14 генераций nb2 без повторов, $0,96 по счётчикам токенов. Альфа проверена на тёмном и светлом",
+    "Все семь сундуков вышли с прямым швом — разрез по шву без правок. Шов найден по тёмной полосе строк, превью с зазором чистое",
+    "Модель обвела каждый предмет на пурпурном ключе белой «наклейкой» 6–8 px — chest_layers.py снимает её: светлые бесцветные пиксели у края, связанные с прозрачным",
+    "Лучи модель довела до краёв кадра — проверка альфы «НЕТ» (рамка исходника не ключ). Слой .fx гасит их мягко по кругу (fade 560–980 ‰), центр на месте",
+    "Столп вышел языком бледного пламени, круглым снизу, — годится: низ прячется за корпусом, свет встаёт из сундука",
+    "Пыль тёплая и тяжелее справа: слева в сцене — как есть, справа — зеркально, плотная часть у сундука",
+    "Сундуки светлее и чище одобренных значков: сцену затемняет интерфейс, снизу корпус подсвечивает свет ступени (маска по рисунку)"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Dark fantasy mobile RPG game art with a gloomy, mystical atmosphere. Painterly digital illustration with soft transitions, elaborate shadows and confident visible brushwork; simplified large readable forms; a crisp rim light along the edges. Rich worn materials: dark forged iron, old gold, weathered wood, carved stone, aged leather. Precious, dramatic, high contrast. No photorealism, no 3D-render look, no anime.",
+  "negative": "No text, no letters, no numbers, no runes, no glyphs, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+  "cutout_rule": "",
+  "categories": {
+    "chests": {
+      "aspect": "4:3",
+      "size": "1K",
+      "cutout": "magenta",
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg"
+      ],
+      "frame": "Format: game item art for a loot-chest opening animation: one closed treasure chest, alone, centered. Match the brushwork, lighting and color handling of the attached style reference (approved game art), but do NOT copy its subject or shape. View: straight from the front, the camera a little above the chest (about 15 degrees), perfectly symmetric left to right, so we see the front face and only a thin sliver of the top; the side faces are hidden. The chest fills about 78% of the canvas width and stands in the middle of the canvas. Construction: the chest is two separate pieces, a body and a lid resting on it. Where they meet, one clean, straight, perfectly horizontal seam runs across the whole front from the left edge of the chest to the right edge; a thin dark shadow line marks it. Nothing crosses the seam: no lock, no padlock, no hasp, no latch, no strap, no band, no hinge and no decoration goes from the lid down onto the body or from the body up onto the lid — the lock is added separately by the game. Lighting: soft pale neutral light from below and from the front, a crisp pale rim light along the whole silhouette. The chest itself does not glow: no colored light, nothing shines from inside it, no light leaks from the seam — the game adds colored magic light around it. Large readable shapes that still read at 120 px; the painterly detail lives inside the silhouette, nothing floats around it. The background is a perfectly flat, uniform, solid pure magenta (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no ground line, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear magenta margin around the chest on every side. Do not use magenta, pink or purple anywhere on the chest."
+    },
+    "chest-lock": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "magenta",
+      "refs": [
+        "art/generated/icons/icon-valor__nb2-v2.raw.jpg"
+      ],
+      "frame": "Format: game item art for a loot-chest opening animation: one object alone, centered, seen straight from the front, perfectly symmetric, upright. Match the brushwork, lighting and color handling of the attached style reference (approved game art), but do NOT copy its subject or shape. The object fills about 70% of the canvas height. Lighting: soft pale neutral light from below and from the front, a crisp pale rim light along the silhouette; the object does not glow. Large readable shapes that still read at 40 px. The background is a perfectly flat, uniform, solid pure magenta (#FF00FF) that fills the whole canvas edge to edge: no gradient, no vignette, no texture, no floor, no cast shadow, no reflection, no glow or light spill on the background, no checkerboard transparency pattern. Leave a clear magenta margin around the object on every side. Do not use magenta, pink or purple anywhere on the object."
+    },
+    "chest-fx": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black-glow",
+      "refs": [],
+      "frame": "Format: a light texture for visual effects in a mobile game. The game lays it over a dark scene and tints it with its own colors, so the light is white and pale neutral grey only: no color, no hue, no tint. Soft painterly magical light with smooth falloff, not a photographic lens flare. Everything outside the light is flat pure black (#000000) to the very edges of the canvas; the light fades completely into the black well before every edge of the canvas. No objects, no scenery, no ground, no stars, no frame, no vignette texture, no checkerboard."
+    }
+  },
+  "jobs": [
+    {
+      "id": "chest-shards",
+      "category": "chests",
+      "title": "Сундук осколков — реликварий Эхо",
+      "source": "lootboxes.js boxes.shards; §17, §23; LB_IC: users",
+      "subject": "Subject: the reliquary of the Echo, a chest that keeps the soul shards of ancient heroes. Material: dark grey-black basalt cut in heavy smooth blocks, bound with broad bands of tarnished silver along the corners and across the body. The lid is a low stone slab; along its top grows a crest of pale, colorless, clouded quartz shards — several crystal points of different heights — the sign of this chest. Cold, heavy, ancient. The silver is worn down to the stone at the edges."
+    },
+    {
+      "id": "chest-keys",
+      "category": "chests",
+      "title": "Сундук ключей — окованный ларь контрактов",
+      "source": "lootboxes.js boxes.keys; §18, §23; LB_IC: key",
+      "subject": "Subject: the keybearer's strongbox, a chest that keeps rune keys. Material: blackened forged iron plates riveted together, reinforced with thick bronze bands and heavy bronze corners. Its sign: the front of the body carries a row of three ornate bronze keyhole plates, and two big old bronze keys lie across the top of the lid as its hinges. A flat lid. Squat and heavy, a small fortress."
+    },
+    {
+      "id": "chest-equip",
+      "category": "chests",
+      "title": "Сундук снаряжения — оружейный ящик Арены",
+      "source": "lootboxes.js boxes.equip; §20, §21, §23; LB_IC: shield",
+      "subject": "Subject: the arena armory crate, a chest that keeps weapons and armor. Material: long dark oak planks bound with dented steel corner plates and steel bands. Its sign: a round steel shield with a sword crossed behind it is mounted in the middle of the lid front, well above the seam. The crate is longer and lower than a common chest, like a weapon case, with a flat lid. Battered, scratched, practical."
+    },
+    {
+      "id": "chest-talisman",
+      "category": "chests",
+      "title": "Сундук талисманов — шкатулка духа",
+      "source": "lootboxes.js boxes.talisman; §25, §26, §23; LB_IC: gem",
+      "subject": "Subject: the spirit casket, a jewel casket that keeps spirit talismans. Material: glossy black lacquered wood with fine old-gold filigree, gold corner caps and four small gold claw feet; a high rounded domed lid. Its sign: in the middle of the lid front, a large oval moonstone, milky white with a faint cool sheen, set in a gold mount. Refined and precious; taller and narrower than a common chest."
+    },
+    {
+      "id": "chest-workers",
+      "category": "chests",
+      "title": "Сундук рабочих — рабочий короб События",
+      "source": "lootboxes.js boxes.workers; §19, §27, §23; LB_IC: gear",
+      "subject": "Subject: the workers' crate, a chest that keeps the shards of hired workers. Material: light pale sanded wood planks with rough dark iron fittings, thick coiled rope handles on both sides of the body. Its sign: two big brass cogwheels mounted on the front of the body and a small iron wrench fixed across the lid. A flat lid. Honest and sturdy, a craftsman's box, the corners worn smooth by hands."
+    },
+    {
+      "id": "chest-craft",
+      "category": "chests",
+      "title": "Сундук крафтового босса — каменный сундук руин",
+      "source": "lootboxes.js boxes.craft; §12.3, §23; LB_IC: crown",
+      "subject": "Subject: the ruin chest of a craft boss, carved from one block of weathered grey stone taken from ancient ruins. Material: rough light-grey stone with deep chips and cracks, patches of dark green moss, corroded green-bronze clamps at the corners. Its sign: the lid is a thick heavy stone slab with a plain crown shape carved in relief on its front. Massive, old and dusty."
+    },
+    {
+      "id": "chest-wander",
+      "category": "chests",
+      "title": "Сундук странника — дорожный сундук",
+      "source": "lootboxes.js boxes.wander; §2, §23, §29; LB_IC: star",
+      "subject": "Subject: the wanderer's travel trunk, carried along long roads. Material: worn dark brown leather over a wooden frame, brass corner caps and rows of brass studs. A rounded domed lid; two leather straps with brass buckles run over the lid only and end above the seam. Its sign: a round brass plate with a plain solid four-pointed star embossed on it in the middle of the lid. Weathered by roads, patched, well loved."
+    },
+    {
+      "id": "chest-lock",
+      "category": "chest-lock",
+      "title": "Замок сундука — срывается при открытии",
+      "source": "screens/chest-open.js: замок на шве крышки",
+      "subject": "Subject: a heavy old padlock that seals a treasure chest. A thick rounded body of blackened forged iron with an old-gold rim and gold rivets, a large dark keyhole in its center, a thick curved iron shackle on top. The keyhole is empty and dark."
+    },
+    {
+      "id": "chest-fx-rays",
+      "category": "chest-fx",
+      "title": "Лучи — за сундуком и самой ценной карточкой",
+      "source": "screens/chest-open.js: .co-rays",
+      "subject": "Subject: god rays bursting from one small bright point in the exact center of the canvas: about sixteen long straight beams of soft light of different widths and lengths, radiating evenly in all directions, brightest at the center and fading out towards their tips, with gaps of black between the beams. Symmetric around the center. Every beam ends well before the edge of the canvas."
+    },
+    {
+      "id": "chest-fx-flash",
+      "category": "chest-fx",
+      "title": "Вспышка — крышка откинулась, карточка перевернулась",
+      "source": "screens/chest-open.js: .co-flash",
+      "subject": "Subject: a bright magical burst of light in the exact center of the canvas: a white-hot round core, a soft round glow around it, and eight thin sharp spikes of light — four long ones pointing up, down, left and right and four shorter diagonal ones. Centered and symmetric. It fills about 70% of the canvas."
+    },
+    {
+      "id": "chest-fx-ring",
+      "category": "chest-fx",
+      "title": "Кольцо рун без знаков — под сундуком",
+      "source": "screens/chest-open.js: .co-ring",
+      "subject": "Subject: a magic circle seen from straight above: two thin concentric glowing rings, and in the band between them a delicate geometric ornament only — evenly spaced dots, short dashes, small diamonds and thin arcs. Absolutely no runes, no glyphs, no letters, no symbols, no pentagram, no star. Thin and clean lines that glow softly; the inside of the inner ring is empty black. A perfect circle centered in the canvas, about 88% of the canvas wide."
+    },
+    {
+      "id": "chest-fx-beam",
+      "category": "chest-fx",
+      "title": "Столп света — из сундука вверх",
+      "source": "screens/chest-open.js: .co-beam",
+      "aspect": "9:16",
+      "subject": "Subject: a vertical pillar of magical light rising straight up: a narrow bright white core with a wide soft glow around it and a few faint wisps curling beside it. It is brightest in the lower third, widens slightly and fades out towards the top, and it also fades softly at its base. Centered horizontally; the pillar and its glow end before the top and bottom edges."
+    },
+    {
+      "id": "chest-fx-dust",
+      "category": "chest-fx",
+      "title": "Пыль — сундук приземлился",
+      "source": "screens/chest-open.js: .co-dust",
+      "aspect": "16:9",
+      "subject": "Subject: a cloud of dust puffing out sideways along the ground, as when a heavy chest lands: a wide, low, billowing cloud, dense in the middle of its bottom edge and thinning out to both sides and upwards, with a few flying grains of grit. This one texture is not white: the dust is warm grey-brown, softly lit from above. Centered horizontally in the lower half of the canvas; it fades out before every edge."
+    },
+    {
+      "id": "chest-fx-haze",
+      "category": "chest-fx",
+      "title": "Дымка — магия вокруг сундука",
+      "source": "screens/chest-open.js: .co-haze",
+      "subject": "Subject: a soft drifting magical mist: wispy swirls of pale smoke curling in a loose round cloud around the center of the canvas, thin delicate curls at its edges, the very center calmer and darker. Pale grey-white. It fades out before every edge."
+    }
+  ],
+  "layers": {
+    "note": "Разрез сундука на корпус и крышку — tools/art-gen/chest_layers.py. seam — строка шва в исходнике, px от верха: середина тёмной полосы шва по яркости строк в средних 60 % ширины; выше — крышка, ниже — корпус; проверено превью с зазором. items — предмет без белой наклейки. fx — текстура света: crop center — поля по центру картинки (лучи и кольцо вращаются вокруг него), bbox — по свету (пыль и столп встают низом на своё место); fade — мягкий край по кругу, ‰ полуширины: от и до",
+    "chests": {
+      "shards": { "from": "chests/chest-shards__nb2.png", "seam": 460 },
+      "keys": { "from": "chests/chest-keys__nb2.png", "seam": 446 },
+      "equip": { "from": "chests/chest-equip__nb2.png", "seam": 444 },
+      "talisman": { "from": "chests/chest-talisman__nb2.png", "seam": 450 },
+      "workers": { "from": "chests/chest-workers__nb2.png", "seam": 353 },
+      "craft": { "from": "chests/chest-craft__nb2.png", "seam": 429 },
+      "wander": { "from": "chests/chest-wander__nb2.png", "seam": 453 }
+    },
+    "items": {
+      "lock": { "from": "chest-lock/chest-lock__nb2.png", "suffix": "clean" }
+    },
+    "fx": {
+      "rays": { "from": "chest-fx/chest-fx-rays__nb2.png", "crop": "center", "fade": [560, 980] },
+      "flash": { "from": "chest-fx/chest-fx-flash__nb2.png", "crop": "center" },
+      "ring": { "from": "chest-fx/chest-fx-ring__nb2.png", "crop": "center" },
+      "haze": { "from": "chest-fx/chest-fx-haze__nb2.png", "crop": "center" },
+      "beam": { "from": "chest-fx/chest-fx-beam__nb2.png", "crop": "bbox" },
+      "dust": { "from": "chest-fx/chest-fx-dust__nb2.png", "crop": "bbox" }
+    }
+  }
+}

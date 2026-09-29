@@ -1,0 +1,147 @@
+/* screens/week.css — «Неделя»: три времени, строки режимов и листы (screens/week.js).
+   Стиль «Свет снизу»: классы index.html (.pnl, .stat, .bar, .well, .gifts, .rkrow, .rs-row, .tabs), свои — с префиксом wk-.
+   Правила воздуха (UI-кит): отступы — токены --sp-l, --sp-m, --sp-s; одна рамка на строку, внутри — строки и разделители;
+   редкость — --rc из [data-r] (--r1…--r7). Правила без .g — чтобы те же строки рисовал раздел UI-кита. */
+
+/* шапка времени: неделя и цивилизация, срок, итог, «Дары» */
+.wk-top{display:flex;align-items:center;gap:var(--sp-l);padding:var(--sp-s) var(--sp-s) var(--sp-s) var(--sp-m);flex:none;min-width:0}
+.wk-id{appearance:none;display:flex;flex-direction:column;gap:3px;min-width:0;flex:1 1 auto;padding:0;border:0;background:none;color:inherit;text-align:left}
+.wk-id>b{font:600 25px/1.05 var(--f-d);color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wk-id>small{display:inline-flex;align-items:center;gap:4px;min-width:0;font-size:12.5px;color:var(--parch-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wk-id>small .i{width:13px;height:13px;flex:none;color:var(--gold-2)}
+button.wk-id:hover>small{color:var(--gold)}
+.wk-clock{appearance:none;display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none;padding:0;border:0;background:none;color:inherit;text-align:right}
+.wk-clock>b{font:600 22px/1 var(--f-d);color:var(--parch);white-space:nowrap;font-variant-numeric:lining-nums tabular-nums}
+button.wk-clock:hover>b{color:var(--gold)}
+.wk-top .gifts{margin-left:0;flex:none}
+.wk-top .gifts img{width:38px;height:38px}
+/* итог прошлой недели: сундуки и Энериум — два числа; нажатие — лист с разбивкой */
+.wk-sum{appearance:none;display:flex;align-items:center;gap:var(--sp-l);flex:none;padding:4px var(--sp-s);border:0;border-radius:10px;background:none;color:inherit;text-align:left}
+.wk-sum:hover{background:rgba(255,255,255,.03)}
+.wk-kv{display:flex;align-items:center;gap:var(--sp-s)}
+.wk-kv>img{width:32px;height:32px;object-fit:contain;border-radius:7px;flex:none}
+.wk-kv .col{gap:3px}
+.wk-kv b{font:600 22px/1 var(--f-d);color:var(--parch);font-variant-numeric:lining-nums tabular-nums}
+.wk-kv small{font:700 10px/1.2 var(--f-u);letter-spacing:.12em;text-transform:uppercase;color:var(--parch-3)}
+.wk-dar{flex:none}
+.wk-dar .bdg{position:absolute;top:-6px;right:-6px}
+
+/* строки режимов: две колонки, одна рамка на строку. Эта неделя — полоса до планки и «›», прошлая — лучший сундук и статус */
+.wk-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:var(--sp-s) var(--sp-m);flex:1 1 0;min-height:0}
+.wk-row{position:relative;display:flex;align-items:center;min-width:0;min-height:0;border-radius:12px;border:1px solid var(--iron);background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),#0e1114}
+.wk-row:hover{border-color:var(--iron-2)}
+.wk-main{appearance:none;flex:1 1 auto;align-self:stretch;display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:var(--sp-m);min-width:0;padding:var(--sp-s) var(--sp-m);border:0;border-radius:12px;background:none;color:var(--parch);text-align:left}
+.wk-row .wk-go{margin-right:var(--sp-s)}
+.wk-pic{position:relative;width:40px;height:40px;flex:none}
+.wk-pic>img{width:100%;height:100%;object-fit:cover;border-radius:10px;box-shadow:0 0 0 1px #262c32}
+.wk-pic .bdg{position:absolute;top:-6px;right:-6px}
+.wk-pic.sm{width:30px;height:30px}
+.wk-pic.sm>img{border-radius:8px}
+.wk-tx{display:flex;flex-direction:column;gap:7px;min-width:0}
+.wk-tx>b{font:600 18px/1.05 var(--f-d);color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wk-sub{display:flex;align-items:center;gap:var(--sp-s);min-width:0;height:24px}
+.wk-sub .bar{flex:1 1 auto;min-width:36px}
+.wk-why{display:inline-flex;align-items:center;gap:4px;min-width:0;font-size:12px;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wk-why .i{width:13px;height:13px;flex:none}
+.wk-why.wait{color:var(--amber)}
+.well.wk-chest img{width:86%;height:86%}
+.wk-nums{display:flex;flex-direction:column;align-items:flex-end;gap:4px;white-space:nowrap}
+.wk-nums>b{font:600 22px/1 var(--f-d);color:var(--gold);font-variant-numeric:lining-nums tabular-nums}
+.wk-nums>span{font-size:12.5px;color:var(--parch-2)}
+.wk-nums>span b{font-weight:700;color:var(--parch);font-variant-numeric:lining-nums tabular-nums}
+.wk-nums>span small{font-size:11px;color:var(--parch-3)}
+.wk-row.lock .wk-tx>b,.wk-row.lock .wk-pic{opacity:.55}
+/* ритуалы — не рейтинговый режим: одна строка под режимами */
+.wk-rit{appearance:none;position:relative;display:flex;align-items:center;gap:var(--sp-m);flex:none;min-width:0;padding:5px var(--sp-m) 5px 6px;border-radius:10px;border:1px solid var(--iron);background:#0c0f12;color:var(--parch);text-align:left}
+.wk-rit:hover{border-color:var(--iron-2)}
+.wk-rit>img{width:28px;height:28px;border-radius:7px;object-fit:cover;box-shadow:0 0 0 1px #262c32}
+.wk-rit>b{font:600 16px/1 var(--f-d)}
+.wk-rit>.i{margin-left:auto;color:var(--gold-2)}
+.wk-rit.hot{border-color:rgba(72,229,212,.4);box-shadow:inset 0 -12px 16px -14px var(--spirit)}
+.wk-rit.hot .wk-why{color:var(--spirit)}
+
+/* следующая неделя: две карточки — герои Эхо и нашествие; ниже — что готовить */
+.wk-next{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-m);flex:1 1 0;min-height:0}
+.wk-card{display:flex;flex-direction:column;gap:var(--sp-s);padding:var(--sp-m);min-width:0;min-height:0;overflow:hidden;text-align:left;color:var(--parch)}
+button.wk-card{appearance:none;font:inherit}
+button.wk-card:hover{border-color:var(--iron-2)}
+.wk-faces{display:flex;gap:6px;flex:none}
+.wk-face{position:relative;width:46px;height:56px;border-radius:9px;overflow:hidden;flex:none;box-shadow:inset 0 -2px 0 var(--rc),0 0 0 1px #242a30}
+.wk-face>img,.wk-face>.rs-ph{position:absolute;inset:0;width:100%;height:100%}
+.wk-face>img{object-fit:cover;object-position:50% 20%}
+.wk-face .rs-ph b{font-size:15px}
+.wk-face.lock{opacity:.35}
+.wk-face>i{position:absolute;left:3px;right:3px;bottom:4px;height:3px;border-radius:2px;background:rgba(0,0,0,.75);overflow:hidden}
+.wk-face>i::before{content:"";position:absolute;left:0;top:0;bottom:0;width:calc(var(--v)*1%);background:var(--spirit)}
+.wk-own{position:absolute;right:3px;bottom:3px;display:grid;place-items:center;width:16px;height:16px;border-radius:50%;background:#0b2724;color:var(--spirit);box-shadow:0 0 0 1px rgba(72,229,212,.5)}
+.wk-own .i{width:11px;height:11px;stroke-width:2.4}
+.wk-big{font:600 21px/1.15 var(--f-d);color:var(--gold)}
+.wk-card .wk-why{white-space:normal}
+.wk-els{display:flex;gap:6px;flex-wrap:wrap;flex:none}
+.wk-el{display:inline-flex;align-items:center;gap:4px}
+.wk-el b{font-size:12.5px;color:var(--parch-2)}
+.wk-tip{flex:none}
+
+/* листы: числа, планки, лидеры, награды, сроки */
+.wk-stats{gap:var(--sp-l);flex-wrap:wrap}
+.wk-pks{display:flex;flex-direction:column}
+.wk-pk{display:grid;grid-template-columns:86px minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;min-height:36px;padding:4px 0;border-bottom:1px solid var(--iron)}
+.wk-pk:last-child{border-bottom:0}
+.wk-pk>b{font:600 17px/1 var(--f-d);color:var(--parch-3)}
+.wk-pk>span:nth-child(2){font-size:12.5px;color:var(--parch-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wk-pk>.num{font-size:12px;white-space:nowrap}
+.wk-pk.got>b{color:var(--gold)}
+.wk-pk.next>b{color:var(--parch)}
+.wk-pk.next>span:nth-child(2){color:var(--parch)}
+.wk-tier{align-items:center;gap:var(--sp-s)}
+.wk-board{display:flex;flex-direction:column;gap:4px}
+.wk-gap{text-align:center;color:var(--parch-3);font-size:12px;line-height:1}
+.wk-rws{display:flex;flex-direction:column}
+.wk-rw{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;padding:5px 0;border-bottom:1px solid var(--iron)}
+.wk-rw:last-child{border-bottom:0}
+.wk-rwb{appearance:none;width:100%;border:0;border-bottom:1px solid var(--iron);background:none;color:var(--parch);text-align:left}
+.wk-rwb:hover .wk-rwt b{color:var(--gold)}
+.wk-rwt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.wk-rwt b{font:600 15px/1.1 var(--f-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wk-rwt small{font-size:11.5px;line-height:1.25;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wk-crs{display:flex;gap:var(--sp-s);flex-wrap:wrap;align-items:center}
+.wk-cr{display:inline-flex;align-items:center;gap:3px;font-size:12.5px;color:var(--rc)}
+.wk-cr b{color:var(--parch)}
+.wk-cur{display:flex;gap:var(--sp-m);flex-wrap:wrap;align-items:center}
+.wk-civ{gap:var(--sp-s)}
+.wk-civ>b{font-size:24px;line-height:1.05;color:var(--gold)}
+.wk-phs{display:flex;flex-direction:column}
+.wk-ph{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;padding:7px 0;border-bottom:1px solid var(--iron)}
+.wk-ph:last-child{border-bottom:0}
+.wk-ph>i{width:9px;height:9px;border-radius:50%;background:var(--iron-2);justify-self:center}
+.wk-ph>span:nth-child(2){display:flex;flex-direction:column;gap:2px;min-width:0}
+.wk-ph b{font:600 15px/1.1 var(--f-d);color:var(--parch)}
+.wk-ph small{font-size:11.5px;line-height:1.3;color:var(--parch-3)}
+.wk-ph>.num{font-size:12.5px;color:var(--parch-2);white-space:nowrap}
+.wk-ph.now>i{background:var(--spirit);box-shadow:0 0 8px var(--spirit)}
+.wk-ph.now b{color:var(--spirit)}
+
+/* раздел UI-кита: те же строки вне кадра телефона */
+.wk-kit{display:flex;flex-direction:column;gap:var(--sp-s)}
+.wk-kit .wk-list{flex:none;grid-auto-rows:auto}
+.wk-kit .eyebrow{font:700 10.5px/1.2 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--gold-2)}
+.wk-kit .wk-row{min-height:62px}
+.wk-kreg{margin:0;padding-left:18px}
+
+/* низкий экран (844×390): шапка и строки плотнее */
+@container main (max-height: 360px){
+  .wk-top{padding:6px var(--sp-s) 6px var(--sp-m)}
+  .wk-id>b{font-size:22px}
+  .wk-clock>b,.wk-kv b,.wk-nums>b{font-size:19px}
+  .wk-kv>img{width:26px;height:26px}
+  .wk-top .gifts img{width:32px;height:32px}
+  .wk-main{padding:6px var(--sp-m);gap:10px}
+  .wk-tx{gap:5px}
+  .wk-tx>b{font-size:16.5px}
+  .wk-pic{width:34px;height:34px}
+  .wk-main{grid-template-columns:34px minmax(0,1fr) auto}
+  .wk-rit{padding:3px var(--sp-m) 3px 5px}
+  .wk-rit>img{width:24px;height:24px}
+  .wk-face{width:40px;height:48px}
+  .wk-big{font-size:19px}
+}

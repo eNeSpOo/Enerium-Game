@@ -1,0 +1,93 @@
+/* screens/shop.css — «Ремесло → Лавка» (screens/shop.js, GDD §14.2): витрина из десяти товаров, лист товара, раздел UI-кита.
+   Правила воздуха: карточка — значок, имя, цена; одна рамка на карточку, внутри ничего в рамках; подробности — в листе.
+   Свет снизу: карточка подсвечена снизу цветом редкости --rc, кристалл — --rico из [data-r] (ADR-0027). Отступы — --sp-l, --sp-m, --sp-s.
+   Движение — transform и opacity: карточки выходят после обновления (--df), купленное вспыхивает отметкой (--dj). Свои классы — lv-*. */
+
+/* шапка витрины: срок новых товаров, сколько осталось, как устроена лавка, «Обновить» */
+.lv-head{display:flex;align-items:center;gap:var(--sp-m);flex:none;min-height:32px;min-width:0}
+.lv-time{display:inline-flex;align-items:center;gap:6px;min-width:0;font-size:13px;color:var(--parch-2)}
+.lv-time .i{width:16px;height:16px;color:var(--sand)}
+.lv-time b{font-weight:700;color:var(--parch)}
+.lv-left{font-size:12.5px;color:var(--parch-3);white-space:nowrap}
+.lv-info{flex:none}
+.lv-ref{flex:none}
+.lv-free{margin-left:2px;padding-left:10px;border-left:1px solid rgba(255,255,255,.14);letter-spacing:.04em;text-transform:none;color:var(--spirit)}
+
+/* витрина: пять в ряд, два ряда — без прокрутки */
+.lv-grid{flex:1 1 0;min-height:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:var(--sp-m)}
+.lv-card{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-s);min-width:0;min-height:0;padding:var(--sp-m) var(--sp-s);
+  border-radius:12px;border:1px solid color-mix(in srgb,var(--rc) 22%,var(--iron));color:var(--parch);text-align:center;cursor:pointer;
+  background:radial-gradient(80% 60% at 50% 100%,color-mix(in srgb,var(--rc) 15%,transparent),transparent 70%),linear-gradient(180deg,#14181b,#0e1114);
+  transition:transform .15s,border-color .15s;animation:lv-in .42s cubic-bezier(.2,.8,.2,1) var(--df,-9999ms) backwards}
+.lv-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--rc) 45%,var(--iron-2))}
+.lv-card:focus-visible{outline:2px solid var(--spirit);outline-offset:2px}
+/* значок: количество в углу, кристалл редкости слева сверху */
+.lv-ic{position:relative;display:grid;place-items:center;flex:none;width:58px;height:58px;border-radius:14px;border:1px solid var(--iron);
+  color:color-mix(in srgb,var(--rc) 70%,var(--parch));background:radial-gradient(80% 80% at 50% 100%,color-mix(in srgb,var(--rc) 28%,transparent),transparent 70%),#0d1013;
+  box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--rc) 80%,transparent)}
+.lv-ic .i{width:28px;height:28px}
+.lv-ic img{width:76%;height:76%;object-fit:contain}
+.lv-ic .gl{font:600 24px/1 var(--f-d);color:var(--gold)}
+.lv-q{position:absolute;right:5px;bottom:4px;font:700 12px/1 var(--f-u);color:var(--parch);text-shadow:0 1px 2px #000,0 0 4px #000}
+.lv-cr{position:absolute;left:5px;top:5px;width:13px;height:13px;background:var(--rico) center/contain no-repeat;filter:drop-shadow(0 0 3px color-mix(in srgb,var(--rc) 60%,transparent))}
+.lv-nm{max-width:100%;min-height:2.3em;font:600 15px/1.15 var(--f-d);color:var(--parch);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+/* цена: значок валюты и число; не хватает — число цветом нехватки */
+.lv-pr{display:inline-flex;align-items:center;gap:5px;font:700 14px/1 var(--f-u);color:var(--gold);font-variant-numeric:lining-nums tabular-nums}
+.lv-pr img{width:18px;height:18px;object-fit:contain}
+.lv-pr.lack{color:var(--rust)}
+.lv-sold{display:inline-flex;align-items:center;gap:5px;font:700 11px/1 var(--f-u);letter-spacing:.12em;text-transform:uppercase;color:var(--spirit)}
+.lv-sold .i{width:14px;height:14px}
+/* куплено: карточка гаснет, отметка остаётся; только что купленное — отметка вспыхивает */
+.lv-card.sold{border-color:var(--iron);background:linear-gradient(180deg,#111417,#0c0e10)}
+.lv-card.sold .lv-ic,.lv-card.sold .lv-nm{opacity:.42}
+.lv-card.just .lv-sold{animation:lv-stamp .5s cubic-bezier(.2,.9,.3,1.4) var(--dj,-9999ms) backwards}
+.lv-card.just::after{content:"";position:absolute;inset:-1px;border-radius:12px;pointer-events:none;opacity:0;box-shadow:0 0 0 1px var(--spirit),0 0 24px -4px var(--spirit);
+  animation:lv-glow 1.2s ease-out var(--dj,-9999ms) both}
+.lv-card.lack .lv-ic{opacity:.8}
+
+/* лист товара: значок с количеством, редкость, имя, ярус; загадка в две строки; где нужен; цена и что останется */
+.lv-sh{display:flex;align-items:center;gap:var(--sp-m);min-width:0}
+.lv-big{position:relative;display:grid;place-items:center;flex:none;width:64px;height:64px;border-radius:14px;border:1px solid var(--iron);
+  color:color-mix(in srgb,var(--rc) 70%,var(--parch));background:radial-gradient(80% 80% at 50% 100%,color-mix(in srgb,var(--rc) 30%,transparent),transparent 70%),#0d1013;
+  box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--rc) 80%,transparent),0 0 20px -8px var(--rc)}
+.lv-big .i{width:30px;height:30px}
+.lv-big img{width:76%;height:76%;object-fit:contain}
+.lv-big .gl{font:600 26px/1 var(--f-d);color:var(--gold)}
+.lv-big b{position:absolute;right:5px;bottom:4px;font:700 12px/1 var(--f-u);color:var(--parch);text-shadow:0 1px 2px #000,0 0 4px #000}
+.lv-sc{display:flex;flex-direction:column;gap:4px;min-width:0}
+.lv-sn{font:600 22px/1.05 var(--f-d);color:var(--parch)}
+.lv-st{font-size:13px;color:var(--parch-3)}
+.lv-stock{align-items:flex-end}
+.lv-use{margin:0;font-size:13px;line-height:1.35;color:var(--parch-2)}
+.lv-use .eyebrow{display:block;margin-bottom:3px}
+.lv-deal{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:var(--sp-s) var(--sp-m);margin:0;padding:var(--sp-m);border-radius:10px;border:1px solid var(--iron);background:#0e1114}
+.lv-deal dt{font:700 10.5px/1.2 var(--f-u);letter-spacing:.14em;text-transform:uppercase;color:var(--parch-3)}
+.lv-deal dd{margin:0;justify-self:end}
+.lv-deal .cost{display:inline-flex;align-items:center;gap:5px;font:700 16px/1 var(--f-u);color:var(--gold);font-variant-numeric:lining-nums tabular-nums}
+.lv-deal .cost img{width:18px;height:18px;object-fit:contain}
+.lv-deal dd.lack .cost{color:var(--rust)}
+.lv-rules{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:var(--sp-s);font-size:14px;line-height:1.4;color:var(--parch-2)}
+
+/* компактный режим низких экранов (844×390 и ниже) — по высоте рабочей области */
+@container main (max-height: 360px){
+  .lv-card{gap:5px;padding:var(--sp-s) 6px}
+  .lv-ic{width:48px;height:48px;border-radius:12px}
+  .lv-ic .i{width:24px;height:24px}
+  .lv-nm{font-size:13.5px}
+  .lv-pr{font-size:13px}
+}
+
+/* раздел UI-кита «Лавка»: состояния карточки и «Обновить» */
+.lv-kbox{gap:var(--sp-m)}
+.lv-kit{display:flex;flex-direction:column;gap:var(--sp-l)}
+.lv-kr{display:flex;flex-wrap:wrap;gap:var(--sp-m);align-items:flex-start}
+.lv-kf{display:flex;flex-direction:column;align-items:center;gap:6px;margin:0}
+.lv-kf figcaption{font-size:12px;color:var(--parch-3)}
+.lv-kf .lv-card{width:156px;height:150px;animation:none;cursor:default}
+
+@keyframes lv-in{from{opacity:0;transform:translateY(10px) scale(.96)}}
+@keyframes lv-stamp{from{opacity:0;transform:scale(1.8)}}
+@keyframes lv-glow{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){
+  .lv-card,.lv-card *,.lv-card::after{animation:none!important;transition:none!important}
+}
