@@ -98,6 +98,51 @@
 - Если модель упорно дорисовывает лишнее — вторую руку, кисть с ножом, — не рисуем заново, а правим свой же вариант: `tools/art-gen/jobs/enemy-portraits-edit.json`.
 - Враг на карточке — угроза в действии, в нём читается история: по телу, позе и месту вокруг. Образцы и прислуга Мастерской — незаконченные эльфы Виала, а не «уроды непонятного происхождения» и не экспонаты кунсткамеры (замечание автора 27.09.2026). Сложную анатомию — одну руку, руку-клинок — рисуем на Pro.
 
+## Глубокий промт персонажа
+
+Правило для всех портретов врагов и героев с 29.09.2026. Автор о первой партии Библиотеки Улариона: дворфы вышли «каменным созданием, которое еле ходит»; «хочу во врагах и героях видеть больше пафоса… чтобы нейронка прописывала их позу… больше деталей, которые связаны с их личностью… чтобы их портрет отражал их характер». Первые задания по способу — `tools/art-gen/jobs/biome-03-library-v2.json` и `heroes-batch-03.json`.
+
+Рамка категории (`frame`) держит мир, кадр, свет и пафос набора. Личное — только в промте персонажа, поле `subject`. Он собирается из слоёв, и каждый слой в тексте подписан: `Who he is`, `Character`, `Pose, the moment of…`, `Details that tell his story`, `Place`. Так модель не теряет слой, а мы видим, что промт полный.
+
+1. **Кто он.** Роль, ранг и класс, место в своём мире — и чего он хочет прямо сейчас: «Right now he has found a part that does not fit: the hero in front of him».
+2. **Характер.** Темперамент и главная черта: гордый, холодный, яростный, насмешливый, фанатичный, усталый, но несгибаемый. Черту пишем телом, а не словом: брови, челюсть, взгляд, осанка. Не «he is proud», а «a jaw clenched like a vice, his neck and back straight as a pillar».
+3. **Поза — словами целиком:**
+   - куда перенесён вес, разворот плеч и корпуса, наклон головы, куда смотрит;
+   - что делает каждая рука, ближняя и дальняя; где оружие или вещь;
+   - миг — пик действия: замах, рывок, заклинание на пике, щит под ударом;
+   - камера чуть снизу, фигура возвышается;
+   - руки в разных местах — «He has exactly two arms: the near arm…, the far arm…», иначе модель дорисует третью.
+4. **Три–пять личных деталей.** Шрамы, починки, знаки ремесла, трофеи, износ, личная вещь. Каждая взята из лора, глав или способностей и что-то говорит о нём. У Подгонщика одно предплечье светлее — он подогнал себя сам; у Елиаса шерсть на тетиве — стрелял так, чтобы не будить спящих. Деталь не спорит с историей: пень за спиной резчицы, которая не рубила деревьев, — брак.
+5. **Пафос.** Враг — достойный противник, которого страшно и почётно победить. Герой — легенда, а не статист. Так и пишем: «a worthy and dangerous enemy — powerful, proud, alive», «a legend, not an extra».
+6. **Свет и кадр** — по этому файлу и кадру категории: свет снизу, контровой по краю, силуэт читается на 74 px.
+7. **Запреты:** скованно, пассивно, статично, «еле ходит», кукольно, пусто в глазах — кроме случаев, когда это прямо свойство персонажа. В `negative` набора: «not a mannequin, not a crash-test dummy, not a marionette on strings… no stiff, passive, awkward or doll-like pose, no dead or empty eyes».
+
+### Чему научила первая партия
+
+- **Рамка не спорит с промтом персонажа.** Рамка дала всем куклам «шарниры в локтях», и Негнущаяся кукла согнула руку в бронзовом локте. Общие слова рамки — с оговоркой «unless the description says otherwise».
+- **Кадр зверя и машины — в их собственном промте,** а не в рамке. Иначе «ног не видно» спорит с «передними лапами», и модель уходит в цикл самоисправления.
+- **Сделанное существо называем материалом:** «carved of dark grey stone, no skin, no hair». Иначе выходит живой человек.
+- **Дворфа называем пропорциями:** «short and enormously broad, a barrel chest, a thick short neck, a broad face, a wide nose». Иначе выходит атлет-человек.
+- **«Глаза не понимают написанного» — не пустые глаза.** Взгляд живой и с целью, понимания письма в нём нет: «alive, attentive, fixed on the enemy with purpose… only the writing they cannot understand».
+- **Письмо на плитах:** «long straight parallel grooves, like ruled lines with nothing written between them». На «fine grooves» модель рисует каракули, похожие на буквы.
+- **Модель упорно рисует вещь по-своему** — бумажную книгу вместо каменной плиты, пень, лишнюю руку. Удачную картинку тогда правим EDIT MODE, а не рисуем заново.
+
+### Пример: Подгонщик, элита Библиотеки
+
+Промт персонажа `b3-e1-fitter-deep`. Картинка вышла с первого раза: `art/generated/enemies/b3-e1-fitter-deep__nb2.jpg`. Полный запрос — стиль, рамка набора, этот текст и запреты (`build` в `tools/art-gen/gen.py`); рамка и запреты лежат в том же задании.
+
+> The enemy: the Fitter, an elite brawler of the Library (Earth). Who he is: the master fitter of the Library's worktables, a heavy, powerful stone dwarf with a bronze hammer and a box of joints. For a thousand years he has knocked parts into place — and knocked them out. He sees every body as a set of parts. Right now he has found a part that does not fit: the hero in front of him. Character: confident, brutal and practical, with a craftsman's pride — he is not angry, he is working. His brows are lowered in concentration, his amber eyes measure the target coldly, his mouth is set in a grim, satisfied line. Pose, the moment of the blow: he has raised a heavy bronze hammer high over his head with both hands, his torso arched back and twisted, his shoulders rolled back — all his weight about to come down in a single blow toward the left. The hammer head is large and close to the camera near the top of the picture. Bronze pins and hinges jump out of the box at his side from the force of the swing, stone chips fly. Details that tell his story: (1) the hammer has a long handle wound with worn leather, its bronze face dented by a thousand blows; (2) a wide leather strap across his chest holds a battered wooden box of spare bronze joints at his hip; (3) his own body is fitted from mismatched parts — one forearm is of a lighter stone than the rest, joined at the elbow with a newer bronze ring: he fitted himself; (4) bronze calipers hang from his belt; (5) his long braided beard is tucked into his belt so it does not catch in the work. Place: a long worktable of the Library behind him with stone arms, hands and gears laid out in neat rows and a half-assembled stone dwarf lying on it; an hourglass with glowing amber sand; amber light glowing in the cracks of the floor below.
+
+Что исправлено против прежнего `b3-e1-fitter` из `jobs/biome-03-library.json`:
+
+| Слой | Было | Стало |
+|---|---|---|
+| Кто он | «a broad dwarf-puppet of grey stone and bronze, heavier than the others» | мастер-подгонщик: тысячу лет вбивает и выбивает части, в каждом теле видит набор частей; сейчас нашёл деталь, которая не подходит, — героя |
+| Характер | нет; «blank stone eyes» — пустые глаза, манекен | уверенный, жёсткий, деловитый, с гордостью мастера: «he is not angry, he is working»; янтарные глаза холодно меряют цель |
+| Поза | одна строка: «raises a heavy bronze hammer high and brings it down» | молот над головой в обеих руках, корпус выгнут и скручен, плечи отведены, весь вес — в один удар влево; боёк крупно у верхнего края |
+| Детали | ящик шарниров | пять: вмятый боёк и кожа на рукояти, ящик на ремне, чужое светлое предплечье, кронциркуль, борода за поясом |
+| Пафос и кадр | «caught in action — not a model posing» | камера чуть снизу, «a worthy and dangerous enemy», запреты «not a mannequin… no dead or empty eyes» |
+
 ## Нельзя
 
 - Текст, буквы, цифры, настоящие алфавиты, водяные знаки, подписи. Текст делает интерфейс.
