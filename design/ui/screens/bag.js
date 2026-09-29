@@ -24,7 +24,8 @@
    «Перековка» у талисмана и предмета — переход в окно «Ремесло → Перековка» (screens/reforge.js) своим режимом и редкостью.
    Дары путешествия по §23.1: две категории — личный рейтинг и клановые награды; история полученного — отдельным видом.
    Строка выплаты — режим и планка или место, период, состав и одно действие; основание выплаты — в подсказке строки,
-   цикл — в сумме сверху. Строки — lbGiftRows UI-кита на EN_LOOTBOXES.modes (типичная неделя), места — рейтинги недели.
+   цикл — в сумме сверху. Прошлая неделя подсчитана — её строки по lbGiftRows UI-кита (типичная неделя EN_LOOTBOXES.modes);
+   эта неделя — только взятые планки из состояния режимов (реестр Недели, EN_WEEK.state; ADR-0031, п. 16), места — рейтинги недели.
    «Получить» переносит закрытые сундуки в запасы (BAG.addChest); открывают их только в запасах.
    Демо-числа — ZP_DEMO, числа вида — ZP_VIEW. Служебное — только команде: TM, PL, tmT из index.html.
    Автопроверка без браузера — tools/content-gen/screens/check_bag.js. */
@@ -36,11 +37,12 @@ const ZP_DEMO = {
   fresh: { items: ['u2', 'find_cb1', 'call_fb1', 'many'], chests: [5, 7], heroes: ['c2-51'] },
   /* осколки героев на старте: отряды Эхо недель дворфов и эльфов, возрождение душ цикла II. В игре — сундуки, прокрутка и каталог праха */
   shards: { 'c2-48': 50, 'c2-51': 38, 'c2-42': 12 },
-  /* «Дары путешествия»: чья неделя — typical из EN_LOOTBOXES.modes: free — обычный игрок, fan — увлечённый.
-     Прошлая неделя подсчитана: личные места по режимам (id режима → место); её личные планки уже получены и лежат в истории.
-     Места текущей недели — из рейтингов S.ranks.
-     gate — режимы, закрытые для аккаунта целиком: id режима → (состояние) => причина или ''. Такому режиму «Дары» не платят ни за эту,
-     ни за прошлую неделю: Лигу без 15 героев не играли и раньше — героев не бывает меньше. Причину даёт экран режима (screens/arena.js) */
+  /* «Дары путешествия»: прошлая неделя подсчитана — чья она: typical из EN_LOOTBOXES.modes: free — обычный игрок, fan — увлечённый;
+     личные места по режимам (id режима → место); её личные планки уже получены и лежат в истории.
+     Эта неделя — только взятые планки: их сообщает экран режима (EN_WEEK.state), места — из рейтингов S.ranks.
+     gate — режимы, закрытые для аккаунта: id режима → (состояние, неделя «Даров») => причина или ''. Лигу без 15 героев не играли и раньше —
+     героев не бывает меньше; Лигу, открытую на этой неделе, не играли на прошлой (демо, 11-й день цикла II: 15-й герой — на 9-й день).
+     Причину даёт экран режима (screens/arena.js) */
   gifts: { who: 'free', prevPlaces: { echo: 212, contract: 41, arena: 95 }, gate: {} },
   /* сценарий «Запасы · талисманы»: какой ларец талисманов показать — его создают рецептом в мастерской */
   flow: { talCasket: 'chest_tal5' },
@@ -345,7 +347,15 @@ function zpArt(e, px) {
   if (e.kind === 'tal') { const f = tlFam(e.no); return f && !tlHide(f) && typeof talIcon === 'function' ? talIcon(f.cat, px, e.name) : ''; }
   if (e.kind === 'equip') return typeof eqIcon === 'function' ? eqIcon(e.slot, px, e.name) : '';
   if (e.kind === 'hero') return typeof shardGhost === 'function' ? shardGhost(e.h, e.q, zpNeed(), px) : '';
+  if (e.kind === 'extra') return zpExtraArt(e.xk, e.id, px);
   return '';
+}
+/* находка из сундука: талисман — арт семейства по имени категории (LBX.talInfo, спойлер — без арта), шарды рабочего — фигура артели */
+function zpExtraArt(xk, id, px) {
+  if (xk === 'wsh') return typeof wkIcon === 'function' ? wkIcon(px, '') : '';
+  if (xk !== 'tal' || typeof talIcon !== 'function' || !window.EN_TALISMANS) return '';
+  const t = LBX && LBX.talInfo[id], cats = EN_TALISMANS.rules.cats, cat = t && !t[2] ? Object.keys(cats).find(k => cats[k] === t[1]) : '';
+  return cat ? talIcon(cat, px, '') : '';
 }
 /* клетка сетки — только значок и число (слова автора 29.09.2026): имя, редкость словом и всё описание — в карточке справа.
    Осколки героя — «собрано/нужно», снаряжение — без числа, на герое — метка; «новое» — точка */
@@ -423,7 +433,7 @@ function zpCardHero(e) {
 function zpCardExtra(e) {
   const g = ZP_EXTRA_GO[e.xk], go = g && typeof OV !== 'undefined' && OV[g.ov] ? g : null;
   return `<div class="pnl icard fit zp-card">
-    ${zpHead({ tile: zpTile(ic(ZP_EXTRA_IC[e.xk] || 'gem'), e.r, { lg: true }), eb: 'Из сундуков', name: trEsc(e.name), cr: zpCr(e.r), q: fmt(e.q), ql: 'в запасах', e })}
+    ${zpHead({ tile: zpExtraArt(e.xk, e.id, ZP_VIEW.cellArt) ? zpTile(zpExtraArt(e.xk, e.id, ZP_VIEW.cellArt), e.r, { lg: true, cls: 'art' }) : zpTile(ic(ZP_EXTRA_IC[e.xk] || 'gem'), e.r, { lg: true }), eb: 'Из сундуков', name: trEsc(e.name), cr: zpCr(e.r), q: fmt(e.q), ql: 'в запасах', e })}
     <div class="col zp-body">${ZP_EXTRA_NOTE[e.xk] ? PL(...ZP_EXTRA_NOTE[e.xk], 'p', 'zp-p') : ''}</div>
     ${go ? `<div class="acts2"><button class="btn go" data-a="${go.a}">${ic(go.ic)}${go.n}</button></div>` : ''}
   </div>`;
@@ -488,9 +498,9 @@ function zpResHtml(L) {
   const cur = Object.entries(s.cur).map(([k, a]) => `<span class="zp-rc" title="${zpCurName(k)}"><img src="${curImg(k)}" alt="${zpCurName(k)}"><b class="num">+${fmt(a)}</b></span>`).join('');
   const tiles = [
     ...Object.entries(s.items).map(([id, q]) => { const it = BAG.item(id); return it ? tile(it.team ? ic('lock') : trIcon(it), it.r, '×' + fmt(q), trEsc(zpName(it))) : ''; }),
-    ...Object.entries(s.shards).map(([id, q]) => { const h = RSI[id]; return h ? tile(rsFace(h), h.r, '×' + fmt(q), trEsc(h.n), { face: true, tip: `Осколки героя: ${trEsc(h.n)} ×${fmt(q)}` }) : ''; }),
+    ...Object.entries(s.shards).map(([id, q]) => { const h = RSI[id], g = h && typeof shardGhost === 'function' ? shardGhost(h, S.rs.shards[id] || 0, zpNeed(), ZP_VIEW.cellArt) : ''; return h ? tile(g || rsFace(h), h.r, '×' + fmt(q), trEsc(h.n), { face: !g, cls: g ? 'art ghost' : '', tip: `Осколки героя: ${trEsc(h.n)} ×${fmt(q)}` }) : ''; }),
     ...Object.entries(s.dust).map(([id, d]) => { const h = RSI[id]; return h ? tile(rsFace(h), h.r, '+' + fmt(d), `${trEsc(h.n)} → прах`, { face: true, dust: true, tip: `${trEsc(h.n)} уже пробуждён: осколки ×${fmt(s.dustQ[id])} → прах +${fmt(d)}` }) : ''; }),
-    ...Object.entries(s.extra).map(([k, q]) => { const [xk, id, r] = k.split(':'); return tile(ic(ZP_EXTRA_IC[xk] || 'gem'), +r, '×' + fmt(q), trEsc(zpExtraName(xk, id, +r))); }),
+    ...Object.entries(s.extra).map(([k, q]) => { const [xk, id, r] = k.split(':'), a = zpExtraArt(xk, id, ZP_VIEW.cellArt); return tile(a || ic(ZP_EXTRA_IC[xk] || 'gem'), +r, '×' + fmt(q), trEsc(zpExtraName(xk, id, +r)), { cls: a ? 'art' : '' }); }),
     ...Object.keys(s.eq || {}).map(uid => { const it = typeof eqItem === 'function' ? eqItem(uid) : null; const art = it && typeof eqIcon === 'function' ? eqIcon(it.slot, ZP_VIEW.cellArt, '') : ''; return it ? tile(art || eqGlyph(it.slot), it.r, '', eqSlotName(it.slot), { cls: art ? 'art' : 'eq', tip: `${eqSlotName(it.slot)} · ${RAR[it.r].toLowerCase()}: ${eqMainTxt(it)}` }) : ''; }),
   ].join('');
   return `<div class="zp-res">
@@ -672,19 +682,38 @@ function darWeeks(st) {
   const p = W[(i + n - 1) % n];
   return [{ id: 'prev', race: p.race, gen: p.gen, counted: true }, { id: 'now', race: W[i].race, gen: W[i].gen, counted: false }];
 }
-/* строки выплат: по одной на планку или место, с составом по сундукам.
-   Планки — lbGiftRows UI-кита (типичная неделя ZP_DEMO.gifts.who), личные места — рейтинги недели. Статус: ok — подтверждено, wait — ждёт, got — получено.
+/* строки выплат: по одной на планку или место, с составом по сундукам. Статус: ok — подтверждено, wait — ждёт, got — получено.
+   Прошлая неделя подсчитана: планки — lbGiftRows UI-кита (типичная неделя ZP_DEMO.gifts.who), личные места — ZP_DEMO.gifts.prevPlaces.
+   Эта неделя — только взятые планки (ADR-0031, п. 16): их сообщает экран режима в реестр Недели (darNow); незаработанной планки в «Дарах»
+   нет, «Получить» — только у взятой. Личные места этой недели — рейтинги S.ranks, ждут подсчёта.
    Клановую долю режима, у которого есть свой журнал раздачи, даёт он сам: DAR_CLAN[id](st, wk) — строки { label, groups: [{ r, count, win }],
-   st, why } или null, тогда — типичная неделя. Клановый босс — журнал клана (screens/clan.js): прошлая неделя — половина сервера по вкладу
-   и доля главы, эта — место клана сейчас */
+   st, why } или null. Клановый босс — журнал клана (screens/clan.js): прошлая неделя — половина сервера по вкладу и доля главы,
+   эта — место клана сейчас */
 const DAR_CLAN = window.DAR_CLAN = window.DAR_CLAN || {};
-function darRows(st) {
+/* взятые планки этой недели — из состояния режима (EN_WEEK.state, screens/week.js): личные — planks, клановые — clanPlanks; номер
+   планки k — строка слоя планок режима в EN_LOOTBOXES. Режим без состояния или закрытый не даёт ничего. Состояние режима — живое (S):
+   у заготовки другого состояния (initialState до подмены S) взятых планок этой недели нет */
+function darNow(st, c, isOpen) {
+  const W = window.EN_WEEK, out = [];
+  if (st !== S || !W || typeof W.state !== 'function') return out;
+  for (const [id, m] of Object.entries(LBX.modes)) {
+    const lm = m.layers.find(l => l.kind === 'plank' && !l.clan), lc = m.layers.find(l => l.kind === 'plank' && l.clan);
+    if ((!lm && !lc) || !isOpen(id)) continue;
+    const s = W.state(id, 'now'); if (!s || s.lock) continue;
+    for (const [ly, list, cat] of [[lm, s.planks, 'me'], [lc, s.clanPlanks, 'clan']]) if (ly) for (const p of list || []) {
+      const row = p.reached ? ly.rows[p.k - 1] : null; if (!row) continue;
+      for (const g of row.cyc[c] || []) out.push({ id, cat, label: lbRowLabel(ly, row), g });
+    }
+  }
+  return out;
+}
+function darRows(st, only) {   // only — id недели ('prev'): только её строки
   if (!LBX || !st.zp) return [];
   const c = st.acc.cycle, got = st.zp.gifts.got, out = [], idx = new Map(), mid = {};
   for (const [id, m] of Object.entries(LBX.modes)) mid[m.n] = id;
   /* режим платит в этом цикле: он недельный, открыт, у него есть неделя в EN_LOOTBOXES.week и он не закрыт для аккаунта (gifts.gate) */
-  const gate = ZP_DEMO.gifts.gate || {}, shut = id => typeof gate[id] === 'function' && !!gate[id](st);
-  const isOpen = id => { const m = LBX.modes[id]; return !!m && m.weekly && c >= m.from && !!(LBX.week[id] && LBX.week[id][c]) && !shut(id); };
+  const gate = ZP_DEMO.gifts.gate || {}, shut = (id, wk) => typeof gate[id] === 'function' && !!gate[id](st, wk);   // wk — неделя «Даров»: Лига могла открыться на этой
+  const isOpen = (id, wk) => { const m = LBX.modes[id]; return !!m && m.weekly && c >= m.from && !!(LBX.week[id] && LBX.week[id][c]) && !shut(id, wk); };
   const put = (wk, cat, id, label, g, kind, place, own) => {
     const key = [wk.race || wk.gen, id, label].join('|');
     let p = idx.get(key);
@@ -692,9 +721,9 @@ function darRows(st) {
       const m = LBX.modes[id], st2 = got[key] ? 'got' : own ? own.st : wk.counted || kind === 'plank' ? 'ok' : 'wait';
       const why = st2 === 'got' ? 'получено · сундуки в запасах'
         : own ? own.why
-          : kind === 'plank' ? 'планка достигнута — подтверждено'
+          : kind === 'plank' ? 'планка взята — подтверждено'
             : kind === 'place' ? (wk.counted ? `итог недели подсчитан · место ${fmt(place)}` : `ждёт подсчёта недели · сейчас место ${fmt(place)}`)
-              : wk.counted ? 'доля клана назначена' : 'ждёт подсчёта недели и распределения в клане';
+              : wk.counted ? 'доля клана назначена' : 'клан взял планку — ждёт подсчёта недели и распределения в клане';
       p = { key, wk, cat, id, m, mode: m.n, box: m.box, label, kind, place, c, st: st2, why, basis: zpClean(m.basis), groups: [],
         period: `неделя ${wk.gen}${wk.id === 'now' ? ', текущая' : wk.id === 'prev' ? ', прошлая' : ''}` };
       idx.set(key, p); out.push(p);
@@ -703,19 +732,29 @@ function darRows(st) {
   };
   const ranks = {}; for (const [n, pl, scope] of st.ranks || []) if (mid[n] && pl && scope !== 'клан') ranks[mid[n]] = pl;
   for (const wk of darWeeks(st)) {
-    const T = lbGiftRows(ZP_DEMO.gifts.who, c), own = {};
-    for (const [id, f] of Object.entries(DAR_CLAN)) if (isOpen(id) && typeof f === 'function') { const r = f(st, wk); if (r) own[id] = r; }
-    for (const cat of ['me', 'clan']) for (const x of T[cat]) { const id = mid[x.mode]; if (isOpen(id) && !(cat === 'clan' && own[id])) put(wk, cat, id, x.label, x.g, x.done ? 'plank' : cat === 'clan' ? 'clan' : 'place'); }
+    if (only && wk.id !== only) continue;
+    const own = {};
+    for (const [id, f] of Object.entries(DAR_CLAN)) if (isOpen(id, wk) && typeof f === 'function') { const r = f(st, wk); if (r) own[id] = r; }
+    if (wk.counted) {   // прошлая неделя подсчитана: итог — типичная неделя
+      const T = lbGiftRows(ZP_DEMO.gifts.who, c);
+      for (const cat of ['me', 'clan']) for (const x of T[cat]) { const id = mid[x.mode]; if (isOpen(id, wk) && !(cat === 'clan' && own[id])) put(wk, cat, id, x.label, x.g, x.done ? 'plank' : cat === 'clan' ? 'clan' : 'place'); }
+    } else for (const x of darNow(st, c, id => isOpen(id, wk))) if (!(x.cat === 'clan' && own[x.id])) put(wk, x.cat, x.id, x.label, x.g, x.cat === 'me' ? 'plank' : 'clan');   // эта — только взятое
     for (const [id, rows] of Object.entries(own)) for (const r of rows) for (const g of r.groups) put(wk, 'clan', id, r.label, g, 'clan', null, r);
     const places = wk.id === 'prev' ? ZP_DEMO.gifts.prevPlaces : ranks;
     for (const [id, pl] of Object.entries(places || {})) {
-      if (!isOpen(id) || !pl) continue;
+      if (!isOpen(id, wk) || !pl) continue;
       const ly = LBX.modes[id].layers.find(l => l.kind === 'place' && !l.clan); if (!ly) continue;
       const row = ly.rows.filter(r => r.top && pl <= r.top).sort((a, b) => a.top - b.top)[0]; if (!row) continue;
       for (const g of row.cyc[c] || []) put(wk, 'me', id, lbRowLabel(ly, row), g, 'place', pl);
     }
   }
   return out;
+}
+/* личная планка k режима id на этой неделе уже получена в «Дарах» — экран режима пишет «в запасах», а не «готово» (Эхо) */
+function darGot(id, k) {
+  if (!LBX || !S || !S.zp) return false;
+  const wk = darWeeks(S).find(w => w.id === 'now'), M = LBX.modes[id], ly = M ? M.layers.find(l => l.kind === 'plank' && !l.clan) : null, row = ly ? ly.rows[k - 1] : null;
+  return !!(wk && row && S.zp.gifts.got[[wk.race || wk.gen, id, lbRowLabel(ly, row)].join('|')]);
 }
 /* строка выплаты: режим и планка или место, период, состав кристаллами и одно действие; основание и статус — в подсказке */
 function darRow(p) {
@@ -909,7 +948,7 @@ function zpState(s) {
   if (!Object.keys(s.rs.shards).length) for (const [id, n] of Object.entries(ZP_DEMO.shards)) if (RSI[id]) s.rs.shards[id] = n;
   for (const id of Object.keys(s.rs.shards)) if (!F.heroes.includes(id)) seen['h:' + id] = 1;
   s.zp = { tab: 'res', f: zpFNone(), q: '', sel: {}, seen, pick: '', n: 1, last: null, opened: {}, ops: {}, op: 1, extra: {}, cops: {}, cop: 1, gifts: { tab: 'me', cat: 'me', got: {}, seq: 0, box: '' } };
-  for (const p of darRows(s)) if (p.wk.id === 'prev' && p.kind === 'plank') s.zp.gifts.got[p.key] = ++s.zp.gifts.seq;   // прошлая неделя: личные планки уже получены
+  for (const p of darRows(s, 'prev')) if (p.kind === 'plank') s.zp.gifts.got[p.key] = ++s.zp.gifts.seq;   // прошлая неделя: личные планки уже получены
   return s;
 }
 const zpInitBase = initialState;

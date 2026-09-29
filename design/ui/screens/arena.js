@@ -3,6 +3,8 @@
    — SCREENS.arena: вкладки «Арена», «Лига», «Оборона» (S.seg.arena: arena, league, def);
    — листы: OV.opp — витрина соперника, состав целиком; OV.arhero — герой соперника; OV.arset — подготовка атаки, он же OV.prep для
      режима отрядов pvp; OV.arres — итог боя Арены; OV.lgopp — матч Лиги: три отряда соперника против трёх своих; OV.lgres — итог матча;
+     итоги — со статистикой в том же виде, что итог Эхо: главное на виду, «Подробности боя» свёрнуты — раунды, кто сколько нанёс,
+     вылечил и принял, какие способности и ульты сработали; у Лиги — по каждому бою матча;
      OV.ardef — журнал обороны; OV.arrew — награды; OV.arrules — как устроено; OV.arpay — цена обновления списка;
    — режим отрядов pvp — «Атака Арены» (SQ_DATA.modes, screens/heroes.js): атакующий состав, как и оборона, героев не занимает;
    — действия ACT.ar*, ACT.lg*; итоги недели — в реестр WEEK_MODES (screens/week.js): Арена и Лига. «Дары» (screens/bag.js) не платят
@@ -12,8 +14,10 @@
    Данные и алгоритм — EN_ARENA и EnArena (design/ui/arena.js, собирает tools/content-gen/arena/build.js). Черновик —
    docs/content/арена-и-лига.md.
    Сервер решает, клиент показывает: список, бой, рейтинг, попытки, обновление, сутки и сезон — операции AR_SRV с номером: номер несёт
-   кнопка, повтор того же номера ничего не повторяет. Бой — ядро боя на сиде пары составов сезона: исход решён до показа, просмотр и
-   «Пропустить» его не меняют (§20.1, §36.9). Служебное — только команде: TM, PL, tmT из index.html.
+   кнопка, повтор того же номера ничего не повторяет. Бой — ядро боя на сиде пары составов сезона, раундов — по таблице ядра
+   (EB.roundsOf('pvp'), 25 на каждый бой Арены и Лиги): исход и статистика решены до показа, просмотр и «Пропустить» их не меняют
+   (§20.1, §36.9). После каждого боя список соперников новый сам — в той же операции, на сиде списка (слово автора 29.09.2026);
+   «Обновить» руками — бесплатные за сутки, дальше за Энериум. Служебное — только команде: TM, PL, tmT из index.html.
    Автопроверка — tools/content-gen/screens/check_arena.js. */
 (function () {
 'use strict';
@@ -21,26 +25,32 @@ const AD = window.EN_ARENA || null, AE = window.EnArena || null;
 
 /* ================== данные экрана: демонстрация, не баланс ================== */
 const AR_DEMO = {
-  season: 1, day: 4,                        // сезон — неделя расы; идёт четвёртый день
-  rating: 1303, games: 212, wins: 38,       // Арена: рейтинг (место около 88 по таблице сервера), боёв всего, побед сезона — три планки
-  att: 20, listNo: 7, paid: 0,              // попыток сейчас, номер списка сезона, платных обновлений сегодня
-  freeIn: 20 * 60,                          // до бесплатного обновления списка, с
+  /* один календарь демо (ADR-0031, п. 17): 11-й день цикла II — вторая неделя цикла; сезон — неделя расы, идёт четвёртый день */
+  season: 2, day: 4,
+  /* Арена: рейтинг — на 88-м месте сервера середины недели (EN_ARENA.server.demo: сборщик берёт его из таблицы «рейтинг → место»
+     прогона — сервер сдвигается с каждым прогоном, место остаётся), боёв всего, побед сезона — три планки */
+  rating: null, games: 212, wins: 38,
+  att: 20, listNo: 7, paid: 0, freeUsed: 0, // попыток сейчас, номер списка сезона, платных и бесплатных «Обновить» сегодня
   days: [131, 104, 96],                     // места на суточных срезах этого сезона: вчера и раньше
   /* журнал обороны до сегодняшнего входа: [соперник, исход атакующего в полуочках, сдвиг рейтинга, когда] — записи, без повтора боя.
      Два отбитых нападения — письмо «Оборона выстояла» во Входящих */
   log: [['a031', 0, 7, 'ночью'], ['a058', 0, 7, 'ночью'], ['a012', 2, -9, 'вчера']],
-  /* прошлая неделя: итог рейтинга, победы, места суточных срезов — Энериум; место недели — из «Даров» */
-  past: { rating: 1336, wins: 44, place: 95, days: [95, 88, 102, 97, 91, 99, 95] },
-  league: { rating: 1000, games: 0, wins: 0, att: 6, listNo: 1 },
+  /* прошлая неделя: итог рейтинга (null — на 95-м месте таблицы конца недели, EN_ARENA.server.demo), победы, места суточных срезов —
+     Энериум; место недели — из «Даров» */
+  past: { rating: null, wins: 44, place: 95, days: [95, 88, 102, 97, 91, 99, 95] },
+  /* Лига открыта с 9-го дня цикла II: 15-й герой коллекции пришёл тогда (ADR-0031, п. 17). Три дня матчей — первая планка (две победы);
+     прошлой недели у Лиги нет (past: null) */
+  league: { rating: 1012, games: 6, wins: 3, att: 4, listNo: 4 },
   defPerDay: 3,                             // команда, «Новые сутки»: сколько нападений на оборону за ночь
   /* сценарий Лиги: коллекция до 15 героев — герои состава циклов I–II с наборами, уровни вокруг отряда демо; три отряда по пять */
-  flow: { lvl: 46, spread: 8, names: ['Лига · I', 'Лига · II', 'Лига · III'], wins: 6, att: 6 },
+  flow: { lvl: 150, spread: 8, names: ['Лига · I', 'Лига · II', 'Лига · III'], wins: 6, att: 6 },
 };
 /* вид */
 const AR_VIEW = {
   near: 500,                                // «наравне» — мощь в пределах ±5 % от своей, б. п.: прогон ядра — +10 уровней ≈ +12 % мощи ≈ 85 % побед
   logRows: 4,                               // записей журнала на экране обороны, остальное — лист
   kit: { r: 1300, g: 99 },                  // UI-кит: пример итога — равные соперники с таким рейтингом и числом боёв
+  abMax: 4,                                 // итог, «Подробности боя»: способностей в строке героя — не больше, остальное — «ещё N»
 };
 
 const BP = 10000, ROM = ['', 'I', 'II', 'III', 'IV', 'V', 'VI'];
@@ -68,6 +78,8 @@ const arOpen = (s = S) => s.acc.cycle >= AD.arena.from;
 const poolN = s => s === S && SQ.pool ? SQ.pool().length : (s.heroes || []).length + Object.keys((s.rs && s.rs.owned) || {}).filter(id => !(s.heroes || []).some(h => h.id === id)).length;
 const lgOpen = (s = S) => typeof leagueOpen === 'function' ? leagueOpen(s) : arOpen(s) && s.acc.cycle >= AD.league.from && poolN(s) >= AD.league.heroes;   // одно правило Лиги — index.html
 const lgWhy = (s = S) => !arOpen(s) ? `рейтинг — с цикла ${ROM[AD.arena.from]}` : poolN(s) < AD.league.heroes ? `нужно ${AD.league.heroes} героев` : '';
+/* прошлая неделя Лиги: её не было, если Лига открылась на этой — итога прошлой недели нет (past пишет только смена сезона) */
+const lgPastWhy = (s = S) => lgWhy(s) || (s.arena && s.arena.lg && !s.arena.lg.past ? 'Лига открылась на этой неделе' : '');
 const seasonId = (s, A) => `${s.acc.cycle}|${s.week.race}|${A.season}`;
 const poolOf = (s, kind) => (kind === 'league' ? AD.pool.league : AD.pool.arena).filter(o => o.c === s.acc.cycle);
 const oppById = (kind, id) => (kind === 'league' ? AD.pool.league : AD.pool.arena).find(o => o.id === id) || null;
@@ -126,15 +138,18 @@ const chestTok = (pay, tip) => pay.length ? `<span class="well ar-chest" data-r=
 
 /* ================== состояние ==================
    S.arena: season, day — сезон и день; rating, games, wins — рейтинг Арены, боёв всего (K), побед сезона; att, max — попытки и их
-   предел; opp — список соперников (id); listNo — номер списка сезона; freeAt — когда бесплатное обновление (по S.week.left);
-   paid — платных обновлений за сутки; hit — атакованные в сезоне; rt — рейтинг соперников после боёв; lost — поражений обороны
-   за сутки; days — места суточных срезов сезона; log — журнал атак и обороны; past — прошлая неделя; lg — то же для Лиги;
+   предел; opp — список соперников (id); listNo — номер списка сезона; freeUsed, paid — бесплатных и платных «Обновить» за сутки;
+   hit — атакованные в сезоне; rt — рейтинг соперников после боёв; lost — поражений обороны за сутки; days — места суточных срезов
+   сезона; log — журнал атак и обороны; past — прошлая неделя; lg — то же для Лиги;
    ops, seq — «сервер»: итоги операций по номерам; last — итог последней операции; pick — соперник в подготовке атаки;
    defAuto — оборона назначается из последней атаки, пока игрок не выбрал её сам (§20.3) */
-function listFor(s, A, kind) {
-  const P = poolOf(s, kind).map(o => ({ id: o.id, r: rtOf(A, o) })), skip = Object.keys(A.hit).concat(A.opp || []);
-  return AE.pickList(M(kind), P, A.rating, AE.makeRng(AE.seedOf(`${kind}|список|${seasonId(s, A)}|${A.listNo}`)), skip).ids;
+/* новый список на сиде: номер списка сезона — часть сида; мимо атакованных и прежнего списка, не хватило новых — добор из прежних
+   (EnArena.pickFresh). fresh — сколько новых лиц: ручное обновление без новых — отказ */
+function freshFor(s, A, kind) {
+  const P = poolOf(s, kind).map(o => ({ id: o.id, r: rtOf(A, o) }));
+  return AE.pickFresh(M(kind), P, A.rating, AE.makeRng(AE.seedOf(`${kind}|список|${seasonId(s, A)}|${A.listNo}`)), Object.keys(A.hit), A.opp || []);
 }
+const listFor = (s, A, kind) => freshFor(s, A, kind).ids;
 function syncRanks(s) {
   if (!s.ranks || !s.arena) return;
   const ra = s.ranks.find(x => x[0] === 'Арена'), rl = s.ranks.find(x => x[0] === 'Лига');
@@ -144,11 +159,13 @@ function syncRanks(s) {
 function arState(s) {
   const D = AR_DEMO, G0 = D.league;
   const log = D.log.map(([oid, half, d, when]) => ({ k: 'def', oid, half, d, when, old: true }));
-  const A = s.arena = { season: D.season, day: D.day, rating: D.rating, games: D.games, wins: D.wins, att: D.att, max: AD.arena.att.cap,
-    opp: [], listNo: D.listNo, freeAt: s.week.left - D.freeIn, paid: D.paid, hit: {}, rt: {}, lost: 0, days: D.days.slice(), log,
-    past: Object.assign({}, D.past, { days: D.past.days.slice() }), defAuto: false, defSeen: null, last: null, pick: null, ops: {}, seq: 1,
+  const acct = AD.server.demo || {}, r0 = D.rating != null ? D.rating : acct.rating != null ? acct.rating : AD.elo.start;
+  const pr0 = D.past.rating != null ? D.past.rating : acct.past != null ? acct.past : r0;
+  const A = s.arena = { season: D.season, day: D.day, rating: r0, games: D.games, wins: D.wins, att: D.att, max: AD.arena.att.cap,
+    opp: [], listNo: D.listNo, freeUsed: D.freeUsed, paid: D.paid, hit: {}, rt: {}, lost: 0, days: D.days.slice(), log,
+    past: Object.assign({}, D.past, { rating: pr0, days: D.past.days.slice() }), defAuto: false, defSeen: null, last: null, pick: null, ops: {}, seq: 1,
     lg: { season: D.season, rating: G0.rating, games: G0.games, wins: G0.wins, att: G0.att, max: AD.league.att.cap, opp: [], listNo: G0.listNo,
-      freeAt: s.week.left, paid: 0, hit: {}, rt: {}, lost: 0, log: [], past: null } };
+      freeUsed: 0, paid: 0, hit: {}, rt: {}, lost: 0, log: [], past: null } };
   if (arOpen(s)) { A.opp = listFor(s, A, 'arena'); A.lg.opp = listFor(s, A.lg, 'league'); }
   if (s.sq && s.sq.sel && !s.sq.sel.pvp) s.sq.sel.pvp = s.sq.sel.arena || null;   // атака по умолчанию — тем же отрядом, что оборона
   syncRanks(s);
@@ -169,7 +186,8 @@ window.addEventListener('en-render', () => {
    Отказ номер не тратит. В игре операцию подтверждает сервер, сид и рейтинги соперников — тоже его */
 const AR_WHY = { closed: `Арена откроется в цикле ${ROM[AD.arena.from]}`, cutoff: 'Приём боёв недели закрыт — итоги скоро', att: 'Попытки кончились. Новые придут завтра',
   gone: 'Этого соперника уже нет в списке', once: 'Этого соперника вы уже атаковали на этой неделе', squad: 'Отряд не готов', lock: 'Лига закрыта',
-  limit: 'Обновлений за Энериум на сегодня больше нет', money: 'Не хватает Энериума', free: 'Бесплатное обновление ещё не пришло', empty: 'Соперников в окне подбора нет', op: 'Действие устарело' };
+  limit: 'Обновлений на сегодня больше нет — список и так новый после каждого боя', money: 'Не хватает Энериума', free: 'Бесплатные обновления на сегодня кончились',
+  empty: 'Новых соперников в окне подбора нет', op: 'Действие устарело' };
 const AR_SRV = {
   run(op, f) {
     const A = S.arena, O = A.ops;
@@ -179,14 +197,24 @@ const AR_SRV = {
     if (!r.refuse) { O[op] = r; A.seq++; }
     return r;
   },
-  /* бой PvP ядром: свои — сторона героев, соперник — сторона врагов; сид — режим, сезон, раунд матча и пара составов */
+  /* бой PvP ядром: свои — сторона героев, соперник — сторона врагов; сид — режим, сезон, раунд матча и пара составов. Раундов — по
+     таблице ядра, одной на все режимы: Арена и Лига — EB.roundsOf('pvp'), 25 на каждый бой (слово автора 29.09.2026). Бой идёт до конца
+     здесь же, со статистикой (EnArena.pvpRun): исход и статистика — из одного боя, итог и «Пропустить» показывают их, а не просмотр */
   fight(mode, mine, theirs, round, flip) {
     const A = S.arena, my = mine.map(id => EB.heroSrc(H(id))), th = theirs.map(x => EB.heroSrc(oppHero(x)));
     const kMine = AE.teamKey(mine), kTh = AE.teamKey(ids5(theirs)), season = seasonId(S, mode === 'лига' ? A.lg : A);
     const seed = flip ? AE.battleSeed(mode, season, round, kTh, kMine) : AE.battleSeed(mode, season, round, kMine, kTh);
-    const rounds = (mode === 'лига' ? AD.league : AD.arena).rounds;
-    const b = EB.run(flip ? AE.pvpBattle(EB, th, my, seed, rounds) : AE.pvpBattle(EB, my, th, seed, rounds));   // pvpBattle копирует источники — снимок ниже цел
-    return { seed, rounds, res: AE.pvpResult(b), mine: mine.slice(), theirs: theirs.map(x => x.slice()), flip: !!flip, a: my, b: th };
+    const rounds = EB.roundsOf('pvp');
+    const out = AE.pvpRun(EB, flip ? AE.pvpBattle(EB, th, my, seed, rounds) : AE.pvpBattle(EB, my, th, seed, rounds));   // pvpBattle копирует источники — снимок ниже цел
+    return { seed, rounds, res: out.res, st: out.st, mine: mine.slice(), theirs: theirs.map(x => x.slice()), flip: !!flip, a: my, b: th };
+  },
+  /* после боя список новый сам (refresh.auto): в той же операции, номер списка — следующий, сид — сезон и номер списка. Без auto —
+     прежнее правило: атакованный выбывает, список кончился — новый */
+  after(X, kind, oid) {
+    X.opp = X.opp.filter(x => x !== oid);
+    if (!M(kind).refresh.auto && X.opp.length) return false;
+    X.listNo++; X.opp = listFor(S, X, kind);
+    return true;
   },
   /* атака Арены: попытка, соперник из списка и один раз за сезон, готовый отряд; бой; рейтинг обеим сторонам (§20.5) */
   attack(op, oid, sid) {
@@ -203,9 +231,7 @@ const AR_SRV = {
       const r0 = A.rating, p0 = arPlace(r0);
       A.rating += e.da; A.games++; A.att--; if (F.res.half === 2) A.wins++;
       A.rt[oid] = rt0 + e.dd; A.hit[oid] = A.seq;
-      A.opp = A.opp.filter(x => x !== oid);
-      let fresh = false;
-      if (!A.opp.length) { A.listNo++; A.opp = listFor(S, A, 'arena'); A.freeAt = S.week.left - AD.arena.refresh.freeMin * 60; fresh = true; }   // список кончился — новый сразу
+      const fresh = AR_SRV.after(A, 'arena', oid);   // после боя — новые соперники
       if (A.defAuto) { SQ.set('arena', sid); A.defSeen = sid; }
       A.log.unshift({ k: 'atk', oid, half: F.res.half, d: e.da, when: 'сегодня', seed: F.seed });
       syncRanks(S);
@@ -230,32 +256,29 @@ const AR_SRV = {
       const r0 = G.rating, p0 = lgPlace(r0);
       G.rating += e.da; G.games++; G.att--; if (sc.half === 2) G.wins++;
       G.rt[oid] = rt0 + e.dd; G.hit[oid] = A.seq;
-      G.opp = G.opp.filter(x => x !== oid);
-      if (!G.opp.length) { G.listNo++; G.opp = listFor(S, G, 'league'); G.freeAt = S.week.left - AD.league.refresh.freeMin * 60; }
+      const fresh = AR_SRV.after(G, 'league', oid);   // после матча — новые соперники
       G.log.unshift({ k: 'atk', oid, half: sc.half, d: e.da, when: 'сегодня', score: [sc.my, sc.their] });
       syncRanks(S);
-      const L = { mode: 'league', no: A.seq, oid, name: o.n, fights, half: sc.half, score: sc, e, r0, r1: G.rating, p0, p1: lgPlace(G.rating), wins: G.wins, rt0 };
+      const L = { mode: 'league', no: A.seq, oid, name: o.n, fights, half: sc.half, score: sc, e, r0, r1: G.rating, p0, p1: lgPlace(G.rating), wins: G.wins, rt0, fresh };
       A.last = L;
       return L;
     });
   },
-  /* обновление списка: бесплатно — по таймеру, иначе за Энериум по цене суток до лимита; атакованные не возвращаются */
+  /* «Обновить» руками: бесплатные за сутки, дальше за Энериум по цене суток до лимита (EnArena.refreshCost). Цену решает сервер:
+     paid — согласие игрока платить, без него платное — отказ. Новых лиц в окне нет — отказ, Энериум не списан; атакованные не возвращаются */
   refresh(op, kind, paid) {
     return AR_SRV.run(op, () => {
       const A = kind === 'league' ? S.arena.lg : S.arena, Mk = M(kind);
       if (kind === 'league' ? !lgOpen() : !arOpen()) return { refuse: kind === 'league' ? 'lock' : 'closed' };
-      const free = S.week.left <= A.freeAt;
-      let price = 0;
-      if (!free) {
-        if (!paid) return { refuse: 'free' };
-        price = AE.refreshPrice(Mk, A.paid); if (price == null) return { refuse: 'limit' };
-        if (S.wallet.enerium < price) return { refuse: 'money' };
-      }
+      const price = AE.refreshCost(Mk, A.freeUsed || 0, A.paid);
+      if (price == null) return { refuse: 'limit' };
+      if (price && !paid) return { refuse: 'free' };
+      if (price && S.wallet.enerium < price) return { refuse: 'money' };
       A.listNo++;
-      const ids = listFor(S, A, kind); if (!ids.length) { A.listNo--; return { refuse: 'empty' }; }
-      if (free) A.freeAt = S.week.left - Mk.refresh.freeMin * 60; else { S.wallet.enerium -= price; A.paid++; }
-      A.opp = ids;
-      return { kind, free, price, ids: ids.slice(), listNo: A.listNo };
+      const L = freshFor(S, A, kind); if (!L.fresh) { A.listNo--; return { refuse: 'empty' }; }
+      if (price) { S.wallet.enerium -= price; A.paid++; } else A.freeUsed = (A.freeUsed || 0) + 1;
+      A.opp = L.ids;
+      return { kind, free: !price, price, ids: L.ids.slice(), listNo: A.listNo };
     });
   },
   /* сутки (команда): ночные нападения на оборону, суточный срез — Энериум за место, попытки и счётчики — заново (§20.2, §20.3, §20.6) */
@@ -281,8 +304,7 @@ const AR_SRV = {
       if (out.def.length) S.inbox.unshift({ id: 'ard' + no, k: 'away', t: out.won === out.def.length ? 'Оборона выстояла' : 'Оборону пробили', s: `Нападений ${out.def.length}, отбито ${out.won} · Арена ${sgn(out.sum)}`, rew: [], go: 'arena' });
       if (en) S.inbox.unshift({ id: 'are' + no, k: 'mail', t: 'Суточный срез Арены', s: `Место ${fmt(place)} · Энериум за место`, rew: [['enerium', en]] });
       A.att = AE.attemptsAfter(AD.arena, A.att, 1); G.att = AE.attemptsAfter(AD.league, G.att, 1);
-      A.paid = 0; G.paid = 0; A.lost = 0; A.day = Math.min(AD.season.days, A.day + 1);
-      A.freeAt = S.week.left; G.freeAt = S.week.left;
+      A.paid = 0; G.paid = 0; A.freeUsed = 0; G.freeUsed = 0; A.lost = 0; A.day = Math.min(AD.season.days, A.day + 1);
       syncRanks(S);
       return Object.assign(out, { place, en, att: A.att });
     });
@@ -293,7 +315,7 @@ const AR_SRV = {
       const A = S.arena, G = A.lg;
       A.past = { rating: A.rating, wins: A.wins, place: AE.placeOf(AD.server.placeEnd, A.rating), days: A.days.slice() };
       G.past = { rating: G.rating, wins: G.wins, place: lgPlace(G.rating) };
-      for (const X of [A, G]) { X.rating = AE.reset(AD, X.rating); X.wins = 0; X.hit = {}; X.rt = {}; X.season++; X.listNo = 1; X.opp = []; X.log = []; X.freeAt = S.week.left; X.paid = 0; }
+      for (const X of [A, G]) { X.rating = AE.reset(AD, X.rating); X.wins = 0; X.hit = {}; X.rt = {}; X.season++; X.listNo = 1; X.opp = []; X.log = []; X.freeUsed = 0; X.paid = 0; }
       A.days = []; A.day = 1; A.lost = 0;
       if (arOpen()) { A.opp = listFor(S, A, 'arena'); G.opp = listFor(S, G, 'league'); }
       syncRanks(S);
@@ -334,7 +356,9 @@ function arPlay(L, def) {
     floor: 1, startFloor: 1, demo: false, guard: false, mode: 'rounds', acted: [], fired: null, view: 0, runMs: 0, kills: 0,
     loot: { gold: 0, spirit: 0, souls: 0, items: {} }, newKnown: [], over: false, seen: false, gap: 0, feed: [], disp: {}, curve: [],
     lastActor: null, pending: 0, endAt: null, max0: 0, done: arDone, seed: L.fights[0].seed };
+  /* «Пропустить» — в каждом бою: и на Арене, и в любом бою матча Лиги — сразу итог со статистикой (у Лиги — итог матча) */
   R.scene = { title: (lg ? 'Лига · ' : def ? 'Оборона · ' : 'Арена · ') + esc(L.name), short: lg ? 'Лига' : 'Арена', back: 'arena', skip: 'arskip',
+    skipTip: lg ? 'Сразу к итогу матча: исход и статистика уже решены' : 'Сразу к итогу: исход и статистика уже решены',
     result: lg ? 'lgres' : 'arres', bg: arBg(), floors: lg && n > 1 ? n : 0,
     sub: r => lg ? `матч · раунд ${ROM[r.floor]} · третий — при равном счёте` : def ? 'на вас напали · бой уже решён' : 'бой уже решён · его можно пропустить',
     badge: r => lg ? `<b>${ROM[r.floor]}</b><span>/ ${ROM[n]}</span>` : `<b>${ic(def ? 'shield' : 'sword')}</b><span>${def ? 'оборона' : 'Арена'}</span>`,
@@ -369,14 +393,50 @@ function whyOf(res, def) {
   return `раунды вышли: вы сняли ${pct1(mine)}, соперник — ${pct1(their)}`;
 }
 
+/* ================== итог со статистикой ==================
+   Тот же вид, что итог Эхо (screens/echo.js, echres), чтобы игрок видел одно и то же: главное — на виду, «Подробности боя» — свёрнуты
+   (классы ech-det, ech-res-kpi, ech-res-t из echo.css). Внутри — раунды и павшие, затем свой отряд и соперник: кто сколько нанёс,
+   вылечил и принял, какие способности и ульты сработали. Числа — статистика боя, что решил исход (F.st, EnArena.pvpRun на «сервере»):
+   «Пропустить» и конец просмотра показывают одно и то же. В обороне свой отряд — вторая сторона боя (F.flip) */
+const mineOf = F => F.flip ? 1 : 0;
+function statFace(u) {
+  const id = String(u.id), rid = id.indexOf('arena:') === 0 ? id.slice(6) : null;
+  if (rid) { const h = RSX(rid); return h ? `<span class="rs-av" data-r="${h.r}">${rsFace(h)}</span>` : '<i></i>'; }
+  const v = SQ.hero(id); return v ? `<span class="rs-av" data-r="${v.r}">${v.face}</span>` : '<i></i>';
+}
+/* сработавшее: ульты — с короной, затем способности и реакции набора по убыванию раз; больше AR_VIEW.abMax — «ещё N» */
+function abLine(u) {
+  const x = (n, k) => `${esc(n)}${k > 1 ? ` <span class="num">×${k}</span>` : ''}`;
+  const all = u.ult.map(([n, k]) => `<b class="ult">${ic('crown')}${x(n, k)}</b>`).concat(u.ab.concat(u.re).sort((a, b) => b[1] - a[1]).map(([n, k]) => x(n, k)));
+  if (!all.length) return '<span class="faint">только обычные атаки</span>';
+  const more = all.length - AR_VIEW.abMax;
+  return all.slice(0, AR_VIEW.abMax).join(' · ') + (more > 0 ? ` · <span class="faint">ещё ${more}</span>` : '');
+}
+function sideTable(us, title) {
+  const rows = us.map(u => `<tr class="${u.alive ? '' : 'fell'}"><td><span class="ech-rf ar-rf"><span class="ar-faces xs">${statFace(u)}</span><b>${esc(u.name)}</b>${u.alive ? '' : '<small>пал</small>'}</span>
+      <small class="ar-ab">${abLine(u)}</small></td><td class="num">${fmt(u.dealt)}</td><td class="num">${fmt(u.healed)}</td><td class="num">${fmt(u.taken)}</td></tr>`).join('');
+  return `<table class="ech-res-t ar-st"><thead><tr><th>${title}</th><th>урон</th><th>лечение</th><th>принято</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+function statsHtml(F) {
+  const st = F && F.st; if (!st) return '<p class="faint">Статистики этого боя нет.</p>';
+  const m = mineOf(F), mine = st.sides[m], their = st.sides[1 - m], fell = us => us.filter(u => !u.alive).length;
+  const kpi = [[`${st.rounds} / ${st.max}`, roundWord(st.max)], [`${fell(their)} / ${their.length}`, 'пало у соперника'], [`${fell(mine)} / ${mine.length}`, 'пало у вас']];
+  return `<div class="row ech-res-kpi sm">${kpi.map(([v, s]) => `<div class="stat"><b class="num">${v}</b><small>${s}</small></div>`).join('')}</div>
+    ${sideTable(mine, 'Ваш отряд')}${sideTable(their, 'Соперник')}`;
+}
+/* свёрнутые подробности — как «Подробности боя» итога Эхо; open — развернуть сразу (сценарий презентации, UI-кит) */
+const detHtml = (sum, body, open, cls) => `<details class="ech-det ar-det${cls ? ' ' + cls : ''}"${open ? ' open' : ''}><summary>${ic('chev')}${sum}</summary><div class="col">${body}</div></details>`;
+
 /* ================== экран ================== */
 const TABS = [['arena', 'Арена'], ['league', 'Лига'], ['def', 'Оборона']];
+/* «Обновить»: пока есть бесплатные — просто кнопка, сколько осталось — в подсказке; дальше — цена на кнопке и лист подтверждения;
+   на сегодня всё — кнопка гаснет. Список и так новый после каждого боя */
 function refreshBtn(kind) {
-  const A = kind === 'league' ? S.arena.lg : S.arena, Mk = M(kind), free = S.week.left <= A.freeAt, price = AE.refreshPrice(Mk, A.paid);
-  if (free) return `<button class="btn sm" data-a="arref" data-v="${arOp()}|${kind}|0">${ic('swap')}Обновить</button>`;
-  const wait = Math.max(0, S.week.left - A.freeAt);
-  if (price == null) return `<button class="btn sm" disabled title="Бесплатно — через ${dur(wait)}">${ic('swap')}Обновить</button>`;
-  return `<button class="btn sm" data-a="sheet" data-v="arpay:${kind}" title="Бесплатно — через ${dur(wait)}">${ic('swap')}Обновить${costTag('enerium', price)}</button>`;
+  const A = kind === 'league' ? S.arena.lg : S.arena, Mk = M(kind), used = A.freeUsed || 0, price = AE.refreshCost(Mk, used, A.paid);
+  const after = Mk.refresh.auto ? ` После каждого ${kind === 'league' ? 'матча' : 'боя'} список и так новый.` : '';
+  if (price === 0) { const left = Mk.refresh.free - used; return `<button class="btn sm" data-a="arref" data-v="${arOp()}|${kind}|0" title="Бесплатно — ещё ${left} ${plural(left, 'раз', 'раза', 'раз')} сегодня.${after}">${ic('swap')}Обновить</button>`; }
+  if (price == null) return `<button class="btn sm" disabled title="Обновлений на сегодня больше нет.${after}">${ic('swap')}Обновить</button>`;
+  return `<button class="btn sm" data-a="sheet" data-v="arpay:${kind}" title="Бесплатные на сегодня кончились.${after}">${ic('swap')}Обновить${costTag('enerium', price)}</button>`;
 }
 /* карточка соперника: лица состава, имя, два числа — рейтинг и мощь, один чип — сила против своего отряда; нажатие — витрина */
 function oppCard(kind, oid) {
@@ -489,7 +549,7 @@ Object.assign(OV, {
     const back = kind === 'league' ? `lgopp:${oid}` : `opp:${oid}`;
     const body = `<div class="ar-hh">${oppTile(h, back)}<div class="col" style="gap:6px"><b class="serif ar-hn">${esc(h.name)}</b>
         <span class="row" style="gap:6px;flex-wrap:wrap">${CLS(h.clsN, 16)}<span>${esc(h.clsN)}</span>${el(h.el)}<span class="faint">${esc(h.race || '')}</span></span>
-        <span class="faint">ур. ${h.lvl} из ${h.cap} · доблесть ${h.valor} из ${h.maxV} · предел ${h.lim} из 5</span>${bmHtml(h.bm, 14)}</div></div>
+        <span class="faint">ур. ${h.lvl} из ${h.cap} · доблесть ${h.valor} из ${h.maxV}</span>${typeof rpRow === 'function' ? rpRow(h.lim) : `<span class="faint">предел ${h.lim} из 5</span>`}${bmHtml(h.bm, 14)}</div></div>
       <span class="eyebrow">В бою · доля хода</span><div class="stats">${abs || '<p class="faint">Бьёт обычной атакой.</p>'}</div>
       <p class="reason">Снаряжения нет.</p>`;
     return sheet(esc(x.n), body, `<button class="btn" data-a="sheet" data-v="${back}">${ic('back')}К составу</button>`);
@@ -506,27 +566,30 @@ Object.assign(OV, {
         <span class="chip ${cls}">${pw}</span>
         <div class="ar-side"><span class="eyebrow">${esc(s.name)}</span><span class="ar-faces">${myFaces(s)}</span>${bmHtml(bmM, 14)}</div></div>
       <div class="row hr-chips">${chips}</div>
-      <p class="reason ${r.ok ? '' : 'warn'}">${r.ok ? 'Исход решится в момент атаки — просмотр его не изменит.' : `«${esc(s.name)}»: ${r.why}. Нужны пятеро разных героев.`}</p>`;
+      <p class="reason ${r.ok ? '' : 'warn'}">${r.ok ? 'Исход решится в момент атаки: бой можно смотреть или пропустить — итог тот же.' : `«${esc(s.name)}»: ${r.why}. Нужны пятеро разных героев.`}</p>`;
     return sheet('Атака · ' + esc(x.n), body, `<button class="link" data-a="sqedit" data-v="pvp|${s.id}">${ic('users')}Изменить</button><button class="btn sm" data-a="sqnew" data-v="${op}|pvp" ${S.squads.length >= SQ_DATA.max ? 'disabled' : ''}>${ic('plus')}Новый</button>
       <span class="g-spacer"></span><button class="btn go" data-a="aratk" data-v="${arOp()}|${oid}|${s.id}" ${r.ok && A.att > 0 ? '' : 'disabled'}>${ic('sword')}В бой</button>`, true);
   },
-  /* итог боя Арены: исход, сдвиг рейтинга крупно, место; почему так кончилось; путь к планке */
+  /* итог боя Арены — тот же вид, что итог Эхо: на виду исход, сдвиг рейтинга крупно, рейтинг и место, почему так кончилось, путь к
+     планке; «Подробности боя» свёрнуты — раунды, павшие, кто сколько нанёс, вылечил и принял, сработавшие способности и ульты.
+     Открывают «Пропустить» и конец просмотра — итог решён в момент атаки. После боя список уже новый: «К новым соперникам» */
   arres(o) {
     const R = runById(o.arg), L = R ? R.res : S.arena.last; if (!L || L.mode !== 'arena') return sheet('Итог', '<p class="faint">Итога нет.</p>');
-    const F = L.fights[0];
+    const F = L.fights[0], det = detHtml('Подробности боя', statsHtml(F), !!o.open);
     /* нападение на оборону: исход глазами защитника и сдвиг рейтинга из журнала */
     if (L.def) {
       const h = 2 - L.half, ttl = h === 2 ? 'Оборона выстояла' : h === 0 ? 'Оборону пробили' : 'Ничья';
       return sheet(ttl + ' · ' + esc(L.name), `<div class="ar-res ${h === 2 ? 'win' : h === 0 ? 'lose' : ''}"><b class="num">${sgn(L.d || 0)}</b><small>рейтинг Арены</small></div>
-        <p class="reason">${cap1(whyOf(F.res, true))}.</p>`, `<span class="g-spacer"></span><button class="btn go" data-a="seg" data-v="arena:def" data-go="arena">К обороне</button>`);
+        <p class="reason">${cap1(whyOf(F.res, true))}.</p>${det}`, `<span class="g-spacer"></span><button class="btn go" data-a="seg" data-v="arena:def" data-go="arena">К обороне</button>`);
     }
     const ttl = L.half === 2 ? 'Победа' : L.half === 0 ? 'Поражение' : 'Ничья';
     const pk = planks('arena', L.wins), nx = pk.find(p => !p.reached);
     const body = `<div class="ar-res ${L.half === 2 ? 'win' : L.half === 0 ? 'lose' : ''}"><b class="num">${sgn(L.e.da)}</b><small>рейтинг ${fmt(L.r1)} · место ${fmt(L.p1)}</small></div>
       <p class="reason">${cap1(whyOf(F.res))}.</p>
       <div class="ar-pl-s"><span>${fmt(L.wins)} ${plural(L.wins, 'победа', 'победы', 'побед')} за неделю</span>${nx ? `<span class="faint">сундук за ${fmt(nx.need)}</span>` : '<span class="faint">все планки взяты</span>'}</div>
+      ${det}
       ${TM(`<p class="reason">Ожидание ${pct1(L.e.e)}, K ${AE.kOf(AD, S.arena.games - 1, L.r0)}; соперник ${sgn(L.e.dd)}. Сид ${String(F.seed >>> 0)}.</p>`)}`;
-    return sheet(ttl + ' · ' + esc(L.name), body, `${R && !R.seen ? '' : `<button class="btn" data-a="arwatch" data-v="${R ? R.id : 'last'}">${ic('eye')}Смотреть бой</button>`}<span class="g-spacer"></span><button class="btn go" data-a="close">К соперникам</button>`);
+    return sheet(ttl + ' · ' + esc(L.name), body, `${R && !R.seen ? '' : `<button class="btn" data-a="arwatch" data-v="${R ? R.id : 'last'}">${ic('eye')}Смотреть бой</button>`}<span class="g-spacer"></span><button class="btn go" data-a="close">${L.fresh ? 'К новым соперникам' : 'К соперникам'}</button>`);
   },
   /* матч Лиги: три отряда соперника по раундам против трёх своих — у каждого раунда оценка силы; третий — при равном счёте */
   lgopp(o) {
@@ -543,13 +606,16 @@ Object.assign(OV, {
       <p class="reason ${L.ok ? '' : 'warn'}">${L.ok ? `Победа ${sgn(w.da)} · поражение ${sgn(l.da)}. Третий раунд — только при 1:1: отдать слабый раунд — тоже решение.` : L.why + '.'}</p>`;
     return sheet(esc(x.n), body, `<button class="link" data-a="sqmode" data-v="league">${ic('users')}Расставить отряды</button><span class="g-spacer"></span><span class="faint ar-f">матчей ${G.att} / ${G.max}</span><button class="btn go" data-a="lgplay" data-v="${arOp()}|${oid}" ${can ? '' : 'disabled'}>${ic('sword')}Сыграть матч</button>`, true);
   },
+  /* итог матча Лиги: на виду счёт крупно и сдвиг рейтинга Лиги; ниже — строка на каждый бой матча: исход и почему так кончилось,
+     нажатие раскрывает его статистику — тот же блок, что «Подробности боя» Арены. open — номер боя, раскрытого сразу (с единицы) */
   lgres(o) {
     const R = runById(o.arg), L = R ? R.res : S.arena.last; if (!L || L.mode !== 'league') return sheet('Итог', '<p class="faint">Итога нет.</p>');
     const ttl = L.half === 2 ? 'Победа' : L.half === 0 ? 'Поражение' : 'Ничья', sc = L.score, half = n => `${Math.floor(n / 2)}${n % 2 ? '½' : ''}`;
-    const rows = L.fights.map((F, i) => `<div class="srow"><span class="n">Раунд ${ROM[i + 1]} · ${verdictOf(F)}</span><span class="v">${esc(whyOf(F.res))}</span><span></span></div>`).join('');
+    const bouts = L.fights.map((F, i) => detHtml(`<b>Раунд ${ROM[i + 1]} · ${verdictOf(F)}</b><small>${esc(whyOf(F.res))}</small>`, statsHtml(F), +o.open === i + 1,
+      `lg-bout ${F.res.half === 2 ? 'win' : F.res.half === 0 ? 'lose' : ''}`)).join('');
     const body = `<div class="ar-res ${L.half === 2 ? 'win' : L.half === 0 ? 'lose' : ''}"><b class="num">${half(sc.my)} : ${half(sc.their)}</b><small>рейтинг Лиги ${fmt(L.r1)} (${sgn(L.e.da)})</small></div>
-      <div class="stats">${rows}</div>${sc.need3 ? '' : `<p class="reason">Третий раунд не понадобился.</p>`}`;
-    return sheet(ttl + ' · ' + esc(L.name), body, `${R && !R.seen ? '' : `<button class="btn" data-a="arwatch" data-v="${R ? R.id : 'last'}">${ic('eye')}Смотреть матч</button>`}<span class="g-spacer"></span><button class="btn go" data-a="close">К Лиге</button>`);
+      <div class="col lg-bouts">${bouts}</div>${sc.need3 ? '' : `<p class="reason">Третий раунд не понадобился.</p>`}`;
+    return sheet(ttl + ' · ' + esc(L.name), body, `${R && !R.seen ? '' : `<button class="btn" data-a="arwatch" data-v="${R ? R.id : 'last'}">${ic('eye')}Смотреть матч</button>`}<span class="g-spacer"></span><button class="btn go" data-a="close">${L.fresh ? 'К новым соперникам' : 'К Лиге'}</button>`);
   },
   /* журнал обороны: все нападения недели */
   ardef() {
@@ -569,18 +635,21 @@ Object.assign(OV, {
   },
   /* как устроено: пять строк правил; команде — Эло и асимметрия */
   arrules(o) {
-    const lg = o.arg === 'league', E = AD.elo;
-    const pts = lg ? ['Три отряда по пять, герой не повторяется. Все три отряда соперника видны.', 'Раунд I — ваш первый отряд против первого соперника, и так далее. Третий раунд — только при 1:1.', 'Отдать слабый раунд, чтобы выиграть два других, — законный ход.', `Матчей — ${AD.league.att.day} в сутки, копятся до ${AD.league.att.cap}.`, 'Дивизион — ступень рейтинга Лиги.']
-      : ['Соперника видно целиком до атаки: решение — до боя, бой лишь проверяет ответ.', 'Бой с этим составом против вашего всегда пойдёт одинаково — поэтому каждого соперника атакуют один раз за неделю.', `Раунды вышли — побеждает тот, кто снял бо́льшую долю здоровья противника.`, `Атак — ${AD.arena.att.day} в сутки, копятся до ${AD.arena.att.cap}. Энериум обновляет список, но не даёт попыток и рейтинга.`, 'Рейтинг — только от побед и поражений. В начале недели он сжимается к среднему.'];
-    const team = TM(`<p class="reason">Эло: E по таблице разницы рейтингов; K ${E.k.new} — первые ${E.k.newGames} боёв, ${E.k.base}, ${E.k.high} выше ${E.k.highFrom}. Ожидание атакующего — со сдвигом ${E.def.shift} в его пользу: он видит соперника и выбирает. Удачная оборона — ${pct1(E.def.winBp)} расчётного, поражений обороны в сутки снимают рейтинг не больше ${E.def.lossCap}. Сброс недели — к ${E.start} наполовину. Раундов боя — ${M(lg ? 'league' : 'arena').rounds}. Сид — пара составов на сезон.</p>`);
+    const lg = o.arg === 'league', E = AD.elo, Mk = M(lg ? 'league' : 'arena'), R0 = Mk.refresh;
+    const list = `После каждого ${lg ? 'матча' : 'боя'} список соперников новый. «Обновить» — ${R0.free} ${plural(R0.free, 'раз', 'раза', 'раз')} в сутки бесплатно, дальше за Энериум: он не даёт ни попыток, ни рейтинга.`;
+    const pts = lg ? ['Три отряда по пять, герой не повторяется. Все три отряда соперника видны.', 'Раунд I — ваш первый отряд против первого соперника, и так далее. Третий раунд — только при 1:1. Отдать слабый раунд, чтобы выиграть два других, — законный ход.', 'Матч можно не смотреть: «Пропустить» — сразу итог и статистика каждого боя.', `Матчей — ${AD.league.att.day} в сутки, копятся до ${AD.league.att.cap}. ${list}`, 'Дивизион — ступень рейтинга Лиги.']
+      : ['Соперника видно целиком до атаки: решение — до боя, бой лишь проверяет ответ.', 'Бой с этим составом против вашего всегда пойдёт одинаково — поэтому каждого соперника атакуют один раз за неделю. Смотреть его не обязательно: «Пропустить» — сразу итог и статистика.', `Раунды вышли — побеждает тот, кто снял бо́льшую долю здоровья противника.`, `Атак — ${AD.arena.att.day} в сутки, копятся до ${AD.arena.att.cap}. ${list}`, 'Рейтинг — только от побед и поражений. В начале недели он сжимается к среднему.'];
+    const team = TM(`<p class="reason">Эло: E по таблице разницы рейтингов; K ${E.k.new} — первые ${E.k.newGames} боёв, ${E.k.base}, ${E.k.high} выше ${E.k.highFrom}. Ожидание атакующего — со сдвигом ${E.def.shift} в его пользу: он видит соперника и выбирает. Удачная оборона — ${pct1(E.def.winBp)} расчётного, поражений обороны в сутки снимают рейтинг не больше ${E.def.lossCap}. Сброс недели — к ${E.start} наполовину. Раундов боя — ${EB.roundsOf('pvp')}, таблица ядра. Сид — пара составов на сезон. Список — на сиде сезона и номера списка; платные обновления — ${R0.price.join(', ')}.</p>`);
     return sheet(lg ? 'Как устроена Лига' : 'Как устроена Арена', `<ul class="ar-rules">${pts.map(p => `<li>${p}</li>`).join('')}</ul>${team}`);
   },
-  /* цена обновления за Энериум — подтверждение: сколько стоит и что останется */
+  /* цена обновления за Энериум — подтверждение: сколько стоит и что останется. Бесплатное подтверждения не просит */
   arpay(o) {
-    const kind = o.arg === 'league' ? 'league' : 'arena', A = kind === 'league' ? S.arena.lg : S.arena, price = AE.refreshPrice(M(kind), A.paid);
-    if (price == null) return dialog('Обновить список', '<p class="reason">Обновлений за Энериум на сегодня больше нет.</p>', '<button class="btn go" data-a="close">Понятно</button>');
-    const ok = S.wallet.enerium >= price, wait = Math.max(0, S.week.left - A.freeAt);
-    return dialog('Обновить список', `<p>Новые соперники — за ${money('enerium', price)}. Останется ${fmt(Math.max(0, S.wallet.enerium - price))}.</p><p class="reason">Бесплатно — через ${dur(wait)}. Попыток и рейтинга Энериум не даёт.</p>`,
+    const kind = o.arg === 'league' ? 'league' : 'arena', A = kind === 'league' ? S.arena.lg : S.arena, price = AE.refreshCost(M(kind), A.freeUsed || 0, A.paid);
+    const after = M(kind).refresh.auto ? ` После каждого ${kind === 'league' ? 'матча' : 'боя'} список и так новый.` : '';
+    if (price == null) return dialog('Обновить список', `<p class="reason">Обновлений на сегодня больше нет.${after}</p>`, '<button class="btn go" data-a="close">Понятно</button>');
+    if (price === 0) return dialog('Обновить список', `<p>Новые соперники — бесплатно.</p><p class="reason">${after.trim()}</p>`, `<button class="btn ghost" data-a="close">Отмена</button><button class="btn go" data-a="arref" data-v="${arOp()}|${kind}|0">Обновить</button>`);
+    const ok = S.wallet.enerium >= price;
+    return dialog('Обновить список', `<p>Новые соперники — за ${money('enerium', price)}. Останется ${fmt(Math.max(0, S.wallet.enerium - price))}.</p><p class="reason">Бесплатные на сегодня кончились.${after} Попыток и рейтинга Энериум не даёт.</p>`,
       `<button class="btn ghost" data-a="close">Отмена</button><button class="btn go" data-a="arref" data-v="${arOp()}|${kind}|1" ${ok ? '' : 'disabled'}>Обновить${costTag('enerium', price)}</button>`);
   },
 });
@@ -606,7 +675,7 @@ Object.assign(ACT, {
     if (r.again) { S.overlay = null; return render(); }
     arPlay(r);
   },
-  /* «Пропустить»: итог уже решён — сразу лист итога */
+  /* «Пропустить» — в любом бою Арены, обороны и матча Лиги: итог уже решён, сразу лист итога со статистикой (у Лиги — итог матча) */
   arskip(v) {
     const R = runById(v) || focusRun(); if (!R || R.kind !== 'pvp') return;
     R.over = true; R.seen = true; S.focus = R.id; S.insp = null; S.route = 'arena'; S.overlay = { t: R.scene.result, arg: R.id };
@@ -629,7 +698,7 @@ Object.assign(ACT, {
 /* ================== неделя: итоги в реестр WEEK_MODES (screens/week.js) ==================
    Арена: место и рейтинг, планки побед недели, лидеры, выплата за место, если неделя кончится сейчас. Прошлая — место и выплаты из
    «Даров» (darRows, screens/bag.js), рейтинг конца недели, Энериум суточных срезов. Лига — так же; закрыта — причина */
-const darPrev = id => typeof darRows === 'function' && S.zp ? darRows(S).filter(p => p.id === id && p.wk && p.wk.id === 'prev') : [];
+const darPrev = id => typeof darRows === 'function' && S.zp ? darRows(S, 'prev').filter(p => p.id === id) : [];
 const pastRows = rows => rows.map(p => ({ label: p.label, box: p.box, groups: p.groups.map(g => ({ r: g.r, count: g.count, win: g.win })), st: p.st, cat: p.cat, kind: p.kind }));
 const WINS = ['победа', 'победы', 'побед'];
 (window.WEEK_MODES = window.WEEK_MODES || []).push({
@@ -657,17 +726,35 @@ const WINS = ['победа', 'победы', 'побед'];
       tier: tierOf('league', place), note: `Дивизион ${divOf(G.rating).n}` };
   },
   past() {
-    const why = lgWhy(); if (why) return { lock: why };
+    const why = lgPastWhy(); if (why) return { lock: why };
     const G = S.arena.lg, P = G.past || { rating: AD.elo.start, place: null }, rows = darPrev('league'), pl = rows.find(p => p.kind === 'place' && p.place);
     return { place: pl ? pl.place : P.place, points: P.rating, top: AD.top.league.past.map(x => x.slice()), rewards: pastRows(rows) };
   },
 });
-/* «Дары» не платят режиму, закрытому для аккаунта: Лигу без 15 героев не играли ни на этой неделе, ни на прошлой — героев не бывает меньше */
-if (typeof ZP_DEMO !== 'undefined' && ZP_DEMO.gifts) (ZP_DEMO.gifts.gate = ZP_DEMO.gifts.gate || {}).league = s => lgWhy(s);
+/* «Дары» не платят режиму, закрытому для аккаунта: Лигу без 15 героев не играли ни на этой неделе, ни на прошлой — героев не бывает меньше;
+   Лига, открытая на этой неделе, за прошлую не платит (wk — неделя «Даров») */
+if (typeof ZP_DEMO !== 'undefined' && ZP_DEMO.gifts) (ZP_DEMO.gifts.gate = ZP_DEMO.gifts.gate || {}).league = (s, wk) => wk && wk.id === 'prev' ? lgPastWhy(s) : lgWhy(s);
 
 /* ================== раздел UI-кита ================== */
+/* пример итога со статистикой: оборона демо-аккаунта против первого соперника списка — настоящий бой ядром на сиде, без операции:
+   состояние не меняется. Один раз на пару составов */
+let arKitF = null;
+function kitFight() {
+  const mine = SQ.ids('arena'), oid = S.arena.opp[0], o = oid && oppById('arena', oid);
+  if (!o || mine.length !== 5) return null;
+  const key = mine.join() + '|' + oid + '|' + seasonId(S, S.arena);
+  if (!arKitF || arKitF.key !== key) arKitF = { key, name: o.n, F: AR_SRV.fight('арена', mine, o.f, 0) };
+  return arKitF;
+}
+function arKitStats() {
+  const K = kitFight(); if (!K) return '<p class="faint">Нужны пятеро в обороне и соперник в списке.</p>';
+  const F = K.F, h = F.res.half, K0 = AR_VIEW.kit, d = AE.attack(AD, { r: K0.r, g: K0.g }, { r: K0.r, g: K0.g, lost: 0 }, h).da;
+  return `<div class="col ar-kit-res"><b class="serif">${h === 2 ? 'Победа' : h === 0 ? 'Поражение' : 'Ничья'} · ${esc(K.name)}</b>
+    <div class="ar-res ${h === 2 ? 'win' : h === 0 ? 'lose' : ''}"><b class="num">${sgn(d)}</b><small>рейтинг · место</small></div>
+    <p class="reason">${cap1(whyOf(F.res))}.</p>${detHtml('Подробности боя', statsHtml(F), true)}</div>`;
+}
 function arKitHtml() {
-  const A = S.arena, ids = A.opp.slice(0, 3), E = AD.elo, Mo = AD.model;
+  const A = S.arena, ids = A.opp.slice(0, 3), E = AD.elo, Mo = AD.model, RF = AD.arena.refresh;
   const cards = ids.map(id => oppCard('arena', id).replace(/data-a="[^"]*"/g, 'data-a="noop"')).join('');
   const res = (half, d) => `<div class="ar-res ${half === 2 ? 'win' : half === 0 ? 'lose' : ''}"><b class="num">${sgn(d)}</b><small>${half === 2 ? 'победа' : half === 0 ? 'поражение' : 'ничья'}</small></div>`;
   const K0 = AR_VIEW.kit, one = half => AE.attack(AD, { r: K0.r, g: K0.g }, { r: K0.r, g: K0.g, lost: 0 }, half), w = one(2), l = one(0), d0 = one(1);
@@ -677,11 +764,20 @@ function arKitHtml() {
   const prof = Mo ? Object.entries(Mo.prof).map(([k, x]) => `<tr><td>${{ free: 'обычный', fan: 'увлечённый', payer: 'плательщик' }[k]}</td><td class="n">${Math.floor(x.att / 100)}</td><td class="n">${x.winMed}</td><td class="n">${pct1(x.winBp)}</td><td class="n">${h2(x.en)}</td><td class="n">${h2(x.spent)}</td></tr>`).join('') : '';
   const hund = v => (v < 0 ? '−' : v > 0 ? '+' : '') + h2(Math.abs(v));   // сотые → «−0,03»
   const sh = Mo ? Mo.shifts.map(x => `<tr><td>${x.shift === E.def.shift ? `<b>${x.shift}</b>` : x.shift < 0 ? '−' + -x.shift : x.shift}</td><td class="n">${hund(x.eqGain)}</td><td class="n">${x.drift.map(fmt).join(' → ')}</td></tr>`).join('') : '';
+  /* автообновление: тот же сервер — список живёт до конца (прежнее правило) и новый после каждого боя */
+  const C0 = Mo && Mo.cmp, PNm = { free: 'обычный', fan: 'увлечённый', payer: 'плательщик' };
+  const [was, now] = C0 ? (C0.auto ? [Mo.prof, C0.prof] : [C0.prof, Mo.prof]) : [null, null];
+  const au = C0 ? Object.keys(Mo.prof).map(k => `<tr><td>${PNm[k]}</td><td class="n">${h2(was[k].wins)} → ${h2(now[k].wins)}</td><td class="n">${pct1(was[k].winBp)} → ${pct1(now[k].winBp)}</td><td class="n">${h2((now[k].frees || 0) + now[k].refs)}</td><td class="n">${h2(now[k].spent)}</td></tr>`).join('') : '';
   return `<section class="k-box ar-kit" style="grid-column:1/-1" id="kitArena"><h3>Арена и Лига</h3>
     <p class="k-note">Асинхронное PvP: состав соперника виден целиком до атаки, бой решён в момент нажатия и только проверяет ответ. Каждого соперника атакуют один раз за неделю — бой этой пары составов всегда один. Вкладки — Арена, Лига, Оборона.${TM(' §20, ADR-0010. Данные и алгоритм — design/ui/arena.js (tools/content-gen/arena/build.js), черновик — docs/content/арена-и-лига.md, экран — screens/arena.js.')}</p>
     <div class="ar-kg">
       <div class="k-air-r"><b>Карточка соперника</b><div class="ar-list kit">${cards}</div><small>Лица состава, имя, два числа — рейтинг и боевая мощь, один чип — сила против вашего отряда. Нажатие — витрина: состав целиком, ротации, «Выбрать отряд».</small></div>
       <div class="k-air-r"><b>Итог боя</b><div class="row" style="gap:var(--sp-m)">${res(2, w.da)}${res(0, l.da)}${res(1, d0.da)}</div><small>Сдвиг рейтинга крупно, под ним — рейтинг и место. Раунды вышли — побеждает снявший бо́льшую долю здоровья противника.</small></div>
+    </div>
+    <div class="ar-kg">
+      <div class="k-air-r"><b>Итог со статистикой · «Пропустить»</b>${arKitStats()}<small>Тот же вид, что итог Эхо: главное — на виду, «Подробности боя» свёрнуты. Внутри — раунды и павшие, кто сколько нанёс, вылечил и принял, сработавшие способности, ульты — с короной. «Пропустить» есть в каждом бою Арены и Лиги и сразу открывает этот итог: бой решён в момент атаки. У Лиги — строка на каждый бой матча, нажатие раскрывает его статистику.</small></div>
+      <div class="k-air-r"><b>Список соперников</b><div class="row" style="gap:6px;flex-wrap:wrap"><span class="chip spirit">${ic('swap')}после боя — новые трое</span><span class="chip">«Обновить» · ${RF.free} в сутки бесплатно</span><span class="chip">дальше ${RF.price.join(' · ')} Энериума</span></div>
+        <small>После каждого боя Арены и каждого матча Лиги список новый сам: атакованные и прежние трое — мимо, не хватило новых — добор из прежних. Кнопка итога — «К новым соперникам». «Обновить» руками нужно редко; сколько осталось бесплатных — в подсказке кнопки, дальше цена — на кнопке.${TM(' Список меняет сама операция боя, на сиде сезона и номера списка: повтор номера — тот же список.')}</small></div>
     </div>
     <div class="ar-kg">
       <div class="k-air-r"><b>Лига · дивизионы</b><div class="row" style="gap:6px;flex-wrap:wrap">${divs}</div><small>Три отряда по пять, герой не повторяется. Раунд I — первый против первого; третий — при 1:1.</small></div>
@@ -691,8 +787,12 @@ function arKitHtml() {
       <div class="k-air-r"><b>Прогон: ${fmt(Mo.players)} игроков × ${Mo.seasons} сезона</b><table class="p-table ar-kt"><thead><tr><th>Профиль</th><th>Атак</th><th>Побед</th><th>Доля</th><th>Энериум</th><th>На обновления</th></tr></thead><tbody>${prof}</tbody></table>
         <small>Планки ${[1, 2, 4, 8].map(x => AD.arena.plank * x).join(' / ')} побед: обычный — третья, увлечённый — четвёртая. Плательщик при той же силе — не больше ×1,7 по победам и Энериуму, обновления не окупаются.</small></div>
       <div class="k-air-r"><b>Сдвиг защиты: выгода равной атаки</b><table class="p-table ar-kt"><thead><tr><th>Сдвиг</th><th>За атаку</th><th>Средний рейтинг по сезонам</th></tr></thead><tbody>${sh}</tbody></table>
-        <small>Выбор отряда под соперника — +${Mo.puzzle.pts} ${plural(Mo.puzzle.pts, 'очко', 'очка', 'очков')} Эло. Сдвиг ${E.def.shift} в пользу атакующего возвращает выгоду равной атаки к нулю; буквальное «+50 защитнику» — рост рейтинга от числа атак. Предел — ${AD.arena.rounds} раундов: гибель стороны решает ${pct1((Mo.rounds.find(x => x.rounds === AD.arena.rounds) || { decBp: 0 }).decBp)} боёв.</small></div>
-    </div>`) : ''}
+        <small>Выбор отряда под соперника — +${Mo.puzzle.pts} ${plural(Mo.puzzle.pts, 'очко', 'очка', 'очков')} Эло. Сдвиг ${E.def.shift} в пользу атакующего возвращает выгоду равной атаки к нулю; буквальное «+50 защитнику» — рост рейтинга от числа атак. Предел — ${EB.roundsOf('pvp')} раундов, таблица ядра: гибель стороны решает ${pct1((Mo.rounds.find(x => x.rounds === EB.roundsOf('pvp')) || { decBp: 0 }).decBp)} боёв.</small></div>
+    </div>
+    ${C0 ? `<div class="ar-kg">
+      <div class="k-air-r"><b>Автообновление списка: прогон</b><table class="p-table ar-kt"><thead><tr><th>Профиль</th><th>Побед за неделю</th><th>Доля побед</th><th>Обновлений руками</th><th>Энериума</th></tr></thead><tbody>${au}</tbody></table>
+        <small>Слева — список живёт до конца, справа — новый после каждого боя. Лучший из новой тройки каждый раз — побед больше у всех, а рейтинг сервера выше: выбор соперника — выгода атакующего сверх Эло, недельный сброс её держит. Планки те же: обычный — третья, увлечённый — четвёртая. Руками обновляют реже; платные — ${RF.price.join(', ')}.</small></div>
+    </div>` : ''}`) : ''}
   </section>`;
 }
 let arKitWatch = false;
@@ -735,14 +835,25 @@ function lgDemo() {
 FLOWS.push(
   ['Арена · соперник целиком', 'Три соперника карточками: лица, рейтинг и мощь. Витрина — состав целиком, ротации, рейтинг за победу и поражение',
     () => { S.route = 'arena'; S.seg.arena = 'arena'; S.overlay = S.arena.opp[0] ? { t: 'opp', arg: S.arena.opp[0] } : null; }],
-  ['Арена · атака и итог', 'Подготовка: соперник против своего отряда, пресеты чипами. «В бой» — бой решён сразу, просмотр можно пропустить; итог — сдвиг рейтинга и место',
+  ['Арена · атака и итог', 'Подготовка: соперник против своего отряда, пресеты чипами. «В бой» — бой решён сразу, просмотр можно пропустить; итог — сдвиг рейтинга и место, список соперников уже новый',
     () => { S.route = 'arena'; S.seg.arena = 'arena'; S.overlay = null; const id = S.arena.opp[0]; if (!id) return; S.arena.pick = id; ACT.aratk(`${arOp()}|${id}|${(mySquad() || {}).id}`); }],
+  ['Арена · пропуск и статистика', '«Пропустить» — сразу итог: сдвиг рейтинга и место на виду, «Подробности боя» — раунды, кто сколько нанёс, вылечил и принял, сработавшие способности и ульты',
+    () => { S.route = 'arena'; S.seg.arena = 'arena'; S.overlay = null; const id = S.arena.opp[0]; if (!id) return; S.arena.pick = id; ACT.aratk(`${arOp()}|${id}|${(mySquad() || {}).id}`); arFlowSkip(); }],
   ['Арена · оборона', 'Слепок обороны с мощью, журнал нападений: отбита или пробита, сдвиг рейтинга',
     () => { S.route = 'arena'; S.seg.arena = 'def'; S.overlay = null; }],
   ['Лига · матч', 'Коллекция на 15 героев, три отряда по пять: раунд I — первый против первого, третий — при 1:1. Матч — два или три боя подряд',
     () => { lgDemo(); S.route = 'arena'; S.seg.arena = 'league'; S.overlay = S.arena.lg.opp[0] ? { t: 'lgopp', arg: S.arena.lg.opp[0] } : null; }],
+  ['Лига · итог матча', '«Пропустить» в любом бою матча — сразу итог: счёт и рейтинг на виду, строка на каждый бой, нажатие раскрывает его статистику',
+    () => { lgDemo(); S.route = 'arena'; S.seg.arena = 'league'; S.overlay = null; const id = S.arena.lg.opp[0]; if (!id) return; ACT.lgplay(`${arOp()}|${id}`); arFlowSkip(); }],
 );
+/* сценарии: бой только начался — «Пропустить», итог с раскрытой статистикой (у Лиги — первый бой матча) */
+function arFlowSkip() {
+  const R = S.runs.find(r => r.kind === 'pvp' && !r.over); if (!R) return;
+  ACT.arskip(R.id);
+  if (S.overlay) { S.overlay.open = 1; render(); }
+}
 
 /* для автопроверки tools/content-gen/screens/check_arena.js и консоли */
-window.EN_ARENA_UI = { SRV: AR_SRV, DEMO: AR_DEMO, VIEW: AR_VIEW, oppHero, oppBm, teamBm, oppCard, planks, tierOf, arPlace, lgPlace, lgOpen, lgWhy, arOpen, poolN, listFor, lgDemo, arPlay, mySquad, power, seasonId };
+window.EN_ARENA_UI = { SRV: AR_SRV, DEMO: AR_DEMO, VIEW: AR_VIEW, oppHero, oppBm, teamBm, oppCard, planks, tierOf, arPlace, lgPlace, lgOpen, lgWhy, arOpen, poolN, listFor, freshFor, lgDemo, arPlay, mySquad, power, seasonId,
+  statsHtml, kitFight };
 })();

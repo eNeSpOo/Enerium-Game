@@ -1,13 +1,14 @@
-/* Арена и Лига — алгоритм, общий для калькулятора и прототипа: Эло, исход боя PvP, матч Лиги, подбор соперников, сид боя,
-   ежедневный Энериум, дивизионы (GDD §20, §5, §34, §36; ADR-0005, ADR-0010, ADR-0014). Сборщик tools/content-gen/arena/build.js
-   вставляет этот файл в design/ui/arena.js как есть. Ориентир для серверного ядра на C#, а не код игры: подбор, бой, исход,
-   рейтинг и награды решает только сервер.
+/* Арена и Лига — алгоритм, общий для калькулятора и прототипа: Эло, исход боя PvP и его статистика, матч Лиги, подбор соперников,
+   новый список после боя, сид боя, ежедневный Энериум, дивизионы (GDD §20, §5, §34, §36; ADR-0005, ADR-0010, ADR-0014).
+   Сборщик tools/content-gen/arena/build.js вставляет этот файл в design/ui/arena.js как есть. Ориентир для серверного ядра на C#,
+   а не код игры: подбор, бой, исход, рейтинг и награды решает только сервер.
    Только целые числа: рейтинг — целый, ожидание и доли — в базисных пунктах (10 000 = 100 %). Все числа правил — в данных D
    (window.EN_ARENA), здесь только алгоритм.
    Ожидание Эло E = 1 / (1 + 10^((Rб − Rа) / 400)) — не формула в коде, а таблица D.elo.table по разнице рейтингов 0…cap: сборщик
    считает её целочисленным корнем, дальше — крайнее значение. Генератор — mulberry32 на сиде, как в ядре боя и сундуках.
-   Порядок обращений к генератору — часть формата: подбор списка — один бросок на место в списке. Бой — ядро боя (EnBattle),
-   порядок его бросков — формат ядра (§5.9). */
+   Порядок обращений к генератору — часть формата: подбор списка — один бросок на место в списке, добор нового списка — тем же
+   генератором после первого прохода. Бой — ядро боя (EnBattle), порядок его бросков — формат ядра (§5.9); статистика боя только
+   читает события ядра и бросков не добавляет. */
 (function (root) {
 'use strict';
 
@@ -21,6 +22,8 @@ function makeRng(seed) {  // mulberry32: roll(n) — целое от 0 до n �
 /* деление целых: к ближайшему (половина — от нуля) и к нулю */
 function divRound(a, b) { const s = a < 0 ? -1 : 1, x = Math.abs(a); return s * Math.floor((x * 2 + b) / (b * 2)); }
 function divZero(a, b) { const s = a < 0 ? -1 : 1; return s * Math.floor(Math.abs(a) / b); }
+/* целый квадратный корень вниз — для разброса в отчётах прогона (шум полос), не для игровых величин */
+function isqrt(v) { if (!(v > 0)) return 0; let s = Math.floor(Math.sqrt(v)); while (s * s > v) s--; while ((s + 1) * (s + 1) <= v) s++; return s; }
 
 /* ---------- Эло (§20.5) ---------- */
 /* ожидание стороны A против B, б. п.; shift — сдвиг в пользу A: асимметрия защиты, у атакующего */
@@ -72,6 +75,25 @@ function pvpResult(b) {
   const half = b.why === 'win' ? 2 : b.why === 'wipe' ? 0 : shA > shB ? 2 : shA < shB ? 0 : 1;
   return { half, why: b.why, rounds: b.round, max: b.maxRounds, shA, shB, t: b.t, fallA: b.u[0].filter(u => !u.alive).length, fallB: b.u[1].filter(u => !u.alive).length };
 }
+/* Бой до конца со статистикой — ради «Пропустить» и итога (§20.1, §36.9). Те же шаги ядра подряд, что в EB.run: исход и порядок
+   бросков генератора — те же, статистика только читает события ядра (cast — способность или ульта, react — реакция набора).
+   По каждой карте обеих сторон: нанесено, вылечено, принято (вместе со щитом), здоровье в конце, пала ли; сработавшие способности,
+   ульты и реакции — [имя, раз] по убыванию раз. Итог { res — исход pvpResult, st — раунды, почему кончился и стороны }. Только целые */
+function pvpRun(EB, b) {
+  const tally = new Map(), none = () => ({ ab: new Map(), ult: new Map(), re: new Map() });
+  const bump = (u, kind, n) => { let t = tally.get(u); if (!t) tally.set(u, t = none()); t[kind].set(n, (t[kind].get(n) || 0) + 1); };
+  while (!b.over) {
+    const a = EB.step(b); if (!a) break;
+    for (const e of a.ev) if (e.s && e.n) { if (e.k === 'cast') bump(e.s, e.ult ? 'ult' : 'ab', e.n); else if (e.k === 'react') bump(e.s, 're', e.n); }
+  }
+  const list = m => [...m].sort((x, y) => y[1] - x[1] || (x[0] < y[0] ? -1 : x[0] > y[0] ? 1 : 0));
+  const side = us => us.map(u => {
+    const t = tally.get(u) || none();
+    return { key: u.key, id: u.id, name: u.name, dealt: u.dealt, healed: u.healed, taken: u.taken, hp: u.alive ? u.hp : 0, maxHp: u.maxHp, alive: u.alive,
+      ab: list(t.ab), ult: list(t.ult), re: list(t.re) };
+  });
+  return { res: pvpResult(b), st: { rounds: b.round, max: b.maxRounds, why: b.why, sides: [side(b.u[0]), side(b.u[1])] } };
+}
 /* ключ состава — герои по id, порядок не важен; сид боя — сезон, режим, раунд матча и пара составов (§20.1): та же пара в сезоне —
    тот же бой, повторная атака информации не несёт */
 const teamKey = ids => ids.slice().sort().join(',');
@@ -102,8 +124,19 @@ function pickList(M, pool, me, rng, skip) {
   }
   return { ids: got, w };
 }
+/* новый список — после каждого боя (M.refresh.auto, слово автора 29.09.2026) и по «Обновить»: сначала без атакованных и без прежнего
+   списка — новые лица; не хватило — добор из прежнего списка, кого ещё не атаковали. Генератор один на оба прохода. fresh — сколько
+   в списке новых лиц: ручное обновление без новых лиц — отказ, Энериум не списывается */
+function pickFresh(M, pool, me, rng, hit, prev) {
+  const was = prev || [], a = pickList(M, pool, me, rng, (hit || []).concat(was));
+  if (a.ids.length >= M.list || !was.length) return { ids: a.ids, w: a.w, fresh: a.ids.length };
+  const b = pickList(Object.assign({}, M, { list: M.list - a.ids.length }), pool, me, rng, (hit || []).concat(a.ids));
+  return { ids: a.ids.concat(b.ids), w: Math.max(a.w, b.w), fresh: a.ids.length };
+}
 /* цена платного обновления списка: n-е за сутки, с нуля; null — лимит суток исчерпан (Энериум не покупает попытки и рейтинг, §20.6) */
 const refreshPrice = (M, n) => n < M.refresh.price.length ? M.refresh.price[n] : null;
+/* ручное обновление: 0 — бесплатное, пока за сутки их взято меньше M.refresh.free; дальше — цена n-го платного, null — до завтра */
+const refreshCost = (M, freeUsed, paid) => freeUsed < M.refresh.free ? 0 : refreshPrice(M, paid);
 /* попытки: суточная прибавка копится до cap (§20.2, §20.4) */
 const attemptsAfter = (M, have, days) => Math.min(M.att.cap, have + days * M.att.day);
 
@@ -125,7 +158,7 @@ function division(D, r) { const L = D.league.divisions; let k = 0; for (let i = 
 /* планки побед: первая × x строки (EN_LOOTBOXES: соседние ×2) */
 const plankNeeds = (first, xs) => xs.map(x => first * x);
 
-root.EnArena = { BP, mix32, seedOf, makeRng, divRound, divZero, expect, kOf, delta, sOf, attack, reset, pvpBattle, pvpResult, teamKey,
-  battleSeed, leagueScore, leagueNext, pickList, refreshPrice, attemptsAfter, dailyEn, placeOf, division, plankNeeds };
+root.EnArena = { BP, mix32, seedOf, makeRng, divRound, divZero, isqrt, expect, kOf, delta, sOf, attack, reset, pvpBattle, pvpResult, pvpRun, teamKey,
+  battleSeed, leagueScore, leagueNext, pickList, pickFresh, refreshPrice, refreshCost, attemptsAfter, dailyEn, placeOf, division, plankNeeds };
 if (typeof module !== 'undefined' && module.exports) module.exports = root.EnArena;
 })(typeof window !== 'undefined' ? window : globalThis);

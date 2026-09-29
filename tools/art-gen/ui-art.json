@@ -916,22 +916,6 @@
       ],
       "fit": 80
     },
-    "shards/ghost-frame.png": {
-      "from": "hero-shard/hero-shard-ghost__nb2-v2.png",
-      "size": [
-        256,
-        256
-      ],
-      "fit": 80
-    },
-    "shards/ghost-mask.png": {
-      "from": "hero-shard/hero-shard-ghost__nb2-v2.mask.png",
-      "size": [
-        256,
-        256
-      ],
-      "fit": 80
-    },
     "lore/city-endalor.jpg": {
       "from": "lore-places/lore-city-endalor__nb2-v3.jpg",
       "size": [
@@ -1158,6 +1142,238 @@
     "heroes/c3-60.jpg": "heroes/hero-c3-60-ranva__nb2.jpg",
     "heroes/c3-61.jpg": "heroes/hero-c3-61-brand__nb2.jpg",
     "heroes/c3-62.jpg": "heroes/hero-c3-62-ketil__nb2-v2.jpg",
-    "heroes/c3-63.jpg": "heroes/hero-c3-63-asdis__nb2.jpg"
+    "heroes/c3-63.jpg": "heroes/hero-c3-63-asdis__nb2.jpg",
+    "limits/stone-on.png": {
+      "from": "limits/rl-stone__nb2.on.png",
+      "size": [
+        128,
+        186
+      ],
+      "fit": 100
+    },
+    "limits/stone-off.png": {
+      "from": "limits/rl-stone__nb2.off.png",
+      "size": [
+        128,
+        186
+      ],
+      "fit": 100
+    },
+    "pass/banner.jpg": {
+      "from": "pass-banner/pass-banner-autumn__nb2.jpg",
+      "size": [
+        1584,
+        672
+      ]
+    },
+    "pass/gift-07.jpg": {
+      "from": "pass-gifts/cal-gift-07__nb2.jpg",
+      "size": [
+        512,
+        512
+      ]
+    },
+    "pass/gift-14.jpg": {
+      "from": "pass-gifts/cal-gift-14__nb2.jpg",
+      "size": [
+        512,
+        512
+      ]
+    },
+    "pass/gift-20.jpg": {
+      "from": "pass-gifts/cal-gift-20__nb2.jpg",
+      "size": [
+        512,
+        512
+      ]
+    },
+    "pass/gift-30.jpg": {
+      "from": "pass-gifts/cal-gift-30__nb2.jpg",
+      "size": [
+        512,
+        512
+      ]
+    },
+    "pass/crown.jpg": {
+      "from": "pass-gifts/pass-crown__nb2.jpg",
+      "size": [
+        512,
+        512
+      ]
+    },
+    "workers/worker.png": {
+      "from": "pass-icons/icon-worker__nb2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 80
+    },
+    "dust.png": {
+      "from": "pass-icons/icon-dust__nb2.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 96
+    },
+    "souls/altar.jpg": {
+      "from": "souls-scene/souls-altar__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "souls/dust-shop.jpg": {
+      "from": "souls-scene-edit/dust-shop-edit__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "souls/frame.png": {
+      "from": "souls-frame/souls-frame__nb2.clean.png",
+      "size": [
+        320,
+        456
+      ]
+    },
+    "shards/glass-mask.png": {
+      "from": "hero-shard-glass/hero-shard-glass__nb2-v2.mask.png",
+      "size": [
+        384,
+        384
+      ],
+      "fit": 92
+    },
+    "shards/glass-rim.png": {
+      "from": "hero-shard-glass/hero-shard-glass__nb2-v2.rim.png",
+      "size": [
+        384,
+        384
+      ],
+      "fit": 92
+    },
+    "shards/glass-cracks.png": {
+      "from": "hero-shard-glass/hero-shard-glass__nb2-v2.cracks.png",
+      "size": [
+        384,
+        384
+      ],
+      "fit": 92
+    },
+    "shards/cls-tank.jpg": {
+      "from": "class-ghost/cls-ghost-tank__nb2.jpg",
+      "size": [
+        464,
+        576
+      ]
+    },
+    "shards/cls-healer.jpg": {
+      "from": "class-ghost/cls-ghost-healer__nb2.jpg",
+      "size": [
+        464,
+        576
+      ]
+    },
+    "shards/cls-mage.jpg": {
+      "from": "class-ghost/cls-ghost-mage__nb2.jpg",
+      "size": [
+        464,
+        576
+      ]
+    },
+    "shards/cls-str.jpg": {
+      "from": "class-ghost/cls-ghost-str__nb2.jpg",
+      "size": [
+        464,
+        576
+      ]
+    },
+    "shards/cls-agi.jpg": {
+      "from": "class-ghost/cls-ghost-agi__nb2.jpg",
+      "size": [
+        464,
+        576
+      ]
+    },
+    "shards/cls-control.jpg": {
+      "from": "class-ghost/cls-ghost-control__nb2.jpg",
+      "size": [
+        464,
+        576
+      ]
+    },
+    "shards/cls-farmer.jpg": {
+      "from": "class-ghost/cls-ghost-farmer__nb2.jpg",
+      "size": [
+        464,
+        576
+      ]
+    },
+    "heroes/c2-51.jpg": "heroes/hero-c2-51-aitan__nb2.jpg",
+    "heroes/c3-51.jpg": "heroes/hero-c3-51-noho__nb2.jpg",
+    "heroes/c4-51.jpg": "heroes/hero-c4-51-tamai__nb2.jpg",
+    "heroes/c5-57.jpg": "heroes/hero-c5-57-kelmil__nb2.jpg",
+    "heroes/c6-51.jpg": "heroes/hero-c6-51-siue__nb2.jpg",
+    "clan/water-elite.jpg": "clan/clan-water-elite__nb2-v3.jpg",
+    "clan/water-boss.jpg": "clan/clan-water-boss__nb2.jpg",
+    "clan/water-tank.jpg": "clan/clan-water-tank__nb2.jpg",
+    "clan/water-healer.jpg": "clan/clan-water-healer__nb2-v2.jpg",
+    "clan/water-ctl1.jpg": "clan/clan-water-ctl1__nb2.jpg",
+    "clan/water-ctl2.jpg": "clan/clan-water-ctl2__nb2.jpg",
+    "clan/water-dd1.jpg": "clan/clan-water-dd1__nb2.jpg",
+    "clan/water-dd2.jpg": "clan/clan-water-dd2__nb2.jpg",
+    "clan/fire-elite.jpg": "clan/clan-fire-elite__nb2.jpg",
+    "clan/fire-boss.jpg": "clan/clan-fire-boss__nb2.jpg",
+    "clan/fire-tank.jpg": "clan/clan-fire-tank__nb2-v3.jpg",
+    "clan/fire-healer.jpg": "clan/clan-fire-healer__nb2.jpg",
+    "clan/fire-ctl1.jpg": "clan/clan-fire-ctl1__nb2-v2.jpg",
+    "clan/fire-ctl2.jpg": "clan/clan-fire-ctl2__nb2.jpg",
+    "clan/fire-dd1.jpg": "clan/clan-fire-dd1__nb2-v2.jpg",
+    "clan/fire-dd2.jpg": "clan/clan-fire-dd2__nb2.jpg",
+    "clan/earth-elite.jpg": "clan/clan-earth-elite__nb2.jpg",
+    "clan/earth-boss.jpg": "clan/clan-earth-boss__nb2.jpg",
+    "clan/earth-tank.jpg": {
+      "from": "clan/clan-earth-tank__nb2.jpg",
+      "mirror": true
+    },
+    "clan/earth-healer.jpg": "clan/clan-earth-healer__nb2.jpg",
+    "clan/earth-ctl1.jpg": "clan/clan-earth-ctl1__nb2-v2.jpg",
+    "clan/earth-ctl2.jpg": "clan/clan-earth-ctl2__nb2-v2.jpg",
+    "clan/earth-dd1.jpg": "clan/clan-earth-dd1__nb2.jpg",
+    "clan/earth-dd2.jpg": "clan/clan-earth-dd2__nb2.jpg",
+    "clan/air-elite.jpg": "clan/clan-air-elite__nb2.jpg",
+    "clan/air-boss.jpg": "clan/clan-air-boss__nb2.jpg",
+    "clan/air-tank.jpg": "clan/clan-air-tank__nb2.jpg",
+    "clan/air-healer.jpg": "clan/clan-air-healer__nb2.jpg",
+    "clan/air-ctl1.jpg": "clan/clan-air-ctl1__nb2.jpg",
+    "clan/air-ctl2.jpg": "clan/clan-air-ctl2__nb2.jpg",
+    "clan/air-dd1.jpg": "clan/clan-air-dd1__nb2.jpg",
+    "clan/air-dd2.jpg": "clan/clan-air-dd2__nb2.jpg",
+    "clan/light-elite.jpg": "clan/clan-light-elite__nb2.jpg",
+    "clan/light-boss.jpg": "clan/clan-light-boss__nb2.jpg",
+    "clan/light-tank.jpg": "clan/clan-light-tank__nb2.jpg",
+    "clan/light-healer.jpg": "clan/clan-light-healer__nb2-v2.jpg",
+    "clan/light-ctl1.jpg": "clan/clan-light-ctl1__nb2.jpg",
+    "clan/light-ctl2.jpg": "clan/clan-light-ctl2__nb2.jpg",
+    "clan/light-dd1.jpg": "clan/clan-light-dd1__nb2.jpg",
+    "clan/light-dd2.jpg": "clan/clan-light-dd2__nb2.jpg",
+    "clan/dark-elite.jpg": "clan/clan-dark-elite__nb2.jpg",
+    "clan/dark-boss.jpg": "clan/clan-dark-boss__nb2.jpg",
+    "clan/dark-tank.jpg": "clan/clan-dark-tank__nb2.jpg",
+    "clan/dark-healer.jpg": "clan/clan-dark-healer__nb2.jpg",
+    "clan/dark-ctl1.jpg": "clan/clan-dark-ctl1__nb2.jpg",
+    "clan/dark-ctl2.jpg": "clan/clan-dark-ctl2__nb2-v2.jpg",
+    "clan/dark-dd1.jpg": "clan/clan-dark-dd1__nb2.jpg",
+    "clan/dark-dd2.jpg": "clan/clan-dark-dd2__nb2.jpg",
+    "clan/time-elite.jpg": "clan/clan-time-elite__nb2-v2.jpg",
+    "clan/time-boss.jpg": "clan/clan-time-boss__nb2-v2.jpg",
+    "clan/time-tank.jpg": "clan/clan-time-tank__nb2.jpg",
+    "clan/time-healer.jpg": "clan/clan-time-healer__nb2.jpg",
+    "clan/time-ctl1.jpg": "clan/clan-time-ctl1__nb2.jpg",
+    "clan/time-ctl2.jpg": "clan/clan-time-ctl2__nb2-v2.jpg",
+    "clan/time-dd1.jpg": "clan/clan-time-dd1__nb2.jpg",
+    "clan/time-dd2.jpg": "clan/clan-time-dd2__nb2.jpg"
   }
 }

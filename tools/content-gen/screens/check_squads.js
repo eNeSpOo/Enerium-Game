@@ -196,7 +196,9 @@ fresh(); T.S.route = 'heroes'; T.S.seg.heroes = 'squads'; T.S.selSquad = 's2';
 fresh();
 {
   const S0 = { descent: T.SQ.of('descent'), echo: T.SQ.of('echo'), arena: T.SQ.of('arena'), league: JSON.stringify(T.SQ.of('league')), clan: T.SQ.of('clan') };
-  if (S0.descent !== 's1' || S0.echo !== 's1' || S0.arena !== 's1' || S0.league !== JSON.stringify([null, null, null]) || S0.clan !== null) say(`режимы: выбор по умолчанию ${JSON.stringify(S0)}`);
+  if (S0.descent !== 's1' || S0.echo !== 's1' || S0.arena !== 's1' || S0.league !== JSON.stringify(T.SQ_DATA.demo.league) || S0.clan !== null) say(`режимы: выбор по умолчанию ${JSON.stringify(S0)}`);
+  /* Лига демо открыта (ADR-0031, п. 17): три отряда выбраны и готовы — пятнадцать разных героев */
+  const L0 = T.SQ.ready('league'); if (!L0.ok) say(`Лига: отряды демо не готовы — ${L0.why || JSON.stringify(L0.dup)}`);
   T.S.route = 'clan'; T.S.seg.clan = 'boss';
   run('лист клана', () => T.SQ.pick('clan'));
   if (!T.S.overlay || T.S.overlay.t !== 'prep' || T.S.overlay.arg !== 'clan' || T.S.overlay.back !== 'clan') say('SQ.pick: лист не открылся над экраном режима');
@@ -208,7 +210,8 @@ fresh();
   const re = T.SQ.ready('echo');
   if (re.ok || re.why !== '4 из 5') say(`Эхо: неполный отряд готов или причина не та — ${re.why}`);
   act('sqpick', `${op()}|echo|s1`);
-  /* Лига: три раунда, герой не повторяется */
+  /* Лига: три раунда, герой не повторяется — выбор с нуля */
+  for (let i = 0; i < 3; i++) T.SQ.set('league', null, i);
   T.S.route = 'arena'; T.S.seg.arena = 'league';
   run('лист Лиги', () => T.SQ.pick('league'));
   act('sqround', '1'); act('sqpick', `${op()}|league|s1|1`);

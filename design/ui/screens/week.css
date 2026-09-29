@@ -81,6 +81,8 @@ button.wk-card:hover{border-color:var(--iron-2)}
 .wk-face>img{object-fit:cover;object-position:50% 20%}
 .wk-face .rs-ph b{font-size:15px}
 .wk-face.lock{opacity:.35}
+.wk-face.glass{overflow:visible;box-shadow:none}
+.wk-face.glass>.hsg{position:absolute;left:50%;top:50%;width:60px;height:60px;transform:translate(-50%,-50%)}
 .wk-face>i{position:absolute;left:3px;right:3px;bottom:4px;height:3px;border-radius:2px;background:rgba(0,0,0,.75);overflow:hidden}
 .wk-face>i::before{content:"";position:absolute;left:0;top:0;bottom:0;width:calc(var(--v)*1%);background:var(--spirit)}
 .wk-own{position:absolute;right:3px;bottom:3px;display:grid;place-items:center;width:16px;height:16px;border-radius:50%;background:#0b2724;color:var(--spirit);box-shadow:0 0 0 1px rgba(72,229,212,.5)}

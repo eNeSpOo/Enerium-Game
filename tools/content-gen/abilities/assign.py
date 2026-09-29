@@ -1,6 +1,7 @@
-"""Распределение способностей по героям и врагам Мастерской (ADR-0016).
+"""Распределение способностей по героям состава и врагам Мастерской (ADR-0016, ADR-0031, п. 7).
 
-Библиотека — library.py (ADR-0015), герои — docs/content/герои/герои.csv (build_heroes.py).
+Библиотека — library.py (ADR-0015). Герои — состав игры docs/content/герои/состав-героев.csv, 360 героев: класс, школа, редкость
+и личный максимум доблести — только оттуда (ADR-0019; ADR-0030, п. 5а).
 Правила автора 27.09.2026:
 - у героя без доблести одна активная способность; каждая доблесть открывает новую; последняя доблесть — ульта,
   и у героя с одной доблестью тоже;
@@ -8,25 +9,44 @@
 - чем реже герой, тем чаще срабатывают его способности;
 - провокации нет: танк держит врагов множителем угрозы (§5.3);
 - враги берут записи библиотеки по классу и стихии, как герои.
+Набор героя состава сжат к его личному максимуму доблести (ADR-0031, п. 7): доблесть 0 — первая активная, каждая следующая
+доблесть — следующая способность набора по порядку, последняя — ульта. Откуда набор:
+- вручную — MANUAL, 110 наборов под героев черновиков docs/content/герои/герои.csv; герой состава находит свой по столбцу
+  «из черновика». Способностей больше, чем доблестей, — лишние уходят с конца; меньше — добор по правилам автомата.
+  Ручной набор не берётся, если у героя в составе другая школа или главный класс: он собран под другого героя;
+- Эхо — набор отряда недели из design/ui/echo-foes.js (выгрузка echo/build.js), сжатый к максимуму Эхо;
+- автомат — остальные, по правилам ADR-0016: школа по стихии, виды по классу, ульта своей школы и класса. В сете, донатном
+  сете и отряде недели активные не повторяются, одинаковых наборов в составе нет — пока библиотека позволяет. Выбор
+  детерминирован: сид — id героя.
 Порядок видов по доблести, виды классов и ступени — предложение: правьте здесь.
 
-  python tools/content-gen/abilities/assign.py
+  python tools/content-gen/abilities/assign.py            собрать
+  python tools/content-gen/abilities/assign.py --check    только проверить: инварианты наборов и свежесть выходов
 
 Выход:
-  tools/content-gen/abilities/kits.json      — наборы героев и врагов для ядра и UI-кита;
+  tools/content-gen/abilities/kits.json      — roster: наборы 360 героев состава; heroes: 110 ручных наборов черновиков, как собраны
+                                               (по ним echo/build.js сверяет, что наборы Эхо свои, heroes/export_ui.py рисует
+                                               UI-кит черновиков); foes: враги Мастерской;
+  design/ui/kits.js                          — наборы для ядра боя прототипа: по id героя состава; id черновика ведёт к нему же;
   docs/content/распределение-способностей.md — черновик для автора.
+Эхо берётся из выгрузки прошлой сборки: после echo/build.js с новыми отрядами недели — перезапустить (--check покажет «устарел»).
 """
 import csv
 import json
 import pathlib
+import re
 import sys
+import zlib
+from collections import Counter
 
 HERE = pathlib.Path(__file__).parent
 ROOT = HERE.parents[2]
 sys.path.insert(0, str(HERE))
 import library as L  # noqa: E402  библиотека собирается тем же кодом, что и черновик библиотеки
 
-HEROES_CSV = ROOT / "docs/content/герои/герои.csv"
+ROSTER_CSV = ROOT / "docs/content/герои/состав-героев.csv"   # состав игры: класс, школа, редкость, источник, личный максимум доблести
+HEROES_CSV = ROOT / "docs/content/герои/герои.csv"          # черновики: под этих героев собраны ручные наборы MANUAL
+ECHO_JS = ROOT / "design/ui/echo-foes.js"                   # отряды недели Эхо и их наборы — выгрузка tools/content-gen/echo/build.js
 OUT_JSON = HERE / "kits.json"
 OUT_MD = ROOT / "docs/content/распределение-способностей.md"
 OUT_UI = ROOT / "design/ui/kits.js"   # наборы для ядра боя прототипа
@@ -46,14 +66,24 @@ RANK_R = {"o": 0, "e": 2, "b": 3, "rune": 4, "uber": 5, "forgotten": 6, "clan": 
 RANK = {"o": ("рядовой", 1, 0), "e": ("элита", 2, 0), "b": ("босс биома", 3, 1), "rune": ("рунный", 4, 1),
         "uber": ("убер", 5, 1), "forgotten": ("забытый", 6, 1), "clan": ("клановый", 7, 1)}
 
-# что открывает доблесть 0, 1, 2, 3, 4; последняя доблесть героя — всегда ульта
+# что открывает доблесть 0, 1, 2, 3, 4 у автомата; последняя доблесть героя — всегда ульта
 UNLOCK = ["act", "act", "pas", "act", "react"]
 UNLOCK_FARM = ["act", "pas", "act", "pas", "react"]   # фарм-герою пассивка добычи — раньше второй активной
 SLOT_NAME = {"act": "активная", "pas": "пассивка", "react": "реакция", "ult": "ульта"}
 ROMAN = ["", "I", "II", "III", "IV", "V", "VI"]
+# источник героя: ключ — начало столбца «источник» состава
+SOURCES = [("gold", "золото", "золото"), ("roulette", "рулетка", "рулетка"), ("echo", "Эхо:", "Эхо"), ("craft", "крафт", "крафт"),
+           ("donat", "донат:", "донат")]
 
-# виды классов: первая активная — главная работа класса, остальные — по кругу, чтобы наборы героев не совпадали.
+FARM_CLASS = "фармер"
+NO_ELEMENT = "без стихии"
+DRAFT_CLASS = {"дебаффер": "контроль", "фармящий": FARM_CLASS}   # класс черновика → класс состава: контроль — один класс (ADR-0022, п. 10)
+DMG_KINDS = {"dmg", "dot"}   # виды урона: донатный герой поддержки их не берёт — донатные сеты без бойцов урона, кроме сета VI (ADR-0021)
+DD_CLASSES = {"маг ДД", "физ ДД силы", "физ ДД ловкости"}   # бойцы урона: первая активная у автомата — всегда урон
+
+# Виды классов состава: первая активная — главная работа класса, остальные — по кругу, чтобы наборы героев не совпадали.
 # У вида — ступени в порядке предпочтения: all — на всех, grp — на 2–3, one — на одного.
+# Контроль — один класс (ADR-0022, п. 10): одни герои заточены под контроль, другие — под дебаффы (слова автора, ADR-0021).
 CLASS = {
     "танк": {"first": ("dmg", ["grp", "one"]),
              "pool": [("debuff", ["grp", "one"]), ("ctrl", ["one", "grp"]), ("shield", ["grp", "one", "all"])],
@@ -61,9 +91,12 @@ CLASS = {
     "лекарь": {"first": ("heal", ["one", "all", "grp"]),
                "pool": [("hot", ["grp", "one", "all"]), ("shield", ["all", "grp", "one"]), ("buff", ["grp", "all", "one"])],
                "ult": ["heal", "hot", "shield"], "role": "heal"},
-    "дебаффер": {"first": ("ctrl", ["one", "grp", "all"]),
-                 "pool": [("debuff", ["grp", "one", "all"]), ("dot", ["grp", "one", "all"]), ("ctrl", ["all", "grp"])],
-                 "ult": ["ctrl", "debuff", "dot"], "role": "ctrl"},
+    "контроль (на контроль)": {"first": ("ctrl", ["one", "grp", "all"]),
+                               "pool": [("ctrl", ["grp", "all", "one"]), ("debuff", ["grp", "one", "all"]), ("ctrl", ["all", "grp", "one"])],
+                               "ult": ["ctrl", "debuff"], "role": "ctrl"},
+    "контроль (на дебаффы)": {"first": ("debuff", ["one", "grp", "all"]),
+                              "pool": [("debuff", ["grp", "all", "one"]), ("dot", ["grp", "one", "all"]), ("ctrl", ["one", "grp", "all"])],
+                              "ult": ["debuff", "dot", "ctrl"], "role": "ctrl"},
     "маг ДД": {"first": ("dmg", ["all", "grp", "one"]),
                "pool": [("dot", ["all", "grp", "one"]), ("debuff", ["all", "grp", "one"]), ("dmg", ["grp", "one", "all"])],
                "ult": ["dmg", "dot", "debuff"], "role": "dps"},
@@ -463,95 +496,314 @@ SET_WHY = {
 }
 
 
+# ---------------- чтение ----------------
+def source_of(raw):
+    """Столбец «источник» состава → ключ источника."""
+    for key, pre, _ in SOURCES:
+        if raw.startswith(pre):
+            return key
+    raise SystemExit(f"источник «{raw}» не разобран")
+
+
+def base_class(c):
+    """«контроль (на дебаффы)» и «дебаффер» → «контроль», «фармящий» → «фармер»."""
+    c = c.strip()
+    return re.sub(r"\s*\(.+\)$", "", DRAFT_CLASS.get(c, c))
+
+
+def school_of(el, farm):
+    """Школа — стихия героя; фарм-герои и герои без стихии — «Без школы» (ADR-0015)."""
+    return "Без школы" if farm or not el or el == NO_ELEMENT else el
+
+
+def seed_of(hid):
+    """Сид героя — от его id: набор не зависит ни от запуска, ни от порядка строк состава."""
+    return zlib.crc32(hid.encode("utf-8"))
+
+
+def echo_kits():
+    """Наборы героев Эхо из выгрузки echo/build.js: {id героя состава: запись}. Нет файла — пусто, герои Эхо идут автоматом."""
+    if not ECHO_JS.exists():
+        return {}
+    m = re.search(r"^window\.EN_ECHO_FOES = (.*);\s*$", ECHO_JS.read_text(encoding="utf-8"), re.M | re.S)
+    if not m:
+        raise SystemExit(f"{ECHO_JS.relative_to(ROOT).as_posix()}: нет window.EN_ECHO_FOES")
+    return json.loads(m.group(1)).get("heroes", {})
+
+
 def load():
     lib, every = L.build()
     by_id = {x["id"]: x for x in every}
-    rows = list(csv.DictReader(HEROES_CSV.open(encoding="utf-8-sig")))
-    return lib, by_id, rows
+    drafts = {r["id"]: r for r in csv.DictReader(HEROES_CSV.open(encoding="utf-8-sig"))}
+    heroes = []
+    for r in csv.DictReader(ROSTER_CSV.open(encoding="utf-8-sig")):
+        hid, classes = r["id"], [c.strip() for c in r["класс"].split("/")]
+        for c in classes:
+            assert c in CLASS or c == FARM_CLASS, (hid, f"класс «{c}» не из классов состава")
+        farm = classes[0] == FARM_CLASS
+        el = "" if r["школа"] == NO_ELEMENT else r["школа"]
+        assert not el or el in lib["sets"], (hid, f"школа «{el}» не из библиотеки")
+        assert r["редкость"] in RAR, (hid, f"редкость «{r['редкость']}»")
+        src, d = source_of(r["источник"]), r["из черновика"].strip() or None
+        assert not d or d in drafts, (hid, f"черновика {d} нет в герои.csv")
+        assert int(r["максимум доблести"]) >= 1, (hid, "максимум доблести от 1: доблесть 0 — активная, последняя — ульта")
+        groups = []   # сеты героя: в них активные не повторяются
+        if src == "donat":
+            groups.append("донатный сет " + re.match(r"донат: сет ([IVX]+)", r["источник"]).group(1))
+        elif src == "echo":
+            groups.append(r["источник"])                  # отряд недели Эхо
+        elif d:
+            groups.append(drafts[d]["орден"])             # орден черновика; донатный герой его не наследует
+        if (r.get("также в сете") or "").strip():
+            groups.append(r["также в сете"].strip())
+        heroes.append({"id": hid, "name": r["имя"], "cls": r["класс"], "classes": classes, "farm": farm, "el": el,
+                       "school": school_of(el, farm), "rarity": r["редкость"], "maxV": int(r["максимум доблести"]),
+                       "cycle": ROMAN.index(r["цикл"]), "src": src, "srcRaw": r["источник"], "draft": d, "groups": groups,
+                       "support": src == "donat" and classes[0] not in DD_CLASSES})
+    assert len({H["id"] for H in heroes}) == len(heroes), "id героев состава повторяются"
+    return lib, by_id, drafts, heroes, echo_kits()
 
 
-def rotate(xs, k):
+# ---------------- наборы ----------------
+def rot(xs, k):
+    xs = list(xs)
+    if not xs:
+        return xs
     k %= len(xs)
     return xs[k:] + xs[:k]
 
 
-def pick_active(lib, school, kind, prefs, k, used):
-    """Способность вида из набора школы; ступень — по кругу от номера героя в группе, без повторов в наборе."""
-    for tier in rotate(prefs, k):
-        aid = f"{school}.{kind}.{tier}"
-        if aid not in used:
-            return aid
-    return None
+def slot_of(a):
+    """Место способности в наборе — по записи библиотеки."""
+    if a.get("ult"):
+        return "ult"
+    return {"passive": "pas", "farmPassive": "pas", "reaction": "react"}.get(a["kind"], "act")
+
+
+def sig(kit):
+    return tuple(aid for _, _, aid in kit)
 
 
 def pick_role(items, role_keys, key, k, used):
-    fit = [x for x in items if x.get(key) in role_keys and x["id"] not in used] or [x for x in items if x["id"] not in used]
-    return rotate(fit, k)[0]["id"] if fit else None
+    fit_ = [x for x in items if x.get(key) in role_keys and x["id"] not in used] or [x for x in items if x["id"] not in used]
+    return rot(fit_, k)[0]["id"] if fit_ else None
 
 
-def hero_kit(lib, h, k):
-    """Набор героя: [(доблесть, место, id способности)] по правилам автора."""
-    classes = [c.strip() for c in h["класс"].split("/")]
-    farm = classes[0] == "фармящий"
-    school = h["стихия"] if h["стихия"] and not farm else "Без школы"
-    maxv = int(h["максимум доблести"])
-    order = (UNLOCK_FARM if farm else UNLOCK)[:maxv] + ["ult"]
-    S, F = lib["sets"][school], lib["farm"]
-    used, kit = set(), []
-    main = CLASS.get(classes[0])
-    role = main["role"] if main else "heal"
-    # очередь активных: главная работа класса, затем второй класс сборного героя, затем круг видов главного класса
-    if farm:
-        acts = [("farm", rotate(F["active"], k)), ("school",) + FARM_SCHOOL_POOL[k % len(FARM_SCHOOL_POOL)], ("farm", rotate(F["active"], k + 1))]
-    else:
-        acts = [main["first"]]
-        if len(classes) > 1:
-            acts.append(CLASS[classes[1]]["first"])
-        acts += rotate(main["pool"], k)
-    ai = 0
-    for v, slot in enumerate(order):
-        aid = None
-        if slot == "act":
-            while aid is None and ai < len(acts):
-                a = acts[ai]
-                ai += 1
-                if a[0] == "farm":
-                    aid = next((x["id"] for x in a[1] if x["id"] not in used), None)
-                elif a[0] == "school":
-                    aid = pick_active(lib, school, a[1], a[2], k, used)
-                else:
-                    aid = pick_active(lib, school, a[0], a[1], k // 2, used)
-        elif slot == "pas":
-            aid = pick_role(F["passive"], {None}, "pas", k + len(kit), used) if farm else pick_role(S["passive"], PAS_ROLE[role], "pas", k, used)
-        elif slot == "react":
-            aid = pick_role(S["reaction"], REACT_ROLE.get(role, set()), "trig", k, used)
+def tiers_of(kind, entries):
+    """Все ступени вида в очереди класса — в порядке предпочтения."""
+    out = []
+    for k, prefs in entries:
+        if k == kind:
+            out += [t for t in prefs if t not in out]
+    return out
+
+
+def act_queue(H):
+    """Очередь видов активных: главная работа класса, работа второго класса сборного героя, затем круг видов главного класса.
+    Донатный герой поддержки урона не берёт."""
+    main = CLASS[H["classes"][0]]
+    head = [main["first"]] + [CLASS[c]["first"] for c in H["classes"][1:2] if c in CLASS]
+    pool = list(main["pool"])
+    if H["support"]:
+        head = [e for e in head if e[0] not in DMG_KINDS]
+        pool = [e for e in pool if e[0] not in DMG_KINDS]
+    return head, pool
+
+
+def farm_pool(H):
+    return [e for e in FARM_SCHOOL_POOL if not (H["support"] and e[0] in DMG_KINDS)]
+
+
+def unlock_of(H):
+    return (UNLOCK_FARM if H["farm"] else UNLOCK)[:H["maxV"]]
+
+
+class Builder:
+    """Набор героя по правилам автомата: очередь активных, пассивки и реакции под роль.
+    taken — активные других героев его сетов: их автомат берёт, только если других вариантов в библиотеке нет."""
+
+    def __init__(self, lib, H, r, taken, used=()):
+        self.H, self.S, self.F, self.taken = H, lib["sets"][H["school"]], lib["farm"], taken
+        self.used, self.seed = set(used), seed_of(H["id"])
+        if H["farm"]:
+            self.role = "heal"
+            self.queue = [("school",) + e for e in rot(farm_pool(H), r)] + [("farm", x["id"]) for x in rot(self.F["active"], self.seed)]
+            self.spare = [("farm", x["id"]) for x in self.F["active"]] + [("school", k, list(L.TIERS)) for k, _ in farm_pool(H)]
         else:
-            if farm:
-                aid = rotate(F["ult"], k)[0]["id"]
-            else:
-                kind = rotate(main["ult"], k)[0]
-                aid = f"{school}.ult.{kind}"
-        assert aid, (h["id"], v, slot)
-        used.add(aid)
-        kit.append((v, slot, aid))
-    return school, kit
+            self.role = CLASS[H["classes"][0]]["role"]
+            head, pool = act_queue(H)
+            self.queue = head + rot(pool, r)
+            kinds = []
+            for k, _ in head + pool:
+                if k not in kinds:
+                    kinds.append(k)
+            self.spare = [(k, list(L.TIERS)) for k in kinds]   # очередь кончилась — любые ступени видов класса
+
+    def ids(self, e):
+        if e[0] == "farm":
+            return [e[1]]
+        if e[0] == "school":
+            return [f"Без школы.{e[1]}.{t}" for t in e[2]]
+        return [f"{self.H['school']}.{e[0]}.{t}" for t in e[1]]
+
+    def add(self, aid):
+        if aid:
+            self.used.add(aid)
+        return aid
+
+    def first(self, aid):
+        """Доблесть 0 — выбранная активная; запись очереди её вида уходит, как у автомата ADR-0016."""
+        kind = None if self.H["farm"] else aid.split(".")[1]
+        for i, e in enumerate(self.queue):
+            if aid in self.ids(e) or e[0] == kind:
+                self.queue.pop(i)
+                break
+        return self.add(aid)
+
+    def act(self):
+        """Следующая активная: сначала — не занятая в сетах героя, из очереди, затем из любых ступеней класса; только потом — повтор."""
+        for strict in (True, False):
+            for q in (self.queue, self.spare):
+                for i, e in enumerate(q):
+                    aid = next((x for x in self.ids(e) if x not in self.used and not (strict and x in self.taken)), None)
+                    if aid:
+                        if q is self.queue:
+                            q.pop(i)
+                        return self.add(aid)
+        return None
+
+    def pas(self):
+        if self.H["farm"]:
+            return self.add(pick_role(self.F["passive"], {None}, "pas", self.seed + len(self.used), self.used))
+        return self.add(pick_role(self.S["passive"], PAS_ROLE[self.role], "pas", self.seed, self.used))
+
+    def react(self):
+        return self.add(pick_role(self.S["reaction"], REACT_ROLE.get(self.role, set()), "trig", self.seed, self.used))
+
+    def slot(self, s):
+        return {"act": self.act, "pas": self.pas, "react": self.react}[s]()
 
 
-def manual_kit(by_id, h):
-    """Набор героя, собранный вручную: проверки правил автора."""
-    farm = h["класс"].split("/")[0].strip() == "фармящий"
-    school = h["стихия"] if h["стихия"] and not farm else "Без школы"
-    spec = MANUAL[h["id"]]
-    assert [v for v, _ in spec] == list(range(int(h["максимум доблести"]) + 1)), (h["id"], "доблести от 0 до максимума, по одной")
+def auto_kit(lib, H, v0, ult, r, taken):
+    """Набор автомата: доблесть 0 — v0, дальше — места по порядку автомата, последняя доблесть — ульта."""
+    B = Builder(lib, H, r, taken)
     kit = []
-    for v, aid in spec:
-        a = by_id[aid]
-        slot = "ult" if a.get("ult") else {"passive": "pas", "farmPassive": "pas", "reaction": "react"}.get(a["kind"], "act")
-        assert a["set"] in {school} | ({"Фарм"} if farm else set()), (h["id"], aid, "чужая школа")
-        kit.append((v, slot, aid))
-    assert kit[0][1] == "act" and kit[-1][1] == "ult", (h["id"], "доблесть 0 — активная, последняя — ульта")
-    assert len({x[2] for x in kit}) == len(kit), h["id"]
+    for v, s in enumerate(unlock_of(H) + ["ult"]):
+        aid = B.first(v0) if v == 0 else B.add(ult) if s == "ult" else B.slot(s)
+        assert aid, (H["id"], v, s, "библиотеке не хватает способностей")
+        kit.append((v, s, aid))
+    return kit
+
+
+def auto_options(lib, H):
+    """Кандидаты набора автомата: (другой вид класса, первая активная, ульта, поворот круга видов). Первая активная — главная
+    работа класса, потом — другие виды класса; у бойцов урона — только урон. Порядок кандидатов повёрнут сидом героя."""
+    s = seed_of(H["id"])
+    by = [s & 0xFF, (s >> 8) & 0xFF, (s >> 16) & 0xFF, s >> 24]
+    if H["farm"]:
+        prim, alts = [x["id"] for x in lib["farm"]["active"]], []
+        ults, rs = [x["id"] for x in lib["farm"]["ult"]], list(range(len(farm_pool(H))))
+    else:
+        head, pool = act_queue(H)
+        entries, sch = head + pool, H["school"]
+        main = entries[0][0]
+        prim, alts = [f"{sch}.{main}.{t}" for t in tiers_of(main, entries)], []
+        for k, _ in entries[1:]:
+            if k == main or (H["classes"][0] in DD_CLASSES and k not in DMG_KINDS):
+                continue
+            alts += [f"{sch}.{k}.{t}" for t in tiers_of(k, entries) if f"{sch}.{k}.{t}" not in alts]
+        ults = [f"{sch}.ult.{k}" for k in CLASS[H["classes"][0]]["ult"] if not (H["support"] and k in DMG_KINDS)]
+        rs = list(range(len(pool)))
+    rs = rs or [0]
+    return [(alt, v0, u, r) for alt, block in ((False, rot(prim, by[0])), (True, rot(alts, by[3])))
+            for v0 in block for u in rot(ults, by[1]) for r in rot(rs, by[2])]
+
+
+def choose(lib, H, sigs, taken, taken_ults):
+    """Лучший кандидат: без повторов активных в сетах героя, набор, которого ещё нет в составе, главная работа класса,
+    своя ульта в сете; при равенстве — первый по сиду героя."""
+    best = None
+    for i, (alt, v0, u, r) in enumerate(auto_options(lib, H)):
+        kit = auto_kit(lib, H, v0, u, r, taken)
+        score = (sum(aid in taken for _, s, aid in kit if s == "act"), sig(kit) in sigs, alt, kit[-1][2] in taken_ults, i)
+        if best is None or score < best[0]:
+            best = (score, kit)
+        if score[:4] == (0, False, False, False):
+            break
+    return best[1]
+
+
+def fit(lib, by_id, H, kit, taken):
+    """Набор, собранный под героя, — к его личному максимуму доблести (ADR-0031, п. 7): доблесть 0 — первая способность,
+    дальше — по порядку набора, последняя доблесть — ульта. Способностей меньше, чем доблестей, — добор по правилам автомата
+    до его порядка видов: активные, пассивка, реакция. Возвращает набор и добранные способности."""
+    body, ult, M = [aid for _, _, aid in kit[:-1]], kit[-1][2], H["maxV"]
+    extra = []
+    if len(body) < M:
+        left = Counter(unlock_of(H)) - Counter(slot_of(by_id[a]) for a in body)
+        need = []
+        for s in unlock_of(H):
+            if left[s] > 0:
+                need.append(s)
+                left[s] -= 1
+        B = Builder(lib, H, seed_of(H["id"]), taken, used=body + [ult])
+        for s in (need + ["act"] * M)[:M - len(body)]:
+            aid = B.slot(s)
+            assert aid, (H["id"], s, "библиотеке не хватает способностей для добора")
+            extra.append(aid)
+    ids = body[:M] + extra + [ult]
+    return [(v, slot_of(by_id[aid]), aid) for v, aid in enumerate(ids)], extra
+
+
+def misfit(H, d):
+    """Почему ручной набор черновика не подходит герою состава: он собран под другой главный класс или другую школу. None — подходит."""
+    dcls = [c.strip() for c in d["класс"].split("/")]
+    dschool = school_of(d["стихия"], base_class(dcls[0]) == FARM_CLASS)
+    if base_class(dcls[0]) != base_class(H["classes"][0]):
+        return f"класс в составе — {H['classes'][0]}, в черновике — {dcls[0]}"
+    if dschool != H["school"]:
+        return f"школа в составе — {H['school']}, в черновике — {dschool}"
+    return None
+
+
+def manual_kit(by_id, d):
+    """Ручной набор героя черновика, как собран: проверки правил автора."""
+    classes = [c.strip() for c in d["класс"].split("/")]
+    farm = base_class(classes[0]) == FARM_CLASS
+    school = school_of(d["стихия"], farm)
+    spec = MANUAL[d["id"]]
+    assert [v for v, _ in spec] == list(range(int(d["максимум доблести"]) + 1)), (d["id"], "доблести от 0 до максимума, по одной")
+    kit = [(v, slot_of(by_id[aid]), aid) for v, aid in spec]
+    for _, _, aid in kit:
+        assert by_id[aid]["set"] in {school} | ({"Фарм"} if farm else set()), (d["id"], aid, "чужая школа")
+    assert kit[0][1] == "act" and kit[-1][1] == "ult", (d["id"], "доблесть 0 — активная, последняя — ульта")
+    assert len(set(sig(kit))) == len(kit), d["id"]
     return school, kit
+
+
+def problems(H, kit, by_id):
+    """Инварианты набора героя состава (ADR-0016, ADR-0031, п. 7). Пустой список — всё в порядке."""
+    out, M = [], H["maxV"]
+    if [v for v, _, _ in kit] != list(range(M + 1)):
+        out.append(f"доблести набора {[v for v, _, _ in kit]}: нужны 0…{M}, по одной способности, без пустых")
+    if not kit or kit[0][1] != "act":
+        out.append("доблесть 0 — не активная")
+    if [v for v, s, _ in kit if s == "ult"] != [M]:
+        out.append("ульта — не ровно на последней доблести")
+    if len(set(sig(kit))) != len(kit):
+        out.append("способность повторяется")
+    for v, s, aid in kit:
+        a = by_id.get(aid)
+        if not a:
+            out.append(f"{aid} — нет в библиотеке")
+            continue
+        if slot_of(a) != s:
+            out.append(f"{aid} — место «{s}», в библиотеке «{slot_of(a)}»")
+        if a["set"] not in {H["school"]} | ({"Фарм"} if H["farm"] else set()):
+            out.append(f"{aid} — не школа героя «{H['school']}»")
+        if H["support"] and s in ("act", "ult") and a["kind"] in DMG_KINDS:
+            out.append(f"{aid} — урон у донатного героя поддержки (ADR-0021)")
+    return out
 
 
 def shares(items, r):
@@ -575,36 +827,94 @@ def kit_items(kit, by_id, r):
     return shares(items, r)
 
 
+def pcts(r):
+    return {"ultPct": RARITY_ULT[r], "actPct": RARITY_ACT[r], "basicPct": 10000 - RARITY_ULT[r] - RARITY_ACT[r]}
+
+
 def build():
-    lib, by_id, rows = load()
-    groups = {}
-    for h in sorted(rows, key=lambda r: r["id"]):
-        key = (h["класс"].split("/")[0].strip(), h["стихия"])
-        groups.setdefault(key, []).append(h["id"])
-    heroes, seen, hand = {}, {}, {}
-    for h in rows:                    # сначала ручные наборы: автомат не должен их повторить
-        if h["id"] in MANUAL:
-            hand[h["id"]] = manual_kit(by_id, h)
-            seen[tuple(x[2] for x in hand[h["id"]][1])] = h["id"]
-    for h in rows:
-        key = (h["класс"].split("/")[0].strip(), h["стихия"])
-        k = groups[key].index(h["id"])
-        school, kit = hand[h["id"]] if h["id"] in hand else hero_kit(lib, h, k)
-        sig = tuple(x[2] for x in kit)
-        tries = 0
-        while sig in seen and h["id"] not in hand:   # одинаковых наборов не бывает: сдвигаем круг, пока набор не станет своим
-            tries += 1
-            assert tries < 60, (h["id"], seen[sig])
-            k += len(groups[key])
-            school, kit = hero_kit(lib, h, k)
-            sig = tuple(x[2] for x in kit)
-        seen[sig] = h["id"]
-        r = RAR.index(h["редкость"])
-        heroes[h["id"]] = {
-            "name": h["имя"], "cls": h["класс"], "el": h["стихия"], "school": school, "rarity": h["редкость"], "maxV": int(h["максимум доблести"]),
-            "ultPct": RARITY_ULT[r], "actPct": RARITY_ACT[r], "basicPct": 10000 - RARITY_ULT[r] - RARITY_ACT[r],
-            "cycle": int(h["цикл"]), "order": h["орден"], "hand": h["id"] in hand, "why": WHY.get(h["id"], "").strip(),
-            "kit": kit_items(kit, by_id, r)}
+    lib, by_id, drafts, heroes, echo = load()
+    assert set(MANUAL) == set(drafts), "у каждого героя черновика — ручной набор, у каждого ручного набора — герой черновика"
+    hand = {did: manual_kit(by_id, drafts[did]) for did in MANUAL}
+    members = {}
+    for H in heroes:
+        for g in H["groups"]:
+            members.setdefault(g, []).append(H["id"])
+    kits, meta, sigs = {}, {}, {}
+
+    def taken_by(H):
+        """Активные и ульты уже собранных героев из сетов героя."""
+        acts, ults = set(), set()
+        for g in H["groups"]:
+            for o in members[g]:
+                if o == H["id"]:
+                    continue
+                for _, s, aid in kits.get(o, []):
+                    if s == "act":
+                        acts.add(aid)
+                    elif s == "ult":
+                        ults.add(aid)
+        return acts, ults
+
+    def put(H, kit, **m):
+        kits[H["id"]], meta[H["id"]] = kit, m
+        sigs.setdefault(sig(kit), []).append(H["id"])
+
+    for H in heroes:   # Эхо: набор отряда недели — тот же порядок, сжатый к максимуму Эхо (номер цикла − 1)
+        e = echo.get(H["id"])
+        if H["src"] == "echo" and e:
+            src = [(x["v"], x["slot"], x["id"]) for x in e["kit"]]
+            assert src and src[-1][1] == "ult" and all(x[2] in by_id for x in src), (H["id"], "набор Эхо: последняя — ульта, способности из библиотеки")
+            kit, extra = fit(lib, by_id, H, src, taken_by(H)[0])
+            put(H, kit, how="echo", was=len(src) - 1, extra=extra)
+    for H in heroes:   # вручную: набор черновика, сжатый к личному максимуму или добранный
+        if H["id"] in kits or not H["draft"]:
+            continue
+        why = misfit(H, drafts[H["draft"]])
+        if why:
+            H["misfit"] = why
+            continue
+        src = hand[H["draft"]][1]
+        kit, extra = fit(lib, by_id, H, src, taken_by(H)[0])
+        put(H, kit, how="hand", was=len(src) - 1, extra=extra)
+    # автомат — по правилам ADR-0016. Первыми — герои, у кого меньше разных пар «первая активная + ульта»: так свободные классы
+    # уступают варианты тесным, и одинаковых наборов меньше. При равенстве — по id
+    auto = [H for H in heroes if H["id"] not in kits]
+    for H in sorted(auto, key=lambda H: (len({(v0, u) for _, v0, u, _ in auto_options(lib, H)}), H["id"])):
+        put(H, choose(lib, H, sigs, *taken_by(H)), how="auto")
+
+    errs = [f"{H['id']} {H['name']}: {p}" for H in heroes for p in problems(H, kits[H["id"]], by_id)]
+    repeats = []   # (сет, способность, герои): активная повторяется в сете
+    for g, ids in members.items():
+        seen = {}
+        for hid in ids:
+            for _, s, aid in kits[hid]:
+                if s == "act":
+                    seen.setdefault(aid, []).append(hid)
+        repeats += [(g, aid, hs) for aid, hs in seen.items() if len(hs) > 1]
+
+    roster = {}
+    for H in heroes:
+        m, r = meta[H["id"]], RAR.index(H["rarity"])
+        roster[H["id"]] = {
+            "name": H["name"], "cls": H["cls"], "el": H["el"], "school": H["school"], "rarity": H["rarity"], "maxV": H["maxV"],
+            "cycle": H["cycle"], "src": H["src"], "source": H["srcRaw"], **({"sets": H["groups"]} if H["groups"] else {}),
+            **({"draft": H["draft"]} if H["draft"] else {}), "how": m["how"],
+            **({"was": m["was"]} if m.get("was") is not None and m["was"] != H["maxV"] else {}),
+            **({"added": m["extra"]} if m.get("extra") else {}),
+            **({"misfit": H["misfit"]} if H.get("misfit") else {}), **pcts(r),
+            # замысел ручного набора — только если набор не сжат: у сжатого он говорит о срезанных способностях (он есть в heroes)
+            **({"why": WHY[H["draft"]].strip()} if m["how"] == "hand" and m["was"] <= H["maxV"] and WHY.get(H["draft"], "").strip() else {}),
+            "kit": kit_items(kits[H["id"]], by_id, r)}
+    of_draft = {H["draft"]: H for H in heroes if H["draft"]}
+    heroes_out = {}
+    for did in sorted(MANUAL):   # ручные наборы черновиков, как собраны: доли хода — по редкости героя в составе
+        d, (school, kit) = drafts[did], hand[did]
+        rar = of_draft[did]["rarity"] if did in of_draft else d["редкость"]
+        r = RAR.index(rar)
+        heroes_out[did] = {"name": d["имя"], "cls": d["класс"], "el": d["стихия"], "school": school, "rarity": rar, "maxV": int(d["максимум доблести"]),
+                           **({"rarityDraft": d["редкость"]} if d["редкость"] != rar else {}), **pcts(r),
+                           "cycle": int(d["цикл"]), "order": d["орден"], "hand": True, "why": WHY.get(did, "").strip(),
+                           **({"roster": of_draft[did]["id"]} if did in of_draft else {}), "kit": kit_items(kit, by_id, r)}
     foes = {}
     for fid, (name, cls, el, rank, kit) in FOES.items():
         rname, n, n_ult = RANK[rank]
@@ -619,9 +929,14 @@ def build():
                       "shareRule": "доли — для полного набора; активные делят долю по весу, ульты — поровну; закрытая доблестью способность отдаёт долю обычной атаке",
                       "rankAbilities": {v[0]: {"abilities": v[1], "ults": v[2], "sharesAs": RAR[RANK_R[k]]} for k, v in RANK.items()},
                       "unlockFree": "что открывают доблести между первой активной и ультой — свободно, набор собирается под героя",
-                      "tankThreat": "провокации нет: танк держит врагов множителем угрозы (§5.3, ADR-0016)"},
-            "heroes": dict(sorted(heroes.items())), "foes": foes}
-    return data, by_id
+                      "tankThreat": "провокации нет: танк держит врагов множителем угрозы (§5.3, ADR-0016)",
+                      "compress": "набор героя состава сжат к личному максимуму доблести: доблесть 0 — первая активная, дальше — по порядку набора, "
+                                  "последняя доблесть — ульта; способностей меньше, чем доблестей, — добор по правилам автомата (ADR-0031, п. 7)",
+                      "parts": {"roster": "наборы героев состава по id героя — их берут игра и kits.js; how: hand — вручную, echo — отряд недели Эхо, "
+                                          "auto — автомат; was — сколько доблестей было в наборе до сжатия или добора, added — добранное",
+                                "heroes": "ручные наборы черновиков по id черновика, как собраны — до сжатия; roster — герой состава с этим набором"}},
+            "roster": roster, "heroes": heroes_out, "foes": foes}
+    return data, by_id, {"errs": errs, "dups": [ids for ids in sigs.values() if len(ids) > 1], "repeats": repeats}
 
 
 # ---------------- черновик для автора ----------------
@@ -651,15 +966,28 @@ def kit_line(h, by_id):
     return "; ".join(f"{x['v']} — {label(x, by_id)}" for x in h["kit"])
 
 
-def write_md(data, by_id):
-    H = data["heroes"]
+def fit_note(h):
+    """Откуда набор героя состава: «вручную», «вручную, сжат с 4», «Эхо», «автомат»."""
+    if h["how"] == "auto":
+        return "автомат" + (", ручной не подошёл" if h.get("misfit") else "")
+    base = "вручную" if h["how"] == "hand" else "Эхо"
+    return base if "was" not in h else f"{base}, {'сжат' if h['was'] > h['maxV'] else 'добран'} с {h['was']}"
+
+
+def names(h, by_id):
+    return " + ".join(by_id[x["id"]]["n"] for x in h["kit"])
+
+
+def render_md(data, by_id, rep):
+    R, D = data["roster"], data["heroes"]
     L_ = []
     A = L_.append
     A("# Распределение способностей")
     A("")
-    A("**Черновик · предложение · ждёт автора.** 27.09.2026. Собрано `tools/content-gen/abilities/assign.py` из библиотеки (`docs/content/библиотека-способностей.md`) "
-      "и таблицы героев `docs/content/герои/герои.csv`. Правьте в скрипте, иначе следующая сборка затрёт правку. Данные — `tools/content-gen/abilities/kits.json`. "
-      "Решения — ADR-0016.")
+    A("**Черновик · предложение · ждёт автора.** 29.09.2026. Собрано `tools/content-gen/abilities/assign.py` из библиотеки "
+      "(`docs/content/библиотека-способностей.md`), состава игры `docs/content/герои/состав-героев.csv`, ручных наборов героев черновиков "
+      "(`docs/content/герои/герои.csv`) и отрядов недели Эхо (`design/ui/echo-foes.js`). Правьте в скрипте, иначе следующая сборка затрёт правку. "
+      "Данные — `tools/content-gen/abilities/kits.json`. Решения — ADR-0016, ADR-0031.")
     A("")
     A("## Правила")
     A("")
@@ -675,36 +1003,97 @@ def write_md(data, by_id):
     A("- провокации нет: танк держит врагов множителем угрозы (§5.3);")
     A("- враги Мастерской берут записи библиотеки по классу и стихии, как герои. Уникальные способности серьёзных противников автор обдумает позже, пока — общая библиотека.")
     A("")
-    hand_sets = []
-    for h in H.values():
-        if h["hand"] and h["order"] not in hand_sets:
-            hand_sets.append(h["order"])
-    rest = sum(1 for h in H.values() if not h["hand"])
-    if rest:
-        A(f"**Как собраны наборы.** Вручную — {len(hand_sets)} сетов. Остальные {rest} героев пока собраны автоматом по ролям классов; "
-          "их пересоберём вручную сет за сетом.")
-    else:
-        A(f"**Как собраны наборы.** Все {len(H)} героев собраны вручную, сет за сетом: набор каждого сета — под его бонус и роли героев из черновиков. "
-          "Автомат остаётся заготовкой для новых героев.")
+    A("Класс, школа, редкость и личный максимум доблести героя — из состава игры (ADR-0019; ADR-0030, п. 5а).")
     A("")
+    # ---- ADR-0031
+    A("## Сжатие к максимуму и автоматические наборы (ADR-0031)")
+    A("")
+    A(f"Набор есть у каждого героя состава — у всех {len(R)}. Он сжат к личному максимуму доблести:")
+    A("- доблесть 0 — одна активная способность, каждая следующая доблесть — следующая способность набора по порядку, последняя — ульта;")
+    A("- у героя за золото максимум 1 — активная и ульта, как в следствиях ADR-0019;")
+    A("- способностей в наборе больше, чем доблестей, — лишние уходят с конца, ульта остаётся последней;")
+    A("- меньше — недостающие места добирает автомат в школе героя, до своего порядка видов: активные, пассивка, реакция. Пустых доблестей нет.")
+    A("")
+    A("Откуда набор:")
+    A("- **вручную** — набор собран под героя черновика, герой состава находит его по столбцу «из черновика». Порядок и выбор сохранены;")
+    A("- **Эхо** — набор отряда недели из `echo-foes.js`, максимум Эхо — номер цикла − 1;")
+    A("- **автомат** — по правилам ADR-0016: школа — стихия героя, фарм-герои и герои без стихии — «Без школы», фарм-герои — ещё и фарм; "
+      "виды — по классу; ульта — своей школы и класса; доли хода — по редкости. Донатный герой поддержки урона не берёт: донатные сеты — "
+      "без бойцов урона, кроме сета VI (ADR-0021).")
+    A("")
+    A("| Источник | Героев | Вручную | из них сжато | добрано | Эхо | Автомат |")
+    A("|---|---|---|---|---|---|---|")
+    rows = [(name, [h for h in R.values() if h["src"] == key]) for key, _, name in SOURCES] + [("всего", list(R.values()))]
+    for name, hs in rows:
+        hand = [h for h in hs if h["how"] == "hand"]
+        A(f"| {name} | {len(hs)} | {len(hand)} | {sum(1 for h in hand if h.get('was', 0) > h['maxV'])} | "
+          f"{sum(1 for h in hand if 'was' in h and h['was'] < h['maxV'])} | {sum(1 for h in hs if h['how'] == 'echo')} | {sum(1 for h in hs if h['how'] == 'auto')} |")
+    A("")
+    A("Разнообразие автомата: в сете, донатном сете и отряде недели активные не повторяются, двух одинаковых наборов в составе нет — пока хватает "
+      "библиотеки. Первая активная — главная работа класса, другой вид класса автомат берёт, только когда своих вариантов не осталось. "
+      "Выбор детерминирован: сид — id героя.")
+    A("")
+    mis = [(hid, h) for hid, h in R.items() if h.get("misfit")]
+    if mis:
+        A(f"**Ручной набор не взят у {L.plural(len(mis), 'героя', 'героев', 'героев')}:** в составе у них другой главный класс или школа, "
+          "набор собран под другого героя. Их наборы собрал автомат:")
+        for i, (hid, h) in enumerate(mis):
+            A(f"- {h['name']} · `{hid}`, {h['source']}, черновик `{h['draft']}` — {h['misfit']}" + (";" if i < len(mis) - 1 else "."))
+        A("")
+    dups = rep["dups"]
+    if dups:
+        A(f"**Одинаковые наборы — {L.plural(len(dups), 'случай', 'случая', 'случаев')}.** У героя с максимумом 1 набор — первая активная и ульта. "
+          "Сжатые ручные наборы совпадают между собой и с набором Эхо, а у бойцов урона одной школы пар «удар + ульта» в классах меньше, "
+          "чем таких героев:")
+        for i, ids in enumerate(dups):
+            A("- " + ", ".join(f"{R[x]['name']} · `{x}` ({fit_note(R[x])})" for x in ids) + f" — {names(R[ids[0]], by_id)}" + (";" if i < len(dups) - 1 else "."))
+        A("")
+    if rep["repeats"]:
+        auto_rep = any(R[x]["how"] == "auto" for _, _, hs in rep["repeats"] for x in hs)
+        A("**Активная повторяется в сете** — " + ("библиотеке не хватило вариантов или так собраны исходные наборы:" if auto_rep
+                                                   else "так собраны исходные наборы, ручные и Эхо; автомат повторов в сетах не дал:"))
+        for i, (g, aid, hs) in enumerate(rep["repeats"]):
+            A(f"- {g}: «{by_id[aid]['n']}» — " + ", ".join(f"{R[x]['name']} · `{x}` ({fit_note(R[x])})" for x in hs)
+              + (";" if i < len(rep["repeats"]) - 1 else "."))
+        A("")
+    # ---- ручные наборы
     A("## Собраны вручную")
     A("")
-    for s in hand_sets:
+    A("Все 110 героев черновиков собраны вручную, сет за сетом: набор каждого сета — под его бонус и роли героев. «Как собран» — набор черновика "
+      "до сжатия. «В составе» — герой игры с этим набором: источник, личный максимум доблести и набор после сжатия или добора.")
+    A("")
+    sets = []
+    for d in D.values():
+        if d["order"] not in sets:
+            sets.append(d["order"])
+    for s in sets:
         A(f"### {s}")
         A("")
         if SET_WHY.get(s):
             A(SET_WHY[s])
             A("")
-        A("| Герой | Класс · стихия | Способности по доблести | Замысел |")
-        A("|---|---|---|---|")
-        for hid, h in H.items():
-            if h["order"] == s and h["hand"]:
-                A(f"| {h['name']} · `{hid}` | {h['cls']} · {h['el']} · до {h['maxV']} | {kit_line(h, by_id)} | {h['why']} |")
+        A("| Герой | Класс · стихия | Как собран | В составе | Замысел |")
+        A("|---|---|---|---|---|")
+        for did, d in D.items():
+            if d["order"] != s:
+                continue
+            rid = d.get("roster")
+            h = R.get(rid)
+            if not h:
+                cell = "нет в составе"
+            else:
+                head = f"`{rid}` · {h['source']} · до {h['maxV']}"
+                cell = (f"{head} — не взят: {h['misfit']}" if h.get("misfit") else f"{head} — как собран" if "was" not in h
+                        else f"{head} — {'сжат' if h['was'] > h['maxV'] else 'добран'}: {kit_line(h, by_id)}")
+            A(f"| {d['name']} · `{did}` | {d['cls']} · {d['el']} · до {d['maxV']} | {kit_line(d, by_id)} | {cell} | {d['why']} |")
         A("")
+    # ---- доли хода
     A("## Доли хода по редкости")
     A("")
     A("Модель автора 27.09.2026: редкость делит ход героя между ультой, способностями и обычной атакой. У обычного героя ульта — 1 %, способности — 29 %, "
       "обычная атака — 70 %; у вневременного — 10 %, 50 % и 40 %. За ступень: ульта +1,5 %, способности +3,5 %, обычная атака −5 %. Числа — демонстрация.")
+    A("")
+    A("Редкость героя — из состава игры: за золото — только обычные и редкие (ADR-0030, п. 5а).")
     A("")
     A("| Редкость | Ульта | Способности | Обычная атака | Шанс реакций × | Ульта хотя бы раз за этаж из 10 ходов |")
     A("|---|---|---|---|---|---|")
@@ -719,47 +1108,58 @@ def write_md(data, by_id):
     A("- если ульт несколько, они делят долю ульты поровну;")
     A("- шансы реакций растут вместе с долей способностей; у эпического героя они как в библиотеке.")
     A("")
-    ex = H.get("h01_2")
+    ex = next(((hid, h) for hid, h in R.items() if h["how"] == "hand" and h["maxV"] >= 4), None)
     if ex:
-        A(f"Пример — {ex['name']}, {ex['rarity']}, максимум доблести {ex['maxV']}:")
-        for v in (0, ex["maxV"]):
-            open_ = [x for x in ex["kit"] if x["v"] <= v and x.get("share")]
-            basic = 10000 - sum(x["share"] for x in open_)
-            A(f"- доблесть {v}: " + ", ".join(f"«{x['n']}» — {pct(x['share'])}" for x in open_) + f"; обычная атака — {pct(basic)}.")
+        hid, h = ex
+        A(f"Пример — {h['name']} · `{hid}`, {h['rarity']}, максимум доблести {h['maxV']}:")
+        for v in (0, h["maxV"]):
+            open_ = [x for x in h["kit"] if x["v"] <= v and x.get("share")]
+            A(f"- доблесть {v}: " + ", ".join(f"«{x['n']}» — {pct(x['share'])}" for x in open_) + f"; обычная атака — {pct(10000 - sum(x['share'] for x in open_))}.")
         A("")
+    # ---- автомат
     A("## Как собирает автомат")
     A("")
-    A("Заготовка для новых героев: пока набор не собран вручную, автомат открывает доблести в таком порядке:")
+    A("Автомат собирает набор героя без ручного набора и набора Эхо, а ещё добирает ручной, если доблестей больше, чем способностей. Места по доблести:")
     A("")
     A("| Максимум доблести | Доблесть 0 | 1 | 2 | 3 | 4 | 5 |")
     A("|---|---|---|---|---|---|---|")
     for mv in range(1, 6):
-        order = UNLOCK[:mv] + ["ult"]
-        A(f"| {mv} | " + " | ".join(SLOT_NAME[s] for s in order) + " |" + " |" * (5 - mv))
+        A(f"| {mv} | " + " | ".join(SLOT_NAME[s] for s in UNLOCK[:mv] + ["ult"]) + " |" + " |" * (5 - mv))
     A("")
-    A("Фарм-герою пассивка добычи открывается раньше второй активной. Виды — по ролям классов, ступени идут по кругу, чтобы наборы героев одного класса и стихии не совпадали:")
+    A("Фарм-герою пассивка добычи открывается раньше второй активной:")
+    A("")
+    A("| Максимум доблести | Доблесть 0 | 1 | 2 | 3 | 4 | 5 |")
+    A("|---|---|---|---|---|---|---|")
+    for mv in range(1, 6):
+        A(f"| {mv} | " + " | ".join(SLOT_NAME[s] for s in UNLOCK_FARM[:mv] + ["ult"]) + " |" + " |" * (5 - mv))
+    A("")
+    A("Виды — по ролям классов состава:")
     A("")
     A("| Класс | Доблесть 0 | Дальше по кругу | Ульта |")
     A("|---|---|---|---|")
     for cls, c in CLASS.items():
         A(f"| {cls} | {KIND_SHORT[c['first'][0]]} | {', '.join(KIND_SHORT[p[0]] for p in c['pool'])} | {', '.join(KIND_SHORT[u] for u in c['ult'])} |")
-    A("| фармящий | фарм | приём «Без школы», фарм | фарм |")
+    A("| фармер | фарм | приём «Без школы», фарм | фарм |")
     A("")
-    A("Сборный герой с двумя классами открывает вторую активную из работы второго класса. Пассивка и реакция подбираются под роль. Двух одинаковых наборов нет.")
+    A("Сборный герой с двумя классами открывает вторую активную из работы второго класса. Пассивка и реакция подбираются под роль. Ступень первой активной, "
+      "ульта и начало круга видов — по сиду героя. Донатный герой поддержки урон и урон по времени пропускает: у танка первой идёт следующая работа класса.")
     A("")
-    for cyc in sorted({h["cycle"] for h in H.values()}):
-        hs = [(hid, h) for hid, h in H.items() if h["cycle"] == cyc]
+    # ---- состав по циклам
+    for cyc in range(1, len(ROMAN)):
+        hs = [(hid, h) for hid, h in R.items() if h["cycle"] == cyc]
+        if not hs:
+            continue
         A(f"## Цикл {ROMAN[cyc]} · {L.plural(len(hs), 'герой', 'героя', 'героев')}")
         A("")
-        A("| Герой | Класс · стихия | Редкость | Способности по доблести |")
-        A("|---|---|---|---|")
+        A("| Герой | Источник | Класс · стихия | Редкость | Способности по доблести |")
+        A("|---|---|---|---|---|")
         for hid, h in hs:
             el = h["el"] or "без стихии"
             school = f" · {h['school']}" if h["school"] != h["el"] else ""
-            mark = " · вручную" if h["hand"] else ""
-            A(f"| {h['name']} · `{hid}`{mark} | {h['cls']} · {el}{school} | {h['rarity']}: способности {pct(h['actPct'])}, ульта {pct(h['ultPct'])}"
-              + f" | {kit_line(h, by_id)} |")
+            A(f"| {h['name']} · `{hid}` · {fit_note(h)} | {h['source']} | {h['cls']} · {el}{school} | {h['rarity']}: способности {pct(h['actPct'])}, "
+              f"ульта {pct(h['ultPct'])} | {kit_line(h, by_id)} |")
         A("")
+    # ---- враги
     A("## Враги Мастерской")
     A("")
     A("Враги берут те же записи библиотеки. Имя врага — прежнее, если смысл совпал.")
@@ -781,37 +1181,79 @@ def write_md(data, by_id):
                        + (f", цель — {'лекарь' if x['tgt'] == 'healer' else 'самый раненый'}" if x["tgt"] else "") for x in f["kit"])
         A(f"| {f['name']} | {RANK[f['rank']][0]} | {f['cls']} · {f['el']} | {ab} | {f['note']} |")
     A("")
+    # ---- открыто
+    one = sum(1 for h in R.values() if h["maxV"] == 1)
     A("## Открыто — решает автор")
     A("")
-    A("1. **Наборы всех 110 героев** собраны вручную — посмотрите замыслы сетов.")
-    A("2. **Роли героев в черновиках** местами расходятся с наборами: механика прежнего боя, приёмы «Без школы» у героев стихий, похожие роли у разных героев. Предложение — переписать роли одним проходом под наборы.")
-    A("3. **Угроза танка:** провокации нет, множитель угрозы танка — × 3. Настроим прогонами, когда библиотека встанет в ядро.")
-    OUT_MD.write_text("\n".join(L_) + "\n", encoding="utf-8")
+    n = 0
+    if mis:
+        n += 1
+        A(f"{n}. **Ручные наборы {L.plural(len(mis), 'героя', 'героев', 'героев')} не взяты** — список выше: в составе у них другой класс или школа. "
+          "Собрать их вручную под класс состава — или вернуть героям класс черновика.")
+    if dups:
+        n += 1
+        A(f"{n}. **Одинаковые наборы — {L.plural(len(dups), 'случай', 'случая', 'случаев')}**, список выше. Развести — сменить одному из героев первую "
+          "активную или ульту вручную; для героев с максимумом 1 в тесных школах библиотеке не хватает пар «удар + ульта».")
+    n += 1
+    A(f"{n}. **Большая часть коллекции живёт на одной активной:** у {one} героев из {len(R)} максимум доблести 1 — набор из активной и ульты "
+      "(ADR-0031, «Что решить автору»).")
+    # доля единственной активной против доли одной из трёх активных — у обычного героя, вес у всех активных равный
+    three = RARITY_ACT[0] * L.CH // (3 * L.CH)
+    n += 1
+    A(f"{n}. **Доля первой активной без доблести выросла.** Доли считаются для полного набора, а полный набор теперь сжат: у героя с максимумом 1 "
+      f"единственная активная берёт всю долю способностей уже на доблести 0 — у обычного героя {pct(RARITY_ACT[0])} хода, а при трёх активных "
+      f"черновика было {pct(three)}. Отряд на золотых героях бьёт способностями чаще, темп боёв перемеряется по порядку сборки. Если и герою "
+      "за золото нужен «потенциал не раскрыт» без доблести, долю можно делить как в наборе на пять доблестей — это правило решает автор.")
+    return "\n".join(L_) + "\n"
 
 
-def write_ui(data):
+def render_json(data):
+    return json.dumps(data, ensure_ascii=False, indent=1) + "\n"
+
+
+def render_ui(data):
     """Наборы для ядра боя прототипа: доблесть открытия, место, запись библиотеки; у врагов — имя врага и правило цели."""
     keep = ("v", "slot", "id", "as", "tgt", "chR")   # chR — шанс реакции по редкости героя
-    ui = {"heroes": {hid: {"ultPct": h["ultPct"], "actPct": h["actPct"], "rarity": h["rarity"], "maxV": h["maxV"],
-                           "kit": [{k: x[k] for k in keep if x.get(k) is not None} for x in h["kit"]]} for hid, h in data["heroes"].items()},
-          "foes": {fid: {"rank": f["rank"], "ultPct": f["ultPct"], "actPct": f["actPct"],
-                         "kit": [{k: x[k] for k in keep if x.get(k) is not None} for x in f["kit"]]} for fid, f in data["foes"].items()}}
-    OUT_UI.write_text("/* Собрано tools/content-gen/abilities/assign.py — наборы способностей героев и врагов (ADR-0016). Руками не править. */\n"
-                      "window.EN_KITS = " + json.dumps(ui, ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")
+
+    def item(x):
+        return {k: x[k] for k in keep if x.get(k) is not None}
+
+    ui = {"heroes": {hid: {"ultPct": h["ultPct"], "actPct": h["actPct"], "rarity": h["rarity"], "maxV": h["maxV"], "kit": [item(x) for x in h["kit"]]}
+                     for hid, h in data["roster"].items()},
+          "drafts": {did: h["roster"] for did, h in data["heroes"].items() if h.get("roster")},
+          "foes": {fid: {"rank": f["rank"], "ultPct": f["ultPct"], "actPct": f["actPct"], "kit": [item(x) for x in f["kit"]]}
+                   for fid, f in data["foes"].items()}}
+    return ("/* Собрано tools/content-gen/abilities/assign.py — наборы способностей героев состава и врагов (ADR-0016, ADR-0031, п. 7). Руками не править.\n"
+            "   heroes — по id героя состава (roster.js): шаги набора — доблести 0…maxV, последняя — ульта. drafts — id черновика → id героя состава:\n"
+            "   отряд боя прототипа и калькуляторы зовут набор по черновику (h.draft), последняя строка ведёт такой ключ к набору героя состава. */\n"
+            "window.EN_KITS = " + json.dumps(ui, ensure_ascii=False, separators=(",", ":")) + ";\n"
+            "(K => { for (const d in K.drafts) K.heroes[d] = K.heroes[K.drafts[d]]; })(window.EN_KITS);\n")
 
 
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
-    data, by_id = build()
-    OUT_JSON.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    write_md(data, by_id)
-    write_ui(data)
-    n = len(data["heroes"])
-    per = {}
-    for h in data["heroes"].values():
-        per[len(h["kit"])] = per.get(len(h["kit"]), 0) + 1
-    print(f"Героев {n}, наборы уникальны; способностей в наборе: " + ", ".join(f"{k} — {v}" for k, v in sorted(per.items()))
-          + f"; врагов {len(data['foes'])} → {OUT_JSON.relative_to(ROOT)}, {OUT_MD.relative_to(ROOT)}")
+    data, by_id, rep = build()
+    if rep["errs"]:
+        print("ОШИБКИ наборов героев состава:", *rep["errs"][:40], sep="\n  ")
+        sys.exit(1)
+    R = data["roster"]
+    how = Counter(h["how"] for h in R.values())
+    hand = [h for h in R.values() if h["how"] == "hand"]
+    print(f"Героев состава {len(R)}, набор у всех: вручную {how['hand']} (сжато {sum(1 for h in hand if h.get('was', 0) > h['maxV'])}, "
+          f"добрано {sum(1 for h in hand if 'was' in h and h['was'] < h['maxV'])}), Эхо {how['echo']}, автомат {how['auto']} "
+          f"(ручной не подошёл — {sum(1 for h in R.values() if h.get('misfit'))}); одинаковых наборов — {len(rep['dups'])}, "
+          f"повторов активной в сете — {len(rep['repeats'])}.")
+    outs = [(OUT_JSON, render_json(data)), (OUT_MD, render_md(data, by_id, rep)), (OUT_UI, render_ui(data))]
+    if "--check" in sys.argv:
+        stale = [p for p, text in outs if not p.exists() or p.read_bytes().replace(b"\r\n", b"\n") != text.encode("utf-8")]
+        if stale:
+            print("Устарел: " + ", ".join(p.relative_to(ROOT).as_posix() for p in stale) + " — пересобрать: python tools/content-gen/abilities/assign.py")
+            sys.exit(1)
+        print("Свежий: kits.json, kits.js и черновик совпадают с составом, ручными наборами и отрядами Эхо.")
+        return
+    for p, text in outs:
+        p.write_text(text, encoding="utf-8")
+    print(f"Врагов {len(data['foes'])} → " + ", ".join(p.relative_to(ROOT).as_posix() for p, _ in outs))
 
 
 if __name__ == "__main__":

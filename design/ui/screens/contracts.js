@@ -15,12 +15,15 @@
 'use strict';
 
 /* ================== данные экрана: демонстрация, не баланс ================== */
+/* один календарь демо (ADR-0031, п. 17): 11-й день цикла II, 16:48 — вторая неделя цикла, четвёртый день недели */
 const CT_DEMO = {
   seed: 'демо-странник',                 // сид игрока: в игре его выдаёт сервер
-  dayLeft: 6 * 3600 + 18 * 60,           // до конца серверного дня
-  day: 1, week: 1,                       // номера периодов демо
+  dayLeft: 7 * 3600 + 12 * 60,           // до конца серверного дня: 16:48
+  day: 11, week: 2,                      // номера периодов демо: день цикла II и неделя цикла — сиды пулов
   weekSigned: { cert: true, prog: [6000, 10000, 2500, 0, 0, 0, 0, 0, 0, 0, 0, 0] },   // недельный — подписан и заверен; прогресс заданий, б. п. цели
-  pts: 210,                              // очки исполненных контрактов этой недели
+  /* очки исполненных контрактов этой недели: три дневных за три прошлых дня — третья планка; неделя обычного — 1 896 (прогон контрактов,
+     econ), четвёртая планка — к концу недели с недельным */
+  pts: 760,
   place: 57,                             // место в рейтинге контрактов, если нет в S.ranks
   past: { frac: 4000, pts: 1650, place: 41 },   // прошлая неделя для «Недели»: доля пути от взятой планки к следующей, б. п.; очки и место — если «Даров» нет
   top: [11500, 9800, 8600],              // лидеры недели — доля порога 5-й планки, б. п.
@@ -580,7 +583,7 @@ const ctTop = (need, t) => CT_DEMO.names.map((n, j) => [n, Math.floor(need * (t 
     if (!CT || !S.contracts || !ctOpen()) return { lock: 'нет данных' };
     const c = ctCyc(), P0 = CT.planks[c] || [];
     /* итог прошлой недели — тот, за который платят «Дары» (bag.js): место — из выплаты за место, очки — в пределах взятых планок */
-    const rows = typeof darRows === 'function' && S.zp ? darRows(S).filter(p => p.id === 'contract' && p.wk && p.wk.id === 'prev') : [];
+    const rows = typeof darRows === 'function' && S.zp ? darRows(S, 'prev').filter(p => p.id === 'contract') : [];
     const k = rows.filter(p => p.kind === 'plank').length, placeRow = rows.find(p => p.kind === 'place' && p.place);
     const lo = k ? P0[Math.min(k, P0.length) - 1] : 0, hi = k < P0.length ? P0[k] : lo * 2;
     const pts = rows.length ? lo + Math.floor((hi - lo) * CT_DEMO.past.frac / CTB) : CT_DEMO.past.pts, pk = ctPlanks(pts);

@@ -12,7 +12,9 @@
    - активации из запасов — ACTIVATE[ярус предмета](id): act — крафтовый биом, call — крафтовый босс, echo — Многоликий (screens/echo.js). */
 
 const DEMO_BAG = {
-  /* id предмета → количество: все 36 базовых, ключи циклов I–II, уникальные и ресурсы руин цикла I, находка и активации дороги */
+  /* id предмета → количество: все 36 базовых, ключи циклов I–II, уникальные и ресурсы руин цикла I, находка и активации дороги.
+     Руны пределов — 11-й день цикла II (ADR-0031, п. 17): отряд пробил предел I, руны предела II на всех пятерых обычный собирает к 13-му
+     дню — пока хватает одному (rn1_2); руны предела I остались второму отряду (rn1_1) */
   items: {
     resin: 3, mushroom: 14, acid: 25, ash: 7, salt: 18, vial: 29, sand: 11, dormite: 22, runechip: 4, crystal: 15,
     ink: 26, candle: 8, spring: 19, plank: 30, mechpart: 12, nail: 23, bracket: 5, gear: 16, thread: 27, dye: 9,
@@ -22,7 +24,7 @@ const DEMO_BAG = {
     k3_tail: 4, k3_eng: 5, k3_alch: 1, k3_ench: 2, k3_smith: 3, k4_hunt: 4, k4_tail: 5, k4_eng: 1, k4_alch: 2,
     k4_ench: 3, k4_smith: 4, u1: 1, u2: 1, cr_stone: 2, cr_harness: 5, cr_shoe: 8, cr_karst: 4, cr_prop: 7,
     cr_mold: 3, find_cb1: 1, act_cb1: 1, call_fb1: 1, p_fang: 2, p_waxthread: 3, p_frame: 1, a_lamp: 1, rn1_1: 12,
-    rn1_2: 1, vs1: 2, many: 1
+    rn1_2: 12, vs1: 2, many: 1
   },
   /* найденные рецепты: пять заготовок цикла I, активация Заброшенной дороги и призыв её босса */
   known: ["r_p_fang", "r_p_waxthread", "r_p_frame", "r_p_clay", "r_p_print", "r_act_cb1", "r_call_fb1"],
@@ -34,7 +36,7 @@ const DEMO_BAG = {
     { box: 'talisman', r: 2, cyc: 2, win: 'step', src: 'Клановый босс · доля клана' },
     { box: 'craft', r: 2, cyc: 1, win: 'step', src: 'Крафтовый босс · Хатт-Уру' },
     { box: 'wander', r: 2, cyc: 1, win: 'step', src: 'Первая победа над боссом биома' },
-    { box: 'wander', r: 1, cyc: 2, win: 'wild', src: 'Календарь · день 3' },
+    { box: 'wander', r: 1, cyc: 2, win: 'wild', src: 'Календарь · день 9' },
   ],
 };
 

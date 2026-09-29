@@ -228,6 +228,18 @@ function suite() {
     } catch (x) { fail(key + ': исключение — ' + (x && x.stack ? x.stack.split('\n').slice(0, 3).join(' | ') : x)); }
   }
 
+  /* пороги личных планок демо-строк — из данных режимов, копии в экране нет (ADR-0031): контракты — EN_CONTRACTS.planks цикла,
+     Арена и Лига — EN_ARENA.arena.plank и .league.plank × x строки планки EN_LOOTBOXES */
+  reset();
+  if ('plank' in W.data) fail('Неделя: в WK остались свои пороги планок (WK.plank)');
+  for (const id of ['contract', 'arena', 'league']) {
+    const dm = window.WEEK_MODES.find(m => m.id === id && m.demo); if (!dm) { fail(`Неделя: нет демо-строки ${id}`); continue; }
+    const c = S.acc.cycle, ly = LBX.modes[id].layers.find(l => l.kind === 'plank' && !l.clan);
+    const want = id === 'contract' ? (window.EN_CONTRACTS.planks[c] || []).slice(0, ly.rows.length) : ly.rows.map(r => window.EN_ARENA[id].plank * r.x);
+    const got = dm.now.call(dm), needs = got && got.planks ? got.planks.map(p => p.need) : [];
+    if (id !== 'league' || !got.lock) { if (needs.join() !== want.join()) fail(`Неделя: демо ${id} — пороги ${needs.join('/')}, в данных ${want.join('/')}`); }
+  }
+
   /* сегменты — действием шапки; вкладки «Рейтинга» — действием листа */
   reset();
   draw('старт');

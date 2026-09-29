@@ -29,23 +29,23 @@ const WK = {
   modes: [['echo', 10, 18, 'echo'], ['event', 20, 21, 'event'], ['contract', 30, 38, 'contracts'], ['clan', 40, 26, 'clan:boss'], ['arena', 50, 3, 'arena:arena'], ['league', 60, 3, 'arena:league']],
   rituals: [33, 'rituals'],                             // ритуалы — не рейтинговый режим: строка под режимами
   leagueHeroes: 15,                                     // §20.4: Лига — для собравших 15 героев
-  /* первая личная планка: очки контрактов, победы Арены и Лиги; дальше — × x строки планки (EN_LOOTBOXES: каждая следующая ×2).
-     Пороги Эхо — echo.js (EN_ECHO.planks), События — S.event.ms (evPlanks). Пороги в очках ждут баланса очков режимов */
-  plank: { contract: 150, arena: 10, league: 3 },
-  /* эта неделя: чего нет в состоянии прототипа. Место — из S.ranks, как в профиле и «Дарах» */
+  /* пороги личных планок в экране не хранятся — они в данных режимов (NEEDS ниже): контракты — EN_CONTRACTS.planks, Арена и Лига —
+     EN_ARENA.arena.plank и .league.plank, Эхо — echo.js (EN_ECHO.planks), Событие — evPlanks (event.js) */
+  /* эта неделя: чего нет в состоянии прототипа. Место — из S.ranks, как в профиле и «Дарах». Запасные числа — те же, что у демо режимов
+     (CT_DEMO, AR_DEMO): один календарь демо, 11-й день цикла II (ADR-0031, п. 17) */
   now: {
-    contract: { points: 70 },                           // очки выполненных контрактов недели — как прежде в листе «Рейтинг»
-    arena: { wins: 23, top: [1832, 1797, 1768] },       // победы сезона — к планкам; рейтинг лидеров (§20.5: старт 1000)
-    league: { wins: 0, rating: 1000, top: [1702, 1668, 1641] },
+    contract: { points: 760 },                          // очки выполненных контрактов недели — как прежде в листе «Рейтинг»
+    arena: { wins: 38, top: [1832, 1797, 1768] },       // победы сезона — к планкам; рейтинг лидеров (§20.5: старт 1000)
+    league: { wins: 3, rating: 1012, top: [1702, 1668, 1641] },
     clan: { points: 38400, mine: 1320, top: [214000, 198500, 187300] },   // очки клана, личный вклад и кланы-лидеры (§25.3)
   },
   /* прошлая неделя: планки и места — из «Даров»; здесь — доля пути от взятой планки к следующей, места без выплаты и лидеры */
   past: {
     frac: { echo: 1900, event: 1900, contract: 1500, arena: 2500, league: 3300 },   // б. п.
-    place: { event: 187, league: 240, clan: 1240 },     // места без выплаты: у События и Лиги места — до топ-100, у клана — «все с очками»
+    place: { event: 187, league: 240, clan: 3460 },     // места без выплаты: у События и Лиги места — до топ-100, у клана — «все с очками» (CL.past в clan.js)
     arena: { rating: 1231, days: [95, 88, 102, 97, 91, 99, 95], top: [1846, 1812, 1779] },   // места на ежедневных срезах рейтинга
     league: { rating: 1084, top: [1715, 1690, 1652] },
-    clan: { points: 21600, mine: 960, top: [231000, 204700, 192100] },
+    clan: { points: 5400, mine: 490, top: [231000, 204700, 192100] },   // первая неделя клана демо (CL.past в clan.js)
     contract: { cur: [['gold', 19600], ['spirit', 1200], ['keys', 28], ['enerium', 40]] },   // пул недельного контракта ×2 за заверение (§18.5)
   },
   arenaEnerium: [[1, 100], [10, 50], [30, 25], [100, 10]],   // §20.6: ежедневный Энериум за место — стартовые значения
@@ -117,6 +117,8 @@ function stateOf(m, t) {
   st.box = raw.box || (LBX.modes[m.id] ? LBX.modes[m.id].box : '');
   st.plankUnit = raw.plankUnit || st.unit;
   st.planks = (Array.isArray(raw.planks) ? raw.planks : []).filter(p => p && int(p.need) != null).map((p, i) => ({ k: p.k || i + 1, need: p.need, pay: Array.isArray(p.pay) ? p.pay : [], reached: p.reached != null ? !!p.reached : st.have >= p.need }));
+  /* клановые планки недели, если режим их ведёт: взятые клановые планки этой недели «Дары» показывают ждущими распределения (bag.js) */
+  st.clanPlanks = (Array.isArray(raw.clanPlanks) ? raw.clanPlanks : []).filter(p => p && int(p.need) != null).map((p, i) => ({ k: p.k || i + 1, need: p.need, pay: Array.isArray(p.pay) ? p.pay : [], reached: !!p.reached }));
   st.next = raw.next && int(raw.next.need) != null ? Object.assign({ pay: [] }, raw.next) : st.planks.find(p => !p.reached) || null;
   const top = (Array.isArray(raw.top) ? raw.top : []).filter(x => Array.isArray(x) && x[0] && int(x[1]) != null).slice().sort((a, b) => b[1] - a[1]);
   st.meName = raw.me || WK.me;
@@ -157,10 +159,18 @@ const who = () => (typeof ZP_DEMO !== 'undefined' && ZP_DEMO.gifts && ZP_DEMO.gi
 const closed = id => { const M = LM(id); return M && cyc() < M.from ? `рейтинг — с цикла ${ROMAN[M.from]}` : ''; };
 const rankPlace = n => { const r = (S.ranks || []).find(x => x[0] === n); return r && Number.isInteger(r[1]) ? r[1] : null; };
 const lastNeed = pk => pk.length ? pk[pk.length - 1].need : 0;
-/* личные планки режима: первая × x строки, сундуки — строка своего цикла */
-function plankRows(id, first, have) {
+/* пороги личных планок — из данных режима: контракты — список порогов цикла (EN_CONTRACTS.planks), Арена и Лига — первая планка
+   (EN_ARENA.arena.plank, .league.plank), дальше × x строки планки EN_LOOTBOXES. Нет данных — нет планок */
+const firstX = kind => { const A = window.EN_ARENA && EN_ARENA[kind]; return A && Number.isInteger(A.plank) ? A.plank : 0; };
+const NEEDS = {
+  contract: (ly, c) => { const P = (window.EN_CONTRACTS && EN_CONTRACTS.planks && EN_CONTRACTS.planks[c]) || []; return ly.rows.map((_, i) => P[i]).filter(Number.isInteger); },
+  arena: ly => firstX('arena') ? ly.rows.map(r => firstX('arena') * r.x) : [],
+  league: ly => firstX('league') ? ly.rows.map(r => firstX('league') * r.x) : [],
+};
+/* личные планки режима: порог из данных, сундуки — строка своего цикла */
+function plankRows(id, have) {
   const M = LM(id), ly = M ? M.layers.find(l => l.kind === 'plank' && !l.clan) : null, c = cyc();
-  return ly && first ? ly.rows.map((row, i) => ({ k: i + 1, need: first * row.x, pay: row.cyc[c] || [], reached: have >= first * row.x })) : [];
+  return ly && NEEDS[id] ? NEEDS[id](ly, c).map((need, i) => ({ k: i + 1, need, pay: ly.rows[i].cyc[c] || [], reached: have >= need })) : [];
 }
 /* место → выплата за место, если неделя кончится сейчас: наименьший «топ-N», куда место входит; у клана вне топа — «все с очками» */
 function tierOf(id, place, clan) {
@@ -177,7 +187,7 @@ function namesFor(id, t, list) {
 const topRel = (id, t, scale) => scale ? namesFor(id, t).map((n, j) => [n, Math.floor(scale * WK.topBp[t][j] / WK.bp)]) : [];
 const topAbs = (id, t, vals, list) => { const N = namesFor(id, t, list); return (vals || []).map((v, j) => [N[j], v]); };
 /* прошлая неделя по «Дарам»: строки выплат прошлой недели этого режима (bag.js), без «Даров» — типичная неделя lootboxes.js */
-const prevRows = id => typeof darRows === 'function' && S.zp ? darRows(S).filter(p => p.id === id && p.wk && p.wk.id === 'prev') : [];
+const prevRows = id => typeof darRows === 'function' && S.zp ? darRows(S, 'prev').filter(p => p.id === id) : [];
 const pastRewards = id => prevRows(id).map(p => ({ label: p.label, box: p.box, groups: p.groups.map(g => ({ r: g.r, count: g.count, win: g.win })), st: p.st, cat: p.cat, kind: p.kind }));
 function pastPlanks(id) {
   const rows = prevRows(id); if (rows.length) return rows.filter(p => p.kind === 'plank').length;
@@ -224,12 +234,12 @@ demo('event', 'Событие', ['очко', 'очка', 'очков'],
 demo('contract', 'Контракты', ['очко', 'очка', 'очков'],
   () => {
     const lock = closed('contract'); if (lock) return { lock };
-    const pts = WK.now.contract.points, pk = plankRows('contract', WK.plank.contract, pts), place = rankPlace('Контракты');
+    const pts = WK.now.contract.points, pk = plankRows('contract', pts), place = rankPlace('Контракты');
     return { place, points: pts, planks: pk, top: topRel('contract', 'now', lastNeed(pk)), tier: tierOf('contract', place), alert: S.contracts.day.signed ? '' : 'Дневной контракт не подписан' };
   },
   () => {
     const lock = closed('contract'); if (lock) return { lock };
-    const needs = plankRows('contract', WK.plank.contract, 0).map(p => p.need);
+    const needs = plankRows('contract', 0).map(p => p.need);
     return { place: pastPlace('contract'), points: pastPts(needs, pastPlanks('contract'), WK.past.frac.contract), top: topRel('contract', 'past', needs[needs.length - 1]),
       rewards: pastRewards('contract'), cur: WK.past.contract.cur.map(x => x.slice()) };
   });
@@ -250,7 +260,7 @@ demo('arena', 'Арена', 'рейтинг',
   () => {
     const lock = closed('arena'); if (lock) return { lock };
     const w = WK.now.arena.wins, place = rankPlace('Арена');
-    return { place, points: S.arena.rating, have: w, planks: plankRows('arena', WK.plank.arena, w), plankUnit: ['победа', 'победы', 'побед'], top: topAbs('arena', 'now', WK.now.arena.top), tier: tierOf('arena', place) };
+    return { place, points: S.arena.rating, have: w, planks: plankRows('arena', w), plankUnit: ['победа', 'победы', 'побед'], top: topAbs('arena', 'now', WK.now.arena.top), tier: tierOf('arena', place) };
   },
   () => {
     const lock = closed('arena'); if (lock) return { lock };
@@ -263,7 +273,7 @@ demo('league', 'Лига', 'рейтинг',
     const lock = closed('league'); if (lock) return { lock };
     if (S.heroes.length < WK.leagueHeroes) return { lock: `нужно ${WK.leagueHeroes} героев` };
     const D = WK.now.league;
-    return { place: null, points: D.rating, have: D.wins, planks: plankRows('league', WK.plank.league, D.wins), plankUnit: ['победа', 'победы', 'побед'], top: topAbs('league', 'now', D.top) };
+    return { place: null, points: D.rating, have: D.wins, planks: plankRows('league', D.wins), plankUnit: ['победа', 'победы', 'побед'], top: topAbs('league', 'now', D.top) };
   },
   () => {
     const lock = closed('league'); if (lock) return { lock };
@@ -346,10 +356,13 @@ function demoNote(rows) {
   const d = rows.filter(st => st.m.demo).map(st => st.m.n);
   return TM(d.length ? `Демо Недели — ${d.join(', ')}: места и выплаты — строки «Даров» (bag.js), очки — от взятой планки, лидеры и Энериум — WK в screens/week.js. Остальные строки сообщают экраны режимов через WEEK_MODES.` : 'Все строки сообщают экраны режимов через WEEK_MODES.', 'p', 'reason');
 }
-/* лица героев Эхо недели: открытые к циклу, в коллекции — отметка, осколки — полоса */
+/* лица героев Эхо недели: открытые к циклу, в коллекции — портрет с отметкой; собираемый — осколок-стекло с его лицом
+   (shardGhost, screens/art-icons.js): доля собранного — светом кромки */
 function faceHtml(h, c) {
   const on = h.c <= c, own = rsHas(h), n = S.rs.shards[h.id] || 0, need = RS.rules.stub.shards;
-  return `<span class="wk-face ${on ? '' : 'lock'}" data-r="${h.r}" title="${trEsc(h.n)}${on ? (own ? ' · в коллекции' : ` · осколков ${n} из ${need}`) : ' · с цикла ' + ROMAN[h.c]}">${rsFace(h)}${own ? `<span class="wk-own">${ic('check')}</span>` : on ? `<i style="--v:${Math.min(100, Math.floor(n * 100 / need))}"></i>` : ''}</span>`;
+  const tip = `${trEsc(h.n)}${on ? (own ? ' · в коллекции' : ` · осколков ${n} из ${need}`) : ' · с цикла ' + ROMAN[h.c]}`;
+  if (on && !own && typeof shardGhost === 'function') return `<span class="wk-face glass" data-r="${h.r}" title="${tip}">${shardGhost(h, n, need, 60)}</span>`;
+  return `<span class="wk-face ${on ? '' : 'lock'}" data-r="${h.r}" title="${tip}">${rsFace(h)}${own ? `<span class="wk-own">${ic('check')}</span>` : on ? `<i style="--v:${Math.min(100, Math.floor(n * 100 / need))}"></i>` : ''}</span>`;
 }
 /* стихии нашествия: сколько врагов лестницы каждой стихии, по убыванию */
 function elCounts(civ) {

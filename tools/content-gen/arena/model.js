@@ -10,16 +10,19 @@
         против пресета по умолчанию; это и есть выгода атакующего, который видит соперника целиком;
       - сторона: у атакующего нет выгоды от того, что он ходит первым при равенстве, — зеркальный бой.
    2. Рейтинг на модельных игроках: сервер из N игроков, сила внутри цикла — разброс в очках Эло; три профиля — обычный, увлечённый
-      и плательщик при времени увлечённого. Четыре сезона по семь дней, сброс между сезонами. Список из трёх, окно подбора,
-      обновление по таймеру и за Энериум, выбор соперника по оценке с шумом, исход — таблица Эло от разницы сил. Суточный срез
+      и плательщик при времени увлечённого. Четыре сезона по семь дней, сброс между сезонами. Список из трёх, окно подбора; после
+      каждой атаки список новый сам (правила: arena.refresh.auto, слово автора 29.09.2026); «Обновить» руками — бесплатные за сутки
+      и платные за Энериум по правилам; выбор соперника по оценке с шумом, исход — таблица Эло от разницы сил. Суточный срез
       рейтинга — Энериум топ-100. Что меряет: выгоду равной атаки (закон §20.5 — ноль) при прочтениях сдвига защиты, дрейф рейтинга,
       совпадение рейтинга и силы, победы за неделю по профилям (пороги планок), Энериум и места плательщика против увлечённого (×1,7),
-      окупает ли Энериум обновления, таблицу «рейтинг → место» и лидеров.
+      окупает ли Энериум обновления, таблицу «рейтинг → место» и лидеров. Для сравнения — тот же сервер без автообновления: список
+      живёт, пока в нём есть кого атаковать (прежнее правило), — сколько побед и ручных обновлений меняет автообновление.
    3. Лига: сколько стоит расстановка трёх отрядов — прямой порядок против лучшей, с «отдать раунд»; победы в неделю по профилям.
 
    Только целые числа в игровых величинах: рейтинг, доли — б. п., сила — очки Эло, шансы — таблица Эло. Отчёт (среднее по игрокам) —
    целые сотые. Генератор — mulberry32 на сидах прогона: тот же прогон — те же числа.
-   Запуск: node tools/content-gen/arena/model.js            — посчитать и записать model.json (около 15 секунд);
+   Запуск: node tools/content-gen/arena/model.js            — посчитать и записать model.json (около 20 секунд; затем build.js,
+                                                              а если сдвинулись победы за неделю — и wanderer/build.js: достижения берут их);
            node tools/content-gen/arena/model.js --print    — только напечатать. */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -34,6 +37,7 @@ const { RULES } = require('./rules.js');
 /* ================================ ДАННЫЕ ПРОГОНА ================================ */
 const SIM = {
   cyc: 2,                                  // герои состава циклов I–II — цикл демо-аккаунта
+  valorMax: 0,                             // доблесть героев отрядов прогона: в цикле II её нет — только на пятом пределе (ADR-0031, п. 1)
   rounds: [15, 20, 25, 30],                // пределы раундов на пробу: 25 — решение автора 29.09.2026 (RULES.rounds.by.pvp); таймер §20.2 — 90 с
   timerMs: 90000,
   level: 60, samples: 300,                 // бой на пробу: средний уровень отряда, боёв на точку
@@ -42,21 +46,25 @@ const SIM = {
   puzzle: { pool: 10, presets: 3, probe: 4, samples: 300 },   // головоломка: героев у игрока, пресетов, сидов на оценку, проб
   mirror: 300,                             // зеркальный бой: тот же отряд с обеих сторон
   /* сервер: игроков, разброс силы внутри цикла (очки Эло), профили — доля, атак в день, дней в неделю, выгода выбора отряда
-     (доля выгоды головоломки, б. п.), шум оценки соперника (очки Эло), бесплатных обновлений в день, платных — до лимита */
+     (доля выгоды головоломки, б. п.), шум оценки соперника (очки Эло), ref — «Обновить» руками: none — не жмёт, free — только
+     бесплатные за сутки, paid — бесплатные и платные до лимита суток. Сколько их и почём — правила (arena.refresh), не допущение прогона */
   server: {
     players: 5000, spreadT: 320, seasons: 4, days: 7, mid: 4,
     placeTable: { from: 2200, to: 600, step: 20 },   // таблица «рейтинг → место»: от, до, шаг рейтинга
     prof: {
-      free: { share: 6000, att: 12, days: 6, pickBp: 5000, noise: 220, freeRef: 0, paid: 0 },
-      fan: { share: 3000, att: 20, days: 7, pickBp: 10000, noise: 110, freeRef: 3, paid: 0 },
-      payer: { share: 1000, att: 20, days: 7, pickBp: 10000, noise: 110, freeRef: 3, paid: 5 },
+      free: { share: 6000, att: 12, days: 6, pickBp: 5000, noise: 220, ref: 'none' },
+      fan: { share: 3000, att: 20, days: 7, pickBp: 10000, noise: 110, ref: 'free' },
+      payer: { share: 1000, att: 20, days: 7, pickBp: 10000, noise: 110, ref: 'paid' },
     },
     bad: 5000,                             // обновить список, если лучший соперник по оценке ниже этого шанса, б. п.
     equalBand: 25,                         // «равная» атака: разница рейтингов и сил не больше, очков
     /* полоса силы для сравнения плательщика с увлечённым — не меньше стольких игроков каждого профиля: при трёх плательщиках полоса —
        шум (с 25 раундами верхняя полоса из трёх плательщиков дала «+18,66 Энериума при расходе 16,66» — случай одного места) */
     bandMin: { fan: 5, payer: 5 },
-    shifts: [0, 25, 50, -50],              // сдвиг защиты на пробу: 25 — принято (с доблестью в ядре), 50 — прежнее прочтение, −50 — буквальное «+50 защитнику»
+    /* запас на шум, когда полосы плательщика и увлечённого сравнивают по Энериуму топа: столько стандартных ошибок разницы (enSe полосы).
+       Полоса, где плательщики ничего не купили, всё равно даёт разницу в обе стороны — это шум групп, а не отдача покупок */
+    noiseSe: 2,
+    shifts: [0, 25, 35, 50, -50],          // сдвиг защиты на пробу: 35 — принято (состав п. 5а ADR-0030), 25 — прежнее, 50 — прежнее прочтение, −50 — буквальное «+50 защитнику»
   },
   league: {
     players: 2000, spreadT: 300, depth: [0, 140, 300], depthNoise: 60,   // сила трёх отрядов: лучший, второй, третий — разница от лучшего
@@ -73,7 +81,9 @@ const HR = (() => {
   const ctx = {}; vm.createContext(ctx); vm.runInContext(src.slice(i, j + 3).replace('const HR_DATA', 'HR_DATA'), ctx); return ctx.HR_DATA;
 })();
 const coreCls = h => HR.cls[String(h.cls || '').split(' / ')[0].trim()] || HR.cls[(h.cl || [])[0]] || HR.clsStub;
+/* набор героя: по id героя состава (kits.js, ADR-0031, п. 7 — набор есть у всех 360); запасные пути — черновик и отряд недели Эхо */
 function draftOf(h) {
+  if (KITS.heroes[h.id]) return h.id;
   const d = h.team && h.team.draft; if (d && KITS.heroes[d]) return d;
   const e = XF && XF.heroes ? XF.heroes[h.id] : null; if (!e) return null;
   const key = HR.echoKit + h.id; if (!KITS.heroes[key]) KITS.heroes[key] = { ultPct: e.ultPct, actPct: e.actPct, rarity: e.rarity, maxV: e.maxV, kit: e.kit };
@@ -85,11 +95,12 @@ const srcOf = (h, lvl, valor) => {
 };
 const POOL = RS.heroes.filter(h => h.c <= SIM.cyc && draftOf(h));
 const byCls = c => POOL.filter(h => coreCls(h) === c);
-/* отряд: танк, лекарь и трое из остальных, уровни — вокруг среднего, доблесть — до личного максимума */
+/* отряд: танк, лекарь и трое из остальных, уровни — вокруг среднего. Доблесть — SIM.valorMax: в циклах I–II доблесть берут только на пятом
+   пределе (§10.2; ADR-0031, п. 1 — отряд прогонов реальный), руна обучения — одна на аккаунт; прежде было «до личного максимума» */
 function team(r, lvl) {
   const pick = xs => xs[r(xs.length)], t = [pick(byCls('Танк')), pick(byCls('Лекарь'))], rest = POOL.filter(h => !['Танк', 'Лекарь'].includes(coreCls(h)));
   while (t.length < 5) { const h = pick(rest); if (!t.includes(h)) t.push(h); }
-  return t.map(h => ({ h, lvl: Math.max(1, lvl + r(9) - 4), valor: r(h.maxV + 1) }));
+  return t.map(h => ({ h, lvl: Math.max(1, lvl + r(9) - 4), valor: r(Math.min(h.maxV, SIM.valorMax) + 1) }));
 }
 const srcs = (t, dl) => t.map(x => srcOf(x.h, x.lvl + (dl || 0), x.valor));
 function fight(ta, tb, seed, rounds, dla) { return A.pvpResult(EB.run(A.pvpBattle(EB, srcs(ta, dla), srcs(tb), seed, rounds))); }
@@ -155,14 +166,17 @@ function calib(D) {
 /* ================================ РЕЙТИНГ НА МОДЕЛЬНЫХ ИГРОКАХ ================================ */
 /* нормальное через сумму двенадцати равномерных (Ирвин — Холл): целое, среднее 0, разброс ≈ sd */
 const normal = (r, sd) => { let s = 0; for (let i = 0; i < 12; i++) s += r(10001); return Math.floor((s - 60000) * sd / 10000); };
-function server(D, C, shift, tag) {
+/* auto — список новый после каждой атаки (по умолчанию — как в правилах, arena.refresh.auto); false — прежнее правило для сравнения:
+   список живёт, пока в нём есть кого атаковать, кончился — новый */
+function server(D, C, shift, tag, auto) {
   const S0 = SIM.server, N = S0.players, r = A.makeRng(A.seedOf('сервер|' + tag)), M = D.arena;
+  const AUTO = auto == null ? !!M.refresh.auto : !!auto;
   const DD = Object.assign({}, D, { elo: Object.assign({}, D.elo, { def: Object.assign({}, D.elo.def, { shift }) }) });
   const kinds = Object.keys(S0.prof), P = [];
   for (let i = 0; i < N; i++) {
     const x = r(A.BP); let acc = 0, kind = kinds[0];
     for (const k of kinds) { acc += S0.prof[k].share; if (x < acc) { kind = k; break; } }
-    P.push({ i, kind, T: normal(r, S0.spreadT), r: D.elo.start, g: 0, lost: 0, wins: 0, att: 0, en: 0, spent: 0, refs: 0, week: [], hit: new Set() });
+    P.push({ i, kind, T: normal(r, S0.spreadT), r: D.elo.start, g: 0, lost: 0, wins: 0, att: 0, en: 0, spent: 0, refs: 0, frees: 0, week: [], hit: new Set() });
   }
   const adv = p => Math.floor(C.puzzle.pts * S0.prof[p.kind].pickBp / A.BP);
   /* подбор: снимок сервера по рейтингу раз в сутки, окно — двоичным поиском, соперник — случайный из окна с проверкой по текущему
@@ -172,20 +186,26 @@ function server(D, C, shift, tag) {
   const lower = v => { let lo = 0, hi = snapR.length; while (lo < hi) { const m = (lo + hi) >> 1; if (snapR[m] < v) lo = m + 1; else hi = m; } return lo; };
   const upper = v => { let lo = 0, hi = snapR.length; while (lo < hi) { const m = (lo + hi) >> 1; if (snapR[m] <= v) lo = m + 1; else hi = m; } return lo; };
   const setR = (p, v) => { p.r = v; };
-  function list(p, skip) {
-    const got = [];
+  function list(p, skip, need) {
+    const got = [], want = need || M.list;
     let w = M.window;
     for (;;) {
       const lo = lower(p.r - w), hi = upper(p.r + w);
-      for (let tries = 0; got.length < M.list && tries < 60 && hi > lo; tries++) {
+      for (let tries = 0; got.length < want && tries < 60 && hi > lo; tries++) {
         const q = snap[lo + r(hi - lo)];
         if (q === p || got.includes(q) || skip.includes(q) || p.hit.has(q.i) || Math.abs(q.r - p.r) > w) continue;
         got.push(q);
       }
-      if (got.length >= M.list || w >= M.maxWindow) break;
+      if (got.length >= want || w >= M.maxWindow) break;
       w = Math.min(M.maxWindow, w + M.step);
     }
     return got;
+  }
+  /* новый список — как в игре (elo.js, pickFresh): сначала новые лица мимо прежнего списка, не хватило — добор из прежних */
+  function fresh(p, prev) {
+    const a = list(p, prev);
+    if (a.length >= M.list || !prev.length) return { ids: a, fresh: a.length };
+    return { ids: a.concat(list(p, a, M.list - a.length)), fresh: a.length };
   }
   const est = (p, q) => A.expect(D, p.T + adv(p) + normal(r, S0.prof[p.kind].noise), q.T, 0);
   const stat = { eq: 0, eqSum: 0, drift: [], att: 0 };
@@ -193,27 +213,30 @@ function server(D, C, shift, tag) {
   for (let s = 0; s < S0.seasons; s++) {
     const last = s === S0.seasons - 1;
     if (s) for (const p of P) setR(p, A.reset(D, p.r));
-    for (const p of P) { p.hit = new Set(); p.wins = 0; p.att = 0; p.en = 0; p.spent = 0; p.refs = 0; }
+    for (const p of P) { p.hit = new Set(); p.wins = 0; p.att = 0; p.en = 0; p.spent = 0; p.refs = 0; p.frees = 0; }
     for (let d = 0; d < S0.days; d++) {
       for (const p of P) p.lost = 0;
       shot();
       const order = P.slice(); for (let i = order.length - 1; i > 0; i--) { const j = r(i + 1); [order[i], order[j]] = [order[j], order[i]]; }
       for (const p of order) {
         const pr = S0.prof[p.kind]; if (d >= pr.days) continue;
-        let n = pr.att, free = pr.freeRef, paid = 0, L = list(p, []);
+        let n = pr.att, freeUsed = 0, paid = 0, L = list(p, []);
         while (n > 0 && L.length) {
           let bi = 0, be = -1; const es = L.map(q => est(p, q)); es.forEach((e, i) => { if (e > be) { be = e; bi = i; } });
-          if (be < S0.bad && (free > 0 || paid < pr.paid)) {   // список плохой — обновить: сначала бесплатно, потом за Энериум
-            if (free > 0) free--; else { p.spent += A.refreshPrice(M, paid) || 0; paid++; p.refs++; }
-            L = list(p, L); continue;
+          /* список плохой — «Обновить»: сначала бесплатные за сутки, потом за Энериум — кто платит; нет новых лиц — отказ без платы */
+          const cost = A.refreshCost(M, freeUsed, paid);
+          if (be < S0.bad && cost != null && (cost === 0 ? pr.ref !== 'none' : pr.ref === 'paid')) {
+            const nl = fresh(p, L);
+            if (nl.fresh) { if (cost === 0) { freeUsed++; p.frees++; } else { p.spent += cost; paid++; p.refs++; } L = nl.ids; continue; }
           }
-          const q = L.splice(bi, 1)[0]; n--; p.hit.add(q.i);
+          const q = L[bi]; n--; p.hit.add(q.i);
           const pw = A.expect(D, p.T + adv(p), q.T, 0), half = r(A.BP) < pw ? 2 : 0;
           const o = A.attack(DD, { r: p.r, g: p.g }, { r: q.r, g: q.g, lost: q.lost }, half);
           if (last && Math.abs(p.r - q.r) <= S0.equalBand && Math.abs(p.T - q.T) <= S0.equalBand) { stat.eq++; stat.eqSum += o.da; }
           setR(p, p.r + o.da); setR(q, q.r + o.dd); p.g++; q.g++; if (o.lost) q.lost++;
           if (half === 2) p.wins++; p.att++; stat.att++;
-          if (!L.length && n > 0) L = list(p, []);   // список кончился — новый бесплатно
+          if (AUTO) L = fresh(p, L).ids;   // после каждого боя список новый сам
+          else { L.splice(bi, 1); if (!L.length && n > 0) L = list(p, []); }   // прежнее правило: список живёт, кончился — новый бесплатно
         }
       }
       /* суточный срез: места и Энериум топа */
@@ -240,23 +263,28 @@ function server(D, C, shift, tag) {
     const wins = xs.map(p => p.wins).sort((a, b) => a - b);
     prof[k] = { n: xs.length, att: Math.floor(sum(p => p.att) * 100 / n), wins: Math.floor(sum(p => p.wins) * 100 / n), winMed: wins[Math.floor(wins.length / 2)],
       winBp: Math.floor(sum(p => p.wins) * A.BP / Math.max(1, sum(p => p.att))), r: Math.floor(sum(p => p.r) / n), en: Math.floor(sum(p => p.en) * 100 / n),
-      spent: Math.floor(sum(p => p.spent) * 100 / n), refs: Math.floor(sum(p => p.refs) * 100 / n), top100: xs.filter(p => p.place <= 100).length, top1000: xs.filter(p => p.place <= 1000).length };
+      spent: Math.floor(sum(p => p.spent) * 100 / n), refs: Math.floor(sum(p => p.refs) * 100 / n), frees: Math.floor(sum(p => p.frees) * 100 / n),
+      top100: xs.filter(p => p.place <= 100).length, top1000: xs.filter(p => p.place <= 1000).length };
   }
-  /* плательщик против увлечённого при той же силе: сила — по пятидесятым долям разброса вверх, берём верхние полосы, где топ */
+  /* плательщик против увлечённого при той же силе: сила — по пятидесятым долям разброса вверх, берём верхние полосы, где топ.
+     enSe — стандартная ошибка разницы средних Энериума «плательщик − увлечённый», сотые: дисперсия каждой группы по игрокам, корень —
+     целый (отчёт прогона, не игровая величина). По ней сборщик отделяет отдачу покупок от шума групп (SIM.server.noiseSe) */
   const bands = [];
+  const varOf = (xs, g) => { const k = xs.length; if (k < 2) return 0; let s = 0, q = 0; for (const p of xs) { const x = g(p) * 100; s += x; q += x * x; } return Math.floor((k * q - s * s) / (k * (k - 1))); };
   for (let lo = 0; lo <= 3 * S0.spreadT; lo += S0.spreadT / 2) {
     const inB = k => P.filter(p => p.kind === k && p.T >= lo && p.T < lo + S0.spreadT / 2), f = inB('fan'), y = inB('payer');
     if (f.length < S0.bandMin.fan || y.length < S0.bandMin.payer) continue;
     const avg = (xs, g) => Math.floor(xs.reduce((a, p) => a + g(p), 0) * 100 / xs.length);
     bands.push({ lo, hi: lo + S0.spreadT / 2, fan: { n: f.length, r: avg(f, p => p.r) / 100 | 0, wins: avg(f, p => p.wins), en: avg(f, p => p.en), place: avg(f, p => p.place) / 100 | 0 },
-      payer: { n: y.length, r: avg(y, p => p.r) / 100 | 0, wins: avg(y, p => p.wins), en: avg(y, p => p.en), place: avg(y, p => p.place) / 100 | 0, spent: avg(y, p => p.spent) } });
+      payer: { n: y.length, r: avg(y, p => p.r) / 100 | 0, wins: avg(y, p => p.wins), en: avg(y, p => p.en), place: avg(y, p => p.place) / 100 | 0, spent: avg(y, p => p.spent) },
+      enSe: A.isqrt(Math.floor(varOf(y, p => p.en) / y.length) + Math.floor(varOf(f, p => p.en) / f.length)) });
   }
   /* совпадение рейтинга и силы: ранговая корреляция, б. п. */
   const rk = (xs, f) => { const o = xs.map((p, i) => [f(p), i]).sort((a, b) => a[0] - b[0]); const out = new Array(xs.length); o.forEach(([, i], k) => { out[i] = k; }); return out; };
   const ra = rk(P, p => p.r), rb = rk(P, p => p.T), n = P.length;
   let d2 = 0; for (let i = 0; i < n; i++) d2 += (ra[i] - rb[i]) * (ra[i] - rb[i]);
   const rho = A.BP - Math.floor(6 * d2 * A.BP / (n * (n * n - 1)));
-  return { shift, prof, bands, eq: stat.eq, eqGain: stat.eq ? Math.floor(stat.eqSum * 100 / stat.eq) : 0, drift: stat.drift, rhoBp: rho, midPlace, endPlace, midTop, endTop, att: stat.att };
+  return { shift, auto: AUTO, prof, bands, eq: stat.eq, eqGain: stat.eq ? Math.floor(stat.eqSum * 100 / stat.eq) : 0, drift: stat.drift, rhoBp: rho, midPlace, endPlace, midTop, endTop, att: stat.att };
 }
 
 /* ================================ ЛИГА ================================ */
@@ -300,11 +328,12 @@ function inputsSha() {
 }
 function run() {
   const D = RULES();
-  const t0 = Date.now();
   const C = calib(D);
   const S = SIM.server.shifts.map(sh => server(D, C, sh, 'сдвиг ' + sh));
+  /* сравнение: тот же сервер при принятом сдвиге (тот же сид — те же игроки), но список живёт до конца — прежнее правило */
+  const acc = D.elo.def.shift, X = server(D, C, acc, 'сдвиг ' + acc, !D.arena.refresh.auto);
   const L = league(D, C);
-  return { meta: { sim: SIM, inputs: inputsSha() }, calib: C, server: S, league: L };
+  return { meta: { sim: SIM, inputs: inputsSha() }, calib: C, server: S, cmp: { shift: acc, auto: X.auto, prof: X.prof, eqGain: X.eqGain, rhoBp: X.rhoBp }, league: L };
 }
 
 module.exports = { SIM, run, calib, server, league, team, fight, POOL, coreCls, draftOf, srcOf, inputsSha };

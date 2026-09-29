@@ -32,13 +32,13 @@ RUNES_PER_LIMIT = 10                  # §10.1
 LEVEL_DIV = 12                        # множитель уровня 1 + уровень / 12, §3.3
 SQUAD = 5
 VALOR_MAX = [1, 2, 3, 4, 5]           # личный максимум доблести, §10.2 и §36.5
-TYPICAL_VALOR = 3                     # самый частый максимум в герои.csv: 62 героя из 110
+TYPICAL_VALOR = 3                     # самый частый максимум у сборных героев состава — рулетка, Эхо, крафт: 32 героя из 108
 ROMAN = ['I', 'II', 'III', 'IV', 'V']
 
-# --- герои: docs/content/герои/герои.csv (при запуске сверяется) ---
-HEROES_VALOR = {1: {1: 1, 2: 7, 3: 11, 4: 3, 5: 3}, 2: {1: 2, 2: 4, 3: 14, 4: 2, 5: 3},
-                3: {1: 1, 2: 2, 3: 9, 4: 2, 5: 1}, 4: {1: 2, 2: 1, 3: 9, 4: 1, 5: 2},
-                5: {1: 3, 2: 3, 3: 14, 4: 1, 5: 4}, 6: {3: 5}}          # цикл -> {максимум: героев}
+# --- герои: состав игры docs/content/герои/состав-героев.csv (при запуске сверяется) — личный максимум по источнику (ADR-0019;
+# ADR-0030, п. 5а): золото — 1, рулетка по циклу II — 2, III–IV — 3, V–VI — 4, Эхо и донат — номер цикла − 1, крафт — 1–5 ---
+HEROES_VALOR = {1: {1: 18, 2: 2, 5: 2}, 2: {1: 56, 2: 11, 5: 2}, 3: {1: 41, 2: 14, 3: 9, 4: 1},
+                4: {1: 40, 3: 24, 5: 2}, 5: {1: 48, 3: 3, 4: 21, 5: 3}, 6: {1: 41, 3: 1, 4: 6, 5: 15}}   # цикл -> {максимум: героев}
 # --- герои за золото: docs/content/герои/состав-героев.csv (при запуске сверяется) ---
 GOLD_HEROES = {1: 18, 2: 42, 3: 40, 4: 40, 5: 47, 6: 40}   # цикл -> героев за золото
 CYCLE_NAMES = ['I', 'II', 'III', 'IV', 'V', 'VI']
@@ -48,45 +48,47 @@ DECK = {'rf': 104, 'elite': 12, 'boss': 1, 'floors': 35}
 
 # --- прогон модели раундов (simRun) отрядом прототипа, все пятеро на уровне L; обновляется через --sim ---
 # раунды — по типу этажа (RULES.rounds.by, решение автора 29.09.2026): рядовые 5, элита 10, босс 20; босс образца — 3 000 %
-# способности — наборы героев из design/ui/kits.js (ADR-0016) при доблести прототипа 2 / 1 / 2 / 1 / 3.
-# доблесть — правило ядра (RULES.valorPct, EB.heroSrcValor): ×1,3 к базовым характеристикам за ступень, как на экране;
-# с ней босс образца падает осадой со 100-го уровня, за один забег — со 120-го
+# способности — наборы героев состава из design/ui/kits.js (ADR-0016; ADR-0031, п. 7: набор сжат к личному максимуму доблести);
+# отряд — реальный (ADR-0031, п. 1): пятеро золотых героев цикла I с максимумом доблести 1, доблесть 0 / 1 / 0 / 0 / 0 — единица у бойца
+# урона пары от руны обучения; фикстура — tools/content-gen/biomes/sim.js, SQUAD. Доли хода — по редкости героя в составе
+# (ADR-0030, п. 5а): обычная, обычная, редкая, редкая, редкая. Доблесть — правило ядра (RULES.valorPct, EB.heroSrcValor)
 # (уровень, забегов до падения босса, рядовых, элит, боссов, мс за эти забеги, стена)
 SIM = [
-    (1, 1, 4, 0, 0, 86000, 4), (5, 1, 5, 0, 0, 114500, 5), (10, 1, 10, 1, 0, 167000, 8),
-    (15, 1, 15, 2, 0, 227200, 11), (20, 1, 21, 2, 0, 237400, 13), (30, 1, 39, 4, 0, 376400, 19),
-    (35, 1, 41, 5, 0, 391200, 20), (43, 1, 41, 5, 0, 349800, 20), (50, 1, 41, 5, 0, 320700, 20),
-    (60, 1, 44, 6, 0, 311900, 21), (65, 1, 78, 10, 0, 554400, 30), (75, 1, 72, 9, 0, 448300, 28),
-    (90, 1, 94, 12, 0, 556400, 33), (100, 2, 206, 24, 1, 1215300, 35), (110, 2, 208, 24, 1, 1169300, 35),
-    (120, 1, 104, 12, 1, 588400, 35), (150, 1, 104, 12, 1, 496400, 35), (160, 1, 104, 12, 1, 480600, 35),
-    (200, 1, 104, 12, 1, 418100, 35), (210, 1, 104, 12, 1, 410000, 35), (250, 1, 104, 12, 1, 375200, 35),
-    (300, 1, 104, 12, 1, 343200, 35), (350, 1, 104, 12, 1, 339500, 35), (500, 1, 104, 12, 1, 316800, 35),
-    (700, 1, 104, 12, 1, 300900, 35), (1200, 1, 104, 12, 1, 295300, 35),
+    (1, 1, 1, 0, 0, 53200, 2), (5, 1, 4, 0, 0, 78900, 4), (10, 1, 6, 1, 0, 123900, 6),
+    (15, 1, 10, 1, 0, 163700, 8), (20, 1, 12, 1, 0, 174900, 9), (30, 1, 16, 2, 0, 201900, 11),
+    (35, 1, 19, 2, 0, 226000, 12), (43, 1, 22, 2, 0, 214800, 13), (50, 1, 35, 4, 0, 335400, 18),
+    (60, 1, 38, 4, 0, 335000, 19), (65, 1, 47, 6, 0, 416500, 22), (75, 1, 44, 6, 0, 357900, 21),
+    (90, 1, 66, 9, 0, 495900, 27), (100, 1, 71, 9, 0, 504500, 28), (110, 1, 72, 9, 0, 489200, 28),
+    (120, 1, 72, 9, 0, 469700, 28), (125, 1, 92, 12, 0, 635200, 33), (130, 3, 306, 36, 1, 2161500, 35),
+    (140, 2, 206, 24, 1, 1410000, 35), (150, 1, 104, 12, 1, 707600, 35), (160, 1, 104, 12, 1, 665000, 35),
+    (200, 1, 104, 12, 1, 569800, 35), (210, 1, 104, 12, 1, 537700, 35), (250, 1, 104, 12, 1, 486200, 35),
+    (300, 1, 104, 12, 1, 423300, 35), (350, 1, 104, 12, 1, 359400, 35), (500, 1, 104, 12, 1, 318400, 35),
+    (700, 1, 104, 12, 1, 310500, 35), (1200, 1, 104, 12, 1, 288300, 35),
 ]
-SIM_DEMO = (0, 1, 43, 6, 0, 317800, 21)     # отряд как в index.html, уровни 42 / 50 / 118 / 46 / 35
-SIM_DEMO_TEMPO = (0, 1, 104, 12, 1, 348330, 35)  # тот же отряд в модели ADR-0007
+SIM_DEMO = (0, 1, 35, 4, 0, 307900, 18)    # отряд как в index.html, уровни 42 / 50 / 118 / 46 / 35
+SIM_DEMO_TEMPO = (0, 1, 67, 9, 0, 297448, 27)    # тот же отряд в модели ADR-0007
 SIM_GUARD = 41   # с какого уровня пара героев без доблести берёт рунного стража биома 1; обновляется через --sim
 SIM_TUTOR = [   # обучающий биом цикла I, пара героев без доблести, один забег на уровне; обновляется через --sim
-    (1, 0, 4, 0, 0, 45200, 4), (2, 0, 4, 0, 0, 43300, 4), (3, 0, 4, 0, 0, 42700, 4),
-    (4, 0, 6, 1, 0, 74700, 6), (5, 0, 8, 1, 0, 84200, 7), (6, 0, 8, 1, 0, 81400, 7),
-    (7, 0, 9, 1, 0, 94500, 8), (8, 0, 10, 1, 0, 92200, 8), (9, 0, 12, 1, 0, 101800, 9),
-    (10, 0, 12, 1, 0, 100000, 9), (11, 0, 12, 1, 0, 102000, 9), (12, 0, 13, 1, 0, 129300, 10),
-    (13, 0, 13, 2, 0, 123200, 10), (14, 0, 13, 2, 0, 123200, 10), (15, 0, 15, 2, 0, 131000, 11),
-    (16, 0, 15, 2, 0, 124500, 11), (17, 0, 15, 2, 0, 120900, 11), (18, 0, 19, 2, 0, 147400, 13),
-    (19, 0, 21, 2, 0, 157700, 14), (20, 0, 23, 2, 0, 163600, 15), (21, 0, 23, 2, 0, 151200, 15),
-    (22, 0, 23, 2, 0, 160500, 15), (23, 0, 23, 2, 0, 160500, 15), (24, 0, 23, 2, 0, 159400, 15),
-    (25, 0, 23, 2, 0, 165400, 15), (26, 0, 23, 2, 0, 165400, 15), (27, 0, 23, 2, 0, 160900, 15),
-    (28, 0, 23, 2, 0, 160300, 15), (29, 0, 23, 2, 0, 159300, 15), (30, 0, 23, 2, 0, 158900, 15),
-    (31, 0, 23, 2, 0, 158300, 15), (32, 0, 23, 2, 0, 158300, 15), (33, 0, 23, 2, 0, 161600, 15),
-    (34, 0, 23, 2, 0, 161600, 15), (35, 0, 23, 2, 0, 170100, 15), (36, 0, 23, 2, 0, 170100, 15),
-    (37, 0, 23, 2, 0, 171500, 15), (38, 0, 23, 2, 0, 167600, 15), (39, 0, 23, 2, 0, 167600, 15),
-    (40, 1, 23, 2, 1, 156600, 15), (41, 1, 23, 2, 1, 155800, 15), (42, 1, 23, 2, 1, 155900, 15),
-    (43, 1, 23, 2, 1, 154600, 15), (44, 1, 23, 2, 1, 146300, 15), (45, 1, 23, 2, 1, 145200, 15),
-    (46, 1, 23, 2, 1, 144600, 15), (47, 1, 23, 2, 1, 144600, 15), (48, 1, 23, 2, 1, 139300, 15),
-    (49, 1, 23, 2, 1, 139300, 15), (50, 1, 23, 2, 1, 139300, 15),
+    (1, 0, 4, 0, 0, 49500, 4), (2, 0, 4, 0, 0, 47600, 4), (3, 0, 4, 0, 0, 44600, 4),
+    (4, 0, 8, 1, 0, 95200, 7), (5, 0, 10, 1, 0, 110200, 8), (6, 0, 10, 1, 0, 107400, 8),
+    (7, 0, 12, 1, 0, 122600, 9), (8, 0, 13, 1, 0, 135900, 10), (9, 0, 13, 1, 0, 135400, 10),
+    (10, 0, 15, 2, 0, 145500, 11), (11, 0, 15, 2, 0, 146800, 11), (12, 0, 15, 2, 0, 143800, 11),
+    (13, 0, 15, 2, 0, 140200, 11), (14, 0, 17, 2, 0, 154800, 12), (15, 0, 19, 2, 0, 167300, 13),
+    (16, 0, 21, 2, 0, 177100, 14), (17, 0, 21, 2, 0, 171900, 14), (18, 0, 21, 2, 0, 168600, 14),
+    (19, 0, 23, 2, 0, 181200, 15), (20, 0, 23, 2, 0, 166800, 15), (21, 0, 23, 2, 0, 187000, 15),
+    (22, 0, 23, 2, 0, 184600, 15), (23, 0, 23, 2, 0, 194400, 15), (24, 0, 23, 2, 0, 185000, 15),
+    (25, 0, 23, 2, 0, 178400, 15), (26, 0, 23, 2, 0, 192500, 15), (27, 0, 23, 2, 0, 191800, 15),
+    (28, 0, 23, 2, 0, 187900, 15), (29, 0, 23, 2, 0, 187100, 15), (30, 0, 23, 2, 0, 188000, 15),
+    (31, 0, 23, 2, 0, 188900, 15), (32, 0, 23, 2, 0, 183500, 15), (33, 1, 23, 2, 1, 183000, 15),
+    (34, 1, 23, 2, 1, 183100, 15), (35, 1, 23, 2, 1, 181100, 15), (36, 1, 23, 2, 1, 181100, 15),
+    (37, 1, 23, 2, 1, 174900, 15), (38, 1, 23, 2, 1, 173400, 15), (39, 1, 23, 2, 1, 172200, 15),
+    (40, 1, 23, 2, 1, 172200, 15), (41, 1, 23, 2, 1, 170700, 15), (42, 1, 23, 2, 1, 167000, 15),
+    (43, 1, 23, 2, 1, 167000, 15), (44, 1, 23, 2, 1, 159700, 15), (45, 1, 23, 2, 1, 158600, 15),
+    (46, 1, 23, 2, 1, 155500, 15), (47, 1, 23, 2, 1, 155500, 15), (48, 1, 23, 2, 1, 150600, 15),
+    (49, 1, 23, 2, 1, 150600, 15), (50, 1, 23, 2, 1, 150600, 15),
 ]
-SIM_SHOW = [1, 10, 15, 35, 43, 65, 100, 110, 120, 150, 160, 210, 350, 1200]
-FULL_CLEAR_LEVEL = 120                         # первый уровень, на котором отряд берёт биом за один забег
+SIM_SHOW = [1, 10, 15, 35, 43, 65, 100, 110, 120, 125, 150, 160, 210, 350, 1200]
+FULL_CLEAR_LEVEL = next(r[0] for r in SIM if r[1] == 1 and r[4])   # первый уровень, на котором отряд берёт биом за один забег (SIM)
 
 # --- дроп: (золото, дух, души) ---
 RATES_NOW = {'rf': (20, 10, 0), 'elite': (100, 50, 1), 'boss': (500, 250, 5), 'guard': (0, 0, 0)}    # §9.1
@@ -100,15 +102,14 @@ OLD_CYCLE_MULT = [1, 3, 9, 27, 81, 243]   # старый ориентир §9.1:
 BIOME2_ADD_BP = 5000                       # предложение: биом 1 цикла c — ×c, биом 2 — ×(c + 0,5)
 POWER_X10 = [10, 16, 26, 41, 66, 105]      # кривая силы §3.3 × 10: во сколько враги цикла сильнее
 
-# --- рунные стражи: §11 и черновик «Дроп» ---
-GUARD_WINS = 7                              # побед в день у стража пределов: ~70 % капа 10 (§11)
-GUARD_OPEN_DAY = 1                          # страж пределов в цикле II — с первого дня: его показало обучение
-RUNES_PER_WIN = 2
-RUNE_WEIGHT_BP = [4000, 2700, 1800, 1000, 500]
-RUNE_REFORGE = 3                            # 3 младших -> 1 старшая
-VALOR_FRAGS_X100 = 204                      # 2,04 осколка за победу в среднем (§11; 2,25 % не описаны)
-VALOR_FRAGS = 100
-VALOR_OPEN_DAY, VALOR_WINS = 1, 3           # страж доблести в цикле II — с первого дня; 7 + 3 = кап 10
+# --- рунные стражи: §11, ADR-0022, ADR-0023 (вариант Б), ADR-0031, п. 4. Числа стражей — данные рецептов design/ui/recipes.js
+# (drops.guardians, dailyGuardianCap, enemies[].boss.runeKeyBp, рецепты рун), читаются при первом обращении (rx()); здесь — допущения модели.
+# Победы у рунных стражей — из ключей, а не из капа: ключи дня — контракты (прогон их сборщика) и ключ с босса биома за вчерашние забеги;
+# побед — сколько хватит ключей при доле 7 : 3, не выше общего капа. Вход — × цикл стража; отряд цикла I в биомах цикла II платит
+# вход стражей цикла II: цены уровней у отряда — как у героев цикла I, вход к стражам — как у цикла II (ADR-0031, п. 4)
+GUARD_OPEN_DAY = 1                          # стражи в цикле II — с первого дня: их показало обучение
+RB_SPLIT_BP = 7000                          # допущение: доля побед у стража пределов — 7 из 10, остальное — страж доблести
+                                            # (и до пятого предела: осколки копятся впрок, доблесть откроет пятый предел)
 
 # --- другие каналы (черновик «Дроп»); контракты — не заглушка, а прогон их сборщика ---
 WEEK_DAYS = 7
@@ -120,31 +121,40 @@ CONTRACT_CYCLE = 2
 CONTRACT_PROFILES = (('обычный', 'o'), ('увлечённый', 'e'))
 RITUAL_PER_HOUR, RITUAL_HOURS = (150, 75, 1), 12    # ритуал героев: золото, дух, души за час; верх сетки §19.4
 CRAFT_BIOME = (3000, 1500, 2)               # закрытие крафтового биома
-ACCOUNT_GOLD = 6000                         # предложение: база золота за уровень аккаунта
+ACCOUNT_GOLD = 6500                         # предложение: база золота за уровень аккаунта. Было 6 000: биом 2 цикла I теперь на 80 % ставок
+                                            # (ADR-0031, п. 5) и даёт около 5 тыс. золота вместо 30 тыс. — пачку обучения, пятерых за 80 000,
+                                            # при 80 % золота на героев (sets.py) обычный не выкупал к концу цикла I; с 6 500 — выкупает
 ACCOUNT_STEP_BP = 1000                      # §16: награда = база × (1 + уровень × 0,1)
 ACCOUNT_LEVELS = 9                          # уровни 1–9 — в цикле I
 FIRST_HERO_GOLD = 10000                     # квест первого героя, ADR-0007
-TUTORIAL_SPIRIT = 2600                      # предложение: цепочка обучения §31 — первый герой до 50-го
+TUTORIAL_SPIRIT = 1600                      # предложение: цепочка обучения §31. Было 2 000: с наборами, сжатыми к максимуму доблести, пара брала
+                                            # биом 1 за два забега, 6,1 мин — меньше цели 7–10 минут боя (ADR-0031, п. 5); с 1 600 — три забега, 9,3 мин
 ARTIFACTS_GOLD_C1 = 49000                   # таблица автора: покупка восьми артефактов, открытых с цикла I
 
 # --- профили: часов забегов в день; забегов одновременно — у всех одинаково, по прогрессу ---
 PROFILES = [('обычный', 3), ('увлечённый', 8)]
-SLOTS = {1: 2, 2: 3, 3: 4}                  # забегов одновременно: номер цикла и ещё один от Странника (ADR-0014)
+PROFILE_KEY = {'обычный': 'o', 'увлечённый': 'e', 'плательщик': 'p'}   # профиль калькулятора → профиль прогона контрактов (econ)
+# забегов одновременно — столько, каков номер цикла (ADR-0014; ADR-0031, п. 3): recipes.js, drops.activeSlots.byCycle — rx().
+# «Право владыки» — редкая вневременная пассивка Памяти (+1 забег, только бесплатные тройки): калькуляторы её не считают
 EXTRA_CAP = {1: 50, 2: 150, 3: 150}         # вторые отряды: руны уходят главному, выше предела им не подняться
 # --- дневная модель — цикл II (ADR-0018): цикл I — обучение на часы, считается отдельно (Т15) ---
 FIRST_CYCLE = 2                             # с какого цикла идёт счёт по дням
-CYCLE_DAYS = 14                             # дней в цикле II: около двух недель по биомам, из них неделя — знакомство с полной неделей расы (автор, 28.09.2026)
+# дней в цикле II — одно число на все калькуляторы: прогон темпа (tools/content-gen/biomes/pace.py → pace.json, cycleDays), день, когда
+# обычный игрок берёт рунного стража последнего биома цикла II. Остальные калькуляторы читают economy.CYCLE_DAYS; нет прогона — запасное
+PACE_JSON = ROOT / 'tools' / 'content-gen' / 'biomes' / 'pace.json'
+CYCLE_DAYS_FALLBACK = 14                    # «около двух недель» (автор, 28.09.2026) — пока нет прогона темпа
 START_LEVEL, START_LIMITS = 50, 1           # отряд входит в цикл II на 50-м, предел I пробит наградами уровня аккаунта
 DAYS_MAX = 400                              # горизонт расчёта темпа
 
 # --- цели темпа обычного игрока в цикле II и дальше (предложение: прежние вехи сдвинуты на цикл) и правило ×1,7 (§1.2, §36.1) ---
-TARGETS = {150: '1-я неделя цикла II', 350: 'конец цикла II, 14-й день', 700: 'цикл III', 1200: 'не позже цикла IV'}
+TARGETS = {150: '1-я неделя цикла II', 350: 'конец цикла II', 700: 'цикл III', 1200: 'не позже цикла IV'}
 TARGET_SQUAD2, TARGET_GOLD_ALL = '1-я неделя цикла II', 'конец цикла II'
 PAYER_MAX_X10 = 17
-# случай: (подпись, день цикла II, отрядов у свободного, отрядов у плательщика)
-PAYER_CASES = [('Цикл II, 1-й день: второй отряд ещё не куплен', 1, 1, 2), ('Цикл II, 7-й день: 2 отряда из 3', 7, 2, 3),
-               ('Цикл II, 14-й день: 2 отряда из 3', 14, 2, 3), ('Цикл III, 25-й день: 3 отряда из 4', 25, 3, 4),
-               ('Если бы слоты давали герои: 2 против 4, 14-й день', 14, 2, 4)]
+# случай: (подпись, день с начала цикла II — 0 значит последний день цикла II, CYCLE_DAYS; с '+' — день цикла III,
+# отрядов у свободного, отрядов у плательщика). Слотов — номер цикла: у плательщика лишний отряд только до покупки второго
+PAYER_CASES = [('Цикл II, 1-й день: второй отряд ещё не куплен', 1, 1, 2), ('Цикл II, 7-й день: 2 отряда из 2', 7, 2, 2),
+               ('Цикл II, последний день: 2 отряда из 2', 0, 2, 2), ('Цикл III, 1-й день: третий отряд ещё не куплен', '+1', 2, 3),
+               ('Если бы слоты давали герои: 2 против 4, последний день цикла II', 0, 2, 4)]
 
 # --- цена героя за золото: ADR-0023, «Второй круг», п. 1 — k-й герой цикла c стоит 10 000 × c × (1 + 30 % × (k − 1)) ---
 HERO_FIRST = 10000                          # первый герой за золото цикла I (ADR-0014)
@@ -152,6 +162,10 @@ HERO_STEP_BP = 3000                         # каждый следующий г
 
 # --- темп цикла I — решение автора 27.09.2026 (ADR-0018): цикл I — обучение, цикл II — испытание на дни ---
 PACE_I = [('Биом 1 цикла I', 1), ('Биом 2 цикла I', 3)]   # часов игры на биом: первый — за час, второй — ещё около трёх
+# коридоры темпа (ADR-0031, п. 5) — минуты забегов: биом 1 — 7–10 минут боя (ADR-0018, дополнение: остальное время первого часа —
+# сценарий обучения), биом 2 — от полутора до трёх часов («ещё примерно за три», ADR-0018); цикл II у обычного — 14–16 дней.
+# Проверка — tools/content-gen/biomes/pace.py --check
+PACE_B1_MIN, PACE_B2_MIN, PACE_II_DAYS = (7, 10), (90, 180), (14, 16)
 TUTOR_IDS = ['h1', 'h2']   # биом 1 закрывают двое героев — к концу часа их у игрока двое: танк и физ ДД из отряда прототипа (ADR-0018)
 
 # --- базовые ресурсы по ADR-0010: малый шанс за взятый этаж ---
@@ -243,32 +257,53 @@ def eff_level(lvl, cycle):
     return max(1, (LEVEL_DIV + lvl) * POWER_X10[0] // POWER_X10[cycle - 1] - LEVEL_DIV)
 
 
-def rune_days(wins, heroes=SQUAD, open_day=GUARD_OPEN_DAY, done=START_LIMITS):
-    """День, к которому у отряда руны на каждый предел. Руны считаются в сотых. done — пределы, пробитые в цикле I: день 0."""
-    n = len(LIMITS)
-    per_win = [RUNES_PER_WIN * 100 * w // BP for w in RUNE_WEIGHT_BP]
-    need = heroes * RUNES_PER_LIMIT * 100
-    stock, nxt, out = [0] * n, done, [0] * done
-    for d in range(open_day, open_day + DAYS_MAX):
-        for k in range(n):
-            stock[k] += per_win[k] * wins
-        for _ in range(2):                   # второй проход — после перековки
-            while nxt < n and stock[nxt] >= need:
-                stock[nxt] -= need
-                out.append(d)
-                nxt += 1
-            for k in range(min(nxt, n - 1)):  # руны уже пройденных пределов — в перековку вверх
-                c = stock[k] // (RUNE_REFORGE * 100)
-                stock[k] -= c * RUNE_REFORGE * 100
-                stock[k + 1] += c * 100
-        if nxt == n:
-            break
-    return out + [DAYS_MAX] * (n - len(out))
+_RX = {}
 
 
-def valor_day():
-    wins = -(-VALOR_FRAGS * 100 // (VALOR_WINS * VALOR_FRAGS_X100))
-    return VALOR_OPEN_DAY + wins - 1, VALOR_FRAGS * 100 // VALOR_FRAGS_X100
+def rx():
+    """Числа рецептов и добычи из design/ui/recipes.js (EN_RECIPES): стражи пределов и доблести, общий кап побед, шанс рунного ключа
+    с босса, забегов одновременно по циклам, рецепты руны доблести и перековки рун. Читается один раз через Node; калькуляторы
+    своих копий не держат (ручка — tools/content-gen/recipes/common.js, затем пересобрать рецепты)."""
+    if not _RX:
+        js = ("globalThis.window=globalThis;require('./design/ui/recipes.js');const R=globalThis.EN_RECIPES,D=R.drops;"
+              "const rec=id=>R.recipes.find(r=>r.id===id);"
+              "process.stdout.write(JSON.stringify({guardians:D.guardians,cap:D.dailyGuardianCap,enemies:D.enemies,"
+              "slots:D.activeSlots.byCycle,valorRune:rec('r_vr1').in[0][1],reforge:rec('r_rn1_2').in[0][1]}))")
+        res = subprocess.run(['node', '-e', js], cwd=ROOT, capture_output=True, text=True, encoding='utf-8')
+        if res.returncode:
+            sys.exit('economy.py: не прочитать design/ui/recipes.js — ' + res.stderr)
+        d = json.loads(res.stdout)
+        lim = next(g for g in d['guardians'] if g['kind'] == 'limits')
+        val = next(g for g in d['guardians'] if g['kind'] == 'valor')
+        boss = next(e for e in d['enemies'] if e['cyc'] == FIRST_CYCLE)['boss']
+        _RX.update({
+            'cap': d['cap'],                                              # общий кап побед у РБ в день (ADR-0022)
+            'entry': (lim['entryKeys'] // lim['cyc'], val['entryKeys'] // val['cyc']),   # ключей × цикл: страж пределов, страж доблести
+            'runes_per_win': lim['runesPerKill'], 'weights': lim['weightsBp'],
+            'shards_x100': sum(n * bp for n, bp in val['shardsBp']) // 100,   # осколков доблести за победу, в среднем × 100
+            'shards_bp': val['shardsBp'],
+            'boss_key_bp': boss['runeKeyBp'],                             # шанс рунного ключа с босса биома; ключей — цикл биома
+            'slots': {c + 1: n for c, n in enumerate(d['slots'])},        # забегов одновременно по циклам
+            'valor_rune': d['valorRune'], 'reforge': d['reforge'],
+        })
+    return _RX
+
+
+def slots(c):
+    """Забегов одновременно в цикле c — номер цикла (ADR-0014; ADR-0031, п. 3), recipes.js drops.activeSlots."""
+    return rx()['slots'][c]
+
+
+def cycle_days_of_pace():
+    """Дней в цикле II по прогону темпа (pace.json, cycleDays): обычный игрок берёт стража последнего биома цикла II."""
+    try:
+        v = json.loads(PACE_JSON.read_text(encoding='utf-8')).get('cycleDays')
+        return int(v) if v else CYCLE_DAYS_FALLBACK
+    except (OSError, ValueError):
+        return CYCLE_DAYS_FALLBACK
+
+
+CYCLE_DAYS = cycle_days_of_pace()
 
 
 def account_gold():
@@ -276,41 +311,129 @@ def account_gold():
     return ACCOUNT_GOLD * steps // BP + FIRST_HERO_GOLD
 
 
-def timeline(rates, mult, hours, caps=True, exp=LEVEL_EXP, days=DAYS_MAX, cycle2=True, start_spirit=0):
-    """Главный отряд A и вторые отряды B растут уровнями по мере дохода, весь дух сначала — A.
-    Первый забег одновременно ведёт A, остальные — B. caps: A не выше предела, пока нет рун;
-    B — не выше EXTRA_CAP. cycle2: после CYCLE_DAYS — следующий цикл, враги сильнее по §3.3.
-    Счёт идёт с начала цикла II (ADR-0018): отряд входит на START_LEVEL, пределы START_LIMITS пробиты в обучении.
-    Возвращает {уровень A: день}, золото нарастающим итогом по дням, уровни (A, B) по дням."""
-    rd = rune_days(GUARD_WINS) if caps else [0] * len(LIMITS)
+def avg_price_x100(c):
+    """Средняя цена входа к РБ цикла c в ключах × 100 при доле побед 7 : 3 (вариант Б: 1 и 3 ключа × цикл)."""
+    p1, p2 = rx()['entry']
+    return (RB_SPLIT_BP * p1 * c + (BP - RB_SPLIT_BP) * p2 * c) * 100 // BP
+
+
+def contract_keys_x100(c, prof):
+    """Ключей режима «Контракты» за день × 100 — прогон сборщика контрактов (contracts.js, econ[цикл][профиль].ctKeys) на 7 дней.
+    Контракты открывает 10-й уровень аккаунта — с цикла II (§16, §18)."""
+    e = contracts_econ().get(str(c), {}).get(prof)
+    return e['ctKeys'] * 100 // WEEK_DAYS if e else 0
+
+
+def rb_wins_x100(keys_x100, c):
+    """Побед у рунных стражей за день × 100: сколько хватит ключей при доле 7 : 3, не выше общего капа (ADR-0022, ADR-0023)."""
+    return min(rx()['cap'] * 100, keys_x100 * 100 // avg_price_x100(c))
+
+
+_TL = {}
+
+
+def timeline_ex(rates, mult, hours, caps=True, exp=LEVEL_EXP, days=DAYS_MAX, cycle2=True, start_spirit=0, prof=None, keys_add_x100=0,
+                full_cap=False, squads=None):
+    """Дни с начала цикла II (ADR-0018): отряд входит на START_LEVEL, пределы START_LIMITS пробиты в обучении.
+    Главный отряд A и вторые отряды B растут уровнями по мере дохода, весь дух сначала — A; первый забег одновременно ведёт A,
+    остальные — B. Забегов одновременно — номер цикла (slots), squads — сколько отрядов у игрока по дням (функция дня; по умолчанию
+    все слоты). caps: A не выше предела, пока нет рун; B — не выше EXTRA_CAP. cycle2: после CYCLE_DAYS — следующий цикл, враги
+    сильнее по §3.3. Рунные стражи — из ключей (вариант Б, ADR-0031, п. 4): утром — ключи контрактов профиля prof и ключ с босса
+    за вчерашние забеги (+ keys_add_x100 в день), побед — сколько хватит ключей, не выше капа; full_cap — полный кап, как без ключей.
+    Руны пределов — по весам стража, излишки уже пройденных пределов — в перековку вверх; осколки доблести копятся с первого дня.
+    Пятый предел — руны V и 1200-й уровень: с этого дня доступна доблесть (§10.2; руна обучения — исключение, ADR-0031, п. 2).
+    Возвращает словарь: reached — {уровень A: день}, gold — золото нарастающим итогом, lv — уровни (A, B) по дням, runes — день рун
+    на пределы I–V, wins — побед у РБ по дням × 100, keys — ключей по дням × 100, limit5 — день пятого предела, shards — осколков
+    доблести нарастающим итогом × 100 по дням."""
+    prof = prof or PROFILE_KEY[dict((h, p) for p, h in PROFILES)[hours]]
+    R, n = rx(), len(LIMITS)
+    per_win = [R['runes_per_win'] * 100 * w // BP for w in R['weights']]
+    need = SQUAD * RUNES_PER_LIMIT * 100
+    stock, nxt, runes = [0] * n, START_LIMITS, [0] * START_LIMITS
     a = b = START_LEVEL
-    bank, gold, reached, gold_by_day, lv_by_day = start_spirit, 0, {}, [0], [(a, b)]
+    bank, gold, reached, shards, boss_prev = start_spirit, 0, {}, 0, 0
+    out = {'gold': [0], 'lv': [(a, b)], 'wins': [0], 'keys': [0], 'shards': [0]}
+    limit5 = None
     for day in range(1, days + 1):
         c = FIRST_CYCLE + 1 if (cycle2 and day > CYCLE_DAYS) else FIRST_CYCLE
-        cap_a = LIMITS[sum(1 for k in range(len(LIMITS) - 1) if rd[k] <= day)] if caps else LIMITS[-1]
-        slots = SLOTS[c]
-        if day >= GUARD_OPEN_DAY:
-            bank += GUARD_WINS * rates['guard'][1] * mult(c) // BP
-            gold += GUARD_WINS * rates['guard'][0] * mult(c) // BP
+        keys = wins = 0
+        if caps and day >= GUARD_OPEN_DAY:
+            keys = contract_keys_x100(c, prof) + boss_prev * R['boss_key_bp'] * c // BP + keys_add_x100
+            wins = R['cap'] * 100 if full_cap else rb_wins_x100(keys, c)
+            lim_w = wins * RB_SPLIT_BP // BP
+            for k in range(n):
+                stock[k] += per_win[k] * lim_w // 100
+            for _ in range(2):                   # второй проход — после перековки
+                while nxt < n and stock[nxt] >= need:
+                    stock[nxt] -= need
+                    runes.append(day)
+                    nxt += 1
+                for k in range(min(nxt, n - 1)):  # руны уже пройденных пределов — в перековку вверх
+                    q = stock[k] // (R['reforge'] * 100)
+                    stock[k] -= q * R['reforge'] * 100
+                    stock[k + 1] += q * 100
+            shards += (wins - lim_w) * R['shards_x100'] // 100
+            bank += wins * rates['guard'][1] * mult(c) // (BP * 100)
+            gold += wins * rates['guard'][0] * mult(c) // (BP * 100)
+        cap_a = LIMITS[min(nxt, n - 1)] if caps else LIMITS[-1]
+        n_sl = slots(c) if squads is None else min(slots(c), squads(day, c))
+        boss = 0
         for _ in range(hours):
-            for k in range(slots):
-                g, s, _ = per_hour(sim_row(eff_level(a if k == 0 else b, c)), rates, mult(c))
+            for k in range(n_sl):
+                row = sim_row(eff_level(a if k == 0 else b, c))
+                g, s, _ = per_hour(row, rates, mult(c))
                 bank += s
                 gold += g
+                boss += row[4] * HOUR_MS * 100 // row[5]
             while a < cap_a and bank >= SQUAD * level_cost(a + 1, exp):
                 bank -= SQUAD * level_cost(a + 1, exp)
                 a += 1
                 if a in LIMITS and a not in reached:
                     reached[a] = day
-            n_b = slots - 1
+            n_b = n_sl - 1
             while n_b and b < min(EXTRA_CAP[c], a) and bank >= n_b * SQUAD * level_cost(b + 1, exp):
                 bank -= n_b * SQUAD * level_cost(b + 1, exp)
                 b += 1
-        gold_by_day.append(gold)
-        lv_by_day.append((a, b))
-        if a >= LIMITS[-1]:
+        boss_prev = boss
+        if limit5 is None and a >= LIMITS[-1] and (nxt == n or not caps):
+            limit5 = day
+        out['gold'].append(gold)
+        out['lv'].append((a, b))
+        out['wins'].append(wins)
+        out['keys'].append(keys)
+        out['shards'].append(shards)
+        if limit5 is not None:
             break
-    return reached, gold_by_day, lv_by_day
+    out.update(reached=reached, runes=runes + [DAYS_MAX] * (n - len(runes)), limit5=limit5 or DAYS_MAX)
+    return out
+
+
+def timeline(rates, mult, hours, caps=True, exp=LEVEL_EXP, days=DAYS_MAX, cycle2=True, start_spirit=0, prof=None):
+    """Как прежде: {уровень A: день}, золото нарастающим итогом по дням, уровни (A, B) по дням — из timeline_ex."""
+    key = (tuple(sorted(rates.items())), mult, hours, caps, exp, days, cycle2, start_spirit, prof, CYCLE_DAYS)
+    if key not in _TL:
+        _TL[key] = timeline_ex(rates, mult, hours, caps, exp, days, cycle2, start_spirit, prof)
+    t = _TL[key]
+    return t['reached'], t['gold'], t['lv']
+
+
+def pace_of(hours, **kw):
+    """Темп профиля на ставках предложения — timeline_ex с кэшем: руны, победы, ключи, пятый предел."""
+    key = ('pace', hours, CYCLE_DAYS, tuple(sorted(kw.items())))
+    if key not in _TL:
+        _TL[key] = timeline_ex(RATES_NEW, mult_new, hours, **kw)
+    return _TL[key]
+
+
+def valor_pace(hours, **kw):
+    """Доблесть у профиля: день пятого предела (с него доступна доблесть), побед у стража доблести в день × 100 и дней на руну
+    доблести (осколки — recipes.js, страж доблести) в среднем за прогон от начала цикла II до пятого предела."""
+    t = pace_of(hours, **kw)
+    R, days = rx(), len(t['wins']) - 1
+    val_x100 = sum(w - w * RB_SPLIT_BP // BP for w in t['wins']) // max(1, days)
+    per_rune = -(-R['valor_rune'] * 100 * 100 // (val_x100 * R['shards_x100'])) if val_x100 else None
+    at5 = t['shards'][min(t['limit5'], days)] // (R['valor_rune'] * 100)
+    return {'limit5': t['limit5'], 'val_x100': val_x100, 'days_per_rune': per_rune, 'runes_at_limit5': at5}
 
 
 def grind(to_lvl, rates, heroes=SQUAD):
@@ -462,7 +585,7 @@ def t7_other():
 
 
 def t8_gap():
-    rd = rune_days(GUARD_WINS)
+    rd = timeline_ex(RATES_NOW, mult_now, PROFILES[0][1], cycle2=False)['runes']
     reg, _, _ = timeline(RATES_NOW, mult_now, PROFILES[0][1], cycle2=False)
     hc, _, _ = timeline(RATES_NOW, mult_now, PROFILES[1][1], cycle2=False)
     rows = []
@@ -522,40 +645,63 @@ def t10_prices():
 
 
 def t11_plan():
-    rd = rune_days(GUARD_WINS)
+    rd = pace_of(PROFILES[0][1])['runes']
     reg, gold, lv = timeline(RATES_NEW, mult_new, PROFILES[0][1])
     hc, _, _ = timeline(RATES_NEW, mult_new, PROFILES[1][1])
     acc = account_gold()
     first5 = hero_total(1, SQUAD)            # первый отряд — пачка обучения, первые пятеро цикла I
     _, next5 = heroes_buy(10 ** 12, (1, 2), {1: SQUAD}, 2 * SQUAD)   # второй — пятеро самых дешёвых следующих, циклы I и II
-    vd, vw = valor_day()
+    vo, ve = valor_pace(PROFILES[0][1]), valor_pace(PROFILES[1][1])
     rows = []
     for i, L in enumerate(LIMITS):
         if L <= START_LEVEL:
             continue
         lock = 'дух' if (i == 0 or reg.get(L, 0) > rd[i - 1]) else 'руны ' + ROMAN[i - 1]
-        rows.append([f'Отряд пяти на {L}-м', TARGETS[L], reg.get(L), hc.get(L), lock])
+        goal = TARGETS[L] + (f', {CYCLE_DAYS}-й день' if L == LIMITS[2] else '')
+        rows.append([f'Отряд пяти на {L}-м', goal, reg.get(L, f'> {DAYS_MAX}'), hc.get(L, f'> {DAYS_MAX}'), lock])
     rows.append(['Второй отряд: ещё 5 героев', TARGET_SQUAD2, day_reaches(gold, first5 + next5 - acc), '—', 'золото'])
     rows.append([f'{GOLD_HEROES[1]} героев за золото цикла I', TARGET_GOLD_ALL,
                  day_reaches(gold, hero_total(1) - acc), '—', 'золото'])
-    rows.append(['Доблесть со стража доблести', f'цикл II, до {CYCLE_DAYS}-го дня', vd, vd, f'руна доблести: {vw} побед'])
+    lock5 = 'руны V' if rd[-1] >= reg.get(LIMITS[-1], DAYS_MAX) else 'дух'
+    rows.append(['Пятый предел: с него доступна доблесть (§10.2)', 'долгая цель, после цикла II', vo['limit5'], ve['limit5'], lock5])
+    rows.append(['Руна доблести со стража доблести', 'около 10 дней (§10.2: пять рун ≈ 50 дней)',
+                 f"раз в {vo['days_per_rune']} дн.", f"раз в {ve['days_per_rune']} дн.",
+                 f"побед у стража доблести в день — {dec1(vo['val_x100'], 100)}; осколки копятся с 1-го дня, к пятому пределу — "
+                 f"{vo['runes_at_limit5']} рун"])
     return table(['Веха', 'Цель', 'День: обычный', 'День: увлечённый', 'Замок у обычного'], rows)
 
 
-def t12_payer():
-    """Дух в день при равном времени: свободный и плательщик с одним прогрессом аккаунта.
-    Плательщик раньше набирает героев на все слоты; сила героев от редкости не растёт (§3.2)."""
+def payer_cases():
+    """Дух в день при равном времени: свободный и плательщик с одним прогрессом аккаунта. Плательщик раньше набирает героев на все
+    слоты; сила героев от редкости не растёт (§3.2). Возвращает (подпись, день, отрядов у свободного и у плательщика, дух обоих,
+    случай настоящий — плательщику хватает слотов цикла)."""
     _, _, lv = timeline(RATES_NEW, mult_new, PROFILES[0][1])
     h = PROFILES[0][1]
+    wins = pace_of(h)['wins']
 
     def day_income(day, squads):
-        a, b = lv[day]
+        a, b = lv[min(day, len(lv) - 1)]
         c = FIRST_CYCLE + 1 if day > CYCLE_DAYS else FIRST_CYCLE
         s = sum(per_hour(sim_row(eff_level(a if k == 0 else b, c)), RATES_NEW, mult_new(c))[1] for k in range(squads))
-        return s * h + GUARD_WINS * RATES_NEW['guard'][1] * mult_new(c) // BP
-    rows = []
+        return s * h + wins[min(day, len(wins) - 1)] * RATES_NEW['guard'][1] * mult_new(c) // (BP * 100)
+    out = []
     for name, day, f, p in PAYER_CASES:
-        free, pay = day_income(day, f), day_income(day, p)
+        day = CYCLE_DAYS + int(day[1:]) if isinstance(day, str) else day or CYCLE_DAYS
+        c = FIRST_CYCLE + 1 if day > CYCLE_DAYS else FIRST_CYCLE
+        out.append((name, day, f, p, day_income(day, f), day_income(day, p), p <= slots(c)))
+    return out
+
+
+def payer_worst_x100(c=None):
+    """Худший настоящий случай Т12 (в цикле c; без него — во всех): во сколько раз больше духа в день у плательщика при равном времени,
+    × 100. Его берут калькуляторы режимов как верхнюю границу дохода плательщика (Эхо — души, лутбоксы — очки)."""
+    cyc = lambda day: FIRST_CYCLE + 1 if day > CYCLE_DAYS else FIRST_CYCLE
+    return max(pay * 100 // free for _, day, _, _, free, pay, real in payer_cases() if real and (c is None or cyc(day) == c))
+
+
+def t12_payer():
+    rows = []
+    for name, _, f, p, free, pay, _ in payer_cases():
         ok = 'да' if pay * 10 <= free * PAYER_MAX_X10 else 'нет'
         rows.append([name, f'{f} / {p}', fmt(free), fmt(pay), ratio(pay, free), ok])
     return table(['Случай', 'Отрядов: свободный / плательщик', 'Дух в день: свободный', 'Плательщик',
@@ -601,20 +747,39 @@ def tutor_pace(rates=RATES_NEW, start_spirit=TUTORIAL_SPIRIT):
     return None
 
 
+def pace_b2():
+    """Биом 2 цикла I по прогону темпа (tools/content-gen/biomes/pace.py → pace.json, rows.b2): босс и рунный страж, итог забегов."""
+    try:
+        return json.loads(PACE_JSON.read_text(encoding='utf-8')).get('rows', {}).get('b2') or {}
+    except (OSError, ValueError):
+        return {}
+
+
+def in_corridor(ms, corridor):
+    lo, hi = corridor
+    return lo * MINUTE_MS <= ms <= hi * MINUTE_MS
+
+
 def t15_tutor():
-    """Цель автора — биом 1 цикла I за час — против прогона обучающего биома."""
+    """Цель автора — биом 1 за час, из них 7–10 минут боя (ADR-0018, дополнение; ADR-0031, п. 5), биом 2 — ещё около трёх часов,
+    от полутора до трёх часов забегов, — против прогонов: обучающий биом здесь, биом 2 — прогон темпа (pace.json)."""
     got = tutor_pace()
     first = next((r for r in SIM_TUTOR if r[1]), None)
-    goal = PACE_I[0][1]
+    lo1, hi1 = PACE_B1_MIN
     if not got:
-        return table(['Веха', 'Цель автора', 'Итог'], [[PACE_I[0][0], f'{goal} ч', 'не пройден']])
+        return table(['Веха', 'Цель автора', 'Итог'], [[PACE_I[0][0], f'{lo1}–{hi1} мин боя', 'не пройден']])
     ms, runs, lvl = got
     duo = f'{len(TUTOR_IDS)} героя'
-    rows = [[PACE_I[0][0], f'{goal} ч', duo, f'{dec1(ms, MINUTE_MS)} мин, {runs} заб.', lvl, f'{first[0]}-й' if first else '—',
-             'в срок' if ms <= goal * HOUR_MS else 'дольше цели'],
+    b2 = pace_b2().get('guard')
+    lo2, hi2 = PACE_B2_MIN
+    rows = [[PACE_I[0][0], f'{lo1}–{hi1} мин боя; остальное до часа — обучение', duo, f'{dec1(ms, MINUTE_MS)} мин, {runs} заб.', lvl,
+             f'{first[0]}-й' if first else '—', 'в срок' if in_corridor(ms, PACE_B1_MIN) else 'мимо цели'],
             ['Рунный страж биома 1', 'после биома', duo, '—', '—', f'{SIM_GUARD}-й' if SIM_GUARD else 'не берётся',
              'по силам' if SIM_GUARD and SIM_GUARD <= LIMITS[0] else 'не по силам'],
-            [PACE_I[1][0], f'ещё {PACE_I[1][1]} ч', '5 героев: ещё трое до полной пачки', 'биома нет в прототипе', '—', '—', '—']]
+            [PACE_I[1][0], f'ещё {dec1(lo2, 60)}–{dec1(hi2, 60)} ч забегов', '5 героев: ещё трое до полной пачки',
+             f"{dec1(b2['ms'], MINUTE_MS)} мин, {b2['runs']} заб." if b2 else 'нет прогона темпа',
+             '/'.join(map(str, b2['lvl'])) if b2 else '—', 'босс и страж — за забег, без осады',
+             ('в срок' if in_corridor(b2['ms'], PACE_B2_MIN) else 'мимо цели') if b2 else '—']]
     return table(['Веха', 'Цель автора', 'Отряд', 'С нуля до победы', 'Уровень отряда', 'Берётся за забег с уровня', 'Итог'], rows)
 
 
@@ -652,23 +817,22 @@ def main():
              ('Т15. Темп цикла I: обучающий биом с нуля', t15_tutor())]
     for title, body in parts:
         print(f'\n### {title}\n\n{body}')
-    print(f'\nРуны на пределы I–V: отряд пяти — дни {rune_days(GUARD_WINS)}, один герой — '
-          f'{rune_days(GUARD_WINS, 1)}, отряд при 10 победах — {rune_days(10)}.')
+    po, pe, pc = pace_of(PROFILES[0][1]), pace_of(PROFILES[1][1]), pace_of(PROFILES[0][1], full_cap=True)
+    print(f'\nРуны на пределы I–V, отряд пяти, дни с начала цикла II: обычный — {po["runes"]}, увлечённый — {pe["runes"]}, '
+          f'при полном капе {rx()["cap"]} побед — {pc["runes"]}. Цикл II — {CYCLE_DAYS} дней (прогон темпа, pace.json).')
 
 
 def check_csv():
-    """HEROES_VALOR берётся из черновика герои.csv, GOLD_HEROES — из состава героев состав-героев.csv."""
-    path = ROOT / 'docs' / 'content' / 'герои' / 'герои.csv'
-    if path.exists():
-        val = {}
-        for r in csv.DictReader(path.open(encoding='utf-8-sig')):
-            val.setdefault(int(r['цикл']), Counter())[int(r['максимум доблести'])] += 1
-        if {c: dict(m) for c, m in val.items()} != HEROES_VALOR:
-            print('!! HEROES_VALOR разошлись с герои.csv — обновите данные', file=sys.stderr)
+    """HEROES_VALOR и GOLD_HEROES — из состава героев состав-героев.csv: личные максимумы по циклам и герои за золото."""
     path = ROOT / 'docs' / 'content' / 'герои' / 'состав-героев.csv'
     if path.exists():
-        gold = Counter(CYCLE_NAMES.index(r['цикл']) + 1 for r in csv.DictReader(path.open(encoding='utf-8-sig'))
-                       if r['источник'].startswith('золото'))
+        rows = list(csv.DictReader(path.open(encoding='utf-8-sig')))
+        val = {}
+        for r in rows:
+            val.setdefault(CYCLE_NAMES.index(r['цикл']) + 1, Counter())[int(r['максимум доблести'])] += 1
+        if {c: dict(m) for c, m in val.items()} != HEROES_VALOR:
+            print('!! HEROES_VALOR разошлись с состав-героев.csv — обновите данные', file=sys.stderr)
+        gold = Counter(CYCLE_NAMES.index(r['цикл']) + 1 for r in rows if r['источник'].startswith('золото'))
         if dict(gold) != GOLD_HEROES:
             print('!! GOLD_HEROES разошлись с состав-героев.csv — обновите данные', file=sys.stderr)
 
@@ -677,18 +841,12 @@ def check_csv():
 
 SIM_JS = r"""
 globalThis.window = globalThis;
+// отряд прогонов — одна фикстура (tools/content-gen/biomes/sim.js, SQUAD): S.heroes из design/ui/index.html, реальный отряд ADR-0031, п. 1 —
+// золотые герои цикла I с максимумом доблести 1, доблесть 0, у бойца урона пары — 1 от руны обучения. Набор — по черновику героя (kits.js);
+// ab, pas и ult — прежняя библиотека: на ней идёт только модель темпа ADR-0007. sim.js сам грузит ядро, библиотеку, наборы и биомы
+const { SQUAD } = require('./tools/content-gen/biomes/sim.js');
 require('./design/ui/abilities.js'); require('./design/ui/kits.js'); require('./design/ui/battle.js');
 const EB = globalThis.EnBattle;
-const A = a => a.map(n => ({ n })), P = a => a.map(n => ({ n, t: 'боевая' }));
-// фикстура S.heroes из design/ui/index.html: характеристики, доблесть, черновик героя — от него набор способностей (kits.js, ADR-0016).
-// ab, pas и ult — прежняя библиотека: на ней идёт только модель темпа ADR-0007
-const SQUAD = [
-  { id: 'h1', name: 'Гарт Нишевой', cls: 'Танк', el: 'Земля', draft: 'h01_2', lvl: 42, valor: 2, st: [128, 54, 72, 246, 62], ab: A(['Вызов', 'Удар щитом', 'Осыпание']), pas: P(['Несгибаемость']), ult: null },
-  { id: 'h2', name: 'Хравн Сборщик', cls: 'Физ. ДД ловкости', fx: 'melee', el: 'Огонь', draft: 'h01_3', lvl: 50, valor: 1, st: [128, 54, 245, 72, 62], ab: A(['Горение', 'Быстрый выпад', 'Погребальный костёр']), pas: P(['Точность']), ult: null },
-  { id: 'h3', name: 'Лаэйра', cls: 'Маг. ДД', el: 'Время', draft: 'h01_5', lvl: 118, valor: 2, st: [72, 246, 54, 62, 128], ab: A(['Разряд', 'Остановка']), pas: P(['Средоточие']), ult: { n: 'Испепеление', at: 5 } },
-  { id: 'h4', name: 'Ильмерра', cls: 'Хилер', el: 'Воздух', draft: 'h01_1', lvl: 46, valor: 1, st: [62, 246, 54, 128, 72], ab: A(['Живая вода', 'Лёгкая поступь', 'Оберег']), pas: P(['Отклик']), ult: null },
-  { id: 'h5', name: 'Мирт Переписчик', cls: 'Контроль', el: 'Вода', draft: 'h01_4', lvl: 35, valor: 3, st: [62, 246, 54, 128, 72], ab: A(['Оковы', 'Стужа', 'Ослабление']), pas: P(['Тень']), ult: { n: 'Ледяные оковы', at: 2 } },
-];
 // один забег; добыча как в ядре (floorLoot): по рангу убитой карты — рядовой, элита, босс
 function run(heroes, siege, mode) {
   const B = EB.BIOMES.c2, k = { rf: 0, el: 0, boss: 0 }; let cur = heroes.map(h => EB.heroSrcValor(h)), ms = 0, wall = 0, hp = siege;

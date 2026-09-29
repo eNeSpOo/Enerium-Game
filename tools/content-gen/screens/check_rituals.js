@@ -231,6 +231,14 @@ if (!R()) { say('S.rituals не заведён'); done(); }
   if (!ready || !T.S.inbox.some(m => m.rit === ready.uid && m.k === 'away')) say('демо: нет готового ритуала с письмом «пока вас не было»');
   if (!runS || runS.kind !== 'work' || runS.crew.length !== runS.ppl) say('демо: нет идущего ритуала рабочих с бригадой');
   for (const x of R0.slots.filter(s => s.st !== 'free')) for (const k of ['t0', 't1', 'ms', 'nominal']) if (!Number.isInteger(x[k])) say(`слот ${x.uid}: ${k} не целые мс`);
+  /* демо: у каждого ритуала своя бригада — рабочий не бывает в двух ритуалах, что шли в одно время; готовый ритуал уже кончился */
+  const works = R0.slots.filter(s => s.st !== 'free' && s.kind === 'work');
+  works.forEach((a, i) => works.slice(i + 1).forEach(b => {
+    const both = a.t0 < b.t1 && b.t0 < a.t1, same = a.crew.filter(id => b.crew.includes(id));
+    if (both && same.length) say(`демо: рабочие ${same.join(', ')} сразу в двух ритуалах — «${a.n}» и «${b.n}»`);
+  }));
+  for (const x of works) if (x.st === 'ready' ? x.t1 > R0.now : x.t1 <= R0.now) say(`демо: ритуал «${x.n}» ${x.st === 'ready' ? 'готов, а срок не вышел' : 'идёт, а срок вышел'}`);
+  for (const x of works) if (new Set(x.crew).size !== x.crew.length || x.crew.some(id => !R0.artel.some(w => w.id === id))) say(`демо: бригада ритуала «${x.n}» — не рабочие артели или повтор`);
   if (!Number.isInteger(R0.now)) say('часы: не целые мс');
 
   /* старт и сбор каждой карточки обеих вкладок: срок — по данным и бригаде, исход — на сиде, выдача — ровно исход */

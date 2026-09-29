@@ -550,7 +550,7 @@ Object.assign(OV, {
       body = `${away.length ? `<span class="eyebrow">Пока вас не было</span>${away.map(mlRewRow).join('')}` : ''}
         ${rew.length ? `<span class="eyebrow">Награды</span>${rew.map(mlRewRow).join('')}` : ''}
         ${!away.length && !rew.length ? '<p class="faint">Пусто. Всё забрано.</p>' : ''}
-        <span class="eyebrow">Дар дня</span><button class="mail" data-a="dlg" data-v="gift" style="text-align:left;width:100%;color:var(--parch)"><div class="col" style="gap:2px"><b>День ${S.gift.day} из 30</b><small class="faint">главный дар — на двадцатый день</small></div><span class="chip ${giftReady() ? 'spirit' : ''}">${giftReady() ? 'можно забрать' : 'получено'}</span></button>`;
+        ${typeof psGiftRow === 'function' ? psGiftRow() : `<span class="eyebrow">Дар дня</span><button class="mail" data-a="dlg" data-v="gift" style="text-align:left;width:100%;color:var(--parch)"><div class="col" style="gap:2px"><b>День ${S.gift.day} из 30</b><small class="faint">главный дар — на двадцатый день</small></div><span class="chip ${giftReady() ? 'spirit' : ''}">${giftReady() ? 'можно забрать' : 'получено'}</span></button>`}`;   // дар дня — screens/pass.js
       if (S.inbox.some(mailHas)) foot = '<span class="faint" style="font-size:12px">Передача ресурсов почтой запрещена · предметы — в запасы</span><button class="btn go" data-a="claimall">Забрать всё</button>';
     } else if (t === 'pm') {
       const unread = S.inbox.filter(m => m.k === 'pm' && mlShown(m)), read = S.soc.read.filter(mlShown), sent = S.soc.sent;

@@ -89,8 +89,11 @@ try {
   for (const id of BIO) {
     const B = EB.BIOMES[id], hs = pack(700);
     for (const f of [1, B.floors.length]) {
-      const b = EB.run(EB.floorBattle(hs, id, f, null, 'rounds')); out.battles++;
-      const b2 = EB.run(EB.floorBattle(hs.slice().reverse(), id, f, null, 'rounds')); out.battles++;
+      /* босс биома с осадой берётся за несколько забегов (ADR-0031: у биома 4 — около 20 на 350-м): добычу этажа босса проверяем в последней
+         попытке осады — босс приходит с десятой долей здоровья */
+      const sg = f === B.floors.length && B.siege !== false ? Math.max(1, Math.floor(EB.floorBattle(hs, id, f, null, 'rounds').u[1][0].maxHp / 10)) : null;
+      const b = EB.run(EB.floorBattle(hs, id, f, sg, 'rounds')); out.battles++;
+      const b2 = EB.run(EB.floorBattle(hs.slice().reverse(), id, f, sg, 'rounds')); out.battles++;
       // раунды этажа — таблица ядра по старшему врагу колоды (слово автора 29.09.2026): рядовые 5, элита 10, босс 20
       if (b.maxRounds !== EB.RULES.rounds.by[B.floors[f - 1].g]) fail(`${id} · этаж ${f}: раундов ${b.maxRounds}, по таблице ядра — ${EB.RULES.rounds.by[B.floors[f - 1].g]}`);
       if (b.win !== b2.win || b.round !== b2.round || b.u[1].map(u => u.hp).join() !== b2.u[1].map(u => u.hp).join()) fail(`${id} · этаж ${f}: порядок героев изменил бой`);
@@ -177,7 +180,7 @@ if (err.length) done();
 const T = vm.runInContext(`({
   get S() { return S; }, set S(v) { S = v; },
   ACT, OV, SCREENS, FLOWS, KH, EB, render, initialState, startRun, advance, runById, F, FA, G, BIOME_UI, ARENAS, KIT_EXTRA, renderKit, setTeam, AV,
-  BU: window.EN_BIOMES_UI, X: window.EN_BIOME_FOES,
+  BU: window.EN_BIOMES_UI, X: window.EN_BIOME_FOES, RX, gdCost, gdSame,
 })`, ctx);
 const draw = key => { out.views++; T.render(); return scan(key, els.game ? els.game.innerHTML : ''); };
 const reset = () => { T.S = T.initialState(); T.S.overlay = null; T.S.wallet.souls = 1e9; };
@@ -272,8 +275,51 @@ try {
   h = draw('Спуск · b3 · страж');
   if (!/data-a="guard"[^>]*disabled/.test(h)) fail('страж биома 3: вход открыт до босса');
   T.ACT.guard(''); if (T.S.runs.length) fail('страж биома 3: впустил до босса');
+  let k0 = T.S.wallet.keys;
   T.ACT.guard('demo'); R = T.S.runs[T.S.runs.length - 1];
   if (!R || !R.guard || R.biome !== 'b3' || R.b.u[1][0].id !== 'b3g1') fail('страж биома 3: демо-вход не начал бой с Провидцем');
+  if (T.S.wallet.keys !== k0) fail('страж биома 3: демо-вход потратил ключи');
+
+  /* 11б. вход к стражу за ключи и повтор проигранного боя (§11; ADR-0031, п. 14; ADR-0014 — сиды постоянны): цена — entryKeys стража
+     у кнопки; проигранный бой того же отряда тех же героев — до оплаты лист-предупреждение, «Всё равно войти» остаётся; ключи
+     списывает только подтверждённый вход, операция с номером — повтор ничего не списывает; другой уровень — другой бой */
+  {
+    reset(); T.S.route = 'descent'; T.S.selBiome = 'b2'; T.S.prepSquad = 's1'; T.S.heroes.forEach(h => { h.lvl = 1; });
+    const cost = (T.RX.drops.guardians.find(g => g.biome === 'b2') || {}).entryKeys, live = () => T.S.runs.filter(r => !r.over && r.guard).length;
+    if (!Number.isInteger(cost) || cost < 1 || T.gdCost('b2') !== cost) fail(`вход к стражу: цена ${T.gdCost('b2')}, у стража в данных ${cost}`);
+    h = draw('Спуск · b2 · страж за ключи');
+    const btn = (h.match(/<button class="btn sm" data-a="guard" data-v="(gd\d+)"[^>]*>[\s\S]*?<\/button>/) || []);
+    if (!btn[0] || !btn[0].includes('class="cost"') || !btn[0].includes(`>${cost}</span>`)) fail('вход к стражу: у кнопки нет номера операции или цены в ключах');
+    k0 = T.S.wallet.keys; T.ACT.guard(btn[1] || '');
+    R = T.S.runs[T.S.runs.length - 1];
+    if (!R || !R.guard || T.S.wallet.keys !== k0 - cost) fail(`вход к стражу: ключей ${k0} → ${T.S.wallet.keys}, цена ${cost}`);
+    T.S.route = 'descent'; if (R) play(R, 'страж · слабый отряд');
+    if (!R || !R.end || R.end.kind !== 'guardLose') fail(`вход к стражу: отряд первого уровня не проиграл — ${R && R.end && R.end.kind}`);
+    else {
+      if (!T.gdSame('b2', 's1')) fail('вход к стражу: проигранный бой не запомнен');
+      const k1 = T.S.wallet.keys; T.S.overlay = null; T.S.route = 'descent';
+      T.ACT.guard('');
+      const O = T.S.overlay;
+      if (!O || O.act !== 'guardgo' || !/^gd\d+$/.test(O.v || '')) fail('повтор боя со стражем: нет листа-предупреждения с номером входа');
+      if (T.S.wallet.keys !== k1 || live()) fail('повтор боя со стражем: ключи списаны или бой начат до подтверждения');
+      const g = draw('повтор боя со стражем · лист');
+      if (!g.includes('Этот бой уже был: тот же отряд — тот же исход. Поднимите уровень или смените отряд') || !/data-a="guardgo"[^>]*>Всё равно войти/.test(g)) fail('повтор боя со стражем: в листе нет слов о том же исходе или «Всё равно войти»');
+      if (O) {
+        T.ACT.guardgo(O.v);
+        if (T.S.wallet.keys !== k1 - cost || live() !== 1) fail(`«Всё равно войти»: ключей ${k1} → ${T.S.wallet.keys}, боёв со стражем ${live()}`);
+        const k2 = T.S.wallet.keys; T.ACT.guardgo(O.v);
+        if (T.S.wallet.keys !== k2 || live() !== 1) fail('«Всё равно войти»: повтор номера списал ключи или начал бой');
+      }
+      T.S.runs = []; T.S.heroes[0].lvl = 2; T.S.overlay = null;
+      if (T.gdSame('b2', 's1')) fail('вход к стражу: другой уровень героя — тот же бой');
+      const k3 = T.S.wallet.keys; T.ACT.guard('');
+      if (T.S.overlay || T.S.wallet.keys !== k3 - cost || live() !== 1) fail('вход к стражу: после подъёма уровня снова предупреждение или ключи не те');
+    }
+    /* ключей мало — отказ без расхода */
+    reset(); T.S.route = 'descent'; T.S.selBiome = 'b2'; T.S.prepSquad = 's1'; T.S.wallet.keys = cost - 1;
+    T.ACT.guard('');
+    if (T.S.runs.length || T.S.wallet.keys !== cost - 1) fail('вход к стражу: без ключей бой начат или ключи ушли');
+  }
 
   /* 12. бестиарий по биомам */
   for (const team of [false, true]) {

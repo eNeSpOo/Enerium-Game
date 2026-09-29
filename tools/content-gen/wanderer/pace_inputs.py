@@ -5,7 +5,8 @@
 - цикл I — счётчики обучения за биом 2 (sets.tutor_b2, таблица С1), награды обучения золотом (economy.account_gold)
   и дух цепочки обучения (economy.TUTORIAL_SPIRIT);
 - победы у рунных стражей в день, циклы II и III, у каждого профиля — sets.kills_avg по принятому варианту ключей (С8а);
-- дни до рун на пределы I–V отряду пяти — sets.rune_days_sets при победах цикла II своего профиля (С8б);
+- дни до рун на пределы I–V отряду пяти — economy.pace_of: победы у стражей по дням из ключей (вариант Б), как в прогоне темпа
+  (biomes/pace.py) и таблице Т11 экономики; прежде — sets.rune_days_sets при средних победах цикла II (С8б);
 - героев за золото по дням с начала цикла II до конца цикла III — sets.gold_buy по принятой цене (С10), пятёрка обучения входит.
 sets.py читает ключи контрактов из design/ui/contracts.js: после пересборки контрактов или калькуляторов — перезапустить.
 
@@ -51,8 +52,7 @@ def build():
     }
     for k, p in PROFILES.items():
         data['guards'][k] = {str(c): S.kills_avg(S.KEY_PICK, days[p], c, prof=p) for c in (2, 3)}
-        k2 = S.kills_avg(S.KEY_PICK, days[p], 2, prof=p)
-        data['limitSquad'][k] = [int(d) for d in S.rune_days_sets(S.split(k2)[0], k2)]
+        data['limitSquad'][k] = [int(d) for d in E.pace_of(dict(E.PROFILES)[p])['runes']]
         data['heroGold'][k] = [sum(b.values()) for b, _, _ in S.gold_buy(price, inc[p], heroes)]
     return data
 

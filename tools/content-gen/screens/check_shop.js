@@ -67,6 +67,7 @@ vm.runInContext(`globalThis.__lv = {
   get S() { return S; }, reset() { S = initialState(); S.route = 'craft'; S.seg.craft = 'shop'; S.overlay = null; },
   html() { render(); return document.getElementById('game').innerHTML; },
   ACT, BAG, OV, LV_DATA, LV_SRV, EN_RECIPES, FLOWS, KIT_EXTRA, MAP, CRAFT_SEGS, shopCost, mkMin, lvKitHtml, lvView,
+  lvSlots, lvFree, lvFreeN, lvBound, lvUniqLeft, lvArt, mkFree, mkPick, rsSetWeek, WN: window.EN_WANDERER || null,
 };`, ctx);
 const W = win.__lv, A = W.ACT, D = W.LV_DATA, R = W.EN_RECIPES;
 
@@ -99,17 +100,18 @@ const eq = (label, a, b) => { if (a !== b) err.push(`${label}: ожидалос�
 const ok = (label, c) => { if (!c) err.push(label); };
 const snap = () => JSON.stringify({ w: W.S.wallet, b: W.S.bag.items, sold: W.S.sold, gen: W.S.lv.gen, shop: W.S.shop });
 const cards = h => [...h.matchAll(/<button class="lv-card[^"]*"[\s\S]*?<\/button>/g)].map(m => m[0]);
-const TOTAL = D.slots.reduce((a, s) => a + s.n, 0);
+const TOTAL = W.lvSlots().reduce((a, s) => a + s.n, 0);   // места с «Свитком ассортимента» (a18); у демо — база
 const fmtN = n => Number(n).toLocaleString('ru-RU');   // как fmt прототипа
 const ROMAN_ = ['', 'I', 'II', 'III', 'IV', 'V', 'VI'];
 
 /* 3. витрина по §14.2 — на сотнях витрин и на всех циклах */
-function rules(label, goods, cyc) {
-  eq(`${label}: товаров`, goods.length, TOTAL);
+function rules(label, goods, cyc, slots) {
+  const plan = slots || W.lvSlots();
+  eq(`${label}: товаров`, goods.length, plan.reduce((a, s) => a + s.n, 0));
   const ids = goods.map(g => g[0]);
   ok(`${label}: повтор товара`, new Set(ids).size === ids.length);
   let at = 0, uniq = 0;
-  for (const sl of D.slots) for (let k = 0; k < sl.n; k++, at++) {
+  for (const sl of plan) for (let k = 0; k < sl.n; k++, at++) {
     const g = goods[at]; if (!g) continue;
     const it = W.BAG.item(g[0]), where = `${label} · ${g[0]}`;
     if (!it) { err.push(`${where}: нет в recipes.js`); continue; }
@@ -117,6 +119,7 @@ function rules(label, goods, cyc) {
     ok(`${where}: ярус ${it.tier} не из пула места`, !!line);
     ok(`${where}: спойлер цикла VI`, !it.team);
     ok(`${where}: лавка продаёт руны (ADR-0014)`, !['rune', 'vshard', 'valor'].includes(it.tier));
+    ok(`${where}: крафтовая находка в лавке — её источник крафтовые биомы (ADR-0031, п. 10)`, it.tier !== 'find');
     ok(`${where}: предмет цикла ${it.cyc} выше текущего ${cyc}`, it.pool || it.cyc <= cyc);
     eq(`${where}: валюта места`, g[2], sl.cur);
     if (line) eq(`${where}: количество`, g[1], line[2]);
@@ -165,11 +168,11 @@ scene('экран', () => {
   ok('шапка: срок новых товаров', h.includes('Новые товары через') && h.includes('data-cd="shop"'));
   ok('шапка: сколько осталось', h.includes(`осталось ${TOTAL} из ${TOTAL}`));
   ok('шапка: «Обновить» с номером операции', /data-a="lvref" data-v="lv\d+"/.test(h));
-  ok('шапка: бесплатные обновления', h.includes(`бесплатно · ${D.refresh.free}`));
+  ok('шапка: бесплатные обновления', h.includes(`бесплатно · ${W.lvFree()}`));
   ok('шапка: как устроена лавка', h.includes('data-a="lvinfo"'));
   ok('без прежней строки правил на экране', !/Уникальное — редко и по одной/.test(h));
   A.lvinfo(); const hi = view('как устроена лавка');
-  ok('лист «Лавка»: правила', hi.includes('Новые товары приходят раз в 8 часов') && hi.includes('уникальный бывает редко'));
+  ok('лист «Лавка»: правила', hi.includes('Новые товары приходят раз в 8 часов') && hi.includes('уникальный бывает редко') && hi.includes('на рынок его не выставить'));
 });
 
 /* 5. покупка — операция с номером */
@@ -225,19 +228,19 @@ scene('покупка: нехватка и чужая витрина', () => {
 /* 6. обновление */
 scene('обновление', () => {
   W.reset();
-  const R0 = D.refresh, g0 = W.S.lv.gen;
+  const R0 = D.refresh, g0 = W.S.lv.gen, free0 = W.lvFree();
   A.buy('0'); A.buydo(W.S.overlay.v);
   let h = view('до обновления');
   const op = (h.match(/data-a="lvref" data-v="(lv\d+)"/) || [])[1];
   const s0 = JSON.stringify(W.S.wallet);
   A.lvref(op);
   eq('бесплатное: новая витрина', W.S.lv.gen, g0 + 1); eq('бесплатное: купленное сброшено', W.S.sold.length, 0);
-  eq('бесплатное: Энериум не тронут', JSON.stringify(W.S.wallet), s0); eq('бесплатных осталось', W.S.lv.free, R0.free - 1);
+  eq('бесплатное: Энериум не тронут', JSON.stringify(W.S.wallet), s0); eq('бесплатных осталось', W.lvFree(), free0 - 1);
   rules('после обновления', W.S.shop, W.S.acc.cycle);
   const s1 = snap(); A.lvref(op); eq('повтор номера обновления ничего не меняет', snap(), s1);
   h = view('после обновления');
   ok('карточки выходят по одной', /class="lv-card[^"]*"[^>]*style="--i:\d+;--df:-?\d+ms"/.test(h));
-  while (W.S.lv.free > 0) A.lvref((view('бесплатно').match(/data-a="lvref" data-v="(lv\d+)"/) || [])[1]);
+  while (W.lvFree() > 0) A.lvref((view('бесплатно').match(/data-a="lvref" data-v="(lv\d+)"/) || [])[1]);
   h = view('за Энериум');
   ok('«Обновить» — цена в Энериуме', /data-a="lvref"[^>]*>[\s\S]*?class="cost"/.test(h));
   for (let k = 0; k < R0.paid.length; k++) {
@@ -255,14 +258,73 @@ scene('обновление', () => {
   ok('лимит: «Обновить» недоступна', /class="btn sm lv-ref" disabled/.test(h));
   const sl = snap(); A.lvref(''); eq('лимит: ничего не меняет', snap(), sl); ok('лимит: строка', !!W.S.toast && /закончились/.test(W.S.toast.t));
   /* нехватка Энериума на платное */
-  W.reset(); W.S.lv.free = 0; W.S.wallet.enerium = D.refresh.paid[0] - 1;
+  W.reset(); W.S.lv.fu = W.lvFreeN(); W.S.wallet.enerium = D.refresh.paid[0] - 1;
   A.lvref((view('нехватка Энериума').match(/data-a="lvref" data-v="(lv\d+)"/) || [])[1]);
   ok('нехватка Энериума: кнопка недоступна', /data-a="lvrefdo"[^>]*disabled/.test(view('нехватка Энериума: подтверждение')));
   const sn = snap(); A.lvrefdo(); eq('нехватка Энериума: ничего', snap(), sn);
   /* срок новых товаров — сервер, без номера операции */
-  W.reset(); const ga = W.S.lv.gen, fa = W.S.lv.free;
+  W.reset(); const ga = W.S.lv.gen, fa = W.lvFree();
   W.LV_SRV.auto();
-  eq('срок: новая витрина', W.S.lv.gen, ga + 1); eq('срок: снова 8 часов', W.S.lv.next, D.autoSec); eq('срок: бесплатные не тратятся', W.S.lv.free, fa);
+  eq('срок: новая витрина', W.S.lv.gen, ga + 1); eq('срок: снова 8 часов', W.S.lv.next, D.autoSec); eq('срок: бесплатные не тратятся', W.lvFree(), fa);
+});
+
+/* 6б. ADR-0031, п. 10 (§14.2, §14.1): уникальный ресурс — не больше одного в неделю на игрока, счёт — «сервер» лавки, отказ словами;
+   купленное за Энериум помечено — «сервер» рынка его не примет; ассортимент и бесплатные обновления — артефакты a18 и a19 из данных
+   Странника: одно число базы — у артефакта, в LV_DATA его нет */
+scene('уникальный в неделю, Энериум и рынок, артефакты', () => {
+  W.reset();
+  const cyc = W.S.acc.cycle, withU = [];
+  for (let g = 1; g <= 400 && withU.length < 2; g++) { const s = W.LV_SRV.roll(g, cyc); if (s.some(x => W.BAG.item(x[0]).tier === 'unique')) withU.push(g); }
+  ok('уникальный в неделю: нет двух витрин с уникальным', withU.length === 2);
+  const put = g => { W.S.lv.gen = g; W.S.shop = W.LV_SRV.roll(g, cyc); W.S.sold = []; return W.S.shop.findIndex(x => W.BAG.item(x[0]).tier === 'unique'); };
+  W.S.wallet.enerium = 1e6;
+  let i = put(withU[0]); const u1 = W.S.shop[i];
+  eq('уникальный в неделю: доступно в начале недели', W.lvUniqLeft(), D.uniqueWeek);
+  A.buy(String(i)); A.buydo(W.S.overlay.v);
+  ok('уникальный в неделю: первый куплен', W.S.sold.includes(i));
+  eq('уникальный в неделю: после покупки осталось', W.lvUniqLeft(), D.uniqueWeek - 1);
+  i = put(withU[1]);
+  A.buy(String(i)); const o2 = W.S.overlay, h2 = view('уникальный в неделю: второй · лист');
+  ok('уникальный в неделю: лист говорит «один в неделю» и не даёт купить', h2.includes('один в неделю') && /data-a="buydo"[^>]*disabled/.test(h2));
+  const s2 = snap(); A.buydo(o2.v);
+  eq('уникальный в неделю: второй не куплен', snap(), s2);
+  ok('уникальный в неделю: отказ словами', !!W.S.toast && /один в неделю/.test(W.S.toast.t));
+  if (typeof W.rsSetWeek === 'function') {
+    const next = vm.runInContext('RS.weeks.map(w => [w.race, w.gen])', ctx).find(([, g]) => g !== W.S.week.race);
+    W.rsSetWeek(next[0]);
+    eq('уникальный в неделю: новая неделя — новый счёт', W.lvUniqLeft(), D.uniqueWeek);
+    i = put(withU[1]); A.buy(String(i)); const s3 = snap(); A.buydo(W.S.overlay.v);
+    ok('уникальный в неделю: на новой неделе куплен', snap() !== s3 && W.S.sold.includes(i));
+  }
+  /* купленное за Энериум помечено: рынок не принимает, форма не предлагает; свободные штуки продаются */
+  W.reset(); W.S.wallet.enerium = 1e6;
+  const ei = W.S.shop.findIndex(x => x[2] === 'enerium'), eg = W.S.shop[ei], id = eg[0], q0 = W.BAG.qty(id);
+  A.buy(String(ei)); A.buydo(W.S.overlay.v);
+  eq('Энериум: помечено купленное', W.lvBound(id), Math.min(W.BAG.qty(id), eg[1]));
+  eq('Энериум: в продажу — только свободные', W.mkFree(id), q0);
+  const M = W.S.market, mine0 = M.mine.length, b0 = W.BAG.qty(id);
+  vm.runInContext(`ACT.mkselldo('проверка-энериум:${id}:${b0}:' + INV.market.pricePct[0])`, ctx);
+  eq('Энериум: рынок не принял лот', M.mine.length, mine0); eq('Энериум: запасы не тронуты', W.BAG.qty(id), b0);
+  ok('Энериум: отказ «куплено в лавке за Энериум — не продаётся»', !!W.S.toast && /куплено в лавке за Энериум — не продаётся/i.test(W.S.toast.t));
+  if (q0 > 0) { vm.runInContext(`ACT.mkselldo('проверка-свободные:${id}:${q0}:' + INV.market.pricePct[0])`, ctx); eq('Энериум: свободные штуки ушли на рынок', M.mine.length, mine0 + 1); }
+  W.S.market.sel = { id, q: 1, pct: vm.runInContext('INV.market.pricePct[0]', ctx) };
+  const P = W.mkPick(); ok('Энериум: форма рынка не предлагает помеченное', P.id !== id || P.have === W.mkFree(id));
+  /* артефакты лавки: база — у артефакта, в LV_DATA её нет; уровни прибавляют */
+  W.reset();
+  ok('артефакты: в LV_DATA нет своей базы бесплатных обновлений', D.refresh.free === undefined);
+  const a18 = W.lvArt(D.art.size), a19 = W.lvArt(D.art.free);
+  if (!a18 || !a19) err.push('артефакты: нет a18 или a19 в данных Странника');
+  else {
+    const L19 = (W.S.wn && W.S.wn.art && W.S.wn.art[a19.id]) || 0;
+    eq('артефакты: бесплатных обновлений — база и уровень «Колокола»', W.lvFreeN(), a19.base + a19.step * Math.max(0, L19));
+    eq('артефакты: база ассортимента — сумма мест данных', D.slots.reduce((a, s) => a + s.n, 0), a18.base);
+    W.S.wn.art[a19.id] = 3; eq('артефакты: «Колокол» уровня 3', W.lvFreeN(), a19.base + a19.step * 3);
+    W.S.wn.art[a18.id] = 2; const plan = W.lvSlots(), n = plan.reduce((a, s) => a + s.n, 0);
+    eq('артефакты: «Свиток» уровня 2 — товаров', n, a18.base + a18.step * 2);
+    rules('витрина со «Свитком»', W.LV_SRV.roll(7, W.S.acc.cycle, plan), W.S.acc.cycle, plan);
+    W.LV_SRV.auto(); eq('артефакты: новая витрина — по «Свитку»', W.S.shop.length, n);
+    eq('артефакты: карточек на витрине', cards(view('витрина со «Свитком»')).length, n);
+  }
 });
 
 /* 7. UI-кит, карта экранов, сценарий, стили */

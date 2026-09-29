@@ -16,6 +16,11 @@
       полные — первыми, осколки по героям с суммой, прах, потрачено.
    6. Режим «Игрок»: на всех видах рулетки нет служебных слов (SERVICE из check_player_view.js), нет undefined и NaN;
       в режиме «Команда» пометка «шансы — демонстрация» на месте.
+   7. «Дорого-богато» (слово автора 29.09.2026): за окном и вкладкой — алтарь душ (RL_ART.altar или CSS), у входа — веер героев пула
+      в раме: шаг от середины — целые --d и --a, середина впереди; полный герой ленты и итога — в раме (рисунок RL_ART.frame или CSS),
+      осколок — стекло с лицом героя (shardGhost, class="hsg") в ленте, в итоге и в сводке. Честно (§1.2): у входа и в окне видны цена
+      прокрутки и шанс героя целиком, лист «Шансы» — ссылкой, пока лента стоит. Арт: пути RL_ART.ready лежат в assets/art, невыгруженные
+      (RL_ART.want без ready) в разметке не встречаются — битых картинок нет.
    Запуск: node tools/content-gen/screens/check_roulette.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -83,7 +88,8 @@ function load(o = {}) {
   const T = vm.runInContext(`({
     get S() { return S; }, set S(v) { S = v; },
     ACT, OV, FLOWS, KH, RS, RSI, render, initialState, setTeam, rsPool, rsCyc, rsHas, rsDustOf, fmt, EnLoot: window.EnLoot,
-    RL_DATA, RL_VIEW, RL_SRV, rlRoll, rlLand, rlReveal, rlFilm, rlBest, rlEase, rlGroups, rlCol,
+    RL_DATA, RL_VIEW, RL_SRV, rlRoll, rlLand, rlReveal, rlFilm, rlBest, rlEase, rlGroups, rlCol, rlPct,
+    RL_ART: typeof RL_ART !== 'undefined' ? RL_ART : null, rlCard: typeof rlCard === 'function' ? rlCard : null, RS_ART: typeof RS_ART !== 'undefined' ? RS_ART : null, KIT_EXTRA,
   })`, ctx);
   return { T, els, rootCls, game: () => (els.game ? els.game.innerHTML : '') };
 }
@@ -346,8 +352,11 @@ for (const [en, lack] of [[340, [10, 100]], [50, [1, 10, 100]], [100000, []]]) {
   const inDlg = [...dlg.matchAll(/data-a="([^"]+)"/g)].map(m => m[1]);
   if (inDlg.filter(a => a === 'rlspin').length !== 3) say('окно · воздух: кнопок прокрутки не три');
   if ((dlg.match(/type="checkbox" data-a="rlskip"/g) || []).length !== 1) say('окно · воздух: нет галочки «Пропустить анимацию»');
-  const extra = [...new Set(inDlg)].filter(a => !['rlspin', 'rlskip', 'close'].includes(a));
+  /* «Шансы» — ссылка на лист rlodds (§1.2: шансы видны там, где крутят); других действий нет */
+  const extra = [...new Set(inDlg)].filter(a => !['rlspin', 'rlskip', 'close', 'sheet'].includes(a));
   if (extra.length) say('окно · воздух: игроку видны лишние действия — ' + extra.join(', '));
+  if ([...dlg.matchAll(/data-a="sheet" data-v="([^"]*)"/g)].some(m => m[1] !== 'rlodds')) say('окно · воздух: лист из окна — не «Шансы»');
+  if (!/data-a="sheet" data-v="rlodds"/.test(dlg)) say('окно: нет ссылки «Шансы»');
   if (!acts.length || !/id="rlTrack"/.test(dlg) || !/id="rlMark"/.test(dlg)) say('окно · воздух: нет ленты или метки');
   if (!/Прокрутка —/.test(playerText(h))) say('окно · воздух: цена не видна');
 }
@@ -383,6 +392,7 @@ for (const [en, lack] of [[340, [10, 100]], [50, [1, 10, 100]], [100000, []]]) {
     const h = view(P, where + ' · крутится');
     if (!/id="rlTrack"/.test(h) || (h.match(/class="rl-card /g) || []).length !== F.cards.length) say(`${where}: карточек ленты в разметке не столько, сколько в ленте`);
     if (/Итог прокрутки|Итог · ×/.test(h)) say(`${where}: окно итога открыто, пока лента крутится`);
+    if (/data-a="sheet"/.test(h.slice(h.indexOf('rl-ov')))) say(`${where}: пока лента крутится, в окне есть ссылка на лист — окно ушло бы с ленты`);
     if (!/data-a="rlspin"[^>]*disabled/.test(h)) say(`${where}: кнопки прокрутки активны, пока лента крутится`);
     const s1 = snap(T);
     run(where + ' · нажатие посреди ленты', () => T.ACT.rlspin(`1:${next(T)}`));
@@ -446,6 +456,71 @@ for (const [en, lack] of [[340, [10, 100]], [50, [1, 10, 100]], [100000, []]]) {
   const op2 = spin(C, 10, 'без localStorage');
   if (C.T.S.rl.show !== op2) say('без localStorage: с галочкой итог не открылся сразу');
   view(C, 'без localStorage · сводка');
+}
+
+/* ================== 7. «дорого-богато»: алтарь, рамы, стекло осколка, честная строка, арт ================== */
+{
+  const A = T.RL_ART;
+  if (!A) say('нет RL_ART — арта Возрождения душ');
+  else {
+    for (const p of A.ready) if (!fs.existsSync(path.join(UI, 'assets', 'art', p))) say(`арт: ${p} в RL_ART.ready, а файла нет`);
+    for (const p of [A.altar, A.frame]) if (!A.ready.includes(p) && !A.want.includes(p)) say(`арт: ${p} ни в ready, ни в want`);
+    if (!Array.isArray(A.win) || A.win.length !== 4 || A.win.some(x => !Number.isInteger(x) || x < 0 || x >= 500)) say('арт: окно рамы RL_ART.win — не четыре целых доли');
+  }
+  const pend = A ? A.want.filter(p => !A.ready.includes(p)) : [];
+  const noPend = (h, where) => { for (const p of pend) if (h.includes(p)) say(`${where}: в разметке невыгруженный ${p} — будет битая картинка`); };
+  const honest = (h, where) => {
+    const t = playerText(h);
+    if (!/Прокрутка —/.test(t) || !t.includes(`герой целиком — ${T.rlPct(D.fullBp)}`)) say(`${where}: не видны цена прокрутки и шанс героя целиком (§1.2)`);
+  };
+  /* вход в сцене: веер героев пула — целые шаги от середины, середина впереди; честная строка; «К рулетке» и «Шансы» */
+  fresh(P, { skip: true });
+  const tab = view(P, 'алтарь · вкладка'), pool2 = T.rsPool(), fan = [...tab.matchAll(/<button class="rl-ef"[^>]*style="--d:(-?\d+);--a:(\d+);--z:(\d+)"/g)].map(m => ({ d: +m[1], a: +m[2], z: +m[3] }));
+  if (fan.length !== pool2.length) say(`алтарь: карточек веера ${fan.length}, героев пула ${pool2.length}`);
+  fan.forEach((x, i) => { if (x.d !== 2 * i - (fan.length - 1) || x.a !== Math.abs(x.d)) say(`алтарь: карточка ${i + 1} веера — шаг ${x.d}, ждали ${2 * i - (fan.length - 1)}`); });
+  if (fan.length && Math.max(...fan.map(x => x.z)) !== fan[Math.floor((fan.length - 1) / 2)].z && Math.max(...fan.map(x => x.z)) !== fan[Math.ceil((fan.length - 1) / 2)].z) say('алтарь: впереди не середина веера');
+  if (!/class="rl-scn[ "]/.test(tab)) say('алтарь: за вкладкой нет сцены алтаря');
+  if ((tab.match(/class="rl-fr"|class="rl-frc"/g) || []).length < pool2.length) say('алтарь: не у каждого героя веера рама');
+  honest(tab.slice(tab.indexOf('rl-entry')), 'алтарь · вкладка'); noPend(tab, 'алтарь · вкладка');
+  if (!/data-a="dlg" data-v="rl"/.test(tab) || !/data-a="sheet" data-v="rlodds"/.test(tab)) say('алтарь: нет «К рулетке» или «Шансы»');
+  /* окно: алтарь за окном, честная строка; лента — осколки стеклом с лицом, полные — в раме */
+  T.S.overlay = { t: 'rl', arg: '' };
+  const w = view(P, 'алтарь · окно'), dlg = w.slice(w.indexOf('rl-ov'));
+  if (!/class="rl-scn[ "]/.test(dlg)) say('окно: за окном нет сцены алтаря');
+  honest(dlg, 'окно'); noPend(w, 'окно');
+  const cards = [...dlg.matchAll(/<span class="rl-card (full|shard)[^"]*"[\s\S]*?(?=<span class="rl-card |<\/div><\/div><i class="rl-mark)/g)].map(m => ({ k: m[1], h: m[0] }));
+  if (!cards.length) say('окно: не нашлось карточек ленты');
+  for (const c of cards) {
+    if (c.k === 'shard' && !c.h.includes('class="hsg"')) { say('лента: осколок — не стекло с лицом (shardGhost)'); break; }
+    if (c.k === 'full' && !/class="rl-fr"|class="rl-frc"/.test(c.h)) { say('лента: полный герой без рамы'); break; }
+  }
+  if (!cards.some(c => c.k === 'full')) {   // полный в ленте покоя может не выпасть — проверим саму карточку
+    const f = T.rlCard({ id: pool2[0].id, full: true }, '');
+    if (!/class="rl-fr"|class="rl-frc"/.test(f)) say('лента: полный герой без рамы');
+  }
+  /* итог: одна прокрутка осколков и полного — стекло и рама; сводка ×10 — осколки строками со стеклом */
+  T.S.rl.demoFull = true; spin(P, 1, 'рама · полный');
+  const r1 = resOf(view(P, 'рама · полный · итог'));
+  if (!/class="rl-big full"[\s\S]*?class="rl-fr"|class="rl-big full"[\s\S]*?class="rl-frc"/.test(r1)) say('итог: полный герой без рамы');
+  T.S.rl.show = '';
+  let sh = null;
+  for (let k = 0; k < 20 && !sh; k++) { const op = spin(P, 1, 'стекло · осколки'); const R = T.S.rl.srv.ops[op]; if (R && !R.list[0].full && !T.rsHas(T.RSI[R.list[0].id])) sh = R; }
+  if (!sh) say('итог: за 20 прокруток не выпали осколки героя не из коллекции');
+  else if (!/class="rl-big shard"[\s\S]*?class="hsg"/.test(resOf(view(P, 'стекло · итог')))) say('итог: осколки — не стекло с лицом');
+  const op10 = spin(P, 10, 'стекло · сводка'), R10 = T.S.rl.srv.ops[op10], h10 = resOf(view(P, 'стекло · сводка'));
+  if (R10 && T.rlGroups(R10).shards.length && (h10.match(/class="rl-gs"><span class="hsg"/g) || []).length !== T.rlGroups(R10).shards.length) say('сводка: не у каждой строки осколков стекло с лицом');
+  noPend(h10, 'сводка');
+  /* потолок доблести у входа — по циклу (RS.srcInfo.roulette.maxByC, ADR-0030, п. 5а) */
+  const I = T.RS.srcInfo.roulette;
+  if (I && I.maxByC) for (let c = 2; c <= 6; c++) {
+    fresh(P, { cyc: c, skip: true }); const M = I.maxByC[c]; if (!M) continue;
+    const want = M[0] === M[1] ? `доблесть до ${M[0]}` : `доблесть ${M[0]}–${M[1]}`, h = view(P, `алтарь · цикл ${c}`);
+    if (!playerText(h.slice(h.indexOf('rl-eh'))).includes(want)) say(`алтарь · цикл ${c}: у входа не «${want}»`);
+  }
+  /* раздел UI-кита «Возрождение душ · рулетка» рисуется без исключений, undefined и NaN */
+  const kit = T.KIT_EXTRA.find(x => { try { return x.html().includes('<h3>Возрождение душ · рулетка</h3>'); } catch (_) { return false; } });
+  if (!kit) say('UI-кит: нет раздела «Возрождение душ · рулетка»');
+  else { const h = run('UI-кит · рулетка', () => kit.html()) || ''; if (/undefined|NaN|\[object /.test(h)) say('UI-кит · рулетка: undefined, NaN или [object'); if (!/class="hsg"/.test(h) || !/class="rl-fr"|class="rl-frc"/.test(h)) say('UI-кит · рулетка: нет стекла осколка или рамы'); }
 }
 
 /* ================== 6. режим «Игрок» и «Команда» на всех видах рулетки ================== */

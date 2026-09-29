@@ -99,10 +99,18 @@ if (!D || !A) { say('event.js: нет window.EN_EVENT или window.EnEvent'); d
   if (A.pts(D, 'floor', 0, { race }) !== 0 || A.pts(D, 'нет', 5, { race }) !== 0) say('алгоритм: очки за пустое или неизвестное дело');
   const big = Array.from({ length: 200 }, () => ({ r: 7, c: 6, lim: 5, valor: 5 }));
   if (A.rp1Bp(D, big) !== D.rp1.capBp) say('алгоритм: сила коллекции выше потолка');
-  if (A.rp1Bp(D, [{ r: 2, c: 1, lim: 0, valor: 3 }]) !== 0) say('алгоритм: сила коллекции без пробитого первого предела');
+  /* правило collRp прототипа (index.html, §10.3): предел не пройден и доблести нет — 0; не пройденный заново предел держит прошлый круг —
+     2^(доблесть − 1), если был пройден до доблести (keep); пройденный — 2^доблесть */
+  const R1 = D.rp1, one = h => A.rp1Bp(D, [h]);
+  if (one({ r: 2, c: 1, lim: 0, valor: 0 }) !== 0) say('алгоритм: сила коллекции без пробитого первого предела');
+  if (one({ r: 2, c: 1, lim: 0, valor: 3 }) !== R1.perBp * 2 * 1 * 4) say('алгоритм: доблесть без пройденного заново предела — не прошлый круг 2^(доблесть − 1)');
+  if (one({ r: 2, c: 1, lim: 0, valor: 3, keep: 0 }) !== 0) say('алгоритм: предел не был пройден и до доблести — а сила есть');
+  if (one({ r: 3, c: 2, lim: 1, valor: 2 }) !== R1.perBp * 3 * 2 * 4) say('алгоритм: пройденный предел — не круг 2^доблесть');
+  if (A.rpHero(D, { r: 3, c: 2, lim: 2, valor: 1, keep: 1 }, 2) !== R1.perBp * 3 * 2 * 2 || A.rpHero(D, { r: 3, c: 2, lim: 1, valor: 1, keep: 1 }, 2) !== 0) say('алгоритм: РП2 — не по пределу 2');
   const cp = A.clanPlanks(D, [2, 2, 3]);
-  const want = D.clanFrom.map(k => D.planks[2][k - 1] * 2 + D.planks[3][k - 1]);
-  if (JSON.stringify(cp) !== JSON.stringify(want)) say(`алгоритм: клановые планки ${cp} вместо суммы личных ${want}`);
+  const want = D.clanX.map(x => Math.floor(D.planks[2][0] * x / 100) * 2 + Math.floor(D.planks[3][0] * x / 100));
+  if (JSON.stringify(cp) !== JSON.stringify(want)) say(`алгоритм: клановые планки ${cp} вместо суммы долей первых порогов ${want}`);
+  if (D.clanX.length !== 3 || D.clanX[2] * 2 !== D.clanX[1] * 3) say(`данные: третья клановая планка — не ×1,5 второй (${D.clanX})`);
   const anc = A.anchorsOf(D.top.players, D.planks[2][4]);
   let last = 1;
   for (let v = anc[0][1] * 2; v > 0; v = Math.floor(v * 9 / 10)) { const p = A.place(anc, v); if (!Number.isInteger(p) || p < last) { say(`алгоритм: место ${p} при ${v} очках`); break; } last = p; }
@@ -177,8 +185,9 @@ function suite() {
   reset('Эльфы', 2);
   if (!E() || E().cyc !== 2 || E().race !== 'Эльфы') fail('состояние: S.event не заведён под неделю и цикл');
   if (E().pts !== sumBy()) fail(`состояние: очки ${E().pts}, а по источникам — ${sumBy()}`);
-  const k0 = A.reached(P(), E().pts);
-  if (k0 !== LBX.modes.event.typical.free.me) fail(`демо: взято планок ${k0}, в «Дарах» у обычного — ${LBX.modes.event.typical.free.me}`);
+  /* демо — четвёртый день недели (ADR-0031, п. 17): планок на одну меньше типичной недели обычного из «Даров» или уже столько же */
+  const k0 = A.reached(P(), E().pts), kt = LBX.modes.event.typical.free.me;
+  if (k0 < kt - 1 || k0 > kt) fail(`демо: взято планок ${k0}, середина недели обычного — ${kt - 1}–${kt}`);
   let p0 = E().pts, r = X.srv.credit('проверка:1', 'floor', 10); out.credits++;
   if (!r.ok || !isInt(r.pts) || E().pts !== p0 + r.pts || r.pts !== A.pts(D, 'floor', 10, { race: 'Эльфы', rp1: X.rp1() })) fail(`сервер: начисление за этажи — ${JSON.stringify(r)}`);
   p0 = E().pts; r = X.srv.credit('проверка:1', 'floor', 10);
@@ -186,14 +195,17 @@ function suite() {
   r = X.srv.credit('проверка:2', 'нет-такого', 3); if (r.refuse !== 'unit' || E().pts !== p0) fail('сервер: неизвестная единица начислена');
   r = X.srv.credit('проверка:3', 'floor', 1.5); if (r.refuse !== 'unit') fail('сервер: дробное количество принято');
   /* Лига — одно правило экранов Лиги, контрактов и События (leagueOpen: данные Арены EN_ARENA.league — цикл II и 15 разных героев):
-     своего цикла у Событий нет. У демо Лига закрыта — матч не засчитан; добрали героев до порога — засчитан и в цикле II */
+     своего цикла у Событий нет. У демо Лига открыта — 15 героев обычный набирает к 9-му дню цикла II (ADR-0031, п. 17), матчи Лиги
+     в счёте недели. Коллекция из пятерых отряда — Лига закрыта, матч не засчитан; вернули героев — засчитан и в цикле II */
   const LR = window.EN_ARENA && EN_ARENA.league, LU = D.units.leagueWin;
   if (!LR || (LU.from && LU.from !== LR.from) || LU.gate !== 'league') fail(`данные: матч Лиги в Событии не по правилу Арены — цикл ${LU.from}, условие ${LU.gate}`);
-  if (leagueOpen()) fail('демо: Лига уже открыта — героев не меньше порога');
+  if (!leagueOpen()) fail('демо: Лига закрыта — у обычного к 11-му дню цикла II уже 15 героев');
+  if (!E().cnt.leagueWin) fail('демо: Лига открыта, а матчей Лиги в счёте недели нет');
+  const own0 = S.rs.owned; S.rs.owned = {};
+  if (leagueOpen()) fail('Лига открыта и у коллекции из пятерых');
   p0 = E().pts; r = X.srv.credit('проверка:4', 'leagueWin', 1);
   if (r.refuse !== 'gate' || E().pts !== p0) fail(`сервер: матч Лиги засчитан при закрытой Лиге — ${JSON.stringify(r)}`);
-  if (E().cnt.leagueWin) fail('демо: матчи Лиги в счёте недели при закрытой Лиге');
-  for (const h of RS.heroes.filter(x => !rsOld(x))) { if (leagueOpen()) break; S.rs.owned[h.id] = { lvl: 0, lim: 0, valor: 0, how: 'gold' }; }
+  S.rs.owned = own0;
   if (!leagueOpen()) fail('Лига не открылась и с 15 героями');
   r = X.srv.credit('проверка:4', 'leagueWin', 1); out.credits++;
   if (!r.ok || r.pts !== A.pts(D, 'leagueWin', 1, { race: 'Эльфы', rp1: X.rp1() }) || E().pts !== p0 + r.pts) fail(`сервер: победа в Лиге в цикле II при открытой Лиге — ${JSON.stringify(r)}`);
@@ -207,7 +219,10 @@ function suite() {
   if (r.pts !== Math.floor(D.units.ritualHalf.price * 12 * D.weeks['Эльфы'].accent.bp * (D.bp + X.rp1()) / (D.bp * D.bp))) fail('сервер: акцент недели не применён');
   /* взятая планка */
   const nx = P().find(x => x > E().pts);
-  if (nx) { r = X.srv.credit('проверка:9', 'floor', nx - E().pts + 1); out.credits++; if (!r.plank) fail('сервер: взятая планка не отмечена'); }
+  /* победы у рунного стража — без дневного потолка: этажи и элиты под потолком спуска (ADR-0031, п. 12) */
+  if (nx) { r = X.srv.credit('проверка:9', 'guard', Math.ceil((nx - E().pts + 1) / D.units.guard.price)); out.credits++; if (!r.plank) fail('сервер: взятая планка не отмечена'); }
+  /* потолок спуска: этажей в день — не больше дневного потолка */
+  if (D.caps.floor != null) { const was = E().srv.day.used.floor || 0; r = X.srv.credit('проверка:9а', 'floor', D.caps.floor + 50); out.credits++; if (!r.ok || r.n !== Math.max(0, D.caps.floor - was) || r.cut !== D.caps.floor + 50 - r.n) fail(`сервер: потолок этажей — засчитано ${r.n}`); }
   /* отсечка: приём закрыт, ничего не меняется */
   p0 = E().pts; S.week.left = 0; r = X.srv.credit('проверка:10', 'floor', 5); if (r.refuse !== 'closed' || E().pts !== p0) fail('сервер: после отсечки очки начислены');
   /* до второго цикла — ничего */
@@ -363,6 +378,20 @@ function suite() {
       S.overlay = { t: 'evsrc', arg: 'нет-такого' }; draw(`${key} · чужой источник`);
       S.overlay = { t: 'evrew', arg: 'чужая' }; draw(`${key} · чужая вкладка`);
     } catch (x) { fail(key + ': исключение — ' + (x && x.stack ? x.stack.split('\n').slice(0, 3).join(' | ') : x)); }
+  }
+  /* место в Событии — одно число (ADR-0031, п. 17): S.ranks сразу после заведения, экран События, строка Недели и лист «Рейтинг» */
+  {
+    S = initialState(); S.overlay = null;
+    const r0 = (S.ranks.find(x => x[0] === 'Событие') || [])[1];
+    if (!isInt(r0) || r0 < 1) fail(`место: в S.ranks при заведении — ${r0}`);
+    X.sync();
+    if (r0 !== X.place()) fail(`место: в S.ranks при заведении ${r0}, на экране События ${X.place()}`);
+    if (W.state('event', 'now').place !== r0) fail(`место: в «Неделе» ${W.state('event', 'now').place}, в S.ranks ${r0}`);
+    S.route = 'event'; S.overlay = { t: 'rank', arg: 'Событие' };
+    const h = draw('место · рейтинг');
+    if (!h.includes(`<b class="num">#${fmt(r0)}</b><small>место</small>`)) fail(`место: в листе «Рейтинг» не ${r0}`);
+    const p0 = E().pts; X.srv.credit('проверка:место', 'floor', 400); out.credits++;
+    if ((S.ranks.find(x => x[0] === 'Событие') || [])[1] !== X.place() || X.place() === null || (E().pts > p0 && X.place() > r0)) fail('место: после очков S.ranks разошёлся с местом События');
   }
   /* после отсечки, без клана и в режиме «Команда» */
   reset('Эльфы', 2); S.week.left = 0; let h = draw('после отсечки'); if (!h.includes('Приём закрыт')) fail('после отсечки не видно, что приём закрыт');

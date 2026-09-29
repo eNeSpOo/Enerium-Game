@@ -287,11 +287,12 @@ reset();
     if (!inN) say('условие «в клане»: в клане задание «Атаковать врагов клана» не выпало ни разу за 60 дней');
   }
   /* условие «Лига открыта» — то же правило, что на экране Лиги: 15 разных героев из данных Арены (EN_ARENA.league), а не свой порог.
-     У демо героев меньше — заданий Лиги нет; докупили героев до порога — задания Лиги выпадают */
+     Коллекция из пятерых — заданий Лиги нет; докупили героев до порога — задания Лиги выпадают */
   const L = vm.runInContext('window.EN_ARENA && EN_ARENA.league', P.ctx);
   /* до порога — купить героев состава (пробуждённые копии героев прототипа не в счёт: коллекция считает разных героев) */
   const leagueDays = full => {
     reset(); S().acc.cycle = Math.max(S().acc.cycle, L.from);
+    if (!full) S().rs.owned = {};   // коллекция из пятерых отряда: у демо (11-й день цикла II, ADR-0031, п. 17) героев уже 16
     const pool = () => vm.runInContext('SQ.pool().length', P.ctx);
     if (full) for (const h of vm.runInContext('RS.heroes.filter(h => !rsOld(h))', P.ctx)) { if (pool() >= L.heroes) break; if (!S().rs.owned[h.id]) S().rs.owned[h.id] = { lvl: 0, lim: 0, valor: 0, how: 'gold' }; }
     if ((pool() >= L.heroes) !== full) return -1;

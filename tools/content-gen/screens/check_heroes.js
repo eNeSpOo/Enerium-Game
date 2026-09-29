@@ -2,10 +2,16 @@
    1. index.html подключает heroes.css и heroes.js после model.js; heroes.js компилируется и в CRLF. Прежнего кода в index.html нет: плитки
       с кристаллом стихии в углу (el(…, true) в плитке), экрана heroes(), колонок «За души», прежних sq, sqBM и листа prep; .hc — в heroes.css.
    2. Плитка — одна анатомия: кристалл редкости (--rico, ADR-0027) и data-r; значков доблести ровно по личному максимуму, светятся
-      взятые; пять отметок рунного предела и уровень — у героя аккаунта; класс значком; у героя состава вне коллекции — цикл. Кристалла
-      стихии в плитке нет. Строки — кристалл у лица рисует CSS (.rs-av::after с --rico).
-   3. Шапка карточки героя аккаунта: боевая мощь, доблесть «текущая / максимальная», уровень «N / потолок» и пять отметок предела,
-      кристалл редкости у названия редкости, класс значком. У героя состава вне коллекции — потенциал доблести.
+      взятые; у героя аккаунта — рунные пределы двумя зеркальными столбами по пять камней по бокам портрета (горят пройденные,
+      следующий — по запасам) и уровень; класс значком; у героя состава вне коллекции — цикл и никаких камней. Кристалла стихии в плитке
+      нет, прежних отметок .limits нет. Строки — кристалл у лица рисует CSS (.rs-av::after с --rico).
+   2б. Рунные пределы (слово автора 29.09.2026 — «по бокам» героя): на потолке уровня следующий камень тлеет, с рунами — пульсирует,
+      на плитке и в шапке одинаково; у чужого героя — только горящие и погасшие; UI-кит задаёт состояние явно. Вёрстка плитки — расчётом
+      по стилям на ширинах коллекции, редактора отряда и UI-кита: камень не мельче 4,5 px, не налезает на кристалл, доблесть, соседей
+      и строку уровня, имени остаётся не меньше 44 px.
+   3. Шапка карточки героя аккаунта: боевая мощь, доблесть «текущая / максимальная», уровень «N / потолок», лицо между двумя столбами
+      рунных камней с подписью предела, кристалл редкости у названия редкости, класс значком. У героя состава вне коллекции —
+      потенциал доблести и лицо без камней.
    4. Купленный герой состава — герой аккаунта: запись коллекции — 0 ур., 0 РП, 0 Добл; H(id) находит его в форме S.heroes; «Мои»
       показывают его плитку, карточку с развитием на всех вкладках; уровень поднимается за дух и пишется в запись коллекции; БМ — целое
       по §6. У героя Эхо — набор из echo-foes.js.
@@ -13,12 +19,19 @@
       C × √(УВС × ЭЗ) по карте ядра сходится у героев, после уровня и со слоями талисманов и снаряжения; одно число на плитке
       «Пятёрки сильнейших» (все герои аккаунта), в шапке, в библиотеке отрядов и листе выбора отряда; соперник Арены, цель Эхо
       и цель клана — та же формула, C одна у героев, бестиария и клана; у клана видна мощь отряда атаки.
-   5. «Призыв → За души» (правила воздуха): главное — вход рулетки с лицами героев пула и «К рулетке»; отряд Эхо недели и каталог праха —
-      входами, списки — в листах hrecho и hrdust; в самой вкладке строк-списков нет. Каталог праха: осколок за прах и пробуждение из листа.
-   5б. Дыра праха закрыта (слово автора 29.09.2026): правило в данных — rules.dustSrc без героев Эхо; каталог праха на всех циклах без
+   5. «Призыв → За души» (правила воздуха): сцена алтаря (hrSoulsView) — вход рулетки с героями пула и «К рулетке»; отряд Эхо недели —
+      входом с листом hrecho, лавка праха — отдельным окном dust; в самой вкладке строк-списков нет.
+   5а. Лавка праха — окно (слово автора 29.09.2026: «магазин праха… отдельным окном»): витрина героев пула доступных циклов — стекло
+      с лицом, цена осколка и доля; выбранный — справа. Осколки за прах — 1, 10 и до комплекта — и пробуждение за души — операции
+      SOUL_SRV с номером: списано ровно цена, повтор номера ничего не меняет, отказы (нехватка, лишнее, герой Эхо) — без расхода и словами.
+      Пробуждение — подтверждение в том же окне, затем окно пробуждения; герой — 0 ур., 0 РП, 0 Добл, лишние осколки — в прах (§15.2).
+      Вёрстка окна считается на 932 × 430 и 844 × 390: две строки витрины и выбранный герой входят без прокрутки окна.
+   5б. Дыра праха закрыта (слово автора 29.09.2026): правило в данных — rules.dustSrc без героев Эхо; лавка праха на всех циклах без
       героев Эхо и с объяснением; ACT.dustbuy отказывает героям Эхо словами и ничего не списывает; в листе отряда недели — «Пробудить» за
-      души и никакого праха, лишние осколки — в прах (§15.2); в запасах у героя Эхо нет «Осколка» за прах. Герой, которого собирают, —
-      призрачный осколок (shardGhost).
+      души и никакого праха, лишние осколки — в прах (§15.2); в запасах у героя Эхо нет «Осколка» за прах.
+   5г. Осколок героя по образцу автора (shardGhost): всегда стекло с лицом — class="hsg", лицо — портрет героя, у героя без портрета —
+      силуэт класса, не инициалы; лицо не гаснет с долей — доля в --s и заживающих трещинах --cr, полный комплект — data-full.
+      Арт: выгруженные пути (ART_ICONS.ready, DU_ART.ready, RS_ART) лежат в assets/art; слои стекла — все три или ни одного.
    5в. «За Энериум» — витрина: пятеро на ступенях цены по местам, цены растут и видны; входы всех сетов; сет-бонус строкой и листом со
       ступенями по сумме доблестей, N ступеней и пятерыми; кнопка покупки с номером и ценой. Покупка — подтверждение с остатком,
       одна операция DN_SRV (списано ровно цена, герой — 0 ур., 0 РП, 0 Добл), окно получения и «сразу итог», повтор номера ничего
@@ -37,7 +50,8 @@ const say = m => { if (err.length < 60) err.push(m); else if (err.length === 60)
 function done() {
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
   console.log(`«Герои»: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; плиток ${cnt.tiles}, шапок ${cnt.heads}, циклов «Призыва» ${cnt.cycles}; мощь сверена с формулой §6 ${cnt.bm} раз.`);
-  console.log('Проверка пройдена: плитка, строка и карточка героя — с одобренным кристаллом, доблестью, пределом, уровнем и классом; «За души» — рулетка крупно, остальное листами; героев Эхо прахом не собрать; «За Энериум» — ступени цены, сет-бонус по ступеням, покупка с номером и окно получения; в режиме «Игрок» служебного нет.');
+  for (const x of cnt.lay || []) console.log('рунные камни: ' + x);
+  console.log('Проверка пройдена: плитка, строка и карточка героя — с одобренным кристаллом, доблестью, пределом рунными камнями по бокам портрета, уровнем и классом; «За души» — сцена алтаря с рулеткой, отряд Эхо входом, лавка праха окном с операциями с номером; осколок — стекло с лицом героя; героев Эхо прахом не собрать; «За Энериум» — ступени цены, сет-бонус по ступеням, покупка с номером и окно получения; в режиме «Игрок» служебного нет.');
   process.exit(0);
 }
 
@@ -59,10 +73,12 @@ const main = scripts.filter(s => !s.src).map(s => s.code).join('\n');
   const OLD = [[/function heroes\(\)/, 'экран heroes()'], [/function heroCard\(/, 'прежняя плитка heroCard'], [/function rsCard\(/, 'прежняя плитка rsCard'],
     [/function squadsView\(/, 'прежние отряды squadsView'], [/function rsRouletteCol\(|function rsEchoCol\(|function rsDustCol\(/, 'колонки «За души»'],
     [/const sq = id =>|const sqBM =/, 'прежние sq, sqBM'], [/\n  prep\(o\) \{/, 'прежний лист prep'], [/\n\.hc\{/, 'стили .hc в index.html'],
-    [/\n  (?:psq|esq|sqadd|sqnew)\(/, 'прежние действия отрядов'], [/\n  spin\(\) \{/, 'прежняя прокрутка «по очереди»']];
+    [/\n  (?:psq|esq|sqadd|sqnew)\(/, 'прежние действия отрядов'], [/\n  spin\(\) \{/, 'прежняя прокрутка «по очереди»'],
+    [/\n  (?:dustbuy|activate|activatedo)\(v\) \{/, 'прежние осколок за прах и пробуждение без номера операции']];
   for (const [re, what] of OLD) if (re.test(main) || (what.startsWith('стили') && re.test(html))) say(`index.html: остался ${what}`);
   const souls = main.match(/function rsSoulsView\(\)[\s\S]*?\n\}/);
-  if (!souls || !/rlCol\(\)/.test(souls[0]) || !/hrSoulsSide\(\)/.test(souls[0])) say('index.html: «За души» (rsSoulsView) не собирает вход рулетки rlCol и входы hrSoulsSide');
+  if (!souls || !/hrSoulsView\(\)/.test(souls[0])) say('index.html: «За души» (rsSoulsView) не собирает сцену алтаря hrSoulsView');
+  if (!/function hrSoulsView\(\)[\s\S]*?rlCol\(\)[\s\S]*?hrSoulsSide\(\)/.test(js)) say('heroes.js: сцена алтаря hrSoulsView не собирает вход рулетки rlCol и входы hrSoulsSide');
   if (!/\.hc \.cr\{[^}]*var\(--rico\)/.test(css)) say('heroes.css: у плитки нет кристалла редкости --rico');
   if (!/\.rs-av::after\{[^}]*var\(--rico\)/.test(css)) say('heroes.css: у лица в строке нет кристалла редкости --rico');
   if (/\.hc[^{]*\{[^}]*inset 0 -3px 0/.test(css)) say('heroes.css: у плитки осталась полоска редкости снизу вместо кристалла');
@@ -102,12 +118,16 @@ function load() {
     get S() { return S; }, set S(v) { S = v; },
     ACT, OV, SCREENS, FLOWS, KH, RS, RSI, EB, INV, H, SQ, render, initialState, setTeam, rsPool, rsCyc, rsHas, rsFrom, rsWeek, fmt, RAR, ROMAN,
     heroCard, rsCard, heroHead, rsHead, hrV, hrMine, hrOwn, hrDustCat, rsRow, heroDetail, rsSetWeek, sq, HR_DATA,
+    hrTile, hrHead, BAG, heroDev: typeof heroDev === 'function' ? heroDev : null, rpNext: typeof rpNext === 'function' ? rpNext : null,
     rsDustable, rsDustOf, rsTiers, dnSets, dnSet, DN_SRV, DN_ART, zpCardHero: typeof zpCardHero === 'function' ? zpCardHero : null,
-    ART_READY: typeof ART_ICONS !== 'undefined' && ART_ICONS.ready.includes(ART_ICONS.frame) && ART_ICONS.ready.includes(ART_ICONS.mask),
+    ART_ICONS: typeof ART_ICONS !== 'undefined' ? ART_ICONS : null, shardGhost: typeof shardGhost === 'function' ? shardGhost : null,
+    DU_ART: typeof DU_ART !== 'undefined' ? DU_ART : null, DU_VIEW: typeof DU_VIEW !== 'undefined' ? DU_VIEW : null, SOUL_SRV: typeof SOUL_SRV !== 'undefined' ? SOUL_SRV : null,
+    RS_ART: typeof RS_ART !== 'undefined' ? RS_ART : null, rsShardPrice, duCat: typeof duCat === 'function' ? duCat : null, hrSoulsView: typeof hrSoulsView === 'function' ? hrSoulsView : null, KIT_EXTRA,
     BM: typeof BM !== 'undefined' ? BM : null, BM_SRC0: typeof BM_SRC0 !== 'undefined' ? BM_SRC0 : null, bmInit0: typeof bmInit0 === 'function' ? bmInit0 : null,
     BF: window.EN_BIOME_FOES || null, CLAN: window.EN_CLAN || null, EC: window.EnClan || null, AD: window.EN_ARENA || null, ARU: window.EN_ARENA_UI || null, ECHO: window.EN_ECHO || null,
     TB: typeof TB !== 'undefined' ? TB : null, TL_SRV: typeof TL_SRV !== 'undefined' ? TL_SRV : null, tlMul: typeof tlMul === 'function' ? tlMul : null, tlWhy: typeof tlWhy === 'function' ? tlWhy : null,
     EQ_SRV: typeof EQ_SRV !== 'undefined' ? EQ_SRV : null, eqMulOf: typeof eqMulOf === 'function' ? eqMulOf : null, eqWornList: typeof eqWornList === 'function' ? eqWornList : null,
+    collRp, collHero, collPct, collRule, EV: window.EN_EV || null,
   })`, ctx);
   return { T, els, rootCls, game: () => (els.game ? els.game.innerHTML : '') };
 }
@@ -135,7 +155,19 @@ const tilesOf = h => [...h.matchAll(/<button class="hc[^"]*"[\s\S]*?<\/button>/g
 const ovOf = h => { const i = h.indexOf('<div class="ov'); return i < 0 ? '' : h.slice(i); };
 const count = (s, re) => (s.match(re) || []).length;
 const starsOf = t => { const m = t.match(/<span class="stars[^"]*"[^>]*>([\s\S]*?)<\/span>/); return m ? { all: count(m[1], /<i/g), on: count(m[1], /<i class="on"/g) } : null; };
-const limsOf = t => { const m = t.match(/<span class="limits"[^>]*>([\s\S]*?)<\/span>/); return m ? { all: count(m[1], /<i/g), on: count(m[1], /<i class="on"/g) } : null; };
+/* рунные пределы — два столба камней по бокам портрета (знак — screens/hero-dev.js): kind t — плитка, h — шапка; side l и r;
+   st — состояния камней I…V: on, off, wait, ready */
+const postsOf = (t, kind) => [...t.matchAll(/<span class="rp (t|h) (l|r)" aria-hidden="true">([\s\S]*?)<\/span>/g)].filter(m => !kind || m[1] === kind)
+  .map(m => ({ kind: m[1], side: m[2], st: [...m[3].matchAll(/<i class="rp-s (on|off|wait|ready)"><\/i>/g)].map(x => x[1]), n: count(m[3], /<i /g) }));
+const TOP = () => T.INV.hero.capByLim.length - 1;
+/* два зеркальных столба по TOP камней: горят ровно lim, следующий — nx или погасший, дальше — погасшие */
+function checkPosts(t, where, kind, lim, nx) {
+  const P = postsOf(t, kind);
+  if (P.length !== 2 || P[0].side !== 'l' || P[1].side !== 'r') { say(`${where}: столбов рунных камней ${P.length} — ждали два, слева и справа`); return; }
+  const want = Array.from({ length: TOP() }, (_, k) => k < lim ? 'on' : k === lim && nx ? nx : 'off').join(' ');
+  for (const p of P) if (p.n !== TOP() || p.st.join(' ') !== want) say(`${where}: столб ${p.side === 'l' ? 'слева' : 'справа'} — «${p.st.join(' ')}», ждали «${want}»`);
+  if (/class="limits"/.test(t)) say(`${where}: остались прежние отметки .limits`);
+}
 
 /* ================== 2. плитка ================== */
 function checkTile(t, where, x) {
@@ -147,18 +179,23 @@ function checkTile(t, where, x) {
   if (!st || st.all !== x.maxV || st.on !== x.valor) say(`${where}: доблесть на плитке ${st ? st.on + ' из ' + st.all : 'нет'}, ждали ${x.valor} из ${x.maxV}`);
   if (!/icons\/cls-[a-z]+\.png/.test(t)) say(`${where}: у плитки нет значка класса`);
   if (x.own) {
-    const L = limsOf(t);
-    if (!L || L.all !== 5 || L.on !== x.lim) say(`${where}: рунный предел на плитке ${L ? L.on + ' из ' + L.all : 'нет'}, ждали ${x.lim} из 5`);
+    checkPosts(t, where, 't', x.lim, x.nx || '');
+    if (!/^<button class="hc rpp[ "]/.test(t)) say(`${where}: у плитки с пределами нет отступа имени от камней (.rpp)`);
     if (!new RegExp(`<small>ур\\.</small><b class="num">${x.lvl}</b>`).test(t)) say(`${where}: на плитке нет уровня ${x.lvl}`);
-  } else if (!t.includes(`цикл ${T.ROMAN[x.c]}`)) say(`${where}: у героя вне коллекции нет цикла на плитке`);
+  } else {
+    if (!t.includes(`цикл ${T.ROMAN[x.c]}`)) say(`${where}: у героя вне коллекции нет цикла на плитке`);
+    if (postsOf(t).length || / rpp[ "]/.test(t)) say(`${where}: у героя вне коллекции — рунные камни, а пределов у него нет`);
+  }
 }
+const nxOf = h => (h && T.rpNext ? T.rpNext(h) : '');
 /* «Мои»: каждый герой аккаунта */
 fresh();
 T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'mine';
 {
-  const h = view('коллекция · мои'), tiles = tilesOf(h);
-  if (tiles.length !== T.S.heroes.length) say(`«Мои»: плиток ${tiles.length}, героев ${T.S.heroes.length}`);
-  T.S.heroes.forEach((x, i) => { const t = tiles.find(y => y.includes(`data-v="${x.id}"`)); if (!t) say(`«Мои»: нет плитки ${x.name}`); else checkTile(t, `«Мои» · ${x.name}`, { r: x.r, maxV: x.maxV, valor: x.valor, own: true, lim: x.lim, lvl: x.lvl }); });
+  /* герои аккаунта — отряд прототипа и купленные: у демо (11-й день цикла II, ADR-0031, п. 17) их 16 */
+  const h = view('коллекция · мои'), tiles = tilesOf(h), mineH = T.hrMine();
+  if (tiles.length !== mineH.length) say(`«Мои»: плиток ${tiles.length}, героев ${mineH.length}`);
+  mineH.forEach((x, i) => { const t = tiles.find(y => y.includes(`data-v="${x.id}"`)); if (!t) say(`«Мои»: нет плитки ${x.name}`); else checkTile(t, `«Мои» · ${x.name}`, { r: x.r, maxV: x.maxV, valor: x.valor, own: true, lim: x.lim, lvl: x.lvl, nx: nxOf(x) }); });
   if (/<span class="bm"/.test(tiles.join(''))) say('«Мои»: на плитке коллекции боевая мощь — лишнее число');
 }
 /* «Все герои»: весь состав — по одной отрисовке на фильтр цикла */
@@ -169,7 +206,7 @@ for (let c = 1; c <= 6; c++) {
   for (const x of list) {
     const t = tiles.find(y => y.includes(`data-v="${x.id}"`)); if (!t) { say(`«Все»: нет плитки ${x.n}`); continue; }
     const v = T.hrV(x);
-    checkTile(t, `«Все» · ${x.n}`, { r: v.r, maxV: v.maxV, valor: v.valor, own: v.own, lim: v.lim, lvl: v.lvl, c: x.c });
+    checkTile(t, `«Все» · ${x.n}`, { r: v.r, maxV: v.maxV, valor: v.valor, own: v.own, lim: v.lim, lvl: v.lvl, c: x.c, nx: v.acc ? nxOf(v.acc) : '' });
   }
 }
 /* строки: у каждой строки героя — редкость на кнопке (кристалл у лица рисует CSS) */
@@ -190,7 +227,8 @@ for (const x of T.S.heroes) {
     if (!/icons\/power\.png/.test(top) || !top.includes(T.fmt(x.bm))) say(`шапка · ${x.name}: нет боевой мощи`);
     if (!top.includes(`<small class="num">${x.valor} / ${x.maxV}</small>`)) say(`шапка · ${x.name}: нет доблести «${x.valor} / ${x.maxV}»`);
     if (!top.includes(`<b class="num">${x.lvl}</b><small class="faint num">/ ${x.cap}</small>`)) say(`шапка · ${x.name}: нет уровня «${x.lvl} / ${x.cap}»`);
-    const L = limsOf(top); if (!L || L.all !== 5 || L.on !== x.lim) say(`шапка · ${x.name}: нет пяти отметок предела`);
+    checkPosts(top, `шапка · ${x.name}`, 'h', x.lim, nxOf(x));
+    if (!new RegExp(`<div class="hd-rp" role="img" aria-label="Рунный предел ${x.lim} из ${TOP()}"`).test(top)) say(`шапка · ${x.name}: лицо не в раме рунных камней или без подписи «Рунный предел ${x.lim} из ${TOP()}»`);
     if (!/icons\/cls-[a-z]+\.png/.test(top)) say(`шапка · ${x.name}: нет значка класса`);
   }
 }
@@ -199,7 +237,76 @@ for (const x of T.S.heroes) {
   fresh(); T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'all'; T.S.rs.sel = x.id;
   const h = view('карточка героя состава'), top = h.slice(h.indexOf('<div class="hd-top">'));
   if (!top.includes(`доблесть до ${x.maxV}`) || !top.includes(`<span class="rar" data-r="${x.r}">`)) say('карточка героя состава: нет потенциала доблести или кристалла редкости');
+  const head = top.slice(0, Math.max(0, top.indexOf('<div class="hd-body">')));
+  if (postsOf(head).length || head.includes('class="hd-rp"')) say('карточка героя состава: у героя вне коллекции — рунные камни, а пределов у него нет');
   cnt.heads++;
+}
+
+/* ================== 2б. рунные пределы: следующий камень, чужие герои, вёрстка плитки ==================
+   Слово автора 29.09.2026: чёрточки предела у уровня — «слабо», пределы — «по бокам» героя. Следующий камень на потолке уровня тлеет
+   (wait), а когда рун хватает — пульсирует (ready), на плитке и в шапке одинаково; у героя соперника и чужого профиля — только горящие
+   и погасшие: запасы не наши. Вёрстка — расчётом размеров по стилям на реальных ширинах плитки */
+{
+  const tileOf = id => tilesOf(view(`пределы · ${id}`)).find(y => y.includes(`data-v="${id}"`)) || '';
+  const headOf = () => { const g = P.game(), i = g.indexOf('<div class="hd-top">'); return i < 0 ? '' : g.slice(i, g.indexOf('<div class="hd-body">', i)); };
+  const mine = id => { T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'mine'; T.S.seg.hero = 'power'; T.S.selHero = id; T.S.overlay = null; };
+  fresh();
+  const h2 = T.H('h2'), d2 = T.heroDev(h2);   // 150 из 150, руны предела II в запасах (демо — 11-й день цикла II)
+  if (!(h2.lvl >= h2.cap) || !d2.rune || d2.have < d2.need) say('пределы: у героя h2 в демо не потолок уровня или мало рун — сценарий «можно пробить» не проверить');
+  mine('h2');
+  let t = tileOf('h2'); checkPosts(t, 'пределы · можно пробить · плитка', 't', h2.lim, 'ready'); checkPosts(headOf(), 'пределы · можно пробить · шапка', 'h', h2.lim, 'ready');
+  if (!/можно пробить следующий/.test((t.match(/aria-label="([^"]*)"/) || [])[1] || '')) say('пределы: подпись плитки не говорит, что предел можно пробить');
+  T.BAG.take(d2.rune.id, T.BAG.qty(d2.rune.id) - (d2.need - 1));
+  t = tileOf('h2'); checkPosts(t, 'пределы · мало рун · плитка', 't', h2.lim, 'wait'); checkPosts(headOf(), 'пределы · мало рун · шапка', 'h', h2.lim, 'wait');
+  const h1 = T.H('h1'); mine('h1');
+  if (h1.lvl >= h1.cap) say('пределы: h1 в демо на потолке — сценарий «уровень растёт» не проверить');
+  checkPosts(tileOf('h1'), 'пределы · уровень растёт · плитка', 't', h1.lim, '');
+  /* чужой герой: та же плитка и шапка без запасов аккаунта — ни тлеющего, ни пульсирующего */
+  fresh(); const hx = T.H('h2'), vx = Object.assign(T.hrV(hx), { acc: null, lim: 2 });
+  checkPosts(T.hrTile(vx, { act: 'noop', bm: true }), 'пределы · чужой герой · плитка', 't', 2, '');
+  checkPosts(T.hrHead(vx), 'пределы · чужой герой · шапка', 'h', 2, '');
+  /* UI-кит задаёт состояние явно */
+  checkPosts(T.hrTile(T.hrV(T.H('h1')), { act: 'noop', rpNext: 'ready' }), 'пределы · UI-кит', 't', T.H('h1').lim, 'ready');
+  cnt.tiles += 7; cnt.heads += 3;
+
+  /* вёрстка: камни по бокам плитки — от кристалла и доблести до строки уровня, имя отступает от них, строка уровня — во всю ширину */
+  const DEV = read('screens/hero-dev.css'), HCSS = read('screens/heroes.css');
+  const num = (css, re, what) => { const m = css.match(re); if (!m) { say(`вёрстка плитки: в стилях нет ${what}`); return null; } return m.slice(1).map(Number); };
+  const [rpw] = num(DEV, /\.hc\{container-type:inline-size;--rp-w:(\d+)cqw\}/, '.hc — контейнер и --rp-w в cqw') || [0];
+  const [pTop, pPct, pBot] = num(DEV, /\.hc \.rp\.t\{[^}]*top:max\((\d+)px,(\d+)%\);bottom:(\d+)px/, 'столба .hc .rp.t') || [0, 0, 0];
+  const [pl, pr] = num(HCSS, /\.hc\.rpp \.nm\{padding:0 calc\(var\(--rp-w\) - (\d+)px\) 0 calc\(var\(--rp-w\) - (\d+)px\)\}/, 'отступа имени .hc.rpp .nm') || [0, 0];
+  const [ar1, ar2] = num(DEV, /\.rp-s\{[^}]*aspect-ratio:(\d+)\/(\d+)/, 'пропорции камня .rp-s') || [40, 58];
+  const [crL, crT, crW] = num(HCSS, /\.hc \.cr\{position:absolute;left:(\d+)px;top:(\d+)px;z-index:2;width:(\d+)px/, 'кристалла .hc .cr') || [4, 4, 17];
+  const [stT] = num(HCSS, /\.hc \.top\{position:absolute;right:\d+px;top:(\d+)px/, 'доблести .hc .top') || [5];
+  const [stW] = num(HCSS, /\.hc \.stars i\{width:(\d+)px/, 'значка доблести') || [11];
+  const [bL, bR, bB] = num(HCSS, /\.hc \.bot\{position:absolute;left:(\d+)px;right:(\d+)px;bottom:(\d+)px/, 'низа плитки .hc .bot') || [6, 5, 5];
+  const metaH = 13;   // строка уровня: значок класса 13 px — выше числа
+  /* ширины плитки: коллекция (3 в ряд), редактор отряда (5 в ряд), UI-кит — по стилям index.html и heroes.css */
+  const I = html, px1 = (re, d) => { const m = I.match(re); return m ? +m[1] : d; };
+  const spM = px1(/--sp-m:(\d+)px/, 12), sqL = +((HCSS.match(/\.sq\{display:grid;grid-template-columns:(\d+)px/) || [])[1] || 236);
+  const sqMax = +((HCSS.match(/\.hr-sqed \.sq-slots\{max-width:(\d+)px/) || [])[1] || 520), sqMaxSm = +((HCSS.match(/@container main \(max-height: 360px\)\{[\s\S]*?\.hr-sqed \.sq-slots\{max-width:(\d+)px/) || [])[1] || 440);
+  const widths = [];
+  for (const X of [{ n: '932 × 430', W: 932, rail: 78, sm: false }, { n: '844 × 390', W: 844, rail: 72, sm: true }]) {
+    const inW = X.W - X.rail - 2 * spM, left = Math.max(250, Math.floor(inW * 34 / 100)), coll = left - 2 - 2 * spM, g = X.sm ? 6 : 8;
+    widths.push([`коллекция ${X.n}`, Math.floor((coll - 2 * g) / 3)]);
+    const right = inW - sqL - spM - 2 - 2 * spM, slots = Math.min(right, X.sm ? sqMaxSm : sqMax);
+    widths.push([`отряд ${X.n}`, Math.floor((slots - 4 * 8) / 5)]);
+  }
+  widths.push(['UI-кит', 80], ['UI-кит, крупно', 110]);
+  const out = [];
+  for (const [n, W] of widths) {
+    const H = W * 5 / 4, sw = W * rpw / 100, sh = sw * ar2 / ar1, top = Math.max(pTop, H * pPct / 100), post = H - top - pBot, gap = (post - 5 * sh) / 4;
+    if (sw < 4.5) say(`вёрстка плитки · ${n}: камень ${sw.toFixed(1)} px — мельче 4,5 px, не читается`);
+    if (gap < 1) say(`вёрстка плитки · ${n}: камни в столбе налезают — шаг ${gap.toFixed(1)} px`);
+    if (top < crT + crW) say(`вёрстка плитки · ${n}: столб начинается на ${top.toFixed(1)} px — под кристаллом редкости (до ${crT + crW} px)`);
+    if (top < stT + stW) say(`вёрстка плитки · ${n}: столб справа залезает под значки доблести`);
+    if (pBot < bB + metaH) say(`вёрстка плитки · ${n}: нижний камень залезает на строку уровня`);
+    if (bL + (sw - pl) < 2 + sw + 2 || bR + (sw - pr) < 2 + sw + 1) say(`вёрстка плитки · ${n}: имя залезает на камни`);
+    const nameW = W - bL - bR - (sw - pl) - (sw - pr);
+    if (nameW < 44) say(`вёрстка плитки · ${n}: на имя остаётся ${nameW.toFixed(0)} px`);
+    out.push(`${n} — плитка ${W} px, камень ${sw.toFixed(1)} × ${sh.toFixed(1)}, шаг ${gap.toFixed(1)}, имя ${nameW.toFixed(0)} px`);
+  }
+  cnt.lay = out;
 }
 
 /* ================== 4. купленный герой — герой аккаунта ================== */
@@ -336,36 +443,146 @@ fresh();
 function souls(c, team) {
   fresh(); T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = 'souls'; T.S.rs.cyc = c;
   const tag = `«За души» · цикл ${c}${team ? ' [команда]' : ''}`, h = view(tag), pool = T.rsPool(), open = c >= T.rsFrom('roulette');
-  const body = h.slice(h.indexOf('<div class="hr-souls">'));
-  if (!body.includes('class="pnl rl-entry"')) say(`${tag}: нет входа рулетки`);
+  const body = h.slice(h.indexOf('<div class="hr-souls'));
+  if (!/class="pnl rl-entry[ "]/.test(body)) say(`${tag}: нет входа рулетки`);
+  if (!/class="rl-scn[ "]/.test(body)) say(`${tag}: нет сцены алтаря`);
   if (open && count(body, /class="rl-ef"/g) !== pool.length) say(`${tag}: лиц пула ${count(body, /class="rl-ef"/g)}, героев пула ${pool.length}`);
   if (open && pool.length && !body.includes('data-a="dlg" data-v="rl"')) say(`${tag}: нет «К рулетке»`);
-  for (const k of ['hrecho', 'hrdust']) if (!body.includes(`data-a="sheet" data-v="${k}"`)) say(`${tag}: нет входа ${k}`);
-  if (/class="rs-row|rs-col/.test(body)) say(`${tag}: во вкладке остались списки — им место в листах`);
+  if (!body.includes('data-a="sheet" data-v="hrecho"')) say(`${tag}: нет входа отряда Эхо недели`);
+  if (!body.includes('data-a="dlg" data-v="dust"')) say(`${tag}: нет входа лавки праха`);
+  if (/class="rs-row|rs-col/.test(body)) say(`${tag}: во вкладке остались списки — им место в листах и окнах`);
   /* воздух: во вкладке одна главная вещь; строк текста и кнопок — немного */
   const lines = playerText(body).split('\n').length, btns = count(body, /<button/g);
   if (lines > 24) say(`${tag}: строк текста ${lines} — тесно`);
   if (btns > pool.length + 6) say(`${tag}: кнопок ${btns} — тесно`);
-  for (const k of ['hrecho', 'hrdust']) { T.S.overlay = { t: k }; const o = ovOf(view(`${tag} · лист ${k}`)); if (!o.includes('class="sheet')) say(`${tag}: лист ${k} не открылся`); }
+  /* вход отряда Эхо — компактно: осколок стеклом с лицом у каждого героя недели, которого ещё нет в коллекции */
+  const W = T.rsWeek(), eb = body.slice(body.indexOf('data-v="hrecho"')), eIn = eb.slice(0, eb.indexOf('</button>'));
+  const want = (W ? W.squad : []).filter(id => T.RSI[id] && !T.rsHas(T.RSI[id])).length;
+  if (count(eIn, /class="hsg"/g) !== want) say(`${tag}: во входе отряда Эхо осколков ${count(eIn, /class="hsg"/g)}, героев недели не в коллекции ${want}`);
+  T.S.overlay = { t: 'hrecho' }; if (!ovOf(view(`${tag} · лист hrecho`)).includes('class="sheet')) say(`${tag}: лист отряда недели не открылся`);
+  T.S.overlay = { t: 'dust' }; if (!/^<div class="ov du-ov/.test(ovOf(view(`${tag} · окно лавки`)))) say(`${tag}: окно лавки праха не открылось`);
   T.S.overlay = null;
   cnt.cycles++;
 }
 for (const team of [false, true]) { run('режим', () => T.setTeam(team)); for (let c = 1; c <= 6; c++) souls(c, team); }
 run('режим «Игрок»', () => T.setTeam(false));
-/* каталог праха: осколок за прах и пробуждение из листа */
+/* ================== 5а. лавка праха: окно и операции SOUL_SRV ================== */
 {
-  fresh(); T.S.acc.cycle = 2; T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = 'souls';
-  const x = T.hrDustCat()[0], need = T.RS.rules.stub.shards;
-  T.S.overlay = { t: 'hrdust' }; run('прах · выбор', () => T.ACT.ssel(x.id));
-  let o = ovOf(view('прах · выбран'));
-  if (!o.includes(`data-a="dustbuy" data-v="${x.id}"`) || !o.includes(`data-a="activate" data-v="${x.id}"`)) say('каталог праха: в листе нет «Осколок» и «Пробудить» выбранного героя');
-  const d0 = T.S.wallet.dust; T.S.wallet.dust = 1e6;
-  run('прах · осколок', () => T.ACT.dustbuy(x.id));
-  if ((T.S.rs.shards[x.id] || 0) !== 1 || !T.S.overlay || T.S.overlay.t !== 'hrdust') say('каталог праха: осколок не куплен или лист закрылся');
-  T.S.rs.shards[x.id] = need; T.S.wallet.souls = 1e6;
-  run('прах · пробудить', () => T.ACT.activate(x.id)); run('прах · подтверждение', () => T.ACT.activatedo(x.id));
-  if (!T.rsHas(x) || !T.H(x.id)) say('каталог праха: пробуждённый герой не пришёл в коллекцию');
-  T.S.wallet.dust = d0;
+  fresh(); T.S.rs.shards = {}; T.S.acc.cycle = 2;   // демо-осколки запасов (screens/bag.js) — прочь: считаем с нуля
+ T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = 'souls';
+  const need = T.RS.rules.stub.shards, cat = T.hrDustCat(), x = cat[0], y = cat[1], p = T.rsShardPrice(x);
+  T.S.overlay = { t: 'dust' };
+  let o = ovOf(view('лавка'));
+  /* витрина: все герои лавки карточками — стекло с лицом, цена осколка и доля собранного */
+  const cards = [...o.matchAll(/<button class="du-c[^"]*" data-r="\d" data-a="ssel" data-v="([^"]+)"[\s\S]*?<\/button>/g)];
+  if (cards.length !== cat.length) say(`лавка: карточек ${cards.length}, героев в лавке ${cat.length}`);
+  for (const m of cards) {
+    const h = T.RSI[m[1]]; if (!h) { say(`лавка: карточка неизвестного героя ${m[1]}`); continue; }
+    if (!m[0].includes('class="hsg"')) say(`лавка: у ${h.n} на карточке нет стекла с лицом`);
+    if (!m[0].includes(`>${T.fmt(T.rsShardPrice(h))}</span>`)) say(`лавка: у ${h.n} на карточке нет цены осколка ${T.rsShardPrice(h)}`);
+    if (!m[0].includes(`${T.fmt(T.S.rs.shards[h.id] || 0)}/${need}`)) say(`лавка: у ${h.n} на карточке нет доли собранного`);
+  }
+  if (!/Героев Эхо здесь нет/.test(o)) say('лавка: не объяснено, почему в ней нет героев Эхо');
+  if (!o.includes(T.fmt(T.S.wallet.dust))) say('лавка: не виден прах на руках');
+  /* выбранный: «Осколки ×q» — номер операции, сколько и цена; покупка — списано ровно цена, повтор номера — ничего */
+  const buyRe = id => new RegExp(`data-a="dustbuy" data-v="(du\\d+)\\|${id}\\|(\\d+)"([^>]*)>`);
+  T.S.du.q = 1; run('лавка · выбор', () => T.ACT.ssel(x.id));
+  o = ovOf(view('лавка · выбран'));
+  let m = o.match(buyRe(x.id));
+  if (!m || m[2] !== '1' || !o.includes(`×1<span class="cost">`)) say('лавка: у выбранного нет «Осколки ×1» с номером операции и ценой');
+  T.S.wallet.dust = 1e6;
+  if (m) {
+    const d0 = T.S.wallet.dust;
+    run('лавка · осколок', () => T.ACT.dustbuy(`${m[1]}|${x.id}|1`));
+    if ((T.S.rs.shards[x.id] || 0) !== 1 || T.S.wallet.dust !== d0 - p) say(`лавка: куплено ${T.S.rs.shards[x.id] || 0}, списано ${d0 - T.S.wallet.dust}, ждали 1 и ${p}`);
+    if (!T.S.overlay || T.S.overlay.t !== 'dust') say('лавка: после покупки окно закрылось');
+    run('лавка · повтор номера', () => T.ACT.dustbuy(`${m[1]}|${x.id}|1`));
+    if ((T.S.rs.shards[x.id] || 0) !== 1 || T.S.wallet.dust !== d0 - p) say('лавка: повтор номера купил ещё раз');
+    if (!T.SOUL_SRV.buy(m[1], x.id, 1).again) say('лавка: повтор номера — не «повтор»');
+  }
+  /* «10» и «до комплекта» */
+  T.S.du.q = 10; o = ovOf(view('лавка · ×10')); m = o.match(buyRe(x.id));
+  if (!m || m[2] !== '10') say('лавка: «10» не ведёт к «Осколки ×10»');
+  else { const s0 = T.S.rs.shards[x.id], d1 = T.S.wallet.dust; run('лавка · ×10', () => T.ACT.dustbuy(`${m[1]}|${x.id}|10`)); if (T.S.rs.shards[x.id] !== s0 + 10 || T.S.wallet.dust !== d1 - 10 * p) say('лавка: ×10 — не десять осколков за десять цен'); }
+  T.S.du.q = 0; o = ovOf(view('лавка · до комплекта')); m = o.match(buyRe(x.id));
+  const left = need - T.S.rs.shards[x.id];
+  if (!m || +m[2] !== left) say(`лавка: «до ${need}» не ведёт к ×${left}`);
+  else { run('лавка · до комплекта', () => T.ACT.dustbuy(`${m[1]}|${x.id}|${left}`)); if (T.S.rs.shards[x.id] !== need) say('лавка: «до комплекта» не собрал комплект'); }
+  /* комплект собран: «Пробудить» вместо покупки; сверх комплекта и дробное число — отказ без расхода */
+  o = ovOf(view('лавка · комплект'));
+  if (buyRe(x.id).test(o) || !new RegExp(`data-a="activate" data-v="du\\d+\\|${x.id}"`).test(o)) say('лавка: при собранном комплекте нет «Пробудить» или осталась покупка');
+  { const d2 = T.S.wallet.dust, r = T.SOUL_SRV.buy('du' + T.S.du.seq, x.id, 1); if (r.refuse !== 'full' || T.S.wallet.dust !== d2) say('лавка: сверх комплекта — не отказ или расход'); }
+  { const r = T.SOUL_SRV.buy('du' + T.S.du.seq, y.id, 1.5); if (r.refuse !== 'qty') say('лавка: дробное число осколков — не отказ'); }
+  /* нехватка праха: кнопка неактивна, сказано сколько; «сервер» — отказ без выдачи */
+  T.S.wallet.dust = 0; T.S.du.q = 1; run('лавка · другой', () => T.ACT.ssel(y.id)); o = ovOf(view('лавка · нет праха')); m = o.match(buyRe(y.id));
+  if (!m || !/disabled/.test(m[3]) || !o.includes(`Не хватает ${T.fmt(T.rsShardPrice(y))} праха`)) say('лавка: при нехватке праха кнопка активна или не сказано сколько');
+  { const r = T.SOUL_SRV.buy('du' + T.S.du.seq, y.id, 1); if (r.refuse !== 'dust' || (T.S.rs.shards[y.id] || 0)) say('лавка: без праха — не отказ или выдача'); }
+  /* пробуждение: подтверждение в том же окне → операция → окно пробуждения; повтор номера ничего не списывает */
+  T.S.rs.ssel = x.id; T.S.rs.shards[x.id] = need + 3; T.S.wallet.souls = 1e6; T.S.wallet.dust = 0;
+  o = ovOf(view('лавка · пробудить'));
+  const wm = o.match(new RegExp(`data-a="activate" data-v="(du\\d+)\\|${x.id}"`));
+  if (!wm) say('лавка: нет «Пробудить» с номером операции');
+  else {
+    run('лавка · «Пробудить»', () => T.ACT.activate(`${wm[1]}|${x.id}`));
+    if (!T.S.overlay || T.S.overlay.t !== 'dust' || !T.S.du.ask) say('лавка: подтверждение пробуждения — не в окне лавки');
+    o = ovOf(view('лавка · подтверждение'));
+    if (!o.includes(`data-a="activatedo" data-v="${wm[1]}|${x.id}"`) || !o.includes('0 уровнем') || !o.includes(`+${T.fmt(3 * T.rsDustOf(x))}`)) say('лавка: в подтверждении нет номера операции, «с чем приходит» или праха за лишние осколки');
+    const s0 = T.S.wallet.souls, d3 = T.S.wallet.dust;
+    run('лавка · пробуждение', () => T.ACT.activatedo(`${wm[1]}|${x.id}`));
+    const own = T.S.rs.owned[x.id];
+    if (!own || own.lvl || own.lim || own.valor || !T.H(x.id)) say('лавка: пробуждённый не пришёл в коллекцию с 0 ур., 0 РП и 0 Добл');
+    if (T.S.wallet.souls !== s0 - T.RS.rules.stub.activateSouls || T.S.wallet.dust !== d3 + 3 * T.rsDustOf(x) || T.S.rs.shards[x.id]) say('лавка: пробуждение — не та цена, не тот прах за лишние или осколки остались');
+    if (!T.S.overlay || T.S.overlay.t !== 'hrwake' || T.S.overlay.back !== 'dust') say('лавка: после пробуждения нет окна пробуждения с возвратом в лавку');
+    const g = ovOf(view('окно пробуждения'));
+    if (!g.includes(x.n) || !/^<div class="ov hr-wake/.test(g) || !/--t0:-\d+ms/.test(g) || !g.includes('data-a="dlg" data-v="dust"') || !g.includes(`data-a="dngo" data-v="${x.id}"`)) say('окно пробуждения: нет имени, времени сцены, «В лавку» или «К развитию»');
+    if (!/class="hsg"/.test(g) || !/class="rl-fr"|class="rl-frc"/.test(g)) say('окно пробуждения: нет стекла осколка или рамы героя');
+    run('окно пробуждения · сразу итог', () => T.ACT.hrwskip());
+    if (!/^<div class="ov hr-wake done"/.test(ovOf(view('окно пробуждения · итог')))) say('окно пробуждения: нажатие не ведёт сразу к итогу');
+    const s1 = T.S.wallet.souls;
+    run('пробуждение · повтор номера', () => T.ACT.activatedo(`${wm[1]}|${x.id}`));
+    if (T.S.wallet.souls !== s1) say('пробуждение: повтор номера списал души ещё раз');
+    if (!T.SOUL_SRV.wake(wm[1], x.id).again) say('пробуждение: повтор номера — не «повтор»');
+  }
+  /* отказы пробуждения без расхода: осколков мало, душ мало */
+  {
+    const z = cat[2] || y; T.S.rs.shards[z.id] = need - 1; T.S.wallet.souls = 1e6; const s2 = T.S.wallet.souls;
+    const r1 = T.SOUL_SRV.wake('du' + T.S.du.seq, z.id);
+    T.S.rs.shards[z.id] = need; T.S.wallet.souls = 0;
+    const r2 = T.SOUL_SRV.wake('du' + T.S.du.seq, z.id);
+    if (r1.refuse !== 'shards' || r2.refuse !== 'souls' || T.rsHas(z) || T.S.rs.shards[z.id] !== need) say(`пробуждение: отказы ${r1.refuse}, ${r2.refuse} — или выдача при отказе`);
+    T.S.wallet.souls = s2;
+  }
+  /* старый вызов из запасов и итога рулетки: ACT.dustbuy(герой) — один осколок, номер — следующий */
+  { const w = cat[3] || y; T.S.wallet.dust = 1e6; const s0 = T.S.rs.shards[w.id] || 0, seq = T.S.du.seq; run('лавка · старый вызов', () => T.ACT.dustbuy(w.id)); if ((T.S.rs.shards[w.id] || 0) !== s0 + 1 || !T.S.du.ops['du' + seq]) say('лавка: старый вызов ACT.dustbuy(герой) — не один осколок операцией с номером'); }
+}
+/* вёрстка окна лавки — расчётом по стилям (зеркало heroes.css и index.html: .du, .du-h, .du-pick, .du-c, .btn, .qty): на 932 × 430 и 844 × 390
+   выбранный герой — со строкой причины — и две строки витрины входят в тело окна без прокрутки окна */
+{
+  const V = T.DU_VIEW, G = { pad: 12, headTop: 10, eyebrow: 12.6, h2: [28, 24], bal: 34, gap: 8, foot: 15.6,
+    card: { pad: 17, gap: 6, name: 15.2, meta: 14 }, pick: { pad: [24, 20], gap: [6, 5], name: 28, type: 15, bar: 12, qty: 30, btn: [44, 40], gapA: 5, reason: 16.25 } };
+  [[932, 430], [844, 390]].forEach(([W, H], k) => {
+    const head = G.headTop + Math.max(G.eyebrow + 2 + G.h2[k], G.bal), body = H - 20 - G.pad - head - 2 * G.gap - G.foot, P = G.pick;
+    const pick = P.pad[k] + V.pick[k] + 2 + P.name + P.type + P.bar + P.qty + P.btn[k] + P.gapA + P.reason + 5 * P.gap[k];
+    if (pick > body) say(`лавка ${W} × ${H}: выбранный герой — ${pick.toFixed(1)} px, в тело окна входит ${body.toFixed(1)}`);
+    const card = G.card.pad + V.card[k] + G.card.gap + G.card.name + G.card.meta, rows = 2 * card + 8 + 6;
+    if (rows > body) say(`лавка ${W} × ${H}: две строки витрины — ${rows.toFixed(1)} px, в тело окна входит ${body.toFixed(1)}`);
+  });
+  /* сцена «За души» (зеркало heroes.css и roulette.css: .hr-souls, .hr-entry, .rl-entry, .rl-faces, .rl-ef): сцена — рабочая область без
+     полей экрана, строки вкладок и шага; веер героев пула самого большого цикла — лица не уже 28 px; пять осколков отряда Эхо — в ряд
+     в табличке; вход рулетки — имя, строка цены и кнопка — по высоте */
+  const S2 = { frame: [[932, 430, 78, 46], [844, 390, 72, 44]], scr: 12, tabs: 38, pad: [[12, 12, 16], [10, 10, 12]], side: [212, 196], gap: 12, col1: 180, fanPad: 16, card: [58, 52],
+    plaque: [[12, 30], [10, 28]], shard: [V.side, 28], title: [67.4, 61.7], foot: 148 };
+  const most = Math.max(...[2, 3, 4, 5, 6].map(c => T.RS.heroes.filter(h => h.src === 'roulette' && h.c === c).length));
+  S2.frame.forEach(([fw, fh, rail, top], k) => {
+    const mw = fw - rail, mh = fh - top, W = mw - 2 * S2.scr, Hh = mh - 2 * S2.scr - S2.tabs - S2.gap, [pv, pr, pl] = S2.pad[k];
+    const entry = W - pl - pr - S2.side[k] - S2.gap, fan = entry - S2.col1 - S2.gap - S2.fanPad, w = S2.card[k];
+    const step = w + Math.min(-6, (fan - most * w) / (most - 1));
+    if (step < 28) say(`«За души» ${fw} × ${fh}: в веере из ${most} героев лицо видно на ${step.toFixed(1)} px — меньше 28`);
+    const inner = S2.side[k] - 2 - S2.plaque[k][0] - S2.plaque[k][1], row = 5 * S2.shard[k] + 4 * 3;
+    if (row > inner) say(`«За души» ${fw} × ${fh}: пять осколков отряда Эхо — ${row} px, в табличке ${inner}`);
+    const col = S2.title[k] + 8 + S2.foot, h = Hh - 2 * pv;
+    if (col > h) say(`«За души» ${fw} × ${fh}: вход рулетки — ${col.toFixed(1)} px, по высоте ${h}`);
+  });
 }
 /* ================== 5б. дыра праха закрыта: героев Эхо прахом не собрать ==================
    Правило — в данных (EN_ROSTER.rules.dustSrc), его проверяет и «сервер» (ACT.dustbuy), и каждая кнопка «Осколок». Пробудить героя Эхо
@@ -385,12 +602,12 @@ run('режим «Игрок»', () => T.setTeam(false));
     fresh(); T.S.rs.cyc = c;
     const cat = T.hrDustCat(), bad = cat.filter(h => !T.rsDustable(h) || h.src === 'echo');
     if (bad.length) say(`каталог праха · цикл ${c}: в нём герои Эхо — ${bad.slice(0, 3).map(h => h.n).join(', ')}`);
-    T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = 'souls'; T.S.overlay = { t: 'hrdust' };
-    const o = ovOf(view(`каталог праха · цикл ${c}`));
-    const echoIn = T.RS.heroes.filter(h => h.src === 'echo' && o.includes(`data-v="${h.id}"`));
-    if (echoIn.length) say(`каталог праха · цикл ${c}: в листе строки героев Эхо — ${echoIn.slice(0, 3).map(h => h.n).join(', ')}`);
-    if (c >= 2 && !/Героев Эхо здесь нет/.test(o)) say(`каталог праха · цикл ${c}: не объяснено, почему в нём нет героев Эхо`);
-    if (T.ART_READY && cat.length && (o.match(/class="hsg"/g) || []).length < cat.length) say(`каталог праха · цикл ${c}: не у каждого собираемого героя призрачный осколок`);
+    T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = 'souls'; T.S.overlay = { t: 'dust' };
+    const o = ovOf(view(`лавка праха · цикл ${c}`));
+    const echoIn = T.RS.heroes.filter(h => h.src === 'echo' && new RegExp(`data-a="(?:ssel|dustbuy|activate)" data-v="(?:du\\d+\\|)?${h.id}[|"]`).test(o));
+    if (echoIn.length) say(`лавка праха · цикл ${c}: в витрине герои Эхо — ${echoIn.slice(0, 3).map(h => h.n).join(', ')}`);
+    if (!/Героев Эхо здесь нет/.test(o)) say(`лавка праха · цикл ${c}: не объяснено, почему в ней нет героев Эхо`);
+    if (cat.length && (o.match(/class="hsg"/g) || []).length < cat.length) say(`лавка праха · цикл ${c}: не у каждого собираемого героя стекло осколка с лицом`);
   }
   /* «сервер»: осколок героя Эхо за прах — отказ, прах и осколки не тронуты */
   fresh(); T.S.acc.cycle = 6;
@@ -406,10 +623,10 @@ run('режим «Игрок»', () => T.setTeam(false));
   let o = ovOf(view('отряд недели'));
   if (/data-a="dustbuy"/.test(o) || /data-v="hrdust"/.test(o)) say('отряд недели: в листе прах — осколки героев Эхо за прах');
   if (!/только из сундуков Эхо/.test(o)) say('отряд недели: не сказано, что осколки героев Эхо — только из сундуков Эхо');
-  if (T.ART_READY && !/class="hsg"/.test(o)) say('отряд недели: у героев, которых собирают, нет призрачного осколка (shardGhost)');
+  if ((o.match(/class="hsg"/g) || []).length < sq5.filter(h => !T.rsHas(h)).length) say('отряд недели: не у каждого героя, которого собирают, стекло осколка с лицом (shardGhost)');
   run('отряд недели · выбор', () => T.ACT.ssel(x.id));
   o = ovOf(view('отряд недели · выбран'));
-  if (!o.includes(`data-a="activate" data-v="${x.id}"`)) say('отряд недели: у выбранного героя Эхо нет «Пробудить»');
+  if (!new RegExp(`data-a="activate" data-v="(?:du\\d+\\|)?${x.id}"`).test(o)) say('отряд недели: у выбранного героя Эхо нет «Пробудить»');
   if (o.includes(`data-a="dustbuy" data-v="${x.id}"`)) say('отряд недели: у героя Эхо есть «Осколок» за прах');
   T.S.rs.shards[x.id] = need + 3; T.S.wallet.souls = 1e6;
   const dust0 = T.S.wallet.dust;
@@ -425,6 +642,58 @@ run('режим «Игрок»', () => T.setTeam(false));
     if (/data-a="dustbuy"/.test(cardE)) say('запасы: у героя Эхо есть «Осколок» за прах');
     if (!/только из сундуков Эхо/.test(cardE) || !cardE.includes(`data-a="activate" data-v="${y.id}"`)) say('запасы: у героя Эхо нет объяснения или «Пробудить»');
     if (!cardR.includes(`data-a="dustbuy" data-v="${r0.id}"`)) say('запасы: у героя рулетки пропал «Осколок» за прах');
+  }
+}
+
+/* ================== 5г. осколок героя по образцу автора ==================
+   Стекло с лицом всегда: портрет героя или силуэт его класса, не инициалы; лицо не гаснет — доля в --s, трещины --cr «заживают»,
+   полный комплект — data-full. Арт: выгруженные пути лежат в assets/art, слои стекла — все три вместе, заказанное — в want */
+{
+  const A = T.ART_ICONS, sg = T.shardGhost, art = p => fs.existsSync(path.join(UI, 'assets', 'art', p));
+  if (!A || !sg) say('осколок: нет ART_ICONS или shardGhost (screens/art-icons.js)');
+  else {
+    for (const p of A.ready) if (!art(p)) say(`арт значков: ${p} в ART_ICONS.ready, а файла нет`);
+    const G = Object.values(A.glass), gotG = G.filter(p => A.ready.includes(p)).length;
+    if (gotG && gotG !== G.length) say('осколок: выгружены не все слои стекла — маска, кромка и трещины ложатся только вместе');
+    for (const p of G) if (!A.ready.includes(p) && !A.want.includes(p)) say(`осколок: слой ${p} ни в ready, ни в want`);
+    if (!Number.isInteger(A.heal) || A.heal < 0 || A.heal > 100) say('осколок: ART_ICONS.heal — не целая доля 0…100');
+    const withArt = T.RS.heroes.find(h => h.src === 'roulette' && T.RS_ART && T.RS_ART.has(h.id));
+    const noArt = T.RS.heroes.find(h => h.src === 'roulette' && T.RS_ART && !T.RS_ART.has(h.id));
+    fresh();
+    for (const [h, got] of [[withArt, 0], [withArt, 20], [withArt, 50], [withArt, 60], [noArt, 7]]) {
+      if (!h) { say('осколок: в составе нет героя рулетки с портретом или без'); break; }
+      const x = sg(h, got, 50, 64) || '', tag = `осколок ${h.n} ${got}/50`;
+      if (!/^<span class="hsg"/.test(x)) { say(`${tag}: не стекло осколка`); continue; }
+      if (h === withArt && !x.includes(`heroes/${h.id}.jpg`)) say(`${tag}: в стекле не портрет героя`);
+      if (h === noArt && !/class="hsg-face (?:cls|svg)"/.test(x)) say(`${tag}: у героя без портрета нет силуэта класса`);
+      if (/hsg-init|>\s*[А-ЯЁA-Z]{1,2}\s*</.test(x)) say(`${tag}: в стекле инициалы вместо лица`);
+      if (/class="hsg-face[^"]*"[^>]*opacity/.test(x)) say(`${tag}: лицо гаснет с долей — оно должно быть видно всегда`);
+      const s = +((x.match(/--s:(\d+)/) || [])[1]), cr = +((x.match(/--cr:(\d+)/) || [])[1]), want = Math.min(100, Math.floor(got * 100 / 50));
+      if (s !== want) say(`${tag}: доля --s ${s}, ждали ${want}`);
+      if (cr !== 100 - Math.floor(want * A.heal / 100)) say(`${tag}: трещины --cr ${cr}, ждали ${100 - Math.floor(want * A.heal / 100)}`);
+      if ((got >= 50) !== / data-full="1"/.test(x)) say(`${tag}: полный комплект ${got >= 50 ? 'не отмечен' : 'отмечен раньше времени'}`);
+      for (const p of A.want.filter(q => !A.ready.includes(q))) if (x.includes(p)) say(`${tag}: в разметке невыгруженный ${p}`);
+    }
+    /* силуэт класса — свой у каждого класса состава: герой без портрета узнаётся хотя бы по классу */
+    const faces = new Map();
+    for (const c of T.RS.classes) {
+      const h = T.RS.heroes.find(q => q.cl && q.cl[0] === c && !(T.RS_ART && T.RS_ART.has(q.id)) && q.src !== 'donat'); if (!h) continue;
+      const f = ((sg(h, 0, 50, 64) || '').match(/<span class="hsg-face[\s\S]*?<\/span>(?=<\/span>)/) || [''])[0];
+      if (faces.has(f)) say(`осколок: у классов «${faces.get(f)}» и «${c}» один силуэт`);
+      faces.set(f, c);
+    }
+  }
+  if (T.DU_ART) for (const p of T.DU_ART.ready) if (!fs.existsSync(path.join(UI, 'assets', 'art', p))) say(`арт лавки: ${p} в DU_ART.ready, а файла нет`);
+  if (T.RS_ART) for (const id of T.RS_ART) if (!fs.existsSync(path.join(UI, 'assets', 'art', 'heroes', id + '.jpg'))) say(`портрет ${id} в RS_ART, а файла нет`);
+  /* разделы UI-кита «За души · алтарь и лавка праха» и «Осколок героя» рисуются без исключений, undefined и NaN */
+  fresh();
+  for (const title of ['«За души» · алтарь и лавка праха', 'Осколок героя']) {
+    const k = T.KIT_EXTRA.find(x => { try { return x.html().includes(`<h3>${title}</h3>`); } catch (_) { return false; } });
+    if (!k) { say(`UI-кит: нет раздела «${title}»`); continue; }
+    const h = run(`UI-кит · ${title}`, () => k.html()) || '';
+    const bad = h.match(/.{0,40}(?:undefined|NaN|\[object ).{0,40}/);
+    if (bad) say(`UI-кит · ${title}: в разметке undefined, NaN или [object — «${bad[0]}»`);
+    if (!/class="hsg"/.test(h)) say(`UI-кит · ${title}: нет осколка героя`);
   }
 }
 
@@ -539,6 +808,34 @@ run('режим «Игрок»', () => T.setTeam(false));
 for (const [n, , f] of T.FLOWS.filter(x => /Энериум|отряд Эхо недели/.test(x[0]))) { fresh(); run('сценарий ' + n, () => f()); view(`сценарий «${n}»`); }
 /* лист «Подробнее» героя состава — с новой шапкой */
 for (const x of [T.RS.heroes[0], T.RS.heroes.find(h => h.src === 'donat'), T.RS.heroes.find(h => h.src === 'echo')]) { fresh(); T.S.route = 'heroes'; T.S.overlay = { t: 'rhero', arg: x.id }; const o = ovOf(view(`лист героя · ${x.n}`)); if (!o.includes('class="hd-top"')) say(`лист героя ${x.n}: нет шапки`); }
+
+/* ================== 5д. Сила коллекции (§10.3, ADR-0031, п. 18): одна функция collRp на все экраны ==================
+   Бонус героя = perBp × редкость × цикл × круг, круг = 2^доблесть; РП k — за предел k; доблесть не сбрасывает: не пройденный заново
+   предел держит прошлый круг (после руны обучения — только пройденные до неё). Целые б. п.; сумма — не выше потолка. «Герои», лист
+   «Сила коллекции» и Событие показывают одно число */
+run('сила коллекции', () => {
+  const X = { collRp: T.collRp, collHero: T.collHero, collPct: T.collPct, R: T.collRule(), EV: T.EV, top: T.INV.hero.capByLim.length - 1 }, R = X.R;
+  if (!R) { say('сила коллекции: нет правила EN_EVENT.rp1'); return; }
+  const hero = o => Object.assign({ r: 2, c: 3, lim: 0, valor: 0 }, o), unit = R.perBp * 2 * 3;
+  const want = [[{}, 1, 0], [{ lim: 1 }, 1, unit], [{ lim: 1 }, 2, 0], [{ valor: 1 }, 1, unit], [{ valor: 1, lim: 1 }, 1, unit * 2], [{ valor: 2, lim: 3 }, 5, unit * 2],
+    [{ valor: 2, lim: 3 }, 3, unit * 4], [{ valor: 1, keep: 1 }, 1, unit], [{ valor: 1, keep: 1 }, 2, 0], [{ valor: R.maxValor + 3, lim: X.top }, 1, unit * 2 ** R.maxValor]];
+  for (const [o, k, w] of want) { const v = X.collHero(hero(o), k); if (v !== w || !Number.isInteger(v)) say(`сила коллекции: герой ${JSON.stringify(o)}, РП${k} — ${v}, ждали ${w}`); }
+  fresh();
+  const rp = [1, 2, 3, 4, 5].map(k => X.collRp(k));
+  if (rp.some(v => !Number.isInteger(v) || v < 0 || v > R.capBp)) say(`сила коллекции: не целые или выше потолка — ${rp.join(', ')}`);
+  if (rp.some((v, i) => i && v > rp[i - 1])) say(`сила коллекции: РП дальних пределов больше ближних — ${rp.join(', ')}`);
+  const sum = [1, 2, 3, 4, 5].map(k => Math.min(R.capBp, T.hrMine().reduce((a, h) => a + X.collHero(h, k), 0)));
+  if (sum.join() !== rp.join()) say(`сила коллекции: сумма по героям коллекции ${sum.join(', ')}, collRp — ${rp.join(', ')}`);
+  T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'mine';
+  const h = view('сила коллекции · кнопка'), chip = (h.match(/class="collpow"[\s\S]*?<span class="chip spirit">([^<]*)<\/span>/) || [])[1];
+  if (chip !== '+' + X.collPct(rp[0])) say(`сила коллекции: на кнопке «${chip}», РП1 — +${X.collPct(rp[0])}`);
+  T.S.overlay = { t: 'coll' }; const sh = ovOf(view('сила коллекции · лист')), vs = [...sh.matchAll(/<span class="v">([^<]*)<\/span>/g)].map(m => m[1]);
+  if (vs.join('|') !== rp.map(v => '+' + X.collPct(v)).join('|')) say(`сила коллекции: в листе «${vs.join(' ')}», collRp — ${rp.map(X.collPct).join(' ')}`);
+  if (X.EV && X.EV.rp1() !== rp[0]) say(`сила коллекции: Событие считает РП1 ${X.EV.rp1()}, collRp — ${rp[0]}`);
+  /* купленный герой с пробитым пределом прибавляет ровно свой вклад */
+  const nh = T.RS.heroes.find(x => !T.rsHas(x) && x.src === 'gold'), was = X.collRp(1);
+  if (nh) { T.S.rs.owned[nh.id] = { lvl: 50, lim: 1, valor: 0, how: 'gold' }; const add = X.collHero({ r: nh.r, c: nh.c, lim: 1, valor: 0 }, 1); if (X.collRp(1) !== Math.min(R.capBp, was + add) || !add) say('сила коллекции: купленный герой с пределом не прибавил свой вклад'); }
+});
 
 /* ================== 6. режим «Команда»: коллекция и карточки рисуются ================== */
 run('режим «Команда»', () => T.setTeam(true));

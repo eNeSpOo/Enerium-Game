@@ -1,6 +1,7 @@
 /* screens/clan.css — «Неделя → Клан» (screens/clan.js): паспорт с резервуаром, клановый босс, участники, древо, поиск.
    Правила воздуха (ADR-0026): одна мысль на экран; на карточке — не больше двух чисел, двух чипов и одного действия; подробности — в листах.
-   Отступы — токены --sp-l / --sp-m / --sp-s; стихия — --c от [data-el]; свои классы — с префиксом cl-. Эмблема и облик врагов — заглушки до арта. */
+   Отступы — токены --sp-l / --sp-m / --sp-s; стихия — --c от [data-el]; свои классы — с префиксом cl-. Эмблема — заглушка до арта; портреты сонмов стихий —
+   выгруженный арт (.cl-ph.art), до выгрузки — свет стихии снизу и знак класса; до первой победы портрет в тумане. */
 
 .cl-scr{gap:var(--sp-m)}
 .cl-card[data-el="Воздух"],.cl-ph[data-el="Воздух"]{--c:var(--air)}.cl-card[data-el="Земля"],.cl-ph[data-el="Земля"]{--c:var(--earth)}.cl-card[data-el="Огонь"],.cl-ph[data-el="Огонь"]{--c:var(--fire)}.cl-card[data-el="Вода"],.cl-ph[data-el="Вода"]{--c:var(--water)}.cl-card[data-el="Время"],.cl-ph[data-el="Время"]{--c:var(--time)}.cl-card[data-el="Свет"],.cl-ph[data-el="Свет"]{--c:var(--light)}.cl-card[data-el="Тьма"],.cl-ph[data-el="Тьма"]{--c:var(--dark)}
@@ -21,8 +22,14 @@
 .cl-ph[data-g="e"]{box-shadow:inset 0 0 0 1px var(--gold-3)}
 .cl-ph[data-g="b"]{box-shadow:inset 0 0 0 2px var(--gold-2),inset 0 -18px 24px -12px var(--gold-2)}
 .cl-ph.sm{width:44px;border-radius:8px}.cl-ph.sm b{font-size:18px}.cl-ph.sm .i{width:18px;height:18px}.cl-ph.sm .ico{width:20px;height:20px}
+.cl-ph.xs{width:28px;border-radius:6px}.cl-ph.xs b{font-size:13px}.cl-ph.xs .i{width:13px;height:13px}.cl-ph.xs .ico{width:14px;height:14px}
 .cl-ph.lg{width:96px}.cl-ph.lg b{font-size:40px}
+.cl-ph.xl{width:150px;flex:none}.cl-ph.xl b{font-size:48px}
 .cl-ph.bt{width:100%;height:100%;aspect-ratio:auto;border:0;border-radius:0}
+/* портрет сонма: выгруженный арт поверх света стихии; до первой победы — в тумане, со знаком вопроса (бестиарий) */
+.cl-ph.art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+.cl-ph.art.unk img{filter:blur(5px) brightness(.4) saturate(.6)}
+.cl-ph.art b{position:relative}
 
 /* паспорт */
 .cl-pass{flex:1 1 0;min-height:0;display:grid;grid-template-columns:220px minmax(0,1fr);gap:var(--sp-m)}
@@ -55,10 +62,11 @@
 .cl-bhead .eyebrow{font-size:11.5px;color:var(--gold)}
 .cl-targets{flex:1 1 0;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--sp-m);align-content:stretch}
 .cl-targets.one{grid-template-columns:minmax(0,560px);justify-content:center}
-.cl-card{display:grid;grid-template-columns:86px minmax(0,1fr);gap:var(--sp-m);padding:var(--sp-m);border-radius:12px;border:1px solid var(--iron);min-width:0;min-height:0;
+.cl-card{display:grid;grid-template-columns:104px minmax(0,1fr);gap:var(--sp-m);padding:var(--sp-m);border-radius:12px;border:1px solid var(--iron);min-width:0;min-height:0;
   background:radial-gradient(120% 80% at 50% 115%,color-mix(in srgb,var(--c,#8a9098) 14%,transparent),transparent 60%),var(--stone)}
 .cl-card[data-g="b"]{border-color:var(--gold-3);box-shadow:inset 0 -18px 30px -24px var(--gold-2)}
-.cl-card.big{grid-template-columns:150px minmax(0,1fr)}
+.cl-card.big{grid-template-columns:170px minmax(0,1fr)}
+.cl-card.big .cl-ph.lg{width:170px}
 .cl-card-ph{border:0;padding:0;background:none;align-self:start}
 .cl-card-ph:hover .cl-ph{border-color:var(--gold-3)}
 .cl-card-b{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0}
@@ -67,6 +75,11 @@
 .cl-chips{flex-wrap:wrap;gap:6px}
 .cl-nums{gap:var(--sp-m);flex-wrap:wrap;font-size:13px}
 .cl-card-b>.btn{align-self:flex-start;margin-top:auto}
+/* действие карточки: «Атаковать» — главное, «Все атаки» — вторичная ссылка рядом (итог одним листом, без боёв подряд) */
+.cl-acts{margin-top:auto;gap:var(--sp-s);align-items:center;flex-wrap:wrap;row-gap:4px}
+.cl-all{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;color:var(--parch-2)}
+.cl-all .i{width:13px;height:13px}
+.cl-all:hover{color:var(--gold)}
 .cl-card.dead,.cl-card.burned{opacity:.55}
 .cl-card.dead .cl-ph,.cl-card.burned .cl-ph{filter:grayscale(.8)}
 .cl-first{display:flex;align-items:center;gap:var(--sp-m);padding:var(--sp-l);flex:1 1 0;align-self:stretch;justify-content:center}
@@ -74,10 +87,19 @@
 .cl-first b{font-size:20px}
 .cl-first-i{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:rgba(72,229,212,.08);color:var(--spirit);flex:none}
 .cl-first-i .i{width:24px;height:24px}
-.cl-bfoot{flex:none;gap:var(--sp-m)}
+.cl-bfoot{flex:none;gap:var(--sp-m);flex-wrap:wrap;row-gap:6px}
 .cl-mine{display:flex;align-items:center;gap:var(--sp-l);padding:4px 10px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;color:var(--parch)}
 .cl-mine:hover{border-color:var(--gold-3)}
 .cl-mine .stat b{font-size:18px}
+/* Хозяин недели внизу вкладки «Босс»: маленький портрет, имя и стихия, победы над Голосами до него */
+.cl-next{display:flex;align-items:center;gap:var(--sp-s);padding:4px 10px 4px 5px;border-radius:10px;border:1px solid var(--gold-3);background:radial-gradient(120% 90% at 30% 120%,rgba(221,188,122,.1),transparent 60%),#0e1114;color:var(--parch);min-width:0}
+.cl-next:hover{border-color:var(--gold-2)}
+.cl-next-t{display:flex;flex-direction:column;gap:1px;min-width:0}
+.cl-next-t small{font:700 9.5px/1.2 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--gold-2)}
+.cl-next-t b{font:600 14px/1.15 var(--f-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cl-dots{display:inline-flex;gap:4px}
+.cl-dots i{width:7px;height:7px;border-radius:50%;background:#262b30;box-shadow:inset 0 0 0 1px #3a4047}
+.cl-dots i.on{background:var(--gold);box-shadow:0 0 6px rgba(221,188,122,.5)}
 
 /* участники */
 .cl-mhead{flex:none;gap:var(--sp-s)}
@@ -98,21 +120,44 @@
 .cl-mv b{font:600 18px/1 var(--f-d)}
 .cl-mv small{font:700 9.5px/1.2 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--parch-3)}
 
-/* древо */
+/* древо: слева одна большая мысль — выбор карточками или следующая веха; справа — путь древа узлами */
 .cl-thead{flex:none;gap:var(--sp-m);flex-wrap:wrap;row-gap:6px}
+.cl-tgrid{flex:1 1 0;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:var(--sp-m);align-items:start}
+.cl-focus{display:flex;flex-direction:column;gap:var(--sp-s);padding:var(--sp-m);min-width:0}
+.cl-focus-h{gap:6px;flex-wrap:wrap}
+.cl-focus-h .eyebrow{margin-right:auto;color:var(--gold)}
+.cl-choice[data-kind="fork"]{border-color:var(--gold-3);box-shadow:inset 0 -24px 40px -30px var(--gold-2)}
+.cl-picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:var(--sp-m)}
+.cl-pick{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:var(--sp-m);border-radius:12px;border:1px solid var(--iron);background:#0e1114;min-width:0}
+.cl-pick[data-kind="fork"]{border-color:var(--gold-3);background:radial-gradient(120% 90% at 50% 120%,rgba(221,188,122,.1),transparent 60%),#0e1114}
+.cl-pick b{font-size:17px;line-height:1.1;color:var(--parch)}
+.cl-pick small{font-size:12.5px;line-height:1.35;color:var(--parch-2);flex:1}
+.cl-pick>.btn{margin-top:var(--sp-s)}
+.cl-pick-i{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:rgba(72,229,212,.08);color:var(--spirit)}
+.cl-pick[data-kind="fork"] .cl-pick-i{background:rgba(221,188,122,.12);color:var(--gold)}
+.cl-pick-i .i{width:18px;height:18px}
+.cl-mile-n{font-size:34px;line-height:1;color:var(--gold)}
+.cl-mile-g{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+.cl-mile-g li{display:flex;align-items:center;gap:8px;font:600 15px/1.25 var(--f-d);color:var(--parch)}
+.cl-mile-g .i{width:16px;height:16px;color:var(--gold-2);flex:none}
+.cl-mile-w{display:flex;align-items:center;gap:6px;margin:0;font-size:13px;color:var(--spirit)}
+.cl-mile-w .i{width:14px;height:14px}
+.cl-path{display:flex;flex-direction:column;gap:var(--sp-s);padding:var(--sp-m);min-width:0}
+.cl-path-h{gap:var(--sp-s)}
 .cl-ctabs button{padding:0 10px}
-.cl-tree{display:flex;flex-direction:column;gap:var(--sp-s);flex:none}
-.cl-br{display:grid;grid-template-columns:170px minmax(0,1fr) 44px;gap:var(--sp-m);align-items:center}
-.cl-br b{font-size:16px;line-height:1.1}
+.cl-br{display:grid;grid-template-columns:96px minmax(0,1fr) 34px;gap:var(--sp-s);align-items:center}
+.cl-br b{display:flex;align-items:center;gap:5px;font-size:14px;line-height:1.1}
+.cl-br b .i{width:13px;height:13px;color:var(--gold-2);flex:none}
 .cl-br small{text-align:right}
-.cl-knots{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cl-knots{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .cl-k{display:inline-grid;place-items:center;width:18px;height:18px;padding:0;border:0;border-radius:50%;background:#262b30;box-shadow:inset 0 0 0 1px #33393f;color:var(--parch-3)}
 .cl-k .i{width:12px;height:12px}
 .cl-k.big{width:24px;height:24px}
+.cl-k[data-kind="fork"]{box-shadow:inset 0 0 0 1px var(--gold-3)}
 .cl-k.on{background:var(--gold);box-shadow:0 0 6px rgba(221,188,122,.5);color:#1a1510}
 .cl-k.now{background:#0e1114;box-shadow:0 0 0 2px var(--spirit),0 0 12px -2px var(--spirit);color:var(--spirit)}
 .cl-k:hover{filter:brightness(1.25)}
-.cl-why{flex:none}
+@media (max-width:900px){.cl-tgrid{grid-template-columns:minmax(0,1fr)}}
 
 /* поиск клана — пустое состояние */
 .cl-fhead{display:flex;align-items:center;gap:var(--sp-m);padding:var(--sp-m);flex:none}
@@ -147,6 +192,23 @@
 .cl-lrow.me span{color:var(--spirit)}
 .cl-thd{gap:var(--sp-m);align-items:flex-start}
 .cl-thd .col{gap:var(--sp-s)}
+/* запись сказителя и свита строкой портретов */
+.cl-rec{display:flex;flex-direction:column;gap:6px}
+.cl-gs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--sp-s)}
+.cl-g{display:flex;flex-direction:column;align-items:center;gap:4px;padding:0;border:0;background:none;color:var(--parch-2);min-width:0}
+.cl-g .cl-ph.sm{width:100%;max-width:64px}
+.cl-g small{font-size:11.5px;line-height:1.15;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cl-g:hover .cl-ph{border-color:var(--gold-3)}
+/* лист фигуры сонма и лист «Сонмы стихий» */
+.cl-foe{display:flex;gap:var(--sp-m);align-items:flex-start}
+.cl-foe>.col{gap:var(--sp-s);min-width:0;flex:1}
+.cl-cls{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--parch-2)}
+.cl-hosts{display:flex;flex-direction:column;gap:6px}
+.cl-hrow{display:grid;grid-template-columns:92px repeat(2,minmax(0,1fr));gap:var(--sp-s);align-items:center;padding:6px 0;border-top:1px solid var(--iron)}
+.cl-hrow:first-child{border-top:0}
+.cl-hrow .cl-g{flex-direction:row;justify-content:flex-start;gap:8px}
+.cl-hrow .cl-g .cl-ph.sm{width:40px}
+.cl-hrow .cl-g small{font-size:13px;text-align:left;color:var(--parch)}
 .cl-abs{display:flex;flex-direction:column;gap:6px}
 .cl-ab{display:flex;flex-direction:column;gap:2px;padding:6px 8px;border-radius:8px;background:#0e1114;border:1px solid var(--iron)}
 .cl-ab b{font-size:13.5px}
@@ -183,6 +245,7 @@
 .cl-lg small{white-space:nowrap}
 .cl-alts{gap:6px}
 .cl-alt{display:flex;align-items:center;gap:var(--sp-m);padding:8px 10px;border-radius:10px;border:1px solid var(--iron);background:#0e1114}
+.cl-alt>.i{width:16px;height:16px;color:var(--gold-2);flex:none}
 .cl-alt .col{gap:2px;flex:1;min-width:0}
 .cl-alt b{font-size:14px}
 .cl-alt small{font-size:12.5px;color:var(--parch-2)}
@@ -196,3 +259,13 @@
 .cl-kit-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-m)}
 .cl-knots.static .cl-k{cursor:default}
 .cl-t.k td,.cl-t.k th{padding:3px 6px}
+/* UI-кит: галерея сонмов — стихия строкой, восемь фигур с именем и ролью */
+.cl-kgal{display:flex;flex-direction:column;gap:var(--sp-s)}
+.cl-kgal-r{display:grid;grid-template-columns:110px repeat(8,minmax(0,1fr));gap:var(--sp-s);align-items:start}
+.cl-kgal-h{display:flex;flex-direction:column;gap:4px;align-items:flex-start;padding-top:6px}
+.cl-kgal-h small{font-size:12px;color:var(--parch-3)}
+.cl-kgal-f{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.cl-kgal-f .cl-ph.sm{width:100%;max-width:84px}
+.cl-kgal-f figcaption{display:flex;flex-direction:column;align-items:center;gap:1px;text-align:center;min-width:0}
+.cl-kgal-f b{font-size:12px;line-height:1.15;color:var(--parch)}
+.cl-kgal-f small{font-size:10.5px;line-height:1.15;color:var(--parch-3)}

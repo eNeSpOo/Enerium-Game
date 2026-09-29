@@ -1,0 +1,217 @@
+/* screens/pass.css — боевой пропуск и дар дня (screens/pass.js).
+   Правила воздуха (ADR-0026): одна мысль на экран; на карточке — не больше двух чисел, двух чипов и одного действия; подробности — листами.
+   Отступы — токены --sp-l / --sp-m / --sp-s; редкость — --rc и кристалл от [data-r] (ADR-0027). Свои классы — с префиксами ps- и dg-.
+   Анимация получения — только transform и opacity; моменты задаёт экран переменными --dt и --tt (отрицательная задержка — показ
+   продолжается после перерисовки); «меньше движения» — без анимации. Правила без .g — чтобы те же клетки рисовал раздел UI-кита. */
+
+/* ================== экран: баннер, ниже — следующая награда и лента ================== */
+.ps{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);grid-auto-rows:auto;gap:var(--sp-m)}
+.ps-ban{position:relative;display:flex;align-items:flex-end;gap:var(--sp-m);height:88px;padding:var(--sp-s) var(--sp-m);border-radius:12px;border:1px solid var(--iron);overflow:hidden;background:#0d1013;min-width:0}
+.ps-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:62% 52%}
+.ps-art.stub{display:block;background:radial-gradient(55% 150% at 74% 118%,rgba(72,229,212,.24),transparent 62%),radial-gradient(34% 90% at 86% 6%,rgba(230,168,75,.32),transparent 70%),radial-gradient(18% 50% at 60% 40%,rgba(230,168,75,.18),transparent 70%),linear-gradient(100deg,#0a0c0f 30%,#17130e 72%,#211a11)}
+.ps-ban::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(8,10,12,.94) 0%,rgba(8,10,12,.6) 36%,rgba(8,10,12,.08) 68%,rgba(8,10,12,.4) 100%)}
+.ps-id{position:relative;z-index:1;display:flex;flex-direction:column;gap:2px;min-width:0;margin-right:auto}
+.ps-id>b{font:600 27px/1 var(--f-d);color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ps-id>small{font-size:12.5px;color:var(--parch-2);white-space:nowrap}
+.ps-pts{position:relative;z-index:1;appearance:none;display:flex;align-items:center;gap:var(--sp-m);min-width:0;width:260px;padding:6px var(--sp-m);border-radius:10px;border:1px solid rgba(221,188,122,.32);background:rgba(10,12,14,.74);color:var(--parch);text-align:left;font:inherit}
+.ps-pts:hover{border-color:rgba(221,188,122,.6)}
+.ps-lv{display:flex;flex-direction:column;align-items:center;flex:none}
+.ps-lv b{font:600 30px/1 var(--f-d);color:var(--gold)}
+.ps-lv small{font-size:11px;color:var(--parch-3)}
+.ps-pb{display:flex;flex-direction:column;gap:5px;flex:1 1 auto;min-width:0}
+.ps-pb small{font-size:12px;color:var(--parch-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ps-q{position:relative;z-index:1;align-self:flex-start}
+.ps-main{display:grid;grid-template-columns:188px minmax(0,1fr);gap:var(--sp-m);min-height:0;min-width:0}
+
+/* следующая награда крупно: ждут — «Забрать всё», иначе — ступень впереди; путь пройден — рамка сезона */
+.ps-next{display:flex;flex-direction:column;align-items:center;gap:5px;padding:var(--sp-m);text-align:center;min-width:0;min-height:0;overflow:hidden}
+.ps-next .ps-big{--pb:76px}
+.ps-next .eyebrow{align-self:stretch}
+.ps-next.wait{border-color:rgba(72,229,212,.4);box-shadow:inset 0 -26px 30px -26px var(--spirit)}
+.ps-nt{font-size:19px;line-height:1.1;color:var(--parch)}
+.ps-ns{font-size:12.5px;color:var(--parch-3)}
+.ps-ns b{color:var(--parch)}
+.ps-all{margin-top:auto;width:100%}
+.ps-src{margin-top:auto}
+.ps-big{position:relative;display:grid;place-items:center;width:var(--pb,84px);height:var(--pb,84px);flex:none;border-radius:16px;border:1px solid var(--iron);
+  background:radial-gradient(70% 70% at 50% 100%,color-mix(in srgb,var(--rc,#ddbc7a) 30%,transparent),transparent 72%),#0b0e11;box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--rc,#6a5534) 70%,transparent)}
+.ps-big>img{width:84%;height:84%;object-fit:contain}
+.ps-big .zp-cp{width:90%}
+.ps-big.sm{--pb:46px;border-radius:10px}
+.ps-stack{display:flex;justify-content:center;padding:4px 0 2px}
+.ps-sk{display:grid;place-items:center;width:58px;height:58px;margin-left:-16px;border-radius:12px;border:1px solid var(--iron-2);background:radial-gradient(70% 70% at 50% 100%,color-mix(in srgb,var(--rc,#ddbc7a) 28%,transparent),transparent 72%),#0b0e11;box-shadow:0 6px 14px -8px #000}
+.ps-sk:first-child{margin-left:0}
+.ps-sk:nth-child(2){transform:translateY(-6px)}
+.ps-sk>img{width:80%;height:80%;object-fit:contain}
+.ps-sk .zp-cp{width:88%}
+
+/* лента: страница из десяти ступеней, строки «Бесплатный» и «Платный»; страница кончается вехой */
+.ps-rib{display:flex;flex-direction:column;gap:var(--sp-s);padding:var(--sp-s) var(--sp-m) var(--sp-m);min-width:0;min-height:0}
+.ps-rh{display:flex;align-items:center;gap:var(--sp-s);min-width:0}
+.ps-pg{margin-left:auto}
+.ps-pg button{position:relative}
+.ps-pg .bdg{position:absolute;top:4px;right:3px;min-width:0;width:7px;height:7px;padding:0;border-radius:50%;background:var(--spirit);box-shadow:0 0 6px var(--spirit)}
+.ps-grid{display:grid;grid-template-columns:72px repeat(10,minmax(0,1fr));gap:4px;align-content:start;min-width:0}
+.ps-lab,.ps-t{display:grid;grid-template-rows:16px 62px 62px;gap:4px;min-width:0}
+.ps-t{padding:0 2px 3px;border-radius:10px}
+.ps-t.mile{background:linear-gradient(180deg,rgba(221,188,122,.1),transparent 72%);box-shadow:inset 0 0 0 1px rgba(221,188,122,.3)}
+.ps-tn{font:700 11px/16px var(--f-u);text-align:center;color:var(--parch-3)}
+.ps-t.on .ps-tn{color:var(--gold)}
+.ps-t.cur .ps-tn{color:var(--spirit)}
+.ps-rl{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:4px;min-width:0;font:700 10.5px/1.1 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--parch-3)}
+.ps-rl.paid{color:var(--gold-2)}
+.ps-buy{appearance:none;display:inline-flex;align-items:center;gap:3px;padding:2px 6px 2px 4px;border-radius:7px;border:1px solid var(--gold-3);background:#14120d;color:var(--gold);font:700 11px/1 var(--f-u);letter-spacing:0;text-transform:none}
+.ps-buy .i{width:12px;height:12px}
+.ps-buy .cost{display:inline-flex;align-items:center;gap:3px}
+.ps-buy .cost img{width:14px;height:14px;object-fit:contain}
+.ps-buy:hover{border-color:var(--gold-2)}
+.ps-open{height:18px;padding:0 5px;font-size:10px;text-transform:none;letter-spacing:0}
+.ps-open .i{width:11px;height:11px}
+
+/* клетка: значок и одно число; сундук — кристалл редкости. got — забрано, ready — ждёт, far — впереди, lock — платный ряд закрыт */
+.ps-c{position:relative;appearance:none;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:0;padding:4px 0 3px;border-radius:9px;border:1px solid var(--iron);background:#0d1013;color:var(--parch);font:inherit}
+.ps-c:hover{border-color:var(--iron-2)}
+.ps-ci{position:relative;display:grid;place-items:center;width:min(40px,86%);aspect-ratio:1;border-radius:8px;background:radial-gradient(80% 80% at 50% 100%,color-mix(in srgb,var(--rc,#2b3036) 28%,transparent),transparent 72%)}
+.ps-ci>img{width:88%;height:88%;object-fit:contain}
+.ps-ci .zp-cp{width:94%}
+.ps-c>small{font-size:11px;line-height:12px;height:12px;color:var(--parch-2);white-space:nowrap}
+.ps-rr{display:inline-flex;align-items:center;justify-content:center}
+.ps-c.far{opacity:.6}
+.ps-c.ready{border-color:rgba(72,229,212,.6);box-shadow:inset 0 -12px 14px -12px var(--spirit)}
+.ps-c.got{opacity:.46}
+.ps-c.lock{opacity:.46}
+.ps-c.lock.on{opacity:.82}
+.ps-ck{position:absolute;right:2px;top:2px;display:grid;color:var(--spirit)}
+.ps-ck .i{width:12px;height:12px}
+.ps-lk{position:absolute;right:2px;top:2px;display:grid;color:var(--gold-2)}
+.ps-lk .i{width:11px;height:11px}
+.ps-dot{position:absolute;right:4px;top:4px;width:6px;height:6px}
+.ps-plus{position:absolute;right:-4px;bottom:-4px;padding:1px 3px;border-radius:5px;background:var(--gold-3);color:var(--parch);font:700 9px/1 var(--f-u)}
+.ps-ring{display:block;width:76%;height:76%;border-radius:50%;border:3px solid var(--fc);box-shadow:0 0 10px color-mix(in srgb,var(--fc) 50%,transparent),inset 0 0 8px color-mix(in srgb,var(--fc) 40%,transparent)}
+
+/* закрыт до 10-го уровня */
+.ps-lock{display:flex;align-items:center;gap:var(--sp-m);padding:var(--sp-m) var(--sp-l);align-self:start}
+.ps-lock .col b{font-size:21px;color:var(--parch)}
+
+/* команде: демо-кнопки */
+.ps-team{flex-wrap:wrap;gap:6px}
+.ps-tnote{font-size:11px;line-height:1.3;flex:1 1 100%;min-width:0}
+
+/* ================== листы ================== */
+.ps-lead{margin:0;font-size:14px}
+.ps-sth{flex-wrap:wrap}
+.ps-blk{display:flex;flex-direction:column;gap:var(--sp-s);padding:var(--sp-m);border-radius:12px;border:1px solid var(--iron);background:#0d1013}
+.ps-blk.paid{border-color:rgba(221,188,122,.28)}
+.ps-bi{display:flex;align-items:center;gap:var(--sp-m);min-width:0}
+.ps-bi b{font-size:15px;line-height:1.2}
+.ps-fw .i{transform:scaleX(-1)}
+.ps-pg2{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-s)}
+.ps-pt{display:flex;flex-direction:column;align-items:center;gap:3px;padding:var(--sp-s);border-radius:10px;border:1px solid var(--iron);background:#0d1013;text-align:center;min-width:0}
+.ps-pt b{font:600 19px/1 var(--f-d);color:var(--gold)}
+.ps-pt small{font-size:11.5px;line-height:1.2;color:var(--parch-3)}
+.ps-pt.en{border-color:rgba(79,220,139,.35)}
+.ps-li{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px;font-size:13.5px;color:var(--parch-2)}
+.ps-rows{max-height:none;overflow:visible}
+.ps-sr .ev-main{padding-right:var(--sp-s)}
+
+/* получение: награды поднимаются по одной, за каждой — вспышка; нажатие — сразу итог */
+.ps-dlg{width:min(460px,calc(100% - 40px))}
+.ps-got{position:relative;display:flex;flex-direction:column;gap:6px;max-height:238px;overflow:auto;scrollbar-width:thin;scrollbar-color:#2c3238 transparent}
+.ps-gi{position:relative;display:flex;align-items:center;gap:var(--sp-m);padding:6px var(--sp-s);border-radius:10px;border:1px solid var(--iron);background:#0d1013;min-width:0}
+.ps-gi b{font-size:14.5px}
+.ps-gf{position:absolute;left:8px;top:50%;width:46px;height:46px;margin-top:-23px;border-radius:50%;pointer-events:none;opacity:0;
+  background:radial-gradient(closest-side,#fff 0,color-mix(in srgb,var(--rc,#ddbc7a) 80%,#fff) 26%,color-mix(in srgb,var(--rc,#ddbc7a) 40%,transparent) 58%,transparent 74%)}
+.ps-got.anim .ps-gi{animation:ps-rise var(--tt) cubic-bezier(.2,.9,.3,1.2) var(--dt) both}
+.ps-got.anim .ps-gf{animation:ps-flash var(--tf) ease-out var(--df) both}
+.ps-tap{position:absolute;inset:0;z-index:3;border:0;background:none;cursor:pointer}
+@keyframes ps-rise{0%{transform:translateY(16px) scale(.72);opacity:0}60%{transform:translateY(-2px) scale(1.05);opacity:1}100%{transform:none;opacity:1}}
+@keyframes ps-flash{0%{transform:scale(.3);opacity:0}30%{transform:scale(1.1);opacity:.95}100%{transform:scale(1.8);opacity:0}}
+.ps-fxl{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
+
+/* ================== дар дня: сегодняшняя отметка крупно, лист из тридцати, вехи рисунками ================== */
+.dlg.dg-dlg .dlg-b{gap:var(--sp-s)}
+.dg{display:grid;grid-template-columns:212px minmax(0,1fr);gap:var(--sp-m);align-items:start;min-width:0}
+.dg-today{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:var(--sp-m);border-radius:14px;border:1px solid rgba(72,229,212,.4);text-align:center;
+  background:radial-gradient(90% 60% at 50% 100%,rgba(72,229,212,.14),transparent 70%),#0d1013}
+.dg-today.mile{border-color:rgba(221,188,122,.5);background:radial-gradient(90% 60% at 50% 100%,rgba(221,188,122,.16),transparent 70%),#0d1013}
+.dg-today.main{border-color:rgba(221,188,122,.75);box-shadow:0 0 22px -8px var(--gold)}
+.dg-today.got{border-color:var(--iron)}
+.dg-today .eyebrow{align-self:stretch}
+.dg-stage{position:relative;display:grid;place-items:center;width:112px;height:112px}
+.dg-glow{position:absolute;inset:-8px;border-radius:50%;pointer-events:none;opacity:.55;background:radial-gradient(closest-side,color-mix(in srgb,var(--rc,#48e5d4) 55%,transparent),transparent 72%)}
+.dg-today.mile .dg-glow{background:radial-gradient(closest-side,rgba(221,188,122,.55),transparent 72%)}
+.dg-today:not(.got):not(.anim) .dg-glow{animation:dg-breathe 2600ms ease-in-out infinite}
+.dg-today.got .dg-glow{opacity:.15}
+.dg-art{position:relative;width:112px;height:112px;border-radius:14px;object-fit:cover;box-shadow:0 0 0 1px rgba(221,188,122,.45),0 10px 24px -12px #000}
+.dg-pic{--pb:96px}
+.dg-name{font-size:17px;line-height:1.15;color:var(--parch)}
+.dg-mn{font-size:20px;line-height:1.05;color:var(--gold)}
+.dg-ml{font-size:12px;line-height:1.25;color:var(--parch-2)}
+.dg-get{width:100%}
+.dg-cd{font-size:12px}
+.dg-today.anim .dg-stage{animation:dg-pop var(--tt) cubic-bezier(.2,.9,.3,1.2) var(--dt) both}
+.dg-today.anim .dg-glow{animation:dg-flash var(--tt) ease-out var(--dt) both}
+@keyframes dg-breathe{0%,100%{transform:scale(.92);opacity:.4}50%{transform:scale(1.06);opacity:.75}}
+@keyframes dg-pop{0%{transform:scale(1)}35%{transform:scale(1.16)}70%{transform:scale(.97)}100%{transform:scale(1)}}
+@keyframes dg-flash{0%{transform:scale(.5);opacity:0}30%{transform:scale(1.15);opacity:1}100%{transform:scale(1.5);opacity:.15}}
+.dg-r{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0}
+.dg-grid{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px;min-width:0}
+.dg-c{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;padding:3px 2px 4px;border-radius:9px;border:1px solid var(--iron);background:#0d1013;min-width:0}
+.dg-c>small{align-self:flex-start;padding-left:2px;font:700 10px/1 var(--f-u);color:var(--parch-3)}
+.dg-ci{display:grid;place-items:center;width:min(34px,90%);aspect-ratio:1;border-radius:7px;overflow:hidden;background:radial-gradient(80% 80% at 50% 100%,color-mix(in srgb,var(--rc,#2b3036) 26%,transparent),transparent 72%)}
+.dg-ci>img{width:88%;height:88%;object-fit:contain}
+.dg-ci>img.dg-mimg{width:100%;height:100%;object-fit:cover}
+.dg-ci .zp-cp{width:94%}
+.dg-c.got{opacity:.45}
+.dg-c.now{border-color:rgba(72,229,212,.7);box-shadow:inset 0 -12px 14px -12px var(--spirit)}
+.dg-c.now::after{content:"";position:absolute;inset:-3px;border-radius:11px;border:1px solid var(--spirit);pointer-events:none;animation:dg-ring 2200ms ease-out infinite}
+.dg-c.mile{border-color:rgba(221,188,122,.5);background:linear-gradient(180deg,rgba(221,188,122,.1),transparent 70%),#0d1013}
+.dg-c.main{border-color:rgba(221,188,122,.85);box-shadow:0 0 12px -4px var(--gold)}
+.dg-c.mile.now{border-color:rgba(72,229,212,.7)}
+.dg-cr{position:absolute;right:2px;top:2px;display:grid;color:var(--gold)}
+.dg-cr .i{width:12px;height:12px}
+.dg-c .ps-ck{top:auto;bottom:2px}
+@keyframes dg-ring{0%{transform:scale(.96);opacity:.9}100%{transform:scale(1.12);opacity:0}}
+/* вехи крупно: строка из четырёх под листом — рисунок, имя, когда */
+.dg-miles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--sp-s)}
+.dg-m{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;border-radius:10px;border:1px solid rgba(221,188,122,.32);background:linear-gradient(180deg,rgba(221,188,122,.08),transparent 70%),#0d1013;text-align:center;min-width:0}
+.dg-m.main{border-color:rgba(221,188,122,.8);box-shadow:0 0 14px -6px var(--gold)}
+.dg-m.now{border-color:rgba(72,229,212,.7)}
+.dg-m.got{opacity:.5}
+.dg-mp{position:relative;display:grid;place-items:center;width:44px;height:44px;border-radius:10px;overflow:hidden;background:radial-gradient(80% 80% at 50% 100%,color-mix(in srgb,var(--rc,#ddbc7a) 28%,transparent),transparent 72%)}
+.dg-mp>img{width:100%;height:100%;object-fit:cover}
+.dg-mp .zp-cp{width:92%}
+.dg-mp .dg-cr{right:1px;top:1px}
+.dg-m>b{font:600 13.5px/1.1 var(--f-d);color:var(--parch)}
+.dg-m>small{font-size:11px;line-height:1.1}
+/* Входящие: строка дара дня */
+.dg-row{display:flex;align-items:center;gap:var(--sp-s);width:100%;text-align:left;color:var(--parch)}
+.dg-row .well img{width:80%;height:80%;object-fit:contain}
+.dg-row .zp-cp{width:90%}
+/* Убежище: «Дар дня» светится, пока отметка ждёт; «Пропуск» — точка, если ждут награды */
+.ps-sb .dot{width:6px;height:6px;margin-left:2px}
+.ps-sb.hot{border-color:rgba(72,229,212,.6);box-shadow:inset 0 -10px 14px -10px var(--spirit),0 0 14px -6px var(--spirit)}
+
+/* ================== UI-кит ================== */
+.ps-kbox .k-row{align-items:flex-start}
+.ps-kar{gap:var(--sp-s)}
+.ps-kit{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--sp-m)}
+.ps-kf,.ps-kn,.ps-ka,.ps-kb{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px}
+.ps-kf{width:64px}
+.ps-kf .ps-c,.ps-kf .dg-c{width:56px}
+.ps-kf .ps-c{height:62px}
+.ps-kn{width:190px}
+.ps-kn .ps-next{width:100%;min-height:230px}
+.ps-knr{align-items:stretch}
+.ps-kf figcaption,.ps-kn figcaption,.ps-ka figcaption,.ps-kb figcaption{font-size:11.5px;line-height:1.15;color:var(--parch-2);text-align:center}
+.ps-ka{width:84px}
+.ps-ka.wide{width:180px}
+.ps-ka>img,.ps-ka>.ps-art{position:static;display:block;width:100%;height:72px;border-radius:10px;object-fit:cover;border:1px solid var(--iron)}
+.ps-kb{width:120px}
+.ps-kb .ps-gi{justify-content:center;width:100%}
+.ps-gi.kb0{opacity:.35;transform:translateY(10px) scale(.8)}
+.ps-gi.kb1 .ps-gf{opacity:.9;transform:scale(1.1)}
+
+@media (prefers-reduced-motion:reduce){
+  .ps-got.anim *,.ps-got.anim,.dg-today *,.dg-c.now::after{animation:none!important;transition:none!important}
+}

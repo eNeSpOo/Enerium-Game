@@ -1,8 +1,10 @@
 /* screens/hero-dev.js — развитие героя и одно окно снаряжения (GDD §3.3, §4.1, §10, §21, §26, §33.2; ADR-0016, ADR-0019, ADR-0022,
    ADR-0026, ADR-0027). Договор — screens/model.js. Регистрирует:
+   — знак рунных пределов: пять рунных камней по бокам портрета, свет поднимается снизу — rpPost, rpRow, rpNext и арт RP_ART; его
+     берут плитка и шапка героя (hrTile, hrHead в screens/heroes.js), путь, листы и анимация пробития здесь;
    — вкладку «Развитие» карточки героя: hdPower(h), её зовёт heroDetail в index.html. Путь героя — пять отрезков уровня, между ними
-     ворота рунных пределов, в конце — звезда доблести. Одна главная вещь — следующий шаг: поднять уровень, пробить предел, взять
-     доблесть. Характеристики — тихой строкой, подробности — в листах;
+     ворота рунных пределов — рунные камни, в конце — звезда доблести. Одна главная вещь — следующий шаг: поднять уровень, пробить
+     предел, взять доблесть. Характеристики — тихой строкой, подробности — в листах;
    — низ вкладки «Снаряжение»: hdGearFoot(h) — «Надеть лучшее» или вход в окно снаряжения;
    — heroDev(h): что нужно для предела и доблести из запасов; её читают шахта (navHeroes) и проверки;
    — «сервер» HD_SRV: уровень, предел и доблесть — операции с номером: проверка, расход и итог одним вызовом, итог решён до анимации,
@@ -15,7 +17,7 @@
      неподходящие тусклые с причиной. Перетаскивание — pointer events, палец и мышь; нажатие — вещь, подсвеченные места, место.
      Сравнение с надетым — стрелками у строк и мощи. Снять — перетащить в запасы или кнопкой. «Надеть лучшее» — операция GR_SRV
      с номером. Листы OV.tal (talismans.js) и OV.eq (equipment.js) открывают это окно на своём месте;
-   — раздел UI-кита через KIT_EXTRA и сценарии презентации.
+   — разделы UI-кита «Рунные пределы» и «Развитие героя и снаряжение» через KIT_EXTRA и сценарии презентации.
    Доблесть по §3.3 и ADR-0016 даёт +INV.hero.valorPct % к базовым характеристикам накопительно: источник героя для боя и мощи
    собирает index.html (valorSt, heroSt), здесь — показ. Своё состояние — S.hd и S.gear, заводятся как S.bag. Числа — HD_DATA и HD_VIEW.
    Служебное — только команде: TM, PL, tmT из index.html. Автопроверка — tools/content-gen/screens/check_hero_dev.js. */
@@ -25,8 +27,15 @@
 const HD_DATA = {
   qty: [1, 10, 'max'],   // §33.2: уровни пачкой — сколько за раз; «Макс» — сколько хватает духа, но не выше потолка
   qtyStart: 'max',       // выбор при входе: до потолка, сколько хватает духа — одно нажатие вместо многих
-  /* сценарии презентации: кто пробивает предел, кто берёт доблесть и последнюю доблесть, чьё снаряжение открыть */
-  flow: { limit: 'h2', valor: 'h4', last: 'h2', gear: 'h1' },
+  /* сценарии презентации: кто пробивает предел, кто берёт доблесть и последнюю доблесть, чьё снаряжение открыть; у руны обучения —
+     на каком пределе герой цикла I берёт первую доблесть (второй биом) */
+  flow: { limit: 'h2', valor: 'h4', last: 'h2', gear: 'h1', train: 1 },
+  /* руна обучения — руна первой доблести, её даёт 8-й уровень аккаунта (§16, ADR-0018). Отдельного предмета в recipes.js нет: это руна
+     доблести цикла I (ярус valor), и отличает её не имя, а источник — награда уровня аккаунта; сколько таких рун не потрачено, держит
+     «сервер» развития (S.hd.train). Её можно применить на любом пределе — первая доблесть героя цикла I учит доблести во втором биоме;
+     обычная руна доблести — только на пятом пределе (ADR-0031, п. 2; §10.2). demo — не потрачено у демо-аккаунта: боец отряда уже
+     взял ею доблесть (ADR-0031, п. 1) */
+  train: { level: 8, cyc: 1, demo: 0 },
 };
 /* числа вида: время анимаций — мс от начала показа; размеры — px; частицы EnFx — [сколько, скорость, жизнь мс, размер] */
 const HD_VIEW = {
@@ -81,9 +90,51 @@ const hdRune = (it, cls = '') => it ? `<span class="hdv-rn${cls ? ' ' + cls : ''
 /* цена у кнопки: руна предела — медальоном со знаком, руна доблести — значком доблести; число, у нехватки — «есть / нужно» */
 const hdCost = (it, n, have) => `<span class="cost">${it && it.tier === 'valor' ? ICON('valor', 18, 'Руна доблести') : hdRune(it, 'sm')}${have != null && have < n ? `${fmt(have)} / ${fmt(n)}` : fmt(n)}</span>`;
 
+/* ================== знак рунных пределов ==================
+   Слово автора 29.09.2026: пять чёрточек у уровня — «слабо», пределы — «слева и справа по бокам» героя. Пять рунных камней — вставки
+   в раму портрета: I внизу, V вверху, свет поднимается снизу («Свет снизу»). Пройденный предел горит бирюзой карста; следующий на
+   потолке уровня тлеет (wait), а когда рун хватает — пульсирует (ready); остальные погасшие. Один язык везде:
+   — плитка героя (hrTile, screens/heroes.js) — крошечные камни по бокам портрета, два столба зеркально;
+   — шапка карточки (hrHead) — столбы камней по бокам лица;
+   — путь развития — ворота пределов I–V камнями, лист предела, превью доблести и «Что изменилось» — строкой из пяти;
+   — анимация пробития — погасший камень в центре, руны слетаются, он загорается; внизу — пять камней героя, новый загорается с ним.
+   Камень рисует CSS (.rp-s, hero-dev.css): погасший — фон, горящий со светом — слой ::after, пульс меняет только opacity. Картинка —
+   SVG-заглушка в стилях; нарисованный камень (tools/art-gen/jobs/rune-limits.json, слои — rune_stones.py) берут крупные камни
+   от 18 px (класс p), как только его пути — в RP_ART.ready. Пределов в круге — INV.hero.capByLim, число в код не вписано */
+const RP_ART = {
+  ready: ['limits/stone-on.png', 'limits/stone-off.png'],   // выгружены 29.09.2026; без пути — SVG-заглушка той же формы
+  on: 'limits/stone-on.png',    // горящий: art/generated/limits/rl-stone__nb2.on.png
+  off: 'limits/stone-off.png',  // погасший: art/generated/limits/rl-stone__nb2.off.png
+};
+const rpTop = () => INV.hero.capByLim.length - 1;   // §10.1: пределов в круге — 5
+const rpSay = n => `Рунный предел ${n} из ${rpTop()}`;
+/* следующий камень героя аккаунта: на потолке уровня — 'wait' (рун не хватает) или 'ready' (можно пробить); иначе '' */
+function rpNext(h) {
+  if (!h || h.lvl < h.cap || h.lim >= rpTop()) return '';
+  const d = heroDev(h);
+  return !d.rune ? '' : d.have >= d.need ? 'ready' : 'wait';
+}
+/* камни I…V: пройдено n, следующий — в состоянии nx; cls — размер: p — крупный, берёт нарисованный камень */
+const rpStones = (n, nx = '', cls = '') => Array.from({ length: rpTop() }, (_, k) => `<i class="rp-s ${k < n ? 'on' : k === n && nx ? nx : 'off'}${cls ? ' ' + cls : ''}"></i>`).join('');
+/* столб камней у портрета: kind — t (плитка) или h (шапка карточки), side — l или r; камни снизу вверх */
+const rpPost = (n, nx, kind, side) => `<span class="rp ${kind} ${side}" aria-hidden="true">${rpStones(n, nx)}</span>`;
+/* строка из пяти камней — в листах, превью и UI-ките */
+const rpRow = (n, nx = '') => `<span class="rp i" role="img" aria-label="${rpSay(n)}" title="${rpSay(n)}">${rpStones(n, nx)}</span>`;
+/* нарисованный камень — адреса в переменные <html>, как значки --ico-*; до выгрузки CSS берёт SVG-заглушку */
+(function rpArtVars() {
+  if (!RP_ART.ready.includes(RP_ART.on) || !RP_ART.ready.includes(RP_ART.off)) return;
+  const abs = p => (typeof artAbs === 'function' ? artAbs(p) : AV(p));
+  try { const st = document.documentElement.style; st.setProperty('--rp-on-p', `url("${abs(RP_ART.on)}")`); st.setProperty('--rp-off-p', `url("${abs(RP_ART.off)}")`); } catch (_) { }
+})();
+
 /* ================== развитие на запасах (§10, ADR-0014) ==================
    Предел — INV.hero.runesPerLimit рун своего предела цикла героя; доблесть — одна руна доблести цикла героя, только на пятом пределе.
-   Руну собирают из осколков в мастерской (рецепт — recipes.js). step — следующий шаг: уровень, предел, доблесть или путь пройден */
+   Руну собирают из осколков в мастерской (рецепт — recipes.js). Исключение — руна обучения (HD_DATA.train): на любом пределе.
+   step — следующий шаг: уровень, предел, доблесть или путь пройден */
+/* руна обучения подходит герою: она есть у аккаунта, герой — её цикла и берёт первую доблесть, личный максимум её допускает */
+const hdTrain = h => !!(S && S.hd && S.hd.train > 0) && h.cycle === HD_DATA.train.cyc && h.valor === 0 && h.maxV > 0;
+/* какой руной будет доблесть: обычной — на пятом пределе, если она есть; иначе руной обучения, если она подходит */
+const hdUseTrain = (h, d) => !!d.train && !(d.open && d.vrHave > 0);
 function heroDev(h) {
   const D = INV.hero, top = D.capByLim.length - 1, c = h.cycle;
   const rune = h.lim < top ? limitRune(c, h.lim + 1) : null;
@@ -93,6 +144,7 @@ function heroDev(h) {
     vr, vrHave: vr ? BAG.qty(vr.id) : 0, vs, vsHave: vs ? BAG.qty(vs.id) : 0, vsNeed: part ? part[1] : 0, rec, open: h.lim >= D.valorAtLim };
   d.step = h.lvl < h.cap ? 'lvl' : h.lim < top ? 'limit' : h.valor < h.maxV ? 'valor' : 'done';
   d.craft = !d.vrHave && !!d.rec && d.vsNeed > 0 && d.vsHave >= d.vsNeed;   // руну доблести можно собрать из осколков
+  d.train = hdTrain(h);   // руна обучения подходит: на любом пределе
   return d;
 }
 /* сколько уровней поднять: выбор «сколько за раз»; «Макс» — сколько хватает духа, но не выше потолка; хотя бы один */
@@ -104,7 +156,7 @@ function hdQty(h) {
   return Math.max(1, q);
 }
 const hdLimCan = h => { const d = heroDev(h); return !!d.rune && d.atCap && d.have >= d.need; };
-const hdValCan = h => { const d = heroDev(h); return h.valor < h.maxV && d.open && d.vrHave > 0; };
+const hdValCan = h => { const d = heroDev(h); return h.valor < h.maxV && ((d.open && d.vrHave > 0) || hdUseTrain(h, d)); };
 /* снимок героя до и после операции — для превью и карточки «Что изменилось» */
 const hdSnap = h => ({ valor: h.valor, lvl: h.lvl, lim: h.lim, cap: h.cap, st: heroSt(h), bm: h.bm });
 
@@ -146,14 +198,16 @@ const HD_SRV = {
   valor(op, hid) {
     return HD_SRV.run(op, () => {
       const h = H(hid); if (!h) return { refuse: 'hero' };
-      const d = heroDev(h);
+      const d = heroDev(h), tr = hdUseTrain(h, d);   // руна обучения — на любом пределе; на пятом с обычной руной — обычная
       if (h.valor >= h.maxV) return { refuse: 'max' };
-      if (!d.open) return { refuse: 'early' };
-      if (!d.vr || !BAG.take(d.vr.id, 1)) return { refuse: 'rune' };
+      if (!d.open && !tr) return { refuse: 'early' };
+      if (tr) S.hd.train--;
+      else if (!d.vr || !BAG.take(d.vr.id, 1)) return { refuse: 'rune' };
       const was = hdSnap(h);
+      h.keep = was.lim;   // пределы прошлого круга: их РП сила коллекции держит на прежнем круге (collHero, §10.3)
       h.valor = was.valor + 1; h.lvl = 0; h.lim = 0; h.cap = hdCapOf(0);   // §10.2: уровень — в 0, пределы проходятся заново
       const now = hdSnap(h), last = h.valor >= h.maxV;
-      return { ok: 'valor', hid: h.id, r: h.r, rune: d.vr.id, was, now, last, maxV: h.maxV,
+      return { ok: 'valor', hid: h.id, r: h.r, rune: tr ? '' : d.vr.id, train: tr, was, now, last, maxV: h.maxV,
         opens: hdOpens(h, h.valor).map(x => ({ id: x.id, slot: x.slot, n: x.n })), ch: hdChapter(h, h.valor), reveal: last ? hdReveal(h) : null };
     });
   },
@@ -171,11 +225,13 @@ const HD_WHY = {
 };
 
 /* ================== вкладка «Развитие» ==================
-   Путь героя: пять отрезков уровня (0–50, 50–150, …, 700–1200), ворота рунных пределов I–V, в конце — звезда доблести. Пройденное
-   светится, текущий отрезок заполнен уровнем, следующие ворота — кнопка: что нужно и что будет. Ниже — следующий шаг героя одной
-   карточкой с одним действием; характеристики — тихой строкой */
+   Путь героя: пять отрезков уровня (0–50, 50–150, …, 700–1200), ворота рунных пределов I–V — рунные камни, в конце — звезда доблести.
+   Пройденный отрезок светится золотом, пройденный камень горит, текущий отрезок заполнен уровнем; следующий камень — кнопка: что нужно
+   и что будет, на потолке уровня он тлеет, а когда рун хватает — пульсирует. Ниже — следующий шаг героя одной карточкой с одним
+   действием; характеристики — тихой строкой */
 function hdPath(h, d) {
   const caps = INV.hero.capByLim, lv = S.hd.lv && S.hd.lv.hid === h.id && hdNow() - S.hd.lv.t0 < HD_VIEW.grow ? S.hd.lv : null;
+  const nx = d.atCap && d.rune ? (d.have >= d.need ? 'ready' : 'wait') : '';   // следующий камень — как на плитке (rpNext)
   const cells = [];
   for (let k = 0; k < d.top; k++) {
     const lo = k ? caps[k - 1] : 0, hi = caps[k], span = Math.max(1, hi - lo);
@@ -183,14 +239,15 @@ function hdPath(h, d) {
     const f0 = lv && k === h.lim ? Math.min(100, hdFl(Math.max(0, lv.from - lo) * 100, span)) : f;
     const st = k < h.lim ? 'done' : k === h.lim ? 'cur' : '';
     cells.push(`<span class="hdv-seg${st ? ' ' + st : ''}${f0 !== f ? ' grow' : ''}" style="--f:${f};--f0:${f0}${lv ? `;--el:${hdNow() - lv.t0}` : ''}"><i></i></span>`);
-    const g = k + 1, gst = k < h.lim ? 'done' : k === h.lim ? (d.atCap ? 'next ready' : 'next') : 'far';
-    const tip = k < h.lim ? `Рунный предел ${ROMAN[g]} пройден` : k === h.lim ? `Рунный предел ${ROMAN[g]} — на уровне ${hi}` : `Рунный предел ${ROMAN[g]} — на уровне ${hi}`;
+    const g = k + 1, gst = k < h.lim ? 'done' : k === h.lim ? `next${nx ? ' ' + nx : ''}` : 'far';
+    const stone = `<i class="rp-s ${k < h.lim ? 'on' : k === h.lim && nx ? nx : 'off'} p"></i>`;
+    const tip = k < h.lim ? `Рунный предел ${ROMAN[g]} пройден` : `Рунный предел ${ROMAN[g]} — на уровне ${hi}${k === h.lim && nx === 'ready' ? ' · руны готовы' : ''}`;
     cells.push(k === h.lim
-      ? `<button class="hdv-gate ${gst}" data-v="${h.id}" data-a="limit" title="${tip}" aria-label="${tip}"><b>${ROMAN[g]}</b><small class="num">${hi}</small></button>`
-      : `<span class="hdv-gate ${gst}" title="${tip}"><b>${ROMAN[g]}</b><small class="num">${hi}</small></span>`);
+      ? `<button class="hdv-gate ${gst}" data-v="${h.id}" data-a="limit" title="${tip}" aria-label="${tip}">${stone}<small class="num">${hi}</small></button>`
+      : `<span class="hdv-gate ${gst}" title="${tip}">${stone}<small class="num">${hi}</small></span>`);
   }
-  const vst = h.valor >= h.maxV ? 'max' : d.open ? 'ready' : 'lock', dot = h.valor < h.maxV && (d.vrHave > 0 || d.craft);
-  const vtip = vst === 'max' ? `Доблесть ${h.valor} из ${h.maxV} — личный максимум` : `Доблесть ${h.valor + 1} из ${h.maxV}${vst === 'ready' ? ' — открыта' : ` — после рунного предела ${ROMAN[INV.hero.valorAtLim]}`}${dot ? ' · руна готова или собирается' : ''}`;
+  const vst = h.valor >= h.maxV ? 'max' : d.open || d.train ? 'ready' : 'lock', dot = h.valor < h.maxV && (d.vrHave > 0 || d.craft || d.train);
+  const vtip = vst === 'max' ? `Доблесть ${h.valor} из ${h.maxV} — личный максимум` : `Доблесть ${h.valor + 1} из ${h.maxV}${vst === 'ready' ? (d.open ? ' — открыта' : ' — руна обучения: можно на любом пределе') : ` — после рунного предела ${ROMAN[INV.hero.valorAtLim]}`}${dot && d.open ? ' · руна готова или собирается' : ''}`;
   const star = `<button class="hdv-star ${vst}${dot ? ' dot' : ''}" data-v="${h.id}" data-a="valor" title="${vtip}" aria-label="${vtip}">${ICON('valor', 24, 'Доблесть')}<small>${vst === 'max' ? 'максимум' : 'доблесть'}</small></button>`;
   const say = `Путь героя: уровень ${h.lvl} из ${h.cap}, рунный предел ${h.lim} из ${d.top}, доблесть ${h.valor} из ${h.maxV}`;
   return `<div class="hdv-path" role="group" aria-label="${say}"><div class="hdv-track">${cells.join('')}</div>${star}</div>`;
@@ -207,9 +264,11 @@ function hdNext(h, d) {
   }
   if (d.step === 'limit') {
     const k = h.lim + 1, cap = hdCapOf(k), can = !!d.rune && d.have >= d.need;
-    if (!d.rune) return hdCard('limit', ic('gem'), `Рунный предел ${ROMAN[k]}`, '<span>Руны этого предела пока нет в запасах игры.</span>', `<button class="btn hdv-go" data-v="${h.id}" data-a="limit" disabled>Пробить</button>`);
+    if (!d.rune) return hdCard('limit', '<i class="rp-s off p"></i>', `Рунный предел ${ROMAN[k]}`, '<span>Руны этого предела пока нет в запасах игры.</span>', `<button class="btn hdv-go" data-v="${h.id}" data-a="limit" disabled>Пробить</button>`);
     const sub = `<span>${cap > h.cap ? `Потолок уровня <span class="num">${h.cap}</span> → <span class="num">${cap}</span>` : 'За ним — доблесть'}</span>${can ? '' : `<button class="link" data-a="item" data-v="${d.rune.id}">Где взять руны</button>`}`;
-    return hdCard('limit', hdRune(d.rune), `Рунный предел ${ROMAN[k]}`, sub,
+    /* значок шага — камень этого предела: с рунами горит ровно — таким он станет, без рун тлеет; пульсирует сам камень на пути,
+       в шапке и на плитке, здесь светится главная кнопка. Руна — в цене у кнопки */
+    return hdCard('limit', `<i class="rp-s ${can ? 'on' : 'wait'} p"></i>`, `Рунный предел ${ROMAN[k]}`, sub,
       `<button class="btn${can ? ' go' : ''} hdv-go" data-v="${h.id}" data-a="limit"${can ? '' : ' disabled'}>Пробить${hdCost(d.rune, d.need, d.have)}</button>`);
   }
   if (d.step === 'valor') {
@@ -235,10 +294,13 @@ function hdPower(h) {
 function hdLimSheet(o) {
   const h = H(o.arg), D0 = INV.hero; if (!h) return '';
   const d = heroDev(h);
-  if (!d.rune) return dialog('Рунные пределы', `<p class="muted hdv-lead">Все пять рунных пределов этого круга пройдены.${h.valor < h.maxV ? ' Дальше — доблесть.' : ''}</p>`, '<button class="btn" data-a="close">Понятно</button>', 'hdv-dlg');
+  if (!d.rune) return dialog('Рунные пределы', `<div class="hdl-who">${rpRow(h.lim)}</div><p class="muted hdv-lead">Все пять рунных пределов этого круга пройдены.${h.valor < h.maxV ? ' Дальше — доблесть.' : ''}</p>`, '<button class="btn" data-a="close">Понятно</button>', 'hdv-dlg');
   const k = h.lim + 1, cap = hdCapOf(k), can = d.atCap && d.have >= d.need;
-  const body = `<div class="hdl"><span class="hdl-rn" data-r="${d.rune.r}"><b>${d.rune.glyph}</b></span>
-      <div class="col" style="gap:4px;min-width:0"><span class="eyebrow">${hdEsc(h.name)}</span>
+  /* главное — камень этого предела: погасший, на потолке тлеет, с рунами пульсирует; рядом с именем — пять камней героя, какие
+     уже горят: пульсирует один камень, крупный */
+  const nx = can ? 'ready' : d.atCap ? 'wait' : '';
+  const body = `<div class="hdl"><span class="hdl-st"><i class="rp-s ${nx || 'off'} p"></i></span>
+      <div class="col" style="gap:4px;min-width:0"><span class="hdl-who"><span class="eyebrow">${hdEsc(h.name)}</span>${rpRow(h.lim)}</span>
         <b class="hdl-t">${cap > h.cap ? `Потолок уровня <span class="num">${h.cap}</span> → <span class="num">${cap}</span>` : 'Путь к доблести'}</b>
         <small class="faint">${cap > h.cap ? 'Без рун герой не растёт выше потолка.' : 'Последний предел круга: за ним — доблесть.'}</small></div></div>
     <dl class="kv hdl-kv"><dt>Нужно</dt><dd><button class="link" data-a="item" data-v="${d.rune.id}">${hdEsc(itName(d.rune))}</button> × ${fmt(d.need)}</dd><dt>В запасах</dt><dd class="${d.have >= d.need ? '' : 'warn'}">${fmt(d.have)}</dd></dl>
@@ -264,18 +326,20 @@ function hdRow(ico, k, was, now, note, cls = '') {
 /* пять характеристик мелко: значок, новое число и прибавка */
 const hdStMini = (a, b) => `<span class="hdv-st">${b.map((x, i) => `<span title="${STATS[i]}: ${a[i]} → ${x}">${ICON(STAT_IC[i], 14, STATS[i])}<b class="num">${x}</b>${x > a[i] ? `<i class="num">+${x - a[i]}</i>` : ''}</span>`).join('')}</span>`;
 const hdAbIco = x => ic(x.slot === 'ult' ? 'crown' : x.ab ? abIcon(x.ab) : 'spark');
-function hdValBody(h, P) {
+/* цена руной обучения у кнопки: тот же значок доблести, подпись — руна обучения */
+const hdTrainCost = () => `<span class="cost">${ICON('valor', 18, 'Руна обучения')}1</span>`;
+function hdValBody(h, P, train) {
   const gain = [hdRow(ICON('valor', 18, 'Доблесть'), 'Доблесть', String(P.v), `${P.nv} из ${h.maxV}`),
     hdRow(ICON(STAT_IC[hdMainSt(h)], 18, 'Характеристики'), 'Характеристики', '', `+${INV.hero.valorPct} %`, hdStMini(P.st0, P.st1))]
     .concat(P.opens.map(x => hdRow(hdAbIco(x), HD_SLOT[x.slot] || 'Способность', '', `«${hdEsc(x.n)}»`)))
     .concat(P.ch != null ? [hdRow(ic('book'), `Глава ${ROMAN[P.nv]}`, '', `«${hdEsc(P.ch)}»`)] : [])
     .concat(P.last ? [P.donat ? hdRow(ic('eye'), 'Память', '', 'вспомнит, кем был') : hdRow(ic('flag'), 'Орден', '', 'раскроет последняя глава')] : []);
   const loss = [hdRow(ic('up'), 'Уровень', String(P.lvl), '0'),
-    hdRow(ic('gem'), 'Рунный предел', `<span class="limits">${limits(P.lim)}</span>`, `<span class="limits">${limits(0)}</span>`),
+    hdRow(ic('gem'), 'Рунный предел', rpRow(P.lim), rpRow(0)),
     hdRow(ICON('power', 18, 'Боевая мощь'), 'Мощь', fmt(P.bm0), fmt(P.bm1), `на уровне ${P.lvl} станет ${fmt(P.bmSame)}`)];
   const lead = P.last ? `Последняя доблесть: ${hdEsc(h.name)} раскроется полностью. Уровень и рунные пределы начнутся заново.`
     : `${hdEsc(h.name)} навсегда станет сильнее. Уровень и рунные пределы начнутся заново.`;
-  return `<p class="hdv-lead">${lead}</p>
+  return `<p class="hdv-lead">${lead}</p>${train ? `<p class="rs-line">${ICON('valor', 18, '')}Руна обучения: можно на любом пределе</p>` : ''}
     <div class="hdv-pv"><section class="gain"><span class="eyebrow">Получит</span>${gain.join('')}</section>
       <section class="loss"><span class="eyebrow">Начнёт заново</span>${loss.join('')}<p class="hdv-keep">Останутся снаряжение, талисманы и сила коллекции: пройденные заново пределы усилят её вдвое.</p></section></div>
     ${TM(`§10.2, §10.4, §3.3, ADR-0016: +${INV.hero.valorPct} % к базовым характеристикам за ступень, накопительно, целыми — valorSt; способность — запись набора с доблестью ${P.nv}; мощь — BM на копии героя. Итог решает HD_SRV.valor с номером операции, анимация его только показывает.`, 'p', 'reason')}`;
@@ -284,12 +348,12 @@ function hdValSheet(o) {
   const h = H(o.arg); if (!h) return '';
   const d = heroDev(h);
   if (h.valor >= h.maxV) return dialog('Доблесть', `<p class="hdv-lead">Это личный максимум героя: доблесть ${h.valor} из ${h.maxV}. Больше ступеней у ${hdEsc(h.name)} нет.</p>`, '<button class="btn" data-a="close">Понятно</button>', 'hdv-dlg');
-  const P = hdPreview(h), can = h.valor < h.maxV && d.open && d.vrHave > 0 && !!o.v;
+  const P = hdPreview(h), tr = hdUseTrain(h, d), can = h.valor < h.maxV && ((d.open && d.vrHave > 0) || tr) && !!o.v;
   const why = !d.open ? `Откроется после рунного предела ${ROMAN[INV.hero.valorAtLim]}.` : !d.vrHave ? `Нужна руна доблести: осколков ${fmt(d.vsHave)} из ${fmt(d.vsNeed)}.` : '';
-  const get = d.vrHave ? '' : d.craft ? `<button class="btn ghost" data-a="valorcraft" data-v="${d.rec.id}">Собрать руну</button>` : d.vs ? `<button class="btn ghost" data-a="item" data-v="${d.vs.id}">Где взять</button>` : '';
-  const foot = can ? `<button class="btn ghost" data-a="close">Отмена</button><button class="btn go" data-a="valordo" data-v="${o.v}">Взять доблесть${hdCost(d.vr, 1)}</button>`
+  const get = d.vrHave || tr ? '' : d.craft ? `<button class="btn ghost" data-a="valorcraft" data-v="${d.rec.id}">Собрать руну</button>` : d.vs ? `<button class="btn ghost" data-a="item" data-v="${d.vs.id}">Где взять</button>` : '';
+  const foot = can ? `<button class="btn ghost" data-a="close">Отмена</button><button class="btn go" data-a="valordo" data-v="${o.v}">Взять доблесть${tr ? hdTrainCost() : hdCost(d.vr, 1)}</button>`
     : `<span class="reason hdv-why">${why}</span>${get}<button class="btn" data-a="close">Понятно</button>`;
-  return dialog(`Доблесть ${P.nv} из ${h.maxV}`, hdValBody(h, P), foot, 'hdv-dlg wide');
+  return dialog(`Доблесть ${P.nv} из ${h.maxV}`, hdValBody(h, P, tr), foot, 'hdv-dlg wide');
 }
 
 /* ================== анимации уровня A: пробитие предела и доблесть ==================
@@ -328,14 +392,16 @@ function hdPlay(op, r) {
   else hdTimers.push(setTimeout(() => hdBurst('.g .hdfx-stars i.new', HD_VIEW.fx.val, r.r), HD_VIEW.val.burst));
 }
 const hdFxDone = () => { const F = S.hd.fx, r = F && S.hd.srv[F.op]; if (!F || !r) return true; return F.skip || hdNow() - F.t0 >= (r.ok === 'limit' ? HD_VIEW.lim.done : HD_VIEW.val.done); };
-/* пробитие предела: руны кольцом появляются, вспыхивают и слетаются в отметку; отметка загорается; потолок уровня — новый */
+/* пробитие предела: в центре — погасший рунный камень; руны кольцом появляются, вспыхивают и слетаются в него, камень загорается;
+   под ним — пять камней героя, новый загорается вместе с ним; потолок уровня — новый */
 function hdFxLim(r, el, done, h) {
   const V = HD_VIEW.lim, n = r.need;
   const runes = Array.from({ length: n }, (_, i) => `<i style="--a:${hdFl(360 * i, n)}deg;--d:${i * V.runeIn};--df:${V.fly + i * V.flyStep}"><b>${r.glyph}</b></i>`).join('');
+  const row = Array.from({ length: rpTop() }, (_, k) => `<i class="rp-s ${k < r.lim[1] ? 'on' : 'off'}${k === r.lim[1] - 1 ? ' new' : ''}"></i>`).join('');
   const up = r.cap[1] > r.cap[0];
   return `<div class="ov hdfx hdfx-lim${done ? ' done' : ''}" data-r="${r.r}" role="dialog" aria-modal="true" aria-label="Рунный предел ${r.glyph} пройден" style="--el:${el};--rr:${V.radius}px;--dm:${V.mark};--dt:${V.title};--dc:${V.cap};--dd:${V.done}">
     <button class="hdfx-skip" data-a="hdskip" aria-label="Пропустить анимацию" tabindex="-1"></button>
-    <div class="hdfx-stage" aria-hidden="true"><span class="hdfx-halo"></span><span class="hdfx-runes">${runes}</span><span class="hdfx-mark"><b>${r.glyph}</b></span></div>
+    <div class="hdfx-stage" aria-hidden="true"><span class="hdfx-halo"></span><span class="hdfx-mark"><i class="rp-s on p"></i></span><span class="hdfx-runes">${runes}</span><span class="hdfx-row">${row}</span></div>
     <div class="hdfx-txt"><span class="eyebrow">${hdEsc(h ? h.name : '')}</span><b class="hdfx-t">Рунный предел ${r.glyph}</b>
       <span class="hdfx-cap">${up ? `Потолок уровня <s class="num">${r.cap[0]}</s> <b class="num">${r.cap[1]}</b>` : '<b>Путь к доблести открыт</b>'}</span>
       <button class="btn go hdfx-ok" data-a="hdfxok">Дальше</button></div></div>`;
@@ -348,7 +414,7 @@ function hdChanges(r, h) {
   if (r.ch != null) rows.push(hdRow(ic('book'), `Глава ${ROMAN[r.now.valor]}`, '', `«${hdEsc(r.ch)}»`, '', 'up'));
   if (r.reveal) rows.push(r.reveal.donat ? hdRow(ic('eye'), 'Память', '', 'вернулась', '', 'up')
     : hdRow(ic('flag'), 'Орден', '', r.reveal.orders.length ? r.reveal.orders.map(n => `«${hdEsc(n)}»`).join(', ') : 'вне орденов', '', 'up'));
-  rows.push(hdRow(ic('up'), 'Уровень', String(r.was.lvl), '0'), hdRow(ic('gem'), 'Рунный предел', `<span class="limits">${limits(r.was.lim)}</span>`, `<span class="limits">${limits(0)}</span>`),
+  rows.push(hdRow(ic('up'), 'Уровень', String(r.was.lvl), '0'), hdRow(ic('gem'), 'Рунный предел', rpRow(r.was.lim), rpRow(0)),
     hdRow(ICON('power', 18, 'Боевая мощь'), 'Мощь', fmt(r.was.bm), fmt(r.now.bm), 'вырастет с уровнем'));
   return rows;
 }
@@ -875,6 +941,32 @@ function hdKitHtml() {
     ${TM('<p class="k-note">Операции — с номером: уровень, предел, доблесть (HD_SRV), надеть и снять (EQ_SRV, TL_SRV), «лучшее» (GR_SRV). Итог решён до анимации, повтор номера ничего не повторяет. Движение — transform и opacity, частицы — EnFx; prefers-reduced-motion — итог без движения.</p>')}
   </section>`;
 }
+/* раздел UI-кита «Рунные пределы»: камень в четырёх состояниях и четырёх размерах, плитки, шапка, путь, строка. Герои — копии героев
+   отряда в нужном состоянии, без записи в S; состояние следующего камня задано явно, а не запасами */
+function rpKitHtml() {
+  const hs = S.heroes; if (!hs.length) return '';
+  const caps = INV.hero.capByLim, top = rpTop(), at = k => ({ lim: k, lvl: caps[Math.min(k, top)] });
+  const ST = [['off', 'не пройден'], ['wait', 'на потолке уровня, рун мало'], ['ready', 'можно пробить'], ['on', 'пройден']];
+  const SZ = ['t', 'h', 'g', 'b'];
+  const stones = ST.map(([s, t]) => `<figure class="rpk-st"><span class="rpk-sz">${SZ.map(z => `<span class="rpk-${z}"><i class="rp-s ${s}${z === 'g' || z === 'b' ? ' p' : ''}"></i></span>`).join('')}</span><figcaption>${t}</figcaption></figure>`).join('');
+  const kid = i => hs[Math.min(i, hs.length - 1)].id;
+  const tiles = [[kid(0), { lvl: 42, lim: 0 }, '', 'Пределов нет'], [kid(1), at(1), 'ready', 'Один пройден, второй можно пробить'],
+    [kid(2), at(3), 'wait', 'Три пройдено, четвёртый ждёт рун'], [kid(3), at(top), '', 'Все пять: путь к доблести']]
+    .map(([id, o, nx, t]) => `<figure class="rpk-tile">${heroCard(hdKitHero(id, o), { act: 'noop', bm: false, rpNext: nx })}<figcaption>${t}</figcaption></figure>`).join('');
+  const hh = hdKitHero(kid(2), at(2)), hv = typeof hrV === 'function' ? Object.assign(hrV(hh), { rpNx: 'ready' }) : null;
+  const head = hv && typeof hrHead === 'function' ? `<div class="pnl hd rpk-hd">${hrHead(hv)}</div>` : '';
+  const ph = hdKitHero(kid(2), at(2)), pd = Object.assign(heroDev(ph), { atCap: true }); pd.have = pd.need;
+  const nArt = [RP_ART.on, RP_ART.off].filter(p => RP_ART.ready.includes(p)).length;
+  return `<section class="k-box rpk" style="grid-column:1/-1" id="kitRuneLimits"><h3>Рунные пределы</h3>
+    <p class="k-note">Пять рунных камней по бокам портрета — рунные пределы героя. Свет поднимается снизу: пройденный предел горит бирюзой, следующий на потолке уровня тлеет, а когда рун хватает — пульсирует. Доблесть гасит все пять: пределы проходятся заново. На плитке камни крошечные, в шапке карточки — столбы у лица, на пути развития камни — ворота пределов.${TM(` Слово автора 29.09.2026: чёрточки у уровня — «слабо», пределы — «по бокам». §10.1: пять пределов на уровнях ${caps.slice(0, top).join(' / ')}; число камней — INV.hero.capByLim. Знак — rpPost, rpRow, rpNext в screens/hero-dev.js; плитка и шапка — hrTile и hrHead в screens/heroes.js.`)}</p>
+    <div class="k-air-r"><b>Камень</b><div class="rpk-sts">${stones}</div><small>Размеры — плитка, шапка карточки, путь развития, лист предела. Пульс — смена погасшего и горящего, движется только прозрачность.</small></div>
+    <div class="k-air-r"><b>Плитка героя</b><div class="rpk-tiles">${tiles}</div><small>Два столба по бокам портрета — зеркально, от кристалла и доблести до строки уровня. Имя отступает от камней, строка уровня — во всю ширину.</small></div>
+    <div class="k-air-r"><b>Шапка карточки и путь</b><div class="rpk-duo">${head}<div class="hdv hdk rpk-path">${hdPath(ph, pd)}</div></div><small>В шапке — столбы камней у лица. На пути — ворота пределов: пройденные горят, следующий — кнопка с уровнем, на котором он стоит.</small></div>
+    <div class="k-air-r"><b>Строка</b><div class="rpk-row">${[0, 2, top].map(n => rpRow(n)).join('')}</div><small>В листе предела, в превью доблести и в «Что изменилось» — пять камней строкой: было → стало.</small></div>
+    ${TM(`<p class="k-note">Картинка: SVG-заглушка в hero-dev.css — плитка и шапка всегда на ней, чётче в мелком. Нарисованный камень — tools/art-gen/jobs/rune-limits.json, горящий, $0,07; погасший выведен из него — tools/art-gen/rune_stones.py, силуэт один. Выгружено ${nArt} из 2 (RP_ART.ready): после выгрузки крупные камни от 18 px берут картинку.</p>`)}
+  </section>`;
+}
+if (typeof KIT_EXTRA !== 'undefined') KIT_EXTRA.push({ html: rpKitHtml });
 if (typeof KIT_EXTRA !== 'undefined') KIT_EXTRA.push({ html: hdKitHtml });
 
 /* ================== сценарии презентации ================== */
@@ -893,6 +985,14 @@ FLOWS.push(
       h.lim = INV.hero.valorAtLim; h.cap = hdCapOf(h.lim); h.lvl = h.cap;
       const d = heroDev(h); if (d.vr && !d.vrHave) BAG.add(d.vr.id, 1);
       ACT.valor(h.id);
+    }],
+  ['Развитие · руна обучения', 'Руна первой доблести с 8-го уровня Странника: герой цикла I берёт доблесть на любом пределе — во втором биоме',
+    () => {
+      /* аккаунт в начале второго биома: руна обучения не потрачена, золотой герой цикла I с первым пределом */
+      const x = RS.heroes.find(r => r.src === 'gold' && r.c === HD_DATA.train.cyc && r.maxV > 0 && !rsHas(r)); if (!x) return;
+      S.rs.owned[x.id] = { lvl: hdCapOf(HD_DATA.flow.train), lim: HD_DATA.flow.train, valor: 0, how: 'gold' }; S.hd.train = 1;
+      S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.seg.hero = 'power'; S.selHero = x.id; S.overlay = null;
+      ACT.valor(x.id);
     }],
   ['Развитие · последняя доблесть', 'Значок доблести взлетает и встаёт на место, свет редкости героя; «Что изменилось» — по строке, орден раскрыт',
     () => {
@@ -918,7 +1018,8 @@ FLOWS.push(
    lv — последний подъём уровня для полосы. S.gear: hid — герой окна, tab — вкладка запасов, focus — выбранное место, srv и seq —
    операции «Надеть лучшее», flash — места, куда только что легли вещи, enter — окно только что открылось */
 function hdState(s) {
-  s.hd = { srv: {}, seq: 1, fx: null, lv: null };
+  /* train — сколько рун обучения у аккаунта: 8-й уровень их выдал (§16), у демо-аккаунта руна уже потрачена (HD_DATA.train.demo) */
+  s.hd = { srv: {}, seq: 1, fx: null, lv: null, train: s.acc.level >= HD_DATA.train.level ? HD_DATA.train.demo : 0 };
   s.qty = HD_DATA.qtyStart;
   s.gear = { hid: '', tab: 'eq', focus: '', srv: {}, seq: 1, flash: null, enter: false };
   return s;

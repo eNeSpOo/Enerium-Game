@@ -63,9 +63,10 @@ const RULES = {
   tableName: { d: 'Дневной', w: 'Недельный' },
   perTable: 1,                            // §18.1: из каждой таблицы принять контракт можно один раз за период
   pool: { base: 3, art: 'a12', mem: 'p188' },   // §18.2: пул 3; артефакт «Доска объявлений» +2 за уровень, Память «Вторая печать» +1
-  rer: { free: 3, art: 'a13', price: 5, paidCap: 10, shared: true },
+  rer: { free: 3, art: 'a13', price: 5, paidCap: 8, shared: true },
   // §18.2: 3 бесплатных замены + артефакт «Кости писаря», Память и достижения; дальше 5 Энериума. Бесплатные — одни на обе таблицы
-  // и сгорают в конце дня. Платных — не больше 10 в день: предложение, чтобы рейтинг и награды не покупались заменами (§36.3, §1.2)
+  // и сгорают в конце дня. Платных — не больше 8 в день: чтобы рейтинг и награды не покупались заменами (§36.3, §1.2). Было 10:
+  // правило ×1,7 и к обычному профилю (ADR-0031, п. 9) — плательщик при 10 заменах набирал очков ×1,71 к обычному в цикле II, при 8 — ×1,63
   cert: { mul: 2, stakePct: 200, one: true, both: 'p199', disc: { p60: 1000, p109: 2000, p157: 3000 } },
   // §18.5: заверение — ×2 на награды, не на очки. Ставка — 2 × золото пула: платишь золотом за второй пул ключей и ресурсов.
   // Ставка уходит при подписи: исполнил — пул ×2, сорвал — ставка сгорает со всем. Заверить можно один контракт из двух —
@@ -433,8 +434,9 @@ function build() {
     const cover = income[c].o.keysAll * RULES.bp / capKeysWeek(c);
     if (cover < TARGET.keysCoverMin) err.push(`цикл ${ROMAN[c]}: ключи обычного со всех источников — ${pct(cover, RULES.bp)} капа, меньше ${pct(TARGET.keysCoverMin, RULES.bp)}`);
   }
-  /* ×1,7: плательщик при том же времени — на мерах прогресса: ключи после капа, золото, дух, базовые — со всеми источниками.
-     Против обычного (он осторожнее) и против бесплатного игрока с тем же риском (q): второе — чистый вклад Энериума, в нём и очки */
+  /* ×1,7: плательщик при том же времени — на мерах прогресса: ключи после капа, золото, дух, базовые — со всеми источниками, задание-дни и очки.
+     Против обычного (ADR-0031, п. 9: правило держится и к нему, хоть он осторожнее) и против бесплатного игрока с тем же риском (q):
+     второе — чистый вклад Энериума */
   const x17 = {};
   for (const c of RULES.cycles) {
     const o = income[c].o, p = income[c].p, q = income[c].q, capK = capKeysWeek(c), C = CAP.cycles[c].o;
@@ -445,7 +447,7 @@ function build() {
       gold: tot(p, 'gold') / tot(o, 'gold'), spirit: tot(p, 'spirit') / tot(o, 'spirit'), base: tot(p, 'base') / tot(o, 'base'),
       unitsQ: sims[c].p.units10 / sims[c].q.units10, ptsQ: meanPts(c, 'p') / meanPts(c, 'q'),
     };
-    row.worst = Math.max(row.keys, row.gold, row.spirit, row.base);
+    row.worst = Math.max(row.keys, row.gold, row.spirit, row.base, row.units, row.pts);   // ADR-0031, п. 9: и задание-дни с очками — к обычному
     row.worstQ = Math.max(row.unitsQ, row.ptsQ);
     x17[c] = row;
     if (row.worst * 100 > LAWS.x17) err.push(`цикл ${ROMAN[c]}: плательщик быстрее обычного в ×${dec(row.worst * 100, 100, 2)} — больше ×1,7`);
@@ -501,6 +503,8 @@ function build() {
       e: { dayDoneBp: Math.round(sims[c].e.dayDone * RULES.bp / sims[c].e.dayTry), weekDoneBp: Math.round(sims[c].e.weekDone * RULES.bp / sims[c].e.weekTry),
         keys: Math.round(income[c].e.keysAll), ctKeys: Math.round(income[c].e.keys + income[c].e.chestKeys + income[c].e.rating),
         pts: Math.round(meanPts(c, 'e')), en: Math.round(income[c].e.en), gold: Math.round(income[c].e.gold), stake: Math.round(income[c].e.stake), spirit: Math.round(income[c].e.spirit) },
+      /* p — плательщик при времени обычного: его ключи контрактов берёт прогон темпа (biomes/pace.py, ×1,7 темпа цикла II) */
+      p: { keys: Math.round(income[c].p.keysAll), ctKeys: Math.round(income[c].p.keys + income[c].p.chestKeys + income[c].p.rating), pts: Math.round(meanPts(c, 'p')) },
       x17: Math.round(x17[c].worst * 100),
     }])),
   };

@@ -9,7 +9,7 @@
 - economy.py и sets.py — средний день циклов II и III, все отряды (таблица С1 черновика сет-бонусов);
 - echo.py — неделя Эхо по циклам II–VI (таблица Э8): атаки, победы, очки, души.
 Циклы IV–VI у биомов — по образцу цикла III, как в echo.py: отряд той же силы к врагам своего цикла,
-забегов одновременно — номер цикла и ещё один (ADR-0014), золото и дух × номер цикла (ADR-0014), души — × номер биома.
+забегов одновременно — номер цикла (ADR-0014; ADR-0031, п. 3), золото и дух × номер цикла (ADR-0014), души — × номер биома.
 
     python tools/content-gen/contracts/capacity.py           # записать capacity.json рядом
     python tools/content-gen/contracts/capacity.py --check   # только сверить, что capacity.json свежий
@@ -42,8 +42,8 @@ CURRENCY = ('gold', 'spirit')
 
 
 def slots(c):
-    """Забегов одновременно: номер цикла и ещё один от Странника (ADR-0014)."""
-    return c + S.SLOTS_EXTRA
+    """Забегов одновременно: номер цикла (ADR-0014; ADR-0031, п. 3) — economy.slots, recipes.js. «Право владыки» не считаем."""
+    return E.slots(c)
 
 
 def biome_days(hours):

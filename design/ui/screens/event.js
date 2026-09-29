@@ -41,12 +41,9 @@ const evSrc = id => EVD.sources.find(x => x.id === id) || null;
 const evPay = pay => pay.map(g => `${g.count > 1 ? g.count + ' × ' : ''}${lbBoxName(evM().box, g.r, g.win)}`).join(', ');
 const evTop = pay => pay.reduce((a, g) => Math.max(a, g.r), 0);
 const evChest = (pay, t) => pay.length ? `<span class="well ev-chest" data-r="${evTop(pay)}" style="--s:${EV_VIEW.chest}px" title="${trEsc(t ? t + ' · ' + evPay(pay) : evPay(pay))}"><img src="${CHEST}" alt=""></span>` : '';
-/* сила коллекции РП1 (§10.3): герои отряда прототипа и купленные герои состава с пробитым первым пределом */
+/* сила коллекции РП1 (§10.3) — одна функция прототипа collRp (index.html): те же числа, что на экране «Герои» и в листе «Сила коллекции» */
 function evRp1(s = S) {
-  if (!EVA) return 0;
-  const hs = (s.heroes || []).map(h => ({ r: h.r, c: h.cycle, lim: h.lim, valor: h.valor }));
-  for (const [id, o] of Object.entries((s.rs && s.rs.owned) || {})) { const h = RSI[id]; if (h && o) hs.push({ r: h.r, c: h.c, lim: o.lim, valor: o.valor }); }
-  return EVA.rp1Bp(EVD, hs);
+  return EVA && typeof collRp === 'function' ? collRp(1, s) : 0;
 }
 /* доли и множители — из базисных пунктов целыми: 40 → «0,4 %», 15 000 → «×1,5» */
 const evFrac = (v, den, digits) => { const i = Math.floor(v / den), f = v % den; return f ? `${i},${String(f).padStart(digits, '0').replace(/0+$/, '')}` : String(i); };
@@ -59,7 +56,7 @@ const evGateShut = (U, s = S) => U.gate === 'league' && !(typeof leagueOpen === 
 
 /* ================== состояние: S.event ==================
    Очки недели, очки по источникам, сделанное по единицам и журнал «сервера». Новый цикл или новая неделя — новый счёт.
-   Демо-аккаунт — середина недели обычного игрока (EN_EVENT.demo): «сервер» уже подтвердил дела прошлых дней */
+   Демо-аккаунт — четвёртый день недели обычного игрока (EN_EVENT.demo, ADR-0031, п. 17): «сервер» уже подтвердил дела прошлых дней */
 function evNew(s, empty) {
   const w = (RS.weeks || []).find(x => trNorm(x.gen) === trNorm(s.week.race)) || (RS.weeks || [])[0] || { race: '' };
   const E = { v: 1, race: w.race, cyc: s.acc.cycle, weekNo: 1, pts: 0, by: {}, cnt: {}, clan: { others: 0 }, demo: false,
@@ -79,12 +76,13 @@ function evNew(s, empty) {
   return E;
 }
 /* клан в демо: очки остальных участников — «сервер» клана. Считаются под нынешний состав: клан заводит свой файл (screens/clan.js),
-   поэтому состав сверяется при каждой сверке. Остальные в среднем — чуть выше своего третьего порога (EN_EVENT.demo) */
+   поэтому состав сверяется при каждой сверке. Остальные к этому часу недели в среднем набрали столько же, сколько обычный игрок своего
+   цикла (EN_EVENT.demo.cyc[цикл].pts), но играют не все — доля clanActiveBp (EN_EVENT.demo) */
 function evClanKey(s) { const C = s.clan; return !C || C.in === false ? '' : `${C.n}|${(evMembers(s) || []).join('')}`; }
 function evClanSeed(E, s) {
-  const M = evMembers(s), P3 = c => (EVA.planks(EVD, c)[EVD.clanFrom[0] - 1] || 0);
+  const M = evMembers(s), mid = c => ((EVD.demo.cyc[c] || {}).pts || 0);   // очки обычного игрока цикла c к этому часу недели
   E.clan.key = evClanKey(s);
-  E.clan.others = M && s.acc.cycle >= EVD.from ? Math.floor((M.reduce((a, c) => a + P3(c), 0) - P3(s.acc.cycle)) * EVD.demo.clanOthersBp / EVD.bp) : 0;
+  E.clan.others = M && s.acc.cycle >= EVD.from ? Math.floor((M.reduce((a, c) => a + mid(c), 0) - mid(s.acc.cycle)) * EVD.demo.clanActiveBp / EVD.bp) : 0;
 }
 /* циклы участников клана, «я» — цикл аккаунта: у клана screens/clan.js — поле cyc участника; без списка — число мест mem; без клана — null.
    Вступивший на этой неделе (weeks — 0) приносит очки клану со следующей недели — в пороги и очки клана он пока не входит (§25.3) */
@@ -103,8 +101,7 @@ function evSync() {
   if (!S) return null;
   if (!S.event || S.event.v !== 1 || S.event.cyc !== S.acc.cycle || S.event.race !== evRace()) S.event = evNew(S);
   if (evOk() && S.event.clan.key !== evClanKey(S)) evClanSeed(S.event, S);
-  const r = (S.ranks || []).find(x => x[0] === 'Событие');
-  if (r && evOk()) r[1] = evPlace();
+  evRank(S);
   return S.event;
 }
 
@@ -127,11 +124,17 @@ function evClan() {
   return { n: M.length, cycles: M, needs, pts, mine: S.event.pts, rows: needs.map((need, i) => ({ k: i + 1, need, pay: ly && ly.rows[i] ? ly.rows[i].cyc[c] || [] : [], got: pts >= need })) };
 }
 /* опоры рейтинга цикла: игроки — доли пятой личной планки, кланы — доли суммы пятых планок клана из clanRef участников */
-function evAnchors(kind) {
-  const c = S.acc.cycle, P = EVA.planks(EVD, c), P5 = P[P.length - 1] || 0;
+function evAnchors(kind, c = S.acc.cycle) {
+  const P = EVA.planks(EVD, c), P5 = P[P.length - 1] || 0;
   return kind === 'clan' ? EVA.anchorsOf(EVD.top.clans, P5 * EVD.top.clanRef) : EVA.anchorsOf(EVD.top.players, P5);
 }
-const evPlace = (v = S.event ? S.event.pts : 0) => v > 0 ? EVA.place(evAnchors('me'), v) : null;
+const evPlace = (v = S.event ? S.event.pts : 0, c = S.acc.cycle) => v > 0 ? EVA.place(evAnchors('me', c), v) : null;
+/* место в Событии — одно число: считает «сервер» по очкам недели, S.ranks и все экраны (профиль, «Дары», Неделя, рейтинг) берут его
+   отсюда (ADR-0031, п. 17). s — состояние: и живое, и заготовка initialState */
+function evRank(s) {
+  const r = (s.ranks || []).find(x => x[0] === 'Событие');
+  if (r && evOk()) r[1] = evOpen(s) && s.event ? evPlace(s.event.pts, s.acc.cycle) : null;
+}
 const evClanPlace = v => v > 0 ? EVA.place(evAnchors('clan'), v) : null;
 /* лидеры: имена по кругу, очки — опоры рейтинга на своих местах; прошлая неделя — имена со сдвигом */
 function evLeaders(kind, n, past) {
@@ -148,7 +151,7 @@ function evTier(place, clan) {
 /* прошлая неделя — та, за которую платят «Дары» (bag.js): взятые планки, место; очки — порог взятой и доля пути к следующей */
 function evPast() {
   const c = S.acc.cycle, needs = EVA.planks(EVD, c);
-  const rows = typeof darRows === 'function' && S.zp ? darRows(S).filter(p => p.id === 'event' && p.wk && p.wk.id === 'prev') : [];
+  const rows = typeof darRows === 'function' && S.zp ? darRows(S, 'prev').filter(p => p.id === 'event') : [];
   const k = rows.length ? rows.filter(p => p.kind === 'plank').length : (evM().typical.free.me || 0);
   const lo = k ? needs[Math.min(k, needs.length) - 1] : 0, hi = k < needs.length ? needs[k] : lo * 2;
   const pts = lo + Math.floor((hi - lo) * EVD.demo.pastFracBp / EVD.bp), pr = rows.find(p => p.kind === 'place' && p.place);
@@ -176,7 +179,7 @@ const EV_SRV = {
     const p = k > 0 ? EVA.pts(EVD, unit, k, { race: E.race, rp1: evRp1() }) : 0;
     E.srv.ops[op] = p; E.srv.seq++;
     if (k > 0) { E.srv.day.used[unit] = (E.srv.day.used[unit] || 0) + k; E.cnt[unit] = (E.cnt[unit] || 0) + k; }
-    if (p > 0) { E.pts += p; E.by[U.src] = (E.by[U.src] || 0) + p; }
+    if (p > 0) { E.pts += p; E.by[U.src] = (E.by[U.src] || 0) + p; evRank(S); }   // место — сразу по новым очкам
     const now = EVA.reached(EVA.planks(EVD, S.acc.cycle), E.pts);
     return { ok: true, pts: p, n: k, cut: n - k, plank: now > was ? now : 0 };
   },
@@ -313,7 +316,7 @@ function teamHtml() {
   return TM(`<div class="row ev-team"><span class="eyebrow">Команда</span>
     <button class="btn sm" data-a="evdemo" data-v="run:${n}">+ забег</button><button class="btn sm" data-a="evdemo" data-v="echo:${n}">+ атака Эхо</button>
     <button class="btn sm" data-a="evdemo" data-v="soon">отсечка через ${EV_TEAM.soonS} с</button><button class="btn sm" data-a="evdemo" data-v="week">новая неделя</button>
-    <span class="faint ev-tnote">EN_EVENT: цены единиц, пороги цикла ${ROMAN[S.acc.cycle]} — ${EVA.planks(EVD, S.acc.cycle).map(fmt).join(' / ')}; сила коллекции +${evPct(evRp1())}; журнал — ${Object.keys(S.event.srv.ops).length} операций. Демо — середина недели обычного игрока.</span></div>`);
+    <span class="faint ev-tnote">EN_EVENT: цены единиц, пороги цикла ${ROMAN[S.acc.cycle]} — ${EVA.planks(EVD, S.acc.cycle).map(fmt).join(' / ')}; сила коллекции +${evPct(evRp1())}; журнал — ${Object.keys(S.event.srv.ops).length} операций. Демо — четвёртый день недели обычного игрока.</span></div>`);
 }
 SCREENS.event = function () {
   const meta = { title: 'Событие недели', back: 'week', chip: weekChip() };
@@ -371,7 +374,7 @@ Object.assign(OV, {
           <div class="ev-pks">${rows.map(r => evRung(r, K.pts, ' · каждому')).join('')}</div>
           <p class="reason">Очки клана — сумма очков участников. Первая планка — будто каждый участник взял третью личную, вторая — четвёртую, третья — пятую.</p>
           <p class="reason">Сундуки — каждому участнику: половину делит сервер по вкладу, половину — глава клана; журнал раздачи видят все. Вступивший приносит очки новому клану со следующей недели.</p>
-          ${TM(`Клановая планка k — сумма личных порогов k + 2 участников по их циклам (EN_EVENT.clanFrom): участников ${K.n}, циклы ${cy}; остальные в демо — в среднем ${evPct(EVD.demo.clanOthersBp)} своего третьего порога. Прогон: обычный клан из 25 берёт первую, клан увлечённых — вторую.`, 'p', 'reason')}`;
+          ${TM(`Клановая планка k — сумма первых личных порогов участников по их циклам × ${EVD.clanX.map(x => evFrac(x, 100, 2)).join(' / ')} (EN_EVENT.clanX; третья — ×1,5 второй): участников ${K.n}, циклы ${cy}; остальные в демо к этому часу недели набрали в среднем столько же, сколько обычный игрок своего цикла, играет ${evPct(EVD.demo.clanActiveBp)}. Прогон: обычный клан из 25 берёт первую, клан увлечённых — вторую, третью — в части недель.`, 'p', 'reason')}`;
         foot = `<button class="btn go" data-a="sheet" data-v="gifts:clan">Дары · клан ${ic('chev')}</button>`;
       }
     } else {
@@ -433,8 +436,9 @@ Object.assign(ACT, {
 
 /* ================== состояние: S.event заводится у новых и у текущего S ================== */
 const evInit0 = initialState;
-initialState = function () { const s = evInit0(); s.event = evNew(s); return s; };
+initialState = function () { const s = evInit0(); s.event = evNew(s); evRank(s); return s; };
 if (S && (!S.event || S.event.v !== 1)) S.event = evNew(S);
+if (S) evRank(S);
 
 /* ================== неделя: итоги в реестр WEEK_MODES (screens/week.js) ==================
    Строка «Событие» на экране «Неделя»: очки недели, личные планки с сундуками рабочих, место и лидеры; прошлая неделя — «Дары» */
@@ -444,8 +448,9 @@ if (S && (!S.event || S.event.v !== 1)) S.event = evNew(S);
     if (!evOk()) return { lock: 'нет данных' };
     evSync();
     if (!evOpen()) return { lock: `рейтинг — с цикла ${ROMAN[EVD.from]}` };
-    const W = evW(), pl = evPlace();
+    const W = evW(), pl = evPlace(), K = evClan();
     return { place: pl, points: S.event.pts, planks: evPlanks().map(p => ({ k: p.k, need: p.need, pay: p.pay, reached: p.got })), top: evLeaders('me', EV_VIEW.top),
+      clanPlanks: K ? K.rows.map(r => ({ k: r.k, need: r.need, pay: r.pay, reached: r.got })) : [],   // взятые клановые — «Дарам» этой недели (bag.js)
       tier: evTier(pl), note: W ? `${W.n}: акцент недели — ${W.an}, очки ${evMul(W.accent.bp)}` : '' };
   },
   past() {

@@ -121,8 +121,14 @@ const WN_LIVE = {
   /* Арена и Лига (screens/arena.js): побед за всё время прототип не хранит — нынешний сезон и прошлый; сервер ведёт свой счётчик */
   arena: s => (s.arena ? (s.arena.wins || 0) + ((s.arena.past && s.arena.past.wins) || 0) : undefined),
   league: s => (s.arena && s.arena.lg ? (s.arena.lg.wins || 0) + ((s.arena.lg.past && s.arena.lg.past.wins) || 0) : undefined),
-  /* планка События этой недели — пороги цикла и очки недели (event.js, screens/event.js); планка засчитывается сразу */
-  plank: s => (s.event && window.EnEvent && window.EN_EVENT ? window.EnEvent.reached(window.EnEvent.planks(window.EN_EVENT, s.acc.cycle), s.event.pts || 0) : undefined),
+  /* высшая личная планка События за неделю — пороги цикла и очки недели (event.js, screens/event.js); планка засчитывается сразу.
+     Прототип хранит эту неделю и итог прошлой (EN_EV.past — её платят «Дары»): лучшая из двух */
+  plank: s => {
+    if (!s.event || !window.EnEvent || !window.EN_EVENT) return undefined;
+    const P = window.EnEvent.planks(window.EN_EVENT, s.acc.cycle), now = window.EnEvent.reached(P, s.event.pts || 0);
+    const past = s === S && window.EN_EV && typeof window.EN_EV.past === 'function' ? window.EnEvent.reached(P, window.EN_EV.past().pts || 0) : 0;
+    return Math.max(now, past);
+  },
 };
 
 /* ================== помощники ================== */

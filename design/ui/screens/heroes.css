@@ -1,10 +1,11 @@
 /* screens/heroes.css — «Герои» (screens/heroes.js): плитка героя, кристалл в строках, прогресс в шапке карточки, библиотека отрядов,
-   лист выбора отряда, вход «За души» и листы Призыва.
-   Стиль «Свет снизу»: редкость — одобренный кристалл --rico и цвет --rc из [data-r] (ADR-0027); доблесть — .stars, рунный предел — .limits.
+   лист выбора отряда, сцена алтаря «За души», окно лавки праха, окно пробуждения и листы Призыва.
+   Стиль «Свет снизу»: редкость — одобренный кристалл --rico и цвет --rc из [data-r] (ADR-0027); доблесть — .stars, рунный предел — пять
+   рунных камней по бокам портрета: камень .rp-s и столбы .rp — в hero-dev.css, здесь только отступ текста от них (.hc.rpp).
    Правила воздуха: на плитке — главное (кристалл, доблесть, предел, имя, класс и уровень), остальное — в карточке; одна рамка, внутри —
    строки и разделители; отступы — --sp-l, --sp-m, --sp-s. Свои классы — hr-*; общие — .hc, .preset, .sq, .sq-slots, .rs-av. */
 
-/* ---------- плитка героя: портрет, кристалл редкости, доблесть и предел сверху, имя, класс и уровень снизу ---------- */
+/* ---------- плитка героя: портрет, кристалл редкости и доблесть сверху, рунные камни по бокам, имя, класс и уровень снизу ---------- */
 .hc{position:relative;display:block;border-radius:10px;overflow:hidden;background:#0c0f12;border:1px solid color-mix(in srgb,var(--rc) 42%,#262b31);padding:0;text-align:left;aspect-ratio:4/5;width:100%;color:var(--parch)}
 .hc>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
 .hc::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.55),transparent 30%,transparent 46%,rgba(6,8,10,.96) 88%)}
@@ -13,9 +14,9 @@
 .hc .stars{gap:0}
 .hc .stars i{width:11px;height:11px}
 .hc .stars:has(i:nth-child(5)) i{width:9px;height:9px}   /* пять доблестей — значки мельче, чтобы не наползать на кристалл */
-.hc .limits{gap:2px;padding:2px 3px;border-radius:4px;background:rgba(6,8,10,.62)}
-.hc .limits i{width:6px;height:3px}
 .hc .bot{position:absolute;left:6px;right:5px;bottom:5px;z-index:2;display:flex;flex-direction:column;gap:3px}
+/* у героя с пределами имя отступает от столбов камней: столб — --rp-w у самого края, от 2 px (hero-dev.css); строка уровня — под ними */
+.hc.rpp .nm{padding:0 calc(var(--rp-w) - 1px) 0 calc(var(--rp-w) - 2px)}
 .hc .nm{font:600 15px/1.05 var(--f-d);color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hc .meta{display:flex;justify-content:space-between;align-items:center;gap:4px;font:700 11px/1 var(--f-u);color:var(--parch-2);min-width:0}
 .hc .lw{display:inline-flex;align-items:center;gap:4px;min-width:0;white-space:nowrap}
@@ -41,14 +42,13 @@
 .rs-av>.rs-ph{overflow:hidden}
 .rs-av::after{content:"";position:absolute;right:-4px;bottom:-4px;z-index:1;width:14px;height:14px;pointer-events:none;background:var(--rico) center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.95)) drop-shadow(0 0 3px color-mix(in srgb,var(--rc) 55%,transparent))}
 
-/* ---------- шапка карточки: справа — боевая мощь, доблесть «текущая / максимальная», уровень и пять отметок предела ---------- */
+/* ---------- шапка карточки: справа — боевая мощь, доблесть «текущая / максимальная» и уровень; пределы — камнями у лица ---------- */
 .hd-bm.hr-vit{gap:5px}
 .hd-bm .hr-vv{display:inline-flex;align-items:center;gap:6px}
 .hd-bm .hr-vv small{font:700 12px/1 var(--f-u);color:var(--parch-2);white-space:nowrap}
 .hd-bm .hr-vl{display:inline-flex;align-items:baseline;gap:3px;font:700 12px/1 var(--f-u);color:var(--parch-2);white-space:nowrap}
 .hd-bm .hr-vl small{font:700 11px/1 var(--f-u)}
 .hd-bm .hr-vl b{font:700 15px/1 var(--f-u);color:var(--parch)}
-.hd-bm .hr-vl .limits{margin-left:5px;align-self:center}
 
 /* ---------- коллекция: «Мои» — фильтр и сортировка в одну строку ---------- */
 .hr-bar{flex:none}
@@ -105,26 +105,163 @@
 .hr-name{height:40px}
 .hr-name input{font-size:16px}
 
-/* ---------- «За души»: вход рулетки крупно (screens/roulette.css), справа — два входа с листами ---------- */
-.hr-souls{flex:1 1 0;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:var(--sp-m)}
+/* ---------- «За души»: сцена алтаря Возрождения душ ----------
+   Одна рама: алтарь (RL_ART.altar или CSS, screens/roulette.css) — зеркало в середине; слева — имя и кнопка рулетки, перед зеркалом —
+   веер героев пула (rl-*), справа — два входа-таблички тёмного стекла с золотой нитью: отряд Эхо недели и лавка праха.
+   Слева и справа сцена темнее — там текст; зеркало в середине открыто */
+.hr-souls{position:relative;flex:1 1 0;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 212px;gap:var(--sp-m);padding:var(--sp-m) var(--sp-m) var(--sp-m) var(--sp-l);
+  border-radius:14px;overflow:hidden;isolation:isolate;border:1px solid rgba(221,188,122,.32);
+  box-shadow:inset 0 1px 0 rgba(255,236,190,.08),inset 0 0 70px rgba(0,0,0,.6),0 18px 40px -26px rgba(72,229,212,.5)}
+.hr-souls::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(90deg,rgba(3,7,8,.82),rgba(3,7,8,.3) 22%,transparent 36%,transparent 62%,rgba(3,7,8,.4) 72%,rgba(3,7,8,.84)),linear-gradient(180deg,rgba(3,7,8,.25),transparent 30%,transparent 62%,rgba(3,7,8,.6))}
+.hr-souls .rl-scn{object-position:50% 34%}
 .hr-side{display:flex;flex-direction:column;gap:var(--sp-m);min-height:0;min-width:0}
-.hr-entry{position:relative;flex:1 1 0;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:6px;min-height:0;padding:var(--sp-m) 34px var(--sp-m) var(--sp-m);text-align:left;color:var(--parch)}
-.hr-entry:hover{border-color:var(--iron-2)}
-.hr-entry b{font:600 19px/1.1 var(--f-d);color:var(--gold)}
-.hr-entry small{font-size:12px;line-height:1.3}
+.hr-entry{position:relative;flex:1 1 0;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;min-height:0;overflow:hidden;isolation:isolate;
+  padding:var(--sp-m) 30px var(--sp-m) var(--sp-m);border-radius:12px;border:1px solid rgba(221,188,122,.3);text-align:left;color:var(--parch);
+  background:linear-gradient(180deg,rgba(10,16,17,.84),rgba(5,8,9,.92));box-shadow:inset 0 1px 0 rgba(255,236,190,.07),0 12px 26px -16px rgba(0,0,0,.9)}
+.hr-entry::before{content:"";position:absolute;left:14px;right:14px;top:-1px;height:1px;background:linear-gradient(90deg,transparent,rgba(243,221,160,.8),transparent)}
+.hr-entry:hover{border-color:rgba(221,188,122,.6)}
+.hr-ebg{position:absolute;inset:0;z-index:-1;width:100%;height:100%;object-fit:cover;opacity:.3;pointer-events:none}
+.hr-echo .hr-ebg{object-position:50% 14%}
+.hr-dust .hr-ebg{object-position:24% 80%;opacity:.44}
+.hr-entry b{font:600 20px/1.05 var(--f-d);color:var(--gold);text-shadow:0 1px 2px #000}
+.hr-entry small{font-size:12px;line-height:1.3;color:var(--parch-2);text-shadow:0 1px 2px #000}
 .hr-entry .chip{flex:none}
-.hr-ef{display:flex;gap:7px}
+.hr-ef{display:flex;gap:3px}
 .hr-ef .rs-av{width:30px;height:30px}
-.hr-ef .rs-av.off{opacity:.45;filter:grayscale(.6)}
 .hr-go{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--gold-2)}
 .hr-civ{font-size:20px;color:var(--gold)}
-.hr-dh{gap:8px;flex-wrap:wrap;font-size:12.5px}
 .hr-dsel{display:flex;flex-direction:column;gap:6px;padding-bottom:var(--sp-s);border-bottom:1px solid var(--iron)}
 .hr-dsel b{font-size:18px;color:var(--parch)}
-/* призрачный осколок героя в строках и входах «За души» (shardGhost, screens/art-icons.js): тот же размер, что лицо .rs-av */
-.hr-srow .hr-sg,.hr-sgf{display:grid;place-items:center;width:30px;height:30px;flex:none}
+/* осколок героя в строках, входах и листах (shardGhost, screens/art-icons.js): стекло с лицом */
+.hr-srow{grid-template-columns:34px minmax(0,1fr) auto}
+.hr-srow .hr-sg{display:grid;place-items:center;width:34px;height:34px;flex:none}
+.hr-sgf{display:grid;place-items:center;width:30px;height:30px;flex:none}
+.hr-sgf.off{opacity:.42;filter:grayscale(.5)}
 .hr-sgl{display:grid;place-items:center;flex:none}
 .hr-dsel:has(.hr-sgl){flex-direction:row;align-items:center;gap:10px}
+/* низкий экран (844×390): таблички плотнее — осколки отряда меньше */
+@container main (max-height: 360px){ .hr-souls{padding:10px 10px 10px var(--sp-m);grid-template-columns:minmax(0,1fr) 196px} .hr-entry{padding:10px 28px 10px 10px;gap:4px} .hr-sgf,.hr-sgf .hsg{width:28px;height:28px} }
+/* раздел UI-кита: сцена вне кадра телефона */
+.hr-kit{position:relative;display:flex;height:310px;max-width:830px}
+
+/* ---------- лавка праха: отдельное окно ----------
+   Лавка-реликварий за витриной (DU_ART.shop или CSS), сверху — имя и прах на руках, слева — витрина героев, справа — выбранный на свету,
+   внизу — одной строкой, почему здесь нет героев Эхо. Размеры осколков — --du-c, --du-p из DU_VIEW (screens/heroes.js) */
+.du-ov>.ov-scrim{background:rgba(2,4,4,.7)}
+.du{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(904px,calc(100% - 28px));height:calc(100% - 20px);display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:var(--sp-s);
+  padding:0 var(--sp-m) var(--sp-m);border-radius:14px;overflow:hidden;isolation:isolate;border:1px solid rgba(221,188,122,.42);
+  background:radial-gradient(60% 50% at 50% 0%,rgba(230,168,75,.14),transparent 70%),linear-gradient(180deg,#121614,#07090a);box-shadow:0 30px 80px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,236,190,.08);
+  animation:pop .22s cubic-bezier(.2,.8,.2,1)}
+.du-ov.still .du,.du-ov.still>.ov-scrim{animation:none}
+.du::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(4,6,6,.6),rgba(4,6,6,.28) 20%,rgba(4,6,6,.4) 58%,rgba(4,6,6,.86)),linear-gradient(90deg,rgba(4,6,6,.35),transparent 30%,transparent 62%,rgba(4,6,6,.6))}
+.du-scn{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:50% 46%;pointer-events:none}
+.du-scn.css{display:block;
+  background:
+    radial-gradient(22% 30% at 50% 0%,rgba(243,196,110,.34),transparent 70%),
+    radial-gradient(40% 18% at 50% 100%,rgba(72,229,212,.18),transparent 72%),
+    repeating-linear-gradient(180deg,transparent 0 46px,rgba(150,112,58,.5) 46px 48px,rgba(12,10,8,.9) 48px 52px),
+    linear-gradient(90deg,rgba(26,20,14,.95) 0 18%,transparent 18% 82%,rgba(26,20,14,.95) 82%),
+    linear-gradient(180deg,#141816,#0a0c0b)}
+.du-mo{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.du-mo i{position:absolute;left:var(--x);top:-6px;width:2px;height:2px;border-radius:50%;background:#f3e2b4;box-shadow:0 0 5px rgba(243,226,180,.85);opacity:0;animation:du-mote var(--s) linear var(--d) infinite}
+@keyframes du-mote{0%{transform:translate(0,0);opacity:0}15%{opacity:.75}100%{transform:translate(14px,400px);opacity:0}}
+.du-h{display:flex;align-items:center;gap:var(--sp-m);padding-top:10px;min-width:0}
+.du-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.du-t h2{font:600 28px/1 var(--f-d);color:var(--gold);text-shadow:0 0 20px rgba(221,188,122,.4),0 2px 0 rgba(0,0,0,.8)}
+.du-bal{margin-left:auto;display:inline-flex;align-items:center;height:34px;padding:0 12px;border-radius:10px;border:1px solid rgba(221,188,122,.36);background:rgba(8,10,10,.82);font-size:16px;color:var(--parch)}
+.du-bal img{width:22px!important;height:22px!important}
+.du-b{display:grid;grid-template-columns:minmax(0,1fr) 248px;gap:var(--sp-m);min-height:0;min-width:0}
+.du-b.one{grid-template-columns:minmax(0,1fr)}
+.du-shelf{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0;min-height:0}
+.du-cyc{flex:none}
+.du-grid{flex:1 1 0;min-height:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));grid-auto-rows:max-content;gap:var(--sp-s);align-content:start;padding:2px 4px 4px 2px}
+.du-empty{flex:1 1 0;display:grid;place-items:center;padding:var(--sp-l);text-align:center;font:italic 500 16px/1.35 var(--f-d);color:var(--parch-2);text-shadow:0 1px 2px #000}
+/* карточка витрины: стекло с лицом, кристалл, имя; цена осколка и доля собранного */
+.du-c{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;padding:8px 6px 7px;border-radius:11px;color:var(--parch);
+  border:1px solid color-mix(in srgb,var(--rc) 30%,rgba(221,188,122,.2));background:radial-gradient(80% 60% at 50% 100%,rgba(72,229,212,.14),transparent 70%),linear-gradient(180deg,rgba(16,21,21,.9),rgba(8,10,11,.94))}
+.du-c:hover{border-color:rgba(221,188,122,.6)}
+.du-c.sel{border-color:var(--spirit);box-shadow:0 0 0 1px var(--spirit),0 10px 22px -10px var(--spirit)}
+.du-cr{position:absolute;left:5px;top:5px;width:15px;height:15px;background:var(--rico) center/contain no-repeat;filter:drop-shadow(0 0 3px color-mix(in srgb,var(--rc) 60%,transparent))}
+.du-cs,.du-cs .hsg{display:grid;place-items:center;width:var(--du-c);height:var(--du-c)}
+.du-cn{max-width:100%;font:600 14.5px/1.05 var(--f-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.du-cm{display:flex;justify-content:space-between;align-items:center;gap:6px;width:100%;font:700 11.5px/1 var(--f-u)}
+.du-cp{display:inline-flex;align-items:center;gap:3px;color:#f0dfb0}
+.du-cp img{width:14px;height:14px;object-fit:contain}
+.du-cq{color:var(--parch-3)}
+.du-c.full .du-cq{color:var(--spirit)}
+/* выбранный герой: осколок на свету, имя, редкость и класс, доля; одна главная кнопка — осколки или пробуждение */
+.du-pick{position:relative;display:flex;flex-direction:column;gap:6px;min-width:0;min-height:0;padding:var(--sp-m);border-radius:12px;overflow:hidden;
+  border:1px solid rgba(221,188,122,.34);background:linear-gradient(180deg,rgba(15,21,20,.94),rgba(7,10,9,.96));box-shadow:inset 0 1px 0 rgba(255,236,190,.08),0 16px 30px -16px rgba(0,0,0,.9)}
+.du-pick::before{content:"";position:absolute;left:16px;right:16px;top:-1px;height:1px;background:linear-gradient(90deg,transparent,rgba(243,221,160,.95),transparent)}
+.du-ps{position:relative;flex:none;display:grid;place-items:center;height:calc(var(--du-p) + 2px)}
+.du-ps::before{content:"";position:absolute;left:20%;right:20%;bottom:-6px;height:26px;border-radius:50%;background:radial-gradient(closest-side,rgba(72,229,212,.5),transparent);filter:blur(3px)}
+.du-ps .hsg{width:var(--du-p);height:var(--du-p)}
+.du-pn{display:flex;align-items:center;gap:6px;min-width:0}
+.du-pn b{flex:1 1 auto;min-width:0;font-size:21px;line-height:1.05;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.du-pn .iconbtn{width:28px;height:28px}
+.du-pt{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;line-height:1.2;color:var(--parch-2)}
+.du-pt>span:last-child{display:inline-flex;align-items:center;gap:4px}
+.du-pb{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px}
+.du-pb small{font:700 12px/1 var(--f-u);color:var(--parch-2)}
+.du-qty{align-self:flex-start;flex:none}
+.du-pa{margin-top:auto;display:flex;flex-direction:column;gap:5px}
+.du-cta{width:100%}
+.du-pa .reason{text-align:center}
+/* строка об Эхо */
+.du-echo{display:flex;align-items:center;gap:6px;min-width:0;font-size:12px;line-height:1.3;color:var(--parch-2);text-shadow:0 1px 2px #000}
+.du-echo>.i{width:13px;height:13px;flex:none;color:var(--parch-3)}
+.du-echo .link{margin-left:auto;flex:none}
+/* подтверждение пробуждения в окне лавки */
+.du-scrim{position:absolute;inset:0;z-index:4;border:0;padding:0;background:rgba(2,4,4,.62);cursor:default;animation:fade .18s ease}
+.du-ask{position:absolute;left:50%;top:50%;z-index:5;transform:translate(-50%,-50%);width:min(400px,calc(100% - 40px));display:flex;flex-direction:column;gap:var(--sp-m);padding:var(--sp-l);border-radius:14px;
+  border:1px solid rgba(221,188,122,.45);background:radial-gradient(90% 60% at 50% 115%,rgba(72,229,212,.12),transparent 70%),linear-gradient(180deg,#171c1f,#0f1315);box-shadow:0 30px 80px rgba(0,0,0,.8);
+  animation:pop .22s cubic-bezier(.2,.8,.2,1)}
+.du-ask h3{font:600 22px/1.05 var(--f-d);color:var(--gold)}
+.du-ah{display:flex;align-items:center;gap:var(--sp-m)}
+.du-ah b{font-size:19px;color:var(--parch)}
+.du-ask p{font-size:13.5px;line-height:1.4;color:var(--parch)}
+.du-af{display:flex;justify-content:flex-end;gap:var(--sp-s)}
+/* низкий экран (844×390): осколки меньше, у выбранного — строка причины только при нехватке */
+.g.sm .du-t h2{font-size:24px}
+.g.sm .du-b{grid-template-columns:minmax(0,1fr) 232px}
+.g.sm .du-cs,.g.sm .du-cs .hsg{width:var(--du-c2);height:var(--du-c2)}
+.g.sm .du-ps{height:calc(var(--du-p2) + 2px)}
+.g.sm .du-ps .hsg{width:var(--du-p2);height:var(--du-p2)}
+.g.sm .du-pick{padding:10px;gap:5px}
+.g.sm .du-pa .reason:not(.warn){display:none}
+.g.sm .du-cta{min-height:40px}
+/* раздел UI-кита: окно лавки вне кадра телефона */
+.du-kit{position:relative;height:410px;max-width:904px;overflow:hidden;border-radius:14px}
+
+/* ---------- окно пробуждения: стекло горит, трещины заживают, вспышка — герой выходит из стекла в раме, имя ----------
+   Время сцены — --t0 (минус сколько прошло от операции), шаги — --w-* из DU_VIEW.wake; кольцо и столп — ключевые кадры витрины доната */
+.hr-wake{overflow:hidden;background:radial-gradient(60% 80% at 30% 100%,rgba(72,229,212,.18),transparent 70%),rgba(2,4,4,.95)}
+.hr-wake>.ov-scrim{background:transparent}
+.hw-s{position:absolute;inset:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:var(--sp-l);padding:24px 48px 64px 24px}
+.hw-pillar{position:absolute;left:14%;width:26%;bottom:64px;top:4%;transform-origin:50% 100%;pointer-events:none;
+  background:radial-gradient(50% 100% at 50% 100%,rgba(72,229,212,.5),rgba(72,229,212,.1) 55%,transparent 75%),linear-gradient(0deg,rgba(221,188,122,.14),transparent 70%);filter:blur(4px);
+  animation:dn-pillar 900ms cubic-bezier(.2,.8,.2,1) calc(var(--t0) + var(--w-glow)) both}
+.hw-ring{position:absolute;left:27%;top:46%;width:170px;height:170px;margin:-85px 0 0 -85px;border-radius:50%;pointer-events:none;border:2px solid rgba(221,188,122,.9);
+  box-shadow:0 0 24px rgba(72,229,212,.8),inset 0 0 24px rgba(72,229,212,.6);opacity:0;animation:dn-ring 900ms ease-out calc(var(--t0) + var(--w-flash)) both}
+.hr-wake .rl-mo{left:8%;right:58%;z-index:0}
+.hw-stage{position:relative;z-index:1;display:grid;place-items:center;min-height:240px}
+.hw-glass{grid-area:1/1;display:grid;place-items:center;animation:hw-glass var(--w-end) linear var(--t0) both}
+.hw-glass .hsg{width:176px;height:176px}
+.hw-hero{grid-area:1/1;position:relative;display:block;width:148px;height:185px;animation:hw-hero 700ms cubic-bezier(.2,.8,.2,1) calc(var(--t0) + var(--w-hero)) both}
+.hw-hero .rl-face{position:absolute;inset:0;border-radius:4px 4px 3px 3px;overflow:hidden}
+.hw-say{position:relative;z-index:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+.hw-say .eyebrow{animation:dn-up 500ms ease-out calc(var(--t0) + var(--w-name)) both}
+.hw-say h2{font:600 38px/1 var(--f-d);color:var(--gold);text-shadow:0 0 22px rgba(221,188,122,.45),0 2px 0 #000;animation:dn-name 700ms cubic-bezier(.2,.8,.2,1) calc(var(--t0) + var(--w-name)) both}
+.hw-say p{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0;font-size:14px;color:var(--parch);animation:dn-up 600ms ease-out calc(var(--t0) + var(--w-text)) both}
+.hw-say small{animation:dn-up 600ms ease-out calc(var(--t0) + var(--w-text)) both}
+.hw-acts{position:absolute;right:20px;bottom:16px;z-index:2;display:flex;gap:8px;animation:dn-up 500ms ease-out calc(var(--t0) + var(--w-text)) both}
+.hw-x{position:absolute;right:10px;top:10px;z-index:3}
+.g.sm .hw-say h2{font-size:32px}
+@keyframes hw-glass{0%{opacity:0;transform:scale(.86)}12%{opacity:1;transform:scale(1)}36%{opacity:1;filter:brightness(1.5)}44%{opacity:0;transform:scale(1.14);filter:brightness(3) blur(4px)}100%{opacity:0;transform:scale(1.14)}}
+@keyframes hw-hero{0%{opacity:0;transform:scale(.9);filter:grayscale(1) brightness(2.2) blur(6px)}60%{opacity:1;filter:grayscale(.3) brightness(1.3)}100%{opacity:1;transform:none;filter:none}}
+@media (prefers-reduced-motion:reduce){ .du-mo{display:none} }
 
 /* ---------- «За Энериум»: витрина-алтарь ----------
    Зал (рисунок или CSS), слева — сет: имя, сеты циклов, пятеро на ступенях цены, сет-бонус; справа — выбранный герой и покупка.

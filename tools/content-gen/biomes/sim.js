@@ -1,9 +1,9 @@
 /* Прогон биомов 2–4 ядром боя — для темпа (pace.py) и проверки (check_biomes.js). Без браузера, только Node.
    Ядро и данные — как в прототипе: battle.js, abilities.js, kits.js, biome-foes.js. Отряд — фикстура S.heroes из index.html:
-   характеристики, доблесть, черновик героя, от него набор (kits.js, ADR-0016), — как в калькуляторе экономики (economy.py, SIM_JS).
-   Числа прогона — не баланс. Только целые числа.
+   характеристики, доблесть, черновик героя, от него набор (kits.js, ADR-0016). Фикстура одна: калькулятор экономики (economy.py, SIM_JS)
+   и через него sets.py и echo.py берут SQUAD отсюда. Числа прогона — не баланс. Только целые числа.
 
-   Модуль: require('./sim.js') → { EB, X, SQUAD, run, campaign, guardWin, tutor, levelCost }.
+   Модуль: require('./sim.js') → { EB, X, SQUAD, TRAIN_ID, run, campaign, guardWin, tutor, levelCost }.
    Командная строка: node sim.js '<json>' — печатает JSON:
    - { mode: 'levels', biome, levels: [L…], squad?: [id…], valor?: число } — по уровням: стена, забегов до падения босса осадой,
      время и добыча первого забега, победа над рунным стражем;
@@ -15,15 +15,21 @@ globalThis.window = globalThis;
 for (const f of ['battle.js', 'abilities.js', 'kits.js', 'biome-foes.js']) require(path.join(UI, f));
 const EB = globalThis.EnBattle, X = globalThis.EN_BIOME_FOES;
 
-/* фикстура S.heroes из design/ui/index.html (как SQUAD в economy.py): уровни и доблесть — прототипа, прогон их меняет */
+/* Отряд прогонов — одна фикстура на все калькуляторы (economy.py, sets.py, echo.py берут её отсюда через economy.SIM_JS):
+   S.heroes из design/ui/index.html — характеристики, черновик героя (от него набор kits.js, ADR-0016), уровни прототипа; прогон
+   уровни меняет. Реальный отряд (ADR-0031, п. 1): пятеро золотых героев цикла I, личный максимум доблести — 1 по составу
+   (состав-героев.csv: c1-01…c1-05); доблесть 0, кроме бойца урона пары — у него доблесть 1 от руны обучения (8-й уровень аккаунта,
+   §16, ADR-0018; ADR-0031, п. 2: её можно применить на любом пределе). Обычная доблесть — только на пятом пределе (§10.2).
+   Доли хода — у набора в kits.js, по редкости героя в составе (assign.py, ADR-0030, п. 5а): обычная, обычная, редкая, редкая, редкая */
 const A = a => a.map(n => ({ n })), P = a => a.map(n => ({ n, t: 'боевая' }));
 const SQUAD = [
-  { id: 'h1', name: 'Гарт Нишевой', cls: 'Танк', el: 'Земля', draft: 'h01_2', lvl: 42, valor: 2, st: [128, 54, 72, 246, 62], ab: A(['Вызов', 'Удар щитом', 'Осыпание']), pas: P(['Несгибаемость']), ult: null },
-  { id: 'h2', name: 'Хравн Сборщик', cls: 'Физ. ДД ловкости', fx: 'melee', el: 'Огонь', draft: 'h01_3', lvl: 50, valor: 1, st: [128, 54, 245, 72, 62], ab: A(['Горение', 'Быстрый выпад', 'Погребальный костёр']), pas: P(['Точность']), ult: null },
-  { id: 'h3', name: 'Лаэйра', cls: 'Маг. ДД', el: 'Время', draft: 'h01_5', lvl: 118, valor: 2, st: [72, 246, 54, 62, 128], ab: A(['Разряд', 'Остановка']), pas: P(['Средоточие']), ult: { n: 'Испепеление', at: 5 } },
-  { id: 'h4', name: 'Ильмерра', cls: 'Хилер', el: 'Воздух', draft: 'h01_1', lvl: 46, valor: 1, st: [62, 246, 54, 128, 72], ab: A(['Живая вода', 'Лёгкая поступь', 'Оберег']), pas: P(['Отклик']), ult: null },
-  { id: 'h5', name: 'Мирт Переписчик', cls: 'Контроль', el: 'Вода', draft: 'h01_4', lvl: 35, valor: 3, st: [62, 246, 54, 128, 72], ab: A(['Оковы', 'Стужа', 'Ослабление']), pas: P(['Тень']), ult: { n: 'Ледяные оковы', at: 2 } },
+  { id: 'h1', name: 'Гарт Нишевой', cls: 'Танк', el: 'Земля', draft: 'h01_2', lvl: 42, valor: 0, maxV: 1, st: [128, 54, 72, 246, 62], ab: A(['Вызов', 'Удар щитом', 'Осыпание']), pas: P(['Несгибаемость']), ult: null },
+  { id: 'h2', name: 'Хравн Сборщик', cls: 'Физ. ДД ловкости', fx: 'melee', el: 'Огонь', draft: 'h01_3', lvl: 50, valor: 1, maxV: 1, st: [128, 54, 245, 72, 62], ab: A(['Горение', 'Быстрый выпад', 'Погребальный костёр']), pas: P(['Точность']), ult: null },
+  { id: 'h3', name: 'Лаэйра', cls: 'Маг. ДД', el: 'Время', draft: 'h01_5', lvl: 118, valor: 0, maxV: 1, st: [72, 246, 54, 62, 128], ab: A(['Разряд', 'Остановка']), pas: P(['Средоточие']), ult: { n: 'Испепеление', at: 5 } },
+  { id: 'h4', name: 'Ильмерра', cls: 'Хилер', el: 'Воздух', draft: 'h01_1', lvl: 46, valor: 0, maxV: 1, st: [62, 246, 54, 128, 72], ab: A(['Живая вода', 'Лёгкая поступь', 'Оберег']), pas: P(['Отклик']), ult: null },
+  { id: 'h5', name: 'Мирт Переписчик', cls: 'Контроль', el: 'Вода', draft: 'h01_4', lvl: 35, valor: 0, maxV: 1, st: [62, 246, 54, 128, 72], ab: A(['Оковы', 'Стужа', 'Ослабление']), pas: P(['Тень']), ult: { n: 'Ледяные оковы', at: 2 } },
 ];
+const TRAIN_ID = SQUAD.find(h => h.valor > 0).id;   // кому руна обучения: боец урона пары первого биома
 const hero = (id, lvl, valor) => EB.heroSrcValor(Object.assign({}, SQUAD.find(h => h.id === id), { lvl, valor }));   // доблесть — +30 % за ступень, правило ядра
 const RANK_OF = u => u.rank === 'e' ? 'e' : u.rank === 'b' ? 'b' : u.rank === 'rune' ? 'rune' : 'o';
 
@@ -78,7 +84,7 @@ function levelCost(n, exp, cyc) {
    Босс — за один забег, без осады. После босса после каждого забега — попытка у рунного стража. */
 function tutor(P) {
   const lv = {}, val = {}; let bank = P.startSpirit || 0, ms = 0, runs = 0, best = 0, boss = null, guard = null, tries = 0;
-  const log = [];
+  const log = [], tot = { floors: 0, o: 0, e: 0, b: 0, spirit: 0, gold: 0, guardWins: 0 };   // итог биома до победы над стражем — счётчики обучения (sets.py)
   for (const a of P.arrive) if (a.floor === 0) { lv[a.id] = a.lvl || 0; val[a.id] = a.valor || 0; }
   const levelUp = () => {
     for (;;) {
@@ -95,13 +101,17 @@ function tutor(P) {
     const heroes = Object.keys(lv).sort().map(id => hero(id, lv[id], val[id]));
     const r = run(heroes, P.biome, null);
     runs++; ms += r.ms + P.gapMs; bank += r.spirit; best = Math.max(best, r.wall);
+    tot.floors += r.win ? r.wall : r.wall - 1; tot.o += r.k.o; tot.e += r.k.e; tot.b += r.k.b; tot.spirit += r.spirit; tot.gold += r.gold;
     const row = { run: runs, ms, heroes: Object.keys(lv).length, lvl: Object.keys(lv).sort().map(id => lv[id]), wall: r.wall, win: r.win, spirit: r.spirit };
     if (r.win && !boss) boss = { runs, ms, lvl: row.lvl.slice(), heroes: row.heroes };
-    if (boss) { tries++; const g = guardWin(heroes, P.biome); ms += g.ms; row.guard = g.win; if (g.win) guard = { runs, ms, tries, lvl: row.lvl.slice(), heroes: row.heroes }; }
+    if (boss) {
+      tries++; const g = guardWin(heroes, P.biome); ms += g.ms; row.guard = g.win;
+      if (g.win) { guard = { runs, ms, tries, lvl: row.lvl.slice(), heroes: row.heroes }; tot.guardWins++; }
+    }
     log.push(row);
     levelUp();
   }
-  return { boss, guard, runs, ms, log };
+  return { boss, guard, runs, ms, log, tot };
 }
 
 /* Цикл II по дням: уровень главного отряда на каждый день — из калькулятора экономики (economy.py, timeline: пределы, руны, дух
@@ -139,7 +149,7 @@ function days(P) {
   return out;
 }
 
-module.exports = { EB, X, SQUAD, hero, run, campaign, guardWin, tutor, days, levelCost };
+module.exports = { EB, X, SQUAD, TRAIN_ID, hero, run, campaign, guardWin, tutor, days, levelCost };
 
 if (require.main === module) {
   const spec = JSON.parse(process.argv[2] || '{}'), out = {};

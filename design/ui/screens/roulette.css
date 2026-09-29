@@ -1,82 +1,125 @@
-/* screens/roulette.css — рулетка «Возрождения душ» (screens/roulette.js): вход во вкладке «За души», окно с лентой, итог и сводка.
-   Стиль «Свет снизу»: лента светится снизу, метка — золото, редкость — цвет --rc и кристалл --rico из [data-r] (ADR-0027).
-   Правила воздуха: в окне — лента, цена, три кнопки и галочка; одна рамка, внутри — строки и разделители; отступы — --sp-l, --sp-m, --sp-s.
-   Свои классы — rl-*; общие — .dlg, .ov-scrim, .pnl, .rs-ph, .rs-av, .btn, .chip, .kv, .rar. */
+/* screens/roulette.css — рулетка «Возрождения душ» (screens/roulette.js): вход в сцене алтаря вкладки «За души», окно с лентой, итог и сводка.
+   «Дорого-богато», уровень витрины «За Энериум»: алтарь душ — рисунок RL_ART.altar или CSS; зеркало светит бирюзой снизу, рамы — старое
+   золото; полный герой — в раме, осколок — стекло с лицом (screens/art-icons.css). Редкость — цвет --rc и кристалл --rico (ADR-0027).
+   Правила воздуха: у входа — имя, цена и шанс героя целиком, одна кнопка; в окне — лента, цена, три кнопки и галочка; отступы — --sp-*.
+   Свои классы — rl-*; общие — .dlg, .ov-scrim, .pnl, .rs-ph, .rs-av, .btn, .chip, .kv, .rar, .hsg. */
 
-/* вход во вкладке «За души» — главное вкладки: лица героев пула с кристаллом редкости, прошлая прокрутка, «Шансы» и «К рулетке» */
-.rl-entry{display:flex;flex-direction:column;justify-content:space-between;gap:var(--sp-m);padding:var(--sp-l);min-height:0;min-width:0;
-  background:radial-gradient(70% 90% at 50% 120%,rgba(72,229,212,.14),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.018),transparent 40%),var(--stone)}
-.rl-eh{display:flex;flex-direction:column;gap:3px}
-.rl-eh h2{font-size:26px;line-height:1.05;color:var(--gold)}
-/* лица — одним веером карт: карта наползает на соседку, наведённая поднимается */
-.rl-faces{display:flex;justify-content:center;align-items:flex-end;padding:4px 10px 0;min-height:0}
-/* наползание — чтобы веер из --n карт (его ставит rlCol) уместился в ширину; малый пул лежит почти вплотную */
-.rl-ef{--w:64px;position:relative;flex:none;width:var(--w);height:calc(var(--w) * 5 / 4);margin-left:min(-6px,calc((100% - var(--n,10) * var(--w)) / (var(--n,10) - 1)));padding:0;border-radius:9px;overflow:hidden;
-  background:#0c0f12;border:1px solid color-mix(in srgb,var(--rc) 45%,#262b31);box-shadow:-6px 0 12px -6px rgba(0,0,0,.9);transition:transform .15s ease,border-color .15s ease}
+/* ---------- алтарь душ: рисунок или CSS — зеркало светом, колонны, свет снизу ---------- */
+.rl-scn{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:50% 40%;pointer-events:none}
+.rl-scn.css{display:block;
+  background:
+    radial-gradient(closest-side at 50% 44%,rgba(210,255,250,.5),rgba(72,229,212,.34) 38%,rgba(20,90,86,.28) 62%,transparent 64%),
+    radial-gradient(closest-side at 50% 44%,transparent 66%,rgba(221,188,122,.7) 68%,rgba(120,96,52,.55) 72%,rgba(190,190,180,.45) 74%,transparent 77%),
+    radial-gradient(40% 30% at 50% 100%,rgba(72,229,212,.28),transparent 72%),
+    linear-gradient(90deg,rgba(6,24,26,.95),transparent 12%,transparent 88%,rgba(6,24,26,.95)),
+    linear-gradient(90deg,transparent 17%,rgba(18,22,24,.9) 17.5%,rgba(18,22,24,.9) 21%,transparent 21.5%,transparent 78.5%,rgba(18,22,24,.9) 79%,rgba(18,22,24,.9) 82.5%,transparent 83%),
+    linear-gradient(180deg,#081214,#050909 70%,#0a1415)}
+/* огоньки душ поднимаются к зеркалу */
+.rl-mo{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.rl-mo i{position:absolute;left:var(--x);bottom:-6px;width:3px;height:3px;border-radius:50%;background:#d8fffa;box-shadow:0 0 6px rgba(72,229,212,.95);opacity:0;animation:rl-mote var(--s) linear var(--d) infinite}
+@keyframes rl-mote{0%{transform:translate(0,0);opacity:0}15%{opacity:.8}100%{transform:translate(-10px,-300px);opacity:0}}
+
+/* ---------- вход в сцене алтаря (сцену и её раму рисует .hr-souls, screens/heroes.css): слева — имя, цена и кнопка, справа — веер ---------- */
+.rl-entry{display:grid;grid-template-columns:minmax(150px,180px) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:var(--sp-s) var(--sp-m);min-width:0;min-height:0;
+  padding:0;background:none;border:0;box-shadow:none}
+.rl-entry.shut{grid-template-columns:minmax(0,1fr)}
+.rl-eh{grid-column:1;grid-row:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+.rl-eh h2{font:600 36px/.95 var(--f-d);color:var(--gold);text-shadow:0 0 22px rgba(221,188,122,.4),0 2px 0 rgba(0,0,0,.85)}
+.rl-eh small{font:700 10.5px/1.2 var(--f-u);letter-spacing:.14em;text-transform:uppercase;color:var(--parch-2);text-shadow:0 1px 2px #000}
+.rl-ef-f{grid-column:1;grid-row:2;align-self:end;display:flex;flex-direction:column;gap:var(--sp-s);min-width:0}
+.rl-last{font-size:12.5px;line-height:1.3;color:var(--parch-2);text-shadow:0 1px 2px #000}
+.rl-last b{color:var(--parch)}
+.rl-hon{display:flex;flex-wrap:wrap;gap:3px 10px;font-size:12.5px;line-height:1.2;color:var(--parch-2);text-shadow:0 1px 2px #000}
+.rl-hp{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.rl-hp b{color:var(--gold)}
+.rl-hon .link{font-size:11.5px}
+.rl-cta{align-self:flex-start;overflow:hidden;box-shadow:inset 0 -14px 20px -10px rgba(72,229,212,.7),inset 0 1px 0 rgba(255,255,255,.1),0 0 0 1px rgba(221,188,122,.35),0 12px 28px -12px var(--spirit)}
+.rl-cta::after{content:"";position:absolute;top:0;bottom:0;left:-45%;width:30%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);transform:skewX(-20deg);animation:rl-sheen 4.5s ease-in-out 1.2s infinite;pointer-events:none}
+.rl-cta[disabled]::after{display:none}
+@keyframes rl-sheen{0%,70%{left:-45%}100%{left:135%}}
+/* веер героев пула перед зеркалом: карточка в раме, середина выше и впереди; --d, --a — шаг от середины (screens/roulette.js) */
+.rl-faces{grid-column:2;grid-row:1/3;align-self:end;display:flex;justify-content:center;align-items:flex-end;min-width:0;padding:0 8px 6px}
+.rl-ef{--w:58px;position:relative;flex:none;width:var(--w);height:calc(var(--w) * 5 / 4);margin-left:min(-6px,calc((100% - var(--n,10) * var(--w)) / (var(--n,10) - 1)));padding:0;border:0;background:none;
+  z-index:var(--z,1);transform-origin:50% 130%;transform:translateY(calc(var(--a,0) * var(--fl,1.5px))) rotate(calc(var(--d,0) * var(--fd,1.5deg)));transition:transform .18s ease;
+  filter:drop-shadow(0 8px 10px rgba(0,0,0,.75))}
 .rl-ef:first-child{margin-left:0}
-.rl-ef:hover,.rl-ef:focus-visible{z-index:4;transform:translateY(-4px);border-color:color-mix(in srgb,var(--rc) 85%,#fff);outline:none}
-@container main (max-height: 360px){ .rl-entry{padding:var(--sp-m)} .rl-ef{--w:56px} .rl-eh h2{font-size:22px} }
-@media (prefers-reduced-motion: reduce){ .rl-ef{transition:none} .rl-ef:hover,.rl-ef:focus-visible{transform:none} }
-.rl-ef .rl-cr{left:3px;top:3px;width:15px;height:15px}
+.rl-ef:hover,.rl-ef:focus-visible{z-index:60;outline:none;transform:translateY(calc(var(--a,0) * var(--fl,1.5px) - 9px)) rotate(calc(var(--d,0) * var(--fd,1.5deg)))}
+.rl-ef .rl-face{position:absolute;inset:0;border-radius:4px 4px 3px 3px;overflow:hidden;background:#0c0f12}
+.rl-ef .rl-face::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 58%,rgba(4,10,10,.55)),radial-gradient(90% 40% at 50% 112%,rgba(72,229,212,.3),transparent 70%)}
+.rl-ef .rl-cr{left:3px;top:3px;width:14px;height:14px}
 .rl-ef .rs-ph b{font-size:18px}
-.rl-em{position:absolute;right:3px;bottom:3px;z-index:3;display:grid;place-items:center;width:15px;height:15px;border-radius:50%}
+.rl-em{position:absolute;right:2px;bottom:2px;z-index:3;display:grid;place-items:center;width:15px;height:15px;border-radius:50%}
 .rl-em.own{background:var(--spirit-3);color:var(--spirit);box-shadow:0 0 0 1px rgba(72,229,212,.4)}
 .rl-em.own .i{width:10px;height:10px}
 .rl-em.ready{width:10px;height:10px;background:var(--spirit);box-shadow:0 0 8px var(--spirit)}
-.rl-ef-f{display:flex;flex-direction:column;gap:var(--sp-s)}
-.rl-cf{flex-wrap:nowrap}
+@container main (max-height: 360px){ .rl-ef{--w:52px} .rl-eh h2{font-size:30px} .rl-faces{padding-bottom:2px} }
+@media (prefers-reduced-motion: reduce){ .rl-ef{transition:none} .rl-cta::after{display:none} }
 
-/* окно рулетки; при перерисовке открытого окна оно не всплывает заново */
-.rl-dlg{width:min(800px,calc(100% - 30px))}
+/* ---------- рама героя души: рисунок выходит за карточку по окну рамы (--fr-*), гребень — над карточкой; без рисунка — золото CSS ---------- */
+.rl-fr{position:absolute;left:var(--fr-l);top:var(--fr-t);width:calc(100% - var(--fr-l) - var(--fr-r));height:calc(100% - var(--fr-t) - var(--fr-b));z-index:2;pointer-events:none;max-width:none}
+.rl-frc{position:absolute;inset:-3px;z-index:2;pointer-events:none;border-radius:7px 7px 5px 5px;border:2px solid #c9a45c;
+  box-shadow:inset 0 0 0 1px #2a1f0c,0 0 0 1px #2a1f0c,0 0 12px rgba(221,188,122,.28)}
+.rl-frc::before{content:"";position:absolute;left:50%;top:-7px;width:10px;height:10px;border-radius:50% 50% 50% 0;transform:translateX(-50%) rotate(-45deg);
+  background:radial-gradient(circle at 35% 35%,#e9fffc,#48e5d4 55%,#0e5b53);box-shadow:0 0 0 1.5px #c9a45c,0 0 10px rgba(72,229,212,.9)}
+
+/* ---------- окно рулетки: алтарь за окном, лента сквозь зеркало; при перерисовке открытое окно не всплывает заново ---------- */
+.rl-dlg{width:min(820px,calc(100% - 24px));height:calc(100% - 22px);overflow:hidden;isolation:isolate;border-color:rgba(221,188,122,.4);
+  background:radial-gradient(60% 55% at 50% 45%,rgba(72,229,212,.12),transparent 70%),linear-gradient(180deg,#0b1214,#070a0b)}
+.rl-dlg::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(4,8,9,.62),rgba(4,8,9,.05) 24%,rgba(4,8,9,.05) 56%,rgba(4,8,9,.9) 86%)}
+.rl-dlg>.dlg-h,.rl-dlg>.dlg-b{position:relative;z-index:1}
 .rl-ov.still>.ov-scrim,.rl-ov.still>.rl-dlg{animation:none}
 .rl-hd{display:flex;flex-direction:column;gap:2px;min-width:0}
-.rl-b{padding-bottom:var(--sp-l)}
+.rl-hd h2{text-shadow:0 0 20px rgba(221,188,122,.35),0 2px 0 rgba(0,0,0,.8)}
+.rl-b{flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-between;padding-bottom:var(--sp-m)}
 
-/* лента: окно с затуханием по краям, дорожка карточек, метка по центру */
+/* лента: окно-стекло с затуханием по краям над светом зеркала, дорожка карточек, метка по центру */
 .rl-stage{position:relative;flex:none;padding:var(--sp-s) 0}
-.rl-win{position:relative;height:132px;overflow:hidden;border-radius:12px;border:1px solid var(--iron);
-  background:radial-gradient(55% 85% at 50% 125%,rgba(72,229,212,.16),transparent 70%),linear-gradient(180deg,#0b0e11,#06080a);
+.rl-halo{position:absolute;left:50%;top:50%;width:300px;height:220px;transform:translate(-50%,-50%);pointer-events:none;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(150,255,245,.34),rgba(72,229,212,.16) 55%,transparent 100%);filter:blur(4px)}
+.rl-win{position:relative;height:152px;overflow:hidden;border-radius:12px;border:1px solid rgba(221,188,122,.34);
+  background:linear-gradient(180deg,rgba(4,12,13,.5),rgba(4,12,13,.28) 40%,rgba(4,12,13,.6));box-shadow:inset 0 1px 0 rgba(255,240,200,.08),inset 0 -24px 30px -24px rgba(72,229,212,.5);
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
-.rl-track{position:absolute;left:0;top:11px;display:flex;gap:var(--sp-s);padding:0 var(--sp-s);will-change:transform;backface-visibility:hidden}
-.rl-mark{position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;z-index:2;pointer-events:none;
+.rl-track{position:absolute;left:0;top:26px;display:flex;gap:14px;padding:0 var(--sp-s);will-change:transform;backface-visibility:hidden}
+.rl-mark{position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;z-index:3;pointer-events:none;
   background:linear-gradient(180deg,var(--gold),rgba(221,188,122,.12) 16%,rgba(221,188,122,.12) 84%,var(--gold))}
-.rl-mark::before,.rl-mark::after{content:"";position:absolute;left:50%;margin-left:-7px;border:7px solid transparent;filter:drop-shadow(0 0 5px rgba(221,188,122,.8))}
-.rl-mark::before{top:0;border-top:9px solid var(--gold);border-bottom:0}
-.rl-mark::after{bottom:0;border-bottom:9px solid var(--gold);border-top:0}
+.rl-mark::before,.rl-mark::after{content:"";position:absolute;left:50%;margin-left:-8px;border:8px solid transparent;filter:drop-shadow(0 0 6px rgba(221,188,122,.9))}
+.rl-mark::before{top:0;border-top:10px solid var(--gold);border-bottom:0}
+.rl-mark::after{bottom:0;border-bottom:10px solid var(--gold);border-top:0}
 .rl-mark.hit{background:linear-gradient(180deg,#fff3d0,rgba(221,188,122,.4) 18%,rgba(221,188,122,.4) 82%,#fff3d0)}
 
-/* карточка ленты: рамка и полоса снизу — цвет редкости, кристалл — в углу */
-.rl-card{position:relative;flex:none;display:block;width:84px;height:110px;border-radius:10px;overflow:hidden;background:#0c0f12;
-  border:1px solid color-mix(in srgb,var(--rc) 38%,#262b31);box-shadow:inset 0 -3px 0 color-mix(in srgb,var(--rc) 75%,transparent);transition:border-color .12s,box-shadow .12s}
+/* карточка ленты: полный герой — лицо в раме; осколки — стекло с лицом; кристалл — в углу */
+.rl-card{position:relative;flex:none;display:block;width:84px;height:110px;border-radius:9px;transition:transform .12s}
+.rl-card.shard{border:1px solid color-mix(in srgb,var(--rc) 34%,#262b31);
+  background:radial-gradient(80% 50% at 50% 100%,rgba(72,229,212,.2),transparent 72%),linear-gradient(180deg,#0c1416,#07090a);box-shadow:inset 0 -3px 0 color-mix(in srgb,var(--rc) 70%,transparent)}
 .rl-cr{position:absolute;left:5px;top:5px;z-index:3;width:16px;height:16px;background:var(--rico) center/contain no-repeat;filter:drop-shadow(0 0 3px color-mix(in srgb,var(--rc) 60%,transparent))}
-/* полный герой: лицо во всю карточку, золотая рамка и «Герой» */
-.rl-card.full{border:2px solid var(--gold);box-shadow:0 0 14px -4px var(--gold),inset 0 0 0 1px rgba(0,0,0,.6)}
-.rl-face,.rl-face>.rs-ph,.rl-face>img{position:absolute;inset:0;width:100%;height:100%}
+.rl-face{position:absolute;inset:0;overflow:hidden;border-radius:inherit;background:#0c0f12}
+.rl-face>.rs-ph,.rl-face>img{position:absolute;inset:0;width:100%;height:100%}
 .rl-face>img{object-fit:cover;object-position:50% 20%}
+.rl-card.full .rl-face{border-radius:4px 4px 3px 3px}
 .rl-card.full .rs-ph b{font-size:30px}
-.rl-card.full::after,.rl-big::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.3),transparent 30%,transparent 55%,rgba(6,8,10,.94))}
-.rl-lbl{position:absolute;left:0;right:0;bottom:7px;z-index:2;text-align:center;font:700 10.5px/1 var(--f-u);font-style:normal;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);text-shadow:0 0 8px rgba(221,188,122,.7)}
-/* осколки: лицо поменьше, огранка осколка и «×N» */
-.rl-sf{position:absolute;left:50%;top:20px;width:52px;height:52px;margin-left:-26px;filter:drop-shadow(0 0 1.5px var(--rc)) drop-shadow(0 6px 10px rgba(0,0,0,.6))}
-.rl-sf>.rs-ph,.rl-sf>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;clip-path:polygon(24% 0,100% 0,100% 76%,76% 100%,0 100%,0 24%)}
+.rl-card.full .rl-face::after,.rl-big.full .rl-face::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.25),transparent 30%,transparent 55%,rgba(6,8,10,.94))}
+.rl-lbl{position:absolute;left:0;right:0;bottom:8px;z-index:3;text-align:center;font:700 10.5px/1 var(--f-u);font-style:normal;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);text-shadow:0 0 8px rgba(221,188,122,.8),0 1px 2px #000}
+/* осколки: стекло с лицом и «×N» */
+.rl-sf{position:absolute;left:50%;top:6px;width:60px;height:60px;margin-left:-30px;display:grid;place-items:center}
 .rl-card.shard .rs-ph b{font-size:18px}
-.rl-q{position:absolute;left:0;right:0;bottom:9px;z-index:2;text-align:center;font:600 21px/1 var(--f-d);color:var(--parch);font-variant-numeric:lining-nums tabular-nums;text-shadow:0 0 10px color-mix(in srgb,var(--rc) 45%,transparent),0 1px 2px #000}
+.rl-q{position:absolute;left:0;right:0;bottom:9px;z-index:3;text-align:center;font:600 21px/1 var(--f-d);color:var(--parch);font-variant-numeric:lining-nums tabular-nums;text-shadow:0 0 10px color-mix(in srgb,var(--rc) 45%,transparent),0 1px 2px #000}
 /* под меткой карточка вспыхивает; на остановке — подсветка, вздрог и у полного героя — блик */
-.rl-card.on{border-color:color-mix(in srgb,var(--rc) 85%,#fff);box-shadow:0 0 16px -2px var(--rc),inset 0 -3px 0 var(--rc)}
-.rl-card.full.on{border-color:#f6dfa6;box-shadow:0 0 20px -2px var(--gold)}
-.rl-card.won{z-index:1;transform:scale(1.05);border-color:#fff;box-shadow:0 0 0 2px var(--rc),0 0 28px 2px color-mix(in srgb,var(--rc) 65%,transparent)}
-.rl-card.full.won{border-color:#fff3d0;box-shadow:0 0 0 2px var(--gold),0 0 36px 6px rgba(221,188,122,.6)}
+.rl-card.shard.on{border-color:color-mix(in srgb,var(--rc) 85%,#fff);box-shadow:0 0 16px -2px var(--rc),inset 0 -3px 0 var(--rc)}
+.rl-card.full.on{filter:drop-shadow(0 0 10px rgba(221,188,122,.9))}
+.rl-card.won{z-index:1;transform:scale(1.06)}
+.rl-card.shard.won{border-color:#fff;box-shadow:0 0 0 2px var(--rc),0 0 28px 2px color-mix(in srgb,var(--rc) 65%,transparent)}
+.rl-card.full.won{filter:drop-shadow(0 0 16px rgba(255,236,190,.95)) drop-shadow(0 0 30px rgba(221,188,122,.6))}
 .rl-card.hit{animation:rl-hit .6s cubic-bezier(.2,.8,.2,1)}
-.rl-card.full.hit::before{content:"";position:absolute;inset:0;z-index:4;background:linear-gradient(105deg,transparent 30%,rgba(255,246,220,.8) 50%,transparent 70%);transform:translateX(-130%);animation:rl-shine 1.2s .15s ease-out forwards}
-@keyframes rl-hit{0%{transform:scale(1)}40%{transform:scale(1.16)}100%{transform:scale(1.05)}}
+.rl-card.full.hit .rl-face::before{content:"";position:absolute;inset:0;z-index:4;background:linear-gradient(105deg,transparent 30%,rgba(255,246,220,.8) 50%,transparent 70%);transform:translateX(-130%);animation:rl-shine 1.2s .15s ease-out forwards}
+@keyframes rl-hit{0%{transform:scale(1)}40%{transform:scale(1.16)}100%{transform:scale(1.06)}}
 @keyframes rl-shine{to{transform:translateX(130%)}}
 
-/* цена, три кнопки и маленькое окно с галочкой */
+/* цена и шанс героя целиком, три кнопки и маленькое окно с галочкой */
 .rl-ctl{display:flex;align-items:flex-end;gap:var(--sp-m);flex-wrap:wrap}
 .rl-go{display:flex;flex-direction:column;gap:var(--sp-s);flex:1 1 auto;min-width:0}
-.rl-price{display:flex;align-items:center;gap:var(--sp-s);font-size:13px;color:var(--parch-2)}
+.rl-price{display:flex;align-items:center;flex-wrap:wrap;gap:4px 12px;font-size:13px;color:var(--parch-2);text-shadow:0 1px 2px #000}
 .rl-btns{display:flex;gap:var(--sp-s);flex-wrap:wrap}
-.rl-skip{display:inline-flex;align-items:center;gap:var(--sp-s);flex:none;padding:6px 10px;border:1px solid var(--iron);border-radius:9px;background:#0c0f11;font-size:12.5px;color:var(--parch-2);cursor:pointer}
+.rl-skip{display:inline-flex;align-items:center;gap:var(--sp-s);flex:none;padding:6px 10px;border:1px solid var(--iron);border-radius:9px;background:rgba(12,15,17,.85);font-size:12.5px;color:var(--parch-2);cursor:pointer}
 .rl-skip input{width:16px;height:16px;margin:0;accent-color:var(--spirit);cursor:pointer}
 .rl-skip input:disabled{cursor:not-allowed}
 .rl-team{display:flex;align-items:center;gap:var(--sp-s) var(--sp-m);flex-wrap:wrap;font-size:12px;line-height:1.3;color:var(--parch-3)}
@@ -84,37 +127,41 @@
 
 /* окно итога поверх рулетки */
 .rl-scrim2{position:absolute;inset:0;z-index:1;border:0;padding:0;background:rgba(3,4,5,.55);cursor:default;animation:fade .18s ease}
-.rl-res{position:absolute;left:50%;top:50%;z-index:2;transform:translate(-50%,-50%);width:min(430px,calc(100% - 40px));max-height:calc(100% - 24px);display:flex;flex-direction:column;
-  background:radial-gradient(90% 60% at 50% 115%,rgba(221,188,122,.1),transparent 70%),linear-gradient(180deg,#191d21,#111417);border:1px solid var(--gold-3);border-radius:14px;
-  box-shadow:0 30px 80px rgba(0,0,0,.8);animation:pop .24s cubic-bezier(.2,.8,.2,1)}
+.rl-res{position:absolute;left:50%;top:50%;z-index:2;transform:translate(-50%,-50%);width:min(440px,calc(100% - 40px));max-height:calc(100% - 24px);display:flex;flex-direction:column;
+  background:radial-gradient(90% 60% at 50% 115%,rgba(72,229,212,.12),transparent 70%),linear-gradient(180deg,#171c1f,#0f1315);border:1px solid rgba(221,188,122,.45);border-radius:14px;
+  box-shadow:0 30px 80px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,236,190,.08);animation:pop .24s cubic-bezier(.2,.8,.2,1)}
 .rl-res.wide{width:min(620px,calc(100% - 40px))}
 .rl-res.still,.rl-scrim2.still{animation:none}
 .rl-res-h{display:flex;align-items:baseline;gap:var(--sp-m);padding:var(--sp-m) var(--sp-l) 4px}
 .rl-res-h h3{font:600 23px/1.05 var(--f-d);color:var(--gold)}
 .rl-spent{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--parch-2);white-space:nowrap}
-.rl-res-b{display:flex;flex-direction:column;gap:var(--sp-s);padding:4px var(--sp-l) var(--sp-m);min-height:0}
+.rl-res-b{display:flex;flex-direction:column;gap:var(--sp-s);padding:18px var(--sp-l) var(--sp-m);min-height:0}
 .rl-res-b>*{flex-shrink:0}
 .rl-res-f{display:flex;gap:var(--sp-s);align-items:center;flex-wrap:wrap;padding:var(--sp-m) var(--sp-l);border-top:1px solid var(--iron)}
 .rl-res-f .rl-close{margin-left:auto}
-/* один итог: лицо крупно, имя, редкость, одна строка и пробуждение */
-.rl-one{display:grid;grid-template-columns:auto minmax(0,1fr);gap:var(--sp-m);align-items:center}
-.rl-big{position:relative;display:block;flex:none;width:92px;height:118px;border-radius:12px;overflow:hidden;border:1px solid color-mix(in srgb,var(--rc) 50%,#262b31);box-shadow:inset 0 -3px 0 var(--rc),0 10px 26px -12px var(--rc)}
-.rl-big>.rs-ph,.rl-big>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+/* один итог: крупно — герой в раме, стекло осколка или лицо ушедшего в прах; имя, редкость, одна строка и пробуждение */
+.rl-one{display:grid;grid-template-columns:auto minmax(0,1fr);gap:var(--sp-l);align-items:center}
+.rl-big{position:relative;display:block;flex:none;width:92px;height:118px}
+.rl-big .rl-face{border-radius:4px 4px 3px 3px}
 .rl-big .rs-ph b{font-size:32px}
-.rl-big.full{border:2px solid var(--gold);box-shadow:0 0 24px -4px var(--gold)}
-.rl-big .rl-q{bottom:8px}
-.rl-k{position:absolute;right:6px;top:6px;z-index:2;font:700 12px/1 var(--f-u);color:var(--gold);text-shadow:0 1px 2px #000}
+.rl-big.full{filter:drop-shadow(0 0 16px rgba(221,188,122,.5))}
+.rl-big.shard{display:grid;justify-items:center;align-content:start;height:auto}
+.rl-big.shard .rl-q{position:static;margin-top:2px}
+.rl-big.dust{border-radius:10px;overflow:hidden;border:1px solid var(--iron-2)}
+.rl-big.dust .rl-face{filter:grayscale(.8) brightness(.6)}
+.rl-k{position:absolute;right:6px;top:6px;z-index:3;font:700 12px/1 var(--f-u);color:var(--gold);text-shadow:0 1px 2px #000}
 .rl-one-tx{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0}
 .rl-nm{font:600 22px/1.05 var(--f-d);color:var(--parch)}
 .rl-line{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px;color:var(--parch-2)}
-/* сводка ×10 и ×100: полные — первыми и крупно, осколки — строками по героям с разделителем, прах — строкой */
-.rl-fulls{display:flex;gap:var(--sp-m);flex-wrap:wrap}
+/* сводка ×10 и ×100: полные — первыми и крупно, осколки — строками по героям со стеклом, прах — строкой */
+.rl-fulls{display:flex;gap:var(--sp-l);flex-wrap:wrap;padding-top:14px}
 .rl-fc{display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:124px;animation:rl-up .42s calc(var(--i) * 90ms) both cubic-bezier(.2,.8,.2,1)}
 .rl-res.still .rl-fc{animation:none}
 .rl-fc .rl-nm{font-size:16px}
 .rl-fc .btn{min-height:28px}
 .rl-grp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 var(--sp-m)}
-.rl-gr{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;padding:6px 0;border-top:1px solid var(--iron)}
+.rl-gr{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;padding:5px 0;border-top:1px solid var(--iron)}
+.rl-gs{display:grid;place-items:center;width:34px;height:34px}
 .rl-gr .tx{display:flex;flex-direction:column;min-width:0}
 .rl-gr .tx b{font:600 15px/1.1 var(--f-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rl-gr small{font-size:11.5px;color:var(--parch-3)}
@@ -122,6 +169,8 @@
 .rl-dust{display:flex;align-items:center;gap:var(--sp-s);flex-wrap:wrap;font-size:12.5px;color:var(--parch-2)}
 .rl-kv{grid-template-columns:auto minmax(0,1fr);font-size:13px}
 .rl-p{font-size:13px;color:var(--parch-2)}
+.rl-oface{display:flex;flex-wrap:wrap;gap:6px}
+.rl-oface .rs-av{width:30px;height:30px}
 @keyframes rl-up{from{opacity:0;transform:translateY(10px) scale(.94)}}
 
 /* частицы на остановке: слой рядом с #game — перерисовка экрана его не сносит */
@@ -129,6 +178,15 @@
 .rl-flash{position:absolute;left:0;top:0;width:200px;height:200px;border-radius:50%;pointer-events:none;mix-blend-mode:screen;
   background:radial-gradient(circle,rgba(255,250,236,.95),color-mix(in srgb,var(--c) 65%,transparent) 32%,transparent 70%)}
 
+/* низкий экран (844×390): окно ниже — лента и кнопки те же, поля меньше */
+.g.sm .rl-dlg .dlg-h{padding-top:10px}
+.g.sm .rl-win{height:146px}
+.g.sm .rl-track{top:22px}
+
+/* раздел UI-кита: карточки ленты вне окна */
+.rl-kit{gap:14px;justify-content:center;flex-wrap:wrap;padding-top:18px}
+
 @media (prefers-reduced-motion:reduce){
-  .rl-card,.rl-card.hit,.rl-card.full.hit::before,.rl-fc,.rl-res,.rl-scrim2{animation:none!important;transition:none!important}
+  .rl-card,.rl-card.hit,.rl-card.full.hit .rl-face::before,.rl-fc,.rl-res,.rl-scrim2,.rl-mo i{animation:none!important;transition:none!important}
+  .rl-mo{display:none}
 }

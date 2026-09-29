@@ -212,6 +212,7 @@ function load(o = {}) {
     ACT, OV, SCREENS, FLOWS, KH, KIT_EXTRA, MAP, BAG, LBX, render, initialState, setTeam, fmt, EnLoot: window.EnLoot, doc: document,
     WN, WN_VIEW, WN_DEMO, WN_SRV, WN_ART, wnRoll, wnChance, wnSync, wnBurst, wnShatter, wnPlan, wnCuts, wnCard, wnSpeed, wnChest, wnProg, wnReady, wnCap, wnLv, wnCyc,
     wnMemTab, wnArtTab, wnAchTab, wnSeries, wnWhen, WN_ACH_VIEW, evPlanks: window.evPlanks || null,
+    evPastK: window.EN_EV && window.EnEvent && window.EN_EVENT ? () => window.EnEvent.reached(window.EnEvent.planks(window.EN_EVENT, S.acc.cycle), window.EN_EV.past().pts || 0) : null,
   })`, ctx);
   const advance = ms => {
     const end = clock.now + ms;
@@ -427,7 +428,7 @@ function roll2(seed, excl, paid) {
   T.S.overlay = { t: 'wnp', arg: slot.id };
   if (!playerText(view(P, 'лист · Право владыки')).includes('За Энериум её не вызвать')) say('лист пассивки: нет строки «за Энериум не вызвать»');
   T.S.overlay = { t: 'mem', arg: '0' }; T.S.mem.ask = 'roll';
-  if (!playerText(view(P, 'подтверждение · за Энериум')).includes('за Энериум не выпадает')) say('подтверждение платного переброса: нет строки о «только бесплатно»');
+  if (!/за Энериум не выпада(?:ет|ют)/.test(playerText(view(P, 'подтверждение · за Энериум')))) say('подтверждение платного переброса: нет строки о «только бесплатно»');
 }
 
 /* ================== 5. анимация: тройка решена до неё; сборка из осколков, бой стекла, полёт в место; частицы по редкости ================== */
@@ -820,7 +821,8 @@ function openAnim(P, where) { run('Вспомнить', () => P.T.ACT.wnmem('0')
     equip: S.eq ? S.eq.count : null,
     arena: S.arena ? S.arena.wins + (S.arena.past ? S.arena.past.wins : 0) : null,   // побед за всё время прототип не хранит: сезон и прошлый
     league: S.arena && S.arena.lg ? S.arena.lg.wins + (S.arena.lg.past ? S.arena.lg.past.wins : 0) : null,
-    plank: S.event && T.evPlanks ? T.evPlanks().filter(x => x.got).length : null,
+    /* высшая планка недели: эта неделя или итог прошлой — его платят «Дары» (EN_EV.past) */
+    plank: S.event && T.evPlanks ? Math.max(T.evPlanks().filter(x => x.got).length, T.evPastK ? T.evPastK() : 0) : null,
   };
   for (const [m, v] of Object.entries(want)) {
     if (!W.ach.list.some(a => a.m === m)) { say(`7в: счётчика ${m} нет в каталоге`); continue; }

@@ -65,6 +65,14 @@ RULES = {
     'bp': BP,
     # ADR-0023, «Второй круг», п. 1: k-й купленный герой цикла c стоит first × c × (1 + step × (k − 1)); preview — сколько цен показать вперёд
     'gold': {'first': 10000, 'stepBp': 3000, 'preview': 3},
+    # Личный максимум доблести по источнику и циклу героя I…VI (ADR-0019; ADR-0030, п. 5а): 0 — источника в этом цикле нет.
+    # Рулетка растёт с циклом: II — 2, III — 3, IV–VI — «3–4» автора поделено по циклу, IV — 3, V–VI — 4 (решение исполнителя 29.09.2026):
+    # потолок задаёт источник и цикл, а редкость — отдельная ось, она уже делит ход героя (ADR-0016). Крафт — по рецепту, от и до.
+    'maxV': {'gold': [1, 1, 1, 1, 1, 1], 'roulette': [0, 2, 3, 3, 4, 4], 'echo': [0, 1, 2, 3, 4, 5], 'donat': [0, 1, 2, 3, 4, 5],
+             'craft': [1, 5]},
+    # Редкости по источнику, номера §3.1 от и до (ADR-0030, п. 5а): за золото — только обычная и редкая; высокие — рулетка, крафт,
+    # Эхо и донат. Рулетка — шесть редкостей от редкой (§15.1), Эхо — от уникальной, донат — вневременная (ADR-0021)
+    'rarity': {'gold': [1, 2], 'roulette': [2, 7], 'echo': [3, 7], 'donat': [7, 7], 'craft': [1, 7]},
     'aversionBp': 2000,                          # ADR-0024, п. 4: +20 % урона по расе своей недели — демонстрация
     'tierBySum': [[15, 3], [10, 2], [5, 1]],     # ADR-0022, п. 6: сумма личных максимумов пятерых от — ступеней
     'tierNeed': [1, 3],                          # §30: ступень I — один участник с доблестью от tierValor, II — трое
@@ -408,6 +416,12 @@ def build():
         max_v = int(r['максимум доблести'])
         if len(titles) != max_v:
             warns.append(f'{hid}: глав {len(titles)}, максимум доблести {max_v}')
+        cyc, rar = ROMAN.index(r['цикл']) + 1, RARITY.index(r['редкость']) + 1
+        mv, rv = RULES['maxV'].get(src['src']), RULES['rarity'].get(src['src'])
+        if mv and not (mv[0] <= max_v <= mv[1] if src['src'] == 'craft' else mv[cyc - 1] and max_v == mv[cyc - 1]):
+            errs.append(f'{hid}: максимум доблести {max_v} не по источнику — {src["src"]}, цикл {r["цикл"]} (rules.maxV)')
+        if rv and not rv[0] <= rar <= rv[1]:
+            errs.append(f'{hid}: редкость «{r["редкость"]}» не по источнику — {src["src"]} (rules.rarity)')
         h = {'id': hid, 'n': esc(r['имя']), 'race': esc(r['раса']), 'cls': esc(r['класс']), 'cl': base_classes(r['класс']),
              'sch': r['школа'], 'r': RARITY.index(r['редкость']) + 1, 'c': ROMAN.index(r['цикл']) + 1, 'maxV': max_v,
              'who': esc(r['кто он']), 'chT': [esc(t) for t in titles], **{k: v for k, v in src.items() if k != 'week'}}
@@ -494,14 +508,22 @@ def build():
     for key in SOURCES:
         hs = [h for h in heroes if h['src'] == key]
         if hs:
+            # maxByC — личный максимум по циклу героя: [от, до] (у рулетки растёт с циклом); rar — героев по редкостям 1…7
+            by_c = {c: [h['maxV'] for h in hs if h['c'] == c] for c in range(1, len(ROMAN) + 1)}
             info[key] = {'count': len(hs), 'from': min(h['c'] for h in hs),
                          'maxV': [min(h['maxV'] for h in hs), max(h['maxV'] for h in hs)],
-                         'byCycle': all(h['maxV'] == h['c'] - 1 for h in hs)}
+                         'byCycle': all(h['maxV'] == h['c'] - 1 for h in hs),
+                         'maxByC': {c: [min(v), max(v)] for c, v in by_c.items() if v},
+                         'rar': [sum(1 for h in hs if h['r'] == i) for i in range(1, len(RARITY) + 1)]}
     for key in ('gold',):
         for c in range(1, len(ROMAN) + 1):
             nos = sorted(h['no'] for h in heroes if h['src'] == key and h['c'] == c)
             if nos != list(range(1, len(nos) + 1)):
                 warns.append(f'каталог золота цикла {ROMAN[c - 1]}: номера {nos[:3]}…')
+            # после мест обучения каталог стоит по редкости: сначала обычные, затем редкие
+            rs = [h['r'] for h in sorted((h for h in heroes if h['src'] == key and h['c'] == c and not h['tut']), key=lambda h: h['no'])]
+            if rs != sorted(rs):
+                warns.append(f'каталог золота цикла {ROMAN[c - 1]} стоит не по редкости: сначала обычные, затем редкие')
 
     order = ['o' + draft_no[k] for k in draft_no if 'o' + draft_no[k] in sets] + sorted(k for k in sets if k[0] == 'd')
     return {

@@ -36,6 +36,12 @@
 .rt-cr{display:inline-grid;place-items:center;flex:none}
 .rt-cr .ico{filter:drop-shadow(0 0 5px color-mix(in srgb,var(--rc) 60%,transparent))}
 .rt-cr.none{width:26px;height:26px;border-radius:8px;border:1px dashed var(--iron-2);color:var(--parch-3)}
+.rt-crew-row .rt-cr.none{width:30px;height:30px;border-radius:50%}
+/* рабочий артели — фигура в кружке своей редкости, кристалл в углу (rtWorker) */
+.rt-wk{position:relative;display:inline-grid;place-items:end center;flex:none;width:var(--px);height:var(--px);border-radius:50%;
+  background:radial-gradient(70% 70% at 50% 100%,color-mix(in srgb,var(--rc) 34%,transparent),transparent 72%),#0d1013;box-shadow:0 0 0 1px color-mix(in srgb,var(--rc) 55%,#1f2429)}
+.rt-wk>img{width:100%;height:100%;object-fit:contain;border-radius:50%}
+.rt-wk>i{position:absolute;right:-4px;top:-4px;display:grid;filter:drop-shadow(0 0 3px color-mix(in srgb,var(--rc) 70%,transparent))}
 
 /* строка вкладки */
 .rt-bar{display:flex;align-items:center;gap:var(--sp-s);flex:none;min-width:0}

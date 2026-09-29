@@ -147,7 +147,8 @@ function buildDrops(CYC, places, items, recipes, byId) {
   const enemies = [];
   for (const cy of CYC) cy.biomes.forEach((b, i) => {
     const c = cy.n, bn = +b.id.slice(1), deck = C.DECKS[b.deck];
-    const sp = k => mulHalf(S[k], c, i === 1), rank = k => ({ spirit: sp(k), gold: Math.floor(sp(k) / 2) });
+    const b2 = i === 1 && E.biome2Pct && E.biome2Pct[c];   // исключение второго биома цикла: % ставки × цикл (common.js, ENEMY.biome2Pct)
+    const sp = k => b2 ? Math.floor(S[k] * c * b2 / 100) : mulHalf(S[k], c, i === 1), rank = k => ({ spirit: sp(k), gold: Math.floor(sp(k) / 2) });
     enemies.push({ biome: b.id, name: b.n, cyc: c, team: !!cy.team, deck: b.deck, floors: deck.floors, elites: deck.elites,
       ordinary: rank('ordinary'), elite: Object.assign(rank('elite'), { souls: C.ENEMY.soulsElitePerBiome * bn, specKeys: 1, runeKeyBp: 0 }),
       boss: Object.assign(rank('boss'), { souls: C.ENEMY.soulsBossPerBiome * bn, uniqueBp: E.uniqueBp, runeKeyBp: E.bossRuneKeyBp, runeKeys: c }),

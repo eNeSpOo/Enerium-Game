@@ -4,17 +4,21 @@
       и hdGearFoot. Числа экрана — целые, в блоках HD_DATA и HD_VIEW.
    2. Доблесть по §3.3 и ADR-0016: +INV.hero.valorPct % к базовым характеристикам накопительно, целыми; источник героя для боя и мощи
       (EB.heroSrc, BM_SRC0) — с ней; карточка и лист «Характеристики» показывают те же числа.
-   3. Вкладка «Развитие» в каждом состоянии: путь — пять ворот и звезда доблести, следующие ворота — кнопка предела; одна карточка
-      следующего шага и не больше одной главной кнопки; характеристики — пять значков тихой строкой.
+   3. Вкладка «Развитие» в каждом состоянии: путь — пять ворот и звезда доблести, следующие ворота — кнопка предела; ворота — рунные
+      камни, как на плитке и в шапке: горят пройденные, следующий на потолке уровня тлеет, с рунами — пульсирует (rpNext); значок шага
+      предела — тот же камень; одна карточка следующего шага и не больше одной главной кнопки; характеристики — пять значков тихой строкой.
    4. «Сервер» HD_SRV: уровень, предел и доблесть — операции с номером; расход — ровно цена; повтор номера ничего не меняет; отказ ничего
       не меняет. «Макс» — сколько хватает духа, не выше потолка.
-   5. Лист предела: сколько нужно, сколько есть, что будет; подтверждение — только когда можно. Анимация пробития: руны, отметка, новый
-      потолок; пропуск — сразу итог; «Дальше» посреди анимации — пропуск.
+   5. Лист предела: главное — камень этого предела, у имени — пять камней героя; сколько нужно, сколько есть, что будет; подтверждение —
+      только когда можно. Анимация пробития: руны слетаются в погасший камень, он загорается, под ним новый камень загорается в ряду
+      из пяти; новый потолок; пропуск — сразу итог; «Дальше» посреди анимации — пропуск.
    6. Доблесть: честное превью до подтверждения — доблесть, +30 % к пяти характеристикам (числа — valorSt), способность из набора,
       глава, что начнётся заново (уровень, пределы, мощь сейчас и на прежнем уровне), что сохранится; до последней доблести орден
       не называется; недоступно — причина и путь к руне. После — карточка «Что изменилось»: по строке, было → стало; на последней
       доблести — орден или «вне орденов».
    7. Анимации: время от начала показа (--el), пропуск нажатием, prefers-reduced-motion; ключевые кадры меняют только transform и opacity.
+      Рунный камень: погасший — фон, горящий — слой ::after; SVG-заглушка, нарисованный камень — у крупных, в RP_ART.ready — только
+      выгруженные файлы; при prefers-reduced-motion пульса нет, «можно пробить» — ровный свет.
    8. Окно снаряжения: девять мест снаряжения и четыре талисмана слева, запасы справа; нажатие — выбор, подсветка мест, надеть в место;
       перетаскивание — те же операции (grDrop), снять — в запасы; сравнение стрелками и прибавка мощи; привязка талисмана к классу —
       значком класса, чужой — тусклый с причиной; «Надеть лучшее» — операция с номером; листы OV.tal и OV.eq открывают это окно.
@@ -22,8 +26,10 @@
       вверх-вниз в запасах — прокрутка, вбок — перетаскивание, на героя мимо места — в своё место; из места в запасы — снять;
       призрак и подсветка убираются, слушатели снимаются, щелчок после броска гасится.
    9. Режим «Игрок»: служебных слов нет (SERVICE из check_player_view.js); режим «Команда» рисуется.
-   10. Вёрстка — расчётом размеров на 932 × 430 и 844 × 390: вкладки карточки, окно снаряжения, анимации и превью помещаются.
-   11. UI-кит (KIT_EXTRA), сценарии презентации, карта экранов: hero, equipment, equipment-item, talismans — готовы.
+   10. Вёрстка — расчётом размеров на 932 × 430 и 844 × 390: вкладки карточки, окно снаряжения, анимации и превью помещаются; в шапке
+      лицо в раме рунных камней оставляет место имени, камни не налезают; камни ворот — на оси пути; ряд камней анимации — над подписью.
+   11. UI-кит (KIT_EXTRA): разделы «Рунные пределы» (камень в четырёх состояниях и размерах, плитки, шапка, путь, строки) и «Развитие
+      героя и снаряжение»; сценарии презентации, карта экранов: hero, equipment, equipment-item, talismans — готовы.
    Запуск: node tools/content-gen/screens/check_hero_dev.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -115,6 +121,7 @@ function load(opt = {}) {
     ACT, OV, FLOWS, KH, MAP, KIT_EXTRA, H, EB, INV, BAG, BM, RS, RSI, RSS, render, initialState, setTeam, fmt, ROMAN,
     heroDev, heroSt, valorSt, BM_SRC0, lvlCost, heroKit, hrTwin: typeof hrTwin === 'function' ? hrTwin : null, rsChTitle,
     HD_DATA, HD_VIEW, HD_SRV, GR_SRV, hdPower, hdGearFoot, hdKitHtml, hdQty, hdOpens, hdChapter, hdBmAt, grWin, grPlan, grDrop, grPick, grBind,
+    RP_ART, rpNext, rpRow, rpPost, rpKitHtml, hdKitHero, heroHead: typeof heroHead === 'function' ? heroHead : null,
     TB, TL: window.EN_TALISMANS, tlEq, tlWhy, tlFam, tlR, tlMul, tlMulOf, EQD: window.EN_EQUIPMENT, eqItem, eqWornList, eqGain, eqMulOf, EQ_SRV, TL_SRV,
   })`, ctx);
   return { T, els, rootCls, timers, wl, document, tick: ms => { now += ms; }, setNow: ms => { now = ms; }, game: () => (els.game ? els.game.innerHTML : '') };
@@ -174,6 +181,14 @@ function checkPower(where, h, want) {
   if (count(g, /class="hdv-gate[ "]/g) !== TOP) say(`${where}: ворот пределов ${count(g, /class="hdv-gate[ "]/g)}, ждали ${TOP}`);
   if (count(g, /class="hdv-gate done"/g) !== Math.min(h.lim, TOP)) say(`${where}: светится ворот ${count(g, /class="hdv-gate done"/g)}, пройдено ${h.lim}`);
   if (h.lim < TOP && !new RegExp(`<button class="hdv-gate next[^"]*" data-v="${h.id}" data-a="limit"`).test(g)) say(`${where}: следующие ворота — не кнопка предела`);
+  /* ворота — рунные камни, как на плитке и в шапке (rpNext): горят пройденные, следующий на потолке тлеет или пульсирует, дальние погасшие */
+  const gates = [...g.matchAll(/class="hdv-gate ([^"]*)"[^>]*><i class="rp-s (on|off|wait|ready) p"><\/i>/g)].map(m => m[2]);
+  const nx = T.rpNext(h), wantSt = Array.from({ length: TOP }, (_, k) => k < h.lim ? 'on' : k === h.lim && nx ? nx : 'off').join(' ');
+  if (gates.join(' ') !== wantSt) say(`${where}: камни ворот «${gates.join(' ')}», ждали «${wantSt}»`);
+  if (nx && !new RegExp(`class="hdv-gate next ${nx}"`).test(g)) say(`${where}: у следующих ворот нет состояния «${nx}»`);
+  if (d.step === 'limit' && d.rune && !g.includes(`<span class="hdv-ic"><i class="rp-s ${d.have >= d.need ? 'on' : 'wait'} p"></i></span>`)) say(`${where}: значок шага предела — не камень этого предела (с рунами горит ровно, без рун тлеет)`);
+  if (count(g, /<i class="rp-s ready/g) > 1) say(`${where}: пульсирует ${count(g, /<i class="rp-s ready/g)} камня во вкладке — только сам следующий камень пути`);
+  if (/class="limits"/.test(g)) say(`${where}: остались прежние отметки .limits`);
   if (!new RegExp(`<button class="hdv-star [^"]*" data-v="${h.id}" data-a="valor"`).test(g)) say(`${where}: звезда доблести — не кнопка`);
   if (count(g, /class="hdv-next"/g) !== 1) say(`${where}: карточек следующего шага ${count(g, /class="hdv-next"/g)} — нужна одна`);
   if (count(g, /class="btn go[ "]/g) > 1) say(`${where}: главных кнопок ${count(g, /class="btn go[ "]/g)} — нужна одна`);
@@ -183,10 +198,10 @@ function checkPower(where, h, want) {
 }
 fresh();
 {
-  const h = T.H('h1');   // уровень 42 из 50
+  const h = T.H('h1');   // 146 из 150: Гарт отстал от отряда (демо — 11-й день цикла II)
   let g = checkPower('уровень растёт', h, 'lvl');
   const q = T.hdQty(h); if (!g.includes(`data-a="lvlup"`) || !g.includes(`:${h.id}:${q}"`)) say('уровень: у кнопки «Поднять» нет номера операции и числа уровней');
-  const h2 = T.H('h2');  // 50 из 50, руны предела I в запасах
+  const h2 = T.H('h2');  // 150 из 150, руны предела II в запасах
   g = checkPower('предел ждёт', h2, 'limit');
   if (!/data-a="limit">Пробить/.test(g)) say('предел: при рунах «Пробить» недоступна или не главная');
   const d2 = T.heroDev(h2); T.BAG.take(d2.rune.id, T.BAG.qty(d2.rune.id) - (d2.need - 1));
@@ -203,8 +218,9 @@ fresh();
   g = checkPower('доблесть · руна есть', h4, 'valor');
   if (!new RegExp(`data-v="${h4.id}" data-a="valor">Взять доблесть`).test(g)) say('доблесть · руна: нет «Взять доблесть» главной кнопкой');
   if (!/class="hdv-star ready/.test(g)) say('доблесть открыта, а звезда не светится');
-  /* путь пройден: доблесть на личном максимуме, пятый предел */
-  const h3 = T.H('h3'); h3.lim = TOP; h3.cap = D.capByLim[TOP]; h3.lvl = h3.cap;
+  /* путь пройден: доблесть на личном максимуме, пятый предел. Герой — тот, у кого доблесть уже на максимуме (у демо-отряда ADR-0031 —
+     Хравн: максимум 1, доблесть 1 от руны обучения) */
+  const h3 = T.S.heroes.find(x => x.maxV > 0 && x.valor >= x.maxV) || T.H('h3'); h3.lim = TOP; h3.cap = D.capByLim[TOP]; h3.lvl = h3.cap;
   g = checkPower('путь пройден', h3, 'done');
   if (/data-a="(?:lvlup|limit|valordo)"[^>]*>(?:Поднять|Пробить)/.test(g)) say('путь пройден: осталось действие развития');
   if (!/class="hdv-star max/.test(g)) say('путь пройден: звезда не «максимум»');
@@ -240,31 +256,39 @@ fresh();
 /* ================== 5. предел: лист, операция, анимация ================== */
 fresh();
 {
-  const h = T.H('h2'), d = T.heroDev(h), bag0 = T.BAG.qty(d.rune.id);
+  /* Хравн — на потолке своего предела, руны следующего есть (демо — 11-й день цикла II: предел I, руны предела II, ADR-0031, п. 17) */
+  const h = T.H('h2'), d = T.heroDev(h), bag0 = T.BAG.qty(d.rune.id), lim0 = h.lim;
   card('h2', 'power');
   run('предел · лист', () => T.ACT.limit('h2'));
   const O = T.S.overlay;
   if (!O || O.t !== 'hdlim' || O.act !== 'limitdo' || !/^hd\d+:h2$/.test(O.v)) say(`предел: лист без подтверждения с номером — ${JSON.stringify(O)}`);
   let g = ovOf(view('предел · лист'));
-  if (!g.includes(`${h.cap}</span> → <span class="num">${D.capByLim[1]}`) || !g.includes('data-a="limitdo"')) say('предел · лист: нет «потолок было → стало» или подтверждения');
+  if (!g.includes(`${h.cap}</span> → <span class="num">${D.capByLim[lim0 + 1]}`) || !g.includes('data-a="limitdo"')) say('предел · лист: нет «потолок было → стало» или подтверждения');
+  if (!g.includes('<span class="hdl-st"><i class="rp-s ready p"></i></span>')) say('предел · лист: главное — не пульсирующий камень этого предела');
+  if (!new RegExp(`<span class="hdl-who"><span class="eyebrow">[^<]*</span><span class="rp i" role="img" aria-label="Рунный предел ${h.lim} из ${TOP}"[^>]*>(?:<i class="rp-s (?:on|off|wait|ready)"></i>){${TOP}}</span>`).test(g)) say('предел · лист: у имени нет пяти камней героя');
   run('предел · подтверждение', () => T.ACT.limitdo(O.v)); cnt.ops++;
-  if (h.lim !== 1 || h.cap !== D.capByLim[1] || T.BAG.qty(d.rune.id) !== bag0 - d.need) say(`предел: lim ${h.lim}, потолок ${h.cap}, руны ${bag0} → ${T.BAG.qty(d.rune.id)}`);
+  if (h.lim !== lim0 + 1 || h.cap !== D.capByLim[lim0 + 1] || T.BAG.qty(d.rune.id) !== bag0 - d.need) say(`предел: lim ${h.lim}, потолок ${h.cap}, руны ${bag0} → ${T.BAG.qty(d.rune.id)}`);
   if (!T.S.overlay || T.S.overlay.t !== 'hdfx') say('предел: после подтверждения нет анимации');
   g = ovOf(view('предел · анимация'));
   if (count(g, /<i style="--a:/g) !== d.need || !g.includes('class="hdfx-mark"') || !g.includes('data-a="hdskip"') || !/--el:\d+/.test(g)) say('предел · анимация: не руны по числу, не отметка, нет пропуска или времени --el');
-  if (!g.includes(`<s class="num">${D.capByLim[0]}</s> <b class="num">${D.capByLim[1]}</b>`)) say('предел · анимация: нет нового потолка «было → стало»');
+  /* новый камень загорается: в центре — камень предела, под ним — пять камней героя, новый загорается вместе с ним */
+  if (!g.includes('<span class="hdfx-mark"><i class="rp-s on p"></i></span>')) say('предел · анимация: в центре не рунный камень, который загорается');
+  const row = (g.match(/<span class="hdfx-row">([\s\S]*?)<\/span>/) || [])[1] || '';
+  if (count(row, /<i class="rp-s /g) !== TOP || count(row, /<i class="rp-s on/g) !== h.lim || count(row, / new"/g) !== 1
+    || !new RegExp(`^(?:<i class="rp-s on"></i>){${h.lim - 1}}<i class="rp-s on new"></i>`).test(row)) say(`предел · анимация: под камнем не пять камней героя с новым ${h.lim}-м`);
+  if (!g.includes(`<s class="num">${D.capByLim[lim0]}</s> <b class="num">${D.capByLim[lim0 + 1]}</b>`)) say('предел · анимация: нет нового потолка «было → стало»');
   run('предел · «Дальше» посреди', () => T.ACT.hdfxok());
   if (!T.S.overlay || T.S.overlay.t !== 'hdfx' || !T.S.hd.fx.skip) say('предел: «Дальше» посреди анимации закрыло её, а должно показать итог');
   if (!/class="ov hdfx hdfx-lim done"/.test(ovOf(view('предел · итог')))) say('предел: пропуск не показал итог (класс done)');
   run('предел · закрыть', () => T.ACT.hdfxok()); if (T.S.overlay) say('предел: «Дальше» после итога не закрыло анимацию');
   const b1 = snapBag(); run('предел · повтор', () => T.ACT.limitdo(O.v)); cnt.ops++;
-  if (h.lim !== 1 || snapBag() !== b1) say('предел: повтор номера что-то изменил');
+  if (h.lim !== lim0 + 1 || snapBag() !== b1) say('предел: повтор номера что-то изменил');
   /* не на потолке — лист без подтверждения, операция отказывает */
   T.S.overlay = null; run('предел · рано', () => T.ACT.limit('h2'));
   if (!T.S.overlay || T.S.overlay.act) say('предел не на потолке: в листе есть подтверждение');
   if (!ovOf(view('предел · рано')).includes('Сначала уровень')) say('предел не на потолке: лист не говорит, что сначала уровень');
   const b2 = snapBag(); run('предел · рано · операция', () => T.ACT.limitdo('h2')); cnt.ops++;
-  if (h.lim !== 1 || snapBag() !== b2) say('предел не на потолке: что-то списалось');
+  if (h.lim !== lim0 + 1 || snapBag() !== b2) say('предел не на потолке: что-то списалось');
   /* пятый предел — потолок не растёт, путь к доблести */
   fresh(); const h5 = T.H('h4'), c = h5.cycle;
   h5.lim = TOP - 1; h5.cap = D.capByLim[h5.lim]; h5.lvl = h5.cap;
@@ -299,6 +323,7 @@ fresh();
   for (const x of T.hdOpens(h, v + 1)) if (!g.includes(`«${x.n}»`)) say(`превью: нет способности «${x.n}» доблести ${v + 1}`);
   const ch = T.hdChapter(h, v + 1); if (ch && !g.includes(`«${ch}»`)) say(`превью: нет главы «${ch}»`);
   if (!g.includes(`<s>${lvl0}</s>`) || !/Уровень/.test(g) || !/Рунный предел/.test(g)) say('превью: нет «уровень было → 0» или рунных пределов');
+  if (!g.includes(`<s><span class="rp i" role="img" aria-label="Рунный предел ${h.lim} из ${TOP}"`) || !g.includes(`<b><span class="rp i" role="img" aria-label="Рунный предел 0 из ${TOP}"`) || /class="limits"/.test(g)) say('превью: рунные пределы не строкой камней «было → стало»');
   const bmA = T.hdBmAt(h, { valor: v + 1, lvl: 0 }), bmS = T.hdBmAt(h, { valor: v + 1 });
   if (!g.includes(T.fmt(bm0)) || !g.includes(T.fmt(bmA)) || !g.includes(T.fmt(bmS))) say(`превью: мощь ${bm0} → ${bmA}, на прежнем уровне ${bmS} — не все числа видны`);
   if (!(bmS > bm0)) say(`превью: на прежнем уровне мощь не выросла — ${bm0} → ${bmS}`);
@@ -315,9 +340,13 @@ fresh();
   if (!r || r.ok !== 'valor' || r.was.bm !== bm0 || r.now.bm !== h.bm) say('доблесть: итог сервера без мощи было → стало');
   const fx = ovOf(view('доблесть · анимация'));
   if (!fx.includes('class="hdfx-stars"') || count(fx, /<i class="on new"><\/i>/g) !== 1 || !fx.includes('class="hdfx-rise"') || !fx.includes('что изменилось')) say('доблесть · анимация: нет звёзд с новой, взлёта значка или карточки «Что изменилось»');
-  if (count(fx, /<li style="--k:\d+">/g) < 6) say(`доблесть · «Что изменилось»: строк ${count(fx, /<li style="--k:\d+">/g)}`);
+  /* строк: доблесть, характеристики, способности этой доблести по набору, глава, раскрытие; уровень, пределы, мощь — набор сжат
+     к личному максимуму (ADR-0031, п. 7), поэтому число строк — по данным героя, а не постоянное */
+  const rowsWant = 5 + T.hdOpens(h, v + 1).length + (ch != null ? 1 : 0) + (r && r.reveal ? 1 : 0);
+  if (count(fx, /<li style="--k:\d+">/g) !== rowsWant) say(`доблесть · «Что изменилось»: строк ${count(fx, /<li style="--k:\d+">/g)}, по набору и главам — ${rowsWant}`);
   for (const t of ['Доблесть', 'Характеристики', 'Уровень', 'Рунный предел', 'Мощь']) if (!fx.includes(`<span class="k">${t}</span>`)) say(`«Что изменилось»: нет строки «${t}»`);
   if (count(fx, /<s>/g) < 3) say('«Что изменилось»: мало строк «было → стало»');
+  if (count(fx, /<span class="rp i" role="img"/g) !== 2 || /class="limits"/.test(fx)) say('«Что изменилось»: рунные пределы не строкой камней «было → стало»');
   if (ch && !fx.includes('data-a="hdread"')) say('«Что изменилось»: нет «Читать главу»');
   run('доблесть · пропуск', () => T.ACT.hdskip());
   run('доблесть · читать главу', () => T.ACT.hdread());
@@ -325,16 +354,18 @@ fresh();
   const b1 = snapBag(); run('доблесть · повтор', () => T.ACT.valordo(O.v)); cnt.ops++;
   if (h.valor !== v + 1 || snapBag() !== b1) say('доблесть: повтор номера что-то изменил');
   /* недоступно: не пятый предел — нет подтверждения, причина; руны нет, осколков хватает — «Собрать руну» */
-  fresh(); const hx = T.H('h2'), dx = T.heroDev(hx); T.BAG.add(dx.vs.id, dx.vsNeed);
-  run('доблесть · рано', () => T.ACT.valor('h2'));
+  /* герой — с доблестью ниже максимума и не на пятом пределе (у демо-отряда ADR-0031 это любой, кроме Хравна) */
+  fresh(); const hx = T.S.heroes.find(x => x.valor < x.maxV && x.lim < D.valorAtLim) || T.H('h2'), dx = T.heroDev(hx); T.BAG.add(dx.vs.id, dx.vsNeed);
+  run('доблесть · рано', () => T.ACT.valor(hx.id));
   let gx = ovOf(view('доблесть · рано'));
   if (/data-a="valordo"/.test(gx) || T.S.overlay.act) say('доблесть не на пятом пределе: есть подтверждение');
   if (!gx.includes(`рунного предела ${T.ROMAN[D.valorAtLim]}`)) say('доблесть не на пятом пределе: нет причины');
   if (!gx.includes(`data-a="valorcraft" data-v="${dx.rec.id}"`)) say('доблесть: осколков хватает, а «Собрать руну» нет');
-  const b2 = snapBag(), vv = hx.valor; run('доблесть · рано · операция', () => T.ACT.valordo('h2')); cnt.ops++;
+  const b2 = snapBag(), vv = hx.valor; run('доблесть · рано · операция', () => T.ACT.valordo(hx.id)); cnt.ops++;
   if (hx.valor !== vv || snapBag() !== b2) say('доблесть не на пятом пределе: что-то списалось');
-  /* личный максимум */
-  run('доблесть · максимум', () => T.ACT.valor('h3'));
+  /* личный максимум — герой, у которого доблесть уже на максимуме (у демо-отряда ADR-0031 — Хравн) */
+  const hm = T.S.heroes.find(x => x.maxV > 0 && x.valor >= x.maxV) || T.H('h3');
+  run('доблесть · максимум', () => T.ACT.valor(hm.id));
   if (!ovOf(view('доблесть · максимум')).includes('личный максимум')) say('доблесть на максимуме: нет причины');
   /* последняя доблесть: орден раскрыт или «вне орденов»; Безликий — память */
   fresh(); const hl = prepValor(T.HD_DATA.flow.last, T.H(T.HD_DATA.flow.last).maxV - 1), names = orderNames(hl);
@@ -345,6 +376,55 @@ fresh();
   run('последняя · подтверждение', () => T.ACT.valordo(T.S.overlay.v)); cnt.ops++;
   const gf = ovOf(view('последняя доблесть · анимация'));
   if (names.length ? !names.every(n => gf.includes(n)) : !gf.includes('вне орденов')) say(`последняя доблесть: «Что изменилось» не раскрывает орден — ${names.join(', ') || 'вне орденов'}`);
+}
+
+/* ================== 6б. руна обучения (ADR-0031, п. 2; §16): руну первой доблести даёт 8-й уровень аккаунта — на любом пределе ==================
+   Отдельного предмета нет: признак — источник (HD_DATA.train), счёт — «сервер» развития S.hd.train. Обычная руна — только на пятом
+   пределе; на пятом с обычной руной тратится обычная. Руна обучения — первая доблесть героя своего цикла; повтор номера ничего не меняет */
+{
+  const TR = T.HD_DATA.train;
+  if (!TR || !Number.isInteger(TR.level) || !Number.isInteger(TR.cyc) || !Number.isInteger(TR.demo)) say('руна обучения: нет правила HD_DATA.train с уровнем, циклом и демо');
+  else {
+    fresh();
+    if (T.S.hd.train !== (T.S.acc.level >= TR.level ? TR.demo : 0)) say(`руна обучения: у демо-аккаунта ${T.S.hd.train}, по правилу ${TR.demo}`);
+    const pick = c => T.RS.heroes.find(r => r.src === 'gold' && r.c === c && r.maxV > 0 && !T.S.rs.owned[r.id] && !(T.hrTwin && T.S.heroes.some(x => T.hrTwin(x) === r)));
+    const own = (r, lim, valor = 0) => { T.S.rs.owned[r.id] = { lvl: D.capByLim[lim], lim, valor, how: 'gold' }; return T.H(r.id); };
+    const x1 = pick(TR.cyc), x2 = pick(TR.cyc + 1);
+    if (!x1) say('руна обучения: нет золотого героя цикла I');
+    else {
+      /* второй биом: предел I, руны обучения нет — доблести нет */
+      fresh(); let h = own(x1, 1); const vr = T.heroDev(h).vr, b0 = snapBag();
+      run('руна обучения · без руны', () => T.ACT.valor(h.id));
+      if (T.S.overlay && T.S.overlay.act) say('руна обучения: без руны на пределе I есть подтверждение');
+      run('руна обучения · без руны · операция', () => T.ACT.valordo(`hd${T.S.hd.seq}:${h.id}`));
+      if (h.valor !== 0 || snapBag() !== b0) say('руна обучения: без руны на пределе I доблесть взята');
+      /* обычная руна доблести на пределе I — нельзя */
+      if (vr) { T.BAG.add(vr.id, 1); const b1 = snapBag(); run('обычная руна · предел I', () => T.ACT.valordo(`hd${T.S.hd.seq}:${h.id}`)); if (h.valor !== 0 || snapBag() !== b1) say('руна обучения: обычная руна доблести сработала на пределе I'); }
+      /* руна обучения на пределе I — можно: превью со строкой, операция с номером, руна обучения тратится, запасы — нет */
+      fresh(); h = own(x1, 1); T.S.hd.train = 1; card(h.id, 'power');
+      const g0 = tabOf(view('руна обучения · путь'));
+      if (!/class="hdv-star ready dot"/.test(g0)) say('руна обучения: звезда доблести на пути не готова');
+      run('руна обучения · превью', () => T.ACT.valor(h.id));
+      const O = T.S.overlay, g = ovOf(view('руна обучения · превью'));
+      if (!O || O.act !== 'valordo') say('руна обучения: в превью нет подтверждения');
+      if (!playerText(strip(g)).includes('Руна обучения: можно на любом пределе')) say('руна обучения: в превью нет строки «Руна обучения: можно на любом пределе»');
+      if (!/data-a="valordo"[^>]*>Взять доблесть<span class="cost"><img[^>]*alt="Руна обучения"/.test(g)) say('руна обучения: у подтверждения нет цены руной обучения');
+      const b2 = snapBag();
+      if (O) run('руна обучения · подтверждение', () => T.ACT.valordo(O.v)); cnt.ops++;
+      if (h.valor !== 1 || h.lim !== 0 || h.lvl !== 0 || T.S.hd.train !== 0 || snapBag() !== b2) say(`руна обучения: доблесть ${h.valor}, предел ${h.lim}, рун обучения ${T.S.hd.train}, запасы ${snapBag() === b2 ? 'те же' : 'изменились'}`);
+      if (h.keep !== 1) say(`руна обучения: пределы прошлого круга ${h.keep}, ждали 1 — сила коллекции держит только пройденные`);
+      const r = O && T.S.hd.srv[O.v.split(':')[0]]; if (!r || !r.train || r.rune) say('руна обучения: итог сервера не говорит, что взята руна обучения');
+      if (O) { run('руна обучения · повтор', () => T.ACT.valordo(O.v)); if (h.valor !== 1 || T.S.hd.train !== 0) say('руна обучения: повтор номера что-то изменил'); }
+      /* пятый предел, обычная руна есть — тратится обычная, руна обучения остаётся */
+      fresh(); h = own(x1, TOP); T.S.hd.train = 1; const d5 = T.heroDev(h);
+      if (d5.vr) { if (!d5.vrHave) T.BAG.add(d5.vr.id, 1); const q = T.BAG.qty(d5.vr.id); run('пятый предел · обычная', () => T.ACT.valordo(`hd${T.S.hd.seq}:${h.id}`));
+        if (h.valor !== 1 || T.BAG.qty(d5.vr.id) !== q - 1 || T.S.hd.train !== 1) say('руна обучения: на пятом пределе с обычной руной потрачена не обычная'); }
+      /* не первая доблесть и чужой цикл — руна обучения не подходит */
+      fresh(); T.S.hd.train = 1; h = own(x1, 1, 1);
+      if (T.heroDev(h).train) say('руна обучения: подходит герою не на первой доблести');
+      if (x2) { h = own(x2, 1); if (T.heroDev(h).train) say('руна обучения: подходит герою цикла II'); }
+    }
+  }
 }
 
 /* ================== 7. анимации: время, пропуск, меньше движения, только transform и opacity ================== */
@@ -358,15 +438,23 @@ fresh();
   }
   const rm = CSS.match(/@media \(prefers-reduced-motion:\s*reduce\)\s*\{([\s\S]*?)\n\}/);
   if (!rm || !/\.hdfx/.test(rm[1]) || !/animation:none/.test(rm[1])) say('hero-dev.css: при prefers-reduced-motion анимации не выключены');
+  if (!rm || !/\.rp-s::after/.test(rm[1]) || !/\.rp-s\.ready::after\{opacity:/.test(rm[1])) say('hero-dev.css: при prefers-reduced-motion пульс рунных камней не выключен или «можно пробить» без ровного света');
+  /* рунный камень: погасший — фон, горящий со светом — слой ::after; пульс и загорание меняют только opacity */
+  for (const [n, re] of [['камень .rp-s с погасшим фоном', /\.rp-s\{[^}]*background:var\(--rp-off\)/], ['горящий слой ::after', /\.rp-s::after\{[^}]*opacity:0;background:var\(--rp-on\)/],
+    ['горит пройденный', /\.rp-s\.on::after\{opacity:1\}/], ['тлеет на потолке', /\.rp-s\.wait::after\{opacity:\.\d+\}/], ['пульсирует, когда можно пробить', /\.rp-s\.ready::after\{animation:rpPulse /],
+    ['SVG-заглушка камня', /--rp-on:url\("data:image\/svg\+xml,[^"]+"\);\s*--rp-off:url\("data:image\/svg\+xml,[^"]+"\)/], ['нарисованный камень у крупных', /\.rp-s\.p\{background-image:var\(--rp-off-p,var\(--rp-off\)\)\}/]])
+    if (!re.test(CSS)) say(`hero-dev.css: нет — ${n}`);
+  /* нарисованный камень: в RP_ART.ready — только выгруженные файлы */
+  for (const p of T.RP_ART.ready) if (!fs.existsSync(path.join(UI, 'assets', 'art', p))) say(`RP_ART.ready: ${p} — файла нет в assets/art`);
   if (!/\.hdfx\.done[^{]*\{animation:none!important\}/.test(CSS)) say('hero-dev.css: пропуск (.done) не выключает анимации');
   if (!/calc\(\(var\(--d[a-z]*\) - var\(--el\)\) \* 1ms\)/.test(CSS)) say('hero-dev.css: задержки не отсчитаны от начала показа (--el)');
   /* меньше движения: итог сразу — класс done, частиц нет */
   const R = load({ reduced: true }), X = R.T;
   X.S = X.initialState(); X.S.overlay = null;
-  const h = X.H('h2'); X.S.selHero = 'h2';
+  const h = X.H('h2'), limR = h.lim; X.S.selHero = 'h2';
   run('меньше движения', () => { X.ACT.limit('h2'); X.ACT.limitdo(X.S.overlay.v); X.render(); });
   if (!/class="ov hdfx hdfx-lim done"/.test(R.game()) || R.timers.length) say('prefers-reduced-motion: анимация не сразу итог или ждут частицы');
-  if (h.lim !== 1) say('prefers-reduced-motion: предел не пробит');
+  if (h.lim !== limR + 1) say('prefers-reduced-motion: предел не пробит');
   /* обычный показ: частицы назначены на время вспышки */
   const Q = load(), Y = Q.T; Y.S = Y.initialState(); Y.S.overlay = null; Y.S.selHero = 'h2';
   run('частицы', () => { Y.ACT.limit('h2'); Y.ACT.limitdo(Y.S.overlay.v); });
@@ -563,6 +651,20 @@ run('режим «Игрок»', () => T.setTeam(false));
   const eqSlot = px(CSS, /\.hd-gear \.eq-slot\{width:(\d+)px/, '.hd-gear .eq-slot'), eqSlotSm = px(CSS, /@container main \(max-height: 360px\)\{[\s\S]*?\.hd-gear \.eq-slot\{width:(\d+)px/, '.hd-gear .eq-slot компакт');
   const tlSlotH = px(CSS, /\.hd-gear \.tl-slot\{min-height:(\d+)px/, '.hd-gear .tl-slot'), tlSlotHSm = px(CSS, /@container main \(max-height: 360px\)\{[\s\S]*?\.hd-gear \.tl-slot\{min-height:(\d+)px/, '.hd-gear .tl-slot компакт');
   const w = (s, k, caps) => Math.ceil(String(s).length * k * (caps ? 0.7 : 0.5));
+  /* рунные пределы: пропорция камня, столбы у лица в шапке, камни-ворота на пути, ряд камней в анимации, строка в превью */
+  const CM = /@container main \(max-height: 360px\)\{[\s\S]*?/.source;
+  const [ar1, ar2] = (CSS.match(/\.rp-s\{[^}]*aspect-ratio:(\d+)\/(\d+)/) || [0, 0, 0]).slice(1).map(Number);
+  if (!ar1 || !ar2) say('вёрстка: нет пропорции камня .rp-s');
+  const faceW = px(I, /\.hd-face\{position:relative;width:(\d+)px/, '.hd-face width'), faceWSm = px(I, new RegExp(CM + /\.hd-face\{width:(\d+)px/.source), '.hd-face компакт width');
+  const rpH = px(CSS, /\.rp\.h\{position:relative;flex:none;width:(\d+)px/, '.rp.h width'), rpHPad = px(CSS, /\.rp\.h\{position:relative;flex:none;width:\d+px;padding:(\d+)px 0\}/, '.rp.h padding');
+  const rpHSm = px(CSS, new RegExp(CM + /\.rp\.h\{width:(\d+)px/.source), '.rp.h компакт'), rpHPadSm = px(CSS, new RegExp(CM + /\.rp\.h\{width:\d+px;padding:(\d+)px 0\}/.source), '.rp.h компакт padding');
+  const rpGap = px(CSS, /\.hd-rp\{display:flex;align-items:stretch;gap:(\d+)px\}/, '.hd-rp gap'), rpGapSm = px(CSS, new RegExp(CM + /\.hd-rp\{gap:(\d+)px\}/.source), '.hd-rp компакт gap');
+  const gateSt = px(CSS, /\.hdv-gate \.rp-s\{width:(\d+)px\}/, '.hdv-gate .rp-s'), gateLbl = px(CSS, /\.hdv-gate small\{position:absolute;top:(\d+)px/, '.hdv-gate small top');
+  const segH = px(CSS, /\.hdv-seg\{[^}]*height:(\d+)px;margin-top:\d+px/, '.hdv-seg height'), segTop = px(CSS, /\.hdv-seg\{[^}]*height:\d+px;margin-top:(\d+)px/, '.hdv-seg margin-top');
+  const markSt = px(CSS, /\.hdfx-mark \.rp-s\{width:(\d+)px\}/, '.hdfx-mark .rp-s'), rowTop = px(CSS, /\.hdfx-row\{position:absolute;left:0;top:(\d+)px/, '.hdfx-row top');
+  const rowSt = px(CSS, /\.hdfx-row \.rp-s\{width:(\d+)px\}/, '.hdfx-row .rp-s'), stagePct = px(CSS, /\.hdfx-stage\{position:absolute;left:50%;top:(\d+)%/, '.hdfx-stage top');
+  const inlSt = px(CSS, /\.rp\.i \.rp-s\{width:(\d+)px\}/, '.rp.i .rp-s'), inlGap = px(CSS, /\.rp\.i\{[^}]*gap:(\d+)px/, '.rp.i gap');
+  const stH = sw => sw * ar2 / Math.max(1, ar1);
   for (const X of SCR) {
     cnt.layout++;
     const mainW = X.W - X.rail, mainH = X.H - X.top, compact = mainH <= 360;
@@ -585,6 +687,15 @@ run('режим «Игрок»', () => T.setTeam(false));
     if (nextW > bodyW) say(`вёрстка ${X.n}: карточка шага ${nextW} px, а ширина ${bodyW} px`);
     const quietW = 5 * (18 + 5 + w('1234', 14)) + 4 * 14 + 12 + 28;
     if (quietW > bodyW) say(`вёрстка ${X.n}: строка характеристик ${quietW} px, а ширина ${bodyW} px`);
+    /* рунные пределы: шапка — лицо между столбами камней, камни помещаются по высоте лица, имени хватает места; путь — камни-ворота
+       на оси отрезков, подпись уровня — в дорожке */
+    const fW = compact ? faceWSm : faceW, fH = compact ? faceSm : face, pw = compact ? rpHSm : rpH, pp = compact ? rpHPadSm : rpHPad, pg = compact ? rpGapSm : rpGap;
+    const pstep = (fH - 2 * pp - 5 * stH(pw)) / 4, block = 2 * pw + 2 * pg + fW, hdGap = compact ? 10 : spM;
+    if (pstep < 2) say(`вёрстка ${X.n}: камни в столбах шапки налезают — шаг ${pstep.toFixed(1)} px`);
+    const vitW = Math.max(24 + 6 + w('123 456', compact ? 24 : 30), 16 * 5 + 6 + w('5 / 5', 12), w('ур. 1200 / 1200', 12) + 8);
+    const idW = bodyW - block - 2 * hdGap - vitW;
+    if (idW < 150) say(`вёрстка ${X.n}: имени в шапке остаётся ${idW} px — рама рунных камней слишком широка`);
+    if (Math.abs(stH(gateSt) / 2 - (segTop + segH / 2)) > 1.5 || gateLbl < stH(gateSt) + 2 || gateLbl + 10 > trackH) say(`вёрстка ${X.n}: камни ворот не на оси пути или подпись уровня не влезает в дорожку ${trackH} px`);
     /* «Снаряжение» в карточке: две группы мест и низ */
     const es = compact ? eqSlotSm : eqSlot, tl = compact ? tlSlotHSm : tlSlotH, g2 = compact ? 6 : spS;
     const gearH = (20 + g2 + es) + g2 + (20 + g2 + tl) + g2 + 32;
@@ -606,6 +717,9 @@ run('режим «Игрок»', () => T.setTeam(false));
     /* анимации: предел — сцена и подпись; доблесть — сцена слева, карточка справа */
     const limTxtTop = Math.floor(X.H * 62 / 100), limTxtH = 14 + 6 + 30 + 6 + 30 + 6 + 8 + 44;
     if (limTxtTop + limTxtH > X.H - 4) say(`вёрстка ${X.n}: подпись предела заканчивается на ${limTxtTop + limTxtH} px при высоте ${X.H}`);
+    /* камень в центре, под ним ряд из пяти — выше подписи */
+    const sY = Math.floor(X.H * stagePct / 100), markBot = sY + stH(markSt) / 2, rowBot = sY + rowTop + stH(rowSt);
+    if (markBot + 6 > sY + rowTop || rowBot > limTxtTop - 4) say(`вёрстка ${X.n}: ряд камней в анимации предела налезает на камень или подпись (${Math.round(rowBot)} px, подпись с ${limTxtTop})`);
     const V = T.HD_VIEW.val, cardWv = Math.min(392, Math.floor(X.W * 46 / 100)), stageX = Math.floor(X.W * 29 / 100);
     if (stageX + 68 > X.W - 26 - cardWv - 8) say(`вёрстка ${X.n}: портрет доблести заходит под карточку «Что изменилось»`);
     const stageY = Math.floor(X.H * 44 / 100);
@@ -615,13 +729,33 @@ run('режим «Игрок»', () => T.setTeam(false));
     /* превью доблести: лист во всю ширину до 640, две колонки строк */
     const dlgW = Math.min(640, X.W - 32), colW = Math.floor((dlgW - 36 - spM) * 11 / 20);
     if (w('Характеристики', 13) + 20 + 8 + w('+30 %', 13.5) > colW) say(`вёрстка ${X.n}: строка превью шире колонки ${colW} px`);
+    const rowW = 5 * inlSt + 4 * inlGap, lossW = Math.floor((dlgW - 36 - spM) * 9 / 20) - 24;
+    if (20 + 8 + w('Рунный предел', 13) + 8 + rowW + 5 + 12 + 5 + rowW > lossW) say(`вёрстка ${X.n}: строка «Рунный предел» в превью шире колонки ${lossW} px`);
     const dlgH = 50 + 40 + spM + (14 + 6 * 24 + 20 + 16) + spM + 58;
     if (dlgH > X.H - 24) say(`вёрстка ${X.n}: превью доблести ${dlgH} px при высоте ${X.H - 24}`);
-    lay.push(`${X.n}: карточка героя ${bodyW} × ${bodyH} — «Развитие» ${nextW} × ${powerH}, строка характеристик ${quietW}, «Снаряжение» ${gearH}; окно снаряжения ${winW} × ${winH} — места ${L}, карточка сравнения ${cardH}, запасы ${cols} в ряд, видно ${rowsVis} ряда; превью доблести ${dlgW} × ${dlgH}`);
+    lay.push(`${X.n}: карточка героя ${bodyW} × ${bodyH} — «Развитие» ${nextW} × ${powerH}, строка характеристик ${quietW}, «Снаряжение» ${gearH}; шапка — лицо в раме рунных камней ${block} px, шаг камней ${pstep.toFixed(1)}, имени ${idW} px; окно снаряжения ${winW} × ${winH} — места ${L}, карточка сравнения ${cardH}, запасы ${cols} в ряд, видно ${rowsVis} ряда; превью доблести ${dlgW} × ${dlgH}; ряд камней в анимации до ${Math.round(rowBot)} px`);
   }
 }
 
 /* ================== 11. UI-кит, сценарии, карта экранов ================== */
+{
+  /* раздел «Рунные пределы»: камень в четырёх состояниях и четырёх размерах, четыре плитки, шапка с рамой камней, путь, строки */
+  const k = T.KIT_EXTRA.find(x => x.html === T.rpKitHtml), iD = T.KIT_EXTRA.findIndex(x => x.html === T.hdKitHtml);
+  if (!k) say('UI-кит: раздела «Рунные пределы» нет в KIT_EXTRA');
+  else {
+    if (T.KIT_EXTRA.indexOf(k) > iD) say('UI-кит: «Рунные пределы» — не рядом с «Развитием героя» (должен идти перед ним)');
+    for (const team of [false, true]) {
+      run('режим', () => T.setTeam(team)); fresh();
+      const h = run('UI-кит · пределы', () => k.html()); cnt.views++;
+      if (typeof h !== 'string' || !/<h3>Рунные пределы<\/h3>/.test(h) || /undefined|NaN|\[object /.test(h)) { say('UI-кит: раздел «Рунные пределы» не рисуется'); continue; }
+      for (const s of ['off', 'wait', 'ready', 'on']) if (count(h, new RegExp(`<i class="rp-s ${s}(?: p)?"></i>`, 'g')) < 4) say(`UI-кит · пределы: камень «${s}» не во всех размерах`);
+      if (count(h, /<figure class="rpk-tile"><button class="hc rpp/g) !== 4) say('UI-кит · пределы: не четыре плитки с камнями');
+      if (!h.includes('class="hd-rp"') || count(h, /class="hdv-gate[ "]/g) !== TOP || count(h, /<span class="rp i"/g) < 3) say('UI-кит · пределы: нет шапки с рамой камней, пути или строк');
+      if (!team) scan(h, 'UI-кит · пределы');
+    }
+    run('режим «Игрок»', () => T.setTeam(false));
+  }
+}
 {
   const k = T.KIT_EXTRA.find(x => x.html === T.hdKitHtml);
   if (!k) say('UI-кит: раздела «Развитие героя и снаряжение» нет в KIT_EXTRA');

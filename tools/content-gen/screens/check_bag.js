@@ -17,8 +17,9 @@
       сходится с запасами, кошельком, осколками и снаряжением; тот же сундук второй раз не открывается. Состав и шансы — лист по нажатию.
       Все виды × редкости × окна × циклы (× недели у осколков) — карточка, лист состава и открытие,
       осколки пробуждённых героев уходят в прах, без флажка «для команды» — ни одного спойлерного имени.
-   6. Дары: типичная неделя сходится с EN_LOOTBOXES.week (кроме клановой доли режима со своим журналом — её сверяет check_clan.js);
-      две категории, история и попап сундуков; одно действие на строку;
+   6. Дары: прошлая неделя (подсчитана) сходится с типичной EN_LOOTBOXES.week (кроме клановой доли режима со своим журналом — её
+      сверяет check_clan.js); эта неделя — только взятые планки по состоянию режима (EN_WEEK.state, ADR-0031, п. 16), незаработанного
+      нет; взятая планка Эхо после «Получить» на экране Эхо — «в запасах» (darGot); две категории, история и попап сундуков; одно действие на строку;
       «Получить» по строке и «Получить всё»; ждущее и полученное второй раз не выдаётся; полученное — в истории;
       кнопка «Дары» на экране недели; цикл I — без Даров.
    7. Экран не читает прежний демо-инвентарь S.items; сброс состояния и сценарии презентации работают.
@@ -70,7 +71,8 @@ if (err.length) done();
 const T = vm.runInContext(`({
   get S() { return S; }, set S(v) { S = v; },
   BAG, ACT, OV, SCREENS, CRAFT_SEGS, ACTIVATE, LBX, RSI, RS, RX, KH, FLOWS, EnLoot: window.EnLoot, render, initialState,
-  zpEntries, zpView, zpChestGroups, zpOpenOne, zpCard, zpSrc, darRows, darCount, lbGiftRows, ZP_DEMO, ZP_FILT, trNorm, trEsc, DAR_CLAN: window.DAR_CLAN || {},
+  zpEntries, zpView, zpChestGroups, zpOpenOne, zpCard, zpSrc, darRows, darCount, lbGiftRows, lbRowLabel, ZP_DEMO, ZP_FILT, trNorm, trEsc, DAR_CLAN: window.DAR_CLAN || {},
+  WEEK: window.EN_WEEK, ECHO: window.EN_ECHO, darGot: typeof darGot === 'function' ? darGot : null,
   zpNum, zpCell, eqIcon: typeof eqIcon === 'function' ? eqIcon : null, talIcon: typeof talIcon === 'function' ? talIcon : null, shardGhost: typeof shardGhost === 'function' ? shardGhost : null,
 })`, ctx);
 const BAD = /undefined|NaN|\[object /;
@@ -453,16 +455,35 @@ reset();
   const c = T.S.acc.cycle, who = T.ZP_DEMO.gifts.who;
   const rows = T.darRows(T.S);
   if (!rows.length) say('Дары: нет строк выплат');
-  /* типичная неделя (планки и клановые строки) сходится с EN_LOOTBOXES.week; режим, закрытый для аккаунта (ZP_DEMO.gifts.gate:
-     Лига без 15 героев), не платит ничего. Режим со своим журналом раздачи (DAR_CLAN: Клановый босс) платит клановую долю по журналу —
-     её сверяет check_clan.js */
-  const nowT = rows.filter(p => p.wk.id === 'now' && p.kind !== 'place'), gate = T.ZP_DEMO.gifts.gate || {};
+  /* прошлая неделя подсчитана: её планки и клановые строки — типичная неделя, сходится с EN_LOOTBOXES.week; режим, закрытый для аккаунта
+     на той неделе (ZP_DEMO.gifts.gate: Лига без 15 героев или открытая только на этой), не платит ничего. Режим со своим журналом раздачи
+     (DAR_CLAN: Клановый босс) платит клановую долю по журналу — её сверяет check_clan.js */
+  const prevT = rows.filter(p => p.wk.id === 'prev' && p.kind !== 'place'), gate = T.ZP_DEMO.gifts.gate || {};
   for (const [mid, w] of Object.entries(T.LBX.week)) {
     if (!w[c] || T.DAR_CLAN[mid]) continue;
-    const shut = typeof gate[mid] === 'function' && !!gate[mid](T.S);
-    const got = T.darCount(nowT.filter(p => p.id === mid)), want = shut ? 0 : w[c][who].boxes;
-    if (got !== want) say(`Дары: ${mid} — сундуков в строках ${got}, в EN_LOOTBOXES.week ${want}`);
+    const shut = typeof gate[mid] === 'function' && !!gate[mid](T.S, { id: 'prev' });
+    const got = T.darCount(prevT.filter(p => p.id === mid)), want = shut ? 0 : w[c][who].boxes;
+    if (got !== want) say(`Дары: ${mid}, прошлая неделя — сундуков в строках ${got}, в EN_LOOTBOXES.week ${want}`);
   }
+  /* эта неделя (ADR-0031, п. 16): личные планки — ровно взятые по состоянию режима (EN_WEEK.state), «Получить» — только у взятой;
+     клановые — только взятые кланом и ждут распределения. Незаработанного в «Дарах» нет */
+  const nowP = rows.filter(p => p.wk.id === 'now' && (p.kind === 'plank' || (p.kind === 'clan' && !T.DAR_CLAN[p.id])));
+  for (const [mid, m] of Object.entries(T.LBX.modes)) {
+    if (!m.weekly || !T.LBX.week[mid] || !T.LBX.week[mid][c]) continue;
+    const st = T.WEEK.state(mid, 'now'), shut = typeof gate[mid] === 'function' && !!gate[mid](T.S, { id: 'now' });
+    const lm = m.layers.find(l => l.kind === 'plank' && !l.clan), lc = m.layers.find(l => l.kind === 'plank' && l.clan);
+    for (const [ly, list, cat] of [[lm, st && !st.lock && !shut ? st.planks : [], 'me'], [lc, st && !st.lock && !shut ? st.clanPlanks : [], 'clan']]) {
+      if (!ly || (cat === 'clan' && T.DAR_CLAN[mid])) continue;
+      const want = list.filter(p => p.reached).map(p => T.lbRowLabel(ly, ly.rows[p.k - 1])).sort().join(), have = nowP.filter(p => p.id === mid && p.cat === cat).map(p => p.label).sort().join();
+      if (want !== have) say(`Дары: ${mid}, эта неделя, ${cat} — в строках «${have}», взято по режиму «${want}»`);
+    }
+  }
+  for (const p of nowP) if (p.kind === 'plank' && p.st !== 'ok' && p.st !== 'got') say(`Дары: взятая планка ${p.key} без «Получить»`);
+  for (const p of nowP) if (p.kind === 'clan' && p.st === 'ok') say(`Дары: клановая планка этой недели ${p.key} выдаётся до распределения`);
+  /* демо: незаработанная планка Эхо не выдаётся — порог из данных режима (echo-rules.js, plank1 × x сундука); контракты 760 из 1 440 — три планки */
+  const echoNeed = k => { const pk = T.ECHO ? T.ECHO.planks() : []; return pk[k - 1] ? pk[k - 1].need : Infinity; };
+  for (const k of [1, 2, 3, 4, 5]) if (T.S.echo.score < echoNeed(k) && nowP.some(p => p.id === 'echo' && p.label.endsWith(' ' + k))) say(`Дары: планка Эхо ${k} выдаётся, а очков меньше порога`);
+  if (nowP.some(p => p.id === 'contract' && T.WEEK.state('contract', 'now').planks.some(x => !x.reached && p.label.endsWith(' ' + x.k)))) say('Дары: незаработанная планка контрактов выдаётся');
   for (const p of rows) {
     if (!p.mode || !p.label || !p.period || !p.basis || !p.groups.length || !p.why) say(`Дары: строка ${p.key} без режима, периода, основания, планки или состава`);
     if (/ADR|§/.test(p.basis)) say(`Дары: в основании ссылка — ${p.basis}`);
@@ -507,6 +528,8 @@ reset();
   }
   const after = T.darRows(T.S);
   if (after.some(p => p.st === 'ok')) say('Дары: после получения остались подтверждённые');
+  /* экран Эхо: взятая и полученная в «Дарах» планка — «в запасах», невзятая — не получена */
+  for (const p of T.ECHO ? T.ECHO.planks() : []) if (p.reached !== p.claimed) say(`Дары: планка Эхо ${p.k} — взята ${p.reached}, а на экране Эхо «в запасах» ${p.claimed}`);
   if (after.filter(p => p.st === 'wait').length !== rows.filter(p => p.st === 'wait').length) say('Дары: ждущее изменилось от «Получить»');
   const hist = sheet('Дары · история после получения', 'hist');
   if ((hist.match(/получено<\/span>/g) || []).length !== after.filter(p => p.st === 'got').length) say('Дары: история не совпадает с полученным');

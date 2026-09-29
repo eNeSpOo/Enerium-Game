@@ -77,7 +77,7 @@ if (err.length) done();
 const T = vm.runInContext(`({
   get S() { return S; }, set S(v) { S = v; },
   BAG, ACT, OV, SCREENS, ACTIVATE, INV, RX, EB, LBX, KH, RS, FLOWS, render, initialState, startRun, advance,
-  heroDev, lootItems, shopCost, mkMin, mkUnit, mkFee, mkPick, poolItems, biomeItems, cycItems, evPlanks,
+  heroDev, lootItems, shopCost, mkMin, mkUnit, mkFee, mkPick, poolItems, biomeItems, cycItems, evPlanks, floorDone, roundsGone,
   RT_SRV: typeof RT_SRV !== 'undefined' ? RT_SRV : null, RT: typeof RT !== 'undefined' ? RT : null, RTE: typeof RTE !== 'undefined' ? RTE : null,
   zpChestGroups: typeof zpChestGroups === 'function' ? zpChestGroups : null, zpOpenOne: typeof zpOpenOne === 'function' ? zpOpenOne : null,
 })`, ctx);
@@ -131,7 +131,12 @@ for (const h of T.S.heroes) { T.S.selHero = h.id; const g = draw(`развити
 /* 5а. развитие героя на запасах */
 reset();
 {
-  const h = T.S.heroes.find(x => x.lvl >= x.cap && x.lim === 0 && x.valor < x.maxV) || T.S.heroes[0], D = T.INV.hero;
+  /* герой проверки: на потолке, предел не последний, доблесть не на максимуме. У демо-отряда ADR-0031 доблесть 1 — только у Хравна, и он
+     на личном максимуме; демо — 11-й день цикла II, отряд на 150-м, предел I. Нет героя на потолке — берём такого же и ставим на потолок:
+     это подготовка проверки, а не данные демо */
+  const TOPL = T.INV.hero.capByLim.length - 1;
+  const h = T.S.heroes.find(x => x.lvl >= x.cap && x.lim < TOPL && x.valor < x.maxV)
+    || (x => { if (x) x.lvl = x.cap; return x; })(T.S.heroes.find(x => x.lim < TOPL && x.valor < x.maxV)) || T.S.heroes[0], D = T.INV.hero, lim0 = h.lim;
   T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'mine'; T.S.seg.hero = 'power'; T.S.selHero = h.id;
   const d = T.heroDev(h);
   if (!d.rune || d.rune.tier !== 'rune' || d.rune.cyc !== h.cycle) say(`развитие: руна предела не своего цикла — ${d.rune && d.rune.id}`);
@@ -144,7 +149,7 @@ reset();
   if (!/data-a="limit" disabled/.test(g)) say('развитие: при нехватке рун «Пробить» доступна');
   let s0 = snap();
   run('развитие · нехватка', () => { T.ACT.limit(); T.ACT.limitdo(h.id); });
-  if (!same(snap(), s0) || h.lim !== 0) say('развитие: при нехватке рун что-то списалось');
+  if (!same(snap(), s0) || h.lim !== lim0) say('развитие: при нехватке рун что-то списалось');
   /* пробитие предела */
   T.S.overlay = null; T.BAG.add(d.rune.id, d.need - T.BAG.qty(d.rune.id)); s0 = snap();
   g = draw('развитие · руны есть');
@@ -156,10 +161,10 @@ reset();
   let s1 = snap();
   eqMap('развитие · расход на предел', diff(s0.items, s1.items), { [d.rune.id]: -d.need });
   if (!same(s0.wallet, s1.wallet)) say('развитие: предел тронул кошелёк');
-  if (h.lim !== 1 || h.cap !== D.capByLim[1]) say(`развитие: после предела lim ${h.lim}, потолок ${h.cap}`);
+  if (h.lim !== lim0 + 1 || h.cap !== D.capByLim[lim0 + 1]) say(`развитие: после предела lim ${h.lim}, потолок ${h.cap}`);
   T.BAG.add(d.rune.id, d.need * 2); s1 = snap();
   run('развитие · повтор предела', () => T.ACT.limitdo(v));
-  if (!same(snap(), s1) || h.lim !== 1) say('развитие: повтор подтверждения пробил предел второй раз');
+  if (!same(snap(), s1) || h.lim !== lim0 + 1) say('развитие: повтор подтверждения пробил предел второй раз');
   /* доблесть: не на пятом пределе — нельзя; руна собирается из осколков в мастерской; на пятом пределе — списывается одна руна */
   h.lvl = h.cap;
   const vr0 = T.BAG.qty(d.vr.id); if (vr0) T.BAG.take(d.vr.id, vr0);
@@ -275,6 +280,26 @@ function checkFloor(where, biome, got, items, guardWin) {
     if (!g.includes('Добыча')) say(where + ': в итоге нет добычи');
     for (const id of Object.keys(R.loot.items)) if (!g.includes(`data-v="${id}"`)) say(`${where}: в итоге не показан ${id}`);
   }
+}
+
+/* 5б'. лента боя (ADR-0031, п. 19): «Время скоротечно…» — число раундов своего боя с верным склонением, не «десять».
+   Бой с боссом биома урезан до двух раундов — он кончается песком; итог этажа пишется в ленту видимого боя */
+reset();
+{
+  const fl = T.EB.BIOMES.b1.floors.length;
+  run('лента · старт', () => T.startRun('s1', 'b1', fl));
+  const R = T.S.runs[T.S.runs.length - 1];
+  if (!R) say('лента: забег не начался');
+  else {
+    T.S.route = 'descent'; R.b.maxRounds = 2;
+    for (let n = 0; n < 4000 && !R.b.over; n++) { R.view += 250; while (!R.b.over && T.EB.nextAt(R.b) <= R.view) T.EB.step(R.b); }
+    run('лента · итог этажа', () => T.floorDone(R, true));
+    if (R.b.why !== 'sand') say(`лента: бой в два раунда кончился не песком — ${R.b.why}`);
+    else if (!R.feed.some(x => x.includes('Время скоротечно') && x.includes(T.roundsGone(R.b.maxRounds)))) say(`лента: нет «${T.roundsGone(R.b.maxRounds)}» — ${R.feed.join(' | ')}`);
+  }
+  const forms = [1, 2, 5, 11, 21, 22, 25].map(T.roundsGone).join(' | ');
+  if (forms !== '1 раунд прошёл | 2 раунда прошли | 5 раундов прошли | 11 раундов прошли | 21 раунд прошёл | 22 раунда прошли | 25 раундов прошли') say(`лента: склонение — ${forms}`);
+  for (const [f, c] of code) { const m = c.match(/[^\n]{0,40}(?:десять раунд|10 раунд(?:ов|а)? прош)[^\n]{0,40}/); if (m && !/модел|ADR|прежн/i.test(m[0])) say(`${f}: «десять раундов» в тексте игрока — «${m[0].trim()}»`); }
 }
 
 /* 5в. лавка */

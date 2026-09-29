@@ -1,7 +1,12 @@
 /* screens/roulette.js — «Герои → Призыв → За души»: рулетка Возрождения душ (§15 GDD, ADR-0019). Договор — screens/model.js.
-   Регистрирует: rlCol — вход рулетки во вкладке «За души», главное вкладки (его зовёт rsSoulsView в index.html); OV.rl — окно рулетки с лентой
-   и итогом поверх, OV.rlodds — лист «Шансы»; действия ACT.rl*; сценарий презентации. Своё состояние — S.rl, заводится как S.bag.
-   Правила §15: пул прокрутки привязан к циклу — герои рулетки текущего цикла (rsPool; у них доблесть 2–3, ADR-0019). Выпадают осколки
+   Регистрирует: rlCol — вход рулетки в сцене алтаря вкладки «За души», главное вкладки (сцену собирает hrSoulsView, screens/heroes.js);
+   OV.rl — окно рулетки с лентой и итогом поверх, OV.rlodds — лист «Шансы»; действия ACT.rl*; сценарий презентации. Своё состояние — S.rl.
+   «Дорого-богато» (слово автора 29.09.2026: «рулетка — это тоже для людей, которые донатят»): алтарь душ за вкладкой и окном — зеркало
+   душ, из стекла выходят контуры героев; герои пула — веером карточек в раме старого золота перед алтарём; лента идёт сквозь зеркало,
+   полный герой — в раме, осколок — стекло с лицом героя (shardGhost, screens/art-icons.js). Честно (§1.2): цена и шанс героя целиком
+   видны у входа и в окне, все шансы — лист «Шансы». Арт — RL_ART: пока пути нет, алтарь и раму рисует CSS, битых картинок нет.
+   Правила §15: пул прокрутки привязан к циклу — герои рулетки текущего цикла (rsPool; потолок доблести — по циклу, RS.srcInfo.roulette.maxByC,
+   ADR-0030, п. 5а: II — 2, III–IV — 3, V–VI — 4). Выпадают осколки
    или, с малым шансом, полный чертёж. Осколки и чертёж героя из коллекции уходят в прах (§15.2, демо-таблица §15.3 — rsDustOf).
    Полный чертёж активируют души: он ложится комплектом осколков, и пробуждает его то же «Пробудить», что в каталоге праха
    (ACT.activate) — герой приходит с 0 ур., 0 РП и 0 Добл, остаток осколков уходит в прах. Так пробуждение и прах сходятся с §15.2.
@@ -49,6 +54,20 @@ const RL_VIEW = {
       motes: [7, 170, 10, 70, 1400, 4, 150], flash: [2.2, 1100], shake: [4, 380],
     },
   },
+  fan: { deg: 3, lift: 3 },        // веер героев пула у алтаря: поворот и опускание карточки за шаг от середины, градусы и px
+  shard: 60,                       // осколок на карточке ленты, px; в итоге одной прокрутки — big
+  big: 96,
+  motes: 14,                       // огоньков душ, что поднимаются к зеркалу за лентой
+};
+/* арт Возрождения душ — tools/art-gen/jobs/souls-altar.json, выгрузка export_ui.py в assets/art/souls/. ready — выгруженные пути:
+   пока пути нет, алтарь и раму рисует CSS. want — заказанные к выгрузке 29.09.2026. win — окно рамы в долях её рисунка, %:
+   сверху, справа, снизу, слева (измерено по альфе рисунка): рама выходит за карточку, гребень — над ней */
+const RL_ART = {
+  ready: ['souls/altar.jpg', 'souls/frame.png'],   // выгрузка 29.09.2026
+  want: ['souls/altar.jpg', 'souls/frame.png'],
+  altar: 'souls/altar.jpg',
+  frame: 'souls/frame.png',
+  win: [137, 62, 50, 62],          // десятые доли процента: 13,7 / 6,2 / 5,0 / 6,2 — только целые
 };
 
 /* ================== помощники ================== */
@@ -293,37 +312,70 @@ function rlBurst(card, full, r) {
 }
 
 /* ================== вид ================== */
-/* вход во вкладке «За души» — одна главная вещь вкладки (правила воздуха): лица героев пула цикла с кристаллом редкости, прошлая
-   прокрутка, «Шансы» и «К рулетке». Лицо открывает карточку героя; отметка — в коллекции или осколков хватает на пробуждение */
+const rlArt = p => RL_ART.ready.includes(p);
+/* рама героя души выходит за карточку: отступы — окно рамы (RL_ART.win) в долях карточки, сотые доли процента, только целые */
+function rlFrVars() {
+  const [t, r, b, l] = RL_ART.win, w = 1000 - r - l, hh = 1000 - t - b;
+  const p = (x, d) => { const v = Math.floor(x * 10000 / d); return `-${Math.floor(v / 100)}.${String(v % 100).padStart(2, '0')}%`; };
+  return `--fr-t:${p(t, hh)};--fr-r:${p(r, w)};--fr-b:${p(b, hh)};--fr-l:${p(l, w)}`;
+}
+/* рама: рисунок старого золота с каплей души в гребне; пока не выгружен — золото CSS */
+const rlFr = () => rlArt(RL_ART.frame) ? `<img class="rl-fr" src="${AV(RL_ART.frame)}" alt="" loading="lazy" decoding="async">` : '<i class="rl-frc" aria-hidden="true"></i>';
+/* алтарь душ за вкладкой и окном: рисунок или CSS — зеркало светом, колонны, свет снизу */
+const rlScene = cls => rlArt(RL_ART.altar) ? `<img class="rl-scn ${cls}" src="${AV(RL_ART.altar)}" alt="" decoding="async">` : `<i class="rl-scn ${cls} css" aria-hidden="true"></i>`;
+/* огоньки душ поднимаются к зеркалу: места и задержки — от номера, без случайности */
+const rlMotes = n => `<span class="rl-mo" aria-hidden="true">${Array.from({ length: n }, (_, i) => `<i style="--x:${(i * 41 + 7) % 100}%;--d:${(i * 577) % 4800}ms;--s:${4600 + (i * 353) % 2400}ms"></i>`).join('')}</span>`;
+/* честная строка (§1.2): цена прокрутки и шанс героя целиком — у входа и в окне; все шансы — лист «Шансы» */
+const rlPriceTxt = () => `<span class="rl-hp">Прокрутка — ${money('enerium', RL_DATA.price)}</span>`;
+const rlChanceTxt = () => `<span class="rl-hp">герой целиком — <b class="num">${rlPct(RL_DATA.fullBp)}</b></span>`;
+const rlHonest = () => rlPriceTxt() + rlChanceTxt();
+/* потолок доблести героев пула — по циклу (RS.srcInfo.roulette.maxByC, ADR-0030, п. 5а): «доблесть до 2» или «доблесть 3–4» */
+function rlValor(c) {
+  const I = RS.srcInfo && RS.srcInfo.roulette; if (!I) return '';
+  const M = (I.maxByC && I.maxByC[c]) || I.maxV; if (!M) return '';
+  return M[0] === M[1] ? `доблесть до ${M[0]}` : `доблесть ${M[0]}–${M[1]}`;
+}
+/* осколок героя — стекло с лицом (shardGhost, screens/art-icons.js); got — собрано: в ленте осколок свежий, с трещинами */
+const rlShard = (h, px, got = 0) => typeof shardGhost === 'function' ? shardGhost(h, got, rlNeed(), px) : rsFace(h);
+/* вход в сцене алтаря — одна главная вещь вкладки (правила воздуха): имя, цикл и доблесть героев пула; герои пула — веером карточек
+   в раме перед зеркалом, отметка — в коллекции или осколков хватает на пробуждение; прошлая прокрутка, цена и шанс героя целиком,
+   «К рулетке» и «Шансы». Карточка открывает героя. Веер — от середины: --d — шаг от середины (вдвое, чтобы целый), --a — его модуль */
 function rlMark(h) {
   if (rsHas(h)) return `<i class="rl-em own" title="В коллекции">${ic('check')}</i>`;
   return (S.rs.shards[h.id] || 0) >= rlNeed() ? '<i class="rl-em ready" title="Осколков хватает на пробуждение"></i>' : '';
 }
 function rlCol() {
-  const cur = rsCyc(), from = rsFrom('roulette'), I = RS.srcInfo.roulette;
-  const head = `<div class="rl-eh"><span class="eyebrow">Возрождение душ</span><h2>Рулетка · цикл ${ROMAN[cur]}</h2><small class="faint">${I ? `доблесть ${I.maxV[0]}–${I.maxV[1]} · ` : ''}осколки или герой целиком</small></div>`;
-  if (cur < from) return `<div class="pnl rl-entry">${head}<p class="rs-line">${ic('lock')}Откроется с цикла ${ROMAN[from]}.</p></div>`;
-  const pool = rsPool(), R = S.rl.srv.ops[S.rl.last];
-  const faces = pool.map(h => `<button class="rl-ef" data-r="${h.r}" data-a="rhero" data-v="${h.id}" title="${h.n} · ${RAR[h.r].toLowerCase()} · доблесть до ${h.maxV}"><span class="rl-face">${rsFace(h)}</span><i class="rl-cr"></i>${rlMark(h)}</button>`).join('');
-  return `<div class="pnl rl-entry">${head}
-    <div class="rl-faces" style="--n:${Math.max(2, pool.length)}">${faces || '<p class="faint">В пуле этого цикла героев нет.</p>'}</div>
-    <div class="rl-ef-f">${R ? `<p class="reason">${rlSay(R, R.n === 1 ? 'Прошлая прокрутка' : 'Прошлая')}</p>` : ''}<div class="row rl-cf"><button class="link" data-a="sheet" data-v="rlodds">Шансы ${ic('chev')}</button><span class="g-spacer"></span><button class="btn go big" data-a="dlg" data-v="rl"${pool.length ? '' : ' disabled'}>К рулетке</button></div></div>
+  const cur = rsCyc(), from = rsFrom('roulette'), V = rlValor(cur);
+  const head = `<div class="rl-eh"><span class="eyebrow">Возрождение душ</span><h2>Рулетка</h2><small>цикл ${ROMAN[cur]}${V ? ' · ' + V : ''}</small></div>`;
+  if (cur < from) return `<div class="pnl rl-entry shut">${head}<div class="rl-ef-f"><p class="rs-line">${ic('lock')}Откроется с цикла ${ROMAN[from]}.</p></div></div>`;
+  const pool = rsPool(), n = pool.length, R = S.rl.srv.ops[S.rl.last], F = RL_VIEW.fan;
+  const faces = pool.map((h, i) => {
+    const d = 2 * i - (n - 1), a = Math.abs(d);
+    return `<button class="rl-ef" data-r="${h.r}" data-a="rhero" data-v="${h.id}" style="--d:${d};--a:${a};--z:${2 * n - a}" title="${h.n} · ${RAR[h.r].toLowerCase()} · доблесть до ${h.maxV}"><span class="rl-face">${rsFace(h)}</span>${rlFr()}<i class="rl-cr"></i>${rlMark(h)}</button>`;
+  }).join('');
+  return `<div class="pnl rl-entry" style="${rlFrVars()};--fd:${F.deg / 2}deg;--fl:${F.lift / 2}px">${head}
+    <div class="rl-faces" style="--n:${Math.max(2, n)}">${faces || '<p class="faint">В пуле этого цикла героев нет.</p>'}</div>
+    <div class="rl-ef-f">${R ? `<p class="rl-last">${rlSay(R, R.n === 1 ? 'Прошлая прокрутка' : 'Прошлая')}</p>` : ''}
+      <p class="rl-hon">${rlHonest()}<button class="link" data-a="sheet" data-v="rlodds">Шансы ${ic('chev')}</button></p>
+      <button class="btn go big rl-cta" data-a="dlg" data-v="rl"${n ? '' : ' disabled'}>К рулетке</button></div>
   </div>`;
 }
-/* карточка ленты: полный герой — лицо во всю карточку, золотая рамка и «Герой»; осколки — лицо поменьше и «×N».
+/* карточка ленты: полный герой — лицо во всю карточку в раме и «Герой»; осколки — стекло с лицом героя и «×N».
    Кристалл редкости рисует CSS из [data-r]: картинки не догружаются посреди прокрутки */
 function rlCard(x, cls) {
   const h = RSI[x.id]; if (!h) return '<span class="rl-card"></span>';
   return x.full
-    ? `<span class="rl-card full${cls}" data-r="${h.r}" title="${h.n} · герой"><span class="rl-face">${rsFace(h)}</span><i class="rl-cr"></i><i class="rl-lbl">Герой</i></span>`
-    : `<span class="rl-card shard${cls}" data-r="${h.r}" title="${h.n} · осколки ×${x.q}"><i class="rl-cr"></i><span class="rl-sf">${rsFace(h)}</span><b class="rl-q">×${x.q}</b></span>`;
+    ? `<span class="rl-card full${cls}" data-r="${h.r}" title="${h.n} · герой"><span class="rl-face">${rsFace(h)}</span>${rlFr()}<i class="rl-cr"></i><i class="rl-lbl">Герой</i></span>`
+    : `<span class="rl-card shard${cls}" data-r="${h.r}" title="${h.n} · осколки ×${x.q}"><i class="rl-cr"></i><span class="rl-sf">${rlShard(h, RL_VIEW.shard)}</span><b class="rl-q">×${x.q}</b></span>`;
 }
+/* лента сквозь зеркало: окно ленты — стекло над светом зеркала, метка — золото */
 function rlStage(F) {
   const done = !!F.op && (S.rl.anim !== F.op || !!(rlAnim && rlAnim.landed));   // лента стоит на выпавшей карточке
   const cards = F.cards.map((x, i) => rlCard(x, i !== F.T ? '' : done ? ' won' : F.op ? '' : ' on')).join('');
-  return `<div class="rl-stage" aria-hidden="true"><div class="rl-win" id="rlWin"><div class="rl-track" id="rlTrack">${cards}</div></div><i class="rl-mark${done ? ' hit' : ''}" id="rlMark"></i></div>`;
+  return `<div class="rl-stage" aria-hidden="true"><i class="rl-halo"></i><div class="rl-win" id="rlWin"><div class="rl-track" id="rlTrack">${cards}</div></div><i class="rl-mark${done ? ' hit' : ''}" id="rlMark"></i></div>`;
 }
-/* цена, три кнопки прокрутки и галочка; нехватка — кнопка неактивна, причина — строкой под кнопками */
+/* цена и шанс героя целиком, три кнопки прокрутки и галочка; нехватка — кнопка неактивна, причина — строкой под кнопками.
+   «Шансы» — лист; пока лента крутится, ссылки нет: окно не уходит с ленты */
 function rlCtl(spin) {
   const D = RL_DATA, bal = S.wallet.enerium, op = rlNext(), red = rlReduced(), lack = D.counts.find(n => bal < rlCost(n));
   const btn = (n, i) => { const c = rlCost(n), no = bal < c; return `<button class="btn${i ? '' : ' go'}" data-a="rlspin" data-v="${n}:${op}"${no || spin ? ' disabled' : ''}${no ? ` title="Не хватает Энериума: нужно ${fmt(c)}, есть ${fmt(bal)}"` : ''}>${i ? '×' + n : 'Крутить'}${costTag('enerium', c)}</button>`; };
@@ -331,19 +383,23 @@ function rlCtl(spin) {
   const team = TM(`<span>Шансы — демонстрация: полный чертёж ${rlPct(D.fullBp)}, иначе осколки ${D.shards.map(([q, w]) => `×${q} — ${rlPct(rlShare(w))}`).join(', ')}; герой — поровну из пула цикла. Итог решает сервер, сид — заглушка.</span>
     <button class="link" data-a="rlgive">Демо: +${fmt(D.demo.give)} Энериума</button><button class="link" data-a="rlfull" aria-pressed="${!!S.rl.demoFull}">Демо: полный чертёж следующим${S.rl.demoFull ? ' · включено' : ''}</button>`, 'div', 'rl-team');
   return `<div class="rl-ctl"><div class="rl-go">
-      <p class="rl-price">Прокрутка — ${money('enerium', D.price)}<span class="faint">· есть ${fmt(bal)}</span></p>
+      <p class="rl-price">${rlPriceTxt()}<span class="faint">· есть ${fmt(bal)}</span>${rlChanceTxt()}${spin ? '' : `<button class="link" data-a="sheet" data-v="rlodds">Шансы ${ic('chev')}</button>`}</p>
       <div class="rl-btns">${D.counts.map(btn).join('')}</div>
       ${why ? `<p class="reason warn">${why}</p>` : ''}</div>
     <label class="rl-skip"${red ? ' title="В системе включено «меньше движения»"' : ''}><input type="checkbox" data-a="rlskip"${rlSkipOn() ? ' checked' : ''}${red ? ' disabled' : ''}><span>Пропустить анимацию</span></label>
   </div>${team}`;
 }
-/* пробуждение из итога: чертёж или собранный комплект — тем же «Пробудить», что в каталоге праха */
+/* пробуждение из итога: чертёж или собранный комплект — тем же «Пробудить», что в лавке праха */
 function rlWake(h) {
   if (rsHas(h)) return `<span class="chip gold">${ic('check')}в коллекции</span>`;
   if ((S.rs.shards[h.id] || 0) < rlNeed()) return '';
   return `<button class="btn sm go" data-a="activate" data-v="${h.id}">Пробудить${costTag('souls', RS.rules.stub.activateSouls)}</button>`;
 }
-const rlBig = (h, full, q, k) => `<span class="rl-big${full ? ' full' : ''}" data-r="${h.r}">${rsFace(h)}${full ? '<i class="rl-lbl">Герой</i>' : `<b class="rl-q">×${q}</b>`}${k > 1 ? `<b class="rl-k">×${k}</b>` : ''}</span>`;
+/* итог крупно: полный герой — в раме; осколки — стекло с лицом и долей собранного; герой из коллекции — лицо, осколки ушли в прах */
+const rlBig = (h, full, q, k) => full
+  ? `<span class="rl-big full" data-r="${h.r}"><span class="rl-face">${rsFace(h)}</span>${rlFr()}<i class="rl-lbl">Герой</i>${k > 1 ? `<b class="rl-k">×${k}</b>` : ''}</span>`
+  : rsHas(h) ? `<span class="rl-big dust" data-r="${h.r}"><span class="rl-face">${rsFace(h)}</span><b class="rl-q">×${q}</b></span>`
+    : `<span class="rl-big shard" data-r="${h.r}">${rlShard(h, RL_VIEW.big, S.rs.shards[h.id] || 0)}<b class="rl-q">×${q}</b></span>`;
 function rlOne(g) {
   const h = RSI[g.id], need = rlNeed(), n = S.rs.shards[g.id] || 0, own = rsHas(h);
   const line = g.dust ? `Уже в коллекции: ${g.full ? 'чертёж' : 'осколки ×' + g.q} → прах ${money('dust', g.dust)}`
@@ -351,13 +407,14 @@ function rlOne(g) {
       : !own && n >= need ? `Осколков ${fmt(n)} — можно пробудить` : `Собрано осколков ${fmt(n)} / ${fmt(need)}`;
   return `<div class="rl-one">${rlBig(h, g.full, g.q)}<div class="rl-one-tx"><span class="eyebrow">${g.full ? 'Полный чертёж' : 'Осколки героя'}</span><b class="rl-nm">${h.n}</b>${rar(h.r)}<p class="rl-line">${line}</p>${g.dust ? '' : rlWake(h)}</div></div>`;
 }
-/* сводка ×10 и ×100: полные чертежи — первыми и крупно, осколки — по героям с суммой, прах — с тем, что в него ушло */
+/* сводка ×10 и ×100: полные чертежи — первыми и крупно, осколки — по героям с суммой и стеклом с долей собранного, прах — с тем,
+   что в него ушло */
 function rlMany(R) {
   const G = rlGroups(R), need = rlNeed(), bp = G.full.reduce((a, x) => a + x.bp, 0), q = G.shards.reduce((a, x) => a + x.q, 0);
   const fulls = G.full.length ? `<span class="eyebrow">Полные чертежи · ${fmt(bp)}</span><div class="rl-fulls">${G.full.map((x, i) => { const h = RSI[x.id];
     return `<div class="rl-fc" style="--i:${i}">${rlBig(h, true, 0, x.bp)}<b class="rl-nm">${h.n}</b>${rar(h.r)}${x.dust ? `<small class="rl-line">в прах ${money('dust', x.dust)}</small>` : rlWake(h)}</div>`; }).join('')}</div>` : '';
   const shards = G.shards.length ? `<span class="eyebrow">Осколки · ${fmt(q)}</span><div class="rl-grp">${G.shards.map(x => { const h = RSI[x.id], n = S.rs.shards[x.id] || 0;
-    return `<div class="rl-gr" data-r="${h.r}"><span class="rs-av">${rsFace(h)}</span><span class="tx"><b>${h.n}</b><small>${n >= need ? `готов к пробуждению · ${fmt(n)}` : `собрано ${fmt(n)} / ${fmt(need)}`}</small></span><b class="rl-plus">+${fmt(x.q)}</b></div>`; }).join('')}</div>` : '';
+    return `<div class="rl-gr" data-r="${h.r}"><span class="rl-gs">${rlShard(h, 34, n)}</span><span class="tx"><b>${h.n}</b><small>${n >= need ? `готов к пробуждению · ${fmt(n)}` : `собрано ${fmt(n)} / ${fmt(need)}`}</small></span><b class="rl-plus">+${fmt(x.q)}</b></div>`; }).join('')}</div>` : '';
   const dust = R.dust ? `<span class="eyebrow">В прах</span><p class="rl-dust">${money('dust', R.dust)}<span>${G.dust.map(x => `${RSI[x.id].n}: ${[x.bp ? 'чертёж' + (x.bp > 1 ? ' ×' + x.bp : '') : '', x.q ? 'осколки ×' + fmt(x.q) : ''].filter(Boolean).join(', ')}`).join(' · ')}</span></p>` : '';
   return fulls + shards + dust;
 }
@@ -366,7 +423,7 @@ function rlRes(R) {
   const one = R.n === 1, still = rlWas.res === R.op ? ' still' : '', bal = S.wallet.enerium, op = rlNext(), t = one ? 'Итог прокрутки' : `Итог · ×${R.n}`;
   const btn = (n, i) => { const c = rlCost(n), no = bal < c; return `<button class="btn sm${i ? '' : ' go'}" data-a="rlspin" data-v="${n}:${op}"${no ? ` disabled title="Не хватает Энериума: нужно ${fmt(c)}, есть ${fmt(bal)}"` : ''}>${i ? '×' + n : 'Ещё раз'}${costTag('enerium', c)}</button>`; };
   return `<button class="rl-scrim2${still}" data-a="rlhide" aria-label="Закрыть итог" tabindex="-1"></button>
-    <section class="rl-res${one ? '' : ' wide'}${still}" role="dialog" aria-label="${t}">
+    <section class="rl-res${one ? '' : ' wide'}${still}" role="dialog" aria-label="${t}" style="${rlFrVars()}">
       <div class="rl-res-h"><h3>${t}</h3>${one ? '' : `<span class="rl-spent">Потрачено ${money('enerium', R.cost)}</span>`}</div>
       <div class="rl-res-b scroll">${one ? rlOne(R.list[0]) : rlMany(R)}</div>
       <div class="rl-res-f">${RL_DATA.counts.map(btn).join('')}<button class="btn sm ghost rl-close" data-a="rlhide">Закрыть</button></div>
@@ -375,22 +432,23 @@ function rlRes(R) {
 
 /* ================== листы ================== */
 Object.assign(OV, {
-  /* окно рулетки (правила воздуха): лента, цена, три кнопки прокрутки и галочка; итог — окном поверх.
-     Пока лента крутится, фон окно не закрывает: закрыть можно крестиком, итог тогда придёт сообщением */
+  /* окно рулетки (правила воздуха): алтарь душ за окном, лента сквозь зеркало, цена и шанс героя целиком, три кнопки прокрутки
+     и галочка; итог — окном поверх. Пока лента крутится, фон окно не закрывает: закрыть можно крестиком, итог тогда придёт сообщением */
   rl() {
     const cur = rsCyc(), from = rsFrom('roulette'), F = rlFilm(), spin = !!S.rl.anim, R = S.rl.show ? S.rl.srv.ops[S.rl.show] : null;
     const body = F ? rlStage(F) + rlCtl(spin) : `<p class="rs-line">${ic('lock')}${cur < from ? `Возрождение душ откроется с цикла ${ROMAN[from]}.` : 'В пуле этого цикла героев нет.'}</p>`;
     return `<div class="ov rl-ov${rlWas.ov ? ' still' : ''}" role="dialog" aria-modal="true" aria-label="Возрождение душ">${spin ? '<div class="ov-scrim"></div>' : '<button class="ov-scrim" data-a="close" aria-label="Закрыть" tabindex="-1"></button>'}
-      <div class="dlg rl-dlg"><div class="dlg-h"><div class="rl-hd"><span class="eyebrow">Возрождение душ</span><h2>Рулетка · цикл ${ROMAN[cur]}</h2></div><button class="iconbtn x" data-a="close" aria-label="Закрыть">${ic('x')}</button></div>
+      <div class="dlg rl-dlg${rlArt(RL_ART.altar) ? ' art' : ''}" style="${rlFrVars()}">${rlScene('rl-dscn')}${rlMotes(RL_VIEW.motes)}
+        <div class="dlg-h"><div class="rl-hd"><span class="eyebrow">Возрождение душ</span><h2>Рулетка · цикл ${ROMAN[cur]}</h2></div><button class="iconbtn x" data-a="close" aria-label="Закрыть">${ic('x')}</button></div>
         <div class="dlg-b rl-b">${body}</div></div>
       ${R ? rlRes(R) : ''}</div>`;
   },
-  /* шансы одной прокрутки — подробности в листе по нажатию; пометка «демонстрация» — только команде */
+  /* шансы одной прокрутки — подробности в листе по нажатию; герои пула — лицами; пометка «демонстрация» — только команде */
   rlodds() {
     const D = RL_DATA, pool = rsPool();
-    const odds = `<span class="eyebrow">Одна прокрутка</span><dl class="kv rl-kv"><dt>Полный чертёж</dt><dd>${rlPct(D.fullBp)}</dd></dl>
+    const odds = `<span class="eyebrow">Одна прокрутка · ${money('enerium', D.price)}</span><dl class="kv rl-kv"><dt>Полный чертёж — герой целиком</dt><dd>${rlPct(D.fullBp)}</dd></dl>
       <span class="eyebrow">Иначе — осколки</span><dl class="kv rl-kv">${D.shards.map(([q, w]) => `<dt>×${q}</dt><dd>${rlPct(rlShare(w))}</dd>`).join('')}</dl>`;
-    const who = pool.length ? `<span class="eyebrow">Герои цикла ${ROMAN[rsCyc()]}</span><p class="rl-p">Герой — любой из ${pool.length}, поровну.</p>` : '';
+    const who = pool.length ? `<span class="eyebrow">Герои цикла ${ROMAN[rsCyc()]}</span><p class="rl-p">Герой — любой из ${pool.length}, поровну.</p><div class="rl-oface">${pool.map(h => `<span class="rs-av" data-r="${h.r}" title="${h.n}">${rsFace(h)}</span>`).join('')}</div>` : '';
     const body = `${odds}${who}<p class="reason">Полный чертёж — герой целиком: его пробуждают души. Осколки и чертёж героя, который уже в коллекции, уходят в прах.</p>
       ${TM(`Шансы — демонстрация, не баланс: таблиц вероятностей в §15.1 ещё нет, числа — RL_DATA. Герой — поровну из пула цикла — толкование прототипа. Чертёж ложится комплектом из ${fmt(rlNeed())} осколков (заглушка roster.js): пробуждение и прах по §15.2 сходятся.`, 'p', 'reason')}`;
     return sheet('Шансы', body, pool.length ? '<button class="btn go" data-a="dlg" data-v="rl">К рулетке</button>' : '');
@@ -448,17 +506,19 @@ initialState = function () { return rlState(rlInitBase()); };
 rlState(S);
 
 /* ================== UI-кит ==================
-   Раздел «Возрождение душ · рулетка»: карточки ленты на героях цикла II, шансы и числа вида — из RL_DATA и RL_VIEW */
+   Раздел «Возрождение душ · рулетка»: вход в сцене алтаря, карточки ленты на героях цикла II, шансы и числа вида — из RL_DATA и RL_VIEW,
+   арт — RL_ART: что выгружено */
 KIT_EXTRA.push({
   html: () => {
     const pool = RS.heroes.filter(h => h.src === 'roulette' && h.c === 2);
     if (pool.length < 4) return '';
     const cards = [[0, 5], [1, 15], [2, 0], [3, 25]].map(([i, q]) => rlCard(q ? { id: pool[i].id, q } : { id: pool[i].id, full: true }, '')).join('');
     const odds = RL_DATA.shards.map(([q, w]) => `×${q} — ${rlPct(rlShare(w))}`).join(', ');
+    const got = RL_ART.want.filter(rlArt).length;
     return `<section class="k-box" style="grid-column:1/-1"><h3>Возрождение душ · рулетка</h3>
-      <div class="k-demo row" style="gap:8px;justify-content:center;flex-wrap:wrap">${cards}</div>
-      <p class="k-note">Лента: полный герой — лицо во всю карточку, золотая рамка и «Герой»; осколки — лицо поменьше и «×N». Кристалл — редкость героя. Итог решает «сервер» на сиде до анимации: лента разгоняется и ${RL_VIEW.ms[0] / 1000}–${RL_VIEW.ms[1] / 1000} с тормозит ровно на выпавшей карточке. Частицы — цвета редкости; у полного героя золотая вспышка, три кольца и дрожь.</p>
-      <p class="k-note">×10 и ×100 — короткая лента на самом ценном итоге, затем сводка: полные герои первыми, осколки по героям, прах, расход. «Пропустить анимацию» — маленькое окошко с галочкой, выбор запоминается; при системном «меньше движения» анимации нет. Полный чертёж пробуждают души (§15.1).</p>
-      <p class="k-note">Шансы — демонстрация: полный чертёж ${rlPct(RL_DATA.fullBp)}, иначе осколки ${odds}. Золотые карточки ленты — оформление, а не шанс. Окно — сценарий «Возрождение душ · рулетка».</p></section>`;
+      <div class="k-demo row rl-kit" style="${rlFrVars()}">${cards}</div>
+      <p class="k-note">${TM('Слова автора: «рулетка — это тоже для людей, которые донатят… дорого-богато». ')}Дорого — свет, материал и крупные формы: за вкладкой «За души» и за окном — алтарь душ, зеркало, из стекла выходят контуры героев. Герои пула — веером карточек в раме старого золота перед зеркалом (RL_VIEW.fan), лента в окне идёт сквозь зеркало. Полный герой — лицо в раме и «Герой»; осколки — стекло с лицом героя и «×N» (shardGhost). Кристалл — редкость героя.</p>
+      <p class="k-note">Честно (§1.2): у входа и в окне — цена прокрутки и шанс героя целиком, все шансы — лист «Шансы». Итог решает «сервер» на сиде до анимации: лента разгоняется и ${RL_VIEW.ms[0] / 1000}–${RL_VIEW.ms[1] / 1000} с тормозит ровно на выпавшей карточке. Частицы — цвета редкости; у полного героя золотая вспышка, три кольца и дрожь. ×10 и ×100 — короткая лента на самом ценном итоге, затем сводка: полные герои первыми, осколки по героям — стеклом с долей собранного, прах, расход. «Пропустить анимацию» запоминается; при системном «меньше движения» анимации нет.</p>
+      <p class="k-note">Шансы — демонстрация: полный чертёж ${rlPct(RL_DATA.fullBp)}, иначе осколки ${odds}. Золотые карточки ленты — оформление, а не шанс. Арт — <code>tools/art-gen/jobs/souls-altar.json</code>: алтарь и рама, выгружено ${got} из ${RL_ART.want.length} (<code>RL_ART.ready</code>); пока пути нет, алтарь и раму рисует CSS. Окно — сценарий «Возрождение душ · рулетка».</p></section>`;
   },
 });

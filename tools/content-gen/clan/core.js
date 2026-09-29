@@ -23,33 +23,70 @@ function need(D, n) {
   return Number(iroot(BigInt(D.res.base) ** BigInt(q) * BigInt(n) ** BigInt(p), q));
 }
 
-/* ---------- древо (§24.2) ---------- */
+/* ---------- древо (§24.2; слово автора 29.09.2026) ----------
+   Уровень клана — потраченные очки навыков. Вехи — от уровня и после сброса остаются: каждый 5-й уровень — +1 атака по врагам клана
+   в день, каждый 10-й — +1 место. Пассивки и вилки — от выбора главы (picks): сброс древа снимает их, уровень остаётся */
 const lvlRow = (D, L) => D.tree.levels[L - 1] || null;
-/* вместимость: база и +1 за каждый десятый уровень */
-const capacity = (D, lvl) => D.capacity.base + fl(lvl, D.capacity.every) * D.capacity.add;
-/* вехи, уже взятые уровнем: +1 атака КБ, пул элит, скорость резервуара, длительность бонусов */
+/* вехи, уже взятые уровнем: { attack, cap } — сумма вех уровней 1…lvl */
 function milestones(D, lvl) {
-  const out = { attack: 0, cap: 0, pool: 0, speed: 0, dur: 0 };
-  for (let L = 1; L <= Math.min(lvl, D.tree.levels.length); L++) { const m = lvlRow(D, L).mile; if (m) out[m.k] += m.v; }
+  const out = Object.fromEntries(Object.keys(D.tree.mileName).map(k => [k, 0]));
+  for (let L = 1; L <= Math.min(lvl, D.tree.levels.length); L++) for (const m of lvlRow(D, L).mile || []) out[m.k] += m.v;
   return out;
 }
-const attacksDay = (D, lvl) => D.boss.attacks.day + milestones(D, lvl).attack;
-const walletCap = (D, lvl) => attacksDay(D, lvl) * (1 + D.boss.attacks.carryDays);
-const elitePool = (D, lvl) => Math.min(D.boss.poolMax, D.boss.pool + milestones(D, lvl).pool);
-const resSpeedBp = (D, lvl) => milestones(D, lvl).speed;
-/* выбранные пассивки: picks — индекс выбранной альтернативы по уровням 1…lvl; сумма значений по виду k (и параметру p) */
+/* вместимость: база и вехи мест */
+const capacity = (D, lvl) => D.capacity.base + milestones(D, lvl).cap * D.capacity.add;
+/* выбранные пассивки: picks — индекс выбранной альтернативы по уровням 1…lvl */
 function picked(D, picks, lvl) {
   const out = [];
-  for (let L = 1; L <= lvl; L++) { const row = lvlRow(D, L), i = picks ? picks[L - 1] : null; if (row && i != null && row.alts[i]) out.push(Object.assign({ L }, row.alts[i])); }
+  for (let L = 1; L <= Math.min(lvl, D.tree.levels.length); L++) { const row = lvlRow(D, L), i = picks ? picks[L - 1] : null; if (row && i != null && row.alts[i]) out.push(Object.assign({ L }, row.alts[i])); }
   return out;
 }
+/* сумма значений по виду k (и параметру p): ключ «k» или «k:p» */
 function bonus(D, picks, lvl) {
   const sum = {};
   for (const a of picked(D, picks, lvl)) { const key = a.k + (a.p ? ':' + a.p : ''); sum[key] = (sum[key] || 0) + a.v; }
   return sum;
 }
-/* раундов в атаке: база режима и «Ещё раунд» из древа */
-function rounds(D, g, picks, lvl) { const b = bonus(D, picks, lvl); return D.boss.rounds[g] + (b[g === 'b' ? 'roundB' : 'roundE'] || 0); }
+/* сумма выбранного по действию в бою клана: t — вид действия из D.tree.kinds[k].fx */
+function fxSum(D, picks, lvl, t) {
+  let v = 0;
+  for (const a of picked(D, picks, lvl)) { const F = D.tree.kinds[a.k].fx; if (F && F.t === t) v += a.v; }
+  return v;
+}
+const attacksDay = (D, lvl) => D.boss.attacks.day + milestones(D, lvl).attack;
+/* кошелёк атак: дневная норма и ещё carryDays норм — копить для босса; вилка «Запас атак» — ещё норма */
+const walletCap = (D, lvl, picks) => attacksDay(D, lvl) * (1 + D.boss.attacks.carryDays + fxSum(D, picks, lvl, 'carry'));
+/* элит в круге: база и вилка «Шире круг», не выше потолка */
+const elitePool = (D, lvl, picks) => Math.min(D.boss.poolMax, D.boss.pool + fxSum(D, picks, lvl, 'pool'));
+/* резервуар быстрее, б. п.: ключ ветки «Клан» — в процентах */
+const resSpeedBp = (D, lvl, picks) => fxSum(D, picks, lvl, 'speed') * fl(D.bp, 100);
+/* раундов в атаке: таблица ядра и вилка «Долгий бой» — только у элиты, не выше потолка */
+function rounds(D, g, picks, lvl) { return D.boss.rounds[g] + (g === 'e' ? Math.min(D.tree.caps.kbRound, fxSum(D, picks, lvl, 'rounds')) : 0); }
+/* класс героя по каноническому списку: у прототипа бывают прежние имена — «Хилер», «Дебаффер» */
+const clsOf = (D, c) => D.tree.clsAlias[c] || c;
+/* стихия героя сильнее стихии цели — по таблице ядра (§3.1): круг четырёх и пара Свет — Тьма */
+const edge = (a, d) => EB().elemMul ? EB().elemMul(a, d) > EB().RULES.elem.base : false;
+/* прибавки древа к одной атаке клана: g — 'e' элита со свитой или 'b' босс. Сервер кладёт их в карты при сборке боя: урон — aura.dmgUp,
+   вампиризм — aura.lifesteal, крит — critDmg, щиты — пассивка shieldUp, здоровье — hpPct карты героя, свита — hpPct приспешников.
+   Все значения — целые проценты из данных; вид действия — fx у вида пассивки */
+function fightMods(D, picks, lvl, g) {
+  const M = { dmg: 0, cls: {}, el: {}, edge: 0, hp: 0, hpCls: {}, shield: 0, crit: 0, leech: 0, retinue: 0 };
+  for (const a of picked(D, picks, lvl)) {
+    const F = D.tree.kinds[a.k].fx; if (!F || (F.on && F.on !== g)) continue;
+    if (F.t === 'dmg') { if (F.edge) M.edge += a.v; else if (F.by === 'cls') M.cls[a.p] = (M.cls[a.p] || 0) + a.v; else if (F.by === 'el') M.el[a.p] = (M.el[a.p] || 0) + a.v; else M.dmg += a.v; }
+    else if (F.t === 'hp') { if (F.by === 'cls') M.hpCls[a.p] = (M.hpCls[a.p] || 0) + a.v; else M.hp += a.v; }
+    else if (F.t === 'shield') M.shield += a.v;
+    else if (F.t === 'crit') M.crit += a.v;
+    else if (F.t === 'leech') M.leech += a.v;
+    else if (F.t === 'retinue' && g === 'e') M.retinue += a.v;
+  }
+  M.retinue = Math.min(M.retinue, D.tree.caps.kbRetinue);
+  return M;
+}
+/* прибавка урона героя в этом бою, %: общая, класса, стихии и «сильная стихия» против стихии цели */
+const heroDmg = (D, M, u, el) => M.dmg + (M.cls[clsOf(D, u.cls)] || 0) + (M.el[u.el] || 0) + (M.edge && edge(u.el, el) ? M.edge : 0);
+const heroHp = (D, M, h) => M.hp + (M.hpCls[clsOf(D, h.cls)] || 0);
+const hasMods = M => !!M && Object.values(M).some(v => typeof v === 'number' ? v : Object.keys(v).length);
 
 /* ---------- клановый босс (§25) ---------- */
 /* сила врагов круга: 12 + уровень, × xBp за круг — «статы элит и КБ × X» (§25.2, главная ручка режима) */
@@ -57,41 +94,66 @@ function circlePow(D, k) { const C = D.boss.circle; let v = C.pow1; for (let i =
 const circleLvl = (D, k) => circlePow(D, k) - D.boss.circle.lvlDiv;
 /* очки врага круга: элита платит меньше КБ, очки растут с кругом (§25.3) */
 function points(D, k, g) { const P = D.boss.points; let v = g === 'b' ? P.boss : P.elite; for (let i = 1; i < k; i++) v = fl(v * P.yBp, D.bp); return v; }
-/* элиты круга: стихия — чистый рандом из семи (§25.2, п. 2), класс — из шести боевых классов (§36.15); сид — от сервера */
+/* ---------- сонмы стихий (слово автора 29.09.2026; данные — D.boss.host из tools/content-gen/clan/foes.js) ----------
+   Семь стихий, в сонме восемь фигур: Голос (элита, маг ДД) и Хозяин (клановый босс, маг ДД), Щит и Лекарь — на обоих этажах, двое Пут —
+   у Голоса, Клинок и Стрела — у Хозяина. Фигура — id «<стихия>-<роль>»: у каждой стихии один Голос и один Хозяин */
+const HO = D => D.boss.host;
+const leadRole = g => g === 'b' ? 'boss' : 'elite';
+/* фигура сонма по стихии и роли: { id, el, role, n, look, tip } или null */
+function fig(D, el, role) { const h = HO(D).hosts.find(x => x.el === el); return h ? HO(D).figs[h.id + '-' + role] || null : null; }
+/* элиты круга: стихии — чистый случай из семи (§25.2, п. 2), без повторов в круге — у стихии один Голос; сид — от сервера.
+   Порядок обращений к генератору: одно на элиту — индекс среди ещё не выпавших стихий */
 function roll(D, key, n) {
-  const r = EB().makeRng(EB().seedOf(key)), B = D.boss;
-  return Array.from({ length: n }, () => { const el = D.lists.els[r(D.lists.els.length)]; return { el, cls: B.classes[r(B.classes.length)] }; });
+  const r = EB().makeRng(EB().seedOf(key)), els = D.lists.els.slice(), out = [];
+  for (let i = 0; i < n && els.length; i++) out.push({ el: els.splice(r(els.length), 1)[0] });
+  return out;
 }
-/* набор врага из общей библиотеки: школа — стихия врага, приёмы — по классу, число и доли хода — по рангу (ADR-0016) */
-function kit(D, g, cls, el) {
-  const B = D.boss, R = g === 'b' ? B.rank.b : B.rank.e, K = g === 'b' ? B.kinds.b : B.kinds.e[cls];
+/* набор цели из общей библиотеки: школа — стихия, приёмы — по роли (Голос или Хозяин), число и доли хода — по рангу (ADR-0016) */
+function kit(D, g, el) {
+  const B = D.boss, R = g === 'b' ? B.rank.b : B.rank.e, K = g === 'b' ? B.kinds.b : B.kinds.e;
   const acts = K.filter(k => !k.startsWith('ult.')).slice(0, R.acts), ults = K.filter(k => k.startsWith('ult.')).slice(0, R.ults);
   return { rank: R.core, actPct: R.share[0], ultPct: R.share[1], kit: acts.map(k => ({ v: 0, slot: 'act', id: el + '.' + k })).concat(ults.map(k => ({ v: 0, slot: 'ult', id: el + '.' + k }))) };
 }
-/* босс недели расы: стихия и класс — таблица контента (§25.4); пока её нет у автора — заглушка данных */
-const bossOf = (D, race) => D.boss.races[race] || D.boss.races[Object.keys(D.boss.races)[0]];
-/* карта врага для ядра: o — { g: 'e' | 'b', uid, cls, el, race, k — круг, name }; здоровье — maxHp ядра (EnBattle.foeMaxHp) */
+/* Хозяин недели расы (§25.4 — таблица контента): { el, civ, why } — стихия, цивилизация Эхо недели и почему он встаёт */
+const bossOf = (D, race) => D.boss.weeks[race] || D.boss.weeks[Object.keys(D.boss.weeks)[0]];
+/* карта цели для ядра: o — { g: 'e' | 'b', uid, el, k — круг, name }; Голос или Хозяин стихии el; раса — сонмов; здоровье — maxHp ядра */
 function card(D, o) {
-  const B = D.boss, g = o.g, cls = g === 'b' ? B.bossCls : o.cls, tpl = g === 'b' ? B.tpl.b : B.tpl.e[cls];
-  const src = { key: 'клан:' + o.uid + '#0', id: 'клан:' + o.uid, name: o.name || '', cls, el: o.el, lvl: circleLvl(D, o.k), st: tpl.slice(),
-    hpPct: B.hp[g], rank: g === 'b' ? B.rank.b.core : B.rank.e.core, race: o.race, kit: kit(D, g, cls, o.el) };
+  const B = D.boss, g = o.g, role = leadRole(g), f = fig(D, o.el, role);
+  const src = { key: 'клан:' + o.uid + '#0', id: 'клан:' + o.uid, name: o.name || (f ? f.n : ''), cls: HO(D).roles[role].cls, el: o.el, lvl: circleLvl(D, o.k),
+    st: HO(D).tpl[role].slice(), hpPct: B.hp[g], rank: g === 'b' ? B.rank.b.core : B.rank.e.core, race: HO(D).race, fig: f ? f.id : '', kit: kit(D, g, o.el) };
   src.maxHp = EB().foeMaxHp(src);
   return src;
 }
 
-/* свита элиты (решение автора 29.09.2026): четыре приспешника стихии элиты — классы по её классу (D.boss.retinue.by), характеристики —
-   рядовые Мастерской того же класса, набор — одна способность школы стихии элиты. src — карта элиты (card); у босса свиты нет */
+/* свита этажа (слово автора 29.09.2026: «он и 4 свиты»): у Голоса — Щит, Лекарь и двое Пут, у Хозяина — Щит, Лекарь, Клинок и Стрела,
+   все — стихии цели. Характеристики — рядовые Мастерской того же класса, набор — одна способность школы своей стихии (ранг рядовой, ADR-0016).
+   src — карта цели (card) */
 function retinue(D, src) {
-  const R = D.boss.retinue;
-  if (!R || src.rank !== D.boss.rank.e.core || !R.by[src.cls]) return [];
-  return R.by[src.cls].map((cls, j) => ({ key: src.id + '#' + (j + 1), id: src.id + ':' + (j + 1), name: R.names[cls], cls, el: src.el, lvl: src.lvl,
-    st: R.tpl[cls].slice(), hpPct: R.hp[cls], rank: R.rank.core, race: src.race,
-    kit: { rank: R.rank.core, actPct: R.rank.share[0], ultPct: R.rank.share[1], kit: [{ v: 0, slot: 'act', id: src.el + '.' + R.kinds[cls] }] } }));
+  const H = HO(D), g = src.rank === D.boss.rank.b.core ? 'b' : 'e', floor = H.floors[g], R = H.rank;
+  if (!floor) return [];
+  return floor.map((role, j) => {
+    const f = fig(D, src.el, role), X = H.roles[role];
+    return { key: src.id + '#' + (j + 1), id: src.id + ':' + (j + 1), name: f ? f.n : X.n, cls: X.cls, el: src.el, lvl: src.lvl, st: H.tpl[role].slice(), hpPct: H.hp[role],
+      rank: R.core, race: H.race, fig: f ? f.id : '', kit: { rank: R.core, actPct: R.share[0], ultPct: R.share[1], kit: [{ v: 0, slot: 'act', id: src.el + '.' + X.kind }] } };
+  });
 }
-/* бой одной атаки клана: цель — первая карта, её здоровье копится между атаками; свита элиты — свежая; бой кончается, когда цель пала.
-   src — карта цели с hp и maxHp цели, если она уже ранена: остаток — её максимум в этой атаке (осада ядра, RULES.siege) */
-function battle(D, heroes, src, seed, maxRounds) {
-  return EB().targetBattle(heroes, { seed, g: src.rank === D.boss.rank.b.core ? 'b' : 'e', main: src, guards: retinue(D, src), maxRounds, endOnMain: true });
+/* бой одной атаки клана: цель — первая карта, её здоровье копится между атаками; свита цели — свежая; бой кончается, когда цель пала.
+   src — карта цели с hp и maxHp цели, если она уже ранена: остаток — её максимум в этой атаке (осада ядра, RULES.siege).
+   M — прибавки древа (fightMods): здоровье героев и свиты — в картах до боя, урон, вампиризм, крит и щиты — в единицах ядра после сборки */
+function battle(D, heroes, src, seed, maxRounds, M) {
+  const on = hasMods(M), g = src.rank === D.boss.rank.b.core ? 'b' : 'e';
+  const hs = on ? heroes.map(h => { const x = heroHp(D, M, h); return x ? Object.assign({}, h, { hpPct: fl((h.hpPct || 100) * (100 + x), 100) }) : h; }) : heroes;
+  let guards = retinue(D, src);
+  if (on && M.retinue) guards = guards.map(u => Object.assign({}, u, { hpPct: Math.max(1, fl(u.hpPct * (100 - M.retinue), 100)) }));
+  const b = EB().targetBattle(hs, { seed, g, main: src, guards, maxRounds, endOnMain: true });
+  if (on) for (const u of b.u[0]) {
+    const d = heroDmg(D, M, u, src.el);
+    if (d) u.aura.dmgUp += d * fl(D.bp, 100);
+    if (M.leech) u.aura.lifesteal += M.leech * fl(D.bp, 100);
+    if (M.crit) u.critDmg += M.crit;
+    if (M.shield) u.lpas.push({ pas: 'shieldUp', pct: M.shield, id: 'клан:щиты' });
+  }
+  return b;
 }
 
 /* ---------- очки и вклад ---------- */
@@ -156,6 +218,6 @@ function bm(D, u) {
 /* мощь карты врага: единица ядра той же карты */
 function cardBm(D, src) { const b = EB().create({ mode: 'rounds', seed: 1, heroes: [], foes: [src] }); return bm(D, b.u[1][0]); }
 
-root.EnClan = { iroot, need, capacity, milestones, attacksDay, walletCap, elitePool, resSpeedBp, picked, bonus, rounds,
-  circlePow, circleLvl, points, roll, kit, bossOf, card, retinue, battle, share, payout, tier, stepsOf, rOf, pool, halves, contrib, serverSplit, bm, cardBm };
+root.EnClan = { iroot, need, capacity, milestones, attacksDay, walletCap, elitePool, resSpeedBp, picked, bonus, fxSum, rounds, clsOf, edge, fightMods, heroDmg, heroHp,
+  circlePow, circleLvl, points, fig, roll, kit, bossOf, card, retinue, battle, share, payout, tier, stepsOf, rOf, pool, halves, contrib, serverSplit, bm, cardBm };
 })(typeof window !== 'undefined' ? window : globalThis);

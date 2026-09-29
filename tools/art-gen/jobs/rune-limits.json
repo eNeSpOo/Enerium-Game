@@ -1,0 +1,40 @@
+{
+  "name": "Рунные пределы героя — рунный камень. Слова автора 29.09.2026: «нужно подумать, как красиво интегрировать на героя показ рунных пределов, ибо нынешние индикаторы — это слабо. Можем это показывать слева и справа по бокам». Решение исполнителя: пять рунных камней по бокам портрета, как вставки в раму; свет поднимается снизу — пройденный предел горит светом карста, следующий на потолке уровня тлеет, а когда его можно пробить — пульсирует. Рисуется один камень — горящий. Погасший выводит из него tools/art-gen/rune_stones.py: тот же силуэт пиксель в пиксель, иначе пульс «гуляет». Пульс — смена погасшего и горящего в интерфейсе, отдельной картинки нет. Стиль и формат — одобренные значки (jobs/ui-attributes.json): 1:1, чёрный фон, прозрачность ключом black; камень — родня плитки доблести: та же золотая кромка и базальт, только плитка вытянута вверх. Образец словами (ADR-0012)",
+  "plan": {
+    "Камень": "вытянутый вверх шестигранник — острый сверху и снизу, прямые бока, ширина около двух третей высоты; толстая скошенная кромка старого золота, внутри — кабошон кристалла карста крупными гранями",
+    "Руна": "одна вертикальная бороздка с маленьким открытым ромбом посередине — знак этого мира, не буква настоящего алфавита, не руна футарка, не оккультный знак; в горящем камне бороздка светится ярче всего",
+    "Свет": "бирюза карста #48E5D4 — та же пара с золотом, что во всём интерфейсе: доблесть — золото, пределы — бирюза. Свет живёт внутри камня; ореол снаружи рисует интерфейс",
+    "Где": "плитка героя — камни по 5–7 px, там рисует SVG интерфейса; шапка карточки — 8–9 px, тоже SVG; путь развития — 18 px, лист предела и анимация пробития — от 30 до 56 px: там — эта картинка",
+    "Выгрузка": "limits/stone-on.png ← limits/rl-stone__nb2.on.png и limits/stone-off.png ← limits/rl-stone__nb2.off.png, 128 × 186 — пропорция камня интерфейса 40 : 58, fit 100. После выгрузки — пути в RP_ART.ready (screens/hero-dev.js)"
+  },
+  "notes": [
+    "Запуск 29.09.2026: rl-stone вышел с первого раза, $0,069, вырезка ключом black — альфа чистая. Кромка толстая, шестигранник вытянут ровно, руна — бороздка с ромбом, как в промте",
+    "Погасший: tools/art-gen/rune_stones.py — свет карста (бирюза, оттенок 150–205°, и почти белое сердце руны) переведён в матовый серо-синий пустой карст, золото не тронуто; оба слоя обрезаны по одной рамке альфа > 8 — 640 × 921. Производные .on.png и .off.png, записей в манифесте нет, как у слоёв сундуков",
+    "Пропорция камня 640 : 921 ≈ 0,695, у камня интерфейса 40 : 58 ≈ 0,690 — выгрузка 128 × 186 с fit 100 даёт камень 128 × 184 почти без полей",
+    "До выгрузки интерфейс рисует SVG-заглушку той же формы (hero-dev.css, --rp-on и --rp-off): плитка и шапка остаются на ней и после выгрузки — в 5–9 px вектор чётче"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.",
+  "negative": "No text, no letters, no numbers, no real-world alphabets, no watermark, no signature, no logo, no UI elements.",
+  "cutout_rule": "The background is solid pure black ({hex}), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance. The whole icon with its glow fits inside the central 80% of the canvas in both width and height: an empty black margin of at least a tenth of the canvas stays on every side — top, bottom, left and right.",
+  "categories": {
+    "limits": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Format: game UI icon, square, no border around the picture. One small precious object, centered, seen perfectly straight on and perfectly symmetric left to right. It floats on pitch black: everything around it is solid pure black to the very edges of the canvas, never white or grey. It must stay readable at a tiny size, 16 px: one simple, strong silhouette built from a few large shapes with clear contrast between them. All the painterly detail lives inside the silhouette — worn gold, facets, light — never as small separate pieces around it: no sparks, embers, shards or particles floating around. A crisp bright rim light runs along the whole outline and cleanly separates it from the black."
+    }
+  },
+  "jobs": [
+    {
+      "id": "rl-stone",
+      "category": "limits",
+      "title": "Рунный камень предела — горящий",
+      "source": "GDD §10.1 — пять рунных пределов 50 / 150 / 350 / 700 / 1200; ADR-0030, п. 9 — путь героя с воротами пределов I–V; слово автора 29.09.2026 — пределы по бокам героя. Погасший — производный, rune_stones.py",
+      "subject": "A rune stone of a hero's limit — one of the five stones set into the frame around a hero's portrait. This one is charged: the limit is broken. The stone is a small upright tablet shaped as a tall hexagon — one sharp point at the top, one sharp point at the bottom, two straight vertical sides — about two thirds as wide as it is tall; from its top point to its bottom point it spans about three quarters of the canvas height. A thick bevelled rim of old gold (#DDBC7A) runs around its whole outline like a jeweller's setting, worn smooth and slightly dented, its bevel catching warm light. Inside the rim sits a cabochon of carst crystal — the magic crystal of this world — cut into a few large smooth facets, dark at its edges. Living turquoise light (#48E5D4) glows from deep inside the crystal, brightest at its heart, and lights the inner edge of the gold rim from within. Carved into the face of the crystal is one simple rune of this world, centered and upright: a single long vertical groove with a small open diamond in its middle — not a letter of any real alphabet, not a Norse rune, not an occult sign. The carved rune blazes with the brightest white-turquoise light. The light stays inside the stone: nothing shines out beyond the gold rim, no rays, no halo, no sparks."
+    }
+  ]
+}

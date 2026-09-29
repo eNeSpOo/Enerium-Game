@@ -1,0 +1,99 @@
+{
+  "name": "Боевой пропуск и дар дня (29.09.2026): баннер сезона «Осенний путь», награды-вехи листа даров — 7-я, 14-я, 20-я (главный дар) и 30-я отметки, последняя ступень пропуска, значок рабочего для ритуалов и перековки, значок праха душ. Задача автора: «Продумать Боевой пропуск и сделать более красивые и желанные ежедневные награды». Черновик — docs/content/пропуск-и-награды.md. Вехи — дорожный сундук странника в нарастающем великолепии: награда на картинке та же, что в листе (сундук странника и Энериум), — честно. Последняя ступень — рамка «Осенний путь» (бесплатный ряд) и сундук с Энериумом (платный ряд) на одной сцене. Выгрузка — после взгляда автора, строки для ui-art.json — в отчёте исполнителя.",
+  "models": [
+    "nb2"
+  ],
+  "style": "Dark fantasy mobile RPG game art with a gloomy, mystical, warm autumn atmosphere. Painterly digital illustration with soft transitions, elaborate shadows and confident visible brushwork; simplified large readable forms; a crisp rim light along the edges. Rich worn materials: aged dark leather, brass, old gold, dark forged iron, weathered wood, carved stone. The season is autumn on the road: copper, amber and gold leaves, small iron lanterns with warm amber light (#E6A84B). Light comes from below and from within; a few strong sources; warm amber against cold teal (#48E5D4). Precious, inviting, high contrast. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no runes, no glyphs, no real-world alphabets, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. No occult symbols, no pentagrams. No gore, no blood, no skulls, no bones. No purple, no violet, no magenta light.",
+  "cutout_rule": "The background is solid pure black ({hex}), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance. The whole icon with its glow fits inside the central 80% of the canvas in both width and height: an empty black margin of at least a tenth of the canvas stays on every side — top, bottom, left and right.",
+  "categories": {
+    "pass-banner": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [
+        "art/style/ref-01-cave-amber-teal.webp",
+        "art/style/ref-02-cave-pillars.webp"
+      ],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Format: wide cinematic banner, 21:9, for the top of the season screen of a mobile game. The game shows it as a wide low band and writes the season's name over its left third, so the left third of the picture stays calm, dim and uncluttered; the main subject and the brightest light sit in the right two thirds, inside the middle band of the height, between 25% and 75%. Atmospheric depth, a few strong light sources, light rising from below. No characters in the foreground."
+    },
+    "pass-gifts": {
+      "aspect": "1:1",
+      "size": "1K",
+      "refs": [
+        "art/generated/chests/chest-wander__nb2.png",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Format: square reward art for a large card of the daily rewards screen of a mobile game: a still life, the reward large and close in the center, filling about 70% of the canvas, seen from the front and a little above. The first attached image is our game's wanderer's travel trunk: draw exactly this trunk — the same rounded lid, the same dark brown leather over a wooden frame, brass corner caps and rows of brass studs, two leather straps with brass buckles on the lid and the round brass plate with a plain solid four-pointed star — but do not copy its flat background or its flat lighting. The background is dark and atmospheric and fades to near black at the corners, because the game places the picture on a dark card. Readable at 64 px: large simple shapes, one strong light."
+    },
+    "pass-icons": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black-glow",
+      "refs": [],
+      "frame": "Format: game UI icon, square, no border around the picture. One subject, centered, about 80% of the canvas, seen straight on or in a clear three-quarter view. The subject floats on pitch black: everything around it is solid pure black to the very edges of the canvas, never white or grey, no frame. It must stay readable at a tiny size, 24 px: one simple, strong, instantly recognizable silhouette built from a few large shapes with clear contrast between them. All the painterly detail lives inside the silhouette, never as small separate pieces around it. A crisp pale rim light runs along the whole outline and cleanly separates it from the black. The subject is rarity-neutral: pale and muted, no bright colored gems — the interface adds the color of rarity around the icon."
+    }
+  },
+  "jobs": [
+    {
+      "id": "pass-banner-autumn",
+      "category": "pass-banner",
+      "title": "Баннер сезона пропуска «Осенний путь»",
+      "source": "§32 — боевой пропуск, сезон; рамка сезона «Осенний путь» (screens/wanderer.js, LK_DATA.frames.pass; jobs/frames.json, frame-pass): ветви, медные листья, железный фонарь. Решение исполнителя: дорога Странника вниз по стене пролома, фонари, листопад в глубину, свет снизу. Без Эуклида и тайн пролома: внизу — только свет карста в трещинах. К выгрузке — design/ui/assets/art/pass/banner.jpg, 1584×672.",
+      "subject": "Subject: the Autumn Road — the season of the wanderer's road. A long narrow stair of worn stone winds down along the sheer wall of a vast chasm, from the upper right toward the depths at the lower right, and disappears into darkness. Small iron lanterns on short iron posts stand along the stair every few steps and glow warm amber (#E6A84B), a chain of warm lights going down. At the top edge of the cliff gnarled dark trees cling to the rock; the wind tears copper, amber and gold autumn leaves from them, and the leaves drift and spiral slowly down the chasm, catching the lantern light like sparks. Far below, from long cracks in the karst rock at the bottom of the chasm, a soft teal light (#48E5D4) rises and lights the underside of the stair and the drifting leaves from below. Far down the stair, very small, one hooded wanderer with a lantern walks down — a tiny silhouette for scale, seen from behind. The left third of the picture is the dark open air of the chasm with only a few drifting leaves. Quiet, inviting, a long road worth walking."
+    },
+    {
+      "id": "cal-gift-07",
+      "category": "pass-gifts",
+      "title": "Дар недели — 7-я отметка листа даров",
+      "source": "Лист даров, 7-я отметка: сундук странника по циклу (lootboxes.js, boxes.wander; docs/content/пропуск-и-награды.md). Решение исполнителя: тот же сундук странника, перевязанный шнуром как подарок, лист под шнуром, фонарь рядом — скромный первый дар. К выгрузке — design/ui/assets/art/pass/gift-07.jpg, 512×512.",
+      "subject": "Subject: the Gift of the Week. The wanderer's travel trunk, closed, stands on a worn stone step. A thin cord of copper-red wool is tied around the trunk crosswise, like a gift, with a simple bow on top of the lid, and one amber autumn leaf is tucked under the cord. A small iron lantern stands on the step beside the trunk and throws warm amber light (#E6A84B) up onto the leather and the brass. Behind, deep shadow and a few drifting leaves. Humble, warm and welcoming — the first gift of a week on the road."
+    },
+    {
+      "id": "cal-gift-14",
+      "category": "pass-gifts",
+      "title": "Дар двух недель — 14-я отметка листа даров",
+      "source": "Лист даров, 14-я отметка: сундук странника на ступень выше цикла. Решение исполнителя: крышка приподнята, из щели золотой свет, монеты на камне, два фонаря. К выгрузке — design/ui/assets/art/pass/gift-14.jpg, 512×512.",
+      "subject": "Subject: the Gift of Two Weeks. The wanderer's travel trunk stands on a stone ledge; its lid is lifted just a finger's width, and warm golden light spills out through the gap and lights the straps and the brass star from below. A few gold coins have slid out onto the stone in front of the trunk and catch the light. Three copper autumn leaves lie around it. Two small iron lanterns glow on either side of the trunk. Richer and more exciting than a simple gift: something good is waiting inside."
+    },
+    {
+      "id": "cal-gift-20",
+      "category": "pass-gifts",
+      "title": "Главный дар — 20-я отметка листа даров",
+      "source": "§29: главный приз — на двадцатый день. Лист даров, 20-я отметка: сундук странника чистого окна на ступень выше цикла и Энериум. Энериум — зелёный огранённый кристалл (art/currency/enerium.png). Решение исполнителя: сундук на пьедестале, столп чистого света, над ним кристаллы Энериума, золотые листья в свете. К выгрузке — design/ui/assets/art/pass/gift-20.jpg, 512×512.",
+      "subject": "Subject: the Main Gift — the grandest reward of the sheet. The wanderer's travel trunk stands on a low round pedestal of dark carved stone with a thin old-gold rim. Its lid is thrown wide open, and a column of pure pale light — white with a hint of teal (#48E5D4) — rises straight up out of it. Above the open trunk, inside the column of light, float three faceted green Energium crystals (#4FDC8B), tall and pointed like the game's Energium gem, glowing from within. Golden autumn leaves swirl slowly around the column of light. Awe-inspiring, precious, the prize everyone waits for."
+    },
+    {
+      "id": "cal-gift-30",
+      "category": "pass-gifts",
+      "title": "Венец листа — 30-я отметка листа даров",
+      "source": "Лист даров, 30-я отметка: сундук странника на ступень выше цикла и Энериум — последняя отметка листа. Решение исполнителя: сундук, увенчанный венком из позолоченных листьев с кристаллом Энериума в центре. К выгрузке — design/ui/assets/art/pass/gift-30.jpg, 512×512.",
+      "subject": "Subject: the Crown of the Sheet — the reward for thirty days on the road. The wanderer's travel trunk, closed, stands on a stone ledge, and on its lid lies a wreath of gilded bronze autumn leaves, like a crown. In the center of the wreath rests one large faceted green Energium crystal (#4FDC8B), glowing from inside and lighting the gilded leaves around it. Tiny golden motes rise from the wreath. An iron lantern hangs above on a hook. Triumphant and warm — a crown for a long road."
+    },
+    {
+      "id": "pass-crown",
+      "category": "pass-gifts",
+      "title": "Венец пути — последняя ступень пропуска",
+      "source": "§32 — боевой пропуск: последняя ступень бесплатного ряда — рамка «Осенний путь» (LK_DATA.frames.pass, арт frames/pass.png), платного — сундук странника и Энериум. Решение исполнителя: рамка стоит аркой на последней площадке лестницы, перед ней открытый сундук со светом и кристаллами Энериума. К выгрузке — design/ui/assets/art/pass/crown.jpg, 512×512.",
+      "refs": [
+        "art/generated/chests/chest-wander__nb2.png",
+        "art/generated/portrait-frames/frame-pass__nb2.png",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "subject": "Subject: the Crown of the Road — the last step of the season. The second attached image is our season's portrait frame: a ring woven of dark twisted branches and roots with copper and amber autumn leaves and a small iron lantern hanging at its bottom. On the last landing at the end of a stone stair, this exact ring stands upright like a round gate, large, filling the upper half of the picture; inside the ring there is only calm darkness. In front of it and below stands the wanderer's travel trunk, its lid open, warm golden light pouring out of it and up onto the ring; beside the trunk lies a small cluster of faceted green Energium crystals (#4FDC8B) glowing from within. The lantern on the ring glows amber (#E6A84B). Autumn leaves drift down through the light. The reward of the whole season, earned step by step."
+    },
+    {
+      "id": "icon-worker",
+      "category": "pass-icons",
+      "title": "Значок рабочего — ритуалы, артель и перековка",
+      "source": "GDD §19.1: рабочие — обычные, не героические души тех, кто жил на Этериосе; собираются из шардов, пробуждаются за души, в бой не ходят. docs/content/ритуалы.md: гончары, рудокопы, переписчики, носильщики; от каждой души остались осколки памяти, выносят то, что лежит в открытых биомах. Сейчас рабочий в ритуалах и перековке — кристалл редкости. Глубокий промт по art/style/style.md, слои подписаны. К выгрузке — design/ui/assets/art/workers/worker.png, 256×256, прозрачный фон; редкость рисует интерфейс рамкой.",
+      "subject": "Subject: a worker — the soul of a common laborer of the old world, summoned by the Wanderer to work while the sand of the ritual hourglass runs. Who he is: in life he was a porter and a miner on the old roads, never a hero; only a few fragments of his memory are left, and with them he remembered his trade. Right now he sets off down a dark road to bring back what lies there. Character: humble, steady and tireless, with a quiet dignity — his back is strong though bent under the load, his step sure; not a beggar, not a slave, a worker proud of honest labor. Pose, the moment of setting off: he is shown from the knees up in a three-quarter view, turned toward the right, leaning a little forward into the step, his weight on his leading foot. He has exactly two arms: his near hand holds up a small iron lantern at waist height; his far hand grips the leather strap of a heavy canvas sack slung over his far shoulder. Details that tell his story: (1) a simple hood that hides his face in soft shadow — no eyes, no features, only calm darkness; (2) a worn leather apron with a small hammer hanging at its loop; (3) a coil of rope at his belt; (4) patches on the sack and on his sleeves. The soul itself is spectral: his whole figure is painted in pale, muted, slightly translucent tones of grey and cold white, lit from inside by a faint teal light (#48E5D4), and the lantern glows the same soft teal. A legend of honest labor, not an extra."
+    },
+    {
+      "id": "icon-dust",
+      "category": "pass-icons",
+      "title": "Значок праха душ",
+      "source": "GDD §15.2–§15.3: прах душ — то, во что уходят лишние осколки пробуждённых героев; на прах берут осколки героев каталога. Сейчас в прототипе значок праха — рисунок SVG (DUST в index.html). К выгрузке — design/ui/assets/art/dust.png, 128×128, прозрачный фон.",
+      "subject": "Subject: soul dust — what remains when a spare shard of a hero's soul dissolves. A small low heap of fine pale golden-white shimmering dust, like glowing sand, lies loose in the middle of the picture, wider than tall. The dust glows softly from within, warm pale gold (#F3E2B4); from its top a few tiny motes of the same warm light rise in a short thin wisp, like the last breath of a memory, and fade within a short distance. One simple readable silhouette: a wide soft mound with a small rising wisp."
+    }
+  ]
+}

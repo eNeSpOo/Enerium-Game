@@ -1,0 +1,159 @@
+{
+  "name": "Возрождение душ и лавка праха — «дорого-богато» (слова автора 29.09.2026: «Где рулетка, магазин праха и т. д. — сделай тоже красиво и дорого-богато и сгенерируй любой арт, что потребуется. Всё-таки рулетка — это тоже для людей, которые донатят, а магазин праха так же сделать можно отдельным окном»). Уровень — витрина «За Энериум» (jobs/donat-showcase.json): зал, рамы, ступени, свет. Здесь: алтарь душ — фон вкладки «За души» и окна рулетки; лавка праха — фон её окна; стекло осколка героя по образцу автора — отдельными слоями (маска, кромка, трещины и блики: tools/art-gen/shard_layers.py); семь силуэтов класса — лицо осколка у героя без портрета; рама карточки героя души. Свет душ — бирюза #48e5d4 (токен --spirit), прах — бледное золото, как значок праха. GDD §15, §1.2; ADR-0019, ADR-0028, ADR-0030.",
+  "plan": {
+    "Алтарь душ": "21:9, 2K. Круглое святилище из чёрного камня, в середине — огромное круглое зеркало душ в кольце старого серебра и золота на ступенчатом алтаре; из стекла выходят призрачные фигуры героев — только контуры света, без лиц. Середина по высоте — спокойная: окно рулетки кладёт туда ленту, вкладка — веер карточек. Симметрия: вкладка сдвигает картинку влево стилем, справа у неё два входа",
+    "Лавка праха": "21:9, 2K. Сводчатая лавка-реликварий: полки с урнами и банками бледно-золотого праха, осколки зеркала на бархатных подставках, медные весы на прилавке, тёплые лампы. Середина — спокойная: окно ставит туда витрину",
+    "Осколок героя": "1:1, 1K, чёрный фон. Образец автора: кусок стекла на чёрном, кромка — бирюзовое стекло с тонкими трещинами и сколами, поверх — трещины и блики; середина стекла — чёрная пустота, в неё интерфейс кладёт лицо героя. Одна картинка режется на слои shard_layers.py: маска, кромка и трещины совпадают пиксель в пиксель",
+    "Силуэты класса": "4:5, 512. Бюст неизвестного героя класса: лицо в глубокой тени, свет контура — по голове, плечам и знаку класса (щит, чаша, посох, меч, лук, оковы, кирка). Холодный серо-бирюзовый монохром. Интерфейс кладёт их в осколок вместо портрета",
+    "Рама": "4:5, 1K, чёрный фон, ключ black. Тонкая линия старого золота по чернёному серебру, бирюзовые кристаллы душ в углах, гребень с каплей-пламенем души. Окно — пустое"
+  },
+  "notes": [
+    "Порядок: сначала --dry-run, потом запуск с --budget. Выгрузку делает export_ui.py по таблице отчёта — ui-art.json этим заданием не правится",
+    "Слои осколка: python tools/art-gen/shard_layers.py art/generated/hero-shard-glass/<файл>.raw.png — рядом ложатся .mask.png, .rim.png, .cracks.png; у всех трёх альфа не ниже 9 на всём силуэте, поэтому рамка выгрузки (альфа > 8) у них одна и fit совмещает их пиксель в пиксель",
+    "Осколок, v1 (hero-shard-glass__nb2): стекло верное, но узкое — ширина к высоте 0,49, кромка — тонкий «неон». В рамку и предмет добавлено: «about four fifths as wide as it is tall… like a broken shield», «thick real glass, not a thin glowing outline and not a neon tube»; прежние тексты — frame_v1 и subject_v1",
+    "Лавка праха, v1 (dust-shop__nb2): лавка удалась, но посреди задней стены — нарисованная панель с восемью пустыми карточками: модель поняла «интерфейс ставит туда витрину» буквально. Правка — dust-shop-edit, EDIT MODE своего v1 (art/style/style.md)",
+    "Запуск 29.09.2026, $0,84 за 13 картинок: алтарь, лавка и её правка, два варианта стекла, семь силуэтов (512 — первый запуск этого размера, 464×576, $0,046), рама. Всё смотрено глазами",
+    "Алтарь (souls-altar__nb2): зеркало душ на алтаре чёрного мрамора, из стекла выходят контуры воина, лучника, щитоносца — принят с первого раза. Середина по высоте занята зеркалом: вкладка кладёт веер героев на ступени алтаря, окно — ленту сквозь зеркало",
+    "Лавка: принята правка dust-shop-edit__nb2 (EDIT MODE): панель с карточками убрана, стена свода цела, всё остальное — как в v1",
+    "Стекло: принят v2 (hero-shard-glass__nb2-v2) — ширина к высоте 0,66, кромка толстым стеклом со сколами, трещины и блик. В правом изломе кромка разомкнута — shard_layers.py замыкает силуэт (CLOSE 16 px). Слои: python tools/art-gen/shard_layers.py art/generated/hero-shard-glass/hero-shard-glass__nb2-v2.raw.jpg → .mask/.rim/.cracks.png, рамка у всех трёх — 209, 51, 602 × 918, кромка ~50 px исходника. Превью с портретом c2-41 при 0 и 100 % — лицо ясно видно на 96 и 44 px",
+    "Силуэты: все семь приняты с первого раза, знак класса читается: шлем и щит, капюшон и чаша, посох с кристаллом, двуручный меч, лук, оковы, кирка с мешком",
+    "Рама (souls-frame__nb2): тонкое старое золото по чернёному серебру, капля души в гребне, бирюзовые кристаллы в углах. Рамка по альфе 774 × 1103 (0,70), окно — 13,7 / 6,2 / 5,0 / 6,2 % сверху, справа, снизу, слева (RL_ART.win в screens/roulette.js). Тёмный ореол вокруг гребня ключ black оставил непрозрачным, и внутри окна он ложился на голову героя: окно чищено — python tools/art-gen/frame_window.py art/generated/souls-frame/souls-frame__nb2.png → souls-frame__nb2.clean.png (очищено 23 334 px; арка окна 151…1036 px исходника; снаружи окна ореол остался). Превью на портрете c2-41 — лицо и волосы открыты, гребень нависает над окном",
+    "К выгрузке (export_ui.py, ui-art.json): souls/altar.jpg ← souls-scene/souls-altar__nb2.jpg 1688×716; souls/dust-shop.jpg ← souls-scene-edit/dust-shop-edit__nb2.jpg 1688×716; souls/frame.png ← souls-frame/souls-frame__nb2.clean.png 320×456 без fit; shards/glass-mask.png, glass-rim.png, glass-cracks.png ← hero-shard-glass/hero-shard-glass__nb2-v2.mask/.rim/.cracks.png — 384×384, fit 92 у всех трёх; shards/cls-*.jpg ← class-ghost/cls-ghost-*__nb2.jpg 464×576. После выгрузки пути — в RL_ART.ready, DU_ART.ready и ART_ICONS.ready"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Epic, precious, regal: rich materials — old gold, tarnished silver, black stone, deep velvet, turquoise soul-glass. Light tells the story: a few strong sources — cracks and crystals that glow from within — throw colored light upward, the light comes from below. Cold turquoise light of souls against warm old gold. Fine dust and motes of light float in the air. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no real-world alphabets, no runes or markings that look like writing, no watermark, no signature, no logo, no UI elements, no border or frame around the picture unless the format asks for a frame. No skulls, no bones, no blood, no gore.",
+  "cutout_rule": "The background is solid pure black ({hex}), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance. The whole subject with its glow fits inside the central 86% of the canvas in both width and height: an empty black margin stays on every side — top, bottom, left and right.",
+  "categories": {
+    "souls-scene": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [
+        "art/style/ref-02-cave-pillars.webp",
+        "art/style/ref-03-cave-teal-runes.webp"
+      ],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Format: a wide cinematic background, 21:9, for a showcase screen of a mobile game. Seen straight on at the height of a standing person, a calm symmetric composition with depth. The middle band of the picture — from about 35% to 75% of the height — stays calm, dim and uncluttered around its center: the interface places a row of hero cards there. The richest detail and the brightest light gather at the left and right edges, at the top center and along the bottom. No readable faces anywhere."
+    },
+    "hero-shard-glass": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black-glow",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no text in the reply. Format: a game UI piece — one shard of broken glass, seen straight on, centered, floating in the dark, about 84% of the canvas high. It stands upright and straight: its long axis is vertical, never tilted, never a slanted rhombus or parallelogram. Everything around it is solid pure black to the very edges of the canvas. The silhouette: a BROAD jagged piece of glass, about four fifths as wide as it is tall — almost as wide as it is tall — shaped roughly like a broken shield: a sharp point at the top a little right of the center, two slanted upper edges like shoulders, a long almost straight left side with one small chip, a right side broken into two straight segments with a notch between them, a jagged bottom edge; it is widest across its upper middle, where a head and shoulders could be seen. Straight fracture lines and sharp corners, never rounded, never drop- or almond-shaped, never narrow.",
+      "frame_v1": "Draw exactly one image in a single pass: no alternative versions, no text in the reply. Format: a game UI piece — one shard of broken glass, seen straight on, centered, floating in the dark, about 84% of the canvas high. It stands upright and straight: its long axis is vertical, never tilted, never a slanted rhombus or parallelogram. Everything around it is solid pure black to the very edges of the canvas. The silhouette: a broad jagged piece of glass, about three quarters as wide as it is tall and widest across its middle, with a large calm middle where a face could be seen — a sharp point at the top a little right of the center, a long almost straight left edge with one small chip, a right edge broken into two straight segments with a notch between them, a jagged bottom edge; straight fracture lines and sharp corners, never rounded, never drop- or almond-shaped."
+    },
+    "class-ghost": {
+      "aspect": "4:5",
+      "size": "512",
+      "refs": [
+        "art/style/ref-03-cave-teal-runes.webp"
+      ],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no text in the reply. Format: vertical 4:5 bust portrait for a small card, shown very small — about 60 px wide. A bust: the head and the upper chest of one unknown hero, centered, the head in the upper third, the body turned a little toward the right. It is a silhouette of a soul, not a person we can recognise: the face is lost in deep shadow — no eyes, no nose, no mouth, no features at all — and only a crisp cold rim light traces the outline of the head, the shoulders and the one object that tells the hero's calling. The whole picture is a cold monochrome of grey and pale turquoise (#9FE3DA) on deep near-black, with a faint turquoise glow rising from below. The object of the calling is large, bold and instantly readable even at 40 px. Plain dark background with a soft haze, nothing else in it."
+    },
+    "souls-frame": {
+      "aspect": "4:5",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no text in the reply. Format: an ornate portrait frame for a hero card in a dark fantasy mobile game, vertical 4:5, seen straight on, perfectly symmetric. The whole canvas is solid pure black — outside the frame and inside its window alike; only the frame itself is painted. The frame line is slender — about 4% of the frame width — and the window is large, empty and gently arched at the top. Ornament gathers at the top center, the bottom center and the four corners and may reach slightly outward beyond the line."
+    },
+    "souls-scene-edit": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Format: a wide cinematic background, 21:9, for a shop screen of a mobile game — an edit of the attached picture, at the same size and composition. No rectangles, no panels, no card outlines, no empty frames, no placeholders."
+    }
+  },
+  "jobs": [
+    {
+      "id": "souls-altar",
+      "category": "souls-scene",
+      "title": "Алтарь Возрождения душ — фон вкладки «За души» и окна рулетки",
+      "source": "GDD §15 — Возрождение душ: осколки или полный чертёж героя, пробуждение за души; слова автора 29.09.2026 — «дорого-богато», уровень витрины «За Энериум». Решение агента: зеркало душ на алтаре, из стекла выходят контуры героев; свет душ — бирюза (--spirit), оправа — старое серебро и золото. К выгрузке — design/ui/assets/art/souls/altar.jpg, 1688×716",
+      "subject": "Subject: the Altar of Soul Rebirth — a vast round sanctum hewn in black stone deep underground, where lost souls are called back. In the center, set upright on a low stepped altar of black marble veined with turquoise, stands a great round mirror about half the picture high, in a heavy ring frame of tarnished silver and old gold carved with a wreath of flowing wisps; its surface is deep turquoise soul-glass with a slow whirl of pale mist inside, glowing from within. From the rim of the mirror pale ghostly outlines of warriors — a helmet, a hood, a raised shield, a bow, only contours of cold light with no faces — seem to step out of the glass on both sides and fade into mist. Tall pillars of black stone ring the sanctum and recede into darkness; between them hang heavy curtains of deep teal velvet with old gold fringe. On both sides small silver braziers burn with cold turquoise flames, and a few hanging lamps of old gold give warm light high above. From long cracks in the altar steps and the floor turquoise light rises upward and lights the pillars and the mirror frame from below. Pale motes of soul-light drift upward toward the mirror like slow snow in reverse. Regal, sacred, mysterious — a place where something precious returns."
+    },
+    {
+      "id": "dust-shop",
+      "category": "souls-scene",
+      "title": "Лавка праха — фон окна лавки",
+      "source": "GDD §15.1–§15.3 — каталог осколков за прах душ; слова автора 29.09.2026 — «магазин праха… отдельным окном», «дорого-богато». Решение агента: лавка-реликварий — урны и банки бледно-золотого праха, осколки зеркала на бархате, медные весы; прах — бледное золото, как значок праха в кошельке. К выгрузке — design/ui/assets/art/souls/dust-shop.jpg, 1688×716",
+      "subject": "Subject: the Dust Shop — a small precious reliquary shop in a low vaulted cellar of dark stone, where soul-dust is traded for shards of heroes. Along both side walls rise tall shelves of dark carved wood with old gold edging; on them stand rows of glass urns, stoppered jars and small brass-bound reliquaries filled with pale golden dust that glows softly from within, and here and there upright shards of broken mirror glass with turquoise edges rest on little stands of deep velvet. At the bottom of the picture runs a long counter of dark wood and old brass, seen from the front, low in the frame: on it a pair of ornate brass scales holds a small heap of glowing pale gold dust on one pan, a few turquoise glass shards lie on a velvet cloth, and a brass scoop rests beside an open jar. High above hang a few lamps of old gold with warm amber light. Pale golden dust hangs in the air in the lamp light like slow snow; turquoise light rises from the glass shards on the counter and from cracks in the stone floor. Rich, quiet, secretive and valuable — a treasure-keeper's shop."
+    },
+    {
+      "id": "hero-shard-glass",
+      "category": "hero-shard-glass",
+      "title": "Стекло осколка героя по образцу автора — кромка, трещины и блики; середина пустая",
+      "source": "Образец автора 29.09.2026: кусок стекла на чёрном, кромка — бирюзовое стекло с тонкими трещинами и сколами, внутри ясно виден призрачный портрет героя по грудь, стекло поверх — трещины и блики. Лицо кладёт интерфейс. Слои — tools/art-gen/shard_layers.py: маска, кромка, трещины. К выгрузке — design/ui/assets/art/shards/glass-mask.png, glass-rim.png, glass-cracks.png — 256×256, fit 92 у всех трёх",
+      "subject": "Subject: a shard of a broken soul-mirror, empty, waiting for the soul that will fill it. Its edge is thick real glass, not a thin glowing outline and not a neon tube: a broad bevelled rim of translucent turquoise glass (#48E5D4), about a twentieth of the shard's width, seen from the front so its thickness shows — lighter and darker bands of glass along it, bright crisp highlights on its outer edge, a faint inner glow, and the broken contour chipped in four or five places with small fresh chips and fine cracks running along the rim itself. Across the flat face of the shard lie only a few fine white hairline cracks — three or four thin straight lines that start at two of the chips on the edge and run a short way inward, one of them splitting in two — and one soft diagonal glint of cold light across the upper left corner of the glass. Everything else on the face of the glass is pure clear black, as black as the background: a dark window where nothing is reflected yet — no face, no figure, no eyes, no haze, no fog, no light in the middle. The rim is continuous all around the contour, never broken into separate pieces. Only a faint, tight glow hugs the rim; no aura or halo spreading outside the shard; no other splinters, sparks or particles around it. A bare shard: no frame, no setting, no metal, no stand.",
+      "subject_v1": "Subject: a shard of a broken soul-mirror, empty, waiting for the soul that will fill it. Its edge is a thick bevelled rim of translucent turquoise glass (#48E5D4), like the edge of a thick pane seen in cross-section: it catches crisp cold light, glows faintly from within, and is broken with a few small chips and fine cracks of its own. Across the flat face of the shard lie only a few fine white hairline cracks — three or four thin straight lines that start at two of the chips on the edge and run a short way inward, one of them splitting in two — and one soft diagonal glint of cold light across the upper left part of the glass. Everything else on the face of the glass is pure clear black, as black as the background: a dark window where nothing is reflected yet — no face, no figure, no eyes, no haze, no fog, no light in the middle. The rim is continuous all around the contour, never broken into separate pieces. No glow, aura or halo outside the shard; no other splinters, sparks or particles around it. A bare shard: no frame, no setting, no metal, no stand."
+    },
+    {
+      "id": "cls-ghost-tank",
+      "category": "class-ghost",
+      "title": "Силуэт класса в осколке: танк",
+      "source": "Задание 29.09.2026: у героя без портрета в осколке — силуэт класса, а не инициалы. Знак класса — art/style/style.md, «Метки карт»: щит. К выгрузке — design/ui/assets/art/shards/cls-tank.jpg, 232×290",
+      "subject": "The hero is a tank, a defender: a massive figure in heavy armour with broad pauldrons and a closed great helm with a narrow dark eye slit; a tall heavy shield is raised in front of the chest, its upper edge and its rim caught by the cold light. Broad, immovable, steadfast."
+    },
+    {
+      "id": "cls-ghost-healer",
+      "category": "class-ghost",
+      "title": "Силуэт класса в осколке: лекарь",
+      "source": "Как у cls-ghost-tank; знак класса — чаша живой воды. К выгрузке — design/ui/assets/art/shards/cls-healer.jpg, 232×290",
+      "subject": "The hero is a healer: a slender figure in a deep hood and a flowing mantle; both hands hold up in front of the chest a shallow chalice from which a small stream of glowing living water spills over the rim and rises as light. Gentle, calm, radiant."
+    },
+    {
+      "id": "cls-ghost-mage",
+      "category": "class-ghost",
+      "title": "Силуэт класса в осколке: маг ДД",
+      "source": "Как у cls-ghost-tank; знак класса — посох с кристаллом. К выгрузке — design/ui/assets/art/shards/cls-mage.jpg, 232×290",
+      "subject": "The hero is a battle mage: a tall figure in a high-collared robe and a pointed hood; one hand holds a long staff that rises beside the head, topped with a large faceted crystal blazing with cold light; the other hand is raised with the palm open, sparks gathering above it. Commanding, dangerous."
+    },
+    {
+      "id": "cls-ghost-str",
+      "category": "class-ghost",
+      "title": "Силуэт класса в осколке: физ ДД силы",
+      "source": "Как у cls-ghost-tank; знак класса — меч. К выгрузке — design/ui/assets/art/shards/cls-str.jpg, 232×290",
+      "subject": "The hero is a warrior of great strength: a broad-shouldered figure in a plain open helmet with cheek guards and a heavy fur-trimmed cloak; a huge two-handed sword rests on one shoulder, its broad blade rising diagonally behind the head and gleaming along its edge. Powerful, fierce."
+    },
+    {
+      "id": "cls-ghost-agi",
+      "category": "class-ghost",
+      "title": "Силуэт класса в осколке: физ ДД ловкости",
+      "source": "Как у cls-ghost-tank; знак класса — лук. К выгрузке — design/ui/assets/art/shards/cls-agi.jpg, 232×290",
+      "subject": "The hero is a swift archer: a lean figure in a close hood and a light scarf; a long curved bow is held upright in front of the body, its limbs curving above the head and below the chest, the string pulled a little; the fletching of arrows shows in a quiver over the shoulder. Quick, watchful, deadly."
+    },
+    {
+      "id": "cls-ghost-control",
+      "category": "class-ghost",
+      "title": "Силуэт класса в осколке: контроль",
+      "source": "Как у cls-ghost-tank; знак класса — оковы. К выгрузке — design/ui/assets/art/shards/cls-control.jpg, 232×290",
+      "subject": "The hero is a binder who controls enemies: a figure in a long hooded robe; heavy chains with open shackles hang from both raised forearms and float in the air around the shoulders in loose loops, the links catching the cold light. Stern, patient, relentless."
+    },
+    {
+      "id": "cls-ghost-farmer",
+      "category": "class-ghost",
+      "title": "Силуэт класса в осколке: фармер",
+      "source": "Как у cls-ghost-tank; знак класса — кирка с мешком. К выгрузке — design/ui/assets/art/shards/cls-farmer.jpg, 232×290",
+      "subject": "The hero is a gatherer, a seeker of riches: a sturdy figure in a wide-brimmed hood and a leather apron; a heavy pickaxe rests on one shoulder and a full sack is slung over the other, a few small glowing crystals peeking from its mouth. Tireless, shrewd."
+    },
+    {
+      "id": "souls-frame",
+      "category": "souls-frame",
+      "title": "Рама карточки героя души — старое золото и бирюза",
+      "source": "Слова автора 29.09.2026: «дорого-богато», уровень рамы «За Энериум» (jobs/donat-marks.json). Решение агента: одна рама на героев рулетки и лавки праха — полный герой ленты, веер пула, итог, выбранный в лавке; осколки — без рамы, их рамка — само стекло. К выгрузке — design/ui/assets/art/souls/frame.png, 320×400, окно — прозрачное",
+      "subject": "A frame for a hero card of the Soul Rebirth: a slender line of old gold over blackened silver with a fine engraved pattern of flowing wisps along it. At the top center a small crest of two curling gold wisps holds a teardrop-shaped turquoise soul crystal (#48E5D4) glowing from within like a small flame; at the bottom center a small ornament of gold wisps with a tiny turquoise crystal; a small turquoise crystal stud at each of the four corners. Precious, sacred and noble; the turquoise glow stays close to the crystals."
+    },
+    {
+      "id": "dust-shop-edit",
+      "category": "souls-scene-edit",
+      "title": "Лавка праха — правка своего варианта: убрать нарисованную панель с восемью пустыми карточками",
+      "source": "v1 art/generated/souls-scene/dust-shop__nb2.jpg: лавка удалась, но модель нарисовала посреди задней стены тёмную панель и восемь пустых контуров карточек — поняла «интерфейс ставит туда витрину» буквально. Правка по art/style/style.md: удачную картинку правим EDIT MODE, а не рисуем заново. К выгрузке — design/ui/assets/art/souls/dust-shop.jpg, 1688×716",
+      "refs": [
+        "art/generated/souls-scene/dust-shop__nb2.jpg"
+      ],
+      "subject": "EDIT MODE — this overrides everything above: do not draw a new picture, edit the attached image. The attached image is the Dust Shop: tall shelves with jars and urns of glowing pale gold dust and small brass-bound reliquaries on both sides, broken mirror shards with turquoise edges on velvet stands, three hanging lamps of old gold under a stone vault, and at the bottom a counter with brass scales holding glowing dust, a purple velvet cloth with turquoise glass shards, a jar and a brass scoop. Keep the picture exactly as it is — every shelf, jar, reliquary, mirror shard, lamp, the vault, the counter and everything on it, the light, the colors and the painting style. Change only this: in the middle of the back wall there is a flat dark rectangular panel with eight empty rounded card outlines in a row — it is not part of the shop. Remove the panel and all eight outlines completely and paint in their place the back wall of the vault: old dark stone blocks in deep shadow, softly lit from above by the lamps and from below by faint turquoise light rising from the cracks in the floor, with a few motes of golden dust drifting in the air — calm, dim and empty. Nothing else changes."
+    }
+  ]
+}

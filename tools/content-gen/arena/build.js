@@ -2,12 +2,12 @@
    Черновик · предложение · ждёт автора. Все числа — демонстрация.
 
    Что делает:
-   1. Правила — rules.js (Эло целочисленной таблицей, K, асимметрия защиты, сброс, подбор, попытки, обновления, раунды, дивизионы,
-      Энериум топ-100).
+   1. Правила — rules.js (Эло целочисленной таблицей, K, асимметрия защиты, сброс, подбор, попытки, список — новый после каждого боя
+      и «Обновить» руками, раунды — из таблицы ядра, дивизионы, Энериум топ-100).
    2. Прогон — model.json (node model.js): таблица «рейтинг → место» сервера, лидеры, победы за неделю по профилям, выгода равной
-      атаки, ×1,7. Сверяет: пороги планок дают ту же планку обычному и увлечённому, что typical лутбоксов (EN_LOOTBOXES.modes);
-      выгода равной атаки — около нуля; плательщик против увлечённого при той же силе — не больше ×1,7 по победам и Энериуму;
-      обновления за Энериум не окупаются Энериумом топа.
+      атаки, ×1,7, сравнение с прежним правилом списка. Сверяет: пороги планок дают ту же планку обычному и увлечённому, что typical
+      лутбоксов (EN_LOOTBOXES.modes); выгода равной атаки — около нуля; плательщик против увлечённого при той же силе — не больше ×1,7
+      по победам и Энериуму; обновления за Энериум не окупаются Энериумом топа; бесплатных обновлений увлечённому хватает (предупреждение).
    3. Демо-сервер: соперники Арены (пять героев) и Лиги (три отряда по пять) из героев состава с наборами способностей — циклы
       по данным, уровни — по рейтингу соперника, доблесть — до личного максимума. Имена — из двух списков, без повторов.
       Сид — «арена-демо»: пересборка даёт те же байты.
@@ -36,13 +36,24 @@ const FILES = {
   doc: path.join(ROOT, 'docs', 'content', 'арена-и-лига.md'),
 };
 
+/* Закон Лиги (ADR-0031, п. 12): последнюю планку увлечённый берёт в части недель — доля недель, б. п., от и до. Прежде порог 40 побед при
+   23 у увлечённого не брался никогда */
+const LEAGUE_TOP_BP = [2000, 4000];
+let leagueTopBp = null;   // доля недель у увлечённого по прогону — в таблицу планок
+
 /* ================================ ДАННЫЕ ДЕМО-СЕРВЕРА ================================ */
 const DEMO = {
   seed: 'арена-демо',
-  /* соперники Арены: сколько по циклам, разброс рейтинга; уровень героя — base на рейтинге at, ± perPts рейтинга за уровень
-     (прогон ядра: около 30 очков Эло за уровень на 60-м), разброс героя ± spread. Предел — по уровню: до 50 — 0, до 150 — 1 */
-  arena: { cyc: [[2, 84], [3, 12]], r: [940, 1680], at: 1315, base: 58, perPts: 30, spread: 7, valorMax: 2, games: [30, 430] },
-  league: { cyc: [[2, 30]], r: [880, 1440], at: 1000, base: 52, perPts: 30, spread: 7, valorMax: 2, games: [20, 180] },   // games — боёв у соперника: от и до, для K
+  /* демо-аккаунт: место на сервере в середине недели и в конце прошлой. Его рейтинги — из таблицы «рейтинг → место» прогона
+     (server.demo), а не числом: сервер сдвигается с каждым прогоном — автообновление списка, состав героев, — а место остаётся */
+  acct: { place: 88, pastPlace: 95 },
+  /* соперники Арены: сколько по циклам, разброс рейтинга вокруг рейтинга демо-аккаунта (around), уровень героя — base на рейтинге
+     демо-аккаунта + atOff, ± perPts рейтинга за уровень (прогон ядра: около 30 очков Эло за уровень на 60-м), разброс героя ± spread.
+     Предел — по уровню: до 50 — 0, до 150 — 1. Рейтинги сервера идут за прогоном, соперники и их уровни относительно демо-аккаунта — те же */
+  /* valorMax — доблесть героев соперников: в цикле II её нет, только на пятом пределе (ADR-0031, п. 1); прежде — до 2.
+     base — средний уровень отряда демо-аккаунта: 11-й день цикла II, отряд на 150-м (ADR-0031, п. 17); прежде — 58, отряд конца цикла I */
+  arena: { cyc: [[2, 84], [3, 12]], around: [-363, 377], atOff: 12, base: 149, perPts: 30, spread: 7, valorMax: 0, games: [30, 430] },
+  league: { cyc: [[2, 30]], r: [880, 1440], at: 1000, base: 143, perPts: 30, spread: 7, valorMax: 0, games: [20, 180] },   // games — боёв у соперника: от и до, для K
   capByLim: [50, 150, 350],   // потолок уровня по пределу (§10.1) — как INV.hero.capByLim прототипа
   names: {
     adj: ['Тихий', 'Северный', 'Лунный', 'Светлый', 'Синий', 'Серый', 'Ночной', 'Пепельный', 'Каменный', 'Янтарный', 'Дальний', 'Старый',
@@ -56,7 +67,16 @@ const DEMO = {
 const RARITY = ['', 'обычная', 'редкая', 'уникальная', 'эпическая', 'древняя', 'первородная', 'вневременная'];
 
 /* ================================ СБОРКА ================================ */
-const loadJs = (files, names) => { const ctx = { console }; ctx.window = ctx; vm.createContext(ctx); for (const f of files) vm.runInContext(fs.readFileSync(f, 'utf8'), ctx, { filename: f }); return names.map(n => ctx[n]); };
+/* рейтинг на месте: наименьший рейтинг, у которого место по таблице «рейтинг → место» не ниже P (EnArena.placeOf с рейтингом не растёт) */
+function ratingAt(T, P) {
+  if (!T || !T.length) return null;
+  let lo = T[T.length - 1][0], hi = T[0][0];
+  if (A.placeOf(T, lo) <= P) return lo;
+  if (A.placeOf(T, hi) > P) return hi;
+  while (hi - lo > 1) { const m = (lo + hi) >> 1; if (A.placeOf(T, m) <= P) hi = m; else lo = m; }
+  return hi;
+}
+const loadJs =(files, names) => { const ctx = { console }; ctx.window = ctx; vm.createContext(ctx); for (const f of files) vm.runInContext(fs.readFileSync(f, 'utf8'), ctx, { filename: f }); return names.map(n => ctx[n]); };
 const fmt = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 const pctBp = bp => { const t = Math.floor((bp + 5) / 10), f = t % 10; return ((t - f) / 10) + (f ? ',' + f : '') + ' %'; };
 const sec1 = ms => { const t = Math.floor((ms + 50) / 100); return `${Math.floor(t / 10)},${t % 10} с`; };
@@ -96,18 +116,44 @@ function build() {
     const lg = need('league'), typL = LBX.modes.league.typical;
     const gotL = { free: planks(lg, MOD.league.prof.free.wins), fan: planks(lg, MOD.league.prof.fan.wins) };
     for (const k of ['free', 'fan']) if (gotL[k] !== typL[k].me) err.push(`Лига: ${k} берёт ${gotL[k]}-ю планку (${MOD.league.prof[k].wins} побед), а typical лутбоксов — ${typL[k].me}-ю`);
+    /* последняя планка Лиги — у увлечённого в части недель (ADR-0031, п. 12): доля недель, где побед не меньше порога, — хвост биномиального
+       распределения матчей недели при его доле побед; целыми, дробью на BigInt */
+    {
+      const P = MOD.league.prof.fan, top = lg[lg.length - 1], n = P.matches, w = BigInt(P.winBp), l = BigInt(A.BP - P.winBp);
+      let sum = 0n, cnk = 1n;
+      for (let k = 0; k <= n; k++) { if (k) cnk = cnk * BigInt(n - k + 1) / BigInt(k); if (k >= top) sum += cnk * w ** BigInt(k) * l ** BigInt(n - k); }
+      const bp = Number(sum * BigInt(A.BP) / BigInt(A.BP) ** BigInt(n));
+      leagueTopBp = bp;
+      if (bp < LEAGUE_TOP_BP[0] || bp > LEAGUE_TOP_BP[1]) err.push(`Лига: последнюю планку (${top} побед) увлечённый берёт в ${hund(bp)} % недель — цель ${LEAGUE_TOP_BP.map(hund).join('–')} %`);
+    }
+    /* ручное «Обновить» при автообновлении: бесплатных хватает увлечённому — он берёт их меньше, чем даёт неделя; иначе лимит решает
+       за игрока, и цену стоит пересмотреть */
+    const freeWeek = D.arena.refresh.free * MOD.meta.sim.server.days * 100;
+    if (S.prof.fan.frees * 100 >= freeWeek * 95) warn.push(`увлечённый берёт ${hund(S.prof.fan.frees)} бесплатных обновлений из ${hund(freeWeek)} за неделю — бесплатных не хватает`);
+    if (!MOD.cmp || MOD.cmp.auto === S.auto) err.push('model.json: нет сравнения с прежним правилом списка — пересчитать model.js');
+    /* платные обновления не окупаются — по смыслу: Энериум топа, который приносят покупки, меньше потраченного на них. Разница полос
+       «плательщик − увлечённый той же силы» — отдача покупок плюс шум групп: в полосе, где плательщики ничего не купили, она — чистый
+       шум и бывает в обе стороны. Поэтому сверх траты должна выйти не сама разница, а разница за вычетом запаса на шум — noiseSe
+       стандартных ошибок (enSe полосы). И то же по всем плательщикам вместе, с весом полосы по числу плательщиков: шум там меньше */
+    const Z = MOD.meta.sim.server.noiseSe;
+    if (!(Z >= 0) || S.bands.some(b => b.enSe == null)) err.push('model.json: нет шума полос (enSe, noiseSe) — пересчитать model.js');
+    let N = 0, G = 0, Sp = 0, V = 0;
     for (const b of S.bands) {
       if (b.payer.wins * 10 > b.fan.wins * 17) err.push(`×1,7: победы плательщика ${hund(b.payer.wins)} против ${hund(b.fan.wins)} при силе ${b.lo}–${b.hi}`);
       /* Энериум — где он заметен: от одного суточного минимума в неделю; ниже — прибавка не больше этого минимума */
       const minEn = D.enerium[D.enerium.length - 1][1] * 100;
       if (b.fan.en >= minEn ? b.payer.en * 10 > b.fan.en * 17 : b.payer.en - b.fan.en > minEn) err.push(`×1,7: Энериум плательщика ${hund(b.payer.en)} против ${hund(b.fan.en)} при силе ${b.lo}–${b.hi}`);
-      if (b.payer.en - b.fan.en > b.payer.spent) err.push(`обновления за Энериум окупаются: плательщик потратил ${hund(b.payer.spent)}, топ дал сверху ${hund(b.payer.en - b.fan.en)}`);
+      const gain = b.payer.en - b.fan.en, se = b.enSe || 0;
+      if (gain - Z * se > b.payer.spent) err.push(`обновления за Энериум окупаются при силе ${b.lo}–${b.hi}: плательщик потратил ${hund(b.payer.spent)}, топ дал сверху ${hund(gain)} при шуме ±${hund(se)}`);
+      N += b.payer.n; G += b.payer.n * gain; Sp += b.payer.n * b.payer.spent; V += b.payer.n * b.payer.n * se * se;
     }
+    if (N && G - Z * A.isqrt(V) > Sp) err.push(`обновления за Энериум окупаются у плательщиков в целом: потратили ${hund(Math.floor(Sp / N))}, топ дал сверху ${hund(Math.floor(G / N))}`);
   }
 
   /* ---------- демо-сервер: соперники ---------- */
   const rng = A.makeRng(A.seedOf(DEMO.seed));
-  const kitOf = h => { const d = h.team && h.team.draft; return (d && KITS.heroes[d]) || (XF && XF.heroes && XF.heroes[h.id]) ? true : false; };
+  /* набор — по id героя состава (kits.js, ADR-0031, п. 7: у всех 360), запасные — черновик и отряд недели Эхо: соперником может быть любой */
+  const kitOf = h => { const d = h.team && h.team.draft; return KITS.heroes[h.id] || (d && KITS.heroes[d]) || (XF && XF.heroes && XF.heroes[h.id]) ? true : false; };
   const clsOf = h => String(h.cls || '').split(' / ')[0].trim();
   const pool = c => RS.heroes.filter(h => h.c <= c && kitOf(h));
   const names = new Set();
@@ -125,11 +171,17 @@ function build() {
     return t.map(h => { const lvl = Math.max(1, L + rng(G.spread * 2 + 1) - G.spread); return [h.id, lvl, limOf(lvl), rng(Math.min(h.maxV, G.valorMax) + 1)]; });
   }
   const rateOf = G => G.r[0] + rng(G.r[1] - G.r[0] + 1);
+  /* места прогона и рейтинги демо-аккаунта на них; соперники Арены — вокруг его рейтинга */
+  const uniq = T => T.filter(([, p], i, a) => i === 0 || p !== a[i - 1][1]);
+  const place = S ? uniq(S.midPlace) : [], placeEnd = S ? uniq(S.endPlace || []) : [];
+  const acct = { rating: ratingAt(place, DEMO.acct.place), place: DEMO.acct.place, past: ratingAt(placeEnd, DEMO.acct.pastPlace), pastPlace: DEMO.acct.pastPlace };
+  if (acct.rating == null || acct.past == null) err.push('model.json: нет таблицы «рейтинг → место» — рейтинги демо-аккаунта не из чего взять');
+  const R0 = acct.rating || D.elo.start, GA = Object.assign({}, DEMO.arena, { r: [R0 + DEMO.arena.around[0], R0 + DEMO.arena.around[1]], at: R0 + DEMO.arena.atOff });
   const arena = [], league = [];
   let no = 0;
-  for (const [c, n] of DEMO.arena.cyc) for (let k = 0; k < n; k++) {
-    const r = rateOf(DEMO.arena);
-    arena.push({ id: 'a' + String(++no).padStart(3, '0'), n: nameOf(), c, r, g: DEMO.arena.games[0] + rng(DEMO.arena.games[1] - DEMO.arena.games[0]), f: team(DEMO.arena, c, r, new Set()) });
+  for (const [c, n] of GA.cyc) for (let k = 0; k < n; k++) {
+    const r = rateOf(GA);
+    arena.push({ id: 'a' + String(++no).padStart(3, '0'), n: nameOf(), c, r, g: GA.games[0] + rng(GA.games[1] - GA.games[0]), f: team(GA, c, r, new Set()) });
   }
   no = 0;
   for (const [c, n] of DEMO.league.cyc) for (let k = 0; k < n; k++) {
@@ -143,8 +195,6 @@ function build() {
   league.forEach(o => { o.t.forEach((f, i) => checkTeam(`${o.n}, отряд ${i + 1}`, f)); if (new Set(o.t.flat().map(x => x[0])).size !== 15) err.push(`${o.n}: в Лиге герой повторяется`); });
 
   /* ---------- места и лидеры: прогон ---------- */
-  const uniq = T => T.filter(([, p], i, a) => i === 0 || p !== a[i - 1][1]);
-  const place = S ? uniq(S.midPlace) : [], placeEnd = S ? uniq(S.endPlace || []) : [];
   const lgScale = x => Math.max(1, Math.floor(x * MOD.meta.sim.league.players / MOD.meta.sim.server.players));
   const leaguePlace = place.map(([r, p]) => [r, lgScale(p)]).filter(([, p], i, a) => i === 0 || p !== a[i - 1][1]);
   const lead = vals => vals.map(v => [nameOf(), v]);
@@ -157,19 +207,20 @@ function build() {
     rounds: MOD.calib.rounds, strength: MOD.calib.strength, puzzle: MOD.calib.puzzle, mirror: MOD.calib.mirror, pool: MOD.calib.pool,
     shifts: MOD.server.map(x => ({ shift: x.shift, eqGain: x.eqGain, drift: x.drift, rho: x.rhoBp, fan: x.prof.fan.r, free: x.prof.free.r })),
     prof: S.prof, bands: S.bands, league: MOD.league, players: MOD.meta.sim.server.players, seasons: MOD.meta.sim.server.seasons,
+    cmp: MOD.cmp ? { auto: MOD.cmp.auto, prof: MOD.cmp.prof, rho: MOD.cmp.rhoBp } : null,
   } : null;
 
   const data = {
     meta: { builder: 'tools/content-gen/arena/build.js', model: 'tools/content-gen/arena/model.json', seed: DEMO.seed },
-    bp: D.bp, elo: D.elo, arena: D.arena, league: D.league, enerium: D.enerium, season: D.season, server: { players: D.server.players, place, placeEnd, leaguePlace, leaguePlayers: MOD.meta.sim.league.players },
+    bp: D.bp, elo: D.elo, arena: D.arena, league: D.league, enerium: D.enerium, season: D.season, server: { players: D.server.players, place, placeEnd, leaguePlace, leaguePlayers: MOD.meta.sim.league.players, demo: acct },
     top, pool: { arena, league }, model,
   };
-  const tables = S ? mkTables(D, data, MOD, S) : {};
+  const tables = S ? mkTables(D, data, MOD, S, LBX) : {};
   return { data, tables, err, warn };
 }
 
 /* ================================ ТАБЛИЦЫ ЧЕРНОВИКА ================================ */
-function mkTables(D, data, MOD, S) {
+function mkTables(D, data, MOD, S, LBX) {
   const t = {}, row = cells => '| ' + cells.join(' | ') + ' |';
   const head = (h, a) => [row(h), row(h.map((_, i) => a && a[i] ? a[i] : '---'))].join('\n');
   const E = D.elo;
@@ -190,21 +241,29 @@ function mkTables(D, data, MOD, S) {
   t.shift = [head(['Сдвиг ожидания в пользу атакующего', 'Выгода равной атаки', 'Средний рейтинг к концу сезонов', 'Совпадение рейтинга и силы']),
     ...MOD.server.map(x => row([x.shift === D.elo.def.shift ? `${x.shift} — принято` : x.shift < 0 ? `${sgn(x.shift)} — буквально «+50 защитнику»` : String(x.shift), `${hund(x.eqGain)} рейтинга за атаку`, x.drift.map(fmt).join(' → '), pctBp(x.rhoBp)]))].join('\n');
   const PN = { free: 'обычный', fan: 'увлечённый', payer: 'плательщик' }, SP = MOD.meta.sim.server.prof;
-  t.prof = [head(['Профиль', 'Доля', 'Атак за неделю', 'Побед (медиана)', 'Доля побед', 'Энериум топа за неделю', 'Обновлений за Энериум', 'Энериума на обновления']),
-    ...Object.entries(S.prof).map(([k, x]) => row([PN[k], pctBp(SP[k].share), hund(x.att), `${hund(x.wins)} (${x.winMed})`, pctBp(x.winBp), hund(x.en), hund(x.refs), hund(x.spent)]))].join('\n');
+  t.prof = [head(['Профиль', 'Доля', 'Атак за неделю', 'Побед (медиана)', 'Доля побед', 'Энериум топа за неделю', 'Обновлений: бесплатно / за Энериум', 'Энериума на обновления']),
+    ...Object.entries(S.prof).map(([k, x]) => row([PN[k], pctBp(SP[k].share), hund(x.att), `${hund(x.wins)} (${x.winMed})`, pctBp(x.winBp), hund(x.en), `${hund(x.frees || 0)} / ${hund(x.refs)}`, hund(x.spent)]))].join('\n');
+  /* автообновление: тот же сервер при прежнем правиле списка (живёт до конца) и при новом (новый после каждого боя) */
+  if (MOD.cmp) {
+    const [was, now] = MOD.cmp.auto ? [S.prof, MOD.cmp.prof] : [MOD.cmp.prof, S.prof], ar = (a, b) => `${a} → ${b}`;
+    t.auto = [head(['Профиль', 'Побед за неделю: список до конца → новый после боя', 'Доля побед', 'Рейтинг к концу сезона', 'Обновлений руками за неделю: бесплатно + за Энериум', 'Энериума на обновления']),
+      ...Object.keys(S.prof).map(k => row([PN[k], ar(hund(was[k].wins), hund(now[k].wins)), ar(pctBp(was[k].winBp), pctBp(now[k].winBp)), ar(fmt(was[k].r), fmt(now[k].r)),
+        ar(`${hund(was[k].frees || 0)} + ${hund(was[k].refs)}`, `${hund(now[k].frees || 0)} + ${hund(now[k].refs)}`), ar(hund(was[k].spent), hund(now[k].spent))]))].join('\n');
+  }
   const minEn = D.enerium[D.enerium.length - 1][1] * 100;   // Энериум заметен — от одного суточного минимума в неделю
   const ratio = (a, b) => '×' + hund(Math.floor(a * 100 / Math.max(1, b)));
-  t.x17 = [head(['Сила, очков над средним', 'Увлечённый: рейтинг, место, побед, Энериум', 'Плательщик: рейтинг, место, побед, Энериум', 'Плательщик потратил', 'Отношение побед / Энериума']),
+  t.x17 = [head(['Сила, очков над средним', 'Увлечённый: рейтинг, место, побед, Энериум', 'Плательщик: рейтинг, место, побед, Энериум', 'Плательщик потратил', 'Энериум сверху — шум ±', 'Отношение побед / Энериума']),
     ...S.bands.map(b => row([`${b.lo}–${b.hi}`, `${fmt(b.fan.r)}, #${fmt(b.fan.place)}, ${hund(b.fan.wins)}, ${hund(b.fan.en)}`, `${fmt(b.payer.r)}, #${fmt(b.payer.place)}, ${hund(b.payer.wins)}, ${hund(b.payer.en)}`, hund(b.payer.spent),
+      `${b.payer.en > b.fan.en ? '+' : ''}${hund(b.payer.en - b.fan.en)} — ±${hund(b.enSe || 0)}`,
       `${ratio(b.payer.wins, b.fan.wins)} / ${b.fan.en >= minEn ? ratio(b.payer.en, b.fan.en) : b.payer.en > b.fan.en ? '+' + hund(b.payer.en - b.fan.en) + ' Энериума' : '—'}`]))].join('\n');
   const L = MOD.league;
   t.league = [head(['Лига', 'Значение']), row(['победа в матче, прямой порядок', pctBp(L.straightBp)]), row(['победа в матче, лучшая расстановка', pctBp(L.bestBp)]),
     row(['лучшая расстановка ставит слабейший отряд против их сильнейшего', pctBp(L.sacBp)]),
     ...Object.entries(L.prof).map(([k, x]) => row([`${PN[k]}: матчей и побед за неделю`, `${x.matches} и ${x.wins}`]))].join('\n');
-  const pk = m => [1, 2, 4, 8].map(x => D[m].plank * x);
-  t.planks = [head(['Режим', 'Планки побед за неделю', 'Обычный', 'Увлечённый']),
-    row(['Арена', pk('arena').join(' / '), wins(S.prof.free.winMed), wins(S.prof.fan.winMed)]),
-    row(['Лига', pk('league').join(' / '), wins(L.prof.free.wins), wins(L.prof.fan.wins)])].join('\n');
+  const pk = m => LBX.modes[m].layers.find(l => l.kind === 'plank' && !l.clan).rows.map(r => D[m].plank * r.x);
+  t.planks = [head(['Режим', 'Планки побед за неделю', 'Обычный', 'Увлечённый', 'Последняя планка у увлечённого — доля недель']),
+    row(['Арена', pk('arena').join(' / '), wins(S.prof.free.winMed), wins(S.prof.fan.winMed), '—']),
+    row(['Лига', pk('league').join(' / '), wins(L.prof.free.wins), wins(L.prof.fan.wins), leagueTopBp == null ? '—' : hund(leagueTopBp) + ' %'])].join('\n');
   t.place = [head(['Рейтинг в середине сезона', 'Место на сервере из ' + fmt(D.server.players), 'Энериум за сутки']),
     ...data.server.place.filter(([r]) => r <= 1600 && r >= 900 && r % 100 === 0).map(([r, p]) => row([fmt(r), '#' + fmt(p), String(A.dailyEn(D, p))]))].join('\n');
   t.enerium = [head(['Место на суточном срезе', 'Энериум']), row(['1', '100']), row(['2–10', '50']), row(['11–30', '25']), row(['31–100', '10'])].join('\n');
@@ -220,7 +279,8 @@ function render(data) {
    (model.json) и демо-сервера. Руками не править: пересборка затрёт правку.
    Черновик · предложение · ждёт автора. Числа — демонстрация, только целые; доли — в базисных пунктах (10 000 = 100 %).
    elo — Эло: таблица ожидания по разнице рейтингов, K, асимметрия защиты, сезонный сброс; arena, league — подбор, попытки,
-   обновления, предел раундов, порог первой планки побед, дивизионы Лиги; enerium — Энериум за место на суточном срезе;
+   список (refresh: auto — новый после каждого боя, free — бесплатных «Обновить» за сутки, price — платные), предел раундов — копия
+   таблицы ядра, порог первой планки побед, дивизионы Лиги; enerium — Энериум за место на суточном срезе;
    server — «рейтинг → место» сервера из прогона; top — лидеры; pool — соперники демо-сервера: [герой, уровень, предел, доблесть];
    model — итог прогона для UI-кита. Обоснование и таблицы — docs/content/арена-и-лига.md. В игре подбор, бой, рейтинг и награды
    решает сервер (§20, §34.1, §36.16). Ниже данных — алгоритм tools/content-gen/arena/elo.js как есть. */\n`;

@@ -20,13 +20,15 @@
 /* ================== данные экрана: демонстрация, не баланс ================== */
 const RT_DEMO = {
   seed: 'демо-странник',                 // сид игрока: в игре его выдаёт сервер
-  day: 371,                              // номер серверного дня: в его пуле у рабочих есть уникальный, у героев — ритуал на ночь
-  at: 9 * 3600000 + 40 * 60000,          // «сейчас» — 09:40 серверного дня, мс от его начала
+  day: 371,                              // номер серверного дня — сид пула: у рабочих есть уникальный, у героев — ритуал на ночь
+  at: 16 * 3600000 + 48 * 60000,         // «сейчас» — 16:48 серверного дня, мс от его начала: один календарь демо (ADR-0031, п. 17)
   artel: [1, 1, 1, 1, 1, 2, 2, 3],       // рабочие демо по редкостям: первая артель и трое из сундуков События
-  done: 50,                              // завершено ритуалов к демо-дню: счётчик S.rituals.done
-  /* слоты демо: готовый пришёл, пока вас не было, — у него письмо во Входящих; второй идёт. ago — сколько мс назад начат */
+  done: 65,                              // завершено ритуалов к 11-му дню цикла II: прогон ритуалов обычного — 5,9 в день
+  /* слоты демо: готовый пришёл, пока вас не было, — у него письмо во Входящих; второй идёт. ago — сколько мс назад начат.
+     Бригады набираются по времени старта: идущий начат раньше и взял лучших, готовый — из оставшихся, короче и уже кончился;
+     одна бригада в двух ритуалах разом не бывает (check_rituals.js) */
   slots: [
-    { st: 'ready', tab: 'work', r: 5, crew: 3, biome: 'b2', band: 'long', nm: 0, ago: 4 * 3600000 },
+    { st: 'ready', tab: 'work', r: 5, crew: 3, biome: 'b2', band: 'long', nm: 0, ago: 175 * 60000 },
     { st: 'run', tab: 'work', r: 6, crew: 3, biome: 'b3', band: 'long', nm: 1, ago: 3 * 3600000 },
   ],
   skip: [3600000, 3 * 3600000, 12 * 3600000],   // команда: перемотка времени
@@ -97,15 +99,16 @@ function rtState(s) {
   R.slots = Array.from({ length: rtSlotsN(s) }, () => ({ st: 'free' }));
   R.free = rtFreeN(s);
   rtFresh(s, 'work', false, true); rtFresh(s, 'hero', false, true);
-  /* демо: готовый и идущий ритуалы — тем же стартом сервера, только в прошлом */
-  const letters = [];
-  RT_DEMO.slots.forEach((D, k) => {
-    if (k >= R.slots.length) return;
-    const card = rtDemoCard(D), crew = R.artel.filter(w => !R.slots.some(x => x.st === 'run' && x.crew.includes(w.id))).sort((a, b) => b.r - a.r).slice(0, card.crew);
-    const t0 = R.now - D.ago, x = rtMake(s, card, crew.map(w => w.id), crew, t0);
+  /* демо: готовый и идущий ритуалы — тем же стартом сервера, только в прошлом. Бригада — лучшие рабочие, свободные в миг старта:
+     кто в ту минуту был в другом ритуале демо (он уже мог стать готовым), тот занят — у каждого ритуала своя бригада */
+  const letters = [], order = RT_DEMO.slots.map((D, k) => k).filter(k => k < R.slots.length).sort((a, b) => RT_DEMO.slots[b].ago - RT_DEMO.slots[a].ago);
+  for (const k of order) {   // по времени старта: раньше начатый набирает бригаду первым
+    const D = RT_DEMO.slots[k], t0 = R.now - D.ago, busy = new Set(R.slots.filter(x => x.st !== 'free' && x.kind === 'work' && x.t0 <= t0 && t0 < x.t1).flatMap(x => x.crew));
+    const card = rtDemoCard(D), crew = R.artel.filter(w => !busy.has(w.id)).sort((a, b) => b.r - a.r).slice(0, card.crew);
+    const x = rtMake(s, card, crew.map(w => w.id), crew, t0);
     if (D.st === 'ready') { x.st = 'ready'; letters.push(rtLetter(x)); }
     R.slots[k] = x;
-  });
+  }
   s.inbox = letters.concat((s.inbox || []).filter(m => !m.rit));
   return s;
 }
@@ -271,6 +274,11 @@ if (typeof addEventListener === 'function') addEventListener('en-render', () => 
 
 /* ================== вид ================== */
 const rtCrystal = (r, px = RT_VIEW.crystal) => `<span class="rt-cr" data-r="${r}" title="${RAR[r]}">${ICON('r' + r, px, RAR[r])}</span>`;
+/* рабочий артели — фигура (wkIcon, screens/art-icons.js) в кружке своей редкости с кристаллом; без арта — кристалл */
+function rtWorker(r, px = 30) {
+  const art = typeof wkIcon === 'function' ? wkIcon(px, '') : '';
+  return art ? `<span class="rt-wk" data-r="${r}" style="--px:${px}px" title="${RAR[r]} рабочий">${art}<i>${ICON('r' + r, Math.max(10, Math.floor(px * 2 / 5)), '')}</i></span>` : rtCrystal(r, px);
+}
 const rtChipTime = ms => `<span class="chip rt-time">${ic('hour')}${rtDur(ms)}</span>`;
 const rtChipCrew = n => `<span class="chip rt-crew" title="Участников: ${n}">${ic('users')}${n}</span>`;
 const rtUniqItem = b => biomeItems('unique', b)[0] || null;
@@ -390,7 +398,7 @@ Object.assign(OV, {
       ms = rtTime(card, crew);
       if (crew.length < card.crew) { ok = false; why = why || `${RT_WHY.workers()} Нужно ${card.crew}, свободно ${crew.length}.`; }
       who = `<span class="eyebrow">Бригада · ${card.crew}</span>
-        <div class="rt-crew-row">${crew.map(w => rtCrystal(w.r, 26)).join('')}${Array.from({ length: Math.max(0, card.crew - crew.length) }, () => `<span class="rt-cr none">${ic('users')}</span>`).join('')}
+        <div class="rt-crew-row">${crew.map(w => rtWorker(w.r)).join('')}${Array.from({ length: Math.max(0, card.crew - crew.length) }, () => `<span class="rt-cr none">${ic('users')}</span>`).join('')}
         <span class="rt-cut">${cut ? `−${cut / 100} % времени` : 'без ускорения'}</span></div>
         <p class="reason">Лучших свободных рабочих ставит сам ритуал: допуск — только число. Редкие рабочие ускоряют.</p>`;
     } else {
@@ -413,7 +421,7 @@ Object.assign(OV, {
     if (!x || x.st === 'free') return sheet('Ритуал', '<p class="faint">Слот свободен.</p>');
     const card = { tab: x.kind, r: x.r, ms: x.nominal, biome: x.biome, unique: x.unique };
     const crew = x.kind === 'hero' ? `<div class="rt-heroes">${x.crew.map(id => { const h = H(id); return h ? `<span class="rt-hero on static" data-r="${h.r}" title="${trEsc(h.name)}"><img src="${h.img}" alt="${trEsc(h.name)}"></span>` : ''; }).join('')}</div>`
-      : `<div class="rt-crew-row">${x.crew.map(id => { const w = R.artel.find(y => y.id === id); return w ? rtCrystal(w.r, 26) : ''; }).join('')}</div>`;
+      : `<div class="rt-crew-row">${x.crew.map(id => { const w = R.artel.find(y => y.id === id); return w ? rtWorker(w.r) : ''; }).join('')}</div>`;
     const body = `<div class="rt-sh-top" data-r="${x.r}">${rtCrystal(x.r, 30)}<span class="col" style="gap:4px"><b class="serif rt-sh-n">${x.n}</b><span class="row" style="gap:6px">${x.st === 'ready' ? `<span class="chip spirit">${ic('check')}готово</span>` : `<span class="chip">${ic('hour')}осталось <span class="num" data-rt-left="${x.uid}">${rtDur(rtLeft(x))}</span></span>`}</span></span></div>
       ${x.st === 'run' ? bar(Math.round((R.now - x.t0) * 100 / Math.max(1, x.ms)), 'sand lg') : ''}
       <span class="eyebrow">${x.kind === 'hero' ? 'Герои' : 'Бригада'} · ${x.crew.length}</span>${crew}
@@ -429,7 +437,7 @@ Object.assign(OV, {
       const all = R.artel.filter(w => w.r === r), sh = rtShards(r), cost = RTE.awaken(RT, r);
       if (!all.length && !sh) return '';
       const b = all.filter(w => busy.has(w.id)).length;
-      return `<div class="rt-arow" data-r="${r}">${rtCrystal(r, 24)}<span class="n"><b>${RAR[r]}</b><small>−${RT.rules.speed.perRBp * r / 100} % времени за участника${b ? ` · в ритуале ${b}` : ''}</small></span><b class="num rt-an">${all.length}</b>
+      return `<div class="rt-arow" data-r="${r}">${rtWorker(r, 28)}<span class="n"><b>${RAR[r]}</b><small>−${RT.rules.speed.perRBp * r / 100} % времени за участника${b ? ` · в ритуале ${b}` : ''}</small></span><b class="num rt-an">${all.length}</b>
         ${sh ? `<span class="rt-ash" title="Шарды: ${sh} из ${need}">${ic('gear')}<span class="num">${sh}/${need}</span></span><button class="btn sm${sh >= need ? ' go' : ''}" data-a="rtawaken" data-v="${op}:${r}" ${sh >= need && S.wallet.souls >= cost ? '' : 'disabled'}>Пробудить${costTag('souls', cost)}</button>` : '<span></span><span></span>'}</div>`;
     }).join('');
     const body = `<p class="rt-lore">Рабочие — обычные души тех, кто жил на Этериосе. В бой не ходят. Собираются из шардов, пробуждаются душами.</p>
@@ -543,7 +551,7 @@ function rtKitHtml() {
   const slots = [{ st: 'ready', uid: 'k1', n: 'Долгая смена', kind: 'work', r: 5 }, { st: 'run', uid: 'k2', n: 'Дозор у пролома', kind: 'hero', r: 4, t0: t0 - 3 * RT_HOUR, t1: t0 + RT_HOUR, ms: 4 * RT_HOUR }, { st: 'free' }]
     .map((x, k) => noop(rtSlotHtml(x, k).replace(/data-rt-left="[^"]*"/, ''))).join('');
   const ladder = [1, 2, 3, 4, 5, 6, 7].map(r => `<figure>${ICON('r' + r, 30, RAR[r])}<figcaption>${RAR[r]}<br><b class="num">${rtDur(TW.ms[r - 1])}</b> · <b class="num">${rtDur(TH.ms[r - 1])}</b></figcaption></figure>`).join('');
-  const speed = [1, 3, 5, 7].map(r => `<span class="rt-kit-sp">${rtCrystal(r, 22)}<b class="num">−${R.speed.perRBp * r / 100} %</b><small>${RTE.awaken(RT, r)} душ</small></span>`).join('');
+  const speed = [1, 3, 5, 7].map(r => `<span class="rt-kit-sp">${rtWorker(r, 30)}<b class="num">−${R.speed.perRBp * r / 100} %</b><small>${RTE.awaken(RT, r)} душ</small></span>`).join('');
   const sim = RT.sim && RT.sim[c], sh = (p, k) => sim && sim[p] ? `${sim[p].shareBp[k] / 100} %` : '—';
   return `<section class="k-box rt-kit" style="grid-column:1/-1" id="kitRituals"><h3>Ритуалы и рабочие</h3>
     <p class="k-note">Офлайн-доход: поставил — забрал. Слоты общие на две вкладки, карточка — лот дневного пула. Редкость ритуала — длительность: рабочие ${rtDur(TW.ms[0])}–${rtDur(TW.ms[6])}, герои вдвое дольше. Провала нет, награда решена при старте. Души — только у героев.${TM(' §19; данные — design/ui/rituals.js, калькулятор — tools/content-gen/rituals/build.js, черновик — docs/content/ритуалы.md, экран — screens/rituals.js.')}</p>
@@ -556,7 +564,7 @@ function rtKitHtml() {
       <div class="k-air-r"><b>Рабочие ускоряют</b><div class="row" style="gap:12px;flex-wrap:wrap">${speed}</div><small>−${R.speed.perRBp / 100} % × редкость за участника, не больше −${R.speed.capBp / 100} %. Пробуждение — души, заметно дешевле героя.</small></div>
       <div class="k-air-r"><b>Сбор</b><div class="rt-kit-fx">${RT_GLASS}</div><small>Часы переворачиваются, награда поднимается по одной, потом — сводка. Итог выдан до анимации; нажатие — сразу итог.</small></div>
     </div>
-    ${TM(`<p class="k-note">Прогон калькулятора, цикл ${ROMAN[c]}: ритуалы обычного — ${sh('o', 'gold')} золота, ${sh('o', 'souls')} душ и ${sh('o', 'basics')} базовых его забегов в день; увлечённого — ${sh('e', 'souls')} душ. Плательщик роллами за Энериум почти не выигрывает: выбор, а не время. Сетка: рабочие ${TW.ms.map(rtDur).join(' / ')}; бригада ${TW.crew.lo.map((x, i) => x === TW.crew.hi[i] ? x : x + '–' + TW.crew.hi[i]).join(' / ')}; герои за час — ${TH.cur.map(([k, n]) => CUR[k].n.toLowerCase() + ' ' + n).join(', ')} × цикл; рабочие — ${TW.basics} базовых за полчаса, ключ — с эпической за каждые 2 ч.</p>`)}
+    ${TM(`<p class="k-note">Прогон калькулятора, цикл ${ROMAN[c]}: ритуалы обычного — ${sh('o', 'gold')} золота, ${sh('o', 'souls')} душ и ${sh('o', 'basics')} базовых его забегов в день; увлечённого — ${sh('e', 'souls')} душ. Плательщик роллами за Энериум почти не выигрывает: выбор, а не время. Сетка: рабочие ${TW.ms.map(rtDur).join(' / ')}; бригада ${TW.crew.lo.map((x, i) => x === TW.crew.hi[i] ? x : x + '–' + TW.crew.hi[i]).join(' / ')}; герои за ${TH.curH || 1} ч — ${TH.cur.map(([k, n]) => CUR[k].n.toLowerCase() + ' ' + n).join(', ')} × цикл; рабочие — ${TW.basics} базовых за полчаса, ключ — с эпической за каждые 2 ч.</p>`)}
   </section>`;
 }
 let rtKitWatch = false;

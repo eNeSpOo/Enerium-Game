@@ -16,15 +16,22 @@
 
 /* ================== данные: демонстрация, не баланс ================== */
 const LV_DATA = {
-  /* места витрины: сколько, валюта, пул — [ярус, вес, количество в товаре]. §14.2 — десять товаров, часть за золото, часть за Энериум */
+  /* места витрины: сколько, валюта, пул — [ярус, вес, количество в товаре]. §14.2 — десять товаров, часть за золото, часть за Энериум.
+     Места за Энериум — ключи ремёсел связкой и изредка уникальный ресурс: крафтовых находок в лавке нет, их источник — крафтовые биомы
+     (ADR-0031, п. 10). grow — сюда ложатся товары сверх базы «Свитка ассортимента» (a18) */
   slots: [
-    { n: 8, cur: 'gold', pool: [['basic', 60, 20], ['key', 26, 2], ['craftres', 14, 3]] },
-    { n: 2, cur: 'enerium', pool: [['find', 90, 1], ['unique', 10, 1]] },
+    { n: 8, cur: 'gold', grow: true, pool: [['basic', 60, 20], ['key', 26, 2], ['craftres', 14, 3]] },
+    { n: 2, cur: 'enerium', pool: [['key', 90, 3], ['unique', 10, 1]] },
   ],
-  uniqueMax: 1,                                                     // §14.2: уникальный ресурс — редко и по одному
-  enerium: { find: [20, 30, 40, 50, 60, 70], unique: [30, 45, 60, 75, 90, 105] },   // цена в Энериуме по циклу предмета — заглушка (прежние 30 и 45)
+  uniqueMax: 1,                                                     // §14.2: уникальный ресурс — редко и по одному на витрине
+  uniqueWeek: 1,                                                    // §14.2, ADR-0031, п. 10: уникальных — не больше одного в неделю на игрока, счёт — «сервер»
+  enerium: { key: [20, 30, 40, 50, 60, 70], unique: [30, 45, 60, 75, 90, 105] },   // цена в Энериуме по циклу предмета — заглушка (связка ключей — по прежней цене находки)
   autoSec: 8 * 3600,                                                // §14.2: новые товары раз в 8 часов
-  refresh: { free: 2, paid: [20, 30, 40, 60, 80] },                 // обновлений в день: бесплатных; дальше — цена каждого по порядку, их число — лимит
+  /* обновлений в день: бесплатные и ассортимент — из данных артефактов (wanderer.js, §14.1): «Колокол лавочника» a19 — бесплатных
+     обновлений base + step × уровень, «Свиток ассортимента» a18 — товаров base + step × уровень; здесь их чисел нет. paid — цена
+     каждого платного обновления по порядку, их число — лимит */
+  art: { size: 'a18', free: 'a19' },
+  refresh: { paid: [20, 30, 40, 60, 80] },
   demo: { next: 5 * 3600 + 42 * 60, gen: 48 },                       // демо: до новых товаров; номер витрины — та, где видны все ярусы пула
   view: { step: 60, just: 1200 },                                   // вид: шаг появления карточек после обновления; «куплено» светится, мс
 };
@@ -37,13 +44,30 @@ const lvNow = () => { try { return Math.round(performance.now()); } catch (_) { 
 const lvOp = () => 'lv' + S.lv.seq;   // номер следующей операции: его несут кнопки «Купить» и «Обновить»
 /* цена товара: за золото — минимальная рынка × количество, за Энериум — из данных витрины */
 const shopCost = g => g[2] === 'gold' ? ['gold', mkMin(g[0]) * g[1]] : [g[2], g[3] || 0];
+/* артефакт лавки (wanderer.js): base + step × уровень; не куплен или без уровней — base. Без данных артефактов — null */
+const lvArt = id => (window.EN_WANDERER && EN_WANDERER.art && EN_WANDERER.art.list.find(a => a.id === id)) || null;
+const lvArtVal = (id, s = S) => { const a = lvArt(id); if (!a || !Number.isInteger(a.base)) return null; const L = s && s.wn && s.wn.art ? s.wn.art[id] : null; return a.base + a.step * Math.max(0, L || 0); };
+/* бесплатных обновлений в день — «Колокол лавочника»; осталось сегодня — минус потраченные (S.lv.fu) */
+const lvFreeN = (s = S) => { const v = lvArtVal(LV_DATA.art.free, s); return v == null ? 0 : v; };
+const lvFree = () => Math.max(0, lvFreeN() - (S.lv.fu || 0));
+/* места витрины: база LV_DATA.slots, товары сверх базы «Свитка ассортимента» — в место grow */
+function lvSlots(s = S) {
+  const base = LV_DATA.slots.reduce((a, sl) => a + sl.n, 0), v = lvArtVal(LV_DATA.art.size, s), extra = v == null ? 0 : Math.max(0, v - base);
+  return LV_DATA.slots.map(sl => sl.grow ? Object.assign({}, sl, { n: sl.n + extra }) : sl);
+}
+/* неделя счёта уникальных — неделя расы (S.week.race): новая неделя — новый счёт */
+const lvWeek = () => String(S.week.race);
+const lvUniqLeft = () => { const U = S.lv.uw; return Math.max(0, LV_DATA.uniqueWeek - (U && U.wk === lvWeek() ? U.n : 0)); };
+/* купленное в лавке за Энериум помечено (S.lv.en: предмет → штук) и на рынок не выставляется: сколько таких штук в запасах сейчас.
+   Потраченное в крафте уходит сначала из свободных — помеченных не больше, чем лежит. Его спрашивает «сервер» рынка (index.html) */
+function lvBound(id) { const n = S.lv && S.lv.en ? S.lv.en[id] || 0 : 0; return Math.max(0, Math.min(n, BAG.qty(id))); }
 const LV_SRV = {
   seed: (gen, cyc) => EB.seedOf(`лавка|${cyc}|${gen}`),   // заглушка серверного сида витрины
   pool: (tier, cyc) => EN_RECIPES.items.filter(it => !it.team && it.tier === tier && (it.pool || it.cyc <= cyc)),
-  roll(gen, cyc) {
+  roll(gen, cyc, slots = lvSlots()) {
     const rng = EB.makeRng(LV_SRV.seed(gen, cyc)), out = [], used = new Set();
     let uniq = 0;
-    for (const sl of LV_DATA.slots) for (let k = 0; k < sl.n; k++) {
+    for (const sl of slots) for (let k = 0; k < sl.n; k++) {
       const opts = sl.pool.map(([t, w, q]) => ({ t, w, q, list: LV_SRV.pool(t, cyc).filter(it => !used.has(it.id)) }))
         .filter(o => o.list.length && (o.t !== 'unique' || uniq < LV_DATA.uniqueMax));
       if (!opts.length) break;
@@ -67,8 +91,11 @@ const LV_SRV = {
     if (S.sold.includes(i)) return { refuse: 'sold' };
     const [c, p] = shopCost(g);
     if (!(p > 0)) return { refuse: 'none' };
+    if (it.tier === 'unique' && !lvUniqLeft()) return { refuse: 'uweek' };   // уникальный — не больше одного в неделю на игрока
     if ((S.wallet[c] || 0) < p) return { refuse: 'money', c, p };
     S.wallet[c] -= p; BAG.add(g[0], g[1]); S.sold.push(i);
+    if (it.tier === 'unique') { const U = L.uw && L.uw.wk === lvWeek() ? L.uw : (L.uw = { wk: lvWeek(), n: 0 }); U.n++; }
+    if (c === 'enerium') L.en[g[0]] = (L.en[g[0]] || 0) + g[1];   // за Энериум — помечено: на рынок не выставить
     const res = { op, i, gen, id: g[0], q: g[1], c, p };
     L.seq++; L.buys++; V[op] = res;
     return { res };
@@ -78,14 +105,14 @@ const LV_SRV = {
     const L = S.lv, V = L.ops, R = LV_DATA.refresh;
     if (V[op]) return { again: true, res: V[op] };
     let cost = 0;
-    if (how === 'free') { if (L.free < 1) return { refuse: 'free' }; }
+    if (how === 'free') { if (lvFree() < 1) return { refuse: 'free' }; }
     else {
-      if (L.free > 0) return { refuse: 'free-left' };
+      if (lvFree() > 0) return { refuse: 'free-left' };
       if (L.paid >= R.paid.length) return { refuse: 'limit' };
       cost = R.paid[L.paid];
       if (S.wallet.enerium < cost) return { refuse: 'money', c: 'enerium', p: cost };
     }
-    if (how === 'free') L.free--; else { S.wallet.enerium -= cost; L.paid++; }
+    if (how === 'free') L.fu = (L.fu || 0) + 1; else { S.wallet.enerium -= cost; L.paid++; }
     L.gen++; S.shop = LV_SRV.roll(L.gen, S.acc.cycle); S.sold = [];
     const res = { op, how, cost, gen: L.gen };
     L.seq++; V[op] = res;
@@ -98,6 +125,7 @@ const LV_REFUSE = {
   stale: 'Товары уже сменились — откройте товар заново',
   none: 'Такого товара нет',
   sold: 'Этот товар уже куплен',
+  uweek: 'Уникальный ресурс — один в неделю: следующий — с новой неделей',
   free: 'Бесплатные обновления на сегодня закончились',
   'free-left': 'Сначала — бесплатные обновления',
   limit: 'Обновления на сегодня закончились',
@@ -129,7 +157,7 @@ function lvCard(g, i, o = {}) {
 }
 /* «Обновить»: пока есть бесплатные — бесплатно и сколько осталось; дальше — цена в Энериуме; лимит — кнопка недоступна */
 function lvRefBtn(o = {}) {
-  const L = S.lv, R = LV_DATA.refresh, free = o.free != null ? o.free : L.free, paid = o.paid != null ? o.paid : L.paid, act = o.kit ? '' : ` data-a="lvref" data-v="${lvOp()}"`;
+  const L = S.lv, R = LV_DATA.refresh, free = o.free != null ? o.free : lvFree(), paid = o.paid != null ? o.paid : L.paid, act = o.kit ? '' : ` data-a="lvref" data-v="${lvOp()}"`;
   if (free > 0) return `<button class="btn sm lv-ref"${act}>${ic('swap')}Обновить<span class="lv-free">бесплатно · ${fmt(free)}</span></button>`;
   if (paid < R.paid.length) return `<button class="btn sm lv-ref"${act}>${ic('swap')}Обновить${costTag('enerium', R.paid[paid])}</button>`;
   return `<button class="btn sm lv-ref" disabled title="Обновления на сегодня закончились">${ic('swap')}Обновить</button>`;
@@ -156,7 +184,7 @@ Object.assign(OV, {
   lvbuy(o) {
     const i = +o.arg, g = S.shop[i], it = g && BAG.item(g[0]);
     if (!it || o.gen !== S.lv.gen) return sheet('Товар', `<p class="reason">Товары уже сменились. Откройте товар на витрине заново.</p>`, '<button class="btn go" data-a="close">Понятно</button>');
-    const [c, p] = shopCost(g), sold = S.sold.includes(i), lack = (S.wallet[c] || 0) < p, hide = itTeam(it);
+    const [c, p] = shopCost(g), sold = S.sold.includes(i), lack = (S.wallet[c] || 0) < p, hide = itTeam(it), week = it.tier === 'unique' && !sold && !lvUniqLeft();
     const T = EN_RECIPES.tiers[it.tier] || { n: '' }, sp = it.spec ? it.spec.split('+').map(x => EN_RECIPES.specs[x] ? EN_RECIPES.specs[x].n.toLowerCase() : '').filter(Boolean).join(' + ') : '';
     const uses = hide ? [] : BAG.knownUses(it.id).filter(Boolean);
     const head = `<div class="lv-sh"><span class="lv-big" data-r="${it.r}">${hide ? ic('lock') : trIcon(it)}<b class="num">×${fmt(g[1])}</b></span>
@@ -164,11 +192,12 @@ Object.assign(OV, {
       <span class="g-spacer"></span><div class="stat lv-stock"><b>${fmt(BAG.qty(it.id))}</b><small>в запасах</small></div></div>`;
     const lore = hide ? '' : foldLore(trEsc(it.lore));
     const use = uses.length ? `<p class="lv-use"><span class="eyebrow">Нужен в рецептах</span>${uses.map(r => trEsc(r.n)).join(', ')}</p>` : '';
-    const deal = sold ? `<p class="reason">Куплено. Новые товары — через ${dur(S.lv.next)}.</p>` : lvDeal(c, p);
-    const note = TM(`Операция ${trEsc(String(o.v || '').split(':')[1] || '')}, витрина ${S.lv.gen}: сервер проверит витрину и кошелёк, спишет цену и положит товар в запасы. Повтор номера ничего не делает. Цена ${c === 'gold' ? 'за золото — минимальная рынка × количество' : 'в Энериуме — LV_DATA.enerium, заглушка'}.`, 'p', 'reason');
+    const deal = sold ? `<p class="reason">Куплено. Новые товары — через ${dur(S.lv.next)}.</p>` : week ? `<p class="reason warn">${LV_REFUSE.uweek}.</p>` : lvDeal(c, p);
+    const bound = !sold && c === 'enerium' ? '<p class="reason">Купленное за Энериум остаётся у вас: на рынок его не выставить.</p>' : '';
+    const note = TM(`Операция ${trEsc(String(o.v || '').split(':')[1] || '')}, витрина ${S.lv.gen}: сервер проверит витрину, недельный счёт уникальных и кошелёк, спишет цену и положит товар в запасы; купленное за Энериум помечено (S.lv.en) — рынок его не примет. Повтор номера ничего не делает. Цена ${c === 'gold' ? 'за золото — минимальная рынка × количество' : 'в Энериуме — LV_DATA.enerium, заглушка'}.`, 'p', 'reason');
     const foot = sold ? '<button class="btn go" data-a="close">Закрыть</button>'
-      : `<button class="btn ghost" data-a="close">Отмена</button><button class="btn go" data-a="buydo" data-v="${trEsc(o.v || '')}"${lack ? ' disabled' : ''}>Купить${costTag(c, p)}</button>`;
-    return sheet('Товар', `${head}${lore}${use}${deal}${note}`, foot);
+      : `<button class="btn ghost" data-a="close">Отмена</button><button class="btn go" data-a="buydo" data-v="${trEsc(o.v || '')}"${lack || week ? ' disabled' : ''}>Купить${costTag(c, p)}</button>`;
+    return sheet('Товар', `${head}${lore}${use}${deal}${bound}${note}`, foot);
   },
   /* обновление за Энериум: цена дня, остаток, сколько ещё можно сегодня */
   lvref(o) {
@@ -181,14 +210,15 @@ Object.assign(OV, {
   },
   /* как устроена лавка: правила §14.2 словами игрока; служебное — команде */
   lvinfo() {
-    const R = LV_DATA.refresh, n = LV_DATA.slots.reduce((a, s) => a + s.n, 0), by = c => LV_DATA.slots.filter(s => s.cur === c).reduce((a, s) => a + s.n, 0);
+    const R = LV_DATA.refresh, P = lvSlots(), n = P.reduce((a, s) => a + s.n, 0), by = c => P.filter(s => s.cur === c).reduce((a, s) => a + s.n, 0), fN = lvFreeN();
     const li = [
       `${fmt(n)} товаров: ${fmt(by('gold'))} за золото, ${fmt(by('enerium'))} за Энериум. Каждый продаётся один раз, покупка сразу в запасах.`,
-      `Новые товары приходят раз в ${fmt(Math.floor(LV_DATA.autoSec / 3600))} часов. Раньше — «Обновить»: ${fmt(R.free)} ${plural(R.free, 'раз', 'раза', 'раз')} в день бесплатно, дальше за Энериум — до ${fmt(R.paid.length)} ${plural(R.paid.length, 'раза', 'раз', 'раз')}, каждое дороже.`,
-      'Базовые ресурсы, ключи ремёсел и ресурсы руин — за золото, по самой низкой цене рынка. Находки и уникальные ресурсы боссов — за Энериум; уникальный бывает редко и по одному.',
+      `Новые товары приходят раз в ${fmt(Math.floor(LV_DATA.autoSec / 3600))} часов. Раньше — «Обновить»: ${fN ? `${fmt(fN)} ${plural(fN, 'раз', 'раза', 'раз')} в день бесплатно, дальше` : 'только'} за Энериум — до ${fmt(R.paid.length)} ${plural(R.paid.length, 'раза', 'раз', 'раз')}, каждое дороже.`,
+      `Базовые ресурсы, ключи ремёсел и ресурсы руин — за золото, по самой низкой цене рынка. За Энериум — ключи ремёсел связкой и уникальные ресурсы боссов: уникальный бывает редко, по одному и не больше ${fmt(LV_DATA.uniqueWeek)} в неделю.`,
+      'Купленное за Энериум остаётся у вас: на рынок его не выставить.',
       'С новым циклом в лавке появляются его ресурсы.',
     ];
-    const team = TM(`Пул и веса — LV_DATA.slots, витрина — LV_SRV.roll на сиде витрины (заглушка серверного). Руны пределов лавка не продаёт (ADR-0014). Цены в Энериуме — заглушка. Артефакты «+2 товара в пуле лавки» и «+1 бесплатное обновление» — показ, в прототипе не прибавляются (§2.8).`, 'p', 'reason');
+    const team = TM(`Пул и веса — LV_DATA.slots, витрина — LV_SRV.roll на сиде витрины (заглушка серверного). Руны пределов лавка не продаёт (ADR-0014), крафтовых находок — тоже: их источник — крафтовые биомы (ADR-0031, п. 10). Цены в Энериуме — заглушка. Артефакты — данные wanderer.js: «Свиток ассортимента» (a18) — товаров ${fmt(n)}, «Колокол лавочника» (a19) — бесплатных обновлений ${fmt(fN)}. Уникальных за неделю — счёт S.lv.uw, купленное за Энериум — S.lv.en.`, 'p', 'reason');
     return sheet('Лавка', `<ul class="lv-rules">${li.map(x => `<li>${x}</li>`).join('')}</ul>${team}`);
   },
 });
@@ -214,11 +244,11 @@ Object.assign(ACT, {
   /* «Обновить»: бесплатное — сразу; за Энериум — подтверждение цены */
   lvref(v) {
     const L = S.lv, op = v || lvOp();
-    if (L.free > 0) {
+    if (lvFree() > 0) {
       const x = LV_SRV.refresh(op, 'free'); if (x.again) return;
       if (x.refuse) return toast(LV_REFUSE[x.refuse]);
       S.lv.fresh = lvNow(); S.overlay = null;
-      return toast(`Товары обновлены · бесплатно ещё ${fmt(S.lv.free)}`);
+      return toast(`Товары обновлены · бесплатно ещё ${fmt(lvFree())}`);
     }
     if (L.paid >= LV_DATA.refresh.paid.length) return toast(LV_REFUSE.limit);
     open('lvref', '', { op });
@@ -240,9 +270,9 @@ function lvKitHtml() {
   const G = S.shop, gi = G.findIndex(g => g[2] === 'gold'), ei = G.findIndex(g => g[2] === 'enerium');
   const cards = [[gi, {}, 'за золото'], [ei, {}, 'за Энериум'], [gi, { sold: true }, 'куплено'], [ei, { lack: true }, 'не хватает']]
     .filter(([i]) => i >= 0).map(([i, o, t]) => `<figure class="lv-kf">${lvCard(G[i], i, Object.assign({ kit: true }, o))}<figcaption>${t}</figcaption></figure>`).join('');
-  const R = LV_DATA.refresh, refs = [[{ free: R.free }, 'бесплатно'], [{ free: 0, paid: 0 }, 'за Энериум'], [{ free: 0, paid: R.paid.length }, 'лимит дня']]
+  const R = LV_DATA.refresh, refs = [[{ free: Math.max(1, lvFreeN()) }, 'бесплатно'], [{ free: 0, paid: 0 }, 'за Энериум'], [{ free: 0, paid: R.paid.length }, 'лимит дня']]
     .map(([o, t]) => `<figure class="lv-kf">${lvRefBtn(Object.assign({ kit: true }, o))}<figcaption>${t}</figcaption></figure>`).join('');
-  const cyc = S.acc.cycle, rows = LV_DATA.slots.map(sl => sl.pool.map(([t, w, q]) => {
+  const cyc = S.acc.cycle, rows = lvSlots().map(sl => sl.pool.map(([t, w, q]) => {
     const n = LV_SRV.pool(t, cyc).length, tn = (EN_RECIPES.tiers[t] || { n: t }).n;
     const price = sl.cur === 'gold' ? 'мин. рынка × кол-во' : (LV_DATA.enerium[t] || []).join(' / ');
     return `<tr><td>${tn}</td><td class="n">${w}</td><td class="n">${q}</td><td>${sl.cur === 'gold' ? 'золото' : 'Энериум'}</td><td class="n">${n}</td><td>${price}</td></tr>`;
@@ -257,11 +287,13 @@ KIT_EXTRA.push({ html: lvKitHtml });
 
 /* ================== регистрация, состояние, срок ================== */
 CRAFT_SEGS.shop = lvView;
-/* S.lv: gen — номер витрины; next — секунд до новых товаров; free и paid — обновления дня; ops и seq — операции с номером;
-   buys — куплено всего; fresh — когда обновили (карточки выходят по одной); just — что куплено только что */
+/* S.lv: gen — номер витрины; next — секунд до новых товаров; fu и paid — бесплатных и платных обновлений сегодня (бесплатных в день —
+   «Колокол лавочника», lvFreeN); ops и seq — операции с номером; buys — куплено всего; uw — уникальных за неделю { wk, n };
+   en — купленное за Энериум, предмет → штук (на рынок не выставить); fresh — когда обновили (карточки выходят по одной);
+   just — что куплено только что */
 function lvState(s) {
-  s.lv = { gen: LV_DATA.demo.gen, next: LV_DATA.demo.next, free: LV_DATA.refresh.free, paid: 0, ops: {}, seq: 1, buys: 0, fresh: null, just: null };
-  s.shop = LV_SRV.roll(s.lv.gen, s.acc.cycle); s.sold = [];
+  s.lv = { gen: LV_DATA.demo.gen, next: LV_DATA.demo.next, fu: 0, paid: 0, ops: {}, seq: 1, buys: 0, uw: null, en: {}, fresh: null, just: null };
+  s.shop = LV_SRV.roll(s.lv.gen, s.acc.cycle, lvSlots(s)); s.sold = [];
   return s;
 }
 const lvInitBase = initialState;

@@ -133,7 +133,8 @@ for (const cy of CYC) {
     lore: k === 1 ? 'Десять рун своего цикла пробивают предел.' : k === 5 ? 'Пятая руна — самая редкая.' : 'Три младшие руны перековываются в одну старшую.',
     src: [`Рунный страж «${A.guard}» · ${C.GUARD.limits.runesPerKill} руны за победу, предел ${ROMAN[k]} — ${pct(W[k - 1])}`].concat(k > 1 ? [`Мастерская · три руны предела ${ROMAN[k - 1]}`] : []) });
   addItem({ id: `vs${c}`, n: `Осколок доблести · цикл ${R}`, cyc: c, b: B.id, tier: 'vshard', r: 3, glyph: 'V', team,
-    lore: 'Сто осколков собираются в одну руну доблести.', src: [`Рунный страж «${B.guard}» · 1–10 осколков за победу`] });
+    lore: 'Сто осколков собираются в одну руну доблести.',
+    src: [`Рунный страж «${B.guard}» · ${C.GUARD.valor.shardsBp[0][0]}–${C.GUARD.valor.shardsBp[C.GUARD.valor.shardsBp.length - 1][0]} осколков за победу`] });
   addItem({ id: `vr${c}`, n: `Руна доблести · цикл ${R}`, cyc: c, b: null, tier: 'valor', r: 4, glyph: 'V', team,
     lore: 'Одна руна — одна доблесть: +30 % к силе и новая глава героя.', src: ['Мастерская · из 100 осколков'] });
   for (let k = 2; k <= 5; k++) addRecipe({ id: `r_rn${c}_${k}`, cyc: c, n: `Руна предела ${ROMAN[k]} · цикл ${R}`, kind: 'rune', out: [`rn${c}_${k}`, 1],

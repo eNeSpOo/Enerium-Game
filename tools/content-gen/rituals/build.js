@@ -95,7 +95,12 @@ const TABS = {
     unitMs: H,
     ms: [1, 2, 3, 4, 6, 8, 12].map(h => h * H),               // 1 / 2 / 3 / 4 / 6 / 8 / 12 ч
     crew: { lo: [1, 1, 2, 2, 3, 3, 4], hi: [1, 2, 2, 3, 3, 4, 5] },
-    cur: [['gold', 75], ['spirit', 150], ['souls', 2]],      // за час × цикл аккаунта на старте; золото — половина духа, как в биомах (ADR-0014)
+    /* награда — за curH часов × цикл аккаунта на старте, вниз до целого; золото — половина духа, как в биомах (ADR-0014).
+       Души — 18 за 10 ч, а не 2 в час (ADR-0031): с реальным отрядом забеги обычного дают меньше душ, и при 2 в час ритуалы давали
+       13,1 % душ его забегов в цикле II и 13,8 % в цикле III — выше цели 13 % (TARGET.shareO). Шаг «за 10 ч» — чтобы ручка была
+       мельче целой души в час; золото и дух — прежние 75 и 150 в час */
+    curH: 10,
+    cur: [['gold', 750], ['spirit', 1500], ['souls', 18]],
     names: [
       ['Малый дозор', 'Слово у порога', 'Счёт песка', 'Смена караула'],
       ['Дозор у пролома', 'Проводы вниз', 'Тихий караул', 'Свеча у часов'],
@@ -119,7 +124,8 @@ const TEXT = {
    может стоять в ритуалах (у увлечённого — без трёх отрядов забегов). Событие: личные и клановые планки недели. */
 const SIM = {
   seeds: 12,
-  days: { 2: 14, 3: 21, 4: 21, 5: 21, 6: 21 },   // capacity.json: цикл II — 14 дней, III — 21; дальше — как III
+  /* дней в цикле — не здесь: одна длина на все калькуляторы, capacity.json (cycleDays: II — прогон темпа biomes/pace.json, III — sets.py);
+     IV–VI — как последний записанный, III, по образцу echo.py (TEMPLATE). Функция daysOf */
   cycles: [2, 3, 4, 5, 6],
   prof: {
     o: { n: 'обычный', cap: 'o', visits: [8, 23], paid: 0, heroes: [12, 18, 24, 30, 36], event: 'free', craft: 'free' },
@@ -240,11 +246,16 @@ function craftWeek(I, c, who) {
 /* ================================ ПРОГОН ================================ */
 
 const cycIdx = c => c - SIM.cycles[0];
+/* дней в цикле c — capacity.json (cycleDays); циклов дальше записанных — как последний записанный (III), по образцу echo.py */
+function daysOf(I, c) {
+  const D = I.cap.cycleDays || {}, k = Object.keys(D).map(Number).filter(x => x <= c).sort((a, b) => a - b).pop();
+  return k == null ? 0 : +D[k];
+}
 function artLv(D, k, c) { const a = D.art[k]; return a ? Math.max(0, Math.min(a.lv, c - a.from + 1)) : 0; }   // один уровень за цикл (wnCap)
 
 /* F — перековка в прогоне (SIM.forge): { need, gold, cyc, keep }; без F — прогон без перековки, как раньше */
 function simulate(D, I, pk, c, seedNo, lists, F) {
-  const pr = SIM.prof[pk], R = D.rules, days = SIM.days[c];
+  const pr = SIM.prof[pk], R = D.rules, days = daysOf(I, c);
   const nSlots = P.slots(D, artLv(D, 'slots', c)), nFree = P.freeRolls(D, artLv(D, 'rolls', c)), nCards = P.cardsN(D, artLv(D, 'cards', c));
   const heroSlots = Math.max(1, nSlots - Math.floor(nSlots * (SIM.heroShare.den - SIM.heroShare.num) / SIM.heroShare.den));
   const roster = pr.heroes[cycIdx(c)];
@@ -275,7 +286,7 @@ function simulate(D, I, pk, c, seedNo, lists, F) {
     forgeNow(cc, now, doAwaken);
   };
   R.starter.forEach((n, i) => { for (let k = 0; k < n; k++) workers.push({ r: i + 1, until: 0 }); });
-  for (let cc = SIM.cycles[0]; cc < c; cc++) for (let w = 0; w < Math.ceil(SIM.days[cc] / 7); w++) weekIn(cc, false, 0);
+  for (let cc = SIM.cycles[0]; cc < c; cc++) for (let w = 0; w < Math.ceil(daysOf(I, cc) / 7); w++) weekIn(cc, false, 0);
   const slots = Array.from({ length: nSlots }, () => null);
   const visits = pr.visits.map(h => h * H);
   let heroBusy = [];   // [{ until, n }]
@@ -387,6 +398,7 @@ function build() {
   const D = makeData(I, err);
   const pp = I.L.assume && I.L.assume.payerPts;
   if (!pp || pp.length !== 2) err.push('lootboxes.js: нет assume.payerPts');
+  for (const c of SIM.cycles) if (!(daysOf(I, c) > 0)) err.push(`capacity.json: нет длины цикла ${ROMAN[c]} (cycleDays)`);
   else PAYER_BP = Math.round(pp[0] * RULES.bp / pp[1]);
   if (err.length) return { err, warn };
 
@@ -528,7 +540,7 @@ function makeTables(D, I, sim, capOf, share, lists, fsim, falt) {
   TBL.grid = T.join('\n');
 
   // награда героев по циклам
-  T = head(['Цикл', 'За час: золото / дух / души', '12 ч: золото / дух / души', 'Атак Эхо за души 12-часового ритуала, рядовой']);
+  T = head(['Цикл', `За ${TH.curH || 1} ч: золото / дух / души`, '12 ч: золото / дух / души', 'Атак Эхо за души 12-часового ритуала, рядовой']);
   for (let c = 1; c <= 6; c++) {
     const a = TH.cur.map(x => x[1] * c), b = P.amount(D, { tab: 'hero', r: 7, ms: TH.ms[6] }, c).cur.map(x => x[1]);
     const atk = I.E.cycles[c] ? I.E.cycles[c][0].souls : null;
@@ -589,7 +601,7 @@ function makeTables(D, I, sim, capOf, share, lists, fsim, falt) {
   // за цикл
   T = head(['Цикл', 'Дней', 'Обычный: золото / дух / души', 'Базовые / ключи / уникальные', 'Увлечённый: золото / дух / души', 'Базовые / ключи / уникальные']);
   for (const c of SIM.cycles) {
-    const n = SIM.days[c], o = sim[c].o.day, e = sim[c].e.day, t = (x) => x * n / 100;
+    const n = daysOf(I, c), o = sim[c].o.day, e = sim[c].e.day, t = (x) => x * n / 100;
     T.push(cells([ROMAN[c], n, `${fmt(t(o.gold))} / ${fmt(t(o.spirit))} / ${fmt(t(o.souls))}`, `${fmt(t(o.basics))} / ${fmt(t(o.keys))} / ${dec(o.uniq * n)}`, `${fmt(t(e.gold))} / ${fmt(t(e.spirit))} / ${fmt(t(e.souls))}`, `${fmt(t(e.basics))} / ${fmt(t(e.keys))} / ${dec(e.uniq * n)}`]));
   }
   TBL.cycle = T.join('\n');

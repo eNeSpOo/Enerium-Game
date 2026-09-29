@@ -64,7 +64,7 @@ if (err.length) done();
 
 /* 3–4. сценарии — выполняются внутри песочницы */
 function suite() {
-  const out = { errors: [], screens: 0, sheets: 0, kills: 0, offers: 0, calls: 0, many: 0, ruins: 0, chests: 0 };
+  const out = { errors: [], screens: 0, sheets: 0, kills: 0, offers: 0, calls: 0, many: 0, ruins: 0, chests: 0, ests: 0 };
   const E = window.EN_ECHO, D = E.data, TOP = E.steps.length, XE = RX.drops.echo, FROM = LBX.modes.echo.from;
   const fail = m => { if (out.errors.length < 80) out.errors.push(m); };
   const draw = () => { render(); return document.getElementById('game').innerHTML; };
@@ -183,7 +183,39 @@ function suite() {
         else if (pi >= 0 && pi < ci) fail(`${key}: у варианта ${st} мощь стоит раньше цены атаки`);
         if ((row.match(/class="ech-n"/g) || []).length > 1) fail(`${key}: у варианта ${st} больше двух чисел`);
       }
-      ACT.echpick('2:' + p.offers[p.offers.length - 1]);
+      /* босс и Убер живут час: «Выбрать» сперва открывает лист с честной оценкой (ADR-0031, п. 8); оценка — целые, кошелёк и цель
+         не меняются, исход словами не раскрыт; оценка на цели призыва и на цели в слоте — одна: номер цели и сид первой атаки те же */
+      const pickEst = (k, st) => {
+        const g = st > TOP ? 'm' : E.stepFoe(E.fidOf(w.race, st)).g;
+        if (!E.short({ g })) { ACT.echpick('2:' + st); return null; }
+        const w0 = S.wallet.souls, g0 = E.ghost('step', st), e0 = E.est(g0); out.ests++;
+        ACT.echpick('2:' + st);
+        if (!S.overlay || S.overlay.t !== 'echest' || S.echo.slots[2]) fail(`${k}: у ${g === 'u' ? 'Убера' : 'босса'} нет листа оценки до выбора`);
+        const hs = draw(); out.sheets++; scan(k + ' · оценка до выбора', hs);
+        if (e0 && e0.atks) {
+          for (const q of ['dmg', 'atks', 'cost', 'souls', 'have']) if (!Number.isInteger(e0[q]) || e0[q] < 0) fail(`${k}: оценка ${q} — ${e0[q]}`);
+          if (e0.souls !== e0.atks * e0.cost || e0.atks !== Math.floor((g0.hp + e0.dmg - 1) / e0.dmg)) fail(`${k}: оценка не ⌈здоровье / урон⌉ × цена — ${JSON.stringify(e0)}`);
+          if (!hs.includes(`На убийство нужно около ${fmt(e0.atks)} `) || !hs.includes(`около ${fmt(e0.souls)} `) || !hs.includes(`у вас ${fmt(e0.have)}.`)) fail(`${k}: в листе оценки нет «около N атак — около M душ, у вас K»`);
+          if ((e0.have < e0.souls) !== hs.includes('может уйти')) fail(`${k}: предупреждение «цель может уйти» не по оценке и душам`);
+        } else if (e0 && !hs.includes('оценки нет')) fail(`${k}: урона нет, а лист не говорит «оценки нет»`);
+        if (/победите|не победить|проиграете|выиграете/i.test(hs)) fail(`${k}: оценка раскрывает исход словами`);
+        if (S.wallet.souls !== w0) fail(`${k}: лист оценки списал души`);
+        ACT.echpick(`2:${st}:ok`);
+        const xs = S.echo.slots[2]; if (xs && e0 && JSON.stringify(E.est(xs)) !== JSON.stringify(e0)) fail(`${k}: оценка до выбора ${JSON.stringify(e0)}, у цели в слоте ${JSON.stringify(E.est(xs))}`);
+        return e0;
+      };
+      /* всегда — первый босс и Убер недели: лист оценки до выбора; при нехватке душ — предупреждение, при достатке — без него */
+      for (const stB of [D.ladder.slice(0, 2).reduce((a, [, n]) => a + n, 1), TOP]) {
+        clearEcho(); S.ech.avail = TOP; S.ech.pending[2] = { offers: [stB] }; S.wallet.souls = 0;
+        const e0 = pickEst(`${key} · ступень ${stB}`, stB);
+        if (!S.echo.slots[2] || S.echo.slots[2].step !== stB) fail(`${key}: после «Выбрать» в листе оценки ступень ${stB} не встала в слот`);
+        if (e0 && e0.atks) {   // новая цель — новый номер и сид: оценка — своя
+          clearEcho(); S.ech.pending[2] = { offers: [stB] }; const e1 = E.est(E.ghost('step', stB));
+          if (e1 && e1.atks) { S.wallet.souls = e1.souls; ACT.echpick('2:' + stB); if (draw().includes('может уйти')) fail(`${key}: душ хватает на оценку, а лист пугает уходом цели`); S.overlay = null; }
+        }
+      }
+      clearEcho(); S.ech.avail = 1 + (c * 2) % TOP; S.wallet.souls = 1e9; S.ech.pending[2] = p; ACT.echsel('2');
+      pickEst(key, p.offers[p.offers.length - 1]);
       const x = S.echo.slots[2];
       if (!x || x.step !== p.offers[p.offers.length - 1] || S.ech.pending[2]) fail(key + ': выбор не занял слот');
       else if (x.left !== D.lifeH[x.g] * D.hour || x.hp !== x.max) fail(key + ': у новой цели не тот срок или здоровье');
@@ -192,8 +224,11 @@ function suite() {
       if (x) {
         const cost = E.cost(x), sl = h.split('class="eslot').find(y => y.includes('data-v="2"')) || '';
         if (!sl.includes('class="ech-sc"') || !sl.includes(`<b class="num">${fmt(cost)}</b>`)) fail(`${key}: в слоте не видно цены одной атаки ${cost}`);
+        const snapX = JSON.stringify([x.hp, x.atk, x.used || null, S.wallet.souls, S.ech.last, S.echo.score]);
         S.overlay = { t: 'echfoe', arg: x.fid }; const hf = draw(); S.overlay = null;
         if (!hf.includes(`<span>Цена атаки</span><b>${fmt(cost)} `)) fail(`${key}: в «Сведениях» цели нет цены атаки ${cost}`);
+        if (E.short(x) !== /На убийство нужно около|оценки нет|Оценку даст/.test(hf)) fail(`${key}: оценка в «Сведениях» ${E.short(x) ? 'нет у цели на час' : 'у цели не на час'}`);
+        if (JSON.stringify([x.hp, x.atk, x.used || null, S.wallet.souls, S.ech.last, S.echo.score]) !== snapX) fail(`${key}: оценка изменила цель, кошелёк или очки`);
       }
       S.ech.wide = false; clearEcho(); ACT.echsum('0'); if (!S.ech.pending[0] || S.ech.pending[0].offers.length !== D.offer.base) fail(key + ': без артефакта вариантов не ' + D.offer.base); S.ech.wide = true;
 
@@ -240,6 +275,12 @@ function suite() {
         if (!S.overlay || S.overlay.t !== 'echact') { fail(k2 + ': нет листа подтверждения'); continue; }
         h = draw(); out.sheets++; scan(k2 + ' · подтверждение', h);
         if (h.includes(fb.name) || (it.opens && h.includes(it.opens))) fail(k2 + ': лист подтверждения раскрывает врага');
+        /* крафтовый босс живёт час: оценка — до призыва, на той цели, какую даст призыв; кошелёк не трогает */
+        const avail = !(it.team && c < 6) && E.checks('call', it).every(y => y.ok);
+        if (avail !== /На убийство нужно около|оценки нет|Оценку даст/.test(h)) fail(`${k2}: оценка до призыва ${avail ? 'не показана' : 'показана у недоступного'}`);
+        const gCraft = avail ? E.est(E.ghost('craft', fb)) : null;
+        if (gCraft && gCraft.atks && (!Number.isInteger(gCraft.souls) || gCraft.souls !== gCraft.atks * gCraft.cost)) fail(`${k2}: оценка не целая — ${JSON.stringify(gCraft)}`);
+        if (S.wallet.souls !== s0 || BAG.qty(it.id) !== q0) fail(k2 + ': лист с оценкой списал');
         if (it.team && c < 6 && h.includes(it.n)) fail(k2 + ': предмет «для команды» назван до цикла VI');
         const op = S.overlay.op;
         ACT.echactdo(op);
@@ -348,7 +389,7 @@ const t0 = Date.now();
 let res;
 try { res = vm.runInContext('(' + suite.toString() + ')()', ctx); } catch (e) { err.push('сценарии: ' + (e.stack || e.message)); done(); }
 err.push(...res.errors);
-console.log(`Эхо проверено за ${Math.round((Date.now() - t0) / 1000)} с: экранов ${res.screens}, листов ${res.sheets}, вариантов призыва ${res.offers}, побед ${res.kills}, крафтовых боссов ${res.calls}, Многоликих ${res.many}, руин ${res.ruins}, сундуков ${res.chests}.`);
+console.log(`Эхо проверено за ${Math.round((Date.now() - t0) / 1000)} с: экранов ${res.screens}, листов ${res.sheets}, вариантов призыва ${res.offers}, побед ${res.kills}, крафтовых боссов ${res.calls}, Многоликих ${res.many}, руин ${res.ruins}, сундуков ${res.chests}, оценок до призыва ${res.ests}.`);
 done();
 
 function done() {

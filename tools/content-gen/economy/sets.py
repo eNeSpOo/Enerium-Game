@@ -38,21 +38,24 @@ TIER_HEROES = (1, 3)                       # §30: ступень I — один
 TIER_BY_SUM = ((15, 3), (10, 2), (5, 1))   # ADR-0022: сумма личных максимумов пятерых от — ступеней у сета
 
 # --- циклы: дни считает economy.timeline с начала цикла II ---
-CYCLE_LEN = {2: E.CYCLE_DAYS, 3: 21}   # цикл II — 14 дней (автор); цикл III — допущение: длиннее II (ADR-0018)
-SLOTS_EXTRA = 1                         # ADR-0014: забег на номер цикла и ещё один от Странника
+CYCLE_LEN = {2: E.CYCLE_DAYS, 3: 21}   # цикл II — прогон темпа (economy.CYCLE_DAYS, pace.json); цикл III — допущение: длиннее II (ADR-0018)
+# забегов одновременно — номер цикла (ADR-0014; ADR-0031, п. 3): economy.slots, recipes.js. «Право владыки» не считаем
 
-# --- цикл I — обучение на часы (ADR-0018): ступень I возможна только во втором биоме, руной уровня аккаунта 8 (§16) ---
+# --- цикл I — обучение на часы (ADR-0018): ступень I возможна только во втором биоме, руной уровня аккаунта 8 (§16).
+# Биом 2 — прогон темпа (pace.json, rows.b2.tot: этажи, убитые, дух, золото до победы над стражем); нет прогона — допущения ниже ---
 TUTOR_B2_HOURS = 3        # ADR-0018: биом 2 — ещё около трёх часов
-TUTOR_B2_LEVEL = 43       # допущение: пачка у стены образца — ряд прогона «43»: 40 рядовых, 4 элиты за 6,6 мин
+TUTOR_B2_LEVEL = 43       # допущение: пачка у стены образца — ряд прогона «43»
 TUTOR_BOSSES = 2          # боссы биомов 1 и 2, по разу; оба закрытия — чистые (допущение)
 
 # --- чистое закрытие: замер прототипа (--sim) на образце цикла II, отряд прототипа ---
-CLEAN_FROM = 100          # с этого уровня прогона закрывающий забег идёт без павших: с доблестью в характеристиках (29.09.2026) —
-                          # со 100-го, где босс образца впервые падает; без неё было со 180-го
+CLEAN_FROM = 145          # с этого уровня прогона закрывающий забег идёт без павших: реальный отряд (ADR-0031, п. 1 — доблесть 0,
+                          # у бойца урона 1), наборы, сжатые к личному максимуму; босс образца падает осадой со 130-го, чисто — со 145-го
+                          # (с доблестью 2 / 1 / 2 / 1 / 3 было со 125-го)
 
-# --- рунные боссы: ADR-0022 ---
-RB_CAP = 10               # общий кап побед у РБ в день на все циклы; какого РБ и какого цикла бить — выбирает игрок
-RB_SPLIT_BP = 7000        # доля побед у стража пределов, как в калькуляторе: 7 из 10; остальное — страж доблести
+# --- рунные боссы: ADR-0022 — общий кап побед в день (recipes.js, dailyGuardianCap) и доля побед у стража пределов 7 : 3 —
+# одно место, калькулятор экономики (economy.rx, economy.RB_SPLIT_BP) ---
+RB_CAP = E.rx()['cap']
+RB_SPLIT_BP = E.RB_SPLIT_BP
 
 # --- рунные ключи ---
 # ключи контрактов — прогон сборщика контрактов, а не прежняя заглушка «1 ключ × цикл за 10 очков»: ключи режима «Контракты»
@@ -62,20 +65,23 @@ CONTRACTS_JS = E.ROOT / 'design' / 'ui' / 'contracts.js'
 CONTRACT_PROFILE = {'обычный': 'o', 'увлечённый': 'e'}   # профиль калькулятора → профиль прогона контрактов
 # вариант: имя, шанс ключа с элиты и с босса (за срабатывание — цикл биома, §11), вход у стража пределов и доблести,
 # рост цены с циклом РБ: 'c' — × цикл, 'tri' — × цикл × (цикл + 1) / 2
+# принятый вариант Б — числа рецептов (recipes.js: шанс ключа с босса, вход у стражей), прежний и А — справка
 KEY_VARIANTS = [
     ('прежний §11', 500, 1000, 1, 2, 'c'),
     ('А: только цена, справка', 500, 1000, 3, 5, 'tri'),
-    ('Б: принят, ключ без элит', 0, 1000, 1, 3, 'c'),
+    ('Б: принят, ключ без элит', 0, E.rx()['boss_key_bp'], E.rx()['entry'][0], E.rx()['entry'][1], 'c'),
 ]
 KEY_PICK = 2              # вариант Б — принят (ADR-0023, п. 16), в §11
-T12_CASES = [(1, 1, 2), (7, 2, 3), (14, 2, 3), (25, 3, 4)]   # Т12 черновика экономики: день, отрядов у свободного и у плательщика
+# Т12 черновика экономики: день с начала цикла II, отрядов у свободного и у плательщика. Слотов — номер цикла: лишний отряд у плательщика —
+# только пока свободный не купил героев на все слоты (1-й день цикла II и 1-й день цикла III)
+T12_CASES = [(1, 1, 2), (7, 2, 2), (CYCLE_LEN[2], 2, 2), (CYCLE_LEN[2] + 1, 2, 3)]
 PAYER_WHATIF = {'v5_for_A': 155, 'v2_for_B': 10}   # проверки «что если»: N сета V в варианте А, N сета II в варианте Б
 
 # --- другие режимы: в GDD есть только попытки или ничего — остальное допущения ---
 ARENA_WINS = 20 * 5000 // BP            # §20.2: 20 атак в день; побед при Эло — допущение 50 %
 LEAGUE_WINS_X10 = 6 * 5000 * 10 // BP   # §20.4: 6 матчей в день; побед — 50 %, в десятых
 CLAN_ATTACKS = 5                        # §25.1: 5 атак в день, древо добавляет до 4
-RITUALS = {'обычный': 2, 'увлечённый': 3}          # допущение: ритуалов на слот в день; слотов — цикл + 1
+RITUALS = {'обычный': 2, 'увлечённый': 3}          # допущение: ритуалов на слот в день; слотов — номер цикла
 ECHO_SPEND_BP = 5000                    # допущение: доля душ дня, что уходит в Эхо
 ECHO_LOST_BP = 1000                     # допущение: доля трат Эхо, что сгорает с ушедшими по времени целями
 ECHO_SUMMONS = {'обычный': 8, 'увлечённый': 20}   # допущение: призывов в день
@@ -167,7 +173,7 @@ def day_of(lv, d, hours, squads=None):
     a, b = lv[min(d - 1, len(lv) - 1)]
     c = E.FIRST_CYCLE if d <= CYCLE_LEN[2] else E.FIRST_CYCLE + 1
     acc = {}
-    for k in range(squads or c + SLOTS_EXTRA):
+    for k in range(squads or E.slots(c)):
         add(acc, squad_day(a if k == 0 else b, c, hours))
     return c, acc
 
@@ -183,9 +189,19 @@ def average(days, c):
 
 
 def tutor_b2():
-    """Цикл I, биом 2: пачка у стены два отряда по TUTOR_B2_HOURS часов, плюс боссы биомов 1 и 2 по разу."""
+    """Цикл I, биом 2 — счётчики за весь биом, в сотых. Есть прогон темпа (pace.json, rows.b2.tot) — его забеги до победы над
+    стражем: этажи, рядовые, элиты, босс, дух и золото; души — по ставкам биома 2 (ADR-0011), плюс босс биома 1 один раз.
+    Нет прогона — допущение: пачка у стены образца TUTOR_B2_HOURS часов в слотах цикла I, боссы биомов 1 и 2 по разу."""
+    tot = E.pace_b2().get('tot')
+    if tot:
+        acc = {'rf': tot['o'] * 100, 'el': tot['e'] * 100, 'boss': (tot['b'] + 1) * 100, 'floors': (tot['floors'] + 1) * 100,
+               'gold': tot['gold'] * 100, 'spirit': tot['spirit'] * 100, 'runs': tot['runs'] * 100}
+        acc['kills'] = acc['rf'] + acc['el'] + acc['boss']
+        acc['clean'] = acc['boss']
+        acc['souls'] = (tot['e'] * E.RATES_NEW['elite'][2] * 2 + tot['b'] * E.RATES_NEW['boss'][2] * 2 + E.RATES_NEW['boss'][2]) * 100
+        return acc
     acc = {}
-    for _ in range(E.SLOTS[1]):
+    for _ in range(E.slots(1)):
         add(acc, squad_day(TUTOR_B2_LEVEL, 1, TUTOR_B2_HOURS, 2))
     for k in ('boss', 'clean', 'kills', 'floors'):
         acc[k] += TUTOR_BOSSES * 100
@@ -287,12 +303,13 @@ def rune_days_sets(limit_x100, all_x100, n4=0, n6=0):
     """Как economy.rune_days, но победы в сотых и сеты IV и VI: +1 руна по весам стража за каждое n4-е убийство стража
     пределов, +1 руна на выбор за каждое n6-е убийство любого РБ — в высший предел, где рун ещё не хватает."""
     n = len(E.LIMITS)
-    per_win = [E.RUNES_PER_WIN * 100 * w // BP for w in E.RUNE_WEIGHT_BP]
+    R = E.rx()
+    per_win = [R['runes_per_win'] * 100 * w // BP for w in R['weights']]
     need = E.SQUAD * E.RUNES_PER_LIMIT * 100
     stock, nxt, out = [0] * n, E.START_LIMITS, [0] * E.START_LIMITS
     for d in range(E.GUARD_OPEN_DAY, E.GUARD_OPEN_DAY + E.DAYS_MAX):
         for k in range(n):
-            stock[k] += per_win[k] * limit_x100 // 100 + (limit_x100 * E.RUNE_WEIGHT_BP[k] // (BP * n4) if n4 else 0)
+            stock[k] += per_win[k] * limit_x100 // 100 + (limit_x100 * R['weights'][k] // (BP * n4) if n4 else 0)
         if n6:
             pick = next((k for k in range(n - 1, nxt - 1, -1) if stock[k] < need), nxt)
             stock[min(pick, n - 1)] += all_x100 // n6
@@ -302,8 +319,8 @@ def rune_days_sets(limit_x100, all_x100, n4=0, n6=0):
                 out.append(d)
                 nxt += 1
             for k in range(min(nxt, n - 1)):
-                q = stock[k] // (E.RUNE_REFORGE * 100)
-                stock[k] -= q * E.RUNE_REFORGE * 100
+                q = stock[k] // (R['reforge'] * 100)
+                stock[k] -= q * R['reforge'] * 100
                 stock[k + 1] += q * 100
         if nxt == n:
             break
@@ -312,7 +329,8 @@ def rune_days_sets(limit_x100, all_x100, n4=0, n6=0):
 
 def valor_x10000(valor_x100, n5=0):
     """Рун доблести в день, в десятитысячных: осколки §11 и руна за каждое n5-е убийство стража доблести."""
-    return valor_x100 * E.VALOR_FRAGS_X100 // E.VALOR_FRAGS + (valor_x100 * 100 // n5 if n5 else 0)
+    R = E.rx()
+    return valor_x100 * R['shards_x100'] // R['valor_rune'] + (valor_x100 * 100 // n5 if n5 else 0)
 
 
 def days_for(runes, rate_x10000):
@@ -427,7 +445,7 @@ def events(cnt, prof, d, cyc):
     """Событий счётчика за день, в сотых. d — средний день цикла; режимы вне биомов — по допущениям."""
     if cnt in d:
         return d[cnt]
-    return {'rituals': RITUALS[prof] * (cyc + SLOTS_EXTRA) * 100,
+    return {'rituals': RITUALS[prof] * E.slots(cyc) * 100,
             'rb_fail': RB_FAILS_X10 * 10,
             'echo_souls': d['souls'] * ECHO_SPEND_BP // BP,
             'echo_expired': ECHO_EXPIRED[prof] * 100,
@@ -522,29 +540,38 @@ def layouts_table():
     return table(['Сет', 'Героев', 'Максимумы', 'Ступеней', 'Не за золото: источник, цикл'], rows)
 
 
+def valor_from(full_cap=False):
+    """День с начала цикла II, с которого у обычного игрока доступна доблесть: пятый предел главного отряда (§10.2) —
+    нижняя граница для любого героя, которому нужна обычная руна доблести. Руна обучения — исключение (ADR-0031, п. 2)."""
+    return E.pace_of(E.PROFILES[0][1], full_cap=full_cap)['limit5']
+
+
 def tiers_table(kills):
-    """Дни до ступени от открытия стража доблести, если все его руны идут в этот сет — нижняя граница.
+    """Дни до ступени с начала цикла II, если все руны стража доблести идут в этот сет — нижняя граница: осколки копятся с первого
+    дня, но обычную руну доблести можно применить только на пятом пределе героя (§10.2) — не раньше пятого предела главного отряда.
+    Руна обучения — одна доблесть героя цикла I на любом пределе (ADR-0031, п. 2): ступень I ордена цикла I.
     kills — победы в день в сотых: полный кап и обычный игрок при ключах-горлышке."""
     full = valor_x10000(split(RB_CAP * 100)[1])
     low = valor_x10000(split(kills)[1])
+    open_full, open_low = valor_from(True), valor_from()
 
-    def days(runes, have, rate):
-        return ' / '.join('обучение' if r <= have else str(days_for(r - have, rate)) for r in runes)
+    def days(runes, have, rate, opened):
+        return ' / '.join('обучение' if r <= have else str(max(opened, days_for(r - have, rate))) for r in runes)
     rows = []
     for no, cyc, name, *_ in ORDERS:
         total = sum(h[2] for h in roster()[name])
         need = (*TIER_HEROES, total)[:tiers_of(total)]
         have = 1 if cyc == 1 else 0
         rows.append([short(name), cyc, total, tiers_of(total), ' / '.join(map(str, need)),
-                     days(need, have, full), days(need, have, low)])
+                     days(need, have, full, open_full), days(need, have, low, open_low)])
     for c, *_ in DONAT:
         total = donat_sum(c)
         need = (*TIER_HEROES, total)[:tiers_of(total)]
         rows.append([f'донатный {ROMAN[c - 1]} «{DONAT_NAMES[c]}»', c, total, tiers_of(total), ' / '.join(map(str, need)),
-                     days(need, 0, full), days(need, 0, low)])
+                     days(need, 0, full, open_full), days(need, 0, low, open_low)])
     return table(['Сет', 'Цикл', 'Сумма максимумов', 'Ступеней', 'Рун доблести на ступени',
-                  f'Дней: полный кап, {num1000(split(RB_CAP * 100)[1] * 10)} победы у стража доблести',
-                  f'Дней: ключи-горлышко, {num1000(split(kills)[1] * 10)} победы'], rows)
+                  f'День цикла II: полный кап, {num1000(split(RB_CAP * 100)[1] * 10)} победы у стража доблести, пятый предел — {open_full}-й',
+                  f'День цикла II: ключи-горлышко, {num1000(split(kills)[1] * 10)} победы, пятый предел — {open_low}-й'], rows)
 
 
 def donat_rows(c2, c3, days, pick):
@@ -554,8 +581,14 @@ def donat_rows(c2, c3, days, pick):
     for c, who, cnt, author, prop, what in DONAT:
         cut = tiers_of(donat_sum(c))
         ns = (author if pick == 'author' else prop)[:cut]
-        if cnt == 'boss':      # в цикле II и в цикле III, где ступень реальна (С5); ключей за срабатывание — цикл биома
+        if cnt == 'boss':      # в цикле II и в цикле III; ключей за срабатывание — цикл биома. Ступени нужна доблесть донатного героя —
+            # обычная руна доблести, то есть пятый предел (§10.2): до него бонуса нет (С5, нижняя граница — пятый предел главного отряда)
+            opened, ends = valor_from(), {2: CYCLE_LEN[2], 3: CYCLE_LEN[2] + CYCLE_LEN[3]}
             for cc, dd in ((2, c2), (3, c3)):
+                if opened > ends[cc]:
+                    rows.append([f'{ROMAN[c - 1]} «{DONAT_NAMES[c]}», в цикле {ROMAN[cc - 1]}', who, what, f'{donat_sum(c)} → {cut}',
+                                 tri(str, ns)] + [f'нет: доблесть — с пятого предела, {opened}-й день'] * 2 + ['—'])
+                    continue
                 fr = [rate3(d['boss'], ns) for d in dd]
                 d = dd[0]
                 share = tri(lambda n: pct(d['boss'] * cc * BP // (n * keys_x100(v, d, cc))), ns) + ' ключей'
@@ -573,12 +606,12 @@ def donat_rows(c2, c3, days, pick):
             part = {'rb1': 0, 'rb2': 1, 'rb': 2}[cnt]
             fr = [rate3((split(k) + (k,))[part], ns) for k in k3]
             if cnt == 'rb1':
-                share = tri(lambda n: pct(BP // (E.RUNES_PER_WIN * n)), ns) + ' рун пределов'
+                share = tri(lambda n: pct(BP // (E.rx()['runes_per_win'] * n)), ns) + ' рун пределов'
             elif cnt == 'rb2':
-                share = tri(lambda n: pct(100 * BP * 100 // (E.VALOR_FRAGS_X100 * n)), ns) + ' рун доблести'
+                share = tri(lambda n: pct(100 * BP * 100 // (E.rx()['shards_x100'] * n)), ns) + ' рун доблести'
             else:
                 limit, _ = split(k3[0])
-                share = tri(lambda n: pct(k3[0] * BP // (n * limit * E.RUNES_PER_WIN * E.RUNE_WEIGHT_BP[-1] // BP)), ns) + \
+                share = tri(lambda n: pct(k3[0] * BP // (n * limit * E.rx()['runes_per_win'] * E.rx()['weights'][-1] // BP)), ns) + \
                     ' рун V предела, если брать V'
         rows.append([f'{ROMAN[c - 1]} «{DONAT_NAMES[c]}»', who, what, f'{donat_sum(c)} → {cut}', tri(str, ns)] + fr + [share])
     return rows
@@ -618,9 +651,11 @@ def payer_table(days):
     """Правило ×1,7 по ресурсам: плательщик с донатными сетами на высшей ступени против свободного, время равное.
     Плательщик раньше набирает отряд на все слоты (Т12): у него на отряд больше; ключи — по варианту цен.
     Ключи контрактов у обоих — обычного по прогону контрактов: время равное, разница — только сеты и лишний отряд.
+    Ступеням донатных сетов нужна доблесть донатного героя — обычная руна доблести, пятый предел (§10.2): до него бонуса сета нет.
     Ниже каждого варианта — проверки «что если» из PAYER_WHATIF."""
     h = E.PROFILES[0][1]
     lv = levels(h)
+    opened = valor_from()
     n2 = DONAT[0][4][0]
     n4, n5, n6 = DONAT[2][4][2], DONAT[3][4][2], DONAT[4][4][2]
     ok = lambda a, b: 'да' if a * 10 <= b * E.PAYER_MAX_X10 else 'нет'
@@ -632,10 +667,11 @@ def payer_table(days):
         for d, f, p in T12_CASES:
             c, af = day_of(lv, d, h, f)
             _, ap = day_of(lv, d, h, p)
-            kf, kp = kills_x100(v, keys_x100(v, af, c), c), kills_x100(v, keys_x100(v, ap, c, n), c)
+            kf, kp = kills_x100(v, keys_x100(v, af, c), c), kills_x100(v, keys_x100(v, ap, c, n if d >= opened else 0), c)
             out = max(out, kp * 1000 // kf)
             if n == n2:
-                rows.append([f'{KEY_VARIANTS[v][0]}: победы у РБ, {d}-й день, отрядов {f} / {p}, сет II', 'побед в день',
+                tag = 'сет II' if d >= opened else f'сет II ещё без доблести (пятый предел — {opened}-й день)'
+                rows.append([f'{KEY_VARIANTS[v][0]}: победы у РБ, {d}-й день, отрядов {f} / {p}, {tag}', 'побед в день',
                              num1000(kf * 10), num1000(kp * 10), ratio(kp, kf), ok(kp, kf)])
         return out
 
@@ -666,11 +702,12 @@ def payer_table(days):
             valor_row(v, w2, n5, f'сет II с N = {n2b} и сет V на ступени III')
     # души: лишний отряд плательщика и сет III на высшей ступени
     n3 = DONAT[1][4][tiers_of(donat_sum(3)) - 1]
-    for day, f, p in ((15, 3, 4), (25, 3, 4)):
+    for day, f, p in ((CYCLE_LEN[2] + 1, 2, 3), (CYCLE_LEN[2] + 11, 3, 3)):
         c, fr = day_of(lv, day, h, f)
         _, pa = day_of(lv, day, h, p)
-        bonus = pa['rf'] * (2 * c - 1) // n3
-        rows.append([f'Души, цикл III, {day}-й день: отрядов {f} / {p}, сет III', 'душ в день', fmt(fr['souls'] // 100),
+        bonus = pa['rf'] * (2 * c - 1) // n3 if day >= opened else 0
+        tag = 'сет III' if day >= opened else 'сет III ещё без доблести'
+        rows.append([f'Души, цикл III, {day}-й день: отрядов {f} / {p}, {tag}', 'душ в день', fmt(fr['souls'] // 100),
                      fmt((pa['souls'] + bonus) // 100), ratio(pa['souls'] + bonus, fr['souls']), ok(pa['souls'] + bonus, fr['souls'])])
     return table(['Ресурс', 'Мера', 'Свободный', 'Плательщик', 'Отношение', 'Не больше ×1,7'], rows)
 

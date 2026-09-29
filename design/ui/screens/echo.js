@@ -79,10 +79,10 @@ const ECH = {
   },
   offer: { base: 1, wide: 3 },                          // вариантов призыва: исходно один, артефакт расширяет (§17.1)
   vs: { evenBp: 1000 },                                 // отряд «наравне» с целью, если его мощь отличается от мощи цели не больше чем на 10 %; дальше — сильнее или слабее
-  plankBase: 10000,                                     // очки первой личной планки в цикле II, дальше ×2 (лутбоксы.md) — пороги ждут баланса очков
   hour: 3600,                                           // секунд в часе
-  /* состояние прототипа на старте: середина недели эльфов */
-  demo: { week: 'Эльфы', avail: 7, score: 38240, place: 146, known: [1, 2, 3, 4, 5, 6],
+  /* состояние прототипа на старте — один календарь демо (ADR-0031, п. 17): 11-й день цикла II, четвёртый день недели эльфов. Очки —
+     лестница обычного за 3,7 дня второй недели цикла (echo.py, ladder_week: 3 дня — 8 982, 4 дня — 12 628), первая планка взята */
+  demo: { week: 'Эльфы', avail: 7, score: 11540, place: 181, known: [1, 2, 3, 4, 5, 6],
     slots: [{ step: 2, hpBp: 6700, leftH: 62 }, { step: 7, hpBp: 10000, leftH: 44 }, null, null] },
   /* древние цивилизации: облик и нашествие — игроку; враги по ступеням 1–14: имя, стихия, класс, облик */
   civ: {
@@ -586,11 +586,13 @@ function draw(avail, n, key) {
   }
   return out.sort((a, b) => a - b);
 }
-/* личные планки недели: сундуки осколков по lootboxes.js, пороги — демо */
+/* личные планки недели: сундуки осколков по lootboxes.js, порог первой планки цикла — данные режима (echo-rules.js, plank1, калькулятор
+   echo.py), дальше — × row.x сундуков. Своих чисел у экрана нет: без правил режима планок нет. Получена — сундуки уже забраны в «Дарах»
+   (darGot, bag.js) */
 function planks(W, c) {
-  const ly = EM.layers.find(l => l.kind === 'plank' && !l.clan);
-  if (!ly || c < EM.from) return [];
-  return ly.rows.map((row, j) => { const need = ECH.plankBase * row.x * ipow(XE.pointsCycleMul, c - EM.from); return { k: j + 1, need, pay: row.cyc[c] || [], reached: S.echo.score >= need, claimed: !!S.ech.claimed[j + 1] }; });
+  const ly = EM.layers.find(l => l.kind === 'plank' && !l.clan), R = XR(), p1 = R && R.plank1 ? R.plank1[c] : null;
+  if (!ly || c < EM.from || !Number.isInteger(p1)) return [];
+  return ly.rows.map((row, j) => { const need = p1 * row.x; return { k: j + 1, need, pay: row.cyc[c] || [], reached: S.echo.score >= need, claimed: !!S.ech.claimed[j + 1] || (typeof darGot === 'function' && darGot('echo', j + 1)) }; });
 }
 /* расовая неприязнь героев Эхо в отряде: +N % урона по расе своей недели (ADR-0024, п. 4) — та же, что уходит в бой (heroAvers) */
 function aversIn(s, race) {
@@ -736,6 +738,34 @@ SCREENS.echo = function () {
   return { title: 'Эхо', back: 'week', chip: weekChip(), html: `<section class="scr ech">${headHtml(W, c)}<div class="ec">${slotsHtml()}${tgt}</div>${ladderHtml(W)}</section>` };
 };
 
+/* ================== честная оценка до атаки (ADR-0031, п. 8) ==================
+   Боссы, Убер и крафтовый босс живут час (shortLife). Перед призывом и в листе цели — оценка: бой ядром на сиде следующей атаки
+   текущим отрядом атаки даёт урон по главному врагу за атаку; атак ≈ ⌈здоровье / урон⌉, душ ≈ атак × цена атаки. Только оценка:
+   исход словами не раскрывается, кошелёк, цель и бестиарий не меняются. В игре оценку даёт сервер на том же сиде */
+const EST = new Map();
+function estOf(x) {
+  const ids = attackIds(x); if (ids.length < ECH.squad || !x || !(x.hp > 0)) return null;
+  const no = (x.atk || 0) + 1, F = fightOf(x, ids, no), key = `${x.uid}|${x.fid}|${x.hp}|${x.max}|${F.o.seed}|${JSON.stringify(F.heroes)}`;
+  if (!EST.has(key)) {
+    let dmg = 0;
+    try { dmg = Math.max(0, EB.echoStats(EB.run(EB.echoBattle(F.heroes, F.o))).main.taken); } catch (_) { dmg = 0; }
+    if (EST.size > 400) EST.clear();
+    EST.set(key, dmg);
+  }
+  const dmg = EST.get(key), cost = atkCost(x), atks = dmg > 0 ? Math.floor((x.hp + dmg - 1) / dmg) : 0;
+  return { dmg, atks, cost, souls: atks * cost, have: S.wallet.souls };
+}
+/* цель, какой её даст призыв: тот же target на копии счётчика Эхо — номер цели и сид первой атаки совпадут с настоящими */
+const ghost = (kind, x) => target(Object.assign({}, S, { ech: Object.assign({}, S.ech) }), kind, x);
+const hoursOf = n => `${n} ${plural(n, 'час', 'часа', 'часов')}`;
+function estHtml(x, e) {
+  if (!e) return `<p class="reason">Оценку даст полный отряд Эхо — ${ECH.squad} героев.</p>`;
+  if (!e.atks) return `<p class="rs-line">${ic('target')}Урон отряда по этой цели за атаку не проходит — оценки нет.</p>`;
+  const L = lifeOf(x.g), warn = e.have < e.souls && shortLife(x) ? `<p class="reason warn">Душ меньше оценки, а цель живёт ${hoursOf(L)}: она может уйти, и потраченные души не вернутся.</p>` : '';
+  return `<p class="rs-line">${ic('target')}На убийство нужно около ${fmt(e.atks)} ${plural(e.atks, 'атаки', 'атак', 'атак')} — около ${fmt(e.souls)} ${plural(e.souls, 'души', 'душ', 'душ')}, у вас ${fmt(e.have)}.</p>${warn}
+    ${TM(`Оценка — бой ядром на сиде ${x.atk ? 'следующей' : 'первой'} атаки этим отрядом: урон по главному врагу ${fmt(e.dmg)} за атаку; атак ⌈${fmt(x.hp)} / ${fmt(e.dmg)}⌉ = ${fmt(e.atks)}, душ ${fmt(e.atks)} × ${fmt(e.cost)}. Исход не раскрывается.`, 'p', 'reason')}`;
+}
+
 /* ================== атака: бой, итог, победа ==================
    Как на сервере (§17.3, §36): оплата → бой ядром целиком на сиде → здоровье цели, очки, бестиарий, лестница и добыча —
    всё решено до показа. Просмотр идёт на экране боя одной сценой; «Пропустить» и конец просмотра только открывают итог.
@@ -819,7 +849,7 @@ function lootHtml(x) {
   if (x.k === 'cur') return li(money(x.id, x.n), CUR[x.id].n, x.stub ? '<span class="chip warn team-only">заглушка</span>' : '');
   if (x.k === 'rune') return x.hit ? li(money('keys', x.n), CUR.keys.n) : TM(`Рунный ключ: шанс ${pctBp(x.bp)} — не выпал`, 'div', 'ech-li faint');
   if (x.k === 'chest') return li(`<span class="well ech-it" data-r="${x.spec.r}" style="--s:30px"><img src="${CHEST}" alt=""></span>`, boxName(x.spec.box, x.spec.r));
-  if (x.k === 'shards') { const h = RSI[x.id]; return li(`<span class="rs-av" data-r="${h.r}">${rsFace(h)}</span>`, h.n, `<b class="num">осколки ×${fmt(x.n)}</b>${x.dust ? `<small class="faint">в прах +${fmt(x.dust)}</small>` : ''}`); }
+  if (x.k === 'shards') { const h = RSI[x.id], g = !x.dust && typeof shardGhost === 'function' ? shardGhost(h, S.rs.shards[h.id] || 0, RS.rules.stub.shards, 34) : ''; return li(g || `<span class="rs-av" data-r="${h.r}">${rsFace(h)}</span>`, h.n, `<b class="num">осколки ×${fmt(x.n)}</b>${x.dust ? `<small class="faint">в прах +${fmt(x.dust)}</small>` : ''}`); }
   return '<p class="faint">Осколков нет: героев недели к этому циклу не открыто.</p>';
 }
 function notReady(s, m, busy) {
@@ -1013,10 +1043,12 @@ Object.assign(ACT, {
     S.ech.pending[i] = { offers: draw(S.ech.avail, S.ech.wide ? ECH.offer.wide : ECH.offer.base, `эхо|${S.ech.wk}|призыв|${++S.ech.seq}`) };
     render();
   },
+  /* выбор варианта: v — «слот:ступень»; босс и Убер живут час — сначала лист с честной оценкой (ADR-0031, п. 8), выбор — «слот:ступень:ok» */
   echpick(v) {
-    sync(); const [a, b] = v.split(':'), i = +a, st = +b, p = S.ech.pending[i];
+    sync(); const [a, b, ok] = String(v).split(':'), i = +a, st = +b, p = S.ech.pending[i];
     if (!p || !p.offers.includes(st) || S.echo.slots[i]) return;
-    const x = target(S, 'step', st); S.echo.slots[i] = x; delete S.ech.pending[i]; S.echo.sel = i;
+    if (ok !== 'ok' && st <= TOP && shortLife({ g: STEPS[st - 1] })) { S.overlay = { t: 'echest', arg: `${i}:${st}` }; render(); focusOverlay(); return; }
+    const x = target(S, 'step', st); S.echo.slots[i] = x; delete S.ech.pending[i]; S.echo.sel = i; S.overlay = null;
     toast(`Цель в слоте ${i + 1}: ${nameOf(foe(x.fid, x))} · ступень ${st} · ${lifeOf(x.g)} ч`);
   },
   /* атака: цена в душах один раз, бой ядром, здоровье цели сохраняется (§17.3, ADR-0025). v — «uid:номер атаки»:
@@ -1163,6 +1195,7 @@ Object.assign(OV, {
         ['Исчезнет через', `<span class="num" data-ech-t="${i}">${dur(sl.left)}</span>`], ['За победу', rewardOf(sl, f, c)]].concat(imm ? [['Иммунитет к контролю', pctBp(imm)]] : [],
         av.n ? [['Неприязнь отряда', `+${pctBp(av.bp)} урона · ${av.n} ${plural(av.n, 'герой', 'героя', 'героев')}`]] : []);
       tgt = `<div class="ech-kv">${kv.map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join('')}</div>
+        ${shortLife(sl) ? estHtml(sl, estOf(sl)) : ''}
         <p class="reason">Урон по цели сохраняется между атаками: в бой она выходит с остатком здоровья, и он — её полное здоровье в этом бою.${TM(` Бой ядром, как в биомах: исход решён при оплате, «Пропустить» — сразу итог. ${XR() ? 'Цена атаки — данные режима.' : 'Цена атаки — прежняя сетка §17.5, ждёт баланса.'}`)}</p>
         ${sl.g === 'm' ? '<span class="chip warn team-only" style="align-self:flex-start">правила — черновик</span>' : ''}`;
     }
@@ -1172,14 +1205,29 @@ Object.assign(OV, {
     const body = `<div class="ech-fhead">${ph(f)}<div class="col ech-fside"><div class="row ech-chips">${chips}</div>${nums}</div></div>${tgt}${face}${lore}`;
     return sheet(f.named || rec ? f.n : 'Неизвестный противник', body);
   },
+  /* выбор босса или Убер-босса (живут час): облик, ранг, здоровье и мощь, честная оценка на сиде первой атаки текущим отрядом
+     (ADR-0031, п. 8) — сколько атак и душ, у вас столько; исход не раскрывается. Одно действие — «Выбрать» */
+  echest(o) {
+    sync();
+    const [a, b] = String(o.arg || '').split(':'), i = +a, st = +b, p = S.ech.pending[i];
+    if (!p || !p.offers.includes(st) || S.echo.slots[i]) return '';
+    const x = ghost('step', st), f = foe(x.fid, x), L = lifeOf(x.g);
+    const body = `<div class="ech-fhead">${ph(f)}<div class="col ech-fside"><div class="row ech-chips"><span class="chip gold">${rankIc(x.g)}${ECH.short[x.g]} · ${st}</span>${el(x.el)}</div>${numIc('hp', x.max)}${numIc('power', x.bm)}</div></div>
+      ${estHtml(x, estOf(x))}
+      <p class="reason">Цель живёт ${hoursOf(L)} — потом уйдёт без очков. Цена одной атаки — ${fmt(atkCost(x))} ${souls(atkCost(x))}.</p>`;
+    return dialog(nameOf(f), body, `<button class="btn ghost" data-a="close">Отмена</button><button class="btn go" data-a="echpick" data-v="${i}:${st}:ok">Выбрать</button>`);
+  },
   /* подтверждение §12.5 (правила воздуха): предмет и свёрнутый лор, только невыполненные условия, расход и два ограничения;
      будущий враг и биом не раскрываются */
   echact(o) {
     const it = BAG.item(o.arg); if (!it) return '';
     const kind = o.kind, hide = hideIt(it), ck = checks(kind, it), ok = ck.every(x => x.ok), bad = ck.filter(x => !x.ok), cost = XE.summonSouls, T = ACT_T[kind];
+    /* крафтовый босс живёт час: честная оценка до призыва — на той цели, какую даст призыв; врага она не называет */
+    const fb = kind === 'call' && ok && !hide ? RX.drops.craftBosses.find(b => b.call === it.id) : null, gx = fb ? ghost('craft', fb) : null;
     const body = `<div class="row ech-itrow">${itIcon(it, 56, hide)}<div class="col" style="gap:5px;min-width:0"><b class="serif ech-itn">${hide ? 'Предмет цикла ' + ROMAN[it.cyc] : it.n}</b><span class="row ech-itm">${rar(it.r)}<span class="faint">${RX.tiers[it.tier].n}${it.spec && !hide ? ' · ' + specOf(it.spec) : ''}</span></span></div></div>
       ${hide ? '' : loreHtml(it.lore)}
       ${bad.length ? `<ul class="ech-checks">${bad.map(x => `<li class="no">${ic('x')}<span>${x.t}</span></li>`).join('')}</ul>` : ''}
+      ${gx ? estHtml(gx, estOf(gx)) : ''}
       <div class="row ech-spend"><span class="eyebrow">Расход</span>${itIcon(it, 28, hide)}<b class="num">×1</b>${kind === 'call' ? `<span class="faint">+</span>${money('souls', cost)}` : ''}</div>
       <ul class="ech-rules">${RULES[kind]().map(r => `<li>${r}</li>`).join('')}</ul>
       ${kind === 'echo' ? '<span class="chip warn team-only" style="align-self:flex-start" title="ADR-0025: этаж — состав ступени, биом — в слот биомов, как руина">как понят ответ автора — поправит автор</span>' : ''}`;
@@ -1297,5 +1345,5 @@ FLOWS.push(['Эхо · босс на час', 'Боссы, Убер и краф�
 /* для автопроверки tools/content-gen/screens/check_echo.js и консоли */
 window.EN_ECHO = { data: ECH, steps: STEPS, foe, stepFoe, fidOf, sync, draw, checks, planks: () => planks(weekOf(S), S.acc.cycle), bio: () => ({ cap: bioCap(), used: bioUsed() }), target: (kind, x, o) => target(S, kind, x, o),
   cost: x => atkCost(x), pts: ptsOf, floorPts, rounds: roundsOf, lvl: lvlOf, hp: hpOf, fight: (x, ids, no) => fightOf(x, ids, no || x.atk + 1), kit: demoKit,
-  manyFree, face: faceArt, arena: arenaOf, manyBp, likShards };
+  manyFree, face: faceArt, arena: arenaOf, manyBp, likShards, est: estOf, ghost, short: x => shortLife(x) };
 })();

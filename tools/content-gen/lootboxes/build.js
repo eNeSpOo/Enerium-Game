@@ -113,12 +113,14 @@ const MODES = {
       { id: 'top', n: 'Места по рейтингу', one: 'Место по рейтингу', kind: 'place', rows: [{ top: 1, get: [[2, 1, 'pure']] }, { top: 10, get: [[2, 1]] }, { top: 100, get: [[1, 1]] }, { top: 1000, get: [[0, 1]] }] },
     ],
     typical: { free: { me: 3 }, fan: { me: 4 } } },
+  /* Лига: планки побед — ×1, ×3, ×6, ×13 порога первой (arena/rules.js, league.plank): соседние не ближе ×2, а последнюю увлечённый берёт
+     в части недель (ADR-0031, п. 12). Было ×1, ×2, ×4, ×8 при пороге 5: 40 побед при 23 у увлечённого — никогда */
   league: { n: 'Лига', box: 'equip', from: 2, base: [0, 2, 3, 4, 5, 6], weekly: true, basis: 'победы в матчах — планки, рейтинг — места (§20.4)',
     layers: [
-      { id: 'me', n: 'Планки побед', one: 'Планка побед', kind: 'plank', rows: [{ x: 1, get: [[0, 2]] }, { x: 2, get: [[0, 1]] }, { x: 4, get: [[0, 1]] }, { x: 8, get: [[1, 1]] }] },
+      { id: 'me', n: 'Планки побед', one: 'Планка побед', kind: 'plank', rows: [{ x: 1, get: [[0, 2]] }, { x: 3, get: [[0, 1]] }, { x: 6, get: [[0, 1]] }, { x: 13, get: [[1, 1]] }] },
       { id: 'top', n: 'Места по рейтингу', one: 'Место по рейтингу', kind: 'place', rows: [{ top: 1, get: [[1, 1, 'pure']] }, { top: 10, get: [[1, 1]] }, { top: 100, get: [[0, 1]] }] },
     ],
-    typical: { free: { me: 1 }, fan: { me: 3 } } },
+    typical: { free: { me: 2 }, fan: { me: 3 } } },
   clan: { n: 'Клановый босс', box: 'talisman', from: 2, base: [0, 1, 2, 3, 4, 5], weekly: true, basis: 'место клана и личные очки (§25.3): планок нет',
     layers: [
       { id: 'clanTop', n: 'Места кланов', one: 'Место клана', kind: 'place', clan: true, rows: [{ top: 1, get: [[2, 2]] }, { top: 10, get: [[1, 1], [2, 1]] }, { top: 100, get: [[1, 2]] }, { top: 1000, get: [[0, 1], [1, 1]] }, { top: 0, get: [[0, 2]] }] },
@@ -128,7 +130,9 @@ const MODES = {
   event: { n: 'Событие', box: 'workers', from: 2, base: [0, 1, 2, 3, 4, 5], weekly: true, basis: 'очки События за неделю (§27)',
     layers: [
       { id: 'me', n: 'Личные планки', one: 'Личная планка', kind: 'plank', rows: [{ x: 1, get: [[0, 2]] }, { x: 2, get: [[0, 1]] }, { x: 4, get: [[0, 1]] }, { x: 8, get: [[1, 1]] }, { x: 16, get: [[1, 1]] }] },
-      { id: 'clan', n: 'Клановые планки', one: 'Клановая планка', kind: 'plank', clan: true, rows: [{ x: 1, get: [[0, 2]] }, { x: 2, get: [[0, 1]] }, { x: 4, get: [[0, 1]] }] },
+      /* клановые планки События (ADR-0031, п. 12): вторая — ×4 первой, третья — ×1,5 второй, чтобы её брал и клан увлечённых в части недель;
+         пороги считает сборщик События (event/build.js, clanX) — шаги x у него те же. minStepBp — исключение из закона «не ближе ×2» */
+      { id: 'clan', n: 'Клановые планки', one: 'Клановая планка', kind: 'plank', clan: true, minStepBp: 15000, rows: [{ x: 1, get: [[0, 2]] }, { x: 4, get: [[0, 1]] }, { x: 6, get: [[0, 1]] }] },
       { id: 'top', n: 'Места игроков, межсерверные', one: 'Место игрока, межсерверное', kind: 'place', rows: [{ top: 1, get: [[2, 1, 'pure']] }, { top: 10, get: [[2, 1]] }, { top: 100, get: [[1, 1]] }] },
       { id: 'clanTop', n: 'Места кланов, межсерверные', one: 'Место клана, межсерверное', kind: 'place', clan: true, rows: [{ top: 1, get: [[2, 1]] }, { top: 10, get: [[1, 1]] }, { top: 100, get: [[0, 1]] }] },
     ],
@@ -139,21 +143,46 @@ const MODES = {
   feats: { n: 'Достижения', box: 'wander', from: 1, once: true, proposal: true, clamp: true, base: [1, 2, 3, 4, 5, 6], basis: 'получение достижения (§29) — цикл игрока в этот момент',
     rows: [{ n: 'Персональные', count: 50, get: [[0, 1]] }, { n: 'Возрождённые', count: 22, get: [[1, 1]] }, { n: 'Таинственные', count: 22, get: [[1, 1, 'pure']] },
       { n: 'Первенство сервера', count: 0, get: [[2, 1, 'pure']] }] },
-  calendar: { n: 'Календарь', box: 'wander', from: 1, proposal: true, clamp: true, base: [1, 2, 3, 4, 5, 6], basis: 'вход в игру, 30 дней (§29)',
-    rows: [{ n: 'Каждый день, кроме 10-го, 20-го и 30-го', days: 27, base: [1, 1, 1, 1, 1, 1], get: [[0, 1, 'wild']] },
-      { n: '10-й день', days: 1, get: [[0, 1]] }, { n: '20-й день — главный приз', days: 1, get: [[1, 1, 'pure']] }, { n: '30-й день', days: 1, get: [[1, 1]] }] },
+  /* календарь — лист «Дар дня» (§29; ADR-0030, п. 22в; ADR-0031, п. 20): 30 отметок за вход в игру, сундуки — на шальных отметках и вехах,
+     остальное — валюты. Лист один на сундуки и пропуск — CAL в tools/content-gen/pass/build.js; строки режима собирает calRows ниже */
+  calendar: { n: 'Календарь', box: 'wander', from: 1, proposal: true, clamp: true, base: [1, 2, 3, 4, 5, 6],
+    basis: 'лист даров «Дар дня»: 30 отметок за вход в игру (§29); сундуки — на шальных отметках и вехах 7, 14, 20, 30', rows: null },
 };
+/* строки календаря из листа даров: сундук со своей редкостью (r) — одна строка на всю группу таких отметок, базой — эта редкость;
+   сундук вехи со сдвигом (off) — строка на веху. Окно — как в листе; лестница — окно по умолчанию */
+function calRows(CAL) {
+  const rows = [], same = new Map();
+  CAL.list.forEach((cell, i) => {
+    const m = i + 1;
+    for (const x of cell) {
+      if (x.k !== 'chest') continue;
+      const get = [0, 1].concat(x.win && x.win !== 'step' ? [x.win] : []);
+      if (x.r != null) {
+        const key = x.r + '|' + (x.win || 'step');
+        if (!same.has(key)) { const row = { marks: [], days: 0, base: [1, 2, 3, 4, 5, 6].map(() => x.r), get: [get] }; same.set(key, row); rows.push(row); }
+        const row = same.get(key); row.marks.push(m); row.days++;
+      } else {
+        get[0] = x.off;
+        const M = CAL.miles[m];
+        rows.push({ n: `${m}-я отметка — ${M ? M.n.toLowerCase() : 'сундук'}`, days: 1, get: [get] });
+      }
+    }
+  });
+  for (const row of rows) if (row.marks) { row.n = `${row.get[0][2] === 'wild' ? 'Шальной сундук' : 'Сундук'} — отметки ${row.marks.join(', ')}`; delete row.marks; }
+  return rows;
+}
+MODES.calendar.rows = calRows(require('../pass/build.js').CAL);
 
 /* Допущения для оценок — не правила игры. */
 const ASSUME = {
   shardsPerHero: 50,       // комплект осколков героя: в GDD числа нет (§15.2), 50 — как в прототипе UI-кита
   workerShards: 10,        // шардов на рабочего: в GDD числа нет (§19.1)
-  payerPts: [147, 100],    // плательщик набирает очков не больше ×1,47 — худший день Т12 черновика экономики
+  payerPts: [146, 100],    // плательщик набирает очков не больше ×1,46 — худший день Т12 черновика экономики (слотов — номер цикла, ADR-0031)
   craftKills: { free: 1, fan: 3 },   // побед над крафтовыми боссами в неделю: билет — уникальный ресурс босса биома, 5 % (§9.1)
   rb: { cap: 10, shareBp: [7000, 3000] },   // кап побед у рунных стражей в день и доля стражей пределов и доблести (черновик сет-бонусов, С8а)
-  day: {   // доход дня всех отрядов — С1 черновика сет-бонусов, вывод sets.py
-    2: { free: { gold: 63970, spirit: 127940 }, fan: { gold: 175929, spirit: 351860 } },
-    3: { free: { gold: 145590, spirit: 291181 }, fan: { gold: 403769, spirit: 807539 } },
+  day: {   // доход дня всех отрядов — С1 черновика сет-бонусов, вывод sets.py (финальный прогон ADR-0031: реальный отряд, слотов — номер цикла)
+    2: { free: { gold: 41967, spirit: 83935 }, fan: { gold: 128594, spirit: 257188 } },
+    3: { free: { gold: 105446, spirit: 210892 }, fan: { gold: 328856, spirit: 657712 } },
   },
 };
 
@@ -420,7 +449,7 @@ for (const [mid, m] of Object.entries(MODES)) {
     const layer = { id: ly.id, n: ly.n, one: ly.one || ly.n, kind: ly.kind, clan: !!ly.clan, rows: [] };
     P.layers.push(layer);
     ly.rows.forEach((row, i) => push(layer, row, ly.kind === 'plank' ? `планка ${i + 1}` : row.top ? `топ-${row.top}` : 'все с очками'));
-    if (ly.kind === 'plank') ly.rows.forEach((row, i) => { if (i && row.x < ly.rows[i - 1].x * RULES.plankStep) err.push(`${m.n} · ${ly.n}: планки ${i} и ${i + 1} ближе ×${RULES.plankStep} по очкам`); });
+    if (ly.kind === 'plank') ly.rows.forEach((row, i) => { const stepBp = ly.minStepBp || RULES.plankStep * 10000; if (i && row.x * 10000 < ly.rows[i - 1].x * stepBp) err.push(`${m.n} · ${ly.n}: планки ${i} и ${i + 1} ближе ×${stepBp / 10000} по очкам`); });
     if (ly.kind === 'place') ly.rows.forEach((row, i) => { if (i && row.top !== 0 && row.top <= ly.rows[i - 1].top) err.push(`${m.n} · ${ly.n}: места не по возрастанию`); });
   }
   if (m.rows) { const layer = { id: 'rows', n: m.n, kind: 'once', rows: [] }; P.layers.push(layer); m.rows.forEach(row => push(layer, row, row.n)); }
@@ -890,21 +919,20 @@ for (const s of spread) {
 block('dust');
 T.push(`| Лишний осколок: редкость героя | Нужный: ${[3, 4, 5, 6, 7].map(rn).join(' | ')} |`, '|---|---|---|---|---|---|');
 for (let a = 3; a <= 7; a++) T.push(`| ${rn(a)} | ${[3, 4, 5, 6, 7].map(b => fx(new Q(DUST.price[b - 1], DUST.perShard[a - 1]), 2)).join(' | ')} |`);
-/* неделя Эхо в поздних циклах: герои отряда прошлых циклов пробуждены — их осколки уходят в прах, прах покупает осколки нового */
+/* неделя Эхо в поздних циклах: герои отряда прошлых циклов пробуждены — их осколки уходят в прах. Прах покупает осколки только героев
+   рулетки (roster.js, rules.dustSrc — ADR-0030, п. 16: героев Эхо прахом не собрать), поэтому новый герой недели идёт только своими осколками */
 block('dust_week');
-T.push('| Цикл | Нового героя напрямую | Лишних: прежние герои отряда пробуждены | Праха из них | Нового героя за прах | Всего нового героя | Недель на комплект |', '|---|---|---|---|---|---|---|');
+T.push('| Цикл | Нового героя напрямую | Лишних: прежние герои отряда пробуждены | Праха из них — на героев рулетки | Недель на комплект нового |', '|---|---|---|---|---|');
 for (let c = 3; c <= 6; c++) {
   const T0 = WEEK.echo[c].free.ev.shards, per = T0.div(new Q(c - 1));
-  let dust = Q0, bought = Q0;
+  let dust = Q0;
   for (const w of WEEKS) {
-    const hs = heroesByWeek[w].filter(h => h.cyc <= c), nu = hs.find(h => h.cyc === c), old = hs.filter(h => h.cyc < c);
-    const d = old.reduce((a, h) => a.add(per.mul(new Q(DUST.perShard[h.r - 1] * h.cyc))), Q0);
-    dust = dust.add(d); bought = bought.add(d.div(new Q(DUST.price[nu.r - 1] * c)));
+    const hs = heroesByWeek[w].filter(h => h.cyc <= c), old = hs.filter(h => h.cyc < c);
+    dust = dust.add(old.reduce((a, h) => a.add(per.mul(new Q(DUST.perShard[h.r - 1] * h.cyc))), Q0));
   }
-  dust = dust.div(new Q(WEEKS.length)); bought = bought.div(new Q(WEEKS.length));
-  const total = per.add(bought);
-  T.push(`| ${ROMAN[c]} | ${fx(per, 1)} | ${fx(per.mul(new Q(c - 2)), 1)} | ${fmt(dust.int(0))} | ${fx(bought, 1)} | ${fx(total, 1)} | ${fx(new Q(ASSUME.shardsPerHero).div(total), 1)} |`);
-  if (c === 6) { inline.dust6 = fmt(dust.int(0)); inline.bought6 = fx(bought, 1); inline.per6 = fx(per, 1); }
+  dust = dust.div(new Q(WEEKS.length));
+  T.push(`| ${ROMAN[c]} | ${fx(per, 1)} | ${fx(per.mul(new Q(c - 2)), 1)} | ${fmt(dust.int(0))} | ${fx(new Q(ASSUME.shardsPerHero).div(per), 1)} |`);
+  if (c === 6) { inline.dust6 = fmt(dust.int(0)); inline.per6 = fx(per, 1); inline.weeks6 = fx(new Q(ASSUME.shardsPerHero).div(per), 1); }
 }
 
 /* спойлеры в таблице талисманов */
@@ -972,7 +1000,7 @@ for (const id of Object.keys(BOXES)) {
 }
 const modesOut = {};
 for (const [mid, m] of Object.entries(MODES)) modesOut[mid] = { n: m.n, box: m.box, basis: m.basis, from: m.from, proposal: !!m.proposal, weekly: !!m.weekly, typical: m.typical || null,
-  layers: PAY[mid].layers.map(ly => ({ id: ly.id, n: ly.n, one: ly.one || ly.n, kind: ly.kind, clan: !!ly.clan, rows: ly.rows.map(r => ({ label: r.label, x: r.x, top: r.top, team: r.team, cyc: r.cyc })) })) };
+  layers: PAY[mid].layers.map(ly => ({ id: ly.id, n: ly.n, one: ly.one || ly.n, kind: ly.kind, clan: !!ly.clan, rows: ly.rows.map(r => ({ label: r.label, x: r.x, top: r.top, team: r.team, days: r.days, cyc: r.cyc })) })) };
 const weekOut = {};
 for (const mid of Object.keys(WEEK)) { weekOut[mid] = {}; for (const c of Object.keys(WEEK[mid])) weekOut[mid][c] = { free: Object.assign({ boxes: WEEK[mid][c].free.boxes }, ev100(WEEK[mid][c].free.ev)), fan: Object.assign({ boxes: WEEK[mid][c].fan.boxes }, ev100(WEEK[mid][c].fan.ev)) }; }
 const DATA = Object.assign({}, L, {

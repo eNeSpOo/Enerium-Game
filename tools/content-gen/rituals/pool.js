@@ -59,11 +59,11 @@ function pool(D, spec) {
   return out;
 }
 
-/* Награда карточки — количества, без бросков: у героев валюта за единицу времени × цикл аккаунта на старте;
+/* Награда карточки — количества, без бросков: у героев валюта за curH единиц времени × цикл аккаунта на старте, вниз до целого;
    у рабочих — базовые за единицу, ключи биома — с редкости keys.from, один за keys.per единиц; уникальный ритуал — только уникальный */
 function amount(D, card, cyc) {
   const T = D.tabs[card.tab], u = card.ms / T.unitMs;
-  if (card.tab === 'hero') return { cur: T.cur.map(([k, per]) => [k, per * u * cyc]), basics: 0, keys: 0, uniq: 0 };
+  if (card.tab === 'hero') return { cur: T.cur.map(([k, per]) => [k, Math.floor(per * u * cyc / (T.curH || 1))]), basics: 0, keys: 0, uniq: 0 };
   if (card.unique) return { cur: [], basics: 0, keys: 0, uniq: D.rules.unique.qty };
   return { cur: [], basics: T.basics * u, keys: card.r >= T.keys.from ? Math.floor(u / T.keys.per) : 0, uniq: 0 };
 }

@@ -222,7 +222,7 @@
 .ech-res-marks{flex-wrap:wrap;gap:6px}
 .ech-loot{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-s) var(--sp-l)}
 .ech-li{display:flex;align-items:center;gap:var(--sp-s);min-width:0;font-size:13px}
-.ech-li>span:not(.well):not(.rs-av):not(.row):not(.chip){min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ech-li>span:not(.well):not(.rs-av):not(.row):not(.chip):not(.hsg){min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ech-li>b{flex:none}
 .ech-li>small{flex:none;font-size:11.5px}
 .ech-res-t{width:100%;border-collapse:collapse;font-size:12.5px}

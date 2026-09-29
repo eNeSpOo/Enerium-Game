@@ -195,7 +195,9 @@ function coView(it) {
   const k = it.kind, o = { kind: k, id: it.id, r: it.r, q: it.q, dust: it.dust || 0, face: false, name: '', hn: '', icon: '', tip: '' };
   if (k === 'shard') {
     const h = RSI[it.id], n = h ? h.n : LBX && LBX.heroInfo[it.id] ? LBX.heroInfo[it.id].n : 'Герой';
-    o.face = !!h; o.icon = h ? rsFace(h) : ic('users'); o.hn = n; o.name = o.dust ? `${n} → прах` : n;
+    /* осколки — стекло с лицом героя и долей собранного (shardGhost, screens/art-icons.js); ушли в прах — портрет пробуждённого */
+    const g = h && !o.dust && typeof shardGhost === 'function' ? shardGhost(h, S.rs.shards[it.id] || 0, RS.rules.stub.shards, 96) : '';
+    o.face = !!h && !g; o.glass = !!g; o.icon = g || (h ? rsFace(h) : ic('users')); o.hn = n; o.name = o.dust ? `${n} → прах` : n;
     o.tip = o.dust ? `${n} уже пробуждён: осколки ×${fmt(it.q)} → прах +${fmt(o.dust)}` : `Осколки героя: ${n} ×${fmt(it.q)}`;
   } else if (k === 'item') {
     const x = BAG.item(it.id);
@@ -204,7 +206,7 @@ function coView(it) {
     o.icon = `<img src="${curImg(it.id)}" alt="">`; o.name = coCurName(it.id); o.tip = `${o.name} ×${fmt(it.q)}`;
   } else {   // tal, wshard, equip — «из сундуков» в запасах; спойлеры в именах талисманов прячет zpExtraName
     const xk = k === 'tal' ? 'tal' : k === 'wshard' ? 'wsh' : 'eq';
-    o.icon = ic(ZP_EXTRA_IC[xk] || 'gem'); o.name = zpExtraName(xk, it.id, it.r); o.tip = `${o.name} ×${fmt(it.q)}`;
+    o.icon = (typeof zpExtraArt === 'function' && zpExtraArt(xk, it.id, 64)) || ic(ZP_EXTRA_IC[xk] || 'gem'); o.name = zpExtraName(xk, it.id, it.r); o.tip = `${o.name} ×${fmt(it.q)}`;
     /* снаряжение: предмет, который создал сервер при открытии (screens/equipment.js) — его слот и главная строка */
     const v = k === 'equip' && typeof eqView === 'function' ? eqView(it) : null;
     if (v) { o.icon = v.icon; o.name = v.name; o.tip = v.tip; }
@@ -497,7 +499,7 @@ function coCardsHtml(R, e, C, my) {
     const fly = best ? H.rise : V.fly, fl = best ? T.hero.flip : t + V.fly, fp = best ? H.flip : V.flip;
     const s = `left:${x}px;top:${y}px;--w:${w}px;--h:${h}px;--fx:${fx}px;--fy:${fy}px;--dc:${t - e}ms;--tf:${fly}ms;--dl:${fl - e}ms;--tp:${fp}ms;--ta:${ta}deg`
       + (best ? `;--dv:${T.hero.hover - e}ms;--tv:${H.hover}ms` : '');
-    const face = `<span class="co-cb co-face"><i class="co-cr"></i><span class="co-ci${c.face ? ' face' : ''}">${c.icon}</span><b class="co-cq">${c.dust ? '+' + fmt(c.dust) : '×' + fmt(c.q)}</b>${best ? '<i class="co-csh co-a"></i>' : ''}</span>`;
+    const face = `<span class="co-cb co-face"><i class="co-cr"></i><span class="co-ci${c.face ? ' face' : c.glass ? ' glass' : ''}">${c.icon}</span><b class="co-cq">${c.dust ? '+' + fmt(c.dust) : '×' + fmt(c.q)}</b>${best ? '<i class="co-csh co-a"></i>' : ''}</span>`;
     const back = `<span class="co-back"><i class="co-bk"></i></span>`;
     const inner = `<i class="co-tail co-a"></i>${best ? '<i class="co-aura co-a"></i>' : ''}<span class="co-flip co-a">${face}${back}</span>`;
     return `<div class="co-card co-a${best ? ' best' : ''}${c.dust ? ' dust' : ''}" data-r="${c.r}" data-i="${i}" title="${trEsc(c.tip)}" style="${s}">`
@@ -524,7 +526,7 @@ function coGroups(R) {
 }
 function coTile(g, i) {
   const tip = g.kind === 'shard' ? (g.dust ? `${g.hn} уже пробуждён: осколки ×${fmt(g.q)} → прах +${fmt(g.dust)}` : `Осколки героя: ${g.hn} ×${fmt(g.q)}`) : `${g.name} ×${fmt(g.q)}`;
-  return `<div class="co-t${g.dust ? ' dust' : ''}" data-r="${g.r}" title="${trEsc(tip)}" style="--i:${i}"><span class="co-ti${g.face ? ' face' : ''}">${g.icon}<b class="co-tq">${g.dust ? '+' + fmt(g.dust) : '×' + fmt(g.q)}</b></span><small>${trEsc(g.name)}</small></div>`;
+  return `<div class="co-t${g.dust ? ' dust' : ''}" data-r="${g.r}" title="${trEsc(tip)}" style="--i:${i}"><span class="co-ti${g.face ? ' face' : g.glass ? ' glass' : ''}">${g.icon}<b class="co-tq">${g.dust ? '+' + fmt(g.dust) : '×' + fmt(g.q)}</b></span><small>${trEsc(g.name)}</small></div>`;
 }
 /* кнопки итога: «Открыть ещё» — один такой же сундук с полной анимацией, «Открыть все» — оставшиеся пачкой; номер операции — на кнопках */
 function coActs(R) {

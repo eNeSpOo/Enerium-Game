@@ -1,11 +1,44 @@
-/* значки предметов и призрачный осколок героя — screens/art-icons.js */
+/* значки предметов и осколок героя — screens/art-icons.js */
 .eq-ico,.tal-ico{object-fit:contain}
-.hsg{position:relative;display:inline-block;width:var(--px,64px);height:var(--px,64px);flex:none}
+
+/* ---------- осколок героя по образцу автора ----------
+   Тёмное стекло, в нём — лицо холодным серо-бирюзовым монохромом (портрет по грудь или силуэт класса), поверх — трещины с бликом
+   и бирюзовая кромка. Лицо видно всегда. Доля собранного --s (целые %) — свет кромки; трещины --cr гаснут к полному комплекту —
+   стекло «заживает»; полный комплект (data-full) — кромка горит и дышит. Размер — --px или место: в клетке запасов — 100 %.
+   Рисунок стекла (data-k="art") — три выгруженных слоя; до выгрузки (data-k="svg") — тот же силуэт, кромка и трещины SVG */
+.hsg{--s:0;--cr:100;position:relative;display:inline-block;width:var(--px,64px);height:var(--px,64px);flex:none;
+  filter:drop-shadow(0 0 calc(1px + var(--s) * .06px) rgba(72,229,212,calc(.14 + var(--s) * .005)))}
 .hsg>*{position:absolute;inset:0}
-.hsg-in{-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;background:rgba(8,14,17,.92);overflow:hidden}
-/* лицо — туда, где стекло осколка после выгрузки: 10 % сверху и снизу, 27 % по бокам */
-.hsg-face{position:absolute;inset:10% 27%;background:50% 0/auto 139% no-repeat;filter:grayscale(1) sepia(.3) hue-rotate(140deg) brightness(.9) contrast(1.15);mix-blend-mode:screen}
-.hsg-init{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:600 calc(var(--px,64px) * .28)/1 var(--f-d);color:#9fd8d2;mix-blend-mode:screen}
-.hsg-fr{width:100%;height:100%;object-fit:contain;pointer-events:none}
-/* редкость — свет по краю, не краской по стеклу */
-.hsg[data-r]{filter:drop-shadow(0 0 6px color-mix(in srgb,var(--rc,#9fd8d2) 45%,transparent))}
+.hsg-in{overflow:hidden;background:radial-gradient(60% 46% at 50% 96%,rgba(72,229,212,.2),transparent 72%),linear-gradient(180deg,#0a1719,#050b0c)}
+.hsg[data-k="art"] .hsg-in{-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
+.hsg[data-k="svg"] .hsg-in{clip-path:polygon(50% 5%,64% 19%,78% 27%,76% 48%,71% 54%,74% 61%,72% 80%,50% 95%,29% 80%,22% 30%)}
+/* лицо: окно стекла — 60 % ширины и 92 % высоты кадра; портрет по грудь — картинка на 150 % высоты окна, верх — 6 %.
+   Цвет — одна цепочка фильтров: серое, чуть сепии и поворот тона в холодную бирюзу; края тают в стекло */
+.hsg-face{position:absolute;left:20%;right:20%;top:4%;bottom:4%;background:50% 6%/auto 150% no-repeat;
+  filter:grayscale(1) sepia(.6) hue-rotate(125deg) contrast(1.08) brightness(1.04);
+  -webkit-mask-image:radial-gradient(82% 74% at 50% 40%,#000 58%,transparent 100%);mask-image:radial-gradient(82% 74% at 50% 40%,#000 58%,transparent 100%)}
+.hsg-face.cls{background-position:50% 26%;background-size:auto 116%}   /* силуэт класса — бюст во весь кадр */
+.hsg-face.svg>svg{display:block;width:100%;height:100%}
+.hsg-face.svg .b{fill:#0b1618;stroke:#8fd9cf;stroke-width:1.4}
+.hsg-face.svg .f{fill:#030708}
+.hsg-face.svg .i{fill:#0d1a1c;stroke:#c6f5ef;stroke-width:1.6}
+.hsg-face.svg .k{fill:none;stroke:#c6f5ef;stroke-width:2.2;stroke-linecap:round}
+.hsg-face.svg .k.w{stroke-width:4.5}
+.hsg-face.svg .k.t{stroke-width:.8}
+.hsg-face.svg .l{fill:#dffcf8;filter:drop-shadow(0 0 3px #48e5d4)}
+/* трещины с бликом и кромка — рисунок или SVG */
+.hsg-cr,.hsg-rim{width:100%;height:100%;object-fit:contain;pointer-events:none}
+.hsg-cr{opacity:calc(var(--cr) / 100)}
+.hsg-sv{width:100%;height:100%;overflow:visible;pointer-events:none}
+.hsg-sv .r{fill:none;stroke:#48e5d4;stroke-width:5;stroke-linejoin:miter;stroke-opacity:.88}
+.hsg-sv .h{fill:none;stroke:#e6fffb;stroke-width:1.1;stroke-linejoin:miter;stroke-opacity:.75}
+.hsg-sv .c{fill:none;stroke:#e9fffc;stroke-width:.8;stroke-linecap:round;opacity:calc(var(--cr) / 100)}
+.hsg-sv .g{fill:#e9fffc;opacity:calc(var(--cr) * .0022)}
+/* полный комплект: кромка горит и дышит; при «меньше движения» — просто горит */
+.hsg[data-full]{animation:hsg-full 2.4s ease-in-out infinite}
+@keyframes hsg-full{0%,100%{filter:drop-shadow(0 0 5px rgba(72,229,212,.7))}50%{filter:drop-shadow(0 0 10px rgba(72,229,212,1)) brightness(1.12)}}
+@media (prefers-reduced-motion:reduce){ .hsg[data-full]{animation:none;filter:drop-shadow(0 0 8px rgba(72,229,212,.9))} }
+/* раздел UI-кита: осколки подряд с подписью */
+.hsg-kit{gap:16px;flex-wrap:wrap;align-items:flex-end}
+.hsg-kit figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px}
+.hsg-kit figcaption{font-size:11px;color:var(--parch-3)}

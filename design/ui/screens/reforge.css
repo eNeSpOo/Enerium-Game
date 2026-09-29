@@ -1,8 +1,10 @@
-/* screens/reforge.css — «Ремесло → Перековка» (screens/reforge.js) по «Правилам воздуха»: слева лестница редкостей, справа
-   наковальня — круг «что уйдёт → что выйдет», цена и одно действие. Одна рамка — панель, внутри строки и отступы.
-   Свои классы — rf-*; общие — pnl, tabs, btn, eyebrow, reason, link, dot. Редкость — рамкой и цветом --r1…--r7 (ADR-0027).
-   Анимация показа — только transform и opacity; моменты (--dt) и длительности (--tt) приходят из разметки и отсчитаны от начала
-   показа, поэтому перерисовка посреди анимации её не рвёт. Базовый стиль элемента — его конечное состояние. */
+/* screens/reforge.css — «Ремесло → Перековка» (screens/reforge.js) по «Правилам воздуха»: слева лестница редкостей кристаллами,
+   в центре сетка — что сплавить, отмечает игрок, — справа наковальня: отмеченное на орбите, что выйдет, цена и одно действие.
+   Одна рамка — панель, внутри строки и отступы. Свои классы — rf-*; общие — pnl, tabs, btn, eyebrow, reason, link, dot.
+   Редкость — рамкой и цветом --r1…--r7 (ADR-0027). Колонки, круг и клетка — переменные .rf: их читает расчёт раскладки
+   в check_reforge.js. Клетка — не меньше 44 px: палец на телефоне. Анимация показа — только transform и opacity; моменты (--dt)
+   и длительности (--tt) приходят из разметки и отсчитаны от начала показа, поэтому перерисовка посреди анимации её не рвёт.
+   Базовый стиль элемента — его конечное состояние. */
 
 /* пять вкладок «Ремесла» в шапке: чуть плотнее, чтобы вместе с кошельком влезть и в 844 px (расчёт — check_reforge.js) */
 .g-seg:has(>button:nth-child(5)) button{padding:0 7px;font-size:16.5px}
@@ -11,60 +13,89 @@
 .g.sm .g-seg:has(>button:nth-child(5)) button{padding:0 6px;font-size:15px}
 .g.sm .g-seg:has(>button:nth-child(5)) button[aria-selected="true"]{font-size:18px}
 
-/* каркас: вкладки режимов сверху, лестница слева, наковальня справа */
+/* каркас: вкладки режимов сверху; ниже лестница, сетка и наковальня. Размеры — здесь и в запросах по высоте и ширине ниже */
+.rf{--rf-lad:56px;--rf-anv:360px;--rf-ring:168px;--rf-cell:52px}
 .rf-bar{flex:none;gap:var(--sp-s)}
 .rf-bar .tabs button{display:inline-flex;align-items:center;gap:6px}
 .rf-bar .tabs .dot{position:static;width:6px;height:6px}
-.rf-main{flex:1 1 0;min-height:0;display:grid;grid-template-columns:236px minmax(0,1fr);gap:10px}
+.rf-main{flex:1 1 0;min-height:0;display:grid;grid-template-columns:var(--rf-lad) minmax(0,1fr) var(--rf-anv);gap:var(--sp-s)}
 .rf-lock{flex:1 1 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-s);padding:var(--sp-l);text-align:center;font-size:14px;color:var(--parch-2)}
 .rf-lk .i{width:28px;height:28px;color:var(--parch-3)}
 
-/* лестница редкостей: вход → итог, сколько свободных и сколько нужно */
-.rf-lad{display:flex;flex-direction:column;gap:2px;padding:6px;min-height:0}
-.rf-step{appearance:none;display:grid;grid-template-columns:auto 12px auto minmax(0,1fr) auto;align-items:center;gap:6px;flex:1 1 0;min-height:34px;padding:0 10px 0 8px;border:0;border-radius:9px;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
-.rf-step>.i{width:12px;height:12px;color:var(--parch-3)}
+/* лестница редкостей: кристалл и сколько свободных; хватает — число светится, выбранная — подсвечена */
+.rf-lad{display:flex;flex-direction:column;gap:2px;padding:4px;min-height:0}
+.rf-step{appearance:none;flex:1 1 0;min-height:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:0;border:0;border-radius:9px;background:none;color:inherit;font:inherit;cursor:pointer}
 .rf-cr{display:inline-grid;place-items:center}
 .rf-cr .ico{filter:drop-shadow(0 0 3px color-mix(in srgb,var(--rc,#fff) 45%,transparent))}
-.rf-sn{min-width:0;font:600 15px/1.1 var(--f-d);color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rf-sq{font:700 13px/1 var(--f-u);color:var(--parch-3);font-variant-numeric:tabular-nums}
-.rf-sq small{font:inherit;font-size:11px;opacity:.75}
-.rf-step.ok .rf-sn{color:var(--parch)}
+.rf-sq{font:700 12px/1 var(--f-u);color:var(--parch-3);font-variant-numeric:tabular-nums}
 .rf-step.ok .rf-sq{color:var(--spirit)}
 .rf-step:hover{background:rgba(255,255,255,.03)}
 .rf-step[aria-pressed="true"]{background:rgba(72,229,212,.07);box-shadow:inset 2px 0 0 var(--spirit)}
 
-/* наковальня: круг слева, справа — что выйдет, итог, цена и действие */
-.rf-anv{display:flex;align-items:center;gap:16px;padding:12px 16px;min-width:0;min-height:0;background:radial-gradient(55% 85% at 22% 50%,color-mix(in srgb,var(--rc,#2b3036) 9%,transparent),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.018),transparent 40%),var(--stone)}
-.rf-ring{position:relative;flex:none}
+/* сетка: сверху счётчик, подсказки и «×»; клетка — значок и одно число; строка под сеткой — что нажато или почему нельзя */
+.rf-pick{display:flex;flex-direction:column;gap:var(--sp-s);padding:var(--sp-s) var(--sp-m);min-width:0;min-height:0}
+.rf-ph{flex:none;display:flex;align-items:center;gap:var(--sp-s);min-width:0}
+.rf-cnt{flex:none;display:inline-flex;align-items:baseline;gap:1px;color:var(--parch)}
+.rf-cnt b{font:600 26px/1 var(--f-d);font-variant-numeric:lining-nums tabular-nums}
+.rf-cnt small{font:600 15px/1 var(--f-d);color:var(--parch-3)}
+.rf-cnt.full b{color:var(--spirit)}
+.rf-cl{min-width:0;font-size:13px;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rf-sp{flex:1 1 0}
+.rf-hb{flex:none;min-height:36px}
+.rf-hb>.i{width:14px;height:14px}
+.rf-grid{flex:1 1 0;min-height:0;display:grid;grid-template-columns:repeat(auto-fill,var(--rf-cell));grid-auto-rows:var(--rf-cell);gap:6px;align-content:start;padding:5px}
+.rf-cell{position:relative;appearance:none;width:var(--rf-cell,52px);height:var(--rf-cell,52px);min-width:44px;min-height:44px;padding:0;border:0;border-radius:10px;background:none;color:inherit;font:inherit;cursor:pointer}
+.rf-cell>.rf-t{border-radius:10px}
+.rf-cell>.tl-t{--ts:88%}
+.rf-cell[aria-pressed="true"]>.rf-t,.rf-cell[aria-pressed="true"]>.tl-t{box-shadow:0 0 0 2px var(--spirit),0 0 14px -2px var(--spirit)}
+.rf-cell[aria-current="true"]{outline:1px dashed var(--gold-2);outline-offset:2px}
+.rf-cell.lock{cursor:help}
+.rf-cell.lock>.rf-t,.rf-cell.lock>.tl-t{opacity:.42;filter:grayscale(.6)}
+.rf-ck,.rf-lb{position:absolute;display:grid;place-items:center;width:18px;height:18px;border-radius:50%;pointer-events:none}
+.rf-ck{top:-5px;right:-5px;background:var(--spirit);color:#07201d;box-shadow:0 0 8px var(--spirit)}
+.rf-ck .i{width:12px;height:12px;stroke-width:3}
+.rf-lb{left:-4px;bottom:-4px;background:#15191d;border:1px solid var(--iron-2);color:var(--parch-2)}
+.rf-lb .i{width:11px;height:11px}
+.rf-q{position:absolute;right:4px;bottom:3px;font:700 10.5px/1 var(--f-u);color:var(--parch);text-shadow:0 1px 2px #000,0 0 4px #000;pointer-events:none}
+.rf-cy{position:absolute;left:4px;top:3px;font:700 9.5px/1 var(--f-u);letter-spacing:.04em;color:var(--parch-2);text-shadow:0 1px 2px #000;pointer-events:none}
+.rf-fo{flex:none;margin:0;min-height:17px;font-size:12.5px;line-height:17px;color:var(--parch-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rf-fo.warn{color:var(--amber)}
+.rf-empty{grid-column:1/-1;margin:var(--sp-m) 0;font-size:13px;color:var(--parch-3)}
+
+/* наковальня: круг и строка «что выйдет» рядом, под ними — одно действие с ценой */
+.rf-anv{display:flex;flex-direction:column;justify-content:center;gap:var(--sp-s);padding:var(--sp-s) var(--sp-m);min-width:0;min-height:0;background:radial-gradient(60% 70% at 30% 40%,color-mix(in srgb,var(--rc,#2b3036) 9%,transparent),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.018),transparent 40%),var(--stone)}
+.rf-top{display:flex;align-items:center;gap:var(--sp-m);min-width:0}
+.rf-ring{position:relative;flex:none;width:var(--rf-ring,168px);height:var(--rf-ring,168px)}
 .rf-disc{position:absolute;inset:13%;border-radius:50%;border:1px dashed #2b3137;background:radial-gradient(closest-side,color-mix(in srgb,var(--rc,#48e5d4) 14%,transparent),transparent)}
-.rf-it{position:absolute;width:38px;height:38px;display:grid;place-items:center}
+.rf-it{position:absolute;display:grid;place-items:center;padding:0;border:0;background:none;color:inherit;font:inherit}
+button.rf-it{cursor:pointer}
 .rf-it.none{border-radius:9px;border:1px dashed #2b3137;background:#0b0d10}
-.rf-it>.tl-t{--ts:30px}
+.rf-it>.tl-t{--ts:88%}
 /* плитка предмета: арт в рамке своей редкости; рабочий — кристалл в круге */
 .rf-t{position:relative;display:grid;place-items:center;width:100%;height:100%;border-radius:9px;border:1px solid color-mix(in srgb,var(--rc,#2b3036) 65%,#000);background:radial-gradient(80% 80% at 50% 100%,color-mix(in srgb,var(--rc,#2b3036) 26%,transparent),transparent 70%),#0d1013;box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--rc,#2b3036) 80%,transparent)}
 .rf-t>img{width:86%;height:86%;object-fit:contain}
 .rf-t.glyph>.i{width:58%;height:58%;stroke-width:1.6;color:var(--parch)}
 .rf-t.cr{border-radius:50%}
+.rf-t.wk>img{width:94%;height:94%;object-position:50% 100%}
+.rf-wkc{position:absolute;right:2px;top:2px;display:grid;filter:drop-shadow(0 0 3px color-mix(in srgb,var(--rc) 70%,transparent))}
 .rf-t.cr>img{width:68%;height:68%}
-.rf-core,.rf-res{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;display:grid;place-items:center}
+.rf-core,.rf-res{position:absolute;left:34%;top:34%;width:32%;height:32%;display:grid;place-items:center}
 .rf-core{border-radius:50%;border:1px solid color-mix(in srgb,var(--rc) 60%,#000);background:radial-gradient(circle at 50% 70%,color-mix(in srgb,var(--rc) 30%,transparent),transparent 65%),#0c0f12;box-shadow:0 0 22px -6px var(--rc)}
-.rf-core b{font:600 26px/1 var(--f-d);color:var(--rc)}
+.rf-core b{font:600 24px/1 var(--f-d);color:var(--rc)}
 .rf-res>.rf-t{border-radius:14px;box-shadow:0 0 26px -4px var(--rc),inset 0 -3px 0 var(--rc)}
-.rf-res>.tl-t{--ts:54px}
-.rf-side{flex:1 1 0;min-width:0;align-self:stretch;display:flex;flex-direction:column;justify-content:center;gap:6px}
-.rf-h{margin:0;font-size:22px;line-height:1.1;color:var(--parch)}
-.rf-p{margin:0;font-size:13px;line-height:1.35;color:var(--parch-2)}
-.rf-got{display:flex;flex-direction:column;gap:3px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,var(--rc,#48e5d4) 8%,transparent);box-shadow:inset 2px 0 0 var(--rc,#48e5d4)}
-.rf-got b{font-size:18px;line-height:1.1;color:var(--parch)}
-.rf-got small{font-size:12.5px;line-height:1.3;color:var(--parch-2)}
-.rf-got .link{align-self:flex-start;margin-top:2px}
-.rf-warn{margin:0}
-.rf-foot{display:flex;align-items:center;justify-content:flex-end;gap:var(--sp-s);flex-wrap:wrap;margin-top:var(--sp-s)}
-.rf-why{font-size:12.5px;color:var(--parch-3)}
-.rf-btn{flex:none;margin-left:0}
+.rf-res>.tl-t{--ts:88%}
+.rf-out{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:4px}
+.rf-out b{font-size:18px;line-height:1.12;color:var(--parch)}
+.rf-out small{font-size:12px;line-height:1.3;color:var(--parch-2);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.rf-out small.warn{color:var(--amber)}
+.rf-out .link{align-self:flex-start;margin-top:2px}
+.rf-btn{flex:none;width:100%}
+.rf-btn.poor .cost{color:var(--amber)}
+.rf-why{margin:0;text-align:center;font-size:12px;color:var(--amber)}
+.rf-tm{margin:0;font-size:11px;line-height:1.25}
 
 /* показ итога: на орбите стягиваются в центр, «?» вспыхивает цветом новой редкости и гаснет, итог поднимается */
-.rf-fl{position:absolute;left:50%;top:50%;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;pointer-events:none;opacity:0;
+.rf-fl{position:absolute;left:15%;top:15%;width:70%;height:70%;border-radius:50%;pointer-events:none;opacity:0;
   background:radial-gradient(closest-side,#fff 0,color-mix(in srgb,var(--rc) 80%,#fff) 24%,color-mix(in srgb,var(--rc) 40%,transparent) 55%,transparent 72%)}
 .rf-tap{position:absolute;inset:0;z-index:3;border:0;background:none;cursor:pointer}
 .rf-anim .rf-fly{animation:rf-fly var(--tt) cubic-bezier(.55,0,.7,.4) var(--dt) both}
@@ -81,8 +112,12 @@
 /* раздел UI-кита: образцы и раскадровка — те же элементы, анимации на паузе в своих моментах */
 .rf-kit{display:flex;flex-direction:column;gap:var(--sp-m)}
 .rf-kg{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:var(--sp-m)}
-.rf-kl{display:flex;flex-direction:column;gap:2px;max-width:260px}
-.rf-kl .rf-step{flex:none;height:36px}
+.rf-kcs{display:flex;flex-wrap:wrap;gap:var(--sp-m)}
+.rf-kc{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.rf-kc figcaption{font-size:12px;color:var(--parch-3)}
+.rf-kh{padding:var(--sp-s);border-radius:10px;background:var(--stone);border:1px solid var(--iron)}
+.rf-kl{display:flex;gap:4px}
+.rf-kl .rf-step{flex:none;width:52px;height:48px}
 .rf-kr{display:grid;place-items:center}
 .rf-board{display:flex;flex-wrap:wrap;gap:var(--sp-m)}
 .rf-still{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px}
@@ -92,13 +127,22 @@
 .rf-frame .rf-ring *,.rf-frame .rf-ring *::before,.rf-frame .rf-ring *::after{animation-play-state:paused!important}
 .rf-kt td .ico{vertical-align:-3px;margin-right:4px}
 
-/* компактный режим низких экранов (844×390 и ниже) — по высоте рабочей области */
+/* низкие экраны (844×390 и ниже) — по высоте рабочей области; узкие — наковальня уже, сетке остаётся не меньше пяти клеток;
+   совсем низкие — телефон во весь экран. Порядок важен: следующий запрос уточняет предыдущий */
 @container main (max-height: 360px){
-  .rf-main{grid-template-columns:216px minmax(0,1fr)}
-  .rf-step{min-height:30px;padding:0 8px 0 6px}
-  .rf-sn{font-size:14px}
-  .rf-anv{gap:12px;padding:10px 12px}
-  .rf-h{font-size:19px}
+  .rf{--rf-lad:52px;--rf-anv:316px;--rf-ring:140px;--rf-cell:48px}
+  .rf-out b{font-size:17px}
+  .rf-cnt b{font-size:24px}
+}
+@container main (max-width: 720px){
+  .rf{--rf-anv:280px;--rf-ring:124px}
+}
+@container main (max-height: 330px){
+  .rf{--rf-ring:118px;--rf-cell:44px}
+  .rf-step{min-height:34px}
+  .rf-hb{padding:0 8px}
+  .rf-cl{display:none}
+  .rf-out small{-webkit-line-clamp:2}
 }
 @media (prefers-reduced-motion:reduce){
   .rf-anim *,.rf-anim *::before,.rf-anim *::after{animation:none!important;transition:none!important}

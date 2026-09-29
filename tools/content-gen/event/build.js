@@ -61,7 +61,12 @@ const RULES = {
   cutoffH: 1,                  // §1.1: приём результатов закрывается за час до серверного подсчёта — одна отсечка на всю игру
   countH: 1,                   // §1.1: подсчёт — один серверный час, потом новая неделя
   accentBp: 15000,             // акцент недели: очки одного занятия ×1,5 (предложение)
-  clanFrom: [3, 4, 5],         // клановая планка k — сумма личных порогов k + 2 всех участников: третьих, четвёртых, пятых
+  /* клановые планки (ADR-0031, п. 12): планка k — сумма по участникам первого личного порога его цикла × clanX[k] / 100. Шаги — x:
+     вторая ×4 первой, третья ×1,5 второй — те же, что у строк клановых планок в лутбоксах (EN_LOOTBOXES.modes.event, clan). Первая
+     доля clanX[0] — не ручка: сборщик берёт наименьшую, при которой клан увлечённых берёт третью не чаще LAWS.clanFan3[1] недель
+     ни в одном цикле. Прежнее правило — сумма третьих, четвёртых и пятых личных порогов — делало третью ×2 второй: её не брал
+     и клан увлечённых */
+  clan: { x: [1, 4, 6], per: 100 },
   plankDigits: 3,              // порог первой личной планки — вниз до трёх значащих цифр: при двух у порогов около 10 000 шаг —
                                // 10 %, и с доблестью в ядре (29.09.2026) порог цикла V упал с 10 900 до 10 000 — неделя этажей
                                // давала обычному четвёртую планку в 45 % недель
@@ -75,12 +80,15 @@ const RULES = {
    - Арена платит за победу, но не больше 10 побед в день: обновление списка за Энериум потолок не поднимает. */
 /* n — имя, u — единица для числа (1, 2, 5), a — «за что» в винительном: «1 очко за этаж»; gate: 'league' — только при открытой Лиге:
    правило Арены (arena/rules.js, league — 15 разных героев), своего цикла у Событий нет */
+/* ADR-0031, п. 12: спуск — не главный источник недели. Этажи и элиты — под дневным потолком (CAPS); цены босса и атаки Эхо подняты
+   (босс 30 → 60, раунд Эхо 5 → 7): это дела, которые растут со временем игры, — без них потолок спуска сжал бы неделю увлечённого
+   к неделе обычного, и увлечённый не брал бы пятую планку */
 const UNITS = {
   floor: { n: 'Этаж', src: 'descent', price: 1, u: ['этаж', 'этажа', 'этажей'], a: 'этаж', what: 'Этаж любого биома, взятый в забеге.' },
   elite: { n: 'Элита', src: 'descent', price: 1, u: ['элита', 'элиты', 'элит'], a: 'элиту', what: 'Элита на этаже любого биома — сверх самого этажа.' },
-  boss: { n: 'Босс биома', src: 'descent', price: 30, u: ['босс', 'босса', 'боссов'], a: 'босса', what: 'Босс биома пал: биом закрыт, в том числе осадой.' },
+  boss: { n: 'Босс биома', src: 'descent', price: 60, u: ['босс', 'босса', 'боссов'], a: 'босса', what: 'Босс биома пал: биом закрыт, в том числе осадой.' },
   guard: { n: 'Рунный страж', src: 'descent', price: 40, u: ['победа', 'победы', 'побед'], a: 'победу', what: 'Победа над рунным стражем любого биома.' },
-  echoRound: { n: 'Атака в Эхо', src: 'echo', price: 5, u: ['раунд', 'раунда', 'раундов'], a: 'раунд', what: 'Атака по цели Эхо, победа или нет: очки — за раунды атаки по рангу цели.' },
+  echoRound: { n: 'Атака в Эхо', src: 'echo', price: 7, u: ['раунд', 'раунда', 'раундов'], a: 'раунд', what: 'Атака по цели Эхо, победа или нет: очки — за раунды атаки по рангу цели.' },
   ritualHalf: { n: 'Ритуал', src: 'rituals', price: 10, u: ['полчаса', 'получаса', 'получасов'], a: 'полчаса', what: 'Завершённый ритуал рабочих или героев: очки — за его время по карточке.' },
   contractD: { n: 'Дневной контракт', src: 'contracts', price: 300, u: ['контракт', 'контракта', 'контрактов'], a: 'контракт', what: 'Дневной контракт исполнен: сделаны все задания. Пустой не в счёт.' },
   contractW: { n: 'Недельный контракт', src: 'contracts', price: 1500, u: ['контракт', 'контракта', 'контрактов'], a: 'контракт', what: 'Недельный контракт исполнен до отсечки.' },
@@ -90,8 +98,10 @@ const UNITS = {
   craftItem: { n: 'Создание', src: 'craft', price: 3, u: ['предмет', 'предмета', 'предметов'], a: 'предмет', what: 'Предмет, созданный в мастерской: на столе или автодокрафтом.' },
   recipe: { n: 'Новый рецепт', src: 'craft', price: 200, u: ['рецепт', 'рецепта', 'рецептов'], a: 'рецепт', what: 'Рецепт, которого ещё не было в книге.' },
 };
-/* дневные потолки единиц — одинаковы для всех (§1.2) */
-const CAPS = { arenaWin: 10, leagueWin: 3, craftItem: 20 };
+/* дневные потолки единиц — одинаковы для всех (§1.2). Этажи и элиты — потолок спуска (ADR-0031, п. 12): без него спуск давал 45–69 %
+   очков недели, и акцент недели двигал медиану на ±7 %. С потолком 400 этажей и 100 элит спуск у обычного — 22–35 % недели по циклам:
+   обычный берёт его за первый час забегов, дальше неделю решают Эхо, ритуалы, контракты, Арена и клан */
+const CAPS = { floor: 400, elite: 100, arenaWin: 10, leagueWin: 3, craftItem: 20 };
 
 /* Источники — строки экрана «Где брать очки»: переход прямо в режим; значок — картинка пути PATH(p) */
 const SOURCES = [
@@ -129,9 +139,11 @@ const WEEKS = {
 /* что такое Событие в мире — одна строка игроку */
 const WORLD = 'Неделя помнит всё, что сделано. Каждое дело — в общий счёт, а счёт приводит рабочих: простые души, что жили на Этериосе.';
 
-/* Сила коллекции РП1 (§10.3): 0,05 % × редкость × цикл × круг за каждого героя коллекции с пробитым первым пределом.
-   Потолок — прежний ориентир максимума §10.3, 33,6 %: без него сила коллекции поздних циклов перекрывала бы игру недели */
-const RP1 = { perBp: 5, lim: 1, maxValor: 4, capBp: 3360 };
+/* Сила коллекции РП1 (§10.3): 0,05 % × редкость × цикл × круг за каждого героя коллекции с пробитым первым пределом; не пройденный
+   заново предел держит прошлый круг (collRp прототипа, ADR-0031, п. 18). limits — пределов в круге (§10.1: 50 / 150 / 350 / 700 / 1200):
+   после обычной доблести пройдены все. Потолок — прежний ориентир максимума §10.3, 33,6 %: без него сила коллекции поздних циклов
+   перекрывала бы игру недели */
+const RP1 = { perBp: 5, lim: 1, maxValor: 4, capBp: 3360, limits: 5 };
 
 /* Допущения прогона — ручки. Ёмкость — калькуляторы; здесь — то, чего в них нет */
 const SIM = {
@@ -151,7 +163,8 @@ const LAWS = {
   oP4Bp: 2500,        // и четвёртую — не чаще чем в 25 % недель (в среднем по девяти неделям)
   oP4WeekBp: 4000,    // в самую щедрую неделю акцента — не чаще 40 %
   eP5Bp: 7500,        // увлечённый берёт пятую не меньше чем в 75 % недель
-  clanLo: 9000, clanHi: 1000,   // обычный клан — первая клановая планка в 90 % недель, вторая — не чаще 10 %; клан увлечённых — вторая и третья
+  clanLo: 9000, clanHi: 1000,   // обычный клан — первая клановая планка в 90 % недель, вторая — не чаще 10 %; клан увлечённых — вторая в 90 %
+  clanFan3: [300, 2500],        // клан увлечённых берёт третью в части недель (ADR-0031, п. 12): в каждом цикле — от 3 до 25 %
   x17: 170,           // §1.2: плательщик при времени обычного — не больше ×1,7
   plankStep: 2,       // соседние планки ×2 (лутбоксы)
 };
@@ -166,11 +179,13 @@ const TOP = {
   clanNames: ['Северный дозор', 'Светлый круг', 'Серые крылья', 'Медный узел', 'Соль и камень', 'Долгая дорога', 'Белый холм', 'Пепельная стража', 'Ночной караван', 'Тихая гавань'],
 };
 
-/* Демо-аккаунт прототипа: середина недели обычного игрока — третья планка взята, до четвёртой — часть пути (как в «Дарах»:
-   типичная неделя обычного — три личные планки и первая клановая). Клан — участники того же цикла, их в среднем больше третьего порога */
+/* Демо-аккаунт прототипа — один календарь (ADR-0031, п. 17): 11-й день цикла II, вторая неделя цикла, четвёртый день недели, 16:48 —
+   до отсечки 3 д 5 ч 12 мин (S.week.left в index.html). Очки демо — медиана недели обычного × доля прошедшего приёма недели; единицы —
+   средний день обычного, сколько таких дней нужно на эти очки. Лига у демо открыта: 15 героев обычный набирает к 9-му дню цикла II.
+   Клан — остальные участники в среднем набрали столько же, но играют не все — доля SIM.clan.activeBp. Прошлая неделя — первая неделя
+   цикла II целиком: типичная неделя обычного */
 const DEMO = {
-  targetBp: 12500,    // очки демо — 125 % третьего порога
-  clanOthersBp: 11000,   // остальные участники клана в среднем — 110 % своего третьего порога
+  elapsedS: 3 * 86400 + 16 * 3600 + 48 * 60,   // от начала приёма недели: окно — неделя без часа отсечки и часа подсчёта (cutoffH, countH)
   pastFracBp: 3000,   // прошлая неделя: очки — порог взятой планки и 30 % пути к следующей
 };
 
@@ -223,7 +238,7 @@ function build() {
   const ly = id => M.layers.find(l => l.id === id);
   const plankRows = ly('me').rows, clanRows = ly('clan').rows;
   if (plankRows.some((r, i) => r.x !== LAWS.plankStep ** i)) err.push('лутбоксы: личные планки События не ×2');
-  if (clanRows.length !== RULES.clanFrom.length || clanRows.some((r, i) => r.x !== LAWS.plankStep ** i)) err.push('лутбоксы: клановых планок не три или они не ×2');
+  if (clanRows.length !== RULES.clan.x.length || clanRows.some((r, i) => r.x !== RULES.clan.x[i])) err.push(`лутбоксы: клановые планки — ×${clanRows.map(r => r.x).join(' / ')}, у События — ×${RULES.clan.x.join(' / ')}`);
   const typ = M.typical;   // где заканчивают неделю обычный и увлечённый в лутбоксах: личные 3 / 5, клановые 1 / 2
   const PAYER_BP = Math.floor(LB.assume.payerPts[0] * BP / LB.assume.payerPts[1]);
   for (const w of RS.weeks) if (!WEEKS[w.race]) err.push(`неделя ${w.race}: нет События`);
@@ -320,14 +335,22 @@ function build() {
     for (let w = 0; w < SIM.weeks * 3; w++) { let s = 0; for (let m = 0; m < act; m++) s += pool[rng(pool.length)]; res.push(s); }
     return res;
   }
+  /* доли клановых планок clanX: первая — наименьшая, при которой клан увлечённых берёт третью не чаще LAWS.clanFan3[1] недель
+     ни в одном цикле; вторая и третья — шагами RULES.clan.x */
+  const clanSims = {};
+  for (const c of RULES.cycles) clanSims[c] = { free: simClan(c, 'o'), fan: simClan(c, 'e') };
+  const clanXOf = x1 => RULES.clan.x.map(k => x1 * k);
+  const needsOf = (x1, c) => EV.clanPlanks({ clanX: clanXOf(x1), planks }, Array(SIM.clan.members).fill(c));
+  let clanX1 = 1;
+  while (clanX1 < RULES.clan.per * 16 && RULES.cycles.some(c => shareAt(clanSims[c].fan, needsOf(clanX1, c)[2]) > LAWS.clanFan3[1])) clanX1++;
+  const clanX = clanXOf(clanX1);
   const clan = {};
   for (const c of RULES.cycles) {
-    const needs = EV.clanPlanks({ clanFrom: RULES.clanFrom, planks }, Array(SIM.clan.members).fill(c));
-    const fr = simClan(c, 'o'), fn = simClan(c, 'e');
+    const needs = needsOf(clanX1, c), fr = clanSims[c].free, fn = clanSims[c].fan;
     clan[c] = { needs, free: fr, fan: fn };
     const r1 = shareAt(fr, needs[0]), r2 = shareAt(fr, needs[1]), f2 = shareAt(fn, needs[1]), f3 = shareAt(fn, needs[2]);
     if (r1 < LAWS.clanLo || r2 > LAWS.clanHi) err.push(`цикл ${ROMAN[c]}: обычный клан — первая клановая в ${pct(r1, BP)}, вторая в ${pct(r2, BP)} недель`);
-    if (f2 < LAWS.clanLo || f3 > LAWS.clanHi) err.push(`цикл ${ROMAN[c]}: клан увлечённых — вторая в ${pct(f2, BP)}, третья в ${pct(f3, BP)} недель`);
+    if (f2 < LAWS.clanLo || f3 < LAWS.clanFan3[0] || f3 > LAWS.clanFan3[1]) err.push(`цикл ${ROMAN[c]}: клан увлечённых — вторая в ${pct(f2, BP)}, третья в ${pct(f3, BP)} недель`);
     if (EV.reached(needs, median(fr)) !== typ.free.clan || EV.reached(needs, median(fn)) !== typ.fan.clan) err.push(`цикл ${ROMAN[c]}: клановые планки не сходятся с типичной неделей лутбоксов`);
   }
 
@@ -351,12 +374,14 @@ function build() {
     (shares[c] = shares[c] || {})[pk] = { tot: Math.floor(tot / 100), by: Object.fromEntries(Object.entries(by).map(([k, v]) => [k, Math.floor(v * BP / tot)])) };
   }
 
-  /* --- демо-аккаунт: единицы середины недели обычного, по циклам. У демо-аккаунта прототипа пять героев — Лига закрыта (правило Арены),
-         поэтому единиц с условием (gate) в демо нет: их не засчитает и «сервер» прототипа --- */
+  /* --- демо-аккаунт: четвёртый день недели обычного, по циклам (DEMO). Лига у демо открыта (15 героев — к 9-му дню цикла II), матчи Лиги
+         в счёте — со средней за цикл долей дней с открытой Лигой --- */
+  const windowS = 7 * 86400 - (RULES.cutoffH + RULES.countH) * 3600, elapsedBp = Math.floor(DEMO.elapsedS * BP / windowS);
+  if (!(elapsedBp > 0 && elapsedBp < BP)) err.push(`демо: день недели вне окна приёма — ${DEMO.elapsedS} с`);
   const demo = {};
   for (const c of RULES.cycles) {
-    const u = Object.fromEntries(Object.entries(days[c].o).map(([k, v]) => [k, UNITS[k] && UNITS[k].gate ? 0 : v]));
-    const per = dayPts100(u, '', null), target = Math.floor(planks[c][2] * DEMO.targetBp / BP);
+    const u = days[c].o;
+    const per = dayPts100(u, '', null), target = Math.floor(median(all(c, 'o')) * elapsedBp / BP);
     const d10 = Math.ceil(target * 1000 / Math.max(1, per));   // дней игры × 10
     const cnt = {};
     for (const k of Object.keys(UNITS)) {
@@ -366,10 +391,11 @@ function build() {
       if (CAPS[k] != null) v = Math.min(v, Math.floor(CAPS[k] * d10 / 10));
       if (v > 0) cnt[k] = v;
     }
-    demo[c] = { d10, cnt };
+    demo[c] = { d10, cnt, pts: target };
+    /* середина недели: планок у демо — на одну меньше, чем за типичную неделю обычного, или уже столько же (акцент недели) */
     for (const race of RACES) {
       const p = Object.entries(cnt).reduce((a, [k, n]) => a + EV.pts({ units: UNITS, weeks: D0.weeks }, k, n, { race }), 0), k = EV.reached(planks[c], p);
-      if (k !== typ.free.me) err.push(`демо, цикл ${ROMAN[c]}, неделя ${race}: ${fmt(p)} очков — планка ${k}, ждали ${typ.free.me}`);
+      if (k < typ.free.me - 1 || k > typ.free.me) err.push(`демо, цикл ${ROMAN[c]}, неделя ${race}: ${fmt(p)} очков — планка ${k}, ждали ${typ.free.me - 1}–${typ.free.me}`);
     }
   }
 
@@ -380,9 +406,9 @@ function build() {
     bp: BP, from: RULES.from, cycles: RULES.cycles, cutoffH: RULES.cutoffH, countH: RULES.countH, shop: RULES.shop ? 1 : 0,
     units: UNITS, caps: CAPS, sources: SOURCES, echoRounds: rounds,
     weeks: Object.fromEntries(Object.entries(WEEKS).map(([race, W]) => [race, { n: W.n, an: W.an, line: W.line, accent: { units: W.units, bp: RULES.accentBp } }])),
-    world: WORLD, rp1: RP1, clanFrom: RULES.clanFrom, planks,
+    world: WORLD, rp1: RP1, clanX, planks,
     top: { players: TOP.players, clans: TOP.clans, names: TOP.names, clanNames: TOP.clanNames, clanRef: SIM.clan.members },
-    demo: { targetBp: DEMO.targetBp, clanOthersBp: DEMO.clanOthersBp, pastFracBp: DEMO.pastFracBp, cyc: demo },
+    demo: { elapsedBp, clanActiveBp: SIM.clan.activeBp, pastFracBp: DEMO.pastFracBp, cyc: demo },
     econ: Object.fromEntries(RULES.cycles.map(c => [c, {
       day: { o: shares[c].o.tot, e: shares[c].e.tot },
       share: { o: shares[c].o.by, e: shares[c].e.by },
@@ -444,7 +470,7 @@ function build() {
   TBL.accents = T.join('\n');
 
   // кланы
-  T = head(['Цикл', 'Клановые планки, клан из 25', 'Обычный клан: неделя → планка', 'Первая / вторая, доля недель', 'Клан увлечённых: неделя → планка', 'Вторая / третья, доля недель']);
+  T = head(['Цикл', `Клановые планки, клан из 25: на участника ×${clanX.map(x => dec(x, RULES.clan.per, 2)).join(' / ')} первого личного порога`, 'Обычный клан: неделя → планка', 'Первая / вторая, доля недель', 'Клан увлечённых: неделя → планка', 'Вторая / третья, доля недель']);
   for (const c of RULES.cycles) {
     const K = clan[c];
     T.push(cells([ROMAN[c], K.needs.map(fmt).join(' / '), `${fmt(median(K.free))} → ${EV.reached(K.needs, median(K.free))}`, `${pct(shareAt(K.free, K.needs[0]), BP)} / ${pct(shareAt(K.free, K.needs[1]), BP)}`,
@@ -485,7 +511,7 @@ function render(data) {
    (capacity.json), ёмкости и прогона контрактов, правил боя Эхо, сундуков и недель. Руками не править: пересборка затрёт правку.
    Черновик · предложение · ждёт автора. Числа — демонстрация, только целые; доли — в базисных пунктах (10 000 = 100 %).
    units — цена единицы в очках, caps — дневные потолки, weeks — девять Событий с акцентом недели, planks[цикл] — пороги
-   личных планок, clanFrom — клановая планка = сумма личных порогов участников, top — опоры рейтинга, demo — демо-аккаунт,
+   личных планок, clanX — клановая планка k = сумма первых личных порогов участников × clanX[k] / 100, top — опоры рейтинга, demo — демо-аккаунт,
    econ — итоги прогона. Обоснование и таблицы — docs/content/событие.md. В игре очки, планки и места решает сервер (§27, §36.16):
    клиент получает свои очки, пороги и место. Ниже данных — алгоритм tools/content-gen/event/rules.js как есть. */\n`;
   return head + 'window.EN_EVENT = ' + JSON.stringify(data) + ';\n' + rules;

@@ -8,16 +8,23 @@
       поражений обороны в сутки — не больше пяти, выгода равной атаки при честном шансе — ноль; сброс сезона; матч Лиги — третий раунд
       только при равном счёте; подбор — окно, расширение, без атакованных, тот же сид — тот же список; Энериум за место.
    4. Бой PvP ядром: у защитников здоровье героя, порядок отряда на бой не влияет, тот же сид — тот же бой, исход по гибели или по
-      снятой доле здоровья; просмотр — тот же бой, что решил исход.
+      снятой доле здоровья; раундов — из таблицы ядра (roundsOf('pvp'), 25); статистика боя (EnArena.pvpRun) — тот же бой, что EB.run:
+      исход тот же, числа целые и сходятся с картами ядра, ульты и способности — из событий ядра; просмотр — тот же бой, что решил исход.
    5. «Сервер» экрана: атака — попытка, рейтинг обеим сторонам, соперник выбывает, повтор номера ничего не меняет, отказы ничего не
-      меняют; список кончился — новый сразу; обновление бесплатно и за Энериум с лимитом; сутки — попытки до предела, Энериум топа
-      письмом, нападения на оборону; сезон — сброс; оборона из последней атаки, пока не выбрана.
-   6. Лига: в демо закрыта — нужно 15 героев; «Дары» не платят Лиге ни за эту, ни за прошлую неделю; сценарий открывает её — три отряда
-      без повторов, матч из двух или трёх боёв.
+      меняют; после каждого боя список новый сам — новые лица мимо атакованных и прежнего списка, повтор номера список не трогает;
+      «Обновить» — бесплатные за сутки, дальше за Энериум по цене с лимитом, без согласия платить — отказ; итог со статистикой: сдвиг
+      рейтинга на виду, «Подробности боя» — раунды, обе стороны, сработавшее, «К новым соперникам»; «Пропустить» и доигранный просмотр
+      показывают одно и то же; сутки — попытки до предела, бесплатные обновления заново, Энериум топа письмом, нападения на оборону;
+      итог обороны — со статистикой глазами защитника; сезон — сброс; оборона из последней атаки, пока не выбрана.
+   6. Лига: в демо открыта — 15 героев к 9-му дню цикла II, «Дары» платят за эту неделю, а за прошлую — нет; с пятью героями закрыта —
+      нужно 15, «Дары» не платят ни за эту, ни за прошлую неделю; сценарий открывает её — три отряда
+      без повторов, матч из двух или трёх боёв; «Пропустить» — в каждом бою матча; итог — строка на каждый бой с его статистикой;
+      после матча список новый.
    7. Вид: три вкладки, все листы, бой и итог — без исключений, undefined и NaN. Правила воздуха на карточке соперника: не больше двух
-      чисел, одного чипа, одно действие. Режим «Игрок»: служебных слов нет; «Команда» — служебное есть.
+      чисел, одного чипа, одно действие. Итог — тот же вид, что итог Эхо: классы «Подробностей боя» есть в echo.css. Режим «Игрок»:
+      служебных слов нет; «Команда» — служебное есть.
    8. Неделя: строки «Арена» и «Лига» в WEEK_MODES — настоящие, целые, планки — порог × x, Энериум прошлой недели — суточные срезы.
-   9. UI-кит, сценарии презентации.
+   9. UI-кит: итог со статистикой и правило списка; сценарии презентации, у пропуска — итог с раскрытой статистикой.
    Запуск: node tools/content-gen/screens/check_arena.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -50,6 +57,11 @@ const scripts = [...html.matchAll(/<script(?:\s+src="([^"]+)")?>([\s\S]*?)<\/scr
   const card = html.match(/\{ n: 'Арена'[\s\S]*?\},\r?\n/);
   for (const id of ['arena', 'opponent', 'pvp-setup', 'defence', 'league']) if (!card || !new RegExp(`ready:\\s*\\[[^\\]]*'${id}'`).test(card[0])) say(`карта экранов: у «Арены» нет ready: ${id}`);
   for (const f of ['arena.js', 'screens/arena.js']) try { new vm.Script(read(f), { filename: f }); } catch (e) { say(`${f}: синтаксис — ${e.message}`); }
+  /* итог — тот же вид, что итог Эхо: «Подробности боя», числа и таблица — классы echo.css, подключённого до экрана */
+  const echoCss = read('screens/echo.css');
+  for (const [cls, re] of [['ech-det', /\.ech-det>summary\{/], ['ech-res-kpi', /\.ech-res-kpi\{/], ['ech-res-t', /\.ech-res-t\{/], ['ech-rf', /\.ech-rf\{/]])
+    if (!re.test(echoCss)) say(`echo.css: нет класса ${cls} — итог Арены больше не того же вида, что итог Эхо`);
+  if (!/<link rel="stylesheet" href="screens\/echo\.css">/.test(html)) say('index.html: не подключён screens/echo.css — итогу Арены нечем рисовать «Подробности боя»');
 }
 if (err.length) done();
 
@@ -201,6 +213,26 @@ const finish = R => { const was = T.S.route; T.S.route = 'week'; for (let n = 0;
   if (b1.maxRounds !== D.arena.rounds) say('бой: предел раундов не из данных');
   // одна таблица раундов на все режимы (слово автора 29.09.2026): Арена и Лига — каждый бой по RULES.rounds.by.pvp
   if (D.arena.rounds !== T.EB.RULES.rounds.by.pvp || D.league.rounds !== T.EB.RULES.rounds.by.pvp) say(`бой: раунды Арены ${D.arena.rounds} и Лиги ${D.league.rounds} — не из таблицы ядра (${T.EB.RULES.rounds.by.pvp})`);
+  if (T.EB.roundsOf('pvp') !== T.EB.RULES.rounds.by.pvp || T.EB.RULES.rounds.by.pvp !== 25) say(`бой: roundsOf('pvp') — ${T.EB.roundsOf('pvp')}, а слово автора — 25 на каждый бой Арены и Лиги`);
+  /* статистика: тот же бой, что EB.run — исход тот же; числа — из карт ядра; сработавшее — из событий ядра; только целые */
+  const out = T.AE.pvpRun(T.EB, T.AE.pvpBattle(T.EB, my, th, seed, D.arena.rounds)); cnt.fights++;
+  if (JSON.stringify(out.res) !== JSON.stringify(r1)) say('статистика: pvpRun дал другой исход, чем EB.run — бой не тот');
+  const st = out.st;
+  if (!st || st.rounds !== b1.round || st.max !== b1.maxRounds || st.why !== b1.why || st.sides.length !== 2) say('статистика: раунды, предел или причина — не те, что у боя');
+  else {
+    st.sides.forEach((us, sd) => us.forEach((u, i) => {
+      const v = b1.u[sd][i];
+      if (u.key !== v.key || u.dealt !== v.dealt || u.healed !== v.healed || u.taken !== v.taken || u.alive !== v.alive) say(`статистика: ${u.name} — не те урон, лечение, принятое или гибель, что у карты ядра`);
+      for (const [k, x] of [['ab', u.ab], ['ult', u.ult], ['re', u.re]]) for (const [n, c] of x) if (typeof n !== 'string' || !n || !(Number.isInteger(c) && c > 0)) say(`статистика: ${u.name} — ${k} «${n}» ×${c}`);
+    }));
+    const ints = (x, p) => { if (typeof x === 'number') { if (!Number.isInteger(x)) say(`статистика: не целое ${p} = ${x}`); } else if (x && typeof x === 'object') for (const [k, v] of Object.entries(x)) ints(v, p + '.' + k); };
+    ints(st, 'st');
+    /* сработавшее — ровно события ядра: тот же бой шагами, счёт cast и react по картам */
+    const b3 = T.AE.pvpBattle(T.EB, my, th, seed, D.arena.rounds), tally = new Map();
+    while (!b3.over) { const a = T.EB.step(b3); if (!a) break; for (const e of a.ev) if ((e.k === 'cast' || e.k === 'react') && e.s) tally.set(e.s.key, (tally.get(e.s.key) || 0) + 1); }
+    for (const us of st.sides) for (const u of us) { const n = [u.ab, u.ult, u.re].reduce((a, x) => a + x.reduce((s, [, c]) => s + c, 0), 0); if (n !== (tally.get(u.key) || 0)) say(`статистика: у ${u.name} сработало ${n}, а событий ядра — ${tally.get(u.key) || 0}`); }
+    if (!st.sides.some(us => us.some(u => u.ab.length || u.ult.length))) say('статистика: за весь бой ни одной способности — события ядра не читаются');
+  }
 }
 
 /* ================== 5. «сервер» Арены ================== */
@@ -211,6 +243,9 @@ fresh();
   for (const id of A().opp) { const o = T.AD.pool.arena.find(x => x.id === id); if (!o || o.c !== T.S.acc.cycle || Math.abs(o.r - A().rating) > D.arena.maxWindow) say(`список: ${id} не из цикла или вне окна`); }
   const pl = (T.S.ranks.find(x => x[0] === 'Арена') || [])[1];
   if (pl !== U.arPlace(A().rating)) say('место Арены в S.ranks не сходится с рейтингом');
+  /* демо-аккаунт стоит на своём месте сервера, как бы прогон ни сдвинул рейтинги: рейтинг — из таблицы мест (EN_ARENA.server.demo) */
+  const acct = D.server.demo;
+  if (!acct || Math.abs(U.arPlace(A().rating) - acct.place) > 3 || Math.abs(T.AE.placeOf(D.server.placeEnd, A().past.rating) - acct.pastPlace) > 3) say(`демо-аккаунт: не на своём месте сервера — сейчас #${U.arPlace(A().rating)}, прошлая неделя #${T.AE.placeOf(D.server.placeEnd, A().past.rating)}`);
   /* атака: подготовка, «В бой», итог */
   const oid = A().opp[0]; T.S.overlay = { t: 'opp', arg: oid };
   let h = view('витрина соперника');
@@ -220,31 +255,53 @@ fresh();
   if (!T.S.overlay || T.S.overlay.t !== 'prep' || T.S.overlay.arg !== 'pvp') say('подготовка: не открылся лист атаки');
   h = view('подготовка атаки');
   const go = btn(ovOf(h), 'aratk'); if (!go) say('подготовка: нет «В бой»');
-  const r0 = A().rating, att0 = A().att, n0 = A().games;
+  const r0 = A().rating, att0 = A().att, n0 = A().games, list0 = A().opp.slice(), no0 = A().listNo;
   act('aratk', go);
   const L = A().last, R = T.S.runs.find(r => r.kind === 'pvp');
   if (!L || !R) say('атака: нет итога или просмотра');
   else {
     cnt.fights++;
+    const F = L.fights[0];
     if (A().att !== att0 - 1 || A().games !== n0 + 1 || A().rating !== r0 + L.e.da) say('атака: попытка, боёв или рейтинг не сходятся');
     if (A().opp.includes(oid) || !A().hit[oid]) say('атака: соперник не выбыл');
+    /* после боя список новый сам (слово автора 29.09.2026): номер списка — следующий, новые лица мимо атакованных и прежних трёх */
+    if (!L.fresh || A().listNo !== no0 + 1) say('после боя: список не обновился сам');
+    if (A().opp.length !== D.arena.list || A().opp.some(id => list0.includes(id) || A().hit[id])) say(`после боя: в новом списке прежние или атакованные — ${A().opp.join(', ')} после ${list0.join(', ')}`);
+    if (F.rounds !== T.EB.roundsOf('pvp')) say(`бой: раундов ${F.rounds}, а в таблице ядра — ${T.EB.roundsOf('pvp')}`);
     if (T.S.route !== 'battle') say('атака: не открылся бой');
-    view('бой Арены');
-    /* показ — тот же бой: исход просмотра совпадает с решённым */
-    const shown = T.AE.pvpResult(T.EB.run(T.AE.pvpBattle(T.EB, L.fights[0].a, L.fights[0].b, L.fights[0].seed, L.fights[0].rounds)));
-    if (JSON.stringify(shown) !== JSON.stringify(L.fights[0].res)) say('просмотр: бой не тот, что решил исход');
+    h = view('бой Арены');
+    if (!h.includes('data-a="arskip"')) say('бой Арены: нет «Пропустить»');
+    /* показ — тот же бой: исход и статистика повтора совпадают с решёнными */
+    const shown = T.AE.pvpRun(T.EB, T.AE.pvpBattle(T.EB, F.a, F.b, F.seed, F.rounds));
+    if (JSON.stringify(shown.res) !== JSON.stringify(F.res)) say('просмотр: бой не тот, что решил исход');
+    if (JSON.stringify(shown.st) !== JSON.stringify(F.st)) say('итог: статистика не та, что у боя, решившего исход');
     T.S.route = 'arena'; act('arskip', R.id);
-    h = view('итог боя');
-    if (!/Победа|Поражение|Ничья/.test(ovOf(h))) say('итог: нет исхода');
-    const r1 = A().rating;
+    h = ovOf(view('итог боя · «Пропустить»'));
+    if (!/Победа|Поражение|Ничья/.test(h)) say('итог: нет исхода');
+    if (!h.includes('class="ech-det ar-det"') || !h.includes('Подробности боя')) say('итог: нет свёрнутых «Подробностей боя» — вид не как у Эхо');
+    if ((h.match(/<tr class="(?:fell)?">/g) || []).length !== 10) say('итог: в подробностях не пять своих и пять соперника');
+    if (!h.includes(`${F.st.rounds} / ${F.st.max}`)) say('итог: нет раундов боя');
+    if (!h.includes('К новым соперникам')) say('итог: кнопка не говорит, что список уже новый');
+    if (!/рейтинг [\d\s  ]+ · место [\d\s  ]+/.test(h)) say('итог: нет рейтинга и места под сдвигом');
+    const skipped = h;
+    const r1 = A().rating, opp1 = A().opp.join();
     act('aratk', go);   // повтор того же номера
     if (A().rating !== r1 || A().att !== att0 - 1) say('атака: повтор номера что-то изменил');
+    if (A().opp.join() !== opp1) say('после боя: повтор номера обновил список ещё раз');
     /* повтор атаки того же соперника — отказ */
     const r2 = U.SRV.attack('a' + A().seq, oid, (U.mySquad() || {}).id);
     if (!r2.refuse) say('атака: того же соперника атаковали дважды за неделю');
-    /* «Смотреть бой» из итога */
+    /* «Смотреть бой» из итога: доигранный просмотр — те же урон, лечение и принятое, что в итоге; итог — тот же лист, что после «Пропустить» */
     act('arwatch', R.id); const R2 = T.S.runs.find(r => r.kind === 'pvp');
-    if (!R2) say('«Смотреть бой»: нет просмотра'); else { finish(R2); if (!R2.over) say('«Смотреть бой»: просмотр не кончился'); }
+    if (!R2) say('«Смотреть бой»: нет просмотра'); else {
+      finish(R2); if (!R2.over) say('«Смотреть бой»: просмотр не кончился');
+      const m = R2.b.u.map(us => us.map(u => [u.key, u.dealt, u.healed, u.taken, u.alive].join())).join('|'), s = F.st.sides.map(us => us.map(u => [u.key, u.dealt, u.healed, u.taken, u.alive].join())).join('|');
+      if (m !== s) say('«Смотреть бой»: доигранный просмотр разошёлся со статистикой итога');
+      T.S.route = 'arena'; T.S.overlay = { t: 'arres', arg: R2.id };
+      const watched = ovOf(view('итог боя · после просмотра'));
+      const body = x => (x.match(/<details[\s\S]*<\/details>/) || [''])[0];
+      if (body(watched) !== body(skipped)) say('итог: после просмотра статистика не та, что после «Пропустить»');
+    }
   }
   /* отказ: неполный отряд — ничего не меняется */
   const s5 = T.S.squads.find(s => s.m.filter(Boolean).length < 5);
@@ -253,25 +310,48 @@ fresh();
   const keep = A().att; A().att = 0;
   { const r = U.SRV.attack('a' + A().seq, A().opp[0], (U.mySquad() || {}).id); if (!r.refuse || r.refuse !== 'att') say('атака без попыток: не отказ'); }
   A().att = keep;
-  /* список кончился — новый сразу */
-  const list0 = A().listNo;
-  while (A().opp.length) { const id = A().opp[0]; const r = U.SRV.attack('a' + A().seq, id, (U.mySquad() || {}).id); cnt.ops++; cnt.fights++; if (r.refuse) { say('атака подряд: отказ ' + r.refuse); break; } if (A().listNo !== list0) break; }
-  if (A().listNo === list0 || A().opp.length !== D.arena.list) say('список: после последнего соперника новый не пришёл');
-  /* обновление: бесплатно — по таймеру; иначе за Энериум по цене суток, до лимита */
-  A().freeAt = T.S.week.left - 3600; A().paid = 0;
-  const en0 = T.S.wallet.enerium;
-  let r = U.SRV.refresh('a' + A().seq, 'arena', false); if (!r.refuse || r.refuse !== 'free') say('обновление: бесплатное до таймера');
+  /* атаки подряд: после каждой — новый список, атакованные не возвращаются */
+  for (let k = 0; k < 3 && A().opp.length; k++) {
+    const id = A().opp[0], no = A().listNo, r = U.SRV.attack('a' + A().seq, id, (U.mySquad() || {}).id); cnt.ops++; cnt.fights++;
+    if (r.refuse) { say('атака подряд: отказ ' + r.refuse); break; }
+    if (A().listNo !== no + 1 || A().opp.length !== D.arena.list || A().opp.some(x => A().hit[x])) say('атака подряд: список после боя не новый или с атакованными');
+  }
+  /* «Обновить»: бесплатные за сутки — без Энериума; дальше без согласия платить — отказ, с согласием — цены суток до лимита */
+  A().freeUsed = 0; A().paid = 0;
+  const en0 = T.S.wallet.enerium, RF = D.arena.refresh;
+  T.S.route = 'arena'; T.S.seg.arena = 'arena'; T.S.overlay = null;
+  let r, hr = view('Арена · «Обновить» бесплатно');
+  if (!btn(hr, 'arref')) say('«Обновить»: бесплатного нет, а бесплатные остались');
+  for (let k = 0; k < RF.free; k++) {
+    const op = 'a' + A().seq, was = A().opp.slice(); r = U.SRV.refresh(op, 'arena', false); cnt.ops++;
+    if (r.refuse || r.price !== 0 || !r.free) { say('«Обновить»: бесплатное — отказ или цена ' + (r.refuse || r.price)); break; }
+    if (A().opp.some(id => was.includes(id))) say('«Обновить»: в новом списке прежние лица, а новых в окне хватает');
+    if (!U.SRV.refresh(op, 'arena', false).again) say('«Обновить»: повтор номера — новая операция');
+  }
+  if (T.S.wallet.enerium !== en0 || A().freeUsed !== RF.free) say('«Обновить»: бесплатные списали Энериум или не посчитались');
+  hr = view('Арена · «Обновить» за Энериум');
+  if (!/data-a="sheet" data-v="arpay:arena"/.test(hr)) say('«Обновить»: бесплатные кончились, а цены на кнопке нет');
+  T.S.overlay = { t: 'arpay', arg: 'arena' }; if (!/Бесплатные на сегодня кончились/.test(ovOf(view('лист цены обновления')))) say('лист цены: не сказано, что бесплатные кончились');
+  T.S.overlay = null;
+  r = U.SRV.refresh('a' + A().seq, 'arena', false); if (!r.refuse || r.refuse !== 'free') say('«Обновить»: платное без согласия — не отказ');
   const prices = [];
-  for (let k = 0; k < D.arena.refresh.price.length + 1; k++) { const op = 'a' + A().seq; r = U.SRV.refresh(op, 'arena', true); cnt.ops++; if (!r.refuse) { prices.push(r.price); const again = U.SRV.refresh(op, 'arena', true); if (!again.again) say('обновление: повтор номера — новая операция'); } }
-  if (prices.join() !== D.arena.refresh.price.join() || T.S.wallet.enerium !== en0 - prices.reduce((a, x) => a + x, 0)) say(`обновление: цены ${prices.join('/')} или расход Энериума не сходятся`);
-  if (!r.refuse || r.refuse !== 'limit') say('обновление: нет лимита суток');
-  A().freeAt = T.S.week.left + 1; r = U.SRV.refresh('a' + A().seq, 'arena', false); if (r.refuse) say('обновление: бесплатное по таймеру — отказ ' + r.refuse);
-  /* сутки: попытки до предела, Энериум топа письмом, нападения на оборону */
-  A().att = D.arena.att.cap - 3; A().rating = 1500; const inbox0 = T.S.inbox.length, day0 = A().day;
+  for (let k = 0; k < RF.price.length + 1; k++) { const op = 'a' + A().seq; r = U.SRV.refresh(op, 'arena', true); cnt.ops++; if (!r.refuse) { prices.push(r.price); const again = U.SRV.refresh(op, 'arena', true); if (!again.again) say('«Обновить»: повтор номера — новая операция'); } }
+  if (prices.join() !== RF.price.join() || T.S.wallet.enerium !== en0 - prices.reduce((a, x) => a + x, 0)) say(`«Обновить»: цены ${prices.join('/')} или расход Энериума не сходятся`);
+  if (!r.refuse || r.refuse !== 'limit') say('«Обновить»: нет лимита суток');
+  if (!/<button class="btn sm" disabled title="Обновлений на сегодня больше нет/.test(view('Арена · «Обновить» до завтра'))) say('«Обновить»: на сегодня всё, а кнопка не гаснет');
+  /* нет новых лиц — отказ без платы: все, кроме списка, уже атакованы */
+  { const keepHit = Object.assign({}, A().hit); A().paid = 0; A().freeUsed = 0;
+    for (const o of T.AD.pool.arena) if (!A().opp.includes(o.id)) A().hit[o.id] = 1;
+    const en1 = T.S.wallet.enerium; r = U.SRV.refresh('a' + A().seq, 'arena', false);
+    if (!r.refuse || r.refuse !== 'empty' || T.S.wallet.enerium !== en1 || A().freeUsed !== 0) say('«Обновить»: без новых лиц — не отказ или что-то списано');
+    A().hit = keepHit; }
+  /* сутки: попытки до предела, обновления заново, Энериум топа письмом, нападения на оборону */
+  A().att = D.arena.att.cap - 3; A().rating = 1500; A().freeUsed = RF.free; A().paid = 1; const inbox0 = T.S.inbox.length, day0 = A().day;
   T.S.route = 'arena'; T.S.seg.arena = 'def'; T.S.overlay = null;
   let hd = view('оборона');
   act('arday', btn(hd, 'arday') || 'a' + A().seq);
   if (A().att !== D.arena.att.cap) say('сутки: попытки не дошли до предела');
+  if (A().freeUsed !== 0 || A().paid !== 0) say('сутки: бесплатные и платные обновления не начались заново');
   if (A().day !== Math.min(7, day0 + 1)) say('сутки: день не сменился');
   if (!T.S.inbox.some(m => m.rew && m.rew.some(x => x[0] === 'enerium'))) say('сутки: на месте в топ-100 нет Энериума письмом');
   if (T.S.inbox.length <= inbox0) say('сутки: писем нет');
@@ -280,7 +360,15 @@ fresh();
   T.S.route = 'arena'; T.S.overlay = null; hd = view('оборона после суток');
   const eye = btn(hd, 'ardefplay'); if (!eye) say('оборона: у свежего нападения нет «Смотреть бой»'); else {
     act('ardefplay', eye); const R3 = T.S.runs.find(x => x.kind === 'pvp');
-    if (R3) { view('бой обороны'); finish(R3); T.S.route = 'arena'; T.S.overlay = { t: R3.scene.result, arg: R3.id }; const ho = ovOf(view('итог обороны')); if (!/Оборона выстояла|Оборону пробили|Ничья/.test(ho)) say('итог обороны: нет исхода глазами защитника'); }
+    if (R3) {
+      const hb = view('бой обороны'); if (!hb.includes('data-a="arskip"')) say('бой обороны: нет «Пропустить»');
+      finish(R3); T.S.route = 'arena'; T.S.overlay = { t: R3.scene.result, arg: R3.id }; const ho = ovOf(view('итог обороны'));
+      if (!/Оборона выстояла|Оборону пробили|Ничья/.test(ho)) say('итог обороны: нет исхода глазами защитника');
+      /* статистика глазами защитника: «Ваш отряд» — вторая сторона боя, герои обороны */
+      const F3 = R3.res.fights[0], mine = F3.st ? F3.st.sides[1].map(u => u.name) : [];
+      const tb = decode((ho.match(/<table class="ech-res-t ar-st">[\s\S]*?<\/table>/) || [''])[0]);
+      if (!F3.flip || !mine.length || !tb.includes('Ваш отряд') || mine.some(n => !tb.includes(n))) say('итог обороны: «Ваш отряд» в подробностях — не герои обороны');
+    }
   }
   /* оборона из последней атаки, пока игрок её не выбрал */
   const s2 = T.S.squads.find(s => s.m.filter(Boolean).length === 5 && s.id !== T.SQ.of('arena')) || null;
@@ -293,12 +381,19 @@ fresh();
 /* ================== 6. Лига ================== */
 fresh();
 {
-  if (U.lgOpen()) say('Лига: в демо открыта, а героев меньше 15');
+  /* демо — 11-й день цикла II (ADR-0031, п. 17): 15 героев обычный набирает к 9-му дню — Лига открыта на этой неделе, прошлой у неё нет */
+  if (!U.lgOpen()) say('Лига: в демо закрыта, а у обычного к 11-му дню цикла II 15 героев');
+  const W = T.WEEK;
+  if (W) { const st = W.state('league', 'now'), sp = W.state('league', 'past'); if (st.lock || !sp.lock) say('Неделя: у Лиги демо — эта неделя открыта, прошлой нет'); }
+  if (T.darRows && !T.darRows(T.S).some(p => p.id === 'league' && p.wk.id === 'now')) say('«Дары»: Лига открыта и планка взята, а сундуков Лиги этой недели нет');
+  if (T.darRows && T.darRows(T.S).some(p => p.id === 'league' && p.wk.id === 'prev')) say('«Дары»: Лига открылась на этой неделе, а за прошлую платит');
+  /* закрытая Лига: коллекция — пятеро отряда; с неё же начинается сценарий показа ниже */
+  T.S.rs.owned = {};
+  if (U.lgOpen()) say('Лига: открыта и у коллекции из пятерых');
   T.S.seg.arena = 'league'; let h = view('Лига · закрыта');
   if (!h.includes('Нужно 15 разных героев')) say('Лига: закрытая вкладка не говорит «Нужно 15 разных героев»');
-  const W = T.WEEK;
-  if (W) { const st = W.state('league', 'now'), sp = W.state('league', 'past'); if (!st.lock || !sp.lock) say('Неделя: Лига не закрыта в демо'); }
-  if (T.darRows && T.darRows(T.S).some(p => p.id === 'league')) say('«Дары»: у демо-аккаунта есть сундуки Лиги, а Лига закрыта');
+  if (W) { const st = W.state('league', 'now'); if (!st.lock) say('Неделя: Лига не закрыта без 15 героев'); }
+  if (T.darRows && T.darRows(T.S).some(p => p.id === 'league')) say('«Дары»: Лига закрыта, а сундуки Лиги есть');
   /* сценарий: коллекция на 15 героев, три отряда без повторов */
   run('сценарий Лиги', () => U.lgDemo());
   if (!U.lgOpen()) say('Лига: сценарий не открыл Лигу');
@@ -309,7 +404,7 @@ fresh();
   const oid = T.S.arena.lg.opp[0]; T.S.overlay = { t: 'lgopp', arg: oid }; h = view('матч Лиги · доска');
   if ((ovOf(h).match(/class="lg-row"/g) || []).length !== 3) say('матч Лиги: не три раунда на доске');
   const go = btn(ovOf(h), 'lgplay'); if (!go) say('матч Лиги: нет «Сыграть матч»');
-  const G = T.S.arena.lg, r0 = G.rating, a0 = G.att;
+  const G = T.S.arena.lg, r0 = G.rating, a0 = G.att, lgList0 = G.opp.slice(), lgNo0 = G.listNo;
   act('lgplay', go);
   const R = T.S.runs.find(r => r.kind === 'pvp'), Lm = T.S.arena.last;
   if (!R || !Lm || Lm.mode !== 'league') say('матч Лиги: нет просмотра или итога');
@@ -320,11 +415,25 @@ fresh();
     if (Lm.fights.length === 2 && halves[0] + halves[1] === 2) say('матч Лиги: при равном счёте нет третьего раунда');
     if (new Set(Lm.fights.flatMap(F => F.mine)).size !== Lm.fights.length * 5) say('матч Лиги: герой повторился');
     if (G.rating !== r0 + Lm.e.da || G.att !== a0 - 1) say('матч Лиги: рейтинг или попытки');
-    view('бой Лиги'); finish(R);
-    if (!R.over) say('матч Лиги: просмотр не кончился');
-    T.S.route = 'arena'; T.S.overlay = { t: 'lgres', arg: R.id }; h = view('итог матча');
-    if (!/Победа|Поражение|Ничья/.test(ovOf(h))) say('итог матча: нет исхода');
-    act('lgplay', go); if (G.rating !== r0 + Lm.e.da) say('матч Лиги: повтор номера что-то изменил');
+    if (Lm.fights.some(F => F.rounds !== T.EB.roundsOf('pvp'))) say('матч Лиги: раундов в бою — не из таблицы ядра');
+    /* после матча список новый сам */
+    if (!Lm.fresh || G.listNo !== lgNo0 + 1 || G.opp.some(id => lgList0.includes(id) || G.hit[id])) say('после матча: список Лиги не новый');
+    /* «Пропустить» — в каждом бою матча: в первом и во втором */
+    let hb = view('бой Лиги · раунд I'); if (!hb.includes('data-a="arskip"')) say('бой Лиги: в первом бою матча нет «Пропустить»');
+    { const was = T.S.route; T.S.route = 'week'; for (let n = 0; n < 40000 && !R.over && R.floor < 2; n++) run('просмотр', () => T.advance(R, 500)); T.S.route = was; }
+    if (R.floor !== 2 || R.over) say('матч Лиги: второй бой матча не начался');
+    else { T.S.route = 'battle'; T.S.focus = R.id; hb = view('бой Лиги · раунд II'); if (!hb.includes('data-a="arskip"')) say('бой Лиги: во втором бою матча нет «Пропустить»'); }
+    act('arskip', R.id);
+    if (!R.over || !T.S.overlay || T.S.overlay.t !== 'lgres') say('«Пропустить» во втором бою: не итог матча');
+    h = ovOf(view('итог матча · «Пропустить»'));
+    if (!/Победа|Поражение|Ничья/.test(h)) say('итог матча: нет исхода');
+    if ((h.match(/class="ech-det ar-det lg-bout/g) || []).length !== Lm.fights.length) say('итог матча: не строка на каждый бой матча');
+    if ((h.match(/<table class="ech-res-t ar-st">/g) || []).length !== Lm.fights.length * 2) say('итог матча: не у каждого боя статистика своих и соперника');
+    if (!h.includes('К новым соперникам')) say('итог матча: кнопка не говорит, что список уже новый');
+    for (const [i, F] of Lm.fights.entries()) { const re = T.AE.pvpRun(T.EB, T.AE.pvpBattle(T.EB, F.a, F.b, F.seed, F.rounds)); cnt.fights++; if (JSON.stringify(re.st) !== JSON.stringify(F.st)) say(`итог матча: статистика боя ${i + 1} — не того боя, что решил исход`); }
+    T.S.overlay = { t: 'lgres', arg: R.id, open: 1 }; if (!/<details class="ech-det ar-det lg-bout[^"]*" open>/.test(ovOf(view('итог матча · первый бой раскрыт')))) say('итог матча: первый бой не раскрывается');
+    const opp1 = G.opp.join();
+    act('lgplay', go); if (G.rating !== r0 + Lm.e.da || G.opp.join() !== opp1) say('матч Лиги: повтор номера что-то изменил');
   }
 }
 
@@ -374,10 +483,19 @@ fresh();
 {
   const x = T.KIT_EXTRA.find(k => { try { return /id="kitArena"/.test(k.html()); } catch (_) { return false; } });
   if (!x) say('UI-кит: нет раздела «Арена и Лига»');
-  else { const h = run('UI-кит', () => x.html()) || ''; if (/undefined|NaN|\[object /.test(h)) say('UI-кит: undefined или NaN'); if (!h.includes('ar-card')) say('UI-кит: нет карточки соперника'); }
-  for (const n of ['Арена · соперник целиком', 'Арена · атака и итог', 'Арена · оборона', 'Лига · матч']) {
+  else {
+    const s0 = JSON.stringify([T.S.arena.rating, T.S.arena.opp, T.S.arena.seq]), h = run('UI-кит', () => x.html()) || '';
+    if (/undefined|NaN|\[object /.test(h)) say('UI-кит: undefined или NaN');
+    if (!h.includes('ar-card')) say('UI-кит: нет карточки соперника');
+    if (!/<details class="ech-det ar-det" open>/.test(h) || (h.match(/<table class="ech-res-t ar-st">/g) || []).length !== 2) say('UI-кит: нет итога со статистикой — «Подробности боя» раскрыты, две таблицы');
+    if (!h.includes('после боя — новые трое')) say('UI-кит: нет правила списка — новый после каждого боя');
+    if (JSON.stringify([T.S.arena.rating, T.S.arena.opp, T.S.arena.seq]) !== s0) say('UI-кит: пример итога изменил состояние Арены');
+  }
+  for (const n of ['Арена · соперник целиком', 'Арена · атака и итог', 'Арена · пропуск и статистика', 'Арена · оборона', 'Лига · матч', 'Лига · итог матча']) {
     const f = T.FLOWS.find(y => y[0] === n); if (!f) { say(`нет сценария «${n}»`); continue; }
-    fresh(); run('сценарий ' + n, () => f[2]()); view(`сценарий «${n}»`);
+    fresh(); run('сценарий ' + n, () => f[2]()); const h = ovOf(view(`сценарий «${n}»`));
+    if (n === 'Арена · пропуск и статистика' && !/<details class="ech-det ar-det" open>/.test(h)) say('сценарий пропуска: итог без раскрытых «Подробностей боя»');
+    if (n === 'Лига · итог матча' && !/<details class="ech-det ar-det lg-bout[^"]*" open>/.test(h)) say('сценарий итога матча: первый бой не раскрыт');
     const R = T.S.runs.find(r => r.kind === 'pvp'); if (R) { finish(R); T.S.runs = []; }
   }
 }
