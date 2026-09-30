@@ -5,12 +5,19 @@
    1. Файлы: index.html подключает crafthall.css до craft.css (у правил раздела вес :where — правило экрана сильнее), market.css;
       crafthall.js — после reforge.js, market.js — после crafthall.js; скрипты компилируются; концы строк — CRLF; классы cr-* и mk-*
       из скриптов описаны в своих стилях; ключевые кадры — только transform и opacity; «меньше движения» — без движения.
-   2. Арт: пути CR_ART.ready есть на диске; у каждого вида рамки — картинка и окно (целые ‰, окно внутри тела); срезы страницы
-      гримуара — внутри картинки; ярус данных без вида рамки — предупреждение (такой ярус получит рамку сырья).
+   2. Арт: пути CR_ART.ready есть на диске, картинок рамок по виду нет; срезы страницы гримуара — внутри картинки.
    3. Залы: у каждого окна «Ремесла» свой зал — Мастерская, Запасы, Лавка, Рынок, Кузня; фаза пыли — от часов страницы: перерисовка
       не начинает движение заново; окно открытия сундука — зал Запасов и помост под сундуком.
-   4. Рамки: колодцы предметов — data-fk своего вида в Мастерской (плитки, гнёзда, пьедестал), в Запасах (клетки и карточка), в Лавке,
-      на Рынке и в листах; у талисманов, снаряжения, осколков и сундуков рамки предмета нет.
+   4. Рамка предмета — одна на все предметы (слово автора 30.09.2026: «пусть они будут едины для всех предметов, и будут более тонкие
+      и в тёмных стилях, а вот подсветка будет определять редкость ресурса»): crK даёт один атрибут любому предмету данных, значку
+      кошелька — ничего; в стилях нет правил по виду рамки; рамка тонкая (металл ≤ 2 px) и тёмная; редкость — свет: кромка, свет снизу
+      и свечение — цветом --rc, кромка ярче с редкостью, свечение — с эпической; у предметов разных видов одной редкости рамка
+      одинакова до значения. Колодцы предметов в рамке — в Мастерской (плитки, гнёзда, пьедестал, книга), в Запасах (клетки всех видов
+      и карточка), в Лавке, на Рынке, в листах, в Перековке, в Эхо и в наградах (ритуалы, контракты, Входящие).
+   4а. Иконка — ровно в окне рамки (каскад css_cascade.js, как в браузере, на 932 × 430 и 844 × 390): у живописи position:absolute,
+      левый и верхний край — отступ рамки и металл, размер задан явно, 2·left + width = сторона колодца для любой стороны, left = top,
+      width = height; рамка без своей кромки колодца (border:0), вектор и глиф — по центру сетки; в кнопке-сцене нет вложенной кнопки
+      (браузер закрыл бы внешнюю, и иконка выпала бы из сцены).
    5. Пометка Этриона (поле hint): карточка ресурса Мастерской и Запасов, лист товара Лавки, у стола — для выбранной ячейки, печать
       у гнезда; без поля — нигде; у спойлера цикла VI — нет.
    6. Тысяча ресурсов — вторая песочница: 1000 ресурсов разных ярусов, циклов, биомов и ремёсел, 500 найденных рецептов, 300 лотов.
@@ -22,7 +29,7 @@
       пометке у стола не меньше 120 px; карточка Запасов — страница гримуара, внутри не меньше 380 px; ряд Лавки вмещает товар на
       подушке, имя в две строки и бирку цены; строка Рынка вмещает предмет, имя, число, цену и действие.
    9. Режим «Игрок»: служебного нет ни в одном окне раздела, ни в их листах (SERVICE из check_player_view.js).
-   10. UI-кит: раздел «Ремесло: залы и вещи мастера» — пять залов, восемь рамок в семи редкостях, пометка, вещи стола.
+   10. UI-кит: раздел «Ремесло: залы и вещи мастера» — пять залов, рамка предмета — виды, семь редкостей и размеры, пометка, вещи стола.
    Запуск: node tools/content-gen/screens/check_crafthall.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -81,8 +88,11 @@ function sandbox(beforeModel) {
     insertAdjacentHTML() {}, setAttribute() {}, getAttribute: () => null, querySelector: () => null, querySelectorAll: () => [], closest: () => null,
     getBoundingClientRect: () => ({ left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 }), scrollIntoView() {}, focus() {}, clientWidth: 1200, clientHeight: 800 });
   const els = {};
+  /* классы у <html> — флаги выгруженного арта (cr-t, cr-p…): каскад рамки берёт их, как браузер */
+  const rootCls = new Set(), rootEl = stubEl('html');
+  rootEl.classList = { add: c => rootCls.add(c), remove: c => rootCls.delete(c), toggle: (c, on) => { const v = on === undefined ? !rootCls.has(c) : !!on; if (v) rootCls.add(c); else rootCls.delete(c); return v; }, contains: c => rootCls.has(c) };
   const document = { readyState: 'loading', addEventListener() {}, getElementById: id => (els[id] = els[id] || stubEl(id)), querySelector: () => null, querySelectorAll: () => [],
-    createElement: () => stubEl(), createElementNS: () => stubEl(), body: stubEl('body'), documentElement: stubEl('html'), activeElement: null, fonts: null, baseURI: 'file:///ui/' };
+    createElement: () => stubEl(), createElementNS: () => stubEl(), body: stubEl('body'), documentElement: rootEl, activeElement: null, fonts: null, baseURI: 'file:///ui/' };
   const win = { document, console, navigator: { userAgent: 'node' }, location: { hash: '', href: '' }, history: { replaceState() {} },
     localStorage: { getItem: () => null, setItem() {} }, innerWidth: 1400, innerHeight: 900, devicePixelRatio: 1, URL,
     addEventListener() {}, removeEventListener() {}, dispatchEvent() {}, matchMedia: () => ({ matches: false, addEventListener() {}, addListener() {} }),
@@ -99,13 +109,15 @@ function sandbox(beforeModel) {
   vm.runInContext(`globalThis.__T = {
     get S() { return S; }, set S(v) { S = v; }, reset(seg) { S = initialState(); S.route = 'craft'; S.seg.craft = seg || 'work'; KH.team = false; },
     html() { render(); return document.getElementById('game').innerHTML; }, rootStyle: document.documentElement.style,
-    ACT, OV, BAG, EN_RECIPES, KIT_EXTRA, KH, CR_VIEW, CR_ART, CR_KIND, CR_FRAMES, crKind, crK, crHint, crHintText, crFacets, crFacetMatch, crBiomeOf,
+    ACT, OV, BAG, EN_RECIPES, KIT_EXTRA, KH, CR_VIEW, CR_ART, crK, crFramed, crKitWell, crHint, crHintText, crFacets, crFacetMatch, crBiomeOf,
     crHallHtml, crKitHtml, crPage, WS_DATA, WS_FX, WS_SRV, wsInvView, wsStock, wsSetTable, zpView, zpEntries, mkView, lvCard, LV_DATA,
-    eqIcon: typeof eqIcon === 'function' ? eqIcon : null, zpCell, ZP_VIEW, rfEqTile, eqSlotName: typeof eqSlotName === 'function' ? eqSlotName : null,
+    eqIcon: typeof eqIcon === 'function' ? eqIcon : null, zpCell, ZP_VIEW, rfEqTile, rfTalTile, rfWorkTile, eqSlotName: typeof eqSlotName === 'function' ? eqSlotName : null,
+    itWell, FLOWS, open: (t, arg, extra) => { S.overlay = Object.assign({ t, arg }, extra || {}); },
   };`, ctx);
   const T = win.__T;
   T.tick = ms => { clock += ms; };
   T.now = () => clock;
+  T.rootCls = rootCls;
   return T;
 }
 const T = sandbox(null);
@@ -136,24 +148,9 @@ function run(label, f) { try { f(); } catch (e) { say(`${label}: исключе�
 run('арт', () => {
   const ART = path.join(UI, 'assets', 'art');
   for (const p of T.CR_ART.ready) ok(`арт: выгрузки нет на диске — ${p}`, fs.existsSync(path.join(ART, p)));
-  const kinds = T.CR_FRAMES.map(([k]) => k);
-  for (const k of kinds) {
-    ok(`рамка «${k}»: нет картинки в CR_ART.ready`, T.CR_ART.ready.includes(`craft/frame-${k}.png`));
-    const w = T.CR_ART.frames[k];
-    ok(`рамка «${k}»: окно — не четыре целых ‰`, Array.isArray(w) && w.length === 4 && w.every(Number.isInteger));
-    if (w) ok(`рамка «${k}»: окно не внутри тела — ${w}`, w[0] + w[2] < 1000 && w[1] + w[3] < 1000 && w.every(x => x > 0));
-  }
-  for (const [t, k] of Object.entries(T.CR_KIND)) ok(`CR_KIND: ярус ${t} ведёт к неизвестной рамке ${k}`, kinds.includes(k));
-  const free = Object.keys(R.tiers || {}).filter(t => !(t in T.CR_KIND));
-  if (free.length) warn.push(`ярусы данных без вида рамки — получат рамку сырья: ${free.join(', ')} (строка в CR_KIND, screens/crafthall.js)`);
-  /* вид по семейству (CR_FAM, поле fam): город, карст, топливо, Энериум — свои рамки; каждая из рамок кому-то нужна */
-  const used = new Set(R.items.map(it => T.crKind(it)));
-  for (const k of used) ok(`предмет получает неизвестную рамку ${k}`, kinds.includes(k));
-  for (const k of kinds) ok(`рамка «${k}» не нужна ни одному предмету данных`, used.has(k));
-  for (const [fam, k] of [['city', 'city'], ['karst', 'karst'], ['fuel', 'karst'], ['ener', 'karst']]) {
-    const it = R.items.find(x => x.fam === fam);
-    if (it) ok(`семейство ${fam}: рамка ${T.crKind(it)}, а нужна ${k}`, T.crKind(it) === k);
-  }
+  /* рамки по виду сняты словом автора 30.09.2026: рамка одна и рисуется CSS (art-icons.css) — картинок рамок и их флага у <html> нет */
+  ok('CR_ART: в выгрузке остались картинки рамок по виду (craft/frame-*)', !T.CR_ART.ready.some(p => /^craft\/frame-/.test(p)) && !('frames' in T.CR_ART));
+  ok('у <html> стоит флаг рамок по виду cr-f', !T.rootCls.has('cr-f'));
   const P = T.CR_ART.page;
   ok('страница гримуара: срезы border-image — не внутри картинки', P.slice[0] + P.slice[2] < P.px[1] && P.slice[1] + P.slice[3] < P.px[0] && P.slice.every(Number.isInteger));
   /* страница в стилях — те же срезы, что в CR_ART.page */
@@ -184,46 +181,73 @@ run('залы', () => {
   ok('chest-open.js: помост не в сцене', /class="co-dais"/.test(read('screens/chest-open.js')));
 });
 
-/* ================== 4. рамки ================== */
-const kindsOk = new Set(T.CR_FRAMES.map(([k]) => k));
-const fks = h => [...h.matchAll(/data-fk="([a-z]+)"/g)].map(m => m[1]);
-run('рамки', () => {
+/* ================== 4. рамка предмета — одна на все предметы ==================
+   Слово автора 30.09.2026: «рамки слишком толстые, пусть они будут едины для всех предметов, и будут более тонкие и в тёмных стилях,
+   а вот подсветка будет определять редкость ресурса». Рамка — art-icons.css («Рамка предмета»): класс itf или атрибут data-fk="item" (crK) */
+const FRAME = ' data-fk="item"', flatCss = s => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s+/g, ' ');
+const ICSS = flatCss(read('screens/art-icons.css'));
+const framedIn = h => (h.match(/<(?:button|span)\b[^>]*\sdata-fk="item"[^>]*>/g) || []).length;
+run('рамка предмета', () => {
+  /* разметка: один атрибут у любого предмета данных; у значков кошелька (семейство wallet — Энериум, рунный ключ) — ничего */
+  let bad = 0;
+  for (const it of R.items) { const want = it.fam === 'wallet' ? '' : FRAME; if (T.crK(it) !== want && bad++ < 3) say(`crK: у ${it.id} (${it.tier}${it.fam ? ' · ' + it.fam : ''}) «${T.crK(it)}», нужно «${want}»`); }
+  ok('в данных нет значка кошелька — правило «кошельку рамки нет» ничего не проверяет', R.items.some(it => it.fam === 'wallet'));
+  /* стили: вид рамкой не различается — ни одного правила по значению data-fk */
+  const sheetsAll = [['index.html', html], ...fs.readdirSync(path.join(UI, 'screens')).filter(f => f.endsWith('.css')).map(f => ['screens/' + f, read('screens/' + f)])];
+  for (const [f, css] of sheetsAll) { const m = flatCss(css).match(/\[data-fk="[^"]*"\]/); if (m) say(`${f}: правило по виду рамки ${m[0]} — рамка одна на все предметы`); }
+  /* тонкая и тёмная: металл не толще 2 px, четыре цвета скоса — тёмные (самый светлый канал не выше 0x70) */
+  const b = (ICSS.match(/:root\{[^}]*--itf-b:(\d+(?:\.\d+)?)px/) || [])[1];
+  ok(`рамка: металл --itf-b ${b} px — толще 2 px`, b != null && +b <= 2);
+  const after = (ICSS.match(/:is\(\.itf,\[data-fk\],[^{]*\)::after\{([^}]*)\}/) || [])[1] || '';
+  const hexes = ((after.match(/border-color:([^;]+)/) || [])[1] || '').match(/#[0-9a-f]{6}/gi) || [];
+  ok(`рамка: у металла не четыре цвета скоса (${hexes.length})`, hexes.length === 4);
+  for (const x of hexes) if (Math.max(...[1, 3, 5].map(i => parseInt(x.slice(i, i + 2), 16))) > 0x70) say(`рамка: металл ${x} — светлый, рамка должна быть тёмной`);
+  /* редкость — светом: кромка, свет снизу и свечение — цветом --rc, их силу ставит редкость; рамка — по отступу --itf-in */
+  ok('рамка: кромка, свет снизу и свечение — не цветом редкости --rc', ['--itf-k', '--itf-l', '--itf-g'].every(v => new RegExp(`color-mix\\(in srgb,var\\(--rc[^)]*\\) (?:calc\\()?var\\(${v}\\)`).test(after)));
+  ok('рамка: не по отступу --itf-in и металлу --itf-b', /inset:var\(--itf-in\)/.test(after) && /border:var\(--itf-b\) solid/.test(after));
+  /* колодцы предметов в рамке — по окнам: Мастерская, Запасы, Лавка, Рынок, листы */
   T.reset('work');
   let h = view('Мастерская · рамки'), grid = h.slice(h.indexOf('ws-grid'), h.indexOf('ws-craft'));
-  const tiles = (grid.match(/data-wsdrag="/g) || []).length, framed = (grid.match(/<button class="well[^"]*"[^>]*data-fk="[a-z]+"[^>]*>/g) || []).length;
-  ok(`Мастерская: плиток ${tiles}, в рамке своего вида ${framed}`, tiles > 0 && tiles === framed);
-  for (const k of fks(grid)) if (!kindsOk.has(k)) say(`Мастерская: неизвестный вид рамки ${k}`);
-  /* вид — от яруса: у каждой плитки рамка своего предмета */
-  for (const m of grid.matchAll(/data-v="([^"]+)"[^>]*data-fk="([a-z]+)"/g)) { const it = T.BAG.item(m[1]); if (it && T.crKind(it) !== m[2]) say(`Мастерская: у ${m[1]} рамка ${m[2]}, вид ${T.crKind(it)}`); }
+  const tiles = [...grid.matchAll(/data-wsdrag="([^"]+)"/g)].map(m => m[1]), wallet = tiles.filter(id => (T.BAG.item(id) || {}).fam === 'wallet').length;
+  ok(`Мастерская: плиток ${tiles.length}, в рамке ${framedIn(grid)}, значков кошелька ${wallet}`, tiles.length > 0 && framedIn(grid) === tiles.length - wallet);
   T.wsSetTable(T.WS_DATA.demo.table); h = view('Мастерская · стол');
-  ok('стол: у ресурса в гнезде нет рамки своего вида', /class="well ws-cell[^"]*"[^>]*data-fk="[a-z]+"/.test(h));
-  ok('стол: у найденного рецепта на пьедестале нет рамки итога', /class="well ws-core known[^"]*"[^>]*data-fk="[a-z]+"/.test(h));
+  ok('стол: ресурс в гнезде не в рамке', /class="well ws-cell[^"]*"[^>]*data-fk="item"/.test(h));
+  ok('стол: итог на пьедестале не в рамке', /class="well ws-core known[^"]*"[^>]*data-fk="item"/.test(h));
   ok('стол: нет диска, кольца и желобов', h.includes('class="ws-disc"') && h.includes('class="ws-rg"') && (h.match(/class="ws-gr[ "]/g) || []).length === T.WS_DATA.cells);
   A.wsinfo('fang'); h = view('карточка ресурса · рамка'); A.close();
-  ok('карточка ресурса: крупная плитка без рамки', /<span class="well" data-r="\d"[^>]*data-fk="[a-z]+"/.test(h));
-  /* Запасы: ресурсы — в рамке; талисманы, снаряжение, осколки, сундуки — со своим артом, без рамки предмета */
+  ok('карточка ресурса: крупная плитка без рамки', /<span class="well" data-r="\d"[^>]*data-fk="item"/.test(h));
+  /* Запасы: ресурс — атрибутом; клетки остальных видов (талисман, снаряжение, осколок, сундук) — в рамке по редкости (art-icons.css) */
   T.reset('stock');
   for (const tab of ['res', 'rune', 'call', 'shard', 'chest', 'tal', 'eq']) {
     T.S.zp.tab = tab; h = view(`Запасы · ${tab}`);
     const g = (h.match(/<div class="zp-grid[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/) || [])[1] || '';
-    const items = T.zpEntries(tab).filter(e => e.kind === 'item').length, framedCells = (g.match(/<button class="zp-cell[^"]*"[^>]*data-fk="/g) || []).length;
-    ok(`Запасы · ${tab}: предметов ${items}, в рамке ${framedCells}`, framedCells === Math.min(items, T.CR_VIEW.page));
-    const e = T.zpEntries(tab)[0];
+    const E = T.zpEntries(tab).slice(0, T.CR_VIEW.page), items = E.filter(e => e.kind === 'item' && e.it.fam !== 'wallet').length;
+    ok(`Запасы · ${tab}: предметов ${items}, в рамке ${framedIn(g)}`, framedIn(g) === items);
+    const withR = (g.match(/<button class="zp-cell[^"]*" data-r="\d"/g) || []).length;
+    ok(`Запасы · ${tab}: клеток с редкостью ${withR}, а предметов ${E.filter(e => e.kind !== 'wallet').length} — у рамки нет редкости`, withR === E.filter(e => e.kind !== 'wallet').length);
+    const e = E[0];
     if (e) { A.zpsel(e.key); const c = view(`Запасы · ${tab} · карточка`), card = c.slice(c.indexOf('zp-card'));
-      ok(`Запасы · ${tab}: у карточки предмета нет рамки своего вида`, e.kind !== 'item' || /class="zp-ic lg[^"]*"[^>]*data-fk="[a-z]+"/.test(card)); }
+      ok(`Запасы · ${tab}: у карточки ресурса нет рамки`, e.kind !== 'item' || /class="zp-ic lg[^"]*"[^>]*data-fk="item"/.test(card)); }
   }
   /* Лавка и Рынок */
   T.reset('shop'); h = view('Лавка · рамки');
   const ics = (h.match(/<span class="lv-ic"[^>]*>/g) || []);
-  ok(`Лавка: у товаров нет рамки своего вида — ${ics.length}`, ics.length === T.S.shop.length && ics.every(x => /data-fk="[a-z]+"/.test(x)));
+  ok(`Лавка: у товаров нет рамки предмета — ${ics.length}`, ics.length === T.S.shop.length && ics.every(x => x.includes(FRAME)));
   A.buy('0'); h = view('Лавка · лист товара'); A.close();
-  ok('лист товара: крупная плитка без рамки', /class="lv-big"[^>]*data-fk="[a-z]+"/.test(h));
+  ok('лист товара: крупная плитка без рамки', /class="lv-big"[^>]*data-fk="item"/.test(h));
   T.reset('market'); T.S.seg.market = 'buy'; h = view('Рынок · лоты');
-  ok('Рынок: у лотов нет рамки своего вида', (h.match(/class="well mk-ic"[^>]*data-fk="[a-z]+"/g) || []).length === T.S.market.lots.length);
+  ok('Рынок: у лотов нет рамки предмета', (h.match(/class="well mk-ic"[^>]*data-fk="item"/g) || []).length === T.S.market.lots.length);
   ok('Рынок: навес над рядами', h.includes('class="mk-aw"'));
   T.S.seg.market = 'mine'; h = view('Рынок · свои лоты');
-  ok('Рынок · свои лоты: предмет лота без рамки', /class="mk-pick"><button class="well mk-ic"[^>]*data-fk="/.test(h));
+  ok('Рынок · свои лоты: предмет лота без рамки', /class="mk-pick"><button class="well mk-ic"[^>]*data-fk="item"/.test(h));
   ok('Рынок · форма лота: предметы не группами по виду', /<optgroup label="[^"]+">/.test(h));
+  /* Перековка: талисман, снаряжение и рабочий — в рамке предмета; кристалл рабочего без арта — без неё */
+  const tal = T.rfTalTile(1, false), eq = T.rfEqTile('main', 3, false), wk = T.rfWorkTile(2, false);
+  ok('Перековка: талисман, снаряжение или рабочий не в рамке предмета', [tal, eq, wk].every(x => !/class="rf-t[^"]*"/.test(x) || /class="rf-t[^"]*\bitf\b/.test(x)));
+  /* награды: колодец предмета (itWell, index.html) — в рамке; без действия — не кнопка */
+  const any = R.items.find(it => !it.team && it.fam !== 'wallet' && it.tier === 'basic');
+  ok('награды: колодец предмета itWell без рамки', T.itWell(any.id, { act: 'noop', size: 30 }).includes(FRAME));
+  ok('itWell { stat }: колодец без действия — не span', /^<span class="well bw"[^>]*>[\s\S]*<\/span>$/.test(T.itWell(any.id, { stat: true, size: 30 })) && !/data-a=/.test(T.itWell(any.id, { stat: true })));
   /* снаряжение — иконка слота своей редкости (art-icons.js: eqIcon(slot, px, alt, r)) в Запасах и Перековке */
   if (T.eqIcon && T.eqSlotName) {
     T.reset('stock');
@@ -232,6 +256,136 @@ run('рамки', () => {
     const slot = eqs.length ? eqs[0].slot : 'main';
     for (let r = 1; r <= 7; r++) { const want = T.eqIcon(slot, 26, T.eqSlotName(slot), r); if (want && !T.rfEqTile(slot, r, false).includes(want)) say(`Перековка: иконка снаряжения не своей редкости ${r}`); }
   }
+});
+
+/* ================== 4а. иконка — ровно в окне рамки: каскад, как в браузере ==================
+   css_cascade.js решает, чьё правило побеждает у элемента, как браузер: специфичность, порядок, @media и @container. У живописи в рамке
+   (res-art, eq-grid, tal-grid, ab-art, картинка без класса, портрет у .face): position:absolute, размер задан явно — у картинки с
+   position:absolute размер auto — её собственный (атрибуты width и height), так иконки съезжали вправо вниз и обрезались (30.09.2026).
+   Длины — линейно по стороне колодца S (a·S + b px): 2·left + width = S и left = top, width = height — для любой стороны; left — ровно
+   отступ рамки и металл (--itf-in + --itf-b), как у кольца рамки; у рамки нет своей кромки колодца (border:0). Вектор и глиф — по центру
+   сетки. Кнопка в кнопке — браузер закрывает внешнюю, иконка выпадает из сцены (ритуалы, 30.09.2026) */
+const CC = require('./css_cascade.js');
+/* длина → [a, b]: a·S + b px (S — сторона колодца); число без единиц — множитель; null — не линейно или auto */
+function lin(v) {
+  const s = String(v == null ? '' : v).replace(/calc\(/g, '(').trim(); let i = 0;
+  const ws = () => { while (s[i] === ' ') i++; };
+  function factor() {
+    ws();
+    if (s[i] === '(') { i++; const x = sum(); ws(); if (s[i] !== ')') return null; i++; return x; }
+    const m = s.slice(i).match(/^(-?\d+(?:\.\d+)?)(px|%)?/); if (!m) return null; i += m[0].length;
+    return m[2] === 'px' ? { a: 0, b: +m[1] } : m[2] === '%' ? { a: +m[1] / 100, b: 0 } : { a: 0, b: +m[1], k: true };
+  }
+  function prod() {
+    let x = factor(); ws();
+    while (x && (s[i] === '*' || s[i] === '/')) {
+      const op = s[i++], y = factor(); if (!y) return null;
+      if (op === '*') x = x.k ? { a: y.a * x.b, b: y.b * x.b, k: y.k } : y.k ? { a: x.a * y.b, b: x.b * y.b } : null;
+      else x = y.k && y.b ? { a: x.a / y.b, b: x.b / y.b, k: x.k } : null;
+      ws();
+    }
+    return x;
+  }
+  function sum() {
+    let x = prod(); ws();
+    while (x && (s[i] === '+' || s[i] === '-')) { const op = s[i++], y = prod(); if (!y) return null; x = op === '+' ? { a: x.a + y.a, b: x.b + y.b } : { a: x.a - y.a, b: x.b - y.b }; ws(); }
+    return x;
+  }
+  const r = sum(); ws();
+  return r && i === s.length && !r.k ? [r.a, r.b] : null;
+}
+const same = (x, y) => !!x && !!y && Math.abs(x[0] - y[0]) < 1e-6 && Math.abs(x[1] - y[1]) < 1e-6;
+/* колодец в рамке: класс itf, атрибут data-fk или клетка и плитка «Запасов» с редкостью */
+const isFrame = e => e.cls.has('itf') || e.attrs.has('data-fk') || ((e.cls.has('zp-cell') || (e.cls.has('zp-ic') && !e.cls.has('bare'))) && e.attrs.has('data-r'));
+const PAINT = ['res-art', 'eq-grid', 'tal-grid', 'ab-art'];
+const isPaint = (f, k) => k.tag === 'img' && (PAINT.some(c => k.cls.has(c)) || !k.attrs.has('class') || f.cls.has('face'));
+/* вложенные кнопки в разметке-строке: браузер закрыл бы внешнюю */
+function nestedButtons(h) { const re = /<(\/?)button\b[^>]*>/g; let m, d = 0, n = 0; while ((m = re.exec(h))) { if (m[1]) d = Math.max(0, d - 1); else { if (d) n++; d++; } } return n; }
+run('иконка в окне рамки', () => {
+  const RULES = CC.sheets(UI, html);
+  const gv = (re, name) => { const m = html.match(re); if (!m) { say(`каскад: не найдено ${name}`); return 0; } return +m[1]; };
+  const G = { top: gv(/\n\.g\{--top:(\d+)px/, '.g --top'), rail: gv(/\n\.g\{--top:\d+px;--rail:(\d+)px/, '.g --rail'), topS: gv(/\n\.g\.sm\{[^}]*--top:(\d+)px/, '.g.sm --top'), railS: gv(/\n\.g\.sm\{[^}]*--rail:(\d+)px/, '.g.sm --rail') };
+  const tree = (small, markup) => CC.wrap([['html', { class: [...T.rootCls].join(' '), lang: 'ru' }], ['body', {}], ['div', { class: 'p-device', id: 'device' }], ['div', { class: 'p-device-inner' }], ['div', { class: small ? 'g sm' : 'g', id: 'game', lang: 'ru' }]], markup);
+  const SCR2 = [{ n: '932 × 430', w: 932, h: 430, small: false }, { n: '844 × 390', w: 844, h: 390, small: true }];
+  const flow = name => { const f = T.FLOWS.find(x => x[0] === name); if (!f) { say(`каскад: нет сценария «${name}»`); return; } T.S.overlay = null; f[2](); };
+  /* окна с предметами: Мастерская, Запасы (все вкладки и карточка), Лавка, Рынок, листы, Перековка, Эхо, награды */
+  const WIN = [
+    ['Мастерская · стол', () => { T.reset('work'); T.wsSetTable(T.WS_DATA.demo.table); }],
+    ['Мастерская · книга рецептов', () => { T.reset('work'); A.wsview('book'); }],
+    ['Мастерская · карточка ресурса', () => { T.reset('work'); A.wsinfo('fang'); }],
+    ...['res', 'rune', 'call', 'shard', 'chest', 'tal', 'eq'].map(tab => [`Запасы · ${tab}`, () => { T.reset('stock'); T.S.zp.tab = tab; const e = T.zpEntries(tab)[0]; if (e) A.zpsel(e.key); }]),
+    ['Лавка', () => T.reset('shop')], ['Лавка · лист товара', () => { T.reset('shop'); A.buy('3'); }],
+    ['Рынок', () => { T.reset('market'); T.S.seg.market = 'buy'; }], ['Рынок · свои лоты', () => { T.reset('market'); T.S.seg.market = 'mine'; }],
+    ['Сведения', () => { T.reset('market'); T.S.seg.market = 'buy'; T.open('item', 'u2'); }],
+    ...['tal', 'eq', 'work'].map(m => [`Перековка · ${m}`, () => { T.reset('reforge'); T.S.seg.rf = m; }]),
+    ['Эхо · активация', () => { T.reset('stock'); A.itact('act_cb1'); }],
+    ['Ритуалы · сбор', () => { flow('Ритуалы · сбор'); if (A.rtfx) A.rtfx(); }],
+    ['Входящие', () => flow('Входящие')],
+    ['UI-кит · рамка предмета', null],
+  ];
+  const tot = { frames: 0, paint: 0, glyph: 0 };
+  for (const X of SCR2) {
+    const K = () => new CC.Cascade(RULES, { w: X.w, h: X.h, reduced: false, hover: false, containers: { main: [X.w - (X.small ? G.railS : G.rail), X.h - (X.small ? G.topS : G.top)] } });
+    for (const [label, set] of WIN) {
+      const where = `каскад ${X.n} · ${label}`;
+      let h;
+      if (set) { set(); h = view(where); } else h = look(where, T.crKitHtml());
+      if (!h) continue;
+      const nb = nestedButtons(h); if (nb) say(`${where}: кнопка в кнопке (${nb}) — браузер закроет внешнюю, иконка выпадет из сцены`);
+      const root = tree(X.small, h), C = K(), frames = CC.q(root, isFrame);
+      if (!frames.length) { say(`${where}: нет ни одного колодца в рамке`); continue; }
+      let paint = 0, beat = 0;
+      for (const f of frames) {
+        tot.frames++;
+        const brd = C.value(f, 'border');
+        if (brd !== '0' && beat++ < 3) say(`${where}: у колодца .${[...f.cls].join('.')} своя кромка «${brd}» (${(C.win(f, 'border') || {}).src}) — окно рамки уедет`);
+        const off = lin(`calc(${C.value(f, '--itf-in')} + ${C.value(f, '--itf-b')})`);
+        for (const k of f.kids) {
+          if (isPaint(f, k)) {
+            paint++; tot.paint++;
+            const p = C.value(k, 'position'), L = lin(C.value(k, 'left')), Tt = lin(C.value(k, 'top')), W = lin(C.value(k, 'width')), H = lin(C.value(k, 'height'));
+            const tell = `${where}: иконка у .${[...f.cls].join('.')}`;
+            if (p !== 'absolute') { if (beat++ < 6) say(`${tell} — position ${p}, а нужна absolute`); continue; }
+            if (!L || !Tt || !W || !H) { if (beat++ < 6) say(`${tell} — размер не задан явно: left ${C.value(k, 'left')}, top ${C.value(k, 'top')}, width ${C.value(k, 'width')}, height ${C.value(k, 'height')} — у картинки auto — её собственный размер, иконка съедет`); continue; }
+            if (!same(L, Tt) || !same(W, H)) { if (beat++ < 6) say(`${tell} — не квадрат по центру: left ${C.value(k, 'left')}, top ${C.value(k, 'top')}, width ${C.value(k, 'width')}, height ${C.value(k, 'height')}`); continue; }
+            if (!same([2 * L[0] + W[0], 2 * L[1] + W[1]], [1, 0]) && beat++ < 6) say(`${tell} — не по центру окна: 2·left + width = ${(2 * L[0] + W[0]).toFixed(3)}·S + ${(2 * L[1] + W[1]).toFixed(1)} px, нужно S`);
+            if (!same(L, off) && beat++ < 6) say(`${tell} — край ${C.value(k, 'left')} не по окну рамки (--itf-in + --itf-b)`);
+            const fit = C.value(k, 'object-fit'); if (!['cover', 'contain'].includes(fit) && beat++ < 6) say(`${tell} — object-fit ${fit}`);
+            for (const side of ['right', 'bottom']) { const v = C.value(k, side); if (v && v !== 'auto' && beat++ < 6) say(`${tell} — ${side} ${v}: размер задан явно, край противоположной стороны — auto`); }
+          } else if (k.tag === 'svg' || k.tag === 'img' || ['gl', 'hsg', 'zp-cp', 'tl-t'].some(c => k.cls.has(c))) {
+            /* вектор, глиф, вырезка (фигура рабочего), стекло осколка, сундук, медальон — по центру сетки колодца */
+            tot.glyph++; paint++;
+            const d = C.value(f, 'display'), pi = C.value(f, 'place-items');
+            if ((d !== 'grid' || pi !== 'center') && beat++ < 6) say(`${where}: значок у .${[...f.cls].join('.')} не по центру — display ${d}, place-items ${pi}`);
+          }
+        }
+      }
+      if (set && !paint) say(`${where}: в рамках нет ни одной иконки — разметка не та`);
+    }
+  }
+  /* редкость — светом: сила кромки растёт с редкостью, свечение — с эпической; вид рамкой не различается — у предметов разных ярусов
+     одной редкости все свойства рамки и окна иконки равны до значения */
+  const C = new CC.Cascade(RULES, { w: 932, h: 430, containers: { main: [932 - G.rail, 430 - G.top] } });
+  const one = R.items.find(it => !it.team && it.tier === 'basic' && T.crFramed(it));
+  const rar = [1, 2, 3, 4, 5, 6, 7].map(r => { const root = tree(false, T.crKitWell(one, r, 44, 'проба')), f = CC.q(root, isFrame)[0]; return f ? { r, k: parseFloat(C.value(f, '--itf-k')), g: parseFloat(C.value(f, '--itf-g')), rc: C.value(f, '--rc') } : null; });
+  if (rar.some(x => !x)) say('каскад: у пробы редкости нет колодца в рамке');
+  else {
+    const rr = r => rar[r - 1];
+    ok(`редкость: кромка не ярче с редкостью — ${rar.map(x => x.k).join(', ')}`, rr(1).k < rr(2).k && rr(2).k === rr(3).k && rr(3).k < rr(4).k && [5, 6, 7].every(r => rr(r).k === rr(4).k));
+    ok(`редкость: свечение не с эпической — ${rar.map(x => x.g).join(', ')}`, [1, 2, 3].every(r => rr(r).g === 0) && [4, 5, 6, 7].every(r => rr(r).g > 0));
+    for (const x of rar) { const want = (html.match(new RegExp(`--r${x.r}:(#[0-9a-f]{6})`, 'i')) || [])[1]; if (!want || String(x.rc).toLowerCase() !== want.toLowerCase()) say(`редкость ${x.r}: свет рамки ${x.rc}, а цвет редкости ${want} (ADR-0027)`); }
+  }
+  const PROPS = ['border', 'border-radius', 'background', 'box-shadow', 'overflow', '--itf-b', '--itf-in', '--itf-r', '--itf-k', '--itf-l', '--itf-g', '--rc'];
+  const drawn = it => !it.team && T.crFramed(it) && !it.img && it.fam !== 'hero';   // иконка сеткой — у всех, кроме своей картинки и героя
+  const tiers = [...new Set(R.items.filter(drawn).map(it => it.tier))];
+  let base = null, baseT = '';
+  for (const t of tiers) {
+    const it = R.items.find(x => drawn(x) && x.tier === t), root = tree(false, T.crKitWell(it, 4, 44, t)), f = CC.q(root, isFrame)[0];
+    const img = f && f.kids.find(k => isPaint(f, k)); if (!f || !img) { say(`вид ${t}: проба без колодца или иконки`); continue; }
+    const sig = PROPS.map(p => C.value(f, p)).concat(['position', 'left', 'top', 'width', 'height', 'object-fit'].map(p => C.value(img, p))).join(' | ');
+    if (base === null) { base = sig; baseT = t; } else if (sig !== base) { say(`вид ${t}: рамка не как у ${baseT} — вид рамкой различаться не должен`); break; }
+  }
+  rep.push(`каскад: колодцев в рамке ${tot.frames} на двух экранах, иконок сеткой ровно в окне ${tot.paint}, значков по центру ${tot.glyph}, видов с одной рамкой ${tiers.length}`);
 });
 
 /* ================== 5. пометка Этриона ================== */
@@ -255,7 +409,7 @@ run('пометка Этриона', () => {
       ok('стол: пометка у ячейки без поля hint', !h.includes('ws-note') && h.includes('class="ws-hex"')); }
     /* лист «Сведения» index.html (рынок, ритуалы, развитие героя): рамка вида и пометка под загадкой */
     A.item('fang'); h = view('Сведения · пометка'); A.close();
-    ok('лист «Сведения»: нет пометки или рамки вида', h.includes(NOTE) && /class="tr-big" data-r="\d" data-fk="[a-z]+"/.test(h));
+    ok('лист «Сведения»: нет пометки или рамки предмета', h.includes(NOTE) && /class="tr-big" data-r="\d" data-fk="item"/.test(h));
     T.reset('stock'); T.S.zp.tab = 'res'; A.zpsel('i:fang'); h = view('Запасы · карточка с пометкой');
     ok('Запасы: в карточке ресурса нет пометки', h.slice(h.indexOf('zp-card')).includes(NOTE));
     T.reset('shop'); const g = T.S.shop[0], sit = T.BAG.item(g[0]); const was = sit.hint; sit.hint = NOTE;
@@ -339,7 +493,7 @@ run('вёрстка', () => {
     rep.push(`${F.n}: карточка Запасов ${card} px, внутри ${inner} px`);
   });
   /* Лавка: нижний ряд вмещает товар на подушке, имя в две строки и бирку цены */
-  const icon = [px(SH, /html\.cr-f \.lv-ic\[data-fk\]\{width:(\d+)px/, 'значка товара'), px(Sc, /html\.cr-f \.lv-ic\[data-fk\]\{width:(\d+)px/, 'значка товара низкого экрана')];
+  const icon = [px(SH, /\.lv-ic\[data-fk\]\{width:(\d+)px/, 'значка товара'), px(Sc, /\.lv-ic\[data-fk\]\{width:(\d+)px/, 'значка товара низкого экрана')];
   const icMb = [px(SH, /\.lv-ic\{margin-bottom:(\d+)px\}/, 'поля под значком'), px(Sc, /\.lv-ic\{margin-bottom:(\d+)px\}/, 'поля под значком низкого экрана')];
   const cardGap = px(SH, /\.lv-card\{isolation:isolate;[^}]*gap:(\d+)px/, 'зазора карточки');
   const padT = px(SH, /\.lv-card\{isolation:isolate;[^}]*padding:(\d+)px/, 'поля карточки');
@@ -377,7 +531,9 @@ run('UI-кит', () => {
   ok('UI-кит: нет раздела «Ремесло: залы и вещи мастера»', T.KIT_EXTRA.some(x => x.html === T.crKitHtml));
   const k = look('UI-кит · Ремесло', T.crKitHtml());
   ok('UI-кит: не пять залов', (k.match(/class="cr-kh-p" data-hall="/g) || []).length === 5);
-  ok(`UI-кит: рамок не ${T.CR_FRAMES.length * 7}`, (k.match(/class="well cr-kw" data-fk="/g) || []).length === T.CR_FRAMES.length * 7);
+  const kv = T.CR_VIEW.kit, nk = kv.tiers.filter(t => R.items.some(it => !it.team && it.tier === t && T.crFramed(it))).length;
+  ok(`UI-кит: рамок предмета не ${nk + 7 + kv.sizes.length} — виды, семь редкостей, размеры`, (k.match(/class="well cr-kw" data-fk="item"/g) || []).length === nk + 7 + kv.sizes.length && nk === kv.tiers.length);
+  ok('UI-кит: у рамок пробы не семь редкостей', [1, 2, 3, 4, 5, 6, 7].every(r => k.includes(`data-fk="item" data-r="${r}"`)));
   ok('UI-кит: нет пометки Этриона', k.includes('Пометка Этриона'));
   ok('UI-кит: нет вещей стола', ['cr-kt-t', 'cr-kt-s', 'cr-kt-c', 'cr-kt-h', 'cr-kt-d'].every(c => k.includes(c)));
 });
@@ -458,6 +614,6 @@ done();
 function done() {
   if (warn.length) console.log('Предупреждения:\n' + warn.join('\n'));
   if (err.length) { console.log('ОШИБКИ:\n' + err.slice(0, 50).join('\n') + (err.length > 50 ? `\n… и ещё ${err.length - 50}` : '')); process.exit(1); }
-  console.log('Проверка пройдена: у каждого окна «Ремесла» свой зал, предметы — в рамках своего вида, пометка Этриона там, где есть поле hint, тысяча ресурсов — порциями и гранями, стол, Запасы, Лавка и Рынок помещаются на 932 × 430 и 844 × 390, игроку служебного не видно.');
+  console.log('Проверка пройдена: у каждого окна «Ремесла» свой зал, предметы — в одной рамке на все виды, редкость — светом, иконка — ровно в окне рамки на обоих экранах, пометка Этриона там, где есть поле hint, тысяча ресурсов — порциями и гранями, стол, Запасы, Лавка и Рынок помещаются на 932 × 430 и 844 × 390, игроку служебного не видно.');
   process.exit(0);
 }

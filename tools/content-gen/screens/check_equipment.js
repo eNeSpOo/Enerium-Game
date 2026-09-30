@@ -357,11 +357,14 @@ reset();
   const tabs = [...h.matchAll(/data-a="zptab" data-v="([^"]+)"/g)].map(m => m[1]);
   if (tabs.join(',') !== 'res,rune,shard,call,chest,tal,eq') say(`вкладки запасов: ${tabs.join(', ')}`);
   if (/Артефакт/.test(playerText(h))) say('в запасах остались артефакты — они живут в «Страннике»');
-  /* сундуки — только сундуки, плитка — рисованный корпус своего вида */
+  /* сундуки — только сундуки, плитка — рисованный сундук: лист режима своей редкости или прежний корпус вида */
   const ch = T.zpEntries('chest'); if (ch.some(e => e.kind !== 'chest')) say('«Сундуки»: не только сундуки');
   T.S.zp.tab = 'chest'; const hc = view(P, 'сундуки');
-  if (T.CO_ART) for (const e of ch) { const body = `chests/${e.cs.box}-body.png`; if (T.CO_ART.ready.includes(body) && !hc.includes(body)) say(`«Сундуки»: у ${e.cs.box} не рисованный корпус`); }
-  if (T.CO_ART && T.CO_ART.ready.includes('chests/wander-body.png')) { T.S.overlay = { t: 'gifts', arg: 'me' }; const hg = view(P, 'Дары'); if (!/chests\/[a-z]+-body\.png/.test(hg)) say('Дары: плитки сундуков — прежний значок'); T.S.overlay = null; }
+  if (T.CO_ART) for (const e of ch) {
+    const ico = `chests/${e.cs.box}/r${e.cs.r}.webp`, body = `chests/${e.cs.box}-body.png`, set = !!(T.CO_ART.sets && T.CO_ART.sets[e.cs.box]) && T.CO_ART.ready.includes(ico);
+    if (set ? !hc.includes(ico) : T.CO_ART.ready.includes(body) && !hc.includes(body)) say(`«Сундуки»: у ${e.cs.box} · ${e.cs.r} не рисованный сундук`);
+  }
+  if (T.CO_ART && T.CO_ART.ready.includes('chests/wander-body.png')) { T.S.overlay = { t: 'gifts', arg: 'me' }; const hg = view(P, 'Дары'); if (!/chests\/[a-z]+(?:-body\.png|\/r\d\.webp)/.test(hg)) say('Дары: плитки сундуков — прежний значок'); T.S.overlay = null; }
   /* призывы: руины, крафтовые боссы, Многоликий */
   for (const e of T.zpEntries('call')) if (!['act', 'call', 'echo'].includes(e.it.tier)) say(`«Призывы»: ${e.id} яруса ${e.it.tier}`);
   /* талисманы: фильтр «подходит классу» — §26 */

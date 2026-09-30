@@ -66,32 +66,48 @@ button.hdv-gate:hover .rp-s{transform:scale(1.1)}
 .hdv-star.max{color:var(--gold-2)}
 .hdv-star.dot::after{content:"";position:absolute;right:9px;top:-1px;z-index:2;width:7px;height:7px;border-radius:50%;background:var(--spirit);box-shadow:0 0 8px var(--spirit)}
 .hdv-star:hover{color:var(--gold)}
-/* следующий шаг — одна карточка, одно действие */
-.hdv-next{flex:none;display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border-radius:12px;border:1px solid rgba(72,229,212,.3);background:radial-gradient(100% 130% at 0% 100%,rgba(72,229,212,.1),transparent 60%),#0e1215}
+/* следующий шаг — одна карточка: заголовок, что станет с героем «было → станет», характеристики тихой строкой; внизу — одно действие
+   у правого края (на странице книги — во всю высоту страницы: book-pages.css) */
+.hdv-next{flex:none;display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid rgba(72,229,212,.3);background:radial-gradient(100% 130% at 0% 100%,rgba(72,229,212,.1),transparent 60%),#0e1215}
 .hdv-next[data-k="valor"]{border-color:rgba(221,188,122,.42);background:radial-gradient(100% 130% at 0% 100%,rgba(221,188,122,.12),transparent 60%),#0e1215}
 .hdv-next[data-k="done"]{border-color:var(--iron);background:#0e1114}
-.hdv-ic{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:rgba(72,229,212,.08);color:var(--spirit)}
+.hdv-hd{display:flex;align-items:center;gap:10px;min-width:0}
+.hdv-ic{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:rgba(72,229,212,.08);color:var(--spirit)}
 .hdv-ic>.i{width:20px;height:20px}
 .hdv-ic>.ico{width:30px;height:30px}
 .hdv-next[data-k="valor"] .hdv-ic,.hdv-next[data-k="done"] .hdv-ic{background:rgba(221,188,122,.08)}
 .hdv-ic .rp-s{width:22px}
-.hdv-tx{min-width:0;display:flex;flex-direction:column;gap:6px}
-.hdv-t{font:600 19px/1.1 var(--f-d);color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdv-t{min-width:0;font:600 19px/1.1 var(--f-d);color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hdv-t .num{color:var(--gold)}
-.hdv-sub{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;min-height:22px;font-size:12.5px;line-height:1.25;color:var(--parch-2)}
-.hdv-sub .qty button{padding:0 8px}
-.hdv-sub .chip .ico{margin-right:1px}
-.hdv-act{display:flex;align-items:center;gap:var(--sp-s)}
-.hdv-go.btn{min-height:40px;padding:0 14px}
+/* превью: строка — значок, что, было → станет */
+.hdv-gain{display:flex;flex-direction:column}
+.hdv-g{display:grid;grid-template-columns:16px minmax(0,1fr) auto;gap:8px;align-items:center;min-height:20px;border-bottom:1px dotted #20252a}
+.hdv-g .ic{display:grid;place-items:center}
+.hdv-g .ic>.ico{width:16px;height:16px}
+.hdv-g .ic>.i{width:14px;height:14px;color:var(--parch-3)}
+.hdv-g .k{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:var(--parch-2)}
+.hdv-g .v{display:inline-flex;align-items:baseline;justify-content:flex-end;gap:5px;white-space:nowrap;font:700 13.5px/1 var(--f-u);color:var(--parch)}
+.hdv-g .v s{text-decoration:none;font-weight:400;color:var(--parch-3)}
+.hdv-g .v>i{font-style:normal;color:var(--parch-3)}
+.hdv-g.up .v b{color:#7ef0a8}
+.hdv-g.down .v b{color:#ff8a74}
+.hdv-g .v em{font:700 11.5px/1 var(--f-u);font-style:normal;color:#7ef0a8}
+.hdv-g.bm .k,.hdv-g.bm.up .v b{color:var(--gold)}
+.hdv-g.warn .k{color:var(--amber)}
+.hdv-g.note{grid-template-columns:16px minmax(0,1fr)}
+.hdv-g.note .k{white-space:normal;font-size:12px;color:var(--parch-3)}
+.hdv-act{display:flex;align-items:center;gap:var(--sp-s);padding-top:8px;border-top:1px solid #1a1e22}
+.hdv-act .hdv-go{margin-left:auto}
+.hdv-act .qty{flex:none}
+.hdv-go.btn{min-height:44px;padding:0 16px}
 .hdv-go .cost{gap:5px}
-/* характеристики тихой строкой: значок и число; что даёт и степень роста — лист «Характеристики» */
-.hdv-quiet{flex:none;display:flex;align-items:center;gap:12px;margin-top:auto;padding-top:6px;border-top:1px solid #171b1f;cursor:pointer}
-.hdv-quiet .st5{display:flex;gap:14px;flex:1 1 auto;min-width:0}
-.hdv-quiet .s5{flex-direction:row;align-items:center;gap:5px;padding:0;border-radius:0;background:none}
+/* характеристики тихой строкой: значок и число, изменившаяся — «→ станет»; нажатие — страница «Мощь» */
+.hdv-quiet{flex:none;display:flex;align-items:center;gap:12px;cursor:pointer}
+.hdv-quiet .st5{display:flex;flex-wrap:wrap;gap:4px 14px;flex:1 1 auto;min-width:0}
+.hdv-quiet .s5{display:inline-flex;flex-direction:row;align-items:center;gap:5px;padding:0;border-radius:0;background:none}
 .hdv-quiet .s5 .ico{width:18px;height:18px;opacity:.85}
 .hdv-quiet .s5 b{font:700 14px/1 var(--f-u);color:var(--parch-2)}
-.hdv-quiet .s5.eqd b{color:var(--spirit)}
-.hdv-quiet .s5 .grade{display:none}
+.hdv-quiet .s5 i{font:700 12px/1 var(--f-u);font-style:normal;color:#7ef0a8}
 .hdv-quiet .hdv-more{flex:none;margin-left:auto;width:28px;height:28px}
 .hdv-quiet:hover .s5 b{color:var(--parch)}
 /* руна предела — медальон со знаком предела, свет — редкость руны */
@@ -136,6 +152,10 @@ button.hdv-gate:hover .rp-s{transform:scale(1.1)}
 .hdv-r .v .to{display:inline-grid;color:var(--parch-3)}
 .hdv-r .v .to .i{width:12px;height:12px}
 .hdv-r .v .rp{align-self:center}
+/* «Рунный предел» было → стало — две строки камней: плотнее, чтобы строка не выходила из колонки превью */
+.hdv-r .v .rp.i{gap:2px}
+.hdv-r .v .rp.i .rp-s{width:6px}
+.hdv-r .v:has(.rp){gap:3px}
 .hdv-r .nt{grid-column:2/-1;font-size:11.5px;line-height:1.25;color:var(--parch-3)}
 .hdv-r.up .v b{color:var(--gold)}
 .hdv-pv .gain .v b{color:var(--gold)}
@@ -216,125 +236,183 @@ button.hdv-gate:hover .rp-s{transform:scale(1.1)}
 }
 
 /* ---------- окно «Снаряжение героя» ----------
-   Язык книги героя (слово автора 30.09.2026: всё, что открывается из книги, — тоже в её языке): лист пергамента в кожаном переплёте
-   с латунной кромкой, чернила — тема .gw (screens/book-pages.css: токены цвета, кнопки кожей в латуни, чипы, закладки); места и плитки —
-   тёмные лунки в латуни, свет редкости снизу. Размеры — прежние: их считает check_hero_dev.js */
+   Слово автора 30.09.2026: окна снаряжения и талисманов «выглядят теперь как заглушка». Окно — оружейная героя в языке книги
+   и «Ремесла»: тёмный зал (рисунок — GW_ART, без него — CSS), панели — чёрный дуб в латунной кромке, карточка — лист чернёного
+   пергамента в золотой линейке. Слева — герой в нише, места — гнёзда вокруг: доспех столбцом слева, оружие и украшения справа,
+   талисманы под портретом; в середине — запасы; справа — карточка сравнения, её главная кнопка — внизу справа, под большим пальцем.
+   Вещь в гнезде и в запасах — в единой тонкой рамке предмета (itf, screens/art-icons.css), редкость — светом. Цвет — тема .gw
+   (book-pages.css). Размеры считает check_hero_dev.js */
 .gw-ov .ov-scrim{animation:none}
 .gw-ov.in .ov-scrim{animation:fade .18s ease}
-.gw{position:absolute;inset:8px;display:flex;flex-direction:column;overflow:hidden;border-radius:5px;border:1px solid #6d4e28;
-  background:radial-gradient(120% 90% at 50% 40%,transparent 58%,rgba(92,58,22,.32)),var(--hb-leaf,none) center/cover no-repeat,linear-gradient(180deg,#ead9b1,#d6be8f);
-  box-shadow:0 0 0 4px #3b2516,0 0 0 5px #8a6a38,0 30px 80px rgba(0,0,0,.75)}
+.gw{position:absolute;inset:8px;display:flex;flex-direction:column;overflow:hidden;border-radius:4px;border:1px solid rgba(214,178,112,.55);
+  background:radial-gradient(80% 60% at 50% 112%,rgba(72,229,212,.12),transparent 62%),radial-gradient(70% 70% at 50% 35%,#1a140e,#0a0806 78%),#0a0806;
+  box-shadow:0 0 0 3px #1a120b,0 0 0 4px rgba(138,106,56,.8),0 30px 80px rgba(0,0,0,.8)}
+html.gw-arm .gw{background:linear-gradient(180deg,rgba(7,6,5,.7),rgba(7,6,5,.38) 24%,rgba(7,6,5,.46) 68%,rgba(7,6,5,.86)),radial-gradient(80% 60% at 50% 112%,rgba(72,229,212,.1),transparent 62%),var(--gw-arm) 50% 42%/cover no-repeat,#0a0806}
 .gw-ov.in .gw{animation:gwIn .22s cubic-bezier(.2,.8,.2,1)}
 @keyframes gwIn{from{opacity:0;transform:translateY(10px) scale(.985)}}
-.gw-h{flex:none;display:flex;align-items:center;gap:var(--sp-s);height:48px;padding:0 10px 0 12px;border-bottom:1px solid var(--pg-rule2,var(--iron));background:linear-gradient(180deg,rgba(96,66,34,.1),transparent)}
+/* шапка — кожаная полоса с латунной нитью снизу: герой, его мощь с прибавкой выбранного, крестик */
+.gw-h{flex:none;display:flex;align-items:center;gap:var(--sp-s);height:48px;padding:0 10px 0 12px;border-bottom:1px solid rgba(214,178,112,.42);
+  background:linear-gradient(180deg,rgba(46,32,20,.94),rgba(22,15,10,.94));box-shadow:0 1px 0 rgba(0,0,0,.6),inset 0 1px 0 rgba(255,228,170,.08)}
 .gw-av{position:relative;flex:none;width:34px;height:34px}
 .gw-av .rs-av,.gw-av>img{display:block;width:34px;height:34px}
-.gw-av .rs-av>img,.gw-av .rs-av>.rs-ph,.gw-av>img{width:34px;height:34px;object-fit:cover;object-position:50% 18%;border-radius:8px}
+.gw-av .rs-av>img,.gw-av .rs-av>.rs-ph,.gw-av>img{width:34px;height:34px;object-fit:cover;object-position:50% 18%;border-radius:6px;box-shadow:0 0 0 1px rgba(214,178,112,.55)}
 .gw-id{display:flex;flex-direction:column;gap:3px;min-width:0}
 .gw-id b{max-width:230px;font:600 19px/1 var(--f-d);color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gw-id small{display:inline-flex;align-items:center;gap:4px;font:700 11px/1 var(--f-u);color:var(--parch-3);white-space:nowrap}
-.gw-bm{display:inline-flex;align-items:center;gap:6px;font:600 20px/1 var(--f-d);color:var(--gold);white-space:nowrap}
+.gw-bm{display:inline-flex;align-items:center;gap:6px;font:600 20px/1 var(--f-d);font-variant-numeric:lining-nums tabular-nums;color:var(--gold);white-space:nowrap}
+.gw-bm b{font-weight:600}
 .gw-bm i{font:700 12px/1 var(--f-u);font-style:normal}
 .gw-bm i.up,.gw-d.up,.gw-bmd.up{color:var(--pg-up,#7ef0a8)}
 .gw-bm i.down,.gw-d.down,.gw-bmd.down{color:var(--pg-down,#ff8a74)}
-.gw-best .i{width:14px;height:14px}
 .i.flip{transform:scaleX(-1)}
-.gw-b{flex:1 1 0;min-height:0;display:grid;grid-template-columns:var(--gw-l,300px) minmax(0,1fr);gap:var(--sp-m);padding:var(--sp-m);
-  background:linear-gradient(90deg,transparent calc(var(--gw-l,300px) + var(--sp-m) * 1.5 - 7px),rgba(60,36,14,.16) calc(var(--gw-l,300px) + var(--sp-m) * 1.5),transparent calc(var(--gw-l,300px) + var(--sp-m) * 1.5 + 7px))}
-/* места героя */
-.gw-hero{display:flex;flex-direction:column;gap:6px;min-width:0;min-height:0}
-.gw-grp{display:flex;align-items:center;gap:var(--sp-s);min-height:20px}
-.gw-grp .chip{height:20px;margin-left:auto}
-.gw-eq{display:flex;flex-direction:column;gap:6px}
-.gw-row{display:flex;align-items:center;gap:6px}
+/* тело: герой | запасы | карточка */
+.gw-b{flex:1 1 0;min-height:0;display:grid;grid-template-columns:var(--gw-l,236px) minmax(0,1fr) var(--gw-c,250px);gap:10px;padding:10px}
+/* панели — чёрный дуб в латунной кромке */
+.gw-hero,.gw-stock{min-width:0;min-height:0;border-radius:4px;border:1px solid rgba(201,162,106,.3);
+  background:linear-gradient(180deg,rgba(26,19,13,.9),rgba(12,9,7,.93));box-shadow:inset 0 1px 0 rgba(255,228,170,.07),inset 0 0 0 1px rgba(0,0,0,.55),0 18px 30px -18px #000}
+/* герой в нише, вокруг — места-гнёзда */
+.gw-hero{display:flex;flex-direction:column;gap:8px;padding:8px}
+.gw-grp{flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;min-height:20px}
+.gw-grp .eyebrow{margin-right:auto}
+.gw-gc{height:20px;gap:3px;padding:0 6px;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase}
+.gw-gc .ico{width:12px;height:12px;margin-left:2px}
+.gw-gc.tal{margin:-2px 0 -4px}
+.gw-gc.tal .ico{margin-left:0}
+.gw-doll{flex:none;display:grid;grid-template-columns:var(--gs,48px) minmax(0,1fr) var(--gs,48px);gap:0 8px;align-items:start}
+.gw-doll.shut{grid-template-columns:minmax(0,1fr)}
+.gw-col{display:flex;flex-direction:column;gap:6px}
 .gw-gap{flex:0 0 10px}
-.gw-slot{--gs:48px;position:relative;flex:none;display:grid;place-items:center;width:var(--gs);height:var(--gs);padding:0;border-radius:6px;border:1px dashed rgba(135,100,56,.8);
-  background:radial-gradient(circle at 50% 42%,rgba(64,46,28,.62),rgba(30,20,12,.8));color:#d8c49a;box-shadow:0 1px 2px rgba(40,24,10,.35);touch-action:none;transition:none}
-.gw-slot .gw-pic{display:grid;place-items:center;width:80%;height:80%}
+.gw-mid{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
+/* ниша: портрет под аркой в латунной кромке, снизу — свет карста */
+.gw-por{position:relative;display:block;width:100%;height:var(--gw-ph,146px);overflow:hidden;border-radius:52px 52px 6px 6px;background:#07090b}
+.gw-por>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 14%}
+.gw-por::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(6,5,4,.25),transparent 28%,transparent 60%,rgba(6,5,4,.85)),radial-gradient(90% 38% at 50% 106%,rgba(72,229,212,.3),transparent 70%);
+  box-shadow:inset 0 0 0 1px rgba(214,178,112,.6),inset 0 0 0 3px rgba(10,7,5,.85),inset 0 0 0 4px rgba(214,178,112,.22),inset 0 12px 18px -8px rgba(0,0,0,.85)}
+.gw-tals{display:grid;grid-template-columns:repeat(2,var(--gt,42px));gap:16px 14px;justify-content:center;padding-top:4px}
+/* место — гнездо: тёмная лунка в латунной кромке; надетая вещь — в единой тонкой рамке предмета, редкость — светом */
+.gw-slot{--gs:48px;position:relative;flex:none;display:grid;place-items:center;width:var(--gs);height:var(--gs);padding:0;border:0;border-radius:6px;
+  background:radial-gradient(circle at 50% 40%,#1b1510,#060504 80%);color:#d8c49a;
+  box-shadow:inset 0 0 0 1px rgba(170,128,70,.75),inset 0 0 0 2px #0d0906,inset 0 4px 10px rgba(0,0,0,.9),0 1px 0 rgba(255,236,190,.08),0 2px 5px rgba(0,0,0,.6);touch-action:none;transition:none}
+.gw-slot .gw-pic{position:relative;display:grid;place-items:center;width:calc(100% - 8px);height:calc(100% - 8px)}
 .gw-slot .gw-pic>.ico,.gw-slot .gw-pic>.i{width:100%;height:100%}
 .gw-slot .gw-pic>.i{width:62%;height:62%;opacity:.55}
-.gw-slot:not(.on) .gw-pic{opacity:.24;filter:grayscale(1)}
-.gw-slot.on{border-style:solid;border-color:color-mix(in srgb,var(--rc) 50%,#876438);background:radial-gradient(90% 75% at 50% 100%,color-mix(in srgb,var(--rc) 30%,transparent),transparent 72%),radial-gradient(circle at 50% 38%,#2c2016,#150e08);
-  box-shadow:inset 0 0 0 1px #22160b,inset 0 -2px 0 color-mix(in srgb,var(--rc) 80%,transparent),0 1px 2px rgba(40,24,10,.45);color:#f3e6c4}
-.gw-slot[data-r="5"].on,.gw-slot[data-r="6"].on,.gw-slot[data-r="7"].on{box-shadow:inset 0 -2px 0 var(--rc),0 0 12px -4px var(--rc)}
-.gw-slot small{position:absolute;left:0;right:0;bottom:2px;text-align:center;font:700 10px/1 var(--f-u);color:#f3e6c4;text-shadow:0 1px 2px #000,0 0 4px #000}
+.gw-slot:not(.on) .gw-pic{opacity:.28;filter:grayscale(1) brightness(1.25)}
+.gw-slot.on .gw-pic{width:100%;height:100%}
+.gw-slot small{position:absolute;left:0;right:0;bottom:4px;z-index:2;text-align:center;font:700 10px/1 var(--f-u);color:#f3e6c4;text-shadow:0 1px 2px #000,0 0 4px #000}
+.gw-slot:hover{box-shadow:inset 0 0 0 1px rgba(226,191,120,.95),inset 0 0 0 2px #0d0906,inset 0 4px 10px rgba(0,0,0,.9),0 2px 5px rgba(0,0,0,.6)}
+/* талисман — огранённый медальон в оправе: без рисунка — круглая лунка, с рисунком — бронзовая оправа с петлёй (PG_ART, pg-ft) */
+.gw-slot.tal{--gs:var(--gt,42px);border-radius:50%}
 .gw-slot.tal .tl-t{--ts:30px}
-.gw-slot.tal>.i{width:18px;height:18px}
-.gw-slot:hover{border-color:#b58d47}
-.gw-slot.sel{box-shadow:0 0 0 1px var(--spirit),0 0 14px -4px var(--spirit)}
-.gw-slot.ok{border-style:solid;border-color:var(--spirit);box-shadow:0 0 0 1px rgba(72,229,212,.55),0 0 16px -4px var(--spirit)}
-.gw-slot.ok::after{content:"";position:absolute;inset:-5px;border-radius:13px;border:1px solid rgba(72,229,212,.55);pointer-events:none;animation:gwCall 1.2s ease-in-out infinite}
-.gw-slot.tgt{box-shadow:0 0 0 2px var(--spirit),0 0 22px -2px var(--spirit)}
+.gw-slot.tal>.i{width:16px;height:16px;color:var(--pg-ink3,#ab9c80)}
+.gw-slot.tal small{bottom:-3px}
+html.pg-ft .gw .gw-slot.tal{background:radial-gradient(circle at 50% 38%,#1c1611,#070504 62%,transparent 64%);box-shadow:none}
+html.pg-ft .gw .gw-slot.tal::before{content:"";position:absolute;inset:var(--pg-fi-tal);z-index:1;pointer-events:none;background:var(--pg-f-tal) center/100% 100% no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.7))}
+/* у медальона в оправе кольцо тени не видно — выбор, зов и запрет светятся по самой оправе */
+html.pg-ft .gw .gw-slot.tal:is(.sel,.ok,.tgt,.drop-ok)::before{filter:drop-shadow(0 0 1px var(--pg-teal,#5fdccb)) drop-shadow(0 0 6px var(--pg-teal,#5fdccb)) drop-shadow(0 1px 1px rgba(0,0,0,.7))}
+html.pg-ft .gw .gw-slot.tal:is(.no,.drop-no)::before{filter:drop-shadow(0 0 1px rgba(255,142,120,.95)) drop-shadow(0 1px 1px rgba(0,0,0,.7))}
+/* выбор и подсказки мест: выбранное — бирюзовым кольцом, подходит — зовёт, не подходит — гаснет */
+.gw-slot.sel{box-shadow:0 0 0 2px var(--pg-teal,#48e5d4),0 0 14px -2px var(--pg-teal,#48e5d4)}
+.gw-slot.ok{box-shadow:0 0 0 2px var(--pg-teal,#48e5d4),0 0 16px -3px var(--pg-teal,#48e5d4)}
+.gw-slot.ok::after{content:"";position:absolute;inset:-5px;border-radius:10px;border:1px solid rgba(95,220,203,.6);pointer-events:none;animation:gwCall 1.2s ease-in-out infinite}
+.gw-slot.tal.ok::after{border-radius:50%}
+.gw-slot.tgt{box-shadow:0 0 0 2px var(--pg-teal,#48e5d4),0 0 22px -2px var(--pg-teal,#48e5d4)}
 @keyframes gwCall{0%,100%{opacity:.2;transform:scale(.96)}50%{opacity:1;transform:scale(1.04)}}
 .gw-slot.dim{opacity:.4}
-.gw-slot.no{opacity:.55;border-color:rgba(220,106,82,.55)}
+.gw-slot.no{opacity:.55;box-shadow:0 0 0 1px rgba(255,142,120,.7)}
 .gw-slot.got{animation:gwGot .6s cubic-bezier(.2,1.5,.4,1)}
 @keyframes gwGot{0%{transform:scale(.8)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
-.gw-slot.drop-ok{border-style:solid;border-color:var(--spirit);box-shadow:0 0 0 1px rgba(72,229,212,.7),0 0 18px -4px var(--spirit)}
-.gw-slot.drop-no{opacity:.45;border-color:rgba(220,106,82,.6)}
+.gw-slot.drop-ok{box-shadow:0 0 0 2px var(--pg-teal,#48e5d4),0 0 18px -4px var(--pg-teal,#48e5d4)}
+.gw-slot.drop-no{opacity:.45;box-shadow:0 0 0 1px rgba(255,142,120,.7)}
 .gw-slot.drop-over{transform:scale(1.1)}
 .gw-slot.drop-no.drop-over{transform:scale(.96)}
-.gw-busy{margin:0}
-/* карточка выбранного: сравнение с надетым и одно действие */
-.gw-card{flex:1 1 0;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:5px;margin-top:2px;padding:8px 10px;border-radius:3px;border:1px solid var(--pg-rule2,var(--iron));
-  background:radial-gradient(90% 70% at 50% 115%,color-mix(in srgb,var(--rc,#8a6a38) 14%,transparent),transparent 70%),rgba(255,250,236,.4);box-shadow:inset 0 0 0 3px rgba(255,250,236,.22),inset 0 0 0 4px var(--pg-rule,transparent);scrollbar-width:thin;scrollbar-color:rgba(96,66,34,.42) transparent}
-.gw-card.empty{justify-content:center;gap:var(--sp-s);border-style:dashed}
-.gw-card .eq-sum{gap:4px 10px}
-.gw-ch{display:flex;align-items:center;gap:8px;min-width:0}
-.gw-ch>.eq-t{--es:34px}
-.gw-ch>.tl-t{--ts:30px}
-.gw-ch .tx{flex:1 1 auto;min-width:0;display:flex;align-items:center;flex-wrap:wrap;gap:1px 6px}
-.gw-ch .tx b{font:600 16px/1.05 var(--f-d);color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.gw-ch .tx small{flex:1 0 100%;font-size:11.5px;line-height:1.2;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gw-ch .zp-cr .ico{width:14px;height:14px}
-.gw-bmd{flex:none;height:20px;padding:0 6px}
-.gw-lns{display:flex;flex-direction:column}
-.gw-ln{display:grid;grid-template-columns:minmax(0,1fr) auto 36px;gap:6px;align-items:center;min-height:19px;font-size:12px}
-.gw-ln .k{display:flex;align-items:center;gap:5px;min-width:0;color:var(--parch-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gw-ln .k .i,.gw-ln .k .ico{width:14px;height:14px;color:var(--parch-3)}
-.gw-ln b{font:700 13px/1 var(--f-u);color:var(--parch);text-align:right}
-.gw-ln.main b{color:var(--gold)}
-.gw-ln.lost .k,.gw-ln.lost b{color:var(--parch-3)}
-.gw-ln:not(:has(.gw-d)){grid-template-columns:minmax(0,1fr) auto}
-.gw-d{font:700 11px/1 var(--f-u);text-align:right;color:var(--parch-3);font-variant-numeric:tabular-nums}
-.gw-more{align-self:flex-start;font-size:11px}
-.gw-fx{margin:0;font-size:12.5px;line-height:1.3;color:var(--parch)}
-.gw-bind{display:flex;align-items:center;gap:5px;margin:0;font-size:11.5px;line-height:1.25;color:var(--parch-3)}
-.gw-bind.warn{color:var(--rust)}
-.gw-cf{display:flex;align-items:center;gap:6px;margin-top:auto;padding-top:2px}
-.gw-cf .reason{font-size:11.5px}
-/* запасы */
-.gw-stock{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0;min-height:0;border-radius:12px;padding:2px}
+.gw-busy,.gw-shut{margin:0;font-size:11.5px}
+.gw-hero.drop-over{background:linear-gradient(180deg,rgba(26,19,13,.9),rgba(12,9,7,.93)),rgba(72,229,212,.05);box-shadow:inset 0 0 0 1px rgba(72,229,212,.35)}
+/* запасы в середине: вкладки и фильтр места, плитки — вещь в рамке, под ней — главное значение */
+.gw-stock{display:flex;flex-direction:column;gap:var(--sp-s);padding:8px}
 .gw-top{flex:none;display:flex;align-items:center;gap:var(--sp-s);flex-wrap:wrap}
 .gw-filt{cursor:pointer;height:26px;gap:4px}
 .gw-filt .eq-g,.gw-filt .i,.gw-filt .ico{width:16px;height:16px}
-.gw-hero.drop-over{background:rgba(72,229,212,.04);border-radius:12px}
-.gw-grid{flex:1 1 0;min-height:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));grid-auto-rows:max-content;gap:6px;align-content:start;touch-action:pan-y}
+.gw-grid{flex:1 1 0;min-height:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));grid-auto-rows:max-content;gap:6px;align-content:start;overflow-x:hidden;overflow-y:auto;touch-action:pan-y;scrollbar-width:thin}
 .gw-grid>.reason{grid-column:1/-1}
-.gw-it{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;padding:6px 2px 4px;border-radius:6px;border:1px solid transparent;background:rgba(255,250,236,.18);color:var(--parch);font:inherit;touch-action:pan-y}
-.gw-it:hover{background:rgba(255,250,236,.4);border-color:var(--pg-rule,transparent)}
+.gw-it{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;padding:5px 2px 4px;border-radius:5px;border:1px solid transparent;background:rgba(0,0,0,.32);color:var(--parch);font:inherit;touch-action:pan-y}
+.gw-it:hover{background:rgba(255,236,190,.05);border-color:var(--pg-rule,transparent)}
 .gw-it>.eq-t{--es:44px}
 .gw-it>.tl-t{--ts:38px}
 .gw-it>small{font:700 11px/1 var(--f-u);color:var(--parch-2);white-space:nowrap}
-.gw-it.cur{border-color:var(--spirit);background:rgba(72,229,212,.06);box-shadow:0 0 14px -6px var(--spirit)}
+.gw-it.cur{border-color:var(--pg-teal,#48e5d4);background:rgba(95,220,203,.08);box-shadow:0 0 14px -6px var(--pg-teal,#48e5d4)}
 .gw-it.off{opacity:.42}
 .gw-it.off>.tl-t,.gw-it.off>.eq-t{filter:grayscale(.8)}
 .gw-it.drag{opacity:.3}
-.gw-up{position:absolute;right:4px;top:4px;display:grid;place-items:center;width:15px;height:15px;border-radius:50%;background:var(--pg-up,rgba(126,240,168,.14));color:#effbe6;box-shadow:0 0 0 1.5px #f2e4c2}
+/* вещь в единой рамке предмета (itf): скругление рамки; иконку в окно кладёт art-icons.css */
+.gw .eq-t.itf{border-radius:var(--itf-r,5px);color:#efe2c0}
+.gw-up{position:absolute;right:3px;top:3px;z-index:3;display:grid;place-items:center;width:15px;height:15px;border-radius:50%;background:#2e7a2a;color:#effbe6;box-shadow:0 0 0 1.5px #0a0806,0 0 6px rgba(143,220,143,.45)}
 .gw-up .i{width:11px;height:11px;stroke-width:2.2}
-.gw-own{position:absolute;left:4px;bottom:17px}
+.gw-own{position:absolute;left:4px;bottom:17px;z-index:3}
 .gw-own .rs-av,.gw-own .rs-av>img,.gw-own .rs-av>.rs-ph{width:16px;height:16px;border-radius:5px}
 .gw-own .rs-av::after{display:none}
 .gw-own .rs-ph b{font-size:7px}
-.gw-cls{position:absolute;left:3px;top:3px;display:grid;place-items:center;width:17px;height:17px;border-radius:50%;background:#0a0d10;box-shadow:0 0 0 1px var(--gold-3)}
+.gw-cls{position:absolute;left:3px;top:3px;z-index:3;display:grid;place-items:center;width:17px;height:17px;border-radius:50%;background:#0a0d10;box-shadow:0 0 0 1px var(--gold-3)}
 .gw-cls .ico,.gw-cls .i{width:12px;height:12px}
-.gw-cls.no{box-shadow:0 0 0 1px rgba(220,106,82,.8)}
-.gw-q{position:absolute;right:4px;top:4px;font:700 10px/1 var(--f-u);color:var(--parch-2)}
+.gw-cls.no{box-shadow:0 0 0 1px rgba(255,142,120,.85)}
+.gw-q{position:absolute;right:4px;top:4px;z-index:3;font:700 10px/1 var(--f-u);color:var(--parch-2)}
 .gw-hint{flex:none;margin:0;font-size:11.5px;line-height:1.2;color:var(--parch-3)}
 .gw-stock.drop-ok{box-shadow:inset 0 0 0 1px rgba(72,229,212,.4)}
-.gw-stock.drop-over{background:rgba(72,229,212,.05)}
+.gw-stock.drop-over{background:linear-gradient(180deg,rgba(26,19,13,.9),rgba(12,9,7,.93)),rgba(72,229,212,.05)}
+/* карточка справа — лист чернёного пергамента в золотой линейке: вещь, «вместо надетой», мощь героя «было → станет», сравнение по
+   строкам «надето → эта» со стрелками; внизу справа — одно главное действие */
+.gw-card{min-width:0;min-height:0;display:flex;flex-direction:column;gap:6px;padding:10px 12px;overflow-x:hidden;overflow-y:auto;border-radius:3px;border:1px solid rgba(214,178,112,.55);
+  background:radial-gradient(110% 60% at 50% 112%,color-mix(in srgb,var(--rc,#8a6a38) 14%,transparent),transparent 62%),linear-gradient(180deg,rgba(255,236,190,.03),rgba(0,0,0,.24)),var(--pg-page,#17120d);
+  box-shadow:inset 0 0 0 3px rgba(0,0,0,.45),inset 0 0 0 4px rgba(214,178,112,.22),0 18px 30px -18px #000;scrollbar-width:thin}
+html.pg-vel .gw-card{background:radial-gradient(110% 60% at 50% 112%,color-mix(in srgb,var(--rc,#8a6a38) 14%,transparent),transparent 62%),linear-gradient(180deg,rgba(255,236,190,.025),rgba(0,0,0,.22)),var(--pg-vel) 0 0/388px auto,var(--pg-page,#17120d)}
+.gw-ch{flex:none;display:flex;align-items:center;gap:10px;min-width:0}
+.gw-ch>.eq-t{--es:52px}
+.gw-ch>.tl-t{--ts:44px}
+.gw-ch .tx{flex:1 1 auto;min-width:0;display:flex;align-items:center;flex-wrap:wrap;gap:2px 6px}
+.gw-ch .tx b{max-width:100%;font:600 18px/1.05 var(--f-d);color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gw-ch .tx small{flex:1 0 100%;font-size:11.5px;line-height:1.2;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gw-ch .zp-cr .ico{width:14px;height:14px}
+.gw-vs{flex:none;display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;margin:0;font-size:12px;line-height:1.2;color:var(--parch-3)}
+.gw-vs .eq-t{--es:24px}
+.gw-vs .eq-t~span{color:var(--parch-2)}
+.gw-pw{flex:none;display:grid;grid-template-columns:16px minmax(0,1fr) auto;gap:4px 6px;align-items:center;padding:6px 0;border-top:1px solid var(--pg-rule,#262b31);border-bottom:1px solid var(--pg-rule,#262b31)}
+.gw-pw .v{grid-column:2/-1}
+.gw-pw>.ico{width:16px;height:16px}
+.gw-pw .k{font-size:12.5px;color:var(--gold)}
+.gw-pw .v{display:inline-flex;align-items:baseline;gap:5px;min-width:0;font:700 14px/1 var(--f-u);white-space:nowrap}
+.gw-pw .v s{text-decoration:none;font-weight:400;color:var(--parch-3)}
+.gw-pw .v>i{font-style:normal;font-weight:400;color:var(--parch-3)}
+.gw-pw .v b{color:var(--parch)}
+.gw-bmd{flex:none;height:20px;padding:0 6px}
+.gw-lns{flex:none;display:flex;flex-direction:column}
+.gw-lh,.gw-lns.vs .gw-ln{display:grid;grid-template-columns:minmax(0,1fr) 42px 42px 32px;gap:4px;align-items:center}
+.gw-lh{padding-bottom:2px;font:700 9px/1.2 var(--f-u);letter-spacing:.08em;text-transform:uppercase;color:var(--parch-3)}
+.gw-lh span:nth-child(n+2){text-align:right}
+.gw-ln{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center;min-height:21px;padding:2px 0;font-size:12px;border-bottom:1px dotted var(--pg-rule,#262b31)}
+.gw-ln .k{display:flex;align-items:center;gap:5px;min-width:0;line-height:1.15;color:var(--parch-2)}
+.gw-ln .k .i,.gw-ln .k .ico{flex:none;width:14px;height:14px;color:var(--parch-3)}
+.gw-ln s{text-decoration:none;text-align:right;font:700 12px/1 var(--f-u);color:var(--parch-3)}
+.gw-ln b{font:700 13px/1 var(--f-u);color:var(--parch);text-align:right}
+.gw-ln.main b{color:var(--gold)}
+.gw-ln.lost .k,.gw-ln.lost b{color:var(--parch-3)}
+.gw-d{font:700 11px/1 var(--f-u);text-align:right;color:var(--parch-3);font-variant-numeric:tabular-nums}
+.gw-more{align-self:flex-start;font-size:11px}
+.gw-fx{margin:0;font-size:13px;line-height:1.3;color:var(--parch)}
+.gw-bind{display:flex;align-items:center;gap:5px;margin:0;font-size:11.5px;line-height:1.25;color:var(--parch-3)}
+.gw-bind.warn{color:var(--rust)}
+.gw-nobm{margin:0}
+.gw-lead{margin:0;font:600 16px/1.2 var(--f-d);color:var(--parch)}
+.gw-card .eq-sum{gap:4px 10px}
+.gw-cf{display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:8px}
+.gw-cf .reason{flex:1 1 auto;min-width:0;font-size:11.5px}
+.gw-cf .gw-go.btn{flex:none;margin-left:auto;min-height:44px;padding:0 16px;font-size:14px}
+.gw-cf .gw-go .cost{padding-left:8px;font-size:13px}
+/* «Надеть лучшее» с прибавкой мощи — плотнее: на 844 × 390 карточка уже */
+.gw-cf .gw-best.btn{max-width:100%;padding:0 10px;font-size:13px;letter-spacing:.05em}
+.g.sm .gw-cf .gw-best.btn{font-size:12.5px;letter-spacing:.03em}
+.g.sm .gw-cf .gw-best .cost{padding-left:6px;font-size:12.5px}
 /* призрак перетаскивания: в #game, координаты — с поправкой на масштаб устройства */
-.gw-ghost{position:absolute;left:0;top:0;z-index:60;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 6px 4px;border-radius:10px;border:1px solid var(--spirit);background:rgba(14,18,21,.9);box-shadow:0 14px 30px -8px rgba(0,0,0,.85),0 0 20px -6px var(--spirit);color:var(--parch);will-change:transform}
+.gw-ghost{position:absolute;left:0;top:0;z-index:60;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 6px 4px;border-radius:8px;border:1px solid var(--spirit);background:rgba(14,11,8,.92);box-shadow:0 14px 30px -8px rgba(0,0,0,.85),0 0 20px -6px var(--spirit);color:var(--parch);will-change:transform}
 .gw-ghost>.eq-t{--es:44px}
 .gw-ghost>.tl-t{--ts:38px}
 .gw-ghost>small{font:700 11px/1 var(--f-u)}
@@ -349,11 +427,19 @@ button.hdv-gate:hover .rp-s{transform:scale(1.1)}
   .hdv-t{font-size:17px}
   .hdv-sub{gap:4px 8px}
 }
+/* окно снаряжения на 844 × 390: колонки уже, гнёзда 44 px, ниша ниже */
 .g.sm .gw-h{height:44px}
-.g.sm .gw-b{--gw-l:280px;padding:10px;gap:10px}
-.g.sm .gw-hero{gap:4px}
+.g.sm .gw-b{--gw-l:208px;--gw-c:226px;padding:8px;gap:8px}
+.g.sm .gw-hero{gap:6px;padding:6px}
 .g.sm .gw-slot{--gs:44px}
-.g.sm .gw-eq{gap:4px}
+.g.sm .gw-col{gap:5px}
+.g.sm .gw-doll{column-gap:6px}
+.g.sm .gw-mid{gap:8px}
+.g.sm .gw-tals{--gt:38px;gap:14px 12px}
+.g.sm .gw-slot.tal{--gs:var(--gt,38px)}
+.g.sm .gw-grp .eyebrow{display:none}
+.g.sm .gw-por{--gw-ph:132px}
+.g.sm .gw-card{padding:8px 10px}
 
 /* ---------- раздел UI-кита ---------- */
 .hdk-g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:var(--sp-m)}
@@ -367,6 +453,8 @@ button.hdv-gate:hover .rp-s{transform:scale(1.1)}
 .hdk-g{position:absolute;left:0;top:0;width:932px;height:430px;transform:scale(.36);transform-origin:0 0;pointer-events:none}
 .hdk-fr .hdfx,.hdk-fr .hdfx *,.hdk-fr .hdfx *::before,.hdk-fr .hdfx *::after{animation-play-state:paused!important}
 .hdk-gw{display:flex;flex-direction:column;gap:var(--sp-s)}
+.hdk-gw.pg{padding:10px 12px;border-radius:4px;background:linear-gradient(180deg,#1a130d,#0c0907);box-shadow:inset 0 0 0 1px rgba(214,178,112,.35)}
+.hdk-doll{display:flex;flex-wrap:wrap;gap:8px}
 .hdk-tiles{grid-template-columns:repeat(6,64px);flex:none}
 /* раздел «Рунные пределы»: камень в четырёх состояниях и размерах — плитка, шапка, путь, лист; плитки шириной как в коллекции */
 .rpk-sts{display:flex;flex-wrap:wrap;gap:var(--sp-l) 28px}

@@ -261,45 +261,85 @@ function hdPath(h, d) {
   const say = `Путь героя: уровень ${h.lvl} из ${h.cap}, рунный предел ${h.lim} из ${d.top}, доблесть ${h.valor} из ${h.maxV}`;
   return `<div class="hdv-path" role="group" aria-label="${say}"><div class="hdv-track">${cells.join('')}</div>${star}</div>`;
 }
-/* карточка следующего шага: значок, что будет, под ним — подробность одной строкой; справа — одно действие с ценой */
-const hdCard = (k, ico, t, sub, act) => `<div class="hdv-next" data-k="${k}"><span class="hdv-ic">${ico}</span><div class="hdv-tx"><b class="hdv-t">${t}</b><div class="hdv-sub">${sub}</div></div><div class="hdv-act">${act}</div></div>`;
+/* ================== что станет с героем: превью шага ==================
+   Слово автора 30.09.2026: «Само меню после прокачки за дух не показывает столько статов и атрибутов станет у героя, получается игрок
+   не понимает что прокачивает за уровень». Числа — ядра, на копии героя в новом состоянии, руками не считаются: мощь — BM.hero,
+   пять характеристик — heroSt с прибавкой снаряжения (eqStatAdd), атрибуты — карта ядра героя (heroUnit, attrList — те же, что на
+   «Мощи» и в бою). Строкой — только то, что меняется: «было → станет»; характеристики — тихой строкой, изменившаяся — со стрелкой.
+   По ядру уровень умножает здоровье, атаку и защиту (battle.js, mkUnit: 1 + уровень / 12, §3.3), доблесть — характеристики (§10.2) */
+/* число атрибута карты ядра по ключу attrList — для «растёт или падает» и прибавки */
+const HD_RAW = { hp: u => u.maxHp, patk: u => u.atk[u.main], matk: u => u.atk[u.main], 'def-phys': u => u.def.str, 'def-mag': u => u.def.int, eva: u => u.eva, crit: u => u.crit, critdmg: u => u.critDmg };
+function hdGain(h, o) {
+  const x = Object.assign({}, h, o), add = typeof eqStatAdd === 'function' ? eqStatAdd : () => [0, 0, 0, 0, 0];
+  const u0 = heroUnit(h), u1 = heroUnit(x), a0 = u0 ? attrList(u0) : [], a1 = u1 ? attrList(u1) : [];
+  const e0 = add(h), e1 = add(x), st0 = heroSt(h).map((v, i) => v + e0[i]), st1 = heroSt(x).map((v, i) => v + e1[i]);
+  const attrs = a1.map(([k, now], i) => ({ k, was: a0[i] ? a0[i][1] : '', now, d: u0 && u1 && HD_RAW[k] ? HD_RAW[k](u1) - HD_RAW[k](u0) : 0 })).filter(r => r.d);
+  return { bm0: BM.hero(h), bm1: BM.hero(x), st0, st1, attrs };
+}
+/* строка превью: значок, что, было → станет; растёт — светлее, падает — красным; прибавка — у мощи */
+const hdG = (ico, k, was, now, d, cls = '', extra = '') => `<div class="hdv-g${cls ? ' ' + cls : ''}${d > 0 ? ' up' : d < 0 ? ' down' : ''}" role="listitem"><span class="ic">${ico}</span><span class="k">${k}</span><span class="v">${was !== '' ? `<s class="num">${was}</s><i aria-hidden="true">→</i>` : ''}<b class="num">${now}</b>${extra}</span></div>`;
+/* строка-пояснение без чисел: значок и текст */
+const hdGNote = (ico, t, cls = '') => `<div class="hdv-g note${cls ? ' ' + cls : ''}" role="listitem"><span class="ic">${ico}</span><span class="k">${t}</span></div>`;
+/* мощь и атрибуты «было → станет»: первой строкой — мощь золотом, с прибавкой */
+function hdGainRows(G) {
+  const d = G.bm1 - G.bm0;
+  return [hdG(ICON('power', 16, 'Боевая мощь'), 'Мощь', fmt(G.bm0), fmt(G.bm1), d, 'bm', d ? `<em class="num">${d > 0 ? '+' : '−'}${fmt(Math.abs(d))}</em>` : '')]
+    .concat(G.attrs.map(r => hdG(ICON(r.k, 16, ATTR_T[r.k]), ATTR_T[r.k], r.was, r.now, r.d)));
+}
+/* пять характеристик тихой строкой: значок и число, изменившаяся — «→ станет»; нажатие — страница «Мощь» той же книги */
+function hdStats(st0, st1) {
+  const cell = (v, i) => { const n = st1[i], say = `${STATS[i]}: ${n !== v ? `${v} → ${n}` : v} · ${STAT_HINT[i]}`;
+    return `<span class="s5${n !== v ? ' ch' : ''}" title="${say}">${ICON(STAT_IC[i], 18, STATS[i])}<b class="num">${v}</b>${n !== v ? `<i class="num">→ ${n}</i>` : ''}</span>`; };
+  return `<div class="hdv-quiet" data-a="seg" data-v="hero:stats" title="Характеристики и атрибуты — страница «Мощь»"><span class="st5">${st0.map(cell).join('')}</span><button class="iconbtn hdv-more" data-a="seg" data-v="hero:stats" aria-label="Мощь: характеристики и атрибуты">${ic('chev')}</button></div>`;
+}
+
+/* карточка следующего шага во всю высоту страницы: заголовок, что станет с героем, характеристики тихой строкой; внизу — одно действие
+   у правого края, под большим пальцем правой руки (слово автора 30.09.2026: «кнопка не удобна для большого пальца правой руки») */
+const hdCard = (k, ico, t, body, act) => `<div class="hdv-next" data-k="${k}"><div class="hdv-hd"><span class="hdv-ic">${ico}</span><b class="hdv-t">${t}</b></div>${body}<div class="hdv-act">${act}</div></div>`;
+const hdList = (rows, say) => `<div class="hdv-gain" role="list" aria-label="${say}">${rows.join('')}</div>`;
 function hdNext(h, d) {
+  const now = hdGain(h, {}), same = hdStats(now.st0, now.st0);
   if (d.step === 'lvl') {
-    const q = hdQty(h), to = h.lvl + q, cost = lvlCost(h.lvl, q), can = cost <= S.wallet.spirit, gain = hdBmAt(h, { lvl: to }) - h.bm;
+    /* внизу — «сколько за раз» (выбор меняет превью и цену) и главная кнопка: подпись, под ней цена — у правого края */
+    const q = hdQty(h), to = h.lvl + q, cost = lvlCost(h.lvl, q), can = cost <= S.wallet.spirit, G = hdGain(h, { lvl: to });
     const qty = `<div class="qty" role="group" aria-label="Сколько уровней за раз">${HD_DATA.qty.map(v => `<button aria-pressed="${S.qty === v}" data-a="qty" data-v="${v}">${v === 'max' ? 'Макс' : '+' + v}</button>`).join('')}</div>`;
-    const sub = `${qty}${gain > 0 ? `<span class="chip spirit" title="Боевая мощь вырастет">${ICON('power', 13, 'Боевая мощь')}+${fmt(gain)}</span>` : ''}${can ? '' : '<button class="link" data-a="sheet" data-v="cur:spirit">Где взять дух</button>'}`;
-    return hdCard('lvl', ic('up'), `Уровень <span class="num">${h.lvl}</span> → <span class="num">${to}</span>`, sub,
-      `<button class="btn go hdv-go" data-v="${hdOp()}:${h.id}:${q}" data-a="lvlup"${can ? '' : ' disabled'}>Поднять${costTag('spirit', cost)}</button>`);
+    /* нехватка духа — строкой превью: сколько есть и где взять; шаг не меняет характеристик (так считает ядро) — так и сказано */
+    const rows = (can ? [] : [hdGNote(ic('info'), `Не хватает духа: есть ${fmt(S.wallet.spirit)} из ${fmt(cost)} · <button class="link" data-a="sheet" data-v="cur:spirit">Где взять дух</button>`, 'warn')]).concat(hdGainRows(G))
+      .concat(G.st1.every((v, i) => v === G.st0[i]) ? [hdGNote(ic('info'), 'Характеристики этот шаг не меняет')] : []);
+    return hdCard('lvl', ic('up'), `Уровень <span class="num">${h.lvl}</span> → <span class="num">${to}</span>`, hdList(rows, `Что станет после подъёма до уровня ${to}`) + hdStats(G.st0, G.st1),
+      `${qty}<button class="btn go hdv-go" data-v="${hdOp()}:${h.id}:${q}" data-a="lvlup"${can ? '' : ' disabled'}>Поднять${costTag('spirit', cost)}</button>`);
   }
   if (d.step === 'limit') {
     const k = h.lim + 1, cap = hdCapOf(k), can = !!d.rune && d.have >= d.need;
-    if (!d.rune) return hdCard('limit', '<i class="rp-s off p"></i>', `Рунный предел ${ROMAN[k]}`, '<span>Руны этого предела пока нет в запасах игры.</span>', `<button class="btn hdv-go" data-v="${h.id}" data-a="limit" disabled>Пробить</button>`);
-    const sub = `<span>${cap > h.cap ? `Потолок уровня <span class="num">${h.cap}</span> → <span class="num">${cap}</span>` : 'За ним — доблесть'}</span>${can ? '' : `<button class="link" data-a="item" data-v="${d.rune.id}">Где взять руны</button>`}`;
+    if (!d.rune) return hdCard('limit', '<i class="rp-s off p"></i>', `Рунный предел ${ROMAN[k]}`, hdList([hdGNote(ic('info'), 'Руны этого предела пока нет в запасах игры.')], 'Что нужно') + same,
+      `<button class="btn hdv-go" data-v="${h.id}" data-a="limit" disabled>Пробить</button>`);
     /* значок шага — камень этого предела: с рунами горит ровно — таким он станет, без рун тлеет; пульсирует сам камень на пути,
-       в шапке и на плитке, здесь светится главная кнопка. Руна — в цене у кнопки */
-    return hdCard('limit', `<i class="rp-s ${can ? 'on' : 'wait'} p"></i>`, `Рунный предел ${ROMAN[k]}`, sub,
-      `<button class="btn${can ? ' go' : ''} hdv-go" data-v="${h.id}" data-a="limit"${can ? '' : ' disabled'}>Пробить${hdCost(d.rune, d.need, d.have)}</button>`);
+       в шапке и на плитке, здесь светится главная кнопка. Руна — в цене у кнопки, строкой — сколько есть */
+    const rows = [cap > h.cap ? hdG(ic('up'), 'Потолок уровня', String(h.cap), String(cap), 1) : hdGNote(ICON('valor', 16, 'Доблесть'), 'За этим пределом — доблесть'),
+      hdG(hdRune(d.rune, 'sm'), `Руны предела ${ROMAN[k]}`, '', `${fmt(d.have)} / ${fmt(d.need)}`, 0, can ? '' : 'warn')];
+    return hdCard('limit', `<i class="rp-s ${can ? 'on' : 'wait'} p"></i>`, `Рунный предел ${ROMAN[k]}`, hdList(rows, `Рунный предел ${ROMAN[k]}: что даст и что нужно`) + same,
+      `${can ? '' : `<button class="link" data-a="item" data-v="${d.rune.id}">Где взять руны</button>`}<button class="btn${can ? ' go' : ''} hdv-go" data-v="${h.id}" data-a="limit"${can ? '' : ' disabled'}>Пробить${hdCost(d.rune, d.need, d.have)}</button>`);
   }
   if (d.step === 'valor') {
-    const nv = h.valor + 1, t = `Доблесть <span class="num">${nv}</span> из <span class="num">${h.maxV}</span>`;
-    if (d.vrHave) return hdCard('valor', ICON('valor', 30, 'Доблесть'), t, `<span>Навсегда +${INV.hero.valorPct} % к характеристикам${hdOpens(h, nv).length ? ' и новая способность' : ''}</span>`,
-      `<button class="btn go hdv-go" data-v="${h.id}" data-a="valor">Взять доблесть</button>`);
-    const sub = `<span>Руна доблести — из осколков: <span class="num">${fmt(d.vsHave)} / ${fmt(d.vsNeed)}</span></span><button class="link" data-v="${h.id}" data-a="valor">Что даст</button>`;
-    return hdCard('valor', ICON('valor', 30, 'Доблесть'), t, sub, d.craft ? `<button class="btn go hdv-go" data-a="valorcraft" data-v="${d.rec.id}">Собрать руну</button>`
-      : `<button class="btn go hdv-go" data-a="item" data-v="${d.vs ? d.vs.id : ''}">Где взять осколки</button>`);
+    /* доблесть: характеристики «было → станет» — ядро (valorSt) на копии героя; способность этой доблести; уровень начнётся заново */
+    const nv = h.valor + 1, t = `Доблесть <span class="num">${nv}</span> из <span class="num">${h.maxV}</span>`, G = hdGain(h, { valor: nv }), op = hdOpens(h, nv);
+    const rows = [hdGNote(ic('up'), `Навсегда +${INV.hero.valorPct} % к характеристикам`)].concat(op.map(x => hdG(hdAbIco(x), HD_SLOT[x.slot] || 'Способность', '', `«${hdEsc(x.n)}»`, 1)))
+      .concat([hdGNote(ic('info'), 'Уровень и рунные пределы начнутся заново', 'warn')]).concat(d.vrHave ? [] : [hdG(ICON('valor', 16, 'Руна доблести'), 'Осколки руны доблести', '', `${fmt(d.vsHave)} / ${fmt(d.vsNeed)}`, 0)]);
+    const act = d.vrHave ? `<button class="btn go hdv-go" data-v="${h.id}" data-a="valor">Взять доблесть</button>`
+      : `<button class="link" data-v="${h.id}" data-a="valor">Что даст</button>${d.craft ? `<button class="btn go hdv-go" data-a="valorcraft" data-v="${d.rec.id}">Собрать руну</button>` : `<button class="btn go hdv-go" data-a="item" data-v="${d.vs ? d.vs.id : ''}">Где взять осколки</button>`}`;
+    return hdCard('valor', ICON('valor', 30, 'Доблесть'), t, hdList(rows, `Доблесть ${nv}: что даст`) + hdStats(G.st0, G.st1), act);
   }
-  return hdCard('done', ICON('valor', 30, 'Доблесть'), 'Путь пройден', `<span>Доблесть ${h.maxV} из ${h.maxV}, уровень ${h.cap}: герой раскрыт полностью</span>`,
+  return hdCard('done', ICON('valor', 30, 'Доблесть'), 'Путь пройден', hdList([hdGNote(ICON('valor', 16, 'Доблесть'), `Доблесть ${h.maxV} из ${h.maxV}, уровень ${h.cap}: герой раскрыт полностью`)], 'Путь пройден') + same,
     `<button class="btn hdv-go" data-a="seg" data-v="hero:skills">Навыки</button>`);
 }
 /* вкладка «Развитие» — страница книги: путь, под ним — где герой сейчас (уровень, предел, доблесть «текущая / максимальная», §33.2),
-   следующий шаг одной карточкой с одним действием; характеристики тихой строкой — нажатие ведёт на страницу «Мощь» той же книги
-   (слово автора 30.09.2026: характеристики — на странице книги, а не в отдельном листе) */
+   следующий шаг одной карточкой во всю высоту страницы: что станет с героем и одно действие внизу справа; характеристики тихой
+   строкой в карточке — нажатие ведёт на страницу «Мощь» той же книги */
 function hdPower(h) {
   const d = heroDev(h);
   const at = (t, k, v, of) => `<span title="${t} ${v} из ${of}">${k} <b class="num">${v}</b><small class="num">/ ${of}</small></span>`;
   return `<div class="hdv" data-step="${d.step}">${hdPath(h, d)}
-    <p class="hdv-sum">${at('Уровень', 'уровень', h.lvl, h.cap)}${at('Рунный предел', 'предел', h.lim, d.top)}${at('Доблесть', 'доблесть', h.valor, h.maxV)}</p>${hdNext(h, d)}
-    <div class="hdv-quiet" data-a="seg" data-v="hero:stats" title="Характеристики и атрибуты — страница «Мощь»">${statStrip(h)}<button class="iconbtn hdv-more" data-a="seg" data-v="hero:stats" aria-label="Мощь: характеристики и атрибуты">${ic('chev')}</button></div></div>`;
+    <p class="hdv-sum">${at('Уровень', 'уровень', h.lvl, h.cap)}${at('Рунный предел', 'предел', h.lim, d.top)}${at('Доблесть', 'доблесть', h.valor, h.maxV)}</p>${hdNext(h, d)}</div>`;
 }
 
 /* ================== лист «Рунный предел» ================== */
@@ -507,6 +547,15 @@ Object.assign(ACT, {
    неподходящие тусклые, причина — в подсказке и в карточке. Выбранная вещь подсвечивает места, куда её можно положить. Операции —
    EQ_SRV и TL_SRV с номером (equipment.js, talismans.js), «Надеть лучшее» — GR_SRV. Состояние окна — S.gear: герой, вкладка, место;
    выбор — S.eq.pick и S.tal.pick, как у прежних листов */
+/* арт окна (tools/art-gen/jobs/hero-gear-window.json, выгрузка ui-art.json → assets/art/gear-window/): зал — оружейная башни, фон окна
+   в языке залов «Ремесла». ready — выгруженные пути: пока пути нет, зал рисует CSS. Адрес — в переменную <html> --gw-arm, класс gw-arm
+   у <html> говорит CSS, что рисунок есть (имя флага не совпадает ни с одним классом элемента — ADR-0035, п. 16) */
+const GW_ART = { ready: ['gear-window/armory.jpg'], hall: 'gear-window/armory.jpg' };   // выгрузка 01.10.2026
+(function gwArtVars() {
+  const R = document.documentElement; if (!R || !R.style || !GW_ART.ready.includes(GW_ART.hall)) return;
+  const abs = p => (typeof artAbs === 'function' ? artAbs(p) : AV(p));
+  try { R.style.setProperty('--gw-arm', `url("${abs(GW_ART.hall)}")`); if (R.classList) R.classList.add('gw-arm'); } catch (_) { }
+})();
 const grEqOn = () => typeof eqOpen === 'function' && eqOpen();
 const grTalOn = () => typeof tlOpen === 'function' && !!TL && tlOpen();
 const grHero = () => H(S.gear.hid) || H(S.selHero) || null;
@@ -514,7 +563,7 @@ const grKey = (k, s) => `${k}:${s}`;
 /* значок вещи — арт слота снаряжения или семейства талисмана (eqIcon, talIcon — screens/art-icons.js); сам значок нейтральный,
    редкость — рамкой и светом --r1…--r7 (ADR-0027). Арта нет — прежняя заглушка: контур слота или медальон со значком эффекта */
 const grEqPic = (slot, px, r = 0) => typeof eqPic === 'function' ? eqPic(slot, px, r) : eqGlyph(slot);
-const grEqT = it => eqTile(it, { lg: true });   // крупный рисунок, размер плитки задают стили окна
+const grEqT = it => eqTile(it, { lg: true, itf: true });   // крупный рисунок в единой рамке предмета (itf); размер плитки задают стили окна
 const grTalT = no => tlTile(no, { lg: true });
 /* множитель мощи слоя талисманов для набора номеров — та же формула, что у надетых (tlMulOf, talismans.js) */
 const grTalGain = (h, nos) => { const m0 = tlMul(h.id), m1 = tlMulOf(nos); return hdFl((m1 - m0) * HD_BP, m0); };
@@ -606,13 +655,19 @@ const GR_SRV = {
 };
 const GR_WHY = { hero: () => 'Такого героя нет.', none: () => 'Лучше надетого в запасах нет.', slot: it => `Место этой вещи — «${eqSlotName(it.slot)}».` };
 
-/* ---------- вид окна ---------- */
+/* ---------- вид окна ----------
+   Слово автора 30.09.2026: «окно талисманов и снаряжения выглядят теперь как заглушка». Окно — оружейная героя в языке книги
+   и «Ремесла»: тёмный материал, латунь и чернёный пергамент. Слева — герой в нише, его места — гнёзда вокруг: доспех — столбцом слева,
+   оружие и украшения — справа, талисманы — под портретом. В середине — запасы, лучшие для героя сверху. Справа — карточка на листе
+   чернёного пергамента: выбранная вещь против надетой — «надето → эта» по строкам со стрелками, мощь героя «было → станет», и одно
+   главное действие внизу справа, под большим пальцем правой руки; когда ничего не выбрано — всё надетое и «Надеть лучшее».
+   Вещь в гнезде и в запасах — живопись в единой тонкой тёмной рамке предмета (itf, screens/art-icons.css): редкость — светом */
 const grFlashOn = key => !!S.gear.flash && S.gear.flash.keys.includes(key) && hdNow() - S.gear.flash.t0 < HD_VIEW.flash;
 function grEqSlot(h, slot, P) {
   const key = grKey('eq', slot), uid = (S.eq.worn[h.id] || {})[slot], it = uid ? eqItem(uid) : null, fit = P ? grFit(h, P, key) : null;
   const st = [it ? 'on' : '', P ? (fit ? 'dim' : 'ok') : '', S.gear.focus === key ? 'sel' : '', grFlashOn(key) ? 'got' : ''].filter(Boolean).join(' ');
   const say = it ? `${eqSlotName(slot)} · ${RAR[it.r].toLowerCase()}: ${eqMainTxt(it, h)}` : `${eqSlotName(slot)}: пусто`;
-  return `<button class="gw-slot eq${st ? ' ' + st : ''}"${it ? ` data-r="${it.r}"` : ''} data-a="gearslot" data-v="${key}" data-gslot="${key}"${it ? ` data-gdrag="slot:${key}"` : ''} title="${hdEsc(say)}" aria-label="${hdEsc(say)}"><span class="gw-pic">${grEqPic(slot, 40, it ? it.r : 0)}</span>${it ? `<small class="num">${eqNum(it.lines[0][0], it.lines[0][1])}</small>` : ''}</button>`;
+  return `<button class="gw-slot eq${st ? ' ' + st : ''}"${it ? ` data-r="${it.r}"` : ''} data-a="gearslot" data-v="${key}" data-gslot="${key}"${it ? ` data-gdrag="slot:${key}"` : ''} title="${hdEsc(say)}" aria-label="${hdEsc(say)}"><span class="gw-pic${it ? ' itf' : ''}"${it ? ` data-r="${it.r}"` : ''}>${grEqPic(slot, 40, it ? it.r : 0)}</span>${it ? `<small class="num">${eqNum(it.lines[0][0], it.lines[0][1])}</small>` : ''}</button>`;
 }
 function grTalSlot(h, i, P) {
   const key = grKey('tal', i), no = tlEq(h.id)[i], fit = P ? grFit(h, P, key) : null;
@@ -621,7 +676,7 @@ function grTalSlot(h, i, P) {
   const tip = P && P.k === 'tal' && fit && fit !== 'slot' ? TL_WHY[fit](P.no) : say;
   return `<button class="gw-slot tal${st ? ' ' + st : ''}"${no ? ` data-r="${tlR(no)}"` : ''} data-a="gearslot" data-v="${key}" data-gslot="${key}"${no ? ` data-gdrag="slot:${key}"` : ''} title="${hdEsc(tip)}" aria-label="${hdEsc(say)}">${no ? `${grTalT(no)}<small class="num">${tlShort(no)}</small>` : ic('plus')}</button>`;
 }
-/* плитка запасов: значок, главное значение; снаряжение лучше надетого — стрелка вверх, на другом герое — его лицо;
+/* плитка запасов: вещь в рамке, главное значение; снаряжение лучше надетого — стрелка вверх, на другом герое — его лицо;
    талисман своего класса до древней — значок класса, чужого — тусклый; сколько штук — в углу */
 function grEqTile(h, it, P, m0) {
   const g = eqGain(h, it, m0), o = eqOwner(it), cur = !!P && P.k === 'eq' && P.it.uid === it.uid;
@@ -636,76 +691,88 @@ function grTalTile(h, x, P) {
   const tip = `${tlName(x.no)} · ${RAR[tlR(x.no)].toLowerCase()}: ${tlFx(x.no)}${why ? ' · ' + TL_WHY[why](x.no) : ''}`;
   return `<button class="gw-it tal${why ? ' off' : ''}${cur ? ' cur' : ''}" data-r="${tlR(x.no)}" data-a="gearpick" data-v="tal:${x.no}" data-gdrag="tal:${x.no}" title="${hdEsc(tip)}" aria-label="${hdEsc(tip)}">${grTalT(x.no)}<small class="num">${tlShort(x.no)}</small>${bound ? `<span class="gw-cls${mine ? '' : ' no'}" title="${hdEsc(`До древней редкости — только ${tlOr(f.cls.map(tlClsName))}`)}">${CLS(tlClsName(f.cls[0]), 12, '')}</span>` : ''}${x.q > 1 ? `<span class="gw-q num">×${x.q}</span>` : ''}</button>`;
 }
-/* строки сравнения: главная и изменившиеся, не больше HD_VIEW.cmpLines; значок, вид, новое значение и разница стрелкой */
+/* сравнение: строка — свойство, надето → эта вещь, разница стрелкой; над строками — подписи столбцов. Строк — не больше
+   HD_VIEW.cmpLines: главная и изменившиеся, все — в листе «Свойства и сравнение» */
 function grLines(it, h, vs) {
   const other = vs ? Object.fromEntries(vs.lines.map(([k, v]) => [k, v])) : {}, rows = [];
-  it.lines.forEach(([k, v], i) => { const d = v - (other[k] || 0); if (i && vs && !d) return; rows.push(`<div class="gw-ln${i ? '' : ' main'}"><span class="k">${eqIco(k, 14, h)}${eqKindName(k, h)}</span><b class="num">${eqNum(k, v)}</b>${vs ? `<span class="gw-d${d > 0 ? ' up' : d < 0 ? ' down' : ''}">${d ? (d > 0 ? '▲' : '▼') + Math.abs(d) : '='}</span>` : ''}</div>`); });
-  if (vs) for (const [k, v] of vs.lines) if (!it.lines.some(x => x[0] === k)) rows.push(`<div class="gw-ln lost"><span class="k">${eqIco(k, 14, h)}${eqKindName(k, h)}</span><b class="num">—</b><span class="gw-d down">▼${v}</span></div>`);
+  it.lines.forEach(([k, v], i) => { const d = v - (other[k] || 0); if (i && vs && !d) return; rows.push(`<div class="gw-ln${i ? '' : ' main'}"><span class="k">${eqIco(k, 14, h)}${eqKindName(k, h)}</span>${vs ? `<s class="num">${other[k] ? eqNum(k, other[k]) : '—'}</s>` : ''}<b class="num">${eqNum(k, v)}</b>${vs ? `<span class="gw-d${d > 0 ? ' up' : d < 0 ? ' down' : ''}">${d ? (d > 0 ? '▲' : '▼') + Math.abs(d) : '='}</span>` : ''}</div>`); });
+  if (vs) for (const [k, v] of vs.lines) if (!it.lines.some(x => x[0] === k)) rows.push(`<div class="gw-ln lost"><span class="k">${eqIco(k, 14, h)}${eqKindName(k, h)}</span><s class="num">${eqNum(k, v)}</s><b class="num">—</b><span class="gw-d down">▼${v}</span></div>`);
   const more = rows.length > HD_VIEW.cmpLines ? rows.length - HD_VIEW.cmpLines : 0;
-  return `<div class="gw-lns">${rows.slice(0, HD_VIEW.cmpLines).join('')}</div>${more ? `<button class="link gw-more" data-a="sheet" data-v="eqitem:${it.uid}">ещё ${more} ${ic('chev')}</button>` : ''}`;
+  const head = vs ? '<div class="gw-lh" aria-hidden="true"><span>свойство</span><span>надето</span><span>эта</span><span></span></div>' : '';
+  return `<div class="gw-lns${vs ? ' vs' : ''}">${head}${rows.slice(0, HD_VIEW.cmpLines).join('')}</div>${more ? `<button class="link gw-more" data-a="sheet" data-v="eqitem:${it.uid}">ещё ${more} ${ic('chev')}</button>` : ''}`;
 }
 /* прибавка мощи чипом со стрелкой: в карточке — процент, в шапке — число */
 const grDelta = bp => `<span class="chip gw-bmd${bp > 0 ? ' up' : bp < 0 ? ' down' : ''}" title="Боевая мощь">${ICON('power', 13, 'Боевая мощь')}${bp > 0 ? '▲' + eqPct(bp) : bp < 0 ? '▼' + eqPct(bp) : '='}</span>`;
-/* карточка слева внизу: выбранная вещь против надетой, надетая в выбранном месте или подсказка и сумма бонусов */
+/* мощь героя «было → станет» строкой карточки — те же числа, что в шапке (grBmWith: база × талисманы × снаряжение) */
+const grPow = (h, bm1, bp) => `<div class="gw-pw" title="Боевая мощь героя">${ICON('power', 16, 'Боевая мощь')}<span class="k">Мощь героя</span>${grDelta(bp)}<span class="v"><s class="num">${fmt(h.bm)}</s><i aria-hidden="true">→</i><b class="num">${fmt(bm1)}</b></span></div>`;
+/* мощь героя с выбранным: снаряжение — заменой в своём слоте, талисман — в своём месте; без выбранного — null */
+function grBm1(h, P) {
+  if (P && P.k === 'eq') return grBmWith(h, { eq: eqMulOf(h, eqWornList(h.id).filter(x => x.slot !== P.it.slot).concat(P.it)) });
+  if (P && P.k === 'tal' && !P.why) { const eq = tlEq(h.id).slice(); eq[P.i] = P.no; return grBmWith(h, { tal: tlMulOf(eq.filter(Boolean)) }); }
+  return null;
+}
+/* карточка справа: выбранная вещь против надетой, надетая в выбранном месте или всё надетое и «Надеть лучшее»; одно главное действие —
+   внизу справа */
 function grCard(h, P) {
   const opE = `eq${S.eq.seq}`, opT = `tl${S.tal.seq}`;
   if (P && P.k === 'eq') {
     const it = P.it, cur = eqItem((S.eq.worn[h.id] || {})[it.slot]), g = eqGain(h, it), from = eqOwner(it);
-    return `<div class="gw-card" data-r="${it.r}"><div class="gw-ch">${grEqT(it)}<span class="tx"><b>${eqSlotName(it.slot)}</b>${eqCr(it.r, 14)}<small>${cur ? `вместо ${RAR[cur.r].toLowerCase()}` : 'место пусто'}</small></span>${grDelta(g)}</div>
-      ${grLines(it, h, cur)}<div class="gw-cf">${from ? `<span class="reason">Снимется с героя ${hdEsc(from.name)}.</span>` : ''}<span class="g-spacer"></span><button class="btn go sm" data-a="eqput" data-v="${opE}:${h.id}:${it.uid}">${cur ? 'Заменить' : 'Надеть'}</button></div></div>`;
+    return `<aside class="gw-card" data-r="${it.r}"><div class="gw-ch">${grEqT(it)}<span class="tx"><b>${eqSlotName(it.slot)}</b>${eqCr(it.r, 14)}<small>${RAR[it.r].toLowerCase()} · цикл ${ROMAN[it.cyc]}</small></span></div>
+      <p class="gw-vs">${cur ? `вместо надетой: ${eqTile(cur, { itf: true })}<span>${RAR[cur.r].toLowerCase()}</span>` : 'место пусто — вещь просто наденется'}</p>
+      ${grPow(h, grBm1(h, P), g)}${grLines(it, h, cur)}<div class="gw-cf">${from ? `<span class="reason">Снимется с героя ${hdEsc(from.name)}.</span>` : ''}<button class="btn go gw-go" data-a="eqput" data-v="${opE}:${h.id}:${it.uid}">${cur ? 'Заменить' : 'Надеть'}</button></div></aside>`;
   }
   if (P && P.k === 'tal') {
     const no = P.no, f = tlFam(no), r = tlR(no), cur = tlEq(h.id)[P.i], g = P.why ? 0 : grTalGainAt(h, no, P.i);
     const bind = !f.cls ? 'Подходит любому герою.' : r >= TL.rules.freeFrom ? 'Древняя черта: подходит любому герою.' : `До древней редкости — только ${tlOr(f.cls.map(tlClsName))}.`;
-    const bm = P.why ? '' : !f.bm ? '<span class="reason">В мощь не входит: действует в своём деле.</span>' : grDelta(g);
-    return `<div class="gw-card" data-r="${r}"><div class="gw-ch">${grTalT(no)}<span class="tx"><b>${tlName(no)}</b>${eqCr(r, 14)}<small>${cur ? `вместо «${tlName(cur)}»` : `место ${P.i + 1}`}</small></span>${f.bm ? bm : ''}</div>
-      <p class="gw-fx">${tlFx(no)}</p><p class="gw-bind${P.why === 'cls' ? ' warn' : ''}">${f.cls && r < TL.rules.freeFrom ? CLS(tlClsName(f.cls[0]), 13, '') : ''}${P.why && P.why !== 'cls' ? TL_WHY[P.why](no) : bind}</p>${tlHide(f) ? '' : TM(`${tlCore(f)} ${f.bm ? 'В БМ входит.' : 'В БМ не входит.'}`, 'p', 'reason')}
-      <div class="gw-cf">${f.bm ? '' : bm}<span class="g-spacer"></span><button class="btn go sm" data-a="talput" data-v="${opT}:${h.id}:${P.i}:${no}"${P.why ? ' disabled' : ''}>${cur ? 'Заменить' : 'Надеть'}</button></div></div>`;
+    const bm = P.why ? '' : !f.bm ? '<p class="reason gw-nobm">В мощь не входит: действует в своём деле.</p>' : grPow(h, grBm1(h, P), g);
+    return `<aside class="gw-card" data-r="${r}"><div class="gw-ch">${grTalT(no)}<span class="tx"><b>${tlName(no)}</b>${eqCr(r, 14)}<small>${cur ? `вместо «${tlName(cur)}»` : `место ${P.i + 1}`}</small></span></div>
+      <p class="gw-fx">${tlFx(no)}</p>${bm}<p class="gw-bind${P.why === 'cls' ? ' warn' : ''}">${f.cls && r < TL.rules.freeFrom ? CLS(tlClsName(f.cls[0]), 13, '') : ''}${P.why && P.why !== 'cls' ? TL_WHY[P.why](no) : bind}</p>${tlHide(f) ? '' : TM(`${tlCore(f)} ${f.bm ? 'В БМ входит.' : 'В БМ не входит.'}`, 'p', 'reason')}
+      <div class="gw-cf"><button class="btn go gw-go" data-a="talput" data-v="${opT}:${h.id}:${P.i}:${no}"${P.why ? ' disabled' : ''}>${cur ? 'Заменить' : 'Надеть'}</button></div></aside>`;
   }
   const fk = S.gear.focus, [k, s] = fk.split(':');
   if (k === 'eq') {
     const it = eqItem((S.eq.worn[h.id] || {})[s]);
-    if (it) return `<div class="gw-card" data-r="${it.r}"><div class="gw-ch">${grEqT(it)}<span class="tx"><b>${eqSlotName(s)}</b>${eqCr(it.r, 14)}<small>надет · цикл ${ROMAN[it.cyc]}</small></span></div>${grLines(it, h, null)}
-      <div class="gw-cf"><button class="link" data-a="sheet" data-v="eqitem:${it.uid}">Свойства ${ic('chev')}</button><span class="g-spacer"></span><button class="btn sm" data-a="eqout" data-v="${opE}:${h.id}:${s}">Снять</button></div></div>`;
-    return `<div class="gw-card empty"><p class="reason">${eqSlotName(s)}: пусто. Подходящие вещи — справа, лучшие сверху.</p></div>`;
+    if (it) return `<aside class="gw-card" data-r="${it.r}"><div class="gw-ch">${grEqT(it)}<span class="tx"><b>${eqSlotName(s)}</b>${eqCr(it.r, 14)}<small>надет · ${RAR[it.r].toLowerCase()} · цикл ${ROMAN[it.cyc]}</small></span></div>${grLines(it, h, null)}
+      <div class="gw-cf"><button class="link" data-a="sheet" data-v="eqitem:${it.uid}">Свойства ${ic('chev')}</button><button class="btn gw-go" data-a="eqout" data-v="${opE}:${h.id}:${s}">Снять</button></div></aside>`;
+    return `<aside class="gw-card empty"><p class="gw-lead">${eqSlotName(s)}: пусто.</p><p class="reason">Подходящие вещи — в запасах, лучшие сверху: нажмите вещь, затем это место, или перетащите её сюда.</p></aside>`;
   }
   if (k === 'tal') {
     const no = tlEq(h.id)[+s];
-    if (no) return `<div class="gw-card" data-r="${tlR(no)}"><div class="gw-ch">${grTalT(no)}<span class="tx"><b>${tlName(no)}</b>${eqCr(tlR(no), 14)}<small>надет · место ${+s + 1}</small></span></div><p class="gw-fx">${tlFx(no)}</p>
-      <div class="gw-cf"><span class="g-spacer"></span><button class="btn sm" data-a="talout" data-v="${opT}:${h.id}:${s}">Снять</button></div></div>`;
-    return `<div class="gw-card empty"><p class="reason">Место талисмана ${+s + 1}: пусто. Своего класса и древние — сверху.</p></div>`;
+    if (no) return `<aside class="gw-card" data-r="${tlR(no)}"><div class="gw-ch">${grTalT(no)}<span class="tx"><b>${tlName(no)}</b>${eqCr(tlR(no), 14)}<small>надет · место ${+s + 1}</small></span></div><p class="gw-fx">${tlFx(no)}</p>
+      <div class="gw-cf"><button class="btn gw-go" data-a="talout" data-v="${opT}:${h.id}:${s}">Снять</button></div></aside>`;
+    return `<aside class="gw-card empty"><p class="gw-lead">Место талисмана ${+s + 1}: пусто.</p><p class="reason">Своего класса и древние — сверху в запасах.</p></aside>`;
   }
-  const worn = grEqOn() ? eqWornList(h.id) : [];
-  return `<div class="gw-card empty"><p class="reason">Перетащите вещь на место героя — или нажмите вещь, затем подсвеченное место.</p>${worn.length && typeof eqSum === 'function' ? eqSum(h) : ''}</div>`;
+  /* ничего не выбрано: всё надетое — суммой бонусов; лучшее в запасах — главным действием с прибавкой мощи на кнопке */
+  const worn = grEqOn() ? eqWornList(h.id) : [], plan = grPlanOf(h);
+  const sum = worn.length && typeof eqSum === 'function' ? `<span class="eyebrow">Всё надетое</span>${eqSum(h)}` : '<p class="gw-lead">Места героя пусты.</p>';
+  return `<aside class="gw-card empty">${sum}<p class="reason">Перетащите вещь на место героя — или нажмите вещь, затем подсвеченное место.</p>
+    <div class="gw-cf">${plan.gain > 0 ? `<button class="btn go gw-go gw-best" data-a="gearbest" data-v="gr${S.gear.seq}:${h.id}" title="Надеть лучшее из свободных запасов">Надеть лучшее<span class="cost num">▲${eqPct(plan.gain)}</span></button>` : '<span class="reason">Лучше надетого в запасах нет.</span>'}</div></aside>`;
 }
-/* шапка окна: переключение героя, лицо и имя, мощь — с прибавкой выбранного, «Надеть лучшее», крестик */
+/* шапка окна: переключение героя, лицо и имя, мощь — с прибавкой выбранного, крестик */
 function grHead(h, P) {
-  let bm1 = null;
-  if (P && P.k === 'eq') { const now = eqWornList(h.id); bm1 = grBmWith(h, { eq: eqMulOf(h, now.filter(x => x.slot !== P.it.slot).concat(P.it)) }); }
-  else if (P && P.k === 'tal' && !P.why) { const eq = tlEq(h.id).slice(); eq[P.i] = P.no; bm1 = grBmWith(h, { tal: tlMulOf(eq.filter(Boolean)) }); }
-  const d = bm1 == null ? 0 : bm1 - h.bm, plan = grPlanOf(h), many = typeof eqHeroes === 'function' && eqHeroes().length > 1;
+  const bm1 = grBm1(h, P), d = bm1 == null ? 0 : bm1 - h.bm, many = typeof eqHeroes === 'function' && eqHeroes().length > 1;
   const face = typeof hrAv === 'function' ? hrAv(h) : `<img src="${h.img}" alt="">`;
   return `<header class="gw-h">${many ? `<button class="iconbtn" data-a="gearhero" data-v="-1" aria-label="Предыдущий герой">${ic('chev', 'flip')}</button>` : ''}
     <span class="gw-av">${face}</span><span class="gw-id"><b>${hdEsc(h.name)}</b><small>${CLS(h.cls, 13, '')}${hdEsc(h.clsN || h.cls)}</small></span>
     ${many ? `<button class="iconbtn" data-a="gearhero" data-v="1" aria-label="Следующий герой">${ic('chev')}</button>` : ''}<span class="g-spacer"></span>
     <span class="gw-bm" title="Боевая мощь">${ICON('power', 18, 'Боевая мощь')}<b class="num">${fmt(h.bm)}</b>${d ? `<i class="num ${d > 0 ? 'up' : 'down'}">${d > 0 ? '▲' : '▼'}${fmt(Math.abs(d))}</i>` : ''}</span>
-    ${plan.gain > 0 ? `<button class="btn sm gw-best" data-a="gearbest" data-v="gr${S.gear.seq}:${h.id}" title="Надеть лучшее из свободных запасов">${ic('spark')}Лучшее</button>` : ''}
     <button class="iconbtn x" data-a="close" aria-label="Закрыть">${ic('x')}</button></header>`;
 }
-/* места героя: подписи групп и мощь от вещей; закрытое — причина одной строкой */
+/* герой в нише и его места-гнёзда: доспех — столбцом слева, оружие и украшения — справа, талисманы — под портретом; над ними —
+   мощь от снаряжения и от талисманов; закрытое — причина одной строкой */
 function grLeft(h, P) {
   const parts = BM.parts(h), me = parts.mul.eq || HD_BP, mt = parts.mul.tal || HD_BP, S9 = grEqOn() ? EQD.rules.slots : [];
   const grp = g => S9.filter(s => EQD.slots[s].grp === g).map(s => grEqSlot(h, s, P)).join('');
-  const eqHtml = grEqOn() ? `<div class="gw-eq"><div class="gw-row">${grp('armor')}</div><div class="gw-row">${grp('weapon')}<i class="gw-gap"></i>${grp('jewel')}</div></div>`
-    : `<p class="reason">${ic('lock')} Снаряжение откроется во втором цикле — вместе с Ареной.</p>`;
-  const talHtml = grTalOn() ? `<div class="gw-row gw-tals">${tlEq(h.id).map((_, i) => grTalSlot(h, i, P)).join('')}</div>`
-    : `<p class="reason">${ic('lock')} Талисманы откроются во втором цикле — вместе с кланами.</p>`;
-  const chip = m => m !== HD_BP ? `<span class="chip${m > HD_BP ? ' spirit' : ''}" title="Боевая мощь от вещей">${ICON('power', 12, 'Боевая мощь')}${eqPct(m - HD_BP)}</span>` : '';
+  /* мощь от группы вещей: снаряжение — над местами, талисманы — над своими местами под портретом */
+  const chip = (t, m, cls = '') => m !== HD_BP ? `<span class="chip gw-gc${m > HD_BP ? ' spirit' : ''}${cls}" title="Боевая мощь от вещей: ${t.toLowerCase()}">${cls ? '' : t}${ICON('power', 12, 'Боевая мощь')}${eqPct(m - HD_BP)}</span>` : '';
+  const tals = grTalOn() ? `${chip('Талисманы', mt, ' tal')}<div class="gw-tals">${tlEq(h.id).map((_, i) => grTalSlot(h, i, P)).join('')}</div>` : `<p class="reason gw-shut">${ic('lock')} Талисманы — во втором цикле.</p>`;
+  const por = `<span class="gw-por" aria-hidden="true"><img src="${h.img}" alt="" loading="lazy" decoding="async"></span>`;
+  const doll = grEqOn() ? `<div class="gw-doll"><div class="gw-col">${grp('armor')}</div><div class="gw-mid">${por}${tals}</div><div class="gw-col">${grp('weapon')}<i class="gw-gap"></i>${grp('jewel')}</div></div>`
+    : `<div class="gw-doll shut"><div class="gw-mid">${por}${tals}</div></div><p class="reason gw-shut">${ic('lock')} Снаряжение откроется во втором цикле — вместе с Ареной.</p>`;
   const busy = busyNote(h.id) ? '<p class="reason gw-busy">Герой в забеге: новый набор — со следующего боя.</p>' : '';
-  return `<section class="gw-hero" data-gdrop="hero"><div class="gw-grp"><span class="eyebrow">Снаряжение</span>${chip(me)}</div>${eqHtml}
-    <div class="gw-grp"><span class="eyebrow">Талисманы</span>${chip(mt)}</div>${talHtml}${busy}${grCard(h, P)}</section>`;
+  return `<section class="gw-hero" data-gdrop="hero"><div class="gw-grp"><span class="eyebrow">Места героя</span>${chip('Снаряжение', me)}</div>${doll}${busy}</section>`;
 }
-/* запасы справа: вкладки, фильтр выбранного места, плитки — лучшие для героя сверху */
+/* запасы в середине: вкладки, фильтр выбранного места, плитки — лучшие для героя сверху */
 function grRight(h, P) {
   const tab = S.gear.tab, fk = S.gear.focus, [fkk, fs] = fk.split(':');
   const eqN = grEqOn() ? Object.values(S.eq.items).filter(it => it.on !== h.id).length : 0, talN = grTalOn() ? TB.list().reduce((a, x) => a + x.q, 0) : 0;
@@ -727,7 +794,7 @@ function grRight(h, P) {
     tiles = list.map(y => grTalTile(h, y.x, P)).join('');
     if (!list.length) empty = 'Запасы талисманов пусты: они приходят в сундуках за кланового босса.';
   }
-  const hint = P ? (P.k === 'tal' && P.why ? 'Этому герою не подходит — причина в карточке слева.' : 'Нажмите подсвеченное место или перетащите вещь туда.') : 'Перетащите вещь на место героя. Снять — перетащить сюда.';
+  const hint = P ? (P.k === 'tal' && P.why ? 'Этому герою не подходит — причина в карточке справа.' : 'Нажмите подсвеченное место или перетащите вещь туда.') : 'Перетащите вещь на место героя. Снять — перетащить сюда.';
   return `<section class="gw-stock" data-gdrop="stock"><div class="gw-top">${tabs}${filt}</div>
     <div class="gw-grid scroll" data-keep="gear:${tab}:${fk}">${tiles || `<p class="reason">${empty}</p>`}</div><p class="gw-hint">${hint}</p></section>`;
 }
@@ -749,12 +816,13 @@ function grInit(o, kind) {
     if (!slot || S.eq.pickFor !== `${S.gear.hid}:${slot}`) S.eq.pick = null;
   } else { S.gear.focus = ''; S.eq.pick = null; S.tal.pick = null; S.gear.tab = s === 'tal' ? 'tal' : 'eq'; }
 }
+/* окно: шапка, под ней — герой, запасы и карточка; фон — оружейная (GW_ART), без рисунка — тёмный зал CSS */
 function grWin(o, kind) {
   grInit(o, kind);
   const h = grHero(); if (!h) return '';
   const P = grPick(h), first = S.gear.enter; S.gear.enter = false;
   return `<div class="ov gw-ov${first ? ' in' : ''}" role="dialog" aria-modal="true" aria-label="Снаряжение героя: ${hdEsc(h.name)}"><button class="ov-scrim" data-a="close" aria-label="Закрыть" tabindex="-1"></button>
-    <div class="gw" data-hid="${h.id}">${grHead(h, P)}<div class="gw-b">${grLeft(h, P)}${grRight(h, P)}</div></div></div>`;
+    <div class="gw" data-hid="${h.id}">${grHead(h, P)}<div class="gw-b">${grLeft(h, P)}${grRight(h, P)}${grCard(h, P)}</div></div></div>`;
 }
 OV.gear = o => grWin(o, 'gear');
 /* низ вкладки «Снаряжение» — одной строкой: лучшее в запасах — одним действием, прибавка мощи — на кнопке, рядом — вход в окно
@@ -943,15 +1011,15 @@ function hdKitHtml() {
   const frames = (kind, list) => `<div class="hdk-frames">${list.map(([t, cap]) => `<figure><div class="hdk-fr"><div class="g hdk-g">${hdKitFrame(kind, t)}</div></div><figcaption>${cap}</figcaption></figure>`).join('')}</div>`;
   const L = HD_VIEW.lim, V = HD_VIEW.val;
   const gh = H(HD_DATA.flow.gear) || base;
-  const slotsDemo = grEqOn() ? `<div class="gw-row">${EQD.rules.slots.slice(0, 5).map(s => grEqSlot(gh, s, null)).join('')}</div>` : '';
+  const slotsDemo = grEqOn() ? `<div class="hdk-doll">${EQD.rules.slots.slice(0, 5).map(s => grEqSlot(gh, s, null)).join('')}</div>` : '';
   const tilesDemo = grTalOn() ? `<div class="gw-grid hdk-tiles">${TB.list().slice(0, 6).map(x => grTalTile(gh, x, null)).join('')}</div>` : '';
   return `<section class="k-box hdk" style="grid-column:1/-1" id="kitHeroDev"><h3>Развитие героя и снаряжение</h3>
-    <p class="k-note">Одна главная вещь — следующий шаг героя: поднять уровень, пробить рунный предел, взять доблесть. Путь — пять отрезков уровня, ворота пределов и звезда доблести в конце. Цена — у кнопки, подробности — в листах. До доблести — честное превью: что получит герой, что начнётся заново, что сохранится.${TM(' §10, §3.3, §33.2; ADR-0016, ADR-0019, ADR-0026. Экран — screens/hero-dev.js: вкладка «Развитие» (hdPower), листы OV.hdlim, OV.hdval, анимации OV.hdfx, окно OV.gear. Доблесть даёт +INV.hero.valorPct % к базовым характеристикам — valorSt в index.html, источник героя для боя и мощи.')}</p>
+    <p class="k-note">Одна главная вещь — следующий шаг героя: поднять уровень, пробить рунный предел, взять доблесть. Путь — пять отрезков уровня, ворота пределов и звезда доблести в конце. В карточке шага — что станет с героем: мощь и атрибуты «было → станет» (числа ядра на копии героя), характеристики тихой строкой; главная кнопка с ценой — внизу справа, под большим пальцем. Подробности — в листах. До доблести — честное превью: что получит герой, что начнётся заново, что сохранится.${TM(' §10, §3.3, §33.2; ADR-0016, ADR-0019, ADR-0026. Экран — screens/hero-dev.js: вкладка «Развитие» (hdPower), листы OV.hdlim, OV.hdval, анимации OV.hdfx, окно OV.gear. Доблесть даёт +INV.hero.valorPct % к базовым характеристикам — valorSt в index.html, источник героя для боя и мощи.')}</p>
     <div class="hdk-g4">${paths}</div>
     <div class="k-air-r"><b>Доблесть · честное превью</b>${pv}<small>Строка — одно изменение: было → стало. Цена и подтверждение — в подвале листа; недоступно — причина и путь к руне.</small></div>
     <div class="k-air-r"><b>Пробитие предела · раскадровка</b>${frames('limit', [[L.fly - 200, 'Руны кольцом'], [L.mark + 180, 'Отметка загорается'], [L.done + 200, 'Новый потолок']])}<small>Руны появляются по одной, вспыхивают и слетаются в отметку предела; вспышка частиц — цвет редкости героя; потолок уровня — новым числом. Нажатие — сразу итог.</small></div>
     <div class="k-air-r"><b>Доблесть · раскадровка</b>${frames('valor', [[V.rise + 420, 'Значок взлетает'], [V.land + 150, 'Встаёт на место'], [V.done + 400, 'Что изменилось']])}<small>Свет редкости героя, значок доблести взлетает и встаёт на своё место, затем карточка — по строке на изменение, стрелкой «было → стало».</small></div>
-    <div class="k-air-r hdk-gear"><b>Окно снаряжения</b><div class="hdk-gw">${slotsDemo}${tilesDemo}</div><small>Слева — места героя: девять снаряжения и четыре талисмана. Справа — запасы: лучшие для героя сверху, чужого класса — тусклые, значок класса — в углу. Перетащить на место — надеть, из места в запасы — снять; нажатием — вещь, затем подсвеченное место. «Лучшее» надевает сильнейшее из свободного.</small></div>
+    <div class="k-air-r hdk-gear"><b>Окно снаряжения — оружейная героя</b><div class="hdk-gw pg">${slotsDemo}${tilesDemo}</div><small>Слева — герой в нише, его места — гнёзда вокруг: доспех слева, оружие и украшения справа, талисманы под портретом. В середине — запасы: лучшие для героя сверху, чужого класса — тусклые, значок класса — в углу. Справа — карточка на чернёном пергаменте: вещь против надетой («надето → эта» по строкам со стрелками), мощь героя «было → станет» и одно главное действие внизу справа; без выбора — всё надетое и «Надеть лучшее». Вещь — в единой тонкой рамке предмета, редкость — светом. Перетащить на место — надеть, из места в запасы — снять; нажатием — вещь, затем подсвеченное место.</small></div>
     ${TM('<p class="k-note">Операции — с номером: уровень, предел, доблесть (HD_SRV), надеть и снять (EQ_SRV, TL_SRV), «лучшее» (GR_SRV). Итог решён до анимации, повтор номера ничего не повторяет. Движение — transform и opacity, частицы — EnFx; prefers-reduced-motion — итог без движения.</p>')}
   </section>`;
 }

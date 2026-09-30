@@ -5,7 +5,7 @@
    --cb, --cl), страницы разворота — --lt…--ll и --rt…--rl, корешок — --gx (HB_ART, book.js; снято tools/art-gen/book_layers.py).
    Книга — контейнер: размеры знаков — доли её ширины (cqw), поэтому одна раскладка — от крупной книги в сетке до мелкой в отряде.
    Без выгруженного арта обложку, разворот, замок и ленту рисует CSS (.hb-cvc, .hb-spc; html без классов hb-lk, hb-rn, hb-sr, hb-ep,
-   hb-lf). Цвет редкости на нейтральной ленте и звезде — наложение multiply по контуру clip-path (маска-картинка у страницы с диска не
+   hb-lf, hb-qa — туман закрытой книги). Цвет редкости на нейтральной ленте и звезде — наложение multiply по контуру clip-path (маска-картинка у страницы с диска не
    грузится). Движение — только transform и opacity; время — от нажатия: задержки --d-* (момент − прошло), перерисовка не рвёт показ;
    при «меньше движения» — без полёта и листов, плавная смена. Свои классы — hb-*; корешок книги — hs-* (книга на полке боком:
    нижняя полка отрядов, отсеки шкафа, грань книги в полёте — «Библиотека Этриона», screens/library.css); хвосты прежней карточки:
@@ -100,6 +100,14 @@ html:not(.hb-lk) .hb-l::after{top:69%}
 .hb-bk>.hb-ft .du-cp img{width:10cqw;height:10cqw}
 /* занятость — поверх портрета */
 .hb-busy{position:absolute;left:0;right:0;top:44%;z-index:5;padding:1.2cqw 1cqw;text-align:center;font:700 clamp(8px,7.4cqw,10px)/1 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--amber);background:rgba(10,8,4,.84)}
+/* блик по обложке (o.glint — витрина «За Энериум»): полоса света изредка проходит по телу книги (--ct…--cl), не по шипам и теням;
+   период и задержку задаёт витрина (--gl-ms, --gl-d); только transform и opacity; «меньше движения» — без блика */
+.hb-glint{position:absolute;z-index:5;overflow:hidden;pointer-events:none;border-radius:3% / 2%;
+  left:calc(var(--cl) * 1% / 10);right:calc(var(--cr) * 1% / 10);top:calc(var(--ct) * 1% / 10);bottom:calc(var(--cb) * 1% / 10)}
+.hb-glint::before{content:"";position:absolute;top:-10%;bottom:-10%;left:-70%;width:45%;opacity:0;mix-blend-mode:screen;
+  background:linear-gradient(90deg,transparent,rgba(255,244,214,.08) 30%,rgba(255,248,228,.42) 50%,rgba(255,244,214,.08) 70%,transparent);
+  transform:translateX(0) skewX(-16deg);animation:hb-glint var(--gl-ms,6000ms) ease-in-out var(--gl-d,0ms) infinite}
+@keyframes hb-glint{0%,58%{opacity:0;transform:translateX(0) skewX(-16deg)}62%{opacity:1}96%{opacity:1}100%{opacity:0;transform:translateX(420%) skewX(-16deg)}}
 /* угольки над гримуаром: поднимаются из обреза страниц */
 .hb-fx{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:visible}
 .hb-fx i{position:absolute;left:var(--x);bottom:6%;width:1.6cqw;aspect-ratio:1;border-radius:50%;background:#ffd9a0;box-shadow:0 0 2cqw .6cqw rgba(230,168,75,.9);opacity:0;animation:hb-ember var(--s) ease-out var(--d) infinite}
@@ -147,9 +155,8 @@ html.hb-sr .hb-rb i.on b::after{content:"";position:absolute;inset:0;background:
 :where(.sq-slots):has(>.hb){max-width:min(100%,420px)}
 
 /* ---------- состояния ---------- */
-/* известный, но не купленный — чёрно-белый портрет; неизвестная душа — силуэт класса (hcFace), свет — тише */
+/* известный, но не купленный — чёрно-белый портрет; неизвестная душа — книга закрыта: «?» в окне (hbQ), имя тише */
 .hb.gray .hb-ph>*{filter:grayscale(1) brightness(.62) contrast(1.06)}
-.hb.soul .hb-ph::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(70% 45% at 50% 42%,rgba(72,229,212,.14),transparent 70%)}
 .hb.soul .hb-bk>.hb-nm{color:var(--parch-2)}
 .hb.dim .hb-ph>*{filter:grayscale(.8) brightness(.5)}
 .hb.dim .hb-bk>.hb-lk{opacity:.5}
@@ -157,14 +164,44 @@ html.hb-sr .hb-rb i.on b::after{content:"";position:absolute;inset:0;background:
 .hb.sel{transform:translateY(-3px)}
 /* путь пройден: доблесть на максимуме, все пределы, уровень на потолке — свет книги золотится */
 .hb[data-max] .hb-gl{opacity:1;box-shadow:0 0 9cqw 2cqw var(--rc),0 0 4cqw 1cqw rgba(233,199,126,.7)}
-/* не найденный герой — безымянная книга: ни ступени, ни редкости; будущий цикл — замок */
-.hb.blank{--hb-mat:linear-gradient(160deg,#2a2d31,#15171a 55%,#202326);--hb-rim:inset 0 0 0 1cqw #3a3e43,inset 0 0 8cqw rgba(0,0,0,.7);cursor:default}
-.hb.blank:hover{transform:none}
-.hb.blank .hb-ph{background:radial-gradient(60% 45% at 50% 55%,rgba(72,229,212,.12),transparent 70%),#07090b}
-.hb-q{position:absolute;inset:0;display:grid;place-items:center;font:600 34cqw/1 var(--f-d);font-style:normal;color:rgba(160,220,214,.28)}
-.hb-q .i{width:24cqw;height:24cqw;color:var(--parch-3)}
+/* ---------- закрытая книга: неизвестная душа и не найденный — туман души и «?» в окне (hbQ) ----------
+   Слово автора 30.09.2026: «карточка неизвестной души выглядит как заглушка, это всё-таки тоже книга, только со знаком вопроса». Обложка —
+   своей ступени; в окне вместо портрета — туман души во тьме (рисунок --hb-soul, пока его нет — свет CSS) и «?» старым золотом,
+   буквой заголовков. Неизвестная душа (осколок найден) — туман светит бирюзой и дышит; не найденный — душа молчит: свет тише, «?»
+   бледнее; будущий цикл — ещё тише, на плашке — когда откроется. Движутся только transform и opacity */
+.hb-q{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden;isolation:isolate;container-type:size;
+  background:radial-gradient(80% 42% at 50% 56%,rgba(72,229,212,.2),transparent 72%),radial-gradient(130% 55% at 50% 112%,rgba(72,229,212,.26),transparent 64%),linear-gradient(180deg,#0b1315,#05080a 60%,#070b0c)}
+.hb-q::before{content:"";position:absolute;inset:-14%;z-index:-1;opacity:.9;pointer-events:none;
+  background:radial-gradient(36% 22% at 30% 36%,rgba(170,235,228,.14),transparent 70%),radial-gradient(40% 24% at 72% 64%,rgba(120,210,200,.12),transparent 70%),radial-gradient(30% 18% at 44% 84%,rgba(190,240,232,.1),transparent 70%);
+  animation:hb-mist 16s ease-in-out infinite alternate}
+html.hb-qa .hb-q{background:#05080a}
+html.hb-qa .hb-q::before{opacity:1;background:var(--hb-soul) 50% 50%/cover no-repeat}
+.hb-q::after{content:"";position:absolute;left:50%;top:47%;z-index:-1;width:120cqmin;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;
+  background:radial-gradient(closest-side,rgba(190,255,248,.32),rgba(72,229,212,.13) 55%,transparent);animation:hb-breath 3.6s ease-in-out infinite}
+.hb-qm{position:relative;display:block;font:700 min(104cqw,60cqh)/.8 var(--f-d);font-style:normal;letter-spacing:0;transform:translateY(4%);
+  color:transparent;background:linear-gradient(180deg,#fff7de 0%,#f5dd9d 28%,#dcb46a 54%,#a97b37 80%,#77521f);-webkit-background-clip:text;background-clip:text;
+  filter:drop-shadow(0 .9cqw 0 rgba(14,9,3,.95)) drop-shadow(0 0 3.4cqw rgba(72,229,212,.5)) drop-shadow(0 0 1cqw rgba(255,230,170,.3))}
+@keyframes hb-mist{from{transform:translate(-4%,2%) scale(1.02)}to{transform:translate(4%,-3%) scale(1.1)}}
+@keyframes hb-breath{0%,100%{opacity:.55}50%{opacity:1}}
+/* страница портрета неизвестной души: «?» крупно, но не во всю страницу */
+.hb-por .hb-qm{font-size:min(62cqw,40cqh)}
+/* не найденный: душа молчит — туман без бирюзы, свет не дышит, «?» бледнее; кнопка без действия не приподнимается */
+.hb.blank .hb-q{background:radial-gradient(80% 42% at 50% 56%,rgba(150,170,172,.1),transparent 72%),radial-gradient(130% 55% at 50% 112%,rgba(110,140,142,.14),transparent 64%),linear-gradient(180deg,#0c1012,#050709 60%,#08090b)}
+html.hb-qa .hb.blank .hb-q::before{filter:grayscale(.7) brightness(.7)}
+.hb.blank .hb-q::after{opacity:.3;animation:none}
+.hb.blank .hb-qm{opacity:.78;filter:drop-shadow(0 .9cqw 0 rgba(14,9,3,.95)) drop-shadow(0 0 2cqw rgba(160,190,190,.28)) saturate(.55)}
+.hb.blank.lock .hb-qm{opacity:.46}
+.hb.blank[data-a="noop"]{cursor:default}
+.hb.blank[data-a="noop"]:hover{transform:none}
 .hb.blank.sel .hb-bk{filter:drop-shadow(0 0 1.6cqw var(--spirit))}
-@media (prefers-reduced-motion:reduce){ .hb-fx i{animation:none;opacity:.55;bottom:calc(8% + var(--x) / 5)} .hb-l.ready::after{animation:none;opacity:.8} .hb{transition:none} }
+/* будущий цикл: на плашке — замок и когда откроется; у мелкой книги — только замок в углу окна */
+.hb-bk>.hb-when{display:flex;align-items:center;justify-content:center;gap:1.6cqw;padding:0 2cqw;font:700 clamp(8px,7cqw,12px)/12cqw var(--f-u);letter-spacing:.08em;text-transform:uppercase;color:var(--parch-2)}
+.hb-when .i{flex:none;width:7cqw;height:7cqw;color:var(--gold-2)}
+.hb-bk>.hb-lkb{position:absolute;z-index:4;right:calc(var(--wr) * 1% / 10 + 3%);bottom:calc(var(--wb) * 1% / 10 + 3%);display:grid;place-items:center;width:26cqw;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle at 50% 35%,#393d42,#16181b 70%);box-shadow:inset 0 0 0 .9cqw #8d9299,0 1cqw 2cqw rgba(0,0,0,.75);color:#d6dbe0}
+.hb-lkb .i{width:14cqw;height:14cqw}
+@media (prefers-reduced-motion:reduce){ .hb-fx i{animation:none;opacity:.55;bottom:calc(8% + var(--x) / 5)} .hb-l.ready::after{animation:none;opacity:.8} .hb{transition:none} .hb-glint{display:none}
+  .hb-q::before{animation:none;transform:scale(1.06)} .hb-q::after{animation:none;opacity:.8} }
 
 /* ---------- корешок книги: книга на полке боком ----------
    Материал — ступень книги (рисунок корешка, HB_ART.spine, или материал ступени --hb-mat без арта); редкость — кристалл --rico и ярлык
@@ -189,16 +226,21 @@ button.hs:active{transform:translateY(-5px)}
   box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--rc) 45%,#c9a26a),0 0 0 1px rgba(0,0,0,.55)}
 .hs-l b{display:block;max-height:94%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;writing-mode:vertical-rl;transform:rotate(180deg);
   font:700 34cqw/1 var(--f-u);letter-spacing:.01em;color:#f4ead2;text-shadow:0 1px 1px rgba(0,0,0,.9)}
-.hs-v{position:absolute;left:10%;right:10%;bottom:4%;z-index:2;height:15cqh;display:grid;place-items:center;border-radius:2px;
-  background:linear-gradient(180deg,#2c2723,#141210);box-shadow:inset 0 0 0 1px #6d6252,0 1px 2px rgba(0,0,0,.8);font:700 36cqw/1 var(--f-u);color:#f7e8c6;letter-spacing:-.02em}
+/* мощь — табличка внизу корешка, чуть шире его (как наклейка на корешке): золото, как мощь на обложке; коротко — hbPow. Шрифт — в px:
+   цифры читаются и на телефоне, у тонкого корешка тоже */
+.hs-p{position:absolute;left:-1px;right:-1px;bottom:3%;z-index:3;height:15cqh;min-height:13px;display:grid;place-items:center;overflow:hidden;border-radius:2px;
+  background:linear-gradient(180deg,#2e271b,#120f0a);box-shadow:inset 0 0 0 1px rgba(233,199,126,.55),inset 0 1px 0 rgba(255,236,190,.16),0 1px 2px rgba(0,0,0,.85);
+  font:700 11px/1 var(--f-u);letter-spacing:-.02em;color:#f3dfa6;white-space:nowrap;text-shadow:0 1px 1px #000;font-variant-numeric:lining-nums tabular-nums}
+.g.sm .hs-p{font-size:10px}
 /* корешок в отсеке шкафа: только материал и ярлык цвета редкости — знаки мелкие не читаются */
 .hs[data-z="s"]{cursor:inherit}
 .hs[data-z="s"]>.hs-cr{display:none}
 .hs[data-z="s"]>.hs-l{left:20%;right:20%;top:30%;bottom:24%}
-/* занят (забег): тусклый; выбран — приподнят */
+/* занят (забег): тусклый; выбран — приподнят; подсказка по удержанию открыта — приподнят и светит бирюзой */
 .hs.dim>.hs-a,.hs.dim>.hs-c{filter:grayscale(.75) brightness(.5)}
-.hs.dim>.hs-l,.hs.dim>.hs-k{opacity:.55}
-.hs.sel{transform:translateY(-6px)}
+.hs.dim>.hs-l,.hs.dim>.hs-k,.hs.dim>.hs-p{opacity:.55}
+.hs.sel,.hs.on{transform:translateY(-6px)}
+.hs.on>.hs-a,.hs.on>.hs-c{filter:drop-shadow(0 0 3px var(--spirit)) drop-shadow(0 0 1px var(--spirit)) drop-shadow(0 2px 3px rgba(0,0,0,.8))}
 /* книгу сняли с полки — она в полёте открытия или закрытия: на своём месте её нет, пока не вернётся */
 .hb.away,.hs.away{opacity:0;transition:none;pointer-events:none}
 @media (prefers-reduced-motion:reduce){ .hs{transition:none} }

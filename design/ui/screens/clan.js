@@ -992,7 +992,7 @@ Object.assign(OV, {
     const total = P.groups.reduce((a, g) => a + g.count, 0), head = P.groups.reduce((a, g) => a + g.head, 0), ed = !P.done && can('gifts');
     const idx = id => P.members.findIndex(m => m.id === id), myCyc = S.acc.cycle;
     const left = P.groups.map((g, gi) => g.head - Object.values(P.plan[gi]).reduce((a, x) => a + x, 0));
-    const wells = P.groups.map(g => `<span class="well" data-r="${EC.rOf(g.step, myCyc)}" style="--s:34px" title="${boxName(EC.rOf(g.step, myCyc))}"><img src="${CHEST}" alt=""><span class="q">${fmt(g.count)}</span></span>`).join('');
+    const wells = P.groups.map(g => `<span class="well itf" data-r="${EC.rOf(g.step, myCyc)}" style="--s:34px" title="${boxName(EC.rOf(g.step, myCyc))}">${chestPic('talisman', EC.rOf(g.step, myCyc))}<span class="q">${fmt(g.count)}</span></span>`).join('');
     const rows = P.members.map(m => {
       const srv = P.groups.map((g, gi) => P.server[gi][idx(m.id)] || 0), hd = P.groups.map((g, gi) => P.plan[gi][m.id] || 0);
       const step = P.groups.map((g, gi) => ed ? `<span class="cl-step" title="${boxName(EC.rOf(g.step, m.cyc))}"><button class="iconbtn" data-a="clplan" data-v="${gi}:${m.id}:-1" ${hd[gi] ? '' : 'disabled'} aria-label="Меньше">${ic('minus')}</button><b class="num">${hd[gi]}</b><button class="iconbtn" data-a="clplan" data-v="${gi}:${m.id}:1" ${left[gi] > 0 ? '' : 'disabled'} aria-label="Больше">${ic('plus')}</button></span>` : `<b class="num">${hd[gi]}</b>`).join('');

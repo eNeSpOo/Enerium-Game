@@ -79,7 +79,7 @@
 .tl-kmarks{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 2px}
 .tl-kmarks .tl-t{--ts:36px}
 /* ---------- иконки ресурсов сеткой (resArt, trIcon в index.html) ----------
-   Живопись в край: окно рамки вида (crafthall.css) — 72 % колодца, иконка вписывается в него целиком. Номер руны предела — в левом нижнем углу:
+   Живопись в край: в рамке предмета (ниже) иконка ложится ровно в её окно. Номер руны предела — в левом нижнем углу окна:
    справа внизу стоит количество, слева вверху — точка «новое» и кристалл редкости */
 .res-art{object-fit:cover}
 .res-gl{display:none}
@@ -87,3 +87,44 @@
 :is(.well,.zp-cell,.zp-ic,.lv-ic,.lv-big,.tr-big,.co-ti)>.res-gl{display:block;position:absolute;left:9%;bottom:6%;z-index:2;pointer-events:none;
   font:700 11px/1 var(--f-d);color:var(--gold);text-shadow:0 1px 2px #000,0 0 4px #000,0 0 8px #000}
 :is(.lv-big,.tr-big)>.res-gl,.ws-core>.res-gl{font-size:15px}
+/* ---------- рамка предмета — одна на все предметы ----------
+   Слово автора 30.09.2026: «рамки слишком толстые, пусть они будут едины для всех предметов, и будут более тонкие и в тёмных стилях,
+   а вот подсветка будет определять редкость ресурса». Рамка — тонкий чернёный металл со скосом (--itf-b), под ним — тёмная щель и
+   кромка цвета редкости --rc (ADR-0027); свет редкости встаёт снизу окна; с эпической — мягкое свечение вокруг. Вид предмета рамкой
+   не различается.
+   Как поставить: класс itf и data-r="1…7" у колодца предмета (или своя --rc); размер задаёт колодец (width и height), колодец —
+   position:relative или absolute. Своих border, background и box-shadow колодцу не надо — их даёт рамка; выбор — кольцо box-shadow
+   не тоньше 2 px правилом весом от двух классов. Иконка сеткой — живопись в край (res-art, eq-grid, tal-grid, ab-art, картинка без
+   класса; у колодца .face — портрет) — ложится ровно в окно: без полей, обрезки и сдвига; значок-вектор, глиф и вырезка — по центру.
+   Свои метки поверх (число, точка) — z-index:2. Рамка внутри большего колодца (гнездо стола, пьедестал) — --itf-in: отступ от края.
+   Переменные: --itf-b — толщина металла, --itf-r — скругление, --itf-in — отступ рамки от края колодца; --itf-k, --itf-l, --itf-g —
+   сила кромки, света снизу и свечения, их ставит редкость.
+   Кто в рамке: класс itf; колодец предмета recipes.js — атрибут data-fk="item" (crK, screens/crafthall.js; у значков кошелька —
+   семейство wallet: Энериум, рунный ключ — рамки нет); клетки и плитки «Запасов» с редкостью — все (bag.js размечает атрибутом только
+   ресурсы). Вес правил — класс и тег html: база колодца уступает рамке, выбор и состояния колодца (от двух классов) — сильнее её */
+:root{--itf-b:2px;--itf-r:5px;--itf-in:0px}
+:where(.itf){position:relative;display:grid;place-items:center}
+html :is(.itf,[data-fk],:where(.zp-cell,.zp-ic:not(.bare))[data-r]){--itf-k:34%;--itf-l:24%;--itf-g:0%;border:0;border-radius:var(--itf-r);overflow:visible;
+  background:radial-gradient(90% 60% at 50% 100%,color-mix(in srgb,var(--rc,#8b8f96) 18%,transparent),transparent 75%),linear-gradient(180deg,#0a0b0d,#121417);
+  box-shadow:0 2px 5px -1px rgba(0,0,0,.7)}
+/* свет редкости: обычная — тихая кромка; редкая и уникальная — ярче; с эпической — ещё ярче и мягкое свечение вокруг */
+html :is(.itf,[data-fk],:where(.zp-cell,.zp-ic:not(.bare))[data-r]):is([data-r="2"],[data-r="3"]){--itf-k:62%;--itf-l:44%}
+html :is(.itf,[data-fk],:where(.zp-cell,.zp-ic:not(.bare))[data-r]):is([data-r="4"],[data-r="5"],[data-r="6"],[data-r="7"]){--itf-k:82%;--itf-l:58%;--itf-g:60%}
+/* металл со скосом (свет сверху слева), тёмная щель, кромка редкости — ярче снизу, свет снизу окна, свечение вокруг; поверх иконки */
+html :is(.itf,[data-fk],:where(.zp-cell,.zp-ic:not(.bare))[data-r])::after{content:"";position:absolute;inset:var(--itf-in);z-index:1;width:auto;height:auto;margin:0;
+  pointer-events:none;opacity:1;background:none;border:var(--itf-b) solid;border-color:#4b4742 #211f1d #0d0d0e #36332f;border-radius:var(--itf-r);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.85),inset 0 0 0 2px color-mix(in srgb,var(--rc,#8b8f96) var(--itf-k),transparent),
+    inset 0 -3px 0 -1px color-mix(in srgb,var(--rc,#8b8f96) calc(var(--itf-k) + 15%),transparent),
+    inset 0 -14px 12px -10px color-mix(in srgb,var(--rc,#8b8f96) var(--itf-l),transparent),0 0 10px -1px color-mix(in srgb,var(--rc,#8b8f96) var(--itf-g),transparent)}
+html button:is(.itf,[data-fk],:where(.zp-cell,.zp-ic:not(.bare))[data-r]):hover::after{border-color:#625d55 #2c2a27 #141415 #48443e}
+/* иконка сеткой — ровно в окно: левый и верхний край — отступ рамки и металл, размер — колодец без них с двух сторон. Картинке задан
+   размер явно: у картинки с position:absolute размер auto — её собственный (атрибуты width и height), а не окно — так иконки съезжали
+   вправо вниз и обрезались (30.09.2026) */
+html :is(.itf,[data-fk],:where(.zp-cell,.zp-ic:not(.bare))[data-r])>img[src]:is(.res-art,.eq-grid,.tal-grid,.ab-art,:not([class])),
+html :is(.itf,[data-fk],:where(.zp-cell,.zp-ic:not(.bare))[data-r]).face>:is(img,.rs-ph){position:absolute;
+  left:calc(var(--itf-in) + var(--itf-b));top:calc(var(--itf-in) + var(--itf-b));right:auto;bottom:auto;margin:0;max-width:none;max-height:none;
+  width:calc(100% - 2 * (var(--itf-in) + var(--itf-b)));height:calc(100% - 2 * (var(--itf-in) + var(--itf-b)));object-fit:cover;
+  border-radius:max(0px,calc(var(--itf-r) - var(--itf-b)))}
+/* метки поверх рамки; номер руны — в левом нижнем углу окна */
+html :is(.itf,[data-fk],:where(.zp-cell,.zp-ic:not(.bare))[data-r])>:is(.q,.dot,.new,.zp-dot,.zp-k,.lv-q,.rz-k,.rf-wkc){z-index:2}
+html :is(.itf,[data-fk],:where(.zp-cell,.zp-ic:not(.bare))[data-r])>.res-gl{left:calc(var(--itf-in) + var(--itf-b) + 5%);bottom:calc(var(--itf-in) + var(--itf-b) + 3%)}

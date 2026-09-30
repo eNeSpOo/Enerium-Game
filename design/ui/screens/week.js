@@ -147,7 +147,7 @@ const payTop = pay => pay.reduce((a, g) => Math.max(a, g.r), 0);
 const payCount = pay => pay.reduce((a, g) => a + g.count, 0);
 /* выплаты одной строкой: одинаковые сундуки — вместе */
 const mergePay = pay => { const by = new Map(); pay.forEach(g => { const k = g.r + ':' + g.win, x = by.get(k); if (x) x.count += g.count; else by.set(k, { r: g.r, win: g.win, count: g.count }); }); return [...by.values()].sort((a, b) => b.r - a.r); };
-const chestTok = (box, pay, lead) => pay.length ? `<span class="well wk-chest" data-r="${payTop(pay)}" style="--s:${WK.view.chest}px" title="${trEsc((lead ? lead + ' · ' : '') + payName(box, pay))}"><img src="${CHEST}" alt=""></span>` : '';
+const chestTok = (box, pay, lead) => pay.length ? `<span class="well itf wk-chest" data-r="${payTop(pay)}" style="--s:${WK.view.chest}px" title="${trEsc((lead ? lead + ' · ' : '') + payName(box, pay))}">${chestPic(box, payTop(pay))}</span>` : '';
 const allGroups = rs => rs.reduce((a, r) => a.concat(r.groups), []);
 const crystals = groups => { const by = {}; groups.forEach(g => { by[g.r] = (by[g.r] || 0) + g.count; }); return Object.keys(by).map(Number).sort((a, b) => b - a).map(r => `<span class="wk-cr" data-r="${r}" title="${RAR[r]}">${ICON('r' + r, WK.view.crystal, RAR[r])}<b class="num">×${fmt(by[r])}</b></span>`).join(''); };
 const placeTxt = p => p ? '#' + fmt(p) : '—';
@@ -287,7 +287,7 @@ function giftsBtn() {
   const has = typeof darRows === 'function' && typeof darCount === 'function' && S.zp;
   const ok = has ? darRows(S).filter(p => p.st === 'ok') : [], n = has ? darCount(ok) : 0;
   const small = has ? `${fmt(n)} ${plural(n, 'сундук', 'сундука', 'сундуков')}` : 'итоги недель';
-  return `<button class="gifts" data-a="sheet" data-v="gifts"><img src="${CHEST}" alt=""><span><b>Дары</b><small>${small}</small></span>${ok.length ? `<span class="bdg">${ok.length}</span>` : ''}</button>`;
+  return `<button class="gifts" data-a="sheet" data-v="gifts">${chestPic('wander', typeof ZP_VIEW !== 'undefined' ? ZP_VIEW.giftR : 4)}<span><b>Дары</b><small>${small}</small></span>${ok.length ? `<span class="bdg">${ok.length}</span>` : ''}</button>`;
 }
 
 /* ================== экран ================== */
@@ -419,7 +419,7 @@ function planksHtml(st) {
 const tierHtml = st => st.tier ? `<p class="rs-line wk-tier">${chestTok(st.box, st.tier.pay, st.tier.label)}<span>Если неделя закончится сейчас: ${(st.tier.one || st.placeLabel).toLowerCase()} — ${st.tier.label}${st.tier.pay.length ? ', ' + payName(st.box, st.tier.pay) : ''}.</span></p>` : '';
 const ST_T = { got: 'получено', ok: 'в «Дарах»', wait: 'ждёт подсчёта' };
 function rewardsHtml(st) {
-  const rows = st.rewards.map(r => `<div class="wk-rw"><span class="well" data-r="${payTop(r.groups)}" style="--s:28px"><img src="${CHEST}" alt=""></span><span class="wk-rwt"><b>${trEsc(r.label)}${r.cat === 'clan' ? ' · клан' : ''}</b><small>${trEsc(payName(r.box || st.box, r.groups))}</small></span><span class="chip ${r.st === 'ok' ? 'warn' : ''}">${ST_T[r.st] || r.st}</span></div>`).join('');
+  const rows = st.rewards.map(r => `<div class="wk-rw"><span class="well itf" data-r="${payTop(r.groups)}" style="--s:28px">${chestPic(r.box || st.box, payTop(r.groups))}</span><span class="wk-rwt"><b>${trEsc(r.label)}${r.cat === 'clan' ? ' · клан' : ''}</b><small>${trEsc(payName(r.box || st.box, r.groups))}</small></span><span class="chip ${r.st === 'ok' ? 'warn' : ''}">${ST_T[r.st] || r.st}</span></div>`).join('');
   const cur = st.cur.length ? `<div class="wk-cur">${st.cur.map(([k, n]) => money(k, n)).join('')}</div>` : '';
   const N = payCount(allGroups(st.rewards));
   return `<span class="eyebrow">Награды · ${fmt(N)} ${plural(N, 'сундук', 'сундука', 'сундуков')}</span>${rows ? `<div class="wk-rws">${rows}</div>` : '<p class="faint">Сундуков нет.</p>'}${cur}${st.note ? `<p class="reason">${st.note}</p>` : ''}`;

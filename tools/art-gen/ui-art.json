@@ -1,5 +1,5 @@
 {
-  "note": "Какой арт из art/generated/ идёт в прототип design/ui/. Враги — ADR-0013, отряд — герои сета 1 «Хранители Песочных Часов», арена — вторая раскладка. mirror — отражение: корпус героя на карте развёрнут вправо, к врагам, корпус врага — влево, к героям (решение автора 27.09.2026). Выгрузка: python tools/art-gen/export_ui.py Эхо, неделя эльфов — арена и портреты Иш-Кантуна, одобрены автором 28.09.2026 (ADR-0025, п. 8): ik-01…ik-14 — ступени лестницы 1–14, ik-15 — Многоликий. Значки атрибутов, редкостей (ADR-0027), классов и доблести одобрены автором 28.09.2026: PNG 128×128 с прозрачностью, эмблема вписана в 80 % кадра (fit). Окно «Спуск» — фон биома во всё окно: место и его обитатели на одном арте (слова автора 30.09.2026), задание tools/art-gen/jobs/descent-backdrops.json; descent/b1…b4.jpg, 1688×716. Карточка героя — книга (выбор автора 30.09.2026, ADR-0032): обложки пяти ступеней с прозрачным окном, развороты, замок закрытый и отпертый, лента и звёздочка (нейтральные, цвет редкости даёт интерфейс), изнанка обложки и лист — books/*, задание tools/art-gen/jobs/hero-books.json, геометрия — tools/art-gen/book_layers.py → HB_ART в design/ui/screens/book.js; крупный арт с альфой — WebP. Карты боя — рамки по типу бойца (jobs/battle-frames.json): bframes/<тип>.png ← battle-frames/*.bf.png — окно вычищено, рисунок обрезан по альфе (tools/art-gen/battle_frame.py); 320 px в ширину, высота — по пропорции рисунка, без fit: доли окна и нарезки в BF (screens/battle-cards.js) совпадают с выгрузкой. Библиотека Этриона — шкаф героев (слово автора 30.09.2026: «задний фон показывает, что они условно находятся на полках огромного древнего шкафа»): bookcase/* — задняя стенка (бесшовная), полка и карниз (повторяются по горизонтали), стойка (по вертикали) и её ножка со светом кристалла, кованый кронштейн, лампада; корешки пяти ступеней книги — books/spine-1…5 (часть книги, HB_ART в design/ui/screens/book.js); задание tools/art-gen/jobs/library-shelves.json, бесшовность и нарезка — tools/art-gen/shelf_layers.py, геометрия — LB_ART в design/ui/screens/library.js и HB_ART.spines. Ремесло — залы и вещи мастера (слово автора 30.09.2026: «Само Окно крафта так же сделай дорогим и богатым, как и в целом над всеми окнами в ремесле»), задание tools/art-gen/jobs/craft-hall.json: craft/hall-*.jpg — фоны окон Мастерской, Запасов, Лавки, Рынка и Перековки (у кузни срезана тёмная полоса снизу — crop); стол, гнездо, пьедестал и горн — строго сверху, обрезаны в квадрат (tools/art-gen/craft_layers.py disc); рамки иконки предмета frame-<вид>.png — одна геометрия: тело рамки — 200 из 256 px холста по центру, окно — CR_ART.frames (craft_layers.py frames; углы холста — точка альфы 9, чтобы выгрузка не срезала поле); уголки — одно изображение в четырёх отражениях (craft_layers.py corners); прилавок и навес — бесшовные полосы (shelf_layers.py strip), пергамент — бесшовная плитка (shelf_layers.py tile); гримуар — страница для border-image из разворота (craft_layers.py book) и сам разворот; частицы — лист 3 × 2 (craft_layers.py sheet). Пути — CR_ART.ready в design/ui/screens/crafthall.js. Странник — покои в Башне вневремени (слово автора 30.09.2026: «сделать окна в нём ААА уровня»), задание tools/art-gen/jobs/wanderer-chambers.json: chambers/hall-*.jpg — фоны вкладок «Обзор», «Память», «Артефакты», «Достижения», «Летопись» (у трёх срезана тёмная полоса снизу — crop); рама зеркала Памяти — девять частей для border-image (tools/art-gen/chambers_layers.py mirror: углы как есть, стороны — бесшовные образцы, низ — отражённый верх) и его стекло; ниша колонки Странника; уголки — одно изображение в четырёх отражениях (craft_layers.py corners); герб, табличка (chambers_layers.py clean, crop), карниз (chambers_layers.py strip); медальоны достижений и частицы — листы (craft_layers.py sheet); артефакты — лист 5 × 4 на пурпурных швах (grid_slice.py); базальт и пергамент — бесшовные плитки (shelf_layers.py tile). Пути — CB_ART.ready в design/ui/screens/chambers.js. Страницы книги героя (слово автора 30.09.2026: «мы перешли с заглушек на красивый визуал а внутри осталось всё по-старому, не порядок»): pages/frame-<вид>.png — рамки значков способности по виду (активная — железо, ульта — старое золото, пассивка — круг, реакция — ржавая кромка), оправа талисмана и рамка буквицы, одна геометрия — тело рамки 200 из 256 px холста (tools/art-gen/craft_layers.py frames, задание jobs/hero-book-pages.json); pages/tab*.webp — кожаные закладки вкладок (верхний язычок, tools/art-gen/page_layers.py tongue), pages/btn*.webp — кнопки кожей в латуни, главная — с кристаллами карста (border-image); pages/ink-*.png — чернильные виньетки: пером на белом, белое → прозрачное (page_layers.py ink, задание jobs/hero-book-ink.json). Пути — PG_ART.ready в design/ui/screens/book-pages.js.",
+  "note": "Какой арт из art/generated/ идёт в прототип design/ui/. Враги — ADR-0013, отряд — герои сета 1 «Хранители Песочных Часов», арена — вторая раскладка. mirror — отражение: корпус героя на карте развёрнут вправо, к врагам, корпус врага — влево, к героям (решение автора 27.09.2026). Выгрузка: python tools/art-gen/export_ui.py Эхо, неделя эльфов — арена и портреты Иш-Кантуна, одобрены автором 28.09.2026 (ADR-0025, п. 8): ik-01…ik-14 — ступени лестницы 1–14, ik-15 — Многоликий. Значки атрибутов, редкостей (ADR-0027), классов и доблести одобрены автором 28.09.2026: PNG 128×128 с прозрачностью, эмблема вписана в 80 % кадра (fit). Окно «Спуск» — фон биома во всё окно: место и его обитатели на одном арте (слова автора 30.09.2026), задание tools/art-gen/jobs/descent-backdrops.json; descent/b1…b4.jpg, 1688×716. Карточка героя — книга (выбор автора 30.09.2026, ADR-0032): обложки пяти ступеней с прозрачным окном, развороты, замок закрытый и отпертый, лента и звёздочка (нейтральные, цвет редкости даёт интерфейс), изнанка обложки и лист, туман в окне закрытой книги неизвестной души (books/soul.webp, задание jobs/hero-soul.json; «?» кладёт интерфейс) — books/*, задание tools/art-gen/jobs/hero-books.json, геометрия — tools/art-gen/book_layers.py → HB_ART в design/ui/screens/book.js; крупный арт с альфой — WebP. Карты боя — рамки по типу бойца (jobs/battle-frames.json): bframes/<тип>.png ← battle-frames/*.bf.png — окно вычищено, рисунок обрезан по альфе (tools/art-gen/battle_frame.py); 320 px в ширину, высота — по пропорции рисунка, без fit: доли окна и нарезки в BF (screens/battle-cards.js) совпадают с выгрузкой. Библиотека Этриона — шкаф героев (слово автора 30.09.2026: «задний фон показывает, что они условно находятся на полках огромного древнего шкафа»): bookcase/* — задняя стенка (бесшовная), полка и карниз (повторяются по горизонтали), стойка (по вертикали) и её ножка со светом кристалла, кованый кронштейн, лампада; корешки пяти ступеней книги — books/spine-1…5 (часть книги, HB_ART в design/ui/screens/book.js); задание tools/art-gen/jobs/library-shelves.json, бесшовность и нарезка — tools/art-gen/shelf_layers.py, геометрия — LB_ART в design/ui/screens/library.js и HB_ART.spines. Ремесло — залы и вещи мастера (слово автора 30.09.2026: «Само Окно крафта так же сделай дорогим и богатым, как и в целом над всеми окнами в ремесле»), задание tools/art-gen/jobs/craft-hall.json: craft/hall-*.jpg — фоны окон Мастерской, Запасов, Лавки, Рынка и Перековки (у кузни срезана тёмная полоса снизу — crop); стол, гнездо, пьедестал и горн — строго сверху, обрезаны в квадрат (tools/art-gen/craft_layers.py disc); рамки иконки предмета frame-<вид>.png — одна геометрия: тело рамки — 200 из 256 px холста по центру, окно — CR_ART.frames (craft_layers.py frames; углы холста — точка альфы 9, чтобы выгрузка не срезала поле); уголки — одно изображение в четырёх отражениях (craft_layers.py corners); прилавок и навес — бесшовные полосы (shelf_layers.py strip), пергамент — бесшовная плитка (shelf_layers.py tile); гримуар — страница для border-image из разворота (craft_layers.py book) и сам разворот; частицы — лист 3 × 2 (craft_layers.py sheet). Пути — CR_ART.ready в design/ui/screens/crafthall.js. Странник — покои в Башне вневремени (слово автора 30.09.2026: «сделать окна в нём ААА уровня»), задание tools/art-gen/jobs/wanderer-chambers.json: chambers/hall-*.jpg — фоны вкладок «Обзор», «Память», «Артефакты», «Достижения», «Летопись» (у трёх срезана тёмная полоса снизу — crop); рама зеркала Памяти — девять частей для border-image (tools/art-gen/chambers_layers.py mirror: углы как есть, стороны — бесшовные образцы, низ — отражённый верх) и его стекло; ниша колонки Странника; уголки — одно изображение в четырёх отражениях (craft_layers.py corners); герб, табличка (chambers_layers.py clean, crop), карниз (chambers_layers.py strip); медальоны достижений и частицы — листы (craft_layers.py sheet); артефакты — лист 5 × 4 на пурпурных швах (grid_slice.py); базальт и пергамент — бесшовные плитки (shelf_layers.py tile). Пути — CB_ART.ready в design/ui/screens/chambers.js. Страницы книги героя (слово автора 30.09.2026: «мы перешли с заглушек на красивый визуал а внутри осталось всё по-старому, не порядок»): pages/frame-<вид>.png — рамки значков способности по виду (активная — железо, ульта — старое золото, пассивка — круг, реакция — ржавая кромка), оправа талисмана и рамка буквицы, одна геометрия — тело рамки 200 из 256 px холста (tools/art-gen/craft_layers.py frames, задание jobs/hero-book-pages.json); pages/tab*.webp — кожаные закладки вкладок (верхний язычок, tools/art-gen/page_layers.py tongue), pages/btn*.webp — кнопки кожей в латуни, главная — с кристаллами карста (border-image); pages/ink-*.png — чернильные виньетки: пером на белом, белое → прозрачное (page_layers.py ink, задание jobs/hero-book-ink.json). Пути — PG_ART.ready в design/ui/screens/book-pages.js. Тёмная подложка страниц (слово автора 30.09.2026: «В открытой книге героя, не хватает тёмной подложки»): правая страница — чернёный пергамент «Ремесла» (craft/vellum.jpg), чернильные виньетки по чёрному не видны — pages/gilt-*.png: те же виньетки старым золотом (page_layers.py gild). Лавка Энериума (слово автора 30.09.2026, правило «дорого-богато»): стартовые наборы I–V, печать платного ряда, пять наборов Энериума, знак рекламы, три выдачи, три предложения — нарезка листов tools/art-gen/jobs/store.json (craft_layers.py sheet), зал store/hall.jpg; пути — EN_STORE.art (tools/content-gen/store/build.js). Книга рецептов Мастерской на всё окно (слово автора 30.09.2026: «рецепты слишком важны для всей игры в целом»), задание tools/art-gen/jobs/recipe-book.json: rbook/book.webp — раскрытый гримуар чернёного пергамента; rbook/strip-s, -m, -l — полосы древнего листа найденного рецепта трёх длин по числу ингредиентов, каждая нарисована в своих пропорциях и выгружена без искажения (размер — по рамке альфы); rbook/frag-1…9 — неровные квадратные обрывки частично найденного рецепта. Нарезка и геометрия — tools/art-gen/rbook_layers.py → RB_ART в design/ui/screens/recipe-book.js. Окно снаряжения героя (слово автора 30.09.2026: «окно талисманов и снаряжения выглядят теперь как заглушка»): gear-window/armory.jpg — оружейная башни, фон окна, задание tools/art-gen/jobs/hero-gear-window.json; путь — GW_ART.ready в design/ui/screens/hero-dev.js.",
   "out": "design/ui/assets/art",
   "size": [
     464,
@@ -1686,6 +1686,13 @@
         713
       ]
     },
+    "books/soul.webp": {
+      "from": "book-soul/book-soul-mist__nb2.jpg",
+      "size": [
+        480,
+        860
+      ]
+    },
     "bframes/hero.png": {
       "from": "battle-frames/bf-hero__nb2-v2.bf.png",
       "size": [
@@ -2628,6 +2635,1182 @@
       "size": [
         140,
         143
+      ]
+    },
+    "pages/gilt-head.png": {
+      "from": "pg-ink/pg-ink__nb2-head.gilt.png",
+      "size": [
+        480,
+        105
+      ]
+    },
+    "pages/gilt-div.png": {
+      "from": "pg-ink/pg-ink__nb2-div.gilt.png",
+      "size": [
+        260,
+        52
+      ]
+    },
+    "pages/gilt-tail.png": {
+      "from": "pg-ink/pg-ink__nb2-tail.gilt.png",
+      "size": [
+        162,
+        90
+      ]
+    },
+    "pages/gilt-wreath.png": {
+      "from": "pg-ink/pg-ink__nb2-wreath.gilt.png",
+      "size": [
+        140,
+        143
+      ]
+    },
+    "gear-window/armory.jpg": {
+      "from": "gw-hall/gw-armory__nb2.jpg",
+      "size": [
+        1600,
+        679
+      ]
+    },
+    "gold.png": {
+      "from": "cur-solid/cur-gold__nb2-v3.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 88
+    },
+    "spirit.png": {
+      "from": "cur-glow/cur-spirit__nb2-v2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 88
+    },
+    "souls.png": {
+      "from": "cur-glow/cur-souls__nb2-v2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 88
+    },
+    "enerium.png": {
+      "from": "cur-solid/cur-enerium__nb2-v3.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 88
+    },
+    "rune-key.png": {
+      "from": "cur-glow/cur-rune-key__nb2-v2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 88
+    },
+    "shelter/sign.webp": {
+      "from": "sh-plate/sh-sign__nb2.trim.plate.edge.tone.png",
+      "size": [
+        749,
+        188
+      ]
+    },
+    "shelter/cta.webp": {
+      "from": "sh-plate/sh-cta__nb2.trim.tone.png",
+      "size": [
+        727,
+        244
+      ]
+    },
+    "shelter/chain.png": {
+      "from": "sh-parts/sh-parts__nb2-chain.png",
+      "size": [
+        24,
+        114
+      ]
+    },
+    "shelter/corner.png": {
+      "from": "sh-parts/sh-parts__nb2-corner.png",
+      "size": [
+        100,
+        102
+      ]
+    },
+    "shelter/flourish.png": {
+      "from": "sh-parts/sh-parts__nb2-flourish.png",
+      "size": [
+        220,
+        35
+      ]
+    },
+    "shelter/lantern.webp": {
+      "from": "sh-fg/sh-lantern__nb2.png",
+      "size": [
+        261,
+        540
+      ]
+    },
+    "shell/edge.png": {
+      "from": "sh-strip/sh-edge__nb2.strip.png",
+      "size": [
+        722,
+        84
+      ]
+    },
+    "shell/edge-v.png": {
+      "from": "sh-strip/sh-edge__nb2.strip.v.png",
+      "size": [
+        84,
+        722
+      ]
+    },
+    "shell/knot.png": {
+      "from": "sh-parts/sh-parts__nb2-knot.png",
+      "size": [
+        96,
+        98
+      ]
+    },
+    "shell/frame.png": {
+      "from": "sh-parts/sh-parts__nb2-frame.png",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "shell/diamond.png": {
+      "from": "sh-parts/sh-parts__nb2-diamond.png",
+      "size": [
+        35,
+        45
+      ]
+    },
+    "shell/iron.jpg": {
+      "from": "sh-tex/sh-iron__nb2.tile.jpg",
+      "size": [
+        464,
+        471
+      ]
+    },
+    "chests/shards/r1-body.webp": {
+      "from": "chest-sheet/chs-shards/r1.body.png",
+      "size": [
+        958,
+        353
+      ]
+    },
+    "chests/shards/r1-lid.webp": {
+      "from": "chest-sheet/chs-shards/r1.lid.png",
+      "size": [
+        960,
+        430
+      ]
+    },
+    "chests/shards/r1.webp": {
+      "from": "chest-sheet/chs-shards/r1.png",
+      "size": [
+        256,
+        208
+      ]
+    },
+    "chests/shards/r2-body.webp": {
+      "from": "chest-sheet/chs-shards/r2.body.png",
+      "size": [
+        958,
+        354
+      ]
+    },
+    "chests/shards/r2-lid.webp": {
+      "from": "chest-sheet/chs-shards/r2.lid.png",
+      "size": [
+        960,
+        431
+      ]
+    },
+    "chests/shards/r2.webp": {
+      "from": "chest-sheet/chs-shards/r2.png",
+      "size": [
+        256,
+        209
+      ]
+    },
+    "chests/shards/r3-body.webp": {
+      "from": "chest-sheet/chs-shards/r3.body.png",
+      "size": [
+        958,
+        354
+      ]
+    },
+    "chests/shards/r3-lid.webp": {
+      "from": "chest-sheet/chs-shards/r3.lid.png",
+      "size": [
+        960,
+        505
+      ]
+    },
+    "chests/shards/r3.webp": {
+      "from": "chest-sheet/chs-shards/r3.png",
+      "size": [
+        256,
+        228
+      ]
+    },
+    "chests/shards/r4-body.webp": {
+      "from": "chest-sheet/chs-shards/r4.body.png",
+      "size": [
+        958,
+        354
+      ]
+    },
+    "chests/shards/r4-lid.webp": {
+      "from": "chest-sheet/chs-shards/r4.lid.png",
+      "size": [
+        960,
+        496
+      ]
+    },
+    "chests/shards/r4.webp": {
+      "from": "chest-sheet/chs-shards/r4.png",
+      "size": [
+        256,
+        226
+      ]
+    },
+    "chests/shards/r5-body.webp": {
+      "from": "chest-sheet/chs-shards/r5.body.png",
+      "size": [
+        957,
+        359
+      ]
+    },
+    "chests/shards/r5-lid.webp": {
+      "from": "chest-sheet/chs-shards/r5.lid.png",
+      "size": [
+        960,
+        440
+      ]
+    },
+    "chests/shards/r5.webp": {
+      "from": "chest-sheet/chs-shards/r5.png",
+      "size": [
+        256,
+        212
+      ]
+    },
+    "chests/shards/r6-body.webp": {
+      "from": "chest-sheet/chs-shards/r6.body.png",
+      "size": [
+        957,
+        355
+      ]
+    },
+    "chests/shards/r6-lid.webp": {
+      "from": "chest-sheet/chs-shards/r6.lid.png",
+      "size": [
+        960,
+        498
+      ]
+    },
+    "chests/shards/r6.webp": {
+      "from": "chest-sheet/chs-shards/r6.png",
+      "size": [
+        256,
+        227
+      ]
+    },
+    "chests/shards/r7-body.webp": {
+      "from": "chest-sheet/chs-shards/r7.body.png",
+      "size": [
+        956,
+        351
+      ]
+    },
+    "chests/shards/r7-lid.webp": {
+      "from": "chest-sheet/chs-shards/r7.lid.png",
+      "size": [
+        960,
+        551
+      ]
+    },
+    "chests/shards/r7.webp": {
+      "from": "chest-sheet/chs-shards/r7.png",
+      "size": [
+        256,
+        240
+      ]
+    },
+    "chests/shards/lock.webp": {
+      "from": "chest-sheet/chs-shards/lock.png",
+      "size": [
+        240,
+        351
+      ]
+    },
+    "store/start-1.png": {
+      "from": "st-sheet/st-starter__nb2-start1.png",
+      "size": [
+        384,
+        384
+      ],
+      "fit": 96
+    },
+    "store/start-2.png": {
+      "from": "st-sheet/st-starter__nb2-start2.png",
+      "size": [
+        384,
+        384
+      ],
+      "fit": 96
+    },
+    "store/start-3.png": {
+      "from": "st-sheet/st-starter__nb2-start3.png",
+      "size": [
+        384,
+        384
+      ],
+      "fit": 96
+    },
+    "store/start-4.png": {
+      "from": "st-sheet/st-starter__nb2-start4.png",
+      "size": [
+        384,
+        384
+      ],
+      "fit": 96
+    },
+    "store/start-5.png": {
+      "from": "st-sheet/st-starter__nb2-start5.png",
+      "size": [
+        384,
+        384
+      ],
+      "fit": 96
+    },
+    "store/pass-seal.png": {
+      "from": "st-sheet/st-starter__nb2-seal.png",
+      "size": [
+        192,
+        192
+      ],
+      "fit": 96
+    },
+    "store/pack-1.png": {
+      "from": "st-sheet/st-packs__nb2-en1.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 96
+    },
+    "store/pack-2.png": {
+      "from": "st-sheet/st-packs__nb2-en2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 96
+    },
+    "store/pack-3.png": {
+      "from": "st-sheet/st-packs__nb2-en3.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 96
+    },
+    "store/pack-4.png": {
+      "from": "st-sheet/st-packs__nb2-en4.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 96
+    },
+    "store/pack-5.png": {
+      "from": "st-sheet/st-packs__nb2-en5.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 96
+    },
+    "store/ad.png": {
+      "from": "st-sheet/st-packs__nb2-ad.png",
+      "size": [
+        192,
+        192
+      ],
+      "fit": 96
+    },
+    "store/sub-1.png": {
+      "from": "st-sheet/st-subs__nb2-sub1.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 96
+    },
+    "store/sub-2.png": {
+      "from": "st-sheet/st-subs__nb2-sub2.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 96
+    },
+    "store/sub-3.png": {
+      "from": "st-sheet/st-subs__nb2-sub3.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 96
+    },
+    "store/offer-path.png": {
+      "from": "st-sheet/st-subs__nb2-path.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 96
+    },
+    "store/offer-week.png": {
+      "from": "st-sheet/st-subs__nb2-week.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 96
+    },
+    "store/offer-fest.png": {
+      "from": "st-sheet/st-subs__nb2-fest.png",
+      "size": [
+        256,
+        256
+      ],
+      "fit": 96
+    },
+    "store/hall.jpg": {
+      "from": "st-hall/st-hall__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "rbook/book.webp": {
+      "from": "rb-wide/rb-book.cut.png",
+      "size": [
+        1997,
+        821
+      ]
+    },
+    "rbook/strip-s.webp": {
+      "from": "rb-strip/rb-strip-s.cut.png",
+      "size": [
+        636,
+        186
+      ]
+    },
+    "rbook/strip-m.webp": {
+      "from": "rb-strip/rb-strip-m.cut.png",
+      "size": [
+        899,
+        188
+      ]
+    },
+    "rbook/strip-l.webp": {
+      "from": "rb-strip/rb-strip-l.cut.png",
+      "size": [
+        1088,
+        191
+      ]
+    },
+    "rbook/frag-1.webp": {
+      "from": "rb-sheet/rb-frag-1.cut.png",
+      "size": [
+        168,
+        168
+      ]
+    },
+    "rbook/frag-2.webp": {
+      "from": "rb-sheet/rb-frag-2.cut.png",
+      "size": [
+        176,
+        175
+      ]
+    },
+    "rbook/frag-3.webp": {
+      "from": "rb-sheet/rb-frag-3.cut.png",
+      "size": [
+        176,
+        177
+      ]
+    },
+    "rbook/frag-4.webp": {
+      "from": "rb-sheet/rb-frag-4.cut.png",
+      "size": [
+        168,
+        168
+      ]
+    },
+    "rbook/frag-5.webp": {
+      "from": "rb-sheet/rb-frag-5.cut.png",
+      "size": [
+        168,
+        168
+      ]
+    },
+    "rbook/frag-6.webp": {
+      "from": "rb-sheet/rb-frag-6.cut.png",
+      "size": [
+        176,
+        177
+      ]
+    },
+    "rbook/frag-7.webp": {
+      "from": "rb-sheet/rb-frag-7.cut.png",
+      "size": [
+        160,
+        161
+      ]
+    },
+    "rbook/frag-8.webp": {
+      "from": "rb-sheet/rb-frag-8.cut.png",
+      "size": [
+        160,
+        159
+      ]
+    },
+    "rbook/frag-9.webp": {
+      "from": "rb-sheet/rb-frag-9.cut.png",
+      "size": [
+        176,
+        177
+      ]
+    },
+    "chests/keys/r1-body.webp": {
+      "from": "chest-sheet/chs-keys/r1.body.png",
+      "size": [
+        955,
+        374
+      ]
+    },
+    "chests/keys/r1-lid.webp": {
+      "from": "chest-sheet/chs-keys/r1.lid.png",
+      "size": [
+        960,
+        355
+      ]
+    },
+    "chests/keys/r1.webp": {
+      "from": "chest-sheet/chs-keys/r1.png",
+      "size": [
+        256,
+        194
+      ]
+    },
+    "chests/keys/r2-body.webp": {
+      "from": "chest-sheet/chs-keys/r2.body.png",
+      "size": [
+        951,
+        377
+      ]
+    },
+    "chests/keys/r2-lid.webp": {
+      "from": "chest-sheet/chs-keys/r2.lid.png",
+      "size": [
+        960,
+        357
+      ]
+    },
+    "chests/keys/r2.webp": {
+      "from": "chest-sheet/chs-keys/r2.png",
+      "size": [
+        256,
+        195
+      ]
+    },
+    "chests/keys/r3-body.webp": {
+      "from": "chest-sheet/chs-keys/r3.body.png",
+      "size": [
+        950,
+        377
+      ]
+    },
+    "chests/keys/r3-lid.webp": {
+      "from": "chest-sheet/chs-keys/r3.lid.png",
+      "size": [
+        960,
+        358
+      ]
+    },
+    "chests/keys/r3.webp": {
+      "from": "chest-sheet/chs-keys/r3.png",
+      "size": [
+        256,
+        195
+      ]
+    },
+    "chests/keys/r4-body.webp": {
+      "from": "chest-sheet/chs-keys/r4.body.png",
+      "size": [
+        950,
+        375
+      ]
+    },
+    "chests/keys/r4-lid.webp": {
+      "from": "chest-sheet/chs-keys/r4.lid.png",
+      "size": [
+        960,
+        358
+      ]
+    },
+    "chests/keys/r4.webp": {
+      "from": "chest-sheet/chs-keys/r4.png",
+      "size": [
+        256,
+        195
+      ]
+    },
+    "chests/keys/r5-body.webp": {
+      "from": "chest-sheet/chs-keys/r5.body.png",
+      "size": [
+        956,
+        381
+      ]
+    },
+    "chests/keys/r5-lid.webp": {
+      "from": "chest-sheet/chs-keys/r5.lid.png",
+      "size": [
+        960,
+        357
+      ]
+    },
+    "chests/keys/r5.webp": {
+      "from": "chest-sheet/chs-keys/r5.png",
+      "size": [
+        256,
+        196
+      ]
+    },
+    "chests/keys/r6-body.webp": {
+      "from": "chest-sheet/chs-keys/r6.body.png",
+      "size": [
+        957,
+        377
+      ]
+    },
+    "chests/keys/r6-lid.webp": {
+      "from": "chest-sheet/chs-keys/r6.lid.png",
+      "size": [
+        960,
+        437
+      ]
+    },
+    "chests/keys/r6.webp": {
+      "from": "chest-sheet/chs-keys/r6.png",
+      "size": [
+        256,
+        216
+      ]
+    },
+    "chests/keys/r7-body.webp": {
+      "from": "chest-sheet/chs-keys/r7.body.png",
+      "size": [
+        957,
+        380
+      ]
+    },
+    "chests/keys/r7-lid.webp": {
+      "from": "chest-sheet/chs-keys/r7.lid.png",
+      "size": [
+        960,
+        356
+      ]
+    },
+    "chests/keys/r7.webp": {
+      "from": "chest-sheet/chs-keys/r7.png",
+      "size": [
+        256,
+        196
+      ]
+    },
+    "chests/keys/lock.webp": {
+      "from": "chest-sheet/chs-keys/lock.png",
+      "size": [
+        240,
+        324
+      ]
+    },
+    "chests/workers/r1-body.webp": {
+      "from": "chest-sheet/chs-workers/r1.body.png",
+      "size": [
+        960,
+        446
+      ]
+    },
+    "chests/workers/r1-lid.webp": {
+      "from": "chest-sheet/chs-workers/r1.lid.png",
+      "size": [
+        869,
+        255
+      ]
+    },
+    "chests/workers/r1.webp": {
+      "from": "chest-sheet/chs-workers/r1.png",
+      "size": [
+        256,
+        186
+      ]
+    },
+    "chests/workers/r2-body.webp": {
+      "from": "chest-sheet/chs-workers/r2.body.png",
+      "size": [
+        960,
+        447
+      ]
+    },
+    "chests/workers/r2-lid.webp": {
+      "from": "chest-sheet/chs-workers/r2.lid.png",
+      "size": [
+        867,
+        253
+      ]
+    },
+    "chests/workers/r2.webp": {
+      "from": "chest-sheet/chs-workers/r2.png",
+      "size": [
+        256,
+        186
+      ]
+    },
+    "chests/workers/r3-body.webp": {
+      "from": "chest-sheet/chs-workers/r3.body.png",
+      "size": [
+        960,
+        446
+      ]
+    },
+    "chests/workers/r3-lid.webp": {
+      "from": "chest-sheet/chs-workers/r3.lid.png",
+      "size": [
+        868,
+        259
+      ]
+    },
+    "chests/workers/r3.webp": {
+      "from": "chest-sheet/chs-workers/r3.png",
+      "size": [
+        256,
+        188
+      ]
+    },
+    "chests/workers/r4-body.webp": {
+      "from": "chest-sheet/chs-workers/r4.body.png",
+      "size": [
+        960,
+        451
+      ]
+    },
+    "chests/workers/r4-lid.webp": {
+      "from": "chest-sheet/chs-workers/r4.lid.png",
+      "size": [
+        865,
+        254
+      ]
+    },
+    "chests/workers/r4.webp": {
+      "from": "chest-sheet/chs-workers/r4.png",
+      "size": [
+        256,
+        187
+      ]
+    },
+    "chests/workers/r5-body.webp": {
+      "from": "chest-sheet/chs-workers/r5.body.png",
+      "size": [
+        960,
+        445
+      ]
+    },
+    "chests/workers/r5-lid.webp": {
+      "from": "chest-sheet/chs-workers/r5.lid.png",
+      "size": [
+        866,
+        250
+      ]
+    },
+    "chests/workers/r5.webp": {
+      "from": "chest-sheet/chs-workers/r5.png",
+      "size": [
+        256,
+        184
+      ]
+    },
+    "chests/workers/r6-body.webp": {
+      "from": "chest-sheet/chs-workers/r6.body.png",
+      "size": [
+        960,
+        446
+      ]
+    },
+    "chests/workers/r6-lid.webp": {
+      "from": "chest-sheet/chs-workers/r6.lid.png",
+      "size": [
+        865,
+        248
+      ]
+    },
+    "chests/workers/r6.webp": {
+      "from": "chest-sheet/chs-workers/r6.png",
+      "size": [
+        256,
+        184
+      ]
+    },
+    "chests/workers/r7-body.webp": {
+      "from": "chest-sheet/chs-workers/r7.body.png",
+      "size": [
+        960,
+        442
+      ]
+    },
+    "chests/workers/r7-lid.webp": {
+      "from": "chest-sheet/chs-workers/r7.lid.png",
+      "size": [
+        861,
+        248
+      ]
+    },
+    "chests/workers/r7.webp": {
+      "from": "chest-sheet/chs-workers/r7.png",
+      "size": [
+        256,
+        183
+      ]
+    },
+    "chests/workers/lock.webp": {
+      "from": "chest-sheet/chs-workers/lock.png",
+      "size": [
+        240,
+        358
+      ]
+    },
+    "foes/fc1.jpg": "craft-boss/cb-fc1-torbjorn__nb2.jpg",
+    "foes/fb2.jpg": "craft-boss/cb-fb2-drill__nb2.jpg",
+    "foes/fb17.jpg": "craft-boss/cb-fb17-beetle-queen__nb2.jpg",
+    "foes/fb9.jpg": "craft-boss/cb-fb9-barrow-flame__nb2-v2.jpg",
+    "foes/fb15.jpg": "craft-boss/cb-fb15-she-who-waits__nb2.jpg",
+    "chests/equip/r1-body.webp": {
+      "from": "chest-sheet/chs-equip/r1.body.png",
+      "size": [
+        946,
+        376
+      ]
+    },
+    "chests/equip/r1-lid.webp": {
+      "from": "chest-sheet/chs-equip/r1.lid.png",
+      "size": [
+        960,
+        351
+      ]
+    },
+    "chests/equip/r1.webp": {
+      "from": "chest-sheet/chs-equip/r1.png",
+      "size": [
+        256,
+        193
+      ]
+    },
+    "chests/equip/r2-body.webp": {
+      "from": "chest-sheet/chs-equip/r2.body.png",
+      "size": [
+        947,
+        378
+      ]
+    },
+    "chests/equip/r2-lid.webp": {
+      "from": "chest-sheet/chs-equip/r2.lid.png",
+      "size": [
+        960,
+        351
+      ]
+    },
+    "chests/equip/r2.webp": {
+      "from": "chest-sheet/chs-equip/r2.png",
+      "size": [
+        256,
+        194
+      ]
+    },
+    "chests/equip/r3-body.webp": {
+      "from": "chest-sheet/chs-equip/r3.body.png",
+      "size": [
+        947,
+        378
+      ]
+    },
+    "chests/equip/r3-lid.webp": {
+      "from": "chest-sheet/chs-equip/r3.lid.png",
+      "size": [
+        960,
+        352
+      ]
+    },
+    "chests/equip/r3.webp": {
+      "from": "chest-sheet/chs-equip/r3.png",
+      "size": [
+        256,
+        194
+      ]
+    },
+    "chests/equip/r4-body.webp": {
+      "from": "chest-sheet/chs-equip/r4.body.png",
+      "size": [
+        948,
+        379
+      ]
+    },
+    "chests/equip/r4-lid.webp": {
+      "from": "chest-sheet/chs-equip/r4.lid.png",
+      "size": [
+        960,
+        354
+      ]
+    },
+    "chests/equip/r4.webp": {
+      "from": "chest-sheet/chs-equip/r4.png",
+      "size": [
+        256,
+        195
+      ]
+    },
+    "chests/equip/r5-body.webp": {
+      "from": "chest-sheet/chs-equip/r5.body.png",
+      "size": [
+        943,
+        383
+      ]
+    },
+    "chests/equip/r5-lid.webp": {
+      "from": "chest-sheet/chs-equip/r5.lid.png",
+      "size": [
+        960,
+        363
+      ]
+    },
+    "chests/equip/r5.webp": {
+      "from": "chest-sheet/chs-equip/r5.png",
+      "size": [
+        256,
+        198
+      ]
+    },
+    "chests/equip/r6-body.webp": {
+      "from": "chest-sheet/chs-equip/r6.body.png",
+      "size": [
+        937,
+        380
+      ]
+    },
+    "chests/equip/r6-lid.webp": {
+      "from": "chest-sheet/chs-equip/r6.lid.png",
+      "size": [
+        960,
+        360
+      ]
+    },
+    "chests/equip/r6.webp": {
+      "from": "chest-sheet/chs-equip/r6.png",
+      "size": [
+        256,
+        197
+      ]
+    },
+    "chests/equip/r7-body.webp": {
+      "from": "chest-sheet/chs-equip/r7.body.png",
+      "size": [
+        941,
+        380
+      ]
+    },
+    "chests/equip/r7-lid.webp": {
+      "from": "chest-sheet/chs-equip/r7.lid.png",
+      "size": [
+        960,
+        359
+      ]
+    },
+    "chests/equip/r7.webp": {
+      "from": "chest-sheet/chs-equip/r7.png",
+      "size": [
+        256,
+        196
+      ]
+    },
+    "chests/equip/lock.webp": {
+      "from": "chest-sheet/chs-equip/lock.png",
+      "size": [
+        240,
+        328
+      ]
+    },
+    "chests/wander/r1-body.webp": {
+      "from": "chest-sheet/chs-wander/r1.body.png",
+      "size": [
+        958,
+        374
+      ]
+    },
+    "chests/wander/r1-lid.webp": {
+      "from": "chest-sheet/chs-wander/r1.lid.png",
+      "size": [
+        960,
+        371
+      ]
+    },
+    "chests/wander/r1.webp": {
+      "from": "chest-sheet/chs-wander/r1.png",
+      "size": [
+        256,
+        198
+      ]
+    },
+    "chests/wander/r2-body.webp": {
+      "from": "chest-sheet/chs-wander/r2.body.png",
+      "size": [
+        957,
+        376
+      ]
+    },
+    "chests/wander/r2-lid.webp": {
+      "from": "chest-sheet/chs-wander/r2.lid.png",
+      "size": [
+        960,
+        372
+      ]
+    },
+    "chests/wander/r2.webp": {
+      "from": "chest-sheet/chs-wander/r2.png",
+      "size": [
+        256,
+        199
+      ]
+    },
+    "chests/wander/r3-body.webp": {
+      "from": "chest-sheet/chs-wander/r3.body.png",
+      "size": [
+        957,
+        376
+      ]
+    },
+    "chests/wander/r3-lid.webp": {
+      "from": "chest-sheet/chs-wander/r3.lid.png",
+      "size": [
+        960,
+        372
+      ]
+    },
+    "chests/wander/r3.webp": {
+      "from": "chest-sheet/chs-wander/r3.png",
+      "size": [
+        256,
+        199
+      ]
+    },
+    "chests/wander/r4-body.webp": {
+      "from": "chest-sheet/chs-wander/r4.body.png",
+      "size": [
+        956,
+        375
+      ]
+    },
+    "chests/wander/r4-lid.webp": {
+      "from": "chest-sheet/chs-wander/r4.lid.png",
+      "size": [
+        960,
+        371
+      ]
+    },
+    "chests/wander/r4.webp": {
+      "from": "chest-sheet/chs-wander/r4.png",
+      "size": [
+        256,
+        198
+      ]
+    },
+    "chests/wander/r5-body.webp": {
+      "from": "chest-sheet/chs-wander/r5.body.png",
+      "size": [
+        959,
+        361
+      ]
+    },
+    "chests/wander/r5-lid.webp": {
+      "from": "chest-sheet/chs-wander/r5.lid.png",
+      "size": [
+        960,
+        360
+      ]
+    },
+    "chests/wander/r5.webp": {
+      "from": "chest-sheet/chs-wander/r5.png",
+      "size": [
+        256,
+        192
+      ]
+    },
+    "chests/wander/r6-body.webp": {
+      "from": "chest-sheet/chs-wander/r6.body.png",
+      "size": [
+        957,
+        362
+      ]
+    },
+    "chests/wander/r6-lid.webp": {
+      "from": "chest-sheet/chs-wander/r6.lid.png",
+      "size": [
+        960,
+        390
+      ]
+    },
+    "chests/wander/r6.webp": {
+      "from": "chest-sheet/chs-wander/r6.png",
+      "size": [
+        256,
+        200
+      ]
+    },
+    "chests/wander/r7-body.webp": {
+      "from": "chest-sheet/chs-wander/r7.body.png",
+      "size": [
+        958,
+        363
+      ]
+    },
+    "chests/wander/r7-lid.webp": {
+      "from": "chest-sheet/chs-wander/r7.lid.png",
+      "size": [
+        960,
+        366
+      ]
+    },
+    "chests/wander/r7.webp": {
+      "from": "chest-sheet/chs-wander/r7.png",
+      "size": [
+        256,
+        194
+      ]
+    },
+    "chests/wander/lock.webp": {
+      "from": "chest-sheet/chs-wander/lock.png",
+      "size": [
+        240,
+        341
       ]
     }
   }

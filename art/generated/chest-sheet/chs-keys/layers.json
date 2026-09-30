@@ -1,0 +1,223 @@
+{
+  "sheet": "chest-sheet/chs-keys__nb2.raw.jpg",
+  "box": "keys",
+  "chests": [
+    {
+      "r": 1,
+      "frame": [
+        0,
+        0,
+        1474,
+        1116
+      ],
+      "seam": 543,
+      "lid": [
+        0,
+        0,
+        1474,
+        545
+      ],
+      "body": [
+        7,
+        541,
+        1467,
+        575
+      ],
+      "auto": 543,
+      "score": 52.47,
+      "rim": 57118,
+      "files": {
+        "whole": "chest-sheet/chs-keys/r1.png",
+        "lid": "chest-sheet/chs-keys/r1.lid.png",
+        "body": "chest-sheet/chs-keys/r1.body.png"
+      }
+    },
+    {
+      "r": 2,
+      "frame": [
+        0,
+        0,
+        1461,
+        1114
+      ],
+      "seam": 542,
+      "lid": [
+        0,
+        0,
+        1461,
+        544
+      ],
+      "body": [
+        8,
+        540,
+        1447,
+        574
+      ],
+      "auto": 542,
+      "score": 88.39,
+      "rim": 57745,
+      "files": {
+        "whole": "chest-sheet/chs-keys/r2.png",
+        "lid": "chest-sheet/chs-keys/r2.lid.png",
+        "body": "chest-sheet/chs-keys/r2.body.png"
+      }
+    },
+    {
+      "r": 3,
+      "frame": [
+        0,
+        0,
+        1460,
+        1114
+      ],
+      "seam": 543,
+      "lid": [
+        0,
+        0,
+        1460,
+        545
+      ],
+      "body": [
+        8,
+        541,
+        1445,
+        573
+      ],
+      "auto": 543,
+      "score": 47.26,
+      "rim": 57441,
+      "files": {
+        "whole": "chest-sheet/chs-keys/r3.png",
+        "lid": "chest-sheet/chs-keys/r3.lid.png",
+        "body": "chest-sheet/chs-keys/r3.body.png"
+      }
+    },
+    {
+      "r": 4,
+      "frame": [
+        0,
+        0,
+        1466,
+        1115
+      ],
+      "seam": 544,
+      "lid": [
+        0,
+        0,
+        1466,
+        546
+      ],
+      "body": [
+        8,
+        542,
+        1451,
+        573
+      ],
+      "auto": 544,
+      "score": 46.31,
+      "rim": 57527,
+      "files": {
+        "whole": "chest-sheet/chs-keys/r4.png",
+        "lid": "chest-sheet/chs-keys/r4.lid.png",
+        "body": "chest-sheet/chs-keys/r4.body.png"
+      }
+    },
+    {
+      "r": 5,
+      "frame": [
+        0,
+        0,
+        1468,
+        1124
+      ],
+      "seam": 544,
+      "lid": [
+        0,
+        0,
+        1468,
+        546
+      ],
+      "body": [
+        0,
+        542,
+        1462,
+        582
+      ],
+      "auto": 544,
+      "score": 47.76,
+      "rim": 58397,
+      "files": {
+        "whole": "chest-sheet/chs-keys/r5.png",
+        "lid": "chest-sheet/chs-keys/r5.lid.png",
+        "body": "chest-sheet/chs-keys/r5.body.png"
+      }
+    },
+    {
+      "r": 6,
+      "frame": [
+        0,
+        0,
+        1471,
+        1243
+      ],
+      "seam": 667,
+      "lid": [
+        0,
+        0,
+        1471,
+        669
+      ],
+      "body": [
+        0,
+        665,
+        1466,
+        578
+      ],
+      "auto": 667,
+      "score": 37.98,
+      "rim": 57515,
+      "files": {
+        "whole": "chest-sheet/chs-keys/r6.png",
+        "lid": "chest-sheet/chs-keys/r6.lid.png",
+        "body": "chest-sheet/chs-keys/r6.body.png"
+      }
+    },
+    {
+      "r": 7,
+      "frame": [
+        0,
+        0,
+        1471,
+        1124
+      ],
+      "seam": 544,
+      "lid": [
+        0,
+        0,
+        1471,
+        546
+      ],
+      "body": [
+        0,
+        542,
+        1466,
+        582
+      ],
+      "auto": 544,
+      "score": 79.53,
+      "rim": 58771,
+      "files": {
+        "whole": "chest-sheet/chs-keys/r7.png",
+        "lid": "chest-sheet/chs-keys/r7.lid.png",
+        "body": "chest-sheet/chs-keys/r7.body.png"
+      }
+    }
+  ],
+  "lock": {
+    "file": "chest-sheet/chs-keys/lock.png",
+    "px": [
+      866,
+      1168
+    ]
+  }
+}

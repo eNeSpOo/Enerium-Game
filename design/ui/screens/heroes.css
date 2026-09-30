@@ -118,6 +118,49 @@
 .hr-sqsel .iconbtn[disabled]{opacity:.4;cursor:not-allowed}
 .hr-from{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 12px;border-radius:10px;border:1px solid rgba(72,229,212,.35);background:rgba(72,229,212,.06);font-size:13px;color:var(--parch-2);flex:none}
 
+/* ---------- подсказка корешка нижней полки (sqPeek, screens/heroes.js): удержание — сведения над полкой, над пальцем ----------
+   Тёмное стекло с золотой нитью, как табличка выбранного героя; свет редкости из угла. Слева — мелкая книга героя (нажатие — книга),
+   справа — имя, редкость, класс и стихия, мощь крупно и «Книга героя», строкой — уровень, доблесть и пределы (замки книги). Хвостик —
+   на корешок (--sqp-ax). Место — sqPeekPlace. Появляется за 160 мс — только transform и opacity; «меньше движения» — сразу */
+.lb-sqr{position:relative}
+.sq-peek{--sqp-bw:58px;position:absolute;left:0;top:0;z-index:30;display:grid;grid-template-columns:var(--sqp-bw) minmax(0,1fr);gap:0 12px;align-items:start;
+  width:min(312px,calc(100% - 12px));padding:10px 12px 10px 10px;border-radius:12px;color:var(--parch);text-align:left;
+  border:1px solid color-mix(in srgb,var(--rc) 35%,rgba(221,188,122,.5));
+  background:radial-gradient(70% 60% at 0% 0%,color-mix(in srgb,var(--rc) 18%,transparent),transparent 72%),linear-gradient(180deg,rgba(19,25,24,.97),rgba(8,11,10,.98));
+  box-shadow:inset 0 1px 0 rgba(255,236,190,.1),0 0 0 1px rgba(0,0,0,.55),0 18px 36px -10px rgba(0,0,0,.95),0 0 26px -8px color-mix(in srgb,var(--rc) 55%,transparent);
+  animation:sqp-in .16s cubic-bezier(.2,.8,.2,1) both}
+.sq-peek::before{content:"";position:absolute;left:18px;right:18px;top:-1px;height:1px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(243,221,160,.95),transparent)}
+.sq-peek.pin{border-color:color-mix(in srgb,var(--rc) 45%,rgba(233,199,126,.75))}
+.sqp-tip{position:absolute;left:var(--sqp-ax,50%);top:100%;width:12px;height:12px;margin:-6px 0 0 -6px;transform:rotate(45deg);pointer-events:none;
+  background:#0a0e0d;border-right:1px solid color-mix(in srgb,var(--rc) 35%,rgba(221,188,122,.5));border-bottom:1px solid color-mix(in srgb,var(--rc) 35%,rgba(221,188,122,.5))}
+.sqp-bk{display:block;min-width:0}
+.sq-peek .sqp-bk>.hb{width:100%}
+.sq-peek .sqp-bk>.hb:hover{transform:translateY(-1px)}
+.sqp-tx{display:flex;flex-direction:column;gap:5px;min-width:0}
+.sqp-n{font:600 19px/1.02 var(--f-d);color:var(--gold);text-shadow:0 1px 2px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sqp-m{display:flex;align-items:center;gap:4px 8px;flex-wrap:wrap;min-width:0;font:700 11.5px/1.15 var(--f-u);color:var(--parch-2)}
+.sqp-m .rar{font-size:10.5px}
+.sqp-c{display:inline-flex;align-items:center;gap:4px;min-width:0;white-space:nowrap}
+.sqp-c .ico{width:14px;height:14px}
+.sqp-m .el{height:18px;padding:0 6px 0 5px;font-size:10px}
+.sqp-row{display:flex;align-items:center;gap:10px;min-width:0}
+.sqp-bm{display:inline-flex;align-items:center;gap:5px;flex:none;font:700 21px/1 var(--f-u);color:#f3dfa6;text-shadow:0 1px 2px #000;font-variant-numeric:lining-nums tabular-nums}
+.sqp-bm .ico{width:20px;height:20px}
+.sqp-go{margin-left:auto;flex:none;min-height:32px;padding:0 11px;gap:6px}
+.sqp-go .i{width:15px;height:15px}
+.sq-peek .hov{box-shadow:0 0 0 2px var(--spirit),0 0 16px var(--spirit)}
+.sq-peek .sqp-bk>.hb.hov{box-shadow:none;filter:drop-shadow(0 0 6px var(--spirit))}
+.sqp-st{display:flex;align-items:baseline;gap:3px 12px;flex-wrap:wrap;font:700 12px/1.1 var(--f-u);color:var(--parch-3);white-space:nowrap}
+.sqp-st b{font-size:13px;color:var(--parch)}
+.sqp-busy{align-self:flex-start;font:700 10.5px/1 var(--f-u);letter-spacing:.08em;text-transform:uppercase;color:var(--amber)}
+@keyframes sqp-in{from{opacity:0;transform:translateY(6px) scale(.97)}to{opacity:1;transform:none}}
+/* низкий экран (844×390): подсказка плотнее — книга мельче, мощь и имя меньше */
+.g.sm .sq-peek{--sqp-bw:50px;width:min(292px,calc(100% - 12px));padding:8px 10px 8px 8px;gap:0 10px}
+.g.sm .sqp-n{font-size:17px}
+.g.sm .sqp-bm{font-size:19px}
+.g.sm .sqp-tx{gap:4px}
+@media (prefers-reduced-motion:reduce){ .sq-peek{animation:none} }
+
 /* ---------- лист выбора отряда: пресеты чипами, состав, одна строка о готовности ---------- */
 .hr-chips{flex-wrap:wrap;gap:6px}
 .hr-chip{display:inline-flex;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font:700 13px/1 var(--f-u)}
@@ -336,7 +379,23 @@
 .dn-alt::after{content:"";position:absolute;left:-14px;right:-14px;bottom:-3px;height:9px;z-index:0;border-top:1px solid rgba(var(--dn-au),.5);background:linear-gradient(180deg,#151c19,#060807);box-shadow:0 -12px 30px -10px rgba(var(--dn-en),.4)}
 .dn-ni{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;min-width:0;height:100%;padding:0;border:0;background:none;color:var(--parch)}
 /* книга героя на ступени: дороже герой — крупнее книга (--g0, --g1 из DN_VIEW), не шире колонки */
-.dn-ni>.hb{flex:none;width:min(100%,calc((var(--g0) + var(--k) * var(--g1)) * .5 * 1cqh))}
+.dn-ni>.dn-fl{position:relative;flex:none;display:block;width:min(100%,calc((var(--g0) + var(--k) * var(--g1)) * .5 * 1cqh))}
+.dn-fl>.hb{width:100%;--gl-d:calc(var(--k) * var(--gl-st,1100ms));filter:drop-shadow(0 0 4px rgba(255,236,190,.4)) drop-shadow(0 0 12px color-mix(in srgb,var(--rc) 55%,transparent))}
+/* парит: книга плавно поднимается и опускается (слово автора 30.09.2026 — «левитация… плавно и подсвечивание»); свет редкости
+   и Энериума за книгой дышит в такт — ярче наверху; свет под книгой на ступени сжимается, когда книга выше. Период — --f-ms, фаза —
+   место × --f-st (пятеро не в такт), подъём — --f0 + место × --f1: дороже герой — выше. Только transform и opacity */
+.dn-fl{animation:dn-float var(--f-ms,4400ms) ease-in-out calc(var(--k) * var(--f-st,760ms) * -1) infinite}
+.dn-fl::before{content:"";position:absolute;left:-55%;right:-55%;top:-20%;bottom:-8%;z-index:-1;border-radius:50%;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(closest-side,rgba(255,246,222,.7),rgba(var(--dn-au),.5) 46%,color-mix(in srgb,var(--rc) 42%,transparent) 66%,transparent);
+  animation:dn-halo var(--f-ms,4400ms) ease-in-out calc(var(--k) * var(--f-st,760ms) * -1) infinite}
+.dn-ni.sel .dn-fl::before{background:radial-gradient(closest-side,rgba(255,250,232,.85),rgba(var(--dn-au),.72) 46%,color-mix(in srgb,var(--rc) 60%,transparent) 66%,transparent)}
+.dn-pd::before{content:"";position:absolute;left:14%;right:14%;top:-5px;height:10px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(var(--dn-en),.62),rgba(var(--dn-en),.16) 60%,transparent);
+  animation:dn-glow var(--f-ms,4400ms) ease-in-out calc(var(--k) * var(--f-st,760ms) * -1) infinite}
+@keyframes dn-float{0%,100%{transform:translateY(0)}50%{transform:translateY(calc(-1 * (var(--f0,4px) + var(--k) * var(--f1,1px))))}}
+@keyframes dn-halo{0%,100%{opacity:.5;transform:scale(.94)}50%{opacity:1;transform:scale(1.05)}}
+@keyframes dn-glow{0%,100%{opacity:1;transform:scaleX(1)}50%{opacity:.5;transform:scaleX(.74)}}
+@media (prefers-reduced-motion:reduce){ .dn-fl,.dn-fl::before,.dn-pd::before{animation:none} .dn-fl::before{opacity:.8} }
 /* сет будущего цикла: героев не видно до открытия цикла */
 .dn-alt.shut{display:flex;align-items:center;justify-content:center}
 .dn-shut{position:relative;z-index:1;display:flex;align-items:center;gap:8px;margin:0;font:italic 500 16px/1.3 var(--f-d);color:var(--parch-2);text-shadow:0 1px 3px #000}

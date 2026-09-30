@@ -1,90 +1,103 @@
-/* screens/book-pages.css — страницы раскрытой книги героя (screens/book-pages.js): сведения чернилами прямо по пергаменту разворота.
-   Слово автора 30.09.2026: «мы перешли с заглушек на красивый визуал, а внутри осталось всё по-старому, не порядок». Язык — тот же,
-   что у обложек, разворотов, шкафа Библиотеки и окон «Ремесла»: пергамент, чернила, старое золото, рубрика красным, буквицы, кожа
-   и латунь; главная кнопка — кожа в латуни с кристаллом карста.
+/* screens/book-pages.css — страницы раскрытой книги героя (screens/book-pages.js).
+   Слово автора 30.09.2026, вечер: «В открытой книге героя, не хватает тёмной подложки, ибо текст становиться где-то не читаемым или
+   трудно читаемым». Правая страница — лист чернёного пергамента, вклеенный в страницу книги: тот же материал, что карточка «Ремесла»
+   (craft/vellum.jpg), по краю — золотая линейка в две нити, вокруг — поле пергамента книги. Пишут по нему белилами и золотом,
+   рубрика — киноварью, главы — с буквицами; кнопки — кожа и латунь, главная — с кристаллом карста.
+   Контраст: самый светлый тон листа — --pg-hi (99-й перцентиль яркости текстуры); основной текст и подписи — не ниже 4,5 : 1 к нему
+   (считает tools/content-gen/screens/check_hero_book.js).
    Тема .pg — правая страница книги (.hb-rp), листы и окна поверх книги (класс ставит обёртка overlay в book-pages.js) и карточка
    «Что изменилось»; окно снаряжения .gw — та же тема (своя вёрстка — hero-dev.css). Общие токены цвета (--parch, --gold, --iron,
-   --spirit…) в теме — чернилами: чипы, строки, числа интерфейса сами пишутся по пергаменту; тёмные подложки компонентов перебиты ниже.
-   Иконки — тёмная живопись в край — лежат в рамках (латунь, железо, золото) как миниатюры в рукописи. Цвет редкости на пергаменте —
-   темнее (светлые --r1…--r7 сделаны для тёмного фона).
+   --spirit…) в теме — белилами и золотом по чёрному: чипы, строки, числа интерфейса сами пишутся по листу.
+   Иконки — тёмная живопись в край — лежат в гнёздах и рамках (латунь, железо, золото). Цвет редкости — свой, светлый (--r1…--r7).
    Движение — только transform и opacity; «меньше движения» — без движения. Свои классы — pg-*; страницы вкладок — .ab (способность),
-   .pgm (мощь), .pg-path (путь), .pg-who (герой). Числа вёрстки считает tools/content-gen/screens/check_hero_book.js. */
+   .pgm (мощь), .pg-path (путь), .pg-who (герой). Числа вёрстки считает check_hero_book.js. */
 
-/* ---------- тема: чернила по пергаменту ---------- */
-.pg,.gw{--pg-ink:#2b1c10;--pg-ink2:#5a422c;--pg-ink3:#876e53;--pg-rule:rgba(96,66,34,.3);--pg-rule2:rgba(96,66,34,.56);
-  --pg-red:#8c2a16;--pg-gold:#85591a;--pg-leaf:#c29443;--pg-teal:#0e665d;--pg-up:#2e6a24;--pg-down:#9a3219;--pg-well:#150e08;
-  --parch:var(--pg-ink);--parch-2:var(--pg-ink2);--parch-3:var(--pg-ink3);--gold:var(--pg-gold);--gold-2:var(--pg-gold);--gold-3:var(--pg-rule2);
-  --iron:var(--pg-rule);--iron-2:var(--pg-rule2);--spirit:var(--pg-teal);--amber:#96500f;--rust:var(--pg-down);
-  color:var(--pg-ink);scrollbar-color:rgba(96,66,34,.42) transparent}
-.pg *::-webkit-scrollbar-thumb,.gw *::-webkit-scrollbar-thumb{background:rgba(96,66,34,.42)}
+/* ---------- тема: белила и золото по чернёному пергаменту ---------- */
+.pg,.gw{--pg-ink:#efe3c6;--pg-ink2:#d2c3a1;--pg-ink3:#ab9c80;--pg-rule:rgba(214,178,112,.2);--pg-rule2:rgba(214,178,112,.42);
+  --pg-red:#e5836a;--pg-gold:#e2bf78;--pg-leaf:#c29443;--pg-teal:#5fdccb;--pg-up:#8fdc8f;--pg-down:#ff8e78;--pg-well:#070504;
+  --pg-page:#17120d;--pg-hi:#241d16;
+  --parch:var(--pg-ink);--parch-2:var(--pg-ink2);--parch-3:var(--pg-ink3);--gold:var(--pg-gold);--gold-2:#c9a15e;--gold-3:rgba(214,178,112,.45);
+  --iron:var(--pg-rule);--iron-2:var(--pg-rule2);--spirit:var(--pg-teal);--amber:#eab25a;--rust:var(--pg-down);
+  color:var(--pg-ink);scrollbar-color:rgba(214,178,112,.35) transparent}
+.pg *::-webkit-scrollbar-thumb,.gw *::-webkit-scrollbar-thumb{background:rgba(214,178,112,.35)}
 :is(.pg,.gw) .eyebrow{color:var(--pg-gold)}
 :is(.pg,.gw) .num{font-variant-numeric:lining-nums tabular-nums}
 :is(.pg,.gw) .reason{color:var(--pg-ink3)}
 :is(.pg,.gw) .reason.warn{color:var(--amber)}
-:is(.pg,.gw) .link{color:var(--pg-gold);text-decoration:underline;text-decoration-color:rgba(133,89,26,.35);text-underline-offset:3px}
-:is(.pg,.gw) .link:hover{color:var(--pg-red)}
+:is(.pg,.gw) .link{color:var(--pg-gold);text-decoration:underline;text-decoration-color:rgba(226,191,120,.35);text-underline-offset:3px}
+:is(.pg,.gw) .link:hover{color:#f6dfa9}
 :is(.pg,.gw) .muted{color:var(--pg-ink2)}
 :is(.pg,.gw) .faint{color:var(--pg-ink3)}
-/* цвет редкости по пергаменту — темнее; кристалл — тот же */
-:is(.pg,.gw) .rar{color:color-mix(in srgb,var(--rc) 52%,#2b1c10)}
-:is(.pg,.gw) .rar::before{filter:drop-shadow(0 1px 1px rgba(40,24,10,.5))}
-/* стихия: светлые карсты (воздух, свет) на пергаменте не видны — ромб с чернильной кромкой */
-:is(.pg,.gw) .el{background:rgba(255,250,236,.35);border-color:var(--pg-rule2);color:var(--pg-ink)}
-:is(.pg,.gw) .el::before{background:color-mix(in srgb,var(--c) 82%,#2b1c10);filter:drop-shadow(0 0 .6px #2b1c10) drop-shadow(0 0 .6px #2b1c10)}
-/* чипы — ярлычки чернилами по пергаменту */
-:is(.pg,.gw) .chip{background:rgba(255,250,236,.34);border-color:var(--pg-rule2);color:var(--pg-ink2)}
-:is(.pg,.gw) .chip.spirit{color:var(--pg-teal);border-color:rgba(14,102,93,.45);background:rgba(14,102,93,.07)}
-:is(.pg,.gw) .chip.gold{color:var(--pg-gold);border-color:rgba(133,89,26,.5);background:rgba(194,148,67,.12)}
-:is(.pg,.gw) .chip.warn{color:var(--amber);border-color:rgba(150,80,15,.42)}
-:is(.pg,.gw) .chip .ico{filter:drop-shadow(0 1px 1px rgba(40,24,10,.4))}
-/* полоса — желобок в пергаменте */
-:is(.pg,.gw) .bar{background:rgba(96,66,34,.16);box-shadow:inset 0 1px 2px rgba(60,36,14,.5),0 1px 0 rgba(255,250,236,.45)}
-:is(.pg,.gw) .bar>i{background:linear-gradient(90deg,#86591a,#d0a352)}
-:is(.pg,.gw) .bar.sp>i{background:linear-gradient(90deg,#0b554e,#2b9b8d)}
-/* «сколько за раз» — выбор чернилами: выбранное подчёркнуто красным */
-:is(.pg,.gw) .qty{border-color:var(--pg-rule2);background:rgba(255,250,236,.3);border-radius:5px}
+/* цвет редкости — свой светлый, кристалл — тот же */
+:is(.pg,.gw) .rar{color:var(--rc)}
+:is(.pg,.gw) .rar::before{filter:drop-shadow(0 1px 1px rgba(0,0,0,.8))}
+/* стихия — ромб в тёмной ячейке с золотой кромкой */
+:is(.pg,.gw) .el{background:rgba(8,6,4,.5);border-color:var(--pg-rule2);color:var(--pg-ink)}
+/* чипы — тёмные ярлычки с золотой нитью */
+:is(.pg,.gw) .chip{background:rgba(8,6,4,.5);border-color:var(--pg-rule2);color:var(--pg-ink2)}
+:is(.pg,.gw) .chip.spirit{color:var(--pg-teal);border-color:rgba(95,220,203,.4);background:rgba(16,64,58,.28)}
+:is(.pg,.gw) .chip.gold{color:var(--pg-gold);border-color:rgba(226,191,120,.45);background:rgba(120,86,30,.2)}
+:is(.pg,.gw) .chip.warn{color:var(--amber);border-color:rgba(234,178,90,.42)}
+:is(.pg,.gw) .chip .ico{filter:drop-shadow(0 1px 1px rgba(0,0,0,.7))}
+/* полоса — желобок в листе */
+:is(.pg,.gw) .bar{background:rgba(0,0,0,.5);box-shadow:inset 0 1px 2px rgba(0,0,0,.85),0 1px 0 rgba(255,236,190,.06)}
+:is(.pg,.gw) .bar>i{background:linear-gradient(90deg,#9a6c26,#e2bf78)}
+:is(.pg,.gw) .bar.sp>i{background:linear-gradient(90deg,#0f6a61,#5fdccb)}
+/* «сколько за раз» — выбранное подчёркнуто золотом */
+:is(.pg,.gw) .qty{border-color:var(--pg-rule2);background:rgba(8,6,4,.55);border-radius:6px}
 :is(.pg,.gw) .qty button{background:none;color:var(--pg-ink2)}
 :is(.pg,.gw) .qty button+button{box-shadow:inset 1px 0 0 var(--pg-rule)}
-:is(.pg,.gw) .qty button[aria-pressed="true"]{background:rgba(140,42,22,.09);color:var(--pg-red);box-shadow:inset 0 -2px 0 var(--pg-red)}
+:is(.pg,.gw) .qty button[aria-pressed="true"]{background:rgba(226,191,120,.14);color:#fbe8bd;box-shadow:inset 0 -2px 0 var(--pg-gold)}
 :is(.pg,.gw) .kv dt{color:var(--pg-ink3)}
 :is(.pg,.gw) .kv dd{color:var(--pg-ink)}
 :is(.pg,.gw) .quote{color:var(--pg-ink2)}
-:is(.pg,.gw) .iconbtn{border-color:var(--pg-rule2);background:linear-gradient(180deg,rgba(255,250,236,.55),rgba(226,206,160,.5));color:var(--pg-ink2);box-shadow:0 1px 2px rgba(60,36,14,.3)}
-:is(.pg,.gw) .iconbtn:hover{color:var(--pg-red);border-color:var(--pg-rule2)}
-:is(.pg,.gw) .search{border-color:var(--pg-rule2);background:rgba(255,250,236,.4);color:var(--pg-ink3)}
+:is(.pg,.gw) .iconbtn{border-color:var(--pg-rule2);background:linear-gradient(180deg,#2a1f15,#140e09);color:var(--pg-ink2);box-shadow:inset 0 1px 0 rgba(255,228,170,.08),0 1px 2px rgba(0,0,0,.6)}
+:is(.pg,.gw) .iconbtn:hover{color:#f6dfa9;border-color:rgba(226,191,120,.6)}
+:is(.pg,.gw) .search{border-color:var(--pg-rule2);background:rgba(8,6,4,.55);color:var(--pg-ink3)}
 :is(.pg,.gw) .search input{color:var(--pg-ink)}
-/* переключатель вкладок (запасы окна снаряжения) — желобок в пергаменте, выбранная — красная кожа, как закладка книги */
-:is(.pg,.gw) .tabs{background:rgba(96,66,34,.1);border-color:var(--pg-rule2)}
+/* переключатель вкладок (запасы окна снаряжения) — желобок, выбранная — красная кожа, как закладка книги */
+:is(.pg,.gw) .tabs{background:rgba(8,6,4,.6);border-color:var(--pg-rule2)}
 :is(.pg,.gw) .tabs button{color:var(--pg-ink3)}
 :is(.pg,.gw) .tabs button:hover{color:var(--pg-ink)}
 :is(.pg,.gw) .tabs button[aria-selected="true"]{color:#fde6ad;background:linear-gradient(180deg,#a2462b,#7a2e1b 56%,#62241a);text-shadow:0 1px 1px rgba(0,0,0,.6);
   box-shadow:inset 0 0 0 1px rgba(40,10,4,.6),inset 0 1px 0 rgba(255,214,160,.3)}
-/* плитки вещей и талисманов — тёмные миниатюры: знак-заглушка в них — светлый, а не чернилами */
 :is(.pg,.gw) :is(.eq-t,.tl-t){color:#efe2c0}
 
 /* ---------- кнопки: кожа и латунь; главная — кристалл карста в латуни, как в «Ремесле» ---------- */
 :is(.pg,.gw) .btn{border:1px solid #8a6a38;background:linear-gradient(180deg,#4a3120,#2e1d11 60%,#24160c);color:#ecd39c;text-shadow:0 1px 1px rgba(0,0,0,.7);
-  box-shadow:inset 0 1px 0 rgba(255,222,170,.18),inset 0 0 0 1px rgba(20,10,4,.5),0 2px 4px rgba(50,30,12,.4)}
+  box-shadow:inset 0 1px 0 rgba(255,222,170,.18),inset 0 0 0 1px rgba(20,10,4,.5),0 2px 4px rgba(0,0,0,.55)}
 :is(.pg,.gw) .btn:hover{filter:brightness(1.12)}
 :is(.pg,.gw) .btn.go{overflow:hidden;border-color:#b58d47;color:#f1fffc;text-shadow:0 0 10px rgba(72,229,212,.55),0 1px 1px rgba(0,0,0,.8);
   background:radial-gradient(120% 120% at 50% 135%,rgba(72,229,212,.62),transparent 60%),linear-gradient(180deg,#1f3a35,#10201d 60%,#0b1614);
-  box-shadow:inset 0 0 0 1px rgba(255,214,150,.22),inset 0 -12px 18px -10px rgba(72,229,212,.62),inset 0 1px 0 rgba(255,255,255,.14),0 3px 8px rgba(40,24,10,.5)}
+  box-shadow:inset 0 0 0 1px rgba(255,214,150,.22),inset 0 -12px 18px -10px rgba(72,229,212,.62),inset 0 1px 0 rgba(255,255,255,.14),0 3px 10px rgba(0,0,0,.6)}
 :is(.pg,.gw) .btn.go::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.2) 50%,transparent 65%);transform:translateX(-120%);transition:transform .7s cubic-bezier(.2,.8,.2,1)}
 :is(.pg,.gw) .btn.go:hover::after{transform:translateX(120%)}
 :is(.pg,.gw) .btn.ghost{border-color:transparent;background:none;box-shadow:none;color:var(--pg-gold);text-shadow:none}
-:is(.pg,.gw) .btn.ghost:hover{color:var(--pg-red);background:rgba(96,66,34,.08)}
-:is(.pg,.gw) .btn[disabled]{color:var(--pg-ink3);border:1px dashed var(--pg-rule2);background:rgba(255,250,236,.22);box-shadow:none;text-shadow:none;filter:none}
+:is(.pg,.gw) .btn.ghost:hover{color:#f6dfa9;background:rgba(214,178,112,.08)}
+:is(.pg,.gw) .btn[disabled]{color:var(--pg-ink3);border:1px dashed var(--pg-rule2);background:rgba(255,236,190,.03);box-shadow:none;text-shadow:none;filter:none}
 :is(.pg,.gw) .btn[disabled]::after{display:none}
 :is(.pg,.gw) .btn .cost{border-left-color:rgba(236,211,156,.25)}
 :is(.pg,.gw) .btn.go .cost{border-left-color:rgba(72,229,212,.35)}
 :is(.pg,.gw) .btn[disabled] .cost{border-left-color:var(--pg-rule)}
 :is(.pg,.gw) .btn .cost img{filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
 
-/* ---------- правая страница: закладки и тело вкладки ---------- */
-/* закладки — кожаные язычки над верхним краем страницы; выбранная — выше, красная кожа с золотым тиснением, её низ сливается со
-   страницей; под закладками — чернильная линейка */
+/* ---------- правая страница: лист чернёного пергамента, вклеенный в страницу книги ----------
+   Лист — слой ::before под сведениями: от низа закладок до полосы обреза, чуть шире поля .hb-rp (book.css) — вокруг остаётся край
+   пергамента книги. Текстура — чернёный пергамент «Ремесла» (PG_ART.img.vel: класс pg-vel у <html>), без неё — ровный тон --pg-page.
+   По краю — золотая линейка в две нити; снизу — едва заметный свет карста. Поля текста от края листа — padding страницы */
+.hb-rp.pg{padding:0 4px 0 4px}
+.hb-rp.pg::before{content:"";position:absolute;z-index:-1;left:-6px;right:-5px;top:var(--pg-sh,-3px);bottom:-3px;pointer-events:none;border:1px solid rgba(214,178,112,.55);border-radius:2px;
+  background:radial-gradient(110% 55% at 50% 108%,rgba(72,229,212,.07),transparent 62%),linear-gradient(180deg,rgba(255,236,190,.035),rgba(0,0,0,.2) 70%,rgba(0,0,0,.32)),var(--pg-page);
+  box-shadow:0 0 0 1px rgba(26,14,6,.75),0 2px 9px rgba(30,16,6,.6),inset 0 0 0 3px rgba(10,7,5,.55),inset 0 0 0 4px rgba(214,178,112,.24),inset 0 0 28px rgba(0,0,0,.55)}
+html.pg-vel .hb-rp.pg::before{background:radial-gradient(110% 55% at 50% 108%,rgba(72,229,212,.07),transparent 62%),linear-gradient(180deg,rgba(255,236,190,.03),rgba(0,0,0,.18) 70%,rgba(0,0,0,.3)),var(--pg-vel) 0 0/388px auto,var(--pg-page)}
+/* закладки стоят над верхним краем листа: лист начинается под ними; закладкам — вся ширина страницы, поля листа им не нужны */
+.hb-rp.pg:has(.pg-tabs){--pg-sh:17px}
+.hb-rp.pg .pg-tabs{margin-left:-4px;margin-right:-4px}
+
+/* ---------- закладки и тело вкладки ---------- */
+/* закладки — кожаные язычки над верхним краем листа; выбранная — выше, красная кожа с золотым тиснением */
 .pg-tabs{position:relative;z-index:2;flex:none;display:flex;align-items:flex-end;gap:2px;height:30px;margin-top:-13px;padding:0 1px;
-  box-shadow:inset 0 -1px 0 var(--pg-rule2)}
+  box-shadow:inset 0 -1px 0 rgba(214,178,112,.5)}
 .pg-bmk{position:relative;flex:none;display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 var(--pg-tp,8px);border:0;border-radius:7px 7px 0 0;
   background:linear-gradient(180deg,#6d4a2e,#4a301d 58%,#3b2515);color:#e3c994;font:700 var(--pg-tf,10.5px)/1 var(--f-u);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;
   text-shadow:0 1px 1px rgba(0,0,0,.75);box-shadow:inset 0 0 0 1px rgba(20,10,4,.55),inset 0 1px 0 rgba(255,222,170,.22),0 -1px 3px rgba(40,24,10,.25);transition:transform .15s ease}
@@ -105,50 +118,102 @@ html.pg-tab .pg-bmk::before{display:none}
 .pg-b{position:relative;flex:1 1 0;min-height:0;display:flex;flex-direction:column}
 .pg-b.pg-in{animation:pg-in var(--pg-t,220ms) cubic-bezier(.2,.8,.2,1) var(--pg-d,0ms) both}
 @keyframes pg-in{from{opacity:0;transform:translateY(var(--pg-y,5px))}to{opacity:1;transform:translateY(0)}}
-/* рубрика — заголовок раздела красным между двух линеек */
+/* рубрика — заголовок раздела киноварью между двух золотых линеек */
 .pg-h{display:flex;align-items:center;gap:8px;margin:2px 0 0;font:600 15px/1.1 var(--f-d);letter-spacing:.03em;color:var(--pg-red)}
 .pg-h::before,.pg-h::after{content:"";flex:1 1 0;height:1px;background:linear-gradient(90deg,transparent,var(--pg-rule2))}
 .pg-h::after{background:linear-gradient(90deg,var(--pg-rule2),transparent)}
-/* буквица — первая буква главы и истории: крупно, красным, с золотой тенью */
-.pg .dcap{float:left;margin:4px 5px -3px 0;font:700 39px/.76 var(--f-d);color:var(--pg-red);text-shadow:1px 1px 0 rgba(194,148,67,.6),2px 2px 0 rgba(96,66,34,.15)}
+/* буквица — первая буква главы и истории: крупно, киноварью, с золотой тенью */
+.pg .dcap{float:left;margin:4px 5px -3px 0;font:700 39px/.76 var(--f-d);color:var(--pg-red);text-shadow:1px 1px 0 rgba(0,0,0,.8),0 0 8px rgba(226,191,120,.35)}
 
-/* ---------- «Развитие»: путь, где герой сейчас, картуш следующего шага, тихая строка характеристик ---------- */
-.pg .hdv{gap:8px}
-.pg .hdv-seg{background:rgba(96,66,34,.15);box-shadow:inset 0 1px 2px rgba(60,36,14,.55),0 1px 0 rgba(255,250,236,.5)}
-.pg .hdv-seg>i{background:linear-gradient(90deg,#0b554e,#2b9b8d)}
-.pg .hdv-seg.done>i{background:linear-gradient(90deg,#86591a,#d4a655)}
+/* ---------- «Развитие»: путь, строка «уровень · предел · доблесть», карточка шага во всю высоту страницы ----------
+   Слово автора 30.09.2026: «меню после прокачки за дух не показывает, сколько статов и атрибутов станет у героя… кнопка не удобна
+   для большого пальца правой руки». Карточка — что станет с героем (мощь и атрибуты «было → станет», характеристики тихой строкой)
+   и одно действие внизу справа: снизу страницы, у правого края — под большим пальцем правой руки; кнопка не ниже 44 px, цена на ней.
+   Раскладку «Развития» на странице книги задаёт этот файл (правила .hb-hd .hdv-* в book.css — прежние, перебиты здесь) */
+.pg .hdv{gap:6px}
+.pg .hb-hd .hdv{overflow:hidden}
+/* путь на странице — без подписей у ворот и звезды: уровень потолка и доблесть — в строке под путём; место отдано превью шага */
+.pg .hdv-track{height:26px}
+.pg .hdv-gate small,.pg .hdv-star small{display:none}
+.pg .hdv-seg{background:rgba(0,0,0,.5);box-shadow:inset 0 1px 2px rgba(0,0,0,.8),0 1px 0 rgba(255,236,190,.06)}
+.pg .hdv-seg>i{background:linear-gradient(90deg,#0f6a61,#5fdccb)}
+.pg .hdv-seg.done>i{background:linear-gradient(90deg,#9a6c26,#e2bf78)}
 .pg .hdv-gate{color:var(--pg-ink3)}
 .pg .hdv-gate small{color:var(--pg-ink3)}
 .pg .hdv-gate.next small{color:var(--pg-ink2)}
 .pg .hdv-gate.ready small{color:var(--pg-teal)}
 .pg .hdv-star{color:var(--pg-ink3)}
 .pg .hdv-star.ready,.pg .hdv-star.max,.pg .hdv-star:hover{color:var(--pg-gold)}
-.pg .hdv-star.ready::before{background:radial-gradient(closest-side,rgba(194,148,67,.55),transparent)}
-.pg .hdv-star.dot::after{background:var(--pg-teal);box-shadow:0 0 0 1.5px #f1e3c0}
+.pg .hdv-star.dot::after{background:var(--pg-teal);box-shadow:0 0 0 1.5px var(--pg-page),0 0 8px var(--pg-teal)}
 .hdv-sum{flex:none;display:flex;flex-wrap:wrap;gap:2px 14px;margin:-4px 0 0;font:400 11.5px/1.2 var(--f-u);letter-spacing:.02em;color:var(--parch-3)}
 .hdv-sum b{margin-left:2px;font-weight:700;font-size:14px;letter-spacing:0;color:var(--parch)}
 .hdv-sum small{margin-left:2px;font-size:11px;letter-spacing:0;color:var(--parch-3)}
-/* следующий шаг — картуш: двойная чернильная рамка с уголками, значок шага — тёмная лунка в латуни */
-.pg .hdv-next{position:relative;border:1px solid var(--pg-rule2);border-radius:3px;background:linear-gradient(180deg,rgba(255,250,236,.45),rgba(255,246,226,.18));
-  box-shadow:inset 0 0 0 3px rgba(255,250,236,.22),inset 0 0 0 4px var(--pg-rule),0 1px 0 rgba(255,250,236,.4)}
-.pg .hdv-next::before,.pg .hdv-next::after{content:"";position:absolute;width:9px;height:9px;border:1.5px solid var(--pg-red);pointer-events:none;opacity:.7}
-.pg .hdv-next::before{left:-3px;top:-3px;border-right:0;border-bottom:0}
-.pg .hdv-next::after{right:-3px;bottom:-3px;border-left:0;border-top:0}
-.pg .hdv-next[data-k="valor"]{border-color:rgba(133,89,26,.65);background:radial-gradient(110% 130% at 0% 100%,rgba(194,148,67,.2),transparent 62%),linear-gradient(180deg,rgba(255,250,236,.45),rgba(255,246,226,.18))}
-.pg .hdv-next[data-k="done"]{border-color:var(--pg-rule2)}
-.pg .hdv-ic{border-radius:6px;background:radial-gradient(circle at 50% 38%,#2d2117,var(--pg-well));color:#72e6d8;box-shadow:inset 0 0 0 1px #8a6a38,inset 0 0 0 2px #1d130a,0 1px 2px rgba(40,24,10,.45)}
-.pg .hdv-next[data-k="valor"] .hdv-ic,.pg .hdv-next[data-k="done"] .hdv-ic{background:radial-gradient(circle at 50% 38%,#33261a,var(--pg-well))}
-.pg .hdv-t{color:var(--pg-ink)}
-.pg .hdv-t .num{color:var(--pg-red)}
+/* карточка шага — рамка в две золотые нити: заголовок, превью «было → станет» (мощь — первой строкой), тихая строка характеристик,
+   низ — «сколько за раз» и главная кнопка с ценой у правого края */
+.pg .hb-hd .hdv-next{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:var(--pg-ng,4px);padding:var(--pg-np,8px) 10px;border:1px solid var(--pg-rule2);border-radius:3px;
+  background:linear-gradient(180deg,rgba(255,236,190,.05),rgba(0,0,0,.2));box-shadow:inset 0 0 0 3px rgba(0,0,0,.25),inset 0 0 0 4px var(--pg-rule)}
+.pg .hdv-next[data-k="valor"]{border-color:rgba(226,191,120,.62);background:radial-gradient(110% 80% at 0% 100%,rgba(194,148,67,.12),transparent 62%),linear-gradient(180deg,rgba(255,236,190,.05),rgba(0,0,0,.2))}
+.pg .hb-hd .hdv-hd{flex:none;display:flex;align-items:center;gap:9px;min-width:0}
+.pg .hb-hd .hdv-ic{flex:none;width:30px;height:30px;border-radius:6px;background:radial-gradient(circle at 50% 38%,#241a12,var(--pg-well));color:#72e6d8;box-shadow:inset 0 0 0 1px #8a6a38,inset 0 0 0 2px #1d130a,0 1px 2px rgba(0,0,0,.6)}
+.pg .hdv-next:is([data-k="valor"],[data-k="done"]) .hdv-ic{background:radial-gradient(circle at 50% 38%,#2d2116,var(--pg-well))}
+.pg .hb-hd .hdv-ic .rp-s{width:19px}
+.pg .hb-hd .hdv-ic>.ico{width:26px;height:26px}
+.pg .hb-hd .hdv-t{flex:1 1 auto;min-width:0;font:600 19px/1.1 var(--f-d);color:var(--pg-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pg .hdv-t .num{color:var(--pg-gold)}
 .pg .hdv-sub{color:var(--pg-ink2)}
-/* характеристики тихой строкой — ведут на «Мощь» */
-.pg .hdv-quiet{border-top:1px solid var(--pg-rule);border-radius:0}
-.pg .hdv-quiet .s5 .ico{opacity:1;filter:drop-shadow(0 1px 1px rgba(40,24,10,.45))}
-.pg .hdv-quiet .s5 b{color:var(--pg-ink)}
-.pg .hdv-quiet:hover .s5 b{color:var(--pg-red)}
-.pg .hdv-quiet .hdv-more{display:inline-grid;width:24px;height:24px;border-radius:50%}
+/* превью: строка — значок, что, было → станет; мощь — первой строкой золотом, с прибавкой */
+.pg .hdv-gain{flex:0 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;scrollbar-width:thin}
+.pg .hdv-g{display:grid;grid-template-columns:16px minmax(0,1fr) auto;gap:7px;align-items:center;min-height:var(--pg-gh,18px);border-bottom:1px dotted var(--pg-rule)}
+.pg .hdv-g .ic{display:grid;place-items:center}
+.pg .hdv-g .ic>.ico{width:16px;height:16px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.7))}
+.pg .hdv-g .ic>.i{width:14px;height:14px;color:var(--pg-ink3)}
+.pg .hdv-g .k{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;line-height:1.2;color:var(--pg-ink2)}
+.pg .hdv-g .v{display:inline-flex;align-items:baseline;justify-content:flex-end;gap:5px;white-space:nowrap;font:700 13.5px/1 var(--f-u);color:var(--pg-ink)}
+.pg .hdv-g .v s{text-decoration:none;font-weight:400;color:var(--pg-ink3)}
+.pg .hdv-g .v>i{font-style:normal;font-weight:400;color:var(--pg-ink3)}
+.pg .hdv-g.up .v b{color:var(--pg-up)}
+.pg .hdv-g.down .v b{color:var(--pg-down)}
+.pg .hdv-g .v em{margin-left:2px;font:700 11.5px/1 var(--f-u);font-style:normal;color:var(--pg-up)}
+.pg .hdv-g.bm .k{color:var(--pg-gold)}
+.pg .hdv-g.bm .v{font-size:14.5px}
+.pg .hdv-g.bm.up .v b{color:var(--pg-gold)}
+.pg .hdv-g.warn .k,.pg .hdv-g.warn .v{color:var(--amber)}
+.pg .hdv-g.note{grid-template-columns:16px minmax(0,1fr)}
+.pg .hdv-g.note .k{white-space:normal;font-size:12px;color:var(--pg-ink3)}
+.pg .hdv-g.note.warn .k{color:var(--amber)}
+/* характеристики тихой строкой: значок и число, изменившаяся — «было → станет»; нажатие — «Мощь» */
+.pg .hb-hd .hdv-quiet{flex:none;display:flex;align-items:center;gap:6px;min-height:var(--pg-qr,20px);margin:0;padding:0 0 2px;border:0;border-bottom:1px solid var(--pg-rule);cursor:pointer}
+.pg .hdv-quiet .st5{display:flex;flex-wrap:wrap;gap:2px 10px;flex:1 1 auto;min-width:0}
+.pg .hdv-quiet .s5{display:inline-flex;flex-direction:row;align-items:center;gap:4px;padding:0;border-radius:0;background:none}
+.pg .hdv-quiet .s5 .ico{width:16px;height:16px;opacity:1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.7))}
+.pg .hdv-quiet .s5 b{font:700 13.5px/1 var(--f-u);color:var(--pg-ink)}
+.pg .hdv-quiet .s5 i{font:700 12px/1 var(--f-u);font-style:normal;color:var(--pg-up)}
+.pg .hdv-quiet:hover .s5 b{color:#f6dfa9}
+.pg .hb-hd .hdv-quiet .hdv-more{display:inline-grid;width:20px;height:20px;margin-left:auto;border-radius:50%}
+.pg .hb-hd .hdv-quiet .hdv-more .i{width:12px;height:12px}
+/* низ карточки: слева — «сколько за раз» или путь к недостающему, у правого края — главная кнопка во всю высоту касания: подпись,
+   под ней — цена (в две строки кнопка узкая и не выходит за самую узкую страницу) */
+.pg .hb-hd .hdv-act{flex:none;display:flex;align-items:center;gap:8px;min-width:0;margin-top:auto;padding-top:0;border-top:0}
+.pg .hdv-act .qty{flex:none}
+.pg .hdv-act .qty button{height:var(--pg-qh,40px);padding:0 var(--pg-qp,10px);font-size:13px}
+.pg .hdv-act .link{flex:0 1 auto;min-width:0;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pg .hb-hd .hdv-act .hdv-go.btn{flex:none;flex-direction:column;gap:3px;margin-left:auto;min-height:var(--pg-goh,46px);padding:0 16px;font-size:14px;line-height:1}
+.pg .hdv-act .hdv-go .cost{gap:5px;margin:0;padding:0;border-left:0;font-size:13.5px;line-height:1}
+.pg .hdv-act .hdv-go .cost img{width:16px;height:16px}
 /* цена у кнопки в картуше */
 .pg .hdv-rn::before{background:radial-gradient(80% 80% at 50% 100%,color-mix(in srgb,var(--rc,#6b7178) 38%,transparent),transparent 72%),#1a120b}
+/* низкий экран 844 × 390: плотнее; кнопка — те же 44 px */
+.g.sm .pg .hdv{gap:4px}
+.g.sm .pg .hb-hd .hdv-next{--pg-ng:3px;--pg-np:6px;padding-left:9px;padding-right:9px}
+.g.sm .pg .hb-hd .hdv-t{font-size:17px}
+.g.sm .pg .hb-hd .hdv-ic{width:28px;height:28px}
+.g.sm .pg .hdv-g{--pg-gh:15px}
+.g.sm .pg .hdv-g .k{font-size:12px}
+.g.sm .pg .hdv-g .v{font-size:13px}
+.g.sm .pg .hdv-act{--pg-goh:44px;--pg-qh:38px;--pg-qp:8px}
+.g.sm .pg .hdv-quiet{--pg-qr:19px}
+.g.sm .pg .hb-hd .hdv-quiet .hdv-more{width:19px;height:19px}
+.g.sm .pg .hdv-quiet .st5{gap:2px 8px}
 
 /* ---------- «Мощь»: из чего сила героя ---------- */
 .pgm{flex:1 1 0;min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:var(--pg-mg,7px);padding-right:2px}
@@ -160,54 +225,53 @@ html.pg-tab .pg-bmk::before{display:none}
 .pgm-src b{font-weight:700;color:var(--pg-ink2)}
 .pgm-st{flex:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px}
 .pgm-s{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;padding:4px 0 3px;border:1px solid transparent;border-radius:5px;background:none;color:var(--pg-ink)}
-.pgm-s>.ico{width:var(--pg-si,28px);height:var(--pg-si,28px);filter:drop-shadow(0 1px 1px rgba(40,24,10,.5))}
-.pgm-s>b{font:600 var(--pg-sf,19px)/1 var(--f-d);color:var(--pg-ink)}   /* чернила явно: число не наследует чужой цвет */
+.pgm-s>.ico{width:var(--pg-si,28px);height:var(--pg-si,28px);filter:drop-shadow(0 1px 2px rgba(0,0,0,.8))}
+.pgm-s>b{font:600 var(--pg-sf,19px)/1 var(--f-d);color:var(--pg-ink)}   /* белила явно: число не наследует чужой цвет */
 .pgm-s>.eqd{position:absolute;top:3px;right:2px;font:700 10px/1 var(--f-u);color:var(--pg-teal)}
-.pgm-s .grade i{background:rgba(96,66,34,.22)}
-.pgm-s .grade i.on{background:var(--pg-teal);box-shadow:none}
+.pgm-s .grade i{background:rgba(214,178,112,.2)}
+.pgm-s .grade i.on{background:var(--pg-teal);box-shadow:0 0 5px rgba(95,220,203,.45)}
 .pgm-n{max-width:100%;overflow:hidden;text-overflow:ellipsis;font:700 9.5px/1 var(--f-u);letter-spacing:.04em;text-transform:uppercase;color:var(--pg-ink3);white-space:nowrap}
 /* главная характеристика — золотое свечение под значком; выбранная — рамкой */
-.pgm-s.main::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:5px;background:radial-gradient(70% 55% at 50% 28%,rgba(194,148,67,.32),transparent 72%)}
-.pgm-s[aria-pressed="true"]{border-color:var(--pg-rule2);background:rgba(255,250,236,.38);box-shadow:0 1px 0 rgba(255,250,236,.5)}
-.pgm-s:hover .pgm-n{color:var(--pg-red)}
+.pgm-s.main::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:5px;background:radial-gradient(70% 55% at 50% 28%,rgba(226,191,120,.22),transparent 72%)}
+.pgm-s[aria-pressed="true"]{border-color:var(--pg-rule2);background:rgba(255,236,190,.05);box-shadow:inset 0 0 12px rgba(0,0,0,.35)}
+.pgm-s:hover .pgm-n{color:var(--pg-gold)}
 .pgm-x{flex:none;margin:0;font:500 var(--pg-xf,14px)/1.28 var(--f-d);color:var(--pg-ink2);font-variant-numeric:lining-nums}
 .pgm-x b{font-weight:700;color:var(--pg-red)}
 .pgm-at{flex:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px 14px;padding-top:var(--pg-atp,4px);border-top:1px solid var(--pg-rule)}
 .pgm-c{display:flex;flex-direction:column;gap:1px;min-width:0}
 .pgm-c>.eyebrow{margin-bottom:2px}
 .pgm-a{display:grid;grid-template-columns:var(--pg-ai,18px) minmax(0,1fr) auto;gap:6px;align-items:center;min-height:var(--pg-ah,18px);border-bottom:1px dotted var(--pg-rule)}
-.pgm-a>.ico{width:var(--pg-ai,18px);height:var(--pg-ai,18px);filter:drop-shadow(0 1px 1px rgba(40,24,10,.45))}
+.pgm-a>.ico{width:var(--pg-ai,18px);height:var(--pg-ai,18px);filter:drop-shadow(0 1px 1px rgba(0,0,0,.7))}
 .pgm-a>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;line-height:1.2;color:var(--pg-ink2)}
 .pgm-a>b{font:700 13px/1 var(--f-u);color:var(--pg-ink)}
 
 /* ---------- «Снаряжение»: девять мест сеткой 3 × 3 и четыре талисмана 2 × 2 рядом; над каждой группой — рубрика с мощью ----------
    Раскладку мест на странице задаёт только этот файл: в других стилях правил .hd-gear … мест нет (check_hero_book.js сверяет каскад).
-   Размер места — --pg-slot, промежутки — --pg-sg и --pg-gg (на 844 × 390 — меньше: book.css, .g.sm .hb-rp) */
-.pg .hd-gear{display:grid;grid-template-columns:auto auto;justify-content:space-around;align-content:start;align-items:start;gap:var(--pg-gv,10px) var(--pg-gg,18px);padding-top:2px}
+   Размер места — --pg-slot, промежутки — --pg-sg и --pg-gg (на 844 × 390 — меньше: book.css, .g.sm .hb-rp).
+   Место — гнездо в листе: тёмная лунка в латунной кромке; надетое — живопись в тонкой тёмной рамке, редкость — светом снизу */
+.pg .hd-gear{display:grid;grid-template-columns:auto auto;grid-template-rows:auto minmax(0,1fr);justify-content:space-around;align-content:stretch;align-items:start;gap:var(--pg-gv,10px) var(--pg-gg,18px);padding-top:2px}
 .pg .hd-gear:has(> .shut){display:flex;flex-direction:column;justify-content:flex-start;gap:8px}
 .pg :is(.eq-row,.tl-row){display:grid;grid-template-columns:repeat(var(--pg-cols,3),var(--pg-slot,46px));gap:var(--pg-rg,4px) var(--pg-sg,7px);align-content:start;min-width:0}
 .pg .tl-row{--pg-cols:2;gap:6px calc(var(--pg-sg,7px) * 2)}
 .pg :is(.eq-row,.tl-row).shut{display:flex;flex-direction:column;gap:3px}
 .pg :is(.eq-slots,.tl-slots){display:contents}
-/* рубрика группы: красным по пергаменту, рядом — мощь от группы; узкой группе чип — строкой ниже */
+/* рубрика группы: киноварью, рядом — мощь от группы; узкой группе чип — строкой ниже */
 .pg .pg-rub{grid-column:1/-1;display:flex;align-items:center;flex-wrap:wrap;gap:3px 6px;min-width:0;min-height:var(--pg-rbh,18px);margin:0 0 1px;font:700 10px/1.1 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--pg-red)}
 .pg .pg-rub .chip{height:18px;padding:0 5px;gap:3px;font-size:10.5px;letter-spacing:0;text-transform:none}
 .pg .pg-rub .chip .ico{width:12px;height:12px}
-/* место — рамка и подпись под ней: высота — по содержимому, ширина — --pg-slot */
+/* место — гнездо и подпись под ним: высота — по содержимому, ширина — --pg-slot */
 .pg :is(.eq-slot,.tl-slot){--pw:var(--pg-slot,46px);position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;width:var(--pw);height:auto;min-height:0;max-height:none;aspect-ratio:auto;
   padding:0;border:0;border-radius:0;background:none;box-shadow:none;color:var(--pg-ink);font:inherit}
-/* надетое — миниатюра: тёмная лунка в латуни, снизу — свет редкости (ADR-0027); без арта рамку рисует CSS */
+/* гнездо: тёмная лунка в латунной кромке; надетое — свет редкости снизу (ADR-0027) и тонкая рамка цвета редкости */
 .pg :is(.eq-w,.tl-w){position:relative;flex:none;display:grid;place-items:center;width:var(--pw);height:var(--pw);border-radius:5px;
-  background:radial-gradient(85% 70% at 50% 106%,color-mix(in srgb,var(--rc,#6b5a44) 42%,transparent),transparent 72%),radial-gradient(circle at 50% 38%,#2c2016,var(--pg-well));
-  box-shadow:inset 0 0 0 2px #876438,inset 0 0 0 3px #22160b,inset 0 0 9px rgba(0,0,0,.6),0 1px 2px rgba(40,24,10,.45)}
-.pg .eq-slot.on .eq-w{box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--rc) 45%,#876438),inset 0 0 0 3px #22160b,inset 0 -3px 6px -2px color-mix(in srgb,var(--rc) 80%,transparent),0 1px 2px rgba(40,24,10,.45)}
+  background:radial-gradient(85% 70% at 50% 106%,color-mix(in srgb,var(--rc,#6b5a44) 40%,transparent),transparent 72%),radial-gradient(circle at 50% 40%,#1d1610,var(--pg-well));
+  box-shadow:inset 0 0 0 1px #7a5c33,inset 0 0 0 2px #120c07,inset 0 3px 9px rgba(0,0,0,.85),0 1px 0 rgba(255,236,190,.07),0 1px 3px rgba(0,0,0,.6)}
+.pg .eq-slot.on .eq-w{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--rc) 55%,#7a5c33),inset 0 0 0 2px #120c07,inset 0 -3px 7px -2px color-mix(in srgb,var(--rc) 80%,transparent),0 1px 3px rgba(0,0,0,.6)}
 .pg .eq-slot:is([data-r="5"],[data-r="6"],[data-r="7"]) .eq-w{filter:drop-shadow(0 0 4px color-mix(in srgb,var(--rc) 55%,transparent))}
 .pg .eq-w>.ico{width:86%;height:86%;border-radius:3px}
-/* пустое место — светлое углубление в странице и бледный рисунок пером того, что туда кладут: иконка места обращена в чернила
-   (тёмный фон живописи уходит в бумагу); под ним — имя места; нажатие — выбор из запасов */
-.pg .eq-slot.none .eq-w{background:linear-gradient(180deg,#e8d6ae,#d8c090);box-shadow:inset 0 0 0 1px rgba(96,66,34,.5),inset 0 2px 6px rgba(60,36,14,.28),0 1px 0 rgba(255,250,236,.5)}
-.pg .eq-slot.none .eq-w>.ico{opacity:.72;filter:grayscale(1) invert(1) contrast(1.6) sepia(.45);mix-blend-mode:multiply}
-.pg .eq-slot.none .eq-w>.i{width:55%;height:55%;opacity:.6;color:var(--pg-ink2)}
+/* пустое место — лунка и бледный силуэт того, что туда кладут; под ним — имя места; нажатие — выбор из запасов */
+.pg .eq-slot.none .eq-w>.ico{opacity:.3;filter:grayscale(1) brightness(1.25)}
+.pg .eq-slot.none .eq-w>.i{width:55%;height:55%;opacity:.55;color:var(--pg-ink3)}
 .pg :is(.eq-slot,.tl-slot):hover :is(.eq-w,.tl-w){transform:translateY(-1px)}
 .pg :is(.eq-slot,.tl-slot):focus-visible{outline:none}
 .pg :is(.eq-slot,.tl-slot):focus-visible :is(.eq-w,.tl-w){outline:2px solid var(--pg-teal);outline-offset:2px}
@@ -215,36 +279,41 @@ html.pg-tab .pg-bmk::before{display:none}
 .pg .tl-cap{max-width:calc(var(--pw) + var(--pg-sg,7px) * 2 - 1px)}
 .pg :is(.eq-slot,.tl-slot).none :is(.eq-cap,.tl-cap){font:italic 500 12px/1.1 var(--f-d);letter-spacing:0;color:var(--pg-ink2)}
 /* в запасах есть лучше — стрелка в углу рамки, внутри неё: закладки над страницей и соседняя подпись её не закрывают */
-.pg .eq-up{position:absolute;top:2px;right:2px;z-index:2;display:grid;place-items:center;width:15px;height:15px;border-radius:50%;background:var(--pg-up);color:#effbe6;box-shadow:0 0 0 1.5px #f2e4c2,0 1px 2px rgba(0,0,0,.45)}
+.pg .eq-up{position:absolute;top:2px;right:2px;z-index:2;display:grid;place-items:center;width:15px;height:15px;border-radius:50%;background:#2e7a2a;color:#effbe6;box-shadow:0 0 0 1.5px var(--pg-well),0 0 6px rgba(143,220,143,.45)}
 .pg .eq-up .i{width:10px;height:10px;stroke-width:2.4}
-/* талисман — огранённый медальон цвета редкости в оправе; пустая оправа — светлое углубление и плюс чернилами */
+/* талисман — огранённый медальон цвета редкости в оправе; пустая оправа — тёмная лунка и плюс */
 .pg .tl-w{border-radius:50%}
 .pg .tl-w .tl-t{--ts:calc(var(--pw) * .66)}
-.pg .tl-slot.none .tl-w{background:linear-gradient(180deg,#e8d6ae,#d8c090);box-shadow:inset 0 0 0 1px rgba(96,66,34,.5),inset 0 2px 6px rgba(60,36,14,.28)}
-.pg .tl-slot.none .tl-w>.i{width:36%;height:36%;color:var(--pg-ink2);opacity:.8}
-/* низ — одной строкой: вход в окно со всеми вещами и главное действие с прибавкой мощи на кнопке */
-.pg .hdg-f{grid-column:1/-1;flex-wrap:nowrap;min-width:0;padding-top:6px;border-top:1px solid var(--pg-rule)}
+.pg .tl-slot.none .tl-w>.i{width:36%;height:36%;color:var(--pg-ink3);opacity:.85}
+/* низ — одной строкой у нижнего края страницы: вход в окно со всеми вещами и главное действие с прибавкой мощи на кнопке — внизу справа,
+   под большим пальцем правой руки */
+.pg .hdg-f{grid-column:1/-1;align-self:end;flex-wrap:nowrap;min-width:0;padding-top:6px;border-top:1px solid var(--pg-rule)}
 .pg .hdg-f .reason{min-width:0;font-size:12px;color:var(--pg-ink2)}
 .pg .hdg-f .link{flex:none;font-size:12.5px}
-.pg .hdg-f .btn{flex:none}
+.pg .hdg-f .btn{flex:none;min-height:44px}
 .pg .hdg-f .btn .cost{padding-left:8px;font-size:12.5px}
+/* низкий экран 844 × 390: на самой низкой странице (ступень книги 5) низ с кнопкой 44 px помещается — промежутки, рубрика и подписи
+   пустых мест плотнее (переменные страницы — поверх book.css) */
+.g.sm .hb-rp.pg{--pg-gv:4px;--pg-rbh:15px;--pg-rg:2px}
+.g.sm .pg .hdg-f{padding-top:3px}
+.g.sm .pg :is(.eq-slot,.tl-slot).none :is(.eq-cap,.tl-cap){font-size:11px}
 
 /* ---------- «Навыки»: доли хода полосой; способность — значок в рамке вида, имя, вид и доблесть, доля хода, описание сразу ---------- */
 .ab-page{flex:1 1 0;min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:6px;padding:0 3px 0 var(--pg-abl,10px)}
 .ab-turn{flex:none;display:flex;flex-direction:column;gap:4px;padding-bottom:6px;border-bottom:1px solid var(--parch-3)}
 .pg .ab-turn{border-bottom-color:var(--pg-rule)}
-.ab-bar{display:flex;height:9px;border-radius:5px;overflow:hidden;background:rgba(96,66,34,.16);box-shadow:inset 0 1px 2px rgba(60,36,14,.5),0 1px 0 rgba(255,250,236,.45)}
+.ab-bar{display:flex;height:9px;border-radius:5px;overflow:hidden;background:rgba(0,0,0,.5);box-shadow:inset 0 1px 2px rgba(0,0,0,.8),0 1px 0 rgba(255,236,190,.06)}
 .ab-bar i{flex:var(--w) 1 0;min-width:3%;height:100%}
-.ab-bar i+i{box-shadow:inset 1px 0 0 rgba(255,250,236,.75)}
-.ab-bar i.a,.ab-leg i.a{background:color-mix(in srgb,var(--c,#a35a2e) 80%,#2b1c10)}
-.ab-bar i.u,.ab-leg i.u{background:linear-gradient(180deg,#e6c06e,#a8782c)}
-.ab-bar i.b,.ab-leg i.b{background:repeating-linear-gradient(135deg,rgba(96,66,34,.34) 0 2px,rgba(96,66,34,.1) 2px 5px)}
-:is(.ab-bar,.ab-leg) i[data-el="Воздух"]{--c:#6fa98a}
+.ab-bar i+i{box-shadow:inset 1px 0 0 rgba(10,7,5,.9)}
+.ab-bar i.a,.ab-leg i.a{background:var(--c,#c0703e)}
+.ab-bar i.u,.ab-leg i.u{background:linear-gradient(180deg,#f0cf85,#b8893a)}
+.ab-bar i.b,.ab-leg i.b{background:repeating-linear-gradient(135deg,rgba(214,178,112,.34) 0 2px,rgba(214,178,112,.1) 2px 5px)}
+:is(.ab-bar,.ab-leg) i[data-el="Воздух"]{--c:#8fd0ad}
 :is(.ab-bar,.ab-leg) i[data-el="Земля"]{--c:var(--earth)}
 :is(.ab-bar,.ab-leg) i[data-el="Огонь"]{--c:var(--fire)}
 :is(.ab-bar,.ab-leg) i[data-el="Вода"]{--c:var(--water)}
-:is(.ab-bar,.ab-leg) i[data-el="Время"]{--c:#2fa866}
-:is(.ab-bar,.ab-leg) i[data-el="Свет"]{--c:#c9a441}
+:is(.ab-bar,.ab-leg) i[data-el="Время"]{--c:#3fc47a}
+:is(.ab-bar,.ab-leg) i[data-el="Свет"]{--c:#e2c25a}
 :is(.ab-bar,.ab-leg) i[data-el="Тьма"]{--c:var(--dark)}
 .ab-leg{display:flex;flex-wrap:wrap;gap:2px 12px;margin:0;font-size:12px;line-height:1.3;color:var(--parch-2)}
 .ab-leg span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
@@ -257,23 +326,23 @@ div.ab[data-k]{display:grid;grid-template-columns:var(--pg-ic,40px) minmax(0,1fr
 .ab-ic{position:relative;display:grid;place-items:center;width:var(--pg-ic,40px);height:var(--pg-ic,40px);margin-top:1px;border-radius:4px;background:var(--pg-well,#0d1013);color:#e6d2a4}
 .ab-ic>.ico{display:block;width:100%;height:100%;border-radius:3px;object-fit:cover}
 .ab-ic>.i{width:52%;height:52%}
-/* рамки по виду без арта: активная — железо, ульта — старое золото, пассивка — круг, реакция — ржавая кромка, обычная атака — чернильный круг */
-div.ab[data-k="act"] .ab-ic{box-shadow:0 0 0 2px #4a4f55,0 0 0 3px #17191c,0 1px 3px 2px rgba(40,24,10,.32)}
-div.ab[data-k="ult"] .ab-ic{box-shadow:0 0 0 2px #cfa04b,0 0 0 3px #5b3c12,0 0 9px 2px rgba(210,160,70,.5)}
+/* рамки по виду без арта: активная — железо, ульта — старое золото, пассивка — круг, реакция — ржавая кромка, обычная атака — золотой круг */
+div.ab[data-k="act"] .ab-ic{box-shadow:0 0 0 2px #5a6068,0 0 0 3px #0c0d0f,0 1px 3px 2px rgba(0,0,0,.5)}
+div.ab[data-k="ult"] .ab-ic{box-shadow:0 0 0 2px #cfa04b,0 0 0 3px #3a2408,0 0 9px 2px rgba(210,160,70,.45)}
 div.ab[data-k="pas"] .ab-ic,div.ab[data-k="pas"] .ab-ic>.ico{border-radius:50%}
-div.ab[data-k="pas"] .ab-ic{box-shadow:0 0 0 2px #93703d,0 0 0 3px #2f2111,0 1px 3px 2px rgba(40,24,10,.3)}
-div.ab[data-k="react"] .ab-ic{border-radius:2px;box-shadow:0 0 0 2px #8e4d2a,0 0 0 3px #2c140a,0 1px 3px 2px rgba(80,30,10,.35)}
+div.ab[data-k="pas"] .ab-ic{box-shadow:0 0 0 2px #93703d,0 0 0 3px #1c1209,0 1px 3px 2px rgba(0,0,0,.5)}
+div.ab[data-k="react"] .ab-ic{border-radius:2px;box-shadow:0 0 0 2px #8e4d2a,0 0 0 3px #1c0c05,0 1px 3px 2px rgba(0,0,0,.5)}
 div.ab[data-k="basic"] .ab-ic{border-radius:50%;background:none;color:var(--parch-2);box-shadow:inset 0 0 0 1.5px var(--parch-3)}
 /* рамки рисунком (PG_ART.frames, pgFit в book-pages.js): слой поверх значка, окно рамки ложится на значок и заходит на его край;
    рамка шире значка — отступ между значком и текстом больше, у страницы слева — поле под шипы реакции */
 html.pg-f div.ab[data-k]{column-gap:var(--pg-icg,14px)}
-html.pg-f div.ab[data-k]:not([data-k="basic"]) .ab-ic{box-shadow:0 2px 5px rgba(40,24,10,.35)}
-html.pg-f div.ab[data-k]:not([data-k="basic"]) .ab-ic::after{content:"";position:absolute;inset:var(--pgfi);z-index:1;pointer-events:none;background:var(--pgf) center/100% 100% no-repeat;filter:drop-shadow(0 1px 1px rgba(40,24,10,.55))}
+html.pg-f div.ab[data-k]:not([data-k="basic"]) .ab-ic{box-shadow:0 2px 5px rgba(0,0,0,.55)}
+html.pg-f div.ab[data-k]:not([data-k="basic"]) .ab-ic::after{content:"";position:absolute;inset:var(--pgfi);z-index:1;pointer-events:none;background:var(--pgf) center/100% 100% no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.7))}
 html.pg-f div.ab[data-k="act"]{--pgf:var(--pg-f-act);--pgfi:var(--pg-fi-act)}
 html.pg-f div.ab[data-k="ult"]{--pgf:var(--pg-f-ult);--pgfi:var(--pg-fi-ult)}
 html.pg-f div.ab[data-k="pas"]{--pgf:var(--pg-f-pas);--pgfi:var(--pg-fi-pas)}
 html.pg-f div.ab[data-k="react"]{--pgf:var(--pg-f-react);--pgfi:var(--pg-fi-react)}
-html.pg-f div.ab[data-k].lock .ab-ic::after{filter:grayscale(.65) brightness(.92) drop-shadow(0 1px 1px rgba(40,24,10,.5))}
+html.pg-f div.ab[data-k].lock .ab-ic::after{filter:grayscale(.65) brightness(.85) drop-shadow(0 1px 1px rgba(0,0,0,.6))}
 .ab-t{min-width:0;display:flex;flex-direction:column;gap:1px}
 .ab-n{display:flex;align-items:baseline;gap:8px;min-width:0}
 /* имя способности — целиком: длинное переносится на вторую строку, а не режется многоточием */
@@ -285,10 +354,10 @@ html.pg-f div.ab[data-k].lock .ab-ic::after{filter:grayscale(.65) brightness(.92
 .ab-sh .i{width:11px;height:11px}
 .ab-k{font:700 9.5px/1.25 var(--f-u);letter-spacing:.09em;text-transform:uppercase;color:var(--gold-2)}
 .ab-x{margin:1px 0 0;font:500 14px/1.28 var(--f-d);color:var(--parch-2);font-variant-numeric:lining-nums}
-/* закрытая доблестью — приглушена: значок бледнее, вид и доблесть — красным «откроется на доблести N» */
+/* закрытая доблестью — приглушена: значок бледнее, вид и доблесть — киноварью «откроется на доблести N» */
 div.ab[data-k].lock{opacity:1}
 div.ab[data-k].lock .ab-ic{opacity:.72;filter:grayscale(.55) sepia(.2)}
-div.ab[data-k].lock .ab-n>b,div.ab[data-k].lock .ab-x{opacity:.62}
+div.ab[data-k].lock .ab-n>b,div.ab[data-k].lock .ab-x{opacity:.72}
 div.ab[data-k].lock .ab-k{color:var(--pg-red,#dc6a52)}
 
 /* ---------- «Путь»: главы читаются прямо в книге ---------- */
@@ -297,19 +366,19 @@ div.ab[data-k].lock .ab-k{color:var(--pg-red,#dc6a52)}
 .pg .chap{grid-template-columns:24px minmax(0,1fr);gap:3px 8px;padding:8px 0 9px;border-top:1px solid var(--pg-rule)}
 .pg .chaps>.chap:first-child{padding-top:2px}
 .pg .chap .n{font:700 17px/1 var(--f-d);color:var(--pg-red);padding-top:1px}
-.pg .chap b{display:block;font:700 16px/1.15 var(--f-d);color:var(--pg-ink)}
+.pg .chap b{display:block;font:700 16px/1.15 var(--f-d);color:var(--pg-gold)}
 .pg .chap .rs-p{margin:5px 0 0;font:500 14.5px/1.34 var(--f-d);color:var(--pg-ink);font-variant-numeric:lining-nums;text-align:justify;hyphens:auto}
 .pg .chap small{color:var(--pg-ink3)}
-.pg .chap.pro small{margin-top:3px;font:italic 500 14px/1.3 var(--f-d)}
+.pg .chap.pro small{margin-top:3px;font:italic 500 14px/1.3 var(--f-d);color:var(--pg-ink2)}
 .pg .chap.lock b,.pg .chap.lock .n{color:var(--pg-ink3)}
 .pg .chap.lock small{display:flex;align-items:center;gap:4px;margin-top:3px;font:700 10.5px/1.2 var(--f-u);letter-spacing:.06em;text-transform:uppercase;color:var(--pg-red)}
 .pg .chap.lock small .i{width:11px;height:11px}
 .pg .rs-none{display:flex;flex-direction:column;gap:2px;padding:6px 0}
 .pg .rs-none b{font:600 16px/1.1 var(--f-d);color:var(--pg-ink)}
-.pg .rs-none p{font:italic 500 14px/1.3 var(--f-d);color:var(--pg-ink3)}
-.pg .kh-set{border:1px solid var(--pg-rule2);border-radius:3px;background:rgba(255,250,236,.3)}
-.pg .kh-set h4{color:var(--pg-ink)}
-.pg .kh-mem button,.pg .kh-mem span{border-color:var(--pg-rule2);background:rgba(255,250,236,.45);color:var(--pg-ink)}
+.pg .rs-none p{font:italic 500 14px/1.3 var(--f-d);color:var(--pg-ink2)}
+.pg .kh-set{border:1px solid var(--pg-rule2);border-radius:3px;background:rgba(0,0,0,.25)}
+.pg .kh-set h4{color:var(--pg-gold)}
+.pg .kh-mem button,.pg .kh-mem span{border-color:var(--pg-rule2);background:rgba(8,6,4,.5);color:var(--pg-ink)}
 .pg .kh-mem small{color:var(--pg-ink3)}
 .pg .kh-tiers td{border-top-color:var(--pg-rule);color:var(--pg-ink2)}
 .pg .kh-tiers td:first-child{color:var(--pg-red)}
@@ -331,8 +400,8 @@ div.ab[data-k].lock .ab-k{color:var(--pg-red,#dc6a52)}
 .pg .hb-soul .eyebrow{color:var(--pg-red)}
 .pg .hb-sq{color:var(--pg-ink2)}
 .pg .hb-sbar small{color:var(--pg-ink)}
-.pg .hk-shb{background:rgba(96,66,34,.16);box-shadow:inset 0 1px 2px rgba(60,36,14,.5)}
-.pg .hb-hid .ico.ab-art{box-shadow:0 0 0 2px #876438,0 0 0 3px #22160b}
+.pg .hk-shb{background:rgba(0,0,0,.5);box-shadow:inset 0 1px 2px rgba(0,0,0,.8)}
+.pg .hb-hid .ico.ab-art{box-shadow:0 0 0 2px #7a5c33,0 0 0 3px #120c07}
 
 /* ---------- низ страницы: одно действие ---------- */
 /* низ книги «до покупки» — одной строкой: слева — что это за покупка и строка пояснения, справа — кнопка с ценой, она не сжимается */
@@ -345,70 +414,70 @@ div.ab[data-k].lock .ab-k{color:var(--pg-red,#dc6a52)}
 .pg .hcb-buy .reason.warn{color:var(--amber)}
 .pg .hcb-shb small{color:var(--pg-ink2)}
 
-/* ---------- листы и окна поверх книги: тот же пергамент ---------- */
-.ov>.sheet.pg,.ov>.dlg.pg{background:radial-gradient(120% 90% at 50% 40%,transparent 58%,rgba(92,58,22,.3)),var(--hb-leaf,none) center/cover no-repeat,linear-gradient(180deg,#ead9b1,#d6be8f)}
-.ov>.sheet.pg{border-left:5px solid #3b2516;box-shadow:inset 1px 0 0 rgba(255,230,180,.3),-24px 0 50px -18px rgba(0,0,0,.85)}
-.ov>.dlg.pg{border:1px solid #6d4e28;border-radius:4px;box-shadow:0 0 0 4px #3b2516,0 0 0 5px #8a6a38,0 30px 70px rgba(0,0,0,.8)}
-.pg :is(.sheet-h,.dlg-h) h2{color:var(--pg-red);text-shadow:none}
+/* ---------- листы и окна поверх книги: тот же чернёный пергамент в золотой линейке ---------- */
+.ov>.sheet.pg,.ov>.dlg.pg{background:radial-gradient(120% 60% at 50% 110%,rgba(72,229,212,.06),transparent 62%),linear-gradient(180deg,rgba(255,236,190,.03),rgba(0,0,0,.22)),var(--pg-page)}
+html.pg-vel .ov>:is(.sheet,.dlg).pg{background:radial-gradient(120% 60% at 50% 110%,rgba(72,229,212,.06),transparent 62%),linear-gradient(180deg,rgba(255,236,190,.025),rgba(0,0,0,.2)),var(--pg-vel) 0 0/388px auto,var(--pg-page)}
+.ov>.sheet.pg{border-left:1px solid rgba(214,178,112,.55);box-shadow:inset 3px 0 0 rgba(0,0,0,.45),inset 4px 0 0 rgba(214,178,112,.22),-30px 0 60px -20px rgba(0,0,0,.9)}
+.ov>.dlg.pg{border:1px solid rgba(214,178,112,.6);border-radius:3px;box-shadow:0 0 0 3px #1a120b,0 0 0 4px rgba(138,106,56,.8),inset 0 0 0 3px rgba(0,0,0,.4),inset 0 0 0 4px rgba(214,178,112,.2),0 30px 70px rgba(0,0,0,.85)}
+.pg :is(.sheet-h,.dlg-h) h2{color:var(--pg-gold);text-shadow:0 1px 2px #000,0 0 14px rgba(226,191,120,.18)}
 .pg .sheet-h{border-bottom:1px solid var(--pg-rule2)}
-.pg .sheet-f{border-top:1px solid var(--pg-rule2);background:rgba(96,66,34,.08)}
+.pg .sheet-f{border-top:1px solid var(--pg-rule2);background:rgba(0,0,0,.35)}
 .pg .dlg-f{border-top:1px solid var(--pg-rule)}
-.pg :is(.sheet-b,.dlg-b){scrollbar-color:rgba(96,66,34,.42) transparent}
-/* превью доблести и лист предела: столбцы «Получит» и «Начнёт заново» — пергамент с линейкой */
-.pg .hdv-pv section{border:1px solid var(--pg-rule2);border-radius:3px;background:rgba(255,250,236,.3)}
-.pg .hdv-pv .gain{border-color:rgba(133,89,26,.6);background:radial-gradient(100% 80% at 0% 100%,rgba(194,148,67,.16),transparent 60%),rgba(255,250,236,.3)}
+.pg :is(.sheet-b,.dlg-b){scrollbar-color:rgba(214,178,112,.35) transparent}
+/* превью доблести и лист предела: столбцы «Получит» и «Начнёт заново» — тёмные поля с золотой нитью */
+.pg .hdv-pv section{border:1px solid var(--pg-rule2);border-radius:3px;background:rgba(0,0,0,.28)}
+.pg .hdv-pv .gain{border-color:rgba(226,191,120,.55);background:radial-gradient(100% 80% at 0% 100%,rgba(194,148,67,.12),transparent 60%),rgba(0,0,0,.28)}
 .pg .hdv-r .v s{color:var(--pg-ink3)}
 .pg .hdv-st i{color:var(--pg-up)}
 .pg .hdv-lead{color:var(--pg-ink)}
-.pg .hdl-t .num{color:var(--pg-red)}
+.pg .hdl-t .num{color:var(--pg-gold)}
 .pg .hdl-kv dd.warn{color:var(--pg-down)}
 .pg .rs-line{color:var(--pg-ink2)}
-/* карточка «Что изменилось» после доблести — лист пергамента */
-.hdfx-card.pg{border:1px solid #6d4e28;border-radius:4px;background:radial-gradient(120% 90% at 50% 40%,transparent 58%,rgba(92,58,22,.3)),var(--hb-leaf,none) center/cover no-repeat,linear-gradient(180deg,#ead9b1,#d6be8f);
-  box-shadow:0 0 0 4px #3b2516,0 0 0 5px #8a6a38,0 30px 80px rgba(0,0,0,.75)}
-.hdfx-card.pg .eyebrow{color:var(--pg-red)}
+.pg .hdv-why{color:var(--pg-ink2)}
+/* карточка «Что изменилось» после доблести — лист чернёного пергамента */
+.hdfx-card.pg{border:1px solid rgba(214,178,112,.6);border-radius:3px;background:radial-gradient(120% 60% at 50% 110%,color-mix(in srgb,var(--rc) 12%,transparent),transparent 62%),linear-gradient(180deg,rgba(255,236,190,.03),rgba(0,0,0,.22)),var(--pg-page);
+  box-shadow:0 0 0 3px #1a120b,0 0 0 4px rgba(138,106,56,.8),inset 0 0 0 3px rgba(0,0,0,.4),inset 0 0 0 4px rgba(214,178,112,.2),0 30px 80px rgba(0,0,0,.8)}
+html.pg-vel .hdfx-card.pg{background:radial-gradient(120% 60% at 50% 110%,color-mix(in srgb,var(--rc) 12%,transparent),transparent 62%),linear-gradient(180deg,rgba(255,236,190,.025),rgba(0,0,0,.2)),var(--pg-vel) 0 0/388px auto,var(--pg-page)}
+.hdfx-card.pg .eyebrow{color:var(--pg-gold)}
 .hdfx-card.pg li:nth-child(n+2){border-top-color:var(--pg-rule)}
-.hdfx-card.pg .hdv-r.up .v b{color:var(--pg-red)}
+.hdfx-card.pg .hdv-r.up .v b{color:var(--pg-gold)}
 
-/* ---------- арт страниц (PG_ART): кнопки кожей в латуни, картуш пером, оправа талисмана, буквица, виньетки ----------
+/* ---------- арт страниц (PG_ART): кнопки кожей в латуни, оправа талисмана, буквица, золотые виньетки ----------
    Без выгрузки (нет класса у <html>) всё выше рисует CSS. Срезы и полосы border-image — переменные --pg-<имя>-s и --pg-<имя>-w */
 /* кнопки: главная — кожа в латуни с кристаллами карста по краям, простая — в тёмной бронзе; неактивная — прежняя пунктирная */
-html.pg-btn :is(.pg,.gw) .btn.go:not([disabled]){border-style:solid;border-color:transparent;border-width:var(--pg-btn-w);border-radius:0;padding:0 var(--pg-bp,4px);background:none;box-shadow:0 3px 6px -2px rgba(40,24,10,.45);
+html.pg-btn :is(.pg,.gw) .btn.go:not([disabled]){border-style:solid;border-color:transparent;border-width:var(--pg-btn-w);border-radius:0;padding:0 var(--pg-bp,4px);background:none;box-shadow:0 3px 6px -2px rgba(0,0,0,.6);
   border-image:var(--pg-btn) var(--pg-btn-s) fill / var(--pg-btn-w) stretch}
-html.pg-btn2 :is(.pg,.gw) .btn:not(.go):not(.ghost):not([disabled]){border-style:solid;border-color:transparent;border-width:var(--pg-btn2-w);border-radius:0;padding:0 var(--pg-bp,4px);background:none;box-shadow:0 3px 6px -2px rgba(40,24,10,.4);
+html.pg-btn2 :is(.pg,.gw) .btn:not(.go):not(.ghost):not([disabled]){border-style:solid;border-color:transparent;border-width:var(--pg-btn2-w);border-radius:0;padding:0 var(--pg-bp,4px);background:none;box-shadow:0 3px 6px -2px rgba(0,0,0,.55);
   border-image:var(--pg-btn2) var(--pg-btn2-s) fill / var(--pg-btn2-w) stretch}
-/* картуш следующего шага — двойная линия пером с завитками по углам; рисунок выступает за край, места не отнимает */
-html.pg-ink-cartouche .pg .hdv-next{border-color:transparent;box-shadow:none;border-image:var(--pg-ink-cartouche) var(--pg-cartouche-s) / var(--pg-cartouche-w) / 3px stretch}
-html.pg-ink-cartouche .pg .hdv-next::before,html.pg-ink-cartouche .pg .hdv-next::after{display:none}
 /* оправа талисмана — огранённая бронза с петлёй для шнурка; окно — вокруг медальона; пустая оправа — тёмное гнездо и плюс */
 html.pg-ft .pg .tl-w{background:none;box-shadow:none}
-html.pg-ft .pg .tl-w::after{content:"";position:absolute;inset:var(--pg-fi-tal);z-index:1;pointer-events:none;background:var(--pg-f-tal) center/100% 100% no-repeat;filter:drop-shadow(0 1px 1px rgba(40,24,10,.55))}
-html.pg-ft .pg .tl-slot.none .tl-w::before{content:"";position:absolute;left:18%;right:18%;top:12%;bottom:12%;clip-path:polygon(50% 0,100% 23%,100% 77%,50% 100%,0 77%,0 23%);background:radial-gradient(circle at 50% 30%,#ecdcb8,#d3b983 78%,#c5a871)}
+html.pg-ft .pg .tl-w::after{content:"";position:absolute;inset:var(--pg-fi-tal);z-index:1;pointer-events:none;background:var(--pg-f-tal) center/100% 100% no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.7))}
+html.pg-ft .pg .tl-slot.none .tl-w::before{content:"";position:absolute;left:18%;right:18%;top:12%;bottom:12%;clip-path:polygon(50% 0,100% 23%,100% 77%,50% 100%,0 77%,0 23%);background:radial-gradient(circle at 50% 36%,#211a13,#0b0806 78%)}
 html.pg-ft .pg .tl-slot.none .tl-w>.i{position:relative;z-index:1}
 html.pg-ft .pg .tl-row{row-gap:8px}
 html.pg-ft .pg .tl-row>.pg-rub{margin-bottom:3px}
 /* буквица — золотая буква на тёмно-бирюзовом поле в золотой рамке с лозой */
 html.pg-fc .pg .dcap{position:relative;display:grid;place-items:center;width:30px;height:31px;margin:5px 11px 1px 5px;border-radius:2px;
   background:radial-gradient(circle at 50% 38%,#17504a,#062220 78%);color:#f3d58c;font:700 26px/1 var(--f-d);text-shadow:0 1px 1px rgba(0,0,0,.85),0 0 6px rgba(194,148,67,.55)}
-html.pg-fc .pg .dcap::after{content:"";position:absolute;inset:var(--pg-fi-cap);pointer-events:none;background:var(--pg-f-cap) center/100% 100% no-repeat;filter:drop-shadow(0 1px 1px rgba(40,24,10,.5))}
-/* мощь — мечи в лавровом венке пером */
+html.pg-fc .pg .dcap::after{content:"";position:absolute;inset:var(--pg-fi-cap);pointer-events:none;background:var(--pg-f-cap) center/100% 100% no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
+/* мощь — мечи в лавровом венке золотом */
 .pgm-wr{flex:none;display:grid;place-items:center;width:var(--pg-wr,32px);height:var(--pg-wr,32px)}
-.pgm-wr>.ico{width:calc(var(--pg-wr,32px) * .66);height:calc(var(--pg-wr,32px) * .66);filter:drop-shadow(0 1px 1px rgba(40,24,10,.5))}
-html.pg-ink-wreath .pgm-wr{background:var(--pg-ink-wreath) center/contain no-repeat}
-/* главы — между ними розетка пером, после последней — концовка; история «до покупки» — от описи отделена заставкой */
-html.pg-ink-div .pg .chaps>.chap+.chap{border-top:0;padding-top:16px;background:var(--pg-ink-div) 50% 2px/58px auto no-repeat}
-html.pg-ink-tail .pg .chaps::after{content:"";display:block;height:20px;margin:2px 0 2px;background:var(--pg-ink-tail) center/auto 100% no-repeat;opacity:.9}
-html.pg-ink-head .pg .rs-kv{border-top:0;padding-top:31px;background:var(--pg-ink-head) 50% 2px/118px auto no-repeat}
+.pgm-wr>.ico{width:calc(var(--pg-wr,32px) * .66);height:calc(var(--pg-wr,32px) * .66);filter:drop-shadow(0 1px 2px rgba(0,0,0,.8))}
+html.pg-gilt-wreath .pgm-wr{background:var(--pg-gilt-wreath) center/contain no-repeat}
+/* главы — между ними золотая розетка, после последней — концовка; история «до покупки» — от описи отделена заставкой */
+html.pg-gilt-div .pg .chaps>.chap+.chap{border-top:0;padding-top:16px;background:var(--pg-gilt-div) 50% 2px/58px auto no-repeat}
+html.pg-gilt-tail .pg .chaps::after{content:"";display:block;height:20px;margin:2px 0 2px;background:var(--pg-gilt-tail) center/auto 100% no-repeat;opacity:.9}
+html.pg-gilt-head .pg .rs-kv{border-top:0;padding-top:31px;background:var(--pg-gilt-head) 50% 2px/118px auto no-repeat}
 
 /* ---------- UI-кит: раздел «Страницы книги героя» ---------- */
 .pgk-row{display:flex;flex-wrap:wrap;gap:var(--sp-l);align-items:flex-start}
 .pgk-f{margin:0;display:flex;flex-direction:column;gap:8px;width:362px;max-width:100%}
-.pgk-p{position:relative;height:332px;border-radius:4px;overflow:hidden;background:var(--hb-leaf,none) center/cover no-repeat,linear-gradient(180deg,#ead9b1,#d6be8f);box-shadow:0 0 0 4px #3b2516,0 0 0 5px #8a6a38}
+.pgk-p{position:relative;height:332px;border-radius:4px;overflow:hidden;isolation:isolate;background:var(--hb-leaf,none) center/cover no-repeat,linear-gradient(180deg,#ead9b1,#d6be8f);box-shadow:0 0 0 4px #3b2516,0 0 0 5px #8a6a38}
 .pgk-p>.hb-rp{position:absolute;inset:18px 12px 8px 16px}
 .pgk-f figcaption,.pgk-fr figcaption{font-size:12px;line-height:1.3;color:var(--parch-3)}
 .pgk-f figcaption b{display:block;margin-bottom:2px;font:600 15px/1.1 var(--f-d);color:var(--parch)}
-.pgk-fr{margin:0;display:flex;flex-direction:column;align-items:center;gap:8px;width:84px;padding:12px 0 8px;border-radius:6px;background:var(--hb-leaf,none) center/cover,linear-gradient(180deg,#ead9b1,#d6be8f)}
-.pgk-fr figcaption{color:#5a422c}
+.pgk-fr{margin:0;display:flex;flex-direction:column;align-items:center;gap:8px;width:84px;padding:12px 0 8px;border-radius:6px;background:linear-gradient(180deg,#1b150f,#0e0a07);box-shadow:inset 0 0 0 1px rgba(214,178,112,.35)}
+.pgk-fr figcaption{color:var(--parch-2)}
 .pgk-fr .ab{display:block;padding:0;border:0}
 
 @media (prefers-reduced-motion:reduce){

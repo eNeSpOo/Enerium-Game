@@ -21,9 +21,11 @@
    редкостей, одна карточка — самая ценная, затем сводка по редкостям.
    Анимация — CSS по времени: разметка рисуется из момента от начала показа (задержки --d…), поэтому перерисовка экрана посреди
    анимации её не рвёт. Движется только transform и opacity; частицы — EnFx (fx.js) в своём слое рядом с #game.
-   Арт — tools/art-gen/jobs/chests.json: сундук вида рисунком, корпус и крышка — отдельные слои (tools/art-gen/chest_layers.py), замок,
-   текстуры света. Выгруженные пути перечислены в CO_ART.ready: пока пути нет — прежний SVG и CSS-градиенты, битых картинок нет.
-   Редкость — светом и цветом токенов --r1…--r7 (ADR-0027), а не отдельными картинками.
+   Арт — сундук своего режима и своей редкости (слово автора 30.09.2026: «лутбоксы должны отличаться по виду от режима… генерить их
+   более крупными размерами»): листы tools/art-gen/jobs/chest-sheets.json — на режим семь редкостей и свой замок, сундук около 1380 px
+   исходника, в выгрузке 960 px; корпус и крышка — слои по шву (tools/art-gen/chest_layers.py sheets), CO_ART.sets. Пока лист режима
+   не выгружен — прежний сундук вида (jobs/chests.json, CO_ART.chests), за ним — SVG и CSS-градиенты; битых картинок нет.
+   Свет и цвет редкости по-прежнему дают токены --r1…--r7 (ADR-0027); рисунок редкости — материал, оковка и камень сундука.
    «Пропустить анимацию» — итог сразу; выбор помнит localStorage (en-co-skip), без него всё работает; при prefers-reduced-motion
    анимации нет. Числа вида — CO_VIEW, арт — CO_ART, демо сценариев — CO_DEMO. Служебное — только команде: TM из index.html.
    Автопроверка — tools/content-gen/screens/check_chest_open.js. */
@@ -109,12 +111,59 @@ const CO_VIEW = {
    tools/art-gen/jobs/chests.json → tools/art-gen/chest_layers.py → выгрузка export_ui.py в assets/art/chests/. ready — выгруженные
    пути: отмечаются после выгрузки. Пока пути нет — прежний SVG и CSS-градиенты. Сундук берёт рисунок, только когда выгружены оба слоя.
    chests — рамка сундука [x, y, ш, в], шов, крышка и корпус [x, y, ш, в] в px исходника 1200 × 896 (вывод chest_layers.py);
-   svg — то же у заглушки SVG, с её масштабом ‰; lock — размер замка в исходнике; fx — текстуры света */
+   svg — то же у заглушки SVG, с её масштабом ‰; lock — размер замка в исходнике; fx — текстуры света.
+   sets — листы режимов (jobs/chest-sheets.json → chest_layers.py sheets и spec): у вида — семь редкостей рисунком и свой замок.
+   scale — px сцены на 1000 px исходника листа (сундук в сцене — как прежний, около 236 px); lock — размер замка режима; by — по
+   редкостям рамка, шов, крышка и корпус в px вырезанного сундука. Пути — chests/<вид>/r<редкость>-body.webp, -lid.webp, плитка
+   запасов и наград r<редкость>.webp (тот же рисунок, уменьшенный), замок lock.webp */
 const CO_ART = {
   ready: ['chests/shards-body.png', 'chests/shards-lid.png', 'chests/keys-body.png', 'chests/keys-lid.png', 'chests/equip-body.png',
     'chests/equip-lid.png', 'chests/talisman-body.png', 'chests/talisman-lid.png', 'chests/workers-body.png', 'chests/workers-lid.png',
     'chests/craft-body.png', 'chests/craft-lid.png', 'chests/wander-body.png', 'chests/wander-lid.png', 'chests/lock.png',
-    'chests/fx-rays.png', 'chests/fx-flash.png', 'chests/fx-ring.png', 'chests/fx-haze.png', 'chests/fx-beam.png', 'chests/fx-dust.png'],   // выгрузка 29.09.2026
+    'chests/fx-rays.png', 'chests/fx-flash.png', 'chests/fx-ring.png', 'chests/fx-haze.png', 'chests/fx-beam.png', 'chests/fx-dust.png',   // выгрузка 29.09.2026
+    ...['shards', 'keys', 'equip', 'workers', 'wander'].flatMap(b => [1, 2, 3, 4, 5, 6, 7].flatMap(r => [`chests/${b}/r${r}-body.webp`, `chests/${b}/r${r}-lid.webp`, `chests/${b}/r${r}.webp`]).concat(`chests/${b}/lock.webp`))],   // листы режимов, 01.10.2026
+  sets: {
+    shards: { scale: 171, lock: [774, 1132], by: [
+      { frame: [0, 0, 1379, 1120], seam: 615, lid: [0, 0, 1379, 617], body: [2, 613, 1376, 507] },
+      { frame: [0, 0, 1378, 1123], seam: 617, lid: [0, 0, 1378, 619], body: [3, 615, 1375, 508] },
+      { frame: [0, 0, 1379, 1230], seam: 724, lid: [0, 0, 1379, 726], body: [2, 722, 1376, 508] },
+      { frame: [0, 0, 1379, 1217], seam: 710, lid: [0, 0, 1379, 712], body: [3, 708, 1376, 509] },
+      { frame: [0, 0, 1381, 1145], seam: 631, lid: [0, 0, 1381, 633], body: [4, 629, 1377, 516] },
+      { frame: [0, 0, 1381, 1224], seam: 715, lid: [0, 0, 1381, 717], body: [4, 713, 1377, 511] },
+      { frame: [0, 0, 1380, 1293], seam: 790, lid: [0, 0, 1380, 792], body: [5, 788, 1374, 505] }] },
+    keys: { scale: 161, lock: [866, 1168], by: [
+      { frame: [0, 0, 1474, 1116], seam: 543, lid: [0, 0, 1474, 545], body: [7, 541, 1467, 575] },
+      { frame: [0, 0, 1461, 1114], seam: 542, lid: [0, 0, 1461, 544], body: [8, 540, 1447, 574] },
+      { frame: [0, 0, 1460, 1114], seam: 543, lid: [0, 0, 1460, 545], body: [8, 541, 1445, 573] },
+      { frame: [0, 0, 1466, 1115], seam: 544, lid: [0, 0, 1466, 546], body: [8, 542, 1451, 573] },
+      { frame: [0, 0, 1468, 1124], seam: 544, lid: [0, 0, 1468, 546], body: [0, 542, 1462, 582] },
+      { frame: [0, 0, 1471, 1243], seam: 667, lid: [0, 0, 1471, 669], body: [0, 665, 1466, 578] },
+      { frame: [0, 0, 1471, 1124], seam: 544, lid: [0, 0, 1471, 546], body: [0, 542, 1466, 582] }] },
+    equip: { scale: 165, lock: [832, 1138], by: [
+      { frame: [0, 0, 1432, 1080], seam: 521, lid: [0, 0, 1432, 523], body: [10, 519, 1411, 561] },
+      { frame: [0, 0, 1426, 1079], seam: 520, lid: [0, 0, 1426, 522], body: [9, 518, 1407, 561] },
+      { frame: [0, 0, 1426, 1080], seam: 521, lid: [0, 0, 1426, 523], body: [11, 519, 1406, 561] },
+      { frame: [0, 0, 1417, 1079], seam: 521, lid: [0, 0, 1417, 523], body: [7, 519, 1400, 560] },
+      { frame: [0, 0, 1431, 1108], seam: 539, lid: [0, 0, 1431, 541], body: [15, 537, 1405, 571] },
+      { frame: [0, 0, 1443, 1108], seam: 539, lid: [0, 0, 1443, 541], body: [22, 537, 1408, 571] },
+      { frame: [0, 0, 1444, 1108], seam: 538, lid: [0, 0, 1444, 540], body: [14, 536, 1415, 572] }] },
+    workers: { scale: 160, lock: [782, 1165], by: [
+      { frame: [0, 0, 1473, 1072], seam: 389, lid: [70, 0, 1333, 391], body: [0, 387, 1473, 685] },
+      { frame: [0, 0, 1474, 1072], seam: 387, lid: [71, 0, 1331, 389], body: [0, 385, 1474, 687] },
+      { frame: [0, 0, 1473, 1079], seam: 396, lid: [70, 0, 1332, 398], body: [0, 394, 1473, 685] },
+      { frame: [0, 0, 1465, 1072], seam: 385, lid: [72, 0, 1320, 387], body: [0, 383, 1465, 689] },
+      { frame: [0, 0, 1475, 1063], seam: 382, lid: [73, 0, 1330, 384], body: [0, 380, 1475, 683] },
+      { frame: [0, 0, 1475, 1063], seam: 379, lid: [73, 0, 1329, 381], body: [0, 377, 1475, 686] },
+      { frame: [0, 0, 1486, 1064], seam: 382, lid: [81, 0, 1332, 384], body: [0, 380, 1486, 684] }] },
+    wander: { scale: 165, lock: [775, 1102], by: [
+      { frame: [0, 0, 1438, 1112], seam: 554, lid: [0, 0, 1438, 556], body: [2, 552, 1435, 560] },
+      { frame: [0, 0, 1433, 1113], seam: 554, lid: [0, 0, 1433, 556], body: [1, 552, 1429, 561] },
+      { frame: [0, 0, 1434, 1113], seam: 554, lid: [0, 0, 1434, 556], body: [3, 552, 1429, 561] },
+      { frame: [0, 0, 1438, 1113], seam: 554, lid: [0, 0, 1438, 556], body: [3, 552, 1432, 561] },
+      { frame: [0, 0, 1419, 1062], seam: 530, lid: [0, 0, 1419, 532], body: [1, 528, 1417, 534] },
+      { frame: [0, 0, 1422, 1110], seam: 576, lid: [0, 0, 1422, 578], body: [2, 574, 1417, 536] },
+      { frame: [0, 0, 1406, 1064], seam: 534, lid: [0, 0, 1406, 536], body: [2, 532, 1403, 532] }] },
+  },
   chests: {
     shards: { frame: [85, 47, 1030, 778], seam: 460, lid: [86, 47, 1027, 415], body: [85, 458, 1030, 367] },
     keys: { frame: [95, 88, 1009, 742], seam: 446, lid: [95, 88, 1009, 360], body: [99, 444, 1000, 386] },
@@ -170,25 +219,40 @@ function coTex(n) {
   const p = `chests/fx-${n}.png`;
   return coArtOk(p) ? { cls: ' co-tex', st: `--tex:url('${coAbs(p)}')` } : { cls: '', st: '' };
 }
-/* сундук вида рисунком — если выгружены оба слоя */
-function coChestArt(box) {
-  const g = CO_ART.chests[box], b = `chests/${box}-body.png`, l = `chests/${box}-lid.png`;
-  return g && coArtOk(b) && coArtOk(l) ? { g, s: CO_VIEW.geo.scale, body: AV(b), lid: AV(l), bodyAbs: coAbs(b), lidAbs: coAbs(l) } : null;
+/* пути листа режима: корпус, крышка, плитка сундука редкости r; замок режима */
+const coSetPath = (box, r, part) => `chests/${box}/r${r}${part ? '-' + part : ''}.webp`;
+const coSetLock = box => `chests/${box}/lock.webp`;
+/* замок сундука: замок режима, если выгружен лист; иначе общий. p — путь (null — заглушка SVG), px — размер в исходнике */
+function coLockOf(box) {
+  const S = CO_ART.sets[box];
+  if (S && coArtOk(coSetLock(box))) return { p: coSetLock(box), px: S.lock };
+  return { p: coArtOk('chests/lock.png') ? 'chests/lock.png' : null, px: CO_ART.lock };
+}
+/* сундук рисунком — если выгружены оба слоя: лист режима своей редкости, иначе прежний сундук вида */
+function coChestArt(box, r) {
+  const S = CO_ART.sets[box], g = S && S.by[(r || 1) - 1];
+  if (g) {
+    const b = coSetPath(box, r, 'body'), l = coSetPath(box, r, 'lid');
+    if (coArtOk(b) && coArtOk(l)) return { g, s: S.scale, set: true, body: AV(b), lid: AV(l), bodyAbs: coAbs(b), lidAbs: coAbs(l) };
+  }
+  const G = CO_ART.chests[box], b = `chests/${box}-body.png`, l = `chests/${box}-lid.png`;
+  return G && coArtOk(b) && coArtOk(l) ? { g: G, s: CO_VIEW.geo.scale, set: false, body: AV(b), lid: AV(l), bodyAbs: coAbs(b), lidAbs: coAbs(l) } : null;
 }
 /* раскладка сундука в px сцены: рамка, шов, крышка и корпус [x, y, ш, в], середина по крышке, глубина, перспектива, замок */
-function coChestGeo(box) {
-  const A = coChestArt(box), G = A ? A.g : CO_ART.svg, s = A ? A.s : CO_ART.svg.scale, V = CO_VIEW.geo;
+function coChestGeo(box, r) {
+  const A = coChestArt(box, r), G = A ? A.g : CO_ART.svg, s = A ? A.s : CO_ART.svg.scale, V = CO_VIEW.geo, K = coLockOf(box).px;
   const px = v => Math.round(v * s / 1000), [fx, fy, fw, fh] = G.frame;
   const part = ([x, y, w, h]) => [px(x - fx), px(y - fy), px(w), px(h)];
   const lid = part(G.lid), body = part(G.body), seam = px(G.seam - fy), inner = Math.min(lid[2], body[2]);
-  const cx = lid[0] + Math.round(lid[2] / 2), lw = Math.round(inner * V.lock / 1000), lh = Math.round(lw * CO_ART.lock[1] / CO_ART.lock[0]);
+  const cx = lid[0] + Math.round(lid[2] / 2), lw = Math.round(inner * V.lock / 1000), lh = Math.round(lw * K[1] / K[0]);
   return { A, w: px(fw), h: px(fh), seam, lid, body, inner, cx, depth: Math.round(lid[3] * V.depth / 1000), persp: Math.round(inner * V.persp / 1000),
     lock: [cx - Math.round(lw / 2), seam - lh + coPct(lh, V.lockDrop), lw, lh] };
 }
 /* картинки сундука и текстуры — заранее, чтобы к падению сундука они были готовы */
 const CO_PRE = new Set();
-function coPreload(box) {
-  const A = coChestArt(box), list = (A ? [A.body, A.lid] : []).concat(coArtOk('chests/lock.png') ? [AV('chests/lock.png')] : [], CO_ART.fx.filter(n => coArtOk(`chests/fx-${n}.png`)).map(n => AV(`chests/fx-${n}.png`)));
+function coPreload(box, r) {
+  const A = coChestArt(box, r), L = coLockOf(box).p;
+  const list = (A ? [A.body, A.lid] : []).concat(L ? [AV(L)] : [], CO_ART.fx.filter(n => coArtOk(`chests/fx-${n}.png`)).map(n => AV(`chests/fx-${n}.png`)));
   for (const u of list) if (!CO_PRE.has(u)) { CO_PRE.add(u); try { const im = new Image(); im.decoding = 'async'; im.src = u; } catch (_) { } }
 }
 
@@ -287,7 +351,7 @@ function coShow(last, o = {}) {
   const host = o.host === 'kit' ? 'kit' : 'game';
   coStop(coCur(host));
   const R = coRun(last, host, o);
-  coPreload(R.box);
+  coPreload(R.box, R.r);
   if (host === 'kit') CO_KIT.run = R; else { S.co.run = R; S.overlay = { t: 'co', arg: String(R.id) }; }
   if (coSkipOn()) { R.phase = 'res'; R.tr = R.t0; } else coSchedule(R);
   coPaint(R);
@@ -461,8 +525,9 @@ function coSvgPart(part, box, u) {
   return `<svg class="co-sv" viewBox="${G.join(' ')}" preserveAspectRatio="none" aria-hidden="true" focusable="false"><defs>${shade}</defs>${body}</svg>`;
 }
 /* замок: рисунок или заглушка SVG; скважина светится */
-function coLockArt() {
-  if (coArtOk('chests/lock.png')) return `<img src="${AV('chests/lock.png')}" alt="" draggable="false">`;
+function coLockArt(box) {
+  const L = coLockOf(box).p;
+  if (L) return `<img src="${AV(L)}" alt="" draggable="false">`;
   return `<svg class="co-sv" viewBox="0 0 82 100" aria-hidden="true" focusable="false"><path d="M19 42V28C19 14 29 6 41 6S63 14 63 28V42" fill="none" stroke="#3a3f45" stroke-width="10"/>
     <path d="M19 42V28C19 14 29 6 41 6S63 14 63 28V42" fill="none" stroke="#6b7078" stroke-width="3" stroke-opacity=".55"/><rect x="6" y="38" width="70" height="58" rx="14" fill="#b08c4e"/>
     <rect x="12" y="44" width="58" height="46" rx="10" fill="#2a2e33"/><path d="M41 55a7 7 0 0 1 4 12.7V78h-8V67.7A7 7 0 0 1 41 55z" fill="#07090b"/></svg>`;
@@ -560,7 +625,7 @@ function coResHtml(R, e) {
 function coStageHtml(R, e) {
   e = Math.max(0, Math.round(e || 0));
   const V = CO_VIEW, G = V.geo, T = R.T, anim = R.phase === 'anim', idle = R.phase === 'idle', d = t => `${t - e}ms`;
-  const C = coChestGeo(R.box), A = C.A, mx = Math.round(G.w / 2), gy = G.h - G.ground, top = gy - C.h, my = top + C.seam, cl = mx - C.cx;
+  const C = coChestGeo(R.box, R.r), A = C.A, mx = Math.round(G.w / 2), gy = G.h - G.ground, top = gy - C.h, my = top + C.seam, cl = mx - C.cx;
   const lv = idle ? [R.r] : R.climb, s = lv.length - 1, lt = k => idle ? 0 : T.lv[k], gild = R.r >= V.gild, H = T.H;
   const lvx = (k, out) => `${k === s && out == null ? ' z' : ''}" data-r="${lv[k]}" style="--l0:${d(lt(k))}${k < s ? `;--l1:${d(lt(k + 1))}` : out != null ? `;--l1:${d(out)}` : ''}`;
   const tex = n => coTex(n), rays = tex('rays'), ring = tex('ring'), haze = tex('haze'), beam = tex('beam'), dust = tex('dust'), flash = tex('flash');
@@ -580,7 +645,7 @@ function coStageHtml(R, e) {
         <div class="co-body" style="left:${bx}px;top:${by}px;width:${bw}px;height:${bh}px">${bodyArt}</div>
         <div class="co-bloom co-a" data-r="${R.b}" style="left:${C.cx - Math.round(C.inner / 2)}px;top:${C.seam}px;width:${C.inner}px"><i class="co-a"></i></div>
         ${lv.map((x, k) => `<div class="co-crk co-lvx${lvx(k, idle ? null : T.open)};left:${C.cx - Math.round(C.inner / 2)}px;top:${C.seam}px;width:${C.inner}px"><i class="co-a"></i><b class="co-leak co-a"></b></div>`).join('')}
-        <div class="co-lock co-a" style="left:${C.lock[0]}px;top:${C.lock[1]}px;width:${C.lock[2]}px;height:${C.lock[3]}px">${coLockArt()}<i class="co-kh co-a"></i></div>
+        <div class="co-lock co-a" style="left:${C.lock[0]}px;top:${C.lock[1]}px;width:${C.lock[2]}px;height:${C.lock[3]}px">${coLockArt(R.box)}<i class="co-kh co-a"></i></div>
       </div></div></div>${hops.map(() => '</div>').join('')}</div>
       ${R.n > 1 ? `<b class="co-n">×${fmt(R.n)}</b>` : ''}<i class="co-mpt" style="left:${C.cx}px;top:${C.seam}px"></i></div>`;
   /* фон сцены: дымка, кольцо под сундуком, ореол каждой ступени света, лучи и столп — после открытия */
@@ -719,10 +784,12 @@ function coKitBind() {
   });
   k.addEventListener('change', e => { const t = e.target; if (t && t.dataset && t.dataset.a === 'coskip' && t.closest && t.closest('#coKit')) coSetSkip(t.checked, 'kit'); });
 }
-/* готовность арта — команде: какие виды нарисованы, замок, текстуры; остальное рисует заглушка SVG и CSS */
+/* готовность арта — команде: листы режимов (семь редкостей и замок), прежние сундуки вида, замок, текстуры; остальное — заглушка */
 function coArtNote() {
-  const kinds = Object.keys(CO_ART.chests), drawn = kinds.filter(k => coChestArt(k)), fx = CO_ART.fx.filter(n => coArtOk(`chests/fx-${n}.png`));
-  return `Арт: сундуки рисунком — ${drawn.length} из ${kinds.length}${drawn.length && drawn.length < kinds.length ? ` (${drawn.map(k => CO_KINDS[k].n).join(', ')})` : ''}; замок — ${coArtOk('chests/lock.png') ? 'рисунок' : 'заглушка SVG'}; текстуры света — ${fx.length} из ${CO_ART.fx.length}. Задание — <code>tools/art-gen/jobs/chests.json</code>, слои — <code>chest_layers.py</code>, выгруженные пути — <code>CO_ART.ready</code>.`;
+  const kinds = Object.keys(CO_ART.chests), R7 = [1, 2, 3, 4, 5, 6, 7];
+  const sets = kinds.filter(k => R7.every(r => { const A = coChestArt(k, r); return A && A.set; })), drawn = kinds.filter(k => coChestArt(k, 1));
+  const fx = CO_ART.fx.filter(n => coArtOk(`chests/fx-${n}.png`)), names = l => l.map(k => CO_KINDS[k].n).join(', ');
+  return `Арт: листы режимов — ${sets.length} из ${kinds.length} видов по семи редкостям${sets.length && sets.length < kinds.length ? ` (${names(sets)})` : ''}, у каждого — свой замок; остальные — прежний сундук вида на все редкости (${drawn.length - sets.length}); замок — ${coArtOk('chests/lock.png') ? 'рисунок' : 'заглушка SVG'}; текстуры света — ${fx.length} из ${CO_ART.fx.length}. Задания — <code>tools/art-gen/jobs/chest-sheets.json</code> и <code>chests.json</code>, слои — <code>chest_layers.py sheets</code>, выгруженные пути — <code>CO_ART.ready</code>.`;
 }
 function coKitHtml() {
   if (!LBX || !window.EnLoot) return '<section class="k-box" style="grid-column:1/-1"><h3>Открытие сундука</h3><p class="k-note">Нет данных: рядом с index.html должен лежать lootboxes.js.</p></section>';

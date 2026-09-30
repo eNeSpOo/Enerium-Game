@@ -1,0 +1,34 @@
+{
+  "name": "Окно закрытой книги неизвестной души (слово автора 30.09.2026: «Карточка неизвестной души выглядит как заглушка, это всё-таки тоже книга, только со знаком вопроса»). Неизвестная душа и не найденный герой — книга своей ступени, закрытая: в окне обложки вместо портрета — туман души во тьме, поверх него интерфейс кладёт «?» старым золотом (hbQ, design/ui/screens/book.js). На арте знака нет: буквы и знаки рисует интерфейс.",
+  "plan": {
+    "book-soul-mist": "9:16, 1K, без вырезки: туман души во тьме — бирюза карста #48E5D4, свет снизу, середина чуть светлее и пустая (над ней — «?»). К выгрузке — design/ui/assets/art/books/soul.webp (непрозрачный WebP), CSS кладёт его под «?» во всё окно обложки (background cover) и медленно ведёт (transform)"
+  },
+  "notes": [
+    "Сначала --dry-run, потом запуск с --budget 1. Картинка смотрится глазами; повторов — не больше двух",
+    "Выгрузка — ui-art.json (books/soul.webp) и export_ui.py --spec ui-art.json --no-stamp; путь — в HB_ART.ready (design/ui/screens/book.js)"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: dark fantasy game art for a mobile RPG — gloomy, heavy, noble and uneasy. Hand-painted digital painting, the same painting as the attached sample: visible confident brush strokes, simplified planes, deep near-black shadows. A muted, desaturated palette: soot black (#050607, #121518), graphite (#262B31), deep dark teal, and one precious cold light — the pale turquoise glow of souls (#48E5D4, #BFF7EF). Light is scarce and precious and comes from below. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.",
+  "negative": "No words, no letters, no digits, no numbers, no question marks, no punctuation, no real-world alphabets, no runes, glyphs or markings that look like writing, no symbols, no sigils, no watermark, no signature, no logo, no captions or labels. No figures, no people, no faces, no silhouettes, no ghosts with faces, no hands, no skulls, no eyes. No frame, no border, no book, no window frame, no objects. No bright white hotspot, no lens flare. No pentagrams, no occult signs, no religious symbols.",
+  "categories": {
+    "book-soul": {
+      "aspect": "9:16",
+      "size": "1K",
+      "refs": [
+        "art/generated/souls-scene/souls-altar__nb2.jpg"
+      ],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a flat painted texture for a game UI, vertical 9:16, seen perfectly straight on, filling the whole canvas edge to edge: no border, no margin, no frame, no perspective. It will be shown behind a small window in a book cover, so the edges may be cropped: the interest is in the middle two thirds. Take from the attached sample only its painting and its turquoise soul-mist in the mirror — not the mirror, not the frame, not the figures, not the room."
+    }
+  },
+  "jobs": [
+    {
+      "id": "book-soul-mist",
+      "category": "book-soul",
+      "title": "Окно закрытой книги — туман неизвестной души",
+      "source": "Слово автора 30.09.2026 о карточке неизвестной души: «это всё-таки тоже книга, только со знаком вопроса». К выгрузке — design/ui/assets/art/books/soul.webp; «?» кладёт интерфейс",
+      "subject": "The texture: deep darkness filled with slow, soft swirls of pale turquoise soul-mist, like the breath of a spirit in cold air. The wisps curl gently around the middle of the canvas as a quiet, wide vortex, rising from below where a dim cold light glows. The very middle is calm, dark-teal and a little brighter than the edges, with nothing in it: a soul that waits beyond a veil, not yet known. A few tiny drifting motes of pale light. Towards the top and the sides the mist fades into soot black. Calm and mysterious, not scary. Soft and dim overall, so that a large golden sign painted over the middle later will read clearly."
+    }
+  ]
+}

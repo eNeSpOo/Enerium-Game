@@ -205,6 +205,8 @@
 .ech-fig .ech-ph{width:100%}
 .ech-fig small{font:700 10.5px/1 var(--f-u)}
 .ech-brow{width:100%;text-align:left;color:var(--parch)}
+.ech-brow>.ech-ph{width:40px;flex:none;border-radius:7px}   /* крафтовый босс в бестиарии — портрет (ECH.craftArt) или инициалы */
+.ech-brow>.col{flex:1}
 
 /* итог атаки: исход — заголовком, здоровье цели полосой с отнятым куском, отнятое и очки, отметки и добыча; подробности свёрнуты */
 .ech-res-top{display:grid;grid-template-columns:44px minmax(0,1fr);gap:var(--sp-m);align-items:center}

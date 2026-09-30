@@ -40,7 +40,7 @@ const evU = (k, n) => { const U = EVD.units[k]; return plural(n, U.u[0], U.u[1],
 const evSrc = id => EVD.sources.find(x => x.id === id) || null;
 const evPay = pay => pay.map(g => `${g.count > 1 ? g.count + ' × ' : ''}${lbBoxName(evM().box, g.r, g.win)}`).join(', ');
 const evTop = pay => pay.reduce((a, g) => Math.max(a, g.r), 0);
-const evChest = (pay, t) => pay.length ? `<span class="well ev-chest" data-r="${evTop(pay)}" style="--s:${EV_VIEW.chest}px" title="${trEsc(t ? t + ' · ' + evPay(pay) : evPay(pay))}"><img src="${CHEST}" alt=""></span>` : '';
+const evChest = (pay, t) => pay.length ? `<span class="well itf ev-chest" data-r="${evTop(pay)}" style="--s:${EV_VIEW.chest}px" title="${trEsc(t ? t + ' · ' + evPay(pay) : evPay(pay))}">${chestPic(evM().box, evTop(pay))}</span>` : '';
 /* сила коллекции РП1 (§10.3) — одна функция прототипа collRp (index.html): те же числа, что на экране «Герои» и в листе «Сила коллекции» */
 function evRp1(s = S) {
   return EVA && typeof collRp === 'function' ? collRp(1, s) : 0;

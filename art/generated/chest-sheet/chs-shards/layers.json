@@ -1,0 +1,223 @@
+{
+  "sheet": "chest-sheet/chs-shards__nb2-v3.raw.jpg",
+  "box": "shards",
+  "chests": [
+    {
+      "r": 1,
+      "frame": [
+        0,
+        0,
+        1379,
+        1120
+      ],
+      "seam": 615,
+      "lid": [
+        0,
+        0,
+        1379,
+        617
+      ],
+      "body": [
+        2,
+        613,
+        1376,
+        507
+      ],
+      "auto": 615,
+      "score": 23.85,
+      "rim": 0,
+      "files": {
+        "whole": "chest-sheet/chs-shards/r1.png",
+        "lid": "chest-sheet/chs-shards/r1.lid.png",
+        "body": "chest-sheet/chs-shards/r1.body.png"
+      }
+    },
+    {
+      "r": 2,
+      "frame": [
+        0,
+        0,
+        1378,
+        1123
+      ],
+      "seam": 617,
+      "lid": [
+        0,
+        0,
+        1378,
+        619
+      ],
+      "body": [
+        3,
+        615,
+        1375,
+        508
+      ],
+      "auto": 617,
+      "score": 43.42,
+      "rim": 0,
+      "files": {
+        "whole": "chest-sheet/chs-shards/r2.png",
+        "lid": "chest-sheet/chs-shards/r2.lid.png",
+        "body": "chest-sheet/chs-shards/r2.body.png"
+      }
+    },
+    {
+      "r": 3,
+      "frame": [
+        0,
+        0,
+        1379,
+        1230
+      ],
+      "seam": 724,
+      "lid": [
+        0,
+        0,
+        1379,
+        726
+      ],
+      "body": [
+        2,
+        722,
+        1376,
+        508
+      ],
+      "auto": 724,
+      "score": 30.88,
+      "rim": 0,
+      "files": {
+        "whole": "chest-sheet/chs-shards/r3.png",
+        "lid": "chest-sheet/chs-shards/r3.lid.png",
+        "body": "chest-sheet/chs-shards/r3.body.png"
+      }
+    },
+    {
+      "r": 4,
+      "frame": [
+        0,
+        0,
+        1379,
+        1217
+      ],
+      "seam": 710,
+      "lid": [
+        0,
+        0,
+        1379,
+        712
+      ],
+      "body": [
+        3,
+        708,
+        1376,
+        509
+      ],
+      "auto": 710,
+      "score": 25.71,
+      "rim": 0,
+      "files": {
+        "whole": "chest-sheet/chs-shards/r4.png",
+        "lid": "chest-sheet/chs-shards/r4.lid.png",
+        "body": "chest-sheet/chs-shards/r4.body.png"
+      }
+    },
+    {
+      "r": 5,
+      "frame": [
+        0,
+        0,
+        1381,
+        1145
+      ],
+      "seam": 631,
+      "lid": [
+        0,
+        0,
+        1381,
+        633
+      ],
+      "body": [
+        4,
+        629,
+        1377,
+        516
+      ],
+      "auto": 631,
+      "score": 14.58,
+      "rim": 0,
+      "files": {
+        "whole": "chest-sheet/chs-shards/r5.png",
+        "lid": "chest-sheet/chs-shards/r5.lid.png",
+        "body": "chest-sheet/chs-shards/r5.body.png"
+      }
+    },
+    {
+      "r": 6,
+      "frame": [
+        0,
+        0,
+        1381,
+        1224
+      ],
+      "seam": 715,
+      "lid": [
+        0,
+        0,
+        1381,
+        717
+      ],
+      "body": [
+        4,
+        713,
+        1377,
+        511
+      ],
+      "auto": 715,
+      "score": 9.74,
+      "rim": 0,
+      "files": {
+        "whole": "chest-sheet/chs-shards/r6.png",
+        "lid": "chest-sheet/chs-shards/r6.lid.png",
+        "body": "chest-sheet/chs-shards/r6.body.png"
+      }
+    },
+    {
+      "r": 7,
+      "frame": [
+        0,
+        0,
+        1380,
+        1293
+      ],
+      "seam": 790,
+      "lid": [
+        0,
+        0,
+        1380,
+        792
+      ],
+      "body": [
+        5,
+        788,
+        1374,
+        505
+      ],
+      "auto": 790,
+      "score": 28.38,
+      "rim": 0,
+      "files": {
+        "whole": "chest-sheet/chs-shards/r7.png",
+        "lid": "chest-sheet/chs-shards/r7.lid.png",
+        "body": "chest-sheet/chs-shards/r7.body.png"
+      }
+    }
+  ],
+  "lock": {
+    "file": "chest-sheet/chs-shards/lock.png",
+    "px": [
+      774,
+      1132
+    ]
+  }
+}

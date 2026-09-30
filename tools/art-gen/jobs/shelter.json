@@ -1,0 +1,103 @@
+{
+  "name": "Убежище и оболочка интерфейса (слово автора 30.09.2026: «Убежище сейчас выглядит как Заглушка, сделай его ААА уровня, добавь декоративные элементы в интерфейс общий»). Сцена Убежища — фон комнаты, четыре проводника и слой наковальни со столом от автора (GDD §28.1): их не перерисовываем. Здесь — вещи сцены и оболочки в одном материале с разговором проводника (jobs/talk.json): кованое железо с кромкой старого золота, свет карста снизу. Оболочка — кованая кромка шапки и шахты, узел на их стыке, гнездо картинки раздела, мелкие вещи (заклёпка, ромб, звено цепи); Убежище — табличка дела на цепях, рама главной кнопки «Спуститься», фонарь переднего плана, кованое железо — текстура. Текста, цифр, лиц и спойлеров на арте нет.",
+  "plan": {
+    "Кромка sh-edge": "21:9, 1K, ключ black: полоса кованого железа во всю ширину — нижняя кромка шапки и правая кромка шахты (повтор; shelf_layers.py strip)",
+    "Табличка дела sh-sign": "21:9, 1K, ключ magenta: вывеска с ушками для цепей — border-image (концы не тянутся, середина ровная)",
+    "Рама главной кнопки sh-cta": "21:9, 1K, ключ magenta: плита «Спуститься» с кристаллами на концах — border-image",
+    "Мелкие вещи sh-parts": "1:1, 2K, ключ black: лист 3 × 3 — узел стыка, гнездо картинки раздела, ромб, заклёпка, цепь, ушко, кристаллы, завиток, уголок (craft_layers.py sheet)",
+    "Фонарь sh-lantern": "9:16, 1K, ключ black-glow: фонарь с кристаллом карста на цепи — передний план сцены",
+    "Железо sh-iron": "1:1, 1K, без вырезки: бесшовное кованое железо — фон шапки и шахты (shelf_layers.py tile)"
+  },
+  "notes": [
+    "Сначала --dry-run, потом запуск с --budget. Каждая картинка смотрится глазами, повторов — не больше двух",
+    "30.09.2026: 6 картинок за $0,45 без повторов. Нарезка: shelf_layers.py strip / tile, craft_layers.py wide / sheet, shelter_layers.py sign / despill / tone / rot (команды — tools/art-gen/README.md, «Убежище и оболочка»); выгрузка — ui-art.json → design/ui/assets/art/shelter/ и shell/, export_ui.py --spec ui-art.json --no-stamp; пути — SH_ART.ready (screens/shelter.js) и SHL_ART.ready (screens/shell.js)"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: dark fantasy game art for a premium mobile RPG — gloomy, ancient, rich and a little menacing. Hand-painted digital painting: visible confident brush strokes, simplified planes, deep near-black shadows, crisp rim light on the edges, rich material detail and masterful craftsmanship. The materials of the Refuge, the Wanderer's shelter in Endalor, a city of mages that floats above an abyss: dark forged iron with hammer marks and soot, raised edges and fine filigree of old gold (#B1915A, #DDBC7A), weathered dark stone. Light is scarce and precious and comes from below: a soft cold turquoise glow of karst crystals (#48E5D4) catches the lower edges, and a few warm amber highlights (#E6A84B) glint like the reflection of a forge. Everything is old, heavy, precious and made by a master smith: no cheap shine, no plastic, no clean flat game-UI look. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.",
+  "negative": "No words, no letters, no digits, no numbers, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no labels, no watermark, no signature, no logo. No skulls, no bones, no blood. No pentagrams, no occult signs, no crosses, no religious symbols, no eyes, no faces, no people, no hands, no creatures. No purple or violet light, no neon. No bright polished gold, no glossy plastic shine.",
+  "cutout_rule": "The background is one solid flat color {hex}, perfectly even from edge to edge: no gradient, no texture, no floor, no wall, no cast shadow, no vignette, no checkerboard. The object itself never uses this background color. Any glow stays close to the object and fades out within a short distance.",
+  "categories": {
+    "sh-strip": {
+      "aspect": "21:9",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — ONE long, perfectly straight horizontal strip, seen straight on from the front, perfectly level, no perspective, no tilt, no bending. It runs across the whole width of the canvas: its left and right ends are cut off by the left and right edges of the canvas, so the strip continues seamlessly when copies are placed side by side. It lies in the middle of the canvas; above and below it the canvas is solid pure black. Its detail repeats evenly along its length: nothing special or unique happens in the middle or near the ends."
+    },
+    "sh-plate": {
+      "aspect": "21:9",
+      "size": "1K",
+      "cutout": "magenta",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — ONE flat horizontal plate seen perfectly straight on from the front: orthographic, level, no perspective, no tilt. It is centered, with an even empty margin of the flat background around it on every side. It must read clearly when it is shown only 40 to 70 pixels tall: a few large, strong shapes, the painterly detail inside them. The long middle part of the plate is calm, plain and perfectly uniform along its length, so the game can stretch it; all the ornament sits in the two end caps, and the two ends mirror each other exactly."
+    },
+    "sh-parts": {
+      "aspect": "1:1",
+      "size": "2K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI sheet for a dark fantasy mobile RPG — NINE separate small objects laid out in a strict grid of three columns and three rows, every object centered in its own equal cell, all seen perfectly straight on and frontal, perfectly level, no perspective, no tilt. Between the objects and around them the canvas is solid pure black, with wide equal empty gaps: no object touches another object or the edge of the canvas. Nothing connects the objects: no lines, no shared background, no shadows. Each object must stay readable at a tiny size, 12 to 40 pixels: a simple strong silhouette built from a few large shapes; no sparks, embers or particles floating around it."
+    },
+    "sh-fg": {
+      "aspect": "9:16",
+      "size": "1K",
+      "cutout": "black-glow",
+      "refs": [
+        "art/style/ref-03-cave-teal-runes.webp"
+      ],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: one foreground object of a game scene, painted on pitch black. It hangs from the top edge of the canvas and fills about two thirds of the canvas height; an empty black margin stays on the left, the right and at the bottom. The attached picture shows only the painting style, the brushwork and the cold light of the game — take nothing else from it."
+    },
+    "sh-tex": {
+      "aspect": "1:1",
+      "size": "1K",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a seamless tileable material texture for a game interface, painted edge to edge over the whole canvas and seen perfectly flat and straight on. It is absolutely uniform: evenly lit from edge to edge, with no light source, no glow, no bright spot, no crystals, no darker or lighter center, no vignette, no border, no objects and no big shapes — only the surface of the material, so copies placed side by side join without a seam."
+    }
+  },
+  "jobs": [
+    {
+      "id": "sh-edge",
+      "category": "sh-strip",
+      "title": "Кованая кромка оболочки",
+      "source": "design/ui/screens/shell.css — нижняя кромка шапки и правая кромка шахты",
+      "subject": "The strip: the forged edge trim of a heavy panel of the Refuge — a narrow straight bar of dark hammered iron. Its upper and lower edges are finished with thin raised beads of old gold; along its middle runs a thin inlaid line of old gold. Small round rivets with old-gold heads sit along the middle line at even intervals, about four strip heights apart. Between the rivets the iron shows soft hammer marks and soot. A faint turquoise light (#48E5D4) from below catches only the lower gold bead. The strip takes about one eighth of the canvas height."
+    },
+    {
+      "id": "sh-sign",
+      "category": "sh-plate",
+      "title": "Табличка дела на цепях",
+      "source": "design/ui/screens/shelter.css — дела Убежища: ритуал, Эхо, контракт",
+      "subject": "The plate: a hanging sign board of the Refuge. A long flat board of dark forged iron with a raised border of old gold along all its edges; the board is about five times as wide as it is tall and takes about four fifths of the canvas width. Each short end finishes in a small ornate end cap of old gold with a scroll curl, and on the top edge, right above each end cap, sits one small round iron eye ring for a chain (the chains themselves are not drawn). The long middle part between the end caps is plain, flat, dark smoky iron, perfectly uniform along its length, a little darker toward its center, with no ornament at all (the game writes there). A thin line of turquoise light (#48E5D4) glows along the lower gold edge, as if lit from below."
+    },
+    {
+      "id": "sh-cta",
+      "category": "sh-plate",
+      "title": "Рама главной кнопки «Спуститься»",
+      "source": "design/ui/screens/shelter.css — главная кнопка Убежища",
+      "subject": "The plate: the frame of the main action button of the Refuge, the one that leads down into the abyss. A wide horizontal plate about three and a half times as wide as it is tall, taking about four fifths of the canvas width, with slightly cut corners: a heavy raised rim of old gold hammered over dark forged iron. In the middle of its left end and of its right end, a faceted turquoise karst crystal (#48E5D4) glows softly from within, held in old-gold claws. The whole long field inside the rim is smooth dark smoky glass, empty and perfectly uniform along its length, with a soft turquoise glow rising from its lower edge, as if a deep shaft full of light lies beneath it."
+    },
+    {
+      "id": "sh-parts",
+      "category": "sh-parts",
+      "title": "Мелкие вещи оболочки и Убежища",
+      "source": "design/ui/screens/shell.css, shelter.css",
+      "subject": "The sheet: NINE separate pieces of forged iron and old gold. Top row, from left to right: (1) a square forged boss where two bars cross: a small square plate of dark iron with four short arms pointing up, down, left and right, each arm ending in an old-gold scroll, and in the center a round faceted turquoise crystal (#48E5D4) in old-gold claws; (2) a square picture frame with softly rounded corners: a thin band of dark forged iron with a raised old-gold inner edge and a small old-gold cap on each of its four corners; its window is empty and pure black, about two thirds of its width; (3) a small diamond-shaped stud of old gold with a tiny turquoise point in its center. Middle row, from left to right: (4) one round rivet head of dark iron with a thin old-gold rim, seen from the front; (5) a short vertical piece of dark iron chain: exactly three oval links hanging straight down, the middle link seen from its edge; (6) a small round iron eye ring with a short hook below it. Bottom row, from left to right: (7) a small cluster of three turquoise karst crystals glowing softly from within, set in a low old-gold mount; (8) a thin, elegant, perfectly symmetric horizontal flourish of old-gold filigree, about five times as wide as it is tall, with a tiny diamond in its center; (9) an L-shaped corner guard of dark forged iron with a raised old-gold edge, its corner pointing to the upper left, both arms equally long and narrow, a tiny turquoise gem in the corner."
+    },
+    {
+      "id": "sh-lantern",
+      "category": "sh-fg",
+      "title": "Фонарь переднего плана",
+      "source": "design/ui/screens/shelter.css — глубина сцены Убежища",
+      "subject": "The object: a heavy old hanging lantern of dark forged iron with old-gold filigree, hanging straight down on a short iron chain from the top edge of the canvas. Behind its thick panes of smoky glass a cluster of turquoise karst crystals (#48E5D4) glows from within and throws soft turquoise light onto the iron cage and the chain; a few cold motes hang in that light close to the glass. The lantern is seen from slightly below, as if it hangs close in front of the viewer."
+    },
+    {
+      "id": "sh-iron",
+      "category": "sh-tex",
+      "title": "Кованое железо — текстура оболочки",
+      "source": "design/ui/screens/shell.css — фон шапки и шахты",
+      "subject": "The material: a sheet of old dark forged iron, almost black (#101316 to #1B1F24): soft irregular hammer marks, fine soot and a faint cold sheen, very low contrast. No rivets, no seams, no edges, no ornament, no rust spots."
+    }
+  ]
+}

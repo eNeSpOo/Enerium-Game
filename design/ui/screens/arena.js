@@ -134,7 +134,7 @@ function tierOf(kind, place) {
   return row ? { label: row.label, one: ly.one, pay: row.cyc[S.acc.cycle] || [] } : null;
 }
 const chestName = (pay, box) => pay.map(g => `${g.count > 1 ? g.count + ' × ' : ''}${typeof lbBoxName === 'function' && window.EN_LOOTBOXES ? lbBoxName(box || 'equip', g.r, g.win) : 'Сундук'}`).join(', ');
-const chestTok = (pay, tip) => pay.length ? `<span class="well ar-chest" data-r="${pay.reduce((a, g) => Math.max(a, g.r), 0)}" title="${esc(tip)}"><img src="${CHEST}" alt=""></span>` : '';
+const chestTok = (pay, tip) => { if (!pay.length) return ''; const r = pay.reduce((a, g) => Math.max(a, g.r), 0); return `<span class="well itf ar-chest" data-r="${r}" title="${esc(tip)}">${chestPic('equip', r)}</span>`; };   // сундук снаряжения своей редкости (chestPic, index.html)
 
 /* ================== состояние ==================
    S.arena: season, day — сезон и день; rating, games, wins — рейтинг Арены, боёв всего (K), побед сезона; att, max — попытки и их

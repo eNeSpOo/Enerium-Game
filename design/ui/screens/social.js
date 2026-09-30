@@ -377,7 +377,7 @@ function mailRewHtml(m) {
   const r = mailRit(m), out = [];
   if (r) out.push(ritRewHtml(r, r.kind, 'noop'));
   for (const [id, n] of m.rew || []) out.push(CUR[id] ? money(id, n) : BAG.item(id) ? `<span class="row">${itWell(id, { act: 'noop', size: 26 })}<b class="num">×${fmt(n)}</b></span>` : '');
-  for (const sp of m.chests || []) out.push(`<span class="row"><span class="well" data-r="${sp.r}" style="--s:26px"><img src="${CHEST}" alt=""></span><small>${LBX && LBX.boxes[sp.box] ? lbBoxName(sp.box, sp.r, sp.win) : 'Сундук'}</small></span>`);
+  for (const sp of m.chests || []) out.push(`<span class="row"><span class="well itf" data-r="${sp.r}" style="--s:26px">${chestPic(sp.box, sp.r)}</span><small>${LBX && LBX.boxes[sp.box] ? lbBoxName(sp.box, sp.r, sp.win) : 'Сундук'}</small></span>`);
   return out.join('');
 }
 /* вкладка письма: pm — «Письма», заявки и сообщения сервера без награды — «Система», остальное — «Награды» */

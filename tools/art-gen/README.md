@@ -121,10 +121,23 @@ python tools/art-gen/shelf_layers.py tile art/generated/cr-texture/cr-vellum__nb
 python tools/art-gen/export_ui.py --spec ui-art.json --no-stamp
 ```
 
-- `frames` — лист рамок: у каждой рамки тело (квадрат без рогов и зубцов) приводится к 200 из 256 px холста, окно — в ‰ тела (`CR_ART.frames`); углы холста — точка альфы 9, чтобы выгрузка не срезала поле. `--tone` — поправка тона (кость и латунь модель рисует слишком ярко).
+- `frames` — лист рамок: у каждой рамки тело (квадрат без рогов и зубцов) приводится к 200 из 256 px холста, окно — в ‰ тела; углы холста — точка альфы 9, чтобы выгрузка не срезала поле. `--tone` — поправка тона (кость и латунь модель рисует слишком ярко). Рамки предмета по виду сняты словом автора 30.09.2026: рамка одна на все предметы и рисуется CSS (`design/ui/screens/art-icons.css`, «Рамка предмета»), прототип картинки `craft/frame-*.png` не берёт.
 - `disc` — круглая вещь сверху в квадрат по центру; `hole` — прозрачная середина (пьедестал), ‰ радиуса.
 - `book` — страница для `border-image` из разворота гримуара: корешок и лента вырезаются, шов сглаживается; срезы страницы — `CR_ART.page`.
 - Выгрузка — `ui-art.json` → `design/ui/assets/art/craft/`, пути — `CR_ART.ready` в `design/ui/screens/crafthall.js`. Проверка — `node tools/content-gen/screens/check_crafthall.js`.
+
+## Книга рецептов Мастерской
+
+Задание — `jobs/recipe-book.json`: раскрытый гримуар во всё окно (21:9 2K, ключ пурпурный), три полосы древнего листа найденного рецепта — короткая, средняя, длинная, каждая своим заданием в своём холсте (21:9 и 4:1, ключ чёрный: светлая бумага на чёрном режется чисто), девять обрывков сеткой 3 × 3. Урок: три полосы на одном квадратном холсте модель рисует слишком высокими (2,7–3,5 : 1); пропорцию полосы задаёт холст и доля пустого фона сверху и снизу.
+
+```
+python tools/art-gen/rbook_layers.py                                  # нарезка, геометрия и размеры выгрузки — печатает JSON
+python tools/art-gen/export_ui.py --spec ui-art.json --no-stamp
+```
+
+- Полосы и обрывки обрезаются по альфе больше 8 — так же, как режет поля `export_ui.py`: рамка картинки и выгрузки одна. Размер выгрузки подбирается так, чтобы высота в целых px дала пропорцию рисунка точнее всего: ничто не тянется неравномерно.
+- Книга: полупрозрачная кромка обложки перекрашивается в тёмную кожу (ключ оставлял зелёный отлив); поле страниц — внутри двойной золотой линейки, `RB_ART.book.page`.
+- Выгрузка — `design/ui/assets/art/rbook/`, пути и размеры — `RB_ART` в `design/ui/screens/recipe-book.js`. Проверка — `node tools/content-gen/screens/check_recipe_book.js`: размер файла — как в `RB_ART`.
 
 ## Страницы книги героя
 
@@ -165,3 +178,64 @@ python tools/art-gen/export_ui.py --spec ui-art.json --no-stamp
 - `clean` — оставить только крупные пятна альфы: крошки песка вокруг вещи на чёрном ключе — прочь.
 - `strip` — полоса во всю ширину из исходника без вырезки, концы сведены в бесшовную петлю (карниз).
 - Выгрузка — `ui-art.json` → `design/ui/assets/art/chambers/`, пути — `CB_ART.ready` в `design/ui/screens/chambers.js`, иконки артефактов и медальоны — `WN_ART.icons` в `design/ui/screens/wanderer.js`. Проверка — `node tools/content-gen/screens/check_chambers.js`.
+
+## Лавка Энериума
+
+Задание — `jobs/store.json` (правило автора для донатных окон — «дорого-богато»): три листа вещей 3 × 2 на чёрном ключе и зал 21:9 2K. Листы: стартовые наборы I–V и печать платного ряда, пять наборов Энериума и знак рекламы, три чаши выдачи и три предложения. Вся витрина — четыре запроса, $0,41. Нарезка и выгрузка:
+
+```
+python tools/art-gen/gen.py jobs/store.json --dry-run
+python tools/art-gen/gen.py jobs/store.json --budget 1
+python tools/art-gen/craft_layers.py sheet art/generated/st-sheet/st-starter__nb2.png 3 2 start1 start2 start3 start4 start5 seal
+python tools/art-gen/craft_layers.py sheet art/generated/st-sheet/st-packs__nb2.png 3 2 en1 en2 en3 en4 en5 ad
+python tools/art-gen/craft_layers.py sheet art/generated/st-sheet/st-subs__nb2.png 3 2 sub1 sub2 sub3 path week fest
+python tools/art-gen/export_ui.py --spec ui-art.json --no-stamp
+```
+
+- **Язык вещей:** рунные ключи — тёмное железо с ушком-колесом, души — бледно-голубое пламя в стекле, Энериум — зелёные кристаллы времени; богатство растёт слева направо: котомка, ларец, окованный ларец, реликварий, сокровищница; у Энериума — горсть, мешочек, шкатулка, сундук, друза. Все три листа вышли с первого раза.
+- **Арт в пьедестале лежит по коробке** (`position:absolute`): процент высоты у элемента сетки не держится, картинка вылезает на подпись.
+- Выгрузка — `ui-art.json` → `design/ui/assets/art/store/`, пути — `EN_STORE.art` (`tools/content-gen/store/build.js`, `ART`); сборщик берёт список выгруженного из папки сам. Проверка — `node tools/content-gen/screens/check_store.js`.
+
+## Убежище и оболочка
+
+Задание — `jobs/shelter.json`: кромка оболочки (полоса во всю ширину, ключ black), вывеска дела и рама главной кнопки «Спуститься» (`border-image`, ключ magenta), лист мелких вещей 3 × 3 (узел стыка, гнездо картинки раздела, ромб, заклёпка, цепь, ушко, кристаллы, завиток, уголок), фонарь переднего плана (ключ black-glow), кованое железо (плитка). Сцену Убежища — фон, проводников и мебель — дал автор (§28.1): их не перерисовываем. Нарезка:
+
+```
+python tools/art-gen/shelf_layers.py strip art/generated/sh-strip/sh-edge__nb2.png
+python tools/art-gen/shelter_layers.py rot art/generated/sh-strip/sh-edge__nb2.strip.png
+python tools/art-gen/craft_layers.py wide art/generated/sh-plate/sh-sign__nb2.png art/generated/sh-plate/sh-cta__nb2.png
+python tools/art-gen/shelter_layers.py sign art/generated/sh-plate/sh-sign__nb2.trim.png 262:362,1150:1250 60 640
+python tools/art-gen/shelter_layers.py despill art/generated/sh-plate/sh-sign__nb2.trim.plate.png 160
+python tools/art-gen/shelter_layers.py tone art/generated/sh-plate/sh-sign__nb2.trim.plate.edge.png 86 80
+python tools/art-gen/shelter_layers.py tone art/generated/sh-plate/sh-cta__nb2.trim.png 84 78
+python tools/art-gen/craft_layers.py sheet art/generated/sh-parts/sh-parts__nb2.png 3 3 knot frame diamond rivet chain ring crystal flourish corner
+python tools/art-gen/shelf_layers.py tile art/generated/sh-tex/sh-iron__nb2.jpg
+python tools/art-gen/export_ui.py --spec ui-art.json --no-stamp
+```
+
+- `sign` — у вывески ушки для цепей стоят над рамкой в растягиваемой середине: `border-image` размазал бы их по всей длине. Ушки стираются, полоса рамки под ними заменяется чистой полосой того же уровня, верх срезается; цепи рисует интерфейс.
+- `despill` — на пурпурном ключе модель обводит контур сиреневой кромкой света и зелёной дымкой: дымка — прочь, сиреневое у самого края — прочь, глубже — в серое той же яркости.
+- `tone` — старое золото модель рисует ярче палитры: яркость и насыщенность ниже.
+- `rot` — кромка для шахты: полоса, повёрнутая против часовой, свет карста — справа, к экрану.
+- Из листа мелких вещей в выгрузку пошли узел, гнездо, ромб, цепь, завиток и уголок; заклёпка, ушко и кристаллы — в запасе (у кристаллов на чёрном ключе тёмный ореол — `shelter_layers.py unhalo`).
+- Срезы `border-image` — px выгрузки: `SH_ART.sign`, `SH_ART.cta` в `design/ui/screens/shelter.js`; окно гнезда — `SHL_ART.frame` в `design/ui/screens/shell.js`. Выгрузка — `ui-art.json` → `design/ui/assets/art/shelter/` и `shell/`. Проверка — `node tools/content-gen/screens/check_shelter.js`: размеры рисунков на диске сверяются с описью.
+
+## Сундуки режимов
+
+Задание — `jobs/chest-sheets.json`: на режим (вид сундука `EN_LOOTBOXES`) лист 4 × 2 на 21:9 4K — семь редкостей сундука и его навесной замок на ровном пурпуре, без швов. Образец — прежний сундук этого режима из `jobs/chests.json`. Нарезка и выгрузка:
+
+```
+python tools/art-gen/gen.py jobs/chest-sheets.json --only chs-keys --budget 0.2
+python tools/art-gen/chest_layers.py sheets --only chs-keys --preview <папка вне репозитория>
+python tools/art-gen/chest_layers.py spec                   # опись в ui-art.json и геометрия для CO_ART.sets
+python tools/art-gen/export_ui.py --spec ui-art.json --no-stamp
+```
+
+- `sheets` — вырезка пурпура из исходника `…raw.jpg` с защитой середины: фон — сильный ключ, связанный с краем листа, и закрытые окна от 300 px (просвет верёвочной ручки); край и ореол кристалла — проекцией на отрезок «цвет рисунка рядом — ключ», фиолетовый камень эпической клетки (`protect`, по умолчанию клетка 4) непрозрачен; тонкие линии сетки во всю высоту или ширину — в ключ. Затем белая наклейка прочь, восемь пятен по строкам (`craft_layers.cut`), у каждого сундука — шов (сам; поправка — `seams` в разделе `layers.sheets`), корпус и крышка. Выход — `art/generated/chest-sheet/<лист>/r1…r7.png`, `.lid.png`, `.body.png`, `lock.png` и `layers.json`; превью — каждый сундук закрытым и с поднятой крышкой, на тёмном и светлом.
+- `spec` — в `ui-art.json` на сундук: корпус и крышка WebP (сундук 960 px в ширину), плитка 256 px — закрытый сундук целиком; на режим — замок 240 px. Печатает `CO_ART.sets` для `design/ui/screens/chest-open.js`: масштаб сцены (сундук около 236 px, как прежний), размер замка, по редкостям рамка, шов, крышка и корпус в px сундука. Пути выгрузки — `chests/<вид>/r<редкость>-body.webp`, `-lid.webp`, `r<редкость>.webp`, `lock.webp`; их список — `CO_ART.ready`.
+- Прототип берёт лист режима своей редкости; нет слоя — прежний сундук вида (`CO_ART.chests`), нет и его — заглушка SVG. Плитка сундука в запасах и наградах — `zpChestPic(вид, редкость)` в `screens/bag.js`, в экранах режимов — `chestPic` из `index.html`. Проверка — `node tools/content-gen/screens/check_chest_open.js`: геометрия — как в `layers.json` и PNG слоёв, сундук в сцене — 200–272 px, пути выгружены, плитки — своей редкости.
+- Ответ 4K часто рвётся посреди приёма («[SSL] record layer failure»; у curl со Schannel — «server closed abruptly»): листы — по одному, одна попытка (`gen.RETRIES = 0`). Лимит предоплаты API кончился 01.10.2026 (HTTP 402) — листы `chs-talisman` и `chs-craft` ждут пополнения.
+
+## Враги крафта Этриона
+
+Задание — `jobs/craft-bosses.json`, портреты 4:5 1K по «Глубокому промту персонажа»; пробная пятёрка — `jobs`, остальные — `backlog` без генерации. Выгрузка — `ui-art.json`: `foes/<id босса>.jpg` 464 × 576; путь в прототипе — `ECH.craftArt` в `design/ui/screens/echo.js` (эхо боссов биомов 1–4 — готовые портреты боссов биомов, пробуждённый — портрет своего босса). Проверка — `node tools/content-gen/screens/check_echo.js`.

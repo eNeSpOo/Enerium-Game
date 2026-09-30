@@ -1,6 +1,7 @@
 /* Энериум · прототип «Свет снизу» — «Ремесло → Мастерская» на данных крафта (GDD §12, §36.12, §36.16).
    Подключается после screens/model.js, до boot(). Договор — screens/model.js: запасы только через BAG, найденные рецепты — BAG.known и BAG.learn.
-   Экран разделён на подписанные зоны «Инвентарь» и «Крафт» (§12.4); крафт — стол из шести ячеек или книга рецептов.
+   Экран разделён на подписанные зоны «Инвентарь» и «Крафт» (§12.4); крафт — стол из шести ячеек. Книга рецептов раскрывается на всё окно
+   кнопкой «Книга рецептов» над столом — screens/recipe-book.js (слово автора 30.09.2026); стол под книгой остаётся как был.
    Вид — по «Правилам воздуха» UI-кита: на столе и в книге нет лишних подписей, сведения о ресурсе — лист по нажатию:
    на лупе ресурса, на имени ресурса выбранной ячейки и на значках ингредиентов в книге.
    - Ввод ресурса — слова автора 29.09.2026: запасы по пять в ряд, плитки крупнее; нажатие на ресурс — ползунок количества от 0 до
@@ -54,7 +55,14 @@ const WS_DATA = {
   ],
   demo: {
     fav: ['r_act_cb1'],                                                   // избранное
-    part: { r_call_fb2: { pos: ['u1', 'p_frame', 'p_coal'] } },           // подсказка в книге: три верных из четырёх
+    /* подсказки в книге — обрывки: у Пускового рычага три верных из пяти, итог не найден; у Заряженного Рубидиума три из четырёх и итог
+       найден — игрок держал камень (seen); у Оэлис все четыре ресурса верны, количества нет — «без количеств», героя игрок не встречал */
+    part: {
+      r_call_fb2: { pos: ['u1', 'p_frame', 'p_coal'] },
+      r_kr_ru: { pos: ['k4_ench', 'k4_alch', 'k4_smith'] },
+      r_h_c1_22: { pos: ['find_cb1', 'k1_ench', 'p_print', 'a_iron'] },
+    },
+    seen: ['kr_ru'],                                                      // что игрок уже держал в руках, кроме нынешних запасов
     table: [['fang', 2], ['k1_hunt', 1]],                                 // поток «Мастерская»: найденный рецепт на столе
     hint: [['find_cb1', 1], ['p_waxthread', 2], ['cr_mold', 3]],          // поток «подсказки»: три верных из четырёх у рецепта героя
     chain: { learn: ['r_a_cast', 'r_p_lure'], make: 'r_call_fb1' },       // поток «автодокрафт»: цепочка и уникальный ресурс
@@ -143,6 +151,30 @@ const WS_SRV = {
   /* найденный: открыт игроком или известен по правилу данных — рецепт руны доблести известен с первого осколка (known0) */
   isKnown: r => !!r && (BAG.known(r.id) || (!!r.known0 && r.in.some(([id]) => BAG.has(id)))),
   known: () => WS_SRV.recipes().filter(WS_SRV.isKnown),
+  /* найденный игроком предмет (слово автора 30.09.2026: итог справа с названием — «если конечно игрок его нашёл, если же нет очевидно
+     справа скомканная бумага»). Нашёл — держал его в руках: сейчас в запасах или кошельке, он прошёл через мастерскую или стоит в найденном
+     рецепте; герой — в коллекции или его осколки у игрока. Что игрок держал, сервер помнит (S.ws.seen) */
+  seen(id) {
+    const it = BAG.item(id); if (!it || it.team) return false;
+    if (it.tier === 'hero') { const h = RSI[it.heroId]; return !!h && (rsHas(h) || (S.rs.shards[h.id] || 0) > 0); }
+    return S.ws.seen.includes(id) || wsQty(id) > 0 || WS_SRV.known().some(r => r.out[0] === id || r.in.some(([x]) => x === id));
+  },
+  /* книга рецептов глазами клиента — только собранное игроком. Найден целиком — рецепт. Найден частично (подсказки §12) — позиции по порядку
+     рецепта: открытая — предмет и количество, если оно известно (q; по §12 количество игрок угадывает сам, подсказка его не открывает),
+     закрытая — null; итог, его название и вид — только если игрок нашёл предмет итога, иначе их нет в ответе. Не найденных рецептов нет */
+  book() {
+    const whole = WS_SRV.known().map(r => ({ id: r.id, whole: true, r }));
+    const part = Object.entries(S.ws.part).map(([id, p]) => {
+      const r = BAG.recipe(id);
+      if (!r || r.team || WS_SRV.isKnown(r)) return null;
+      const out = WS_SRV.seen(r.out[0]) ? r.out[0] : '';
+      const slots = r.in.map(([x]) => p.pos.includes(x) ? { id: x, q: (p.q && p.q[x]) || 0 } : null);
+      return { id, whole: false, slots, open: p.pos.length, all: p.pos.length >= r.in.length, out, name: out ? r.n : '', kind: out ? r.kind : '' };
+    }).filter(Boolean);
+    return whole.concat(part);
+  },
+  /* запомнить найденное: предметы, что прошли через руки игрока */
+  see(ids) { for (const id of ids) if (BAG.item(id) && !S.ws.seen.includes(id)) S.ws.seen.push(id); },
   /* попытка на столе (§12): какой рецепт сработает и какие подсказки откроются. Ничего не меняет — итог проводит attempt */
   check(cells) {
     const have = new Map(cells.map(c => [c.id, c.q])), pool = WS_SRV.recipes();
@@ -172,6 +204,7 @@ const WS_SRV = {
     const v = WS_SRV.check(cells);
     if (v.refuse) return { refuse: 'owned', hero: v.hero };
     const isNew = !!v.made && !WS_SRV.isKnown(v.made), put = cells.map(c => [c.id, c.q, c.pos]);
+    WS_SRV.see(cells.map(c => c.id));
     cells.forEach(c => wsTake(c.id, c.q));   // со стола уходит всё: рецепт расходует своё, лишнее и неудача сгорают
     let res;
     if (v.made) {
@@ -199,6 +232,7 @@ const WS_SRV = {
     if (!p.ok) return { refuse: p.stop.length ? 'stop' : 'lack', p };
     if (p.special.length && !ok) return { refuse: 'consent', p };
     if (!p.spend.every(([id, q]) => wsHas(id, q))) return { refuse: 'changed', p };
+    WS_SRV.see(p.spend.map(([id]) => id).concat(p.steps.map(s => s.r.out[0])));
     p.spend.forEach(([id, q]) => wsTake(id, q));
     p.extra.forEach(([id, q]) => wsGive(id, q));
     wsGive(r.out[0], p.out);
@@ -221,11 +255,13 @@ const WS_REFUSE = {
 const wsEmpty = () => Array.from({ length: WS_DATA.cells }, () => null);
 const WS_SKIP_KEY = 'en-craft-skip';   // localStorage: «Пропустить анимацию» мастерской — свой выбор, не общий с сундуками и рулеткой
 const wsSkipSaved = () => { try { return localStorage.getItem(WS_SKIP_KEY) === '1'; } catch (_) { return false; } };
+/* S.ws.book — книга рецептов (screens/recipe-book.js): вкладка, вид, только избранное, поиск; t0 — когда раскрыта, мс; hl — новая запись,
+   на которой книга раскрыта после удачи. S.ws.seen — предметы, что игрок держал в руках (WS_SRV.seen): демо — запасы и WS_DATA.demo.seen */
 function wsFresh() {
   const D = WS_DATA.demo, part = {};
   for (const [id, p] of Object.entries(D.part)) part[id] = { pos: p.pos.slice() };
-  return { cells: wsEmpty(), sel: 0, pick: '', view: 'table', inv: { cat: 'all', q: '', f: {} }, book: { tab: 'all', kind: '', fav: false, q: '' }, part, fav: D.fav.slice(), last: null,
-    ops: {}, seq: 1, fx: null, skip: wsSkipSaved(), drop: null };
+  return { cells: wsEmpty(), sel: 0, pick: '', view: 'table', inv: { cat: 'all', q: '', f: {} }, book: { tab: 'all', kind: '', fav: false, q: '', t0: 0, hl: '' }, part, fav: D.fav.slice(), last: null,
+    ops: {}, seq: 1, fx: null, skip: wsSkipSaved(), drop: null, seen: Object.keys(DEMO_BAG.items).concat(D.seen) };
 }
 const wsOp = () => 'ws' + S.ws.seq;   // номер следующей операции: его несут кнопки «Попробовать», «Создать» и подтверждения
 const wsItemOrd = new Map(EN_RECIPES.items.map((it, i) => [it.id, i]));
@@ -257,6 +293,7 @@ const wsStock = () => EN_RECIPES.items.filter(it => !it.team && it.tier !== 'her
    ADR-0019), валюта — в кошелёк */
 function wsGive(id, q) {
   const it = BAG.item(id); if (!it) return;
+  WS_SRV.see([id]);
   if (it.tier === 'hero') {   // комплект осколков героя; у пробуждённого осколки — в прах (§15.2)
     const h = RSI[it.heroId]; if (!h) return;
     const n = wsHeroNeed() * q;
@@ -492,11 +529,11 @@ function wsInvHtml() {
 }
 /* воронка кнопки «Фильтры»: в наборе значков index.html её нет — та же, что у «Запасов» */
 const WS_FUNNEL = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6.5 7.5V18l-3 2v-7.5z"/></svg>';
-/* зона «Крафт»: стол или книга рецептов */
+/* зона «Крафт»: стол; над ним — кнопка «Книга рецептов»: книга раскрывается на всё окно (screens/recipe-book.js), число — записей в ней */
 function wsCraftHtml() {
-  const book = S.ws.view === 'book', n = WS_SRV.known().length + wsParts().length;
-  const tabs = `<div class="tabs" role="tablist" aria-label="Крафт"><button role="tab" aria-selected="${!book}" data-a="wsview" data-v="table">Стол</button><button role="tab" aria-selected="${book}" data-a="wsview" data-v="book">${ic('book')}Книга · ${n}</button></div>`;
-  return `<div class="pnl ws-craft${book ? ' ws-bk' : ''}"><div class="pnl-h"><h2>Крафт</h2><span class="g-spacer"></span>${tabs}</div>${book ? wsBookHtml() : wsTableHtml()}</div>`;
+  const n = WS_SRV.book().length;
+  const bk = `<button class="ws-bkbtn" data-a="wsview" data-v="book" aria-label="Книга рецептов, записей: ${fmt(n)}" title="Книга рецептов">${ic('book')}<span>Книга рецептов</span><b class="num">${fmt(n)}</b></button>`;
+  return `<div class="pnl ws-craft"><div class="pnl-h"><h2>Крафт</h2><span class="g-spacer"></span>${bk}</div>${wsTableHtml()}</div>`;
 }
 /* ячейка стола — гнездо в бронзовом кольце: пустая — «+», с ресурсом — предмет в рамке своего вида. Только что положенный ресурс
    опускается в гнездо (--dd — момент от начала, мс: перерисовка не рвёт движение); у ресурса, чья пометка Этриона сейчас у стола, —
@@ -545,63 +582,21 @@ function wsFootHtml(g) {
   if (!any) st = 'Положите ресурсы в ячейки — порядок не важен.';
   else if (g.lack.length) { cls = 'bad'; st = 'Не хватает: ' + trEsc(wsNames(g.lack.map(c => [c.id, c.q - wsQty(c.id)]))); }
   else if (g.st === 'known') st = g.owned ? `«${trEsc(g.r.n)}»: ${trEsc(wsHeroWhy(wsHero(g.r)))}` : `Совпадает с рецептом «${trEsc(g.r.n)}»${g.extra.length ? ' · лишнее сгорит: ' + trEsc(wsNames(g.extra)) : ''}`;
-  else { const t = wsTrail(); st = t ? `На столе все открытые позиции «${trEsc(t.r.n)}»: ${t.n} из ${t.r.in.length}. Остальное — угадать.` : 'Сочетание неизвестно. При неудаче сгорит всё положенное.'; }
+  else {
+    const t = wsTrail(), nm = t ? wsPartName(t.r) : '';   // итог обрывка не найден — без имени
+    st = t ? `На столе все открытые позиции ${nm ? `«${trEsc(nm)}»` : 'обрывка рецепта'}: ${t.n} из ${t.r.in.length}. Остальное — угадать.` : 'Сочетание неизвестно. При неудаче сгорит всё положенное.';
+  }
   const go = any && !g.lack.length && !g.owned;
   return `<div class="ws-foot"><p class="ws-st ${cls}" role="status">${st}</p><button class="btn ghost sm" data-a="wsclear"${any ? '' : ' disabled'}>Очистить</button><button class="btn go" data-a="wstry" data-v="${wsOp()}"${go ? '' : ' disabled'}>${g.st === 'known' ? 'Создать' : 'Попробовать'}</button></div>`;
 }
 
-/* ================== книга рецептов (§12.4) ==================
-   Плотный список: найденные рецепты и подсказки. Поиск, вид, избранное и вкладки видны всегда, прокручивается только список */
+/* ================== книга рецептов (§12.4) — screens/recipe-book.js ==================
+   Здесь — то, что нужно столу, итогу попытки и карточке ресурса. Обрывок рецепта, итог которого игрок не нашёл, безымянен везде: его
+   названия нет ни в книге, ни у стола, ни в итоге, ни в карточке (WS_SRV.book, слово автора 30.09.2026) */
+/* подсказки — записи книги, найденные частично: [{ r, part }] */
 const wsParts = () => Object.keys(S.ws.part).map(id => ({ r: BAG.recipe(id), part: S.ws.part[id] })).filter(x => x.r && !x.r.team && !WS_SRV.isKnown(x.r));
-function wsBookRows() {
-  const fav = id => S.ws.fav.includes(id) ? 0 : 1;
-  return WS_SRV.known().map(r => ({ r, plan: wsPlan(r, 1) })).concat(wsParts())
-    .sort((a, b) => fav(a.r.id) - fav(b.r.id) || (a.part ? 1 : 0) - (b.part ? 1 : 0) || wsOrd.get(a.r.id) - wsOrd.get(b.r.id));
-}
-/* поиск — по названию рецепта, результату и известным ингредиентам */
-function wsBookHit(x, q) {
-  if (!q) return true;
-  const ids = x.r.in.map(([id]) => id).filter(id => !x.part || x.part.pos.includes(id));
-  return [x.r.n, wsName(x.r.out[0])].concat(ids.map(wsName)).some(s => trNorm(s).includes(q));
-}
-/* строка книги: избранное, название и одно состояние, компактный состав, одно действие. Особый ресурс — ромб на значке,
-   значки ингредиентов и результата — кнопки сведений */
-function wsRowHtml(x) {
-  const r = x.r, out = BAG.item(r.out[0]), fav = S.ws.fav.includes(r.id);
-  const star = `<button class="ws-star" data-a="wsfav" data-v="${r.id}" aria-pressed="${fav}" aria-label="${fav ? 'Убрать из избранного' : 'В избранное'}: ${trEsc(r.n)}">${ic('star')}</button>`;
-  const outW = `<span class="arr">${ic('arrow')}</span>${wsWell(out, { q: r.out[1] > 1 ? r.out[1] : null })}`;
-  if (x.part) {
-    const shown = r.in.map(([id]) => id).filter(id => x.part.pos.includes(id)), hid = r.in.length - shown.length;
-    const ing = shown.map(id => wsWell(BAG.item(id), { q: '?' })).join('') + '<span class="well empty" title="Позиция не открыта">?</span>'.repeat(hid);
-    const chip = `<span class="chip spirit">${ic('eye')}${hid ? `верно ${shown.length} из ${r.in.length}` : 'без количеств'}</span>`;
-    return `<div class="ws-rc part">${star}<div class="ws-rc-m"><div class="ws-rc-t"><b>${trEsc(r.n)}</b>${chip}</div><div class="ws-ing">${ing}${outW}</div></div><button class="btn sm" data-a="wsload" data-v="${r.id}">На стол</button></div>`;
-  }
-  const p = x.plan, k = p.steps.length;
-  const state = p.owned ? `<span class="chip gold">${ic('check')}${rsHas(p.hero) ? 'в коллекции' : 'осколки собраны'}</span>`
-    : p.ok ? `<span class="chip spirit">${ic('check')}${k ? `через ${k} ${plural(k, 'этап', 'этапа', 'этапов')}` : 'можно создать'}</span>`
-    : p.stop.length ? `<span class="chip warn">${ic('lock')}неизвестный этап</span>` : '<span class="chip">не хватает</span>';
-  const ing = r.in.map(([id, q]) => wsWell(BAG.item(id), { q, cls: wsQty(id) < q ? 'ws-short' : '' })).join('');
-  return `<div class="ws-rc">${star}<div class="ws-rc-m"><div class="ws-rc-t"><b>${trEsc(r.n)}</b>${state}</div><div class="ws-ing">${ing}${outW}</div></div><button class="btn sm go" data-a="wsmake" data-v="${r.id}"${p.owned ? ' disabled' : ''}>Создать</button></div>`;
-}
-function wsBookHtml() {
-  const B = S.ws.book, q = trNorm(B.q.trim()), rows = wsBookRows(), K = WS_DATA.kinds.find(k => k[0] === B.kind);
-  const base = rows.filter(x => (!B.fav || S.ws.fav.includes(x.r.id)) && (!K || K[2].includes(x.r.kind)) && wsBookHit(x, q));
-  const tabs = [['all', 'Все', base], ['can', 'Создать сейчас', base.filter(x => x.plan && x.plan.ok && !x.plan.owned)], ['hint', 'Подсказки', base.filter(x => x.part)]];
-  const cur = tabs.find(t => t[0] === B.tab) || tabs[0];
-  const opts = '<option value="">Все виды</option>' + WS_DATA.kinds.filter(k => k[0] === B.kind || rows.some(x => k[2].includes(x.r.kind)))
-    .map(k => `<option value="${k[0]}"${k[0] === B.kind ? ' selected' : ''}>${k[1]}</option>`).join('');
-  const empty = cur[0] === 'hint' && !rows.some(x => x.part)
-    ? `<p class="reason">Подсказок пока нет. Они появляются, когда на столе не меньше ${WS_DATA.hintMin} верных ресурсов рецепта от ${WS_DATA.hintFrom} ингредиентов.</p>`
-    : '<p class="faint ws-none">Ничего не найдено</p>';
-  return `<div class="ws-bh"><label class="search grow">${ic('search')}<input id="wsBookQ" type="search" placeholder="Рецепт или ресурс" value="${trEsc(B.q)}" autocomplete="off" aria-label="Поиск по книге рецептов"></label><select class="rs-sel" data-a="wsbkind" aria-label="Вид рецепта">${opts}</select><button class="iconbtn ws-favt" data-a="wsbfav" aria-pressed="${B.fav}" aria-label="Только избранное" title="Только избранное">${ic('star')}</button></div>
-    <div class="tabs" role="tablist" aria-label="Книга рецептов">${tabs.map(([k, l, list]) => `<button role="tab" aria-selected="${cur[0] === k}" data-a="wsbtab" data-v="${k}">${l} · ${list.length}</button>`).join('')}</div>
-    <div class="ws-list scroll grow" data-keep="wsbook:${cur[0]}">${wsBookPage(cur) || empty}</div>`;
-}
-/* строки книги порциями: 500 рецептов разом не рисуются */
-function wsBookPage(cur) {
-  const key = 'wsbook:' + cur[0], P = typeof crPage === 'function' ? crPage(cur[2], key) : { shown: cur[2], rest: 0 };
-  return P.shown.map(wsRowHtml).join('') + (typeof crMoreHtml === 'function' ? crMoreHtml(key, P.rest, 'ws-more') : '');
-}
+/* имя обрывка для игрока: итог найден — название рецепта, нет — пусто */
+const wsPartName = r => (r && WS_SRV.seen(r.out[0]) ? r.n : '');
 
 /* ================== анимация крафта: показ итога ==================
    R — один показ: host — 'game' (окно поверх игры) или 'kit' (сцена раздела UI-кита); phase — 'anim' или 'res' (итог); tempo — full,
@@ -770,12 +765,14 @@ function wsFxBookHtml(R, e) {
 }
 /* строка предметов итога: колодцы с количеством, имя — в подсказке */
 const wsFxWells = list => `<div class="ws-fx-ws">${(list || []).map(([id, q]) => { const it = BAG.item(id); return it ? wsWell(it, { stat: true, q, size: 34 }) : ''; }).join('')}</div>`;
+/* подсказка в итоге: итог рецепта игрок нашёл — с названием, нет — «обрывки рецепта» без имени (как в книге) */
 function wsFxHints(list) {
   return (list || []).map(x => {
     const r = BAG.recipe(x.rid); if (!r) return '';
     const txt = x.all ? 'все ресурсы верны, количество — нет: рецепт открыт без количеств'
       : x.first ? `появился в книге: верно ${x.n} из ${r.in.length}` : `открыта позиция «${trEsc(x.fresh.map(wsName).join('», «'))}»: верно ${x.n} из ${r.in.length}`;
-    return `<div class="ws-hint">${ic('eye')}<span><b>«${trEsc(r.n)}»</b> — ${txt}</span></div>`;
+    const nm = wsPartName(r);
+    return `<div class="ws-hint">${ic('eye')}<span>${nm ? `<b>«${trEsc(nm)}»</b> — ${txt}` : `<b>Обрывки рецепта</b> — ${txt}`}</span></div>`;
   }).join('');
 }
 /* лист итога справа от круга: одна мысль — что вышло; что сгорело и подсказка — если положена по §12; одно главное действие */
@@ -989,7 +986,7 @@ Object.assign(OV, {
       <p class="quote">${trEsc(it.lore)}</p>${typeof crHint === 'function' ? crHint(it) : ''}
       <dl class="kv"><dt>Цикл</dt><dd>${it.pool ? 'общий пул' : ROMAN[it.cyc] || '—'}</dd><dt>На столе</dt><dd>${on ? fmt(on) : 'нет'}</dd>${wsSpecial(it.id) ? '<dt>Особый ресурс</dt><dd class="gold">расход только с согласия</dd>' : ''}</dl>
       <span class="eyebrow">Найденные рецепты</span>${uses.length ? `<div class="tr-use">${uses.map(r => `<button class="chip" data-a="wsmake" data-v="${r.id}">${trEsc(r.n)}</button>`).join('')}</div>` : '<p class="faint" style="font-size:12.5px">Пока ни одного. Рецепты ищут на столе, загадка подсказывает дорогу.</p>'}
-      ${trails.length ? `<span class="eyebrow">Подсказки</span><div class="tr-use">${trails.map(x => `<span class="chip spirit">${trEsc(x.r.n)}</span>`).join('')}</div>` : ''}
+      ${trails.length ? `<span class="eyebrow">Обрывки рецептов</span><div class="tr-use">${trails.map(x => { const nm = wsPartName(x.r); return `<button class="chip spirit" data-a="wsbookpart" data-v="${x.r.id}">${nm ? trEsc(nm) : 'Итог не найден'} · ${x.part.pos.length} из ${x.r.in.length}</button>`; }).join('')}</div>` : ''}
     </div>`;
     return sheet('Карточка ресурса', body, `<button class="btn go" data-a="wspick" data-v="${it.id}"${wsCellMax(it.id) ? '' : ' disabled'}>${ic('plus')}На стол</button>`);
   },
@@ -1047,6 +1044,12 @@ Object.assign(OV, {
   },
 });
 
+/* книга рецептов раскрывается (screens/recipe-book.js): момент — для анимации раскрытия; всё, что сейчас в запасах, сервер запоминает как
+   найденное (WS_SRV.seen) — когда оно уйдёт, итог обрывка не станет снова безымянным. Уже раскрытая книга не начинает анимацию заново */
+function wsBookOpen() {
+  if (S.ws.view !== 'book') { S.ws.book.t0 = wsNow(); S.ws.book.hl = ''; WS_SRV.see(wsStock().map(it => it.id)); }
+  S.ws.view = 'book';
+}
 /* ================== действия ================== */
 Object.assign(ACT, {
   wscat(v) { S.ws.inv.cat = v; render(); },
@@ -1090,7 +1093,8 @@ Object.assign(ACT, {
     render(); wsRefocus('wsQc');
   },
   wsclear() { const b = wsCellsCopy(); S.ws.cells = wsEmpty(); S.ws.sel = 0; wsFeel(b); render(); },
-  wsview(v) { S.ws.view = v === 'book' ? 'book' : 'table'; render(); },
+  /* книга рецептов — на всё окно (screens/recipe-book.js, wsBookOpen), стол под ней остаётся */
+  wsview(v) { if (v === 'book') wsBookOpen(); else S.ws.view = 'table'; render(); },
   wsinfo(v) { if (BAG.item(v)) open('wsitem', v); },
   /* «Попробовать» / «Создать» стола: номер операции несёт кнопка */
   wstry(v) {
@@ -1107,9 +1111,9 @@ Object.assign(ACT, {
     wsSetTable(L.map(c => [c.id, c.q]));
     S.overlay = null; wsFeel(b); render();
   },
-  wshints() { S.ws.view = 'book'; S.ws.book.tab = 'hint'; S.overlay = null; render(); },
+  wshints() { wsBookOpen(); Object.assign(S.ws.book, { tab: 'hint', kind: '', fav: false, q: '' }); S.overlay = null; render(); },
   /* новая запись: книга открыта на этом рецепте — поиск по его имени */
-  wsbookgo(v) { const r = BAG.recipe(v); S.overlay = null; S.ws.view = 'book'; Object.assign(S.ws.book, { tab: 'all', kind: '', fav: false, q: r ? r.n : '' }); render(); },
+  wsbookgo(v) { const r = BAG.recipe(v); S.overlay = null; wsBookOpen(); Object.assign(S.ws.book, { tab: 'all', kind: '', fav: false, q: r ? r.n : '', hl: r ? r.id : '' }); render(); },
   wsbtab(v) { S.ws.book.tab = v; render(); },
   wsbkind(v, t) { S.ws.book.kind = t ? t.value : ''; render(); },
   wsbfav() { S.ws.book.fav = !S.ws.book.fav; render(); },

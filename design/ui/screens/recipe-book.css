@@ -1,0 +1,207 @@
+/* screens/recipe-book.css — книга рецептов Мастерской на всё окно (screens/recipe-book.js; слово автора 30.09.2026). Раскрытый гримуар
+   чернёного пергамента поверх шапки и шахты, как книга героя; на страницах — собранное игроком: найденный рецепт — ровный лист древней
+   бумаги узкой полосой, найденный частично — обрывки. Бумага светлая, страницы тёмные — лист читается сразу.
+   Геометрия — переменные из RB_ART и RB_VIEW (rbVars): книга держит пропорции рисунка, поле страниц — внутри золотой линейки, высота
+   листа H одна у всех записей и зависит только от ширины страницы; ширина листа — H × пропорция его картинки: ничто не тянется неравномерно.
+   Арт — переменные <html> (--rb-book, --rb-strip-*, --rb-frag-*) и флаги rb-bk, rb-pp, rb-fr; без арта всё рисует CSS.
+   Движение — только transform и opacity; «меньше движения» — без движения. */
+
+/* ---------- слой и книга: над шапкой и шахтой (index.html: шапка — 6, шахта — 4), под листами и окнами (.ov — 20) ---------- */
+.rb{position:absolute;inset:0;z-index:19;overflow:hidden;container-type:size;color:var(--parch);font:14px/1.35 var(--f-u);text-align:left}
+/* подложка — зал Мастерской в тени: шапку и шахту книга закрывает целиком */
+.rb-scrim{position:absolute;inset:0;background:radial-gradient(80% 90% at 50% 55%,#16110d,#040304);animation:rb-fade var(--rb-open) ease var(--rb-d0) both}
+html.cr-h .rb-scrim{background:radial-gradient(80% 90% at 50% 55%,rgba(10,8,6,.8),rgba(3,3,4,.96)),var(--cr-hall-work) 50% 42%/cover no-repeat,#050405}
+/* книга — в пропорциях рисунка: во всю высоту окна без полей сверху и снизу, не шире окна (RB_VIEW.zoom) */
+.rb-book{position:absolute;left:50%;top:50%;width:min(calc(100cqw * var(--rb-zoom) / 1000),calc((100cqh - 2 * var(--rb-m)) * var(--rb-bw) / var(--rb-bh)));aspect-ratio:var(--rb-bw) / var(--rb-bh);
+  transform:translate(-50%,-50%);animation:rb-open var(--rb-open) cubic-bezier(.2,.8,.2,1) var(--rb-d0) both}
+/* разворот: рисунок книги; без него — переплёт тёмной кожи, чернёный пергамент, тень корешка и золотая линейка CSS */
+.rb-sp{position:absolute;inset:0;pointer-events:none;border-radius:1.4% / 3.4%;
+  background:linear-gradient(90deg,transparent 47%,rgba(0,0,0,.6) 50%,transparent 53%),radial-gradient(110% 95% at 50% 45%,#2b221b,#120e0b 78%);
+  box-shadow:inset 0 0 0 9px #24170e,inset 0 0 0 10px rgba(201,162,106,.55),inset 0 0 0 22px rgba(0,0,0,.25),inset 0 0 0 23px rgba(201,162,106,.3),0 22px 40px -12px #000}
+html.rb-bk .rb-sp{border-radius:0;box-shadow:none;background:var(--rb-book) center/100% 100% no-repeat;filter:drop-shadow(0 20px 26px rgba(0,0,0,.85))}
+/* табличка «Книга рецептов» — на верхнем крае книги над корешком; с артом — латунная табличка зала (--cr-plate) */
+.rb-title{position:absolute;left:50%;top:0;z-index:2;transform:translate(-50%,-30%);padding:3px 14px 4px;border-radius:4px;white-space:nowrap;pointer-events:none;
+  background:linear-gradient(180deg,#3a2a18,#1d140b);box-shadow:inset 0 0 0 1px rgba(214,178,112,.55),0 4px 10px rgba(0,0,0,.7);
+  font:600 15px/1 var(--f-d);letter-spacing:.03em;color:#f0d79c;text-shadow:0 1px 2px #000,0 0 12px rgba(221,188,122,.3)}
+html.cr-pl .rb-title{border-style:solid;border-color:transparent;border-width:1px 15px 8px;padding:3px 4px 0;border-radius:0;background:none;box-shadow:none;line-height:17px;
+  border-image:var(--cr-plate) 6 92 52 92 fill / 1px 15px 8px stretch}
+/* крестик — в углу окна, как у книги героя */
+.rb-x{appearance:none;position:absolute;right:8px;top:8px;z-index:3;display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;border-radius:50%;cursor:pointer;
+  background:radial-gradient(circle at 50% 35%,rgba(44,34,24,.95),rgba(10,8,6,.95));color:#ecd39c;box-shadow:inset 0 0 0 1.5px #8a6a38,inset 0 0 0 3px rgba(0,0,0,.6),0 3px 8px rgba(0,0,0,.6)}
+.rb-x .i{width:16px;height:16px}
+.rb-x:hover,.rb-x:focus-visible{color:#fff3cf}
+
+/* ---------- страницы: поле внутри золотой линейки обеих страниц, промежуток — корешок ---------- */
+.rb-pg{position:absolute;left:calc(var(--rb-pl) * .1%);right:calc(100% - var(--rb-pr) * .1%);top:calc(var(--rb-pt) * .1%);bottom:calc(100% - var(--rb-pb) * .1%);
+  display:flex;flex-direction:column;gap:6px;min-width:0;min-height:0}
+/* шапка страниц: слева вкладки, справа поиск, вид и «только избранное» — видны всегда (§12.4) */
+.rb-h{flex:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:calc(var(--rb-g) * .1%);align-items:center;min-width:0}
+.rb-tabs{display:flex;gap:2px;min-width:0;overflow-x:auto;scrollbar-width:none}
+.rb-tabs::-webkit-scrollbar{display:none}
+.rb-tabs button{appearance:none;flex:none;height:27px;padding:0 9px;border:0;border-radius:5px;background:none;color:#a8916a;cursor:pointer;
+  font:700 11.5px/1 var(--f-u);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;transition:color .15s}
+.rb-tabs button:hover{color:#e8cf95}
+.rb-tabs button[aria-selected="true"]{color:#f5dca0;background:linear-gradient(180deg,rgba(62,45,27,.92),rgba(28,20,12,.92));
+  box-shadow:inset 0 0 0 1px rgba(214,178,112,.35),inset 0 -2px 0 var(--spirit),inset 0 -10px 12px -10px var(--spirit)}
+.rb-tools{display:flex;align-items:center;gap:6px;min-width:0}
+.rb-q{flex:1 1 0;display:flex;align-items:center;gap:6px;min-width:0;height:28px;padding:0 9px;border-radius:6px;border:1px solid rgba(201,162,106,.32);
+  background:linear-gradient(180deg,rgba(8,6,4,.78),rgba(20,14,9,.78));box-shadow:inset 0 1px 3px rgba(0,0,0,.8);color:#8f7b5a}
+.rb-q .i{flex:none;width:14px;height:14px}
+.rb-q input{all:unset;flex:1 1 0;min-width:0;font:13.5px/1 var(--f-u);color:var(--parch)}
+.rb-q input::placeholder{color:#7d6c52}
+.rb-kind{flex:none;max-width:118px;height:28px;padding:0 4px;border-radius:6px;border:1px solid rgba(201,162,106,.32);background:#100c08;color:#e6d3a8;font:13px var(--f-u)}
+.rb-favt{appearance:none;flex:none;display:grid;place-items:center;width:28px;height:28px;padding:0;border-radius:6px;border:1px solid rgba(201,162,106,.32);
+  background:linear-gradient(180deg,#221a12,#130e09);color:#a8916a;cursor:pointer}
+.rb-favt .i{width:15px;height:15px}
+.rb-favt[aria-pressed="true"]{color:var(--gold);border-color:var(--gold-3)}
+.rb-favt[aria-pressed="true"] .i{fill:currentColor}
+/* список — по двум страницам: столбец — страница, промежуток — корешок. Прокручивается только он; полосы нет, край страницы гаснет:
+   сверху --pt, снизу --fade (в проверке раскладки — те же числа) */
+.rb-list{--pt:3px;--fade:12px;flex:1 1 0;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;container-type:inline-size;
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:calc(var(--rb-g) * .1%);row-gap:var(--rb-rg);align-content:start;align-items:start;padding:var(--pt) 0 calc(var(--fade) + 2px);
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 var(--pt),#000 calc(100% - var(--fade)),transparent);mask-image:linear-gradient(180deg,transparent,#000 var(--pt),#000 calc(100% - var(--fade)),transparent)}
+.rb-list::-webkit-scrollbar{display:none}
+
+/* ---------- запись: высота листа H — одна у всех: ширина страницы / пропорция длинного листа ---------- */
+.rb-e{--h:calc((100cqw - 100cqw * var(--rb-g) / 1000) / 2 * var(--rb-lh) / var(--rb-lw));position:relative;justify-self:start;min-width:0;isolation:isolate}
+/* значок в рамке предмета — одной на все предметы (art-icons.css, атрибут data-fk от crK): здесь только размер — доля H; иконка ложится
+   ровно в окно рамки, скругление и свет редкости — её */
+.rb-e .well{--s:calc(var(--h) * var(--rb-ic) / 1000)}
+.rb-e .rb-ic{flex:none}
+.rb-e .well .i{width:46%;height:46%;color:var(--rc,var(--parch-2))}
+.rb-e .well .gl{font:600 calc(var(--h) * .22)/1 var(--f-d);color:var(--gold)}
+/* количество — тёмная плашка «×N» со светлым текстом (образец автора); не хватает — красным; «×?» — количество не открыто */
+.rb-e .well .q{right:calc(var(--h) * -.04);bottom:calc(var(--h) * -.09);z-index:3;min-width:calc(var(--h) * .24);height:calc(var(--h) * .21);padding:0 calc(var(--h) * .045);
+  border-radius:calc(var(--h) * .06);background:rgba(22,15,10,.95);box-shadow:0 0 0 1px rgba(214,178,112,.8),0 1px 2px rgba(0,0,0,.6);color:#f6e2b4;text-shadow:none;
+  font:700 max(10px,calc(var(--h) * .16))/calc(var(--h) * .21) var(--f-u);text-align:center;white-space:nowrap}
+.rb-e .well .q::before{content:"×";margin-right:1px;opacity:.8}
+/* у итога плашка — в углу значка: ниже — название */
+.rb-out .well .q{right:calc(var(--h) * -.03);bottom:calc(var(--h) * -.03)}
+.rb-e .well.ws-short .q{color:#ffa28a;box-shadow:0 0 0 1px rgba(220,106,82,.9),0 1px 2px rgba(0,0,0,.6)}
+/* особый ресурс — золотой ромб в углу: расход только с согласия (§12.1) */
+.rb-e .well.ws-sp::before{content:"";position:absolute;left:3px;top:3px;z-index:3;width:5px;height:5px;transform:rotate(45deg);background:var(--gold);box-shadow:0 0 5px var(--gold)}
+/* итог — лицо героя: рамка и окно — общие (art-icons.css, itf и face), здесь — только лицо в кадре */
+.rb-e .rb-hero>img,.rb-e .rb-hero>.rs-ph{object-fit:cover;object-position:50% 18%}
+.rb-e .rb-hero .rs-ph b{font-size:calc(var(--h) * .18)}
+/* лист и обрывки пропускают нажатие мимо значков к листу — «Создать»; значки — карточка ресурса */
+.rb-in,.rb-out{position:relative;z-index:1;pointer-events:none}
+.rb-in .well,.rb-out .well{pointer-events:auto}
+.rb-in{display:flex;align-items:flex-start;gap:calc(var(--h) * var(--rb-gap) / 1000)}
+/* стрелка — действие записи: у листа «Создать», у обрывков «На стол»; подпись — состояние одним-двумя словами, уже стрелки: длинная
+   переносится, а не наезжает на плашку количества слева */
+.rb-go{appearance:none;position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:calc(var(--h) * .02);width:100%;padding:0 0 0 calc(var(--h) * .07);border:0;background:none;color:#4a2e17;cursor:pointer;
+  margin-top:calc(var(--h) * var(--rb-ic) / 2000 - var(--h) * .15)}
+.rb-go:disabled{cursor:default}
+.rb-arw{width:calc(var(--h) * .5);height:calc(var(--h) * .3);fill:none;stroke:currentColor;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s ease}
+.rb-go:not(:disabled):hover .rb-arw,.rb-go:focus-visible .rb-arw{transform:translateX(2px)}
+.rb-go small{max-width:calc(var(--h) * .6);font:700 max(8.5px,calc(var(--h) * .125))/1.05 var(--f-u);letter-spacing:.06em;text-transform:uppercase;text-align:center;color:#6d4a2a}
+/* итог справа — значок и название под ним (две строки) */
+.rb-out{display:flex;flex-direction:column;align-items:center;gap:calc(var(--h) * .025);min-width:0;width:100%}
+.rb-nm{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;max-width:100%;overflow-wrap:break-word;text-align:center;
+  font:700 max(10.5px,calc(var(--h) * .165))/1.08 var(--f-u);color:#2a190c}
+/* путь рецепта, если у итога их несколько («старым путём», «из пыли»), — курсивом внизу листа под ингредиентами: там бумага свободна */
+.rb-alt{position:absolute;z-index:1;left:calc(var(--h) * var(--rb-padl) / 1000);bottom:calc(var(--h) * .07);pointer-events:none;
+  max-width:calc(100% - var(--h) * (var(--rb-padl) + var(--rb-padr) + var(--rb-go) + var(--rb-omin)) / 1000);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font:italic 600 max(10.5px,calc(var(--h) * .16))/1.05 var(--f-d);color:#6d4a2a}
+/* избранное — звезда в верхнем углу записи */
+.rb-star{appearance:none;position:absolute;z-index:2;top:calc(var(--h) * .06);right:calc(var(--h) * .06);display:grid;place-items:center;width:calc(var(--h) * .3);height:calc(var(--h) * .3);
+  padding:0;border:0;background:none;color:rgba(84,54,28,.45);cursor:pointer}
+.rb-star .i{width:80%;height:80%}
+.rb-star:hover,.rb-star:focus-visible{color:rgba(84,54,28,.85)}
+.rb-star[aria-pressed="true"]{color:#c9962c;filter:drop-shadow(0 0 2px rgba(70,40,8,.7))}
+.rb-star[aria-pressed="true"] .i{fill:currentColor}
+/* запись, на которой книгу раскрыли после удачи: вспыхивает бирюзой и гаснет (время — от раскрытия, --hd) */
+.rb-e[data-hl]::after{content:"";position:absolute;inset:-4px;z-index:3;pointer-events:none;border-radius:6px;box-shadow:0 0 0 2px rgba(72,229,212,.8),0 0 18px rgba(72,229,212,.55);
+  opacity:0;animation:rb-hl var(--rb-hlt) ease-out var(--hd,0ms) both}
+
+/* ---------- найден целиком: полоса древнего листа своей длины ---------- */
+.rb-w{--aw:var(--rb-lw);--ah:var(--rb-lh);--rbp:var(--rb-strip-l);width:calc(var(--h) * var(--aw) / var(--ah));aspect-ratio:var(--aw) / var(--ah);display:grid;
+  grid-template-columns:max-content minmax(0,1fr) calc(var(--h) * var(--rb-go) / 1000) minmax(calc(var(--h) * var(--rb-omin) / 1000),calc(var(--h) * var(--rb-omax) / 1000));
+  align-items:start;padding:calc(var(--h) * .11) calc(var(--h) * var(--rb-padr) / 1000) 0 calc(var(--h) * var(--rb-padl) / 1000)}
+/* места на листе — явно: ингредиенты, промежуток, стрелка, итог (звезда и нажатие на лист — поверх, вне сетки) */
+.rb-w>.rb-in{grid-column:1}
+.rb-w>.rb-go{grid-column:3}
+.rb-w>.rb-out{grid-column:4}
+.rb-w[data-len="s"]{--aw:var(--rb-sw);--ah:var(--rb-sh);--rbp:var(--rb-strip-s)}
+.rb-w[data-len="m"]{--aw:var(--rb-mw);--ah:var(--rb-mh);--rbp:var(--rb-strip-m)}
+/* бумага — под записью: рисунок листа в его пропорциях (у записи те же), без рисунка — светлый пергамент CSS; тень — по краю бумаги */
+.rb-w::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:3px;
+  background:radial-gradient(120% 150% at 50% 45%,#f2e3c1,#dcc59a 68%,#b89a6b);box-shadow:inset 0 0 0 1px rgba(90,60,30,.35);filter:drop-shadow(0 3px 5px rgba(0,0,0,.6))}
+html.rb-pp .rb-w::before{border-radius:0;box-shadow:none;background:var(--rbp) center/100% 100% no-repeat}
+/* можно создать сейчас — край листа светится бирюзой, стрелка и подпись — бирюзовыми чернилами */
+.rb-w[data-st="ok"]::before{filter:drop-shadow(0 0 1.5px rgba(72,229,212,.95)) drop-shadow(0 0 8px rgba(72,229,212,.5)) drop-shadow(0 3px 5px rgba(0,0,0,.55))}
+.rb-w[data-st="ok"] .rb-go,.rb-w[data-st="ok"] .rb-go small{color:#0b5a52}
+.rb-w[data-st="lack"] .rb-go small,.rb-w[data-st="stop"] .rb-go small{color:#8e2c1a}
+.rb-w[data-st="own"]>*:not(.rb-star){opacity:.72}
+/* нажатие на лист — «Создать» */
+.rb-hit{appearance:none;position:absolute;inset:0;z-index:0;margin:0;padding:0;border:0;border-radius:4px;background:none;cursor:pointer}
+.rb-hit:disabled{cursor:default}
+
+/* ---------- найден частично: обрывки на тёмной странице ---------- */
+.rb-p{--fr:var(--rb-frag4);display:grid;grid-template-columns:max-content calc(var(--h) * var(--rb-go) / 1000) minmax(calc(var(--h) * var(--rb-omin) / 1000),calc(var(--h) * var(--rb-omax) / 1000));
+  align-items:start;padding-top:calc(var(--h) * .03)}
+.rb-p>.rb-in{grid-column:1;gap:calc(var(--h) * var(--rb-fgap) / 1000)}
+.rb-p>.rb-go{grid-column:2}
+.rb-p>.rb-out{grid-column:3}
+.rb-p[data-n="5"]{--fr:var(--rb-frag5)}
+.rb-p[data-n="6"]{--fr:var(--rb-frag6)}
+.rb-p .rb-go{color:#d9bd84;margin-top:calc(var(--h) * var(--fr) / 2000 - var(--h) * .15)}
+.rb-p .rb-go small{color:#bfa577}
+.rb-p .rb-nm{color:#ecd9ad}
+.rb-p .rb-star{top:calc(var(--h) * -.02);right:0;color:rgba(221,188,122,.4)}
+.rb-p .rb-star:hover,.rb-p .rb-star:focus-visible{color:rgba(221,188,122,.8)}
+.rb-p .rb-star[aria-pressed="true"]{color:var(--gold);filter:drop-shadow(0 0 4px rgba(221,188,122,.5))}
+/* обрывок — неровный квадрат древнего листа, какой из девяти — data-k; значок в нём — по середине */
+.rb-f{position:relative;display:grid;place-items:center;flex:none;width:calc(var(--h) * var(--fr) / 1000);aspect-ratio:1 / 1;isolation:isolate}
+.rb-f::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:2px;
+  background:radial-gradient(90% 90% at 50% 45%,#f0e0bd,#d8bf93 70%,#b39465);box-shadow:inset 0 0 0 1px rgba(90,60,30,.35);filter:drop-shadow(0 2px 3px rgba(0,0,0,.65))}
+html.rb-fr .rb-f::before{border-radius:0;box-shadow:none;background:var(--rbf) center/contain no-repeat}
+.rb-f[data-k="1"]{--rbf:var(--rb-frag-1)}
+.rb-f[data-k="2"]{--rbf:var(--rb-frag-2)}
+.rb-f[data-k="3"]{--rbf:var(--rb-frag-3)}
+.rb-f[data-k="4"]{--rbf:var(--rb-frag-4)}
+.rb-f[data-k="5"]{--rbf:var(--rb-frag-5)}
+.rb-f[data-k="6"]{--rbf:var(--rb-frag-6)}
+.rb-f[data-k="7"]{--rbf:var(--rb-frag-7)}
+.rb-f[data-k="8"]{--rbf:var(--rb-frag-8)}
+.rb-f[data-k="9"]{--rbf:var(--rb-frag-9)}
+.rb-f .well{--s:min(calc(var(--h) * var(--rb-ic) / 1000),calc(var(--h) * var(--fr) / 1000 * var(--rb-fic) / 1000))}
+/* пустой обрывок — позиция не найдена: бумага чуть тусклее найденной */
+.rb-f-q::before{filter:saturate(.8) brightness(.9) drop-shadow(0 2px 3px rgba(0,0,0,.65))}
+/* «?» — крупно, тёмно-красные чернила со светлой обводкой бумаги (образец автора): читается и на обрывке, и в мелком размере */
+.rb-qm{font:700 calc(var(--h) * var(--fr) / 1000 * .64)/1 var(--f-d);color:#7c1c12;
+  text-shadow:1.5px 0 #f4e4c0,-1.5px 0 #f4e4c0,0 1.5px #f4e4c0,0 -1.5px #f4e4c0,1px 1px #f4e4c0,-1px -1px #f4e4c0,1px -1px #f4e4c0,-1px 1px #f4e4c0,0 2px 4px rgba(60,30,10,.35)}
+
+/* ---------- порции, пусто, конец: текст — на одной странице, через корешок не переходит ---------- */
+/* «Показать ещё» и строка конца — в следующей клетке: сразу за последней записью, на своей странице */
+.rb-more{justify-self:stretch;align-self:center}
+.rb-none{grid-column:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:120px;margin:0;padding:12px 8%;text-align:center;
+  font:italic 500 15.5px/1.4 var(--f-d);color:#cdb88f}
+.rb-none p{margin:0}
+.rb-clr{appearance:none;height:30px;padding:0 12px;border-radius:7px;border:1px solid rgba(214,178,112,.45);background:linear-gradient(180deg,#261d14,#15100b);color:#f0d79c;cursor:pointer;
+  font:700 12px/1 var(--f-u);letter-spacing:.08em;text-transform:uppercase}
+.rb-end{align-self:center;margin:0;padding:6px 8%;text-align:center;font:italic 500 14px/1.3 var(--f-d);color:rgba(205,184,143,.72)}
+
+/* ---------- низкий экран (844 × 390): шапка страниц плотнее ---------- */
+@container (max-height: 400px){
+  .rb-tabs button{height:25px;padding:0 7px;font-size:11px;letter-spacing:.06em}
+  .rb-q,.rb-kind,.rb-favt{height:26px}
+  .rb-favt{width:26px}
+  .rb-kind{max-width:104px;font-size:12.5px}
+  .rb-title{font-size:14px}
+}
+
+/* ---------- UI-кит: раздел «Книга рецептов: бумага» ---------- */
+.rb-kit{gap:var(--sp-m)}
+.rb-kg{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:18px 22px;padding:18px;border-radius:10px;border:1px solid rgba(201,162,106,.25);
+  background:radial-gradient(120% 90% at 50% 45%,#261d16,#100c09)}
+.rb-kf{margin:0;display:flex;flex-direction:column;gap:8px;min-width:0;container-type:inline-size}
+.rb-kf .rb-e{--h:calc(100cqw * var(--rb-lh) / var(--rb-lw))}
+.rb-kf figcaption{font-size:12px;color:var(--parch-3)}
+
+@keyframes rb-fade{from{opacity:0}}
+@keyframes rb-open{from{opacity:0;transform:translate(-50%,-47%) scale(.965)}}
+@keyframes rb-hl{0%,55%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){
+  .rb,.rb *,.rb *::before,.rb *::after{animation:none!important;transition:none!important}
+}

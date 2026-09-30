@@ -5,10 +5,15 @@
       CRLF; числа вида PG_VIEW — целые; ключевые кадры — только transform и opacity; при «меньше движения» страница не проступает.
    1а. Арт страниц PG_ART: выгруженный путь — файл в assets/art; окна рамок, срезы и полосы — целые; класс у <html> — ровно когда
       выгружен весь рисунок правила html.pg-* (закладки — парой); переменные рисунка ставит pgArtVars; без арта — всё рисует CSS.
-   2. Правая страница — пергамент без тёмного вкладыша и без шапки (тема .pg); закладки героя аккаунта — «Развитие», «Мощь»,
+   2. Правая страница — лист чернёного пергамента, вклеенный в страницу книги (слово автора 30.09.2026: «В открытой книге героя, не
+      хватает тёмной подложки»): слой .hb-rp.pg::before под сведениями — от низа закладок до полосы обреза, текстура — PG_ART.img.vel;
+      без шапки (тема .pg). Контраст: каждый цвет текста темы (--pg-ink, --pg-ink2, --pg-ink3, --pg-red, --pg-gold, --pg-teal, --pg-up,
+      --pg-down, --amber) к самому светлому тону листа --pg-hi — не ниже 4,5 : 1. Закладки героя аккаунта — «Развитие», «Мощь»,
       «Снаряжение», «Навыки», «Путь», выбранная — одна; из книги не открывается прежний лист «Характеристики»; на страницах своего
       героя нет свёрнутого текста (<details>).
-   3. «Развитие»: строка «уровень · предел · доблесть» — числа героя; тихая строка характеристик ведёт на «Мощь».
+   3. «Развитие»: строка «уровень · предел · доблесть» — числа героя; тихая строка характеристик ведёт на «Мощь»; главная кнопка шага —
+      последней в карточке, у правого края, внизу страницы (слово автора 30.09.2026: «кнопка не удобна для большого пальца правой руки»),
+      не ниже 44 px, с ценой (раздел 12а — каскадом).
    4. «Мощь»: боевая мощь — BM.hero, основа и слои вещей — BM.parts; пять характеристик — heroSt и прибавка снаряжения, степень роста —
       по h.gr, главная отмечена; строка под ними объясняет главную, нажатие — выбранную; атрибуты «Нападение» и «Защита» — attrList
       карты героя в бою.
@@ -25,8 +30,8 @@
       доблести N», ни слова их текста; орден — в конце.
    8. Книга «до покупки»: «Герой» (история целиком с буквицей, личный максимум), «Мощь» (по базовым характеристикам, на 0 уровне),
       «Навыки», «Путь» и одно действие; неизвестная душа — без закладок и сведений.
-   9. Листы и окна, открытые из книги (предел, доблесть, «Сведения»), — класс темы .pg; окно снаряжения — тема .gw; карточка «Что
-      изменилось» — .pg; лист не поверх книги — прежний.
+   9. Листы и окна, открытые из книги (предел, доблесть, «Сведения»), — класс темы .pg (тот же чернёный пергамент); окно снаряжения —
+      тема .gw; карточка «Что изменилось» — .pg; лист не поверх книги — прежний.
    10. Смена вкладки: страница проступает — время от нажатия, после показа класса нет; «меньше движения» — сразу.
    11. Режим «Игрок»: служебного нет (SERVICE из check_player_view.js); режим «Команда» рисуется.
    12. Вёрстка — расчётом размеров на 932 × 430 и 844 × 390: правая страница разворота каждой ступени — поля .hb-rp и полоса обреза
@@ -38,8 +43,10 @@
       @container, var(); сверено с getComputedStyle безголового Chrome): раскладку «Снаряжения» решает только book-pages.css —
       свойства вёрстки, которые задаёт страница, не перебивает ни одно правило других стилей, и никакое чужое правило не трогает
       места через обёртки страницы (.hd-gear, .hb-hd, .hb-rp…); у места высота — по содержимому, ширина — --pg-slot, подпись видна,
-      стрелка «есть лучше» — внутри рамки (закладки её не закрывают), рубрика — над сеткой; число характеристики «Мощи» — чернилами;
-      кнопка с ценой внизу книги «до покупки» не сжимается, пояснение — чернилами.
+      стрелка «есть лучше» — внутри рамки (закладки её не закрывают), рубрика — над сеткой, низ «Снаряжения» — у нижнего края страницы;
+      цвет текста на страницах (число характеристики «Мощи», строки превью «Развития», описание способности, текст главы, подписи
+      мест, пояснение «до покупки») — из темы и не ниже 4,5 : 1 к листу; «Развитие»: карточка шага — во всю высоту страницы, её низ —
+      последним, главная кнопка — последней в нём, у правого края, не ниже 44 px; кнопка с ценой внизу книги «до покупки» не сжимается.
    13. UI-кит «Страницы книги героя» и сценарии презентации рисуются.
    Запуск: node tools/content-gen/screens/check_hero_book.js [--dump] — --dump печатает правую страницу каждой вкладки */
 'use strict';
@@ -54,9 +61,9 @@ const cnt = { pages: 0, player: 0, abilities: 0, chapters: 0, slots: 0, layout: 
 const say = m => { if (err.length < 60) err.push(m); else if (err.length === 60) err.push('… и ещё ошибки'); };
 function done() {
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
-  console.log(`Страницы книги героя: страниц ${cnt.pages}, из них глазами игрока ${cnt.player}; способностей с описанием ${cnt.abilities}, глав ${cnt.chapters}, мест ${cnt.slots}; расчётов вёрстки ${cnt.layout}.`);
+  console.log(`Страницы книги героя: страниц ${cnt.pages}, из них глазами игрока ${cnt.player}; способностей с описанием ${cnt.abilities}, глав ${cnt.chapters}, мест ${cnt.slots}; расчётов вёрстки ${cnt.layout}; сверок контраста ${cnt.contrast || 0}.`);
   for (const x of lay) console.log('вёрстка ' + x);
-  console.log('Проверка пройдена: страницы книги — чернилами по пергаменту; закладки «Развитие», «Мощь», «Снаряжение», «Навыки», «Путь»; описание способности видно без нажатия; характеристики и атрибуты — на странице; места — в рамках редкости, пустое говорит, что туда кладут; главы читаются целиком; листы поверх книги — тем же пергаментом; всё помещается на 932 × 430 и 844 × 390.');
+  console.log('Проверка пройдена: страницы книги — белилами и золотом по листу чернёного пергамента, контраст текста не ниже 4,5 : 1; закладки «Развитие», «Мощь», «Снаряжение», «Навыки», «Путь»; главная кнопка шага — внизу справа, не ниже 44 px; описание способности видно без нажатия; характеристики и атрибуты — на странице; места — гнёзда, пустое говорит, что туда кладут; главы читаются целиком; листы поверх книги — тем же чернёным пергаментом; всё помещается на 932 × 430 и 844 × 390.');
   process.exit(0);
 }
 
@@ -84,9 +91,26 @@ const JS = read('screens/book-pages.js'), CSS = read('screens/book-pages.css'), 
   }
   const rm = (CSS.match(/@media \(prefers-reduced-motion:reduce\)\{([\s\S]*?)\n\}/) || [])[1] || '';
   if (!/\.pg-b\.pg-in\{animation:none\}/.test(rm)) say('book-pages.css: при «меньше движения» страница проступает');
-  /* правая страница — пергамент: без тёмного вкладыша и шапки */
-  if (!/\n\.hb-rp\{position:absolute;inset:\d+px \d+px \d+px \d+px;/.test(BCSS) || /\n\.hb-rp\{[^}]*background/.test(BCSS)) say('book.css: правая страница — не пергамент с полями (.hb-rp{inset:…} без подложки)');
+  /* правая страница — поле .hb-rp в странице разворота (book.css, без своей подложки); лист чернёного пергамента под сведениями —
+     слой .hb-rp.pg::before в book-pages.css: от низа закладок до полосы обреза, чуть шире поля; текстура — PG_ART.img.vel */
+  if (!/\n\.hb-rp\{position:absolute;inset:\d+px \d+px \d+px \d+px;/.test(BCSS) || /\n\.hb-rp\{[^}]*background/.test(BCSS)) say('book.css: правая страница — не поле .hb-rp{inset:…} без своей подложки');
   if (!/\.pg,\.gw\{--pg-ink:/.test(CSS)) say('book-pages.css: нет темы страницы .pg и окна снаряжения .gw');
+  const sheet = (CSS.match(/\n\.hb-rp\.pg::before\{([^}]*)\}/) || [])[1] || '';
+  if (!/position:absolute/.test(sheet) || !/z-index:-1/.test(sheet) || !/background:[^;]*var\(--pg-page\)/.test(sheet) || !/top:var\(--pg-sh,-?\d+px\)/.test(sheet)) say('book-pages.css: нет листа чернёного пергамента под сведениями (.hb-rp.pg::before: слой под текстом, тон --pg-page, верх — --pg-sh)');
+  if (!/\nhtml\.pg-vel \.hb-rp\.pg::before\{[^}]*var\(--pg-vel\)/.test(CSS)) say('book-pages.css: лист без текстуры чернёного пергамента (html.pg-vel … var(--pg-vel))');
+  const sh = +((CSS.match(/\n\.hb-rp\.pg:has\(\.pg-tabs\)\{--pg-sh:(\d+)px\}/) || [])[1] || NaN), th = CSS.match(/\.pg-tabs\{[^}]*height:(\d+)px;margin-top:-(\d+)px/);
+  if (!th || sh !== +th[1] - +th[2]) say(`book-pages.css: лист начинается не под закладками (--pg-sh ${sh}, закладки кончаются на ${th ? +th[1] - +th[2] : '?'} px)`);
+  /* контраст: цвет текста темы к самому светлому тону листа (--pg-hi) — не ниже 4,5 : 1 (WCAG 2.x, относительная яркость) */
+  const theme = (CSS.match(/\.pg,\.gw\{(--pg-ink:[\s\S]*?)\}/) || [])[1] || '', tok = k => ((theme.match(new RegExp(`(?:^|;)\\s*${k}:(#[0-9a-f]{6})`, 'i')) || [])[1] || '');
+  const lum = hex => { const c = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255).map(v => v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
+  const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+  const hi = tok('--pg-hi'), page = tok('--pg-page');
+  if (!hi || !page || lum(hi) < lum(page)) say('book-pages.css: у темы нет тона листа --pg-page и самого светлого его тона --pg-hi');
+  else for (const k of ['--pg-ink', '--pg-ink2', '--pg-ink3', '--pg-red', '--pg-gold', '--pg-teal', '--pg-up', '--pg-down', '--amber']) {
+    const c = tok(k); cnt.contrast = (cnt.contrast || 0) + 1;
+    if (!c) say(`book-pages.css: у темы нет цвета ${k}`);
+    else if (ratio(c, hi) < 4.5) say(`book-pages.css: ${k} ${c} к листу ${hi} — контраст ${ratio(c, hi).toFixed(2)} : 1, ниже 4,5 : 1`);
+  }
 }
 if (err.length) done();
 
@@ -162,7 +186,7 @@ const P = load(), T = P.T;
     if (!n) say(`book-pages.css: html.${c} — рисунка с таким классом в PG_ART нет`);
     else if (n.every(p => A.ready.includes(p)) !== P.rootCls.has(c)) say(`html.${c}: класс у <html> ${P.rootCls.has(c) ? 'стоит, а рисунок выгружен не весь' : 'не ставится, а рисунок выгружен'}`);
   }
-  for (const [, v] of CSS.matchAll(/var\((--pg-(?:fi?-[a-z]+|tab|tab-on|btn2?|ink-[a-z]+|[a-z0-9]+-[sw]))\)/g)) if (!P.rootVars.has(v)) say(`book-pages.css: переменной ${v} pgArtVars не ставит`);
+  for (const [, v] of CSS.matchAll(/var\((--pg-(?:fi?-[a-z]+|tab|tab-on|btn2?|vel|gilt-[a-z]+|ink-[a-z]+|[a-z0-9]+-[sw]))\)/g)) if (!P.rootVars.has(v)) say(`book-pages.css: переменной ${v} pgArtVars не ставит`);
   for (const [k, v] of P.rootVars) if (/^--pg-fi-/.test(k) && !/^(-?\d+(\.\d)?% ){3}-?\d+(\.\d)?%$/.test(v)) say(`${k}: поля рамки «${v}» — не четыре доли`);
   const Q = load({ noArt: true });
   const left = [...Q.rootCls].filter(c => c.startsWith('pg-')), urls = [...Q.rootVars].filter(([k, v]) => k.startsWith('--pg-') && /url\(/.test(v)).map(([k]) => k);
@@ -499,6 +523,11 @@ run('режим «Игрок»', () => T.setTeam(false));
   const SCR = [{ n: '932 × 430', W: 932, H: 430, small: false }, { n: '844 × 390', W: 844, H: 390, small: true }];
   const BV = T.HB_VIEW, BA = T.HB_ART;
   const ins = (BCSS.match(/\n\.hb-rp\{[^}]*inset:(\d+)px (\d+)px (\d+)px (\d+)px/) || []).slice(1).map(Number);
+  /* поля листа: справа, снизу, слева (book-pages.css, .hb-rp.pg{padding:0 …}); закладки возвращают их себе отрицательными полями */
+  const sheetPad = (CSS.match(/\n\.hb-rp\.pg\{padding:0 (\d+)px (\d+)(?:px)? (\d+)px\}/) || []).slice(1).map(Number);
+  if (sheetPad.length !== 3) { say('book-pages.css: нет полей листа .hb-rp.pg{padding:0 …px …px …px}'); sheetPad.push(0, 0, 0); }
+  const tabsBack = CSS.match(/\n\.hb-rp\.pg \.pg-tabs\{margin-left:-(\d+)px;margin-right:-(\d+)px\}/);
+  if (!tabsBack || +tabsBack[1] !== sheetPad[2] || +tabsBack[2] !== sheetPad[0]) say('book-pages.css: закладки не возвращают себе поля листа (.hb-rp.pg .pg-tabs{margin-left:-…;margin-right:-…})');
   /* снизу страница кончается над полосой обреза: bottom:calc(Npx + var(--re) …), --re — HB_ART.spreads[ступень].e, ‰ высоты страницы */
   const reM = BCSS.match(/\n\.hb-rp\{[^}]*bottom:calc\((\d+)px \+ var\(--re,0\) \* 1% \/ 10\)/);
   if (!reM) say('book.css: правая страница снизу не поднята над полосой обреза (.hb-rp{bottom:calc(…px + var(--re,0) * 1% / 10)})');
@@ -519,7 +548,8 @@ run('режим «Игрок»', () => T.setTeam(false));
   const si = [px(CSS, /width:var\(--pg-si,(\d+)px\)/, 'значок характеристики --pg-si'), px(BCSS, /\.g\.sm \.hb-rp\{[^}]*--pg-si:(\d+)px/, '.g.sm --pg-si')];
   const hbfGap = px(BCSS, /\.hb-rp\{[^}]*gap:(\d+)px/, '.hb-rp gap'), footBtn = px(BCSS, /\.hb-f \.btn\.big\{min-height:(\d+)px\}/, '.hb-f .btn.big'), footPad = px(BCSS, /\.hb-f\{[^}]*padding-top:(\d+)px/, '.hb-f padding-top');
   /* «Мощь»: числа — переменные страницы и их значения на низком экране (.g.sm .hb-rp) */
-  const sm = (v, name) => px(BCSS, new RegExp(`\\.g\\.sm \\.hb-rp\\{[^}]*--${v}:([\\d.]+)px`), '.g.sm --' + name);
+  /* переменная страницы на низком экране: своё правило листа (book-pages.css, .g.sm .hb-rp.pg) — поверх book.css (.g.sm .hb-rp) */
+  const sm = (v, name) => { const own = CSS.match(new RegExp(`\\.g\\.sm \\.hb-rp\\.pg\\{[^}]*--${v}:([\\d.]+)px`)); return own ? +own[1] : px(BCSS, new RegExp(`\\.g\\.sm \\.hb-rp\\{[^}]*--${v}:([\\d.]+)px`), '.g.sm --' + name); };
   const pgmGap = [px(CSS, /\.pgm\{[^}]*gap:var\(--pg-mg,(\d+)px\)/, '.pgm gap'), sm('pg-mg', 'pg-mg')], bmF = [px(CSS, /\.pgm-bm>b\{[^}]*font:600 var\(--pg-bf,(\d+)px\)/, '.pgm-bm b'), sm('pg-bf', 'pg-bf')];
   const stF = [px(CSS, /\.pgm-s>b\{font:600 var\(--pg-sf,(\d+)px\)/, '.pgm-s b'), sm('pg-sf', 'pg-sf')], aHs = [px(CSS, /\.pgm-a\{[^}]*min-height:var\(--pg-ah,(\d+)px\)/, '.pgm-a'), sm('pg-ah', 'pg-ah')];
   const atPad = [px(CSS, /\.pgm-at\{[^}]*padding-top:var\(--pg-atp,(\d+)px\)/, '.pgm-at --pg-atp'), sm('pg-atp', 'pg-atp')];
@@ -533,7 +563,9 @@ run('режим «Игрок»', () => T.setTeam(false));
   const capF = px(CSS, /\.pg :is\(\.eq-cap,\.tl-cap\)\{[^}]*font:700 ([\d.]+)px\/([\d.]+)/, 'подпись места'), capL = +((CSS.match(/\.pg :is\(\.eq-cap,\.tl-cap\)\{[^}]*font:700 [\d.]+px\/([\d.]+)/) || [])[1] || 1.2);
   const noneF = px(CSS, /\.pg :is\(\.eq-slot,\.tl-slot\)\.none :is\(\.eq-cap,\.tl-cap\)\{font:italic 500 (\d+)px\/([\d.]+)/, 'подпись пустого места'), noneL = +((CSS.match(/\.pg :is\(\.eq-slot,\.tl-slot\)\.none :is\(\.eq-cap,\.tl-cap\)\{font:italic 500 \d+px\/([\d.]+)/) || [])[1] || 1.1);
   const slotGap = px(CSS, /\.pg :is\(\.eq-slot,\.tl-slot\)\{[^}]*gap:(\d+)px/, 'место: рамка — подпись'), tlRowGap = px(CSS, /\.pg \.tl-row\{--pg-cols:2;gap:(\d+)px/, '.tl-row gap'), tlArtGap = px(CSS, /html\.pg-ft \.pg \.tl-row\{row-gap:(\d+)px\}/, 'оправа: промежуток рядов');
-  const gFootPad = px(CSS, /\.pg \.hdg-f\{[^}]*padding-top:(\d+)px/, '.pg .hdg-f padding-top'), gBtnH = px(html, /\n\.btn\.sm\{min-height:(\d+)px/, '.btn.sm min-height');
+  const gFootPad = [px(CSS, /\.pg \.hdg-f\{[^}]*padding-top:(\d+)px/, '.pg .hdg-f padding-top'), px(CSS, /\.g\.sm \.pg \.hdg-f\{padding-top:(\d+)px\}/, '.g.sm .pg .hdg-f padding-top')], gBtnH = px(CSS, /\.pg \.hdg-f \.btn\{[^}]*min-height:(\d+)px/, '.pg .hdg-f .btn min-height');
+  const noneFs = px(CSS, /\.g\.sm \.pg :is\(\.eq-slot,\.tl-slot\)\.none :is\(\.eq-cap,\.tl-cap\)\{font-size:(\d+)px\}/, '.g.sm подпись пустого места');
+  if (gBtnH < 44) say(`вёрстка: главная кнопка «Снаряжения» ниже 44 px (${gBtnH})`);
   const abF = px(CSS, /\.ab-x\{[^}]*font:500 (\d+)px/, '.ab-x'), abL = +((CSS.match(/\.ab-x\{[^}]*font:500 \d+px\/([\d.]+)/) || [])[1] || 1.3);
   const nameF = px(CSS, /\.ab-n>b\{[^}]*font:700 (\d+)px/, '.ab-n b'), rsF = px(CSS, /\.pg \.chap \.rs-p\{[^}]*font:500 ([\d.]+)px/, '.pg .chap .rs-p'), whoF = px(CSS, /\.pg \.rs-who\{[^}]*font:500 (\d+)px/, '.pg .rs-who');
   /* способность с самым длинным описанием — на неё считаем строку */
@@ -547,14 +579,17 @@ run('режим «Игрок»', () => T.setTeam(false));
     for (const t of [1, 2, 3, 4, 5]) { const r = BA.spreads[t].r, rh = Math.floor(bh * (1000 - r[0] - r[2]) / 1000); pw = Math.min(pw, Math.floor(bw * (1000 - r[1] - r[3]) / 1000) - ins[1] - ins[3]); ph = Math.min(ph, rh - ins[0] - ins[2] - Math.ceil(rh * (BA.spreads[t].e || 0) / 1000)); }
     const minPage = X.small ? [284, 259] : [316, 290];
     if (pw < minPage[0] || ph < minPage[1]) say(`вёрстка ${X.n}: правая страница ${pw} × ${ph} — меньше ${minPage[0]} × ${minPage[1]}`);
+    /* поля листа чернёного пергамента (.hb-rp.pg{padding}): текст отступает от края листа; закладки — во всю ширину страницы
+       (отрицательные поля .pg-tabs), тело вкладки — уже на поля и ниже на нижнее поле */
+    const pwT = pw; pw -= sheetPad[0] + sheetPad[2]; ph -= sheetPad[1];
     const bodyH = ph - (tabsH - tabsUp) - hdGap;
     /* закладки: подпись прописными и поля — в ширину страницы (у героя — пять, «до покупки» — четыре и глаз «Команды») */
     /* ширина закладки — подпись и поля: у CSS — --pg-tp, у рисунка — полоса рисунка и --pg-tpa; помещаться должны обе */
     const pad = Math.max(tp[k], tabArt ? tabSide[k] + tpa[k] : 0);
     const tabsW = list => list.reduce((a, l) => a + w(l, tf[k], true) + 2 * pad, 0) + (list.length - 1) * tabGap;
     const own = tabsW(TABS.map(x => x[1])), pre = tabsW(['Герой', 'Мощь', 'Навыки', 'Путь']) + tabGap + 24;
-    if (own > pw) say(`вёрстка ${X.n}: закладки героя ${own} px, а ширина страницы ${pw} px`);
-    if (pre > pw) say(`вёрстка ${X.n}: закладки «до покупки» ${pre} px, а ширина страницы ${pw} px`);
+    if (own > pwT) say(`вёрстка ${X.n}: закладки героя ${own} px, а ширина страницы ${pwT} px`);
+    if (pre > pwT) say(`вёрстка ${X.n}: закладки «до покупки» ${pre} px, а ширина страницы ${pwT} px`);
     /* «Мощь»: мощь одной строкой (справа — из чего она, не больше двух строк), пять характеристик (значок, число, степень роста,
        подпись), строка объяснения — самая длинная из возможных, атрибуты столбцами. Всё — без прокрутки на обоих экранах */
     const g = pgmGap[k], bmH = Math.max(bmMin[k], wr[k], bmF[k], 2 * Math.ceil(srcF * 1.15) + 1) + 6 + 1;
@@ -562,7 +597,8 @@ run('режим «Игрок»', () => T.setTeam(false));
     if (srcW > pw - leftW && Math.max(w('основа 99 999', srcF), w('снаряжение +99,9 %', srcF), w('талисманы +99,9 %', srcF)) > (pw - leftW)) say(`вёрстка ${X.n}: из чего мощь — не помещается справа от числа`);
     const stH = sPad[0] + si[k] + 2 + stF[k] + 2 + 10 + 2 + 9.5 + sPad[1] + 2;
     let why = '';
-    T.STATS.forEach((_, i) => { for (const gr of [1, 2, 3]) { const s = `${T.STATS[i]} — ${T.STAT_HINT[i]}. Рост ${T.GRADE[gr]} за уровень${gr === 1 ? ' — главная' : ''}; снаряжение +999.`; if (s.length > why.length) why = s; } });
+    /* та же фраза, что pgWhy (book-pages.js): что даёт, главная ли, прибавка снаряжения; «рост за уровень» не пишется (ADR-0037) */
+    T.STATS.forEach((_, i) => { for (const main of [true, false]) { const s = `${T.STATS[i]} — ${T.STAT_HINT[i]}${main ? '. Главная: от неё обычная атака' : ''}; снаряжение +999.`; if (s.length > why.length) why = s; } });
     const xLines = Math.ceil(wd(why, xF[k]) / pw), whyH = Math.ceil(xLines * xF[k] * xL);
     if (xLines > 2) say(`вёрстка ${X.n}: строка под характеристиками — ${xLines} строки («${why}»)`);
     const atH = atPad[k] + 1 + 12 + 2 + 4 * (Math.max(aHs[k], aIc[k], Math.ceil(12.5 * 1.2)) + 1) + 3;
@@ -572,8 +608,8 @@ run('режим «Игрок»', () => T.setTeam(false));
     if (atW > pw) say(`вёрстка ${X.n}: атрибуты «Мощи» ${atW} px, а ширина страницы ${pw} px`);
     /* «Снаряжение»: рубрика, три ряда мест 3 × 3 (рамка, подпись), талисманы 2 × 2 рядом; низ одной строкой — «Все вещи» и кнопка
        «Надеть лучшее» с прибавкой мощи; всё — без прокрутки */
-    const capH = Math.round(Math.max(capF * capL, noneF * noneL)), gRowH = slot[k] + slotGap + capH;
-    const gearH = 2 + rbh[k] + 1 + rg[k] + 3 * gRowH + 2 * rg[k] + gv[k] + gFootPad + 1 + gBtnH;
+    const capH = Math.round(Math.max(capF * capL, (X.small ? noneFs : noneF) * noneL)), gRowH = slot[k] + slotGap + capH;
+    const gearH = 2 + rbh[k] + 1 + rg[k] + 3 * gRowH + 2 * rg[k] + gv[k] + gFootPad[k] + 1 + gBtnH;
     if (gearH > bodyH) say(`вёрстка ${X.n}: «Снаряжение» ${gearH} px, а места ${bodyH} px`);
     const tlGap = Math.max(tlRowGap, tlArtGap), tlH = 2 + rbh[k] + 1 + rg[k] + 2 * gRowH + tlGap;
     if (tlH > 3 * gRowH + 2 * rg[k] + rbh[k] + 20 + 2 * 18) say(`вёрстка ${X.n}: талисманы выше мест снаряжения`);
@@ -622,7 +658,7 @@ run('режим «Игрок»', () => T.setTeam(false));
   const SCR2 = [{ n: '932 × 430', w: 932, h: 430, small: false }, { n: '844 × 390', w: 844, h: 390, small: true }];
   const inPage = e => CC.within(e, x => x.cls.has('hb-rp') && x.cls.has('pg'));
   const pxv = v => { const m = String(v || '').trim().match(/^(-?[\d.]+)px$/); return m ? +m[1] : null; };
-  const INK = '#2b1c10', INK2 = '#5a422c';
+  const INK = '#efe3c6', INK2 = '#d2c3a1';   // белила и белила второго плана — тема .pg (book-pages.css)
   for (const X of SCR2) {
     const K = () => new CC.Cascade(RULES, { w: X.w, h: X.h, reduced: false, hover: false, containers: { main: [X.w - (X.small ? G.railS : G.rail), X.h - (X.small ? G.topS : G.top)] } });
     /* «Снаряжение»: всё пусто (стрелки «есть лучше») и всё надето */
@@ -670,13 +706,64 @@ run('режим «Игрок»', () => T.setTeam(false));
         if (kids[0] !== 'pg-rub' || C.value(row.kids[0], 'grid-column-start') !== '1' || C.value(row, 'display') !== 'grid') say(`${where}: рубрика .${cls} — не первой строкой над сеткой (${kids.join(', ')})`);
       }
     }
-    /* «Мощь»: число характеристики — чернилами страницы, не цветом наследства */
+    /* цвет текста на листе: из темы страницы (book-pages.css) и не ниже 4,5 : 1 к самому светлому тону листа --pg-hi; полупрозрачный
+       цвет кладётся на --pg-hi */
+    const hiTone = ((CSS.match(/\.pg,\.gw\{[^}]*--pg-hi:(#[0-9a-f]{6})/i) || [])[1] || '#241d16');
+    const rgbOf = v => { const s = String(v || '').trim().toLowerCase(), h = s.match(/^#([0-9a-f]{6})$/); if (h) return [0, 2, 4].map(i => parseInt(h[1].slice(i, i + 2), 16)).concat(1);
+      const m = s.match(/^rgba?\(([^)]+)\)$/); if (!m) return null; const p = m[1].split(',').map(x => parseFloat(x)); return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1]; };
+    const lumOf = c => { const l = c.slice(0, 3).map(v => v / 255).map(v => v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4); return 0.2126 * l[0] + 0.7152 * l[1] + 0.0722 * l[2]; };
+    const contrastOf = v => { const c = rgbOf(v), b = rgbOf(hiTone); if (!c || !b) return 0; const mix = c.slice(0, 3).map((x, i) => x * c[3] + b[i] * (1 - c[3])); const x = lumOf(mix), y = lumOf(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+    const readable = (C, root, test, what, want) => {
+      const els = CC.q(root, e => inPage(e) && test(e)); if (!els.length) { say(`каскад ${X.n} · ${what}: на странице нет таких строк`); return; }
+      for (const e of els.slice(0, 6)) {
+        const c = String(C.value(e, 'color') || '').toLowerCase(), r = contrastOf(c); cnt.contrast = (cnt.contrast || 0) + 1;
+        if (want && c !== want) { say(`каскад ${X.n} · ${what}: цвет ${c || 'без цвета'}, ждали ${want}`); break; }
+        if (r < 4.5) { say(`каскад ${X.n} · ${what}: цвет ${c || 'без цвета'} к листу ${hiTone} — ${r.toFixed(2)} : 1, ниже 4,5 : 1`); break; }
+      }
+    };
+    /* «Мощь»: число характеристики — белилами страницы, не цветом наследства */
     fresh(); book('h2', 'stats');
     { const root = tree(X.small, view(`каскад ${X.n} · «Мощь»`)), C = K();
       const b = CC.q(root, e => inPage(e) && e.tag === 'b' && e.parent && e.parent.cls.has('pgm-s'));
       if (b.length !== 5) say(`каскад ${X.n} · «Мощь»: чисел характеристик ${b.length}`);
-      for (const e of b) { const c = String(C.value(e, 'color') || '').toLowerCase(), w = C.win(e, 'color'); if (c !== INK || !w || w.src !== PAGE) { say(`каскад ${X.n} · «Мощь»: число характеристики — ${c || 'без цвета'} (${w ? w.src : 'наследство'}), ждали чернила ${INK}`); break; } } }
-    /* книга «до покупки»: кнопка с ценой не сжимается, пояснение — чернилами */
+      for (const e of b) { const c = String(C.value(e, 'color') || '').toLowerCase(), w = C.win(e, 'color'); if (c !== INK || !w || w.src !== PAGE) { say(`каскад ${X.n} · «Мощь»: число характеристики — ${c || 'без цвета'} (${w ? w.src : 'наследство'}), ждали белила ${INK}`); break; } }
+      readable(C, root, e => e.cls.has('pgm-x'), '«Мощь», строка под характеристиками');
+      readable(C, root, e => e.tag === 'span' && e.parent && e.parent.cls.has('pgm-a'), '«Мощь», имя атрибута'); }
+    /* «Развитие»: карточка шага — во всю высоту страницы, её низ — последним; главная кнопка — последней в нём, у правого края
+       (под большим пальцем правой руки), не ниже 44 px и с ценой; строки превью и характеристики — читаются */
+    fresh(); book('h1', 'power');
+    { const root = tree(X.small, view(`каскад ${X.n} · «Развитие»`)), C = K(), where = `каскад ${X.n} · «Развитие»`;
+      const card = CC.q(root, e => inPage(e) && e.cls.has('hdv-next'))[0], act = card && card.kids[card.kids.length - 1], go = act && act.kids[act.kids.length - 1];
+      if (!card || C.value(card, 'flex-grow') !== '1' || C.value(card, 'display') !== 'flex' || C.value(card, 'flex-direction') !== 'column') say(`${where}: карточка шага — не во всю высоту страницы (flex-grow ${card ? C.value(card, 'flex-grow') : '—'})`);
+      if (!act || !act.cls.has('hdv-act') || C.value(act, 'margin-top') !== 'auto') say(`${where}: низ карточки с кнопкой — не последним и не прижат к низу страницы`);
+      if (!go || !go.cls.has('hdv-go') || !go.cls.has('go')) say(`${where}: главная кнопка — не последней в низу карточки (у правого края)`);
+      else {
+        const mh = pxv(C.value(go, 'min-height'));
+        if (C.value(go, 'margin-left') !== 'auto') say(`${where}: главная кнопка не прижата к правому краю (margin-left ${C.value(go, 'margin-left')})`);
+        if (!(mh >= 44)) say(`${where}: главная кнопка ниже 44 px (min-height ${C.value(go, 'min-height')})`);
+        if (C.value(go, 'flex-shrink') !== '0') say(`${where}: главная кнопка сжимается — цену обрежет`);
+        if (!CC.q(go, e => e.cls.has('cost')).length) say(`${where}: на главной кнопке нет цены`);
+        lay.push(`каскад ${X.n}: «Развитие» — кнопка шага последней в карточке, справа, ${mh} px`);
+      }
+      readable(C, root, e => e.cls.has('k') && e.parent && e.parent.cls.has('hdv-g'), '«Развитие», подпись строки превью');
+      readable(C, root, e => e.tag === 'b' && e.parent && e.parent.cls.has('v') && e.parent.parent && e.parent.parent.cls.has('hdv-g'), '«Развитие», «станет» в превью');
+      readable(C, root, e => e.tag === 's' && e.parent && e.parent.cls.has('v'), '«Развитие», «было» в превью');
+      readable(C, root, e => e.tag === 'b' && e.parent && e.parent.cls.has('s5'), '«Развитие», характеристика');
+      readable(C, root, e => e.cls.has('hdv-sum'), '«Развитие», строка «уровень · предел · доблесть»'); }
+    /* «Снаряжение»: низ — у нижнего края страницы, главная кнопка — последней в нём, не ниже 44 px; подписи мест читаются */
+    fresh(); book('h1', 'gear');
+    { const root = tree(X.small, view(`каскад ${X.n} · «Снаряжение» · низ`)), C = K(), where = `каскад ${X.n} · «Снаряжение»`;
+      const gear = CC.q(root, e => inPage(e) && e.cls.has('hd-gear'))[0], foot = gear && CC.q(gear, e => e.cls.has('hdg-f'))[0], btn = foot && foot.kids[foot.kids.length - 1];
+      if (!gear || !/1fr\)?$/.test(String(C.value(gear, 'grid-template-rows') || '').trim())) say(`${where}: у сетки мест нет растущего ряда под низ (grid-template-rows ${gear ? C.value(gear, 'grid-template-rows') : '—'})`);
+      if (!foot || C.value(foot, 'align-self') !== 'end') say(`${where}: низ с главной кнопкой не прижат к нижнему краю страницы`);
+      if (!btn || !btn.cls.has('btn') || !(pxv(C.value(btn, 'min-height')) >= 44)) say(`${where}: главная кнопка низа — не последней или ниже 44 px`);
+      readable(C, root, e => e.cls.has('eq-cap'), '«Снаряжение», подпись места'); }
+    /* «Навыки» и «Путь»: описание способности и текст главы читаются */
+    fresh(); book('h3', 'skills');
+    { const root = tree(X.small, view(`каскад ${X.n} · «Навыки»`)), C = K(); readable(C, root, e => e.cls.has('ab-x'), '«Навыки», описание способности'); }
+    fresh(); book('h2', 'path');
+    { const root = tree(X.small, view(`каскад ${X.n} · «Путь»`)), C = K(); readable(C, root, e => e.cls.has('rs-p'), '«Путь», текст главы'); }
+    /* книга «до покупки»: кнопка с ценой не сжимается, пояснение — белилами второго плана */
     fresh(); { const gold = T.RS.heroes.find(x => x.src === 'gold' && x.c <= T.rsCyc() && !T.rsHas(x));
       T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'rs'; T.S.rs.sel = gold.id; T.S.seg.rhero = 'who'; T.S.overlay = null;
       const root = tree(X.small, view(`каскад ${X.n} · до покупки`)), C = K();
@@ -684,7 +771,8 @@ run('режим «Игрок»', () => T.setTeam(false));
       if (!btn) say(`каскад ${X.n} · до покупки: внизу нет кнопки`);
       else if (C.value(btn, 'flex-shrink') !== '0') say(`каскад ${X.n} · до покупки: кнопка с ценой сжимается (flex-shrink ${C.value(btn, 'flex-shrink')}) — цену обрежет`);
       if (sp && C.value(sp, 'display') !== 'none') say(`каскад ${X.n} · до покупки: распорка отнимает место у пояснения`);
-      if (!why || String(C.value(why, 'color')).toLowerCase() !== INK2) say(`каскад ${X.n} · до покупки: пояснение не чернилами (${why ? C.value(why, 'color') : 'нет'})`); }
+      if (!why || String(C.value(why, 'color')).toLowerCase() !== INK2) say(`каскад ${X.n} · до покупки: пояснение не белилами второго плана (${why ? C.value(why, 'color') : 'нет'})`);
+      readable(C, root, e => e.cls.has('rs-who'), 'до покупки, история героя'); }
     cnt.layout++;
   }
 }

@@ -40,8 +40,15 @@ async function target() {
     await cmd('Page.enable'); await cmd('Runtime.enable');
     await cmd('Network.enable'); await cmd('Network.setCacheDisabled', { cacheDisabled: true });   // у стилей нет штампа версии: иначе долгоживущий Chrome покажет старые
     await cmd('Emulation.setDeviceMetricsOverride', { width: 1600, height: 1000, deviceScaleFactor: 2, mobile: false });
-    await cmd('Page.navigate', { url: 'http://localhost:8765/' });
-    await sleep(3500);
+    /* ждём, пока прототип поднимется: без кэша ~90 скриптов и сотни картинок грузятся дольше фиксированной паузы; сервер превью под
+       нагрузкой иногда отказывает в соединении — тогда страница без скриптов, и её грузим заново (до трёх раз) */
+    let up = false;
+    for (let t = 0; t < 3 && !up; t++) {
+      await cmd('Page.navigate', { url: 'http://localhost:8765/' });
+      for (let i = 0; i < 60; i++) { await sleep(500); if (await ev(`typeof S !== 'undefined' && typeof render === 'function' && !!document.querySelector('.p-device')`)) { up = true; break; } }
+    }
+    if (!up) throw new Error('прототип не поднялся за три загрузки');
+    await sleep(800);
     const log = [];
     for (const s of shots) {
       const dev = s.dev || '932';

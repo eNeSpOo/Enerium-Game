@@ -60,8 +60,9 @@ const rfCap = s => (s ? s[0].toUpperCase() + s.slice(1) : '');
 /* доля в базисных пунктах словом, целыми: 200 → «2 %», 250 → «2,5 %» */
 const rfPct = bp => { const i = Math.floor(bp / 100), f = bp % 100; return `${i}${f ? ',' + String(f).padStart(2, '0').replace(/0$/, '') : ''} %`; };
 const rfHero = id => { const h = id && typeof H === 'function' ? H(id) : null; return h ? h.name : 'другой герой'; };
-/* рамка редкости вокруг арта предмета: без арта — прежний значок экрана */
-const rfFrame = (r, inner, cls = '') => `<span class="rf-t${cls ? ' ' + cls : ''}" data-r="${r}">${inner}</span>`;
+/* рамка предмета (art-icons.css, класс itf) — одна на талисманы, снаряжение и рабочих, свет — редкость; кристалл рабочего без арта
+   (cls cr) — круглый, без рамки. Без арта у талисмана — прежний медальон экрана */
+const rfFrame = (r, inner, cls = '') => `<span class="rf-t${cls ? ' ' + cls : ''}${/(^|\s)cr(\s|$)/.test(cls) ? '' : ' itf'}" data-r="${r}">${inner}</span>`;
 
 /* ---- талисманы: свободные — в запасах (TB), надетые — в местах героев (S.tal.eq) ---- */
 function rfTalWorn(r) {

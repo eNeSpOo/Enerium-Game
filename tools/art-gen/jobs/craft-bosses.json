@@ -1,0 +1,254 @@
+{
+  "name": "Враги крафта Этриона (ADR-0033): крафтовые боссы руин и городов, пробуждённые, эхо боссов биомов — портреты для Эхо (screens/echo.js: слоты, карточка цели, «Сведения», «Призван», итог боя, лицо в бою). Слово автора 30.09.2026: «вот у нас сейчас появились враги после Этриона и им тоже нужно будет генерить Арты». Способ — «Глубокий промт персонажа» (art/style/style.md), кадр — ADR-0012: по пояс, корпус развёрнут влево, без картинки в запросе. Партиями по слову автора: «генерить разом такую пачку героев это большой риск слить много денег в пустоту… генерировать… постепенно партиями». Пробная пятёрка — jobs; остальные — backlog, без генерации",
+  "plan": {
+    "Кто они": "крафтовый босс — память о тех, кто пал в месте (ресурсы-рецепты-дроп.md, «Крафтовые места и боссы»); предмет призывает его в Эхо. Эхо поднимает его целиком, каким он был в миг, когда остановилась его история: живым и плотным, не призраком — как враги недель Эхо (echo-*.json)",
+    "Пробная пятёрка": "разные места, расы и облики: Торбьёрн (люди, город Кромка Алаэля, цикл I), Бур у стены (аппараты, Старый подкоп, I), Матка каменных жуков (звери, Источенное хранилище, II), Пламя над курганом (саганы, Курган клинков, III), Та, что ждёт (эльфы, Дом с остановленными часами, V)",
+    "Облик": "из данных recipes.js: places[].boss (lore), призыв call_<id>, трофей tr_<id> и трофей пробуждённого tr_<id>a — поле art (фраза облика предмета) и lore",
+    "Свет": "у каждого места свой: свет снизу — от стихии и вещей места, контровой по краю",
+    "Пробуждённые": "«тот же босс целиком» — рисовать правкой (EDIT) портрета своего босса с деталью пробуждения из lore: так лицо и одежда останутся теми же; пока своего нет, прототип показывает портрет босса",
+    "Эхо боссов биомов": "bm1–bm4 — готовые портреты боссов биомов 1–4 (foes/b1, b2b1, b3b1, b4b1); bm5–bm10 — одним рисунком с боссами биомов 5–10, когда их будут рисовать; bm11–bm12 и всё цикла VI — для команды, не рисуются"
+  },
+  "notes": [
+    "01.10.2026, пятёрка пробы: Торбьёрн, Бур и Матка — с первого раза. Пламя над курганом v1 — лысый человек с тёмной кожей анфас: саган не читается, поза статична. v2 — голова из углей и трещин угля, пламя вместо волос, «нет человеческой кожи», корпус в три четверти влево",
+    "Итог пробы: Торбьёрн — живопись, пафос, все пять деталей; Бур — машина с живой ручкой хозяина у рычага (на 74 px не мешает); Матка и Пламя v2 — плоская, более «графичная» заливка, чем у Торбьёрна; Та, что ждёт — все детали, часы на поясе вышли двумя. Выгрузка — foes/fc1, fb2, fb17, fb9 (v2), fb15"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Epic, dramatic character art: a powerful pose, a low camera, strong theatrical light from below. Light tells the story: a few strong sources of the figure's own place glow from within and throw colored light upward, the light comes from below. Warm and cold light contrast. Dust motes, sparks, ash or grains float in the light. Moderate detail, clean readable forms; the face, the hands and the weapon get the most detail. No photorealism, no 3D-render look, no anime, no cartoon.",
+  "negative": "No text, no letters, no numbers, no glyphs, no runes that look like letters, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no pentagrams, no watermark, no signature, no logo, no UI elements, no border or frame around the picture, no plaque, no lettering. No gore, no blood, no skulls, no corpses, no horror grotesque. No nudity, no cleavage, no sexualized forms. Only one figure in the foreground; a figure shaped like a person has exactly two arms and two hands. Not a mannequin, not a crash-test dummy, not a marionette on strings, not a statue on display, not a ghost, not a transparent spirit: no stiff, passive, awkward or doll-like pose, no dead or empty eyes.",
+  "cutout_rule": "",
+  "categories": {
+    "craft-boss": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Enemy card portrait, 4:5. The card is shown small on the battle field (about 74 px wide) and large in the bestiary, so the enemy must read as one bold, simple, well-lit silhouette with a clear pose against a darker background. Framing: a close, heroic half-length portrait. The camera is a little below the figure's chest and looks slightly up, so the enemy towers over the viewer and fills most of the frame. A figure shaped like a person is cut by the bottom edge of the picture at the waist or the belt: head, shoulders, chest, arms and hands in the frame, no hips, no legs, no feet. Beasts and machines are framed as their own description says. The head sits in the upper third with a little space above it. The body is turned in three-quarter view toward the LEFT side of the picture, where its enemies stand; its weapon, its spell or the thing it is named after is thrust toward the left, in front of the body, and reads clearly. Pathos: it is a worthy and dangerous enemy — powerful, proud, alive and caught at the peak of an action, a foe that is frightening and honourable to defeat. Its character shows in its face, its gaze and its posture; its story shows in the details of its body and its things. World: the Echo — the memory of the world. This enemy is the memory of someone who fell long ago in an old place — a ruin of a former people on the roads to the middle of the world, or a city above them — and the Echo raises it whole, exactly as it was in the moment its story stopped: solid, alive and real, not a ghost. Colors: muted, like all our enemies — earthy darks, dull metals, soot black, with the one colored light of its own place; everything else sinks into near-black shadow. Light: the light comes from below, from the sources of its own place named in the description, and lights the face and hands from underneath; a crisp rim light on its edges. Background: its own place, darker and softer than the figure, with depth; the bottom of the picture fades smoothly into shadow, no plaque, no lettering. All portraits of this set share the same framing, painting style and lighting logic."
+    }
+  },
+  "jobs": [
+    {
+      "id": "cb-fc1-torbjorn",
+      "category": "craft-boss",
+      "title": "Торбьёрн, ярл, пришедший за дровами — босс города «Кромка Алаэля», люди, цикл I",
+      "source": "recipes.js places ci1.boss fc1; call_fc1 «Парус в лианах», tr_fc1 «Именной топор ярла», tr_fc1a «Шлем, проросший мхом»; выгрузка — design/ui/assets/art/foes/fc1.jpg (ECH.craftArt, screens/echo.js)",
+      "subject": "The enemy: Torbjorn, a jarl of the north who came for firewood — the boss of the Edge of Alael. Who he is: a northern sea-king who led a landing of longships to the southern edge of the ancient elven forest of Alael to cut its timber. The forest swallowed his warriors and his longships in one night, and since then the north buys its wood in ports. He is the only one still standing. Right now the hero is one more thing between him and the timber he crossed the sea for. Character: stubborn, proud and hard as the winter sea, a leader who has never once retreated; heavy brows drawn low, pale grey eyes narrowed with cold fury, a jaw clenched under a salt-stiff braided beard, his neck and back straight as a mast. Pose, the moment of the blow: he has swung a long bearded axe high over his right shoulder with both hands and is about to bring it down toward the left; his shoulders are twisted, his whole weight behind the swing, his chest thrust forward. He has exactly two arms: the near arm grips the haft low, the far arm high near the head of the axe. Details that tell his story: (1) his named bearded axe, a jarl's axe, its blade carved with plain knotwork, a dull dark-red stone set in its poll — the stone has gone dark but has not cracked; (2) a torn striped sail of faded red and white, patched from three pieces, thrown over his shoulders as a cloak, pale bone arrowheads stuck in it; (3) a carved wooden eye-shaped bead on a cord at his throat; (4) thin green vines and small leaves already creeping over his mail shirt and his shoulders — the forest is still taking him; (5) an old iron helmet with a nose guard, bright green moss starting in its rivets. Place: the dark edge of an ancient forest at night, huge twisted trees and hanging vines, the carved prow of a longship half-swallowed by roots and moss behind him; the light rises from below — a cold pale green-white glow of moss and roots on the forest floor — with a small warm glint of the dull red stone as the only warm light."
+    },
+    {
+      "id": "cb-fb2-drill",
+      "category": "craft-boss",
+      "title": "Бур у стены — босс руины «Старый подкоп», аппараты, цикл I",
+      "source": "recipes.js places cb2.boss fb2; call_fb2 «Пусковой рычаг», tr_fb2 «Ворот подкопа», tr_fb2a «Сердечник бура»; выгрузка — design/ui/assets/art/foes/fb2.jpg",
+      "subject": "The enemy: the Drill at the Wall — the boss of the Old Dig, a machine. Who it is: a great boring machine of a former people. With it they cut their way down through the rock toward the middle of the world, until its masters fell asleep at the wall of the face — and it stopped with them and never started again. Now the Echo has started it one more time, and in front of it stands a new wall: the hero. It is a machine, not a robot and not a person: it has no arms, no legs and no face. Framing for this machine: its front fills the frame like a bust — the great drill, its heavy head and its furnace; the bottom edge cuts it at the base of its body, its frame and tracks are out of the picture. Character: relentless, patient, blindly purposeful; it knows only one direction — through. Its furnace grille glows like a single hot eye. Pose, the moment of the charge: the machine lurches forward on its frame and drives its huge spiral drill bit toward the left, the bit spinning so fast that its edges blur, rock chips and sparks bursting from its point; its whole heavy body leans into the thrust. Details that tell its story: (1) the drill bit is worn and chipped from years in the rock, caked with stone dust; (2) on its side, an iron start lever on a wooden frame, and a small clay hand still grips the lever — the hand of the master who started it; (3) a wooden winch drum with a bronze crank on its flank, old rope still coiled on it; (4) through a hatch in its bronze body glows its heart — a warm cylindrical metal core with spiral grooves, turning by itself; (5) old patched plates of dark iron and dull bronze, rivets, soot, a thin wisp of steam from its seams. Place: the end of an ancient tunnel at the middle of the world, a rough wall of rock in front of it, old timber props, stone dust hanging in the air; the light rises from below — warm orange light of embers at its base and of its furnace — with cold grey-blue rim light from the dark tunnel behind."
+    },
+    {
+      "id": "cb-fb17-beetle-queen",
+      "category": "craft-boss",
+      "title": "Матка каменных жуков — босс руины «Источенное хранилище», звери, цикл II",
+      "source": "recipes.js places cb17.boss fb17; call_fb17 «Треснувшая кладка», tr_fb17 «Жвалы матки», tr_fb17a «Проглоченная строка»; выгрузка — design/ui/assets/art/foes/fb17.jpg",
+      "subject": "The enemy: the Queen of the Stone Beetles — the boss of the Gnawed Vault, a beast. Who she is: a former people cut their writing into stone slabs and kept it in a vault in the rock. Stone beetles gnawed the slabs to dust, and their queen grew huge on the knowledge of others; she will not give up what is left. Right now she rears over the last whole slab, and the hero has come for it. She is a giant beetle of living stone, not a person: no human face, no human arms. Framing for this beast: her head, her great mandibles, her two raised forelegs and the front of her armoured body fill the frame; the rest of her body is behind and below, out of the picture. Character: jealous, possessive and coldly clever; her many small eyes glint amber and watch every move; she does not rage, she guards. Pose, the moment of the strike: she rears up with her two forelegs raised and spread wide, her head thrust toward the left and her massive mandibles opened wide, about to snap shut; stone dust pours from her jaws. Details that tell her story: (1) massive stone-grey mandibles with serrated edges, sharper than a chisel; (2) her carapace of grey stone plates, and in the translucent chitin between them faint straight parallel lines show through, like ruled lines — the writing she swallowed, only lines, never letters; (3) at her base a clutch of cracked stone cocoons on a tunnelled slab; (4) a small ancient bronze gear stuck in the plates of her back; (5) old chips and scars on her plates where tools once struck her. Place: a vault of stone shelves in the rock, slabs gnawed into lace and heaps of stone dust, one last whole slab under her; the light rises from below — dim warm amber light from cracks in the floor and from the dust itself — with a cold grey rim light on her plates."
+    },
+    {
+      "id": "cb-fb9-barrow-flame",
+      "category": "craft-boss",
+      "title": "Пламя над курганом — босс руины «Курган клинков», саганы, цикл III",
+      "source": "recipes.js places cb9.boss fb9; call_fb9 «Урна с тёплым пеплом», tr_fb9 «Негасимый уголь», tr_fb9a «Пепел имени»; выгрузка — design/ui/assets/art/foes/fb9.jpg",
+      "subject": "The enemy: the Flame over the Barrow — the boss of the Barrow of Blades, a sagan of fire. Who it is: a former people buried their chiefs in a barrow on the northern hills together with their weapons. On the night of a chief's funeral the fire of the pyre noticed itself and became a sagan — thinking fire that took a body. Since that night it burns over the barrow and lets no one take the weapons of the dead. Right now the hero has set foot on the barrow. It is a sagan, not a person: its whole body is living crimson fire held in a frame of charred pyre logs, shaped like a tall, strong figure with a head, a broad chest and exactly two arms. Its head is a mass of glowing embers and cracked charcoal, its face like a mask carved from coal — heavy brows, a broad nose, a hard mouth — with flames rising from its crown instead of hair. There is no human skin anywhere: no bald head, no living man, no real-world person. Its body is covered by the burning funeral shroud of the chief. Character: solemn, grave and implacable — a guardian, not a madman; its eyes are two burning coals, steady and unblinking. Pose, the moment of the strike: it rises above the crest of the barrow with its torso turned in three-quarter view toward the LEFT, leaning into the blow; its near arm, on the left of the picture, sweeps a roaring wave of crimson fire toward the left; its far arm raises a chief's old sword high above its head, point up, wreathed in flame. Never a static frontal stance. Details that tell its story: (1) in the middle of its chest burns its heart — a single lump of coal with a steady crimson flame that never dims; (2) the burning funeral shroud of a chief on its shoulders; (3) the old swords and axes of the dead stuck in the barrow around it, their blades glowing red; (4) a charred wooden name tag hanging on a cord from its wrist, with nothing readable on it; (5) grey ash falls around it like snow. Place: a burial mound on dark northern hills at night, blades stuck in the earth, the sky black; the light rises from below — deep crimson light of the fire and the glowing blades — with a cool grey rim light on the ash."
+    },
+    {
+      "id": "cb-fb15-she-who-waits",
+      "category": "craft-boss",
+      "title": "Та, что ждёт — босс руины «Дом с остановленными часами», эльфы, цикл V",
+      "source": "recipes.js places cb15.boss fb15; call_fb15 «Вторая чашка», tr_fb15 «Обручальный лист», tr_fb15a «Часы на двоих»; выгрузка — design/ui/assets/art/foes/fb15.jpg",
+      "subject": "The enemy: She Who Waits — the boss of the House with Stopped Clocks, an elf. Who she is: the mistress of a house in a grove, who stopped every clock in the house on the day her betrothed did not come back. She has waited two hundred years; for her it is no time at all, for the house it is. Right now a stranger has walked into her house — the hero — and she will let no one move the hands. She is an elf: tall and slender, long pointed ears, an ageless narrow face with high cheekbones, pale skin; she must not look like a real-world person. Character: calm, cold and unbending, grief turned into stillness; her face does not move, her dark green eyes have not blinked for centuries, her lips pressed thin; her chin is raised, her back straight as a candle. Pose, the moment of the spell: she thrusts her near hand toward the left with the fingers spread, and in front of her palm the air itself stops — a ring of dust motes and drops of tea hanging motionless in green light; her far hand holds a small crystal locket pressed to her heart. She has exactly two arms: the near one casting, the far one at her chest. Details that tell her story: (1) the crystal locket holds a single fresh green leaf — the betrothal leaf the elves give instead of a ring; it does not wilt while she waits; (2) her gown is of a fashion two hundred years old, fine but faded, grey dust lying on its shoulders; (3) her hair is still pinned up for a wedding, one dried flower in it; (4) a pocket watch with two dials hangs on a chain at her belt, one dial stopped; (5) behind her on a small table, two teacups and a stopped wall clock. Place: a dim room in a house in a grove, many clocks on the walls, all stopped, dust hanging still in the air; the light rises from below — a pale green light of stopped time glowing in the floorboards and in the hanging dust — with warm dull brass glints on the clocks."
+    }
+  ],
+  "backlog": {
+    "note": "Остальные враги крафта Этриона — задания без генерации: партиями по слову автора, тем же способом (промт персонажа по слоям Who / Character / Pose / Details / Place, облик — из places[].boss, call_, tr_ и tr_…a в recipes.js). Цикл VI и всё «для команды» (fb7, fb16, fb19, fc6 и их пробуждённые, bm11, bm12) не рисуются: спойлер (§38, дайджест). Пробуждённые — правкой (EDIT) портрета своего босса: деталь пробуждения из awake.lore",
+    "bosses": [
+      {
+        "id": "fb1",
+        "n": "Хатт-Уру, ловчий станции",
+        "race": "Забытые",
+        "cyc": 1,
+        "place": "cb1 Заброшенная дорога — отрезок дороги древних и разбитая станция у портала под Эндалором",
+        "look": "охотник народа, строившего станцию: древняя тетива, чёрный рог с бегущими зверями; кормил строителей, ходил за зверем по дороге, которой ещё не было"
+      },
+      {
+        "id": "fb3",
+        "n": "Лу-Ниэт, книжница башни",
+        "race": "Забытые",
+        "cyc": 2,
+        "place": "cb3 Засыпанная башня — башня звездочётов ушла под землю",
+        "look": "хранительница знания своего народа, сама засыпала башню: застёгнутая книга, глиняная табличка-азбука, астролябия без неба"
+      },
+      {
+        "id": "fb8",
+        "n": "Хродмар Гудок, что считал смены под завалом",
+        "race": "Дворфы",
+        "cyc": 2,
+        "place": "cb8 Сложившаяся выработка — склон Кароксорра, рухнула в Год, когда тряхнуло",
+        "look": "бригадир смены: медная бляха с киркой, мел, каска бригадира; считал смены по гудку, пока было кому дуть"
+      },
+      {
+        "id": "fc2",
+        "n": "Огнемётный привод, у узких ворот",
+        "race": "Аппараты",
+        "cyc": 2,
+        "place": "ci2 Ярусы над пустотой — город дворфов в полости Кароксорра, мосты, эстакады, клети подъёмников",
+        "look": "огнемётный привод на станине у ворот: раскалённое бронзовое сопло, не помнит, как останавливаться"
+      },
+      {
+        "id": "fb4",
+        "n": "Зверь без всадника",
+        "race": "Звери",
+        "cyc": 3,
+        "place": "cb4 Поле древней битвы",
+        "look": "боевой зверь прежнего войска в кованом помятом налобнике, пустая упряжь; ждёт всадника"
+      },
+      {
+        "id": "fb10",
+        "n": "Таран у ворот",
+        "race": "Аппараты",
+        "cyc": 3,
+        "place": "cb10 Выжженная крепость — крепость на перевале, сожжена в осаде",
+        "look": "осадный таран, сожжённый, но дошедший до ворот; бронзовый противовес на цепи; качается до сих пор"
+      },
+      {
+        "id": "fb20",
+        "n": "Кузнец для тех, кто не придёт",
+        "race": "Забытые",
+        "cyc": 3,
+        "place": "cb20 Горн на склоне — кузня на остывшей огненной горе",
+        "look": "кузнец, что куёт до сих пор: молот с тёплым светящимся бойком, нетронутый древний меч"
+      },
+      {
+        "id": "fc3",
+        "n": "Сеймур, учитель",
+        "race": "Люди",
+        "cyc": 3,
+        "place": "ci3 Песок Сеймура — крепость тёмного камня, Арена, Храм Огня в скале",
+        "look": "вождь севера и лучший боец своего времени, учитель Крога: пояс вождя в бляхах, одно место пустое. Тот же человек, что герой c3-65 (assets/art/heroes/c3-65.jpg): врагу — правкой (EDIT) портрета героя, корпус влево"
+      },
+      {
+        "id": "fb5",
+        "n": "Меда-Ус, хранительница воды",
+        "race": "Забытые",
+        "cyc": 4,
+        "place": "cb5 Затопленное святилище — вода в нём чистая",
+        "look": "держала воду святилища чистой: кувшин с синей глазурью, колокол"
+      },
+      {
+        "id": "fb11",
+        "n": "Спящий под маяком",
+        "race": "Звери",
+        "cyc": 4,
+        "place": "cb11 Маяк на мели — море отступило",
+        "look": "морской зверь, кормившийся светом маяка: светящаяся жемчужина в пасти, светящийся ус"
+      },
+      {
+        "id": "fb12",
+        "n": "Жребиемёт",
+        "race": "Аппараты",
+        "cyc": 4,
+        "place": "cb12 Площадь жребия",
+        "look": "машина, что бросает кости до сих пор: костяные грани без знаков, неровная шестерня"
+      },
+      {
+        "id": "fb18",
+        "n": "Смотритель шлюза",
+        "race": "Люди",
+        "cyc": 4,
+        "place": "cb18 Шлюз без реки — река ушла в другое русло",
+        "look": "поднимает и опускает затворы по часам: бронзовый рычаг затвора"
+      },
+      {
+        "id": "fc4",
+        "n": "Страж арки",
+        "race": "Саганы",
+        "cyc": 4,
+        "place": "ci4 Ступени падающей реки — белый камень, красная черепица, арки Паладиума, гавань",
+        "look": "саган воды, связанный синим камнем в замке арки"
+      },
+      {
+        "id": "fb6",
+        "n": "Ведда-Ор, что спускала на верёвке",
+        "race": "Забытые",
+        "cyc": 5,
+        "place": "cb6 Штольня искателей — штольня под Эндалором врезалась в древний чужой ход",
+        "look": "спускала своих на верёвке и слушала свист снизу: верёвка в узлах, свисток, костяное веретено"
+      },
+      {
+        "id": "fb13",
+        "n": "Тень полудня",
+        "race": "Саганы",
+        "cyc": 5,
+        "place": "cb13 Солнечный круг — тень на камнях стоит на одном часе",
+        "look": "саган, заметивший себя в тени столба и стоящий вместе с ней: осколок золотого света"
+      },
+      {
+        "id": "fb14",
+        "n": "Погонщик, что опоздал",
+        "race": "Люди",
+        "cyc": 5,
+        "place": "cb14 Опоздавший караван — караван с зелёным камнем, ход остановлен",
+        "look": "опаздывает на один день уже триста лет: кнут, застывший в щелчке"
+      },
+      {
+        "id": "fb21",
+        "n": "Зверь в прыжке",
+        "race": "Звери",
+        "cyc": 5,
+        "place": "cb21 Застывшая охота — поляна у воронки",
+        "look": "застывший в прыжке над охотниками; стрела висит у его бока сто лет; когти с зелёным светом"
+      },
+      {
+        "id": "fc5",
+        "n": "Селестина, первая в архиве Доводов",
+        "race": "Люди",
+        "cyc": 5,
+        "place": "ci5 Довод — парящий город магов, кварталы школ, Иллюзориум",
+        "look": "маг, вызывавшая всех и проигрывавшая вслух, пока не перестала проигрывать: перчатка мага с тремя камнями на костяшках"
+      }
+    ],
+    "awakened": "по одному на каждого босса выше и на пятёрку пробы: fb1_aw…fb21_aw, fc1_aw…fc5_aw без цикла VI — 23 правки (EDIT) портрета своего босса; деталь — из awake.lore и трофея tr_<id>a (у Торбьёрна — шлем, сквозь который пророс лес; у Бура — сердечник, что крутится сам; у Матки — проглоченная строка в хитине; у Пламени — пепел имени; у Той, что ждёт, — часы на двоих)",
+    "echo": [
+      {
+        "id": "bm5",
+        "n": "Кузнец · эхо",
+        "biome": "b5 Кузня",
+        "look": "северянин вдвое выше человека, в кожаном фартуке, алые жилы Нитриума, стойка с недокованным оружием — одним рисунком с боссом биома 5"
+      },
+      {
+        "id": "bm6",
+        "n": "Воплощение Крога · эхо",
+        "biome": "b6 Арена, где бой не кончался",
+        "look": "огромный северянин с двумя топорами, в которых светится Нитриум; холоден и расчётлив — одним рисунком с боссом биома 6"
+      },
+      {
+        "id": "bm7",
+        "n": "Палач · эхо",
+        "biome": "b7 Залы у водопадов",
+        "look": "закрытый шлем без прорезей, топор в рост человека, колокол без языка у пояса — одним рисунком с боссом биома 7"
+      },
+      {
+        "id": "bm8",
+        "n": "Судья с весами · эхо",
+        "biome": "b8 Город суда",
+        "look": "исполин в мантии с синей лентой, молот с противовесом, огромные весы за спиной, вода в чаше — одним рисунком с боссом биома 8"
+      },
+      {
+        "id": "bm9",
+        "n": "Тот, кто не дошёл · эхо",
+        "biome": "b9 Зал часов",
+        "look": "изношенный плащ неведомого века, карта обрывается у врат, нога занесена для шага — одним рисунком с боссом биома 9"
+      },
+      {
+        "id": "bm10",
+        "n": "Архитектор · эхо",
+        "biome": "b10 Лабиринт у воронки",
+        "look": "огромный аппарат с руками-кранами и отвесом на груди — одним рисунком с боссом биома 10"
+      }
+    ]
+  }
+}

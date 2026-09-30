@@ -77,7 +77,8 @@ const eqGlyph = slot => `<svg class="i eq-g" viewBox="0 0 24 24" aria-hidden="tr
 /* значок предмета: иконка сеткой по слоту и редкости (eqIcon, screens/art-icons.js) — чем выше редкость, тем богаче вещь; рамка
    и свет плитки — тоже редкость. r не передана — обычная вещь слота. Мельче 24 px живопись не читается — контур слота */
 const eqPic = (slot, px = 32, r = 0) => (px >= 24 && typeof eqIcon === 'function' ? eqIcon(slot, px, '', r) : '') || eqGlyph(slot);
-const eqTile = (it, o = {}) => `<span class="eq-t${o.lg ? ' lg' : ''}" data-r="${it.r}" aria-hidden="true">${eqPic(it.slot, o.lg ? 48 : 32, it.r)}</span>`;
+/* плитка вещи; o.itf — в единой тонкой рамке предмета (itf, screens/art-icons.css): редкость — светом; так в окне снаряжения героя */
+const eqTile = (it, o = {}) => `<span class="eq-t${o.lg ? ' lg' : ''}${o.itf ? ' itf' : ''}" data-r="${it.r}" aria-hidden="true">${eqPic(it.slot, o.lg ? 48 : 32, it.r)}</span>`;
 const eqCr = (r, px = 16) => `<span class="zp-cr" data-r="${r}" title="${RAR[r]}">${ICON('r' + r, px, RAR[r])}</span>`;
 /* порядок в списках: редкость выше, главная строка больше, цикл новее, раньше пришёл */
 const eqSort = (a, b) => b.r - a.r || b.lines[0][1] - a.lines[0][1] || b.cyc - a.cyc || a.n - b.n;

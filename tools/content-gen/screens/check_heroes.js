@@ -9,13 +9,15 @@
    2. Книга — одна анатомия (hbCard): ступень data-t = максимум доблести 1…5, редкость data-r и кристалл, стадия data-s; у героя
       аккаунта — круг уровня, пять замков (пройденные отперты, следующий на потолке тлеет или пульсирует), мощь BM.hero; лент ровно
       максимум доблести, взятые — цвета редкости; стихия — медальон, класс — щит (размер l), имя — на плашке. У героя вне коллекции —
-      ни уровня, ни замков, мощь по базовым статам (BM на герое без записи коллекции). Неизвестная душа — силуэт класса вместо
-      портрета, даже выгруженного. Гримуар — угольки; путь пройден — data-max.
+      ни уровня, ни замков, мощь по базовым статам (BM на герое без записи коллекции). Неизвестная душа — книга закрыта: туман и «?»
+      вместо портрета, даже выгруженного, силуэта-заглушки нет (слово автора 30.09.2026: «это всё-таки тоже книга, только со знаком
+      вопроса»). Гримуар — угольки; путь пройден — data-max.
    2а. «Мои» — все 16 героев аккаунта демо, по мощи сильнейшие сверху; порядок, фильтр значками, счётчик «в коллекции N из M»; лист
       фильтра.
    2б. Стадии знакомства (решение автора 30.09.2026): hrStage сверен с независимым правилом по всем 360 героям и циклам. Каталог —
       только найденные (стадии 1–3), счётчик «найдено N из M»; «За золото» будущего цикла — без героев; донатный сет будущего цикла —
-      без героев; веер рулетки и отряд недели — ненайденные безымянными книгами; лавка праха — только найденные; книга не найденного
+      без героев; веер рулетки и отряд недели — ненайденные закрытыми книгами своей ступени с «?», без имени и редкости, будущий цикл —
+      «цикл N» на плашке; лавка праха — только найденные; книга не найденного
       не открывается ни из каталога, ни окном; у неизвестной души книга без сведений — только осколки и где их брать; рецепт героя
       кладёт комплект осколков, а не героя; стекло осколка неизвестной души — силуэт, не портрет; сервер праха не продаёт первый
       осколок.
@@ -35,13 +37,17 @@
       вкладках; уровень за дух пишется в запись коллекции; у героя Эхо — набор из echo-foes.js.
    4б. Боевая мощь — одна функция BM (§6): независимый пересчёт у героев, после уровня и со слоями вещей; одно число на книге,
       в раскрытой книге, «Пятёрке сильнейших», отрядах и листе выбора отряда; соперник Арены, цель Эхо, цель клана — та же формула.
-   5. «За золото» — сетка книг каталога цикла; раскрытая книга «до покупки» с ценой и «Купить»; покупка ACT.gbuy; нехватка — сколько.
+   5. «За золото» — сетка книг каталога цикла без купленных (слово автора 30.09.2026: «в призыве за золото не должны показываться герои,
+      которые уже есть в коллекции»): счётчик «в коллекции N из M», собрана вся картотека — сказано словами; сетка и счётчики — и когда
+      куплено почти всё; раскрытая книга «до покупки» с ценой и «Купить»; покупка ACT.gbuy; нехватка — сколько.
    5а. «За души»: сцена алтаря — вход рулетки веером книг, вход отряда Эхо недели, лавка праха окном.
    5б. Витрина отряда недели — окно: пятеро крупными книгами по стадиям; «Пробудить» у собранного — подтверждение в окне, операция
       с номером, окно пробуждения с возвратом.
    5в. Лавка праха — книги найденных героев, цена осколка; операции SOUL_SRV; дыра праха закрыта (героев Эхо прахом не собрать).
    5г. Стекло осколка: без маски-картинки; портрет — у собранного комплекта, у неизвестной души — силуэт класса.
-   5д. «За Энериум» — книги сета на ступенях цены, покупка DN_SRV; сила коллекции — одна функция collRp.
+   5д. «За Энериум» — книги сета на ступенях цены, покупка DN_SRV; сила коллекции — одна функция collRp. Пятеро парят (слово автора
+      30.09.2026: «левитация… плавно и подсвечивание»): книга поднимается и опускается, свет за ней дышит, блик по обложке — только
+      transform и opacity, фаза — от места; при «меньше движения» — без движения.
    6. Режим «Игрок»: служебного нет (SERVICE из check_player_view.js), нет undefined и NaN; режим «Команда» рисуется.
    7. Вёрстка — расчётом на 932 × 430 и 844 × 390: книги на полках шкафа — «Мои» и «За золото» (книга не уже HC_VIEW.card и
       HC_VIEW.gold, в ряду не меньше пяти, видно больше одной полки, lbCols считает то же число книг на полке, что и расчёт; табличка
@@ -61,7 +67,7 @@
       древнего шкафа, каждая на своём ряде»): «Мои», каталог и «За золото» — шкаф: карниз со строкой счётчиков, порядка и фильтра,
       стойки, лампады, свет снизу, пыль в луче (LB_VIEW.dust пылинок); книги — рядами по lbCols, у каждого ряда своя полка
       с кронштейнами, ряды полные, кроме последнего, полок не меньше LB_VIEW.rows; пустой фильтр — строка на полке и «Сбросить»;
-      «За золото» — у каждой книги латунная табличка на кромке: цена следующего найма, нехватка — тусклая, купленный — «в коллекции»;
+      «За золото» — у каждой книги латунная табличка на кромке: цена следующего найма, нехватка — тусклая; купленных на полках нет;
       будущий цикл — без книг. Арт шкафа — пути LB_ART.ready на диске, адреса и классы у <html>, геометрия целая; без арта — CSS.
       UI-кит «Библиотека Этриона» в обоих режимах; в режиме «Игрок» служебного нет.
    Запуск: node tools/content-gen/screens/check_heroes.js */
@@ -78,7 +84,7 @@ function done() {
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
   console.log(`«Герои»: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; книг проверено ${cnt.cards}, книг на полке отряда ${cnt.tiles}, раскрытых книг ${cnt.bigs}, циклов «Призыва» ${cnt.cycles}; стадий знакомства сверено ${cnt.stage}; моментов анимации ${cnt.anim}; мощь сверена с формулой §6 ${cnt.bm} раз.`);
   for (const x of cnt.lay) console.log('вёрстка ' + x);
-  console.log('Проверка пройдена: карточка героя — книга: ступень — максимум доблести, кристалл и свет — редкость, замки — рунные пределы, ленты — взятая доблесть; стадии знакомства — не найденных не видно, неизвестная душа — силуэт и закрытые сведения; «Мои» и каталог, порядок и фильтр — на полках шкафа Библиотеки Этриона, у каждого ряда своя полка; «За золото» — цена латунной табличкой на кромке; раскрытая книга — портрет и вкладки развития, «до покупки» — без прокачки и снаряжения; анимация открытия по времени — книга выдвигается с полки корешком и разворачивается обложкой, от корешка нижней полки — корешком, пропуск, «меньше движения»; отряд недели, лавка праха и «За Энериум» — книгами; вёрстка 932 × 430 и 844 × 390; в режиме «Игрок» служебного нет.');
+  console.log('Проверка пройдена: карточка героя — книга: ступень — максимум доблести, кристалл и свет — редкость, замки — рунные пределы, ленты — взятая доблесть; стадии знакомства — не найденных не видно, неизвестная душа — закрытая книга своей ступени с «?» и закрытые сведения, в веере и отряде недели не найденный — та же закрытая книга без имени; «Мои» и каталог, порядок и фильтр — на полках шкафа Библиотеки Этриона, у каждого ряда своя полка; «За золото» — без купленных, цена латунной табличкой на кромке, счётчик «в коллекции N из M»; раскрытая книга — портрет и вкладки развития, «до покупки» — без прокачки и снаряжения; анимация открытия по времени — книга выдвигается с полки корешком и разворачивается обложкой, от корешка нижней полки — корешком, пропуск, «меньше движения»; отряд недели, лавка праха и «За Энериум» — книгами, пятеро «За Энериум» парят и светятся; вёрстка 932 × 430 и 844 × 390; в режиме «Игрок» служебного нет.');
   process.exit(0);
 }
 
@@ -186,7 +192,7 @@ function load(o = {}) {
     hrTile, hrHead, RP_VIEW: typeof RP_VIEW !== 'undefined' ? RP_VIEW : null, heroDev: typeof heroDev === 'function' ? heroDev : null, rpNext: typeof rpNext === 'function' ? rpNext : null,
     HC_VIEW, HC_SORT, hcNum, hcView, hcOwnList, hcCatList, hcMax, heroKit, hrDraft,
     HB_VIEW, HB_ART, HB_KIT, hbCard, hbBlank, hbWin, hbTier, hbKitHtml, hbTimes, hbFlight, hbOpenFx, hbTurnFx, hbLayer, hbRsBook,
-    rsDustable, rsDustOf, rsTiers, dnSets, dnSet, DN_SRV, DN_ART, zpCardHero: typeof zpCardHero === 'function' ? zpCardHero : null,
+    rsDustable, rsDustOf, rsTiers, dnSets, dnSet, DN_SRV, DN_ART, DN_VIEW, zpCardHero: typeof zpCardHero === 'function' ? zpCardHero : null,
     ART_ICONS: typeof ART_ICONS !== 'undefined' ? ART_ICONS : null, shardGhost: typeof shardGhost === 'function' ? shardGhost : null, hcFace,
     shardCls: typeof shardCls === 'function' ? shardCls : null, shardClsSvg: typeof shardClsSvg === 'function' ? shardClsSvg : null,
     DU_ART: typeof DU_ART !== 'undefined' ? DU_ART : null, DU_VIEW: typeof DU_VIEW !== 'undefined' ? DU_VIEW : null, SOUL_SRV: typeof SOUL_SRV !== 'undefined' ? SOUL_SRV : null,
@@ -271,8 +277,10 @@ function checkBook(t, where, x) {
   if (z === 's' && /class="hb-(?:el|nm|cls)"/.test(t)) say(`${where}: у мелкой книги лишнее — стихия, имя или класс (только главное)`);
   if (/class="rs-ph"|class="hsg-init"/.test(t)) say(`${where}: инициалы вместо портрета`);
   if (x.img && !x.soul && !t.includes(`heroes/${x.img}.jpg`)) say(`${where}: портрет — не рисунок героя ${x.img}`);
-  if (x.soul && /heroes\/[\w-]+\.jpg/.test(t.replace(/<span class="hsg[\s\S]*?<\/span><\/span>/g, ''))) say(`${where}: у неизвестной души виден портрет — должен быть силуэт класса`);
-  if ((x.sil || x.soul) && !/class="hk-sil"/.test(t)) say(`${where}: нет силуэта класса`);
+  if (x.soul && /heroes\/[\w-]+\.jpg/.test(t.replace(/<span class="hsg[\s\S]*?<\/span><\/span>/g, ''))) say(`${where}: у неизвестной души виден портрет — книга должна быть закрыта`);
+  if (x.sil && !x.soul && !/class="hk-sil"/.test(t)) say(`${where}: нет силуэта класса`);
+  if (x.soul && !/<span class="hb-ph"><span class="hb-q" aria-hidden="true"><i class="hb-qm">\?<\/i><\/span><\/span>/.test(t)) say(`${where}: неизвестная душа — не закрытая книга с «?» в окне (слово автора 30.09.2026)`);
+  if (x.soul && /class="hk-sil"/.test(t)) say(`${where}: у неизвестной души силуэт-заглушка — книга закрыта, в окне «?»`);
   const own = x.own && !x.gray;
   if (own) {
     checkLocks(t, where, x.lim, x.nx || '');
@@ -434,7 +442,7 @@ const stageOf = (h, S) => { if (T.rsHas(h)) return 3; if (h.c > T.rsCyc()) retur
   const A = T.ART_ICONS, F = A && A.clsFit;
   const jpgSize = f => { const b = fs.readFileSync(f); for (let i = 2; i < b.length - 9;) { if (b[i] !== 0xff) { i++; continue; } const m = b[i + 1], len = b.readUInt16BE(i + 2); if (m >= 0xc0 && m <= 0xc3) return [b.readUInt16BE(i + 7), b.readUInt16BE(i + 5)]; i += 2 + len; } return null; };
   const byKey = new Map();
-  for (const h of T.RS.heroes) { const k = T.shardCls ? T.shardCls(h) : ''; if (k && !byKey.has(k)) byKey.set(k, h); }
+  for (const h of T.RS.heroes) { if ((T.RS_ART && T.RS_ART.has(h.id)) || T.rsHas(h)) continue; const k = T.shardCls ? T.shardCls(h) : ''; if (k && !byKey.has(k)) byKey.set(k, h); }
   const keys = [...byKey.keys()];
   if (!F || !Number.isInteger(F.ratio) || !F.box) say('силуэт: нет кадра фигуры ART_ICONS.clsFit');
   else if (keys.length < 7) say(`силуэт: классов в составе ${keys.length} — ждали семь силуэтов`);
@@ -445,8 +453,9 @@ const stageOf = (h, S) => { if (T.rsHas(h)) return 3; if (h.c > T.rsCyc()) retur
       if (b.some(v => !Number.isInteger(v) || v < 0 || v > 1000) || b[0] >= b[2] || b[1] >= b[3]) say(`силуэт ${k}: кадр ${b.join(', ')} — не целые тысячные доли рисунка`);
       if (!sz) say(`силуэт ${k}: нет рисунка ${A.cls(k)}`);
       else if (Math.abs(Math.round(sz[0] * 1000 / sz[1]) - F.ratio) > 1) say(`силуэт ${k}: рисунок ${sz[0]} × ${sz[1]}, а ratio в данных ${F.ratio}`);
-      /* hcFace кладёт кадр в поле; SVG без выгрузки — «вписать», не «заполнить» */
-      const f = T.hcFace(Object.assign(T.hrV(byKey.get(k)), { st: 1 }));
+      /* hcFace кладёт кадр в поле у известного героя без портрета (у неизвестной души — «?»); SVG без выгрузки — «вписать», не «заполнить» */
+      const f = T.hcFace(Object.assign(T.hrV(byKey.get(k)), { st: 2 }));
+      if (!/^<span class="hb-q"/.test(T.hcFace(Object.assign(T.hrV(byKey.get(k)), { st: 1 })))) say(`силуэт ${k}: у неизвестной души в окне не «?»`);
       if (!f.includes(`<span class="hk-fit"><img class="fit" style="--bx:${b[0]};--by:${b[1]};--bw:${b[2] - b[0]};--bh:${b[3] - b[1]};--ir:${F.ratio}"`)) say(`силуэт ${k}: в окне книги рисунок не вписан кадром фигуры в поле`);
       if (T.shardClsSvg && !T.shardClsSvg(k, true).includes('preserveAspectRatio="xMidYMax meet"')) say(`силуэт ${k}: SVG без выгрузки заполняет окно и обрезает фигуру`);
     }
@@ -782,18 +791,20 @@ for (const team of [false, true]) {
   for (let c = 1; c <= 6; c++) {
     fresh(); T.S.acc.cycle = c; T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = 'gold';
     const tag = `«За золото» · цикл ${c}${team ? ' [команда]' : ''}`, g = view(tag), cat = T.RS.heroes.filter(h => h.src === 'gold' && h.c === c).sort((a, b) => a.no - b.no);
+    const left = cat.filter(h => !T.rsHas(h)), got = cat.length - left.length;
     const ids = cardsOf(g).map(t => (t.match(/data-v="([^"]+)"/) || [])[1]);
-    if (ids.join() !== cat.map(h => h.id).join()) say(`${tag}: книги ${ids.length} не по «№» каталога (${cat.length})`);
+    if (ids.join() !== left.map(h => h.id).join()) say(`${tag}: книги ${ids.length} — не герои картотеки без купленных по «№» (${left.length} из ${cat.length})`);
+    for (const h of cat.filter(x => T.rsHas(x))) if (g.includes(`data-v="${h.id}"`)) say(`${tag}: в картотеке виден купленный ${h.n} — слово автора 30.09.2026: «не должны показываться герои, которые уже есть в коллекции»`);
+    if (!g.includes(`в коллекции ${T.fmt(got)} из ${T.fmt(cat.length)}`)) say(`${tag}: нет счётчика «в коллекции ${got} из ${cat.length}»`);
     const k = T.rsBought(c) + 1;
     if (!g.includes(`Следующий найм — ${k}-й в цикле:`) || !g.includes(`<b class="num">${T.fmt(T.rsGold(c, k))}</b>`)) say(`${tag}: нет строки «Следующий найм» с ценой ${T.rsGold(c, k)}`);
-    for (const h of cat.slice(0, 6)) {
-      const t = cardOf(g, h.id), v = T.hrV(h), own = T.rsHas(h);
+    for (const h of left.slice(0, 6)) {
+      const t = cardOf(g, h.id);
       if (!t.includes(`data-a="gsel" data-v="${h.id}"`)) say(`${tag} · ${h.n}: нажатие не открывает книгу «до покупки»`);
-      if (own !== /class="hb-in"/.test(t)) say(`${tag} · ${h.n}: отметка «в коллекции» ${own ? 'пропала' : 'у некупленного'}`);
-      if (!own) checkBook(t, `${tag} · ${h.n}`, rsX(h, { img: T.RS_ART.has(h.id) ? h.id : null, sil: !T.RS_ART.has(h.id) }));
-      else if (v.acc) checkBook(t, `${tag} · ${h.n}`, Object.assign(accX(v.acc), { bm: null }));
+      if (/class="hb-in"/.test(t)) say(`${tag} · ${h.n}: отметка «в коллекции» у некупленного`);
+      checkBook(t, `${tag} · ${h.n}`, rsX(h, { img: T.RS_ART.has(h.id) ? h.id : null, sil: !T.RS_ART.has(h.id) }));
     }
-    if (count(g, /<button class="hb[ "][^>]*>/g) !== cat.length) say(`${tag}: книг ${count(g, /<button class="hb[ "][^>]*>/g)}, героев каталога ${cat.length}`);
+    if (count(g, /<button class="hb[ "][^>]*>/g) !== left.length) say(`${tag}: книг ${count(g, /<button class="hb[ "][^>]*>/g)}, некупленных героев картотеки ${left.length}`);
     cnt.cycles++;
   }
 }
@@ -818,7 +829,23 @@ run('режим «Игрок»', () => T.setTeam(false));
   w = winOf(view('«За золото» · куплен'));
   if (!w.includes(`data-a="dngo" data-v="${x.id}"`) || /data-a="gbuy"/.test(w)) say('«За золото»: после покупки у книги нет «К развитию» или осталась покупка');
   run('золото · закрыть', () => T.ACT.hbclose('gold')); if (T.S.rs.gsel) say('«За золото»: закрытие не вернуло к сетке');
-  if (!cardOf(view('«За золото» · сетка после'), x.id).includes('class="hb-in"')) say('«За золото»: у купленного в сетке нет отметки «в коллекции»');
+  { const ga = view('«За золото» · сетка после'), all = T.RS.heroes.filter(h => h.src === 'gold' && h.c === 2);
+    if (cardOf(ga, x.id)) say('«За золото»: купленный остался в картотеке — ему место в коллекции');
+    if (!ga.includes(`в коллекции ${T.fmt(k)} из ${T.fmt(all.length)}`)) say(`«За золото»: после найма счётчик не «в коллекции ${k} из ${all.length}»`); }
+  /* куплено почти всё и всё: сетка и счётчики не ломаются. Почти всё — на полке три книги, полок не меньше LB_VIEW.rows, счётчик
+     и следующий найм верны; всё — полка говорит, что картотека собрана, найма нет, фильтра нет */
+  { fresh(); T.S.acc.cycle = 2; T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = 'gold';
+    const all = T.RS.heroes.filter(h => h.src === 'gold' && h.c === 2).sort((a, b) => a.no - b.no), rest = all.slice(-3);
+    for (const h of all.slice(0, -3)) T.S.rs.owned[h.id] = { lvl: 0, lim: 0, valor: 0, how: 'gold' };
+    let g = view('«За золото» · почти всё куплено'); const kk = T.rsBought(2) + 1;
+    if (cardsOf(g).map(b => (b.match(/data-v="([^"]+)"/) || [])[1]).join() !== rest.map(h => h.id).join()) say(`«За золото» · почти всё куплено: на полках не три оставшихся (${cardsOf(g).length})`);
+    if (!g.includes(`в коллекции ${T.fmt(all.length - 3)} из ${T.fmt(all.length)}`) || !g.includes(`Следующий найм — ${kk}-й в цикле:`) || !g.includes(`<b class="num">${T.fmt(T.rsGold(2, kk))}</b>`)) say('«За золото» · почти всё куплено: счётчик или следующий найм не сходятся');
+    if (count(gridOf(g), /<div class="lb-row[ "]/g) < T.LB_VIEW.rows || count(gridOf(g), /<span class="lb-tag[ "]/g) !== 3) say('«За золото» · почти всё куплено: полок меньше, чем в пустом шкафу, или табличек цены не три');
+    for (const h of rest) T.S.rs.owned[h.id] = { lvl: 0, lim: 0, valor: 0, how: 'gold' };
+    g = view('«За золото» · всё куплено');
+    if (cardsOf(g).length || !g.includes(`Картотека цикла II собрана: все ${T.fmt(all.length)}`) || !g.includes(`в коллекции ${T.fmt(all.length)} из ${T.fmt(all.length)}`)) say('«За золото» · всё куплено: видны книги или не сказано, что картотека собрана');
+    if (/Следующий найм/.test(g) || /data-v="hcflt:gold"/.test(g)) say('«За золото» · всё куплено: осталась строка следующего найма или фильтр пустой картотеки');
+    T.S.overlay = { t: 'hcflt', arg: 'gold' }; if (!ovOf(view('«За золото» · фильтр при почти пустой')).includes('Подходит героев: <b class="num">0</b>')) say('«За золото»: лист фильтра считает купленных'); T.S.overlay = null; }
   /* будущий цикл — героев не видно (стадия 0), сказано, когда откроется; книга будущего не открывается */
   T.S.rs.gcyc = 4; const z = T.RS.heroes.find(h => h.src === 'gold' && h.c === 4);
   const gz = view('«За золото» · будущий цикл'); if (cardsOf(gz).length || !gz.includes('откроется при переходе на цикл IV')) say('«За золото» · будущий цикл: видны герои или не сказано, когда откроется');
@@ -835,7 +862,14 @@ function souls(c, team) {
   if (open && count(body, /<span class="rl-ef"/g) !== pool.length) say(`${tag}: книг веера ${count(body, /<span class="rl-ef"/g)}, героев пула ${pool.length}`);
   if (open) { const fan = body.slice(body.indexOf('<div class="rl-faces'), body.indexOf('<div class="rl-ef-f')), blank = count(fan, /<button class="hb blank/g), found = pool.filter(x => T.hrStage(x) >= 1).length;
     if (blank !== pool.length - found || count(fan, /<button class="hb[ "]/g) !== pool.length) say(`${tag}: в веере безымянных ${blank}, не найденных героев пула ${pool.length - found}`);
-    for (const x of pool) if (!T.hrStage(x) && fan.includes(`data-v="${x.id}"`)) say(`${tag}: в веере виден не найденный ${x.n}`); }
+    for (const x of pool) if (!T.hrStage(x) && fan.includes(`data-v="${x.id}"`)) say(`${tag}: в веере виден не найденный ${x.n}`);
+    const blanks = booksOf(fan).filter(b => /^<button class="hb blank/.test(b)), tiers = pool.filter(x => !T.hrStage(x)).map(x => tierOf(x.maxV)).sort().join();
+    if (blanks.map(b => +(b.match(/data-t="(\d)"/) || [])[1]).sort().join() !== tiers) say(`${tag}: безымянные книги веера — не своей ступени (${tiers})`);
+    for (const b of blanks) {
+      if (!/<span class="hb-ph"><span class="hb-q" aria-hidden="true"><i class="hb-qm">\?<\/i><\/span><\/span>/.test(b)) { say(`${tag}: в веере не найденный — не закрытая книга с «?»`); break; }
+      if (/data-r="|class="hb-(?:nm|cr|bm)"/.test(b)) { say(`${tag}: у не найденного в веере видны имя, редкость или мощь`); break; }
+      if (T.HB_ART.ready.includes(`books/cover-${(b.match(/data-t="(\d)"/) || [])[1]}.webp`) && !/class="hb-cva"/.test(b)) { say(`${tag}: у не найденного не обложка своей ступени — заглушка`); break; }
+    } }
   if (open && pool.length && !body.includes('data-a="dlg" data-v="rl"')) say(`${tag}: нет «К рулетке»`);
   if (!body.includes('data-a="sheet" data-v="hrecho"')) say(`${tag}: нет входа отряда Эхо недели`);
   if (!body.includes('data-a="dlg" data-v="dust"')) say(`${tag}: нет входа лавки праха`);
@@ -871,7 +905,12 @@ run('режим «Игрок»', () => T.setTeam(false));
     for (const h of sq5) {
       const t = books.find(x => x.includes(`data-a="ssel" data-v="${h.id}"`)), own = T.rsHas(h), n = T.S.rs.shards[h.id] || 0, st = T.hrStage(h);
       if (!t) { say(`${tag}: нет книги ${h.n}`); continue; }
-      if (!st) { if (!/^<button class="hb blank/.test(t) || t.includes(h.n) || /data-r="/.test(t)) say(`${tag}: не найденный ${h.n} — не безымянная книга`); if (h.c > c && !/ lock/.test(t.slice(0, 40))) say(`${tag}: у героя будущего цикла нет замка`); continue; }
+      if (!st) {
+        if (!/^<button class="hb blank/.test(t) || t.includes(h.n) || /data-r="/.test(t)) say(`${tag}: не найденный ${h.n} — не безымянная книга`);
+        if (!t.includes(`data-t="${tierOf(h.maxV)}"`) || !/<i class="hb-qm">\?<\/i>/.test(t) || (T.HB_ART.ready.includes(`books/cover-${tierOf(h.maxV)}.webp`) && !/class="hb-cva"/.test(t))) say(`${tag}: не найденный ${h.n} — не закрытая книга своей ступени ${tierOf(h.maxV)} с «?»`);
+        if (h.c > c && (!/ lock/.test(t.slice(0, 40)) || !t.includes(`цикл ${T.ROMAN[h.c]}</b>`))) say(`${tag}: у героя будущего цикла нет замка и «цикл ${T.ROMAN[h.c]}» на плашке`);
+        continue;
+      }
       checkBook(t, `${tag} · ${h.n}`, own ? Object.assign(accX(T.H(h.id)), { bm: null }) : rsX(h, { shard: [n, N], img: st === 2 && T.RS_ART.has(h.id) ? h.id : null, bm: null }));
     }
     if (!/class="he-sel"/.test(o)) say(`${tag}: нет выбранного героя с действием`);
@@ -1114,6 +1153,21 @@ for (const team of [false, true]) {
   }
 }
 run('режим «Игрок»', () => T.setTeam(false));
+/* пятеро парят и светятся (слово автора 30.09.2026: «анимация левитации карточек донатных героев вверх и вниз, плавно и подсвечивание их,
+   всё-таки донатные герои должны быть желанными»): книга — в обёртке .dn-fl, у книги блик; числа — DN_VIEW.float и glint, в переменные
+   витрины; ключевые кадры — только transform и opacity; фаза — от места (--k); при «меньше движения» — без движения */
+{
+  fresh(); T.S.acc.cycle = 2; T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = 'donat';
+  const h = view('«За Энериум» · левитация'), NN = niches(h), DV = T.DN_VIEW;
+  if (!DV || !DV.float || !DV.glint || ![DV.float.ms, DV.float.step, DV.glint.ms, DV.glint.step, ...DV.float.lift].every(Number.isInteger)) say('«За Энериум»: нет чисел левитации DN_VIEW.float и блика DN_VIEW.glint или они не целые');
+  else if (!h.includes(`--f-ms:${DV.float.ms}ms;--f-st:${DV.float.step}ms;--f0:${DV.float.lift[0]}px;--f1:${DV.float.lift[1]}px;--gl-ms:${DV.glint.ms}ms;--gl-st:${DV.glint.step}ms`)) say('«За Энериум»: числа левитации не дошли до витрины (переменные --f-*, --gl-*)');
+  for (const n of NN) if (!/<span class="dn-fl" data-r="\d"><button class="hb[ "][\s\S]*?<i class="hb-glint" aria-hidden="true"><\/i>/.test(n.html)) { say('«За Энериум»: книга на ступени не парит (нет .dn-fl) или без блика'); break; }
+  const DC = CSS.slice(CSS.indexOf('/* парит:'));
+  for (const [sel, kf] of [['.dn-fl{', 'dn-float'], ['.dn-fl::before{', 'dn-halo'], ['.dn-pd::before{', 'dn-glow']]) if (!new RegExp(sel.replace(/[.{:]/g, x => '\\' + x) + '[^}]*animation:' + kf + ' var\\(--f-ms').test(DC)) say(`heroes.css: ${sel} — без анимации ${kf} от --f-ms`);
+  for (const kf of ['dn-float', 'dn-halo', 'dn-glow', 'sqp-in']) { const m = CSS.match(new RegExp('@keyframes ' + kf + '\\{([\\s\\S]*?\\})\\}')); if (!m) { say(`heroes.css: нет @keyframes ${kf}`); continue; } const bad = [...m[1].matchAll(/([a-z-]+)\s*:/g)].map(x => x[1]).filter(p => !['transform', 'opacity'].includes(p)); if (bad.length) say(`heroes.css: @keyframes ${kf} меняет ${bad.join(', ')} — только transform и opacity`); }
+  if (!/@media \(prefers-reduced-motion:reduce\)\{ \.dn-fl,\.dn-fl::before,\.dn-pd::before\{animation:none\}/.test(CSS)) say('heroes.css: при «меньше движения» пятеро витрины парят');
+  if (!/\.hb-glint\{display:none\}/.test(BCSS)) say('book.css: при «меньше движения» блик по обложке идёт');
+}
 {
   fresh(); T.S.acc.cycle = 2; T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = 'donat';
   const s = T.dnSet(), x = T.RSI[s.members[0]], p = priceOf(x);
@@ -1477,20 +1531,21 @@ run('режим «Игрок»', () => T.setTeam(false));
   { const h = collView('шкаф · никого'); if (!/<div class="lb-row say">[\s\S]*?data-a="hcclr"/.test(gridOf(h))) say('шкаф: пустой фильтр — нет строки на полке со «Сбросить»'); }
   run('шкаф · сброс', () => T.ACT.hcclr());
   { const h = collView('шкаф · каталог', { all: true }), ids = T.hcCatList().map(v => v.id); caseOf(h, 'шкаф · каталог'); shelvesOf(h, 'шкаф · каталог', ids, T.lbCols(T.HC_VIEW.card)); }
-  /* «За золото»: у каждой книги табличка на кромке — цена следующего найма (нехватка — тусклая), купленный — «в коллекции» */
+  /* «За золото»: у каждой книги табличка на кромке — цена следующего найма (нехватка — тусклая); купленных на полке нет */
   for (const c of [1, 2, 3]) {
     fresh(); T.S.acc.cycle = 2; T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = 'gold'; T.S.rs.gcyc = c;
     const where = `шкаф · «За золото» · цикл ${c}`, h = view(where), cat = T.RS.heroes.filter(x => x.src === 'gold' && x.c === c).sort((a, b) => a.no - b.no);
     caseOf(h, where);
     if (c > T.rsCyc()) { if (cardsOf(gridOf(h)).length || !/<div class="lb-row say">[\s\S]*?откроется при переходе на цикл/.test(gridOf(h))) say(`${where}: будущий цикл — книги видны или не сказано, когда откроется`); continue; }
-    shelvesOf(h, where, cat.map(x => x.id), T.lbCols(T.HC_VIEW.gold));
+    const left = cat.filter(x => !T.rsHas(x));
+    shelvesOf(h, where, left.map(x => x.id), T.lbCols(T.HC_VIEW.gold));
     const k = T.rsBought(c) + 1, price = T.fmt(T.rsGold(c, k)), lack = T.S.wallet.gold < T.rsGold(c, k);
     const cells = [...gridOf(h).matchAll(/<div class="lb-c">(<button class="hb[\s\S]*?<\/button>)(<span class="lb-tag[\s\S]*?<\/span>)?<\/div>/g)];
-    if (cells.length !== cat.length) say(`${where}: ячеек с книгой ${cells.length}, героев картотеки ${cat.length}`);
+    if (cells.length !== left.length) say(`${where}: ячеек с книгой ${cells.length}, некупленных героев картотеки ${left.length}`);
     for (const [, book, tag] of cells) {
       const id = (book.match(/data-v="([^"]+)"/) || [])[1], x = T.RSI[id];
       if (!tag) { say(`${where} · ${x ? x.n : id}: нет таблички на кромке полки`); continue; }
-      if (T.rsHas(x)) { if (!tag.includes('lb-tag own') || !tag.includes('в коллекции')) say(`${where} · ${x.n}: у купленного на табличке не «в коллекции»`); }
+      if (T.rsHas(x)) say(`${where} · ${x.n}: купленный на полке картотеки`);
       else if (!tag.includes(`<b class="num">${price}</b>`) || !tag.includes('gold') || /lb-tag lack/.test(tag) !== lack) say(`${where} · ${x.n}: на табличке не цена следующего найма ${price} или нехватка не видна`);
     }
   }

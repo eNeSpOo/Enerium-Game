@@ -1,0 +1,60 @@
+{
+  "name": "Книга рецептов — проба трёх стадий бумаги (слово автора 30.09.2026): цельный рецепт — ровный кусок древнего листа с оборванными краями, широкий прямоугольник, когда-то мятый; частично найденный — неровные квадратные обрывки, на них найденный ресурс; не найденный — смятые куски древней бумаги со знаком вопроса. Знак вопроса, иконки ресурсов и имя рецепта кладёт интерфейс; на арте нет ни текста, ни знаков.",
+  "plan": {
+    "rp-whole": "21:9, 1K, ключ magenta: цельный лист",
+    "rp-frags": "1:1, 1K, ключ magenta: четыре обрывка сеткой 2 × 2",
+    "rp-crumpled": "1:1, 1K, ключ magenta: четыре смятых куска сеткой 2 × 2"
+  },
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: dark fantasy game art for a premium mobile RPG — gloomy, ancient, rich and uneasy. Hand-painted digital painting: visible confident brush strokes, simplified planes, deep near-black shadows, crisp rim light on edges, rich material detail and masterful craftsmanship. Palette: soot black (#050607, #121518), graphite (#262B31), very dark old oak, blackened iron, aged bronze and old gold leaf that gleams softly, yellowed bone, deep teal velvet. Everything is heavy, worn by centuries of use, precious and made by a master: no cheap shine, no plastic, no clean saturated game-UI colors. Light is scarce and precious and comes from below: a cold turquoise glow of karst crystals (#48E5D4) from beneath, and a few warm amber highlights (#E6A84B). The world lies deep under the city of Endalor, in the tower of a keeper of knowledge: vast, cold, silent and dusty. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.",
+  "negative": "No words, no letters, no digits, no numbers, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no labels, no price tags, no handwriting, no watermark, no signature, no logo, no UI elements, no buttons, no border or frame around the whole picture. No skulls, no skeletons, no blood, no gore. No pentagrams, no occult signs, no crosses, no religious symbols, no eyes, no faces. No people, no hands, no creatures. No candles with dripping wax. No purple or violet light, no neon. No bright polished gold, no glossy plastic shine, no clean bright mobile-game UI look.",
+  "cutout_rule": "The background is one solid flat color {hex}, perfectly even from edge to edge: no gradient, no texture, no floor, no wall, no table under the object, no cast shadow, no vignette, no checkerboard. The object itself never uses this background color. Any glow stays close to the object and fades out within a short distance.",
+  "categories": {
+    "rp-wide": {
+      "aspect": "21:9",
+      "size": "1K",
+      "cutout": "magenta",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG, seen perfectly straight on from above, flat, no perspective. The description says what lies on the canvas and how it is arranged."
+    },
+    "rp-grid": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "magenta",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG, seen perfectly straight on from above, flat, no perspective. The description says what lies on the canvas and how it is arranged."
+    }
+  },
+  "jobs": [
+    {
+      "id": "rp-whole",
+      "category": "rp-wide",
+      "title": "Стадия 1 — цельный найденный рецепт: широкий ровный лист древней бумаги",
+      "source": "Книга рецептов Мастерской, строка найденного рецепта: интерфейс кладёт на лист ингредиенты, стрелку, итог и имя рецепта",
+      "subject": "One whole, wide horizontal sheet of ancient parchment lying flat in the middle of the canvas, about three times wider than tall, filling most of the width. The paper is aged and warm: yellowed ivory to light tan, darker brown towards the edges, a few faint water stains and small foxing spots. All four edges are slightly uneven and torn in places, with a couple of small nicks, but the sheet is complete — no missing pieces. Faint old crease lines cross it in a loose web, the memory of having once been crumpled into a ball and later smoothed out flat again; it is flat now. The surface inside is clean and empty: no writing, no drawings, no marks. Soft light from above, a subtle paper grain."
+    },
+    {
+      "id": "rp-frags",
+      "category": "rp-grid",
+      "title": "Стадия 2 — рецепт найден частично: неровные квадратные обрывки древнего листа",
+      "source": "Книга рецептов Мастерской, строка частично найденного рецепта: на обрывке — найденный ресурс (иконку кладёт интерфейс)",
+      "subject": "Four separate torn fragments of the same ancient parchment page, arranged in a 2 by 2 grid with generous empty background between them; each fragment sits in its own quarter of the canvas and never touches another. Each fragment is roughly square but irregular: jagged torn edges, one or two edges straight where the page was cut, small nicks; each has a slightly different shape. The paper is aged yellowed ivory to light tan, darker at the torn edges, faint creases and stains. Each fragment is flat and its middle is clean and empty — no writing, no drawings, no marks."
+    },
+    {
+      "id": "rp-crumpled",
+      "category": "rp-grid",
+      "title": "Стадия 3 — не найдено: смятые куски древней бумаги",
+      "source": "Книга рецептов Мастерской: не найденный ингредиент или рецепт — смятый кусок, знак вопроса кладёт интерфейс",
+      "subject": "Four separate crumpled pieces of ancient parchment, arranged in a 2 by 2 grid with generous empty background between them; each piece sits in its own quarter of the canvas and never touches another. Each piece was squeezed into a loose crumpled ball and then half opened: many sharp folds and creases, deep shadows between the folds, torn edges, roughly square overall footprint. The paper is aged yellowed ivory to tan, darker and dirtier than a clean page, a little dust. No writing, no drawings, no marks, no question marks."
+    },
+    {
+      "id": "rp-strip",
+      "category": "rp-wide",
+      "title": "Стадия 1, вторая проба — цельный рецепт узкой полосой, без растяжения (слово автора: «слишком высокую, а после сузил… сделай новую бумагу уже нормальную»)",
+      "source": "Книга рецептов Мастерской: строка найденного рецепта — ингредиенты слева, стрелка, итог с названием справа; ширина строки меняется срезами по краям, середина не тянется",
+      "subject": "One long, narrow horizontal strip torn from an ancient parchment page, lying flat and perfectly level across the middle of the canvas. It spans almost the full width of the canvas and is about six times wider than it is tall; above and below the strip the canvas is empty background. The paper is aged and warm: yellowed ivory to light tan, darker brown towards the edges, a few faint water stains and small foxing spots. The two long edges are slightly uneven and torn in places with small nicks; both short ends are torn raggedly. Faint old crease lines cross it here and there — it was once crumpled and later smoothed flat again; it is flat now. The surface is clean and empty: no writing, no drawings, no marks. Soft light from above, a subtle paper grain, the same thickness from end to end."
+    }
+  ]
+}

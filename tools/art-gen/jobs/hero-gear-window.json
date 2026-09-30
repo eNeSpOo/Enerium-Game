@@ -1,0 +1,35 @@
+{
+  "name": "Окно снаряжения героя — оружейная башни (слово автора 30.09.2026: «окно талисманов и снаряжения выглядят теперь как заглушка»). Окно открывается из книги героя; фон — зал, где хранится снаряжение героев, в языке залов «Ремесла»: тёмный камень, чёрный дуб, латунь, свет карста снизу. Панели интерфейса закрывают большую часть: детали — по краям и в глубине, середина спокойная и тёмная.",
+  "plan": {
+    "Зал gw-armory": "21:9, 2K, без вырезки: фон окна снаряжения героя; выгрузка — design/ui/assets/art/gear-window/armory.jpg (ui-art.json), путь — GW_ART.ready в design/ui/screens/hero-dev.js"
+  },
+  "notes": [
+    "Сначала --dry-run, потом запуск с --budget. Картинка смотрится глазами, повторов — не больше двух"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: dark fantasy game art for a premium mobile RPG — gloomy, ancient, rich and uneasy. Hand-painted digital painting: visible confident brush strokes, simplified planes, deep near-black shadows, crisp rim light on edges, rich material detail and masterful craftsmanship. Palette: soot black (#050607, #121518), graphite (#262B31), very dark old oak, blackened iron, aged bronze and old gold leaf that gleams softly, yellowed bone, deep teal velvet. Everything is heavy, worn by centuries of use, precious and made by a master: no cheap shine, no plastic, no clean saturated game-UI colors. Light is scarce and precious and comes from below: a cold turquoise glow of karst crystals (#48E5D4) from beneath, and a few warm amber highlights (#E6A84B). The world lies deep under the city of Endalor, in the tower of a keeper of knowledge: vast, cold, silent and dusty. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.",
+  "negative": "No words, no letters, no digits, no numbers, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no labels, no price tags, no handwriting, no watermark, no signature, no logo, no UI elements, no buttons, no border or frame around the whole picture. No skulls, no skeletons, no blood, no gore. No pentagrams, no occult signs, no crosses, no religious symbols, no eyes, no faces. No people, no hands, no creatures. No candles with dripping wax. No purple or violet light, no neon. No bright polished gold, no glossy plastic shine, no clean bright mobile-game UI look. No helmets with faces or eyes inside, no masks.",
+  "cutout_rule": "The background is one solid flat color {hex}, perfectly even from edge to edge: no gradient, no texture, no floor, no wall, no table under the object, no cast shadow, no vignette, no checkerboard. The object itself never uses this background color. Any glow stays close to the object and fades out within a short distance.",
+  "categories": {
+    "gw-hall": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [
+        "art/style/ref-01-cave-amber-teal.webp",
+        "art/style/ref-02-cave-pillars.webp"
+      ],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a wide cinematic panorama, 21:9, painted edge to edge over the whole frame — no black bars at the top or bottom, no letterbox, no dark border. It is the full-screen background of the hero's equipment window; the interface lays three heavy panels over most of it — the hero with his gear on the left, the stores in the middle, a card on the right. So the composition is calm, symmetrical and deep: the viewer stands in the middle of a room and looks straight ahead into the depth, the vanishing point in the center at about 45% of the height. The richest detail lives along the upper edge, along the left and right edges and far away in the depth; the wide middle band, from 20% to 85% of the height, is darker, softer, hazier and low in contrast; the bottom fifth is a dark floor fading into shadow. No figures of any kind. The attached pictures show the painting style, the brushwork and the cold-and-warm light of the game — take only the style from them, not the place."
+    }
+  },
+  "jobs": [
+    {
+      "id": "gw-armory",
+      "category": "gw-hall",
+      "title": "Оружейная башни — зал, где хранится снаряжение героев",
+      "source": "Фон окна «Снаряжение героя» (grWin, design/ui/screens/hero-dev.js). К выгрузке — design/ui/assets/art/gear-window/armory.jpg",
+      "subject": "The place: the Armory of the tower — a long, tall vaulted hall of dark basalt where the gear of the keeper's heroes is kept in order, ready for the descent. Along both side walls stand rows of heavy armor stands of black oak and iron, each dressed in a complete old suit: dented plate cuirasses, mail hauberks, pauldrons, gauntlets hanging from the arms, greaves at the feet; closed helmets rest on top of the stands and are dark and empty inside. Between the stands, tall iron weapon racks hold swords, axes, maces and spears in neat rows; round and kite shields hang on the walls above them, their painted emblems worn away to plain metal. Along the top of the picture, heavy dark beams with hanging chains and iron hooks; small bronze plaques without any marks under the stands. In the far depth, at the vanishing point, a tall iron-bound door and before it a wide low table covered with dark velvet where a single sword lies. Cold turquoise light rises from karst crystals set in low iron braziers on the floor between the stands and catches the edges of the metal; one hanging lantern gives a small warm amber glow. Dust hangs in the air. The middle of the picture is calm, dark and hazy."
+    }
+  ]
+}

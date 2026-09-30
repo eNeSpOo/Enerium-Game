@@ -215,50 +215,6 @@
 @media (prefers-reduced-motion:reduce){
   .ps-got.anim *,.ps-got.anim,.dg-today *,.dg-c.now::after{animation:none!important;transition:none!important}
 }
-/* ================== Лавка Энериума, вкладка «Энериум»: стартовый набор и пакеты (stView) ================== */
-.ps-store{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:var(--sp-m);align-items:stretch}
-.ps-st{gap:var(--sp-s);border-color:rgba(221,188,122,.45);box-shadow:inset 0 3px 0 -1px var(--rc),inset 0 -26px 30px -26px rgba(221,188,122,.45)}
-.ps-st.got{opacity:.72}
-.ps-stq{gap:var(--sp-m);flex-wrap:wrap}
-.ps-stq .cost{display:inline-flex;align-items:center;gap:5px;font:700 18px/1 var(--f-u);color:var(--gold);font-variant-numeric:lining-nums tabular-nums}
-.ps-stq .cost img{width:22px;height:22px;object-fit:contain}
-.ps-stb{margin-top:auto;align-self:flex-start}
-@media (max-width:720px){.ps-store{grid-template-columns:minmax(0,1fr)}}
-/* зал доната — «дорого-богато» (правило автора для донатных окон): материалы витрины сетов (heroes.css, .dn) — чёрный мрамор, старое
-   золото, свет Энериума снизу; фон — зал DN_ART.hall, без него — свет CSS. Движение — только transform и opacity */
-.st-hall{--st-en:79,220,139;--st-au:221,188,122;position:relative;isolation:isolate;overflow:hidden;flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:var(--sp-m);
-  padding:var(--sp-m);border-radius:14px;border:1px solid rgba(var(--st-au),.3);
-  background:radial-gradient(62% 58% at 50% 112%,rgba(var(--st-en),.22),transparent 70%),radial-gradient(30% 70% at 0% 30%,rgba(var(--st-au),.08),transparent 70%),linear-gradient(180deg,#0c1412,#070b0a 60%,#040605);
-  box-shadow:inset 0 1px 0 rgba(255,236,190,.08),inset 0 0 70px rgba(0,0,0,.65),0 18px 40px -26px rgba(var(--st-en),.55)}
-.st-bg{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:50% 72%}
-.st-hall.art::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(3,6,5,.46),rgba(3,6,5,.08) 34%,rgba(3,6,5,.16) 70%,rgba(3,6,5,.62))}
-.st-hall .ps-store{flex:1 1 0;min-height:0}
-.st-hall .rcard{position:relative;border-color:rgba(var(--st-au),.34);background:linear-gradient(180deg,rgba(20,28,24,.8),rgba(6,10,9,.9));
-  box-shadow:inset 0 1px 0 rgba(255,236,190,.1),inset 0 -26px 32px -26px rgba(var(--st-en),.5),0 16px 26px -18px #000;transition:transform .18s ease-out}
-.st-hall .rcard:hover{transform:translateY(-3px)}
-.st-hall .rcard>b{font:600 17px/1.1 var(--f-d);color:#f0d79c;text-shadow:0 0 14px rgba(var(--st-au),.3),0 2px 0 rgba(0,0,0,.7)}
-.st-hall .reason{flex:none;white-space:normal;overflow-wrap:anywhere;color:var(--parch-2);text-shadow:0 1px 2px #000}
-/* стартовый набор — главная вещь зала: золотая кромка, печать «×2» сургучом */
-.st-hall .ps-st{border-color:rgba(var(--st-au),.62);box-shadow:inset 0 3px 0 -1px var(--rc),inset 0 -30px 36px -28px rgba(var(--st-au),.55),0 0 0 1px rgba(var(--st-au),.18),0 18px 30px -18px #000,0 0 26px -10px rgba(var(--st-au),.45)}
-.st-hall .ps-st>b{font-size:21px}
-/* ключи и души — крупно посередине карточки, кнопка — во всю ширину внизу */
-.st-hall .ps-stq{margin:auto 0;justify-content:center;gap:26px}
-.st-hall .ps-stq .cost{flex-direction:column;gap:6px;font-size:26px}
-.st-hall .ps-stq .cost img{width:46px;height:46px;filter:drop-shadow(0 0 10px rgba(var(--st-en),.5))}
-.st-hall .ps-st small{align-self:stretch;min-width:0;white-space:normal;overflow-wrap:anywhere;text-align:center}
-.st-hall .ps-stb{align-self:stretch;justify-content:center}
-.st-x2{position:absolute;top:-10px;right:-8px;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;font:700 15px/1 var(--f-d);font-style:normal;color:#fbe7b0;
-  background:radial-gradient(circle at 42% 36%,#b5342a,#6d1510 62%,#420a07);box-shadow:inset 0 0 0 2px rgba(0,0,0,.25),inset 0 -5px 8px rgba(0,0,0,.35),0 3px 6px rgba(0,0,0,.6);transform:rotate(-8deg);text-shadow:0 1px 1px #000}
-/* пакеты — кристалл Энериума на малом пьедестале света посередине карточки, кристалл тихо парит; имя переносится, не режется */
-.st-pk{align-items:center;text-align:center}
-.st-hall .st-pk>b,.st-hall .st-pk>small{align-self:stretch;min-width:0;white-space:normal;overflow-wrap:anywhere}
-.st-hall .st-pk>b{font-size:15.5px;line-height:1.15}
-@container main (max-width: 800px){ .st-hall .st-pk>b{font-size:13px} .st-hall .st-pk>small{font-size:10px} .st-hall .ps-st>b{font-size:18px} }
-.st-ped{position:relative;display:grid;place-items:end center;width:100px;height:96px;flex:none;margin-top:auto}
-.st-ped::after{content:"";position:absolute;left:10%;right:10%;bottom:0;height:12px;border-radius:50%;background:radial-gradient(closest-side,rgba(var(--st-en),.55),transparent)}
-.st-cr{position:relative;z-index:1;width:80px;height:80px;object-fit:contain;filter:drop-shadow(0 0 10px rgba(var(--st-en),.55));animation:st-float 3.6s ease-in-out infinite}
-.st-pk:nth-child(2) .st-cr{animation-delay:-1.2s}
-.st-pk:nth-child(3) .st-cr{animation-delay:-2.4s}
-@keyframes st-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-.st-buy{margin-top:auto;align-self:stretch;justify-content:center}
-@media (prefers-reduced-motion:reduce){.st-cr,.st-hall .rcard{animation:none!important;transition:none!important}}
+/* лист «Платный ряд»: печать ряда рядом со вступлением — арт Лавки (screens/store.js, stArt('seal')), без него — только текст */
+.ps-lead2{display:flex;align-items:center;gap:var(--sp-m)}
+.ps-seal{width:56px;height:56px;flex:none;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(0,0,0,.6))}

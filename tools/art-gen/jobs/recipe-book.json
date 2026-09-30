@@ -1,0 +1,82 @@
+{
+  "name": "Книга рецептов Мастерской на всё окно (слово автора 30.09.2026): цельный рецепт — ровный лист древней бумаги узкой полосой, три длины по числу ингредиентов, каждая в своих пропорциях; частично найденный — неровные квадратные обрывки, по одному на ингредиент; книга — гримуар чернёного пергамента во всё окно. Иконки, количество, стрелку, «?» и названия кладёт интерфейс; на арте нет ни текста, ни знаков. Бумага — на чёрном: её светлые края тёмная кромка не портит, а тёмная страница книги прячет остаток фона. Нарезка и геометрия — tools/art-gen/rbook_layers.py → RB_ART в design/ui/screens/recipe-book.js.",
+  "plan": {
+    "rb-strips": "снято: проба 1 — три полосы на одном квадратном холсте вышли 2,7 / 3,2 / 3,5 : 1, слишком высокими для строки книги; запрос и картинка — в манифесте",
+    "rb-frags": "1:1, 1K, ключ black: девять обрывков сеткой 3 × 3",
+    "rb-book": "21:9, 2K, ключ magenta: раскрытый гримуар сверху, страницы пустые",
+    "rb-strip-s": "21:9, 1K, ключ black: короткая полоса ~3,3 : 1 (1–2 ингредиента)",
+    "rb-strip-m": "4:1, 1K, ключ black: средняя полоса ~4,5 : 1 (3–4 ингредиента)",
+    "rb-strip-l": "снято: на холсте 4:1 модель нарисовала 7,8 : 1 — слишком узкой; рабочая длинная полоса — rb-strip-l2",
+    "rb-strip-l2": "21:9, 1K, ключ black: длинная полоса ~5,8 : 1, вторая проба"
+  },
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: dark fantasy game art for a premium mobile RPG — ancient, rich and uneasy. Hand-painted digital painting: visible confident brush strokes, simplified planes, deep near-black shadows, rich material detail and masterful craftsmanship. Palette: soot black (#050607, #121518), graphite (#262B31), very dark old oak, blackened iron, aged bronze and old gold leaf that gleams softly, yellowed bone, deep teal velvet. Everything is heavy, worn by centuries of use, precious and made by a master: no cheap shine, no plastic, no clean saturated game-UI colors. The world lies deep under the city of Endalor, in the tower of a keeper of knowledge: vast, cold, silent and dusty. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.",
+  "negative": "No words, no letters, no digits, no numbers, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no labels, no handwriting, no watermark, no signature, no logo, no UI elements, no buttons, no border or frame around the whole picture. No skulls, no blood, no gore. No pentagrams, no occult signs, no crosses, no religious symbols, no eyes, no faces. No people, no hands, no creatures. No candles. No purple or violet light, no neon. No bright polished gold, no glossy plastic shine.",
+  "cutout_rule": "The background is one solid flat color {hex}, perfectly even from edge to edge: no gradient, no texture, no floor, no wall, no table under the object, no cast shadow, no vignette, no glow. The object itself never uses this background color and never touches the edge of the canvas.",
+  "categories": {
+    "rb-sheet": {
+      "aspect": "1:1",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a sheet of game UI pieces for a dark fantasy mobile RPG, seen perfectly straight on from above, flat, no perspective. The pieces are separate objects on an empty background; the description says what lies on the canvas and how it is arranged. Paper here is evenly lit by soft warm light from above: no colored rim light, no turquoise or teal light on the paper, no glow around it.",
+      "size": "1K"
+    },
+    "rb-wide": {
+      "aspect": "21:9",
+      "size": "2K",
+      "cutout": "magenta",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG, seen perfectly straight on from above, flat, no perspective. The description says what lies on the canvas and how it is arranged. Light is scarce and comes from below: a faint cold turquoise glow of karst crystals (#48E5D4) touches the lower edges."
+    },
+    "rb-strip": {
+      "aspect": "21:9",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG, seen perfectly straight on from above, flat, no perspective. The description says what lies on the canvas and how it is arranged. Paper here is evenly lit by soft warm light from above: no colored rim light, no turquoise or teal light on the paper, no glow around it."
+    }
+  },
+  "jobs": [
+    {
+      "id": "rb-frags",
+      "category": "rb-sheet",
+      "title": "Найден частично — девять неровных квадратных обрывков древнего листа: по обрывку на ингредиент и на итог",
+      "source": "Книга рецептов Мастерской: обрывки частично найденного рецепта — найденный ингредиент с иконкой и количеством, ненайденный — пустой обрывок с «?»; справа — итог (известен — иконка и название, нет — пустой обрывок с «?»)",
+      "size": "1K",
+      "subject": "Nine separate torn fragments of one ancient parchment page lying flat, arranged in a neat 3 by 3 grid with generous empty background between them; each fragment sits alone in the middle of its own cell and never touches another. Each fragment is roughly square but irregular: jagged torn edges on two or three sides, one or two straighter edges where the page was cut, small nicks and a chipped corner; every fragment has a clearly different shape, and all of them are about the same size. The same paper as one old page: yellowed ivory to light tan, darker brown along the torn edges, faint soft crease lines, here and there a small pale stain. The middle of each fragment is calm and clean. Nothing written, drawn, stamped or printed on them: no ruled lines, no drawn border, no holes, no burns. Nothing else lies on the canvas."
+    },
+    {
+      "id": "rb-book",
+      "category": "rb-wide",
+      "title": "Книга рецептов во всё окно — раскрытый гримуар чернёного пергамента, страницы пустые",
+      "source": "Книга рецептов Мастерской (слово автора: «открываем на всё окно… ибо рецепты слишком важны для всей игры в целом»): на страницах интерфейс раскладывает листы и обрывки рецептов, поиск, вид и избранное",
+      "subject": "One large ancient grimoire lying open, seen perfectly straight from above, centered and filling almost the whole canvas: two open pages side by side and a deep dark gutter down the middle where the pages curve into the spine. The pages are blackened vellum: very dark warm brown-black with a subtle mottled texture, slightly lighter toward the middle of each page and darker toward the gutter and the outer edges; each page has a thin double rule of dull old gold inset from its edges, with tiny corner flourishes. Around the pages only a narrow border of the cover shows: dark aged leather with worn edges and heavy dark bronze corner fittings at the four outer corners; along the outer sides and the bottom, thin layered page edges show, faintly lit cold turquoise from below. The pages are empty: nothing written, nothing drawn, no ribbon, no bookmark, nothing lying on them. The book is flat and rectangular, not tilted, and its cover never touches the edge of the canvas."
+    },
+    {
+      "id": "rb-strip-s",
+      "category": "rb-strip",
+      "aspect": "21:9",
+      "title": "Найден целиком — короткая полоса древнего листа, ~3,3 : 1: один-два ингредиента",
+      "source": "Книга рецептов Мастерской: полоса найденного рецепта — ингредиенты слева, стрелка, итог с названием справа; своя длина — своя картинка в своих пропорциях, неравномерно не тянется",
+      "subject": "One single strip torn from an ancient parchment page, lying flat and perfectly level across the middle of the canvas. It is short and wide: about three and a third times as wide as it is tall. It spans almost the whole width of the canvas, and the empty background above it and below it is each about one sixth of the canvas height. The paper is aged and warm: yellowed ivory to light tan, darker brown towards the edges, the same thickness from end to end. The two long edges are slightly uneven with a few small torn nicks, both short ends are torn raggedly with soft fibrous edges; the paper was once crumpled and later smoothed flat again, so a few faint soft crease lines cross it; a couple of faint tea-colored water stains and small foxing spots sit near the edges; the middle of the strip is calm and fairly even, so small icons can later be placed on it. Nothing written, drawn, stamped or printed on it: no ruled lines, no drawn border, no holes, no burns. Nothing else lies on the canvas: no scraps, no crumbs, no second copy."
+    },
+    {
+      "id": "rb-strip-m",
+      "category": "rb-strip",
+      "aspect": "4:1",
+      "title": "Найден целиком — средняя полоса древнего листа, ~4,5 : 1: три-четыре ингредиента",
+      "source": "Книга рецептов Мастерской: полоса найденного рецепта — ингредиенты слева, стрелка, итог с названием справа; своя длина — своя картинка в своих пропорциях, неравномерно не тянется",
+      "subject": "One single long strip torn from an ancient parchment page, lying flat and perfectly level across the middle of the canvas. It is about four and a half times as wide as it is tall. It spans almost the whole width of the canvas, and a thin band of empty background stays above it and below it. The paper is aged and warm: yellowed ivory to light tan, darker brown towards the edges, the same thickness from end to end. The two long edges are slightly uneven with a few small torn nicks, both short ends are torn raggedly with soft fibrous edges; the paper was once crumpled and later smoothed flat again, so a few faint soft crease lines cross it; a couple of faint tea-colored water stains and small foxing spots sit near the edges; the middle of the strip is calm and fairly even, so small icons can later be placed on it. Nothing written, drawn, stamped or printed on it: no ruled lines, no drawn border, no holes, no burns. Nothing else lies on the canvas: no scraps, no crumbs, no second copy."
+    },
+    {
+      "id": "rb-strip-l2",
+      "category": "rb-strip",
+      "aspect": "21:9",
+      "title": "Найден целиком — длинная полоса древнего листа, ~5,8 : 1: пять-шесть ингредиентов (вторая проба: на холсте 4:1 модель нарисовала 7,8 : 1)",
+      "source": "Книга рецептов Мастерской: полоса найденного рецепта — ингредиенты слева, стрелка, итог с названием справа; своя длина — своя картинка в своих пропорциях, неравномерно не тянется",
+      "subject": "One single very long, narrow strip torn from an ancient parchment page, lying flat and perfectly level across the middle of the canvas. It is about six times as wide as it is tall. It spans almost the whole width of the canvas; above it and below it is wide empty background, so the strip covers only the middle third of the canvas height. The paper is aged and warm: yellowed ivory to light tan, darker brown towards the edges, the same thickness from end to end. The two long edges are slightly uneven with a few small torn nicks, both short ends are torn raggedly with soft fibrous edges; the paper was once crumpled and later smoothed flat again, so a few faint soft crease lines cross it; a couple of faint tea-colored water stains and small foxing spots sit near the edges; the middle of the strip is calm and fairly even, so small icons can later be placed on it. Nothing written, drawn, stamped or printed on it: no ruled lines, no drawn border, no holes, no burns. Nothing else lies on the canvas: no scraps, no crumbs, no second copy."
+    }
+  ]
+}

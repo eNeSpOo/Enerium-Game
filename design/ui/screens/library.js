@@ -215,13 +215,16 @@ const lbInitBase = initialState;
 initialState = function () { return lbState(lbInitBase()); };
 lbState(S);
 
+/* UI-кит: мощь корешков пяти ступеней — чтобы видно было короткую запись (hbPow) */
+const LB_KIT = { bm: [940, 7420, 75080, 128400, 1234000] };
+
 /* ================== UI-кит: раздел «Библиотека Этриона» ==================
    Шкаф с двумя полками, полка «За золото» с табличками, отсек отряда, полка отряда крупным планом, нижняя полка корешков пяти ступеней
    и семи редкостей; что где нажимать; команде — откуда арт и числа */
 KIT_EXTRA.push({ html: lbKitHtml });
 function lbKitHtml() {
   if (!RS.heroes.length) return '';
-  const noop = h => h.replace(/data-a="[^"]*"/g, 'data-a="noop"').replace(/ data-hold="[^"]*"/g, '');
+  const noop = h => h.replace(/data-a="[^"]*"/g, 'data-a="noop"').replace(/ data-(?:hold|peek)="[^"]*"/g, '');
   const mine = hcOwnList(), V = LB_VIEW;
   const books = mine.slice(0, 8).map(v => hbCard(v, { z: 'l', act: 'noop' }));
   const shelf = lbShelves(books, { n: 5, rows: 2 });
@@ -233,8 +236,8 @@ function lbKitHtml() {
   const gdemo = noop(lbCase({ cls: 'hk-hire gold lbk-gold', lamps: false, top: `<div class="hkh"><span class="eyebrow">Картотека цикла ${ROMAN[rsCyc()]}</span></div>`, body: `<div class="hkg lb-shv" style="--n:${gs.n}">${gs.html}</div>` }));
   const rh = RS.heroes.find(h => h.src === 'roulette' && typeof RS_ART !== 'undefined' && RS_ART.has(h.id)) || RS.heroes[0], base = hcView(rh);
   const mk = o => Object.assign({}, base, { own: true, st: 3, acc: null, busy: '', lvl: 150, cap: 150, lim: 1, valor: 0 }, o);
-  const tiers = [1, 2, 3, 4, 5].map(t => hbSpine(mk({ maxV: t, r: t + 1, lvl: [34, 150, 350, 700, 1200][t - 1] }), { tag: 'span' })).join('');
-  const rars = [1, 2, 3, 4, 5, 6, 7].map(r => hbSpine(mk({ maxV: 3, r }), { tag: 'span' })).join('');
+  const tiers = [1, 2, 3, 4, 5].map(t => hbSpine(mk({ maxV: t, r: t + 1, lvl: [34, 150, 350, 700, 1200][t - 1], bm: LB_KIT.bm[t - 1] }), { tag: 'span' })).join('');
+  const rars = [1, 2, 3, 4, 5, 6, 7].map(r => hbSpine(mk({ maxV: 3, r, bm: LB_KIT.bm[2] }), { tag: 'span' })).join('');
   const busy = mine[0] ? hbSpine(Object.assign({}, mine[0], { busy: 'Забег · Мастерская' }), { tag: 'span', dim: true }) : '';
   const minis = [1, 2, 3, 4, 5].map(t => hbSpine(mk({ maxV: t, r: t + 2 }), { tag: 'span', z: 's' })).join('');
   const O = HB_VIEW.open;
@@ -243,7 +246,7 @@ function lbKitHtml() {
     <div class="lbk-demo">${demo}</div>
     <p class="k-note">«За золото» — тот же шкаф: картотека цикла, цена найма — латунной табличкой на кромке полки под книгой, у купленного — «в коллекции». «За Энериум» и «За души» — другие залы башни.</p>
     <div class="lbk-demo gold">${gdemo}</div>
-    <p class="k-note">Корешок — книга на полке боком: материал — ступень книги (как обложка), кристалл и ярлык — редкость, значок — класс, внизу — уровень, на ярлыке — имя. В отряде — нижняя полка свободных героев корешками: нажатие — книга выезжает и встаёт в выбранное место отряда (или в первое пустое), удержание — книга раскрывается; перестановка — нажать место, потом другое.</p>
+    <p class="k-note">Корешок — книга на полке боком: материал — ступень книги (как обложка), кристалл и ярлык — редкость, значок — класс, на ярлыке — имя, внизу — мощь золотом, коротко: 940, 7,4К, 75К, 1,2М. В отряде — нижняя полка свободных героев корешками: нажатие — книга выезжает и встаёт в выбранное место отряда (или в первое пустое); удержание — сведения над полкой, над пальцем: имя, редкость, класс, стихия, мощь, уровень, доблесть, пределы и «Книга героя»; отпустил палец — сведения закрылись, повёл палец в них — остаются; перестановка — нажать место, потом другое.</p>
     <div class="lbk-row"><div class="lbk-sp">${tiers}</div><div class="lbk-sp">${rars}</div><div class="lbk-sp">${busy}</div><div class="lbk-sp mini">${minis}</div></div>
     <p class="k-note">Слева в отрядах — высокий шкаф: отряд — отсек с пятью маленькими корешками и табличкой имени и мощи на кромке. Справа — выбранный отряд на одной полке крупным планом. Открытие книги продолжает картину: книга выдвигается с полки к игроку корешком, разворачивается обложкой — и раскрывается.</p>
     ${TM(`<p class="k-note">Слово автора 30.09.2026 — шкаф вместо серых панелей. Арт — tools/art-gen/jobs/library-shelves.json (стенка, полка, карниз, стойка и ножка, кронштейн, лампада, корешки пяти ступеней), бесшовность и нарезка — tools/art-gen/shelf_layers.py → LB_ART и HB_ART.spines. Выгружено ${LB_ART.ready.length} путей шкафа (LB_ART.ready) и ${[1, 2, 3, 4, 5].filter(t => hbArt(HB_ART.spine(t))).length} корешков; без пути шкаф и корешок рисует CSS. Книг на полке — lbCols: сколько встаёт в ширину, не уже HC_VIEW.card (коллекция) и HC_VIEW.gold («За золото»); полок не меньше ${V.rows}; удержание — ${V.hold} мс, сдвиг ${V.slop} px — прокрутка; книга встаёт в место отряда за ${V.rise} мс; выдвигается с полки за ${O.pull} мс.</p>`)}

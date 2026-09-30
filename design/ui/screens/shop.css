@@ -95,7 +95,7 @@
 /* ===================================================================================================================
    Зал «Лавка» (screens/crafthall.js, слово автора 30.09.2026 — «дорого и богато»): тесная лавочка в скале, тёплый свет фонарей.
    Витрина — два ряда: верхний на полке (доска шкафа Библиотеки), нижний на прилавке (арт --cr-counter, CR_ART). Товар — на бархатной
-   подушке, в рамке своего вида (data-fk, crafthall.css); цена — латунной биркой на кромке полки. Правила воздуха прежние: значок,
+   подушке, в рамке предмета (art-icons.css: одна на все виды, свет — редкость); цена — латунной биркой на кромке полки. Правила воздуха прежние: значок,
    имя, цена — одно действие; карточка без коробки, рамка — только у наведённой и купленной.
    =================================================================================================================== */
 .lv-grid{position:relative;isolation:isolate}
@@ -117,10 +117,10 @@ html.cr-sh .lv-grid::after{background:var(--cr-counter) 0 0/auto 100% repeat-x;b
 .lv-ic::before{content:"";position:absolute;left:50%;bottom:-17px;z-index:-1;width:150%;aspect-ratio:1563/1000;transform:translateX(-50%);pointer-events:none;
   border-radius:40%;background:radial-gradient(closest-side,#1f5f59,#0e2c2a 70%,transparent 72%)}
 html.cr-sh .lv-ic::before{border-radius:0;background:var(--cr-cushion) center/contain no-repeat;filter:drop-shadow(0 5px 5px rgba(0,0,0,.7))}
-html.cr-f .lv-ic[data-fk]{width:56px;height:56px}
-html.cr-f .lv-ic[data-fk] .i{width:42%;height:42%;color:color-mix(in srgb,var(--rc) 70%,var(--parch))}
-html.cr-f .lv-ic[data-fk] .lv-q{right:1px;bottom:0;padding:0 3px;border-radius:6px;background:rgba(8,7,5,.82)}
-html.cr-f .lv-ic[data-fk] .lv-cr{left:-4px;top:-4px;z-index:3}
+.lv-ic[data-fk]{width:56px;height:56px}
+.lv-ic[data-fk] .i{width:42%;height:42%;color:color-mix(in srgb,var(--rc) 70%,var(--parch))}
+.lv-ic[data-fk] .lv-q{right:3px;bottom:2px;padding:0 3px;border-radius:5px;background:rgba(8,7,5,.72)}
+.lv-ic[data-fk] .lv-cr{left:-4px;top:-4px;z-index:3}
 .lv-nm{color:#ecd9ad;text-shadow:0 1px 2px #000}
 /* цена — латунная бирка */
 .lv-pr,.lv-sold{padding:3px 8px 3px 6px;border-radius:3px;background:linear-gradient(180deg,#7b6038,#5b4526 58%,#4b391e);box-shadow:inset 0 0 0 1px rgba(233,199,126,.45),inset 0 1px 0 rgba(255,236,190,.25),0 2px 3px rgba(0,0,0,.8);
@@ -133,12 +133,12 @@ html.cr-f .lv-ic[data-fk] .lv-cr{left:-4px;top:-4px;z-index:3}
 /* шапка витрины: срок и «Обновить» на латунной планке */
 .lv-head{padding:0 6px 0 10px;border-radius:17px;background:linear-gradient(180deg,rgba(24,18,12,.86),rgba(12,9,7,.9));box-shadow:inset 0 0 0 1px rgba(201,162,106,.28),0 8px 16px -10px #000}
 .lv-time b{color:#f0d79c}
-/* лист товара: крупная плитка — рамка своего вида, свет редкости */
-html.cr-f .lv-big[data-fk]{width:68px;height:68px}
-html.cr-f .lv-big[data-fk] b{z-index:2;right:1px;bottom:0;padding:0 3px;border-radius:6px;background:rgba(8,7,5,.82)}
+/* лист товара: крупная плитка — в рамке предмета, свет редкости */
+.lv-big[data-fk]{width:68px;height:68px}
+.lv-big[data-fk] b{z-index:2;right:3px;bottom:2px;padding:0 3px;border-radius:5px;background:rgba(8,7,5,.72)}
 .lv-deal{border-color:rgba(201,162,106,.3);background:rgba(8,6,4,.55)}
 @container main (max-height: 360px){
-  html.cr-f .lv-ic[data-fk]{width:48px;height:48px}
+  .lv-ic[data-fk]{width:48px;height:48px}
   .lv-ic{margin-bottom:4px}
   .lv-grid>.lv-card:nth-child(n+6){padding-bottom:12px}
   .lv-grid::before{top:calc(50% - 6px - 20px);height:22px}

@@ -6,8 +6,12 @@
                                            в ноль; нарезка по пятнам (близкие точки — одна виньетка); каждая — <имя листа>-<имя>.png
   tongue <png…>                            закладка: из вырезанной закладки-«папки» — верхний язычок до плеч (там, где ширина скачком
                                            растёт), по ширине язычка; → .tongue.png. Срезы border-image — от краёв язычка, ‰
+  gild   <png…>                            золото из чернил: виньетка пером → та же виньетка старым золотом для чернёного пергамента
+                                           (слово автора 30.09.2026 о тёмной подложке страниц: чернила по чёрному не видны). Форма —
+                                           альфа пера, цвет — золото сверху светлее, к низу бронзовее; гуще штрих — светлее; → .gilt.png
 
   python tools/art-gen/page_layers.py ink art/generated/pg-ink/pg-ink__nb2.jpg 3 2 head div corner cartouche tail wreath
+  python tools/art-gen/page_layers.py gild art/generated/pg-ink/pg-ink__nb2-head.png art/generated/pg-ink/pg-ink__nb2-div.png
 """
 import json
 import pathlib
@@ -21,6 +25,9 @@ import craft_layers as CL   # noqa: E402  нарезка по пятнам, пу
 from craft_layers import load, rel, stem, permille   # noqa: E402
 
 NOISE = 0.07     # доля чернил, ниже которой пиксель — бумага, а не чернила
+GILT = ((250, 226, 166), (218, 174, 94), (156, 112, 48))   # золото виньетки сверху вниз: светлое, старое, бронзовое
+GILT_BODY = 0.72  # доля яркости у самого тонкого штриха: гуще штрих — ближе к полному золоту
+GILT_ALPHA = 1.15  # тонкие штрихи чуть плотнее: золото по чёрному тоньше чернил по пергаменту
 SHOULDER = 1.12  # во сколько раз ширина строки больше язычка — там начинаются плечи закладки
 MERGE_INK = 0.03  # точки пера ближе этой доли стороны листа — одна виньетка
 
@@ -73,6 +80,23 @@ def tongue(p):
     return {"file": rel(out), "px": [t.width, t.height], "ratio": permille(t.width, t.height)}
 
 
+def gild(p):
+    """Виньетка старым золотом: альфа — от пера, цвет — вертикальный переход GILT, яркость — от плотности штриха"""
+    src = load(p)
+    im = np.asarray(Image.open(src).convert("RGBA")).astype(np.float32)
+    a = im[..., 3] / 255.0
+    h = im.shape[0]
+    t = np.linspace(0.0, 1.0, h)[:, None, None]
+    top, mid, bot = [np.array(c, np.float32)[None, None, :] for c in GILT]
+    ramp = np.where(t < 0.5, top + (mid - top) * (t / 0.5), mid + (bot - mid) * ((t - 0.5) / 0.5))
+    col = ramp * (GILT_BODY + (1.0 - GILT_BODY) * a[..., None])
+    alpha = np.clip(a * GILT_ALPHA, 0.0, 1.0) * 255.0
+    rgba = np.dstack([np.clip(col, 0, 255), alpha]).round().astype(np.uint8)
+    out = src.with_name(src.stem + ".gilt.png")
+    Image.fromarray(rgba, "RGBA").save(out, optimize=True)
+    return {"file": rel(out), "px": [int(rgba.shape[1]), int(rgba.shape[0])]}
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     if len(sys.argv) < 3:
@@ -82,6 +106,8 @@ def main():
         res = ink(args[0], int(args[1]), int(args[2]), args[3:])
     elif kind == "tongue":
         res = [tongue(a) for a in args]
+    elif kind == "gild":
+        res = [gild(a) for a in args]
     else:
         sys.exit(__doc__)
     print(json.dumps(res, ensure_ascii=False, indent=2))

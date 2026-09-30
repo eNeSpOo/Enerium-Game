@@ -7,9 +7,9 @@
    Регистрирует:
    — зал окна: SCREENS.craft (обёртка поверх model.js и reforge.js) кладёт под экран слой .cr-hall — фон зала, свет снизу, пыль в луче;
      окно открытия сундука и сцена удачи мастерской берут картину зала из переменных --cr-hall-stock и --cr-hall-work;
-   — рамку иконки предмета по виду: атрибут data-fk (crK) у колодца предмета — материал рамки (сырьё, ключ, трофей, изделие, призыв,
-     руна, заряженный карст, город); редкость — свет в окне и контур рамки цветом --rc. Иконки ресурсов нарисуют позже сеткой:
-     квадратная живопись в край, рамку даёт интерфейс — как у иконок способностей;
+   — рамку предмета: атрибут data-fk="item" (crK) у колодца предмета данных — одна рамка на все виды (art-icons.css, «Рамка
+     предмета»: слово автора 30.09.2026 — «пусть они будут едины для всех предметов… а вот подсветка будет определять редкость»);
+     редкость — свет кромки и окна цветом --rc. Значкам кошелька (Энериум, рунный ключ) рамки нет;
    — пометку Этриона (crHint): поле hint ресурса — подсказка-загадка, где его использовать; карточка предмета, ячейка стола, лист товара;
    — выборку для 1000 ресурсов: грани цикл, биом, вид, ремесло, редкость (crFacets, crFacetMatch) и показ порциями (crPage, ACT.crmore);
    — отклик на действие частицами EnFx (crBurst) и раздел UI-кита «Ремесло: залы и вещи мастера».
@@ -35,25 +35,13 @@ const CR_VIEW = {
   },
   seed: 'Ремесло · зал',   // рисунок пыли и угольков — постоянный: один и тот же кадр при каждой перерисовке
   cycle: 1092000,          // фаза пыли, дыхания света и хода колец — часы страницы по модулю этого числа, мс: скачок фазы — раз в 18 минут
+  /* UI-кит «Рамка предмета»: ярусы образцов — рамка у всех одна; размеры колодца, px — от строки книги рецептов до листа товара */
+  kit: { tiers: ['basic', 'key', 'unique', 'made', 'call', 'rune', 'craftres'], sizes: [26, 34, 44, 56, 68] },
 };
-
-/* вид предмета → материал рамки иконки: по ярусу (tier). Ярус без строки — рамка сырья, автопроверка называет его */
-const CR_KIND = {
-  basic: 'res', craftres: 'res', key: 'key', unique: 'boss', trophy: 'boss', find: 'boss',
-  part: 'made', made: 'made', product: 'made', hero: 'made',
-  act: 'call', call: 'call', echo: 'call',
-  rune: 'rune', vshard: 'rune', valor: 'rune',
-};
-/* вид по семейству (поле fam данных Этриона, 30.09.2026) — сильнее яруса: у города, карста, топлива, кристалла и друзы Энериума ярус
-   общий (город — act, карст и топливо — made и product), свою рамку им даёт семейство; руническая пыль — среди рун */
-const CR_FAM = { city: 'city', karst: 'karst', fuel: 'karst', ener: 'karst', dust: 'rune' };
-/* рамки — порядок листа craft-hall.json и подписи для UI-кита */
-const CR_FRAMES = [['res', 'Сырьё'], ['key', 'Ключи'], ['boss', 'Добыча боссов и руин'], ['made', 'Изделия'], ['call', 'Призывы'], ['rune', 'Руны'],
-  ['karst', 'Карсты и топливо'], ['city', 'Города']];
 
 /* арт (tools/art-gen/jobs/craft-hall.json, выгрузка export_ui.py в assets/art/craft/). ready — выгруженные пути: пока пути нет, вещь
-   рисует CSS. Геометрия — вывод tools/art-gen/craft_layers.py, тысячные доли, только целые:
-   frame — холст рамки и тело рамки на нём (px исходника), win — окно рамки по видам [сверху, справа, снизу, слева], ‰ тела;
+   рисует CSS. Рамки предмета по виду (craft/frame-*.png) сняты словом автора 30.09.2026: рамка одна на все предметы и рисуется CSS
+   (art-icons.css). Геометрия — вывод tools/art-gen/craft_layers.py, тысячные доли, только целые:
    core.hole — прозрачная середина пьедестала, ‰ радиуса; page — страница гримуара для border-image: срезы [сверху, справа, снизу,
    слева] в px страницы; ratio — ширина к высоте, ‰ */
 const CR_ART = {
@@ -61,14 +49,9 @@ const CR_ART = {
     'craft/table.webp', 'craft/socket.webp', 'craft/core.webp', 'craft/hearth.webp', 'craft/dais.webp',
     'craft/corner-tl.png', 'craft/corner-tr.png', 'craft/corner-bl.png', 'craft/corner-br.png', 'craft/seal.png', 'craft/cushion.webp',
     'craft/plate.webp', 'craft/counter.webp', 'craft/awning.webp', 'craft/vellum.jpg', 'craft/grimoire.webp', 'craft/grimoire-spread.webp',
-    'craft/frame-res.png', 'craft/frame-key.png', 'craft/frame-boss.png', 'craft/frame-made.png', 'craft/frame-call.png', 'craft/frame-rune.png',
-    'craft/frame-karst.png', 'craft/frame-city.png',
     'craft/fx-ember.png', 'craft/fx-glint.png', 'craft/fx-shard.png', 'craft/fx-mote.png', 'craft/fx-smoke.png', 'craft/fx-ash.png',   // выгрузка 30.09.2026
     'chests/fx-beam.png', 'chests/fx-ring.png'],   // текстуры света окна сундука (chest-open.js, CO_ART) — луч над столом и кольцо под пьедесталом
   hall: { work: 'craft/hall-work.jpg', stock: 'craft/hall-stock.jpg', shop: 'craft/hall-shop.jpg', market: 'craft/hall-market.jpg', forge: 'craft/hall-forge.jpg' },
-  frame: { canon: 256, body: 200 },
-  frames: { res: [155, 150, 155, 150], key: [195, 145, 140, 135], boss: [135, 130, 135, 125], made: [135, 135, 140, 135],
-    call: [115, 115, 105, 115], rune: [160, 160, 155, 160], karst: [135, 135, 140, 135], city: [190, 130, 145, 130] },
   core: { hole: 281 },
   page: { px: [604, 697], slice: [100, 149, 137, 150] },
   ratio: { dais: 2301, cushion: 1563, plate: 4739, counter: 3636, awning: 4283, seal: 880, corner: 983, spread: 1524 },
@@ -84,9 +67,10 @@ const CR_ART = {
 
 /* ================== помощники ================== */
 const crArt = p => CR_ART.ready.includes(p);
-const crKind = it => (it && (CR_FAM[it.fam] || CR_KIND[it.tier])) || 'res';
-/* атрибут рамки у колодца предмета: вид — материал рамки, редкость — data-r рядом */
-const crK = it => (it ? ` data-fk="${crKind(it)}"` : '');
+/* рамка предмета — одна на все предметы (art-icons.css, «Рамка предмета»): атрибут data-fk="item" у колодца предмета данных, редкость —
+   data-r рядом. Значкам кошелька — семейство wallet (Энериум, рунный ключ) — рамки нет: это значки валюты, а не предметы */
+const crFramed = it => !!it && it.fam !== 'wallet';
+const crK = it => (crFramed(it) ? ' data-fk="item"' : '');
 const crS = () => S.cr || (S.cr = crFresh());
 function crFresh() { return { more: {} }; }
 
@@ -99,7 +83,6 @@ function crFresh() { return { more: {} }; }
   const all = (list, cls) => { if (list.every(Boolean) && R.classList) R.classList.add(cls); };
   const I = CR_ART.img;
   all(Object.entries(CR_ART.hall).map(([k, p]) => set('--cr-hall-' + k, p)), 'cr-h');
-  all(CR_FRAMES.map(([k]) => set('--cr-f-' + k, `craft/frame-${k}.png`)), 'cr-f');
   all([set('--cr-table', I.table), set('--cr-socket', I.socket), set('--cr-core', I.core)], 'cr-t');
   all([set('--cr-hearth', I.hearth)], 'cr-hh');
   all([set('--cr-dais', I.dais)], 'cr-d');
@@ -146,7 +129,7 @@ function crHint(it, o = {}) {
   return `<div class="cr-hint${o.cls ? ' ' + o.cls : ''}"><i class="cr-seal" aria-hidden="true"></i><div class="cr-hint-t"><b class="cr-hint-h">Пометка Этриона</b>${nm}<p>${trEsc(t)}</p></div></div>`;
 }
 
-/* лист «Сведения» (index.html: рынок, ритуалы, развитие героя) — та же карточка предмета: крупная плитка в рамке своего вида,
+/* лист «Сведения» (index.html: рынок, ритуалы, развитие героя) — та же карточка предмета: крупная плитка в рамке предмета,
    пометка Этриона — под загадкой. Обёртка вида: сам лист и его данные прежние */
 if (typeof itemCard === 'function') {
   const crItemCardBase = itemCard;
@@ -247,29 +230,28 @@ Object.assign(ACT, {
 });
 
 /* ================== UI-кит: раздел «Ремесло: залы и вещи мастера» ==================
-   Залы окон, рамки восьми видов в семи редкостях, пометка Этриона, стол и его вещи, показ порциями. Проба — не выдача */
-function crKitSample(kind) {
-  return EN_RECIPES.items.find(it => !it.team && crKind(it) === kind) || null;
-}
+   Залы окон, рамка предмета — одна на все виды, в семи редкостях и в размерах окон, пометка Этриона, стол и его вещи. Проба — не выдача */
+const crKitSample = tier => EN_RECIPES.items.find(it => !it.team && it.tier === tier && crFramed(it)) || null;
+const crKitWell = (it, r, px, cap) => `<span class="well cr-kw"${crK(it)} data-r="${r}"${px ? ` style="--s:${px}px"` : ''} title="${trEsc(cap)}">${trIcon(it)}</span>`;
 function crKitHtml() {
   const halls = Object.entries(CR_VIEW.hall).map(([seg, h]) => {
     const name = { work: 'Мастерская', stock: 'Запасы', shop: 'Лавка', market: 'Рынок', reforge: 'Перековка' }[seg];
     return `<figure class="cr-kh"><span class="cr-kh-p" data-hall="${h}"></span><figcaption>${name}</figcaption></figure>`;
   }).join('');
-  const rows = CR_FRAMES.map(([k, n]) => {
-    const it = crKitSample(k);
-    const inner = it ? trIcon(it) : ic('gem');
-    const cells = [1, 2, 3, 4, 5, 6, 7].map(r => `<span class="well cr-kw" data-fk="${k}" data-r="${r}" title="${n} · ${RAR[r]}">${inner}</span>`).join('');
-    return `<div class="cr-kf"><b>${n}</b><div class="cr-kfs">${cells}</div></div>`;
-  }).join('');
+  /* виды — рамка одна; редкости — свет; размеры — от строки книги рецептов до листа товара */
+  const K = CR_VIEW.kit, its = K.tiers.map(crKitSample).filter(Boolean), one = its[0];
+  const kinds = its.map(it => crKitWell(it, it.r, 0, `${(EN_RECIPES.tiers[it.tier] || { n: it.tier }).n} · ${RAR[it.r]}`)).join('');
+  const rars = one ? [1, 2, 3, 4, 5, 6, 7].map(r => crKitWell(one, r, 0, RAR[r])).join('') : '';
+  const sizes = one ? K.sizes.map(px => crKitWell(one, 5, px, px + ' px')).join('') : '';
+  const rows = [['Виды', kinds], ['Редкости', rars], ['Размеры', sizes]].map(([n, cells]) => `<div class="cr-kf"><b>${n}</b><div class="cr-kfs">${cells}</div></div>`).join('');
   /* образец пометки — первый ресурс с полем hint; пока его в данных нет — загадка ресурса тем же видом (текст пометок пишет Этрион) */
   const withHint = EN_RECIPES.items.find(it => !it.team && crHintText(it)), stand = EN_RECIPES.items.find(it => !it.team && it.lore);
   const hint = crHint(withHint || (stand ? { hint: stand.lore, tier: stand.tier } : null));
-  const team = TM(`<p class="k-note">Рамка — атрибут data-fk у колодца предмета (crK): вид — материал рамки по ярусу CR_KIND, редкость — свет в окне и контур цветом --rc. Новый ярус данных — строкой в CR_KIND, иначе рамка сырья. Пометка Этриона — поле hint ресурса (crHint)${withHint ? '' : '; в данных его пока нет — образец показывает загадку ресурса'}. Грани выборки — crFacets, порции — crPage (CR_VIEW.page). Арт — CR_ART, задание tools/art-gen/jobs/craft-hall.json, нарезка — tools/art-gen/craft_layers.py.</p>`, 'div');
+  const team = TM(`<p class="k-note">Рамка предмета — art-icons.css, «Рамка предмета»: класс itf или атрибут data-fk="item" (crK — у колодца предмета данных), редкость — data-r. Вид рамкой не различается; у значков кошелька (семейство wallet) рамки нет. Иконка сеткой ложится ровно в окно, внутри гнезда и пьедестала рамка отступает на --itf-in. Пометка Этриона — поле hint ресурса (crHint)${withHint ? '' : '; в данных его пока нет — образец показывает загадку ресурса'}. Грани выборки — crFacets, порции — crPage (CR_VIEW.page). Арт — CR_ART, задание tools/art-gen/jobs/craft-hall.json, нарезка — tools/art-gen/craft_layers.py.</p>`, 'div');
   return `<section class="k-box cr-kit" style="grid-column:1/-1"><h3>Ремесло: залы и вещи мастера</h3>
     <p class="k-note">У каждого окна «Ремесла» свой зал башни: Мастерская — картотеки и верстаки, Запасы — подклеть с сундуками, Лавка — лавочка в скале, Рынок — ряды под навесами, Перековка — кузня. Свет — карст снизу, в луче — пыль.</p>
     <div class="cr-khs">${halls}</div>
-    <p class="k-note">Рамка иконки предмета: вид — материал, редкость — свет в окне и контур. Иконку ресурса рисуют квадратной живописью в край, рамку даёт интерфейс.</p>
+    <p class="k-note">Рамка предмета — одна на все виды: тонкий чернёный металл, редкость — свет кромки и снизу окна, с эпической — мягкое свечение. Иконка — живопись в край, ровно в окне рамки.</p>
     <div class="cr-kfr">${rows}</div>
     <p class="k-note">Пометка Этриона — подсказка-загадка ресурса: в карточке предмета, в ячейке стола и в листе товара.</p>
     <div class="cr-khint">${hint}</div>

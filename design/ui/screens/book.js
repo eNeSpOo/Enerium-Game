@@ -13,8 +13,10 @@
      у героя этого аккаунта). Взятая доблесть — короткие ленты-закладки из нижнего края: лент столько, каков максимум, взятая — цвета
      редкости со звёздочкой, невзятая — блёклая. Уровень — круг слева сверху, стихия — медальон справа сверху, класс — щит слева снизу,
      мощь — мечи и число справа снизу, имя — на плашке. Размер o.z: l — сетки, m — витрины, s — отряды и списки (только главное:
-     редкость, доблесть, пределы, уровень). Стадии знакомства (hrStage, screens/heroes.js): неизвестная душа — силуэт класса и полоса
-     осколков; hbBlank — безымянная книга не найденного героя (веер рулетки, отряд недели);
+     редкость, доблесть, пределы, уровень). Стадии знакомства (hrStage, screens/heroes.js), слово автора 30.09.2026: «карточка неизвестной
+     души… это всё-таки тоже книга, только со знаком вопроса». Неизвестная душа — книга своей ступени, закрытая: в окне вместо портрета
+     туман души и «?» (hbQ), имя, редкость, класс, мощь по базовым статам и полоса осколков; hbBlank — не найденный герой (веер рулетки,
+     отряд недели): та же закрытая книга своей ступени с «?», без имени, редкости и мощи, будущий цикл — «цикл N» на плашке;
    — раскрытую книгу hbWin: разворот своей ступени, слева — портрет во всю страницу (лупа — OV.hczoom), кружок уровня, медальон
      стихии, щит класса, мощь, табличка с именем, редкостью, классом и расой и стрелки ‹ › к соседнему герою; справа — страница-
      пергамент без шапки: вкладки heroDetail (index.html; развитие и снаряжение — screens/hero-dev.js; страницы, закладки и тема
@@ -25,7 +27,8 @@
      раскрывается поверх сетки, из которой её открыли; книга героя отряда (S.sq.book, долгое нажатие на корешок или книгу отряда) —
      поверх отрядов; окно OV.rhero (screens/heroes.js) — та же книга поверх любого экрана;
    — hbSpine(вид, o) — корешок книги: книга на полке боком («Библиотека Этриона», screens/library.js) — нижняя полка отрядов, отсеки
-     шкафа отрядов, грань книги в полёте анимации. Материал — ступень книги, редкость — кристалл и ярлык, класс, уровень, имя;
+     шкафа отрядов, грань книги в полёте анимации. Материал — ступень книги, редкость — кристалл и ярлык, класс, имя и мощь — внизу
+     золотом, коротко (hbPow; слово автора 30.09.2026: «игрок видит самых сильных героев и кидает их в отряд»); уровень — в подсказке;
    — анимацию (hbOpenFx, hbTurnFx, ACT.hbclose, ACT.hbskip). Открытие продолжает картину шкафа: книга выдвигается с полки к игроку
      и встаёт корешком (книга с нижней полки — только выдвигается), летит в центр и разворачивается обложкой (3D, rotateY с перспективой;
      толщина — корешок своей ступени), обложка открывается, листы перелистываются; пыль, искры и свет цвета редкости из страниц; книга
@@ -67,17 +70,20 @@ const HB_VIEW = {
    lock — замок: закрытый и отпертый на одном холсте, тела совпадают; key — скважина закрытого [x, y], glow — свет отпертого;
    ribbon — лента: ratio — ширина к высоте, ‰; notch — вершина выреза «ласточкин хвост» от низа, ‰ ширины ленты;
    star — звёздочка: ratio и контур clip-path — 16 точек [x, y]; spines[ступень] — корешок: ratio — ширина к высоте (толщина книги),
-   ‰ (tools/art-gen/shelf_layers.py spines, задание jobs/library-shelves.json); css — геометрия книги без арта */
+   ‰ (tools/art-gen/shelf_layers.py spines, задание jobs/library-shelves.json); soul — окно закрытой книги неизвестной души: туман
+   души во тьме, «?» кладёт интерфейс (задание jobs/hero-soul.json); css — геометрия книги без арта */
 const HB_ART = {
   ready: ['books/cover-1.webp', 'books/cover-2.webp', 'books/cover-3.webp', 'books/cover-4.webp', 'books/cover-5.webp',
     'books/spread-1.webp', 'books/spread-2.webp', 'books/spread-3.webp', 'books/spread-4.webp', 'books/spread-5.webp',
     'books/lock.png', 'books/lock-open.png', 'books/ribbon.png', 'books/star.png', 'books/endpaper.jpg', 'books/leaf.jpg',   // выгрузка 30.09.2026
-    'books/spine-1.png', 'books/spine-2.png', 'books/spine-3.png', 'books/spine-4.png', 'books/spine-5.png'],              // корешки — 30.09.2026, вечер
+    'books/spine-1.png', 'books/spine-2.png', 'books/spine-3.png', 'books/spine-4.png', 'books/spine-5.png',               // корешки — 30.09.2026, вечер
+    'books/soul.webp'],                                                                                                      // туман закрытой книги — 01.10.2026
   cover: t => 'books/cover-' + t + '.webp',
   spread: t => 'books/spread-' + t + '.webp',
   spine: t => 'books/spine-' + t + '.png',
   spines: { 1: { ratio: 284 }, 2: { ratio: 266 }, 3: { ratio: 291 }, 4: { ratio: 272 }, 5: { ratio: 319 } },
-  img: { lockOff: 'books/lock.png', lockOn: 'books/lock-open.png', ribbon: 'books/ribbon.png', star: 'books/star.png', endpaper: 'books/endpaper.jpg', leaf: 'books/leaf.jpg' },
+  img: { lockOff: 'books/lock.png', lockOn: 'books/lock-open.png', ribbon: 'books/ribbon.png', star: 'books/star.png', endpaper: 'books/endpaper.jpg', leaf: 'books/leaf.jpg',
+    soul: 'books/soul.webp' },
   covers: {
     1: { win: [113, 176, 197, 173], core: [1, 3, 1, 1] },
     2: { win: [178, 176, 221, 230], core: [0, 1, 1, 1] },
@@ -130,7 +136,7 @@ const hbSpreadVars = g => `--lt:${g.l[0]};--lr:${g.l[1]};--lb:${g.l[2]};--ll:${g
   if (!st) return;
   const set = (k, p, cls) => { if (!hbArt(p)) return; try { st.setProperty(k, `url("${abs(p)}")`); if (cls && R.classList) R.classList.add(cls); } catch (_) { } };
   set('--hb-lock', I.lockOff, 'hb-lk'); set('--hb-lock-on', I.lockOn); set('--hb-ribbon', I.ribbon, 'hb-rn'); set('--hb-star', I.star, 'hb-sr');
-  set('--hb-endp', I.endpaper, 'hb-ep'); set('--hb-leaf', I.leaf, 'hb-lf');
+  set('--hb-endp', I.endpaper, 'hb-ep'); set('--hb-leaf', I.leaf, 'hb-lf'); set('--hb-soul', I.soul, 'hb-qa');   // hb-qa — флаг, не класс элемента: окно «?» — .hb-q
   try {
     st.setProperty('--hb-notch', String(hbArt(I.ribbon) ? HB_ART.ribbon.notch : HB_ART.css.notch));
     if (hbArt(I.star)) st.setProperty('--hb-sclip', `polygon(${HB_ART.star.clip.map(([x, y]) => `${hbPct(x)} ${hbPct(y)}`).join(',')})`);
@@ -144,7 +150,7 @@ const hbSpreadVars = g => `--lt:${g.l[0]};--lr:${g.l[1]};--lb:${g.l[2]};--ll:${g
    note — занятость поверх портрета; gray — чёрно-белая (известный, но не купленный — каталог); shard — [собрано, нужно] — полоса
    осколков; own — отметка «в коллекции» у купленного (витрины); bm — мощь: у своего героя по умолчанию в l, false — без неё;
    foot — своё внизу (цена в лавке праха); rpNext — состояние следующего замка вместо рассчитанного (UI-кит); stage — стадия вместо
-   рассчитанной (UI-кит) */
+   рассчитанной (UI-кит); glint — блик света изредка проходит по обложке (витрина «За Энериум»: донатные герои должны быть желанными) */
 const HB_Z = { l: 1, m: 1, s: 1 };
 /* замки пределов: сверху вниз I…V, пройденные отперты и светят бирюзой, следующий на потолке уровня тлеет (wait) или пульсирует (ready) */
 const hbLocks = (n, nx) => `<span class="hb-lk" aria-hidden="true">${Array.from({ length: hbTop() }, (_, i) => `<i class="hb-l ${i < n ? 'on' : i === n && nx ? nx : 'off'}"></i>`).join('')}</span>`;
@@ -173,7 +179,7 @@ function hbCover(v, o = {}) {
   const sh = o.shard && z !== 's' ? hcShard(Object.assign({}, v, { st }), o.shard[0], o.shard[1]) : '';
   const cover = g.art ? `<img class="hb-cva" src="${AV(g.art)}" alt="" aria-hidden="true" loading="lazy" decoding="async">` : '<i class="hb-cvc" aria-hidden="true"></i>';
   return `<span class="hb-bk" style="${hbGeoVars(g)};--hb-g:${HB_VIEW.glow[(v.r || 1) - 1] || 0}"><i class="hb-gl" aria-hidden="true"></i><span class="hb-ph">${hcFace(Object.assign({}, v, { st }))}</span>${cover}${t >= HB_VIEW.tiers && !o.gray && !o.lock ? hbMotes() : ''}
-    <i class="hb-cr" aria-hidden="true"></i>${lv}${elm}${own ? hbLocks(v.lim, nx) : ''}${sh ? `<span class="hb-shw">${sh}</span>` : ''}${nm}${z === 's' && !o.bm ? '' : hbFoot(v, o, z, own)}${note ? `<span class="hb-busy">${note}</span>` : ''}</span>`;
+    <i class="hb-cr" aria-hidden="true"></i>${lv}${elm}${own ? hbLocks(v.lim, nx) : ''}${sh ? `<span class="hb-shw">${sh}</span>` : ''}${nm}${z === 's' && !o.bm ? '' : hbFoot(v, o, z, own)}${note ? `<span class="hb-busy">${note}</span>` : ''}${o.glint ? '<i class="hb-glint" aria-hidden="true"></i>' : ''}</span>`;
 }
 /* книгу сняли с полки — она в полёте анимации (открытие или закрытие): на своём месте её нет, пока не вернётся */
 function hbAway(id) {
@@ -190,40 +196,58 @@ function hbCard(v, o = {}) {
   const cls = ['hb', o.gray ? 'gray' : '', st === 1 ? 'soul' : '', o.sel ? 'sel' : '', o.dim ? 'dim' : '', away ? 'away' : ''].filter(Boolean).join(' ');
   return `<button class="${cls}" data-z="${z}" data-t="${t}" data-r="${v.r}" data-s="${st}"${mx ? ' data-max="1"' : ''} data-a="${o.act || 'hc'}" data-v="${o.val != null ? o.val : v.id}"${o.sel ? ' aria-pressed="true"' : ''} aria-label="${hrEsc(say)}">${hbCover(v, Object.assign({}, o, { z, stage: st }))}${hbRibs(own ? v.valor : 0, v.maxV)}</button>`;
 }
-/* безымянная книга не найденного героя (веер рулетки, отряд недели): ни ступени, ни редкости, ни имени; lock — герой будущего цикла */
+/* окно закрытой книги: туман души и «?» вместо портрета — у неизвестной души (hcFace, screens/heroes.js) и у не найденного (hbBlank).
+   Туман — рисунок HB_ART.img.soul, пока его нет — CSS; «?» — буква шрифта заголовков, старое золото */
+const hbQ = () => '<span class="hb-q" aria-hidden="true"><i class="hb-qm">?</i></span>';
+/* книга не найденного героя (веер рулетки, отряд недели): книга своей ступени (o.t — максимум доблести героя), закрытая — «?» в окне;
+   ни имени, ни редкости, ни мощи. lock — герой будущего цикла: на плашке — o.when, когда откроется (у мелкой — только замок) */
 function hbBlank(o = {}) {
-  const z = HB_Z[o.z] ? o.z : 'l';
-  return `<button class="hb blank${o.sel ? ' sel' : ''}${o.lock ? ' lock' : ''}" data-z="${z}" data-t="1" data-s="0" data-a="${o.act || 'noop'}" data-v="${hrEsc(o.val || '')}"${o.sel ? ' aria-pressed="true"' : ''} aria-label="${hrEsc(o.say || 'Неизвестная душа')}" title="${hrEsc(o.say || 'Неизвестная душа')}">
-    <span class="hb-bk" style="${hbGeoVars({ win: HB_ART.css.win, core: HB_ART.css.core })}"><span class="hb-ph"><i class="hb-q" aria-hidden="true">${o.lock ? ic('lock') : '?'}</i></span><i class="hb-cvc" aria-hidden="true"></i></span></button>`;
+  const z = HB_Z[o.z] ? o.z : 'l', t = Math.max(1, Math.min(HB_VIEW.tiers, +o.t || 1)), g = hbCoverGeo(t), say = hrEsc(o.say || 'Неизвестная душа');
+  const cover = g.art ? `<img class="hb-cva" src="${AV(g.art)}" alt="" aria-hidden="true" loading="lazy" decoding="async">` : '<i class="hb-cvc" aria-hidden="true"></i>';
+  const lock = !o.lock ? '' : z !== 's' && o.when ? `<b class="hb-nm hb-when">${ic('lock')}${hrEsc(o.when)}</b>` : `<i class="hb-lkb" aria-hidden="true">${ic('lock')}</i>`;
+  return `<button class="hb blank${o.sel ? ' sel' : ''}${o.lock ? ' lock' : ''}" data-z="${z}" data-t="${t}" data-s="0" data-a="${o.act || 'noop'}" data-v="${hrEsc(o.val || '')}"${o.sel ? ' aria-pressed="true"' : ''} aria-label="${say}" title="${say}">
+    <span class="hb-bk" style="${hbGeoVars(g)}"><span class="hb-ph">${hbQ()}</span>${cover}${lock}</span><span class="hb-rb" aria-hidden="true"></span></button>`;
 }
 
 /* ================== корешок книги ==================
    Книга на полке боком — «Библиотека Этриона» (screens/library.js): нижняя полка отрядов (свободные герои), отсеки шкафа отрядов, грань
    книги в полёте анимации (книга выдвигается с полки корешком). Материал — ступень книги, как обложка (HB_ART.spine); редкость —
-   кристалл и ярлык её цвета; класс — значок; уровень — табличка внизу (у героя аккаунта); имя — вдоль ярлыка, снизу вверх. Толщина
-   книги — ширина корешка к высоте (HB_ART.spines, ‰). Пока корешка нет в HB_ART.ready, материал рисует CSS (.hs-c) */
+   кристалл и ярлык её цвета; класс — значок; имя — вдоль ярлыка, снизу вверх; внизу — мощь золотом на тёмной табличке, коротко
+   (hbPow). Слово автора 30.09.2026: «обычно игрок видит самых сильных героев и кидает их в отряд» — мощь видна сразу; уровень, доблесть
+   и пределы — в подсказке по удержанию (screens/heroes.js, sqPeek). Толщина книги — ширина корешка к высоте (HB_ART.spines, ‰). Пока
+   корешка нет в HB_ART.ready, материал рисует CSS (.hs-c) */
 const hbSpineR = t => (hbArt(HB_ART.spine(t)) && HB_ART.spines[t] ? HB_ART.spines[t].ratio : HB_ART.css.spine);
 const hbShort = n => String(n == null ? '' : n).trim().split(/\s+/)[0];
-/* лицо корешка: материал, кристалл, ярлык с именем; у полного (z = l) — ещё класс и уровень */
-function hbSpineFace(v, z, own) {
+/* мощь на корешке — не длиннее четырёх знаков: 940, 7,4К, 75К, 128К, 1,2М, 12М; десятые — только до десяти тысяч или миллионов.
+   Только целые: тысяча и миллион — единицы счёта, не баланс */
+function hbPow(n) {
+  const x = Math.max(0, Math.floor(+n || 0)), [d, s] = x >= 1000000 ? [1000000, 'М'] : x >= 1000 ? [1000, 'К'] : [1, ''];
+  if (d === 1) return String(x);
+  const k = Math.floor(x * 10 / d);   // десятые доли единицы
+  return k < 100 && k % 10 ? `${Math.floor(k / 10)},${k % 10}${s}` : `${Math.floor(k / 10)}${s}`;
+}
+/* лицо корешка: материал, кристалл, ярлык с именем; у полного (z = l) — ещё класс и мощь */
+function hbSpineFace(v, z) {
   const p = HB_ART.spine(hbTier(v)), full = z !== 's';
   return `${hbArt(p) ? `<img class="hs-a" src="${AV(p)}" alt="" aria-hidden="true" loading="lazy" decoding="async">` : '<i class="hs-c" aria-hidden="true"></i>'}<i class="hs-cr" aria-hidden="true"></i>`
     + `<span class="hs-l" aria-hidden="true">${full ? `<b>${hrEsc(hbShort(v.n))}</b>` : ''}</span>`
-    + (full ? `<span class="hs-k" aria-hidden="true">${CLS(v.ic, 16, '')}</span>${own ? `<b class="hs-v num" aria-hidden="true">${v.lvl}</b>` : ''}` : '');
+    + (full ? `<span class="hs-k" aria-hidden="true">${CLS(v.ic, 16, '')}</span><b class="hs-p num" aria-hidden="true">${hbPow(v.bm)}</b>` : '');
 }
 /* корешок-кнопка или знак. o: z — l (полка: всё), s (отсек шкафа: материал, кристалл и ярлык); tag — span (внутри другой кнопки
-   и в полёте), иначе кнопка; act, val — нажатие; hold — долгое нажатие «действие:значение» (книга раскрывается); dim, note — занят;
-   sel — выбран; say — что сделает нажатие, для подписи; stage — стадия вместо рассчитанной (UI-кит) */
+   и в полёте), иначе кнопка; act, val — нажатие; hold — долгое нажатие «действие:значение» (screens/library.js); peek — id героя:
+   удержание — подсказка над полкой (screens/heroes.js, sqPeek), on — подсказка открыта; dim, note — занят; sel — выбран; say — что
+   сделает нажатие, для подписи; tip: false — без всплывающей подписи браузера (у корешка своя подсказка); stage — стадия вместо
+   рассчитанной (UI-кит) */
 function hbSpine(v, o = {}) {
   if (!v) return '';
   const z = o.z === 's' ? 's' : 'l', t = hbTier(v), st = o.stage != null ? o.stage : hbStage(v), own = st === 3;
   const note = o.note != null ? o.note : own ? v.busy || '' : '', dim = o.dim != null ? !!o.dim : !!note;
-  const say = `${v.n}, ${String(RAR[v.r] || '').toLowerCase()}, ${v.cls}${own ? `, уровень ${v.lvl}` : ''}${note ? ', ' + note : ''}${o.say ? '. ' + o.say : ''}`;
-  const cls = ['hs', dim ? 'dim' : '', o.sel ? 'sel' : '', o.tag !== 'span' && hbAway(v.id) ? 'away' : ''].filter(Boolean).join(' ');
+  const say = `${v.n}, ${String(RAR[v.r] || '').toLowerCase()}, ${v.cls}${z === 'l' ? `, мощь ${fmt(v.bm)}` : ''}${own ? `, уровень ${v.lvl}` : ''}${note ? ', ' + note : ''}${o.say ? '. ' + o.say : ''}`;
+  const cls = ['hs', dim ? 'dim' : '', o.sel ? 'sel' : '', o.on ? 'on' : '', o.tag !== 'span' && hbAway(v.id) ? 'away' : ''].filter(Boolean).join(' ');
   const attrs = `class="${cls}" data-z="${z}" data-t="${t}" data-r="${v.r}" data-s="${st}" data-id="${hrEsc(v.id)}" style="--sr:${hbSpineR(t)}"`;
-  const face = hbSpineFace(v, z, own);
-  if (o.tag === 'span') return z === 's' ? `<span ${attrs} aria-hidden="true">${face}</span>` : `<span ${attrs} role="img" aria-label="${hrEsc(say)}" title="${hrEsc(say)}">${face}</span>`;
-  return `<button ${attrs} data-a="${o.act || 'noop'}" data-v="${hrEsc(o.val != null ? o.val : v.id)}"${o.hold ? ` data-hold="${hrEsc(o.hold)}"` : ''} aria-label="${hrEsc(say)}" title="${hrEsc(say)}">${face}</button>`;
+  const face = hbSpineFace(v, z), tip = o.tip === false ? '' : ` title="${hrEsc(say)}"`;
+  if (o.tag === 'span') return z === 's' ? `<span ${attrs} aria-hidden="true">${face}</span>` : `<span ${attrs} role="img" aria-label="${hrEsc(say)}"${tip}>${face}</span>`;
+  return `<button ${attrs} data-a="${o.act || 'noop'}" data-v="${hrEsc(o.val != null ? o.val : v.id)}"${o.hold ? ` data-hold="${hrEsc(o.hold)}"` : ''}${o.peek ? ` data-peek="${hrEsc(o.peek)}"` : ''} aria-label="${hrEsc(say)}"${tip}>${face}</button>`;
 }
 
 /* ================== раскрытая книга ==================
@@ -476,7 +500,7 @@ hbState(S);
 FLOWS.push(
   ['Книга героя · открытие', 'Нажатие на книгу на полке: книга выдвигается к игроку корешком, летит в центр и разворачивается обложкой, обложка открывается, листы перелистываются, свет редкости из страниц — и книга раскрыта',
     () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.hgrid = 'own'; S.selHero = 'h2'; S.seg.hero = 'power'; S.overlay = null; hbOpenFx(null, 'h2'); }],
-  ['Книга · неизвестная душа', 'Найден осколок героя: книга своей ступени с силуэтом класса и полосой осколков; раскрытая — без сведений, только осколки и где их брать',
+  ['Книга · неизвестная душа', 'Найден осколок героя: книга своей ступени закрыта — в окне туман и «?», имя, редкость и полоса осколков; раскрытая — без сведений, только осколки и где их брать',
     () => {
       S.route = 'heroes'; S.seg.heroes = 'coll'; S.overlay = null;
       const h = RS.heroes.find(x => x.src === 'roulette' && x.c <= rsCyc() && !rsHas(x)); if (!h) return;
@@ -502,8 +526,9 @@ function hbKitHtml() {
   const ribs = [[0, 3], [1, 3], [3, 3], [2, 5], [5, 5]].map(([v, m]) => fig(`<span class="hbk-rb" data-r="4">${hbRibs(v, m)}</span>`, `${v} из ${m}`, 92)).join('');
   const soulH = RS.heroes.find(h => RS_SHARD.includes(h.src) && typeof RS_ART !== 'undefined' && RS_ART.has(h.id)) || rh, gold = RS.heroes.find(h => h.src === 'gold' && h.c === rsCyc()) || RS.heroes.find(h => h.src === 'gold');
   const sv = Object.assign(hcView(soulH), { st: 1 }), kv = Object.assign(hcView(gold), { st: 2 }), fv = Object.assign(hcView(soulH), { st: 2 }), mine = hcOwnList()[0];
-  const stages = [fig(hbBlank({ z: 'l', say: 'Не найден' }), '<b>Не найден</b>только в веере рулетки и отряде недели — безымянной книгой; в каталоге не виден', 128),
-    fig(hbCard(sv, { z: 'l', act: 'noop', shard: [Math.floor(need * 2 / 5), need] }), '<b>Неизвестная душа</b>есть осколок: силуэт класса, имя, класс, редкость, мощь по базовым статам', 128),
+  const stages = [fig(hbBlank({ z: 'l', t: sv.maxV, say: 'Не найден' }), '<b>Не найден</b>только в веере рулетки и отряде недели — закрытая книга своей ступени с «?», без имени и редкости; в каталоге не виден', 128),
+    fig(hbBlank({ z: 'l', t: HB_VIEW.tiers - 1, lock: true, when: 'цикл ' + ROMAN[ROMAN.length - 1], say: 'Будущий цикл' }), '<b>Будущий цикл</b>отряд недели: книга закрыта, на плашке — когда откроется', 128),
+    fig(hbCard(sv, { z: 'l', act: 'noop', shard: [Math.floor(need * 2 / 5), need] }), '<b>Неизвестная душа</b>есть осколок: книга закрыта — «?» вместо портрета; имя, класс, редкость, мощь по базовым статам, осколки', 128),
     fig(hbCard(fv, { z: 'l', act: 'noop', shard: [need, need] }), '<b>Известен</b>комплект осколков — в цвете, «Пробудить»', 128),
     fig(hbCard(kv, { z: 'l', act: 'noop', gray: true }), '<b>Известен</b>герой за золото — чёрно-белый до найма', 128),
     mine ? fig(hbCard(mine, { z: 'l', act: 'noop' }), '<b>В коллекции</b>уровень, замки, ленты, мощь', 128) : ''].join('');
@@ -521,7 +546,7 @@ function hbKitHtml() {
     <div class="hbk-row">${rars}</div>
     <div class="hbk-row"><div class="hbk-col"><p class="k-note">Замок рунного предела — четыре состояния; тлеет и пульсирует только у своего героя.</p><div class="hbk-row">${locks}</div></div>
       <div class="hbk-col"><p class="k-note">Ленты доблести: сколько лент — таков максимум.</p><div class="hbk-row">${ribs}</div></div></div>
-    <p class="k-note">Стадии знакомства с героем: не найденного не видно — только счётчик «в коллекции N из M», «найдено N из M»; неизвестная душа — книга с силуэтом класса, сведения закрыты; известный — книга «до покупки»; в коллекции — полная книга.</p>
+    <p class="k-note">Стадии знакомства с героем: не найденного не видно — только счётчик «в коллекции N из M», «найдено N из M»; неизвестная душа — та же книга своей ступени, закрытая: «?» вместо портрета, сведения закрыты; известный — книга «до покупки»; в коллекции — полная книга.</p>
     <div class="hbk-row">${stages}</div>
     <p class="k-note">Размер — от крупной в сетке до мелкой в отрядах и списках: у мелкой только главное — редкость, доблесть, пределы, уровень.</p>
     <div class="hbk-row">${sizes}</div>

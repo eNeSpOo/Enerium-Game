@@ -1,0 +1,298 @@
+/* screens/shelter.css — Убежище (screens/shelter.js, §28.1 GDD): сцена с глубиной, светом и живыми проводниками; дела, таблички,
+   записка и главная кнопка — в материале сцены: кованое железо, старое золото, свет карста снизу (материал разговора, talk.css).
+   Кадр сцены — тот же, что у фона: .sh-st повторяет кадрирование комнаты 1408 : 768 по рабочей области (контейнер .sh); всё внутри
+   кадра — в тысячных долях кадра (--x, --y… из SH_CAST и SH_ROOM).
+   Планы: back — комната, Кузнец и Алхимик, мебель; front — Энцо и Хранитель; fx — передний план. План едет за указателем
+   (translate: --mx, --my × сила плана) и плывёт вместе с камерой (transform, keyframes shDrift); таблички — в тех же планах.
+   Время: фаза повторяющихся движений — --t (часы страницы, отрицательная задержка) плюс своя задержка вещи --d: перерисовка ничего
+   не начинает заново. Движется только transform и opacity; «меньше движения» — всё стоит.
+   Арт — переменные <html> из SH_ART (--sh-sign, --sh-cta, --sh-chain, --sh-corner, --sh-medal, частицы «Ремесла») и флаги sha-*;
+   без арта рисует CSS. Числа вида — переменные <html> из SH_VIEW (--sh-sign0, --sh-cta0…) и срезы border-image (--sh-s0…, --sh-c0…). */
+
+/* ---------- экран: контейнер размеров, числа вида ---------- */
+.sh{container-type:size;overflow:hidden;background:#07090b;--pb:var(--sh-pb,5);--pf:var(--sh-pf,11);--px:var(--sh-px,18);
+  --shs:var(--sh-sign0,48px);--cth:var(--sh-cta0,62px);--chl:12px}
+@container main (max-height: 360px){ .sh{--shs:var(--sh-sign1,44px);--cth:var(--sh-cta1,56px);--chl:10px} }
+.sh button{cursor:pointer;font:inherit;color:inherit;-webkit-tap-highlight-color:transparent}
+
+/* ---------- сцена: кадр комнаты, планы, камера ---------- */
+.sh-scene{position:absolute;inset:0;overflow:hidden;background:#07090b}
+.sh-st{position:absolute;aspect-ratio:1408/768;width:max(100cqw,183.33cqh);left:calc(min(0px,100cqw - 183.33cqh) * .5);top:calc(min(0px,100cqh - 54.545cqw) * .4);pointer-events:none}
+.sh-stage{z-index:1}
+.sh-lay{position:absolute;inset:0;pointer-events:none;--pk:var(--pb);--da:var(--sh-db,.5);--dz:1.03;
+  translate:calc(var(--mx,0) * var(--pk) * -1px) calc(var(--my,0) * var(--pk) * -.6px);transition:translate .7s cubic-bezier(.2,.8,.2,1)}
+.sh-lay.front{--pk:var(--pf);--da:var(--sh-df,.9);--dz:1.01}
+.sh-lay.fx{--pk:var(--px);--da:var(--sh-dx,1.4);--dz:1.02}
+.sh-dr{position:absolute;inset:0;pointer-events:none;transform:scale(var(--dz));animation:shDrift 26s ease-in-out infinite alternate;animation-delay:var(--t,0ms)}
+.sh-room,.sh-furn{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:fill;pointer-events:none;-webkit-user-drag:none}
+.sh-room{z-index:0;filter:saturate(.92)}
+.sh-furn{z-index:3}
+
+/* ---------- свет комнаты: жар горна, лучи из окон, колба, свечи ---------- */
+.sh-forge,.sh-floor,.sh-flask,.sh-cn,.sh-beam{position:absolute;pointer-events:none;mix-blend-mode:screen}
+.sh-forge{z-index:1;left:calc(var(--x) * .1%);top:calc(var(--y) * .1%);width:calc(var(--w) * .1%);height:calc(var(--h) * .1%);translate:-50% -50%;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(255,170,80,.55),rgba(240,110,40,.22) 45%,transparent);animation:shFlick 2.3s steps(1,end) infinite,shHeat 4.6s ease-in-out infinite;animation-delay:var(--t,0ms),var(--t,0ms)}
+.sh-floor{z-index:1;left:calc(var(--x) * .1%);top:calc(var(--y) * .1% + 12%);width:34%;height:22%;translate:-50% 0;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(255,140,60,.2),transparent);animation:shHeat 5.2s ease-in-out infinite;animation-delay:calc(-1.3s + var(--t,0ms))}
+.sh-beams{position:absolute;inset:0;z-index:1;pointer-events:none}
+.sh-beam{left:calc(var(--x) * .1%);top:calc(var(--y) * .1%);width:calc(var(--w) * .1%);height:calc(var(--l) * .1%);transform-origin:50% 0;rotate:var(--a);
+  background:linear-gradient(180deg,rgba(185,250,240,.42),rgba(140,230,220,.17) 40%,rgba(110,210,200,.05) 72%,transparent);filter:blur(4px);animation:shBeam 11s ease-in-out infinite;animation-delay:calc(var(--d) + var(--t,0ms))}
+.sh-flask{z-index:4;left:calc(var(--x) * .1%);top:calc(var(--y) * .1%);width:calc(var(--w) * .1%);aspect-ratio:1;translate:-50% -50%;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(110,245,150,.5),rgba(79,220,139,.16) 50%,transparent);animation:shPulse 3.4s ease-in-out infinite;animation-delay:var(--t,0ms)}
+.sh-cn{z-index:4;left:calc(var(--x) * .1%);top:calc(var(--y) * .1%);width:calc(var(--s) * .1%);aspect-ratio:1;translate:-50% -50%;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(255,200,120,.75),rgba(255,150,70,.2) 50%,transparent);animation:shFlick 1.7s steps(1,end) infinite;animation-delay:calc(var(--d) + var(--t,0ms))}
+
+/* фонарь с кристаллом карста на переднем плане (слой fx): качается на цепи, светит холодным, чуть не в фокусе */
+.sh-lan{position:absolute;z-index:1;left:calc(var(--x) * .1%);top:calc(var(--y) * .1%);height:calc(var(--h) * .1%);aspect-ratio:261/540;translate:-50% 0;transform-origin:50% 0;pointer-events:none;
+  animation:shLantern 6.2s ease-in-out infinite;animation-delay:var(--t,0ms)}
+.sh-lan img{position:relative;display:block;width:100%;height:100%;max-width:none;filter:brightness(.82) blur(.5px)}
+.sh-lan-gl{position:absolute;left:50%;top:62%;width:240%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;mix-blend-mode:screen;
+  background:radial-gradient(closest-side,rgba(72,229,212,.34),rgba(72,229,212,.08) 55%,transparent);animation:shBreathe 3.8s ease-in-out infinite;animation-delay:var(--t,0ms)}
+
+/* ---------- частицы: угли над горном, пар над колбой, пыль в лучах; рисунок постоянный (сид), фаза — часы страницы ---------- */
+.sh-emb,.sh-steam,.sh-dust{position:absolute;inset:0;pointer-events:none}
+.sh-emb,.sh-dust{z-index:1}
+.sh-steam{z-index:4}
+.sh-em,.sh-sm,.sh-du{position:absolute;left:calc(var(--x) * .1%);top:calc(var(--y) * .1%);opacity:0;will-change:transform,opacity}
+.sh-em{width:calc(var(--s) * .55px);height:calc(var(--s) * .55px);border-radius:50%;background:radial-gradient(closest-side,#fff3c4,#ffb14a 45%,rgba(255,110,40,0));box-shadow:0 0 5px 1px rgba(255,140,60,.75);mix-blend-mode:screen;
+  animation:shEmber var(--dur) cubic-bezier(.3,.6,.6,1) infinite;animation-delay:calc(var(--d) + var(--t,0ms))}
+.sh-sm{width:calc(var(--s) * 1px);aspect-ratio:1;border-radius:50%;background:radial-gradient(closest-side,rgba(200,240,210,.28),transparent);filter:blur(3px);
+  animation:shSteam var(--dur) ease-out infinite;animation-delay:calc(var(--d) + var(--t,0ms))}
+.sh-du{width:calc(var(--s) * 1px);height:calc(var(--s) * 1px);border-radius:50%;background:#e8f3ea;box-shadow:0 0 4px rgba(200,255,240,.7);
+  animation:shDust var(--dur) ease-in-out infinite;animation-delay:calc(var(--d) + var(--t,0ms))}
+html.sha-fx .sh-sm{background:var(--sh-smoke) center/contain no-repeat;filter:sepia(1) hue-rotate(70deg) saturate(1.6) brightness(1.3);opacity:0}
+
+/* ---------- проводник: одна картинка двумя слоями — грудь от пояса дышит, полы от пояса качаются, вес — от ступней ---------- */
+.sh-npc{position:absolute;z-index:2;left:calc(var(--x) * .1%);bottom:calc(var(--b) * .1%);height:calc(var(--h) * .1%);aspect-ratio:var(--ar);padding:0;border:0;background:none;pointer-events:auto}
+.sh-npc:focus-visible{outline:none}
+.sh-body{position:absolute;inset:0;transform-origin:50% 100%;animation:shShift 9s ease-in-out infinite;animation-delay:calc(var(--d) + var(--t,0ms));transition:filter .2s ease-out}
+.sh-up,.sh-lo,.sh-rim{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:contain;pointer-events:none;-webkit-user-drag:none;will-change:transform}
+.sh-up{clip-path:polygon(-40% -10%,140% -10%,140% calc(var(--waist) + .3%),-40% calc(var(--waist) + .3%));transform-origin:50% var(--waist);
+  animation:shBreath 4.8s ease-in-out infinite;animation-delay:calc(var(--d) + var(--t,0ms))}
+.sh-lo{clip-path:polygon(-40% var(--waist),140% var(--waist),140% 115%,-40% 115%);transform-origin:50% var(--waist);
+  animation:shSway 6.6s ease-in-out infinite;animation-delay:calc(var(--d) * 1.3 + var(--t,0ms))}
+/* Кузнец у горна: тёплый контровой свет по левому краю фигуры — та же картинка, окрашенная жаром, мерцает вместе с горном */
+.sh-rim{filter:brightness(1.9) sepia(1) saturate(3.4) hue-rotate(-14deg);mix-blend-mode:screen;opacity:.62;
+  -webkit-mask-image:linear-gradient(90deg,#000 10%,rgba(0,0,0,.45) 34%,transparent 56%);mask-image:linear-gradient(90deg,#000 10%,rgba(0,0,0,.45) 34%,transparent 56%);
+  animation:shFlick 2.3s steps(1,end) infinite;animation-delay:calc(-.4s + var(--t,0ms))}
+/* свет в руках: клинки Энцо, колбы Алхимика, находка Кузнеца, ладонь Хранителя */
+.sh-gl{position:absolute;left:calc(var(--gx) * .1%);top:calc(var(--gy) * .1%);width:calc(var(--gs) * 1%);aspect-ratio:1;translate:-50% -50%;border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(var(--gc),.7),rgba(var(--gc),.22) 48%,transparent);mix-blend-mode:screen;animation:shGlow 3.2s ease-in-out infinite;animation-delay:calc(var(--gd) + var(--t,0ms))}
+/* наведение и фокус — кромка света по силуэту; нажатие — свет ярче. На телефоне наведения нет — нажатая фигура не «залипает» */
+@media (hover:hover){ .sh-npc:hover .sh-body{filter:drop-shadow(0 0 1px rgba(72,229,212,.9)) drop-shadow(0 0 14px rgba(72,229,212,.32))} }
+.sh-npc:focus-visible .sh-body{filter:drop-shadow(0 0 1px rgba(72,229,212,.9)) drop-shadow(0 0 14px rgba(72,229,212,.32))}
+.sh-npc.is-press .sh-body{filter:brightness(1.18) drop-shadow(0 0 2px rgba(221,188,122,.95)) drop-shadow(0 0 18px rgba(221,188,122,.4))}
+
+/* ---------- тень сцены: сверху под вывесками, снизу под записку и кнопку, виньетка ---------- */
+.sh-shade{position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,rgba(5,6,8,.74),rgba(5,6,8,.34) 15%,transparent 30%,transparent 56%,rgba(5,6,8,.5) 76%,rgba(5,6,8,.9)),
+    radial-gradient(120% 95% at 50% 42%,transparent 56%,rgba(0,0,0,.6))}
+
+/* ---------- передний план: дымка у пола и крупные пылинки не в фокусе ---------- */
+.sh-fx{z-index:3}
+.sh-haze{position:absolute;left:-10%;width:70%;height:30%;top:66%;border-radius:50%;pointer-events:none;opacity:.5;
+  background:radial-gradient(closest-side,rgba(150,190,185,.16),transparent);filter:blur(10px);animation:shHaze 34s ease-in-out infinite alternate;animation-delay:var(--t,0ms)}
+.sh-haze.b{left:42%;top:72%;width:66%;animation-duration:41s;animation-delay:calc(-17s + var(--t,0ms))}
+.sh-bk{position:absolute;left:calc(var(--x) * .1%);top:calc(var(--y) * .1%);width:calc(var(--s) * 1px);aspect-ratio:1;border-radius:50%;opacity:0;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(255,226,170,.5),rgba(255,200,120,.12) 60%,transparent);filter:blur(2.5px);animation:shBokeh var(--dur) ease-in-out infinite;animation-delay:calc(var(--d) + var(--t,0ms))}
+
+/* ---------- табличка проводника: герб роли, имя старым золотом, роль — метка (как в разговоре, talk.css .tk-nm) ---------- */
+.sh-tags{z-index:4}
+.sh-tags .sh-lay{--dz:1}   /* таблички плывут вместе с планом, но без увеличения — текст остаётся чётким */
+.sh-tag{position:absolute;left:calc(var(--tx) * .1%);top:calc(var(--ty) * .1%);display:flex;align-items:center;padding:7px 2px;margin-top:-7px;border:0;background:none;color:var(--parch);pointer-events:auto;
+  transform:translateX(-50%);transition:transform .18s cubic-bezier(.2,.8,.2,1),filter .18s}
+.sh-crest{position:relative;z-index:2;flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;box-shadow:0 6px 12px -6px #000,0 0 12px rgba(72,229,212,.18)}
+.sh-crest img{display:block;width:100%;height:100%;max-width:none;-webkit-user-drag:none}
+.sh-crest.css{background:radial-gradient(circle closest-side,#101820 0 52%,#070a0c 53% 55%,#b1915a 56% 58%,#2f343a 59% 76%,#161a1e 77% 94%,#8c7650 95% 98%,transparent 99%)}
+.sh-crest.css svg{width:16px;height:16px;fill:none;stroke:var(--gold);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.sh-tag .sh-crest{margin-right:-12px}
+.sh-nm{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:6px 16px 7px 20px}
+.sh-nm::before,.sh-nm::after{content:"";position:absolute;clip-path:polygon(0 50%,10px 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,10px 100%)}
+.sh-nm::before{inset:0;background:linear-gradient(90deg,rgba(221,188,122,.2),rgba(221,188,122,.7) 30%,rgba(221,188,122,.7) 70%,rgba(221,188,122,.2))}
+.sh-nm::after{inset:1px;background:var(--noise),linear-gradient(180deg,rgba(29,34,39,.96),rgba(15,18,21,.96) 55%,rgba(10,12,14,.96))}
+.sh-nm b{position:relative;z-index:1;font:600 17px/1 var(--f-d);color:var(--gold);letter-spacing:.02em;white-space:nowrap;text-shadow:0 1px 0 #000,0 0 12px rgba(221,188,122,.2)}
+.sh-nm small{position:relative;z-index:1;font:700 8.5px/1 var(--f-u);letter-spacing:.18em;text-transform:uppercase;color:var(--parch-2);white-space:nowrap}
+/* ждёт разговора: метка карста над табличкой покачивается */
+.sh-new{position:absolute;z-index:3;left:calc(50% + 11px);top:0;width:9px;height:9px;rotate:45deg;background:var(--spirit);box-shadow:0 0 0 1px rgba(221,188,122,.8),0 0 10px 2px rgba(72,229,212,.7);
+  animation:shBob 1.6s ease-in-out infinite alternate;animation-delay:var(--t,0ms)}
+@media (hover:hover){ .sh-tag:hover{filter:brightness(1.15)} .sh-tag:hover .sh-crest{box-shadow:0 6px 12px -6px #000,0 0 14px 2px rgba(72,229,212,.5)} }
+.sh-tag:focus-visible{outline:1px solid rgba(72,229,212,.7);outline-offset:3px}
+.sh-tag.is-press{transform:translateX(-50%) scale(.95);filter:brightness(1.25)}
+
+/* ---------- свет шахты снизу: под главной кнопкой поднимаются огоньки карста ---------- */
+.sh-portal{position:absolute;right:0;bottom:0;width:46%;height:52%;z-index:5;pointer-events:none}
+.sh-well{position:absolute;right:-6%;bottom:-30%;width:78%;height:78%;border-radius:50%;background:radial-gradient(closest-side,rgba(72,229,212,.3),rgba(72,229,212,.08) 55%,transparent);
+  animation:shBreathe 5.4s ease-in-out infinite;animation-delay:var(--t,0ms)}
+.sh-mt{position:absolute;right:12px;bottom:18px;width:var(--mtw,230px);height:40px}
+.sh-mt i{position:absolute;left:var(--x);bottom:0;width:var(--s);height:var(--s);border-radius:50%;background:rgba(160,255,244,.95);box-shadow:0 0 6px 1px rgba(72,229,212,.8);opacity:0;
+  animation:shMote var(--dur) linear infinite;animation-delay:calc(var(--d) + var(--t,0ms))}
+
+/* ---------- интерфейс поверх сцены ---------- */
+.sh-ui{position:absolute;inset:0;z-index:9;pointer-events:none}
+.sh-top{position:absolute;left:12px;right:12px;top:0;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.sh-acts{display:flex;gap:10px;align-items:flex-start;min-width:0}
+.sh-meds{display:flex;gap:4px;padding-top:6px}
+.sh-bot{position:absolute;left:12px;right:12px;bottom:12px;display:flex;align-items:flex-end;gap:12px}
+.sh-top>*>*,.sh-bot>*{pointer-events:auto}
+
+/* ---------- дело — вывеска на цепях: железо и старое золото, путевая иконка на левом конце; готовое дело светится снизу ---------- */
+.sh-sign{position:relative;display:block;flex:none;padding:0;border:0;background:none;color:var(--parch);text-align:left;--bt:5px;--bb:6px;--bl:10px;--br:10px;--ic:28px;
+  transition:translate .2s cubic-bezier(.2,.8,.2,1)}
+html.sha-sign .sh-sign{--bt:calc(var(--shs) * var(--sh-s0) / var(--sh-sh));--br:calc(var(--shs) * var(--sh-s1) / var(--sh-sh));--bb:calc(var(--shs) * var(--sh-s2) / var(--sh-sh));--bl:calc(var(--shs) * var(--sh-s3) / var(--sh-sh));--ic:calc(var(--shs) * .54)}
+.sh-sw{position:relative;display:block;padding-top:var(--chl);transform-origin:50% 0;animation:shSwing 7.4s ease-in-out infinite;animation-delay:calc(var(--d,0ms) + var(--t,0ms))}
+.sh-ch{position:absolute;top:0;z-index:0;width:5px;height:calc(var(--chl) + var(--bt) * .7);
+  background:repeating-linear-gradient(180deg,#2c3238 0 3px,#6b6f73 3px 4px,#1b1f23 4px 6px)}
+html.sha-chain .sh-ch{width:calc(var(--chl) * .5);background:var(--sh-chain) 50% 100%/100% auto repeat-y;filter:brightness(.9)}
+.sh-ch.l{left:24%}
+.sh-ch.r{right:24%}
+.sh-plate{position:relative;z-index:1;display:flex;align-items:center;gap:8px;height:var(--shs);padding:0 12px 0 6px;border-radius:4px;
+  border:1px solid rgba(221,188,122,.5);background:var(--noise),linear-gradient(180deg,#22272c,#121518 60%,#0b0d0f);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),inset 0 0 0 2px rgba(0,0,0,.5),0 10px 18px -10px #000;transition:filter .18s,transform .12s ease-out}
+html.sha-sign .sh-plate{gap:0;padding:0 2px 0 0;border-radius:0;border-style:solid;border-color:transparent;border-width:var(--bt) var(--br) var(--bb) var(--bl);background:none;
+  border-image:var(--sh-sign) var(--sh-ss) fill / var(--bt) var(--br) var(--bb) var(--bl) stretch;box-shadow:none;filter:drop-shadow(0 8px 8px rgba(0,0,0,.55))}
+.sh-ic{position:relative;flex:none;width:var(--ic);height:var(--ic);border-radius:7px;overflow:hidden;box-shadow:0 0 0 1px rgba(221,188,122,.55),0 0 0 2px #0a0c0e,0 4px 8px -3px #000}
+.sh-ic img{display:block;width:100%;height:100%;object-fit:cover;-webkit-user-drag:none}
+html.sha-sign .sh-ic{position:absolute;left:calc(var(--bl) * -.5 - var(--ic) * .5);top:50%;margin-top:calc(var(--ic) * -.5)}
+.sh-tx{display:flex;flex-direction:column;gap:1px;min-width:0;padding-left:2px}
+.sh-tx b{font:700 13px/1.1 var(--f-u);color:var(--parch);white-space:nowrap;text-shadow:0 1px 1px #000}
+.sh-tx small{font:400 11.5px/1.15 var(--f-u);color:var(--parch-3);white-space:nowrap}
+.sh-sign.hot .sh-tx small{color:var(--spirit)}
+.sh-sign.hot .sh-plate::after{content:"";position:absolute;z-index:-1;left:6%;right:6%;bottom:calc(var(--bb) * -1 - 7px);height:16px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(72,229,212,.7),rgba(72,229,212,.15) 60%,transparent);animation:shPulse 2.4s ease-in-out infinite;animation-delay:var(--t,0ms)}
+.sh-sign.hot .sh-ic{box-shadow:0 0 0 1px rgba(72,229,212,.8),0 0 0 2px #0a0c0e,0 0 12px 1px rgba(72,229,212,.5)}
+@media (hover:hover){ .sh-sign:hover{translate:0 2px} .sh-sign:hover .sh-plate{filter:brightness(1.14) drop-shadow(0 8px 8px rgba(0,0,0,.55))} }
+.sh-sign:focus-visible{outline:none}
+.sh-sign:focus-visible .sh-plate{filter:brightness(1.14) drop-shadow(0 0 6px rgba(72,229,212,.6))}
+.sh-sign.is-press .sh-plate{transform:scale(.96);filter:brightness(1.3) drop-shadow(0 0 8px rgba(72,229,212,.55))}
+
+/* ---------- медальоны: «Дар дня», «Пропуск» (кнопки screens/pass.js) и «Чат» — знак в медальоне, подпись под ним ---------- */
+.sh-md,.sh-meds .btn{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;width:56px;height:60px;min-height:0;padding:45px 0 0;
+  border:0;border-radius:0;background:none;box-shadow:none;filter:none;color:var(--parch-2);font:700 9.5px/1 var(--f-u);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;
+  text-shadow:0 1px 2px #000,0 0 8px #000,0 0 3px #000;transition:color .15s}
+.sh-md::before,.sh-meds .btn::before{content:"";position:absolute;left:50%;top:0;width:42px;height:42px;margin-left:-21px;border-radius:50%;transition:transform .12s ease-out,box-shadow .18s;
+  background:radial-gradient(circle closest-side,#18222a 0 60%,#0a0d10 62% 66%,#b1915a 67% 71%,#30353b 72% 90%,#8c7650 91% 96%,transparent 97%);box-shadow:0 8px 14px -8px #000}
+html.sha-medal .sh-md::before,html.sha-medal .sh-meds .btn::before{background:var(--sh-medal) center/contain no-repeat}
+.sh-md>.i,.sh-meds .btn>.i{position:absolute;left:50%;top:12px;width:18px;height:18px;margin-left:-9px;color:var(--gold);filter:drop-shadow(0 0 4px rgba(221,188,122,.35));transition:transform .12s ease-out}
+.sh-md .bdg{position:absolute;top:-3px;left:calc(50% + 9px);z-index:2}
+.sh-meds .btn .dot{position:absolute;z-index:2;top:2px;left:calc(50% + 12px);margin:0;width:8px;height:8px}
+.sh-meds .ps-sb.hot{border-color:transparent;box-shadow:none;color:var(--parch)}
+.sh-meds .ps-sb.hot::before{box-shadow:0 8px 14px -8px #000,0 0 14px 2px rgba(72,229,212,.5)}
+@media (hover:hover){ .sh-md:hover,.sh-meds .btn:hover{color:var(--gold);filter:none} .sh-md:hover::before,.sh-meds .btn:hover::before{box-shadow:0 8px 14px -8px #000,0 0 14px 2px rgba(221,188,122,.45)} }
+.sh-md:focus-visible,.sh-meds .btn:focus-visible{outline:none;color:var(--gold)}
+.sh-md:focus-visible::before,.sh-meds .btn:focus-visible::before{box-shadow:0 0 0 2px rgba(72,229,212,.7)}
+.sh-md.is-press::before,.sh-meds .btn.is-press::before,.sh-md:active::before,.sh-meds .btn:active::before{transform:scale(.9)}
+.sh-md.is-press>.i,.sh-meds .btn.is-press>.i{transform:scale(.88)}
+.sh-meds .btn:active{transform:none}
+
+/* ---------- «Следующий шаг» — записка Хранителя знаний: тёмное стекло, кромка старого золота, кованые уголки ---------- */
+.sh-next{position:relative;flex:0 1 334px;min-width:0;margin-left:auto;display:flex;align-items:flex-start;gap:10px;padding:12px 14px 10px 12px;border-radius:3px;
+  background:var(--noise),linear-gradient(180deg,rgba(18,22,26,.92),rgba(8,10,12,.95));
+  box-shadow:0 0 0 1px rgba(221,188,122,.34),0 0 0 2px rgba(0,0,0,.6),0 26px 50px -20px rgba(0,0,0,.92),inset 0 1px 0 rgba(255,255,255,.05),inset 0 -22px 30px -24px rgba(72,229,212,.45)}
+.sh-next::after{content:"";position:absolute;left:14%;right:14%;top:-1px;height:1px;background:linear-gradient(90deg,transparent,rgba(240,214,160,.85),transparent);pointer-events:none}
+.sh-orn{position:absolute;z-index:2;width:20px;height:20px;pointer-events:none;
+  background:linear-gradient(var(--gold-2),var(--gold-2)) 0 0/100% 2px no-repeat,linear-gradient(var(--gold-2),var(--gold-2)) 0 0/2px 100% no-repeat}
+html.sha-corner .sh-orn{width:22px;height:22px;background:var(--sh-corner) 0 0/contain no-repeat;filter:drop-shadow(0 1px 2px #000)}
+.sh-orn.tl{left:-4px;top:-4px}
+.sh-orn.tr{right:-4px;top:-4px;transform:scaleX(-1)}
+.sh-orn.bl{left:-4px;bottom:-4px;transform:scaleY(-1)}
+.sh-orn.br{right:-4px;bottom:-4px;transform:scale(-1,-1)}
+.sh-next .sh-crest{width:38px;height:38px;margin-top:1px}
+.sh-next-b{display:flex;flex-direction:column;gap:3px;min-width:0}
+.sh-next-b .eyebrow{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sh-next-b h2{font:600 19px/1.1 var(--f-d);color:var(--parch)}
+.sh-next-b p{font-size:12.5px;line-height:1.3;color:var(--parch-2);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.sh-next-a{display:flex;align-items:center;gap:12px;margin-top:4px}
+html.sha-flour .sh-next-b h2::after{content:"";display:block;width:92px;height:9px;margin-top:3px;background:var(--sh-flourish) 0 50%/contain no-repeat;opacity:.75}
+
+/* ---------- «Спуститься» — плита старого золота с кристаллами карста, под ней свет шахты ---------- */
+.sh-cta{position:relative;flex:none;display:flex;align-items:center;justify-content:center;height:var(--cth);min-width:214px;padding:0 26px;border:1px solid rgba(72,229,212,.55);border-radius:12px;
+  color:#effffc;background:linear-gradient(180deg,#123c38,#0b2724);box-shadow:inset 0 -14px 20px -10px rgba(72,229,212,.62),inset 0 1px 0 rgba(255,255,255,.08),0 10px 24px -14px var(--spirit);
+  transition:transform .12s ease-out,filter .18s;--ct:8px;--cr:30px;--cb:8px;--cl:30px}
+html.sha-cta .sh-cta{padding:0 4px;border-radius:0;border-style:solid;border-color:transparent;background:none;box-shadow:none;
+  --ct:calc(var(--cth) * var(--sh-c0) / var(--sh-ch));--cr:calc(var(--cth) * var(--sh-c1) / var(--sh-ch));--cb:calc(var(--cth) * var(--sh-c2) / var(--sh-ch));--cl:calc(var(--cth) * var(--sh-c3) / var(--sh-ch));
+  border-width:var(--ct) var(--cr) var(--cb) var(--cl);border-image:var(--sh-cta) var(--sh-cs) fill / var(--ct) var(--cr) var(--cb) var(--cl) stretch;filter:drop-shadow(0 10px 12px rgba(0,0,0,.6))}
+.sh-cta-l{position:absolute;left:0;right:0;bottom:0;height:80%;pointer-events:none;border-radius:inherit;
+  background:radial-gradient(60% 90% at 50% 110%,rgba(120,255,240,.42),rgba(72,229,212,.1) 60%,transparent);mix-blend-mode:screen;animation:shBreathe 3.6s ease-in-out infinite;animation-delay:var(--t,0ms)}
+.sh-cta-t{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;white-space:nowrap}
+.sh-cta-t b{font:700 17px/1 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:#f1fffc;text-shadow:0 0 12px rgba(72,229,212,.65),0 1px 2px #000}
+.sh-cta-t small{font:italic 500 13px/1 var(--f-d);color:#bfe7df;letter-spacing:.02em;text-shadow:0 1px 2px #000}
+.sh-cta-sh{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.sh-cta-sh i{position:absolute;top:0;bottom:0;left:0;width:30%;background:linear-gradient(100deg,transparent,rgba(160,255,244,.14) 45%,rgba(255,255,255,.26) 50%,rgba(160,255,244,.14) 55%,transparent);
+  opacity:0;animation:shSheen 6s ease-in-out infinite;animation-delay:calc(1.2s + var(--t,0ms))}
+@media (hover:hover){ .sh-cta:hover{filter:brightness(1.12) drop-shadow(0 0 14px rgba(72,229,212,.35))} .sh-cta:hover .sh-cta-l{opacity:1} }
+.sh-cta.is-hover{filter:brightness(1.12) drop-shadow(0 0 14px rgba(72,229,212,.35))}
+.sh-cta:focus-visible{outline:none;filter:brightness(1.12) drop-shadow(0 0 10px rgba(72,229,212,.7))}
+.sh-cta.is-press,.sh-cta:active{transform:scale(.97);filter:brightness(1.3) drop-shadow(0 0 16px rgba(72,229,212,.6))}
+
+/* ---------- «Спуститься»: камера уходит вниз, свет шахты поднимается — потом «Спуск» ---------- */
+.sh.dive{pointer-events:none}
+.sh.dive .sh-stage,.sh.dive .sh-tags,.sh.dive .sh-fx{animation:shDive .42s cubic-bezier(.55,0,.8,.4) forwards}
+.sh.dive .sh-ui{animation:shGone .22s ease-in forwards}
+.sh.dive .sh-well{animation:shFlare .42s ease-in forwards}
+
+/* ---------- слой частиц отклика: рядом с #game, перерисовка экрана его не сносит ---------- */
+.sh-fxl{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
+
+/* ---------- низкий экран: 844 × 390 ---------- */
+@container main (max-height: 360px){
+  .sh-top{left:10px;right:10px}
+  .sh-bot{left:10px;right:10px;bottom:10px;gap:10px}
+  .sh-acts{gap:8px}
+  .sh-tx b{font-size:12.5px}
+  .sh-tx small{font-size:11px}
+  .sh-next{flex-basis:300px;padding:10px 12px 9px 10px;gap:8px}
+  .sh-next .sh-crest{width:32px;height:32px}
+  .sh-next-b h2{font-size:17px}
+  .sh-next-b p{font-size:12px;line-height:1.25}
+  html.sha-flour .sh-next-b h2::after{display:none}
+  .sh-cta{min-width:200px}
+  .sh-cta-t b{font-size:16px}
+  .sh-cta-t small{font-size:12px}
+  .sh-md,.sh-meds .btn{width:52px;height:56px;padding-top:42px}
+  .sh-md::before,.sh-meds .btn::before{width:39px;height:39px;margin-left:-19.5px}
+  .sh-md>.i,.sh-meds .btn>.i{top:10.5px}
+  .sh-nm b{font-size:16px}
+  .sh-crest{width:31px;height:31px}
+}
+
+/* ---------- UI-кит: вещи сцены в состояниях ---------- */
+.sh-kit{gap:var(--sp-m)}
+.sh-kit-w{display:flex;flex-direction:column;gap:14px;padding:14px;border-radius:10px;background:radial-gradient(90% 120% at 50% 110%,rgba(72,229,212,.08),transparent 60%),#07090b;--shs:48px;--cth:62px;--chl:12px;--t:0ms}
+.sh-kit-row{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px}
+.sh-kit-row>.eyebrow{flex:0 0 100%}
+.sh-kit-c{position:relative;display:flex;align-items:flex-start;min-height:60px}
+.sh-kit-c .sh-tag{position:relative;left:0;top:0;margin-top:0;transform:none}
+.sh-kit-c.sh-meds{padding-top:0}
+.sh-kit-next .sh-next{margin-left:0;flex:0 1 360px}
+
+/* ---------- кадры ---------- */
+@keyframes shDrift{from{transform:translate3d(calc(var(--da) * -1%),calc(var(--da) * .35%),0) scale(var(--dz))}to{transform:translate3d(calc(var(--da) * 1%),calc(var(--da) * -.35%),0) scale(var(--dz))}}
+@keyframes shShift{0%,100%{transform:rotate(-.22deg)}50%{transform:rotate(.22deg)}}
+@keyframes shBreath{0%,100%{transform:none}50%{transform:scaleY(var(--breath))}}
+@keyframes shSway{0%,100%{transform:skewX(calc(var(--sway) * -1))}50%{transform:skewX(var(--sway))}}
+@keyframes shFlick{0%{opacity:.82}9%{opacity:1}17%{opacity:.76}26%{opacity:.94}34%{opacity:.7}45%{opacity:1}57%{opacity:.84}66%{opacity:.97}78%{opacity:.74}88%{opacity:.96}}
+@keyframes shHeat{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+@keyframes shBeam{0%,100%{opacity:.55}50%{opacity:1}}
+@keyframes shPulse{0%,100%{opacity:.6;transform:scale(.94)}50%{opacity:1;transform:scale(1.05)}}
+@keyframes shGlow{0%,100%{opacity:.55;transform:scale(.9)}50%{opacity:1;transform:scale(1.08)}}
+@keyframes shBreathe{0%,100%{opacity:.72}50%{opacity:1}}
+@keyframes shEmber{0%{opacity:0;transform:translate3d(0,0,0) scale(1)}12%{opacity:1}70%{opacity:.8}100%{opacity:0;transform:translate3d(calc(var(--dx) * 1px),calc(var(--rise) * -.1cqh),0) scale(.35)}}
+@keyframes shSteam{0%{opacity:0;transform:translate3d(-50%,0,0) scale(.4)}20%{opacity:.8}100%{opacity:0;transform:translate3d(calc(var(--dx) * 1px - 50%),calc(var(--rise) * -.1cqh),0) scale(1.6)}}
+@keyframes shDust{0%{opacity:0;transform:translate3d(0,0,0)}25%{opacity:.55}75%{opacity:.4}100%{opacity:0;transform:translate3d(calc(var(--dx) * 1px),calc(var(--dy) * 1px),0)}}
+@keyframes shBokeh{0%{opacity:0;transform:translate3d(0,0,0)}30%{opacity:.7}70%{opacity:.5}100%{opacity:0;transform:translate3d(calc(var(--dx) * 1px),calc(var(--dy) * 1px),0)}}
+@keyframes shHaze{from{transform:translate3d(-4%,0,0)}to{transform:translate3d(6%,-3%,0)}}
+@keyframes shMote{0%{opacity:0;transform:translate3d(0,0,0)}15%{opacity:1}80%{opacity:.6}100%{opacity:0;transform:translate3d(var(--dx),calc(var(--rise) * -1),0)}}
+@keyframes shLantern{0%,100%{transform:rotate(-1.1deg)}50%{transform:rotate(1.1deg)}}
+@keyframes shSwing{0%,100%{transform:rotate(-.55deg)}50%{transform:rotate(.55deg)}}
+@keyframes shBob{from{transform:translate3d(0,-2px,0)}to{transform:translate3d(0,2px,0)}}
+@keyframes shSheen{0%,70%{opacity:0;transform:translate3d(-110%,0,0)}78%{opacity:1}100%{opacity:0;transform:translate3d(360%,0,0)}}
+@keyframes shDive{to{transform:translate3d(0,-7%,0) scale(1.12);opacity:.35}}
+@keyframes shGone{to{opacity:0;transform:translate3d(0,6px,0)}}
+@keyframes shFlare{to{opacity:1;transform:scale(1.9)}}
+
+/* ---------- меньше движения: всё стоит, переход сразу ---------- */
+@media (prefers-reduced-motion:reduce){
+  .sh *,.sh *::before,.sh *::after{animation:none!important;transition:none!important}
+  .sh-lay{translate:none}
+  .sh-em,.sh-sm,.sh-du,.sh-bk,.sh-mt i{display:none}
+}

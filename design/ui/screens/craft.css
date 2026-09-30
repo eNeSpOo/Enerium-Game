@@ -1,8 +1,8 @@
-/* screens/craft.css — «Ремесло → Мастерская» (screens/craft.js): зоны «Инвентарь» и «Крафт», стол из шести ячеек, книга рецептов,
-   автодокрафт (GDD §12.4), анимация удачи и неудача. Вид — зал Мастерской башни Этриона (screens/crafthall.js, слово автора 30.09.2026:
+/* screens/craft.css — «Ремесло → Мастерская» (screens/craft.js): зоны «Инвентарь» и «Крафт», стол из шести ячеек, кнопка книги
+   рецептов (сама книга на всё окно — recipe-book.css), автодокрафт (GDD §12.4), анимация удачи и неудача. Вид — зал Мастерской башни Этриона (screens/crafthall.js, слово автора 30.09.2026:
    «Само Окно крафта так же сделай дорогим и богатым… чтобы они выглядили ааа уровня»): слева — шкаф картотеки, «Инвентарь»: тёмный дуб,
    латунные уголки, предметы в рамках своего вида; справа — сцена «Крафт» прямо в зале: стол-круг сверху — базальт в бронзовом ободе,
-   шесть гнёзд вокруг пьедестала результата, желоба к нему светятся; книга рецептов — страница гримуара чернёного пергамента.
+   шесть гнёзд вокруг пьедестала результата, желоба к нему светятся; над столом — кнопка «Книга рецептов».
    По «Правилам воздуха»: на столе и в книге нет лишних подписей, сведения о ресурсе — лист по нажатию. Свои классы — на ws-, остальное —
    общие классы «Света снизу» (pnl, tabs, chip, well, btn) и слой «Ремесла» (cr-*: рамки предметов, пометка Этриона, порции).
    Арт — переменные <html> из CR_ART (--cr-table, --cr-socket, --cr-core, --cr-page…) и классы cr-t, cr-p; без арта всё рисует CSS.
@@ -162,48 +162,25 @@ html.cr-f .ws .ws-core[data-fk]::after{inset:14%}
 .ws-st.unknown{color:var(--amber)}
 .ws-st.bad{color:var(--rust)}
 
-/* ===== Крафт · книга рецептов — страница гримуара: чернёный пергамент, золотая линовка, позолоченный обрез; поиск и фильтры видны
-   всегда, прокручивается только список ===== */
-.ws-craft.ws-bk{background:linear-gradient(180deg,#16110d,#0e0b09);border:1px solid rgba(201,162,106,.35);box-shadow:0 20px 44px -18px #000}
-html.cr-p .ws-craft.ws-bk{border-style:solid;border-color:transparent;border-width:14px 20px 18px 22px;padding:6px 10px 4px;background:none;
-  border-image:var(--cr-page) 100 149 137 150 fill / 14px 20px 18px 22px stretch;filter:drop-shadow(0 18px 22px rgba(0,0,0,.8))}
-/* закладка гримуара: алая шёлковая лента свисает с верхнего края страницы */
-.ws-craft.ws-bk::after{content:"";position:absolute;right:16%;top:-14px;z-index:2;width:12px;height:46px;pointer-events:none;
-  background:linear-gradient(90deg,#4a0f12,#8e2a26 40%,#6d1c1b 70%,#3a0a0c);clip-path:polygon(0 0,100% 0,100% 100%,50% 82%,0 100%);box-shadow:0 2px 3px #000}
-.ws-bk .pnl-h h2{color:#e8cf95}
-.ws-bh{display:flex;align-items:center;gap:6px;flex:none;min-width:0}
-.ws-bh .rs-sel{flex:none;max-width:128px}
-.ws-favt{width:28px;height:28px}
-.ws-favt[aria-pressed="true"]{color:var(--gold);border-color:var(--gold-3)}
-.ws-favt[aria-pressed="true"] .i{fill:currentColor}
-/* строки — записи гримуара: без рамок, золотая линовка между ними; подсказка — лёгкий свет слева */
-.ws-list{display:flex;flex-direction:column;padding-right:2px;border-top:1px solid rgba(201,162,106,.3)}
-.ws-list>*{flex:none}
-.ws-rc{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 4px 6px 2px;border-bottom:1px solid rgba(201,162,106,.16);transition:background .15s}
-.ws-rc:hover{background:linear-gradient(90deg,rgba(221,188,122,.05),transparent 70%)}
-.ws-rc.part{background:linear-gradient(90deg,rgba(72,229,212,.07),transparent 55%)}
-.ws-rc-m{display:flex;flex-direction:column;gap:4px;min-width:0}
-.ws-rc-t{display:flex;align-items:center;gap:6px;min-width:0}
-.ws-rc-t b{flex:0 1 auto;min-width:0;font:600 15px/1.1 var(--f-d);color:#ecd9ad;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ws-rc .chip{flex:none;height:18px;padding:0 6px;font-size:10px;gap:4px}
-.ws-rc .chip .i{width:11px;height:11px}
-.ws-star{appearance:none;display:grid;place-items:center;width:22px;height:22px;border:0;border-radius:6px;background:none;padding:0;color:var(--parch-3)}
-.ws-star:hover{color:var(--gold-2)}
-.ws-star[aria-pressed="true"]{color:var(--gold);filter:drop-shadow(0 0 4px rgba(221,188,122,.5))}
-.ws-star[aria-pressed="true"] .i{fill:currentColor}
-.ws-star .i{width:15px;height:15px}
-/* компактный состав: только настоящие места, без пустых квадратов */
+/* ===== Крафт · кнопка «Книга рецептов» — кожаный переплёт в латуни, свет карста снизу; книга раскрывается на всё окно (recipe-book.css).
+   Число — записей в книге: найденных рецептов и обрывков ===== */
+.ws-bkbtn{appearance:none;position:relative;display:inline-flex;align-items:center;gap:7px;flex:none;height:30px;padding:0 5px 0 10px;border-radius:7px;cursor:pointer;
+  border:1px solid rgba(214,178,112,.55);background:radial-gradient(120% 120% at 50% 135%,rgba(72,229,212,.3),transparent 62%),linear-gradient(180deg,#3a2a1a,#1b130c);
+  color:#f0d79c;font:700 12px/1 var(--f-u);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;text-shadow:0 1px 2px #000;
+  box-shadow:inset 0 1px 0 rgba(255,228,170,.14),inset 0 -10px 14px -10px rgba(72,229,212,.55),0 6px 14px -8px #000;transition:filter .15s,transform .1s}
+.ws-bkbtn:hover,.ws-bkbtn:focus-visible{filter:brightness(1.18)}
+.ws-bkbtn:active{transform:translateY(1px)}
+.ws-bkbtn .i{width:16px;height:16px;color:var(--spirit);filter:drop-shadow(0 0 4px rgba(72,229,212,.6))}
+.ws-bkbtn b{min-width:20px;height:18px;padding:0 5px;border-radius:9px;background:rgba(6,8,8,.72);box-shadow:inset 0 0 0 1px rgba(214,178,112,.4);color:#f6e2b4;
+  font:700 11px/18px var(--f-u);letter-spacing:0;text-align:center}
+/* компактный состав этапа автодокрафта: только настоящие места, без пустых квадратов */
 .ws-ing{display:flex;align-items:center;gap:5px;flex-wrap:wrap;min-width:0}
 .ws-ing .well{--s:26px;border-radius:6px}
-.ws-list .ws-ing button.well{cursor:pointer}
 .ws .ws-ing .well .i,.ws-o .ws-ing .well .i{width:13px;height:13px}
 .ws .ws-ing .well .gl,.ws-o .ws-ing .well .gl{font-size:12px}
 .ws-ing .well .q{font-size:10px;right:0;bottom:-2px}
-.ws-ing .well.empty{font:600 13px/1 var(--f-d);color:var(--spirit)}
 .ws-ing .well.ws-short .q{color:var(--rust)}
 .ws-ing .well.ws-sp::before{left:2px;top:2px;width:4px;height:4px}
-.ws-ing .arr{display:inline-grid;place-items:center;color:var(--gold-2)}
-.ws-ing .arr .i{width:13px;height:13px}
 
 /* ===== слои поверх: сведения, попытка, автодокрафт ===== */
 .ws-o{display:contents}
@@ -260,8 +237,6 @@ html.cr-p .ws-craft.ws-bk{border-style:solid;border-color:transparent;border-wid
   .ws .ws-core .i{width:22px;height:22px}
   .ws-grid{gap:6px}
   .ws-tile>.well .q{right:5px;bottom:4px;font-size:12px}
-  .ws-rc{padding:4px 4px 4px 2px}
-  html.cr-p .ws-craft.ws-bk{border-width:12px 16px 14px 18px;padding:4px 8px 2px;border-image-width:12px 16px 14px 18px}
 }
 @container main (max-height: 320px){
   .ws-hex{--hx:138px}

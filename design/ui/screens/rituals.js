@@ -290,7 +290,7 @@ function rtRewCard(card) {
     const souls = (A.cur.find(c => c[0] === 'souls') || [0, 0])[1];
     return `<span class="rt-num" title="Души"><img src="${curImg('souls')}" alt="Души"><b class="num">${fmt(souls)}</b></span><span class="rt-also" title="Ещё золото и дух"><img src="${curImg('gold')}" alt="Золото"><img src="${curImg('spirit')}" alt="Дух"></span>`;
   }
-  if (card.unique) { const u = rtUniqItem(card.biome); return u ? `<span class="rt-num">${itWell(u.id, { act: 'noop', size: 30 })}<b class="num">×${A.uniq}</b></span>` : ''; }
+  if (card.unique) { const u = rtUniqItem(card.biome); return u ? `<span class="rt-num">${itWell(u.id, { stat: true, size: 30 })}<b class="num">×${A.uniq}</b></span>` : ''; }
   return `<span class="rt-num" title="Базовые ресурсы общего пула">${ic('gem')}<b class="num">${fmt(A.basics)}</b></span>${A.keys ? `<span class="rt-num" title="Ключи ремёсел биома">${ic('key')}<b class="num">${fmt(A.keys)}</b></span>` : ''}`;
 }
 /* награда строками листа: всё, что придёт */
@@ -455,7 +455,7 @@ Object.assign(OV, {
     const items = Object.entries(x.items).sort((a, b) => b[1] - a[1]), more = items.length - RT_VIEW.items;
     /* задержки — от начала показа: перерисовка посреди анимации её не рвёт */
     const inner = x.cur.map(([k, n]) => `<img src="${curImg(k)}" alt="${CUR[k].n}"><b class="num">${fmt(n)}</b>`)
-      .concat(items.slice(0, RT_VIEW.items).map(([id, n]) => `${itWell(id, { act: 'noop', size: 34 })}<b class="num">×${fmt(n)}</b>`))
+      .concat(items.slice(0, RT_VIEW.items).map(([id, n]) => `${itWell(id, { stat: true, size: 34 })}<b class="num">×${fmt(n)}</b>`))
       .concat(more > 0 ? [`<span class="chip">и ещё ${more}</span>`] : []);
     const cells = inner.map((h, i) => `<span class="rt-gi" style="animation-delay:${RT_VIEW.first + i * RT_VIEW.step - t}ms">${h}</span>`).join('');
     const scene = `<button class="rt-fx${skip ? ' done' : ''}" data-r="${x.r}" data-a="rtfx" aria-label="Показать итог">

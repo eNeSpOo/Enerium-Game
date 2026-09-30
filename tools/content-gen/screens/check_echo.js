@@ -389,6 +389,30 @@ const t0 = Date.now();
 let res;
 try { res = vm.runInContext('(' + suite.toString() + ')()', ctx); } catch (e) { err.push('сценарии: ' + (e.stack || e.message)); done(); }
 err.push(...res.errors);
+/* портреты врагов крафта Этриона (ECH.craftArt, tools/art-gen/jobs/craft-bosses.json): у каждого — выгруженный файл и портрет в облике;
+   пробуждённый без своего — портрет своего босса; эхо боссов биомов 1–4 — портреты боссов биомов; прочие крафтовые — заглушка без картинки */
+{
+  let A = null;
+  try {
+    A = vm.runInContext(`(() => {
+      const E = window.EN_ECHO, C = E.data.craftArt || {}, ids = RX.drops.craftBosses.map(b => b.id), has = new Set(ids);
+      const pic = id => E.faceArt(E.foe(id)) || '';
+      return { art: Object.entries(C).map(([id, p]) => [id, p, has.has(id), pic(id)]),
+        aw: Object.keys(C).filter(id => has.has(id + '_aw')).map(id => [id, C[id], pic(id + '_aw')]),
+        none: ids.filter(id => id !== 'lik' && !C[id] && !C[id.replace(/_aw$/, '')]).map(id => [id, pic(id)]) };
+    })()`, ctx);
+  } catch (e) { err.push('портреты крафтовых боссов: ' + e.message); }
+  if (A) {
+    for (const [id, p, has, h] of A.art) {
+      if (!has) err.push(`ECH.craftArt.${id}: такого крафтового босса нет в recipes.js`);
+      if (!fs.existsSync(path.join(UI, 'assets', 'art', p))) err.push(`ECH.craftArt.${id}: нет файла assets/art/${p}`);
+      if (!h.includes(p + '?v=')) err.push(`ECH.craftArt.${id}: портрет не показан в облике врага`);
+    }
+    for (const [id, p, h] of A.aw) if (!h.includes(p + '?v=')) err.push(`${id}_aw: пробуждённый не показывает портрет своего босса`);
+    for (const [id, h] of A.none) if (h) err.push(`${id}: картинка без портрета в ECH.craftArt`);
+    console.log(`Портреты врагов крафта: ${A.art.length} (пробуждённых — по портрету своего босса: ${A.aw.length}), без портрета — ${A.none.length}.`);
+  }
+}
 console.log(`Эхо проверено за ${Math.round((Date.now() - t0) / 1000)} с: экранов ${res.screens}, листов ${res.sheets}, вариантов призыва ${res.offers}, побед ${res.kills}, крафтовых боссов ${res.calls}, Многоликих ${res.many}, руин ${res.ruins}, сундуков ${res.chests}, оценок до призыва ${res.ests}.`);
 done();
 

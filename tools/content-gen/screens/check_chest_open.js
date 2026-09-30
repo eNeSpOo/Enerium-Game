@@ -4,7 +4,8 @@
    2. Числа вида CO_VIEW и арта CO_ART — целые; по семи редкостям — первый свет, дрожь, подскок крышки, ореол, лучи, столп, дымка,
       всплеск, искра, самая ценная; растут с редкостью. Лучи — с эпической, кольца и дрожь всплеска — с древней. У каждого вида
       сундука из EN_LOOTBOXES — свой материал заглушки и рамка рисунка: крышка над швом, корпус под ним, размеры — как у слоёв
-      tools/art-gen/chest_layers.py (PNG в art/generated, если они есть).
+      tools/art-gen/chest_layers.py (PNG в art/generated, если они есть). Листы режимов CO_ART.sets (jobs/chest-sheets.json): семь
+      редкостей вида, у каждой шов, крышка и корпус — как в layers.json листа и как PNG слоёв; сундук листа в сцене — как прежний.
    3. Операция: кнопка «Открыть» карточки несёт номер операции. Выдача — до анимации: запасы, кошелёк, осколки, «из сундуков» и
       снаряжение (предметами — screens/equipment.js) изменились ровно на итог, итог — EnLoot.roll на сиде каждого сундука с прахом по
       коллекции (пересчёт независимый). Повтор того же
@@ -22,7 +23,8 @@
       анимацию» — итог сразу; галочка посреди анимации — итог сразу; выбор помнит localStorage, без него всё работает; при
       prefers-reduced-motion галочка стоит и заблокирована. Окно закрыли посреди анимации — итог сообщением, выдачи второй раз нет.
    8. Арт: пока путь не выгружен — заглушка SVG и градиенты, ни одной картинки из assets/art/chests; все пути выгружены — рисунок
-      корпуса и крышки, замок и текстуры света; сундук без одного из слоёв остаётся заглушкой.
+      корпуса и крышки, замок и текстуры света; у вида с листом режима — сундук своей редкости и замок режима; нет слоя редкости —
+      прежний сундук вида; сундук без одного из слоёв остаётся заглушкой.
    9. Все виды × редкости × окна × циклы (× недели у осколков): показ без исключений, undefined и NaN, служебного игроку не видно.
    10. UI-кит: раздел «Открытие сундука» — семь видов, семь редкостей, пачка; проба не меняет S; раскадровка — пять моментов;
        «С анимацией» раздела «Лутбоксы» — те же предметы, что его список бросков. Карта экранов: шаблон «Открытие сундука».
@@ -116,7 +118,7 @@ function load(o = {}) {
   const T = vm.runInContext(`({
     get S() { return S; }, set S(v) { S = v; },
     ACT, OV, FLOWS, KH, BAG, LBX, RSI, RX, LB, TEMPLATES, KIT_EXTRA, render, initialState, setTeam, fmt, rsHas, lbHtml, EnLoot: window.EnLoot,
-    zpChestGroups, zpChestKey, zpV, zpDef, zpSeed, zpExtraKey,
+    zpChestGroups, zpChestKey, zpV, zpDef, zpSeed, zpExtraKey, zpChestPic, chestPic: typeof chestPic === 'function' ? chestPic : null,
     CO_VIEW, CO_ART, CO_KINDS, CO_DEMO, CO_KIT, coShow, coReveal, coGroups, coVal, coSync, coKitAct, coKitHtml, coStageHtml, coChestGeo, coWinMin,
   })`, ctx);
   if (o.ready) { T.CO_ART.ready.length = 0; T.CO_ART.ready.push(...o.ready); }   // свой набор выгруженного: [] — «без арта»
@@ -381,7 +383,27 @@ const V = T.CO_VIEW, ART = T.CO_ART;
   const lockPx = pngSize(path.join(gen, layers.items.lock.from.replace(/\.png$/, '.clean.png')));
   if (lockPx && !eq(lockPx, ART.lock)) say(`CO_ART.lock: ${ART.lock.join('×')}, а замок ${lockPx.join('×')}`);
   if (!eq([...ART.fx].sort(), Object.keys(layers.fx).sort())) say('CO_ART.fx: не те текстуры, что в jobs/chests.json');
-  const paths = Object.keys(ART.chests).flatMap(k => [`chests/${k}-body.png`, `chests/${k}-lid.png`]).concat('chests/lock.png', ART.fx.map(n => `chests/fx-${n}.png`));
+  /* листы режимов: семь редкостей вида, геометрия — как в layers.json листа и как PNG слоёв; сундук в сцене — как прежний */
+  const sheets = JSON.parse(fs.readFileSync(path.join(ROOT, 'tools', 'art-gen', 'jobs', 'chest-sheets.json'), 'utf8')).layers.sheets;
+  for (const [k, S] of Object.entries(ART.sets || {})) {
+    if (!T.LBX.boxes[k]) { say(`CO_ART.sets: вида ${k} нет в EN_LOOTBOXES`); continue; }
+    if (!(S.scale > 0) || !Array.isArray(S.lock) || S.lock.length !== 2 || !Array.isArray(S.by) || S.by.length !== 7) { say(`CO_ART.sets.${k}: нет масштаба, замка или семи редкостей`); continue; }
+    const sid = Object.keys(sheets).find(x => sheets[x].box === k);
+    const lf = sid && path.join(gen, path.dirname(sheets[sid].from), sid, 'layers.json'), L = lf && fs.existsSync(lf) ? JSON.parse(fs.readFileSync(lf, 'utf8')) : null;
+    if (!sid) say(`CO_ART.sets.${k}: нет листа в jobs/chest-sheets.json`);
+    S.by.forEach((g, i) => {
+      geo(`sets.${k}.r${i + 1}`, g);
+      const w = Math.round(g.frame[2] * S.scale / 1000);
+      if (w < 200 || w > 272) say(`CO_ART.sets.${k}.r${i + 1}: сундук в сцене ${w} px — не как прежний (200–272)`);
+      const c = L && L.chests[i];
+      if (!L) return;
+      if (!c || c.r !== i + 1 || !eq(c.frame, g.frame) || c.seam !== g.seam || !eq(c.lid, g.lid) || !eq(c.body, g.body)) { say(`CO_ART.sets.${k}.r${i + 1}: не та геометрия, что в layers.json листа`); return; }
+      for (const part of ['body', 'lid']) { const px = pngSize(path.join(gen, c.files[part])); if (px && (px[0] !== g[part][2] || px[1] !== g[part][3])) say(`CO_ART.sets.${k}.r${i + 1}.${part}: ${g[part][2]}×${g[part][3]}, а слой ${px[0]}×${px[1]}`); }
+    });
+    if (L && !eq(L.lock.px, S.lock)) say(`CO_ART.sets.${k}.lock: ${S.lock.join('×')}, а замок листа ${L.lock.px.join('×')}`);
+  }
+  const setPaths = Object.keys(ART.sets || {}).flatMap(k => [1, 2, 3, 4, 5, 6, 7].flatMap(r => [`chests/${k}/r${r}-body.webp`, `chests/${k}/r${r}-lid.webp`, `chests/${k}/r${r}.webp`]).concat(`chests/${k}/lock.webp`));
+  const paths = Object.keys(ART.chests).flatMap(k => [`chests/${k}-body.png`, `chests/${k}-lid.png`]).concat('chests/lock.png', ART.fx.map(n => `chests/fx-${n}.png`), setPaths);
   for (const p of ART.ready) if (!paths.includes(p)) say(`CO_ART.ready: лишний путь ${p}`);
   for (const p of ART.ready) if (!fs.existsSync(path.join(UI, 'assets', 'art', p))) say(`CO_ART.ready: ${p} отмечен, а файла в design/ui/assets/art нет`);
 }
@@ -545,7 +567,8 @@ const V = T.CO_VIEW, ART = T.CO_ART;
 
 /* ================== 8. арт: пока путь не выгружен — заглушка; выгружены — рисунок ================== */
 {
-  const all = Object.keys(ART.chests).flatMap(k => [`chests/${k}-body.png`, `chests/${k}-lid.png`]).concat('chests/lock.png', ART.fx.map(n => `chests/fx-${n}.png`));
+  const setAll = Object.keys(ART.sets || {}).flatMap(k => [1, 2, 3, 4, 5, 6, 7].flatMap(r => [`chests/${k}/r${r}-body.webp`, `chests/${k}/r${r}-lid.webp`, `chests/${k}/r${r}.webp`]).concat(`chests/${k}/lock.webp`));
+  const all = Object.keys(ART.chests).flatMap(k => [`chests/${k}-body.png`, `chests/${k}-lid.png`]).concat('chests/lock.png', ART.fx.map(n => `chests/fx-${n}.png`), setAll);
   const scene = (Q, box, r, where) => {
     fresh(Q, { skip: false });
     const sp = { box, r, cyc: 3, win: 'step' }; if (box === 'shards') sp.week = 'Эльфы';
@@ -566,12 +589,32 @@ const V = T.CO_VIEW, ART = T.CO_ART;
   const full = load({ ready: all });
   for (const box of Object.keys(ART.chests)) for (const r of [2, 6]) {
     const h = scene(full, box, r, `с артом · ${box} · ${r}`); cnt.art++;
-    for (const p of [`chests/${box}-body.png`, `chests/${box}-lid.png`, 'chests/lock.png']) if (!new RegExp(`<img src="[^"]*${reEsc(p)}\\?v=`).test(h)) say(`с артом · ${box}: нет картинки ${p}`);
+    const set = !!(ART.sets && ART.sets[box]);
+    const want = set ? [`chests/${box}/r${r}-body.webp`, `chests/${box}/r${r}-lid.webp`, `chests/${box}/lock.webp`] : [`chests/${box}-body.png`, `chests/${box}-lid.png`, 'chests/lock.png'];
+    for (const p of want) if (!new RegExp(`<img src="[^"]*${reEsc(p)}\\?v=`).test(h)) say(`с артом · ${box} · ${r}: нет картинки ${p}`);
+    if (set && /chests\/[a-z]+-(?:body|lid)\.png/.test(h)) say(`с артом · ${box} · ${r}: у вида с листом режима — прежний сундук`);
     if (/<svg class="co-sv"/.test(h)) say(`с артом · ${box}: осталась заглушка SVG`);
     for (const n of ['haze', 'beam', 'dust', 'flash']) if (!new RegExp(`--tex:url\\('[^']*chests/fx-${n}\\.png\\?v=`).test(h)) say(`с артом · ${box}: нет текстуры ${n}`);
     if (r >= V.gild && !/class="co-shn co-a" style="--m:url\('/.test(h)) say(`с артом · ${box} · ${r}: нет золотого отблеска по рисунку`);
     if (!/class="co-lit co-lvx/.test(h)) say(`с артом · ${box}: нет света ступени на корпусе`);
   }
+  /* лист режима без крышки одной редкости — прежний сундук вида этой редкости, замок режима остаётся */
+  for (const box of Object.keys(ART.sets || {})) {
+    const part = load({ ready: all.filter(p => p !== `chests/${box}/r3-lid.webp`) }), hp = scene(part, box, 3, `лист без крышки · ${box}`);
+    if (!hp.includes(`chests/${box}-body.png`) || hp.includes(`chests/${box}/r3-`)) say(`лист без крышки · ${box}: не прежний сундук вида`);
+    const hq = scene(part, box, 4, `лист · ${box} · 4`);
+    if (!hq.includes(`chests/${box}/r4-lid.webp`)) say(`лист · ${box} · 4: соседняя редкость потеряла рисунок`);
+  }
+  /* плитка сундука в запасах и наградах (zpChestPic, chestPic): у вида с листом — тот же рисунок своей редкости, уменьшенный; без листа —
+     прежний сундук вида; без арта — значок CHEST */
+  let pics = 0;
+  for (const box of Object.keys(T.LBX.boxes)) for (let r = 1; r <= 7; r++) {
+    const set = !!(ART.sets && ART.sets[box]), h = full.T.zpChestPic(box, r), w = set ? `chests/${box}/r${r}.webp` : `chests/${box}-body.png`; pics++;
+    if (!h.includes(w + '?v=')) say(`плитка сундука · ${box} · ${r}: нет картинки ${w}`);
+    if (!full.T.chestPic || full.T.chestPic(box, r) !== h) say(`chestPic · ${box} · ${r}: не та же картинка, что в запасах`);
+    if (/chests\//.test(none.T.zpChestPic(box, r))) say(`плитка сундука без арта · ${box} · ${r}: путь к невыгруженному арту`);
+  }
+  if (!pics) say('плитка сундука: не проверена');
   /* сундук без одного слоя — заглушка целиком, пути нет */
   const half = load({ ready: ['chests/keys-body.png'] }), hh = scene(half, 'keys', 4, 'арт без крышки');
   if (/chests\/keys/.test(hh) || (hh.match(/<svg class="co-sv"/g) || []).length < 3) say('арт без крышки: сундук не остался заглушкой целиком');
@@ -622,7 +665,7 @@ const V = T.CO_VIEW, ART = T.CO_ART;
     for (let r = 1; r <= 7; r++) if (!h.includes(`data-co="r:${r}"`)) say(`UI-кит: нет кнопки пробы редкости ${r}`);
     for (const b of Object.keys(K.T.LBX.boxes)) if (!h.includes(`data-co="box:${b}"`)) say(`UI-кит: нет вида ${b}`);
     if (!h.includes('data-co="many"') || !h.includes('id="coKit"') || !h.includes('id="coKitStage"')) say('UI-кит: нет пачки или сцены');
-    if (!/Арт: сундуки рисунком — \d+ из 7/.test(h)) say('UI-кит: нет строки о готовности арта');
+    if (!/Арт: листы режимов — \d+ из 7 видов по семи редкостям/.test(h)) say('UI-кит: нет строки о готовности арта');
     run('UI-кит · paint', () => entry.paint());
     const idle = K.els.coKitStage ? K.els.coKitStage.innerHTML : '';
     if (!/co-st co-idle/.test(idle) || !/class="co-lock co-a"/.test(idle)) say('UI-кит: до пробы на сцене нет закрытого сундука под замком');

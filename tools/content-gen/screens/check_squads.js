@@ -19,9 +19,13 @@
       показан отряд, — это по сути полка»): слева — шкаф, отряд — отсек с пятью корешками (пустое место — след) и латунной табличкой
       имени и мощи (BM.squad) на кромке полки, выбранный отмечен; справа — выбранный отряд на одной полке крупным планом: пять мест,
       книги размера m, доска полки; нижняя полка — свободные герои корешками по мощи: цвет редкости, ступень книги, значок класса,
-      уровень; нажатие — операция с номером ставит героя в выбранное или первое пустое место, книга встаёт на место (показ по времени);
-      долгое нажатие (по часам песочницы) — книга раскрывается поверх отрядов, щелчок после него героя не ставит, сдвиг — не нажатие,
-      правая кнопка — сразу книга; закрытие — к отрядам; «Выбрать» из листа режима — под шкафом, полка отряда высоты не теряет.
+      мощь коротко (hbPow сверен с независимым правилом: 940, 7,4К, 75К, 1,2М); нажатие — операция с номером ставит героя в выбранное
+      или первое пустое место, книга встаёт на место (показ по времени). Удержание (по часам песочницы; слово автора 30.09.2026:
+      «показывать боевую мощь условно при удержании… вижу это в виде тултипа, но… через телефон») — сведения над полкой, не книга:
+      мелкая книга, имя, редкость, класс, стихия, мощь, уровень, доблесть, пределы и «Книга героя»; отпустил — закрылись, отпустил
+      в сведениях — остались, на «Книге героя» — книга раскрывается поверх отрядов; щелчок после удержания героя не ставит, сдвиг —
+      не нажатие; правая кнопка — сразу закреплённые сведения; нажатие мимо и Esc — закрывают; героя поставили — закрыты; закрытие
+      книги — к отрядам; «Выбрать» из листа режима — под шкафом, полка отряда высоты не теряет.
       Вёрстка расчётом на 932 × 430 и 844 × 390: видно не меньше трёх отсеков, книга на полке отряда не меньше 64 px, на нижней
       полке видно не меньше 12 корешков, корешки отсека помещаются рядом со строкой режимов.
    Запуск: node tools/content-gen/screens/check_squads.js */
@@ -38,7 +42,7 @@ function done() {
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
   console.log(`Отряды: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; операций ${cnt.ops}, забегов и атак ${cnt.runs}.`);
   for (const x of cnt.lay || []) console.log('вёрстка ' + x);
-  console.log('Проверка пройдена: библиотека до десяти отрядов с именами, места до пяти героев, один лист выбора на все режимы со своим выбором у каждого, связка со спуском и Эхо, повтор номера ничего не меняет; отряды — шкаф: отсеки с корешками и табличкой имени и мощи, полка отряда крупным планом, нижняя полка корешков — нажатие ставит героя, удержание раскрывает книгу; вёрстка 932 × 430 и 844 × 390; в режиме «Игрок» служебного нет.');
+  console.log('Проверка пройдена: библиотека до десяти отрядов с именами, места до пяти героев, один лист выбора на все режимы со своим выбором у каждого, связка со спуском и Эхо, повтор номера ничего не меняет; отряды — шкаф: отсеки с корешками и табличкой имени и мощи, полка отряда крупным планом, нижняя полка корешков с мощью — нажатие ставит героя, удержание — сведения над полкой, из них — книга; вёрстка 932 × 430 и 844 × 390; в режиме «Игрок» служебного нет.');
   process.exit(0);
 }
 
@@ -52,6 +56,7 @@ function done() {
 const scripts = [...html.matchAll(/<script(?:\s+src="([^"]+)")?>([\s\S]*?)<\/script>/g)].map(m => ({ src: m[1], code: m[2] }));
 /* часы песочницы: setTimeout — в очередь, tick(мс) двигает время и выполняет наступившие; слушатели документа — для долгого нажатия */
 const clock = { now: 0, q: [], id: 0 }, dlis = {};
+let pointAt = null;   // что под пальцем в точке (document.elementFromPoint): отпускание над подсказкой корешка
 function tick(ms) {
   const end = clock.now + ms;
   for (;;) {
@@ -75,6 +80,7 @@ function load() {
   root.classList = { add: c => rootCls.add(c), remove: c => rootCls.delete(c), toggle: (c, on) => { const v = on === undefined ? !rootCls.has(c) : !!on; if (v) rootCls.add(c); else rootCls.delete(c); return v; }, contains: c => rootCls.has(c) };
   const els = {};
   const document = { readyState: 'loading', addEventListener: (t, f) => { (dlis[t] = dlis[t] || []).push(f); }, getElementById: id => (els[id] = els[id] || stubEl(id)),
+    elementFromPoint: (x, y) => (pointAt ? pointAt(x, y) : null),
     querySelector: () => null, querySelectorAll: () => [], createElement: () => stubEl(), createElementNS: () => stubEl(), body: stubEl('body'),
     documentElement: root, activeElement: null, fonts: null };
   const noStore = () => { throw new Error('localStorage недоступен'); };
@@ -94,7 +100,7 @@ function load() {
   const T = vm.runInContext(`({
     get S() { return S; }, set S(v) { S = v; },
     ACT, OV, FLOWS, KH, RS, RSI, EB, H, SQ, SQ_DATA, render, initialState, setTeam, startRun, advance, busyNote, rsHas, sq, sqBM,
-    LB_VIEW, HC_VIEW, HB_ART, BM, fmt, hrMine, hrV, hbTier, hbSpineR, lbCols, SHELL_SIZE,
+    LB_VIEW, HC_VIEW, HB_ART, BM, fmt, hrMine, hrV, hbTier, hbSpineR, lbCols, SHELL_SIZE, hbPow, SQ_PEEK: typeof SQ_PEEK !== 'undefined' ? SQ_PEEK : null,
   })`, ctx);
   return { T, els, game: () => (els.game ? els.game.innerHTML : '') };
 }
@@ -382,17 +388,23 @@ fresh();
     if (!new RegExp(`<div class="lb-slot" data-hold="sqbook:${id}"><button class="hb[^"]*" data-z="m"[^>]*data-a="sqslot" data-v="q${T.S.sq.seq}\\|${i}"`).test(stage)) say(`полка отряда: на месте ${i + 1} нет книги ${id} размера m с нажатием и удержанием`);
   });
   if (!/<i class="lb-pl near" aria-hidden="true">/.test(stage)) say('полка отряда: нет доски полки');
-  /* нижняя полка — свободные корешками по мощи: ступень, редкость, класс, уровень; нажатие — операция с номером, удержание — книга */
+  /* нижняя полка — свободные корешками по мощи: ступень, редкость, класс, мощь коротко; нажатие — операция с номером, удержание — сведения.
+     Короткая мощь — независимым правилом: до тысячи — как есть; дальше тысячи «К» или миллионы «М», десятые — только до десяти, без «,0» */
   const low = part('<div class="lb-low">');
   const pool = T.hrMine().filter(x => !s.m.includes(x.id)).sort((a, b) => b.bm - a.bm);
-  const sp = [...low.matchAll(/<button class="hs[^"]*" data-z="l" data-t="(\d)" data-r="(\d)" data-s="3" data-id="([^"]+)" style="--sr:(\d+)" data-a="sqput" data-v="([^"]+)" data-hold="sqbook:([^"]+)"[\s\S]*?<\/button>/g)];
+  const short = n => { if (n < 1000) return String(n); const [d, u] = n >= 1e6 ? [1e6, 'М'] : [1e3, 'К'], w = Math.floor(n / d), r = Math.floor((n % d) * 10 / d); return w < 10 && r ? `${w},${r}${u}` : `${w}${u}`; };
+  for (const [n, want] of [[0, '0'], [940, '940'], [999, '999'], [1000, '1К'], [7420, '7,4К'], [7000, '7К'], [9990, '9,9К'], [75080, '75К'], [128400, '128К'], [999999, '999К'], [1234000, '1,2М'], [12345678, '12М']])
+    if (T.hbPow(n) !== want || short(n) !== want) say(`мощь на корешке: ${n} → «${T.hbPow(n)}», ждали «${want}»`);
+  const sp = [...low.matchAll(/<button class="hs[^"]*" data-z="l" data-t="(\d)" data-r="(\d)" data-s="3" data-id="([^"]+)" style="--sr:(\d+)" data-a="sqput" data-v="([^"]+)" data-peek="([^"]+)"[\s\S]*?<\/button>/g)];
   if (sp.map(m => m[3]).join() !== pool.map(x => x.id).join()) say(`нижняя полка: корешки ${sp.map(m => m[3]).slice(0, 4).join(', ')}… — не свободные герои по мощи (${pool.length})`);
-  for (const [t, tier, r, id, sr, v, hold] of sp) {
+  for (const [t, tier, r, id, sr, v, peek] of sp) {
     const x = T.H(id), where = `нижняя полка · ${x.name}`;
     if (+tier !== T.hbTier(x) || +r !== x.r || +sr !== T.hbSpineR(+tier)) say(`${where}: корешок не своей ступени, редкости или толщины`);
-    if (v !== `q${T.S.sq.seq}|${s.id}|${id}` || hold !== id) say(`${where}: нажатие не операция с номером или удержание не книга`);
-    if (!/icons\/cls-[a-z]+\.png/.test(t) || !t.includes(`<b class="hs-v num" aria-hidden="true">${x.lvl}</b>`) || !t.includes('<i class="hs-cr" aria-hidden="true"></i>') || !/<span class="hs-l" aria-hidden="true"><b>[^<]+<\/b><\/span>/.test(t)) say(`${where}: на корешке нет класса, уровня ${x.lvl}, кристалла редкости или ярлыка с именем`);
+    if (v !== `q${T.S.sq.seq}|${s.id}|${id}` || peek !== id) say(`${where}: нажатие не операция с номером или удержание не сведения героя`);
+    if (!/icons\/cls-[a-z]+\.png/.test(t) || !t.includes(`<b class="hs-p num" aria-hidden="true">${short(x.bm)}</b>`) || !t.includes('<i class="hs-cr" aria-hidden="true"></i>') || !/<span class="hs-l" aria-hidden="true"><b>[^<]+<\/b><\/span>/.test(t)) say(`${where}: на корешке нет класса, мощи ${short(x.bm)}, кристалла редкости или ярлыка с именем`);
+    if (/ data-hold=| title="/.test(t)) say(`${where}: у корешка осталась книга по удержанию или подпись браузера поверх своей подсказки`);
   }
+  if (!low.includes('удержание — сведения')) say('нижняя полка: строка подсказки не говорит, что удержание — сведения');
   if (!/<i class="lb-pl" aria-hidden="true">/.test(low) || !/data-keep="sqpool"/.test(low)) say('нижняя полка: нет доски или прокрутка не помнит положение');
   /* нажатие на корешок: герой — в первое пустое место (операция с номером), книга встаёт на место — показ по времени */
   const e = s.m.indexOf(null), hid = pool[0].id, op0 = T.S.sq.seq;
@@ -407,29 +419,59 @@ fresh();
   /* выбранное место: нажатие на корешок — в него */
   act('sqslot', `q${T.S.sq.seq}|1`); const was = s.m[1], nx = T.hrMine().find(x => !s.m.includes(x.id));
   act('sqput', `q${T.S.sq.seq}|${s.id}|${nx.id}`); if (s.m[1] !== nx.id || s.m.includes(was)) say('нижняя полка: герой не встал в выбранное место');
-  /* долгое нажатие — по часам песочницы: pointerdown, hold мс — книга; щелчок после него героя не ставит; сдвиг — прокрутка, не нажатие */
+  /* удержание корешка — по часам песочницы: pointerdown, hold мс — сведения над полкой (подсказка), не книга; отпустил — закрылись;
+     щелчок после удержания героя не ставит; сдвиг — прокрутка, не нажатие; отпустил в сведениях — остались; на «Книге героя» — книга */
   const fire = (k, ev) => { for (const f of dlis[k] || []) f(ev); };
-  const el = id => ({ getAttribute: a => (a === 'data-hold' ? `sqbook:${id}` : null), isConnected: true, disabled: false, classList: { contains: c => c === 'hs' }, querySelector: () => null, getBoundingClientRect: () => ({ left: 0, top: 0, width: 0, height: 0 }) });
-  const ev = (t, o = {}) => Object.assign({ target: { closest: q => (q === '[data-hold]' ? t : null) }, button: 0, clientX: 40, clientY: 300, pd: 0, sp: 0, preventDefault() { this.pd++; }, stopPropagation() { this.sp++; } }, o);
-  if (!(dlis.pointerdown || []).length || !(dlis.click || []).length || !(dlis.contextmenu || []).length) say('долгое нажатие: нет слушателей pointerdown, click и contextmenu');
+  const el = id => ({ getAttribute: a => (a === 'data-peek' ? id : null), isConnected: true, disabled: false, classList: { contains: c => c === 'hs' }, querySelector: () => null, getBoundingClientRect: () => ({ left: 0, top: 0, width: 0, height: 0 }) });
+  const ev = (t, o = {}) => Object.assign({ target: { closest: q => (q === '[data-peek]' ? t : null) }, button: 0, pointerId: 1, clientX: 40, clientY: 300, pd: 0, sp: 0, preventDefault() { this.pd++; }, stopPropagation() { this.sp++; } }, o);
+  const peekOf = () => T.S.sq.peek ? `${T.S.sq.peek.id}${T.S.sq.peek.pin ? ' · закреплены' : ''}` : 'нет';
+  if (!(dlis.pointerdown || []).length || !(dlis.pointerup || []).length || !(dlis.click || []).length || !(dlis.contextmenu || []).length) say('удержание: нет слушателей pointerdown, pointerup, click и contextmenu');
+  if (!T.SQ_PEEK || ![T.SQ_PEEK.gap, T.SQ_PEEK.edge, T.SQ_PEEK.tip].every(n => Number.isInteger(n) && n > 0)) say('сведения корешка: нет целых чисел места SQ_PEEK (над корешком, от края, хвостик)');
   const free2 = T.hrMine().find(x => !s.m.includes(x.id)), b = el(free2.id);
-  T.S.sq.book = ''; fire('pointerdown', ev(b)); tick(Math.floor(V.hold / 2)); fire('pointerup', ev(b)); tick(V.hold);
+  T.S.sq.book = ''; T.S.sq.peek = null; fire('pointerdown', ev(b)); tick(Math.floor(V.hold / 2)); fire('pointerup', ev(b)); tick(V.hold);
   const c1 = ev(b); fire('click', c1);
-  if (T.S.sq.book || c1.sp) say('короткое нажатие: раскрылась книга или щелчок не дошёл до действия');
+  if (T.S.sq.book || T.S.sq.peek || c1.sp) say(`короткое нажатие: раскрылась книга, открылись сведения (${peekOf()}) или щелчок не дошёл до действия`);
   fire('pointerdown', ev(b)); fire('pointermove', ev(b, { clientX: 40 + V.slop + 4 })); tick(V.hold + 1);
-  if (T.S.sq.book) say('сдвиг пальца по полке: раскрылась книга — это прокрутка, не нажатие');
+  if (T.S.sq.book || T.S.sq.peek) say('сдвиг пальца по полке: открылись книга или сведения — это прокрутка, не нажатие');
+  fire('pointerup', ev(b));
   fire('pointerdown', ev(b)); tick(V.hold + 1);
-  if (T.S.sq.book !== free2.id) say('долгое нажатие на корешок: книга героя не раскрылась');
-  if (!T.S.hb.anim || T.S.hb.anim.kind !== 'in' || T.S.hb.anim.id !== free2.id) say('долгое нажатие: книга раскрылась без анимации открытия');
-  const c2 = ev(b); fire('click', c2); if (!c2.sp || !c2.pd) say('долгое нажатие: щелчок после него поставил бы героя в отряд');
+  if (T.S.sq.book) say('удержание корешка: раскрылась книга — теперь сведения, книга — кнопкой в них');
+  if (!T.S.sq.peek || T.S.sq.peek.id !== free2.id || T.S.sq.peek.pin) say(`удержание корешка: не открылись сведения героя над полкой (${peekOf()})`);
+  { const g0 = view('сведения корешка'), r0 = g0.slice(g0.indexOf('<div class="lb-sqr">')), pk = (r0.match(/<div class="sq-peek[ "][\s\S]*?<i class="sqp-tip" aria-hidden="true"><\/i><\/div>/) || [''])[0], x = T.H(free2.id), v = T.hrV(x);
+    if (!pk) say('сведения корешка: подсказки нет над полкой (в колонке отряда)');
+    else {
+      const need = [[`<b class="sqp-n">${x.name}</b>`, 'имени'], [`<span class="rar" data-r="${x.r}">`, 'редкости'], [`data-el="${x.el}"`, 'стихии'], [`${v.cls}</span>`, 'класса'], [`<span class="num">${T.fmt(x.bm)}</span>`, `мощи ${T.fmt(x.bm)}`],
+        [`Ур.&nbsp;<b class="num">${x.lvl}</b>/${x.cap}`, 'уровня'], [`Доблесть&nbsp;<b class="num">${x.valor}</b>/${x.maxV}`, 'доблести'], [`Пределы&nbsp;<b class="num">${x.lim}</b>/`, 'пределов'],
+        [`<button class="btn sm go sqp-go" data-a="sqbook" data-v="${x.id}">`, 'кнопки «Книга героя»'], [`data-z="s" `, 'мелкой книги']];
+      for (const [k, what] of need) if (!pk.includes(k)) say(`сведения корешка: нет ${what}`);
+      if (!new RegExp(`<button class="hs on"[^>]*data-id="${x.id}"`).test(g0)) say('сведения корешка: корешок, чьи сведения открыты, не приподнят');
+    } }
+  fire('pointerup', ev(b));
+  if (T.S.sq.peek) say(`удержание: отпустил палец — сведения не закрылись (${peekOf()})`);
+  const c2 = ev(b); fire('click', c2); if (!c2.sp || !c2.pd) say('удержание: щелчок после него поставил бы героя в отряд');
+  /* отпустил в сведениях — остались; нажатие мимо — закрыты; Esc — закрыты */
+  const box = { closest: q => (q === '.sq-peek' ? box : null) };
+  fire('pointerdown', ev(b)); tick(V.hold + 1); pointAt = () => box; fire('pointerup', ev(b)); pointAt = null;
+  if (!T.S.sq.peek || !T.S.sq.peek.pin) say(`удержание: отпустил палец в сведениях — они не остались (${peekOf()})`);
+  fire('click', ev(b)); const c3 = ev(b, { target: { closest: () => null } }); fire('click', c3);
+  if (T.S.sq.peek) say(`сведения: нажатие мимо не закрыло их (${peekOf()})`);
+  const cm = ev(b); fire('contextmenu', cm);
+  if (!T.S.sq.peek || !T.S.sq.peek.pin || !cm.pd) say(`правая кнопка на корешке: не открылись закреплённые сведения (${peekOf()})`);
+  { const k = { key: 'Escape', pd: 0, sp: 0, preventDefault() { this.pd++; }, stopPropagation() { this.sp++; } }; fire('keydown', k); if (T.S.sq.peek || !k.pd) say('сведения: Esc не закрыл их'); }
+  /* отпустил на «Книге героя» — книга раскрывается поверх отрядов, полёт — от корешка */
+  const btn = { getAttribute: a => (a === 'data-a' ? 'sqbook' : a === 'data-v' ? free2.id : null), closest: q => (q === '.sq-peek' ? box : q === '.sq-peek [data-a]' ? btn : null) };
+  fire('pointerdown', ev(b)); tick(V.hold + 1); pointAt = () => btn; fire('pointerup', ev(b)); pointAt = null;
+  if (T.S.sq.book !== free2.id || T.S.sq.peek) say(`«Книга героя» в сведениях: книга героя не раскрылась или сведения остались (${peekOf()})`);
+  if (!T.S.hb.anim || T.S.hb.anim.kind !== 'in' || T.S.hb.anim.id !== free2.id) say('«Книга героя» в сведениях: книга раскрылась без анимации открытия');
+  const c4 = ev(b); fire('click', c4); if (!c4.sp || !c4.pd) say('«Книга героя» в сведениях: щелчок после отпускания поставил бы героя в отряд');
   g = view('книга героя поверх отрядов');
   if (!/<div class="hb-win/.test(g) || !g.includes('data-a="hbclose" data-v="sq"') || (g.match(/data-a="seg" data-v="hero:(?:power|gear|skills|path)"/g) || []).length !== 4) say('книга героя поверх отрядов: нет книги с вкладками героя или закрытие не к отрядам');
   if (!g.includes('<div class="lb-case tall"')) say('книга героя поверх отрядов: под книгой нет шкафа отрядов');
   run('книга · закрыть', () => T.ACT.hbclose('sq'));
   if (T.S.sq.book || T.S.hb.anim || /<div class="hb-win/.test(view('отряды после книги'))) say('книга героя поверх отрядов: закрытие не вернуло к отрядам');
-  T.S.sq.book = ''; const c3 = ev(b); fire('contextmenu', c3);
-  if (T.S.sq.book !== free2.id || !c3.pd) say('правая кнопка на корешке: книга не раскрылась сразу');
-  run('книга · закрыть 2', () => T.ACT.hbclose('sq'));
+  /* сведения открыты — героя поставили: сведения закрыты */
+  T.S.sq.book = ''; T.S.sq.peek = { id: free2.id, pin: true }; T.S.sq.slot = 0;   /* место выбрано: герой встанет в него, даже если отряд полон */
+  { const s2 = T.sq(T.S.selSquad); act('sqput', `q${T.S.sq.seq}|${s2.id}|${free2.id}`); if (s2.m[0] !== free2.id) say('сведения: герой из сведений не встал в выбранное место'); if (T.S.sq.peek) say('сведения: героя поставили в отряд, а сведения его корешка остались'); }
   tick(10000);
   /* «Выбрать» из листа режима — под шкафом: полка отряда справа высоты не теряет */
   fresh(); T.S.route = 'echo'; run('лист Эхо', () => T.SQ.pick('echo')); act('sqedit', 'echo|s2');

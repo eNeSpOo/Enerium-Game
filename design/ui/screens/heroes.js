@@ -7,7 +7,7 @@
      (выбор автора 30.09.2026, ADR-0032): ступень книги — личный максимум доблести, редкость — кристалл и свет книги, рунные пределы —
      замки, взятая доблесть — ленты-закладки; вид, анимация открытия и раскрытая книга — screens/book.js;
    — стадии знакомства с героем (hrStage, решение автора 30.09.2026): не найден — нигде не виден, только счётчик; неизвестная душа —
-     в запасах есть осколок: книга с силуэтом класса, сведения закрыты; известен — комплект осколков, герои за золото открытых циклов
+     в запасах есть осколок: книга своей ступени закрыта — «?» вместо портрета, сведения закрыты; известен — комплект осколков, герои за золото открытых циклов
      и донатные; в коллекции;
    — раскрытую книгу героя (слой поверх сетки, screens/book.js): слева портрет — нажатие показывает его крупно (OV.hczoom), справа —
      вкладки «Развитие», «Мощь», «Снаряжение», «Навыки», «Путь» (heroDetail без шапки, index.html; развитие и окно снаряжения —
@@ -23,20 +23,21 @@
      у каждого режима свой сохранённый выбор. API для экранов режимов — SQ (описан в screens/README.md). Вид отрядов — «Библиотека
      Этриона» (слово автора 30.09.2026, screens/library.js): слева — высокий шкаф, отряд — отсек с пятью корешками и латунной табличкой
      имени и мощи; справа — выбранный отряд на одной полке крупным планом (книги размера m) и нижняя полка свободных героев корешками:
-     нажатие — книга выезжает и встаёт в выбранное место (или в первое пустое), удержание — книга раскрывается (ACT.sqbook);
+     на корешке — мощь; нажатие — книга выезжает и встаёт в выбранное место (или в первое пустое), удержание — сведения над полкой
+     (sqPeek: имя, редкость, класс, стихия, мощь, уровень, доблесть, пределы и «Книга героя» — ACT.sqbook);
    — «Мои», «Каталог» и «За золото» — книги на полках шкафа (lbCase, lbShelves — screens/library.js): каждый ряд — на своей полке,
      на карнизе — строка счётчиков, порядка и фильтра; у «За золото» цена — латунной табличкой на кромке полки под книгой;
    — «Призыв»: hireView и вкладки «За золото», «За Энериум», «За души». «За золото» — та же сетка книг героев каталога цикла (будущий
      цикл не виден), нажатие — раскрытая книга «до покупки» с ценой и «Купить» (покупка — ACT.gbuy, index.html). «За души» — сцена алтаря
      Возрождения душ (hrSoulsView, её зовёт rsSoulsView в index.html; слово автора 29.09.2026 — «дорого-богато»): зеркало душ, перед ним
-     веером книги героев пула (не найденные — безымянные книги) и вход рулетки (rlCol, screens/roulette.js); справа два входа — отряд
+     веером книги героев пула (не найденные — закрытые книги с «?») и вход рулетки (rlCol, screens/roulette.js); справа два входа — отряд
      Эхо недели (окно-витрина OV.hrecho: цивилизация, пятеро крупными книгами, неприязнь, откуда осколки, пробуждение за души) и лавка
      праха (окно OV.dust). Лавка праха — отдельное окно: витрина найденных героев пула рулетки доступных циклов — книги с ценой осколка
      и полосой осколков; справа — выбранный: осколки за прах (1, 10 или до комплекта) и пробуждение за души; после пробуждения — окно
      OV.hrwake: трещины заживают, герой выходит из стекла в раме. Героев Эхо прахом не собрать (слово автора 29.09.2026): лавка продаёт
      осколки только героев из EN_ROSTER.rules.dustSrc (rsDustable, index.html) и говорит почему; героя Эхо собирают осколки из сундуков
      Эхо, пробуждают — души (окно отряда недели). Покупка осколков и пробуждение — операции SOUL_SRV с номером. Герой, которого собирают,
-     в сетках и витринах — книга с полосой осколков (неизвестная душа — с силуэтом класса), в списках — осколок: стекло с его лицом
+     в сетках и витринах — книга с полосой осколков (неизвестная душа — закрытая, с «?»), в списках — осколок: стекло с его лицом
      (shardGhost, screens/art-icons.js);
    — «За Энериум» — витрина донатного сета (dnView): зал, пятеро Безликих на ступенях цены — дороже герой, выше ступень и ярче свет;
      сет — коллекция: сколько из пяти уже в коллекции и какую ступень сет-бонуса это даёт (лист OV.hrset — ступени наглядно).
@@ -126,6 +127,11 @@ const DN_VIEW = {
   step: [14, 6],        // ступень цены под героем: высота, px — step[0] + место × step[1]: пятый стоит выше всех
   grow: [40, 4],        // высота рамы, % высоты помоста — grow[0] + место × grow[1] (не шире колонки): дороже герой — крупнее рама
   motes: 12,            // песчинок времени над помостом
+  /* пятеро парят над ступенями (слово автора 30.09.2026: «анимация левитации карточек донатных героев вверх и вниз, плавно, и подсвечивание
+     их… донатные герои должны быть желанными»): период, мс; сдвиг фазы за место, мс — пятеро не качаются в такт; подъём, px —
+     float.lift[0] + место × float.lift[1]: дороже герой — выше парит */
+  float: { ms: 4400, step: 760, lift: [4, 1] },
+  glint: { ms: 6400, step: 1100 },   // блик по обложке: период, мс; сдвиг за место, мс — блик обходит пятерых по очереди
   ring: [0, 'одна', 'две', 'три'],   // слова для «ступеней у сета» в листе сет-бонуса
   titles: ['Жрец'],     // слова звания перед именем: на табличке под рамой — имя, а не звание
   /* окно получения героя — мс от покупки: трещина света, столп, рама, вспышка, имя, строки, всё на месте */
@@ -322,7 +328,7 @@ function hrPath(h) {
    Слова автора 30.09.2026: «сетка со всеми героями, которых игрок уже купил… по форме условно 9 на 16, и, нажимая на арт, мы уже
    открываем крупным планом карточку героя». Карточка — книга (hbCard, screens/book.js); нажатие — книга поднимается, летит в центр
    и раскрывается поверх сетки (слой hbLayer там же), закрытие возвращает её в сетку. «Мои» — герои аккаунта, по мощи сильнейшие
-   сверху; «Каталог» — найденные герои состава (стадии 1–3, hrStage): неизвестная душа — силуэт класса и полоса осколков, известный —
+   сверху; «Каталог» — найденные герои состава (стадии 1–3, hrStage): неизвестная душа — закрытая книга с «?» и полоса осколков, известный —
    чёрно-белый (комплект осколков — в цвете, полоса горит), купленный — в цвете. Не найденных не видно — только счётчик масштаба
    «в коллекции N из M», «найдено N из M». Порядок — список, фильтр — лист значков (OV.hcflt): класс, стихия, редкость, цикл, в каталоге —
    источник */
@@ -353,14 +359,16 @@ function hcView(x) {
   v.src = v.rh ? v.rh.src : '';
   return v;
 }
-/* портрет в окне книги: рисунок героя; у героя без портрета и у неизвестной души — силуэт его класса, как в стекле осколка
-   (art-icons.js), в свете стихии снизу — не инициалы. Неизвестная душа — силуэт, даже если портрет выгружен (решение автора
-   30.09.2026); портрет появится сам, когда путь попадёт в RS_ART. Силуэт вписан кадром фигуры (ART_ICONS.clsFit): окно показывает
-   фигуру с оружием целиком — лук Лучницы, посох, меч и цепи не обрезаются (замечание автора 30.09.2026); где кадр, CSS считает сам
-   (heroes.css, .hk-fit: поле окна без знаков и плашек), свободное место — подложка в свете стихии */
+/* портрет в окне книги: рисунок героя; у героя без портрета — силуэт его класса, как в стекле осколка (art-icons.js), в свете стихии
+   снизу — не инициалы; портрет появится сам, когда путь попадёт в RS_ART. Неизвестная душа — книга закрыта: в окне туман души и «?»
+   (hbQ, screens/book.js), даже если портрет выгружен (слово автора 30.09.2026: «это всё-таки тоже книга, только со знаком вопроса»).
+   Силуэт вписан кадром фигуры (ART_ICONS.clsFit): окно показывает фигуру с оружием целиком — лук Лучницы, посох, меч и цепи
+   не обрезаются (замечание автора 30.09.2026); где кадр, CSS считает сам (heroes.css, .hk-fit: поле окна без знаков и плашек),
+   свободное место — подложка в свете стихии */
 function hcFace(v) {
-  const soul = v.st === 1, o = v.acc && !RSI[v.acc.id] ? v.acc : null, rh = v.rh;
-  const pic = soul ? '' : o ? o.img : rh && typeof RS_ART !== 'undefined' && RS_ART.has(rh.id) ? AV('heroes/' + rh.id + '.jpg') : '';
+  if (v.st === 1 && typeof hbQ === 'function') return hbQ();
+  const o = v.acc && !RSI[v.acc.id] ? v.acc : null, rh = v.rh;
+  const pic = o ? o.img : rh && typeof RS_ART !== 'undefined' && RS_ART.has(rh.id) ? AV('heroes/' + rh.id + '.jpg') : '';
   if (pic) return `<img class="hk-img" src="${pic}" alt="" loading="lazy" decoding="async">`;
   const key = typeof shardCls === 'function' ? shardCls(rh || v.acc || {}) : '', A = typeof ART_ICONS !== 'undefined' ? ART_ICONS : null, p = key && A ? A.cls(key) : '';
   const b = A && A.clsFit && A.clsFit.box[key], fit = b ? ` class="fit" style="--bx:${b[0]};--by:${b[1]};--bw:${b[2] - b[0]};--bh:${b[3] - b[1]};--ir:${A.clsFit.ratio}"` : '';
@@ -379,7 +387,7 @@ function hcShardOf(v) {
   return RS_SHARD.includes(v.rh.src) || n > 0 ? [n, hrNeed()] : null;
 }
 /* книга в сетке каталога: купленный — в цвете с уровнем, замками и мощью; известный — чёрно-белый, комплект осколков — в цвете;
-   неизвестная душа — силуэт класса; у сборных — полоса осколков */
+   неизвестная душа — закрытая книга с «?»; у сборных — полоса осколков */
 function hcCatCard(v, o = {}) {
   if (v.st === 3) return hbCard(v, Object.assign({ z: 'l' }, o));
   const sh = hcShardOf(v), full = !!sh && sh[0] >= sh[1];
@@ -644,8 +652,10 @@ const SQ = {
    по сути полка»; «снизу пока неудобная панель, её нужно будет продумать»). Слева — высокий шкаф: отряд — отсек с пятью маленькими
    корешками и латунной табличкой имени и мощи на кромке полки, где отряд выбран — строкой. Справа — выбранный отряд на одной полке
    крупным планом: пять мест, книги размера m стоят в ряд; нажатие — выбрать место, другое место — поменяться; удержание — книга героя.
+   Корешок несёт мощь (hbSpine);
    Внизу — нижняя полка: свободные герои корешками (цвет редкости, класс, уровень, имя), по мощи; нажатие — книга выезжает и встаёт
-   в выбранное место отряда (или в первое пустое, ACT.sqput), удержание — книга раскрывается (ACT.sqbook). Логика — прежняя: SQ_SRV */
+   в выбранное место отряда (или в первое пустое, ACT.sqput), удержание — сведения над полкой (sqPeek), из них — книга (ACT.sqbook).
+   Логика — прежняя: SQ_SRV */
 function hrSquadsView() {
   const s = sq(S.selSquad); S.selSquad = s.id;
   const op = sqOp(), slot = S.sq.slot, n = s.m.filter(Boolean).length, full = S.squads.length >= SQ_DATA.max;
@@ -668,19 +678,135 @@ function hrSquadsView() {
   }).join('');
   const sel = slot >= 0 && s.m[slot] ? H(s.m[slot]) : null;
   const bar = sel ? `<span class="hr-sqsel"><b>${hrEsc(sel.name)}</b><button class="iconbtn" data-a="sqmv" data-v="${op}|${s.id}|${slot}|-1" aria-label="Сдвинуть влево" ${slot > 0 ? '' : 'disabled'}>${ic('back')}</button><button class="iconbtn" data-a="sqmv" data-v="${op}|${s.id}|${slot}|1" aria-label="Сдвинуть вправо" ${slot < SQ_DATA.size - 1 ? '' : 'disabled'}>${ic('arrow')}</button><button class="btn sm" data-a="sqrem" data-v="${op}|${s.id}|${slot}">${ic('x')}Убрать</button></span>`
-    : `<span class="reason">${slot >= 0 ? `Место ${slot + 1}: нажмите корешок на нижней полке.` : 'Корешок — в отряд, удержание — книга. Место, потом другое — поменяются.'}</span>`;
-  /* нижняя полка: свободные герои корешками, сильнейшие слева */
-  const pool = hrMine().filter(h => !s.m.includes(h.id)).sort((a, b) => b.bm - a.bm);
-  const spine = h => hbSpine(hrV(h), { act: 'sqput', val: `${op}|${s.id}|${h.id}`, hold: `sqbook:${h.id}`, say: 'Нажмите — в отряд, удерживайте — книга героя' });
+    : `<span class="reason">${slot >= 0 ? `Место ${slot + 1}: нажмите корешок на нижней полке.` : 'Корешок — в отряд, удержание — сведения. Место, потом другое — поменяются.'}</span>`;
+  /* нижняя полка: свободные герои корешками, сильнейшие слева; на корешке — мощь; удержание — сведения над полкой (sqPeek) */
+  const pool = hrMine().filter(h => !s.m.includes(h.id)).sort((a, b) => b.bm - a.bm), pk = !S.overlay && S.sq.peek && pool.some(h => h.id === S.sq.peek.id) ? S.sq.peek : null;
+  const spine = h => hbSpine(hrV(h), { act: 'sqput', val: `${op}|${s.id}|${h.id}`, peek: h.id, on: !!pk && pk.id === h.id, tip: false, say: 'Нажмите — в отряд, удерживайте — сведения' });
   /* пришли из листа режима — под шкафом: для какого режима, «Назад» и «Выбрать» (полка отряда справа не теряет высоты) */
   const F = S.sq.from, from = F ? `<div class="hr-from lb-from"><span>Выбор для режима «${SQM[F.mode].n}»</span><span class="row"><button class="link" data-a="sqback">${ic('back')}Назад</button><span class="g-spacer"></span><button class="btn sm go" data-a="sqpick" data-v="${op}|${F.mode}|${s.id}|${S.sq.round}" aria-label="Выбрать «${hrEsc(s.name)}» для режима «${SQM[F.mode].n}»">Выбрать</button></span></div>` : '';
   const head = `<div class="hkh hr-sqh"><h2 class="serif gold">${hrEsc(s.name)}</h2><button class="iconbtn" data-a="sheet" data-v="sqname:${s.id}" aria-label="Переименовать отряд" title="Переименовать">${HR_PEN}</button><button class="iconbtn" data-a="sqdel" data-v="${s.id}" aria-label="Удалить отряд" title="Удалить" ${S.squads.length > 1 ? '' : 'disabled'}>${ic('trash')}</button><span class="chip">${n} / ${SQ_DATA.size}</span><span class="g-spacer"></span><b class="bm sq-bm" title="Боевая мощь отряда">${ICON('power', 22, 'Боевая мощь')}<span class="num">${fmt(sqBM(s))}</span></b></div>`;
   const stage = `<div class="lb-stage"><div class="lb-five" role="group" aria-label="Полка отряда «${hrEsc(s.name)}»: пять мест">${five}</div>${lbPlank('near')}</div>`;
   const low = `<div class="lb-low"><div class="lb-lowh"><span class="eyebrow">${pool.length ? `Герои · ${pool.length}` : 'Все герои в отряде'}</span><span class="g-spacer"></span>${bar}</div>
       <div class="lb-lows scroll" data-keep="sqpool"><div class="lb-lowr" role="group" aria-label="Нижняя полка: свободные герои">${pool.map(spine).join('')}${lbPlank()}</div></div></div>`;
-  return `<section class="scr"><div class="lb-sq" style="${lbVars()}"><div class="lb-sql">${left}${from}</div><div class="lb-sqr">${lbCase({ cls: 'near', top: head, body: stage + low })}</div></div></section>`;
+  return `<section class="scr"><div class="lb-sq" style="${lbVars()}"><div class="lb-sql">${left}${from}</div><div class="lb-sqr">${lbCase({ cls: 'near', top: head, body: stage + low })}${pk ? sqPeekHtml(H(pk.id), pk.pin) : ''}</div></div></section>`;
 }
 const HR_PEN = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/></svg>';
+
+/* ---------- нижняя полка: сведения по удержанию ----------
+   Слово автора 30.09.2026: «в отрядах нужно как-то на книгах внизу показывать боевую мощь условно при удержании, то есть давать
+   информацию игроку, что это за герой… вижу это в виде тултипа, но не забываем, что игрок это будет делать в основном через телефон,
+   просто открывать книгу тут и показывать информацию очень долго, обычно игрок видит самых сильных героев и кидает их в отряд».
+   Мощь — на самом корешке (hbSpine). Удержание корешка (LB_VIEW.hold мс) — подсказка над полкой, над пальцем, а не под ним: мелкая
+   книга, имя, редкость, класс, стихия, мощь, уровень, доблесть, пределы и «Книга героя». Отпустил палец — подсказка закрылась; повёл
+   палец в подсказку и отпустил — она остаётся, на кнопке или книге — книга раскрывается; правая кнопка мыши и клавиша меню — сразу
+   закреплённая подсказка. Закреплённую закрывают нажатие мимо, прокрутка полки и Esc. Нажатие на корешок — как прежде: герой в отряд;
+   сдвиг пальца дальше LB_VIEW.slop до удержания — прокрутка полки. Подсказка — вид: отряд не меняется. Числа места — SQ_PEEK */
+const SQ_PEEK = { gap: 10, edge: 6, tip: 18 };   // над корешком, px (палец её не закрывает); от края колонки, px; хвостик — не ближе к углу, px
+/* подсказка: мелкая книга (нажатие — книга раскрывается), имя, редкость, класс и стихия, мощь, уровень, доблесть и пределы, занятость;
+   одна кнопка — «Книга героя». pin — закреплена: палец отпущен над ней, правая кнопка мыши или клавиша меню */
+function sqPeekHtml(h, pin) {
+  if (!h) return '';
+  const v = hrV(h), top = hrLimTop();
+  return `<div class="sq-peek${pin ? ' pin' : ''}" data-id="${hrEsc(h.id)}" data-r="${v.r}" role="dialog" aria-label="${hrEsc(v.n)}: сведения">
+    <div class="sqp-bk">${hbCard(v, { z: 's', act: 'sqbook', val: h.id, bm: false, note: '' })}</div>
+    <div class="sqp-tx"><b class="sqp-n">${hrEsc(v.n)}</b>
+      <span class="sqp-m">${rar(v.r)}<span class="sqp-c">${CLS(v.ic, 14, '')}${hrEsc(v.cls)}</span>${el(v.el)}</span>
+      <span class="sqp-row"><b class="sqp-bm" title="Боевая мощь">${ICON('power', 20, 'Боевая мощь')}<span class="num">${fmt(v.bm)}</span></b>
+        <button class="btn sm go sqp-go" data-a="sqbook" data-v="${hrEsc(h.id)}">${ic('book')}Книга героя</button></span>
+      <span class="sqp-st"><span>Ур.&nbsp;<b class="num">${v.lvl}</b>/${v.cap}</span><span>Доблесть&nbsp;<b class="num">${v.valor}</b>/${v.maxV}</span><span>Пределы&nbsp;<b class="num">${v.lim}</b>/${top}</span></span>
+      ${v.busy ? `<span class="sqp-busy">${hrEsc(v.busy)}</span>` : ''}</div>
+    <i class="sqp-tip" aria-hidden="true"></i></div>`;
+}
+const sqPeekSet = (id, pin) => { S.sq.peek = id && H(id) ? { id, pin: !!pin } : null; };
+const sqSpineEl = id => { try { return document.querySelector(`.g .lb-lowr .hs[data-id="${id}"]`); } catch (_) { return null; } };
+/* подсказка на экране без полной перерисовки: палец держит корешок — его элемент не заменяем, иначе браузер потеряет касание */
+function sqPeekPaint() {
+  try {
+    const host = document.querySelector('.g .lb-sqr'); if (!host) return;
+    host.querySelectorAll('.sq-peek').forEach(x => x.remove());
+    document.querySelectorAll('.g .lb-lowr .hs.on').forEach(x => x.classList.remove('on'));
+    const P = S.sq.peek, sp = P && sqSpineEl(P.id); if (!P || !sp) return;
+    host.insertAdjacentHTML('beforeend', sqPeekHtml(H(P.id), P.pin)); sp.classList.add('on');
+    sqPeekPlace();
+  } catch (_) { }
+}
+/* место подсказки: над корешком на SQ_PEEK.gap px, по его середине, не за краем колонки; хвостик — на корешок. Кадр устройства
+   масштабирован — делим на масштаб, как hbRect */
+function sqPeekPlace() {
+  try {
+    const P = S.sq && S.sq.peek, g = $game(); if (!P || !g || !g.offsetWidth) return;
+    const host = g.querySelector('.lb-sqr'), box = host && host.querySelector('.sq-peek'), sp = sqSpineEl(P.id);
+    if (!box || !sp || !host.offsetWidth) return;
+    const V = SQ_PEEK, k = g.getBoundingClientRect().width / g.offsetWidth, hr = host.getBoundingClientRect(), sr = sp.getBoundingClientRect();
+    const w = box.offsetWidth, hh = box.offsetHeight, cx = Math.round((sr.left + sr.width / 2 - hr.left) / k), top = Math.round((sr.top - hr.top) / k);
+    const left = Math.max(V.edge, Math.min(host.offsetWidth - w - V.edge, cx - Math.floor(w / 2)));
+    box.style.left = left + 'px'; box.style.top = Math.max(V.edge, top - V.gap - hh) + 'px';
+    box.style.setProperty('--sqp-ax', Math.max(V.tip, Math.min(w - V.tip, cx - left)) + 'px');
+  } catch (_) { }
+}
+const sqPeekFocus = () => { try { requestAnimationFrame(() => { const b = document.querySelector('.g .sq-peek .sqp-go'); if (b) b.focus({ preventScroll: true }); }); } catch (_) { } };
+/* жест корешка: удержание — подсказка, отпускание — закрыть или оставить, над кнопкой — её действие; щелчок после удержания героя
+   в отряд не ставит. Правая кнопка мыши и клавиша меню — закреплённая подсказка */
+(function sqPeekTouch() {
+  if (typeof document === 'undefined' || !document.addEventListener) return;
+  let tm = 0, el = null, x0 = 0, y0 = 0, pid = null, held = false, eat = false;
+  const at = e => (e.target && e.target.closest ? e.target.closest('[data-peek]') : null);
+  const under = (x, y) => { try { const t = document.elementFromPoint(x, y); return t && t.closest ? t : null; } catch (_) { return null; } };
+  const stop = () => { if (tm) clearTimeout(tm); tm = 0; };
+  const shut = () => { sqPeekSet(''); sqPeekPaint(); };
+  const show = (b, pin) => {
+    const id = b.getAttribute('data-peek'); if (!H(id)) return;
+    sqPeekSet(id, pin); sqPeekPaint();
+    try { if (!pin && navigator.vibrate) navigator.vibrate(8); } catch (_) { }   // на телефоне — лёгкий отклик: подсказка открылась
+  };
+  document.addEventListener('pointerdown', e => {
+    stop(); held = false; eat = false; el = null;
+    const b = at(e); if (!b || (e.button != null && e.button !== 0) || b.disabled) return;
+    el = b; x0 = e.clientX; y0 = e.clientY; pid = e.pointerId;
+    tm = setTimeout(() => { tm = 0; const t = el; if (!t || !t.isConnected) { el = null; return; } held = true; eat = true; show(t, false); }, LB_VIEW.hold);
+  }, true);
+  document.addEventListener('pointermove', e => {
+    if (!el || (pid != null && e.pointerId != null && e.pointerId !== pid)) return;
+    if (!held) { if (Math.max(Math.abs(e.clientX - x0), Math.abs(e.clientY - y0)) > LB_VIEW.slop) { stop(); el = null; } return; }
+    const t = under(e.clientX, e.clientY), b = t && t.closest('.sq-peek [data-a]');   // палец над кнопкой или книгой подсказки — подсвечена
+    try { document.querySelectorAll('.g .sq-peek .hov').forEach(x => { if (x !== b) x.classList.remove('hov'); }); if (b) b.classList.add('hov'); } catch (_) { }
+  }, true);
+  document.addEventListener('pointerup', e => {
+    stop(); const was = held && !!el; el = null; held = false; if (!was) return;
+    const t = under(e.clientX, e.clientY), b = t && t.closest('.sq-peek [data-a]');
+    if (b) { const f = ACT[b.getAttribute('data-a')]; if (f) f(b.getAttribute('data-v') || '', b, e); return; }   // на кнопке или книге — книга
+    if (t && t.closest('.sq-peek') && S.sq.peek) { sqPeekSet(S.sq.peek.id, true); sqPeekPaint(); return; }       // в подсказке — остаётся
+    shut();                                                                                                      // отпустил — закрылась
+  }, true);
+  document.addEventListener('pointercancel', () => { stop(); const was = held; el = null; held = false; if (was && S.sq.peek && !S.sq.peek.pin) shut(); }, true);
+  /* сведения открыты, палец ведут к кнопке — полку не прокручивать: иначе браузер заберёт касание (pointercancel) и сведения закроются.
+     Слушатель, что может остановить прокрутку, — только на нижней полке (после каждой отрисовки — на новой): прокрутка остального
+     прототипа его не ждёт */
+  const noPan = e => { if (held && el && e.cancelable) e.preventDefault(); };
+  window.addEventListener('en-render', () => { try { const low = document.querySelector('.g .lb-lows'); if (low && !low.sqPan) { low.sqPan = 1; low.addEventListener('touchmove', noPan, { passive: false }); } } catch (_) { } });
+  document.addEventListener('click', e => {
+    if (eat) { eat = false; e.preventDefault(); e.stopPropagation(); return; }
+    const t = e.target && e.target.closest ? e.target : null;
+    if (!S.sq || !S.sq.peek || (t && t.closest('.sq-peek'))) return;
+    shut();   // нажатие мимо: подсказка закрыта, у нажатого — своё действие (корешок — в отряд)
+  }, true);
+  document.addEventListener('contextmenu', e => {
+    const b = at(e); if (!b) return;
+    e.preventDefault(); if (held || el) return;   // палец держит корешок: подсказку откроет удержание, отпускание её закроет
+    stop(); eat = false; show(b, true); sqPeekFocus();
+  }, true);
+  document.addEventListener('scroll', e => {
+    if (tm) { stop(); el = null; }
+    const t = e.target; if (S.sq && S.sq.peek && t && t.classList && t.classList.contains('lb-lows')) { held = false; shut(); }
+  }, true);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') eat = false;   // щелчок с клавиатуры — не после удержания
+    if (e.key !== 'Escape' || !S.sq || !S.sq.peek || S.overlay) return;
+    e.preventDefault(); e.stopPropagation(); const id = S.sq.peek.id; shut();
+    const sp = sqSpineEl(id); if (sp) { try { sp.focus({ preventScroll: true }); } catch (_) { } }
+  }, true);
+  window.addEventListener('resize', sqPeekPlace);
+})();
 
 /* ---------- лист выбора отряда: один на все режимы ---------- */
 const sqMark = r => r.ok ? `<i class="ok" aria-hidden="true">${ic('check')}</i>` : `<small>${r.why}</small>`;
@@ -733,24 +859,28 @@ function hireView() {
   </section>`;
 }
 /* за золото — слова автора 30.09.2026: «в призыве за золото то же самое: сетка героев и вся информация по герою до его покупки, чтобы
-   игрок понимал, что он покупает». Картотека Этриона цикла — книги на полках того же шкафа («Библиотека Этриона», screens/library.js),
-   «№» — только порядок; купленный — отметка «в коллекции»; цена k-й покупки цикла растёт линейно — строка на карнизе, латунная табличка
-   на кромке полки под каждой книгой и кнопка «Купить» в книге; максимум доблести — 1, книга — первой ступени, её ленты на полке прячет
-   табличка. Герои будущего цикла не видны до его открытия (стадии знакомства, решение автора 30.09.2026): картотека говорит, когда
-   откроется */
+   игрок понимал, что он покупает»; «в призыве за золото не должны показываться герои, которые уже есть в коллекции». Картотека Этриона
+   цикла — книги на полках того же шкафа («Библиотека Этриона», screens/library.js), «№» — только порядок; купленных на полках нет —
+   их считает табличка «в коллекции N из M» на карнизе; собрана вся картотека — сказано словами. Цена k-й покупки цикла растёт линейно —
+   строка на карнизе, латунная табличка на кромке полки под каждой книгой и кнопка «Купить» в книге; максимум доблести — 1, книга —
+   первой ступени, её ленты на полке прячет табличка. Герои будущего цикла не видны до его открытия (стадии знакомства, решение автора
+   30.09.2026): картотека говорит, когда откроется */
+/* герои картотеки цикла c, которых ещё нет в коллекции, — по «№», под фильтр */
+const rsGoldLeft = c => RS.heroes.filter(h => h.src === 'gold' && h.c === c && !rsHas(h)).sort((a, b) => a.no - b.no).map(hcView).filter(v => v && hcPass(v, 'gold'));
 function rsGoldView() {
   const cur = rsCyc(), c = S.rs.gcyc || cur, open = c <= cur, k = rsBought(c) + 1, price = rsGold(c, k), lack = Math.max(0, price - S.wallet.gold);
-  const cat = RS.heroes.filter(h => h.src === 'gold' && h.c === c).sort((a, b) => a.no - b.no);
-  const list = open ? cat.map(hcView).filter(v => v && hcPass(v, 'gold')) : [];
+  const cat = RS.heroes.filter(h => h.src === 'gold' && h.c === c), got = k - 1, all = open && cat.length > 0 && got >= cat.length;
+  const list = open ? rsGoldLeft(c) : [];
   const opts = ROMAN.slice(1).map((r, i) => `<option value="${i + 1}" ${i + 1 === c ? 'selected' : ''}>Картотека Этриона · цикл ${r}${i + 1 > cur ? ' · закрыта' : ''}</option>`).join('');
-  /* под книгой — латунная табличка на кромке полки: цена следующего найма; купленный — «в коллекции»; нехватка — табличка тусклее */
-  const tag = v => v.own ? lbTag(`${ic('check')}в коллекции`, 'own')
-    : lbTag(`<img src="${curImg('gold')}" alt="Золото"><b class="num">${fmt(price)}</b>`, lack ? 'lack' : '', lack ? `Не хватает ${fmt(lack)} золота` : `${k}-й найм цикла`);
-  const cells = list.map(v => hbCard(v, { z: 'l', act: 'gsel', val: v.rh ? v.rh.id : v.id, own: true }) + tag(v));
+  /* под книгой — латунная табличка на кромке полки: цена следующего найма; нехватка — табличка тусклее */
+  const tag = () => lbTag(`<img src="${curImg('gold')}" alt="Золото"><b class="num">${fmt(price)}</b>`, lack ? 'lack' : '', lack ? `Не хватает ${fmt(lack)} золота` : `${k}-й найм цикла`);
+  const cells = list.map(v => hbCard(v, { z: 'l', act: 'gsel', val: v.rh ? v.rh.id : v.id }) + tag());
   const shut = `<div class="hk-empty"><p>${ic('lock')} Картотека цикла ${ROMAN[c]} откроется при переходе на цикл ${ROMAN[c]}: тогда станут известны и его герои.</p></div>`;
-  const sh = lbShelves(cells, { min: HC_VIEW.gold, empty: cells.length ? '' : open ? hcEmpty() : shut });
-  const top = `<div class="hkh"><select class="rs-sel hk-cyc" data-a="gcyc" aria-label="Картотека героев за золото">${opts}</select>${open ? `<span class="chip" title="Нанято героев этой картотеки">${k - 1} / ${cat.length}</span>` : ''}
-      <p class="rs-next">${open ? `Следующий найм — ${k}-й в цикле:${money('gold', price)}` : `${ic('lock')}Картотека откроется в цикле ${ROMAN[c]}`}</p><span class="g-spacer"></span>${hcFBtn('gold', hcFN('gold'))}</div>`;
+  const full = `<div class="hk-empty"><p>${ic('check')} Картотека цикла ${ROMAN[c]} собрана: все ${fmt(cat.length)} ${plural(cat.length, 'герой', 'героя', 'героев')} — в коллекции.</p></div>`;
+  const sh = lbShelves(cells, { min: HC_VIEW.gold, empty: cells.length ? '' : !open ? shut : all ? full : hcEmpty() });
+  const next = !open ? `${ic('lock')}Картотека откроется в цикле ${ROMAN[c]}` : all ? 'Нанимать в этой картотеке больше некого' : `Следующий найм — ${k}-й в цикле:${money('gold', price)}`;
+  const top = `<div class="hkh"><select class="rs-sel hk-cyc" data-a="gcyc" aria-label="Картотека героев за золото">${opts}</select>${open ? `<span class="chip" title="Нанятые — в коллекции, в картотеке их не показываем">в коллекции ${fmt(got)} из ${fmt(cat.length)}</span>` : ''}
+      <p class="rs-next">${next}</p><span class="g-spacer"></span>${all ? '' : hcFBtn('gold', hcFN('gold'))}</div>`;
   return lbCase({ cls: 'hk-hire gold', top, body: `<div class="hkg lb-shv scroll" style="--n:${sh.n}" data-keep="gold:${c}">${sh.html}</div>` });
 }
 /* одно действие карточки «до покупки» за золото: цена у кнопки «Купить» (покупка — ACT.gbuy в index.html, подтверждение с ценой
@@ -809,12 +939,13 @@ function dnFrame(h, cls = '', extra = '') {
   const art = dnArt(DN_ART.frame);
   return `<span class="dn-fr${art ? ' art' : ''}${cls ? ' ' + cls : ''}" data-r="${h.r}"><span class="dn-ph">${rsFace(h)}</span>${art ? `<img class="dn-fi" src="${AV(DN_ART.frame)}" alt="">` : '<i class="dn-crest" aria-hidden="true"></i>'}${extra}</span>`;
 }
-/* герой на ступени: книга (hbCard, screens/book.js), ступень с ценой; в коллекции — отметка вместо цены. Нажатие на книгу — выбрать */
+/* герой на ступени: книга (hbCard, screens/book.js) парит над ступенью в свете редкости и Энериума, свет под ней дышит в такт (DN_VIEW.float);
+   ступень с ценой; в коллекции — отметка вместо цены. Нажатие на книгу — выбрать */
 function dnNiche(h, s, sel) {
   const own = rsHas(h), p = dnPrice(h);
   const price = own ? `<span class="dn-pr own">${ic('check')}есть</span>` : `<span class="dn-pr"><img src="${curImg('enerium')}" alt=""><b class="num">${fmt(p)}</b></span>`;
   return `<div class="dn-ni${h === sel ? ' sel' : ''}${own ? ' own' : ''}" style="--k:${h.place}">
-    ${hbCard(hcView(h), { z: 'm', act: 'dsel', val: h.id, sel: h === sel, own: true, bm: false })}
+    <span class="dn-fl" data-r="${h.r}">${hbCard(hcView(h), { z: 'm', act: 'dsel', val: h.id, sel: h === sel, own: true, bm: false, glint: true })}</span>
     <span class="dn-pd">${price}</span>
   </div>`;
 }
@@ -857,7 +988,7 @@ function dnView() {
   const hall = dnArt(DN_ART.hall);
   const tab = x => { const shut = x.cycle > cur; return `<button role="tab" class="dn-tab" aria-selected="${x === s}" data-a="dcyc" data-v="${x.cycle}" aria-label="${hrEsc(`Сет цикла ${ROMAN[x.cycle]} «${x.name}»${shut ? ', откроется при переходе' : ''}`)}" title="${hrEsc(`Цикл ${ROMAN[x.cycle]} · «${x.name}»`)}">${dnEmblem(x, 26)}${shut ? `<i class="dn-lk">${ic('lock')}</i>` : ''}</button>`; };
   const sub = open ? `Цикл ${ROMAN[s.cycle]} · в коллекции ${own} из ${hs.length}` : `Цикл ${ROMAN[s.cycle]} · откроется при переходе`;
-  const G = DN_VIEW, vars = `--s0:${G.step[0]}px;--s1:${G.step[1]}px;--g0:${G.grow[0]};--g1:${G.grow[1]}`;
+  const G = DN_VIEW, F = G.float, vars = `--s0:${G.step[0]}px;--s1:${G.step[1]}px;--g0:${G.grow[0]};--g1:${G.grow[1]};--f-ms:${F.ms}ms;--f-st:${F.step}ms;--f0:${F.lift[0]}px;--f1:${F.lift[1]}px;--gl-ms:${G.glint.ms}ms;--gl-st:${G.glint.step}ms`;
   const alt = open ? hs.map(h => dnNiche(h, s, sel)).join('') : `<p class="dn-shut">${ic('lock')}<span>Герои сета станут известны в цикле ${ROMAN[s.cycle]}</span></p>`;
   return `<div class="dn${hall ? ' art' : ''}" style="${vars}">
     ${hall ? `<img class="dn-hall" src="${AV(DN_ART.hall)}" alt="">` : '<i class="dn-arch" aria-hidden="true"></i>'}
@@ -936,7 +1067,7 @@ function hrSoulsSide() {
 
 /* ================== лавка праха: отдельное окно ==================
    Слова автора 29.09.2026: «магазин праха так же сделать можно отдельным окном». Витрина найденных героев пула рулетки доступных циклов
-   (§15.1): книга героя (неизвестная душа — с силуэтом класса), цена осколка (§15.3 × цикл героя) и полоса осколков; сверху — циклы,
+   (§15.1): книга героя (неизвестная душа — закрытая, с «?»), цена осколка (§15.3 × цикл героя) и полоса осколков; сверху — циклы,
    когда их больше одного. Справа —
    выбранный: осколки за прах — 1, 10 или до комплекта — и, когда комплект собран, пробуждение за души с подтверждением в том же окне.
    Героев Эхо здесь нет, и сказано почему. Решает SOUL_SRV: операция с номером, повтор ничего не списывает и не выдаёт */
@@ -954,7 +1085,7 @@ function duQty(h) {
   const left = Math.max(1, hrNeed() - (S.rs.shards[h.id] || 0)), q = S.du.q;
   return Math.min(left, q > 0 ? q : left);
 }
-/* книга витрины (hbCard, screens/book.js): редкость, ступень, имя, полоса осколков и цена осколка; неизвестная душа — силуэт класса */
+/* книга витрины (hbCard, screens/book.js): редкость, ступень, имя, полоса осколков и цена осколка; неизвестная душа — закрытая, с «?» */
 function duCard(h, sel) {
   const n = S.rs.shards[h.id] || 0, need = hrNeed(), p = rsShardPrice(h);
   const foot = `<span class="du-cp" title="Осколок — ${fmt(p)} праха"><img src="${curImg('dust')}" alt="">${fmt(p)}</span>`;
@@ -1019,8 +1150,8 @@ Object.assign(OV, {
   },
   /* отряд Эхо недели — окно-витрина (слова автора 30.09.2026: «с отрядом недели тоже нужно сделать красивое окно, всё-таки этих героев
      будут хотеть все»): за окном — арена цивилизации недели; цивилизация, нашествие и неприязнь; пятеро по циклам II–VI крупными
-     книгами — неизвестная душа с силуэтом и полосой осколков, собранный комплект и пробуждённый — в цвете, не найденный — безымянная
-     книга, будущий цикл — она же с замком.
+     книгами — неизвестная душа — закрытая книга с «?» и полосой осколков, собранный комплект и пробуждённый — в цвете, не найденный —
+     закрытая книга своей ступени с «?» без имени, будущий цикл — она же, на плашке — когда откроется.
      Внизу — откуда осколки (только сундуки Эхо за места недели, прахом нельзя) и выбранный герой с одним действием: «Пробудить» за души —
      подтверждение в том же окне, операция SOUL_SRV с номером */
   hrecho() {
@@ -1029,12 +1160,14 @@ Object.assign(OV, {
     const sel = squad.find(h => h.id === S.rs.ssel) || squad.find(h => open(h) && !rsHas(h) && has(h) >= need) || squad.find(h => open(h) && !rsHas(h)) || squad.find(open) || squad[0] || null;
     const to = squad.length ? squad[squad.length - 1].c : from, av = squad.find(h => h.avers && h.avers.race);
     const art = W ? hrEchoArt(W.race) : '';
-    /* книга героя недели: найденный — своей стадии (неизвестная душа — силуэт, комплект — в цвете, пробуждённый — с прогрессом);
-       не найденный — безымянная книга, герой будущего цикла — она же с замком (стадии знакомства, решение автора 30.09.2026) */
+    /* книга героя недели: найденный — своей стадии (неизвестная душа — закрытая книга с «?» и полосой осколков, комплект — в цвете,
+       пробуждённый — с прогрессом); не найденный — та же закрытая книга своей ступени с «?», без имени и редкости; герой будущего
+       цикла — она же, на плашке — когда откроется (стадии знакомства, решение автора 30.09.2026; слово автора того же дня: «это
+       всё-таки тоже книга, только со знаком вопроса») */
     const card = h => {
-      if (!open(h)) return hbBlank({ z: 'l', act: 'ssel', val: h.id, sel: h === sel, lock: true, say: `Герой цикла ${ROMAN[h.c]}: откроется с циклом` });
+      if (!open(h)) return hbBlank({ z: 'l', t: h.maxV, act: 'ssel', val: h.id, sel: h === sel, lock: true, when: `цикл ${ROMAN[h.c]}`, say: `Герой цикла ${ROMAN[h.c]}: откроется с циклом` });
       const v = hcView(h);
-      return v.st ? hcCatCard(v, { act: 'ssel', val: h.id, sel: h === sel, bm: false }) : hbBlank({ z: 'l', act: 'ssel', val: h.id, sel: h === sel, say: 'Неизвестная душа: первый осколок — в сундуках Эхо' });
+      return v.st ? hcCatCard(v, { act: 'ssel', val: h.id, sel: h === sel, bm: false }) : hbBlank({ z: 'l', t: h.maxV, act: 'ssel', val: h.id, sel: h === sel, say: 'Неизвестная душа: первый осколок — в сундуках Эхо' });
     };
     const wsel = `<select class="rs-sel team-only" data-a="sweek" aria-label="Неделя расы, демо">${RS.weeks.map(w => `<option value="${w.race}" ${w === W ? 'selected' : ''}>Неделя ${w.gen}</option>`).join('')}</select>`;
     const src = cur < from ? `${ic('lock')}<span>Эхо откроется с цикла ${ROMAN[from]}.</span>`
@@ -1069,7 +1202,7 @@ Object.assign(OV, {
     const kind = HC_FK[o.arg] ? o.arg : 'own', f = S.hf, keys = HC_FK[kind];
     const b = (k, val, lbl, ico) => { const on = f[k] === val; return `<button class="hkf-b${on ? ' on' : ''}" data-a="hcf" data-v="${k}:${val}" aria-pressed="${on}" title="${hrEsc(lbl)}">${ico}<span>${hrEsc(lbl)}</span></button>`; };
     const grp = (k, t, items) => keys.includes(k) ? `<div class="hkf-g"><span class="eyebrow">${t}</span><div class="hkf-r">${items.join('')}</div></div>` : '';
-    const n = kind === 'all' ? hcCatList().length : kind === 'gold' ? RS.heroes.filter(h => h.src === 'gold' && h.c === (S.rs.gcyc || rsCyc())).map(hcView).filter(v => v && hcPass(v, 'gold')).length : hcOwnList().length;
+    const n = kind === 'all' ? hcCatList().length : kind === 'gold' ? rsGoldLeft(S.rs.gcyc || rsCyc()).length : hcOwnList().length;
     const body = grp('cls', 'Класс', RS.classes.map(k => b('cls', k, cap1(k), CLS(k, 20, ''))))
       + grp('el', 'Стихия', (RS.schools || []).map(e => b('el', e, cap1(e), el(e, true))))
       + grp('r', 'Редкость', RAR.slice(1).map((t, i) => b('r', i + 1, t, `<i class="hkf-cr" data-r="${i + 1}" aria-hidden="true"></i>`)))
@@ -1325,14 +1458,16 @@ Object.assign(ACT, {
     if (i < 0) return toast('В отряде уже пятеро: нажмите, кого заменить');
     const r = SQ_SRV.put(op, id, i, hid);
     if (r.res && !r.again && r.res.swap == null && typeof lbRise === 'function') lbRise(i, hid, t);
-    S.sq.slot = -1; sqSay(r); render();
+    S.sq.slot = -1; S.sq.peek = null; sqSay(r); render();
   },
-  /* удержание корешка нижней полки или книги полки отряда — книга героя раскрывается поверх отрядов (слой — screens/book.js, hbLayer);
-     закрытие — к отрядам. Вид: отряд не меняется */
+  /* книга героя раскрывается поверх отрядов (слой — screens/book.js, hbLayer): «Книга героя» или мелкая книга в подсказке корешка —
+     книга выдвигается с нижней полки, полёт от корешка; удержание книги на полке отряда — от неё. Закрытие — к отрядам. Вид: отряд
+     не меняется */
   sqbook(v, t) {
     const h = H(v); if (!h) return;
-    S.route = 'heroes'; S.seg.heroes = 'squads'; S.overlay = null; S.sq.book = h.id; S.selHero = h.id;
-    if (typeof hbOpenFx === 'function') hbOpenFx(t, h.id);
+    const from = t && t.closest && t.closest('.sq-peek') ? sqSpineEl(h.id) : t;
+    S.route = 'heroes'; S.seg.heroes = 'squads'; S.overlay = null; S.sq.peek = null; S.sq.book = h.id; S.selHero = h.id;
+    if (typeof hbOpenFx === 'function') hbOpenFx(from, h.id);
     render();
   },
   sqrem(v) { const [op, id, i] = sqParse(v), r = SQ_SRV.take(op, id, +i); S.sq.slot = -1; sqSay(r); render(); },
@@ -1496,7 +1631,10 @@ document.addEventListener('input', e => { const t = e.target; if (t && t.id === 
 /* ушли из библиотеки не через «Назад» и не «Выбрать» — выбор для режима забыт: строка режима в библиотеке больше не висит; книга
    героя отряда закрыта */
 window.addEventListener('en-render', () => {
-  if (!S.sq || (S.route === 'heroes' && S.seg.heroes === 'squads')) return;
+  if (!S.sq) return;
+  if (S.route === 'heroes' && S.seg.heroes === 'squads' && !S.overlay) { if (S.sq.peek) sqPeekPlace(); return; }
+  if (S.sq.peek) S.sq.peek = null;
+  if (S.route === 'heroes' && S.seg.heroes === 'squads') return;
   if (S.sq.from) S.sq.from = null;
   if (S.sq.book) S.sq.book = '';
 });
@@ -1508,10 +1646,10 @@ document.addEventListener('keydown', e => {
 /* ================== состояние ==================
    S.sq: seq и ops — «сервер» библиотеки; sel — выбор режимов, у которых нет своего поля (оборона Арены, Лига, Клановый босс);
    slot — выбранное место в редакторе, round — раунд Лиги в листе, from — из какого режима пришли в библиотеку и куда вернуться,
-   name — черновик имени, book — чья книга раскрыта поверх отрядов (удержание корешка). Маршрут возврата листа — поле back его слоя (S.overlay.back): лист открыт поверх экрана режима */
+   name — черновик имени, book — чья книга раскрыта поверх отрядов, peek — подсказка корешка нижней полки: { id, pin } (удержание). Маршрут возврата листа — поле back его слоя (S.overlay.back): лист открыт поверх экрана режима */
 function sqState(s) {
   const D = SQ_DATA.demo;
-  s.sq = { seq: 1, ops: {}, sel: { arena: D.arena, league: D.league.slice(), clan: D.clan }, slot: -1, round: 0, from: null, name: null, book: '' };
+  s.sq = { seq: 1, ops: {}, sel: { arena: D.arena, league: D.league.slice(), clan: D.clan }, slot: -1, round: 0, from: null, name: null, book: '', peek: null };
   /* S.dn — «сервер» покупок за Энериум: seq — номер следующей, ops — итоги по номерам; got — окно получения: номер и время покупки */
   s.dn = { seq: 1, ops: {}, got: null };
   /* S.du — «сервер» лавки праха и пробуждения (SOUL_SRV): seq, ops; q — сколько брать (0 — до комплекта), cyc — цикл витрины (0 — все),
@@ -1533,7 +1671,7 @@ FLOWS.push(
     () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'own'; S.overlay = null; }],
   ['Книга героя', 'Нажатие на книгу: она летит в центр и раскрывается — слева портрет, справа развитие, снаряжение, навыки и путь; замки на переплёте, ленты снизу',
     () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.hgrid = 'own'; S.selHero = 'h2'; S.seg.hero = 'power'; S.overlay = null; }],
-  ['Каталог · найденные герои', 'Только найденные: неизвестная душа — силуэт и полоса осколков, известный — книга «до покупки»; не найденных не видно — только счётчик',
+  ['Каталог · найденные герои', 'Только найденные: неизвестная душа — закрытая книга своей ступени с «?» и полосой осколков, известный — книга «до покупки»; не найденных не видно — только счётчик',
     () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'all'; S.overlay = null; }],
   ['За золото · до покупки', 'Картотека цикла на полках того же шкафа, цена найма — латунной табличкой под книгой; нажатие — книга «до покупки»: портрет, редкость, класс, стихия, доблесть, навыки по доблести, история, цена и «Купить»',
     () => {
@@ -1547,9 +1685,14 @@ FLOWS.push(
       if (h) { S.rs.shards[h.id] = Math.max(S.rs.shards[h.id] || 0, hrNeed()); S.rs.ssel = h.id; S.wallet.souls = Math.max(S.wallet.souls, RS.rules.stub.activateSouls); }
       S.overlay = { t: 'hrecho' };
     }],
-  ['Отряды · библиотека', 'Шкаф отрядов: отряд — отсек с корешками и табличкой имени и мощи; справа — отряд на полке крупным планом, внизу — свободные герои корешками: нажатие — в отряд, удержание — книга',
+  ['Отряды · библиотека', 'Шкаф отрядов: отряд — отсек с корешками и табличкой имени и мощи; справа — отряд на полке крупным планом, внизу — свободные герои корешками с мощью: нажатие — в отряд, удержание — сведения',
     () => { S.route = 'heroes'; S.seg.heroes = 'squads'; S.selSquad = 's2'; S.sq.slot = -1; S.sq.book = ''; S.overlay = null; }],
-  ['Отряды · книга с нижней полки', 'Удержание корешка: книга выдвигается с полки корешком, разворачивается обложкой и раскрывается поверх отрядов; закрытие — к отрядам',
+  ['Отряды · сведения по удержанию', 'Удержание корешка — сведения над полкой, над пальцем: мелкая книга, имя, редкость, класс, стихия, мощь, уровень, доблесть, пределы и «Книга героя»; отпустил — закрылась',
+    () => {
+      S.route = 'heroes'; S.seg.heroes = 'squads'; S.selSquad = 's2'; S.sq.slot = -1; S.sq.book = ''; S.overlay = null;
+      const s = sq('s2'), h = hrMine().filter(x => !s.m.includes(x.id)).sort((a, b) => b.bm - a.bm)[1]; if (h) sqPeekSet(h.id, true);
+    }],
+  ['Отряды · книга с нижней полки', '«Книга героя» в сведениях корешка: книга выдвигается с полки корешком, разворачивается обложкой и раскрывается поверх отрядов; закрытие — к отрядам',
     () => {
       S.route = 'heroes'; S.seg.heroes = 'squads'; S.selSquad = 's2'; S.sq.slot = -1; S.overlay = null;
       const s = sq('s2'), h = hrMine().filter(x => !s.m.includes(x.id)).sort((a, b) => b.bm - a.bm)[0]; if (!h) return;
@@ -1602,7 +1745,7 @@ KIT_EXTRA.push({
     return `<section class="k-box" style="grid-column:1/-1"><h3>Отряды и мелкая книга</h3>
       <div class="k-demo" style="display:grid;grid-template-columns:repeat(4,minmax(0,84px));gap:10px">${tiles}</div>
       <p class="k-note">В листе выбора отряда, витринах Арены и профилях — та же книга, мелкая: только главное — кристалл редкости, ступень книги (максимум доблести), замки рунных пределов, ленты взятой доблести и уровень. Имя, класс и мощь — по нажатию и в раскрытой книге; у витрин (пятёрка сильнейших, оборона) — мощь под книгой. Занятость — поверх портрета.</p>
-      <p class="k-note">Сами отряды — шкаф (раздел «Библиотека Этриона»): слева отряд — отсек с пятью корешками и табличкой имени и мощи, справа — выбранный отряд на полке крупным планом (книги размера m), внизу — свободные герои корешками: нажатие — книга встаёт в выбранное место или в первое пустое, удержание — книга раскрывается.</p>
+      <p class="k-note">Сами отряды — шкаф (раздел «Библиотека Этриона»): слева отряд — отсек с пятью корешками и табличкой имени и мощи, справа — выбранный отряд на полке крупным планом (книги размера m), внизу — свободные герои корешками, на корешке — мощь: нажатие — книга встаёт в выбранное место или в первое пустое, удержание — сведения над полкой (имя, редкость, класс, стихия, мощь, уровень, доблесть, пределы) и «Книга героя».</p>
       <div class="k-row">${pres}</div>
       <p class="k-note">Библиотека «Отряды» (§2.1): до ${SQ_DATA.max} пресетов с именами, в каждом до ${SQ_DATA.size} героев; пресет героев не занимает. Создать, переименовать, удалить, собрать и переставить — операции с номером: повтор ничего не меняет. Один лист выбора на все режимы — <code>OV.prep</code>, у каждого режима свой выбор:</p>
       <table class="rk-tab"><tr><th>Режим</th><th>Героев</th><th>Занятые</th><th>Где выбор</th></tr>${rows}</table>

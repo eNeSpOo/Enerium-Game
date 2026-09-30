@@ -11,7 +11,9 @@
       на какой ступени заканчивает сезон занятый.
    3. Награды двух рядов: валюта растёт с уровнем Странника (§16), сундук странника — с циклом. Правило ×1,7 для платного ряда —
       по каждому виду награды: (бесплатный + платный) / бесплатный, с содержимым сундуков по ожиданию лутбоксов (ev). Доля ряда
-      в доходе обычного за сезон. Энериум: возврат цены, Энериум бесплатного ряда и листа даров против Энериума контрактов.
+      в доходе обычного за сезон. Энериум: Энериум обоих рядов и листа даров против Энериума контрактов. Платный ряд продаётся за деньги
+      (слово автора 30.09.2026: «Боевой пропуск делать за деньги, это основная подписочная система»): цена и её законы — витрина
+      Лавки Энериума, tools/content-gen/store/build.js.
    4. Лист даров: 30 отметок, вехи 7 / 14 / 20 / 30, главный дар — двадцатая; ценность листа по циклам.
    5. Арт: задания tools/art-gen/jobs/pass.json, выбранные картинки в art/generated/, траты — манифест, выгружено ли в прототип.
 
@@ -65,10 +67,12 @@ const RULES = {
   level: { perLevelBp: 1000 },            // §16: Награда = База × (1 + Уровень × 0,1)
   chestBox: 'wander',                     // сундук странника — общий: ресурсы и прах (лутбоксы, «Категория — у своего источника»)
   chestBase: [0, 1, 2, 3, 4, 5, 6],       // редкость сундука по циклу аккаунта: цикл I — обычный … цикл VI — первородный (как у календаря лутбоксов)
-  price: 600,                             // Энериума за платный ряд сезона: прогресс не продаётся, продаётся только второй ряд наград
+  /* платный ряд — за деньги, товар Лавки Энериума (tools/content-gen/store/build.js, PASS): прогресс не продаётся, продаётся только
+     второй ряд наград (§32). Слово автора 30.09.2026: «Я Думаю нужно Боевой пропуск делать за деньги, это основная подписочная система» */
+  sku: 'pass',
   frame: 'pass',                          // последняя ступень бесплатного ряда — рамка облика «Осенний путь» (screens/wanderer.js)
   /* что может дать клетка: ни душ, ни рун, ни героев, ни снаряжения. Рунных ключей нет — слово автора 30.09.2026 (ADR-0033): ключи падают
-     только с боссов биома, у донатного сета ключников, в сундуках с малым шансом и за контракты; платный ряд за Энериум продавал бы их */
+     только с боссов биома, у донатного сета ключников, в сундуках с малым шансом и за контракты; за деньги — только в стартовых наборах */
   kinds: ['gold', 'spirit', 'dust', 'enerium', 'chest', 'frame'],
 };
 
@@ -94,19 +98,20 @@ const FREE = [
   [G(1600)], [EN(25)], [EN(30)], [DU(25)], [FR(RULES.frame), CH(2, 'step')],
 ];
 /* Платный ряд — «ещё немного того же»: валюты — 60 % бесплатного ряда по каждому виду, разложены на шесть ступеней;
-   три сундука на вехах 10, 20 и 30 — как на 10-й ступени бесплатного ряда, без чистого окна; Энериум — возврат части цены.
+   три сундука на вехах 10, 20 и 30 — как на 10-й ступени бесплатного ряда, без чистого окна; Энериум — награда ряда.
    Венец сезона — сундук на две ступени выше и рамка — только у бесплатного ряда: сундук платного ряда той же редкости дал бы
    по ресурсам сундуков больше ×1,7 (цикл IV). Облика в платном ряду нет: облик не продаётся (ADR-0030, п. 20). Героев и осколков
-   героев нет: это не донатный сет. Клетки рунных ключей (ADR-0033: ключи не продаются, а ряд покупают за Энериум) — теперь Энериум
-   по 10; три прежние клетки по 40 стали по 20: возврат остался 200 — треть цены. Бесплатному игроку ряд стоит 400 за сезон — около
-   половины его ручейка за 4 недели: брать ряд каждый сезон — выбор, а не подарок. Больше возврат — и ряд стал бы почти бесплатным */
+   героев нет: это не донатный сет. Рунных ключей и душ нет: за деньги они только в стартовых наборах (ADR-0034). Ряд продаётся
+   за деньги — Энериум в нём больше не возврат цены, а награда: 900 за сезон, шесть клеток по 50, три по 100 и 300 на последней
+   ступени. Это около базового курса цены ряда в Лавке Энериума: ряд окупает себя Энериумом, валюта и сундуки — сверху. Закон курса —
+   tools/content-gen/store/build.js (LAWS.passEn) */
 const PAID = [
-  [SP(1920)], [G(960)], [DU(15)], [EN(10)], [EN(20)],
-  [SP(1920)], [G(960)], [DU(15)], [EN(10)], [CH(1, 'step')],
-  [SP(1920)], [G(960)], [DU(15)], [EN(10)], [EN(20)],
-  [SP(1920)], [G(960)], [DU(15)], [EN(10)], [CH(1, 'step')],
-  [SP(1920)], [G(960)], [DU(15)], [EN(10)], [EN(20)],
-  [SP(1920)], [G(960)], [DU(15)], [EN(10)], [CH(1, 'step'), EN(80)],
+  [SP(1920)], [G(960)], [DU(15)], [EN(50)], [EN(100)],
+  [SP(1920)], [G(960)], [DU(15)], [EN(50)], [CH(1, 'step')],
+  [SP(1920)], [G(960)], [DU(15)], [EN(50)], [EN(100)],
+  [SP(1920)], [G(960)], [DU(15)], [EN(50)], [CH(1, 'step')],
+  [SP(1920)], [G(960)], [DU(15)], [EN(50)], [EN(100)],
+  [SP(1920)], [G(960)], [DU(15)], [EN(50)], [CH(1, 'step'), EN(300)],
 ];
 
 /* Лист даров (§29): 30 отметок, одна — в серверные сутки за вход в игру. Лист не сгорает: пропущенный день ничего не отнимает,
@@ -132,21 +137,8 @@ const CAL = {
   forgive: 'all', // пропуск не сбрасывает лист: §29 просит прощать часть пропусков — прощаем все (предложение автору)
 };
 
-/* Витрина «Лавки Энериума», вкладка «Энериум» (§32, «Запретный магазин»). Рубли — вид витрины прототипа: платёж проводит платформа,
-   выдачу решает сервер операцией с номером. Облик не продаётся (ADR-0030, п. 20).
-   Стартовый набор — слово автора 30.09.2026 (ADR-0033): «Рунные ключи и Души будут продаваться в донатном магазине как стартовый набор
-   с х2 лутом за первую покупку но всего лишь 1 раз за игру». Больше рунные ключи и души не продаются нигде: ни за рубли, ни за Энериум.
-   Сервер помнит покупку: раз за игру — второй покупки нет, повтор номера ничего не выдаёт. Раз покупка одна, она всегда первая — ×2.
-   Числа — сколько ключей и душ в наборе до удвоения. Состав не растёт с циклом: набор — «стартовый», его ждут в начале.
-   Пакеты Энериума и подписка — прежние числа витрины index.html; первая покупка пакета ×2 — у каждого пакета своя, один раз */
-const STORE = {
-  starter: { id: 'starter', n: 'Стартовый набор', rub: 149, once: true, x: 2, keys: 20, souls: 500 },
-  packs: [
-    { id: 'small', n: 'Горсть Энериума', en: 400, rub: 199, firstX: 2 },
-    { id: 'big', n: 'Запас Энериума', en: 1600, rub: 699, firstX: 2 },
-  ],
-  sub: { id: 'sub', n: 'Ежедневная выдача', en: 30, days: 30, rub: 299 },
-};
+/* Витрина Лавки Энериума — стартовые наборы, наборы Энериума, выдача, цена платного ряда, предложения, реклама — своим сборщиком:
+   tools/content-gen/store/build.js (design/ui/store.js, docs/content/монетизация.md). Пропуск знает только товар ряда — RULES.sku */
 
 /* Допущения прогона — ручки */
 const SIM = {
@@ -172,12 +164,9 @@ const LAWS = {
   pace17: 170,                 // плательщик проходит путь не быстрее ×1,7 обычного
   incomeBp: 500,               // бесплатный ряд — не больше 5 % золота и духа обычного за сезон
   /* прежний закон «Энериум бесплатного ряда и листа даров — не больше контрактов обычного» снят: по слову автора 30.09.2026 (ADR-0033)
-     бесплатный игрок копит Энериум понемногу — объём ручейка и сроки целей проверяет tools/content-gen/economy/enerium.js */
-  refundBp: 5000,              // возврат цены платным рядом — не больше половины цены
+     бесплатный игрок копит Энериум понемногу — объём ручейка и сроки целей проверяет tools/content-gen/economy/enerium.js.
+     Прежние законы возврата цены и стартового набора ушли в витрину: ряд продаётся за деньги — tools/content-gen/store/build.js */
   calMain: 20,                 // §29: главный приз — на двадцатый день
-  /* стартовый набор (ADR-0033): с удвоением — не больше starterDays дней дохода обычного цикла II по ключам (прогон контрактов, все
-     источники) и по душам (ёмкость дня): разовый толчок, а не обход ×1,7 — за 14 дней цикла II это не больше ×1,15 */
-  starterDays: 2,
 };
 
 /* Демо-аккаунт прототипа — один календарь (ADR-0031, п. 17): 11-й день цикла II, четвёртый день второй недели, 16:48. Сезон начался
@@ -224,24 +213,12 @@ function build() {
   /* --- данные «сервера»: таблица дел Событий как есть --- */
   const D = {
     bp: BP, open: RULES.open, season: RULES.season, tiers: RULES.tiers, tierPts: RULES.tierPts, dayCap: RULES.dayCap, rate: RULES.rate,
-    level: RULES.level, chestBox: RULES.chestBox, chestBase: RULES.chestBase, price: RULES.price, frame: RULES.frame,
+    level: RULES.level, chestBox: RULES.chestBox, chestBase: RULES.chestBase, sku: RULES.sku, frame: RULES.frame,
     units: Object.fromEntries(Object.entries(EV.units).map(([k, U]) => [k, Object.assign({ n: U.n, src: U.src, price: U.price }, U.gate ? { gate: U.gate } : {})])),
     caps: EV.caps, sources: EV.sources.map(s => ({ id: s.id, n: s.n, go: s.go, p: s.p, what: s.what })),
     rows: { free: FREE, paid: PAID },
     cal: CAL,
-    store: STORE,
   };
-
-  /* --- витрина: стартовый набор раз за игру с ×2 (ADR-0033), пакеты и подписка — целые и больше нуля --- */
-  {
-    const T = STORE.starter;
-    if (!T || T.once !== true || T.x !== 2) err.push('стартовый набор: раз за игру и ×2 за первую покупку — слово автора (ADR-0033)');
-    for (const [k, v] of Object.entries({ keys: T.keys, souls: T.souls, rub: T.rub, x: T.x })) if (!Number.isInteger(v) || v <= 0) err.push(`стартовый набор: ${k} — ${v}`);
-    const keysDay = CT.econ[2] ? Math.floor(CT.econ[2].o.keys / 7) : 0, soulsDay = CAP.cycles[2] ? Math.floor(CAP.cycles[2].o.souls / 100) : 0;
-    if (T.keys * T.x > keysDay * LAWS.starterDays) err.push(`стартовый набор: ${T.keys * T.x} рунных ключей — больше ${LAWS.starterDays} дней ключей обычного цикла II (${keysDay} в день)`);
-    if (T.souls * T.x > soulsDay * LAWS.starterDays) err.push(`стартовый набор: ${T.souls * T.x} душ — больше ${LAWS.starterDays} дней душ обычного цикла II (${soulsDay} в день)`);
-    for (const p of STORE.packs.concat([STORE.sub])) for (const v of [p.en, p.rub, p.firstX || 1, p.days || 1]) if (!Number.isInteger(v) || v <= 0) err.push(`витрина: ${p.n} — ${v}`);
-  }
 
   /* --- законы данных: клетки --- */
   const kinds = new Set(RULES.kinds);
@@ -357,9 +334,8 @@ function build() {
       else if (r > LAWS.paidMax) err.push(`цикл ${ROMAN[c]}, уровень ${level}: «${cat}» с платным рядом — ×${dec(r, 100, 2)}, больше ×${dec(LAWS.paidMax, 100, 2)} (ADR-0030, п. 22б)`);
     }
   }
-  const refund = rowValue('paid', 2, 10).enerium, freeEn = rowValue('free', 2, 10).enerium;
-  if (refund * BP > RULES.price * LAWS.refundBp) err.push(`платный ряд возвращает ${fmt(refund)} Энериума — больше половины цены ${fmt(RULES.price)}`);
-  if (refund >= RULES.price) err.push('платный ряд окупает себя Энериумом');
+  const paidEn = rowValue('paid', 2, 10).enerium, freeEn = rowValue('free', 2, 10).enerium;
+  if (D.rows.paid.concat(D.rows.free).some(c => c.some(x => x.k === 'souls' || x.k === 'keys'))) err.push('ряды пропуска: рунные ключи или души — за деньги они только в стартовых наборах');
 
   /* --- доля в доходе обычного за сезон: золото и дух дня (capacity.json) × дни игры --- */
   const income = {};
@@ -376,7 +352,7 @@ function build() {
   const calEn = CAL.list.reduce((a, c) => a + enOf(c), 0);
   const calEn28 = Math.floor(calEn * RULES.season.days / CAL.marks);
   const ctEn28 = CT.econ[2].o.en * RULES.season.weeks;
-  const en = { price: RULES.price, refund, freeEn, calEn, calEn28, ctEn28, ctEn28e: CT.econ[2].e.en * RULES.season.weeks, payerNet: freeEn + refund - RULES.price, donat: RS.rules.stub.donatPrice };
+  const en = { paidEn, freeEn, calEn, calEn28, ctEn28, ctEn28e: CT.econ[2].e.en * RULES.season.weeks, payer: freeEn + paidEn, donat: RS.rules.stub.donatPrice };
 
   /* --- лист даров: ценность по циклам на уровне середины цикла --- */
   function calValue(c, level) {
@@ -438,7 +414,7 @@ function build() {
       pace: Object.fromEntries(cycles.map(c => [c, pace[c]])),
       x17: Object.fromEntries(cycles.map(c => [c, Object.fromEntries(SIM.lvl[c].map(l => [l, x17[`${c}:${l}`].r]))])),
       income: Object.fromEntries(cycles.map(c => [c, { gBp: income[c].gBp, sBp: income[c].sBp, level: income[c].mid }])),
-      en: { price: en.price, refund: en.refund, free: en.freeEn, cal: en.calEn, cal28: en.calEn28, contracts28: en.ctEn28, payerNet: en.payerNet },
+      en: { paid: en.paidEn, free: en.freeEn, cal: en.calEn, cal28: en.calEn28, contracts28: en.ctEn28, payer: en.payer },
       lvl: SIM.lvl,
     },
   });
@@ -464,7 +440,7 @@ function build() {
   T.push(cells(['Ступеней', `${RULES.tiers}, по ${RULES.tierPts} очков — всего ${fmt(RULES.tiers * RULES.tierPts)}`]));
   T.push(cells(['Очки', `дела по таблице цен Событий без акцента недели; ${RULES.rate} очков дел — 1 очко пропуска; дневные потолки единиц — как у Событий`]));
   T.push(cells(['Потолок сезона', `копится: к дню d — не больше d × ${RULES.dayCap}; пройти ряд быстрее ${Math.ceil(RULES.tiers * RULES.tierPts / RULES.dayCap)} дней нельзя`]));
-  T.push(cells(['Платный ряд', `${fmt(RULES.price)} Энериума за сезон; возвращает ${fmt(refund)} Энериума по пути; купить можно в любой день — награды взятых ступеней сразу ждут «Забрать»`]));
+  T.push(cells(['Платный ряд', `за деньги — товар Лавки Энериума, цена — docs/content/монетизация.md; Энериума в ряду — ${fmt(paidEn)}; купить можно в любой день — награды взятых ступеней сразу ждут «Забрать»`]));
   T.push(cells(['Рост наград', `валюта — × (1 + уровень × ${dec(RULES.level.perLevelBp, BP, 1)}) по §16; сундук — редкость по циклу; Энериум — без роста`]));
   TBL.season = T.join('\n');
 
@@ -503,27 +479,15 @@ function build() {
 
   // Энериум
   T = head(['Что', 'Энериум']);
-  T.push(cells(['Цена платного ряда за сезон', fmt(en.price)]));
-  T.push(cells(['Возврат по пути в платном ряду', `${fmt(en.refund)} — ${pct(en.refund, en.price)} цены`]));
-  T.push(cells(['Итог плательщика за сезон, с бесплатным рядом', (en.payerNet < 0 ? '−' : '') + fmt(Math.abs(en.payerNet))]));
+  T.push(cells(['Цена платного ряда за сезон', 'за деньги, не за Энериум — docs/content/монетизация.md']));
+  T.push(cells(['Платный ряд за сезон', fmt(en.paidEn)]));
+  T.push(cells(['Плательщик за сезон — оба ряда', fmt(en.payer)]));
   T.push(cells(['Бесплатный ряд за сезон', fmt(en.freeEn)]));
   T.push(cells(['Лист даров: за 30 отметок / за 28 дней', `${fmt(en.calEn)} / ${fmt(en.calEn28)}`]));
   T.push(cells(['Контракты обычного / увлечённого за 4 недели, цикл II', `${fmt(en.ctEn28)} / ${fmt(en.ctEn28e)}`]));
   T.push(cells(['Бесплатный ряд и лист даров за 4 недели — ручеёк бесплатного игрока (ADR-0033)', `${fmt(en.freeEn + en.calEn28)}; весь Энериум обычного и сроки целей — docs/content/экономика-энериум.md`]));
   T.push(cells(['Донатные герои цикла — для сравнения', en.donat.map(fmt).join(' / ')]));
   TBL.energium = T.join('\n');
-
-  // витрина «Лавки Энериума»: стартовый набор, пакеты, подписка
-  {
-    const ST = STORE.starter, keysDay = Math.floor(CT.econ[2].o.keys / 7), soulsDay = Math.floor(CAP.cycles[2].o.souls / 100);
-    const days = (n, per) => dec(n * 10, per * 10, 1);
-    T = head(['Товар', 'Что даёт', 'Первая покупка', 'Сколько раз', 'Цена']);
-    T.push(cells([ST.n, `рунные ключи ${fmt(ST.keys)}, души ${fmt(ST.souls)}`, `×${ST.x}: ключи ${fmt(ST.keys * ST.x)}, души ${fmt(ST.souls * ST.x)}`, 'раз за игру — сервер помнит покупку', `${fmt(ST.rub)} ₽`]));
-    for (const p of STORE.packs) T.push(cells([p.n, `Энериум ${fmt(p.en)}`, `×${p.firstX}: ${fmt(p.en * p.firstX)}`, 'без ограничения', `${fmt(p.rub)} ₽`]));
-    T.push(cells([STORE.sub.n, `Энериум ${fmt(STORE.sub.en)} в день, ${STORE.sub.days} дней — ${fmt(STORE.sub.en * STORE.sub.days)}`, '—', 'без ограничения', `${fmt(STORE.sub.rub)} ₽ за ${STORE.sub.days} дней`]));
-    T.push(cells(['Стартовый набор против дохода обычного, цикл II', `дней дохода: ключи — ${days(ST.keys * ST.x, keysDay)} (${keysDay} в день), души — ${days(ST.souls * ST.x, soulsDay)} (${fmt(soulsDay)} в день)`, `не больше ${LAWS.starterDays} дней`, '', '']));
-    TBL.store = T.join('\n');
-  }
 
   // лист даров
   T = head(['Отметка', 'Награда', 'Цикл I, уровень 5', 'Цикл II, уровень 24', 'Цикл VI, уровень 85']);
@@ -567,8 +531,8 @@ function render(data) {
    (event.js), сундуков (lootboxes.js), Энериума контрактов (contracts.js) и ёмкости дня (capacity.json). Руками не править: пересборка
    затрёт правку. Черновик · предложение · ждёт автора. Числа — демонстрация, только целые; доли — в базисных пунктах (10 000 = 100 %).
    season — сезон, tiers и tierPts — ступени, dayCap — потолок, копится по дням; rate — очков дел на очко пропуска; units и caps — таблица
-   дел и дневные потолки Событий как есть; rows.free и rows.paid — клетки двух рядов; price — цена платного ряда; cal — лист даров;
-   store — витрина «Лавки Энериума»: стартовый набор раз за игру с ×2, пакеты и подписка;
+   дел и дневные потолки Событий как есть; rows.free и rows.paid — клетки двух рядов; sku — товар платного ряда в Лавке Энериума
+   (цена — design/ui/store.js, EN_STORE); cal — лист даров;
    art — пути картинок и выгруженные (ready); demo — демо-аккаунт; econ — итоги прогона. Обоснование — docs/content/пропуск-и-награды.md.
    В игре очки, ступени и выдачу решает сервер (§32, §36.16). Ниже данных — алгоритм tools/content-gen/pass/rules.js как есть. */\n`;
   return head + 'window.EN_PASS = ' + JSON.stringify(data) + ';\n' + rules;
@@ -584,7 +548,7 @@ function withTables(doc, tables) {
   return doc;
 }
 
-module.exports = { build, render, withTables, markA, markB, FILES, RULES, FREE, PAID, CAL, STORE, SIM, LAWS, DEMO, ART };
+module.exports = { build, render, withTables, markA, markB, FILES, RULES, FREE, PAID, CAL, SIM, LAWS, DEMO, ART };
 
 if (require.main === module) {
   const R = build();

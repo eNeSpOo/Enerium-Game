@@ -49,6 +49,13 @@ const ECH = {
     'Нежить': { arena: 'arena-echo-tanehem.jpg', faces: 'echo/tn-' },
     'Забытые': { arena: 'arena-echo-nameless.jpg', faces: 'echo/nm-' },
   },
+  /* портреты врагов крафта Этриона (tools/art-gen/jobs/craft-bosses.json, выгрузка ui-art.json): id крафтового босса → портрет в
+     assets/art. Пробуждённый без своего портрета показывает портрет своего босса («тот же босс целиком»); эхо боссов биомов 1–4 —
+     портреты самих боссов биомов; Лик недели — лицо врага недели, которое он носит. Кого здесь нет — заглушка с инициалами */
+  craftArt: {
+    fc1: 'foes/fc1.jpg', fb2: 'foes/fb2.jpg', fb17: 'foes/fb17.jpg', fb9: 'foes/fb9.jpg', fb15: 'foes/fb15.jpg',   // пробная пятёрка, 01.10.2026
+    bm1: 'foes/b1.jpg', bm2: 'foes/b2b1.jpg', bm3: 'foes/b3b1.jpg', bm4: 'foes/b4b1.jpg',
+  },
   /* бой Эхо (ADR-0025) — демо, пока не подключены echo-rules.js и echo-foes.js. Характеристики карты — как у образца Мастерской
      того же класса (EB.FOES: рядовой — у рядовых, остальные — у элит); здоровье главного врага — шкала hp выше, защитники — по своему hpPct */
   fight: {
@@ -349,7 +356,7 @@ const kn = fid => knownIn(S, fid);
 const hpPct = x => Math.floor(x.hp * 100 / x.max);
 const specOf = id => id && RX.specs[id] ? RX.specs[id].n.toLowerCase() : '';
 const hideIt = it => !!it.team && S.acc.cycle < TEAM_CYC;
-const itIcon = (it, size, hide) => `<span class="well ech-it" data-r="${it.r}" style="--s:${size}px">${hide ? (typeof resHideIco === 'function' ? resHideIco(size) : ic('lock')) : trIcon(it)}</span>`;
+const itIcon = (it, size, hide) => `<span class="well ech-it" data-r="${it.r}"${typeof crK === 'function' ? crK(it) : ''} style="--s:${size}px">${hide ? (typeof resHideIco === 'function' ? resHideIco(size) : ic('lock')) : trIcon(it)}</span>`;
 const boxName = (box, r) => `${LBX.boxes[box].n} · ${LBX.boxRarity[r - 1]}`;
 const freeCount = () => S.echo.slots.filter((x, i) => !x && !S.ech.pending[i]).length;
 const freeSlot = () => S.echo.slots.findIndex((x, i) => !x && !S.ech.pending[i]);
@@ -385,7 +392,13 @@ const rankIc = g => g === 'e' ? ic('gem') : g === 'm' ? ic('users') : g === 'o' 
 const rankOf = f => f.g === 'craft' ? `${ECH.rank.craft} · цикл ${ROMAN[f.cyc]}${f.fb && f.fb.powerCycleStep ? ` · сила цикла ${ROMAN[f.cyc + f.fb.powerCycleStep] || f.cyc + f.fb.powerCycleStep}` : ''}` : `${ECH.rank[f.g]} · ступень ${f.step}`;
 /* арт недели (ADR-0025): портреты ступеней 1–15 и фон арены; нет арта — заглушка */
 const artOf = race => ECH.art[race] || null;
-const faceArt = f => { const A = artOf(f.race), st = f.fid === 'many' ? MANY : f.step; return A && f.g !== 'craft' && st >= 1 && st <= MANY ? AV(A.faces + String(st).padStart(2, '0') + '.jpg') : ''; };
+/* враг крафта: свой портрет, пробуждённый — портрет своего босса, Лик недели — лицо врага недели, которое он носит */
+const craftArt = f => {
+  if (f.fid === 'lik') return f.face ? faceArt(f.face) : '';
+  const C = ECH.craftArt || {}, p = C[f.fid] || C[String(f.fid).replace(/_aw$/, '')];
+  return p ? AV(p) : '';
+};
+const faceArt = f => { if (f.g === 'craft') return craftArt(f); const A = artOf(f.race), st = f.fid === 'many' ? MANY : f.step; return A && st >= 1 && st <= MANY ? AV(A.faces + String(st).padStart(2, '0') + '.jpg') : ''; };
 const arenaOf = race => artOf(race) ? AV(artOf(race).arena) : null;
 /* облик врага: портрет недели или заглушка — свет стихии снизу, рамка по рангу; до первой победы — знак вопроса, портрет в тумане */
 const ph = (f, cls = '') => {
@@ -848,7 +861,7 @@ function lootHtml(x) {
   if (x.k === 'item') { const it = BAG.item(x.id); return li(itIcon(it, 30), it.n, `<b class="num">×${fmt(x.n)}</b>`); }
   if (x.k === 'cur') return li(money(x.id, x.n), CUR[x.id].n, x.stub ? '<span class="chip warn team-only">заглушка</span>' : '');
   if (x.k === 'rune') return x.hit ? li(money('keys', x.n), CUR.keys.n) : TM(`Рунный ключ: шанс ${pctBp(x.bp)} — не выпал`, 'div', 'ech-li faint');
-  if (x.k === 'chest') return li(`<span class="well ech-it" data-r="${x.spec.r}" style="--s:30px"><img src="${CHEST}" alt=""></span>`, boxName(x.spec.box, x.spec.r));
+  if (x.k === 'chest') return li(`<span class="well itf ech-it" data-r="${x.spec.r}" style="--s:30px">${chestPic(x.spec.box, x.spec.r)}</span>`, boxName(x.spec.box, x.spec.r));
   if (x.k === 'shards') { const h = RSI[x.id], g = !x.dust && typeof shardGhost === 'function' ? shardGhost(h, S.rs.shards[h.id] || 0, RS.rules.stub.shards, 34) : ''; return li(g || `<span class="rs-av" data-r="${h.r}">${rsFace(h)}</span>`, h.n, `<b class="num">осколки ×${fmt(x.n)}</b>${x.dust ? `<small class="faint">в прах +${fmt(x.dust)}</small>` : ''}`); }
   return '<p class="faint">Осколков нет: героев недели к этому циклу не открыто.</p>';
 }
@@ -1170,7 +1183,7 @@ Object.assign(OV, {
     const W = weekOf(S), list = STEPS.map((g, j) => stepFoe(fidOf(W.race, j + 1))).concat(foe('many')), crafts = RX.drops.craftBosses.filter(b => kn(b.id)), nk = list.filter(f => kn(f.fid)).length;
     const body = `<span class="eyebrow">${W.civ} · изучено ${nk} из ${list.length}</span>
       <div class="ech-bgrid">${list.map(f => `<button class="ech-fig" data-a="echfoe" data-v="${f.fid}" title="${f.named || kn(f.fid) ? f.n : 'Не изучен'} · ступень ${f.step}">${ph(f)}<small>${f.step}</small></button>`).join('')}</div>
-      ${crafts.length ? `<span class="eyebrow">Крафтовые боссы</span>${crafts.map(b => `<button class="mail ech-brow" data-a="echfoe" data-v="${b.id}"><span class="col" style="gap:2px;min-width:0"><b>${b.name}</b><small class="faint">цикл ${ROMAN[b.cyc]}${b.spec ? ' · ' + specOf(b.spec) : ''}</small></span>${ic('chev')}</button>`).join('')}` : ''}
+      ${crafts.length ? `<span class="eyebrow">Крафтовые боссы</span>${crafts.map(b => `<button class="mail ech-brow" data-a="echfoe" data-v="${b.id}">${ph(foe(b.id), 'sm')}<span class="col" style="gap:2px;min-width:0"><b>${b.name}</b><small class="faint">цикл ${ROMAN[b.cyc]}${b.spec ? ' · ' + specOf(b.spec) : ''}</small></span>${ic('chev')}</button>`).join('')}` : ''}
       <p class="reason">Запись открывает первая победа. Бестиарий не сбрасывается с неделей.</p>`;
     return sheet('Бестиарий недели', body);
   },
@@ -1343,7 +1356,7 @@ FLOWS.push(['Эхо · босс на час', 'Боссы, Убер и краф�
 }]);
 
 /* для автопроверки tools/content-gen/screens/check_echo.js и консоли */
-window.EN_ECHO = { data: ECH, steps: STEPS, foe, stepFoe, fidOf, sync, draw, checks, planks: () => planks(weekOf(S), S.acc.cycle), bio: () => ({ cap: bioCap(), used: bioUsed() }), target: (kind, x, o) => target(S, kind, x, o),
+window.EN_ECHO = { data: ECH, steps: STEPS, foe, stepFoe, faceArt, fidOf, sync, draw, checks, planks: () => planks(weekOf(S), S.acc.cycle), bio: () => ({ cap: bioCap(), used: bioUsed() }), target: (kind, x, o) => target(S, kind, x, o),
   cost: x => atkCost(x), pts: ptsOf, floorPts, rounds: roundsOf, lvl: lvlOf, hp: hpOf, fight: (x, ids, no) => fightOf(x, ids, no || x.atk + 1), kit: demoKit,
   manyFree, face: faceArt, arena: arenaOf, manyBp, likShards, est: estOf, ghost, short: x => shortLife(x) };
 })();

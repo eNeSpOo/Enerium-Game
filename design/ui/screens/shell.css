@@ -1,0 +1,78 @@
+/* screens/shell.css — оболочка игры: кованые кромки шапки и шахты, узел на их стыке, гнёзда картинок разделов, кованый кошелёк,
+   колокол-медальон, ромб выбранной вкладки (screens/shell.js). Слово автора 30.09.2026: «…добавь
+   декоративные элементы в интерфейс общий».
+   Только украшения: фоны, тени, псевдоэлементы и position: relative без сдвига. Размеры, отступы, шрифты и шаг шахты — прежние
+   (index.html; их считает check_shell.js), экраны читаются, как раньше. Подключается последним: у правил оболочки тот же вес,
+   что в index.html, — последнее слово за этим файлом.
+   Арт — переменные <html> из SHL_ART (--shl-edge, --shl-knot, --shl-frame…) и флаги shla-*; без арта — CSS или ничего.
+   Движение — только transform и opacity; «меньше движения» — как везде. */
+
+/* ---------- числа вида: пара [932 × 430, 844 × 390] ---------- */
+.g{--shl-e:var(--shl-edge0,9px);--shl-k:var(--shl-knot0,26px)}
+.g.sm{--shl-e:var(--shl-edge1,8px);--shl-k:var(--shl-knot1,24px)}
+
+/* ---------- шапка: кованое железо, светлая нить сверху, кромка снизу ---------- */
+.g-top{--shl-ti:none;background:linear-gradient(180deg,rgba(22,26,31,.62),rgba(7,9,11,.9)),var(--shl-ti) 0 0/var(--shl-iron-s,240px) auto,linear-gradient(#0e1114,#0a0c0e)}
+html.shla-iron .g-top{--shl-ti:var(--shl-iron)}
+.g-top::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(221,188,122,.2) 18%,rgba(221,188,122,.2) 82%,transparent)}
+/* кромка под шапкой: без арта — две нити старого золота, с артом — полоса кованого железа с заклёпками */
+.g-top::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:5px;z-index:1;pointer-events:none;
+  background:linear-gradient(rgba(177,145,90,.5),rgba(177,145,90,.5)) 0 0/100% 1px no-repeat,linear-gradient(#101316,#0b0d10) 0 1px/100% 3px no-repeat,linear-gradient(rgba(72,229,212,.28),rgba(72,229,212,.28)) 0 4px/100% 1px no-repeat}
+html.shla-edge .g-top::after{bottom:calc(var(--shl-e) * -.5);height:var(--shl-e);background:var(--shl-edge) 0 50%/auto 100% repeat-x;filter:drop-shadow(0 2px 3px rgba(0,0,0,.75))}
+/* выбранная вкладка: свет над кромкой, ромб старого золота посередине */
+.g-seg button[aria-selected="true"]::after{z-index:2}
+.g-seg button[aria-selected="true"]::before{content:"";position:absolute;left:50%;bottom:-4px;z-index:3;width:7px;height:9px;margin-left:-3.5px;pointer-events:none;
+  background:linear-gradient(135deg,#f0d79c,#8c7650);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+html.shla-dia .g-seg button[aria-selected="true"]::before{width:8px;height:10px;margin-left:-4px;bottom:-5px;clip-path:none;background:var(--shl-diamond) center/contain no-repeat}
+/* заголовок экрана — над кромкой: длинный заголовок на узком экране переносится (правило index.html), вторая строка не уходит под кромку */
+.g-title h1{position:relative;z-index:2}
+.g-back{border-color:rgba(177,145,90,.42);background:linear-gradient(180deg,#1d2226,#121518);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 2px 4px rgba(0,0,0,.5)}
+
+/* ---------- портрет Странника над шахтой: правая кромка шахты поднимается до верха, узел на стыке шапки и шахты ---------- */
+.g-ava{--shl-ae:none;background:var(--shl-ae) 100% 0/var(--shl-e) auto repeat-y,linear-gradient(90deg,#0d1013,#0b0d10 80%)}
+html.shla-edge .g-ava{--shl-ae:var(--shl-edge-v);border-right-color:transparent}
+.g-ava .lv{z-index:6}   /* уровень Странника — над узлом стыка */
+.g-ava::after{content:"";position:absolute;z-index:5;right:-5px;bottom:-5px;width:9px;height:9px;pointer-events:none;
+  background:linear-gradient(135deg,#f0d79c,#8c7650);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+html.shla-knot .g-ava::after{right:calc(var(--shl-k) * -.5 + var(--shl-e) * .5);bottom:calc(var(--shl-k) * -.5);width:var(--shl-k);height:var(--shl-k);clip-path:none;
+  background:var(--shl-knot) center/contain no-repeat;filter:drop-shadow(0 2px 4px rgba(0,0,0,.8))}
+
+/* ---------- шахта: кованое железо, правая кромка, гнёзда картинок разделов ---------- */
+.g-rail{--shl-re:none;--shl-ri:none;background:var(--shl-re) 100% 0/var(--shl-e) auto repeat-y,linear-gradient(90deg,rgba(12,14,17,.74),rgba(9,11,13,.9) 80%),var(--shl-ri) 0 0/var(--shl-iron-s,240px) auto,linear-gradient(90deg,#0b0d10,#0a0c0e 80%)}
+html.shla-edge .g-rail{--shl-re:var(--shl-edge-v);border-right-color:transparent}
+html.shla-iron .g-rail{--shl-ri:var(--shl-iron)}
+/* гнездо картинки раздела: кованая рамка с уголками старого золота обнимает картинку; выбранный раздел — гнездо светится */
+.g-nav .nv::before{content:"";position:absolute;left:50%;top:50%;z-index:1;width:var(--shl-fs,54px);height:var(--shl-fs,54px);margin:calc(var(--shl-fs,54px) * -.5) 0 0 calc(var(--shl-fs,54px) * -.5);
+  pointer-events:none;border-radius:14px;box-shadow:inset 0 0 0 1px rgba(177,145,90,.28);transition:filter .2s,opacity .2s}
+html.shla-frame .g-nav .nv::before{border-radius:0;box-shadow:none;background:var(--shl-frame) center/100% 100% no-repeat;filter:drop-shadow(0 3px 4px rgba(0,0,0,.65)) brightness(.86)}
+html.shla-frame .g-nav[aria-current="page"] .nv::before{filter:drop-shadow(0 0 6px rgba(72,229,212,.7)) brightness(1.12)}
+html.shla-frame .g-nav.lock .nv::before{filter:grayscale(1) brightness(.55)}
+@media (hover:hover){ html.shla-frame .g-nav:not([aria-current="page"]):hover .nv::before{filter:drop-shadow(0 3px 4px rgba(0,0,0,.65)) brightness(1.05)} }
+.g-nav .lbl{position:relative;z-index:2}
+
+/* ---------- кошелёк: кованая полоса, ромбы на концах, тонкие разделители старого золота ---------- */
+.g-wallet{position:relative;border-color:rgba(177,145,90,.34);background:linear-gradient(180deg,#0e1114,#07090b);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045),inset 0 0 0 1px rgba(0,0,0,.55),inset 0 -8px 10px -9px rgba(72,229,212,.35),0 2px 6px -2px rgba(0,0,0,.6)}
+.g-wallet::before,.g-wallet::after{content:"";position:absolute;top:50%;z-index:1;width:8px;height:10px;margin-top:-5px;pointer-events:none;
+  background:linear-gradient(135deg,#f0d79c,#8c7650);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.g-wallet::before{left:-4.5px}
+.g-wallet::after{right:-4.5px}
+html.shla-dia .g-wallet::before,html.shla-dia .g-wallet::after{width:9px;height:12px;margin-top:-6px;clip-path:none;background:var(--shl-diamond) center/contain no-repeat;filter:drop-shadow(0 1px 1px #000)}
+.g-cur{position:relative}
+.g-cur+.g-cur::before{content:"";position:absolute;left:-1px;top:7px;bottom:7px;width:1px;pointer-events:none;background:linear-gradient(transparent,rgba(221,188,122,.32),transparent)}
+
+/* ---------- колокол — медальон кованого железа с кромкой старого золота ---------- */
+.g-icon{transition:box-shadow .18s,color .18s}
+html.shla-medal .g-icon{border-color:transparent;border-radius:50%;background:var(--shl-medal) center/contain no-repeat;color:var(--gold);box-shadow:0 4px 10px -4px #000}
+html.shla-medal .g-icon:hover{color:#f0d79c;box-shadow:0 4px 10px -4px #000,0 0 12px 1px rgba(221,188,122,.4)}
+html.shla-medal .g-icon .i{filter:drop-shadow(0 0 4px rgba(221,188,122,.3))}
+
+/* ---------- UI-кит: «Оболочка: кованые кромки» ---------- */
+.shl-kit-row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;padding:12px;border-radius:10px;background:#07090b}
+.shl-kit-f{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px;width:110px;text-align:center}
+.shl-kit-f.wide{width:260px}
+.shl-kit-f img{max-width:100%;height:56px;object-fit:contain}
+.shl-kit-f.wide img{height:auto;max-height:40px;width:100%;object-fit:cover;object-position:left center}
+.shl-kit-f figcaption{font-size:12px;line-height:1.2;color:var(--parch-2)}
+.shl-kit-none{display:block;width:48px;height:48px;border-radius:8px;border:1px dashed var(--iron-2)}

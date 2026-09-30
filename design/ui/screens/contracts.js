@@ -317,7 +317,7 @@ if (typeof setInterval === 'function') setInterval(() => { if (S && S.contracts)
 
 /* ================== вид ================== */
 const ctIco = (k, n, t) => `<span class="ct-ri" title="${t}"><img src="${curImg(k)}" alt="${t}"><b class="num">${fmt(n)}</b></span>`;
-const ctChest = (r, n) => `<span class="ct-ri" title="Сундук ключей · ${ctBoxR(r)}"><span class="well ct-chest" data-r="${r}" style="--s:${CT_VIEW.chest}px"><img src="${CHEST}" alt="Сундук ключей"></span>${n > 1 ? `<b class="num">×${n}</b>` : ''}</span>`;
+const ctChest = (r, n) => `<span class="ct-ri" title="Сундук ключей · ${ctBoxR(r)}"><span class="well itf ct-chest" data-r="${r}" style="--s:${CT_VIEW.chest}px">${chestPic('keys', r)}</span>${n > 1 ? `<b class="num">×${n}</b>` : ''}</span>`;
 /* награда строкой: главное — ключи; с эпической — Энериум, иначе золото; сундук недели — значком */
 function ctRewShort(P) {
   if (!P) return '<span class="faint">без наград</span>';
@@ -336,7 +336,7 @@ function ctRewRows(P) {
     ${P.ckeys ? row(`<span class="ct-rimg v">${ic('key')}</span>`, 'Ключи ремёсел', '×' + fmt(P.ckeys), 'из биомов вашего цикла') : ''}
     ${P.uniq ? row(`<span class="ct-rimg v r">${ic('star')}</span>`, 'Уникальный ресурс босса', '×' + fmt(P.uniq), 'одного из боссов вашего цикла') : ''}
     ${P.en ? row(cur('enerium'), 'Энериум', fmt(P.en), 'за задания эпической редкости и выше') : ''}
-    ${P.chest ? row(`<span class="well ct-chest" data-r="${P.chest.r}" style="--s:30px"><img src="${CHEST}" alt=""></span>`, `Сундук ключей · ${ctBoxR(P.chest.r)}`, '×' + P.chest.n, 'откроется в запасах') : ''}
+    ${P.chest ? row(`<span class="well itf ct-chest" data-r="${P.chest.r}" style="--s:30px">${chestPic('keys', P.chest.r)}</span>`, `Сундук ключей · ${ctBoxR(P.chest.r)}`, '×' + P.chest.n, 'откроется в запасах') : ''}
   </div>`;
 }
 /* строка срока: «до конца дня · 6 ч 18 мин» */

@@ -1,0 +1,223 @@
+{
+  "sheet": "chest-sheet/chs-wander__nb2.raw.jpg",
+  "box": "wander",
+  "chests": [
+    {
+      "r": 1,
+      "frame": [
+        0,
+        0,
+        1438,
+        1112
+      ],
+      "seam": 554,
+      "lid": [
+        0,
+        0,
+        1438,
+        556
+      ],
+      "body": [
+        2,
+        552,
+        1435,
+        560
+      ],
+      "auto": 554,
+      "score": 26.37,
+      "rim": 30454,
+      "files": {
+        "whole": "chest-sheet/chs-wander/r1.png",
+        "lid": "chest-sheet/chs-wander/r1.lid.png",
+        "body": "chest-sheet/chs-wander/r1.body.png"
+      }
+    },
+    {
+      "r": 2,
+      "frame": [
+        0,
+        0,
+        1433,
+        1113
+      ],
+      "seam": 554,
+      "lid": [
+        0,
+        0,
+        1433,
+        556
+      ],
+      "body": [
+        1,
+        552,
+        1429,
+        561
+      ],
+      "auto": 554,
+      "score": 27.55,
+      "rim": 31692,
+      "files": {
+        "whole": "chest-sheet/chs-wander/r2.png",
+        "lid": "chest-sheet/chs-wander/r2.lid.png",
+        "body": "chest-sheet/chs-wander/r2.body.png"
+      }
+    },
+    {
+      "r": 3,
+      "frame": [
+        0,
+        0,
+        1434,
+        1113
+      ],
+      "seam": 554,
+      "lid": [
+        0,
+        0,
+        1434,
+        556
+      ],
+      "body": [
+        3,
+        552,
+        1429,
+        561
+      ],
+      "auto": 554,
+      "score": 23.39,
+      "rim": 30991,
+      "files": {
+        "whole": "chest-sheet/chs-wander/r3.png",
+        "lid": "chest-sheet/chs-wander/r3.lid.png",
+        "body": "chest-sheet/chs-wander/r3.body.png"
+      }
+    },
+    {
+      "r": 4,
+      "frame": [
+        0,
+        0,
+        1438,
+        1113
+      ],
+      "seam": 554,
+      "lid": [
+        0,
+        0,
+        1438,
+        556
+      ],
+      "body": [
+        3,
+        552,
+        1432,
+        561
+      ],
+      "auto": 554,
+      "score": 25.68,
+      "rim": 28077,
+      "files": {
+        "whole": "chest-sheet/chs-wander/r4.png",
+        "lid": "chest-sheet/chs-wander/r4.lid.png",
+        "body": "chest-sheet/chs-wander/r4.body.png"
+      }
+    },
+    {
+      "r": 5,
+      "frame": [
+        0,
+        0,
+        1419,
+        1062
+      ],
+      "seam": 530,
+      "lid": [
+        0,
+        0,
+        1419,
+        532
+      ],
+      "body": [
+        1,
+        528,
+        1417,
+        534
+      ],
+      "auto": 530,
+      "score": 27.02,
+      "rim": 29005,
+      "files": {
+        "whole": "chest-sheet/chs-wander/r5.png",
+        "lid": "chest-sheet/chs-wander/r5.lid.png",
+        "body": "chest-sheet/chs-wander/r5.body.png"
+      }
+    },
+    {
+      "r": 6,
+      "frame": [
+        0,
+        0,
+        1422,
+        1110
+      ],
+      "seam": 576,
+      "lid": [
+        0,
+        0,
+        1422,
+        578
+      ],
+      "body": [
+        2,
+        574,
+        1417,
+        536
+      ],
+      "auto": 576,
+      "score": 17.08,
+      "rim": 27972,
+      "files": {
+        "whole": "chest-sheet/chs-wander/r6.png",
+        "lid": "chest-sheet/chs-wander/r6.lid.png",
+        "body": "chest-sheet/chs-wander/r6.body.png"
+      }
+    },
+    {
+      "r": 7,
+      "frame": [
+        0,
+        0,
+        1406,
+        1064
+      ],
+      "seam": 534,
+      "lid": [
+        0,
+        0,
+        1406,
+        536
+      ],
+      "body": [
+        2,
+        532,
+        1403,
+        532
+      ],
+      "auto": 534,
+      "score": 67.71,
+      "rim": 24038,
+      "files": {
+        "whole": "chest-sheet/chs-wander/r7.png",
+        "lid": "chest-sheet/chs-wander/r7.lid.png",
+        "body": "chest-sheet/chs-wander/r7.body.png"
+      }
+    }
+  ],
+  "lock": {
+    "file": "chest-sheet/chs-wander/lock.png",
+    "px": [
+      775,
+      1102
+    ]
+  }
+}

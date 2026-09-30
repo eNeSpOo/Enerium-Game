@@ -149,7 +149,8 @@ function lvCard(g, i, o = {}) {
   const just = !o.kit && sold && L.just && L.just.i === i && L.just.gen === L.gen && now - L.just.t < V.just;
   if (just) vars.push(`--dj:${L.just.t - now}ms`);
   const price = sold ? `<span class="lv-sold">${ic('check')}Куплено</span>` : lvPrice(c, p, lack);
-  /* товар лежит на бархатной подушке, в рамке своего вида (crK, screens/crafthall.js); цена — латунной биркой на кромке полки */
+  /* товар лежит на бархатной подушке, в рамке предмета (crK, screens/crafthall.js; одна на все виды, свет — редкость); цена — латунной
+     биркой на кромке полки */
   const fk = typeof crK === 'function' ? crK(it) : '';
   const inner = `<span class="lv-ic" data-r="${it.r}"${fk}>${itTeam(it) ? (typeof resHideIco === 'function' ? resHideIco() : ic('lock')) : trIcon(it)}<b class="lv-q num">×${fmt(g[1])}</b><i class="lv-cr" aria-hidden="true"></i></span><span class="lv-nm">${nm}</span>${price}`;
   const cls = `lv-card${sold ? ' sold' : ''}${lack ? ' lack' : ''}${just ? ' just' : ''}`;

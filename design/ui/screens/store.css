@@ -1,0 +1,172 @@
+/* screens/store.css — Лавка Энериума (screens/store.js): стартовые наборы, наборы Энериума, выдача, предложения, реклама.
+   «Дорого-богато» — правило автора для донатных окон: зал-сокровищница (store/hall.jpg), чёрный мрамор, старое золото, свет Энериума
+   снизу. Правила воздуха (ADR-0026): карточка — картинка, имя, до двух чисел, до двух чипов и одно действие; отступы — токены
+   --sp-l / --sp-m / --sp-s. Свои классы — с префиксом st-. Движение — только transform и opacity; «меньше движения» — без движения. */
+
+/* ================== зал ================== */
+.st-hall{--st-en:79,220,139;--st-au:221,188,122;--st-so:143,220,255;position:relative;isolation:isolate;overflow:hidden;flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:var(--sp-s);
+  padding:var(--sp-m);border-radius:14px;border:1px solid rgba(var(--st-au),.3);
+  background:radial-gradient(62% 58% at 50% 112%,rgba(var(--st-en),.22),transparent 70%),radial-gradient(30% 70% at 0% 30%,rgba(var(--st-au),.08),transparent 70%),linear-gradient(180deg,#0c1412,#070b0a 60%,#040605);
+  box-shadow:inset 0 1px 0 rgba(255,236,190,.08),inset 0 0 70px rgba(0,0,0,.65),0 18px 40px -26px rgba(var(--st-en),.55)}
+.st-bg{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:50% 60%}
+.st-hall.art::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(3,6,5,.62),rgba(3,6,5,.3) 30%,rgba(3,6,5,.4) 70%,rgba(3,6,5,.78))}
+.st-note{flex:none;margin:0;white-space:normal;overflow-wrap:anywhere;color:var(--parch-2);text-shadow:0 1px 2px #000}
+.st-note .link{display:inline-flex;align-items:center;gap:2px}
+.st-team{flex:none;flex-wrap:wrap;gap:6px}
+.st-tnote{font-size:11px;line-height:1.3;flex:1 1 100%;min-width:0}
+
+/* карточки зала: чёрный мрамор, золотая кромка, свет Энериума снизу */
+.st-show,.st-pk,.st-sb,.st-of,.st-ad{position:relative;border-radius:12px;border:1px solid rgba(var(--st-au),.34);background:linear-gradient(180deg,rgba(20,28,24,.84),rgba(6,10,9,.92));
+  box-shadow:inset 0 1px 0 rgba(255,236,190,.1),inset 0 -26px 32px -26px rgba(var(--st-en),.5),0 16px 26px -18px #000}
+.st-pk,.st-sb{transition:transform .18s ease-out}
+.st-pk:hover,.st-sb:hover{transform:translateY(-3px)}
+.st-nm,.st-pn{font-family:var(--f-d);font-weight:600;color:#f0d79c;text-shadow:0 0 14px rgba(var(--st-au),.3),0 2px 0 rgba(0,0,0,.7)}
+
+/* пьедестал света и арт; до выгрузки — кристалл из света CSS */
+.st-ped{position:relative;display:block;flex:none}
+.st-ped::after{content:"";position:absolute;left:12%;right:12%;bottom:2%;height:14%;border-radius:50%;z-index:0;background:radial-gradient(closest-side,rgba(var(--st-en),.55),transparent)}
+.st-pic{position:relative;z-index:1;display:block;object-fit:contain;filter:drop-shadow(0 10px 14px rgba(0,0,0,.65))}
+/* в пьедестале и ступени лесенки арт лежит по коробке: процент высоты у элемента сетки не держится */
+.st-ped>.st-pic,.st-rp>.st-pic{position:absolute;left:0;bottom:0;width:100%;height:100%;object-position:50% 100%}
+.st-pic.stub{border-radius:50%;background:radial-gradient(38% 46% at 50% 55%,rgba(var(--st-en),.75),rgba(var(--st-en),.12) 60%,transparent 72%);filter:none}
+.st-ico{width:20px;height:20px;object-fit:contain;flex:none}
+
+/* печать «×2» сургучом */
+.st-x2{position:absolute;top:-10px;right:-8px;z-index:3;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;font:700 15px/1 var(--f-d);font-style:normal;color:#fbe7b0;
+  background:radial-gradient(circle at 42% 36%,#b5342a,#6d1510 62%,#420a07);box-shadow:inset 0 0 0 2px rgba(0,0,0,.25),inset 0 -5px 8px rgba(0,0,0,.35),0 3px 6px rgba(0,0,0,.6);transform:rotate(-8deg);text-shadow:0 1px 1px #000}
+.st-x2.sm{top:-8px;right:-6px;width:34px;height:34px;font-size:12.5px}
+
+/* ================== «Наборы»: ступень крупно, лесенка, предложения ================== */
+.st-start{flex:1 1 0;min-height:0;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:var(--sp-m)}
+.st-main{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0;min-height:0}
+.st-show{flex:1 1 0;min-height:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:var(--sp-m);align-items:center;padding:var(--sp-m) var(--sp-m) var(--sp-m) var(--sp-s);
+  border-color:rgba(var(--st-au),.62);box-shadow:inset 0 3px 0 -1px var(--r7),inset 0 -30px 36px -28px rgba(var(--st-au),.55),0 0 0 1px rgba(var(--st-au),.18),0 18px 30px -18px #000,0 0 26px -10px rgba(var(--st-au),.45)}
+.st-show.done{box-shadow:inset 0 3px 0 -1px var(--gold-2),inset 0 -26px 32px -26px rgba(var(--st-en),.4),0 16px 26px -18px #000}
+.st-sh-l .st-ped{width:150px;height:150px}
+.st-sh-r{display:flex;flex-direction:column;gap:6px;min-width:0}
+.st-nm{font-size:25px;line-height:1.02}
+.st-its{display:flex;gap:var(--sp-s) 10px;flex-wrap:wrap;margin:2px 0}
+.st-it{display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:6px;align-items:center}
+.st-it .st-ico{grid-row:1/3;width:26px;height:26px;filter:drop-shadow(0 0 8px rgba(var(--st-en),.45))}
+.st-it[data-k="souls"] .st-ico{filter:drop-shadow(0 0 8px rgba(var(--st-so),.55))}
+.st-it b{font:700 19px/1 var(--f-u);color:var(--gold);font-variant-numeric:lining-nums tabular-nums}
+.st-it small{font-size:11px;line-height:1.1;color:var(--parch-3)}
+.st-sub{font-size:12px;line-height:1.3;color:var(--parch-2);white-space:normal;overflow-wrap:anywhere}
+.st-show .st-buy{align-self:flex-start;min-width:150px;justify-content:center}
+.st-done{align-self:flex-start}
+.st-rungs{flex:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--sp-s)}
+.st-rung{position:relative;appearance:none;display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 2px 5px;border-radius:10px;border:1px solid rgba(var(--st-au),.26);background:rgba(8,12,11,.78);color:var(--parch);font:inherit;min-width:0}
+.st-rung:hover{border-color:rgba(var(--st-au),.55)}
+.st-rp{position:relative;display:block;width:40px;height:34px}
+.st-rk{position:absolute;right:-6px;top:-2px;display:grid;color:var(--spirit)}
+.st-rk .i{width:13px;height:13px}
+.st-rk.lk{color:var(--gold-2)}
+.st-rn{font:600 14px/1 var(--f-d);color:var(--gold)}
+.st-rung small{font-size:11px;line-height:1.1;color:var(--parch-2);white-space:nowrap}
+.st-rung.got{opacity:.6}
+.st-rung.lock{opacity:.58}
+.st-rung.lock .st-pic{filter:grayscale(.7) brightness(.7)}
+.st-rung.cur{border-color:rgba(var(--st-au),.8);background:linear-gradient(180deg,rgba(var(--st-au),.14),rgba(8,12,11,.8));box-shadow:0 0 16px -6px rgba(var(--st-au),.7)}
+.st-offers{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0;min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:#2c3238 transparent}
+.st-offers>.eyebrow{flex:none;color:#e9cf93;text-shadow:0 1px 2px #000}
+.st-of{flex:none;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;padding:6px var(--sp-s)}
+.st-of .st-ped{width:58px;height:58px}
+.st-ofb{gap:1px;min-width:0}
+.st-ofb .eyebrow{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-ofn{display:inline-flex;align-items:center;gap:4px;font:700 18px/1 var(--f-u);color:var(--gold)}
+.st-until{font-size:11.5px;color:var(--parch-3);white-space:nowrap}
+.st-none{margin:0;white-space:normal;color:var(--parch-2);text-shadow:0 1px 2px #000}
+
+/* ================== «Энериум»: пять наборов, реклама ================== */
+.st-en{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:var(--sp-s)}
+.st-packs{flex:1 1 0;min-height:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--sp-s)}
+.st-pk,.st-sb{display:flex;flex-direction:column;align-items:center;gap:4px;padding:var(--sp-s);text-align:center;min-width:0;min-height:0}
+.st-pk.first{border-color:rgba(var(--st-au),.55)}
+.st-pk .st-ped{width:100%;flex:1 1 0;min-height:56px;max-height:112px}
+/* богатство растёт: малый набор ниже, великий — во весь пьедестал */
+.st-pk:nth-child(1) .st-ped>.st-pic{height:66%}
+.st-pk:nth-child(2) .st-ped>.st-pic{height:76%}
+.st-pk:nth-child(3) .st-ped>.st-pic{height:84%}
+.st-pk:nth-child(4) .st-ped>.st-pic{height:92%}
+.st-pn{font-size:15.5px;line-height:1.1;align-self:stretch;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-pa{display:inline-flex;align-items:center;gap:5px}
+.st-pa b{font:700 20px/1 var(--f-u);color:var(--gold);font-variant-numeric:lining-nums tabular-nums}
+.st-pa small{font-size:11px;color:var(--parch-3)}
+.st-bonus{height:20px}
+.st-bonus.none{display:block;visibility:hidden}
+.st-pk .st-buy,.st-sb .st-buy{align-self:stretch;justify-content:center;margin-top:auto}
+.st-ad{flex:none;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:var(--sp-m);align-items:center;padding:6px var(--sp-m);border-color:rgba(var(--st-en),.36)}
+.st-pic.ad{width:40px;height:40px}
+.st-adb{gap:1px;min-width:0}
+.st-adb b{font:600 16px/1.1 var(--f-d);color:#f0d79c}
+.st-adb small{font-size:12px;line-height:1.25;color:var(--parch-2);white-space:normal}
+.st-adgo{min-width:120px;justify-content:center}
+
+/* ================== «Выдача»: три чаши ================== */
+.st-subs{flex:1 1 0;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-m)}
+.st-sb .st-ped{width:100%;flex:1 1 0;min-height:60px;max-height:130px}
+.st-sb:nth-child(1) .st-ped>.st-pic{height:78%}
+.st-sb:nth-child(2) .st-ped>.st-pic{height:88%}
+.st-sb.on{border-color:rgba(var(--st-en),.6);box-shadow:inset 0 1px 0 rgba(255,236,190,.1),inset 0 -30px 36px -26px rgba(var(--st-en),.7),0 16px 26px -18px #000}
+.st-sb .st-pn{font-size:17px}
+.st-sbl{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--parch-2);white-space:nowrap}
+.st-sbl .i{width:13px;height:13px;color:var(--spirit)}
+.st-rule{flex:none;margin:0;white-space:normal;color:var(--parch-2);text-shadow:0 1px 2px #000}
+
+/* ================== листы ================== */
+.st-shd{display:flex;align-items:center;gap:var(--sp-m)}
+.st-shd .st-ped{width:108px;height:108px}
+.st-gl{display:flex;flex-direction:column;gap:6px;flex:1 1 auto;min-width:0}
+.st-gi{position:relative;display:flex;align-items:center;gap:var(--sp-s);padding:6px var(--sp-s);border-radius:10px;border:1px solid var(--iron);background:#0d1013}
+.st-gi b{font-size:14.5px}
+.st-gi .num{margin-left:auto}
+.st-gw{display:grid;place-items:center;width:30px;height:30px;flex:none}
+.st-gw .st-ico{width:26px;height:26px}
+.st-dlg{width:min(440px,calc(100% - 40px))}
+.st-got{position:relative;display:flex;flex-direction:column;gap:6px}
+.st-got.anim .st-gi{animation:st-rise var(--tt) cubic-bezier(.2,.9,.3,1.2) var(--dt) both}
+/* арт купленного — над наградами, поднимается первым */
+.st-gothd{display:flex;justify-content:center;margin-bottom:2px}
+.st-gothd .st-ped{width:84px;height:84px}
+.st-got .st-gi{padding:3px var(--sp-s)}
+.st-gotnote{font-size:12px;line-height:1.25;color:var(--parch-2);white-space:normal;min-width:0;flex:1 1 auto}
+.g.sm .st-gothd .st-ped{width:64px;height:64px}
+.g.sm .st-got .st-gi{padding:2px var(--sp-s)}
+.st-got{gap:5px}
+.st-got.anim .st-gothd{animation:st-rise var(--tt) cubic-bezier(.2,.9,.3,1.2) var(--dt) both}
+@keyframes st-rise{0%{transform:translateY(16px) scale(.72);opacity:0}60%{transform:translateY(-2px) scale(1.05);opacity:1}100%{transform:none;opacity:1}}
+/* попап рекламы и ролик: полоса — transform */
+.st-adp{display:flex;flex-direction:column;align-items:center;gap:var(--sp-s);text-align:center}
+.st-adp .st-pic.ad{width:76px;height:76px}
+.st-adp p{margin:0}
+.st-adw{display:inline-flex;align-items:center;gap:6px;font:700 24px/1 var(--f-u);color:var(--gold)}
+.st-adw .st-ico{width:28px;height:28px}
+.st-reel{display:grid;place-items:center;width:100%;height:84px;border-radius:10px;border:1px solid var(--iron-2);background:radial-gradient(60% 80% at 50% 100%,rgba(var(--st-en),.18),transparent 70%),#07090a}
+.st-bar{position:relative;width:100%;height:6px;border-radius:3px;overflow:hidden;background:#1a1f23}
+.st-bar i{position:absolute;inset:0;transform-origin:0 50%;background:linear-gradient(90deg,#1f8f5a,#4fdc8b);animation:st-bar var(--tt) linear var(--dt) both}
+@keyframes st-bar{0%{transform:scaleX(0)}100%{transform:scaleX(1)}}
+.st-adlink{display:inline-flex;align-items:center;gap:5px;margin-top:2px;font-size:12.5px}
+
+/* ================== 844 × 390: мельче арт и шрифт, та же раскладка ================== */
+.g.sm .st-sh-l .st-ped{width:120px;height:120px}
+.g.sm .st-nm{font-size:21px}
+.g.sm .st-it .st-ico{width:22px;height:22px}
+.g.sm .st-it b{font-size:17px}
+.g.sm .st-sub{font-size:11.5px}
+.g.sm .st-rp{height:28px}
+.g.sm .st-of .st-ped{width:46px;height:46px}
+.g.sm .st-pn{font-size:13.5px}
+.g.sm .st-pa b{font-size:17px}
+.g.sm .st-sb .st-pn{font-size:15px}
+
+/* ================== UI-кит ================== */
+.st-kit{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:var(--sp-m)}
+.st-kbox .k-row{align-items:flex-start}
+.st-kf{margin:0;display:flex;flex-direction:column;align-items:stretch;gap:4px;width:170px;--st-en:79,220,139;--st-au:221,188,122;--st-so:143,220,255}
+.st-kf.wide{width:100%;max-width:560px}
+.st-kf figcaption{font-size:11.5px;line-height:1.15;color:var(--parch-2);text-align:center}
+.st-kf .st-pk,.st-kf .st-sb{height:250px}
+
+@media (prefers-reduced-motion:reduce){
+  .st-pk,.st-sb,.st-got.anim .st-gi,.st-got.anim .st-gothd,.st-bar i{animation:none!important;transition:none!important}
+}

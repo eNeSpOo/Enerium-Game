@@ -1,6 +1,8 @@
 /* Энериум бесплатного игрока — калькулятор к docs/content/экономика-энериум.md. Решение автора 30.09.2026 (ADR-0033):
    «Доступны, потому что мы продумаем систему так, что игрок по немногу сможет получать энериум и копить его. Как на героев за энериум,
    так и на рулетку, со временем он сможет на всё накопить». Друза — только по лестнице: 100 Энериума → кристалл, 100 кристаллов → друза.
+   Слово автора 30.09.2026, ночь (ответ на ADR-0034): «Я думал от 25 - 50 + -, + реклама за просмотр которой тоже будет даться энериум,
+   на её не много, от 10 в день»; «Боевой пропуск делать за деньги»; сегменты — «не донатеров от 100р на средних от 500+ и на 2500+».
    Черновик · предложение · ждёт автора. Числа — демонстрация.
 
    Что считает:
@@ -9,19 +11,19 @@
       - бесплатный ряд пропуска — pass.js, rows.free: за сезон, ряд проходят все три профиля (прогон пропуска, econ.pace);
       - контракты эпической редкости и выше — design/ui/contracts.js, econ[цикл][профиль].en: Энериум за неделю по прогону контрактов;
       - Арена, суточный топ-100 — design/ui/arena.js, model.prof: Энериум за неделю по прогону на 5 000 игроках;
-      - у плательщика ещё покупки — витрина «Лавки Энериума» (pass.js, store): подписка и пакет раз в BUY.packEvery дней,
-        первая покупка пакета ×2 — один раз.
+      - реклама по желанию — design/ui/store.js, ads: сверх ручейка, у того, кто смотрит;
+      - покупки — сегменты автора (SEGS): выдача, платный ряд пропуска за деньги, наборы, стартовые наборы — витрина design/ui/store.js.
    2. Крафт обычного — модель стока (design/ui/recipes.js, stats.sink): Энериум, который уходит в призывы за день, и возврат — победа над
       призванным врагом (drops.craftBosses, enerium) × призывов в день по смеси стока (tools/content-gen/recipes/common.js, SINK).
       Кристаллы циклов V–VI модель стока растит из зелёных крупиц — в Энериум кошелька их не пересчитываем.
    3. Цели — дни копилки с начала цикла II: первый донатный герой, весь донатный сет цикла, прокрутка «Возрождения душ» и десять,
-      платный ряд пропуска, кристалл и друза. У обычного два счёта: копит весь Энериум — и копит, призывая по модели стока.
+      кристалл и друза. У обычного — с рекламой и без, с призывами крафта; у плательщика — по сегментам автора.
    4. Законы — LAWS ниже; любое нарушение — ошибка, таблицы не пишутся.
 
-   Читает: design/ui/pass.js, contracts.js, arena.js, recipes.js, roster.js, tools/content-gen/contracts/capacity.json (дни циклов),
-   tools/content-gen/recipes/common.js (смесь призывов стока). Своих данных игры не пишет: только таблицы черновика между метками
-   «<!-- @таблица имя -->» и «<!-- /таблица имя -->», текст вокруг — ручной. Порядок сборки — после пропуска (шаг 9): читает прогоны
-   контрактов, Арены и пропуска. Только целые: доход — сотые Энериума в день.
+   Читает: design/ui/pass.js, store.js, contracts.js, arena.js, recipes.js, roster.js, tools/content-gen/contracts/capacity.json (дни
+   циклов), tools/content-gen/recipes/common.js (смесь призывов стока). Своих данных игры не пишет: только таблицы черновиков между метками
+   «<!-- @таблица имя -->» и «<!-- /таблица имя -->» — docs/content/экономика-энериум.md и таблицу segments в docs/content/монетизация.md;
+   текст вокруг — ручной. Порядок сборки — после пропуска и Лавки (шаг 9). Только целые: доход — сотые Энериума в день.
    Запуск: node tools/content-gen/economy/enerium.js           — посчитать и вписать таблицы;
            node tools/content-gen/economy/enerium.js --check   — только проверить законы и свежесть таблиц;
            node tools/content-gen/economy/enerium.js --print   — таблицы в консоль. */
@@ -30,10 +32,11 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const ROOT = path.join(__dirname, '..', '..', '..');
 const UI = path.join(ROOT, 'design', 'ui');
 const FILES = {
-  pass: path.join(UI, 'pass.js'), contracts: path.join(UI, 'contracts.js'), arena: path.join(UI, 'arena.js'),
+  pass: path.join(UI, 'pass.js'), store: path.join(UI, 'store.js'), contracts: path.join(UI, 'contracts.js'), arena: path.join(UI, 'arena.js'),
   recipes: path.join(UI, 'recipes.js'), roster: path.join(UI, 'roster.js'),
   cap: path.join(ROOT, 'tools', 'content-gen', 'contracts', 'capacity.json'),
   doc: path.join(ROOT, 'docs', 'content', 'экономика-энериум.md'),
+  money: path.join(ROOT, 'docs', 'content', 'монетизация.md'),
 };
 const COMMON = require('../recipes/common.js');
 
@@ -43,37 +46,44 @@ const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI'];
 const CYCLES = [2, 3, 4, 5, 6];   // контракты, Арена и пропуск — с цикла II (§16); цикл I — обучение на часы
 
 /* Профили. login — дней входа в неделю: отметка листа даров берётся в день входа; обычный один день в неделю не играет — как в прогонах
-   контрактов и пропуска. ct, ar — профиль прогона контрактов и Арены. craft — модель стока (она у обычного). buy — покупает Энериум */
+   контрактов и пропуска. ct, ar — профиль прогона контрактов и Арены. craft — модель стока (она у обычного) */
 const PROF = {
   o: { n: 'обычный', login: 6, ct: 'o', ar: 'free', craft: true },
   e: { n: 'увлечённый', login: 7, ct: 'e', ar: 'fan' },
-  p: { n: 'плательщик', login: 6, ct: 'p', ar: 'payer', buy: true },
+  p: { n: 'плательщик', login: 6, ct: 'p', ar: 'payer' },
 };
 
-/* Покупки плательщика — витрина «Лавки Энериума» (pass.js, store): подписка «Ежедневная выдача» — каждый день; пакет pack — раз
-   в packEvery дней, первая покупка ×2 — один раз за игру. Это образ «плательщика» для целей Энериума, а не потолок покупок:
-   объём покупки Энериума не ограничен (§1.2), потолок ×1,7 держат души и дневные капы */
-const BUY = { sub: true, pack: 'big', packEvery: 28 };
+/* Сегменты автора — «не донатеров от 100р на средних от 500+ и на 2500+». Время обычного, игрой — как плательщик (p). Что покупает:
+   subs — выдача (каждые 30 дней, пока идёт), pass — платный ряд пропуска каждый сезон, packs — [набор, раз в сколько дней], первая
+   покупка набора ×2 — один раз; chain — сколько стартовых наборов берёт в первый день цикла II. Это образы для расчёта, а не потолок:
+   объём покупки Энериума не ограничен (§1.2), ×1,7 прогресса держат души и дневные капы */
+const SEGS = {
+  s: { n: 'от 100 ₽', subs: ['sub1'], pass: false, packs: [], chain: 1 },
+  m: { n: 'от 500 ₽', subs: ['sub1'], pass: true, packs: [], chain: 3 },
+  l: { n: 'от 2 500 ₽', subs: ['sub3'], pass: true, packs: [['en4', 28]], chain: 5 },
+};
+const SEG_MID = 'm';   // сегмент для «доли бесплатного» — средний
 
-/* Цели Энериума. cost — функция данных игры; perCycle — цель повторяется каждый цикл (донатный сет открывается с каждым циклом, ADR-0021) */
+/* Цели Энериума. cost — функция данных игры; perCycle — цель повторяется каждый цикл (донатный сет открывается с каждым циклом, ADR-0021).
+   Платный ряд пропуска больше не цель ручейка: он продаётся за деньги (слово автора 30.09.2026) */
 const GOALS = [
   { id: 'hero1', n: 'Первый донатный герой цикла', cost: X => X.donat[0], perCycle: true },
   { id: 'heroSet', n: 'Весь донатный сет цикла — пятеро', cost: X => X.donat.reduce((a, v) => a + v, 0), perCycle: true },
   { id: 'spin', n: 'Прокрутка «Возрождения душ»', cost: X => X.spin },
   { id: 'spin10', n: 'Десять прокруток «Возрождения душ»', cost: X => X.spin * 10 },
-  { id: 'pass', n: 'Платный ряд пропуска на сезон', cost: X => X.passPrice },
   { id: 'crystal', n: 'Кристалл Энериума — призыв цикла V', cost: X => X.step },
   { id: 'drusa', n: 'Друза Энериума — пробуждённый призыв V–VI', cost: X => X.step * X.step },
 ];
 
-/* Законы ручейка. Дни — с начала цикла II, обычный копит весь бесплатный Энериум */
+/* Законы ручейка. Дни — с начала цикла II, обычный копит весь бесплатный Энериум, без рекламы */
 const LAWS = {
   hero1Days: 7,       // первого донатного героя цикла II обычный берёт за первую неделю цикла: «по немногу», но с первых дней
   spinDays: 4,        // прокрутка «Возрождения душ» — не реже раза в четыре дня
   heroSetDays: 70,    // весь донатный сет — за два-три цикла: «со временем он сможет на всё накопить»
   drusaDays: 365,     // друза — за год копилки: самая дорогая вещь лестницы остаётся целью, а не подарком
+  dayRange: [25, 50], // обычный игрой в день, каждый цикл II–VI — слово автора: «от 25 - 50 + -»; реклама — сверху
   x17: 170,           // плательщик при том же времени добывает игрой не больше ×1,7 Энериума обычного (§1.2): покупки — отдельно
-  thirdMaxBp: 5000,   // бесплатный Энериум обычного — не больше половины Энериума плательщика вместе с покупками (§9.3: «порядка трети»)
+  thirdMaxBp: 5000,   // бесплатный Энериум обычного — не больше половины Энериума среднего плательщика с покупками (§9.3: «порядка трети»)
   horizon: 1100,      // дней счёта целей: горизонт, за которым цель считается недостижимой
 };
 
@@ -83,14 +93,14 @@ const loadJs = (file, name) => { const c = { window: {} }; c.window = c; vm.crea
 const fmt = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 const d100 = x => { const s = x < 0 ? '−' : '', a = Math.abs(x), i = Math.floor(a / 100), f = a % 100; return s + fmt(i) + (f ? ',' + String(f).padStart(2, '0').replace(/0$/, '') : ''); };
 const ratio = (a, b) => b ? (Math.floor(a * 100 / b) / 100).toFixed(2).replace('.', ',') : '—';
+const usd = c => `$${Math.floor(c / 100)},${String(c % 100).padStart(2, '0')}`;
 
 function build() {
   const err = [], warn = [];
-  const PS = loadJs(FILES.pass, 'EN_PASS'), CT = loadJs(FILES.contracts, 'EN_CONTRACTS'), AR = loadJs(FILES.arena, 'EN_ARENA');
+  const PS = loadJs(FILES.pass, 'EN_PASS'), ST = loadJs(FILES.store, 'EN_STORE'), CT = loadJs(FILES.contracts, 'EN_CONTRACTS'), AR = loadJs(FILES.arena, 'EN_ARENA');
   const RX = loadJs(FILES.recipes, 'EN_RECIPES'), RS = loadJs(FILES.roster, 'EN_ROSTER');
   const CAP = JSON.parse(fs.readFileSync(FILES.cap, 'utf8'));
-  if (!PS || !CT || !AR || !RX || !RS) return { err: ['нет данных: pass.js, contracts.js, arena.js, recipes.js или roster.js'], warn };
-  if (!PS.store) return { err: ['pass.js: нет витрины store — пересобрать tools/content-gen/pass/build.js'], warn };
+  if (!PS || !ST || !CT || !AR || !RX || !RS) return { err: ['нет данных: pass.js, store.js, contracts.js, arena.js, recipes.js или roster.js'], warn };
 
   /* --- дни циклов: II и III — прогон ёмкости, IV–VI — как III (как у ритуалов и модели стока) --- */
   const days = {};
@@ -100,6 +110,7 @@ function build() {
   /* --- источники: сотые Энериума в день --- */
   const enOf = list => list.reduce((a, cell) => a + cell.filter(x => x.k === 'enerium').reduce((b, x) => b + x.n, 0), 0);
   const calSheet = enOf(PS.cal.list), freeRow = enOf(PS.rows.free), paidRow = enOf(PS.rows.paid);
+  const ads100 = ST.ads.perView * ST.ads.dayCap * 100;
   const src = {};
   for (const [pid, P] of Object.entries(PROF)) {
     src[pid] = {};
@@ -125,38 +136,50 @@ function build() {
   for (const c of CYCLES) {
     const s = sink[c], bosses = RX.drops.craftBosses.filter(b => b.cyc === c);
     const avg = kinds => { const l = bosses.filter(b => kinds.includes(b.kind)); return l.length ? Math.floor(l.reduce((a, b) => a + b.enerium, 0) / l.length) : 0; };
-    /* возврат × 100 в день: призывов в день × доля вида × Энериум за победу; смесь — крафтовые боссы руин, эхо боссов, города */
     const back = Math.floor(s.summonsX100 * (MIX.craft * avg(['ruin']) + MIX.memory * avg(['memory']) + MIX.city * avg(['city'])) / 10000);
     craft[c] = { spend: s.enerDirectX100, back, crystals: s.ener2X100 };
   }
 
-  /* --- покупки плательщика --- */
-  const ST = PS.store, pack = ST.packs.find(x => x.id === BUY.pack);
-  if (!pack) err.push(`витрина: нет пакета ${BUY.pack}`);
-  const subDay = BUY.sub && ST.sub ? ST.sub.en : 0;
-  const buyAt = d => subDay + (pack && (d - 1) % BUY.packEvery === 0 ? pack.en * (d === 1 ? pack.firstX : 1) : 0);   // Энериум покупок в день d
-  const buyAvg = subDay * 100 + (pack ? Math.floor(pack.en * 100 / BUY.packEvery) : 0);
+  /* --- покупки сегментов: Энериум в день d (целые), расход за 4 недели --- */
+  const seg = {};
+  const packEn = id => { const p = ST.packs.find(x => x.id === id); return p ? Math.floor(p.en * (10000 + (p.bonusBp || 0)) / 10000) : 0; };
+  for (const [sid, G] of Object.entries(SEGS)) {
+    const subs = G.subs.map(id => ST.subs.find(x => x.id === id)).filter(Boolean);
+    if (subs.length !== G.subs.length) err.push(`сегмент ${sid}: нет выдачи ${G.subs.join(', ')} в store.js`);
+    const packs = G.packs.map(([id, every]) => ({ id, every, P: ST.packs.find(x => x.id === id) })).filter(x => x.P);
+    if (packs.length !== G.packs.length) err.push(`сегмент ${sid}: нет набора в store.js`);
+    const steps = ST.chain.steps.slice(0, G.chain);
+    const chainEn = steps.reduce((a, s) => a + (s.get.find(x => x[0] === 'enerium') || [0, 0])[1] * ST.chain.x, 0);
+    const chainRub = steps.reduce((a, s) => a + ST.tiers[s.tier].rub, 0), chainUsd = steps.reduce((a, s) => a + ST.tiers[s.tier].usd, 0);
+    const passDay = G.pass ? Math.floor(paidRow * 100 / PS.season.days) : 0;
+    const subDay = subs.reduce((a, s) => a + s.daily, 0);
+    /* Энериум покупок в день d: выдача каждый день; платный ряд — средний день сезона; набор — в день покупки, первая ×2; цепочка — в день 1 */
+    const at = d => subDay * 100 + passDay + packs.reduce((a, x) => a + ((d - 1) % x.every === 0 ? packEn(x.id) * (d === 1 ? x.P.firstX : 1) * 100 : 0), 0) + (d === 1 ? chainEn * 100 : 0);
+    const avg = subDay * 100 + passDay + packs.reduce((a, x) => a + Math.floor(packEn(x.id) * 100 / x.every), 0);
+    /* расход за 4 недели: выдача — цена за 30 дней в пересчёте на 28 дней не нужна — берём как покупку раз в месяц; пропуск — раз в сезон */
+    const tier = id => ST.tiers[id];
+    const rub = subs.reduce((a, s) => a + tier(s.tier).rub, 0) + (G.pass ? tier(ST.pass.tier).rub : 0) + packs.reduce((a, x) => a + tier(x.P.tier).rub, 0);
+    const usdC = subs.reduce((a, s) => a + tier(s.tier).usd, 0) + (G.pass ? tier(ST.pass.tier).usd : 0) + packs.reduce((a, x) => a + tier(x.P.tier).usd, 0);
+    seg[sid] = { n: G.n, at, avg, rub, usd: usdC, chainRub, chainUsd, chainEn, subs, packs, pass: G.pass, chain: G.chain };
+  }
+  if (err.length) return { err, warn };
 
   /* --- цели: дни копилки с начала цикла II --- */
-  const X = { donat: RS.rules.stub.donatPrice, spin: RS.rules.spin, passPrice: PS.price, step: RX.drops.ener ? RX.drops.ener.step : COMMON.ENER.step };
-  const incomeAt = (pid, d, withCraft) => {
-    const c = cycleAt(d), s = src[pid][c];
-    let x = s.play;
-    if (withCraft) x += craft[c].back - craft[c].spend;
-    return x;
-  };
-  /* sub — только подписка «Ежедневная выдача» сверх Энериума игрой, без пакетов: «лёгкий» плательщик */
-  function daysTo(pid, cost, withCraft, sub) {
+  const X = { donat: RS.rules.stub.donatPrice, spin: RS.rules.spin, step: RX.drops.ener ? RX.drops.ener.step : COMMON.ENER.step };
+  const incomeAt = (pid, d, withCraft) => { const c = cycleAt(d), s = src[pid][c]; return s.play + (withCraft ? craft[c].back - craft[c].spend : 0); };
+  /* opt: craft — призывы крафта по модели стока; ads — реклама каждый день; seg — покупки сегмента */
+  function daysTo(pid, cost, opt = {}) {
     let bank = 0;
     for (let d = 1; d <= LAWS.horizon; d++) {
-      bank += incomeAt(pid, d, withCraft) + (sub ? subDay * 100 : PROF[pid].buy ? buyAt(d) * 100 : 0);
+      bank += incomeAt(pid, d, opt.craft) + (opt.ads ? ads100 : 0) + (opt.seg ? seg[opt.seg].at(d) : 0);
       if (bank >= cost * 100) return d;
     }
     return null;
   }
   const goals = GOALS.map(g => {
     const cost = g.cost(X);
-    return { id: g.id, n: g.n, cost, perCycle: !!g.perCycle, o: daysTo('o', cost, false), oc: daysTo('o', cost, true), e: daysTo('e', cost, false), ps: daysTo('p', cost, false, true), p: daysTo('p', cost, false) };
+    return { id: g.id, n: g.n, cost, perCycle: !!g.perCycle, o: daysTo('o', cost), oa: daysTo('o', cost, { ads: true }), oc: daysTo('o', cost, { craft: true }), e: daysTo('e', cost),
+      s: daysTo('p', cost, { seg: 's' }), m: daysTo('p', cost, { seg: 'm' }), l: daysTo('p', cost, { seg: 'l' }) };
   });
 
   /* --- законы --- */
@@ -166,26 +189,35 @@ function build() {
   late(G.spin, LAWS.spinDays, 'прокрутка «Возрождения душ»');
   late(G.heroSet, LAWS.heroSetDays, 'весь донатный сет');
   late(G.drusa, LAWS.drusaDays, 'друза Энериума');
+  for (const c of CYCLES) {
+    const o = src.o[c].play;
+    if (o < LAWS.dayRange[0] * 100 || o > LAWS.dayRange[1] * 100) err.push(`цикл ${ROMAN[c]}: обычный игрой — ${d100(o)} Энериума в день, вне «${LAWS.dayRange.join('–')}» автора`);
+  }
   for (const g of goals) {
-    if (g.p == null || g.o == null || g.p >= g.o) err.push(`цель «${g.n}»: плательщик не быстрее обычного (${g.p} против ${g.o} дн.) — донат теряет смысл`);
-    if (g.ps == null || g.ps > g.o) err.push(`цель «${g.n}»: плательщик с подпиской медленнее обычного`);
+    const segs = ['s', 'm', 'l'];
+    for (const sid of segs) if (g[sid] == null || g.o == null || g[sid] > g.o) err.push(`цель «${g.n}»: плательщик ${SEGS[sid].n} медленнее обычного (${g[sid]} против ${g.o} дн.)`);
+    if (g.m > g.s || g.l > g.m) err.push(`цель «${g.n}»: сегмент крупнее копит медленнее (${g.s} / ${g.m} / ${g.l} дн.)`);
+    if (g.s != null && g.o != null && g.s >= g.o && g.cost > 100) err.push(`цель «${g.n}»: плательщик от 100 ₽ не быстрее обычного — донат теряет смысл`);
     if (g.e != null && g.o != null && g.e > g.o) err.push(`цель «${g.n}»: увлечённый медленнее обычного`);
+    if (g.oa != null && g.o != null && g.oa > g.o) err.push(`цель «${g.n}»: с рекламой медленнее, чем без неё`);
   }
   const x17 = {};
   for (const c of CYCLES) {
-    const o = src.o[c].play, p = src.p[c].play;
-    x17[c] = { play: Math.floor(p * 100 / o), all: Math.floor((p + buyAvg) * 100 / o), share: Math.floor(o * 10000 / (p + buyAvg)) };
+    const o = src.o[c].play, p = src.p[c].play, mid = seg[SEG_MID].avg;
+    x17[c] = { play: Math.floor(p * 100 / o), all: Math.floor((p + mid) * 100 / o), share: Math.floor(o * 10000 / (p + mid)), ads: Math.floor((o + ads100) * 100 / o) };
     if (p * 100 > o * LAWS.x17) err.push(`цикл ${ROMAN[c]}: плательщик добывает игрой ×${ratio(p, o)} Энериума обычного — больше ×1,7`);
-    if (x17[c].share > LAWS.thirdMaxBp) err.push(`цикл ${ROMAN[c]}: бесплатный Энериум обычного — ${Math.round(x17[c].share / 100)} % Энериума плательщика с покупками, больше ${LAWS.thirdMaxBp / 100} %`);
+    if (x17[c].share > LAWS.thirdMaxBp) err.push(`цикл ${ROMAN[c]}: бесплатный Энериум обычного — ${Math.round(x17[c].share / 100)} % Энериума среднего плательщика, больше ${LAWS.thirdMaxBp / 100} %`);
   }
-  const walk = (x, where) => { if (typeof x === 'number' && !Number.isInteger(x)) err.push(`не целое ${x} — ${where}`); else if (x && typeof x === 'object') for (const [k, v] of Object.entries(x)) walk(v, where + '.' + k); };
+  const walk = (x, where) => { if (typeof x === 'number' && !Number.isInteger(x)) err.push(`не целое ${x} — ${where}`); else if (x && typeof x === 'object') for (const [k, v] of Object.entries(x)) if (typeof v !== 'function') walk(v, where + '.' + k); };
   walk({ src, craft, goals, x17 }, 'расчёт');
 
   /* ================================ ТАБЛИЦЫ ================================ */
-  const TBL = {};
+  const TBL = {}, MONEY = {};
   const head = cols => ['| ' + cols.join(' | ') + ' |', '| ' + cols.map(() => '---').join(' | ') + ' |'];
   const cells = xs => '| ' + xs.join(' | ') + ' |';
   const dd = n => n == null ? `дольше ${fmt(LAWS.horizon)}` : String(n);
+  const low = t => t[0].toLowerCase() + t.slice(1);
+  const segBuys = S => [...S.subs.map(s => low(s.n)), ...(S.pass ? ['платный ряд пропуска'] : []), ...S.packs.map(x => `${low(x.P.n)} раз в ${x.every} дней`)].join(', ');
   let T;
 
   // источники: что и сколько
@@ -196,32 +228,33 @@ function build() {
   T.push(cells(['Контракты эпической редкости и выше', `за задание от эпического до вневременного: дневное — ${ctEn('d')}, недельное — ${ctEn('w')}; сколько в неделю — прогон контрактов`, '`tools/content-gen/contracts/build.js`, `TARGET.en`']));
   T.push(cells(['Арена, суточный топ-100', `${AR.enerium.map(([top, n]) => `${top === 1 ? '1-е' : 'до ' + top + '-го'} — ${n}`).join(', ')} в сутки`, '`tools/content-gen/arena/rules.js`, `enerium`']));
   T.push(cells(['Победа над призванным врагом', 'возврат части Энериума призыва: крафтовый босс — 5 × цикл, эхо босса биома — 10 × цикл', '`tools/content-gen/recipes/common.js`, `CRAFT`']));
-  T.push(cells(['Покупки плательщика', `подписка — ${fmt(subDay)} в день; «${pack ? pack.n : '—'}» — ${pack ? fmt(pack.en) : '—'} раз в ${BUY.packEvery} дней, первая покупка ×${pack ? pack.firstX : 1}`, '`tools/content-gen/pass/build.js`, `STORE`; `BUY` калькулятора']));
+  T.push(cells(['Реклама по желанию', `${ST.ads.perView} за ролик, до ${ST.ads.dayCap} роликов в сутки — до ${ST.ads.perView * ST.ads.dayCap} в день, сверх ручейка`, '`tools/content-gen/store/build.js`, `ADS`']));
+  T.push(cells(['Покупки', `сегменты автора: ${Object.values(seg).map(S => `${S.n} — ${segBuys(S)}`).join('; ')}`, '`tools/content-gen/store/build.js`; `SEGS` калькулятора']));
   TBL.sources = T.join('\n');
 
   // доход в день по циклам
-  T = head(['Цикл', 'Профиль', 'Дар дня', 'Пропуск', 'Контракты', 'Арена', 'Игрой в день', 'Покупки в день', 'Крафт: призывы / возврат']);
+  T = head(['Цикл', 'Профиль', 'Дар дня', 'Пропуск', 'Контракты', 'Арена', 'Игрой в день', 'С рекламой', 'Крафт: призывы / возврат']);
   for (const c of CYCLES) for (const pid of Object.keys(PROF)) {
     const s = src[pid][c], P = PROF[pid];
-    T.push(cells([pid === 'o' ? ROMAN[c] : '', P.n, d100(s.cal), d100(s.pass), d100(s.ct), d100(s.ar), `**${d100(s.play)}**`, P.buy ? d100(buyAvg) : '—',
+    T.push(cells([pid === 'o' ? ROMAN[c] : '', P.n, d100(s.cal), d100(s.pass), d100(s.ct), d100(s.ar), `**${d100(s.play)}**`, d100(s.play + ads100),
       P.craft ? `${craft[c].spend ? '−' + d100(craft[c].spend) : '0'} / +${d100(craft[c].back)}${craft[c].crystals ? ` · кристаллов ${d100(craft[c].crystals)} — из крупиц` : ''}` : '—']));
   }
   TBL.day = T.join('\n');
 
   // за цикл
-  T = head(['Цикл', 'Дней', 'Обычный', 'Обычный с призывами крафта', 'Увлечённый', 'Плательщик: игрой / с покупками']);
-  let cum = { o: 0, oc: 0, e: 0, p: 0, pb: 0 };
+  T = head(['Цикл', 'Дней', 'Обычный', 'Обычный с рекламой', 'Обычный с призывами крафта', 'Увлечённый', 'Плательщик игрой', 'Средний плательщик с покупками']);
+  let cum = { o: 0, oa: 0, oc: 0, e: 0, p: 0, pm: 0 };
   for (const c of CYCLES) {
-    const n = days[c], o = src.o[c].play * n, oc = (src.o[c].play + craft[c].back - craft[c].spend) * n, e = src.e[c].play * n, p = src.p[c].play * n, pb = p + buyAvg * n;
-    cum = { o: cum.o + o, oc: cum.oc + oc, e: cum.e + e, p: cum.p + p, pb: cum.pb + pb };
-    T.push(cells([ROMAN[c], String(n), fmt(Math.floor(o / 100)), fmt(Math.floor(oc / 100)), fmt(Math.floor(e / 100)), `${fmt(Math.floor(p / 100))} / ${fmt(Math.floor(pb / 100))}`]));
+    const n = days[c], o = src.o[c].play * n, oa = (src.o[c].play + ads100) * n, oc = (src.o[c].play + craft[c].back - craft[c].spend) * n, e = src.e[c].play * n, p = src.p[c].play * n, pm = p + seg[SEG_MID].avg * n;
+    cum = { o: cum.o + o, oa: cum.oa + oa, oc: cum.oc + oc, e: cum.e + e, p: cum.p + p, pm: cum.pm + pm };
+    T.push(cells([ROMAN[c], String(n), fmt(Math.floor(o / 100)), fmt(Math.floor(oa / 100)), fmt(Math.floor(oc / 100)), fmt(Math.floor(e / 100)), fmt(Math.floor(p / 100)), fmt(Math.floor(pm / 100))]));
   }
-  T.push(cells(['II–VI', String(CYCLES.reduce((a, c) => a + days[c], 0)), `**${fmt(Math.floor(cum.o / 100))}**`, fmt(Math.floor(cum.oc / 100)), fmt(Math.floor(cum.e / 100)), `${fmt(Math.floor(cum.p / 100))} / ${fmt(Math.floor(cum.pb / 100))}`]));
+  T.push(cells(['II–VI', String(CYCLES.reduce((a, c) => a + days[c], 0)), `**${fmt(Math.floor(cum.o / 100))}**`, fmt(Math.floor(cum.oa / 100)), fmt(Math.floor(cum.oc / 100)), fmt(Math.floor(cum.e / 100)), fmt(Math.floor(cum.p / 100)), fmt(Math.floor(cum.pm / 100))]));
   TBL.cycle = T.join('\n');
 
   // цели
-  T = head(['Цель', 'Энериума', 'Обычный, дней', 'Обычный с призывами крафта', 'Увлечённый', 'Плательщик: подписка', 'Плательщик: подписка и пакет']);
-  for (const g of goals) T.push(cells([g.n + (g.perCycle ? ' *' : ''), fmt(g.cost), `**${dd(g.o)}**`, dd(g.oc), dd(g.e), dd(g.ps), dd(g.p)]));
+  T = head(['Цель', 'Энериума', 'Обычный, дней', 'С рекламой', 'С призывами крафта', 'Увлечённый', `Плательщик ${SEGS.s.n}`, `${SEGS.m.n}`, `${SEGS.l.n}`]);
+  for (const g of goals) T.push(cells([g.n + (g.perCycle ? ' *' : ''), fmt(g.cost), `**${dd(g.o)}**`, dd(g.oa), dd(g.oc), dd(g.e), dd(g.s), dd(g.m), dd(g.l)]));
   TBL.goals = T.join('\n');
 
   // призывы крафта: Энериум лестницы в рецептах призывов по циклам (recipes.js; кристалл — step Энериума, друза — step кристаллов)
@@ -249,7 +282,6 @@ function build() {
     T = head(['Трата', 'Цена', 'Потолок', 'Где в данных']);
     T.push(cells(['Донатный герой цикла', X.donat.map(fmt).join(' / '), 'пятеро за цикл', '`tools/content-gen/heroes/export_roster.py`, `stub.donatPrice`']));
     T.push(cells(['Прокрутка «Возрождения душ»', fmt(X.spin), '—', '`export_roster.py`, `spin`']));
-    T.push(cells(['Платный ряд пропуска', `${fmt(PS.price)}, возвращает ${fmt(paidRow)}`, 'раз в сезон', '`tools/content-gen/pass/build.js`, `RULES.price`']));
     T.push(cells(['Замена задания контракта', fmt(rer.price), `${rer.paidCap} в день — до ${fmt(rer.price * rer.paidCap)}`, '`tools/content-gen/contracts/build.js`, `RULES.rer`']));
     T.push(cells(['«Обновить» Арены и Лиги', ref.price.map(fmt).join(' / '), `${ref.price.length} в сутки — до ${fmt(sum(ref.price))}`, '`tools/content-gen/arena/rules.js`']));
     T.push(cells(['Роллы ритуалов', rolls.map(fmt).join(' / '), `${rolls.length} в день — до ${fmt(sum(rolls))}`, '`tools/content-gen/rituals/build.js`, `RULES.rolls`']));
@@ -259,22 +291,32 @@ function build() {
   }
 
   // ×1,7 и доля бесплатного
-  T = head(['Цикл', 'Плательщик / обычный: игрой', 'Плательщик с покупками / обычный', 'Бесплатный обычного — доля Энериума плательщика']);
-  for (const c of CYCLES) T.push(cells([ROMAN[c], `×${ratio(x17[c].play, 100)}`, `×${ratio(x17[c].all, 100)}`, `${Math.round(x17[c].share / 100)} %`]));
+  T = head(['Цикл', 'Плательщик / обычный: игрой', `Средний плательщик (${SEGS[SEG_MID].n}) с покупками / обычный`, 'Бесплатный обычного — доля Энериума среднего плательщика', 'Обычный с рекламой / без']);
+  for (const c of CYCLES) T.push(cells([ROMAN[c], `×${ratio(x17[c].play, 100)}`, `×${ratio(x17[c].all, 100)}`, `${Math.round(x17[c].share / 100)} %`, `×${ratio(x17[c].ads, 100)}`]));
   TBL.x17 = T.join('\n');
 
   // законы
   T = head(['Закон', 'Порог', 'Сейчас']);
+  T.push(cells(['Обычный игрой в день, циклы II–VI', `${LAWS.dayRange.join('–')} — слово автора`, `${d100(Math.min(...CYCLES.map(c => src.o[c].play)))}–${d100(Math.max(...CYCLES.map(c => src.o[c].play)))}`]));
   T.push(cells(['Первый донатный герой цикла II — обычный', `не дольше ${LAWS.hero1Days} дней`, `${dd(G.hero1.o)} дн.`]));
   T.push(cells(['Прокрутка «Возрождения душ» — обычный', `не реже раза в ${LAWS.spinDays} дня`, `${dd(G.spin.o)} дн.`]));
   T.push(cells(['Весь донатный сет — обычный', `не дольше ${LAWS.heroSetDays} дней`, `${dd(G.heroSet.o)} дн.`]));
   T.push(cells(['Друза Энериума — обычный', `не дольше ${LAWS.drusaDays} дней`, `${dd(G.drusa.o)} дн.`]));
-  T.push(cells(['Плательщик быстрее обычного', 'на каждой цели', goals.every(g => g.p != null && g.o != null && g.p < g.o) ? 'да' : 'нет']));
+  T.push(cells(['Каждый сегмент плательщика быстрее обычного, крупнее — не медленнее', 'на каждой цели', goals.every(g => ['s', 'm', 'l'].every(k => g[k] != null && g[k] <= g.o) && g.m <= g.s && g.l <= g.m) ? 'да' : 'нет']));
   T.push(cells(['Плательщик игрой — не больше ×1,7 обычного', '×1,7', `до ×${ratio(Math.max(...CYCLES.map(c => x17[c].play)), 100)}`]));
-  T.push(cells(['Бесплатный обычного — не больше половины Энериума плательщика', `${LAWS.thirdMaxBp / 100} %`, `до ${Math.round(Math.max(...CYCLES.map(c => x17[c].share)) / 100)} %`]));
+  T.push(cells(['Бесплатный обычного — не больше половины Энериума среднего плательщика', `${LAWS.thirdMaxBp / 100} %`, `до ${Math.round(Math.max(...CYCLES.map(c => x17[c].share)) / 100)} %`]));
   TBL.laws = T.join('\n');
 
-  return { err, warn, tables: TBL, src, craft, goals, x17, days, buyAvg, calSheet, freeRow, paidRow };
+  // монетизация: сегменты автора — что покупают и за сколько дней копят
+  T = head(['Сегмент', 'Что покупает', 'Расход в месяц: Россия · Запад', 'Стартовые наборы, раз', 'Энериум покупок в день', 'Первый донатный герой, дней', 'Весь донатный сет', 'Десять прокруток', 'Друза']);
+  T.push(cells(['Обычный, без покупок', 'ничего; реклама — по желанию', '—', '—', '—', dd(G.hero1.o), dd(G.heroSet.o), dd(G.spin10.o), dd(G.drusa.o)]));
+  for (const sid of ['s', 'm', 'l']) {
+    const S = seg[sid];
+    T.push(cells([`${S.n}`, segBuys(S), `${fmt(S.rub)} ₽ · ${usd(S.usd)}`, `${S.chain > 1 ? 'I–' : ''}${ROMAN[S.chain]}: ${fmt(S.chainRub)} ₽ · ${usd(S.chainUsd)}, Энериум ${fmt(S.chainEn)}`, d100(S.avg), dd(G.hero1[sid]), dd(G.heroSet[sid]), dd(G.spin10[sid]), dd(G.drusa[sid])]));
+  }
+  MONEY.segments = T.join('\n');
+
+  return { err, warn, tables: TBL, money: MONEY, src, craft, goals, x17, days, seg, calSheet, freeRow, paidRow, ads100 };
 }
 
 /* ================================ ВЫВОД ================================ */
@@ -289,26 +331,28 @@ function withTables(doc, tables) {
   return doc;
 }
 
-module.exports = { build, withTables, markA, markB, FILES, PROF, BUY, GOALS, LAWS };
+module.exports = { build, withTables, markA, markB, FILES, PROF, SEGS, GOALS, LAWS };
 
 if (require.main === module) {
   const R = build();
   for (const w of R.warn) console.log('предупреждение: ' + w);
   if (process.argv.includes('--print')) {
     if (R.err.length) console.log('ОШИБКИ:\n' + R.err.join('\n'));
-    for (const [k, t] of Object.entries(R.tables || {})) console.log(`\n### ${k}\n\n${t}`);
+    for (const [k, t] of Object.entries(Object.assign({}, R.tables || {}, R.money || {}))) console.log(`\n### ${k}\n\n${t}`);
     process.exit(R.err.length ? 1 : 0);
   }
   if (R.err.length) { console.log('ОШИБКИ:\n' + R.err.join('\n')); process.exit(1); }
-  const docOld = fs.existsSync(FILES.doc) ? fs.readFileSync(FILES.doc, 'utf8') : null;
-  const docNew = docOld ? withTables(docOld, R.tables) : null;
+  const docOld = fs.existsSync(FILES.doc) ? fs.readFileSync(FILES.doc, 'utf8') : null, docNew = docOld ? withTables(docOld, R.tables) : null;
+  const monOld = fs.existsSync(FILES.money) ? fs.readFileSync(FILES.money, 'utf8') : null, monNew = monOld ? withTables(monOld, R.money) : null;
   if (!docNew) { console.log(`ОШИБКИ:\nв ${path.relative(ROOT, FILES.doc)} нет меток таблиц`); process.exit(1); }
+  if (!monNew) { console.log(`ОШИБКИ:\nв ${path.relative(ROOT, FILES.money)} нет меток таблицы segments`); process.exit(1); }
   if (process.argv.includes('--check')) {
-    const ok = docNew === docOld;
-    console.log(ok ? 'Свежие: таблицы docs/content/экономика-энериум.md совпадают с расчётом; законы ручейка держатся.' : 'Устарели: docs/content/экономика-энериум.md — пересчитать.');
+    const ok = docNew === docOld && monNew === monOld;
+    console.log(ok ? 'Свежие: таблицы docs/content/экономика-энериум.md и сегменты docs/content/монетизация.md совпадают с расчётом; законы ручейка держатся.' : `Устарели: ${[docNew !== docOld && 'docs/content/экономика-энериум.md', monNew !== monOld && 'docs/content/монетизация.md'].filter(Boolean).join(', ')} — пересчитать.`);
     process.exit(ok ? 0 : 1);
   }
   fs.writeFileSync(FILES.doc, docNew);
+  fs.writeFileSync(FILES.money, monNew);
   const o = R.src.o[2], g = Object.fromEntries(R.goals.map(x => [x.id, x]));
-  console.log(`Энериум обычного в цикле II — ${d100(o.play)} в день; первый донатный герой — ${g.hero1.o}-й день, весь сет — ${g.heroSet.o}-й, друза — ${g.drusa.o}-й.`);
+  console.log(`Энериум обычного в цикле II — ${d100(o.play)} в день, с рекламой — ${d100(o.play + R.ads100)}; первый донатный герой — ${g.hero1.o}-й день, весь сет — ${g.heroSet.o}-й, друза — ${g.drusa.o}-й.`);
 }
