@@ -337,9 +337,11 @@ function rlValor(c) {
 }
 /* осколок героя — стекло с лицом (shardGhost, screens/art-icons.js); got — собрано: в ленте осколок свежий, с трещинами */
 const rlShard = (h, px, got = 0) => typeof shardGhost === 'function' ? shardGhost(h, got, rlNeed(), px) : rsFace(h);
-/* вход в сцене алтаря — одна главная вещь вкладки (правила воздуха): имя, цикл и доблесть героев пула; герои пула — веером карточек
-   в раме перед зеркалом, отметка — в коллекции или осколков хватает на пробуждение; прошлая прокрутка, цена и шанс героя целиком,
-   «К рулетке» и «Шансы». Карточка открывает героя. Веер — от середины: --d — шаг от середины (вдвое, чтобы целый), --a — его модуль */
+/* вход в сцене алтаря — одна главная вещь вкладки (правила воздуха): имя, цикл и доблесть героев пула; герои пула — веером книг
+   перед зеркалом (hbCard, screens/book.js), отметка — в коллекции или осколков хватает на пробуждение; прошлая прокрутка, цена и шанс
+   героя целиком, «К рулетке» и «Шансы». Книга открывает героя — летит в центр и раскрывается. Не найденный герой пула (стадии
+   знакомства, решение автора 30.09.2026) — безымянная книга: пул честно виден числом, герой — нет. Веер — от середины: --d — шаг
+   от середины (вдвое, чтобы целый), --a — его модуль */
 function rlMark(h) {
   if (rsHas(h)) return `<i class="rl-em own" title="В коллекции">${ic('check')}</i>`;
   return (S.rs.shards[h.id] || 0) >= rlNeed() ? '<i class="rl-em ready" title="Осколков хватает на пробуждение"></i>' : '';
@@ -350,8 +352,10 @@ function rlCol() {
   if (cur < from) return `<div class="pnl rl-entry shut">${head}<div class="rl-ef-f"><p class="rs-line">${ic('lock')}Откроется с цикла ${ROMAN[from]}.</p></div></div>`;
   const pool = rsPool(), n = pool.length, R = S.rl.srv.ops[S.rl.last], F = RL_VIEW.fan;
   const faces = pool.map((h, i) => {
-    const d = 2 * i - (n - 1), a = Math.abs(d);
-    return `<button class="rl-ef" data-r="${h.r}" data-a="rhero" data-v="${h.id}" style="--d:${d};--a:${a};--z:${2 * n - a}" title="${h.n} · ${RAR[h.r].toLowerCase()} · доблесть до ${h.maxV}"><span class="rl-face">${rsFace(h)}</span>${rlFr()}<i class="rl-cr"></i>${rlMark(h)}</button>`;
+    const d = 2 * i - (n - 1), a = Math.abs(d), st = typeof hrStage === 'function' ? hrStage(h) : 2;
+    const book = st && typeof hbCard === 'function' ? hbCard(hcView(h), { z: 's', act: 'rhero', val: h.id, bm: false })
+      : typeof hbBlank === 'function' ? hbBlank({ z: 's', say: 'Неизвестная душа: её осколок — в Возрождении душ' }) : '';
+    return `<span class="rl-ef" style="--d:${d};--a:${a};--z:${2 * n - a}">${book}${st ? rlMark(h) : ''}</span>`;
   }).join('');
   return `<div class="pnl rl-entry" style="${rlFrVars()};--fd:${F.deg / 2}deg;--fl:${F.lift / 2}px">${head}
     <div class="rl-faces" style="--n:${Math.max(2, n)}">${faces || '<p class="faint">В пуле этого цикла героев нет.</p>'}</div>

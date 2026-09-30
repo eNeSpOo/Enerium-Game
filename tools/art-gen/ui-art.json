@@ -1,5 +1,5 @@
 {
-  "note": "Какой арт из art/generated/ идёт в прототип design/ui/. Враги — ADR-0013, отряд — герои сета 1 «Хранители Песочных Часов», арена — вторая раскладка. mirror — отражение: корпус героя на карте развёрнут вправо, к врагам, корпус врага — влево, к героям (решение автора 27.09.2026). Выгрузка: python tools/art-gen/export_ui.py Эхо, неделя эльфов — арена и портреты Иш-Кантуна, одобрены автором 28.09.2026 (ADR-0025, п. 8): ik-01…ik-14 — ступени лестницы 1–14, ik-15 — Многоликий. Значки атрибутов, редкостей (ADR-0027), классов и доблести одобрены автором 28.09.2026: PNG 128×128 с прозрачностью, эмблема вписана в 80 % кадра (fit). Окно «Спуск» — фон биома во всё окно: место и его обитатели на одном арте (слова автора 30.09.2026), задание tools/art-gen/jobs/descent-backdrops.json; descent/b1…b4.jpg, 1688×716.",
+  "note": "Какой арт из art/generated/ идёт в прототип design/ui/. Враги — ADR-0013, отряд — герои сета 1 «Хранители Песочных Часов», арена — вторая раскладка. mirror — отражение: корпус героя на карте развёрнут вправо, к врагам, корпус врага — влево, к героям (решение автора 27.09.2026). Выгрузка: python tools/art-gen/export_ui.py Эхо, неделя эльфов — арена и портреты Иш-Кантуна, одобрены автором 28.09.2026 (ADR-0025, п. 8): ik-01…ik-14 — ступени лестницы 1–14, ik-15 — Многоликий. Значки атрибутов, редкостей (ADR-0027), классов и доблести одобрены автором 28.09.2026: PNG 128×128 с прозрачностью, эмблема вписана в 80 % кадра (fit). Окно «Спуск» — фон биома во всё окно: место и его обитатели на одном арте (слова автора 30.09.2026), задание tools/art-gen/jobs/descent-backdrops.json; descent/b1…b4.jpg, 1688×716. Карточка героя — книга (выбор автора 30.09.2026, ADR-0032): обложки пяти ступеней с прозрачным окном, развороты, замок закрытый и отпертый, лента и звёздочка (нейтральные, цвет редкости даёт интерфейс), изнанка обложки и лист — books/*, задание tools/art-gen/jobs/hero-books.json, геометрия — tools/art-gen/book_layers.py → HB_ART в design/ui/screens/book.js; крупный арт с альфой — WebP. Карты боя — рамки по типу бойца (jobs/battle-frames.json): bframes/<тип>.png ← battle-frames/*.bf.png — окно вычищено, рисунок обрезан по альфе (tools/art-gen/battle_frame.py); 320 px в ширину, высота — по пропорции рисунка, без fit: доли окна и нарезки в BF (screens/battle-cards.js) совпадают с выгрузкой.",
   "out": "design/ui/assets/art",
   "size": [
     464,
@@ -115,6 +115,16 @@
     "heroes/c1-19.jpg": "heroes/hero-c1-19-elias__nb2.jpg",
     "heroes/c1-21.jpg": "heroes/hero-c1-21-vetverog__nb2-v2.jpg",
     "heroes/c1-22.jpg": "heroes/hero-c1-22-oelis__nb2.jpg",
+    "heroes/c2-01.jpg": "heroes/hero-c2-01-grimsa-test2__nb2.jpg",
+    "heroes/c2-02.jpg": "heroes/hero-c2-02-anselm-v2__nb2.jpg",
+    "heroes/c2-03.jpg": "heroes/hero-c2-03-bastian-v2__nb2.jpg",
+    "heroes/c2-04.jpg": "heroes/hero-c2-04-bjorn-v3__nb2.jpg",
+    "heroes/c2-05.jpg": "heroes/hero-c2-05-trud-v2__nb2.jpg",
+    "heroes/c2-06.jpg": "heroes/hero-c2-06-frida-v3__nb2.jpg",
+    "heroes/c2-07.jpg": "heroes/hero-c2-07-vigdis-v2__nb2.jpg",
+    "heroes/c2-08.jpg": "heroes/hero-c2-08-eldgrim-v2__nb2.jpg",
+    "heroes/c2-09.jpg": "heroes/hero-c2-09-skeggi-v3__nb2.jpg",
+    "heroes/c2-10.jpg": "heroes/hero-c2-10-nyal-v2__nb2.jpg",
     "heroes/c2-41.jpg": "heroes/hero-c2-41-ulva__nb2-v2.jpg",
     "heroes/c2-42.jpg": "heroes/hero-c2-42-taviel__nb2-v2.jpg",
     "heroes/c2-43.jpg": "heroes/hero-c2-43-korvin__nb2.jpg",
@@ -1557,6 +1567,206 @@
         121,
         128
       ]
-    }
+    },
+    "books/cover-1.webp": {
+      "from": "book-cover/book-cover-1__nb2.book.png",
+      "size": [
+        400,
+        665
+      ]
+    },
+    "books/cover-2.webp": {
+      "from": "book-cover/book-cover-2__nb2.book.png",
+      "size": [
+        400,
+        640
+      ]
+    },
+    "books/cover-3.webp": {
+      "from": "book-cover/book-cover-3__nb2.book.png",
+      "size": [
+        400,
+        655
+      ]
+    },
+    "books/cover-4.webp": {
+      "from": "book-cover/book-cover-4__nb2.book.png",
+      "size": [
+        400,
+        656
+      ]
+    },
+    "books/cover-5.webp": {
+      "from": "book-cover/book-cover-5__nb2-v2.book.png",
+      "size": [
+        400,
+        617
+      ]
+    },
+    "books/spread-1.webp": {
+      "from": "book-spread/book-spread-1__nb2.book.png",
+      "size": [
+        1200,
+        488
+      ]
+    },
+    "books/spread-2.webp": {
+      "from": "book-spread/book-spread-2__nb2.book.png",
+      "size": [
+        1200,
+        508
+      ]
+    },
+    "books/spread-3.webp": {
+      "from": "book-spread/book-spread-3__nb2-v2.book.png",
+      "size": [
+        1200,
+        495
+      ]
+    },
+    "books/spread-4.webp": {
+      "from": "book-spread/book-spread-4__nb2.book.png",
+      "size": [
+        1200,
+        481
+      ]
+    },
+    "books/spread-5.webp": {
+      "from": "book-spread/book-spread-5__nb2.book.png",
+      "size": [
+        1200,
+        513
+      ]
+    },
+    "books/lock.png": {
+      "from": "book-part/book-lock__nb2.book.png",
+      "size": [
+        96,
+        117
+      ]
+    },
+    "books/lock-open.png": {
+      "from": "book-part/book-lock-open__nb2-v2.book.png",
+      "size": [
+        96,
+        117
+      ]
+    },
+    "books/ribbon.png": {
+      "from": "book-part/book-ribbon__nb2.book.png",
+      "size": [
+        72,
+        240
+      ]
+    },
+    "books/star.png": {
+      "from": "book-part/book-star__nb2.book.png",
+      "size": [
+        96,
+        100
+      ]
+    },
+    "books/endpaper.jpg": {
+      "from": "book-sheet/book-endpaper__nb2.jpg",
+      "size": [
+        420,
+        752
+      ]
+    },
+    "books/leaf.jpg": {
+      "from": "book-sheet/book-leaf__nb2.jpg",
+      "crop": [
+        70,
+        18,
+        1156,
+        878
+      ],
+      "size": [
+        900,
+        713
+      ]
+    },
+    "bframes/hero.png": {
+      "from": "battle-frames/bf-hero__nb2-v2.bf.png",
+      "size": [
+        320,
+        254
+      ]
+    },
+    "bframes/o.png": {
+      "from": "battle-frames/bf-o__nb2-v2.bf.png",
+      "size": [
+        320,
+        228
+      ]
+    },
+    "bframes/e.png": {
+      "from": "battle-frames/bf-e__nb2.bf.png",
+      "size": [
+        320,
+        240
+      ]
+    },
+    "bframes/voice.png": {
+      "from": "battle-frames/bf-voice__nb2.bf.png",
+      "size": [
+        320,
+        239
+      ]
+    },
+    "bframes/b.png": {
+      "from": "battle-frames/bf-b__nb2.bf.png",
+      "size": [
+        320,
+        234
+      ]
+    },
+    "bframes/echo.png": {
+      "from": "battle-frames/bf-echo__nb2.bf.png",
+      "size": [
+        320,
+        271
+      ]
+    },
+    "bframes/many.png": {
+      "from": "battle-frames/bf-many__nb2.bf.png",
+      "size": [
+        320,
+        234
+      ]
+    },
+    "bframes/rune.png": {
+      "from": "battle-frames/bf-rune__nb2-v2.bf.png",
+      "size": [
+        320,
+        250
+      ]
+    },
+    "bframes/uber.png": {
+      "from": "battle-frames/bf-uber__nb2.bf.png",
+      "size": [
+        320,
+        241
+      ]
+    },
+    "bframes/forgotten.png": {
+      "from": "battle-frames/bf-forgotten-fix__nb2.bf.png",
+      "size": [
+        320,
+        240
+      ]
+    },
+    "bframes/host.png": {
+      "from": "battle-frames/bf-host__nb2.bf.png",
+      "size": [
+        320,
+        259
+      ]
+    },
+    "heroes/c2-11.jpg": "heroes/hero-c2-11-runna-v2__nb2.jpg",
+    "heroes/c2-12.jpg": "heroes/hero-c2-12-eyvind-v2__nb2.jpg",
+    "heroes/c2-13.jpg": "heroes/hero-c2-13-rummat-v2__nb2.jpg",
+    "heroes/c2-14.jpg": "heroes/hero-c2-14-bera-v2__nb2.jpg",
+    "heroes/c2-15.jpg": "heroes/hero-c2-15-nazir-v2__nb2.jpg"
   }
 }

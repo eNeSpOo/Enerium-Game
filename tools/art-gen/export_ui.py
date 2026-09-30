@@ -5,6 +5,7 @@
 mirror: true — отразить по горизонтали: на карте герой смотрит вправо, на врагов, а враг — влево, на героев.
 crop: [x0, y0, x1, y1] — вырезать кадр из исходника до сжатия (пиксели исходника), например портрет по пояс из картинки в полный рост.
 Путь в прототипе на .png — значок с прозрачностью: пустые поля обрезаются по альфе, fit: N вписывает эмблему в N % кадра по центру.
+Путь на .webp — то же с прозрачностью, но WebP: крупный арт с альфой (обложки и развороты книги героя) легче PNG в разы.
 
   python tools/art-gen/export_ui.py
   python tools/art-gen/export_ui.py --no-stamp    # только картинки, index.html не трогать: его правят параллельно
@@ -30,7 +31,7 @@ def main():
         if isinstance(src, str):
             src = {"from": src}
         size = tuple(src.get("size", spec["size"]))
-        png = dst.lower().endswith(".png")
+        png = dst.lower().endswith((".png", ".webp"))   # с прозрачностью
         with Image.open(ROOT / "art/generated" / src["from"]) as im:
             if src.get("crop"):
                 im = im.crop(tuple(src["crop"]))
@@ -39,7 +40,9 @@ def main():
             pic = ImageOps.mirror(pic)
         path = out / dst
         path.parent.mkdir(parents=True, exist_ok=True)
-        if png:
+        if dst.lower().endswith(".webp"):
+            pic.save(path, "WEBP", quality=88, method=6)
+        elif png:
             pic.save(path, "PNG", optimize=True)
         else:
             pic.save(path, "JPEG", quality=86, optimize=True, progressive=True)

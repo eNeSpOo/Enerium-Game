@@ -1,45 +1,15 @@
-/* screens/heroes.css — «Герои» (screens/heroes.js): карточка героя 9 : 16 и сетка коллекции, каталога и «За золото», большая карточка
-   героя, крупный портрет, лист фильтра, витрина отряда недели; плитка героя, кристалл в строках, прогресс в шапке карточки, библиотека
-   отрядов, лист выбора отряда, сцена алтаря «За души», окно лавки праха, окно пробуждения и листы Призыва.
-   Стиль «Свет снизу»: редкость — одобренный кристалл --rico и цвет --rc из [data-r] (ADR-0027); доблесть — значок доблести, рунный
-   предел — пять рунных камней по бокам портрета: камень .rp-s и столбы .rp — в hero-dev.css, здесь — где они стоят на карточках.
-   Ступень вида карточки — [data-t] 1…3 (hcTier): кромка, уголки, золото с гребнем, свет и частицы — всё в блоке «ступени» ниже; после
-   выбора стиля автором рамка ступени — картинка (.hk-fa, HC_ART), CSS-рамка ступени прячется (.art).
-   Правила воздуха: на карточке — главное (кристалл, доблесть, предел, имя, класс, стихия, уровень, мощь), остальное — в большой карточке;
-   отступы — --sp-l, --sp-m, --sp-s. Движение — только transform и opacity, при «меньше движения» частицы стоят. Свои классы — hk-*
-   (карточка и сетка), hcb-* (большая карточка), hcz (портрет крупно), he-* (витрина отряда недели), hck-* (UI-кит), hr-*; общие — .hc,
-   .preset, .sq, .sq-slots, .rs-av. */
+/* screens/heroes.css — «Герои» (screens/heroes.js): сетка коллекции, каталога и «За золото», строка над ней, лист фильтра, крупный портрет,
+   прогресс в шапке листов, кристалл в строках, библиотека отрядов, лист выбора отряда, сцена алтаря «За души», окно лавки праха, окно
+   пробуждения, витрина «За Энериум», витрина отряда недели и листы Призыва. Сама карточка героя — книга: screens/book.css (hb-*).
+   Стиль «Свет снизу»: редкость — одобренный кристалл --rico и цвет --rc из [data-r] (ADR-0027); доблесть — ленты книги, рунный
+   предел — замки книги; в шапке листов — камни (.rp-s, hero-dev.css).
+   Правила воздуха: на книге — главное, остальное — в раскрытой книге; отступы — --sp-l, --sp-m, --sp-s. Движение — только transform
+   и opacity. Свои классы — hk-* (сетка, портрет и полоса осколков книги), hcb-buy (действие книги «до покупки»), hcz (портрет крупно),
+   he-* (витрина отряда недели), hr-*; общие — .hc.empty (пустое место отряда), .preset, .sq, .sq-slots, .rs-av. */
 
-/* ---------- плитка героя: портрет, кристалл редкости и доблесть сверху, рунные камни по бокам, имя, класс и уровень снизу ---------- */
-.hc{position:relative;display:block;border-radius:10px;overflow:hidden;background:#0c0f12;border:1px solid color-mix(in srgb,var(--rc) 42%,#262b31);padding:0;text-align:left;aspect-ratio:4/5;width:100%;color:var(--parch)}
-.hc>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
-.hc::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.55),transparent 30%,transparent 46%,rgba(6,8,10,.96) 88%)}
-.hc .cr{position:absolute;left:4px;top:4px;z-index:2;width:17px;height:17px;background:var(--rico) center/contain no-repeat;filter:drop-shadow(0 1px 2px rgba(0,0,0,.9)) drop-shadow(0 0 4px color-mix(in srgb,var(--rc) 60%,transparent))}
-.hc .top{position:absolute;right:5px;top:5px;z-index:2;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
-.hc .stars{gap:0}
-.hc .stars i{width:11px;height:11px}
-.hc .stars:has(i:nth-child(5)) i{width:9px;height:9px}   /* пять доблестей — значки мельче, чтобы не наползать на кристалл */
-.hc .bot{position:absolute;left:6px;right:5px;bottom:5px;z-index:2;display:flex;flex-direction:column;gap:3px}
-/* у героя с пределами имя отступает от столбов камней: столб — --rp-w у самого края, от 2 px (hero-dev.css); строка уровня — под ними */
-.hc.rpp .nm{padding:0 calc(var(--rp-w) - 1px) 0 calc(var(--rp-w) - 2px)}
-.hc .nm{font:600 15px/1.05 var(--f-d);color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hc .meta{display:flex;justify-content:space-between;align-items:center;gap:4px;font:700 11px/1 var(--f-u);color:var(--parch-2);min-width:0}
-.hc .lw{display:inline-flex;align-items:center;gap:4px;min-width:0;white-space:nowrap}
-.hc .lv{display:inline-flex;align-items:baseline;gap:2px}
-.hc .lv small{font:700 9.5px/1 var(--f-u);letter-spacing:.04em;color:var(--parch-3)}
-.hc .lv b{font:700 12px/1 var(--f-u);color:var(--parch)}
-.hc .cy{color:var(--parch-3)}
-.hc .own{display:grid;place-items:center;flex:none;width:15px;height:15px;border-radius:50%;background:var(--spirit-3);color:var(--spirit);box-shadow:0 0 0 1px rgba(72,229,212,.4)}
-.hc .own .i{width:10px;height:10px}
-.hc .meta .bm{color:var(--parch);gap:3px;font-size:11px}
-.hc.wbm .lv small{display:none}
-.hc .busy{position:absolute;left:0;right:0;top:42%;z-index:2;text-align:center;font:700 10px/1 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--amber);background:rgba(10,8,4,.82);padding:4px 2px}
-.hc.sel{border-color:var(--spirit);box-shadow:0 0 0 1px var(--spirit),0 10px 22px -10px var(--spirit)}
-.hc.dim>img,.hc.dim>.rs-ph{filter:grayscale(.8) brightness(.55)}
-.hc.empty{border-style:dashed;border-color:#2c3238;box-shadow:none;background:#0b0d10;display:grid;place-items:center;color:var(--parch-3)}
-.hc.empty::after{display:none}
+/* ---------- пустое место в отряде и на обороне: той же формы, что мелкая книга (screens/book.css) ---------- */
+.hc.empty{position:relative;display:grid;place-items:center;width:100%;aspect-ratio:9/17;padding:0;border-radius:8px;border:1px dashed #2c3238;background:#0b0d10;color:var(--parch-3);box-shadow:none}
 .hc.empty.sel{border-color:var(--spirit);color:var(--spirit);box-shadow:0 0 0 1px var(--spirit)}
-.k-box .hc{max-width:110px}
 
 /* ---------- строки и лица: кристалл редкости в углу портрета (вместо прежней полоски снизу) ---------- */
 .rs-av{overflow:visible;box-shadow:none}
@@ -55,19 +25,26 @@
 .hd-bm .hr-vl small{font:700 11px/1 var(--f-u)}
 .hd-bm .hr-vl b{font:700 15px/1 var(--f-u);color:var(--parch)}
 
-/* ---------- карточка героя 9 : 16 (hcCard): портрет во всю карточку, рамка ступени, знаки у вершины, рунные камни по бокам ----------
-   Карточка — контейнер по ширине: знаки, камни и рамка растут вместе с ней (cqw, в пределах clamp). Слои снизу вверх: портрет,
-   затемнение, сияние и искры, рамка ступени, камни, знаки и подписи. Те же классы — у портрета большой карточки (.hcb-pt) и крупного
-   портрета (.hcz) */
-.hk{--hk-r:12px;position:relative;display:block;width:100%;aspect-ratio:9/16;padding:0;border:0;border-radius:var(--hk-r);overflow:hidden;isolation:isolate;
-  background:#07090b;color:var(--parch);text-align:left;cursor:pointer;container-type:inline-size;--rp-w:11cqw;box-shadow:0 10px 22px -14px #000;transition:transform .15s ease}
-.hk:hover{transform:translateY(-2px)}
-.hk,.hcb-pt,.hcz{--hk-bw:clamp(3px,3cqw,7px)}
-.hk-ph{position:absolute;inset:0;z-index:0;display:block}
+/* ---------- портрет в окне книги и полоса осколков (hcFace, hcShard): у героя без портрета и у неизвестной души — силуэт класса, как в
+   стекле осколка (art-icons.js), снизу — свет стихии; не инициалы ---------- */
 .hk-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 16%}
-/* герой без портрета: силуэт его класса (как в стекле осколка), снизу — свет стихии; не инициалы */
-.hk-sil{position:absolute;inset:0;display:block;--c:#8a9098;background:linear-gradient(180deg,#0d1316,#06080a)}
+/* герой без портрета: силуэт его класса (как в стекле осколка), снизу — свет стихии; не инициалы. Свободное поле окна — подложка
+   в тон рисунку: тёмное стекло и туман */
+.hk-sil{position:absolute;inset:0;display:block;--c:#8a9098;
+  background:radial-gradient(75% 40% at 50% 70%,rgba(110,150,150,.12),transparent 72%),linear-gradient(180deg,#0f1518,#06080a)}
 .hk-sil>img,.hk-sil>svg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 24%;opacity:.86}
+/* поле силуэта — окно без полос --st сверху, --sb снизу и --sx по бокам: их задаёт окно (обложка, страница портрета, крупный план),
+   там знаки, плашки и рама. В поле — кадр фигуры (ART_ICONS.clsFit: --bx, --by, --bw, --bh — тысячные доли рисунка, --ir — ширина
+   к высоте, ‰): кадр вписан целиком — масштаб по меньшему из двух, кадр посередине, низ кадра — на нижней границе поля; края рисунка
+   тают в подложку. Проверка — check_heroes.js, «силуэт класса в окне» */
+.hk-fit{position:absolute;top:var(--st,0px);bottom:var(--sb,0px);left:var(--sx,0px);right:var(--sx,0px);display:block;container-type:size}
+.hk-fit>img.fit{position:absolute;left:50%;bottom:0;width:auto;max-width:none;object-fit:fill;opacity:.86;
+  height:min(calc(100cqh * 1000 / var(--bh)),calc(100cqw * 1000000 / (var(--bw) * var(--ir))));
+  transform:translate(calc(-1% * (var(--bx) + var(--bw) / 2) / 10),calc(1% * (1000 - var(--by) - var(--bh)) / 10));
+  -webkit-mask:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent),linear-gradient(180deg,transparent,#000 9%,#000 91%,transparent);-webkit-mask-composite:source-in;
+  mask:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent),linear-gradient(180deg,transparent,#000 9%,#000 91%,transparent);mask-composite:intersect}
+/* силуэт без выгрузки (SVG «вписать») — в том же поле */
+.hk-fit>svg{position:absolute;inset:0;width:100%;height:100%;opacity:.86}
 .hk-sil::after{content:"";position:absolute;inset:0;background:radial-gradient(95% 55% at 50% 108%,color-mix(in srgb,var(--c) 46%,transparent),transparent 72%);mix-blend-mode:screen}
 .hk-sil .b{fill:#0b1618;stroke:#8fd9cf;stroke-width:1.2}
 .hk-sil .f{fill:#030708}
@@ -77,107 +54,12 @@
 .hk-sil .k.t{stroke-width:.8}
 .hk-sil .l{fill:#dffcf8}
 .hk-sil[data-el="Воздух"]{--c:var(--air)}.hk-sil[data-el="Земля"]{--c:var(--earth)}.hk-sil[data-el="Огонь"]{--c:var(--fire)}.hk-sil[data-el="Вода"]{--c:var(--water)}.hk-sil[data-el="Время"]{--c:var(--time)}.hk-sil[data-el="Свет"]{--c:var(--light)}.hk-sil[data-el="Тьма"]{--c:var(--dark)}
-/* затемнение: у вершины — под знаками, внизу — под именем и числами */
-.hk::after,.hcb-pt::after,.hcz::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(3,4,5,.66),transparent 22%,transparent 50%,rgba(4,6,8,.86) 76%,rgba(4,6,8,.97))}
-.hcb-pt::after{background:linear-gradient(180deg,rgba(3,4,5,.58),transparent 20%,transparent 70%,rgba(4,6,8,.6))}
-.hcz::after{background:linear-gradient(180deg,rgba(3,4,5,.45),transparent 18%,transparent 70%,rgba(4,6,8,.85))}
-
-/* ---------- раскладка значков — одна у карточки сетки, портрета большой карточки и крупного портрета ----------
-   У вершины — гребень: кристалл редкости, под ним — доблесть дугой; в кружках — уровень слева, стихия справа; по бокам — рунные камни;
-   внизу — имя на плашке, класс в кружке и мощь (у несобранного — полоса осколков или цикл). Раскладку автор выберет из второй партии
-   проб — сменить её значит поправить только этот блок (разметка — hcMarks и hcCard, screens/heroes.js) */
-.hk-cr{position:absolute;left:50%;top:3px;z-index:6;width:clamp(18px,17cqw,40px);aspect-ratio:1;transform:translateX(-50%);background:var(--rico) center/contain no-repeat;
-  filter:drop-shadow(0 2px 3px rgba(0,0,0,.9)) drop-shadow(0 0 6px color-mix(in srgb,var(--rc) 70%,transparent))}
-.hk-st{position:absolute;left:50%;top:calc(4px + clamp(18px,17cqw,40px));z-index:5;display:flex;align-items:flex-start;gap:1px;transform:translateX(-50%)}
-.hk-st i{width:clamp(10px,9cqw,18px);aspect-ratio:1;background:var(--ico-valor) center/contain no-repeat;filter:grayscale(1) brightness(.42);opacity:.8;transform:translateY(var(--y,0px))}
-.hk-st i.on{filter:drop-shadow(0 0 3px rgba(221,188,122,.75));opacity:1}
-.hk-lv,.hk-el,.hk-cls{display:grid;place-items:center;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 50% 32%,#23282d,#0a0c0f 72%);
-  box-shadow:0 0 0 1.5px var(--hk-rim,#6d6252),0 0 0 3px rgba(0,0,0,.55),0 2px 4px rgba(0,0,0,.8)}
-.hk-lv,.hk-el{position:absolute;top:6px;z-index:6;width:clamp(22px,19cqw,38px)}
-.hk-lv{left:6px}
-.hk-el{right:6px}
-.hk-lv b{font:700 clamp(8px,7cqw,13px)/1 var(--f-u);color:var(--parch);letter-spacing:-.02em}
-.hk-el .el.bare::before{width:clamp(9px,8cqw,14px);height:clamp(12px,11cqw,19px)}
-.hk .rp.t{position:absolute;z-index:4;top:max(46px,24%);bottom:33%;width:var(--rp-w)}
-.hk .rp.t.l{left:calc(var(--hk-bw) + 1px)}
-.hk .rp.t.r{right:calc(var(--hk-bw) + 1px)}
-.hk-bot{position:absolute;left:0;right:0;bottom:0;z-index:5;display:flex;flex-direction:column;gap:4px;padding:0 calc(var(--hk-bw) + 3px) calc(var(--hk-bw) + 3px)}
-.hk-nm{display:block;padding:3px 6px;border-radius:5px;text-align:center;font:600 14px/1.1 var(--f-d);color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #000;
-  background:linear-gradient(180deg,rgba(38,33,26,.9),rgba(14,12,10,.94));box-shadow:inset 0 0 0 1px var(--hk-rim,#6d6252),0 2px 4px rgba(0,0,0,.6)}
-.hk-row{display:flex;align-items:center;gap:5px;min-width:0;height:22px}
-.hk-cls{flex:none;width:22px}
-.hk-cls .ico{width:15px;height:15px}
-.hk-bm{flex:1 1 auto;min-width:0;display:flex;align-items:center;justify-content:center;gap:4px;height:22px;border-radius:6px;background:linear-gradient(180deg,rgba(24,28,32,.94),rgba(8,10,12,.96));
-  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--hk-rim,#6d6252) 70%,transparent),inset 0 1px 0 rgba(255,255,255,.05);font:700 13px/1 var(--f-u);color:var(--gold);font-variant-numeric:lining-nums tabular-nums}
-.hk-bm .ico{width:13px;height:13px}
-.hk-cy,.hk-in{flex:1 1 auto;min-width:0;display:flex;align-items:center;justify-content:flex-end;gap:3px;font:700 10px/1 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--parch-3);white-space:nowrap}
-.hk-in{color:var(--spirit)}
-.hk-in .i{width:11px;height:11px}
-/* полоса осколков: стекло с лицом, доля, «собрано / нужно»; собранный комплект — светится */
 .hk-sh{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:4px;height:18px}
 .hk-shb{flex:1 1 auto;min-width:0;height:5px;border-radius:3px;background:#0b0d0f;box-shadow:inset 0 0 0 1px #262c32;overflow:hidden}
 .hk-shb i{display:block;height:100%;width:calc(var(--v) * 1%);background:linear-gradient(90deg,var(--spirit-3),var(--spirit))}
 .hk-sh small{font:700 10.5px/1 var(--f-u);color:var(--parch-2);white-space:nowrap}
 .hk-sh.full .hk-shb i{box-shadow:0 0 8px var(--spirit)}
 .hk-sh.full small{color:var(--spirit)}
-/* поверх портрета: занятость, «максимум», замок закрытого цикла */
-.hk-busy{position:absolute;left:0;right:0;top:44%;z-index:6;padding:4px 2px;text-align:center;font:700 10px/1 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--amber);background:rgba(10,8,4,.82)}
-.hk-max{position:absolute;left:-2px;right:-2px;top:60%;z-index:6;padding:4px 0;text-align:center;font:700 10px/1 var(--f-u);letter-spacing:.24em;text-transform:uppercase;color:#1d1405;
-  background:linear-gradient(90deg,transparent,#d8b262 14%,#fff0c4 50%,#d8b262 86%,transparent);box-shadow:0 0 14px rgba(233,199,126,.5)}
-.hk-lk{position:absolute;left:50%;top:42%;z-index:6;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;transform:translate(-50%,-50%);background:rgba(8,10,12,.85);color:var(--parch-2);box-shadow:0 0 0 1px var(--iron-2)}
-.hk-lk .i{width:16px;height:16px}
-
-/* ---------- ступени вида: сила героя одним взглядом (hcTier: редкость и доблесть) ----------
-   В духе стилей, отмеченных автором 30.09.2026, — «золотая филигрань» и «кованое железо»: металл рамки и отделка богатеют со ступенью,
-   у вершины — сияние и искры. 1 — тёмное железо с заклёпками, нить цвета редкости; 2 — позолота, листья у гребня, кабошоны цвета редкости,
-   свет редкости; 3 — старое золото с крыльями у гребня, раскалённые швы, сияние и искры у вершины. Рамка — кольцо .hk-fr (маска из
-   градиентов, без картинки), отделка — .hk-orn (нить, заклёпки, кабошоны) и .hk-crest (гребень). Рамка картинкой (.hk-fa, HC_ART)
-   прячет CSS своей ступени (.art). Сменить вид — переменные --hk-metal, --hk-rim и блоки ступеней ниже */
-.hk-fr,.hk-orn,.hk-crest{position:absolute;z-index:3;pointer-events:none}
-.hk-fa{position:absolute;inset:0;z-index:3;width:100%;height:100%;pointer-events:none}
-.hk-fr.art,.hk-orn.art,.hk-crest.art{display:none}
-.hk-fr{inset:0;padding:var(--hk-bw);border-radius:inherit;background:var(--hk-metal);
-  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
-.hk-orn{inset:var(--hk-bw);border-radius:calc(var(--hk-r) - var(--hk-bw));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--rc) 60%,transparent),inset 0 0 0 2px rgba(0,0,0,.55);
-  --pin:radial-gradient(circle,var(--hk-pin1) 0 32%,var(--hk-pin2) 36% 58%,rgba(0,0,0,.6) 62% 70%,transparent 74%);
-  background:var(--pin) 3px 3px/var(--hk-pin) var(--hk-pin) no-repeat,var(--pin) calc(100% - 3px) 3px/var(--hk-pin) var(--hk-pin) no-repeat,
-    var(--pin) 3px calc(100% - 3px)/var(--hk-pin) var(--hk-pin) no-repeat,var(--pin) calc(100% - 3px) calc(100% - 3px)/var(--hk-pin) var(--hk-pin) no-repeat}
-.hk-crest{left:50%;top:0;width:clamp(30px,30cqw,72px);aspect-ratio:2/1;transform:translateX(-50%)}
-.hk-crest::before,.hk-crest::after{content:"";position:absolute;top:8%;width:46%;height:70%;background:var(--hk-leaf,none)}
-.hk-crest::before{left:0;clip-path:polygon(100% 20%,58% 0,18% 22%,0 62%,40% 52%,100% 70%)}
-.hk-crest::after{right:0;clip-path:polygon(0 20%,42% 0,82% 22%,100% 62%,60% 52%,0 70%)}
-/* ступень 1 — тёмное железо (тусклая бронза): заклёпки по углам, крепление гребня — железо */
-.hk,.hcb-pt,.hcz{--hk-metal:linear-gradient(160deg,#70665a,#2d2924 30%,#554b3e 52%,#211e1a 76%,#4d4438);--hk-rim:#6d6252;--hk-pin1:#bdb09a;--hk-pin2:#4a4238;--hk-pin:clamp(7px,6cqw,12px)}
-/* ступень 2 — позолота: листья у гребня, кабошоны цвета редкости, свет редкости снизу и вокруг */
-:is(.hk,.hcb-pt,.hcz)[data-t="2"]{--hk-metal:linear-gradient(160deg,#f4dc9c,#a07733 28%,#ecca7c 48%,#6e4f1d 74%,#dcb86a);--hk-rim:#c9a45c;--hk-pin1:color-mix(in srgb,var(--rc) 55%,#fff);--hk-pin2:var(--rc);--hk-pin:clamp(9px,8cqw,16px);
-  --hk-leaf:linear-gradient(180deg,#f7e2a6,#b1873c 60%,#6e4f1d)}
-:is(.hk,.hcb-pt,.hcz)[data-t="2"] .hk-orn{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--rc) 75%,transparent),inset 0 0 0 3px rgba(0,0,0,.5),inset 0 -60px 50px -40px color-mix(in srgb,var(--rc) 40%,transparent)}
-.hk[data-t="2"]{box-shadow:0 0 0 1px color-mix(in srgb,var(--rc) 30%,transparent),0 10px 24px -12px color-mix(in srgb,var(--rc) 55%,#000)}
-/* ступень 3 — старое золото: крылья у гребня, раскалённые швы, сияние и искры у вершины */
-:is(.hk,.hcb-pt,.hcz)[data-t="3"]{--hk-metal:linear-gradient(160deg,#fff4cc,#caa04e 20%,#fde6a6 42%,#8d6421 66%,#f6d58f 84%,#b3843a);--hk-rim:#f0cf85;--hk-pin1:#fff;--hk-pin2:var(--rc);--hk-pin:clamp(10px,9cqw,18px);
-  --hk-leaf:linear-gradient(180deg,#fff2c6,#e2b45c 45%,#8d6421)}
-:is(.hk,.hcb-pt,.hcz)[data-t="3"] .hk-orn{box-shadow:inset 0 0 0 1px #ffd489,inset 0 0 12px rgba(255,150,50,.55),inset 0 -70px 60px -46px color-mix(in srgb,var(--rc) 45%,transparent)}
-:is(.hk,.hcb-pt,.hcz)[data-t="3"] .hk-crest{width:clamp(40px,46cqw,110px)}
-:is(.hk,.hcb-pt,.hcz)[data-t="3"] .hk-crest::before{clip-path:polygon(100% 30%,70% 0,44% 8%,22% 0,0 30%,14% 44%,0 64%,40% 58%,100% 76%)}
-:is(.hk,.hcb-pt,.hcz)[data-t="3"] .hk-crest::after{clip-path:polygon(0 30%,30% 0,56% 8%,78% 0,100% 30%,86% 44%,100% 64%,60% 58%,0 76%)}
-.hk[data-t="3"]{box-shadow:0 0 0 1px rgba(240,207,133,.6),0 0 18px -3px rgba(255,190,90,.6),0 0 22px -8px var(--rc),0 12px 26px -12px #000}
-.hcb-pt[data-t="3"],.hcz[data-t="3"]{box-shadow:0 0 0 1px rgba(240,207,133,.6),0 0 32px -6px rgba(255,190,90,.55),0 18px 40px -20px #000}
-.hcb-pt[data-t="2"],.hcz[data-t="2"]{box-shadow:0 0 0 1px color-mix(in srgb,var(--rc) 30%,transparent),0 18px 40px -20px color-mix(in srgb,var(--rc) 50%,#000)}
-/* сияние и искры у вершины — ступень 3: свет за гребнем дышит (opacity), искры поднимаются от гребня (transform и opacity) */
-.hk-fx{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
-.hk-fx b{position:absolute;left:50%;top:-18%;width:110%;aspect-ratio:1;border-radius:50%;transform:translateX(-50%);background:radial-gradient(closest-side,rgba(255,214,140,.55),rgba(255,170,70,.18) 55%,transparent);animation:hk-glow 3.2s ease-in-out infinite}
-.hk-fx i{position:absolute;left:var(--x);top:9%;width:3px;height:3px;border-radius:50%;background:#fff1cf;box-shadow:0 0 6px 1px rgba(255,190,90,.9);opacity:0;animation:hk-spark var(--s) ease-out var(--d) infinite}
-@keyframes hk-glow{0%,100%{opacity:.65}50%{opacity:1}}
-@keyframes hk-spark{0%{opacity:0;transform:translateY(18cqw) scale(.6)}20%{opacity:1}100%{opacity:0;transform:translateY(-4cqw) scale(1)}}
-/* не в коллекции: чёрно-белый портрет, тёмное железо без отделки — редкость видна кристаллом; закрытый цикл — темнее и замок */
-.hk.gray[data-t]{--hk-metal:linear-gradient(160deg,#4b4f54,#1d2023 40%,#3a3e43 60%,#17191b);--hk-rim:#4a4f55;box-shadow:0 10px 22px -14px #000}
-.hk.gray[data-t] .hk-orn{background:none;box-shadow:inset 0 0 0 1px #30363c,inset 0 0 0 2px rgba(0,0,0,.55)}
-.hk.gray[data-t] .hk-crest{display:none}
-.hk.gray .hk-ph{filter:grayscale(1) brightness(.62) contrast(1.06)}
-.hk.gray .hk-nm{color:var(--parch-2)}
-.hk.lock .hk-ph{filter:grayscale(1) brightness(.32)}
-.hk.sel{outline:2px solid var(--spirit);outline-offset:2px}
-@media (prefers-reduced-motion:reduce){ .hk-fx b{animation:none;opacity:.85} .hk-fx i{animation:none;opacity:.7;top:calc(4% + var(--z) / 3)} .hk{transition:none} }
 
 /* ---------- сетка: «Мои», каталог, «За золото»; строка над ней — вид, сила коллекции, порядок и фильтр ----------
    Ширина карточки — не меньше --hk-w0 (932 × 430) и --hk-w1 (844 × 390) из HC_VIEW.card, высота — 16/9; прокрутка — сетка */
@@ -185,7 +67,8 @@
 .hkh{display:flex;align-items:center;gap:var(--sp-s);flex:none;min-width:0;min-height:32px}
 .hkh .rs-next{margin:0;white-space:nowrap}
 .hk-tabs{flex:none}
-.hk-cnt{font:700 12px/1 var(--f-u);color:var(--parch-3);white-space:nowrap}
+.hk-cnt,.hk-scale{font:700 12px/1 var(--f-u);color:var(--parch-3);white-space:nowrap}
+.hk-scale{letter-spacing:.02em}
 .collpow.hk-pow{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 8px 0 12px;flex:none}
 .collpow.hk-pow b{display:inline;font-size:13px}
 .hk-sort,.hk-cyc{height:32px;padding:0 6px;flex:none}
@@ -204,64 +87,27 @@
 .hkf-b .ico{width:20px;height:20px}
 .hkf-cr{width:16px;height:16px;background:var(--rico) center/contain no-repeat}
 
-/* ---------- большая карточка (hcBig): слева портрет в раме ступени, справа — шапка, вкладки, одно действие ----------
-   Карточка — контейнер (hcb): портрет — не шире --hcb-max % и в пропорции --hcb-w : --hcb-h (HC_VIEW.big) по высоте. Та же карточка —
-   на экране (коллекция, «За золото») и в окне поверх любого экрана (.hc-win на месте рабочей области) */
-.hcb-scr{gap:0}
-.hcb{position:relative;flex:1 1 0;min-height:0;min-width:0;container:hcb/size}
-.hcb-g{position:absolute;inset:0;display:grid;grid-template-columns:min(calc(1cqw * var(--hcb-max,40)),calc(100cqh * var(--hcb-w,5) / var(--hcb-h,7))) minmax(0,1fr);gap:var(--sp-m)}
-.hcb-pt{--hk-gold:#e2bd72;--hk-r:16px;position:relative;min-height:0;border-radius:var(--hk-r);overflow:hidden;isolation:isolate;background:#07090b;container-type:inline-size;box-shadow:0 18px 40px -20px #000}
-.hcb-ph{position:absolute;inset:0;z-index:0;display:block;width:100%;height:100%;padding:0;border:0;background:none;cursor:zoom-in}
-.hcb-ph .hk-img{object-position:50% 10%}
-.hcb-rp{position:absolute;inset:0;z-index:4;pointer-events:none}
-.hcb-rp .rp.h{position:absolute;top:24%;bottom:28%;width:22px;padding:0}
-.hcb-rp .rp.h.l{left:8px}
-.hcb-rp .rp.h.r{right:8px}
-.hcb-zi{position:absolute;right:10px;bottom:10px;z-index:6;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:rgba(8,10,12,.7);color:var(--parch-2);box-shadow:0 0 0 1px var(--iron-2);pointer-events:none}
-.hcb-zi .i{width:14px;height:14px}
-.hcb-pt .hk-max{top:auto;bottom:16%}
-.hcb-in{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0;min-height:0}
-.hcb-h{display:flex;align-items:flex-start;gap:var(--sp-m);flex:none;min-width:0}
-.hcb-bk{flex:none}
-.hcb-id{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1 1 auto}
-.hcb-id h2{font:600 28px/1 var(--f-d);color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hcb-step{display:flex;gap:4px;flex:none}
-.hcb .hd-bm{flex:none}
-.hcb-tabs.pnl.hd{flex:1 1 0;min-height:0;padding:0;border:0;background:none;box-shadow:none}
-.hcb-tabs .hd-body{margin-top:0}
-.hcb-tb{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:var(--sp-s)}
-.hcb-tr{flex:none}
-.hcb-sc{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:var(--sp-s)}
-.hcb-f{flex:none;display:flex;align-items:center;gap:var(--sp-s);min-width:0;padding-top:var(--sp-s);border-top:1px solid var(--iron)}
+/* ---------- одно действие книги «до покупки»: покупка, пробуждение или как получить (hcGetFoot, hcGoldFoot) ---------- */
 .hcb-buy{display:flex;flex-direction:column;gap:3px;min-width:0}
 .hcb-buy b{font:600 16px/1.1 var(--f-d);color:var(--parch)}
 .hcb-shb{display:flex;align-items:center;gap:8px;min-width:150px}
 .hcb-shb .bar{flex:1 1 auto}
 .hcb-shb small{font:700 12px/1 var(--f-u);color:var(--parch-2)}
-@container hcb (max-height: 340px){
-  .hcb-id{gap:4px}
-  .hcb-id h2{font-size:24px}
-  .hcb .hd-bm b{font-size:24px}
-  .hcb-rp .rp.h{width:18px}
-  .hcb .btn.big{min-height:42px}
-  .hcb-f{padding-top:6px}
-}
-/* в окне поверх любого экрана: на месте рабочей области, шапка и шахта — под затемнением */
-.hc-ov>.ov-scrim{background:rgba(2,4,5,.74)}
-.hc-win{position:absolute;left:var(--rail,0px);top:var(--top,0px);right:0;bottom:0;display:flex;flex-direction:column;padding:var(--sp-m);border-left:1px solid var(--iron);
-  background:radial-gradient(120% 90% at 50% 120%,rgba(72,229,212,.05),transparent 60%),linear-gradient(#0c0e11,#090b0d);box-shadow:-30px 0 60px -20px rgba(0,0,0,.8);animation:fade .18s ease}
-/* портрет крупно: рисунок целиком (выгрузка 4 : 5) в раме своей ступени */
+
+/* портрет крупно: рисунок целиком (выгрузка 4 : 5) в тонкой раме цвета редкости, кристалл и имя */
 .hcz-ov>.ov-scrim{background:rgba(2,3,4,.92)}
-.hcz{--hk-gold:#e2bd72;--hk-r:18px;position:absolute;left:50%;top:50%;z-index:1;margin:0;height:calc(100% - 32px);aspect-ratio:4/5;border-radius:var(--hk-r);overflow:hidden;isolation:isolate;transform:translate(-50%,-50%);
-  background:#07090b;container-type:inline-size;box-shadow:0 30px 80px rgba(0,0,0,.8);animation:pop .22s cubic-bezier(.2,.8,.2,1)}
+.hcz{position:absolute;left:50%;top:50%;z-index:1;margin:0;height:calc(100% - 32px);aspect-ratio:4/5;border-radius:14px;overflow:hidden;isolation:isolate;transform:translate(-50%,-50%);
+  background:#07090b;box-shadow:0 0 0 1px color-mix(in srgb,var(--rc) 55%,#2a2f35),0 0 40px -8px var(--rc),0 30px 80px rgba(0,0,0,.8);animation:pop .22s cubic-bezier(.2,.8,.2,1)}
+.hcz::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(3,4,5,.45),transparent 18%,transparent 70%,rgba(4,6,8,.85))}
 .hcz-ph{position:absolute;inset:0;z-index:0}
 .hcz-ph .hk-img{object-position:50% 0}
+.hcz-ph .hk-sil{--st:54px;--sb:50px;--sx:16px}   /* поле силуэта: сверху — кристалл и «Закрыть», снизу — имя */
+.hcz>.hb-cr{position:absolute;left:50%;top:10px;z-index:3;width:40px;aspect-ratio:1;transform:translateX(-50%);background:var(--rico) center/contain no-repeat;filter:drop-shadow(0 2px 3px rgba(0,0,0,.9)) drop-shadow(0 0 8px color-mix(in srgb,var(--rc) 75%,transparent))}
 .hcz figcaption{position:absolute;left:0;right:0;bottom:0;z-index:5;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:40px 16px 14px}
 .hcz figcaption b{font:600 26px/1 var(--f-d);color:var(--gold);text-shadow:0 2px 6px #000}
-.hcz figcaption .hk-st{position:static;transform:none;margin-left:auto}
-.hcz .hk-st i{width:18px}
+.hcz figcaption .stars{margin-left:auto}
 .hcz-x{position:absolute;right:12px;top:12px;z-index:2}
-@media (prefers-reduced-motion:reduce){ .hcz,.hc-win{animation:none} }
+@media (prefers-reduced-motion:reduce){ .hcz{animation:none} }
 
 /* ---------- отряды: библиотека слева, редактор справа ---------- */
 .sq{display:grid;grid-template-columns:236px minmax(0,1fr);gap:var(--sp-m);height:100%}
@@ -280,7 +126,7 @@
 .sq-bm{font:600 24px/1 var(--f-d);color:var(--gold);gap:6px}
 .sq-slots{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
 .hr-sqed{gap:var(--sp-s);min-height:0}
-.hr-sqed .sq-slots{max-width:520px;flex:none}
+.hr-sqed .sq-slots{max-width:400px;flex:none;column-gap:12px}   /* мелкие книги: высота книги с лентами — как у прежней плитки 4 : 5 */
 .hr-sqh{gap:6px;flex:none}
 .hr-sqh h2{font-size:24px;line-height:1.05;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hr-sqbar{min-height:32px;flex:none}
@@ -379,7 +225,7 @@
 .du-b.one{grid-template-columns:minmax(0,1fr)}
 .du-shelf{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0;min-height:0}
 .du-cyc{flex:none}
-.du-grid{flex:1 1 0;min-height:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));grid-auto-rows:max-content;gap:var(--sp-s);align-content:start;padding:2px 4px 4px 2px}
+.du-grid{flex:1 1 0;min-height:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));grid-auto-rows:max-content;gap:var(--sp-s);align-content:start;padding:2px 4px 4px 2px}
 .du-empty{flex:1 1 0;display:grid;place-items:center;padding:var(--sp-l);text-align:center;font:italic 500 16px/1.35 var(--f-d);color:var(--parch-2);text-shadow:0 1px 2px #000}
 /* карточка витрины: стекло с лицом, кристалл, имя; цена осколка и доля собранного */
 .du-c{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;padding:8px 6px 7px;border-radius:11px;color:var(--parch);
@@ -510,6 +356,12 @@
 .dn-alt{container-type:size;position:relative;flex:1 1 0;min-height:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--sp-s);align-items:end;padding:0 6px}
 .dn-alt::after{content:"";position:absolute;left:-14px;right:-14px;bottom:-3px;height:9px;z-index:0;border-top:1px solid rgba(var(--dn-au),.5);background:linear-gradient(180deg,#151c19,#060807);box-shadow:0 -12px 30px -10px rgba(var(--dn-en),.4)}
 .dn-ni{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;min-width:0;height:100%;padding:0;border:0;background:none;color:var(--parch)}
+/* книга героя на ступени: дороже герой — крупнее книга (--g0, --g1 из DN_VIEW), не шире колонки */
+.dn-ni>.hb{flex:none;width:min(100%,calc((var(--g0) + var(--k) * var(--g1)) * .5 * 1cqh))}
+/* сет будущего цикла: героев не видно до открытия цикла */
+.dn-alt.shut{display:flex;align-items:center;justify-content:center}
+.dn-shut{position:relative;z-index:1;display:flex;align-items:center;gap:8px;margin:0;font:italic 500 16px/1.3 var(--f-d);color:var(--parch-2);text-shadow:0 1px 3px #000}
+.dn-shut .i{width:16px;height:16px;color:var(--gold-2)}
 .dn-ni::before{content:"";position:absolute;left:14%;right:14%;top:8%;bottom:calc((var(--s0) + var(--k) * var(--s1)) * var(--sq,1));z-index:-1;pointer-events:none;opacity:calc(var(--k) * .09);
   background:radial-gradient(60% 90% at 50% 100%,rgba(var(--dn-en),.55),transparent 72%);filter:blur(5px);transition:opacity .25s}
 .dn-ni.sel::before{opacity:1;background:linear-gradient(0deg,rgba(var(--dn-en),.42),rgba(var(--dn-en),.1) 60%,transparent),radial-gradient(60% 90% at 50% 100%,rgba(var(--dn-en),.55),transparent 72%)}
@@ -659,16 +511,14 @@
 
 /* компактный режим низкого экрана (844×390): рабочая область ниже 360 */
 @container main (max-height: 360px){
-  .hc .stars i{width:10px;height:10px}
-  .hc .nm{font-size:13.5px}
-  .hr-sqed .sq-slots{max-width:440px}
+  .hr-sqed .sq-slots{max-width:330px}
   .hr-sqh h2{font-size:21px}
   .hr-entry b{font-size:17px}
 }
 
 /* ---------- витрина отряда недели (OV.hrecho) ----------
    Окно на арене цивилизации недели (ECH.art или CSS): шапка — цивилизация, нашествие, неприязнь; посередине — пятеро крупными карточками
-   9 : 16, выбранный приподнят; внизу — откуда осколки и выбранный с одним действием. Карточка — не шире пятой части ряда и по высоте ряда:
+   (книгами, screens/book.css), выбранный приподнят; внизу — откуда осколки и выбранный с одним действием. Книга — не шире пятой части ряда и по высоте ряда:
    ряд — контейнер (her), окно — контейнер (he) для низкого экрана */
 .he-ov>.ov-scrim{background:rgba(2,4,4,.74)}
 .he{position:absolute;left:50%;top:50%;width:min(904px,calc(100% - 28px));height:calc(100% - 20px);display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:var(--sp-s);padding:0 var(--sp-m) var(--sp-m);
@@ -686,8 +536,8 @@
 .he-av{flex:none;height:26px;color:#ffc2b5;border-color:rgba(232,90,78,.45);background:rgba(40,10,8,.72)}
 .he-row{position:relative;min-height:0;container:her/size}
 .he-cards{position:absolute;inset:0;display:flex;justify-content:center;align-items:flex-end;gap:var(--he-gap,12px);padding-bottom:2px}
-.he-cards .hk{flex:none;width:min(calc((100cqw - 4 * var(--he-gap,12px)) / 5),calc((100cqh - 12px) * 9 / 16));transition:transform .2s ease}
-.he-cards .hk.sel{transform:translateY(-8px)}
+.he-cards .hb{flex:none;width:min(calc((100cqw - 4 * var(--he-gap,12px)) / 5),calc((100cqh - 14px) * 9 / 17));transition:transform .2s ease}
+.he-cards .hb.sel{transform:translateY(-8px)}
 .he-f{display:flex;align-items:center;gap:var(--sp-m);min-width:0}
 .he-src{display:flex;align-items:center;gap:6px;flex:1 1 auto;min-width:0;margin:0;font-size:12px;line-height:1.3;color:var(--parch-2);text-shadow:0 1px 2px #000}
 .he-src>.i{flex:none;width:14px;height:14px;color:var(--gold-2)}
@@ -698,14 +548,4 @@
 .he-sn small{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--parch-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .he-sn small>span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis}
 @container he (max-height: 380px){ .he-h{padding-top:8px} .he-t h2{font-size:25px} .he-sel{padding:4px 4px 4px 10px} .he-sn b{font-size:16px} .he .btn{min-height:36px} .he .btn.go{min-height:40px} }
-@media (prefers-reduced-motion:reduce){ .he{animation:none} .he-cards .hk{transition:none} }
-
-/* ---------- раздел UI-кита «Карточка героя»: ступени, состояния, большая карточка и витрина вне кадра телефона ---------- */
-.hck-row{display:flex;flex-wrap:wrap;gap:var(--sp-l);align-items:flex-start}
-.hck-t{margin:0;display:flex;flex-direction:column;gap:8px;width:150px}
-.hck-c{width:150px}
-.hck-t figcaption{font-size:12px;line-height:1.3;color:var(--parch-3)}
-.hck-t figcaption b{display:block;margin-bottom:2px;font:600 15px/1.1 var(--f-d);color:var(--parch)}
-.hck-big{position:relative;display:flex;width:830px;max-width:100%;height:360px;margin:var(--sp-m) 0}
-.hck-big>.hcb{flex:1 1 auto}
-.hck-he{position:relative;height:410px;max-width:904px;overflow:hidden;border-radius:14px}
+@media (prefers-reduced-motion:reduce){ .he{animation:none} .he-cards .hb{transition:none} }

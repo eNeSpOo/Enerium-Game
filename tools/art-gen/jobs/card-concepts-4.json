@@ -1,0 +1,170 @@
+{
+  "name": "Карточка героя, четвёртая партия: книжная система — три варианта знака доблести. Автор выбрал «Оклад гримуара» (card3-03), 30.09.2026: «Мне нравится эта концепция книг, и я хочу, чтобы сами книги и означали, по сути, героя с 1 максимальной доблестью, 2, 3, 4, 5. Нажимая на героя, мы и открываем информацию о герое как будто в виде книги… Замки со светящимся бирюзовым цветом в виде рунных пределов — это вообще 10 из 10. Красные печати — это лишнее, их нужно убрать. Продумай 5 книжек — от обычной книги в переплёте до условного гримуара; свечение книги как на референсе, и её кристалл — это и есть её редкость. Нужно понять, как будут выглядеть доблести, которые сделал игрок, в таком формате. Классы, уровень и стихию оставить так же, как и кристалл редкости. Дай 3 варианта самых подходящих». На каждый вариант — две картинки: A — ряд из пяти книг-карточек (максимум доблести 1…5), B — раскрытая книга героя",
+  "plan": {
+    "Правила системы — одни во всех вариантах": {
+      "вид книги = личный максимум доблести": "1 — простая книга в мягкой потёртой коже, без металла; 2 — тёмная кожа, четыре железных уголка, ремень с пряжкой; 3 — том в окладе: пластины тёмной бронзы с гравированной каймой, бронзовые шишки по углам; 4 — тяжёлый кодекс: толстые доски в чёрной коже, железные полосы, пластины резной кости по углам, большие железные шишки; 5 — гримуар: богатый оклад из воронёного железа и резной кости, шипастые углы, из обреза страниц бьёт свет. Книга растёт массой, работой и древностью, не глянцем",
+      "редкость": "кристалл вверху по центру книги + цвет свечения вокруг неё; у обычной свечения почти нет; цвета — ADR-0027",
+      "рунные пределы": "пять навесных замков столбцом по правому краю; пройденный — отперт, из скважины бьёт бирюза; отсчёт сверху — как card3-03",
+      "уровень, стихия, класс, мощь": "уровень — круг слева вверху, стихия — медальон справа вверху, класс — щит слева внизу, мощь — мечи и число справа внизу; как card3-03",
+      "печати": "нет — автор: «лишнее»"
+    },
+    "Ряд A — пять книг": {
+      "книга 1": "обычная, доблесть 0 из 1, 1 предел, ур. 34, мощь 1240",
+      "книга 2": "редкая, 1 из 2, 2 предела, ур. 150, мощь 8420",
+      "книга 3": "уникальная, 2 из 3, 3 предела, ур. 350, мощь 48350",
+      "книга 4": "эпическая, 3 из 4, 4 предела, ур. 700, мощь 210600",
+      "книга 5": "вневременная, 5 из 5, все 5 пределов, ур. 1200, мощь 912780"
+    },
+    "Разворот B": "гримуар (максимум 5), вневременный, доблесть 3 из 5, 3 предела, ур. 350, мощь 184200 — нарочно не вершина, чтобы на развороте было видно взятые и невзятые доблести и главы. Левая страница — портрет с уровнем, стихией, классом и мощью по углам; правая — страница героя: навыки, развитие, пять глав (три открыты, две в тени); строки — заглушки без букв; замки пределов и знак доблести — на переплёте",
+    "Три знака доблести": {
+      "v1 — ленты-закладки": "закладки свисают из-под книги, лент столько, сколько максимум; взятая — лента цвета редкости с горящей звездой-наконечником, невзятая — выцветшая, с тусклым наконечником. Почему: по GDD §10.4 каждая доблесть открывает ровно одну главу истории героя, а закладка — это открытая глава",
+      "v2 — бинты корешка": "поднятые бинты поперёк корешка по левому краю книги, бинтов столько, сколько максимум; взятый — окован тёмной бронзой и перечёркнут золотой нитью света, невзятый — голая кожа. Почему: доблесть — корешок слева, пределы — замки справа, знаки по разные стороны книги и не путаются; сама книга крепнет с каждой доблестью",
+      "v3 — тиснёные звёзды": "звёзды, тиснённые в коже дугой под кристаллом, звёзд столько, сколько максимум; взятая — золотое тиснение с мягким свечением, невзятая — слепое тиснение, один оттиск. Почему: звезда — наш знак доблести (значок valor) и дуга звёзд из референса автора; золотое против слепого тиснения — язык переплётчика; камни в гнёздах, как предлагал координатор, спутались бы с кристаллом редкости"
+    }
+  },
+  "notes": [
+    "Стиль и запреты — как у третьей пятёрки (jobs/card-concepts-3.json, тёмное фэнтези), образец стиля — выбранная автором картинка art/generated/card-concepts/card3-03-grimoire-fix2__nb2.jpg; в промте прямо сказано не брать с неё печати, шнуры и кольца",
+    "Категория одна — card-concepts: gen.py кладёт картинки в папку категории. Ряд A — 21:9 (3168×1344 в 2K, пять карточек 9:16 помещаются), разворот B — 16:9; пропорции заданы у каждого задания",
+    "Референсы A: портрет Брокка, образец стиля, кристаллы r1, r2, r3, r4, r7 (пять редкостей ряда), мечи мощи, щит класса. Референсы B: портрет, образец стиля, кристалл r7, мечи, щит",
+    "Знак доблести в промте — словами, значок valor не прикладываем: в первой десятке лишние референсы путали модель"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: dark fantasy game art for a mobile RPG — gloomy, heavy, noble and uneasy. Hand-painted digital painting, the same painting as the attached samples: visible confident brush strokes, simplified planes, deep near-black shadows, crisp rim light on edges. A muted, desaturated palette: soot black (#050607, #121518), graphite (#262B31), old leather, blackened iron, dark bronze, yellowed bone, aged parchment. Everything is matte, worn and aged: no bright or polished gold, no gloss, no shiny jewellery, no clean saturated game-UI colors. Light is scarce and precious: the scene is lit only from below — cold turquoise carst light (#48E5D4) — while the crystals, padlocks, page edges and valor signs glow on their own; everything else sinks into shadow. Ash, dust motes and faint embers drift in the light. A hero's power shows as awe and age, not as wealth. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.",
+  "negative": "No words, no letters, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no titles or lettering on covers, spines or pages, no handwriting, no lines of text, no watermark, no signature, no logo, no captions or labels. The only characters anywhere in the picture are the digits of the level and combat power numbers — no word Level, no Lv, no abbreviations such as CP, BP or PWR; the name plate stays blank. No wax seals, no seals of any kind, no cords with rings. No skulls, no skeletons, no blood. No pentagrams, no occult signs, no crosses, no religious symbols. No bright polished gold, no glossy plastic shine, no clean bright mobile-game UI look. No phone mockup, no hands, no table, no floor, no tilted books, no perspective. The hero has exactly two arms and two hands; no empty eyes.",
+  "categories": {
+    "card-concepts": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [
+        "art/generated/heroes/hero-c2-46-brokk__nb2.jpg",
+        "art/generated/card-concepts/card3-03-grimoire-fix2__nb2.jpg"
+      ],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nThis is a concept for the hero cards of a dark fantasy mobile RPG in which every hero is a book: tapping the card opens the book, and everything about the hero — skills, growth, the chapters of his story — is a part of that book. The first attached image is the hero's portrait. The second attached image is the approved style sample: take from it the dark painted book covers, the column of five padlocks with their turquoise light, the round level badge, the element medallion, the class shield, the combat power icon and the glow around the book — but none of its red wax seals, cords or rings: there are no wax seals anywhere. The other attached images are our game icons, listed below; they give the shape of these elements; paint them in the same dark, matte, aged key, and do not copy their plain square backgrounds.\n\nThe rules of the book system:\n- The kind of book is the hero's personal valor maximum, from 1 to 5. The book grows in mass, craft and age, never in gloss: 1 — a small plain book in soft worn brown leather over thin boards, no metal at all; 2 — a sturdier book in dark leather with four iron corner pieces and one leather strap with an iron buckle across its lower part; 3 — a tome in an oklad: the cover framed by plates of dark bronze with engraved borders and bronze bosses at the corners; 4 — a heavy codex: thick boards in black leather bound with iron straps, plates of carved yellowed bone at the corners, large iron bosses; 5 — a grimoire: a massive cover in a rich oklad of blackened iron and carved bone with spiked iron corners, its page edges blazing with light that spills out, ash and embers rising.\n- Rarity is the crystal set at the top center of the book plus the color of the glow around the book: common — white (#E6E8EA), almost no glow; rare — yellow (#F0CC4F); unique — turquoise (#1FB8D0); epic — violet (#A986EE); timeless — green (#5FD67A).\n- Rune limits are always exactly five small iron padlocks hanging in one vertical column along the right edge of the book. A passed limit is an open padlock, unlocked, with turquoise light (#48E5D4) streaming out of its keyhole; an unpassed one is a closed dark padlock. Passed limits count from the top.\n- Valor: the book has exactly as many valor places as its maximum, never more; the concept below says what they look like. A valor sign never looks like a padlock or a crystal.\n- Level: digits in a round badge at the top left. Element: a small round medallion of dark iron around a raw chunk of amber-orange rock glowing from within (#EB9D40) — a rock, not a planet — at the top right. Class: the tank's shield icon at the bottom left. Combat power: the crossed-swords icon right before its number, at the bottom right. Digits only — never a word, never letters such as Lv, CP or BP. The digits are clean, bold and legible, in pale old gold.\n- The hero, wherever he is painted: the old dwarf of the first attached image — a bald head, a stern furrowed face, a long white braided beard, a heavy brown leather coat studded with iron rivets, a round iron-rimmed shield, a heavy chain with a huge old iron key — the same face, clothes and pose, head in the upper third, shown down to the hips, his background in deep shadow, lit from below; his beard stays white. Under his portrait, a blank name plate with nothing written on it."
+    }
+  },
+  "jobs": [
+    {
+      "id": "card4-v1a-ribbons",
+      "category": "card-concepts",
+      "title": "Книжная система, вариант 1 (ленты-закладки): ряд из пяти книг",
+      "source": "Слова автора 30.09.2026 о книжной системе; доблесть — ленты-закладки: по GDD §10.4 каждая доблесть открывает одну главу истории героя",
+      "aspect": "21:9",
+      "refs": [
+        "art/generated/heroes/hero-c2-46-brokk__nb2.jpg",
+        "art/generated/card-concepts/card3-03-grimoire-fix2__nb2.jpg",
+        "design/ui/assets/art/icons/r1.png",
+        "design/ui/assets/art/icons/r2.png",
+        "design/ui/assets/art/icons/r3.png",
+        "design/ui/assets/art/icons/r4.png",
+        "design/ui/assets/art/icons/r7.png",
+        "design/ui/assets/art/icons/power.png",
+        "design/ui/assets/art/icons/cls-tank.png"
+      ],
+      "subject": "Format: a concept sheet, landscape 21:9. On near-black darkness with a faint turquoise glow rising from below — no table, no floor, no scenery — stand exactly five closed books side by side in one row, each seen straight on from the front as a vertical card in a 9:16 proportion, about two thirds of the canvas high, evenly spaced, the same size, flat, not tilted, not in perspective, placed a little above the middle so that the ribbons hanging below them fit in the canvas. From left to right they are the five kinds of book, 1 to 5, with the hero's portrait painted on a panel set into each cover. Attached icons after the style sample: (3) the white crystal — common; (4) the yellow crystal — rare; (5) the turquoise crystal — unique; (6) the violet crystal — epic; (7) the green crystal — timeless; (8) the combat power icon — crossed swords; (9) the class icon — a shield on a hexagonal tile.\n\nValor in this concept — bookmark ribbons, the chapters of his story that the hero has opened. Flat silk bookmark ribbons hang out of the bottom edge of the book, from under the name plate, and dangle below the book side by side — as many ribbons as the book's valor maximum. A taken valor is a ribbon of the book's rarity color ending in a small metal four-pointed star that glows amber-gold (#E6A84B); an untaken one is a faded, frayed grey ribbon ending in a dull dark metal star. No wax, no seals, no rings, no cords.\n\nThe five books, left to right:\n1) Book 1, common: a milky-white crystal, almost no glow; valor 0 of 1 — one single faded ribbon and nothing more; padlocks: the top one open and shining, the four below closed; level 34; combat power 1240.\n2) Book 2, rare: a yellow crystal and a soft yellow glow; valor 1 of 2 — two ribbons: the left one yellow with a glowing star tip, the right one faded; padlocks: the top two open and shining, the three below closed; level 150; combat power 8420.\n3) Book 3, unique: a turquoise crystal and a turquoise glow; valor 2 of 3 — three ribbons: the left two turquoise with glowing star tips, the right one faded; padlocks: the top three open, the two below closed; level 350; combat power 48350.\n4) Book 4, epic: a violet crystal and a violet glow; valor 3 of 4 — four ribbons: the left three violet with glowing star tips, the right one faded; padlocks: the top four open, the lowest closed; level 700; combat power 210600.\n5) Book 5, timeless: a green crystal and a strong green glow; valor 5 of 5 — five ribbons, all green with glowing star tips; all five padlocks open and shining; level 1200; combat power 912780."
+    },
+    {
+      "id": "card4-v1b-ribbons",
+      "category": "card-concepts",
+      "title": "Книжная система, вариант 1 (ленты-закладки): раскрытая книга героя",
+      "source": "Слова автора 30.09.2026: «нажимая на героя, мы и открываем информацию о герое как будто в виде книги»; гримуар, доблесть 3 из 5, 3 предела",
+      "aspect": "16:9",
+      "refs": [
+        "art/generated/heroes/hero-c2-46-brokk__nb2.jpg",
+        "art/generated/card-concepts/card3-03-grimoire-fix2__nb2.jpg",
+        "design/ui/assets/art/icons/r7.png",
+        "design/ui/assets/art/icons/power.png",
+        "design/ui/assets/art/icons/cls-tank.png"
+      ],
+      "subject": "Format: the open book of the hero — what the player sees after tapping his card — landscape 16:9. His grimoire — book 5, the massive cover in a rich oklad of blackened iron and carved bone with spiked iron corners — lies open and fills most of the frame, seen straight from above, flat, both pages facing the viewer, on near-black darkness, no table. The heavy binding frames the two pages like a picture frame. The hero is timeless: the green rarity crystal (image 3) is set at the head of the book, at the top center above the gutter, and a green glow surrounds the whole book; light spills from the page edges. Attached icons after the style sample: (3) the green rarity crystal; (4) the combat power icon — crossed swords; (5) the class icon — a shield on a hexagonal tile.\n\nLeft page — the portrait page: the hero painted over the whole page as a full-page illustration in a thin painted border; on its corners, as on his card: level 350 in a round badge at the top left, the element medallion at the top right, the class icon (image 5) at the bottom left, the combat power — the crossed swords (image 4) and 184200 — at the bottom right; a blank name plate at the bottom center.\n\nRight page — the hero's page, laid out like a section of an old book, on dark aged parchment, in three blocks divided by thin ornamental rules:\n1) at the top, a row of four round skill medallions in dark iron frames, each with a small painted emblem: a raised shield, a stone wall, a hammer, a heavy chain;\n2) in the middle, the growth block: a long horizontal bar of amber light, two thirds filled, with a small round badge at its left end;\n3) at the bottom, the chapters: five chapter rows one under another, each a small square painted miniature with two short placeholder bars beside it; the first three rows are vivid and lit, the last two faded and veiled in shadow.\nEvery placeholder is a straight solid bar of faded ink with rounded ends — never letters, never handwriting, nothing readable.\n\nRune limits: five padlocks hang in one vertical column on hasps along the right edge of the binding, beside the right page: the top three open with turquoise light streaming from their keyholes, the lower two closed and dark.\n\nValor 3 of 5 — bookmark ribbons: five flat silk bookmark ribbons come out of the bottom of the gutter between the two pages and hang down below the book side by side: the left three are green, each ending in a small metal four-pointed star glowing amber-gold — taken; the right two are faded, frayed grey with dull dark star tips — untaken. No wax, no seals, no rings."
+    },
+    {
+      "id": "card4-v2a-spine",
+      "category": "card-concepts",
+      "title": "Книжная система, вариант 2 (бинты корешка): ряд из пяти книг",
+      "source": "Слова автора 30.09.2026 о книжной системе; доблесть — бинты корешка слева, пределы — замки справа: знаки по разные стороны книги. Вторая попытка: в первой (card4-v2a-spine__nb2.jpg) книги развёрнуты в три четверти, замки ушли на корешок к бинтам, уровень нарисован дважды, перед мощью — сердце вместо мечей",
+      "aspect": "21:9",
+      "refs": [
+        "art/generated/heroes/hero-c2-46-brokk__nb2.jpg",
+        "art/generated/card-concepts/card3-03-grimoire-fix2__nb2.jpg",
+        "design/ui/assets/art/icons/r1.png",
+        "design/ui/assets/art/icons/r2.png",
+        "design/ui/assets/art/icons/r3.png",
+        "design/ui/assets/art/icons/r4.png",
+        "design/ui/assets/art/icons/r7.png",
+        "design/ui/assets/art/icons/power.png",
+        "design/ui/assets/art/icons/cls-tank.png"
+      ],
+      "subject": "Format: a concept sheet, landscape 21:9. On near-black darkness with a faint turquoise glow rising from below — no table, no floor, no scenery — stand exactly five closed books side by side in one row, each seen flat, straight from the front as a vertical card in a 9:16 proportion — a front view, never a three-quarter view: the spine shows only as a rounded strip along the left edge of the front cover. The books are about four fifths of the canvas high, evenly spaced, the same size. From left to right they are the five kinds of book, 1 to 5, with the hero's portrait painted on a panel set into each cover. Attached icons after the style sample: (3) the white crystal — common; (4) the yellow crystal — rare; (5) the turquoise crystal — unique; (6) the violet crystal — epic; (7) the green crystal — timeless; (8) the combat power icon — crossed swords; (9) the class icon — a shield on a hexagonal tile.\n\nValor in this concept — raised bands on the spine. The spine strip runs down the whole left edge of each book, about one eighth of the book's width. Raised bands cross it horizontally, evenly spaced — as many bands as the book's valor maximum, and nothing else: no padlocks, no keyholes, no icons, no gems, no digits on the spine. A taken valor is a band capped with dark bronze and crossed by a glowing amber-gold line of light (#E6A84B); an untaken one is a plain raised band of dark leather, cold.\nThe padlocks are on the opposite side of the book: the column of five padlocks hangs along the right edge of each cover.\nEvery sign appears exactly once on each book: the level only in the round badge at the top left; the element medallion at the top right; the class shield only at the bottom left; the combat power at the bottom right — the crossed swords (image 8) directly before the number, never a heart.\n\nThe five books, left to right; padlocks are listed from top to bottom:\n1) Book 1, common: a milky-white crystal, almost no glow; spine: one single plain band in the middle and nothing more; padlocks: open, closed, closed, closed, closed; level 34; combat power 1240.\n2) Book 2, rare: a yellow crystal and a soft yellow glow; spine: two bands — the upper capped and glowing, the lower plain; padlocks: open, open, closed, closed, closed; level 150; combat power 8420.\n3) Book 3, unique: a turquoise crystal and a turquoise glow; spine: three bands — the upper two capped and glowing, the lowest plain; padlocks: open, open, open, closed, closed; level 350; combat power 48350.\n4) Book 4, epic: a violet crystal and a violet glow; spine: four bands — the upper three capped and glowing, the lowest plain; padlocks: open, open, open, open, closed; level 700; combat power 210600.\n5) Book 5, timeless: a green crystal and a strong green glow; spine: five bands, all capped and glowing; padlocks: open, open, open, open, open; level 1200; combat power 912780. Its page edges glow with green light — no fire, no flames."
+    },
+    {
+      "id": "card4-v2b-spine",
+      "category": "card-concepts",
+      "title": "Книжная система, вариант 2 (бинты корешка): раскрытая книга героя",
+      "source": "Слова автора 30.09.2026: «нажимая на героя, мы и открываем информацию о герое как будто в виде книги»; гримуар, доблесть 3 из 5, 3 предела; корешок на развороте — полоса по средокрестию",
+      "aspect": "16:9",
+      "refs": [
+        "art/generated/heroes/hero-c2-46-brokk__nb2.jpg",
+        "art/generated/card-concepts/card3-03-grimoire-fix2__nb2.jpg",
+        "design/ui/assets/art/icons/r7.png",
+        "design/ui/assets/art/icons/power.png",
+        "design/ui/assets/art/icons/cls-tank.png"
+      ],
+      "subject": "Format: the open book of the hero — what the player sees after tapping his card — landscape 16:9. His grimoire — book 5, the massive cover in a rich oklad of blackened iron and carved bone with spiked iron corners — lies open and fills most of the frame, seen straight from above, flat, both pages facing the viewer, on near-black darkness, no table. The heavy binding frames the two pages like a picture frame. The hero is timeless: the green rarity crystal (image 3) is set at the head of the book, at the top center above the gutter, and a green glow surrounds the whole book; light spills from the page edges. Attached icons after the style sample: (3) the green rarity crystal; (4) the combat power icon — crossed swords; (5) the class icon — a shield on a hexagonal tile.\n\nLeft page — the portrait page: the hero painted over the whole page as a full-page illustration in a thin painted border; on its corners, as on his card: level 350 in a round badge at the top left, the element medallion at the top right, the class icon (image 5) at the bottom left, the combat power — the crossed swords (image 4) and 184200 — at the bottom right; a blank name plate at the bottom center.\n\nRight page — the hero's page, laid out like a section of an old book, on dark aged parchment, in three blocks divided by thin ornamental rules:\n1) at the top, a row of four round skill medallions in dark iron frames, each with a small painted emblem: a raised shield, a stone wall, a hammer, a heavy chain;\n2) in the middle, the growth block: a long horizontal bar of amber light, two thirds filled, with a small round badge at its left end;\n3) at the bottom, the chapters: five chapter rows one under another, each a small square painted miniature with two short placeholder bars beside it; the first three rows are vivid and lit, the last two faded and veiled in shadow.\nEvery placeholder is a straight solid bar of faded ink with rounded ends — never letters, never handwriting, nothing readable.\n\nRune limits: five padlocks hang in one vertical column on hasps along the right edge of the binding, beside the right page: the top three open with turquoise light streaming from their keyholes, the lower two closed and dark.\n\nValor 3 of 5 — raised bands on the spine: the spine shows as a raised vertical strip of dark leather running down the gutter between the two pages, from the crystal at the top to the bottom edge, and exactly five raised bands cross it, evenly spaced from top to bottom: the upper three capped with dark bronze and crossed by a glowing amber-gold line — taken; the lower two plain dark leather — untaken."
+    },
+    {
+      "id": "card4-v3a-stars",
+      "category": "card-concepts",
+      "title": "Книжная система, вариант 3 (тиснёные звёзды): ряд из пяти книг",
+      "source": "Слова автора 30.09.2026 о книжной системе; доблесть — звёзды: золотое тиснение против слепого; камни в гнёздах спутались бы с кристаллом редкости",
+      "aspect": "21:9",
+      "refs": [
+        "art/generated/heroes/hero-c2-46-brokk__nb2.jpg",
+        "art/generated/card-concepts/card3-03-grimoire-fix2__nb2.jpg",
+        "design/ui/assets/art/icons/r1.png",
+        "design/ui/assets/art/icons/r2.png",
+        "design/ui/assets/art/icons/r3.png",
+        "design/ui/assets/art/icons/r4.png",
+        "design/ui/assets/art/icons/r7.png",
+        "design/ui/assets/art/icons/power.png",
+        "design/ui/assets/art/icons/cls-tank.png"
+      ],
+      "subject": "Format: a concept sheet, landscape 21:9. On near-black darkness with a faint turquoise glow rising from below — no table, no floor, no scenery — stand exactly five closed books side by side in one row, each seen straight on from the front as a vertical card in a 9:16 proportion, about four fifths of the canvas high, evenly spaced, the same size, flat, not tilted, not in perspective. From left to right they are the five kinds of book, 1 to 5, with the hero's portrait painted on a panel set into each cover. Attached icons after the style sample: (3) the white crystal — common; (4) the yellow crystal — rare; (5) the turquoise crystal — unique; (6) the violet crystal — epic; (7) the green crystal — timeless; (8) the combat power icon — crossed swords; (9) the class icon — a shield on a hexagonal tile.\n\nValor in this concept — stars tooled into the cover. Right under the crystal, stars are tooled into the leather of the cover in a short arc — as many stars as the book's valor maximum. A taken valor is a gold-tooled star: filled with old gold that glows softly amber (#E6A84B); an untaken one is a blind-tooled star: only its outline pressed into the dark leather, no gold, no light. Each star has four long sharp rays in a cross.\n\nThe five books, left to right:\n1) Book 1, common: a milky-white crystal, almost no glow; valor 0 of 1 — one single blind-tooled star and nothing more; padlocks: the top one open and shining, the four below closed; level 34; combat power 1240.\n2) Book 2, rare: a yellow crystal and a soft yellow glow; valor 1 of 2 — two stars: the left one gold-tooled and glowing, the right one blind; padlocks: the top two open and shining, the three below closed; level 150; combat power 8420.\n3) Book 3, unique: a turquoise crystal and a turquoise glow; valor 2 of 3 — three stars: the left two gold-tooled, the right one blind; padlocks: the top three open, the two below closed; level 350; combat power 48350.\n4) Book 4, epic: a violet crystal and a violet glow; valor 3 of 4 — four stars: the left three gold-tooled, the right one blind; padlocks: the top four open, the lowest closed; level 700; combat power 210600.\n5) Book 5, timeless: a green crystal and a strong green glow; valor 5 of 5 — five stars, all gold-tooled and glowing; all five padlocks open and shining; level 1200; combat power 912780."
+    },
+    {
+      "id": "card4-v3b-stars",
+      "category": "card-concepts",
+      "title": "Книжная система, вариант 3 (тиснёные звёзды): раскрытая книга героя",
+      "source": "Слова автора 30.09.2026: «нажимая на героя, мы и открываем информацию о герое как будто в виде книги»; гримуар, доблесть 3 из 5, 3 предела",
+      "aspect": "16:9",
+      "refs": [
+        "art/generated/heroes/hero-c2-46-brokk__nb2.jpg",
+        "art/generated/card-concepts/card3-03-grimoire-fix2__nb2.jpg",
+        "design/ui/assets/art/icons/r7.png",
+        "design/ui/assets/art/icons/power.png",
+        "design/ui/assets/art/icons/cls-tank.png"
+      ],
+      "subject": "Format: the open book of the hero — what the player sees after tapping his card — landscape 16:9. His grimoire — book 5, the massive cover in a rich oklad of blackened iron and carved bone with spiked iron corners — lies open and fills most of the frame, seen straight from above, flat, both pages facing the viewer, on near-black darkness, no table. The heavy binding frames the two pages like a picture frame. The hero is timeless: the green rarity crystal (image 3) is set at the head of the book, at the top center above the gutter, and a green glow surrounds the whole book; light spills from the page edges. Attached icons after the style sample: (3) the green rarity crystal; (4) the combat power icon — crossed swords; (5) the class icon — a shield on a hexagonal tile.\n\nLeft page — the portrait page: the hero painted over the whole page as a full-page illustration in a thin painted border; on its corners, as on his card: level 350 in a round badge at the top left, the element medallion at the top right, the class icon (image 5) at the bottom left, the combat power — the crossed swords (image 4) and 184200 — at the bottom right; a blank name plate at the bottom center.\n\nRight page — the hero's page, laid out like a section of an old book, on dark aged parchment, in three blocks divided by thin ornamental rules:\n1) at the top, a row of four round skill medallions in dark iron frames, each with a small painted emblem: a raised shield, a stone wall, a hammer, a heavy chain;\n2) in the middle, the growth block: a long horizontal bar of amber light, two thirds filled, with a small round badge at its left end;\n3) at the bottom, the chapters: five chapter rows one under another, each a small square painted miniature with two short placeholder bars beside it; the first three rows are vivid and lit, the last two faded and veiled in shadow.\nEvery placeholder is a straight solid bar of faded ink with rounded ends — never letters, never handwriting, nothing readable.\n\nRune limits: five padlocks hang in one vertical column on hasps along the right edge of the binding, beside the right page: the top three open with turquoise light streaming from their keyholes, the lower two closed and dark.\n\nValor 3 of 5 — stars tooled into the binding: on the dark leather rim of the binding along the top edge, right under the crystal, a short straight row of exactly five tooled stars, centered: the left three gold-tooled and softly glowing amber — taken; the right two blind-tooled, only their outlines pressed into the leather — untaken. Each star has four long sharp rays in a cross."
+    }
+  ],
+  "result": {
+    "Итог 30.09.2026": "12 запросов nb2 2K, $1.248 по счётчикам токенов (потолок $3); два переноса без запроса (цена 0, операции — в манифесте, поле patch_ops). Правки — jobs/card-concepts-4-edit.json. Обрывов SSL в этой партии не было",
+    "Выбор автора": "вариант 1 — ленты-закладки. Правки вариантов 2 и 3 остановлены по слову автора",
+    "Замечание автора к лентам — для следующей работы": "«сами корешки слишком длинные — это сетка героев, их много»: ленты доблести должны быть короткими, лишь выглядывать из-под книги",
+    "Итоговые картинки": {
+      "card4-v1a (ряд из пяти книг, ленты)": "art/generated/card-concepts/card4-v1a-ribbons-patch__nb2.jpg — счёт верный: ленты 0/1, 1/2, 2/3, 3/4, 5/5; замки 1-2-3-4-5. Из card4-v1a-ribbons-fix (правка EDIT: замки книг 3 и 5, ремень книги 2 убран с замков) + перенос отпертого замка у книг 2 и 4",
+      "card4-v1b (раскрытая книга, ленты)": "art/generated/card-concepts/card4-v1b-ribbons-patch__nb2.jpg — счёт верный: ленты 3 зелёные + 2 выцветшие, замки 3 из 5, главы 5 (три открыты, две в тени). Из card4-v1b-ribbons-fix2 (правка EDIT: главы) + перенос фона на месте лишней ленты; первая правка (card4-v1b-ribbons-fix) вернула ту же картинку",
+      "card4-v2a (ряд, бинты корешка) — остановлен": "art/generated/card-concepts/card4-v2a-spine__nb2-v2.jpg — перерисовка после первой пробы в три четверти; огрехи: бинтов 0/3/3/4/2 вместо 1/2/3/4/5, взятые и невзятые не различаются, замки 0/0/2/3/4",
+      "card4-v2b (раскрытая книга, бинты) — готов без правок": "art/generated/card-concepts/card4-v2b-spine__nb2.jpg — бинты 3 из 5, замки 3 из 5, главы 5",
+      "card4-v3a (ряд, звёзды) — остановлен": "art/generated/card-concepts/card4-v3a-stars__nb2.jpg — огрехи: у книг 3–5 второй ряд звёзд над плашкой имени, у книги 4 три звезды вместо четырёх, у книги 5 шесть; замки 1/1/2/3/4. Правка card4-v3a-stars-fix исправила замки книг 2–3, но сломала звёзды книги 3",
+      "card4-v3b (раскрытая книга, звёзды)": "art/generated/card-concepts/card4-v3b-stars-fix__nb2.jpg — звёзды 3 из 5, замки 3 из 5, глав 5 после правки"
+    },
+    "Чему научила партия": [
+      "В ряду из пяти книг модель путает счёт замков с числом взятых доблестей: у книги N отперто столько замков, сколько у неё доблестей. Правка EDIT отпирает не те гнёзда",
+      "Надёжно и бесплатно — перенос готового отпертого замка в соседнее гнездо того же столбца: та же рамка, мягкая маска, шва не видно",
+      "Образец стиля с печатями внизу (card3-03) тянет знаки вниз: у звёзд модель дорисовала второй ряд на месте печатей",
+      "Правку, которую модель проигнорировала целиком, лучше повторить одной простой операцией; «удали» и «приглуши» проходят, «перестрой блок» — нет"
+    ]
+  }
+}

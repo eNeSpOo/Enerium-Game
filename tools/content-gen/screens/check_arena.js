@@ -250,7 +250,7 @@ fresh();
   const oid = A().opp[0]; T.S.overlay = { t: 'opp', arg: oid };
   let h = view('витрина соперника');
   if (!h.includes('data-a="arprep"')) say('витрина: нет «Выбрать отряд»');
-  if ((ovOf(h).match(/class="hc/g) || []).length < 5) say('витрина: не пять героев соперника');
+  if ((ovOf(h).match(/<button class="hb[ "]/g) || []).length < 5) say('витрина: не пять книг героев соперника');
   act('arprep', oid);
   if (!T.S.overlay || T.S.overlay.t !== 'prep' || T.S.overlay.arg !== 'pvp') say('подготовка: не открылся лист атаки');
   h = view('подготовка атаки');

@@ -131,7 +131,7 @@ const WS_SRV = {
   check(cells) {
     const have = new Map(cells.map(c => [c.id, c.q])), pool = WS_SRV.recipes();
     const fit = pool.filter(r => r.in.every(([id, q]) => (have.get(id) || 0) >= q)).sort(wsSpecific)[0];
-    if (fit) { const h = wsHero(fit); return h && rsHas(h) ? { refuse: 'owned', r: fit, hero: h } : { made: fit }; }
+    if (fit) { const h = wsHero(fit); return wsHeroDone(h) ? { refuse: 'owned', r: fit, hero: h } : { made: fit }; }
     const ids = [...have.keys()], hints = [];
     if (ids.length >= WS_DATA.hintMin) for (const r of pool) {
       const ing = r.in.map(([id]) => id);
@@ -194,7 +194,7 @@ const WS_SRV = {
 };
 const WS_REFUSE = {
   unknown: 'Автодокрафт работает только по найденным рецептам',
-  owned: 'Герой уже в коллекции',
+  owned: 'Герой уже в коллекции или его осколков хватает',
   stop: 'Неизвестный этап: автодокрафт остановлен',
   lack: 'Не хватает ресурсов',
   consent: 'Без согласия особый ресурс не списывается',
@@ -216,6 +216,12 @@ const wsItemOrd = new Map(EN_RECIPES.items.map((it, i) => [it.id, i]));
 const wsGroupOf = it => Math.max(0, WS_DATA.groups.findIndex(g => g[2] && g[2].includes(it.tier)));
 const wsSpecial = id => { const it = BAG.item(id); return !!it && (WS_DATA.special.tiers.includes(it.tier) || WS_DATA.special.items.includes(id)); };
 const wsHero = r => { const it = r ? BAG.item(r.out[0]) : null; return it && it.tier === 'hero' ? RSI[it.heroId] || null : null; };
+/* рецепт героя кладёт в запасы комплект его осколков (стадии знакомства, решение автора 30.09.2026: «важна суть появления осколка
+   в инвентаре… если осколков хватает на полного героя, он уже входит во 2 стадию»); дальше — пробуждение за души, как у всех.
+   Повтор не нужен, пока герой в коллекции или комплект лежит в запасах */
+const wsHeroNeed = () => (RS.rules ? RS.rules.stub.shards : 0);
+const wsHeroDone = h => !!h && (rsHas(h) || (S.rs.shards[h.id] || 0) >= wsHeroNeed());
+const wsHeroWhy = h => rsHas(h) ? `${h.n} уже в коллекции` : `Осколков героя ${h.n} уже хватает — пробудите его за души`;
 /* создаётся ли предмет рецептом: в игре — признак предмета, сам рецепт клиенту не приходит */
 const wsByRecipe = id => (RX_OUT[id] || []).some(r => !r.team);
 const wsCells = () => S.ws.cells.filter(Boolean);
@@ -231,10 +237,16 @@ const wsExtra = (cells, r) => cells.map(c => { const x = r.in.find(([id]) => id 
 const wsStock = () => EN_RECIPES.items.filter(it => !it.team && it.tier !== 'hero' && BAG.qty(it.id) > 0)
   .sort((a, b) => wsGroupOf(a) - wsGroupOf(b) || wsItemOrd.get(a.id) - wsItemOrd.get(b.id));
 
-/* выдача итога: предмет — в запасы, герой — в коллекцию с 0 ур., 0 РП и 0 Добл (ADR-0019), валюта — в кошелёк */
+/* выдача итога: предмет — в запасы, герой — комплект его осколков в запасы (пробуждение — за души, придёт с 0 ур., 0 РП и 0 Добл,
+   ADR-0019), валюта — в кошелёк */
 function wsGive(id, q) {
   const it = BAG.item(id); if (!it) return;
-  if (it.tier === 'hero') { const h = RSI[it.heroId]; if (h && !rsHas(h)) rsAdd(h, 'craft'); return; }
+  if (it.tier === 'hero') {   // комплект осколков героя; у пробуждённого осколки — в прах (§15.2)
+    const h = RSI[it.heroId]; if (!h) return;
+    const n = wsHeroNeed() * q;
+    if (rsHas(h)) S.wallet.dust += n * rsDustOf(h); else S.rs.shards[h.id] = (S.rs.shards[h.id] || 0) + n;
+    return;
+  }
   const w = WS_DATA.wallet[id]; if (w && w in S.wallet) { S.wallet[w] += q; return; }
   BAG.add(id, q);
 }
@@ -340,7 +352,7 @@ function wsPlan(r, n) {
   steps.forEach(([p, t]) => { const e = st.find(x => x.r === p); if (e) e.t += t; else st.push({ r: p, t }); });
   const sp = Object.entries(spend), hero = wsHero(r);
   return { r, n, out: r.out[1] * n, spend: sp, steps: st, stop, lack: Object.entries(lack), extra: Object.entries(made).filter(([, q]) => q > 0),
-    special: sp.filter(([id]) => wsSpecial(id)), hero, owned: !!hero && rsHas(hero), ok: !stop.length && !Object.keys(lack).length };
+    special: sp.filter(([id]) => wsSpecial(id)), hero, owned: wsHeroDone(hero), ok: !stop.length && !Object.keys(lack).length };
 }
 /* сколько раз можно создать сейчас */
 function wsMaxN(r) {
@@ -358,7 +370,7 @@ function wsGuess() {
   const fit = WS_SRV.known().filter(r => r.in.every(([id, q]) => (have.get(id) || 0) >= q)).sort(wsSpecific)[0];
   if (!fit) return { st: 'unknown', lack, special, extra: [] };
   const h = wsHero(fit);
-  return { st: 'known', r: fit, lack, special, extra: wsExtra(cells, fit), owned: !!h && rsHas(h) };
+  return { st: 'known', r: fit, lack, special, extra: wsExtra(cells, fit), owned: wsHeroDone(h) };
 }
 /* подсказка, чьи открытые позиции все лежат на столе */
 function wsTrail() {
@@ -377,7 +389,7 @@ function wsAttempt(consent, op) {
   if (v.again) return;
   if (v.refuse === 'lack') { S.overlay = null; return toast('Не хватает в запасах — поправьте стол'); }
   if (v.refuse === 'consent') return toast(WS_REFUSE.consent);
-  if (v.refuse === 'owned') { S.overlay = null; return toast(`${v.hero.n} уже в коллекции.${TM(' Что даёт повтор рецепта героя, не решено — заглушка прототипа')}`); }
+  if (v.refuse === 'owned') { S.overlay = null; return toast(`${wsHeroWhy(v.hero)}.${TM(' Что даёт повтор рецепта героя, не решено — заглушка прототипа')}`); }
   if (v.refuse) return;
   S.ws.last = cells.map(c => ({ id: c.id, q: c.q })); S.ws.cells = wsEmpty(); S.ws.sel = 0;
   wsFxStart(v.res);
@@ -451,7 +463,7 @@ function wsFootHtml(g) {
   let st, cls = g.st;
   if (!any) st = 'Положите ресурсы в ячейки — порядок не важен.';
   else if (g.lack.length) { cls = 'bad'; st = 'Не хватает в запасах: ' + trEsc(wsNames(g.lack.map(c => [c.id, c.q - BAG.qty(c.id)]))); }
-  else if (g.st === 'known') st = g.owned ? `«${trEsc(g.r.n)}»: ${trEsc(wsHero(g.r).n)} уже в коллекции` : `Совпадает с рецептом «${trEsc(g.r.n)}»${g.extra.length ? ' · лишнее сгорит: ' + trEsc(wsNames(g.extra)) : ''}`;
+  else if (g.st === 'known') st = g.owned ? `«${trEsc(g.r.n)}»: ${trEsc(wsHeroWhy(wsHero(g.r)))}` : `Совпадает с рецептом «${trEsc(g.r.n)}»${g.extra.length ? ' · лишнее сгорит: ' + trEsc(wsNames(g.extra)) : ''}`;
   else { const t = wsTrail(); st = t ? `На столе все открытые позиции «${trEsc(t.r.n)}»: ${t.n} из ${t.r.in.length}. Остальное — угадать.` : 'Сочетание неизвестно. При неудаче сгорит всё положенное.'; }
   const go = any && !g.lack.length && !g.owned;
   return `<div class="ws-foot"><p class="ws-st ${cls}" role="status">${st}</p><button class="btn ghost sm" data-a="wsclear"${any ? '' : ' disabled'}>Очистить</button><button class="btn go" data-a="wstry" data-v="${wsOp()}"${go ? '' : ' disabled'}>${g.st === 'known' ? 'Создать' : 'Попробовать'}</button></div>`;
@@ -484,7 +496,7 @@ function wsRowHtml(x) {
     return `<div class="ws-rc part">${star}<div class="ws-rc-m"><div class="ws-rc-t"><b>${trEsc(r.n)}</b>${chip}</div><div class="ws-ing">${ing}${outW}</div></div><button class="btn sm" data-a="wsload" data-v="${r.id}">На стол</button></div>`;
   }
   const p = x.plan, k = p.steps.length;
-  const state = p.owned ? `<span class="chip gold">${ic('check')}в коллекции</span>`
+  const state = p.owned ? `<span class="chip gold">${ic('check')}${rsHas(p.hero) ? 'в коллекции' : 'осколки собраны'}</span>`
     : p.ok ? `<span class="chip spirit">${ic('check')}${k ? `через ${k} ${plural(k, 'этап', 'этапа', 'этапов')}` : 'можно создать'}</span>`
     : p.stop.length ? `<span class="chip warn">${ic('lock')}неизвестный этап</span>` : '<span class="chip">не хватает</span>';
   const ing = r.in.map(([id, q]) => wsWell(BAG.item(id), { q, cls: BAG.qty(id) < q ? 'ws-short' : '' })).join('');
@@ -702,9 +714,9 @@ function wsFxPaneHtml(R, e) {
       eb = 'Новая запись в книге';
       rows.push(`<p class="ws-fx-line">Новый рецепт: дальше его можно создать из книги, со всей цепочкой.</p>`);
     } else eb = out ? wsTier(out) : '';
-    if (R.hero) rows.push(`<p class="ws-fx-line">${trEsc(R.hero.n)} в коллекции: 0 ур. · 0 РП · 0 Добл.</p>`);
+    if (R.hero) rows.push(`<p class="ws-fx-line">${trEsc(R.hero.n)}: комплект осколков в запасах — героя пробуждают души, придёт с 0 ур. · 0 РП · 0 Добл.</p>`);
     if ((res.burn || []).length) rows.push(`<div class="ws-fx-row"><span class="ws-fx-sub">Лишнее сгорело</span>${wsFxWells(res.burn)}</div>`);
-    if (game && R.hero) acts.push(`<button class="link" data-a="rhero" data-v="${R.hero.id}">${ic('users')}Карточка героя</button>`);
+    if (game && R.hero) acts.push(`<button class="link" data-a="rhero" data-v="${R.hero.id}">${ic('users')}Книга героя</button>`);
     if (game && R.isNew && R.rec) acts.push(`<button class="btn sm ghost" data-a="wsbookgo" data-v="${R.rec.id}">${ic('book')}В книгу</button>`);
     else if (game && R.kind === 'made' && wsCanRepeat()) acts.push('<button class="btn sm ghost" data-a="wsrepeat">Повторить набор</button>');
   }
@@ -918,12 +930,12 @@ Object.assign(OV, {
     const n = Math.max(1, o.n || 1), p = wsPlan(r, n), out = BAG.item(r.out[0]);
     const cap = p.hero ? 1 : WS_DATA.makeCap, max = wsMaxN(r);
     const step = `<div class="ws-n" role="group" aria-label="Сколько раз создать"><button class="ws-qb" data-a="wsn" data-v="-1"${n <= 1 ? ' disabled' : ''} aria-label="Меньше">−</button><b class="num">${n}</b><button class="ws-qb" data-a="wsn" data-v="1"${n >= cap ? ' disabled' : ''} aria-label="Больше">+</button><button class="ws-qb" data-a="wsn" data-v="max"${max > 1 ? '' : ' disabled'}>Макс${max > 1 ? ' · ' + max : ''}</button></div>`;
-    const top = `<div class="ws-mk">${wsWell(out, { stat: true, size: 52 })}<div class="col" style="gap:3px;min-width:0"><span class="eyebrow">${wsTier(out)}</span><b class="serif" style="font-size:20px;line-height:1.05">${trEsc(out.n)}</b><small class="faint">выйдет ×${fmt(p.out)}${p.hero ? ' · придёт с 0 ур., 0 РП и 0 Добл' : ''}</small></div><span class="g-spacer"></span>${step}</div>`;
+    const top = `<div class="ws-mk">${wsWell(out, { stat: true, size: 52 })}<div class="col" style="gap:3px;min-width:0"><span class="eyebrow">${wsTier(out)}</span><b class="serif" style="font-size:20px;line-height:1.05">${trEsc(out.n)}</b><small class="faint">выйдет ×${fmt(p.out)}${p.hero ? ' · комплект осколков героя, пробуждение — за души' : ''}</small></div><span class="g-spacer"></span>${step}</div>`;
     const stages = p.steps.map(s => wsStepHtml(s.r, s.t, false)).join('')
       + p.stop.map(id => `<li class="unk">${ic('lock')}<b>${trEsc(wsName(id))}</b><span>рецепт не найден</span></li>`).join('')
       + wsStepHtml(r, n, true);
     const warn = [];
-    if (p.owned) warn.push(`<p class="reason warn">${trEsc(p.hero.n)} уже в коллекции.${TM(' Что даёт повтор рецепта героя, не решено — заглушка прототипа.')}</p>`);
+    if (p.owned) warn.push(`<p class="reason warn">${trEsc(wsHeroWhy(p.hero))}.${TM(' Что даёт повтор рецепта героя, не решено — заглушка прототипа.')}</p>`);
     if (p.stop.length) warn.push(`<p class="reason warn">Этап не найден: ${p.stop.map(id => '«' + trEsc(wsName(id)) + '»').join(', ')}. Автодокрафт остановлен — рецепт этапа ищут на столе.</p>`);
     if (p.lack.length) warn.push(`<p class="reason warn">Не хватает: ${trEsc(wsNames(p.lack))}.</p>`);
     const extra = p.extra.length ? `<p class="reason">Останется в запасах: ${trEsc(wsNames(p.extra))}.</p>` : '';
@@ -987,7 +999,7 @@ Object.assign(ACT, {
   wstry(v) {
     const g = wsGuess(); if (g.st === 'empty') return;
     if (g.lack.length) return toast('Не хватает в запасах: ' + wsNames(g.lack.map(c => [c.id, c.q - BAG.qty(c.id)])));
-    if (g.owned) return toast(`${wsHero(g.r).n} уже в коллекции`);
+    if (g.owned) return toast(wsHeroWhy(wsHero(g.r)));
     const op = v || wsOp();
     if (g.st === 'known' && !g.extra.length && !g.special.length) return wsAttempt(false, op);   // чистый найденный рецепт — без лишнего вопроса
     open('wstry', '', { ok: false, op });

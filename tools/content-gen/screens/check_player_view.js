@@ -40,7 +40,7 @@ const VOID = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input'
 /* переключатели и листы, которые обход нажимает сам: меняют только вид, а не запасы и кошелёк */
 const SAFE = new Set(['seg', 'hview', 'zptab', 'wsview', 'rscyc', 'lore', 'lorefoe', 'biome', 'hero', 'sq', 'esel', 'echsel', 'gsel', 'dsel', 'ssel',
   'zpsel', 'dartab', 'wsbtab', 'wsbkind', 'wscat', 'wsinfo', 'legend', 'sheet', 'dlg', 'foe', 'item', 'rhero', 'npc', 'talkmore', 'echfoe', 'echweek',
-  'echbest', 'darbox', 'rsval', 'hfilter', 'hsort', 'qty', 'echcb', 'hc', 'hcback', 'hcf', 'hcclr', 'hczoom', 'hczx', 'hcstep']);
+  'echbest', 'darbox', 'rsval', 'hfilter', 'hsort', 'qty', 'echcb', 'hc', 'hcback', 'hcf', 'hcclr', 'hczoom', 'hczx', 'hcstep', 'hbclose', 'hbskip']);
 
 /* ================== разметка → то, что видит игрок ================== */
 const TAG = /<!--[\s\S]*?-->|<(\/?)([a-zA-Z][\w-]*)((?:[^>"']|"[^"]*"|'[^']*')*?)(\/?)>/g;
@@ -257,13 +257,21 @@ function main() {
       T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'mine'; T.S.selHero = h.id; T.S.seg.hero = tab; T.S.overlay = null;
       draw(`герой ${h.name} · ${tab}${tag}`);
     }
-    /* состав героев: карточка каждого героя, его последняя доблесть и лист поверх */
-    reset();
+    /* состав героев: книга каждого героя, его последняя доблесть и лист поверх. Книгу не найденного героя не открыть (стадии знакомства,
+       30.09.2026): обход делает каждого известным — все циклы открыты, у сборных комплект осколков; неизвестная душа — одним осколком */
+    reset(); T.S.rs.cyc = 6;
+    const need = T.RS.rules.stub.shards;
     for (const h of T.RS.heroes) {
+      T.S.rs.shards = T.S.rs.owned[h.id] || h.src === 'gold' || h.src === 'donat' ? {} : { [h.id]: need };   // только он: сетка под книгой не разрастается
       T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'rs'; T.S.rs.sel = h.id; T.S.rs.val = null; T.S.overlay = null;
       draw(`состав · ${h.n}${tag}`);
       T.S.rs.val = { id: h.id, v: h.maxV }; draw(`состав · ${h.n} · последняя доблесть${tag}`);
       T.S.overlay = { t: 'rhero', arg: h.id }; draw(`лист героя · ${h.n}${tag}`);
+    }
+    for (const src of ['roulette', 'echo', 'craft']) {
+      const h = T.RS.heroes.find(x => x.src === src && x.c >= 2 && !T.S.rs.owned[x.id]); if (!h) continue;
+      T.S.rs.shards = { [h.id]: 1 }; T.S.hview = 'rs'; T.S.rs.sel = h.id; T.S.overlay = null; draw(`неизвестная душа · ${h.n}${tag}`);
+      T.S.overlay = { t: 'rhero', arg: h.id }; draw(`неизвестная душа поверх · ${h.n}${tag}`);
     }
     /* Призыв: три вкладки на каждом цикле */
     for (let c = 1; c <= 6; c++) for (const tab of ['gold', 'donat', 'souls']) {

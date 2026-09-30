@@ -1,0 +1,192 @@
+{
+  "name": "Карточка героя — книга (выбор автора 30.09.2026, ADR-0032, раздел «Выбор автора — карточка-книга»). Слова автора: «Мне нравится эта концепция книг, и я хочу, чтобы сами книги и означали, по сути, героя с 1 максимальной доблестью, 2, 3, 4, 5. Нажимая на героя, мы и открываем информацию о герое как будто в виде книги… Замки со светящимся бирюзовым цветом в виде рунных пределов — 10 из 10. Красные печати — лишнее»; «Значит, мы создаём анимацию открытия книги после нажатия на карточку? С генерацией всех артов, что потребуется, и партиклами?» — да. Арт карточки-книги и её анимации: обложки пяти ступеней с прозрачным окном под портрет, развороты пяти ступеней, замок закрытый и отпертый, лента-закладка и звёздочка-подвес (нейтральные — цвет редкости даёт интерфейс), изнанка обложки и лист для перелистывания. Всё, что зависит от героя, — кристалл, уровень, стихия, класс, мощь, имя, замки, ленты — кладёт интерфейс: на арте их нет.",
+  "plan": {
+    "Обложки book-cover-1…5": "9:16, 1K, ключ black: одна закрытая книга, окно под портрет — пустое чёрное (после вырезки — прозрачное); ступень = личный максимум доблести: 1 — мягкая потёртая кожа без металла; 2 — тёмная кожа в полосах воронёного железа, железные уголки, застёжка с шишкой слева; 3 — оклад: бронзовые пластины с резной плетёнкой; 4 — кодекс: чёрная кожа, железо, резная кость вдоль левого края и снизу; 5 — гримуар: воронёное железо, шипы по углам, кость, свет из обреза страниц. Образец — одобренный ряд art/generated/card-concepts/card4-v1a-ribbons-patch__nb2.jpg. Геометрия (окно, полосы) — tools/art-gen/book_layers.py → данные HB_ART в screens/book.js",
+    "Развороты book-spread-1…5": "21:9, 2K, ключ black: раскрытая книга той же ступени сверху, страницы — чистый пергамент, переплёт рамой; образец — card4-v1b-ribbons-patch__nb2.jpg и обложка той же ступени",
+    "Замок": "1:1, 1K, ключ black: навесной замок воронёного железа, закрытый; отпертый — EDIT MODE закрытого: дужка поднята, из скважины бьёт бирюза #48E5D4",
+    "Лента и звёздочка": "нейтральные, светлые: ленту и звезду красит в цвет редкости интерфейс (наложение по контуру clip-path — маска-картинка у страницы с диска не грузится)",
+    "Изнанка обложки и лист": "9:16 и 5:4, 1K, без вырезки: форзац на изнанке доски и чистый лист пергамента — для анимации открытия"
+  },
+  "notes": [
+    "Порядок: обложки → развороты (референс — выбранная обложка своей ступени) → детали. Сначала --dry-run, потом запуск с --budget. Каждая картинка смотрится глазами, повторов — не больше двух",
+    "После генерации: python tools/art-gen/book_layers.py <файлы> — окно обложки, страницы разворота, скважина замка, контур ленты и звезды в ‰ рамки; выгрузка — ui-art.json и export_ui.py --no-stamp"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: dark fantasy game art for a mobile RPG — gloomy, heavy, noble and uneasy. Hand-painted digital painting, the same painting as the attached samples: visible confident brush strokes, simplified planes, deep near-black shadows, crisp rim light on edges. A muted, desaturated palette: soot black (#050607, #121518), graphite (#262B31), old leather, blackened iron, dark bronze, yellowed bone, aged parchment. Everything is matte, worn and aged: no bright or polished gold, no gloss, no shiny jewellery, no clean saturated game-UI colors. Light is scarce and precious and comes from below. A book's power shows as mass, craft and age, not as wealth. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.",
+  "negative": "No words, no letters, no digits, no numbers, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no titles or lettering on covers, spines or pages, no handwriting, no lines of text, no watermark, no signature, no logo, no captions or labels. No wax seals, no seals of any kind, no cords with rings. No skulls, no skeletons, no blood. No pentagrams, no occult signs, no crosses, no religious symbols. No bright polished gold, no glossy plastic shine, no clean bright mobile-game UI look. No hands, no table, no floor, no tilted objects, no perspective.",
+  "cutout_rule": "The background is solid pure black ({hex}), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance. The whole subject with its glow fits inside the central 90% of the canvas in both width and height: an empty black margin stays on every side — top, bottom, left and right.",
+  "categories": {
+    "book-cover": {
+      "aspect": "9:16",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [
+        "art/generated/card-concepts/card4-v1a-ribbons-patch__nb2.jpg"
+      ],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — the front cover of ONE closed book that serves as a hero card, vertical 9:16, seen perfectly straight on: flat, upright, not tilted, no perspective. The book fills the canvas up to the black margin. The whole canvas is solid pure black — outside the book and inside its window alike; only the cover itself is painted.\n\nThe cover works as a picture frame. In its middle there is ONE large empty rectangular window with straight edges and slightly rounded corners, running from about 12% to about 74% of the book's height and from about 12% to about 85% of its width. The window is pure flat black: nothing at all is painted in it — no portrait, no figure, no picture, no glow, no texture, no reflection, no inner border. The spine is the left edge of the book. Around the window the cover shows plain calm bands of its material: a strip along the right edge about 15% of the book's width, a band along the top about 12% of its height, and a broad band along the bottom about 26% of its height. The interface places its own badges, a gem, padlocks, a name plate and numbers on these bands, so none of those are painted: the bands carry only the cover's own material, corners and ornament.\n\nThe attached image is the approved concept sheet: five hero books stand side by side, from left to right book 1 to book 5, each with the painted portrait of an old dwarf, round badges with numbers, a crystal, padlocks and ribbons. Take from it ONLY the design of the one cover named below — its material, construction, corners, ornament, wear, colors and brushwork — and paint that cover alone, large, with the window empty. Never copy from the sheet: the dwarf and his portrait, the round badges with numbers, the crystal at the top, the round orange element medallion, the padlocks along the right edge, the shield icon, the crossed swords and numbers, the name plate, the ribbons and stars below the books, or the colored glow around the books. No colored glow, halo or aura of any color around the book: the black background touches the edges of the cover directly."
+    },
+    "book-spread": {
+      "aspect": "21:9",
+      "size": "2K",
+      "cutout": "black",
+      "refs": [
+        "art/generated/card-concepts/card4-v1b-ribbons-patch__nb2.jpg"
+      ],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — the open book of a hero, landscape 21:9: ONE book lying wide open, seen straight from above, flat, both pages facing the viewer, perfectly symmetric left to right, no perspective, no tilt. The whole canvas around the book is solid pure black. The open book is as wide as the black margin allows.\n\nIts binding — the two opened boards of the cover — frames the two pages like a picture frame: the cover material shows all around the pages as a border about 5% of the book's height at the top and at the bottom and about 3% of the book's width on the left and on the right, and the spine runs straight down the middle between the two pages. The two pages take up almost the whole book: the boards never stick out beyond the pages as broad panels — the binding is only that narrow border. The two pages are blank aged parchment, warm and slightly yellowed, with soft shadows toward the gutter in the middle and darker worn edges and corners. The pages are completely empty: no writing, no lines, no illustrations, no frames, no borders, no ornaments, no stains that look like pictures, nothing lying on them. Nothing hangs from the book and nothing sits on the binding: no bookmarks, no ribbons, no padlocks, no gems, no crystals, no badges, no medallions, no clasps across the pages.\n\nThe attached images: (1) the approved concept of the open book — take from it the layout of an open book framed by its binding, the parchment of the pages and the painting, but none of its portrait, badges, icons, bars, miniatures, padlocks, crystal, ribbons, stars or the green glow; (2) the closed cover of this very book — its binding is made of exactly this material and ornament. No colored glow, halo or aura of any color around the book: the black background touches the edges of the binding directly."
+    },
+    "book-part": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — one small object, centered, seen perfectly straight on and perfectly upright. It floats on pitch black: everything around it is solid pure black to the very edges of the canvas. It must stay readable at a tiny size, about 14 px: one simple strong silhouette built from a few large shapes, all the painterly detail inside the silhouette; no sparks, embers or particles floating around it. A crisp rim light runs along the outline and separates it from the black."
+    },
+    "book-sheet": {
+      "aspect": "9:16",
+      "size": "1K",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a flat texture for a game UI, seen perfectly straight on, filling the whole canvas edge to edge: no border, no margin, no background around it, no perspective, no shadow outside it."
+    }
+  },
+  "jobs": [
+    {
+      "id": "book-cover-1",
+      "category": "book-cover",
+      "title": "Обложка книги, ступень 1 — простая кожаная книга",
+      "source": "Слова автора 30.09.2026: книга = личный максимум доблести 1…5; образец — книга 1 ряда card4-v1a-ribbons-patch. К выгрузке — design/ui/assets/art/books/cover-1.png, окно прозрачное",
+      "subject": "The cover to paint: BOOK 1 — the first book from the left on the sheet: a small plain book in soft, worn, warm brown leather over thin boards, no metal at all. Scuffed and darkened edges, softly rounded worn corners, a few scratches and creases in the leather, a faint blind-tooled line running around the window and along the edges. The humblest book: honest, used, a little battered."
+    },
+    {
+      "id": "book-cover-2",
+      "category": "book-cover",
+      "title": "Обложка книги, ступень 2 — окованная, с застёжкой",
+      "source": "Образец — книга 2 ряда card4-v1a-ribbons-patch. К выгрузке — design/ui/assets/art/books/cover-2.png",
+      "subject": "The cover to paint: BOOK 2 — the second book from the left on the sheet: a sturdier book whose dark grey-black leather cover is framed by broad bands of dark blackened iron with small rivets, four heavy iron corner pieces, and a leather tab with a round iron boss that fastens the cover at the middle of its left edge, reaching a little over the window. Solid, practical, protected."
+    },
+    {
+      "id": "book-cover-3",
+      "category": "book-cover",
+      "title": "Обложка книги, ступень 3 — резной оклад",
+      "source": "Образец — книга 3 ряда card4-v1a-ribbons-patch. К выгрузке — design/ui/assets/art/books/cover-3.png",
+      "subject": "The cover to paint: BOOK 3 — the third book from the left on the sheet: a tome in an oklad — its brown leather cover is framed by broad plates of dark aged bronze with carved interlaced knotwork running all around the window, small bronze bosses at the four corners, and a warm reddish-brown leather panel inside the bottom band framed by the same knotwork. Crafted, old, carefully kept."
+    },
+    {
+      "id": "book-cover-4",
+      "category": "book-cover",
+      "title": "Обложка книги, ступень 4 — кодекс с костью и железом",
+      "source": "Образец — книга 4 ряда card4-v1a-ribbons-patch. К выгрузке — design/ui/assets/art/books/cover-4.png",
+      "subject": "The cover to paint: BOOK 4 — the fourth book from the left on the sheet: a heavy codex — thick boards in black leather bound with riveted iron plates and straps, long pieces of carved yellowed bone set along the whole left edge and a broad plate of carved bone across the bottom band, a heavy iron clasp with a large round iron boss at the middle of the left edge reaching a little over the window. Ancient, heavy and a little frightening."
+    },
+    {
+      "id": "book-cover-5",
+      "category": "book-cover",
+      "title": "Обложка книги, ступень 5 — гримуар",
+      "source": "Образец — книга 5 ряда card4-v1a-ribbons-patch. К выгрузке — design/ui/assets/art/books/cover-5.png",
+      "subject": "The cover to paint: BOOK 5 — the fifth book from the left on the sheet: a grimoire — a massive cover in a rich oklad of blackened, riveted iron with sharp iron spikes jutting out of the four corners, a long carved yellowed bone along the whole left edge, the oklad kept to a band around the window — the window is as large as on the other books of the sheet, from about 12% to 74% of the book height and from about 12% to 85% of its width, no inner panels or straps around it, and a thin strip of the page edges visible along the right and bottom sides of the book, glowing with warm amber light (#E6A84B) that spills out of the pages — the only light of the cover; a few tiny embers rise from it. Awe-inspiring, dangerous, legendary."
+    },
+    {
+      "id": "book-spread-1",
+      "category": "book-spread",
+      "title": "Разворот книги, ступень 1",
+      "refs": [
+        "art/generated/card-concepts/card4-v1b-ribbons-patch__nb2.jpg",
+        "art/generated/book-cover/book-cover-1__nb2.raw.jpg"
+      ],
+      "source": "Раскрытая книга героя ступени 1 — окно героя. К выгрузке — design/ui/assets/art/books/spread-1.webp",
+      "subject": "The book: BOOK 1 — a small plain book in soft, worn, warm brown leather over thin boards, no metal at all: scuffed and darkened edges, softly rounded worn corners, a faint blind-tooled line along the edges of the boards."
+    },
+    {
+      "id": "book-spread-2",
+      "category": "book-spread",
+      "title": "Разворот книги, ступень 2",
+      "refs": [
+        "art/generated/card-concepts/card4-v1b-ribbons-patch__nb2.jpg",
+        "art/generated/book-cover/book-cover-2__nb2.raw.jpg"
+      ],
+      "source": "К выгрузке — design/ui/assets/art/books/spread-2.webp",
+      "subject": "The book: BOOK 2 — a sturdier book: dark grey-black leather boards framed by broad bands of dark blackened iron with small rivets, heavy iron corner pieces at the four outer corners."
+    },
+    {
+      "id": "book-spread-3",
+      "category": "book-spread",
+      "title": "Разворот книги, ступень 3",
+      "refs": [
+        "art/generated/card-concepts/card4-v1b-ribbons-patch__nb2.jpg",
+        "art/generated/book-cover/book-cover-3__nb2.raw.jpg"
+      ],
+      "source": "К выгрузке — design/ui/assets/art/books/spread-3.webp",
+      "subject": "The book: BOOK 3 — a tome in an oklad: brown leather boards framed by plates of dark aged bronze with carved interlaced knotwork, small bronze bosses at the four outer corners."
+    },
+    {
+      "id": "book-spread-4",
+      "category": "book-spread",
+      "title": "Разворот книги, ступень 4",
+      "refs": [
+        "art/generated/card-concepts/card4-v1b-ribbons-patch__nb2.jpg",
+        "art/generated/book-cover/book-cover-4__nb2.raw.jpg"
+      ],
+      "source": "К выгрузке — design/ui/assets/art/books/spread-4.webp",
+      "subject": "The book: BOOK 4 — a heavy codex: thick boards in black leather bound with riveted iron plates, long pieces of carved yellowed bone along the outer left and right edges of the binding, large iron bosses at the four outer corners."
+    },
+    {
+      "id": "book-spread-5",
+      "category": "book-spread",
+      "title": "Разворот книги, ступень 5",
+      "refs": [
+        "art/generated/card-concepts/card4-v1b-ribbons-patch__nb2.jpg",
+        "art/generated/book-cover/book-cover-5__nb2-v2.raw.jpg"
+      ],
+      "source": "К выгрузке — design/ui/assets/art/books/spread-5.webp",
+      "subject": "The book: BOOK 5 — a grimoire: a massive binding in a rich oklad of blackened, riveted iron with sharp iron spikes jutting out of the four outer corners, carved yellowed bone along the outer left edge, and the edges of the pages glowing with warm amber light (#E6A84B) that spills out of the book."
+    },
+    {
+      "id": "book-lock",
+      "category": "book-part",
+      "title": "Замок рунного предела — закрытый",
+      "source": "Слова автора: «Замки со светящимся бирюзовым цветом в виде рунных пределов — 10 из 10». Пять замков по правому краю книги; пройденный предел — отперт. К выгрузке — design/ui/assets/art/books/lock.png",
+      "subject": "The object: one small old padlock of dark blackened iron, closed, hanging straight. A rounded, slightly squat body a little wider than tall, with a thin raised rim and two tiny rivets; a thick round shackle on top, both of its legs deep inside the body; one clear keyhole in the middle of the body — a small round hole over a short slot, dark and empty. Worn, heavy, matte iron with a cold grey rim light; no light comes out of it."
+    },
+    {
+      "id": "book-lock-open",
+      "category": "book-part",
+      "title": "Замок рунного предела — отпертый, бирюзовый свет из скважины",
+      "refs": [
+        "art/generated/book-part/book-lock__nb2.raw.jpg"
+      ],
+      "source": "EDIT MODE закрытого замка (book-lock): тот же замок, дужка отперта, из скважины бьёт бирюза. К выгрузке — design/ui/assets/art/books/lock-open.png",
+      "subject": "EDIT MODE — this overrides everything above about composing a new picture: edit the attached image instead of drawing a new one. The attached image is a closed padlock of dark iron on black. Keep the padlock exactly as it is — its body, rim, rivets, shackle, size, position and painting — and change only this: the padlock is now OPEN — the shackle has sprung open: its right end has come out of the body and is lifted clearly above it, swung a little outward to the right, with a visible gap between the end of the shackle and the top of the body, while its left end stays in the body; and bright turquoise light (#48E5D4) streams out of its keyhole: the keyhole glows white-turquoise inside, the light spills over the iron around it and lights the body from within, with a soft short turquoise glow close around the padlock. Nothing else changes; the background stays pure black."
+    },
+    {
+      "id": "book-ribbon",
+      "category": "book-part",
+      "title": "Лента-закладка — нейтральная, её красит интерфейс",
+      "aspect": "9:16",
+      "source": "Взятая доблесть — короткая лента-закладка цвета редкости, выглядывает из нижнего края книги; невзятая — блёклая. Цвет даёт интерфейс. К выгрузке — design/ui/assets/art/books/ribbon.png",
+      "subject": "The object: one short flat silk bookmark ribbon hanging straight down, seen from the front: pale neutral silver-grey silk, almost white, with soft vertical folds, a subtle sheen and a slightly frayed woven edge; its top edge is cut straight across, its lower end is cut into a neat swallowtail fork. It is about one fifth as wide as it is tall and fills about four fifths of the canvas height. No star, no ornament, no color other than pale grey."
+    },
+    {
+      "id": "book-star",
+      "category": "book-part",
+      "title": "Звёздочка-подвес ленты — нейтральная, её красит интерфейс",
+      "source": "Звёздочка на конце взятой ленты; цвет — редкость героя, его даёт интерфейс. К выгрузке — design/ui/assets/art/books/star.png",
+      "subject": "The object: one small four-pointed star pendant of pale silvery metal, almost white, seen straight on: four long sharp points — up, down, left and right — with a crisp bevel along each point and a small round ring on top of the upper point for hanging; a soft pale light glows at its center. Neutral pale silver-white only, no other color."
+    },
+    {
+      "id": "book-endpaper",
+      "category": "book-sheet",
+      "title": "Изнанка обложки — форзац",
+      "source": "Изнанка обложки в анимации открытия книги: доска с форзацем. К выгрузке — design/ui/assets/art/books/endpaper.jpg",
+      "subject": "The texture: the inside of the front cover of an old leather-bound book: a sheet of dark marbled endpaper in deep teal, black and dull bronze swirls glued onto the board, framed along all four edges by the turned-in dark brown leather of the cover, a little worn at the corners. Calm, even, no bright spots."
+    },
+    {
+      "id": "book-leaf",
+      "category": "book-sheet",
+      "title": "Лист для перелистывания",
+      "aspect": "4:3",
+      "source": "Лист, который перелистывается в анимации открытия книги. К выгрузке — design/ui/assets/art/books/leaf.jpg",
+      "subject": "The texture: one blank page of aged parchment, seen flat and straight on, filling the canvas: warm, slightly yellowed, with faint soft stains, a fine paper grain, darker worn edges and a soft shadow along its left edge where it is bound. Completely blank: no writing, no lines, no drawings, no frame."
+    }
+  ]
+}

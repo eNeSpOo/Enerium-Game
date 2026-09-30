@@ -1,0 +1,33 @@
+{
+  "name": "Правки рамок карт боя (jobs/battle-frames.json) EDIT MODE: удачную картинку правим, а не рисуем заново (art/style/style.md). Выход — в ту же папку art/generated/battle-frames, имя — с приставкой -fix",
+  "notes": [
+    "bf-forgotten-fix — у «забытого» модель залила фон вокруг рамки белым (cutout.py: углы не прозрачные, фон исходника не ровный ключ). Рамка — камень, цепи, сломанная корона — удалась: фон делаем чёрным, остальное не трогаем"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Keep the dark painterly style of the attached picture: the same brush strokes, muted colors, materials and light.",
+  "negative": "No text, no letters, no numbers, no runes or markings that look like writing, no watermark, no signature, no logo. Do not add anything that is not listed, do not move, resize or restyle the frame, nothing inside the window.",
+  "cutout_rule": "The background is solid pure black ({hex}), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard, no white anywhere around the frame.",
+  "categories": {
+    "battle-frames": {
+      "aspect": "5:4",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Edit the first attached picture. Keep the frame exactly as it is — its shape, its size and place on the canvas, the stone blocks, the chains, the broken crown, the spikes, the colors and the light — and change only what is listed below."
+    }
+  },
+  "jobs": [
+    {
+      "id": "bf-forgotten-fix",
+      "category": "battle-frames",
+      "title": "Карта боя: крафтовый «забытый» босс — чёрный фон вместо белого",
+      "source": "jobs/battle-frames.json, bf-forgotten__nb2: фон вокруг рамки белый",
+      "refs": [
+        "art/generated/battle-frames/bf-forgotten__nb2.raw.jpg"
+      ],
+      "subject": "The background around the frame is white. Make the whole background around the frame solid pure black (#000000), edge to edge — the same pure black as inside the window. The frame keeps its own dark silhouette, its chains and its crown on the black; only the white around it becomes black."
+    }
+  ]
+}

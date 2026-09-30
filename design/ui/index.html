@@ -525,8 +525,8 @@ button.well:hover{border-color:var(--iron-3)}
 .bt-banner{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);z-index:6;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;pointer-events:none;animation:fade .3s ease}
 .bt-banner b{font:600 30px/1 var(--f-d);color:var(--gold);text-shadow:0 0 18px rgba(221,188,122,.35),0 2px 6px #000}
 .bt-banner small{font:700 11px/1.2 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--parch-2);text-shadow:0 1px 3px #000}
-/* карта бойца: герой и враг устроены одинаково */
-.bc{position:absolute;top:calc(var(--r) * var(--rowh));width:74px;display:flex;flex-direction:column;gap:3px;transition:transform .14s ease,opacity .5s ease;--c:var(--iron-2)}
+/* карта бойца: герой и враг устроены одинаково; --cw — ширина карты, по ней рамку карты кладёт screens/battle-cards.css */
+.bc{position:absolute;top:calc(var(--r) * var(--rowh));--cw:74px;width:var(--cw);display:flex;flex-direction:column;gap:3px;transition:transform .14s ease,opacity .5s ease;--c:var(--iron-2)}
 .bt-side.h .bc{left:calc(var(--k) * var(--colw))}
 .bt-side.f .bc{right:calc(var(--k) * var(--colw))}
 .bc[data-el="Воздух"]{--c:var(--air)}.bc[data-el="Земля"]{--c:var(--earth)}.bc[data-el="Огонь"]{--c:var(--fire)}.bc[data-el="Вода"]{--c:var(--water)}.bc[data-el="Время"]{--c:var(--time)}.bc[data-el="Свет"]{--c:var(--light)}.bc[data-el="Тьма"]{--c:var(--dark)}
@@ -717,7 +717,7 @@ button.well:hover{border-color:var(--iron-3)}
 .bc.shake{animation:cshake .38s ease}
 .bc.casting{animation:cgrow .5s cubic-bezier(.2,.8,.2,1);z-index:3}
 .bc.casting.ult{animation-name:cgrowU;animation-duration:.8s}
-.bc.lead{width:84px;--fh:calc(var(--rowh) - 30px)}
+.bc.lead{--cw:84px;--fh:calc(var(--rowh) - 30px)}
 .bc.lead .face{border-color:var(--gold-2);box-shadow:0 0 0 1px var(--gold-3),0 12px 22px -10px rgba(221,188,122,.45),inset 0 -3px 0 var(--gold-2)}
 .bc.lead .nm{color:var(--gold)}
 .bc.ready .face{box-shadow:0 0 0 1px var(--spirit),0 0 18px -2px var(--spirit)}
@@ -823,7 +823,7 @@ button.well:hover{border-color:var(--iron-3)}
 .fx-btn b{font-size:13.5px}
 .fx-btn small{font-size:11.5px;color:var(--parch-3);line-height:1.25}
 
-/* Герои (коллекция, большая карточка и каталог — screens/heroes.css) */
+/* Герои (коллекция и каталог — screens/heroes.css, книга героя — screens/book.css) */
 .hd{display:flex;flex-direction:column;min-height:0;min-width:0;padding:var(--sp-m)}
 .hd-top{display:grid;grid-template-columns:74px minmax(0,1fr) auto;gap:var(--sp-m);align-items:start}
 /* шапка героя: имя, строка класса и стихии, строка редкости; справа — БМ значком и доблесть */
@@ -1396,6 +1396,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <link rel="stylesheet" href="screens/equipment.css">
 <link rel="stylesheet" href="screens/hero-dev.css">
 <link rel="stylesheet" href="screens/heroes.css">
+<link rel="stylesheet" href="screens/book.css">
 <link rel="stylesheet" href="screens/contracts.css">
 <link rel="stylesheet" href="screens/clan.css">
 <link rel="stylesheet" href="screens/event.css">
@@ -1405,6 +1406,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <link rel="stylesheet" href="screens/pass.css">
 <link rel="stylesheet" href="screens/talk.css">
 <link rel="stylesheet" href="screens/social.css">
+<link rel="stylesheet" href="screens/battle-cards.css">
 </head>
 <body>
 <div class="p-app">
@@ -1537,7 +1539,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 const ASSET = window.EN_ASSET || '../enerium/assets/';
 const A = p => ASSET + p;
 const ART = n => A('art/' + n);
-const ART_V = 'c9e322a0';   // версия выгрузки арта — её ставит tools/art-gen/export_ui.py, чтобы браузер не брал старые картинки из кэша
+const ART_V = '200fec9d';   // версия выгрузки арта — её ставит tools/art-gen/export_ui.py, чтобы браузер не брал старые картинки из кэша
 const AV = n => ART(n) + '?v=' + ART_V;
 /* значки атрибутов, редкостей, классов и доблести — одобрены автором 28.09.2026, выгрузка tools/art-gen/export_ui.py → assets/art/icons/:
    power, hp, patk, matk, def-phys, def-mag, eva, crit, critdmg; str, int, agi, end, spd; r1…r7 — редкости (ADR-0027);
@@ -2259,11 +2261,14 @@ function legendHtml(mode) {
     ${common('атак')}
     <span class="ex big">${ic('chain')}</span><span>Контроль — знак поверх портрета: оглушение, безмолвие, остановка.</span>`;
 }
+/* рамка карты по типу бойца — screens/battle-cards.js (bfCard): рамка не выгружена — карта прежняя */
+const BC_PLAIN = { cls: '', data: '', style: '', face: '', mark: '', tip: '' };
 function cardHtml(R, u, n, k) {
   const [col, row] = SLOT[n][k], kn = unitKnown(u), d = R.disp[dkey(u)] || { hp: u.hp, sh: u.sh, dead: !u.alive };
-  return `<div class="bc ${u.side ? 'foe' : ''} ${u.lead ? 'lead' : ''} ${kn ? '' : 'unk'} ${d.dead ? 'dead' : ''} ${S.insp === dkey(u) ? 'sel' : ''}" id="bc${u.side}${u.i}" data-a="insp" data-v="${dkey(u)}" data-el="${u.el}" style="--k:${col};--r:${row}" title="${kn ? u.name + ' · ' + u.cls + ' · ' + u.el : 'Не изучен: имя и способности откроет первая победа'}">
-    <div class="face">${unitFace(u, true)}<div class="buffs"></div><div class="debuffs"></div><span class="cls">${kn ? CLS(u.cls, 18, u.cls) : ''}</span><span class="tgt"></span><span class="ctl"></span>${u.side ? '' : '<span class="fell">пал</span>'}</div>
-    <span class="nm">${kn ? u.name : 'Не изучен'}</span>
+  const fr = (typeof bfCard === 'function' && bfCard(R, u)) || BC_PLAIN;
+  return `<div class="bc ${u.side ? 'foe' : ''} ${u.lead ? 'lead' : ''} ${kn ? '' : 'unk'} ${d.dead ? 'dead' : ''} ${S.insp === dkey(u) ? 'sel' : ''}${fr.cls}" id="bc${u.side}${u.i}" data-a="insp" data-v="${dkey(u)}" data-el="${u.el}"${fr.data} style="--k:${col};--r:${row}${fr.style}" title="${kn ? u.name + fr.tip + ' · ' + u.cls + ' · ' + u.el : 'Не изучен' + fr.tip + ': имя и способности откроет первая победа'}">
+    <div class="face">${unitFace(u, true)}${fr.face}<div class="buffs"></div><div class="debuffs"></div><span class="cls">${kn ? CLS(u.cls, 18, u.cls) : ''}</span><span class="tgt"></span><span class="ctl"></span>${u.side ? '' : '<span class="fell">пал</span>'}</div>
+    ${fr.mark}<span class="nm">${kn ? u.name : 'Не изучен'}</span>
     ${bar(d.hp / u.maxHp * 100, 'hp', `<span class="sh" style="left:0;width:${Math.min(100, d.sh * 100 / u.maxHp)}%"></span>`)}
     <div class="rot"></div>
   </div>`;
@@ -2390,7 +2395,9 @@ const RS_ART = new Set(['c1-06', 'c1-07', 'c1-08', 'c1-09', 'c1-10', 'c1-11', 'c
   'c2-54', 'c3-55', 'c4-48', 'c5-54', 'c6-55', 'c2-55', 'c3-48', 'c4-49', 'c5-61', 'c6-50',   // + Эхо, остальные восемь недель, 30.09
   'c3-41', 'c3-42', 'c3-43', 'c3-44', 'c3-45', 'c3-46', 'c3-64', 'c3-65', 'c4-41', 'c4-42', 'c4-43', 'c4-44', 'c4-45', 'c4-46', 'c4-64', 'c4-65',
   'c5-48', 'c5-49', 'c5-50', 'c5-51', 'c5-52', 'c5-74', 'c6-41', 'c6-42', 'c6-43', 'c6-44', 'c6-45', 'c6-46',   // + рулетка циклов III–VI, 30.09
-  'c4-59', 'c4-60', 'c4-61', 'c4-62', 'c4-63', 'c5-69', 'c5-70', 'c5-71', 'c5-72', 'c5-73', 'c6-59', 'c6-60', 'c6-61', 'c6-62', 'c6-63']);   // + Безликие донатных сетов IV–VI, 30.09
+  'c4-59', 'c4-60', 'c4-61', 'c4-62', 'c4-63', 'c5-69', 'c5-70', 'c5-71', 'c5-72', 'c5-73', 'c6-59', 'c6-60', 'c6-61', 'c6-62', 'c6-63',   // + Безликие донатных сетов IV–VI, 30.09
+  'c2-01', 'c2-02', 'c2-03', 'c2-04', 'c2-05', 'c2-06', 'c2-07', 'c2-08', 'c2-09', 'c2-10',   // + золото цикла II, по способу, принятому автором (art/style/style.md), 30.09
+  'c2-11', 'c2-12', 'c2-13', 'c2-14', 'c2-15']);
 function rsFace(h) {
   const o = rsOld(h);
   if (o) return `<img src="${o.img}" alt="">`;
@@ -2400,7 +2407,7 @@ function rsFace(h) {
 }
 const rsSrcChip = h => `<span class="chip ${h.src === 'donat' ? 'spirit' : h.src === 'echo' ? 'gold' : ''}">${RS_SRC_ONE[h.src]}${h.src === 'gold' ? ' · №' + h.no : h.src === 'donat' ? ' · ' + h.place + '-й' : ''}</span>`;
 const rsAversShort = h => `+${pctBp(h.avers.bp != null ? h.avers.bp : RS.rules.aversionBp)} урона по расе «${h.avers.race}»`;
-/* карточка 9 : 16 (hcCard), большая карточка (hcBig, hcPre), плитка (rsCard) и шапка (rsHead) — screens/heroes.js; строка списка — здесь.
+/* книга героя (hbCard, раскрытая — hbWin: screens/book.js), мелкая книга (rsCard) и шапка (rsHead) — screens/heroes.js; строка списка — здесь.
    Кристалл редкости у лица в строке рисует CSS (.rs-av, screens/heroes.css) */
 function rsRow(h, o = {}) {
   return `<button class="rs-row ${o.dim ? 'dim' : ''}" data-r="${h.r}" data-a="${o.act}" data-v="${h.id}" aria-current="${!!o.sel}"><span class="rs-av">${rsFace(h)}</span><span class="tx"><b>${h.n}</b><small>${o.sub != null ? o.sub : h.cls}</small></span>${o.right || ''}</button>`;
@@ -2484,13 +2491,13 @@ function rsSetHtml(h, v, o = {}) {
   } else out.push(`<div class="rs-none"><b class="serif">Орден не раскрыт</b><p class="faint">Откроет последняя доблесть — глава «${rsChTitle(h, h.maxV - 1)}».</p></div>`);
   return out.join('');
 }
-/* коллекция, большая карточка героя и карточка «до покупки» — screens/heroes.js; шапка для листов — heroHead, rsHead */
+/* коллекция — screens/heroes.js, книга героя и книга «до покупки» — screens/book.js; шапка для листов — heroHead, rsHead */
 /* развитие героя — screens/hero-dev.js: heroDev (что нужно для предела и доблести), вкладка «Развитие» (hdPower), листы предела
    и доблести, анимации, окно снаряжения и низ вкладки «Снаряжение» (hdGearFoot). Здесь — характеристики строкой и сама карточка */
 /* пять характеристик значками: число и степень роста; что даёт характеристика — в подсказке и в листе «Атрибуты». Число — с доблестью
    (heroSt) и прибавкой снаряжения (eqStatAdd, screens/equipment.js): такое число светится, разбивка — в подсказке */
 const statStrip = h => { const add = typeof eqStatAdd === 'function' ? eqStatAdd(h) : null; return `<div class="st5">${heroSt(h).map((v, i) => { const x = add ? add[i] : 0; return `<div class="s5${x ? ' eqd' : ''}" title="${STATS[i]}: ${STAT_HINT[i]} · рост ${GRADE[h.gr[i]]} за уровень${x ? ` · ${v} и снаряжение +${x}` : ''}">${ICON(STAT_IC[i], 24, STATS[i])}<b class="num">${v + x}</b><span class="grade">${[1, 2, 3].map(g => `<i class="${4 - h.gr[i] >= g ? 'on' : ''}"></i>`).join('')}</span></div>`; }).join('')}</div>`; };
-/* вкладки героя аккаунта; o.head === false — без шапки: так их берёт большая карточка героя (hcBig, screens/heroes.js), портрет у неё слева */
+/* вкладки героя аккаунта; o.head === false — без шапки: так их берёт раскрытая книга героя (hbOwnWin, screens/book.js), портрет — на левой странице */
 function heroDetail(h, o = {}) {
   const t = S.seg.hero;
   let body = '';
@@ -3715,7 +3722,7 @@ const MAP = [
   { n: 'Спуск', p: 10, where: 'Шахта · 2', d: 'Окно во весь экран: фон биома — место и его обитатели, что ждут отряд, на одном арте, частицы биома. Слева — путь вниз по циклам, сверху — название и цитата, снизу — этажи, босс и осада, рунный страж и вход к нему за ключи; одно главное действие «Начать забег», идущие забеги — «К бою» и «Ещё отряд». Бестиарий — лист по кнопке «Бестиарий»: обитатели по полкам, карточка врага, вся книга — в Летописи. Арена биома — фон боя, а не «Спуска» (screens/descent.js). Биомы 1–4: у каждого свой фон, арена, враги, забег, босс и рунный страж.', o: ['biomes', 'runic', 'bestiary:s', 'biome-setup:s', 'runic-setup:s', 'crafted-biomes:d'],
     ready: ['biomes', 'runic', 'bestiary', 'biome-setup'] },
   { n: 'Бой', p: 27, where: 'Один на все режимы', d: 'Биом, страж, Эхо, Арена, Лига, Клановый босс — один просмотрщик. «К итогу» доступно всегда.', o: ['battle', 'echo-battle:d', 'pvp-battle:d', 'league-match:d', 'clan-boss-battle:d'] },
-  { n: 'Герои', p: 24, where: 'Шахта · 3', d: 'Коллекция — купленные герои сеткой карточек 9 : 16 (screens/heroes.js): портрет во всю карточку, гребень — кристалл редкости, доблесть дугой, уровень и стихия в кружках, рунные камни по бокам, класс и мощь; ступень вида — металл рамки, отделка, сияние и искры — растёт с редкостью и доблестью; по мощи сильнейшие сверху, порядок и фильтр значками; «Каталог» — все герои, несобранные чёрно-белые с полосой осколков. Нажатие на арт — большая карточка: слева портрет в раме (крупно по нажатию), справа — мощь, доблесть, уровень и вкладки Развитие, Снаряжение, Навыки, Путь — четыре вместо шести; герой до покупки — та же карточка: история, навыки по доблести, главы, цена и «Купить», без прокачки и снаряжения. «Развитие» (screens/hero-dev.js) — путь героя: уровень, ворота рунных пределов и звезда доблести, одна главная кнопка — следующий шаг; листы предела и доблести с честным превью, анимации пробития предела и доблести. «Снаряжение» — девять мест снаряжения и четыре места духовных талисманов, «Надеть лучшее»; одно окно поверх: места героя слева, запасы справа, перетаскивание и нажатие, сравнение стрелками; «Свойства и сравнение» (screens/equipment.js, screens/talismans.js). Отряды — библиотека до десяти и один лист выбора на все режимы. Призыв — три вкладки; «За золото» — та же сетка карточек и карточка до покупки; «За души» — алтарь Возрождения душ: зеркало, герои пула веером в раме, цена и шанс героя целиком, вход рулетки (screens/roulette.js); отряд Эхо недели — окно-витрина: цивилизация, пятеро крупными карточками, несобранные чёрно-белые с полосой осколков, неприязнь и «Пробудить»; лавка праха — отдельным окном: витрина героев пула, осколки за прах, пробуждение душами и окно пробуждения (screens/heroes.js). Осколок героя — стекло с его лицом, доля — свет кромки и заживающие трещины (screens/art-icons.js).', o: ['heroes', 'hero', 'hero-story', 'orders', 'equipment', 'equipment-item:s', 'talismans', 'collection-passives:s', 'squads', 'recruitment', 'hire-preview', 'resurrection', 'blueprints'],
+  { n: 'Герои', p: 24, where: 'Шахта · 3', d: 'Коллекция — купленные герои сеткой книг (screens/heroes.js, screens/book.js): ступень книги — личный максимум доблести, от кожаной книги до гримуара; редкость — кристалл и свет книги, рунные пределы — пять замков по правому краю, взятая доблесть — ленты-закладки; уровень, стихия, класс и мощь; по мощи сильнейшие сверху, порядок и фильтр значками, счётчик «в коллекции N из 360»; «Каталог» — найденные герои: неизвестная душа — силуэт класса и полоса осколков, известный — чёрно-белый. Нажатие на книгу — книга летит в центр и раскрывается: слева портрет (крупно по нажатию), справа — вкладки Развитие, Снаряжение, Навыки, Путь; герой до покупки — та же книга: история, навыки по доблести, главы, цена и «Купить», без прокачки и снаряжения; неизвестная душа — только осколки и где их брать. «Развитие» (screens/hero-dev.js) — путь героя: уровень, ворота рунных пределов и звезда доблести, одна главная кнопка — следующий шаг; листы предела и доблести с честным превью, анимации пробития предела и доблести. «Снаряжение» — девять мест снаряжения и четыре места духовных талисманов, «Надеть лучшее»; одно окно поверх: места героя слева, запасы справа, перетаскивание и нажатие, сравнение стрелками; «Свойства и сравнение» (screens/equipment.js, screens/talismans.js). Отряды — библиотека до десяти и один лист выбора на все режимы. Призыв — три вкладки; «За золото» — та же сетка книг и книга до покупки; «За души» — алтарь Возрождения душ: зеркало, герои пула веером книг, цена и шанс героя целиком, вход рулетки (screens/roulette.js); отряд Эхо недели — окно-витрина: цивилизация, пятеро крупными книгами своей стадии, неприязнь и «Пробудить»; лавка праха — отдельным окном: найденные герои пула, осколки за прах, пробуждение душами и окно пробуждения (screens/heroes.js). Осколок героя — стекло с его лицом, доля — свет кромки и заживающие трещины (screens/art-icons.js).', o: ['heroes', 'hero', 'hero-story', 'orders', 'equipment', 'equipment-item:s', 'talismans', 'collection-passives:s', 'squads', 'recruitment', 'hire-preview', 'resurrection', 'blueprints'],
     ready: ['heroes', 'hero', 'hero-story', 'orders', 'collection-passives', 'squads', 'recruitment', 'hire-preview', 'talismans', 'resurrection', 'blueprints', 'equipment', 'equipment-item'] },
   { n: 'Ремесло', p: 11, where: 'Шахта · 4', d: 'Мастерская с запасами слева и столом справа: ресурсы — по пять в ряд, у каждого лупа карточки; нажатие — ползунок количества, потом ячейка. Книга рецептов открывается на месте стола. Попытка — анимация удачи и неудачи, автодокрафт — короткая (screens/craft.js). Лавка — витрина из десяти товаров, подробности и цена — в листе товара (screens/shop.js). Запасы — семь вкладок, сетка 6 × 5 — значок и число, подробности справа (screens/bag.js). Перековка — своё окно: талисманы, снаряжение, рабочие; что сплавить, отмечает игрок — сетка с отметками, счётчик и подсказки; лестница редкостей, наковальня, цена в золоте по циклу (screens/reforge.js).', o: ['craft', 'recipes', 'inventory', 'shop', 'market', 'my-listings', 'reforge'],
     ready: ['craft', 'recipes', 'shop', 'inventory', 'reforge'] },
@@ -4672,6 +4679,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 <script src="screens/contracts.js"></script>
 <script src="screens/event.js"></script>
 <script src="screens/heroes.js"></script>
+<script src="screens/book.js"></script>
 <script src="screens/arena.js"></script>
 <script src="screens/clan.js"></script>
 <script src="screens/reforge.js"></script>
@@ -4679,5 +4687,6 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 <script src="screens/pass.js"></script>
 <script src="screens/talk.js"></script>
 <script src="screens/social.js"></script>
+<script src="screens/battle-cards.js"></script>
 </body>
 </html>

@@ -26,9 +26,9 @@
       вверх-вниз в запасах — прокрутка, вбок — перетаскивание, на героя мимо места — в своё место; из места в запасы — снять;
       призрак и подсветка убираются, слушатели снимаются, щелчок после броска гасится.
    9. Режим «Игрок»: служебных слов нет (SERVICE из check_player_view.js); режим «Команда» рисуется.
-   10. Вёрстка — расчётом размеров на 932 × 430 и 844 × 390: вкладки большой карточки героя (правая колонка рядом с портретом),
-      окно снаряжения, анимации и превью помещаются; в шапке большой карточки остаётся место имени; камни у портрета не налезают друг
-      на друга и на кружок уровня; камни ворот — на оси пути; ряд камней анимации — над подписью.
+   10. Вёрстка — расчётом размеров на 932 × 430 и 844 × 390: вкладки книги героя (правая страница разворота каждой ступени),
+      окно снаряжения, анимации и превью помещаются; в шапке страницы остаётся место имени; камни ворот — на оси пути; ряд камней
+      анимации — над подписью.
    11. UI-кит (KIT_EXTRA): разделы «Рунные пределы» (камень в четырёх состояниях и размерах, плитки, шапка, путь, строки) и «Развитие
       героя и снаряжение»; сценарии презентации, карта экранов: hero, equipment, equipment-item, talismans — готовы.
    Запуск: node tools/content-gen/screens/check_hero_dev.js */
@@ -66,7 +66,7 @@ const JS = read('screens/hero-dev.js'), CSS = read('screens/hero-dev.css');
   const OLD = [[/function heroDev\(/, 'heroDev'], [/const hdIt = /, 'hdIt'], [/<div class="ladder">/, 'лестница развития'], [/\n  lvlup\(\) \{/, 'ACT.lvlup'],
     [/\n  limit\(\) \{/, 'ACT.limit'], [/\n  valor\(\) \{/, 'ACT.valor'], [/\n  valordo\(v\) \{/, 'ACT.valordo'], [/\n  limitdo\(v\) \{/, 'ACT.limitdo']];
   for (const [re, what] of OLD) if (re.test(main)) say(`index.html: остался прежний ${what} — развитие живёт в screens/hero-dev.js`);
-  /* вкладки героя — heroDetail (index.html); большая карточка (screens/heroes.js) берёт их без шапки: портрет у неё слева */
+  /* вкладки героя — heroDetail (index.html); книга героя (screens/book.js) берёт их без шапки: портрет — на левой странице */
   const hd = main.match(/function heroDetail\(h(?:, o = \{\})?\)[\s\S]*?\n\}/);
   if (!hd) say('index.html: нет heroDetail');
   else {
@@ -74,7 +74,7 @@ const JS = read('screens/hero-dev.js'), CSS = read('screens/hero-dev.css');
     if (!/t === 'gear'[\s\S]{0,300}eqRow\(h\)[\s\S]{0,120}talRow\(h\)[\s\S]{0,120}hdGearFoot\(h\)/.test(hd[0])) say('index.html: вкладка «Снаряжение» — не места снаряжения, талисманов и hdGearFoot');
     if (!/\['power', 'Развитие'\], \['gear', 'Снаряжение'\], \['skills', 'Навыки'\], \['path', 'Путь'\]/.test(hd[0])) say('index.html: у карточки героя не четыре вкладки «Развитие», «Снаряжение», «Навыки», «Путь»');
   }
-  if (!/heroDetail\(h, \{ head: false/.test(read('screens/heroes.js'))) say('screens/heroes.js: большая карточка героя не берёт вкладки из heroDetail — развитие без неё');
+  if (!/heroDetail\(h, \{ head: false/.test(read('screens/book.js'))) say('screens/book.js: книга героя не берёт вкладки из heroDetail — развитие без неё');
   if (!/const grow = typeof heroDev !== 'function'/.test(main)) say('index.html: шахта зовёт heroDev без проверки, что экран подключён');
   if (!/const valorSt = /.test(main) || !/const heroSt = /.test(main) || !/INV\.hero\.valorPct/.test(main.match(/const valorSt = [^\n]*/)[0] || '')) say('index.html: нет valorSt и heroSt — доблесть по INV.hero.valorPct');
   const iV = main.indexOf('EB.heroSrc = h => { const s = src0(h);'), iB = main.indexOf('const BM_SRC0 = EB.heroSrc;');
@@ -124,7 +124,7 @@ function load(opt = {}) {
     ACT, OV, FLOWS, KH, MAP, KIT_EXTRA, H, EB, INV, BAG, BM, RS, RSI, RSS, render, initialState, setTeam, fmt, ROMAN,
     heroDev, heroSt, valorSt, BM_SRC0, lvlCost, heroKit, hrTwin: typeof hrTwin === 'function' ? hrTwin : null, rsChTitle,
     HD_DATA, HD_VIEW, HD_SRV, GR_SRV, hdPower, hdGearFoot, hdKitHtml, hdQty, hdOpens, hdChapter, hdBmAt, grWin, grPlan, grDrop, grPick, grBind,
-    RP_ART, rpNext, rpRow, rpPost, rpKitHtml, hdKitHero, heroHead: typeof heroHead === 'function' ? heroHead : null, HC_VIEW: typeof HC_VIEW !== 'undefined' ? HC_VIEW : { big: [5, 7], bigMax: 40 },
+    RP_ART, rpNext, rpRow, rpPost, rpKitHtml, hdKitHero, heroHead: typeof heroHead === 'function' ? heroHead : null, HB_VIEW: typeof HB_VIEW !== 'undefined' ? HB_VIEW : null, HB_ART: typeof HB_ART !== 'undefined' ? HB_ART : null,
     TB, TL: window.EN_TALISMANS, tlEq, tlWhy, tlFam, tlR, tlMul, tlMulOf, EQD: window.EN_EQUIPMENT, eqItem, eqWornList, eqGain, eqMulOf, EQ_SRV, TL_SRV,
   })`, ctx);
   return { T, els, rootCls, timers, wl, document, tick: ms => { now += ms; }, setNow: ms => { now = ms; }, game: () => (els.game ? els.game.innerHTML : '') };
@@ -653,17 +653,21 @@ run('режим «Игрок»', () => T.setTeam(false));
   const eqSlot = px(CSS, /\.hd-gear \.eq-slot\{width:(\d+)px/, '.hd-gear .eq-slot'), eqSlotSm = px(CSS, /@container main \(max-height: 360px\)\{[\s\S]*?\.hd-gear \.eq-slot\{width:(\d+)px/, '.hd-gear .eq-slot компакт');
   const tlSlotH = px(CSS, /\.hd-gear \.tl-slot\{min-height:(\d+)px/, '.hd-gear .tl-slot'), tlSlotHSm = px(CSS, /@container main \(max-height: 360px\)\{[\s\S]*?\.hd-gear \.tl-slot\{min-height:(\d+)px/, '.hd-gear .tl-slot компакт');
   const w = (s, k, caps) => Math.ceil(String(s).length * k * (caps ? 0.7 : 0.5));
-  /* рунные пределы: пропорция камня, столбы у портрета большой карточки, камни-ворота на пути, ряд камней в анимации, строка в превью */
+  /* рунные пределы: пропорция камня, камни-ворота на пути, ряд камней в анимации, строка в превью */
   const [ar1, ar2] = (CSS.match(/\.rp-s\{[^}]*aspect-ratio:(\d+)\/(\d+)/) || [0, 0, 0]).slice(1).map(Number);
   if (!ar1 || !ar2) say('вёрстка: нет пропорции камня .rp-s');
-  /* большая карточка героя (screens/heroes.css, данные вида — HC_VIEW в screens/heroes.js): шапка правой колонки и столбы камней у портрета;
-     компактный вид — контейнер карточки ниже 340 px (@container hcb) */
-  const HCSS = read('screens/heroes.css'), CB = /@container hcb \(max-height: 340px\)\{[\s\S]*?/.source, HC = T.HC_VIEW;
-  const h2 = px(HCSS, /\.hcb-id h2\{font:600 (\d+)px/, '.hcb-id h2'), h2Sm = px(HCSS, new RegExp(CB + /\.hcb-id h2\{font-size:(\d+)px/.source), '.hcb-id h2 компакт');
-  const idGap = px(HCSS, /\.hcb-id\{display:flex;flex-direction:column;gap:(\d+)px/, '.hcb-id gap'), idGapSm = px(HCSS, new RegExp(CB + /\.hcb-id\{gap:(\d+)px/.source), '.hcb-id gap компакт');
-  const bmF = px(I, /\.hd-bm b\{font:600 (\d+)px/, '.hd-bm b'), bmFSm = px(HCSS, new RegExp(CB + /\.hcb \.hd-bm b\{font-size:(\d+)px/.source), '.hcb .hd-bm b компакт');
-  const pRpTop = px(HCSS, /\.hcb-rp \.rp\.h\{position:absolute;top:(\d+)%/, '.hcb-rp .rp.h top'), pRpBot = px(HCSS, /\.hcb-rp \.rp\.h\{[^}]*bottom:(\d+)%/, '.hcb-rp .rp.h bottom');
-  const pRpW = px(HCSS, /\.hcb-rp \.rp\.h\{[^}]*width:(\d+)px/, '.hcb-rp .rp.h width'), pRpWSm = px(HCSS, new RegExp(CB + /\.hcb-rp \.rp\.h\{width:(\d+)px/.source), '.hcb-rp .rp.h компакт');
+  /* книга героя (screens/book.css, данные вида — HB_VIEW и HB_ART в screens/book.js): вкладки героя — на правой странице разворота, у каждой
+     ступени страница своя — считаем самую узкую и самую низкую; шапка страницы — имя, класс и стихия, справа ‹ › и прогресс (на низком
+     экране прогресс скрыт); «Развитие» на странице — карточка шага в две строки (кнопка под текстом) */
+  const BCSS = read('screens/book.css'), BV = T.HB_VIEW, BA = T.HB_ART;
+  const h2 = px(BCSS, /\.hb-id h2\{font:600 (\d+)px/, '.hb-id h2'), h2Sm = px(BCSS, /\.g\.sm \.hb-id h2\{font-size:(\d+)px/, '.g.sm .hb-id h2');
+  const idGap = px(BCSS, /\.hb-id\{[^}]*gap:(\d+)px/, '.hb-id gap'), stepW = px(BCSS, /\.hb-step \.iconbtn\{width:(\d+)px/, '.hb-step .iconbtn');
+  const tabB = px(BCSS, /\.hb-rp \.tabs button\{height:(\d+)px/, '.hb-rp .tabs button'), rpGap = px(BCSS, /\.hb-rp\{[^}]*gap:(\d+)px/, '.hb-rp gap');
+  const nPad = px(BCSS, /\.hb-hd \.hdv-next\{[^}]*padding:(\d+)px/, '.hb-hd .hdv-next padding'), nIc = px(BCSS, /\.hb-hd \.hdv-ic\{width:(\d+)px/, '.hb-hd .hdv-ic');
+  const nT = px(BCSS, /\.hb-hd \.hdv-t\{font-size:(\d+)px/, '.hb-hd .hdv-t'), nQ = px(BCSS, /\.hb-hd \.hdv-sub \.qty button\{height:(\d+)px/, '.hb-hd .qty button'), nGo = px(BCSS, /\.hb-hd \.hdv-go\.btn\{min-height:(\d+)px/, '.hb-hd .hdv-go');
+  const qGap = px(BCSS, /\.hb-hd \.hdv-quiet \.st5\{gap:(\d+)px/, '.hb-hd .st5 gap'), qIc = px(BCSS, /\.hb-hd \.hdv-quiet \.s5 \.ico\{width:(\d+)px/, '.hb-hd .s5 .ico'), qF = px(BCSS, /\.hb-hd \.hdv-quiet \.s5 b\{font-size:(\d+)px/, '.hb-hd .s5 b');
+  if (!/\.hb-hd \.hdv-act\{grid-column:2/.test(BCSS)) say('вёрстка: на странице книги кнопка шага не под текстом — карточка шага в строку не влезает');
+  if (!/\.hb-h\.own \.hd-line\+\.hd-line\{display:none\}/.test(BCSS) || !/\.g\.sm \.hb-vit\{display:none\}/.test(BCSS)) say('вёрстка: шапка страницы книги у своего героя не сжата (вторая строка, прогресс на низком экране)');
   const gateSt = px(CSS, /\.hdv-gate \.rp-s\{width:(\d+)px\}/, '.hdv-gate .rp-s'), gateLbl = px(CSS, /\.hdv-gate small\{position:absolute;top:(\d+)px/, '.hdv-gate small top');
   const segH = px(CSS, /\.hdv-seg\{[^}]*height:(\d+)px;margin-top:\d+px/, '.hdv-seg height'), segTop = px(CSS, /\.hdv-seg\{[^}]*height:\d+px;margin-top:(\d+)px/, '.hdv-seg margin-top');
   const markSt = px(CSS, /\.hdfx-mark \.rp-s\{width:(\d+)px\}/, '.hdfx-mark .rp-s'), rowTop = px(CSS, /\.hdfx-row\{position:absolute;left:0;top:(\d+)px/, '.hdfx-row top');
@@ -674,42 +678,42 @@ run('режим «Игрок»', () => T.setTeam(false));
     cnt.layout++;
     const mainW = X.W - X.rail, mainH = X.H - X.top, compact = mainH <= 360;
     const inW = mainW - 2 * spM, inH = mainH - 2 * spM;
-    /* большая карточка: портрет — по высоте в пропорции HC_VIEW.big, не шире bigMax %; справа — шапка, вкладки и тело вкладки */
-    const cq = inH <= 340, pw = Math.min(Math.floor(inW * HC.bigMax / 100), Math.floor(inH * HC.big[0] / HC.big[1])), bodyW = inW - pw - spM;
-    const vitH = (cq ? bmFSm : bmF) + 5 + 16 + 5 + 15, headH = Math.max((cq ? h2Sm : h2) + 2 * (cq ? idGapSm : idGap) + 2 * 22, vitH);
-    const bodyH = inH - headH - spS - (tabH + 2 * tabPad + 2) - spS;
-    /* «Развитие»: путь, карточка шага, тихая строка */
-    const gap = compact ? 6 : spS, padN = compact ? 8 : 10, tH = Math.ceil((compact ? titleSm : title) * 1.1);
-    const nextH = 2 + 2 * padN + Math.max(icoN, goH, tH + 6 + qtyH);
-    const quietH = 6 + 1 + 18;
+    /* книга героя: окно во всю игру (HB_VIEW.win), правая страница разворота; вкладыш — поля 3 % 3 % 3 % 4 %, отступы 8 и 10 px */
+    const bw = Math.min(BV.win.max, X.W - BV.win.padX) - BV.win.lock, bh = X.H - BV.win.padY - BV.win.rib;
+    let bodyW = 1e9, pageH = 1e9;
+    for (const t of [1, 2, 3, 4, 5]) { const r = BA.spreads[t].r; bodyW = Math.min(bodyW, Math.floor(bw * (1000 - r[1] - r[3]) / 1000 * .93) - 20); pageH = Math.min(pageH, Math.floor(bh * (1000 - r[0] - r[2]) / 1000 * .94) - 16); }
+    /* шапка у своего героя: имя и строка класса; справа ‹ › и прогресс в три строки (на низком экране скрыт) */
+    const lineH = 20, headH = Math.max((X.small ? h2Sm : h2) + idGap + lineH, stepW, X.small ? 0 : 3 * 14 + 2 * 3);
+    const bodyH = pageH - headH - rpGap - (tabB + 1) - rpGap;
+    /* «Развитие»: путь, карточка шага в две строки — значок и текст (заголовок, количество и прибавка мощи), под текстом кнопка; тихая строка */
+    const gap = compact ? 6 : spS, tH = Math.ceil(nT * 1.1);
+    const nextH = 2 + 2 * nPad + Math.max(nIc, tH + 4 + nQ) + 4 + nGo;
+    const quietH = 6 + 1 + qIc;
     const powerH = trackH + gap + nextH + gap + quietH;
-    if (powerH > bodyH) say(`вёрстка ${X.n}: «Развитие» ${powerH} px, а места ${bodyH} px`);
-    /* ширина карточки шага: значок, самая длинная строка, самая широкая кнопка */
-    const btnPad = 2 * 14 + 2, costW = n => 10 + 1 + 18 + 5 + w(n, 14);
+    if (powerH > bodyH) say(`вёрстка ${X.n}: «Развитие» на странице книги ${powerH} px, а места ${bodyH} px`);
+    /* ширина карточки шага: значок, строка текста или кнопка — что шире */
+    const btnPad = 2 * 12 + 2, costW = n => 10 + 1 + 18 + 5 + w(n, 14);
     const btn = Math.max(btnPad + w('Взять доблесть', 13, true), btnPad + w('Поднять', 13, true) + 8 + costW('12 345'), btnPad + w('Пробить', 13, true) + 8 + costW('10 / 10'));
-    const qtyW = w('+1+10Макс', 12) + 3 * 16 + 2, chipW = 16 + 13 + 5 + w('+12 345', 11);
-    const text = Math.max(w('Уровень 1199 → 1200', compact ? titleSm : title), qtyW + 10 + chipW);
-    const nextW = 2 * (compact ? 10 : 12) + icoN + 2 * (compact ? 10 : 12) + text + btn;
-    if (nextW > bodyW) say(`вёрстка ${X.n}: карточка шага ${nextW} px, а ширина ${bodyW} px`);
-    const quietW = 5 * (18 + 5 + w('1234', 14)) + 4 * 14 + 12 + 28;
-    if (quietW > bodyW) say(`вёрстка ${X.n}: строка характеристик ${quietW} px, а ширина ${bodyW} px`);
-    /* рунные пределы: столбы камней у портрета большой карточки — ниже кружков уровня и стихии, камни не налезают; шапке хватает места
-       на имя рядом с мощью; путь — камни-ворота на оси отрезков, подпись уровня — в дорожке. Столбы делят TOP камней (RP_VIEW.split
-       в hero-dev.js, ADR-0031): в столбе — больший из двух кусков */
-    const split = +((JS.match(/const RP_VIEW = \{ split: (\d+) \}/) || [0, TOP])[1]), perPost = Math.max(Math.min(split, TOP), TOP - Math.min(split, TOP));
-    const sw = cq ? pRpWSm : pRpW, postH = inH * (100 - pRpTop - pRpBot) / 100, pstep = (postH - perPost * stH(sw)) / Math.max(1, perPost - 1);
-    if (pstep < 2) say(`вёрстка ${X.n}: камни в столбах у портрета налезают — шаг ${pstep.toFixed(1)} px`);
-    const circle = Math.max(22, Math.min(38, pw * 19 / 100));
-    if (inH * pRpTop / 100 < 6 + circle + 4) say(`вёрстка ${X.n}: верхний камень у портрета залезает под кружок уровня`);
-    const vitW = Math.max(24 + 6 + w('123 456', cq ? bmFSm : bmF), 16 * 5 + 6 + w('5 / 5', 12), w('ур. 1200 / 1200', 12) + 8);
-    const idW = bodyW - 32 - 2 * spM - 2 * 32 - 8 - vitW;   // «Назад», два «‹ ›» и промежутки
-    if (idW < 150) say(`вёрстка ${X.n}: имени в шапке большой карточки остаётся ${idW} px`);
+    const qtyW = w('+1+10Макс', 12) + 3 * 18 + 2, chipW = 16 + 13 + 5 + w('+12 345', 11);
+    const text = Math.max(w('Уровень 1199 → 1200', nT), qtyW + 8 + chipW);
+    const nextW = 2 + 2 * 9 + nIc + 8 + Math.max(text, btn);
+    if (nextW > bodyW) say(`вёрстка ${X.n}: карточка шага ${nextW} px, а ширина страницы ${bodyW} px`);
+    const quietW = 5 * (qIc + 5 + w('1234', qF)) + 4 * qGap;
+    if (quietW > bodyW) say(`вёрстка ${X.n}: строка характеристик ${quietW} px, а ширина страницы ${bodyW} px`);
+    /* путь — камни-ворота на оси отрезков, подпись уровня — в дорожке; ширина пути: пять ворот, отрезки не уже 10 px, звезда доблести */
+    const pathW = TOP * 18 + (TOP + 1) * 10 + 10 + 52;
+    if (pathW > bodyW) say(`вёрстка ${X.n}: путь ${pathW} px, а ширина страницы ${bodyW} px`);
+    const vitW = X.small ? 0 : w('доблесть 5/ 5', 11) + 10;
+    const idW = bodyW - 2 * stepW - 3 - 8 - (X.small ? 0 : vitW + 8);
+    if (idW < 120) say(`вёрстка ${X.n}: имени в шапке страницы книги остаётся ${idW} px`);
     if (Math.abs(stH(gateSt) / 2 - (segTop + segH / 2)) > 1.5 || gateLbl < stH(gateSt) + 2 || gateLbl + 10 > trackH) say(`вёрстка ${X.n}: камни ворот не на оси пути или подпись уровня не влезает в дорожку ${trackH} px`);
     /* «Снаряжение» в карточке: две группы мест и низ */
-    const es = compact ? eqSlotSm : eqSlot, tl = compact ? tlSlotHSm : tlSlotH, g2 = compact ? 6 : spS;
+    /* места снаряжения на странице книги — по ширине страницы (book.css: девять в ряд, не шире 360 px), не меньше 26 px */
+    const es = Math.floor((Math.min(360, bodyW) - 8 * 3) / 9), tl = compact ? tlSlotHSm : tlSlotH, g2 = compact ? 6 : spS;
     const gearH = (20 + g2 + es) + g2 + (20 + g2 + tl) + g2 + 32;
     if (gearH > bodyH) say(`вёрстка ${X.n}: «Снаряжение» ${gearH} px, а места ${bodyH} px`);
-    if (9 * es + 8 * (compact ? 4 : 5) > bodyW) say(`вёрстка ${X.n}: девять мест не влезают в ширину ${bodyW} px`);
+    if (es < 26) say(`вёрстка ${X.n}: место снаряжения на странице книги ${es} px — мелко`);
+    void eqSlot; void eqSlotSm;
     /* окно снаряжения */
     const s = X.small ? slotGwSm : slotGw, L = X.small ? gwLSm : gwL, gh = X.small ? gwHSm : gwH, gp = X.small ? 10 : spM, rowG = X.small ? 4 : 6;
     const winW = X.W - 16 - 2, winH = X.H - 16 - 2, bodyGh = winH - gh - 1 - 2 * gp;
@@ -742,7 +746,7 @@ run('режим «Игрок»', () => T.setTeam(false));
     if (20 + 8 + w('Рунный предел', 13) + 8 + rowW + 5 + 12 + 5 + rowW > lossW) say(`вёрстка ${X.n}: строка «Рунный предел» в превью шире колонки ${lossW} px`);
     const dlgH = 50 + 40 + spM + (14 + 6 * 24 + 20 + 16) + spM + 58;
     if (dlgH > X.H - 24) say(`вёрстка ${X.n}: превью доблести ${dlgH} px при высоте ${X.H - 24}`);
-    lay.push(`${X.n}: большая карточка — портрет ${pw} × ${inH}, справа ${bodyW} × ${bodyH} — «Развитие» ${nextW} × ${powerH}, строка характеристик ${quietW}, «Снаряжение» ${gearH}; шапка ${headH} px, имени ${idW} px; камни у портрета ${sw} px, шаг ${pstep.toFixed(1)}; окно снаряжения ${winW} × ${winH} — места ${L}, карточка сравнения ${cardH}, запасы ${cols} в ряд, видно ${rowsVis} ряда; превью доблести ${dlgW} × ${dlgH}; ряд камней в анимации до ${Math.round(rowBot)} px`);
+    lay.push(`${X.n}: книга героя — правая страница не меньше ${bodyW} × ${pageH}, под вкладку ${bodyH} — «Развитие» ${nextW} × ${powerH}, строка характеристик ${quietW}, путь ${pathW}, «Снаряжение» ${gearH} (место ${es} px); шапка ${headH} px, имени ${idW} px; окно снаряжения ${winW} × ${winH} — места ${L}, карточка сравнения ${cardH}, запасы ${cols} в ряд, видно ${rowsVis} ряда; превью доблести ${dlgW} × ${dlgH}; ряд камней в анимации до ${Math.round(rowBot)} px`);
   }
 }
 
@@ -758,7 +762,7 @@ run('режим «Игрок»', () => T.setTeam(false));
       const h = run('UI-кит · пределы', () => k.html()); cnt.views++;
       if (typeof h !== 'string' || !/<h3>Рунные пределы<\/h3>/.test(h) || /undefined|NaN|\[object /.test(h)) { say('UI-кит: раздел «Рунные пределы» не рисуется'); continue; }
       for (const s of ['off', 'wait', 'ready', 'on']) if (count(h, new RegExp(`<i class="rp-s ${s}(?: p)?"></i>`, 'g')) < 4) say(`UI-кит · пределы: камень «${s}» не во всех размерах`);
-      if (count(h, /<figure class="rpk-tile"><button class="hc rpp/g) !== 4) say('UI-кит · пределы: не четыре плитки с камнями');
+      if (count(h, /<figure class="rpk-tile"><button class="hb[ "]/g) !== 4 || count(h, /<span class="hb-lk" aria-hidden="true">/g) < 4) say('UI-кит · пределы: не четыре мелкие книги с замками');
       if (!h.includes('class="hd-rp"') || count(h, /class="hdv-gate[ "]/g) !== TOP || count(h, /<span class="rp i"/g) < 3) say('UI-кит · пределы: нет шапки с рамой камней, пути или строк');
       if (!team) scan(h, 'UI-кит · пределы');
     }

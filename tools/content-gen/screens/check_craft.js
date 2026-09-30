@@ -9,7 +9,8 @@
       будущих биомов и боссов (§12.5); в режиме «Игрок» — ни одного служебного слова из check_player_view.js.
       «Правила воздуха»: у стола и книги нет лишних подписей, сведения о ресурсе — лист по нажатию.
    4. Запасы меняются как положено: попытка списывает весь стол, неудача ничего не создаёт, повторное нажатие не повторяет расход,
-      особый ресурс без согласия не списывается, герой приходит в коллекцию с 0 ур., 0 РП и 0 Добл.
+      особый ресурс без согласия не списывается; рецепт героя кладёт в запасы комплект его осколков — героя пробуждают души (стадии
+      знакомства, решение автора 30.09.2026), он придёт с 0 ур., 0 РП и 0 Добл.
    5. Все классы ws-* из craft.js описаны в craft.css; ни в одном теге нет второго style или class.
    5а. Ввод ресурса (слова автора 29.09.2026): запасы — по пять в ряд, плитки крупнее прежних 48 px; у каждой плитки справа сверху
       лупа — карточка ресурса; нажатие — ползунок от 0 до min(100, запас), подтверждение кладёт ресурс в ячейку ровно в выбранном
@@ -71,7 +72,7 @@ if (err.length) done();
 vm.runInContext(`globalThis.__ws = {
   get S() { return S; }, reset() { S = initialState(); S.route = 'craft'; S.seg.craft = 'work'; },
   html() { render(); return document.getElementById('game').innerHTML; },
-  ACT, BAG, WS_DATA, WS_SRV, RSI, rsHas, FLOWS, EN_RECIPES, wsPut, wsSetTable, wsToCraft, wsPick, wsPutQ, wsRangeLive, wsCellMax,
+  ACT, BAG, WS_DATA, WS_SRV, RSI, rsHas, wsHeroNeed, FLOWS, EN_RECIPES, wsPut, wsSetTable, wsToCraft, wsPick, wsPutQ, wsRangeLive, wsCellMax,
   WS_FX, WS_KIT, wsCracks, wsKitHtml, wsKitPlay, wsKitAct, wsKitBoardHtml, KIT_EXTRA,
   kitStage() { return document.getElementById('wsKitStage').innerHTML; },
 };`, ctx);
@@ -261,23 +262,23 @@ scene('подсказки и герой', () => {
   W.wsSetTable([['find_cb1', 2], ['p_waxthread', 2], ['cr_mold', 3], ['p_print', 1]]);
   A.wstry(); A.wstrydo();
   const hero = W.RSI['c1-20'];
-  ok('герой в коллекции', !!hero && W.rsHas(hero));
-  eq('герой пришёл с 0 ур., 0 РП и 0 Добл', JSON.stringify(W.S.rs.owned['c1-20']), JSON.stringify({ lvl: 0, lim: 0, valor: 0, how: 'craft' }));
+  ok('комплект осколков героя в запасах', !!hero && !W.rsHas(hero) && (W.S.rs.shards['c1-20'] || 0) === W.wsHeroNeed());
+  eq('герой не пришёл сразу — его пробуждают души', JSON.stringify(W.S.rs.owned['c1-20'] || null), 'null');
   ok('рецепт героя найден', W.BAG.known(rid)); ok('подсказка снята', !W.S.ws.part[rid]); eq('герой не лёг в запасы', q('h_c1_20'), 0);
   h = view('герой создан');
   ok('итог: нет «0 ур. · 0 РП · 0 Добл»', h.includes('0 ур. · 0 РП · 0 Добл')); ok('итог: нет карточки героя', h.includes('data-a="rhero"'));
   ok('итог героя — лицо в свете редкости, полная версия', h.includes('class="ws-fx-hero"') && W.S.ws.fx && W.S.ws.fx.tempo === 'full');
   /* повтор героя */
   A.close(); A.wsview('book'); A.wsbtab('all');
-  ok('книга: нет «в коллекции»', view('книга: герой в коллекции').includes('в коллекции'));
-  A.wsmake(rid); ok('автодокрафт героя из коллекции недоступен', disabled(view('автодокрафт: герой в коллекции'), 'wsmakedo'));
+  ok('книга: нет «осколки собраны»', view('книга: осколки героя собраны').includes('осколки собраны'));
+  A.wsmake(rid); ok('автодокрафт героя с собранными осколками недоступен', disabled(view('автодокрафт: осколки героя собраны'), 'wsmakedo'));
   W.BAG.add('find_cb1', 2); W.BAG.add('cr_mold', 3); W.BAG.add('p_waxthread', 2); W.BAG.add('p_print', 1);
   const b = snap(['find_cb1']);
   A.wsmakedo(); eq('повтор героя ничего не списывает', q('find_cb1'), b.find_cb1);
   A.close();
   W.wsSetTable([['find_cb1', 2], ['p_waxthread', 2], ['cr_mold', 3], ['p_print', 1]]);
-  h = view('стол: герой в коллекции');
-  ok('стол: нет «уже в коллекции»', h.includes('уже в коллекции')); ok('стол: попытка недоступна', disabled(h, 'wstry'));
+  h = view('стол: осколки героя собраны');
+  ok('стол: нет «уже хватает»', h.includes('уже хватает')); ok('стол: попытка недоступна', disabled(h, 'wstry'));
   A.wstry(); eq('стол: ничего не списано', q('find_cb1'), b.find_cb1);
 });
 
@@ -294,7 +295,7 @@ scene('подсказки: новая позиция', () => {
   eq('с неверным ресурсом подсказки нет', W.S.ws.part[rid] && W.S.ws.part[rid].pos.length, 4);
   ok('стол: известные позиции на столе', (W.wsSetTable([['cr_prop', 1], ['k1_eng', 1], ['a_bag', 1], ['tr_fb2', 1]]), view('стол: известные позиции')).includes('все открытые позиции'));
   W.wsSetTable([['tr_fb2', 1], ['a_pick', 1], ['cr_prop', 6], ['a_bag', 1], ['k1_eng', 2]]); A.wstry(); A.wstrydo();
-  ok('Ойвин Должник в коллекции', W.rsHas(W.RSI['c1-18']));
+  ok('Ойвин Должник — комплект осколков', !W.rsHas(W.RSI['c1-18']) && (W.S.rs.shards['c1-18'] || 0) >= W.wsHeroNeed());
   view('Ойвин создан');
 });
 

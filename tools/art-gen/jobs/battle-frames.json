@@ -1,0 +1,120 @@
+{
+  "name": "Карты боя: рамки по типу врага и одна универсальная рамка героя. Слова автора 30.09.2026: «на боевой арене нужны рамки по типу врага и универсальные карточки для наших героев, но они там не в 9 на 16, а прямоугольные, так как игра горизонтальная». Стиль — как у карточки-книги автора (art/generated/card-concepts/card3-03-grimoire-fix2__nb2.jpg, card4-v1a-ribbons__nb2.jpg): тёмное фэнтези, кожа, воронёное железо, кость, свет снизу. Ранг читается сразу: чем опаснее враг, тем тяжелее и страшнее рамка, без глянца (art/style/style.md, «Метки карт»). Карта боя маленькая — 74–84 px портрета, поэтому рамка тонкая, окно большое, украшение — только сверху и в верхних углах, низ и бока — тонкие планки. Рисуется на чёрном, прозрачность — ключ black, окно вырезает cutout.py как большую закрытую тёмную область",
+  "plan": {
+    "Набор": {
+      "hero": "герой — одна рамка на всех: бронза по тёмной коже, железные уголки книги, пустое гнездо сверху под кристалл редкости",
+      "o": "рядовой — тонкое тёмное железо, плоские уголки",
+      "e": "элита — воронёное железо, шипы из верхних углов, гребень с угольком",
+      "voice": "клан, Голос сонма — тёмное серебро и синяя эмаль, скрещённые рога за щитом",
+      "b": "босс биома — железо и кость, рога, венец шипов с огненной щелью-глазом",
+      "echo": "босс Эхо — древняя бронза с патиной, кольца-отголоски, зелёный свет времени",
+      "many": "Многоликий — венец из спокойных масок",
+      "rune": "рунный страж — древний камень, бирюзовые насечки, крылатый знак",
+      "uber": "Убер-босс — массивное железо и кость, четыре рога, зелёный огонь времени",
+      "forgotten": "крафтовый «забытый» — пепельный камень и тёмное золото в цепях, сломанная корона",
+      "host": "клан, Хозяин стихии — самая тяжёлая: серебро, железо, синяя эмаль, венец шипов, огромные рога"
+    },
+    "Кадр": "5:4, 1K. Окно — прямоугольник ~1,35 : 1 почти во всю рамку; бока и низ — планки ~3 % ширины; украшение поднимается над верхней планкой не выше 1/10 ширины и выходит вбок не дальше 1/30"
+  },
+  "notes": [
+    "Порядок: сначала --dry-run, потом запуск с --budget 2.5. Картинку смотреть глазами; повторов на рамку — не больше двух",
+    "Вторая партия 30.09.2026 — девять рамок на второй редакции: приняты hero (v2: тонкие планки, пустое гнездо в верхней планке), voice, echo, many, uber, host. Повторы: у рядового модель добавила рога в углы — рядовой тяжелее элиты, в предмет добавлено «absolutely no horns, no thorns…»; у рунного стража насечки вышли похожими на буквы, кристалл — сердцем, планки — тяжёлыми блоками: теперь «short straight notches and small dots… like tally marks», кристалл-ромб, тонкие балки; у забытого фон вокруг рамки белый — правка EDIT MODE своего же варианта (jobs/battle-frames-edit.json): фон — чёрный, всё остальное как есть",
+    "Проба 30.09.2026 — bf-hero, bf-e, bf-b на первой редакции рамки категории (точный промт — в манифесте). Элита и босс приняты. У героя планки втрое толще просьбы — рамка карты шире колонки на низком экране; у босса верхняя планка толстая и рога уходят вбок. В рамку категории добавлено: все четыре планки одинаково тонкие, рога растут вверх и лишь чуть наружу, без дыма и искр; у героя — «very slim, like a thin book binding», гнездо — в верхней планке",
+    "Окно и нарезка: python tools/art-gen/battle_frame.py art/generated/battle-frames/<файл>.png [--preview] — ореол в окне и сор вне рамки прочь, обрезка по альфе (<файл>.bf.png), окно win и нарезка cut в тысячных долях — их числа в BF.types (design/ui/screens/battle-cards.js); у «забытого» — --no-halo: цепи заходят в окно, это украшение, а не ореол",
+    "Итог 30.09.2026: 15 картинок, $1,04 по манифесту (бюджет $2,5). В прототипе — 11: hero v2, o v2, e, voice, b, echo, many, rune v2, uber, forgotten-fix, host; заменены 4 (hero, o, rune, forgotten — повтор не больше одного на рамку). Выгрузка — ui-art.json: bframes/<тип>.png ← battle-frames/*.bf.png, 320 px в ширину, без fit"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: dark fantasy game UI art for a mobile RPG — gloomy, heavy, noble and uneasy. Hand-painted digital painting: visible confident brush strokes, simplified planes, deep near-black shadows, crisp rim light on the edges. A muted, desaturated palette: soot black (#050607, #121518), graphite (#262B31), blackened iron, old dark leather, dark bronze, yellowed bone, weathered stone. Everything is matte, worn and aged: no bright polished gold, no gloss, no shiny jewellery, no clean saturated game-UI colors. Light is scarce and precious: the frame is lit from below with a crisp rim light along its edges; only its magical parts glow from within. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.",
+  "negative": "No text, no letters, no numbers, no real-world alphabets, no runes or markings that look like writing, no watermark, no signature, no logo, no interface elements other than the frame itself: no buttons, no bars, no gauges, no name plate, no label, no banner with lettering. No skulls, no blood, no gore. No pentagrams, no occult signs, no crosses, no religious symbols. No bright polished gold, no glossy plastic shine. Nothing at all inside the window.",
+  "cutout_rule": "The background is solid pure black ({hex}), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the frame and fades into the black within a short distance. The whole frame with all its ornament fits inside the central 90% of the canvas: an empty black margin stays on every side — top, bottom, left and right.",
+  "categories": {
+    "battle-frames": {
+      "aspect": "5:4",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no text in the reply.\n\nFormat: a frame for a fighter card on the battle screen of a dark fantasy mobile card battler. Landscape 5:4 canvas, seen straight on, flat, not in perspective, perfectly symmetric from left to right. The frame is a landscape rectangle, and its window — the empty opening where the game later puts the fighter's portrait — is a clean landscape rectangle with straight inner edges and small square corners, about 1.35 times as wide as it is tall; the window takes almost the whole frame. Everything on the canvas is solid pure black except the frame itself: the window is pure black and completely empty — no face, no figure, no glow, no smoke, no mist, no reflection, no pattern inside it.\n\nProportions, strictly: all four bars are equally slim — the top bar is as slim as the two side bars and the bottom bar, each about 3% of the frame width; the side bars and the bottom bar are plain, with no ornament on them; nothing hangs below the bottom bar and nothing sticks out sideways from the lower two thirds of the frame. All ornament stands on the top bar and at the two top corners: it rises above the top bar by at most one tenth of the frame width; horns and spikes at the top corners grow upward and only a little outward, reaching sideways past the side bars by at most one thirtieth of the frame width. Nothing hangs down into the window: the inner edge of the frame is a clean straight line on all four sides. No smoke, sparks, motes or particles anywhere around the frame.\n\nIn the game it is seen very small, about 90 pixels wide: bold, simple, strong silhouettes and one clear accent rather than fine filigree; a thin crisp light rim runs along the inner edge of the frame so that the portrait separates from it. The enemy frames form a ladder of danger: the more dangerous the enemy, the heavier and more terrifying its frame — bone, thorns, horns, dark flame, glowing cracks of carst — awe and dread, never wealth or gloss."
+    }
+  },
+  "jobs": [
+    {
+      "id": "bf-hero",
+      "category": "battle-frames",
+      "title": "Карта боя: герой — одна рамка на всех героев отряда",
+      "source": "Решение исполнителя 30.09.2026 по слову автора: «универсальные карточки для наших героев»; кристалл редкости и доблесть — метка интерфейса",
+      "subject": "The side: our heroes — one frame for every hero of the player's squad, standing against the enemy. Not a threat: dignity, age and quiet strength, like the binding of an old book of legends. A slim frame of dark leather edged with thin dark bronze lines, bound at the four corners with small blackened iron corner pieces like the corners of an old book cover; a few tiny bronze studs along the bars. At the top center a small round socket of dark bronze set into the top bar, about twice as tall as the bar, empty and pure black inside; nothing else rises above the top bar. Faint cold turquoise carst light (#48E5D4) comes from below and catches the lower corners; everything else is matte and dim. The bars are very slim, like a thin book binding."
+    },
+    {
+      "id": "bf-o",
+      "category": "battle-frames",
+      "title": "Карта боя: рядовой",
+      "source": "GDD §5.7 — ранг карты задаёт рамку; рядовой — низший ранг",
+      "subject": "The enemy rank: rank-and-file — the lowest and weakest rank. The plainest frame of the set: a thin frame of dark worn iron with hairline cracks and a few small round rivets; small plain angular iron brackets at the four corners, flat and low; at the top center only a tiny plain iron clasp, barely raised above the top bar. Absolutely no horns, no thorns, no spikes, no claws and no crest anywhere: nothing rises above the top bar except the tiny clasp. No light of its own, only a faint cold rim light from below. Humble and grim."
+    },
+    {
+      "id": "bf-e",
+      "category": "battle-frames",
+      "title": "Карта боя: элита",
+      "source": "GDD §5.7 — ранг карты задаёт рамку; элита — второй ранг, у стража — его четыре элиты",
+      "subject": "The enemy rank: elite — the second rank, a clear threat. A frame of blackened iron, a little heavier than the plainest one; from each top corner three short sharp iron thorns curl up and outward, low; at the top center a low crest of three iron thorns cradling a small ember-orange (#E6A84B) stone that glows from within; the bottom corners are plain flat iron brackets. Menacing but restrained; the ember is the only light."
+    },
+    {
+      "id": "bf-voice",
+      "category": "battle-frames",
+      "title": "Карта боя: клан — Голос сонма",
+      "source": "GDD §25 — клановый босс: Голос идёт впереди сонма, три Голоса пали — встаёт Хозяин; ранг — элита",
+      "subject": "The enemy: the Voice of the Host — an elite herald who walks ahead of an elemental host and calls it into battle; an enemy of the clan war, as dangerous as an elite. A frame of dark tarnished silver bound with bands of deep blue enamel (#27406B). At the top center two short curved war horns of dark silver cross behind a small round blank shield of deep blue enamel with a thin silver rim, low over the top bar; a faint cold blue-white light (#BFD8FF) glows along the horns; the top corners end in short silver spikes pointing up and outward. Stern, cold, summoning."
+    },
+    {
+      "id": "bf-b",
+      "category": "battle-frames",
+      "title": "Карта боя: босс биома",
+      "source": "GDD §5.7 — ранг карты задаёт рамку; босс биома — хозяин последнего этажа",
+      "subject": "The enemy rank: biome boss — the master of the deepest step of a biome; awe and dread. A heavy frame of blackened iron and old yellowed bone. Two thick curved horns of old bone grow from the top corners and sweep outward and up in low, wide curves; a row of short bone thorns runs along the top bar; at the top center a crown of bone thorns holds a narrow slit of burning ember light (#F0564A fading to #E6A84B), like a half-open watching eye; thin dark smoke curls from the horn tips and stays close to them. The bottom corners are heavy dark iron caps, flat."
+    },
+    {
+      "id": "bf-echo",
+      "category": "battle-frames",
+      "title": "Карта боя: босс Эхо",
+      "source": "GDD §17 — Эхо показывает память о тех, кого уже нет; босс недели — ранг босса",
+      "subject": "The enemy: a boss of the Echo — risen from the memory of a vanished ancient civilization; as dangerous as a biome boss, but older and stranger. A heavy frame of ancient weathered bronze, dark and eroded, crusted with green verdigris and split by cracks from which a pale green light of time (#4FDC8B) seeps. Two short curved bronze horns rise from the top corners, their tips crumbling; at the top center an ancient round bronze crest with three thin concentric rings around a pale green light, like the ripples of an echo. The bottom corners are worn flat bronze caps."
+    },
+    {
+      "id": "bf-many",
+      "category": "battle-frames",
+      "title": "Карта боя: Многоликий",
+      "source": "GDD §17.4 — пятнадцатая ступень Эхо, «как вишенка»; облик — лица целой цивилизации",
+      "subject": "The enemy: the Many-Faced — a rare foe of the Echo who wears the faces of a whole civilization; strange and uncanny rather than brutal. A frame of pale weathered stone and dark bronze. Along the top bar sits a row of small masks like a crown — seven small calm faces of pale stone, dark bronze and old gold, each face different, eyes closed, set side by side, the middle one a little larger with a faint gold glow in its eye slits; each top corner holds one more small mask; the bottom corners are plain flat bronze caps. The masks are serene and eerie, not grotesque."
+    },
+    {
+      "id": "bf-rune",
+      "category": "battle-frames",
+      "title": "Карта боя: рунный страж",
+      "source": "GDD §11, §5.7 — страж решает, пройдёшь ли глубже; иммунитет к контролю 25 %",
+      "subject": "The enemy rank: rune guardian — the guardian at the gate of a biome who decides whether you may pass deeper; solemn, sacred awe. A frame of ancient dark stone bound with blackened iron; its bars are slim stone beams, not heavy blocks. Along the top bar runs a row of short straight notches and small dots cut deep into the stone, like tally marks — never shapes that resemble letters — glowing spirit turquoise (#48E5D4) from within; at the top center a stone sigil with a pair of short spread stone wings holding a tall diamond-shaped turquoise crystal that shines from within; the top corners end in sharp stone points angled up and a little outward. The bottom corners are small flat stone caps."
+    },
+    {
+      "id": "bf-uber",
+      "category": "battle-frames",
+      "title": "Карта боя: Убер-босс",
+      "source": "GDD §17.4, §5.4 — Убер-босс недели на 14-й ступени; иммунитет к контролю 50 %",
+      "subject": "The enemy rank: Uber boss — the supreme boss of an Echo week, the most terrible foe of the Echo. A massive frame of blackened iron and dark scorched bone. Two great curved horns rise from the top corners, curving upward and back, and two smaller horns grow beside them; a jagged crown of bone spikes stands at the top center around a burning green eye of time-fire (#4FDC8B); low green ghost-flames lick along the top bar; the metal is split by cracks glowing green. The bottom corners are heavy dark iron caps, flat."
+    },
+    {
+      "id": "bf-forgotten",
+      "category": "battle-frames",
+      "title": "Карта боя: крафтовый «забытый» босс",
+      "source": "GDD §12, §5.4 — крафтовый босс Эхо, «память о тех, кого уже нет»; иммунитет к контролю 75 %",
+      "subject": "The enemy rank: the Forgotten — a craft boss called up from the memory of those who are no more; more dangerous than an Uber boss. A massive frame of ash-grey stone and tarnished dark gold, bound tight with heavy rusted chains wound around the top bar and the top corners — the chains lie flat and tight, nothing hangs. At the top center a hollow broken crown of dark gold, its points snapped off, with a cold dim amber light (#E6A84B) glowing inside its hollow; the top corners are cracked stone blocks bound in chain, dusted with pale ash. Heavy, ancient, sealed away — a thing the world tried to forget."
+    },
+    {
+      "id": "bf-host",
+      "category": "battle-frames",
+      "title": "Карта боя: клан — Хозяин стихии",
+      "source": "GDD §25, §5.4 — клановый босс; иммунитет к контролю 100 %, самый тяжёлый ранг",
+      "subject": "The enemy rank: Master of the Element — the clan boss, lord of an elemental host, who rises when three of its Voices have fallen; the most terrible and unbreakable foe in the game. The heaviest frame of the set: massive dark silver and blackened iron with bands of deep blue enamel (#27406B), split by cracks glowing cold blue-white (#BFD8FF). At the top center a great crown of jagged dark silver spikes, the middle spike the tallest, with a round blank shield of deep blue enamel at its base; two huge curved horns of dark iron rise upward from the top corners, curving back. Cold, crushing, absolute."
+    }
+  ]
+}

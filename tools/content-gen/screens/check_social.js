@@ -415,7 +415,7 @@ for (const team of [false, true]) {
     if (!h) { say(`профиль ${n}: лист не открылся`); continue; }
     if (!/class="lk-ava/.test(h)) say(`профиль ${n}: нет облика`);
     if (n !== T.S.look.nick && R()[n] !== 'block') {
-      if ((h.match(/<button class="hc/g) || []).length !== 5) say(`профиль ${n}: в пятёрке не пять героев`);
+      if ((h.match(/<button class="hb[ "]/g) || []).length !== 5) say(`профиль ${n}: в пятёрке не пять книг героев`);
       if (!/Достижения · \d+ из \d+/.test(h)) say(`профиль ${n}: нет главного из достижений`);
       const f = sheetF(h);
       if (!f.includes('data-v="ppreport:') || !f.includes('data-v="ppblock:')) say(`профиль ${n}: нет «Пожаловаться» и «Заблокировать»`);

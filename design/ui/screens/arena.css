@@ -59,7 +59,7 @@ button.ar-me:hover>b{color:var(--parch)}
 .ar-def{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:var(--sp-m);flex:1 1 0;min-height:0}
 .ar-dsq{gap:var(--sp-m)}
 .ar-dsq h2{font-size:23px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.ar-dsq .sq-slots{max-width:560px}
+.ar-dsq .sq-slots{max-width:420px}   /* книги героев (screens/book.css): высота с лентами — как у прежней плитки 4 : 5 */
 .ar-log{gap:var(--sp-s);min-height:0;overflow:auto;scrollbar-width:thin}
 .ar-lrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;align-items:center;gap:var(--sp-s);padding:6px 0;border-top:1px solid var(--iron)}
 .ar-lrow .tx{display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -86,7 +86,7 @@ button.ar-me:hover>b{color:var(--parch)}
 /* листы: витрина соперника, герой соперника, подготовка атаки, итог, матч Лиги, награды */
 .ar-oh{gap:var(--sp-l)}
 .ar-els{gap:6px;flex-wrap:wrap}
-.ar-five{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--sp-s)}
+.ar-five{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--sp-s);max-width:420px}
 .ar-f{font-size:12.5px;white-space:nowrap}
 .ar-hh{display:grid;grid-template-columns:118px minmax(0,1fr);gap:var(--sp-m);align-items:start}
 .ar-hn{font-size:24px;line-height:1.05}

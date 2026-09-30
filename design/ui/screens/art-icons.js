@@ -31,6 +31,15 @@ const ART_ICONS = {
   /* лицо героя без портрета — силуэт его класса; ключ — значок класса (clsPng, index.html): cls-tank, cls-healer… */
   cls: key => 'shards/' + key + '.jpg',
   clsStub: 'cls-str',   // класс не узнан — силуэт бойца
+  /* кадр силуэта класса в окне книги и на странице портрета (hcFace, screens/heroes.js): box — где на рисунке вся фигура с оружием
+     и знаком класса (лук, цепи, кирка, чаша, посох, меч, щит) — [слева, сверху, справа, снизу], тысячные доли рисунка; ratio — ширина
+     рисунка к высоте, ‰ (выгрузка 464 × 576). Окно вписывает этот кадр целиком, не рисунок: фигура не обрезается ни в высоком окне
+     обложки, ни на широкой странице (замечание автора 30.09.2026: «заглушка Лучницы… обрезана»). Числа вида */
+  clsFit: {
+    ratio: 806,
+    box: { 'cls-agi': [190, 31, 832, 972], 'cls-control': [47, 87, 948, 1000], 'cls-farmer': [82, 146, 905, 1000], 'cls-healer': [78, 83, 884, 1000],
+      'cls-mage': [125, 69, 940, 1000], 'cls-str': [26, 52, 948, 1000], 'cls-tank': [9, 104, 1000, 1000] },
+  },
   heal: 75,             // трещины гаснут к полному комплекту на столько %: стекло «заживает». Число вида
 };
 const artReady = p => ART_ICONS.ready.includes(p);
@@ -61,16 +70,19 @@ const SHARD_CLS = {
   'cls-control': { head: 'hood', item: '<path class="k" d="M10 70Q20 58 28 70T46 70T64 70"/><circle class="i" cx="12" cy="84" r="5"/><circle class="i" cx="66" cy="84" r="5"/>' },
   'cls-farmer': { head: 'hood', item: '<path class="k w" d="M16 98L58 36"/><path class="k" d="M42 28Q58 30 70 46"/><path class="i" d="M50 78H70V96H50Z"/>' },
 };
-function shardClsSvg(key) {
+/* meet — вписать кадр целиком (окно книги: лук и оружие не обрезаются); без него — заполнить кадр (стекло осколка) */
+function shardClsSvg(key, meet) {
   const C = SHARD_CLS[key] || SHARD_CLS[ART_ICONS.clsStub];
-  return `<svg viewBox="0 0 80 100" preserveAspectRatio="xMidYMin slice" aria-hidden="true"><path class="b" d="${SHARD_BODY.chest}"/><path class="b" d="${SHARD_BODY[C.head]}"/><path class="f" d="M40 30C34 30 30 36 30 44C30 52 34 58 40 58C46 58 50 52 50 44C50 36 46 30 40 30Z"/>${C.item}</svg>`;
+  return `<svg viewBox="0 0 80 100" preserveAspectRatio="${meet ? 'xMidYMax meet' : 'xMidYMin slice'}" aria-hidden="true"><path class="b" d="${SHARD_BODY.chest}"/><path class="b" d="${SHARD_BODY[C.head]}"/><path class="f" d="M40 30C34 30 30 36 30 44C30 52 34 58 40 58C46 58 50 52 50 44C50 36 46 30 40 30Z"/>${C.item}</svg>`;
 }
 /* класс героя → ключ силуэта: значок класса clsPng (index.html) понимает и героев состава, и героев отряда прототипа */
 const shardCls = h => (typeof clsPng === 'function' && clsPng((h.cl && h.cl[0]) || h.cls)) || ART_ICONS.clsStub;
-/* лицо в стекле: портрет героя отряда прототипа или выгруженный портрет состава; нет — силуэт класса (рисунок или SVG) */
-function shardFace(h) {
+/* лицо в стекле: портрет героя отряда прототипа или выгруженный портрет состава; нет — силуэт класса (рисунок или SVG). Пока осколков
+   не хватает на героя и его нет в коллекции, он неизвестная душа (стадии знакомства, решение автора 30.09.2026): в стекле — силуэт
+   класса, даже если портрет выгружен; known — комплект собран или герой пробуждён */
+function shardFace(h, known = true) {
   const old = typeof rsOld === 'function' ? rsOld(h) : null;
-  const pic = old ? old.img : typeof RS_ART !== 'undefined' && RS_ART.has(h.id) ? AV('heroes/' + h.id + '.jpg') : '';
+  const pic = old ? old.img : known && typeof RS_ART !== 'undefined' && RS_ART.has(h.id) ? AV('heroes/' + h.id + '.jpg') : '';
   if (pic) return `<span class="hsg-face" style="background-image:url('${pic}')"></span>`;
   const key = shardCls(h), p = ART_ICONS.cls(key);
   return artReady(p) ? `<span class="hsg-face cls" style="background-image:url('${AV(p)}')"></span>` : `<span class="hsg-face svg">${shardClsSvg(key)}</span>`;
@@ -84,8 +96,9 @@ function shardGhost(h, got, need, px = 64) {
   const cr = 100 - Math.floor(share * ART_ICONS.heal / 100);
   const G = ART_ICONS.glass, art = artReady(G.mask) && artReady(G.rim) && artReady(G.cracks);
   const say = artEsc(`${h.n}: осколки ${got} из ${need}`), head = `data-k="${art ? 'art' : 'svg'}"${full ? ' data-full="1"' : ''} style="--px:${px}px;--s:${share};--cr:${cr}" title="${say}" aria-label="${say}"`;
-  if (!art) return `<span class="hsg" ${head}><span class="hsg-in">${shardFace(h)}</span>${SHARD_SVG}</span>`;
-  return `<span class="hsg" ${head}><span class="hsg-in">${shardFace(h)}</span><img class="hsg-cr" src="${AV(G.cracks)}" alt="" loading="lazy" decoding="async"><img class="hsg-rim" src="${AV(G.rim)}" alt="" loading="lazy" decoding="async"></span>`;
+  const known = full || (typeof rsHas === 'function' && rsHas(h));
+  if (!art) return `<span class="hsg" ${head}><span class="hsg-in">${shardFace(h, known)}</span>${SHARD_SVG}</span>`;
+  return `<span class="hsg" ${head}><span class="hsg-in">${shardFace(h, known)}</span><img class="hsg-cr" src="${AV(G.cracks)}" alt="" loading="lazy" decoding="async"><img class="hsg-rim" src="${AV(G.rim)}" alt="" loading="lazy" decoding="async"></span>`;
 }
 
 /* ================== UI-кит: осколок героя ==================

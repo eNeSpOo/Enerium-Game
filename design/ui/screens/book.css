@@ -1,0 +1,362 @@
+/* screens/book.css — карточка героя — книга (screens/book.js): книга в сетке, витрине и отряде, раскрытая книга героя, анимация.
+   Выбор автора 30.09.2026 (ADR-0032): ступень книги — личный максимум доблести (data-t 1…5), редкость — кристалл --rico и свет --rc
+   (data-r, ADR-0027), рунные пределы — замки по правому краю (бирюза карста — всегда бирюза), взятая доблесть — короткие ленты из
+   нижнего края. Раскладка ложится на арт: окно и тело книги — целые тысячные доли рамки рисунка (--wt, --wr, --wb, --wl, --ct, --cr,
+   --cb, --cl), страницы разворота — --lt…--ll и --rt…--rl, корешок — --gx (HB_ART, book.js; снято tools/art-gen/book_layers.py).
+   Книга — контейнер: размеры знаков — доли её ширины (cqw), поэтому одна раскладка — от крупной книги в сетке до мелкой в отряде.
+   Без выгруженного арта обложку, разворот, замок и ленту рисует CSS (.hb-cvc, .hb-spc; html без классов hb-lk, hb-rn, hb-sr, hb-ep,
+   hb-lf). Цвет редкости на нейтральной ленте и звезде — наложение multiply по контуру clip-path (маска-картинка у страницы с диска не
+   грузится). Движение — только transform и opacity; время — от нажатия: задержки --d-* (момент − прошло), перерисовка не рвёт показ;
+   при «меньше движения» — без полёта и листов, плавная смена. Свои классы — hb-*; хвосты прежней карточки: .hk-img, .hk-sil,
+   .hk-sh — в heroes.css. */
+
+/* ---------- книга: кнопка, обложка 9 : 16, ленты под ней ---------- */
+.hb{position:relative;display:flex;flex-direction:column;width:100%;min-width:0;padding:0;border:0;background:none;color:var(--parch);text-align:left;cursor:pointer;
+  container-type:inline-size;-webkit-tap-highlight-color:transparent;transition:transform .15s ease}
+.hb:hover{transform:translateY(-2px)}
+.hb:focus-visible{outline:none}
+.hb:focus-visible .hb-bk{filter:drop-shadow(0 0 2cqw var(--spirit))}
+.hb-bk{position:relative;z-index:1;display:block;width:100%;aspect-ratio:9/16;isolation:isolate;container-type:inline-size}
+/* свет книги — цвет редкости, сила — HB_VIEW.glow (у обычной почти нет) */
+.hb-gl{position:absolute;inset:2.5% 4%;z-index:-1;border-radius:4%;opacity:calc(var(--hb-g,0) / 100);box-shadow:0 0 9cqw 2cqw var(--rc),0 0 3cqw .6cqw var(--rc);pointer-events:none}
+/* портрет в окне обложки: чуть заходит под раму — без щелей */
+.hb-ph{position:absolute;z-index:0;overflow:hidden;background:#07090b;
+  left:calc(var(--wl) * 1% / 10 - 1.5%);right:calc(var(--wr) * 1% / 10 - 1.5%);top:calc(var(--wt) * 1% / 10 - 1%);bottom:calc(var(--wb) * 1% / 10 - 1%)}
+.hb-ph .hk-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 14%}
+/* поле силуэта класса в окне (heroes.css, .hk-fit) — в долях ширины книги: сверху — заход под раму и круг уровня или медальон стихии
+   у углов окна (0,6 ширины круга; у m круг 26, у мелкой — 0,7 от 32), снизу — плашка имени, по бокам — заход окна под раму */
+.hb-ph .hk-sil{--st:18cqw;--sb:8cqw;--sx:2cqw}
+.hb[data-z="s"] .hb-ph .hk-sil{--st:25cqw;--sb:3cqw}
+.hb-ph::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(3,4,5,.45),transparent 20%,transparent 60%,rgba(4,6,8,.82))}
+/* обложка ступени: рисунок с прозрачным окном — или CSS (ниже) */
+.hb-cva{position:absolute;inset:0;z-index:1;width:100%;height:100%;pointer-events:none;-webkit-user-drag:none;user-select:none}
+.hb-cvc{position:absolute;inset:0;z-index:1;pointer-events:none;border-radius:3.6% / 2%;
+  padding:calc(var(--wt) * .17778cqw) calc(var(--wr) * .1cqw) calc(var(--wb) * .17778cqw) calc(var(--wl) * .1cqw);
+  background:var(--hb-mat);box-shadow:var(--hb-rim);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+/* материал ступеней без арта: 1 — мягкая кожа; 2 — тёмная кожа в воронёном железе; 3 — бронзовый оклад с резьбой; 4 — чёрная кожа,
+   железо и кость; 5 — воронёное железо, кость и свет обреза страниц */
+.hb,.hb-win{--hb-mat:radial-gradient(90% 60% at 30% 20%,rgba(255,220,170,.12),transparent 60%),linear-gradient(160deg,#8a5b3a,#5a3a24 45%,#704a2e 70%,#3e2818);
+  --hb-rim:inset 0 0 0 .8cqw rgba(30,18,10,.8),inset 0 0 0 1.6cqw rgba(160,110,70,.25),inset 0 0 6cqw rgba(0,0,0,.5)}
+[data-t="2"]{--hb-mat:linear-gradient(135deg,#6d7278 0 7%,transparent 7% 93%,#6d7278 93%),linear-gradient(225deg,#6d7278 0 7%,transparent 7% 93%,#6d7278 93%),linear-gradient(160deg,#35383c,#1b1d20 50%,#2c2f33);
+  --hb-rim:inset 0 0 0 3cqw #3d4146,inset 0 0 0 3.8cqw #121315,inset 0 0 8cqw rgba(0,0,0,.6)}
+[data-t="3"]{--hb-mat:repeating-linear-gradient(45deg,rgba(214,168,98,.18) 0 1.4cqw,transparent 1.4cqw 2.8cqw),linear-gradient(160deg,#7a5530,#4f3419 45%,#6a4724 70%,#3a2612);
+  --hb-rim:inset 0 0 0 1.5cqw #9a7442,inset 0 0 0 2.4cqw #2e1f0e,inset 0 0 0 5.5cqw rgba(196,150,86,.45),inset 0 0 7cqw rgba(0,0,0,.5)}
+[data-t="4"]{--hb-mat:linear-gradient(90deg,#d8c89c 0 5%,#8a7a52 5% 7%,transparent 7%),linear-gradient(0deg,#cdbd90 0 5%,transparent 5%),linear-gradient(160deg,#26282b,#101113 55%,#1e2023);
+  --hb-rim:inset 0 0 0 1.2cqw #4a4e53,inset 0 0 0 2cqw #0c0d0e,inset 0 0 8cqw rgba(0,0,0,.65)}
+[data-t="5"]{--hb-mat:linear-gradient(90deg,#d6c69a 0 5%,#6a5a3a 5% 6.5%,transparent 6.5%),radial-gradient(60% 40% at 100% 50%,rgba(230,168,75,.4),transparent 70%),linear-gradient(160deg,#2c2f33,#0f1012 55%,#23252a);
+  --hb-rim:inset 0 0 0 1.4cqw #55595f,inset 0 0 0 2.4cqw #0b0b0c,inset -1.2cqw 0 0 #e6a84b,inset 0 0 9cqw rgba(0,0,0,.7)}
+/* кристалл редкости — посреди верхней полосы обложки */
+.hb-bk>.hb-cr{position:absolute;left:50%;top:calc(var(--wt) * 1% / 20 + var(--ct) * 1% / 20);z-index:4;width:15cqw;aspect-ratio:1;transform:translate(-50%,-50%);
+  background:var(--rico) center/contain no-repeat;filter:drop-shadow(0 1cqw 1cqw rgba(0,0,0,.85)) drop-shadow(0 0 2.4cqw color-mix(in srgb,var(--rc) 75%,transparent))}
+/* уровень — кожаный круг у верхнего левого угла окна */
+.hb-bk>.hb-lv{position:absolute;z-index:4;left:calc(var(--wl) * 1% / 10);top:calc(var(--wt) * 1% / 10);width:24cqw;aspect-ratio:1;transform:translate(-40%,-40%);display:grid;place-items:center;border-radius:50%;
+  background:radial-gradient(circle at 50% 32%,#835a3c,#4d301d 58%,#2c1b10);box-shadow:inset 0 0 0 .9cqw #c9a26a,inset 0 0 0 1.8cqw #3a2616,0 1cqw 2cqw rgba(0,0,0,.75)}
+.hb-bk>.hb-lv b{font:700 9cqw/1 var(--f-u);color:#f7e8c6;letter-spacing:-.04em;text-shadow:0 .5cqw 1cqw #000}
+.hb-bk>.hb-lv.w4 b{font-size:7cqw}
+/* стихия — медальон воронёного железа у верхнего правого угла окна */
+.hb-bk>.hb-el{position:absolute;z-index:4;right:calc(var(--wr) * 1% / 10);top:calc(var(--wt) * 1% / 10);width:21cqw;aspect-ratio:1;transform:translate(40%,-40%);display:grid;place-items:center;border-radius:50%;
+  background:radial-gradient(circle at 50% 35%,#393d42,#16181b 70%);box-shadow:inset 0 0 0 .9cqw #8d9299,inset 0 0 0 1.8cqw #1b1d20,0 1cqw 2cqw rgba(0,0,0,.75)}
+.hb-bk>.hb-el .el.bare::before{width:7cqw;height:9.6cqw}
+/* замки пределов — столбцом по правой полосе обложки, сверху вниз I…V */
+.hb-bk>.hb-lk{position:absolute;z-index:4;right:calc(var(--wr) * 1% / 20);top:calc(var(--wt) * 1% / 10 + 11%);bottom:calc(var(--wb) * 1% / 10 + 4%);width:12cqw;transform:translateX(50%);
+  display:flex;flex-direction:column;justify-content:space-between;align-items:center;pointer-events:none}
+.hb-l{position:relative;display:block;flex:none;width:100%;aspect-ratio:817/1000}
+/* замок рисунком: закрытый и отпертый — на одном холсте, тела совпадают; скважина — --hb-key-x, --hb-key-y */
+html.hb-lk .hb-l{background:var(--hb-lock) center/contain no-repeat;filter:drop-shadow(0 .6cqw .8cqw rgba(0,0,0,.8))}
+html.hb-lk .hb-l.on{background-image:var(--hb-lock-on);filter:drop-shadow(0 0 1.6cqw rgba(72,229,212,.75)) drop-shadow(0 .6cqw .8cqw rgba(0,0,0,.7))}
+/* свет из скважины: тлеет — на рун не хватает, пульсирует — можно пробить; движется только opacity */
+.hb-l::after{content:"";position:absolute;left:var(--hb-key-x,50%);top:var(--hb-key-y,60%);width:90%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;opacity:0;
+  background:radial-gradient(closest-side,#effffc,rgba(72,229,212,.85) 22%,rgba(72,229,212,.2) 60%,transparent)}
+.hb-l.wait::after{opacity:.4}
+.hb-l.ready::after{animation:hb-pulse 1.8s ease-in-out infinite}
+@keyframes hb-pulse{0%,100%{opacity:.2}50%{opacity:1}}
+/* замок без рисунка: дужка и тело, скважина; отпертый — дужка поднята, скважина светит */
+html:not(.hb-lk) .hb-l::before{content:"";position:absolute;left:10%;right:10%;bottom:0;height:62%;border-radius:26% 26% 32% 32%;
+  background:radial-gradient(circle at 50% 50%,#050606 0 9%,transparent 11%),linear-gradient(180deg,#4d5157,#24272b 60%,#15171a);box-shadow:inset 0 0 0 .7cqw #70767d,0 .5cqw .8cqw rgba(0,0,0,.7)}
+html:not(.hb-lk) .hb-l{background:radial-gradient(60% 40% at 50% 30%,transparent 55%,#3a3e43 56% 72%,transparent 73%) 0 0/100% 80% no-repeat}
+html:not(.hb-lk) .hb-l.on{background-position:0 -18%;filter:drop-shadow(0 0 1.6cqw rgba(72,229,212,.75))}
+html:not(.hb-lk) .hb-l.on::before{background:radial-gradient(circle at 50% 50%,#effffc 0 8%,#48e5d4 12%,rgba(72,229,212,.2) 34%,transparent 36%),linear-gradient(180deg,#4d5157,#24272b 60%,#15171a)}
+html:not(.hb-lk) .hb-l::after{top:69%}
+/* плашка имени — на нижней кромке окна; у узкого окна (гримуар) — шире окна, по раме: имя читается и в мелкой сетке */
+.hb-bk>.hb-nm{position:absolute;z-index:4;left:min(calc(var(--wl) * 1% / 10 - 2%),12%);right:min(calc(var(--wr) * 1% / 10 - 2%),12%);bottom:calc(var(--wb) * 1% / 10 - 3.6%);display:block;height:12cqw;padding:0 3cqw;border-radius:1.6cqw;
+  background:linear-gradient(180deg,#2c2723,#141210);box-shadow:inset 0 0 0 .5cqw #6d6252,inset 0 .6cqw 0 rgba(255,255,255,.06),0 .8cqw 1.8cqw rgba(0,0,0,.65);
+  font:600 clamp(9px,8.4cqw,17px)/12cqw var(--f-d);text-align:center;color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #000}
+/* полоса осколков — над плашкой, в окне */
+.hb-shw{position:absolute;z-index:4;left:calc(var(--wl) * 1% / 10);right:calc(var(--wr) * 1% / 10);bottom:calc(var(--wb) * 1% / 10 + 4.6%);display:block;padding:0 1.5cqw}
+.hb-shw .hk-sh{height:15cqw;gap:1.6cqw}
+.hb-shw .hk-sh small{font-size:clamp(8px,7.4cqw,11px)}
+.hb-shw .hsg{width:13cqw;height:13cqw}
+/* низ обложки: щит класса и мощь (или отметка, цена) */
+.hb-bk>.hb-ft{position:absolute;z-index:4;left:calc(var(--wl) * 1% / 10 - 6%);right:calc(var(--wr) * 1% / 10 - 6%);bottom:calc(var(--cb) * 1% / 10 + 2.4%);height:16cqw;display:flex;align-items:center;gap:1.5cqw}
+.hb-bk>.hb-ft .hb-cls{flex:none;display:grid;place-items:center;width:16cqw;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 50% 35%,#3a2d20,#120e0a 72%);box-shadow:inset 0 0 0 .7cqw #8f6c3c,0 .6cqw 1.2cqw rgba(0,0,0,.7)}
+.hb-bk>.hb-ft .hb-cls .ico{width:11.5cqw;height:11.5cqw}
+.hb-bm{display:inline-flex;align-items:center;gap:1cqw;min-width:0;font:700 clamp(9px,9cqw,15px)/1 var(--f-u);color:#f3dfa6;text-shadow:0 1px 2px #000;font-variant-numeric:lining-nums tabular-nums;white-space:nowrap}
+.hb-bk .hb-bm .ico{width:10cqw;height:10cqw}
+.hb-in{display:inline-flex;align-items:center;gap:1cqw;font:700 clamp(8px,7cqw,10px)/1 var(--f-u);letter-spacing:.08em;text-transform:uppercase;color:var(--spirit);white-space:nowrap}
+.hb-in .i{width:8cqw;height:8cqw}
+.hb-bk>.hb-ft .du-cp{font-size:clamp(9px,9cqw,13px)}
+.hb-bk>.hb-ft .du-cp img{width:10cqw;height:10cqw}
+/* занятость — поверх портрета */
+.hb-busy{position:absolute;left:0;right:0;top:44%;z-index:5;padding:1.2cqw 1cqw;text-align:center;font:700 clamp(8px,7.4cqw,10px)/1 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--amber);background:rgba(10,8,4,.84)}
+/* угольки над гримуаром: поднимаются из обреза страниц */
+.hb-fx{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:visible}
+.hb-fx i{position:absolute;left:var(--x);bottom:6%;width:1.6cqw;aspect-ratio:1;border-radius:50%;background:#ffd9a0;box-shadow:0 0 2cqw .6cqw rgba(230,168,75,.9);opacity:0;animation:hb-ember var(--s) ease-out var(--d) infinite}
+@keyframes hb-ember{0%{opacity:0;transform:translate(0,0)}20%{opacity:.9}100%{opacity:0;transform:translate(3cqw,-60cqw)}}
+
+/* ленты доблести: лишь выглядывают из нижнего края; лент — личный максимум, взятая — цвет редкости и звёздочка */
+.hb-rb{position:relative;z-index:0;display:flex;justify-content:center;gap:3cqw;height:14cqw;margin-top:-5cqw;pointer-events:none}
+.hb-rb i{position:relative;flex:none;display:block;width:7.5cqw;height:100%}
+.hb-rb s{position:absolute;inset:0;display:block;text-decoration:none;clip-path:polygon(0 0,100% 0,100% 100%,50% calc(100% - 7.5cqw * var(--hb-notch,350) / 1000),0 100%);
+  background:linear-gradient(90deg,#6f6a64,#b4ada3 42%,#d8d2c6 55%,#9e978c 72%,#5f5a54)}
+.hb-rb i.on s{background:linear-gradient(90deg,color-mix(in srgb,var(--rc) 55%,#000),var(--rc) 42%,color-mix(in srgb,var(--rc) 60%,#fff) 55%,var(--rc) 72%,color-mix(in srgb,var(--rc) 50%,#000))}
+html.hb-rn .hb-rb s,html.hb-rn .hb-rb i.on s{background:var(--hb-ribbon) center bottom/100% auto no-repeat}
+html.hb-rn .hb-rb i:not(.on) s{filter:grayscale(1) brightness(.6)}
+html.hb-rn .hb-rb i.on s::after{content:"";position:absolute;inset:0;background:var(--rc);mix-blend-mode:multiply}
+/* звёздочка на конце ленты: взятая — цвет редкости и свет, невзятая — тусклая */
+.hb-rb b{position:absolute;left:50%;bottom:-3.2cqw;width:8.5cqw;aspect-ratio:96/100;transform:translateX(-50%);display:block;
+  clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);background:linear-gradient(135deg,#8d8a86,#4b4946)}
+.hb-rb i.on b{background:linear-gradient(135deg,color-mix(in srgb,var(--rc) 45%,#fff),var(--rc) 55%,color-mix(in srgb,var(--rc) 60%,#000));filter:drop-shadow(0 0 1.4cqw var(--rc))}
+html.hb-sr .hb-rb b{clip-path:none;background:var(--hb-star) center/contain no-repeat;filter:grayscale(1) brightness(.5)}
+html.hb-sr .hb-rb i.on b{filter:drop-shadow(0 0 1.4cqw var(--rc))}
+html.hb-sr .hb-rb i.on b::after{content:"";position:absolute;inset:0;background:var(--rc);mix-blend-mode:multiply;clip-path:var(--hb-sclip,none)}
+
+/* ---------- размеры: m — витрины, s — отряды и списки: знаки крупнее относительно книги, лишнего нет ---------- */
+.hb[data-z="m"] .hb-bk>.hb-cr{width:17cqw}
+.hb[data-z="m"] .hb-bk>.hb-lv{width:26cqw}
+.hb[data-z="m"] .hb-bk>.hb-lv b{font-size:10cqw}
+.hb[data-z="m"] .hb-bk>.hb-lk{width:13cqw}
+.hb[data-z="m"] .hb-bk>.hb-nm{font-size:clamp(9px,9.6cqw,14px)}
+.hb[data-z="s"] .hb-bk>.hb-cr{width:21cqw}
+.hb[data-z="s"] .hb-bk>.hb-lv{width:32cqw;transform:translate(-30%,-30%)}
+.hb[data-z="s"] .hb-bk>.hb-lv b{font-size:12.5cqw}
+.hb[data-z="s"] .hb-bk>.hb-lv.w4 b{font-size:10cqw}
+.hb[data-z="s"] .hb-bk>.hb-lk{width:15cqw;top:calc(var(--wt) * 1% / 10 + 9%);bottom:calc(var(--wb) * 1% / 10 + 1%)}
+.hb[data-z="s"] .hb-rb{gap:3.5cqw;height:17cqw;margin-top:-6cqw}
+.hb[data-z="s"] .hb-rb i{width:10cqw}
+.hb[data-z="s"] .hb-rb s{clip-path:polygon(0 0,100% 0,100% 100%,50% calc(100% - 10cqw * var(--hb-notch,350) / 1000),0 100%)}
+.hb[data-z="s"] .hb-rb b{width:11cqw;bottom:-4cqw}
+.hb[data-z="s"] .hb-bk>.hb-ft{left:calc(var(--wl) * 1% / 10 - 4%);right:calc(var(--wr) * 1% / 10 - 4%);height:20cqw;justify-content:center}
+.hb[data-z="s"] .hb-bm{font-size:clamp(9px,13cqw,13px)}
+.hb[data-z="s"] .hb-bk .hb-bm .ico{width:13cqw;height:13cqw}
+.hb[data-z="s"] .hb-busy{font-size:clamp(7px,9cqw,10px);letter-spacing:.06em}
+
+/* ряды мелких книг (отряд, лист выбора отряда, пятёрка сильнейших, профиль): книга выше прежней плитки 4 : 5 — ряд уже, высота та же;
+   у своих рядов (редактор отряда, оборона Арены) — свой предел ширины */
+:where(.sq-slots):has(>.hb){max-width:min(100%,420px)}
+
+/* ---------- состояния ---------- */
+/* известный, но не купленный — чёрно-белый портрет; неизвестная душа — силуэт класса (hcFace), свет — тише */
+.hb.gray .hb-ph>*{filter:grayscale(1) brightness(.62) contrast(1.06)}
+.hb.soul .hb-ph::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(70% 45% at 50% 42%,rgba(72,229,212,.14),transparent 70%)}
+.hb.soul .hb-bk>.hb-nm{color:var(--parch-2)}
+.hb.dim .hb-ph>*{filter:grayscale(.8) brightness(.5)}
+.hb.dim .hb-bk>.hb-lk{opacity:.5}
+.hb.sel .hb-bk{filter:drop-shadow(0 0 1.6cqw var(--spirit)) drop-shadow(0 0 .4cqw var(--spirit))}
+.hb.sel{transform:translateY(-3px)}
+/* путь пройден: доблесть на максимуме, все пределы, уровень на потолке — свет книги золотится */
+.hb[data-max] .hb-gl{opacity:1;box-shadow:0 0 9cqw 2cqw var(--rc),0 0 4cqw 1cqw rgba(233,199,126,.7)}
+/* не найденный герой — безымянная книга: ни ступени, ни редкости; будущий цикл — замок */
+.hb.blank{--hb-mat:linear-gradient(160deg,#2a2d31,#15171a 55%,#202326);--hb-rim:inset 0 0 0 1cqw #3a3e43,inset 0 0 8cqw rgba(0,0,0,.7);cursor:default}
+.hb.blank:hover{transform:none}
+.hb.blank .hb-ph{background:radial-gradient(60% 45% at 50% 55%,rgba(72,229,212,.12),transparent 70%),#07090b}
+.hb-q{position:absolute;inset:0;display:grid;place-items:center;font:600 34cqw/1 var(--f-d);font-style:normal;color:rgba(160,220,214,.28)}
+.hb-q .i{width:24cqw;height:24cqw;color:var(--parch-3)}
+.hb.blank.sel .hb-bk{filter:drop-shadow(0 0 1.6cqw var(--spirit))}
+@media (prefers-reduced-motion:reduce){ .hb-fx i{animation:none;opacity:.55;bottom:calc(8% + var(--x) / 5)} .hb-l.ready::after{animation:none;opacity:.8} .hb{transition:none} }
+
+/* ---------- окно героя — раскрытая книга ----------
+   Слой поверх сетки (коллекция, «За золото») или окно поверх любого экрана (.ov.hb-ov). Разворот своей ступени во всё окно (не шире
+   --hb-mw), справа — выступ замков (--hb-lkw), снизу — полоса лент (--hb-rbh). Книга — контейнер размера: знаки — в px и долях */
+.hb-win{position:absolute;inset:0;z-index:19;overflow:hidden}
+.ov.hb-ov>.hb-win{z-index:auto}
+.hb-scrim{position:absolute;inset:0;border:0;padding:0;background:radial-gradient(75% 70% at 50% 45%,rgba(10,12,14,.8),rgba(2,3,4,.95));cursor:default}
+.hb-stage{position:absolute;left:50%;top:50%;width:min(var(--hb-mw),calc(100% - var(--hb-px)));height:calc(100% - var(--hb-py));transform:translate(-50%,-50%)}
+.hb-book{position:absolute;left:0;top:0;width:calc(100% - var(--hb-lkw));height:calc(100% - var(--hb-rbh));isolation:isolate;color:var(--parch)}
+.hb-aura{position:absolute;inset:4% 2.5% 5%;z-index:-1;border-radius:3%;pointer-events:none;opacity:calc(var(--hb-g,0) / 100 + .12);box-shadow:0 0 44px 8px var(--rc),0 0 16px 2px var(--rc)}
+.hb-spa{position:absolute;inset:0;z-index:0;width:100%;height:100%;pointer-events:none;-webkit-user-drag:none;user-select:none}
+/* разворот без рисунка: переплёт ступени рамой, две страницы пергамента, тень корешка */
+.hb-spc{position:absolute;inset:0;z-index:0;border-radius:18px / 30px;background:var(--hb-mat);box-shadow:var(--hb-rim),0 16px 40px -16px #000}
+.hb-spc::before,.hb-spc::after{content:"";position:absolute;top:calc(var(--lt) * 1% / 10);bottom:calc(var(--lb) * 1% / 10)}
+.hb-spc::before{left:calc(var(--ll) * 1% / 10);right:calc(var(--lr) * 1% / 10);border-radius:10px 2px 2px 10px;background:linear-gradient(90deg,#b69a68,#e3d1a8 12%,#ead9b2 70%,#bda172 97%,#8a7148)}
+.hb-spc::after{left:calc(var(--rl) * 1% / 10);right:calc(var(--rr) * 1% / 10);border-radius:2px 10px 10px 2px;background:linear-gradient(90deg,#8a7148,#bda172 3%,#ead9b2 30%,#e3d1a8 88%,#b69a68)}
+.hb-pg{position:absolute;z-index:1;min-width:0;min-height:0}
+.hb-pg.l{left:calc(var(--ll) * 1% / 10);right:calc(var(--lr) * 1% / 10);top:calc(var(--lt) * 1% / 10);bottom:calc(var(--lb) * 1% / 10)}
+.hb-pg.r{left:calc(var(--rl) * 1% / 10);right:calc(var(--rr) * 1% / 10);top:calc(var(--rt) * 1% / 10);bottom:calc(var(--rb) * 1% / 10)}
+/* левая страница — портрет во всю страницу в тонкой раме; знаки — по углам, имя — на плашке */
+.hb-por{position:absolute;inset:3.5% 4% 3.5% 5.5%;display:block;padding:0;border:0;border-radius:6px;overflow:hidden;background:#07090b;cursor:zoom-in;
+  box-shadow:0 0 0 2px #2b1f13,0 0 0 3px rgba(201,162,106,.55),0 6px 18px rgba(0,0,0,.5)}
+.hb-por.soul{cursor:default}
+.hb-por .hk-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%}
+.hb-por .hk-sil{--st:44px;--sb:40px;--sx:12px}   /* поле силуэта: сверху — уровень и стихия, снизу — класс, имя и мощь */
+.hb-por::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(3,4,5,.35),transparent 18%,transparent 62%,rgba(4,6,8,.8))}
+.hb-zi{position:absolute;right:8px;top:50%;z-index:2;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;transform:translateY(-50%);background:rgba(8,10,12,.62);color:var(--parch-2);box-shadow:0 0 0 1px var(--iron-2);pointer-events:none}
+.hb-zi .i{width:13px;height:13px}
+.hb-pg.l>.hb-lv{position:absolute;z-index:3;left:1%;top:0;width:52px;height:52px;display:grid;place-items:center;border-radius:50%;
+  background:radial-gradient(circle at 50% 32%,#835a3c,#4d301d 58%,#2c1b10);box-shadow:inset 0 0 0 2px #c9a26a,inset 0 0 0 4px #3a2616,0 3px 8px rgba(0,0,0,.75)}
+.hb-pg.l>.hb-lv b{font:700 18px/1 var(--f-u);color:#f7e8c6;letter-spacing:-.03em;text-shadow:0 1px 2px #000}
+.hb-pg.l>.hb-el{position:absolute;z-index:3;right:1%;top:0;width:46px;height:46px;display:grid;place-items:center;border-radius:50%;
+  background:radial-gradient(circle at 50% 35%,#393d42,#16181b 70%);box-shadow:inset 0 0 0 2px #8d9299,inset 0 0 0 4px #1b1d20,0 3px 8px rgba(0,0,0,.75)}
+.hb-pg.l>.hb-el .el.bare::before{width:14px;height:19px}
+.hb-pg.l>.hb-cls{position:absolute;z-index:3;left:2%;bottom:1.5%;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;
+  background:radial-gradient(circle at 50% 35%,#3a2d20,#120e0a 72%);box-shadow:inset 0 0 0 2px #8f6c3c,0 3px 8px rgba(0,0,0,.75)}
+.hb-pg.l>.hb-cls .ico{width:30px;height:30px}
+.hb-pg.l>.hb-bm{position:absolute;z-index:3;right:6%;bottom:5.5%;font-size:18px;gap:5px}
+.hb-pg.l>.hb-bm .ico{width:22px;height:22px}
+.hb-pg.l>.hb-nm{position:absolute;z-index:3;left:18%;right:26%;bottom:4.5%;height:28px;padding:0 10px;border-radius:5px;background:linear-gradient(180deg,#2c2723,#141210);
+  box-shadow:inset 0 0 0 1px #6d6252,inset 0 1px 0 rgba(255,255,255,.06),0 2px 6px rgba(0,0,0,.6);font:600 17px/28px var(--f-d);text-align:center;color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #000}
+/* правая страница — тёмный вкладыш на пергаменте: сведения героя; вкладки — кожаными закладками по краю страницы */
+.hb-rp{position:absolute;inset:3% 3% 3% 4%;display:flex;flex-direction:column;gap:6px;min-width:0;min-height:0;padding:8px 10px 8px;border-radius:8px;
+  background:linear-gradient(180deg,rgba(18,15,12,.9),rgba(11,10,9,.94));box-shadow:0 0 0 1px rgba(201,162,106,.3),inset 0 0 30px rgba(0,0,0,.5),0 4px 14px rgba(0,0,0,.35)}
+.hb-h{display:flex;align-items:flex-start;gap:8px;flex:none;min-width:0}
+.hb-id{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 auto}
+.hb-id h2{font:600 23px/1 var(--f-d);color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 0 14px rgba(221,188,122,.25)}
+.hb-id .hd-line{gap:6px;font-size:12px}
+.hb-h.own .hd-line+.hd-line{display:none}   /* у своего героя редкость видна кристаллом, прогресс — справа: вторая строка лишняя, место — вкладкам */
+.hb-step{display:flex;gap:3px;flex:none}
+.hb-step .iconbtn{width:30px;height:30px}
+.hb-vit{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:none;font:700 11px/1 var(--f-u);color:var(--parch-3);white-space:nowrap}
+.hb-vit b{font-size:14px;color:var(--parch)}
+.hb-vit small{margin-left:2px;font-size:11px;color:var(--parch-3)}
+.hb-rp .tabs,.hb-tr .tabs{gap:3px;padding:0;border:0;border-radius:0;background:none;box-shadow:none;border-bottom:1px solid rgba(201,162,106,.3)}
+.hb-rp .tabs button{height:26px;padding:0 10px;border-radius:7px 7px 0 0;color:#cdb68c;letter-spacing:.06em;
+  background:linear-gradient(180deg,#3a2a1c,#22180f);box-shadow:inset 0 0 0 1px rgba(201,162,106,.3)}
+.hb-rp .tabs button[aria-selected="true"]{color:var(--gold);background:linear-gradient(180deg,#5c4128,#33241a);box-shadow:inset 0 0 0 1px rgba(233,199,126,.7),inset 0 -2px 0 var(--rc,var(--spirit))}
+.hb-hd.pnl.hd{flex:1 1 0;min-height:0;padding:0;border:0;background:none;box-shadow:none}
+.hb-hd .hd-body{margin-top:0}
+.hb-hd .hd-cols{grid-template-columns:minmax(0,1fr)}
+/* на странице книги места снаряжения и талисманов — по ширине страницы (у разворота каждой ступени страница своя) */
+.hb-hd .hd-gear .eq-slots{grid-template-columns:repeat(9,minmax(0,1fr));gap:3px;max-width:360px}
+.hb-hd .hd-gear .eq-slot{width:auto;height:auto;aspect-ratio:1}
+.hb-hd .hd-gear .tl-slots{grid-template-columns:repeat(4,minmax(0,1fr));max-width:280px}
+.hb-hd .hdg-f{flex-wrap:wrap;row-gap:4px}
+/* «Развитие» на странице книги — страница уже прежней колонки: карточка шага в две строки (кнопка — под текстом), кнопки количества
+   и характеристики тихой строкой — плотнее; «подробнее» у характеристик не нужен — лист открывает вся строка */
+.hb-hd .hdv-path{padding:0}
+.hb-hd .hdv-next{grid-template-columns:30px minmax(0,1fr);gap:4px 8px;padding:5px 9px}
+.hb-hd .hdv-ic{width:30px;height:30px}
+.hb-hd .hdv-tx{gap:4px}
+.hb-hd .hdv-t{font-size:16px}
+.hb-hd .hdv-sub .qty button{height:24px}
+.hb-hd .hdv-act{grid-column:2;min-width:0}
+.hb-hd .hdv-go.btn{min-height:34px;padding:0 12px}
+.hb-hd .hdv-quiet{gap:6px}
+.hb-hd .hdv-quiet .st5{gap:7px}
+.hb-hd .hdv-quiet .s5 .ico{width:16px;height:16px}
+.hb-hd .hdv-quiet .s5 b{font-size:13px}
+.hb-hd .hdv-quiet .hdv-more{display:none}
+.hb-tb{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:6px}
+.hb-tr{flex:none}
+.hb-sc{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:8px}
+.hb-f{flex:none;display:flex;align-items:center;gap:8px;min-width:0;padding-top:6px;border-top:1px solid rgba(201,162,106,.25)}
+.hb-f .btn.big{min-height:40px}
+/* неизвестная душа: сведения закрыты — только осколки и где их брать */
+.hb-soul{flex:1 1 0;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:10px;padding:4px 8px}
+.hb-sq{margin:0;font:italic 500 16px/1.35 var(--f-d);color:var(--parch-2)}
+.hb-sbar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px}
+.hb-sbar small{font:700 12px/1 var(--f-u);color:var(--parch-2)}
+/* переплёт: кристалл у корешка сверху, замки — у правого края, ленты — из нижнего края; закрыть — в углу */
+.hb-book>.hb-cr{position:absolute;z-index:3;left:calc(var(--gx) * 1% / 10);top:calc(var(--ct) * 1% / 10);width:34px;aspect-ratio:1;transform:translate(-50%,-40%);
+  background:var(--rico) center/contain no-repeat;filter:drop-shadow(0 2px 3px rgba(0,0,0,.85)) drop-shadow(0 0 8px color-mix(in srgb,var(--rc) 80%,transparent))}
+.hb-lks{position:absolute;z-index:3;right:calc(var(--cr) * 1% / 10);top:calc(var(--rt) * 1% / 10 + 10%);bottom:calc(var(--rb) * 1% / 10 + 10%);width:26px;transform:translateX(52%)}
+.hb-lks>.hb-lk{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;align-items:center}
+.hb-lks .hb-l{width:26px}
+html.hb-lk .hb-lks .hb-l.on{filter:drop-shadow(0 0 6px rgba(72,229,212,.8)) drop-shadow(0 2px 3px rgba(0,0,0,.7))}
+.hb-book>.hb-rb{position:absolute;z-index:-1;left:calc(var(--gx) * 1% / 10);bottom:calc(var(--cb) * 1% / 10);height:30px;gap:14px;margin:0;transform:translate(-50%,calc(100% - 8px))}
+.hb-book>.hb-rb i{width:16px}
+.hb-book>.hb-rb s{clip-path:polygon(0 0,100% 0,100% 100%,50% calc(100% - 16px * var(--hb-notch,350) / 1000),0 100%)}
+.hb-book>.hb-rb b{width:17px;bottom:-7px}
+.hb-book>.hb-rb i.on b{filter:drop-shadow(0 0 5px var(--rc))}
+.hb-x{position:absolute;right:-8px;top:-10px;z-index:6}
+.hb-skip{position:absolute;inset:0;z-index:30;border:0;padding:0;background:none;cursor:pointer}
+/* низкий экран (844 × 390): шрифты и знаки плотнее */
+.g.sm .hb-id h2{font-size:20px}
+.g.sm .hb-pg.l>.hb-lv{width:46px;height:46px}
+.g.sm .hb-pg.l>.hb-nm{font-size:15px}
+.g.sm .hb-rp .tabs button{padding:0 8px}
+.g.sm .hb-vit{display:none}
+
+/* ---------- анимация: открытие, закрытие, перелистывание ----------
+   Время — от нажатия: задержки --d-* = момент − прошло (book.js, hbAnimVars). Закрытая книга (.hb-fly) летит от карточки в сетке
+   (--fx, --fy, масштаб --fs ‰) к корешку разворота; её обложка (.hb-cv3) открывается вокруг корешка — rotateY с перспективой, на
+   изнанке — форзац; разворот проступает; листы перелистываются; из страниц — свет цвета редкости, пыль и искры; страницы проступают.
+   Закрытие — то же назад: страницы гаснут, обложка закрывается, книга летит в сетку */
+.hb-anim{position:absolute;inset:0;z-index:5;pointer-events:none}
+.hb-fly{position:absolute;z-index:4;transform-origin:0 0;perspective:1600px;perspective-origin:0 50%}
+.hb-cv3{position:absolute;inset:0;z-index:2;transform-origin:0 50%;transform-style:preserve-3d}
+.hb-cvf,.hb-cvb{position:absolute;inset:0;display:block;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.hb-cvf>.hb-bk{width:100%;height:100%}
+.hb-cvb{transform:rotateY(180deg);border-radius:3% / 2%;background:linear-gradient(135deg,#28303a,#10151a);box-shadow:inset 0 0 0 5px #3b2616,inset 0 0 20px rgba(0,0,0,.6)}
+html.hb-ep .hb-cvb{background:var(--hb-endp) center/100% 100% no-repeat}
+/* обрез страниц под обложкой: видно, пока обложка поднимается */
+.hb-edge{position:absolute;z-index:1;inset:1.5% 1% 1.5% 0;border-radius:0 3px 3px 0;background:linear-gradient(90deg,#8a7148,#e3d1a8 20%,#d8c59a),repeating-linear-gradient(0deg,rgba(0,0,0,.08) 0 2px,transparent 2px 4px)}
+.hb-leaf{position:absolute;z-index:3;left:calc(var(--rl) * 1% / 10);right:calc(var(--rr) * 1% / 10);top:calc(var(--rt) * 1% / 10);bottom:calc(var(--rb) * 1% / 10);perspective:1600px;perspective-origin:0 50%}
+.hb-leaf::before{content:"";position:absolute;inset:0;transform-origin:0 50%;border-radius:0 6px 6px 0;opacity:0;
+  background:linear-gradient(90deg,rgba(90,70,40,.4),transparent 14%),linear-gradient(180deg,#eadab2,#d9c498);box-shadow:0 4px 14px rgba(0,0,0,.35)}
+html.hb-lf .hb-leaf::before{background:linear-gradient(90deg,rgba(60,45,25,.35),transparent 12%),var(--hb-leaf) center/100% 100% no-repeat}
+.hb-burst{position:absolute;z-index:4;left:calc(var(--gx) * 1% / 10);top:48%;width:62%;aspect-ratio:1;border-radius:50%;opacity:0;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--rc) 70%,#fff),color-mix(in srgb,var(--rc) 45%,transparent) 42%,transparent)}
+.hb-shine{position:absolute;z-index:4;left:calc(var(--rl) * 1% / 10);right:calc(var(--rr) * 1% / 10);top:calc(var(--rt) * 1% / 10);bottom:calc(var(--rb) * 1% / 10);opacity:0;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(70% 55% at 12% 50%,color-mix(in srgb,var(--rc) 60%,transparent),transparent 72%)}
+.hb-dust,.hb-spk{position:absolute;inset:0;z-index:5;pointer-events:none}
+.hb-dust i{position:absolute;left:var(--x);top:var(--y);width:3px;height:3px;border-radius:50%;background:#efdfb8;box-shadow:0 0 4px rgba(239,223,184,.8);opacity:0}
+.hb-spk i{position:absolute;left:calc(var(--gx) * 1% / 10);top:46%;width:4px;height:4px;border-radius:50%;background:color-mix(in srgb,var(--rc) 45%,#fff);box-shadow:0 0 6px 1px var(--rc);opacity:0}
+/* открытие */
+.hb-win.in .hb-scrim{animation:hb-in var(--t-fly) ease-out var(--d-fly) both}
+.hb-win.in .hb-fly{animation:hb-fly var(--t-fly) cubic-bezier(.3,.7,.2,1) var(--d-fly) both,hb-out 200ms linear var(--d-show) both}
+.hb-win.in .hb-cv3{animation:hb-open var(--t-cv) cubic-bezier(.45,.05,.25,1) var(--d-cv) both}
+.hb-win.in .hb-spa,.hb-win.in .hb-spc,.hb-win.in .hb-aura{animation:hb-appear 360ms ease-out var(--d-cv) both}
+.hb-win.in .hb-pg,.hb-win.in .hb-lks,.hb-win.in .hb-book>.hb-rb,.hb-win.in .hb-book>.hb-cr,.hb-win.in .hb-x{animation:hb-in var(--t-show) ease-out var(--d-show) both}
+.hb-win.in .hb-leaf{animation:hb-out 180ms linear var(--d-show) both}
+.hb-win.in .hb-leaf::before{animation:hb-leaf var(--t-leaf) cubic-bezier(.4,.1,.3,1) var(--d-leaf) both}
+.hb-win.in .hb-burst{animation:hb-burst 900ms ease-out var(--d-burst) both}
+.hb-win.in .hb-shine{animation:hb-shine 1100ms ease-in-out var(--d-shine) both}
+.hb-win.in .hb-dust i{animation:hb-dust var(--s) ease-out var(--d) both}
+.hb-win.in .hb-spk i{animation:hb-spark 700ms cubic-bezier(.2,.7,.3,1) var(--d) both}
+/* закрытие: страницы гаснут, закрытая книга проступает на развороте, обложка закрывается, книга летит в сетку */
+.hb-win.out .hb-pg,.hb-win.out .hb-lks,.hb-win.out .hb-book>.hb-rb,.hb-win.out .hb-book>.hb-cr,.hb-win.out .hb-x{animation:hb-out var(--t-hide) ease-in var(--d-hide) both}
+.hb-win.out .hb-spa,.hb-win.out .hb-spc,.hb-win.out .hb-aura{animation:hb-appear var(--t-cv) ease-in var(--d-cv) reverse both}
+.hb-win.out .hb-fly{animation:hb-in var(--t-hide) linear var(--d-hide) both,hb-fly var(--t-fly) cubic-bezier(.6,0,.8,.4) var(--d-fly) reverse both}
+.hb-win.out .hb-cv3{animation:hb-open var(--t-cv) cubic-bezier(.45,.05,.25,1) var(--d-cv) reverse both}
+.hb-win.out .hb-scrim{animation:hb-out var(--t-fly) ease-in var(--d-fly) both}
+/* ‹ ›: лист перелистывается вперёд (справа налево) или назад, страницы проступают */
+.hb-leaf.turn{z-index:3}
+.hb-leaf.turn.back{left:calc(var(--ll) * 1% / 10);right:calc(var(--lr) * 1% / 10);top:calc(var(--lt) * 1% / 10);bottom:calc(var(--lb) * 1% / 10);perspective-origin:100% 50%}
+.hb-leaf.turn.back::before{transform-origin:100% 50%;border-radius:6px 0 0 6px}
+.hb-win.turn .hb-leaf::before{animation:hb-turn var(--t-turn) cubic-bezier(.4,.1,.3,1) var(--d-turn) both}
+.hb-win.turn .hb-leaf.back::before{animation-name:hb-turnb}
+.hb-win.turn .hb-pg{animation:hb-in var(--t-turn) ease-out var(--d-turn) both}
+/* «меньше движения»: без полёта и листов — плавная смена */
+.hb-win.fade .hb-stage,.hb-win.fade .hb-scrim{animation:hb-in var(--t-fade) ease-out var(--d-fade) both}
+@keyframes hb-in{from{opacity:0}to{opacity:1}}
+@keyframes hb-out{from{opacity:1}to{opacity:0}}
+@keyframes hb-fly{0%{transform:translate(var(--fx),var(--fy)) scale(calc(var(--fs) / 1000))}26%{transform:translate(var(--fx),calc(var(--fy) - 12px)) scale(calc(var(--fs) / 1000 * 1.06))}100%{transform:translate(0,0) scale(1)}}
+@keyframes hb-open{from{transform:rotateY(0deg)}to{transform:rotateY(-180deg)}}
+@keyframes hb-appear{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+@keyframes hb-leaf{0%{opacity:0;transform:rotateY(0deg)}10%{opacity:1}100%{opacity:1;transform:rotateY(-180deg)}}
+@keyframes hb-turn{0%{opacity:1;transform:rotateY(0deg)}85%{opacity:1}100%{opacity:0;transform:rotateY(-180deg)}}
+@keyframes hb-turnb{0%{opacity:1;transform:rotateY(0deg)}85%{opacity:1}100%{opacity:0;transform:rotateY(180deg)}}
+@keyframes hb-burst{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}25%{opacity:.95}100%{opacity:0;transform:translate(-50%,-50%) scale(1.5)}}
+@keyframes hb-shine{0%{opacity:0}35%{opacity:.9}100%{opacity:0}}
+@keyframes hb-dust{0%{opacity:0;transform:translate(0,0)}20%{opacity:.85}100%{opacity:0;transform:translate(var(--dx),var(--dy))}}
+@keyframes hb-spark{0%{opacity:0;transform:translate(0,0) scale(1)}15%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.4)}}
+@media (prefers-reduced-motion:reduce){
+  .hb-win .hb-anim,.hb-win .hb-skip{display:none}
+  .hb-win.fade .hb-stage,.hb-win.fade .hb-scrim{animation-duration:var(--t-fade)!important}
+}
+
+/* ---------- раздел UI-кита «Карточка-книга» ---------- */
+.hbk-row{display:flex;flex-wrap:wrap;gap:var(--sp-l);align-items:flex-start}
+.hbk-col{display:flex;flex-direction:column;gap:8px;min-width:0}
+.hbk-f{margin:0;display:flex;flex-direction:column;gap:8px}
+.hbk-f>.hb{width:100%}
+.hbk-f figcaption{font-size:12px;line-height:1.3;color:var(--parch-3)}
+.hbk-f figcaption b{display:block;margin-bottom:2px;font:600 15px/1.1 var(--f-d);color:var(--parch)}
+.hbk-l{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px;width:92px}
+.hbk-l figcaption{font-size:11.5px;line-height:1.25;text-align:center;color:var(--parch-3)}
+.hb-lk.solo{position:relative;display:block;width:34px;container-type:inline-size}
+.hbk-rb{display:block;width:92px;padding-top:10px;container-type:inline-size}
+.hbk-rb .hb-rb{margin-top:0}
+.hbk-beats{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:3px;font-size:12.5px;color:var(--parch-2)}
+.hbk-beats b{display:inline-block;min-width:64px;color:var(--gold)}
+.hbk-win{position:relative;width:904px;max-width:100%;height:410px;margin:var(--sp-m) 0;border-radius:14px;overflow:hidden;background:#07090a}

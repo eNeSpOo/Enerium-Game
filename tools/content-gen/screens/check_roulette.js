@@ -17,11 +17,12 @@
    6. Режим «Игрок»: на всех видах рулетки нет служебных слов (SERVICE из check_player_view.js), нет undefined и NaN;
       в режиме «Команда» пометка «шансы — демонстрация» на месте.
    7. «Дорого-богато» (слово автора 29.09.2026): за окном и вкладкой — алтарь душ (RL_ART.altar или CSS), у входа — веер героев пула
-      в раме: шаг от середины — целые --d и --a, середина впереди; полный герой ленты и итога — в раме (рисунок RL_ART.frame или CSS),
+      книгами (hbCard, screens/book.js; не найденный — безымянной книгой, стадии знакомства 30.09.2026): шаг от середины — целые --d
+      и --a, середина впереди; полный герой ленты и итога — в раме (рисунок RL_ART.frame или CSS),
       осколок — стекло с лицом героя (shardGhost, class="hsg") в ленте, в итоге и в сводке. Честно (§1.2): у входа и в окне видны цена
       прокрутки и шанс героя целиком, лист «Шансы» — ссылкой, пока лента стоит. Арт: пути RL_ART.ready лежат в assets/art, невыгруженные
-      (RL_ART.want без ready) в разметке не встречаются — битых картинок нет. Герой веера открывает большую карточку «до покупки»
-      поверх вкладки (screens/heroes.js) — без прокачки и снаряжения, с «Назад».
+      (RL_ART.want без ready) в разметке не встречаются — битых картинок нет. Найденный герой веера открывает книгу «до покупки»
+      поверх вкладки (OV.rhero) — без прокачки и снаряжения, с «Закрыть»; не найденный книги не открывает.
    Запуск: node tools/content-gen/screens/check_roulette.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -476,24 +477,30 @@ for (const [en, lack] of [[340, [10, 100]], [50, [1, 10, 100]], [100000, []]]) {
   };
   /* вход в сцене: веер героев пула — целые шаги от середины, середина впереди; честная строка; «К рулетке» и «Шансы» */
   fresh(P, { skip: true });
-  const tab = view(P, 'алтарь · вкладка'), pool2 = T.rsPool(), fan = [...tab.matchAll(/<button class="rl-ef"[^>]*style="--d:(-?\d+);--a:(\d+);--z:(\d+)"/g)].map(m => ({ d: +m[1], a: +m[2], z: +m[3] }));
-  if (fan.length !== pool2.length) say(`алтарь: карточек веера ${fan.length}, героев пула ${pool2.length}`);
+  /* первый герой пула собран (комплект осколков — известен), остальные — как в демо: без осколков не найдены */
+  const pool2 = T.rsPool(), need = T.RS.rules.stub.shards;
+  if (pool2[0] && !T.rsHas(pool2[0])) T.S.rs.shards[pool2[0].id] = need;
+  const tab = view(P, 'алтарь · вкладка'), fan = [...tab.matchAll(/<span class="rl-ef" style="--d:(-?\d+);--a:(\d+);--z:(\d+)"/g)].map(m => ({ d: +m[1], a: +m[2], z: +m[3] }));
+  if (fan.length !== pool2.length) say(`алтарь: книг веера ${fan.length}, героев пула ${pool2.length}`);
   fan.forEach((x, i) => { if (x.d !== 2 * i - (fan.length - 1) || x.a !== Math.abs(x.d)) say(`алтарь: карточка ${i + 1} веера — шаг ${x.d}, ждали ${2 * i - (fan.length - 1)}`); });
   if (fan.length && Math.max(...fan.map(x => x.z)) !== fan[Math.floor((fan.length - 1) / 2)].z && Math.max(...fan.map(x => x.z)) !== fan[Math.ceil((fan.length - 1) / 2)].z) say('алтарь: впереди не середина веера');
   if (!/class="rl-scn[ "]/.test(tab)) say('алтарь: за вкладкой нет сцены алтаря');
-  if ((tab.match(/class="rl-fr"|class="rl-frc"/g) || []).length < pool2.length) say('алтарь: не у каждого героя веера рама');
+  { const fanH = tab.slice(tab.indexOf('<div class="rl-faces'), tab.indexOf('<div class="rl-ef-f')), unfound = pool2.filter(h => !T.rsHas(h) && !(T.S.rs.shards[h.id] > 0));
+    if ((fanH.match(/<span class="rl-ef"[^>]*><button class="hb[ "]/g) || []).length !== pool2.length) say('алтарь: не у каждого героя веера книга');
+    if ((fanH.match(/<button class="hb blank/g) || []).length !== unfound.length) say(`алтарь: безымянных книг ${(fanH.match(/<button class="hb blank/g) || []).length}, не найденных героев пула ${unfound.length}`);
+    for (const h of unfound) if (fanH.includes(`data-v="${h.id}"`) || fanH.includes(h.n)) say(`алтарь: в веере виден не найденный ${h.n}`); }
   honest(tab.slice(tab.indexOf('rl-entry')), 'алтарь · вкладка'); noPend(tab, 'алтарь · вкладка');
   if (!/data-a="dlg" data-v="rl"/.test(tab) || !/data-a="sheet" data-v="rlodds"/.test(tab)) say('алтарь: нет «К рулетке» или «Шансы»');
-  /* герой веера — большая карточка «до покупки» поверх вкладки (screens/heroes.js, OV.rhero): портрет, имя, навыки по доблести; прокачки
-     и снаряжения у неё нет; «Назад» закрывает её */
+  /* найденный герой веера — книга «до покупки» поверх вкладки (OV.rhero, screens/book.js): портрет, имя, навыки по доблести; прокачки
+     и снаряжения у неё нет; «Закрыть» закрывает её */
   { const h0 = pool2[0];
     if (h0 && !tab.includes(`data-a="rhero" data-v="${h0.id}"`)) say('алтарь: герой веера не открывает свою карточку');
     else if (h0) {
       run('веер · карточка', () => T.ACT.rhero(h0.id));
       const g = view(P, 'веер · карточка героя'), ov = g.slice(g.indexOf('<div class="ov'));
-      if (!/^<div class="ov hc-ov"/.test(ov) || !ov.includes('<div class="hcb"') || !ov.includes(`<h2>${h0.n}</h2>`)) say('алтарь: карточка героя веера — не большая карточка «до покупки» поверх вкладки');
+      if (!/^<div class="ov hb-ov"><div class="hb-win/.test(ov) || !ov.includes(`<h2>${h0.n}</h2>`) || !ov.includes('data-v="rhero:skills"')) say('алтарь: книга героя веера — не книга «до покупки» поверх вкладки');
       if (/data-a="(?:lvlup|limit|gearbest)"/.test(ov)) say('алтарь: в карточке героя до пробуждения — прокачка или снаряжение');
-      if (!ov.includes('class="iconbtn hcb-bk" data-a="close"')) say('алтарь: у карточки героя веера нет «Назад»');
+      if (!ov.includes('data-a="hbclose" data-v="ov"')) say('алтарь: у книги героя веера нет «Закрыть»');
       T.S.overlay = null;
     } }
   /* окно: алтарь за окном, честная строка; лента — осколки стеклом с лицом, полные — в раме */

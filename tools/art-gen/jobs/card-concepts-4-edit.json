@@ -1,0 +1,73 @@
+{
+  "name": "Правки четвёртой партии карточек героя (jobs/card-concepts-4.json, книжная система): модель верно строит книги и знаки доблести, но в рядах из пяти книг отпирает на один замок меньше нужного, дублирует ряд звёзд, на развороте рисует лишние главы и ленты. По art/style/style.md удачную картинку правим EDIT MODE, а не рисуем заново. Выход — в ту же папку art/generated/card-concepts, имя — вариант с приставкой -fix",
+  "models": [
+    "nb2"
+  ],
+  "style": "Keep the dark painterly style of the attached picture: the same brush strokes, muted colors, light from below, books, glow, particles and background.",
+  "negative": "No words, no letters, no new digits, no Roman numerals, no runes or glyphs that look like writing, no watermark, no signature, no logo, no wax seals. Do not add anything that is not listed above, do not move or restyle the books, no table, no floor.",
+  "categories": {
+    "card-concepts": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [],
+      "frame": "Edit the first attached picture. Keep everything exactly as it is — the books, the hero, the light, the glow, the icons, the digits, the layout and the composition — and change only what is listed below. Where something is removed, continue the surrounding leather, metal, parchment, picture or background seamlessly, as if it had never been there. An open padlock is an unlocked padlock with turquoise light (#48E5D4) streaming out of its keyhole; a closed padlock is dark. Before you finish, count the changed elements on each book again and make sure they match the list."
+    }
+  },
+  "jobs": [
+    {
+      "id": "card4-v1a-ribbons-fix",
+      "category": "card-concepts",
+      "title": "Правка ряда v1 (ленты): замки пределов 1-2-3-4-5",
+      "source": "Правка art/generated/card-concepts/card4-v1a-ribbons__nb2.jpg: ленты доблести верны; замки сдвинуты на один — у книги 2 три замка под ремнём и жёлтый свет, у книг 3 и 4 отперто на один меньше, у книги 5 четыре замка",
+      "aspect": "21:9",
+      "refs": [
+        "art/generated/card-concepts/card4-v1a-ribbons__nb2.jpg"
+      ],
+      "subject": "The five books stand in a row, numbered 1 to 5 from left to right. Each has a column of padlocks along its right edge. Change only the padlocks:\n1. Book 2 (the second from the left, with the yellow crystal): its column holds only three padlocks, and the leather strap crosses the column. Make the strap end at the edge of the cover before the column, and make the column exactly five padlocks, evenly spaced, from top to bottom: open, open, closed, closed, closed. The top padlock now shines yellow — make its light turquoise, like on the other books.\n2. Book 3 (turquoise crystal): from top to bottom it is open, open, closed, closed, closed. Open the third one: open, open, open, closed, closed.\n3. Book 4 (violet crystal): from top to bottom it is open, open, open, closed, closed. Open the fourth one: open, open, open, open, closed.\n4. Book 5 (green crystal): its column holds four open padlocks. Add a fifth open shining padlock of the same kind below them, at the same spacing.\nBook 1 stays exactly as it is. The ribbons, crystals, digits and icons do not change."
+    },
+    {
+      "id": "card4-v1b-ribbons-fix",
+      "category": "card-concepts",
+      "title": "Правка разворота v1 (ленты): пять лент, пять глав",
+      "source": "Правка art/generated/card-concepts/card4-v1b-ribbons__nb2.jpg: шесть лент (четвёртая — серая с золотой звёздочкой), восемь глав в два столбца вместо пяти",
+      "aspect": "16:9",
+      "refs": [
+        "art/generated/card-concepts/card4-v1b-ribbons__nb2.jpg"
+      ],
+      "subject": "1. Six ribbons hang below the open book. The fourth from the left — the grey ribbon with a small gold star, just right of the middle — is extra: remove it and continue the dark background there. Five ribbons remain: three green with glowing gold star tips on the left, two faded grey with dark star tips on the right.\n2. On the right page, the chapters block at the bottom holds eight entries in two columns. Replace them with a single column of exactly five chapter rows filling the same area: the top three vivid and lit, the lower two faded and veiled in shadow; each row is a small square painted miniature with two short placeholder bars of faded ink beside it — no letters.\nNothing else changes."
+    },
+    {
+      "id": "card4-v3a-stars-fix",
+      "category": "card-concepts",
+      "title": "Правка ряда v3 (звёзды): один ряд звёзд, 4 и 5 звёзд у книг 4 и 5, замки 1-2-3-4-5",
+      "source": "Правка art/generated/card-concepts/card4-v3a-stars__nb2.jpg: у книг 3–5 второй ряд звёзд над плашкой имени; под кристаллом у книги 4 три звезды вместо четырёх, у книги 5 шесть вместо пяти; замки отперты на один меньше",
+      "aspect": "21:9",
+      "refs": [
+        "art/generated/card-concepts/card4-v3a-stars__nb2.jpg"
+      ],
+      "subject": "The five books stand in a row, numbered 1 to 5 from left to right.\n1. Books 3, 4 and 5 carry a second row of stars just above the name plate. Remove these lower rows of stars on all three books and continue the portrait there. The rows of stars right under the crystals stay.\n2. Book 4 (violet crystal): the row of stars under the crystal has three stars — two gold, one dark. Make it exactly four stars: three gold and one dark at the right end.\n3. Book 5 (green crystal): the row of stars under the crystal has six gold stars. Make it exactly five gold stars.\n4. The padlocks along the right edge of each book, from top to bottom: book 2 (yellow crystal) — open, open, closed, closed, closed (open the second one); book 3 (turquoise crystal) — open, open, open, closed, closed (open the third one); book 4 (violet crystal) — open, open, open, open, closed (open the fourth one); book 5 (green crystal) — all five open. Book 1 stays as it is.\nNothing else changes."
+    },
+    {
+      "id": "card4-v3b-stars-fix",
+      "category": "card-concepts",
+      "title": "Правка разворота v3 (звёзды): пять глав вместо шести",
+      "source": "Правка art/generated/card-concepts/card4-v3b-stars__nb2.jpg: шесть глав (три яркие, три блёклые) вместо пяти",
+      "aspect": "16:9",
+      "refs": [
+        "art/generated/card-concepts/card4-v3b-stars__nb2.jpg"
+      ],
+      "subject": "1. On the right page, the chapters block holds six entries in two columns of three. Remove the bottom right entry — the faded one, its miniature and its bars — and continue the plain parchment there, so exactly five entries remain: three vivid and two faded.\nNothing else changes."
+    },
+    {
+      "id": "card4-v1b-ribbons-fix2",
+      "category": "card-concepts",
+      "title": "Правка разворота v1 (ленты), вторая: пять глав — три открыты, две в тени",
+      "source": "Правка исходника art/generated/card-concepts/card4-v1b-ribbons__nb2.jpg: первая правка (card4-v1b-ribbons-fix) вернула ту же картинку. Здесь — только главы: из восьми записей в два столбца остаются пять, читаются по столбцам; лишняя лента убирается переносом фона, без запроса",
+      "aspect": "16:9",
+      "refs": [
+        "art/generated/card-concepts/card4-v1b-ribbons__nb2.jpg"
+      ],
+      "subject": "Change only the chapters block at the bottom of the right page — the grid of small square pictures with bars beside them, in two columns of four:\n1. In the right column, delete the lower three entries — their pictures and their bars — and leave plain parchment there.\n2. The top entry of the right column (the turquoise figure) stays in place, but make it faded and veiled in shadow, exactly like the dark faded entry at the bottom of the left column.\nAfter this the block holds five entries: the left column — three vivid entries and one faded entry; the right column — one faded entry at the top. Everything else in the picture stays exactly as it is."
+    }
+  ]
+}

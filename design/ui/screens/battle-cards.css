@@ -1,0 +1,51 @@
+/* ================== карты боя: рамка по типу бойца — screens/battle-cards.js (BF) ==================
+   Всё ниже — только у карты с выгруженной рамкой (.bc.fr): без неё карта прежняя.
+   Рамка — одна картинка нарезкой border-image: углы и верх с украшением не тянутся, прямые планки между ними браузер тянет по высоте
+   карты. Геометрия рисунка — тысячные доли, переменные ставит bfCard: --bf-ar — высота к ширине, --bf-w* — окно, --bf-c* — нарезка,
+   --bf-m* — гнездо метки героя. Окно рамки — ширина карты --cw (index.html: .bc 74 px, главная — 84 px).
+   Раскладка: над окном — верх рамки (--bf-t), портрет — окно, имя — на низу портрета, полоса здоровья и щита — на нижней планке, под ней
+   шансы. Карта без рамки: кадр --fh + 35 px (зазор 3, имя 10, зазор 3, полоса 5, зазор 3, шансы 11). С рамкой: --bf-t + кадр +
+   --bf-lo + 3 + 11, где --bf-lo — низ рамки или полоса, что ниже; кадр — --fh + 21 px − --bf-t − --bf-lo: высота карты та же */
+.bc.fr{
+  --bf-w:calc(var(--cw) * 1000 / (1000 - var(--bf-wl) - var(--bf-wr)));
+  --bf-t:calc(var(--bf-w) * var(--bf-ar) * var(--bf-wt) / 1000000);
+  --bf-b:calc(var(--bf-w) * var(--bf-ar) * var(--bf-wb) / 1000000);
+  --bf-lo:max(4px, var(--bf-b));
+  padding-top:var(--bf-t)}
+.bc.fr .face{height:calc(var(--fh) + 21px - var(--bf-t) - var(--bf-lo));overflow:visible;border:0;border-radius:0;background:#0b0d10}
+/* рамка поверх портрета: окно рисунка — ровно кадр портрета, планки и украшение — снаружи */
+.bc.fr .face>.bf{position:absolute;z-index:1;pointer-events:none;
+  left:calc(var(--bf-w) * var(--bf-wl) / -1000);right:calc(var(--bf-w) * var(--bf-wr) / -1000);
+  top:calc(var(--bf-t) * -1);bottom:calc(var(--bf-b) * -1);
+  border-style:solid;border-color:transparent;border-image-repeat:stretch;
+  border-width:calc(var(--bf-w) * var(--bf-ar) * var(--bf-ct) / 1000000) calc(var(--bf-w) * var(--bf-cr) / 1000) calc(var(--bf-w) * var(--bf-ar) * var(--bf-cb) / 1000000) calc(var(--bf-w) * var(--bf-cl) / 1000)}
+.bc.fr .face>.buffs,.bc.fr .face>.debuffs,.bc.fr .face>.ctl,.bc.fr .face>.fell{z-index:2}
+.bc.fr .face>.cls,.bc.fr .face>.tgt{z-index:3}
+.bc.fr .face>.tgt{bottom:15px}   /* низ портрета — у имени */
+/* имя — на низу портрета, на тёмной подложке; справа место значку класса */
+.bc.fr>.nm{position:absolute;z-index:2;left:0;right:0;top:calc(var(--fh) + 7px - var(--bf-lo));height:13px;padding:0 21px 0 3px;line-height:13px;
+  background:linear-gradient(0deg,rgba(5,6,8,.92),rgba(5,6,8,.72) 55%,rgba(5,6,8,0));pointer-events:none}
+/* полоса здоровья и щита — на нижней планке рамки: на портрет заходит на 1 px */
+.bc.fr>.bar{z-index:2;margin-top:-4px}
+.bc.fr>.rot{margin-top:calc(var(--bf-lo) - 4px)}
+/* метка героя: кристалл редкости в гнезде рамки, за ним звёзды доблести по верхней планке; у соперника Арены — зеркально */
+.bc.fr>.bf-mk{--d:calc(var(--bf-w) * var(--bf-md) / 1000);position:absolute;z-index:3;display:flex;align-items:center;gap:2px;
+  left:calc(var(--bf-w) * (var(--bf-mx) - var(--bf-wl)) / 1000);top:calc(var(--bf-w) * var(--bf-ar) * var(--bf-my) / 1000000);
+  transform:translate(calc(var(--d) / -2), -50%)}
+.bc.foe.fr>.bf-mk{flex-direction:row-reverse;transform:translate(calc(var(--d) / 2 - 100%), -50%)}
+.bf-mk>b{width:var(--d);height:var(--d);flex:none;background:var(--rico) center/contain no-repeat}
+.bf-st{display:flex;gap:1px}
+.bf-st i{width:5px;height:5px;background:var(--ico-valor) center/contain no-repeat;opacity:.3}
+.bf-st i.on{opacity:1}
+
+/* легенда знаков: образцы рамок в строке «Рамка» */
+.bt-legend .ex.bf-lg{gap:3px}
+.bf-lg img{width:24px;height:auto;display:block}
+
+/* UI-кит: все рамки рядом — карта в своей ячейке, рамка выходит за карту вбок */
+.bf-kit{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-start}
+.bf-kit figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px;width:124px}
+.bf-kit figcaption{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;font-size:11px;line-height:1.25;color:var(--parch-3)}
+.bf-kit figcaption b{font:700 11px/1.2 var(--f-u);color:var(--parch-2)}
+.bf-kc{position:relative;width:124px;height:calc(var(--fh) + 40px)}
+.bf-kc>.bc{left:50%;margin-left:calc(var(--cw) / -2)}
