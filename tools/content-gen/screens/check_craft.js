@@ -73,6 +73,7 @@ vm.runInContext(`globalThis.__ws = {
   get S() { return S; }, reset() { S = initialState(); S.route = 'craft'; S.seg.craft = 'work'; },
   html() { render(); return document.getElementById('game').innerHTML; },
   ACT, BAG, WS_DATA, WS_SRV, RSI, rsHas, wsHeroNeed, FLOWS, EN_RECIPES, wsPut, wsSetTable, wsToCraft, wsPick, wsPutQ, wsRangeLive, wsCellMax,
+  wsQty, wsStock, wsPlan,
   WS_FX, WS_KIT, wsCracks, wsKitHtml, wsKitPlay, wsKitAct, wsKitBoardHtml, KIT_EXTRA,
   kitStage() { return document.getElementById('wsKitStage').innerHTML; },
 };`, ctx);
@@ -162,7 +163,10 @@ scene('пустой стол', () => {
   /* воздух: у инвентаря нет строки-подсказки под сеткой, у пустой ячейки — подписи; сведения — по нажатию */
   ok('пустой стол: под инвентарём снова строка-подсказка', !/Нажмите ресурс|Можно и перетащить/.test(h));
   ok('пустой стол: у пустой ячейки снова подпись', !/Ячейка \d+ пуста/.test(h));
-  const stock = R.items.filter(i => !i.team && q(i.id) > 0);
+  /* запасы мастерской — предметы запасов и валюта-ресурс из кошелька (WS_DATA.wallet: Энериум, рунный ключ) */
+  const walletQ = id => { const w = W.WS_DATA.wallet[id]; return w && w in W.S.wallet ? W.S.wallet[w] : 0; };
+  const stock = R.items.filter(i => !i.team && i.tier !== 'hero' && q(i.id) + walletQ(i.id) > 0);
+  for (const id of Object.keys(W.WS_DATA.wallet)) if (walletQ(id) > 0) ok(`инвентарь: нет «${id}» из кошелька`, stock.some(i => i.id === id));
   for (const [k, , tiers] of W.WS_DATA.groups) {
     A.wscat(k);
     eq(`инвентарь · ${k}: ресурсов`, (view('инвентарь · ' + k).match(/data-wsdrag="/g) || []).length, stock.filter(i => !tiers || tiers.includes(i.tier)).length);
@@ -327,18 +331,20 @@ scene('автодокрафт: этапы и согласие', () => {
   ok('нет согласия на уникальный', h.includes('data-a="wsok"')); ok('без согласия недоступно', disabled(h, 'wsmakedo'));
   ok('нет этапа «Глиняный слепок»', h.includes('Глиняный слепок'));
   A.wsmakedo(); eq('без согласия уникальный не списан', q('u2'), b0.u2);
-  W.BAG.add('energ', 10);   // Энериум в каждом призыве врага (recipes.js, r_call_fb1: 5): экран мастерской берёт ингредиенты из запасов
-  const ids = ['call_fb1', 'u2', 'find_cb1', 'bone', 'k2_hunt', 'resin', 'sand', 'k1_alch', 'k1_ench', 'p_frame', 'a_cast', 'p_clay', 'p_print', 'p_lure', 'energ'], b = snap(ids);
+  /* Энериум в каждом призыве врага (recipes.js, r_call_fb1: 5) — из кошелька: он и валюта, и ресурс мастерской (слово автора 30.09.2026) */
+  const w0 = W.S.wallet.enerium;
+  ok('в демо-кошельке не хватает Энериума на призыв', w0 >= 5);
+  const ids =['call_fb1', 'u2', 'find_cb1', 'bone', 'k2_hunt', 'resin', 'sand', 'k1_alch', 'k1_ench', 'p_frame', 'a_cast', 'p_clay', 'p_print', 'p_lure', 'energ'], b = snap(ids);
   A.wsok('', { checked: true });
   ok('с согласием доступно', !disabled(view('автодокрафт: согласие дано'), 'wsmakedo'));
   A.wsmakedo();
   eq('призыв создан', q('call_fb1'), b.call_fb1 + 1); eq('уникальный списан', q('u2'), b.u2 - 1); eq('находка списана', q('find_cb1'), b.find_cb1 - 1);
   eq('кость', q('bone'), b.bone - 2); eq('смола', q('resin'), b.resin - 3); eq('песок', q('sand'), b.sand - 5); eq('каркас — из запасов', q('p_frame'), b.p_frame - 1);
-  eq('Энериум призыва списан', q('energ'), b.energ - 5);
+  eq('Энериум призыва списан из кошелька', W.S.wallet.enerium, w0 - 5); eq('Энериум не появился в запасах', q('energ'), b.energ);
   eq('промежуточные этапы не остались в запасах', q('a_cast') + q('p_clay') + q('p_print') + q('p_lure'), b.a_cast + b.p_clay + b.p_print + b.p_lure);
   eq('итог автодокрафта', W.S.overlay && W.S.overlay.res && W.S.overlay.res.kind, 'make');
   view('итог автодокрафта');
-  A.wsmakedo(); eq('повторное нажатие не повторяет расход', q('call_fb1'), b.call_fb1 + 1);
+  A.wsmakedo(); eq('повторное нажатие не повторяет расход', q('call_fb1'), b.call_fb1 + 1); eq('повтор не списывает Энериум второй раз', W.S.wallet.enerium, w0 - 5);
   A.close(); A.wsview('book');
   ok('книга: уникального больше нет — «не хватает»', /Слепок ловчего<\/b><span class="chip">не хватает/.test(view('книга после автодокрафта')));
 });
@@ -358,6 +364,35 @@ scene('автодокрафт: количество', () => {
   A.wsmake('r_vr1'); const hv = view('автодокрафт: руна доблести');
   ok('руна доблести: не хватает осколков', hv.includes('Не хватает') || hv.includes('Этап не найден'));
   A.wsmake('r_a_iron'); ok('ненайденный рецепт не раскрывает состав', !view('автодокрафт: не найден').includes('Этапы'));
+});
+
+/* слово автора 30.09.2026: «Энериум и донатная валюта, и ресурс в мастерской» — в ячейку и в рецепт он идёт из кошелька; остаток —
+   запасы и кошелёк, списание — сначала запасы, затем кошелёк, одной операцией; повтор номера ничего не меняет */
+scene('Энериум из кошелька', () => {
+  W.reset();
+  const bag0 = q('energ'); if (bag0) W.BAG.take('energ', bag0);
+  ok('в демо-запасах мало соли для проверки', q('salt') >= 3);
+  W.S.wallet.enerium = 7;
+  eq('остаток мастерской — запасы и кошелёк', W.wsQty('energ'), 7);
+  ok('Энериума из кошелька нет в запасах мастерской', W.wsStock().some(it => it.id === 'energ'));
+  eq('в ячейку — не больше, чем в кошельке', W.wsCellMax('energ'), Math.min(W.WS_DATA.cellMax, 7));
+  W.wsPutQ('energ', 5);
+  ok('у Энериума на столе нет подписи «в кошельке»', view('стол: Энериум из кошелька').includes('в кошельке 7'));
+  const salt = q('salt');
+  let v = W.WS_SRV.attempt('tw1', [{ id: 'energ', q: 5, pos: 0 }, { id: 'salt', q: 1, pos: 1 }], true);
+  ok('попытка с Энериумом из кошелька не проведена', !!v.res);
+  eq('Энериум списан из кошелька', W.S.wallet.enerium, 2); eq('соль списана из запасов', q('salt'), salt - 1);
+  v = W.WS_SRV.attempt('tw1', [{ id: 'energ', q: 5, pos: 0 }, { id: 'salt', q: 1, pos: 1 }], true);
+  ok('повтор номера — не «again»', !!v.again); eq('повтор номера не списал Энериум', W.S.wallet.enerium, 2);
+  v = W.WS_SRV.attempt('tw2', [{ id: 'energ', q: 5, pos: 0 }], true);
+  eq('без Энериума — отказ «не хватает»', v.refuse, 'lack'); eq('отказ ничего не списал', W.S.wallet.enerium, 2);
+  W.BAG.add('energ', 3); W.S.wallet.enerium = 10;
+  v = W.WS_SRV.attempt('tw3', [{ id: 'energ', q: 5, pos: 0 }, { id: 'salt', q: 1, pos: 1 }], true);
+  eq('сначала списаны запасы', q('energ'), 0); eq('остаток — из кошелька', W.S.wallet.enerium, 8);
+  W.S.wallet.enerium = 0;
+  const p = W.wsPlan(W.BAG.recipe('r_call_fb1'), 1);
+  ok('автодокрафт: Энериум — «неизвестный этап»', !p.stop.includes('energ'));
+  ok('автодокрафт: нехватки Энериума не видно', p.lack.some(([id]) => id === 'energ'));
 });
 
 scene('сведения о ресурсах', () => {
@@ -384,7 +419,7 @@ scene('не хватает в запасах', () => {
   W.reset();
   W.wsSetTable([['fang', 6], ['k1_hunt', 1]]); W.BAG.take('fang', 3);
   const h = view('запасы изменились');
-  ok('нет «Не хватает в запасах»', h.includes('Не хватает в запасах')); ok('попытка недоступна', disabled(h, 'wstry'));
+  ok('нет «Не хватает:»', h.includes('Не хватает:')); ok('попытка недоступна', disabled(h, 'wstry'));
   const b = snap(['fang']); A.wstry(); eq('ничего не списано', q('fang'), b.fang);
 });
 

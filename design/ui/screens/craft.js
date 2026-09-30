@@ -30,7 +30,9 @@ const WS_DATA = {
   /* невосполнимое (§12.1): уникальные, руны, Энериум. Трофеи, находки и Многоликий — открытый вопрос автору
      (docs/content/ресурсы-рецепты-дроп.md, «Открыто», п. 2) */
   special: { tiers: ['unique', 'rune', 'valor'], items: ['energ'] },
-  wallet: { energ: 'enerium', rkey: 'keys' },   // выход рецепта, который у игрока — валюта кошелька, а не предмет запасов
+  /* валюта кошелька, которая и ресурс мастерской (слово автора 30.09.2026: «Энериум и донатная валюта, и ресурс в мастерской»):
+     выход рецепта идёт в кошелёк, вход — в ячейку и в рецепт — берётся из кошелька (wsQty, wsTake) */
+  wallet: { energ: 'enerium', rkey: 'keys' },
   /* вкладки инвентаря — ярусы recipes.js */
   groups: [
     ['all', 'Всё', null],
@@ -122,6 +124,18 @@ const wsSum = r => r.in.reduce((a, [, q]) => a + q, 0);
    Иначе рецепт, чей состав входит в другой, закрыл бы его навсегда: Дорожный фонарь — внутри Снадобья от ожогов.
    Правило прототипа, в §12 его нет — вопрос автору. */
 const wsSpecific = (a, b) => b.in.length - a.in.length || wsSum(b) - wsSum(a) || wsOrd.get(a.id) - wsOrd.get(b.id);
+/* сколько ресурса у игрока для мастерской: запасы и, у валюты кошелька (WS_DATA.wallet), кошелёк. Списание — сначала запасы, затем
+   кошелёк; всё внутри одной операции сервера. Сервер и экран мастерской читают количество только так */
+const wsWal = id => { const w = WS_DATA.wallet[id]; return w && S.wallet && w in S.wallet ? w : ''; };
+const wsQty = id => BAG.qty(id) + (wsWal(id) ? Math.max(0, S.wallet[wsWal(id)] || 0) : 0);
+const wsHas = (id, q = 1) => wsQty(id) >= q;
+/* подпись остатка: у валюты-ресурса без запасов — «в кошельке N», у остального — «есть N» */
+const wsHave = id => (wsWal(id) && !BAG.qty(id) ? 'в кошельке ' : 'есть ') + fmt(wsQty(id));
+function wsTake(id, q) {
+  const b = Math.min(BAG.qty(id), q), w = wsWal(id);
+  if (b) BAG.take(id, b);
+  if (q > b && w) S.wallet[w] -= q - b;
+}
 const WS_SRV = {
   recipes: () => EN_RECIPES.recipes.filter(r => !r.team),
   /* сид операции — заглушка серверного: исход крафта случайности не имеет (§12), по сиду рисуются только трещины и дым неудачи */
@@ -153,12 +167,12 @@ const WS_SRV = {
     const V = S.ws.ops;
     if (V[op]) return { again: true, res: V[op] };
     if (!cells.length) return { refuse: 'empty' };
-    if (!cells.every(c => BAG.has(c.id, c.q))) return { refuse: 'lack' };
+    if (!cells.every(c => wsHas(c.id, c.q))) return { refuse: 'lack' };
     if (!consent && cells.some(c => wsSpecial(c.id))) return { refuse: 'consent' };
     const v = WS_SRV.check(cells);
     if (v.refuse) return { refuse: 'owned', hero: v.hero };
     const isNew = !!v.made && !WS_SRV.isKnown(v.made), put = cells.map(c => [c.id, c.q, c.pos]);
-    cells.forEach(c => BAG.take(c.id, c.q));   // со стола уходит всё: рецепт расходует своё, лишнее и неудача сгорают
+    cells.forEach(c => wsTake(c.id, c.q));   // со стола уходит всё: рецепт расходует своё, лишнее и неудача сгорают
     let res;
     if (v.made) {
       const r = v.made, h = wsHero(r);
@@ -184,8 +198,8 @@ const WS_SRV = {
     if (p.owned) return { refuse: 'owned', p };
     if (!p.ok) return { refuse: p.stop.length ? 'stop' : 'lack', p };
     if (p.special.length && !ok) return { refuse: 'consent', p };
-    if (!p.spend.every(([id, q]) => BAG.has(id, q))) return { refuse: 'changed', p };
-    p.spend.forEach(([id, q]) => BAG.take(id, q));
+    if (!p.spend.every(([id, q]) => wsHas(id, q))) return { refuse: 'changed', p };
+    p.spend.forEach(([id, q]) => wsTake(id, q));
     p.extra.forEach(([id, q]) => wsGive(id, q));
     wsGive(r.out[0], p.out);
     BAG.learn(r.id);
@@ -228,15 +242,15 @@ const wsHeroWhy = h => rsHas(h) ? `${h.n} уже в коллекции` : `Ос�
 const wsByRecipe = id => (RX_OUT[id] || []).some(r => !r.team);
 const wsCells = () => S.ws.cells.filter(Boolean);
 const wsOn = id => { const c = S.ws.cells.find(x => x && x.id === id); return c ? c.q : 0; };
-const wsCellMax = id => Math.min(WS_DATA.cellMax, BAG.qty(id));
+const wsCellMax = id => Math.min(WS_DATA.cellMax, wsQty(id));
 const wsName = id => { const it = BAG.item(id); return it ? it.n : '—'; };
 const wsNames = list => list.map(([id, q]) => `${wsName(id)} ×${fmt(q)}`).join(', ');
 const wsTier = it => (EN_RECIPES.tiers[it.tier] || { n: '' }).n;
-const wsCanRepeat = () => (S.ws.last || []).some(c => BAG.has(c.id));
+const wsCanRepeat = () => (S.ws.last || []).some(c => wsHas(c.id));
 /* что со стола сгорит сверх рецепта */
 const wsExtra = (cells, r) => cells.map(c => { const x = r.in.find(([id]) => id === c.id); return [c.id, c.q - (x ? x[1] : 0)]; }).filter(([, q]) => q > 0);
-/* запасы игрока в порядке ярусов и данных: только через BAG */
-const wsStock = () => EN_RECIPES.items.filter(it => !it.team && it.tier !== 'hero' && BAG.qty(it.id) > 0)
+/* запасы игрока в порядке ярусов и данных: через BAG, валюта-ресурс — ещё и из кошелька (wsQty) */
+const wsStock = () => EN_RECIPES.items.filter(it => !it.team && it.tier !== 'hero' && wsQty(it.id) > 0)
   .sort((a, b) => wsGroupOf(a) - wsGroupOf(b) || wsItemOrd.get(a.id) - wsItemOrd.get(b.id));
 
 /* выдача итога: предмет — в запасы, герой — комплект его осколков в запасы (пробуждение — за души, придёт с 0 ур., 0 РП и 0 Добл,
@@ -359,13 +373,14 @@ function wsPlan(r, n) {
   WS_SRV.known().forEach(k => { if (!by[k.out[0]]) by[k.out[0]] = k; });
   const left = {}, spend = {}, made = {}, lack = {}, stop = [], steps = [];
   const want = (id, q, d) => {
-    const s = id in left ? left[id] : BAG.qty(id), a = Math.min(s, q);
+    const s = id in left ? left[id] : wsQty(id), a = Math.min(s, q);
     if (a) { left[id] = s - a; spend[id] = (spend[id] || 0) + a; q -= a; }
     const m = made[id] || 0, b = Math.min(m, q);
     if (b) { made[id] = m - b; q -= b; }
     if (!q) return;
     const p = by[id];
-    if (!p || d > WS_DATA.depth) { if (wsByRecipe(id)) { if (!stop.includes(id)) stop.push(id); } else lack[id] = (lack[id] || 0) + q; return; }
+    /* валюта кошелька (Энериум, рунный ключ) — «не хватает», а не «неизвестный этап»: её копят, рецепт жилы — не единственный путь */
+    if (!p || d > WS_DATA.depth) { if (wsByRecipe(id) && !wsWal(id)) { if (!stop.includes(id)) stop.push(id); } else lack[id] = (lack[id] || 0) + q; return; }
     const t = Math.ceil(q / p.out[1]);
     p.in.forEach(([x, k]) => want(x, k * t, d + 1));
     steps.push([p, t]);
@@ -388,7 +403,7 @@ function wsMaxN(r) {
 /* что видит клиент на столе: совпадение только с найденными рецептами — исход всё равно решает сервер */
 function wsGuess() {
   const cells = wsCells();
-  const lack = cells.filter(c => c.q > BAG.qty(c.id)), special = cells.filter(c => wsSpecial(c.id));
+  const lack = cells.filter(c => c.q > wsQty(c.id)), special = cells.filter(c => wsSpecial(c.id));
   if (!cells.length) return { st: 'empty', lack, special, extra: [] };
   const have = new Map(cells.map(c => [c.id, c.q]));
   const fit = WS_SRV.known().filter(r => r.in.every(([id, q]) => (have.get(id) || 0) >= q)).sort(wsSpecific)[0];
@@ -433,7 +448,7 @@ function wsWell(it, o = {}) {
   return `<${tag} class="${cls}" data-r="${it.r}"${act}${o.attr || ''} title="${trEsc(it.n)}"${o.size ? ` style="--s:${o.size}px"` : ''}${k}>${trIcon(it)}${q}${o.on ? `<span class="ws-on">${fmt(o.on)}</span>` : ''}${o.note ? '<i class="ws-nt" aria-hidden="true"></i>' : ''}</${tag}>`;
 }
 const wsList = list => `<div class="ws-sum">${list.map(([id, q]) => { const it = BAG.item(id); return it ? `<span class="ws-need${wsSpecial(id) ? ' sp' : ''}">${wsWell(it, { stat: true, q })}<span class="col"><b>${trEsc(it.n)}</b><small class="faint">${wsTier(it)}</small></span></span>` : ''; }).join('')}</div>`;
-const wsNeedHtml = ([id, q]) => { const it = BAG.item(id); return it ? `<span class="ws-need${wsSpecial(id) ? ' sp' : ''}">${wsWell(it, { stat: true, q })}<span class="col"><b>${trEsc(it.n)}</b><small class="faint num">есть ${fmt(BAG.qty(id))}${wsSpecial(id) ? ' · особый' : ''}</small></span></span>` : ''; };
+const wsNeedHtml = ([id, q]) => { const it = BAG.item(id); return it ? `<span class="ws-need${wsSpecial(id) ? ' sp' : ''}">${wsWell(it, { stat: true, q })}<span class="col"><b>${trEsc(it.n)}</b><small class="faint num">${wsHave(id)}${wsSpecial(id) ? ' · особый' : ''}</small></span></span>` : ''; };
 const wsIng = (r, t) => `<span class="ws-ing">${r.in.map(([id, q]) => wsWell(BAG.item(id), { stat: true, q: q * t })).join('')}</span>`;
 const wsStepHtml = (r, t, fin) => `<li${fin ? ' class="fin"' : ''}>${wsWell(BAG.item(r.out[0]), { stat: true, size: 28 })}<b>${trEsc(r.n)}</b><span class="num faint">×${fmt(t)}</span>${wsIng(r, t)}</li>`;
 
@@ -443,7 +458,7 @@ function wsView() {
 /* плитка запасов: значок и количество; справа сверху — лупа карточки ресурса. Нажатие — ползунок количества, перенос — на ячейку.
    На столе — свет плитки и число на столе слева сверху; особый ресурс — ромб слева снизу */
 function wsTile(it, o = {}) {
-  const q = o.q != null ? o.q : BAG.qty(it.id), on = o.on != null ? o.on : wsOn(it.id), sp = wsSpecial(it.id), sel = !o.kit && S.ws.pick === it.id;
+  const q = o.q != null ? o.q : wsQty(it.id), on = o.on != null ? o.on : wsOn(it.id), sp = wsSpecial(it.id), sel = !o.kit && S.ws.pick === it.id;
   const lbl = `${trEsc(it.n)}, ${q} шт.${on ? ', на столе ' + on : ''}${sp ? ', особый ресурс' : ''}`;
   const a = x => o.kit ? 'noop' : x, k = typeof crK === 'function' ? crK(it) : '';
   return `<div class="ws-tile${on ? ' on' : ''}" data-r="${it.r}"><button class="well${sp ? ' ws-sp' : ''}${sel ? ' sel' : ''}" data-r="${it.r}" data-a="${a('wspick')}" data-v="${it.id}"${o.kit ? '' : ` draggable="true" data-wsdrag="${it.id}"`} aria-label="${lbl}" title="${trEsc(it.n)}"${k}>${trIcon(it)}<span class="q">${fmt(q)}</span>${on ? `<span class="ws-on">${fmt(on)}</span>` : ''}</button><button class="ws-lens" data-a="${a('wsinfo')}" data-v="${it.id}" aria-label="Карточка ресурса: ${trEsc(it.n)}" title="Карточка ресурса">${ic('search')}</button></div>`;
@@ -492,7 +507,7 @@ function wsCellHtml(c, i, noteId) {
   const attr = ` data-wscell="${i}" aria-pressed="${sel}"${drop ? ` style="--dd:${D.t - now}ms"` : ''}`;
   if (!it) return `<button class="well empty ws-cell${sel ? ' sel' : ''}" data-a="wscell" data-v="${i}"${attr} aria-label="Ячейка ${i + 1}, пустая">${ic('plus')}</button>`;
   const note = !!noteId && noteId === c.id;
-  return wsWell(it, { act: 'wscell', v: i, q: c.q, sel, note, cls: 'ws-cell' + (c.q > BAG.qty(c.id) ? ' ws-lack' : '') + (drop ? ' ws-drop' : ''), attr });
+  return wsWell(it, { act: 'wscell', v: i, q: c.q, sel, note, cls: 'ws-cell' + (c.q > wsQty(c.id) ? ' ws-lack' : '') + (drop ? ' ws-drop' : ''), attr });
 }
 /* желоба стола: от гнезда к пьедесталу; у занятого гнезда желоб светится цветом стола, у найденного рецепта — цветом редкости итога */
 function wsGrooves(r) {
@@ -522,13 +537,13 @@ function wsQtyHtml() {
   const W = S.ws, c = W.cells[W.sel], it = c ? BAG.item(c.id) : null;
   if (!it) return '<div class="ws-qty"></div>';
   const max = Math.max(1, wsCellMax(c.id)), v = Math.max(1, Math.min(max, c.q));
-  return `<div class="ws-qty"><button class="ws-qn" data-a="wsinfo" data-v="${it.id}" title="Карточка: ${trEsc(it.n)} · в запасах ${fmt(BAG.qty(c.id))}"><span>${trEsc(it.n)}</span>${ic('search')}</button><input class="ws-range" id="wsQc" type="range" min="1" max="${max}" step="1" value="${v}" data-a="wsqset" style="--p:${wsPct(v, 1, max)}%" aria-label="Количество в ячейке ${W.sel + 1}: от 1 до ${max}"><b class="num ws-qv" id="wsQcN">${fmt(v)}</b><button class="ws-qb" data-a="wsq" data-v="x" aria-label="Убрать из ячейки">${ic('x')}</button></div>`;
+  return `<div class="ws-qty"><button class="ws-qn" data-a="wsinfo" data-v="${it.id}" title="Карточка: ${trEsc(it.n)} · ${wsHave(c.id)}"><span>${trEsc(it.n)}</span>${ic('search')}</button><input class="ws-range" id="wsQc" type="range" min="1" max="${max}" step="1" value="${v}" data-a="wsqset" style="--p:${wsPct(v, 1, max)}%" aria-label="Количество в ячейке ${W.sel + 1}: от 1 до ${max}"><b class="num ws-qv" id="wsQcN">${fmt(v)}</b><button class="ws-qb" data-a="wsq" data-v="x" aria-label="Убрать из ячейки">${ic('x')}</button></div>`;
 }
 function wsFootHtml(g) {
   const any = g.st !== 'empty';
   let st, cls = g.st;
   if (!any) st = 'Положите ресурсы в ячейки — порядок не важен.';
-  else if (g.lack.length) { cls = 'bad'; st = 'Не хватает в запасах: ' + trEsc(wsNames(g.lack.map(c => [c.id, c.q - BAG.qty(c.id)]))); }
+  else if (g.lack.length) { cls = 'bad'; st = 'Не хватает: ' + trEsc(wsNames(g.lack.map(c => [c.id, c.q - wsQty(c.id)]))); }
   else if (g.st === 'known') st = g.owned ? `«${trEsc(g.r.n)}»: ${trEsc(wsHeroWhy(wsHero(g.r)))}` : `Совпадает с рецептом «${trEsc(g.r.n)}»${g.extra.length ? ' · лишнее сгорит: ' + trEsc(wsNames(g.extra)) : ''}`;
   else { const t = wsTrail(); st = t ? `На столе все открытые позиции «${trEsc(t.r.n)}»: ${t.n} из ${t.r.in.length}. Остальное — угадать.` : 'Сочетание неизвестно. При неудаче сгорит всё положенное.'; }
   const go = any && !g.lack.length && !g.owned;
@@ -565,7 +580,7 @@ function wsRowHtml(x) {
   const state = p.owned ? `<span class="chip gold">${ic('check')}${rsHas(p.hero) ? 'в коллекции' : 'осколки собраны'}</span>`
     : p.ok ? `<span class="chip spirit">${ic('check')}${k ? `через ${k} ${plural(k, 'этап', 'этапа', 'этапов')}` : 'можно создать'}</span>`
     : p.stop.length ? `<span class="chip warn">${ic('lock')}неизвестный этап</span>` : '<span class="chip">не хватает</span>';
-  const ing = r.in.map(([id, q]) => wsWell(BAG.item(id), { q, cls: BAG.qty(id) < q ? 'ws-short' : '' })).join('');
+  const ing = r.in.map(([id, q]) => wsWell(BAG.item(id), { q, cls: wsQty(id) < q ? 'ws-short' : '' })).join('');
   return `<div class="ws-rc">${star}<div class="ws-rc-m"><div class="ws-rc-t"><b>${trEsc(r.n)}</b>${state}</div><div class="ws-ing">${ing}${outW}</div></div><button class="btn sm go" data-a="wsmake" data-v="${r.id}"${p.owned ? ' disabled' : ''}>Создать</button></div>`;
 }
 function wsBookHtml() {
@@ -970,7 +985,7 @@ Object.assign(OV, {
     const uses = WS_SRV.known().filter(r => r.in.some(([id]) => id === it.id));
     const trails = wsParts().filter(x => x.part.pos.includes(it.id)), on = wsOn(it.id);
     const body = `<div class="ws-o">
-      <div class="row" style="gap:12px">${wsWell(it, { stat: true, size: 64 })}<div class="col" style="gap:4px;min-width:0"><span class="eyebrow">${wsTier(it)}${sp ? ' · ' + sp : ''}</span><b class="serif" style="font-size:22px;line-height:1.05">${trEsc(it.n)}</b><span class="ws-rar" data-r="${it.r}">${ICON('r' + it.r, 16)}${RAR[it.r]}</span></div><span class="g-spacer"></span><div class="stat" style="align-items:flex-end"><b>${fmt(BAG.qty(it.id))}</b><small>в запасах</small></div></div>
+      <div class="row" style="gap:12px">${wsWell(it, { stat: true, size: 64 })}<div class="col" style="gap:4px;min-width:0"><span class="eyebrow">${wsTier(it)}${sp ? ' · ' + sp : ''}</span><b class="serif" style="font-size:22px;line-height:1.05">${trEsc(it.n)}</b><span class="ws-rar" data-r="${it.r}">${ICON('r' + it.r, 16)}${RAR[it.r]}</span></div><span class="g-spacer"></span><div class="stat" style="align-items:flex-end"><b>${fmt(wsQty(it.id))}</b><small>${wsWal(it.id) && !BAG.qty(it.id) ? 'в кошельке' : 'в запасах'}</small></div></div>
       <p class="quote">${trEsc(it.lore)}</p>${typeof crHint === 'function' ? crHint(it) : ''}
       <dl class="kv"><dt>Цикл</dt><dd>${it.pool ? 'общий пул' : ROMAN[it.cyc] || '—'}</dd><dt>На столе</dt><dd>${on ? fmt(on) : 'нет'}</dd>${wsSpecial(it.id) ? '<dt>Особый ресурс</dt><dd class="gold">расход только с согласия</dd>' : ''}</dl>
       <span class="eyebrow">Найденные рецепты</span>${uses.length ? `<div class="tr-use">${uses.map(r => `<button class="chip" data-a="wsmake" data-v="${r.id}">${trEsc(r.n)}</button>`).join('')}</div>` : '<p class="faint" style="font-size:12.5px">Пока ни одного. Рецепты ищут на столе, загадка подсказывает дорогу.</p>'}
@@ -984,7 +999,7 @@ Object.assign(OV, {
     const it = BAG.item(o.arg); if (!it || it.team) return '';
     const max = wsCellMax(it.id), on = wsOn(it.id), v = Math.max(0, Math.min(max, o.v == null ? 0 : o.v)), step = WS_DATA.pick.step;
     const body = `<div class="ws-o ws-qd">
-      <div class="ws-qh">${wsWell(it, { stat: true, size: 52 })}<div class="col" style="gap:3px;min-width:0"><span class="eyebrow">${wsTier(it)}</span><b class="serif ws-qt">${trEsc(it.n)}</b><small class="faint num">в запасах ${fmt(BAG.qty(it.id))}${on ? ' · на столе ' + fmt(on) : ''}</small></div><b class="num ws-qbig" id="wsQvN">${fmt(v)}</b></div>
+      <div class="ws-qh">${wsWell(it, { stat: true, size: 52 })}<div class="col" style="gap:3px;min-width:0"><span class="eyebrow">${wsTier(it)}</span><b class="serif ws-qt">${trEsc(it.n)}</b><small class="faint num">${wsHave(it.id)}${on ? ' · на столе ' + fmt(on) : ''}</small></div><b class="num ws-qbig" id="wsQvN">${fmt(v)}</b></div>
       <div class="ws-qs"><button class="ws-qb" data-a="wsqn" data-v="${-step}"${v <= 0 ? ' disabled' : ''} aria-label="Меньше">${ic('minus')}</button><input class="ws-range" id="wsQv" type="range" min="0" max="${max}" step="1" value="${v}" data-a="wsqv" style="--p:${wsPct(v, 0, max)}%" aria-label="Сколько положить: от 0 до ${max}"><button class="ws-qb" data-a="wsqn" data-v="${step}"${v >= max ? ' disabled' : ''} aria-label="Больше">${ic('plus')}</button></div>
       <div class="ws-qe num"><span>0</span><span>${fmt(max)}</span></div>
       ${wsSpecial(it.id) ? '<p class="reason">Особый ресурс: при попытке спишется только с вашего согласия.</p>' : ''}</div>`;
@@ -1080,7 +1095,7 @@ Object.assign(ACT, {
   /* «Попробовать» / «Создать» стола: номер операции несёт кнопка */
   wstry(v) {
     const g = wsGuess(); if (g.st === 'empty') return;
-    if (g.lack.length) return toast('Не хватает в запасах: ' + wsNames(g.lack.map(c => [c.id, c.q - BAG.qty(c.id)])));
+    if (g.lack.length) return toast('Не хватает: ' + wsNames(g.lack.map(c => [c.id, c.q - wsQty(c.id)])));
     if (g.owned) return toast(wsHeroWhy(wsHero(g.r)));
     const op = v || wsOp();
     if (g.st === 'known' && !g.extra.length && !g.special.length) return wsAttempt(false, op);   // чистый найденный рецепт — без лишнего вопроса
@@ -1103,8 +1118,8 @@ Object.assign(ACT, {
   wsload(v) {
     const r = BAG.recipe(v), p = S.ws.part[v], b = wsCellsCopy(); if (!r || !p) return;
     const ids = r.in.map(([id]) => id).filter(id => p.pos.includes(id));
-    wsSetTable(ids.filter(id => BAG.has(id)).map(id => [id, 1])); wsFeel(b);
-    const miss = ids.filter(id => !BAG.has(id));
+    wsSetTable(ids.filter(id => wsHas(id)).map(id => [id, 1])); wsFeel(b);
+    const miss = ids.filter(id => !wsHas(id));
     if (miss.length) toast('Нет в запасах: ' + miss.map(wsName).join(', ')); else render();
   },
   wsmake(v) { if (BAG.recipe(v)) open('wsmake', v, { n: 1, ok: false, op: wsOp() }); },
