@@ -599,8 +599,9 @@ function suite() {
   /* 12. рунный страж со «Спуска» */
   {
     S = initialState(); S.route = 'descent'; S.selBiome = 'b1'; S.overlay = null;
+    S.siege.b1 = { hp: null, max: null, killed: false };   // босс Мастерской ещё стоит (в демо Мастерская пройдена — босс пал): вход до босса
     let h = scan('Спуск', draw());
-    if (!/data-a="guard"[^>]*disabled/.test(h)) fail('Спуск: нет входа к стражу или он открыт до босса');
+    if (/data-a="guard" data-v="gd\d+"/.test(h) || !/class="ds-st wait"/.test(h)) fail('Спуск: вход к стражу открыт до босса или не сказано, что страж ждёт за боссом');   // окно «Спуск» (screens/descent.js): до босса входа нет, состояние — «за боссом»
     if (!/class="[^"]*\bteam-only\b[^"]*" data-a="guard" data-v="demo"/.test(h)) fail('Спуск: демо-вход к стражу — не только для команды (режим «Игрок / Команда»)');
     ACT.guard('');
     if (S.runs.length) fail('Спуск: страж впустил до победы над боссом');
@@ -621,7 +622,7 @@ function suite() {
     }
     S = initialState(); G('b1').killed = true; S.route = 'descent'; S.selBiome = 'b1';
     h = scan('Спуск · босс пал', draw());
-    if (/data-a="guard" disabled/.test(h)) fail('Спуск: после босса вход к стражу закрыт');
+    if (!/data-a="guard" data-v="gd\d+"/.test(h)) fail('Спуск: после босса вход к стражу закрыт');
     ACT.guard('');
     R = S.runs[S.runs.length - 1];
     if (!R || !R.guard) fail('Спуск: после босса страж не впустил');

@@ -1,0 +1,178 @@
+/* Энериум · прототип — окно «Спуск» (screens/descent.js). Фон во всё окно — место биома и его обитатели на одном арте, частицы биома,
+   тень под интерфейс; слева — путь вниз, сверху — название, снизу — состояние и одно главное действие. Лист «Бестиарий» и раздел UI-кита.
+   Отступы — токены воздуха --sp-l / --sp-m / --sp-s. Движется только transform и opacity; «меньше движения» — частиц нет, фон не плывёт.
+   Грузится до screens/echo.css: узлы руин (.bnode.ruin) и их середина (.biome, .banner) перекрашиваются там. */
+
+/* ================== сцена: фон, частицы, тень ================== */
+.ds{background:#07090b;overflow:hidden}
+.ds-stage{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.ds-bg{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;object-fit:cover;transform:scale(1.02);transform-origin:62% 55%;animation:ds-drift 48s ease-in-out infinite alternate}
+.ds-bg.ds-plain{background:radial-gradient(70% 70% at 64% 70%,color-mix(in srgb,var(--tg) 16%,transparent),transparent 62%),radial-gradient(60% 45% at 64% 100%,color-mix(in srgb,var(--tm) 42%,transparent),transparent 70%),var(--noise),var(--td)}
+.ds-bg.out{z-index:1;animation:ds-out var(--fade) ease var(--dl,0ms) both}
+.ds-fx{position:absolute;inset:0;z-index:2;overflow:hidden}
+.ds-veil{position:absolute;inset:0;z-index:3;background:
+  linear-gradient(90deg,rgba(5,6,8,.9) 0,rgba(5,6,8,.66) 20%,rgba(5,6,8,.24) 42%,rgba(5,6,8,0) 64%),
+  linear-gradient(0deg,rgba(5,6,8,.94) 0,rgba(5,6,8,.6) 20%,rgba(5,6,8,.12) 42%,rgba(5,6,8,0) 56%),
+  linear-gradient(180deg,rgba(5,6,8,.58) 0,rgba(5,6,8,0) 24%),
+  radial-gradient(130% 110% at 62% 45%,transparent 58%,rgba(0,0,0,.5))}
+
+/* частицы: вид — data-k, числа — переменные разметки (DS_KIND); отрицательная задержка — в окне они уже летят */
+.ds-p{position:absolute;display:block;width:var(--s);height:var(--s);border-radius:50%;opacity:0;background:radial-gradient(circle,#fff 0,var(--c) 40%,transparent 72%);animation:ds-rise var(--d) linear var(--dl) infinite}
+.ds-p[data-k="dust"]{background:radial-gradient(circle,var(--c) 0,transparent 70%)}
+.ds-p[data-k="shaving"]{width:calc(var(--s) * .3);height:var(--s);border-radius:2px;background:linear-gradient(180deg,var(--c),#7d5130);animation-name:ds-fall;animation-timing-function:ease-in-out}
+.ds-p[data-k="spore"]{box-shadow:0 0 calc(var(--s) * 2) var(--c);animation-name:ds-sway;animation-timing-function:ease-in-out}
+.ds-p[data-k="mote"]{animation-name:ds-sway;animation-timing-function:ease-in-out}
+.ds-p[data-k="page"]{height:calc(var(--s) * 1.3);border-radius:1px;background:linear-gradient(160deg,var(--c),#8f8466);box-shadow:0 0 0 1px rgba(0,0,0,.28);animation-name:ds-flut;animation-timing-function:ease-in-out}
+.ds-p[data-k="ink"]{background:radial-gradient(circle,#1a1109 0,#1a1109 28%,var(--c) 46%,transparent 76%);box-shadow:0 0 6px var(--c)}   /* капля чернил в янтарном свете */
+.ds-p[data-k="spark"]{background:radial-gradient(circle,#fff6de 0,var(--c) 45%,transparent 75%);box-shadow:0 0 5px var(--c);animation-timing-function:cubic-bezier(.2,.6,.4,1)}
+.ds-p[data-k="steam"]{background:radial-gradient(circle,var(--c) 0,transparent 68%);animation-name:ds-steam;animation-timing-function:ease-out}
+
+/* ================== интерфейс поверх сцены ================== */
+.ds-ui{position:absolute;inset:0;z-index:4;display:grid;grid-template-columns:176px minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:var(--sp-l);padding:var(--sp-m) var(--sp-l) var(--sp-m) var(--sp-m)}
+
+/* путь вниз: циклы, биомы на нити шахты, нераскрытая глубина одной строкой */
+.ds-nav{display:flex;flex-direction:column;gap:2px;min-height:0;overflow:auto;scrollbar-width:none;padding:var(--sp-s) 6px var(--sp-s) var(--sp-s);border-radius:14px;background:linear-gradient(180deg,rgba(13,16,19,.82),rgba(9,11,13,.64));border:1px solid rgba(255,255,255,.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 18px 40px -24px #000}
+.ds-nav::-webkit-scrollbar{display:none}
+.ds-nav>.eyebrow{padding:2px 4px 6px 6px}
+.ds-nav .cyc{display:grid;grid-template-columns:22px minmax(0,1fr);gap:2px;align-items:start}
+.ds-nav .cyc>b{font:600 16px/38px var(--f-d);color:var(--gold-2);text-align:center}
+.ds-nav .cyc.dim>b{color:var(--parch-3)}
+.ds-nav .cyc>b .i{width:15px;height:15px;vertical-align:-2px}
+.ds-nav .cyc>div{position:relative;display:flex;flex-direction:column;gap:2px;min-width:0}
+.ds-nav .cyc>div::before{content:"";position:absolute;left:12px;top:12px;bottom:12px;width:1px;background:linear-gradient(rgba(221,188,122,.32),rgba(72,229,212,.24));pointer-events:none}
+.ds-nav .bnode{position:relative;display:flex;align-items:center;gap:8px;width:100%;min-height:38px;padding:4px 8px 4px 7px;border-radius:9px;border:1px solid transparent;background:none;text-align:left;color:var(--parch);font-size:13px;line-height:1.12;transition:background-color .15s,border-color .15s}
+.ds-nav .bnode::before{content:"";position:relative;z-index:1;flex:none;width:10px;height:13px;clip-path:polygon(50% 0,100% 38%,50% 100%,0 38%);background:#5b6168}
+.ds-nav .bnode>span{min-width:0}
+.ds-nav .bnode small{display:block;margin-top:2px;font-size:11px;line-height:1.15;color:var(--parch-3)}
+.ds-nav .bnode.done::before{background:var(--gold)}
+.ds-nav .bnode.front::before{background:var(--spirit);filter:drop-shadow(0 0 5px var(--spirit))}
+.ds-nav .bnode.front small{color:var(--spirit)}
+.ds-nav .bnode.lock{color:var(--parch-3)}
+.ds-nav .bnode.lock::before{background:#2e3338}
+.ds-nav button.bnode:hover:not([disabled]){background:rgba(255,255,255,.045)}
+.ds-nav .bnode[aria-current="true"]{border-color:rgba(72,229,212,.32);background:linear-gradient(90deg,rgba(72,229,212,.16),rgba(72,229,212,.03));box-shadow:inset 2px 0 0 var(--spirit)}
+.ds-nav .bnode[disabled]{cursor:default}
+.ds-nav .ds-run{margin-left:auto;flex:none;width:7px;height:7px;border-radius:50%;background:var(--spirit);box-shadow:0 0 8px var(--spirit);animation:ds-pulse 1.6s ease-in-out infinite}
+.ds-nav .ds-deep>div::before,.ds-nav .ech-rs>div::before{display:none}
+.ds-nav .ds-deep>b{font-size:14px}
+.ds-nav .ech-rs{margin-top:6px;padding-top:4px;border-top:1px solid rgba(255,255,255,.06)}
+
+/* середина: строка места, название, цитата — сверху; состояние и действие — снизу */
+.ds-main{position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:var(--sp-m);min-width:0;min-height:0}
+.ds-head{display:flex;flex-direction:column;align-items:flex-start;gap:6px;max-width:min(480px,100%);padding:6px 0 0 4px;text-shadow:0 2px 14px rgba(0,0,0,.9),0 0 2px rgba(0,0,0,.6)}
+.g .ds-head .eyebrow{color:var(--gold)}
+.ds-head h2{font-size:42px;line-height:.94;color:var(--parch);letter-spacing:.005em}
+.ds-head .quote{max-width:40ch;font-size:16px;color:var(--parch-2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ds-head .chip{text-shadow:none}
+.ds-main.swap .ds-head{animation:ds-in .55s cubic-bezier(.2,.8,.2,1) var(--dl,0ms) both}
+.ds-foot{display:flex;flex-direction:column;gap:var(--sp-m);min-width:0}
+.ds-row{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:var(--sp-s) var(--sp-m);min-width:0}
+.ds-state{display:flex;align-items:stretch;min-width:0}
+.ds-st{display:flex;align-items:center;gap:8px;padding:0 14px;border-left:1px solid rgba(255,255,255,.1);min-width:0}
+.ds-st:first-child{padding-left:4px;border-left:0}
+.ds-st>.i{width:18px;height:18px;color:var(--parch-3);filter:drop-shadow(0 1px 4px #000)}
+.ds-st>span{display:flex;flex-direction:column;gap:3px;min-width:0}
+.ds-st b{font:600 20px/1 var(--f-d);color:var(--parch);white-space:nowrap;text-shadow:0 2px 10px #000;font-variant-numeric:lining-nums tabular-nums}
+.ds-st small{max-width:140px;font:700 10px/1.15 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 6px #000}
+.ds-st.down>.i,.ds-st.done>.i,.ds-st.down b,.ds-st.done b{color:var(--gold)}
+.ds-st.siege>.i,.ds-st.siege b{color:var(--amber)}
+.ds-st.open>.i,.ds-st.open b{color:var(--spirit)}
+.ds-st.wait b{color:var(--parch-2)}
+.ds-gd{flex:none;gap:6px}
+.ds-know{display:flex;align-items:center;gap:var(--sp-m);min-width:0}
+.ds-know-t{display:flex;flex-direction:column;gap:6px;min-width:112px}
+.ds-know-t span{font-size:13px;color:var(--parch-2);white-space:nowrap;text-shadow:0 1px 8px #000}
+.ds-know-t b{color:var(--parch);font-size:15px}
+.ds-know .bar{height:4px}
+.ds-go{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none;margin-left:auto}
+.ds-go .row{gap:var(--sp-s)}
+.ds-go .reason{text-align:right;text-shadow:0 1px 8px #000}
+.ds-go .btn.go.big{min-width:196px;min-height:52px;border-radius:14px;letter-spacing:.14em}
+.ds-live{display:inline-flex;align-items:center;gap:6px;font:700 11px/1 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--spirit);text-shadow:0 1px 8px #000}
+.ds-live .i{width:14px;height:14px}
+
+/* середина руины и биома Многоликого — screens/echo.js рисует её на классах .biome и .banner */
+.ds .biome{display:grid;grid-template-rows:auto minmax(0,1fr);gap:var(--sp-m);min-width:0;min-height:0}
+.ds .banner{position:relative;height:150px;border-radius:12px;overflow:hidden;border:1px solid var(--iron);background:#0a0c0e}
+.ds .banner>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 58%}
+.ds .banner::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(7,9,11,.95) 0,rgba(7,9,11,.7) 38%,rgba(7,9,11,.1) 72%),linear-gradient(0deg,rgba(7,9,11,.85),transparent 45%)}
+.ds .banner.plain{background:radial-gradient(80% 120% at 80% 100%,rgba(72,229,212,.12),transparent 60%),var(--noise),#0d1013}
+.ds .banner.plain::after{background:none}
+.ds .banner .in{position:absolute;inset:0;z-index:1;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.ds .banner h2{font-size:32px;line-height:1;color:var(--parch)}
+.ds .banner .quote{max-width:46ch;font-size:15px}
+.ds .banner .facts{margin-top:auto;display:flex;gap:18px;align-items:flex-end}
+.ds .banner .facts .stat b{font-size:24px}
+.ds .banner .facts .stat small{color:var(--parch-2)}
+
+/* низкий экран (844 × 390 и ниже) и узкий телефон */
+@container main (max-height: 360px){
+  .ds-ui{grid-template-columns:166px minmax(0,1fr);gap:var(--sp-m)}
+  .ds-head h2{font-size:35px}
+  .ds-head .quote{font-size:14.5px}
+  .ds-nav .bnode{min-height:34px}
+  .ds-nav .cyc>b{line-height:34px}
+  .ds-st{padding:0 10px}
+  .ds-st b{font-size:18px}
+  .ds-go .btn.go.big{min-width:172px;min-height:46px}
+  .ds .banner{height:140px}
+}
+@container main (max-width: 640px){
+  .ds-ui{grid-template-columns:148px minmax(0,1fr)}
+  .ds-head h2{font-size:30px}
+  .ds-st>.i{display:none}
+  .ds-st small{max-width:96px}
+  .ds-know-t{min-width:0}
+}
+
+/* ================== лист «Бестиарий» ================== */
+.ds-bs-h{display:flex;flex-direction:column;gap:6px}
+.ds-bs-k{gap:var(--sp-m)}
+.ds-bs-k span{font-size:14px;color:var(--parch-2);white-space:nowrap}
+.ds-bs-k b{color:var(--parch);font-size:16px}
+.ds-bs-k .bar{flex:1 1 0;height:5px}
+.ds-bs-grp{display:flex;flex-direction:column;gap:6px}
+.ds-bs-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px var(--sp-s)}
+.ds-bf{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;width:100%;padding:4px 8px 4px 4px;border-radius:9px;border:1px solid transparent;background:rgba(255,255,255,.025);color:var(--parch);text-align:left}
+.ds-bf:hover{border-color:var(--iron-2);background:rgba(255,255,255,.045)}
+.ds-bf-ph{position:relative;width:40px;height:50px;border-radius:7px;overflow:hidden;border:1px solid #262b31;background:#0a0c0e}
+.ds-bf-ph img{display:block;width:100%;height:100%;object-fit:cover}
+.ds-bf.elite .ds-bf-ph{border-color:rgba(221,188,122,.45)}
+.ds-bf.boss .ds-bf-ph{border-color:var(--gold)}
+.ds-bf.unk .ds-bf-ph{border-color:rgba(72,229,212,.4)}
+.ds-bf.unk .ds-bf-ph img{filter:blur(4px) brightness(.35) saturate(.5)}
+.ds-bf-ph i{position:absolute;inset:0;display:grid;place-items:center;font:600 18px/1 var(--f-d);font-style:normal;color:var(--spirit);text-shadow:0 0 10px var(--spirit)}
+.ds-bf-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ds-bf-t b{font-size:14px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ds-bf.unk .ds-bf-t b{color:var(--parch-3)}
+.ds-bf-t small{font-size:11.5px;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ds-bf .chip{height:20px}
+
+/* ================== UI-кит: окно на каждом биоме ================== */
+.ds-kit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(427px,1fr));gap:var(--sp-m)}
+.ds-kit-f{margin:0;display:flex;flex-direction:column;gap:6px;min-width:0}
+.ds-kit-cell{position:relative;width:427px;max-width:100%;height:192px;overflow:hidden;border-radius:10px;border:1px solid #1b1f24;background:var(--ink)}
+.g.ds-kit-g{position:absolute;left:0;top:0;display:block;width:854px;height:384px;transform:scale(.5);transform-origin:0 0;pointer-events:none;border-radius:0}
+.ds-kit-g .g-main{width:100%;height:100%}
+.ds-kit-f figcaption{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;color:var(--parch-3)}
+.ds-kit-f figcaption b{color:var(--parch)}
+.ds-kit-acts{display:flex;flex-wrap:wrap;gap:var(--sp-m);align-items:flex-end}
+.ds-kit-acts figure{margin:0;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.ds-kit-acts figcaption{font-size:12px;color:var(--parch-3)}
+.ds-kit-act{padding:var(--sp-s);border-radius:10px;background:radial-gradient(90% 90% at 70% 100%,rgba(72,229,212,.08),transparent 70%),#07090b}
+.ds-kit-act .ds-go{margin-left:0}
+
+/* ================== движение: только transform и opacity ================== */
+@keyframes ds-drift{from{transform:scale(1.02)}to{transform:scale(1.07) translate3d(-1%,-.6%,0)}}
+@keyframes ds-out{from{opacity:1}to{opacity:0}}
+@keyframes ds-in{from{opacity:0;transform:translate3d(0,8px,0)}to{opacity:1;transform:none}}
+@keyframes ds-pulse{50%{opacity:.35;transform:scale(.7)}}
+@keyframes ds-rise{0%{opacity:0;transform:translate3d(0,0,0) scale(.6)}15%{opacity:var(--o)}80%{opacity:var(--o)}100%{opacity:0;transform:translate3d(var(--dx),var(--dy),0) scale(1)}}
+@keyframes ds-sway{0%{opacity:0;transform:translate3d(0,0,0)}20%{opacity:var(--o)}50%{transform:translate3d(calc(var(--dx) * -.5),calc(var(--dy) * .5),0)}80%{opacity:var(--o)}100%{opacity:0;transform:translate3d(var(--dx),var(--dy),0)}}
+@keyframes ds-fall{0%{opacity:0;transform:translate3d(0,0,0) rotate(0deg)}15%{opacity:var(--o)}85%{opacity:var(--o)}100%{opacity:0;transform:translate3d(var(--dx),var(--dy),0) rotate(var(--r))}}
+@keyframes ds-flut{0%{opacity:0;transform:translate3d(0,0,0) rotate(0deg) scaleX(1)}15%{opacity:var(--o)}35%{transform:translate3d(calc(var(--dx) * .3),calc(var(--dy) * .3),0) rotate(calc(var(--r) * .3)) scaleX(-.4)}65%{transform:translate3d(calc(var(--dx) * .7),calc(var(--dy) * .65),0) rotate(calc(var(--r) * .7)) scaleX(.8)}85%{opacity:var(--o)}100%{opacity:0;transform:translate3d(var(--dx),var(--dy),0) rotate(var(--r)) scaleX(-.2)}}
+@keyframes ds-steam{0%{opacity:0;transform:translate3d(0,0,0) scale(.5)}30%{opacity:var(--o)}100%{opacity:0;transform:translate3d(var(--dx),var(--dy),0) scale(1.6)}}
+@media (prefers-reduced-motion:reduce){
+  .ds-fx,.ds-bg.out{display:none}
+  .ds-bg,.ds-main.swap .ds-head,.ds-nav .ds-run{animation:none}
+}

@@ -1,0 +1,112 @@
+{
+  "name": "Портреты героев Эхо, рулетки и доната, 30.09.2026: правка своих картинок первого прогона в режиме EDIT (art/style/style.md: удачную картинку правим, а не рисуем заново; образцы — jobs/donat-edit.json, donat-edit-2.json). Лимту (heroes-echo-ankeshar.json): внизу модель написала имя на тёмной плашке — убрать. Анахе (heroes-echo-goldendeer.json): вместо шин в руке и на поясе — голые кости — заменить деревянными шинами. Урсет (heroes-echo-tanehem.json): «веер соли» модель поняла буквально и дала ей складной веер — вместо него брызги соли из раскрытой ладони. Брудд (heroes-echo-nameless.json): на камне за спиной вырезано имя латиницей — убрать буквы. Хельвиг (heroes-batch-04.json): дворфийке нарисована борода, а принятая дворфийка c2-41 без бороды — убрать. Марта, Тэйнэ (donat-set4.json) и Кальдер (donat-set5.json): у Безликих вышли тёмная маска с чертами, гладкий коричневый овал и серое лицо — вместо лица тьма (ADR-0023, п. 10). Вторая волна: Сиэран (donat-set6.json) — v2 взял лук на полный натяг, но в капюшоне проступило лицо эльфа — вместо лица тьма",
+  "models": [
+    "nb2"
+  ],
+  "style": "Keep the painterly style of the attached picture: the same brush strokes, light, colors and background.",
+  "negative": "No text, no letters, no numbers, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+  "cutout_rule": "",
+  "categories": {
+    "heroes": {
+      "aspect": "4:5",
+      "size": "1K",
+      "refs": [],
+      "frame": "Edit the attached hero portrait. Keep the pose, the hands, the clothes, the objects, the background, the light and the framing exactly as they are. Change only what is listed below."
+    }
+  },
+  "jobs": [
+    {
+      "id": "hero-c6-62-sieran",
+      "category": "heroes",
+      "title": "Сиэран Первая Тетива — правка v2: вместо лица — тьма",
+      "source": "Правка art/generated/heroes/hero-c6-62-sieran__nb2-v2.jpg. К выгрузке — design/ui/assets/art/heroes/c6-62.jpg",
+      "refs": [
+        "art/generated/heroes/hero-c6-62-sieran__nb2-v2.jpg"
+      ],
+      "subject": "1. His face: the pale elven face with eyes, a nose and a mouth inside the hood must go completely. Inside the green-grey hood there is only a smooth, soft, deep darkness, as dark as a night sky — no surface, no mask, no eyes, no nose, no mouth, no features at all. The tips of his long pointed elven ears still show at the sides of the hood, and the hood keeps its shape. Keep the drawn bow, the arrow, both hands and the glowing light in his chest exactly as they are."
+    },
+    {
+      "id": "hero-c3-47-limtu",
+      "category": "heroes",
+      "title": "Лимту Илистая — правка: без надписи и плашки внизу",
+      "source": "Правка art/generated/heroes/hero-c3-47-limtu__nb2.jpg. К выгрузке — design/ui/assets/art/heroes/c3-47.jpg",
+      "refs": [
+        "art/generated/heroes/hero-c3-47-limtu__nb2.jpg"
+      ],
+      "subject": "1. Remove the dark horizontal band and all the words written at the bottom of the picture completely: there must be no letters, no words and no band anywhere in the picture. In their place continue what is behind them: the dark water with its glowing blue crystals and reflections, the lower part of her grey robe and the punting pole, sinking softly into shadow."
+    },
+    {
+      "id": "hero-c4-52-anahe",
+      "category": "heroes",
+      "title": "Анахе Костоправка — правка: деревянные шины вместо костей",
+      "source": "Правка art/generated/heroes/hero-c4-52-anahe__nb2.jpg. К выгрузке — design/ui/assets/art/heroes/c4-52.jpg",
+      "refs": [
+        "art/generated/heroes/hero-c4-52-anahe__nb2.jpg"
+      ],
+      "subject": "1. The object in her near hand is a bare white bone: replace it with a straight, flat splint of pale planed wood of the same size, held in the same grip, with the wet leather thong still trailing from it and the same blue glow.\n2. The bundle of bare white bones hanging at her belt becomes a bundle of flat wooden splints tied with cord.\nThere are no bones anywhere in the picture."
+    },
+    {
+      "id": "hero-c4-48-urset",
+      "category": "heroes",
+      "title": "Урсет Соль и Ладан — правка: брызги соли вместо веера",
+      "source": "Правка art/generated/heroes/hero-c4-48-urset__nb2.jpg. К выгрузке — design/ui/assets/art/heroes/c4-48.jpg",
+      "refs": [
+        "art/generated/heroes/hero-c4-48-urset__nb2.jpg"
+      ],
+      "subject": "1. She holds a white folding fan in her near hand: remove the fan completely. Her near hand is open, palm down, the fingers spread, just after a sowing throw, and a wide, glittering spray of loose white salt grains flies from it toward the right edge, scattering through the air like seed.\nKeep the bronze censer on its chain, the smoke, the ring of salt on the sand, the robe and everything else exactly as it is."
+    },
+    {
+      "id": "hero-c2-55-brudd",
+      "category": "heroes",
+      "title": "Брудд Стоячий — правка: без букв на камне",
+      "source": "Правка art/generated/heroes/hero-c2-55-brudd__nb2.jpg. К выгрузке — design/ui/assets/art/heroes/c2-55.jpg",
+      "refs": [
+        "art/generated/heroes/hero-c2-55-brudd__nb2.jpg"
+      ],
+      "subject": "1. Remove the carved letters on the tall standing stone behind his head completely: the face of that stone is plain, weathered grey stone with patches of moss — no letters, no marks, no carving at all."
+    },
+    {
+      "id": "hero-c4-45-helwig",
+      "category": "heroes",
+      "title": "Хельвиг Поручительница — правка: дворфийка без бороды",
+      "source": "Правка art/generated/heroes/hero-c4-45-helwig__nb2.jpg. К выгрузке — design/ui/assets/art/heroes/c4-45.jpg",
+      "refs": [
+        "art/generated/heroes/hero-c4-45-helwig__nb2.jpg"
+      ],
+      "subject": "1. She is a dwarf woman and has no beard: remove the beard and the moustache completely; her chin, jaw and upper lip are bare, weathered skin. Keep the grey hair on her head braided and pulled back, and keep her face, her knowing smile and her raised eyebrow."
+    },
+    {
+      "id": "hero-c4-60-marta",
+      "category": "heroes",
+      "title": "Марта Большой Обод — правка: вместо маски — тьма",
+      "source": "Правка art/generated/heroes/hero-c4-60-marta__nb2.jpg. К выгрузке — design/ui/assets/art/heroes/c4-60.jpg",
+      "refs": [
+        "art/generated/heroes/hero-c4-60-marta__nb2.jpg"
+      ],
+      "subject": "1. Her face: the dark mask-like face with eyes, a nose and a mouth must go completely. Inside the dark blue hood there is only a smooth, soft, deep darkness, as dark as a night sky — no surface, no mask, no eyes, no eye holes, no nose, no mouth, no features at all. The hood keeps its shape and its folds."
+    },
+    {
+      "id": "hero-c4-63-teine",
+      "category": "heroes",
+      "title": "Тэйнэ Прощённая — правка: вместо гладкого овала — тьма",
+      "source": "Правка art/generated/heroes/hero-c4-63-teine__nb2.jpg. К выгрузке — design/ui/assets/art/heroes/c4-63.jpg",
+      "refs": [
+        "art/generated/heroes/hero-c4-63-teine__nb2.jpg"
+      ],
+      "subject": "1. Her face: the smooth brown oval face must go completely. Inside the green hood there is only a smooth, soft, deep darkness, as dark as a night sky — no surface, no mask, no eyes, no nose, no mouth, no features at all. The tips of her long pointed elven ears still show at the sides of the hood, and the hood keeps its shape and its folds."
+    },
+    {
+      "id": "hero-c5-69-kalder",
+      "category": "heroes",
+      "title": "Кальдер Мена — правка: вместо лица — тьма",
+      "source": "Правка art/generated/heroes/hero-c5-69-kalder__nb2.jpg. К выгрузке — design/ui/assets/art/heroes/c5-69.jpg",
+      "refs": [
+        "art/generated/heroes/hero-c5-69-kalder__nb2.jpg"
+      ],
+      "subject": "1. His face: the grey face with eyes, brows, a nose and cheeks must go completely. Inside the brown leather hood, above the beard, there is only a smooth, soft, deep darkness, as dark as a night sky — no eyes, no nose, no brows, no face at all. Keep his long braided golden beard with the brass rings exactly as it is: it hangs down from that darkness."
+    }
+  ],
+  "notes": [
+    "Запуск 30.09.2026: восемь правок с первого раза, $0,547 (Лимту, Анахе, Урсет, Брудд, Хельвиг, Марта, Тэйнэ, Кальдер → __nb2-v2); вторая волна — Сиэран по v2 → __nb2-v3, $0,068. Всё выгружено (ui-art.json)"
+  ]
+}

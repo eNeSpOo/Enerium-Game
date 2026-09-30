@@ -1,0 +1,88 @@
+{
+  "name": "Правки третьей пятёрки карточек героя (jobs/card-concepts-3.json, тёмное фэнтези): модель верно строит рамку и систему значков, но путает счёт, пишет буквы на камнях и слово Level. По art/style/style.md удачную картинку правим EDIT MODE, а не рисуем заново: к запросу прикладывается сама картинка, при нужде — одобренный значок образцом. Выход — в ту же папку art/generated/card-concepts, имя — вариант с приставкой -fix",
+  "models": [
+    "nb2"
+  ],
+  "style": "Keep the dark painterly style of the attached picture: the same brush strokes, muted colors, light from below, frames, particles and background.",
+  "negative": "No words, no letters, no new digits, no Roman numerals, no runes or glyphs that look like writing, no watermark, no signature, no logo. Do not add anything that is not listed above, do not move or restyle the cards, no table, no floor.",
+  "categories": {
+    "card-concepts": {
+      "aspect": "16:9",
+      "size": "2K",
+      "refs": [],
+      "frame": "Edit the first attached picture: a concept sheet with three vertical hero cards side by side — the left card, the middle card and the right card. Keep everything exactly as it is — the hero, the frames, the light, the glow, the particles, the icons, the digits, the layout and the composition — and change only what is listed below. Where something is removed, continue the surrounding frame, ornament or picture seamlessly, as if it had never been there. Before you finish, count the changed icons on each card again and make sure they match the list."
+    }
+  },
+  "jobs": [
+    {
+      "id": "card3-01-reliquary-fix",
+      "category": "card-concepts",
+      "title": "Правка тёмной 1 (реликварий): медальон стихии в нижний ряд, камни слабого без букв, без свечей на клетках вершины",
+      "source": "Правка art/generated/card-concepts/card3-01-reliquary__nb2-v2.jpg: нет медальона стихии (правый верхний угол заняли свечи), на камнях слабой карточки буквы, у вершины на клетках пределов стоят лишние свечи",
+      "refs": [
+        "art/generated/card-concepts/card3-01-reliquary__nb2-v2.jpg"
+      ],
+      "subject": "1. At the bottom of each card, between the small shield icon on the left and the crossed swords with the number on the right, add the element medallion: a small round medallion of dark iron around a raw chunk of amber-orange rock glowing from within (#EB9D40) — a rock, not a planet.\n2. On the left card, the five dull stones in the cages carry carved signs that look like letters. Remove the signs: each of these five stones becomes a plain dull grey stone with only a small dark diamond at its center.\n3. On the right card, a green candle stands on top of each of the five cages at the bottom of the window. Remove these five candles and their dripping wax, and continue the cage tops and the frame there; the cages with their glowing turquoise stones stay. The five candles at the top of the right card stay.\nNothing else changes."
+    },
+    {
+      "id": "card3-02-thorns-fix",
+      "category": "card-concepts",
+      "title": "Правка тёмной 2 (терновник): пять прорезей пределов вместо шести",
+      "source": "Правка art/generated/card-concepts/card3-02-thorns__nb2.jpg: на левой боковине каждой карточки шесть прорезей",
+      "refs": [
+        "art/generated/card-concepts/card3-02-thorns__nb2.jpg"
+      ],
+      "subject": "1. The left rail of each card holds a vertical column of six diamond-shaped slits. On every card remove the lowest slit and continue the iron rail there, so each rail holds exactly five slits: the left card — five dark slits; the middle card — three burning with turquoise fire at the top and two dark below; the right card — five burning. Nothing else changes."
+    },
+    {
+      "id": "card3-03-grimoire-fix",
+      "category": "card-concepts",
+      "title": "Правка тёмной 3 (гримуар): без слова Level, пять замков у средней и вершины, третий шнур у средней",
+      "source": "Правка art/generated/card-concepts/card3-03-grimoire__nb2.jpg: слово Level на значках уровня; у средней четыре замка (два отперты), у вершины четыре отпертых; у средней нет третьего шнура с пустым кольцом",
+      "refs": [
+        "art/generated/card-concepts/card3-03-grimoire__nb2.jpg"
+      ],
+      "subject": "1. The round level badge in the top left corner of each card carries the word Level above the number. Remove the word on all three cards and keep only the number — 34, 512, 1200 — a little larger and centered in the badge.\n2. On the middle card, the right edge of the cover holds four padlocks: two open shining ones at the top and two closed dark ones below. Turn the third padlock from the top into an open padlock with turquoise light streaming from its keyhole, like the two above it, and add one more closed dark padlock under the lowest one, so the column holds exactly five: three open and shining at the top, two closed and dark below.\n3. On the right card, the right edge holds four open shining padlocks. Add one more open shining padlock of the same kind under the lowest one, so there are exactly five.\n4. On the middle card, two red wax seals hang on cords from the bottom of the cover. Add a third cord to the right of them, hanging the same way, that ends in an empty dark iron ring with no wax."
+    },
+    {
+      "id": "card3-04-crypt-fix",
+      "category": "card-concepts",
+      "title": "Правка тёмной 4 (склеп): без значка мечей над уровнем",
+      "source": "Правка art/generated/card-concepts/card3-04-crypt__nb2.jpg: над цифрами уровня в цоколе стоит лишний значок мечей",
+      "refs": [
+        "art/generated/card-concepts/card3-04-crypt__nb2.jpg"
+      ],
+      "subject": "1. In the base of each stele, a small crossed-swords icon stands above the level digits on the left — 34, 512, 1200. Remove that icon on all three cards and continue the carved stone there; keep the level digits exactly as they are. The crossed swords above the combat power number on the right stay. Nothing else changes."
+    },
+    {
+      "id": "card3-05-abyss-fix",
+      "category": "card-concepts",
+      "title": "Правка тёмной 5 (бездна): рунные камни без букв",
+      "source": "Правка art/generated/card-concepts/card3-05-abyss__nb2.jpg: на камнях пределов вырезаны знаки, похожие на латинские буквы F, R, B",
+      "refs": [
+        "art/generated/card-concepts/card3-05-abyss__nb2.jpg"
+      ],
+      "subject": "1. The five rune stones in the row at the bottom of each window carry carved signs that look like letters. Remove the signs from all fifteen stones: every stone becomes plain and smooth; a lit stone keeps its turquoise glow from within and its thin cracks of light, with only a small bright diamond-shaped spark at its center; an unlit stone is plain dull grey with only a small dark diamond at its center. Keep the counts: the left card — five unlit; the middle card — three lit on the left, two unlit on the right; the right card — five lit. Nothing else changes."
+    },
+    {
+      "id": "card3-02-thorns-fix2",
+      "category": "card-concepts",
+      "title": "Правка тёмной 2 (терновник), вторая: пять прорезей у средней и вершины",
+      "source": "Правка art/generated/card-concepts/card3-02-thorns-fix__nb2.jpg: первая правка исправила только слабую карточку, у средней и вершины по-прежнему шесть прорезей",
+      "refs": [
+        "art/generated/card-concepts/card3-02-thorns-fix__nb2.jpg"
+      ],
+      "subject": "1. On the middle card, the left rail holds six diamond slits: three burning with turquoise fire at the top and three dark below. Remove the lowest dark slit, the sixth from the top, and continue the iron rail there, so this rail holds five: three burning and two dark.\n2. On the right card, the left rail holds six burning slits. Remove the lowest one, the sixth from the top, and continue the dark iron rail there, so this rail holds five burning slits.\n3. The left card already holds five dark slits and stays exactly as it is. Nothing else changes."
+    },
+    {
+      "id": "card3-03-grimoire-fix2",
+      "category": "card-concepts",
+      "title": "Правка тёмной 3 (гримуар), вторая: три отпертых замка у средней, пять у вершины",
+      "source": "Правка art/generated/card-concepts/card3-03-grimoire-fix__nb2.jpg: первая правка сняла Level и добавила шнур, но у средней отперты два замка из пяти, у вершины четыре замка",
+      "refs": [
+        "art/generated/card-concepts/card3-03-grimoire-fix__nb2.jpg"
+      ],
+      "subject": "1. On the middle card, the right edge of the cover holds five padlocks: the top two are open and shining, the three below are closed and dark. Open the third padlock from the top: make it an open padlock with turquoise light streaming out of its keyhole, exactly like the two above it. The lowest two stay closed and dark.\n2. On the right card, the right edge holds four open shining padlocks. Add a fifth open shining padlock of the same kind below the lowest one, at the same spacing, above the wax seals.\nNothing else changes."
+    }
+  ]
+}

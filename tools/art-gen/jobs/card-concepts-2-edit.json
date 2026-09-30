@@ -1,0 +1,182 @@
+{
+  "name": "Правки второй десятки карточек героя (jobs/card-concepts-2.json): модель верно строит систему значков, но путает счёт и дописывает буквы. По art/style/style.md удачную картинку правим EDIT MODE, а не рисуем заново: к запросу прикладывается сама картинка, при нужде — одобренный значок образцом. Выход — в ту же папку art/generated/card-concepts, имя — вариант с приставкой -fix",
+  "models": [
+    "nb2"
+  ],
+  "style": "Keep the painterly style of the attached picture: the same brush strokes, light, colors, frames, particles and background.",
+  "negative": "No words, no letters, no new digits, no Roman numerals, no runes or glyphs that look like writing, no watermark, no signature, no logo. Do not add anything that is not listed above, do not move or restyle the cards.",
+  "categories": {
+    "card-concepts": {
+      "aspect": "16:9",
+      "size": "2K",
+      "refs": [],
+      "frame": "Edit the first attached picture: a concept sheet with three vertical hero cards side by side — the left card, the middle card and the right card. Keep everything exactly as it is — the hero, the frames, the light, the glow, the particles, the icons, the digits, the layout and the composition — and change only what is listed below. Where something is removed, continue the surrounding frame, ornament or picture seamlessly, as if it had never been there. Before you finish, count the changed icons on each card again and make sure they match the list."
+    }
+  },
+  "jobs": [
+    {
+      "id": "card2-01-crown-fix",
+      "category": "card-concepts",
+      "title": "Правка системы 1 (корона): без букв CP у мощи, зелёный кристалл в короне вершины",
+      "source": "Правка art/generated/card-concepts/card2-01-crown__nb2.jpg; образец кристалла — design/ui/assets/art/icons/r7.png",
+      "refs": [
+        "art/generated/card-concepts/card2-01-crown__nb2.jpg",
+        "design/ui/assets/art/icons/r7.png"
+      ],
+      "subject": "1. At the bottom of each card the combat power reads CP followed by the number. Remove the letters CP on all three cards and put a small crossed-swords icon right before the number instead — the same crossed swords that now sit at the right end of the name plaque: crossed swords and 1240, crossed swords and 48350, crossed swords and 912780. Then remove the crossed swords from the right end of each name plaque, so the name plaque is plain and blank.\n2. On the right card, the front of the crown's band holds a turquoise six-sided stone. Replace it with the green rarity crystal from the second attached picture — a faceted almond-shaped green crystal glowing from within, the same size and place as the violet crystal in the band of the middle card's crown."
+    },
+    {
+      "id": "card2-02-medallion-fix",
+      "category": "card-concepts",
+      "title": "Правка системы 2 (медальон): у средней карточки две золотые звезды из трёх",
+      "source": "Правка art/generated/card-concepts/card2-02-medallion__nb2.jpg",
+      "refs": [
+        "art/generated/card-concepts/card2-02-medallion__nb2.jpg"
+      ],
+      "subject": "1. On the middle card, three star places stand on top of the big round medallion: the left one is a gold star, the middle and the right one are empty dark sockets. Turn the middle one into a gold star, exactly like the left one, so the middle card has two gold stars and one empty socket on the right. The left card keeps its one empty socket and the right card its five gold stars."
+    },
+    {
+      "id": "card2-03-corners-fix",
+      "category": "card-concepts",
+      "title": "Правка системы 3 (углы и крылья): медальон стихии вместо глобуса, перья крыльев 1 и 3",
+      "source": "Правка art/generated/card-concepts/card2-03-corners__nb2.jpg: модель прочла Earth как планету",
+      "refs": [
+        "art/generated/card-concepts/card2-03-corners__nb2.jpg"
+      ],
+      "subject": "1. In the top right corner of each of the three cards there is a picture of the planet Earth. Replace it on all three cards with the element medallion: a round medallion with a rim of dark iron and old gold around a raw chunk of amber-orange rock glowing from within (#EB9D40) — a stone, not a planet: no globe, no map, no continents, no oceans.\n2. On the left card, each tiny wing stub on the sides of the frame has two dark feathers. Leave only one dark feather on each side.\n3. On the middle card, each small wing has four feathers — two gold and two dark. Remove the lowest dark feather on each side, so each wing has exactly three feathers: two gold and one dark.\n4. The right card's big golden wings stay as they are."
+    },
+    {
+      "id": "card2-05-gems-fix",
+      "category": "card-concepts",
+      "title": "Правка системы 5 (каменья): три горящих предела у средней, значок класса у средней, зелёный кристалл в гребне вершины",
+      "source": "Правка art/generated/card-concepts/card2-05-gems__nb2.jpg; образцы — design/ui/assets/art/icons/cls-tank.png, r7.png",
+      "refs": [
+        "art/generated/card-concepts/card2-05-gems__nb2.jpg",
+        "design/ui/assets/art/icons/cls-tank.png",
+        "design/ui/assets/art/icons/r7.png"
+      ],
+      "subject": "1. On the middle card, the left rail holds five rune stones: the upper two glow turquoise, the lower three are dark. Make the third stone from the top glow turquoise too, like the two above it, so the upper three glow and the lower two stay dark.\n2. On the middle card, the bottom left corner holds a large dark six-sided stone. Replace it with the class icon from the second attached picture — the shield on a hexagonal tile — the same as in the bottom left corner of the left and the right card.\n3. On the right card, the crest at the top center holds a turquoise six-sided stone. Replace it with the green rarity crystal from the third attached picture — a faceted almond-shaped green crystal glowing from within, the same size and place as the violet crystal at the top of the middle card."
+    },
+    {
+      "id": "card2-06-insignia-fix",
+      "category": "card-concepts",
+      "title": "Правка системы 6 (знаки отличия): медальон стихии вместо глобуса, пять шевронов у вершины, водяной герб у слабого и средней",
+      "source": "Правка art/generated/card-concepts/card2-06-insignia__nb2.jpg: модель прочла Earth как планету",
+      "refs": [
+        "art/generated/card-concepts/card2-06-insignia__nb2.jpg"
+      ],
+      "subject": "1. In the top right corner of each of the three cards there is a picture of the planet Earth. Replace it on all three cards with the element medallion: a round medallion with a rim of dark iron and old gold around a raw chunk of amber-orange rock glowing from within (#EB9D40) — a stone, not a planet: no globe, no map, no continents, no oceans.\n2. On the right card, the rank badge at the upper left shows gold chevrons, but some of them form a diamond. Make it exactly five solid gold chevrons, all pointing up, stacked evenly one above another, with the level number 1200 under them as now.\n3. Behind the hero on the left and the middle card, add a large faint emblem of a shield painted on the dark wall behind his head and shoulders, like a coat of arms — the same shield shape as the golden shield on the right card: barely visible on the left card, clearer and faintly gilded on the middle card."
+    },
+    {
+      "id": "card2-07-casual-fix",
+      "category": "card-concepts",
+      "title": "Правка системы 7 (минимум): у средней три позиции звезды — две золотые и одна пустая",
+      "source": "Правка art/generated/card-concepts/card2-07-casual__nb2.jpg",
+      "refs": [
+        "art/generated/card-concepts/card2-07-casual__nb2.jpg"
+      ],
+      "subject": "1. On the middle card, the arc of stars over the hero's head has five places — three gold stars and two empty sockets. Make it exactly three places, centered over his head: two gold stars and one empty socket on the right. Remove the other two places and continue the dark background there.\n2. The left card keeps its single empty socket and the right card its five gold stars."
+    },
+    {
+      "id": "card2-09-sash-fix",
+      "category": "card-concepts",
+      "title": "Правка системы 9 (перевязь): пять зарубок на клинке вершины вместо шести",
+      "source": "Правка art/generated/card-concepts/card2-09-sash__nb2.jpg",
+      "refs": [
+        "art/generated/card-concepts/card2-09-sash__nb2.jpg"
+      ],
+      "subject": "1. On the right card, the blade of the sword along the left edge has six glowing turquoise notches. Remove the lowest one and continue the blade there, so exactly five glowing notches remain, evenly spaced.\n2. The left and the middle card keep their five notches each."
+    },
+    {
+      "id": "card2-10-constellation-fix",
+      "category": "card-concepts",
+      "title": "Правка системы 10 (созвездие и карст): пять отдельных кристаллов вместо кучек, без второго созвездия на груди вершины",
+      "source": "Правка art/generated/card-concepts/card2-10-constellation__nb2.jpg",
+      "refs": [
+        "art/generated/card-concepts/card2-10-constellation__nb2.jpg"
+      ],
+      "subject": "1. On the right card, a second constellation — five stars joined in a pentagon — lies over the hero's chest and key. Remove it completely and restore his coat, chain and key there. The arc of five bright stars above his head stays.\n2. At the bottom of each card the carst crystals stand in clusters. On every card replace them with exactly five separate single crystals of the same size, standing in one straight row across the bottom of the portrait, evenly spaced with gaps between them, like five candles. Left card: all five are matte grey-white crystal with no light. Middle card: the three on the left glow turquoise from within, the two on the right are matte grey-white. Right card: all five glow turquoise and their light rises onto the hero."
+    },
+    {
+      "id": "card2-05-gems-fix2",
+      "category": "card-concepts",
+      "title": "Правка системы 5 (каменья), вторая: вернуть значок класса слабому",
+      "source": "Правка art/generated/card-concepts/card2-05-gems-fix__nb2.jpg: первая правка всё исправила, но в нижнем левом углу слабой карточки заменила значок класса тёмным камнем; образец — design/ui/assets/art/icons/cls-tank.png",
+      "refs": [
+        "art/generated/card-concepts/card2-05-gems-fix__nb2.jpg",
+        "design/ui/assets/art/icons/cls-tank.png"
+      ],
+      "subject": "1. On the left card, the bottom left corner holds a large dark six-sided stone. Replace it with the class icon from the second attached picture — the shield on a hexagonal tile — the same as in the bottom left corner of the middle and the right card. Nothing else changes."
+    },
+    {
+      "id": "card2-07-casual-fix2",
+      "category": "card-concepts",
+      "title": "Правка системы 7 (минимум), вторая: у средней три позиции звезды",
+      "source": "Правка art/generated/card-concepts/card2-07-casual-fix__nb2.jpg: после первой правки у средней пять позиций — пустая, золотая, золотая, пустая, пустая",
+      "refs": [
+        "art/generated/card-concepts/card2-07-casual-fix__nb2.jpg"
+      ],
+      "subject": "1. On the middle card, the arc of star places over the hero's head reads from left to right: an empty socket, a gold star, a gold star, an empty socket, an empty socket. Delete the leftmost empty socket and the rightmost empty socket and continue the dark background there, so three places remain: gold star, gold star, empty socket. Nothing else changes."
+    },
+    {
+      "id": "card2-09-sash-fix2",
+      "category": "card-concepts",
+      "title": "Правка системы 9 (перевязь), вторая: пять зарубок на всех трёх клинках",
+      "source": "Правка исходника art/generated/card-concepts/card2-09-sash__nb2.jpg: на всех трёх клинках по шесть зарубок; первая правка (card2-09-sash-fix) удлинила клинок вершины и оставила шесть",
+      "refs": [
+        "art/generated/card-concepts/card2-09-sash__nb2.jpg"
+      ],
+      "subject": "1. Each of the three swords along the left edge has six notches on its blade. On every card fill the lowest, sixth notch with plain steel, the same as the blade around it, so every blade has exactly five notches: the left card — five dark notches; the middle card — three glowing turquoise at the top and two dark below; the right card — five glowing turquoise. Do not change the length, the width or the position of the swords. Nothing else changes."
+    },
+    {
+      "id": "card2-10-constellation-fix2",
+      "category": "card-concepts",
+      "title": "Правка системы 10 (созвездие и карст), вторая: пять кристаллов в пяти чашах",
+      "source": "Правка art/generated/card-concepts/card2-10-constellation-fix__nb2.jpg: кристаллы по-прежнему стоят тремя кучками",
+      "refs": [
+        "art/generated/card-concepts/card2-10-constellation-fix__nb2.jpg"
+      ],
+      "subject": "1. Along the bottom of the portrait on each card, the carst crystals stand in three clusters. Replace them on every card with a row of exactly five small iron cups, evenly spaced across the bottom of the portrait with gaps between them, each cup holding one single upright crystal — five cups, five crystals. Left card: all five crystals are matte grey-white with no light. Middle card: the three crystals on the left glow turquoise from within, the two on the right are matte grey-white. Right card: all five glow turquoise and their light rises onto the hero. Nothing else changes."
+    },
+    {
+      "id": "card2-01-crown-fix2",
+      "category": "card-concepts",
+      "title": "Правка системы 1 (корона), вторая: убрать лишний значок мечей с плашки имени",
+      "source": "Правка art/generated/card-concepts/card2-01-crown-fix__nb2.jpg: на средней и правой карточке у правого края плашки имени остался круглый значок скрещённых мечей — повтор значка мощи",
+      "refs": [
+        "art/generated/card-concepts/card2-01-crown-fix__nb2.jpg"
+      ],
+      "subject": "1. On the middle and the right card, a round badge with crossed swords sits at the right end of the name plaque. Remove it on both cards and continue the plain blank name plaque there, the same as on the left card. The small crossed swords right before the combat power numbers stay. Nothing else changes."
+    },
+    {
+      "id": "card2-03-corners-fix2",
+      "category": "card-concepts",
+      "title": "Правка системы 3 (углы и крылья), вторая: по три пера в крыльях средней карточки",
+      "source": "Правка art/generated/card-concepts/card2-03-corners-fix__nb2.jpg: у средней карточки правое крыло из четырёх перьев — тёмное, два золотых, тёмное",
+      "refs": [
+        "art/generated/card-concepts/card2-03-corners-fix__nb2.jpg"
+      ],
+      "subject": "1. On the middle card, the wing on the right side of the frame has four feathers: a dark one on top, two gold ones, and a dark one at the bottom. Remove the dark feather at the bottom, so this wing has exactly three feathers — one dark on top and two gold — the same as the wing on the left side of the middle card. Nothing else changes."
+    },
+    {
+      "id": "card2-08-tarot-fix",
+      "category": "card-concepts",
+      "title": "Правка системы 8 (таро): убрать второй значок класса у вершины",
+      "source": "Правка art/generated/card-concepts/card2-08-tarot__nb2.jpg: у правой карточки в нижнем правом углу лишний круглый значок со щитом — второй значок класса",
+      "refs": [
+        "art/generated/card-concepts/card2-08-tarot__nb2.jpg"
+      ],
+      "subject": "1. On the right card, in the bottom right corner next to the combat power number, there is a round badge with a shield. Remove it and continue the golden frame and the dark plate there, so the right card has only one class badge — the one in the bottom left corner, like the other two cards. Nothing else changes."
+    },
+    {
+      "id": "card2-02-medallion-fix2",
+      "category": "card-concepts",
+      "title": "Правка системы 2 (медальон), вторая: горящие дуги пределов подряд",
+      "source": "Правка art/generated/card-concepts/card2-02-medallion-fix__nb2.jpg: у средней карточки горят три дуги из пяти, но вразброс — верхняя левая, левая и правая",
+      "refs": [
+        "art/generated/card-concepts/card2-02-medallion-fix__nb2.jpg"
+      ],
+      "subject": "1. On the middle card, the ring of the big round medallion around the number 512 is made of five arc segments; three glow turquoise and two are dark iron, but they are mixed. Rearrange the light so the glowing arcs run in order clockwise from the top: the three arcs of the right half of the ring — from the top down the right side to the bottom — glow turquoise, and the two arcs of the left half of the ring are dark iron. Keep exactly three glowing arcs and two dark ones. Nothing else changes."
+    }
+  ]
+}

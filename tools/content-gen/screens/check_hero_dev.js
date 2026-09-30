@@ -26,8 +26,9 @@
       вверх-вниз в запасах — прокрутка, вбок — перетаскивание, на героя мимо места — в своё место; из места в запасы — снять;
       призрак и подсветка убираются, слушатели снимаются, щелчок после броска гасится.
    9. Режим «Игрок»: служебных слов нет (SERVICE из check_player_view.js); режим «Команда» рисуется.
-   10. Вёрстка — расчётом размеров на 932 × 430 и 844 × 390: вкладки карточки, окно снаряжения, анимации и превью помещаются; в шапке
-      лицо в раме рунных камней оставляет место имени, камни не налезают; камни ворот — на оси пути; ряд камней анимации — над подписью.
+   10. Вёрстка — расчётом размеров на 932 × 430 и 844 × 390: вкладки большой карточки героя (правая колонка рядом с портретом),
+      окно снаряжения, анимации и превью помещаются; в шапке большой карточки остаётся место имени; камни у портрета не налезают друг
+      на друга и на кружок уровня; камни ворот — на оси пути; ряд камней анимации — над подписью.
    11. UI-кит (KIT_EXTRA): разделы «Рунные пределы» (камень в четырёх состояниях и размерах, плитки, шапка, путь, строки) и «Развитие
       героя и снаряжение»; сценарии презентации, карта экранов: hero, equipment, equipment-item, talismans — готовы.
    Запуск: node tools/content-gen/screens/check_hero_dev.js */
@@ -65,13 +66,15 @@ const JS = read('screens/hero-dev.js'), CSS = read('screens/hero-dev.css');
   const OLD = [[/function heroDev\(/, 'heroDev'], [/const hdIt = /, 'hdIt'], [/<div class="ladder">/, 'лестница развития'], [/\n  lvlup\(\) \{/, 'ACT.lvlup'],
     [/\n  limit\(\) \{/, 'ACT.limit'], [/\n  valor\(\) \{/, 'ACT.valor'], [/\n  valordo\(v\) \{/, 'ACT.valordo'], [/\n  limitdo\(v\) \{/, 'ACT.limitdo']];
   for (const [re, what] of OLD) if (re.test(main)) say(`index.html: остался прежний ${what} — развитие живёт в screens/hero-dev.js`);
-  const hd = main.match(/function heroDetail\(h\)[\s\S]*?\n\}/);
+  /* вкладки героя — heroDetail (index.html); большая карточка (screens/heroes.js) берёт их без шапки: портрет у неё слева */
+  const hd = main.match(/function heroDetail\(h(?:, o = \{\})?\)[\s\S]*?\n\}/);
   if (!hd) say('index.html: нет heroDetail');
   else {
     if (!/hdPower\(h\)/.test(hd[0])) say('index.html: вкладка «Развитие» не зовёт hdPower');
     if (!/t === 'gear'[\s\S]{0,300}eqRow\(h\)[\s\S]{0,120}talRow\(h\)[\s\S]{0,120}hdGearFoot\(h\)/.test(hd[0])) say('index.html: вкладка «Снаряжение» — не места снаряжения, талисманов и hdGearFoot');
     if (!/\['power', 'Развитие'\], \['gear', 'Снаряжение'\], \['skills', 'Навыки'\], \['path', 'Путь'\]/.test(hd[0])) say('index.html: у карточки героя не четыре вкладки «Развитие», «Снаряжение», «Навыки», «Путь»');
   }
+  if (!/heroDetail\(h, \{ head: false/.test(read('screens/heroes.js'))) say('screens/heroes.js: большая карточка героя не берёт вкладки из heroDetail — развитие без неё');
   if (!/const grow = typeof heroDev !== 'function'/.test(main)) say('index.html: шахта зовёт heroDev без проверки, что экран подключён');
   if (!/const valorSt = /.test(main) || !/const heroSt = /.test(main) || !/INV\.hero\.valorPct/.test(main.match(/const valorSt = [^\n]*/)[0] || '')) say('index.html: нет valorSt и heroSt — доблесть по INV.hero.valorPct');
   const iV = main.indexOf('EB.heroSrc = h => { const s = src0(h);'), iB = main.indexOf('const BM_SRC0 = EB.heroSrc;');
@@ -121,7 +124,7 @@ function load(opt = {}) {
     ACT, OV, FLOWS, KH, MAP, KIT_EXTRA, H, EB, INV, BAG, BM, RS, RSI, RSS, render, initialState, setTeam, fmt, ROMAN,
     heroDev, heroSt, valorSt, BM_SRC0, lvlCost, heroKit, hrTwin: typeof hrTwin === 'function' ? hrTwin : null, rsChTitle,
     HD_DATA, HD_VIEW, HD_SRV, GR_SRV, hdPower, hdGearFoot, hdKitHtml, hdQty, hdOpens, hdChapter, hdBmAt, grWin, grPlan, grDrop, grPick, grBind,
-    RP_ART, rpNext, rpRow, rpPost, rpKitHtml, hdKitHero, heroHead: typeof heroHead === 'function' ? heroHead : null,
+    RP_ART, rpNext, rpRow, rpPost, rpKitHtml, hdKitHero, heroHead: typeof heroHead === 'function' ? heroHead : null, HC_VIEW: typeof HC_VIEW !== 'undefined' ? HC_VIEW : { big: [5, 7], bigMax: 40 },
     TB, TL: window.EN_TALISMANS, tlEq, tlWhy, tlFam, tlR, tlMul, tlMulOf, EQD: window.EN_EQUIPMENT, eqItem, eqWornList, eqGain, eqMulOf, EQ_SRV, TL_SRV,
   })`, ctx);
   return { T, els, rootCls, timers, wl, document, tick: ms => { now += ms; }, setNow: ms => { now = ms; }, game: () => (els.game ? els.game.innerHTML : '') };
@@ -640,7 +643,6 @@ run('режим «Игрок»', () => T.setTeam(false));
   const I = html;
   const SCR = [{ n: '932 × 430', W: 932, H: 430, top: 46, rail: 78, small: false }, { n: '844 × 390', W: 844, H: 390, top: 44, rail: 72, small: true }];
   const spM = px(I, /--sp-m:(\d+)px/, '--sp-m'), spS = px(I, /--sp-s:(\d+)px/, '--sp-s');
-  const face = px(I, /\.hd-face\{[^}]*height:(\d+)px/, '.hd-face height'), faceSm = px(I, /@container main \(max-height: 360px\)\{[\s\S]*?\.hd-face\{width:\d+px;height:(\d+)px/, '.hd-face компакт');
   const tabH = px(I, /\.tabs button\{[^}]*height:(\d+)px/, '.tabs button height'), tabPad = px(I, /\.tabs\{[^}]*padding:(\d+)px/, '.tabs padding');
   const trackH = px(CSS, /\.hdv-track\{[^}]*height:(\d+)px/, '.hdv-track height'), icoN = px(CSS, /\.hdv-ic\{[^}]*height:(\d+)px/, '.hdv-ic');
   const title = px(CSS, /\.hdv-t\{font:600 (\d+)px/, '.hdv-t'), titleSm = px(CSS, /@container main \(max-height: 360px\)\{[\s\S]*?\.hdv-t\{font-size:(\d+)px/, '.hdv-t компакт');
@@ -651,14 +653,17 @@ run('режим «Игрок»', () => T.setTeam(false));
   const eqSlot = px(CSS, /\.hd-gear \.eq-slot\{width:(\d+)px/, '.hd-gear .eq-slot'), eqSlotSm = px(CSS, /@container main \(max-height: 360px\)\{[\s\S]*?\.hd-gear \.eq-slot\{width:(\d+)px/, '.hd-gear .eq-slot компакт');
   const tlSlotH = px(CSS, /\.hd-gear \.tl-slot\{min-height:(\d+)px/, '.hd-gear .tl-slot'), tlSlotHSm = px(CSS, /@container main \(max-height: 360px\)\{[\s\S]*?\.hd-gear \.tl-slot\{min-height:(\d+)px/, '.hd-gear .tl-slot компакт');
   const w = (s, k, caps) => Math.ceil(String(s).length * k * (caps ? 0.7 : 0.5));
-  /* рунные пределы: пропорция камня, столбы у лица в шапке, камни-ворота на пути, ряд камней в анимации, строка в превью */
-  const CM = /@container main \(max-height: 360px\)\{[\s\S]*?/.source;
+  /* рунные пределы: пропорция камня, столбы у портрета большой карточки, камни-ворота на пути, ряд камней в анимации, строка в превью */
   const [ar1, ar2] = (CSS.match(/\.rp-s\{[^}]*aspect-ratio:(\d+)\/(\d+)/) || [0, 0, 0]).slice(1).map(Number);
   if (!ar1 || !ar2) say('вёрстка: нет пропорции камня .rp-s');
-  const faceW = px(I, /\.hd-face\{position:relative;width:(\d+)px/, '.hd-face width'), faceWSm = px(I, new RegExp(CM + /\.hd-face\{width:(\d+)px/.source), '.hd-face компакт width');
-  const rpH = px(CSS, /\.rp\.h\{position:relative;flex:none;width:(\d+)px/, '.rp.h width'), rpHPad = px(CSS, /\.rp\.h\{position:relative;flex:none;width:\d+px;padding:(\d+)px 0\}/, '.rp.h padding');
-  const rpHSm = px(CSS, new RegExp(CM + /\.rp\.h\{width:(\d+)px/.source), '.rp.h компакт'), rpHPadSm = px(CSS, new RegExp(CM + /\.rp\.h\{width:\d+px;padding:(\d+)px 0\}/.source), '.rp.h компакт padding');
-  const rpGap = px(CSS, /\.hd-rp\{display:flex;align-items:stretch;gap:(\d+)px\}/, '.hd-rp gap'), rpGapSm = px(CSS, new RegExp(CM + /\.hd-rp\{gap:(\d+)px\}/.source), '.hd-rp компакт gap');
+  /* большая карточка героя (screens/heroes.css, данные вида — HC_VIEW в screens/heroes.js): шапка правой колонки и столбы камней у портрета;
+     компактный вид — контейнер карточки ниже 340 px (@container hcb) */
+  const HCSS = read('screens/heroes.css'), CB = /@container hcb \(max-height: 340px\)\{[\s\S]*?/.source, HC = T.HC_VIEW;
+  const h2 = px(HCSS, /\.hcb-id h2\{font:600 (\d+)px/, '.hcb-id h2'), h2Sm = px(HCSS, new RegExp(CB + /\.hcb-id h2\{font-size:(\d+)px/.source), '.hcb-id h2 компакт');
+  const idGap = px(HCSS, /\.hcb-id\{display:flex;flex-direction:column;gap:(\d+)px/, '.hcb-id gap'), idGapSm = px(HCSS, new RegExp(CB + /\.hcb-id\{gap:(\d+)px/.source), '.hcb-id gap компакт');
+  const bmF = px(I, /\.hd-bm b\{font:600 (\d+)px/, '.hd-bm b'), bmFSm = px(HCSS, new RegExp(CB + /\.hcb \.hd-bm b\{font-size:(\d+)px/.source), '.hcb .hd-bm b компакт');
+  const pRpTop = px(HCSS, /\.hcb-rp \.rp\.h\{position:absolute;top:(\d+)%/, '.hcb-rp .rp.h top'), pRpBot = px(HCSS, /\.hcb-rp \.rp\.h\{[^}]*bottom:(\d+)%/, '.hcb-rp .rp.h bottom');
+  const pRpW = px(HCSS, /\.hcb-rp \.rp\.h\{[^}]*width:(\d+)px/, '.hcb-rp .rp.h width'), pRpWSm = px(HCSS, new RegExp(CB + /\.hcb-rp \.rp\.h\{width:(\d+)px/.source), '.hcb-rp .rp.h компакт');
   const gateSt = px(CSS, /\.hdv-gate \.rp-s\{width:(\d+)px\}/, '.hdv-gate .rp-s'), gateLbl = px(CSS, /\.hdv-gate small\{position:absolute;top:(\d+)px/, '.hdv-gate small top');
   const segH = px(CSS, /\.hdv-seg\{[^}]*height:(\d+)px;margin-top:\d+px/, '.hdv-seg height'), segTop = px(CSS, /\.hdv-seg\{[^}]*height:\d+px;margin-top:(\d+)px/, '.hdv-seg margin-top');
   const markSt = px(CSS, /\.hdfx-mark \.rp-s\{width:(\d+)px\}/, '.hdfx-mark .rp-s'), rowTop = px(CSS, /\.hdfx-row\{position:absolute;left:0;top:(\d+)px/, '.hdfx-row top');
@@ -669,9 +674,10 @@ run('режим «Игрок»', () => T.setTeam(false));
     cnt.layout++;
     const mainW = X.W - X.rail, mainH = X.H - X.top, compact = mainH <= 360;
     const inW = mainW - 2 * spM, inH = mainH - 2 * spM;
-    const left = Math.max(250, Math.floor(inW * 34 / 100)), panelW = inW - left - spM;
-    const hdPadV = compact ? 8 : spM, hdPadH = compact ? 10 : spM;
-    const bodyW = panelW - 2 - 2 * hdPadH, bodyH = inH - 2 - 2 * hdPadV - (compact ? faceSm : face) - spS - (tabH + 2 * tabPad + 2) - spS;
+    /* большая карточка: портрет — по высоте в пропорции HC_VIEW.big, не шире bigMax %; справа — шапка, вкладки и тело вкладки */
+    const cq = inH <= 340, pw = Math.min(Math.floor(inW * HC.bigMax / 100), Math.floor(inH * HC.big[0] / HC.big[1])), bodyW = inW - pw - spM;
+    const vitH = (cq ? bmFSm : bmF) + 5 + 16 + 5 + 15, headH = Math.max((cq ? h2Sm : h2) + 2 * (cq ? idGapSm : idGap) + 2 * 22, vitH);
+    const bodyH = inH - headH - spS - (tabH + 2 * tabPad + 2) - spS;
     /* «Развитие»: путь, карточка шага, тихая строка */
     const gap = compact ? 6 : spS, padN = compact ? 8 : 10, tH = Math.ceil((compact ? titleSm : title) * 1.1);
     const nextH = 2 + 2 * padN + Math.max(icoN, goH, tH + 6 + qtyH);
@@ -687,14 +693,17 @@ run('режим «Игрок»', () => T.setTeam(false));
     if (nextW > bodyW) say(`вёрстка ${X.n}: карточка шага ${nextW} px, а ширина ${bodyW} px`);
     const quietW = 5 * (18 + 5 + w('1234', 14)) + 4 * 14 + 12 + 28;
     if (quietW > bodyW) say(`вёрстка ${X.n}: строка характеристик ${quietW} px, а ширина ${bodyW} px`);
-    /* рунные пределы: шапка — лицо между столбами камней, камни помещаются по высоте лица, имени хватает места; путь — камни-ворота
-       на оси отрезков, подпись уровня — в дорожке */
-    const fW = compact ? faceWSm : faceW, fH = compact ? faceSm : face, pw = compact ? rpHSm : rpH, pp = compact ? rpHPadSm : rpHPad, pg = compact ? rpGapSm : rpGap;
-    const pstep = (fH - 2 * pp - 5 * stH(pw)) / 4, block = 2 * pw + 2 * pg + fW, hdGap = compact ? 10 : spM;
-    if (pstep < 2) say(`вёрстка ${X.n}: камни в столбах шапки налезают — шаг ${pstep.toFixed(1)} px`);
-    const vitW = Math.max(24 + 6 + w('123 456', compact ? 24 : 30), 16 * 5 + 6 + w('5 / 5', 12), w('ур. 1200 / 1200', 12) + 8);
-    const idW = bodyW - block - 2 * hdGap - vitW;
-    if (idW < 150) say(`вёрстка ${X.n}: имени в шапке остаётся ${idW} px — рама рунных камней слишком широка`);
+    /* рунные пределы: столбы камней у портрета большой карточки — ниже кружков уровня и стихии, камни не налезают; шапке хватает места
+       на имя рядом с мощью; путь — камни-ворота на оси отрезков, подпись уровня — в дорожке. Столбы делят TOP камней (RP_VIEW.split
+       в hero-dev.js, ADR-0031): в столбе — больший из двух кусков */
+    const split = +((JS.match(/const RP_VIEW = \{ split: (\d+) \}/) || [0, TOP])[1]), perPost = Math.max(Math.min(split, TOP), TOP - Math.min(split, TOP));
+    const sw = cq ? pRpWSm : pRpW, postH = inH * (100 - pRpTop - pRpBot) / 100, pstep = (postH - perPost * stH(sw)) / Math.max(1, perPost - 1);
+    if (pstep < 2) say(`вёрстка ${X.n}: камни в столбах у портрета налезают — шаг ${pstep.toFixed(1)} px`);
+    const circle = Math.max(22, Math.min(38, pw * 19 / 100));
+    if (inH * pRpTop / 100 < 6 + circle + 4) say(`вёрстка ${X.n}: верхний камень у портрета залезает под кружок уровня`);
+    const vitW = Math.max(24 + 6 + w('123 456', cq ? bmFSm : bmF), 16 * 5 + 6 + w('5 / 5', 12), w('ур. 1200 / 1200', 12) + 8);
+    const idW = bodyW - 32 - 2 * spM - 2 * 32 - 8 - vitW;   // «Назад», два «‹ ›» и промежутки
+    if (idW < 150) say(`вёрстка ${X.n}: имени в шапке большой карточки остаётся ${idW} px`);
     if (Math.abs(stH(gateSt) / 2 - (segTop + segH / 2)) > 1.5 || gateLbl < stH(gateSt) + 2 || gateLbl + 10 > trackH) say(`вёрстка ${X.n}: камни ворот не на оси пути или подпись уровня не влезает в дорожку ${trackH} px`);
     /* «Снаряжение» в карточке: две группы мест и низ */
     const es = compact ? eqSlotSm : eqSlot, tl = compact ? tlSlotHSm : tlSlotH, g2 = compact ? 6 : spS;
@@ -733,7 +742,7 @@ run('режим «Игрок»', () => T.setTeam(false));
     if (20 + 8 + w('Рунный предел', 13) + 8 + rowW + 5 + 12 + 5 + rowW > lossW) say(`вёрстка ${X.n}: строка «Рунный предел» в превью шире колонки ${lossW} px`);
     const dlgH = 50 + 40 + spM + (14 + 6 * 24 + 20 + 16) + spM + 58;
     if (dlgH > X.H - 24) say(`вёрстка ${X.n}: превью доблести ${dlgH} px при высоте ${X.H - 24}`);
-    lay.push(`${X.n}: карточка героя ${bodyW} × ${bodyH} — «Развитие» ${nextW} × ${powerH}, строка характеристик ${quietW}, «Снаряжение» ${gearH}; шапка — лицо в раме рунных камней ${block} px, шаг камней ${pstep.toFixed(1)}, имени ${idW} px; окно снаряжения ${winW} × ${winH} — места ${L}, карточка сравнения ${cardH}, запасы ${cols} в ряд, видно ${rowsVis} ряда; превью доблести ${dlgW} × ${dlgH}; ряд камней в анимации до ${Math.round(rowBot)} px`);
+    lay.push(`${X.n}: большая карточка — портрет ${pw} × ${inH}, справа ${bodyW} × ${bodyH} — «Развитие» ${nextW} × ${powerH}, строка характеристик ${quietW}, «Снаряжение» ${gearH}; шапка ${headH} px, имени ${idW} px; камни у портрета ${sw} px, шаг ${pstep.toFixed(1)}; окно снаряжения ${winW} × ${winH} — места ${L}, карточка сравнения ${cardH}, запасы ${cols} в ряд, видно ${rowsVis} ряда; превью доблести ${dlgW} × ${dlgH}; ряд камней в анимации до ${Math.round(rowBot)} px`);
   }
 }
 

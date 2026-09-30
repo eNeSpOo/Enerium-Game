@@ -1,5 +1,5 @@
-/* Энериум · прототип — биомы 2–4 (screens/biomes.js). Экран «Спуска» берёт общие классы index.html (.biome, .banner, .shelf);
-   здесь — раздел UI-кита «Биомы спуска». Отступы — токены воздуха --sp-l / --sp-m / --sp-s. */
+/* Энериум · прототип — биомы 2–4 (screens/biomes.js). Окно «Спуск» — screens/descent.css; здесь — раздел UI-кита «Биомы спуска».
+   Отступы — токены воздуха --sp-l / --sp-m / --sp-s. */
 .bk-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-m)}
 .bk-b{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0;padding:var(--sp-s);border:1px solid var(--iron);border-radius:12px;background:#0c0f12}
 .bk-ar{position:relative;height:120px;border-radius:9px;overflow:hidden;border:1px solid #262b31}

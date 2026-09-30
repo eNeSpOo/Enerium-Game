@@ -3,6 +3,7 @@
 Что куда идёт — в ui-art.json рядом: путь в прототипе → картинка из art/generated/.
 Картинки сжимаются до размера для экрана телефона, исходники не трогаются.
 mirror: true — отразить по горизонтали: на карте герой смотрит вправо, на врагов, а враг — влево, на героев.
+crop: [x0, y0, x1, y1] — вырезать кадр из исходника до сжатия (пиксели исходника), например портрет по пояс из картинки в полный рост.
 Путь в прототипе на .png — значок с прозрачностью: пустые поля обрезаются по альфе, fit: N вписывает эмблему в N % кадра по центру.
 
   python tools/art-gen/export_ui.py
@@ -31,6 +32,8 @@ def main():
         size = tuple(src.get("size", spec["size"]))
         png = dst.lower().endswith(".png")
         with Image.open(ROOT / "art/generated" / src["from"]) as im:
+            if src.get("crop"):
+                im = im.crop(tuple(src["crop"]))
             pic = fit_icon(im.convert("RGBA"), size, src.get("fit")) if png else im.convert("RGB").resize(size, Image.LANCZOS)
         if src.get("mirror"):
             pic = ImageOps.mirror(pic)

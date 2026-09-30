@@ -1,0 +1,144 @@
+{
+  "name": "Карточка героя: десять пробных концепций вида. Слова автора 30.09.2026: «Карточка героя, её иконки и информация на ней должна говорить игроку, насколько сильный герой находится перед ним… Сгенери мне через наше API 10 пробных вариантов видов карты героев». Карточка в коллекции — вертикальная, около 9:16. На карточке — доблесть, рунные пределы, редкость, боевая мощь, класс, стихия значками; уровень и имя. Каждая картинка — один вариант: три карточки одного героя в ряд, слабый → сильный → вершина, чтобы автор видел, как вариант передаёт рост силы (референс автора: рамка богаче, звёзд больше, сияние и искры растут). Стиль — art/style/style.md: тёмное фэнтези, живопись, свет снизу, железо, золото, карст. Пробы для выбора стиля: в прототип не выгружаются",
+  "plan": {
+    "Три ступени на каждой картинке": {
+      "слева — слабый": "обычная (белый кристалл r1), доблесть 0 из 1 — одна пустая позиция, предел 0 — все пять камней погашены, ур. 34, мощь 1240",
+      "в центре — сильный": "эпическая (фиолетовый r4), доблесть 2 из 3, предел III — горят три камня слева, ур. 512, мощь 48350",
+      "справа — вершина": "вневременная (зелёный r7), доблесть 5 из 5, предел V — горят все пять, ур. 1200, мощь 912780, максимум эффектов"
+    },
+    "Раскладка — одна на все варианты": "сверху по центру — кристалл редкости в гребне, под ним дуга звёзд доблести; слева вверху — уровень, справа вверху — медальон стихии; по бокам портрета — рунные камни: слева I–III, справа IV–V; внизу — пустая плашка имени, под ней значок класса и мощь со скрещёнными мечами",
+    "Десять концепций": {
+      "card-01-filigree": "золотая филигрань, как референс автора: от тусклой бронзы к золоту с крыльями, сиянием и искрами",
+      "card-02-karst": "тёмный базальт, в нём просыпаются жилы карста цвета редкости",
+      "card-03-mirror": "кусок нашего зеркала в серебряной кромке: осколок собирается в целое зеркало",
+      "card-04-reliquary": "готический реликварий: витражи вокруг героя загораются",
+      "card-05-tarot": "арка таро с лентой имени: нимб растёт в лучистое солнце",
+      "card-06-minimal": "минимализм «Свет снизу»: тонкая линия рамки, сила — высота и яркость света снизу",
+      "card-07-heraldry": "геральдика: знамя с гербовым гребнем и намётом",
+      "card-08-forged": "кованое железо с заклёпками и каменьями: железо перековано, раскалено, в каменьях",
+      "card-09-ether": "эфирная: рамки почти нет, сила — аура и парящие рунные камни",
+      "card-10-breakout": "выход из рамки (выбор агента): сила читается по тому, насколько герой перерос карточку — видно даже на крошечной карточке сетки, а в Unity это два слоя с параллаксом"
+    }
+  },
+  "notes": [
+    "Герой — Брокк Первый Ключ (c2-46, дворф-танк, Земля): сильный силуэт со щитом и ключом, лицо читается; янтарь Земли не спорит с цветами трёх редкостей — белым, фиолетовым, зелёным. Образец — исходник портрета из art/generated/heroes (928×1152), в прототипе он же уменьшенный — design/ui/assets/art/heroes/c2-46.jpg",
+    "Референсы — картинки-образцы: модель повторяет наши одобренные значки — кристалл редкости (образец формы — r4, цвета трёх ступеней словами), рунные камни limits/stone-on и stone-off, доблесть, боевая мощь, класс cls-tank. Медальона стихии в выгрузке нет — он словами, по плану card-marks.json. Первая проба (card-01, 9 референсов: три кристалла r1, r4, r7) путала капли кристаллов с рунными камнями — отсюда один образец кристалла и раскладка отдельным списком «где что» и «что на каждой карточке»",
+    "Надписей словами нет: кириллицу модель коверкает. Только цифры уровня и мощи, плашка имени пустая — имя пишет интерфейс",
+    "Размер 2K: на 1K карточка выходит около 400 px в ширину, мелкие значки не разглядеть"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG, the same painting as the attached hero portrait. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, deep near-black shadows. Card frames are hand-crafted and worn — dark forged iron, old gold, weathered stone, tarnished silver, carst crystals that glow from within — rich in detail, precious and dramatic. Light tells the story: it comes from below — from glowing crystals, cracks and gems — cold turquoise (#48E5D4) against warm gold and amber (#DDBC7A, #E6A84B); dust motes and sparks float in the light. Dark fantasy: mystery and gravity, high contrast. No photorealism, no 3D-render look, no anime, no flat vector style.",
+  "negative": "No words, no letters, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no watermark, no signature, no logo, no captions, titles or labels above or under the cards. The only characters anywhere in the picture are the digits of the level and combat power numbers given above — no word Level, no Lv, no letters on any badge; the name plaque stays blank. No pentagrams, no occult signs, no crosses; every star is a solid compass star with four long rays. No phone mockup, no hands holding the cards, no table, no perspective, no tilted or overlapping cards, no fourth card. The hero has exactly two arms and two hands; no empty eyes.",
+  "categories": {
+    "card-concepts": {
+      "aspect": "16:9",
+      "size": "2K",
+      "refs": [
+        "art/generated/heroes/hero-c2-46-brokk__nb2.jpg",
+        "design/ui/assets/art/icons/r4.png",
+        "design/ui/assets/art/limits/stone-on.png",
+        "design/ui/assets/art/limits/stone-off.png",
+        "design/ui/assets/art/icons/valor.png",
+        "design/ui/assets/art/icons/power.png",
+        "design/ui/assets/art/icons/cls-tank.png"
+      ],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a concept sheet for the hero card of a dark fantasy mobile RPG, landscape 16:9. On a plain dark background — near-black slate (#0C0E11) with a soft vignette, no table, no scenery — stand exactly three vertical hero cards side by side in one row, evenly spaced and the same size. Each card is tall and narrow, in a 9:16 proportion, about five sixths of the canvas high, seen straight on, flat, not tilted, not in perspective, fully inside the canvas with a small margin. The three cards show the same hero in the same card design at three steps of power, from left to right: weak, strong, legendary. The player must feel the difference in power at a glance, before reading any number: from left to right the frame grows richer, the light brighter, the aura and the particles stronger. Each card may spill its glow and particles onto the dark background around it.\n\nAttached images, in this order: (1) the hero's portrait; (2) the rarity crystal; (3) a lit rune stone; (4) an unlit rune stone; (5) the valor star; (6) the combat power icon; (7) the class icon. They give the exact look of these elements on the cards; do not copy their plain square backgrounds.\n\nThe hero, the same on all three cards: the old dwarf from image 1 — a bald head, a stern furrowed face, a long white braided beard, a heavy brown leather coat studded with iron rivets, a round iron-rimmed shield on his arm, a heavy chain with a huge old iron key across his chest. Keep his face, clothes, colors and pose as in image 1. He is painted edge to edge inside the card's window: head in the upper third, shown down to the hips; the dark stone and amber crystals of his portrait fill the window behind him.\n\nLayout — every card has the same elements in the same places, unless the concept below says otherwise:\n- top center: the rarity crystal — the faceted almond-shaped crystal of image 2, set into the top of the frame; one per card;\n- right under it, along the top edge of the window: a short arc of valor star places. Each star is the compass star of image 5 without its tile: four long sharp rays in a cross — never a five-pointed star. A filled place is a glowing gold star; an empty place is a dark hollow star-shaped socket;\n- top left corner: a small round badge with the level number — digits only, no word such as Level or Lv;\n- top right corner: the element medallion — a small round disc, not a hexagon: a rim of dark iron and old gold around a chunk of amber rock glowing from within (Earth, #EB9D40). It is not the class icon;\n- the rune stones — tall six-sided stones in gold bezels, pointed at the top and at the bottom, exactly like images 3 and 4, never drop-shaped: a vertical column of three stones along the left edge of the window and a vertical column of only two stones along the right edge; five stones in total, never six;\n- bottom: a blank name plaque across the card — smooth, with nothing written on it. Under it one row: the class icon of image 7 on the left — a shield on a hexagonal tile, the only place on the card where this shield icon appears — and the combat power to its right: the crossed swords of image 6 followed by the number.\nThe digits are clean, bold and legible, in light warm gold.\n\nWhat each card shows:\n- Left card, weak: a milky-white rarity crystal; valor: a single star place — exactly one empty star socket and nothing more, because this hero's maximum is one star; level 34; all five rune stones unlit, dark grey like image 4; combat power 1240.\n- Middle card, strong: a violet rarity crystal (#A986EE); THREE star places — two gold stars and one empty socket; level 512; the three rune stones on the left lit with turquoise light like image 3, the two on the right unlit; combat power 48350.\n- Right card, legendary: a green rarity crystal (#5FD67A); FIVE star places, all five gold and blazing; level 1200; all five rune stones lit — three on the left, two on the right; combat power 912780."
+    }
+  },
+  "jobs": [
+    {
+      "id": "card-01-filigree",
+      "category": "card-concepts",
+      "title": "Карточка героя, концепция 1: золотая филигрань",
+      "source": "Слова автора 30.09.2026 и его референс 1: рамка богаче вместе с силой — простая, богаче, роскошная золотая с гребнем, камнем, сиянием и искрами",
+      "subject": "Concept: Gold Filigree — the frame is a piece of jewellery, and the power shows as the goldsmith's work growing richer. Left card: a plain narrow frame of dull dark bronze with flat edges and no ornament; plain bronze bezels hold the crystal, the star socket and the rune stones; no glow at all, the portrait slightly muted. Middle card: the frame is gilded; delicate gold filigree scrolls curl out of the four corners; a small pointed crest with little gold leaves holds the violet crystal; a soft violet-and-gold glow runs along the inner edge of the window; a few golden sparks drift up from the bottom. Right card: a sumptuous frame of polished old gold with dense openwork filigree along every edge; a tall crest with spread golden wings and rays around a large green crystal; the corners grow into ornate gold flourishes set with small green gems; a warm golden radiance blazes behind the whole card and spills onto the background; embers and bright gold sparks swirl around the card; a short ribbon of plain crimson silk, with nothing written on it, is draped across the top right corner as the sign of the maximum."
+    },
+    {
+      "id": "card-02-karst",
+      "category": "card-concepts",
+      "title": "Карточка героя, концепция 2: тёмный камень с жилами карста",
+      "source": "Слова автора 30.09.2026; art/style/style.md — пустой карст матовый, заряженный светится изнутри; цвета редкостей — ADR-0027",
+      "subject": "Concept: Living Karst — the frame is carved from dark basalt, and carst crystal of the rarity's color wakes inside the stone. Left card: a frame of matte dark grey basalt with rough chipped edges and a few hairline cracks; the carst in it is empty — matte grey-white crystal with no light; everything is cold and still. Middle card: the same basalt split by veins of glowing violet carst that run from the corners toward the top crystal; small violet crystals break out of the stone at the corners; violet light leaks from the cracks and lights the hero from below. Right card: the basalt is laced with bright green carst veins like frozen lightning; big clusters of glowing green crystals grow out of the top and the lower corners and break the frame's outline; green light pours up from the cracks at the bottom onto the hero; stone chips and green motes float around the card, the air shimmers."
+    },
+    {
+      "id": "card-03-mirror",
+      "category": "card-concepts",
+      "title": "Карточка героя, концепция 3: кусок зеркала в металлической кромке",
+      "source": "Слова автора 30.09.2026; осколки героя и Памяти — куски разбитого зеркала с серебряной изнанкой по сколу (jobs/hero-shard.json, jobs/memory-shards.json)",
+      "subject": "Concept: Mirror Shard — the card is a piece of a broken magic mirror, and the hero is its reflection; as the hero grows, the mirror comes together. The glass is edged with a bevelled rim of pale tarnished silver — the mirror's backing — which carries the crystal, the stars, the rune stones and the icons. Left card: a narrow jagged shard with chipped corners and several cracks across the glass; the reflection of the hero is dim, cold and misty, half faded; the silver rim is thin, dark and tarnished; no light. Middle card: a larger, cleaner piece that fills the card's shape, with only a couple of cracks near the edges; the rim is bright silver with small clasps; violet light seeps from the cracks; a few small splinters of mirror float beside it. Right card: the mirror is whole and flawless — a tall mirror in a rim of silver and old gold; the reflection is vivid and radiant; green light glows behind the glass and around the rim; a ring of mirror fragments orbits the card, catching the light; mist and glints."
+    },
+    {
+      "id": "card-04-reliquary",
+      "category": "card-concepts",
+      "title": "Карточка героя, концепция 4: готический реликварий с витражом",
+      "source": "Слова автора 30.09.2026; вариант из списка задания",
+      "subject": "Concept: Gothic Reliquary — the card is a tall reliquary shrine: a pointed lancet arch over the portrait, tracery of stone and metal, and stained-glass panels in the frame around the hero. No crosses and no religious symbols: the tracery is plain geometric. Left card: a simple reliquary of dark wood and iron; a plain arch; the stained-glass panels are dull and unlit — dusty grey glass in black lead lines. Middle card: gilded tracery; the stained-glass panels glow violet and amber, lit from behind; a small rose window at the top of the arch holds the violet crystal; warm candle light from below. Right card: a grand reliquary of old gold with pinnacles and spires rising on both sides; the rose window at the top holds the large green crystal and blazes with light; every stained-glass panel shines green and gold; rays of colored light fall on the hero; golden dust and sparks hang in the light."
+    },
+    {
+      "id": "card-05-tarot",
+      "category": "card-concepts",
+      "title": "Карточка героя, концепция 5: арка таро с лентой имени",
+      "source": "Слова автора 30.09.2026; вариант из списка задания; лента имени пустая — имя пишет интерфейс",
+      "subject": "Concept: Tarot Arch — the card is a tall painted card with a rounded arch at the top, a wide ornamental border, and a ribbon for the name across the bottom instead of the plaque, like an old tarot card. The ribbon is blank. Left card: a narrow plain border of dark worn parchment with a single thin line; a plain rounded arch; the name ribbon is faded grey cloth; no halo; muted colors. Middle card: the border is gilded and engraved with climbing vines; the ribbon is deep violet silk with gold edges; a soft halo of light rises behind the hero's head inside the arch; the keystone of the arch holds the violet crystal. Right card: the border is rich gold with green enamel inlays; a radiant sunburst of fine gold rays fills the arch behind the hero; the ribbon is green-and-gold silk and flutters; the keystone blazes with the green crystal; the rays and golden dust spill beyond the card; tiny gold motes fall like snow."
+    },
+    {
+      "id": "card-06-minimal",
+      "category": "card-concepts",
+      "title": "Карточка героя, концепция 6: минимализм «Свет снизу»",
+      "source": "Слова автора 30.09.2026; прототип интерфейса «Свет снизу» (design/ui/)",
+      "subject": "Concept: Light from Below — a restrained modern card in the spirit of our interface: the portrait is full-bleed, the frame is only a thin line of old gold with small cut corners, the icons sit on small dark plates, and the power is told mainly by one thing — the light that rises from the bottom edge in the color of the rarity. Left card: no light from below; the frame line is dull grey; the portrait is dim and slightly desaturated; the bottom sinks into shadow. Middle card: a violet glow rises from the bottom edge and lights the hero from below up to the chest; the thin frame line catches a violet reflection; a few fine motes rise. Right card: a strong green light rises from the bottom edge and floods the hero up to the face; the thin frame line glows gold along its whole length; fine motes and thin streaks of light rise upward and spill beyond the card's top edge; a soft green glow around the card."
+    },
+    {
+      "id": "card-07-heraldry",
+      "category": "card-concepts",
+      "title": "Карточка героя, концепция 7: геральдика",
+      "source": "Слова автора 30.09.2026; вариант из списка задания",
+      "subject": "Concept: Heraldry — the card is a hanging banner: the hero is painted on heavy cloth that hangs from a crossbar, with a heraldic crest above it and cloth mantling around it; the power shows as the heraldic achievement grows. The rune stones, the stars and the icons are set into the banner's border. Left card: a plain worn banner of dull dark brown cloth on a simple wooden crossbar; frayed edges; a plain iron cap holds the white crystal; no crest, no ornament, no glow. Middle card: the banner is deep violet with a gold-embroidered border and tassels; a small iron crest holds the violet crystal; short curling cloth mantling at the top corners; a soft glow. Right card: a grand banner of deep green and black with rich gold embroidery along every edge and heavy gold tassels; a crown-like crest of gold holds the large green crystal; long flowing mantling of gold and green cloth curls down both sides of the card; two crossed spears stand behind the banner; gold light and sparks; the banner stirs as if in a wind rising from below."
+    },
+    {
+      "id": "card-08-forged",
+      "category": "card-concepts",
+      "title": "Карточка героя, концепция 8: кованое железо с заклёпками и каменьями",
+      "source": "Слова автора 30.09.2026; вариант из списка задания; материалы интерфейса — кованое железо, старое золото, камень (art/style/style.md)",
+      "subject": "Concept: Forged Iron — a heavy frame of black forged iron straps, hammered and riveted like a dwarven gate, with gems set into the iron; as the hero grows, the iron is reforged, inlaid and heated. Left card: rough black iron straps with plain round rivets; empty gem sockets; cold grey light; a patch of rust. Middle card: the iron is inlaid with lines of gold; violet cabochon gems sit in claw settings at the four corners; the seams glow faintly orange with heat; a few embers rise. Right card: a massive frame of dark iron with thick gold inlay and gold-capped rivets; gems are set all along the frame, a large green gem at the top; the seams and hammer marks glow red-hot like iron just out of the forge; embers and sparks fly upward; heat shimmers above the card; molten light drips at the bottom."
+    },
+    {
+      "id": "card-09-ether",
+      "category": "card-concepts",
+      "title": "Карточка героя, концепция 9: эфирная — аура и парящие руны",
+      "source": "Слова автора 30.09.2026 — силу можно отметить партиклами и анимациями; вариант из списка задания",
+      "subject": "Concept: Ether — the card has almost no material frame, only a thin line of light; the power is the hero's aura and the rune stones floating free in the air around the portrait. Left card: a faint thin outline of pale mist; the five rune stones rest dull and still at the sides; almost no aura; the portrait is dim. Middle card: a violet aura flickers like soft flame around the hero's silhouette; the three lit rune stones lift away from the frame and glow; thin wisps of light curl around the card. Right card: a powerful green aura like spectral flame blazes around the hero and spills beyond the card; all five lit rune stones orbit the portrait on a ring of light; the valor stars shine above his head like a small constellation; motes of light rise; rings of light pulse around the crystal."
+    },
+    {
+      "id": "card-10-breakout",
+      "category": "card-concepts",
+      "title": "Карточка героя, концепция 10: выход из рамки",
+      "source": "Слова автора 30.09.2026; выбор агента: сила читается по тому, насколько герой перерос карточку — видно даже на крошечной карточке сетки; в Unity это два слоя с параллаксом. Вторая попытка: в первой герой не вышел из рамки, в гребне вершины — рунный камень вместо кристалла",
+      "subject": "Concept: Breakout — the power shows as how far the hero outgrows his card: the weaker he is, the tighter the frame holds him; the stronger he is, the further he steps out of it toward the viewer. Left card: a thick plain frame of dark stone and iron around a small window; the hero is small and fully contained inside it, slightly dim. Middle card: the frame is thinner and gilded at its edges, the window larger; the hero is bigger — the rim of his round shield crosses over the frame's left edge and casts a shadow on it; a soft violet glow. Right card: the frame is reduced to a golden base with the name plaque and four golden corners; the hero is much bigger than the window and steps out of the card toward the viewer: his shoulders, his beard and the great round shield spill over the left and right edges of the frame and hide parts of it, and his head comes forward in front of the frame, with the valor stars and the crest still visible above it. Cracks run through the golden corners where he breaks out, stone chips fly, green light erupts from below, embers and dust swirl around him. The crest at the top of every card holds the rarity crystal — white, violet, green — never a rune stone."
+    }
+  ],
+  "result": {
+    "Итог 30.09.2026": "23 запросов nb2 2K, $2.395 по счётчикам токенов (потолок задания $2,5). Правки — jobs/card-concepts-edit.json",
+    "Выбранные — по одной на вариант": {
+      "card-01-filigree": "art/generated/card-concepts/card-01-filigree-fix__nb2.jpg — огрех: рунных камней 4 / 6 / 6 вместо 5",
+      "card-02-karst": "art/generated/card-concepts/card-02-karst-fix__nb2-v2.jpg — огрех: у слабого три пустые позиции звезды вместо одной; у средней доблесть 1 из 3",
+      "card-03-mirror": "art/generated/card-concepts/card-03-mirror-fix__nb2.jpg — огрех: у вершины 4 камня; слабая карточка — треснувшее зеркало во всю карточку. Узкий осколок у слабого — в первой пробе card-03-mirror__nb2.jpg",
+      "card-04-reliquary": "art/generated/card-concepts/card-04-reliquary-fix__nb2.jpg — счёт верный",
+      "card-05-tarot": "art/generated/card-concepts/card-05-tarot-fix__nb2.jpg — огрех: у вершины 6 камней",
+      "card-06-minimal": "art/generated/card-concepts/card-06-minimal__nb2.jpg — огрех: позиций звезды 2 у слабого и 4 у средней; правка хуже — вписала ряды звёзд в плашки имени",
+      "card-07-heraldry": "art/generated/card-concepts/card-07-heraldry-fix__nb2.jpg — счёт верный",
+      "card-08-forged": "art/generated/card-concepts/card-08-forged-fix__nb2.jpg — огрех: у слабого 6 камней",
+      "card-09-ether": "art/generated/card-concepts/card-09-ether-fix__nb2.jpg — огрех: у слабого 6 камней",
+      "card-10-breakout": "art/generated/card-concepts/card-10-breakout-fix__nb2.jpg — огрех: 6 камней на всех трёх"
+    },
+    "Чему научила партия": [
+      "Идею рамки nb2 держит с первого раза; не держит счёт мелких повторяющихся значков. Пять камней 3+2 модель достраивает до симметричных 3+3, одну позицию звезды — до ряда из двух–пяти",
+      "Девять картинок-образцов путают: капли кристаллов редкости модель ставила вместо рунных камней. Один образец формы кристалла и цвета словами — надёжнее",
+      "Раскладку лучше давать двумя списками: «где что стоит» и «что на каждой карточке». Слово level в промте модель пишет на значке — только «digits only»",
+      "EDIT MODE надёжно заменяет и убирает крупное — слово, значок, кристалл в гребне, лишнюю цифру; счёт камней и звёзд правит через раз и иногда ломает соседнее",
+      "Для прототипа счёт не важен: звёзды, камни и цифры рисует интерфейс из данных, картинка задаёт только рамку, свет и частицы"
+    ]
+  }
+}

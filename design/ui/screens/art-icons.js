@@ -11,7 +11,8 @@
      кромка горит и дышит. Нет портрета — в стекле силуэт класса героя, а не инициалы.
    ready — выгруженные пути, want — заказанные к выгрузке. Нет пути в ready — осколок рисует SVG (тот же силуэт стекла, кромка,
    трещины и силуэт класса): битых картинок нет. Значки снаряжения и талисманов без пути отдают '', вызывающий рисует свою заглушку.
-   Адреса маски — полные: url() в стилях экранов браузер разрешает от их файла, а не от index.html */
+   Лицо в стекле обрезает clip-path по обводу маски (SHARD_PTS), а не mask-image картинкой: маску-картинку браузер грузит по правилам
+   CORS, у страницы с диска (file://) она не грузится, и незагруженная маска прячет лицо целиком — так в стекле пропадали лица (30.09.2026) */
 const ART_ICONS = {
   ready: ['equip/head.png', 'equip/chest.png', 'equip/hands.png', 'equip/legs.png', 'equip/feet.png', 'equip/main.png',
     'equip/off.png', 'equip/ring.png', 'equip/amulet.png', 'talismans/fight.png', 'talismans/hunt.png', 'talismans/farm.png',
@@ -75,7 +76,8 @@ function shardFace(h) {
   return artReady(p) ? `<span class="hsg-face cls" style="background-image:url('${AV(p)}')"></span>` : `<span class="hsg-face svg">${shardClsSvg(key)}</span>`;
 }
 /* осколок героя. h — герой состава (RSI), got и need — осколков собрано и нужно, px — сторона квадрата (в клетке запасов — 100 %).
-   Слои снизу вверх: тёмное стекло и лицо — по маске стекла; трещины и блик (гаснут по доле); кромка. --s — доля собранного, целые % */
+   Слои снизу вверх: тёмное стекло и лицо — по обводу стекла (clip-path, art-icons.css); трещины и блик (гаснут по доле); кромка.
+   --s — доля собранного, целые %. Маски-картинки нет: у страницы с диска она не грузится и прячет лицо (см. шапку файла) */
 function shardGhost(h, got, need, px = 64) {
   if (!h) return '';
   const share = need > 0 ? Math.min(100, Math.floor(got * 100 / need)) : 0, full = need > 0 && got >= need;
@@ -83,8 +85,7 @@ function shardGhost(h, got, need, px = 64) {
   const G = ART_ICONS.glass, art = artReady(G.mask) && artReady(G.rim) && artReady(G.cracks);
   const say = artEsc(`${h.n}: осколки ${got} из ${need}`), head = `data-k="${art ? 'art' : 'svg'}"${full ? ' data-full="1"' : ''} style="--px:${px}px;--s:${share};--cr:${cr}" title="${say}" aria-label="${say}"`;
   if (!art) return `<span class="hsg" ${head}><span class="hsg-in">${shardFace(h)}</span>${SHARD_SVG}</span>`;
-  const mask = `url('${artAbs(G.mask)}')`;
-  return `<span class="hsg" ${head}><span class="hsg-in" style="-webkit-mask-image:${mask};mask-image:${mask}">${shardFace(h)}</span><img class="hsg-cr" src="${AV(G.cracks)}" alt="" loading="lazy" decoding="async"><img class="hsg-rim" src="${AV(G.rim)}" alt="" loading="lazy" decoding="async"></span>`;
+  return `<span class="hsg" ${head}><span class="hsg-in">${shardFace(h)}</span><img class="hsg-cr" src="${AV(G.cracks)}" alt="" loading="lazy" decoding="async"><img class="hsg-rim" src="${AV(G.rim)}" alt="" loading="lazy" decoding="async"></span>`;
 }
 
 /* ================== UI-кит: осколок героя ==================

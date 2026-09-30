@@ -50,7 +50,7 @@ const scripts = [...html.matchAll(/<script(?:\s+src="([^"]+)")?>([\s\S]*?)<\/scr
   else if (i('screens/equipment.js') < i('screens/talismans.js')) say('index.html: screens/equipment.js подключён раньше talismans.js — источник героя обернётся не поверх талисманов');
   else if (i('screens/equipment.js') < i('screens/bag.js')) say('index.html: screens/equipment.js подключён раньше bag.js');
   if (!/<link rel="stylesheet" href="screens\/equipment\.css">/.test(html)) say('index.html: не подключён screens/equipment.css');
-  const hd = html.match(/function heroDetail\(h\)[\s\S]*?\n\}/);
+  const hd = html.match(/function heroDetail\(h(?:, o = \{\})?\)[\s\S]*?\n\}/);   // вкладки героя; большая карточка (screens/heroes.js) берёт их без шапки
   if (!hd || !/eqRow\(h\)[\s\S]{0,120}talRow\(h\)/.test(hd[0])) say('index.html: вкладка «Снаряжение» (heroDetail) не зовёт eqRow рядом с talRow');
   if (!/const statStrip = [^\n]*eqStatAdd/.test(html)) say('index.html: пять характеристик (statStrip) без прибавки снаряжения');
   if (!/hattr\(o\) \{[\s\S]{0,400}eqStatAdd/.test(html)) say('index.html: лист «Атрибуты» без прибавки снаряжения');

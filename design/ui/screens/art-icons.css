@@ -10,7 +10,9 @@
   filter:drop-shadow(0 0 calc(1px + var(--s) * .06px) rgba(72,229,212,calc(.14 + var(--s) * .005)))}
 .hsg>*{position:absolute;inset:0}
 .hsg-in{overflow:hidden;background:radial-gradient(60% 46% at 50% 96%,rgba(72,229,212,.2),transparent 72%),linear-gradient(180deg,#0a1719,#050b0c)}
-.hsg[data-k="art"] .hsg-in{-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
+/* стекло-рисунок: лицо обрезает обвод его маски (glass-mask.png, 16 точек, совпадение с маской 98 %) — clip-path, а не mask-image:
+   маску-картинку у страницы с диска браузер не грузит (CORS), и незагруженная маска прячет лицо целиком */
+.hsg[data-k="art"] .hsg-in{clip-path:polygon(50% 11%,59% 18%,61% 23%,66% 24%,73% 30%,71% 47%,67% 53%,69% 60%,67% 77%,61% 80%,50% 89%,33% 77%,33% 67%,30% 60%,29% 46%,27% 30%)}
 .hsg[data-k="svg"] .hsg-in{clip-path:polygon(50% 5%,64% 19%,78% 27%,76% 48%,71% 54%,74% 61%,72% 80%,50% 95%,29% 80%,22% 30%)}
 /* лицо: окно стекла — 60 % ширины и 92 % высоты кадра; портрет по грудь — картинка на 150 % высоты окна, верх — 6 %.
    Цвет — одна цепочка фильтров: серое, чуть сепии и поворот тона в холодную бирюзу; края тают в стекло */

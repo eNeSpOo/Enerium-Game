@@ -20,7 +20,8 @@
       в раме: шаг от середины — целые --d и --a, середина впереди; полный герой ленты и итога — в раме (рисунок RL_ART.frame или CSS),
       осколок — стекло с лицом героя (shardGhost, class="hsg") в ленте, в итоге и в сводке. Честно (§1.2): у входа и в окне видны цена
       прокрутки и шанс героя целиком, лист «Шансы» — ссылкой, пока лента стоит. Арт: пути RL_ART.ready лежат в assets/art, невыгруженные
-      (RL_ART.want без ready) в разметке не встречаются — битых картинок нет.
+      (RL_ART.want без ready) в разметке не встречаются — битых картинок нет. Герой веера открывает большую карточку «до покупки»
+      поверх вкладки (screens/heroes.js) — без прокачки и снаряжения, с «Назад».
    Запуск: node tools/content-gen/screens/check_roulette.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -483,6 +484,18 @@ for (const [en, lack] of [[340, [10, 100]], [50, [1, 10, 100]], [100000, []]]) {
   if ((tab.match(/class="rl-fr"|class="rl-frc"/g) || []).length < pool2.length) say('алтарь: не у каждого героя веера рама');
   honest(tab.slice(tab.indexOf('rl-entry')), 'алтарь · вкладка'); noPend(tab, 'алтарь · вкладка');
   if (!/data-a="dlg" data-v="rl"/.test(tab) || !/data-a="sheet" data-v="rlodds"/.test(tab)) say('алтарь: нет «К рулетке» или «Шансы»');
+  /* герой веера — большая карточка «до покупки» поверх вкладки (screens/heroes.js, OV.rhero): портрет, имя, навыки по доблести; прокачки
+     и снаряжения у неё нет; «Назад» закрывает её */
+  { const h0 = pool2[0];
+    if (h0 && !tab.includes(`data-a="rhero" data-v="${h0.id}"`)) say('алтарь: герой веера не открывает свою карточку');
+    else if (h0) {
+      run('веер · карточка', () => T.ACT.rhero(h0.id));
+      const g = view(P, 'веер · карточка героя'), ov = g.slice(g.indexOf('<div class="ov'));
+      if (!/^<div class="ov hc-ov"/.test(ov) || !ov.includes('<div class="hcb"') || !ov.includes(`<h2>${h0.n}</h2>`)) say('алтарь: карточка героя веера — не большая карточка «до покупки» поверх вкладки');
+      if (/data-a="(?:lvlup|limit|gearbest)"/.test(ov)) say('алтарь: в карточке героя до пробуждения — прокачка или снаряжение');
+      if (!ov.includes('class="iconbtn hcb-bk" data-a="close"')) say('алтарь: у карточки героя веера нет «Назад»');
+      T.S.overlay = null;
+    } }
   /* окно: алтарь за окном, честная строка; лента — осколки стеклом с лицом, полные — в раме */
   T.S.overlay = { t: 'rl', arg: '' };
   const w = view(P, 'алтарь · окно'), dlg = w.slice(w.indexOf('rl-ov'));

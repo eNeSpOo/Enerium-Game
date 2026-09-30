@@ -581,8 +581,8 @@ reset();
   const want = Math.round(T.EB.RULES.resist[T.EB.FOES.g1.rank] / 100) + ' %';
   if (!gm.includes(`<b>${want}</b><small>иммунитет к контролю`)) say(`лист Мастера: иммунитет к контролю не ${want} из RULES.resist`);
   if (/сопр\. контролю/.test(gm)) say('лист Мастера: осталось «сопр. контролю» с числом из разметки');
-  /* лор героя состава на экране — две строки и «ещё», полный текст — в листе «Подробнее» */
-  T.S.overlay = null; T.S.hview = 'all';
+  /* лор героя состава в его карточке (вкладка «Герой», screens/heroes.js) — две строки и «ещё» */
+  T.S.overlay = null; T.S.hview = 'rs';
   const long = T.RS.heroes.find(h => h.who && h.who.length > 150);
   if (long) { T.S.rs.sel = long.id; T.S.seg.rhero = 'who'; if (!draw('лор героя').includes('<details class="lore">')) say(`лор героя ${long.n}: не свёрнут в две строки`); }
   /* карточка бойца: атрибуты значками */

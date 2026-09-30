@@ -1,0 +1,69 @@
+{
+  "name": "Разговор с проводником Убежища (§28.2 GDD): гербы ролей четырёх проводников, медальон номера ответа и уголок рамки реплики. Слова автора 30.09.2026: «Окно диалога выглядит слабо, хочется увидеть AAA-уровень UI и графики». Стиль меток карт одобрен автором 27.09.2026 (art/style/style.md, «Метки карт»; jobs/card-marks.json): тёмное фэнтези, кованое железо, старое золото, свет изнутри и снизу, сплошной чёрный фон — прозрачность вырезается из чёрного, ключ black. Гербы — одна оправа на всех четырёх: так роли читаются одним набором Убежища, внутри — знак роли. Знаки — решение агента по ролям проводников (NPCS в design/ui/index.html) и их фигурам: Энцо — контракты, Кузнец — Мастерская, Алхимик — Лавка, Хранитель знаний — Память и Летопись. Табличку имени и стекло реплики рисует CSS: имя разной длины, картинка растягивалась бы. Выгрузка — design/ui/assets/art/talk/, пути — TK_ART.ready в design/ui/screens/talk.js.",
+  "models": [
+    "nb2"
+  ],
+  "style": "Dark fantasy game art with a menacing, gloomy, mystical atmosphere. Digital painting with soft transitions, elaborate shadows and an artistic emphasis on details. Lighting effects bring it to life: magical glow, aura and embers, light that comes from inside the subject and from below. Rich worn materials: dark forged iron, old gold, weathered stone, carst crystals glowing from within. Precious, dramatic, high contrast.",
+  "negative": "No text, no letters, no numbers, no digits, no real-world alphabets, no runes or markings that look like writing, no watermark, no signature, no logo. No faces, no skulls, no pentagrams, no occult signs.",
+  "cutout_rule": "The background is solid pure black ({hex}), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the metal and fades into the black within a short distance. The whole piece with its ornament fits inside the central 88% of the canvas: an empty black margin stays on every side.",
+  "categories": {
+    "talk-crests": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no text in the reply. Format: game emblem of a guide's role in the Refuge — the Wanderer's shelter under the city — square, no border around the picture. A round medallion about 72% of the canvas, centered, seen straight on: a rim of dark forged iron with hammer marks, a thin raised old-gold inner edge and four small old-gold studs at the top, bottom, left and right; inside the rim, one symbol in old gold and its own worn materials on a field of deep blue-black enamel, lit from below by soft turquoise light (#48E5D4). All four guide emblems share exactly the same rim, so they read as one set of the Refuge; only the symbol inside and its own small accent light make each one unique. A strong, simple symbol that still reads when the emblem is 28 pixels wide."
+    },
+    "talk-ui": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no text in the reply. Format: one piece of a dark fantasy game interface, seen straight on, flat front view without perspective, on solid black. Materials: dark forged iron with hammer marks, raised old-gold edges and fine old-gold filigree, a faint turquoise light (#48E5D4) from below catching the lower edges. Clean readable forms at small size: in the game the piece is shown 30 to 60 pixels wide."
+    }
+  },
+  "jobs": [
+    {
+      "id": "talk-crest-contracts",
+      "category": "talk-crests",
+      "title": "Герб роли: Энцо, контракты",
+      "source": "NPCS.enzo — «Энцо · Контракты»; фигура — assets/art/shelter-enzo.png (плащ, кинжалы с алым отсветом). К выгрузке — design/ui/assets/art/talk/crest-contracts.png, 144×144.",
+      "subject": "Symbol inside the medallion: a rolled parchment contract tied with a dark cord and closed with a round dark-red wax seal — the seal is plain, with no letters and no signs on it; behind the scroll a slim dagger lies diagonally from the lower left to the upper right, the thin edge of its blade glinting with a faint crimson light. The mark of Enzo, who offers the Wanderer contracts and keeps count of promises."
+    },
+    {
+      "id": "talk-crest-forge",
+      "category": "talk-crests",
+      "title": "Герб роли: Кузнец, Мастерская",
+      "source": "NPCS.smith — «Кузнец · Мастерская»; фигура — assets/art/shelter-smith.png (молот на плече, наковальня). К выгрузке — design/ui/assets/art/talk/crest-forge.png, 144×144.",
+      "subject": "Symbol inside the medallion: a heavy smith's hammer with a worn wooden handle lying across a small black anvil; a few bright amber sparks (#E6A84B) jump from the anvil face and a warm amber glow burns under it. The mark of the Smith of the workshop, where six cells and a riddle make a recipe."
+    },
+    {
+      "id": "talk-crest-shop",
+      "category": "talk-crests",
+      "title": "Герб роли: Алхимик, Лавка",
+      "source": "NPCS.alch — «Алхимик · Лавка»; фигура — assets/art/shelter-alchemist.png (зелёные склянки, мешок монет). К выгрузке — design/ui/assets/art/talk/crest-shop.png, 144×144.",
+      "subject": "Symbol inside the medallion: a round-bottomed glass flask with a long narrow neck and a cork, filled with a glowing green potion (#4FDC8B) that lights the glass from within, and three worn old-gold coins stacked at its foot. The mark of the Alchemist who keeps the shop."
+    },
+    {
+      "id": "talk-crest-memory",
+      "category": "talk-crests",
+      "title": "Герб роли: Хранитель знаний, Память и Летопись",
+      "source": "NPCS.mage — «Хранитель знаний · Память · Летопись»; фигура — assets/art/shelter-mage.png. Свет — бирюза духа, а не фиолетовый: фиолетовый в стиле — только дикий карст и искажение. К выгрузке — design/ui/assets/art/talk/crest-memory.png, 144×144.",
+      "subject": "Symbol inside the medallion: an old book lying open, seen from the front, its blank pages gently fanned; just above the pages floats a small bright four-pointed star of turquoise light (#48E5D4), like a remembered moment, and faint turquoise motes rise from the pages toward it. The pages are blank: no writing, no lines, no signs. The mark of the Keeper of Knowledge, who returns memories and keeps the chronicle."
+    },
+    {
+      "id": "talk-medallion",
+      "category": "talk-ui",
+      "title": "Медальон номера ответа",
+      "source": "Номер ответа в разговоре — «как в хороших RPG» (задача 30.09.2026): цифру печатает интерфейс. К выгрузке — design/ui/assets/art/talk/medallion.png, 96×96.",
+      "subject": "The piece: a small round button medallion, centered, about 70% of the canvas: a thick ring of dark forged iron with a thin raised old-gold outer rim and four tiny old-gold studs at the top, bottom, left and right; the center is a smooth, slightly recessed disc of dark smoky blue-black glass with a soft turquoise glow at its lower edge. The center is completely empty — nothing is painted on it: the interface prints a number there. Perfectly round and symmetric."
+    },
+    {
+      "id": "talk-corner",
+      "category": "talk-ui",
+      "title": "Уголок рамки реплики",
+      "source": "Рамка реплики — тёмное стекло с филигранью старого золота (задача 30.09.2026): один уголок, остальные три — его отражения. К выгрузке — design/ui/assets/art/talk/corner.png, 128×128.",
+      "subject": "The piece: the upper-left corner guard of an ornate frame around a dark dialogue panel. An L-shaped bracket: its outer corner points to the upper left of the canvas, one arm runs straight to the right along a horizontal line, the other runs straight down along a vertical line; both arms are the same length — about two thirds of the canvas — narrow, and end in small old-gold scroll curls. The bracket is dark forged iron with a raised old-gold edge; at the corner a small faceted turquoise gem (#48E5D4) glows softly from within in a gold claw mount; fine old-gold filigree tendrils grow from the corner into the inside of the L. The piece is perfectly symmetric about the diagonal from the upper left to the lower right. Everything else is empty black."
+    }
+  ]
+}

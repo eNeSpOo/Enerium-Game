@@ -570,7 +570,7 @@ function wnIdCol() {
     <div class="row" style="gap:6px"><span class="chip gold">уровень ${S.acc.level}</span><span class="chip">цикл ${ROMAN[c]}</span></div>
     <button class="lvlbtn" data-a="sheet" data-v="level"><span class="row" style="justify-content:space-between;width:100%"><span class="faint" style="font-size:12px">опыт</span><span class="num" style="font-size:12px">${fmt(S.acc.xp)} / ${fmt(S.acc.next)}</span></span>${bar(pct)}</button>
     <button class="link" data-a="go" data-v="clan">${ic('shield')}${S.clan.n}</button>${demo}
-    <div class="row" style="gap:6px;margin-top:auto"><button class="iconbtn" data-a="sheet" data-v="look" aria-label="Облик" title="Облик">${ic('eye')}</button><button class="iconbtn lk-frb" data-a="sheet" data-v="friends" aria-label="Друзья${fr ? `: заявок ${fr}` : ''}" title="Друзья">${ic('users')}${bdgN(fr)}</button><button class="iconbtn" data-a="dlg" data-v="settings" aria-label="Настройки">${ic('gear')}</button><button class="iconbtn" data-a="go" data-v="chronicle" aria-label="Летопись">${ic('book')}</button></div></div>`;
+    <div class="wn-ibs"><button class="btn sm" data-a="sheet" data-v="look">${ic('eye')}Облик</button><button class="btn sm lk-frb" data-a="sheet" data-v="friends" aria-label="Друзья${fr ? `: заявок ${fr}` : ''}">${ic('users')}Друзья${bdgN(fr)}</button><button class="btn sm" data-a="dlg" data-v="settings">${ic('gear')}Настройки</button><button class="btn sm" data-a="go" data-v="chronicle">${ic('book')}Летопись</button></div></div>`;
 }
 
 /* ================== Память: пять мест ==================

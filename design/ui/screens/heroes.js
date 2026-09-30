@@ -1,34 +1,49 @@
 /* screens/heroes.js — «Герои»: коллекция, карточка героя, отряды и «Призыв» (§2.1, §3, §10, §15, §33 GDD; ADR-0019, ADR-0026, ADR-0027).
    Договор — screens/model.js. Регистрирует:
    — SCREENS.heroes: вкладки «Коллекция», «Отряды», «Призыв»;
-   — одну анатомию героя: плитку (heroCard — герой аккаунта, rsCard — герой состава), шапку карточки (heroHead, rsHead) и карточку героя
-     состава (rsDetail). Редкость — одобренный кристалл r1…r7 (--rico, ADR-0027), доблесть — значки по личному максимуму, рунный предел —
-     пять рунных камней по бокам портрета (знак — screens/hero-dev.js: rpPost, rpNext), уровень, класс — значком. На плитке главное,
-     остальное — в карточке;
+   — коллекцию по слову автора 30.09.2026 («сетка со всеми героями, которых игрок уже купил… по форме условно 9 на 16, и, нажимая на
+     арт, мы уже открываем крупным планом карточку героя: слева портрет… справа информация»): сетка карточек 9 : 16 (hcCard) — герои
+     аккаунта, по мощи сильнейшие сверху, сортировка и фильтр значками (лист OV.hcflt); переключатель «Каталог» — все герои состава,
+     несобранные чёрно-белые с полосой осколков. Карточка говорит о силе героя сама: кристалл и цвет редкости, доблесть дугой звёзд,
+     рунные камни пределов по бокам, класс и стихия значками, уровень и мощь; ступень вида (hcTier: редкость и доблесть) — рамка, свет
+     и частицы. Вид ступеней — классы и переменные CSS (heroes.css), рамка картинкой — HC_ART, когда автор выберет стиль;
+   — большую карточку героя (hcBig): слева портрет в раме своей ступени — нажатие показывает его крупно (OV.hczoom), справа — имя, мощь,
+     доблесть и уровень и вкладки «Развитие», «Снаряжение», «Навыки», «Путь» (heroDetail без шапки, index.html; развитие и окно
+     снаряжения — screens/hero-dev.js). Герой состава «до покупки» — та же карточка: «Герой», «Навыки», «Путь» и одно действие внизу —
+     цена и «Купить» или как получить; снаряжения, талисманов и прокачки нет. Она же — окно поверх любого экрана (OV.rhero);
+   — одну анатомию героя: карточку 9 : 16 (hcCard), плитку (heroCard — герой аккаунта, rsCard — герой состава) для отрядов и витрин,
+     шапку (heroHead, rsHead) для листов. Редкость — одобренный кристалл r1…r7 (--rico, ADR-0027), доблесть — значки по личному
+     максимуму, рунный предел — пять рунных камней по бокам портрета (знак — screens/hero-dev.js: rpPost, rpNext), уровень, класс — значком;
    — героев аккаунта: hrOwn собирает купленного и пробуждённого героя состава в той же форме, что герои боя прототипа (S.heroes), — H(id)
      в index.html находит и его: карточка, развитие, отряды и бой работают одинаково;
    — отряды: библиотеку пресетов S.squads (§2.1: до десяти, имена, до пяти героев) и один лист выбора отряда на все режимы — OV.prep;
      у каждого режима свой сохранённый выбор. API для экранов режимов — SQ (описан в screens/README.md);
-   — «Призыв»: hireView и вкладки «За золото», «За Энериум», «За души». «За души» — сцена алтаря Возрождения душ (hrSoulsView, её зовёт
-     rsSoulsView в index.html; слово автора 29.09.2026 — «дорого-богато»): зеркало душ, перед ним веером герои пула и вход рулетки
-     (rlCol, screens/roulette.js); справа два входа — отряд Эхо недели (лист OV.hrecho) и лавка праха (окно OV.dust). Лавка праха —
+   — «Призыв»: hireView и вкладки «За золото», «За Энериум», «За души». «За золото» — та же сетка карточек 9 : 16 героев каталога цикла,
+     нажатие — большая карточка «до покупки» с ценой и «Купить» (покупка — ACT.gbuy, index.html). «За души» — сцена алтаря Возрождения
+     душ (hrSoulsView, её зовёт rsSoulsView в index.html; слово автора 29.09.2026 — «дорого-богато»): зеркало душ, перед ним веером герои
+     пула и вход рулетки (rlCol, screens/roulette.js); справа два входа — отряд Эхо недели (окно-витрина OV.hrecho: цивилизация, пятеро
+     крупными карточками, несобранные чёрно-белые с полосой осколков, неприязнь, откуда осколки, пробуждение за души) и лавка праха
+     (окно OV.dust). Лавка праха —
      отдельное окно: витрина героев пула рулетки доступных циклов — стекло осколка с лицом, имя, цена осколка и доля собранного; справа —
      выбранный: осколки за прах (1, 10 или до комплекта) и пробуждение за души; после пробуждения — окно OV.hrwake: трещины заживают,
      герой выходит из стекла в раме. Героев Эхо прахом не собрать (слово автора 29.09.2026): лавка продаёт осколки только героев из
      EN_ROSTER.rules.dustSrc (rsDustable, index.html) и говорит почему; героя Эхо собирают осколки из сундуков Эхо, пробуждают — души
-     (лист отряда недели). Покупка осколков и пробуждение — операции SOUL_SRV с номером. Герой, которого собирают, везде — осколок:
-     стекло с его лицом (shardGhost, screens/art-icons.js), собранный — портрет;
+     (окно отряда недели). Покупка осколков и пробуждение — операции SOUL_SRV с номером. Герой, которого собирают, — осколок: стекло
+     с его лицом (shardGhost, screens/art-icons.js), в сетках и витрине отряда недели — чёрно-белая карточка с полосой осколков;
    — «За Энериум» — витрина донатного сета (dnView): зал, пятеро Безликих на ступенях цены — дороже герой, выше ступень и ярче свет;
      сет — коллекция: сколько из пяти уже в коллекции и какую ступень сет-бонуса это даёт (лист OV.hrset — ступени наглядно).
      Справа — выбранный герой, что он даёт и одна кнопка покупки с ценой. Честно (§1.2, §32): цена и с чем герой приходит видны
      до покупки, подтверждение OV.dnbuy называет остаток Энериума. Покупка — операция DN_SRV с номером, после неё — окно получения
      героя OV.hrgot: свет снизу, песок времени, рама и имя; нажатие — сразу итог. Арт витрины — DN_ART: пока путь не выгружен,
      зал, раму и эмблемы рисует CSS;
-   — действия ACT.sq*, ACT.d*, ACT.dn*, ACT.du*, ACT.dustbuy, activate и activatedo, лист имени OV.sqname, разделы UI-кита «Отряды»,
-     «За Энериум» и «За души · лавка праха» через KIT_EXTRA, сценарии.
-   Своё состояние — S.sq, S.dn и S.du, заводятся как S.bag. Сервер решает, клиент показывает: изменение отрядов — операция SQ_SRV,
-   покупка за Энериум — DN_SRV, осколки за прах и пробуждение — SOUL_SRV; номер несёт кнопка, повтор того же номера ничего не меняет
-   и не списывает. Числа — в блоках данных SQ_DATA, HR_DATA, HR_VIEW, DN_VIEW и DU_VIEW, цены героев — EN_ROSTER.rules.
+   — действия ACT.hc*, ACT.sq*, ACT.d*, ACT.dn*, ACT.du*, ACT.dustbuy, activate и activatedo, лист имени OV.sqname, разделы UI-кита
+     «Карточка героя», «Отряды», «За Энериум» и «За души · лавка праха» через KIT_EXTRA, сценарии.
+   Своё состояние — S.hf, S.hgrid, S.sq, S.dn и S.du, заводятся как S.bag. Вид коллекции — S.hview: own — сетка героев аккаунта,
+   all — каталог, mine — большая карточка героя аккаунта S.selHero (прежнее имя: так её открывают другие экраны и сценарии), rs — большая
+   карточка героя состава S.rs.sel; в «За золото» карточку «до покупки» открывает S.rs.gsel. Сервер решает, клиент показывает: изменение
+   отрядов — операция SQ_SRV, покупка за Энериум — DN_SRV, осколки за прах и пробуждение — SOUL_SRV; номер несёт кнопка, повтор того же
+   номера ничего не меняет и не списывает. Числа — в блоках данных SQ_DATA, HR_DATA, HR_VIEW, HC_VIEW, DN_VIEW и DU_VIEW, цены героев —
+   EN_ROSTER.rules.
    Служебное — только команде: TM, PL, tmT из index.html.
    Автопроверки — tools/content-gen/screens/check_heroes.js и check_squads.js. */
 'use strict';
@@ -81,6 +96,37 @@ const HR_DATA = {
 /* числа вида: цвета стихий для заглушки портрета — те же, что токены --air…--dark в index.html */
 const HR_VIEW = {
   el: { 'Воздух': '#dff4e5', 'Земля': '#eb9d40', 'Огонь': '#f0564a', 'Вода': '#5a94f7', 'Время': '#4fdc8b', 'Свет': '#f4e6ae', 'Тьма': '#a986ee', 'без стихии': '#8a9098' },
+};
+/* коллекция, большая карточка героя и «За золото» — числа вида, не баланс. Слова автора 30.09.2026: «карточка героя, её иконки
+   и информация на ней должна говорить игроку, насколько сильный герой находится перед ним». Ступень вида — сила одним взглядом:
+   основа — редкость, каждая взятая доблесть поднимает ступень. Вид ступеней — классы и переменные CSS (heroes.css, [data-t]) */
+const HC_VIEW = {
+  card: [112, 104],        // сетка: карточка 9 : 16 не уже, px — [932 × 430, 844 × 390]; высота — 16/9 ширины
+  gap: 8,                  // между карточками сетки, px
+  /* ступень вида: r — по редкости r1…r7, valor — прибавка за взятые доблести 0…5, не выше top. В духе стилей, отмеченных автором
+     30.09.2026 («золотая филигрань», «кованое железо»): 1 — тёмное железо с заклёпками, 2 — позолота, листья у гребня и кабошоны цвета
+     редкости, 3 — старое золото с крыльями, раскалённые швы, сияние и искры у вершины */
+  tier: { r: [1, 1, 2, 2, 3, 3, 3], valor: [0, 1, 1, 2, 2, 2], top: 3 },
+  motes: 6,                // искр у вершины карточки высшей ступени; движутся transform и opacity, при «меньше движения» стоят
+  arc: 3,                  // дуга доблести: звезда ниже середины на ⌊d² × arc / 4⌋ px, d — шаг от середины
+  short: 100000,           // мощь от этого числа — коротко: «128,4К»
+  big: [5, 7],             // большая карточка: портрет, ширина : высота; не шире bigMax % карточки
+  bigMax: 40,
+  echo: 12,                // витрина отряда недели: между карточками, px
+  /* UI-кит: три ступени на одном герое — [редкость, доблесть, личный максимум, рунный предел, мощь]; уровень — потолок предела. Вид */
+  kit: [[2, 0, 3, 0, 18420], [2, 1, 3, 1, 64210], [2, 3, 3, 5, 728870]],
+};
+/* рамка карточки картинкой — по ступеням 1…3, когда автор выберет стиль (art/generated/card-concepts, выгрузка export_ui.py в
+   assets/art/cards/). ready — выгруженные пути: пока пусто, рамку, уголки, гребень и свет рисует CSS; путь в ready — ступень
+   берёт картинку поверх портрета (окно рамки прозрачное), CSS-рамка этой ступени прячется */
+const HC_ART = {
+  ready: [],
+  frame: t => 'cards/frame-t' + t + '.png',
+};
+/* порядок сетки: «Мои» — по мощи, сильнейшие сверху; каталог — по циклу, как в составе */
+const HC_SORT = {
+  own: [['bm', 'По мощи'], ['r', 'По редкости'], ['lvl', 'По уровню'], ['valor', 'По доблести']],
+  all: [['c', 'По циклу'], ['r', 'По редкости']],
 };
 /* «За Энериум»: числа вида витрины, не баланс. Цены героев — EN_ROSTER.rules.stub.donatPrice, ступени сета — EN_ROSTER.rules и N сета */
 const DN_VIEW = {
@@ -199,7 +245,7 @@ function hrV(x) {
 const hrLimTop = () => INV.hero.capByLim.length - 1;
 const hrRpNext = v => (v.acc && typeof rpNext === 'function' ? rpNext(v.acc) : '');
 /* плитка: портрет, кристалл редкости, доблесть по личному максимуму; по бокам портрета — пять рунных камней предела, два столба
-   зеркально: пройденные горят, следующий на потолке уровня тлеет или пульсирует; внизу — имя, класс значком и уровень.
+   делят их — слева I–III, справа IV–V (RP_VIEW.split): пройденные горят, следующий на потолке уровня тлеет или пульсирует; внизу — имя, класс значком и уровень.
    o: act, val, sel, dim, note — занятость поверх портрета; bm — боевая мощь (витрины и отряды); mark — отметка «в коллекции»;
    rpNext — состояние следующего камня вместо рассчитанного (UI-кит) */
 function hrTile(v, o = {}) {
@@ -253,97 +299,219 @@ function hrHead(v, aside) {
 function heroHead(h) { return hrHead(hrV(h)); }
 /* шапка героя состава: v — доблесть для примерки (режим «Команда»); у купленного — его прогресс */
 function rsHead(h, v, aside) { const x = hrV(h); if (!x.own) x.valor = Math.min(v || 0, x.maxV); return hrHead(x, aside); }
-/* «Путь» героя из состава в карточке аккаунта: главы по доблести и орден — из roster.js (heroDetail в index.html) */
+/* «Путь» героя аккаунта: главы по доблести и орден — из roster.js; у героя отряда прототипа — его запись в составе (hrTwin).
+   Его зовёт heroDetail в index.html, вкладка «Путь» */
 function hrPath(h) {
-  const rh = RSI[h.id]; if (!rh) return '';
+  const rh = hrTwin(h); if (!rh) return '';
   return `<div class="hd-cols"><div class="col scroll" data-keep="hrpath:${h.id}">${rsChaptersHtml(rh, h.valor)}</div>
     <div class="col scroll" style="gap:8px"><span class="eyebrow">Орден</span>${rsSetHtml(rh, h.valor)}</div></div>`;
 }
 
-/* ================== Коллекция ==================
-   «Все герои» — состав игры с фильтрами, «Мои» — герои аккаунта. Карточка рядом: у героя аккаунта — развитие (heroDetail, index.html),
-   у героя состава — кто он, воспоминания и орден */
+/* ================== Коллекция: сетка карточек 9 : 16 и большая карточка ==================
+   Слова автора 30.09.2026: «сетка со всеми героями, которых игрок уже купил… по форме условно 9 на 16, и, нажимая на арт, мы уже
+   открываем крупным планом карточку героя: слева портрет, который можем посмотреть, а уже справа информация по герою». «Мои» — герои
+   аккаунта, по мощи сильнейшие сверху; «Каталог» — все герои состава: несобранные чёрно-белые, у сборных — полоса осколков. Порядок —
+   список, фильтр — лист значков (OV.hcflt): класс, стихия, редкость, цикл, в каталоге — источник */
 const HR_NODATA = '<section class="scr"><div class="pnl pad"><p class="faint">Нет данных: рядом с index.html должен лежать roster.js.</p></div></section>';
 function hrScreen() {
   const seg = S.seg.heroes;
   const meta = { title: 'Герои', seg: { key: 'heroes', items: [['coll', 'Коллекция'], ['squads', 'Отряды'], ['hire', 'Призыв']] } };
   if (seg === 'squads') return { ...meta, html: hrSquadsView() };
   if (seg === 'hire') return { ...meta, html: hireView() };
-  return { ...meta, html: S.hview === 'mine' ? hrMineView() : rsCollView() };
+  return { ...meta, html: S.hview === 'mine' ? hcOwnView() : S.hview === 'rs' ? hcRsView() : hcGridView() };
 }
 SCREENS.heroes = hrScreen;
-function rsViewTabs(all) {
-  const v = S.hview === 'mine' ? 'mine' : 'all', tabs = [['all', 'Все герои', all], ['mine', 'Мои', hrMine().length]];
-  return `<div class="tabs" role="tablist" aria-label="Коллекция">${tabs.map(([k, l, n]) => `<button role="tab" aria-selected="${v === k}" data-a="hview" data-v="${k}">${l} · ${n}</button>`).join('')}</div>`;
+
+/* ---------- вид героя на карточке ---------- */
+const hcRom = c => ROMAN[c] || '';
+/* ступень вида: основа — редкость, взятые доблести поднимают (HC_VIEW.tier); не выше top */
+function hcTier(v) {
+  const T = HC_VIEW.tier, r = Math.max(1, Math.min(T.r.length, v.r || 1)), k = Math.max(0, Math.min(T.valor.length - 1, v.valor || 0));
+  return Math.min(T.top, T.r[r - 1] + T.valor[k]);
 }
-function hrMineView() {
-  const mine = hrMine();
-  let h = H(S.selHero);
-  if (!h || !mine.includes(h)) { h = mine[0]; S.selHero = h.id; }
-  const hf = S.hfilter || 'all', sortBM = S.hsort === 'bm', free = mine.filter(x => !busyNote(x.id));
-  let list = hf === 'free' ? free : mine;
-  if (sortBM) list = [...list].sort((a, b) => b.bm - a.bm);
-  const grid = list.map(x => heroCard(x, { sel: x.id === h.id, bm: false })).join('') || '<p class="faint" style="grid-column:1/-1">Все герои заняты</p>';
-  return `<section class="scr"><div class="hs">
-    <div class="pnl coll">
-      ${rsViewTabs(RS.heroes.filter(rsFilter).length)}
-      <div class="row hr-bar"><div class="tabs" role="tablist" aria-label="Мои герои"><button role="tab" aria-selected="${hf === 'all'}" data-a="hfilter" data-v="all">Все · ${mine.length}</button><button role="tab" aria-selected="${hf === 'free'}" data-a="hfilter" data-v="free">Свободные · ${free.length}</button></div><span class="g-spacer"></span><button class="iconbtn" data-a="hsort" aria-pressed="${sortBM}" aria-label="Сортировать по боевой мощи" title="По боевой мощи">${ic('sort')}</button></div>
-      <div class="coll-grid scroll grow" data-keep="mine">${grid}</div>
-      <button class="collpow" data-a="sheet" data-v="coll" title="Рейтинговые пассивки всех героев коллекции: РП1 — Событие, все пять — по нажатию"><span><b>Сила коллекции</b></span><span class="chip spirit">+${collPct(collRp(1))}</span>${ic('chev')}</button>
-    </div>
-    ${heroDetail(h)}
-  </div></section>`;
+/* путь пройден — лента «максимум»: доблесть на личном максимуме, все пределы круга пройдены, уровень на потолке */
+const hcMax = v => !!v.own && v.maxV > 0 && v.valor >= v.maxV && v.lim >= hrLimTop() && v.lvl >= v.cap;
+/* мощь на карточке: до HC_VIEW.short — полностью, дальше коротко — «128,4К», «1,2М»; только целые */
+function hcNum(n) {
+  if (!(n >= HC_VIEW.short)) return fmt(n || 0);
+  const [d, s] = n >= 1000000 ? [100000, 'М'] : [100, 'К'], k = Math.floor(n / d);
+  return `${fmt(Math.floor(k / 10))}${k % 10 ? ',' + (k % 10) : ''}${s}`;
 }
-function rsCollView() {
-  if (!RS.heroes.length) return HR_NODATA;
-  const f = S.rs.f, list = RS.heroes.filter(rsFilter), sel = RSI[S.rs.sel] || list[0] || RS.heroes[0];
-  const opt = (v, t, cur) => `<option value="${v}" ${String(cur) === String(v) ? 'selected' : ''}>${t}</option>`;
-  const grid = list.map(h => rsCard(h, { sel: h.id === sel.id })).join('') || '<p class="faint" style="grid-column:1/-1">Никого: ослабьте фильтры</p>';
-  return `<section class="scr"><div class="hs">
-    <div class="pnl coll">
-      ${rsViewTabs(list.length)}
-      <div class="row rs-filters">
-        <select class="rs-sel" data-a="rsf" data-v="cyc" aria-label="Цикл">${opt('', 'Цикл', f.cyc)}${ROMAN.slice(1).map((r, i) => opt(i + 1, 'Цикл ' + r, f.cyc)).join('')}</select>
-        <select class="rs-sel" data-a="rsf" data-v="src" aria-label="Источник">${opt('', 'Откуда', f.src)}${RS.sources.map(k => opt(k, RS_SRC_ONE[k], f.src)).join('')}</select>
-        <select class="rs-sel" data-a="rsf" data-v="cls" aria-label="Класс">${opt('', 'Класс', f.cls)}${RS.classes.map(k => opt(k, k, f.cls)).join('')}</select>
+/* вид героя для сетки и карточки — hrV и то, по чему фильтруют: класс в составе и источник */
+function hcView(x) {
+  const v = hrV(x); if (!v) return null;
+  v.key = v.rh && v.rh.cl ? v.rh.cl[0] : String(v.ic || '');
+  v.src = v.rh ? v.rh.src : '';
+  return v;
+}
+/* портрет во всю карточку: рисунок героя; у героя без портрета — силуэт его класса, как в стекле осколка (art-icons.js), в свете
+   стихии снизу — не инициалы */
+function hcFace(v) {
+  const o = v.acc && !RSI[v.acc.id] ? v.acc : null, rh = v.rh;
+  const pic = o ? o.img : rh && typeof RS_ART !== 'undefined' && RS_ART.has(rh.id) ? AV('heroes/' + rh.id + '.jpg') : '';
+  if (pic) return `<img class="hk-img" src="${pic}" alt="" loading="lazy" decoding="async">`;
+  const key = typeof shardCls === 'function' ? shardCls(rh || v.acc || {}) : '', p = key && typeof ART_ICONS !== 'undefined' ? ART_ICONS.cls(key) : '';
+  const sil = p && typeof artReady === 'function' && artReady(p) ? `<img src="${AV(p)}" alt="" loading="lazy" decoding="async">` : key && typeof shardClsSvg === 'function' ? shardClsSvg(key) : '';
+  return `<span class="hk-sil" data-el="${hrEsc(v.el)}">${sil}</span>`;
+}
+/* доблесть дугой под гребнем: звёзд — личный максимум, горят взятые; середина выше краёв */
+function hcStars(v, m) {
+  if (!(m > 0)) return '';
+  return `<span class="hk-st" title="Доблесть ${v} из ${m}">${Array.from({ length: m }, (_, i) => { const d = 2 * i - (m - 1); return `<i class="${i < v ? 'on' : ''}" style="--y:${Math.floor(d * d * HC_VIEW.arc / 4)}px"></i>`; }).join('')}</span>`;
+}
+/* сияние и искры у вершины — у высшей ступени: места и задержки — от номера, без случайности; при «меньше движения» стоят (heroes.css) */
+const hcMotes = () => `<span class="hk-fx" aria-hidden="true"><b></b>${Array.from({ length: HC_VIEW.motes }, (_, i) => `<i style="--x:${(i * 37 + 9) % 60 + 20}%;--z:${(i * 23) % 40}%;--d:${(i * 530) % 3200}ms;--s:${1800 + (i * 290) % 1400}ms"></i>`).join('')}</span>`;
+/* рамка ступени: картинка, когда выгружена (HC_ART.ready); иначе — CSS в духе стилей, отмеченных автором 30.09.2026 («золотая
+   филигрань» и «кованое железо»): металл рамки и отделка богатеют со ступенью — тёмное железо с заклёпками; позолота, листья гребня
+   и кабошоны цвета редкости; старое золото с крыльями у гребня и раскалёнными швами */
+function hcFr(t) {
+  const p = HC_ART.frame(t), art = HC_ART.ready.includes(p) ? ' art' : '';
+  return `<i class="hk-fr${art}" aria-hidden="true"></i><i class="hk-orn${art}" aria-hidden="true"></i><i class="hk-crest${art}" aria-hidden="true"></i>${art ? `<img class="hk-fa" src="${AV(p)}" alt="" aria-hidden="true" loading="lazy" decoding="async">` : ''}`;
+}
+/* знаки у вершины — одна раскладка у карточки сетки и портрета большой карточки: гребень — кристалл редкости, под ним — доблесть дугой;
+   в кружках: слева — уровень (у героя аккаунта), справа — стихия. Раскладка — блок «раскладка значков» в heroes.css: сменить её — там */
+function hcMarks(v, own) {
+  return `<i class="hk-cr" aria-hidden="true"></i>${hcStars(v.valor, v.maxV)}${own ? `<span class="hk-lv" title="Уровень ${v.lvl} из ${v.cap}"><b class="num">${v.lvl}</b></span>` : ''}<span class="hk-el">${el(v.el, true)}</span>`;
+}
+/* полоса осколков под портретом: стекло с лицом, доля, «собрано / нужно»; полный комплект светится */
+function hcShard(v, got, need) {
+  const p = need > 0 ? Math.min(100, Math.floor(got * 100 / need)) : 0, g = v.rh && typeof shardGhost === 'function' ? shardGhost(v.rh, got, need, 18) : '';
+  return `<span class="hk-sh${got >= need ? ' full' : ''}" title="Осколки ${fmt(got)} из ${fmt(need)}">${g}<span class="hk-shb"><i style="--v:${p}"></i></span><small class="num">${fmt(got)}/${fmt(need)}</small></span>`;
+}
+/* карточка героя 9 : 16 — одна на «Мои», каталог, «За золото» и отряд недели. Портрет во всю карточку; у вершины — гребень с кристаллом
+   редкости и доблесть дугой, в кружках — уровень и стихия; по бокам — рунные камни пределов (у героя аккаунта: пройденные горят, следующий
+   тлеет или пульсирует); внизу — имя на плашке, класс значком и мощь со значком (у несобранного — полоса осколков или цикл). Ступень вида
+   (data-t) — металл рамки, отделка, свет и искры; путь пройден — «максимум».
+   o: act, val — действие; gray — не в коллекции: чёрно-белый портрет; shard — [собрано, нужно] — полоса осколков; lock — цикл закрыт;
+   sel — выбрана; own — отметка «в коллекции» у купленного (витрины); bm: false — без мощи; note — занятость поверх портрета */
+function hcCard(v, o = {}) {
+  const t = hcTier(v), own = v.own && !o.gray, mx = own && hcMax(v), nx = own ? hrRpNext(v) : '';
+  const posts = own && typeof rpPost === 'function' ? rpPost(v.lim, nx, 't', 'l') + rpPost(v.lim, nx, 't', 'r') : '';
+  const note = o.note != null ? o.note : own ? v.busy : '';
+  const foot = o.shard ? hcShard(v, o.shard[0], o.shard[1])
+    : own && o.bm !== false ? `<span class="hk-bm" title="Боевая мощь ${fmt(v.bm)}">${ICON('power', 13, 'Боевая мощь')}<b class="num">${hcNum(v.bm)}</b></span>`
+    : o.own && v.own ? `<span class="hk-in">${ic('check')}в коллекции</span>` : `<span class="hk-cy">цикл ${hcRom(v.c)}</span>`;
+  const say = `${v.n}, ${RAR[v.r].toLowerCase()}, ${v.cls}, ${String(v.el).toLowerCase()}${own ? `, уровень ${v.lvl}, рунный предел ${v.lim} из ${hrLimTop()}${nx === 'ready' ? ' — можно пробить следующий' : ''}, мощь ${fmt(v.bm)}` : `, цикл ${hcRom(v.c)}`}, доблесть ${v.valor} из ${v.maxV}${o.shard ? `, осколки ${o.shard[0]} из ${o.shard[1]}` : ''}${o.lock ? ', цикл ещё закрыт' : ''}${note ? ', ' + note : ''}`;
+  const cls = ['hk', o.gray ? 'gray' : '', o.lock ? 'lock' : '', o.sel ? 'sel' : '', posts ? 'rpp' : ''].filter(Boolean).join(' ');
+  return `<button class="${cls}" data-r="${v.r}" data-t="${t}"${mx ? ' data-max="1"' : ''} data-a="${o.act || 'hc'}" data-v="${o.val != null ? o.val : v.id}"${o.sel ? ' aria-pressed="true"' : ''} aria-label="${hrEsc(say)}">
+    <span class="hk-ph">${hcFace(v)}</span>${hcFr(t)}${t >= HC_VIEW.tier.top && !o.gray && !o.lock ? hcMotes() : ''}
+    ${hcMarks(v, own)}${posts}
+    ${mx ? '<span class="hk-max">максимум</span>' : ''}${note ? `<span class="hk-busy">${note}</span>` : ''}${o.lock ? `<span class="hk-lk" aria-hidden="true">${ic('lock')}</span>` : ''}
+    <span class="hk-bot"><b class="hk-nm">${hrEsc(v.n)}</b><span class="hk-row"><span class="hk-cls" title="${hrEsc(v.cls)}">${CLS(v.ic, 14, v.cls)}</span>${foot}</span></span>
+  </button>`;
+}
+const hcGridVars = () => `--hk-w0:${HC_VIEW.card[0]}px;--hk-w1:${HC_VIEW.card[1]}px;--hk-gap:${HC_VIEW.gap}px`;
+
+/* ---------- порядок и фильтр ---------- */
+/* сетка сейчас: all — каталог, own — герои аккаунта (карточка помнит, из какой сетки открыта: S.hgrid) */
+const hcKind = () => S.hview === 'all' || (S.hview === 'rs' && S.hgrid === 'all') ? 'all' : 'own';
+const HC_FK = { own: ['cls', 'el', 'r', 'c'], all: ['cls', 'el', 'r', 'c', 'src'], gold: ['cls', 'el', 'r'] };
+function hcPass(v, kind) {
+  const f = S.hf, on = k => HC_FK[kind].includes(k) && f[k];
+  return (!on('cls') || v.key === f.cls) && (!on('el') || v.el === f.el) && (!on('r') || v.r === f.r) && (!on('c') || v.c === f.c) && (!on('src') || v.src === f.src);
+}
+const hcFN = kind => HC_FK[kind].filter(k => S.hf[k]).length;
+const HC_CMP = {
+  bm: (a, b) => b.bm - a.bm, r: (a, b) => b.r - a.r || b.bm - a.bm, lvl: (a, b) => b.lvl - a.lvl || b.bm - a.bm,
+  valor: (a, b) => b.valor - a.valor || b.bm - a.bm, c: (a, b) => a.c - b.c,
+};
+const hcSortOf = kind => { const k = kind === 'all' ? S.hf.sortAll : S.hf.sort, L = HC_SORT[kind]; return L.some(x => x[0] === k) ? k : L[0][0]; };
+function hcSorted(list, kind) {
+  const cmp = HC_CMP[hcSortOf(kind)], at = new Map(list.map((v, i) => [v, i]));
+  return [...list].sort((a, b) => cmp(a, b) || at.get(a) - at.get(b));
+}
+/* «Мои» — герои аккаунта: отряд прототипа и купленные; ‹ › большой карточки листают этот же список */
+const hcOwnList = () => hcSorted(hrMine().map(hcView).filter(v => v && hcPass(v, 'own')), 'own');
+/* каталог — весь состав; купленный — вид героя аккаунта */
+const hcCatList = () => hcSorted(RS.heroes.map(hcView).filter(v => v && hcPass(v, 'all')), 'all');
+const HC_FUN = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7.5V19l-4 1.5v-8z"/></svg>';
+const hcFBtn = (kind, n) => `<button class="iconbtn hk-fb${n ? ' on' : ''}" data-a="sheet" data-v="hcflt:${kind}" aria-label="Фильтр${n ? ': выбрано ' + n : ''}" title="Фильтр">${HC_FUN}${n ? `<b class="num">${n}</b>` : ''}</button>`;
+/* строка над сеткой: «Мои» и «Каталог», сила коллекции, порядок и фильтр — компактно (правила воздуха) */
+function hcBar(kind, shown, total) {
+  const all = kind === 'all', n = hcFN(kind), sort = hcSortOf(kind);
+  const tabs = `<div class="tabs hk-tabs" role="tablist" aria-label="Коллекция"><button role="tab" aria-selected="${!all}" data-a="hview" data-v="own">Мои · ${hrMine().length}</button><button role="tab" aria-selected="${all}" data-a="hview" data-v="all">Каталог · ${RS.heroes.length}</button></div>`;
+  const pow = all ? '' : `<button class="collpow hk-pow" data-a="sheet" data-v="coll" title="Рейтинговые пассивки всех героев коллекции: РП1 — Событие, все пять — по нажатию"><b>Сила коллекции</b><span class="chip spirit">+${collPct(collRp(1))}</span>${ic('chev')}</button>`;
+  const sel = `<select class="rs-sel hk-sort" data-a="hcsort" aria-label="Порядок">${HC_SORT[kind].map(([k, l]) => `<option value="${k}"${k === sort ? ' selected' : ''}>${l}</option>`).join('')}</select>`;
+  return `<div class="hkh">${tabs}${n ? `<span class="hk-cnt num">${shown} из ${total}</span>` : ''}<span class="g-spacer"></span>${pow}${sel}${hcFBtn(kind, n)}</div>`;
+}
+const hcEmpty = () => `<div class="hk-empty"><p>Под фильтр никто не подходит</p><button class="btn sm" data-a="hcclr">Сбросить фильтр</button></div>`;
+/* сетка: «Мои» — карточки героев аккаунта; каталог — весь состав, несобранные чёрно-белые, у сборных — полоса осколков, закрытый цикл — замок */
+function hcGridView() {
+  const kind = S.hview === 'all' ? 'all' : 'own';
+  if (kind === 'all' && !RS.heroes.length) return HR_NODATA;
+  const list = kind === 'all' ? hcCatList() : hcOwnList(), total = kind === 'all' ? RS.heroes.length : hrMine().length, cur = rsCyc(), need = hrNeed();
+  const card = v => {
+    if (kind !== 'all' || v.own) return hcCard(v);
+    const lock = v.c > cur, sh = RS_SHARD.includes(v.src) && !lock ? [S.rs.shards[v.id] || 0, need] : null;
+    return hcCard(v, { gray: !(sh && sh[0] >= need), shard: sh, lock });
+  };
+  return `<section class="scr hk-scr">${hcBar(kind, list.length, total)}
+    <div class="hkg scroll" style="${hcGridVars()}" data-keep="hk:${kind}">${list.map(card).join('') || hcEmpty()}</div></section>`;
+}
+
+/* ---------- большая карточка ----------
+   Слева — портрет в раме своей ступени: нажатие показывает его крупно (OV.hczoom); кристалл, доблесть дугой, рунные камни по бокам,
+   «максимум». Справа — шапка: имя, класс и стихия, раса, редкость и цикл; у героя аккаунта — мощь, доблесть и уровень, у героя состава —
+   личный максимум доблести. Ниже — вкладки и одно действие. o: back — атрибуты кнопки «Назад», step — ‹ › по сетке, body, foot, src */
+function hcBig(v, o = {}) {
+  const t = hcTier(v), own = !!v.own, mx = own && hcMax(v), nx = own ? hrRpNext(v) : '', G = HC_VIEW, say = `Рунный предел ${v.lim} из ${hrLimTop()}`;
+  const posts = own && typeof rpPost === 'function' ? `<span class="hcb-rp" role="img" aria-label="${say}" title="${say}">${rpPost(v.lim, nx, 'h', 'l')}${rpPost(v.lim, nx, 'h', 'r')}</span>` : '';
+  const back = o.back ? `<button class="iconbtn hcb-bk" ${o.back} aria-label="Назад" title="Назад">${ic('back')}</button>` : '';
+  const step = o.step ? `<span class="hcb-step"><button class="iconbtn" data-a="hcstep" data-v="-1" aria-label="Предыдущий герой" title="Предыдущий">${ic('chev', 'flip')}</button><button class="iconbtn" data-a="hcstep" data-v="1" aria-label="Следующий герой" title="Следующий">${ic('chev')}</button></span>` : '';
+  return `<div class="hcb" style="--hcb-w:${G.big[0]};--hcb-h:${G.big[1]};--hcb-max:${G.bigMax}">
+    <div class="hcb-g">
+      <div class="hcb-pt" data-r="${v.r}" data-t="${t}"${mx ? ' data-max="1"' : ''}>
+        <button class="hcb-ph" data-a="hczoom" data-v="${v.id}" aria-label="${hrEsc(v.n)}: портрет крупно">${hcFace(v)}</button>${hcFr(t)}${t >= G.tier.top ? hcMotes() : ''}
+        ${hcMarks(v, own)}${posts}
+        ${mx ? '<span class="hk-max">максимум</span>' : ''}${own && v.busy ? `<span class="hk-busy">${v.busy}</span>` : ''}<i class="hcb-zi" aria-hidden="true">${ic('search')}</i>
       </div>
-      <div class="coll-grid scroll grow" data-keep="rsgrid:${f.cyc}:${f.src}:${f.cls}">${grid}</div>
+      <div class="hcb-in">
+        <header class="hcb-h">${back}<div class="hcb-id"><h2>${hrEsc(v.n)}</h2>
+          <div class="hd-line"><span class="hd-cls">${CLS(v.ic, 18)}${v.cls}</span>${el(v.el)}<span>${v.race}</span></div>
+          <div class="hd-line">${rar(v.r)}<span class="faint caps">цикл ${hcRom(v.c)}</span>${o.src || ''}</div></div>${step}
+          <div class="hd-bm hr-vit${own ? '' : ' rs-aside'}">${own ? hrVitals(v) : hrPot(v)}</div></header>
+        ${o.body || ''}${o.foot ? `<div class="hcb-f">${o.foot}</div>` : ''}
+      </div>
     </div>
-    ${rsDetail(sel)}
-  </div></section>`;
-}
-/* главное действие карточки героя состава: свой герой — к развитию, иначе — к своему способу получить */
-function rsGetHtml(h) {
-  const acc = rsOld(h) || (S.rs.owned[h.id] ? H(h.id) : null), own = S.rs.owned[h.id];
-  if (acc) return `<button class="btn go sm" data-a="rsmine" data-v="${acc.id}">${ic('up')}Развитие</button>${own ? `<span class="reason">${RS_HOW[own.how] || 'в коллекции'}</span>` : TM(`<span class="reason">В бою прототипа ${acc.name} — на прежнем наборе способностей</span>`)}`;
-  const how = {
-    gold: `Следующий найм цикла ${ROMAN[h.c]} — ${fmt(rsGold(h.c, rsBought(h.c) + 1))} золота`,
-    donat: 'Любой из пятерых за Энериум',
-    roulette: 'Осколки — в возрождении душ и за прах',
-    echo: 'Осколки — только в сундуках Эхо',
-    craft: 'Скрытый рецепт: его находят перебором в Мастерской',
-  }[h.src] || '';
-  const go = h.src === 'craft' ? '' : `<button class="btn go sm" data-a="rsgo" data-v="${h.id}">${ic('arrow')}${h.src === 'gold' ? 'К найму' : h.src === 'donat' ? 'В витрину' : 'К душам'}</button>`;
-  return `${go}${h.c > rsCyc() ? `<span class="chip warn">${ic('lock')}цикл ${ROMAN[h.c]}</span>` : ''}<span class="reason">${how}</span>`;
-}
-/* карточка героя состава — правила воздуха: лор в две строки, до двух чипов, одно действие; остальное — лист «Подробнее».
-   act — своё главное действие (в Призыве оно в шапке), по умолчанию — как получить героя; extra — перед действием (формула цены команде) */
-function rsBrief(h, act, extra = '') {
-  const chips = rsSrcChip(h) + (h.avers && h.avers.race ? `<span class="chip" title="Неприязнь героя Эхо">${ic('target')}${rsAversShort(h)}</span>` : '');
-  return `<div class="hd-sec">
-    ${foldLore(h.who)}
-    <div class="row hd-facts">${chips}</div>${extra}
-    <div class="hd-act">${act == null ? rsGetHtml(h) : act}<button class="link" data-a="rhero" data-v="${h.id}">Подробнее ${ic('chev')}</button></div>
   </div>`;
 }
-function rsDetail(h) {
-  if (!h) return '<div class="pnl hd"><p class="faint">Выберите героя.</p></div>';
-  const t = S.seg.rhero || 'who', v = rsV(h);
-  const body = t === 'mem' ? `<div class="col scroll grow" style="gap:6px" data-keep="rsmem:${h.id}">${rsValorPick(h, v)}${rsChaptersHtml(h, v)}</div>`
-    : t === 'set' ? `<div class="col scroll grow" style="gap:8px" data-keep="rsset:${h.id}">${rsValorPick(h, v)}${rsSetHtml(h, v)}</div>`
-    : rsBrief(h);
+/* большая карточка героя аккаунта: вкладки «Развитие», «Снаряжение», «Навыки», «Путь» — heroDetail без шапки (index.html); одно главное
+   действие — следующий шаг во вкладке «Развитие» (screens/hero-dev.js) */
+function hcOwnView() {
+  const mine = hrMine(); let h = H(S.selHero);
+  if (!h || !mine.includes(h)) { h = mine[0]; if (!h) return hcGridView(); S.selHero = h.id; }
+  const list = hcOwnList(), many = list.length > 1 || (list.length === 1 && list[0].id !== h.id);
+  return `<section class="scr hcb-scr">${hcBig(hcView(h), { back: 'data-a="hcback"', step: many, body: heroDetail(h, { head: false, cls: 'hcb-tabs' }) })}</section>`;
+}
+/* большая карточка героя состава — «до покупки»: вкладки «Герой» (история-завязка и с чем приходит), «Навыки» (что откроет каждая
+   доблесть: набор героя, доли хода), «Путь» (главы и орден). Снаряжения, талисманов и прокачки нет — героя ещё нет в коллекции;
+   купленный — та же карточка с его прогрессом. o: back — атрибуты «Назад», foot — одно действие внизу */
+function hcPre(rh, o = {}) {
+  const v = hcView(rh), val = S.rs.val && S.rs.val.id === rh.id ? rsV(rh) : v.own ? v.valor : 0;
+  const t = ['who', 'skills', 'path'].includes(S.seg.rhero) ? S.seg.rhero : 'who';
   const team = `<button class="iconbtn rs-team team-only" data-a="rsteam" aria-pressed="${!!KH.team}" aria-label="Режим «Команда»" title="Режим «Команда»: орден, черновик и заметки видны сразу. Нажать — вернуться к виду игрока">${ic('eye')}</button>`;
-  return `<div class="pnl hd">${rsHead(h, v)}<div class="hd-body"><div class="row" style="justify-content:space-between"><div class="tabs" role="tablist" aria-label="Разделы героя">${[['who', 'Герой'], ['mem', 'Воспоминания'], ['set', 'Орден']].map(([k, l]) => `<button role="tab" aria-selected="${t === k}" data-a="seg" data-v="rhero:${k}">${l}</button>`).join('')}</div>${team}</div>${body}</div></div>`;
+  const tabs = `<div class="row hcb-tr"><div class="tabs" role="tablist" aria-label="Разделы героя">${[['who', 'Герой'], ['skills', 'Навыки'], ['path', 'Путь']].map(([k, l]) => `<button role="tab" aria-selected="${t === k}" data-a="seg" data-v="rhero:${k}">${l}</button>`).join('')}</div><span class="g-spacer"></span>${team}</div>`;
+  const pseudo = { draft: hrDraft(rh), valor: val }, kit = typeof heroKit === 'function' && heroKit(pseudo) ? heroKitHtml(pseudo) : '<p class="faint">Набора способностей пока нет.</p>';
+  const body = t === 'skills' ? `${rsValorPick(rh, val)}${kit}`
+    : t === 'path' ? `<div class="hcb-sc scroll" data-keep="hcpath:${rh.id}">${rsValorPick(rh, val)}${rsChaptersHtml(rh, val)}<span class="eyebrow">Орден</span>${rsSetHtml(rh, val)}</div>`
+    : `<div class="hcb-sc scroll" data-keep="hcwho:${rh.id}">${rsWhoHtml(rh)}</div>`;
+  return hcBig(v, { back: o.back, src: rsSrcChip(rh), body: `<div class="hcb-tb">${tabs}${body}</div>`, foot: o.foot });
+}
+/* каталог: карточка героя состава на месте сетки; «Назад» — в каталог */
+function hcRsView() {
+  const rh = RSI[S.rs.sel] || RS.heroes[0]; if (!rh) return HR_NODATA;
+  return `<section class="scr hcb-scr">${hcPre(rh, { back: 'data-a="hcback"', foot: hcGetFoot(rh) })}</section>`;
+}
+/* одно действие карточки героя состава: купленный — к развитию; иначе — к своему способу получить: найм, витрина, души, отряд недели */
+function hcGetFoot(rh) {
+  const own = S.rs.owned[rh.id];
+  if (rsHas(rh)) return `<span class="chip gold">${ic('check')}${own && RS_HOW[own.how] ? RS_HOW[own.how] : 'в коллекции'}</span><span class="g-spacer"></span><button class="btn go" data-a="dngo" data-v="${rh.id}">${ic('up')}К развитию</button>`;
+  const cur = rsCyc(), lock = rh.c > cur, need = hrNeed(), n = S.rs.shards[rh.id] || 0, W = rsWeek(), week = !!W && W.squad.includes(rh.id);
+  const how = { gold: `Найм за золото: следующий в цикле ${ROMAN[rh.c]} — ${fmt(rsGold(rh.c, rsBought(rh.c) + 1))}`, donat: 'Донатный сет за Энериум: любой из пятерых',
+    roulette: 'Осколки — в Возрождении душ и в лавке праха', echo: 'Осколки — только в сундуках Эхо за места недели', craft: 'Скрытый рецепт: его находят перебором в Мастерской' }[rh.src] || '';
+  const sh = RS_SHARD.includes(rh.src) && !lock ? `<span class="hcb-shb">${bar(Math.min(100, hrFl(n * 100, need)), n >= need ? 'sp' : '')}<small class="num">${fmt(n)} / ${fmt(need)}</small></span>` : '';
+  const go = rh.src === 'craft' ? '' : `<button class="btn go" data-a="rsgo" data-v="${rh.id}">${ic('arrow')}${{ gold: 'К найму', donat: 'В витрину', roulette: 'К душам', echo: week ? 'К отряду недели' : 'К душам' }[rh.src]}</button>`;
+  return `<div class="hcb-buy">${lock ? `<span class="chip warn">${ic('lock')}цикл ${ROMAN[rh.c]}</span>` : ''}<span class="reason">${how}</span>${sh}</div><span class="g-spacer"></span>${go}`;
 }
 
 /* ================== Отряды ==================
@@ -565,11 +733,13 @@ function sqLeagueSheet() {
 }
 
 /* ================== Призыв: три способа получить героя (ADR-0019) ==================
-   За золото — каталог цикла, цена по счёту покупки (ADR-0023); за Энериум — донатный сет цикла, с цикла II (ADR-0021); за души —
-   рулетка крупно, отряд Эхо недели и каталог праха — входами (правила воздуха). Цикл I–VI переключается для демо — только команде */
+   За золото — сетка карточек 9 : 16 каталога цикла, цена по счёту покупки (ADR-0023); за Энериум — донатный сет цикла, с цикла II
+   (ADR-0021); за души — рулетка крупно, отряд Эхо недели и лавка праха — входами (правила воздуха). Цикл I–VI переключается для
+   демо — только команде. Открытая карточка «до покупки» занимает всю рабочую область: крупным планом, «Назад» — к сетке */
 function hireView() {
   if (!RS.heroes.length) return HR_NODATA;
-  const t = S.seg.hire || 'gold', c = rsCyc();
+  const t = S.seg.hire || 'gold', c = rsCyc(), pick = t === 'gold' && S.rs.gsel ? RSI[S.rs.gsel] : null;
+  if (pick && pick.src === 'gold') return `<section class="scr hcb-scr">${hcPre(pick, { back: 'data-a="gsel" data-v=""', foot: hcGoldFoot(pick) })}</section>`;
   const tabs = [['gold', 'За золото'], ['donat', 'За Энериум'], ['souls', 'За души']];
   return `<section class="scr">
     <div class="row rs-hbar"><div class="tabs" role="tablist" aria-label="Способ получить героя">${tabs.map(([k, l]) => `<button role="tab" aria-selected="${t === k}" data-a="seg" data-v="hire:${k}">${l}</button>`).join('')}</div>
@@ -578,37 +748,31 @@ function hireView() {
     ${t === 'donat' ? dnView() : t === 'souls' ? rsSoulsView() : rsGoldView()}
   </section>`;
 }
-/* за золото: каталог цикла, «№» — только порядок; цена k-й покупки цикла растёт линейно, максимум доблести — 1 */
+/* за золото — слова автора 30.09.2026: «в призыве за золото то же самое: сетка героев и вся информация по герою до его покупки, чтобы
+   игрок понимал, что он покупает». Каталог цикла карточками 9 : 16, «№» — только порядок; купленный — отметка; цена k-й покупки цикла
+   растёт линейно — одна строка над сеткой и на кнопке «Купить» в карточке; максимум доблести — 1. Будущий цикл — витрина с замком */
 function rsGoldView() {
   const cur = rsCyc(), c = S.rs.gcyc || cur, open = c <= cur, k = rsBought(c) + 1;
   const cat = RS.heroes.filter(h => h.src === 'gold' && h.c === c).sort((a, b) => a.no - b.no);
-  const sel = cat.find(h => h.id === S.rs.gsel) || cat.find(h => !rsHas(h)) || cat[0];
+  const list = cat.map(hcView).filter(v => v && hcPass(v, 'gold'));
   const opts = ROMAN.slice(1).map((r, i) => `<option value="${i + 1}" ${i + 1 === c ? 'selected' : ''}>Каталог цикла ${r}${i + 1 > cur ? ' · закрыт' : ''}</option>`).join('');
-  const rows = cat.map(h => rsRow(h, { act: 'gsel', sel: sel && h.id === sel.id, sub: rsSub(h, `${h.cls}${h.tut ? ' · <span class="rs-tut">обучение</span>' : ''}`), right: rsHas(h) ? `<span class="chip gold">${ic('check')}есть</span>` : `<span class="faint num">№${h.no}</span>` })).join('');
-  return `<div class="hs rs-hs">
-    <div class="pnl coll">
-      <div class="row"><select class="rs-sel grow" data-a="gcyc" aria-label="Каталог героев за золото">${opts}</select><span class="chip" title="Нанято героев этого каталога">${k - 1} / ${cat.length}</span></div>
-      <p class="rs-next">${open ? `Следующий найм — ${k}-й в цикле:${money('gold', rsGold(c, k))}` : `${ic('lock')}Каталог откроется в цикле ${ROMAN[c]}`}</p>
-      <div class="rs-list scroll grow" data-keep="gcat:${c}">${rows}</div>
-    </div>
-    ${sel ? rsGoldCard(sel, c, k, open) : '<div class="pnl hd"></div>'}
+  const cards = list.map(v => hcCard(v, { act: 'gsel', val: v.rh ? v.rh.id : v.id, own: true, lock: !open, bm: false })).join('') || hcEmpty();
+  return `<div class="hk-hire">
+    <div class="hkh"><select class="rs-sel hk-cyc" data-a="gcyc" aria-label="Каталог героев за золото">${opts}</select><span class="chip" title="Нанято героев этого каталога">${k - 1} / ${cat.length}</span>
+      <p class="rs-next">${open ? `Следующий найм — ${k}-й в цикле:${money('gold', rsGold(c, k))}` : `${ic('lock')}Каталог откроется в цикле ${ROMAN[c]}`}</p><span class="g-spacer"></span>${hcFBtn('gold', hcFN('gold'))}</div>
+    <div class="hkg scroll" style="${hcGridVars()}" data-keep="gold:${c}">${cards}</div>
   </div>`;
 }
-/* карточка найма: шапка с ценой на кнопке, лор в две строки, остальное — в листе «Подробнее»; формула цены — команде */
-function rsGoldCard(h, c, k, open) {
-  const g = RS.rules.gold, price = rsGold(c, k);
-  const aside = rsHas(h) ? `<span class="chip gold">${ic('check')}в коллекции</span><button class="link" data-a="rsopen" data-v="${h.id}">Открыть ${ic('chev')}</button>`
-    : open ? `<button class="btn go" data-a="gbuy" data-v="${h.id}">Нанять${costTag('gold', price)}</button><small class="faint">${k}-й найм цикла ${ROMAN[c]}</small>`
-    : `<span class="chip warn">${ic('lock')}цикл ${ROMAN[c]}</span><small class="faint">витрина до перехода</small>`;
-  const next = Array.from({ length: g.preview }, (_, i) => k + i).map(n => `<div class="srow"><span class="n">${n}-я покупка цикла ${ROMAN[c]}</span><span class="v">${fmt(rsGold(c, n))}</span><span></span></div>`).join('');
-  const team = `<div class="col team-only" style="gap:6px">
-      <span class="eyebrow">Цена — по счёту покупки</span>
-      <p class="reason num">${fmt(g.first)} × ${c} × (1 + ${pctBp(g.stepBp)} × (${k} − 1)) = ${fmt(price)}</p>
-      <div class="stats">${next}</div>
-      <p class="reason">№ в каталоге — только порядок. Цена растёт с каждой покупкой в цикле, и всех героев цикла к его концу не выкупить.</p>
-    </div>`;
-  return `<div class="pnl hd">${rsHead(h, 0, aside)}
-    <div class="hd-body">${rsBrief(h, '<span class="reason">Цена растёт с каждым наймом в цикле</span>', team)}</div></div>`;
+/* одно действие карточки «до покупки» за золото: цена у кнопки «Купить» (покупка — ACT.gbuy в index.html, подтверждение с ценой
+   следующей); не хватает — сколько; будущий цикл — витрина; купленный — к развитию. Формула цены — команде */
+function hcGoldFoot(rh) {
+  const c = rh.c, k = rsBought(c) + 1, price = rsGold(c, k), G = RS.rules.gold;
+  if (rsHas(rh)) return `<span class="chip gold">${ic('check')}в коллекции</span><span class="g-spacer"></span><button class="btn go" data-a="dngo" data-v="${rh.id}">${ic('up')}К развитию</button>`;
+  if (c > rsCyc()) return `<span class="chip warn">${ic('lock')}цикл ${ROMAN[c]}</span><span class="reason">Каталог откроется при переходе на цикл ${ROMAN[c]} — пока витрина</span>`;
+  const lack = Math.max(0, price - S.wallet.gold);
+  const team = TM(`${fmt(G.first)} × ${c} × (1 + ${pctBp(G.stepBp)} × (${k} − 1)) = ${fmt(price)}`, 'span', 'reason num');
+  return `<div class="hcb-buy"><b>${k}-я покупка цикла ${ROMAN[c]}</b><span class="reason${lack ? ' warn' : ''}">${lack ? `Не хватает ${fmt(lack)} золота` : 'Придёт с 0 уровнем · следующая покупка дороже'}</span>${team}</div>
+    <span class="g-spacer"></span><button class="btn go big hcb-cta" data-a="gbuy" data-v="${rh.id}"${lack ? ' disabled' : ''}>Купить${costTag('gold', price)}</button>`;
 }
 /* ================== «За Энериум»: витрина донатного сета ==================
    Слова автора 29.09.2026: «сделать интереснее и дорого-богато, это всё-таки окно для донатных игроков… чтобы игрок хотел купить
@@ -717,10 +881,16 @@ function dnView() {
 
 /* ================== «За души»: сцена алтаря ==================
    Слово автора 29.09.2026: «рулетка — это тоже для людей, которые донатят… красиво и дорого-богато». Сцена — одна рама: алтарь душ
-   (RL_ART.altar или CSS), перед зеркалом — вход рулетки веером героев пула (rlCol), справа — два входа: отряд Эхо недели (лист
+   (RL_ART.altar или CSS), перед зеркалом — вход рулетки веером героев пула (rlCol), справа — два входа: отряд Эхо недели (окно-витрина
    OV.hrecho) и лавка праха (окно OV.dust). В лавке — только герои из rules.dustSrc (rsDustable): героев Эхо прахом не собрать, их
    осколки — сундуки Эхо, пробуждение — души */
 const hrDustCat = () => RS.heroes.filter(h => rsDustable(h) && h.c <= rsCyc() && !rsHas(h));
+/* арена цивилизации недели — рисунок Эхо (screens/echo.js отдаёт свои данные как EN_ECHO.data: ECH живёт внутри его обёртки);
+   нет рисунка — пусто, фон рисует CSS */
+function hrEchoArt(race) {
+  const E = window.EN_ECHO && window.EN_ECHO.data, a = E && E.art && E.art[race];
+  return a && a.arena ? AV(a.arena) : '';
+}
 const hrNeed = () => RS.rules.stub.shards;
 /* герой, которого собирают из осколков, — осколок: стекло с его лицом, доля собранного — светом кромки и заживающими трещинами
    (shardGhost, screens/art-icons.js); собранный и пробуждённый — портрет: null, строка берёт портрет */
@@ -728,17 +898,19 @@ function hrGhost(h, px) {
   if (!h || rsHas(h) || typeof shardGhost !== 'function') return null;
   return shardGhost(h, S.rs.shards[h.id] || 0, hrNeed(), px) || null;
 }
-/* строка героя, которого собирают: та же анатомия, что rsRow (index.html), лицо — осколок */
-function hrShardRow(h, o = {}) {
-  const g = hrGhost(h, 34);
-  if (!g) return rsRow(h, o);
-  return `<button class="rs-row hr-srow ${o.dim ? 'dim' : ''}" data-r="${h.r}" data-a="${o.act}" data-v="${h.id}" aria-current="${!!o.sel}"><span class="hr-sg">${g}</span><span class="tx"><b>${h.n}</b><small>${o.sub != null ? o.sub : h.cls}</small></span>${o.right || ''}</button>`;
+/* витрина отряда недели — выбранный герой одной строкой: имя, редкость и доблесть, осколки; одно действие — пробудить за души (комплект
+   собран), к развитию (в коллекции) или карточка героя. Пробуждение — подтверждение в том же окне (duAsk), операция SOUL_SRV.wake */
+function heSel(h) {
+  if (!h) return '';
+  const need = hrNeed(), n = S.rs.shards[h.id] || 0, own = rsHas(h), lock = h.c > rsCyc(), souls = RS.rules.stub.activateSouls, lack = Math.max(0, souls - S.wallet.souls);
+  const sub = own ? 'в коллекции' : lock ? `откроется в цикле ${ROMAN[h.c]}` : n >= need ? `осколков ${fmt(n)} / ${fmt(need)} — можно пробудить` : `осколков ${fmt(n)} / ${fmt(need)}`;
+  const act = own ? `<button class="btn go" data-a="dngo" data-v="${h.id}">${ic('up')}К развитию</button>`
+    : n >= need && !lock ? `<button class="btn" data-a="rhero" data-v="${h.id}">Карточка</button><button class="btn go he-cta" data-a="activate" data-v="${duOp()}|${h.id}"${lack ? ` disabled title="Не хватает ${fmt(lack)} душ"` : ''}>Пробудить${costTag('souls', souls)}</button>`
+    : `<button class="btn go" data-a="rhero" data-v="${h.id}">Карточка героя</button>`;
+  return `<div class="he-sel" data-r="${h.r}"><span class="he-sn"><b>${hrEsc(h.n)}</b><small>${rar(h.r)}<span>доблесть до ${h.maxV} · ${sub}</span></small></span>${act}</div>`;
 }
-/* выбранный в листе: осколок крупно, имя, полоса собранного */
-function hrShardPick(h) {
-  const n = S.rs.shards[h.id] || 0, need = hrNeed(), g = hrGhost(h, 64);
-  return `<div class="hr-dsel">${g ? `<span class="hr-sgl">${g}</span>` : ''}<div class="col" style="gap:6px;min-width:0;flex:1 1 auto"><div class="row"><b class="serif">${h.n}</b><span class="g-spacer"></span><button class="link" data-a="rhero" data-v="${h.id}">Карточка ${ic('chev')}</button></div>${bar(Math.min(100, hrFl(n * 100, need)), n >= need ? 'sp' : '')}<small class="faint num">осколков ${n} / ${need}${TM(' · число — заглушка')}</small></div></div>`;
-}
+let heWas = false;   // витрина была открыта в прошлой отрисовке: при выборе героя она не всплывает заново
+window.addEventListener('en-render', () => { heWas = !!(S.overlay && S.overlay.t === 'hrecho'); });
 /* сцена «За души» — её зовёт rsSoulsView (index.html): алтарь, огоньки душ, вход рулетки и два входа справа */
 function hrSoulsView() {
   const art = typeof RL_ART !== 'undefined' && RL_ART.ready.includes(RL_ART.altar);
@@ -751,7 +923,7 @@ function hrSoulsSide() {
   const cur = rsCyc(), from = rsFrom('echo'), W = rsWeek(), squad = W ? W.squad.map(id => RSI[id]).filter(Boolean) : [];
   const cat = hrDustCat(), need = hrNeed(), ready = cat.filter(h => (S.rs.shards[h.id] || 0) >= need).length, dfrom = rsFrom('roulette');
   const bg = src => src ? `<img class="hr-ebg" src="${src}" alt="" loading="lazy" decoding="async">` : '';
-  const eArt = W && typeof ECH !== 'undefined' && ECH.art && ECH.art[W.race] ? AV(ECH.art[W.race].arena) : '';
+  const eArt = W ? hrEchoArt(W.race) : '';
   const dArt = DU_ART.ready.includes(DU_ART.shop) ? AV(DU_ART.shop) : '';
   const face = h => { const on = h.c <= cur, g = hrGhost(h, DU_VIEW.side); return g ? `<span class="hr-sgf${on ? '' : ' off'}">${g}</span>` : `<span class="rs-av" data-r="${h.r}">${rsFace(h)}</span>`; };
   const echo = `<button class="hr-entry hr-echo" data-a="sheet" data-v="hrecho" aria-label="Эхо: отряд недели">${bg(eArt)}
@@ -851,29 +1023,60 @@ Object.assign(OV, {
     return dialog('Имя отряда', `<label class="search hr-name"><input id="sqName" type="text" maxlength="${SQ_DATA.nameMax}" value="${hrEsc(v)}" autocomplete="off" spellcheck="false" aria-label="Имя отряда"></label><p class="reason">До ${SQ_DATA.nameMax} знаков. Имя видно только вам.</p>`,
       `<button class="btn ghost" data-a="close">Отмена</button><button class="btn go" data-a="sqrendo" data-v="${sqOp()}|${s.id}">Сохранить</button>`);
   },
-  /* отряд Эхо недели: цивилизация, пятеро по циклам — осколками, будущие тусклые; неприязнь. Героя Эхо собирают только осколки из сундуков
-     Эхо — прахом нельзя; собранного пробуждают души — здесь же: выбрать героя, «Пробудить» (операция SOUL_SRV с номером) */
+  /* отряд Эхо недели — окно-витрина (слова автора 30.09.2026: «с отрядом недели тоже нужно сделать красивое окно, всё-таки этих героев
+     будут хотеть все»): за окном — арена цивилизации недели; цивилизация, нашествие и неприязнь; пятеро по циклам II–VI крупными
+     карточками 9 : 16 — несобранный чёрно-белый с полосой осколков, собранный комплект и пробуждённый — в цвете, будущий цикл — замок.
+     Внизу — откуда осколки (только сундуки Эхо за места недели, прахом нельзя) и выбранный герой с одним действием: «Пробудить» за души —
+     подтверждение в том же окне, операция SOUL_SRV с номером */
   hrecho() {
-    const cur = rsCyc(), from = rsFrom('echo'), W = rsWeek(), squad = W ? W.squad.map(id => RSI[id]).filter(Boolean) : [];
-    const to = squad.length ? squad[squad.length - 1].c : from, av = squad.find(h => h.avers && h.avers.race), need = hrNeed();
-    const sel = squad.find(h => h.id === S.rs.ssel && h.c <= cur) || null;
-    const rows = squad.map(h => h.c <= cur
-      ? hrShardRow(h, { act: 'ssel', sel: h === sel, sub: rsSub(h, `цикл ${ROMAN[h.c]} · доблесть до ${h.maxV}`), right: rsShardTag(h) })
-      : hrShardRow(h, { act: 'rhero', dim: true, sub: rsSub(h, `откроется в цикле ${ROMAN[h.c]}`), right: ic('lock') })).join('');
+    const cur = rsCyc(), from = rsFrom('echo'), W = rsWeek(), squad = W ? W.squad.map(id => RSI[id]).filter(Boolean) : [], need = hrNeed();
+    const has = h => S.rs.shards[h.id] || 0, open = h => h.c <= cur;
+    const sel = squad.find(h => h.id === S.rs.ssel) || squad.find(h => open(h) && !rsHas(h) && has(h) >= need) || squad.find(h => open(h) && !rsHas(h)) || squad.find(open) || squad[0] || null;
+    const to = squad.length ? squad[squad.length - 1].c : from, av = squad.find(h => h.avers && h.avers.race);
+    const art = W ? hrEchoArt(W.race) : '';
+    const card = h => { const own = rsHas(h), n = has(h); return hcCard(hcView(h), { act: 'ssel', val: h.id, gray: !own && n < need, shard: own ? null : [n, need], lock: !open(h), sel: h === sel, bm: false }); };
     const wsel = `<select class="rs-sel team-only" data-a="sweek" aria-label="Неделя расы, демо">${RS.weeks.map(w => `<option value="${w.race}" ${w === W ? 'selected' : ''}>Неделя ${w.gen}</option>`).join('')}</select>`;
-    let pick = cur < from ? '' : '<p class="reason">Выберите героя — сколько осколков собрано и пробуждение.</p>', foot = `<button class="btn go" data-a="sheet" data-v="gifts">Дары путешествия</button>`;
-    if (sel) {
-      const n = S.rs.shards[sel.id] || 0;
-      pick = rsHas(sel) ? `<div class="hr-dsel"><div class="row"><b class="serif">${sel.n}</b><span class="g-spacer"></span><span class="chip gold">${ic('check')}в коллекции</span></div></div>` : hrShardPick(sel);
-      foot = rsHas(sel) ? `<button class="btn go" data-a="rhero" data-v="${sel.id}">Карточка героя</button>`
-        : `<button class="btn" data-a="sheet" data-v="gifts">Дары</button><button class="btn go" data-a="activate" data-v="${duOp()}|${sel.id}" ${n >= need ? '' : 'disabled'}>Пробудить${costTag('souls', RS.rules.stub.activateSouls)}</button>`;
-    }
-    const body = `${W && W.civ ? `<div class="col" style="gap:3px"><b class="serif hr-civ">${W.civ}</b><small class="faint">нашествие «${W.raid}» · по герою за цикл, ${ROMAN[from]}–${ROMAN[to]}</small></div>` : `<small class="faint">по герою за цикл, ${ROMAN[from]}–${ROMAN[to]}</small>`}
-      ${cur < from ? `<p class="rs-line">${ic('lock')}Эхо откроется с цикла ${ROMAN[from]}.</p>` : ''}
-      ${av ? `<p class="rs-line">${ic('target')}Неприязнь: ${rsAversShort(av)}</p>` : ''}
-      ${pick}<div class="rs-list">${rows}</div>
-      <p class="reason">Осколки героев Эхо — только из сундуков Эхо за места: прахом их не собрать. Собранного героя пробуждают души.</p>${wsel}`;
-    return sheet('Отряд недели', body, foot, true);
+    const src = cur < from ? `${ic('lock')}<span>Эхо откроется с цикла ${ROMAN[from]}.</span>`
+      : `${ic('gem')}<span>Осколки героев Эхо — только из сундуков Эхо за места недели: прахом их не собрать. Собранного пробуждают души.</span><button class="link" data-a="go" data-v="echo">В Эхо ${ic('chev')}</button>`;
+    return `<div class="ov he-ov${heWas ? ' still' : ''}" role="dialog" aria-modal="true" aria-label="Эхо: отряд недели"><button class="ov-scrim" data-a="close" aria-label="Закрыть" tabindex="-1"></button>
+      <div class="he" style="--he-gap:${HC_VIEW.echo}px">${art ? `<img class="he-bg" src="${art}" alt="" decoding="async">` : '<i class="he-bg css" aria-hidden="true"></i>'}
+        <div class="he-h"><div class="he-t"><span class="eyebrow">Эхо · отряд недели</span><h2>${W && W.civ ? W.civ : 'Отряд недели'}</h2><small>${W && W.raid ? `нашествие «${W.raid}» · ` : ''}по герою за цикл, ${ROMAN[from]}–${ROMAN[to]}</small></div>
+          ${av ? `<span class="chip he-av" title="Неприязнь героев Эхо — особенность, не способность: действует везде, где встречаются враги этой расы">${ic('target')}${rsAversShort(av)}</span>` : ''}<span class="g-spacer"></span>${wsel}<button class="iconbtn x" data-a="close" aria-label="Закрыть">${ic('x')}</button></div>
+        <div class="he-row"><div class="he-cards" role="group" aria-label="Пятеро недели">${squad.map(card).join('')}</div></div>
+        <div class="he-f"><p class="he-src">${src}</p>${heSel(sel)}</div>
+        ${S.du.ask ? duAsk() : ''}
+      </div></div>`;
+  },
+  /* большая карточка героя состава поверх любого экрана — «до покупки» или с прогрессом купленного: из рулетки, лавки праха, запасов,
+     мастерской, Эхо и витрины отряда недели. Окно встаёт на место рабочей области; «Назад» возвращает в окно, из которого открыли (back) */
+  rhero(o) {
+    const rh = RSI[o.arg]; if (!rh) return '';
+    const back = o.back ? `data-a="dlg" data-v="${hrEsc(o.back)}"` : 'data-a="close"';
+    return `<div class="ov hc-ov" role="dialog" aria-modal="true" aria-label="${hrEsc(rh.n)}"><button class="ov-scrim" ${back} aria-label="Закрыть" tabindex="-1"></button>
+      <div class="hc-win">${hcPre(rh, { back, foot: hcGetFoot(rh) })}</div></div>`;
+  },
+  /* портрет крупно — по нажатию на портрет большой карточки: рисунок целиком в раме своей ступени; закрытие возвращает прежнее окно */
+  hczoom(o) {
+    const x = H(o.arg) || RSI[o.arg], v = x && hcView(x); if (!v) return '';
+    const t = hcTier(v);
+    return `<div class="ov hcz-ov" role="dialog" aria-modal="true" aria-label="${hrEsc(v.n)} — портрет"><button class="ov-scrim" data-a="hczx" aria-label="Закрыть" tabindex="-1"></button>
+      <figure class="hcz" data-r="${v.r}" data-t="${t}"><span class="hcz-ph">${hcFace(v)}</span>${hcFr(t)}${t >= HC_VIEW.tier.top ? hcMotes() : ''}<i class="hk-cr" aria-hidden="true"></i>
+        <figcaption><b>${hrEsc(v.n)}</b>${rar(v.r)}${hcStars(v.valor, v.maxV)}</figcaption></figure>
+      <button class="iconbtn x hcz-x" data-a="hczx" aria-label="Закрыть">${ic('x')}</button></div>`;
+  },
+  /* фильтр сетки значками: класс, стихия, редкость, цикл, в каталоге — источник; нажатие — выбрать или снять; сколько героев подходит */
+  hcflt(o) {
+    const kind = HC_FK[o.arg] ? o.arg : 'own', f = S.hf, keys = HC_FK[kind];
+    const b = (k, val, lbl, ico) => { const on = f[k] === val; return `<button class="hkf-b${on ? ' on' : ''}" data-a="hcf" data-v="${k}:${val}" aria-pressed="${on}" title="${hrEsc(lbl)}">${ico}<span>${hrEsc(lbl)}</span></button>`; };
+    const grp = (k, t, items) => keys.includes(k) ? `<div class="hkf-g"><span class="eyebrow">${t}</span><div class="hkf-r">${items.join('')}</div></div>` : '';
+    const n = kind === 'all' ? hcCatList().length : kind === 'gold' ? RS.heroes.filter(h => h.src === 'gold' && h.c === (S.rs.gcyc || rsCyc())).map(hcView).filter(v => v && hcPass(v, 'gold')).length : hcOwnList().length;
+    const body = grp('cls', 'Класс', RS.classes.map(k => b('cls', k, cap1(k), CLS(k, 20, ''))))
+      + grp('el', 'Стихия', (RS.schools || []).map(e => b('el', e, cap1(e), el(e, true))))
+      + grp('r', 'Редкость', RAR.slice(1).map((t, i) => b('r', i + 1, t, `<i class="hkf-cr" data-r="${i + 1}" aria-hidden="true"></i>`)))
+      + grp('c', 'Цикл', ROMAN.slice(1).map((r, i) => b('c', i + 1, 'Цикл ' + r, '')))
+      + grp('src', 'Откуда', RS.sources.map(k => b('src', k, RS_SRC_ONE[k], '')))
+      + `<p class="reason">Подходит героев: <b class="num">${n}</b></p>`;
+    return sheet('Фильтр', body, `<button class="btn ghost" data-a="hcclr">Сбросить</button><button class="btn go" data-a="close">Готово</button>`, true);
   },
   /* лавка праха — отдельное окно (§15.1–§15.3): лавка-реликварий за стеклом витрины (DU_ART или CSS), прах на руках, витрина героев
      доступных циклов, выбранный — справа. Героев Эхо здесь нет — и сказано почему, со ссылкой на отряд недели */
@@ -902,7 +1105,8 @@ Object.assign(OV, {
     const G = DU_VIEW.wake, at = S.du.got && S.du.got.op === R.op ? S.du.got.at : 0, need = hrNeed();
     const t = at ? Math.max(0, Math.min(G.end, Date.now() - at)) : G.end, done = t >= G.end;
     const vars = `--t0:-${t}ms;` + Object.entries(G).map(([k, v]) => `--w-${k}:${v}ms`).join(';') + (typeof rlFrVars === 'function' ? ';' + rlFrVars() : '');
-    const back = o.back === 'dust', woke = h.sex === 'f' ? 'пробуждена' : 'пробуждён';
+    const back = o.back === 'dust' ? '<button class="btn" data-a="dlg" data-v="dust">В лавку</button>' : o.back === 'hrecho' ? '<button class="btn" data-a="dlg" data-v="hrecho">К отряду недели</button>' : '';
+    const woke = h.sex === 'f' ? 'пробуждена' : 'пробуждён';
     return `<div class="ov hr-wake${done ? ' done' : ''}" role="dialog" aria-modal="true" aria-label="${hrEsc(h.n)} — ${woke}" style="${vars}">
       <button class="ov-scrim" data-a="${done ? 'close' : 'hrwskip'}" aria-label="${done ? 'Закрыть' : 'Показать сразу'}" tabindex="-1"></button>
       <div class="hw-s" data-a="${done ? 'noop' : 'hrwskip'}">
@@ -911,7 +1115,7 @@ Object.assign(OV, {
         <div class="hw-say"><span class="eyebrow">${cap1(woke)} душами</span><h2>${hrEsc(h.n)}</h2><p>${rar(h.r)}<span>${hrEsc(h.cls)}</span></p>
           <small class="faint">В коллекции · 0 ур. · доблесть до ${h.maxV}${R.dust ? ` · лишние осколки — в прах: +${fmt(R.dust)}` : ''}</small></div>
       </div>
-      <div class="hw-acts">${back ? '<button class="btn" data-a="dlg" data-v="dust">В лавку</button>' : '<button class="btn" data-a="close">Закрыть</button>'}<button class="btn go" data-a="dngo" data-v="${h.id}">${ic('up')}К развитию</button></div>
+      <div class="hw-acts">${back || '<button class="btn" data-a="close">Закрыть</button>'}<button class="btn go" data-a="dngo" data-v="${h.id}">${ic('up')}К развитию</button></div>
       <button class="iconbtn x hw-x" data-a="close" aria-label="Закрыть">${ic('x')}</button>
     </div>`;
   },
@@ -1174,12 +1378,57 @@ Object.assign(ACT, {
   },
   /* окно получения: нажатие — сразу итог */
   dnskip() { if (S.dn.got) S.dn.got.at = Date.now() - DN_VIEW.got.end; render(); focusOverlay(); },
-  /* «К развитию»: герой в «Моих», вкладка «Сила» */
+  /* «К развитию»: большая карточка героя аккаунта, вкладка «Развитие»; «Назад» — к сетке «Мои» */
   dngo(v) {
     const h = RSI[v]; if (!h) return;
     const acc = rsOld(h) || H(h.id);
-    S.overlay = null; S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.selHero = acc ? acc.id : v; S.seg.hero = 'power';
+    S.overlay = null; S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.hgrid = 'own'; S.selHero = acc ? acc.id : v; S.seg.hero = 'power';
     render();
+  },
+});
+/* коллекция и большая карточка: вид — сетка, карточка, крупный портрет, порядок и фильтр; ничего не списывают и не выдают */
+const HC_ZERO = { cls: '', el: '', r: 0, c: 0, src: '' };
+const hcRsGo0 = ACT.rsgo;
+Object.assign(ACT, {
+  /* нажатие на арт: герой аккаунта — большая карточка с развитием, герой состава — карточка «до покупки»; сетка запоминается для «Назад» */
+  hc(v) {
+    const acc = H(v); S.hgrid = S.hview === 'all' ? 'all' : 'own'; S.seg.heroes = 'coll';
+    if (acc) { S.selHero = acc.id; S.hview = 'mine'; }
+    else if (RSI[v]) { S.rs.sel = v; S.rs.val = null; S.hview = 'rs'; S.seg.rhero = 'who'; }
+    else return;
+    render();
+  },
+  hcback() { S.hview = S.hgrid === 'all' ? 'all' : 'own'; render(); },
+  /* ‹ › в большой карточке — соседний герой той же сетки, с тем же порядком и фильтром */
+  hcstep(v) {
+    const list = hcOwnList(); if (!list.length) return;
+    const i = list.findIndex(x => x.id === S.selHero), d = +v < 0 ? -1 : 1, n = list.length;
+    S.selHero = list[i < 0 ? 0 : ((i + d) % n + n) % n].id; S.hview = 'mine'; render();
+  },
+  /* портрет крупно поверх; закрытие возвращает окно, из которого открыли (карточка героя состава поверх любого экрана) */
+  hczoom(v) { if (!v || !(H(v) || RSI[v])) return; S.overlay = { t: 'hczoom', arg: v, back: S.overlay && S.overlay.t !== 'hczoom' ? S.overlay : null }; render(); focusOverlay(); },
+  hczx() { S.overlay = S.overlay && S.overlay.t === 'hczoom' ? S.overlay.back || null : null; render(); },
+  /* фильтр: «группа:значение» — выбрать или снять; сброс — всё или одну группу */
+  hcf(v) {
+    const [k, x] = String(v).split(':'); if (!(k in HC_ZERO)) return;
+    const val = typeof HC_ZERO[k] === 'number' ? +x || 0 : x || '';
+    S.hf[k] = S.hf[k] === val ? HC_ZERO[k] : val; render();
+  },
+  hcclr(v) { if (v in HC_ZERO) S.hf[v] = HC_ZERO[v]; else Object.assign(S.hf, HC_ZERO); render(); },
+  /* порядок сетки — выпадающий список: «Мои» и каталог помнят свой */
+  hcsort(v, t) { const k = hcKind(), x = t && t.value; if (!HC_SORT[k].some(y => y[0] === x)) return; S.hf[k === 'all' ? 'sortAll' : 'sort'] = x; render(); },
+  /* «За золото»: карточка «до покупки»; пусто — назад к сетке */
+  gsel(v) { S.rs.gsel = RSI[v] ? v : ''; S.seg.rhero = 'who'; S.rs.val = null; render(); },
+  /* герой состава из сетов, листов и строк — карточка в каталоге */
+  rssel(v) { if (!RSI[v]) return; S.rs.sel = v; S.rs.val = null; S.hgrid = 'all'; S.hview = 'rs'; S.seg.heroes = 'coll'; S.seg.rhero = 'who'; go('heroes'); },
+  rsopen(v) { ACT.rssel(v); },
+  /* карточка героя состава поверх любого экрана; из лавки праха и витрины отряда недели «Назад» возвращает в них */
+  rhero(v) { if (!RSI[v]) return; const t = S.overlay && S.overlay.t, back = t === 'dust' || t === 'hrecho' ? t : ''; S.seg.rhero = 'who'; S.rs.val = null; open('rhero', v, back ? { back } : {}); },
+  /* как получить: герой Эхо этой недели — витрина отряда недели; остальные — как прежде (index.html) */
+  rsgo(v) {
+    const h = RSI[v], W = rsWeek();
+    if (h && h.src === 'echo' && W && W.squad.includes(h.id) && h.c <= rsCyc()) { S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'souls'; S.rs.ssel = v; S.du.ask = null; open('hrecho'); return; }
+    return hcRsGo0 ? hcRsGo0(v) : undefined;
   },
 });
 /* лавка праха и пробуждение: вид — выбор, сколько брать, цикл витрины; покупка и пробуждение — операции SOUL_SRV с номером.
@@ -1196,23 +1445,24 @@ Object.assign(ACT, {
     const h = RSI[r.res.id];
     toast(`${h.n}: +${fmt(r.res.q)} ${plural(r.res.q, 'осколок', 'осколка', 'осколков')}`);
   },
-  /* «Пробудить»: в лавке — подтверждение в том же окне, в остальных местах — общее подтверждение; кнопка несёт номер операции */
+  /* «Пробудить»: в лавке праха и витрине отряда недели — подтверждение в том же окне, в остальных местах — общее подтверждение;
+     кнопка несёт номер операции */
   activate(v) {
     const { op, id } = duArgs(v), h = RSI[id], need = hrNeed();
     if (!h || rsHas(h) || (S.rs.shards[id] || 0) < need) return;
-    if (S.overlay && S.overlay.t === 'dust') { S.du.ask = { op, id }; render(); return; }
+    if (S.overlay && (S.overlay.t === 'dust' || S.overlay.t === 'hrecho')) { S.du.ask = { op, id }; render(); return; }
     S.overlay = { t: 'confirm', title: 'Пробудить героя', text: `${h.n} соберётся из ${need} осколков и придёт с 0 уровнем, 0 рунных пределов и 0 доблести. Лишние осколки уйдут в прах.`,
       warnTeam: 'Число осколков и цена в душах — заглушки: таблица не утверждена (§15.1).', ok: 'Пробудить', act: 'activatedo', v: `${op}|${id}`, cost: ['souls', RS.rules.stub.activateSouls] };
     render(); focusOverlay();
   },
-  /* пробуждение: операция SOUL_SRV, затем окно пробуждения; из лавки — «В лавку» возвращает в неё */
+  /* пробуждение: операция SOUL_SRV, затем окно пробуждения; из лавки и витрины отряда недели — кнопка возврата в них */
   activatedo(v) {
-    const { op, id } = duArgs(v), fromDust = !!(S.overlay && S.overlay.t === 'dust'), r = SOUL_SRV.wake(op, id);
+    const { op, id } = duArgs(v), t = S.overlay && S.overlay.t, from = t === 'dust' || t === 'hrecho' ? t : '', r = SOUL_SRV.wake(op, id);
     S.du.ask = null;
-    if (r.refuse) { if (!fromDust) S.overlay = null; duSay(r); return; }
+    if (r.refuse) { if (!from) S.overlay = null; duSay(r); return; }
     if (r.again) { render(); return; }
     S.du.got = { op: r.res.op, at: Date.now() };
-    S.overlay = { t: 'hrwake', arg: r.res.op, back: fromDust ? 'dust' : '' }; render(); focusOverlay();
+    S.overlay = { t: 'hrwake', arg: r.res.op, back: from }; render(); focusOverlay();
   },
   /* окно пробуждения: нажатие — сразу итог */
   hrwskip() { if (S.du.got) S.du.got.at = Date.now() - DU_VIEW.wake.end; render(); focusOverlay(); },
@@ -1241,6 +1491,10 @@ function sqState(s) {
   /* S.du — «сервер» лавки праха и пробуждения (SOUL_SRV): seq, ops; q — сколько брать (0 — до комплекта), cyc — цикл витрины (0 — все),
      ask — подтверждение пробуждения в окне лавки, got — окно пробуждения: номер и время операции */
   s.du = { seq: 1, ops: {}, q: DU_VIEW.qty[0], cyc: 0, ask: null, got: null };
+  /* коллекция: S.hview — own (сетка героев аккаунта), all (каталог), mine (большая карточка героя аккаунта S.selHero), rs (карточка героя
+     состава S.rs.sel); S.hgrid — из какой сетки открыта карточка; S.hf — порядок и фильтр сетки, у «Моих» и каталога порядок свой */
+  s.hview = 'own'; s.hgrid = 'own';
+  s.hf = Object.assign({ sort: HC_SORT.own[0][0], sortAll: HC_SORT.all[0][0] }, HC_ZERO);
   return s;
 }
 const sqInitBase = initialState;
@@ -1249,6 +1503,24 @@ sqState(S);
 
 /* ================== сценарии презентации ================== */
 FLOWS.push(
+  ['Коллекция · карточки 9 : 16', 'Купленные герои сеткой: портрет во всю карточку, редкость, доблесть дугой, рунные камни, класс и стихия, уровень и мощь; ступень вида — сила героя',
+    () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'own'; S.overlay = null; }],
+  ['Большая карточка героя', 'Нажатие на арт: слева портрет в раме ступени — крупно по нажатию, справа — мощь, доблесть, уровень и вкладки развития',
+    () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.hgrid = 'own'; S.selHero = 'h2'; S.seg.hero = 'power'; S.overlay = null; }],
+  ['Каталог · все герои', 'Все герои состава: несобранные чёрно-белые, у сборных — полоса осколков, закрытый цикл — замок; нажатие — карточка «до покупки»',
+    () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'all'; S.overlay = null; }],
+  ['За золото · до покупки', 'Сетка героев каталога цикла; нажатие — большая карточка: портрет, редкость, класс, стихия, доблесть, навыки по доблести, история, цена и «Купить»',
+    () => {
+      S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'gold'; S.rs.gcyc = 0; S.overlay = null; S.seg.rhero = 'who';
+      const h = RS.heroes.find(x => x.src === 'gold' && x.c === rsCyc() && !rsHas(x)); S.rs.gsel = h ? h.id : '';
+    }],
+  ['Отряд недели · витрина', 'Цивилизация недели и пятеро крупными карточками: несобранные чёрно-белые с полосой осколков, собранный комплект — в цвете и «Пробудить» за души',
+    () => {
+      S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'souls'; S.du.ask = null;
+      const W = rsWeek(), h = W && W.squad.map(id => RSI[id]).find(x => x && x.c <= rsCyc() && !rsHas(x));
+      if (h) { S.rs.shards[h.id] = Math.max(S.rs.shards[h.id] || 0, hrNeed()); S.rs.ssel = h.id; S.wallet.souls = Math.max(S.wallet.souls, RS.rules.stub.activateSouls); }
+      S.overlay = { t: 'hrecho' };
+    }],
   ['Отряды · библиотека', 'До десяти отрядов: создать, назвать, собрать до пяти героев и переставить; где какой отряд выбран',
     () => { S.route = 'heroes'; S.seg.heroes = 'squads'; S.selSquad = 's2'; S.sq.slot = -1; S.overlay = null; }],
   ['Отряд для режима · один лист', 'Спуск, Эхо, оборона Арены, Лига и Клановый босс — один лист выбора, у каждого режима свой сохранённый отряд',
@@ -1264,8 +1536,8 @@ FLOWS.push(
       const r = DN_SRV.buy(dnOp(), h.id); if (!r.res) return;
       S.rs.dsel = h.id; S.dn.got = { op: r.res.op, at: Date.now() }; S.overlay = { t: 'hrgot', arg: r.res.op };
     }],
-  ['За души · отряд Эхо недели', 'Героя Эхо собирают только осколки из сундуков Эхо — прахом нельзя; собранного пробуждают души',
-    () => { S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'souls'; S.overlay = { t: 'hrecho' }; }],
+  ['За души · отряд Эхо недели', 'Витрина отряда недели: героя Эхо собирают только осколки из сундуков Эхо — прахом нельзя; собранного пробуждают души',
+    () => { S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'souls'; S.du.ask = null; S.overlay = { t: 'hrecho' }; }],
   ['За души · алтарь Возрождения', 'Сцена алтаря: зеркало душ, герои пула веером в раме, цена и шанс героя целиком, «К рулетке»; справа — отряд Эхо и лавка праха',
     () => { S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'souls'; S.overlay = null; if (rsCyc() < rsFrom('roulette')) S.rs.cyc = rsFrom('roulette'); }],
   ['Лавка праха', 'Отдельное окно: витрина героев пула — стекло с лицом, цена осколка и доля собранного; осколки за прах — 1, 10 или до комплекта; героев Эхо нет — сказано почему',
@@ -1285,7 +1557,40 @@ FLOWS.push(
 );
 
 /* ================== UI-кит ==================
-   Раздел «Отряды»: анатомия плитки героя, пресеты библиотеки, правила режимов и API листа выбора */
+   Раздел «Карточка героя»: три ступени силы на одном герое, состояния в каталоге и витрине отряда недели, большая карточка героя
+   аккаунта и «до покупки», витрина отряда недели; команде — как сменить вид после выбора стиля */
+KIT_EXTRA.push({ html: hcKitHtml });
+function hcKitHtml() {
+  if (!RS.heroes.length || !RS.rules) return '';
+  const noop = h => h.replace(/data-a="[^"]*"/g, 'data-a="noop"'), cap = INV.hero.capByLim, need = hrNeed(), cur = rsCyc();
+  const rh = RS.heroes.find(h => h.src === 'roulette' && typeof RS_ART !== 'undefined' && RS_ART.has(h.id)) || RS.heroes[0], base = hcView(rh);
+  const mk = ([r, valor, maxV, lim, bm]) => Object.assign({}, base, { own: true, acc: null, busy: '', r, valor, maxV, lim, lvl: cap[lim], cap: cap[lim], bm });
+  const fig = (card, say) => `<figure class="hck-t"><div class="hck-c">${card}</div><figcaption>${say}</figcaption></figure>`;
+  const tiers = HC_VIEW.kit.map(x => { const v = mk(x); return fig(hcCard(v, { act: 'noop' }), `<b>Ступень ${hcTier(v)}</b>${RAR[v.r].toLowerCase()} · доблесть ${v.valor} из ${v.maxV}${hcMax(v) ? ' · путь пройден' : ''}`); }).join('');
+  const pool = RS.heroes.filter(h => RS_SHARD.includes(h.src) && !rsHas(h)), a = pool.find(h => h.c <= cur) || pool[0], b = pool.find(h => h !== a && h.c <= cur) || a;
+  const z = pool.find(h => h.c > cur) || RS.heroes.find(h => h.c > cur), mine = hcOwnList()[0];
+  const states = [[mine, {}, 'в коллекции: цвет, уровень и мощь'], [a && hcView(a), { gray: true, shard: [Math.floor(need * 2 / 5), need] }, 'не собран: чёрно-белый, полоса осколков'],
+    [b && hcView(b), { shard: [need, need] }, 'комплект собран: в цвете, полоса горит'], [z && hcView(z), { gray: true, lock: true }, 'цикл ещё закрыт: замок']]
+    .filter(x => x[0]).map(([v, o, t]) => fig(hcCard(v, Object.assign({ act: 'noop' }, o)), t)).join('');
+  const h2 = H('h2') || S.heroes[0], gold = RS.heroes.find(h => h.src === 'gold' && h.c === cur && !rsHas(h)) || RS.heroes.find(h => h.src === 'gold');
+  const big = h2 ? noop(hcBig(hcView(h2), { back: 'data-a="noop"', step: true, body: heroDetail(h2, { head: false, cls: 'hcb-tabs' }) })) : '';
+  const pre = gold ? noop(hcPre(gold, { back: 'data-a="noop"', foot: hcGoldFoot(gold) })) : '';
+  const echo = cur >= rsFrom('echo') ? noop(OV.hrecho()) : '';
+  const T = HC_VIEW.tier;
+  return `<section class="k-box hck" style="grid-column:1/-1" id="kitHeroCard"><h3>Карточка героя</h3>
+    <p class="k-note">Сетка коллекции, каталога, «За золото» и отряда недели — карточки 9 : 16: портрет во всю карточку; у вершины — гребень с кристаллом редкости и доблесть дугой (звёзд — личный максимум), в кружках — уровень и стихия; по бокам — рунные камни пределов; внизу — имя на плашке, класс и мощь. Карточка сама говорит, насколько герой силён: металл рамки и отделка богатеют с редкостью и доблестью — тёмное железо с заклёпками; позолота, листья у гребня и кабошоны цвета редкости; старое золото с крыльями, раскалённые швы, сияние и искры у вершины. Путь пройден — лента «максимум».</p>
+    <div class="hck-row">${tiers}</div>
+    <p class="k-note">В каталоге и витрине отряда недели — несобранные чёрно-белые, у сборных героев под портретом полоса осколков со стеклом осколка; собранный комплект — в цвете, будущий цикл — замок.</p>
+    <div class="hck-row">${states}</div>
+    <p class="k-note">Нажатие на карточку — большая карточка крупным планом: слева портрет в раме своей ступени (нажатие — ещё крупнее), справа — имя, мощь, доблесть, уровень и вкладки «Развитие», «Снаряжение», «Навыки», «Путь»; одно главное действие — следующий шаг героя. Герой до покупки — та же карточка: «Герой», «Навыки» — что откроет каждая доблесть, «Путь»; внизу — цена и «Купить».</p>
+    <div class="hck-big">${big}</div>
+    <div class="hck-big">${pre}</div>
+    ${echo ? `<p class="k-note">Отряд недели — окно-витрина: арена цивилизации за окном, пятеро крупными карточками, неприязнь, откуда осколки и «Пробудить» за души у собранного.</p><div class="hck-he">${echo}</div>` : ''}
+    ${TM(`<p class="k-note">Как сменить вид после выбора автором (art/generated/card-concepts; отмечены «золотая филигрань» и «кованое железо», раскладку значков выберут из второй партии проб): рамка ступени картинкой — путь в HC_ART.ready (assets/art/cards/frame-t1…t3.png, окно прозрачное), CSS-рамка этой ступени прячется сама; металл, отделка, свет и искры — переменные --hk-metal, --hk-rim, --hk-pin*, --hk-leaf и блоки [data-t] в heroes.css; раскладка значков — один блок «раскладка значков» в heroes.css и разметка hcMarks и hcCard; какая ступень у героя — HC_VIEW.tier: по редкости ${T.r.join(' / ')}, за доблести +${T.valor.join(' / +')}, не выше ${T.top}; размеры сетки и большой карточки — HC_VIEW. Портреты — общий RS_ART; героя без портрета рисует силуэт класса (art-icons.js).</p>`)}
+  </section>`;
+}
+
+/* Раздел «Отряды»: анатомия плитки героя, пресеты библиотеки, правила режимов и API листа выбора */
 KIT_EXTRA.push({
   html: () => {
     const h = S.heroes[0], h2 = S.heroes[2], cat = RS.heroes.find(x => x.src === 'roulette' && x.c === 2) || RS.heroes[0];

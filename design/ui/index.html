@@ -419,7 +419,7 @@ button.well:hover{border-color:var(--iron-3)}
 .fig{position:relative;display:flex;align-items:flex-end;justify-content:center;border:0;background:none;padding:0}
 .fig img{height:100%;width:auto;aspect-ratio:4/5;object-fit:cover;object-position:50% 22%;border-radius:8px;border:1px solid #262b31;box-shadow:0 8px 14px -8px #000}
 .fig.unk img{filter:blur(5px) brightness(.32) saturate(.5);border-color:rgba(72,229,212,.45)}
-.fig .qm{position:absolute;inset:0;display:grid;place-items:center;font:600 22px/1 var(--f-d);color:var(--spirit);text-shadow:0 0 10px var(--spirit)}
+.fig .qm{position:absolute;inset:0;display:grid;place-items:center;font:600 18px/1 var(--f-d);color:var(--spirit);text-shadow:0 0 10px var(--spirit)}
 
 /* строка «ключ: значение» */
 .kv{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:13px}
@@ -487,50 +487,7 @@ button.well:hover{border-color:var(--iron-3)}
 .next p{color:var(--parch-2);font-size:13px;line-height:1.35}
 .next .row{margin-top:4px}
 
-/* Спуск */
-.ds{display:grid;grid-template-columns:176px minmax(0,1fr);gap:var(--sp-m);height:100%}
-.shaft{display:flex;flex-direction:column;padding:10px 8px 10px 10px;gap:2px;overflow:auto;scrollbar-width:none}
-.shaft .cyc{display:grid;grid-template-columns:24px 1fr;gap:6px;align-items:start;padding:3px 0}
-.shaft .cyc>b{font:600 17px/26px var(--f-d);color:var(--gold-2);text-align:center}
-.shaft .cyc.dim>b{color:var(--parch-3)}
-.bnode{position:relative;display:flex;align-items:center;gap:7px;width:100%;min-height:30px;padding:4px 7px;border-radius:8px;border:1px solid transparent;background:none;text-align:left;color:var(--parch);font-size:13px;line-height:1.1}
-.bnode::before{content:"";flex:none;width:9px;height:12px;clip-path:polygon(50% 0,100% 38%,50% 100%,0 38%);background:#5b6168}
-.bnode.done::before{background:var(--gold)}
-.bnode.front::before{background:var(--spirit);filter:drop-shadow(0 0 5px var(--spirit))}
-.bnode.lock{color:var(--parch-3)}
-.bnode.lock::before{background:#2e3338}
-.bnode:hover:not(.lock){background:rgba(255,255,255,.03)}
-.bnode[aria-current="true"]{border-color:var(--iron-2);background:var(--stone-2)}
-.bnode small{display:block;font-size:11px;color:var(--parch-3)}
-.biome{display:grid;grid-template-rows:auto minmax(0,1fr);gap:var(--sp-m);min-width:0;min-height:0}
-.banner{position:relative;height:150px;border-radius:12px;overflow:hidden;border:1px solid var(--iron);background:#0a0c0e}
-.banner>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 58%}
-.banner::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(7,9,11,.95) 0,rgba(7,9,11,.7) 38%,rgba(7,9,11,.1) 72%),linear-gradient(0deg,rgba(7,9,11,.85),transparent 45%)}
-.banner .in{position:absolute;inset:0;z-index:1;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
-.banner h2{font-size:32px;line-height:1;color:var(--parch)}
-.banner .quote{max-width:46ch;font-size:15px}
-.banner .facts{margin-top:auto;display:flex;gap:18px;align-items:flex-end}
-.banner .ds-chips{gap:6px;flex-wrap:wrap;margin-bottom:1px}
-.banner .cta{position:absolute;right:12px;bottom:12px;z-index:2;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
-.banner .cta .ds-guard{gap:6px;flex-wrap:nowrap}
-.ds-low{display:grid;grid-template-columns:250px minmax(0,1fr);gap:10px;min-height:0}
-.seal{display:grid;grid-template-columns:46px 1fr;gap:10px;align-items:center;padding:8px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;text-align:left;color:var(--parch);width:100%}
-.seal .ph{width:46px;height:54px;border-radius:8px;overflow:hidden;background:radial-gradient(80% 90% at 50% 100%,rgba(72,229,212,.2),transparent),#0a0c0e;display:flex;align-items:flex-end;justify-content:center}
-.seal .ph img{height:100%}
-.seal b{display:block;font:600 16px/1.1 var(--f-d)}
-.seal small{display:block;color:var(--parch-3);font-size:12px;line-height:1.25}
-.seal.ok{border-color:rgba(221,188,122,.3)}
-.seal.todo{border-color:rgba(72,229,212,.4);box-shadow:inset 0 -12px 16px -14px var(--spirit)}
-.shelf{display:flex;flex-direction:column;gap:6px;min-height:0;padding:8px 10px 10px}
-.shelf-row{display:flex;gap:4px;align-items:flex-end;flex:1 1 0;min-height:0}
-.shelf-grp{display:flex;flex-direction:column;gap:4px;min-width:0;flex:6 1 0;height:100%}
-.shelf-grp.two{flex:2.4 1 0}
-.shelf-grp>small{font:700 10px/1 var(--f-u);letter-spacing:.14em;text-transform:uppercase;color:var(--parch-3);padding-left:2px}
-.shelf-figs{flex:1 1 0;min-height:0;display:flex;gap:2px;align-items:flex-end;border-bottom:1px solid #2a2f35;padding-bottom:2px;background:linear-gradient(0deg,rgba(72,229,212,.06),transparent 30%)}
-.shelf-figs .fig{flex:1 1 0;height:92%;min-width:0;border-radius:6px}
-.shelf-figs .fig.el-e img{height:100%}
-.shelf-figs .fig:hover{background:rgba(255,255,255,.03)}
-.shelf-figs .fig.boss{height:100%}
+/* Спуск — окно целиком в screens/descent.css */
 
 /* Бой: пять карт против отряда врагов-карт. Раскладка 3 + 2 только для вида — цель выбирает угроза */
 .bt{position:absolute;inset:0;overflow:hidden;background:#07090a;--rowh:100px;--colw:92px;--fh:62px}
@@ -866,10 +823,7 @@ button.well:hover{border-color:var(--iron-3)}
 .fx-btn b{font-size:13.5px}
 .fx-btn small{font-size:11.5px;color:var(--parch-3);line-height:1.25}
 
-/* Герои */
-.hs{display:grid;grid-template-columns:318px minmax(0,1fr);gap:var(--sp-m);height:100%}
-.coll{display:flex;flex-direction:column;gap:var(--sp-s);min-height:0;padding:var(--sp-m)}
-.coll-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:max-content;gap:8px;align-content:start}
+/* Герои (коллекция, большая карточка и каталог — screens/heroes.css) */
 .hd{display:flex;flex-direction:column;min-height:0;min-width:0;padding:var(--sp-m)}
 .hd-top{display:grid;grid-template-columns:74px minmax(0,1fr) auto;gap:var(--sp-m);align-items:start}
 /* шапка героя: имя, строка класса и стихии, строка редкости; справа — БМ значком и доблесть */
@@ -882,11 +836,6 @@ button.well:hover{border-color:var(--iron-3)}
 .hd-bm{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
 .hd-bm b{font:600 30px/1 var(--f-d);color:var(--gold);font-variant-numeric:lining-nums tabular-nums}
 .hd-bm .bm{gap:6px}
-/* тело карточки героя состава: лор в две строки, чипы, действие внизу (правила воздуха) */
-.hd-sec{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:var(--sp-s);overflow:auto;scrollbar-width:thin;scrollbar-color:#2c3238 transparent}
-.hd-facts{flex-wrap:wrap}
-.hd-act{margin-top:auto;display:flex;align-items:center;gap:var(--sp-s);flex-wrap:wrap;padding-top:var(--sp-s)}
-.hd-act .link{margin-left:auto}
 /* пять характеристик значками: число и степень роста */
 .hd-st{gap:var(--sp-m)}
 .hd-st .link{align-self:flex-start}
@@ -961,8 +910,6 @@ button.well:hover{border-color:var(--iron-3)}
 .chip.wr{white-space:normal;height:auto;min-height:22px;line-height:1.15;padding:3px 8px}
 .rs-team[aria-pressed="true"]{color:var(--amber);border-color:rgba(230,168,75,.45);background:rgba(230,168,75,.08)}
 .rs-sel{height:28px;min-width:0;border-radius:8px;border:1px solid var(--iron-2);background:#0c0f11;color:var(--parch);font:13px var(--f-u);padding:0 4px}
-.rs-filters{gap:4px}
-.rs-filters .rs-sel{flex:1 1 0}
 /* строка героя в списках Призыва */
 .rs-list{display:flex;flex-direction:column;gap:4px}
 .rs-list>*{flex:none}
@@ -981,7 +928,6 @@ button.well:hover{border-color:var(--iron-3)}
 /* Призыв: три вкладки, переключатель цикла; вкладка «За души» — screens/heroes.css и screens/roulette.css */
 .rs-hbar{flex:none;gap:8px}
 .rs-cyc button{padding:0 9px}
-.hs.rs-hs{flex:1 1 0;min-height:0;height:auto}
 .rs-next{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12.5px;color:var(--parch-2);flex:none}
 .rs-aside{gap:6px}
 .rs-aside .stat{align-items:flex-end}
@@ -1120,19 +1066,7 @@ button.well:hover{border-color:var(--iron-3)}
 .opp:hover{border-color:var(--iron-2)}
 /* пропуск сезона — screens/pass.css */
 
-/* NPC-диалог */
-.talk{position:absolute;inset:0;z-index:25;display:grid;grid-template-columns:minmax(0,1fr) 44%;background:radial-gradient(70% 90% at 80% 60%,rgba(72,229,212,.1),transparent 60%),rgba(5,6,8,.92);animation:fade .2s ease}
-.talk .txt{display:flex;flex-direction:column;gap:10px;padding:18px 10px 14px 22px;min-height:0}
-.talk .txt .say{flex:1 1 0;min-height:0;overflow:auto;font:500 19px/1.45 var(--f-d);color:var(--parch)}
-.talk .txt .ans{display:flex;flex-direction:column;gap:6px}
-.talk .ans button{display:flex;align-items:center;gap:10px;text-align:left;padding:10px 12px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;color:var(--parch);font-size:14.5px}
-.talk .ans button:hover{border-color:rgba(72,229,212,.45)}
-.talk .ans button .k{font:600 16px/1 var(--f-d);color:var(--gold-2);width:16px}
-.talk .who{position:relative;overflow:hidden}
-.talk .who img{position:absolute;bottom:-3%;left:50%;transform:translateX(-50%);height:102%;width:auto;filter:drop-shadow(0 0 30px rgba(0,0,0,.8))}
-.talk .who .plate{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:1;text-align:center;padding:8px 18px;border-radius:10px;background:rgba(8,10,12,.86);border:1px solid rgba(221,188,122,.3)}
-.talk .who .plate b{display:block;font:600 24px/1 var(--f-d);color:var(--gold)}
-.talk .who .plate small{font:700 10px/1 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--parch-2)}
+/* разговор с проводником — screens/talk.css */
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
 
@@ -1156,26 +1090,6 @@ button.well:hover{border-color:var(--iron-3)}
 .next{margin-left:0;width:340px}
 .descend{min-height:64px;padding:0 30px;font-size:17px;border-radius:14px;letter-spacing:.14em}
 .descend .i{width:20px;height:20px}
-
-/* ===== Спуск ===== */
-.banner.plain{background:radial-gradient(80% 120% at 80% 100%,rgba(72,229,212,.12),transparent 60%),var(--noise),#0d1013}
-.banner.plain::after{background:none}
-.banner .facts .stat b{font-size:24px}
-.banner .facts .stat small{color:var(--parch-2)}
-.shelf{display:flex;flex-direction:column;gap:6px;min-height:0;padding:8px 10px 10px}
-.shelf .pnl-h h2{font-size:19px}
-.shelf-g{flex:1 1 0;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 172px;grid-template-rows:minmax(0,1fr) minmax(0,1fr);gap:6px 14px}
-.shelf-r,.shelf-b{position:relative;display:flex;flex-direction:column;min-height:0;min-width:0}
-.shelf-b{grid-column:2;grid-row:1/3;padding-left:12px;border-left:1px solid var(--iron)}
-.shelf-r>small,.shelf-b>small{font:700 10px/1 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--parch-3);margin-bottom:3px}
-.shelf-g .shelf-figs{flex:1 1 0;min-height:0;display:flex;gap:4px;align-items:stretch;border-bottom:1px solid #2a2f35;padding:0 2px 1px;background:linear-gradient(0deg,rgba(72,229,212,.07),transparent 40%)}
-.shelf-g .fig{position:relative;height:auto;flex-basis:0;flex-shrink:1;min-width:0;border-radius:6px;padding:0;display:block}
-.shelf-g .fig img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.shelf-g .fig:hover{background:rgba(255,255,255,.035)}
-.shelf-b .shelf-figs{gap:8px}
-.seal-tag{position:absolute;left:50%;bottom:4px;transform:translateX(-50%);display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:5px;background:rgba(10,11,12,.86);border:1px solid rgba(221,188,122,.35);font:700 9.5px/1 var(--f-u);letter-spacing:.08em;text-transform:uppercase;color:var(--gold);white-space:nowrap}
-.seal-tag .i{width:10px;height:10px}
-.fig .qm{font-size:18px}
 
 /* ===== Герои ===== */
 .collpow{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;color:var(--parch);text-align:left}
@@ -1242,7 +1156,6 @@ button.well:hover{border-color:var(--iron-3)}
 .well.cur{border-color:var(--spirit);box-shadow:0 0 0 1px var(--spirit),0 8px 16px -8px var(--spirit)}
 /* компактный режим для низких экранов (844×390 и ниже): по высоте рабочей области */
 .g-main{container-type:size;container-name:main}
-.hs{grid-template-columns:minmax(250px,34%) minmax(0,1fr)}
 @container main (max-height: 360px){
   .hd{padding:8px 10px}
   .hd-top{grid-template-columns:60px minmax(0,1fr) auto;gap:10px}
@@ -1262,8 +1175,6 @@ button.well:hover{border-color:var(--iron-3)}
   .craft-hint{position:relative;z-index:2;padding:2px 0 4px}
   .step-act .qty button{padding:0 5px}
   .tabs button{padding:0 9px}
-  .banner{height:140px}
-  .coll-grid{gap:6px}
 }
 /* лестница развития: всё помещается в узкую колонку */
 .step-act .qty button{padding:0 7px}
@@ -1272,7 +1183,6 @@ button.well:hover{border-color:var(--iron-3)}
 .craft-hint{text-align:center;font-size:12.5px;color:var(--parch-3);padding:2px 0 6px;min-height:22px}
 .craft-hint.known{color:var(--spirit)}
 .craft-hint.unknown{color:var(--amber)}
-.talk .eyebrow .chip{vertical-align:middle}
 
 /* ===== полноэкранный режим и телефон ===== */
 .p-device.fs{padding:0;border-radius:0;background:#000;display:grid;place-items:center}
@@ -1476,6 +1386,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <link rel="stylesheet" href="screens/craft.css">
 <link rel="stylesheet" href="screens/shop.css">
 <link rel="stylesheet" href="screens/bag.css">
+<link rel="stylesheet" href="screens/descent.css">
 <link rel="stylesheet" href="screens/echo.css">
 <link rel="stylesheet" href="screens/roulette.css">
 <link rel="stylesheet" href="screens/chest-open.css">
@@ -1492,6 +1403,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <link rel="stylesheet" href="screens/reforge.css">
 <link rel="stylesheet" href="screens/chronicle.css">
 <link rel="stylesheet" href="screens/pass.css">
+<link rel="stylesheet" href="screens/talk.css">
 <link rel="stylesheet" href="screens/social.css">
 </head>
 <body>
@@ -1625,7 +1537,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 const ASSET = window.EN_ASSET || '../enerium/assets/';
 const A = p => ASSET + p;
 const ART = n => A('art/' + n);
-const ART_V = '1fdc5a16';   // версия выгрузки арта — её ставит tools/art-gen/export_ui.py, чтобы браузер не брал старые картинки из кэша
+const ART_V = 'c9e322a0';   // версия выгрузки арта — её ставит tools/art-gen/export_ui.py, чтобы браузер не брал старые картинки из кэша
 const AV = n => ART(n) + '?v=' + ART_V;
 /* значки атрибутов, редкостей, классов и доблести — одобрены автором 28.09.2026, выгрузка tools/art-gen/export_ui.py → assets/art/icons/:
    power, hp, patk, matk, def-phys, def-mag, eva, crit, critdmg; str, int, agi, end, spd; r1…r7 — редкости (ADR-0027);
@@ -1644,7 +1556,7 @@ const PATH = n => A('path-icons/path-' + String(n).padStart(2, '0') + '.jpg');
 const FA = f => f.art || AV('foes/' + f.id + '.jpg');
 const FPOS = f => f.pos || '50% 22%';
 const ARENA = AV('arena-workshop.jpg');
-/* арена биома: фон боя и шапка «Спуска»; биомы 2–4 кладёт сюда screens/biomes.js — выгруженную или заглушку */
+/* арена биома — фон боя (в окне «Спуск» — свой фон биома, screens/descent.js); биомы 2–4 кладёт сюда screens/biomes.js — выгруженную или заглушку */
 const ARENAS = { b1: ARENA };
 const biomeArena = b => ARENAS[b] || ARENA;
 const DUST = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><radialGradient id="g" cx="50%" cy="80%" r="60%"><stop offset="0" stop-color="#f3e2b4"/><stop offset=".6" stop-color="#b08d55"/><stop offset="1" stop-color="#5d4a2c"/></radialGradient></defs><path d="M6 52c6-12 14-22 26-22s20 10 26 22z" fill="url(#g)"/><path d="M20 44c3-4 7-7 12-7" stroke="#fff3cf" stroke-opacity=".5" stroke-width="2" fill="none"/><circle cx="22" cy="18" r="2.2" fill="#f7e9c2"/><circle cx="38" cy="12" r="1.6" fill="#f7e9c2" opacity=".8"/><circle cx="31" cy="22" r="1.3" fill="#f7e9c2" opacity=".7"/><circle cx="44" cy="24" r="1.8" fill="#f7e9c2" opacity=".6"/></svg>');
@@ -2197,9 +2109,9 @@ function shelter() {
 function npcImg(k) { const n = NPCS[k]; return `<button class="npc" style="${n.pos};z-index:${n.z}" data-a="npc" data-v="${k}" aria-label="${n.n}"><img src="${n.img}" alt="" width="768" height="1408"></button>`; }
 
 /* ================== Спуск ==================
-   Один экран на все биомы с данными боя (EB.BIOMES): шапка-арена, обитатели своего биома, босс и страж как ворота.
-   Тексты шапки, подписи полок и итога забега — BIOME_UI: Мастерская — здесь, биомы 2–4 — screens/biomes.js из biome-foes.js.
-   Закрытый биом игрок не выбирает; команда может начать и его (режим «Команда») */
+   Окно «Спуск» целиком — screens/descent.js: фон биома с его обитателями, путь вниз, состояние, вход к стражу, бестиарий листом.
+   Здесь — общее для окна, итога забега, Летописи и листа отряда: тексты зала, подписи полок бестиария и итога — BIOME_UI
+   (Мастерская — здесь, биомы 2–4 — screens/biomes.js из biome-foes.js), обитатели биома — bioFoes; «сервер» входа к стражу — GD_SRV */
 const BIOME_UI = {
   b1: { eyebrow: 'Цикл I · первый зал под Эндалором', quote: '«Место, где никого не ждут — и всё равно всех встречают»', pos: '50% 4%',
     shelf: { o: 'Образцы', e: 'Прислуга' }, seals: ['Повержен', 'Пройден'], els: ['Земля', 'Воздух'],
@@ -2207,64 +2119,6 @@ const BIOME_UI = {
     guardWin: ['Мастер пропустил дальше', 'Рунный страж и его свита повержены. Если пройден и босс биома — откроется Подземный лес.'], guardLose: 'Мастер не пропустил' },
 };
 const bioFoes = id => S.foes.filter(f => (f.biome || 'b1') === id);   // обитатели биома; у карточек Мастерской поля biome нет
-const bioChip = id => EB.BIOMES[id].siege === false ? `<span class="chip ${G(id).killed ? 'gold' : ''}">${ic('crown')}босс ${G(id).killed ? 'пал' : 'стоит'}</span>`
-  : `<span class="chip ${G(id).killed && G(id).hp == null ? 'gold' : ''}">${ic('crown')}${G(id).killed && G(id).hp == null ? 'босс пал' : 'осада ' + siegeDone(id) + '%'}</span>`;
-function descent() {
-  const b = S.biomes.find(x => x.id === S.selBiome);
-  const shaft = `<nav class="pnl shaft" aria-label="Путь вниз">${[1, 2, 3, 4, 5, 6].map(c => {
-    const bs = S.biomes.filter(x => x.cyc === c);
-    if (!bs.length) return `<div class="cyc dim"><b>${ROMAN[c]}</b><div class="bnode lock">Глубже<small>&nbsp;· не открыто</small></div></div>`;
-    return `<div class="cyc ${c > S.acc.cycle ? 'dim' : ''}"><b>${ROMAN[c]}</b><div>${bs.map(x => `<button class="bnode ${x.state}" data-a="biome" data-v="${x.id}" aria-current="${x.id === S.selBiome}" ${x.state === 'lock' && !KH.team ? 'disabled' : ''}><span>${x.name || 'Не открыт'}${x.state === 'front' ? '<small>рубеж спуска</small>' : x.state === 'done' ? '<small>пройден</small>' : '<small>после рунного стража</small>'}</span></button>`).join('')}</div></div>`;
-  }).join('')}</nav>`;
-  const U = BIOME_UI[b.id], B = EB.BIOMES[b.id];
-  let main;
-  if (U && B) {
-    const fs = bioFoes(b.id), k = fs.filter(f => known(f.id)).length, done = b.state === 'done', seals = U.seals || ['Повержен', 'Пройден'];
-    const row = g => fs.filter(f => f.g === g).map(f => figBtn(f)).join('');
-    main = `<div class="biome">
-      <div class="banner">
-        <img src="${biomeArena(b.id)}" alt="" style="object-position:${U.pos || '50% 50%'}">
-        <div class="in">
-          <span class="eyebrow">${U.eyebrow}</span>
-          <h2>${b.name}</h2>
-          <p class="quote">${U.quote}</p>
-          <div class="facts">
-            <div class="stat"><b>${B.floors.length}</b><small>этажей</small></div>
-            <div class="stat"><b>${k}<span class="faint">/${fs.length}</span></b><small>изучено</small></div>
-            <div class="row ds-chips">${bioChip(b.id)}${b.state === 'lock' ? TM(`${ic('lock')}закрыт для игрока · забег команды`, 'span', 'chip warn') : ''}</div>
-          </div>
-        </div>
-        <div class="cta">${guardHtml()}<button class="btn go big" data-a="sheet" data-v="prep">${ic('down')}Начать забег</button></div>
-      </div>
-      <div class="pnl shelf">
-        <div class="pnl-h" title="До первой победы враг показывает только мощь, здоровье, стихию и тип"><h2>Обитатели</h2></div>
-        <div class="shelf-g">
-          <div class="shelf-r"><small>${U.shelf.o}</small><div class="shelf-figs">${row('o')}</div></div>
-          <div class="shelf-r"><small>${U.shelf.e}</small><div class="shelf-figs">${row('e')}</div></div>
-          <div class="shelf-b"><small>Путь вниз</small><div class="shelf-figs">${fs.filter(f => f.g === 'b').map(f => figBtn(f, done ? (f.type === 'Рунный страж' || f.id === 'g1' ? seals[1] : seals[0]) : '')).join('')}</div></div>
-        </div>
-      </div>
-    </div>`;
-  } else {
-    const front = b.state === 'front';
-    main = `<div class="biome"><div class="banner plain"><div class="in">
-        <span class="eyebrow">Цикл ${ROMAN[b.cyc]} · ${front ? 'рубеж спуска' : 'пройден'}</span>
-        <h2>${b.name || 'Не открыт'}</h2>
-        <p class="quote">${front ? 'Босс биома не побеждён. Рунный страж ждёт после него.' : 'Босс и рунный страж повержены. Биом можно проходить ради добычи.'}</p>
-      </div><div class="cta"><button class="btn go big off" disabled>${ic('down')}Спуститься</button><span class="reason team-only">В прототипе у этого биома нет данных боя</span></div></div>
-      <div class="pnl pad col" style="justify-content:center;align-items:center;text-align:center">
-        ${PL('До первой встречи враги скрыты — имена и способности открывает победа.', 'Иллюстрация зала и его обитатели появятся вместе с авторским контентом. До первой встречи враги будут скрыты — имена и способности открывает победа.', 'p', 'faint')}
-      </div></div>`;
-  }
-  return { title: 'Спуск', sub: 'цикл ' + ROMAN[S.acc.cycle], html: `<section class="scr"><div class="ds">${shaft}${main}</div></section>` };
-}
-/* вход к рунному стражу на «Спуске»: страж ждёт за боссом биома (§11, ADR-0018); демо-вход прототипа — в любой момент, без ключей.
-   Бой — 25 раундов, каждая обычная атака стража отнимает раунд (ADR-0020). Вход стоит рунические ключи (§11: entryKeys стража,
-   RX.drops.guardians) — цена у кнопки; кнопка несёт номер операции входа */
-function guardHtml(id = S.selBiome) {
-  const B = EB.BIOMES[id] || EB.BIOMES.b1, open = G(id).killed, n = B.guard.m.length, gf = F(B.guard.m[0]), who = gf && known(gf.id) ? gf.name : 'Страж', cost = gdCost(id);
-  return `<div class="row ds-guard"><button class="btn sm${open ? '' : ' off'}" data-a="guard" ${open ? `data-v="${gdOp()}"` : 'disabled'} title="${open ? `${who} ждёт: ${guardCards(id)}, ${EB.RULES.rounds.rune} раундов, каждая его обычная атака отнимает раунд${cost ? ` · вход — ${cost} ${plural(cost, 'ключ', 'ключа', 'ключей')}` : ''}` : 'Страж ждёт за боссом биома: откроется после победы над ним'}">${ic('crown')}Рунный страж${open && cost ? costTag('keys', cost) : ''}</button><button class="btn sm ghost team-only" data-a="guard" data-v="demo" title="Демо прототипа: сразу к стражу, ${n} ${plural(n, 'карта', 'карты', 'карт')}; босс и стена не меняются, ключи не тратятся">демо-вход</button></div>`;
-}
 /* «сервер» входа к стражу (ADR-0031, п. 14; ADR-0014). Сиды постоянны: тот же отряд тех же героев — тот же бой. Проигранный бой
    запоминается отпечатком источников героев — всего, что уходит в бой (уровень, доблесть, характеристики, набор, вещи); до оплаты
    такого же боя — лист-предупреждение, «Всё равно войти» остаётся. Ключи списывает только подтверждённый вход — операция с номером,
@@ -2296,10 +2150,6 @@ function gdEnter(op, id) {
   if (r.again) return render();
   if (r.refuse) return toast(GD_WHY[r.refuse](r));
   startRun(S.prepSquad, id, null, true);
-}
-function figBtn(f, seal) {
-  const k = known(f.id);
-    return `<button class="fig ${k ? '' : 'unk'} ${f.g === 'b' ? 'boss' : ''}" data-a="foe" data-v="${f.id}" aria-label="${k ? f.name : 'Не изучен'}" title="${k ? f.name : 'Не изучен'}"><img src="${FA(f)}" alt="" style="object-position:${FPOS(f)}">${k ? '' : '<span class="qm">?</span>'}${seal ? `<span class="seal-tag">${ic('check')}${seal}</span>` : ''}</button>`;
 }
 
 /* ================== Бой ==================
@@ -2529,11 +2379,18 @@ function rsSetWeek(race) {
 }
 function rsAdd(h, how) { S.rs.owned[h.id] = { lvl: 0, lim: 0, valor: 0, how }; }   // ADR-0019: любой герой приходит с 0 ур., 0 РП и 0 Добл
 /* портреты героев состава — выгрузка tools/art-gen/export_ui.py в assets/art/heroes/<id>.jpg (ui-art.json); сет 1 рисуют герои отряда (rsOld).
-   28.09.2026: десять героев рулетки цикла II и десять героев каталога золота цикла I после сета 1; 29.09.2026 — ещё пятеро каталога цикла I */
+   28.09.2026: десять героев рулетки цикла II и десять героев каталога золота цикла I после сета 1; 29.09.2026 — ещё пятеро каталога цикла I;
+   30.09.2026 — все герои Эхо, рулетки и доната: у каждого героя этих источников свой портрет */
 const RS_ART = new Set(['c1-06', 'c1-07', 'c1-08', 'c1-09', 'c1-10', 'c1-11', 'c1-12', 'c1-13', 'c1-14', 'c1-15', 'c1-16', 'c1-17', 'c1-19', 'c1-21', 'c1-22',
   'c2-41', 'c2-42', 'c2-43', 'c2-44', 'c2-45', 'c2-46', 'c2-66', 'c2-67', 'c2-68', 'c2-69',
   'c2-59', 'c2-60', 'c2-61', 'c2-62', 'c2-63', 'c3-59', 'c3-60', 'c3-61', 'c3-62', 'c3-63',
-  'c2-51', 'c3-51', 'c4-51', 'c5-57', 'c6-51']);   // + отряд Эхо недели Иш-Кантун, 29.09   // + Безликие донатных сетов II и III, 29.09
+  'c2-51', 'c3-51', 'c4-51', 'c5-57', 'c6-51',   // + отряд Эхо недели Иш-Кантун, 29.09   // + Безликие донатных сетов II и III, 29.09
+  'c2-50', 'c3-47', 'c4-47', 'c5-55', 'c6-47', 'c2-48', 'c3-50', 'c4-50', 'c5-56', 'c6-49', 'c2-47', 'c3-52', 'c4-52', 'c5-58', 'c6-52',
+  'c2-52', 'c3-49', 'c4-53', 'c5-59', 'c6-53', 'c2-49', 'c3-53', 'c4-54', 'c5-60', 'c6-54', 'c2-53', 'c3-54', 'c4-55', 'c5-53', 'c6-48',
+  'c2-54', 'c3-55', 'c4-48', 'c5-54', 'c6-55', 'c2-55', 'c3-48', 'c4-49', 'c5-61', 'c6-50',   // + Эхо, остальные восемь недель, 30.09
+  'c3-41', 'c3-42', 'c3-43', 'c3-44', 'c3-45', 'c3-46', 'c3-64', 'c3-65', 'c4-41', 'c4-42', 'c4-43', 'c4-44', 'c4-45', 'c4-46', 'c4-64', 'c4-65',
+  'c5-48', 'c5-49', 'c5-50', 'c5-51', 'c5-52', 'c5-74', 'c6-41', 'c6-42', 'c6-43', 'c6-44', 'c6-45', 'c6-46',   // + рулетка циклов III–VI, 30.09
+  'c4-59', 'c4-60', 'c4-61', 'c4-62', 'c4-63', 'c5-69', 'c5-70', 'c5-71', 'c5-72', 'c5-73', 'c6-59', 'c6-60', 'c6-61', 'c6-62', 'c6-63']);   // + Безликие донатных сетов IV–VI, 30.09
 function rsFace(h) {
   const o = rsOld(h);
   if (o) return `<img src="${o.img}" alt="">`;
@@ -2543,7 +2400,7 @@ function rsFace(h) {
 }
 const rsSrcChip = h => `<span class="chip ${h.src === 'donat' ? 'spirit' : h.src === 'echo' ? 'gold' : ''}">${RS_SRC_ONE[h.src]}${h.src === 'gold' ? ' · №' + h.no : h.src === 'donat' ? ' · ' + h.place + '-й' : ''}</span>`;
 const rsAversShort = h => `+${pctBp(h.avers.bp != null ? h.avers.bp : RS.rules.aversionBp)} урона по расе «${h.avers.race}»`;
-/* плитка (rsCard), шапка карточки (rsHead) и карточка героя состава (rsDetail) — screens/heroes.js; строка списка — здесь.
+/* карточка 9 : 16 (hcCard), большая карточка (hcBig, hcPre), плитка (rsCard) и шапка (rsHead) — screens/heroes.js; строка списка — здесь.
    Кристалл редкости у лица в строке рисует CSS (.rs-av, screens/heroes.css) */
 function rsRow(h, o = {}) {
   return `<button class="rs-row ${o.dim ? 'dim' : ''}" data-r="${h.r}" data-a="${o.act}" data-v="${h.id}" aria-current="${!!o.sel}"><span class="rs-av">${rsFace(h)}</span><span class="tx"><b>${h.n}</b><small>${o.sub != null ? o.sub : h.cls}</small></span>${o.right || ''}</button>`;
@@ -2627,13 +2484,14 @@ function rsSetHtml(h, v, o = {}) {
   } else out.push(`<div class="rs-none"><b class="serif">Орден не раскрыт</b><p class="faint">Откроет последняя доблесть — глава «${rsChTitle(h, h.maxV - 1)}».</p></div>`);
   return out.join('');
 }
-/* карточка героя: шапка (heroHead, rsHead), карточка героя состава (rsDetail) и коллекция — screens/heroes.js */
+/* коллекция, большая карточка героя и карточка «до покупки» — screens/heroes.js; шапка для листов — heroHead, rsHead */
 /* развитие героя — screens/hero-dev.js: heroDev (что нужно для предела и доблести), вкладка «Развитие» (hdPower), листы предела
    и доблести, анимации, окно снаряжения и низ вкладки «Снаряжение» (hdGearFoot). Здесь — характеристики строкой и сама карточка */
 /* пять характеристик значками: число и степень роста; что даёт характеристика — в подсказке и в листе «Атрибуты». Число — с доблестью
    (heroSt) и прибавкой снаряжения (eqStatAdd, screens/equipment.js): такое число светится, разбивка — в подсказке */
 const statStrip = h => { const add = typeof eqStatAdd === 'function' ? eqStatAdd(h) : null; return `<div class="st5">${heroSt(h).map((v, i) => { const x = add ? add[i] : 0; return `<div class="s5${x ? ' eqd' : ''}" title="${STATS[i]}: ${STAT_HINT[i]} · рост ${GRADE[h.gr[i]]} за уровень${x ? ` · ${v} и снаряжение +${x}` : ''}">${ICON(STAT_IC[i], 24, STATS[i])}<b class="num">${v + x}</b><span class="grade">${[1, 2, 3].map(g => `<i class="${4 - h.gr[i] >= g ? 'on' : ''}"></i>`).join('')}</span></div>`; }).join('')}</div>`; };
-function heroDetail(h) {
+/* вкладки героя аккаунта; o.head === false — без шапки: так их берёт большая карточка героя (hcBig, screens/heroes.js), портрет у неё слева */
+function heroDetail(h, o = {}) {
   const t = S.seg.hero;
   let body = '';
   if (t === 'power') {
@@ -2666,7 +2524,7 @@ function heroDetail(h) {
       <div class="col" style="gap:8px"><span class="eyebrow">Орден</span><div class="rs-none"><b class="serif">Не раскрыт</b><p class="faint">Связи с орденами открывают главы.</p></div>
       <span class="reason">Глав столько же, сколько доблестей: ${h.maxV}.</span></div></div>`;
   }
-  return `<div class="pnl hd">${heroHead(h)}
+  return `<div class="pnl hd${o.cls ? ' ' + o.cls : ''}">${o.head === false ? '' : heroHead(h)}
     <div class="hd-body">
       <div class="tabs" role="tablist" aria-label="Разделы героя">${[['power', 'Развитие'], ['gear', 'Снаряжение'], ['skills', 'Навыки'], ['path', 'Путь']].map(([k, l]) => `<button role="tab" aria-selected="${t === k}" data-a="seg" data-v="hero:${k}">${l}${k === 'gear' && typeof hdGearDot === 'function' && hdGearDot(h) ? '<i class="tdot" title="В запасах есть лучше"></i>' : ''}</button>`).join('')}</div>
       ${body}
@@ -2989,7 +2847,7 @@ function storeView() {
   return { ...meta, html: `<section class="scr">${body}</section>` };
 }
 
-const SCREENS = { shelter, descent, battle, craft: craftView,week: () => ({ title: 'Неделя', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран недели не подключён.</p></div></section>' }), echo: () => ({ title: 'Эхо', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран Эхо не подключён.</p></div></section>' }), contracts: () => ({ title: 'Контракты', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран контрактов не подключён.</p></div></section>' }), rituals: () => ({ title: 'Ритуалы', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран ритуалов не подключён.</p></div></section>' }), arena: () => ({ title: 'Арена', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран Арены не подключён.</p></div></section>' }), clan: () => ({ title: 'Клан', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран клана не подключён.</p></div></section>' }), event: () => ({ title: 'Событие недели', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран События не подключён.</p></div></section>' }), profile: () => ({ title: 'Странник', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран Странника не подключён.</p></div></section>' }), chronicle: chronicleView, store: storeView };
+const SCREENS = { shelter, battle, craft: craftView,week: () => ({ title: 'Неделя', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран недели не подключён.</p></div></section>' }), echo: () => ({ title: 'Эхо', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран Эхо не подключён.</p></div></section>' }), contracts: () => ({ title: 'Контракты', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран контрактов не подключён.</p></div></section>' }), rituals: () => ({ title: 'Ритуалы', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран ритуалов не подключён.</p></div></section>' }), arena: () => ({ title: 'Арена', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран Арены не подключён.</p></div></section>' }), clan: () => ({ title: 'Клан', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран клана не подключён.</p></div></section>' }), event: () => ({ title: 'Событие недели', back: 'week', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран События не подключён.</p></div></section>' }), profile: () => ({ title: 'Странник', html: '<section class="scr"><div class="pnl pad"><p class="faint">Экран Странника не подключён.</p></div></section>' }), chronicle: chronicleView, store: storeView };
 
 /* ================== занятость ==================
    забег; ритуал героев — rtBusyNote (screens/rituals.js): участники заняты до конца таймера, Арена и Лига их всё равно берут */
@@ -3132,23 +2990,10 @@ const OV = {
   settings() {
     return dialog('Настройки', `<div class="setrow"><span>Музыка</span><input type="range" id="setMus" min="0" max="100" value="60" aria-label="Громкость музыки"></div><div class="setrow"><span>Звуки</span><input type="range" id="setSfx" min="0" max="100" value="80" aria-label="Громкость звуков"></div><div class="setrow"><span>Крупный текст</span><input type="checkbox" id="setBig" aria-label="Крупный текст"></div><div class="setrow"><span>Меньше анимации</span><input type="checkbox" id="setMot" aria-label="Меньше анимации"></div><div class="setrow"><span>Промокод</span><label class="search" style="width:200px"><input id="setPromo" type="text" placeholder="Введите код" autocomplete="off"></label></div>`, `<button class="btn ghost" data-a="close">Закрыть</button><button class="btn go" data-a="toast" data-v="Настройки сохранены">Сохранить</button>`);
   },
+  /* разговор с проводником (npc) — screens/talk.js: сцена, реплика по буквам, ответы-медальоны, табличка с гербом */
 };
-function talkView(o) {
-  const n = NPCS[o.arg], line = n.say[o.i || 0], more = (o.i || 0) < n.say.length - 1;
-  return `<div class="talk" role="dialog" aria-modal="true" aria-label="Разговор: ${n.n}">
-    <div class="txt"><span class="eyebrow">${n.n} · ${n.role} <span class="chip team-only" style="height:18px;margin-left:6px">демо-реплика</span></span>
-      <p class="say">${line}</p>
-      <div class="ans">
-        ${more ? `<button data-a="talkmore"><span class="k">1</span>Расскажи больше</button>` : ''}
-        <button data-a="talkgo" data-v="${n.go[0]}"><span class="k">${more ? 2 : 1}</span>${n.go[1]}</button>
-        <button data-a="close"><span class="k">${more ? 3 : 2}</span>Вернуться в Убежище</button>
-      </div></div>
-    <div class="who"><img src="${n.img}" alt=""><div class="plate"><b>${n.n}</b><small>${n.role}</small></div></div>
-  </div>`;
-}
 function overlay() {
   const o = S.overlay; if (!o) return '';
-  if (o.t === 'npc') return talkView(o);
   return OV[o.t] ? OV[o.t](o) : '';
 }
 
@@ -3166,7 +3011,7 @@ const ACT = {
   dlg(v) { const [t, ...a] = v.split(':'); open(t, a.join(':')); },
   close() { close(); },
   toast(v) { toast(v); },
-  biome(v) { S.selBiome = v; render(); },
+  /* выбор биома на «Спуске» — ACT.biome в screens/descent.js */
   foe(v) { open('foe', v); },
   lorefoe(v) { S.lore.foe = v; render(); },
   lore(v) { S.lore.sec = v; render(); },
@@ -3216,9 +3061,7 @@ const ACT = {
   item(v) { open('item', v); },
   /* активация из листа сведений — тем же обработчиком, что и в запасах (ACTIVATE — screens/model.js, регистрирует screens/echo.js) */
   itact(v) { const it = BAG.item(v), f = it && ACTIVATE[it.tier]; if (typeof f !== 'function' || !BAG.has(v)) return toast('Активация пока недоступна'); S.overlay = null; f(v); render(); },
-  npc(v) { S.overlay = { t: 'npc', arg: v, i: 0 }; NPCS[v].isNew = false; render(); focusOverlay(); },
-  talkmore() { S.overlay.i++; render(); },
-  talkgo(v) { if (v === 'mem') { S.overlay = null; open('mem'); return; } ACT.go(v); },
+  /* разговор с проводником: открыть (npc), дальше (talkmore), к заданию (talkgo), в Убежище (talkbye), реплика целиком (tkskip) — screens/talk.js */
   /* развитие героя — ACT.qty, lvlup, limit, limitdo, valor, valordo, valorcraft в screens/hero-dev.js: операции HD_SRV с номером */
   /* отряды: библиотека и выбор отряда режима — ACT.sq* в screens/heroes.js */
   /* лавка: ACT.buy и ACT.buydo — в screens/shop.js, покупка — операция с номером */
@@ -3777,15 +3620,9 @@ function render() {
   ensureLoop();
   if (fxInst && fxInst.host !== document.getElementById('btField')) { fxInst.destroy(); fxInst = null; }
   if (S.route === 'battle' && focusRun()) paintHud(focusRun());
-  if (S.route === 'descent' && S.runs.some(r => !r.over)) decorateActivation();
   window.dispatchEvent(new CustomEvent('en-render'));
 }
-function focusOverlay() { requestAnimationFrame(() => { const x = document.querySelector('.g .ov .x, .g .talk .ans button'); x && x.focus({ preventScroll: true }); }); }
-function decorateActivation() {
-  const cta = document.querySelector('.banner .cta'); if (!cta || !BIOME_UI[S.selBiome]) return;
-  const live = S.runs.filter(r => !r.over && !r.scene && r.biome === S.selBiome); if (!live.length) return;
-  cta.innerHTML = `${guardHtml()}<span class="chip spirit">${ic('users')}Забегов идёт: ${live.length}</span><div class="row" style="gap:6px"><button class="btn" data-a="sheet" data-v="prep">${ic('plus')}Ещё отряд</button><button class="btn go big" data-a="focus" data-v="${live[0].id}">${ic('eye')}К бою</button></div>`;
-}
+function focusOverlay() { requestAnimationFrame(() => { const x = document.querySelector('.g .ov .x, .g .tk-a'); x && x.focus({ preventScroll: true }); }); }   // .tk-a — первый ответ разговора (screens/talk.js)
 function bindGame() {
   const g = $game();
   g.addEventListener('click', e => {
@@ -3820,7 +3657,7 @@ const FLOWS = [
   ['Неделя → Эхо', 'Слоты, цель и сохранённый отряд; цена атаки — у кнопки, в слотах и у каждого варианта призыва', () => { S.route = 'echo'; S.echo.sel = 0; S.overlay = null; }],
   ['Эхо · бой и итог', 'Атака — бой ядром: главный враг ступени и четыре защитника на одной арене. «Пропустить» — сразу итог', () => { S.route = 'echo'; S.echo.sel = 0; S.overlay = null; if (ACT.echatk) ACT.echatk(); }],
   ['Входящие', 'Всё, что пришло, пока вас не было, в одном листе', () => { S.route = 'shelter'; S.overlay = { t: 'inbox' }; }],
-  ['Разговор с проводником', 'Текст слева, персонаж справа, три ответа', () => { S.route = 'shelter'; S.overlay = { t: 'npc', arg: 'enzo', i: 0 }; }],
+  ['Разговор с проводником', 'Сцена Убежища в дымке, проводник в контровом свете, реплика печатается по буквам, ответы — медальоны 1–3', () => { S.route = 'shelter'; S.overlay = { t: 'npc', arg: 'enzo', i: 0 }; }],
 ];
 const DESIGN = { w: 932, h: 430 };
 function fitDevice() {
@@ -3873,12 +3710,13 @@ const OLD = {
 };
 /* s: стал листом или окном поверх; d: дубль, удалён; обычный: содержимое слито в экран */
 const MAP = [
-  { n: 'Убежище', p: 12, where: 'Шахта · 1', d: 'Дом. Проводники в перспективе, занятия, следующий шаг и главная кнопка «Спуститься».', o: ['city', 'npc-dialog:s', 'tutorial', 'tutorial-quests', 'navigation:d'] },
-  { n: 'Спуск', p: 10, where: 'Шахта · 2', d: 'Путь вниз по циклам, зал с обитателями, босс и страж как ворота. Бестиарий живёт в самом биоме. Биомы 1–4: у каждого своя арена, враги, забег, босс и рунный страж; бестиарий — по биомам.', o: ['biomes', 'runic', 'bestiary', 'biome-setup:s', 'runic-setup:s', 'crafted-biomes:d'],
+  { n: 'Убежище', p: 12, where: 'Шахта · 1', d: 'Дом. Проводники в перспективе, занятия, следующий шаг и главная кнопка «Спуститься». Разговор — во весь экран: проводник в контровом свете, реплика печатается, ответы — медальоны, табличка с гербом роли (screens/talk.js).', o: ['city', 'npc-dialog:s', 'tutorial', 'tutorial-quests', 'navigation:d'],
+    ready: ['npc-dialog'] },
+  { n: 'Спуск', p: 10, where: 'Шахта · 2', d: 'Окно во весь экран: фон биома — место и его обитатели, что ждут отряд, на одном арте, частицы биома. Слева — путь вниз по циклам, сверху — название и цитата, снизу — этажи, босс и осада, рунный страж и вход к нему за ключи; одно главное действие «Начать забег», идущие забеги — «К бою» и «Ещё отряд». Бестиарий — лист по кнопке «Бестиарий»: обитатели по полкам, карточка врага, вся книга — в Летописи. Арена биома — фон боя, а не «Спуска» (screens/descent.js). Биомы 1–4: у каждого свой фон, арена, враги, забег, босс и рунный страж.', o: ['biomes', 'runic', 'bestiary:s', 'biome-setup:s', 'runic-setup:s', 'crafted-biomes:d'],
     ready: ['biomes', 'runic', 'bestiary', 'biome-setup'] },
   { n: 'Бой', p: 27, where: 'Один на все режимы', d: 'Биом, страж, Эхо, Арена, Лига, Клановый босс — один просмотрщик. «К итогу» доступно всегда.', o: ['battle', 'echo-battle:d', 'pvp-battle:d', 'league-match:d', 'clan-boss-battle:d'] },
-  { n: 'Герои', p: 24, where: 'Шахта · 3', d: 'Коллекция и карточка рядом (screens/heroes.js): на плитке — кристалл редкости, доблесть, рунный предел, класс и уровень. Развитие, Снаряжение, Навыки, Путь — четыре вкладки вместо шести. «Развитие» (screens/hero-dev.js) — путь героя: уровень, ворота рунных пределов и звезда доблести, одна главная кнопка — следующий шаг; листы предела и доблести с честным превью, анимации пробития предела и доблести. «Снаряжение» — девять мест снаряжения и четыре места духовных талисманов, «Надеть лучшее»; одно окно поверх: места героя слева, запасы справа, перетаскивание и нажатие, сравнение стрелками; «Свойства и сравнение» (screens/equipment.js, screens/talismans.js). Отряды — библиотека до десяти и один лист выбора на все режимы. Призыв — три вкладки; «За души» — алтарь Возрождения душ: зеркало, герои пула веером в раме, цена и шанс героя целиком, вход рулетки (screens/roulette.js); отряд Эхо недели — входом с пятью осколками, лавка праха — отдельным окном: витрина героев пула, осколки за прах, пробуждение душами и окно пробуждения (screens/heroes.js). Осколок героя везде — стекло с его лицом, доля — свет кромки и заживающие трещины (screens/art-icons.js).', o: ['heroes', 'hero', 'hero-story', 'orders', 'equipment', 'equipment-item:s', 'talismans', 'collection-passives:s', 'squads', 'recruitment', 'hire-preview', 'resurrection', 'blueprints'],
-    ready: ['heroes', 'hero', 'squads', 'recruitment', 'talismans', 'resurrection', 'blueprints', 'equipment', 'equipment-item'] },
+  { n: 'Герои', p: 24, where: 'Шахта · 3', d: 'Коллекция — купленные герои сеткой карточек 9 : 16 (screens/heroes.js): портрет во всю карточку, гребень — кристалл редкости, доблесть дугой, уровень и стихия в кружках, рунные камни по бокам, класс и мощь; ступень вида — металл рамки, отделка, сияние и искры — растёт с редкостью и доблестью; по мощи сильнейшие сверху, порядок и фильтр значками; «Каталог» — все герои, несобранные чёрно-белые с полосой осколков. Нажатие на арт — большая карточка: слева портрет в раме (крупно по нажатию), справа — мощь, доблесть, уровень и вкладки Развитие, Снаряжение, Навыки, Путь — четыре вместо шести; герой до покупки — та же карточка: история, навыки по доблести, главы, цена и «Купить», без прокачки и снаряжения. «Развитие» (screens/hero-dev.js) — путь героя: уровень, ворота рунных пределов и звезда доблести, одна главная кнопка — следующий шаг; листы предела и доблести с честным превью, анимации пробития предела и доблести. «Снаряжение» — девять мест снаряжения и четыре места духовных талисманов, «Надеть лучшее»; одно окно поверх: места героя слева, запасы справа, перетаскивание и нажатие, сравнение стрелками; «Свойства и сравнение» (screens/equipment.js, screens/talismans.js). Отряды — библиотека до десяти и один лист выбора на все режимы. Призыв — три вкладки; «За золото» — та же сетка карточек и карточка до покупки; «За души» — алтарь Возрождения душ: зеркало, герои пула веером в раме, цена и шанс героя целиком, вход рулетки (screens/roulette.js); отряд Эхо недели — окно-витрина: цивилизация, пятеро крупными карточками, несобранные чёрно-белые с полосой осколков, неприязнь и «Пробудить»; лавка праха — отдельным окном: витрина героев пула, осколки за прах, пробуждение душами и окно пробуждения (screens/heroes.js). Осколок героя — стекло с его лицом, доля — свет кромки и заживающие трещины (screens/art-icons.js).', o: ['heroes', 'hero', 'hero-story', 'orders', 'equipment', 'equipment-item:s', 'talismans', 'collection-passives:s', 'squads', 'recruitment', 'hire-preview', 'resurrection', 'blueprints'],
+    ready: ['heroes', 'hero', 'hero-story', 'orders', 'collection-passives', 'squads', 'recruitment', 'hire-preview', 'talismans', 'resurrection', 'blueprints', 'equipment', 'equipment-item'] },
   { n: 'Ремесло', p: 11, where: 'Шахта · 4', d: 'Мастерская с запасами слева и столом справа: ресурсы — по пять в ряд, у каждого лупа карточки; нажатие — ползунок количества, потом ячейка. Книга рецептов открывается на месте стола. Попытка — анимация удачи и неудачи, автодокрафт — короткая (screens/craft.js). Лавка — витрина из десяти товаров, подробности и цена — в листе товара (screens/shop.js). Запасы — семь вкладок, сетка 6 × 5 — значок и число, подробности справа (screens/bag.js). Перековка — своё окно: талисманы, снаряжение, рабочие; что сплавить, отмечает игрок — сетка с отметками, счётчик и подсказки; лестница редкостей, наковальня, цена в золоте по циклу (screens/reforge.js).', o: ['craft', 'recipes', 'inventory', 'shop', 'market', 'my-listings', 'reforge'],
     ready: ['craft', 'recipes', 'shop', 'inventory', 'reforge'] },
   { n: 'Неделя', p: 6, where: 'Шахта · 5', d: 'Три времени сегментами. Эта неделя — раса и цивилизация Эхо, срок до отсечки и шесть режимов строкой: место, очки, полоса до планки. Прошлая — итог: сундуки и Энериум, место и очки по режимам, лидеры и награды в листе, ссылка в Дары. Следующая — раса, герои Эхо с неприязнью, стихии нашествия. Режимы сообщают итоги через WEEK_MODES (screens/week.js). Одна отсечка для всей игры.', o: ['week', 'lootboxes:s', 'rankings:s', 'echo-rewards:s', 'event-rewards:s', 'pvp-rewards:s', 'clan-rewards:s'],
@@ -4817,6 +4655,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 <!-- экраны на общих запасах: договор — screens/model.js; грузятся до boot() -->
 <script src="screens/model.js"></script>
 <script src="screens/art-icons.js"></script>
+<script src="screens/descent.js"></script>
 <script src="screens/week.js"></script>
 <script src="screens/craft.js"></script>
 <script src="screens/shop.js"></script>
@@ -4838,6 +4677,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 <script src="screens/reforge.js"></script>
 <script src="screens/chronicle.js"></script>
 <script src="screens/pass.js"></script>
+<script src="screens/talk.js"></script>
 <script src="screens/social.js"></script>
 </body>
 </html>

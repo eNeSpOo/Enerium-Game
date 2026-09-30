@@ -1,0 +1,167 @@
+/* screens/talk.css — разговор с проводником Убежища (screens/talk.js, §28.2 GDD).
+   Сцена во весь экран игры: Убежище за спиной в дымке и виньетке, проводник справа крупным планом в контровом свете своего тона,
+   слева реплика на тёмном стекле с уголками кованого железа и старого золота и ответы-медальоны, под проводником — табличка с гербом.
+   Время — от отметок разговора: --el — сколько прошло от входа, --lel — от начала печати реплики, --left — сколько печати осталось
+   (их ставит talk.js в style корня), поэтому перерисовка посреди входа или печати ничего не повторяет и не рвёт.
+   Движется только transform и opacity. Тон света — rgb без альфы: --tone (свет сцены), --spark (искры). Корень — контейнер размеров:
+   высота фигуры и подъём частиц — в cqh. Проверка вёрстки 932 × 430 и 844 × 390 — tools/content-gen/screens/check_talk.js. */
+.tk{position:absolute;inset:0;z-index:25;overflow:hidden;isolation:isolate;container:tk/size;color:var(--parch);font:14px/1.35 var(--f-u);text-align:left;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;--el:0ms;--lel:0ms;--left:0ms;--glyph:200ms;--tone:72,229,212;--spark:221,188,122;--fh:128cqh;--fy:26cqh;--fx:0%;--ar:.5451;--waist:45%;--breath:1.01;--sway:.8deg}
+.tk *{box-sizing:border-box}
+.tk.out{pointer-events:none}
+.tk button{cursor:pointer;font:inherit;color:inherit}
+
+/* ===== сцена: Убежище за спиной — в дымке, виньетке и медленном дрейфе камеры ===== */
+.tk-bg{position:absolute;inset:0;z-index:0;overflow:hidden;background:#050607;animation:tkFade .34s ease-out both;animation-delay:calc(0ms - var(--el))}
+.tk-cam{position:absolute;inset:-7%;animation:tkCam 1.5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(0ms - var(--el))}
+.tk-room{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 45%;filter:blur(6px) brightness(.6) saturate(.85);will-change:transform;animation:tkDrift 28s ease-in-out infinite alternate;animation-delay:calc(0ms - var(--el))}
+.tk-shade{position:absolute;inset:0;background:radial-gradient(95% 90% at 74% 56%,transparent 36%,rgba(3,4,5,.7) 100%),linear-gradient(90deg,rgba(4,5,7,.74),rgba(4,5,7,.4) 36%,rgba(4,5,7,0) 62%),linear-gradient(0deg,rgba(4,5,7,.66),transparent 32%),linear-gradient(180deg,rgba(4,5,7,.42),transparent 20%)}
+/* свет снизу за проводником: столп тона и лужа света у края кадра */
+.tk-shaft{position:absolute;top:0;bottom:0;right:1.5%;width:41%;z-index:1;pointer-events:none;background:radial-gradient(48% 80% at 50% 104%,rgba(var(--tone),.34),rgba(var(--tone),.08) 55%,transparent 76%),linear-gradient(90deg,transparent 28%,rgba(var(--tone),.06) 50%,transparent 72%);animation:tkFade .8s ease-out both;animation-delay:calc(120ms - var(--el))}
+
+/* ===== проводник: вход справа; дышит — грудь от пояса, полы от пояса, вес от ступней. Слои грудь и полы — одна картинка,
+   обрезанная по поясу с нахлёстом в .3 %: мягкого свечения в их фильтре нет — в нахлёсте оно легло бы полосой; ореол даёт столп ===== */
+.tk-who{position:absolute;top:0;bottom:0;right:1.5%;width:41%;z-index:2;pointer-events:none;animation:tkWho .62s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(60ms - var(--el))}
+.tk-fig{position:absolute;left:50%;bottom:calc(-1 * var(--fy));height:var(--fh);width:calc(var(--fh) * var(--ar));margin-left:calc(var(--fh) * var(--ar) / -2 + var(--fx))}
+.tk-body{position:absolute;inset:0;transform-origin:50% 100%;animation:tkShift 9s ease-in-out infinite;animation-delay:calc(-2s - var(--el))}
+.tk-up,.tk-lo{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;max-width:none;will-change:transform;filter:drop-shadow(-1.5px -1px 0 rgba(var(--tone),.55)) drop-shadow(1px 0 0 rgba(var(--tone),.24))}
+.tk-up{clip-path:polygon(-40% -10%,140% -10%,140% calc(var(--waist) + .3%),-40% calc(var(--waist) + .3%));transform-origin:50% var(--waist);animation:tkBreath 4.8s ease-in-out infinite;animation-delay:calc(0ms - var(--el))}
+.tk-lo{clip-path:polygon(-40% var(--waist),140% var(--waist),140% 115%,-40% 115%);transform-origin:50% var(--waist);animation:tkSway 6.6s ease-in-out infinite;animation-delay:calc(-1.7s - var(--el))}
+/* низ кадра: ноги уходят в темноту, снизу поднимается свет тона */
+.tk-haze{position:absolute;left:0;right:0;bottom:0;height:36%;z-index:3;pointer-events:none;background:radial-gradient(42% 70% at 78% 108%,rgba(var(--tone),.24),transparent 72%),linear-gradient(0deg,rgba(4,5,7,.9),rgba(4,5,7,.5) 45%,transparent);animation:tkFade .5s ease-out both;animation-delay:calc(0ms - var(--el))}
+
+/* ===== частицы: пыль в луче и искры тона; задержки отрицательные — фаза у каждой своя ===== */
+.tk-dust{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden;animation:tkFade .9s ease-out both;animation-delay:calc(200ms - var(--el))}
+.tk-dust i{position:absolute;left:var(--x);bottom:-6px;width:var(--s);height:var(--s);border-radius:50%;background:rgba(var(--tone),.9);box-shadow:0 0 6px 1px rgba(var(--tone),.55);opacity:0;will-change:transform,opacity;animation:tkMote var(--dur) linear infinite;animation-delay:calc(var(--del) - var(--el))}
+.tk-dust i.sp{background:rgba(var(--spark),1);box-shadow:0 0 5px 1px rgba(var(--spark),.8);animation-name:tkSpark;animation-timing-function:cubic-bezier(.3,.6,.6,1)}
+
+/* ===== слева: реплика и ответы — внизу, над ними сцена ===== */
+.tk-side{position:absolute;left:0;top:0;bottom:0;width:57%;z-index:4;display:flex;flex-direction:column;justify-content:flex-end;gap:12px;padding:20px 12px 16px 28px}
+.tk-box{position:relative;flex:0 1 auto;min-height:0;display:flex;flex-direction:column;padding:16px 22px 10px 24px;border-radius:3px;cursor:pointer;background:var(--noise),linear-gradient(180deg,rgba(18,22,26,.9),rgba(8,10,12,.94));box-shadow:0 0 0 1px rgba(221,188,122,.34),0 0 0 2px rgba(0,0,0,.6),0 26px 50px -20px rgba(0,0,0,.92),inset 0 1px 0 rgba(255,255,255,.05),inset 0 -22px 30px -24px rgba(var(--tone),.45);animation:tkRise .46s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(160ms - var(--el))}
+.tk-box::before{content:"";position:absolute;inset:5px;border:1px solid rgba(221,188,122,.1);border-radius:2px;pointer-events:none}
+.tk-box::after{content:"";position:absolute;left:14%;right:14%;top:-1px;height:1px;background:linear-gradient(90deg,transparent,rgba(240,214,160,.85),transparent);pointer-events:none}
+.tk-orn{position:absolute;z-index:2;width:40px;height:auto;pointer-events:none;max-width:none}
+.tk-orn.tl{left:-5px;top:-5px}
+.tk-orn.tr{right:-5px;top:-5px;transform:scaleX(-1)}
+.tk-orn.bl{left:-5px;bottom:-5px;transform:scaleY(-1)}
+.tk-orn.br{right:-5px;bottom:-5px;transform:scale(-1,-1)}
+svg.tk-orn{height:40px;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.tk-tm{position:absolute;top:-10px;right:44px;z-index:3;height:19px}
+.tk-scroll{position:relative;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#2c3238 transparent;padding-right:4px}
+.tk-say{margin:0;font:500 21px/1.42 var(--f-d);color:var(--parch);letter-spacing:.005em;text-shadow:0 1px 0 #000,0 0 18px rgba(0,0,0,.6);text-wrap:pretty}
+.tk-gl i{font-style:normal;opacity:0;animation:tkGlyph var(--glyph) ease-out forwards;animation-delay:calc(var(--t) * 1ms - var(--lel))}
+.tk.typed .tk-gl i{animation:none;opacity:1}
+.tk-foot{display:flex;align-items:center;gap:8px;min-height:14px;margin-top:6px}
+.tk-pg{display:flex;align-items:center;gap:7px;padding-left:2px}
+.tk-pg i{width:6px;height:6px;transform:rotate(45deg);background:#20252a;box-shadow:0 0 0 1px rgba(221,188,122,.28)}
+.tk-pg i.was{background:var(--gold-3)}
+.tk-pg i.on{background:var(--gold);box-shadow:0 0 0 1px rgba(221,188,122,.6),0 0 8px rgba(221,188,122,.6)}
+.tk-more{margin-left:auto;width:9px;height:9px;border-right:2px solid rgba(var(--tone),.9);border-bottom:2px solid rgba(var(--tone),.9);transform:rotate(45deg);animation:tkBob .9s ease-in-out infinite alternate,tkGone .2s ease-out forwards;animation-delay:0ms,var(--left)}
+.tk.typed .tk-more{display:none}
+
+/* ===== ответы: номер в медальоне, свет при наведении и нажатии; главный светится снизу, «вернуться» — вторичный ===== */
+.tk-ans{display:flex;flex-direction:column;gap:4px;max-width:440px;padding-left:2px}
+.tk-a{position:relative;display:flex;align-items:center;gap:12px;width:100%;min-height:44px;padding:4px 12px 4px 4px;border:0;border-radius:6px;background:none;color:var(--parch);font:400 16.5px/1.2 var(--f-u);letter-spacing:.01em;text-align:left;animation:tkSlide .38s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--d) - var(--el))}
+.tk-a::before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(90deg,rgba(72,229,212,.17),rgba(72,229,212,.05) 55%,transparent 88%);opacity:0;transition:opacity .18s ease-out;pointer-events:none}
+.tk-a::after{content:"";position:absolute;left:46px;right:22%;bottom:0;height:1px;background:linear-gradient(90deg,rgba(221,188,122,.3),transparent);pointer-events:none}
+.tk-a:last-child::after{display:none}
+.tk-a:focus-visible{outline:1px solid rgba(72,229,212,.6);outline-offset:-1px}
+.tk-a:focus-visible::before,.tk-a.is-hover::before{opacity:1}
+.tk-t{position:relative;min-width:0;transition:transform .18s cubic-bezier(.2,.8,.2,1)}
+.tk-a:focus-visible .tk-t,.tk-a.is-hover .tk-t{transform:translate3d(4px,0,0)}
+.tk-k{position:relative;flex:none;display:grid;place-items:center;width:34px;height:34px;transition:transform .15s ease-out}
+.tk-k img{position:absolute;inset:0;width:100%;height:100%;max-width:none}
+.tk-k.css{border-radius:50%;background:radial-gradient(circle at 50% 36%,#27313a,#0c0f12 64%);box-shadow:0 0 0 1px rgba(221,188,122,.6),0 0 0 3px #090b0d,0 0 0 4px rgba(221,188,122,.22),inset 0 -7px 8px -5px rgba(72,229,212,.4)}
+.tk-k b{position:relative;font:700 17px/1 var(--f-d);color:var(--gold);font-variant-numeric:lining-nums;text-shadow:0 1px 0 #000,0 0 8px rgba(0,0,0,.8)}
+.tk-k::after{content:"";position:absolute;inset:-2px;border-radius:50%;box-shadow:0 0 14px 2px rgba(72,229,212,.55),inset 0 0 8px rgba(72,229,212,.5);opacity:0;transition:opacity .18s ease-out;pointer-events:none}
+.tk-a:focus-visible .tk-k::after,.tk-a.is-hover .tk-k::after{opacity:1}
+/* наведение — только там, где оно есть: на телефоне нажатая кнопка не «залипает» светом */
+@media (hover:hover){
+  .tk-a:hover::before,.tk-a.go:hover::before{opacity:1}
+  .tk-a:hover .tk-t{transform:translate3d(4px,0,0)}
+  .tk-a:hover .tk-k::after,.tk-a.go:hover .tk-k::after{opacity:1}
+  .tk-a.back:hover{color:var(--parch-2)}
+}
+.tk-a:active .tk-k,.tk-a.is-press .tk-k{transform:scale(.9)}
+.tk-a:active::before,.tk-a.is-press::before{opacity:1}
+.tk-a:active .tk-t,.tk-a.is-press .tk-t{transform:translate3d(6px,1px,0)}
+.tk-a.go .tk-t{color:#effffc;text-shadow:0 0 12px rgba(72,229,212,.45)}
+.tk-a.go::before{opacity:.5}
+.tk-a.go .tk-k::after{opacity:.55}
+.tk-a.go:focus-visible::before,.tk-a.go.is-hover::before,.tk-a.go:focus-visible .tk-k::after,.tk-a.go.is-hover .tk-k::after{opacity:1}
+.tk-p{position:relative;flex:none;width:26px;height:26px;margin-left:-2px;border-radius:8px;object-fit:cover;box-shadow:0 0 0 1px rgba(221,188,122,.35),0 4px 10px -4px #000}
+.tk-shine{position:absolute;inset:0;overflow:hidden;border-radius:inherit;pointer-events:none}.tk-sheen{position:absolute;top:0;bottom:0;left:0;width:34%;pointer-events:none;background:linear-gradient(100deg,transparent,rgba(160,255,244,.16) 45%,rgba(255,255,255,.22) 50%,rgba(160,255,244,.16) 55%,transparent);opacity:0;animation:tkSheen 1.3s ease-out both;animation-delay:calc(var(--left) + 220ms)}
+.tk-a.back{color:var(--parch-3);font-size:15px}
+.tk-a.back .tk-k{transform:scale(.82);opacity:.72}
+.tk-a.back:active .tk-k,.tk-a.back.is-press .tk-k{transform:scale(.74)}
+.tk-a.back:focus-visible,.tk-a.back.is-hover{color:var(--parch-2)}
+
+/* ===== табличка имени с гербом роли: под проводником, кованое железо и кромка старого золота ===== */
+.tk-plate{position:absolute;right:1.5%;width:41%;bottom:14px;z-index:4;display:flex;justify-content:center;align-items:center;pointer-events:none;animation:tkRise .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(360ms - var(--el))}
+.tk-crest{position:relative;z-index:2;flex:none;display:grid;place-items:center;width:64px;height:64px;margin-right:-22px;border-radius:50%;box-shadow:0 0 18px 2px rgba(var(--tone),.35),0 8px 18px -6px #000}
+.tk-crest img{display:block;width:100%;height:100%;max-width:none}
+.tk-crest.css{background:radial-gradient(circle closest-side,#101820 0 52%,#070a0c 53% 55%,#b1915a 56% 58%,#2f343a 59% 76%,#161a1e 77% 94%,#8c7650 95% 98%,transparent 99%)}
+.tk-crest.css svg{width:30px;height:30px;fill:none;stroke:var(--gold);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 6px rgba(var(--tone),.55))}
+.tk-nm{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:150px;padding:8px 28px 9px 34px}
+.tk-nm::before,.tk-nm::after{content:"";position:absolute;clip-path:polygon(0 50%,14px 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,14px 100%)}
+.tk-nm::before{inset:0;background:linear-gradient(90deg,rgba(221,188,122,.2),rgba(221,188,122,.72) 30%,rgba(221,188,122,.72) 70%,rgba(221,188,122,.2))}
+.tk-nm::after{inset:1px;background:var(--noise),linear-gradient(180deg,#1d2227,#0f1215 55%,#0a0c0e)}
+.tk-nm b{position:relative;z-index:1;font:600 26px/1 var(--f-d);color:var(--gold);letter-spacing:.02em;white-space:nowrap;text-shadow:0 1px 0 #000,0 0 14px rgba(221,188,122,.22)}
+.tk-nm small{position:relative;z-index:1;font:700 10px/1 var(--f-u);letter-spacing:.2em;text-transform:uppercase;color:var(--parch-2);white-space:nowrap}
+.tk-nm i{position:absolute;z-index:1;left:20%;right:20%;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--tone),.95),transparent);box-shadow:0 0 10px 1px rgba(var(--tone),.6)}
+
+/* ===== низкий экран: 844 × 390 и телефон ===== */
+@container tk (max-height:400px){
+  .tk-side{gap:10px;padding:16px 10px 12px 24px}
+  .tk-box{padding:14px 20px 8px 22px}
+  .tk-say{font-size:20px;line-height:1.4}
+  .tk-plate{bottom:10px}
+  .tk-crest{width:58px;height:58px;margin-right:-20px}
+  .tk-nm b{font-size:24px}
+}
+
+/* ===== уход: коротко, только transform и opacity ===== */
+.tk.out .tk-bg{animation:tkGone .24s ease-in forwards}
+.tk.out .tk-who{animation:tkWhoOut .24s ease-in forwards}
+.tk.out .tk-side,.tk.out .tk-plate,.tk.out .tk-dust,.tk.out .tk-shaft,.tk.out .tk-haze{animation:tkSink .22s ease-in forwards}
+
+/* ===== без движения: класс still (prefers-reduced-motion) — реплика целиком, частицы стоят на своём пути ===== */
+.tk.still *,.tk.still *::before,.tk.still *::after{animation:none!important;transition:none!important}
+.tk.still .tk-dust i{opacity:calc(var(--o) / 100);transform:translate3d(calc(var(--dx) * var(--ph) / 100),calc(var(--rise) * var(--ph) / -100),0)}
+@media (prefers-reduced-motion:reduce){
+  .tk *,.tk *::before,.tk *::after{animation:none!important;transition:none!important}
+  .tk-gl i{opacity:1}
+  .tk-dust i{opacity:calc(var(--o) / 100);transform:translate3d(calc(var(--dx) * var(--ph) / 100),calc(var(--rise) * var(--ph) / -100),0)}
+  .tk-more{display:none}
+}
+
+/* ===== кадры ===== */
+@keyframes tkFade{from{opacity:0}}
+@keyframes tkGone{to{opacity:0}}
+@keyframes tkCam{from{transform:scale(1.07)}}
+@keyframes tkDrift{from{transform:scale(1.02) translate3d(-1.2%,.6%,0)}to{transform:scale(1.06) translate3d(1.2%,-.6%,0)}}
+@keyframes tkWho{from{opacity:0;transform:translate3d(7%,0,0)}}
+@keyframes tkWhoOut{to{opacity:0;transform:translate3d(5%,0,0)}}
+@keyframes tkRise{from{opacity:0;transform:translate3d(0,14px,0)}}
+@keyframes tkSink{to{opacity:0;transform:translate3d(0,8px,0)}}
+@keyframes tkSlide{from{opacity:0;transform:translate3d(-12px,0,0)}}
+@keyframes tkShift{0%,100%{transform:rotate(-.25deg)}50%{transform:rotate(.25deg)}}
+@keyframes tkBreath{0%,100%{transform:none}50%{transform:scaleY(var(--breath))}}
+@keyframes tkSway{0%,100%{transform:skewX(calc(var(--sway) * -1))}50%{transform:skewX(var(--sway))}}
+@keyframes tkGlyph{from{opacity:0}to{opacity:1}}
+@keyframes tkBob{from{transform:translate3d(0,-2px,0) rotate(45deg)}to{transform:translate3d(0,2px,0) rotate(45deg)}}
+@keyframes tkSheen{0%{opacity:0;transform:translate3d(-110%,0,0)}25%{opacity:1}100%{opacity:0;transform:translate3d(320%,0,0)}}
+@keyframes tkMote{0%{opacity:0;transform:translate3d(0,0,0)}15%{opacity:calc(var(--o) / 100)}80%{opacity:calc(var(--o) / 160)}100%{opacity:0;transform:translate3d(var(--dx),calc(var(--rise) * -1),0)}}
+@keyframes tkSpark{0%{opacity:0;transform:translate3d(0,0,0) scale(1)}10%{opacity:1}60%{opacity:calc(var(--o) / 100)}100%{opacity:0;transform:translate3d(var(--dx),calc(var(--rise) * -1),0) scale(.4)}}
+
+/* ===== UI-кит: живая сцена в кадре телефона и состояния ответа ===== */
+.tk-kit-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tk-kit-wrap{overflow-x:auto;padding-bottom:4px}
+.tk-kit-dev{position:relative;width:932px;height:430px;border-radius:14px;overflow:hidden;background:#050607;border:1px solid var(--iron);flex:none}
+.tk-kit-dev.sm{width:844px;height:390px}
+.tk-kit-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:var(--sp-m)}
+.tk-kit-cell{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:10px;background:#07090b;border:1px solid #1b1f24;--el:100000ms;--left:100000ms;--tone:72,229,212}
+.tk-kit-cell small{color:var(--parch-3);font-size:12px}
+.tk-kit-crests{display:flex;flex-wrap:wrap;gap:18px}
+.tk-kit-crests figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px;width:92px}
+.tk-kit-crests figcaption{font-size:12px;line-height:1.2;color:var(--parch-2);text-align:center}
+.tk-kit-crests .tk-crest{margin:0}

@@ -11,14 +11,21 @@
    7. Темп — главные утверждения прогона: пара первого биома и четверо не берут босса биома 2, первая полная пачка на 50-м
       берёт и босса, и стража; биомы 3–4 — стена на 150-м, всё пройдено на 525-м; прогон темпа pace.json сделан на этих данных.
    Прототип (index.html и screens/*.js в песочнице, как check_echo_battle.js):
-   8. «Спуск»: у каждого биома своя шапка-арена, свои 14 обитателей, босс и страж; закрытый биом игрок не выбирает, команда — может.
+   8. Окно «Спуск» (screens/descent.js) на каждом биоме и в обоих режимах: фон — арт своего биома (место и обитатели), а не арена;
+      сетки портретов обитателей нет — строка «Изучено N из M» и кнопка «Бестиарий»; путь вниз по циклам — закрытый биом игрок
+      не выбирает, команда — может; состояние: этажи, босс, рунный страж; одно главное действие; идущий забег — «К бою» и «Ещё отряд»;
+      частицы — свои у каждого биома, целые, не больше потолка, при «меньше движения» их нет; CSS — только transform и opacity;
+      смена биома — прежний фон гаснет поверх нового; демо открывает «Спуск» на рубеже.
+      Бестиарий — лист OV.dsbest: 14 обитателей своего биома по полкам, неизученные без имени, карточка — с возвратом к списку,
+      «В Летописи» — книга на враге этого биома. Фоны выгружены и стоят в tools/art-gen/ui-art.json.
    9. Арт: портрет и арена — выгруженный файл из списка готовых или заглушка data:, битых адресов нет; без готовности — заглушка.
    10. Забег и бой — на арене и с врагами своего биома; итог забега — тексты своего биома, после стража биома 2 — слово Этриона.
    11. Рунный страж: у пройденного биома 2 вход открыт, у рубежа 3 — после босса, демо-вход — всегда; удар стража отнимает раунд.
    12. Бестиарий по биомам: Летопись группирует врагов по биомам, закрытый — только команде; у кого нет записи сказителя —
        облик без совета старика; числа карточек — ядро на этаже первой встречи.
    13. Демо-аккаунт: 1–2 пройдены, 3 — рубеж, 4 закрыт; у биома 4 есть имя. Сценарии презентации — быстрый бой и страж каждого биома.
-   14. Режим «Игрок»: на экранах биомов нет служебных слов (strip и SERVICE из check_player_view.js); раздел UI-кита рисуется.
+   14. Режим «Игрок»: на экранах биомов нет служебных слов (strip и SERVICE из check_player_view.js); разделы UI-кита
+       «Биомы спуска» и «Окно «Спуск»» рисуются.
    Везде: без исключений, без undefined, NaN и [object. Числа проверки — не баланс.
    Запуск: node tools/content-gen/screens/check_biomes.js */
 'use strict';
@@ -180,7 +187,7 @@ if (err.length) done();
 const T = vm.runInContext(`({
   get S() { return S; }, set S(v) { S = v; },
   ACT, OV, SCREENS, FLOWS, KH, EB, render, initialState, startRun, advance, runById, F, FA, G, BIOME_UI, ARENAS, KIT_EXTRA, renderKit, setTeam, AV,
-  BU: window.EN_BIOMES_UI, X: window.EN_BIOME_FOES, RX, gdCost, gdSame,
+  BU: window.EN_BIOMES_UI, X: window.EN_BIOME_FOES, RX, gdCost, gdSame, DS: window.EN_DESCENT, bioFoes, known,
 })`, ctx);
 const draw = key => { out.views++; T.render(); return scan(key, els.game ? els.game.innerHTML : ''); };
 const reset = () => { T.S = T.initialState(); T.S.overlay = null; T.S.wallet.souls = 1e9; };
@@ -192,7 +199,7 @@ try {
   const st = id => T.S.biomes.find(b => b.id === id);
   if (!st('b1') || st('b1').state !== 'done' || st('b2').state !== 'done' || st('b3').state !== 'front' || st('b4').state !== 'lock') fail('демо: биомы 1–2 пройдены, 3 — рубеж, 4 закрыт — не так');
   if (!st('b4').name) fail('демо: у биома 4 нет имени');
-  if (!T.G('b2').killed || T.G('b3').killed) fail('демо: у пройденного биома 2 босс не пал или у рубежа 3 — уже пал');
+  if (!T.G('b1').killed || !T.G('b2').killed || T.G('b3').killed) fail('демо: у пройденных биомов 1–2 босс не пал или у рубежа 3 — уже пал');
   const kn = id => T.S.known.includes(id);
   if (Object.keys(PX.cards).filter(f => PX.cards[f].biome === 'b2').some(f => !kn(f))) fail('демо: не все враги пройденного биома 2 изучены');
   if (Object.keys(PX.cards).filter(f => PX.cards[f].biome === 'b4').some(kn)) fail('демо: враги закрытого биома 4 уже изучены');
@@ -201,29 +208,133 @@ try {
   if (T.S.foes.length !== 14 * 4) fail(`демо: карточек бестиария ${T.S.foes.length}, нужно 56`);
   for (const f of T.S.foes.filter(x => !x.biome)) if (PX.workshop[f.id] && (f.hp !== PX.workshop[f.id].hp || f.bm !== PX.workshop[f.id].bm)) fail(`бестиарий: у ${f.id} Мастерской числа не из ядра`);
 
-  /* 8–9. «Спуск» каждого биома; арт — выгруженный или заглушка */
-  for (const team of [false, true]) {
-    T.setTeam(team);
-    for (const id of ['b1', 'b2', 'b3', 'b4']) {
-      reset(); T.S.route = 'descent'; T.S.selBiome = id;
-      const key = `Спуск · ${id} · ${team ? 'команда' : 'игрок'}`, h = draw(key);
-      if (!team) serviceIn(key, h);
-      const nav = h.match(new RegExp(`<button class="bnode[^"]*" data-a="biome" data-v="b4"[^>]*>`));
-      if (!nav) fail(`${key}: нет узла биома 4`);
-      else if (team === /disabled/.test(nav[0])) fail(`${key}: узел закрытого биома 4 ${team ? 'закрыт для команды' : 'открыт игроку'}`);
-      if (!h.includes(`src="${T.ARENAS[id] || ''}"`)) fail(`${key}: шапка — не арена своего биома`);
-      const figs = [...h.matchAll(/data-a="foe" data-v="([^"]+)"/g)].map(m => m[1]);
-      const mine = T.S.foes.filter(f => (f.biome || 'b1') === id).map(f => f.id);
-      if (figs.length !== 14 || figs.some(f => !mine.includes(f))) fail(`${key}: на полках ${figs.length} врагов, чужие: ${figs.filter(f => !mine.includes(f)).join(', ')}`);
-      if (!/data-a="guard"/.test(h) || !/data-a="sheet" data-v="prep"/.test(h)) fail(`${key}: нет входа к стражу или «Начать забег»`);
-      if (id === 'b4' && !/class="team-only chip warn"/.test(h)) fail(`${key}: у закрытого биома нет пометки команде`);
-      for (const f of figs) {   // карточка врага: лист, картинка — файл из готовых или заглушка
-        const c = T.F(f), url = T.FA(c);
-        if (!(url.startsWith('data:image/svg+xml,') || READY.has(`foes/${f}.jpg`) && url === T.AV(`foes/${f}.jpg`) || !c.biome)) fail(`${key}: у ${f} адрес портрета «${url.slice(0, 60)}» — не выгруженный и не заглушка`);
+  /* 8. окно «Спуск» (screens/descent.js) на каждом биоме, игроку и команде */
+  const DS = T.DS;
+  if (!DS) fail('окно «Спуск»: нет screens/descent.js (window.EN_DESCENT)');
+  else {
+    if (T.initialState().selBiome !== 'b3') fail(`демо: «Спуск» открывается не на рубеже, а на ${T.initialState().selBiome}`);
+    const fxOf = h => { const m = h.match(/<div class="ds-fx" data-fx="([^"]+)">([\s\S]*?)<\/div>/); return m ? { key: m[1], ps: [...m[2].matchAll(/<i class="ds-p" data-k="([^"]+)" style="([^"]*)"><\/i>/g)] } : null; };
+    for (const team of [false, true]) {
+      T.setTeam(team);
+      for (const id of ['b1', 'b2', 'b3', 'b4']) {
+        reset(); T.S.route = 'descent'; T.S.selBiome = id;
+        const key = `Спуск · ${id} · ${team ? 'команда' : 'игрок'}`, h = draw(key);
+        if (!team) serviceIn(key, h);
+        if (!h.startsWith('<') || !/<section class="scr flush ds" data-biome="/.test(h)) fail(`${key}: окно не нарисовано`);
+        /* путь вниз: все биомы демо, закрытый — игроку выключен */
+        for (const b of T.S.biomes) if (!new RegExp(`<button class="bnode ${b.state}" data-a="biome" data-v="${b.id}" aria-current="${b.id === id}"`).test(h)) fail(`${key}: на пути вниз нет узла ${b.id} или выбран не тот`);
+        const nav = h.match(/<button class="bnode[^"]*" data-a="biome" data-v="b4"[^>]*>/);
+        if (!nav) fail(`${key}: нет узла биома 4`);
+        else if (team === /disabled/.test(nav[0])) fail(`${key}: узел закрытого биома 4 ${team ? 'закрыт для команды' : 'открыт игроку'}`);
+        if (!/<div class="cyc dim ds-deep"><b>III–VI<\/b>/.test(h)) fail(`${key}: нераскрытая глубина — не одной строкой III–VI`);
+        /* фон — арт своего биома, не арена */
+        const art = DS.DS_DATA.art[id];
+        if (!art || !h.includes(`<img class="ds-bg" src="${T.AV(art)}"`)) fail(`${key}: фон окна — не арт своего биома`);
+        if (h.includes(T.ARENAS[id] || 'arena-')) fail(`${key}: в окне «Спуск» арена биома — ей место в бою`);
+        /* обитатели: портретов в окне нет — строка «Изучено» и кнопка «Бестиарий» */
+        const mine = T.bioFoes(id), k = mine.filter(f => T.known(f.id)).length;
+        if (/data-a="foe"/.test(h) || /class="fig[ "]/.test(h) || /shelf/.test(h) || /\/foes\//.test(h)) fail(`${key}: в окне осталась сетка портретов обитателей`);
+        if (!h.includes(`Изучено <b class="num">${k}</b> из ${mine.length}`)) fail(`${key}: нет строки «Изучено ${k} из ${mine.length}»`);
+        if (!h.includes(`data-a="sheet" data-v="dsbest:${id}"`) || !h.includes('Бестиарий</button>')) fail(`${key}: нет кнопки «Бестиарий»`);
+        /* состояние: этажи, босс, рунный страж */
+        const B = T.EB.BIOMES[id], g = T.G(id);
+        if (!h.includes(`<b>${B.floors.length}</b>`)) fail(`${key}: нет числа этажей`);
+        if (!/class="ds-st (?:up|siege|down)"/.test(h) || !/class="ds-st (?:wait|open|done)"/.test(h)) fail(`${key}: нет состояния босса или стража`);
+        if (g.killed !== /class="ds-st down"/.test(h)) fail(`${key}: босс ${g.killed ? 'пал' : 'стоит'}, а в состоянии — иначе`);
+        /* главное действие: одно; закрытый биом — только команде; демо-вход к стражу — только команде */
+        const open = id !== 'b4' || team;
+        if (open !== /<button class="btn go big" data-a="sheet" data-v="prep">/.test(h)) fail(`${key}: «Начать забег» ${open ? 'нет' : 'доступно игроку в закрытом биоме'}`);
+        if ((h.match(/class="btn go/g) || []).length !== 1) fail(`${key}: главных действий не одно`);
+        if (!/<button class="btn sm ghost team-only" data-a="guard" data-v="demo"/.test(h)) fail(`${key}: демо-вход к стражу не только команде`);
+        if (g.killed !== /<button class="btn sm" data-a="guard" data-v="gd\d+"/.test(h)) fail(`${key}: вход к стражу ${g.killed ? 'закрыт после босса' : 'открыт до босса'}`);
+        if (id === 'b4' && !/class="team-only chip warn"/.test(h)) fail(`${key}: у закрытого биома нет пометки команде`);
+        /* частицы своего биома: виды из DS_FX, не больше потолка, числа целые */
+        const fx = fxOf(h), want = (DS.DS_FX[id] || []).map(x => x[0]).sort().join();
+        if (!fx || fx.key !== id || !fx.ps.length || fx.ps.length > DS.DS_VIEW.maxFx) fail(`${key}: частицы — ${fx ? fx.key + ' · ' + fx.ps.length : 'нет'}`);
+        else {
+          if ([...new Set(fx.ps.map(m => m[1]))].sort().join() !== want) fail(`${key}: виды частиц ${[...new Set(fx.ps.map(m => m[1]))].join(', ')}, у биома — ${want}`);
+          if (fx.ps.some(m => /\d\.\d/.test(m[2]))) fail(`${key}: у частиц не целые числа`);
+        }
       }
     }
+    T.setTeam(false);
+    /* одни и те же частицы при каждой отрисовке: раскладка — на сиде биома */
+    reset(); T.S.route = 'descent'; T.S.selBiome = 'b2';
+    { const a = draw('Спуск · частицы · 1'), b = draw('Спуск · частицы · 2'); if (JSON.stringify(fxOf(a)) !== JSON.stringify(fxOf(b))) fail('частицы: раскладка меняется от отрисовки к отрисовке'); }
+    /* «меньше движения» — частиц нет */
+    {
+      const mm = ctx.matchMedia; ctx.matchMedia = q => ({ matches: /reduce/.test(q), addEventListener() {}, addListener() {} });
+      const h = draw('Спуск · меньше движения');
+      if (/class="ds-p"/.test(h)) fail('частицы: при prefers-reduced-motion они есть');
+      if (!/<img class="ds-bg" src=/.test(h)) fail('меньше движения: пропал фон');
+      ctx.matchMedia = mm;
+    }
+    /* CSS окна: движется только transform и opacity; «меньше движения» гасит частицы и дрейф фона */
+    {
+      const css = read('screens/descent.css').replace(/\r?\n/g, ' ');
+      for (const m of css.matchAll(/@keyframes\s+([\w-]+)\s*\{((?:[^{}]*\{[^{}]*\})*)\s*\}/g)) {
+        const props = [...m[2].matchAll(/([a-z-]+)\s*:/g)].map(x => x[1]).filter(p => p !== 'transform' && p !== 'opacity');
+        if (props.length) fail(`descent.css: @keyframes ${m[1]} двигает не только transform и opacity — ${props.join(', ')}`);
+      }
+      const rm = (css.match(/@media \(prefers-reduced-motion:reduce\)\{(.*?)\}\s*\}/) || [])[1] || '';
+      if (!/\.ds-fx[^{]*\{display:none\}/.test(rm) || !/\.ds-bg[^{]*\{animation:none/.test(rm)) fail('descent.css: при «меньше движения» частицы или дрейф фона не выключены');
+      if (html.indexOf('href="screens/descent.css"') < 0 || html.indexOf('href="screens/descent.css"') > html.indexOf('href="screens/echo.css"')) fail('index.html: descent.css не подключён или грузится после echo.css');
+      if (html.indexOf('src="screens/descent.js"') < 0 || html.indexOf('src="screens/descent.js"') > html.indexOf('src="screens/echo.js"')) fail('index.html: descent.js не подключён или грузится после echo.js');
+      if (/function descent\(|figBtn|shelf-figs|decorateActivation/.test(html)) fail('index.html: остался прежний «Спуск»');
+    }
+    /* смена биома: прежний фон гаснет поверх нового */
+    reset(); T.S.route = 'descent'; T.S.selBiome = 'b1'; draw('Спуск · смена · b1');
+    T.ACT.biome('b2');
+    { const h = draw('Спуск · смена · b2');
+      if (!h.includes(`<img class="ds-bg" src="${T.AV(DS.DS_DATA.art.b2)}"`) || !h.includes(`<img class="ds-bg out" src="${T.AV(DS.DS_DATA.art.b1)}"`)) fail('смена биома: прежний фон не гаснет поверх нового');
+      if (!/class="ds-main swap"/.test(h)) fail('смена биома: название не входит заново'); }
+    /* идущий забег: «К бою» и «Ещё отряд», огонёк у биома на пути вниз */
+    reset(); T.S.route = 'descent'; T.S.selBiome = 'b2'; T.S.prepSquad = 's1'; T.ACT.start();
+    {
+      const R = T.S.runs[T.S.runs.length - 1]; T.S.route = 'descent'; T.S.overlay = null;
+      const h = draw('Спуск · идёт забег');
+      if (!R || !h.includes(`data-a="focus" data-v="${R.id}"`) || !h.includes('Ещё отряд</button>')) fail('идущий забег: нет «К бою» или «Ещё отряд»');
+      if (!/data-v="b2"[^>]*>(?:(?!<\/button>)[\s\S])*class="ds-run"/.test(h)) fail('идущий забег: нет огонька у биома на пути вниз');
+      if (/<button class="btn go big" data-a="sheet" data-v="prep">/.test(h)) fail('идущий забег: главным осталось «Начать забег», а не «К бою»');
+      T.S.runs = [];
+    }
+    /* бестиарий биома: лист, 14 обитателей своего биома, неизученные — без имени, карточка — с возвратом, «В Летописи» */
+    for (const team of [false, true]) {
+      T.setTeam(team);
+      for (const id of ['b1', 'b2', 'b3', 'b4']) {
+        reset(); T.S.route = 'descent'; T.S.selBiome = id; T.S.overlay = { t: 'dsbest', arg: id };
+        const key = `Бестиарий · ${id} · ${team ? 'команда' : 'игрок'}`, h = draw(key);
+        if (!team) serviceIn(key, h);
+        const mine = T.bioFoes(id), got = [...h.matchAll(/<button class="ds-bf[^"]*" data-a="foe" data-v="([^"]+)"/g)].map(m => m[1]);
+        if (got.length !== 14 || mine.length !== 14 || got.some(f => !mine.some(x => x.id === f))) fail(`${key}: в листе ${got.length} врагов, чужие: ${got.filter(f => !mine.some(x => x.id === f)).join(', ')}`);
+        for (const f of mine) {
+          const url = T.FA(f), kn = T.known(f.id);
+          if (!(url.startsWith('data:image/svg+xml,') || READY.has(`foes/${f.id}.jpg`) && url === T.AV(`foes/${f.id}.jpg`) || !f.biome)) fail(`${key}: у ${f.id} адрес портрета «${url.slice(0, 60)}» — не выгруженный и не заглушка`);
+          if (!kn && h.includes(`<b>${f.name}</b>`)) fail(`${key}: неизученный ${f.id} назван по имени`);
+          if (kn && !h.includes(`<b>${f.name}</b>`)) fail(`${key}: изученный ${f.id} без имени`);
+        }
+        for (const t of [(T.BIOME_UI[id].shelf || {}).o, (T.BIOME_UI[id].shelf || {}).e, 'Путь вниз']) if (!t || !h.includes(`<span class="eyebrow">${t}</span>`)) fail(`${key}: нет полки «${t}»`);
+        if (!h.includes(`data-a="dsbook" data-v="${id}"`)) fail(`${key}: нет перехода в Летопись`);
+      }
+    }
+    T.setTeam(false);
+    reset(); T.S.route = 'descent'; T.S.selBiome = 'b2'; T.S.overlay = { t: 'dsbest', arg: 'b2' };
+    T.ACT.foe('b2o1');
+    { const h = draw('Бестиарий · карточка');
+      if (!T.S.overlay || T.S.overlay.t !== 'foe' || T.S.overlay.ds !== 'b2' || !/data-a="sheet" data-v="dsbest:b2"><svg[\s\S]*?<\/svg>Все обитатели/.test(h)) fail('бестиарий: у карточки врага нет возврата к списку'); }
+    T.S.overlay = null; T.ACT.foe('b2o1');
+    if (draw('лист врага без бестиария').includes('Все обитатели')) fail('лист врага не из бестиария: лишний возврат к списку');
+    reset(); T.S.route = 'descent'; T.S.selBiome = 'b3'; T.S.overlay = { t: 'dsbest', arg: 'b3' };
+    T.ACT.dsbook('b3');
+    { const h = draw('бестиарий → Летопись'), f = T.F(T.S.lore && T.S.lore.foe);
+      if (T.S.route !== 'profile' || !T.S.lore || T.S.lore.sec !== 'best' || !f || f.biome !== 'b3' || !T.known(f.id) || !h.includes('Библиотека Улариона · цикл')) fail(`бестиарий → Летопись: ${T.S.route}, ${JSON.stringify(T.S.lore)}`); }
+    /* фоны выгружены и стоят в ui-art.json */
+    const uiArt = JSON.parse(fs.readFileSync(path.join(ROOT, 'tools', 'art-gen', 'ui-art.json'), 'utf8'));
+    for (const [id, p] of Object.entries(DS.DS_DATA.art)) {
+      if (!uiArt.items[p]) fail(`фон ${id}: ${p} нет в tools/art-gen/ui-art.json`);
+      if (!fs.existsSync(path.join(UI, 'assets', 'art', p))) fail(`фон ${id}: ${p} не выгружен`);
+    }
   }
-  T.setTeam(false);
   for (const id of ['b2', 'b3', 'b4']) {
     const a = T.ARENAS[id];
     if (!(a.startsWith('data:image/svg+xml,') && !READY.has(`arena-${id}.jpg`) || READY.has(`arena-${id}.jpg`) && a === T.AV(`arena-${id}.jpg`))) fail(`${id}: арена — не выгруженная и не заглушка`);
@@ -262,7 +373,7 @@ try {
   /* 11. рунный страж со «Спуска» */
   reset(); T.S.route = 'descent'; T.S.selBiome = 'b2'; T.S.prepSquad = 's1';
   let h = draw('Спуск · b2 · страж');
-  if (/data-a="guard" disabled/.test(h)) fail('страж биома 2: у пройденного биома вход закрыт');
+  if (!/<button class="btn sm" data-a="guard" data-v="gd\d+"/.test(h)) fail('страж биома 2: у пройденного биома вход закрыт');
   T.ACT.guard('');
   let R = T.S.runs[T.S.runs.length - 1];
   if (!R || !R.guard || R.biome !== 'b2') fail('страж биома 2: вход не начал бой со стражем своего биома');
@@ -273,7 +384,7 @@ try {
   }
   reset(); T.S.route = 'descent'; T.S.selBiome = 'b3';
   h = draw('Спуск · b3 · страж');
-  if (!/data-a="guard"[^>]*disabled/.test(h)) fail('страж биома 3: вход открыт до босса');
+  if (/data-a="guard" data-v="gd\d+"/.test(h) || !/class="ds-st wait"/.test(h)) fail('страж биома 3: вход открыт до босса или состояние не говорит, что страж за боссом');
   T.ACT.guard(''); if (T.S.runs.length) fail('страж биома 3: впустил до босса');
   let k0 = T.S.wallet.keys;
   T.ACT.guard('demo'); R = T.S.runs[T.S.runs.length - 1];
@@ -357,7 +468,13 @@ try {
   }
   if (!T.FLOWS.find(x => x[0].startsWith('Рунный страж')).toString().length) fail('сценарий стража Мастерской пропал');
 
-  /* 14. раздел UI-кита */
-  try { T.renderKit(); const k = els.kitGrid ? els.kitGrid.innerHTML : ''; scan('UI-кит', k); if (!k.includes('Биомы спуска') || BIO.some(id => !k.includes(PX.biomes[id].core.name))) fail('UI-кит: нет раздела «Биомы спуска» или биома в нём'); } catch (e) { fail('UI-кит: ' + e.message); }
+  /* 14. разделы UI-кита: «Биомы спуска» и окно «Спуск» на каждом биоме */
+  try {
+    T.renderKit(); const k = els.kitGrid ? els.kitGrid.innerHTML : ''; scan('UI-кит', k);
+    if (!k.includes('Биомы спуска') || BIO.some(id => !k.includes(PX.biomes[id].core.name))) fail('UI-кит: нет раздела «Биомы спуска» или биома в нём');
+    const kd = (k.match(/<section class="k-box"[^>]*id="kitDescent">([\s\S]*?)<\/section>\s*(?=<section|$)/) || [])[1] || '';
+    if (!kd.includes('Окно «Спуск»') || (kd.match(/<div class="g ds-kit-g">/g) || []).length !== 4) fail('UI-кит: нет раздела «Окно «Спуск»» или окна на каждом из четырёх биомов');
+    if (T.DS) for (const id of ['b1', 'b2', 'b3', 'b4']) if (!kd.includes(`<img class="ds-bg" src="${T.AV(T.DS.DS_DATA.art[id])}"`)) fail(`UI-кит: в окне «Спуск» нет фона ${id}`);
+  } catch (e) { fail('UI-кит: ' + e.message); }
 } catch (e) { fail('прототип: исключение — ' + String(e && e.stack || e).split('\n').slice(0, 3).join(' | ')); }
 done();

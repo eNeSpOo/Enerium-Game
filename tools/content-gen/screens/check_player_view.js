@@ -40,7 +40,7 @@ const VOID = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input'
 /* переключатели и листы, которые обход нажимает сам: меняют только вид, а не запасы и кошелёк */
 const SAFE = new Set(['seg', 'hview', 'zptab', 'wsview', 'rscyc', 'lore', 'lorefoe', 'biome', 'hero', 'sq', 'esel', 'echsel', 'gsel', 'dsel', 'ssel',
   'zpsel', 'dartab', 'wsbtab', 'wsbkind', 'wscat', 'wsinfo', 'legend', 'sheet', 'dlg', 'foe', 'item', 'rhero', 'npc', 'talkmore', 'echfoe', 'echweek',
-  'echbest', 'darbox', 'rsval', 'hfilter', 'hsort', 'qty', 'echcb']);
+  'echbest', 'darbox', 'rsval', 'hfilter', 'hsort', 'qty', 'echcb', 'hc', 'hcback', 'hcf', 'hcclr', 'hczoom', 'hczx', 'hcstep']);
 
 /* ================== разметка → то, что видит игрок ================== */
 const TAG = /<!--[\s\S]*?-->|<(\/?)([a-zA-Z][\w-]*)((?:[^>"']|"[^"]*"|'[^']*')*?)(\/?)>/g;
@@ -260,7 +260,7 @@ function main() {
     /* состав героев: карточка каждого героя, его последняя доблесть и лист поверх */
     reset();
     for (const h of T.RS.heroes) {
-      T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'all'; T.S.rs.sel = h.id; T.S.rs.val = null; T.S.overlay = null;
+      T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'rs'; T.S.rs.sel = h.id; T.S.rs.val = null; T.S.overlay = null;
       draw(`состав · ${h.n}${tag}`);
       T.S.rs.val = { id: h.id, v: h.maxV }; draw(`состав · ${h.n} · последняя доблесть${tag}`);
       T.S.overlay = { t: 'rhero', arg: h.id }; draw(`лист героя · ${h.n}${tag}`);

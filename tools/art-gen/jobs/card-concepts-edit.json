@@ -1,0 +1,121 @@
+{
+  "name": "Правки пробных карточек героя (jobs/card-concepts.json): модель рисует идею верно, но путает счёт — лишние позиции звёзд у слабого героя, шесть рунных камней вместо пяти, подменённые значки класса и стихии, слово Level, лишняя цифра. По art/style/style.md удачную картинку правим EDIT MODE, а не рисуем заново: к запросу прикладывается сама картинка, при нужде — одобренный значок образцом. Выход — в ту же папку art/generated/card-concepts, имя — вариант с приставкой -fix",
+  "models": [
+    "nb2"
+  ],
+  "style": "Keep the painterly style of the attached picture: the same brush strokes, light, colors, frames, particles and background.",
+  "negative": "No words, no letters, no new digits, no Roman numerals, no runes or glyphs that look like writing, no watermark, no signature, no logo. Do not add anything that is not listed above, do not move or restyle the cards.",
+  "categories": {
+    "card-concepts": {
+      "aspect": "16:9",
+      "size": "2K",
+      "refs": [],
+      "frame": "Edit the first attached picture: a concept sheet with three vertical hero cards side by side — the left card, the middle card and the right card. Keep everything exactly as it is — the hero, the frames, the light, the glow, the particles, the icons, the digits and the composition — and change only what is listed below. Where something is removed, continue the surrounding frame, ornament or picture seamlessly, as if it had never been there. The rune stones are the small tall six-sided stones in gold bezels beside the hero's portrait; the star places are the small stars and empty star sockets under the crystal at the top of each card.\n\nAfter the edit, every card must match this list exactly — count the stars and the stones on each card before you finish:\n- Left card: exactly one star place, and it is an empty socket; exactly five rune stones, all unlit — three on the left side of the portrait, two on the right side.\n- Middle card: exactly three star places — two gold stars and one empty socket; exactly five rune stones — three lit ones on the left side, two unlit ones on the right side.\n- Right card: exactly five gold stars; exactly five rune stones, all lit — three on the left side, two on the right side.\nAnything on the list that is already right stays untouched."
+    }
+  },
+  "jobs": [
+    {
+      "id": "card-01-filigree-fix",
+      "category": "card-concepts",
+      "title": "Правка карточки 1 (филигрань): медальон стихии вместо второго значка класса, пять камней вместо шести",
+      "source": "Правка art/generated/card-concepts/card-01-filigree__nb2.jpg — лучшая из двух проб; во второй хуже звёзды и камни",
+      "refs": [
+        "art/generated/card-concepts/card-01-filigree__nb2.jpg"
+      ],
+      "subject": "1. In the top right corner of each of the three cards there is a hexagonal tile with a shield. Replace it on every card with the element medallion: a small round disc — a rim of dark iron and old gold around a chunk of amber rock glowing from within (#EB9D40). On the right card the crimson ribbon stays where it is and may partly cover the medallion.\n2. Each card has three rune stones on the right side of the portrait. On every card remove the lowest of these three and continue the frame's side rail there, so each card has three stones on the left and two on the right — five in all. On the left card all stones stay unlit; on the middle card the two remaining right stones stay unlit; on the right card they stay lit.\n3. Keep the hexagonal shield tile at the bottom left of each card exactly as it is."
+    },
+    {
+      "id": "card-02-karst-fix",
+      "category": "card-concepts",
+      "title": "Правка карточки 2 (карст): без слова Level, одна позиция звезды у слабого, пять камней у вершины — вторая правка от исходника",
+      "source": "Правка art/generated/card-concepts/card-02-karst__nb2.jpg. Первая правка (card-02-karst-fix__nb2.jpg) убрала Level и лишнюю звезду, но зажгла третью звезду у средней и сняла у вершины три камня вместо одного",
+      "refs": [
+        "art/generated/card-concepts/card-02-karst__nb2.jpg"
+      ],
+      "subject": "1. Remove the word Level from the round level badge in the top left corner of each card; keep only the number — 34, 512, 1200 — a little larger and centered in the badge.\n2. On the left card, the arc under the white crystal has two empty star sockets. Remove the right one, so a single empty socket remains.\n3. On the right card, the right side of the portrait has three lit rune stones — top, middle and bottom. Remove only the middle one of the right side and continue the basalt and its green veins there. The three lit stones on the left side of the right card stay as they are.\n4. The middle card stays exactly as it is: two gold stars and one empty socket, three lit stones on the left, two unlit on the right."
+    },
+    {
+      "id": "card-03-mirror-fix",
+      "category": "card-concepts",
+      "title": "Правка карточки 3 (зеркало): одна позиция звезды у слабого, пять камней у вершины",
+      "source": "Правка art/generated/card-concepts/card-03-mirror__nb2.jpg",
+      "refs": [
+        "art/generated/card-concepts/card-03-mirror__nb2.jpg"
+      ],
+      "subject": "1. On the left card, three empty star sockets float under the white crystal. Keep only the middle one — a single empty star socket — and remove the other two.\n2. On the right card, the right side of the portrait has three lit rune stones. Remove the lowest one and continue the frame and its glow there, so the right side has two lit stones."
+    },
+    {
+      "id": "card-04-reliquary-fix",
+      "category": "card-concepts",
+      "title": "Правка карточки 4 (реликварий): без знаков-цифр на камнях, пять камней у вершины",
+      "source": "Правка art/generated/card-concepts/card-04-reliquary__nb2.jpg",
+      "refs": [
+        "art/generated/card-concepts/card-04-reliquary__nb2.jpg"
+      ],
+      "subject": "1. Some rune stones carry marks that look like the digits 3 and 5. Remove all such marks on all three cards: every unlit stone is plain dark grey slate with only a small faint diamond in its center, and every lit stone shows only its turquoise diamond light — no digits and no signs on any stone.\n2. On the right card, the right side of the portrait has three lit rune stones. Remove the lowest one and continue the golden frame there, so the right side has two lit stones."
+    },
+    {
+      "id": "card-05-tarot-fix",
+      "category": "card-concepts",
+      "title": "Правка карточки 5 (таро): пять камней у средней и у вершины, значок класса у вершины",
+      "source": "Правка art/generated/card-concepts/card-05-tarot__nb2.jpg; образец значка — design/ui/assets/art/icons/cls-tank.png",
+      "refs": [
+        "art/generated/card-concepts/card-05-tarot__nb2.jpg",
+        "design/ui/assets/art/icons/cls-tank.png"
+      ],
+      "subject": "1. On the middle card, the right side of the portrait has three unlit rune stones. Remove the lowest one and continue the gilded border there, so the right side has two unlit stones.\n2. On the right card, the right side of the portrait has three lit rune stones. Remove the lowest one and continue the green-and-gold border there, so the right side has two lit stones.\n3. On the right card, at the bottom left next to the crossed swords, there is a turquoise rune stone instead of the class icon. Replace it with the class icon — the shield on a hexagonal tile from the second attached picture, the same as at the bottom left of the left and middle cards."
+    },
+    {
+      "id": "card-06-minimal-fix",
+      "category": "card-concepts",
+      "title": "Правка карточки 6 (минимализм): одна позиция звезды у слабого, три у средней",
+      "source": "Правка art/generated/card-concepts/card-06-minimal__nb2.jpg",
+      "refs": [
+        "art/generated/card-concepts/card-06-minimal__nb2.jpg"
+      ],
+      "subject": "1. On the left card, the dark plate under the white crystal holds two empty star sockets. Keep only one — a single empty star socket centered under the crystal — and remove the other; shorten the plate to fit one star.\n2. On the middle card, the plate under the violet crystal holds two gold stars and two empty sockets. Remove one of the empty sockets, so it holds three places — two gold stars and one empty socket — centered under the crystal."
+    },
+    {
+      "id": "card-07-heraldry-fix",
+      "category": "card-concepts",
+      "title": "Правка карточки 7 (геральдика): одна позиция звезды у слабого",
+      "source": "Правка art/generated/card-concepts/card-07-heraldry__nb2.jpg",
+      "refs": [
+        "art/generated/card-concepts/card-07-heraldry__nb2.jpg"
+      ],
+      "subject": "1. On the left card, three empty star sockets are sewn onto the brown banner under the white crystal. Keep only the middle one — a single empty star socket — and remove the other two, leaving plain worn cloth there."
+    },
+    {
+      "id": "card-08-forged-fix",
+      "category": "card-concepts",
+      "title": "Правка карточки 8 (кованое железо): значок класса вместо доблести, пять камней у слабого, мощь 912780",
+      "source": "Правка art/generated/card-concepts/card-08-forged__nb2.jpg; образец значка — design/ui/assets/art/icons/cls-tank.png",
+      "refs": [
+        "art/generated/card-concepts/card-08-forged__nb2.jpg",
+        "design/ui/assets/art/icons/cls-tank.png"
+      ],
+      "subject": "1. At the bottom left of each card there is a hexagonal tile with a gold four-pointed star. Replace it on all three cards with the class icon — the shield on a hexagonal tile from the second attached picture.\n2. On the left card, the right side of the portrait has only one unlit rune stone, low down. Add one more unlit rune stone of the same kind on the right side, level with the top stone on the left side, so the right side has two stones.\n3. On the right card, the combat power number reads 9127800. Change it to 912780 — six digits, the same style and size."
+    },
+    {
+      "id": "card-09-ether-fix",
+      "category": "card-concepts",
+      "title": "Правка карточки 9 (эфир): одна позиция звезды и пять камней у слабого, пять камней у вершины",
+      "source": "Правка art/generated/card-concepts/card-09-ether__nb2.jpg",
+      "refs": [
+        "art/generated/card-concepts/card-09-ether__nb2.jpg"
+      ],
+      "subject": "1. On the left card, three empty diamond-shaped sockets sit under the white crystal. Keep only the middle one and make it a single empty star-shaped socket; remove the other two.\n2. On the left card, the right side of the portrait has no rune stones. Add two unlit rune stones there — dark grey stones in gold bezels, the same as the three on its left side — level with the top and the middle stone on the left side.\n3. On the right card, one lit rune stone floats at the bottom center of the ring of light, in front of the hero's coat. Remove it, so five lit stones remain: three on the left and two on the right."
+    },
+    {
+      "id": "card-10-breakout-fix",
+      "category": "card-concepts",
+      "title": "Правка карточки 10 (выход из рамки): кристалл редкости в гребне вершины вместо рунного камня, пять камней вместо шести",
+      "source": "Правка art/generated/card-concepts/card-10-breakout__nb2-v2.jpg; образец кристалла — design/ui/assets/art/icons/r7.png",
+      "refs": [
+        "art/generated/card-concepts/card-10-breakout__nb2-v2.jpg",
+        "design/ui/assets/art/icons/r7.png"
+      ],
+      "subject": "1. On the right card, the crest at the top center holds a turquoise rune stone. Replace it with the green rarity crystal from the second attached picture — a faceted almond-shaped green crystal glowing from within, the same size and place as the white crystal on the left card and the violet crystal on the middle card.\n2. On each of the three cards, the right side of the portrait has three rune stones, one above another. On every card remove the lowest of these three and continue the frame or the picture there, so each card has three stones on the left side and two on the right side. The three stones on the left side of every card stay exactly as they are."
+    }
+  ]
+}

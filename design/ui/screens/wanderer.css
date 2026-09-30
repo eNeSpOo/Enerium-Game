@@ -361,3 +361,7 @@ button.wn-slot{appearance:none;font:inherit;cursor:pointer}
   .wn-card,.wn-card *,.wn-slot,.wn-slot *,.wn-ov,.wn-ov *,.wn-ghost,.wn-ghost *{animation:none!important;transition:none!important}
   .wn-motes,.wn-frs,.wn-deb,.wn-core,.wn-bray,.wn-mfl,.wn-lit.old{display:none}
 }
+/* кнопки карточки Странника — значок и подпись (слова автора: казуальному игроку одни значки непонятны), сеткой 2 × 2 */
+.wn-ibs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:auto}
+.wn-ibs .btn{justify-content:flex-start;position:relative;min-width:0}
+.wn-ibs .btn .bdg{position:static;margin-left:auto}

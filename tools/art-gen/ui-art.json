@@ -1,5 +1,5 @@
 {
-  "note": "Какой арт из art/generated/ идёт в прототип design/ui/. Враги — ADR-0013, отряд — герои сета 1 «Хранители Песочных Часов», арена — вторая раскладка. mirror — отражение: корпус героя на карте развёрнут вправо, к врагам, корпус врага — влево, к героям (решение автора 27.09.2026). Выгрузка: python tools/art-gen/export_ui.py Эхо, неделя эльфов — арена и портреты Иш-Кантуна, одобрены автором 28.09.2026 (ADR-0025, п. 8): ik-01…ik-14 — ступени лестницы 1–14, ik-15 — Многоликий. Значки атрибутов, редкостей (ADR-0027), классов и доблести одобрены автором 28.09.2026: PNG 128×128 с прозрачностью, эмблема вписана в 80 % кадра (fit).",
+  "note": "Какой арт из art/generated/ идёт в прототип design/ui/. Враги — ADR-0013, отряд — герои сета 1 «Хранители Песочных Часов», арена — вторая раскладка. mirror — отражение: корпус героя на карте развёрнут вправо, к врагам, корпус врага — влево, к героям (решение автора 27.09.2026). Выгрузка: python tools/art-gen/export_ui.py Эхо, неделя эльфов — арена и портреты Иш-Кантуна, одобрены автором 28.09.2026 (ADR-0025, п. 8): ik-01…ik-14 — ступени лестницы 1–14, ik-15 — Многоликий. Значки атрибутов, редкостей (ADR-0027), классов и доблести одобрены автором 28.09.2026: PNG 128×128 с прозрачностью, эмблема вписана в 80 % кадра (fit). Окно «Спуск» — фон биома во всё окно: место и его обитатели на одном арте (слова автора 30.09.2026), задание tools/art-gen/jobs/descent-backdrops.json; descent/b1…b4.jpg, 1688×716.",
   "out": "design/ui/assets/art",
   "size": [
     464,
@@ -1316,6 +1316,108 @@
     "heroes/c4-51.jpg": "heroes/hero-c4-51-tamai__nb2.jpg",
     "heroes/c5-57.jpg": "heroes/hero-c5-57-kelmil__nb2.jpg",
     "heroes/c6-51.jpg": "heroes/hero-c6-51-siue__nb2.jpg",
+    "heroes/c2-50.jpg": "heroes/hero-c2-50-iru__nb2.jpg",
+    "heroes/c3-47.jpg": "heroes/hero-c3-47-limtu__nb2-v2.jpg",
+    "heroes/c4-47.jpg": {
+      "from": "heroes/hero-c4-47-ashnun__nb2.jpg",
+      "crop": [
+        262,
+        40,
+        790,
+        700
+      ]
+    },
+    "heroes/c5-55.jpg": "heroes/hero-c5-55-ennatu__nb2.jpg",
+    "heroes/c6-47.jpg": "heroes/hero-c6-47-kiddu__nb2.jpg",
+    "heroes/c2-48.jpg": "heroes/hero-c2-48-tikku__nb2.jpg",
+    "heroes/c3-50.jpg": "heroes/hero-c3-50-mayuk__nb2.jpg",
+    "heroes/c4-50.jpg": "heroes/hero-c4-50-oika__nb2.jpg",
+    "heroes/c5-56.jpg": "heroes/hero-c5-56-hassi__nb2.jpg",
+    "heroes/c6-49.jpg": "heroes/hero-c6-49-rua__nb2.jpg",
+    "heroes/c2-47.jpg": "heroes/hero-c2-47-targym__nb2.jpg",
+    "heroes/c3-52.jpg": "heroes/hero-c3-52-kezy__nb2.jpg",
+    "heroes/c4-52.jpg": "heroes/hero-c4-52-anahe__nb2-v2.jpg",
+    "heroes/c5-58.jpg": "heroes/hero-c5-58-oisu__nb2.jpg",
+    "heroes/c6-52.jpg": "heroes/hero-c6-52-burte__nb2.jpg",
+    "heroes/c2-52.jpg": "heroes/hero-c2-52-oltika__nb2.jpg",
+    "heroes/c3-49.jpg": "heroes/hero-c3-49-iyana__nb2.jpg",
+    "heroes/c4-53.jpg": "heroes/hero-c4-53-shalko__nb2.jpg",
+    "heroes/c5-59.jpg": {
+      "from": "heroes/hero-c5-59-kaztl__nb2.jpg",
+      "crop": [
+        260,
+        40,
+        928,
+        875
+      ]
+    },
+    "heroes/c6-53.jpg": "heroes/hero-c6-53-minke__nb2.jpg",
+    "heroes/c2-49.jpg": "heroes/hero-c2-49-laon__nb2.jpg",
+    "heroes/c3-53.jpg": "heroes/hero-c3-53-ariena__nb2.jpg",
+    "heroes/c4-54.jpg": "heroes/hero-c4-54-evmel__nb2.jpg",
+    "heroes/c5-60.jpg": "heroes/hero-c5-60-pirros__nb2.jpg",
+    "heroes/c6-54.jpg": "heroes/hero-c6-54-keressa__nb2.jpg",
+    "heroes/c2-53.jpg": "heroes/hero-c2-53-kersu__nb2-v2.jpg",
+    "heroes/c3-54.jpg": "heroes/hero-c3-54-iddin__nb2.jpg",
+    "heroes/c4-55.jpg": "heroes/hero-c4-55-nattu__nb2.jpg",
+    "heroes/c5-53.jpg": "heroes/hero-c5-53-ziana__nb2.jpg",
+    "heroes/c6-48.jpg": "heroes/hero-c6-48-eshmu__nb2.jpg",
+    "heroes/c2-54.jpg": "heroes/hero-c2-54-tiumet__nb2.jpg",
+    "heroes/c3-55.jpg": "heroes/hero-c3-55-ashep__nb2.jpg",
+    "heroes/c4-48.jpg": "heroes/hero-c4-48-urset__nb2-v2.jpg",
+    "heroes/c5-54.jpg": "heroes/hero-c5-54-inenh__nb2.jpg",
+    "heroes/c6-55.jpg": "heroes/hero-c6-55-mehi__nb2.jpg",
+    "heroes/c2-55.jpg": "heroes/hero-c2-55-brudd__nb2-v2.jpg",
+    "heroes/c3-48.jpg": "heroes/hero-c3-48-odlen__nb2-v2.jpg",
+    "heroes/c4-49.jpg": "heroes/hero-c4-49-karren__nb2.jpg",
+    "heroes/c5-61.jpg": "heroes/hero-c5-61-seilen__nb2.jpg",
+    "heroes/c6-50.jpg": "heroes/hero-c6-50-menven__nb2.jpg",
+    "heroes/c3-41.jpg": "heroes/hero-c3-41-benno__nb2.jpg",
+    "heroes/c3-42.jpg": "heroes/hero-c3-42-veveya__nb2.jpg",
+    "heroes/c3-43.jpg": {
+      "from": "heroes/hero-c3-43-aeris__nb2.jpg",
+      "mirror": true
+    },
+    "heroes/c3-44.jpg": "heroes/hero-c3-44-hilda__nb2.jpg",
+    "heroes/c3-45.jpg": "heroes/hero-c3-45-branded__nb2.jpg",
+    "heroes/c3-46.jpg": "heroes/hero-c3-46-meret__nb2.jpg",
+    "heroes/c3-64.jpg": "heroes/hero-c3-64-hjalti__nb2.jpg",
+    "heroes/c3-65.jpg": "heroes/hero-c3-65-seymour__nb2.jpg",
+    "heroes/c4-41.jpg": "heroes/hero-c4-41-arman__nb2.jpg",
+    "heroes/c4-42.jpg": "heroes/hero-c4-42-beatrice__nb2.jpg",
+    "heroes/c4-43.jpg": "heroes/hero-c4-43-honore__nb2.jpg",
+    "heroes/c4-44.jpg": "heroes/hero-c4-44-adelaide__nb2.jpg",
+    "heroes/c4-45.jpg": "heroes/hero-c4-45-helwig__nb2-v2.jpg",
+    "heroes/c4-46.jpg": "heroes/hero-c4-46-lysander__nb2.jpg",
+    "heroes/c4-64.jpg": "heroes/hero-c4-64-merun__nb2.jpg",
+    "heroes/c4-65.jpg": "heroes/hero-c4-65-sabina__nb2.jpg",
+    "heroes/c5-48.jpg": "heroes/hero-c5-48-odelia__nb2.jpg",
+    "heroes/c5-49.jpg": "heroes/hero-c5-49-arden__nb2.jpg",
+    "heroes/c5-50.jpg": "heroes/hero-c5-50-orest__nb2.jpg",
+    "heroes/c5-51.jpg": "heroes/hero-c5-51-vedna__nb2.jpg",
+    "heroes/c5-52.jpg": "heroes/hero-c5-52-assia__nb2.jpg",
+    "heroes/c5-74.jpg": "heroes/hero-c5-74-gunnar__nb2.jpg",
+    "heroes/c6-41.jpg": "heroes/hero-c6-41-amalia__nb2.jpg",
+    "heroes/c6-42.jpg": "heroes/hero-c6-42-gottfried__nb2.jpg",
+    "heroes/c6-43.jpg": "heroes/hero-c6-43-celeste__nb2.jpg",
+    "heroes/c6-44.jpg": "heroes/hero-c6-44-ulrich__nb2.jpg",
+    "heroes/c6-45.jpg": "heroes/hero-c6-45-neris__nb2.jpg",
+    "heroes/c6-46.jpg": "heroes/hero-c6-46-evelina__nb2.jpg",
+    "heroes/c4-59.jpg": "heroes/hero-c4-59-thibault__nb2.jpg",
+    "heroes/c4-60.jpg": "heroes/hero-c4-60-marta__nb2-v2.jpg",
+    "heroes/c4-61.jpg": "heroes/hero-c4-61-joren__nb2.jpg",
+    "heroes/c4-62.jpg": "heroes/hero-c4-62-gabor__nb2.jpg",
+    "heroes/c4-63.jpg": "heroes/hero-c4-63-teine__nb2-v2.jpg",
+    "heroes/c5-69.jpg": "heroes/hero-c5-69-kalder__nb2-v2.jpg",
+    "heroes/c5-70.jpg": "heroes/hero-c5-70-morten__nb2.jpg",
+    "heroes/c5-71.jpg": "heroes/hero-c5-71-irmina__nb2.jpg",
+    "heroes/c5-72.jpg": "heroes/hero-c5-72-elvar__nb2.jpg",
+    "heroes/c5-73.jpg": "heroes/hero-c5-73-liv__nb2.jpg",
+    "heroes/c6-59.jpg": "heroes/hero-c6-59-halvard__nb2.jpg",
+    "heroes/c6-60.jpg": "heroes/hero-c6-60-thierry__nb2.jpg",
+    "heroes/c6-61.jpg": "heroes/hero-c6-61-gisla__nb2.jpg",
+    "heroes/c6-62.jpg": "heroes/hero-c6-62-sieran__nb2-v3.jpg",
+    "heroes/c6-63.jpg": "heroes/hero-c6-63-yalen__nb2.jpg",
     "clan/water-elite.jpg": "clan/clan-water-elite__nb2-v3.jpg",
     "clan/water-boss.jpg": "clan/clan-water-boss__nb2.jpg",
     "clan/water-tank.jpg": "clan/clan-water-tank__nb2.jpg",
@@ -1374,6 +1476,87 @@
     "clan/time-ctl1.jpg": "clan/clan-time-ctl1__nb2.jpg",
     "clan/time-ctl2.jpg": "clan/clan-time-ctl2__nb2-v2.jpg",
     "clan/time-dd1.jpg": "clan/clan-time-dd1__nb2.jpg",
-    "clan/time-dd2.jpg": "clan/clan-time-dd2__nb2.jpg"
+    "clan/time-dd2.jpg": "clan/clan-time-dd2__nb2.jpg",
+    "descent/b1.jpg": {
+      "from": "descent-bg/descent-b1-workshop__nb2-v2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "descent/b2.jpg": {
+      "from": "descent-bg/descent-b2-forest__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "descent/b3.jpg": {
+      "from": "descent-bg/descent-b3-library__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "descent/b4.jpg": {
+      "from": "descent-bg/descent-b4-stoneheim__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "talk/crest-contracts.png": {
+      "from": "talk-crests/talk-crest-contracts__nb2.round.png",
+      "size": [
+        144,
+        144
+      ],
+      "fit": 100
+    },
+    "talk/crest-forge.png": {
+      "from": "talk-crests/talk-crest-forge__nb2.round.png",
+      "size": [
+        144,
+        144
+      ],
+      "fit": 100
+    },
+    "talk/crest-shop.png": {
+      "from": "talk-crests/talk-crest-shop__nb2.round.png",
+      "size": [
+        144,
+        144
+      ],
+      "fit": 100
+    },
+    "talk/crest-memory.png": {
+      "from": "talk-crests/talk-crest-memory__nb2.round.png",
+      "size": [
+        144,
+        144
+      ],
+      "fit": 100
+    },
+    "talk/medallion.png": {
+      "from": "talk-ui/talk-medallion__nb2.round.png",
+      "size": [
+        96,
+        96
+      ],
+      "fit": 100
+    },
+    "talk/corner.png": {
+      "from": "talk-ui/talk-corner__nb2.png",
+      "crop": [
+        176,
+        175,
+        866,
+        904
+      ],
+      "size": [
+        121,
+        128
+      ]
+    }
   }
 }

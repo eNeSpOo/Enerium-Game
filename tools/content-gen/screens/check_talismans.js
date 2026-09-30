@@ -44,7 +44,7 @@ const scripts = [...html.matchAll(/<script(?:\s+src="([^"]+)")?>([\s\S]*?)<\/scr
   if (i('screens/talismans.js') < 0) say('index.html: не подключён screens/talismans.js');
   else if (i('screens/talismans.js') < i('screens/model.js')) say('index.html: screens/talismans.js подключён раньше model.js');
   if (!/<link rel="stylesheet" href="screens\/talismans\.css">/.test(html)) say('index.html: не подключён screens/talismans.css');
-  const hd = html.match(/function heroDetail\(h\)[\s\S]*?\n\}/);
+  const hd = html.match(/function heroDetail\(h(?:, o = \{\})?\)[\s\S]*?\n\}/);   // вкладки героя; большая карточка (screens/heroes.js) берёт их без шапки
   if (!hd || !/talRow\(h\)/.test(hd[0])) say('index.html: вкладка «Сила» (heroDetail) не зовёт talRow');
   const heroes = html.match(/\{ n: 'Герои'[\s\S]*?\},\r?\n/);
   if (!heroes || !/ready:\s*\[[^\]]*'talismans'/.test(heroes[0])) say('index.html: на карте экранов окно talismans не отмечено готовым (ready карточки «Герои»)');

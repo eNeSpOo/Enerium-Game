@@ -1,0 +1,208 @@
+{
+  "name": "Карточка героя, вторая десятка: десять систем значков. Автор о первой десятке (jobs/card-concepts.json), 30.09.2026: «Я думал, ты продумаешь, как показать рунные пределы и доблести, то есть буквально новый вид карточки героя с 10 разными решениями в виде иконок редкостей, доблестей, РП, БМ, класса, уровня и т. д. Но 2 варианта понравилось». Понравились card-01 (золотая филигрань) и card-08 (кованое железо с золотом). Теперь рамка — в их духе, а каждый вариант — своя система значков и раскладки: редкость, доблесть (личный максимум и сколько взято), пять рунных пределов, боевая мощь, класс, стихия, уровень. Как в первой десятке: Брокк Первый Ключ (c2-46), три карточки 9:16 в ряд — слабый, сильный, вершина; только цифры и значки, без слов",
+  "plan": {
+    "Три ступени": {
+      "слева — слабый": "обычная (белая), доблесть 0 из 1, предел 0 из 5, ур. 34, мощь 1240",
+      "в центре — сильный": "эпическая (фиолетовая), доблесть 2 из 3, предел III — три из пяти, ур. 512, мощь 48350",
+      "справа — вершина": "вневременная (зелёная), доблесть 5 из 5, все пять пределов, ур. 1200, мощь 912780"
+    },
+    "Рамки": {
+      "A — золотая филигрань (card-01)": "тусклая бронза без украшений → позолота с завитками по углам → полированное золото, ажурная филигрань, сияние и искры",
+      "B — кованое железо с золотом (card-08)": "чёрные железные полосы, заклёпки, ржавчина → золотая инкрустация, фиолетовые кабошоны, тёплые швы → массивное железо с толстым золотом, раскалённые швы, искры, капли расплава",
+      "A+B": "железо или камень с золотой филигранью"
+    },
+    "Десять систем значков": {
+      "card2-01-crown (A)": "доблесть — зубцы короны на гребне, взятый — с золотым камнем; редкость — кристалл в обруче короны; пределы — пять камней в ряд по нижней кромке; класс и стихия — по бокам короны; уровень — печать у мощи",
+      "card2-02-medallion (B)": "медальон внизу: уровень в центре, пять дуг — пределы, звёзды доблести по ободу; класс и стихия — малые медальоны по бокам; мощь — полоса вверху; редкость — кристалл на гребне и свет ядра медальона",
+      "card2-03-corners (A)": "по углам — редкость, стихия, класс, уровень; пределы — пять гравированных ромбов по верхней кромке загораются; доблесть — крылья на боковинах: перьев столько, сколько максимум, взятые золотые",
+      "card2-04-pillar (B)": "столб силы: слева стеклянная шкала из пяти сегментов — пределы, у её подножия кристалл редкости; справа столбец звёзд — доблесть; редкость — цвет свечения фона; вверху — класс, уровень, стихия",
+      "card2-05-gems (B)": "всё — каменья: пределы — пять гнёзд с рунными камнями по левой боковине, доблесть — гнёзда по правой (гнёзд столько, сколько максимум, горят взятые), редкость — большой кристалл гребня, класс и стихия — камеи в нижних углах",
+      "card2-06-insignia (A+B)": "знаки отличия: доблесть — шевроны на нагрудном знаке, под ними уровень; пределы — пять заклёпок-звёздочек ранга на планке; класс — водяной герб-щит за героем; редкость — кристалл-орден",
+      "card2-07-casual (A)": "казуальный минимум: на лице три вещи — цвет редкости, дуга звёзд, мощь; пределы — тонкая линия из пяти огоньков под звёздами; класс, стихия и уровень — только в окне героя",
+      "card2-08-tarot (A)": "арка таро: доблесть — в замковом камне арки; пределы — пять фонариков на цепочках; уровень — в гербовом щите; редкость — кристалл над аркой и нимб",
+      "card2-09-sash (B)": "перевязь по диагонали с мощью; доблесть — медали на перевязи; пределы — пять зарубок на клинке меча вдоль левого края; редкость — цвет перевязи и кристалл в навершии меча",
+      "card2-10-constellation (A+B)": "свой вариант: доблесть — созвездие над головой героя (точек столько, сколько максимум, зажжены взятые); пределы — пять кристаллов карста растут из нижней кромки: пустой карст матовый, пройденный светится (art/style/style.md); обе вещи — родной язык мира и дёшево анимируются в Unity: загорается кристалл, прочерчивается линия созвездия"
+    }
+  },
+  "notes": [
+    "Уроки первой десятки: nb2 держит идею, но досчитывает мелкие повторы до симметрии и до ряда из пяти. Поэтому вид каждой карточки расписан в промте поштучно, с местом и числом, а слабому герою с одной позицией доблести прямо сказано «одна и больше ничего»",
+    "Референсы — по варианту: портрет и только те одобренные значки, что в нём есть (кристалл r4 — образец формы, цвета словами; рунные камни; звезда доблести; мощь; класс). Картинки первой десятки не прикладываются: модель повторила бы их раскладку, а раскладку как раз меняем. Рамки A и B описаны словами по card-01 и card-08",
+    "Медальон стихии — словами: в выгрузке его нет"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG, the same painting as the attached hero portrait. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, deep near-black shadows. Card frames are hand-crafted and worn — dark forged iron, old gold, bronze, weathered stone, carst crystals that glow from within — rich in detail, precious and dramatic. Light comes from below — from glowing crystals, cracks and gems — cold turquoise (#48E5D4) against warm gold and amber (#DDBC7A, #E6A84B); dust motes and sparks float in the light. Game interface icons on the cards are bold, clean and readable at a small size. Dark fantasy: mystery and gravity, high contrast. No photorealism, no 3D-render look, no anime, no flat vector style.",
+  "negative": "No words, no letters, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no watermark, no signature, no logo, no captions, titles or labels above or under the cards. The only characters anywhere in the picture are the digits of the level and combat power numbers — no word Level, no Lv, no abbreviations such as CP, BP or PWR, no letters on any badge or plate; the name plaque stays blank. No pentagrams, no occult signs, no crosses. No phone mockup, no hands holding the cards, no table, no perspective, no tilted or overlapping cards, no fourth card. The hero has exactly two arms and two hands; no empty eyes.",
+  "categories": {
+    "card-concepts": {
+      "aspect": "16:9",
+      "size": "2K",
+      "refs": [
+        "art/generated/heroes/hero-c2-46-brokk__nb2.jpg"
+      ],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a concept sheet for the hero card of a dark fantasy mobile RPG, landscape 16:9. On a plain dark background — near-black slate (#0C0E11) with a soft vignette, no table, no scenery — stand exactly three vertical hero cards side by side in one row, evenly spaced and the same size. Each card is tall and narrow, in a 9:16 proportion, about five sixths of the canvas high, seen straight on, flat, not tilted, not in perspective, fully inside the canvas with a small margin. The three cards show the same hero with the same card design at three steps of power, from left to right: weak, strong, legendary. The frame grows richer from left to right, and the icons on the card tell the player exactly how strong the hero is. This sheet presents one system of icons: the layout is the same on all three cards, only the states of the icons and the richness of the frame change. Every icon must be easy to read and to count.\n\nThe first attached image is the hero's portrait: the old dwarf — a bald head, a stern furrowed face, a long white braided beard, a heavy brown leather coat studded with iron rivets, a round iron-rimmed shield on his arm, a heavy chain with a huge old iron key across his chest. Paint him the same on all three cards, with his face, clothes, colors and pose as in the portrait, edge to edge inside the card's window, head in the upper third, shown down to the hips. The other attached images are our game icons, listed in the concept below; they give the exact look of these elements on the cards; do not copy their plain square backgrounds.\n\nWhat the three cards must show — the concept below says how:\n- rarity: the left card is common — white (#E6E8EA); the middle card is epic — violet (#A986EE); the right card is timeless — green (#5FD67A);\n- valor — the hero's personal maximum and how much of it is taken: left — maximum 1, taken 0; middle — maximum 3, taken 2; right — maximum 5, taken 5. There are exactly as many valor places as the maximum, never more;\n- rune limits — always exactly five places: left — none passed; middle — three passed; right — all five passed;\n- level: 34, 512, 1200; combat power: 1240, 48350, 912780 — digits only, never with a word or letters: the combat power is always the crossed-swords icon standing right before its number, with no letters such as CP or BP;\n- class: tank — the shield icon; element: Earth — a small round medallion of dark iron and old gold around a chunk of amber rock glowing from within (#EB9D40).\nEvery card also has a blank name plaque with nothing written on it. The digits are clean, bold and legible, in light warm gold."
+    }
+  },
+  "jobs": [
+    {
+      "id": "card2-01-crown",
+      "category": "card-concepts",
+      "title": "Карточка героя, система 1: корона доблести (рамка A — филигрань)",
+      "source": "Слова автора 30.09.2026 и идея координатора: доблесть — зубцы короны на гребне, каждый взятый — с камнем; пределы — пять гнёзд с камнями вдоль нижнего края",
+      "refs": [
+        "art/generated/heroes/hero-c2-46-brokk__nb2.jpg",
+        "design/ui/assets/art/icons/r4.png",
+        "design/ui/assets/art/limits/stone-on.png",
+        "design/ui/assets/art/limits/stone-off.png",
+        "design/ui/assets/art/icons/power.png",
+        "design/ui/assets/art/icons/cls-tank.png"
+      ],
+      "subject": "Concept: the Crown of Valor. Attached icons after the portrait: (2) the rarity crystal; (3) a lit rune stone; (4) an unlit rune stone; (5) the combat power icon — crossed swords; (6) the class icon — a shield on a hexagonal tile.\n\nFrame — gold filigree. Left card: a plain narrow frame of dull dark bronze with flat edges, no ornament, no glow. Middle card: a gilded frame, delicate filigree scrolls curl out of the four corners, a soft violet glow along the inner edge. Right card: a sumptuous frame of polished old gold with dense openwork filigree along every edge, a warm golden radiance behind the card, embers and gold sparks swirling around it.\n\nIcons and layout:\n- Valor is a crown standing on top of the card. Its spikes are the valor places: a taken valor is a spike tipped with a glowing gold gem, an empty place is a spike with an empty dark socket. Left card: a plain low bronze circlet with one single short spike in its middle, its socket empty — no other spikes. Middle card: a gilded crown with exactly three spikes — the left and the middle spike hold glowing gold gems, the right spike holds an empty socket. Right card: a tall ornate golden crown with exactly five spikes, all five tipped with blazing gold gems.\n- Rarity: the rarity crystal (image 2) set in the front of the crown's band, under the spikes — white on the left card, violet on the middle card, green on the right card.\n- Class and element flank the crown at the top corners of the card: the class icon (image 6) on the left, the element medallion on the right.\n- Bottom: the blank name plaque; under it one row: a small round gold seal with the level number on the left and the combat power — the crossed swords (image 5) and the number — on the right.\n- Rune limits: five rune stones (images 3 and 4) set in one straight horizontal row into the bottom edge of the frame, under that row. Left card: all five unlit. Middle card: the three on the left lit with turquoise light, the two on the right unlit. Right card: all five lit."
+    },
+    {
+      "id": "card2-02-medallion",
+      "category": "card-concepts",
+      "title": "Карточка героя, система 2: кольцо-медальон (рамка B — кованое железо)",
+      "source": "Идея координатора: кольцо-медальон внизу — уровень в центре, пять дуг — пределы, звёзды доблести по ободу, класс и стихия — медальоны по бокам",
+      "refs": [
+        "art/generated/heroes/hero-c2-46-brokk__nb2.jpg",
+        "design/ui/assets/art/icons/r4.png",
+        "design/ui/assets/art/icons/valor.png",
+        "design/ui/assets/art/icons/power.png",
+        "design/ui/assets/art/icons/cls-tank.png"
+      ],
+      "subject": "Concept: the Medallion. Attached icons after the portrait: (2) the rarity crystal; (3) the valor star — use only the star, without its tile: four long sharp rays in a cross, never a five-pointed star; (4) the combat power icon — crossed swords; (5) the class icon — a shield on a hexagonal tile.\n\nFrame — forged iron and gold. Left card: rough black iron straps with plain round rivets, a patch of rust, cold light. Middle card: the iron is inlaid with lines of gold, violet cabochons sit in claw settings at the four corners, the seams glow faintly orange. Right card: a massive frame of dark iron with thick gold inlay and gold-capped rivets, the seams glow red-hot, embers and sparks fly up, molten light drips at the bottom.\n\nIcons and layout:\n- The heart of the card is one big round medallion of iron and gold at the bottom center, about half as wide as the card, overlapping the lower part of the portrait.\n- Level: the level number in the center of the big medallion.\n- Rune limits: the ring of the big medallion around the number is split into five equal arc segments. A passed limit is an arc glowing turquoise (#48E5D4); an unpassed one is a dark iron arc. Left card: all five arcs dark. Middle card: three arcs glow, two are dark. Right card: all five arcs glow.\n- Valor: star places stand on the top of the medallion's rim in a small arc, stars like image 3. Left card: one single empty star socket on top of the rim and nothing more. Middle card: three places — two gold stars and one empty socket. Right card: five gold stars, blazing.\n- Class and element: two small round medallions attached to the left and the right side of the big one, like its wings — the class icon (image 5) on the left, the element medallion on the right.\n- Rarity: the rarity crystal (image 2) at the top center of the frame — white, violet, green — and the core of the big medallion glows faintly in the same color.\n- Combat power: a band across the top of the card, just under the crystal: the crossed swords (image 4) and the number.\n- The blank name plaque sits under the big medallion at the bottom of the card."
+    },
+    {
+      "id": "card2-03-corners",
+      "category": "card-concepts",
+      "title": "Карточка героя, система 3: углы и крылья (рамка A — филигрань)",
+      "source": "Идея координатора: редкость, стихия, класс, уровень — по углам; пределы — руны по верхней кромке загораются; доблесть — крылья на боковинах растут. Руны заменены гравированными ромбами: знаки, похожие на письмо, запрещены (art/style/style.md)",
+      "refs": [
+        "art/generated/heroes/hero-c2-46-brokk__nb2.jpg",
+        "design/ui/assets/art/icons/r4.png",
+        "design/ui/assets/art/icons/power.png",
+        "design/ui/assets/art/icons/cls-tank.png"
+      ],
+      "subject": "Concept: Corners and Wings. Attached icons after the portrait: (2) the rarity crystal; (3) the combat power icon — crossed swords; (4) the class icon — a shield on a hexagonal tile.\n\nFrame — gold filigree. Left card: a plain narrow frame of dull dark bronze with flat edges, no ornament, no glow. Middle card: a gilded frame with delicate filigree scrolls, a soft violet glow along the inner edge. Right card: a sumptuous frame of polished old gold with dense openwork filigree, a warm golden radiance behind the card, gold sparks around it.\n\nIcons and layout:\n- The four corners of the frame hold four signs in round corner settings, in the same places on every card: top left — the rarity crystal (image 2): white, violet, green; top right — the element medallion; bottom left — the class icon (image 4); bottom right — a round badge with the level number.\n- Rune limits: five small engraved diamond shapes in one row along the top edge of the frame, between the two top corners — simple diamonds, never letters. A passed limit is a diamond glowing turquoise from inside the engraving; an unpassed one is a dark empty groove. Left card: all five dark. Middle card: the three on the left glow, the two on the right are dark. Right card: all five glow.\n- Valor: a wing grows from each side rail of the frame, at the height of the hero's shoulders, the two wings mirrored. Each wing has as many long feathers as the valor maximum: a taken valor is a shining gold feather, an empty place is a dark bare feather. Left card: a tiny folded wing stub on each side, each with one single dark feather. Middle card: small half-open wings, each with exactly three feathers — two shining gold and one dark. Right card: large spread golden wings, each with exactly five blazing gold feathers, reaching beyond the card's edges.\n- Bottom center, between the class and the level corners: the blank name plaque and under it the combat power — the crossed swords (image 3) and the number."
+    },
+    {
+      "id": "card2-04-pillar",
+      "category": "card-concepts",
+      "title": "Карточка героя, система 4: столб силы (рамка B — кованое железо)",
+      "source": "Идея координатора: слева шкала из пяти сегментов света — пределы, справа столбец звёзд — доблесть, редкость — цвет свечения фона",
+      "refs": [
+        "art/generated/heroes/hero-c2-46-brokk__nb2.jpg",
+        "design/ui/assets/art/icons/r4.png",
+        "design/ui/assets/art/icons/valor.png",
+        "design/ui/assets/art/icons/power.png",
+        "design/ui/assets/art/icons/cls-tank.png"
+      ],
+      "subject": "Concept: the Pillar of Power. Attached icons after the portrait: (2) the rarity crystal; (3) the valor star — use only the star, without its tile: four long sharp rays in a cross, never a five-pointed star; (4) the combat power icon — crossed swords; (5) the class icon — a shield on a hexagonal tile.\n\nFrame — forged iron and gold. Left card: rough black iron straps with plain round rivets, a patch of rust, cold light. Middle card: the iron is inlaid with lines of gold, the seams glow faintly orange. Right card: a massive frame of dark iron with thick gold inlay and gold-capped rivets, the seams glow red-hot, embers and sparks fly up.\n\nIcons and layout:\n- Rune limits: the whole left rail of the frame is a tall glass gauge set in iron, divided into five stacked segments. Passed limits fill with turquoise light from the bottom up. Left card: all five segments dark and empty. Middle card: the lower three segments glow, the upper two are dark. Right card: all five segments glow and light overflows at the top.\n- Rarity: the rarity crystal (image 2) sits at the foot of the left gauge like the lamp that feeds it — white, violet, green — and the glow of the background behind the hero takes the same color: cold grey-white on the left card, violet on the middle card, green on the right card.\n- Valor: the right rail of the frame holds a vertical column of star places from the top down, stars like image 3. Left card: one single empty star socket at the top of the right rail, and the rest of the rail is plain iron. Middle card: three places — the first and the second from the top are gold stars, the third one below them is an empty socket, and the rest of the rail is plain. Right card: five gold stars filling the rail, blazing.\n- A bar across the top of the card: the class icon (image 5) on the left, the level number in the middle, the element medallion on the right.\n- Bottom: the blank name plaque; under it a heavy iron plate with the crossed swords (image 4) and the combat power number, large."
+    },
+    {
+      "id": "card2-05-gems",
+      "category": "card-concepts",
+      "title": "Карточка героя, система 5: всё — каменья (рамка B — кованое железо)",
+      "source": "Идея координатора: пределы — пять гнёзд по левому краю, доблесть — гнёзда по правому (сколько позиций — столько максимум, горят взятые), редкость — большой камень гребня",
+      "refs": [
+        "art/generated/heroes/hero-c2-46-brokk__nb2.jpg",
+        "design/ui/assets/art/icons/r4.png",
+        "design/ui/assets/art/limits/stone-on.png",
+        "design/ui/assets/art/limits/stone-off.png",
+        "design/ui/assets/art/icons/power.png",
+        "design/ui/assets/art/icons/cls-tank.png"
+      ],
+      "subject": "Concept: All Gems — every sign on the card is a stone set into the iron. Attached icons after the portrait: (2) the rarity crystal; (3) a lit rune stone; (4) an unlit rune stone; (5) the combat power icon — crossed swords; (6) the class icon — a shield on a hexagonal tile.\n\nFrame — forged iron and gold. Left card: rough black iron straps with plain round rivets, a patch of rust, cold light. Middle card: the iron is inlaid with lines of gold, the seams glow faintly orange. Right card: a massive frame of dark iron with thick gold inlay and gold-capped rivets, the seams glow red-hot, embers and sparks fly up, molten light drips at the bottom.\n\nIcons and layout:\n- Rarity: one large rarity crystal (image 2) in the crest at the top center — white, violet, green.\n- Rune limits: five rune stones (images 3 and 4) set one above another down the left rail of the frame. Left card: all five unlit. Middle card: the upper three lit with turquoise light, the lower two unlit. Right card: all five lit.\n- Valor: claw settings down the right rail of the frame from the top, as many as the valor maximum. A taken valor is a faceted gold gem shining like a small sun; an empty place is an empty dark claw setting. Left card: one single empty claw setting at the top of the right rail, and the rest of the rail is plain iron. Middle card: three settings — the top two hold shining gold gems, the third is empty, the rest of the rail plain. Right card: five shining gold gems down the whole right rail.\n- Level: the level number on a round iron boss at the top left corner of the frame.\n- Bottom corners: the class icon (image 6) set like a cameo in the bottom left corner, the element medallion in the bottom right corner.\n- Between them at the bottom: the blank name plaque and under it the combat power — the crossed swords (image 5) and the number."
+    },
+    {
+      "id": "card2-06-insignia",
+      "category": "card-concepts",
+      "title": "Карточка героя, система 6: знаки отличия (рамка A+B — железо с золотой филигранью)",
+      "source": "Идея координатора: доблесть — шевроны, пределы — пять точек-«звёзд» ранга, класс — водяной знак-герб за героем",
+      "refs": [
+        "art/generated/heroes/hero-c2-46-brokk__nb2.jpg",
+        "design/ui/assets/art/icons/r4.png",
+        "design/ui/assets/art/icons/power.png",
+        "design/ui/assets/art/icons/cls-tank.png"
+      ],
+      "subject": "Concept: Insignia of Rank — the card reads like a soldier's decorations. Attached icons after the portrait: (2) the rarity crystal; (3) the combat power icon — crossed swords; (4) the class icon — a shield on a hexagonal tile.\n\nFrame — dark forged iron plates edged with gold filigree. Left card: plain black iron with a thin line of dull bronze, no ornament, no glow. Middle card: the iron is edged with gilded filigree scrolls at the corners, a soft violet glow along the inner edge. Right card: massive dark iron covered with rich polished gold filigree, a golden radiance behind the card, sparks around it.\n\nIcons and layout:\n- Valor and level: a rank badge of iron and gold on the upper left of the frame. Valor is shown as chevrons — V-shaped rank stripes stacked one above another on this badge, as many as the valor maximum; a taken valor is a solid shining gold chevron, an empty place is a thin dark chevron outline. Under the chevrons, on the same badge, the level number. Left card: one single empty chevron outline and nothing more. Middle card: three chevrons — the lower two solid gold, the top one an empty outline. Right card: five solid gold chevrons.\n- Rune limits: five round studs like rank pips in one straight row on a bar under the portrait. A passed limit is a stud glowing turquoise; an unpassed one is a dark iron stud. Left card: all five dark. Middle card: the three on the left glow, the two on the right are dark. Right card: all five glow.\n- Class: a large emblem of the class — the shield from image 4, without its tile — as a faint watermark crest in the background behind the hero, like a coat of arms on a wall: barely visible on the left card, clearer on the middle card, glowing gold on the right card.\n- Rarity: the rarity crystal (image 2) at the top center of the frame, set like the jewel of an order — white, violet, green.\n- Element: the element medallion in the top right corner.\n- Bottom: the blank name plaque, then the combat power — the crossed swords (image 3) and the number."
+    },
+    {
+      "id": "card2-07-casual",
+      "category": "card-concepts",
+      "title": "Карточка героя, система 7: казуальный минимум (рамка A — тонкая филигрань)",
+      "source": "Идея координатора: на лице карточки только цвет редкости, дуга звёзд и мощь; пределы — тонкая линия из пяти огоньков под звёздами. Класс, стихия и уровень — только в окне героя",
+      "refs": [
+        "art/generated/heroes/hero-c2-46-brokk__nb2.jpg",
+        "design/ui/assets/art/icons/r4.png",
+        "design/ui/assets/art/icons/valor.png",
+        "design/ui/assets/art/icons/power.png"
+      ],
+      "subject": "Concept: Casual Minimum — the card face shows only three things, large and simple: the rarity color, the arc of valor stars and the combat power, plus a thin line of five lights for the rune limits. Class, element and level are not on this card at all — no class icon, no element medallion, no level number: they live in the hero's detail screen. Attached icons after the portrait: (2) the rarity crystal; (3) the valor star — use only the star, without its tile: four long sharp rays in a cross, never a five-pointed star; (4) the combat power icon — crossed swords.\n\nFrame — thin gold filigree, restrained, the portrait as large as possible. Left card: a thin plain frame of dull bronze. Middle card: a thin gilded frame with small filigree corners. Right card: a thin frame of polished gold with filigree corners, a golden radiance and a few sparks.\n\nIcons and layout:\n- Rarity: the whole frame line and a soft glow around the card take the rarity color — cool white on the left card, violet on the middle card, green on the right card — and a small rarity crystal (image 2) sits at the top center.\n- Valor: one large arc of stars like image 3 over the hero's head. Left card: one single empty star socket and nothing more. Middle card: exactly three places — the left and the middle are gold stars, the right one is an empty socket. Right card: five gold stars, blazing.\n- Rune limits: right under the arc of stars, a thin line of five tiny flames. A passed limit is a small bright turquoise flame; an unpassed one is a tiny dark ember. Left card: five dark embers. Middle card: three turquoise flames on the left, two dark embers on the right. Right card: five bright flames.\n- Bottom: a slim blank name plaque, and under it the combat power, big and bold: the crossed swords (image 4) and the number."
+    },
+    {
+      "id": "card2-08-tarot",
+      "category": "card-concepts",
+      "title": "Карточка героя, система 8: арка таро (рамка A — филигрань)",
+      "source": "Идея координатора: доблесть — в замковом камне арки, пределы — пять фонариков на цепочках внизу, уровень — в щите",
+      "refs": [
+        "art/generated/heroes/hero-c2-46-brokk__nb2.jpg",
+        "design/ui/assets/art/icons/r4.png",
+        "design/ui/assets/art/icons/valor.png",
+        "design/ui/assets/art/icons/power.png",
+        "design/ui/assets/art/icons/cls-tank.png"
+      ],
+      "subject": "Concept: the Tarot Arch. Attached icons after the portrait: (2) the rarity crystal; (3) the valor star — use only the star, without its tile: four long sharp rays in a cross, never a five-pointed star; (4) the combat power icon — crossed swords; (5) the class icon — a shield on a hexagonal tile.\n\nFrame — gold filigree around a tall rounded arch. Left card: a plain frame of dull dark bronze, no ornament, no glow. Middle card: a gilded arch with delicate filigree scrolls, a soft violet glow along its inner edge. Right card: an arch of polished old gold with dense openwork filigree, a golden radiance and sparks.\n\nIcons and layout:\n- The portrait sits in a tall rounded arch. The keystone at the top of the arch holds the valor: star places set into the keystone like gems, in a small fan, stars like image 3. Left card: the keystone holds one single empty star socket and nothing more. Middle card: three places — the left and the middle are gold stars, the right one is an empty socket. Right card: five gold stars fanned around the keystone, blazing.\n- Rarity: the rarity crystal (image 2) crowns the arch above the keystone — white, violet, green — and the halo behind the hero's head inside the arch has the same color.\n- In the two corners beside the top of the arch: on the left, a small heraldic shield with the level number; on the right, the element medallion.\n- Rune limits: five small lanterns of iron and glass hang on thin chains in one row across the bottom of the arch, just above the name plaque. A passed limit is a lantern burning with turquoise light; an unpassed one is a dark cold lantern. Left card: all five dark. Middle card: the three on the left burn, the two on the right are dark. Right card: all five burn.\n- Bottom: the blank name plaque, and under it one row: the class icon (image 5) on the left and the combat power — the crossed swords (image 4) and the number — on the right."
+    },
+    {
+      "id": "card2-09-sash",
+      "category": "card-concepts",
+      "title": "Карточка героя, система 9: перевязь и клинок (рамка B — кованое железо)",
+      "source": "Идея координатора: лента-перевязь по диагонали с мощью, доблесть — медали на ленте, пределы — зарубки на клинке вдоль края",
+      "refs": [
+        "art/generated/heroes/hero-c2-46-brokk__nb2.jpg",
+        "design/ui/assets/art/icons/r4.png",
+        "design/ui/assets/art/icons/power.png",
+        "design/ui/assets/art/icons/cls-tank.png"
+      ],
+      "subject": "Concept: the Sash and the Blade. Attached icons after the portrait: (2) the rarity crystal; (3) the combat power icon — crossed swords; (4) the class icon — a shield on a hexagonal tile.\n\nFrame — forged iron and gold. Left card: rough black iron straps with plain round rivets, a patch of rust, cold light. Middle card: the iron is inlaid with lines of gold, the seams glow faintly orange. Right card: a massive frame of dark iron with thick gold inlay and gold-capped rivets, the seams glow red-hot, embers and sparks fly up.\n\nIcons and layout:\n- Rune limits: a straight sword runs down the whole left edge of the card as part of the frame, its hilt at the top left, its blade pointing down. The blade has five notches along it, evenly spaced. A passed limit is a notch glowing turquoise; an unpassed one is a dark notch. Left card: all five dark. Middle card: the upper three glow, the lower two are dark. Right card: all five glow.\n- Rarity: the rarity crystal (image 2) set in the sword's pommel at the top left — white, violet, green — and the sash below has the same color.\n- The sash: a broad band of heavy cloth runs diagonally across the lower half of the card, from the right edge down to the bottom left, over the hero's coat, like an order's ribbon, in the rarity color: grey-white, violet, green. The combat power is on the sash in gold: the crossed swords (image 3) and the number.\n- Valor: medals pinned to the sash above the number, in a row along it, as many places as the valor maximum. A taken valor is a round gold medal with a four-pointed star; an empty place is a small empty dark ring. Left card: one single empty ring and nothing more. Middle card: three places — the first two are gold medals, the third is an empty ring. Right card: five gold medals.\n- Top right corner: a round badge with the level number; under it the element medallion. Bottom right corner: the class icon (image 4).\n- The blank name plaque runs across the top of the card, to the right of the sword's hilt."
+    },
+    {
+      "id": "card2-10-constellation",
+      "category": "card-concepts",
+      "title": "Карточка героя, система 10: созвездие и карст (рамка A+B — камень с золотом; выбор агента)",
+      "source": "Выбор агента: доблесть — созвездие над головой, пределы — пять кристаллов карста растут из нижней кромки (пустой карст матовый, заряженный светится — art/style/style.md). Язык мира, а не условный значок; в Unity дёшево анимируется",
+      "refs": [
+        "art/generated/heroes/hero-c2-46-brokk__nb2.jpg",
+        "design/ui/assets/art/icons/r4.png",
+        "design/ui/assets/art/icons/power.png",
+        "design/ui/assets/art/icons/cls-tank.png"
+      ],
+      "subject": "Concept: Constellation and Carst — both signs of power belong to this world: valor is a constellation lighting up over the hero, rune limits are carst crystals that charge with light. Attached icons after the portrait: (2) the rarity crystal; (3) the combat power icon — crossed swords; (4) the class icon — a shield on a hexagonal tile.\n\nFrame — dark weathered stone bound with iron and gold filigree. Left card: dark stone with a thin line of dull iron, no ornament, no glow. Middle card: the stone is bound with gilded iron bands and small filigree corners, a soft violet glow. Right card: stone and polished gold filigree, golden light and sparks.\n\nIcons and layout:\n- Valor: a small constellation in the dark above the hero's head, its star points joined by thin golden lines, as many points as the valor maximum. A taken valor is a bright shining four-pointed star; an empty place is a faint dim point. Left card: one single faint point, alone, with no lines. Middle card: three points in a small triangle — two bright stars and one faint point. Right card: five bright stars joined in a crown-like figure, glowing.\n- Rune limits: five carst crystals grow in one row from the lower border of the frame, just above the name plaque, overlapping the bottom of the portrait. A passed limit is a crystal glowing turquoise from within; an unpassed one is matte grey-white crystal without any light. Left card: five matte grey crystals. Middle card: the three on the left glow, the two on the right are matte. Right card: all five glow and their light rises onto the hero.\n- Rarity: the rarity crystal (image 2) at the top center of the frame — white, violet, green.\n- Top corners: the level number carved into a small stone tablet on the left; the element medallion on the right.\n- Bottom: the blank name plaque; under it one row: the class icon (image 4) on the left and the combat power — the crossed swords (image 3) and the number — on the right."
+    }
+  ],
+  "result": {
+    "Итог 30.09.2026": "26 запросов nb2 2K, $2,686 по счётчикам токенов (потолок $3); ещё один ответ оборвался ошибкой SSL и в манифест не попал — вероятно, оплачен, около $0,10. Правки — jobs/card-concepts-2-edit.json; склейка card2-07 — без запроса, записана в манифест с ценой 0",
+    "Выбранные — по одной на вариант": {
+      "card2-01-crown": "art/generated/card-concepts/card2-01-crown-fix2__nb2.jpg — счёт верный",
+      "card2-02-medallion": "art/generated/card-concepts/card2-02-medallion-fix2__nb2.jpg — счёт верный, дуги пределов горят подряд по часовой от верха",
+      "card2-03-corners": "art/generated/card-concepts/card2-03-corners-fix2__nb2.jpg — огрех: у вершины полные крылья, перьев больше пяти",
+      "card2-04-pillar": "art/generated/card-concepts/card2-04-pillar__nb2.jpg — счёт верный с первого раза; кристалл редкости внизу по центру, а не у подножия шкалы; звёзды пятиконечные",
+      "card2-05-gems": "art/generated/card-concepts/card2-05-gems-fix2__nb2.jpg — счёт верный",
+      "card2-06-insignia": "art/generated/card-concepts/card2-06-insignia-fix__nb2.jpg — счёт верный; у вершины герб класса — золотой щит поверх портрета, а не водяной знак",
+      "card2-07-casual": "art/generated/card-concepts/card2-07-casual-merge__nb2.jpg — склейка: слабая карточка из card2-07-casual-fix, средняя и вершина из card2-07-casual-fix2; счёт верный",
+      "card2-08-tarot": "art/generated/card-concepts/card2-08-tarot-fix__nb2.jpg — счёт верный; у вершины в правом нижнем углу пустое круглое гнездо",
+      "card2-09-sash": "art/generated/card-concepts/card2-09-sash__nb2.jpg — огрех: на клинке по шесть зарубок вместо пяти; правки не помогли — вторая исправила только слабый клинок и дорисовала под карточками деревянный стол",
+      "card2-10-constellation": "art/generated/card-concepts/card2-10-constellation-fix2__nb2.jpg — счёт верный"
+    },
+    "Чему научила партия": [
+      "Поштучная раскладка «где что» и «что на каждой карточке» и только нужные варианту значки-образцы подняли верный счёт с первого раза: 4 из 10 против 2 из 10 в первой десятке",
+      "Earth модель читает как планету: медальон стихии рисовала глобусом. Писать «a raw chunk of amber rock — a stone, not a planet: no globe, no map, no continents»",
+      "Мощь модель подписывает буквами CP. Писать «the crossed-swords icon right before its number, with no letters such as CP or BP»",
+      "Считать правкой модель умеет, когда меняется одна вещь в одном месте: «удали нижний», «зажги третий сверху», «замени этот значок». Правка трёх клинков сразу исправила один",
+      "Если две правки одной картинки верны на разных карточках, их можно склеить по тёмному промежутку между карточками — пиксели остальных карточек у правок совпадают"
+    ]
+  }
+}

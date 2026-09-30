@@ -24,21 +24,22 @@
 .rp-s.ready::after{animation:rpPulse 1.8s ease-in-out infinite}
 @keyframes rpPulse{0%,100%{opacity:.2}50%{opacity:1}}
 /* столб: камни снизу вверх — свет поднимается снизу; за ними золотая нить */
-.rp.t,.rp.h{display:flex;flex-direction:column-reverse;justify-content:space-between;align-items:center;pointer-events:none}
+.rp.t,.rp.h{display:flex;flex-direction:column-reverse;justify-content:space-evenly;align-items:center;pointer-events:none}
 .rp.t .rp-s,.rp.h .rp-s{width:100%}
 .rp.t::before,.rp.h::before{content:"";position:absolute;left:50%;top:6%;bottom:6%;width:1px;margin-left:-.5px;background:linear-gradient(180deg,rgba(221,188,122,0),rgba(221,188,122,.38) 18%,rgba(221,188,122,.2) 50%,rgba(221,188,122,.38) 82%,rgba(221,188,122,0))}
 /* плитка героя: столбы у самого края портрета — от кристалла и доблести до строки уровня; ширина камня — --rp-w, 7 % ширины плитки
    (единицы контейнера: плитка — контейнер по ширине), имя от столбов отступает (.hc.rpp .nm, heroes.css), строка уровня — во всю
    ширину под ними */
-.hc{container-type:inline-size;--rp-w:7cqw}
-.hc .rp.t{position:absolute;z-index:2;top:max(22px,25%);bottom:20px;width:var(--rp-w)}
+.hc{container-type:inline-size;--rp-w:12cqw}   /* столб — три камня (RP_VIEW.split): камень вдвое крупнее прежних пяти */
+.hc .rp.t{position:absolute;z-index:2;top:max(22px,22%);bottom:20px;width:var(--rp-w)}
 .hc .rp.t.l{left:2px}
 .hc .rp.t.r{right:2px}
 .hc.dim .rp.t{opacity:.45}
 /* шапка карточки: лицо между двумя столбами, как в раме */
 .hd-top:has(>.hd-rp){grid-template-columns:auto minmax(0,1fr) auto}
-.hd-rp{display:flex;align-items:stretch;gap:4px}
-.rp.h{position:relative;flex:none;width:9px;padding:3px 0}
+.hd-rp{display:flex;align-items:stretch;gap:5px}
+/* столб у лица — до трёх камней (RP_VIEW.split): камень 16 px, нарисованный (класс p) */
+.rp.h{position:relative;flex:none;width:16px;padding:3px 0}
 /* строка из пяти: лист предела, превью доблести, «Что изменилось» */
 .rp.i{display:inline-flex;align-items:center;gap:3px;vertical-align:middle}
 .rp.i .rp-s{width:7px}
@@ -343,7 +344,7 @@ button.hdv-gate:hover .rp-s{transform:scale(1.1)}
 /* ---------- низкий экран 844 × 390: рабочая область ниже 360 ---------- */
 @container main (max-height: 360px){
   .hd-rp{gap:3px}
-  .rp.h{width:7px;padding:2px 0}
+  .rp.h{width:13px;padding:2px 0}
   .hdv{gap:6px}
   .hdv-next{padding:8px 10px;gap:10px}
   .hdv-t{font-size:17px}
