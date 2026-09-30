@@ -1,0 +1,32 @@
+{
+  "name": "Страницы книги героя — чернильные виньетки: заставка под рубрику, короткий разделитель, уголок страницы, картуш, концовка главы, венок. Рисуются пером по белому; белое уходит в прозрачность (tools/art-gen/page_layers.py ink) — на пергаменте разворота остаются одни чернила.",
+  "plan": {
+    "Виньетки pg-ink": "3:2, 2K, без вырезки: шесть виньеток 3 × 2 пером на белом; белое → прозрачное с восстановлением цвета чернил, нарезка по пятнам — page_layers.py ink"
+  },
+  "notes": [
+    "Сначала --dry-run, потом запуск с --budget. Каждая картинка смотрится глазами, повторов — не больше двух",
+    "После генерации: python tools/art-gen/page_layers.py ink art/generated/pg-ink/pg-ink__nb2.jpg 3 2 head div corner cartouche tail wreath; выгрузка — ui-art.json → design/ui/assets/art/pages/ и export_ui.py --no-stamp"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: the ornaments of an old hand-written book of heroes, drawn with a quill in dark sepia-brown iron-gall ink: confident calligraphic strokes with thick and thin lines, slightly uneven like real ink, small flourishes, curls and dots, a few accents in faded red-brown ink. A flat ink drawing on plain pure white: no paper texture, no parchment color, no shading, no gradient, no shadows, no border around the picture. Only dark sepia-brown ink and a little faded red ink.",
+  "negative": "No words, no letters, no digits, no numbers, no alphabets, no runes or glyphs that look like writing, no handwriting, no lines of text, no watermark, no signature, no logo. No faces, no figures, no animals, no birds, no skulls, no crosses, no pentagrams, no occult or religious symbols. No beige or gray background, no paper texture, no 3D, no metal, no gold, no glow, no color fills.",
+  "categories": {
+    "pg-ink": {
+      "aspect": "3:2",
+      "size": "2K",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a sheet of separate ink ornaments laid out in a strict grid of three columns and two rows, every ornament centered in its own equal cell, all perfectly straight and level. The whole canvas is plain pure white (#FFFFFF), with wide equal empty white gaps between the ornaments and around them: no ornament touches another ornament or the edge of the canvas. Nothing connects the ornaments."
+    }
+  },
+  "jobs": [
+    {
+      "id": "pg-ink",
+      "category": "pg-ink",
+      "title": "Чернильные виньетки страниц книги — заставка, разделитель, уголок, картуш, концовка, венок",
+      "source": "Страницы книги героя (screens/book-pages.css): рубрики разделов, картуш следующего шага, концовка главы, венок мощи. К выгрузке — design/ui/assets/art/pages/ink-<имя>.png (page_layers.py ink)",
+      "subject": "The sheet: SIX ink ornaments. Top row, from left to right: (1) a long horizontal headpiece, about eight times as wide as it is tall: a calligraphic flourish spreading symmetrically to the left and to the right from a small central diamond, thick in the middle and thinning to fine curled ends; (2) a short horizontal divider, about four times as wide as it is tall: a small rosette of four dots in the middle with one short curling stroke on each side; (3) an L-shaped corner flourish for the top-left corner of a page: a thin line running right along the top and a thin line running down along the left side, meeting at the corner in a curl with a small leaf. Bottom row, from left to right: (4) an empty rectangular cartouche, twice as wide as it is tall, drawn with a double ink line, with a small curling flourish at each of its four corners; the inside is plain empty white; (5) a small tailpiece that ends a chapter: a short wavy stroke with three dots in a downward-pointing triangle under it; (6) a small round wreath of two thin laurel branches meeting at the bottom and tied with a small faded red ribbon, the middle empty."
+    }
+  ]
+}

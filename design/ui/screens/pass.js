@@ -2,7 +2,9 @@
    Боевой пропуск и сделать более красивые и желанные ежедневные награды». Черновик для автора — docs/content/пропуск-и-награды.md.
    Данные — design/ui/pass.js (EN_PASS и алгоритм EnPass): собирает tools/content-gen/pass/build.js, руками не править.
    Регистрирует:
-   — вкладку «Пропуск» Лавки Энериума: обёртка SCREENS.store, остальные вкладки рисует storeView в index.html. Сезон «Осенний путь»:
+   — вкладку «Энериум» Лавки Энериума (stView): стартовый набор — рунные ключи и души раз за игру, первая покупка ×2 (слово автора
+     30.09.2026, ADR-0033), пакеты Энериума и подписка из EN_PASS.store; «сервер» ST_SRV помнит покупку, лист OV.stbuy — что внутри до оплаты;
+   — вкладку «Пропуск» Лавки Энериума: обёртка SCREENS.store, вкладку «Облик» рисует storeView в index.html. Сезон «Осенний путь»:
      баннер, ступень и очки, лента из 30 ступеней страницами по десять — два ряда, бесплатный и платный, — и следующая награда крупно;
    — листы: OV.pstier (ступень: обе награды, что внутри, «Забрать»), OV.pspaid (платный ряд: что даёт — до покупки, цена),
      OV.pssrc (откуда очки), OV.psinfo (как устроен пропуск), OV.psgot (получение с анимацией);
@@ -117,6 +119,7 @@ function psState(s) {
   if (!psOk()) return s;
   s.pass = psNew(s, true);
   s.gift = dgNew(true);
+  s.store = stNew();
   dgSync(s); psLook(s);
   return s;
 }
@@ -250,6 +253,27 @@ const DG_SRV = {
 /* новые серверные сутки: лист даров и день сезона */
 function psNewDay() { DG_SRV.newDay(); if (S.pass) PS_SRV.day(); }
 
+/* ================== «сервер» Лавки Энериума: стартовый набор ==================
+   Слово автора 30.09.2026 (ADR-0033): рунные ключи и души продаются только стартовым набором — раз за игру, первая покупка ×2.
+   Платёж проводит платформа, выдачу решает сервер: buy(op) — операция с номером; повтор номера ничего не повторяет, вторая покупка —
+   отказ, отказ ничего не меняет. Сервер помнит покупку: S.store.starter. Состав и множитель — EN_PASS.store.starter */
+function stNew() { return { v: 1, starter: null, srv: { ops: {}, seq: 1 } }; }
+const ST_SRV = {
+  buy(op) {
+    const T = S.store;
+    if (!psOk() || !PSD.store || !T) return { refuse: 'data' };
+    if (!op) return { refuse: 'op' };
+    if (T.srv.ops[op]) return { again: true, res: T.srv.ops[op] };
+    if (T.starter) return { refuse: 'bought' };
+    const D = PSD.store.starter, res = { op, keys: D.keys * D.x, souls: D.souls * D.x };
+    S.wallet.keys = (S.wallet.keys || 0) + res.keys;
+    S.wallet.souls = (S.wallet.souls || 0) + res.souls;
+    T.starter = { op }; T.srv.ops[op] = res; T.srv.seq++;
+    return { res };
+  },
+};
+const ST_REFUSE = { data: 'Лавка недоступна', op: 'Операция без номера', bought: 'Стартовый набор уже куплен: он продаётся раз за игру' };
+
 /* ================== дела в очки: обёртка «сервера» Событий ==================
    Наблюдатель Событий (screens/event.js) превращает дела в операции с номером — те же операции засчитываются пропуску своим номером.
    Номер Событий живёт неделю, поэтому у пропуска к нему прибавлен номер недели */
@@ -374,6 +398,21 @@ function psGotItems(R, fx) {
   }).join('')).join('');
 }
 Object.assign(OV, {
+  /* стартовый набор: всё, что внутри, до оплаты; раз за игру — сервер помнит покупку */
+  stbuy(o) {
+    if (!psOk() || !PSD.store || !S.store) return '';
+    const T = PSD.store.starter, got = !!S.store.starter, op = (o && o.arg) || 'st' + S.store.srv.seq;
+    const li = [
+      `Рунные ключи — ${fmt(T.keys)}, души — ${fmt(T.souls)}. Первая покупка ×${T.x}: вы получите ${fmt(T.keys * T.x)} и ${fmt(T.souls * T.x)}.`,
+      'Раз за игру: второй раз набор не продаётся.',
+      'Больше рунные ключи и души за деньги не продаются — только игрой: боссы биомов, контракты, сундуки.',
+    ];
+    const foot = got ? `<span class="chip spirit">${ic('check')}набор получен</span><span class="g-spacer"></span><button class="btn" data-a="close">Закрыть</button>`
+      : `<button class="btn ghost" data-a="close">Отмена</button><button class="btn go" data-a="stbuydo" data-v="${op}">Купить · ${fmt(T.rub)} ₽</button>`;
+    return sheet(T.n, `<p class="muted ps-lead">Ключи к рунным стражам и души для Эхо и пробуждений — на первые шаги пути.</p>
+      <div class="row ps-stq">${costTag('keys', T.keys * T.x)}${costTag('souls', T.souls * T.x)}</div><ul class="ps-li">${li.map(x => `<li>${x}</li>`).join('')}</ul>
+      ${TM('<p class="reason">Прототип: окно оплаты платформы не вызывается, «сервер» выдаёт набор сразу. ST_SRV.buy — операция с номером: повтор ничего не выдаёт, вторая покупка — отказ. Состав — EN_PASS.store.starter.</p>')}`, foot);
+  },
   /* ступень: обе награды, что внутри, «Забрать»; платный ряд закрыт — ссылка на его лист */
   pstier(o) {
     if (!psOk() || !S.pass) return '';
@@ -546,6 +585,15 @@ Object.assign(ACT, {
     toast(x.res.wait ? `Платный ряд открыт — ${x.res.wait} ${plural(x.res.wait, 'награда ждёт', 'награды ждут', 'наград ждут')}` : 'Платный ряд открыт', curImg('enerium'));
   },
   psskip() { const fx = S.pass && S.pass.fx; if (fx) { fx.done = true; render(); } },
+  /* стартовый набор: лист до оплаты, затем операция с номером */
+  stbuy(v) { S.overlay = { t: 'stbuy', arg: v }; render(); },
+  stbuydo(v) {
+    const x = ST_SRV.buy(v);
+    if (x.again) return;
+    if (x.refuse) return toast(ST_REFUSE[x.refuse] || ST_REFUSE.op);
+    S.overlay = null;
+    toast(`Стартовый набор: рунные ключи +${fmt(x.res.keys)}, души +${fmt(x.res.souls)}`, curImg('keys'));
+  },
   giftget(v) {
     const x = DG_SRV.claim(v);
     if (x.again) return;
@@ -570,9 +618,26 @@ const psStore0 = SCREENS.store;
 SCREENS.store = function () {
   const m = psStore0.apply(this, arguments);
   if (m && m.seg) m.seg = Object.assign({}, m.seg, { items: m.seg.items.map(([k, l]) => (k === 'pass' ? [k, l, psWaiting().length > 0] : [k, l])) });
+  if (S.seg.store === 'en' && psOk() && PSD.store) return Object.assign({}, m, { html: `<section class="scr">${stView()}</section>` });
   if (S.seg.store !== 'pass') return m;
   return Object.assign({}, m, { html: psView() });
 };
+/* вкладка «Энериум»: стартовый набор крупно — раз за игру, ×2 первой покупки; ниже — пакеты Энериума и подписка (EN_PASS.store).
+   Рубли — вид витрины прототипа: платёж проводит платформа. Карточка — значок, имя, не больше двух чисел и одно действие */
+function stView() {
+  const ST = PSD.store, T = ST.starter, got = !!(S.store && S.store.starter), op = 'st' + (S.store ? S.store.srv.seq : 1);
+  /* зал доната — материалы витрины сетов (screens/heroes.js, DN_ART): чёрный мрамор, старое золото, свет Энериума снизу */
+  const hall = typeof DN_ART !== 'undefined' && typeof dnArt === 'function' && dnArt(DN_ART.hall);
+  const starter = `<div class="rcard ps-st${got ? ' got' : ''}" data-r="6">${got ? '' : `<i class="st-x2" aria-hidden="true">×${T.x}</i>`}
+      <span class="eyebrow">${got ? 'Получено' : `Раз за игру · первая покупка ×${T.x}`}</span><b>${T.n}</b>
+      <div class="row ps-stq">${costTag('keys', T.keys * T.x)}${costTag('souls', T.souls * T.x)}</div>
+      <small class="muted">Рунные ключи и души за деньги — только в этом наборе.</small>
+      ${got ? `<span class="chip spirit ps-stb">${ic('check')}куплено</span>` : `<button class="btn go sm ps-stb" data-a="stbuy" data-v="${op}">${fmt(T.rub)} ₽</button>`}</div>`;
+  const pack = p => `<div class="rcard st-pk" data-r="${p.firstX ? 6 : 3}"><span class="st-ped" aria-hidden="true"><img class="st-cr" src="${ART('enerium.png')}" alt=""></span><b>${p.n}</b><small class="muted num">${fmt(p.en)} Энериума${p.firstX ? ` · первая покупка ×${p.firstX}` : ' в день'}</small><button class="btn go sm st-buy" data-a="toast" data-v="${tmT('Покупка пока недоступна', 'Покупка в прототипе не выполняется')}">${fmt(p.rub)} ₽${p.days ? ` / ${p.days} дней` : ''}</button></div>`;
+  return `<div class="st-hall${hall ? ' art' : ''}">${hall ? `<img class="st-bg" src="${AV(DN_ART.hall)}" alt="">` : ''}
+    <div class="ps-store">${starter}<div class="rcards grow">${ST.packs.map(pack).join('')}${pack(ST.sub)}</div></div>
+    <p class="reason">За деньги — только больше возможностей отработать прогресс. Рунные ключи и души — только стартовым набором, раз за игру. Попытки и рейтинг не продаются.</p></div>`;
+}
 
 /* ================== для других экранов ================== */
 /* Убежище: «Дар дня» светится, пока сегодняшняя отметка ждёт; «Пропуск» — точка, если ждут награды */
@@ -619,7 +684,7 @@ function psKitHtml() {
   const board = ['поднимается', 'вспышка и частицы', 'на месте'].map((c, i) => `<figure class="ps-kb"><div class="ps-gi kb${i}"><i class="ps-gf" aria-hidden="true"></i><span class="ps-big sm" data-r="4">${psPic({ k: 'chest', box: PSD.chestBox, r: 4, win: 'step' })}</span></div><figcaption>${c}</figcaption></figure>`).join('');
   const E = PSD.econ, pace = [2, 3, 4, 5, 6].map(c => { const P = E.pace[c]; return `<tr><td>${ROMAN[c]}</td><td class="n">${P.o.med}</td><td class="n">${P.e.med}</td><td class="n">${P.p.med}</td><td class="n">${P.z.tier}</td></tr>`; }).join('');
   const team = TM(`<div class="p-table-wrap"><table class="p-table"><tr><th>Цикл</th><th>Обычный: день</th><th>Увлечённый: день</th><th>Плательщик: день</th><th>Занятый: ступень к концу</th></tr>${pace}</table></div>
-    <p class="k-note">Прогон — tools/content-gen/pass/build.js: ${PSD.tiers} ступеней × ${PSD.tierPts} очков, потолок ${PSD.dayCap} в день копится; ×1,7 по каждому виду держится, Энериум: цена ${fmt(PSD.price)}, возврат ${fmt(E.en.refund)}, бесплатный ряд ${fmt(E.en.free)} и лист даров ${fmt(E.en.cal28)} за 4 недели против ${fmt(E.en.contracts28)} контрактов. Черновик — docs/content/пропуск-и-награды.md.</p>`, 'div');
+    <p class="k-note">Прогон — tools/content-gen/pass/build.js: ${PSD.tiers} ступеней × ${PSD.tierPts} очков, потолок ${PSD.dayCap} в день копится; ×1,7 по каждому виду держится, Энериум: цена ${fmt(PSD.price)}, возврат ${fmt(E.en.refund)}, бесплатный ряд ${fmt(E.en.free)} и лист даров ${fmt(E.en.cal28)} за 4 недели — ручеёк бесплатного игрока (ADR-0033), контракты обычного — ${fmt(E.en.contracts28)}; сроки целей — docs/content/экономика-энериум.md. Рунных ключей в рядах и листе нет. Черновик — docs/content/пропуск-и-награды.md.</p>`, 'div');
   return `<section class="k-box ps-kbox" style="grid-column:1/-1"><h3>Боевой пропуск и дар дня</h3>
     <p class="k-note">Пропуск — лента из ${PSD.tiers} ступеней страницами по десять: два ряда, страница кончается вехой; следующая награда — крупно слева, одно действие — «Забрать всё». Что даёт платный ряд — лист до покупки. Дар дня — отметка в сутки: сегодняшняя крупно и светится, лист не сгорает, вехи 7, 14, 20 и 30 — рисунками. Получение — награды поднимаются по одной, частицы по редкости; только transform и opacity.</p>
     <div class="ps-kit"><div class="k-air-r"><b>Клетка ленты</b><div class="k-row">${cells}</div><small>Значок и одно число; сундук — кристаллом редкости. Отметка — «получено», точка — ждёт, замок — платный ряд.</small></div>
@@ -637,4 +702,5 @@ FLOWS.push(
   ['Пропуск · платный ряд', 'Всё, что даёт платный ряд, — до покупки; цена одна на сезон, очков не прибавляет', () => { S.route = 'store'; S.seg.store = 'pass'; S.overlay = { t: 'pspaid' }; }],
   ['Дар дня · забрать', 'Лист даров из 30 отметок: сегодняшняя крупно, «Забрать» — вспышка и частицы', () => { S.route = 'shelter'; S.overlay = { t: 'gift' }; }],
   ['Дар дня · главный дар', 'Двадцатая отметка — главный дар: сундук чистого окна и Энериум', () => { S.route = 'shelter'; S.gift.got = PSD.cal.main - 1; S.gift.last = S.gift.today - 1; dgSync(); S.overlay = { t: 'gift' }; }],
+  ['Лавка · стартовый набор', 'Рунные ключи и души за деньги — только этим набором, раз за игру, первая покупка ×2; что внутри — листом до оплаты', () => { S.route = 'store'; S.seg.store = 'en'; S.overlay = S.store ? { t: 'stbuy', arg: 'st' + S.store.srv.seq } : null; }],
 );

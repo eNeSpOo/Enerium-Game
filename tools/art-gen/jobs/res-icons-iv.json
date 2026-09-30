@@ -1,0 +1,777 @@
+{
+  "name": "Иконки ресурсов сеткой — цикл IV. Слово автора: «Иконки по ресурсам начинай генерировать только тогда, когда придёт с отчётом Этрион». Собирает tools/art-gen/res_jobs.py из design/ui/recipes.js — руками не править",
+  "plan": {
+    "Язык иконки": "один предмет в покое на тёмном камне, три четверти сверху, узнаваемая форма читается на 32 px; вид предмета различает рамка интерфейса (CR_KIND и CR_FAM, screens/crafthall.js), редкость — свет в окне рамки",
+    "Палитра": "цвет карста цикла, свет снизу — его же: The palette of this sheet: blue light (#5A94F7), white stone and sea water. The light from below is a cool blue glow.",
+    "Листы": "листы Этриона (поле sheet) переупакованы внутри цикла по 20 клеток, остаток — малым листом; предметы с img и герои не рисуются"
+  },
+  "notes": [
+    "cells — [id предмета EN_RECIPES.items, имя файла]; spare — пустая клетка малого листа, не выгружается; hidden — «ресурс скрыт»",
+    "Проба 30.09.2026 — res-P-1 и res-I-1 — нарисована с предметом на две трети клетки: в рамке вида окно — 72 % колодца, предмет выходил мелким на 32 px. С остальных листов предмет — на три четверти клетки",
+    "Фраза облика — поле art Этриона; письмо, руны и цифры переписаны в неразборчивые штрихи (FIX в res_jobs.py)",
+    "Слабые клетки — надписи, пентаграмма, «летающая тарелка», светлый фон — перерисованы листами res-fix-* (jobs/res-icons-fix.json): их клетка заменяет клетку этого листа"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "res-icons": {
+      "aspect": "5:4",
+      "size": "2K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square item icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the item in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game lays its own frame over the edges of the cell, so everything important stays in the middle. Every cell shows exactly one item — a raw material, a trophy, a crafted piece or a relic — lying or standing still on dark near-black stone with faint cracks and a darker vignette toward the edges of the cell: one clear central object, large, filling about three quarters of the cell, in a clear three-quarter view from slightly above, with a bold recognisable silhouette that reads at 32 px. When a cell names several things, the first one is the main object — large and centred — and the others are small details beside it. Light rises from below in the colour of this sheet's palette, a soft glow from cracks in the stone — never a spotlight; crisp rim light on the edges of the object; a few dust motes in the light. Painted exactly like the ability icons of this game: loose, confident painterly brush strokes, soft painted edges and deep shadows — no black outlines, no flat sticker look, no scenery, no hands or people unless the cell names them. Writing is never drawn: wherever a cell mentions script, notes, pages, maps, tallies, tags or marks, they are faint unreadable smudges and straight ruled lines; clock faces and dials are plain, with simple notches and no numerals. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each differs clearly from its neighbours."
+    }
+  },
+  "jobs": [
+    {
+      "id": "res-IV-1",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл IV — лист 1: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона IV-01",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "k7_hunt",
+          "k7_hunt"
+        ],
+        [
+          "k7_tail",
+          "k7_tail"
+        ],
+        [
+          "k7_eng",
+          "k7_eng"
+        ],
+        [
+          "k7_alch",
+          "k7_alch"
+        ],
+        [
+          "k7_ench",
+          "k7_ench"
+        ],
+        [
+          "k7_smith",
+          "k7_smith"
+        ],
+        [
+          "rc_b7",
+          "rc_b7"
+        ],
+        [
+          "mc_b7",
+          "mc_b7"
+        ],
+        [
+          "mt_b7",
+          "mt_b7"
+        ],
+        [
+          "k8_hunt",
+          "k8_hunt"
+        ],
+        [
+          "k8_tail",
+          "k8_tail"
+        ],
+        [
+          "k8_eng",
+          "k8_eng"
+        ],
+        [
+          "k8_alch",
+          "k8_alch"
+        ],
+        [
+          "k8_ench",
+          "k8_ench"
+        ],
+        [
+          "k8_smith",
+          "k8_smith"
+        ],
+        [
+          "rc_b8",
+          "rc_b8"
+        ],
+        [
+          "mc_b8",
+          "mc_b8"
+        ],
+        [
+          "mt_b8",
+          "mt_b8"
+        ],
+        [
+          "p_shackle",
+          "p_shackle"
+        ],
+        [
+          "p_hammer",
+          "p_hammer"
+        ]
+      ],
+      "subject": "The palette of this sheet: blue light (#5A94F7), white stone and sea water. The light from below is a cool blue glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A single large dark iridescent scale, wet-looking, bigger than a palm; A bundle of dark knotted fishing net with small cork floats; A heavy bronze sluice winch wheel with a locking pawl; A small glass flask of luminous turquoise water; A small bronze branding iron with a blue crystal set in its stamp face.\n\nRow 2: A single heavy iron shackle link, dark and cold; A clapperless bronze bell hanging from heavy iron shackle links; A wooden execution platform beside a waterfall, a clapperless bell on chains at its edge; The heavy iron poll of a giant executioner axe, the blade broken away; A sharp hooked raptor talon with a bit of stone dust on it.\n\nRow 3: A long blue silk sash with an embroidered scales motif; A large cast iron balance weight with a ring handle; A small heap of bright white lime dust; A small heap of deep blue crystal grains glowing cool light; A heavy cast bronze counterweight shaped like a teardrop.\n\nRow 4: A blank ash-grey seal resting on one pan of a bronze balance with iron weights; A blank verdict scroll under an ash seal, beside a model of a white stepped harbour city; A wide bronze bowl holding water that rises in a column above its rim; A newly forged heavy iron link; A long-handled bronze judge hammer with a teardrop counterweight."
+    },
+    {
+      "id": "res-IV-2",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл IV — лист 2: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона IV-01, IV-02",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "a_brazier",
+          "a_brazier"
+        ],
+        [
+          "p_toll",
+          "p_toll"
+        ],
+        [
+          "rn4_1",
+          "rn4_1"
+        ],
+        [
+          "rn4_2",
+          "rn4_2"
+        ],
+        [
+          "rn4_3",
+          "rn4_3"
+        ],
+        [
+          "rn4_4",
+          "rn4_4"
+        ],
+        [
+          "rn4_5",
+          "rn4_5"
+        ],
+        [
+          "vs4",
+          "vs4"
+        ],
+        [
+          "vr4",
+          "vr4"
+        ],
+        [
+          "kr_pa",
+          "kr_pa"
+        ],
+        [
+          "p_clearwater",
+          "p_clearwater"
+        ],
+        [
+          "p_whitewash",
+          "p_whitewash"
+        ],
+        [
+          "p_purewater",
+          "p_purewater"
+        ],
+        [
+          "a_purevessel",
+          "a_purevessel"
+        ],
+        [
+          "a_ballot",
+          "a_ballot"
+        ],
+        [
+          "a_riverbed",
+          "a_riverbed"
+        ],
+        [
+          "a_c11wax",
+          "a_c11wax"
+        ],
+        [
+          "p_brand",
+          "p_brand"
+        ],
+        [
+          "p_writ",
+          "p_writ"
+        ],
+        [
+          "p_logpage",
+          "p_logpage"
+        ]
+      ],
+      "subject": "The palette of this sheet: blue light (#5A94F7), white stone and sea water. The light from below is a cool blue glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: An iron brazier hanging on heavy chain links locked with a bronze lock; A bronze toll ring with copper coins threaded through it; A small flat stone of deep blue crystal with one carved notch glowing along its edge; A small flat stone of deep blue crystal with two carved notches glowing along its edge; A small flat stone of deep blue crystal with three carved notches glowing along its edge.\n\nRow 2: A small flat stone of deep blue crystal with four carved notches glowing along its edge; A small flat stone of deep blue crystal with five carved notches glowing along its edge; A jagged shard of deep blue crystal with a tiny star-shaped glint at its heart; A round stone disc of deep blue stone with one solid, filled five-pointed star carved deep and glowing — a solid star, never an outline; A palm-sized faceted deep blue crystal glowing with cool steady light.\n\nRow 3: A sealed glass bottle of perfectly clear faintly turquoise water; A wooden bucket of thick white lime wash with a brush; A small stone flask of glowing clear water with silt settled at the bottom; A sealed glass vessel of clear water with a blue seal brand on its stopper; A whitewashed stone urn with a small bronze judge hammer resting on its lid.\n\nRow 4: A small stone channel painted white with clear water flowing in it; Two seashells holding pale wax candles with small steady flames; A copper plate stamped with a glowing blue seal mark; A parchment with blue ink and a small glowing blue crystal pressed into its seal; A torn log page with faded ruled lines with salt crystals on it."
+    },
+    {
+      "id": "res-IV-3",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл IV — лист 3: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона IV-02, IV-03",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "a_contract",
+          "a_contract"
+        ],
+        [
+          "a_insured",
+          "a_insured"
+        ],
+        [
+          "a_passage",
+          "a_passage"
+        ],
+        [
+          "p_lock",
+          "p_lock"
+        ],
+        [
+          "p_weight",
+          "p_weight"
+        ],
+        [
+          "a_scales",
+          "a_scales"
+        ],
+        [
+          "a_whitestep",
+          "a_whitestep"
+        ],
+        [
+          "a_citytile",
+          "a_citytile"
+        ],
+        [
+          "a_sluicegate",
+          "a_sluicegate"
+        ],
+        [
+          "p_riverpebble",
+          "p_riverpebble"
+        ],
+        [
+          "p_netting",
+          "p_netting"
+        ],
+        [
+          "p_sash",
+          "p_sash"
+        ],
+        [
+          "p_reedmat",
+          "p_reedmat"
+        ],
+        [
+          "a_sail",
+          "a_sail"
+        ],
+        [
+          "a_harborkit",
+          "a_harborkit"
+        ],
+        [
+          "a_boat",
+          "a_boat"
+        ],
+        [
+          "a_accusation",
+          "a_accusation"
+        ],
+        [
+          "a_c4goods",
+          "a_c4goods"
+        ],
+        [
+          "a_c12rope",
+          "a_c12rope"
+        ],
+        [
+          "p_darkscale",
+          "p_darkscale"
+        ]
+      ],
+      "subject": "The palette of this sheet: blue light (#5A94F7), white stone and sea water. The light from below is a cool blue glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A formal parchment contract with blue seals, a copper brand and a blue sash tied around it; A signed promissory note with a blue seal and a tiny ship sketch; A sealed passage document tied with a hemp rope and a toll ring; A heavy bronze lock with a ring bolt; A precisely shaped iron weight with filed edges.\n\nRow 2: A bronze balance scale with iron weights and a blue seal stamped on the beam; A gleaming white stone step with fresh limewash; A red roof tile with a copper seal brand and a small brass weight tied to it; A small bronze sluice gate held by two heavy locks and a counterweight; A small section of river pebbles set in white lime.\n\nRow 3: A folded dark net glossy with fresh tar; A blue sash with inked ruled lines along its length; A small woven reed mat with two worn knee marks; A large grey storm sail with net reinforcement and dark scales sewn at the corners; A mended fishing net with a fishbone needle and gull-feather floats.\n\nRow 4: A small wooden pilgrim boat with a tarred net draped over its side and dark scales on the hull; A blue sash with a claw clasp wrapped around an iron weight; A coil of harbour rope with gull feathers and a red roof tile tied in; A tarred rope laid in a circle around a curved keel plank; A plate of large dark iridescent scales stitched onto salted hide."
+    },
+    {
+      "id": "res-IV-4",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл IV — лист 4: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона IV-03, IV-04",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "p_talon",
+          "p_talon"
+        ],
+        [
+          "p_diceset",
+          "p_diceset"
+        ],
+        [
+          "a_harborhorn",
+          "a_harborhorn"
+        ],
+        [
+          "a_c18dice",
+          "a_c18dice"
+        ],
+        [
+          "act_cb5",
+          "act_cb5"
+        ],
+        [
+          "cr_bellbronze",
+          "cr_bellbronze"
+        ],
+        [
+          "cr_vow",
+          "cr_vow"
+        ],
+        [
+          "cr_tenet",
+          "cr_tenet"
+        ],
+        [
+          "cr_reed",
+          "cr_reed"
+        ],
+        [
+          "cr_conch",
+          "cr_conch"
+        ],
+        [
+          "cr_silt",
+          "cr_silt"
+        ],
+        [
+          "cr_step",
+          "cr_step"
+        ],
+        [
+          "cr_wax",
+          "cr_wax"
+        ],
+        [
+          "cr_ring",
+          "cr_ring"
+        ],
+        [
+          "find_cb5",
+          "find_cb5"
+        ],
+        [
+          "find_cb5b",
+          "find_cb5b"
+        ],
+        [
+          "call_fb5",
+          "call_fb5"
+        ],
+        [
+          "tr_fb5",
+          "tr_fb5"
+        ],
+        [
+          "tr_fb5a",
+          "tr_fb5a"
+        ],
+        [
+          "call_fb5_aw",
+          "call_fb5_aw"
+        ]
+      ],
+      "subject": "The palette of this sheet: blue light (#5A94F7), white stone and sea water. The light from below is a cool blue glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A raptor talon clasp wrapped in feathers and thread; A set of three polished bone dice on a black crow feather; A dark scaled horn with a raptor-claw clasp on a cord; Bone dice on a broken marble column segment inside a chalk circle; A carved wooden oar with a bronze lock on its shaft, a flask of clear water tied to the blade.\n\nRow 2: Curved fragments of an old bronze bell with green patina; A small clay tablet, smooth from water; A flat stone with a carved line of ancient law; A bundle of pale green reeds with roots still wet; A spiral seashell with pearly interior and muddy exterior.\n\nRow 3: A small clay dish of fine dark silt with a clear film of water on top; A worn stone step with two knee-shaped hollows; A lump of pale wax shaped like a frozen flame; A heavy bronze mooring ring set in a chunk of stone; A shallow carved stone bowl with a faint blue glow on its inner surface.\n\nRow 4: A small bronze boat lantern with a blue glass pane; A reassembled cracked bronze bell under water, a stone bowl and a sealed writ beside it; A tall clay water jug with a blue glaze, filled with perfectly clear water; A complex knot of blue cord tied around a small clay tablet; A bronze bell ringing under clear water with vow tablets floating around, faces in the ripples."
+    },
+    {
+      "id": "res-IV-5",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл IV — лист 5: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона IV-04, IV-05",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "lu_cb5",
+          "lu_cb5"
+        ],
+        [
+          "lu_cb11",
+          "lu_cb11"
+        ],
+        [
+          "lu_cb12",
+          "lu_cb12"
+        ],
+        [
+          "lu_cb18",
+          "lu_cb18"
+        ],
+        [
+          "lu_ci4",
+          "lu_ci4"
+        ],
+        [
+          "ec_b7",
+          "ec_b7"
+        ],
+        [
+          "ec_b8",
+          "ec_b8"
+        ],
+        [
+          "act_cb11",
+          "act_cb11"
+        ],
+        [
+          "cr_lampglass",
+          "cr_lampglass"
+        ],
+        [
+          "cr_tarrope",
+          "cr_tarrope"
+        ],
+        [
+          "cr_whalebone",
+          "cr_whalebone"
+        ],
+        [
+          "cr_barnacle",
+          "cr_barnacle"
+        ],
+        [
+          "cr_keel",
+          "cr_keel"
+        ],
+        [
+          "cr_foghorn",
+          "cr_foghorn"
+        ],
+        [
+          "cr_saltcrust",
+          "cr_saltcrust"
+        ],
+        [
+          "cr_bigscale",
+          "cr_bigscale"
+        ],
+        [
+          "cr_stair",
+          "cr_stair"
+        ],
+        [
+          "find_cb11",
+          "find_cb11"
+        ],
+        [
+          "find_cb11b",
+          "find_cb11b"
+        ],
+        [
+          "call_fb11",
+          "call_fb11"
+        ]
+      ],
+      "subject": "The palette of this sheet: blue light (#5A94F7), white stone and sea water. The light from below is a cool blue glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A small bronze bell filled with clear turquoise water over a layer of pale silt; A cracked lighthouse lamp glass beside a fog horn and one huge iridescent scale; A leather dice cup with three bone dice and a black crow feather tucked in; A toothed sluice gate segment with a heavy chain and a carved water level mark; A carved arch keystone in a basin of fountain water, an unsigned rolled bill floating on it.\n\nRow 2: A tongueless bronze bell filled with turquoise water and dark fish scales; Iron scale weights and hawk talons piled on a court scale pan tied with a blue ribbon; A small flame burning in a pair of seashells on a lump of wax, chained to a bronze lock; A thick curved panel of greenish lighthouse glass; A coil of thick tarred rope with sailor knots.\n\nRow 3: A long curved bleached whale rib; A crusty cluster of barnacles on a chunk of stone; A curved length of dark keel timber with iron fittings; A large dented bronze fog horn with a flared bell; A jagged white crust of salt crystals.\n\nRow 4: A huge palm-sized greenish sea-beast scale; A wedge-shaped spiral stair step of grey stone; A large heavy lighthouse lens with concentric rings, dim; A water-stained ship log book tied with cord; A lighthouse lens and a bronze fog horn tangled in a tarred net, a clapperless bell on top."
+    },
+    {
+      "id": "res-IV-6",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл IV — лист 6: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона IV-05, IV-06, IV-07",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "tr_fb11",
+          "tr_fb11"
+        ],
+        [
+          "tr_fb11a",
+          "tr_fb11a"
+        ],
+        [
+          "call_fb11_aw",
+          "call_fb11_aw"
+        ],
+        [
+          "act_cb12",
+          "act_cb12"
+        ],
+        [
+          "cr_feekarst",
+          "cr_feekarst"
+        ],
+        [
+          "cr_dice",
+          "cr_dice"
+        ],
+        [
+          "cr_lotcup",
+          "cr_lotcup"
+        ],
+        [
+          "cr_pillar",
+          "cr_pillar"
+        ],
+        [
+          "cr_chalk",
+          "cr_chalk"
+        ],
+        [
+          "cr_ledgerstone",
+          "cr_ledgerstone"
+        ],
+        [
+          "cr_lotrope",
+          "cr_lotrope"
+        ],
+        [
+          "cr_scalepan",
+          "cr_scalepan"
+        ],
+        [
+          "cr_crowfeather",
+          "cr_crowfeather"
+        ],
+        [
+          "find_cb12",
+          "find_cb12"
+        ],
+        [
+          "find_cb12b",
+          "find_cb12b"
+        ],
+        [
+          "call_fb12",
+          "call_fb12"
+        ],
+        [
+          "tr_fb12",
+          "tr_fb12"
+        ],
+        [
+          "tr_fb12a",
+          "tr_fb12a"
+        ],
+        [
+          "call_fb12_aw",
+          "call_fb12_aw"
+        ],
+        [
+          "act_cb18",
+          "act_cb18"
+        ]
+      ],
+      "subject": "The palette of this sheet: blue light (#5A94F7), white stone and sea water. The light from below is a cool blue glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A large luminous pearl glowing soft blue-white; A long thin glowing whisker of a sea beast; A glowing lighthouse lens surrounded by huge scales and a whale rib, faces in the beam; A circle marked with tarred rope on stone, a wooden keel plank in the middle with bone dice; A small pile of matte grey-white stones in a leather fee pouch.\n\nRow 2: A smooth yellowed bone die with notch marks on its faces; A dented copper dice cup; A broken marble column segment with a crack across its fluted surface; A stick of white chalk worn flat on one side; A stone slab covered in tiny rows of carved tally results.\n\nRow 3: A knotted rope with dozens of small knots; A single bronze balance pan with a broken chain; A glossy black crow feather; A single bone die lying on a stone, one notched face up; A long scroll with columns of faint ruled lines.\n\nRow 4: A copper dice cup with three bone dice spilling out beside an ash-grey blank seal; A sharp faceted bone chip with no markings; A bronze gear with irregular teeth of different lengths; A dice cup on a stone slab of carved outcomes inside a chalk circle, faces in the dice pips; A small sluice gate of bronze locks and iron weights set across a dry stone channel, water pooling behind it."
+    },
+    {
+      "id": "res-IV-7",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл IV — лист 7: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона IV-07, IV-08",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "cr_sluicegear",
+          "cr_sluicegear"
+        ],
+        [
+          "cr_dryreed",
+          "cr_dryreed"
+        ],
+        [
+          "cr_riverstone",
+          "cr_riverstone"
+        ],
+        [
+          "cr_gatecrust",
+          "cr_gatecrust"
+        ],
+        [
+          "cr_eelskin",
+          "cr_eelskin"
+        ],
+        [
+          "cr_lockchain",
+          "cr_lockchain"
+        ],
+        [
+          "cr_tollring",
+          "cr_tollring"
+        ],
+        [
+          "cr_lockmark",
+          "cr_lockmark"
+        ],
+        [
+          "cr_towrope",
+          "cr_towrope"
+        ],
+        [
+          "find_cb18",
+          "find_cb18"
+        ],
+        [
+          "find_cb18b",
+          "find_cb18b"
+        ],
+        [
+          "call_fb18",
+          "call_fb18"
+        ],
+        [
+          "tr_fb18",
+          "tr_fb18"
+        ],
+        [
+          "tr_fb18a",
+          "tr_fb18a"
+        ],
+        [
+          "call_fb18_aw",
+          "call_fb18_aw"
+        ],
+        [
+          "act_ci4",
+          "act_ci4"
+        ],
+        [
+          "cr_ci4_keystone",
+          "cr_ci4_keystone"
+        ],
+        [
+          "cr_ci4_tile",
+          "cr_ci4_tile"
+        ],
+        [
+          "cr_ci4_white",
+          "cr_ci4_white"
+        ],
+        [
+          "cr_ci4_rope",
+          "cr_ci4_rope"
+        ]
+      ],
+      "subject": "The palette of this sheet: blue light (#5A94F7), white stone and sea water. The light from below is a cool blue glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A bronze toothed rack from a sluice gate; A bundle of dry pale reeds; A smooth round grey river pebble; A flake of white mineral crust from a gate; A long dry grey eel skin.\n\nRow 2: A heavy chain with links worn on one side; A bronze ring with a slot for coins; A stone tile carved with water level marks; A long thick hemp towing rope; A large bronze key on a neck cord.\n\nRow 3: A stained log book with columns of ship passages; A bronze key, a toothed rack and a heavy chain beside a small sluice gate, a clapperless bell above; A polished bronze lever handle; A stone tile with a single glowing water line; A sluice chamber wall with level marks, an eel skin and many faces reflected in the water line.\n\nRow 4: A palm-sized model of a white stepped city with red roofs, waterfalls and blue spires, a small harbour at the bottom; A wedge-shaped keystone with an empty socket where a blue crystal was; A curved red clay roof tile; A clean white limestone step block; A thick salt-stained harbour mooring rope."
+    },
+    {
+      "id": "res-IV-8",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл IV — лист 8: 15 иконок сеткой 4×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона IV-08",
+      "aspect": "1:1",
+      "size": "2K",
+      "grid": [
+        4,
+        4
+      ],
+      "cells": [
+        [
+          "cr_ci4_bill",
+          "cr_ci4_bill"
+        ],
+        [
+          "cr_ci4_wax",
+          "cr_ci4_wax"
+        ],
+        [
+          "cr_ci4_fountain",
+          "cr_ci4_fountain"
+        ],
+        [
+          "cr_ci4_gull",
+          "cr_ci4_gull"
+        ],
+        [
+          "cr_ci4_fishbone",
+          "cr_ci4_fishbone"
+        ],
+        [
+          "cr_ci4_weight",
+          "cr_ci4_weight"
+        ],
+        [
+          "cr_ci4_brand",
+          "cr_ci4_brand"
+        ],
+        [
+          "cr_ci4_scarf",
+          "cr_ci4_scarf"
+        ],
+        [
+          "find_ci4",
+          "find_ci4"
+        ],
+        [
+          "find_ci4b",
+          "find_ci4b"
+        ],
+        [
+          "call_fc4",
+          "call_fc4"
+        ],
+        [
+          "tr_fc4",
+          "tr_fc4"
+        ],
+        [
+          "tr_fc4a",
+          "tr_fc4a"
+        ],
+        [
+          "call_fc4_aw",
+          "call_fc4_aw"
+        ],
+        [
+          "chest_eq4",
+          "chest_eq4"
+        ],
+        [
+          "spare-0",
+          "spare-0"
+        ]
+      ],
+      "subject": "The palette of this sheet: blue light (#5A94F7), white stone and sea water. The light from below is a cool blue glow.\n\nThe grid: exactly 4 columns and 4 rows, 16 icons.\n\nRow 1: An unsigned promissory note with a blue wax seal space; A stick of dark blue sealing wax; A crystal flask of perfectly clear fountain water; A white-grey gull feather.\n\nRow 2: A long thin fish bone like a needle; A small brass shop weight stamped with a blue seal mark; A copper brand plate with a seal pattern, pried from a barrel; A light silk scarf with a cypress pattern.\n\nRow 3: A round blue wax seal with a festive ribbon; A folded sealed document tied with a black cord; Two empty keystones in a pool of clear water that is starting to cloud, a clapperless bell beside them; A glowing deep blue keystone crystal.\n\nRow 4: A single perfect droplet of water suspended in a tiny glass sphere; A glowing blue arch over a canal with harbour ropes, faces reflected in the water; An iron-bound wooden casket with bronze fittings and a purple gem lock; an empty dark stone surface with a few dust motes."
+    }
+  ]
+}

@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-V-2__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-v.json",
+  "job": "res-V-2",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "rn5_1",
+      "file": "art/generated/res-icons/res-V-2/rn5_1.webp",
+      "box": [
+        9,
+        20,
+        439,
+        450
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn5_2",
+      "file": "art/generated/res-icons/res-V-2/rn5_2.webp",
+      "box": [
+        471,
+        20,
+        902,
+        451
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn5_3",
+      "file": "art/generated/res-icons/res-V-2/rn5_3.webp",
+      "box": [
+        936,
+        20,
+        1367,
+        451
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn5_4",
+      "file": "art/generated/res-icons/res-V-2/rn5_4.webp",
+      "box": [
+        1401,
+        20,
+        1832,
+        451
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn5_5",
+      "file": "art/generated/res-icons/res-V-2/rn5_5.webp",
+      "box": [
+        1865,
+        20,
+        2295,
+        450
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "vs5",
+      "file": "art/generated/res-icons/res-V-2/vs5.webp",
+      "box": [
+        9,
+        482,
+        439,
+        912
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "vr5",
+      "file": "art/generated/res-icons/res-V-2/vr5.webp",
+      "box": [
+        471,
+        481,
+        903,
+        913
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "fu_bat",
+      "file": "art/generated/res-icons/res-V-2/fu_bat.webp",
+      "box": [
+        936,
+        481,
+        1368,
+        913
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_hanging",
+      "file": "art/generated/res-icons/res-V-2/p_hanging.webp",
+      "box": [
+        1401,
+        481,
+        1833,
+        913
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_riverclay",
+      "file": "art/generated/res-icons/res-V-2/p_riverclay.webp",
+      "box": [
+        1865,
+        482,
+        2295,
+        912
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_sundrop",
+      "file": "art/generated/res-icons/res-V-2/p_sundrop.webp",
+      "box": [
+        9,
+        944,
+        439,
+        1374
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_timebait",
+      "file": "art/generated/res-icons/res-V-2/a_timebait.webp",
+      "box": [
+        471,
+        943,
+        903,
+        1375
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_hourglass",
+      "file": "art/generated/res-icons/res-V-2/p_hourglass.webp",
+      "box": [
+        936,
+        943,
+        1368,
+        1375
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_greendust",
+      "file": "art/generated/res-icons/res-V-2/p_greendust.webp",
+      "box": [
+        1401,
+        943,
+        1833,
+        1375
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_starcalendar",
+      "file": "art/generated/res-icons/res-V-2/a_starcalendar.webp",
+      "box": [
+        1865,
+        944,
+        2295,
+        1374
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_latewatch",
+      "file": "art/generated/res-icons/res-V-2/a_latewatch.webp",
+      "box": [
+        9,
+        1406,
+        439,
+        1836
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_c5goods",
+      "file": "art/generated/res-icons/res-V-2/a_c5goods.webp",
+      "box": [
+        471,
+        1406,
+        902,
+        1837
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_c14sun",
+      "file": "art/generated/res-icons/res-V-2/a_c14sun.webp",
+      "box": [
+        936,
+        1406,
+        1367,
+        1837
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_oldsteel",
+      "file": "art/generated/res-icons/res-V-2/p_oldsteel.webp",
+      "box": [
+        1401,
+        1406,
+        1832,
+        1837
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_angle",
+      "file": "art/generated/res-icons/res-V-2/p_angle.webp",
+      "box": [
+        1865,
+        1406,
+        2295,
+        1836
+      ],
+      "px": 430,
+      "key_left": 0.0
+    }
+  ]
+}

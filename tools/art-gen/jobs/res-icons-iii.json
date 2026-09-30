@@ -1,0 +1,777 @@
+{
+  "name": "Иконки ресурсов сеткой — цикл III. Слово автора: «Иконки по ресурсам начинай генерировать только тогда, когда придёт с отчётом Этрион». Собирает tools/art-gen/res_jobs.py из design/ui/recipes.js — руками не править",
+  "plan": {
+    "Язык иконки": "один предмет в покое на тёмном камне, три четверти сверху, узнаваемая форма читается на 32 px; вид предмета различает рамка интерфейса (CR_KIND и CR_FAM, screens/crafthall.js), редкость — свет в окне рамки",
+    "Палитра": "цвет карста цикла, свет снизу — его же: The palette of this sheet: scarlet light (#F0564A), red-hot iron, soot and pale arena sand. The light from below is the scarlet glow of embers.",
+    "Листы": "листы Этриона (поле sheet) переупакованы внутри цикла по 20 клеток, остаток — малым листом; предметы с img и герои не рисуются"
+  },
+  "notes": [
+    "cells — [id предмета EN_RECIPES.items, имя файла]; spare — пустая клетка малого листа, не выгружается; hidden — «ресурс скрыт»",
+    "Проба 30.09.2026 — res-P-1 и res-I-1 — нарисована с предметом на две трети клетки: в рамке вида окно — 72 % колодца, предмет выходил мелким на 32 px. С остальных листов предмет — на три четверти клетки",
+    "Фраза облика — поле art Этриона; письмо, руны и цифры переписаны в неразборчивые штрихи (FIX в res_jobs.py)",
+    "Слабые клетки — надписи, пентаграмма, «летающая тарелка», светлый фон — перерисованы листами res-fix-* (jobs/res-icons-fix.json): их клетка заменяет клетку этого листа"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "res-icons": {
+      "aspect": "5:4",
+      "size": "2K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square item icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the item in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game lays its own frame over the edges of the cell, so everything important stays in the middle. Every cell shows exactly one item — a raw material, a trophy, a crafted piece or a relic — lying or standing still on dark near-black stone with faint cracks and a darker vignette toward the edges of the cell: one clear central object, large, filling about three quarters of the cell, in a clear three-quarter view from slightly above, with a bold recognisable silhouette that reads at 32 px. When a cell names several things, the first one is the main object — large and centred — and the others are small details beside it. Light rises from below in the colour of this sheet's palette, a soft glow from cracks in the stone — never a spotlight; crisp rim light on the edges of the object; a few dust motes in the light. Painted exactly like the ability icons of this game: loose, confident painterly brush strokes, soft painted edges and deep shadows — no black outlines, no flat sticker look, no scenery, no hands or people unless the cell names them. Writing is never drawn: wherever a cell mentions script, notes, pages, maps, tallies, tags or marks, they are faint unreadable smudges and straight ruled lines; clock faces and dials are plain, with simple notches and no numerals. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each differs clearly from its neighbours."
+    }
+  },
+  "jobs": [
+    {
+      "id": "res-III-1",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл III — лист 1: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона III-01, III-02",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "k5_hunt",
+          "k5_hunt"
+        ],
+        [
+          "k5_tail",
+          "k5_tail"
+        ],
+        [
+          "k5_eng",
+          "k5_eng"
+        ],
+        [
+          "k5_alch",
+          "k5_alch"
+        ],
+        [
+          "k5_ench",
+          "k5_ench"
+        ],
+        [
+          "k5_smith",
+          "k5_smith"
+        ],
+        [
+          "rc_b5",
+          "rc_b5"
+        ],
+        [
+          "mc_b5",
+          "mc_b5"
+        ],
+        [
+          "mt_b5",
+          "mt_b5"
+        ],
+        [
+          "k6_hunt",
+          "k6_hunt"
+        ],
+        [
+          "k6_tail",
+          "k6_tail"
+        ],
+        [
+          "k6_eng",
+          "k6_eng"
+        ],
+        [
+          "k6_alch",
+          "k6_alch"
+        ],
+        [
+          "k6_ench",
+          "k6_ench"
+        ],
+        [
+          "k6_smith",
+          "k6_smith"
+        ],
+        [
+          "u6",
+          "u6"
+        ],
+        [
+          "rc_b6",
+          "rc_b6"
+        ],
+        [
+          "mc_b6",
+          "mc_b6"
+        ],
+        [
+          "mt_b6",
+          "mt_b6"
+        ],
+        [
+          "rn3_1",
+          "rn3_1"
+        ]
+      ],
+      "subject": "The palette of this sheet: scarlet light (#F0564A), red-hot iron, soot and pale arena sand. The light from below is the scarlet glow of embers.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A single overlapping scale of forged iron, still warm-looking with an orange sheen; A coil of dark leather grip wrapping with sweat-darkened spirals; A pair of long iron blacksmith tongs with scorched jaws; A small iron pot of thick dark quenching oil with a rainbow sheen; A tiny floating spark of bright orange fire above an anvil chip.\n\nRow 2: A rough flat bar of steel roughly shaped like a blade, unfinished; A glowing ember heart set into a small forge on a bed of steel blanks; A weapon rack of half-forged blades beside a roaring forge with a glowing heart; A half-finished sword with a rough unpolished blade but a razor edge; A thick tuft of coarse red-brown mane hair with a braided lock.\n\nRow 3: A faded torn banner of red cloth with an indistinct faded patch; A section of heavy iron portcullis grating caked with sand; A small clay jar of dark red paste with embers glinting in it; A small heap of crimson crystal grains glowing hot red; A notched battle-worn steel blade fragment with dozens of nicks.\n\nRow 4: A jagged steel chip from a great axe with a faint red glow along the break; A jagged axe chip set into a new wrapped handle with reforged blade edges; A red season banner planted beside a model of a ringed northern fortress city, an axe chip hanging from the pole; A blood-stained linen bandage that seems to knit itself back together; A small flat stone of crimson crystal with one carved notch glowing along its edge."
+    },
+    {
+      "id": "res-III-2",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл III — лист 2: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона III-02",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "rn3_2",
+          "rn3_2"
+        ],
+        [
+          "rn3_3",
+          "rn3_3"
+        ],
+        [
+          "rn3_4",
+          "rn3_4"
+        ],
+        [
+          "rn3_5",
+          "rn3_5"
+        ],
+        [
+          "vs3",
+          "vs3"
+        ],
+        [
+          "vr3",
+          "vr3"
+        ],
+        [
+          "kr_ni",
+          "kr_ni"
+        ],
+        [
+          "fu_forge",
+          "fu_forge"
+        ],
+        [
+          "p_quench",
+          "p_quench"
+        ],
+        [
+          "p_cautery",
+          "p_cautery"
+        ],
+        [
+          "p_torch",
+          "p_torch"
+        ],
+        [
+          "p_arenasalve",
+          "p_arenasalve"
+        ],
+        [
+          "a_quenchpit",
+          "a_quenchpit"
+        ],
+        [
+          "p_spark",
+          "p_spark"
+        ],
+        [
+          "p_kindle",
+          "p_kindle"
+        ],
+        [
+          "p_redglass",
+          "p_redglass"
+        ],
+        [
+          "a_pyre",
+          "a_pyre"
+        ],
+        [
+          "p_masterglyph",
+          "p_masterglyph"
+        ],
+        [
+          "p_tongs",
+          "p_tongs"
+        ],
+        [
+          "p_grate",
+          "p_grate"
+        ]
+      ],
+      "subject": "The palette of this sheet: scarlet light (#F0564A), red-hot iron, soot and pale arena sand. The light from below is the scarlet glow of embers.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A small flat stone of crimson crystal with two carved notches glowing along its edge; A small flat stone of crimson crystal with three carved notches glowing along its edge; A small flat stone of crimson crystal with four carved notches glowing along its edge; A small flat stone of crimson crystal with five carved notches glowing along its edge; A jagged shard of crimson crystal with a tiny star-shaped glint at its heart.\n\nRow 2: A round stone disc of crimson stone with one solid, filled five-pointed star carved deep and glowing — a solid star, never an outline; A palm-sized faceted crimson crystal glowing hot red from within; A sealed iron brazier pot of black coal with crimson crystal glowing at its heart; A dark tempered steel bar with a blue-black quench sheen; A clay pot of dark red smouldering paste.\n\nRow 3: A torch of black pitch wound in soot-stained cloth; A small tin of dark salve beside a horn of golden mead; A stone pit filled with dark quenching oil, a tempered bar resting on its rim; A cluster of crystal shards orbiting a bright orange spark; A bundle of charcoal sticks studded with glowing crimson crystals.\n\nRow 4: A polished oval of fused glass with crimson sparks trapped inside; A small funeral pyre of charcoal studded with red crystals burning with a crimson flame; A blade blank stamped with a small maker's mark glowing faintly; A pair of blacksmith tongs with freshly forged jaws; A square panel of riveted iron grating."
+    },
+    {
+      "id": "res-III-3",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл III — лист 3: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона III-02, III-03",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "a_crate",
+          "a_crate"
+        ],
+        [
+          "a_shieldframe",
+          "a_shieldframe"
+        ],
+        [
+          "a_c3goods",
+          "a_c3goods"
+        ],
+        [
+          "p_wrap",
+          "p_wrap"
+        ],
+        [
+          "p_bannerpatch",
+          "p_bannerpatch"
+        ],
+        [
+          "a_trialcord",
+          "a_trialcord"
+        ],
+        [
+          "a_bellows",
+          "a_bellows"
+        ],
+        [
+          "p_scale",
+          "p_scale"
+        ],
+        [
+          "p_hide",
+          "p_hide"
+        ],
+        [
+          "p_warhorn",
+          "p_warhorn"
+        ],
+        [
+          "p_mantle",
+          "p_mantle"
+        ],
+        [
+          "a_horn",
+          "a_horn"
+        ],
+        [
+          "a_armor",
+          "a_armor"
+        ],
+        [
+          "a_waterskin",
+          "a_waterskin"
+        ],
+        [
+          "a_bearcloak",
+          "a_bearcloak"
+        ],
+        [
+          "a_warband",
+          "a_warband"
+        ],
+        [
+          "a_wethides",
+          "a_wethides"
+        ],
+        [
+          "a_lizardcoat",
+          "a_lizardcoat"
+        ],
+        [
+          "p_blank",
+          "p_blank"
+        ],
+        [
+          "p_edge",
+          "p_edge"
+        ]
+      ],
+      "subject": "The palette of this sheet: scarlet light (#F0564A), red-hot iron, soot and pale arena sand. The light from below is the scarlet glow of embers.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A sturdy iron-bound crate with glowing red sparks visible through slats; A rectangular frame of two iron gratings clamped together; A split round shield with two blunt training axes and a drinking horn tied to it; A tightly wound leather grip with a braided tail; A patched red banner with feathers sewn along the top edge.\n\nRow 2: Three braided ribbons tied around a split shield and a folded striped sail; A pair of large leather forge bellows on an iron frame; A shoulder guard of overlapping forged iron scales on hide; A folded thick tanned hide with coarse mane hair at one edge; A large curved horn carved from a massive bone.\n\nRow 3: A grey wolf pelt mantle over a patterned burial cloak; A great bone horn in leather wrapping with a faded banner hanging beneath; A leather armour vest with a scaled shoulder guard and leather straps; A leather waterskin stitched with horsehair, a salve tin tied to its strap; A bear fur cloak fastened with a carved tusk clasp.\n\nRow 4: A light fighter kit: a tanned hide vest, a scaled shoulder guard and a leather grip wrap; Two wet dark hides draped over a frame, steaming; A small coat of red lizard scales stitched onto heat-hardened leather; A rough-forged steel blade blank glowing faintly orange at the edges; A reforged steel blade with faint ghost marks of old notches."
+    },
+    {
+      "id": "res-III-4",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл III — лист 4: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона III-03, III-04",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "p_torcplate",
+          "p_torcplate"
+        ],
+        [
+          "a_blade2",
+          "a_blade2"
+        ],
+        [
+          "a_seasonbelt",
+          "a_seasonbelt"
+        ],
+        [
+          "a_mourning",
+          "a_mourning"
+        ],
+        [
+          "act_cb4",
+          "act_cb4"
+        ],
+        [
+          "cr_blade",
+          "cr_blade"
+        ],
+        [
+          "cr_banner",
+          "cr_banner"
+        ],
+        [
+          "cr_warbone",
+          "cr_warbone"
+        ],
+        [
+          "cr_helm",
+          "cr_helm"
+        ],
+        [
+          "cr_shaft",
+          "cr_shaft"
+        ],
+        [
+          "cr_ochre",
+          "cr_ochre"
+        ],
+        [
+          "cr_finial",
+          "cr_finial"
+        ],
+        [
+          "cr_strap",
+          "cr_strap"
+        ],
+        [
+          "cr_hoof",
+          "cr_hoof"
+        ],
+        [
+          "find_cb4",
+          "find_cb4"
+        ],
+        [
+          "find_cb4b",
+          "find_cb4b"
+        ],
+        [
+          "call_fb4",
+          "call_fb4"
+        ],
+        [
+          "tr_fb4",
+          "tr_fb4"
+        ],
+        [
+          "tr_fb4a",
+          "tr_fb4a"
+        ],
+        [
+          "call_fb4_aw",
+          "call_fb4_aw"
+        ]
+      ],
+      "subject": "The palette of this sheet: scarlet light (#F0564A), red-hot iron, soot and pale arena sand. The light from below is the scarlet glow of embers.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A flattened twisted iron torc hammered into a reinforcing plate; A northern sword with a wrapped grip and an empty stone socket in the crossguard; An iron belt plaque cast with a ring motif, lying on a dark stone; A reforged blade and a tempered steel bar laid together on a cloth; A large war horn of bone wrapped in leather, a faded red banner tied below it.\n\nRow 2: An ancient straight sword of unfamiliar pale steel, pitted but unrusted; A rotted battle standard with a faded wave-shaped patch; A massive curved animal bone, sun-bleached, with old saddle wear marks; A dented ancient bronze helmet with its crest sheared off; A broken spear shaft of dark resin-soaked wood.\n\nRow 3: A small lump of bright red ochre pigment with fingerprints; A bronze banner-pole finial shaped like a stylized water drop; A wide stiff leather shield strap with a bronze buckle; A huge hoof encased in a thick forged iron shoe; A long leaf-shaped spearhead of strange silvery steel.\n\nRow 4: A leather strap tied with seven tight oath knots; An ancient war harness with armour plates and red ochre marks, a spearhead tied to it; A heavy forged iron chamfron for a war beast, deeply dented; A single ornate bronze stirrup with a worn footplate; A war harness with an ancient sword and an iron-shod hoof, many faces reflected in the armour."
+    },
+    {
+      "id": "res-III-5",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл III — лист 5: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона III-04, III-05",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "lu_cb4",
+          "lu_cb4"
+        ],
+        [
+          "lu_cb9",
+          "lu_cb9"
+        ],
+        [
+          "lu_cb10",
+          "lu_cb10"
+        ],
+        [
+          "lu_cb20",
+          "lu_cb20"
+        ],
+        [
+          "lu_ci3",
+          "lu_ci3"
+        ],
+        [
+          "ec_b5",
+          "ec_b5"
+        ],
+        [
+          "ec_b6",
+          "ec_b6"
+        ],
+        [
+          "act_cb9",
+          "act_cb9"
+        ],
+        [
+          "cr_rawkarst",
+          "cr_rawkarst"
+        ],
+        [
+          "cr_barrowblade",
+          "cr_barrowblade"
+        ],
+        [
+          "cr_urn",
+          "cr_urn"
+        ],
+        [
+          "cr_torc",
+          "cr_torc"
+        ],
+        [
+          "cr_shieldboard",
+          "cr_shieldboard"
+        ],
+        [
+          "cr_wolfpelt",
+          "cr_wolfpelt"
+        ],
+        [
+          "cr_embercoal",
+          "cr_embercoal"
+        ],
+        [
+          "cr_runestone",
+          "cr_runestone"
+        ],
+        [
+          "cr_shroud",
+          "cr_shroud"
+        ],
+        [
+          "find_cb9",
+          "find_cb9"
+        ],
+        [
+          "find_cb9b",
+          "find_cb9b"
+        ],
+        [
+          "call_fb9",
+          "call_fb9"
+        ]
+      ],
+      "subject": "The palette of this sheet: scarlet light (#F0564A), red-hot iron, soot and pale arena sand. The light from below is the scarlet glow of embers.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A crumbling war banner wrapped around a shod hoof, streaked with red ochre, a tuft of coarse mane on top; Two clay urns filled with glowing barrow coals beside a notched stone; An iron ram head fitted onto a charred log, bound with coils of horsehair; Old blacksmith tongs gripping a chip of anvil over a pool of dark slag, glistening with quench oil; Two blunt training axes crossed on a patch of arena sand, tied with a red exam ribbon.\n\nRow 2: Glowing forge sparks hovering over a rack of unfinished blade blanks; Iron floor grates half buried in arena sand beside a smoking pot of cauterizing paste; A torch made from a notched blade wrapped in cloth, burning with crimson flame, an ancient helmet beside it; A rough-hewn matte grey-white crystal chunk with chisel marks; An ancient sword deliberately bent double, dark with age.\n\nRow 3: A small round clay burial urn with a lid, warm ash inside; A heavy twisted iron neck torc with animal-head terminals; A weathered linden wood shield plank with traces of red paint; A thick grey wolf pelt cloak with the head still attached; A few lumps of charcoal glowing faintly crimson from within.\n\nRow 4: A small standing stone covered in rows of tally notches; A decayed burial cloak with a faint intact woven pattern; A small charred wooden tag with a carved line; An ornate iron chieftain helmet with gilded brow, pristine; A clay urn glowing from within with crimson embers, a charred name tag tied to its lid."
+    },
+    {
+      "id": "res-III-6",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл III — лист 6: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона III-05, III-06, III-07",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "tr_fb9",
+          "tr_fb9"
+        ],
+        [
+          "tr_fb9a",
+          "tr_fb9a"
+        ],
+        [
+          "call_fb9_aw",
+          "call_fb9_aw"
+        ],
+        [
+          "act_cb10",
+          "act_cb10"
+        ],
+        [
+          "cr_scorched",
+          "cr_scorched"
+        ],
+        [
+          "cr_ramiron",
+          "cr_ramiron"
+        ],
+        [
+          "cr_slingstone",
+          "cr_slingstone"
+        ],
+        [
+          "cr_pitch",
+          "cr_pitch"
+        ],
+        [
+          "cr_arrows",
+          "cr_arrows"
+        ],
+        [
+          "cr_gatehinge",
+          "cr_gatehinge"
+        ],
+        [
+          "cr_sootcloth",
+          "cr_sootcloth"
+        ],
+        [
+          "cr_emberglass",
+          "cr_emberglass"
+        ],
+        [
+          "cr_horsehair",
+          "cr_horsehair"
+        ],
+        [
+          "find_cb10",
+          "find_cb10"
+        ],
+        [
+          "find_cb10b",
+          "find_cb10b"
+        ],
+        [
+          "call_fb10",
+          "call_fb10"
+        ],
+        [
+          "tr_fb10",
+          "tr_fb10"
+        ],
+        [
+          "tr_fb10a",
+          "tr_fb10a"
+        ],
+        [
+          "call_fb10_aw",
+          "call_fb10_aw"
+        ],
+        [
+          "act_cb20",
+          "act_cb20"
+        ]
+      ],
+      "subject": "The palette of this sheet: scarlet light (#F0564A), red-hot iron, soot and pale arena sand. The light from below is the scarlet glow of embers.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A single lump of coal burning with a steady crimson flame that never dims; A small pile of grey ash streaked with faint glowing red lines; A glowing urn wrapped in a burial cloak with a notched stone, faces flickering in the flames; A large rectangular assault shield of iron grating and old linden planks bound with twisted torcs; A thick palisade log charred black on one side.\n\nRow 2: A heavy iron battering ram head shaped like a snarling beast, its brow worn flat; A smooth round catapult stone, chipped on one side; A lump of black pitch with glassy drip ridges; A bundle of arrow shafts with burnt fletching, stuck together; A massive iron gate hinge still bolted to a chunk of stone.\n\nRow 3: A soot-blackened square of heavy cloth; A chunk of fused glassy stone with crimson sparks trapped inside; A coil of coarse dark horsehair cord, scorched at the ends; A large iron gate key blackened by fire; A bundle of wooden tally boards tied with cord, the last one charred.\n\nRow 4: Charred palisade logs lashed around a beast-headed ram, a burnt key hanging from it; A heavy bronze counterweight swinging slowly on a short chain; A thick oak plank with a deep split and iron studs; A burning palisade with gate hinges and catapult stones, faces glowing in the embers; Large leather bellows on a frame of iron grating and wet hides, a fire glowing at the nozzle."
+    },
+    {
+      "id": "res-III-7",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл III — лист 7: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона III-07, III-08",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "cr_slagrun",
+          "cr_slagrun"
+        ],
+        [
+          "cr_anvilchip",
+          "cr_anvilchip"
+        ],
+        [
+          "cr_bellowleather",
+          "cr_bellowleather"
+        ],
+        [
+          "cr_tongsold",
+          "cr_tongsold"
+        ],
+        [
+          "cr_quenchoil",
+          "cr_quenchoil"
+        ],
+        [
+          "cr_firecinder",
+          "cr_firecinder"
+        ],
+        [
+          "cr_forgeglyph",
+          "cr_forgeglyph"
+        ],
+        [
+          "cr_lavahide",
+          "cr_lavahide"
+        ],
+        [
+          "cr_obsidian",
+          "cr_obsidian"
+        ],
+        [
+          "find_cb20",
+          "find_cb20"
+        ],
+        [
+          "find_cb20b",
+          "find_cb20b"
+        ],
+        [
+          "call_fb20",
+          "call_fb20"
+        ],
+        [
+          "tr_fb20",
+          "tr_fb20"
+        ],
+        [
+          "tr_fb20a",
+          "tr_fb20a"
+        ],
+        [
+          "call_fb20_aw",
+          "call_fb20_aw"
+        ],
+        [
+          "act_ci3",
+          "act_ci3"
+        ],
+        [
+          "cr_ci3_sand",
+          "cr_ci3_sand"
+        ],
+        [
+          "cr_ci3_axe",
+          "cr_ci3_axe"
+        ],
+        [
+          "cr_ci3_shield",
+          "cr_ci3_shield"
+        ],
+        [
+          "cr_ci3_mead",
+          "cr_ci3_mead"
+        ]
+      ],
+      "subject": "The palette of this sheet: scarlet light (#F0564A), red-hot iron, soot and pale arena sand. The light from below is the scarlet glow of embers.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A frozen rivulet of dark glassy slag; A heavy chip of dark iron with one flat polished face; A folded piece of heat-hardened dark leather; Old blacksmith tongs with jaws shaped like claws; A clay jar of thick black quenching oil.\n\nRow 2: A handful of glowing orange-flecked volcanic ash; A small iron punch with a small maker's mark; A small red-scaled lizard skin, slightly warm; A sharp shard of black volcanic glass; An unfinished spearhead lying on an anvil, still glowing faintly.\n\nRow 3: A wooden order board with a list of weapons and a broken seal; An unfinished spearhead on an anvil chip, slag and a glowing ember heart beside it; A heavy smithing hammer with a warm glowing head; A pristine ancient sword that has never been used, gleaming; An anvil with a maker punch and glowing ash, many faces in the sparks.\n\nRow 4: A palm-sized model of a dark stone fortress with concentric walls, a sand arena in the centre and a fire temple in the cliff; A handful of coarse sand stained reddish in places; A blunt training axe with a worn wooden handle; A round wooden shield split in two, iron rim still holding one half; A drinking horn half full of golden mead with foam."
+    },
+    {
+      "id": "res-III-8",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл III — лист 8: 14 иконок сеткой 4×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона III-08",
+      "aspect": "1:1",
+      "size": "2K",
+      "grid": [
+        4,
+        4
+      ],
+      "cells": [
+        [
+          "cr_ci3_salve",
+          "cr_ci3_salve"
+        ],
+        [
+          "cr_ci3_ringstone",
+          "cr_ci3_ringstone"
+        ],
+        [
+          "cr_ci3_fur",
+          "cr_ci3_fur"
+        ],
+        [
+          "cr_ci3_tusk",
+          "cr_ci3_tusk"
+        ],
+        [
+          "cr_ci3_ribbon",
+          "cr_ci3_ribbon"
+        ],
+        [
+          "cr_ci3_sail",
+          "cr_ci3_sail"
+        ],
+        [
+          "cr_ci3_nitchip",
+          "cr_ci3_nitchip"
+        ],
+        [
+          "cr_ci3_forgecoal",
+          "cr_ci3_forgecoal"
+        ],
+        [
+          "find_ci3",
+          "find_ci3"
+        ],
+        [
+          "find_ci3b",
+          "find_ci3b"
+        ],
+        [
+          "call_fc3",
+          "call_fc3"
+        ],
+        [
+          "tr_fc3",
+          "tr_fc3"
+        ],
+        [
+          "tr_fc3a",
+          "tr_fc3a"
+        ],
+        [
+          "call_fc3_aw",
+          "call_fc3_aw"
+        ],
+        [
+          "spare-0",
+          "spare-0"
+        ],
+        [
+          "spare-1",
+          "spare-1"
+        ]
+      ],
+      "subject": "The palette of this sheet: scarlet light (#F0564A), red-hot iron, soot and pale arena sand. The light from below is the scarlet glow of embers.\n\nThe grid: exactly 4 columns and 4 rows, 16 icons.\n\nRow 1: A small tin of dark burnt-smelling salve; A dark basalt building block with a carved ring mark; A heavy brown bear fur mantle with a bronze clasp; A curved yellowed tusk with a chipped tip.\n\nRow 2: A braided red-and-black ribbon with a small iron bead; A folded striped sail of heavy wool; A small crimson crystal shard with a broken facet; A few lumps of dense black forge coal with a faint red glow.\n\nRow 3: A crude hand-forged short sword hanging on a hearth hook; A polished crimson Nitrium gem in a small leather pouch; A blunt training axe stuck in a pile of red sand, a crude first sword beside it; A broad leather belt covered in iron plaques, one space empty.\n\nRow 4: A small leather pouch of red arena sand, glowing faintly; A challenge axe on red sand ringed with crimson crystal shards, faces in the sand grains; an empty dark stone surface with a few dust motes; an empty dark stone surface with a few dust motes."
+    }
+  ]
+}

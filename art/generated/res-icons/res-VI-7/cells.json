@@ -1,0 +1,120 @@
+{
+  "sheet": "art/generated/res-icons/res-VI-7__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-vi.json",
+  "job": "res-VI-7",
+  "grid": [
+    3,
+    3
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "find_ci6",
+      "file": "art/generated/res-icons/res-VI-7/find_ci6.webp",
+      "box": [
+        17,
+        17,
+        329,
+        329
+      ],
+      "px": 312,
+      "key_left": 0.02768
+    },
+    {
+      "id": "find_ci6b",
+      "file": "art/generated/res-icons/res-VI-7/find_ci6b.webp",
+      "box": [
+        356,
+        17,
+        668,
+        329
+      ],
+      "px": 312,
+      "key_left": 0.01716
+    },
+    {
+      "id": "call_fc6",
+      "file": "art/generated/res-icons/res-VI-7/call_fc6.webp",
+      "box": [
+        694,
+        17,
+        1006,
+        329
+      ],
+      "px": 312,
+      "key_left": 0.01702
+    },
+    {
+      "id": "tr_fc6",
+      "file": "art/generated/res-icons/res-VI-7/tr_fc6.webp",
+      "box": [
+        17,
+        355,
+        329,
+        667
+      ],
+      "px": 312,
+      "key_left": 0.02704
+    },
+    {
+      "id": "tr_fc6a",
+      "file": "art/generated/res-icons/res-VI-7/tr_fc6a.webp",
+      "box": [
+        356,
+        355,
+        668,
+        667
+      ],
+      "px": 312,
+      "key_left": 0.03386
+    },
+    {
+      "id": "call_fc6_aw",
+      "file": "art/generated/res-icons/res-VI-7/call_fc6_aw.webp",
+      "box": [
+        694,
+        355,
+        1006,
+        667
+      ],
+      "px": 312,
+      "key_left": 0.05234
+    },
+    {
+      "id": "chest_tal6",
+      "file": "art/generated/res-icons/res-VI-7/chest_tal6.webp",
+      "box": [
+        18,
+        694,
+        329,
+        1005
+      ],
+      "px": 311,
+      "key_left": 0.05112
+    },
+    {
+      "id": "chest_eq6",
+      "file": "art/generated/res-icons/res-VI-7/chest_eq6.webp",
+      "box": [
+        356,
+        694,
+        667,
+        1005
+      ],
+      "px": 311,
+      "key_left": 0.04729
+    },
+    {
+      "id": "spare-0",
+      "file": "art/generated/res-icons/res-VI-7/spare-0.webp",
+      "box": [
+        695,
+        694,
+        1006,
+        1005
+      ],
+      "px": 311,
+      "key_left": 0.03708
+    }
+  ]
+}

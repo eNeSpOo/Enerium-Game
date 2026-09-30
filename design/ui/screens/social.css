@@ -148,3 +148,43 @@
 .soc-kmu{gap:var(--sp-m);align-items:center}
 .soc-rules{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
 @media (max-width:900px){.soc-kgrid{grid-template-columns:minmax(0,1fr)}}
+/* ================== покои: облик и общение в материалах раздела «Странник» ==================
+   Окна облика и общения — окна покоев (класс cb-win, screens/chambers.js): базальт, серебряная кромка, бледное золото, свет времени.
+   «Облик» — примерочная: портрет в малой нише (CB_ART.niche), рамки и частицы — таблички на стене; письмо — холодный пергамент
+   (CB_ART.vellum); строки друзей, писем и чата — таблички с серебряной кромкой. Движение — только transform и opacity */
+.cb-win .lk-body{grid-template-columns:150px minmax(0,1fr)}
+.cb-win .lk-prev{gap:6px;padding:calc(150px * var(--cb-nr,1792) / 1000 * var(--cb-nt,81) / 1000 + 4px) 6px 12px;border-radius:3px;
+  background:radial-gradient(40% 26% at 50% 30%,#152028,transparent 72%),#07090b;box-shadow:0 0 0 1px rgba(200,206,214,.22),0 14px 24px -14px #000}
+html.cb-n .cb-win .lk-prev{background:var(--cb-niche) 50% 0/100% auto no-repeat,#07090b}
+.cb-win .lk-prev .lk-ava{--px:94px!important}
+.cb-win .lk-pn{color:#efe2bc;text-shadow:0 1px 3px #000}
+.cb-win .lk-prev small{text-shadow:0 1px 2px #000}
+.cb-win .lk-tile{border:0;border-radius:3px;background:linear-gradient(180deg,rgba(26,30,35,.9),rgba(10,12,15,.94));box-shadow:inset 0 0 0 1px rgba(200,206,214,.16),0 8px 14px -10px #000;transition:transform .15s ease}
+@media (hover:hover){.cb-win .lk-tile:not(.lock):hover{transform:translateY(-2px)}}
+.cb-win .lk-tile.sel{box-shadow:inset 0 0 0 1px rgba(88,226,176,.7),inset 0 -12px 16px -14px #58e2b0,0 0 14px -4px rgba(88,226,176,.6)}
+.cb-win .lk-tile.lock{opacity:.7}
+.cb-win .lk-sex{border:0;border-radius:3px;background:linear-gradient(180deg,rgba(26,30,35,.9),rgba(10,12,15,.94));box-shadow:inset 0 0 0 1px rgba(200,206,214,.2),0 12px 20px -14px #000;transition:transform .15s ease}
+@media (hover:hover){.cb-win .lk-sex:hover{transform:translateY(-2px)}}
+/* профиль игрока, друзья, почта: строки — таблички; своё и новое — свет времени */
+.cb-win .fr-row,.cb-win .mail,.cb-win .pp-a,.cb-win .rkrow{border:0;border-radius:3px;background:rgba(12,14,17,.86);box-shadow:inset 0 0 0 1px rgba(200,206,214,.14)}
+.cb-win .fr-t b,.cb-win .ml-t b,.cb-win .mail b{color:#efe6cc}
+.cb-win .ml-pm.new{box-shadow:inset 0 0 0 1px rgba(88,226,176,.45),inset 0 -10px 14px -12px #58e2b0}
+.cb-win .rkrow.me{box-shadow:inset 0 0 0 1px rgba(88,226,176,.45),inset 0 -10px 14px -12px #58e2b0}
+.cb-win .rkrow b.serif{color:#efe2bc}
+.cb-win .pp-head{padding:10px 12px;border-radius:3px;background:radial-gradient(70% 90% at 12% 50%,rgba(79,220,160,.1),transparent 70%),rgba(10,12,15,.7);box-shadow:inset 0 0 0 1px rgba(200,206,214,.14)}
+.cb-win .pp-rsn{border-color:rgba(200,206,214,.26);background:rgba(10,12,15,.86)}
+.cb-win .pp-rsn[aria-pressed="true"]{color:#efe0b4;border-color:rgba(214,194,142,.55);background:#15140f}
+.cb-win .ml-to{border-color:rgba(200,206,214,.26);background:rgba(10,12,15,.86)}
+.cb-win .ml-to[aria-pressed="true"]{color:#efe0b4;border-color:rgba(88,226,176,.6)}
+/* письмо и новое письмо — холодный пергамент в серебряной рамке */
+.cb-win .ml-text,.cb-win .ml-area{border:0;border-radius:2px;background:linear-gradient(180deg,#171b20,#101318);
+  box-shadow:inset 0 0 0 1px rgba(214,194,142,.3),inset 0 0 0 4px #0e1115,inset 0 0 0 5px rgba(200,206,214,.12)}
+html.cb-t .cb-win .ml-text,html.cb-t .cb-win .ml-area{background:linear-gradient(180deg,rgba(20,24,29,.3),rgba(10,12,15,.45)),var(--cb-vellum) 0 0/300px auto,#12151a}
+.cb-win .ml-text{padding:14px 16px;font:italic 500 16px/1.45 var(--f-d);color:#ece2c8}
+.cb-win .ml-area{font:italic 500 16px/1.45 var(--f-d);color:#ece2c8}
+/* чат: реплика — табличка тёмного стекла, своя — с кромкой света времени */
+.cb-win .ch-b{border:0;border-radius:3px 10px 10px 10px;background:rgba(14,17,21,.9);box-shadow:inset 0 0 0 1px rgba(200,206,214,.14)}
+.cb-win .ch-msg.me .ch-b{box-shadow:inset 0 0 0 1px rgba(88,226,176,.35)}
+.cb-win .ch-nk{color:#d6c28e}
+.cb-win .ch-mute b{color:#ecb970}
+@media (prefers-reduced-motion:reduce){.cb-win .lk-tile,.cb-win .lk-sex{transition:none}}

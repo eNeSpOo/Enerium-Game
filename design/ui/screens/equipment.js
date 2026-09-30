@@ -200,20 +200,24 @@ function eqGain(h, it, m0) {
 }
 
 /* ================== вид ================== */
-/* место в карточке героя: значок слота (арт — eqPic), у надетого — кромка и свет редкости; пустое — бледный
-   значок. Нажатие открывает окно «Снаряжение героя» на этом месте */
-function eqSlotBtn(h, slot, uid, sel) {
-  const it = uid ? eqItem(uid) : null, t = it ? `${eqSlotName(slot)} · ${RAR[it.r].toLowerCase()}: ${eqMainTxt(it, h)}` : `${eqSlotName(slot)}: пусто`;
-  return `<button class="eq-slot${it ? ' on' : ''}${sel ? ' sel' : ''}" ${it ? `data-r="${it.r}"` : ''} data-a="sheet" data-v="eq:${h.id}:${slot}" aria-label="${trEsc(t)}" title="${trEsc(t)}">${eqPic(slot, 32, it ? it.r : 0)}</button>`;
+/* место на странице «Снаряжение» книги героя: предмет в рамке, свет редкости снизу; под рамкой — главное значение надетого или имя места.
+   Пустое место говорит, что туда кладут и как (слово автора 30.09.2026): бледный предмет этого места и его имя, нажатие — окно
+   «Снаряжение героя» на этом месте; в запасах есть лучше — стрелка в углу. up — план «Надеть лучшее» (grPlanOf, screens/hero-dev.js)
+   нашёл сюда вещь */
+function eqSlotBtn(h, slot, uid, sel, up) {
+  const it = uid ? eqItem(uid) : null, name = eqSlotName(slot);
+  const t = (it ? `${name} · ${RAR[it.r].toLowerCase()}: ${eqMainTxt(it, h)}` : `${name}: пусто — нажмите, чтобы выбрать вещь`) + (up ? ' · в запасах есть лучше' : '');
+  return `<button class="eq-slot${it ? ' on' : ' none'}${sel ? ' sel' : ''}${up ? ' up' : ''}" ${it ? `data-r="${it.r}"` : ''} data-a="sheet" data-v="eq:${h.id}:${slot}" aria-label="${trEsc(t)}" title="${trEsc(t)}"><span class="eq-w">${eqPic(slot, 40, it ? it.r : 0)}</span>${up ? `<i class="eq-up" aria-hidden="true">${ic('up')}</i>` : ''}<small class="eq-cap${it ? ' num' : ''}">${it ? eqNum(it.lines[0][0], it.lines[0][1]) : name}</small></button>`;
 }
-/* девять мест во вкладке «Снаряжение» карточки героя, рядом с талисманами: зовёт heroDetail в index.html */
+/* девять мест на странице «Снаряжение» книги героя: сеткой 3 × 3 по порядку мест (доспех, оружие, украшения), над ней — рубрика с мощью
+   от снаряжения; рядом — талисманы (talRow, screens/talismans.js). Зовёт heroDetail в index.html */
 function eqRow(h) {
   if (!EQD || !S.eq || !h) return '';
-  if (!eqOpen()) return `<div class="eq-row"><span class="eyebrow">Снаряжение</span><p class="reason">${ic('lock')} Откроется во втором цикле — вместе с Ареной.</p></div>`;
+  if (!eqOpen()) return `<div class="eq-row shut"><p class="pg-rub"><span>Снаряжение</span></p><p class="reason">${ic('lock')} Откроется во втором цикле — вместе с Ареной.</p></div>`;
   const P = BM.parts(h), m = P.mul.eq || EQB, d = m - EQB, w = S.eq.worn[h.id] || {};
+  const plan = typeof grPlanOf === 'function' ? grPlanOf(h) : null, up = new Set(plan ? plan.eq.map(x => x.slot) : []);
   const chip = d ? `<span class="chip spirit" title="${tmT('Боевая мощь от снаряжения', `Боевая мощь от снаряжения: база ${fmt(P.base)} × ${eqFl(m, EQB)},${String(m % EQB).padStart(4, '0')}`)}">${ICON('power', 13, 'Боевая мощь')}${eqPct(d)}</span>` : '';
-  return `<div class="eq-row"><div class="row"><span class="eyebrow">Снаряжение</span><span class="g-spacer"></span>${chip}</div>
-    <div class="eq-slots">${EQD.rules.slots.map(s => eqSlotBtn(h, s, w[s])).join('')}</div></div>`;
+  return `<div class="eq-row"><p class="pg-rub"><span>Снаряжение</span>${chip}</p><div class="eq-slots">${EQD.rules.slots.map(s => eqSlotBtn(h, s, w[s], false, up.has(s))).join('')}</div></div>`;
 }
 /* строки предмета: значок, вид, значение; против другого предмета — разница */
 function eqLines(it, h, vs) {

@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-VI-1__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-vi.json",
+  "job": "res-VI-1",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "k11_hunt",
+      "file": "art/generated/res-icons/res-VI-1/k11_hunt.webp",
+      "box": [
+        13,
+        20,
+        445,
+        452
+      ],
+      "px": 432,
+      "key_left": 0.03296
+    },
+    {
+      "id": "k11_tail",
+      "file": "art/generated/res-icons/res-VI-1/k11_tail.webp",
+      "box": [
+        474,
+        20,
+        907,
+        453
+      ],
+      "px": 433,
+      "key_left": 0.0
+    },
+    {
+      "id": "k11_eng",
+      "file": "art/generated/res-icons/res-VI-1/k11_eng.webp",
+      "box": [
+        936,
+        20,
+        1368,
+        452
+      ],
+      "px": 432,
+      "key_left": 0.01323
+    },
+    {
+      "id": "k11_alch",
+      "file": "art/generated/res-icons/res-VI-1/k11_alch.webp",
+      "box": [
+        1397,
+        20,
+        1830,
+        453
+      ],
+      "px": 433,
+      "key_left": 0.06489
+    },
+    {
+      "id": "k11_ench",
+      "file": "art/generated/res-icons/res-VI-1/k11_ench.webp",
+      "box": [
+        1859,
+        20,
+        2292,
+        453
+      ],
+      "px": 433,
+      "key_left": 0.00723
+    },
+    {
+      "id": "k11_smith",
+      "file": "art/generated/res-icons/res-VI-1/k11_smith.webp",
+      "box": [
+        13,
+        483,
+        445,
+        915
+      ],
+      "px": 432,
+      "key_left": 0.01386
+    },
+    {
+      "id": "rc_b11",
+      "file": "art/generated/res-icons/res-VI-1/rc_b11.webp",
+      "box": [
+        474,
+        483,
+        906,
+        915
+      ],
+      "px": 432,
+      "key_left": 0.05501
+    },
+    {
+      "id": "mc_b11",
+      "file": "art/generated/res-icons/res-VI-1/mc_b11.webp",
+      "box": [
+        936,
+        483,
+        1368,
+        915
+      ],
+      "px": 432,
+      "key_left": 0.02029
+    },
+    {
+      "id": "mt_b11",
+      "file": "art/generated/res-icons/res-VI-1/mt_b11.webp",
+      "box": [
+        1397,
+        483,
+        1829,
+        915
+      ],
+      "px": 432,
+      "key_left": 0.02912
+    },
+    {
+      "id": "k12_hunt",
+      "file": "art/generated/res-icons/res-VI-1/k12_hunt.webp",
+      "box": [
+        1859,
+        483,
+        2291,
+        915
+      ],
+      "px": 432,
+      "key_left": 0.03719
+    },
+    {
+      "id": "k12_tail",
+      "file": "art/generated/res-icons/res-VI-1/k12_tail.webp",
+      "box": [
+        13,
+        945,
+        445,
+        1377
+      ],
+      "px": 432,
+      "key_left": 0.02439
+    },
+    {
+      "id": "k12_eng",
+      "file": "art/generated/res-icons/res-VI-1/k12_eng.webp",
+      "box": [
+        474,
+        945,
+        907,
+        1378
+      ],
+      "px": 433,
+      "key_left": 0.01909
+    },
+    {
+      "id": "k12_alch",
+      "file": "art/generated/res-icons/res-VI-1/k12_alch.webp",
+      "box": [
+        936,
+        945,
+        1368,
+        1377
+      ],
+      "px": 432,
+      "key_left": 0.0138
+    },
+    {
+      "id": "k12_ench",
+      "file": "art/generated/res-icons/res-VI-1/k12_ench.webp",
+      "box": [
+        1397,
+        945,
+        1830,
+        1378
+      ],
+      "px": 433,
+      "key_left": 0.02298
+    },
+    {
+      "id": "k12_smith",
+      "file": "art/generated/res-icons/res-VI-1/k12_smith.webp",
+      "box": [
+        1859,
+        945,
+        2292,
+        1378
+      ],
+      "px": 433,
+      "key_left": 0.06703
+    },
+    {
+      "id": "u12",
+      "file": "art/generated/res-icons/res-VI-1/u12.webp",
+      "box": [
+        13,
+        1407,
+        445,
+        1839
+      ],
+      "px": 432,
+      "key_left": 0.00732
+    },
+    {
+      "id": "rc_b12",
+      "file": "art/generated/res-icons/res-VI-1/rc_b12.webp",
+      "box": [
+        474,
+        1407,
+        907,
+        1840
+      ],
+      "px": 433,
+      "key_left": 0.0088
+    },
+    {
+      "id": "mc_b12",
+      "file": "art/generated/res-icons/res-VI-1/mc_b12.webp",
+      "box": [
+        936,
+        1407,
+        1368,
+        1839
+      ],
+      "px": 432,
+      "key_left": 0.02422
+    },
+    {
+      "id": "mt_b12",
+      "file": "art/generated/res-icons/res-VI-1/mt_b12.webp",
+      "box": [
+        1397,
+        1407,
+        1830,
+        1840
+      ],
+      "px": 433,
+      "key_left": 0.03952
+    },
+    {
+      "id": "rn6_1",
+      "file": "art/generated/res-icons/res-VI-1/rn6_1.webp",
+      "box": [
+        1859,
+        1407,
+        2292,
+        1840
+      ],
+      "px": 433,
+      "key_left": 0.07961
+    }
+  ]
+}

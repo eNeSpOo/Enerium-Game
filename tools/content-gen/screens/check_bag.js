@@ -180,7 +180,7 @@ reset();
     const cells = (grid.match(/<button class="zp-cell[ "]/g) || []).length;
     if (cells !== W.shown.length) say(`сетка · ${tab}: клеток ${cells}, записей ${W.shown.length}`);
     /* в клетке только значок и число: видимый текст сетки — числа, «/», «К», «М» */
-    const txt = playerText(grid.replace(/<span class="(?:hsg-init|rs-ph|gl)"[^>]*>[\s\S]*?<\/span>/g, '')).replace(/\s+/g, ' ').trim();   // инициалы вместо лица и знак руны — значок, не имя
+    const txt = playerText(grid.replace(/<span class="(?:hsg-init|rs-ph|gl|res-gl)"[^>]*>[\s\S]*?<\/span>/g, '')).replace(/\s+/g, ' ').trim();   // инициалы вместо лица и знак руны (у иконки сеткой — номер поверх, res-gl) — значок, не имя
     if (/[A-Za-zА-Яа-яЁё]/.test(txt.replace(/[КМ]/g, ''))) say(`сетка · ${tab}: в клетках снова слова — «${txt.slice(0, 80)}»`);
     if (/zp-row|zp-gh/.test(h)) say(`сетка · ${tab}: остались строки или заголовки групп прежнего списка`);
     const e = W.shown[0]; if (!e) continue;

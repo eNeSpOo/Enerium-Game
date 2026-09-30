@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-IV-5__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-iv.json",
+  "job": "res-IV-5",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "lu_cb5",
+      "file": "art/generated/res-icons/res-IV-5/lu_cb5.webp",
+      "box": [
+        7,
+        12,
+        446,
+        451
+      ],
+      "px": 439,
+      "key_left": 0.0
+    },
+    {
+      "id": "lu_cb11",
+      "file": "art/generated/res-icons/res-IV-5/lu_cb11.webp",
+      "box": [
+        470,
+        12,
+        909,
+        451
+      ],
+      "px": 439,
+      "key_left": 6e-05
+    },
+    {
+      "id": "lu_cb12",
+      "file": "art/generated/res-icons/res-IV-5/lu_cb12.webp",
+      "box": [
+        933,
+        12,
+        1373,
+        452
+      ],
+      "px": 440,
+      "key_left": 0.0
+    },
+    {
+      "id": "lu_cb18",
+      "file": "art/generated/res-icons/res-IV-5/lu_cb18.webp",
+      "box": [
+        1397,
+        13,
+        1835,
+        451
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "lu_ci4",
+      "file": "art/generated/res-icons/res-IV-5/lu_ci4.webp",
+      "box": [
+        1859,
+        13,
+        2297,
+        451
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "ec_b7",
+      "file": "art/generated/res-icons/res-IV-5/ec_b7.webp",
+      "box": [
+        7,
+        476,
+        446,
+        915
+      ],
+      "px": 439,
+      "key_left": 0.0
+    },
+    {
+      "id": "ec_b8",
+      "file": "art/generated/res-icons/res-IV-5/ec_b8.webp",
+      "box": [
+        470,
+        476,
+        909,
+        915
+      ],
+      "px": 439,
+      "key_left": 0.0
+    },
+    {
+      "id": "act_cb11",
+      "file": "art/generated/res-icons/res-IV-5/act_cb11.webp",
+      "box": [
+        933,
+        476,
+        1373,
+        916
+      ],
+      "px": 440,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_lampglass",
+      "file": "art/generated/res-icons/res-IV-5/cr_lampglass.webp",
+      "box": [
+        1397,
+        477,
+        1835,
+        915
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_tarrope",
+      "file": "art/generated/res-icons/res-IV-5/cr_tarrope.webp",
+      "box": [
+        1859,
+        477,
+        2297,
+        915
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_whalebone",
+      "file": "art/generated/res-icons/res-IV-5/cr_whalebone.webp",
+      "box": [
+        7,
+        940,
+        446,
+        1379
+      ],
+      "px": 439,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_barnacle",
+      "file": "art/generated/res-icons/res-IV-5/cr_barnacle.webp",
+      "box": [
+        470,
+        940,
+        909,
+        1379
+      ],
+      "px": 439,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_keel",
+      "file": "art/generated/res-icons/res-IV-5/cr_keel.webp",
+      "box": [
+        933,
+        940,
+        1373,
+        1380
+      ],
+      "px": 440,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_foghorn",
+      "file": "art/generated/res-icons/res-IV-5/cr_foghorn.webp",
+      "box": [
+        1397,
+        941,
+        1835,
+        1379
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_saltcrust",
+      "file": "art/generated/res-icons/res-IV-5/cr_saltcrust.webp",
+      "box": [
+        1859,
+        941,
+        2297,
+        1379
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_bigscale",
+      "file": "art/generated/res-icons/res-IV-5/cr_bigscale.webp",
+      "box": [
+        7,
+        1404,
+        446,
+        1843
+      ],
+      "px": 439,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_stair",
+      "file": "art/generated/res-icons/res-IV-5/cr_stair.webp",
+      "box": [
+        470,
+        1404,
+        909,
+        1843
+      ],
+      "px": 439,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb11",
+      "file": "art/generated/res-icons/res-IV-5/find_cb11.webp",
+      "box": [
+        933,
+        1404,
+        1373,
+        1844
+      ],
+      "px": 440,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb11b",
+      "file": "art/generated/res-icons/res-IV-5/find_cb11b.webp",
+      "box": [
+        1397,
+        1405,
+        1835,
+        1843
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb11",
+      "file": "art/generated/res-icons/res-IV-5/call_fb11.webp",
+      "box": [
+        1859,
+        1405,
+        2297,
+        1843
+      ],
+      "px": 438,
+      "key_left": 0.0
+    }
+  ]
+}

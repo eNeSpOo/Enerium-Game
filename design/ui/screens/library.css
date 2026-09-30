@@ -14,7 +14,7 @@
 .lb-top{position:relative;z-index:6;flex:none;height:var(--lb-top);display:flex;align-items:center;min-width:0;padding:0 calc(var(--lb-pw) + 6px)}
 .lb-cn{position:absolute;top:0;bottom:0;left:-3px;right:-3px;z-index:-1;pointer-events:none;border-radius:4px 4px 0 0;
   background:linear-gradient(180deg,#3b2c1d 0,#21180f 14%,#140e09 30%,#110c08 68%,#1d150d 82%,#0a0806 100%);box-shadow:inset 0 1px 0 rgba(233,199,126,.22),0 6px 10px -4px rgba(0,0,0,.9)}
-html.lb-c .lb-cn{background:var(--lb-cornice) 0 0/auto 100% repeat-x}
+html.lb-cz .lb-cn{background:var(--lb-cornice) 0 0/auto 100% repeat-x}
 .lb-top .hkh{flex:1 1 auto;min-width:0;min-height:0;height:100%}
 .lb-top .tabs{padding:2px;background:rgba(7,6,5,.8);border-color:rgba(201,162,106,.3)}
 .lb-top .tabs button{height:22px}

@@ -92,6 +92,10 @@ module.exports = function emit(D) {
     const h = byId[r.out[0]], b = r.bom, rare = Object.keys(b).filter(id => ['trophy', 'unique'].includes(byId[id].tier)).length, finds = Object.keys(b).filter(id => byId[id].tier === 'find').reduce((a, id) => a + b[id], 0);
     if (h.maxV >= 4 && !rare && finds < 2) err.push(`${r.id}: герой с максимумом доблести ${h.maxV} без трофея, уникального ресурса или двух находок`);
   }
+  /* рунные ключи — слово автора 30.09.2026 (ADR-0033): падают только с боссов биома, у донатного сета ключников, в сундуках с малым
+     шансом и за контракты. Рецептов ключей нет, у крафтовых мест и призванных врагов ключа нет — малый шанс живёт в их сундуке */
+  for (const r of recipes) if (r.out[0] === 'rkey') err.push(`${r.id}: рецепт создаёт рунные ключи — их дают только боссы биома, сет ключников, сундуки и контракты (ADR-0033)`);
+  for (const [k, v] of Object.entries(C.CRAFT)) if (v && v.runeKeyBp) err.push(`CRAFT.${k}: рунный ключ ${v.runeKeyBp} б. п. — у крафтовых мест и призванных врагов его нет (ADR-0033)`);
   /* призывы врагов: Энериум своей ступени и уникальный ресурс босса биома — сам или через перекрафт */
   const calls = recipes.filter(r => byId[r.out[0]].tier === 'call');
   for (const r of calls) {

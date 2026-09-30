@@ -1,0 +1,7 @@
+[
+  { "name": "book-skills", "dev": "932", "js": "S.overlay=null; S.route='heroes'; S.seg.heroes='coll'; S.hview='mine'; S.hgrid='own'; S.selHero='h3'; S.seg.hero='skills'; render();", "wait": 2200 },
+  { "name": "book-gear-844", "dev": "844", "js": "S.overlay=null; S.route='heroes'; S.seg.heroes='coll'; S.hview='mine'; S.hgrid='own'; S.selHero='h1'; S.seg.hero='gear'; render();", "wait": 2200 },
+  { "name": "wanderer-over", "dev": "932", "js": "S.overlay=null; go('profile'); S.seg.profile='over'; render();", "wait": 1800 },
+  { "name": "store-energium", "dev": "932", "js": "S.overlay=null; go('store'); S.seg.store='en'; render();", "wait": 1800 },
+  { "name": "stock-card", "dev": "932", "js": "S.overlay=null; go('craft'); S.seg.craft='stock'; render();", "wait": 1800 }
+]

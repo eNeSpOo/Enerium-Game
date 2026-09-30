@@ -110,8 +110,9 @@ module.exports = function sink({ items, recipes, byId, CYC, places, memories, OU
     });
     const enerDemand = [C.ENER.t1].reduce((a, id) => a + (want[id] || 0), 0);
     const ener2Demand = wantE[C.ENER.t2] || 0, enerDirect = wantE[C.ENER.t1] || 0;
-    /* рунные ключи от крафта в день × 100 (для темпа доблести, tempo.py): закрытия мест, победы над призванными (ключей — номер цикла),
-       рецепты ключей — по разу за цикл */
+    /* рунные ключи от крафта напрямую в день × 100 (для темпа доблести, tempo.py): закрытия мест, победы над призванными (ключей — номер
+       цикла), рецепты ключей — по разу за цикл. По слову автора 30.09.2026 (ADR-0033) всё это — ноль, emit.js это проверяет; малый шанс
+       ключей живёт в сундуке крафтового босса, его считает tempo.py по lootboxes.js */
     const CB = C.CRAFT;
     const rkBoss = (list, bp, keyBp) => list.length ? Math.floor(sum * bp / 10000) * keyBp * c / 10000 : 0;
     const rkOnce = once.filter(r => r.out[0] === 'rkey').reduce((a, r) => a + Math.floor(r.out[1] * 100 * S.onceEach / days), 0);

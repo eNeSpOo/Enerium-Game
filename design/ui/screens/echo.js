@@ -349,7 +349,7 @@ const kn = fid => knownIn(S, fid);
 const hpPct = x => Math.floor(x.hp * 100 / x.max);
 const specOf = id => id && RX.specs[id] ? RX.specs[id].n.toLowerCase() : '';
 const hideIt = it => !!it.team && S.acc.cycle < TEAM_CYC;
-const itIcon = (it, size, hide) => `<span class="well ech-it" data-r="${it.r}" style="--s:${size}px">${hide ? ic('lock') : trIcon(it)}</span>`;
+const itIcon = (it, size, hide) => `<span class="well ech-it" data-r="${it.r}" style="--s:${size}px">${hide ? (typeof resHideIco === 'function' ? resHideIco(size) : ic('lock')) : trIcon(it)}</span>`;
 const boxName = (box, r) => `${LBX.boxes[box].n} · ${LBX.boxRarity[r - 1]}`;
 const freeCount = () => S.echo.slots.filter((x, i) => !x && !S.ech.pending[i]).length;
 const freeSlot = () => S.echo.slots.findIndex((x, i) => !x && !S.ech.pending[i]);
@@ -910,7 +910,7 @@ function ruinParts(cb) {
     <div class="col"><span class="eyebrow">Ресурсы руины</span>${cb.res.map(id => row(BAG.item(id))).join('')}<small class="faint">за этаж с шансом ${pctBp(cb.resPerFloorBp)}</small></div>
     <div class="col"><span class="eyebrow">Находка</span>${row(BAG.item(cb.find))}<small class="faint">${cb.finds} за закрытие, ещё одна — ${pctBp(cb.secondFindBp)}</small></div>
     <div class="col"><span class="eyebrow">Босс руины · в Эхо</span><b class="serif ech-bn">${k ? fb.name : 'Имя откроет первая победа'}</b><small class="faint">${specOf(fb.spec)}${k ? ' · ' + trRace(fb.race) : ''}</small><small class="faint">зовут предметом «${call.n}»</small></div>
-    <div class="col"><span class="eyebrow">За закрытие</span><div class="row ech-pay">${money('spirit', cb.spirit)}${money('gold', cb.gold)}${money('souls', cb.souls)}</div><small class="faint">осколков сборных героев ${cb.heroShards} · очков События ${cb.eventPoints} · рунный ключ ${pctBp(cb.runeKeyBp)} × ${cb.runeKeys}</small></div>
+    <div class="col"><span class="eyebrow">За закрытие</span><div class="row ech-pay">${money('spirit', cb.spirit)}${money('gold', cb.gold)}${money('souls', cb.souls)}</div><small class="faint">осколков сборных героев ${cb.heroShards} · очков События ${cb.eventPoints}${cb.runeKeyBp ? ` · рунный ключ ${pctBp(cb.runeKeyBp)} × ${cb.runeKeys}` : ''}</small></div>
   </div>`;
 }
 const weekGen = race => { const W = RS.weeks.find(w => w.race === race); return W ? W.gen : race; };

@@ -151,7 +151,7 @@ function lvCard(g, i, o = {}) {
   const price = sold ? `<span class="lv-sold">${ic('check')}Куплено</span>` : lvPrice(c, p, lack);
   /* товар лежит на бархатной подушке, в рамке своего вида (crK, screens/crafthall.js); цена — латунной биркой на кромке полки */
   const fk = typeof crK === 'function' ? crK(it) : '';
-  const inner = `<span class="lv-ic" data-r="${it.r}"${fk}>${itTeam(it) ? ic('lock') : trIcon(it)}<b class="lv-q num">×${fmt(g[1])}</b><i class="lv-cr" aria-hidden="true"></i></span><span class="lv-nm">${nm}</span>${price}`;
+  const inner = `<span class="lv-ic" data-r="${it.r}"${fk}>${itTeam(it) ? (typeof resHideIco === 'function' ? resHideIco() : ic('lock')) : trIcon(it)}<b class="lv-q num">×${fmt(g[1])}</b><i class="lv-cr" aria-hidden="true"></i></span><span class="lv-nm">${nm}</span>${price}`;
   const cls = `lv-card${sold ? ' sold' : ''}${lack ? ' lack' : ''}${just ? ' just' : ''}`;
   if (o.kit) return `<div class="${cls}" data-r="${it.r}">${inner}</div>`;
   const lbl = `${nm}, ${fmt(g[1])} шт., ${sold ? 'куплено' : `${fmt(p)} ${lvCurGen(c)}`}`;
@@ -189,7 +189,7 @@ Object.assign(OV, {
     const [c, p] = shopCost(g), sold = S.sold.includes(i), lack = (S.wallet[c] || 0) < p, hide = itTeam(it), week = it.tier === 'unique' && !sold && !lvUniqLeft();
     const T = EN_RECIPES.tiers[it.tier] || { n: '' }, sp = it.spec ? it.spec.split('+').map(x => EN_RECIPES.specs[x] ? EN_RECIPES.specs[x].n.toLowerCase() : '').filter(Boolean).join(' + ') : '';
     const uses = hide ? [] : BAG.knownUses(it.id).filter(Boolean);
-    const head = `<div class="lv-sh"><span class="lv-big" data-r="${it.r}"${typeof crK === 'function' ? crK(it) : ''}>${hide ? ic('lock') : trIcon(it)}<b class="num">×${fmt(g[1])}</b></span>
+    const head = `<div class="lv-sh"><span class="lv-big" data-r="${it.r}"${typeof crK === 'function' ? crK(it) : ''}>${hide ? (typeof resHideIco === 'function' ? resHideIco(64) : ic('lock')) : trIcon(it)}<b class="num">×${fmt(g[1])}</b></span>
       <div class="lv-sc">${rar(it.r)}<b class="lv-sn">${trEsc(itName(it))}</b><span class="lv-st">${T.n}${sp ? ' · ' + sp : ''}</span></div>
       <span class="g-spacer"></span><div class="stat lv-stock"><b>${fmt(BAG.qty(it.id))}</b><small>в запасах</small></div></div>`;
     const lore = hide ? '' : foldLore(trEsc(it.lore)) + (typeof crHint === 'function' ? crHint(it) : '');

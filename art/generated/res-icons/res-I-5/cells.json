@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-I-5__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-i.json",
+  "job": "res-I-5",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "call_fb1",
+      "file": "art/generated/res-icons/res-I-5/call_fb1.webp",
+      "box": [
+        15,
+        22,
+        445,
+        452
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fb1",
+      "file": "art/generated/res-icons/res-I-5/tr_fb1.webp",
+      "box": [
+        476,
+        22,
+        906,
+        452
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fb1a",
+      "file": "art/generated/res-icons/res-I-5/tr_fb1a.webp",
+      "box": [
+        937,
+        22,
+        1367,
+        452
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "act_cb2",
+      "file": "art/generated/res-icons/res-I-5/act_cb2.webp",
+      "box": [
+        1398,
+        22,
+        1828,
+        452
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_karst",
+      "file": "art/generated/res-icons/res-I-5/cr_karst.webp",
+      "box": [
+        1859,
+        22,
+        2289,
+        452
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_prop",
+      "file": "art/generated/res-icons/res-I-5/cr_prop.webp",
+      "box": [
+        15,
+        482,
+        445,
+        912
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_mold",
+      "file": "art/generated/res-icons/res-I-5/cr_mold.webp",
+      "box": [
+        476,
+        482,
+        906,
+        912
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_slag",
+      "file": "art/generated/res-icons/res-I-5/cr_slag.webp",
+      "box": [
+        937,
+        482,
+        1367,
+        912
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_drip",
+      "file": "art/generated/res-icons/res-I-5/cr_drip.webp",
+      "box": [
+        1398,
+        482,
+        1828,
+        912
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_worm",
+      "file": "art/generated/res-icons/res-I-5/cr_worm.webp",
+      "box": [
+        1859,
+        482,
+        2289,
+        912
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_wrap",
+      "file": "art/generated/res-icons/res-I-5/cr_wrap.webp",
+      "box": [
+        15,
+        944,
+        445,
+        1374
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_wedge",
+      "file": "art/generated/res-icons/res-I-5/cr_wedge.webp",
+      "box": [
+        476,
+        944,
+        906,
+        1374
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_bit",
+      "file": "art/generated/res-icons/res-I-5/cr_bit.webp",
+      "box": [
+        937,
+        944,
+        1367,
+        1374
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb2",
+      "file": "art/generated/res-icons/res-I-5/find_cb2.webp",
+      "box": [
+        1398,
+        944,
+        1828,
+        1374
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb2b",
+      "file": "art/generated/res-icons/res-I-5/find_cb2b.webp",
+      "box": [
+        1859,
+        944,
+        2289,
+        1374
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb2",
+      "file": "art/generated/res-icons/res-I-5/call_fb2.webp",
+      "box": [
+        15,
+        1404,
+        445,
+        1834
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fb2",
+      "file": "art/generated/res-icons/res-I-5/tr_fb2.webp",
+      "box": [
+        476,
+        1404,
+        906,
+        1834
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fb2a",
+      "file": "art/generated/res-icons/res-I-5/tr_fb2a.webp",
+      "box": [
+        937,
+        1404,
+        1367,
+        1834
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "act_ci1",
+      "file": "art/generated/res-icons/res-I-5/act_ci1.webp",
+      "box": [
+        1398,
+        1404,
+        1828,
+        1834
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_ci1_oar",
+      "file": "art/generated/res-icons/res-I-5/cr_ci1_oar.webp",
+      "box": [
+        1859,
+        1404,
+        2289,
+        1834
+      ],
+      "px": 430,
+      "key_left": 0.0
+    }
+  ]
+}

@@ -203,7 +203,7 @@ function coView(it) {
     o.tip = o.dust ? `${n} уже пробуждён: осколки ×${fmt(it.q)} → прах +${fmt(o.dust)}` : `Осколки героя: ${n} ×${fmt(it.q)}`;
   } else if (k === 'item') {
     const x = BAG.item(it.id);
-    o.icon = !x ? ic('gem') : x.team ? ic('lock') : trIcon(x); o.name = x ? zpName(x) : 'Предмет'; o.tip = `${o.name} ×${fmt(it.q)}`;
+    o.icon = !x ? ic('gem') : x.team ? (typeof resHideIco === 'function' ? resHideIco(64) : ic('lock')) : trIcon(x); o.name = x ? zpName(x) : 'Предмет'; o.tip = `${o.name} ×${fmt(it.q)}`;
   } else if (k === 'cur') {
     o.icon = `<img src="${curImg(it.id)}" alt="">`; o.name = coCurName(it.id); o.tip = `${o.name} ×${fmt(it.q)}`;
   } else {   // tal, wshard, equip — «из сундуков» в запасах; спойлеры в именах талисманов прячет zpExtraName

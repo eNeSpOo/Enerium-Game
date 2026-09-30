@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-IV-2__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-iv.json",
+  "job": "res-IV-2",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "a_brazier",
+      "file": "art/generated/res-icons/res-IV-2/a_brazier.webp",
+      "box": [
+        13,
+        20,
+        442,
+        449
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_toll",
+      "file": "art/generated/res-icons/res-IV-2/p_toll.webp",
+      "box": [
+        475,
+        20,
+        904,
+        449
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn4_1",
+      "file": "art/generated/res-icons/res-IV-2/rn4_1.webp",
+      "box": [
+        938,
+        20,
+        1366,
+        448
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn4_2",
+      "file": "art/generated/res-icons/res-IV-2/rn4_2.webp",
+      "box": [
+        1399,
+        20,
+        1828,
+        449
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn4_3",
+      "file": "art/generated/res-icons/res-IV-2/rn4_3.webp",
+      "box": [
+        1861,
+        20,
+        2290,
+        449
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn4_4",
+      "file": "art/generated/res-icons/res-IV-2/rn4_4.webp",
+      "box": [
+        13,
+        482,
+        442,
+        911
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn4_5",
+      "file": "art/generated/res-icons/res-IV-2/rn4_5.webp",
+      "box": [
+        475,
+        482,
+        904,
+        911
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "vs4",
+      "file": "art/generated/res-icons/res-IV-2/vs4.webp",
+      "box": [
+        938,
+        482,
+        1366,
+        910
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "vr4",
+      "file": "art/generated/res-icons/res-IV-2/vr4.webp",
+      "box": [
+        1399,
+        482,
+        1828,
+        911
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "kr_pa",
+      "file": "art/generated/res-icons/res-IV-2/kr_pa.webp",
+      "box": [
+        1861,
+        482,
+        2290,
+        911
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_clearwater",
+      "file": "art/generated/res-icons/res-IV-2/p_clearwater.webp",
+      "box": [
+        13,
+        945,
+        443,
+        1375
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_whitewash",
+      "file": "art/generated/res-icons/res-IV-2/p_whitewash.webp",
+      "box": [
+        475,
+        945,
+        905,
+        1375
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_purewater",
+      "file": "art/generated/res-icons/res-IV-2/p_purewater.webp",
+      "box": [
+        938,
+        946,
+        1366,
+        1374
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_purevessel",
+      "file": "art/generated/res-icons/res-IV-2/a_purevessel.webp",
+      "box": [
+        1399,
+        945,
+        1829,
+        1375
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_ballot",
+      "file": "art/generated/res-icons/res-IV-2/a_ballot.webp",
+      "box": [
+        1861,
+        945,
+        2291,
+        1375
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_riverbed",
+      "file": "art/generated/res-icons/res-IV-2/a_riverbed.webp",
+      "box": [
+        13,
+        1408,
+        443,
+        1838
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_c11wax",
+      "file": "art/generated/res-icons/res-IV-2/a_c11wax.webp",
+      "box": [
+        475,
+        1408,
+        905,
+        1838
+      ],
+      "px": 430,
+      "key_left": 1e-05
+    },
+    {
+      "id": "p_brand",
+      "file": "art/generated/res-icons/res-IV-2/p_brand.webp",
+      "box": [
+        938,
+        1409,
+        1366,
+        1837
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_writ",
+      "file": "art/generated/res-icons/res-IV-2/p_writ.webp",
+      "box": [
+        1399,
+        1408,
+        1829,
+        1838
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_logpage",
+      "file": "art/generated/res-icons/res-IV-2/p_logpage.webp",
+      "box": [
+        1861,
+        1408,
+        2291,
+        1838
+      ],
+      "px": 430,
+      "key_left": 0.0
+    }
+  ]
+}

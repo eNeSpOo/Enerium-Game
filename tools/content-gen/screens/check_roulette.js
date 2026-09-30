@@ -491,14 +491,14 @@ for (const [en, lack] of [[340, [10, 100]], [50, [1, 10, 100]], [100000, []]]) {
     for (const h of unfound) if (fanH.includes(`data-v="${h.id}"`) || fanH.includes(h.n)) say(`алтарь: в веере виден не найденный ${h.n}`); }
   honest(tab.slice(tab.indexOf('rl-entry')), 'алтарь · вкладка'); noPend(tab, 'алтарь · вкладка');
   if (!/data-a="dlg" data-v="rl"/.test(tab) || !/data-a="sheet" data-v="rlodds"/.test(tab)) say('алтарь: нет «К рулетке» или «Шансы»');
-  /* найденный герой веера — книга «до покупки» поверх вкладки (OV.rhero, screens/book.js): портрет, имя, навыки по доблести; прокачки
+  /* найденный герой веера — книга «до покупки» поверх вкладки (OV.rhero, screens/book.js): портрет, имя на табличке левой страницы, навыки по доблести; прокачки
      и снаряжения у неё нет; «Закрыть» закрывает её */
   { const h0 = pool2[0];
     if (h0 && !tab.includes(`data-a="rhero" data-v="${h0.id}"`)) say('алтарь: герой веера не открывает свою карточку');
     else if (h0) {
       run('веер · карточка', () => T.ACT.rhero(h0.id));
       const g = view(P, 'веер · карточка героя'), ov = g.slice(g.indexOf('<div class="ov'));
-      if (!/^<div class="ov hb-ov"><div class="hb-win/.test(ov) || !ov.includes(`<h2>${h0.n}</h2>`) || !ov.includes('data-v="rhero:skills"')) say('алтарь: книга героя веера — не книга «до покупки» поверх вкладки');
+      if (!/^<div class="ov hb-ov"><div class="hb-win/.test(ov) || !ov.includes(`<b class="hb-pn">${h0.n}</b>`) || !ov.includes('data-v="rhero:skills"')) say('алтарь: книга героя веера — не книга «до покупки» поверх вкладки');
       if (/data-a="(?:lvlup|limit|gearbest)"/.test(ov)) say('алтарь: в карточке героя до пробуждения — прокачка или снаряжение');
       if (!ov.includes('data-a="hbclose" data-v="ov"')) say('алтарь: у книги героя веера нет «Закрыть»');
       T.S.overlay = null;

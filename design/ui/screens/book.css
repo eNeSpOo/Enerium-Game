@@ -228,8 +228,15 @@ button.hs:active{transform:translateY(-5px)}
 .hb-por .hk-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%}
 .hb-por .hk-sil{--st:44px;--sb:40px;--sx:12px}   /* поле силуэта: сверху — уровень и стихия, снизу — класс, имя и мощь */
 .hb-por::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(3,4,5,.35),transparent 18%,transparent 62%,rgba(4,6,8,.8))}
-.hb-zi{position:absolute;right:8px;top:50%;z-index:2;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;transform:translateY(-50%);background:rgba(8,10,12,.62);color:var(--parch-2);box-shadow:0 0 0 1px var(--iron-2);pointer-events:none}
+.hb-zi{position:absolute;right:8px;top:58px;z-index:2;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:rgba(8,10,12,.62);color:var(--parch-2);box-shadow:0 0 0 1px var(--iron-2);pointer-events:none}
 .hb-zi .i{width:13px;height:13px}
+/* «‹ ›» — соседний герой той же сетки: по краям портрета, посередине высоты; тёмное стекло в латунной кромке */
+.hb-stp{position:absolute;z-index:4;top:50%;display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;border-radius:50%;transform:translateY(-50%);
+  background:radial-gradient(circle at 50% 35%,rgba(40,32,24,.88),rgba(10,8,6,.9));color:#ecd39c;box-shadow:inset 0 0 0 1.5px #8a6a38,inset 0 0 0 3px rgba(0,0,0,.6),0 3px 8px rgba(0,0,0,.6);transition:transform .15s ease}
+.hb-stp.l{left:calc(5.5% + 6px)}
+.hb-stp.r{right:calc(4% + 6px)}
+.hb-stp:hover{transform:translateY(-50%) scale(1.08);color:#fff3cf}
+.hb-stp .i{width:17px;height:17px}
 .hb-pg.l>.hb-lv{position:absolute;z-index:3;left:1%;top:0;width:52px;height:52px;display:grid;place-items:center;border-radius:50%;
   background:radial-gradient(circle at 50% 32%,#835a3c,#4d301d 58%,#2c1b10);box-shadow:inset 0 0 0 2px #c9a26a,inset 0 0 0 4px #3a2616,0 3px 8px rgba(0,0,0,.75)}
 .hb-pg.l>.hb-lv b{font:700 18px/1 var(--f-u);color:#f7e8c6;letter-spacing:-.03em;text-shadow:0 1px 2px #000}
@@ -241,52 +248,36 @@ button.hs:active{transform:translateY(-5px)}
 .hb-pg.l>.hb-cls .ico{width:30px;height:30px}
 .hb-pg.l>.hb-bm{position:absolute;z-index:3;right:6%;bottom:5.5%;font-size:18px;gap:5px}
 .hb-pg.l>.hb-bm .ico{width:22px;height:22px}
-.hb-pg.l>.hb-nm{position:absolute;z-index:3;left:18%;right:26%;bottom:4.5%;height:28px;padding:0 10px;border-radius:5px;background:linear-gradient(180deg,#2c2723,#141210);
-  box-shadow:inset 0 0 0 1px #6d6252,inset 0 1px 0 rgba(255,255,255,.06),0 2px 6px rgba(0,0,0,.6);font:600 17px/28px var(--f-d);text-align:center;color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #000}
-/* правая страница — тёмный вкладыш на пергаменте: сведения героя; вкладки — кожаными закладками по краю страницы */
-.hb-rp{position:absolute;inset:3% 3% 3% 4%;display:flex;flex-direction:column;gap:6px;min-width:0;min-height:0;padding:8px 10px 8px;border-radius:8px;
-  background:linear-gradient(180deg,rgba(18,15,12,.9),rgba(11,10,9,.94));box-shadow:0 0 0 1px rgba(201,162,106,.3),inset 0 0 30px rgba(0,0,0,.5),0 4px 14px rgba(0,0,0,.35)}
-.hb-h{display:flex;align-items:flex-start;gap:8px;flex:none;min-width:0}
-.hb-id{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 auto}
-.hb-id h2{font:600 23px/1 var(--f-d);color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 0 14px rgba(221,188,122,.25)}
-.hb-id .hd-line{gap:6px;font-size:12px}
-.hb-h.own .hd-line+.hd-line{display:none}   /* у своего героя редкость видна кристаллом, прогресс — справа: вторая строка лишняя, место — вкладкам */
-.hb-step{display:flex;gap:3px;flex:none}
-.hb-step .iconbtn{width:30px;height:30px}
-.hb-vit{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:none;font:700 11px/1 var(--f-u);color:var(--parch-3);white-space:nowrap}
-.hb-vit b{font-size:14px;color:var(--parch)}
-.hb-vit small{margin-left:2px;font-size:11px;color:var(--parch-3)}
-.hb-rp .tabs,.hb-tr .tabs{gap:3px;padding:0;border:0;border-radius:0;background:none;box-shadow:none;border-bottom:1px solid rgba(201,162,106,.3)}
-.hb-rp .tabs button{height:26px;padding:0 10px;border-radius:7px 7px 0 0;color:#cdb68c;letter-spacing:.06em;
-  background:linear-gradient(180deg,#3a2a1c,#22180f);box-shadow:inset 0 0 0 1px rgba(201,162,106,.3)}
-.hb-rp .tabs button[aria-selected="true"]{color:var(--gold);background:linear-gradient(180deg,#5c4128,#33241a);box-shadow:inset 0 0 0 1px rgba(233,199,126,.7),inset 0 -2px 0 var(--rc,var(--spirit))}
+/* табличка имени: имя, под ним — редкость, класс и раса (шапки на правой странице больше нет: она целиком под сведения) */
+.hb-plate{position:absolute;z-index:3;left:18%;right:26%;bottom:3.5%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:40px;padding:4px 10px 5px;border-radius:5px;
+  background:linear-gradient(180deg,#2c2723,#141210);box-shadow:inset 0 0 0 1px #6d6252,inset 0 1px 0 rgba(255,255,255,.06),0 2px 6px rgba(0,0,0,.6);text-align:center}
+.hb-pn{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 17px/1.05 var(--f-d);color:var(--parch);text-shadow:0 1px 2px #000}
+.hb-pm{display:flex;align-items:center;justify-content:center;gap:0 6px;max-width:100%;overflow:hidden;white-space:nowrap;font:700 10px/1 var(--f-u);letter-spacing:.03em;color:var(--parch-2)}
+.hb-pm>span:not(.rar){min-width:0;overflow:hidden;text-overflow:ellipsis}
+.hb-pm>span:not(.rar)::before{content:"·";margin-right:6px;color:var(--parch-3)}
+.hb-pm .rar{flex:none;font-size:10px;letter-spacing:.06em}
+.hb-pm .rar::before{width:11px;height:11px}
+/* правая страница — сведения чернилами прямо по пергаменту разворота, без вкладыша (тема .pg — screens/book-pages.css): поля от края
+   листа, у корешка шире; снизу — над полосой обреза (торцы листов блока, --re: HB_ART.spreads[ступень].e, ‰ высоты страницы): по ней
+   не пишут; закладки вкладок — над верхним краем страницы (.pg-tabs) */
+.hb-rp{position:absolute;inset:6px 12px 4px 16px;bottom:calc(4px + var(--re,0) * 1% / 10);display:flex;flex-direction:column;gap:6px;min-width:0;min-height:0}
 .hb-hd.pnl.hd{flex:1 1 0;min-height:0;padding:0;border:0;background:none;box-shadow:none}
-.hb-hd .hd-body{margin-top:0}
-/* одна колонка на странице книги; !important — «Навыки» (heroKitHtml, index.html) задают две колонки прямо в разметке, а на узкой
-   странице имени способности остаётся 55 px и оно наезжает на долю хода */
-.hb-hd .hd-cols{grid-template-columns:minmax(0,1fr)!important}
-/* на странице книги места снаряжения и талисманов — по ширине страницы (у разворота каждой ступени страница своя) */
-.hb-hd .hd-gear .eq-slots{grid-template-columns:repeat(9,minmax(0,1fr));gap:3px;max-width:360px}
-.hb-hd .hd-gear .eq-slot{width:auto;height:auto;aspect-ratio:1}
-.hb-hd .hd-gear .tl-slots{grid-template-columns:repeat(4,minmax(0,1fr));max-width:280px}
-.hb-hd .hdg-f{flex-wrap:wrap;row-gap:4px}
-/* «Развитие» на странице книги — страница уже прежней колонки: карточка шага в две строки (кнопка — под текстом), кнопки количества
-   и характеристики тихой строкой — плотнее; «подробнее» у характеристик не нужен — лист открывает вся строка */
+.hb-hd .hd-body{margin-top:0;gap:6px}
+/* «Развитие» на странице книги: карточка шага в две строки (кнопка — под текстом), кнопки количества и характеристики тихой строкой —
+   плотнее; стрелка у тихой строки ведёт на «Мощь» */
 .hb-hd .hdv-path{padding:0}
-.hb-hd .hdv-next{grid-template-columns:30px minmax(0,1fr);gap:4px 8px;padding:5px 9px}
+.hb-hd .hdv-next{grid-template-columns:30px minmax(0,1fr);gap:4px 8px;padding:6px 10px}
 .hb-hd .hdv-ic{width:30px;height:30px}
 .hb-hd .hdv-tx{gap:4px}
-.hb-hd .hdv-t{font-size:16px}
+.hb-hd .hdv-t{font-size:17px}
 .hb-hd .hdv-sub .qty button{height:24px}
 .hb-hd .hdv-act{grid-column:2;min-width:0}
-.hb-hd .hdv-go.btn{min-height:34px;padding:0 12px}
+.hb-hd .hdv-go.btn{min-height:36px;padding:0 13px}
 .hb-hd .hdv-quiet{gap:6px}
-.hb-hd .hdv-quiet .st5{gap:7px}
-.hb-hd .hdv-quiet .s5 .ico{width:16px;height:16px}
-.hb-hd .hdv-quiet .s5 b{font-size:13px}
-.hb-hd .hdv-quiet .hdv-more{display:none}
+.hb-hd .hdv-quiet .st5{gap:8px}
+.hb-hd .hdv-quiet .s5 .ico{width:17px;height:17px}
+.hb-hd .hdv-quiet .s5 b{font-size:14px}
 .hb-tb{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:6px}
-.hb-tr{flex:none}
 .hb-sc{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:8px}
 .hb-f{flex:none;display:flex;align-items:center;gap:8px;min-width:0;padding-top:6px;border-top:1px solid rgba(201,162,106,.25)}
 .hb-f .btn.big{min-height:40px}
@@ -309,12 +300,15 @@ html.hb-lk .hb-lks .hb-l.on{filter:drop-shadow(0 0 6px rgba(72,229,212,.8)) drop
 .hb-book>.hb-rb i.on b{filter:drop-shadow(0 0 5px var(--rc))}
 .hb-x{position:absolute;right:-8px;top:-10px;z-index:6}
 .hb-skip{position:absolute;inset:0;z-index:30;border:0;padding:0;background:none;cursor:pointer}
-/* низкий экран (844 × 390): шрифты и знаки плотнее */
-.g.sm .hb-id h2{font-size:20px}
+/* низкий экран (844 × 390): шрифты и знаки плотнее; закладки уже, места и значки — мельче */
 .g.sm .hb-pg.l>.hb-lv{width:46px;height:46px}
-.g.sm .hb-pg.l>.hb-nm{font-size:15px}
-.g.sm .hb-rp .tabs button{padding:0 8px}
-.g.sm .hb-vit{display:none}
+.g.sm .hb-pn{font-size:15px}
+.g.sm .hb-plate{min-height:36px;padding:3px 8px 4px}
+.g.sm .hb-stp{width:30px;height:30px}
+.g.sm .hb-rp{--pg-tp:6px;--pg-tf:10px;--pg-tpa:0px;--pg-tab-w:8px 6px 0 6px;--pg-slot:42px;--pg-sg:6px;--pg-gg:14px;--pg-ic:36px;--pg-icg:12px;--pg-abl:9px;--pg-si:24px;--pg-sf:17px;--pg-bf:22px;--pg-wr:28px;--pg-ah:16px;--pg-ai:15px;--pg-atp:3px;--pg-mg:4px;--pg-bmh:28px;--pg-xf:13px;--pg-gv:8px;--pg-rg:3px;--pg-rbh:16px}
+.g.sm .hb-hd .hdv-quiet .st5{gap:6px}
+.g.sm .hb-hd .hdv-quiet .s5 .ico{width:16px;height:16px}
+.g.sm .hb-hd .hdv-quiet .s5 b{font-size:13px}
 
 /* ---------- анимация: открытие, закрытие, перелистывание ----------
    Время — от нажатия: задержки --d-* = момент − прошло (book.js, hbAnimVars). Закрытая книга (.hb-fly) летит от карточки в сетке

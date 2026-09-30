@@ -83,12 +83,13 @@ const LB_ART = {
 const lbArt = p => LB_ART.ready.includes(p);
 const lbSurf = () => (lbArt(LB_ART.img.plank) ? LB_ART.plank : LB_ART.css).surf;
 const lbBand = () => (lbArt(LB_ART.img.cornice) ? LB_ART.cornice : LB_ART.css).band;
-/* нарисованные части шкафа — адреса в переменные <html>, как у книги (book.js): класс у <html> говорит CSS, что рисунок есть */
+/* нарисованные части шкафа — адреса в переменные <html>, как у книги (book.js): класс у <html> говорит CSS, что рисунок есть.
+   Имя флага не должно совпадать с классом элемента: прежний флаг карниза lb-c совпадал с ячейкой полки .lb-c, и её правила ложились на <html> */
 (function lbArtVars() {
   const R = document.documentElement, st = R && R.style, I = LB_ART.img, abs = p => { try { return new URL(AV(p), document.baseURI).href; } catch (_) { return AV(p); } };
   if (!st) return;
   const set = (k, p, cls) => { if (!lbArt(p)) return; try { st.setProperty(k, `url("${abs(p)}")`); if (R.classList) R.classList.add(cls); } catch (_) { } };
-  set('--lb-wall', I.wall, 'lb-w'); set('--lb-plank', I.plank, 'lb-p'); set('--lb-cornice', I.cornice, 'lb-c'); set('--lb-post', I.post, 'lb-s');
+  set('--lb-wall', I.wall, 'lb-w'); set('--lb-plank', I.plank, 'lb-p'); set('--lb-cornice', I.cornice, 'lb-cz'); set('--lb-post', I.post, 'lb-s');
   set('--lb-foot', I.foot, 'lb-f'); set('--lb-bracket', I.bracket, 'lb-b'); set('--lb-lamp', I.lamp, 'lb-l');
 })();
 /* кадр игры: ширина, шахта, шапка и компактный ли он. В песочнице проверок и до первой отрисовки — кадр 932 × 430 (SHELL_SIZE) */

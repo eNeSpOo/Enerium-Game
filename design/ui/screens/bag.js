@@ -320,15 +320,17 @@ function zpHead({ tile, eb = '', name, cr = '', q = null, ql = '', e = null }) {
   const chip = e ? zpNewChip(e) : '';
   return `<div class="zp-head">${tile}<div class="zp-ht">${eb || chip ? `<span class="zp-eb"><span class="eyebrow">${eb}</span>${chip}</span>` : ''}<span class="zp-nm"><b class="serif zp-name">${name}</b>${cr}</span></div>${q == null ? '' : `<div class="zp-q"><b class="num">${q}</b>${ql ? `<small>${ql}</small>` : ''}</div>`}</div>`;
 }
+/* закрытый предмет (спойлер цикла VI) — «ресурс скрыт», свёрток в тумане (resHideIco, screens/art-icons.js); без неё — замок */
+const zpHideIco = () => typeof resHideIco === 'function' ? resHideIco() : ic('lock');
 /* плитка предмета — в рамке своего вида (crK, screens/crafthall.js) */
-const zpItemTile = (it, o = {}) => zpTile(it.team ? ic('lock') : trIcon(it), it.r, Object.assign({ fk: typeof crK === 'function' ? crK(it) : '' }, o));
+const zpItemTile =(it, o = {}) => zpTile(it.team ? zpHideIco() : trIcon(it), it.r, Object.assign({ fk: typeof crK === 'function' ? crK(it) : '' }, o));
 const zpItemEb = it => zpIsCasket(it) ? 'Ларец мастерской' : zpSpec(it.spec) || ZP_KIND[it.tier] || (RX.tiers[it.tier] || { n: 'Предмет' }).n;
 /* цикл и неделя сундука — одной строкой: сундуки одного вида из разных циклов и недель различаются только ими */
 const zpChestWhen = sp => `цикл ${ROMAN[sp.cyc] || sp.cyc}${sp.box === 'shards' && sp.week ? ' · неделя ' + zpWeekGen(sp.week) : ''}`;
 
 /* ================== список ================== */
 function zpIcon(e) {
-  if (e.kind === 'item') return e.it.team ? ic('lock') : trIcon(e.it);
+  if (e.kind === 'item') return e.it.team ? zpHideIco() : trIcon(e.it);
   if (e.kind === 'wallet') return `<img src="${CUR[e.k].img}" alt="">`;
   if (e.kind === 'hero') return rsFace(e.h);
   if (e.kind === 'chest') return zpChestIco(e.cs.box);
@@ -511,7 +513,7 @@ function zpResHtml(L) {
   const tile = (inner, r, q, name, o = {}) => `<div class="zp-rl${o.dust ? ' zp-dust' : ''}" title="${o.tip || name}">${zpTile(inner, r, { lg: true, face: !!o.face, q, cls: o.cls, fk: o.fk })}<small>${name}</small></div>`;
   const cur = Object.entries(s.cur).map(([k, a]) => `<span class="zp-rc" title="${zpCurName(k)}"><img src="${curImg(k)}" alt="${zpCurName(k)}"><b class="num">+${fmt(a)}</b></span>`).join('');
   const tiles = [
-    ...Object.entries(s.items).map(([id, q]) => { const it = BAG.item(id); return it ? tile(it.team ? ic('lock') : trIcon(it), it.r, '×' + fmt(q), trEsc(zpName(it)), { fk: typeof crK === 'function' ? crK(it) : '' }) : ''; }),
+    ...Object.entries(s.items).map(([id, q]) => { const it = BAG.item(id); return it ? tile(it.team ? zpHideIco() : trIcon(it), it.r, '×' + fmt(q), trEsc(zpName(it)), { fk: typeof crK === 'function' ? crK(it) : '' }) : ''; }),
     ...Object.entries(s.shards).map(([id, q]) => { const h = RSI[id], g = h && typeof shardGhost === 'function' ? shardGhost(h, S.rs.shards[id] || 0, zpNeed(), ZP_VIEW.cellArt) : ''; return h ? tile(g || rsFace(h), h.r, '×' + fmt(q), trEsc(h.n), { face: !g, cls: g ? 'art ghost' : '', tip: `Осколки героя: ${trEsc(h.n)} ×${fmt(q)}` }) : ''; }),
     ...Object.entries(s.dust).map(([id, d]) => { const h = RSI[id]; return h ? tile(rsFace(h), h.r, '+' + fmt(d), `${trEsc(h.n)} → прах`, { face: true, dust: true, tip: `${trEsc(h.n)} уже пробуждён: осколки ×${fmt(s.dustQ[id])} → прах +${fmt(d)}` }) : ''; }),
     ...Object.entries(s.extra).map(([k, q]) => { const [xk, id, r] = k.split(':'), a = zpExtraArt(xk, id, ZP_VIEW.cellArt); return tile(a || ic(ZP_EXTRA_IC[xk] || 'gem'), +r, '×' + fmt(q), trEsc(zpExtraName(xk, id, +r)), { cls: a ? 'art' : '' }); }),

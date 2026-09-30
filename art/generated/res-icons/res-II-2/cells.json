@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-II-2__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-ii.json",
+  "job": "res-II-2",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "rn2_2",
+      "file": "art/generated/res-icons/res-II-2/rn2_2.webp",
+      "box": [
+        7,
+        15,
+        442,
+        450
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn2_3",
+      "file": "art/generated/res-icons/res-II-2/rn2_3.webp",
+      "box": [
+        471,
+        15,
+        906,
+        450
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn2_4",
+      "file": "art/generated/res-icons/res-II-2/rn2_4.webp",
+      "box": [
+        935,
+        15,
+        1370,
+        450
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn2_5",
+      "file": "art/generated/res-icons/res-II-2/rn2_5.webp",
+      "box": [
+        1398,
+        15,
+        1833,
+        450
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "vs2",
+      "file": "art/generated/res-icons/res-II-2/vs2.webp",
+      "box": [
+        1861,
+        15,
+        2296,
+        450
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "vr2",
+      "file": "art/generated/res-icons/res-II-2/vr2.webp",
+      "box": [
+        7,
+        478,
+        443,
+        914
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "kr_ru",
+      "file": "art/generated/res-icons/res-II-2/kr_ru.webp",
+      "box": [
+        471,
+        478,
+        906,
+        913
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "fu_dw",
+      "file": "art/generated/res-icons/res-II-2/fu_dw.webp",
+      "box": [
+        935,
+        478,
+        1371,
+        914
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_oil",
+      "file": "art/generated/res-icons/res-II-2/p_oil.webp",
+      "box": [
+        1398,
+        478,
+        1833,
+        913
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_glaze",
+      "file": "art/generated/res-icons/res-II-2/p_glaze.webp",
+      "box": [
+        1861,
+        478,
+        2297,
+        914
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_ration2",
+      "file": "art/generated/res-icons/res-II-2/p_ration2.webp",
+      "box": [
+        7,
+        943,
+        443,
+        1379
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_mortar",
+      "file": "art/generated/res-icons/res-II-2/a_mortar.webp",
+      "box": [
+        471,
+        944,
+        906,
+        1379
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_foundry",
+      "file": "art/generated/res-icons/res-II-2/a_foundry.webp",
+      "box": [
+        935,
+        943,
+        1371,
+        1379
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_bait",
+      "file": "art/generated/res-icons/res-II-2/a_bait.webp",
+      "box": [
+        1398,
+        944,
+        1833,
+        1379
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_eggwax",
+      "file": "art/generated/res-icons/res-II-2/p_eggwax.webp",
+      "box": [
+        1861,
+        943,
+        2297,
+        1379
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_cord",
+      "file": "art/generated/res-icons/res-II-2/p_cord.webp",
+      "box": [
+        7,
+        1407,
+        443,
+        1843
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_apron",
+      "file": "art/generated/res-icons/res-II-2/p_apron.webp",
+      "box": [
+        471,
+        1407,
+        906,
+        1842
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_scroll",
+      "file": "art/generated/res-icons/res-II-2/p_scroll.webp",
+      "box": [
+        935,
+        1407,
+        1371,
+        1843
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_mitt",
+      "file": "art/generated/res-icons/res-II-2/p_mitt.webp",
+      "box": [
+        1398,
+        1407,
+        1833,
+        1842
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_trade",
+      "file": "art/generated/res-icons/res-II-2/a_trade.webp",
+      "box": [
+        1861,
+        1407,
+        2297,
+        1843
+      ],
+      "px": 436,
+      "key_left": 0.0
+    }
+  ]
+}

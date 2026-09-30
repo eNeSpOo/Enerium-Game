@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-VI-6__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-vi.json",
+  "job": "res-VI-6",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "cr_ashbone",
+      "file": "art/generated/res-icons/res-VI-6/cr_ashbone.webp",
+      "box": [
+        8,
+        14,
+        445,
+        451
+      ],
+      "px": 437,
+      "key_left": 0.08539
+    },
+    {
+      "id": "find_cb19",
+      "file": "art/generated/res-icons/res-VI-6/find_cb19.webp",
+      "box": [
+        471,
+        14,
+        908,
+        451
+      ],
+      "px": 437,
+      "key_left": 0.07144
+    },
+    {
+      "id": "find_cb19b",
+      "file": "art/generated/res-icons/res-VI-6/find_cb19b.webp",
+      "box": [
+        933,
+        14,
+        1370,
+        451
+      ],
+      "px": 437,
+      "key_left": 0.09007
+    },
+    {
+      "id": "call_fb19",
+      "file": "art/generated/res-icons/res-VI-6/call_fb19.webp",
+      "box": [
+        1396,
+        14,
+        1833,
+        451
+      ],
+      "px": 437,
+      "key_left": 0.01422
+    },
+    {
+      "id": "tr_fb19",
+      "file": "art/generated/res-icons/res-VI-6/tr_fb19.webp",
+      "box": [
+        1858,
+        14,
+        2295,
+        451
+      ],
+      "px": 437,
+      "key_left": 0.07826
+    },
+    {
+      "id": "tr_fb19a",
+      "file": "art/generated/res-icons/res-VI-6/tr_fb19a.webp",
+      "box": [
+        8,
+        477,
+        446,
+        915
+      ],
+      "px": 438,
+      "key_left": 0.0688
+    },
+    {
+      "id": "call_fb19_aw",
+      "file": "art/generated/res-icons/res-VI-6/call_fb19_aw.webp",
+      "box": [
+        471,
+        477,
+        908,
+        914
+      ],
+      "px": 437,
+      "key_left": 0.04365
+    },
+    {
+      "id": "act_ci6",
+      "file": "art/generated/res-icons/res-VI-6/act_ci6.webp",
+      "box": [
+        933,
+        477,
+        1371,
+        915
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_ci6_crossstone",
+      "file": "art/generated/res-icons/res-VI-6/cr_ci6_crossstone.webp",
+      "box": [
+        1396,
+        477,
+        1833,
+        914
+      ],
+      "px": 437,
+      "key_left": 0.07997
+    },
+    {
+      "id": "cr_ci6_post",
+      "file": "art/generated/res-icons/res-VI-6/cr_ci6_post.webp",
+      "box": [
+        1858,
+        477,
+        2296,
+        915
+      ],
+      "px": 438,
+      "key_left": 0.08039
+    },
+    {
+      "id": "cr_ci6_spear",
+      "file": "art/generated/res-icons/res-VI-6/cr_ci6_spear.webp",
+      "box": [
+        8,
+        941,
+        446,
+        1379
+      ],
+      "px": 438,
+      "key_left": 0.07244
+    },
+    {
+      "id": "cr_ci6_wallshield",
+      "file": "art/generated/res-icons/res-VI-6/cr_ci6_wallshield.webp",
+      "box": [
+        471,
+        941,
+        908,
+        1378
+      ],
+      "px": 437,
+      "key_left": 0.05376
+    },
+    {
+      "id": "cr_ci6_banners",
+      "file": "art/generated/res-icons/res-VI-6/cr_ci6_banners.webp",
+      "box": [
+        933,
+        941,
+        1371,
+        1379
+      ],
+      "px": 438,
+      "key_left": 0.07107
+    },
+    {
+      "id": "cr_ci6_tent",
+      "file": "art/generated/res-icons/res-VI-6/cr_ci6_tent.webp",
+      "box": [
+        1396,
+        941,
+        1833,
+        1378
+      ],
+      "px": 437,
+      "key_left": 0.07497
+    },
+    {
+      "id": "cr_ci6_firstchip",
+      "file": "art/generated/res-icons/res-VI-6/cr_ci6_firstchip.webp",
+      "box": [
+        1858,
+        941,
+        2296,
+        1379
+      ],
+      "px": 438,
+      "key_left": 0.10658
+    },
+    {
+      "id": "cr_ci6_towerstone",
+      "file": "art/generated/res-icons/res-VI-6/cr_ci6_towerstone.webp",
+      "box": [
+        9,
+        1405,
+        445,
+        1841
+      ],
+      "px": 436,
+      "key_left": 0.07889
+    },
+    {
+      "id": "cr_ci6_well",
+      "file": "art/generated/res-icons/res-VI-6/cr_ci6_well.webp",
+      "box": [
+        471,
+        1405,
+        907,
+        1841
+      ],
+      "px": 436,
+      "key_left": 0.08022
+    },
+    {
+      "id": "cr_ci6_draftclay",
+      "file": "art/generated/res-icons/res-VI-6/cr_ci6_draftclay.webp",
+      "box": [
+        934,
+        1405,
+        1370,
+        1841
+      ],
+      "px": 436,
+      "key_left": 0.07778
+    },
+    {
+      "id": "cr_ci6_hound",
+      "file": "art/generated/res-icons/res-VI-6/cr_ci6_hound.webp",
+      "box": [
+        1396,
+        1405,
+        1832,
+        1841
+      ],
+      "px": 436,
+      "key_left": 0.09378
+    },
+    {
+      "id": "cr_ci6_twisted",
+      "file": "art/generated/res-icons/res-VI-6/cr_ci6_twisted.webp",
+      "box": [
+        1859,
+        1405,
+        2295,
+        1841
+      ],
+      "px": 436,
+      "key_left": 0.08616
+    }
+  ]
+}

@@ -1,0 +1,294 @@
+{
+  "name": "Странник — покои в Башне вневремени (слово автора 30.09.2026: «Так же надо прорабатывать Окно странника и так же сделать окна в нём ААА уровня, генери графику какую пожелаешь»). Тема раздела: игрок знает, что Странник пришёл в себя в покоях Башни вневремени — чёрного обелиска без окон и дверей в Эндалоре (дайджест, «Что знает игрок в начале»; глава Летописи «Пробуждение»). Раздел «Странник» — эти покои: «Обзор» — сама комната и ниша с портретом, «Память» — зеркало, осколки которого — пассивки Памяти, «Артефакты» — реликварий, «Достижения» — зал трофеев, «Летопись» — зал с аналоем. Материалы общие: полированный чёрный базальт, старое потемневшее серебро, тонкая инкрустация бледного золота, тёмное дымчатое стекло, свет времени снизу (зелень Энериума и бирюза карста), золотой песок стоит в воздухе — время здесь остановилось. Ремесло — дуб, латунь, пергамент; Странник — базальт, серебро, стекло: разделы не спутать. На арте нет ни текста, ни цифр, ни лиц; всё, что зависит от игрока (редкость, имя, числа), кладёт интерфейс. Спойлеров §38 и дайджеста нет: ни Этриона, ни стёртой памяти, ни того, кто такой Странник.",
+  "plan": {
+    "Залы cb-hall-*": "21:9, 2K, без вырезки: фоны вкладок «Обзор», «Память», «Артефакты», «Достижения», «Летопись»; интерфейс закрывает середину — детали по краям и в глубине, середина тёмная и тихая",
+    "Зеркало Памяти cb-mirror": "16:9, 2K, ключ magenta: рама с углами-застёжками и ровными сторонами, тёмное стекло — для border-image (9 частей); стекло тянется, углы — нет",
+    "Ниша Странника cb-niche": "9:16, 1K, без вырезки: арочная ниша в базальте во весь кадр — колонка Странника (портрет, имя, уровень, кнопки)",
+    "Уголок и герб cb-corner, cb-crest": "1:1, 1K, ключ black: уголок — в четырёх отражениях (craft_layers.py corners); герб — песочные часы с крыльями над зеркалом",
+    "Табличка и карниз cb-plate, cb-ledge": "21:9, 1K, ключ black: табличка — концы с оковкой, середина ровная; карниз — полоса во всю ширину, повторяется (shelf_layers.py strip)",
+    "Медальоны cb-medals": "4:3, 2K, ключ black: двенадцать медальонов 4 × 3 — эмблемы тем достижений, первенства и тайны (craft_layers.py sheet)",
+    "Артефакты cb-arts": "5:4, 4K, пурпурные швы: 20 клеток 5 × 4 — восемнадцать артефактов, закрытый и пустой реликварий; живопись в край, рамку даёт интерфейс (grid_slice.py)",
+    "Частицы cb-fx": "3:2, 1K, ключ black-glow: шесть частиц 3 × 2 — песчинка, блик, щепка стекла, огонёк времени, пылинка, дымка (craft_layers.py sheet)",
+    "Текстуры cb-basalt, cb-vellum": "1:1, 1K, без вырезки: бесшовные (shelf_layers.py tile) — базальт панелей и листов, холодный пергамент страниц Летописи"
+  },
+  "notes": [
+    "Сначала --dry-run, потом запуск с --budget. Каждая картинка смотрится глазами, повторов — не больше двух",
+    "После генерации: craft_layers.py corners / wide / sheet, shelf_layers.py strip / tile, grid_slice.py для артефактов; выгрузка — ui-art.json → design/ui/assets/art/chambers/ и export_ui.py --spec ui-art.json --no-stamp; пути — CB_ART.ready в design/ui/screens/chambers.js"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: dark fantasy game art for a premium mobile RPG — gloomy, ancient, rich, silent and a little uncanny. Hand-painted digital painting: visible confident brush strokes, simplified planes, deep near-black shadows, crisp rim light on edges, rich material detail and masterful craftsmanship. Palette: soot black (#050607, #121518), graphite (#262B31), polished black basalt that gleams like dark glass, old tarnished silver, thin inlays of pale old gold (#D9C38F), dark smoky mirror glass, deep teal-green velvet. Everything is ancient, precious and made by a master: no cheap shine, no plastic, no clean saturated game-UI colors. Light is scarce and precious and comes from below: a soft cold glow of pale green and turquoise crystals (#4FDC8B, #48E5D4) rising from beneath, and a few warm pale-gold highlights. Grains of golden sand float motionless in the air, as if time has stopped. The place is the Tower of Timelessness — a black obelisk without windows or doors, the tallest tower of the floating city of Endalor: tall, cold, silent and timeless. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.",
+  "negative": "No words, no letters, no digits, no numbers, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no labels, no price tags, no handwriting, no watermark, no signature, no logo, no UI elements, no buttons, no border or frame around the whole picture. No skulls, no skeletons, no blood, no gore. No pentagrams, no occult signs, no crosses, no religious symbols, no eyes, no faces. No people, no hands, no creatures. No windows, no sky. No purple or violet light, no neon. No bright polished gold, no glossy plastic shine, no clean bright mobile-game UI look.",
+  "cutout_rule": "The background is one solid flat color {hex}, perfectly even from edge to edge: no gradient, no texture, no floor, no wall, no table under the object, no cast shadow, no vignette, no checkerboard. The object itself never uses this background color. Any glow stays close to the object and fades out within a short distance.",
+  "categories": {
+    "cb-hall": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [
+        "art/style/ref-01-cave-amber-teal.webp",
+        "art/style/ref-02-cave-pillars.webp"
+      ],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a wide cinematic panorama, 21:9, painted edge to edge over the whole frame — no black bars at the top or bottom, no letterbox, no dark border. It is the full-screen background of one window of the game's Wanderer section; the interface lays heavy panels over most of it. So the composition is calm, symmetrical and deep: the viewer stands in the middle of a room and looks straight ahead into the depth, the vanishing point in the center at about 45% of the height. The richest detail lives along the upper edge, along the left and right edges and far away in the depth; the wide middle band, from 20% to 85% of the height, is darker, softer, hazier and low in contrast; the bottom fifth is a dark floor fading into shadow. No figures of any kind. The attached pictures show the painting style, the brushwork and the cold-and-warm light of the game — take only the style from them, not the place."
+    },
+    "cb-frame": {
+      "aspect": "16:9",
+      "size": "2K",
+      "cutout": "magenta",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — ONE large flat rectangular object seen perfectly straight on: orthographic, frontal and level, no perspective, no tilt. It fills about nine tenths of the canvas and is centered, with an even margin of the flat background around it. The whole background is one flat pure magenta (#FF00FF): no wall, no floor, no shadow. The object itself contains no magenta and no pink."
+    },
+    "cb-panel": {
+      "aspect": "9:16",
+      "size": "1K",
+      "refs": [
+        "art/style/ref-02-cave-pillars.webp"
+      ],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a tall vertical game UI panel, 9:16, painted edge to edge over the whole canvas and seen perfectly straight on: orthographic, frontal and level, no perspective, no tilt, perfectly symmetrical left to right. No margin, no background around it: the object fills the canvas from edge to edge. The interface writes its own portrait, name and buttons over the middle of it, so the inside is calm, dark and low in contrast; all the ornament lives at the edges. The attached picture shows only the painting style and the light."
+    },
+    "cb-part": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — one small object, centered, seen perfectly straight on and upright unless the description says otherwise. It floats on pitch black: everything around it is solid pure black, and an empty black margin of at least one tenth of the canvas stays on every side — top, bottom, left and right. It must stay readable at a tiny size, about 24 px: one simple strong silhouette built from a few large shapes, all the painterly detail inside the silhouette; no sparks, embers or particles floating around it. A crisp rim light runs along the outline and separates it from the black."
+    },
+    "cb-strip": {
+      "aspect": "21:9",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — ONE long, perfectly straight horizontal strip, seen straight on from the front, perfectly level, no perspective, no tilt, no bending. It lies in the middle of the canvas; above and below it the canvas is solid pure black. The description says how wide it is and how its ends look."
+    },
+    "cb-sheet": {
+      "aspect": "4:3",
+      "size": "2K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI sheet for a dark fantasy mobile RPG — several separate objects laid out in a strict grid, every object centered in its own equal cell, all seen perfectly straight on and frontal, no perspective. Between the objects and around them the canvas is solid pure black, with wide equal empty black gaps: no object touches another object or the edge of the canvas. Nothing connects the objects: no lines, no shared background, no shadows."
+    },
+    "cb-icons": {
+      "aspect": "5:4",
+      "size": "4K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a sheet of square item icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the picture in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game puts its own frame on top: ONE precious old object, a relic of a collector's treasury, large and centered, resting on dark teal-green velvet in a dark niche of black stone, with a darker vignette toward the edges of the cell. One clear central object with a bold silhouette that stays readable at 48 px. Soft cold pale green and turquoise light rises from below — never a spotlight, never a saturated cone — with warm pale-gold highlights on metal; crisp rim light on the edges of the forms; a few grains of golden sand hang in the light. Loose painterly brush strokes, soft painted edges, never black outlines, never a sticker look. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each icon differs clearly from its neighbours in shape and composition. The attached pictures show only the painting style of the game's icons — do not copy their objects."
+    },
+    "cb-fx": {
+      "aspect": "3:2",
+      "size": "1K",
+      "cutout": "black-glow",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI sheet for a dark fantasy mobile RPG — several separate small light effects laid out in a strict grid, every effect centered in its own equal cell. Between them and around them the canvas is solid pure black, with wide equal empty black gaps: no effect touches another effect or the edge of the canvas."
+    },
+    "cb-texture": {
+      "aspect": "1:1",
+      "size": "1K",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a flat seamless texture for a game UI, seen perfectly straight on, filling the whole canvas edge to edge: no border, no frame, no margin, no perspective, no vignette, no light spot, no shadow falling on it. The texture tiles seamlessly: whatever touches the left edge continues from the right edge, and whatever touches the top edge continues from the bottom edge. Even, calm and low in contrast, and very dark: light text is written over it and must stay readable."
+    }
+  },
+  "jobs": [
+    {
+      "id": "cb-hall-over",
+      "category": "cb-hall",
+      "title": "Покои Странника — комната без окон в Башне вневремени: ложе, плащ на крюке, стол, большие часы в глубине, песок стоит в воздухе",
+      "source": "Дайджест: «Странник приходит в себя в покоях Башни вневремени»; глава Летописи «Пробуждение». Фон вкладки «Странник → Обзор». К выгрузке — design/ui/assets/art/chambers/hall-over.jpg",
+      "subject": "The place: the Wanderer's own chambers inside the Tower of Timelessness — the quiet room where the Wanderer once woke with no memory of the way here. A tall windowless chamber of polished black basalt that gleams like dark glass; thin vertical ribs of inlaid pale old gold climb the walls and meet in a pointed vault lost in darkness. Along the left wall: a narrow bed of dark carved wood with a rumpled grey woolen blanket, a small iron-bound chest at its foot, a worn traveller's cloak of dark cloth with a deep hood hanging empty on an iron hook, a long walking staff leaning beside it. Along the right wall: a heavy writing desk of dark wood with a closed book, a quill in an inkwell and a small hourglass on it; above the desk tall recessed shelves with a few old books and rolled maps. Far in the depth, at the vanishing point, a great hourglass taller than a man stands on a round stone pedestal in a shallow alcove; its golden sand hangs frozen in mid-fall and glows softly. Grains of golden sand float motionless in the air all through the room. A soft pale green and turquoise glow rises from thin cracks in the black floor and from small crystals at the foot of the walls — never a spotlight. Silent and still: the room waits for its owner."
+    },
+    {
+      "id": "cb-hall-mem",
+      "category": "cb-hall",
+      "title": "Зал зеркала Памяти — пустые серебряные рамы по стенам, осколки стекла висят в воздухе",
+      "source": "Значки Памяти — осколки условного зеркала (слово автора 29.09.2026). Фон вкладки «Странник → Память». К выгрузке — design/ui/assets/art/chambers/hall-mem.jpg",
+      "subject": "The place: the Hall of the Mirror of Memory inside the Tower of Timelessness — a round windowless chamber of polished black basalt under a low dome lost in darkness. The curved walls are hung with dozens of empty mirror frames of old tarnished silver, large and small, oval and tall; most frames are empty, some still hold a few jagged shards of dark mirror glass. Many broken shards of mirror glass float motionless in the air around the room at different depths, each catching a faint glint of colored light — cold white, pale gold, turquoise, soft green. Far in the depth, at the vanishing point, a low round stone pedestal stands empty in a faint pool of light. A soft pale green and turquoise glow rises from thin cracks in the floor — never a spotlight. Grains of golden sand hang motionless in the air. Quiet and dreamlike, like a memory half remembered."
+    },
+    {
+      "id": "cb-hall-arts",
+      "category": "cb-hall",
+      "title": "Реликварий — шкафы чёрного дерева в серебре, за стеклом на бархате — диковины",
+      "source": "Артефакты — пассивные умения аккаунта (§14.1). Фон вкладки «Странник → Артефакты». К выгрузке — design/ui/assets/art/chambers/hall-arts.jpg",
+      "subject": "The place: the Reliquary of the Tower of Timelessness — a long vaulted treasury of polished black basalt where curious and precious things are kept. Along both walls rise tall cabinets of black wood bound in old tarnished silver, with doors of old glass; behind the glass, on shelves lined with dark teal-green velvet, rests a scattered collection of curious objects, each in its own softly lit niche: an old lantern, a brass bell, a ring of keys, a silver chalice, a rolled map, a small casket, an hourglass, a seal on a chain. Far in the depth, at the vanishing point, a tall narrow door of black iron bound in silver, closed. Soft pale green and turquoise light rises from the floor and from small crystals at the foot of the cabinets — never a spotlight; a few warm pale-gold glints shine on the silver. Grains of golden sand hang in the still air."
+    },
+    {
+      "id": "cb-hall-ach",
+      "category": "cb-hall",
+      "title": "Зал трофеев — стяги, щиты и медальоны без знаков, лавровый венец в глубине",
+      "source": "Достижения и первенства сервера (§29). Фон вкладки «Странник → Достижения». К выгрузке — design/ui/assets/art/chambers/hall-ach.jpg",
+      "subject": "The place: the Hall of Honours of the Tower of Timelessness — a tall hall of polished black basalt with a ribbed vault lost in darkness. Along both walls hang long faded banners of dark cloth — deep teal, dark red, faded blue — their lower edges cut into points and fringed with tarnished gold; under them, on the black stone, rows of blank shields and blank round medallions of bronze and silver, crossed old spears and swords, a great curved horn, laurel wreaths of dull gold on iron hooks. Low stone pedestals along the walls carry trophies: an old helmet, a silver cup, a gauntlet. Far in the depth, at the vanishing point, a tall arch with a laurel crown of dull gold resting on a pedestal, lit from below. Soft pale green and turquoise light rises from cracks in the floor — never a spotlight; warm pale-gold glints on the metal. Grains of golden sand hang motionless in the air. Every shield, medallion and banner is blank: no emblems, no writing."
+    },
+    {
+      "id": "cb-hall-chron",
+      "category": "cb-hall",
+      "title": "Зал Летописи — книжные стены до свода, в глубине аналой с огромной раскрытой книгой",
+      "source": "Летопись — книга знаний (§28.3). Фон вкладки «Странник → Летопись». К выгрузке — design/ui/assets/art/chambers/hall-chron.jpg",
+      "subject": "The place: the Chronicle Room of the Tower of Timelessness — a tall quiet reading hall of polished black basalt. Along both walls rise immense shelves of dark wood packed with ancient books, scroll racks and bundles of rolled parchments, reaching up into the darkness; tall library ladders lean on them; small hourglasses stand on the shelves among the books. Far in the depth, at the vanishing point, on a low round dais, stands a great lectern of carved black stone holding one huge open book whose blank pages give off a soft pale light that rises into the dark. Soft pale green and turquoise light rises from thin cracks in the floor — never a spotlight. Dust and grains of golden sand hang motionless in the still air. The books have plain spines: no titles, no writing anywhere."
+    },
+    {
+      "id": "cb-mirror",
+      "category": "cb-frame",
+      "title": "Зеркало Памяти — рама старого серебра с углами-застёжками, ровные стороны, тёмное пустое стекло",
+      "source": "Вкладка «Память»: пять мест Памяти — осколки в стекле зеркала; окно «Вспомнить». Рамка ложится border-image (9 частей): углы не тянутся, стороны и стекло тянутся — поэтому на сторонах нет украшений посередине. К выгрузке — design/ui/assets/art/chambers/mirror.webp",
+      "subject": "The object: the Mirror of Memory — a wide rectangular mirror about twice as wide as it is tall. Its frame is a heavy molding of dark old tarnished silver, about one twelfth of the mirror's height thick, with a thin inlaid line of pale old gold along its inner edge and fine repeating beading along its outer edge; along each of the four sides the molding is calm and exactly the same all along its length — no ornament in the middle of any side. Only the four corners are ornate: at each corner a square silver clasp with a small raised hourglass in its center and curling leaves. Inside the frame: the mirror glass — dark smoky grey-blue glass, almost black, deep like still water at night, with soft faint reflections of light near its lower edge and a few thin hairline cracks; the glass is empty — nothing and no one is reflected in it, no room, no figure."
+    },
+    {
+      "id": "cb-niche",
+      "category": "cb-panel",
+      "title": "Ниша Странника — арочная ниша в базальте во весь кадр: портрет, имя и кнопки колонки Странника",
+      "source": "Колонка Странника во всех вкладках раздела и примерка «Облика». К выгрузке — design/ui/assets/art/chambers/niche.jpg",
+      "subject": "The object: a tall arched niche carved into a wall of polished black basalt, filling the whole canvas. A raised molding of dark old tarnished silver with a thin inlaid line of pale old gold runs up both sides of the canvas and bends into a round arch whose top touches the upper part of the canvas; the four corners of the canvas outside the arch are plain polished black basalt. At the top of the arch sits a small keystone shaped like an hourglass. Inside the arch: a deep, smooth, dark recess of black stone, calm and plain, softly lit from below by a faint pale green and turquoise glow that fades upward; a few grains of golden sand hang motionless in the dark. At the bottom, across the whole width, a flat ledge of basalt with a thin silver edge."
+    },
+    {
+      "id": "cb-corner",
+      "category": "cb-part",
+      "title": "Уголок оковки — старое серебро с песочными часами в углу (выгружается в четырёх отражениях)",
+      "source": "Уголки панелей, листов и окон раздела «Странник». К выгрузке — design/ui/assets/art/chambers/corner-tl…br.png",
+      "subject": "The object: one ornate corner fitting for a precious box or a book cover — an L-shaped piece of dark old tarnished silver with a thin inlaid line of pale old gold along both arms: a small raised hourglass sits in the corner itself, framed by two curling leaves; one round rivet near the end of each arm. The corner of the L points to the TOP LEFT of the canvas: one arm runs along the top toward the right, the other runs down along the left side; both arms are equally long and narrow. Seen perfectly flat and straight on."
+    },
+    {
+      "id": "cb-crest",
+      "category": "cb-part",
+      "title": "Герб Покоев — песочные часы между крыльями, старое серебро (над зеркалом и в шапке окон)",
+      "source": "Вершина зеркала Памяти и шапки окон раздела. К выгрузке — design/ui/assets/art/chambers/crest.png",
+      "aspect": "16:9",
+      "subject": "The object: a small crest ornament of dark old tarnished silver — an hourglass standing upright between two outspread stylized wings; inside the glass of the hourglass a little golden sand glows softly; thin lines of pale old gold run along the feathers. Perfectly symmetrical left to right, frontal and wide: about two and a half times wider than it is tall."
+    },
+    {
+      "id": "cb-plate",
+      "category": "cb-strip",
+      "title": "Серебряная табличка — концы с оковкой, середина ровная (растягивается под надпись)",
+      "source": "Заголовки вкладок раздела: «Пятёрка сильнейших», «Память Странника», «Реликварий», «Зал трофеев». К выгрузке — design/ui/assets/art/chambers/plate.webp",
+      "subject": "The strip: a horizontal nameplate of dark old tarnished silver set on polished black basalt — a long flat plate with a thin raised border of pale old gold along all its edges; each end finishes in a small ornate cap with a tiny raised hourglass; the long middle part between the caps is calm, plain, flat and perfectly uniform, darker toward its center, with no ornament at all (the game writes a title there). The plate takes about four fifths of the canvas width and one sixth of its height, centered."
+    },
+    {
+      "id": "cb-ledge",
+      "category": "cb-strip",
+      "title": "Карниз из базальта с серебряной кромкой — на нём стоят книги пятёрки; повторяется по горизонтали",
+      "source": "«Обзор»: пятёрка сильнейших стоит книгами на карнизе. К выгрузке — design/ui/assets/art/chambers/ledge.png (shelf_layers.py strip)",
+      "subject": "The strip: the front edge of a long shelf ledge of polished black basalt, seen straight from the front — one long, perfectly straight horizontal band: its top third is the flat top surface of the ledge seen slightly from above, dark and softly gleaming, and its lower two thirds are the front face, bordered above and below by thin moldings of dark old tarnished silver with fine beading and a thin inlaid line of pale old gold. It runs across the whole width of the canvas: its left and right ends are cut off by the edges of the canvas, so copies placed side by side continue seamlessly; it takes about one fifth of the canvas height. Its detail repeats evenly along its length: nothing special happens in the middle or near the ends. A faint cold turquoise light touches its lower edge from below."
+    },
+    {
+      "id": "cb-medals",
+      "category": "cb-sheet",
+      "title": "Медальоны зала трофеев — эмблемы тем достижений, первенства и тайны, 4 × 3",
+      "source": "Карточки достижений: тема — эмблема медальона (WN.ach.groups), первенство — венец, тайна — замок. К выгрузке — design/ui/assets/art/chambers/medal-<тема>.png (craft_layers.py sheet)",
+      "subject": "The sheet: TWELVE round medallions in a grid of four columns and three rows. All twelve are exactly the same size, perfectly round and perfectly frontal; the gaps of solid pure black between them and around them are wide and equal — each gap at least a quarter of a medallion's width. Each medallion is a thick round medal of dark old tarnished silver with a raised rim of pale old gold, and in its center one bold raised relief emblem of silver that reads at a tiny size of about 32 px — a single simple strong shape; soft light catches the relief from below. The twelve emblems, top row from left to right: (1) a lantern hanging on a short chain; (2) a big old key with a round bow; (3) a hammer resting on an anvil; (4) a bell with three curved rings of sound spreading from it. Middle row from left to right: (5) an hourglass; (6) an eight-pointed compass star; (7) a thick closed book with a clasp; (8) a solid five-pointed star inside a small laurel wreath. Bottom row from left to right: (9) an amulet with a round moonstone hanging on a cord; (10) a crown of laurel leaves; (11) a closed padlock; (12) a laurel wreath open at the top."
+    },
+    {
+      "id": "cb-arts",
+      "category": "cb-icons",
+      "title": "Артефакты — восемнадцать диковин реликвария, закрытый и пустой реликварий, сеткой 5 × 4",
+      "source": "Таблица артефактов автора (18 записей, EN_WANDERER.art.list, §14.1). Порядок клеток — порядок данных. К выгрузке — design/ui/assets/art/chambers/art-<id>.webp (grid_slice.py)",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "a1",
+          "art-a1"
+        ],
+        [
+          "a2",
+          "art-a2"
+        ],
+        [
+          "a3",
+          "art-a3"
+        ],
+        [
+          "a4",
+          "art-a4"
+        ],
+        [
+          "a5",
+          "art-a5"
+        ],
+        [
+          "a6",
+          "art-a6"
+        ],
+        [
+          "a7",
+          "art-a7"
+        ],
+        [
+          "a8",
+          "art-a8"
+        ],
+        [
+          "a9",
+          "art-a9"
+        ],
+        [
+          "a10",
+          "art-a10"
+        ],
+        [
+          "a12",
+          "art-a12"
+        ],
+        [
+          "a13",
+          "art-a13"
+        ],
+        [
+          "a14",
+          "art-a14"
+        ],
+        [
+          "a15",
+          "art-a15"
+        ],
+        [
+          "a16",
+          "art-a16"
+        ],
+        [
+          "a18",
+          "art-a18"
+        ],
+        [
+          "a19",
+          "art-a19"
+        ],
+        [
+          "a20",
+          "art-a20"
+        ],
+        [
+          "lock",
+          "art-lock"
+        ],
+        [
+          "none",
+          "art-none"
+        ]
+      ],
+      "subject": "The palette of this sheet: dark old tarnished silver, aged bronze and brass, dark wood, worn leather, old glass, deep teal-green velvet, black stone; small accents of pale green and turquoise light, soft pale gold on metal. These are precious curiosities of a collector's treasury — each one old, heavy and made by a master.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: a heavy round bronze seal stamp on a short handle, its face turned toward us with a raised relief of a road winding between two mountains toward an open gate; a simple wooden casket bound with dark iron, its lid ajar, lumps of raw ore and a few pale crystals inside; a richer casket of black wood bound in silver with small curved horns on its lid, open, warm golden light spilling from inside; a worn leather hunter's purse tied with a cord, gold coins spilling out of it and a long animal fang hanging from the cord as a charm; a stoppered glass flask in a silver cage, inside it swirling wisps of pale green mist curling like whispers.\n\nRow 2: a silver chalice on a tall stem, cold pale blue flames of souls rising softly from its cup; a ring of old iron holding a bundle of slender lockpicks and thin keys; one single ornate lockpick-key of pale gold with a bow shaped like a small crown and a green jewel set in it; a brass magnifying loupe held above a small heap of old trinkets — a button, a ring, a coin, a bead; a small round hand mirror in a silver frame, its glass filled with a spiral of ghostly pale light, nothing reflected in it.\n\nRow 3: a small wooden notice board on two legs with several blank parchment notes pinned to it with iron nails; three dice of old yellowed bone with small round dots lying beside a feather quill; a small striped caravan tent of faded teal and dark red cloth with a lantern glowing at its open entrance; an old map partly unrolled, a winding red line of a road drawn across it past tiny mountains, a small brass compass lying on it; a wooden signpost with two blank arrow-shaped boards pointing two different ways over a forking path.\n\nRow 4: a long merchant's scroll partly unrolled, small painted pictures of goods on it — a bottle, a key, a gem — and no writing; a brass shop bell hanging from a curled iron bracket; a pair of brass merchant scales with a small stack of coins on one pan and a gem on the other; a small object completely hidden under a dark velvet cloth tied with a silver cord; an empty glass reliquary case with silver corners standing on dark velvet, nothing inside."
+    },
+    {
+      "id": "cb-fx",
+      "category": "cb-fx",
+      "title": "Частицы Покоев — песчинка, блик, щепка стекла, огонёк времени, пылинка, дымка",
+      "source": "Частицы раздела: песок стоит в воздухе, стекло зеркала, свет времени. К выгрузке — design/ui/assets/art/chambers/fx-<вид>.png (craft_layers.py sheet)",
+      "subject": "The sheet: SIX small light effects for game particles in a grid of three columns and two rows, each centered in its own equal cell, with wide empty gaps of solid pure black between them. Top row, from left to right: (1) a single grain of golden sand glowing softly, a tiny warm point of light; (2) a four-pointed star glint with thin long rays, pale silver-white with a faint green tint; (3) a tiny thin sliver of broken mirror glass catching a bright silver edge of light. Bottom row, from left to right: (4) a soft round mote of pale green light, blurred at the edges; (5) a soft round mote of pale golden light, blurred at the edges; (6) a single curling wisp of pale grey-green mist."
+    },
+    {
+      "id": "cb-basalt",
+      "category": "cb-texture",
+      "title": "Полированный чёрный базальт с прожилками бледного золота — бесшовная текстура панелей и листов",
+      "source": "Панели, листы и окна раздела «Странник». К выгрузке — design/ui/assets/art/chambers/basalt.jpg (shelf_layers.py tile)",
+      "subject": "The texture: polished black basalt — a very dark grey-black stone surface filling the canvas: subtle darker mottling and a faint cloudy depth like dark glass, a few very thin meandering veins of pale old gold and hairline veins of dull silver, a soft uneven tone from #0B0D0F to #181B1F. Calm and low in contrast."
+    },
+    {
+      "id": "cb-vellum",
+      "category": "cb-texture",
+      "title": "Холодный тёмный пергамент — бесшовная текстура страницы Летописи",
+      "source": "Страница главы Летописи, письма. К выгрузке — design/ui/assets/art/chambers/vellum.jpg (shelf_layers.py tile)",
+      "subject": "The texture: the surface of an old sheet of parchment dyed a cold deep grey-blue-black, seen perfectly flat and filling the canvas edge to edge. Only the material itself: subtle mottled grain, faint fibers, a few tiny pale scratches and soft creases, a soft uneven tone from #0D0F12 to #1B1E22, a very faint dust of tiny silver specks. Absolutely uniform over the whole canvas: the same density of detail everywhere, no light, no glow, no bright spot, no crystals, no sparkles, no stars, no smoke, no objects, no darker or lighter center, no vignette. Calm and low in contrast."
+    }
+  ]
+}

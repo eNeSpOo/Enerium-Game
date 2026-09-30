@@ -78,3 +78,12 @@
   clip-path:polygon(50% 0,100% 23%,100% 77%,50% 100%,0 77%,0 23%)}
 .tl-kmarks{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 2px}
 .tl-kmarks .tl-t{--ts:36px}
+/* ---------- иконки ресурсов сеткой (resArt, trIcon в index.html) ----------
+   Живопись в край: окно рамки вида (crafthall.css) — 72 % колодца, иконка вписывается в него целиком. Номер руны предела — в левом нижнем углу:
+   справа внизу стоит количество, слева вверху — точка «новое» и кристалл редкости */
+.res-art{object-fit:cover}
+.res-gl{display:none}
+.tr-big{position:relative}
+:is(.well,.zp-cell,.zp-ic,.lv-ic,.lv-big,.tr-big,.co-ti)>.res-gl{display:block;position:absolute;left:9%;bottom:6%;z-index:2;pointer-events:none;
+  font:700 11px/1 var(--f-d);color:var(--gold);text-shadow:0 1px 2px #000,0 0 4px #000,0 0 8px #000}
+:is(.lv-big,.tr-big)>.res-gl,.ws-core>.res-gl{font-size:15px}

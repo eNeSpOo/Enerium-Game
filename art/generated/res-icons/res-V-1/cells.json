@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-V-1__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-v.json",
+  "job": "res-V-1",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "k9_hunt",
+      "file": "art/generated/res-icons/res-V-1/k9_hunt.webp",
+      "box": [
+        10,
+        16,
+        447,
+        453
+      ],
+      "px": 437,
+      "key_left": 0.0
+    },
+    {
+      "id": "k9_tail",
+      "file": "art/generated/res-icons/res-V-1/k9_tail.webp",
+      "box": [
+        473,
+        16,
+        909,
+        452
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "k9_eng",
+      "file": "art/generated/res-icons/res-V-1/k9_eng.webp",
+      "box": [
+        936,
+        17,
+        1371,
+        452
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "k9_alch",
+      "file": "art/generated/res-icons/res-V-1/k9_alch.webp",
+      "box": [
+        1397,
+        17,
+        1832,
+        452
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "k9_ench",
+      "file": "art/generated/res-icons/res-V-1/k9_ench.webp",
+      "box": [
+        1858,
+        16,
+        2295,
+        453
+      ],
+      "px": 437,
+      "key_left": 0.0
+    },
+    {
+      "id": "k9_smith",
+      "file": "art/generated/res-icons/res-V-1/k9_smith.webp",
+      "box": [
+        10,
+        479,
+        446,
+        915
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "u9",
+      "file": "art/generated/res-icons/res-V-1/u9.webp",
+      "box": [
+        473,
+        479,
+        909,
+        915
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "rc_b9",
+      "file": "art/generated/res-icons/res-V-1/rc_b9.webp",
+      "box": [
+        936,
+        479,
+        1371,
+        914
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "mc_b9",
+      "file": "art/generated/res-icons/res-V-1/mc_b9.webp",
+      "box": [
+        1397,
+        479,
+        1832,
+        914
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "mt_b9",
+      "file": "art/generated/res-icons/res-V-1/mt_b9.webp",
+      "box": [
+        1858,
+        479,
+        2294,
+        915
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "k10_hunt",
+      "file": "art/generated/res-icons/res-V-1/k10_hunt.webp",
+      "box": [
+        10,
+        941,
+        447,
+        1378
+      ],
+      "px": 437,
+      "key_left": 0.0
+    },
+    {
+      "id": "k10_tail",
+      "file": "art/generated/res-icons/res-V-1/k10_tail.webp",
+      "box": [
+        473,
+        941,
+        909,
+        1377
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "k10_eng",
+      "file": "art/generated/res-icons/res-V-1/k10_eng.webp",
+      "box": [
+        936,
+        942,
+        1371,
+        1377
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "k10_alch",
+      "file": "art/generated/res-icons/res-V-1/k10_alch.webp",
+      "box": [
+        1397,
+        942,
+        1832,
+        1377
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "k10_ench",
+      "file": "art/generated/res-icons/res-V-1/k10_ench.webp",
+      "box": [
+        1858,
+        941,
+        2295,
+        1378
+      ],
+      "px": 437,
+      "key_left": 0.0
+    },
+    {
+      "id": "k10_smith",
+      "file": "art/generated/res-icons/res-V-1/k10_smith.webp",
+      "box": [
+        10,
+        1404,
+        446,
+        1840
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "u10",
+      "file": "art/generated/res-icons/res-V-1/u10.webp",
+      "box": [
+        473,
+        1404,
+        909,
+        1840
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "rc_b10",
+      "file": "art/generated/res-icons/res-V-1/rc_b10.webp",
+      "box": [
+        936,
+        1404,
+        1371,
+        1839
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "mc_b10",
+      "file": "art/generated/res-icons/res-V-1/mc_b10.webp",
+      "box": [
+        1397,
+        1404,
+        1832,
+        1839
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "mt_b10",
+      "file": "art/generated/res-icons/res-V-1/mt_b10.webp",
+      "box": [
+        1858,
+        1404,
+        2294,
+        1840
+      ],
+      "px": 436,
+      "key_left": 0.0
+    }
+  ]
+}

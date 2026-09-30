@@ -189,20 +189,22 @@ if (TL && window.EnBattle) {
 const tlCore = f => f.lib ? 'В бою прототипа действует.' : `В бою прототипа пока не действует: нужен примитив ядра «${f.need}» — ${TL.rules.needs[f.need]}.`;
 
 /* ================== вид ================== */
-/* место в карточке героя: медальон с артом семейства (tlTile) и короткое значение; пустое — плюс.
-   Нажатие открывает окно «Снаряжение героя» на этом месте */
-function tlSlotBtn(h, i, no, sel) {
-  const t = no ? `${tlName(no)} · ${RAR[tlR(no)].toLowerCase()}: ${tlFx(no)}` : `Место ${i + 1}: пусто`;
-  return `<button class="tl-slot${no ? ' on' : ''}${sel ? ' sel' : ''}" ${no ? `data-r="${tlR(no)}"` : ''} data-a="sheet" data-v="tal:${h.id}:${i}" aria-label="${trEsc(t)}" title="${trEsc(t)}">${no ? `${tlTile(no)}<b class="num">${tlShort(no)}</b>` : ic('plus')}</button>`;
+/* место талисмана на странице «Снаряжение» книги героя: огранённый медальон цвета редкости с иконкой линейки (tlTile) и короткое
+   значение под ним; пустое — пустая оправа и подпись «талисман»: туда кладут талисман, нажатие — окно «Снаряжение героя» на этом месте;
+   в запасах есть подходящий — стрелка в углу (up — план «Надеть лучшее», grPlanOf в screens/hero-dev.js) */
+function tlSlotBtn(h, i, no, sel, up) {
+  const t = (no ? `${tlName(no)} · ${RAR[tlR(no)].toLowerCase()}: ${tlFx(no)}` : `Место талисмана ${i + 1}: пусто — нажмите, чтобы выбрать талисман`) + (up ? ' · в запасах есть подходящий' : '');
+  return `<button class="tl-slot${no ? ' on' : ' none'}${sel ? ' sel' : ''}${up ? ' up' : ''}" ${no ? `data-r="${tlR(no)}"` : ''} data-a="sheet" data-v="tal:${h.id}:${i}" aria-label="${trEsc(t)}" title="${trEsc(t)}"><span class="tl-w">${no ? tlTile(no) : ic('plus')}</span>${up ? `<i class="eq-up" aria-hidden="true">${ic('up')}</i>` : ''}<b class="tl-cap${no ? ' num' : ''}">${no ? tlShort(no) || '✓' : 'талисман'}</b></button>`;
 }
-/* ряд из четырёх мест во вкладке «Снаряжение» карточки героя: зовёт heroDetail в index.html */
+/* четыре места талисманов на странице «Снаряжение» книги героя — сеткой 2 × 2 рядом со снаряжением, над ней — рубрика с мощью от
+   талисманов: зовёт heroDetail в index.html */
 function talRow(h) {
   if (!TL || !S.tal) return '';
-  if (!tlOpen()) return `<div class="tl-row"><span class="eyebrow">Духовные талисманы</span><p class="reason">${ic('lock')} Откроются во втором цикле — вместе с кланами.</p></div>`;
+  if (!tlOpen()) return `<div class="tl-row shut"><p class="pg-rub"><span>Духовные талисманы</span></p><p class="reason">${ic('lock')} Откроются во втором цикле — вместе с кланами.</p></div>`;
   const P = BM.parts(h), m = P.mul.tal || TLB, d = m - TLB;
+  const plan = typeof grPlanOf === 'function' ? grPlanOf(h) : null, up = new Set(plan ? plan.tal.map(x => x.i) : []);
   const chip = tlWorn(h.id).length ? `<span class="chip${d > 0 ? ' spirit' : ''}" title="${tmT('Боевая мощь от талисманов', `Боевая мощь от талисманов: база ${fmt(P.base)} × ${tlX(m)}`)}">${ICON('power', 13, 'Боевая мощь')}${tlPct(d)}</span>` : '';
-  return `<div class="tl-row"><div class="row"><span class="eyebrow">Духовные талисманы</span><span class="g-spacer"></span>${chip}</div>
-    <div class="tl-slots">${tlEq(h.id).map((no, i) => tlSlotBtn(h, i, no)).join('')}</div></div>`;
+  return `<div class="tl-row"><p class="pg-rub"><span>Талисманы</span>${chip}</p><div class="tl-slots">${tlEq(h.id).map((no, i) => tlSlotBtn(h, i, no, false, up.has(i))).join('')}</div></div>`;
 }
 /* строка эффекта со значком — сумма бонусов, карточка талисмана */
 const tlFxRow = no => `<div class="tl-fx">${tlTile(no)}<span><b>${tlName(no)}</b><small>${tlFx(no)}</small></span></div>`;

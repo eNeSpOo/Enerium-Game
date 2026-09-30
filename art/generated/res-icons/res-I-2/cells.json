@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-I-2__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-i.json",
+  "job": "res-I-2",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "rn1_1",
+      "file": "art/generated/res-icons/res-I-2/rn1_1.webp",
+      "box": [
+        7,
+        15,
+        438,
+        446
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn1_2",
+      "file": "art/generated/res-icons/res-I-2/rn1_2.webp",
+      "box": [
+        469,
+        15,
+        900,
+        446
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn1_3",
+      "file": "art/generated/res-icons/res-I-2/rn1_3.webp",
+      "box": [
+        937,
+        15,
+        1368,
+        446
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn1_4",
+      "file": "art/generated/res-icons/res-I-2/rn1_4.webp",
+      "box": [
+        1405,
+        15,
+        1836,
+        446
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn1_5",
+      "file": "art/generated/res-icons/res-I-2/rn1_5.webp",
+      "box": [
+        1867,
+        15,
+        2297,
+        445
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "vs1",
+      "file": "art/generated/res-icons/res-I-2/vs1.webp",
+      "box": [
+        7,
+        477,
+        438,
+        908
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "vr1",
+      "file": "art/generated/res-icons/res-I-2/vr1.webp",
+      "box": [
+        463,
+        471,
+        906,
+        914
+      ],
+      "px": 443,
+      "key_left": 0.0
+    },
+    {
+      "id": "kr_el",
+      "file": "art/generated/res-icons/res-I-2/kr_el.webp",
+      "box": [
+        930,
+        470,
+        1375,
+        915
+      ],
+      "px": 445,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_clay",
+      "file": "art/generated/res-icons/res-I-2/p_clay.webp",
+      "box": [
+        1399,
+        471,
+        1842,
+        914
+      ],
+      "px": 443,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_brew",
+      "file": "art/generated/res-icons/res-I-2/p_brew.webp",
+      "box": [
+        1867,
+        478,
+        2297,
+        908
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_lamp",
+      "file": "art/generated/res-icons/res-I-2/a_lamp.webp",
+      "box": [
+        7,
+        947,
+        438,
+        1378
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_cast",
+      "file": "art/generated/res-icons/res-I-2/a_cast.webp",
+      "box": [
+        463,
+        941,
+        906,
+        1384
+      ],
+      "px": 443,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_tonic",
+      "file": "art/generated/res-icons/res-I-2/a_tonic.webp",
+      "box": [
+        930,
+        940,
+        1375,
+        1385
+      ],
+      "px": 445,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_remedy",
+      "file": "art/generated/res-icons/res-I-2/a_remedy.webp",
+      "box": [
+        1399,
+        941,
+        1842,
+        1384
+      ],
+      "px": 443,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_thorn",
+      "file": "art/generated/res-icons/res-I-2/p_thorn.webp",
+      "box": [
+        1867,
+        948,
+        2297,
+        1378
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_stonewater",
+      "file": "art/generated/res-icons/res-I-2/p_stonewater.webp",
+      "box": [
+        7,
+        1414,
+        438,
+        1845
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_ration",
+      "file": "art/generated/res-icons/res-I-2/a_ration.webp",
+      "box": [
+        465,
+        1410,
+        904,
+        1849
+      ],
+      "px": 439,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_balsam",
+      "file": "art/generated/res-icons/res-I-2/p_balsam.webp",
+      "box": [
+        933,
+        1410,
+        1372,
+        1849
+      ],
+      "px": 439,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_healstone",
+      "file": "art/generated/res-icons/res-I-2/a_healstone.webp",
+      "box": [
+        1401,
+        1410,
+        1840,
+        1849
+      ],
+      "px": 439,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_print",
+      "file": "art/generated/res-icons/res-I-2/p_print.webp",
+      "box": [
+        1867,
+        1414,
+        2297,
+        1844
+      ],
+      "px": 430,
+      "key_left": 0.0
+    }
+  ]
+}

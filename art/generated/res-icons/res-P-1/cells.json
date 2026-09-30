@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-P-1__nb2-v2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-p.json",
+  "job": "res-P-1",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "resin",
+      "file": "art/generated/res-icons/res-P-1/resin.webp",
+      "box": [
+        7,
+        13,
+        436,
+        442
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "mushroom",
+      "file": "art/generated/res-icons/res-P-1/mushroom.webp",
+      "box": [
+        472,
+        13,
+        902,
+        443
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "acid",
+      "file": "art/generated/res-icons/res-P-1/acid.webp",
+      "box": [
+        938,
+        13,
+        1367,
+        442
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "ash",
+      "file": "art/generated/res-icons/res-P-1/ash.webp",
+      "box": [
+        1403,
+        13,
+        1832,
+        442
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "salt",
+      "file": "art/generated/res-icons/res-P-1/salt.webp",
+      "box": [
+        1869,
+        14,
+        2297,
+        442
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "vial",
+      "file": "art/generated/res-icons/res-P-1/vial.webp",
+      "box": [
+        7,
+        480,
+        436,
+        909
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "sand",
+      "file": "art/generated/res-icons/res-P-1/sand.webp",
+      "box": [
+        472,
+        479,
+        902,
+        909
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "dormite",
+      "file": "art/generated/res-icons/res-P-1/dormite.webp",
+      "box": [
+        938,
+        480,
+        1367,
+        909
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "runechip",
+      "file": "art/generated/res-icons/res-P-1/runechip.webp",
+      "box": [
+        1403,
+        480,
+        1832,
+        909
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "crystal",
+      "file": "art/generated/res-icons/res-P-1/crystal.webp",
+      "box": [
+        1869,
+        480,
+        2297,
+        908
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "ink",
+      "file": "art/generated/res-icons/res-P-1/ink.webp",
+      "box": [
+        7,
+        947,
+        436,
+        1376
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "candle",
+      "file": "art/generated/res-icons/res-P-1/candle.webp",
+      "box": [
+        472,
+        946,
+        902,
+        1376
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "spring",
+      "file": "art/generated/res-icons/res-P-1/spring.webp",
+      "box": [
+        938,
+        947,
+        1367,
+        1376
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "plank",
+      "file": "art/generated/res-icons/res-P-1/plank.webp",
+      "box": [
+        1403,
+        947,
+        1832,
+        1376
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "mechpart",
+      "file": "art/generated/res-icons/res-P-1/mechpart.webp",
+      "box": [
+        1869,
+        947,
+        2297,
+        1375
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "nail",
+      "file": "art/generated/res-icons/res-P-1/nail.webp",
+      "box": [
+        7,
+        1414,
+        436,
+        1843
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "bracket",
+      "file": "art/generated/res-icons/res-P-1/bracket.webp",
+      "box": [
+        472,
+        1414,
+        902,
+        1844
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "gear",
+      "file": "art/generated/res-icons/res-P-1/gear.webp",
+      "box": [
+        938,
+        1414,
+        1367,
+        1843
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "thread",
+      "file": "art/generated/res-icons/res-P-1/thread.webp",
+      "box": [
+        1403,
+        1414,
+        1832,
+        1843
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "dye",
+      "file": "art/generated/res-icons/res-P-1/dye.webp",
+      "box": [
+        1869,
+        1415,
+        2297,
+        1843
+      ],
+      "px": 428,
+      "key_left": 0.0
+    }
+  ]
+}

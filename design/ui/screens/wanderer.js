@@ -21,7 +21,11 @@
    transform и opacity, без фильтров в кадре. «Пропустить анимацию» помнит localStorage (без него всё работает), при
    prefers-reduced-motion анимации нет. Эффекты пассивок, артефактов и достижений — показ: в расчёты прототипа не входят (§2.8).
    Числа баланса — в данных, числа вида — WN_VIEW, демо-состояние — WN_DEMO. Служебное — только команде: TM, PL, tmT.
-   Автопроверка — tools/content-gen/screens/check_wanderer.js. */
+   Вид раздела — покои в Башне вневремени (слово автора 30.09.2026 — «окна ААА уровня»; зал, материалы и окна — screens/chambers.js):
+   колонка — ниша с портретом и постамент; «Обзор» — пятёрка на карнизе и таблички рейтингов; «Память» — зеркало с пятью осколками в
+   стекле; «Артефакты» — витрины реликвария с вещью каждого артефакта (WN_ART.relic); «Достижения» — таблички с медальонами тем
+   (WN_ART.medal). Иконки и медальоны до выгрузки рисует CSS.
+   Автопроверки — tools/content-gen/screens/check_wanderer.js и check_chambers.js (покои). */
 'use strict';
 
 const WN = window.EN_WANDERER || null;
@@ -88,6 +92,14 @@ const WN_ART = {
   empty: 'memory/shard-empty.png',  // пустое место: тёмное стекло, памяти ещё нет
   ready: ['memory/shard-r1.png', 'memory/shard-r2.png', 'memory/shard-r3.png', 'memory/shard-r4.png', 'memory/shard-r5.png',
     'memory/shard-r6.png', 'memory/shard-r7.png', 'memory/shard-empty.png'],   // выгруженные пути: выгрузка 29.09.2026
+  /* иконки артефактов реликвария — своя вещь на бархате в нише, живопись в край, рамку даёт интерфейс (art-lock — вещь под покрывалом:
+     артефакты ещё не открыты); медальоны зала трофеев — тема достижения (WN.ach.groups), first — венец первенства, myst — замок тайны.
+     Задание — tools/art-gen/jobs/wanderer-chambers.json, выгрузка assets/art/chambers/ (лист артефактов — grid_slice.py, медальоны —
+     craft_layers.py sheet). До выгрузки — значок интерфейса в круге CSS */
+  relic: 'chambers/art-{id}.webp',
+  medal: 'chambers/medal-{g}.png',
+  icons: ['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'a9', 'a10', 'a12', 'a13', 'a14', 'a15', 'a16', 'a18', 'a19', 'a20', 'lock'].map(k => `chambers/art-${k}.webp`)
+    .concat(['descent', 'guard', 'craft', 'echo', 'week', 'wand', 'heroes', 'valor', 'souls', 'first', 'myst'].map(k => `chambers/medal-${k}.png`)),   // выгрузка 30.09.2026
 };
 
 /* ================== демо-состояние: данные, не код ==================
@@ -535,6 +547,16 @@ const wnGem = (cls = '') => `<span class="wn-gem ${cls}"><span class="wn-crys"><
 const wnIcon = (r, st = 'lock') => (wnArtOn(r) ? `<img class="wn-shi" src="${AV(wnArt(r))}" alt="" decoding="async" draggable="false">` : wnGem(r ? '' : st));
 /* значок в своей рамке: свет за осколком и сам осколок. cls — размер (xs, sm, md) или место (sl) */
 const wnIco = (r, cls = '', st) => `<span class="wn-ico${cls ? ' ' + cls : ''}"${r ? ` data-r="${r}"` : ''} aria-hidden="true"><span class="wn-glow"></span><span class="wn-whole">${wnIcon(r, st)}</span></span>`;
+/* вещь реликвария — иконка артефакта (id) или вещь под покрывалом ('lock'); медальон зала трофеев — тема достижения, 'first', 'myst'.
+   Нет выгрузки — значок интерфейса в круге CSS, без битой картинки */
+const wnIconOn = p => WN_ART.icons.includes(p);
+const wnRelic = id => { const p = WN_ART.relic.replace('{id}', id); return wnIconOn(p) ? `<img src="${AV(p)}" alt="" loading="lazy" decoding="async" draggable="false">` : `<i class="wn-relic-c">${ic(id === 'lock' ? 'lock' : 'gem')}</i>`; };
+function wnMedal(g) {
+  const p = WN_ART.medal.replace('{g}', g);
+  if (wnIconOn(p)) return `<img class="wn-medal" src="${AV(p)}" alt="" loading="lazy" decoding="async" draggable="false">`;
+  const G = (WN && WN.ach.groups[g]) || {};
+  return g === 'first' ? ic('crown') : g === 'myst' ? ic('lock') : G.icon ? ICON(G.icon, 18, '') : ic(G.ic || 'star');
+}
 /* живые огоньки: сколько — по редкости или n; места — детерминированно, без случайности в разметке */
 const wnMotes = (r, n = WN_VIEW.motes[r] || 0) => (n ? `<span class="wn-motes" aria-hidden="true">${Array.from({ length: n }, (_, k) => `<i style="--x:${(k * 37 + 11) % 88 + 6}%;--d:${(k * 430) % 2600}ms;--t:${2200 + (k % 3) * 500}ms"></i>`).join('')}</span>` : '');
 /* карта варианта: рамка тёмного стекла; свет редкости — слой .wn-lit; значок, редкость, имя, категория; лучи и огоньки — по редкости.
@@ -561,16 +583,19 @@ function wnCard(p, o = {}) {
     ${old}<span class="wn-lit" aria-hidden="true"></span><span class="wn-rays" aria-hidden="true"></span>${bray}${wnMotes(p.r)}${ico}
     ${rar(p.r)}<b class="wn-cn">${p.n}</b><small class="wn-cc">${p.cat}</small>${mfl}<span class="wn-gl" aria-hidden="true"></span></${tag}>`;
 }
-/* колонка Странника — та же, что у «Обзора»: облик и имя (лист «Облик» — ниже, lkIdHead), уровень, цикл, опыт, клан, облик, друзья
-   и настройки. Команде — демо-цикл экрана. У «Друзей» — число входящих заявок (screens/social.js) */
+/* колонка Странника — та же во всех вкладках: ниша в стене покоев (screens/chambers.js) — облик и имя (лист «Облик» — ниже, lkIdHead),
+   уровень и цикл; под нишей — постамент: опыт песком (лист уровня), клан, облик, друзья, настройки и Летопись. Команде — демо-цикл
+   экрана. У «Друзей» — число входящих заявок (screens/social.js) */
 function wnIdCol() {
   const pct = Math.round(S.acc.xp / S.acc.next * 100), c = wnCyc(), fr = typeof socIncoming === 'function' ? socIncoming() : 0;
   const demo = TM(`<div class="wn-demo"><span>Демо: цикл экрана</span><div class="row">${[1, 2, 3, 4, 5, 6].map(k => `<button class="wn-dc" data-a="wncyc" data-v="${k}" aria-pressed="${k === c}">${ROMAN[k]}</button>`).join('')}</div></div>`);
   return `<div class="pnl idc">${lkIdHead()}
-    <div class="row" style="gap:6px"><span class="chip gold">уровень ${S.acc.level}</span><span class="chip">цикл ${ROMAN[c]}</span></div>
-    <button class="lvlbtn" data-a="sheet" data-v="level"><span class="row" style="justify-content:space-between;width:100%"><span class="faint" style="font-size:12px">опыт</span><span class="num" style="font-size:12px">${fmt(S.acc.xp)} / ${fmt(S.acc.next)}</span></span>${bar(pct)}</button>
-    <button class="link" data-a="go" data-v="clan">${ic('shield')}${S.clan.n}</button>${demo}
-    <div class="wn-ibs"><button class="btn sm" data-a="sheet" data-v="look">${ic('eye')}Облик</button><button class="btn sm lk-frb" data-a="sheet" data-v="friends" aria-label="Друзья${fr ? `: заявок ${fr}` : ''}">${ic('users')}Друзья${bdgN(fr)}</button><button class="btn sm" data-a="dlg" data-v="settings">${ic('gear')}Настройки</button><button class="btn sm" data-a="go" data-v="chronicle">${ic('book')}Летопись</button></div></div>`;
+    <span class="wn-idl">уровень <b class="num">${S.acc.level}</b><i aria-hidden="true"></i>цикл ${ROMAN[c]}</span>
+    <div class="wn-idp">${demo}
+      <button class="lvlbtn" data-a="sheet" data-v="level"><span class="wn-xpl"><span>опыт</span><span class="num">${fmt(S.acc.xp)} / ${fmt(S.acc.next)}</span></span>${bar(pct, 'sand')}</button>
+      <button class="link wn-clan" data-a="go" data-v="clan">${ic('shield')}${S.clan.n}</button>
+      <div class="wn-ibs"><button class="btn sm" data-a="sheet" data-v="look">${ic('eye')}Облик</button><button class="btn sm lk-frb" data-a="sheet" data-v="friends" aria-label="Друзья${fr ? `: заявок ${fr}` : ''}">${ic('users')}Друзья${bdgN(fr)}</button><button class="btn sm" data-a="dlg" data-v="settings">${ic('gear')}Настройки</button><button class="btn sm" data-a="go" data-v="chronicle">${ic('book')}Летопись</button></div>
+    </div></div>`;
 }
 
 /* ================== Память: пять мест ==================
@@ -594,9 +619,11 @@ function wnMemTab() {
   const M = S.mem, c = wnCyc(), set = wnPinned(M).length, week = M.resetWeek === wnWeek();
   const note = c < WN.mem.places[0] ? `Цикл I — обучение: первое место откроется в цикле ${ROMAN[WN.mem.places[0]]}.`
     : week ? `Сброс уже был на этой неделе. Следующий — через ${dur(S.week.left)}.` : 'Место открывается в каждом новом цикле. Полный сброс — раз в неделю расы.';
-  return `<div class="pnl pad col wn-mem">
-      <div class="row"><h2 class="serif gold" style="font-size:22px">Память Странника</h2><span class="g-spacer"></span><span class="faint num">${set} / ${WN.mem.places.length}</span></div>
-      <div class="wn-slots">${M.slots.map(wnSlot).join('')}</div>
+  /* зеркало Памяти (screens/chambers.js — рама и стекло): табличка на верхней раме, пять мест — осколки в стекле; под зеркалом — полка */
+  return `<div class="col wn-mem">
+      <div class="wn-mir"><i class="wn-glass" aria-hidden="true"></i><i class="wn-gleam" aria-hidden="true"></i>
+        <h2 class="wn-plt">Память Странника<span class="num">${set} / ${WN.mem.places.length}</span></h2>
+        <div class="wn-slots">${M.slots.map(wnSlot).join('')}</div></div>
       <div class="row wn-mfoot"><p class="reason">${note}</p><span class="g-spacer"></span>
         <button class="btn sm" data-a="sheet" data-v="wncat">${ic('book')}Каталог</button>
         <button class="btn sm" data-a="dlg" data-v="memreset"${set ? '' : ' disabled'}>Полный сброс${costTag('enerium', WN.mem.reset)}</button></div>
@@ -661,7 +688,7 @@ function wnMemWindow(o) {
   const skip = `<label class="wn-skip"${red ? ' title="В системе включено «меньше движения»"' : ''}><input type="checkbox" data-a="wnskip"${wnSkipOn() ? ' checked' : ''}${red ? ' disabled' : ''}><span>Пропустить анимацию</span></label>`;
   const team = TM(`Тройка № ${off.n} места ${i + 1} ${off.paid ? 'за Энериум — без пассивок «только бесплатно»' : 'бесплатная'}: решена сервером до анимации, сид ${off.seed}, на вариант два броска — редкость, затем вес.`, 'p', 'reason');
   return `<div class="ov wn-ov${M.still ? ' still' : ''}" role="dialog" aria-modal="true" aria-label="Место Памяти · цикл ${ROMAN[x.c]}">${busy ? '<div class="ov-scrim"></div>' : '<button class="ov-scrim" data-a="close" aria-label="Закрыть" tabindex="-1"></button>'}
-    <div class="dlg fit wn-dlg"><div class="dlg-h"><div class="col" style="gap:2px"><span class="eyebrow">Вспомнить одно из трёх</span><h2>Место Памяти · цикл ${ROMAN[x.c]}</h2></div><button class="link wn-tocat" data-a="sheet" data-v="wncat"${busy ? ' disabled' : ''}>${ic('book')}Каталог</button><button class="iconbtn x" data-a="close" aria-label="Закрыть">${ic('x')}</button></div>
+    <div class="dlg fit wn-dlg"><i class="wn-crest" aria-hidden="true"></i><div class="dlg-h"><div class="col" style="gap:2px"><span class="eyebrow">Вспомнить одно из трёх</span><h2>Место Памяти · цикл ${ROMAN[x.c]}</h2></div><button class="link wn-tocat" data-a="sheet" data-v="wncat"${busy ? ' disabled' : ''}>${ic('book')}Каталог</button><button class="iconbtn x" data-a="close" aria-label="Закрыть">${ic('x')}</button></div>
       <div class="dlg-b wn-b"><div class="wn-three${busy ? ' busy' : ''}">${cards}</div>${busy ? '<div class="wn-det wn-wait"><p class="faint">Память возвращается…</p></div>' : wnPickPanel(off, M.pick)}${team}</div>
       <div class="dlg-f wn-f">${skip}<span class="g-spacer"></span>${roll}<button class="btn go" data-a="wnpin" data-v="${i}:${off.n}:${M.pick}:${op}"${busy ? ' disabled' : ''}>Вспомнить</button></div>
       ${lack ? `<p class="reason warn wn-lack">Не хватает Энериума на переброс: нужно ${fmt(cost)}, есть ${fmt(bal)}.</p>` : ''}</div>
@@ -674,7 +701,7 @@ function wnLeaveWindow(L, x) {
   const cards = L.ids.map((id, k) => (k === L.k ? wnCard(wnP(id), { k, id: 'wnCard' + k, sel: true, cls: ' go' })
     : wnCard(wnP(id), { k, id: 'wnCard' + k, brk: { bk: -el, h: wnViewHash(L.i + ':' + L.n, k) } }))).join('');
   return `<div class="ov wn-ov leave" role="dialog" aria-modal="true" aria-label="Место Памяти · цикл ${ROMAN[x.c]}" style="--bk:${-el}ms;--brk:${V.breakMs}ms"><div class="ov-scrim"></div>
-    <div class="dlg fit wn-dlg"><div class="dlg-h"><div class="col" style="gap:2px"><span class="eyebrow">Вспомнить одно из трёх</span><h2>Место Памяти · цикл ${ROMAN[x.c]}</h2></div><button class="iconbtn x" data-a="close" aria-label="Закрыть">${ic('x')}</button></div>
+    <div class="dlg fit wn-dlg"><i class="wn-crest" aria-hidden="true"></i><div class="dlg-h"><div class="col" style="gap:2px"><span class="eyebrow">Вспомнить одно из трёх</span><h2>Место Памяти · цикл ${ROMAN[x.c]}</h2></div><button class="iconbtn x" data-a="close" aria-label="Закрыть">${ic('x')}</button></div>
       <div class="dlg-b wn-b"><div class="wn-three busy">${cards}</div><div class="wn-det wn-wait" data-r="${p.r}"><p class="faint">«${p.n}» занимает место цикла ${ROMAN[x.c]}…</p></div></div>
       <div class="dlg-f wn-f"><span class="g-spacer"></span><button class="btn go" disabled>Вспомнить</button></div></div></div>`;
 }
@@ -689,20 +716,20 @@ function wnArtAct(a) {
   if (L >= cap) return `<span class="chip" title="Следующий уровень — в цикле ${ROMAN[a.from + L]}">${ic('hour')}${ROMAN[L + 1]} — в цикле ${ROMAN[a.from + L]}</span>`;
   return `<button class="btn sm" data-a="wnup" data-v="${a.id}:${op}"${S.wallet.souls < wnUpCost(a) ? ' disabled' : ''}>Улучшить${costTag('souls', wnUpCost(a))}</button>`;
 }
-/* карточка артефакта — чистый вид: L — уровень (−1 — не куплен), cap — потолок цикла, lock — цикл ещё не наступил, act — действие */
+/* карточка артефакта — витрина реликвария, чистый вид: вещь в нише на бархате (wnRelic), режим, имя, эффект за уровень и «сейчас»;
+   внизу — отметки уровней и одно действие. L — уровень (−1 — не куплен), cap — потолок цикла, lock — цикл ещё не наступил, act — действие */
 function wnArtView(a, L, cap, lock, act) {
   const pips = Array.from({ length: a.lv }, (_, k) => `<i class="${k < L ? 'on' : k < cap ? 'can' : ''}"></i>`).join('');
   return `<div class="wn-art${lock ? ' lock' : L < 0 ? ' new' : ''}">
-    <button class="wn-an" data-a="sheet" data-v="wnart:${a.id}"><span class="eyebrow">${a.mode}</span><b>${a.n}</b><small class="wn-ad">${a.d}</small></button>
-    <div class="row wn-alv"><span class="wn-pips" title="Уровень ${L > 0 ? ROMAN[L] : 0} из ${ROMAN[a.lv]}">${pips}</span><span class="g-spacer"></span><b class="num wn-now" title="${a.what}">${lock || L < 0 ? '' : wnArtNow(a, L)}</b></div>
-    <div class="wn-aft">${act}</div></div>`;
+    <button class="wn-an" data-a="sheet" data-v="wnart:${a.id}"><span class="wn-relic">${wnRelic(a.id)}</span><span class="wn-at"><span class="eyebrow">${a.mode}</span><b>${a.n}</b><small class="wn-ad">${a.d}</small>${lock || L < 0 ? '' : `<small class="wn-now" title="${a.what}">сейчас <b class="num">${wnArtNow(a, L)}</b></small>`}</span></button>
+    <div class="row wn-alv"><span class="wn-pips" title="Уровень ${L > 0 ? ROMAN[L] : 0} из ${ROMAN[a.lv]}">${pips}</span><span class="g-spacer"></span><span class="wn-aft">${act}</span></div></div>`;
 }
 const wnArtCard = a => wnArtView(a, wnLv(a.id), wnCap(a), wnCyc() < a.from, wnArtAct(a));
 function wnArtTab() {
-  if (!wnArtOpen()) return `<div class="pnl pad col"><h2 class="serif gold" style="font-size:22px">Артефакты</h2><p class="muted">Артефакты откроются на ${WN.art.rules.openLevel}-м уровне Странника.</p></div>`;
+  if (!wnArtOpen()) return `<div class="col wn-arts wn-shut"><span class="wn-relic">${wnRelic('lock')}</span><h2 class="wn-plt">Реликварий</h2><p class="muted">Артефакты откроются на ${WN.art.rules.openLevel}-м уровне Странника.</p></div>`;
   const L = WN.art.list, own = L.filter(a => wnLv(a.id) >= 0).length;
   return `<div class="col wn-arts">
-      <div class="row"><span class="eyebrow">Пассивные умения аккаунта</span><span class="faint num">${own} / ${L.length}</span><span class="g-spacer"></span><span class="reason">Покупка — золотом, уровни — душами, не выше одного за цикл</span></div>
+      <div class="row wn-arh"><h2 class="wn-plt">Реликварий<span class="num">${own} / ${L.length}</span></h2><span class="g-spacer"></span><span class="reason">Пассивные умения аккаунта: покупка — золотом, уровни — душами, не выше одного за цикл</span></div>
       <div class="wn-grid three scroll grow" data-keep="wnarts">${L.map(wnArtCard).join('')}</div>
       ${TM(`<p class="reason">Таблица автора — 18 артефактов (в правилах — 26). Цена уровня = база × номер уровня; потолок уровня — цикл − цикл открытия + 1. Эффекты — показ, в расчёты не входят. Правки под систему — в листе артефакта.</p>`)}
     </div>`;
@@ -719,8 +746,8 @@ const wnCat = id => WN.ach.cats.find(c => c.id === id) || WN.ach.cats[0];
 const wnHidden = a => a.cat === 'myst' && !wnGot(a.id) && !wnReady(a);   // таинственное: условие и прогресс скрыты до выполнения (§29)
 const wnPas = a => (WN.ach.kinds[a.pk] ? wnForm(WN.ach.kinds[a.pk].t, a.v) : '');
 const wnUnit = (a, n) => { const M = WN.ach.metrics[a.m]; return M ? plural(n, ...M.u) : ''; };
-/* значок темы: из набора значков (ICON), где он есть, иначе знак интерфейса */
-const wnGrpIco = g => { const G = WN.ach.groups[g] || {}; return G.icon ? ICON(G.icon, 18, '') : ic(G.ic || 'star'); };
+/* значок темы — медальон зала трофеев (wnMedal); до выгрузки — значок из набора (ICON) или знак интерфейса */
+const wnGrpIco = g => wnMedal(g);
 /* серии категории: ступени по порядку; текущая — первая не полученная, у пройденной серии — последняя */
 function wnSeries(cat) {
   const by = new Map();
@@ -755,7 +782,7 @@ const wnSteps = (steps, cur, gotOf = a => wnGot(a.id)) => `<span class="wn-steps
 /* карточка достижения — чистый вид: hidden — тайна до выполнения, got, ready, p — прогресс, op — номер операции для «Получить»,
    steps — ступени серии (у одиночного — нет), gotOf — какие ступени получены (по умолчанию — состояние аккаунта). Не больше двух чисел, двух меток и одного действия (правила воздуха) */
 function wnFeatView(a, { hidden, got, ready, p, op, steps, gotOf }) {
-  if (hidden) return `<button class="wn-feat hid" data-a="sheet" data-v="wnfeat:${a.id}"><span class="wn-fh"><span class="wn-fi">${ic('lock')}</span><span class="col"><b class="wn-fn">Тайна</b><span class="quote">${a.hint}</span></span></span></button>`;
+  if (hidden) return `<button class="wn-feat hid" data-a="sheet" data-v="wnfeat:${a.id}"><span class="wn-fh"><span class="wn-fi">${wnMedal('myst')}</span><span class="col"><b class="wn-fn">Тайна</b><span class="quote">${a.hint}</span></span></span></button>`;
   const act = got ? `<span class="chip gold">${ic('check')}получено</span>` : ready ? `<button class="btn go sm" data-a="wnclaim" data-v="${a.id}:${op}">Получить</button>` : wnNums(a, p);
   return `<div class="wn-feat${got ? ' got' : ready ? ' ready' : ''}" data-r="${a.r}">
     <button class="wn-fh" data-a="sheet" data-v="wnfeat:${a.id}"><span class="wn-fi">${wnGrpIco(a.g)}</span><span class="col"><b class="wn-fn">${a.n}</b><small class="wn-fd">${a.d}</small></span></button>
@@ -770,19 +797,21 @@ function wnFirstView(f, h, got, op) {
   const mine = h === '@';
   const st = mine ? (got ? `<span class="chip gold">${ic('crown')}твоё</span>` : `<button class="btn go sm" data-a="wnclaim" data-v="${f.id}:${op}">Забрать сундук</button>`)
     : h ? `<span class="chip">${ic('flag')}${wnEsc(h)}</span>` : '<span class="chip spirit">свободно</span>';
-  return `<div class="wn-first${mine ? ' mine' : h ? ' taken' : ''}"><button class="wn-fh" data-a="sheet" data-v="wnfeat:${f.id}"><span class="wn-fi">${ic('crown')}</span><span class="col"><b class="wn-fn">${f.n}</b><small class="wn-fd">${f.d}</small></span></button><div class="row wn-ff">${st}</div></div>`;
+  return `<div class="wn-first${mine ? ' mine' : h ? ' taken' : ''}"><button class="wn-fh" data-a="sheet" data-v="wnfeat:${f.id}"><span class="wn-fi">${wnMedal('first')}</span><span class="col"><b class="wn-fn">${f.n}</b><small class="wn-fd">${f.d}</small></span></button><div class="row wn-ff">${st}</div></div>`;
 }
 const wnFirstRow = f => wnFirstView(f, S.wn.ach.first[f.id], wnGot(f.id), wnOp());
 function wnAchTab() {
   const cur = wnCat(S.seg.wnach).id, all = WN.ach.list;
   const tab = c => { const l = c.id === 'first' ? WN.ach.firsts.filter(f => f.c <= wnCyc()) : all.filter(a => a.cat === c.id), got = l.filter(a => c.id === 'first' ? S.wn.ach.first[a.id] === '@' : wnGot(a.id)).length;
     return `<button role="tab" aria-selected="${c.id === cur}" data-a="seg" data-v="wnach:${c.id}">${c.n}<span class="wn-tc">${got}/${l.length}</span></button>`; };
-  const head = `<div class="row"><div class="tabs" role="tablist" aria-label="Достижения">${WN.ach.cats.map(tab).join('')}</div><span class="g-spacer"></span><button class="link" data-a="sheet" data-v="wnpas">Пассивки ${ic('chev')}</button></div>`;
+  /* «Пассивки» — в строке описания раздела, а не рядом с вкладками: на 844 × 390 вкладкам нужна вся ширина, ссылка не уходит за край */
+  const head = `<div class="row"><div class="tabs" role="tablist" aria-label="Достижения">${WN.ach.cats.map(tab).join('')}</div></div>`;
+  const pas = `<button class="link" data-a="sheet" data-v="wnpas">Пассивки ${ic('chev')}</button>`;
   const team = TM('<p class="reason">Каталог — черновик: tools/content-gen/wanderer/achievements.js, когда получают — прогон achievements-pace.js по калькуляторам экономики; таблицы — docs/content/достижения.md. Сундук — строка режима «Достижения» в lootboxes.js по циклу получения. Эффекты — показ, в расчёты не входят.</p>');
   if (cur === 'first') {
     const past = wnCyc() > 1 ? `<button class="link" data-a="sheet" data-v="wnfame">Слава прошлых циклов ${ic('chev')}</button>` : '';
     return `<div class="col wn-ach">${head}
-      <div class="row"><p class="reason">${wnCat(cur).d} · цикл ${ROMAN[wnCyc()]}</p><span class="g-spacer"></span>${past}</div>
+      <div class="row wn-achd"><p class="reason">${wnCat(cur).d} · цикл ${ROMAN[wnCyc()]}</p><span class="g-spacer"></span>${past}${pas}</div>
       <div class="wn-firsts scroll grow" data-keep="wnach:first">${WN.ach.firsts.filter(f => f.c === wnCyc()).map(wnFirstRow).join('')}</div>${team}</div>`;
   }
   const S2 = wnSeries(cur), open = S2.filter(x => !x.done), ready = open.filter(x => wnReady(x.cur));
@@ -798,7 +827,7 @@ function wnAchTab() {
   const gotBox = got.length ? `<section class="wn-sec"><button class="wn-gotbar" data-a="seg" data-v="wngot:${unfold ? 0 : 1}" aria-expanded="${unfold}">${ic('check')}<span>Получено · ${got.length}</span><span class="g-spacer"></span>${ic(unfold ? 'up' : 'down')}</button>${unfold ? `<div class="wn-gotl">${got.map(wnGotRow).join('')}</div>` : ''}</section>` : '';
   const body = sec('Можно получить', ready) + sec('Ближайшие', near) + (cur === 'myst' ? sec('Тайны', rest) : groups.map(g => sec(WN.ach.groups[g].n, rest.filter(x => x.cur.g === g))).join('')) + gotBox;
   return `<div class="col wn-ach">${head}
-      <p class="reason">${wnCat(cur).d}</p>
+      <div class="row wn-achd"><p class="reason">${wnCat(cur).d}</p><span class="g-spacer"></span>${pas}</div>
       <div class="wn-achb scroll grow" data-keep="wnach:${cur}">${body || '<p class="faint">Всё получено.</p>'}</div>${team}
     </div>`;
 }
@@ -1440,14 +1469,16 @@ function lkIdHead() {
   return `<button class="lk-idb" data-a="sheet" data-v="look" aria-label="Облик: рамка, портрет, частицы и имя" title="Облик">${lkAva(L, { px: LK_VIEW.sizes.id })}</button>
     <h2 class="serif lk-idn">${lkEsc(L.nick)}</h2>${L.sex ? '' : '<button class="btn sm go" data-a="dlg" data-v="lksex">Кто вы?</button>'}`;
 }
-/* «Обзор»: колонка Странника, пятёрка сильнейших и рейтинги недели (§2.2, §33.4) */
+/* «Обзор» — покои (screens/chambers.js): колонка Странника; пятёрка сильнейших книгами на карнизе, над ней — табличка с суммой мощи;
+   ниже — рейтинги недели табличками на стене, у каждой — знак режима (§2.2, §33.4) */
+const lkRankIco = n => { const m = (window.WEEK_MODES || []).find(x => x.n === n); return m && typeof m.icon === 'number' ? `<img src="${PATH(m.icon)}" alt="" loading="lazy" decoding="async">` : `<i>${ic('flag')}</i>`; };
 function lkOverview() {
   const top5 = [...(typeof hrMine === 'function' ? hrMine() : S.heroes)].sort((a, b) => b.bm - a.bm).slice(0, 5);   // все герои аккаунта, мощь — BM.hero
-  const body = `<div class="col" style="min-height:0">
-      <div class="pnl pad col" style="gap:8px"><div class="row"><h2 class="serif gold" style="font-size:20px">Пятёрка сильнейших</h2><span class="g-spacer"></span><b class="bm sq-bm" title="Сумма боевой мощи пятёрки">${ICON('power', 20, 'Боевая мощь')}<span class="num">${fmt(BM.squad(top5.map(h => h.id)))}</span></b></div>
-        <div class="sq-slots">${top5.map(h => heroCard(h, { act: 'hero-open' })).join('')}</div></div>
-      <div class="pnl pad col grow" style="gap:6px;min-height:0"><div class="row"><h2 class="serif gold" style="font-size:20px">Рейтинги недели</h2><span class="g-spacer"></span><span class="faint" style="font-size:12px">текущий период</span></div>
-        <div class="ranks">${S.ranks.map(([n, p, s]) => `<button class="rk" data-a="sheet" data-v="rank:${n}" ${p ? '' : 'disabled'}><span>${n}</span><b class="num">${p ? '#' + p : '—'}</b><small>${s}</small></button>`).join('')}</div></div>
+  const body = `<div class="col wn-ov">
+      <section class="wn-five"><h2 class="wn-plt">Пятёрка сильнейших<b class="bm sq-bm" title="Сумма боевой мощи пятёрки">${ICON('power', 18, 'Боевая мощь')}<span class="num">${fmt(BM.squad(top5.map(h => h.id)))}</span></b></h2>
+        <div class="wn-shelf"><div class="sq-slots">${top5.map(h => heroCard(h, { act: 'hero-open' })).join('')}</div></div></section>
+      <section class="wn-wk"><div class="row wn-wkh"><span class="eyebrow">Рейтинги недели</span><span class="g-spacer"></span><small class="faint">текущий период</small></div>
+        <div class="ranks">${S.ranks.map(([n, p, s]) => `<button class="rk" data-a="sheet" data-v="rank:${n}" ${p ? '' : 'disabled'}><span class="rk-i">${lkRankIco(n)}</span><span>${n}</span><b class="num">${p ? '#' + p : '—'}</b><small>${s}</small></button>`).join('')}</div></section>
     </div>`;
   return { title: 'Странник', seg: wnSeg(), html: `<section class="scr"><div class="pf wn-pf">${wnIdCol()}${body}</div></section>` };
 }

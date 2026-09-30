@@ -1,0 +1,156 @@
+{
+  "sheet": "art/generated/res-icons/res-V-9__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-v.json",
+  "job": "res-V-9",
+  "grid": [
+    4,
+    3
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "cr_ci5_bird",
+      "file": "art/generated/res-icons/res-V-9/cr_ci5_bird.webp",
+      "box": [
+        26,
+        20,
+        583,
+        577
+      ],
+      "px": 557,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_ci5_bat",
+      "file": "art/generated/res-icons/res-V-9/cr_ci5_bat.webp",
+      "box": [
+        623,
+        20,
+        1180,
+        577
+      ],
+      "px": 557,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_ci5_socket",
+      "file": "art/generated/res-icons/res-V-9/cr_ci5_socket.webp",
+      "box": [
+        1220,
+        20,
+        1777,
+        577
+      ],
+      "px": 557,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_ci5_plate",
+      "file": "art/generated/res-icons/res-V-9/cr_ci5_plate.webp",
+      "box": [
+        1817,
+        20,
+        2374,
+        577
+      ],
+      "px": 557,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_ci5_seal",
+      "file": "art/generated/res-icons/res-V-9/cr_ci5_seal.webp",
+      "box": [
+        25,
+        614,
+        584,
+        1173
+      ],
+      "px": 559,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_ci5",
+      "file": "art/generated/res-icons/res-V-9/find_ci5.webp",
+      "box": [
+        623,
+        615,
+        1181,
+        1173
+      ],
+      "px": 558,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_ci5b",
+      "file": "art/generated/res-icons/res-V-9/find_ci5b.webp",
+      "box": [
+        1219,
+        614,
+        1778,
+        1173
+      ],
+      "px": 559,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fc5",
+      "file": "art/generated/res-icons/res-V-9/call_fc5.webp",
+      "box": [
+        1816,
+        614,
+        2375,
+        1173
+      ],
+      "px": 559,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fc5",
+      "file": "art/generated/res-icons/res-V-9/tr_fc5.webp",
+      "box": [
+        26,
+        1213,
+        583,
+        1770
+      ],
+      "px": 557,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fc5a",
+      "file": "art/generated/res-icons/res-V-9/tr_fc5a.webp",
+      "box": [
+        623,
+        1213,
+        1180,
+        1770
+      ],
+      "px": 557,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fc5_aw",
+      "file": "art/generated/res-icons/res-V-9/call_fc5_aw.webp",
+      "box": [
+        1220,
+        1213,
+        1777,
+        1770
+      ],
+      "px": 557,
+      "key_left": 0.0
+    },
+    {
+      "id": "chest_tal5",
+      "file": "art/generated/res-icons/res-V-9/chest_tal5.webp",
+      "box": [
+        1817,
+        1213,
+        2374,
+        1770
+      ],
+      "px": 557,
+      "key_left": 0.0
+    }
+  ]
+}

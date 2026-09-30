@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-V-4__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-v.json",
+  "job": "res-V-4",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "p_mosswool",
+      "file": "art/generated/res-icons/res-V-4/p_mosswool.webp",
+      "box": [
+        19,
+        26,
+        446,
+        453
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_huntkit",
+      "file": "art/generated/res-icons/res-V-4/a_huntkit.webp",
+      "box": [
+        479,
+        26,
+        906,
+        453
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_frozenhunt",
+      "file": "art/generated/res-icons/res-V-4/a_frozenhunt.webp",
+      "box": [
+        938,
+        26,
+        1365,
+        453
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_c21spoils",
+      "file": "art/generated/res-icons/res-V-4/a_c21spoils.webp",
+      "box": [
+        1398,
+        26,
+        1825,
+        453
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "act_cb6",
+      "file": "art/generated/res-icons/res-V-4/act_cb6.webp",
+      "box": [
+        1858,
+        26,
+        2285,
+        453
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_rope",
+      "file": "art/generated/res-icons/res-V-4/cr_rope.webp",
+      "box": [
+        19,
+        485,
+        446,
+        912
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_vein",
+      "file": "art/generated/res-icons/res-V-4/cr_vein.webp",
+      "box": [
+        479,
+        485,
+        906,
+        912
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_shard",
+      "file": "art/generated/res-icons/res-V-4/cr_shard.webp",
+      "box": [
+        938,
+        485,
+        1365,
+        912
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_chisel",
+      "file": "art/generated/res-icons/res-V-4/cr_chisel.webp",
+      "box": [
+        1398,
+        485,
+        1825,
+        912
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_glowmoss",
+      "file": "art/generated/res-icons/res-V-4/cr_glowmoss.webp",
+      "box": [
+        1858,
+        485,
+        2285,
+        912
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_seekbell",
+      "file": "art/generated/res-icons/res-V-4/cr_seekbell.webp",
+      "box": [
+        18,
+        944,
+        446,
+        1372
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_studmark",
+      "file": "art/generated/res-icons/res-V-4/cr_studmark.webp",
+      "box": [
+        479,
+        944,
+        906,
+        1371
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_oldbone",
+      "file": "art/generated/res-icons/res-V-4/cr_oldbone.webp",
+      "box": [
+        938,
+        944,
+        1366,
+        1372
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_barrow",
+      "file": "art/generated/res-icons/res-V-4/cr_barrow.webp",
+      "box": [
+        1398,
+        944,
+        1825,
+        1371
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb6",
+      "file": "art/generated/res-icons/res-V-4/find_cb6.webp",
+      "box": [
+        1857,
+        944,
+        2285,
+        1372
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb6b",
+      "file": "art/generated/res-icons/res-V-4/find_cb6b.webp",
+      "box": [
+        19,
+        1404,
+        446,
+        1831
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb6",
+      "file": "art/generated/res-icons/res-V-4/call_fb6.webp",
+      "box": [
+        479,
+        1404,
+        906,
+        1831
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fb6",
+      "file": "art/generated/res-icons/res-V-4/tr_fb6.webp",
+      "box": [
+        938,
+        1404,
+        1365,
+        1831
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fb6a",
+      "file": "art/generated/res-icons/res-V-4/tr_fb6a.webp",
+      "box": [
+        1398,
+        1404,
+        1825,
+        1831
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb6_aw",
+      "file": "art/generated/res-icons/res-V-4/call_fb6_aw.webp",
+      "box": [
+        1858,
+        1404,
+        2285,
+        1831
+      ],
+      "px": 427,
+      "key_left": 0.0
+    }
+  ]
+}

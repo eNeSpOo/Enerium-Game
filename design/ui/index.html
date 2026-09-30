@@ -1392,6 +1392,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <link rel="stylesheet" href="screens/echo.css">
 <link rel="stylesheet" href="screens/roulette.css">
 <link rel="stylesheet" href="screens/chest-open.css">
+<link rel="stylesheet" href="screens/chambers.css">
 <link rel="stylesheet" href="screens/wanderer.css">
 <link rel="stylesheet" href="screens/biomes.css">
 <link rel="stylesheet" href="screens/talismans.css">
@@ -1400,6 +1401,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <link rel="stylesheet" href="screens/heroes.css">
 <link rel="stylesheet" href="screens/book.css">
 <link rel="stylesheet" href="screens/library.css">
+<link rel="stylesheet" href="screens/book-pages.css">
 <link rel="stylesheet" href="screens/contracts.css">
 <link rel="stylesheet" href="screens/clan.css">
 <link rel="stylesheet" href="screens/event.css">
@@ -1542,7 +1544,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 const ASSET = window.EN_ASSET || '../enerium/assets/';
 const A = p => ASSET + p;
 const ART = n => A('art/' + n);
-const ART_V = 'c1ec424c';   // версия выгрузки арта — её ставит tools/art-gen/export_ui.py, чтобы браузер не брал старые картинки из кэша
+const ART_V = 'db2be8b1';   // версия выгрузки арта — её ставит tools/art-gen/export_ui.py, чтобы браузер не брал старые картинки из кэша
 const AV = n => ART(n) + '?v=' + ART_V;
 /* значки атрибутов, редкостей, классов и доблести — одобрены автором 28.09.2026, выгрузка tools/art-gen/export_ui.py → assets/art/icons/:
    power, hp, patk, matk, def-phys, def-mag, eva, crit, critdmg; str, int, agi, end, spd; r1…r7 — редкости (ADR-0027);
@@ -1571,9 +1573,9 @@ const CHEST = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www
 const CUR = {
   gold: { n: 'Золото', img: ART('gold.png'), src: 'Каждый враг, контракты, ритуалы героев' },
   spirit: { n: 'Дух', img: ART('spirit.png'), src: 'Враги биомов, ритуалы героев. Тратится на уровни героев' },
-  souls: { n: 'Души', img: ART('souls.png'), src: 'Элиты и боссы, ритуалы героев. Только фармятся' },
-  enerium: { n: 'Энериум', img: ART('enerium.png'), src: 'Контракты эпик+, Арена топ-100, лавка Энериума' },
-  keys: { n: 'Рунические ключи', img: ART('rune-key.png'), src: 'Контракты — главный источник; боссы биомов, крафтовые биомы и боссы' },
+  souls: { n: 'Души', img: ART('souls.png'), src: 'Элиты и боссы, ритуалы героев. За деньги — только стартовый набор, раз за игру' },
+  enerium: { n: 'Энериум', img: ART('enerium.png'), src: 'Дар дня, пропуск, контракты эпик+, Арена топ-100; лавка Энериума' },
+  keys: { n: 'Рунические ключи', img: ART('rune-key.png'), src: 'Контракты — главный источник; боссы биомов, сундуки — изредка. За деньги — только стартовый набор, раз за игру' },
   dust: { n: 'Прах душ', img: DUST, src: 'Повторные осколки пробуждённых героев' },
 };
 const RAR = ['', 'Обычная', 'Редкая', 'Уникальная', 'Эпическая', 'Древняя', 'Первородная', 'Вневременная'];
@@ -1897,7 +1899,7 @@ const itName = it => !it ? '—' : itTeam(it) ? `${(RX.tiers[it.tier] || { n: '�
 function itWell(id, { act = 'item', val, q, size, dis, sel } = {}) {
   const it = BAG.item(id); if (!it) return '';
   const nm = trEsc(itName(it));
-  return `<button class="well bw${sel ? ' sel' : ''}" data-r="${it.r}"${size ? ` style="--s:${size}px"` : ''} data-a="${act}" data-v="${val ?? id}" title="${nm}" aria-label="${nm}${q != null ? ', ' + q + ' шт.' : ''}"${dis ? ' disabled' : ''}>${itTeam(it) ? ic('lock') : trIcon(it)}${q != null ? `<span class="q">${fmt(q)}</span>` : ''}</button>`;
+  return `<button class="well bw${sel ? ' sel' : ''}" data-r="${it.r}"${size ? ` style="--s:${size}px"` : ''} data-a="${act}" data-v="${val ?? id}" title="${nm}" aria-label="${nm}${q != null ? ', ' + q + ' шт.' : ''}"${dis ? ' disabled' : ''}>${itTeam(it) ? (typeof resHideIco === 'function' ? resHideIco() : ic('lock')) : trIcon(it)}${q != null ? `<span class="q">${fmt(q)}</span>` : ''}</button>`;
 }
 const poolItems = () => RX.items.filter(i => i.pool && !i.team);                     // 36 базовых общего пула (ADR-0023, п. 1)
 const biomeItems = (tier, b) => RX.items.filter(i => i.tier === tier && i.b === b);   // ключи и уникальные биома
@@ -2188,28 +2190,35 @@ const abIcon = ab => ab.kind === 'dmg' ? (ab.tgt === 'all' ? 'wave' : ab.stat ==
   : ab.kind === 'ctrl' || ab.kind === 'debuff' || ab.kind === 'buff' ? (ST_ICON[ab.st] || ['down'])[0] : ab.kind === 'dot' ? DOT_ICON[ab.school] || 'flame' : ab.kind === 'dispel' ? 'crack'
   : ab.kind === 'passive' ? 'gem' : ab.kind === 'reaction' ? 'swap' : 'spark';
 const si = (icon, n, p, cls, title, color) => `<span class="si ${cls}" style="--p:${p}${color ? ';--rc:' + color : ''}" title="${title}">${ic(icon)}${n ? `<b>${n}</b>` : ''}</span>`;
-/* Набор героя из распределения (ADR-0016): способности по доблести и доли хода по редкости. Закрытые отдают свою долю обычной атаке. */
+/* Набор героя из распределения (ADR-0016): способности по доблести и доли хода по редкости. Закрытые отдают свою долю обычной атаке.
+   Страница книги «Навыки» — слово автора 30.09.2026: «способности нужно нажимать чтобы их читать это странно». Всё видно сразу: значок
+   в рамке своего вида, имя, вид и доблесть открытия, доля хода и описание; закрытые доблестью — приглушены, «откроется на доблести N»;
+   сверху — доли хода одной полосой: способности, ульта, обычная атака. Вид — screens/book-pages.css */
 const heroKit = h => h.draft && window.EN_KITS && EN_KITS.heroes[h.draft] || null;
+const AB_KIND = { act: 'Активная', ult: 'Ульта', pas: 'Пассивка', react: 'Реакция' };
 function heroKitHtml(h) {
   const K = heroKit(h), L = EB.lib(), acts = K.kit.filter(x => x.slot === 'act' && L[x.id]), ults = K.kit.filter(x => x.slot === 'ult');
   const w = acts.reduce((a, x) => a + L[x.id].ch, 0);
   const up = K.kit.filter(x => x.slot === 'pas' && x.v <= h.valor && L[x.id] && L[x.id].pas === 'ultUp').reduce((a, x) => a + L[x.id].pct, 0);   // «Неспешность»
   const share = x => x.slot === 'act' && L[x.id] ? Math.floor(K.actPct * L[x.id].ch / w) : x.slot === 'ult' ? Math.floor(Math.floor(K.ultPct / ults.length) * (100 + up) / 100) : 0;
-  const basic = 10000 - K.kit.filter(x => x.v <= h.valor).reduce((a, x) => a + share(x), 0);
+  const open = K.kit.filter(x => x.v <= h.valor), basic = 10000 - open.reduce((a, x) => a + share(x), 0);
   const rows = K.kit.map(x => {
     const a = L[x.id] || { n: x.id, d: '' }, on = x.v <= h.valor, s = share(x);
-    const what = x.slot === 'ult' ? 'Ульта' : x.slot === 'pas' ? 'Пассивка' : x.slot === 'react' ? 'Реакция' : '';
-    return abRow({ icon: (typeof abArt === 'function' && abArt(a, 30, '', on ? '' : 'off')) || ic(on ? (x.slot === 'ult' ? 'crown' : abIcon(a)) : 'lock'), n: x.v, name: `${schoolMark(a.school)}${a.n}`, what, d: a.d, lock: !on,
-      chip: `<span class="chip ${x.slot === 'ult' && on ? 'spirit' : ''}" title="${on ? (x.chR ? 'Шанс реакции: растёт с редкостью героя' : 'Доля хода') : 'Откроется на доблести ' + x.v}">${on ? (s ? pctBp(s) : x.chR ? 'шанс ' + pctBp(x.chR) : 'всегда') : 'доблесть ' + x.v}</span>` });
+    const when = !x.v ? 'есть сразу' : on ? `доблесть ${x.v}` : `откроется на доблести ${x.v}`;
+    const chip = on ? `<span class="ab-sh${x.slot === 'ult' ? ' u' : ''}" title="${s ? 'Доля хода: столько ходов из ста' : x.chR ? 'Шанс реакции: растёт с редкостью героя' : 'Действует всегда'}">${s ? pctBp(s) : x.chR ? 'шанс ' + pctBp(x.chR) : 'всегда'}</span>`
+      : `<span class="ab-sh lock" title="Откроется на доблести ${x.v}">${ic('lock')}доблесть ${x.v}</span>`;
+    return abRow({ kind: x.slot, icon: (typeof abArt === 'function' && abArt(a, 40, '', on ? '' : 'off')) || ic(on ? (x.slot === 'ult' ? 'crown' : abIcon(a)) : 'lock'),
+      name: `${schoolMark(a.school)}${a.n}`, what: `${AB_KIND[x.slot] || 'Способность'} · ${when}`, d: a.d, lock: !on, chip });
   }).join('');
-  return `<div class="hd-cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)">
-    <div class="col scroll" style="gap:6px"><span class="eyebrow">Способности по доблести · доля хода</span>
-      <div class="rot-list">${rows}${abRow({ icon: ic('sword'), n: '—', name: 'Обычная атака', d: 'Если ни одна способность не сработала.', chip: `<span class="chip">${pctBp(basic)}</span>` })}</div>
-      ${PL('Число слева — доблесть, с которой способность открыта. Нажмите способность — что она делает.', 'Число слева — доблесть, на которой способность открывается; последняя — ульта (ADR-0016). Кристалл у названия — школа. В свой ход герой бросает шанс по долям хода.', 'span', 'reason')}</div>
-    <div class="col" style="gap:6px"><span class="eyebrow">Доли хода · ${K.rarity}</span>
-      <span class="muted">Способности — <b class="num">${pctBp(K.actPct)}</b>, ульта — <b class="num">${pctBp(K.ultPct)}</b></span>
-      <small class="faint team-only">Редкость задаёт, как часто срабатывают способности и ульта: у обычного героя — 29 % и 1 %, у вневременного — 50 % и 10 %. Активные делят долю по весу, закрытые доблестью отдают свою часть обычной атаке.</small></div>
-  </div>`;
+  /* доли хода полосой: открытые способности и ульта — по одной, остальное — обычная атака */
+  const sum = k => open.filter(x => x.slot === k).reduce((a, x) => a + share(x), 0), sa = sum('act'), su = sum('ult');
+  const segs = open.filter(x => share(x) > 0 && L[x.id]).map(x => ({ w: share(x), k: x.slot === 'ult' ? 'u' : 'a', el: L[x.id].school, n: L[x.id].n })).concat([{ w: basic, k: 'b', n: 'Обычная атака' }]);
+  const say = `Доли хода: способности ${pctBp(sa)}${su ? ', ульта ' + pctBp(su) : ''}, обычная атака ${pctBp(basic)}`;
+  const bar = `<div class="ab-bar" role="img" aria-label="${say}">${segs.map(g => `<i class="${g.k}"${g.el ? ` data-el="${g.el}"` : ''} style="--w:${g.w}" title="${g.n}: ${pctBp(g.w)}"></i>`).join('')}</div>`;
+  const leg = `<p class="ab-leg"><span><i class="a"></i>способности <b class="num">${pctBp(sa)}</b></span>${su ? `<span><i class="u"></i>ульта <b class="num">${pctBp(su)}</b></span>` : ''}<span><i class="b"></i>обычная атака <b class="num">${pctBp(basic)}</b></span></p>`;
+  return `<div class="ab-page scroll" data-keep="kit:${h.id || h.draft}"><div class="ab-turn"><span class="eyebrow">Доли хода · ${K.rarity}</span>${bar}${leg}</div>
+    <div class="rot-list">${rows}${abRow({ kind: 'basic', icon: ic('sword'), name: 'Обычная атака', what: 'Если ни одна способность не сработала', chip: `<span class="ab-sh">${pctBp(basic)}</span>` })}</div>
+    ${TM('<p class="reason">Редкость задаёт, как часто срабатывают способности и ульта: у обычного героя — 29 % и 1 %, у вневременного — 50 % и 10 % (ADR-0016). Активные делят долю по весу, закрытые доблестью отдают свою часть обычной атаке; последняя доблесть — ульта. В свой ход герой бросает шанс по долям хода.</p>')}</div>`;
 }
 function statusHtml(u, d, rounds) {
   const good = [], bad = [], per = rounds ? 'в каждый ход носителя' : 'в каждую атаку носителя', word = rounds ? roundWord : atkWord;
@@ -2429,28 +2438,34 @@ function rsSrcLong(h) {
   return 'Скрытый рецепт крафта: его находят перебором';
 }
 const RS_FACELESS = 'Безликий: лица нет — стёрлось. Себя он вспомнит на последней доблести.';
-/* всё о герое — лист «Подробнее» и UI-кит: лор по «ещё», откуда, доблесть, неприязнь, с чем приходит, главы */
-function rsWhoHtml(h) {
+/* всё о герое — страница «Герой» книги «до покупки» и UI-кит: лор, откуда, доблесть, неприязнь, с чем приходит, главы. o.book — страница
+   книги: книгу читают, а не раскрывают — лор целиком, с буквицей (слово автора 30.09.2026: «нужно нажимать чтобы их читать это
+   странно»); в UI-ките — по «ещё» */
+function rsWhoHtml(h, o = {}) {
   const facts = [['Откуда', rsSrcLong(h)], ['Доблесть', `максимум ${h.maxV}${TM(' · ' + rsMaxTxt(h))}`]]
     .concat(h.avers ? [['Неприязнь', h.avers.race ? `${rsAversShort(h)}${TM('. Особенность героя Эхо, не способность: действует везде, где встречаются враги этой расы')}` : h.avers.text || '']] : [])
     .concat([['Приходит', '0 ур. · 0 РП · 0 Добл'], [h.maxV > 1 ? 'Главы' : 'Глава', h.chT.map((t, i) => '«' + rsChTitle(h, i) + '»').join(' · ')]]);
   return `${h.src === 'donat' ? `<p class="reason">${RS_FACELESS}</p>` : ''}
-    ${foldLore(h.who)}
+    ${o.book ? `<p class="rs-who">${rsDropCap(h.who)}</p>` : foldLore(h.who)}
     <dl class="kv rs-kv">${facts.map(([k, x]) => `<dt>${k}</dt><dd>${x}</dd>`).join('')}</dl>
     ${KH.team && h.team ? rsTeamHtml(h) : ''}`;
 }
+/* буквица: первая буква абзаца — отдельным знаком (страница книги рисует её крупно, красным с золотом); кавычка — перед ней */
+const rsDropCap = p => { const s = String(p || ''), m = s.match(/^([«"„(]?)([^\s«"„(])/); return m ? `${m[1]}<span class="dcap">${m[2]}</span>${s.slice(m[0].length)}` : s; };
 function rsTeamHtml(h) {
   const T = h.team, sets = (T.sets || []).map(k => RSS[k]).filter(Boolean);
   return `<div class="kh-team">${T.draft ? `<p><b>Черновик:</b> ${T.draft}</p>` : ''}${sets.map(s => `<p><b>Орден:</b> ${s.name}${s.proposed ? ' — предложение, ждёт автора' : ''}${T.also === s.key ? '. «Хитрый переход»: он и в донатном сете, и в ордене (ADR-0023, п. 11)' : ''}</p>`).join('')}${(T.notes || []).map(x => `<p>${x}</p>`).join('')}</div>`;
 }
-/* «Воспоминания героя»: заголовки глав видны до открытия (§33.1), текст — по доблести: две строки и «ещё»; нет текста в главы/цикл-N.md — только заголовок */
+/* «Воспоминания героя»: заголовки глав видны до открытия (§33.1), текст — по доблести. Открытая глава читается прямо в книге — целиком,
+   с буквицей (слово автора 30.09.2026: «Путь» — главы читаются в книге, без «ещё»); закрытая — заголовок и доблесть, на которой откроется;
+   нет текста в главы/цикл-N.md — только заголовок */
 function rsChaptersHtml(h, v) {
-  const rows = [`<div class="chap"><span class="n">·</span><div><b>Обрывки личности</b><small class="faint">${h.src === 'donat' ? 'Лица нет, кем был — не помнит. Остались ремесло и чужие голоса.' : 'Остались лишь обрывки: голоса, дорога и чувство утраты.'}</small></div></div>`];
+  const rows = [`<div class="chap pro"><span class="n">·</span><div><b>Обрывки личности</b><small class="faint">${h.src === 'donat' ? 'Лица нет, кем был — не помнит. Остались ремесло и чужие голоса.' : 'Остались лишь обрывки: голоса, дорога и чувство утраты.'}</small></div></div>`];
   h.chT.forEach((_, i) => {
     const no = i + 1, x = h.ch && h.ch[i], title = rsChTitle(h, i);
     rows.push(no <= v
-      ? `<div class="chap"><span class="n">${ROMAN[no]}</span><div><b>${title}</b>${x && x[1].length ? foldLore(x[1], 'rs-p') : '<small class="faint team-only">Текст главы пишется — пока только заголовок.</small>'}</div></div>`
-      : `<div class="chap lock"><span class="n">${ROMAN[no]}</span><div><b>${title}</b><small>Откроется на доблести ${no}${no === h.maxV ? ' · последний день' : ''}</small></div></div>`);
+      ? `<div class="chap"><span class="n">${ROMAN[no]}</span><div><b>${title}</b>${x && x[1].length ? x[1].map((p, j) => `<p class="rs-p">${j ? p : rsDropCap(p)}</p>`).join('') : '<small class="faint team-only">Текст главы пишется — пока только заголовок.</small>'}</div></div>`
+      : `<div class="chap lock"><span class="n">${ROMAN[no]}</span><div><b>${title}</b><small>${ic('lock')}Откроется на доблести ${no}${no === h.maxV ? ' · последний день' : ''}</small></div></div>`);
   });
   return `<div class="chaps">${rows.join('')}</div>`;
 }
@@ -2500,49 +2515,47 @@ function rsSetHtml(h, v, o = {}) {
 /* пять характеристик значками: число и степень роста; что даёт характеристика — в подсказке и в листе «Атрибуты». Число — с доблестью
    (heroSt) и прибавкой снаряжения (eqStatAdd, screens/equipment.js): такое число светится, разбивка — в подсказке */
 const statStrip = h => { const add = typeof eqStatAdd === 'function' ? eqStatAdd(h) : null; return `<div class="st5">${heroSt(h).map((v, i) => { const x = add ? add[i] : 0; return `<div class="s5${x ? ' eqd' : ''}" title="${STATS[i]}: ${STAT_HINT[i]} · рост ${GRADE[h.gr[i]]} за уровень${x ? ` · ${v} и снаряжение +${x}` : ''}">${ICON(STAT_IC[i], 24, STATS[i])}<b class="num">${v + x}</b><span class="grade">${[1, 2, 3].map(g => `<i class="${4 - h.gr[i] >= g ? 'on' : ''}"></i>`).join('')}</span></div>`; }).join('')}</div>`; };
-/* вкладки героя аккаунта; o.head === false — без шапки: так их берёт раскрытая книга героя (hbOwnWin, screens/book.js), портрет — на левой странице */
+/* вкладки героя аккаунта — страницы раскрытой книги (hbOwnWin, hbSqWin в screens/book.js): закладки «Развитие», «Мощь», «Снаряжение»,
+   «Навыки», «Путь» по верхнему краю правой страницы (pgTabs, screens/book-pages.js), портрет — на левой странице. Слово автора 30.09.2026:
+   главное видно сразу, без нажатий; одно главное действие на вкладке. o.head === false — без шапки: так их берёт книга */
 function heroDetail(h, o = {}) {
   const t = S.seg.hero;
   let body = '';
   if (t === 'power') {
     body = typeof hdPower === 'function' ? hdPower(h) : '<p class="faint">Экран развития не подключён: рядом с index.html должен лежать screens/hero-dev.js.</p>';
+  } else if (t === 'stats') {   // «Мощь»: мощь, пять характеристик со степенью роста, атрибуты боя — на странице, не в листе (screens/book-pages.js)
+    body = typeof pgStats === 'function' ? pgStats(h) : '<p class="faint">Страницы книги не подключены: рядом с index.html должен лежать screens/book-pages.js.</p>';
   } else if (t === 'gear') {   // места снаряжения и талисманов, низ — «Надеть лучшее» или окно снаряжения (screens/hero-dev.js)
     body = `<div class="hd-gear">${typeof eqRow === 'function' ? eqRow(h) : ''}${typeof talRow === 'function' ? talRow(h) : ''}${typeof hdGearFoot === 'function' ? hdGearFoot(h) : ''}</div>`;
   } else if (t === 'skills' && heroKit(h)) {
     body = heroKitHtml(h);
-  } else if (t === 'skills') {
-    body = `<div class="hd-cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)">
-      <div class="col scroll" style="gap:6px"><span class="eyebrow">Способности · шанс в свой ход</span>
-        ${(() => {
-          const T = EB.chanceTable({ abs: h.ab.map(a => Object.assign({ n: a.n }, EB.LIB[a.n])), ult: h.ult && h.valor >= h.ult.at ? Object.assign({ n: h.ult.n }, EB.LIB[h.ult.n]) : null });
-          const ch = n => { const x = T.find(t => t.n === n); return x ? x.ch : 0; }, rest = 10000 - T.reduce((a, t) => a + t.ch, 0);
-          const rows = h.ab.map(a => { const L = EB.LIB[a.n], left = L.r && L.r.left; return abRow({ icon: ic(abIcon(L)), n: pctBp(ch(a.n)).replace(' %', ''), name: `${schoolMark(a.school)}${a.n}`, d: a.d, chip: `<span class="chip" title="Шанс сработать в свой ход">${pctBp(ch(a.n))}${left ? ' · ' + left + ' ' + roundWord(left) : ''}</span>` }); }).join('');
-          const ult = h.ult ? (h.valor >= h.ult.at ? abRow({ icon: ic('crown'), n: 'У', name: h.ult.n, what: 'Ульта', d: `${h.ult.d} Срабатывает по шансу, без зарядки.`, chip: `<span class="chip spirit">${pctBp(ch(h.ult.n))}</span>` })
-            : abRow({ icon: ic('lock'), n: ic('crown'), name: h.ult.n, what: 'Ульта', d: h.ult.d, chip: `<span class="chip">доблесть ${h.ult.at}</span>`, lock: true })) : '';
-          return `<div class="rot-list">${rows}${ult}${abRow({ icon: ic('sword'), n: '—', name: 'Обычная атака', d: 'Если ни одна способность не сработала.', chip: `<span class="chip">${pctBp(rest)}</span>` })}</div>`;
-        })()}
-        ${PL('Кристалл у названия — школа стихии. Нажмите способность — что она делает.', `Кристалл у названия — магия школы стихии героя; без него — приём класса. Порядок способностей не важен: в свой ход герой бросает шанс (ADR-0010). Сумма шансов карты — не выше ${pctBp(EB.RULES.rounds.capBp)}, лишнее сжимается пропорционально.`, 'span', 'reason')}
-      </div>
-      <div class="col" style="gap:6px"><span class="eyebrow">Пассивные</span><div class="chaps">${h.pas.map(p => `<div class="chap one"><div><b>${p.n}</b> <span class="chip" style="height:18px;margin-left:4px">${p.t}</span><small class="faint">${p.d}</small></div></div>`).join('')}</div></div>
-    </div>`;
+  } else if (t === 'skills') {   // герой без набора из распределения: способности прежней библиотеки ядра и шанс в свой ход — тоже сразу видны
+    const T = EB.chanceTable({ abs: h.ab.map(a => Object.assign({ n: a.n }, EB.LIB[a.n])), ult: h.ult && h.valor >= h.ult.at ? Object.assign({ n: h.ult.n }, EB.LIB[h.ult.n]) : null });
+    const ch = n => { const x = T.find(y => y.n === n); return x ? x.ch : 0; }, rest = 10000 - T.reduce((a, y) => a + y.ch, 0);
+    const rows = h.ab.map(a => { const L = EB.LIB[a.n], left = L.r && L.r.left; return abRow({ kind: 'act', icon: ic(abIcon(L)), name: `${schoolMark(a.school)}${a.n}`, what: 'Активная · шанс в свой ход', d: a.d, chip: `<span class="ab-sh" title="Шанс сработать в свой ход">${pctBp(ch(a.n))}${left ? ' · ' + left + ' ' + roundWord(left) : ''}</span>` }); }).join('');
+    const ult = h.ult ? (h.valor >= h.ult.at ? abRow({ kind: 'ult', icon: ic('crown'), name: h.ult.n, what: `Ульта · доблесть ${h.ult.at}`, d: `${h.ult.d} Срабатывает по шансу, без зарядки.`, chip: `<span class="ab-sh u">${pctBp(ch(h.ult.n))}</span>` })
+      : abRow({ kind: 'ult', icon: ic('lock'), name: h.ult.n, what: `Ульта · откроется на доблести ${h.ult.at}`, d: h.ult.d, chip: `<span class="ab-sh lock">${ic('lock')}доблесть ${h.ult.at}</span>`, lock: true })) : '';
+    const pas = h.pas.map(p => abRow({ kind: 'pas', icon: ic('gem'), name: p.n, what: `Пассивка · ${p.t}`, d: p.d, chip: '<span class="ab-sh">всегда</span>' })).join('');
+    body = `<div class="ab-page scroll" data-keep="kit:${h.id}"><div class="rot-list">${rows}${ult}${pas}${abRow({ kind: 'basic', icon: ic('sword'), name: 'Обычная атака', what: 'Если ни одна способность не сработала', chip: `<span class="ab-sh">${pctBp(rest)}</span>` })}</div>
+      ${TM(`<p class="reason">Кристалл у названия — магия школы стихии героя; без него — приём класса. Порядок способностей не важен: в свой ход герой бросает шанс (ADR-0010). Сумма шансов карты — не выше ${pctBp(EB.RULES.rounds.capBp)}, лишнее сжимается пропорционально.</p>`)}</div>`;
   } else if (typeof hrPath === 'function' && hrPath(h)) {   // купленный герой состава: главы по доблести и орден — из roster.js (screens/heroes.js)
     body = hrPath(h);
   } else {
-    const ch = [`<div class="chap"><span class="n">·</span><div><b>Обрывки личности</b><small class="faint">Остались лишь обрывки: незнакомые голоса, дорога и ощущение утраты.</small></div></div>`];
-    for (let i = 1; i <= h.maxV; i++) ch.push(i <= h.valor ? `<div class="chap"><span class="n">${ROMAN[i]}</span><div><b>Глава ${ROMAN[i]}</b><small class="faint">Открыта доблестью ${i}.${TM(' Текст главы задаёт автор.')}</small></div></div>` : `<div class="chap lock"><span class="n">${ROMAN[i]}</span><div><b>Глава ${ROMAN[i]}</b><small>Откроется на доблести ${i}</small></div></div>`);
-    body = `<div class="hd-cols"><div class="col scroll"><div class="chaps">${ch.join('')}</div></div>
-      <div class="col" style="gap:8px"><span class="eyebrow">Орден</span><div class="rs-none"><b class="serif">Не раскрыт</b><p class="faint">Связи с орденами открывают главы.</p></div>
-      <span class="reason">Глав столько же, сколько доблестей: ${h.maxV}.</span></div></div>`;
+    const ch = [`<div class="chap pro"><span class="n">·</span><div><b>Обрывки личности</b><small class="faint">Остались лишь обрывки: незнакомые голоса, дорога и ощущение утраты.</small></div></div>`];
+    for (let i = 1; i <= h.maxV; i++) ch.push(i <= h.valor ? `<div class="chap"><span class="n">${ROMAN[i]}</span><div><b>Глава ${ROMAN[i]}</b><small class="faint">Открыта доблестью ${i}.${TM(' Текст главы задаёт автор.')}</small></div></div>` : `<div class="chap lock"><span class="n">${ROMAN[i]}</span><div><b>Глава ${ROMAN[i]}</b><small>${ic('lock')}Откроется на доблести ${i}</small></div></div>`);
+    body = `<div class="pg-path scroll" data-keep="hrpath:${h.id}"><div class="chaps">${ch.join('')}</div><h3 class="pg-h">Орден</h3><div class="rs-none"><b class="serif">Не раскрыт</b><p class="faint">Связи с орденами открывают главы. Глав столько же, сколько доблестей: ${h.maxV}.</p></div></div>`;
   }
+  const tabs = [['power', 'Развитие'], ['stats', 'Мощь'], ['gear', 'Снаряжение'], ['skills', 'Навыки'], ['path', 'Путь']];
+  const dot = k => k === 'gear' && typeof hdGearDot === 'function' && hdGearDot(h) ? 'в запасах есть лучше' : '';
+  const nav = typeof pgTabs === 'function' ? pgTabs(tabs.map(([k, l]) => [k, l, dot(k)]), t, 'hero', { label: 'Разделы героя' })
+    : `<div class="tabs" role="tablist" aria-label="Разделы героя">${tabs.map(([k, l]) => `<button role="tab" aria-selected="${t === k}" data-a="seg" data-v="hero:${k}">${l}</button>`).join('')}</div>`;
   return `<div class="pnl hd${o.cls ? ' ' + o.cls : ''}">${o.head === false ? '' : heroHead(h)}
-    <div class="hd-body">
-      <div class="tabs" role="tablist" aria-label="Разделы героя">${[['power', 'Развитие'], ['gear', 'Снаряжение'], ['skills', 'Навыки'], ['path', 'Путь']].map(([k, l]) => `<button role="tab" aria-selected="${t === k}" data-a="seg" data-v="hero:${k}">${l}${k === 'gear' && typeof hdGearDot === 'function' && hdGearDot(h) ? '<i class="tdot" title="В запасах есть лучше"></i>' : ''}</button>`).join('')}</div>
-      ${body}
-    </div></div>`;
+    <div class="hd-body">${nav}${typeof pgBody === 'function' ? pgBody(body, 'hero') : body}</div></div>`;
 }
-/* строка способности: значок, доблесть или шанс, имя и вид, чип; что делает — по нажатию (правила воздуха, п. 3) */
-function abRow({ icon, n, name, what = '', d = '', chip = '', lock = false }) {
-  return `<details class="ab-d"><summary class="ab ${lock ? 'lock' : ''}"><span class="h">${icon}</span><span class="n">${n}</span><span><b>${name}</b>${what ? `<small>${what}</small>` : ''}</span>${chip}</summary>${d ? `<p class="ab-x">${d}</p>` : ''}</details>`;
+/* строка способности на странице книги: значок в рамке своего вида (data-k: act, ult, pas, react, basic), имя и доля хода, вид и доблесть
+   открытия, описание — видно сразу, без нажатия (слово автора 30.09.2026); закрытая доблестью — приглушена */
+function abRow({ icon, name, what = '', d = '', chip = '', lock = false, kind = 'act' }) {
+  return `<div class="ab${lock ? ' lock' : ''}" data-k="${kind}"><span class="ab-ic">${icon}</span><div class="ab-t"><div class="ab-n"><b>${name}</b>${chip}</div>${what ? `<small class="ab-k">${what}</small>` : ''}${d ? `<p class="ab-x">${d}</p>` : ''}</div></div>`;
 }
 /* ================== Призыв ==================
    Отряды и вкладки Призыва (hireView: за золото, за Энериум, за души) — screens/heroes.js. Здесь — строки списков Призыва и вкладка
@@ -2629,6 +2642,9 @@ const trNorm = x => String(x).toLowerCase().replace(/ё/g, 'е');
 const trHit = it => { const q = trNorm(S.tree.q.trim()); return q.length > 1 && trNorm(it.n).includes(q); };
 function trIcon(it) {
   if (it.img) return `<img src="${it.img.startsWith('path:') ? PATH(+it.img.slice(5)) : ART(it.img)}" alt="">`;
+  /* иконка сеткой (resArt, screens/art-icons.js) — раньше векторного значка; у руны предела поверх — её номер: пять рун цикла похожи */
+  const art = typeof resArt === 'function' ? resArt(it) : '';
+  if (art) return it.glyph && it.tier === 'rune' ? `${art}<span class="res-gl" aria-hidden="true">${it.glyph}</span>` : art;
   if (it.glyph && it.tier === 'rune') return `<span class="gl">${it.glyph}</span>`;
   const sp = it.spec && RX.specs[it.spec.split('+')[0]];
   return ic(TR_IC[it.tier] || (sp ? sp.icon : 'gem'));
@@ -2849,7 +2865,8 @@ function storeView() {
   const t = S.seg.store;
   const meta = { title: 'Лавка Энериума', seg: { key: 'store', items: [['en', 'Энериум'], ['pass', 'Пропуск'], ['look', 'Облик']] } };
   let body;
-  if (t === 'en') body = `<div class="rcards grow" style="grid-template-columns:repeat(3,minmax(0,1fr))">${[['Горсть Энериума', 400, '199 ₽', true], ['Запас Энериума', 1600, '699 ₽', true], ['Ежедневная выдача', 30, '299 ₽ / 30 дней', false]].map(([n, q, p, x2]) => `<div class="rcard" data-r="${x2 ? 6 : 3}"><img src="${ART('enerium.png')}" alt="" style="width:48px;height:48px;object-fit:contain"><b>${n}</b><small class="muted num">${fmt(q)} Энериума${x2 ? ' · первая покупка ×2' : ' в день'}</small><button class="btn go sm" style="margin-top:auto" data-a="toast" data-v="${tmT('Покупка пока недоступна', 'Покупка в прототипе не выполняется')}">${p}</button></div>`).join('')}</div><p class="reason">За деньги — только больше возможностей отработать прогресс. Души, попытки и рейтинг не продаются.</p>`;
+  /* витрина «Энериум» — screens/pass.js (stView): стартовый набор раз за игру (ADR-0033), пакеты и подписка — из данных EN_PASS.store */
+  if (t === 'en') body = '<div class="pnl pad"><p class="faint">Витрина Лавки Энериума не подключена.</p></div>';
   /* пропуск сезона — screens/pass.js: он рисует вкладку поверх storeView (обёртка SCREENS.store) */
   else if (t === 'pass') body = '<div class="pnl pad"><p class="faint">Экран пропуска не подключён.</p></div>';
   /* облик — знак отличия, а не товар (§32): рамки и частицы зарабатываются, лист «Облик» — в «Страннике» (screens/wanderer.js) */
@@ -2874,7 +2891,7 @@ function itemCard(id) {
   if (!it) return '<p class="faint">Такого предмета в данных нет.</p>';
   const hide = itTeam(it), T = RX.tiers[it.tier] || { n: '' }, sp = it.spec ? it.spec.split('+').map(x => RX.specs[x] ? RX.specs[x].n : x).join(' + ') : '';
   const uses = BAG.knownUses(id).filter(Boolean), src = hide ? [] : itSrc(it), min = mkMin(id);
-  return `<div class="row" style="gap:14px;align-items:center"><span class="tr-big" data-r="${it.r}">${hide ? ic('lock') : trIcon(it)}</span><div class="col" style="gap:5px;min-width:0">${rar(it.r)}<b class="serif" style="font-size:23px;line-height:1">${trEsc(itName(it))}</b><span class="faint" style="font-size:13px">${T.n}${sp ? ' · ' + sp.toLowerCase() : ''}</span></div><span class="g-spacer"></span><div class="stat" style="align-items:flex-end"><b>${fmt(BAG.qty(id))}</b><small>в запасах</small></div></div>
+  return `<div class="row" style="gap:14px;align-items:center"><span class="tr-big" data-r="${it.r}">${hide ? (typeof resHideIco === 'function' ? resHideIco() : ic('lock')) : trIcon(it)}</span><div class="col" style="gap:5px;min-width:0">${rar(it.r)}<b class="serif" style="font-size:23px;line-height:1">${trEsc(itName(it))}</b><span class="faint" style="font-size:13px">${T.n}${sp ? ' · ' + sp.toLowerCase() : ''}</span></div><span class="g-spacer"></span><div class="stat" style="align-items:flex-end"><b>${fmt(BAG.qty(id))}</b><small>в запасах</small></div></div>
     ${hide ? '<p class="reason">Сведения откроются в своём цикле.</p>' : foldLore(trEsc(it.lore))}
     <dl class="kv"><dt>Цикл</dt><dd>${it.pool ? 'все циклы · общий пул' : 'цикл ' + ROMAN[it.cyc]}</dd><dt>Найденные рецепты</dt><dd>${uses.length ? uses.map(r => trEsc(r.n)).join(', ') : 'нет'}</dd>${min ? `<dt>Мин. цена рынка</dt><dd>${fmt(min)} за шт.</dd>` : ''}</dl>
     ${src.length ? `<span class="eyebrow">Откуда падает</span><ul class="tr-src"><li>${trEsc(src[0])}</li></ul>${src.length > 1 ? `<details class="more-list"><summary><span class="more">ещё ${src.length - 1}</span></summary><ul class="tr-src">${src.slice(1).map(s => `<li>${trEsc(s)}</li>`).join('')}</ul></details>` : ''}` : ''}
@@ -2936,10 +2953,10 @@ const OV = {
   /* «Входящие» — почта с вкладками, письма друзей, заявки — screens/social.js (OV.inbox) */
   cur(o) {
     const k = o.arg, c = CUR[k];
-    const spend = { gold: 'Лавка, рынок (комиссия 10%), заверение контрактов, артефакты', spirit: 'Уровни героев', souls: 'Эхо, активация чертежей и рабочих, артефакты', enerium: 'Перебросы и сброс Памяти, обновления, прокрутка возрождения', keys: 'Вход к рунному стражу', dust: 'Осколки героев в лавке праха' }[k];
+    const spend = { gold: 'Лавка, рынок (комиссия 10%), заверение контрактов, артефакты', spirit: 'Уровни героев', souls: 'Эхо, активация чертежей и рабочих, артефакты', enerium: 'Донатные герои, прокрутка возрождения, пропуск, призывы крафта, перебросы Памяти, обновления', keys: 'Вход к рунному стражу; лишние — в руническую пыль', dust: 'Осколки героев в лавке праха' }[k];
     return sheet(c.n, `<div class="row" style="gap:14px"><img src="${c.img}" alt="" style="width:64px;height:64px;object-fit:contain"><div class="stat"><b style="font-size:34px">${fmt(S.wallet[k])}</b><small>на руках</small></div></div>
       <dl class="kv" style="grid-template-columns:1fr;gap:2px"><dt>Откуда</dt><dd style="text-align:left;margin-bottom:8px">${c.src}</dd><dt>На что</dt><dd style="text-align:left">${spend}</dd></dl>
-      ${k === 'souls' ? '<p class="reason">Души не продаются за деньги — это общее правило игры.</p>' : ''}`, k === 'enerium' ? `<button class="btn go" data-a="go" data-v="store">В лавку Энериума</button>` : k === 'dust' && OV.dust ? '<button class="btn go" data-a="dlg" data-v="dust">В лавку праха</button>' : '');
+      ${k === 'souls' || k === 'keys' ? '<p class="reason">За деньги — только стартовый набор, раз за игру. Дальше — только игрой.</p>' : ''}`, k === 'enerium' ? `<button class="btn go" data-a="go" data-v="store">В лавку Энериума</button>` : k === 'dust' && OV.dust ? '<button class="btn go" data-a="dlg" data-v="dust">В лавку праха</button>' : '');
   },
   level() {
     const src = [['Первое убийство нового существа', 50], ['Первое закрытие биома', 500], ['Первый рунный страж цикла', 500], ['Пробитие рунного предела', 150], ['Доблесть герою', 300], ['Первая победа над врагом в Эхо', 100], ['Новый герой', 200], ['Переход на новый цикл', 2000]];
@@ -3726,7 +3743,7 @@ const MAP = [
   { n: 'Спуск', p: 10, where: 'Шахта · 2', d: 'Окно во весь экран: фон биома — место и его обитатели, что ждут отряд, на одном арте, частицы биома. Слева — путь вниз по циклам, сверху — название и цитата, снизу — этажи, босс и осада, рунный страж и вход к нему за ключи; одно главное действие «Начать забег», идущие забеги — «К бою» и «Ещё отряд». Бестиарий — лист по кнопке «Бестиарий»: обитатели по полкам, карточка врага, вся книга — в Летописи. Арена биома — фон боя, а не «Спуска» (screens/descent.js). Биомы 1–4: у каждого свой фон, арена, враги, забег, босс и рунный страж.', o: ['biomes', 'runic', 'bestiary:s', 'biome-setup:s', 'runic-setup:s', 'crafted-biomes:d'],
     ready: ['biomes', 'runic', 'bestiary', 'biome-setup'] },
   { n: 'Бой', p: 27, where: 'Один на все режимы', d: 'Биом, страж, Эхо, Арена, Лига, Клановый босс — один просмотрщик. «К итогу» доступно всегда.', o: ['battle', 'echo-battle:d', 'pvp-battle:d', 'league-match:d', 'clan-boss-battle:d'] },
-  { n: 'Герои', p: 24, where: 'Шахта · 3', d: 'Коллекция — купленные герои сеткой книг (screens/heroes.js, screens/book.js): ступень книги — личный максимум доблести, от кожаной книги до гримуара; редкость — кристалл и свет книги, рунные пределы — пять замков по правому краю, взятая доблесть — ленты-закладки; уровень, стихия, класс и мощь; по мощи сильнейшие сверху, порядок и фильтр значками, счётчик «в коллекции N из 360»; «Каталог» — найденные герои: неизвестная душа — силуэт класса и полоса осколков, известный — чёрно-белый. Нажатие на книгу — книга летит в центр и раскрывается: слева портрет (крупно по нажатию), справа — вкладки Развитие, Снаряжение, Навыки, Путь; герой до покупки — та же книга: история, навыки по доблести, главы, цена и «Купить», без прокачки и снаряжения; неизвестная душа — только осколки и где их брать. «Развитие» (screens/hero-dev.js) — путь героя: уровень, ворота рунных пределов и звезда доблести, одна главная кнопка — следующий шаг; листы предела и доблести с честным превью, анимации пробития предела и доблести. «Снаряжение» — девять мест снаряжения и четыре места духовных талисманов, «Надеть лучшее»; одно окно поверх: места героя слева, запасы справа, перетаскивание и нажатие, сравнение стрелками; «Свойства и сравнение» (screens/equipment.js, screens/talismans.js). Отряды — библиотека до десяти и один лист выбора на все режимы. Призыв — три вкладки; «За золото» — та же сетка книг и книга до покупки; «За души» — алтарь Возрождения душ: зеркало, герои пула веером книг, цена и шанс героя целиком, вход рулетки (screens/roulette.js); отряд Эхо недели — окно-витрина: цивилизация, пятеро крупными книгами своей стадии, неприязнь и «Пробудить»; лавка праха — отдельным окном: найденные герои пула, осколки за прах, пробуждение душами и окно пробуждения (screens/heroes.js). Осколок героя — стекло с его лицом, доля — свет кромки и заживающие трещины (screens/art-icons.js).', o: ['heroes', 'hero', 'hero-story', 'orders', 'equipment', 'equipment-item:s', 'talismans', 'collection-passives:s', 'squads', 'recruitment', 'hire-preview', 'resurrection', 'blueprints'],
+  { n: 'Герои', p: 24, where: 'Шахта · 3', d: 'Коллекция — купленные герои сеткой книг (screens/heroes.js, screens/book.js): ступень книги — личный максимум доблести, от кожаной книги до гримуара; редкость — кристалл и свет книги, рунные пределы — пять замков по правому краю, взятая доблесть — ленты-закладки; уровень, стихия, класс и мощь; по мощи сильнейшие сверху, порядок и фильтр значками, счётчик «в коллекции N из 360»; «Каталог» — найденные герои: неизвестная душа — силуэт класса и полоса осколков, известный — чёрно-белый. Нажатие на книгу — книга летит в центр и раскрывается: слева портрет (крупно по нажатию), справа — пергамент с закладками Развитие, Мощь, Снаряжение, Навыки, Путь: способности с описанием, характеристики и главы видны сразу, без нажатий; герой до покупки — та же книга: история, мощь, навыки по доблести, главы, цена и «Купить», без прокачки и снаряжения; неизвестная душа — только осколки и где их брать. «Развитие» (screens/hero-dev.js) — путь героя: уровень, ворота рунных пределов и звезда доблести, одна главная кнопка — следующий шаг; листы предела и доблести с честным превью, анимации пробития предела и доблести. «Снаряжение» — девять мест снаряжения и четыре места духовных талисманов, «Надеть лучшее»; одно окно поверх: места героя слева, запасы справа, перетаскивание и нажатие, сравнение стрелками; «Свойства и сравнение» (screens/equipment.js, screens/talismans.js). Отряды — библиотека до десяти и один лист выбора на все режимы. Призыв — три вкладки; «За золото» — та же сетка книг и книга до покупки; «За души» — алтарь Возрождения душ: зеркало, герои пула веером книг, цена и шанс героя целиком, вход рулетки (screens/roulette.js); отряд Эхо недели — окно-витрина: цивилизация, пятеро крупными книгами своей стадии, неприязнь и «Пробудить»; лавка праха — отдельным окном: найденные герои пула, осколки за прах, пробуждение душами и окно пробуждения (screens/heroes.js). Осколок героя — стекло с его лицом, доля — свет кромки и заживающие трещины (screens/art-icons.js).', o: ['heroes', 'hero', 'hero-story', 'orders', 'equipment', 'equipment-item:s', 'talismans', 'collection-passives:s', 'squads', 'recruitment', 'hire-preview', 'resurrection', 'blueprints'],
     ready: ['heroes', 'hero', 'hero-story', 'orders', 'collection-passives', 'squads', 'recruitment', 'hire-preview', 'talismans', 'resurrection', 'blueprints', 'equipment', 'equipment-item'] },
   { n: 'Ремесло', p: 11, where: 'Шахта · 4', d: 'Мастерская с запасами слева и столом справа: ресурсы — по пять в ряд, у каждого лупа карточки; нажатие — ползунок количества, потом ячейка. Книга рецептов открывается на месте стола. Попытка — анимация удачи и неудачи, автодокрафт — короткая (screens/craft.js). Лавка — витрина из десяти товаров, подробности и цена — в листе товара (screens/shop.js). Запасы — семь вкладок, сетка 6 × 5 — значок и число, подробности справа (screens/bag.js). Перековка — своё окно: талисманы, снаряжение, рабочие; что сплавить, отмечает игрок — сетка с отметками, счётчик и подсказки; лестница редкостей, наковальня, цена в золоте по циклу (screens/reforge.js).', o: ['craft', 'recipes', 'inventory', 'shop', 'market', 'my-listings', 'reforge'],
     ready: ['craft', 'recipes', 'shop', 'inventory', 'reforge'] },
@@ -3748,7 +3765,7 @@ const MAP = [
     ready: ['profile', 'wanderer-passives', 'artifacts', 'achievements', 'server-firsts', 'public-profile', 'friends', 'cosmetics'] },
   { n: 'Летопись', p: 19, where: 'Странник · вкладка', d: 'Одна книга знаний во вкладке Странника: боги, мир, города, Спуск, Странник — главы лора; бестиарий и механики — справка. Глава — одна мысль: картинка сверху, две строки и «ещё». Закрытая глава — условие; новые — точка у вкладки и дело у портрета (screens/chronicle.js).', o: ['cycles'],
     ready: ['cycles'] },
-  { n: 'Лавка Энериума', p: 30, where: '«+» у Энериума', d: 'Энериум и пропуск. Пропуск — сезон «Осенний путь»: баннер, ступень и очки, лента из 30 ступеней страницами по десять, два ряда, следующая награда крупно; что даёт платный ряд — лист до покупки; получение — награды по одной с частицами (screens/pass.js). Облик не продаётся: вкладка ведёт в лист «Облик» Странника. Подтверждение покупки — системное.', o: ['forbidden-shop', 'battle-pass', 'subscriptions', 'checkout:s', 'ad-reward'],
+  { n: 'Лавка Энериума', p: 30, where: '«+» у Энериума', d: 'Энериум и пропуск. Вкладка «Энериум» — стартовый набор: рунные ключи и души раз за игру, первая покупка ×2, что внутри — листом до оплаты; пакеты Энериума и подписка — из данных (screens/pass.js, EN_PASS.store). Пропуск — сезон «Осенний путь»: баннер, ступень и очки, лента из 30 ступеней страницами по десять, два ряда, следующая награда крупно; что даёт платный ряд — лист до покупки; получение — награды по одной с частицами (screens/pass.js). Облик не продаётся: вкладка ведёт в лист «Облик» Странника. Подтверждение покупки — системное.', o: ['forbidden-shop', 'battle-pass', 'subscriptions', 'checkout:s', 'ad-reward'],
     ready: ['battle-pass'] },
 ];
 const TEMPLATES = [
@@ -4685,6 +4702,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 <script src="screens/heroes.js"></script>
 <script src="screens/book.js"></script>
 <script src="screens/library.js"></script>
+<script src="screens/book-pages.js"></script>
 <script src="screens/arena.js"></script>
 <script src="screens/clan.js"></script>
 <script src="screens/reforge.js"></script>
@@ -4694,6 +4712,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 <script src="screens/pass.js"></script>
 <script src="screens/talk.js"></script>
 <script src="screens/social.js"></script>
+<script src="screens/chambers.js"></script>
 <script src="screens/battle-cards.js"></script>
 </body>
 </html>

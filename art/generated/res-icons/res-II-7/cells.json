@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-II-7__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-ii.json",
+  "job": "res-II-7",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "cr_copperplate",
+      "file": "art/generated/res-icons/res-II-7/cr_copperplate.webp",
+      "box": [
+        11,
+        18,
+        443,
+        450
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_silkweb",
+      "file": "art/generated/res-icons/res-II-7/cr_silkweb.webp",
+      "box": [
+        473,
+        18,
+        905,
+        450
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb17",
+      "file": "art/generated/res-icons/res-II-7/find_cb17.webp",
+      "box": [
+        936,
+        18,
+        1368,
+        450
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb17b",
+      "file": "art/generated/res-icons/res-II-7/find_cb17b.webp",
+      "box": [
+        1398,
+        18,
+        1831,
+        451
+      ],
+      "px": 433,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb17",
+      "file": "art/generated/res-icons/res-II-7/call_fb17.webp",
+      "box": [
+        1861,
+        18,
+        2293,
+        450
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fb17",
+      "file": "art/generated/res-icons/res-II-7/tr_fb17.webp",
+      "box": [
+        11,
+        481,
+        443,
+        913
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fb17a",
+      "file": "art/generated/res-icons/res-II-7/tr_fb17a.webp",
+      "box": [
+        473,
+        481,
+        905,
+        913
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb17_aw",
+      "file": "art/generated/res-icons/res-II-7/call_fb17_aw.webp",
+      "box": [
+        936,
+        481,
+        1368,
+        913
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "act_ci2",
+      "file": "art/generated/res-icons/res-II-7/act_ci2.webp",
+      "box": [
+        1398,
+        481,
+        1831,
+        914
+      ],
+      "px": 433,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_ci2_rivet",
+      "file": "art/generated/res-icons/res-II-7/cr_ci2_rivet.webp",
+      "box": [
+        1861,
+        481,
+        2293,
+        913
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_ci2_cage",
+      "file": "art/generated/res-icons/res-II-7/cr_ci2_cage.webp",
+      "box": [
+        11,
+        944,
+        443,
+        1376
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_ci2_gear",
+      "file": "art/generated/res-icons/res-II-7/cr_ci2_gear.webp",
+      "box": [
+        473,
+        944,
+        905,
+        1376
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_ci2_board",
+      "file": "art/generated/res-icons/res-II-7/cr_ci2_board.webp",
+      "box": [
+        936,
+        944,
+        1368,
+        1376
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_ci2_soot",
+      "file": "art/generated/res-icons/res-II-7/cr_ci2_soot.webp",
+      "box": [
+        1398,
+        944,
+        1831,
+        1377
+      ],
+      "px": 433,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_ci2_steam",
+      "file": "art/generated/res-icons/res-II-7/cr_ci2_steam.webp",
+      "box": [
+        1861,
+        944,
+        2293,
+        1376
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_ci2_ribbon",
+      "file": "art/generated/res-icons/res-II-7/cr_ci2_ribbon.webp",
+      "box": [
+        11,
+        1407,
+        443,
+        1839
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_ci2_mat",
+      "file": "art/generated/res-icons/res-II-7/cr_ci2_mat.webp",
+      "box": [
+        473,
+        1407,
+        905,
+        1839
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_ci2_goat",
+      "file": "art/generated/res-icons/res-II-7/cr_ci2_goat.webp",
+      "box": [
+        936,
+        1407,
+        1368,
+        1839
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_ci2_bell",
+      "file": "art/generated/res-icons/res-II-7/cr_ci2_bell.webp",
+      "box": [
+        1398,
+        1406,
+        1831,
+        1839
+      ],
+      "px": 433,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_ci2_charge",
+      "file": "art/generated/res-icons/res-II-7/cr_ci2_charge.webp",
+      "box": [
+        1861,
+        1407,
+        2293,
+        1839
+      ],
+      "px": 432,
+      "key_left": 0.0
+    }
+  ]
+}

@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-V-7__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-v.json",
+  "job": "res-V-7",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "act_cb15",
+      "file": "art/generated/res-icons/res-V-7/act_cb15.webp",
+      "box": [
+        20,
+        23,
+        447,
+        450
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_stopclock",
+      "file": "art/generated/res-icons/res-V-7/cr_stopclock.webp",
+      "box": [
+        480,
+        23,
+        906,
+        449
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_dustsheet",
+      "file": "art/generated/res-icons/res-V-7/cr_dustsheet.webp",
+      "box": [
+        939,
+        23,
+        1365,
+        449
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_teacup",
+      "file": "art/generated/res-icons/res-V-7/cr_teacup.webp",
+      "box": [
+        1398,
+        23,
+        1824,
+        449
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_pressedflower",
+      "file": "art/generated/res-icons/res-V-7/cr_pressedflower.webp",
+      "box": [
+        1857,
+        23,
+        2283,
+        449
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_window",
+      "file": "art/generated/res-icons/res-V-7/cr_window.webp",
+      "box": [
+        20,
+        484,
+        447,
+        911
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_embroidery",
+      "file": "art/generated/res-icons/res-V-7/cr_embroidery.webp",
+      "box": [
+        480,
+        484,
+        906,
+        910
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_songbird",
+      "file": "art/generated/res-icons/res-V-7/cr_songbird.webp",
+      "box": [
+        939,
+        484,
+        1365,
+        910
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_doorkey",
+      "file": "art/generated/res-icons/res-V-7/cr_doorkey.webp",
+      "box": [
+        1398,
+        484,
+        1824,
+        910
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_wallbow",
+      "file": "art/generated/res-icons/res-V-7/cr_wallbow.webp",
+      "box": [
+        1857,
+        484,
+        2283,
+        910
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb15",
+      "file": "art/generated/res-icons/res-V-7/find_cb15.webp",
+      "box": [
+        20,
+        945,
+        447,
+        1372
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb15b",
+      "file": "art/generated/res-icons/res-V-7/find_cb15b.webp",
+      "box": [
+        480,
+        945,
+        906,
+        1371
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb15",
+      "file": "art/generated/res-icons/res-V-7/call_fb15.webp",
+      "box": [
+        939,
+        945,
+        1365,
+        1371
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fb15",
+      "file": "art/generated/res-icons/res-V-7/tr_fb15.webp",
+      "box": [
+        1398,
+        945,
+        1824,
+        1371
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fb15a",
+      "file": "art/generated/res-icons/res-V-7/tr_fb15a.webp",
+      "box": [
+        1857,
+        945,
+        2283,
+        1371
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb15_aw",
+      "file": "art/generated/res-icons/res-V-7/call_fb15_aw.webp",
+      "box": [
+        20,
+        1405,
+        447,
+        1832
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "act_cb21",
+      "file": "art/generated/res-icons/res-V-7/act_cb21.webp",
+      "box": [
+        480,
+        1406,
+        906,
+        1832
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_frozenarrow",
+      "file": "art/generated/res-icons/res-V-7/cr_frozenarrow.webp",
+      "box": [
+        939,
+        1406,
+        1365,
+        1832
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_leapfur",
+      "file": "art/generated/res-icons/res-V-7/cr_leapfur.webp",
+      "box": [
+        1398,
+        1406,
+        1824,
+        1832
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_frozenhorn",
+      "file": "art/generated/res-icons/res-V-7/cr_frozenhorn.webp",
+      "box": [
+        1857,
+        1406,
+        2283,
+        1832
+      ],
+      "px": 426,
+      "key_left": 0.0
+    }
+  ]
+}

@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-II-3__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-ii.json",
+  "job": "res-II-3",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "a_ledger",
+      "file": "art/generated/res-icons/res-II-3/a_ledger.webp",
+      "box": [
+        7,
+        12,
+        444,
+        449
+      ],
+      "px": 437,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_rune",
+      "file": "art/generated/res-icons/res-II-3/p_rune.webp",
+      "box": [
+        470,
+        12,
+        908,
+        450
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_amber",
+      "file": "art/generated/res-icons/res-II-3/p_amber.webp",
+      "box": [
+        933,
+        11,
+        1372,
+        450
+      ],
+      "px": 439,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_starchart",
+      "file": "art/generated/res-icons/res-II-3/p_starchart.webp",
+      "box": [
+        1397,
+        12,
+        1835,
+        450
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_shiftlamp",
+      "file": "art/generated/res-icons/res-II-3/p_shiftlamp.webp",
+      "box": [
+        1861,
+        13,
+        2297,
+        449
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_plate",
+      "file": "art/generated/res-icons/res-II-3/a_plate.webp",
+      "box": [
+        7,
+        477,
+        444,
+        914
+      ],
+      "px": 437,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_seal",
+      "file": "art/generated/res-icons/res-II-3/a_seal.webp",
+      "box": [
+        470,
+        476,
+        908,
+        914
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_orderslip",
+      "file": "art/generated/res-icons/res-II-3/a_orderslip.webp",
+      "box": [
+        933,
+        476,
+        1372,
+        915
+      ],
+      "px": 439,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_cinder",
+      "file": "art/generated/res-icons/res-II-3/a_cinder.webp",
+      "box": [
+        1397,
+        476,
+        1835,
+        914
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_shaftlamp",
+      "file": "art/generated/res-icons/res-II-3/a_shaftlamp.webp",
+      "box": [
+        1861,
+        477,
+        2297,
+        913
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_rubbing",
+      "file": "art/generated/res-icons/res-II-3/a_rubbing.webp",
+      "box": [
+        7,
+        942,
+        444,
+        1379
+      ],
+      "px": 437,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_restored",
+      "file": "art/generated/res-icons/res-II-3/a_restored.webp",
+      "box": [
+        470,
+        941,
+        908,
+        1379
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_c17goods",
+      "file": "art/generated/res-icons/res-II-3/a_c17goods.webp",
+      "box": [
+        933,
+        941,
+        1372,
+        1380
+      ],
+      "px": 439,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_joint",
+      "file": "art/generated/res-icons/res-II-3/p_joint.webp",
+      "box": [
+        1397,
+        941,
+        1835,
+        1379
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_chain",
+      "file": "art/generated/res-icons/res-II-3/p_chain.webp",
+      "box": [
+        1861,
+        942,
+        2297,
+        1378
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_lens",
+      "file": "art/generated/res-icons/res-II-3/p_lens.webp",
+      "box": [
+        7,
+        1407,
+        444,
+        1844
+      ],
+      "px": 437,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_mech",
+      "file": "art/generated/res-icons/res-II-3/a_mech.webp",
+      "box": [
+        470,
+        1406,
+        908,
+        1844
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_lift",
+      "file": "art/generated/res-icons/res-II-3/a_lift.webp",
+      "box": [
+        933,
+        1406,
+        1372,
+        1845
+      ],
+      "px": 439,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_cart",
+      "file": "art/generated/res-icons/res-II-3/a_cart.webp",
+      "box": [
+        1397,
+        1406,
+        1835,
+        1844
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_winch",
+      "file": "art/generated/res-icons/res-II-3/a_winch.webp",
+      "box": [
+        1861,
+        1407,
+        2297,
+        1843
+      ],
+      "px": 436,
+      "key_left": 0.0
+    }
+  ]
+}

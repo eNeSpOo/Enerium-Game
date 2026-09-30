@@ -121,8 +121,17 @@ def call(key, model_id, prompt, refs, aspect, size, max_tokens):
         },
     }
     for attempt in range(RETRIES + 1):
-        r = requests.post(API.format(model=model_id), json=body, timeout=600,
-                          headers={"x-goog-api-key": key, "Content-Type": "application/json"})
+        try:
+            r = requests.post(API.format(model=model_id), json=body, timeout=600,
+                              headers={"x-goog-api-key": key, "Content-Type": "application/json"})
+        except requests.exceptions.RequestException as e:
+            # оборванный ответ (SSL record layer failure, разрыв соединения): картинка могла быть уже оплачена — повтор после паузы
+            if attempt < RETRIES:
+                wait = 15 * (attempt + 1)
+                print(f"    сеть: {type(e).__name__}, ответ оборван, повтор через {wait} с")
+                time.sleep(wait)
+                continue
+            raise RuntimeError(f"сеть: {type(e).__name__}: {str(e)[:300]}")
         if r.status_code == 200:
             return r.json()
         if r.status_code in (429, 500, 503) and attempt < RETRIES:

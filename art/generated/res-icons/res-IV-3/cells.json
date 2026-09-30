@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-IV-3__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-iv.json",
+  "job": "res-IV-3",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "a_contract",
+      "file": "art/generated/res-icons/res-IV-3/a_contract.webp",
+      "box": [
+        28,
+        35,
+        449,
+        456
+      ],
+      "px": 421,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_insured",
+      "file": "art/generated/res-icons/res-IV-3/a_insured.webp",
+      "box": [
+        485,
+        35,
+        906,
+        456
+      ],
+      "px": 421,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_passage",
+      "file": "art/generated/res-icons/res-IV-3/a_passage.webp",
+      "box": [
+        941,
+        35,
+        1362,
+        456
+      ],
+      "px": 421,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_lock",
+      "file": "art/generated/res-icons/res-IV-3/p_lock.webp",
+      "box": [
+        1398,
+        35,
+        1819,
+        456
+      ],
+      "px": 421,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_weight",
+      "file": "art/generated/res-icons/res-IV-3/p_weight.webp",
+      "box": [
+        1854,
+        35,
+        2275,
+        456
+      ],
+      "px": 421,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_scales",
+      "file": "art/generated/res-icons/res-IV-3/a_scales.webp",
+      "box": [
+        28,
+        490,
+        449,
+        911
+      ],
+      "px": 421,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_whitestep",
+      "file": "art/generated/res-icons/res-IV-3/a_whitestep.webp",
+      "box": [
+        485,
+        490,
+        906,
+        911
+      ],
+      "px": 421,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_citytile",
+      "file": "art/generated/res-icons/res-IV-3/a_citytile.webp",
+      "box": [
+        941,
+        490,
+        1362,
+        911
+      ],
+      "px": 421,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_sluicegate",
+      "file": "art/generated/res-icons/res-IV-3/a_sluicegate.webp",
+      "box": [
+        1398,
+        490,
+        1819,
+        911
+      ],
+      "px": 421,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_riverpebble",
+      "file": "art/generated/res-icons/res-IV-3/p_riverpebble.webp",
+      "box": [
+        1854,
+        490,
+        2275,
+        911
+      ],
+      "px": 421,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_netting",
+      "file": "art/generated/res-icons/res-IV-3/p_netting.webp",
+      "box": [
+        28,
+        945,
+        449,
+        1366
+      ],
+      "px": 421,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_sash",
+      "file": "art/generated/res-icons/res-IV-3/p_sash.webp",
+      "box": [
+        485,
+        945,
+        906,
+        1366
+      ],
+      "px": 421,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_reedmat",
+      "file": "art/generated/res-icons/res-IV-3/p_reedmat.webp",
+      "box": [
+        941,
+        945,
+        1362,
+        1366
+      ],
+      "px": 421,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_sail",
+      "file": "art/generated/res-icons/res-IV-3/a_sail.webp",
+      "box": [
+        1398,
+        945,
+        1819,
+        1366
+      ],
+      "px": 421,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_harborkit",
+      "file": "art/generated/res-icons/res-IV-3/a_harborkit.webp",
+      "box": [
+        1854,
+        945,
+        2275,
+        1366
+      ],
+      "px": 421,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_boat",
+      "file": "art/generated/res-icons/res-IV-3/a_boat.webp",
+      "box": [
+        29,
+        1402,
+        449,
+        1822
+      ],
+      "px": 420,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_accusation",
+      "file": "art/generated/res-icons/res-IV-3/a_accusation.webp",
+      "box": [
+        485,
+        1402,
+        905,
+        1822
+      ],
+      "px": 420,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_c4goods",
+      "file": "art/generated/res-icons/res-IV-3/a_c4goods.webp",
+      "box": [
+        942,
+        1402,
+        1362,
+        1822
+      ],
+      "px": 420,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_c12rope",
+      "file": "art/generated/res-icons/res-IV-3/a_c12rope.webp",
+      "box": [
+        1398,
+        1402,
+        1818,
+        1822
+      ],
+      "px": 420,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_darkscale",
+      "file": "art/generated/res-icons/res-IV-3/p_darkscale.webp",
+      "box": [
+        1855,
+        1402,
+        2275,
+        1822
+      ],
+      "px": 420,
+      "key_left": 0.0
+    }
+  ]
+}

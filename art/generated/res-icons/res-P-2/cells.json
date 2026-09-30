@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-P-2__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-p.json",
+  "job": "res-P-2",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "rag",
+      "file": "art/generated/res-icons/res-P-2/rag.webp",
+      "box": [
+        26,
+        29,
+        450,
+        453
+      ],
+      "px": 424,
+      "key_left": 0.0
+    },
+    {
+      "id": "leather",
+      "file": "art/generated/res-icons/res-P-2/leather.webp",
+      "box": [
+        483,
+        29,
+        907,
+        453
+      ],
+      "px": 424,
+      "key_left": 0.0
+    },
+    {
+      "id": "canvas",
+      "file": "art/generated/res-icons/res-P-2/canvas.webp",
+      "box": [
+        940,
+        29,
+        1364,
+        453
+      ],
+      "px": 424,
+      "key_left": 0.0
+    },
+    {
+      "id": "yarn",
+      "file": "art/generated/res-icons/res-P-2/yarn.webp",
+      "box": [
+        1397,
+        29,
+        1821,
+        453
+      ],
+      "px": 424,
+      "key_left": 0.0
+    },
+    {
+      "id": "fang",
+      "file": "art/generated/res-icons/res-P-2/fang.webp",
+      "box": [
+        1854,
+        29,
+        2277,
+        452
+      ],
+      "px": 423,
+      "key_left": 0.0
+    },
+    {
+      "id": "bone",
+      "file": "art/generated/res-icons/res-P-2/bone.webp",
+      "box": [
+        26,
+        487,
+        450,
+        911
+      ],
+      "px": 424,
+      "key_left": 0.0
+    },
+    {
+      "id": "claw",
+      "file": "art/generated/res-icons/res-P-2/claw.webp",
+      "box": [
+        483,
+        487,
+        907,
+        911
+      ],
+      "px": 424,
+      "key_left": 0.0
+    },
+    {
+      "id": "hide",
+      "file": "art/generated/res-icons/res-P-2/hide.webp",
+      "box": [
+        940,
+        487,
+        1364,
+        911
+      ],
+      "px": 424,
+      "key_left": 0.0
+    },
+    {
+      "id": "feather",
+      "file": "art/generated/res-icons/res-P-2/feather.webp",
+      "box": [
+        1397,
+        487,
+        1821,
+        911
+      ],
+      "px": 424,
+      "key_left": 0.0
+    },
+    {
+      "id": "sinew",
+      "file": "art/generated/res-icons/res-P-2/sinew.webp",
+      "box": [
+        1854,
+        487,
+        2277,
+        910
+      ],
+      "px": 423,
+      "key_left": 0.0
+    },
+    {
+      "id": "ember",
+      "file": "art/generated/res-icons/res-P-2/ember.webp",
+      "box": [
+        26,
+        945,
+        450,
+        1369
+      ],
+      "px": 424,
+      "key_left": 0.0
+    },
+    {
+      "id": "ironore",
+      "file": "art/generated/res-icons/res-P-2/ironore.webp",
+      "box": [
+        483,
+        945,
+        907,
+        1369
+      ],
+      "px": 424,
+      "key_left": 0.0
+    },
+    {
+      "id": "scrap",
+      "file": "art/generated/res-icons/res-P-2/scrap.webp",
+      "box": [
+        940,
+        945,
+        1364,
+        1369
+      ],
+      "px": 424,
+      "key_left": 0.0
+    },
+    {
+      "id": "dross",
+      "file": "art/generated/res-icons/res-P-2/dross.webp",
+      "box": [
+        1397,
+        945,
+        1821,
+        1369
+      ],
+      "px": 424,
+      "key_left": 0.0
+    },
+    {
+      "id": "copper",
+      "file": "art/generated/res-icons/res-P-2/copper.webp",
+      "box": [
+        1854,
+        945,
+        2277,
+        1368
+      ],
+      "px": 423,
+      "key_left": 0.0
+    },
+    {
+      "id": "coal",
+      "file": "art/generated/res-icons/res-P-2/coal.webp",
+      "box": [
+        26,
+        1402,
+        450,
+        1826
+      ],
+      "px": 424,
+      "key_left": 0.0
+    },
+    {
+      "id": "ener2",
+      "file": "art/generated/res-icons/res-P-2/ener2.webp",
+      "box": [
+        483,
+        1402,
+        907,
+        1826
+      ],
+      "px": 424,
+      "key_left": 0.0
+    },
+    {
+      "id": "ener3",
+      "file": "art/generated/res-icons/res-P-2/ener3.webp",
+      "box": [
+        940,
+        1402,
+        1364,
+        1826
+      ],
+      "px": 424,
+      "key_left": 0.0
+    },
+    {
+      "id": "rdust",
+      "file": "art/generated/res-icons/res-P-2/rdust.webp",
+      "box": [
+        1397,
+        1402,
+        1821,
+        1826
+      ],
+      "px": 424,
+      "key_left": 0.0
+    },
+    {
+      "id": "mask",
+      "file": "art/generated/res-icons/res-P-2/mask.webp",
+      "box": [
+        1854,
+        1402,
+        2277,
+        1825
+      ],
+      "px": 423,
+      "key_left": 0.0
+    }
+  ]
+}

@@ -159,7 +159,10 @@ const TARGET = {
   ckeysBp: 300,       // ключи ремёсел — 3 % дохода с элит; с уникальной редкости задания
   ckeyFrom: 3,
   uniq: { d: [0, 0, 0, 0, 0, 0, 0], w: [0, 0, 0, 0, 0, 0, 1] },   // уникальный ресурс босса — за вневременное задание недели
-  en: { d: [0, 0, 0, 1, 2, 3, 5], w: [0, 0, 0, 5, 8, 12, 20] },    // Энериум — с эпической (§9.3, §18.5), без цикла: цены в Энериуме от цикла не зависят
+  /* Энериум — с эпической (§9.3, §18.5), без цикла: цены в Энериуме от цикла не зависят. ×4 к прежним 1 / 2 / 3 / 5 и 5 / 8 / 12 / 20 —
+     ручеёк бесплатного игрока (слово автора 30.09.2026, ADR-0033): контракты — главный заработанный Энериум, около 13–25 в день у обычного.
+     Сроки целей и ×1,7 — tools/content-gen/economy/enerium.js; платные замены по-прежнему не окупаются (LAWS.loopPct) */
+  en: { d: [0, 0, 0, 4, 8, 12, 20], w: [0, 0, 0, 20, 32, 48, 80] },
   chest: { box: 'keys', win: 'step', t: 'w' },                     // недельный контракт — ещё сундук ключей редкости самого редкого задания (§23)
   tolBp: 2000,        // достигнутая после округления доля — не дальше 20 % от цели
   keysCoverMin: 7000, // ключи обычного со всех источников — не меньше 70 % капа (§11)
@@ -503,8 +506,9 @@ function build() {
       e: { dayDoneBp: Math.round(sims[c].e.dayDone * RULES.bp / sims[c].e.dayTry), weekDoneBp: Math.round(sims[c].e.weekDone * RULES.bp / sims[c].e.weekTry),
         keys: Math.round(income[c].e.keysAll), ctKeys: Math.round(income[c].e.keys + income[c].e.chestKeys + income[c].e.rating),
         pts: Math.round(meanPts(c, 'e')), en: Math.round(income[c].e.en), gold: Math.round(income[c].e.gold), stake: Math.round(income[c].e.stake), spirit: Math.round(income[c].e.spirit) },
-      /* p — плательщик при времени обычного: его ключи контрактов берёт прогон темпа (biomes/pace.py, ×1,7 темпа цикла II) */
-      p: { keys: Math.round(income[c].p.keysAll), ctKeys: Math.round(income[c].p.keys + income[c].p.chestKeys + income[c].p.rating), pts: Math.round(meanPts(c, 'p')) },
+      /* p — плательщик при времени обычного: его ключи контрактов берёт прогон темпа (biomes/pace.py, ×1,7 темпа цикла II),
+         Энериум — калькулятор ручейка Энериума (economy/enerium.js, ×1,7 Энериума игрой) */
+      p: { keys: Math.round(income[c].p.keysAll), ctKeys: Math.round(income[c].p.keys + income[c].p.chestKeys + income[c].p.rating), pts: Math.round(meanPts(c, 'p')), en: Math.round(income[c].p.en) },
       x17: Math.round(x17[c].worst * 100),
     }])),
   };

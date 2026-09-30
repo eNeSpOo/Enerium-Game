@@ -5,8 +5,9 @@
 Скрипт собирает из описей нарезки (cells.json) итоговую клетку на каждую иконку и пишет опись выгрузки для export_ui.py:
 - способности — spells/<имя>.webp, имя — набор латиницей и id способности: «Огонь.dmg.all» → fire-dmg-all (ART_ICONS.spell, art-icons.js);
 - талисманы — tal/<ключ линейки>.webp (EN_TALISMANS.fams);
-- снаряжение — gear/<слот>-<редкость>.webp (EN_EQUIPMENT.templates «слот.редкость»).
-И проверяет, что иконка есть у каждой способности библиотеки, линейки талисмана и шаблона снаряжения.
+- снаряжение — gear/<слот>-<редкость>.webp (EN_EQUIPMENT.templates «слот.редкость»);
+- ресурсы — res/<id>.webp (EN_RECIPES.items), «ресурс скрыт» — res/hidden.webp; предметы с готовой картинкой (img) и герои не рисуются.
+И проверяет, что иконка есть у каждой способности библиотеки, линейки талисмана, шаблона снаряжения и предмета ресурсов.
 
   python tools/art-gen/ui_icons.py            # пересобрать ui-icons.json
   python tools/art-gen/export_ui.py --spec ui-icons.json --no-stamp --quiet
@@ -26,6 +27,7 @@ KINDS = {
     "spell-icons": lambda cid, stem: f"spells/{stem}.webp",
     "talisman-icons": lambda cid, stem: None if stem.endswith("-alt") else f"tal/{cid}.webp",
     "equip-icons": lambda cid, stem: "gear/" + cid.replace(".", "-") + ".webp",
+    "res-icons": lambda cid, stem: None if cid.startswith("spare") else f"res/{cid}.webp",   # spare — пустая клетка малого листа
 }
 
 
@@ -52,6 +54,16 @@ def cells(category):
     return got
 
 
+def res_ids():
+    """Предметы ресурсов с иконкой сеткой: все EN_RECIPES.items, кроме готовой картинки (img) и героев (fam hero)."""
+    code = ("global.window = globalThis; require(process.argv[1]); "
+            "process.stdout.write(JSON.stringify(window.EN_RECIPES.items.filter(i => !i.img && i.fam !== 'hero').map(i => i.id)));")
+    run = subprocess.run(["node", "-e", code, str(ROOT / "design/ui/recipes.js")], capture_output=True, text=True, encoding="utf-8")
+    if run.returncode:
+        sys.exit(f"recipes.js: {run.stderr.strip()[:300]}")
+    return json.loads(run.stdout)
+
+
 def js_keys(name, expr):
     """Ключи из файла данных прототипа: файл выполняется в Node, как в браузере, expr — выражение от window."""
     code = ("global.window = globalThis; require(process.argv[1]); "
@@ -73,10 +85,15 @@ def main():
     need = {f"spells/{spell_stem(i)}.webp": i for i in ids}
     need["spells/ability-hidden.webp"] = "способность скрыта"
     need.update({f"tal/{k}.webp": k for k in js_keys("talismans.js", "window.EN_TALISMANS.fams")})
+    need["tal/hidden.webp"] = "талисман скрыт"
     need.update({"gear/" + k.replace(".", "-") + ".webp": k for k in js_keys("equipment.js", "window.EN_EQUIPMENT.templates")})
+    res = res_ids()
+    need.update({f"res/{i}.webp": i for i in res})
+    need["res/hidden.webp"] = "ресурс скрыт"
     missing = [f"{v} ({k})" for k, v in need.items() if k not in items]
+    extra = [k for k in items if k not in need]
     spec = {
-        "note": "Иконки, нарисованные сеткой (слово автора 30.09.2026): способности библиотеки, линейки духовных талисманов, снаряжение по слоту и редкости. "
+        "note": "Иконки, нарисованные сеткой (слово автора 30.09.2026): способности библиотеки, линейки духовных талисманов, снаряжение по слоту и редкости, ресурсы. "
                 "Собирает tools/art-gen/ui_icons.py из нарезки grid_slice.py — руками не править: клетка листа переделки заменяет клетку большого листа. "
                 "Выгрузка: python tools/art-gen/export_ui.py --spec ui-icons.json --no-stamp. Пути читает design/ui/screens/art-icons.js (ART_ICONS.grid)",
         "out": "design/ui/assets/art",
@@ -88,10 +105,13 @@ def main():
     for k in items:
         kinds[k.split("/")[0]] = kinds.get(k.split("/")[0], 0) + 1
     print(f"ui-icons.json: {len(items)} иконок — " + ", ".join(f"{k} {v}" for k, v in kinds.items()))
-    if missing:
-        print(f"! без иконки {len(missing)}: " + "; ".join(missing[:20]))
+    if missing or extra:
+        if missing:
+            print(f"! без иконки {len(missing)}: " + "; ".join(missing[:20]))
+        if extra:
+            print(f"! лишние записи {len(extra)}: " + "; ".join(extra[:20]))
         sys.exit(1)
-    print(f"У каждой из {len(ids)} способностей, {len(need) - len(ids) - 1} линеек и шаблонов есть иконка")
+    print(f"У каждой из {len(ids)} способностей, {len(need) - len(ids) - len(res) - 3} линеек и шаблонов, {len(res)} предметов ресурсов есть иконка")
 
 
 if __name__ == "__main__":

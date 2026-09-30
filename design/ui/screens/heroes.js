@@ -10,8 +10,9 @@
      в запасах есть осколок: книга с силуэтом класса, сведения закрыты; известен — комплект осколков, герои за золото открытых циклов
      и донатные; в коллекции;
    — раскрытую книгу героя (слой поверх сетки, screens/book.js): слева портрет — нажатие показывает его крупно (OV.hczoom), справа —
-     вкладки «Развитие», «Снаряжение», «Навыки», «Путь» (heroDetail без шапки, index.html; развитие и окно снаряжения —
-     screens/hero-dev.js). Книга «до покупки» — те же страницы: «Герой», «Навыки», «Путь» и одно действие внизу — «Купить», «Пробудить»
+     вкладки «Развитие», «Мощь», «Снаряжение», «Навыки», «Путь» (heroDetail без шапки, index.html; развитие и окно снаряжения —
+     screens/hero-dev.js; страницы и закладки — screens/book-pages.js). Книга «до покупки» — те же страницы: «Герой», «Мощь», «Навыки»,
+     «Путь» и одно действие внизу — «Купить», «Пробудить»
      или как получить; снаряжения, талисманов и прокачки нет. Она же — окно поверх любого экрана (OV.rhero);
    — одну анатомию героя: книгу (hbCard) в сетках, витринах, отрядах и профилях — heroCard (герой аккаунта), rsCard (герой состава)
      и hrTile дают мелкую книгу; шапку (heroHead, rsHead) для листов. Редкость — одобренный кристалл r1…r7 (--rico, ADR-0027),
@@ -310,11 +311,11 @@ function heroHead(h) { return hrHead(hrV(h)); }
 /* шапка героя состава: v — доблесть для примерки (режим «Команда»); у купленного — его прогресс */
 function rsHead(h, v, aside) { const x = hrV(h); if (!x.own) x.valor = Math.min(v || 0, x.maxV); return hrHead(x, aside); }
 /* «Путь» героя аккаунта: главы по доблести и орден — из roster.js; у героя отряда прототипа — его запись в составе (hrTwin).
-   Его зовёт heroDetail в index.html, вкладка «Путь» */
+   Страница книги — одна колонка, как в книге: открытые главы читаются целиком, с буквицей, закрытые — заголовком и доблестью; орден —
+   в конце (слово автора 30.09.2026: «Путь» — главы читаются прямо в книге). Его зовёт heroDetail в index.html, вкладка «Путь» */
 function hrPath(h) {
   const rh = hrTwin(h); if (!rh) return '';
-  return `<div class="hd-cols"><div class="col scroll" data-keep="hrpath:${h.id}">${rsChaptersHtml(rh, h.valor)}</div>
-    <div class="col scroll" style="gap:8px"><span class="eyebrow">Орден</span>${rsSetHtml(rh, h.valor)}</div></div>`;
+  return `<div class="pg-path scroll" data-keep="hrpath:${h.id}">${rsChaptersHtml(rh, h.valor)}<h3 class="pg-h">Орден</h3>${rsSetHtml(rh, h.valor)}</div>`;
 }
 
 /* ================== Коллекция: сетка книг ==================
@@ -434,20 +435,22 @@ function hcGridView() {
   return `<section class="scr hk-scr">${lbCase({ cls: 'hk-case', top: hcBar(kind, list.length, found), body: `<div class="hkg lb-shv scroll" style="--n:${sh.n}" data-keep="hk:${kind}">${sh.html}</div>` })}</section>`;
 }
 
-/* ---------- страницы раскрытой книги (сама книга — hbWin, screens/book.js) ----------
-   Книга «до покупки» (стадия 2): вкладки «Герой» (история-завязка и с чем приходит), «Навыки» (что откроет каждая доблесть: набор
-   героя, доли хода), «Путь» (главы и орден). Снаряжения, талисманов и прокачки нет — героя ещё нет в коллекции; купленный — та же
-   книга с его прогрессом. Неизвестная душа (стадия 1) — страница без сведений: сколько осколков и где их брать */
+/* ---------- страницы раскрытой книги (сама книга — hbWin, screens/book.js; язык страниц — screens/book-pages.js) ----------
+   Книга «до покупки» (стадия 2): закладки «Герой» (история-завязка целиком и с чем приходит), «Мощь» (§33.1: мощь, характеристики со
+   степенью роста и атрибуты по базовым характеристикам, на 0 уровне), «Навыки» (что откроет каждая доблесть: набор героя, доли хода —
+   описание сразу), «Путь» (главы и орден). Снаряжения, талисманов и прокачки нет — героя ещё нет в коллекции; купленный — та же книга
+   с его прогрессом. Неизвестная душа (стадия 1) — страница без сведений: сколько осколков и где их брать */
 function hcPreBody(rh) {
   const v = hcView(rh), val = S.rs.val && S.rs.val.id === rh.id ? rsV(rh) : v.own ? v.valor : 0;
-  const t = ['who', 'skills', 'path'].includes(S.seg.rhero) ? S.seg.rhero : 'who';
+  const tabs = [['who', 'Герой'], ['stats', 'Мощь'], ['skills', 'Навыки'], ['path', 'Путь']], t = tabs.some(x => x[0] === S.seg.rhero) ? S.seg.rhero : 'who';
   const team = `<button class="iconbtn rs-team team-only" data-a="rsteam" aria-pressed="${!!KH.team}" aria-label="Режим «Команда»" title="Режим «Команда»: орден, черновик и заметки видны сразу. Нажать — вернуться к виду игрока">${ic('eye')}</button>`;
-  const tabs = `<div class="row hb-tr"><div class="tabs" role="tablist" aria-label="Разделы героя">${[['who', 'Герой'], ['skills', 'Навыки'], ['path', 'Путь']].map(([k, l]) => `<button role="tab" aria-selected="${t === k}" data-a="seg" data-v="rhero:${k}">${l}</button>`).join('')}</div><span class="g-spacer"></span>${team}</div>`;
+  const nav = pgTabs(tabs, t, 'rhero', { label: 'Разделы героя', extra: team });
   const pseudo = { draft: hrDraft(rh), valor: val }, kit = typeof heroKit === 'function' && heroKit(pseudo) ? heroKitHtml(pseudo) : '<p class="faint">Набора способностей пока нет.</p>';
-  const body = t === 'skills' ? `<div class="hb-sc scroll" data-keep="hcskill:${rh.id}">${rsValorPick(rh, val)}${kit}</div>`
-    : t === 'path' ? `<div class="hb-sc scroll" data-keep="hcpath:${rh.id}">${rsValorPick(rh, val)}${rsChaptersHtml(rh, val)}<span class="eyebrow">Орден</span>${rsSetHtml(rh, val)}</div>`
-    : `<div class="hb-sc scroll" data-keep="hcwho:${rh.id}">${rsWhoHtml(rh)}</div>`;
-  return `<div class="hb-tb">${tabs}${body}</div>`;
+  const body = t === 'skills' ? `<div class="hb-sc">${rsValorPick(rh, val)}${kit}</div>`
+    : t === 'stats' ? `<div class="hb-sc">${pgStats(hrBuild(rh), { pre: true })}</div>`
+    : t === 'path' ? `<div class="hb-sc pg-path scroll" data-keep="hcpath:${rh.id}">${rsValorPick(rh, val)}${rsChaptersHtml(rh, val)}<h3 class="pg-h">Орден</h3>${rsSetHtml(rh, val)}</div>`
+    : `<div class="hb-sc pg-who scroll" data-keep="hcwho:${rh.id}"><p class="pg-kick">${rar(rh.r)}<span>${hrEsc(rh.cls)}</span><span>цикл ${ROMAN[rh.c]}</span></p>${rsWhoHtml(rh, { book: true })}</div>`;
+  return `<div class="hb-tb">${nav}${pgBody(body, 'rhero')}</div>`;
 }
 /* где брать осколки — по источнику героя */
 const HC_WHERE = { roulette: 'Осколки — в Возрождении душ и в лавке праха.', echo: 'Осколки — только в сундуках Эхо за места недели.', craft: 'Осколки — из скрытого рецепта Мастерской.' };
@@ -476,13 +479,13 @@ function hcGetFoot(rh) {
   if (rh.src === 'gold') return hcGoldFoot(rh);
   if (rh.src === 'donat') {
     const p = rsDonatPrice(rh), lack = Math.max(0, p - S.wallet.enerium);
-    return `<div class="hcb-buy"><b>Донатный сет «${RSS[rh.dset] ? RSS[rh.dset].name : ''}»</b><span class="reason${lack ? ' warn' : ''}">${lack ? `Не хватает ${fmt(lack)} Энериума` : 'Придёт с 0 уровнем · сет-бонус растёт с доблестью'}</span></div>
+    return `<div class="hcb-buy"><b>Донатный сет «${RSS[rh.dset] ? RSS[rh.dset].name : ''}»</b><span class="reason${lack ? ' warn' : ''}">${lack ? `Не хватает ${fmt(lack)} Энериума` : 'Сет-бонус растёт с доблестью'}</span></div>
       <span class="g-spacer"></span><button class="btn go big hcb-cta" data-a="dbuy" data-v="${dnOp()}|${rh.id}"${lack ? ' disabled' : ''}>Купить${costTag('enerium', p)}</button>`;
   }
   const need = hrNeed(), n = S.rs.shards[rh.id] || 0, souls = RS.rules.stub.activateSouls, lack = Math.max(0, souls - S.wallet.souls);
   const sh = `<span class="hcb-shb">${bar(Math.min(100, hrFl(n * 100, need)), n >= need ? 'sp' : '')}<small class="num">${fmt(n)} / ${fmt(need)}</small></span>`;
   if (n < need) return `<div class="hcb-buy"><span class="reason">${HC_WHERE[rh.src] || ''}</span>${sh}</div>${hcSoulFoot(rh)}`;
-  return `<div class="hcb-buy"><b>Осколки собраны</b><span class="reason${lack ? ' warn' : ''}">${lack ? `Не хватает ${fmt(lack)} душ` : 'Придёт с 0 уровнем · лишние осколки — в прах'}</span></div>
+  return `<div class="hcb-buy"><b>Осколки собраны</b><span class="reason${lack ? ' warn' : ''}">${lack ? `Не хватает ${fmt(lack)} душ` : 'Лишние — в прах'}</span></div>
     <span class="g-spacer"></span><button class="btn go big hcb-cta" data-a="activate" data-v="${duOp()}|${rh.id}"${lack ? ' disabled' : ''}>Пробудить${costTag('souls', souls)}</button>`;
 }
 
@@ -758,7 +761,7 @@ function hcGoldFoot(rh) {
   if (c > rsCyc()) return `<span class="chip warn">${ic('lock')}цикл ${ROMAN[c]}</span><span class="reason">Каталог откроется при переходе на цикл ${ROMAN[c]} — пока витрина</span>`;
   const lack = Math.max(0, price - S.wallet.gold);
   const team = TM(`${fmt(G.first)} × ${c} × (1 + ${pctBp(G.stepBp)} × (${k} − 1)) = ${fmt(price)}`, 'span', 'reason num');
-  return `<div class="hcb-buy"><b>${k}-я покупка цикла ${ROMAN[c]}</b><span class="reason${lack ? ' warn' : ''}">${lack ? `Не хватает ${fmt(lack)} золота` : 'Придёт с 0 уровнем · следующая покупка дороже'}</span>${team}</div>
+  return `<div class="hcb-buy"><b>${k}-я покупка цикла ${ROMAN[c]}</b><span class="reason${lack ? ' warn' : ''}">${lack ? `Не хватает ${fmt(lack)} золота` : 'Следующая — дороже'}</span>${team}</div>
     <span class="g-spacer"></span><button class="btn go big hcb-cta" data-a="gbuy" data-v="${rh.id}"${lack ? ' disabled' : ''}>Купить${costTag('gold', price)}</button>`;
 }
 /* ================== «За Энериум»: витрина донатного сета ==================

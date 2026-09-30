@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-III-1__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-iii.json",
+  "job": "res-III-1",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "k5_hunt",
+      "file": "art/generated/res-icons/res-III-1/k5_hunt.webp",
+      "box": [
+        12,
+        21,
+        443,
+        452
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "k5_tail",
+      "file": "art/generated/res-icons/res-III-1/k5_tail.webp",
+      "box": [
+        475,
+        21,
+        905,
+        451
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "k5_eng",
+      "file": "art/generated/res-icons/res-III-1/k5_eng.webp",
+      "box": [
+        937,
+        21,
+        1367,
+        451
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "k5_alch",
+      "file": "art/generated/res-icons/res-III-1/k5_alch.webp",
+      "box": [
+        1398,
+        21,
+        1829,
+        452
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "k5_ench",
+      "file": "art/generated/res-icons/res-III-1/k5_ench.webp",
+      "box": [
+        1861,
+        21,
+        2292,
+        452
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "k5_smith",
+      "file": "art/generated/res-icons/res-III-1/k5_smith.webp",
+      "box": [
+        12,
+        482,
+        443,
+        913
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "rc_b5",
+      "file": "art/generated/res-icons/res-III-1/rc_b5.webp",
+      "box": [
+        475,
+        482,
+        905,
+        912
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "mc_b5",
+      "file": "art/generated/res-icons/res-III-1/mc_b5.webp",
+      "box": [
+        937,
+        482,
+        1367,
+        912
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "mt_b5",
+      "file": "art/generated/res-icons/res-III-1/mt_b5.webp",
+      "box": [
+        1398,
+        482,
+        1829,
+        913
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "k6_hunt",
+      "file": "art/generated/res-icons/res-III-1/k6_hunt.webp",
+      "box": [
+        1861,
+        482,
+        2292,
+        913
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "k6_tail",
+      "file": "art/generated/res-icons/res-III-1/k6_tail.webp",
+      "box": [
+        12,
+        948,
+        444,
+        1380
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "k6_eng",
+      "file": "art/generated/res-icons/res-III-1/k6_eng.webp",
+      "box": [
+        475,
+        949,
+        905,
+        1379
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "k6_alch",
+      "file": "art/generated/res-icons/res-III-1/k6_alch.webp",
+      "box": [
+        937,
+        949,
+        1367,
+        1379
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "k6_ench",
+      "file": "art/generated/res-icons/res-III-1/k6_ench.webp",
+      "box": [
+        1398,
+        949,
+        1829,
+        1380
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "k6_smith",
+      "file": "art/generated/res-icons/res-III-1/k6_smith.webp",
+      "box": [
+        1861,
+        949,
+        2292,
+        1380
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "u6",
+      "file": "art/generated/res-icons/res-III-1/u6.webp",
+      "box": [
+        24,
+        1422,
+        431,
+        1829
+      ],
+      "px": 407,
+      "key_left": 0.0
+    },
+    {
+      "id": "rc_b6",
+      "file": "art/generated/res-icons/res-III-1/rc_b6.webp",
+      "box": [
+        486,
+        1422,
+        893,
+        1829
+      ],
+      "px": 407,
+      "key_left": 0.0
+    },
+    {
+      "id": "mc_b6",
+      "file": "art/generated/res-icons/res-III-1/mc_b6.webp",
+      "box": [
+        948,
+        1422,
+        1355,
+        1829
+      ],
+      "px": 407,
+      "key_left": 0.0
+    },
+    {
+      "id": "mt_b6",
+      "file": "art/generated/res-icons/res-III-1/mt_b6.webp",
+      "box": [
+        1410,
+        1422,
+        1817,
+        1829
+      ],
+      "px": 407,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn3_1",
+      "file": "art/generated/res-icons/res-III-1/rn3_1.webp",
+      "box": [
+        1873,
+        1422,
+        2280,
+        1829
+      ],
+      "px": 407,
+      "key_left": 0.0
+    }
+  ]
+}

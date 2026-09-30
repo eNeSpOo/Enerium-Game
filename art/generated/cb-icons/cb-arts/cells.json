@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/cb-icons/cb-arts__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/wanderer-chambers.json",
+  "job": "cb-arts",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "a1",
+      "file": "art/generated/cb-icons/cb-arts/art-a1.webp",
+      "box": [
+        17,
+        29,
+        891,
+        903
+      ],
+      "px": 874,
+      "key_left": 0.0
+    },
+    {
+      "id": "a2",
+      "file": "art/generated/cb-icons/cb-arts/art-a2.webp",
+      "box": [
+        942,
+        29,
+        1815,
+        902
+      ],
+      "px": 873,
+      "key_left": 0.0
+    },
+    {
+      "id": "a3",
+      "file": "art/generated/cb-icons/cb-arts/art-a3.webp",
+      "box": [
+        1867,
+        29,
+        2741,
+        903
+      ],
+      "px": 874,
+      "key_left": 0.0
+    },
+    {
+      "id": "a4",
+      "file": "art/generated/cb-icons/cb-arts/art-a4.webp",
+      "box": [
+        2792,
+        29,
+        3666,
+        903
+      ],
+      "px": 874,
+      "key_left": 0.0
+    },
+    {
+      "id": "a5",
+      "file": "art/generated/cb-icons/cb-arts/art-a5.webp",
+      "box": [
+        3716,
+        29,
+        4590,
+        903
+      ],
+      "px": 874,
+      "key_left": 0.0
+    },
+    {
+      "id": "a6",
+      "file": "art/generated/cb-icons/cb-arts/art-a6.webp",
+      "box": [
+        17,
+        954,
+        892,
+        1829
+      ],
+      "px": 875,
+      "key_left": 0.0
+    },
+    {
+      "id": "a7",
+      "file": "art/generated/cb-icons/cb-arts/art-a7.webp",
+      "box": [
+        942,
+        955,
+        1815,
+        1828
+      ],
+      "px": 873,
+      "key_left": 0.0
+    },
+    {
+      "id": "a8",
+      "file": "art/generated/cb-icons/cb-arts/art-a8.webp",
+      "box": [
+        1867,
+        954,
+        2742,
+        1829
+      ],
+      "px": 875,
+      "key_left": 0.0
+    },
+    {
+      "id": "a9",
+      "file": "art/generated/cb-icons/cb-arts/art-a9.webp",
+      "box": [
+        2792,
+        955,
+        3666,
+        1829
+      ],
+      "px": 874,
+      "key_left": 0.0
+    },
+    {
+      "id": "a10",
+      "file": "art/generated/cb-icons/cb-arts/art-a10.webp",
+      "box": [
+        3716,
+        954,
+        4591,
+        1829
+      ],
+      "px": 875,
+      "key_left": 0.0
+    },
+    {
+      "id": "a12",
+      "file": "art/generated/cb-icons/cb-arts/art-a12.webp",
+      "box": [
+        17,
+        1882,
+        892,
+        2757
+      ],
+      "px": 875,
+      "key_left": 0.0
+    },
+    {
+      "id": "a13",
+      "file": "art/generated/cb-icons/cb-arts/art-a13.webp",
+      "box": [
+        942,
+        1883,
+        1815,
+        2756
+      ],
+      "px": 873,
+      "key_left": 0.0
+    },
+    {
+      "id": "a14",
+      "file": "art/generated/cb-icons/cb-arts/art-a14.webp",
+      "box": [
+        1867,
+        1882,
+        2742,
+        2757
+      ],
+      "px": 875,
+      "key_left": 0.0
+    },
+    {
+      "id": "a15",
+      "file": "art/generated/cb-icons/cb-arts/art-a15.webp",
+      "box": [
+        2792,
+        1883,
+        3666,
+        2757
+      ],
+      "px": 874,
+      "key_left": 0.0
+    },
+    {
+      "id": "a16",
+      "file": "art/generated/cb-icons/cb-arts/art-a16.webp",
+      "box": [
+        3716,
+        1882,
+        4591,
+        2757
+      ],
+      "px": 875,
+      "key_left": 0.0
+    },
+    {
+      "id": "a18",
+      "file": "art/generated/cb-icons/cb-arts/art-a18.webp",
+      "box": [
+        17,
+        2809,
+        892,
+        3684
+      ],
+      "px": 875,
+      "key_left": 0.00027
+    },
+    {
+      "id": "a19",
+      "file": "art/generated/cb-icons/cb-arts/art-a19.webp",
+      "box": [
+        942,
+        2810,
+        1815,
+        3683
+      ],
+      "px": 873,
+      "key_left": 0.0
+    },
+    {
+      "id": "a20",
+      "file": "art/generated/cb-icons/cb-arts/art-a20.webp",
+      "box": [
+        1867,
+        2809,
+        2742,
+        3684
+      ],
+      "px": 875,
+      "key_left": 0.0
+    },
+    {
+      "id": "lock",
+      "file": "art/generated/cb-icons/cb-arts/art-lock.webp",
+      "box": [
+        2792,
+        2810,
+        3666,
+        3684
+      ],
+      "px": 874,
+      "key_left": 0.0
+    },
+    {
+      "id": "none",
+      "file": "art/generated/cb-icons/cb-arts/art-none.webp",
+      "box": [
+        3716,
+        2809,
+        4591,
+        3684
+      ],
+      "px": 875,
+      "key_left": 0.0
+    }
+  ]
+}

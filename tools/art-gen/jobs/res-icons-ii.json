@@ -1,0 +1,749 @@
+{
+  "name": "Иконки ресурсов сеткой — цикл II. Слово автора: «Иконки по ресурсам начинай генерировать только тогда, когда придёт с отчётом Этрион». Собирает tools/art-gen/res_jobs.py из design/ui/recipes.js — руками не править",
+  "plan": {
+    "Язык иконки": "один предмет в покое на тёмном камне, три четверти сверху, узнаваемая форма читается на 32 px; вид предмета различает рамка интерфейса (CR_KIND и CR_FAM, screens/crafthall.js), редкость — свет в окне рамки",
+    "Палитра": "цвет карста цикла, свет снизу — его же: The palette of this sheet: warm amber-orange light (#EB9D40), bronze and grey-brown library stone. The light from below is a warm amber glow.",
+    "Листы": "листы Этриона (поле sheet) переупакованы внутри цикла по 20 клеток, остаток — малым листом; предметы с img и герои не рисуются"
+  },
+  "notes": [
+    "cells — [id предмета EN_RECIPES.items, имя файла]; spare — пустая клетка малого листа, не выгружается; hidden — «ресурс скрыт»",
+    "Проба 30.09.2026 — res-P-1 и res-I-1 — нарисована с предметом на две трети клетки: в рамке вида окно — 72 % колодца, предмет выходил мелким на 32 px. С остальных листов предмет — на три четверти клетки",
+    "Фраза облика — поле art Этриона; письмо, руны и цифры переписаны в неразборчивые штрихи (FIX в res_jobs.py)",
+    "Слабые клетки — надписи, пентаграмма, «летающая тарелка», светлый фон — перерисованы листами res-fix-* (jobs/res-icons-fix.json): их клетка заменяет клетку этого листа"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "res-icons": {
+      "aspect": "5:4",
+      "size": "2K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square item icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the item in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game lays its own frame over the edges of the cell, so everything important stays in the middle. Every cell shows exactly one item — a raw material, a trophy, a crafted piece or a relic — lying or standing still on dark near-black stone with faint cracks and a darker vignette toward the edges of the cell: one clear central object, large, filling about three quarters of the cell, in a clear three-quarter view from slightly above, with a bold recognisable silhouette that reads at 32 px. When a cell names several things, the first one is the main object — large and centred — and the others are small details beside it. Light rises from below in the colour of this sheet's palette, a soft glow from cracks in the stone — never a spotlight; crisp rim light on the edges of the object; a few dust motes in the light. Painted exactly like the ability icons of this game: loose, confident painterly brush strokes, soft painted edges and deep shadows — no black outlines, no flat sticker look, no scenery, no hands or people unless the cell names them. Writing is never drawn: wherever a cell mentions script, notes, pages, maps, tallies, tags or marks, they are faint unreadable smudges and straight ruled lines; clock faces and dials are plain, with simple notches and no numerals. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each differs clearly from its neighbours."
+    }
+  },
+  "jobs": [
+    {
+      "id": "res-II-1",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл II — лист 1: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона II-01, II-02",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "k3_hunt",
+          "k3_hunt"
+        ],
+        [
+          "k3_tail",
+          "k3_tail"
+        ],
+        [
+          "k3_eng",
+          "k3_eng"
+        ],
+        [
+          "k3_alch",
+          "k3_alch"
+        ],
+        [
+          "k3_ench",
+          "k3_ench"
+        ],
+        [
+          "k3_smith",
+          "k3_smith"
+        ],
+        [
+          "u3",
+          "u3"
+        ],
+        [
+          "rc_b3",
+          "rc_b3"
+        ],
+        [
+          "mc_b3",
+          "mc_b3"
+        ],
+        [
+          "mt_b3",
+          "mt_b3"
+        ],
+        [
+          "k4_hunt",
+          "k4_hunt"
+        ],
+        [
+          "k4_tail",
+          "k4_tail"
+        ],
+        [
+          "k4_eng",
+          "k4_eng"
+        ],
+        [
+          "k4_alch",
+          "k4_alch"
+        ],
+        [
+          "k4_ench",
+          "k4_ench"
+        ],
+        [
+          "k4_smith",
+          "k4_smith"
+        ],
+        [
+          "rc_b4",
+          "rc_b4"
+        ],
+        [
+          "mc_b4",
+          "mc_b4"
+        ],
+        [
+          "mt_b4",
+          "mt_b4"
+        ],
+        [
+          "rn2_1",
+          "rn2_1"
+        ]
+      ],
+      "subject": "The palette of this sheet: warm amber-orange light (#EB9D40), bronze and grey-brown library stone. The light from below is a warm amber glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A domed beetle shell of grey stone-like chitin with fine gnawed grooves; A long cord of braided hemp with many small counting knots, a bronze tag at one end; A small bronze ball joint from a mechanical doll, polished by use; A small bronze oil can with a long spout, a drop of golden oil at the tip; A small stone cylinder wrapped in dense spiralling grooves, glowing faint amber.\n\nRow 2: A curved strip of old bronze edging with rivet holes, green patina in the grooves; An ancient bronze gear with worn irregular teeth, faint amber light in its hub; An ancient bronze gear mounted on a new shaft of ball joints, dripping golden oil; A large amber lens set in a bronze mechanical housing with a gear visible behind it; A thin sheet of bronze foil engraved with tiny orderly rows of marks.\n\nRow 3: A heavy leather collar worn shiny, a bronze ring and a small bell; A thick leather apron scorched with many small burn holes; A single massive iron chain link, worn smooth on the inside; A glossy black droplet of cooled lava with a glowing orange core; A small heap of amber-orange crystal grains glowing warmly.\n\nRow 4: A flat hammer face of dark steel worn perfectly even by countless blows; A hollow amber crown hanging from a heavy iron chain of many links; A cast bronze edict plate beside a small model of a mountain city, an amber crown on top; A heavy ceremonial chain of bronze links, each engraved with a tiny tool mark; A small flat stone of amber-orange crystal with one carved notch glowing along its edge."
+    },
+    {
+      "id": "res-II-2",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл II — лист 2: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона II-02",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "rn2_2",
+          "rn2_2"
+        ],
+        [
+          "rn2_3",
+          "rn2_3"
+        ],
+        [
+          "rn2_4",
+          "rn2_4"
+        ],
+        [
+          "rn2_5",
+          "rn2_5"
+        ],
+        [
+          "vs2",
+          "vs2"
+        ],
+        [
+          "vr2",
+          "vr2"
+        ],
+        [
+          "kr_ru",
+          "kr_ru"
+        ],
+        [
+          "fu_dw",
+          "fu_dw"
+        ],
+        [
+          "p_oil",
+          "p_oil"
+        ],
+        [
+          "p_glaze",
+          "p_glaze"
+        ],
+        [
+          "p_ration2",
+          "p_ration2"
+        ],
+        [
+          "a_mortar",
+          "a_mortar"
+        ],
+        [
+          "a_foundry",
+          "a_foundry"
+        ],
+        [
+          "a_bait",
+          "a_bait"
+        ],
+        [
+          "p_eggwax",
+          "p_eggwax"
+        ],
+        [
+          "p_cord",
+          "p_cord"
+        ],
+        [
+          "p_apron",
+          "p_apron"
+        ],
+        [
+          "p_scroll",
+          "p_scroll"
+        ],
+        [
+          "p_mitt",
+          "p_mitt"
+        ],
+        [
+          "a_trade",
+          "a_trade"
+        ]
+      ],
+      "subject": "The palette of this sheet: warm amber-orange light (#EB9D40), bronze and grey-brown library stone. The light from below is a warm amber glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A small flat stone of amber-orange crystal with two carved notches glowing along its edge; A small flat stone of amber-orange crystal with three carved notches glowing along its edge; A small flat stone of amber-orange crystal with four carved notches glowing along its edge; A small flat stone of amber-orange crystal with five carved notches glowing along its edge; A jagged shard of amber-orange crystal with a tiny star-shaped glint at its heart.\n\nRow 2: A round stone disc of amber-orange stone with one solid, filled five-pointed star carved deep and glowing — a solid star, never an outline; A palm-sized faceted amber-orange crystal glowing warmly from within; A sealed dark iron canister with an amber glow seeping from its seams and a green crystal chip set in the lid; A small clear glass bottle of pure golden oil; A small ceramic pot of glossy black-orange glaze.\n\nRow 3: A cloth bundle of hard square biscuits and a salt pouch tied with twine; A wooden trough of thick grey mortar with a trowel resting on the rim; A small ceramic crucible coated inside with glossy rust-orange glaze; A clay pot of golden oil with soaked hardtack biscuits; A small cake of grey-amber wax with stone grit.\n\nRow 4: A coiled cord with many neat counting knots and a bronze end cap; A scorched leather apron patched with newer leather squares; A leather scroll tube with a fresh scroll and a knotted cord hanging out; A thick leather glove lined with soft grey fur at the cuff; A knotted cord record tied around a small sack of grey stones and a jar of salve."
+    },
+    {
+      "id": "res-II-3",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл II — лист 3: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона II-02, II-03",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "a_ledger",
+          "a_ledger"
+        ],
+        [
+          "p_rune",
+          "p_rune"
+        ],
+        [
+          "p_amber",
+          "p_amber"
+        ],
+        [
+          "p_starchart",
+          "p_starchart"
+        ],
+        [
+          "p_shiftlamp",
+          "p_shiftlamp"
+        ],
+        [
+          "a_plate",
+          "a_plate"
+        ],
+        [
+          "a_seal",
+          "a_seal"
+        ],
+        [
+          "a_orderslip",
+          "a_orderslip"
+        ],
+        [
+          "a_cinder",
+          "a_cinder"
+        ],
+        [
+          "a_shaftlamp",
+          "a_shaftlamp"
+        ],
+        [
+          "a_rubbing",
+          "a_rubbing"
+        ],
+        [
+          "a_restored",
+          "a_restored"
+        ],
+        [
+          "a_c17goods",
+          "a_c17goods"
+        ],
+        [
+          "p_joint",
+          "p_joint"
+        ],
+        [
+          "p_chain",
+          "p_chain"
+        ],
+        [
+          "p_lens",
+          "p_lens"
+        ],
+        [
+          "a_mech",
+          "a_mech"
+        ],
+        [
+          "a_lift",
+          "a_lift"
+        ],
+        [
+          "a_cart",
+          "a_cart"
+        ],
+        [
+          "a_winch",
+          "a_winch"
+        ]
+      ],
+      "subject": "The palette of this sheet: warm amber-orange light (#EB9D40), bronze and grey-brown library stone. The light from below is a warm amber glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A bound ledger with neat ruled lines, an owl quill tucked in its spine; A small stone tile with a deeply etched glowing spiral groove; A small bundle of charcoal sticks studded with glowing amber crystals; A restored stone star table with fresh ink filling the missing last row; A restored dwarven lamp with a new amber window glowing warmly.\n\nRow 2: A glazed stone slab with two glowing etched spiral grooves under a glossy coat; A heavy round bronze seal with an amber stone at its centre; A stamped order slip tied with a guild ribbon and sealed in bronze; A compressed brick of dull amber slag, faintly warm; A dwarven lantern with an amber glow focused through a polished lens into a beam.\n\nRow 3: A cloth rubbing of dense grooves with a knotted counting cord; A tunnelled stone tablet filled with wax and freshly engraved; Several tunnelled stone tablets bound onto a stone shelf beam; A compact assembly of bronze ball joints and pins; A coil of heavy iron lifting chain with uniform links.\n\nRow 4: A polished round lens with a hairline crack, set in a thin bronze ring; A compact bronze mechanism of joints, chain and a cast housing; A small iron cage lift on straightened rails with a heavy chain above; A small wooden mine cart with bronze trim on old iron-rimmed wheels; A compact iron winch drum with a heavy chain and a bronze joint mechanism."
+    },
+    {
+      "id": "res-II-4",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл II — лист 4: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона II-03, II-04",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "a_c2goods",
+          "a_c2goods"
+        ],
+        [
+          "a_c8shaft",
+          "a_c8shaft"
+        ],
+        [
+          "p_shell",
+          "p_shell"
+        ],
+        [
+          "p_yoke",
+          "p_yoke"
+        ],
+        [
+          "p_quill",
+          "p_quill"
+        ],
+        [
+          "a_woolwrap",
+          "a_woolwrap"
+        ],
+        [
+          "a_beastcart",
+          "a_beastcart"
+        ],
+        [
+          "p_bronze",
+          "p_bronze"
+        ],
+        [
+          "p_casting",
+          "p_casting"
+        ],
+        [
+          "p_rail",
+          "p_rail"
+        ],
+        [
+          "a_trademark",
+          "a_trademark"
+        ],
+        [
+          "call_fb1_aw",
+          "call_fb1_aw"
+        ],
+        [
+          "call_fb2_aw",
+          "call_fb2_aw"
+        ],
+        [
+          "call_fc1_aw",
+          "call_fc1_aw"
+        ],
+        [
+          "lu_cb3",
+          "lu_cb3"
+        ],
+        [
+          "lu_cb8",
+          "lu_cb8"
+        ],
+        [
+          "lu_cb17",
+          "lu_cb17"
+        ],
+        [
+          "lu_ci2",
+          "lu_ci2"
+        ],
+        [
+          "ec_b3",
+          "ec_b3"
+        ],
+        [
+          "ec_b4",
+          "ec_b4"
+        ]
+      ],
+      "subject": "The palette of this sheet: warm amber-orange light (#EB9D40), bronze and grey-brown library stone. The light from below is a warm amber glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A bundle of decorative bronze gears and rivets tied to a stamped order slip; A curved section of red brick shaft lining with a bronze compass resting on it; A cleaned grey stone-like beetle shell etched with faint acid patterns; A sturdy leather harness with a polished collar ring and bronze buckles; A sharpened grey owl quill with a dark ink-stained nib.\n\nRow 2: A rolled bundle of pale goat wool wrapped around a felt mat; A heavy work harness connected to a length of lifting chain; A curved bronze plate with rivets and a green-patinated border; A clean cast bronze block with a single stamped mark; A straightened iron rail segment with hammer marks along its length.\n\nRow 3: A bronze cast stamp with a guild seal and amber inlay; A clay hunter mould glowing from within, a bow and a ration bundle bound to it, many faint faces in the glaze; A start lever wrapped in lifting chain, an oiled drill tooth mounted on it, faces glinting in the grease; A vine-wrapped striped sail with an oak oar lashed across it, seeds glowing in the weave; A closed book bound with four bronze clasps, a faded map peeking from between its pages.\n\nRow 4: A brass shift whistle hanging from a wooden tally board beside a worn miner glove; A cluster of grey stone cocoons on a tunnelled stone tablet, half covered by a shard of beetle chitin; Brass shell casings and a cog wheel smeared with rust-red soot, a glowing drop of lava beside them; Carved stone cylinders laid in neat rows beside beetle carapaces on a stone shelf; Worn leather animal collars and hammer heads bundled together around a brass city token."
+    },
+    {
+      "id": "res-II-5",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл II — лист 5: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона II-05, II-06",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "act_cb3",
+          "act_cb3"
+        ],
+        [
+          "cr_clasp",
+          "cr_clasp"
+        ],
+        [
+          "cr_map",
+          "cr_map"
+        ],
+        [
+          "cr_stars",
+          "cr_stars"
+        ],
+        [
+          "cr_lens",
+          "cr_lens"
+        ],
+        [
+          "cr_tube",
+          "cr_tube"
+        ],
+        [
+          "cr_owl",
+          "cr_owl"
+        ],
+        [
+          "cr_inkpot",
+          "cr_inkpot"
+        ],
+        [
+          "cr_brick",
+          "cr_brick"
+        ],
+        [
+          "cr_compass",
+          "cr_compass"
+        ],
+        [
+          "find_cb3",
+          "find_cb3"
+        ],
+        [
+          "find_cb3b",
+          "find_cb3b"
+        ],
+        [
+          "call_fb3",
+          "call_fb3"
+        ],
+        [
+          "tr_fb3",
+          "tr_fb3"
+        ],
+        [
+          "tr_fb3a",
+          "tr_fb3a"
+        ],
+        [
+          "call_fb3_aw",
+          "call_fb3_aw"
+        ],
+        [
+          "act_cb8",
+          "act_cb8"
+        ],
+        [
+          "cr_rail",
+          "cr_rail"
+        ],
+        [
+          "cr_lamp",
+          "cr_lamp"
+        ],
+        [
+          "cr_rubble",
+          "cr_rubble"
+        ]
+      ],
+      "subject": "The palette of this sheet: warm amber-orange light (#EB9D40), bronze and grey-brown library stone. The light from below is a warm amber glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A bronze winch mechanism on a stone slab, groove-etched plate fixed to its side, oil gleaming on the gears; An ornate bronze book clasp with a hinge and no book attached; A crumbling brown parchment map with faded roads converging to a centre and small battle marks; A thin stone tablet engraved with a grid of star marks, the last row broken off; A large round glass lens with a single straight crack across its middle.\n\nRow 2: A worn leather scroll tube with a brass cap, empty; A soft grey-brown owl feather with pale barred markings; A small stone inkwell with layers of dried black ink cracked at the rim; A red fired brick stamped with a small maker mark, soot on one side; A bronze drafting compass with one leg snapped short.\n\nRow 3: A torn fragment of ancient pale scroll with faded ruled lines; A small bronze astrolabe with nested rings, faint star points glinting; A heavy bronze-clasped book cover with a beetle-shell spine, a single torn page inside; A small clay tablet with rows of faint scratches; A single page of thick parchment with dense ruled lines that seems to shift when looked at.\n\nRow 4: A bronze book cover bursting with star tables and maps, faces glinting in the gilding; A small iron cage lift on a heavy chain with an amber lamp and a lens in its window; A length of iron mine rail bent into an arc; A small dwarven mining lamp with a cracked amber window, dark inside; A pile of sharp grey stone rubble with fresh-looking fracture faces."
+    },
+    {
+      "id": "res-II-6",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл II — лист 6: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона II-06, II-07",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "cr_whistle",
+          "cr_whistle"
+        ],
+        [
+          "cr_bread",
+          "cr_bread"
+        ],
+        [
+          "cr_glove",
+          "cr_glove"
+        ],
+        [
+          "cr_mole",
+          "cr_mole"
+        ],
+        [
+          "cr_amberore",
+          "cr_amberore"
+        ],
+        [
+          "cr_tally",
+          "cr_tally"
+        ],
+        [
+          "find_cb8",
+          "find_cb8"
+        ],
+        [
+          "find_cb8b",
+          "find_cb8b"
+        ],
+        [
+          "call_fb8",
+          "call_fb8"
+        ],
+        [
+          "tr_fb8",
+          "tr_fb8"
+        ],
+        [
+          "tr_fb8a",
+          "tr_fb8a"
+        ],
+        [
+          "call_fb8_aw",
+          "call_fb8_aw"
+        ],
+        [
+          "act_cb17",
+          "act_cb17"
+        ],
+        [
+          "cr_gnawed",
+          "cr_gnawed"
+        ],
+        [
+          "cr_beetlechitin",
+          "cr_beetlechitin"
+        ],
+        [
+          "cr_eggcase",
+          "cr_eggcase"
+        ],
+        [
+          "cr_shelfbeam",
+          "cr_shelfbeam"
+        ],
+        [
+          "cr_bindingcord",
+          "cr_bindingcord"
+        ],
+        [
+          "cr_stylus",
+          "cr_stylus"
+        ],
+        [
+          "cr_dustfine",
+          "cr_dustfine"
+        ]
+      ],
+      "subject": "The palette of this sheet: warm amber-orange light (#EB9D40), bronze and grey-brown library stone. The light from below is a warm amber glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A dented copper steam whistle with a pull ring; A hard square dwarven hardtack biscuit with a stamped pattern; A thick leather miner glove with worn-through fingertips; A soft grey mole pelt with velvety fur; A chunk of dark rock threaded with a glowing amber-orange vein.\n\nRow 2: A small wooden board covered with chalk tally marks, the last row smeared; A leather mining helmet with a copper brigade badge and a deep dent; A small bronze commemorative token stamped with a pickaxe and a date line; A copper whistle bolted to a chalk tally board, a dented miner helmet hanging beside; A round copper brigade badge with an embossed ring and pickaxe.\n\nRow 3: A tiny worn stub of white chalk in a leather holder; A copper shift whistle wrapped with cracked amber lamps and hardtack, faces glinting in the metal; A clay pot of golden oil bait beside a cloth rubbing of carved grooves and a grey mole pelt; A stone tablet eaten through with tunnels, fragments of carved lines at the edges; A handful of thin grey shed beetle chitin flakes.\n\nRow 4: An oval cocoon of cemented stone dust, slightly warm; A long stone shelf beam riddled with holes; A thick braided cord with counting knots, frayed at one end; A bronze engraving stylus with a worn-down tip; A small sack of extremely fine pale stone powder."
+    },
+    {
+      "id": "res-II-7",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл II — лист 7: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона II-07, II-08",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "cr_copperplate",
+          "cr_copperplate"
+        ],
+        [
+          "cr_silkweb",
+          "cr_silkweb"
+        ],
+        [
+          "find_cb17",
+          "find_cb17"
+        ],
+        [
+          "find_cb17b",
+          "find_cb17b"
+        ],
+        [
+          "call_fb17",
+          "call_fb17"
+        ],
+        [
+          "tr_fb17",
+          "tr_fb17"
+        ],
+        [
+          "tr_fb17a",
+          "tr_fb17a"
+        ],
+        [
+          "call_fb17_aw",
+          "call_fb17_aw"
+        ],
+        [
+          "act_ci2",
+          "act_ci2"
+        ],
+        [
+          "cr_ci2_rivet",
+          "cr_ci2_rivet"
+        ],
+        [
+          "cr_ci2_cage",
+          "cr_ci2_cage"
+        ],
+        [
+          "cr_ci2_gear",
+          "cr_ci2_gear"
+        ],
+        [
+          "cr_ci2_board",
+          "cr_ci2_board"
+        ],
+        [
+          "cr_ci2_soot",
+          "cr_ci2_soot"
+        ],
+        [
+          "cr_ci2_steam",
+          "cr_ci2_steam"
+        ],
+        [
+          "cr_ci2_ribbon",
+          "cr_ci2_ribbon"
+        ],
+        [
+          "cr_ci2_mat",
+          "cr_ci2_mat"
+        ],
+        [
+          "cr_ci2_goat",
+          "cr_ci2_goat"
+        ],
+        [
+          "cr_ci2_bell",
+          "cr_ci2_bell"
+        ],
+        [
+          "cr_ci2_charge",
+          "cr_ci2_charge"
+        ]
+      ],
+      "subject": "The palette of this sheet: warm amber-orange light (#EB9D40), bronze and grey-brown library stone. The light from below is a warm amber glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A small green-tarnished copper plate with a notch; A thick silvery cobweb strand wound on a stick; A single intact carved groove on a stone fragment; A glowing amber lump nested in stone dust; Cracked stone cocoons on a tunnelled tablet, a beetle shell and an ancient gear beside them.\n\nRow 2: A pair of massive stone-grey mandibles with serrated edges; A translucent chitin fragment with a thin dark line visible inside; A cracked cocoon cluster wrapped in thick cobweb, beetle chitin and faces on the stone; A palm-sized model of a mountain hollowed into tiered ledges with bridges and lifts, amber glow from inside; A large round-headed iron rivet with a stamped guild mark.\n\nRow 3: A polished iron bar from a lift cage, smooth from hands; A decorative bronze gear with ornamental spokes, from a public mechanism; A pinned paper order slip with stamped seals and a torn corner; A smear of rusty orange soot on a scrap of cloth; A small glass flask of clear water beaded with condensation.\n\nRow 4: A woven guild ribbon in rust and bronze colours with a small metal tag; A thick square felt mat, dusty and pressed flat by years of use; A tuft of long pale grey mountain goat wool; A small bronze animal bell with a leather strap; A spent brass cartridge case, blackened at the mouth."
+    },
+    {
+      "id": "res-II-8",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл II — лист 8: 7 иконок сеткой 3×3",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона II-08",
+      "aspect": "1:1",
+      "size": "1K",
+      "grid": [
+        3,
+        3
+      ],
+      "cells": [
+        [
+          "cr_ci2_amber",
+          "cr_ci2_amber"
+        ],
+        [
+          "find_ci2",
+          "find_ci2"
+        ],
+        [
+          "find_ci2b",
+          "find_ci2b"
+        ],
+        [
+          "call_fc2",
+          "call_fc2"
+        ],
+        [
+          "tr_fc2",
+          "tr_fc2"
+        ],
+        [
+          "tr_fc2a",
+          "tr_fc2a"
+        ],
+        [
+          "call_fc2_aw",
+          "call_fc2_aw"
+        ],
+        [
+          "spare-0",
+          "spare-0"
+        ],
+        [
+          "spare-1",
+          "spare-1"
+        ]
+      ],
+      "subject": "The palette of this sheet: warm amber-orange light (#EB9D40), bronze and grey-brown library stone. The light from below is a warm amber glow.\n\nThe grid: exactly 3 columns and 3 rows, 9 icons.\n\nRow 1: A flake of crusted dull amber slag with a faint warm glow; A bronze gate token stamped with an eye and a pair of scales; A folded technical blueprint of a machine with no signature, edges burned.\n\nRow 2: A heavy iron gate lever with brass cartridge cases and decorative gears hanging from its chain; A heavy bronze nozzle glowing dull red at its tip; A large ornate iron key with a square bit, never used.\n\nRow 3: A gate lever riveted to a bridge beam, amber crystals glowing in its housing, faces in the polished metal; an empty dark stone surface with a few dust motes; an empty dark stone surface with a few dust motes."
+    }
+  ]
+}

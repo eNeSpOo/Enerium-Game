@@ -14,7 +14,7 @@ const mkS = () => { const C = crS(); return C.mk || (C.mk = { kind: '' }); };
 function mkIc(id, q) {
   const it = BAG.item(id); if (!it) return '';
   const nm = trEsc(itName(it));
-  return `<button class="well mk-ic" data-r="${it.r}"${crK(it)} data-a="item" data-v="${id}" title="${nm}" aria-label="${nm}${q != null ? ', ' + q + ' шт.' : ''}">${itTeam(it) ? ic('lock') : trIcon(it)}</button>`;
+  return `<button class="well mk-ic" data-r="${it.r}"${crK(it)} data-a="item" data-v="${id}" title="${nm}" aria-label="${nm}${q != null ? ', ' + q + ' шт.' : ''}">${itTeam(it) ? (typeof resHideIco === 'function' ? resHideIco() : ic('lock')) : trIcon(it)}</button>`;
 }
 /* строка лота — доска ряда: предмет, имя и редкость, сколько, цена лота и за штуку, одно действие */
 function mkLotHtml(x) {

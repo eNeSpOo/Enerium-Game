@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-I-4__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-i.json",
+  "job": "res-I-4",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "p_venom",
+      "file": "art/generated/res-icons/res-I-4/p_venom.webp",
+      "box": [
+        7,
+        13,
+        445,
+        451
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_tracker",
+      "file": "art/generated/res-icons/res-I-4/p_tracker.webp",
+      "box": [
+        471,
+        13,
+        908,
+        450
+      ],
+      "px": 437,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_coal",
+      "file": "art/generated/res-icons/res-I-4/p_coal.webp",
+      "box": [
+        933,
+        13,
+        1371,
+        451
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_bloom",
+      "file": "art/generated/res-icons/res-I-4/p_bloom.webp",
+      "box": [
+        1396,
+        13,
+        1833,
+        450
+      ],
+      "px": 437,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_pick",
+      "file": "art/generated/res-icons/res-I-4/a_pick.webp",
+      "box": [
+        1859,
+        13,
+        2297,
+        451
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_iron",
+      "file": "art/generated/res-icons/res-I-4/a_iron.webp",
+      "box": [
+        7,
+        477,
+        445,
+        915
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_steel",
+      "file": "art/generated/res-icons/res-I-4/a_steel.webp",
+      "box": [
+        471,
+        477,
+        908,
+        914
+      ],
+      "px": 437,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_northiron",
+      "file": "art/generated/res-icons/res-I-4/p_northiron.webp",
+      "box": [
+        933,
+        477,
+        1371,
+        915
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "act_cb1",
+      "file": "art/generated/res-icons/res-I-4/act_cb1.webp",
+      "box": [
+        1396,
+        477,
+        1833,
+        914
+      ],
+      "px": 437,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_stone",
+      "file": "art/generated/res-icons/res-I-4/cr_stone.webp",
+      "box": [
+        1859,
+        477,
+        2297,
+        915
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_harness",
+      "file": "art/generated/res-icons/res-I-4/cr_harness.webp",
+      "box": [
+        7,
+        941,
+        445,
+        1379
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_shoe",
+      "file": "art/generated/res-icons/res-I-4/cr_shoe.webp",
+      "box": [
+        471,
+        941,
+        908,
+        1378
+      ],
+      "px": 437,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_axle",
+      "file": "art/generated/res-icons/res-I-4/cr_axle.webp",
+      "box": [
+        933,
+        941,
+        1371,
+        1379
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_sign",
+      "file": "art/generated/res-icons/res-I-4/cr_sign.webp",
+      "box": [
+        1396,
+        941,
+        1833,
+        1378
+      ],
+      "px": 437,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_thorn",
+      "file": "art/generated/res-icons/res-I-4/cr_thorn.webp",
+      "box": [
+        1859,
+        941,
+        2297,
+        1379
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_tuft",
+      "file": "art/generated/res-icons/res-I-4/cr_tuft.webp",
+      "box": [
+        7,
+        1405,
+        445,
+        1843
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_camp",
+      "file": "art/generated/res-icons/res-I-4/cr_camp.webp",
+      "box": [
+        471,
+        1405,
+        908,
+        1842
+      ],
+      "px": 437,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_girth",
+      "file": "art/generated/res-icons/res-I-4/cr_girth.webp",
+      "box": [
+        933,
+        1405,
+        1371,
+        1843
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb1",
+      "file": "art/generated/res-icons/res-I-4/find_cb1.webp",
+      "box": [
+        1396,
+        1405,
+        1833,
+        1842
+      ],
+      "px": 437,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb1b",
+      "file": "art/generated/res-icons/res-I-4/find_cb1b.webp",
+      "box": [
+        1859,
+        1405,
+        2297,
+        1843
+      ],
+      "px": 438,
+      "key_left": 0.0
+    }
+  ]
+}

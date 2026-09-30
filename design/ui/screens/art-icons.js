@@ -59,7 +59,7 @@ const artEsc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/<
    - снаряжение — по слоту и редкости; редкость не передана — иконка обычной, самой простой вещи слота. Мельче 24 px живопись не
      читается: там вызывающий оставляет контур слота или вектор (eqPic, screens/equipment.js) */
 Object.assign(ART_ICONS, {
-  grid: { spells: true, tal: true, gear: true },   // выгрузка 30.09.2026
+  grid: { spells: true, tal: true, gear: true, res: true },   // выгрузка 30.09.2026
   slug: { 'Огонь': 'fire', 'Земля': 'earth', 'Воздух': 'air', 'Тьма': 'dark', 'Вода': 'water', 'Свет': 'light', 'Время': 'time',
     'Без школы': 'none', 'фарм': 'farm' },   // набор → латиница имени файла; то же в tools/art-gen/ui_icons.py
   spell: id => { const s = String(id || '').split('.'), k = ART_ICONS.slug[s[0]]; return k && s.length > 1 ? 'spells/' + k + '-' + s.slice(1).join('-') + '.webp' : ''; },
@@ -68,6 +68,18 @@ Object.assign(ART_ICONS, {
   talHidden: 'tal/hidden.webp',                   // линейка скрыта (спойлер): амулет в тумане
   gear: (slot, r) => 'gear/' + slot + '-' + r + '.webp',
 });
+/* ================== иконки ресурсов сеткой ==================
+   Слово автора: «Иконки по ресурсам начинай генерировать только тогда, когда придёт с отчётом Этрион». Иконка есть у каждого предмета
+   recipes.js, кроме предметов с готовой картинкой (it.img — она главнее) и героев (fam hero — у них портреты): res/<id>.webp.
+   Листы — tools/art-gen/jobs/res-icons-*.json, собирает res_jobs.py из поля art Этриона. Вид предмета различает рамка (data-fk,
+   CR_KIND, screens/crafthall.js), редкость — свет в её окне. «Ресурс скрыт» — закрытый предмет (спойлер цикла VI) вместо замка */
+Object.assign(ART_ICONS, { res: id => 'res/' + id + '.webp', resHidden: 'res/hidden.webp' });
+const resDrawn = it => !!it && !!it.id && !it.img && it.fam !== 'hero';
+/* иконка предмета; '' — у предмета своя картинка, он герой или выгрузки нет: вызывающий (trIcon, index.html) рисует прежнее */
+function resArt(it, px = 48, alt = '') { return ART_ICONS.grid.res && resDrawn(it) ? artImg(ART_ICONS.res(it.id), px, alt, 'res-art') : ''; }
+/* закрытый предмет: вместо замка — свёрток в тумане */
+function resHideIco(px = 48, alt = '') { return ART_ICONS.grid.res ? artImg(ART_ICONS.resHidden, px, alt, 'res-art hid') : ic('lock'); }
+
 /* иконка способности по записи библиотеки или ядра (у записи есть id); '' — иконки нет */
 function abArt(ab, px = 32, alt = '', cls = '') {
   const p = ART_ICONS.grid.spells && ab && ab.id ? ART_ICONS.spell(ab.id) : '';

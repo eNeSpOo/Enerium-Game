@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-II-6__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-ii.json",
+  "job": "res-II-6",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "cr_whistle",
+      "file": "art/generated/res-icons/res-II-6/cr_whistle.webp",
+      "box": [
+        12,
+        18,
+        437,
+        443
+      ],
+      "px": 425,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_bread",
+      "file": "art/generated/res-icons/res-II-6/cr_bread.webp",
+      "box": [
+        475,
+        18,
+        900,
+        443
+      ],
+      "px": 425,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_glove",
+      "file": "art/generated/res-icons/res-II-6/cr_glove.webp",
+      "box": [
+        939,
+        18,
+        1364,
+        443
+      ],
+      "px": 425,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_mole",
+      "file": "art/generated/res-icons/res-II-6/cr_mole.webp",
+      "box": [
+        1403,
+        18,
+        1828,
+        443
+      ],
+      "px": 425,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_amberore",
+      "file": "art/generated/res-icons/res-II-6/cr_amberore.webp",
+      "box": [
+        1867,
+        18,
+        2292,
+        443
+      ],
+      "px": 425,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_tally",
+      "file": "art/generated/res-icons/res-II-6/cr_tally.webp",
+      "box": [
+        12,
+        483,
+        437,
+        908
+      ],
+      "px": 425,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb8",
+      "file": "art/generated/res-icons/res-II-6/find_cb8.webp",
+      "box": [
+        475,
+        482,
+        901,
+        908
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb8b",
+      "file": "art/generated/res-icons/res-II-6/find_cb8b.webp",
+      "box": [
+        939,
+        483,
+        1364,
+        908
+      ],
+      "px": 425,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb8",
+      "file": "art/generated/res-icons/res-II-6/call_fb8.webp",
+      "box": [
+        1403,
+        482,
+        1829,
+        908
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fb8",
+      "file": "art/generated/res-icons/res-II-6/tr_fb8.webp",
+      "box": [
+        1867,
+        482,
+        2293,
+        908
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fb8a",
+      "file": "art/generated/res-icons/res-II-6/tr_fb8a.webp",
+      "box": [
+        12,
+        950,
+        437,
+        1375
+      ],
+      "px": 425,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb8_aw",
+      "file": "art/generated/res-icons/res-II-6/call_fb8_aw.webp",
+      "box": [
+        475,
+        949,
+        901,
+        1375
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "act_cb17",
+      "file": "art/generated/res-icons/res-II-6/act_cb17.webp",
+      "box": [
+        939,
+        950,
+        1364,
+        1375
+      ],
+      "px": 425,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_gnawed",
+      "file": "art/generated/res-icons/res-II-6/cr_gnawed.webp",
+      "box": [
+        1403,
+        949,
+        1829,
+        1375
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_beetlechitin",
+      "file": "art/generated/res-icons/res-II-6/cr_beetlechitin.webp",
+      "box": [
+        1867,
+        949,
+        2293,
+        1375
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_eggcase",
+      "file": "art/generated/res-icons/res-II-6/cr_eggcase.webp",
+      "box": [
+        12,
+        1417,
+        437,
+        1842
+      ],
+      "px": 425,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_shelfbeam",
+      "file": "art/generated/res-icons/res-II-6/cr_shelfbeam.webp",
+      "box": [
+        475,
+        1416,
+        901,
+        1842
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_bindingcord",
+      "file": "art/generated/res-icons/res-II-6/cr_bindingcord.webp",
+      "box": [
+        939,
+        1417,
+        1364,
+        1842
+      ],
+      "px": 425,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_stylus",
+      "file": "art/generated/res-icons/res-II-6/cr_stylus.webp",
+      "box": [
+        1403,
+        1416,
+        1829,
+        1842
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_dustfine",
+      "file": "art/generated/res-icons/res-II-6/cr_dustfine.webp",
+      "box": [
+        1867,
+        1416,
+        2293,
+        1842
+      ],
+      "px": 426,
+      "key_left": 0.0
+    }
+  ]
+}

@@ -1,0 +1,856 @@
+{
+  "name": "Иконки ресурсов сеткой — цикл V. Слово автора: «Иконки по ресурсам начинай генерировать только тогда, когда придёт с отчётом Этрион». Собирает tools/art-gen/res_jobs.py из design/ui/recipes.js — руками не править",
+  "plan": {
+    "Язык иконки": "один предмет в покое на тёмном камне, три четверти сверху, узнаваемая форма читается на 32 px; вид предмета различает рамка интерфейса (CR_KIND и CR_FAM, screens/crafthall.js), редкость — свет в окне рамки",
+    "Палитра": "цвет карста цикла, свет снизу — его же: The palette of this sheet: green light (#4FDC8B), old clock brass and dry grey silt. The light from below is a green glow.",
+    "Листы": "листы Этриона (поле sheet) переупакованы внутри цикла по 20 клеток, остаток — малым листом; предметы с img и герои не рисуются"
+  },
+  "notes": [
+    "cells — [id предмета EN_RECIPES.items, имя файла]; spare — пустая клетка малого листа, не выгружается; hidden — «ресурс скрыт»",
+    "Проба 30.09.2026 — res-P-1 и res-I-1 — нарисована с предметом на две трети клетки: в рамке вида окно — 72 % колодца, предмет выходил мелким на 32 px. С остальных листов предмет — на три четверти клетки",
+    "Фраза облика — поле art Этриона; письмо, руны и цифры переписаны в неразборчивые штрихи (FIX в res_jobs.py)",
+    "Слабые клетки — надписи, пентаграмма, «летающая тарелка», светлый фон — перерисованы листами res-fix-* (jobs/res-icons-fix.json): их клетка заменяет клетку этого листа"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "res-icons": {
+      "aspect": "5:4",
+      "size": "2K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square item icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the item in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game lays its own frame over the edges of the cell, so everything important stays in the middle. Every cell shows exactly one item — a raw material, a trophy, a crafted piece or a relic — lying or standing still on dark near-black stone with faint cracks and a darker vignette toward the edges of the cell: one clear central object, large, filling about three quarters of the cell, in a clear three-quarter view from slightly above, with a bold recognisable silhouette that reads at 32 px. When a cell names several things, the first one is the main object — large and centred — and the others are small details beside it. Light rises from below in the colour of this sheet's palette, a soft glow from cracks in the stone — never a spotlight; crisp rim light on the edges of the object; a few dust motes in the light. Painted exactly like the ability icons of this game: loose, confident painterly brush strokes, soft painted edges and deep shadows — no black outlines, no flat sticker look, no scenery, no hands or people unless the cell names them. Writing is never drawn: wherever a cell mentions script, notes, pages, maps, tallies, tags or marks, they are faint unreadable smudges and straight ruled lines; clock faces and dials are plain, with simple notches and no numerals. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each differs clearly from its neighbours."
+    }
+  },
+  "jobs": [
+    {
+      "id": "res-V-1",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл V — лист 1: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона V-01",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "k9_hunt",
+          "k9_hunt"
+        ],
+        [
+          "k9_tail",
+          "k9_tail"
+        ],
+        [
+          "k9_eng",
+          "k9_eng"
+        ],
+        [
+          "k9_alch",
+          "k9_alch"
+        ],
+        [
+          "k9_ench",
+          "k9_ench"
+        ],
+        [
+          "k9_smith",
+          "k9_smith"
+        ],
+        [
+          "u9",
+          "u9"
+        ],
+        [
+          "rc_b9",
+          "rc_b9"
+        ],
+        [
+          "mc_b9",
+          "mc_b9"
+        ],
+        [
+          "mt_b9",
+          "mt_b9"
+        ],
+        [
+          "k10_hunt",
+          "k10_hunt"
+        ],
+        [
+          "k10_tail",
+          "k10_tail"
+        ],
+        [
+          "k10_eng",
+          "k10_eng"
+        ],
+        [
+          "k10_alch",
+          "k10_alch"
+        ],
+        [
+          "k10_ench",
+          "k10_ench"
+        ],
+        [
+          "k10_smith",
+          "k10_smith"
+        ],
+        [
+          "u10",
+          "u10"
+        ],
+        [
+          "rc_b10",
+          "rc_b10"
+        ],
+        [
+          "mc_b10",
+          "mc_b10"
+        ],
+        [
+          "mt_b10",
+          "mt_b10"
+        ]
+      ],
+      "subject": "The palette of this sheet: green light (#4FDC8B), old clock brass and dry grey silt. The light from below is a green glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A tuft of dark fur frozen mid-ruffle, faint green frost glinting on the tips; A worn travelling cloak of an unknown century, patched and dusty; A brass clock pendulum frozen at the edge of its swing; A single water drop suspended in mid-air above a stone floor; A tiny hourglass that fits in a palm, its sand frozen mid-fall.\n\nRow 2: An antique sword of unfamiliar style with a dull greenish sheen; A hand-drawn map that ends abruptly at a drawn gate, the last line unfinished; An old map extended by a single fresh line of ink up to a drawn gate, wrapped in cloak cloth; A single boot print before a drawn gate on a map, beside a model of a floating disc city; A fossilized boot print in stone with a thin green glow.\n\nRow 3: A spiralled grey horn with ridges like a maze; A spool of pale thread with a frayed broken end; A smooth grey block with worn edges from being moved many times; A cracked dry crust of grey river silt; A small heap of emerald green crystal grains glowing steadily.\n\nRow 4: A heavy forged iron corner bracket for a wall; A heavy bronze plumb bob on a taut cord, always pointing straight down; A bronze plumb bob hanging on a fresh pale thread from a bone spindle; A wall of grey sliding stones held by iron corner brackets, a plumb bob hanging beside; A technical wall plan on thin paper with lines that seem to shift."
+    },
+    {
+      "id": "res-V-2",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл V — лист 2: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона V-02",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "rn5_1",
+          "rn5_1"
+        ],
+        [
+          "rn5_2",
+          "rn5_2"
+        ],
+        [
+          "rn5_3",
+          "rn5_3"
+        ],
+        [
+          "rn5_4",
+          "rn5_4"
+        ],
+        [
+          "rn5_5",
+          "rn5_5"
+        ],
+        [
+          "vs5",
+          "vs5"
+        ],
+        [
+          "vr5",
+          "vr5"
+        ],
+        [
+          "fu_bat",
+          "fu_bat"
+        ],
+        [
+          "p_hanging",
+          "p_hanging"
+        ],
+        [
+          "p_riverclay",
+          "p_riverclay"
+        ],
+        [
+          "p_sundrop",
+          "p_sundrop"
+        ],
+        [
+          "a_timebait",
+          "a_timebait"
+        ],
+        [
+          "p_hourglass",
+          "p_hourglass"
+        ],
+        [
+          "p_greendust",
+          "p_greendust"
+        ],
+        [
+          "a_starcalendar",
+          "a_starcalendar"
+        ],
+        [
+          "a_latewatch",
+          "a_latewatch"
+        ],
+        [
+          "a_c5goods",
+          "a_c5goods"
+        ],
+        [
+          "a_c14sun",
+          "a_c14sun"
+        ],
+        [
+          "p_oldsteel",
+          "p_oldsteel"
+        ],
+        [
+          "p_angle",
+          "p_angle"
+        ]
+      ],
+      "subject": "The palette of this sheet: green light (#4FDC8B), old clock brass and dry grey silt. The light from below is a green glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A small flat stone of emerald green crystal with one carved notch glowing along its edge; A small flat stone of emerald green crystal with two carved notches glowing along its edge; A small flat stone of emerald green crystal with three carved notches glowing along its edge; A small flat stone of emerald green crystal with four carved notches glowing along its edge; A small flat stone of emerald green crystal with five carved notches glowing along its edge.\n\nRow 2: A jagged shard of emerald green crystal with a tiny star-shaped glint at its heart; A round stone disc of emerald green stone with one solid, filled five-pointed star carved deep and glowing — a solid star, never an outline; A brass-and-glass cylindrical battery with an emerald crystal glowing inside and gears visible at the ends; A small glass vial with a single drop floating in its centre above sand; A clay pot of dark wet silt with faint flowing patterns.\n\nRow 3: A vial with a golden dew drop floating in it; A vial of floating dew drop surrounded by glowing green crystal dust; An hourglass with sand visibly flowing, a faint green glow; A small tray of emerald crystal grains scattered on grey ash; A stone calendar disc overlaid with a star chart, glowing lines connecting them.\n\nRow 4: Two hourglasses mounted upside down on a spiral horn; A sealed letter with two glowing guest seals and scraps of school robes; Two glowing sunstones wrapped in a meridian rope with a vial of golden dew; A bar of antique greenish steel with an old pattern; A heavy iron corner bracket with bolts."
+    },
+    {
+      "id": "res-V-3",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл V — лист 3: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона V-02, V-03",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "a_sunmark",
+          "a_sunmark"
+        ],
+        [
+          "a_c13tools",
+          "a_c13tools"
+        ],
+        [
+          "a_c15bells",
+          "a_c15bells"
+        ],
+        [
+          "p_movement",
+          "p_movement"
+        ],
+        [
+          "p_slidestone",
+          "p_slidestone"
+        ],
+        [
+          "p_cartspoke",
+          "p_cartspoke"
+        ],
+        [
+          "a_glove",
+          "a_glove"
+        ],
+        [
+          "a_timepiece",
+          "a_timepiece"
+        ],
+        [
+          "a_gnomonbase",
+          "a_gnomonbase"
+        ],
+        [
+          "a_homeclock",
+          "a_homeclock"
+        ],
+        [
+          "p_slowarrow",
+          "p_slowarrow"
+        ],
+        [
+          "a_c21bow",
+          "a_c21bow"
+        ],
+        [
+          "p_seekcloak",
+          "p_seekcloak"
+        ],
+        [
+          "p_spindle",
+          "p_spindle"
+        ],
+        [
+          "a_kit",
+          "a_kit"
+        ],
+        [
+          "a_tallypole",
+          "a_tallypole"
+        ],
+        [
+          "a_caravanlead",
+          "a_caravanlead"
+        ],
+        [
+          "a_travelcloak",
+          "a_travelcloak"
+        ],
+        [
+          "p_stillfur",
+          "p_stillfur"
+        ],
+        [
+          "p_mazehorn",
+          "p_mazehorn"
+        ]
+      ],
+      "subject": "The palette of this sheet: green light (#4FDC8B), old clock brass and dry grey silt. The light from below is a green glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: An iron corner bracket engraved with hour marks filled with green crystal dust; A steel chisel, a name tag and a small brass bell tied together; Mule bells hanging from a wagon spoke wrapped in faded canvas; An intricate brass clock movement with a swinging pendulum; A neatly squared grey stone block with measurement lines.\n\nRow 2: A small wooden wheel with old spokes and a worn iron rim; A leather and brass mage glove with white, amber and red gems on the knuckles and a green gem on the back; A small brass clock with an hourglass mounted in its case, pendulum moving; Two squared grey stones bound with antique greenish steel bands; A small wooden house clock with a vial of floating water in its pendulum.\n\nRow 3: An arrow with fresh feathers that moves slowly through the air; A longbow, bright songbird feathers and a small brass key bundled together; An old seeker cloak freshly lined with canvas and feathers at the collar; A bone spindle wound with pale strong thread; A bundle of seeker gear: a cloak, fur wrap, bone spindle and a spiral horn.\n\nRow 4: A tall pole wrapped with a knotted rope and small name tags; A bone spindle of pale thread tied to a vial with a floating drop; A warm travel cloak with dark fur lining hanging on a door peg; A folded pelt of dark frost-tipped fur; A spiral grey horn with a bone mouthpiece."
+    },
+    {
+      "id": "res-V-4",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл V — лист 4: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона V-03, V-04",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "p_mosswool",
+          "p_mosswool"
+        ],
+        [
+          "a_huntkit",
+          "a_huntkit"
+        ],
+        [
+          "a_frozenhunt",
+          "a_frozenhunt"
+        ],
+        [
+          "a_c21spoils",
+          "a_c21spoils"
+        ],
+        [
+          "act_cb6",
+          "act_cb6"
+        ],
+        [
+          "cr_rope",
+          "cr_rope"
+        ],
+        [
+          "cr_vein",
+          "cr_vein"
+        ],
+        [
+          "cr_shard",
+          "cr_shard"
+        ],
+        [
+          "cr_chisel",
+          "cr_chisel"
+        ],
+        [
+          "cr_glowmoss",
+          "cr_glowmoss"
+        ],
+        [
+          "cr_seekbell",
+          "cr_seekbell"
+        ],
+        [
+          "cr_studmark",
+          "cr_studmark"
+        ],
+        [
+          "cr_oldbone",
+          "cr_oldbone"
+        ],
+        [
+          "cr_barrow",
+          "cr_barrow"
+        ],
+        [
+          "find_cb6",
+          "find_cb6"
+        ],
+        [
+          "find_cb6b",
+          "find_cb6b"
+        ],
+        [
+          "call_fb6",
+          "call_fb6"
+        ],
+        [
+          "tr_fb6",
+          "tr_fb6"
+        ],
+        [
+          "tr_fb6a",
+          "tr_fb6a"
+        ],
+        [
+          "call_fb6_aw",
+          "call_fb6_aw"
+        ]
+      ],
+      "subject": "The palette of this sheet: green light (#4FDC8B), old clock brass and dry grey silt. The light from below is a green glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A tuft of dark fur threaded with glowing green and dark moss; A spiral hunting horn and a dark fur wrap tied together with a leather thong; A folded hunting cloak wrapped around a bronze horn and an arrow; A tuft of floating fur, a rippling hunting cloak and a boar spear bound together; A brass lantern with a small clockwork inside and an hourglass mounted on top, wrapped in fur.\n\nRow 2: A coil of rope with evenly spaced depth knots; A slab of rock with an empty channel where a green vein used to be; A raw emerald crystal shard with rock still attached; A steel chisel with a green-dusted edge; A patch of luminous green moss on dark rock.\n\nRow 3: A small brass bell on a knotted cord; A small carved stone tag, set in rock; An old yellowed bone of unknown creature; A worn wooden wheelbarrow with a scraped iron wheel; A small bone whistle, ancient, with a single hole.\n\nRow 4: A mage glove of leather and brass with an empty socket on the back; A knotted rope tied to a pale thread, a bone whistle and a torn map hanging from the knot; An endless coil of knotted rope disappearing into shadow; A single complex knot in old rope, glowing faintly green; A long knotted rope with bone and name-tags tied along it, faces in the knots."
+    },
+    {
+      "id": "res-V-5",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл V — лист 5: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона V-04, V-05",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "lu_cb6",
+          "lu_cb6"
+        ],
+        [
+          "lu_cb13",
+          "lu_cb13"
+        ],
+        [
+          "lu_cb14",
+          "lu_cb14"
+        ],
+        [
+          "lu_cb15",
+          "lu_cb15"
+        ],
+        [
+          "lu_cb21",
+          "lu_cb21"
+        ],
+        [
+          "lu_ci5",
+          "lu_ci5"
+        ],
+        [
+          "ec_b9",
+          "ec_b9"
+        ],
+        [
+          "ec_b10",
+          "ec_b10"
+        ],
+        [
+          "act_cb13",
+          "act_cb13"
+        ],
+        [
+          "cr_gnomonchip",
+          "cr_gnomonchip"
+        ],
+        [
+          "cr_sunstone",
+          "cr_sunstone"
+        ],
+        [
+          "cr_shadowmoss",
+          "cr_shadowmoss"
+        ],
+        [
+          "cr_hourmark",
+          "cr_hourmark"
+        ],
+        [
+          "cr_lark",
+          "cr_lark"
+        ],
+        [
+          "cr_meridian",
+          "cr_meridian"
+        ],
+        [
+          "cr_dialstone",
+          "cr_dialstone"
+        ],
+        [
+          "cr_dawnwater",
+          "cr_dawnwater"
+        ],
+        [
+          "cr_sundisk",
+          "cr_sundisk"
+        ],
+        [
+          "find_cb13",
+          "find_cb13"
+        ],
+        [
+          "find_cb13b",
+          "find_cb13b"
+        ]
+      ],
+      "subject": "The palette of this sheet: green light (#4FDC8B), old clock brass and dry grey silt. The light from below is a green glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A coil of old climbing rope with a bone whistle and a small curved horn tied to its end; Two glowing sunstones on a bronze hour marker, a patch of dark moss growing in their shadow; A travel pass sealed with wax, tied with mule bells and a tuft of grey mule hair; A small table setting with two porcelain teacups, a stopped clock and an unfinished embroidery hoop; An arrow suspended mid-flight above a glowing paw print, a leather hound leash coiled below.\n\nRow 2: A fractured stone debate plate with a torn school robe scrap and a small blue energy cell; A worn traveller cloak draped over several small hourglasses with frozen sand; Shifting stone blocks with animal horns set in the mortar, forming a small labyrinth wall; A carved stone pillar gnomon casting a sharp shadow, chisel marks on its sides; A broken chunk of an ancient stone pillar with a groove.\n\nRow 3: A pale golden stone glowing softly from within; A dark velvety moss in a crescent shape; A bronze peg with an engraved notch; A small brown lark feather; A taut old rope with a bronze pin at each end.\n\nRow 4: A stone slab with many radial hour lines carved into it; A small vial of dew with a golden tint; A polished bronze disc engraved with sun rays; A thin slate plate with a sharp dark shadow permanently fixed on it; A round stone calendar disc with many concentric rings of marks."
+    },
+    {
+      "id": "res-V-6",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл V — лист 6: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона V-05, V-06",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "call_fb13",
+          "call_fb13"
+        ],
+        [
+          "tr_fb13",
+          "tr_fb13"
+        ],
+        [
+          "tr_fb13a",
+          "tr_fb13a"
+        ],
+        [
+          "call_fb13_aw",
+          "call_fb13_aw"
+        ],
+        [
+          "act_cb14",
+          "act_cb14"
+        ],
+        [
+          "cr_cargo",
+          "cr_cargo"
+        ],
+        [
+          "cr_mulebell",
+          "cr_mulebell"
+        ],
+        [
+          "cr_hangdust",
+          "cr_hangdust"
+        ],
+        [
+          "cr_waterskin5",
+          "cr_waterskin5"
+        ],
+        [
+          "cr_awning",
+          "cr_awning"
+        ],
+        [
+          "cr_mulehair",
+          "cr_mulehair"
+        ],
+        [
+          "cr_spoke",
+          "cr_spoke"
+        ],
+        [
+          "cr_tollbill",
+          "cr_tollbill"
+        ],
+        [
+          "cr_payment",
+          "cr_payment"
+        ],
+        [
+          "find_cb14",
+          "find_cb14"
+        ],
+        [
+          "find_cb14b",
+          "find_cb14b"
+        ],
+        [
+          "call_fb14",
+          "call_fb14"
+        ],
+        [
+          "tr_fb14",
+          "tr_fb14"
+        ],
+        [
+          "tr_fb14a",
+          "tr_fb14a"
+        ],
+        [
+          "call_fb14_aw",
+          "call_fb14_aw"
+        ]
+      ],
+      "subject": "The palette of this sheet: green light (#4FDC8B), old clock brass and dry grey silt. The light from below is a green glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A slate with a fixed shadow between two glowing sunstones and bronze hour pegs, a plumb bob above; A small shard of solid golden light; A folded piece of darkness like soft black cloth; A stone dial slab with a moving shadow, lark feathers around it, faces in the shadow; An hourglass mounted upside down on a horn, a spool of thread and two glowing sunstones tied to it.\n\nRow 2: A cracked wooden crate with faint green light leaking from the split; A small iron mule bell frozen mid-swing; A small glass jar with dust particles suspended motionless; A leather waterskin half full, sloshing without moving; A faded canvas wagon cover, sun-bleached on one side only.\n\nRow 3: A tuft of grey mule hair, strands floating slightly; A single wooden wheel spoke; A travel pass document with a stamped seal and a date; A small leather coin pouch, heavy and knotted shut; A cracked emerald crystal with a faint shimmer of slowed air around it.\n\nRow 4: A sealed letter with a travel-worn envelope; A travel pass with a freshly corrected date, a cracked green crystal and mule bells on top; A long leather whip frozen mid-crack in an S curve; An hourglass with a single grain of sand suspended in its neck; A caravan pass with mule hair and a cracked crate, faces in the dust."
+    },
+    {
+      "id": "res-V-7",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл V — лист 7: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона V-07, V-08",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "act_cb15",
+          "act_cb15"
+        ],
+        [
+          "cr_stopclock",
+          "cr_stopclock"
+        ],
+        [
+          "cr_dustsheet",
+          "cr_dustsheet"
+        ],
+        [
+          "cr_teacup",
+          "cr_teacup"
+        ],
+        [
+          "cr_pressedflower",
+          "cr_pressedflower"
+        ],
+        [
+          "cr_window",
+          "cr_window"
+        ],
+        [
+          "cr_embroidery",
+          "cr_embroidery"
+        ],
+        [
+          "cr_songbird",
+          "cr_songbird"
+        ],
+        [
+          "cr_doorkey",
+          "cr_doorkey"
+        ],
+        [
+          "cr_wallbow",
+          "cr_wallbow"
+        ],
+        [
+          "find_cb15",
+          "find_cb15"
+        ],
+        [
+          "find_cb15b",
+          "find_cb15b"
+        ],
+        [
+          "call_fb15",
+          "call_fb15"
+        ],
+        [
+          "tr_fb15",
+          "tr_fb15"
+        ],
+        [
+          "tr_fb15a",
+          "tr_fb15a"
+        ],
+        [
+          "call_fb15_aw",
+          "call_fb15_aw"
+        ],
+        [
+          "act_cb21",
+          "act_cb21"
+        ],
+        [
+          "cr_frozenarrow",
+          "cr_frozenarrow"
+        ],
+        [
+          "cr_leapfur",
+          "cr_leapfur"
+        ],
+        [
+          "cr_frozenhorn",
+          "cr_frozenhorn"
+        ]
+      ],
+      "subject": "The palette of this sheet: green light (#4FDC8B), old clock brass and dry grey silt. The light from below is a green glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: An old iron key wrapped in faded canvas with a small mule bell tied to it; A wall clock with hands stopped at one hour, a fingerprint on the glass; A white dust sheet draped over an armchair, spotless; A porcelain teacup full of tea that never cools; A pressed pale flower between two pages.\n\nRow 2: A pane of old window glass with one clear polished spot; An embroidery hoop with a half-finished floral pattern and a needle; A small bright yellow songbird feather; A small brass key half-hidden under a stone step; An elegant longbow hanging on a wall peg, freshly strung.\n\nRow 3: A single ornate clock hand pointing at nothing; A fine travel cloak with one unfinished hem and a needle still in it; Two teacups on a small table beside a stopped wall clock, a torn map folded under one cup; A single fresh green leaf pressed in a small crystal locket; A pocket watch with two dials, one stopped, one moving.\n\nRow 4: A table with two cups, a songbird feather and a dust sheet, many faces in the window glass; An elegant longbow with a spiral horn and a fur bundle, a glowing green bait vial tied to its string; An arrow suspended motionless in mid-air; A tuft of tawny fur floating motionless; A bronze hunting horn with a visible ripple of frozen sound at its mouth."
+    },
+    {
+      "id": "res-V-8",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл V — лист 8: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона V-08, V-09",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "cr_pawprint",
+          "cr_pawprint"
+        ],
+        [
+          "cr_frozendew",
+          "cr_frozendew"
+        ],
+        [
+          "cr_huntcloak",
+          "cr_huntcloak"
+        ],
+        [
+          "cr_boarspear",
+          "cr_boarspear"
+        ],
+        [
+          "cr_bentgrass",
+          "cr_bentgrass"
+        ],
+        [
+          "cr_leash",
+          "cr_leash"
+        ],
+        [
+          "find_cb21",
+          "find_cb21"
+        ],
+        [
+          "find_cb21b",
+          "find_cb21b"
+        ],
+        [
+          "call_fb21",
+          "call_fb21"
+        ],
+        [
+          "tr_fb21",
+          "tr_fb21"
+        ],
+        [
+          "tr_fb21a",
+          "tr_fb21a"
+        ],
+        [
+          "call_fb21_aw",
+          "call_fb21_aw"
+        ],
+        [
+          "act_ci5",
+          "act_ci5"
+        ],
+        [
+          "cr_ci5_cell",
+          "cr_ci5_cell"
+        ],
+        [
+          "cr_ci5_link",
+          "cr_ci5_link"
+        ],
+        [
+          "cr_ci5_cog",
+          "cr_ci5_cog"
+        ],
+        [
+          "cr_ci5_banner",
+          "cr_ci5_banner"
+        ],
+        [
+          "cr_ci5_robe",
+          "cr_ci5_robe"
+        ],
+        [
+          "cr_ci5_ink",
+          "cr_ci5_ink"
+        ],
+        [
+          "cr_ci5_ash",
+          "cr_ci5_ash"
+        ]
+      ],
+      "subject": "The palette of this sheet: green light (#4FDC8B), old clock brass and dry grey silt. The light from below is a green glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A faintly glowing paw print hanging in empty air; A blade of grass with perfectly round dew drops; A green hunting cloak rippling as if in wind, but still; A heavy boar spear head with a crossbar; A flattened clump of grass pressed in a paw shape.\n\nRow 2: A taut leather dog leash frozen in tension; An arrow in a hand, still slowly moving forward; A large fang hanging motionless in mid-fall; A released bowstring with arrows hanging in the air and glowing paw prints, a plumb bob pointing down; A set of large extended claws on a paw, glowing faintly green.\n\nRow 3: An old arrow lying on the grass, its fletching finally still; A released bowstring with floating fur and a taut leash, faces of hunters around; A palm-sized model of a floating disc city above clouds with blue accumulators underneath and a black obelisk; A cylindrical blue glowing accumulator cell with brass caps; A huge polished steel chain link with frost on it.\n\nRow 4: A large brass gear with cloud condensation beads; A long pennant banner with a small hourglass shape woven in; A square of fine robe fabric in a school colour with a plain woven stripe; A crystal inkwell of deep violet-blue ink; A small handful of fine grey ash drifting upward."
+    },
+    {
+      "id": "res-V-9",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл V — лист 9: 12 иконок сеткой 4×3",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона V-09",
+      "aspect": "4:3",
+      "size": "2K",
+      "grid": [
+        4,
+        3
+      ],
+      "cells": [
+        [
+          "cr_ci5_bird",
+          "cr_ci5_bird"
+        ],
+        [
+          "cr_ci5_bat",
+          "cr_ci5_bat"
+        ],
+        [
+          "cr_ci5_socket",
+          "cr_ci5_socket"
+        ],
+        [
+          "cr_ci5_plate",
+          "cr_ci5_plate"
+        ],
+        [
+          "cr_ci5_seal",
+          "cr_ci5_seal"
+        ],
+        [
+          "find_ci5",
+          "find_ci5"
+        ],
+        [
+          "find_ci5b",
+          "find_ci5b"
+        ],
+        [
+          "call_fc5",
+          "call_fc5"
+        ],
+        [
+          "tr_fc5",
+          "tr_fc5"
+        ],
+        [
+          "tr_fc5a",
+          "tr_fc5a"
+        ],
+        [
+          "call_fc5_aw",
+          "call_fc5_aw"
+        ],
+        [
+          "chest_tal5",
+          "chest_tal5"
+        ]
+      ],
+      "subject": "The palette of this sheet: green light (#4FDC8B), old clock brass and dry grey silt. The light from below is a green glow.\n\nThe grid: exactly 4 columns and 3 rows, 12 icons.\n\nRow 1: A long white feather with a silvery sheen; A small leathery bat wing; A small empty brass gem socket with claw prongs; A fragment of a stone floor slab scorched and scratched with calculations.\n\nRow 2: A glowing round seal mark on a small leather tab; A formal scroll with rules, judges and a result, sealed in wax; A letter sealed with a glowing wax seal; A dueling challenge scroll on cracked stone slabs, school robe scraps and a plumb bob, blue light.\n\nRow 3: A mage glove with three identical glowing gems on the knuckles; A ring of many thin engraved metal plates linked together; A glowing challenge scroll surrounded by guest seals and a large emerald crystal cluster, many faces in the light; An ornate dark wood casket with gold filigree and an ancient-rarity gem."
+    }
+  ]
+}

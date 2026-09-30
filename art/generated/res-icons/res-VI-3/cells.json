@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-VI-3__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-vi.json",
+  "job": "res-VI-3",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "a_laststation",
+      "file": "art/generated/res-icons/res-VI-3/a_laststation.webp",
+      "box": [
+        14,
+        20,
+        442,
+        448
+      ],
+      "px": 428,
+      "key_left": 0.07355
+    },
+    {
+      "id": "a_c6goods",
+      "file": "art/generated/res-icons/res-VI-3/a_c6goods.webp",
+      "box": [
+        476,
+        20,
+        904,
+        448
+      ],
+      "px": 428,
+      "key_left": 0.05122
+    },
+    {
+      "id": "p_pilgrim",
+      "file": "art/generated/res-icons/res-VI-3/p_pilgrim.webp",
+      "box": [
+        938,
+        20,
+        1366,
+        448
+      ],
+      "px": 428,
+      "key_left": 0.03475
+    },
+    {
+      "id": "p_stillcloth",
+      "file": "art/generated/res-icons/res-VI-3/p_stillcloth.webp",
+      "box": [
+        1400,
+        20,
+        1828,
+        448
+      ],
+      "px": 428,
+      "key_left": 0.04997
+    },
+    {
+      "id": "a_pilgrimkit",
+      "file": "art/generated/res-icons/res-VI-3/a_pilgrimkit.webp",
+      "box": [
+        1861,
+        20,
+        2289,
+        448
+      ],
+      "px": 428,
+      "key_left": 0.05248
+    },
+    {
+      "id": "a_shellward",
+      "file": "art/generated/res-icons/res-VI-3/a_shellward.webp",
+      "box": [
+        14,
+        482,
+        442,
+        910
+      ],
+      "px": 428,
+      "key_left": 0.05153
+    },
+    {
+      "id": "a_c19notes",
+      "file": "art/generated/res-icons/res-VI-3/a_c19notes.webp",
+      "box": [
+        476,
+        482,
+        904,
+        910
+      ],
+      "px": 428,
+      "key_left": 0.05472
+    },
+    {
+      "id": "p_twisthorn",
+      "file": "art/generated/res-icons/res-VI-3/p_twisthorn.webp",
+      "box": [
+        938,
+        482,
+        1366,
+        910
+      ],
+      "px": 428,
+      "key_left": 0.05026
+    },
+    {
+      "id": "p_draftscale",
+      "file": "art/generated/res-icons/res-VI-3/p_draftscale.webp",
+      "box": [
+        1400,
+        482,
+        1828,
+        910
+      ],
+      "px": 428,
+      "key_left": 0.04756
+    },
+    {
+      "id": "a_deepkit",
+      "file": "art/generated/res-icons/res-VI-3/a_deepkit.webp",
+      "box": [
+        1861,
+        482,
+        2289,
+        910
+      ],
+      "px": 428,
+      "key_left": 0.10526
+    },
+    {
+      "id": "p_crucible",
+      "file": "art/generated/res-icons/res-VI-3/p_crucible.webp",
+      "box": [
+        14,
+        945,
+        442,
+        1373
+      ],
+      "px": 428,
+      "key_left": 0.05392
+    },
+    {
+      "id": "p_sprue",
+      "file": "art/generated/res-icons/res-VI-3/p_sprue.webp",
+      "box": [
+        476,
+        945,
+        904,
+        1373
+      ],
+      "px": 428,
+      "key_left": 0.05263
+    },
+    {
+      "id": "p_hotalloy",
+      "file": "art/generated/res-icons/res-VI-3/p_hotalloy.webp",
+      "box": [
+        938,
+        945,
+        1366,
+        1373
+      ],
+      "px": 428,
+      "key_left": 0.1155
+    },
+    {
+      "id": "lu_cb7",
+      "file": "art/generated/res-icons/res-VI-3/lu_cb7.webp",
+      "box": [
+        1400,
+        945,
+        1828,
+        1373
+      ],
+      "px": 428,
+      "key_left": 0.04167
+    },
+    {
+      "id": "lu_cb16",
+      "file": "art/generated/res-icons/res-VI-3/lu_cb16.webp",
+      "box": [
+        1861,
+        945,
+        2289,
+        1373
+      ],
+      "px": 428,
+      "key_left": 0.04524
+    },
+    {
+      "id": "lu_cb19",
+      "file": "art/generated/res-icons/res-VI-3/lu_cb19.webp",
+      "box": [
+        14,
+        1408,
+        442,
+        1836
+      ],
+      "px": 428,
+      "key_left": 0.05018
+    },
+    {
+      "id": "lu_ci6",
+      "file": "art/generated/res-icons/res-VI-3/lu_ci6.webp",
+      "box": [
+        476,
+        1408,
+        904,
+        1836
+      ],
+      "px": 428,
+      "key_left": 0.0579
+    },
+    {
+      "id": "ec_b11",
+      "file": "art/generated/res-icons/res-VI-3/ec_b11.webp",
+      "box": [
+        938,
+        1408,
+        1366,
+        1836
+      ],
+      "px": 428,
+      "key_left": 0.06843
+    },
+    {
+      "id": "ec_b12",
+      "file": "art/generated/res-icons/res-VI-3/ec_b12.webp",
+      "box": [
+        1400,
+        1408,
+        1828,
+        1836
+      ],
+      "px": 428,
+      "key_left": 0.04036
+    },
+    {
+      "id": "act_cb7",
+      "file": "art/generated/res-icons/res-VI-3/act_cb7.webp",
+      "box": [
+        1861,
+        1408,
+        2289,
+        1836
+      ],
+      "px": 428,
+      "key_left": 0.0444
+    }
+  ]
+}

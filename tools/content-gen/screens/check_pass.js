@@ -24,6 +24,9 @@
    9. Арт: пока путь не в EN_PASS.art.ready — ни одной ссылки на pass/…; выгруженный — AV с версией.
    10. Убежище, Входящие, Лавка: кнопки «Дар дня» и «Пропуск», строка дара во Входящих, точка у вкладки «Пропуск».
    11. UI-кит, карта экранов (ready у battle-pass и calendar), сценарии; режим «Игрок» — ни одного служебного слова.
+   12. Лавка Энериума, вкладка «Энериум» — стартовый набор (слово автора 30.09.2026, ADR-0033): рунные ключи и души раз за игру, первая
+       покупка ×2; карточка — цена и «раз за игру», лист до оплаты — покупка с номером; «сервер» выдаёт ровно ключи и души × 2 один раз,
+       повтор номера ничего не выдаёт, вторая покупка — отказ, после покупки набор не продаётся. Рунных ключей в рядах и листе даров нет.
    Запуск: node tools/content-gen/screens/check_pass.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -40,7 +43,7 @@ const run = (where, f) => { try { return f(); } catch (e) { say(`${where}: ис�
 function done() {
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
   console.log(`Пропуск и дар дня: отрисовок ${cnt.views}, листов ${cnt.sheets}, операций «сервера» ${cnt.ops}, отметок листа даров ${cnt.marks}.`);
-  console.log('Проверка пройдена: очки — только за дела и один раз, потолок копится, «Забрать» и покупка — операции с номером, платный ряд виден до покупки, лист даров не сгорает, главный дар — 20-я отметка, анимации — transform и opacity, игроку служебного не видно.');
+  console.log('Проверка пройдена: очки — только за дела и один раз, потолок копится, «Забрать» и покупка — операции с номером, платный ряд виден до покупки, лист даров не сгорает, главный дар — 20-я отметка, стартовый набор — раз за игру с ×2, анимации — transform и opacity, игроку служебного не видно.');
   process.exit(0);
 }
 
@@ -118,7 +121,7 @@ if (err.length) done();
 const T = vm.runInContext(`({
   get S() { return S; }, set S(v) { S = v; },
   ACT, OV, SCREENS, FLOWS, KIT_EXTRA, MAP, TEMPLATES, KH, BAG, LBX, render, initialState, setTeam, inboxN, leagueOpen: typeof leagueOpen === 'function' ? leagueOpen : null,
-  PS_SRV, DG_SRV, psWaiting, psNewDay, psShelterBtns, psGiftRow, psKitHtml, dgSync, LK_DATA, EN_PASS: window.EN_PASS, EnPass: window.EnPass, EN_EVENT: window.EN_EVENT, EN_EV: window.EN_EV,
+  PS_SRV, DG_SRV, ST_SRV: typeof ST_SRV !== 'undefined' ? ST_SRV : null, fmt, psWaiting, psNewDay, psShelterBtns, psGiftRow, psKitHtml, dgSync, LK_DATA, EN_PASS: window.EN_PASS, EnPass: window.EnPass, EN_EVENT: window.EN_EVENT, EN_EV: window.EN_EV,
 })`, ctx);
 const D = T.EN_PASS, PA = T.EnPass;
 const BIG = Object.keys(D.units).find(k => D.caps[k] == null && !D.units[k].gate);   // дело без дневного потолка и условия — для больших зачётов
@@ -468,5 +471,35 @@ const wallet = () => JSON.parse(JSON.stringify(T.S.wallet));
   const tpl = T.TEMPLATES.find(x => x[0] === 'Входящие');
   if (!tpl || !(tpl[3] || []).includes('calendar')) say('карта экранов: дар дня не отмечен готовым');
   if (T.FLOWS.filter(x => /^Пропуск|^Дар дня/.test(x[0])).length < 4) say('сценариев пропуска и дара дня меньше четырёх');
+}
+/* ================== 12. Лавка Энериума: стартовый набор ================== */
+{
+  const ST = D.store && D.store.starter, num = n => new RegExp(String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '[\\s\\u00a0\\u202f]?'));
+  if (!ST || !T.ST_SRV) say('Лавка: нет стартового набора — EN_PASS.store.starter или ST_SRV');
+  else {
+    if (ST.once !== true || ST.x !== 2) say('стартовый набор: не «раз за игру с ×2» — слово автора (ADR-0033)');
+    if (D.rows.free.concat(D.rows.paid, D.cal.list).some(cell => cell.some(x => x.k === 'keys'))) say('рунные ключи в рядах пропуска или листе даров — их дают только боссы биома, сет ключников, сундуки и контракты');
+    reset(); T.S.route = 'store'; T.S.seg.store = 'en';
+    const h = mainOf(draw('Лавка · Энериум · стартовый набор'));
+    if (!/data-a="stbuy"/.test(h) || !num(ST.rub).test(h)) say('Лавка: нет стартового набора с ценой');
+    if (!/Раз за игру/.test(h)) say('Лавка: у стартового набора нет «раз за игру»');
+    if (!num(ST.keys * ST.x).test(h) || !num(ST.souls * ST.x).test(h)) say('Лавка: в карточке набора не ключи и души с удвоением');
+    const s0 = sheetOf('лист стартового набора', 'stbuy', 'st1');
+    if (!/data-a="stbuydo" data-v="st1"/.test(s0) || !/Раз за игру/.test(s0)) say('лист стартового набора: нет покупки с номером или «раз за игру»');
+    const k0 = T.S.wallet.keys, s1 = T.S.wallet.souls, got = () => [T.S.wallet.keys - k0, T.S.wallet.souls - s1].join('/'), want = `${ST.keys * ST.x}/${ST.souls * ST.x}`;
+    let r = T.ST_SRV.buy('st1'); cnt.ops++;
+    if (!r.res || got() !== want) say(`стартовый набор: выдано ${got()}, а надо ${want}`);
+    r = T.ST_SRV.buy('st1'); cnt.ops++;
+    if (!r.again || got() !== want) say('стартовый набор: повтор номера выдал ещё раз');
+    r = T.ST_SRV.buy('st2'); cnt.ops++;
+    if (r.refuse !== 'bought' || got() !== want) say('стартовый набор: вторая покупка не отказала');
+    if (T.ST_SRV.buy('').refuse !== 'op') say('стартовый набор: операция без номера не отказала');
+    T.S.overlay = null;
+    const h2 = mainOf(draw('Лавка · стартовый набор куплен'));
+    if (/data-a="stbuy"/.test(h2) || !/куплено/.test(h2)) say('Лавка: после покупки набор снова продаётся');
+    if (/data-a="stbuydo"/.test(sheetOf('лист стартового набора · куплен', 'stbuy', 'st2'))) say('лист стартового набора: после покупки снова «Купить»');
+    reset(); const kk = T.S.wallet.keys; T.ACT.stbuydo('st9'); T.ACT.stbuydo('st9'); T.ACT.stbuydo('st10');
+    if (T.S.wallet.keys - kk !== ST.keys * ST.x) say('ACT.stbuydo: повтор или второе нажатие выдали ещё раз');
+  }
 }
 done();

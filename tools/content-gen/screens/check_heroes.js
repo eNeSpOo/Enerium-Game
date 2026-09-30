@@ -25,10 +25,12 @@
       целые доли, ratio — как у рисунка; моделью формулы .hk-fit>img.fit фигура целиком внутри поля и окна — обложки каждой ступени
       и размера, страницы портрета на обоих экранах, крупного плана; поле не под кругами, плашкой имени и знаками страницы.
    3. Раскрытая книга героя аккаунта — нажатие на книгу: слой поверх сетки, разворот своей ступени; слева — портрет (лупа — OV.hczoom,
-      закрытие возвращает прежнее окно), уровень, стихия, класс, мощь и имя; справа — вкладки «Развитие», «Снаряжение», «Навыки», «Путь»
-      из heroDetail; замки на переплёте, ленты снизу; ‹ › — соседний герой той же сетки; закрытие — к сетке.
-   3а. Книга «до покупки» (каталог, окно поверх экрана): «Герой», «Навыки», «Путь», ни развития, ни снаряжения; одно действие по
-      источнику; поверх лавки праха и витрины отряда недели «Назад» возвращает в них.
+      закрытие возвращает прежнее окно), уровень, стихия, класс, мощь и табличка — имя, под ним редкость; справа — страница без шапки,
+      закладки «Развитие», «Мощь», «Снаряжение», «Навыки», «Путь» из heroDetail (страницы — check_hero_book.js); замки на переплёте,
+      ленты снизу; ‹ › — соседний герой той же сетки; закрытие — к сетке.
+   3а. Книга «до покупки» (каталог, окно поверх экрана): «Герой» (история целиком, личный максимум), «Мощь» (на 0 уровне), «Навыки»,
+      «Путь», ни развития, ни снаряжения; имя — на табличке, лент — максимум доблести; одно действие по источнику; поверх лавки праха
+      и витрины отряда недели «Назад» возвращает в них.
    4. Купленный герой состава — герой аккаунта: запись коллекции 0 ур., 0 РП, 0 Добл; H(id); книга в «Моих» и раскрытая книга на всех
       вкладках; уровень за дух пишется в запись коллекции; у героя Эхо — набор из echo-foes.js.
    4б. Боевая мощь — одна функция BM (§6): независимый пересчёт у героев, после уровня и со слоями вещей; одно число на книге,
@@ -44,7 +46,7 @@
    7. Вёрстка — расчётом на 932 × 430 и 844 × 390: книги на полках шкафа — «Мои» и «За золото» (книга не уже HC_VIEW.card и
       HC_VIEW.gold, в ряду не меньше пяти, видно больше одной полки, lbCols считает то же число книг на полке, что и расчёт; табличка
       цены помещается под книгой; ленты свисают с кромки полки, не ниже неё), знаки обложки не налезают, раскрытая книга (страницы
-      разворота каждой ступени — правой хватает на девять мест снаряжения), витрина отряда недели.
+      разворота каждой ступени, правая — снизу над полосой обреза: ей хватает на сетки мест «Снаряжения»), витрина отряда недели.
    8. Анимация — по часам песочницы: открытие — время от нажатия: книга выдвигается с полки к игроку корешком (объём книги: обложка,
       обрез, корешок своей ступени), летит в центр и разворачивается обложкой, дальше — как прежде; полёт от места карточки (на полке
       книги в это время нет), шаги по
@@ -380,7 +382,7 @@ const stageOf = (h, S) => { if (T.rsHas(h)) return 3; if (h.c > T.rsCyc()) retur
   run('каталог · нажатие', () => T.ACT.hc(a.id));
   if (T.S.hview !== 'rs' || T.S.rs.sel !== a.id) say('каталог: нажатие на неизвестную душу не открыло её книгу');
   let w = winOf(view('каталог · книга неизвестной души'));
-  if (!w || !w.includes('Неизвестная душа') || /data-v="rhero:(?:who|skills|path)"/.test(w) || /class="rot-list"|class="chaps"|class="quote|class="lore/.test(w)) say('неизвестная душа: в книге видны сведения — история, навыки или путь');
+  if (!w || !w.includes('Неизвестная душа') || /data-v="rhero:(?:who|stats|skills|path)"/.test(w) || /class="rot-list"|class="chaps"|class="quote|class="lore|class="rs-who"|class="pgm/.test(w)) say('неизвестная душа: в книге видны сведения — история, мощь, навыки или путь');
   if (!w.includes(`${T.fmt(7)} / ${T.fmt(N)}`) || !w.includes('Возрождении душ')) say('неизвестная душа: в книге нет осколков «собрано / нужно» или где их брать');
   if (/data-a="hczoom"/.test(w) || /heroes\/[\w-]+\.jpg/.test(w.replace(/<span class="hsg[\s\S]*?<\/span><\/span>/g, ''))) say('неизвестная душа: в книге виден портрет или его можно открыть крупно');
   if (!w.includes(`data-a="rsgo" data-v="${a.id}"`)) say('неизвестная душа: нет пути туда, где берут осколки');
@@ -544,7 +546,8 @@ const stageOf = (h, S) => { if (T.rsHas(h)) return 3; if (h.c > T.rsCyc()) retur
 }
 
 /* ================== 3. раскрытая книга героя аккаунта ================== */
-const vitOf = w => (w.match(/<span class="hb-vit">([\s\S]*?)<\/span><\/header>/) || [])[1] || '';
+/* где герой сейчас — строка «уровень · предел · доблесть» на странице «Развитие» (шапки на правой странице больше нет) */
+const vitOf = w => (w.match(/<p class="hdv-sum">([\s\S]*?)<\/p>/) || [])[1] || '';
 const leftOf = w => { const i = w.indexOf('<section class="hb-pg l"'); return i < 0 ? '' : w.slice(i, w.indexOf('</section>', i)); };
 fresh();
 {
@@ -552,12 +555,14 @@ fresh();
     T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'own';
     run('открыть', () => T.ACT.hc(x.id)); calm();
     if (T.S.hview !== 'mine' || T.S.selHero !== x.id) { say(`книга · ${x.name}: нажатие на книгу её не открыло`); continue; }
-    for (const tab of ['power', 'gear', 'skills', 'path']) {
+    for (const tab of ['power', 'stats', 'gear', 'skills', 'path']) {
       T.S.seg.hero = tab; const h = view(`книга · ${x.name} · ${tab}`), w = winOf(h); cnt.bigs++;
       if (!w) { say(`книга · ${x.name}: не раскрыта`); break; }
       if (!gridOf(h)) say(`книга · ${x.name}: под книгой нет сетки, из которой её открыли`);
       if (/<div class="hd-top">/.test(w)) say(`книга · ${x.name}: осталась прежняя шапка с маленьким лицом`);
-      if (count(w, /data-a="seg" data-v="hero:(?:power|gear|skills|path)"/g) !== 4) say(`книга · ${x.name}: не четыре вкладки`);
+      const nav = (w.match(/<nav class="pg-tabs"[\s\S]*?<\/nav>/) || [''])[0];
+      if (count(nav, /<button class="pg-bmk" role="tab" aria-selected="(?:true|false)" data-a="seg" data-v="hero:(?:power|stats|gear|skills|path)"/g) !== 5 || !nav.includes(`aria-selected="true" data-a="seg" data-v="hero:${tab}"`)) say(`книга · ${x.name} · ${tab}: не пять закладок или выбрана не та`);
+      if (tab === 'stats' && (!w.includes('class="pgm') || !w.includes(`<b class="num">${T.fmt(T.BM.hero(x))}</b>`))) say(`книга · ${x.name}: на странице «Мощь» нет мощи и характеристик`);
       if (tab === 'power' && (!w.includes('class="hdv-path"') || !w.includes('class="hdv-next"'))) say(`книга · ${x.name}: во вкладке «Развитие» нет пути или следующего шага`);
       if (tab === 'gear' && count(w, /class="eq-slot[ "]/g) !== 9) say(`книга · ${x.name}: во вкладке «Снаряжение» не девять мест`);
       if (tab === 'skills' && !/class="rot-list"/.test(w)) say(`книга · ${x.name}: во вкладке «Навыки» нет способностей`);
@@ -568,11 +573,12 @@ fresh();
       const t = tierOf(x.maxV), L = leftOf(w), bm = T.BM.hero(x), vit = vitOf(w);
       if (!w.includes(`data-t="${t}"`) || !w.includes(`data-r="${x.r}"`)) say(`книга · ${x.name}: разворот не своей ступени или без редкости`);
       if (!L.includes(`data-a="hczoom" data-v="${x.id}"`)) say(`книга · ${x.name}: портрет не открывается крупно`);
-      if (!L.includes(`<b class="num">${x.lvl}</b>`) || !L.includes(`<b class="num">${T.fmt(bm)}</b>`) || !/icons\/cls-[a-z]+\.png/.test(L) || !L.includes('class="hb-el"') || !L.includes(`<b class="hb-nm">${x.name}</b>`)) say(`книга · ${x.name}: на странице портрета нет уровня, мощи BM.hero ${bm}, класса, стихии или имени`);
+      if (!L.includes(`<b class="num">${x.lvl}</b>`) || !L.includes(`<b class="num">${T.fmt(bm)}</b>`) || !/icons\/cls-[a-z]+\.png/.test(L) || !L.includes('class="hb-el"') || !L.includes(`<b class="hb-pn">${x.name}</b>`)) say(`книга · ${x.name}: на странице портрета нет уровня, мощи BM.hero ${bm}, класса, стихии или имени`);
       checkLocks(w.slice(w.indexOf('<span class="hb-lks"')), `книга · ${x.name} · переплёт`, x.lim, nxOf(x));
       const R = ribsOf(w.slice(w.indexOf('</section>', w.indexOf('<section class="hb-pg r"'))));
       if (R.all !== x.maxV || R.on !== x.valor) say(`книга · ${x.name}: лент ${R.all} (взятых ${R.on}), ждали ${x.maxV} (${x.valor})`);
-      if (!w.includes(`<h2>${x.name}</h2>`) || !w.includes(`<span class="rar" data-r="${x.r}">`)) say(`книга · ${x.name}: в шапке страницы нет имени или редкости`);
+      if (!L.includes(`<span class="hb-plate"><b class="hb-pn">${x.name}</b><small class="hb-pm"><span class="rar" data-r="${x.r}">`)) say(`книга · ${x.name}: на табличке портрета нет имени и под ним редкости`);
+      if (/<header class="hb-h|class="hb-vit"/.test(w)) say(`книга · ${x.name}: на правой странице осталась прежняя шапка — имя и знаки теперь на левой`);
       if (!vit.includes(`<b class="num">${x.lvl}</b><small class="num">/ ${x.cap}</small>`) || !vit.includes(`<b class="num">${x.valor}</b><small class="num">/ ${x.maxV}</small>`)) say(`книга · ${x.name}: нет уровня «${x.lvl} / ${x.cap}» или доблести «${x.valor} / ${x.maxV}»`);
       if (!w.includes('data-a="hbclose" data-v="grid"')) say(`книга · ${x.name}: закрытие не ведёт к сетке`);
     }
@@ -605,20 +611,23 @@ function checkPre(w, x, where) {
   if (/<span class="hb-lks"/.test(w)) say(`${where}: у героя вне коллекции — замки пределов`);
   if (/class="hb-lv/.test(L)) say(`${where}: у героя вне коллекции — уровень`);
   if (!L.includes(`<b class="num">${T.fmt(T.hrBaseBm(x))}</b>`)) say(`${where}: нет мощи по базовым статам ${T.hrBaseBm(x)}`);
-  if (!w.includes(`<h2>${x.n}</h2>`) || !w.includes(`<span class="rar" data-r="${x.r}">`) || !w.includes(`data-el="${x.sch}"`) || !/icons\/cls-[a-z]+\.png/.test(w)) say(`${where}: нет имени, редкости, стихии или класса`);
-  if (!w.includes(`доблесть до <b class="num">${x.maxV}</b>`)) say(`${where}: нет личного максимума доблести`);
+  if (!L.includes(`<b class="hb-pn">${x.n}</b>`) || !L.includes(`<span class="rar" data-r="${x.r}">`) || !w.includes(`data-el="${x.sch}"`) || !/icons\/cls-[a-z]+\.png/.test(w)) say(`${where}: нет имени, редкости, стихии или класса`);
+  /* личный максимум доблести — лентами под книгой: лент столько, каков максимум, взятых нет */
+  const R = ribsOf(w.slice(w.indexOf('</section>', w.indexOf('<section class="hb-pg r"'))));
+  if (R.all !== x.maxV || R.on !== 0) say(`${where}: лент доблести ${R.all} (взятых ${R.on}) — ждали личный максимум ${x.maxV}`);
   for (const bad of ['data-a="lvlup"', 'data-a="limit"', 'data-a="gearbest"', 'class="eq-slot', 'class="hdv-path"', 'data-a="seg" data-v="hero:']) if (w.includes(bad)) say(`${where}: у героя до покупки — прокачка или снаряжение (${bad})`);
-  if (count(w, /data-a="seg" data-v="rhero:(?:who|skills|path)"/g) !== 3) say(`${where}: не три вкладки «Герой», «Навыки», «Путь»`);
+  if (count(w, /data-a="seg" data-v="rhero:(?:who|stats|skills|path)"/g) !== 4) say(`${where}: не четыре закладки «Герой», «Мощь», «Навыки», «Путь»`);
 }
 fresh();
 {
   const ro = T.RS.heroes.find(x => x.src === 'roulette' && !T.rsHas(x) && x.maxV > 1 && x.c <= T.rsCyc()) || T.RS.heroes.find(x => x.src === 'roulette' && !T.rsHas(x) && x.c <= T.rsCyc());
   T.S.rs.shards[ro.id] = need();
   T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'all'; run('до покупки', () => T.ACT.hc(ro.id)); calm();
-  for (const tab of ['who', 'skills', 'path']) {
+  for (const tab of ['who', 'stats', 'skills', 'path']) {
     T.S.seg.rhero = tab; const w = winOf(view(`до покупки · ${ro.n} · ${tab}`));
     checkPre(w, ro, `до покупки · ${tab}`);
-    if (tab === 'who' && (!w.includes('0 ур. · 0 РП · 0 Добл') || !/class="quote|class="lore/.test(w))) say('до покупки · «Герой»: нет истории или «с чем приходит»');
+    if (tab === 'who' && (!w.includes('0 ур. · 0 РП · 0 Добл') || !/class="rs-who"/.test(w) || !w.includes(`максимум ${ro.maxV}`))) say('до покупки · «Герой»: нет истории, «с чем приходит» или личного максимума доблести');
+    if (tab === 'stats' && (!w.includes('class="pgm') || !w.includes(`<b class="num">${T.fmt(T.hrBaseBm(ro))}</b>`) || !w.includes('на 0 уровне'))) say('до покупки · «Мощь»: нет мощи по базовым характеристикам на 0 уровне');
     if (tab === 'skills') {
       const K = T.heroKit({ draft: T.hrDraft(ro) });
       if (!K) say('до покупки · «Навыки»: у героя нет набора');
@@ -1241,16 +1250,21 @@ run('режим «Игрок»', () => T.setTeam(false));
     const maxPrice = T.rsGold(6, 40), tagW = 11 + 4 + T.fmt(maxPrice).length * 6.2 + 12 + 2 * 7;
     if (tagW > gold.cw) say(`вёрстка ${X.n}: табличка цены ${tagW.toFixed(0)} px шире книги ${gold.cw.toFixed(0)} px`);
     const cw = mine.cw, ch = bookH(cw), lock = cw * lkW / 100, nameW = cw * nameMin / 100, cols = mine.cols, rows = mine.rows;
-    /* раскрытая книга: окно во всю игру, разворот каждой ступени — правой странице хватает на девять мест снаряжения (по 26 px) */
+    /* раскрытая книга: окно во всю игру, разворот каждой ступени; правая страница — пергамент с полями .hb-rp (screens/book.css), без
+       вкладыша, снизу — над полосой обреза (HB_ART.spreads[ступень].e): ей хватает на сетки мест «Снаряжения» — три места и два талисмана
+       в ряд (по 40 px) */
     const sw = Math.min(BV.win.max, X.W - BV.win.padX), sh = X.H - BV.win.padY, bw = sw - BV.win.lock, bh = sh - BV.win.rib;
+    const pad = ((BCSS.match(/\n\.hb-rp\{[^}]*inset:(\d+)px (\d+)px (\d+)px (\d+)px/) || []).slice(1).map(Number));
+    if (pad.length !== 4) say('вёрстка: нет полей правой страницы книги (.hb-rp{inset:…})');
+    const reB = BCSS.match(/\n\.hb-rp\{[^}]*bottom:calc\((\d+)px \+ var\(--re,0\) \* 1% \/ 10\)/); if (reB) pad[2] = +reB[1]; else say('вёрстка: правая страница книги снизу не поднята над полосой обреза');
     let minR = 1e9, minRH = 1e9, minL = 1e9;
     for (const t of [1, 2, 3, 4, 5]) {
       const g = T.HB_ART.spreads[t], rw = bw * (1000 - g.r[1] - g.r[3]) / 1000, rhh = bh * (1000 - g.r[0] - g.r[2]) / 1000, lw = bw * (1000 - g.l[1] - g.l[3]) / 1000;
-      const content = rw * .93 - 20;   // вкладыш: поля 3 % и 4 %, отступы 10 + 10
-      minR = Math.min(minR, content); minRH = Math.min(minRH, rhh * .94 - 16); minL = Math.min(minL, lw);
+      const content = rw - (pad[1] || 0) - (pad[3] || 0);   // поля страницы: справа и у корешка
+      minR = Math.min(minR, content); minRH = Math.min(minRH, rhh - (pad[0] || 0) - (pad[2] || 0) - rhh * (g.e || 0) / 1000); minL = Math.min(minL, lw);
       if (g.l[3] >= g.g || g.r[3] < g.g - 60 || 1000 - g.l[1] > g.r[3] + 60) say(`вёрстка · разворот ${t}: страницы не по разные стороны корешка`);
     }
-    if (minR < 9 * 26 + 8 * 3) say(`вёрстка ${X.n}: на правой странице ${minR.toFixed(0)} px — девяти мест снаряжения тесно`);
+    if (minR < 5 * 40 + 4 * 6 + 14) say(`вёрстка ${X.n}: на правой странице ${minR.toFixed(0)} px — сеткам мест «Снаряжения» тесно`);
     if (minRH < 230) say(`вёрстка ${X.n}: правая страница ${minRH.toFixed(0)} px в высоту — вкладке тесно`);
     if (minL < 300) say(`вёрстка ${X.n}: левая страница ${minL.toFixed(0)} px — портрету мало`);
     const cbh = Math.floor(bh * BV.win.cb / 100), cbw = Math.floor(cbh * 9 / 16);
@@ -1485,8 +1499,28 @@ run('режим «Игрок»', () => T.setTeam(false));
   /* арт шкафа: пути на диске, адреса и классы у <html>, геометрия целая; без арта — CSS */
   const art = p => fs.existsSync(path.join(UI, 'assets', 'art', p));
   for (const p of LA.ready) { if (!Object.values(LA.img).includes(p)) say(`арт шкафа: неизвестный путь ${p}`); if (!art(p)) say(`арт шкафа: ${p} в LB_ART.ready, а файла нет`); }
-  for (const [k, cls, p] of [['--lb-wall', 'lb-w', LA.img.wall], ['--lb-plank', 'lb-p', LA.img.plank], ['--lb-cornice', 'lb-c', LA.img.cornice], ['--lb-post', 'lb-s', LA.img.post], ['--lb-foot', 'lb-f', LA.img.foot], ['--lb-bracket', 'lb-b', LA.img.bracket], ['--lb-lamp', 'lb-l', LA.img.lamp]])
+  for (const [k, cls, p] of [['--lb-wall', 'lb-w', LA.img.wall], ['--lb-plank', 'lb-p', LA.img.plank], ['--lb-cornice', 'lb-cz', LA.img.cornice], ['--lb-post', 'lb-s', LA.img.post], ['--lb-foot', 'lb-f', LA.img.foot], ['--lb-bracket', 'lb-b', LA.img.bracket], ['--lb-lamp', 'lb-l', LA.img.lamp]])
     if (LA.ready.includes(p) && (!P.rootVars[k] || !P.rootCls.has(cls))) say(`арт шкафа: ${k} не в переменных <html> или нет класса ${cls}`);
+  /* флаг «арт загружен» у <html> — не класс элемента: правило «.флаг» легло бы на весь документ. Так было с .lb-c (ячейка полки)
+     и .pg-tab (закладка книги): весь прототип получил nowrap, заглавные буквы и display у <html> */
+  {
+    const inline = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map(m => m[1]);
+    const files = fs.readdirSync(path.join(UI, 'screens')).filter(f => f.endsWith('.css')).map(f => fs.readFileSync(path.join(UI, 'screens', f), 'utf8'));
+    const css = inline.concat(files).join('\n').replace(/\/\*[\s\S]*?\*\//g, '');
+    /* селектор ложится на сам <html>, если он — один составной блок без предков (без пробела и > + ~), без чужого тега и атрибутов,
+       и все его классы — флаги <html>: «.pg-tab», «.pg-tab:hover», «.lb-c::before». «html.флаг …», «.флаг.другой», «.предок .флаг» — нет */
+    const hits = new Set();
+    for (const [, head] of css.matchAll(/([^{}]+)\{/g)) {
+      if (/^\s*@/.test(head)) continue;
+      for (const sel0 of head.split(',')) {
+        const sel = sel0.trim(), flat = sel.replace(/\([^)]*\)/g, '');
+        if (!sel || /[\s>+~]/.test(flat) || /\[/.test(flat) || /^(html|:root)\b/i.test(sel) || /^[a-z*]/i.test(sel)) continue;
+        const cls = [...flat.matchAll(/\.([\w-]+)/g)].map(m => m[1]);
+        if (cls.length && cls.every(c => P.rootCls.has(c))) hits.add(sel);
+      }
+    }
+    for (const sel of hits) say(`стиль «${sel}» ложится на сам <html>: его класс — флаг «арт загружен» у <html>, а не класс элемента`);
+  }
   for (const v of [LA.plank.surf, ...LA.cornice.band, LA.foot.ratio, ...LA.foot.post, LA.bracket.ratio, LA.lamp.ratio, LA.css.surf, ...LA.css.band]) if (!Number.isInteger(v) || v < 0 || v > 5000) say(`арт шкафа: геометрия ${v} — не целая доля`);
   for (const [k, v] of Object.entries(LV)) if (typeof v === 'number' && !Number.isInteger(v)) say(`шкаф: LB_VIEW.${k} = ${v} — не целое`);
   { const keep = LA.ready.slice(); LA.ready.length = 0; if (!T.lbVars().includes(`--lb-su:${LA.css.surf}`)) say('шкаф без арта: доска полки не по CSS'); LA.ready.push(...keep); if (!T.lbVars().includes(`--lb-su:${LA.plank.surf}`)) say('шкаф с артом: верх доски не по рисунку'); }

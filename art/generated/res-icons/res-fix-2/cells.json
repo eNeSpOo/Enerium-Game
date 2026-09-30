@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-fix-2__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-fix.json",
+  "job": "res-fix-2",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "call_fb14",
+      "file": "art/generated/res-icons/res-fix-2/call_fb14.webp",
+      "box": [
+        13,
+        20,
+        443,
+        450
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb14_aw",
+      "file": "art/generated/res-icons/res-fix-2/call_fb14_aw.webp",
+      "box": [
+        475,
+        20,
+        905,
+        450
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "act_ci5",
+      "file": "art/generated/res-icons/res-fix-2/act_ci5.webp",
+      "box": [
+        937,
+        20,
+        1367,
+        450
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_c19notes",
+      "file": "art/generated/res-icons/res-fix-2/a_c19notes.webp",
+      "box": [
+        1399,
+        20,
+        1829,
+        450
+      ],
+      "px": 430,
+      "key_left": 0.00086
+    },
+    {
+      "id": "call_fb19",
+      "file": "art/generated/res-icons/res-fix-2/call_fb19.webp",
+      "box": [
+        1861,
+        20,
+        2291,
+        450
+      ],
+      "px": 430,
+      "key_left": 0.00449
+    },
+    {
+      "id": "tr_fb19a",
+      "file": "art/generated/res-icons/res-fix-2/tr_fb19a.webp",
+      "box": [
+        13,
+        482,
+        443,
+        912
+      ],
+      "px": 430,
+      "key_left": 0.02524
+    },
+    {
+      "id": "find_cb7b",
+      "file": "art/generated/res-icons/res-fix-2/find_cb7b.webp",
+      "box": [
+        475,
+        482,
+        905,
+        912
+      ],
+      "px": 430,
+      "key_left": 0.00293
+    },
+    {
+      "id": "cr_slate",
+      "file": "art/generated/res-icons/res-fix-2/cr_slate.webp",
+      "box": [
+        937,
+        482,
+        1367,
+        912
+      ],
+      "px": 430,
+      "key_left": 0.0148
+    },
+    {
+      "id": "vr3",
+      "file": "art/generated/res-icons/res-fix-2/vr3.webp",
+      "box": [
+        1399,
+        482,
+        1829,
+        912
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "lu_ci3",
+      "file": "art/generated/res-icons/res-fix-2/lu_ci3.webp",
+      "box": [
+        1861,
+        482,
+        2291,
+        912
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "ec_b6",
+      "file": "art/generated/res-icons/res-fix-2/ec_b6.webp",
+      "box": [
+        13,
+        944,
+        443,
+        1374
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "act_ci3",
+      "file": "art/generated/res-icons/res-fix-2/act_ci3.webp",
+      "box": [
+        475,
+        944,
+        905,
+        1374
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "mc_b7",
+      "file": "art/generated/res-icons/res-fix-2/mc_b7.webp",
+      "box": [
+        937,
+        944,
+        1367,
+        1374
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb5_aw",
+      "file": "art/generated/res-icons/res-fix-2/call_fb5_aw.webp",
+      "box": [
+        1399,
+        944,
+        1829,
+        1374
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_trademark",
+      "file": "art/generated/res-icons/res-fix-2/a_trademark.webp",
+      "box": [
+        1861,
+        944,
+        2291,
+        1374
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "ec_b4",
+      "file": "art/generated/res-icons/res-fix-2/ec_b4.webp",
+      "box": [
+        13,
+        1407,
+        443,
+        1837
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_casting",
+      "file": "art/generated/res-icons/res-fix-2/p_casting.webp",
+      "box": [
+        475,
+        1407,
+        905,
+        1837
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_window",
+      "file": "art/generated/res-icons/res-fix-2/cr_window.webp",
+      "box": [
+        937,
+        1407,
+        1367,
+        1837
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "mt_b9",
+      "file": "art/generated/res-icons/res-fix-2/mt_b9.webp",
+      "box": [
+        1399,
+        1407,
+        1829,
+        1837
+      ],
+      "px": 430,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb5",
+      "file": "art/generated/res-icons/res-fix-2/call_fb5.webp",
+      "box": [
+        1861,
+        1407,
+        2291,
+        1837
+      ],
+      "px": 430,
+      "key_left": 0.0
+    }
+  ]
+}

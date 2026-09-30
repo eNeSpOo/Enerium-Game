@@ -1,0 +1,604 @@
+{
+  "name": "Иконки ресурсов сеткой — цикл I. Слово автора: «Иконки по ресурсам начинай генерировать только тогда, когда придёт с отчётом Этрион». Собирает tools/art-gen/res_jobs.py из design/ui/recipes.js — руками не править",
+  "plan": {
+    "Язык иконки": "один предмет в покое на тёмном камне, три четверти сверху, узнаваемая форма читается на 32 px; вид предмета различает рамка интерфейса (CR_KIND и CR_FAM, screens/crafthall.js), редкость — свет в окне рамки",
+    "Палитра": "цвет карста цикла, свет снизу — его же: The palette of this sheet: pale white-green crystal light (#DFF4E5), light pale wood, warm grey clay and pale moss. The light from below is a soft pale white-green glow — never saturated teal.",
+    "Листы": "листы Этриона (поле sheet) переупакованы внутри цикла по 20 клеток, остаток — малым листом; предметы с img и герои не рисуются"
+  },
+  "notes": [
+    "cells — [id предмета EN_RECIPES.items, имя файла]; spare — пустая клетка малого листа, не выгружается; hidden — «ресурс скрыт»",
+    "Проба 30.09.2026 — res-P-1 и res-I-1 — нарисована с предметом на две трети клетки: в рамке вида окно — 72 % колодца, предмет выходил мелким на 32 px. С остальных листов предмет — на три четверти клетки",
+    "Фраза облика — поле art Этриона; письмо, руны и цифры переписаны в неразборчивые штрихи (FIX в res_jobs.py)",
+    "Слабые клетки — надписи, пентаграмма, «летающая тарелка», светлый фон — перерисованы листами res-fix-* (jobs/res-icons-fix.json): их клетка заменяет клетку этого листа",
+    "Листы res-I-2…res-I-6 вышли с насыщенным мятным конусом света — как зелень цикла V, а палитра цикла I — «белый с прозеленью». Мята приглушена без новой генерации: python tools/art-gen/hue_fix.py \"art/generated/res-icons/res-I-*/cells.json\" (полоса 125–190°, насыщенность × 0,25, яркость × 0,92; клетки, где полосы больше 4 %) — 64 клетки получили <имя>.fix.webp"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "res-icons": {
+      "aspect": "5:4",
+      "size": "2K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square item icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the item in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game lays its own frame over the edges of the cell, so everything important stays in the middle. Every cell shows exactly one item — a raw material, a trophy, a crafted piece or a relic — lying or standing still on dark near-black stone with faint cracks and a darker vignette toward the edges of the cell: one clear central object, large, filling about three quarters of the cell, in a clear three-quarter view from slightly above, with a bold recognisable silhouette that reads at 32 px. When a cell names several things, the first one is the main object — large and centred — and the others are small details beside it. Light rises from below in the colour of this sheet's palette, a soft glow from cracks in the stone — never a spotlight; crisp rim light on the edges of the object; a few dust motes in the light. Painted exactly like the ability icons of this game: loose, confident painterly brush strokes, soft painted edges and deep shadows — no black outlines, no flat sticker look, no scenery, no hands or people unless the cell names them. Writing is never drawn: wherever a cell mentions script, notes, pages, maps, tallies, tags or marks, they are faint unreadable smudges and straight ruled lines; clock faces and dials are plain, with simple notches and no numerals. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each differs clearly from its neighbours."
+    }
+  },
+  "jobs": [
+    {
+      "id": "res-I-1",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл I — лист 1: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона I-01",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "k1_hunt",
+          "k1_hunt"
+        ],
+        [
+          "k1_tail",
+          "k1_tail"
+        ],
+        [
+          "k1_eng",
+          "k1_eng"
+        ],
+        [
+          "k1_alch",
+          "k1_alch"
+        ],
+        [
+          "k1_ench",
+          "k1_ench"
+        ],
+        [
+          "k1_smith",
+          "k1_smith"
+        ],
+        [
+          "u1",
+          "u1"
+        ],
+        [
+          "rc_b1",
+          "rc_b1"
+        ],
+        [
+          "mc_b1",
+          "mc_b1"
+        ],
+        [
+          "mt_b1",
+          "mt_b1"
+        ],
+        [
+          "k2_hunt",
+          "k2_hunt"
+        ],
+        [
+          "k2_tail",
+          "k2_tail"
+        ],
+        [
+          "k2_eng",
+          "k2_eng"
+        ],
+        [
+          "k2_alch",
+          "k2_alch"
+        ],
+        [
+          "k2_ench",
+          "k2_ench"
+        ],
+        [
+          "k2_smith",
+          "k2_smith"
+        ],
+        [
+          "u2",
+          "u2"
+        ],
+        [
+          "rc_b2",
+          "rc_b2"
+        ],
+        [
+          "mc_b2",
+          "mc_b2"
+        ],
+        [
+          "mt_b2",
+          "mt_b2"
+        ]
+      ],
+      "subject": "The palette of this sheet: pale white-green crystal light (#DFF4E5), light pale wood, warm grey clay and pale moss. The light from below is a soft pale white-green glow — never saturated teal.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A fan of thin curved steel blades joined at a bone hilt, edges catching a pale green glint; A long bone needle shaped like a slender finger, threaded with amber cord, clay dust on the tip; A square grey stone slab with a carved round mark, chipped corners and dried clay smears; A lump of warm reddish clay with finger marks, a thin curl of steam, faint ember glow inside; A pale clay mask with empty eye holes, a faint face imprint inside, cracked at the chin.\n\nRow 2: A bronze bellows nozzle with a flared mouth, soot-blackened, a faint orange glow at its tip; A small grey clay hand with delicate curled fingers, a seam at the wrist where it was pressed onto a larger body; A small clay hand half-sunk into a lump of warm red clay, faint steam and ember glow around the wrist; A half-finished clay figure on a wire armature, one small hand attached, green crystal chips set in its chest; A single deep groove carved across a slab of dried clay, glowing faint white-green along its length.\n\nRow 3: A curved hunting horn of pale antler bound with bark strips, a soft green glow at its mouth; A coiled ribbon of pale bark fibre, faintly luminous, loose threads at both ends; A springy forked branch of pale smooth wood, bound at one end with bark; A broad translucent leaf glowing cold white-green from within, its veins bright like frost; A small heap of white-green crystal grains glowing softly on dark cloth.\n\nRow 4: A gnarled root threaded with rusty ore veins, earth still clinging, a dull metallic sheen; A thick lock of silver-green fur tied with a knot of root fibre, faintly glowing at the tips; A lock of silver-green fur wrapped in white thread charms and small claws, glowing softly; A large antler horn wrapped with fur and white charms, a tiny ringed white city carved on its bell; A tiny milk tooth of a beast cub on a braided grass cord, pale green glow at its root."
+    },
+    {
+      "id": "res-I-2",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл I — лист 2: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона I-02",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "rn1_1",
+          "rn1_1"
+        ],
+        [
+          "rn1_2",
+          "rn1_2"
+        ],
+        [
+          "rn1_3",
+          "rn1_3"
+        ],
+        [
+          "rn1_4",
+          "rn1_4"
+        ],
+        [
+          "rn1_5",
+          "rn1_5"
+        ],
+        [
+          "vs1",
+          "vs1"
+        ],
+        [
+          "vr1",
+          "vr1"
+        ],
+        [
+          "kr_el",
+          "kr_el"
+        ],
+        [
+          "p_clay",
+          "p_clay"
+        ],
+        [
+          "p_brew",
+          "p_brew"
+        ],
+        [
+          "a_lamp",
+          "a_lamp"
+        ],
+        [
+          "a_cast",
+          "a_cast"
+        ],
+        [
+          "a_tonic",
+          "a_tonic"
+        ],
+        [
+          "a_remedy",
+          "a_remedy"
+        ],
+        [
+          "p_thorn",
+          "p_thorn"
+        ],
+        [
+          "p_stonewater",
+          "p_stonewater"
+        ],
+        [
+          "a_ration",
+          "a_ration"
+        ],
+        [
+          "p_balsam",
+          "p_balsam"
+        ],
+        [
+          "a_healstone",
+          "a_healstone"
+        ],
+        [
+          "p_print",
+          "p_print"
+        ]
+      ],
+      "subject": "The palette of this sheet: pale white-green crystal light (#DFF4E5), light pale wood, warm grey clay and pale moss. The light from below is a soft pale white-green glow — never saturated teal.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A small flat stone of pale white-green crystal with one carved notch glowing along its edge; A small flat stone of pale white-green crystal with two carved notches glowing along its edge; A small flat stone of pale white-green crystal with three carved notches glowing along its edge; A small flat stone of pale white-green crystal with four carved notches glowing along its edge; A small flat stone of pale white-green crystal with five carved notches glowing along its edge.\n\nRow 2: A jagged shard of pale white-green crystal with a tiny star-shaped glint at its heart; A round stone disc of pale white-green stone with one solid, filled five-pointed star carved deep and glowing — a solid star, never an outline; A palm-sized faceted crystal of white with a green tint, glowing softly from within; A smooth block of grey-brown clay, damp and dense, a thumbprint on its top; A small stoppered flask of pale green liquid glowing coldly, frost on the glass.\n\nRow 3: A small lantern of pale wood and glass, cold white-green light inside, a woven handle; A hollow grey clay figure mould split in two halves, a face imprinted inside; A dark green draught in a clay cup, faint glowing steam curling up; A small clay jar sealed with resin, pale green salve glowing at the rim; A small corked glass vial of dark purple bitter brew with thorn sprigs inside.\n\nRow 4: A clay bowl of cloudy grey water with a crust of mineral crystals at the rim; A small cloth bundle tied with twine, a vial and a salt pouch peeking out; A small wooden tin of soft green salve with moss fibres and dew beads; A white-green glowing crystal sunk into a clay jar of pale salve; A shallow sand-and-resin tablet bearing the imprint of a sleeping face, edges crumbling."
+    },
+    {
+      "id": "res-I-3",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл I — лист 3: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона I-02, I-03",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "p_ward",
+          "p_ward"
+        ],
+        [
+          "a_karstsack",
+          "a_karstsack"
+        ],
+        [
+          "p_signcopy",
+          "p_signcopy"
+        ],
+        [
+          "p_frame",
+          "p_frame"
+        ],
+        [
+          "p_limb",
+          "p_limb"
+        ],
+        [
+          "a_bow",
+          "a_bow"
+        ],
+        [
+          "a_stone",
+          "a_stone"
+        ],
+        [
+          "p_wheel",
+          "p_wheel"
+        ],
+        [
+          "p_wedge",
+          "p_wedge"
+        ],
+        [
+          "p_whitestone",
+          "p_whitestone"
+        ],
+        [
+          "p_waxthread",
+          "p_waxthread"
+        ],
+        [
+          "p_bast",
+          "p_bast"
+        ],
+        [
+          "a_bag",
+          "a_bag"
+        ],
+        [
+          "p_felt",
+          "p_felt"
+        ],
+        [
+          "p_girth",
+          "p_girth"
+        ],
+        [
+          "p_dustmask",
+          "p_dustmask"
+        ],
+        [
+          "p_elfstring",
+          "p_elfstring"
+        ],
+        [
+          "p_fang",
+          "p_fang"
+        ],
+        [
+          "p_lure",
+          "p_lure"
+        ],
+        [
+          "a_arrow",
+          "a_arrow"
+        ]
+      ],
+      "subject": "The palette of this sheet: pale white-green crystal light (#DFF4E5), light pale wood, warm grey clay and pale moss. The light from below is a soft pale white-green glow — never saturated teal.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A white-green crystal chip in a knotted thread cage hanging from a loop; A tied sack of glowing green bark cloth bulging with matte grey-white stones; A sheet of rough paper covered in faint scratches and arrows all pointing one way; A small skeletal frame of bent wire and wooden clamps tied with thread at the joints; A curved limb of pale laminated wood with a bone tip, smooth and slightly flexed.\n\nRow 2: A slender recurved bow of pale wood with bone tips and a waxed amber string; A neat cut block of grey road stone with chisel marks and a carved round mark; A small spoked wooden wheel with an iron rim hammered from old horseshoes; A short timber prop jammed tight with two wooden wedges, iron bands around them; A small section of white stone masonry with thin grey mortar lines.\n\nRow 3: A small skein of amber waxed thread, glossy and stiff, wound on a bone spindle; A folded strip of bark cloth dyed pale luminous green, glowing faintly at the folds; A shoulder bag of glowing green bark cloth stitched with amber thread; A folded square of dense grey-brown felt with a few coarse hairs sticking out; A restitched wide leather strap with fresh amber seams and a copper buckle.\n\nRow 4: A cloth face wrap with fresh amber stitching and cords to tie behind the head; A coil of pale green vine twisted with amber thread into a bowstring; A yellowed beast fang filed to a needle point, fine scrape marks along its curve; A short bone whistle carved with leaf patterns, a hole at one end, a string loop; A bundle of three arrows with fang tips and luminous green fletching."
+    },
+    {
+      "id": "res-I-4",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл I — лист 4: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона I-03, I-04",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "p_venom",
+          "p_venom"
+        ],
+        [
+          "p_tracker",
+          "p_tracker"
+        ],
+        [
+          "p_coal",
+          "p_coal"
+        ],
+        [
+          "p_bloom",
+          "p_bloom"
+        ],
+        [
+          "a_pick",
+          "a_pick"
+        ],
+        [
+          "a_iron",
+          "a_iron"
+        ],
+        [
+          "a_steel",
+          "a_steel"
+        ],
+        [
+          "p_northiron",
+          "p_northiron"
+        ],
+        [
+          "act_cb1",
+          "act_cb1"
+        ],
+        [
+          "cr_stone",
+          "cr_stone"
+        ],
+        [
+          "cr_harness",
+          "cr_harness"
+        ],
+        [
+          "cr_shoe",
+          "cr_shoe"
+        ],
+        [
+          "cr_axle",
+          "cr_axle"
+        ],
+        [
+          "cr_sign",
+          "cr_sign"
+        ],
+        [
+          "cr_thorn",
+          "cr_thorn"
+        ],
+        [
+          "cr_tuft",
+          "cr_tuft"
+        ],
+        [
+          "cr_camp",
+          "cr_camp"
+        ],
+        [
+          "cr_girth",
+          "cr_girth"
+        ],
+        [
+          "find_cb1",
+          "find_cb1"
+        ],
+        [
+          "find_cb1b",
+          "find_cb1b"
+        ]
+      ],
+      "subject": "The palette of this sheet: pale white-green crystal light (#DFF4E5), light pale wood, warm grey clay and pale moss. The light from below is a soft pale white-green glow — never saturated teal.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A tiny stoppered vial of milky blue liquid with drifting spores; A hooded cloak of silvery-green fur with moss trimming, glowing faintly at the edges; A lump of charcoal glowing deep orange from within, cracks lit like veins; A rough spongy lump of dark iron, slag pits on its surface, faintly hot; A heavy forged pickaxe with a bog-iron head and a pale bent-wood handle.\n\nRow 2: A flat bar of dark reforged iron with faint horseshoe curves still visible; A dense bar of bluish-grey steel with a watered pattern, one end still rough; A rough bundle of northern scrap iron: a shield boss and an axe head hammered together; A small carved stone milestone wrapped in luminous green bark ribbon, a bone whistle hanging from it; A worn square paving stone of grey granite, edges rounded by centuries of wheels.\n\nRow 3: A tangle of cracked leather harness straps with small bronze rings, dusty and stiff; A rusted horseshoe with square nail holes, red flakes on dark iron; A split wooden cart axle, dark and hard as bone, an iron collar still clamped on one end; A weathered wooden signboard with faint scratches, all arrows pointing the same way; A thorny sprig with small dark blue berries, sharp spines along a twisted stem.\n\nRow 4: A tuft of coarse grey-brown fur caught on a thorn twig; A few dry black charcoal lumps half-buried in grey road dust; A wide leather girth strap with a green-tarnished copper buckle; A small round clockwork of tarnished bronze with an unfamiliar dial, sand grains trapped behind cracked glass; A green-tarnished copper plaque with stamped builder marks and a long row of dots."
+    },
+    {
+      "id": "res-I-5",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл I — лист 5: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона I-04, I-05, I-06",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "call_fb1",
+          "call_fb1"
+        ],
+        [
+          "tr_fb1",
+          "tr_fb1"
+        ],
+        [
+          "tr_fb1a",
+          "tr_fb1a"
+        ],
+        [
+          "act_cb2",
+          "act_cb2"
+        ],
+        [
+          "cr_karst",
+          "cr_karst"
+        ],
+        [
+          "cr_prop",
+          "cr_prop"
+        ],
+        [
+          "cr_mold",
+          "cr_mold"
+        ],
+        [
+          "cr_slag",
+          "cr_slag"
+        ],
+        [
+          "cr_drip",
+          "cr_drip"
+        ],
+        [
+          "cr_worm",
+          "cr_worm"
+        ],
+        [
+          "cr_wrap",
+          "cr_wrap"
+        ],
+        [
+          "cr_wedge",
+          "cr_wedge"
+        ],
+        [
+          "cr_bit",
+          "cr_bit"
+        ],
+        [
+          "find_cb2",
+          "find_cb2"
+        ],
+        [
+          "find_cb2b",
+          "find_cb2b"
+        ],
+        [
+          "call_fb2",
+          "call_fb2"
+        ],
+        [
+          "tr_fb2",
+          "tr_fb2"
+        ],
+        [
+          "tr_fb2a",
+          "tr_fb2a"
+        ],
+        [
+          "act_ci1",
+          "act_ci1"
+        ],
+        [
+          "cr_ci1_oar",
+          "cr_ci1_oar"
+        ]
+      ],
+      "subject": "The palette of this sheet: pale white-green crystal light (#DFF4E5), light pale wood, warm grey clay and pale moss. The light from below is a soft pale white-green glow — never saturated teal.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A hollow clay mould holding a small bronze clockwork, a lock of green fur and a bone whistle beside it; A coil of ancient bowstring, dark and glossy, faintly humming with green light; A short black horn carved with running beasts, its mouth worn smooth by an ancient hand; A squat miner lamp of dark iron and cloudy glass, a small bronze clock tied to its handle; A matte grey-white crystal chunk with no inner light, dusty facets.\n\nRow 2: A thick timber prop, darkened and cracked, with iron brackets at both ends; A patch of pale blue-grey mould with soft glowing spores on a stone chip; A rough chunk of rust-brown ore rock with glinting metallic flecks; A stoppered vial of heavy clear water with a faint grey mineral haze; A pale segmented blind centipede curled in a crack, translucent legs.\n\nRow 3: A folded strip of coarse grey cloth with dust stains and a knotted tie; A heavy wooden wedge with a split, iron-banded head; A broken drill tooth of dark bluish steel, its tip snapped off; An old pickaxe with a worn handle lying on its side, blade dulled by stone; A wooden tally stick covered in notches, the last notch only half cut.\n\nRow 4: An iron start lever on a wooden frame, a small clay hand gripping it, embers glowing at the base; A small wooden winch drum with a bronze crank, rope still coiled on it; A warm cylindrical metal core with spiral grooves, faintly rotating by itself; A palm-sized model of a ringed white city climbing around a great tree, tiny waterfalls, soft white-green glow; A split oak oar blade with carved northern knotwork, moss creeping over the grip."
+    },
+    {
+      "id": "res-I-6",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл I — лист 6: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона I-06",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "cr_ci1_sail",
+          "cr_ci1_sail"
+        ],
+        [
+          "cr_ci1_umbon",
+          "cr_ci1_umbon"
+        ],
+        [
+          "cr_ci1_liana",
+          "cr_ci1_liana"
+        ],
+        [
+          "cr_ci1_moss",
+          "cr_ci1_moss"
+        ],
+        [
+          "cr_ci1_dew",
+          "cr_ci1_dew"
+        ],
+        [
+          "cr_ci1_fur",
+          "cr_ci1_fur"
+        ],
+        [
+          "cr_ci1_claw",
+          "cr_ci1_claw"
+        ],
+        [
+          "cr_ci1_stone",
+          "cr_ci1_stone"
+        ],
+        [
+          "cr_ci1_seed",
+          "cr_ci1_seed"
+        ],
+        [
+          "cr_ci1_arrow",
+          "cr_ci1_arrow"
+        ],
+        [
+          "cr_ci1_axe",
+          "cr_ci1_axe"
+        ],
+        [
+          "find_ci1",
+          "find_ci1"
+        ],
+        [
+          "find_ci1b",
+          "find_ci1b"
+        ],
+        [
+          "call_fc1",
+          "call_fc1"
+        ],
+        [
+          "tr_fc1",
+          "tr_fc1"
+        ],
+        [
+          "tr_fc1a",
+          "tr_fc1a"
+        ],
+        [
+          "lu_ci1",
+          "lu_ci1"
+        ],
+        [
+          "ec_b1",
+          "ec_b1"
+        ],
+        [
+          "ec_b2",
+          "ec_b2"
+        ],
+        [
+          "hidden",
+          "res-hidden"
+        ]
+      ],
+      "subject": "The palette of this sheet: pale white-green crystal light (#DFF4E5), light pale wood, warm grey clay and pale moss. The light from below is a soft pale white-green glow — never saturated teal.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A torn striped red-and-white sail fragment tangled in thin green vines; A dented iron shield boss covered in notches and green lichen; A long thin vine with pale leaves curling back on itself; A cushion of soft emerald moss with faint silver tracks across it; A clear glass drop of dew clinging to a white stone arch, glinting pale green.\n\nRow 2: A soft bundle of long silvery-green animal fur, faintly luminous; A long curved grey claw with a scratch of red paint from a northern shield; A chunk of smooth white terrace stone with a tiny root growing through a crack; A pale teardrop-shaped seed with a faint glowing vein, resting on a leaf; A slender leaf-shaped arrowhead of pale steel with a fine etched vein.\n\nRow 3: A rusted northern axe head with a young sapling grown through its eye; A carved wooden bead with a single painted eye, on a braided grass cord; A small rolled scroll of pale bark paper tied with a green thread and a leaf seal; A striped sail patched together from three torn pieces, pale arrowheads stuck in it, a carved eye bead on the knot; A northern bearded axe with a dull red stone set in the poll, runic knotwork on the blade.\n\nRow 4: A northern iron helmet overgrown with bright green moss and a tiny sapling; A bundle of split pine wood tied with a torn sail strip, an arrowhead tucked into the knot; A ring of carved clay slabs with brass bellows nozzles, a faint white-green glow at the centre; A woven nest of pale bast and springy branches lined with feathers, a faint green glow inside; a hidden, not yet known item, in neutral cold grey instead of the palette of this sheet: a small bundle wrapped in dark grey cloth and tied with cord, its shape hidden, pale grey mist curling around it."
+    }
+  ]
+}

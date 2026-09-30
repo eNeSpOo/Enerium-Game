@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-IV-4__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-iv.json",
+  "job": "res-IV-4",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "p_talon",
+      "file": "art/generated/res-icons/res-IV-4/p_talon.webp",
+      "box": [
+        19,
+        26,
+        445,
+        452
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_diceset",
+      "file": "art/generated/res-icons/res-IV-4/p_diceset.webp",
+      "box": [
+        479,
+        26,
+        905,
+        452
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_harborhorn",
+      "file": "art/generated/res-icons/res-IV-4/a_harborhorn.webp",
+      "box": [
+        939,
+        26,
+        1365,
+        452
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_c18dice",
+      "file": "art/generated/res-icons/res-IV-4/a_c18dice.webp",
+      "box": [
+        1399,
+        26,
+        1825,
+        452
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "act_cb5",
+      "file": "art/generated/res-icons/res-IV-4/act_cb5.webp",
+      "box": [
+        1859,
+        26,
+        2285,
+        452
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_bellbronze",
+      "file": "art/generated/res-icons/res-IV-4/cr_bellbronze.webp",
+      "box": [
+        19,
+        485,
+        445,
+        911
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_vow",
+      "file": "art/generated/res-icons/res-IV-4/cr_vow.webp",
+      "box": [
+        479,
+        485,
+        905,
+        911
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_tenet",
+      "file": "art/generated/res-icons/res-IV-4/cr_tenet.webp",
+      "box": [
+        939,
+        485,
+        1365,
+        911
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_reed",
+      "file": "art/generated/res-icons/res-IV-4/cr_reed.webp",
+      "box": [
+        1399,
+        485,
+        1825,
+        911
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_conch",
+      "file": "art/generated/res-icons/res-IV-4/cr_conch.webp",
+      "box": [
+        1859,
+        485,
+        2285,
+        911
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_silt",
+      "file": "art/generated/res-icons/res-IV-4/cr_silt.webp",
+      "box": [
+        19,
+        945,
+        445,
+        1371
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_step",
+      "file": "art/generated/res-icons/res-IV-4/cr_step.webp",
+      "box": [
+        479,
+        945,
+        905,
+        1371
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_wax",
+      "file": "art/generated/res-icons/res-IV-4/cr_wax.webp",
+      "box": [
+        939,
+        945,
+        1365,
+        1371
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_ring",
+      "file": "art/generated/res-icons/res-IV-4/cr_ring.webp",
+      "box": [
+        1399,
+        945,
+        1825,
+        1371
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb5",
+      "file": "art/generated/res-icons/res-IV-4/find_cb5.webp",
+      "box": [
+        1859,
+        945,
+        2285,
+        1371
+      ],
+      "px": 426,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb5b",
+      "file": "art/generated/res-icons/res-IV-4/find_cb5b.webp",
+      "box": [
+        20,
+        1405,
+        444,
+        1829
+      ],
+      "px": 424,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb5",
+      "file": "art/generated/res-icons/res-IV-4/call_fb5.webp",
+      "box": [
+        480,
+        1405,
+        904,
+        1829
+      ],
+      "px": 424,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fb5",
+      "file": "art/generated/res-icons/res-IV-4/tr_fb5.webp",
+      "box": [
+        940,
+        1405,
+        1364,
+        1829
+      ],
+      "px": 424,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fb5a",
+      "file": "art/generated/res-icons/res-IV-4/tr_fb5a.webp",
+      "box": [
+        1400,
+        1405,
+        1824,
+        1829
+      ],
+      "px": 424,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb5_aw",
+      "file": "art/generated/res-icons/res-IV-4/call_fb5_aw.webp",
+      "box": [
+        1860,
+        1405,
+        2284,
+        1829
+      ],
+      "px": 424,
+      "key_left": 0.0
+    }
+  ]
+}

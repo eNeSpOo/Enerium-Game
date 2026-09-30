@@ -5,7 +5,8 @@
      правому краю, состояние следующего — тот же rpNext;
    — вкладку «Развитие» карточки героя: hdPower(h), её зовёт heroDetail в index.html. Путь героя — пять отрезков уровня, между ними
      ворота рунных пределов — рунные камни, в конце — звезда доблести. Одна главная вещь — следующий шаг: поднять уровень, пробить
-     предел, взять доблесть. Характеристики — тихой строкой, подробности — в листах;
+     предел, взять доблесть. Над ним — строка «уровень · предел · доблесть», под ним характеристики тихой строкой: нажатие ведёт
+     на страницу «Мощь» той же книги (screens/book-pages.js). Язык страниц — чернила по пергаменту (тема .pg);
    — низ вкладки «Снаряжение»: hdGearFoot(h) — «Надеть лучшее» или вход в окно снаряжения;
    — heroDev(h): что нужно для предела и доблести из запасов; её читают шахта (navHeroes) и проверки;
    — «сервер» HD_SRV: уровень, предел и доблесть — операции с номером: проверка, расход и итог одним вызовом, итог решён до анимации,
@@ -17,7 +18,8 @@
    — окно «Снаряжение героя» OV.gear: слева — места героя, девять снаряжения и четыре талисмана, справа — запасы: подходящие сверху,
      неподходящие тусклые с причиной. Перетаскивание — pointer events, палец и мышь; нажатие — вещь, подсвеченные места, место.
      Сравнение с надетым — стрелками у строк и мощи. Снять — перетащить в запасы или кнопкой. «Надеть лучшее» — операция GR_SRV
-     с номером. Листы OV.tal (talismans.js) и OV.eq (equipment.js) открывают это окно на своём месте;
+     с номером. Листы OV.tal (talismans.js) и OV.eq (equipment.js) открывают это окно на своём месте. Окно — лист пергамента
+     в кожаном переплёте с латунной кромкой: чернила — тема .gw (screens/book-pages.css), вёрстка — hero-dev.css;
    — разделы UI-кита «Рунные пределы» и «Развитие героя и снаряжение» через KIT_EXTRA и сценарии презентации.
    Доблесть по §3.3 и ADR-0016 даёт +INV.hero.valorPct % к базовым характеристикам накопительно: источник героя для боя и мощи
    собирает index.html (valorSt, heroSt), здесь — показ. Своё состояние — S.hd и S.gear, заводятся как S.bag. Числа — HD_DATA и HD_VIEW.
@@ -289,12 +291,15 @@ function hdNext(h, d) {
   return hdCard('done', ICON('valor', 30, 'Доблесть'), 'Путь пройден', `<span>Доблесть ${h.maxV} из ${h.maxV}, уровень ${h.cap}: герой раскрыт полностью</span>`,
     `<button class="btn hdv-go" data-a="seg" data-v="hero:skills">Навыки</button>`);
 }
-/* вкладка «Развитие»: путь, следующий шаг, характеристики тихой строкой — значки и числа; нажатие — лист «Характеристики»:
-   что даёт каждая, степень роста и атрибуты */
+/* вкладка «Развитие» — страница книги: путь, под ним — где герой сейчас (уровень, предел, доблесть «текущая / максимальная», §33.2),
+   следующий шаг одной карточкой с одним действием; характеристики тихой строкой — нажатие ведёт на страницу «Мощь» той же книги
+   (слово автора 30.09.2026: характеристики — на странице книги, а не в отдельном листе) */
 function hdPower(h) {
   const d = heroDev(h);
-  return `<div class="hdv" data-step="${d.step}">${hdPath(h, d)}${hdNext(h, d)}
-    <div class="hdv-quiet" data-a="sheet" data-v="hattr:${h.id}" title="Характеристики и атрибуты">${statStrip(h)}<button class="iconbtn hdv-more" data-a="sheet" data-v="hattr:${h.id}" aria-label="Характеристики и атрибуты">${ic('info')}</button></div></div>`;
+  const at = (t, k, v, of) => `<span title="${t} ${v} из ${of}">${k} <b class="num">${v}</b><small class="num">/ ${of}</small></span>`;
+  return `<div class="hdv" data-step="${d.step}">${hdPath(h, d)}
+    <p class="hdv-sum">${at('Уровень', 'уровень', h.lvl, h.cap)}${at('Рунный предел', 'предел', h.lim, d.top)}${at('Доблесть', 'доблесть', h.valor, h.maxV)}</p>${hdNext(h, d)}
+    <div class="hdv-quiet" data-a="seg" data-v="hero:stats" title="Характеристики и атрибуты — страница «Мощь»">${statStrip(h)}<button class="iconbtn hdv-more" data-a="seg" data-v="hero:stats" aria-label="Мощь: характеристики и атрибуты">${ic('chev')}</button></div></div>`;
 }
 
 /* ================== лист «Рунный предел» ================== */
@@ -435,7 +440,7 @@ function hdFxVal(r, el, done, h) {
     <button class="hdfx-skip" data-a="hdskip" aria-label="Пропустить анимацию" tabindex="-1"></button>
     <div class="hdfx-stage" aria-hidden="true"><span class="hdfx-light"></span><span class="hdfx-face"><img src="${h ? h.img : ''}" alt=""></span>
       <span class="hdfx-stars">${stars}</span><span class="hdfx-rise">${ICON('valor', 40, '')}</span></div>
-    <aside class="hdfx-card"><span class="eyebrow">${hdEsc(h ? h.name : '')} · что изменилось</span><ul>${rows}</ul>
+    <aside class="hdfx-card pg"><span class="eyebrow">${hdEsc(h ? h.name : '')} · что изменилось</span><ul>${rows}</ul>
       <div class="hdfx-f">${r.ch != null ? '<button class="link" data-a="hdread">Читать главу</button>' : ''}<span class="g-spacer"></span><button class="btn go hdfx-ok" data-a="hdfxok">Готово</button></div></aside></div>`;
 }
 function hdFxSheet(o) {
@@ -752,12 +757,13 @@ function grWin(o, kind) {
     <div class="gw" data-hid="${h.id}">${grHead(h, P)}<div class="gw-b">${grLeft(h, P)}${grRight(h, P)}</div></div></div>`;
 }
 OV.gear = o => grWin(o, 'gear');
-/* низ вкладки «Снаряжение»: лучшее в запасах — одним действием; иначе — вход в окно */
+/* низ вкладки «Снаряжение» — одной строкой: лучшее в запасах — одним действием, прибавка мощи — на кнопке, рядом — вход в окно
+   со всеми вещами; лучшего нет — так и сказано, главное действие — окно снаряжения */
 function hdGearFoot(h) {
   if (!grEqOn() && !grTalOn()) return '';
-  const P = grPlanOf(h);
-  return `<div class="hdg-f">${P.gain > 0 ? `<span class="reason">В запасах есть лучше: мощь ${grDelta(P.gain)}</span><span class="g-spacer"></span><button class="link" data-a="dlg" data-v="gear:${h.id}">Открыть</button><button class="btn go sm" data-a="gearbest" data-v="gr${S.gear.seq}:${h.id}">${ic('spark')}Надеть лучшее</button>`
-    : `<span class="reason">Перетащите вещи на места героя — или нажмите вещь, затем место.</span><span class="g-spacer"></span><button class="btn go sm" data-a="dlg" data-v="gear:${h.id}">Открыть снаряжение</button>`}</div>`;
+  const P = grPlanOf(h), all = 'Все вещи героя — окно снаряжения';
+  return `<div class="hdg-f">${P.gain > 0 ? `<button class="link hdg-all" data-a="dlg" data-v="gear:${h.id}" title="${all}">Все вещи</button><span class="g-spacer"></span><button class="btn go sm" data-a="gearbest" data-v="gr${S.gear.seq}:${h.id}" title="В запасах есть лучше: мощь ${eqPct(P.gain)}">Надеть лучшее<span class="cost num">▲${eqPct(P.gain)}</span></button>`
+    : `<span class="reason">Лучше в запасах нет</span><span class="g-spacer"></span><button class="btn go sm" data-a="dlg" data-v="gear:${h.id}">Открыть снаряжение</button>`}</div>`;
 }
 /* точка на вкладке «Снаряжение»: в свободных запасах есть лучше надетого */
 const hdGearDot = h => grPlanOf(h).gain > 0;

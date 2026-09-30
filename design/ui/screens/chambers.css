@@ -1,0 +1,169 @@
+/* screens/chambers.css — «Странник»: покои в Башне вневремени (screens/chambers.js). Общий слой вкладок и окон раздела: зал под
+   вкладкой, материалы панелей, вкладок, кнопок и чипов раздела, окна раздела (класс cb-win) — базальт с серебряными уголками,
+   табличка заголовка, уголки. Подключается ДО стилей экранов раздела (wanderer.css, chronicle.css, social.css): у правил раздела
+   вес — :where(), поэтому своё правило экрана при равном весе сильнее.
+   Арт — переменные <html> из CB_ART (--cb-hall-*, --cb-mirror, --cb-niche, --cb-plate…) и классы cb-h, cb-m, cb-n, cb-p, cb-l, cb-t,
+   cb-c, cb-cr, cb-x; без арта рисует CSS. Числа вида — переменные <html> из CB_VIEW (--cb-id0, --cb-id1…).
+   Движение — только transform и opacity; «меньше движения» — без движения. Свои классы — cb-*; общие вещи раздела — wn-plt. */
+
+/* ---------- числа вида: пара [932 × 430, 844 × 390] — второе, когда рабочая область не выше 360 px ---------- */
+.g-main[data-route="profile"]{--cb-idw:var(--cb-id0,220px);--cb-av:var(--cb-ava0,96px);--cb-lh:var(--cb-ledge0,14px);--cb-plh:var(--cb-plate0,30px);--cb-mcw:var(--cb-mc0,54px)}
+@container main (max-height: 360px){ .g-main[data-route="profile"] .scr{--cb-idw:var(--cb-id1,200px);--cb-av:var(--cb-ava1,84px);--cb-lh:var(--cb-ledge1,12px);--cb-plh:var(--cb-plate1,28px);--cb-mcw:var(--cb-mc1,46px)} }
+.cb-win,.cb-kit{--cb-lh:var(--cb-ledge0,14px);--cb-plh:var(--cb-plate0,30px);--cb-mcw:var(--cb-mc1,46px)}
+
+/* ---------- зал вкладки: фон, тень сверху и снизу, свет времени снизу, песок и огоньки в воздухе ---------- */
+.cb-hall{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#06080a}
+.cb-hall-bg{position:absolute;inset:-1%;background:radial-gradient(90% 70% at 50% 100%,rgba(79,220,139,.07),transparent 70%),radial-gradient(60% 60% at 50% 40%,#13171b,#07090b 75%)}
+html.cb-h .cb-hall[data-hall="over"] .cb-hall-bg{background:var(--cb-hall-over) 50% 42%/cover no-repeat}
+html.cb-h .cb-hall[data-hall="mem"] .cb-hall-bg{background:var(--cb-hall-mem) 50% 45%/cover no-repeat}
+html.cb-h .cb-hall[data-hall="arts"] .cb-hall-bg{background:var(--cb-hall-arts) 50% 40%/cover no-repeat}
+html.cb-h .cb-hall[data-hall="ach"] .cb-hall-bg{background:var(--cb-hall-ach) 50% 42%/cover no-repeat}
+html.cb-h .cb-hall[data-hall="chron"] .cb-hall-bg{background:var(--cb-hall-chron) 50% 45%/cover no-repeat}
+/* зал тише панелей: тень сверху (там шапка), глубже снизу, виньетка по краям */
+.cb-hall::after{content:"";position:absolute;inset:0;z-index:3;
+  background:linear-gradient(180deg,rgba(4,5,7,.62),rgba(4,5,7,.3) 24%,rgba(4,5,7,.34) 70%,rgba(4,5,7,.8)),radial-gradient(80% 90% at 50% 50%,transparent 45%,rgba(0,0,0,.55))}
+/* свет времени снизу — зелень Энериума и бирюза карста, дышит */
+.cb-hall-lt{position:absolute;left:0;right:0;bottom:0;z-index:1;height:48%;
+  background:radial-gradient(62% 100% at 50% 100%,rgba(79,220,160,.14),rgba(72,229,212,.035) 55%,transparent 76%);animation:cb-breathe 8s ease-in-out var(--t,0ms) infinite}
+/* песок стоит в воздухе и едва дрейфует; огоньки времени поднимаются от пола — рисунок постоянный (cbHallHtml) */
+.cb-sand{position:absolute;inset:0;z-index:2}
+.cb-sd,.cb-mo{position:absolute;left:var(--x);top:var(--y);width:2px;height:2px;border-radius:50%;opacity:0;animation:cb-hang var(--s) ease-in-out calc(var(--d) + var(--t,0ms)) infinite}
+.cb-sd{background:#ead59c;box-shadow:0 0 4px rgba(234,213,156,.7)}
+.cb-mo{top:auto;bottom:calc(var(--y) * .3);width:3px;height:3px;background:#8ef0c6;box-shadow:0 0 6px rgba(120,240,190,.8);animation-name:cb-rise}
+html.cb-x .cb-sd{width:7px;height:7px;background:var(--cb-fx-sand) center/contain no-repeat;box-shadow:none}
+html.cb-x .cb-mo{width:10px;height:10px;background:var(--cb-fx-time) center/contain no-repeat;box-shadow:none}
+
+/* ---------- материалы раздела: панели, вкладки, поиск, чипы, кнопки ---------- */
+/* панель — полированный базальт поверх зала, серебряная кромка, отсвет сверху */
+:where(.g-main[data-route="profile"],.cb-win) .pnl{border-color:rgba(200,206,214,.2);background:linear-gradient(180deg,rgba(19,22,26,.88),rgba(9,11,14,.92));
+  box-shadow:inset 0 1px 0 rgba(230,236,244,.06),inset 0 0 0 1px rgba(0,0,0,.5),0 20px 40px -22px #000}
+html.cb-t :where(.g-main[data-route="profile"],.cb-win) .pnl{background:linear-gradient(180deg,rgba(17,20,24,.66),rgba(8,10,13,.84)),var(--cb-basalt) 0 0/300px auto,#0b0d10}
+/* вкладки — серебряные закладки: выбранная — бледное золото, снизу свет времени */
+:where(.g-main[data-route="profile"],.cb-win) .tabs{background:linear-gradient(180deg,rgba(12,14,17,.92),rgba(7,8,10,.94));border-color:rgba(200,206,214,.24);box-shadow:inset 0 1px 0 rgba(230,236,244,.05)}
+:where(.g-main[data-route="profile"],.cb-win) .tabs button{color:#8f969e}
+:where(.g-main[data-route="profile"],.cb-win) .tabs button:hover{color:#d3d8de}
+:where(.g-main[data-route="profile"],.cb-win) .tabs button[aria-selected="true"]{color:#efe0b4;background:linear-gradient(180deg,#262b31,#14171b);
+  box-shadow:inset 0 0 0 1px rgba(200,206,214,.26),inset 0 -2px 0 #58e2b0,inset 0 -12px 14px -12px #58e2b0}
+/* поиск — тёмное стекло в серебре */
+:where(.g-main[data-route="profile"],.cb-win) .search{border-color:rgba(200,206,214,.26);background:linear-gradient(180deg,#090b0e,#10141a);box-shadow:inset 0 1px 3px rgba(0,0,0,.8)}
+/* чипы — серебряная кромка; золотой — бледное золото */
+:where(.g-main[data-route="profile"],.cb-win) .chip{border-color:rgba(200,206,214,.2);background:rgba(10,12,15,.8)}
+:where(.g-main[data-route="profile"],.cb-win) .chip.gold{color:#ecdcae;border-color:rgba(214,194,142,.45)}
+/* кнопки: главная — кристалл времени в серебре, по наведению — блик; второстепенная — базальт с серебряной кромкой */
+:where(.g-main[data-route="profile"],.cb-win) .btn{border-color:rgba(200,206,214,.34);color:#e6dcc0;background:linear-gradient(180deg,#23272d,#131619);
+  box-shadow:inset 0 1px 0 rgba(236,242,248,.1),0 2px 4px rgba(0,0,0,.6)}
+:where(.g-main[data-route="profile"],.cb-win) .btn.go{overflow:hidden;border-color:rgba(206,214,222,.62);color:#effff8;text-shadow:0 0 12px rgba(88,226,176,.5);
+  background:radial-gradient(120% 110% at 50% 130%,rgba(79,220,160,.58),transparent 62%),linear-gradient(180deg,#143a31,#0a211c);
+  box-shadow:inset 0 0 0 1px rgba(120,240,200,.26),inset 0 -14px 20px -10px rgba(79,220,160,.62),inset 0 1px 0 rgba(255,255,255,.14),0 10px 24px -12px #4fdc8b}
+:where(.g-main[data-route="profile"],.cb-win) .btn.go::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.22) 50%,transparent 65%);
+  transform:translateX(-120%);transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+:where(.g-main[data-route="profile"],.cb-win) .btn.go:hover::after{transform:translateX(120%)}
+:where(.g-main[data-route="profile"],.cb-win) .btn.ghost{border-color:transparent;background:none;box-shadow:none;color:#b8bec6}
+:where(.g-main[data-route="profile"],.cb-win) .btn.warn{color:#ea8a74}
+:where(.g-main[data-route="profile"],.cb-win) .btn[disabled]{color:var(--parch-3);border-color:rgba(200,206,214,.12);background:linear-gradient(180deg,#141619,#0f1113);box-shadow:none;text-shadow:none}
+:where(.g-main[data-route="profile"],.cb-win) .btn[disabled]::after{display:none}
+:where(.g-main[data-route="profile"],.cb-win) .iconbtn{border-color:rgba(200,206,214,.26);background:linear-gradient(180deg,#1d2126,#121418)}
+:where(.g-main[data-route="profile"],.cb-win) .link{color:#c9b98e}
+:where(.g-main[data-route="profile"],.cb-win) .link:hover{color:#efe0b4}
+:where(.g-main[data-route="profile"],.cb-win) .eyebrow{color:#aeb4bc}
+:where(.g-main[data-route="profile"],.cb-win) .bar{background:#07090b;box-shadow:inset 0 0 0 1px rgba(200,206,214,.16)}
+
+/* ---------- табличка заголовка: серебро в базальте, концы с песочными часами (CB_ART.plate — border-image) ---------- */
+.wn-plt{position:relative;z-index:2;display:inline-flex;align-items:center;justify-content:center;gap:10px;flex:none;height:var(--cb-plh,30px);max-width:100%;
+  padding:0 calc(var(--cb-plh,30px) * .8) 1px;border-radius:3px;white-space:nowrap;
+  color:#efe2bc;font:600 17px/1 var(--f-d);letter-spacing:.03em;text-shadow:0 1px 2px #000,0 0 12px rgba(214,194,142,.25);
+  background:linear-gradient(180deg,#2a2f35,#15181c);box-shadow:inset 0 0 0 1px rgba(214,194,142,.5),inset 0 0 0 3px #101316,inset 0 0 0 4px rgba(200,206,214,.22),0 6px 12px -6px #000}
+html.cb-p .wn-plt{border-radius:0;background:none;box-shadow:none;border:solid transparent;padding:0 4px 1px;
+  border-width:calc(var(--cb-plh,30px) * var(--cb-pst) / 1000) calc(var(--cb-plh,30px) * var(--cb-psr) / 1000) calc(var(--cb-plh,30px) * var(--cb-psb) / 1000);
+  border-image:var(--cb-plate) var(--cb-ps) fill / calc(var(--cb-plh,30px) * var(--cb-pst) / 1000) calc(var(--cb-plh,30px) * var(--cb-psr) / 1000) calc(var(--cb-plh,30px) * var(--cb-psb) / 1000) stretch;
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,.7))}
+/* табличка — всегда одна строка: заголовки экрана (.g h2 в index.html) переносят строки с балансом, у таблички перенос снят сильнее */
+.g .wn-plt{white-space:nowrap;text-wrap:nowrap}
+.wn-plt>.num,.wn-plt>.bm{font:700 12px/1 var(--f-u);letter-spacing:.06em;color:#c9ced6;text-shadow:0 1px 2px #000}
+.wn-plt>.bm .ico{width:15px;height:15px}
+@container main (max-height: 360px){ .wn-plt{font-size:16px} }
+
+/* ---------- окна раздела: лист и окно — базальт, серебряная кромка, серебряные уголки, свет времени снизу ---------- */
+.sheet.cb-win{border-left:1px solid rgba(200,206,214,.34);box-shadow:-30px 0 60px -20px rgba(0,0,0,.85),inset 1px 0 0 rgba(236,242,248,.06);
+  background:radial-gradient(120% 50% at 0% 100%,rgba(79,220,160,.06),transparent 60%),linear-gradient(180deg,#15181c,#0c0e11)}
+html.cb-t .sheet.cb-win{background:radial-gradient(120% 50% at 0% 100%,rgba(79,220,160,.07),transparent 60%),linear-gradient(180deg,rgba(15,18,22,.58),rgba(8,10,13,.74)),var(--cb-basalt) 0 0/320px auto,#0b0d10}
+.cb-win .sheet-h{border-bottom:0;background:linear-gradient(90deg,rgba(200,206,214,.42),rgba(214,194,142,.14) 60%,transparent) 0 100%/100% 1px no-repeat}
+.cb-win .sheet-h h2,.cb-win .dlg-h h2{color:#efe2bc;text-shadow:0 1px 2px #000,0 0 16px rgba(214,194,142,.2)}
+.cb-win .sheet-f{border-top:0;background:linear-gradient(90deg,rgba(200,206,214,.32),rgba(214,194,142,.1) 60%,transparent) 0 0/100% 1px no-repeat,rgba(6,8,10,.6)}
+.dlg.cb-win{border-color:rgba(200,206,214,.38);box-shadow:0 30px 80px rgba(0,0,0,.8),inset 0 1px 0 rgba(236,242,248,.07);
+  background:radial-gradient(90% 60% at 50% 112%,rgba(79,220,160,.1),transparent 70%),linear-gradient(180deg,#171a1e,#0e1013)}
+html.cb-t .dlg.cb-win{background:radial-gradient(90% 60% at 50% 112%,rgba(79,220,160,.1),transparent 70%),linear-gradient(180deg,rgba(15,18,22,.5),rgba(8,10,13,.7)),var(--cb-basalt) 0 0/320px auto,#0b0d10}
+/* серебряные уголки: у листа — слева сверху и снизу, у окна — все четыре. Уголок ложится на угол рамки (--cb-cn — размер,
+   --cb-co — насколько выходит наружу); текст и кнопки отступают от его внутреннего края на --cb-cg: поля шапки и низа — --cb-ci.
+   Лист без низа: тело кончается над нижним уголком — прозрачная кромка снизу, строки под уголок не заходят и при прокрутке */
+.cb-win{--cb-cn:20px;--cb-co:0px;--cb-cg:10px;--cb-ci:calc(var(--cb-cn) - var(--cb-co) + var(--cb-cg))}
+.dlg.cb-win{--cb-cn:24px;--cb-co:4px}
+html.cb-c .sheet.cb-win::before{content:"";position:absolute;inset:0 auto 0 0;z-index:3;width:var(--cb-cn);pointer-events:none;
+  background:var(--cb-ctl) 0 0/var(--cb-cn) auto no-repeat,var(--cb-cbl) 0 100%/var(--cb-cn) auto no-repeat;filter:drop-shadow(0 1px 2px #000)}
+html.cb-c .dlg.fit.cb-win::before{inset:calc(var(--cb-co) * -1);border-radius:0;opacity:1;filter:drop-shadow(0 1px 2px #000);
+  background:var(--cb-ctl) 0 0/var(--cb-cn) auto no-repeat,var(--cb-ctr) 100% 0/var(--cb-cn) auto no-repeat,var(--cb-cbl) 0 100%/var(--cb-cn) auto no-repeat,var(--cb-cbr) 100% 100%/var(--cb-cn) auto no-repeat}
+.cb-win .sheet-h,.cb-win .sheet-b,.cb-win .sheet-f{padding-left:var(--cb-ci)}
+.cb-win .dlg-h,.cb-win .dlg-b,.cb-win .dlg-f{padding-left:var(--cb-ci);padding-right:var(--cb-ci)}
+.sheet.cb-win>.sheet-b:last-child{border-bottom:calc(var(--cb-cn) + 6px) solid transparent}
+.cb-win .kv dt{color:#8d949c}
+.cb-win .quote{padding:8px 10px;border-left:2px solid rgba(214,194,142,.4);background:linear-gradient(90deg,rgba(214,194,142,.06),transparent 80%)}
+/* настройки: ползунок и галочка — серебро и свет времени */
+.cb-win .setrow{border-bottom-color:rgba(200,206,214,.12)}
+.cb-win .setrow>span{font:600 17px/1.1 var(--f-d);color:#e6dcc0}
+.cb-win .setrow input[type=range],.cb-win .setrow input[type=checkbox]{accent-color:#58e2b0}
+/* уровень Странника: число — бледное золото, полоса — песок */
+.cb-win .stat b{color:#efe2bc;text-shadow:0 0 16px rgba(214,194,142,.25)}
+.cb-win .srow{border-bottom-color:rgba(200,206,214,.1)}
+
+/* ---------- слой частиц отклика: рядом с #game, перерисовка экрана его не сносит ---------- */
+.cb-fxl{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
+
+/* ---------- UI-кит: раздел «Странник: покои и вещи» ---------- */
+.cb-kit{gap:var(--sp-m)}
+.cb-khs{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:var(--sp-m)}
+.cb-kh{margin:0;display:flex;flex-direction:column;gap:6px}
+.cb-kh figcaption,.cb-krow figcaption{font:600 15px/1.1 var(--f-d);color:var(--parch)}
+.cb-kh-p{display:block;aspect-ratio:21/9;border-radius:8px;border:1px solid rgba(200,206,214,.25);background:#0b0c0e}
+html.cb-h .cb-kh-p[data-hall="over"]{background:var(--cb-hall-over) center/cover}
+html.cb-h .cb-kh-p[data-hall="mem"]{background:var(--cb-hall-mem) center/cover}
+html.cb-h .cb-kh-p[data-hall="arts"]{background:var(--cb-hall-arts) center/cover}
+html.cb-h .cb-kh-p[data-hall="ach"]{background:var(--cb-hall-ach) center/cover}
+html.cb-h .cb-kh-p[data-hall="chron"]{background:var(--cb-hall-chron) center/cover}
+.cb-krow{display:flex;flex-wrap:wrap;gap:var(--sp-l);align-items:flex-start}
+.cb-krow figure,.cb-kn,.cb-kmir{margin:0;display:flex;flex-direction:column;gap:6px}
+.cb-kn-p{display:block;width:150px;height:268px;border-radius:4px;background:#0b0d10}
+html.cb-n .cb-kn-p{background:var(--cb-niche) center/100% 100% no-repeat}
+.cb-kmir-p{position:relative;display:block;width:420px;max-width:100%;height:200px;border:solid transparent;border-width:calc(var(--cb-mcw) * var(--cb-mfv) / 1000) calc(var(--cb-mcw) * var(--cb-mfh) / 1000);background:#0b0e12}
+html.cb-m .cb-kmir-p{border-image:var(--cb-mirror) var(--cb-ms) / var(--cb-mcw) round}
+.cb-kparts{gap:12px;min-width:220px;align-items:flex-start}
+.cb-kl{display:block;width:260px;height:14px;background:linear-gradient(180deg,#2b3036,#101316)}
+html.cb-l .cb-kl{background:var(--cb-ledge) 0 0/auto 100% repeat-x}
+.cb-kc{position:relative;display:block;width:120px;height:70px;border:1px solid rgba(200,206,214,.2);background:#0d1013}
+html.cb-c .cb-kc{background:var(--cb-ctl) 0 0/26px auto no-repeat,var(--cb-ctr) 100% 0/26px auto no-repeat,var(--cb-cbl) 0 100%/26px auto no-repeat,var(--cb-cbr) 100% 100%/26px auto no-repeat,#0d1013}
+.cb-kc i{display:none}
+.cb-kcr{display:block;width:120px;height:57px;background:radial-gradient(closest-side,rgba(214,194,142,.3),transparent)}
+html.cb-cr .cb-kcr{background:var(--cb-crest) center/contain no-repeat}
+.cb-kxs{display:flex;gap:10px;align-items:center}
+.cb-kx{display:block;width:26px;height:26px;border-radius:50%;background:radial-gradient(closest-side,#ead59c,transparent)}
+html.cb-x .cb-kx{border-radius:0}
+html.cb-x .cb-kx[data-k="sand"]{background:var(--cb-fx-sand) center/contain no-repeat}
+html.cb-x .cb-kx[data-k="glint"]{background:var(--cb-fx-glint) center/contain no-repeat}
+html.cb-x .cb-kx[data-k="sliver"]{background:var(--cb-fx-sliver) center/contain no-repeat}
+html.cb-x .cb-kx[data-k="time"]{background:var(--cb-fx-time) center/contain no-repeat}
+html.cb-x .cb-kx[data-k="gold"]{background:var(--cb-fx-gold) center/contain no-repeat}
+html.cb-x .cb-kx[data-k="mist"]{background:var(--cb-fx-mist) center/contain no-repeat}
+.cb-kms{display:flex;flex-wrap:wrap;gap:var(--sp-m)}
+.cb-km{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;width:84px;text-align:center}
+.cb-km .wn-medal{width:56px;height:56px}
+.cb-km figcaption,.cb-kr figcaption{font-size:11.5px;line-height:1.2;color:var(--parch-2)}
+.cb-krs{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:var(--sp-m)}
+.cb-kr{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.cb-kr .wn-relic{width:72px;height:72px}
+
+@keyframes cb-hang{0%{opacity:0;transform:translate(0,0)}25%{opacity:.7}75%{opacity:.5}100%{opacity:0;transform:translate(var(--dx),var(--dy))}}
+@keyframes cb-rise{0%{opacity:0;transform:translate(0,0) scale(.7)}20%{opacity:.8}100%{opacity:0;transform:translate(var(--dx),calc(var(--dy) * 3)) scale(.4)}}
+@keyframes cb-breathe{0%,100%{opacity:.75}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){
+  .cb-hall *,:where(.g-main[data-route="profile"],.cb-win) .btn.go::after{animation:none!important;transition:none!important}
+  .cb-sd,.cb-mo{display:none}
+}

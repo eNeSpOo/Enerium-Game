@@ -1,0 +1,224 @@
+{
+  "name": "Иконки ресурсов сеткой — цикл общий пул. Слово автора: «Иконки по ресурсам начинай генерировать только тогда, когда придёт с отчётом Этрион». Собирает tools/art-gen/res_jobs.py из design/ui/recipes.js — руками не править",
+  "plan": {
+    "Язык иконки": "один предмет в покое на тёмном камне, три четверти сверху, узнаваемая форма читается на 32 px; вид предмета различает рамка интерфейса (CR_KIND и CR_FAM, screens/crafthall.js), редкость — свет в окне рамки",
+    "Палитра": "цвет карста цикла, свет снизу — его же: These are the common materials found everywhere below the city: each item keeps its own natural colours — clay, wood, iron, bone, cloth, glass, ash — and glows only where its cell says it glows. The light from below is a soft warm neutral gold.",
+    "Листы": "листы Этриона (поле sheet) переупакованы внутри цикла по 20 клеток, остаток — малым листом; предметы с img и герои не рисуются"
+  },
+  "notes": [
+    "cells — [id предмета EN_RECIPES.items, имя файла]; spare — пустая клетка малого листа, не выгружается; hidden — «ресурс скрыт»",
+    "Проба 30.09.2026 — res-P-1 и res-I-1 — нарисована с предметом на две трети клетки: в рамке вида окно — 72 % колодца, предмет выходил мелким на 32 px. С остальных листов предмет — на три четверти клетки",
+    "Фраза облика — поле art Этриона; письмо, руны и цифры переписаны в неразборчивые штрихи (FIX в res_jobs.py)",
+    "Слабые клетки — надписи, пентаграмма, «летающая тарелка», светлый фон — перерисованы листами res-fix-* (jobs/res-icons-fix.json): их клетка заменяет клетку этого листа",
+    "res-P-1 нарисован дважды (30.09.2026): проба вышла с предметом на две трети клетки и конусом света; второй — по рамке с тремя четвертями, свет — из трещин камня"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "res-icons": {
+      "aspect": "5:4",
+      "size": "2K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square item icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the item in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game lays its own frame over the edges of the cell, so everything important stays in the middle. Every cell shows exactly one item — a raw material, a trophy, a crafted piece or a relic — lying or standing still on dark near-black stone with faint cracks and a darker vignette toward the edges of the cell: one clear central object, large, filling about three quarters of the cell, in a clear three-quarter view from slightly above, with a bold recognisable silhouette that reads at 32 px. When a cell names several things, the first one is the main object — large and centred — and the others are small details beside it. Light rises from below in the colour of this sheet's palette, a soft glow from cracks in the stone — never a spotlight; crisp rim light on the edges of the object; a few dust motes in the light. Painted exactly like the ability icons of this game: loose, confident painterly brush strokes, soft painted edges and deep shadows — no black outlines, no flat sticker look, no scenery, no hands or people unless the cell names them. Writing is never drawn: wherever a cell mentions script, notes, pages, maps, tallies, tags or marks, they are faint unreadable smudges and straight ruled lines; clock faces and dials are plain, with simple notches and no numerals. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each differs clearly from its neighbours."
+    }
+  },
+  "jobs": [
+    {
+      "id": "res-P-1",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл общий — лист 1: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона P-01",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "resin",
+          "resin"
+        ],
+        [
+          "mushroom",
+          "mushroom"
+        ],
+        [
+          "acid",
+          "acid"
+        ],
+        [
+          "ash",
+          "ash"
+        ],
+        [
+          "salt",
+          "salt"
+        ],
+        [
+          "vial",
+          "vial"
+        ],
+        [
+          "sand",
+          "sand"
+        ],
+        [
+          "dormite",
+          "dormite"
+        ],
+        [
+          "runechip",
+          "runechip"
+        ],
+        [
+          "crystal",
+          "crystal"
+        ],
+        [
+          "ink",
+          "ink"
+        ],
+        [
+          "candle",
+          "candle"
+        ],
+        [
+          "spring",
+          "spring"
+        ],
+        [
+          "plank",
+          "plank"
+        ],
+        [
+          "mechpart",
+          "mechpart"
+        ],
+        [
+          "nail",
+          "nail"
+        ],
+        [
+          "bracket",
+          "bracket"
+        ],
+        [
+          "gear",
+          "gear"
+        ],
+        [
+          "thread",
+          "thread"
+        ],
+        [
+          "dye",
+          "dye"
+        ]
+      ],
+      "subject": "These are the common materials found everywhere below the city: each item keeps its own natural colours — clay, wood, iron, bone, cloth, glass, ash — and glows only where its cell says it glows. The light from below is a soft warm neutral gold.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A small clay pot of sticky amber resin with a wooden stirring stick; A cluster of pale luminous forest mushrooms with thin stems; A stoppered glass flask of greenish acid with a faint wisp of vapour; A small heap of fine grey ash with a few dark cinders; A small linen pouch spilling coarse grey sea salt crystals.\n\nRow 2: An empty small glass vial with a cork, faint sand grains inside; A small mound of pale fine sand with a few grains trickling down; A pinch of softly glowing blue-white dust on a dark leaf; A small pile of stone shavings covered in tiny fragments of carved grooves; A handful of small clear crystal shards with faint reddish glints.\n\nRow 3: A small stone inkwell of thick black ink with a quill resting in it; A short stub of a white candle with a steady small flame; A small coiled steel spring with a hooked end; A rough wooden plank with bark on one edge; A small broken brass mechanism with a bent gear and a pin.\n\nRow 4: A few old square iron nails, slightly bent; A heavy U-shaped iron bracket with two bolt holes; A small bronze gear with a few chipped teeth; A spool of plain linen thread with a loose end; A small bowl of pale green luminous plant dye."
+    },
+    {
+      "id": "res-P-2",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл общий — лист 2: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона P-01, P-02",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "rag",
+          "rag"
+        ],
+        [
+          "leather",
+          "leather"
+        ],
+        [
+          "canvas",
+          "canvas"
+        ],
+        [
+          "yarn",
+          "yarn"
+        ],
+        [
+          "fang",
+          "fang"
+        ],
+        [
+          "bone",
+          "bone"
+        ],
+        [
+          "claw",
+          "claw"
+        ],
+        [
+          "hide",
+          "hide"
+        ],
+        [
+          "feather",
+          "feather"
+        ],
+        [
+          "sinew",
+          "sinew"
+        ],
+        [
+          "ember",
+          "ember"
+        ],
+        [
+          "ironore",
+          "ironore"
+        ],
+        [
+          "scrap",
+          "scrap"
+        ],
+        [
+          "dross",
+          "dross"
+        ],
+        [
+          "copper",
+          "copper"
+        ],
+        [
+          "coal",
+          "coal"
+        ],
+        [
+          "ener2",
+          "ener2"
+        ],
+        [
+          "ener3",
+          "ener3"
+        ],
+        [
+          "rdust",
+          "rdust"
+        ],
+        [
+          "mask",
+          "mask"
+        ]
+      ],
+      "subject": "These are the common materials found everywhere below the city: each item keeps its own natural colours — clay, wood, iron, bone, cloth, glass, ash — and glows only where its cell says it glows. The light from below is a soft warm neutral gold.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A few scraps of old faded cloth tied in a bundle; A rolled piece of soft worn leather with strap holes; A folded bolt of heavy off-white canvas; A tangled ball of multicoloured old yarn; A single curved yellowed beast fang with a blunt tip.\n\nRow 2: A clean white animal bone, slightly curved; A worn blunt animal claw with stone dust in its grooves; A folded raw animal hide with coarse fur on one side; A single grey-white feather with a sharp quill; A dried coiled animal sinew, pale and stiff.\n\nRow 3: A small dull black ember with a faint red crack; A lump of rusty brown iron ore with moss on one side; A rough small ingot of mixed scrap metal; A few flakes of dark iron scale with a blue sheen; A green-patinated lump of raw copper ore.\n\nRow 4: A few chunks of black charcoal with a matte surface; A single fist-sized hexagonal emerald crystal, deep green, with slow light pulsing inside; A large cluster of many emerald crystals grown together on a dark stone base, radiating green light; A small heap of fine glittering grey-gold dust with tiny glowing flecks; A single pale mask peeled from a many-faced mask, glowing faintly."
+    }
+  ]
+}

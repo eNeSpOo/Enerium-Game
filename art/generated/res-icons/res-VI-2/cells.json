@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-VI-2__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-vi.json",
+  "job": "res-VI-2",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "rn6_2",
+      "file": "art/generated/res-icons/res-VI-2/rn6_2.webp",
+      "box": [
+        25,
+        27,
+        450,
+        452
+      ],
+      "px": 425,
+      "key_left": 0.03751
+    },
+    {
+      "id": "rn6_3",
+      "file": "art/generated/res-icons/res-VI-2/rn6_3.webp",
+      "box": [
+        483,
+        28,
+        907,
+        452
+      ],
+      "px": 424,
+      "key_left": 0.04012
+    },
+    {
+      "id": "rn6_4",
+      "file": "art/generated/res-icons/res-VI-2/rn6_4.webp",
+      "box": [
+        939,
+        27,
+        1365,
+        453
+      ],
+      "px": 426,
+      "key_left": 0.04197
+    },
+    {
+      "id": "rn6_5",
+      "file": "art/generated/res-icons/res-VI-2/rn6_5.webp",
+      "box": [
+        1397,
+        27,
+        1822,
+        452
+      ],
+      "px": 425,
+      "key_left": 0.03948
+    },
+    {
+      "id": "vs6",
+      "file": "art/generated/res-icons/res-VI-2/vs6.webp",
+      "box": [
+        1854,
+        27,
+        2279,
+        452
+      ],
+      "px": 425,
+      "key_left": 0.04504
+    },
+    {
+      "id": "vr6",
+      "file": "art/generated/res-icons/res-VI-2/vr6.webp",
+      "box": [
+        25,
+        485,
+        450,
+        910
+      ],
+      "px": 425,
+      "key_left": 0.1693
+    },
+    {
+      "id": "necro",
+      "file": "art/generated/res-icons/res-VI-2/necro.webp",
+      "box": [
+        483,
+        486,
+        907,
+        910
+      ],
+      "px": 424,
+      "key_left": 0.01424
+    },
+    {
+      "id": "p_greenice",
+      "file": "art/generated/res-icons/res-VI-2/p_greenice.webp",
+      "box": [
+        939,
+        485,
+        1365,
+        911
+      ],
+      "px": 426,
+      "key_left": 0.0063
+    },
+    {
+      "id": "p_violetice",
+      "file": "art/generated/res-icons/res-VI-2/p_violetice.webp",
+      "box": [
+        1397,
+        485,
+        1822,
+        910
+      ],
+      "px": 425,
+      "key_left": 0.01518
+    },
+    {
+      "id": "p_emptyglove",
+      "file": "art/generated/res-icons/res-VI-2/p_emptyglove.webp",
+      "box": [
+        1854,
+        485,
+        2279,
+        910
+      ],
+      "px": 425,
+      "key_left": 0.02382
+    },
+    {
+      "id": "p_violetkindle",
+      "file": "art/generated/res-icons/res-VI-2/p_violetkindle.webp",
+      "box": [
+        25,
+        943,
+        450,
+        1368
+      ],
+      "px": 425,
+      "key_left": 0.05518
+    },
+    {
+      "id": "p_candle",
+      "file": "art/generated/res-icons/res-VI-2/p_candle.webp",
+      "box": [
+        483,
+        944,
+        907,
+        1368
+      ],
+      "px": 424,
+      "key_left": 0.00657
+    },
+    {
+      "id": "a_vigil",
+      "file": "art/generated/res-icons/res-VI-2/a_vigil.webp",
+      "box": [
+        939,
+        943,
+        1365,
+        1369
+      ],
+      "px": 426,
+      "key_left": 0.01577
+    },
+    {
+      "id": "a_violetlamp",
+      "file": "art/generated/res-icons/res-VI-2/a_violetlamp.webp",
+      "box": [
+        1397,
+        943,
+        1822,
+        1368
+      ],
+      "px": 425,
+      "key_left": 0.01277
+    },
+    {
+      "id": "a_teacherkit",
+      "file": "art/generated/res-icons/res-VI-2/a_teacherkit.webp",
+      "box": [
+        1854,
+        943,
+        2279,
+        1368
+      ],
+      "px": 425,
+      "key_left": 0.0125
+    },
+    {
+      "id": "a_c16camp",
+      "file": "art/generated/res-icons/res-VI-2/a_c16camp.webp",
+      "box": [
+        25,
+        1401,
+        450,
+        1826
+      ],
+      "px": 425,
+      "key_left": 0.02017
+    },
+    {
+      "id": "a_c19niche",
+      "file": "art/generated/res-icons/res-VI-2/a_c19niche.webp",
+      "box": [
+        483,
+        1401,
+        907,
+        1825
+      ],
+      "px": 424,
+      "key_left": 0.00775
+    },
+    {
+      "id": "p_moldpiece",
+      "file": "art/generated/res-icons/res-VI-2/p_moldpiece.webp",
+      "box": [
+        939,
+        1401,
+        1364,
+        1826
+      ],
+      "px": 425,
+      "key_left": 0.01847
+    },
+    {
+      "id": "p_bolt",
+      "file": "art/generated/res-icons/res-VI-2/p_bolt.webp",
+      "box": [
+        1397,
+        1401,
+        1822,
+        1826
+      ],
+      "px": 425,
+      "key_left": 0.03291
+    },
+    {
+      "id": "a_mold",
+      "file": "art/generated/res-icons/res-VI-2/a_mold.webp",
+      "box": [
+        1854,
+        1401,
+        2279,
+        1826
+      ],
+      "px": 425,
+      "key_left": 0.0201
+    }
+  ]
+}

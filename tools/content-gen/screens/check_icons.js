@@ -11,23 +11,27 @@
       у записи без id (прежний набор врагов) иконки нет — вызывающий рисует вектор.
    4. Места показа: книга героя (heroKitHtml) и библиотека UI-кита зовут abArt, плитка талисмана — талисман линейки, плитка
       снаряжения — редкость предмета, неизвестная душа — «способность скрыта».
+   5. Ресурсы (слово автора: «Иконки по ресурсам начинай генерировать только тогда, когда придёт с отчётом Этрион»): у каждого предмета
+      recipes.js, кроме готовой картинки (img) и героев (fam hero), есть res/<id>.webp 256 × 256, плюс «ресурс скрыт»; опись и папка res
+      совпадают; resArt не даёт иконку предмету с img и герою; trIcon (index.html) берёт иконку раньше вектора, it.img — главнее;
+      закрытый предмет в запасах, лавке, на рынке, в листе «Сведения», сундуке и Эхо — «ресурс скрыт», а не замок.
    Запуск: node tools/content-gen/screens/check_icons.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const ROOT = path.join(__dirname, '..', '..', '..'), UI = path.join(ROOT, 'design', 'ui'), ART = path.join(UI, 'assets', 'art');
 const read = f => fs.readFileSync(path.join(UI, f), 'utf8');
-const err = [], cnt = { spells: 0, tal: 0, gear: 0 };
+const err = [], cnt = { spells: 0, tal: 0, gear: 0, res: 0 };
 const say = m => { if (err.length < 60) err.push(m); else if (err.length === 60) err.push('… и ещё ошибки'); };
 function done() {
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
-  console.log(`Иконки сеткой: способностей ${cnt.spells}, линеек талисманов ${cnt.tal}, шаблонов снаряжения ${cnt.gear}.`);
-  console.log('Проверка пройдена: у каждой способности, линейки и шаблона есть иконка 256 px, опись и выгрузка совпадают, помощники находят иконку по id, имени и редкости.');
+  console.log(`Иконки сеткой: способностей ${cnt.spells}, линеек талисманов ${cnt.tal}, шаблонов снаряжения ${cnt.gear}, предметов ресурсов ${cnt.res}.`);
+  console.log('Проверка пройдена: у каждой способности, линейки, шаблона и предмета есть иконка 256 px, опись и выгрузка совпадают, помощники находят иконку по id, имени и редкости, закрытый предмет — «ресурс скрыт».');
   process.exit(0);
 }
 
 /* данные прототипа — как в браузере */
 const data = f => { const ctx = { console }; ctx.window = ctx; vm.createContext(ctx); vm.runInContext(read(f), ctx, { filename: f }); return ctx; };
-const A = data('abilities.js').EN_ABILITIES, T = data('talismans.js').EN_TALISMANS, E = data('equipment.js').EN_EQUIPMENT;
+const A = data('abilities.js').EN_ABILITIES, T = data('talismans.js').EN_TALISMANS, E = data('equipment.js').EN_EQUIPMENT, R = data('recipes.js').EN_RECIPES;
 
 /* помощники art-icons.js в песочнице: заглушки того, что даёт index.html */
 const ctx = { console, KIT_EXTRA: [], EN_TALISMANS: T, document: { baseURI: 'file:///' } };
@@ -62,7 +66,7 @@ function want(p, what) {
 
 /* ================== 1–3. файлы и помощники ================== */
 const G = run('ART_ICONS.grid');
-if (!G || !G.spells || !G.tal || !G.gear) say('ART_ICONS.grid: выгружены не все наборы — spells, tal, gear');
+if (!G || !G.spells || !G.tal || !G.gear || !G.res) say('ART_ICONS.grid: выгружены не все наборы — spells, tal, gear, res');
 // способности
 const abilities = A.sets.flatMap(s => s.items);
 if (abilities.length !== A.total) say(`abilities.js: способностей ${abilities.length}, а total ${A.total}`);
@@ -92,6 +96,15 @@ for (const id of Object.keys(E.templates)) {
   want(p, `снаряжение ${id}`); cnt.gear++;
 }
 for (const s of E.rules.slots) if (srcOf(run(`eqIcon(${JSON.stringify(s)}, 40)`)) !== `gear/${s}-1.webp`) say(`eqIcon('${s}') без редкости: нужна иконка обычной вещи`);
+// ресурсы
+for (const it of R.items) {
+  const p = srcOf(run(`resArt(${JSON.stringify(it)}, 48)`)), drawn = !it.img && it.fam !== 'hero';
+  if (!drawn) { if (p) say(`${it.id} «${it.n}»: у предмета ${it.img ? 'своя картинка' : 'портрет героя'}, а resArt дал иконку`); continue; }
+  if (p !== `res/${it.id}.webp`) { say(`${it.id} «${it.n}»: resArt дал «${p}»`); continue; }
+  want(p, `ресурс ${it.id} «${it.n}»`); cnt.res++;
+}
+want(run('ART_ICONS.resHidden'), 'ресурс скрыт');
+if (srcOf(run(`resHideIco(48)`)) !== run('ART_ICONS.resHidden')) say('resHideIco: не «ресурс скрыт»');
 // опись выгрузки и папки совпадают
 const spec = JSON.parse(fs.readFileSync(path.join(ROOT, 'tools', 'art-gen', 'ui-icons.json'), 'utf8'));
 const items = Object.keys(spec.items);
@@ -101,7 +114,7 @@ for (const p of items) {
   if (!fs.existsSync(path.join(ROOT, 'art', 'generated', from))) say(`ui-icons.json: ${p} ← ${from} — исходника нет`);
 }
 for (const p of need) if (!spec.items[p]) say(`ui-icons.json: нет записи ${p}`);
-for (const dir of ['spells', 'tal', 'gear']) {
+for (const dir of ['spells', 'tal', 'gear', 'res']) {
   const full = path.join(ART, dir);
   for (const f of fs.existsSync(full) ? fs.readdirSync(full) : []) if (!need.has(`${dir}/${f}`)) say(`assets/art/${dir}/${f} — файл не из описи`);
 }
@@ -109,21 +122,29 @@ for (const dir of ['spells', 'tal', 'gear']) {
 const fix = Object.entries(spec.items).filter(([, s]) => /fix/.test(typeof s === 'string' ? s : s.from));
 if (!fix.length) say('ui-icons.json: нет ни одной клетки листа переделки — слабые клетки не заменены');
 for (const [p, s] of Object.entries(spec.items)) {
-  const from = typeof s === 'string' ? s : s.from, m = /^spell-icons\/(spell-[a-z]+-(?:active|ult)|spell-farm)\//.exec(from);
-  if (!m) continue;
-  const stem = path.basename(p, '.webp');
-  const fixed = fs.readdirSync(path.join(ROOT, 'art', 'generated', 'spell-icons')).filter(d => /fix/.test(d) && fs.existsSync(path.join(ROOT, 'art', 'generated', 'spell-icons', d, stem + '.webp')));
+  const from = typeof s === 'string' ? s : s.from, m = /^(spell-icons|res-icons)\/([a-zA-Z0-9-]+)\//.exec(from);
+  if (!m || /fix/.test(m[2])) continue;
+  const stem = path.basename(from).replace(/(\.fix)?\.webp$/, ''), dir = path.join(ROOT, 'art', 'generated', m[1]);
+  const fixed = fs.readdirSync(dir).filter(d => /fix/.test(d) && fs.existsSync(path.join(dir, d, stem + '.webp')));
   if (fixed.length) say(`${p}: взята клетка большого листа, хотя есть переделка в ${fixed.join(', ')}`);
 }
 
 /* ================== 4. места показа ================== */
 const html = read('index.html'), src = f => read('screens/' + f);
 const fnOf = (code, name) => { const m = new RegExp(`function ${name}\\(`).exec(code); return m ? code.slice(m.index, code.indexOf('\n}', m.index)) : ''; };
-if (!/abArt\(a, 30/.test(fnOf(html, 'heroKitHtml'))) say('index.html: книга героя (heroKitHtml, вкладка «Навыки») не зовёт abArt');
+if (!/abArt\(a, \d+/.test(fnOf(html, 'heroKitHtml'))) say('index.html: книга героя (heroKitHtml, вкладка «Навыки») не зовёт abArt');
 if (!/abArt\(a, 24\)/.test(fnOf(html, 'klTile')) || !/abArt\(a, 46\)/.test(fnOf(html, 'klDetail'))) say('index.html: библиотека UI-кита (klTile, klDetail) не зовёт abArt');
 if (!/abArt\(a, 26\)/.test(fnOf(html, 'khKit'))) say('index.html: набор героя черновика (khKit) не зовёт abArt');
 if (!/talIcon\(f\.cat, [^)]*tlFid\(no\)\)/.test(src('talismans.js'))) say('screens/talismans.js: плитка талисмана не передаёт линейку в talIcon');
 if (!/eqPic\(it\.slot, o\.lg \? 48 : 32, it\.r\)/.test(src('equipment.js'))) say('screens/equipment.js: плитка предмета не передаёт редкость');
 if (!/abHiddenArt\(/.test(fnOf(src('heroes.js'), 'hcSoulBody'))) say('screens/heroes.js: неизвестная душа не показывает «способность скрыта»');
 if (!/abArt\(x\.ab/.test(src('hero-dev.js'))) say('screens/hero-dev.js: строки развития не зовут abArt');
+{
+  const tr = fnOf(html, 'trIcon'), iImg = tr.indexOf('it.img'), iArt = tr.indexOf('resArt(');
+  if (iArt < 0) say('index.html: trIcon не берёт иконку ресурса (resArt)');
+  else if (iImg < 0 || iImg > iArt) say('index.html: trIcon — готовая картинка it.img должна быть главнее иконки сеткой');
+  const lock = [['index.html', html], ...['bag.js', 'shop.js', 'market.js', 'chest-open.js', 'echo.js'].map(f => ['screens/' + f, src(f)])]
+    .filter(([, code]) => /ic\('lock'\) : trIcon\(/.test(code.replace(/typeof resHideIco === 'function' \? resHideIco\([^)]*\) : ic\('lock'\)/g, '')));
+  for (const [f] of lock) say(`${f}: закрытый предмет рисуется замком — нужен «ресурс скрыт» (resHideIco)`);
+}
 done();

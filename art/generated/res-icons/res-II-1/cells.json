@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-II-1__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-ii.json",
+  "job": "res-II-1",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "k3_hunt",
+      "file": "art/generated/res-icons/res-II-1/k3_hunt.webp",
+      "box": [
+        7,
+        10,
+        443,
+        446
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "k3_tail",
+      "file": "art/generated/res-icons/res-II-1/k3_tail.webp",
+      "box": [
+        466,
+        7,
+        908,
+        449
+      ],
+      "px": 442,
+      "key_left": 0.0
+    },
+    {
+      "id": "k3_eng",
+      "file": "art/generated/res-icons/res-II-1/k3_eng.webp",
+      "box": [
+        931,
+        7,
+        1373,
+        449
+      ],
+      "px": 442,
+      "key_left": 0.0
+    },
+    {
+      "id": "k3_alch",
+      "file": "art/generated/res-icons/res-II-1/k3_alch.webp",
+      "box": [
+        1397,
+        8,
+        1838,
+        449
+      ],
+      "px": 441,
+      "key_left": 0.0
+    },
+    {
+      "id": "k3_ench",
+      "file": "art/generated/res-icons/res-II-1/k3_ench.webp",
+      "box": [
+        1861,
+        10,
+        2297,
+        446
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "k3_smith",
+      "file": "art/generated/res-icons/res-II-1/k3_smith.webp",
+      "box": [
+        7,
+        476,
+        443,
+        912
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "u3",
+      "file": "art/generated/res-icons/res-II-1/u3.webp",
+      "box": [
+        466,
+        473,
+        908,
+        915
+      ],
+      "px": 442,
+      "key_left": 0.0
+    },
+    {
+      "id": "rc_b3",
+      "file": "art/generated/res-icons/res-II-1/rc_b3.webp",
+      "box": [
+        931,
+        473,
+        1373,
+        915
+      ],
+      "px": 442,
+      "key_left": 0.0
+    },
+    {
+      "id": "mc_b3",
+      "file": "art/generated/res-icons/res-II-1/mc_b3.webp",
+      "box": [
+        1397,
+        473,
+        1838,
+        914
+      ],
+      "px": 441,
+      "key_left": 0.0
+    },
+    {
+      "id": "mt_b3",
+      "file": "art/generated/res-icons/res-II-1/mt_b3.webp",
+      "box": [
+        1861,
+        476,
+        2297,
+        912
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "k4_hunt",
+      "file": "art/generated/res-icons/res-II-1/k4_hunt.webp",
+      "box": [
+        7,
+        943,
+        443,
+        1379
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "k4_tail",
+      "file": "art/generated/res-icons/res-II-1/k4_tail.webp",
+      "box": [
+        466,
+        940,
+        908,
+        1382
+      ],
+      "px": 442,
+      "key_left": 0.0
+    },
+    {
+      "id": "k4_eng",
+      "file": "art/generated/res-icons/res-II-1/k4_eng.webp",
+      "box": [
+        931,
+        940,
+        1373,
+        1382
+      ],
+      "px": 442,
+      "key_left": 0.0
+    },
+    {
+      "id": "k4_alch",
+      "file": "art/generated/res-icons/res-II-1/k4_alch.webp",
+      "box": [
+        1397,
+        941,
+        1838,
+        1382
+      ],
+      "px": 441,
+      "key_left": 0.0
+    },
+    {
+      "id": "k4_ench",
+      "file": "art/generated/res-icons/res-II-1/k4_ench.webp",
+      "box": [
+        1861,
+        943,
+        2297,
+        1379
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "k4_smith",
+      "file": "art/generated/res-icons/res-II-1/k4_smith.webp",
+      "box": [
+        7,
+        1409,
+        443,
+        1845
+      ],
+      "px": 436,
+      "key_left": 0.0
+    },
+    {
+      "id": "rc_b4",
+      "file": "art/generated/res-icons/res-II-1/rc_b4.webp",
+      "box": [
+        466,
+        1406,
+        908,
+        1848
+      ],
+      "px": 442,
+      "key_left": 0.0
+    },
+    {
+      "id": "mc_b4",
+      "file": "art/generated/res-icons/res-II-1/mc_b4.webp",
+      "box": [
+        931,
+        1406,
+        1373,
+        1848
+      ],
+      "px": 442,
+      "key_left": 0.0
+    },
+    {
+      "id": "mt_b4",
+      "file": "art/generated/res-icons/res-II-1/mt_b4.webp",
+      "box": [
+        1397,
+        1407,
+        1838,
+        1848
+      ],
+      "px": 441,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn2_1",
+      "file": "art/generated/res-icons/res-II-1/rn2_1.webp",
+      "box": [
+        1861,
+        1409,
+        2297,
+        1845
+      ],
+      "px": 436,
+      "key_left": 0.0
+    }
+  ]
+}

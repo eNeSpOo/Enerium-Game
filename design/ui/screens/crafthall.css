@@ -78,6 +78,17 @@ html.cr-f :is(.well,.zp-cell,.zp-ic,.lv-ic,.lv-big,.mk-ic,.tr-big)[data-fk]>img{
 html.cr-f :is(.well,.zp-cell,.zp-ic,.lv-ic,.lv-big,.mk-ic,.tr-big)[data-fk] :is(.q,.dot,.zp-dot,.zp-worn,.zp-k,.lv-q,.lv-cr){z-index:2}
 /* крупная плитка листа «Сведения» (index.html) — тоже в рамке */
 html.cr-f .tr-big[data-fk]{position:relative;width:56px;height:56px}
+/* иконка ресурса сеткой (resArt, screens/art-icons.js) — живопись в край: ложится ровно в окно рамки своего вида, без зазора.
+   Окна — CR_ART.frames (screens/crafthall.js), ‰ тела рамки; тело рамки совпадает с колодцем, поэтому ‰ / 10 = % колодца */
+html.cr-f :is(.well,.zp-cell,.zp-ic,.lv-ic,.lv-big,.mk-ic,.tr-big)[data-fk]>img.res-art{position:absolute;width:auto;height:auto;border-radius:0;object-fit:cover;inset:15.5% 15% 15.5% 15%}
+html.cr-f [data-fk="key"]>img.res-art{inset:19.5% 14.5% 14% 13.5%}
+html.cr-f [data-fk="boss"]>img.res-art{inset:13.5% 13% 13.5% 12.5%}
+html.cr-f :is([data-fk="made"],[data-fk="karst"])>img.res-art{inset:13.5% 13.5% 14% 13.5%}
+html.cr-f [data-fk="call"]>img.res-art{inset:11.5% 11.5% 10.5% 11.5%}
+html.cr-f [data-fk="rune"]>img.res-art{inset:16% 16% 15.5% 16%}
+html.cr-f [data-fk="city"]>img.res-art{inset:19% 13% 14.5% 13%}
+/* номер руны предела — в левом нижнем углу окна рамки, поверх иконки */
+html.cr-f [data-fk]>.res-gl{left:19%;bottom:18%}
 /* выбранный колодец — бирюзовое кольцо поверх рамки */
 html.cr-f .well[data-fk].sel{box-shadow:0 0 0 2px var(--spirit),0 0 14px -2px var(--spirit)}
 /* редкое светится сильнее: с эпической — второй ореол */

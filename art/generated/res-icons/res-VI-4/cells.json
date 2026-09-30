@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-VI-4__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-vi.json",
+  "job": "res-VI-4",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "cr_crust",
+      "file": "art/generated/res-icons/res-VI-4/cr_crust.webp",
+      "box": [
+        9,
+        15,
+        444,
+        450
+      ],
+      "px": 435,
+      "key_left": 0.0033
+    },
+    {
+      "id": "cr_campash",
+      "file": "art/generated/res-icons/res-VI-4/cr_campash.webp",
+      "box": [
+        472,
+        15,
+        907,
+        450
+      ],
+      "px": 435,
+      "key_left": 0.0693
+    },
+    {
+      "id": "cr_tentpeg",
+      "file": "art/generated/res-icons/res-VI-4/cr_tentpeg.webp",
+      "box": [
+        936,
+        15,
+        1370,
+        449
+      ],
+      "px": 434,
+      "key_left": 0.00044
+    },
+    {
+      "id": "cr_sentrybell",
+      "file": "art/generated/res-icons/res-VI-4/cr_sentrybell.webp",
+      "box": [
+        1399,
+        15,
+        1833,
+        449
+      ],
+      "px": 434,
+      "key_left": 0.00652
+    },
+    {
+      "id": "cr_pilgrimshoe",
+      "file": "art/generated/res-icons/res-VI-4/cr_pilgrimshoe.webp",
+      "box": [
+        1862,
+        15,
+        2297,
+        450
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_frostwolf",
+      "file": "art/generated/res-icons/res-VI-4/cr_frostwolf.webp",
+      "box": [
+        9,
+        478,
+        444,
+        913
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_icecandle",
+      "file": "art/generated/res-icons/res-VI-4/cr_icecandle.webp",
+      "box": [
+        472,
+        478,
+        907,
+        913
+      ],
+      "px": 435,
+      "key_left": 0.00017
+    },
+    {
+      "id": "cr_cultblade",
+      "file": "art/generated/res-icons/res-VI-4/cr_cultblade.webp",
+      "box": [
+        936,
+        479,
+        1370,
+        913
+      ],
+      "px": 434,
+      "key_left": 0.00374
+    },
+    {
+      "id": "cr_prayercord",
+      "file": "art/generated/res-icons/res-VI-4/cr_prayercord.webp",
+      "box": [
+        1399,
+        479,
+        1833,
+        913
+      ],
+      "px": 434,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb7",
+      "file": "art/generated/res-icons/res-VI-4/find_cb7.webp",
+      "box": [
+        1862,
+        478,
+        2297,
+        913
+      ],
+      "px": 435,
+      "key_left": 0.07451
+    },
+    {
+      "id": "find_cb7b",
+      "file": "art/generated/res-icons/res-VI-4/find_cb7b.webp",
+      "box": [
+        9,
+        942,
+        444,
+        1377
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb7",
+      "file": "art/generated/res-icons/res-VI-4/call_fb7.webp",
+      "box": [
+        472,
+        942,
+        907,
+        1377
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fb7",
+      "file": "art/generated/res-icons/res-VI-4/tr_fb7.webp",
+      "box": [
+        936,
+        942,
+        1370,
+        1376
+      ],
+      "px": 434,
+      "key_left": 0.08236
+    },
+    {
+      "id": "tr_fb7a",
+      "file": "art/generated/res-icons/res-VI-4/tr_fb7a.webp",
+      "box": [
+        1399,
+        942,
+        1833,
+        1376
+      ],
+      "px": 434,
+      "key_left": 0.00115
+    },
+    {
+      "id": "call_fb7_aw",
+      "file": "art/generated/res-icons/res-VI-4/call_fb7_aw.webp",
+      "box": [
+        1862,
+        942,
+        2297,
+        1377
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "act_cb16",
+      "file": "art/generated/res-icons/res-VI-4/act_cb16.webp",
+      "box": [
+        9,
+        1406,
+        444,
+        1841
+      ],
+      "px": 435,
+      "key_left": 0.02965
+    },
+    {
+      "id": "cr_nichestone",
+      "file": "art/generated/res-icons/res-VI-4/cr_nichestone.webp",
+      "box": [
+        472,
+        1406,
+        907,
+        1841
+      ],
+      "px": 435,
+      "key_left": 0.0011
+    },
+    {
+      "id": "cr_violetvein",
+      "file": "art/generated/res-icons/res-VI-4/cr_violetvein.webp",
+      "box": [
+        936,
+        1406,
+        1370,
+        1840
+      ],
+      "px": 434,
+      "key_left": 0.02483
+    },
+    {
+      "id": "cr_deadtool",
+      "file": "art/generated/res-icons/res-VI-4/cr_deadtool.webp",
+      "box": [
+        1399,
+        1406,
+        1833,
+        1840
+      ],
+      "px": 434,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_gravecloth",
+      "file": "art/generated/res-icons/res-VI-4/cr_gravecloth.webp",
+      "box": [
+        1862,
+        1406,
+        2297,
+        1841
+      ],
+      "px": 435,
+      "key_left": 0.0
+    }
+  ]
+}

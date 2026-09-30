@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-III-2__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-iii.json",
+  "job": "res-III-2",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "rn3_2",
+      "file": "art/generated/res-icons/res-III-2/rn3_2.webp",
+      "box": [
+        14,
+        22,
+        441,
+        449
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn3_3",
+      "file": "art/generated/res-icons/res-III-2/rn3_3.webp",
+      "box": [
+        475,
+        21,
+        904,
+        450
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn3_4",
+      "file": "art/generated/res-icons/res-III-2/rn3_4.webp",
+      "box": [
+        938,
+        21,
+        1367,
+        450
+      ],
+      "px": 429,
+      "key_left": 0.0
+    },
+    {
+      "id": "rn3_5",
+      "file": "art/generated/res-icons/res-III-2/rn3_5.webp",
+      "box": [
+        1401,
+        21,
+        1829,
+        449
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "vs3",
+      "file": "art/generated/res-icons/res-III-2/vs3.webp",
+      "box": [
+        1864,
+        22,
+        2291,
+        449
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "vr3",
+      "file": "art/generated/res-icons/res-III-2/vr3.webp",
+      "box": [
+        14,
+        484,
+        441,
+        911
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "kr_ni",
+      "file": "art/generated/res-icons/res-III-2/kr_ni.webp",
+      "box": [
+        475,
+        484,
+        903,
+        912
+      ],
+      "px": 428,
+      "key_left": 2e-05
+    },
+    {
+      "id": "fu_forge",
+      "file": "art/generated/res-icons/res-III-2/fu_forge.webp",
+      "box": [
+        938,
+        484,
+        1366,
+        912
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_quench",
+      "file": "art/generated/res-icons/res-III-2/p_quench.webp",
+      "box": [
+        1401,
+        484,
+        1829,
+        912
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_cautery",
+      "file": "art/generated/res-icons/res-III-2/p_cautery.webp",
+      "box": [
+        1864,
+        484,
+        2291,
+        911
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_torch",
+      "file": "art/generated/res-icons/res-III-2/p_torch.webp",
+      "box": [
+        14,
+        946,
+        441,
+        1373
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_arenasalve",
+      "file": "art/generated/res-icons/res-III-2/p_arenasalve.webp",
+      "box": [
+        475,
+        946,
+        903,
+        1374
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_quenchpit",
+      "file": "art/generated/res-icons/res-III-2/a_quenchpit.webp",
+      "box": [
+        938,
+        946,
+        1366,
+        1374
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_spark",
+      "file": "art/generated/res-icons/res-III-2/p_spark.webp",
+      "box": [
+        1401,
+        946,
+        1829,
+        1374
+      ],
+      "px": 428,
+      "key_left": 0.00049
+    },
+    {
+      "id": "p_kindle",
+      "file": "art/generated/res-icons/res-III-2/p_kindle.webp",
+      "box": [
+        1864,
+        946,
+        2291,
+        1373
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_redglass",
+      "file": "art/generated/res-icons/res-III-2/p_redglass.webp",
+      "box": [
+        14,
+        1409,
+        441,
+        1836
+      ],
+      "px": 427,
+      "key_left": 2e-05
+    },
+    {
+      "id": "a_pyre",
+      "file": "art/generated/res-icons/res-III-2/a_pyre.webp",
+      "box": [
+        475,
+        1409,
+        903,
+        1837
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_masterglyph",
+      "file": "art/generated/res-icons/res-III-2/p_masterglyph.webp",
+      "box": [
+        938,
+        1409,
+        1366,
+        1837
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_tongs",
+      "file": "art/generated/res-icons/res-III-2/p_tongs.webp",
+      "box": [
+        1401,
+        1409,
+        1829,
+        1837
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_grate",
+      "file": "art/generated/res-icons/res-III-2/p_grate.webp",
+      "box": [
+        1864,
+        1409,
+        2291,
+        1836
+      ],
+      "px": 427,
+      "key_left": 0.0
+    }
+  ]
+}

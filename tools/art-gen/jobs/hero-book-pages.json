@@ -1,0 +1,49 @@
+{
+  "name": "Страницы книги героя — рамки значков, закладки и кнопки (слово автора 30.09.2026: «хочу чтобы ты продумал UI и UX всего внутри карточки героя… мы перешли с заглушек на красивый визуал а внутри осталось всё по-старому, не порядок»). Внутри книги — тот же язык, что снаружи: пергамент, чернила, старое золото, кожа и латунь. Рамка значка способности — её вид: активная — железо, ульта — старое золото, пассивка — круг, реакция — ржавая кромка с шипами; места снаряжения — латунь, талисмана — огранённая оправа, буквица — золото с лозой, закрытое — кожа с замком. Закладки вкладок — кожаные язычки над верхним краем страницы, кнопки — кожа в латуни, главная — с кристаллом карста. Всё, что зависит от героя (иконки, числа, подписи, цвет редкости), кладёт интерфейс: на арте их нет.",
+  "plan": {
+    "Рамки pg-frames": "3:2, 2K, ключ black: восемь рамок 4 × 2 — активная, ульта, пассивка, реакция, место снаряжения, оправа талисмана, буквица, закрытое; окна чёрные — после вырезки прозрачные; нарезка и одна геометрия — tools/art-gen/craft_layers.py frames",
+    "Закладки и кнопки pg-parts": "3:2, 2K, ключ magenta: кожаная закладка и выбранная закладка, кнопка-пластина с кристаллами карста и простая — для border-image; нарезка — craft_layers.py sheet"
+  },
+  "notes": [
+    "Сначала --dry-run, потом запуск с --budget. Каждая картинка смотрится глазами, повторов — не больше двух",
+    "После генерации: python tools/art-gen/craft_layers.py frames art/generated/pg-sheet/pg-frames__nb2.png 4 2 act ult pas react gear tal cap lock --tone ult:86:78,cap:86:78 — рамки, окна в ‰ тела; python tools/art-gen/craft_layers.py sheet art/generated/pg-parts/pg-parts__nb2.png 2 2 tab tab-on btn btn2 — закладки и кнопки; python tools/art-gen/page_layers.py tongue art/generated/pg-parts/pg-parts__nb2-tab.png art/generated/pg-parts/pg-parts__nb2-tab-on.png — язычки закладок; выгрузка — ui-art.json → design/ui/assets/art/pages/ и export_ui.py --no-stamp; пути — PG_ART.ready в design/ui/screens/book-pages.js"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: dark fantasy game art for a mobile RPG — gloomy, heavy, noble and uneasy. Hand-painted digital painting: visible confident brush strokes, simplified planes, deep near-black shadows, crisp rim light on edges, rich material detail and masterful craftsmanship. A muted, desaturated palette: soot black (#050607, #121518), graphite (#262B31), old leather, blackened iron, dark bronze, aged brass, old gold leaf that gleams softly, yellowed bone. Everything is matte, worn and aged: no bright polished gold, no gloss, no plastic, no clean saturated game-UI colors. These pieces belong to the pages of an ancient book of heroes kept in the tower of a keeper of knowledge. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.",
+  "negative": "No words, no letters, no digits, no numbers, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no handwriting, no lines of text, no watermark, no signature, no logo, no captions or labels. No wax seals, no seals of any kind. No skulls, no skeletons, no blood, no eyes, no faces. No pentagrams, no occult signs, no crosses, no religious symbols. No bright polished gold, no glossy plastic shine, no clean bright mobile-game UI look. No hands, no table, no floor, no tilted objects, no perspective, no pictures or icons inside the frames or windows.",
+  "cutout_rule": "The background is one solid flat color {hex}, perfectly even from edge to edge: no gradient, no texture, no floor, no wall, no table under the object, no cast shadow, no vignette, no checkerboard. The objects themselves never use this background color. Any glow stays close to the object and fades out within a short distance.",
+  "categories": {
+    "pg-sheet": {
+      "aspect": "3:2",
+      "size": "2K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI sheet for a dark fantasy mobile RPG — several separate objects laid out in a strict grid, every object centered in its own equal cell, all seen perfectly straight on and frontal, no perspective. Between the objects and around them the canvas is solid pure black, with wide equal empty black gaps: no object touches another object or the edge of the canvas. Nothing connects the objects: no lines, no shared background, no shadows."
+    },
+    "pg-parts": {
+      "aspect": "3:2",
+      "size": "2K",
+      "cutout": "magenta",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI sheet for a dark fantasy mobile RPG — four separate objects laid out in a strict grid of two columns and two rows, every object centered in its own equal cell, all seen perfectly straight on and frontal, perfectly level, no perspective, no tilt. Between the objects and around them the canvas is one flat background color, with wide equal empty gaps: no object touches another object or the edge of the canvas. Nothing connects the objects: no lines, no shared background, no shadows."
+    }
+  },
+  "jobs": [
+    {
+      "id": "pg-frames",
+      "category": "pg-sheet",
+      "title": "Рамки значков страниц книги — активная, ульта, пассивка, реакция, место снаряжения, оправа талисмана, буквица, закрытое",
+      "source": "Страницы книги героя (screens/book-pages.js): «Навыки» — значок способности в рамке её вида; «Снаряжение» — места вещей и талисманов; «Путь» — буквица главы; закрытое доблестью. К выгрузке — design/ui/assets/art/pages/frame-<вид>.png (craft_layers.py frames)",
+      "subject": "The sheet: EIGHT frames for the small square icons on the pages of a book of heroes, in a grid of four columns and two rows. All eight frames are exactly the same size, perfectly straight and frontal; the gaps of solid pure black between them and around them are wide and equal — each gap at least a quarter of a frame's width. Each frame is a thick border, about one eighth of the frame's width, around a large EMPTY window of solid pure black, and the eight windows are all the same size. Bold, simple, heavy shapes that read at a tiny size of about 40 px: chunky material, strong corners, no thin fragile filigree. The frames differ in material, shape and corner details. Top row, from left to right: (1) a SQUARE frame of dark blackened, hammered iron with one round rivet in each corner — plain and sturdy; (2) a SQUARE frame of old gold, more precious than the others: a thin raised inner rim, small curled scrolls at the four corners and a small rounded crest rising from the middle of the top edge; (3) a perfectly ROUND ring frame of dark aged bronze with a thin engraved groove and four tiny round studs at its top, bottom, left and right — the window inside is a perfect circle; (4) a SQUARE frame of rusted, pitted dark iron whose four corners end in short sharp thorns pointing diagonally outward. Bottom row, from left to right: (5) a SQUARE frame of warm aged brass with an engraved double border and a small round boss in the middle of each of its four sides; (6) a HEXAGONAL frame with a pointed top and a pointed bottom, like the setting of a cut gem, of dark bronze with a small plain loop on its top point — the window inside is a hexagon of the same shape; (7) a SQUARE frame of old gold with a few curling vine tendrils and tiny leaves hugging its top-left corner and its bottom-right corner, staying close to the frame; (8) a SQUARE frame of dark stitched leather over thin iron bands, with a small closed iron padlock hanging from the middle of its bottom edge."
+    },
+    {
+      "id": "pg-parts",
+      "category": "pg-parts",
+      "title": "Закладки вкладок и кнопки страниц книги — кожаная закладка, выбранная закладка, главная кнопка с кристаллами карста, простая кнопка",
+      "source": "Страницы книги героя (screens/book-pages.css): закладки вкладок над верхним краем правой страницы и кнопки — border-image. К выгрузке — design/ui/assets/art/pages/tab.webp, tab-on.webp (язычок — page_layers.py tongue), btn.webp, btn2.webp (craft_layers.py sheet)",
+      "subject": "The sheet: FOUR separate pieces of an old book of heroes. Top row, from left to right: (1) a leather index tab that sticks out of the top edge of a book page: a flat tongue of dark brown leather about three times as wide as it is tall, with softly rounded top corners, straight vertical sides and a straight flat bottom edge; a line of fine pale stitching runs close to its top edge and down both sides; the whole long middle part is plain, even and calm; (2) exactly the same tab, same size and same shape, in deep oxblood-red leather with its stitching in old gold thread. Bottom row, from left to right: (3) a wide button plate about four times as wide as it is tall, with rounded corners: a panel of dark oiled black-brown leather inside a raised rim of aged bronze, with one small smooth oval turquoise crystal (#48E5D4) glowing softly from within, set into the rim in the middle of its left end, and one in the middle of its right end; the long middle part of the leather panel is plain and even; (4) the same button plate shape with a rim of darker, duller bronze around plain dark leather and no crystals."
+    }
+  ]
+}

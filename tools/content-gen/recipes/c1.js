@@ -449,7 +449,7 @@ module.exports = {
       art: 'A small wooden tin of soft green salve with moss fibres and dew beads.',
       in: [['cr_ci1_moss', 2], ['cr_ci1_dew', 2], ['p_brew', 1]], why: 'Мох, по которому читают следы, роса без пылинки и холодный настой.' },
     { id: 'p_northiron', n: 'Северный лом', tier: 'part', spec: 'smith', lore: 'Умбон и топор десанта, скованные вместе. Север узнает своё железо по звуку.',
-      hint: 'Север узнает своё железо по звуку. Из чужого железа, что не служит хозяину, куют ключи богов.',
+      hint: 'Север узнает своё железо по звуку. Чужое железо, что не служит хозяину, перекуют в вещь для ларца.',
       art: 'A rough bundle of northern scrap iron: a shield boss and an axe head hammered together.',
       in: [['cr_ci1_umbon', 1], ['cr_ci1_axe', 1], ['p_coal', 1]], why: 'Железо севера, которое лес не переварил, под раздутым углём.' },
     { id: 'p_tracker', n: 'Плащ следопыта', tier: 'part', spec: 'hunt', lore: 'Плащ из шерсти зверя Алаэля с мхом по кромке. В лесу его не видно.',

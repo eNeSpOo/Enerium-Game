@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-III-6__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-iii.json",
+  "job": "res-III-6",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "tr_fb9",
+      "file": "art/generated/res-icons/res-III-6/tr_fb9.webp",
+      "box": [
+        18,
+        24,
+        445,
+        451
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fb9a",
+      "file": "art/generated/res-icons/res-III-6/tr_fb9a.webp",
+      "box": [
+        478,
+        24,
+        905,
+        451
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb9_aw",
+      "file": "art/generated/res-icons/res-III-6/call_fb9_aw.webp",
+      "box": [
+        938,
+        24,
+        1365,
+        451
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "act_cb10",
+      "file": "art/generated/res-icons/res-III-6/act_cb10.webp",
+      "box": [
+        1399,
+        24,
+        1826,
+        451
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_scorched",
+      "file": "art/generated/res-icons/res-III-6/cr_scorched.webp",
+      "box": [
+        1859,
+        24,
+        2286,
+        451
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_ramiron",
+      "file": "art/generated/res-icons/res-III-6/cr_ramiron.webp",
+      "box": [
+        18,
+        484,
+        445,
+        911
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_slingstone",
+      "file": "art/generated/res-icons/res-III-6/cr_slingstone.webp",
+      "box": [
+        478,
+        484,
+        905,
+        911
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_pitch",
+      "file": "art/generated/res-icons/res-III-6/cr_pitch.webp",
+      "box": [
+        938,
+        484,
+        1366,
+        912
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_arrows",
+      "file": "art/generated/res-icons/res-III-6/cr_arrows.webp",
+      "box": [
+        1399,
+        484,
+        1826,
+        911
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_gatehinge",
+      "file": "art/generated/res-icons/res-III-6/cr_gatehinge.webp",
+      "box": [
+        1859,
+        484,
+        2286,
+        911
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_sootcloth",
+      "file": "art/generated/res-icons/res-III-6/cr_sootcloth.webp",
+      "box": [
+        18,
+        945,
+        445,
+        1372
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_emberglass",
+      "file": "art/generated/res-icons/res-III-6/cr_emberglass.webp",
+      "box": [
+        478,
+        945,
+        905,
+        1372
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_horsehair",
+      "file": "art/generated/res-icons/res-III-6/cr_horsehair.webp",
+      "box": [
+        938,
+        945,
+        1365,
+        1372
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb10",
+      "file": "art/generated/res-icons/res-III-6/find_cb10.webp",
+      "box": [
+        1399,
+        945,
+        1826,
+        1372
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb10b",
+      "file": "art/generated/res-icons/res-III-6/find_cb10b.webp",
+      "box": [
+        1859,
+        945,
+        2286,
+        1372
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb10",
+      "file": "art/generated/res-icons/res-III-6/call_fb10.webp",
+      "box": [
+        18,
+        1405,
+        445,
+        1832
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fb10",
+      "file": "art/generated/res-icons/res-III-6/tr_fb10.webp",
+      "box": [
+        478,
+        1405,
+        905,
+        1832
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fb10a",
+      "file": "art/generated/res-icons/res-III-6/tr_fb10a.webp",
+      "box": [
+        938,
+        1405,
+        1365,
+        1832
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb10_aw",
+      "file": "art/generated/res-icons/res-III-6/call_fb10_aw.webp",
+      "box": [
+        1399,
+        1405,
+        1826,
+        1832
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "act_cb20",
+      "file": "art/generated/res-icons/res-III-6/act_cb20.webp",
+      "box": [
+        1859,
+        1405,
+        2286,
+        1832
+      ],
+      "px": 427,
+      "key_left": 0.0
+    }
+  ]
+}

@@ -96,7 +96,14 @@ python tools/art-gen/export_ui.py --spec ui-icons.json --no-stamp --quiet
 
 `ui_icons.py` берёт клетки больших листов, поверх — клетки листов переделки и `.fix.webp`, и проверяет, что иконка есть у каждой способности библиотеки, линейки талисмана и шаблона снаряжения. `export_ui.py` читает обе описи — `ui-art.json` (арт экранов) и `ui-icons.json` (иконки сеткой); `--spec` выгружает одну. Иконки — WebP 256 px в `design/ui/assets/art/spells`, `tal`, `gear`; пути строят помощники `abArt`, `talIcon`, `eqIcon` (`design/ui/screens/art-icons.js`). Проверка — `node tools/content-gen/screens/check_icons.js`.
 
-Задания сеткой: способности — `jobs/spell-icons-<школа>.json`, фарм с «Тысячей птиц» и «способность скрыта» — `jobs/spell-icons-farm.json`; талисманы — `jobs/talisman-icons.json`; снаряжение — `jobs/equip-icons.json`. Язык иконок и уроки — `art/style/style.md`.
+Задания сеткой: способности — `jobs/spell-icons-<школа>.json`, фарм с «Тысячей птиц» и «способность скрыта» — `jobs/spell-icons-farm.json`; талисманы — `jobs/talisman-icons.json`; снаряжение — `jobs/equip-icons.json`; ресурсы — `jobs/res-icons-<цикл>.json` и переделка `jobs/res-icons-fix.json`, их собирает `res_jobs.py` из поля `art` предметов `design/ui/recipes.js`. Язык иконок и уроки — `art/style/style.md`.
+
+Светлая палитра даёт насыщенный конус света снизу — мяту вместо «белого с прозеленью». Полосу оттенков приглушает `hue_fix.py` без новой генерации: клетка с конусом получает рядом `<имя>.fix.webp`, выгрузка берёт его.
+
+```
+python tools/art-gen/res_jobs.py                                                  # задания ресурсов из recipes.js
+python tools/art-gen/hue_fix.py "art/generated/res-icons/res-I-*/cells.json" --dry-run   # какие клетки поправит
+```
 
 ## Залы и вещи «Ремесла»
 
@@ -118,3 +125,43 @@ python tools/art-gen/export_ui.py --spec ui-art.json --no-stamp
 - `disc` — круглая вещь сверху в квадрат по центру; `hole` — прозрачная середина (пьедестал), ‰ радиуса.
 - `book` — страница для `border-image` из разворота гримуара: корешок и лента вырезаются, шов сглаживается; срезы страницы — `CR_ART.page`.
 - Выгрузка — `ui-art.json` → `design/ui/assets/art/craft/`, пути — `CR_ART.ready` в `design/ui/screens/crafthall.js`. Проверка — `node tools/content-gen/screens/check_crafthall.js`.
+
+## Страницы книги героя
+
+Задания — `jobs/hero-book-pages.json` (лист восьми рамок значков 4 × 2 на чёрном ключе: активная, ульта, пассивка, реакция, место снаряжения, талисман, буквица, замок; лист закладок и кнопок 2 × 2 на пурпурном) и `jobs/hero-book-ink.json` (шесть чернильных виньеток пером на белом, без вырезки). Нарезка и выгрузка:
+
+```
+python tools/art-gen/craft_layers.py frames art/generated/pg-sheet/pg-frames__nb2.png 4 2 act ult pas react gear tal cap lock --tone ult:86:78,cap:86:78
+python tools/art-gen/craft_layers.py sheet art/generated/pg-parts/pg-parts__nb2.png 2 2 tab tab-on btn btn2
+python tools/art-gen/page_layers.py tongue art/generated/pg-parts/pg-parts__nb2-tab.png art/generated/pg-parts/pg-parts__nb2-tab-on.png
+python tools/art-gen/page_layers.py ink art/generated/pg-ink/pg-ink__nb2.jpg 3 2 head div corner cartouche tail wreath
+python tools/art-gen/export_ui.py --no-stamp
+```
+
+- `ink` — белое уходит в прозрачность с восстановлением цвета чернил («цвет в альфу»): на пергаменте разворота остаются одни чернила, шум бумаги — в ноль; виньетки режутся по пятнам, близкие точки пера — одна виньетка.
+- `tongue` — из вырезанной закладки-«папки» — верхний язычок до плеч; срезы `border-image` — от краёв язычка.
+- Окна рамок, срезы и полосы — `PG_ART` в `design/ui/screens/book-pages.js`, выгрузка — `ui-art.json` → `design/ui/assets/art/pages/`. Не выгружены: рамка места снаряжения (толстая кромка съедает значок в 40 px — лунку рисует CSS), замок (нормализация рамки ломает дужку), уголок страницы.
+
+## Покои Странника
+
+Задание — `jobs/wanderer-chambers.json`: пять залов вкладок «Странника» (21:9 2K), рама зеркала Памяти, ниша колонки, уголок, герб, табличка, карниз, лист медальонов тем достижений, лист артефактов реликвария (5 × 4 на пурпурных швах), частицы, базальт и холодный пергамент. Нарезка:
+
+```
+python tools/art-gen/chambers_layers.py mirror art/generated/cb-frame/cb-mirror__nb2.png
+python tools/art-gen/chambers_layers.py clean art/generated/cb-part/cb-corner__nb2.png art/generated/cb-part/cb-crest__nb2.png art/generated/cb-strip/cb-plate__nb2.png
+python tools/art-gen/chambers_layers.py crop art/generated/cb-strip/cb-plate__nb2.clean.png 96 256 1490 410
+python tools/art-gen/chambers_layers.py strip art/generated/cb-strip/cb-ledge__nb2.raw.jpg 226 346
+python tools/art-gen/craft_layers.py corners art/generated/cb-part/cb-corner__nb2.clean.png
+python tools/art-gen/craft_layers.py wide art/generated/cb-part/cb-crest__nb2.clean.png
+python tools/art-gen/craft_layers.py sheet art/generated/cb-sheet/cb-medals__nb2.png 4 3 descent guard craft echo week wand heroes valor souls first myst wreath
+python tools/art-gen/craft_layers.py sheet art/generated/cb-fx/cb-fx__nb2.png 3 2 sand glint sliver time gold mist
+python tools/art-gen/grid_slice.py jobs/wanderer-chambers.json cb-arts art/generated/cb-icons/cb-arts__nb2.jpg
+python tools/art-gen/shelf_layers.py tile art/generated/cb-texture/cb-basalt__nb2.jpg
+python tools/art-gen/shelf_layers.py tile art/generated/cb-texture/cb-vellum__nb2-v2.jpg
+python tools/art-gen/export_ui.py --spec ui-art.json --no-stamp
+```
+
+- `mirror` — рама для `border-image` из девяти частей: углы C × C как есть, стороны — образец сразу за углом, сведённый в бесшовную петлю, низ — отражённый верх (у подножия модель рисует кристаллы); стекло вырезано по толщине рамы — где кончается бархат, ищем по цвету. Рядом — `.glass.jpg`, само стекло. Геометрия — `CB_ART.mirror`: срез угла в px выгрузки, толщина рамы — ‰ угла.
+- `clean` — оставить только крупные пятна альфы: крошки песка вокруг вещи на чёрном ключе — прочь.
+- `strip` — полоса во всю ширину из исходника без вырезки, концы сведены в бесшовную петлю (карниз).
+- Выгрузка — `ui-art.json` → `design/ui/assets/art/chambers/`, пути — `CB_ART.ready` в `design/ui/screens/chambers.js`, иконки артефактов и медальоны — `WN_ART.icons` в `design/ui/screens/wanderer.js`. Проверка — `node tools/content-gen/screens/check_chambers.js`.

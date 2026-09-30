@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-II-5__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-ii.json",
+  "job": "res-II-5",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "act_cb3",
+      "file": "art/generated/res-icons/res-II-5/act_cb3.webp",
+      "box": [
+        14,
+        22,
+        445,
+        453
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_clasp",
+      "file": "art/generated/res-icons/res-II-5/cr_clasp.webp",
+      "box": [
+        475,
+        22,
+        906,
+        453
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_map",
+      "file": "art/generated/res-icons/res-II-5/cr_map.webp",
+      "box": [
+        936,
+        22,
+        1367,
+        453
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_stars",
+      "file": "art/generated/res-icons/res-II-5/cr_stars.webp",
+      "box": [
+        1398,
+        22,
+        1829,
+        453
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_lens",
+      "file": "art/generated/res-icons/res-II-5/cr_lens.webp",
+      "box": [
+        1859,
+        22,
+        2290,
+        453
+      ],
+      "px": 431,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_tube",
+      "file": "art/generated/res-icons/res-II-5/cr_tube.webp",
+      "box": [
+        14,
+        482,
+        446,
+        914
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_owl",
+      "file": "art/generated/res-icons/res-II-5/cr_owl.webp",
+      "box": [
+        474,
+        482,
+        906,
+        914
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_inkpot",
+      "file": "art/generated/res-icons/res-II-5/cr_inkpot.webp",
+      "box": [
+        936,
+        482,
+        1368,
+        914
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_brick",
+      "file": "art/generated/res-icons/res-II-5/cr_brick.webp",
+      "box": [
+        1397,
+        482,
+        1829,
+        914
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_compass",
+      "file": "art/generated/res-icons/res-II-5/cr_compass.webp",
+      "box": [
+        1858,
+        482,
+        2290,
+        914
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb3",
+      "file": "art/generated/res-icons/res-II-5/find_cb3.webp",
+      "box": [
+        14,
+        942,
+        446,
+        1374
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_cb3b",
+      "file": "art/generated/res-icons/res-II-5/find_cb3b.webp",
+      "box": [
+        474,
+        942,
+        907,
+        1375
+      ],
+      "px": 433,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb3",
+      "file": "art/generated/res-icons/res-II-5/call_fb3.webp",
+      "box": [
+        936,
+        942,
+        1368,
+        1374
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fb3",
+      "file": "art/generated/res-icons/res-II-5/tr_fb3.webp",
+      "box": [
+        1397,
+        942,
+        1830,
+        1375
+      ],
+      "px": 433,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fb3a",
+      "file": "art/generated/res-icons/res-II-5/tr_fb3a.webp",
+      "box": [
+        1858,
+        942,
+        2291,
+        1375
+      ],
+      "px": 433,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fb3_aw",
+      "file": "art/generated/res-icons/res-II-5/call_fb3_aw.webp",
+      "box": [
+        14,
+        1403,
+        446,
+        1835
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "act_cb8",
+      "file": "art/generated/res-icons/res-II-5/act_cb8.webp",
+      "box": [
+        474,
+        1403,
+        906,
+        1835
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_rail",
+      "file": "art/generated/res-icons/res-II-5/cr_rail.webp",
+      "box": [
+        936,
+        1403,
+        1368,
+        1835
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_lamp",
+      "file": "art/generated/res-icons/res-II-5/cr_lamp.webp",
+      "box": [
+        1397,
+        1403,
+        1829,
+        1835
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "cr_rubble",
+      "file": "art/generated/res-icons/res-II-5/cr_rubble.webp",
+      "box": [
+        1858,
+        1403,
+        2290,
+        1835
+      ],
+      "px": 432,
+      "key_left": 0.0
+    }
+  ]
+}

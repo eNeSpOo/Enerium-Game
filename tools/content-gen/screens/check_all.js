@@ -581,10 +581,14 @@ reset();
   const want = Math.round(T.EB.RULES.resist[T.EB.FOES.g1.rank] / 100) + ' %';
   if (!gm.includes(`<b>${want}</b><small>иммунитет к контролю`)) say(`лист Мастера: иммунитет к контролю не ${want} из RULES.resist`);
   if (/сопр\. контролю/.test(gm)) say('лист Мастера: осталось «сопр. контролю» с числом из разметки');
-  /* лор героя состава в его карточке (вкладка «Герой», screens/heroes.js) — две строки и «ещё» */
+  /* лор героя состава в его книге (вкладка «Герой», screens/heroes.js) — страница для чтения: текст целиком, с буквицей, без «ещё»
+     (слово автора 30.09.2026: нажимать, чтобы читать, — странно). Вне книги лор по-прежнему в две строки и «ещё» (foldLore) */
   T.S.overlay = null; T.S.hview = 'rs';
   const long = T.RS.heroes.find(h => h.who && h.who.length > 150);
-  if (long) { T.S.rs.sel = long.id; T.S.seg.rhero = 'who'; if (!draw('лор героя').includes('<details class="lore">')) say(`лор героя ${long.n}: не свёрнут в две строки`); }
+  if (long) {
+    T.S.rs.sel = long.id; T.S.seg.rhero = 'who'; const lw = draw('лор героя');
+    if (!lw.includes('<p class="rs-who">') || !lw.includes(long.who.slice(-60)) || lw.includes('<details class="lore">')) say(`лор героя ${long.n}: в книге не читается целиком`);
+  }
   /* карточка бойца: атрибуты значками */
   reset(); run('бой: старт', () => T.startRun('s1', 'b1'));
   const R = T.S.runs[0];

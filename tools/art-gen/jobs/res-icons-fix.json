@@ -1,0 +1,218 @@
+{
+  "name": "Иконки ресурсов сеткой — переделка слабых клеток. Собирает tools/art-gen/res_jobs.py (FIX_CELLS) — руками не править",
+  "plan": {
+    "Правило": "клетка листа res-fix заменяет клетку большого листа (tools/art-gen/ui_icons.py); палитра — своя у каждой клетки"
+  },
+  "notes": [
+    "проверка листов на доске 30.09.2026: надписи — модель подписала бумагу и жетоны английским словом из фразы облика (EDICT, ORDER, Contract, Promissory note, TRAVEL PASS, Lesson plans, Sermon leaflet, BRIGADE BADGE…); пентаграмма вместо сплошной звезды у руны доблести цикла III; «летающая тарелка» вместо парящего города; светлый фон песка и воды вместо тёмного камня; мелкий знак, похожий на букву"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "res-icons": {
+      "aspect": "5:4",
+      "size": "2K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square item icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the item in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game lays its own frame over the edges of the cell, so everything important stays in the middle. Every cell shows exactly one item — a raw material, a trophy, a crafted piece or a relic — lying or standing still on dark near-black stone with faint cracks and a darker vignette toward the edges of the cell: one clear central object, large, filling about three quarters of the cell, in a clear three-quarter view from slightly above, with a bold recognisable silhouette that reads at 32 px. When a cell names several things, the first one is the main object — large and centred — and the others are small details beside it. Light rises from below in the colour of this sheet's palette, a soft glow from cracks in the stone — never a spotlight; crisp rim light on the edges of the object; a few dust motes in the light. Painted exactly like the ability icons of this game: loose, confident painterly brush strokes, soft painted edges and deep shadows — no black outlines, no flat sticker look, no scenery, no hands or people unless the cell names them. Writing is never drawn: wherever a cell mentions script, notes, pages, maps, tallies, tags or marks, they are faint unreadable smudges and straight ruled lines; clock faces and dials are plain, with simple notches and no numerals. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each differs clearly from its neighbours."
+    }
+  },
+  "jobs": [
+    {
+      "id": "res-fix-1",
+      "category": "res-icons",
+      "title": "Переделка слабых клеток — лист 1: 20 иконок сеткой 5×4",
+      "source": "проверка листов на доске 30.09.2026: надписи — модель подписала бумагу и жетоны английским словом из фразы облика (EDICT, ORDER, Contract, Promissory note, TRAVEL PASS, Lesson plans, Sermon leaflet, BRIGADE BADGE…); пентаграмма вместо сплошной звезды у руны доблести цикла III; «летающая тарелка» вместо парящего города; светлый фон песка и воды вместо тёмного камня; мелкий знак, похожий на букву",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "mc_b4",
+          "mc_b4"
+        ],
+        [
+          "a_orderslip",
+          "a_orderslip"
+        ],
+        [
+          "a_rubbing",
+          "a_rubbing"
+        ],
+        [
+          "a_restored",
+          "a_restored"
+        ],
+        [
+          "a_c2goods",
+          "a_c2goods"
+        ],
+        [
+          "tr_fb8",
+          "tr_fb8"
+        ],
+        [
+          "lu_cb8",
+          "lu_cb8"
+        ],
+        [
+          "mt_b3",
+          "mt_b3"
+        ],
+        [
+          "find_cb1b",
+          "find_cb1b"
+        ],
+        [
+          "p_writ",
+          "p_writ"
+        ],
+        [
+          "a_contract",
+          "a_contract"
+        ],
+        [
+          "a_insured",
+          "a_insured"
+        ],
+        [
+          "cr_tenet",
+          "cr_tenet"
+        ],
+        [
+          "find_cb18b",
+          "find_cb18b"
+        ],
+        [
+          "cr_ci4_bill",
+          "cr_ci4_bill"
+        ],
+        [
+          "u9",
+          "u9"
+        ],
+        [
+          "rc_b9",
+          "rc_b9"
+        ],
+        [
+          "mc_b9",
+          "mc_b9"
+        ],
+        [
+          "lu_cb14",
+          "lu_cb14"
+        ],
+        [
+          "cr_tollbill",
+          "cr_tollbill"
+        ]
+      ],
+      "subject": "This sheet gathers replacement icons from several sets. Every cell names its own palette in brackets, and each cell keeps strictly to its own palette — colours never spill from one cell to another; the light from below in each cell takes that cell's colour. Nothing is ever written on any object: every sheet of paper, parchment, slate, plaque, badge or tablet is blank or shows only faint wavy lines and smudges — never a word, never a letter, never a number, never a title.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: (warm amber-orange light, bronze, grey-brown library stone) a heavy cast bronze plate with a smooth blank face and a raised rim, beside a small carved model of a mountain city, a small amber crown resting on top of the plate; (warm amber-orange light, bronze, grey-brown library stone) a folded sheet of old paper tied with a narrow guild ribbon and closed with a round bronze seal — the paper is blank; (warm amber-orange light, bronze, grey-brown library stone) a square of rough cloth with dense dark rubbed-in wavy lines from carved stone, tied with a knotted counting cord; (warm amber-orange light, bronze, grey-brown library stone) a grey stone slab riddled with small tunnels, the tunnels filled with smooth golden wax, a few fresh carved grooves across it; (warm amber-orange light, bronze, grey-brown library stone) a bundle of decorative bronze gears and rivets tied together with twine to a folded blank sheet of paper.\n\nRow 2: (warm amber-orange light, bronze, grey-brown library stone) a round copper badge with a raised pickaxe in the middle and a plain smooth raised ring around the edge; (warm amber-orange light, bronze, grey-brown library stone) a brass whistle hanging on a cord from a small wooden board covered with chalk tally strokes, a worn leather glove beside it; (warm amber-orange light, bronze, grey-brown library stone) a thin curling sheet of bronze foil with rows of tiny punched dots; (pale white-green light, almost white, pale wood, warm grey clay) a small rectangular copper plaque tarnished green, with four rivet holes and a row of punched dots along its edge; (cool blue light, white stone, sea water) a rolled sheet of parchment tied with blue cord, a small glowing blue crystal pressed into its blue wax seal — the parchment is blank.\n\nRow 3: (cool blue light, white stone, sea water) a thick roll of parchment bound with a blue sash, two blue wax seals and a small copper plate hanging from the sash; (cool blue light, white stone, sea water) a folded sheet of parchment with a blue wax seal and a tiny drawn sailing ship in its corner — no writing; (cool blue light, white stone, sea water) a flat grey stone with one long straight carved groove across it, worn smooth by water; (cool blue light, white stone, sea water) a thick water-stained book bound in leather, closed, a strap around it; (cool blue light, white stone, sea water) a blank folded sheet of paper with an empty round space for a blue wax seal.\n\nRow 4: (green light, old clock brass, dry grey silt) an old hand-drawn map on parchment: a winding path of dots that ends abruptly at a drawn arched gate; (green light, old clock brass, dry grey silt) an old map on parchment with one fresh dark line of ink reaching a drawn arched gate, the map wrapped in a scrap of cloak cloth; (green light, old clock brass, dry grey silt) a single bare boot print pressed into grey stone before a small carved stone arch of a gate, a tiny stone model of a round city on a floating rock beside it; (green light, old clock brass, dry grey silt) a folded parchment closed with a green wax seal, tied with two small brass mule bells and a tuft of grey mule hair; (green light, old clock brass, dry grey silt) a folded parchment closed with a round green wax seal and a stamped ring mark — no writing."
+    },
+    {
+      "id": "res-fix-2",
+      "category": "res-icons",
+      "title": "Переделка слабых клеток — лист 2: 20 иконок сеткой 5×4",
+      "source": "проверка листов на доске 30.09.2026: надписи — модель подписала бумагу и жетоны английским словом из фразы облика (EDICT, ORDER, Contract, Promissory note, TRAVEL PASS, Lesson plans, Sermon leaflet, BRIGADE BADGE…); пентаграмма вместо сплошной звезды у руны доблести цикла III; «летающая тарелка» вместо парящего города; светлый фон песка и воды вместо тёмного камня; мелкий знак, похожий на букву",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "call_fb14",
+          "call_fb14"
+        ],
+        [
+          "call_fb14_aw",
+          "call_fb14_aw"
+        ],
+        [
+          "act_ci5",
+          "act_ci5"
+        ],
+        [
+          "a_c19notes",
+          "a_c19notes"
+        ],
+        [
+          "call_fb19",
+          "call_fb19"
+        ],
+        [
+          "tr_fb19a",
+          "tr_fb19a"
+        ],
+        [
+          "find_cb7b",
+          "find_cb7b"
+        ],
+        [
+          "cr_slate",
+          "cr_slate"
+        ],
+        [
+          "vr3",
+          "vr3"
+        ],
+        [
+          "lu_ci3",
+          "lu_ci3"
+        ],
+        [
+          "ec_b6",
+          "ec_b6"
+        ],
+        [
+          "act_ci3",
+          "act_ci3"
+        ],
+        [
+          "mc_b7",
+          "mc_b7"
+        ],
+        [
+          "call_fb5_aw",
+          "call_fb5_aw"
+        ],
+        [
+          "a_trademark",
+          "a_trademark"
+        ],
+        [
+          "ec_b4",
+          "ec_b4"
+        ],
+        [
+          "p_casting",
+          "p_casting"
+        ],
+        [
+          "cr_window",
+          "cr_window"
+        ],
+        [
+          "mt_b9",
+          "mt_b9"
+        ],
+        [
+          "call_fb5",
+          "call_fb5"
+        ]
+      ],
+      "subject": "This sheet gathers replacement icons from several sets. Every cell names its own palette in brackets, and each cell keeps strictly to its own palette — colours never spill from one cell to another; the light from below in each cell takes that cell's colour. Nothing is ever written on any object: every sheet of paper, parchment, slate, plaque, badge or tablet is blank or shows only faint wavy lines and smudges — never a word, never a letter, never a number, never a title.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: (green light, old clock brass, dry grey silt) a folded parchment with a green wax seal, a cracked green crystal and two small brass mule bells resting on top; (green light, old clock brass, dry grey silt) a cracked wooden crate with a folded parchment and a tuft of grey mule hair on its lid, a pale haze of dust around it; (green light, old clock brass, dry grey silt) a palm-sized carved stone model of a round city of white towers on a floating rock above a small puff of cloud, a black obelisk in its centre, small blue crystals set in the rock underneath — carved stone, not a machine, no lights; (cold violet light, black iron) a small slate board with chalk wavy lines and a shattered hourglass leaning against it; (cold violet light, black iron) two leather gloves grown together at the fingers, lying on a blank sheet on a wooden desk, a small violet flower beside them.\n\nRow 2: (cold violet light, black iron) a closed notebook bound with cord, its pages edged with faint violet light; (cold violet light, black iron) a crumpled sheet of paper with one ink circle broken in one place, nothing else on it; (cold violet light, black iron) a dark slate board with a few chalk strokes and a stub of chalk on its frame; (scarlet light, red-hot iron, soot) a round disc of crimson stone with one solid, filled five-pointed star raised in relief in its centre — one flat solid star, no lines inside it, no outline, no circle around it; (scarlet light, red-hot iron, soot) two blunt training axes crossed on dark stone, tied together with a red ribbon, a little pale sand scattered under them.\n\nRow 3: (scarlet light, red-hot iron, soot) a heavy iron floor grate lying on dark stone with a small smoking clay pot beside it, a little sand in its gaps; (scarlet light, red-hot iron, soot) a palm-sized carved stone model of a dark fortress with concentric walls around a small round arena, standing on dark stone; (cool blue light, white stone, sea water) a small wooden platform on posts with a clapperless bronze bell hanging from a chain at its edge, water pouring down behind it into the dark; (cool blue light, white stone, sea water) a bronze bell half sunk in dark water, small flat stone tablets floating around it, pale rings of ripples; (warm amber-orange light, bronze, grey-brown library stone) a bronze stamp with a wooden handle and a round amber inlay on its smooth base.\n\nRow 4: (warm amber-orange light, bronze, grey-brown library stone) worn leather animal collars and two hammer heads bundled together around a plain round brass token; (warm amber-orange light, bronze, grey-brown library stone) a clean cast bronze block with smooth faces and one small round punch mark; (green light, old clock brass, dry grey silt) a small square pane of old glass in a thin dark lead frame, one clear polished spot shining in it; (green light, old clock brass, dry grey silt) a boot print fossilized in grey stone, a thin green glow in its hollow; (cool blue light, white stone, sea water) a cracked bronze bell mended with bronze staples, standing in shallow dark water beside a stone bowl and a folded blank sealed sheet."
+    }
+  ]
+}

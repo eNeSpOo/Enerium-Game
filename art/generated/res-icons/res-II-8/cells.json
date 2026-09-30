@@ -1,0 +1,120 @@
+{
+  "sheet": "art/generated/res-icons/res-II-8__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-ii.json",
+  "job": "res-II-8",
+  "grid": [
+    3,
+    3
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "cr_ci2_amber",
+      "file": "art/generated/res-icons/res-II-8/cr_ci2_amber.webp",
+      "box": [
+        9,
+        9,
+        333,
+        333
+      ],
+      "px": 324,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_ci2",
+      "file": "art/generated/res-icons/res-II-8/find_ci2.webp",
+      "box": [
+        350,
+        9,
+        674,
+        333
+      ],
+      "px": 324,
+      "key_left": 0.0
+    },
+    {
+      "id": "find_ci2b",
+      "file": "art/generated/res-icons/res-II-8/find_ci2b.webp",
+      "box": [
+        691,
+        9,
+        1015,
+        333
+      ],
+      "px": 324,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fc2",
+      "file": "art/generated/res-icons/res-II-8/call_fc2.webp",
+      "box": [
+        9,
+        350,
+        333,
+        674
+      ],
+      "px": 324,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fc2",
+      "file": "art/generated/res-icons/res-II-8/tr_fc2.webp",
+      "box": [
+        349,
+        349,
+        675,
+        675
+      ],
+      "px": 326,
+      "key_left": 0.0
+    },
+    {
+      "id": "tr_fc2a",
+      "file": "art/generated/res-icons/res-II-8/tr_fc2a.webp",
+      "box": [
+        691,
+        350,
+        1015,
+        674
+      ],
+      "px": 324,
+      "key_left": 0.0
+    },
+    {
+      "id": "call_fc2_aw",
+      "file": "art/generated/res-icons/res-II-8/call_fc2_aw.webp",
+      "box": [
+        9,
+        691,
+        333,
+        1015
+      ],
+      "px": 324,
+      "key_left": 0.0
+    },
+    {
+      "id": "spare-0",
+      "file": "art/generated/res-icons/res-II-8/spare-0.webp",
+      "box": [
+        350,
+        691,
+        674,
+        1015
+      ],
+      "px": 324,
+      "key_left": 0.0
+    },
+    {
+      "id": "spare-1",
+      "file": "art/generated/res-icons/res-II-8/spare-1.webp",
+      "box": [
+        691,
+        691,
+        1015,
+        1015
+      ],
+      "px": 324,
+      "key_left": 0.0
+    }
+  ]
+}

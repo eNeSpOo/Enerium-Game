@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/res-icons/res-I-3__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/res-icons-i.json",
+  "job": "res-I-3",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "p_ward",
+      "file": "art/generated/res-icons/res-I-3/p_ward.webp",
+      "box": [
+        8,
+        16,
+        440,
+        448
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_karstsack",
+      "file": "art/generated/res-icons/res-I-3/a_karstsack.webp",
+      "box": [
+        470,
+        15,
+        904,
+        449
+      ],
+      "px": 434,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_signcopy",
+      "file": "art/generated/res-icons/res-I-3/p_signcopy.webp",
+      "box": [
+        935,
+        15,
+        1369,
+        449
+      ],
+      "px": 434,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_frame",
+      "file": "art/generated/res-icons/res-I-3/p_frame.webp",
+      "box": [
+        1399,
+        15,
+        1833,
+        449
+      ],
+      "px": 434,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_limb",
+      "file": "art/generated/res-icons/res-I-3/p_limb.webp",
+      "box": [
+        1865,
+        16,
+        2297,
+        448
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_bow",
+      "file": "art/generated/res-icons/res-I-3/a_bow.webp",
+      "box": [
+        8,
+        480,
+        440,
+        912
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_stone",
+      "file": "art/generated/res-icons/res-I-3/a_stone.webp",
+      "box": [
+        470,
+        479,
+        904,
+        913
+      ],
+      "px": 434,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_wheel",
+      "file": "art/generated/res-icons/res-I-3/p_wheel.webp",
+      "box": [
+        935,
+        479,
+        1369,
+        913
+      ],
+      "px": 434,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_wedge",
+      "file": "art/generated/res-icons/res-I-3/p_wedge.webp",
+      "box": [
+        1399,
+        479,
+        1833,
+        913
+      ],
+      "px": 434,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_whitestone",
+      "file": "art/generated/res-icons/res-I-3/p_whitestone.webp",
+      "box": [
+        1865,
+        480,
+        2297,
+        912
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_waxthread",
+      "file": "art/generated/res-icons/res-I-3/p_waxthread.webp",
+      "box": [
+        8,
+        947,
+        440,
+        1379
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_bast",
+      "file": "art/generated/res-icons/res-I-3/p_bast.webp",
+      "box": [
+        470,
+        945,
+        905,
+        1380
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_bag",
+      "file": "art/generated/res-icons/res-I-3/a_bag.webp",
+      "box": [
+        933,
+        944,
+        1371,
+        1382
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_felt",
+      "file": "art/generated/res-icons/res-I-3/p_felt.webp",
+      "box": [
+        1399,
+        945,
+        1834,
+        1380
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_girth",
+      "file": "art/generated/res-icons/res-I-3/p_girth.webp",
+      "box": [
+        1865,
+        947,
+        2297,
+        1379
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_dustmask",
+      "file": "art/generated/res-icons/res-I-3/p_dustmask.webp",
+      "box": [
+        8,
+        1413,
+        440,
+        1845
+      ],
+      "px": 432,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_elfstring",
+      "file": "art/generated/res-icons/res-I-3/p_elfstring.webp",
+      "box": [
+        470,
+        1411,
+        905,
+        1846
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_fang",
+      "file": "art/generated/res-icons/res-I-3/p_fang.webp",
+      "box": [
+        933,
+        1410,
+        1371,
+        1848
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "p_lure",
+      "file": "art/generated/res-icons/res-I-3/p_lure.webp",
+      "box": [
+        1399,
+        1411,
+        1834,
+        1846
+      ],
+      "px": 435,
+      "key_left": 0.0
+    },
+    {
+      "id": "a_arrow",
+      "file": "art/generated/res-icons/res-I-3/a_arrow.webp",
+      "box": [
+        1865,
+        1413,
+        2297,
+        1845
+      ],
+      "px": 432,
+      "key_left": 0.0
+    }
+  ]
+}

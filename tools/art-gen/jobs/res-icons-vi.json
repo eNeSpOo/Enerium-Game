@@ -1,0 +1,654 @@
+{
+  "name": "Иконки ресурсов сеткой — цикл VI. Слово автора: «Иконки по ресурсам начинай генерировать только тогда, когда придёт с отчётом Этрион». Собирает tools/art-gen/res_jobs.py из design/ui/recipes.js — руками не править",
+  "plan": {
+    "Язык иконки": "один предмет в покое на тёмном камне, три четверти сверху, узнаваемая форма читается на 32 px; вид предмета различает рамка интерфейса (CR_KIND и CR_FAM, screens/crafthall.js), редкость — свет в окне рамки",
+    "Палитра": "цвет карста цикла, свет снизу — его же: The palette of this sheet: violet light (#A986EE), black iron and cold frozen fire. The light from below is a cold violet glow.",
+    "Листы": "листы Этриона (поле sheet) переупакованы внутри цикла по 20 клеток, остаток — малым листом; предметы с img и герои не рисуются"
+  },
+  "notes": [
+    "cells — [id предмета EN_RECIPES.items, имя файла]; spare — пустая клетка малого листа, не выгружается; hidden — «ресурс скрыт»",
+    "Проба 30.09.2026 — res-P-1 и res-I-1 — нарисована с предметом на две трети клетки: в рамке вида окно — 72 % колодца, предмет выходил мелким на 32 px. С остальных листов предмет — на три четверти клетки",
+    "Фраза облика — поле art Этриона; письмо, руны и цифры переписаны в неразборчивые штрихи (FIX в res_jobs.py)",
+    "Слабые клетки — надписи, пентаграмма, «летающая тарелка», светлый фон — перерисованы листами res-fix-* (jobs/res-icons-fix.json): их клетка заменяет клетку этого листа"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "res-icons": {
+      "aspect": "5:4",
+      "size": "2K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square item icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the item in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game lays its own frame over the edges of the cell, so everything important stays in the middle. Every cell shows exactly one item — a raw material, a trophy, a crafted piece or a relic — lying or standing still on dark near-black stone with faint cracks and a darker vignette toward the edges of the cell: one clear central object, large, filling about three quarters of the cell, in a clear three-quarter view from slightly above, with a bold recognisable silhouette that reads at 32 px. When a cell names several things, the first one is the main object — large and centred — and the others are small details beside it. Light rises from below in the colour of this sheet's palette, a soft glow from cracks in the stone — never a spotlight; crisp rim light on the edges of the object; a few dust motes in the light. Painted exactly like the ability icons of this game: loose, confident painterly brush strokes, soft painted edges and deep shadows — no black outlines, no flat sticker look, no scenery, no hands or people unless the cell names them. Writing is never drawn: wherever a cell mentions script, notes, pages, maps, tallies, tags or marks, they are faint unreadable smudges and straight ruled lines; clock faces and dials are plain, with simple notches and no numerals. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each differs clearly from its neighbours."
+    }
+  },
+  "jobs": [
+    {
+      "id": "res-VI-1",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл VI — лист 1: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона VI-01, VI-02",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "k11_hunt",
+          "k11_hunt"
+        ],
+        [
+          "k11_tail",
+          "k11_tail"
+        ],
+        [
+          "k11_eng",
+          "k11_eng"
+        ],
+        [
+          "k11_alch",
+          "k11_alch"
+        ],
+        [
+          "k11_ench",
+          "k11_ench"
+        ],
+        [
+          "k11_smith",
+          "k11_smith"
+        ],
+        [
+          "rc_b11",
+          "rc_b11"
+        ],
+        [
+          "mc_b11",
+          "mc_b11"
+        ],
+        [
+          "mt_b11",
+          "mt_b11"
+        ],
+        [
+          "k12_hunt",
+          "k12_hunt"
+        ],
+        [
+          "k12_tail",
+          "k12_tail"
+        ],
+        [
+          "k12_eng",
+          "k12_eng"
+        ],
+        [
+          "k12_alch",
+          "k12_alch"
+        ],
+        [
+          "k12_ench",
+          "k12_ench"
+        ],
+        [
+          "k12_smith",
+          "k12_smith"
+        ],
+        [
+          "u12",
+          "u12"
+        ],
+        [
+          "rc_b12",
+          "rc_b12"
+        ],
+        [
+          "mc_b12",
+          "mc_b12"
+        ],
+        [
+          "mt_b12",
+          "mt_b12"
+        ],
+        [
+          "rn6_1",
+          "rn6_1"
+        ]
+      ],
+      "subject": "The palette of this sheet: violet light (#A986EE), black iron and cold frozen fire. The light from below is a cold violet glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A twisted, asymmetrical horn with violet veins; A faded grey hooded travelling robe, stiff as if frozen; A huge curved fragment of a casting mould, dark and heavy; A crust of iridescent residue scraped from a crucible; A mage glove with a cracked green gem, fingers twisted.\n\nRow 2: A section of a thick bronze pouring channel; A violet flower blooming inside a glowing crucible of molten alloy; An empty enormous mould lit by undying candles, a violet flower in a crucible before it; A sphere half bright white light and half deep shadow; A large iridescent scale unlike any known creature.\n\nRow 3: A piece of cloth frozen mid-ripple in the air; A massive ancient bronze door bolt covered in faint scratches; A shard of translucent green ice that does not melt; A small heap of violet crystal grains with a dark shimmer; A glowing lump of metal that never cools, violet-white.\n\nRow 4: A pale smooth face mask of an otherworldly being, eyes closed; A pale mask fixed to a massive ancient door bolt; An open ancient gate bolt with a mask, a violet crystal and a small model of a ground-level city; A large scale shimmering with impossible colours; A small flat stone of violet crystal with one carved notch glowing along its edge."
+    },
+    {
+      "id": "res-VI-2",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл VI — лист 2: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона VI-02",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "rn6_2",
+          "rn6_2"
+        ],
+        [
+          "rn6_3",
+          "rn6_3"
+        ],
+        [
+          "rn6_4",
+          "rn6_4"
+        ],
+        [
+          "rn6_5",
+          "rn6_5"
+        ],
+        [
+          "vs6",
+          "vs6"
+        ],
+        [
+          "vr6",
+          "vr6"
+        ],
+        [
+          "necro",
+          "necro"
+        ],
+        [
+          "p_greenice",
+          "p_greenice"
+        ],
+        [
+          "p_violetice",
+          "p_violetice"
+        ],
+        [
+          "p_emptyglove",
+          "p_emptyglove"
+        ],
+        [
+          "p_violetkindle",
+          "p_violetkindle"
+        ],
+        [
+          "p_candle",
+          "p_candle"
+        ],
+        [
+          "a_vigil",
+          "a_vigil"
+        ],
+        [
+          "a_violetlamp",
+          "a_violetlamp"
+        ],
+        [
+          "a_teacherkit",
+          "a_teacherkit"
+        ],
+        [
+          "a_c16camp",
+          "a_c16camp"
+        ],
+        [
+          "a_c19niche",
+          "a_c19niche"
+        ],
+        [
+          "p_moldpiece",
+          "p_moldpiece"
+        ],
+        [
+          "p_bolt",
+          "p_bolt"
+        ],
+        [
+          "a_mold",
+          "a_mold"
+        ]
+      ],
+      "subject": "The palette of this sheet: violet light (#A986EE), black iron and cold frozen fire. The light from below is a cold violet glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A small flat stone of violet crystal with two carved notches glowing along its edge; A small flat stone of violet crystal with three carved notches glowing along its edge; A small flat stone of violet crystal with four carved notches glowing along its edge; A small flat stone of violet crystal with five carved notches glowing along its edge; A jagged shard of violet crystal with a tiny star-shaped glint at its heart.\n\nRow 2: A round stone disc of violet stone with one solid, filled five-pointed star carved deep and glowing — a solid star, never an outline; A dark violet crystal pulsing with a slow deep light; A glass vial holding a chunk of green ice that does not melt; A chunk of green ice with a violet droplet frozen inside; A twisted mage glove with an empty cracked socket.\n\nRow 3: A bundle of charcoal studded with violet crystals, burning cold; A tall candle burning inside a sheath of green ice; Two ice-encased candles beside a mage glove; A heavy bronze lamp housing a cold violet flame behind a bolt; An empty mage glove beside a vial of green ice.\n\nRow 4: Two ice-encased candles mounted on bronze tent pegs; Cold violet dwarven lamps set on a niche stone with pale dust; A smoothed curved fragment of a huge mould; A massive bronze door bolt knocked out of its brackets; A giant empty casting mould shaped like a tall standing figure glowing faintly inside."
+    },
+    {
+      "id": "res-VI-3",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл VI — лист 3: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона VI-02, VI-03, VI-04",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "a_laststation",
+          "a_laststation"
+        ],
+        [
+          "a_c6goods",
+          "a_c6goods"
+        ],
+        [
+          "p_pilgrim",
+          "p_pilgrim"
+        ],
+        [
+          "p_stillcloth",
+          "p_stillcloth"
+        ],
+        [
+          "a_pilgrimkit",
+          "a_pilgrimkit"
+        ],
+        [
+          "a_shellward",
+          "a_shellward"
+        ],
+        [
+          "a_c19notes",
+          "a_c19notes"
+        ],
+        [
+          "p_twisthorn",
+          "p_twisthorn"
+        ],
+        [
+          "p_draftscale",
+          "p_draftscale"
+        ],
+        [
+          "a_deepkit",
+          "a_deepkit"
+        ],
+        [
+          "p_crucible",
+          "p_crucible"
+        ],
+        [
+          "p_sprue",
+          "p_sprue"
+        ],
+        [
+          "p_hotalloy",
+          "p_hotalloy"
+        ],
+        [
+          "lu_cb7",
+          "lu_cb7"
+        ],
+        [
+          "lu_cb16",
+          "lu_cb16"
+        ],
+        [
+          "lu_cb19",
+          "lu_cb19"
+        ],
+        [
+          "lu_ci6",
+          "lu_ci6"
+        ],
+        [
+          "ec_b11",
+          "ec_b11"
+        ],
+        [
+          "ec_b12",
+          "ec_b12"
+        ],
+        [
+          "act_cb7",
+          "act_cb7"
+        ]
+      ],
+      "subject": "The palette of this sheet: violet light (#A986EE), black iron and cold frozen fire. The light from below is a cold violet glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A small stone road station with a four-way signpost at its door and light glowing from beneath; A crossroads stone with dog fur and a folded tent canvas; A grey hooded robe with a knotted cord belt; A piece of cloth frozen mid-ripple on a canvas backing; A grey pilgrim robe folded with a straightened horn.\n\nRow 2: A frozen rippling cloth stretched over a curved mould fragment; A slate board with student notes and a shattered hourglass; A straightened horn with faint violet veins; A plate of iridescent scales on hide with grey fur lining; An iridescent scale plate strapped to a glowing ingot.\n\nRow 3: A crucible of glowing molten alloy; A broken-off bronze pouring channel section; A glowing violet-white ingot; A shard of green crystalline crust pierced by a curved cultist blade; A small workbench with a blacksmith tool still clenched in place and a single metal ingot.\n\nRow 4: A fused glowing glove resting on student notebooks next to a belt pocket watch; A lump of raw grey clay with a twisted claw and a violet crystal chip embedded in it; Twisted horns and folded violet pilgrim robes around a pair of candles, one bright and one dark; Heavy iron door bolts frozen inside blocks of glowing green ice; A grey robed pilgrim token tied with a candle and a twisted horn."
+    },
+    {
+      "id": "res-VI-4",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл VI — лист 4: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона VI-04, VI-05",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "cr_crust",
+          "cr_crust"
+        ],
+        [
+          "cr_campash",
+          "cr_campash"
+        ],
+        [
+          "cr_tentpeg",
+          "cr_tentpeg"
+        ],
+        [
+          "cr_sentrybell",
+          "cr_sentrybell"
+        ],
+        [
+          "cr_pilgrimshoe",
+          "cr_pilgrimshoe"
+        ],
+        [
+          "cr_frostwolf",
+          "cr_frostwolf"
+        ],
+        [
+          "cr_icecandle",
+          "cr_icecandle"
+        ],
+        [
+          "cr_cultblade",
+          "cr_cultblade"
+        ],
+        [
+          "cr_prayercord",
+          "cr_prayercord"
+        ],
+        [
+          "find_cb7",
+          "find_cb7"
+        ],
+        [
+          "find_cb7b",
+          "find_cb7b"
+        ],
+        [
+          "call_fb7",
+          "call_fb7"
+        ],
+        [
+          "tr_fb7",
+          "tr_fb7"
+        ],
+        [
+          "tr_fb7a",
+          "tr_fb7a"
+        ],
+        [
+          "call_fb7_aw",
+          "call_fb7_aw"
+        ],
+        [
+          "act_cb16",
+          "act_cb16"
+        ],
+        [
+          "cr_nichestone",
+          "cr_nichestone"
+        ],
+        [
+          "cr_violetvein",
+          "cr_violetvein"
+        ],
+        [
+          "cr_deadtool",
+          "cr_deadtool"
+        ],
+        [
+          "cr_gravecloth",
+          "cr_gravecloth"
+        ]
+      ],
+      "subject": "The palette of this sheet: violet light (#A986EE), black iron and cold frozen fire. The light from below is a cold violet glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A shard of thick green crystalline crust; A handful of ash frozen in mid-drift, faintly warm; A bronze tent peg driven into stone; A bronze bell frozen mid-swing; A worn leather boot with a hole in the sole.\n\nRow 2: A tuft of grey dog fur frozen stiff; A candle encased in green ice, its flame still burning; A short curved blade with violet stains; A long knotted cord with many small beads; A jagged violet crystal emitting dark smoke.\n\nRow 3: A crumpled sermon leaflet with an ink circle broken in one place; A clay face mould from the first workshop beside a pale mask and green crust shards; A shard of light glowing from below, warm white-violet; A pale mask slightly too large, eyes open; A giant empty mould with many faces flickering on its inner surface.\n\nRow 4: A torch burning with violet flame between two ice-encased candles on bronze pegs; A stone block with a hollow shaped like a standing figure; A slab of rock with a glowing violet vein; A worn dwarven hammer gripped by stiff fingers; A decayed dwarven work coat."
+    },
+    {
+      "id": "res-VI-5",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл VI — лист 5: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона VI-05, VI-06",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "cr_bonedust",
+          "cr_bonedust"
+        ],
+        [
+          "cr_twistedrat",
+          "cr_twistedrat"
+        ],
+        [
+          "cr_workbench",
+          "cr_workbench"
+        ],
+        [
+          "cr_deadlamp",
+          "cr_deadlamp"
+        ],
+        [
+          "cr_lastingot",
+          "cr_lastingot"
+        ],
+        [
+          "find_cb16",
+          "find_cb16"
+        ],
+        [
+          "find_cb16b",
+          "find_cb16b"
+        ],
+        [
+          "call_fb16",
+          "call_fb16"
+        ],
+        [
+          "tr_fb16",
+          "tr_fb16"
+        ],
+        [
+          "tr_fb16a",
+          "tr_fb16a"
+        ],
+        [
+          "call_fb16_aw",
+          "call_fb16_aw"
+        ],
+        [
+          "act_cb19",
+          "act_cb19"
+        ],
+        [
+          "cr_greenglove",
+          "cr_greenglove"
+        ],
+        [
+          "cr_slate",
+          "cr_slate"
+        ],
+        [
+          "cr_shellsplinter",
+          "cr_shellsplinter"
+        ],
+        [
+          "cr_violetdrip",
+          "cr_violetdrip"
+        ],
+        [
+          "cr_studentnotes",
+          "cr_studentnotes"
+        ],
+        [
+          "cr_beltglass",
+          "cr_beltglass"
+        ],
+        [
+          "cr_brokenglass",
+          "cr_brokenglass"
+        ],
+        [
+          "cr_softring",
+          "cr_softring"
+        ]
+      ],
+      "subject": "The palette of this sheet: violet light (#A986EE), black iron and cold frozen fire. The light from below is a cold violet glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A small pile of pale grey dust; A small twisted rat with three eyes and violet veins; A dwarven workbench with half-finished tools on it; An old dwarven lamp burning with a cold violet flame; A dark metal ingot clutched in skeletal fingers.\n\nRow 2: A copper name tag with a guild mark; A tarnished copper steam whistle with violet frost; A copper name tag, a gripped hammer and an ingot before an empty stone niche, a violet flower beside; A small chisel that seems to twitch on its own; A pristine leather apron, cold to the touch.\n\nRow 3: A row of dwarven workbenches lit by cold violet lamps, many faces in the shadows; A small pouch of green crystals beside a frozen cloth ward and a violet-lit lamp; A mage glove fused with a withered hand, its back gem darkened; A dark slate board with chalk marks, the last ones in a different hand; A splinter of cold translucent violet-black material.\n\nRow 4: A single violet droplet in a small glass bead; A small stack of notes with faint ruled lines on every page; A cord belt with a tiny hourglass attached; A shattered hourglass whose sand stays in place; A deformed soft metal ring."
+    },
+    {
+      "id": "res-VI-6",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл VI — лист 6: 20 иконок сеткой 5×4",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона VI-06, VI-07",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "cr_ashbone",
+          "cr_ashbone"
+        ],
+        [
+          "find_cb19",
+          "find_cb19"
+        ],
+        [
+          "find_cb19b",
+          "find_cb19b"
+        ],
+        [
+          "call_fb19",
+          "call_fb19"
+        ],
+        [
+          "tr_fb19",
+          "tr_fb19"
+        ],
+        [
+          "tr_fb19a",
+          "tr_fb19a"
+        ],
+        [
+          "call_fb19_aw",
+          "call_fb19_aw"
+        ],
+        [
+          "act_ci6",
+          "act_ci6"
+        ],
+        [
+          "cr_ci6_crossstone",
+          "cr_ci6_crossstone"
+        ],
+        [
+          "cr_ci6_post",
+          "cr_ci6_post"
+        ],
+        [
+          "cr_ci6_spear",
+          "cr_ci6_spear"
+        ],
+        [
+          "cr_ci6_wallshield",
+          "cr_ci6_wallshield"
+        ],
+        [
+          "cr_ci6_banners",
+          "cr_ci6_banners"
+        ],
+        [
+          "cr_ci6_tent",
+          "cr_ci6_tent"
+        ],
+        [
+          "cr_ci6_firstchip",
+          "cr_ci6_firstchip"
+        ],
+        [
+          "cr_ci6_towerstone",
+          "cr_ci6_towerstone"
+        ],
+        [
+          "cr_ci6_well",
+          "cr_ci6_well"
+        ],
+        [
+          "cr_ci6_draftclay",
+          "cr_ci6_draftclay"
+        ],
+        [
+          "cr_ci6_hound",
+          "cr_ci6_hound"
+        ],
+        [
+          "cr_ci6_twisted",
+          "cr_ci6_twisted"
+        ]
+      ],
+      "subject": "The palette of this sheet: violet light (#A986EE), black iron and cold frozen fire. The light from below is a cold violet glow.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: A grey ash-coated animal bone; A single page of faint ruled lines that seems to shift; An empty small leather pouch with a green-stained seam; A lesson page with two fused gloves and student notes on a desk, a violet flower beside; A withered hand fused with a dark green crystal in a glove.\n\nRow 2: A notebook of lesson plans with empty student name lines; A classroom of violet shadows with shattered hourglasses and many faces as students; A palm-sized model of a walled city at a crossroads of four roads, a black tower in its centre; A worn square stone with four grooves meeting at its centre; A tall wooden signpost with four arrows pointing outward.\n\nRow 3: A spear with a pale elven shaft and a heavy dwarven iron head; A large tower shield with painted stripes of many colours; Four small banners of different colours on one pole; A folded piece of fine tent canvas with a woven border; A small violet crystalline chip with a dark core.\n\nRow 4: A smooth black stone with no reflection; A small clay jug of cool well water; A lump of warm grey clay with a faint pulse; A tuft of thick dark dog fur; A crooked claw with violet veins, unfinished-looking."
+    },
+    {
+      "id": "res-VI-7",
+      "category": "res-icons",
+      "title": "Ресурсы, цикл VI — лист 7: 8 иконок сеткой 3×3",
+      "source": "design/ui/recipes.js (EN_RECIPES.items: поле art), листы Этриона VI-07",
+      "aspect": "1:1",
+      "size": "1K",
+      "grid": [
+        3,
+        3
+      ],
+      "cells": [
+        [
+          "find_ci6",
+          "find_ci6"
+        ],
+        [
+          "find_ci6b",
+          "find_ci6b"
+        ],
+        [
+          "call_fc6",
+          "call_fc6"
+        ],
+        [
+          "tr_fc6",
+          "tr_fc6"
+        ],
+        [
+          "tr_fc6a",
+          "tr_fc6a"
+        ],
+        [
+          "call_fc6_aw",
+          "call_fc6_aw"
+        ],
+        [
+          "chest_tal6",
+          "chest_tal6"
+        ],
+        [
+          "chest_eq6",
+          "chest_eq6"
+        ],
+        [
+          "spare-0",
+          "spare-0"
+        ]
+      ],
+      "subject": "The palette of this sheet: violet light (#A986EE), black iron and cold frozen fire. The light from below is a cold violet glow.\n\nThe grid: exactly 3 columns and 3 rows, 9 icons.\n\nRow 1: A small bronze watch badge with four arrows; A stone slab with the imprint of a huge mechanical foot; A clay face mould beside lumps of warm grey clay and crooked claws, a watch badge on top.\n\nRow 2: A lump of warm pulsing clay in a stone bowl; A blank smooth clay face with no features; Lumps of warm clay forming many faces around a violet chip.\n\nRow 3: A black lacquered casket with violet-glowing seams and a primal-rarity gem; A heavy iron casket with violet-glowing seams and a primal-rarity gem lock; an empty dark stone surface with a few dust motes."
+    }
+  ]
+}
