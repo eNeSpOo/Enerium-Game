@@ -1,0 +1,222 @@
+{
+  "name": "Иконки способностей сеткой — набор «Вода» (слово автора 30.09.2026): «Мне нравятся стиль и сами иконки делай всю библиотеку всех скилов». Образец — spell-icons-fire.json: style, negative и категория spell-icons — без правок",
+  "plan": {
+    "Лист активок spell-water-active": "3:2, 4K, сетка 6×4 — 24 активки набора; строка — два вида по три ступени: на всех, на 2–3, на одного",
+    "Лист ульт spell-water-ult": "1:1, 2K, сетка 4×4 — 8 ульт, 4 боевые пассивки, 4 реакции",
+    "Нарезка": "python tools/art-gen/grid_slice.py jobs/spell-icons-water.json <id задания> <лист>"
+  },
+  "notes": [
+    "Палитра — цвет карста школы (art/style/style.md, «Палитра»), эффекты — поле eff набора в library.json",
+    "Язык иконки и уроки пробы — art/style/style.md, «Иконки способностей сеткой»: у каждой клетки один центральный предмет",
+    "cells — [id способности из tools/content-gen/abilities/library.json, имя файла] по строкам сверху, в строке слева направо; grid — [столбцы, строки]"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "spell-icons": {
+      "aspect": "1:1",
+      "size": "2K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square ability icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the picture in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game puts its own frame on top: one clear central image with a bold silhouette that stays readable at 48 px, on a dark near-black stone background with faint cracks and a darker vignette toward the edges of the cell. Light rises from below in the color of the magic school; crisp rim light on the edges of the forms; a few sparks and dust motes in the light. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each icon differs clearly from its neighbours in shape and composition."
+    }
+  },
+  "jobs": [
+    {
+      "id": "spell-water-active",
+      "category": "spell-icons",
+      "title": "Вода — 24 активки сеткой 6×4",
+      "source": "tools/content-gen/abilities/library.json, набор «Вода», active; docs/content/библиотека-способностей.md",
+      "aspect": "3:2",
+      "size": "4K",
+      "grid": [
+        6,
+        4
+      ],
+      "cells": [
+        [
+          "Вода.dmg.all",
+          "water-dmg-all"
+        ],
+        [
+          "Вода.dmg.grp",
+          "water-dmg-grp"
+        ],
+        [
+          "Вода.dmg.one",
+          "water-dmg-one"
+        ],
+        [
+          "Вода.heal.all",
+          "water-heal-all"
+        ],
+        [
+          "Вода.heal.grp",
+          "water-heal-grp"
+        ],
+        [
+          "Вода.heal.one",
+          "water-heal-one"
+        ],
+        [
+          "Вода.shield.all",
+          "water-shield-all"
+        ],
+        [
+          "Вода.shield.grp",
+          "water-shield-grp"
+        ],
+        [
+          "Вода.shield.one",
+          "water-shield-one"
+        ],
+        [
+          "Вода.dot.all",
+          "water-dot-all"
+        ],
+        [
+          "Вода.dot.grp",
+          "water-dot-grp"
+        ],
+        [
+          "Вода.dot.one",
+          "water-dot-one"
+        ],
+        [
+          "Вода.hot.all",
+          "water-hot-all"
+        ],
+        [
+          "Вода.hot.grp",
+          "water-hot-grp"
+        ],
+        [
+          "Вода.hot.one",
+          "water-hot-one"
+        ],
+        [
+          "Вода.ctrl.all",
+          "water-ctrl-all"
+        ],
+        [
+          "Вода.ctrl.grp",
+          "water-ctrl-grp"
+        ],
+        [
+          "Вода.ctrl.one",
+          "water-ctrl-one"
+        ],
+        [
+          "Вода.debuff.all",
+          "water-debuff-all"
+        ],
+        [
+          "Вода.debuff.grp",
+          "water-debuff-grp"
+        ],
+        [
+          "Вода.debuff.one",
+          "water-debuff-one"
+        ],
+        [
+          "Вода.buff.all",
+          "water-buff-all"
+        ],
+        [
+          "Вода.buff.grp",
+          "water-buff-grp"
+        ],
+        [
+          "Вода.buff.one",
+          "water-buff-one"
+        ]
+      ],
+      "subject": "The magic school of this sheet is Water: deep blue water and Paladium-blue light (#5A94F7), white foam, pale blue ice and frost, cold white mist; the light from below is blue. Attacking spells are cold, sharp and crushing — jagged ice and heavy water. Supporting spells — healing, springs, shields and living water for allies — glow a softer warm gold mixed with clear blue water, with rounded, calm shapes. A spell for all targets shows something wide that fills its cell; a spell for two or three targets shows two or three of its thing; a spell for one target shows one focused object. Attacks move to the right, toward the enemies. Every icon, even the widest, is built around one clear central object with a bold silhouette — never only smoke, dust, snow, fog or a scattered pattern.\n\nThe grid: exactly 6 columns and 4 rows, 24 icons.\n\nRow 1: a dark storm cloud across the top of the cell raining sharp icicles down and to the right over the whole width; three spears of solid water shooting to the right, spraying white foam; one deep whirlpool of dark blue water spiralling down into a single point, seen from slightly above; an old stone sluice gate opening, a wide sheet of clear water full of warm golden light pouring out and spreading across the ground; three gentle rounded waves of clear water with warm golden light rolling onto a dark shore; one small clay cup brimming with glowing clear water, warm golden light rising from it.\n\nRow 2: a huge dome of clear blue ice over the dark ground, frost patterns on its surface, a warm golden rim; three tall slabs of clear blue ice standing side by side like shields; one breastplate made of clear blue ice, frost patterns on it, a warm golden rim; one big snowflake of ice with feathery branches in the center, a cold white fog spreading from it across the whole cell to the right; three dark maple leaves covered in thick spiky white hoarfrost; one bare hand, its fingers turning blue-white from frostbite, ice crystals growing on the skin.\n\nRow 3: a long row of icicles hanging from a stone eave and melting, drops of glowing water falling in soft golden light across the whole width; three small springs bubbling up between stones, each with a soft golden glow; one clear spring welling up between dark stones, warm golden light in its water; a great waterfall frozen solid into blue ice from top to bottom, filling the whole cell; two hands of blue ice rising from the frozen ground, each gripping tightly; one pair of heavy shackles made of blue ice, locked shut, frosty vapour rising.\n\nRow 4: a big iron-bound cartwheel stuck fast in thick ice, a blizzard sweeping to the right across the whole cell; two iron boots frozen to the ground in lumps of blue ice; one iron-shod boot frozen to the ground in a thick lump of blue ice, frost climbing up the leg; a great white water lily blooming on a wide calm pool, warm golden light rising from its heart; two clay jugs pouring streams of glowing clear water; one stoppered glass flask filled with glowing blue water, warm golden light shining through it."
+    },
+    {
+      "id": "spell-water-ult",
+      "category": "spell-icons",
+      "title": "Вода — 8 ульт, 4 пассивки, 4 реакции сеткой 4×4",
+      "source": "tools/content-gen/abilities/library.json, набор «Вода», ult, passive, reaction; docs/content/библиотека-способностей.md",
+      "aspect": "1:1",
+      "size": "2K",
+      "grid": [
+        4,
+        4
+      ],
+      "cells": [
+        [
+          "Вода.ult.dmg",
+          "water-ult-dmg"
+        ],
+        [
+          "Вода.ult.heal",
+          "water-ult-heal"
+        ],
+        [
+          "Вода.ult.shield",
+          "water-ult-shield"
+        ],
+        [
+          "Вода.ult.dot",
+          "water-ult-dot"
+        ],
+        [
+          "Вода.ult.hot",
+          "water-ult-hot"
+        ],
+        [
+          "Вода.ult.ctrl",
+          "water-ult-ctrl"
+        ],
+        [
+          "Вода.ult.debuff",
+          "water-ult-debuff"
+        ],
+        [
+          "Вода.ult.buff",
+          "water-ult-buff"
+        ],
+        [
+          "Вода.pas.1",
+          "water-pas-1"
+        ],
+        [
+          "Вода.pas.2",
+          "water-pas-2"
+        ],
+        [
+          "Вода.pas.3",
+          "water-pas-3"
+        ],
+        [
+          "Вода.pas.4",
+          "water-pas-4"
+        ],
+        [
+          "Вода.react.1",
+          "water-react-1"
+        ],
+        [
+          "Вода.react.2",
+          "water-react-2"
+        ],
+        [
+          "Вода.react.3",
+          "water-react-3"
+        ],
+        [
+          "Вода.react.4",
+          "water-react-4"
+        ]
+      ],
+      "subject": "The magic school of this sheet is Water: deep blue water and Paladium-blue light (#5A94F7), white foam, pale blue ice and frost, cold white mist; the light from below is blue. Attacking spells are cold, sharp and crushing — jagged ice and heavy water. Supporting spells — healing, springs, shields and living water for allies — glow a softer warm gold mixed with clear blue water, with rounded, calm shapes. Every icon, even the widest, is built around one clear central object with a bold silhouette — never only smoke, dust, snow, fog or a scattered pattern.\n\nThe grid: exactly 4 columns and 4 rows, 16 icons. Rows 1 and 2 are ultimate spells — the grandest, most epic images of the set, bigger in scale, with bright gold highlights in the blue light. Row 3 are passive traits — calm, emblem-like single objects, no action. Row 4 are reactions — an instant answer to an event in battle, shown as one moment of action.\n\nRow 1: a colossal tidal wave towering over a dark shore and rolling to the right, its foaming crest lit with gold; a great river of warm golden water pouring from a break in the clouds into a wide lake; a massive glacier wall of blue ice with bright golden light glowing inside it, towering over the ground; a whole frozen land, its dark ground split by ice, jagged ice spires erupting everywhere across the whole cell.\n\nRow 2: a great mountain of ice melting in warm golden light, streams of glowing water running down its sides; a gigantic jagged crystal of blue ice bursting up from the center, a shockwave of frost freezing everything around it; the head of a gigantic winter wolf made of swirling snow and ice, breathing a freezing blizzard to the right; a great stone font filled with glowing living water, a column of bright golden light rising from it.\n\nRow 3: one large clear drop of water, perfectly pure, a warm golden highlight in it; one smooth river stone with clear water flowing around it in two calm currents; one dagger made of blue ice, frost along its edge; one deep old stone well, a wooden bucket of glowing water resting on its rim.\n\nRow 4: a spring of glowing water bursting up from cracked stone beneath a fallen shield; a rush of clear water washing a dark stain off a steel breastplate; an empty cup being refilled to overflowing by a surge of glowing water; a warrior instantly encased in a solid block of blue ice as a killing blade strikes it and shatters."
+    }
+  ]
+}

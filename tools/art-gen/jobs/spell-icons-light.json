@@ -1,0 +1,222 @@
+{
+  "name": "Иконки способностей сеткой — набор «Свет» (слово автора 30.09.2026): «Мне нравятся стиль и сами иконки делай всю библиотеку всех скилов». Образец — spell-icons-fire.json: style, negative и категория spell-icons — без правок",
+  "plan": {
+    "Лист активок spell-light-active": "3:2, 4K, сетка 6×4 — 24 активки набора; строка — два вида по три ступени: на всех, на 2–3, на одного",
+    "Лист ульт spell-light-ult": "1:1, 2K, сетка 4×4 — 8 ульт, 4 боевые пассивки, 4 реакции",
+    "Нарезка": "python tools/art-gen/grid_slice.py jobs/spell-icons-light.json <id задания> <лист>"
+  },
+  "notes": [
+    "Палитра — цвет карста школы (art/style/style.md, «Палитра»), эффекты — поле eff набора в library.json",
+    "Язык иконки и уроки пробы — art/style/style.md, «Иконки способностей сеткой»: у каждой клетки один центральный предмет",
+    "cells — [id способности из tools/content-gen/abilities/library.json, имя файла] по строкам сверху, в строке слева направо; grid — [столбцы, строки]"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "spell-icons": {
+      "aspect": "1:1",
+      "size": "2K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square ability icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the picture in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game puts its own frame on top: one clear central image with a bold silhouette that stays readable at 48 px, on a dark near-black stone background with faint cracks and a darker vignette toward the edges of the cell. Light rises from below in the color of the magic school; crisp rim light on the edges of the forms; a few sparks and dust motes in the light. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each icon differs clearly from its neighbours in shape and composition."
+    }
+  },
+  "jobs": [
+    {
+      "id": "spell-light-active",
+      "category": "spell-icons",
+      "title": "Свет — 24 активки сеткой 6×4",
+      "source": "tools/content-gen/abilities/library.json, набор «Свет», active; docs/content/библиотека-способностей.md",
+      "aspect": "3:2",
+      "size": "4K",
+      "grid": [
+        6,
+        4
+      ],
+      "cells": [
+        [
+          "Свет.dmg.all",
+          "light-dmg-all"
+        ],
+        [
+          "Свет.dmg.grp",
+          "light-dmg-grp"
+        ],
+        [
+          "Свет.dmg.one",
+          "light-dmg-one"
+        ],
+        [
+          "Свет.heal.all",
+          "light-heal-all"
+        ],
+        [
+          "Свет.heal.grp",
+          "light-heal-grp"
+        ],
+        [
+          "Свет.heal.one",
+          "light-heal-one"
+        ],
+        [
+          "Свет.shield.all",
+          "light-shield-all"
+        ],
+        [
+          "Свет.shield.grp",
+          "light-shield-grp"
+        ],
+        [
+          "Свет.shield.one",
+          "light-shield-one"
+        ],
+        [
+          "Свет.dot.all",
+          "light-dot-all"
+        ],
+        [
+          "Свет.dot.grp",
+          "light-dot-grp"
+        ],
+        [
+          "Свет.dot.one",
+          "light-dot-one"
+        ],
+        [
+          "Свет.hot.all",
+          "light-hot-all"
+        ],
+        [
+          "Свет.hot.grp",
+          "light-hot-grp"
+        ],
+        [
+          "Свет.hot.one",
+          "light-hot-one"
+        ],
+        [
+          "Свет.ctrl.all",
+          "light-ctrl-all"
+        ],
+        [
+          "Свет.ctrl.grp",
+          "light-ctrl-grp"
+        ],
+        [
+          "Свет.ctrl.one",
+          "light-ctrl-one"
+        ],
+        [
+          "Свет.debuff.all",
+          "light-debuff-all"
+        ],
+        [
+          "Свет.debuff.grp",
+          "light-debuff-grp"
+        ],
+        [
+          "Свет.debuff.one",
+          "light-debuff-one"
+        ],
+        [
+          "Свет.buff.all",
+          "light-buff-all"
+        ],
+        [
+          "Свет.buff.grp",
+          "light-buff-grp"
+        ],
+        [
+          "Свет.buff.one",
+          "light-buff-one"
+        ]
+      ],
+      "subject": "The magic school of this sheet is Light: pale gold and white light (#F4E6AE), bright white rays, warm cream-gold, polished silver and white stone; the light from below is pale gold and white. Attacking spells are harsh and blinding — hard white beams and sharp jagged rays. Supporting spells — healing, radiance, shields and consecration for allies — glow a softer warm gold with rounded, calm shapes and soft halos. A spell for all targets shows something wide that fills its cell; a spell for two or three targets shows two or three of its thing; a spell for one target shows one focused object. Attacks move to the right, toward the enemies. Every icon, even the widest, is built around one clear central object with a bold silhouette — never only smoke, dust, snow, fog or a scattered pattern.\n\nThe grid: exactly 6 columns and 4 rows, 24 icons.\n\nRow 1: a big faceted white crystal on the ground bursting with a blinding flash, harsh rays shooting across the whole cell to the right; three narrow spears of harsh white light flying to the right; one sword of pure white light striking down from above onto a single point; a wide warm beam of golden light falling through a tall arched window into a dark hall, spreading across the floor; three small golden oil lamps with soft warm flames; one narrow pillar of warm golden light falling from above onto a small round spot on the ground.\n\nRow 2: a huge dome of warm golden light over the dark ground, soft and calm; three round shields of golden light standing side by side; one ornate round shield of polished silver with a radiant golden sun on its boss; a harsh white sun blazing overhead, its searing rays scorching the ground below across the whole cell, the ground cracking and smoking; three pale white-gold flames burning on the dark ground; one harsh white ray striking a dark steel shoulder guard, the metal glowing and smoking where it hits.\n\nRow 3: a golden sunrise over dark hills, warm light spreading across the whole cell; three small stars of warm golden light rising into the dark; one radiant orb of warm golden light glowing softly inside a soft halo; a big iron lantern with its shutters open, blasting a wide blinding fan of white light to the right across the whole cell; two polished silver hand mirrors flashing blinding white glints; one raised gauntlet shielding against a blinding white starburst.\n\nRow 4: a whole row of five dark masks hanging on a stone wall, all cracked by a flood of white light; two dark masks split in half, harsh white light pouring through the cracks; one dark mask with bright white light shining through its eye holes and cracks; a pair of hands pressed together in prayer, warm golden light radiating widely across the whole cell; two white mantles glowing with soft golden light, floating side by side; one breastplate with a golden sun on its chest, glowing softly."
+    },
+    {
+      "id": "spell-light-ult",
+      "category": "spell-icons",
+      "title": "Свет — 8 ульт, 4 пассивки, 4 реакции сеткой 4×4",
+      "source": "tools/content-gen/abilities/library.json, набор «Свет», ult, passive, reaction; docs/content/библиотека-способностей.md",
+      "aspect": "1:1",
+      "size": "2K",
+      "grid": [
+        4,
+        4
+      ],
+      "cells": [
+        [
+          "Свет.ult.dmg",
+          "light-ult-dmg"
+        ],
+        [
+          "Свет.ult.heal",
+          "light-ult-heal"
+        ],
+        [
+          "Свет.ult.shield",
+          "light-ult-shield"
+        ],
+        [
+          "Свет.ult.dot",
+          "light-ult-dot"
+        ],
+        [
+          "Свет.ult.hot",
+          "light-ult-hot"
+        ],
+        [
+          "Свет.ult.ctrl",
+          "light-ult-ctrl"
+        ],
+        [
+          "Свет.ult.debuff",
+          "light-ult-debuff"
+        ],
+        [
+          "Свет.ult.buff",
+          "light-ult-buff"
+        ],
+        [
+          "Свет.pas.1",
+          "light-pas-1"
+        ],
+        [
+          "Свет.pas.2",
+          "light-pas-2"
+        ],
+        [
+          "Свет.pas.3",
+          "light-pas-3"
+        ],
+        [
+          "Свет.pas.4",
+          "light-pas-4"
+        ],
+        [
+          "Свет.react.1",
+          "light-react-1"
+        ],
+        [
+          "Свет.react.2",
+          "light-react-2"
+        ],
+        [
+          "Свет.react.3",
+          "light-react-3"
+        ],
+        [
+          "Свет.react.4",
+          "light-react-4"
+        ]
+      ],
+      "subject": "The magic school of this sheet is Light: pale gold and white light (#F4E6AE), bright white rays, warm cream-gold, polished silver and white stone; the light from below is pale gold and white. Attacking spells are harsh and blinding — hard white beams and sharp jagged rays. Supporting spells — healing, radiance, shields and consecration for allies — glow a softer warm gold with rounded, calm shapes and soft halos. Every icon, even the widest, is built around one clear central object with a bold silhouette — never only smoke, dust, snow, fog or a scattered pattern.\n\nThe grid: exactly 4 columns and 4 rows, 16 icons. Rows 1 and 2 are ultimate spells — the grandest, most epic images of the set, bigger in scale, with bright gold highlights in the white light. Row 3 are passive traits — calm, emblem-like single objects, no action. Row 4 are reactions — an instant answer to an event in battle, shown as one moment of action.\n\nRow 1: colossal pillars of white light crashing down from the sky across the whole cell, the ground shattering where they land; a great golden tree of light bursting into bloom from a dead stump; a colossal vault of the heavens — a huge arch of golden stars over the dark ground; a sea of tall white-gold flames engulfing the ground across the whole cell.\n\nRow 2: a vast break in dark clouds with countless golden rays pouring down onto the land; a gigantic blazing white sun at its highest point, so bright that everything below is washed out in white; a great bell of white gold ringing, waves of harsh white light cracking dark masks around it; a magnificent suit of white-gold plate armour standing empty like a monument, radiating golden light.\n\nRow 3: one golden halo floating in the dark, a soft ring of light; one perfectly clear crystal sphere on a small silver stand, pure light inside it; one white-gold spear standing upright, calm; one candle flame standing perfectly straight while a gust of wind bends around it.\n\nRow 4: a shield of golden light appearing in front of a warrior just as a heavy blow lands on it; a cup overflowing with golden light, the spilled light hardening into a glowing golden rim around it; a fallen warrior's sword stuck in the ground, a column of warm golden light rising from it and spreading; a raised polished silver shield flashing a blinding white glare back at a huge descending enemy blade."
+    }
+  ]
+}

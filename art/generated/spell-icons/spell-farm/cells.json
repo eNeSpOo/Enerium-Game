@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/spell-icons/spell-farm__nb2-v2.jpg",
+  "jobs": "tools/art-gen/jobs/spell-icons-farm.json",
+  "job": "spell-farm",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "фарм.act.1",
+      "file": "art/generated/spell-icons/spell-farm/farm-act-1.webp",
+      "box": [
+        15,
+        24,
+        442,
+        451
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "фарм.act.2",
+      "file": "art/generated/spell-icons/spell-farm/farm-act-2.webp",
+      "box": [
+        477,
+        24,
+        904,
+        451
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "фарм.act.3",
+      "file": "art/generated/spell-icons/spell-farm/farm-act-3.webp",
+      "box": [
+        938,
+        24,
+        1365,
+        451
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "фарм.act.4",
+      "file": "art/generated/spell-icons/spell-farm/farm-act-4.webp",
+      "box": [
+        1400,
+        24,
+        1827,
+        451
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "фарм.act.5",
+      "file": "art/generated/spell-icons/spell-farm/farm-act-5.webp",
+      "box": [
+        1862,
+        24,
+        2289,
+        451
+      ],
+      "px": 427,
+      "key_left": 0.0
+    },
+    {
+      "id": "фарм.act.6",
+      "file": "art/generated/spell-icons/spell-farm/farm-act-6.webp",
+      "box": [
+        14,
+        484,
+        442,
+        912
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "фарм.ult.1",
+      "file": "art/generated/spell-icons/spell-farm/farm-ult-1.webp",
+      "box": [
+        476,
+        484,
+        904,
+        912
+      ],
+      "px": 428,
+      "key_left": 0.00105
+    },
+    {
+      "id": "фарм.ult.2",
+      "file": "art/generated/spell-icons/spell-farm/farm-ult-2.webp",
+      "box": [
+        937,
+        484,
+        1365,
+        912
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "фарм.ult.3",
+      "file": "art/generated/spell-icons/spell-farm/farm-ult-3.webp",
+      "box": [
+        1399,
+        484,
+        1827,
+        912
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "фарм.ult.4",
+      "file": "art/generated/spell-icons/spell-farm/farm-ult-4.webp",
+      "box": [
+        1861,
+        484,
+        2289,
+        912
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "фарм.pas.1",
+      "file": "art/generated/spell-icons/spell-farm/farm-pas-1.webp",
+      "box": [
+        14,
+        944,
+        442,
+        1372
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "фарм.pas.2",
+      "file": "art/generated/spell-icons/spell-farm/farm-pas-2.webp",
+      "box": [
+        476,
+        944,
+        904,
+        1372
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "фарм.pas.3",
+      "file": "art/generated/spell-icons/spell-farm/farm-pas-3.webp",
+      "box": [
+        937,
+        944,
+        1365,
+        1372
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "фарм.pas.4",
+      "file": "art/generated/spell-icons/spell-farm/farm-pas-4.webp",
+      "box": [
+        1399,
+        944,
+        1827,
+        1372
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "фарм.pas.5",
+      "file": "art/generated/spell-icons/spell-farm/farm-pas-5.webp",
+      "box": [
+        1861,
+        944,
+        2289,
+        1372
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "фарм.pas.6",
+      "file": "art/generated/spell-icons/spell-farm/farm-pas-6.webp",
+      "box": [
+        14,
+        1404,
+        442,
+        1832
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "фарм.pas.7",
+      "file": "art/generated/spell-icons/spell-farm/farm-pas-7.webp",
+      "box": [
+        476,
+        1404,
+        904,
+        1832
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "фарм.pas.8",
+      "file": "art/generated/spell-icons/spell-farm/farm-pas-8.webp",
+      "box": [
+        937,
+        1404,
+        1365,
+        1832
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.ult.birds",
+      "file": "art/generated/spell-icons/spell-farm/air-ult-birds.webp",
+      "box": [
+        1399,
+        1404,
+        1827,
+        1832
+      ],
+      "px": 428,
+      "key_left": 0.0
+    },
+    {
+      "id": "hidden",
+      "file": "art/generated/spell-icons/spell-farm/ability-hidden.webp",
+      "box": [
+        1861,
+        1404,
+        2289,
+        1832
+      ],
+      "px": 428,
+      "key_left": 0.0
+    }
+  ]
+}

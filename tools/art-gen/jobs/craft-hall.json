@@ -1,0 +1,223 @@
+{
+  "name": "Ремесло — залы башни и вещи мастера (слово автора 30.09.2026: «Само Окно крафта так же сделай дорогим и богатым, как и в целом над всеми окнами в ремесле, чтобы они выглядили ааа уровня, сгенерируй для этого всё что надо будет»). Тема: знания о рецептах даёт Этрион из своей картотеки в башне, герои — книги на полках его библиотеки; Мастерская — место, где эти знания становятся вещью. Залы — фоны окон «Ремесла»: Мастерская, Запасы, Лавка, Рынок, Перековка. Вещи — стол-круг сверху, гнездо ячейки, пьедестал результата, горн перековки, помост сундука, гримуар рецептов, латунные уголки и табличка, печать Этриона для подсказки, бархатная подушка лавки, прилавок, навес рынка, рамки иконки предмета по виду, частицы, тёмный пергамент. Всё, что зависит от предмета (редкость, количество, имя), кладёт интерфейс: на арте нет ни текста, ни цифр.",
+  "plan": {
+    "Залы cr-hall-*": "21:9, 2K, без вырезки: фон окна; интерфейс закрывает середину — детали по краям и в глубине, середина спокойная и тёмная, низ уходит в тень",
+    "Стол, гнездо, пьедестал, горн cr-table, cr-socket, cr-core, cr-hearth": "1:1, 1K, ключ black / black-glow: строго сверху, круглые и по центру; тёмные окна вырезаются — свет и темноту внутри даёт интерфейс",
+    "Помост cr-dais": "16:9, 1K, ключ black-glow: низкий круглый помост в три четверти — под сундук в окне открытия",
+    "Гримуар cr-grim": "16:9, 1K, ключ magenta: раскрытая книга сверху, страницы — чернёный пергамент, пустые (текст — интерфейс); пурпурный ключ — потому что страницы почти чёрные",
+    "Уголок, печать, подушка cr-corner, cr-seal, cr-cushion": "1:1, 1K, ключ black: один предмет с полем вокруг; уголок выгружается в четырёх отражениях",
+    "Табличка, прилавок, навес cr-plate, cr-counter, cr-awning": "21:9, 1K, ключ black: табличка — концы с оковкой, середина ровная; прилавок и навес — полоса во всю ширину, повторяется по горизонтали (shelf_layers.py strip)",
+    "Рамки cr-frames": "3:2, 2K, ключ black: восемь квадратных рамок 4 × 2 — вид предмета материалом; нарезка — craft_layers.py sheet",
+    "Частицы cr-fx": "3:2, 1K, ключ black-glow: шесть частиц 3 × 2; нарезка — craft_layers.py sheet",
+    "Пергамент cr-vellum": "1:1, 1K, без вырезки: бесшовная текстура (shelf_layers.py tile)"
+  },
+  "notes": [
+    "Сначала --dry-run, потом запуск с --budget. Каждая картинка смотрится глазами, повторов — не больше двух",
+    "После генерации: python tools/art-gen/craft_layers.py <команда> <файлы> — нарезка листов, уголки, окна рамок, геометрия в ‰; полосы и текстура — shelf_layers.py strip / tile; выгрузка — ui-art.json → design/ui/assets/art/craft/ и export_ui.py --no-stamp; пути — в CR_ART.ready (design/ui/screens/crafthall.js)"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: dark fantasy game art for a premium mobile RPG — gloomy, ancient, rich and uneasy. Hand-painted digital painting: visible confident brush strokes, simplified planes, deep near-black shadows, crisp rim light on edges, rich material detail and masterful craftsmanship. Palette: soot black (#050607, #121518), graphite (#262B31), very dark old oak, blackened iron, aged bronze and old gold leaf that gleams softly, yellowed bone, deep teal velvet. Everything is heavy, worn by centuries of use, precious and made by a master: no cheap shine, no plastic, no clean saturated game-UI colors. Light is scarce and precious and comes from below: a cold turquoise glow of karst crystals (#48E5D4) from beneath, and a few warm amber highlights (#E6A84B). The world lies deep under the city of Endalor, in the tower of a keeper of knowledge: vast, cold, silent and dusty. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.",
+  "negative": "No words, no letters, no digits, no numbers, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no labels, no price tags, no handwriting, no watermark, no signature, no logo, no UI elements, no buttons, no border or frame around the whole picture. No skulls, no skeletons, no blood, no gore. No pentagrams, no occult signs, no crosses, no religious symbols, no eyes, no faces. No people, no hands, no creatures. No candles with dripping wax. No purple or violet light, no neon. No bright polished gold, no glossy plastic shine, no clean bright mobile-game UI look.",
+  "cutout_rule": "The background is one solid flat color {hex}, perfectly even from edge to edge: no gradient, no texture, no floor, no wall, no table under the object, no cast shadow, no vignette, no checkerboard. The object itself never uses this background color. Any glow stays close to the object and fades out within a short distance.",
+  "categories": {
+    "cr-hall": {
+      "aspect": "21:9",
+      "size": "2K",
+      "refs": [
+        "art/style/ref-01-cave-amber-teal.webp",
+        "art/style/ref-02-cave-pillars.webp"
+      ],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a wide cinematic panorama, 21:9, painted edge to edge over the whole frame — no black bars at the top or bottom, no letterbox, no dark border. It is the full-screen background of one window of the game's craft section; the interface lays heavy panels over most of it. So the composition is calm, symmetrical and deep: the viewer stands in the middle of a room and looks straight ahead into the depth, the vanishing point in the center at about 45% of the height. The richest detail lives along the upper edge, along the left and right edges and far away in the depth; the wide middle band, from 20% to 85% of the height, is darker, softer, hazier and low in contrast; the bottom fifth is a dark floor fading into shadow. No figures of any kind. The attached pictures show the painting style, the brushwork and the cold-and-warm light of the game — take only the style from them, not the place."
+    },
+    "cr-disc": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — ONE round object seen from directly above: a top-down, orthographic view, perfectly round, perfectly centered, no perspective, no tilt. It floats on pitch black: everything around it is solid pure black, and an empty black margin of at least one twentieth of the canvas stays on every side. Strong, simple, heavy shapes that still read at a small size; all the painterly detail stays inside the silhouette. A crisp rim light runs along the outer edge and separates it from the black."
+    },
+    "cr-part": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — one small object, centered, seen perfectly straight on and upright unless the description says otherwise. It floats on pitch black: everything around it is solid pure black, and an empty black margin of at least one tenth of the canvas stays on every side — top, bottom, left and right. It must stay readable at a tiny size, about 24 px: one simple strong silhouette built from a few large shapes, all the painterly detail inside the silhouette; no sparks, embers or particles floating around it. A crisp rim light runs along the outline and separates it from the black."
+    },
+    "cr-strip": {
+      "aspect": "21:9",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — ONE long, perfectly straight horizontal strip, seen straight on from the front, perfectly level, no perspective, no tilt, no bending. It lies in the middle of the canvas; above and below it the canvas is solid pure black. The description says how wide it is and how its ends look."
+    },
+    "cr-sheet": {
+      "aspect": "3:2",
+      "size": "2K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI sheet for a dark fantasy mobile RPG — several separate objects laid out in a strict grid, every object centered in its own equal cell, all seen perfectly straight on and frontal, no perspective. Between the objects and around them the canvas is solid pure black, with wide equal empty black gaps: no object touches another object or the edge of the canvas. Nothing connects the objects: no lines, no shared background, no shadows."
+    },
+    "cr-texture": {
+      "aspect": "1:1",
+      "size": "1K",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a flat seamless texture for a game UI, seen perfectly straight on, filling the whole canvas edge to edge: no border, no frame, no margin, no perspective, no vignette, no light spot, no shadow falling on it. The texture tiles seamlessly: whatever touches the left edge continues from the right edge, and whatever touches the top edge continues from the bottom edge. Even, calm and low in contrast, and very dark: light text is written over it and must stay readable."
+    },
+    "cr-book": {
+      "aspect": "16:9",
+      "size": "1K",
+      "cutout": "magenta",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — ONE open book lying perfectly flat, seen from directly above: orthographic, perfectly frontal and level, no perspective, no tilt, no page curling up toward the viewer. The book fills about nine tenths of the canvas width and is centered, with an even margin of the flat background around it. The whole background is one flat pure magenta (#FF00FF) — no table, no cloth, no shadow on it. The book itself contains no magenta and no pink."
+    }
+  },
+  "jobs": [
+    {
+      "id": "cr-hall-work",
+      "category": "cr-hall",
+      "title": "Зал Мастерской — башня, где знания становятся вещью: картотеки до свода, верстаки, свет карста снизу",
+      "source": "Слово автора 30.09.2026; тема — знания о рецептах из картотеки Этриона. Фон окна «Ремесло → Мастерская» и сцены удачи и неудачи. К выгрузке — design/ui/assets/art/craft/hall-work.jpg",
+      "subject": "The place: the Workshop of the tower — the great hall deep under the city where the keeper's written knowledge becomes things. A deep hall of dark basalt under a high ribbed vault lost in darkness. Along both side walls immense ancient card-index cabinets of blackened oak rise from the floor into the vault: hundreds of identical small drawers with dull brass pulls and small empty brass frames, tall iron ladders leaning on them. At their feet stand long heavy workbenches with the tools of every craft laid out in careful order: brass calipers and compasses, crucibles and tongs, a pair of scales, glass alembics and retorts with faintly glowing liquids, hanging bundles of dried herbs, coils of chain, spools of thread, rolls of leather. Far away in the depth, at the vanishing point, a tall arched doorway glows with warm amber forge light. Iron chandeliers with raw turquoise karst crystals hang high in the dark vault. Cold turquoise light rises from thin cracks in the stone floor and from clusters of karst crystals growing at the feet of the cabinets; motes of dust hang in the light. Silent and empty: the hall waits for its master."
+    },
+    {
+      "id": "cr-hall-stock",
+      "category": "cr-hall",
+      "title": "Зал Запасов — подклеть башни: полки до свода, сундуки, ларцы, банки, мешки",
+      "source": "Фон окна «Ремесло → Запасы» и окна открытия сундука. К выгрузке — design/ui/assets/art/craft/hall-stock.jpg",
+      "subject": "The place: the Stores of the tower — a long vaulted undercroft where everything the keeper has gathered is kept in order. A dark stone vault resting on squat round pillars. Deep shelves of black oak and iron racks line both walls and climb into the darkness, crowded yet orderly: iron-bound chests of many sizes, small caskets with bronze corners, stacked crates, sealed clay jars and glass jars of reagents, sacks of ore, bundles of hides, coils of rope, iron keys hanging in rows on hooks. In the far depth, at the vanishing point, a heavy iron-bound double door with huge hinges and a massive old chest bound in chains before it. Cold turquoise light rises from karst crystals set in low iron braziers on the floor; one hanging lantern gives a small warm amber glow. Dust hangs in the air."
+    },
+    {
+      "id": "cr-hall-shop",
+      "category": "cr-hall",
+      "title": "Лавка — тесная лавочка в скале подземного города, тёплый свет фонарей, полки товаров, бархатные занавеси",
+      "source": "Фон окна «Ремесло → Лавка»: витрина из десяти товаров стоит на полке и прилавке интерфейса. К выгрузке — design/ui/assets/art/craft/hall-shop.jpg",
+      "subject": "The place: the Merchant's Nook — a small shop carved into the rock of the underground city, the one warm place in the dark. Walls of dark stone and old dark wood crowded with shelves of wares: glass bottles and flasks, clay jars, bundles of herbs and furs, brass lanterns, brass instruments, rolls of leather, small wooden boxes. Heavy dark oxblood velvet curtains hang at the left and right edges, gathered with tasseled golden cords. A brass hanging scale and strings of dried herbs and garlic hang from a dark beam along the top. Several hanging lanterns give a warm amber light; small cold turquoise glints of karst shine from a few jars and from a thin crack in the floor. The middle of the picture is a dark, calm, open space in front of the shelves — the game puts its own shelf, counter and goods there."
+    },
+    {
+      "id": "cr-hall-market",
+      "category": "cr-hall",
+      "title": "Рынок — торговые ряды в пещере подземного города: лавки под навесами, фонари на верёвках",
+      "source": "Фон окна «Ремесло → Рынок». К выгрузке — design/ui/assets/art/craft/hall-market.jpg",
+      "subject": "The place: the Market Rows of the underground city — a long cavern street of stalls under the rock, closed for the night. Rows of wooden stalls with sagging cloth awnings of faded dark oxblood red, dark ochre and deep teal stripes recede into the depth on both sides, their counters empty, covered with cloth or shuttered; crates, baskets, sacks and barrels stand stacked beside them. Iron lanterns with warm amber light hang on ropes stretched across the street from stall to stall and lead the eye into the depth. Far above, the rough rock ceiling of the cavern with small stalactites and clusters of glowing turquoise karst crystals. The street floor is worn stone slabs fading into shadow. Empty and quiet, waiting for the morning."
+    },
+    {
+      "id": "cr-hall-forge",
+      "category": "cr-hall",
+      "title": "Кузня перековки — горн в глубине, наковальня, цепи, искры; тёплый огонь против холодного карста",
+      "source": "Фон окна «Ремесло → Перековка». К выгрузке — design/ui/assets/art/craft/hall-forge.jpg",
+      "subject": "The place: the Reforging Forge of the tower — a dark stone smithy where old things are melted down and forged anew. In the far center a great forge hearth built of black stone, its mouth glowing with deep orange fire and embers under a huge hood of blackened iron; massive leather bellows beside it. A heavy anvil stands in the middle distance on a stump, lit orange by the fire. Chains and hooks hang from dark beams, racks of tongs and hammers stand along the walls, a stone quenching trough steams quietly. Sparks and embers drift upward into the smoky vault. Near the viewer, cold turquoise karst light glows from cracks in the floor and contrasts with the warm fire."
+    },
+    {
+      "id": "cr-table",
+      "category": "cr-disc",
+      "title": "Стол-круг Мастерской сверху — базальтовый диск в бронзовом ободе, узор строго по кругу",
+      "source": "Стол из шести ячеек вокруг результата: гнёзда и пьедестал ставит интерфейс по своим местам, поэтому на диске нет ни гнёзд, ни лучей. К выгрузке — design/ui/assets/art/craft/table.png",
+      "subject": "The object: the round crafting table of the Workshop seen from directly above — a massive disc of dark basalt framed by a thick outer rim of aged bronze studded with small round rivets. Its top is engraved with fine concentric circles and, halfway between the rim and the center, one wide band of interlaced knotwork running all the way around. The pattern is perfectly rotationally symmetric: no spokes, no radial lines, no marks at any particular position, no sockets, no holes, no objects on it. The central third of the disc is a plain round field of smooth darker stone. A faint cold turquoise light seeps from hairline cracks near the rim and lies softly on the stone."
+    },
+    {
+      "id": "cr-socket",
+      "category": "cr-disc",
+      "title": "Гнездо ячейки стола сверху — бронзовое кольцо с заклёпками вокруг пустой чаши",
+      "source": "Шесть ячеек стола. Тёмная чаша вырезается — темноту и свет внутри даёт интерфейс. К выгрузке — design/ui/assets/art/craft/socket.png",
+      "subject": "The object: one socket of the crafting table seen from directly above — a thick ring of aged dark bronze with six small round rivets evenly spaced around it and a thin engraved groove along its middle; inside the ring a round recessed cup whose inside is a deep, empty, completely dark bowl. The ring is about one fifth of the socket's radius wide. A thin cold turquoise rim of light along the inner edge of the ring."
+    },
+    {
+      "id": "cr-core",
+      "category": "cr-disc",
+      "title": "Пьедестал результата сверху — каменный постамент с кольцом старого золота и пустой чашей",
+      "source": "Середина стола: здесь поднимается итог крафта. Чаша вырезается — итог и свет редкости кладёт интерфейс. К выгрузке — design/ui/assets/art/craft/core.png",
+      "cutout": "black-glow",
+      "subject": "The object: the central pedestal of the crafting table seen from directly above — a round raised pedestal of dark stone crowned by a broad ring of old gold-bronze with fine interlaced knotwork and four small cold turquoise karst gems set at equal distances in the ring; in its middle a round shallow hollow, completely dark and empty, lit only along its rim by a thin ring of cold turquoise light rising from inside. The golden ring is about one quarter of the pedestal's radius wide."
+    },
+    {
+      "id": "cr-hearth",
+      "category": "cr-disc",
+      "title": "Горн перековки сверху — кольцо клёпаного железа вокруг ямы с углями",
+      "source": "Круг окна «Перековка»: на ободе — отмеченное, в середине рождается итог. К выгрузке — design/ui/assets/art/craft/hearth.png",
+      "subject": "The object: a round forge hearth seen from directly above — a wide ring of blackened riveted iron plates, sooty and heat-stained with blue and brown tempering colors, around a round pit of glowing coals and embers: deep red at the edges, orange and bright yellow in the very middle, with small flames licking up and a few sparks. The iron ring is about one third of the hearth's radius wide and its plates are all alike, the pattern going evenly all the way around."
+    },
+    {
+      "id": "cr-dais",
+      "category": "cr-part",
+      "title": "Помост сундука — низкий круглый камень в бронзовом поясе, трещины светятся",
+      "source": "Окно открытия сундука: сундук падает на помост. К выгрузке — design/ui/assets/art/craft/dais.png",
+      "aspect": "16:9",
+      "cutout": "black-glow",
+      "subject": "The object: a low round dais of dark basalt seen from the front and slightly above (a three-quarter view): a wide, short cylinder whose top is a flat ellipse about four times wider than it is tall, and whose side is bound with a band of aged bronze with small rivets. Thin cracks across the top glow cold turquoise from within, and the light rises softly from them. Nothing stands on it. It is wide: it takes about four fifths of the canvas width."
+    },
+    {
+      "id": "cr-corner",
+      "category": "cr-part",
+      "title": "Уголок оковки — латунь с листом и заклёпками (выгружается в четырёх отражениях)",
+      "source": "Уголки панелей, листов и карточек «Ремесла». К выгрузке — design/ui/assets/art/craft/corner-tl…br.png",
+      "subject": "The object: one ornate corner fitting for a heavy chest or a book cover — an L-shaped piece of aged bronze with an old-gold tone: a pointed filigree leaf fills the corner, three round rivets sit along each arm, a thin engraved border runs along both arms. The corner of the L points to the TOP LEFT of the canvas: one arm runs along the top toward the right, the other runs down along the left side; both arms are equally long and narrow. Seen perfectly flat and straight on."
+    },
+    {
+      "id": "cr-seal",
+      "category": "cr-part",
+      "title": "Печать Этриона — восковая печать с башней (знак подсказки Этриона)",
+      "source": "Подсказка-загадка Этриона (поле hint ресурса) в карточке предмета и в ячейке стола. К выгрузке — design/ui/assets/art/craft/seal.png",
+      "subject": "The object: a round wax seal of deep teal-green wax with slightly irregular squeezed-out edges, pressed with a clean raised relief of a slender tall tower with a pointed roof standing on a small hill; the relief catches a warm amber highlight along its edges. A short cut end of dark red silk ribbon peeks out from under the bottom of the seal. Seen straight on."
+    },
+    {
+      "id": "cr-cushion",
+      "category": "cr-part",
+      "title": "Бархатная подушка витрины лавки — под каждым товаром",
+      "source": "Витрина лавки: товар лежит на подушке. К выгрузке — design/ui/assets/art/craft/cushion.png",
+      "subject": "The object: a small square display cushion of deep teal velvet with gold braid piping along its edges and four small gold tassels at its corners, seen from the front and slightly above (three-quarter view): plump, with a soft dip in the middle as if something precious rested there; nothing lies on it. It is wide and low: about three times wider than it is tall."
+    },
+    {
+      "id": "cr-plate",
+      "category": "cr-strip",
+      "title": "Латунная табличка — концы с оковкой, середина ровная (растягивается под надпись)",
+      "source": "Подписи зон «Инвентарь» и «Крафт» (§12.4), шапка лавки. К выгрузке — design/ui/assets/art/craft/plate.png",
+      "subject": "The strip: a horizontal nameplate of aged bronze for a heavy cabinet — a long flat plate with a thin raised border along all its edges; each end finishes in an ornate cap of filigree around a big round rivet; the long middle part between the caps is calm, plain, flat and perfectly uniform, darker toward its center, with no ornament at all (the game writes a title there). The plate takes about four fifths of the canvas width and one sixth of its height, centered."
+    },
+    {
+      "id": "cr-counter",
+      "category": "cr-strip",
+      "title": "Прилавок лавки — тёмный орех, резные филёнки, латунь, бархатная дорожка; повторяется по горизонтали",
+      "source": "Витрина лавки: нижний ряд товаров стоит на прилавке. К выгрузке — design/ui/assets/art/craft/counter.png (shelf_layers.py strip)",
+      "subject": "The strip: the front of a merchant's shop counter — one long, perfectly straight horizontal band. Its top quarter is the thick top edge of the counter in dark old walnut, worn smooth and faintly gleaming; along it hangs a strip of deep teal velvet with gold braid. Below, the front panel shows a row of identical carved recessed panels framed with thin dark brass strips and small brass nail heads. It runs across the whole width of the canvas: its left and right ends are cut off by the left and right edges of the canvas, so copies placed side by side continue seamlessly; it takes about one quarter of the canvas height. Its detail repeats evenly along its length: nothing special happens in the middle or near the ends."
+    },
+    {
+      "id": "cr-awning",
+      "category": "cr-strip",
+      "title": "Навес рыночного ряда — полосатое полотно с фестонами; повторяется по горизонтали",
+      "source": "Окно «Рынок»: список лотов стоит под навесом ряда. К выгрузке — design/ui/assets/art/craft/awning.png (shelf_layers.py strip)",
+      "subject": "The strip: a market stall awning seen straight from the front — a horizontal band of heavy, faded, worn cloth in broad alternating vertical stripes of dark oxblood red and dark ochre, hanging from a dark wooden pole that runs along its top; its lower edge is cut into equal rounded scallops, each with a small dark tassel. The cloth is patched in a few places. It runs across the whole width of the canvas: its left and right ends are cut off by the edges, so copies placed side by side continue seamlessly; it takes about one quarter of the canvas height. The stripes and scallops repeat evenly along its length."
+    },
+    {
+      "id": "cr-frames",
+      "category": "cr-sheet",
+      "title": "Рамки иконки предмета — восемь видов материалом: сырьё, ключ, трофей, изделие, призыв, руна, заряженный карст, город",
+      "source": "Иконки ресурсов нарисуют позже сеткой: квадратная живопись в край, рамку даёт интерфейс. Вид — материал рамки, редкость — свет и кристалл интерфейса. К выгрузке — design/ui/assets/art/craft/frame-<вид>.png (craft_layers.py sheet)",
+      "subject": "The sheet: EIGHT square picture frames for item icons in a grid of four columns and two rows. All eight frames are exactly the same size and perfectly square, perfectly straight and frontal; the gaps of solid pure black between them and around them are wide and equal — each gap at least a quarter of a frame's width. Each frame is a thick square border, about one eighth of the frame's width, around a large EMPTY square window of solid pure black, and the eight windows are all the same size. Bold, simple, heavy shapes that read at a tiny size of about 48 px: chunky material, strong corners, no thin fragile filigree. The frames differ only in material and corner details. Top row, from left to right: (1) rough blackened iron plates with a big round rivet in each corner — raw materials; (2) dark bronze with a small keyhole-shaped notch in the middle of the top edge — keys; (3) dark gold-bronze with a small curved fang or claw at each corner — trophies of great beasts; (4) finely worked warm brass with a small pointed leaf at each corner — crafted wares. Bottom row, from left to right: (5) yellowed bone bound with blackened iron, with a small curved horn at each top corner — summoning items; (6) carved dark grey stone with thin inlaid lines of old gold along the border — runes; (7) dark silver set with a small raw turquoise crystal at each corner — charged crystals; (8) a squared masonry border of small dark stone blocks with a tiny battlement along the top edge — cities."
+    },
+    {
+      "id": "cr-fx",
+      "category": "cr-sheet",
+      "title": "Частицы — уголёк, блик-звезда, осколок карста, пылинка света, завиток дыма, хлопья пепла",
+      "source": "Частицы окон «Ремесла»: отклик на действие, воздух залов. К выгрузке — design/ui/assets/art/craft/fx-<вид>.png (craft_layers.py sheet)",
+      "size": "1K",
+      "cutout": "black-glow",
+      "subject": "The sheet: SIX small light effects for game particles in a grid of three columns and two rows, each centered in its own equal cell, with wide empty gaps of solid pure black between them. Top row, from left to right: (1) a single glowing ember — a tiny irregular coal with a bright orange-gold core and a soft warm glow; (2) a four-pointed star glint with thin long rays, white with a warm gold tint; (3) a small raw karst crystal shard glowing cold turquoise from within. Bottom row, from left to right: (4) a soft round mote of pale golden light, blurred at the edges; (5) a single curling wisp of pale grey smoke; (6) a small curled flake of grey ash with a faint glowing orange edge."
+    },
+    {
+      "id": "cr-vellum",
+      "category": "cr-texture",
+      "title": "Чернёный пергамент — бесшовная текстура карточек и листов",
+      "source": "Карточка предмета, листы и строки книги рецептов. К выгрузке — design/ui/assets/art/craft/vellum.jpg (shelf_layers.py tile)",
+      "subject": "The texture: black-dyed vellum — an old page of parchment dyed a deep black-brown, filling the canvas: subtle mottled grain, faint fibers, tiny pale scratches and creases, a soft uneven tone from #0E0B09 to #1C1712, a very faint dust of gold specks. Calm and low in contrast."
+    },
+    {
+      "id": "cr-grim",
+      "category": "cr-book",
+      "title": "Гримуар рецептов — раскрытая книга сверху, страницы чернёного пергамента с золотой линовкой",
+      "source": "Книга рецептов Мастерской: список рецептов написан интерфейсом на страницах. К выгрузке — design/ui/assets/art/craft/grimoire.webp",
+      "subject": "The object: an ancient grimoire of recipes lying open, seen from directly above: two facing pages of black-dyed vellum — deep black-brown, softly mottled — each page framed by a thin ruled double border of faded old gold with small gold flourishes in its corners; the page edges are gilded. Inside the borders both pages are completely blank. Around the pages the heavy cover of black leather shows as a narrow rim with aged bronze corner fittings; a thick raised spine runs down the middle between the pages; a dark red silk ribbon bookmark lies along the spine and hangs out over the bottom edge."
+    }
+  ]
+}

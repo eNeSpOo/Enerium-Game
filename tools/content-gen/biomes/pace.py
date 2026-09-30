@@ -229,17 +229,17 @@ def main(check):
               table(['Уровень'] + [NAMES[b] for b in CYCLE_II],
                     [[L] + [f"{cell(lv[b][i])} · {mins(lv[b][i]['ms'])} мин" for b in CYCLE_II] for i, L in enumerate(LEVELS_II)]))
     for name, d in days.items():
-        rows = []
+        trows = []   # строки таблицы Б4; rows — данные pace.json, их не затирать
         for k, x in d['biomes'].items():
             walls = ', '.join(f"с {d0}-го дня — {f}-й этаж" for d0, f in x.get('walls', [])) or 'нет'
-            rows.append([NAMES[k], f"{x['from']}-й", walls, f"{x['boss']['day']}-й, уровень {x['boss']['lvl']}, забегов {x['boss']['runs']}" if x.get('boss') else '—',
+            trows.append([NAMES[k], f"{x['from']}-й", walls, f"{x['boss']['day']}-й, уровень {x['boss']['lvl']}, забегов {x['boss']['runs']}" if x.get('boss') else '—',
                          f"{x['guard']['day']}-й, уровень {x['guard']['lvl']}" if x.get('guard') else '—'])
         last = last_guard(d) or DAYS_SHOW
         lvl = ', '.join(f'{i}: {a}' for i, a in enumerate(d['levels'][:last + 2]) if i)
         runes = ', '.join(f'{E.ROMAN[i]} — {r}-й' for i, r in enumerate(d['runes']) if i)
         md.append(f"Б4. Цикл II по дням — {who(name)}, {d['hours']} ч забегов в день. Уровень главного отряда по дням (economy.py): {lvl}. "
                   f"Руны пределов (стражи — из ключей, вариант Б): {runes}; пятый предел — {d['limit5']}-й день.\n\n" +
-                  table(['Биом', 'С дня', 'Стена до босса', 'Босс пал', 'Рунный страж пал'], rows))
+                  table(['Биом', 'С дня', 'Стена до босса', 'Босс пал', 'Рунный страж пал'], trows))
     text = '\n\n'.join(md)
     sig = data_sig()
     payload = {'sig': sig, 'cycleDays': E.CYCLE_DAYS, 'fixed': tried, 'verdict': v, 'rows': rows, 'md': text}

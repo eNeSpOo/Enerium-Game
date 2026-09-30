@@ -1383,9 +1383,11 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <link rel="stylesheet" href="screens/art-icons.css">
 <link rel="stylesheet" href="screens/week.css">
 <link rel="stylesheet" href="screens/arena.css">
+<link rel="stylesheet" href="screens/crafthall.css">
 <link rel="stylesheet" href="screens/craft.css">
 <link rel="stylesheet" href="screens/shop.css">
 <link rel="stylesheet" href="screens/bag.css">
+<link rel="stylesheet" href="screens/market.css">
 <link rel="stylesheet" href="screens/descent.css">
 <link rel="stylesheet" href="screens/echo.css">
 <link rel="stylesheet" href="screens/roulette.css">
@@ -1540,7 +1542,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 const ASSET = window.EN_ASSET || '../enerium/assets/';
 const A = p => ASSET + p;
 const ART = n => A('art/' + n);
-const ART_V = '54a1202d';   // версия выгрузки арта — её ставит tools/art-gen/export_ui.py, чтобы браузер не брал старые картинки из кэша
+const ART_V = 'c1ec424c';   // версия выгрузки арта — её ставит tools/art-gen/export_ui.py, чтобы браузер не брал старые картинки из кэша
 const AV = n => ART(n) + '?v=' + ART_V;
 /* значки атрибутов, редкостей, классов и доблести — одобрены автором 28.09.2026, выгрузка tools/art-gen/export_ui.py → assets/art/icons/:
    power, hp, patk, matk, def-phys, def-mag, eva, crit, critdmg; str, int, agi, end, spd; r1…r7 — редкости (ADR-0027);
@@ -2197,7 +2199,7 @@ function heroKitHtml(h) {
   const rows = K.kit.map(x => {
     const a = L[x.id] || { n: x.id, d: '' }, on = x.v <= h.valor, s = share(x);
     const what = x.slot === 'ult' ? 'Ульта' : x.slot === 'pas' ? 'Пассивка' : x.slot === 'react' ? 'Реакция' : '';
-    return abRow({ icon: ic(on ? (x.slot === 'ult' ? 'crown' : abIcon(a)) : 'lock'), n: x.v, name: `${schoolMark(a.school)}${a.n}`, what, d: a.d, lock: !on,
+    return abRow({ icon: (typeof abArt === 'function' && abArt(a, 30, '', on ? '' : 'off')) || ic(on ? (x.slot === 'ult' ? 'crown' : abIcon(a)) : 'lock'), n: x.v, name: `${schoolMark(a.school)}${a.n}`, what, d: a.d, lock: !on,
       chip: `<span class="chip ${x.slot === 'ult' && on ? 'spirit' : ''}" title="${on ? (x.chR ? 'Шанс реакции: растёт с редкостью героя' : 'Доля хода') : 'Откроется на доблести ' + x.v}">${on ? (s ? pctBp(s) : x.chR ? 'шанс ' + pctBp(x.chR) : 'всегда') : 'доблесть ' + x.v}</span>` });
   }).join('');
   return `<div class="hd-cols" style="grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)">
@@ -2649,10 +2651,10 @@ function trLayout(c) {
   const craft = (cy.craft || []).flatMap(pid => { const p = RX.places.find(x => x.id === pid); return [p.act, ...p.res, p.find, p.boss.call, p.boss.trophy]; });
   const cols = [['Базовые пула и добыча', [...pool, ...byB(A.id, 'unique'), ...byB(B.id, 'unique'), ...pick(i => i.tier === 'echo')]],
     ['Ключи · ' + A.n, byB(A.id, 'key')], ['Ключи · ' + B.n, byB(B.id, 'key')], ['Заготовки', pick(i => i.tier === 'part')],
-    ['Изделия', pick(i => i.tier === 'made')], ['Руины и Эхо', craft.concat(pick(i => i.tier === 'call' && !craft.includes(i.id)))],
+    ['Изделия', pick(i => i.tier === 'made')], ['Руины и Эхо', craft.concat(pick(i => ['call', 'trophy', 'find'].includes(i.tier) && !craft.includes(i.id)))],
     ['Герои и награды', pick(i => i.tier === 'hero' || i.tier === 'product')]];
   const farBy = cols.map(() => []); far.forEach(id => farBy[TR_COL(RXI[id])].push(id));
-  return { recs, far, farBy, strip: [1, 2, 3, 4, 5].map(k => `rn${c}_${k}`).concat([`vs${c}`, `vr${c}`]), cols };
+  return { recs, far, farBy, strip: [1, 2, 3, 4, 5].map(k => `rn${c}_${k}`).concat([`vs${c}`, `vr${c}`], its.filter(i => i.fam === 'dust').map(i => i.id)), cols };
 }
 const trLayoutIds = c => { const L = trLayout(c); return new Set(L.cols.flatMap(x => x[1]).concat(L.far, L.strip)); };
 /* вся цепочка узла по всем циклам: up — из чего собирается, down — куда уходит */
@@ -2863,7 +2865,8 @@ const busyNote = id => { const r = runOf(id); if (r) return 'Забег · ' + (
 const shelterTags = () => '';
 
 /* ================== сведения о предмете запасов (§14.3, §14.4) ==================
-   Лист поверх любого экрана: загадка, ремесло, ярус, цикл, количество, найденные рецепты, откуда падает (первый источник, остальные — по «ещё»).
+   Лист поверх любого экрана: описание, пометка Этриона — загадка ресурса (поле hint, screens/crafthall.js), ремесло, ярус, цикл,
+   количество, найденные рецепты, откуда падает (первый источник, остальные — по «ещё»).
    Полная карточка с фильтрами — «Ремесло → Запасы» (screens/bag.js). Спойлеры цикла VI — только «для команды». */
 const itSrc = it => (it.src || []).filter(s => !/предложени/.test(s)).map(s => String(s).replace(/\s*\((?:ADR|§)[^)]*\)/g, '').replace(/,?\s*(?:число\s+)?—\s*заглушка/g, '').trim()).filter(Boolean);
 function itemCard(id) {
@@ -2872,7 +2875,7 @@ function itemCard(id) {
   const hide = itTeam(it), T = RX.tiers[it.tier] || { n: '' }, sp = it.spec ? it.spec.split('+').map(x => RX.specs[x] ? RX.specs[x].n : x).join(' + ') : '';
   const uses = BAG.knownUses(id).filter(Boolean), src = hide ? [] : itSrc(it), min = mkMin(id);
   return `<div class="row" style="gap:14px;align-items:center"><span class="tr-big" data-r="${it.r}">${hide ? ic('lock') : trIcon(it)}</span><div class="col" style="gap:5px;min-width:0">${rar(it.r)}<b class="serif" style="font-size:23px;line-height:1">${trEsc(itName(it))}</b><span class="faint" style="font-size:13px">${T.n}${sp ? ' · ' + sp.toLowerCase() : ''}</span></div><span class="g-spacer"></span><div class="stat" style="align-items:flex-end"><b>${fmt(BAG.qty(id))}</b><small>в запасах</small></div></div>
-    ${hide ? '<p class="reason">Сведения откроются в своём цикле.</p>' : `<span class="eyebrow">Загадка</span>${foldLore(trEsc(it.lore))}`}
+    ${hide ? '<p class="reason">Сведения откроются в своём цикле.</p>' : foldLore(trEsc(it.lore))}
     <dl class="kv"><dt>Цикл</dt><dd>${it.pool ? 'все циклы · общий пул' : 'цикл ' + ROMAN[it.cyc]}</dd><dt>Найденные рецепты</dt><dd>${uses.length ? uses.map(r => trEsc(r.n)).join(', ') : 'нет'}</dd>${min ? `<dt>Мин. цена рынка</dt><dd>${fmt(min)} за шт.</dd>` : ''}</dl>
     ${src.length ? `<span class="eyebrow">Откуда падает</span><ul class="tr-src"><li>${trEsc(src[0])}</li></ul>${src.length > 1 ? `<details class="more-list"><summary><span class="more">ещё ${src.length - 1}</span></summary><ul class="tr-src">${src.slice(1).map(s => `<li>${trEsc(s)}</li>`).join('')}</ul></details>` : ''}` : ''}
     ${typeof ACTIVATE[it.tier] === 'function' ? '<p class="reason">Что внутри — откроется после подтверждения. Просмотр не расходует предмет.</p>' : ''}`;
@@ -3909,7 +3912,7 @@ function renderKit() {
     <p class="k-note">Данные — <code>docs/content/герои/</code>, выгрузка <code>tools/content-gen/heroes/export_ui.py</code> в <code>heroes.js</code>. Черновик, ждёт автора. Портреты пока заглушки: свет стихии снизу, нижняя кромка — редкость. Арт рисуется отдельно в <code>art/generated/</code>. Наборы способностей отряда боя прототипа — отсюда; новый состав — раздел «Состав героев» выше.</p>
     <div id="kitHeroes"></div></section>
   <section class="k-box" style="grid-column:1/-1"><h3>Библиотека способностей · ${window.EN_ABILITIES ? EN_ABILITIES.total : 0}</h3>
-    <p class="k-note">Данные — <code>docs/content/библиотека-способностей.md</code>, выгрузка <code>tools/content-gen/abilities/library.py</code> в <code>abilities.js</code>, решения — ADR-0015. Черновик: названия с номером — из таблицы автора, остальные автор принял как рабочие; числа — демонстрация. Набор без фильтров показан матрицей «вид × ступень», фильтр или поиск ищут по всей библиотеке. По героям способности ещё не распределены.</p>
+    <p class="k-note">Данные — <code>docs/content/библиотека-способностей.md</code>, выгрузка <code>tools/content-gen/abilities/library.py</code> в <code>abilities.js</code>, решения — ADR-0015. Черновик: названия с номером — из таблицы автора, остальные автор принял как рабочие; числа — демонстрация. Набор без фильтров показан матрицей «вид × ступень», фильтр или поиск ищут по всей библиотеке. По героям способности ещё не распределены. Иконки — живопись сеткой, листом на набор школы (<code>tools/art-gen/jobs/spell-icons-*.json</code>, выгрузка — <code>tools/art-gen/ui-icons.json</code>): школа — цвет и материал, вид — мотив, ступень — сколько вещей в клетке; рамку даёт интерфейс.</p>
     <div id="kitLib" class="kl"></div></section>
   <section class="k-box"><h3>Враг</h3><div class="k-demo row" style="gap:18px;justify-content:center;height:170px"><div class="fig" style="height:150px"><img src="${FA(f1)}" alt=""></div><div class="fig unk" style="height:150px"><img src="${FA(f6)}" alt=""><span class="qm">?</span></div></div><p class="k-note">Изучен — картина целиком. До первой победы картина затемнена и размыта, поверх — знак вопроса.</p></section>
   <section class="k-box"><h3>Иконки путей</h3><div class="k-row">${[[12, 'Убежище'], [10, 'Спуск'], [24, 'Герои'], [11, 'Ремесло'], [6, 'Неделя'], [18, 'Эхо'], [38, 'Контракты'], [33, 'Ритуалы'], [3, 'Арена'], [26, 'Клан'], [21, 'Событие'], [29, 'Странник']].map(([p, n]) => `<figure style="margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;width:64px"><img src="${PATH(p)}" alt="" style="width:48px;height:48px;border-radius:12px;box-shadow:0 0 0 1px #262c32"><figcaption style="font-size:11px;color:var(--parch-2);text-align:center;line-height:1.1">${n}</figcaption></figure>`).join('')}</div><p class="k-note">Авторский набор. Иконка узнаётся, подпись остаётся всегда.</p></section>
@@ -4288,7 +4291,7 @@ function khKit(h, v) {
     const tier = x.slot !== 'pas' && x.slot !== 'react' && a.tier && D.tiers[a.tier] ? ' · ' + D.tiers[a.tier].toLowerCase() : '';
     const ch = x.share ? ' · ' + P(x.share) + ' хода' : x.chR ? ' · шанс ' + P(x.chR) : '';
     return `<button class="kh-ab ${x.slot === 'ult' ? 'ult' : ''} ${on ? '' : 'lock'}" data-kh="ab" data-v="${x.id}" data-set="${a.set}" title="${klEsc(a.d)}">`
-      + `<span class="dv">${x.v}</span><span class="ti">${ic(KL_IC[a.k] || 'gem')}</span><span class="tx"><b>${a.n}</b><small>${what}${tier}${ch}${on ? '' : ' · откроется на доблести ' + x.v}</small></span></button>`;
+      + `<span class="dv">${x.v}</span><span class="ti">${(typeof abArt === 'function' && abArt(a, 26)) || ic(KL_IC[a.k] || 'gem')}</span><span class="tx"><b>${a.n}</b><small>${what}${tier}${ch}${on ? '' : ' · откроется на доблести ' + x.v}</small></span></button>`;
   }).join('');
   const why = h.kitHand ? (h.kitWhy ? `<p class="muted" style="font-size:13px">${h.kitWhy}</p>` : '')
     : '<p class="faint" style="font-size:12.5px">Набор собран автоматом по роли класса — черновик: сеты пересобираются вручную.</p>';
@@ -4501,7 +4504,7 @@ function klTile(a, inMatrix) {
   const D = klData(), tier = a.tier && D.tiers[a.tier] ? D.tiers[a.tier].toLowerCase() + ' · ' : '';
   const where = inMatrix ? '' : (KL.set ? '' : a.set + ' · ') + tier;
   return `<button class="kl-tile ${a.t}" data-kl="sel" data-v="${a.id}" data-set="${a.set}" aria-pressed="${KL.sel === a.id}" title="${klEsc(a.d)}">`
-    + `${a.src ? `<span class="no">№${a.src[0]}</span>` : ''}<span class="ti">${ic(KL_IC[a.k] || 'gem')}${a.t === 'ult' ? ic('crown', 'u') : ''}</span>`
+    + `${a.src ? `<span class="no">№${a.src[0]}</span>` : ''}<span class="ti">${(typeof abArt === 'function' && abArt(a, 24)) || ic(KL_IC[a.k] || 'gem')}${a.t === 'ult' ? ic('crown', 'u') : ''}</span>`
     + `<b>${a.n}</b><span class="nu">${where}${a.num}</span>${a.tw ? `<em>${a.tw}</em>` : ''}</button>`;
 }
 function klPart(S_, t, title) {
@@ -4529,7 +4532,7 @@ function klDetail() {
       + `<p class="muted">${a.src[2]}</p><small class="faint">Название сохранено, механика новая: таблица делалась под прежний бой со счётчиком атак.</small></div>`
     : '<p class="faint" style="font-size:12.5px">Название рабочее, не из таблицы автора.</p>';
   const data = Object.entries(a.data).map(([k, v]) => `<tr><td>${k}</td><td>${klEsc(typeof v === 'object' ? JSON.stringify(v) : v)}</td></tr>`).join('');
-  return `<div class="row" style="gap:10px"><span class="kl-ico">${ic(KL_IC[a.k] || 'gem')}</span><div class="col" style="gap:3px"><span class="eyebrow">${eyebrow}</span><b class="nm">${a.n}</b></div></div>`
+  return `<div class="row" style="gap:10px"><span class="kl-ico">${(typeof abArt === 'function' && abArt(a, 46)) || ic(KL_IC[a.k] || 'gem')}</span><div class="col" style="gap:3px"><span class="eyebrow">${eyebrow}</span><b class="nm">${a.n}</b></div></div>`
     + (a.k === 'reaction' ? '' : `<div class="kl-meta">${a.ch ? `<span class="chip">шанс ${a.ch / 100} %</span>` : ''}<span class="chip">${a.num}</span>${a.t === 'ult' ? '<span class="chip gold">ульта</span>' : ''}</div>`)
     + `<p style="font-size:14.5px;color:var(--parch)">${a.d}</p>${trig}${eff}${src}<span class="eyebrow">Данные для ядра</span><table class="kl-data">${data}</table>`;
 }
@@ -4685,6 +4688,8 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 <script src="screens/arena.js"></script>
 <script src="screens/clan.js"></script>
 <script src="screens/reforge.js"></script>
+<script src="screens/crafthall.js"></script>
+<script src="screens/market.js"></script>
 <script src="screens/chronicle.js"></script>
 <script src="screens/pass.js"></script>
 <script src="screens/talk.js"></script>

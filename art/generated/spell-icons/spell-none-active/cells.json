@@ -1,0 +1,300 @@
+{
+  "sheet": "art/generated/spell-icons/spell-none-active__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/spell-icons-none.json",
+  "job": "spell-none-active",
+  "grid": [
+    6,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "Без школы.dmg.all",
+      "file": "art/generated/spell-icons/spell-none-active/none-dmg-all.webp",
+      "box": [
+        34,
+        46,
+        816,
+        828
+      ],
+      "px": 782,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.dmg.grp",
+      "file": "art/generated/spell-icons/spell-none-active/none-dmg-grp.webp",
+      "box": [
+        876,
+        46,
+        1658,
+        828
+      ],
+      "px": 782,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.dmg.one",
+      "file": "art/generated/spell-icons/spell-none-active/none-dmg-one.webp",
+      "box": [
+        1716,
+        46,
+        2498,
+        828
+      ],
+      "px": 782,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.heal.all",
+      "file": "art/generated/spell-icons/spell-none-active/none-heal-all.webp",
+      "box": [
+        2557,
+        46,
+        3339,
+        828
+      ],
+      "px": 782,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.heal.grp",
+      "file": "art/generated/spell-icons/spell-none-active/none-heal-grp.webp",
+      "box": [
+        3398,
+        46,
+        4180,
+        828
+      ],
+      "px": 782,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.heal.one",
+      "file": "art/generated/spell-icons/spell-none-active/none-heal-one.webp",
+      "box": [
+        4239,
+        46,
+        5021,
+        828
+      ],
+      "px": 782,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.shield.all",
+      "file": "art/generated/spell-icons/spell-none-active/none-shield-all.webp",
+      "box": [
+        33,
+        885,
+        816,
+        1668
+      ],
+      "px": 783,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.shield.grp",
+      "file": "art/generated/spell-icons/spell-none-active/none-shield-grp.webp",
+      "box": [
+        875,
+        885,
+        1658,
+        1668
+      ],
+      "px": 783,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.shield.one",
+      "file": "art/generated/spell-icons/spell-none-active/none-shield-one.webp",
+      "box": [
+        1716,
+        885,
+        2499,
+        1668
+      ],
+      "px": 783,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.dot.all",
+      "file": "art/generated/spell-icons/spell-none-active/none-dot-all.webp",
+      "box": [
+        2556,
+        885,
+        3339,
+        1668
+      ],
+      "px": 783,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.dot.grp",
+      "file": "art/generated/spell-icons/spell-none-active/none-dot-grp.webp",
+      "box": [
+        3398,
+        885,
+        4181,
+        1668
+      ],
+      "px": 783,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.dot.one",
+      "file": "art/generated/spell-icons/spell-none-active/none-dot-one.webp",
+      "box": [
+        4239,
+        885,
+        5022,
+        1668
+      ],
+      "px": 783,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.hot.all",
+      "file": "art/generated/spell-icons/spell-none-active/none-hot-all.webp",
+      "box": [
+        33,
+        1724,
+        816,
+        2507
+      ],
+      "px": 783,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.hot.grp",
+      "file": "art/generated/spell-icons/spell-none-active/none-hot-grp.webp",
+      "box": [
+        875,
+        1724,
+        1658,
+        2507
+      ],
+      "px": 783,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.hot.one",
+      "file": "art/generated/spell-icons/spell-none-active/none-hot-one.webp",
+      "box": [
+        1716,
+        1724,
+        2499,
+        2507
+      ],
+      "px": 783,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.ctrl.all",
+      "file": "art/generated/spell-icons/spell-none-active/none-ctrl-all.webp",
+      "box": [
+        2556,
+        1724,
+        3339,
+        2507
+      ],
+      "px": 783,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.ctrl.grp",
+      "file": "art/generated/spell-icons/spell-none-active/none-ctrl-grp.webp",
+      "box": [
+        3398,
+        1724,
+        4181,
+        2507
+      ],
+      "px": 783,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.ctrl.one",
+      "file": "art/generated/spell-icons/spell-none-active/none-ctrl-one.webp",
+      "box": [
+        4239,
+        1724,
+        5022,
+        2507
+      ],
+      "px": 783,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.debuff.all",
+      "file": "art/generated/spell-icons/spell-none-active/none-debuff-all.webp",
+      "box": [
+        33,
+        2563,
+        816,
+        3346
+      ],
+      "px": 783,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.debuff.grp",
+      "file": "art/generated/spell-icons/spell-none-active/none-debuff-grp.webp",
+      "box": [
+        875,
+        2563,
+        1658,
+        3346
+      ],
+      "px": 783,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.debuff.one",
+      "file": "art/generated/spell-icons/spell-none-active/none-debuff-one.webp",
+      "box": [
+        1716,
+        2563,
+        2499,
+        3346
+      ],
+      "px": 783,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.buff.all",
+      "file": "art/generated/spell-icons/spell-none-active/none-buff-all.webp",
+      "box": [
+        2556,
+        2563,
+        3339,
+        3346
+      ],
+      "px": 783,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.buff.grp",
+      "file": "art/generated/spell-icons/spell-none-active/none-buff-grp.webp",
+      "box": [
+        3398,
+        2563,
+        4181,
+        3346
+      ],
+      "px": 783,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.buff.one",
+      "file": "art/generated/spell-icons/spell-none-active/none-buff-one.webp",
+      "box": [
+        4239,
+        2563,
+        5022,
+        3346
+      ],
+      "px": 783,
+      "key_left": 0.0
+    }
+  ]
+}

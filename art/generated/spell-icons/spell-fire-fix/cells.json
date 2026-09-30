@@ -1,0 +1,60 @@
+{
+  "sheet": "art/generated/spell-icons/spell-fire-fix__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/spell-icons-fix.json",
+  "job": "spell-fire-fix",
+  "grid": [
+    2,
+    2
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "Огонь.debuff.all",
+      "file": "art/generated/spell-icons/spell-fire-fix/fire-debuff-all.webp",
+      "box": [
+        22,
+        22,
+        495,
+        495
+      ],
+      "px": 473,
+      "key_left": 0.0
+    },
+    {
+      "id": "Огонь.ctrl.grp",
+      "file": "art/generated/spell-icons/spell-fire-fix/fire-ctrl-grp.webp",
+      "box": [
+        529,
+        22,
+        1002,
+        495
+      ],
+      "px": 473,
+      "key_left": 0.0
+    },
+    {
+      "id": "Огонь.debuff.one",
+      "file": "art/generated/spell-icons/spell-fire-fix/fire-debuff-one.webp",
+      "box": [
+        22,
+        529,
+        495,
+        1002
+      ],
+      "px": 473,
+      "key_left": 0.0
+    },
+    {
+      "id": "Огонь.ult.debuff",
+      "file": "art/generated/spell-icons/spell-fire-fix/fire-ult-debuff.webp",
+      "box": [
+        529,
+        529,
+        1002,
+        1002
+      ],
+      "px": 473,
+      "key_left": 0.0
+    }
+  ]
+}

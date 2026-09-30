@@ -1,0 +1,204 @@
+{
+  "sheet": "art/generated/spell-icons/spell-none-ult__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/spell-icons-none.json",
+  "job": "spell-none-ult",
+  "grid": [
+    4,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "Без школы.ult.dmg",
+      "file": "art/generated/spell-icons/spell-none-ult/none-ult-dmg.webp",
+      "box": [
+        28,
+        29,
+        506,
+        507
+      ],
+      "px": 478,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.ult.heal",
+      "file": "art/generated/spell-icons/spell-none-ult/none-ult-heal.webp",
+      "box": [
+        533,
+        29,
+        1011,
+        507
+      ],
+      "px": 478,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.ult.shield",
+      "file": "art/generated/spell-icons/spell-none-ult/none-ult-shield.webp",
+      "box": [
+        1037,
+        29,
+        1515,
+        507
+      ],
+      "px": 478,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.ult.dot",
+      "file": "art/generated/spell-icons/spell-none-ult/none-ult-dot.webp",
+      "box": [
+        1541,
+        29,
+        2019,
+        507
+      ],
+      "px": 478,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.ult.hot",
+      "file": "art/generated/spell-icons/spell-none-ult/none-ult-hot.webp",
+      "box": [
+        28,
+        533,
+        507,
+        1012
+      ],
+      "px": 479,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.ult.ctrl",
+      "file": "art/generated/spell-icons/spell-none-ult/none-ult-ctrl.webp",
+      "box": [
+        532,
+        533,
+        1011,
+        1012
+      ],
+      "px": 479,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.ult.debuff",
+      "file": "art/generated/spell-icons/spell-none-ult/none-ult-debuff.webp",
+      "box": [
+        1037,
+        533,
+        1516,
+        1012
+      ],
+      "px": 479,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.ult.buff",
+      "file": "art/generated/spell-icons/spell-none-ult/none-ult-buff.webp",
+      "box": [
+        1541,
+        533,
+        2019,
+        1011
+      ],
+      "px": 478,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.pas.1",
+      "file": "art/generated/spell-icons/spell-none-ult/none-pas-1.webp",
+      "box": [
+        28,
+        1037,
+        507,
+        1516
+      ],
+      "px": 479,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.pas.2",
+      "file": "art/generated/spell-icons/spell-none-ult/none-pas-2.webp",
+      "box": [
+        532,
+        1037,
+        1012,
+        1517
+      ],
+      "px": 480,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.pas.3",
+      "file": "art/generated/spell-icons/spell-none-ult/none-pas-3.webp",
+      "box": [
+        1037,
+        1037,
+        1516,
+        1516
+      ],
+      "px": 479,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.pas.4",
+      "file": "art/generated/spell-icons/spell-none-ult/none-pas-4.webp",
+      "box": [
+        1541,
+        1038,
+        2019,
+        1516
+      ],
+      "px": 478,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.react.1",
+      "file": "art/generated/spell-icons/spell-none-ult/none-react-1.webp",
+      "box": [
+        28,
+        1541,
+        507,
+        2020
+      ],
+      "px": 479,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.react.2",
+      "file": "art/generated/spell-icons/spell-none-ult/none-react-2.webp",
+      "box": [
+        532,
+        1541,
+        1011,
+        2020
+      ],
+      "px": 479,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.react.3",
+      "file": "art/generated/spell-icons/spell-none-ult/none-react-3.webp",
+      "box": [
+        1037,
+        1541,
+        1516,
+        2020
+      ],
+      "px": 479,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.react.4",
+      "file": "art/generated/spell-icons/spell-none-ult/none-react-4.webp",
+      "box": [
+        1541,
+        1541,
+        2019,
+        2019
+      ],
+      "px": 478,
+      "key_left": 0.0
+    }
+  ]
+}

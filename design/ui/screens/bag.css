@@ -9,6 +9,11 @@
 .zp-gb{gap:6px}
 .zp-gb img{width:20px;height:20px;border-radius:5px}
 .zp-gb b{color:var(--spirit);letter-spacing:0}
+/* узкий экран (844 × 390, рабочая область 772 px): семь вкладок и «Дары» — в одну строку, вкладки плотнее; иначе «Дары» уходят за край */
+@container main (max-width: 800px){
+  .zp-bar .tabs button{padding:0 6px;letter-spacing:.06em}
+  .zp-gb{padding-inline:8px}
+}
 /* слова автора 29.09.2026: сетка 6 столбцов, видно 5 рядов, дальше прокрутка. Клетка — --zt, зазор — --zg; ширина списка — ровно шесть
    клеток, поля панели и полоса прокрутки (--zpad), карточка справа получает остальное. Пять рядов входят в 932 × 430 и 844 × 390 */
 .zp-stock{--zt:44px;--zg:6px;--zpad:30px;flex:1 1 0;min-height:0;height:auto;grid-template-columns:calc(6 * var(--zt) + 5 * var(--zg) + var(--zpad)) minmax(0,1fr)}
@@ -62,7 +67,7 @@
 .well .zp-k{right:3px;bottom:2px}
 .well .zp-k .i{width:12px;height:12px}
 
-/* карточка: плитка, имя с кристаллом редкости, количество; ниже — загадка, строки-ссылки на листы, одно действие */
+/* карточка: плитка, имя с кристаллом редкости, количество; ниже — описание, пометка Этриона, строки-ссылки на листы, одно действие */
 .zp-card{min-width:0}
 .zp-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:var(--sp-m);align-items:center;flex:none}
 .zp-ht{display:flex;flex-direction:column;gap:4px;min-width:0}
@@ -83,7 +88,7 @@
 .zp-body{gap:var(--sp-m)}
 .zp-p{font-size:13px;line-height:1.35;color:var(--parch-2)}
 
-/* загадка и лор — две строки, остальное по «ещё» */
+/* описание (лор) — две строки, остальное по «ещё» */
 .zp-lt{font:italic 500 15px/1.35 var(--f-d);color:var(--parch-2)}
 .zp-lt b{margin-right:6px;font:700 10px/1 var(--f-u);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-2);vertical-align:1px}
 .zp-lore{flex:none}
@@ -200,4 +205,51 @@ button.zp-link:hover>.i{color:var(--gold-2)}
   .zp-q b{font-size:20px}
   .zp-link,.zp-none{min-height:34px}
   .zp-rh b{font-size:20px}
+}
+
+/* ===================================================================================================================
+   Зал «Запасы» (screens/crafthall.js, слово автора 30.09.2026 — «дорого и богато»): подклеть башни с полками и сундуками.
+   Сетка — шкаф: задняя стенка шкафа Библиотеки (тот же дуб), латунная кромка, свет карста снизу; клетка — предмет в рамке своего
+   вида (data-fk, crafthall.css), свет в окне — редкость. Карточка справа — страница гримуара Этриона: чернёный пергамент, золотая
+   линовка, позолоченный обрез. Размеры сетки и поля панели не меняются — пять рядов видно, как считает check_bag.js.
+   =================================================================================================================== */
+.zp-inv{border-color:rgba(201,162,106,.3);border-radius:8px;
+  background:radial-gradient(90% 45% at 50% 110%,rgba(72,229,212,.1),transparent 70%),linear-gradient(180deg,#18120c,#0d0a07);
+  box-shadow:inset 0 1px 0 rgba(255,228,170,.08),inset 0 0 0 1px rgba(0,0,0,.55),inset 0 -30px 40px -30px rgba(72,229,212,.2),0 22px 40px -20px #000}
+html.lb-w .zp-inv{background:radial-gradient(90% 45% at 50% 110%,rgba(72,229,212,.12),transparent 70%),linear-gradient(180deg,rgba(12,9,6,.5),rgba(8,6,4,.78)),var(--lb-wall) 0 0/300px auto repeat,#0d0a08}
+/* клетка — ниша шкафа: тёмная глубина, снизу свет редкости; предмет — в рамке своего вида */
+.zp-cell{transition:transform .14s cubic-bezier(.2,.8,.2,1)}
+.zp-cell:hover{transform:translateY(-2px)}
+.zp-cell:active{transform:scale(.95)}
+html.cr-f .zp-cell[data-fk][aria-current="true"]{box-shadow:0 0 0 2px var(--spirit),0 0 16px -2px var(--spirit)}
+html.cr-f .zp-cell[data-fk]>.i{width:40%;height:40%;color:color-mix(in srgb,var(--rc,#aaa) 72%,var(--parch))}
+html.cr-f .zp-cell[data-fk] .q{right:1px;bottom:0;min-width:14px;padding:0 2px;border-radius:6px;background:rgba(8,7,5,.82);text-align:center}
+/* «+N» — последняя клетка: ещё порция запасов (тысяча ресурсов не рисуется разом); «ещё» у описания — .zp-more, это другое */
+.zp-plus{appearance:none;display:grid;place-items:center;width:var(--zt);height:var(--zt);padding:0;border-radius:6px;border:1px dashed rgba(201,162,106,.45);
+  background:linear-gradient(180deg,rgba(28,21,14,.75),rgba(14,11,8,.75));color:#e8cf95;cursor:pointer}
+.zp-plus b{font:700 12px/1 var(--f-u)}
+.zp-plus:hover{border-style:solid;border-color:var(--gold-2);color:var(--gold)}
+/* карточка — страница гримуара: чернёный пергамент, золотая линовка, позолоченный обрез; без арта — пергамент CSS */
+.zp-card{border-color:rgba(201,162,106,.35);background:radial-gradient(100% 60% at 50% 110%,rgba(72,229,212,.07),transparent 70%),linear-gradient(180deg,#1a140e,#100c09)}
+html.cr-p .zp-card{border-style:solid;border-color:transparent;border-width:14px 20px 18px 22px;border-radius:0;padding:var(--sp-s) var(--sp-m) var(--sp-s);background:none;box-shadow:none;
+  border-image:var(--cr-page) 100 149 137 150 fill / 14px 20px 18px 22px stretch;filter:drop-shadow(0 18px 24px rgba(0,0,0,.8))}
+html.cr-p .zp-card.fit::before{display:none}
+.zp-card .zp-name{color:#f0d79c;text-shadow:0 1px 2px #000}
+.zp-card .zp-q b{color:#f0d79c}
+.zp-card .zp-lt{color:#e2d2ad}
+.zp-card .zp-links{border-top-color:rgba(201,162,106,.3)}
+.zp-card .zp-link,.zp-card .zp-none{border-bottom-color:rgba(201,162,106,.16)}
+.zp-card .cr-hint{margin-top:2px}
+/* прокрутка карточки: низ гаснет, и обрезанный край читается как «листай дальше», а не как блок под кнопкой;
+   запас снизу — в конце прокрутки гаснет только он, текст — никогда */
+.zp-card .zp-body{padding-bottom:var(--sp-m);-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - var(--sp-m)),transparent);mask-image:linear-gradient(180deg,#000 calc(100% - var(--sp-m)),transparent)}
+/* крупная плитка шапки — в рамке своего вида */
+html.cr-f .zp-ic.lg[data-fk]{--z:52px}
+html.cr-f .zp-ic[data-fk]>.i{color:color-mix(in srgb,var(--rc,#aaa) 72%,var(--parch))}
+@container main (max-height: 360px){
+  html.cr-p .zp-card{border-width:12px 16px 14px 18px;border-image-width:12px 16px 14px 18px;padding:6px 10px}
+  html.cr-f .zp-ic.lg[data-fk]{--z:44px}
+}
+@media (prefers-reduced-motion:reduce){
+  .zp-cell{transition:none!important}
 }

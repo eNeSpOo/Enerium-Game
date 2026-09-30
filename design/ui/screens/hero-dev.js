@@ -332,7 +332,8 @@ function hdRow(ico, k, was, now, note, cls = '') {
 }
 /* пять характеристик мелко: значок, новое число и прибавка */
 const hdStMini = (a, b) => `<span class="hdv-st">${b.map((x, i) => `<span title="${STATS[i]}: ${a[i]} → ${x}">${ICON(STAT_IC[i], 14, STATS[i])}<b class="num">${x}</b>${x > a[i] ? `<i class="num">+${x - a[i]}</i>` : ''}</span>`).join('')}</span>`;
-const hdAbIco = x => ic(x.slot === 'ult' ? 'crown' : x.ab ? abIcon(x.ab) : 'spark');
+/* значок открытой способности: иконка сеткой (abArt, screens/art-icons.js), без неё — прежний вектор */
+const hdAbIco = x => (x.ab && typeof abArt === 'function' && abArt(x.ab, 24)) || ic(x.slot === 'ult' ? 'crown' : x.ab ? abIcon(x.ab) : 'spark');
 /* цена руной обучения у кнопки: тот же значок доблести, подпись — руна обучения */
 const hdTrainCost = () => `<span class="cost">${ICON('valor', 18, 'Руна обучения')}1</span>`;
 function hdValBody(h, P, train) {
@@ -507,7 +508,7 @@ const grHero = () => H(S.gear.hid) || H(S.selHero) || null;
 const grKey = (k, s) => `${k}:${s}`;
 /* значок вещи — арт слота снаряжения или семейства талисмана (eqIcon, talIcon — screens/art-icons.js); сам значок нейтральный,
    редкость — рамкой и светом --r1…--r7 (ADR-0027). Арта нет — прежняя заглушка: контур слота или медальон со значком эффекта */
-const grEqPic = (slot, px) => typeof eqPic === 'function' ? eqPic(slot, px) : eqGlyph(slot);
+const grEqPic = (slot, px, r = 0) => typeof eqPic === 'function' ? eqPic(slot, px, r) : eqGlyph(slot);
 const grEqT = it => eqTile(it, { lg: true });   // крупный рисунок, размер плитки задают стили окна
 const grTalT = no => tlTile(no, { lg: true });
 /* множитель мощи слоя талисманов для набора номеров — та же формула, что у надетых (tlMulOf, talismans.js) */
@@ -606,7 +607,7 @@ function grEqSlot(h, slot, P) {
   const key = grKey('eq', slot), uid = (S.eq.worn[h.id] || {})[slot], it = uid ? eqItem(uid) : null, fit = P ? grFit(h, P, key) : null;
   const st = [it ? 'on' : '', P ? (fit ? 'dim' : 'ok') : '', S.gear.focus === key ? 'sel' : '', grFlashOn(key) ? 'got' : ''].filter(Boolean).join(' ');
   const say = it ? `${eqSlotName(slot)} · ${RAR[it.r].toLowerCase()}: ${eqMainTxt(it, h)}` : `${eqSlotName(slot)}: пусто`;
-  return `<button class="gw-slot eq${st ? ' ' + st : ''}"${it ? ` data-r="${it.r}"` : ''} data-a="gearslot" data-v="${key}" data-gslot="${key}"${it ? ` data-gdrag="slot:${key}"` : ''} title="${hdEsc(say)}" aria-label="${hdEsc(say)}"><span class="gw-pic">${grEqPic(slot, 40)}</span>${it ? `<small class="num">${eqNum(it.lines[0][0], it.lines[0][1])}</small>` : ''}</button>`;
+  return `<button class="gw-slot eq${st ? ' ' + st : ''}"${it ? ` data-r="${it.r}"` : ''} data-a="gearslot" data-v="${key}" data-gslot="${key}"${it ? ` data-gdrag="slot:${key}"` : ''} title="${hdEsc(say)}" aria-label="${hdEsc(say)}"><span class="gw-pic">${grEqPic(slot, 40, it ? it.r : 0)}</span>${it ? `<small class="num">${eqNum(it.lines[0][0], it.lines[0][1])}</small>` : ''}</button>`;
 }
 function grTalSlot(h, i, P) {
   const key = grKey('tal', i), no = tlEq(h.id)[i], fit = P ? grFit(h, P, key) : null;

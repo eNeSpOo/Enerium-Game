@@ -1,0 +1,155 @@
+{
+  "name": "Иконки способностей сеткой — переделка слабых клеток малыми листами (правило art/style/style.md: шум без предмета, непонятная форма, повтор соседа, надпись). Образец — spell-icons-fire.json: style, negative и категория spell-icons — без правок",
+  "plan": {
+    "Малый лист": "1:1, 1K, сетка 2×2 — четыре клетки; 3:2, 1K, сетка 3×2 — шесть. Клетка — 470–500 px, иконке хватает 256",
+    "Нарезка": "python tools/art-gen/grid_slice.py jobs/spell-icons-fix.json <id задания> <лист>; клетки ложатся в art/generated/spell-icons/<id задания>/ и в выгрузке заменяют клетки большого листа"
+  },
+  "notes": [
+    "Клетки разных наборов на одном листе: у каждой клетки своя палитра словами — лист не смешивает школы",
+    "cells — [id способности, имя файла] по строкам сверху; grid — [столбцы, строки]"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "spell-icons": {
+      "aspect": "1:1",
+      "size": "2K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square ability icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the picture in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game puts its own frame on top: one clear central image with a bold silhouette that stays readable at 48 px, on a dark near-black stone background with faint cracks and a darker vignette toward the edges of the cell. Light rises from below in the color of the magic school; crisp rim light on the edges of the forms; a few sparks and dust motes in the light. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each icon differs clearly from its neighbours in shape and composition."
+    }
+  },
+  "jobs": [
+    {
+      "id": "spell-fire-fix",
+      "category": "spell-icons",
+      "title": "Огонь — четыре слабые клетки пробы сеткой 2×2",
+      "source": "tools/content-gen/abilities/library.json, набор «Огонь»: Пеплопад, Дымная завеса, Клеймо пепла, Печать пепла; уроки — art/style/style.md",
+      "aspect": "1:1",
+      "size": "1K",
+      "grid": [
+        2,
+        2
+      ],
+      "cells": [
+        [
+          "Огонь.debuff.all",
+          "fire-debuff-all"
+        ],
+        [
+          "Огонь.ctrl.grp",
+          "fire-ctrl-grp"
+        ],
+        [
+          "Огонь.debuff.one",
+          "fire-debuff-one"
+        ],
+        [
+          "Огонь.ult.debuff",
+          "fire-ult-debuff"
+        ]
+      ],
+      "subject": "The magic school of this sheet is Fire: scarlet fire (#F0564A) with orange and amber flames, glowing embers, grey ash and soot-black stone; the light from below is scarlet and amber. Attacking spells burn a violent, jagged scarlet. A spell for all targets shows something wide that fills its cell; a spell for two targets shows two of its thing; a spell for one target shows one focused object. Attacks move to the right, toward the enemies. Every icon is built around one clear central object with a bold silhouette — never only ash, smoke or a scattered pattern: the object is named together with the form it is known by.\n\nThe grid: exactly 2 columns and 2 rows, 4 icons. The last icon is an ultimate spell — grander and more epic, with bright gold highlights in the fire.\n\nRow 1: a big dark clay funeral urn tipped on its side, a wide fan of glowing ash with scarlet edges pouring out of its mouth and sweeping to the right across the whole cell; two round clay smoke pots bound with iron bands, cracked open on the ground, each belching a thick column of grey-black smoke full of scarlet embers, the two columns twisting together into a screen.\n\nRow 2: one glowing scarlet handprint of hot ash seared into a dark leather breastplate, thin smoke rising from it; a large blob of glowing scarlet sealing wax with irregular dripping edges, freshly stamped with a deep flame-shaped emblem, lying on scorched stone, a ring of glowing ash bursting outward from under it."
+    },
+    {
+      "id": "spell-mix-fix",
+      "category": "spell-icons",
+      "title": "Слабые клетки семи наборов сеткой 4×3",
+      "source": "проверка листов на доске 30.09.2026: повтор соседа — Земля ult.hot, Воздух ult.heal и ult.shield, Без школы ult.buff; непонятная форма — Земля ult.ctrl, Вода hot.grp (пружины вместо родников), Время dmg.grp и dmg.one (модель разрезала первую клетку на две и сдвинула строку); тонкий предмет пропадает на 32 px — Время pas.2, Свет pas.1 и pas.3; светлый снег вместо тёмного фона — Воздух pas.1",
+      "aspect": "4:3",
+      "size": "2K",
+      "grid": [
+        4,
+        3
+      ],
+      "cells": [
+        [
+          "Земля.ult.hot",
+          "earth-ult-hot"
+        ],
+        [
+          "Земля.ult.ctrl",
+          "earth-ult-ctrl"
+        ],
+        [
+          "Без школы.ult.buff",
+          "none-ult-buff"
+        ],
+        [
+          "Время.dmg.grp",
+          "time-dmg-grp"
+        ],
+        [
+          "Время.dmg.one",
+          "time-dmg-one"
+        ],
+        [
+          "Время.pas.2",
+          "time-pas-2"
+        ],
+        [
+          "Вода.hot.grp",
+          "water-hot-grp"
+        ],
+        [
+          "Свет.pas.1",
+          "light-pas-1"
+        ],
+        [
+          "Свет.pas.3",
+          "light-pas-3"
+        ],
+        [
+          "Воздух.ult.heal",
+          "air-ult-heal"
+        ],
+        [
+          "Воздух.ult.shield",
+          "air-ult-shield"
+        ],
+        [
+          "Воздух.pas.1",
+          "air-pas-1"
+        ]
+      ],
+      "subject": "This sheet gathers replacement icons from several magic schools. Every cell names its own school and palette in brackets, and each cell keeps strictly to its own palette — colours never spill from one cell to another. A spell for all targets shows something wide that fills its cell; a spell for two or three targets shows two or three of its thing; a spell for one target shows one focused object. Attacks move to the right, toward the enemies. Every icon, even the widest, is built around one clear central object with a bold silhouette — never only smoke, dust, snow, fog or a scattered pattern. Ultimate spells are the grandest, most epic images, with bright gold highlights; passive traits are calm, emblem-like single objects, no action.\n\nThe grid: exactly 4 columns and 3 rows, 12 icons.\n\nRow 1: (Earth ultimate — dark rock, amber-orange light #EB9D40 and bright gold) a colossal ancient tree with a vast crown of golden leaves, its trunk and roots glowing with rivers of golden sap, warm golden light rising; (Earth ultimate — dark rock, amber light and bright gold) a row of three warriors in mid-charge turning to stone from the feet up — their legs and bodies already cracked grey rock, the stone creeping up toward their raised swords, amber light glowing in the cracks, stone dust rising; (a fighting skill with no magic, ultimate — steel, wood, warm torchlight and bright gold) a great bronze war horn, long and curved, raised to the sky, a wave of warm golden sound bursting from its mouth, torches blazing on both sides; (Time — bronze, pale golden sand, green Energium light #4FDC8B) three heavy bronze pendulum blades on long rods swinging to the right side by side, green light along their edges.\n\nRow 2: (Time — bronze and green light) one thread of glowing green light snapping in two with a sharp spark as a pair of bronze shears closes on it; (Time passive — bronze and green light) one thick drop of golden honey slowly falling from a wooden dipper, calm; (Water — clear blue water #5A94F7 and warm gold) three small fountains of clear water bubbling up between dark stones, each with a soft golden glow — water, not metal coils; (Light passive — white light #F4E6AE and warm gold) a warrior's helmet with a golden halo floating above it.\n\nRow 3: (Light passive — white light and warm gold) a broad white-gold war hammer standing upright on its head, soft light around it; (Air ultimate — pale, almost white wind #DFF4E5 and bright gold) a colossal ring of warm golden wind circling around a bright center, seen from slightly above, white feathers and golden motes carried around it; (Air ultimate — pale wind and bright gold) a giant round shield made of spinning white wind, standing upright like a spinning disc of air, its rim bright gold, arrows and stones bouncing off it; (Air passive — pale, almost white wind) one light leather boot stepping on a single white feather without crushing it, on the dark stone floor."
+    },
+    {
+      "id": "spell-mix-fix-2",
+      "category": "spell-icons",
+      "title": "Ещё четыре слабые клетки сеткой 2×2",
+      "source": "доска 30.09.2026: Время dmg.grp с первой переделки — лопаты вместо маятников; Земля pas.3 — след современной подошвы с протектором; Тьма shield.all — занавес читается шторой; Земля heal.grp — три лепёшки глины похожи на печенье",
+      "aspect": "1:1",
+      "size": "1K",
+      "grid": [
+        2,
+        2
+      ],
+      "cells": [
+        [
+          "Время.dmg.grp",
+          "time-dmg-grp"
+        ],
+        [
+          "Земля.pas.3",
+          "earth-pas-3"
+        ],
+        [
+          "Тьма.shield.all",
+          "dark-shield-all"
+        ],
+        [
+          "Земля.heal.grp",
+          "earth-heal-grp"
+        ]
+      ],
+      "subject": "This sheet gathers replacement icons from several magic schools. Every cell names its own school and palette in brackets, and each cell keeps strictly to its own palette — colours never spill from one cell to another. A spell for all targets shows something wide that fills its cell; a spell for two or three targets shows two or three of its thing; a spell for one target shows one focused object. Attacks move to the right, toward the enemies. Every icon, even the widest, is built around one clear central object with a bold silhouette — never only smoke, dust, snow, fog or a scattered pattern. Passive traits are calm, emblem-like single objects, no action.\n\nThe grid: exactly 2 columns and 2 rows, 4 icons.\n\nRow 1: (Time — bronze, pale golden sand, green Energium light #4FDC8B) three heavy crescent-shaped bronze blades, each hanging from a long rod like a great pendulum, swinging to the right side by side, green arcs of motion behind them; (Earth passive — dark rock, amber-orange light #EB9D40) one deep footprint of a heavy iron-shod boot with a plain smooth sole, sunk into cracked stone, cracks radiating from it.\n\nRow 2: (Darkness — black shadow, violet light #A986EE and warm gold) a huge dome of black smoke and shadow arching over the dark ground like a protective vault, violet light in its folds, a warm golden rim along its edge; (Earth — dark rock, warm gold and honey-amber) three small round clay pots of healing clay paste standing side by side, soft golden light glowing from the paste inside them."
+    }
+  ]
+}

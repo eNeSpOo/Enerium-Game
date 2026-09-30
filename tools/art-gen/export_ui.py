@@ -1,15 +1,21 @@
 """Выгрузка одобренного арта в прототип интерфейса.
 
-Что куда идёт — в ui-art.json рядом: путь в прототипе → картинка из art/generated/.
+Что куда идёт — в описях рядом: путь в прототипе → картинка из art/generated/.
+- ui-art.json — арт экранов: портреты, арены, значки, окна;
+- ui-icons.json — иконки, нарисованные сеткой: способности, линейки талисманов, снаряжение по редкости (256 px, WebP).
 Картинки сжимаются до размера для экрана телефона, исходники не трогаются.
 mirror: true — отразить по горизонтали: на карте герой смотрит вправо, на врагов, а враг — влево, на героев.
 crop: [x0, y0, x1, y1] — вырезать кадр из исходника до сжатия (пиксели исходника), например портрет по пояс из картинки в полный рост.
 Путь в прототипе на .png — значок с прозрачностью: пустые поля обрезаются по альфе, fit: N вписывает эмблему в N % кадра по центру.
 Путь на .webp — то же с прозрачностью, но WebP: крупный арт с альфой (обложки и развороты книги героя) легче PNG в разы.
+Непрозрачная картинка на .webp (иконка сеткой — живопись в край) просто сжимается до размера описи.
 
-  python tools/art-gen/export_ui.py
-  python tools/art-gen/export_ui.py --no-stamp    # только картинки, index.html не трогать: его правят параллельно
+  python tools/art-gen/export_ui.py                           # все описи
+  python tools/art-gen/export_ui.py --spec ui-icons.json      # только одна опись; --spec можно повторить
+  python tools/art-gen/export_ui.py --no-stamp                # только картинки, index.html не трогать: его правят параллельно
+  python tools/art-gen/export_ui.py --quiet                   # без строки на каждую картинку, только итоги
 """
+import argparse
 import hashlib
 import json
 import pathlib
@@ -19,12 +25,24 @@ import sys
 from PIL import Image, ImageOps
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-SPEC = pathlib.Path(__file__).with_name("ui-art.json")
+TOOL = pathlib.Path(__file__).resolve().parent
+SPECS = ["ui-art.json", "ui-icons.json"]   # описи выгрузки по порядку; файла нет — опись пропускается
 
 
-def main():
-    sys.stdout.reconfigure(encoding="utf-8")
-    spec = json.loads(SPEC.read_text(encoding="utf-8"))
+def load_specs(names, strict=False):
+    """Описи из tools/art-gen/: [(имя, опись)]. strict — названной описи нет: ошибка; иначе пропуск."""
+    out = []
+    for name in names:
+        path = TOOL / name
+        if path.exists():
+            out.append((name, json.loads(path.read_text(encoding="utf-8"))))
+        elif strict:
+            sys.exit(f"Нет описи {name} в tools/art-gen/")
+    return out
+
+
+def export(name, spec, quiet):
+    """Выгрузить одну опись; вернуть число картинок и КБ."""
     out = ROOT / spec["out"]
     total = 0
     for dst, src in spec["items"].items():
@@ -41,6 +59,8 @@ def main():
         path = out / dst
         path.parent.mkdir(parents=True, exist_ok=True)
         if dst.lower().endswith(".webp"):
+            if pic.mode == "RGBA" and pic.getchannel("A").getextrema()[0] == 255:
+                pic = pic.convert("RGB")                 # живопись в край: альфа не нужна
             pic.save(path, "WEBP", quality=88, method=6)
         elif png:
             pic.save(path, "PNG", optimize=True)
@@ -48,12 +68,30 @@ def main():
             pic.save(path, "JPEG", quality=86, optimize=True, progressive=True)
         kb = path.stat().st_size // 1024
         total += kb
-        print(f"{dst:22} ← {src['from']}  {size[0]}×{size[1]}{', отражён' if src.get('mirror') else ''}, {kb} КБ")
-    print(f"Итого {len(spec['items'])} картинок, {total} КБ → {spec['out']}")
-    if "--no-stamp" in sys.argv[1:]:
+        if not quiet:
+            print(f"{dst:22} ← {src['from']}  {size[0]}×{size[1]}{', отражён' if src.get('mirror') else ''}, {kb} КБ")
+    print(f"{name}: {len(spec['items'])} картинок, {total} КБ → {spec['out']}")
+    return len(spec["items"]), total
+
+
+def main():
+    sys.stdout.reconfigure(encoding="utf-8")
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--spec", action="append", help="опись из tools/art-gen/; по умолчанию все: " + ", ".join(SPECS))
+    ap.add_argument("--no-stamp", action="store_true", help="не записывать версию выгрузки в design/ui/index.html")
+    ap.add_argument("--quiet", action="store_true", help="без строки на каждую картинку")
+    a = ap.parse_args()
+
+    specs = load_specs(a.spec or SPECS, strict=bool(a.spec))
+    count = size = 0
+    for name, spec in specs:
+        n, kb = export(name, spec, a.quiet)
+        count, size = count + n, size + kb
+    print(f"Итого {count} картинок, {size} КБ")
+    if a.no_stamp:
         print("Версия выгрузки не записана (--no-stamp): новые пути браузер и так возьмёт свежими")
         return
-    stamp_version(out, spec)
+    stamp_version(load_specs(SPECS))
 
 
 def fit_icon(im, size, fit):
@@ -76,11 +114,13 @@ def fit_icon(im, size, fit):
     return canvas
 
 
-def stamp_version(out, spec):
-    """Версия выгрузки — хеш картинок. Она попадает в адреса картинок прототипа: браузер не покажет старые из кэша."""
+def stamp_version(specs):
+    """Версия выгрузки — хеш картинок всех описей. Она попадает в адреса картинок прототипа: браузер не покажет старые из кэша."""
     h = hashlib.sha1()
-    for dst in sorted(spec["items"]):
-        h.update((out / dst).read_bytes())
+    for name, spec in specs:
+        out = ROOT / spec["out"]
+        for dst in sorted(spec["items"]):
+            h.update((out / dst).read_bytes())
     ver = h.hexdigest()[:8]
     page = ROOT / "design/ui/index.html"
     raw = page.read_bytes().decode("utf-8")

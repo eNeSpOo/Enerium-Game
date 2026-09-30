@@ -44,3 +44,37 @@
 .hsg-kit{gap:16px;flex-wrap:wrap;align-items:flex-end}
 .hsg-kit figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px}
 .hsg-kit figcaption{font-size:11px;color:var(--parch-3)}
+/* ---------- иконки сеткой — screens/art-icons.js: способности, линейки талисманов, снаряжение по редкости ----------
+   Живопись в край клетки; рамку, кромку и свет редкости даёт место, где иконка стоит */
+.ab-art,.eq-grid,.tal-grid{object-fit:cover;border-radius:18%}
+.ab-art.off{filter:grayscale(.75) brightness(.7)}   /* способность ещё закрыта доблестью */
+/* строка способности (abRow, index.html): иконка крупнее вектора */
+.ab:has(.ab-art){grid-template-columns:32px 30px minmax(0,1fr) auto}
+.ab .h .ico.ab-art{width:30px;height:30px}
+/* строки развития героя (hdRow, screens/hero-dev.js) */
+.hdv-r:has(.ab-art){grid-template-columns:24px minmax(0,1fr) auto}
+.hdv-r .ic .ico.ab-art{width:24px;height:24px}
+/* UI-кит: плитка библиотеки, её карточка, набор героя черновика */
+.kl-tile .ti .ico.ab-art{width:24px;height:24px;border-radius:6px}
+.kl-ico:has(.ab-art){overflow:hidden}
+.kl-ico .ico.ab-art{width:100%;height:100%;border-radius:inherit}
+.kh-ab:has(.ab-art){grid-template-columns:22px 26px minmax(0,1fr)}
+.kh-ab .ti .ico.ab-art{width:26px;height:26px;border-radius:6px}
+/* приёмы кланового босса и его элит (screens/clan.js): иконка слева от имени и описания */
+.cl-ab:has(.ab-art){display:grid;grid-template-columns:32px minmax(0,1fr);align-items:center;gap:8px}
+.cl-ab>span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.cl-ab .ico.ab-art{width:32px;height:32px;border-radius:7px}
+/* неизвестная душа: закрытые книги навыков (hcSoulBody, screens/heroes.js) */
+.hb-hid{display:flex;flex-wrap:wrap;gap:6px}
+.hb-hid .ico.ab-art{width:30px;height:30px;border-radius:7px}
+/* снаряжение: иконка во всю плитку и место */
+.eq-t .eq-ico.eq-grid,.eq-slot .eq-ico.eq-grid{width:100%;height:100%;border-radius:inherit}
+.gw-slot .gw-pic>.eq-grid{border-radius:7px}
+.co-ci>.eq-grid,.co-ti>.eq-grid{border-radius:12%}
+.eq-icons{display:flex;flex-direction:column;gap:4px}
+.eq-ic-row{display:flex;flex-wrap:wrap;gap:4px}
+/* талисман: иконка линейки по шестиграннику медальона, кромка редкости остаётся */
+.tl-t.art .tal-ico.tal-grid{position:absolute;inset:2px;width:calc(100% - 4px);height:calc(100% - 4px);border-radius:0;
+  clip-path:polygon(50% 0,100% 23%,100% 77%,50% 100%,0 77%,0 23%)}
+.tl-kmarks{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 2px}
+.tl-kmarks .tl-t{--ts:36px}

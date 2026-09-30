@@ -1,0 +1,60 @@
+{
+  "sheet": "art/generated/talisman-icons/tal-fix__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/talisman-icons.json",
+  "job": "tal-fix",
+  "grid": [
+    2,
+    2
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "hidden",
+      "file": "art/generated/talisman-icons/tal-fix/tal-hidden.webp",
+      "box": [
+        21,
+        21,
+        497,
+        497
+      ],
+      "px": 476,
+      "key_left": 0.0
+    },
+    {
+      "id": "seal_bleed",
+      "file": "art/generated/talisman-icons/tal-fix/tal-seal-bleed.webp",
+      "box": [
+        526,
+        21,
+        1002,
+        497
+      ],
+      "px": 476,
+      "key_left": 0.0
+    },
+    {
+      "id": "chief",
+      "file": "art/generated/talisman-icons/tal-fix/tal-chief.webp",
+      "box": [
+        21,
+        526,
+        497,
+        1002
+      ],
+      "px": 476,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_mechpart",
+      "file": "art/generated/talisman-icons/tal-fix/tal-mark-mechpart.webp",
+      "box": [
+        526,
+        526,
+        1003,
+        1003
+      ],
+      "px": 477,
+      "key_left": 0.0
+    }
+  ]
+}

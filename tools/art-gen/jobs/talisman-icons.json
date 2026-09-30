@@ -1,0 +1,622 @@
+{
+  "name": "Иконки духовных талисманов сеткой — по одной на линейку, 118 линеек пятью листами 6×4 (слово автора 30.09.2026: «а после тогда в таком же стиле сделай сетку для духовных талисманов, снаряжений»). Манера — как у иконок способностей: style и negative — из spell-icons-fire.json",
+  "plan": {
+    "Язык иконки": "талисман — «чужая черта в герое» (docs/content/талисманы.md, «Что такое духовный талисман»): вещь-памятка, а не действие. Каждая иконка — один неподвижный амулет прямо по центру на узловом шнурке, спущенном с верхнего края клетки; в амулете — лунный камень с клубком призрачного света, от амулета поднимается призрачная струйка, за ним — мягкий круг бледного света. Способность — действие и сцена, талисман — предмет в покое: семья читается шнурком, лунным камнем и ореолом",
+    "Свет по видам": "боевые — угольно-алый, охотничьи — лунное серебро, добыча и знаки сборщика — тёплое золото удачи, печати — бирюза. Тот же язык, что у значков семейств (jobs/talisman-families.json)",
+    "Форма по видам": "бич — трофей, пробитый железным шипом; оберег — тот же трофей в круглом щитке; печать — плита-ромб с выпуклой золотой эмблемой; знак сборщика — круглый жетон с привязанной вещью ресурса",
+    "Листы": "tal-fight — боевые 24; tal-mix — боевые 11, «талисман скрыт», добыча 9, охотничьи 2 и запасная клетка; tal-hunt — охотничьи 24; tal-seal-mark — печати 12 и знаки сборщика 12; tal-mark — знаки сборщика 24",
+    "Редкость": "не рисуется: её дают рамка и кристалл интерфейса (ADR-0027)"
+  },
+  "notes": [
+    "Спойлеры: у бича и оберега Перворождённых — только гладкий чёрный камень, облика расы нет. Искажённые — тусклый фиолетовый кристалл в клетке: игрок с начала знает, что искажение идёт от фиолетового дикого карста (дайджест)",
+    "Раса у бича и оберега — трофеем: аппараты — зуб шестерни, Забытые — черепок глиняной маски, звери — коготь, нежить — кость, саганы — бусина с искрой, этеры — песочные часы (их второе сердце)",
+    "tal-fight нарисован дважды (30.09.2026): в первом ореол вышел плоским бледным диском-тарелкой, контур — чёрной обводкой «наклейки», дымок — розовым, лунный камень был не у всех. Во втором ореол назван тусклым и тающим в камень, манера — живописный мазок без обводки, как у иконок способностей, лунный камень — у каждого, дымок — «тлеющий уголь, не розовый»",
+    "tal-mark нарисован дважды (30.09.2026): в первом модель бросила жетон и повесила сами вещи на шнурок — вышли значки ресурсов, не как 12 знаков на tal-seal-mark. Во втором жетон вернулся, но лунный камень вырос на всю середину, а вещь ушла в угол. В третьем размеры названы словами: камень — «с ноготь», наверху; вещь — в центре, на половину диска, главный предмет иконки",
+    "cells — [ключ линейки EN_TALISMANS.fams, имя файла]; hidden — значок «талисман скрыт» для спойлерных линеек; cloak-alt в последней клетке tal-mix — второй вариант «Плаща безымянного»: капюшон уже занят «Покровом Пятерых» (tal-fight)"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "talisman-icons": {
+      "aspect": "3:2",
+      "size": "4K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square spirit-talisman icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the talisman in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game puts its own frame on top. A spirit talisman is a small keepsake that holds a trait of someone else's soul — how that soul struck, guarded or survived — and gives the trait to the one who wears it. Every cell shows exactly one talisman at rest, seen straight on: it hangs straight down in the middle of the cell from a short loop of knotted dark cord that comes down from the top edge of the cell. The talisman is a small flat charm of dark materials — dark forged iron, dark carved bone, dark wood, dark leather or dark stone — shaped as the thing named for its cell, with fittings of worn old gold. Every talisman without exception has one smooth oval cabochon of milky moonstone set in it, clearly visible; inside the moonstone a captured soul-trait turns like a small ghostly wisp of coloured light, and one thin ghostly wisp of the same light curls up from the charm like breath on a cold night. The charm and its cord fill about two thirds of the cell with one bold, simple silhouette that stays readable at 48 px. Behind it: a dark near-black stone background with faint cracks, a darker vignette toward the edges of the cell, and a soft, dim glow of pale ghostly light behind the charm that fades smoothly into the dark stone — never a flat disc or a plate. Light rises gently from below; crisp rim light on the edges of the charm; a few dust motes in the light. Painted exactly like the ability icons of this game: loose, confident painterly brush strokes, soft painted edges and deep shadows — no black outlines, no flat sticker look. No action, no spell effects, no scenes: always one still object. All talismans share the same cord, the same moonstone, the same brushwork, lighting, level of detail and palette, so they read as one family, and each differs clearly from its neighbours in the shape of its charm."
+    }
+  },
+  "jobs": [
+    {
+      "id": "tal-fight",
+      "category": "talisman-icons",
+      "title": "Боевые талисманы: 15 сквозных, 8 проков, «Волчья гордость» — сеткой 6×4",
+      "source": "design/ui/talismans.js (EN_TALISMANS.fams), docs/content/талисманы.md",
+      "aspect": "3:2",
+      "size": "4K",
+      "grid": [
+        6,
+        4
+      ],
+      "cells": [
+        [
+          "cup",
+          "tal-cup"
+        ],
+        [
+          "spring",
+          "tal-spring"
+        ],
+        [
+          "frost",
+          "tal-frost"
+        ],
+        [
+          "oath",
+          "tal-oath"
+        ],
+        [
+          "eye",
+          "tal-eye"
+        ],
+        [
+          "abyss",
+          "tal-abyss"
+        ],
+        [
+          "ash",
+          "tal-ash"
+        ],
+        [
+          "dance",
+          "tal-dance"
+        ],
+        [
+          "veil",
+          "tal-veil"
+        ],
+        [
+          "reap",
+          "tal-reap"
+        ],
+        [
+          "ages",
+          "tal-ages"
+        ],
+        [
+          "heart",
+          "tal-heart"
+        ],
+        [
+          "tears",
+          "tal-tears"
+        ],
+        [
+          "whisper",
+          "tal-whisper"
+        ],
+        [
+          "firstblood",
+          "tal-firstblood"
+        ],
+        [
+          "needle",
+          "tal-needle"
+        ],
+        [
+          "fang",
+          "tal-fang"
+        ],
+        [
+          "moth",
+          "tal-moth"
+        ],
+        [
+          "hunter",
+          "tal-hunter"
+        ],
+        [
+          "lead",
+          "tal-lead"
+        ],
+        [
+          "resin",
+          "tal-resin"
+        ],
+        [
+          "thorn",
+          "tal-thorn"
+        ],
+        [
+          "yoke",
+          "tal-yoke"
+        ],
+        [
+          "wolf",
+          "tal-wolf"
+        ]
+      ],
+      "subject": "All talismans of this sheet are combat talismans — traits of how a soul struck and endured; their soul-light, in the moonstone and in the ghostly wisp, is a fierce ember red-orange (#E8603C) like a smouldering coal — never pink.\n\nThe grid: exactly 6 columns and 4 rows, 24 talismans. For each cell, the shape of its charm:\n\nRow 1: a small crimson-lacquered cup with a single drop of blood on its rim; a stone spring-head with two thin trickles of water flowing from one source; a long icicle of pale frosted crystal; an iron fist clenched around a broken chain link; an almond-shaped eye of dark bronze, the moonstone as its pupil; a black clawed hand with long curled fingers.\n\nRow 2: a small flame carved from grey ash-stone; a curved dancer's blade bent into a graceful spiral; a small hooded cloak of dark cloth, its folds held by a gold clasp; a long curved scythe blade; a round flat stone worn smooth by ages, one deep old footprint of a bare foot pressed into it, moss in its cracks; a heart of dark granite with seams of gold.\n\nRow 3: a thin silver crescent with three small pale teardrops hanging from it; a small iron helmet visor with a thin needle passing through its eye slit; an arrowhead with a single drop of blood at its tip; a long bone needle threaded with a pale thread that is unravelling; a big stone-eater's fang with chips of stone stuck in its grooves; a moth with ashen, singed wings.\n\nRow 4: a round bronze hunter's tag with a notch cut into its edge and a small ring target carved on it; a heavy plumb weight of dull grey lead; a thick drop of dark amber resin with a tiny insect trapped inside; a long crimson thorn on a piece of dark stem; a small wooden yoke dusted with grey ash; a proud wolf's head carved from dark bone."
+    },
+    {
+      "id": "tal-mix",
+      "category": "talisman-icons",
+      "title": "Боевые (11), «талисман скрыт», добыча (9), охотничьи (2) и запасная клетка — сеткой 6×4",
+      "source": "design/ui/talismans.js (EN_TALISMANS.fams), docs/content/талисманы.md",
+      "aspect": "3:2",
+      "size": "4K",
+      "grid": [
+        6,
+        4
+      ],
+      "cells": [
+        [
+          "banner",
+          "tal-banner"
+        ],
+        [
+          "sting",
+          "tal-sting"
+        ],
+        [
+          "scales",
+          "tal-scales"
+        ],
+        [
+          "cloak",
+          "tal-cloak"
+        ],
+        [
+          "rage",
+          "tal-rage"
+        ],
+        [
+          "firstword",
+          "tal-firstword"
+        ],
+        [
+          "secondword",
+          "tal-secondword"
+        ],
+        [
+          "ember",
+          "tal-ember"
+        ],
+        [
+          "hammer",
+          "tal-hammer"
+        ],
+        [
+          "chains",
+          "tal-chains"
+        ],
+        [
+          "archon",
+          "tal-archon"
+        ],
+        [
+          "hidden",
+          "tal-hidden"
+        ],
+        [
+          "vein",
+          "tal-vein"
+        ],
+        [
+          "vessel",
+          "tal-vessel"
+        ],
+        [
+          "soulpath",
+          "tal-soulpath"
+        ],
+        [
+          "magpie",
+          "tal-magpie"
+        ],
+        [
+          "censer",
+          "tal-censer"
+        ],
+        [
+          "bag",
+          "tal-bag"
+        ],
+        [
+          "coin",
+          "tal-coin"
+        ],
+        [
+          "net",
+          "tal-net"
+        ],
+        [
+          "reaper",
+          "tal-reaper"
+        ],
+        [
+          "path",
+          "tal-path"
+        ],
+        [
+          "echo",
+          "tal-echo"
+        ],
+        [
+          "cloak",
+          "tal-cloak-alt"
+        ]
+      ],
+      "subject": "This sheet holds three kinds of talismans; the soul-light, in the moonstone and in the ghostly wisp, follows the kind named for each row: combat talismans — fierce ember red-orange (#E8603C); loot talismans — warm lucky gold (#F0CC4F); hunting talismans — cold pale silver-blue moonlight (#BFD8F0). Rows 1 and 2 are combat talismans. Rows 3 and 4 up to the third cell of row 4 are loot talismans. The fourth and fifth cells of row 4 are hunting talismans. The last cell of row 4 is a combat talisman.\n\nThe grid: exactly 6 columns and 4 rows, 24 talismans. For each cell, the shape of its charm:\n\nRow 1: a small shield with a torn scrap of banner cloth tied to it; a scorpion's curled stinger; a small balance scales of old gold; a small black cat carved from dark wood, curled up, its eyes half closed; a boar's tusk bound with red cord; one feather quill whose tip glows.\n\nRow 2: two feather quills crossed and tied together; a tiny hourglass with a single glowing grain of sand left in it; a dwarven war hammer with a heavy square head; a pair of heavy iron shackles, closed; a small ivory mask of a calm sleeping face with closed eyes; a talisman hidden in mist, in neutral pale grey light instead of ember red: only the dark outline of a charm on its cord, veiled by thick pale grey mist so that its shape cannot be seen.\n\nRow 3: a small nugget of raw gold dusted with gold; a tiny stoppered glass vessel with a turquoise swirl inside; a small lantern with a pale blue flame inside; a magpie feather with a small shiny gem tied to it; a small bronze censer with a curl of smoke; a small bulging sack tied with cord.\n\nRow 4: an old coin with a hole in its middle; a small knotted net with a pale blue flame caught in it; a small sheaf of wheat bound with gold; a small hunting bow with a tuft of grey wool tied to its string; a spiral seashell; a small smooth mask of grey stone with no face at all, blank and featureless."
+    },
+    {
+      "id": "tal-hunt",
+      "category": "talisman-icons",
+      "title": "Охотничьи талисманы: 8 бичей, 8 оберегов, 8 прочих — сеткой 6×4",
+      "source": "design/ui/talismans.js (EN_TALISMANS.fams), docs/content/талисманы.md",
+      "aspect": "3:2",
+      "size": "4K",
+      "grid": [
+        6,
+        4
+      ],
+      "cells": [
+        [
+          "bane_apparat",
+          "tal-bane-apparat"
+        ],
+        [
+          "bane_firstborn",
+          "tal-bane-firstborn"
+        ],
+        [
+          "bane_forgotten",
+          "tal-bane-forgotten"
+        ],
+        [
+          "bane_beast",
+          "tal-bane-beast"
+        ],
+        [
+          "bane_twisted",
+          "tal-bane-twisted"
+        ],
+        [
+          "bane_undead",
+          "tal-bane-undead"
+        ],
+        [
+          "bane_sagan",
+          "tal-bane-sagan"
+        ],
+        [
+          "bane_eter",
+          "tal-bane-eter"
+        ],
+        [
+          "ward_apparat",
+          "tal-ward-apparat"
+        ],
+        [
+          "ward_firstborn",
+          "tal-ward-firstborn"
+        ],
+        [
+          "ward_forgotten",
+          "tal-ward-forgotten"
+        ],
+        [
+          "ward_beast",
+          "tal-ward-beast"
+        ],
+        [
+          "ward_twisted",
+          "tal-ward-twisted"
+        ],
+        [
+          "ward_undead",
+          "tal-ward-undead"
+        ],
+        [
+          "ward_sagan",
+          "tal-ward-sagan"
+        ],
+        [
+          "ward_eter",
+          "tal-ward-eter"
+        ],
+        [
+          "chief",
+          "tal-chief"
+        ],
+        [
+          "lords",
+          "tal-lords"
+        ],
+        [
+          "scythe",
+          "tal-scythe"
+        ],
+        [
+          "almanac",
+          "tal-almanac"
+        ],
+        [
+          "assault",
+          "tal-assault"
+        ],
+        [
+          "flute",
+          "tal-flute"
+        ],
+        [
+          "diary",
+          "tal-diary"
+        ],
+        [
+          "trophy",
+          "tal-trophy"
+        ]
+      ],
+      "subject": "All talismans of this sheet are hunting talismans — traits of a tracker who learned how an enemy lives and dies; their soul-light is a cold pale silver-blue moonlight (#BFD8F0). A scourge talisman is sharp: its trophy is pierced by an iron spike. A ward talisman is round: its trophy is set in the middle of a small round shield-shaped charm.\n\nThe grid: exactly 6 columns and 4 rows, 24 talismans. For each cell, the shape of its charm:\n\nRow 1: a broken bronze gear tooth pierced by a short iron spike; a plain smooth black stone pierced by a short iron spike; a shard of a cracked clay face-mask pierced by a short iron spike; a big hooked beast claw pierced by a short iron spike; a shard of dull violet crystal in a small iron cage, pierced by a short iron spike; a small bleached bone bound along a short iron spike with red thread.\n\nRow 2: a glass bead holding a trapped spark of pale energy, pierced by a short iron spike; a tiny cracked hourglass pierced by a short iron spike; a small round shield-shaped charm with a broken bronze gear tooth set in its middle; a small round shield-shaped charm with a plain smooth black stone set in its middle; a small round shield-shaped charm with a shard of a cracked clay face-mask set in its middle; a small round shield-shaped charm with a big hooked beast claw set in its middle.\n\nRow 3: a small round shield-shaped charm with a shard of dull violet crystal in a tiny iron cage set in its middle; a small round shield-shaped charm with a small bleached bone set in its middle; a small round shield-shaped charm with a glass bead holding a trapped spark of pale energy set in its middle; a small round shield-shaped charm with a tiny whole hourglass set in its middle; a torn horsehair plume from a war-chief's helmet, bound with cord; a huge fang of a great beast.\n\nRow 4: a small hand sickle; a round bronze wheel with plain notches around its rim and no numerals; a small triangular war pennant of plain cloth on a spear tip; a small bone flute; a tiny leather diary with a clasp and a pressed feather sticking out of it; a small broken golden crown."
+    },
+    {
+      "id": "tal-seal-mark",
+      "category": "talisman-icons",
+      "title": "Печати (12) и знаки сборщика (12) сеткой 6×4",
+      "source": "design/ui/talismans.js (EN_TALISMANS.fams), docs/content/талисманы.md",
+      "aspect": "3:2",
+      "size": "4K",
+      "grid": [
+        6,
+        4
+      ],
+      "cells": [
+        [
+          "seal_slow",
+          "tal-seal-slow"
+        ],
+        [
+          "seal_drain",
+          "tal-seal-drain"
+        ],
+        [
+          "seal_weak",
+          "tal-seal-weak"
+        ],
+        [
+          "seal_bleed",
+          "tal-seal-bleed"
+        ],
+        [
+          "seal_mark",
+          "tal-seal-mark"
+        ],
+        [
+          "seal_rend",
+          "tal-seal-rend"
+        ],
+        [
+          "seal_pierce",
+          "tal-seal-pierce"
+        ],
+        [
+          "seal_miss",
+          "tal-seal-miss"
+        ],
+        [
+          "seal_silence",
+          "tal-seal-silence"
+        ],
+        [
+          "seal_stun",
+          "tal-seal-stun"
+        ],
+        [
+          "seal_knock",
+          "tal-seal-knock"
+        ],
+        [
+          "seal_freeze",
+          "tal-seal-freeze"
+        ],
+        [
+          "mark_nail",
+          "tal-mark-nail"
+        ],
+        [
+          "mark_mushroom",
+          "tal-mark-mushroom"
+        ],
+        [
+          "mark_plank",
+          "tal-mark-plank"
+        ],
+        [
+          "mark_ironore",
+          "tal-mark-ironore"
+        ],
+        [
+          "mark_sinew",
+          "tal-mark-sinew"
+        ],
+        [
+          "mark_ash",
+          "tal-mark-ash"
+        ],
+        [
+          "mark_acid",
+          "tal-mark-acid"
+        ],
+        [
+          "mark_fang",
+          "tal-mark-fang"
+        ],
+        [
+          "mark_claw",
+          "tal-mark-claw"
+        ],
+        [
+          "mark_leather",
+          "tal-mark-leather"
+        ],
+        [
+          "mark_bone",
+          "tal-mark-bone"
+        ],
+        [
+          "mark_dye",
+          "tal-mark-dye"
+        ]
+      ],
+      "subject": "This sheet holds two kinds of talismans. Rows 1 and 2 are seal talismans — traits of refusal, of a soul that would not let a curse take hold; their soul-light is a cold turquoise (#48E5D4). Every seal talisman has the same shape: a square plaque of dark stone standing on one corner like a diamond, with a thick bevelled rim of old gold; the moonstone is set in its top corner, and the middle of the plaque bears one bold, simple emblem in raised old gold, named for its cell — a picture, never a letter or a sign of writing. Rows 3 and 4 are collector's signs — loot talismans, the keepsakes of a gatherer who always found what others missed; their soul-light is a warm lucky gold (#F0CC4F). Every collector's sign has the same shape: a round token of dark wood with an old-gold rim, the moonstone set at its top, and across the face of the token one small real thing is bound with thin cord, named for its cell.\n\nThe grid: exactly 6 columns and 4 rows, 24 talismans. For each cell, the shape of its charm:\n\nRow 1: the emblem: a running hare; the emblem: a feather; the emblem: an open hand; the emblem: a knotted bandage; the emblem: a footprint half wiped away; the emblem: a needle and thread sewing a seam.\n\nRow 2: the emblem: a smooth seamless breastplate; the emblem: an open eye; the emblem: a pair of closed lips; the emblem: an owl; the emblem: a cord with a row of knots; the emblem: a heart with a small flame inside it.\n\nRow 3: the thing bound to the token: a bent iron nail; the thing bound to the token: a small brown mushroom; the thing bound to the token: a short wooden plank; the thing bound to the token: a lump of rusty brown iron ore; the thing bound to the token: a coil of dried sinew; the thing bound to the token: a tiny clay dish of grey ash.\n\nRow 4: the thing bound to the token: a tiny glass vial of yellow acid; the thing bound to the token: a curved fang; the thing bound to the token: a hooked claw; the thing bound to the token: a folded piece of tanned leather; the thing bound to the token: a small bone; the thing bound to the token: a tiny clay pot of red dye."
+    },
+    {
+      "id": "tal-mark",
+      "category": "talisman-icons",
+      "title": "Знаки сборщика (24) сеткой 6×4",
+      "source": "design/ui/talismans.js (EN_TALISMANS.fams), docs/content/талисманы.md",
+      "aspect": "3:2",
+      "size": "4K",
+      "grid": [
+        6,
+        4
+      ],
+      "cells": [
+        [
+          "mark_rag",
+          "tal-mark-rag"
+        ],
+        [
+          "mark_copper",
+          "tal-mark-copper"
+        ],
+        [
+          "mark_salt",
+          "tal-mark-salt"
+        ],
+        [
+          "mark_thread",
+          "tal-mark-thread"
+        ],
+        [
+          "mark_mechpart",
+          "tal-mark-mechpart"
+        ],
+        [
+          "mark_dross",
+          "tal-mark-dross"
+        ],
+        [
+          "mark_crystal",
+          "tal-mark-crystal"
+        ],
+        [
+          "mark_canvas",
+          "tal-mark-canvas"
+        ],
+        [
+          "mark_feather",
+          "tal-mark-feather"
+        ],
+        [
+          "mark_sand",
+          "tal-mark-sand"
+        ],
+        [
+          "mark_ember",
+          "tal-mark-ember"
+        ],
+        [
+          "mark_spring",
+          "tal-mark-spring"
+        ],
+        [
+          "mark_yarn",
+          "tal-mark-yarn"
+        ],
+        [
+          "mark_dormite",
+          "tal-mark-dormite"
+        ],
+        [
+          "mark_runechip",
+          "tal-mark-runechip"
+        ],
+        [
+          "mark_candle",
+          "tal-mark-candle"
+        ],
+        [
+          "mark_vial",
+          "tal-mark-vial"
+        ],
+        [
+          "mark_bracket",
+          "tal-mark-bracket"
+        ],
+        [
+          "mark_scrap",
+          "tal-mark-scrap"
+        ],
+        [
+          "mark_resin",
+          "tal-mark-resin"
+        ],
+        [
+          "mark_coal",
+          "tal-mark-coal"
+        ],
+        [
+          "mark_ink",
+          "tal-mark-ink"
+        ],
+        [
+          "mark_gear",
+          "tal-mark-gear"
+        ],
+        [
+          "mark_hide",
+          "tal-mark-hide"
+        ]
+      ],
+      "subject": "All talismans of this sheet are collector's signs — loot talismans, the keepsakes of a gatherer who always found what others missed; their soul-light is a warm lucky gold (#F0CC4F). Every cell of this sheet shows the same collector's token: a round flat disc of dark wood about two thirds of the cell wide, with a thick old-gold rim, hanging from the cord. The moonstone on it is small — no bigger than a fingernail — and sits at the very top of the disc, just under the cord. The middle of the disc belongs to the thing named for the cell: it is large, centered, covering about half of the disc, and lashed flat across the wood with a few turns of thin cord — it is the main subject of the icon and never hangs on its own. All 24 tokens are identical except for the thing lashed to them.\n\nThe grid: exactly 6 columns and 4 rows, 24 talismans. For each cell, the shape of its charm:\n\nRow 1: the thing lashed to the token: a torn scrap of cloth; the thing lashed to the token: a nugget of raw copper with a green patina; the thing lashed to the token: a small heap of white sea-salt crystals; the thing lashed to the token: a small spool of thread; the thing lashed to the token: a broken bronze lever from a mechanism with a pin through it; the thing lashed to the token: a lump of black iron scale.\n\nRow 2: the thing lashed to the token: a small shard of scarlet crystal; the thing lashed to the token: a folded piece of sailcloth; the thing lashed to the token: a feather; the thing lashed to the token: a tiny pouch of sand spilling a little; the thing lashed to the token: a small dead grey ember; the thing lashed to the token: a coiled metal spring.\n\nRow 3: the thing lashed to the token: a small ball of yarn; the thing lashed to the token: a pinch of softly glowing pale dust on a leaf; the thing lashed to the token: a flake of grey stone with straight carved grooves, crumbling into dust; the thing lashed to the token: a short stub of a candle; the thing lashed to the token: an empty little glass vial; the thing lashed to the token: a bent iron bracket.\n\nRow 4: the thing lashed to the token: a small lump of scrap-metal ingot; the thing lashed to the token: a drop of amber resin; the thing lashed to the token: a lump of black coal; the thing lashed to the token: a tiny bottle of black ink; the thing lashed to the token: a small bronze gear; the thing lashed to the token: a rolled piece of raw hide with fur."
+    },
+    {
+      "id": "tal-fix",
+      "category": "talisman-icons",
+      "title": "Четыре слабые клетки талисманов сеткой 2×2",
+      "source": "проверка листов на доске 30.09.2026: «талисман скрыт» повторил соседнюю маску «Печати архонта»; «Печать сомкнутых ран» — пластырь с крестом; «Гроза вожаков» — султан читается метлой; «Знак сборщика: обломок механизма» — гаечный ключ",
+      "aspect": "1:1",
+      "size": "1K",
+      "grid": [
+        2,
+        2
+      ],
+      "cells": [
+        [
+          "hidden",
+          "tal-hidden"
+        ],
+        [
+          "seal_bleed",
+          "tal-seal-bleed"
+        ],
+        [
+          "chief",
+          "tal-chief"
+        ],
+        [
+          "mark_mechpart",
+          "tal-mark-mechpart"
+        ]
+      ],
+      "subject": "This sheet holds four talismans of different kinds; the soul-light, in the moonstone and in the ghostly wisp, follows the kind named for each cell, and each cell keeps strictly to its own colours.\n\nThe grid: exactly 2 columns and 2 rows, 4 talismans. For each cell:\n\nRow 1: a talisman hidden from view, in neutral pale grey light instead of a coloured soul-light: the knotted cord comes down into thick swirling pale grey mist that wraps the charm completely, only a vague dark shape of a charm shows through — no face, no mask, nothing recognisable; a seal talisman, cold turquoise soul-light: a square plaque of dark stone standing on one corner like a diamond, with a thick bevelled rim of old gold, the moonstone set in its top corner; in the middle of the plaque one bold emblem in raised old gold — a strip of linen cloth tied in a simple knot, no cross, no plaster.\n\nRow 2: a hunting talisman, cold pale silver-blue soul-light: a small horned helmet of dark iron with one of its horns broken off, the moonstone set in its brow; a collector's sign, warm lucky gold soul-light: a round flat disc of dark wood with a thick old-gold rim hanging from the cord, a small moonstone at the very top of the disc; lashed flat across the middle of the disc with a few turns of thin cord, large and centered, a broken bronze lever from an old mechanism — a short flat bar with a round hole at one end and a pin through it, not a wrench."
+    }
+  ]
+}

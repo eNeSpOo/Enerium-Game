@@ -1,0 +1,300 @@
+{
+  "sheet": "art/generated/spell-icons/spell-air-active__nb2-v2.jpg",
+  "jobs": "tools/art-gen/jobs/spell-icons-air.json",
+  "job": "spell-air-active",
+  "grid": [
+    6,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "Воздух.dmg.all",
+      "file": "art/generated/spell-icons/spell-air-active/air-dmg-all.webp",
+      "box": [
+        39,
+        51,
+        814,
+        826
+      ],
+      "px": 775,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.dmg.grp",
+      "file": "art/generated/spell-icons/spell-air-active/air-dmg-grp.webp",
+      "box": [
+        879,
+        51,
+        1654,
+        826
+      ],
+      "px": 775,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.dmg.one",
+      "file": "art/generated/spell-icons/spell-air-active/air-dmg-one.webp",
+      "box": [
+        1720,
+        51,
+        2495,
+        826
+      ],
+      "px": 775,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.heal.all",
+      "file": "art/generated/spell-icons/spell-air-active/air-heal-all.webp",
+      "box": [
+        2560,
+        51,
+        3335,
+        826
+      ],
+      "px": 775,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.heal.grp",
+      "file": "art/generated/spell-icons/spell-air-active/air-heal-grp.webp",
+      "box": [
+        3400,
+        51,
+        4175,
+        826
+      ],
+      "px": 775,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.heal.one",
+      "file": "art/generated/spell-icons/spell-air-active/air-heal-one.webp",
+      "box": [
+        4241,
+        51,
+        5016,
+        826
+      ],
+      "px": 775,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.shield.all",
+      "file": "art/generated/spell-icons/spell-air-active/air-shield-all.webp",
+      "box": [
+        39,
+        890,
+        813,
+        1664
+      ],
+      "px": 774,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.shield.grp",
+      "file": "art/generated/spell-icons/spell-air-active/air-shield-grp.webp",
+      "box": [
+        880,
+        890,
+        1654,
+        1664
+      ],
+      "px": 774,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.shield.one",
+      "file": "art/generated/spell-icons/spell-air-active/air-shield-one.webp",
+      "box": [
+        1720,
+        890,
+        2494,
+        1664
+      ],
+      "px": 774,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.dot.all",
+      "file": "art/generated/spell-icons/spell-air-active/air-dot-all.webp",
+      "box": [
+        2561,
+        890,
+        3335,
+        1664
+      ],
+      "px": 774,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.dot.grp",
+      "file": "art/generated/spell-icons/spell-air-active/air-dot-grp.webp",
+      "box": [
+        3401,
+        890,
+        4175,
+        1664
+      ],
+      "px": 774,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.dot.one",
+      "file": "art/generated/spell-icons/spell-air-active/air-dot-one.webp",
+      "box": [
+        4242,
+        890,
+        5016,
+        1664
+      ],
+      "px": 774,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.hot.all",
+      "file": "art/generated/spell-icons/spell-air-active/air-hot-all.webp",
+      "box": [
+        38,
+        1728,
+        814,
+        2504
+      ],
+      "px": 776,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.hot.grp",
+      "file": "art/generated/spell-icons/spell-air-active/air-hot-grp.webp",
+      "box": [
+        879,
+        1728,
+        1655,
+        2504
+      ],
+      "px": 776,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.hot.one",
+      "file": "art/generated/spell-icons/spell-air-active/air-hot-one.webp",
+      "box": [
+        1719,
+        1728,
+        2495,
+        2504
+      ],
+      "px": 776,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.ctrl.all",
+      "file": "art/generated/spell-icons/spell-air-active/air-ctrl-all.webp",
+      "box": [
+        2560,
+        1728,
+        3336,
+        2504
+      ],
+      "px": 776,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.ctrl.grp",
+      "file": "art/generated/spell-icons/spell-air-active/air-ctrl-grp.webp",
+      "box": [
+        3400,
+        1728,
+        4176,
+        2504
+      ],
+      "px": 776,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.ctrl.one",
+      "file": "art/generated/spell-icons/spell-air-active/air-ctrl-one.webp",
+      "box": [
+        4241,
+        1728,
+        5017,
+        2504
+      ],
+      "px": 776,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.debuff.all",
+      "file": "art/generated/spell-icons/spell-air-active/air-debuff-all.webp",
+      "box": [
+        38,
+        2567,
+        815,
+        3344
+      ],
+      "px": 777,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.debuff.grp",
+      "file": "art/generated/spell-icons/spell-air-active/air-debuff-grp.webp",
+      "box": [
+        878,
+        2567,
+        1656,
+        3345
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.debuff.one",
+      "file": "art/generated/spell-icons/spell-air-active/air-debuff-one.webp",
+      "box": [
+        1719,
+        2567,
+        2496,
+        3344
+      ],
+      "px": 777,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.buff.all",
+      "file": "art/generated/spell-icons/spell-air-active/air-buff-all.webp",
+      "box": [
+        2559,
+        2567,
+        3337,
+        3345
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.buff.grp",
+      "file": "art/generated/spell-icons/spell-air-active/air-buff-grp.webp",
+      "box": [
+        3399,
+        2567,
+        4177,
+        3345
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.buff.one",
+      "file": "art/generated/spell-icons/spell-air-active/air-buff-one.webp",
+      "box": [
+        4241,
+        2568,
+        5017,
+        3344
+      ],
+      "px": 776,
+      "key_left": 0.0
+    }
+  ]
+}

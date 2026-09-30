@@ -453,8 +453,11 @@ function hcPreBody(rh) {
 const HC_WHERE = { roulette: 'Осколки — в Возрождении душ и в лавке праха.', echo: 'Осколки — только в сундуках Эхо за места недели.', craft: 'Осколки — из скрытого рецепта Мастерской.' };
 function hcSoulBody(rh) {
   const n = S.rs.shards[rh.id] || 0, need = hrNeed(), p = Math.min(100, hrFl(n * 100, need));
+  /* навыки неизвестной души — столько закрытых книг, сколько способностей в наборе: «способность скрыта» (abHiddenArt, art-icons.js) */
+  const K = typeof heroKit === 'function' ? heroKit({ draft: hrDraft(rh) }) : null, cnt = K ? K.kit.length : 0;
+  const hid = cnt && typeof abHiddenArt === 'function' ? `<div class="hb-hid" role="img" aria-label="Навыков: ${cnt}, пока скрыты" title="Навыки скрыты: откроются вместе с книгой">${Array.from({ length: cnt }, () => abHiddenArt(30)).join('')}</div>` : '';
   return `<div class="hb-soul"><span class="eyebrow">Неизвестная душа</span>
-    <p class="hb-sq">О ${rh.sex === 'f' ? 'ней' : 'нём'} известно лишь имя. Соберите осколки — и книга откроется: история, навыки и путь.</p>
+    <p class="hb-sq">О ${rh.sex === 'f' ? 'ней' : 'нём'} известно лишь имя. Соберите осколки — и книга откроется: история, навыки и путь.</p>${hid}
     <div class="hb-sbar">${bar(p, '')}<small class="num">${fmt(n)} / ${fmt(need)}</small></div>
     <p class="reason">${HC_WHERE[rh.src] || ''}</p></div>`;
 }

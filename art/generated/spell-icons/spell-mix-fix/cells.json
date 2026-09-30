@@ -1,0 +1,156 @@
+{
+  "sheet": "art/generated/spell-icons/spell-mix-fix__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/spell-icons-fix.json",
+  "job": "spell-mix-fix",
+  "grid": [
+    4,
+    3
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "Земля.ult.hot",
+      "file": "art/generated/spell-icons/spell-mix-fix/earth-ult-hot.webp",
+      "box": [
+        25,
+        21,
+        584,
+        580
+      ],
+      "px": 559,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.ult.ctrl",
+      "file": "art/generated/spell-icons/spell-mix-fix/earth-ult-ctrl.webp",
+      "box": [
+        622,
+        21,
+        1181,
+        580
+      ],
+      "px": 559,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.ult.buff",
+      "file": "art/generated/spell-icons/spell-mix-fix/none-ult-buff.webp",
+      "box": [
+        1219,
+        21,
+        1778,
+        580
+      ],
+      "px": 559,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.dmg.grp",
+      "file": "art/generated/spell-icons/spell-mix-fix/time-dmg-grp.webp",
+      "box": [
+        1816,
+        21,
+        2375,
+        580
+      ],
+      "px": 559,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.dmg.one",
+      "file": "art/generated/spell-icons/spell-mix-fix/time-dmg-one.webp",
+      "box": [
+        25,
+        616,
+        584,
+        1175
+      ],
+      "px": 559,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.pas.2",
+      "file": "art/generated/spell-icons/spell-mix-fix/time-pas-2.webp",
+      "box": [
+        622,
+        616,
+        1181,
+        1175
+      ],
+      "px": 559,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.hot.grp",
+      "file": "art/generated/spell-icons/spell-mix-fix/water-hot-grp.webp",
+      "box": [
+        1219,
+        616,
+        1778,
+        1175
+      ],
+      "px": 559,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.pas.1",
+      "file": "art/generated/spell-icons/spell-mix-fix/light-pas-1.webp",
+      "box": [
+        1816,
+        616,
+        2375,
+        1175
+      ],
+      "px": 559,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.pas.3",
+      "file": "art/generated/spell-icons/spell-mix-fix/light-pas-3.webp",
+      "box": [
+        25,
+        1211,
+        584,
+        1770
+      ],
+      "px": 559,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.ult.heal",
+      "file": "art/generated/spell-icons/spell-mix-fix/air-ult-heal.webp",
+      "box": [
+        622,
+        1211,
+        1181,
+        1770
+      ],
+      "px": 559,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.ult.shield",
+      "file": "art/generated/spell-icons/spell-mix-fix/air-ult-shield.webp",
+      "box": [
+        1219,
+        1211,
+        1778,
+        1770
+      ],
+      "px": 559,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.pas.1",
+      "file": "art/generated/spell-icons/spell-mix-fix/air-pas-1.webp",
+      "box": [
+        1816,
+        1211,
+        2375,
+        1770
+      ],
+      "px": 559,
+      "key_left": 0.0
+    }
+  ]
+}

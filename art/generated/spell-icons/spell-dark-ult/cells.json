@@ -1,0 +1,204 @@
+{
+  "sheet": "art/generated/spell-icons/spell-dark-ult__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/spell-icons-dark.json",
+  "job": "spell-dark-ult",
+  "grid": [
+    4,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "Тьма.ult.dmg",
+      "file": "art/generated/spell-icons/spell-dark-ult/dark-ult-dmg.webp",
+      "box": [
+        25,
+        25,
+        501,
+        501
+      ],
+      "px": 476,
+      "key_left": 0.03976
+    },
+    {
+      "id": "Тьма.ult.heal",
+      "file": "art/generated/spell-icons/spell-dark-ult/dark-ult-heal.webp",
+      "box": [
+        532,
+        25,
+        1008,
+        501
+      ],
+      "px": 476,
+      "key_left": 0.0
+    },
+    {
+      "id": "Тьма.ult.shield",
+      "file": "art/generated/spell-icons/spell-dark-ult/dark-ult-shield.webp",
+      "box": [
+        1039,
+        25,
+        1515,
+        501
+      ],
+      "px": 476,
+      "key_left": 0.0
+    },
+    {
+      "id": "Тьма.ult.dot",
+      "file": "art/generated/spell-icons/spell-dark-ult/dark-ult-dot.webp",
+      "box": [
+        1547,
+        25,
+        2023,
+        501
+      ],
+      "px": 476,
+      "key_left": 0.07972
+    },
+    {
+      "id": "Тьма.ult.hot",
+      "file": "art/generated/spell-icons/spell-dark-ult/dark-ult-hot.webp",
+      "box": [
+        25,
+        532,
+        501,
+        1008
+      ],
+      "px": 476,
+      "key_left": 0.0
+    },
+    {
+      "id": "Тьма.ult.ctrl",
+      "file": "art/generated/spell-icons/spell-dark-ult/dark-ult-ctrl.webp",
+      "box": [
+        532,
+        532,
+        1009,
+        1009
+      ],
+      "px": 477,
+      "key_left": 0.069
+    },
+    {
+      "id": "Тьма.ult.debuff",
+      "file": "art/generated/spell-icons/spell-dark-ult/dark-ult-debuff.webp",
+      "box": [
+        1039,
+        532,
+        1516,
+        1009
+      ],
+      "px": 477,
+      "key_left": 0.07005
+    },
+    {
+      "id": "Тьма.ult.buff",
+      "file": "art/generated/spell-icons/spell-dark-ult/dark-ult-buff.webp",
+      "box": [
+        1547,
+        532,
+        2023,
+        1008
+      ],
+      "px": 476,
+      "key_left": 0.0
+    },
+    {
+      "id": "Тьма.pas.1",
+      "file": "art/generated/spell-icons/spell-dark-ult/dark-pas-1.webp",
+      "box": [
+        25,
+        1040,
+        501,
+        1516
+      ],
+      "px": 476,
+      "key_left": 0.0
+    },
+    {
+      "id": "Тьма.pas.2",
+      "file": "art/generated/spell-icons/spell-dark-ult/dark-pas-2.webp",
+      "box": [
+        532,
+        1040,
+        1009,
+        1517
+      ],
+      "px": 477,
+      "key_left": 0.0
+    },
+    {
+      "id": "Тьма.pas.3",
+      "file": "art/generated/spell-icons/spell-dark-ult/dark-pas-3.webp",
+      "box": [
+        1039,
+        1040,
+        1516,
+        1517
+      ],
+      "px": 477,
+      "key_left": 0.01838
+    },
+    {
+      "id": "Тьма.pas.4",
+      "file": "art/generated/spell-icons/spell-dark-ult/dark-pas-4.webp",
+      "box": [
+        1547,
+        1040,
+        2023,
+        1516
+      ],
+      "px": 476,
+      "key_left": 0.03548
+    },
+    {
+      "id": "Тьма.react.1",
+      "file": "art/generated/spell-icons/spell-dark-ult/dark-react-1.webp",
+      "box": [
+        25,
+        1548,
+        501,
+        2024
+      ],
+      "px": 476,
+      "key_left": 0.00561
+    },
+    {
+      "id": "Тьма.react.2",
+      "file": "art/generated/spell-icons/spell-dark-ult/dark-react-2.webp",
+      "box": [
+        532,
+        1548,
+        1008,
+        2024
+      ],
+      "px": 476,
+      "key_left": 0.03171
+    },
+    {
+      "id": "Тьма.react.3",
+      "file": "art/generated/spell-icons/spell-dark-ult/dark-react-3.webp",
+      "box": [
+        1039,
+        1548,
+        1515,
+        2024
+      ],
+      "px": 476,
+      "key_left": 0.03511
+    },
+    {
+      "id": "Тьма.react.4",
+      "file": "art/generated/spell-icons/spell-dark-ult/dark-react-4.webp",
+      "box": [
+        1547,
+        1548,
+        2023,
+        2024
+      ],
+      "px": 476,
+      "key_left": 0.00083
+    }
+  ]
+}

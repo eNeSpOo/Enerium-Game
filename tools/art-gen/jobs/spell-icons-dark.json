@@ -1,0 +1,222 @@
+{
+  "name": "Иконки способностей сеткой — набор «Тьма» (слово автора 30.09.2026): «Мне нравятся стиль и сами иконки делай всю библиотеку всех скилов». Образец — spell-icons-fire.json: style, negative и категория spell-icons — без правок",
+  "plan": {
+    "Лист активок spell-dark-active": "3:2, 4K, сетка 6×4 — 24 активки набора; строка — два вида по три ступени: на всех, на 2–3, на одного",
+    "Лист ульт spell-dark-ult": "1:1, 2K, сетка 4×4 — 8 ульт, 4 боевые пассивки, 4 реакции",
+    "Нарезка": "python tools/art-gen/grid_slice.py jobs/spell-icons-dark.json <id задания> <лист>"
+  },
+  "notes": [
+    "Палитра — цвет карста школы (art/style/style.md, «Палитра»), эффекты — поле eff набора в library.json",
+    "Язык иконки и уроки пробы — art/style/style.md, «Иконки способностей сеткой»: у каждой клетки один центральный предмет",
+    "cells — [id способности из tools/content-gen/abilities/library.json, имя файла] по строкам сверху, в строке слева направо; grid — [столбцы, строки]"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "spell-icons": {
+      "aspect": "1:1",
+      "size": "2K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square ability icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the picture in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game puts its own frame on top: one clear central image with a bold silhouette that stays readable at 48 px, on a dark near-black stone background with faint cracks and a darker vignette toward the edges of the cell. Light rises from below in the color of the magic school; crisp rim light on the edges of the forms; a few sparks and dust motes in the light. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each icon differs clearly from its neighbours in shape and composition."
+    }
+  },
+  "jobs": [
+    {
+      "id": "spell-dark-active",
+      "category": "spell-icons",
+      "title": "Тьма — 24 активки сеткой 6×4",
+      "source": "tools/content-gen/abilities/library.json, набор «Тьма», active; docs/content/библиотека-способностей.md",
+      "aspect": "3:2",
+      "size": "4K",
+      "grid": [
+        6,
+        4
+      ],
+      "cells": [
+        [
+          "Тьма.dmg.all",
+          "dark-dmg-all"
+        ],
+        [
+          "Тьма.dmg.grp",
+          "dark-dmg-grp"
+        ],
+        [
+          "Тьма.dmg.one",
+          "dark-dmg-one"
+        ],
+        [
+          "Тьма.heal.all",
+          "dark-heal-all"
+        ],
+        [
+          "Тьма.heal.grp",
+          "dark-heal-grp"
+        ],
+        [
+          "Тьма.heal.one",
+          "dark-heal-one"
+        ],
+        [
+          "Тьма.shield.all",
+          "dark-shield-all"
+        ],
+        [
+          "Тьма.shield.grp",
+          "dark-shield-grp"
+        ],
+        [
+          "Тьма.shield.one",
+          "dark-shield-one"
+        ],
+        [
+          "Тьма.dot.all",
+          "dark-dot-all"
+        ],
+        [
+          "Тьма.dot.grp",
+          "dark-dot-grp"
+        ],
+        [
+          "Тьма.dot.one",
+          "dark-dot-one"
+        ],
+        [
+          "Тьма.hot.all",
+          "dark-hot-all"
+        ],
+        [
+          "Тьма.hot.grp",
+          "dark-hot-grp"
+        ],
+        [
+          "Тьма.hot.one",
+          "dark-hot-one"
+        ],
+        [
+          "Тьма.ctrl.all",
+          "dark-ctrl-all"
+        ],
+        [
+          "Тьма.ctrl.grp",
+          "dark-ctrl-grp"
+        ],
+        [
+          "Тьма.ctrl.one",
+          "dark-ctrl-one"
+        ],
+        [
+          "Тьма.debuff.all",
+          "dark-debuff-all"
+        ],
+        [
+          "Тьма.debuff.grp",
+          "dark-debuff-grp"
+        ],
+        [
+          "Тьма.debuff.one",
+          "dark-debuff-one"
+        ],
+        [
+          "Тьма.buff.all",
+          "dark-buff-all"
+        ],
+        [
+          "Тьма.buff.grp",
+          "dark-buff-grp"
+        ],
+        [
+          "Тьма.buff.one",
+          "dark-buff-one"
+        ]
+      ],
+      "subject": "The magic school of this sheet is Darkness: deep black shadow and black smoke lit by violet light (#A986EE), pale bone and dark crimson blood; the light from below is violet. Attacking spells are jagged, cruel and cold — violet-black shadow. Supporting spells — healing, dark blood, shields and bloodthirst for allies — glow a softer warm gold mixed with dusky violet and deep crimson, with rounded, calm shapes. A spell for all targets shows something wide that fills its cell; a spell for two or three targets shows two or three of its thing; a spell for one target shows one focused object. Attacks move to the right, toward the enemies. Every icon, even the widest, is built around one clear central object with a bold silhouette — never only smoke, dust, snow, fog or a scattered pattern.\n\nThe grid: exactly 6 columns and 4 rows, 24 icons.\n\nRow 1: a huge blade of black shadow, many times longer than a sword, sweeping in a wide arc to the right across the whole cell, violet light along its edge; three black shadow hands with long clawed fingers lunging to the right out of the ground; one black scythe blade slicing down and to the right, a violet gleam along its edge; a full moon of warm gold half hidden behind dark clouds, casting soft golden light over the whole cell; three black candles standing in a row, each with a soft warm golden flame, violet smoke curling from them; one dark goblet filled to the brim with glowing dark-red blood, warm golden light rising from it.\n\nRow 2: a vast curtain of black smoke falling from above across the whole cell like a heavy drape, violet light in its folds, a warm golden rim at its edges; three round shields made of solid black shadow standing side by side, each with a violet rim; one glossy black breastplate shaped like a beetle's shell, a violet sheen on its surface and a warm golden rim; a wide field of wheat withering into grey and black as a violet-black blight rolls across it to the right; three dry grey leaves on a black twig, their edges curling and crumbling into violet dust; one red rose withering to black from the stem up, its petals falling, violet smoke curling around it.\n\nRow 3: a big pomegranate burst open in the center, its glowing dark-red seeds lit warm gold from within and scattering widely across the whole cell; three drops of black blood falling, each with a warm golden glow inside; one small glass vial of dark blood sealed with black wax, glowing warm gold from within; the dark mouth of a deep stone well, violet-black shadows pouring out of it and spreading across the whole cell; two pairs of glowing violet eyes staring out of pitch-black shadow; one pale mask of a frozen scream, cracked, violet shadows pouring from its eye holes.\n\nRow 4: a tall war banner of plain cloth drooping on a bent pole, torn and faded, violet mist spreading over the whole cell; two swords whose blades droop and bend like soft wax; one dark iron gauntlet with limp, drooping fingers, thin violet chains of shadow wrapped around its wrist; a great black bat with its wings spread across the whole width of the cell, its body glowing dark red, a warm golden rim on its wings; two curved daggers crossed, blood dripping from their blades, dark red light; one longsword standing upright, veins of glowing blood-red light running up its blade."
+    },
+    {
+      "id": "spell-dark-ult",
+      "category": "spell-icons",
+      "title": "Тьма — 8 ульт, 4 пассивки, 4 реакции сеткой 4×4",
+      "source": "tools/content-gen/abilities/library.json, набор «Тьма», ult, passive, reaction; docs/content/библиотека-способностей.md",
+      "aspect": "1:1",
+      "size": "2K",
+      "grid": [
+        4,
+        4
+      ],
+      "cells": [
+        [
+          "Тьма.ult.dmg",
+          "dark-ult-dmg"
+        ],
+        [
+          "Тьма.ult.heal",
+          "dark-ult-heal"
+        ],
+        [
+          "Тьма.ult.shield",
+          "dark-ult-shield"
+        ],
+        [
+          "Тьма.ult.dot",
+          "dark-ult-dot"
+        ],
+        [
+          "Тьма.ult.hot",
+          "dark-ult-hot"
+        ],
+        [
+          "Тьма.ult.ctrl",
+          "dark-ult-ctrl"
+        ],
+        [
+          "Тьма.ult.debuff",
+          "dark-ult-debuff"
+        ],
+        [
+          "Тьма.ult.buff",
+          "dark-ult-buff"
+        ],
+        [
+          "Тьма.pas.1",
+          "dark-pas-1"
+        ],
+        [
+          "Тьма.pas.2",
+          "dark-pas-2"
+        ],
+        [
+          "Тьма.pas.3",
+          "dark-pas-3"
+        ],
+        [
+          "Тьма.pas.4",
+          "dark-pas-4"
+        ],
+        [
+          "Тьма.react.1",
+          "dark-react-1"
+        ],
+        [
+          "Тьма.react.2",
+          "dark-react-2"
+        ],
+        [
+          "Тьма.react.3",
+          "dark-react-3"
+        ],
+        [
+          "Тьма.react.4",
+          "dark-react-4"
+        ]
+      ],
+      "subject": "The magic school of this sheet is Darkness: deep black shadow and black smoke lit by violet light (#A986EE), pale bone and dark crimson blood; the light from below is violet. Attacking spells are jagged, cruel and cold — violet-black shadow. Supporting spells — healing, dark blood, shields and bloodthirst for allies — glow a softer warm gold mixed with dusky violet and deep crimson, with rounded, calm shapes. Every icon, even the widest, is built around one clear central object with a bold silhouette — never only smoke, dust, snow, fog or a scattered pattern.\n\nThe grid: exactly 4 columns and 4 rows, 16 icons. Rows 1 and 2 are ultimate spells — the grandest, most epic images of the set, bigger in scale, with bright gold highlights in the violet light. Row 3 are passive traits — calm, emblem-like single objects, no action. Row 4 are reactions — an instant answer to an event in battle, shown as one moment of action.\n\nRow 1: a colossal maw of black shadow with rows of violet-glowing teeth closing on one single point from above and below; a great black abyss opening in the ground, a pillar of warm golden light pouring up out of it, black smoke around it; a total eclipse — a black sun with a blazing golden corona hanging over a dark dome of night; a whole dead forest of withered black trees under a violet sky, grey ash drifting across the whole cell.\n\nRow 2: a huge heart of dark-red crystal glowing with warm golden light, dark veins spreading from it across the whole cell; one gigantic violet eye opening in a black void, filling the whole cell; a heavy black chain wrapped around a great broken sword, the chain glowing violet, the blade cracked; a huge blood-red full moon rising over black hills, bright gold at its rim.\n\nRow 3: one pair of long sharp fangs of pale bone, a drop of dark blood on one tip; one lit candle standing on a stone floor, its shadow stretching unnaturally long across the whole floor; the head of a black wolf with violet eyes, calm, seen from the front; a black lotus floating on dark water, drawing violet light into its petals.\n\nRow 4: a black scythe sweeping through a rising pale wisp of life-light, drawing it along the blade toward its wielder; a killing arrow stopped in mid-air a finger from a hooded face, gripped by a hand of black shadow; a black hand mirror reflecting a violet bolt of curse back to the right; a big black raven perched on a fallen, dented shield, dark red light in its eyes."
+    }
+  ]
+}

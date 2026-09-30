@@ -1,0 +1,300 @@
+{
+  "sheet": "art/generated/spell-icons/spell-water-active__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/spell-icons-water.json",
+  "job": "spell-water-active",
+  "grid": [
+    6,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "Вода.dmg.all",
+      "file": "art/generated/spell-icons/spell-water-active/water-dmg-all.webp",
+      "box": [
+        46,
+        52,
+        824,
+        830
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.dmg.grp",
+      "file": "art/generated/spell-icons/spell-water-active/water-dmg-grp.webp",
+      "box": [
+        883,
+        52,
+        1661,
+        830
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.dmg.one",
+      "file": "art/generated/spell-icons/spell-water-active/water-dmg-one.webp",
+      "box": [
+        1720,
+        52,
+        2498,
+        830
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.heal.all",
+      "file": "art/generated/spell-icons/spell-water-active/water-heal-all.webp",
+      "box": [
+        2559,
+        53,
+        3334,
+        828
+      ],
+      "px": 775,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.heal.grp",
+      "file": "art/generated/spell-icons/spell-water-active/water-heal-grp.webp",
+      "box": [
+        3394,
+        52,
+        4172,
+        830
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.heal.one",
+      "file": "art/generated/spell-icons/spell-water-active/water-heal-one.webp",
+      "box": [
+        4231,
+        52,
+        5009,
+        830
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.shield.all",
+      "file": "art/generated/spell-icons/spell-water-active/water-shield-all.webp",
+      "box": [
+        46,
+        889,
+        824,
+        1667
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.shield.grp",
+      "file": "art/generated/spell-icons/spell-water-active/water-shield-grp.webp",
+      "box": [
+        883,
+        889,
+        1661,
+        1667
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.shield.one",
+      "file": "art/generated/spell-icons/spell-water-active/water-shield-one.webp",
+      "box": [
+        1720,
+        889,
+        2498,
+        1667
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.dot.all",
+      "file": "art/generated/spell-icons/spell-water-active/water-dot-all.webp",
+      "box": [
+        2559,
+        890,
+        3334,
+        1665
+      ],
+      "px": 775,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.dot.grp",
+      "file": "art/generated/spell-icons/spell-water-active/water-dot-grp.webp",
+      "box": [
+        3394,
+        889,
+        4172,
+        1667
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.dot.one",
+      "file": "art/generated/spell-icons/spell-water-active/water-dot-one.webp",
+      "box": [
+        4231,
+        889,
+        5009,
+        1667
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.hot.all",
+      "file": "art/generated/spell-icons/spell-water-active/water-hot-all.webp",
+      "box": [
+        46,
+        1725,
+        824,
+        2503
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.hot.grp",
+      "file": "art/generated/spell-icons/spell-water-active/water-hot-grp.webp",
+      "box": [
+        883,
+        1725,
+        1661,
+        2503
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.hot.one",
+      "file": "art/generated/spell-icons/spell-water-active/water-hot-one.webp",
+      "box": [
+        1720,
+        1725,
+        2498,
+        2503
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.ctrl.all",
+      "file": "art/generated/spell-icons/spell-water-active/water-ctrl-all.webp",
+      "box": [
+        2559,
+        1727,
+        3334,
+        2502
+      ],
+      "px": 775,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.ctrl.grp",
+      "file": "art/generated/spell-icons/spell-water-active/water-ctrl-grp.webp",
+      "box": [
+        3394,
+        1725,
+        4172,
+        2503
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.ctrl.one",
+      "file": "art/generated/spell-icons/spell-water-active/water-ctrl-one.webp",
+      "box": [
+        4231,
+        1725,
+        5009,
+        2503
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.debuff.all",
+      "file": "art/generated/spell-icons/spell-water-active/water-debuff-all.webp",
+      "box": [
+        46,
+        2563,
+        823,
+        3340
+      ],
+      "px": 777,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.debuff.grp",
+      "file": "art/generated/spell-icons/spell-water-active/water-debuff-grp.webp",
+      "box": [
+        883,
+        2563,
+        1660,
+        3340
+      ],
+      "px": 777,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.debuff.one",
+      "file": "art/generated/spell-icons/spell-water-active/water-debuff-one.webp",
+      "box": [
+        1720,
+        2563,
+        2497,
+        3340
+      ],
+      "px": 777,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.buff.all",
+      "file": "art/generated/spell-icons/spell-water-active/water-buff-all.webp",
+      "box": [
+        2559,
+        2564,
+        3334,
+        3339
+      ],
+      "px": 775,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.buff.grp",
+      "file": "art/generated/spell-icons/spell-water-active/water-buff-grp.webp",
+      "box": [
+        3394,
+        2563,
+        4171,
+        3340
+      ],
+      "px": 777,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.buff.one",
+      "file": "art/generated/spell-icons/spell-water-active/water-buff-one.webp",
+      "box": [
+        4231,
+        2563,
+        5008,
+        3340
+      ],
+      "px": 777,
+      "key_left": 0.0
+    }
+  ]
+}

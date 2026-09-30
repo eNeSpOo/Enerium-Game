@@ -327,12 +327,14 @@ scene('автодокрафт: этапы и согласие', () => {
   ok('нет согласия на уникальный', h.includes('data-a="wsok"')); ok('без согласия недоступно', disabled(h, 'wsmakedo'));
   ok('нет этапа «Глиняный слепок»', h.includes('Глиняный слепок'));
   A.wsmakedo(); eq('без согласия уникальный не списан', q('u2'), b0.u2);
-  const ids = ['call_fb1', 'u2', 'find_cb1', 'bone', 'k2_hunt', 'resin', 'sand', 'k1_alch', 'k1_ench', 'p_frame', 'a_cast', 'p_clay', 'p_print', 'p_lure'], b = snap(ids);
+  W.BAG.add('energ', 10);   // Энериум в каждом призыве врага (recipes.js, r_call_fb1: 5): экран мастерской берёт ингредиенты из запасов
+  const ids = ['call_fb1', 'u2', 'find_cb1', 'bone', 'k2_hunt', 'resin', 'sand', 'k1_alch', 'k1_ench', 'p_frame', 'a_cast', 'p_clay', 'p_print', 'p_lure', 'energ'], b = snap(ids);
   A.wsok('', { checked: true });
   ok('с согласием доступно', !disabled(view('автодокрафт: согласие дано'), 'wsmakedo'));
   A.wsmakedo();
   eq('призыв создан', q('call_fb1'), b.call_fb1 + 1); eq('уникальный списан', q('u2'), b.u2 - 1); eq('находка списана', q('find_cb1'), b.find_cb1 - 1);
   eq('кость', q('bone'), b.bone - 2); eq('смола', q('resin'), b.resin - 3); eq('песок', q('sand'), b.sand - 5); eq('каркас — из запасов', q('p_frame'), b.p_frame - 1);
+  eq('Энериум призыва списан', q('energ'), b.energ - 5);
   eq('промежуточные этапы не остались в запасах', q('a_cast') + q('p_clay') + q('p_print') + q('p_lure'), b.a_cast + b.p_clay + b.p_print + b.p_lure);
   eq('итог автодокрафта', W.S.overlay && W.S.overlay.res && W.S.overlay.res.kind, 'make');
   view('итог автодокрафта');
@@ -352,7 +354,9 @@ scene('автодокрафт: количество', () => {
   A.close(); A.wsmake('r_act_cb1'); view('автодокрафт: активация');
   A.close(); A.wsview('book');
   ok('руна доблести известна с первого осколка', view('книга: руна доблести').includes('Руна доблести · цикл I'));
-  A.wsmake('r_vr1'); ok('руна доблести: не хватает осколков', view('автодокрафт: руна доблести').includes('Не хватает'));
+  /* осколков нет: не хватает — или этап не найден, когда у осколка есть рецепт (из рунической пыли, recipes.js r_vs1_dust) */
+  A.wsmake('r_vr1'); const hv = view('автодокрафт: руна доблести');
+  ok('руна доблести: не хватает осколков', hv.includes('Не хватает') || hv.includes('Этап не найден'));
   A.wsmake('r_a_iron'); ok('ненайденный рецепт не раскрывает состав', !view('автодокрафт: не найден').includes('Этапы'));
 });
 

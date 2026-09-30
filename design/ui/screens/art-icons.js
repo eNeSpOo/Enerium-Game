@@ -47,10 +47,68 @@ const artAbs = p => { try { return new URL(AV(p), document.baseURI).href; } catc
 const artImg = (p, px, alt, cls) => `<img class="ico ${cls || ''}" src="${AV(p)}" width="${px}" height="${px}" alt="${alt || ''}" loading="lazy" decoding="async">`;
 const artEsc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-/* значок слота снаряжения; '' — арта нет */
-function eqIcon(slot, px = 40, alt = '') { const p = ART_ICONS.equip(slot); return artReady(p) ? artImg(p, px, alt, 'eq-ico') : ''; }
-/* значок семейства талисмана; '' — арта нет */
-function talIcon(fam, px = 40, alt = '') { const p = ART_ICONS.tal(fam); return artReady(p) ? artImg(p, px, alt, 'tal-ico') : ''; }
+/* ================== иконки сеткой: способности, линейки талисманов, снаряжение по редкости ==================
+   Слово автора 30.09.2026: «Мне нравятся стиль и сами иконки делай всю библиотеку всех скилов, а после тогда в таком же стиле сделай
+   сетку для духовных талисманов, снаряжений». Листы — tools/art-gen/jobs/spell-icons-*.json, talisman-icons.json, equip-icons.json;
+   нарезка — grid_slice.py; опись выгрузки — tools/art-gen/ui-icons.json (собирает ui_icons.py), 256 px WebP в assets/art/spells, tal, gear.
+   Живопись в край клетки: рамку даёт интерфейс. grid — какие наборы выгружены целиком: у каждой способности библиотеки, линейки
+   талисмана и шаблона снаряжения есть файл (ui_icons.py и check_icons.js). Набора нет в grid — помощники отдают прежнее.
+   - способность — по id библиотеки: «Огонь.dmg.all» → spells/fire-dmg-all.webp; нет id (враги прежнего набора) — '';
+   - талисман — по ключу линейки EN_TALISMANS.fams. Окна, которые знают только семейство и имя (запасы, перековка), получают иконку
+     линейки по имени в alt; без имени — прежний значок семейства;
+   - снаряжение — по слоту и редкости; редкость не передана — иконка обычной, самой простой вещи слота. Мельче 24 px живопись не
+     читается: там вызывающий оставляет контур слота или вектор (eqPic, screens/equipment.js) */
+Object.assign(ART_ICONS, {
+  grid: { spells: true, tal: true, gear: true },   // выгрузка 30.09.2026
+  slug: { 'Огонь': 'fire', 'Земля': 'earth', 'Воздух': 'air', 'Тьма': 'dark', 'Вода': 'water', 'Свет': 'light', 'Время': 'time',
+    'Без школы': 'none', 'фарм': 'farm' },   // набор → латиница имени файла; то же в tools/art-gen/ui_icons.py
+  spell: id => { const s = String(id || '').split('.'), k = ART_ICONS.slug[s[0]]; return k && s.length > 1 ? 'spells/' + k + '-' + s.slice(1).join('-') + '.webp' : ''; },
+  spellHidden: 'spells/ability-hidden.webp',      // «способность скрыта» — неизвестная душа: закрытая книга в тумане
+  talLine: key => 'tal/' + key + '.webp',
+  talHidden: 'tal/hidden.webp',                   // линейка скрыта (спойлер): амулет в тумане
+  gear: (slot, r) => 'gear/' + slot + '-' + r + '.webp',
+});
+/* иконка способности по записи библиотеки или ядра (у записи есть id); '' — иконки нет */
+function abArt(ab, px = 32, alt = '', cls = '') {
+  const p = ART_ICONS.grid.spells && ab && ab.id ? ART_ICONS.spell(ab.id) : '';
+  return p ? artImg(p, px, alt, ('ab-art ' + cls).trim()) : '';
+}
+/* значок способности для строки и плитки: иконка сеткой, иначе прежний вектор (abIcon, index.html) */
+function abIco(ab, px = 32, alt = '') { return abArt(ab, px, alt) || ic(ab && typeof abIcon === 'function' ? abIcon(ab) : 'spark'); }
+/* «способность скрыта»: неизвестная душа и закрытое доблестью — пока не узнаны */
+function abHiddenArt(px = 32, alt = '') { return ART_ICONS.grid.spells ? artImg(ART_ICONS.spellHidden, px, alt, 'ab-art hid') : ic('lock'); }
+
+/* линейка талисмана по имени — для окон, которые передают семейство и имя (tlName) */
+let TAL_BY_NAME = null;
+function talLineOf(fam, alt) {
+  const T = window.EN_TALISMANS; if (!T) return '';
+  if (T.fams[fam]) return fam;                                  // передан сам ключ линейки
+  if (!alt) return '';
+  if (!TAL_BY_NAME) { TAL_BY_NAME = new Map(); for (const k in T.fams) TAL_BY_NAME.set(T.fams[k].n, k); }
+  const k = TAL_BY_NAME.get(String(alt));
+  return k && (!fam || T.fams[k].cat === fam) ? k : '';
+}
+/* предмет снаряжения: слот и редкость; первым может прийти шаблон «слот.редкость» или сам предмет { slot, r } */
+function eqSlotR(slot, r) {
+  if (slot && typeof slot === 'object') return [slot.slot, slot.r];
+  const s = String(slot || ''), i = s.indexOf('.');
+  return i > 0 ? [s.slice(0, i), +s.slice(i + 1)] : [s, r];
+}
+
+/* значок снаряжения: иконка сеткой по слоту и редкости; без выгрузки — прежний значок слота; '' — арта нет.
+   r — редкость 1…7; не передана — обычная */
+function eqIcon(slot, px = 40, alt = '', r = 0) {
+  const [s, rr] = eqSlotR(slot, r);
+  if (ART_ICONS.grid.gear && s) return artImg(ART_ICONS.gear(s, rr >= 1 && rr <= 7 ? rr : 1), px, alt, 'eq-ico eq-grid');
+  const p = ART_ICONS.equip(s); return artReady(p) ? artImg(p, px, alt, 'eq-ico') : '';
+}
+/* значок талисмана: иконка линейки (line — ключ EN_TALISMANS.fams, или fam — сам ключ, или имя линейки в alt);
+   линейка не узнана — прежний значок семейства fam; '' — арта нет */
+function talIcon(fam, px = 40, alt = '', line = '') {
+  const key = line || talLineOf(fam, alt);
+  if (ART_ICONS.grid.tal && key) return artImg(ART_ICONS.talLine(key), px, alt, 'tal-ico tal-grid');
+  const p = ART_ICONS.tal(fam); return artReady(p) ? artImg(p, px, alt, 'tal-ico') : '';
+}
 /* фигура рабочего артели: ритуалы, перековка, шарды рабочего в запасах и сундуках; '' — арта нет */
 function wkIcon(px = 40, alt = '') { const p = ART_ICONS.worker; return artReady(p) ? artImg(p, px, alt, 'wk-ico') : ''; }
 

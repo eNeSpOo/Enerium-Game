@@ -1,5 +1,5 @@
 {
-  "note": "Какой арт из art/generated/ идёт в прототип design/ui/. Враги — ADR-0013, отряд — герои сета 1 «Хранители Песочных Часов», арена — вторая раскладка. mirror — отражение: корпус героя на карте развёрнут вправо, к врагам, корпус врага — влево, к героям (решение автора 27.09.2026). Выгрузка: python tools/art-gen/export_ui.py Эхо, неделя эльфов — арена и портреты Иш-Кантуна, одобрены автором 28.09.2026 (ADR-0025, п. 8): ik-01…ik-14 — ступени лестницы 1–14, ik-15 — Многоликий. Значки атрибутов, редкостей (ADR-0027), классов и доблести одобрены автором 28.09.2026: PNG 128×128 с прозрачностью, эмблема вписана в 80 % кадра (fit). Окно «Спуск» — фон биома во всё окно: место и его обитатели на одном арте (слова автора 30.09.2026), задание tools/art-gen/jobs/descent-backdrops.json; descent/b1…b4.jpg, 1688×716. Карточка героя — книга (выбор автора 30.09.2026, ADR-0032): обложки пяти ступеней с прозрачным окном, развороты, замок закрытый и отпертый, лента и звёздочка (нейтральные, цвет редкости даёт интерфейс), изнанка обложки и лист — books/*, задание tools/art-gen/jobs/hero-books.json, геометрия — tools/art-gen/book_layers.py → HB_ART в design/ui/screens/book.js; крупный арт с альфой — WebP. Карты боя — рамки по типу бойца (jobs/battle-frames.json): bframes/<тип>.png ← battle-frames/*.bf.png — окно вычищено, рисунок обрезан по альфе (tools/art-gen/battle_frame.py); 320 px в ширину, высота — по пропорции рисунка, без fit: доли окна и нарезки в BF (screens/battle-cards.js) совпадают с выгрузкой. Библиотека Этриона — шкаф героев (слово автора 30.09.2026: «задний фон показывает, что они условно находятся на полках огромного древнего шкафа»): bookcase/* — задняя стенка (бесшовная), полка и карниз (повторяются по горизонтали), стойка (по вертикали) и её ножка со светом кристалла, кованый кронштейн, лампада; корешки пяти ступеней книги — books/spine-1…5 (часть книги, HB_ART в design/ui/screens/book.js); задание tools/art-gen/jobs/library-shelves.json, бесшовность и нарезка — tools/art-gen/shelf_layers.py, геометрия — LB_ART в design/ui/screens/library.js и HB_ART.spines.",
+  "note": "Какой арт из art/generated/ идёт в прототип design/ui/. Враги — ADR-0013, отряд — герои сета 1 «Хранители Песочных Часов», арена — вторая раскладка. mirror — отражение: корпус героя на карте развёрнут вправо, к врагам, корпус врага — влево, к героям (решение автора 27.09.2026). Выгрузка: python tools/art-gen/export_ui.py Эхо, неделя эльфов — арена и портреты Иш-Кантуна, одобрены автором 28.09.2026 (ADR-0025, п. 8): ik-01…ik-14 — ступени лестницы 1–14, ik-15 — Многоликий. Значки атрибутов, редкостей (ADR-0027), классов и доблести одобрены автором 28.09.2026: PNG 128×128 с прозрачностью, эмблема вписана в 80 % кадра (fit). Окно «Спуск» — фон биома во всё окно: место и его обитатели на одном арте (слова автора 30.09.2026), задание tools/art-gen/jobs/descent-backdrops.json; descent/b1…b4.jpg, 1688×716. Карточка героя — книга (выбор автора 30.09.2026, ADR-0032): обложки пяти ступеней с прозрачным окном, развороты, замок закрытый и отпертый, лента и звёздочка (нейтральные, цвет редкости даёт интерфейс), изнанка обложки и лист — books/*, задание tools/art-gen/jobs/hero-books.json, геометрия — tools/art-gen/book_layers.py → HB_ART в design/ui/screens/book.js; крупный арт с альфой — WebP. Карты боя — рамки по типу бойца (jobs/battle-frames.json): bframes/<тип>.png ← battle-frames/*.bf.png — окно вычищено, рисунок обрезан по альфе (tools/art-gen/battle_frame.py); 320 px в ширину, высота — по пропорции рисунка, без fit: доли окна и нарезки в BF (screens/battle-cards.js) совпадают с выгрузкой. Библиотека Этриона — шкаф героев (слово автора 30.09.2026: «задний фон показывает, что они условно находятся на полках огромного древнего шкафа»): bookcase/* — задняя стенка (бесшовная), полка и карниз (повторяются по горизонтали), стойка (по вертикали) и её ножка со светом кристалла, кованый кронштейн, лампада; корешки пяти ступеней книги — books/spine-1…5 (часть книги, HB_ART в design/ui/screens/book.js); задание tools/art-gen/jobs/library-shelves.json, бесшовность и нарезка — tools/art-gen/shelf_layers.py, геометрия — LB_ART в design/ui/screens/library.js и HB_ART.spines. Ремесло — залы и вещи мастера (слово автора 30.09.2026: «Само Окно крафта так же сделай дорогим и богатым, как и в целом над всеми окнами в ремесле»), задание tools/art-gen/jobs/craft-hall.json: craft/hall-*.jpg — фоны окон Мастерской, Запасов, Лавки, Рынка и Перековки (у кузни срезана тёмная полоса снизу — crop); стол, гнездо, пьедестал и горн — строго сверху, обрезаны в квадрат (tools/art-gen/craft_layers.py disc); рамки иконки предмета frame-<вид>.png — одна геометрия: тело рамки — 200 из 256 px холста по центру, окно — CR_ART.frames (craft_layers.py frames; углы холста — точка альфы 9, чтобы выгрузка не срезала поле); уголки — одно изображение в четырёх отражениях (craft_layers.py corners); прилавок и навес — бесшовные полосы (shelf_layers.py strip), пергамент — бесшовная плитка (shelf_layers.py tile); гримуар — страница для border-image из разворота (craft_layers.py book) и сам разворот; частицы — лист 3 × 2 (craft_layers.py sheet). Пути — CR_ART.ready в design/ui/screens/crafthall.js.",
   "out": "design/ui/assets/art",
   "size": [
     464,
@@ -1850,6 +1850,270 @@
       "size": [
         102,
         320
+      ]
+    },
+    "craft/hall-work.jpg": {
+      "from": "cr-hall/cr-hall-work__nb2.jpg",
+      "size": [
+        1600,
+        679
+      ]
+    },
+    "craft/hall-stock.jpg": {
+      "from": "cr-hall/cr-hall-stock__nb2.jpg",
+      "size": [
+        1600,
+        679
+      ]
+    },
+    "craft/hall-shop.jpg": {
+      "from": "cr-hall/cr-hall-shop__nb2.jpg",
+      "size": [
+        1600,
+        679
+      ]
+    },
+    "craft/hall-market.jpg": {
+      "from": "cr-hall/cr-hall-market__nb2.jpg",
+      "size": [
+        1600,
+        679
+      ]
+    },
+    "craft/hall-forge.jpg": {
+      "from": "cr-hall/cr-hall-forge__nb2.jpg",
+      "crop": [
+        0,
+        0,
+        3168,
+        1270
+      ],
+      "size": [
+        1600,
+        641
+      ]
+    },
+    "craft/table.webp": {
+      "from": "cr-disc/cr-table__nb2.disc.png",
+      "size": [
+        600,
+        600
+      ]
+    },
+    "craft/socket.webp": {
+      "from": "cr-disc/cr-socket__nb2.disc.png",
+      "size": [
+        160,
+        160
+      ]
+    },
+    "craft/core.webp": {
+      "from": "cr-disc/cr-core__nb2.disc.png",
+      "size": [
+        240,
+        240
+      ]
+    },
+    "craft/hearth.webp": {
+      "from": "cr-disc/cr-hearth__nb2.disc.png",
+      "size": [
+        400,
+        400
+      ]
+    },
+    "craft/dais.webp": {
+      "from": "cr-part/cr-dais__nb2.trim.png",
+      "size": [
+        560,
+        243
+      ]
+    },
+    "craft/corner-tl.png": {
+      "from": "cr-part/cr-corner__nb2.tl.png",
+      "size": [
+        96,
+        98
+      ]
+    },
+    "craft/corner-tr.png": {
+      "from": "cr-part/cr-corner__nb2.tr.png",
+      "size": [
+        96,
+        98
+      ]
+    },
+    "craft/corner-bl.png": {
+      "from": "cr-part/cr-corner__nb2.bl.png",
+      "size": [
+        96,
+        98
+      ]
+    },
+    "craft/corner-br.png": {
+      "from": "cr-part/cr-corner__nb2.br.png",
+      "size": [
+        96,
+        98
+      ]
+    },
+    "craft/seal.png": {
+      "from": "cr-part/cr-seal__nb2.trim.png",
+      "size": [
+        96,
+        109
+      ]
+    },
+    "craft/cushion.webp": {
+      "from": "cr-part/cr-cushion__nb2.trim.png",
+      "size": [
+        200,
+        128
+      ]
+    },
+    "craft/plate.webp": {
+      "from": "cr-strip/cr-plate__nb2.trim.png",
+      "size": [
+        744,
+        157
+      ]
+    },
+    "craft/counter.webp": {
+      "from": "cr-strip/cr-counter__nb2.strip.png",
+      "size": [
+        800,
+        220
+      ]
+    },
+    "craft/awning.webp": {
+      "from": "cr-strip/cr-awning__nb2.strip.png",
+      "size": [
+        800,
+        187
+      ]
+    },
+    "craft/frame-res.png": {
+      "from": "cr-sheet/cr-frames__nb2-res.png",
+      "size": [
+        192,
+        192
+      ]
+    },
+    "craft/frame-key.png": {
+      "from": "cr-sheet/cr-frames__nb2-key.png",
+      "size": [
+        192,
+        192
+      ]
+    },
+    "craft/frame-boss.png": {
+      "from": "cr-sheet/cr-frames__nb2-boss.png",
+      "size": [
+        192,
+        192
+      ]
+    },
+    "craft/frame-made.png": {
+      "from": "cr-sheet/cr-frames__nb2-made.png",
+      "size": [
+        192,
+        192
+      ]
+    },
+    "craft/frame-call.png": {
+      "from": "cr-sheet/cr-frames__nb2-call.png",
+      "size": [
+        192,
+        192
+      ]
+    },
+    "craft/frame-rune.png": {
+      "from": "cr-sheet/cr-frames__nb2-rune.png",
+      "size": [
+        192,
+        192
+      ]
+    },
+    "craft/frame-karst.png": {
+      "from": "cr-sheet/cr-frames__nb2-karst.png",
+      "size": [
+        192,
+        192
+      ]
+    },
+    "craft/frame-city.png": {
+      "from": "cr-sheet/cr-frames__nb2-city.png",
+      "size": [
+        192,
+        192
+      ]
+    },
+    "craft/fx-ember.png": {
+      "from": "cr-sheet/cr-fx__nb2-ember.png",
+      "size": [
+        96,
+        96
+      ],
+      "fit": 100
+    },
+    "craft/fx-glint.png": {
+      "from": "cr-sheet/cr-fx__nb2-glint.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 100
+    },
+    "craft/fx-shard.png": {
+      "from": "cr-sheet/cr-fx__nb2-shard.png",
+      "size": [
+        96,
+        96
+      ],
+      "fit": 100
+    },
+    "craft/fx-mote.png": {
+      "from": "cr-sheet/cr-fx__nb2-mote.png",
+      "size": [
+        96,
+        96
+      ],
+      "fit": 100
+    },
+    "craft/fx-smoke.png": {
+      "from": "cr-sheet/cr-fx__nb2-smoke.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 100
+    },
+    "craft/fx-ash.png": {
+      "from": "cr-sheet/cr-fx__nb2-ash.png",
+      "size": [
+        96,
+        96
+      ],
+      "fit": 100
+    },
+    "craft/vellum.jpg": {
+      "from": "cr-texture/cr-vellum__nb2.tile.jpg",
+      "size": [
+        388,
+        318
+      ]
+    },
+    "craft/grimoire.webp": {
+      "from": "cr-book/cr-grim__nb2.page.png",
+      "size": [
+        604,
+        697
+      ]
+    },
+    "craft/grimoire-spread.webp": {
+      "from": "cr-book/cr-grim__nb2.png",
+      "size": [
+        640,
+        420
       ]
     }
   }

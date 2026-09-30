@@ -1,0 +1,185 @@
+/* screens/crafthall.css — «Ремесло»: залы башни и вещи мастера (screens/crafthall.js). Общий слой окон Мастерской, Запасов, Лавки,
+   Рынка и Перековки: зал под окном, материалы панелей и вкладок раздела, рамка иконки предмета по виду, пометка Этриона, показ порциями,
+   листы и окна раздела — чернёный пергамент с латунными уголками. Подключается ДО стилей экранов: у правил раздела вес — :where(),
+   поэтому своё правило экрана (craft.css, bag.css…) при равном весе сильнее.
+   Арт — переменные <html> из CR_ART (--cr-hall-*, --cr-f-*, --cr-page…) и классы cr-h, cr-f, cr-p, cr-c…; без арта рисует CSS.
+   Движение — только transform и opacity; «меньше движения» — без движения. Свои классы — cr-*. */
+
+/* ---------- зал окна: фон, тень сверху и снизу, свет карста снизу, пыль в луче ---------- */
+.cr-hall{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#07080a}
+.cr-hall-bg{position:absolute;inset:-1%;background:radial-gradient(90% 70% at 50% 100%,rgba(72,229,212,.08),transparent 70%),radial-gradient(60% 60% at 50% 40%,#161310,#0a0908 75%)}
+html.cr-h .cr-hall[data-hall="work"] .cr-hall-bg{background:var(--cr-hall-work) 50% 42%/cover no-repeat}
+html.cr-h .cr-hall[data-hall="stock"] .cr-hall-bg{background:var(--cr-hall-stock) 50% 45%/cover no-repeat}
+html.cr-h .cr-hall[data-hall="shop"] .cr-hall-bg{background:var(--cr-hall-shop) 50% 40%/cover no-repeat}
+html.cr-h .cr-hall[data-hall="market"] .cr-hall-bg{background:var(--cr-hall-market) 50% 40%/cover no-repeat}
+html.cr-h .cr-hall[data-hall="forge"] .cr-hall-bg{background:var(--cr-hall-forge) 50% 50%/cover no-repeat}
+/* зал тише панелей: тень сверху (там шапка), глубже снизу, виньетка по краям */
+.cr-hall::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(4,5,6,.62),rgba(4,5,6,.3) 26%,rgba(4,5,6,.34) 70%,rgba(4,5,6,.78)),radial-gradient(80% 90% at 50% 50%,transparent 45%,rgba(0,0,0,.55))}
+.cr-hall[data-hall="shop"]::after,.cr-hall[data-hall="forge"]::after{background:linear-gradient(180deg,rgba(6,4,3,.6),rgba(6,4,3,.26) 26%,rgba(6,4,3,.3) 70%,rgba(6,4,3,.78)),radial-gradient(80% 90% at 50% 50%,transparent 45%,rgba(0,0,0,.55))}
+/* свет снизу: карст у Мастерской, Запасов и Рынка; тёплый жар у Лавки и Кузни — дышит */
+.cr-hall-lt{position:absolute;left:0;right:0;bottom:0;z-index:1;height:46%;mix-blend-mode:screen;
+  background:radial-gradient(62% 100% at 50% 100%,rgba(72,229,212,.14),rgba(72,229,212,.03) 55%,transparent 76%);animation:cr-breathe 7s ease-in-out var(--t,0ms) infinite}
+.cr-hall[data-hall="shop"] .cr-hall-lt,.cr-hall[data-hall="forge"] .cr-hall-lt{background:radial-gradient(62% 100% at 50% 100%,rgba(230,168,75,.14),rgba(230,168,75,.03) 55%,transparent 76%)}
+/* пыль в луче и угольки над горном: движение — transform и opacity, рисунок — постоянный (crHallHtml) */
+.cr-dust,.cr-emb{position:absolute;inset:0;z-index:1}
+.cr-mt,.cr-em{position:absolute;left:var(--x);top:var(--y);width:3px;height:3px;border-radius:50%;opacity:0;animation:cr-mote var(--s) linear calc(var(--d) + var(--t,0ms)) infinite}
+.cr-mt{background:#efe1bd;box-shadow:0 0 5px rgba(239,225,189,.7)}
+.cr-em{background:#ffb35c;box-shadow:0 0 6px #ff8a3d}
+html.cr-x .cr-mt{width:9px;height:9px;background:var(--cr-fx-mote) center/contain no-repeat;box-shadow:none;mix-blend-mode:screen}
+html.cr-x .cr-em{width:10px;height:10px;background:var(--cr-fx-ember) center/contain no-repeat;box-shadow:none;mix-blend-mode:screen}
+.cr-emb .cr-em{top:auto;bottom:calc(100% - var(--y));animation-name:cr-rise}
+
+/* ---------- материалы раздела: панели, вкладки, поиск, кнопки ---------- */
+/* панели — тёмный дуб поверх зала, латунная кромка, отсвет сверху */
+:where(.g-main[data-route="craft"]) .pnl{border-color:rgba(201,162,106,.26);background:radial-gradient(120% 70% at 50% -10%,rgba(233,199,126,.05),transparent 60%),linear-gradient(180deg,rgba(21,16,11,.88),rgba(11,9,7,.91));
+  box-shadow:inset 0 1px 0 rgba(255,228,170,.07),inset 0 0 0 1px rgba(0,0,0,.55),0 20px 40px -22px #000}
+/* вкладки — латунные закладки картотеки: выбранная — светлее, снизу свет карста */
+:where(.g-main[data-route="craft"]) .tabs{background:linear-gradient(180deg,rgba(14,11,8,.92),rgba(8,7,5,.94));border-color:rgba(201,162,106,.28);box-shadow:inset 0 1px 0 rgba(255,228,170,.05)}
+:where(.g-main[data-route="craft"]) .tabs button{color:#9d8f76;transition:color .15s}
+:where(.g-main[data-route="craft"]) .tabs button:hover{color:#d8c49a}
+:where(.g-main[data-route="craft"]) .tabs button[aria-selected="true"]{color:#f0d79c;background:linear-gradient(180deg,#2c2117,#16100b);box-shadow:inset 0 0 0 1px rgba(201,162,106,.3),inset 0 -2px 0 var(--spirit),inset 0 -12px 14px -12px var(--spirit)}
+/* поиск — кожаная полоса с латунной кромкой */
+:where(.g-main[data-route="craft"]) .search{border-color:rgba(201,162,106,.3);background:linear-gradient(180deg,#0c0a08,#141009);box-shadow:inset 0 1px 3px rgba(0,0,0,.8)}
+/* кнопки раздела: главная — кристалл карста в латуни, по наведению — блеск; второстепенная — железо с латунной кромкой */
+:where(.g-main[data-route="craft"],.g-main[data-route="craft"]~.ov) .btn{border-color:rgba(201,162,106,.4);background:linear-gradient(180deg,#261d14,#15100b);box-shadow:inset 0 1px 0 rgba(255,228,170,.1),0 2px 4px rgba(0,0,0,.6)}
+:where(.g-main[data-route="craft"],.g-main[data-route="craft"]~.ov) .btn.go{overflow:hidden;border-color:rgba(214,178,112,.7);color:#f1fffc;
+  background:radial-gradient(120% 110% at 50% 130%,rgba(72,229,212,.6),transparent 62%),linear-gradient(180deg,#143e39,#0a2320);
+  box-shadow:inset 0 0 0 1px rgba(72,229,212,.3),inset 0 -14px 20px -10px rgba(72,229,212,.65),inset 0 1px 0 rgba(255,255,255,.14),0 10px 24px -12px var(--spirit)}
+:where(.g-main[data-route="craft"],.g-main[data-route="craft"]~.ov) .btn.go::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.22) 50%,transparent 65%);transform:translateX(-120%);transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+:where(.g-main[data-route="craft"],.g-main[data-route="craft"]~.ov) .btn.go:hover::after{transform:translateX(120%)}
+:where(.g-main[data-route="craft"],.g-main[data-route="craft"]~.ov) .btn.ghost{border-color:transparent;background:none;box-shadow:none}
+:where(.g-main[data-route="craft"],.g-main[data-route="craft"]~.ov) .btn[disabled]{color:var(--parch-3);border-color:rgba(201,162,106,.14);background:linear-gradient(180deg,#15120f,#100d0b);box-shadow:none;text-shadow:none}
+:where(.g-main[data-route="craft"],.g-main[data-route="craft"]~.ov) .btn[disabled]::after{display:none}
+:where(.g-main[data-route="craft"],.g-main[data-route="craft"]~.ov) .iconbtn{border-color:rgba(201,162,106,.3);background:linear-gradient(180deg,#221a12,#130e09)}
+/* заголовок зоны — латунная табличка: концы с оковкой, середина под надпись (§12.4: подписанные зоны) */
+:where(.g-main[data-route="craft"]) .pnl-h>h2{color:#f0d79c;text-shadow:0 1px 2px #000,0 0 14px rgba(221,188,122,.25);letter-spacing:.02em}
+html.cr-pl :where(.g-main[data-route="craft"]) .pnl-h>h2{flex:none;border-style:solid;border-color:transparent;border-width:1px 15px 8px;padding:3px 4px 0;line-height:17px;font-size:16px;
+  border-image:var(--cr-plate) 6 92 52 92 fill / 1px 15px 8px stretch}
+
+/* ---------- рамка иконки предмета: вид — материал (data-fk, CR_KIND), редкость — свет в окне и контур рамки ----------
+   Тело рамки — 200 из 256 px холста: рамка шире колодца на --cr-fi с каждой стороны, окно — по центру; выступы (рога, зубцы) — в поле.
+   Иконку ресурса рисуют квадратной живописью в край — рамка ложится поверх её краёв */
+:root{--cr-fi:14%}
+html.cr-f [data-fk="res"]{--crf:var(--cr-f-res)}
+html.cr-f [data-fk="key"]{--crf:var(--cr-f-key)}
+html.cr-f [data-fk="boss"]{--crf:var(--cr-f-boss)}
+html.cr-f [data-fk="made"]{--crf:var(--cr-f-made)}
+html.cr-f [data-fk="call"]{--crf:var(--cr-f-call)}
+html.cr-f [data-fk="rune"]{--crf:var(--cr-f-rune)}
+html.cr-f [data-fk="karst"]{--crf:var(--cr-f-karst)}
+html.cr-f [data-fk="city"]{--crf:var(--cr-f-city)}
+html.cr-f :is(.well,.zp-cell,.zp-ic,.lv-ic,.lv-big,.mk-ic,.tr-big)[data-fk]{overflow:visible;border-color:transparent;border-radius:4px;box-shadow:none;
+  background:radial-gradient(78% 62% at 50% 104%,color-mix(in srgb,var(--rc,#8a8a8a) 34%,transparent),transparent 74%),radial-gradient(closest-side,#15181b,#07090b)}
+html.cr-f :is(.well,.zp-cell,.zp-ic,.lv-ic,.lv-big,.mk-ic,.tr-big)[data-fk]::after{content:"";position:absolute;inset:calc(-1 * var(--cr-fi));z-index:1;pointer-events:none;border-radius:0;opacity:1;
+  background:var(--crf) center/100% 100% no-repeat;filter:drop-shadow(0 0 1.5px color-mix(in srgb,var(--rc,#8a8a8a) 75%,transparent))}
+html.cr-f :is(.well,.zp-cell,.zp-ic,.lv-ic,.lv-big,.mk-ic,.tr-big)[data-fk][data-r="1"]::after{filter:drop-shadow(0 1px 1px rgba(0,0,0,.8))}
+html.cr-f :is(.well,.zp-cell,.zp-ic,.lv-ic,.lv-big,.mk-ic,.tr-big)[data-fk]>img{position:relative;width:72%;height:72%;border-radius:2px;object-fit:contain}
+html.cr-f :is(.well,.zp-cell,.zp-ic,.lv-ic,.lv-big,.mk-ic,.tr-big)[data-fk] :is(.q,.dot,.zp-dot,.zp-worn,.zp-k,.lv-q,.lv-cr){z-index:2}
+/* крупная плитка листа «Сведения» (index.html) — тоже в рамке */
+html.cr-f .tr-big[data-fk]{position:relative;width:56px;height:56px}
+/* выбранный колодец — бирюзовое кольцо поверх рамки */
+html.cr-f .well[data-fk].sel{box-shadow:0 0 0 2px var(--spirit),0 0 14px -2px var(--spirit)}
+/* редкое светится сильнее: с эпической — второй ореол */
+html.cr-f :is(.well,.zp-cell,.zp-ic,.lv-ic,.lv-big,.mk-ic,.tr-big)[data-fk]:is([data-r="4"],[data-r="5"],[data-r="6"],[data-r="7"])::after{filter:drop-shadow(0 0 1.5px var(--rc)) drop-shadow(0 0 5px color-mix(in srgb,var(--rc) 45%,transparent))}
+/* без арта — рамка CSS: кромка цветом вида, свет снизу — редкость */
+html:not(.cr-f) [data-fk]{--crk:#39414a}
+html:not(.cr-f) [data-fk="key"]{--crk:#6a5536}
+html:not(.cr-f) [data-fk="boss"]{--crk:#8a6a3a}
+html:not(.cr-f) [data-fk="made"]{--crk:#9a7a48}
+html:not(.cr-f) [data-fk="call"]{--crk:#8c8270}
+html:not(.cr-f) [data-fk="rune"]{--crk:#5d6670}
+html:not(.cr-f) [data-fk="karst"]{--crk:#2f8a82}
+html:not(.cr-f) [data-fk="city"]{--crk:#4b4f55}
+html:not(.cr-f) :is(.well,.zp-cell,.zp-ic,.lv-ic,.lv-big,.mk-ic,.tr-big)[data-fk]{border-color:var(--crk)}
+
+/* ---------- пометка Этриона: записка из картотеки с печатью башни ---------- */
+.cr-hint{position:relative;display:flex;align-items:flex-start;gap:10px;min-width:0;padding:10px 12px 10px 10px;border-radius:3px;
+  background:linear-gradient(180deg,#261d14,#17110c);box-shadow:inset 0 0 0 1px rgba(221,188,122,.34),inset 0 0 0 4px rgba(23,17,12,.95),inset 0 0 0 5px rgba(221,188,122,.16),0 12px 22px -12px #000}
+html.cr-p .cr-hint{background:linear-gradient(180deg,rgba(40,30,20,.35),rgba(14,11,8,.2)),var(--cr-vellum) 0 0/240px auto,#1a1410}
+.cr-seal{flex:none;width:30px;height:34px;border-radius:50%;background:radial-gradient(circle at 45% 40%,#2c8c80,#0f3c38 70%);box-shadow:0 2px 3px #000}
+html.cr-se .cr-seal{border-radius:0;background:var(--cr-seal) center/contain no-repeat;box-shadow:none;filter:drop-shadow(0 2px 3px #000)}
+.cr-hint-t{display:flex;flex-direction:column;gap:3px;min-width:0}
+.cr-hint-h{font:700 10px/1.2 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:#6fd9cc}
+.cr-hint-t p{margin:0;font:italic 500 15px/1.35 var(--f-d);color:#ecdcb6}
+.cr-hint-n{font:600 14px/1.1 var(--f-d);color:#f0d79c}
+/* у стола: узкая записка чуть наискось, печать сверху; появляется, когда выбрана ячейка с пометкой */
+.cr-hint.ws-note{flex-direction:column;align-items:center;gap:6px;padding:12px 10px 12px;text-align:center;transform:translateY(-50%) rotate(-1.5deg)}
+.cr-hint.ws-note:not(.shown){animation:cr-note .45s cubic-bezier(.2,.8,.2,1) both}
+.cr-hint.ws-note .cr-seal{margin-top:-24px;width:34px;height:38px}
+.cr-hint.ws-note .cr-hint-t p{font-size:13.5px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:7;-webkit-box-orient:vertical;overflow:hidden}
+@container main (max-height: 360px){ .cr-hint.ws-note{padding:10px 8px} .cr-hint.ws-note .cr-hint-t p{font-size:13px;-webkit-line-clamp:5} }
+
+/* ---------- показ порциями: «Показать ещё» — последняя клетка списка ---------- */
+.cr-more{appearance:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:40px;padding:6px 10px;border:1px dashed rgba(201,162,106,.4);border-radius:8px;
+  background:linear-gradient(180deg,rgba(28,21,14,.7),rgba(14,11,8,.7));color:#e8cf95;font:700 12px/1.1 var(--f-u);letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.cr-more small{font:600 11px/1.1 var(--f-u);letter-spacing:.04em;text-transform:none;color:var(--parch-3)}
+.cr-more:hover{border-style:solid;border-color:var(--gold-2);color:var(--gold)}
+
+/* ---------- грани выборки в листе «Фильтры»: чипы ---------- */
+.cr-fcs{display:flex;flex-wrap:wrap;gap:6px}
+.cr-fc{appearance:none;cursor:pointer;height:30px;padding:0 10px;font-size:12px;gap:6px}
+.cr-fc .i{width:14px;height:14px}
+.cr-fc .ico{width:16px;height:16px}
+.cr-fc[aria-pressed="true"]{color:var(--gold);border-color:var(--gold-3);background:#18130d;box-shadow:inset 0 -2px 0 var(--spirit)}
+
+/* ---------- листы и окна раздела: чернёный пергамент, золотая линовка, латунные уголки ---------- */
+:where(.g-main[data-route="craft"]~.ov) .sheet{border-left:1px solid rgba(201,162,106,.45);box-shadow:-30px 0 60px -20px rgba(0,0,0,.85),inset 1px 0 0 rgba(255,228,170,.07);
+  background:radial-gradient(120% 50% at 0% 100%,rgba(72,229,212,.06),transparent 60%),linear-gradient(180deg,#18130e,#0f0c09)}
+html.cr-p :where(.g-main[data-route="craft"]~.ov) .sheet{background:radial-gradient(120% 50% at 0% 100%,rgba(72,229,212,.07),transparent 60%),linear-gradient(180deg,rgba(20,15,11,.5),rgba(10,8,6,.66)),var(--cr-vellum) 0 0/320px auto,#15100c}
+:where(.g-main[data-route="craft"]~.ov) .sheet-h{border-bottom:0;background:linear-gradient(90deg,rgba(221,188,122,.45),rgba(221,188,122,.1) 70%,transparent) 0 100%/100% 1px no-repeat}
+:where(.g-main[data-route="craft"]~.ov) .sheet-h h2,:where(.g-main[data-route="craft"]~.ov) .dlg-h h2{color:#f0d79c;text-shadow:0 1px 2px #000,0 0 16px rgba(221,188,122,.22)}
+:where(.g-main[data-route="craft"]~.ov) .sheet-f{border-top:0;background:linear-gradient(90deg,rgba(221,188,122,.35),rgba(221,188,122,.08) 70%,transparent) 0 0/100% 1px no-repeat,rgba(8,6,4,.55)}
+:where(.g-main[data-route="craft"]~.ov) .dlg{border-color:rgba(201,162,106,.45);background:radial-gradient(90% 60% at 50% 110%,rgba(72,229,212,.08),transparent 70%),linear-gradient(180deg,#1a140e,#100c09);box-shadow:0 30px 80px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,228,170,.07)}
+html.cr-p :where(.g-main[data-route="craft"]~.ov) .dlg{background:radial-gradient(90% 60% at 50% 110%,rgba(72,229,212,.08),transparent 70%),linear-gradient(180deg,rgba(20,15,11,.45),rgba(10,8,6,.62)),var(--cr-vellum) 0 0/320px auto,#15100c}
+/* латунные уголки: у листа — слева сверху и снизу, у окна — все четыре */
+html.cr-c :where(.g-main[data-route="craft"]~.ov) .sheet::before{content:"";position:absolute;inset:6px auto 6px 6px;z-index:3;width:26px;pointer-events:none;
+  background:var(--cr-ctl) 0 0/26px auto no-repeat,var(--cr-cbl) 0 100%/26px auto no-repeat;filter:drop-shadow(0 1px 2px #000)}
+html.cr-c :where(.g-main[data-route="craft"]~.ov) .dlg.fit::before{inset:-3px;border-radius:0;opacity:1;filter:drop-shadow(0 1px 2px #000);
+  background:var(--cr-ctl) 0 0/24px auto no-repeat,var(--cr-ctr) 100% 0/24px auto no-repeat,var(--cr-cbl) 0 100%/24px auto no-repeat,var(--cr-cbr) 100% 100%/24px auto no-repeat}
+/* карточка предмета и листы: крупная плитка — рамка своего вида; загадка — курсив на пергаменте */
+:where(.g-main[data-route="craft"]~.ov) .quote{padding:8px 10px;border-left:2px solid rgba(221,188,122,.4);background:linear-gradient(90deg,rgba(221,188,122,.06),transparent 80%)}
+
+/* ---------- UI-кит: раздел «Ремесло: залы и вещи мастера» ---------- */
+.cr-kit{gap:var(--sp-m)}
+.cr-khs{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:var(--sp-m)}
+.cr-kh{margin:0;display:flex;flex-direction:column;gap:6px}
+.cr-kh figcaption{font:600 15px/1.1 var(--f-d);color:var(--parch)}
+.cr-kh-p{display:block;aspect-ratio:21/9;border-radius:8px;border:1px solid rgba(201,162,106,.3);background:#0b0c0e}
+html.cr-h .cr-kh-p[data-hall="work"]{background:var(--cr-hall-work) center/cover}
+html.cr-h .cr-kh-p[data-hall="stock"]{background:var(--cr-hall-stock) center/cover}
+html.cr-h .cr-kh-p[data-hall="shop"]{background:var(--cr-hall-shop) center/cover}
+html.cr-h .cr-kh-p[data-hall="market"]{background:var(--cr-hall-market) center/cover}
+html.cr-h .cr-kh-p[data-hall="forge"]{background:var(--cr-hall-forge) center/cover}
+.cr-kfr{display:flex;flex-direction:column;gap:10px;padding:10px 12px;border-radius:10px;background:linear-gradient(180deg,#15100c,#0c0a08);border:1px solid rgba(201,162,106,.25)}
+.cr-kf{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;align-items:center}
+.cr-kf>b{font:600 15px/1.1 var(--f-d);color:#ecd9ad}
+.cr-kfs{display:flex;flex-wrap:wrap;gap:14px}
+.cr-kw{--s:52px}
+.cr-kw .i{width:40%;height:40%;color:var(--rc)}
+.cr-kw>img{width:72%;height:72%}
+.cr-khint{max-width:460px}
+.cr-kt{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-l);padding:12px;border-radius:10px;background:#08090b;border:1px solid var(--iron)}
+.cr-kt>span{display:block;flex:none}
+.cr-kt-t{width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,#15191c 0 46%,#101316 50% 94%,#6c5231 95%)}
+.cr-kt-s{width:64px;height:64px;border-radius:50%;background:radial-gradient(circle,#07090b 0 40%,#5b4528 44% 70%,#2b2014 72%)}
+.cr-kt-c{width:84px;height:84px;border-radius:50%;background:radial-gradient(circle,#081a18 0 26%,#6d5431 28% 64%,#1a140d 66%)}
+.cr-kt-h{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,#ffcf6a 0 12%,#c4491d 32%,#2a2a2e 45% 100%)}
+.cr-kt-d{width:180px;height:78px;border-radius:50%;background:radial-gradient(closest-side,#232629,#101214)}
+html.cr-t .cr-kt-t{background:var(--cr-table) center/contain no-repeat}
+html.cr-t .cr-kt-s{background:var(--cr-socket) center/contain no-repeat}
+html.cr-t .cr-kt-c{background:var(--cr-core) center/contain no-repeat}
+html.cr-hh .cr-kt-h{background:var(--cr-hearth) center/contain no-repeat}
+html.cr-d .cr-kt-d{border-radius:0;background:var(--cr-dais) center/contain no-repeat}
+
+/* ---------- слой частиц отклика: рядом с #game, перерисовка экрана его не сносит ---------- */
+.cr-fxl{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
+
+@keyframes cr-mote{0%{opacity:0;transform:translate(0,0)}20%{opacity:.6}80%{opacity:.32}100%{opacity:0;transform:translate(var(--dx),var(--dy))}}
+@keyframes cr-rise{0%{opacity:0;transform:translate(0,0) scale(1)}15%{opacity:.9}100%{opacity:0;transform:translate(var(--dx),calc(var(--dy) * 2.4)) scale(.4)}}
+@keyframes cr-breathe{0%,100%{opacity:.8}50%{opacity:1}}
+@keyframes cr-note{from{opacity:0;transform:translateY(-50%) translateX(-10px) rotate(-4deg)}}
+@media (prefers-reduced-motion:reduce){
+  .cr-hall *,.cr-hint,.cr-more,:where(.g-main[data-route="craft"],.g-main[data-route="craft"]~.ov) .btn.go::after{animation:none!important;transition:none!important}
+  .cr-mt,.cr-em{display:none}
+}

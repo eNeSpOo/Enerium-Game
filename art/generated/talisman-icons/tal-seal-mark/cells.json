@@ -1,0 +1,300 @@
+{
+  "sheet": "art/generated/talisman-icons/tal-seal-mark__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/talisman-icons.json",
+  "job": "tal-seal-mark",
+  "grid": [
+    6,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "seal_slow",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-seal-slow.webp",
+      "box": [
+        24,
+        40,
+        810,
+        826
+      ],
+      "px": 786,
+      "key_left": 0.0
+    },
+    {
+      "id": "seal_drain",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-seal-drain.webp",
+      "box": [
+        868,
+        40,
+        1654,
+        826
+      ],
+      "px": 786,
+      "key_left": 0.0
+    },
+    {
+      "id": "seal_weak",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-seal-weak.webp",
+      "box": [
+        1712,
+        40,
+        2498,
+        826
+      ],
+      "px": 786,
+      "key_left": 0.0
+    },
+    {
+      "id": "seal_bleed",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-seal-bleed.webp",
+      "box": [
+        2557,
+        40,
+        3343,
+        826
+      ],
+      "px": 786,
+      "key_left": 0.0
+    },
+    {
+      "id": "seal_mark",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-seal-mark.webp",
+      "box": [
+        3401,
+        40,
+        4187,
+        826
+      ],
+      "px": 786,
+      "key_left": 0.0
+    },
+    {
+      "id": "seal_rend",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-seal-rend.webp",
+      "box": [
+        4246,
+        40,
+        5032,
+        826
+      ],
+      "px": 786,
+      "key_left": 0.0
+    },
+    {
+      "id": "seal_pierce",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-seal-pierce.webp",
+      "box": [
+        24,
+        881,
+        811,
+        1668
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "seal_miss",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-seal-miss.webp",
+      "box": [
+        867,
+        881,
+        1654,
+        1668
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "seal_silence",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-seal-silence.webp",
+      "box": [
+        1712,
+        881,
+        2499,
+        1668
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "seal_stun",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-seal-stun.webp",
+      "box": [
+        2557,
+        881,
+        3344,
+        1668
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "seal_knock",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-seal-knock.webp",
+      "box": [
+        3401,
+        881,
+        4188,
+        1668
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "seal_freeze",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-seal-freeze.webp",
+      "box": [
+        4245,
+        881,
+        5032,
+        1668
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_nail",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-mark-nail.webp",
+      "box": [
+        25,
+        1723,
+        810,
+        2508
+      ],
+      "px": 785,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_mushroom",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-mark-mushroom.webp",
+      "box": [
+        868,
+        1723,
+        1653,
+        2508
+      ],
+      "px": 785,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_plank",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-mark-plank.webp",
+      "box": [
+        1713,
+        1723,
+        2498,
+        2508
+      ],
+      "px": 785,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_ironore",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-mark-ironore.webp",
+      "box": [
+        2558,
+        1723,
+        3343,
+        2508
+      ],
+      "px": 785,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_sinew",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-mark-sinew.webp",
+      "box": [
+        3402,
+        1723,
+        4187,
+        2508
+      ],
+      "px": 785,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_ash",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-mark-ash.webp",
+      "box": [
+        4246,
+        1723,
+        5031,
+        2508
+      ],
+      "px": 785,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_acid",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-mark-acid.webp",
+      "box": [
+        25,
+        2563,
+        810,
+        3348
+      ],
+      "px": 785,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_fang",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-mark-fang.webp",
+      "box": [
+        868,
+        2563,
+        1653,
+        3348
+      ],
+      "px": 785,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_claw",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-mark-claw.webp",
+      "box": [
+        1713,
+        2563,
+        2498,
+        3348
+      ],
+      "px": 785,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_leather",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-mark-leather.webp",
+      "box": [
+        2558,
+        2563,
+        3343,
+        3348
+      ],
+      "px": 785,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_bone",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-mark-bone.webp",
+      "box": [
+        3402,
+        2563,
+        4187,
+        3348
+      ],
+      "px": 785,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_dye",
+      "file": "art/generated/talisman-icons/tal-seal-mark/tal-mark-dye.webp",
+      "box": [
+        4246,
+        2563,
+        5031,
+        3348
+      ],
+      "px": 785,
+      "key_left": 0.0
+    }
+  ]
+}

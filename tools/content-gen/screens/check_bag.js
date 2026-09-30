@@ -139,7 +139,10 @@ for (const tab of ['res', 'rune', 'shard', 'call', 'chest', 'tal', 'eq']) {
       if (uses.length && !card.includes(`data-v="zpuse:${e.id}"`)) say(`${tab} · ${e.key}: нет строки «Найденные рецепты»`);
       if (!uses.length && tab === 'res' && !card.includes('Ни в одном найденном рецепте')) say(`${tab} · ${e.key}: не сказано, что в найденных рецептах ресурса нет`);
       if (src.length && !card.includes(`data-v="zpsrc:${e.id}"`)) say(`${tab} · ${e.key}: нет строки «Откуда падает»`);
-      if (!e.it.team && e.it.lore && !card.includes('Загадка')) say(`${tab} · ${e.key}: в карточке нет загадки`);
+      /* §14.3 «загадка» ресурса — пометка Этриона (поле hint, crHint — screens/crafthall.js); лор — описание без подписи */
+      if (!e.it.team && e.it.lore && !card.includes(T.trEsc(e.it.lore))) say(`${tab} · ${e.key}: в карточке нет описания`);
+      if (!e.it.team && e.it.hint && typeof T.crHint === 'function' && !card.includes('Пометка Этриона')) say(`${tab} · ${e.key}: в карточке нет пометки Этриона — загадки ресурса`);
+      if (card.includes('<b>Загадка</b>')) say(`${tab} · ${e.key}: описание подписано «Загадка» — загадка ресурса теперь пометка Этриона`);
       if (/ADR-|\(§/.test(strip(card))) say(`${tab} · ${e.key}: игроку видна ссылка на ADR или §`);
       const su = sheetOf('zpuse', e.id, `${tab} · ${e.key} · лист рецептов`), ss = sheetOf('zpsrc', e.id, `${tab} · ${e.key} · лист источников`); cnt.sheets += 2;
       for (const r of uses) if (!su.includes(T.trEsc(r.n))) say(`${tab} · ${e.key}: в листе рецептов нет «${r.n}»`);

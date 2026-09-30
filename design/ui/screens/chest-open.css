@@ -311,3 +311,13 @@
 @media (prefers-reduced-motion:reduce){
   .co-st,.co-st *{animation:none!important;transition:none!important}
 }
+
+/* ===================================================================================================================
+   Зал «Запасы» за сценой (screens/crafthall.js, слово автора 30.09.2026 — «дорого и богато»): сундук открывают в подклети башни —
+   фон зала в глубокой тени, свет редкости снизу; сундук падает на каменный помост, трещины помоста светятся карстом.
+   Помост стоит (движение сундука — прежнее, по времени); без арта — тёмный эллипс CSS.
+   =================================================================================================================== */
+html.cr-h .co-bg{background:radial-gradient(60% 55% at 50% 96%,color-mix(in srgb,var(--rc) 20%,transparent),transparent 72%),radial-gradient(130% 100% at 50% 60%,rgba(8,10,12,.74),rgba(3,4,5,.95)),var(--cr-hall-stock) 50% 45%/cover no-repeat,#050607}
+.co-dais{position:absolute;z-index:0;aspect-ratio:2301/1000;transform:translate(-50%,-30%);pointer-events:none;border-radius:50%;
+  background:radial-gradient(50% 30% at 50% 30%,#2a2f33,#16191c 70%,transparent 72%),radial-gradient(50% 45% at 50% 55%,#0c0e10 60%,transparent 64%)}
+html.cr-d .co-dais{border-radius:0;background:var(--cr-dais) center/100% 100% no-repeat;filter:drop-shadow(0 14px 18px rgba(0,0,0,.85))}

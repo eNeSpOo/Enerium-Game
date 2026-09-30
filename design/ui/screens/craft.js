@@ -89,6 +89,8 @@ const WS_FX = {
   /* новая запись в книге — после удачи, от конца полной версии: книга раскрывается, листы, свет, чернила пишут имя рецепта */
   book: { open: 520, flip: 3, flipAt: 280, flipStep: 150, flipDur: 560, light: 360, lightDur: 1200, ink: 860, inkStep: 34, end: 1640 },
   pane: 320, shiftDur: 480, fade: 220,                                        // лист итога, уход круга влево, затухание короткой без листа, мс
+  drop: { life: 900 },                                                        // ресурс опускается в гнездо стола, итог встаёт на пьедестал: сколько держится класс движения, мс
+  ringMs: 24000,                                                              // кольцо света под пьедесталом: оборот, мс
   /* по редкости итога: ореол, лучи (с эпической), свет по всей сцене при вспышке — %; масштаб вспышки, % */
   halo: [30, 36, 44, 54, 64, 74, 84], rays: [0, 0, 0, 30, 42, 54, 66], sflash: [0, 0, 8, 14, 22, 30, 38], flashScale: [100, 108, 116, 126, 138, 150, 164],
   /* частицы EnFx. Искры, полосы, золото — [сколько, скорость, жизнь мс, размер]; кольца — [радиус в % круга, мс, толщина, задержка мс];
@@ -208,8 +210,8 @@ const wsSkipSaved = () => { try { return localStorage.getItem(WS_SKIP_KEY) === '
 function wsFresh() {
   const D = WS_DATA.demo, part = {};
   for (const [id, p] of Object.entries(D.part)) part[id] = { pos: p.pos.slice() };
-  return { cells: wsEmpty(), sel: 0, pick: '', view: 'table', inv: { cat: 'all', q: '' }, book: { tab: 'all', kind: '', fav: false, q: '' }, part, fav: D.fav.slice(), last: null,
-    ops: {}, seq: 1, fx: null, skip: wsSkipSaved() };
+  return { cells: wsEmpty(), sel: 0, pick: '', view: 'table', inv: { cat: 'all', q: '', f: {} }, book: { tab: 'all', kind: '', fav: false, q: '' }, part, fav: D.fav.slice(), last: null,
+    ops: {}, seq: 1, fx: null, skip: wsSkipSaved(), drop: null };
 }
 const wsOp = () => 'ws' + S.ws.seq;   // номер следующей операции: его несут кнопки «Попробовать», «Создать» и подтверждения
 const wsItemOrd = new Map(EN_RECIPES.items.map((it, i) => [it.id, i]));
@@ -293,6 +295,28 @@ function wsPutQ(id, q, at) {
   if (i < 0) { toast(`Все ${WS_DATA.cells} ячеек заняты`); return false; }
   if (W.cells[i] && W.cells[i].id === id) W.cells[i].q = n; else W.cells[i] = { id, q: n };
   W.sel = i; W.pick = id; return true;
+}
+/* отклик стола (только вид): ресурс лёг в гнездо — опускается и вспыхивает искрами цвета стола; ушёл — пепел; сложился найденный
+   рецепт — кольцо света у пьедестала цветом редкости итога. Запасы и стол это не меняет */
+function wsFeel(before) {
+  const W = S.ws, now = wsNow(), fx = typeof crBurst === 'function';
+  W.cells.forEach((c, i) => {
+    const b = before[i];
+    if (c && (!b || b.id !== c.id)) { W.drop = { i, id: c.id, t: now }; if (fx) crBurst(`[data-wscell="${i}"]`, 'put'); }
+    else if (!c && b && fx) crBurst(`[data-wscell="${i}"]`, 'take', '#9a8f80');
+  });
+  const was = wsGuessOf(before), g = wsGuess();
+  if (g.st === 'known' && (!was || was.r !== g.r)) {
+    W.match = { rid: g.r.id, t: now };
+    if (fx) { const out = BAG.item(g.r.out[0]); crBurst('.ws-hex-in .ws-core', 'match', out && typeof crColor === 'function' ? crColor(out.r) : undefined); }
+  }
+}
+const wsCellsCopy = () => S.ws.cells.map(c => c && { id: c.id, q: c.q });
+/* найденный рецепт для прежнего набора стола — сравнить, сложился ли новый */
+function wsGuessOf(cells) {
+  const have = new Map(cells.filter(Boolean).map(c => [c.id, c.q]));
+  const r = have.size ? WS_SRV.known().filter(x => x.in.every(([id, q]) => (have.get(id) || 0) >= q)).sort(wsSpecific)[0] : null;
+  return r ? { r } : null;
 }
 /* нажатие на ресурс: ползунок количества от 0 до min(100, запас), потом — ячейка (слова автора 29.09.2026). at — ячейка переноса */
 function wsPick(id, at) {
@@ -399,12 +423,14 @@ function wsAttempt(consent, op) {
 /* колодец предмета recipes.js: иконка ремесла или яруса из «Древа рецептов» (trIcon), кромка — редкость, ромб — особый ресурс */
 function wsWell(it, o = {}) {
   if (!it) return '';
-  const sp = wsSpecial(it.id), tag = o.stat ? 'span' : 'button';
+  const sp = !o.plain && wsSpecial(it.id), tag = o.stat ? 'span' : 'button';
   const cls = ['well', o.sel ? 'sel' : '', sp ? 'ws-sp' : '', o.cls || ''].filter(Boolean).join(' ');
   const lbl = `${trEsc(it.n)}${typeof o.q === 'number' ? ', ' + o.q + ' шт.' : ''}${o.on ? ', на столе ' + o.on : ''}${sp ? ', особый ресурс' : ''}`;
   const act = o.stat ? '' : ` data-a="${o.act || 'wsinfo'}" data-v="${o.v != null ? o.v : it.id}"${o.drag ? ` draggable="true" data-wsdrag="${it.id}"` : ''} aria-label="${lbl}"`;
   const q = o.q == null ? '' : `<span class="q">${typeof o.q === 'number' ? fmt(o.q) : o.q}</span>`;
-  return `<${tag} class="${cls}" data-r="${it.r}"${act}${o.attr || ''} title="${trEsc(it.n)}"${o.size ? ` style="--s:${o.size}px"` : ''}>${trIcon(it)}${q}${o.on ? `<span class="ws-on">${fmt(o.on)}</span>` : ''}</${tag}>`;
+  /* рамка по виду предмета (crK, screens/crafthall.js): материал — вид, свет — редкость */
+  const k = typeof crK === 'function' ? crK(it) : '';
+  return `<${tag} class="${cls}" data-r="${it.r}"${act}${o.attr || ''} title="${trEsc(it.n)}"${o.size ? ` style="--s:${o.size}px"` : ''}${k}>${trIcon(it)}${q}${o.on ? `<span class="ws-on">${fmt(o.on)}</span>` : ''}${o.note ? '<i class="ws-nt" aria-hidden="true"></i>' : ''}</${tag}>`;
 }
 const wsList = list => `<div class="ws-sum">${list.map(([id, q]) => { const it = BAG.item(id); return it ? `<span class="ws-need${wsSpecial(id) ? ' sp' : ''}">${wsWell(it, { stat: true, q })}<span class="col"><b>${trEsc(it.n)}</b><small class="faint">${wsTier(it)}</small></span></span>` : ''; }).join('')}</div>`;
 const wsNeedHtml = ([id, q]) => { const it = BAG.item(id); return it ? `<span class="ws-need${wsSpecial(id) ? ' sp' : ''}">${wsWell(it, { stat: true, q })}<span class="col"><b>${trEsc(it.n)}</b><small class="faint num">есть ${fmt(BAG.qty(id))}${wsSpecial(id) ? ' · особый' : ''}</small></span></span>` : ''; };
@@ -419,37 +445,77 @@ function wsView() {
 function wsTile(it, o = {}) {
   const q = o.q != null ? o.q : BAG.qty(it.id), on = o.on != null ? o.on : wsOn(it.id), sp = wsSpecial(it.id), sel = !o.kit && S.ws.pick === it.id;
   const lbl = `${trEsc(it.n)}, ${q} шт.${on ? ', на столе ' + on : ''}${sp ? ', особый ресурс' : ''}`;
-  const a = x => o.kit ? 'noop' : x;
-  return `<div class="ws-tile${on ? ' on' : ''}" data-r="${it.r}"><button class="well${sp ? ' ws-sp' : ''}${sel ? ' sel' : ''}" data-r="${it.r}" data-a="${a('wspick')}" data-v="${it.id}"${o.kit ? '' : ` draggable="true" data-wsdrag="${it.id}"`} aria-label="${lbl}" title="${trEsc(it.n)}">${trIcon(it)}<span class="q">${fmt(q)}</span>${on ? `<span class="ws-on">${fmt(on)}</span>` : ''}</button><button class="ws-lens" data-a="${a('wsinfo')}" data-v="${it.id}" aria-label="Карточка ресурса: ${trEsc(it.n)}" title="Карточка ресурса">${ic('search')}</button></div>`;
+  const a = x => o.kit ? 'noop' : x, k = typeof crK === 'function' ? crK(it) : '';
+  return `<div class="ws-tile${on ? ' on' : ''}" data-r="${it.r}"><button class="well${sp ? ' ws-sp' : ''}${sel ? ' sel' : ''}" data-r="${it.r}" data-a="${a('wspick')}" data-v="${it.id}"${o.kit ? '' : ` draggable="true" data-wsdrag="${it.id}"`} aria-label="${lbl}" title="${trEsc(it.n)}"${k}>${trIcon(it)}<span class="q">${fmt(q)}</span>${on ? `<span class="ws-on">${fmt(on)}</span>` : ''}</button><button class="ws-lens" data-a="${a('wsinfo')}" data-v="${it.id}" aria-label="Карточка ресурса: ${trEsc(it.n)}" title="Карточка ресурса">${ic('search')}</button></div>`;
 }
-/* зона «Инвентарь»: запасы по ярусам и поиск, по пять в ряд. Нажатие — ползунок количества, потом ячейка; лупа — карточка ресурса */
-function wsInvHtml() {
+/* выборка запасов для 1000 ресурсов (screens/crafthall.js): вкладка — группа ярусов, поиск по имени, грани в листе «Фильтры» —
+   цикл, биом, вид, ремесло, редкость. Действуют только значения, которые есть в списке вкладки */
+const WS_FACETS = ['cyc', 'biome', 'kind', 'spec', 'r'];
+function wsInvView() {
   const W = S.ws, q = trNorm(W.inv.q.trim()), g = WS_DATA.groups.find(x => x[0] === W.inv.cat) || WS_DATA.groups[0];
-  const list = wsStock().filter(it => (!g[2] || g[2].includes(it.tier)) && (!q || trNorm(it.n).includes(q)));
+  const base = wsStock().filter(it => !g[2] || g[2].includes(it.tier));
+  const F = typeof crFacets === 'function' ? crFacets(base) : null, f = W.inv.f || {}, E = {};
+  if (F) for (const k of WS_FACETS) E[k] = F[k].includes(f[k]) ? f[k] : '';
+  const list = base.filter(it => (!q || trNorm(it.n).includes(q)) && (!F || crFacetMatch(it, E)));
+  return { g, base, F, E, list, n: WS_FACETS.filter(k => E[k]).length };
+}
+/* зона «Инвентарь» — шкаф картотеки: запасы по группам, поиск и «Фильтры», по пять в ряд, порциями. Нажатие — ползунок количества,
+   потом ячейка; лупа — карточка ресурса */
+function wsInvHtml() {
+  const W = S.ws, V = wsInvView(), g = V.g;
   const tabs = WS_DATA.groups.map(([k, l]) => `<button role="tab" aria-selected="${g[0] === k}" data-a="wscat" data-v="${k}">${l}</button>`).join('');
-  const wells = list.map(it => wsTile(it)).join('');
+  const key = `wsinv:${g[0]}`, P = typeof crPage === 'function' ? crPage(V.list, key) : { shown: V.list, rest: 0 };
+  const wells = P.shown.map(it => wsTile(it)).join('') + (typeof crMoreHtml === 'function' ? crMoreHtml(key, P.rest, 'ws-more') : '');
+  const fb = V.F && WS_FACETS.some(k => V.F[k].length > 1)
+    ? `<button class="iconbtn ws-fb" data-a="sheet" data-v="wsfilt" aria-pressed="${!!V.n}" aria-label="Фильтры${V.n ? ': ' + V.n : ''}" title="Фильтры: цикл, биом, вид, ремесло, редкость">${WS_FUNNEL}${V.n ? `<b class="num">${V.n}</b>` : ''}</button>` : '';
+  const none = V.base.length && V.n ? '<div class="ws-none"><p class="faint">Ничего не найдено</p><button class="btn sm" data-a="wsfclr">Сбросить фильтры</button></div>' : '<p class="faint ws-none">Ничего не найдено</p>';
   return `<div class="pnl ws-inv">
-    <div class="pnl-h"><h2>Инвентарь</h2><label class="search grow">${ic('search')}<input id="wsInvQ" type="search" placeholder="Поиск по запасам" value="${trEsc(W.inv.q)}" autocomplete="off" aria-label="Поиск по запасам"></label></div>
+    <div class="pnl-h"><h2>Инвентарь</h2><label class="search grow">${ic('search')}<input id="wsInvQ" type="search" placeholder="Поиск по запасам" value="${trEsc(W.inv.q)}" autocomplete="off" aria-label="Поиск по запасам"></label>${fb}</div>
     <div class="tabs" role="tablist" aria-label="Запасы по ярусам">${tabs}</div>
-    <div class="ws-grid scroll grow" data-keep="wsinv:${g[0]}">${wells || '<p class="faint ws-none">Ничего не найдено</p>'}</div>
+    <div class="ws-grid scroll grow" data-keep="${key}">${wells || none}</div>
   </div>`;
 }
+/* воронка кнопки «Фильтры»: в наборе значков index.html её нет — та же, что у «Запасов» */
+const WS_FUNNEL = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6.5 7.5V18l-3 2v-7.5z"/></svg>';
 /* зона «Крафт»: стол или книга рецептов */
 function wsCraftHtml() {
   const book = S.ws.view === 'book', n = WS_SRV.known().length + wsParts().length;
   const tabs = `<div class="tabs" role="tablist" aria-label="Крафт"><button role="tab" aria-selected="${!book}" data-a="wsview" data-v="table">Стол</button><button role="tab" aria-selected="${book}" data-a="wsview" data-v="book">${ic('book')}Книга · ${n}</button></div>`;
-  return `<div class="pnl ws-craft"><div class="pnl-h"><h2>Крафт</h2><span class="g-spacer"></span>${tabs}</div>${book ? wsBookHtml() : wsTableHtml()}</div>`;
+  return `<div class="pnl ws-craft${book ? ' ws-bk' : ''}"><div class="pnl-h"><h2>Крафт</h2><span class="g-spacer"></span>${tabs}</div>${book ? wsBookHtml() : wsTableHtml()}</div>`;
 }
-function wsCellHtml(c, i) {
-  const sel = S.ws.sel === i, it = c ? BAG.item(c.id) : null, attr = ` data-wscell="${i}" aria-pressed="${sel}"`;
+/* ячейка стола — гнездо в бронзовом кольце: пустая — «+», с ресурсом — предмет в рамке своего вида. Только что положенный ресурс
+   опускается в гнездо (--dd — момент от начала, мс: перерисовка не рвёт движение); у ресурса, чья пометка Этриона сейчас у стола, —
+   печать в углу: так видно, о каком гнезде записка */
+function wsCellHtml(c, i, noteId) {
+  const sel = S.ws.sel === i, it = c ? BAG.item(c.id) : null, D = S.ws.drop, now = wsNow();
+  const drop = !!(D && D.i === i && c && D.id === c.id && now - D.t < WS_FX.drop.life);
+  const attr = ` data-wscell="${i}" aria-pressed="${sel}"${drop ? ` style="--dd:${D.t - now}ms"` : ''}`;
   if (!it) return `<button class="well empty ws-cell${sel ? ' sel' : ''}" data-a="wscell" data-v="${i}"${attr} aria-label="Ячейка ${i + 1}, пустая">${ic('plus')}</button>`;
-  return wsWell(it, { act: 'wscell', v: i, q: c.q, sel, cls: 'ws-cell' + (c.q > BAG.qty(c.id) ? ' ws-lack' : ''), attr });
+  const note = !!noteId && noteId === c.id;
+  return wsWell(it, { act: 'wscell', v: i, q: c.q, sel, note, cls: 'ws-cell' + (c.q > BAG.qty(c.id) ? ' ws-lack' : '') + (drop ? ' ws-drop' : ''), attr });
 }
+/* желоба стола: от гнезда к пьедесталу; у занятого гнезда желоб светится цветом стола, у найденного рецепта — цветом редкости итога */
+function wsGrooves(r) {
+  const G = WS_FX.geo;
+  return S.ws.cells.map((c, i) => `<i class="ws-gr${c ? ' on' : ''}" style="--a:${G.ang[i] + 180}deg"${c && r ? ` data-r="${r}"` : ''}></i>`).join('');
+}
+/* стол — круг мастерской: базальтовый диск в бронзовом ободе, шесть гнёзд по кругу, в середине — пьедестал результата.
+   Найденный рецепт — итог на пьедестале, кольцо света под ним цветом редкости. Слева от стола — пометка Этриона ресурса выбранной ячейки */
 function wsTableHtml() {
-  const g = wsGuess(), out = g.st === 'known' ? BAG.item(g.r.out[0]) : null;
-  const core = out ? `<span class="well ws-core known" data-r="${out.r}" title="${trEsc(out.n)}">${trIcon(out)}</span>` : '<span class="well ws-core"><span>?</span></span>';
-  return `<div class="ws-hex"><div class="ws-hex-in">${S.ws.cells.map(wsCellHtml).join('')}${core}</div></div>${wsQtyHtml()}${wsFootHtml(g)}`;
+  const g = wsGuess(), out = g.st === 'known' ? BAG.item(g.r.out[0]) : null, r = out ? out.r : 0;
+  /* итог встаёт на пьедестал только в миг, когда рецепт сложился (--dm — момент от начала, мс); кольцо идёт по часам страницы */
+  const now = wsNow(), M = S.ws.match, fresh = !!(out && M && M.rid === g.r.id && now - M.t < WS_FX.drop.life);
+  const core = out ? `<span class="well ws-core known${fresh ? ' fresh' : ''}" data-r="${out.r}"${typeof crK === 'function' ? crK(out) : ''} title="${trEsc(out.n)}"${fresh ? ` style="--dm:${M.t - now}ms"` : ''}>${trIcon(out)}</span>` : '<span class="well ws-core"><span>?</span></span>';
+  /* пометка у стола: ресурс выбранной ячейки; у пустой ячейки — последний взятый со стола или первый на столе — стол не прыгает при выборе */
+  const c = S.ws.cells[S.ws.sel], on = S.ws.cells.filter(Boolean), last = on.find(x => x.id === S.ws.pick) || on[0];
+  const it = c ? BAG.item(c.id) : last ? BAG.item(last.id) : null;
+  const note = it && typeof crHint === 'function' ? crHint(it, { cls: 'ws-note' + (wsNoteLast === it.id ? ' shown' : ''), name: true }) : '';
+  wsNoteLast = note ? it.id : '';
+  const cells = S.ws.cells.map((x, i) => wsCellHtml(x, i, wsNoteLast)).join('');
+  return `<div class="ws-hex${note ? ' noted' : ''}">${note}<div class="ws-hex-in${out ? ' match' : ''}"${r ? ` data-r="${r}"` : ''} style="--rt:${-(now % WS_FX.ringMs)}ms"><i class="ws-disc"></i><i class="ws-rg"></i>${wsGrooves(r)}${cells}${core}</div></div>${wsQtyHtml()}${wsFootHtml(g)}`;
 }
+/* пометка у стола появляется, когда её ресурс только выбран; при следующих перерисовках — уже на месте */
+let wsNoteLast = '';
 /* количество в выбранной ячейке: ползунок от 1 до min(100, запас), число и «убрать». Имя ресурса — кнопка карточки; пустая ячейка —
    пустая строка, которая держит высоту */
 function wsQtyHtml() {
@@ -514,7 +580,12 @@ function wsBookHtml() {
     : '<p class="faint ws-none">Ничего не найдено</p>';
   return `<div class="ws-bh"><label class="search grow">${ic('search')}<input id="wsBookQ" type="search" placeholder="Рецепт или ресурс" value="${trEsc(B.q)}" autocomplete="off" aria-label="Поиск по книге рецептов"></label><select class="rs-sel" data-a="wsbkind" aria-label="Вид рецепта">${opts}</select><button class="iconbtn ws-favt" data-a="wsbfav" aria-pressed="${B.fav}" aria-label="Только избранное" title="Только избранное">${ic('star')}</button></div>
     <div class="tabs" role="tablist" aria-label="Книга рецептов">${tabs.map(([k, l, list]) => `<button role="tab" aria-selected="${cur[0] === k}" data-a="wsbtab" data-v="${k}">${l} · ${list.length}</button>`).join('')}</div>
-    <div class="ws-list scroll grow" data-keep="wsbook:${cur[0]}">${cur[2].map(wsRowHtml).join('') || empty}</div>`;
+    <div class="ws-list scroll grow" data-keep="wsbook:${cur[0]}">${wsBookPage(cur) || empty}</div>`;
+}
+/* строки книги порциями: 500 рецептов разом не рисуются */
+function wsBookPage(cur) {
+  const key = 'wsbook:' + cur[0], P = typeof crPage === 'function' ? crPage(cur[2], key) : { shown: cur[2], rest: 0 };
+  return P.shown.map(wsRowHtml).join('') + (typeof crMoreHtml === 'function' ? crMoreHtml(key, P.rest, 'ws-more') : '');
 }
 
 /* ================== анимация крафта: показ итога ==================
@@ -655,7 +726,7 @@ function wsFxCircleHtml(R, e) {
   if (!fail) {
     const [cw, ch] = R.hero ? G.card : [G.res, G.res], up = anim ? [`--dt:${d(T.rise)}`, `--tt:${P.riseDur}ms`] : [];
     const body = R.hero ? `<span class="ws-fx-hero" data-r="${R.r}">${rsFace(R.hero)}</span>`
-      : R.out ? wsWell(R.out, { stat: true, size: G.res, q: R.q > 1 ? '×' + fmt(R.q) : null }) : '';
+      : R.out ? wsWell(R.out, { stat: true, plain: true, size: G.res, q: R.q > 1 ? '×' + fmt(R.q) : null }) : '';
     h.push(`<div class="ws-fx-res${anim ? ' ws-in' : ''}" data-r="${R.r}"${wsSty([`width:${cw}px`, `height:${ch}px`, `margin:${-ch / 2}px 0 0 ${-cw / 2}px`].concat(up))}>${body}</div>`);
   }
   /* предметы на своих местах: появляются; удача — вздрагивают к центру и втягиваются; неудача — дрожат, покрываются пеплом и осыпаются */
@@ -884,7 +955,15 @@ function wsBurstBook(R) {
 
 /* ================== листы поверх ================== */
 Object.assign(OV, {
-  /* сведения о ресурсе: ярус, загадка-подсказка к рецептам (§12), запасы, найденные рецепты. Будущий биом и босс не раскрываются (§12.5) */
+  /* фильтры запасов мастерской: цикл, биом, вид, ремесло, редкость — список за листом меняется сразу */
+  wsfilt() {
+    const V = wsInvView();
+    const body = V.F && typeof crFacetSheet === 'function' ? crFacetSheet(V.F, V.E, 'wsf', WS_FACETS) : '';
+    return sheet('Фильтры', body || '<p class="faint">У этой группы фильтров нет.</p>',
+      `<button class="link" data-a="wsfclr">Сбросить</button><button class="btn go" data-a="close">Показать · ${fmt(V.list.length)}</button>`);
+  },
+  /* сведения о ресурсе: ярус, описание и пометка Этриона — загадка, где ресурс пригодится (§12, поле hint), запасы, найденные рецепты.
+     Будущий биом и босс не раскрываются (§12.5) */
   wsitem(o) {
     const it = BAG.item(o.arg); if (!it || it.team) return '';
     const sp = it.spec ? it.spec.split('+').map(s => EN_RECIPES.specs[s] ? EN_RECIPES.specs[s].n.toLowerCase() : '').filter(Boolean).join(' + ') : '';
@@ -892,7 +971,7 @@ Object.assign(OV, {
     const trails = wsParts().filter(x => x.part.pos.includes(it.id)), on = wsOn(it.id);
     const body = `<div class="ws-o">
       <div class="row" style="gap:12px">${wsWell(it, { stat: true, size: 64 })}<div class="col" style="gap:4px;min-width:0"><span class="eyebrow">${wsTier(it)}${sp ? ' · ' + sp : ''}</span><b class="serif" style="font-size:22px;line-height:1.05">${trEsc(it.n)}</b><span class="ws-rar" data-r="${it.r}">${ICON('r' + it.r, 16)}${RAR[it.r]}</span></div><span class="g-spacer"></span><div class="stat" style="align-items:flex-end"><b>${fmt(BAG.qty(it.id))}</b><small>в запасах</small></div></div>
-      <p class="quote"><b>Загадка</b>${trEsc(it.lore)}</p>
+      <p class="quote">${trEsc(it.lore)}</p>${typeof crHint === 'function' ? crHint(it) : ''}
       <dl class="kv"><dt>Цикл</dt><dd>${it.pool ? 'общий пул' : ROMAN[it.cyc] || '—'}</dd><dt>На столе</dt><dd>${on ? fmt(on) : 'нет'}</dd>${wsSpecial(it.id) ? '<dt>Особый ресурс</dt><dd class="gold">расход только с согласия</dd>' : ''}</dl>
       <span class="eyebrow">Найденные рецепты</span>${uses.length ? `<div class="tr-use">${uses.map(r => `<button class="chip" data-a="wsmake" data-v="${r.id}">${trEsc(r.n)}</button>`).join('')}</div>` : '<p class="faint" style="font-size:12.5px">Пока ни одного. Рецепты ищут на столе, загадка подсказывает дорогу.</p>'}
       ${trails.length ? `<span class="eyebrow">Подсказки</span><div class="tr-use">${trails.map(x => `<span class="chip spirit">${trEsc(x.r.n)}</span>`).join('')}</div>` : ''}
@@ -956,8 +1035,11 @@ Object.assign(OV, {
 /* ================== действия ================== */
 Object.assign(ACT, {
   wscat(v) { S.ws.inv.cat = v; render(); },
+  /* грань выборки запасов: «грань:значение», пустое значение — все */
+  wsf(v) { const s = String(v || ''), i = s.indexOf(':'), k = s.slice(0, i), x = s.slice(i + 1); if (!WS_FACETS.includes(k)) return; const f = S.ws.inv.f || (S.ws.inv.f = {}); if (x) f[k] = x; else delete f[k]; render(); },
+  wsfclr() { S.ws.inv.f = {}; S.ws.inv.q = ''; render(); },
   /* без ползунка: одна штука или +1 к своей ячейке — для сценариев и подсказок; плитка запасов зовёт wspick */
-  wsput(v) { if (S.overlay) S.overlay = null; if (wsPut(v)) S.ws.view = 'table'; render(); },
+  wsput(v) { const b = wsCellsCopy(); if (S.overlay) S.overlay = null; if (wsPut(v)) S.ws.view = 'table'; wsFeel(b); render(); },
   /* нажатие на ресурс — ползунок количества; из карточки ресурса — тот же ползунок */
   wspick(v) { if (S.overlay) S.overlay = null; if (!wsPick(v)) render(); },
   /* ползунок отпустили: v — значение с поля */
@@ -974,25 +1056,25 @@ Object.assign(ACT, {
   /* подтверждение ползунка: ресурс ложится в ячейку ровно в выбранном количестве; 0 — убрать со стола */
   wsqdo() {
     const o = S.overlay; if (!o || o.t !== 'wsqty') return;
-    const id = o.arg, v = o.v || 0, on = wsOn(id);
+    const id = o.arg, v = o.v || 0, on = wsOn(id), b = wsCellsCopy();
     if (!v && !on) return;
     S.overlay = null;
     if (wsPutQ(id, v, o.at)) S.ws.view = 'table';
-    render();
+    wsFeel(b); render();
   },
   wscell(v) { const i = +v; if (!(i >= 0 && i < WS_DATA.cells)) return; S.ws.sel = i; const c = S.ws.cells[i]; if (c) S.ws.pick = c.id; render(); },
   wsq(v) {
-    const W = S.ws, c = W.cells[W.sel]; if (!c) return;
+    const W = S.ws, c = W.cells[W.sel], b = wsCellsCopy(); if (!c) return;
     if (v === 'x') W.cells[W.sel] = null;
     else { const max = wsCellMax(c.id); c.q = v === 'max' ? max : Math.max(1, Math.min(max, c.q + (+v || 0))); if (c.q < 1) W.cells[W.sel] = null; }
-    render();
+    wsFeel(b); render();
   },
   wsqset(v, t) {
     const W = S.ws, c = W.cells[W.sel], n = Math.floor(Number(t && t.value));
     if (c && Number.isFinite(n)) { c.q = Math.max(1, Math.min(wsCellMax(c.id), n)); if (c.q < 1) W.cells[W.sel] = null; }
     render(); wsRefocus('wsQc');
   },
-  wsclear() { S.ws.cells = wsEmpty(); S.ws.sel = 0; render(); },
+  wsclear() { const b = wsCellsCopy(); S.ws.cells = wsEmpty(); S.ws.sel = 0; wsFeel(b); render(); },
   wsview(v) { S.ws.view = v === 'book' ? 'book' : 'table'; render(); },
   wsinfo(v) { if (BAG.item(v)) open('wsitem', v); },
   /* «Попробовать» / «Создать» стола: номер операции несёт кнопка */
@@ -1006,9 +1088,9 @@ Object.assign(ACT, {
   },
   wstrydo(v) { const o = S.overlay; if (!o || o.t !== 'wstry') return; wsAttempt(!!o.ok, v || o.op); },   // повторное нажатие не повторяет расход
   wsrepeat() {
-    const L = S.ws.last || [];
+    const L = S.ws.last || [], b = wsCellsCopy();
     wsSetTable(L.map(c => [c.id, c.q]));
-    S.overlay = null; render();
+    S.overlay = null; wsFeel(b); render();
   },
   wshints() { S.ws.view = 'book'; S.ws.book.tab = 'hint'; S.overlay = null; render(); },
   /* новая запись: книга открыта на этом рецепте — поиск по его имени */
@@ -1019,9 +1101,9 @@ Object.assign(ACT, {
   wsfav(v) { const f = S.ws.fav, i = f.indexOf(v); if (i >= 0) f.splice(i, 1); else f.push(v); render(); },
   /* подсказку — на стол: открытые позиции по одной штуке, выбрана следующая пустая ячейка */
   wsload(v) {
-    const r = BAG.recipe(v), p = S.ws.part[v]; if (!r || !p) return;
+    const r = BAG.recipe(v), p = S.ws.part[v], b = wsCellsCopy(); if (!r || !p) return;
     const ids = r.in.map(([id]) => id).filter(id => p.pos.includes(id));
-    wsSetTable(ids.filter(id => BAG.has(id)).map(id => [id, 1]));
+    wsSetTable(ids.filter(id => BAG.has(id)).map(id => [id, 1])); wsFeel(b);
     const miss = ids.filter(id => !BAG.has(id));
     if (miss.length) toast('Нет в запасах: ' + miss.map(wsName).join(', ')); else render();
   },

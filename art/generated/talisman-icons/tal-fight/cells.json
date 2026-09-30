@@ -1,0 +1,300 @@
+{
+  "sheet": "art/generated/talisman-icons/tal-fight__nb2-v2.jpg",
+  "jobs": "tools/art-gen/jobs/talisman-icons.json",
+  "job": "tal-fight",
+  "grid": [
+    6,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "cup",
+      "file": "art/generated/talisman-icons/tal-fight/tal-cup.webp",
+      "box": [
+        16,
+        31,
+        812,
+        827
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "spring",
+      "file": "art/generated/talisman-icons/tal-fight/tal-spring.webp",
+      "box": [
+        861,
+        31,
+        1657,
+        827
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "frost",
+      "file": "art/generated/talisman-icons/tal-fight/tal-frost.webp",
+      "box": [
+        1707,
+        31,
+        2503,
+        827
+      ],
+      "px": 796,
+      "key_left": 1e-05
+    },
+    {
+      "id": "oath",
+      "file": "art/generated/talisman-icons/tal-fight/tal-oath.webp",
+      "box": [
+        2553,
+        31,
+        3349,
+        827
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "eye",
+      "file": "art/generated/talisman-icons/tal-fight/tal-eye.webp",
+      "box": [
+        3399,
+        31,
+        4195,
+        827
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "abyss",
+      "file": "art/generated/talisman-icons/tal-fight/tal-abyss.webp",
+      "box": [
+        4244,
+        31,
+        5040,
+        827
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "ash",
+      "file": "art/generated/talisman-icons/tal-fight/tal-ash.webp",
+      "box": [
+        16,
+        875,
+        812,
+        1671
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "dance",
+      "file": "art/generated/talisman-icons/tal-fight/tal-dance.webp",
+      "box": [
+        861,
+        875,
+        1657,
+        1671
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "veil",
+      "file": "art/generated/talisman-icons/tal-fight/tal-veil.webp",
+      "box": [
+        1707,
+        875,
+        2503,
+        1671
+      ],
+      "px": 796,
+      "key_left": 1e-05
+    },
+    {
+      "id": "reap",
+      "file": "art/generated/talisman-icons/tal-fight/tal-reap.webp",
+      "box": [
+        2553,
+        875,
+        3349,
+        1671
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "ages",
+      "file": "art/generated/talisman-icons/tal-fight/tal-ages.webp",
+      "box": [
+        3399,
+        875,
+        4195,
+        1671
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "heart",
+      "file": "art/generated/talisman-icons/tal-fight/tal-heart.webp",
+      "box": [
+        4244,
+        875,
+        5040,
+        1671
+      ],
+      "px": 796,
+      "key_left": 2e-05
+    },
+    {
+      "id": "tears",
+      "file": "art/generated/talisman-icons/tal-fight/tal-tears.webp",
+      "box": [
+        16,
+        1721,
+        811,
+        2516
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "whisper",
+      "file": "art/generated/talisman-icons/tal-fight/tal-whisper.webp",
+      "box": [
+        861,
+        1721,
+        1656,
+        2516
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "firstblood",
+      "file": "art/generated/talisman-icons/tal-fight/tal-firstblood.webp",
+      "box": [
+        1707,
+        1721,
+        2502,
+        2516
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "needle",
+      "file": "art/generated/talisman-icons/tal-fight/tal-needle.webp",
+      "box": [
+        2553,
+        1721,
+        3348,
+        2516
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "fang",
+      "file": "art/generated/talisman-icons/tal-fight/tal-fang.webp",
+      "box": [
+        3399,
+        1721,
+        4194,
+        2516
+      ],
+      "px": 795,
+      "key_left": 4e-05
+    },
+    {
+      "id": "moth",
+      "file": "art/generated/talisman-icons/tal-fight/tal-moth.webp",
+      "box": [
+        4244,
+        1721,
+        5039,
+        2516
+      ],
+      "px": 795,
+      "key_left": 1e-05
+    },
+    {
+      "id": "hunter",
+      "file": "art/generated/talisman-icons/tal-fight/tal-hunter.webp",
+      "box": [
+        16,
+        2566,
+        811,
+        3361
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "lead",
+      "file": "art/generated/talisman-icons/tal-fight/tal-lead.webp",
+      "box": [
+        861,
+        2566,
+        1656,
+        3361
+      ],
+      "px": 795,
+      "key_left": 3e-05
+    },
+    {
+      "id": "resin",
+      "file": "art/generated/talisman-icons/tal-fight/tal-resin.webp",
+      "box": [
+        1707,
+        2566,
+        2502,
+        3361
+      ],
+      "px": 795,
+      "key_left": 5e-05
+    },
+    {
+      "id": "thorn",
+      "file": "art/generated/talisman-icons/tal-fight/tal-thorn.webp",
+      "box": [
+        2553,
+        2566,
+        3348,
+        3361
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "yoke",
+      "file": "art/generated/talisman-icons/tal-fight/tal-yoke.webp",
+      "box": [
+        3399,
+        2566,
+        4194,
+        3361
+      ],
+      "px": 795,
+      "key_left": 2e-05
+    },
+    {
+      "id": "wolf",
+      "file": "art/generated/talisman-icons/tal-fight/tal-wolf.webp",
+      "box": [
+        4244,
+        2566,
+        5039,
+        3361
+      ],
+      "px": 795,
+      "key_left": 7e-05
+    }
+  ]
+}

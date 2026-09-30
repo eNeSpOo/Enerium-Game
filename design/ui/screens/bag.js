@@ -7,7 +7,8 @@
    цикл, ремесло, редкость, «не в найденных рецептах», у талисманов — вид и «подходит классу», у снаряжения — слот; сами фильтры — в листе.
    Сетка — слова автора 29.09.2026: 6 столбцов, видно 5 рядов, дальше прокрутка; в клетке только значок и число, без имени — всё
    описание в карточке справа по выбору. Значки талисманов, снаряжения и осколков героя — арт screens/art-icons.js, редкость — рамкой.
-   Карточка ресурса: значок, имя, кристалл редкости, количество, одно действие. Загадка свёрнута в две строки;
+   Карточка ресурса: значок, имя, кристалл редкости, количество, одно действие. Описание (лор) свёрнуто в две строки, под ним —
+   пометка Этриона: загадка §14.3, где вещь пригодится (поле hint, crHint — screens/crafthall.js);
    «Найденные рецепты» (BAG.knownUses) и «Откуда падает» — листы по нажатию. Пометка «новое» — точкой в сетке и в карточке.
    Сундук — карточка §14.4: тип, редкость, количество и «Открыть»; выбор количества и итог — в ней же, итог крупно. Плитка сундука —
    рисованный сундук своего вида: корпус и крышка слоями (CO_ART, screens/chest-open.js); пока слой не выгружен — прежний значок.
@@ -81,9 +82,10 @@ const ZP_KIND = {
   rune: 'Руна предела', vshard: 'Осколок доблести', valor: 'Руна доблести', hero: 'Герой из рецепта', product: 'Награда мастерской',
 };
 /* фильтры вкладки: цикл, ремесло, редкость, «не в найденных рецептах», вид талисмана, класс, слот; поиск — у всех. Подписи — в листе */
-const ZP_FILT = { res: ['cyc', 'spec', 'r', 'un'], rune: ['cyc', 'r', 'un'], shard: ['cyc', 'r'], call: ['cyc', 'spec', 'r'], chest: ['cyc', 'r'], tal: ['r', 'cat', 'cls'], eq: ['cyc', 'r', 'slot'] };
-const ZP_FNAME = { cyc: 'Цикл', spec: 'Ремесло', r: 'Редкость', cat: 'Вид', cls: 'Подходит классу', slot: 'Слот' };
-const ZP_FKEYS = ['cyc', 'spec', 'r', 'cat', 'cls', 'slot'];
+/* для тысячи ресурсов (screens/crafthall.js) — ещё биом и вид (ярус): у ресурсов, рун и ключей, призывов */
+const ZP_FILT = { res: ['cyc', 'biome', 'kind', 'spec', 'r', 'un'], rune: ['cyc', 'biome', 'kind', 'r', 'un'], shard: ['cyc', 'r'], call: ['cyc', 'biome', 'kind', 'spec', 'r'], chest: ['cyc', 'r'], tal: ['r', 'cat', 'cls'], eq: ['cyc', 'r', 'slot'] };
+const ZP_FNAME = { cyc: 'Цикл', biome: 'Биом', kind: 'Вид', spec: 'Ремесло', r: 'Редкость', cat: 'Вид', cls: 'Подходит классу', slot: 'Слот' };
+const ZP_FKEYS = ['cyc', 'biome', 'kind', 'spec', 'r', 'cat', 'cls', 'slot'];
 /* «Руны и ключи»: рунные ключи и прах — из кошелька */
 const ZP_WALLET = ['keys', 'dust'];
 const ZP_WALLET_NOTE = {
@@ -125,7 +127,8 @@ const ZP_FUNNEL = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d
 const zpV = () => S.zp || zpState(S).zp;
 const zpEQ = () => (typeof EQD !== 'undefined' && EQD) || null;
 const zpTL = () => (typeof TL !== 'undefined' && TL) || null;
-const zpTabOf = it => ZP_CASKET[it.id] || (zpEQ() && zpEQ().rules.caskets[it.id] ? 'eq' : '') || ZP_TAB_OF[it.tier] || 'res';
+/* новый ярус с обработчиком призыва (ACTIVATE) — тоже во вкладку призывов: так встанут города-биомы и призыв врагов из данных Этриона */
+const zpTabOf = it => ZP_CASKET[it.id] || (zpEQ() && zpEQ().rules.caskets[it.id] ? 'eq' : '') || ZP_TAB_OF[it.tier] || (typeof ACTIVATE === 'object' && typeof ACTIVATE[it.tier] === 'function' ? 'call' : '') || 'res';
 const zpIsCasket = it => zpTabOf(it) === 'tal' || zpTabOf(it) === 'eq';
 /* строка для игрока: без ссылок на ADR и §, без пометок заглушки */
 const zpClean = s => String(s == null ? '' : s).replace(/\s*\((?:ADR|§)[^)]*\)/g, '').replace(/,?\s*(?:число\s+)?—\s*заглушка/g, '').trim();
@@ -143,7 +146,7 @@ const zpWeekGen = race => { const w = (RS.weeks || []).find(x => x.race === race
 const darChests = n => `${fmt(n)} ${plural(n, 'сундук', 'сундука', 'сундуков')}`;
 const darCount = ps => ps.reduce((a, p) => a + p.groups.reduce((b, g) => b + g.count, 0), 0);
 const zpFCount = E => ZP_FKEYS.filter(k => E[k]).length + (E.un ? 1 : 0);
-const zpFNone = () => ({ cyc: '', spec: '', r: '', un: false, cat: '', cls: '', slot: '' });
+const zpFNone = () => ({ cyc: '', biome: '', kind: '', spec: '', r: '', un: false, cat: '', cls: '', slot: '' });
 const zpHeroes = () => (typeof hrMine === 'function' ? hrMine() : S.heroes);
 
 /* развёрнутый сундук для показа и розыгрыша; нет данных или вида — null */
@@ -179,7 +182,8 @@ function zpItems(tab) {
   for (const [id, q] of Object.entries(S.bag.items)) {
     const it = BAG.item(id);
     if (!it || !(q > 0) || zpTabOf(it) !== tab) continue;
-    out.push({ key: 'i:' + id, kind: 'item', id, it, q, name: zpName(it), r: it.r, cyc: it.pool ? 'pool' : it.cyc, spec: it.spec || '', grp: zpIsCasket(it) ? 'casket' : it.tier, un: !zpKnown(id).length });
+    out.push({ key: 'i:' + id, kind: 'item', id, it, q, name: zpName(it), r: it.r, cyc: it.pool ? 'pool' : it.cyc, spec: it.spec || '', grp: zpIsCasket(it) ? 'casket' : it.tier, un: !zpKnown(id).length,
+      biome: typeof crBiomeOf === 'function' ? crBiomeOf(it) : '', tier: it.tier });
   }
   return out;
 }
@@ -251,11 +255,12 @@ function zpSeen(e) {
 
 /* ================== фильтры ================== */
 function zpOpts(all, tab) {
-  const cyc = new Set(), spec = new Set(), r = new Set(), cat = new Set(), slot = new Set();
+  const cyc = new Set(), spec = new Set(), r = new Set(), cat = new Set(), slot = new Set(), biome = new Set(), kind = new Set();
   for (const e of all) {
     if (e.cyc != null) cyc.add(String(e.cyc)); if (e.spec) e.spec.split('+').forEach(x => spec.add(x)); if (e.r) r.add(String(e.r));
-    if (e.cat) cat.add(e.cat); if (e.slot) slot.add(e.slot);
+    if (e.cat) cat.add(e.cat); if (e.slot) slot.add(e.slot); if (e.biome) biome.add(e.biome); if (e.tier) kind.add(e.tier);
   }
+  const bn = b => b === 'pool' ? -1 : b === 'ruin' ? 99 : +String(b).replace(/\D/g, '') || 50, tiers = Object.keys(RX.tiers || {});
   const T = zpTL(), E = zpEQ();
   return {
     cyc: [...cyc].sort((a, b) => (a === 'pool' ? 0 : +a) - (b === 'pool' ? 0 : +b)),
@@ -264,16 +269,20 @@ function zpOpts(all, tab) {
     cat: T ? Object.keys(T.rules.cats).filter(x => cat.has(x)) : [],
     cls: T && tab === 'tal' && all.some(e => e.kind === 'tal') ? Object.keys(T.rules.classes) : [],
     slot: E ? E.rules.slots.filter(x => slot.has(x)) : [],
+    biome: [...biome].sort((a, b) => bn(a) - bn(b)),
+    kind: [...kind].sort((a, b) => tiers.indexOf(a) - tiers.indexOf(b)),
   };
 }
 /* действующие фильтры: неприменимые к вкладке и отсутствующие в её списке значения не действуют */
 function zpEff(tab, O) {
   const V = zpV(), f = V.f, on = ZP_FILT[tab] || [], pick = k => on.includes(k) && O[k].includes(f[k]) ? f[k] : '';
-  return { cyc: pick('cyc'), spec: pick('spec'), r: pick('r'), cat: pick('cat'), cls: pick('cls'), slot: pick('slot'), un: on.includes('un') && !!f.un, q: trNorm(V.q.trim()) };
+  return { cyc: pick('cyc'), biome: pick('biome'), kind: pick('kind'), spec: pick('spec'), r: pick('r'), cat: pick('cat'), cls: pick('cls'), slot: pick('slot'), un: on.includes('un') && !!f.un, q: trNorm(V.q.trim()) };
 }
 function zpMatch(e, E) {
   if (E.q && !trNorm(e.name).includes(E.q)) return false;
   if (E.cyc && String(e.cyc) !== E.cyc) return false;
+  if (E.biome && e.biome !== E.biome) return false;
+  if (E.kind && e.tier !== E.kind) return false;
   if (E.spec && !(e.spec || '').split('+').includes(E.spec)) return false;
   if (E.r && String(e.r) !== E.r) return false;
   if (E.un && !(e.kind === 'item' && e.un)) return false;
@@ -292,7 +301,7 @@ function zpPick(tab, shown) {
 
 /* ================== общие части разметки ================== */
 /* плитка предмета: без рамки, редкость — нижняя кромка; o.lg — крупная, o.face — портрет героя, o.q — число в углу, o.dot — «новое» */
-const zpTile = (inner, r, o = {}) => `<span class="zp-ic${o.lg ? ' lg' : ''}${o.face ? ' face' : ''}${o.cls ? ' ' + o.cls : ''}"${r ? ` data-r="${r}"` : ''}>${inner}${o.q ? `<span class="q">${o.q}</span>` : ''}${o.dot ? '<span class="dot zp-dot" title="Новое"></span>' : ''}</span>`;
+const zpTile = (inner, r, o = {}) => `<span class="zp-ic${o.lg ? ' lg' : ''}${o.face ? ' face' : ''}${o.cls ? ' ' + o.cls : ''}"${r ? ` data-r="${r}"` : ''}${o.fk || ''}>${inner}${o.q ? `<span class="q">${o.q}</span>` : ''}${o.dot ? '<span class="dot zp-dot" title="Новое"></span>' : ''}</span>`;
 /* кристалл редкости (ADR-0027) — одобренный значок r1…r7 */
 const zpCr = (r, px = 18) => r ? `<span class="zp-cr" data-r="${r}" title="${RAR[r]}">${ICON('r' + r, px, RAR[r])}</span>` : '';
 const zpNewChip = e => zpIsNewShown(e) ? '<span class="chip spirit">новое</span>' : '';
@@ -311,7 +320,8 @@ function zpHead({ tile, eb = '', name, cr = '', q = null, ql = '', e = null }) {
   const chip = e ? zpNewChip(e) : '';
   return `<div class="zp-head">${tile}<div class="zp-ht">${eb || chip ? `<span class="zp-eb"><span class="eyebrow">${eb}</span>${chip}</span>` : ''}<span class="zp-nm"><b class="serif zp-name">${name}</b>${cr}</span></div>${q == null ? '' : `<div class="zp-q"><b class="num">${q}</b>${ql ? `<small>${ql}</small>` : ''}</div>`}</div>`;
 }
-const zpItemTile = (it, o = {}) => zpTile(it.team ? ic('lock') : trIcon(it), it.r, o);
+/* плитка предмета — в рамке своего вида (crK, screens/crafthall.js) */
+const zpItemTile = (it, o = {}) => zpTile(it.team ? ic('lock') : trIcon(it), it.r, Object.assign({ fk: typeof crK === 'function' ? crK(it) : '' }, o));
 const zpItemEb = it => zpIsCasket(it) ? 'Ларец мастерской' : zpSpec(it.spec) || ZP_KIND[it.tier] || (RX.tiers[it.tier] || { n: 'Предмет' }).n;
 /* цикл и неделя сундука — одной строкой: сундуки одного вида из разных циклов и недель различаются только ими */
 const zpChestWhen = sp => `цикл ${ROMAN[sp.cyc] || sp.cyc}${sp.box === 'shards' && sp.week ? ' · неделя ' + zpWeekGen(sp.week) : ''}`;
@@ -345,7 +355,7 @@ function zpNum(q) {
    Редкость рисует рамка клетки цветом --r1…--r7. Арта нет — '' и прежний значок */
 function zpArt(e, px) {
   if (e.kind === 'tal') { const f = tlFam(e.no); return f && !tlHide(f) && typeof talIcon === 'function' ? talIcon(f.cat, px, e.name) : ''; }
-  if (e.kind === 'equip') return typeof eqIcon === 'function' ? eqIcon(e.slot, px, e.name) : '';
+  if (e.kind === 'equip') return typeof eqIcon === 'function' ? eqIcon(e.slot, px, e.name, e.r) : '';   // иконка слота своей редкости (art-icons.js)
   if (e.kind === 'hero') return typeof shardGhost === 'function' ? shardGhost(e.h, e.q, zpNeed(), px) : '';
   if (e.kind === 'extra') return zpExtraArt(e.xk, e.id, px);
   return '';
@@ -355,7 +365,7 @@ function zpExtraArt(xk, id, px) {
   if (xk === 'wsh') return typeof wkIcon === 'function' ? wkIcon(px, '') : '';
   if (xk !== 'tal' || typeof talIcon !== 'function' || !window.EN_TALISMANS) return '';
   const t = LBX && LBX.talInfo[id], cats = EN_TALISMANS.rules.cats, cat = t && !t[2] ? Object.keys(cats).find(k => cats[k] === t[1]) : '';
-  return cat ? talIcon(cat, px, '') : '';
+  return cat ? talIcon(cat, px, t[0]) : '';   // имя в подписи — talIcon находит по нему линейку
 }
 /* клетка сетки — только значок и число (слова автора 29.09.2026): имя, редкость словом и всё описание — в карточке справа.
    Осколки героя — «собрано/нужно», снаряжение — без числа, на герое — метка; «новое» — точка */
@@ -365,15 +375,19 @@ function zpCell(e, on) {
   const inner = art || (e.kind === 'tal' ? tlTile(e.no) : zpIcon(e));
   const kind = e.kind === 'chest' ? ' chest' : e.kind === 'equip' ? ' eq' : e.kind === 'tal' ? ' tal' : hero ? (art ? ' ghost' : ' face') : '';
   const worn = e.kind === 'equip' && eqOwner(e.it) ? `<span class="zp-worn" title="На герое">${ic('users')}</span>` : '';
-  return `<button class="zp-cell${kind}${art ? ' art' : ''}"${e.r ? ` data-r="${e.r}"` : ''} data-a="zpsel" data-v="${trEsc(e.key)}" aria-current="${!!on}" aria-label="${trEsc(e.name)}${q ? ', ' + q : ''}" title="${trEsc(e.name + ' — ' + zpSub(e))}">${inner}${q ? `<span class="q${hero && e.q >= need ? ' full' : ''}">${q}</span>` : ''}${worn}${zpIsNew(e) ? '<span class="dot zp-dot" title="Новое"></span>' : ''}</button>`;
+  const fk = e.kind === 'item' && typeof crK === 'function' ? crK(e.it) : '';
+  return `<button class="zp-cell${kind}${art ? ' art' : ''}"${e.r ? ` data-r="${e.r}"` : ''}${fk} data-a="zpsel" data-v="${trEsc(e.key)}" aria-current="${!!on}" aria-label="${trEsc(e.name)}${q ? ', ' + q : ''}" title="${trEsc(e.name + ' — ' + zpSub(e))}">${inner}${q ? `<span class="q${hero && e.q >= need ? ' full' : ''}">${q}</span>` : ''}${worn}${zpIsNew(e) ? '<span class="dot zp-dot" title="Новое"></span>' : ''}</button>`;
 }
 /* над сеткой одна строка: поиск и «Фильтры» — сами фильтры в листе. Сетка — 6 столбцов, видно 5 рядов, дальше прокрутка */
 function zpListPanel(tab, all, shown, sel, E) {
   const V = zpV(), n = zpFCount(E);
   const find = `<label class="search grow">${ic('search')}<input id="zpq" type="search" placeholder="Поиск по запасам" value="${trEsc(V.q)}" autocomplete="off" aria-label="Поиск по запасам"></label>`;
   const fb = (ZP_FILT[tab] || []).length ? `<button class="btn sm zp-fb" data-a="sheet" data-v="zpfilt" aria-pressed="${!!n}">${ZP_FUNNEL}Фильтры${n ? `<b class="num">${n}</b>` : ''}</button>` : '';
+  /* тысяча ресурсов — порциями (crPage): последняя клетка — «+N», ещё порция; в клетке, как у всех, только число */
+  const P = typeof crPage === 'function' ? crPage(shown, 'zp:' + tab) : { shown, rest: 0 }, per = typeof CR_VIEW === 'object' ? CR_VIEW.page : P.rest;
+  const more = P.rest ? `<button class="zp-plus" data-a="crmore" data-v="zp:${tab}" title="Показать ещё ${fmt(Math.min(P.rest, per))} из ${fmt(P.rest)}" aria-label="Показать ещё ${fmt(Math.min(P.rest, per))}"><b class="num">+${zpNum(Math.min(P.rest, per))}</b></button>` : '';
   const body = !shown.length ? `<div class="zp-empty">${all.length ? '<p class="faint">Ничего не найдено.</p><button class="btn sm" data-a="zpclr">Сбросить фильтры</button>' : `<p class="faint">${ZP_EMPTY[tab]}</p>`}</div>`
-    : shown.map(e => zpCell(e, sel && e.key === sel.key)).join('');
+    : P.shown.map(e => zpCell(e, sel && e.key === sel.key)).join('') + more;
   const keep = trEsc(['zpl', tab, ZP_FKEYS.map(k => E[k]).join(','), E.un ? 1 : 0, E.q].join(':'));
   return `<div class="pnl inv zp-inv">
     <div class="row zp-find">${find}${fb}</div>
@@ -384,7 +398,7 @@ function zpListPanel(tab, all, shown, sel, E) {
 /* ================== карточки ================== */
 function zpCardItem(e) {
   const it = e.it, act = zpTabOf(it) === 'call', box = zpIsCasket(it), uses = zpKnown(it.id), src = it.team ? [] : zpSrc(it);
-  const lore = it.team ? '<p class="reason">Сведения откроются в своём цикле.</p>' : zpLore(trEsc(it.lore), box ? '' : 'Загадка');
+  const lore = it.team ? '<p class="reason">Сведения откроются в своём цикле.</p>' : zpLore(trEsc(it.lore)) + (typeof crHint === 'function' ? crHint(it) : '');
   const opens = it.opens ? `<p class="zp-p">${ZP_OPENS[it.tier === 'act' ? 'act' : 'call']}${KH.team ? ` <span class="faint">Для команды: «${trEsc(it.opens)}».</span>` : ''}</p>` : '';
   /* призыв и ларец применяют из запасов: строка рецептов у них — только если они входят в найденный рецепт */
   const use = uses.length ? zpLink('zpuse:' + it.id, 'Найденные рецепты', `<b class="num">${uses.length}</b>`) : act || box ? '' : '<p class="zp-none">Ни в одном найденном рецепте</p>';
@@ -494,14 +508,14 @@ function zpInfo(sp, def) {
 /* итог открытия — крупно: сколько открыто, валюта, плитки полученного */
 function zpResHtml(L) {
   const s = L.sum;
-  const tile = (inner, r, q, name, o = {}) => `<div class="zp-rl${o.dust ? ' zp-dust' : ''}" title="${o.tip || name}">${zpTile(inner, r, { lg: true, face: !!o.face, q, cls: o.cls })}<small>${name}</small></div>`;
+  const tile = (inner, r, q, name, o = {}) => `<div class="zp-rl${o.dust ? ' zp-dust' : ''}" title="${o.tip || name}">${zpTile(inner, r, { lg: true, face: !!o.face, q, cls: o.cls, fk: o.fk })}<small>${name}</small></div>`;
   const cur = Object.entries(s.cur).map(([k, a]) => `<span class="zp-rc" title="${zpCurName(k)}"><img src="${curImg(k)}" alt="${zpCurName(k)}"><b class="num">+${fmt(a)}</b></span>`).join('');
   const tiles = [
-    ...Object.entries(s.items).map(([id, q]) => { const it = BAG.item(id); return it ? tile(it.team ? ic('lock') : trIcon(it), it.r, '×' + fmt(q), trEsc(zpName(it))) : ''; }),
+    ...Object.entries(s.items).map(([id, q]) => { const it = BAG.item(id); return it ? tile(it.team ? ic('lock') : trIcon(it), it.r, '×' + fmt(q), trEsc(zpName(it)), { fk: typeof crK === 'function' ? crK(it) : '' }) : ''; }),
     ...Object.entries(s.shards).map(([id, q]) => { const h = RSI[id], g = h && typeof shardGhost === 'function' ? shardGhost(h, S.rs.shards[id] || 0, zpNeed(), ZP_VIEW.cellArt) : ''; return h ? tile(g || rsFace(h), h.r, '×' + fmt(q), trEsc(h.n), { face: !g, cls: g ? 'art ghost' : '', tip: `Осколки героя: ${trEsc(h.n)} ×${fmt(q)}` }) : ''; }),
     ...Object.entries(s.dust).map(([id, d]) => { const h = RSI[id]; return h ? tile(rsFace(h), h.r, '+' + fmt(d), `${trEsc(h.n)} → прах`, { face: true, dust: true, tip: `${trEsc(h.n)} уже пробуждён: осколки ×${fmt(s.dustQ[id])} → прах +${fmt(d)}` }) : ''; }),
     ...Object.entries(s.extra).map(([k, q]) => { const [xk, id, r] = k.split(':'), a = zpExtraArt(xk, id, ZP_VIEW.cellArt); return tile(a || ic(ZP_EXTRA_IC[xk] || 'gem'), +r, '×' + fmt(q), trEsc(zpExtraName(xk, id, +r)), { cls: a ? 'art' : '' }); }),
-    ...Object.keys(s.eq || {}).map(uid => { const it = typeof eqItem === 'function' ? eqItem(uid) : null; const art = it && typeof eqIcon === 'function' ? eqIcon(it.slot, ZP_VIEW.cellArt, '') : ''; return it ? tile(art || eqGlyph(it.slot), it.r, '', eqSlotName(it.slot), { cls: art ? 'art' : 'eq', tip: `${eqSlotName(it.slot)} · ${RAR[it.r].toLowerCase()}: ${eqMainTxt(it)}` }) : ''; }),
+    ...Object.keys(s.eq || {}).map(uid => { const it = typeof eqItem === 'function' ? eqItem(uid) : null; const art = it && typeof eqIcon === 'function' ? eqIcon(it.slot, ZP_VIEW.cellArt, '', it.r) : ''; return it ? tile(art || eqGlyph(it.slot), it.r, '', eqSlotName(it.slot), { cls: art ? 'art' : 'eq', tip: `${eqSlotName(it.slot)} · ${RAR[it.r].toLowerCase()}: ${eqMainTxt(it)}` }) : ''; }),
   ].join('');
   return `<div class="zp-res">
     <div class="zp-rh"><b class="serif">Открыто: ${darChests(s.n)}</b><span class="chip spirit">${ic('check')}в запасах</span></div>
@@ -560,6 +574,8 @@ Object.assign(OV, {
     const chip = (k, v, label, cur, r) => `<button class="chip zp-fc" data-a="zpf" data-v="${k}:${v}" aria-pressed="${!!cur}"${r ? ` data-r="${r}"` : ''}>${label}</button>`;
     const group = (k, list, label) => on.includes(k) && list.length ? `<span class="eyebrow">${ZP_FNAME[k]}</span><div class="zp-fcs">${chip(k, '', 'Все', !E[k])}${list.map(x => chip(k, x, label(x), E[k] === x, k === 'r' ? x : 0)).join('')}</div>` : '';
     const body = group('cyc', O.cyc, c => c === 'pool' ? 'Общий пул' : 'Цикл ' + ROMAN[c])
+      + group('biome', O.biome, b => typeof crBiomeName === 'function' ? crBiomeName(b) : b)
+      + group('kind', O.kind, k => (RX.tiers[k] || { n: k }).n)
       + group('spec', O.spec, s => `${ic(RX.specs[s].icon || 'gem')}${RX.specs[s].n}`)
       + group('r', O.r, r => `${ICON('r' + r, 16)}${RAR[r]}`)
       + group('slot', O.slot, s => `${eqGlyph(s)}${eqSlotName(s)}`)
@@ -847,6 +863,8 @@ Object.assign(ACT, {
     V.sel[tab] = v; V.pick = e && zpIsNew(e) ? v : '';
     if (e) zpSeen(e);
     if (tab === 'chest') { V.n = 1; if (V.last && V.last.key !== v) V.last = null; }   // итог другого сундука не висит в чужой карточке
+    /* отклик выбора (только вид): искры цвета редкости у выбранной клетки — screens/crafthall.js */
+    if (e && typeof crBurst === 'function') crBurst('.zp-cell[aria-current="true"]', 'pick', e.r && typeof crColor === 'function' ? crColor(e.r) : undefined);
     render();
   },
   zpn(v) {

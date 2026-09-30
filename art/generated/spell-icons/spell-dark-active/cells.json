@@ -1,0 +1,300 @@
+{
+  "sheet": "art/generated/spell-icons/spell-dark-active__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/spell-icons-dark.json",
+  "job": "spell-dark-active",
+  "grid": [
+    6,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "Тьма.dmg.all",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-dmg-all.webp",
+      "box": [
+        12,
+        28,
+        807,
+        823
+      ],
+      "px": 795,
+      "key_left": 0.06778
+    },
+    {
+      "id": "Тьма.dmg.grp",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-dmg-grp.webp",
+      "box": [
+        858,
+        28,
+        1654,
+        824
+      ],
+      "px": 796,
+      "key_left": 0.06561
+    },
+    {
+      "id": "Тьма.dmg.one",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-dmg-one.webp",
+      "box": [
+        1707,
+        28,
+        2503,
+        824
+      ],
+      "px": 796,
+      "key_left": 0.01597
+    },
+    {
+      "id": "Тьма.heal.all",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-heal-all.webp",
+      "box": [
+        2555,
+        28,
+        3351,
+        824
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "Тьма.heal.grp",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-heal-grp.webp",
+      "box": [
+        3403,
+        28,
+        4199,
+        824
+      ],
+      "px": 796,
+      "key_left": 0.02137
+    },
+    {
+      "id": "Тьма.heal.one",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-heal-one.webp",
+      "box": [
+        4251,
+        29,
+        5044,
+        822
+      ],
+      "px": 793,
+      "key_left": 0.00038
+    },
+    {
+      "id": "Тьма.shield.all",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-shield-all.webp",
+      "box": [
+        12,
+        874,
+        807,
+        1669
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "Тьма.shield.grp",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-shield-grp.webp",
+      "box": [
+        858,
+        874,
+        1654,
+        1670
+      ],
+      "px": 796,
+      "key_left": 0.06834
+    },
+    {
+      "id": "Тьма.shield.one",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-shield-one.webp",
+      "box": [
+        1707,
+        874,
+        2503,
+        1670
+      ],
+      "px": 796,
+      "key_left": 0.03481
+    },
+    {
+      "id": "Тьма.dot.all",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-dot-all.webp",
+      "box": [
+        2555,
+        874,
+        3351,
+        1670
+      ],
+      "px": 796,
+      "key_left": 0.00565
+    },
+    {
+      "id": "Тьма.dot.grp",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-dot-grp.webp",
+      "box": [
+        3403,
+        874,
+        4199,
+        1670
+      ],
+      "px": 796,
+      "key_left": 0.03609
+    },
+    {
+      "id": "Тьма.dot.one",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-dot-one.webp",
+      "box": [
+        4251,
+        875,
+        5044,
+        1668
+      ],
+      "px": 793,
+      "key_left": 0.08541
+    },
+    {
+      "id": "Тьма.hot.all",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-hot-all.webp",
+      "box": [
+        12,
+        1721,
+        807,
+        2516
+      ],
+      "px": 795,
+      "key_left": 0.08748
+    },
+    {
+      "id": "Тьма.hot.grp",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-hot-grp.webp",
+      "box": [
+        858,
+        1721,
+        1654,
+        2517
+      ],
+      "px": 796,
+      "key_left": 0.02865
+    },
+    {
+      "id": "Тьма.hot.one",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-hot-one.webp",
+      "box": [
+        1707,
+        1721,
+        2503,
+        2517
+      ],
+      "px": 796,
+      "key_left": 0.03964
+    },
+    {
+      "id": "Тьма.ctrl.all",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-ctrl-all.webp",
+      "box": [
+        2555,
+        1721,
+        3351,
+        2517
+      ],
+      "px": 796,
+      "key_left": 0.00368
+    },
+    {
+      "id": "Тьма.ctrl.grp",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-ctrl-grp.webp",
+      "box": [
+        3403,
+        1721,
+        4199,
+        2517
+      ],
+      "px": 796,
+      "key_left": 0.00821
+    },
+    {
+      "id": "Тьма.ctrl.one",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-ctrl-one.webp",
+      "box": [
+        4251,
+        1722,
+        5044,
+        2515
+      ],
+      "px": 793,
+      "key_left": 0.02523
+    },
+    {
+      "id": "Тьма.debuff.all",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-debuff-all.webp",
+      "box": [
+        12,
+        2567,
+        807,
+        3362
+      ],
+      "px": 795,
+      "key_left": 0.03749
+    },
+    {
+      "id": "Тьма.debuff.grp",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-debuff-grp.webp",
+      "box": [
+        858,
+        2567,
+        1654,
+        3363
+      ],
+      "px": 796,
+      "key_left": 0.07599
+    },
+    {
+      "id": "Тьма.debuff.one",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-debuff-one.webp",
+      "box": [
+        1707,
+        2567,
+        2503,
+        3363
+      ],
+      "px": 796,
+      "key_left": 0.08508
+    },
+    {
+      "id": "Тьма.buff.all",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-buff-all.webp",
+      "box": [
+        2555,
+        2567,
+        3351,
+        3363
+      ],
+      "px": 796,
+      "key_left": 0.0442
+    },
+    {
+      "id": "Тьма.buff.grp",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-buff-grp.webp",
+      "box": [
+        3403,
+        2567,
+        4199,
+        3363
+      ],
+      "px": 796,
+      "key_left": 0.02791
+    },
+    {
+      "id": "Тьма.buff.one",
+      "file": "art/generated/spell-icons/spell-dark-active/dark-buff-one.webp",
+      "box": [
+        4251,
+        2568,
+        5044,
+        3361
+      ],
+      "px": 793,
+      "key_left": 0.06006
+    }
+  ]
+}

@@ -1,0 +1,300 @@
+{
+  "sheet": "art/generated/talisman-icons/tal-mark__nb2-v3.jpg",
+  "jobs": "tools/art-gen/jobs/talisman-icons.json",
+  "job": "tal-mark",
+  "grid": [
+    6,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "mark_rag",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-rag.webp",
+      "box": [
+        17,
+        30,
+        814,
+        827
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_copper",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-copper.webp",
+      "box": [
+        862,
+        30,
+        1659,
+        827
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_salt",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-salt.webp",
+      "box": [
+        1707,
+        30,
+        2504,
+        827
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_thread",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-thread.webp",
+      "box": [
+        2552,
+        30,
+        3349,
+        827
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_mechpart",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-mechpart.webp",
+      "box": [
+        3397,
+        30,
+        4193,
+        826
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_dross",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-dross.webp",
+      "box": [
+        4242,
+        30,
+        5039,
+        827
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_crystal",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-crystal.webp",
+      "box": [
+        17,
+        875,
+        814,
+        1672
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_canvas",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-canvas.webp",
+      "box": [
+        862,
+        875,
+        1659,
+        1672
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_feather",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-feather.webp",
+      "box": [
+        1707,
+        875,
+        2504,
+        1672
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_sand",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-sand.webp",
+      "box": [
+        2552,
+        875,
+        3349,
+        1672
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_ember",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-ember.webp",
+      "box": [
+        3397,
+        875,
+        4193,
+        1671
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_spring",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-spring.webp",
+      "box": [
+        4242,
+        875,
+        5039,
+        1672
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_yarn",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-yarn.webp",
+      "box": [
+        17,
+        1720,
+        814,
+        2517
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_dormite",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-dormite.webp",
+      "box": [
+        862,
+        1720,
+        1660,
+        2518
+      ],
+      "px": 798,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_runechip",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-runechip.webp",
+      "box": [
+        1707,
+        1720,
+        2505,
+        2518
+      ],
+      "px": 798,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_candle",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-candle.webp",
+      "box": [
+        2552,
+        1720,
+        3349,
+        2517
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_vial",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-vial.webp",
+      "box": [
+        3397,
+        1721,
+        4193,
+        2517
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_bracket",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-bracket.webp",
+      "box": [
+        4242,
+        1720,
+        5039,
+        2517
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_scrap",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-scrap.webp",
+      "box": [
+        17,
+        2566,
+        814,
+        3363
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_resin",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-resin.webp",
+      "box": [
+        862,
+        2566,
+        1660,
+        3364
+      ],
+      "px": 798,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_coal",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-coal.webp",
+      "box": [
+        1707,
+        2566,
+        2505,
+        3364
+      ],
+      "px": 798,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_ink",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-ink.webp",
+      "box": [
+        2552,
+        2566,
+        3349,
+        3363
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_gear",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-gear.webp",
+      "box": [
+        3397,
+        2567,
+        4193,
+        3363
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark_hide",
+      "file": "art/generated/talisman-icons/tal-mark/tal-mark-hide.webp",
+      "box": [
+        4242,
+        2566,
+        5039,
+        3363
+      ],
+      "px": 797,
+      "key_left": 0.0
+    }
+  ]
+}

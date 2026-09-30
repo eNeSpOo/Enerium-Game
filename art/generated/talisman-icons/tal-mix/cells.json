@@ -1,0 +1,300 @@
+{
+  "sheet": "art/generated/talisman-icons/tal-mix__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/talisman-icons.json",
+  "job": "tal-mix",
+  "grid": [
+    6,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "banner",
+      "file": "art/generated/talisman-icons/tal-mix/tal-banner.webp",
+      "box": [
+        34,
+        48,
+        815,
+        829
+      ],
+      "px": 781,
+      "key_left": 5e-05
+    },
+    {
+      "id": "sting",
+      "file": "art/generated/talisman-icons/tal-mix/tal-sting.webp",
+      "box": [
+        875,
+        48,
+        1656,
+        829
+      ],
+      "px": 781,
+      "key_left": 0.0
+    },
+    {
+      "id": "scales",
+      "file": "art/generated/talisman-icons/tal-mix/tal-scales.webp",
+      "box": [
+        1716,
+        48,
+        2497,
+        829
+      ],
+      "px": 781,
+      "key_left": 0.0
+    },
+    {
+      "id": "cloak",
+      "file": "art/generated/talisman-icons/tal-mix/tal-cloak.webp",
+      "box": [
+        2558,
+        48,
+        3339,
+        829
+      ],
+      "px": 781,
+      "key_left": 0.0
+    },
+    {
+      "id": "rage",
+      "file": "art/generated/talisman-icons/tal-mix/tal-rage.webp",
+      "box": [
+        3400,
+        48,
+        4181,
+        829
+      ],
+      "px": 781,
+      "key_left": 0.0
+    },
+    {
+      "id": "firstword",
+      "file": "art/generated/talisman-icons/tal-mix/tal-firstword.webp",
+      "box": [
+        4240,
+        48,
+        5021,
+        829
+      ],
+      "px": 781,
+      "key_left": 0.0
+    },
+    {
+      "id": "secondword",
+      "file": "art/generated/talisman-icons/tal-mix/tal-secondword.webp",
+      "box": [
+        34,
+        887,
+        815,
+        1668
+      ],
+      "px": 781,
+      "key_left": 0.0
+    },
+    {
+      "id": "ember",
+      "file": "art/generated/talisman-icons/tal-mix/tal-ember.webp",
+      "box": [
+        875,
+        887,
+        1656,
+        1668
+      ],
+      "px": 781,
+      "key_left": 0.0
+    },
+    {
+      "id": "hammer",
+      "file": "art/generated/talisman-icons/tal-mix/tal-hammer.webp",
+      "box": [
+        1716,
+        887,
+        2497,
+        1668
+      ],
+      "px": 781,
+      "key_left": 0.00063
+    },
+    {
+      "id": "chains",
+      "file": "art/generated/talisman-icons/tal-mix/tal-chains.webp",
+      "box": [
+        2558,
+        887,
+        3339,
+        1668
+      ],
+      "px": 781,
+      "key_left": 0.0
+    },
+    {
+      "id": "archon",
+      "file": "art/generated/talisman-icons/tal-mix/tal-archon.webp",
+      "box": [
+        3400,
+        887,
+        4181,
+        1668
+      ],
+      "px": 781,
+      "key_left": 0.0
+    },
+    {
+      "id": "hidden",
+      "file": "art/generated/talisman-icons/tal-mix/tal-hidden.webp",
+      "box": [
+        4240,
+        887,
+        5021,
+        1668
+      ],
+      "px": 781,
+      "key_left": 0.0
+    },
+    {
+      "id": "vein",
+      "file": "art/generated/talisman-icons/tal-mix/tal-vein.webp",
+      "box": [
+        34,
+        1725,
+        815,
+        2506
+      ],
+      "px": 781,
+      "key_left": 0.0
+    },
+    {
+      "id": "vessel",
+      "file": "art/generated/talisman-icons/tal-mix/tal-vessel.webp",
+      "box": [
+        875,
+        1725,
+        1656,
+        2506
+      ],
+      "px": 781,
+      "key_left": 0.0
+    },
+    {
+      "id": "soulpath",
+      "file": "art/generated/talisman-icons/tal-mix/tal-soulpath.webp",
+      "box": [
+        1716,
+        1725,
+        2497,
+        2506
+      ],
+      "px": 781,
+      "key_left": 0.0
+    },
+    {
+      "id": "magpie",
+      "file": "art/generated/talisman-icons/tal-mix/tal-magpie.webp",
+      "box": [
+        2558,
+        1725,
+        3339,
+        2506
+      ],
+      "px": 781,
+      "key_left": 0.0
+    },
+    {
+      "id": "censer",
+      "file": "art/generated/talisman-icons/tal-mix/tal-censer.webp",
+      "box": [
+        3400,
+        1725,
+        4181,
+        2506
+      ],
+      "px": 781,
+      "key_left": 0.0
+    },
+    {
+      "id": "bag",
+      "file": "art/generated/talisman-icons/tal-mix/tal-bag.webp",
+      "box": [
+        4240,
+        1725,
+        5021,
+        2506
+      ],
+      "px": 781,
+      "key_left": 0.0
+    },
+    {
+      "id": "coin",
+      "file": "art/generated/talisman-icons/tal-mix/tal-coin.webp",
+      "box": [
+        33,
+        2564,
+        815,
+        3346
+      ],
+      "px": 782,
+      "key_left": 0.0
+    },
+    {
+      "id": "net",
+      "file": "art/generated/talisman-icons/tal-mix/tal-net.webp",
+      "box": [
+        875,
+        2564,
+        1657,
+        3346
+      ],
+      "px": 782,
+      "key_left": 0.0
+    },
+    {
+      "id": "reaper",
+      "file": "art/generated/talisman-icons/tal-mix/tal-reaper.webp",
+      "box": [
+        1715,
+        2564,
+        2497,
+        3346
+      ],
+      "px": 782,
+      "key_left": 0.0
+    },
+    {
+      "id": "path",
+      "file": "art/generated/talisman-icons/tal-mix/tal-path.webp",
+      "box": [
+        2558,
+        2564,
+        3340,
+        3346
+      ],
+      "px": 782,
+      "key_left": 0.0
+    },
+    {
+      "id": "echo",
+      "file": "art/generated/talisman-icons/tal-mix/tal-echo.webp",
+      "box": [
+        3399,
+        2564,
+        4181,
+        3346
+      ],
+      "px": 782,
+      "key_left": 0.0
+    },
+    {
+      "id": "cloak",
+      "file": "art/generated/talisman-icons/tal-mix/tal-cloak-alt.webp",
+      "box": [
+        4240,
+        2564,
+        5022,
+        3346
+      ],
+      "px": 782,
+      "key_left": 0.0
+    }
+  ]
+}

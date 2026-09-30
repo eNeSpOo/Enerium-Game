@@ -1,0 +1,127 @@
+{
+  "name": "Иконки способностей сеткой — фарм, девятая ульта Воздуха «Тысяча птиц» и «способность скрыта» одним листом 5×4 (слово автора 30.09.2026: «делай всю библиотеку всех скилов»). Образец — spell-icons-fire.json: style, negative и категория spell-icons — без правок",
+  "plan": {
+    "Лист spell-farm": "5:4, 2K, сетка 5×4 — 18 способностей фарма (6 активок, 4 ульты, 8 пассивок), «Тысяча птиц» и «способность скрыта» — значок неизвестной души",
+    "Нарезка": "python tools/art-gen/grid_slice.py jobs/spell-icons-farm.json spell-farm <лист>"
+  },
+  "notes": [
+    "Фарм без школы: палитра добычи — золото, бирюза духа (--spirit), бледно-голубое пламя душ, сырьё; «Тысяча птиц» — в палитре Воздуха, скрытая — нейтральный серый",
+    "«Способность скрыта» — закрытая книга с замком в тумане: карточка героя — книга (ADR-0032), неизвестная душа открывается осколками",
+    "cells — [id способности из tools/content-gen/abilities/library.json, имя файла]; hidden — не способность, а значок скрытой",
+    "Лист нарисован дважды (30.09.2026): первый ушёл в мультяшный контур «иконки инвентаря», а «Тысяча птиц» — в белых голубей на светлом небе. Во втором прямо названы живописный мазок без контура, общий тёмный фон и хищные птицы"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "spell-icons": {
+      "aspect": "1:1",
+      "size": "2K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square ability icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the picture in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game puts its own frame on top: one clear central image with a bold silhouette that stays readable at 48 px, on a dark near-black stone background with faint cracks and a darker vignette toward the edges of the cell. Light rises from below in the color of the magic school; crisp rim light on the edges of the forms; a few sparks and dust motes in the light. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each icon differs clearly from its neighbours in shape and composition."
+    }
+  },
+  "jobs": [
+    {
+      "id": "spell-farm",
+      "category": "spell-icons",
+      "title": "Фарм, «Тысяча птиц» и скрытая — 20 иконок сеткой 5×4",
+      "source": "tools/content-gen/abilities/library.json, farm и Воздух.ult.birds; docs/content/библиотека-способностей.md",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "фарм.act.1",
+          "farm-act-1"
+        ],
+        [
+          "фарм.act.2",
+          "farm-act-2"
+        ],
+        [
+          "фарм.act.3",
+          "farm-act-3"
+        ],
+        [
+          "фарм.act.4",
+          "farm-act-4"
+        ],
+        [
+          "фарм.act.5",
+          "farm-act-5"
+        ],
+        [
+          "фарм.act.6",
+          "farm-act-6"
+        ],
+        [
+          "фарм.ult.1",
+          "farm-ult-1"
+        ],
+        [
+          "фарм.ult.2",
+          "farm-ult-2"
+        ],
+        [
+          "фарм.ult.3",
+          "farm-ult-3"
+        ],
+        [
+          "фарм.ult.4",
+          "farm-ult-4"
+        ],
+        [
+          "фарм.pas.1",
+          "farm-pas-1"
+        ],
+        [
+          "фарм.pas.2",
+          "farm-pas-2"
+        ],
+        [
+          "фарм.pas.3",
+          "farm-pas-3"
+        ],
+        [
+          "фарм.pas.4",
+          "farm-pas-4"
+        ],
+        [
+          "фарм.pas.5",
+          "farm-pas-5"
+        ],
+        [
+          "фарм.pas.6",
+          "farm-pas-6"
+        ],
+        [
+          "фарм.pas.7",
+          "farm-pas-7"
+        ],
+        [
+          "фарм.pas.8",
+          "farm-pas-8"
+        ],
+        [
+          "Воздух.ult.birds",
+          "air-ult-birds"
+        ],
+        [
+          "hidden",
+          "ability-hidden"
+        ]
+      ],
+      "subject": "This sheet holds the skills of treasure hunters and gatherers, and two special icons at its end. Their palette is the palette of loot: warm gold coins and old gold, turquoise spirit light (#48E5D4) for spirit, pale blue flames for souls, raw materials — ore, wood, bone, feathers, hide — and dark leather and iron; the light from below is warm gold. Paint them exactly like the other sheets of this set: loose, confident painterly brush strokes and soft painted edges, never black outlines, never a flat cartoon or sticker look; every cell sits on the same dark near-black stone background. Every icon, even the widest, is built around one clear central object with a bold silhouette — never only smoke, dust, snow, fog or a scattered pattern.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons. Row 1 and the first icon of row 2 are active skills — one moment of action. The other four icons of row 2 are ultimate skills — the grandest, most epic images of the sheet, with bright gold highlights. Row 3 and the first three icons of row 4 are passive traits — calm, emblem-like single objects, no action.\n\nRow 1: a gloved hand reaching into a fallen enemy's open leather pouch and pulling out gold coins and a small turquoise wisp of spirit; two small bone tags on red string hanging side by side, each marked with a smear of gold paint; a pair of greedy glinting eyes in the dark with gold coins reflected in them, a wide scatter of gold coins below across the whole cell; a curved skinning knife slicing open a sack of hide, raw materials — ore, bones, feathers — spilling out; a traveller's open satchel swinging on its strap, herbs, ore and feathers dropping into it on the move.\n\nRow 2: a jeweller's loupe held over one rare glowing gem lying among ordinary grey stones; an overflowing treasure chest bursting with gold coins, gems and raw materials, golden light pouring out; a thick glittering vein of raw gold running through a dark rock wall, a miner's pick stuck in it; a great burst of turquoise spirit swirls spilling out of a cracked urn, glowing wisps scattering across the whole cell; a shovel stuck in freshly dug earth beside a half-buried iron-bound chest, an old key in its lock.\n\nRow 3: a pair of hands with golden fingertips holding one gold coin; one small glass vial with a turquoise swirl of spirit trapped inside; one small iron cage-lantern holding a pale blue flame; one woven wicker basket full of gathered things — herbs, a lump of ore, a feather, a mushroom; two old ornate iron keys on one ring.\n\nRow 4: a hunter's leather pouch with one glowing rare crystal peeking out of it; a lucky horseshoe of old iron with a gold coin resting in it; a tightly packed traveller's pack with an extra pouch strapped on, bulging; an ultimate spell of the Air school, in the Air palette of pale white-green light (#DFF4E5) and silver-white wind instead of loot colours: a vast flock of fierce white birds of prey with sharp, blade-like wings sweeping to the right across the whole cell over the dark stone background, thin red cuts in the air behind them, bright gold highlights — hunters, not doves, no open sky; a skill that is hidden and not yet known, neutral cold grey instead of loot colours: a closed old leather-bound book with a locked iron clasp, pale grey mist curling over it, its cover plain with no marks."
+    }
+  ]
+}

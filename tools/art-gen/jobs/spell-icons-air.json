@@ -1,0 +1,224 @@
+{
+  "name": "Иконки способностей сеткой — набор «Воздух» (слово автора 30.09.2026): «Мне нравятся стиль и сами иконки делай всю библиотеку всех скилов». Образец — spell-icons-fire.json: style, negative и категория spell-icons — без правок",
+  "plan": {
+    "Лист активок spell-air-active": "3:2, 4K, сетка 6×4 — 24 активки набора; строка — два вида по три ступени: на всех, на 2–3, на одного",
+    "Лист ульт spell-air-ult": "1:1, 2K, сетка 4×4 — 8 ульт, 4 боевые пассивки, 4 реакции",
+    "Нарезка": "python tools/art-gen/grid_slice.py jobs/spell-icons-air.json <id задания> <лист>"
+  },
+  "notes": [
+    "Палитра — цвет карста школы (art/style/style.md, «Палитра»), эффекты — поле eff набора в library.json",
+    "Язык иконки и уроки пробы — art/style/style.md, «Иконки способностей сеткой»: у каждой клетки один центральный предмет",
+    "cells — [id способности из tools/content-gen/abilities/library.json, имя файла] по строкам сверху, в строке слева направо; grid — [столбцы, строки]",
+    "Лист активок нарисован дважды (30.09.2026): в первом свет снизу вышел насыщенной бирюзой прожектором — близко к зелени Времени; во втором свет назван почти белым, «не прожектор». Пилы заменены кольцами ветра, щит в ctrl.one — копьём: щит уже в shield.one",
+    "Во втором листе шесть клеток — ctrl.all, ctrl.grp, ctrl.one, buff.all, buff.grp, buff.one — сохранили насыщенную бирюзу снизу (9–21 % пикселей против 0 у остальных клеток набора). Бирюза приглушена обработкой, а не новым листом: насыщенность оттенков 100–220° × 0,08, яркость × 0,88 — файлы <имя>.fix.webp рядом с клетками, записи в манифесте нет. Выгрузка берёт их вместо клеток (tools/art-gen/ui_icons.py)"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "spell-icons": {
+      "aspect": "1:1",
+      "size": "2K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square ability icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the picture in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game puts its own frame on top: one clear central image with a bold silhouette that stays readable at 48 px, on a dark near-black stone background with faint cracks and a darker vignette toward the edges of the cell. Light rises from below in the color of the magic school; crisp rim light on the edges of the forms; a few sparks and dust motes in the light. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each icon differs clearly from its neighbours in shape and composition."
+    }
+  },
+  "jobs": [
+    {
+      "id": "spell-air-active",
+      "category": "spell-icons",
+      "title": "Воздух — 24 активки сеткой 6×4",
+      "source": "tools/content-gen/abilities/library.json, набор «Воздух», active; docs/content/библиотека-способностей.md",
+      "aspect": "3:2",
+      "size": "4K",
+      "grid": [
+        6,
+        4
+      ],
+      "cells": [
+        [
+          "Воздух.dmg.all",
+          "air-dmg-all"
+        ],
+        [
+          "Воздух.dmg.grp",
+          "air-dmg-grp"
+        ],
+        [
+          "Воздух.dmg.one",
+          "air-dmg-one"
+        ],
+        [
+          "Воздух.heal.all",
+          "air-heal-all"
+        ],
+        [
+          "Воздух.heal.grp",
+          "air-heal-grp"
+        ],
+        [
+          "Воздух.heal.one",
+          "air-heal-one"
+        ],
+        [
+          "Воздух.shield.all",
+          "air-shield-all"
+        ],
+        [
+          "Воздух.shield.grp",
+          "air-shield-grp"
+        ],
+        [
+          "Воздух.shield.one",
+          "air-shield-one"
+        ],
+        [
+          "Воздух.dot.all",
+          "air-dot-all"
+        ],
+        [
+          "Воздух.dot.grp",
+          "air-dot-grp"
+        ],
+        [
+          "Воздух.dot.one",
+          "air-dot-one"
+        ],
+        [
+          "Воздух.hot.all",
+          "air-hot-all"
+        ],
+        [
+          "Воздух.hot.grp",
+          "air-hot-grp"
+        ],
+        [
+          "Воздух.hot.one",
+          "air-hot-one"
+        ],
+        [
+          "Воздух.ctrl.all",
+          "air-ctrl-all"
+        ],
+        [
+          "Воздух.ctrl.grp",
+          "air-ctrl-grp"
+        ],
+        [
+          "Воздух.ctrl.one",
+          "air-ctrl-one"
+        ],
+        [
+          "Воздух.debuff.all",
+          "air-debuff-all"
+        ],
+        [
+          "Воздух.debuff.grp",
+          "air-debuff-grp"
+        ],
+        [
+          "Воздух.debuff.one",
+          "air-debuff-one"
+        ],
+        [
+          "Воздух.buff.all",
+          "air-buff-all"
+        ],
+        [
+          "Воздух.buff.grp",
+          "air-buff-grp"
+        ],
+        [
+          "Воздух.buff.one",
+          "air-buff-one"
+        ]
+      ],
+      "subject": "The magic school of this sheet is Air: pale Elazium light, almost white with only a faint hint of green (#DFF4E5), silver-white streaks of wind, pale grey clouds and white feathers; its cutting wounds are thin lines of red. The light from below is a soft, pale, almost white glow rising from cracks in the dark stone — never a spotlight, never a saturated teal or green. Attacking spells are sharp, fast and slicing — hard silver-white wind. Supporting spells — healing, fresh wind, shields and lightness for allies — glow a softer warm gold mixed with pale white-green, with rounded, calm shapes. A spell for all targets shows something wide that fills its cell; a spell for two or three targets shows two or three of its thing; a spell for one target shows one focused object. Attacks move to the right, toward the enemies. Every icon, even the widest, is built around one clear central object with a bold silhouette — never only smoke, dust, snow, fog or a scattered pattern.\n\nThe grid: exactly 6 columns and 4 rows, 24 icons.\n\nRow 1: one enormous crescent of white wind slicing to the right across the whole width of the cell like the trace of a giant blade, thin red cuts left in the air behind it; three spinning rings of hard white wind with sharp silver edges, flying to the right like thrown blades; one narrow whirlwind of white wind streaked with red, drilling into a single point; an old wind chime of bone tubes and brass hanging and swaying, sending soft wide rings of warm golden air out across the whole cell; three reed pipes standing side by side, each breathing out a soft spiral of warm golden air; one small glass bottle with a spiral of warm golden air turning inside it.\n\nRow 2: a huge translucent dome of swirling white wind over the dark ground, white feathers circling inside its wall, a warm golden rim; three small whirlwinds standing side by side like pillars, each a protective column of warm golden-white air; one round shield at the calm center of a storm, white clouds spiralling around it; a tattered war banner of plain cloth on a pole, whipped by a violent wind that tears its cloth into ribbons with sharp cut edges, silver streaks of wind rushing to the right across the whole cell; three long feathers with razor-sharp silver edges flying to the right, a drop of red at each tip; one dark leather bracer slashed by four thin parallel cuts, a thin red line in each, a wisp of wind curling past it.\n\nRow 3: one large white feather floating in the center, surrounded by slow wide rings of warm golden wind spreading across the whole cell; three winged maple seeds spinning in a soft warm golden breeze; one white dandelion seed head, its seeds gently blown away in a soft golden breeze; a great curved horn of bone blowing a mighty blast of white wind to the right across the whole cell, leaves and dust flying; two narrow tornadoes of white wind twisting side by side, lifting stones and leaves; one heavy spear knocked flying end over end through the air by a sharp spiral of white wind.\n\nRow 4: a lone dead tree bending under a vast grey dust storm that fills the whole cell, dust streaming to the right; two strips of dark cloth blindfold, knotted, fluttering in a swirl of grey dust; one wide open eye with a pale iris, a gust of grey sand blasting into it; a big sail billowing full with warm golden wind, filling the whole cell; two light leather boots with small white wings at the heels, floating above the ground; one long cloak billowing out to the right in a soft warm golden wind, light as air."
+    },
+    {
+      "id": "spell-air-ult",
+      "category": "spell-icons",
+      "title": "Воздух — 8 ульт, 4 пассивки, 4 реакции сеткой 4×4",
+      "source": "tools/content-gen/abilities/library.json, набор «Воздух», ult, passive, reaction; docs/content/библиотека-способностей.md",
+      "aspect": "1:1",
+      "size": "2K",
+      "grid": [
+        4,
+        4
+      ],
+      "cells": [
+        [
+          "Воздух.ult.dmg",
+          "air-ult-dmg"
+        ],
+        [
+          "Воздух.ult.heal",
+          "air-ult-heal"
+        ],
+        [
+          "Воздух.ult.shield",
+          "air-ult-shield"
+        ],
+        [
+          "Воздух.ult.dot",
+          "air-ult-dot"
+        ],
+        [
+          "Воздух.ult.hot",
+          "air-ult-hot"
+        ],
+        [
+          "Воздух.ult.ctrl",
+          "air-ult-ctrl"
+        ],
+        [
+          "Воздух.ult.debuff",
+          "air-ult-debuff"
+        ],
+        [
+          "Воздух.ult.buff",
+          "air-ult-buff"
+        ],
+        [
+          "Воздух.pas.1",
+          "air-pas-1"
+        ],
+        [
+          "Воздух.pas.2",
+          "air-pas-2"
+        ],
+        [
+          "Воздух.pas.3",
+          "air-pas-3"
+        ],
+        [
+          "Воздух.pas.4",
+          "air-pas-4"
+        ],
+        [
+          "Воздух.react.1",
+          "air-react-1"
+        ],
+        [
+          "Воздух.react.2",
+          "air-react-2"
+        ],
+        [
+          "Воздух.react.3",
+          "air-react-3"
+        ],
+        [
+          "Воздух.react.4",
+          "air-react-4"
+        ]
+      ],
+      "subject": "The magic school of this sheet is Air: pale white-green Elazium light (#DFF4E5), silver-white streaks of wind, pale grey clouds and white feathers; its cutting wounds are thin lines of red; the light from below is pale white-green. Attacking spells are sharp, fast and slicing — hard silver-white wind. Supporting spells — healing, fresh wind, shields and lightness for allies — glow a softer warm gold mixed with pale white-green, with rounded, calm shapes. Every icon, even the widest, is built around one clear central object with a bold silhouette — never only smoke, dust, snow, fog or a scattered pattern.\n\nThe grid: exactly 4 columns and 4 rows, 16 icons. Rows 1 and 2 are ultimate spells — the grandest, most epic images of the set, bigger in scale, with bright gold highlights in the pale wind. Row 3 are passive traits — calm, emblem-like single objects, no action. Row 4 are reactions — an instant answer to an event in battle, shown as one moment of action.\n\nRow 1: dozens of silver swords whirling in a spiral around one single point, all their points turned inward, white wind and thin red cuts around them; a vast gentle hurricane of warm golden wind spiralling upward, white feathers and golden motes rising inside it; a colossal wall of whirling winds rising up to the clouds across the whole cell, bright gold light running through its currents; a vast dark storm cloud raining thousands of razor-sharp silver shards diagonally to the right across the whole cell.\n\nRow 2: a great tree in full white blossom, a warm golden wind carrying clouds of its petals across the whole cell; a gigantic tornado touching down, tearing up the ground and flinging dark rocks and broken spears into the air; a vast wall of thick grey-white haze rolling over a lone stone watchtower and swallowing it up to its top; a huge pair of white wings spread wide, their feathers glowing bright gold at the edges, golden wind swirling around them.\n\nRow 3: one faint footprint in fresh snow, barely pressed in, a white feather resting in it; a small wooden pinwheel with four white sails, spinning; one arrow with white fletching pointing to the right, a thin stream of wind curling around its shaft; one curved talon of a bird of prey, a thin red line along its razor edge.\n\nRow 4: a slim rapier thrusting forward to the right past an enemy blade that has just missed, a thin cut of wind at its point; an enemy axe striking down into empty air, only a swirl of white wind and feathers left where its target stood; a runner's boot kicking off the ground in a burst of white wind; a huge falling blade of an enemy's strike, a swirl of white wind pushing it aside at the last moment."
+    }
+  ]
+}

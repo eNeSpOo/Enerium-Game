@@ -1,0 +1,300 @@
+{
+  "sheet": "art/generated/spell-icons/spell-earth-active__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/spell-icons-earth.json",
+  "job": "spell-earth-active",
+  "grid": [
+    6,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "Земля.dmg.all",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-dmg-all.webp",
+      "box": [
+        23,
+        38,
+        810,
+        825
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.dmg.grp",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-dmg-grp.webp",
+      "box": [
+        868,
+        38,
+        1655,
+        825
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.dmg.one",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-dmg-one.webp",
+      "box": [
+        1712,
+        38,
+        2499,
+        825
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.heal.all",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-heal-all.webp",
+      "box": [
+        2556,
+        38,
+        3343,
+        825
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.heal.grp",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-heal-grp.webp",
+      "box": [
+        3400,
+        38,
+        4187,
+        825
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.heal.one",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-heal-one.webp",
+      "box": [
+        4245,
+        38,
+        5032,
+        825
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.shield.all",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-shield-all.webp",
+      "box": [
+        23,
+        880,
+        811,
+        1668
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.shield.grp",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-shield-grp.webp",
+      "box": [
+        867,
+        880,
+        1655,
+        1668
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.shield.one",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-shield-one.webp",
+      "box": [
+        1712,
+        880,
+        2500,
+        1668
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.dot.all",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-dot-all.webp",
+      "box": [
+        2556,
+        880,
+        3344,
+        1668
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.dot.grp",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-dot-grp.webp",
+      "box": [
+        3400,
+        880,
+        4188,
+        1668
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.dot.one",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-dot-one.webp",
+      "box": [
+        4245,
+        880,
+        5033,
+        1668
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.hot.all",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-hot-all.webp",
+      "box": [
+        22,
+        1723,
+        811,
+        2512
+      ],
+      "px": 789,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.hot.grp",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-hot-grp.webp",
+      "box": [
+        867,
+        1723,
+        1656,
+        2512
+      ],
+      "px": 789,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.hot.one",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-hot-one.webp",
+      "box": [
+        1711,
+        1723,
+        2500,
+        2512
+      ],
+      "px": 789,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.ctrl.all",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-ctrl-all.webp",
+      "box": [
+        2556,
+        1723,
+        3344,
+        2511
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.ctrl.grp",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-ctrl-grp.webp",
+      "box": [
+        3399,
+        1723,
+        4188,
+        2512
+      ],
+      "px": 789,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.ctrl.one",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-ctrl-one.webp",
+      "box": [
+        4244,
+        1723,
+        5033,
+        2512
+      ],
+      "px": 789,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.debuff.all",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-debuff-all.webp",
+      "box": [
+        22,
+        2566,
+        812,
+        3356
+      ],
+      "px": 790,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.debuff.grp",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-debuff-grp.webp",
+      "box": [
+        867,
+        2567,
+        1656,
+        3356
+      ],
+      "px": 789,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.debuff.one",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-debuff-one.webp",
+      "box": [
+        1711,
+        2566,
+        2501,
+        3356
+      ],
+      "px": 790,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.buff.all",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-buff-all.webp",
+      "box": [
+        2556,
+        2567,
+        3344,
+        3355
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.buff.grp",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-buff-grp.webp",
+      "box": [
+        3399,
+        2566,
+        4189,
+        3356
+      ],
+      "px": 790,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.buff.one",
+      "file": "art/generated/spell-icons/spell-earth-active/earth-buff-one.webp",
+      "box": [
+        4244,
+        2566,
+        5034,
+        3356
+      ],
+      "px": 790,
+      "key_left": 0.0
+    }
+  ]
+}

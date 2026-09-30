@@ -1,0 +1,204 @@
+{
+  "sheet": "art/generated/spell-icons/spell-water-ult__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/spell-icons-water.json",
+  "job": "spell-water-ult",
+  "grid": [
+    4,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "Вода.ult.dmg",
+      "file": "art/generated/spell-icons/spell-water-ult/water-ult-dmg.webp",
+      "box": [
+        27,
+        27,
+        497,
+        497
+      ],
+      "px": 470,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.ult.heal",
+      "file": "art/generated/spell-icons/spell-water-ult/water-ult-heal.webp",
+      "box": [
+        535,
+        27,
+        1005,
+        497
+      ],
+      "px": 470,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.ult.shield",
+      "file": "art/generated/spell-icons/spell-water-ult/water-ult-shield.webp",
+      "box": [
+        1042,
+        27,
+        1512,
+        497
+      ],
+      "px": 470,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.ult.dot",
+      "file": "art/generated/spell-icons/spell-water-ult/water-ult-dot.webp",
+      "box": [
+        1550,
+        27,
+        2020,
+        497
+      ],
+      "px": 470,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.ult.hot",
+      "file": "art/generated/spell-icons/spell-water-ult/water-ult-hot.webp",
+      "box": [
+        27,
+        534,
+        497,
+        1004
+      ],
+      "px": 470,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.ult.ctrl",
+      "file": "art/generated/spell-icons/spell-water-ult/water-ult-ctrl.webp",
+      "box": [
+        535,
+        534,
+        1005,
+        1004
+      ],
+      "px": 470,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.ult.debuff",
+      "file": "art/generated/spell-icons/spell-water-ult/water-ult-debuff.webp",
+      "box": [
+        1042,
+        534,
+        1513,
+        1005
+      ],
+      "px": 471,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.ult.buff",
+      "file": "art/generated/spell-icons/spell-water-ult/water-ult-buff.webp",
+      "box": [
+        1550,
+        534,
+        2021,
+        1005
+      ],
+      "px": 471,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.pas.1",
+      "file": "art/generated/spell-icons/spell-water-ult/water-pas-1.webp",
+      "box": [
+        27,
+        1042,
+        497,
+        1512
+      ],
+      "px": 470,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.pas.2",
+      "file": "art/generated/spell-icons/spell-water-ult/water-pas-2.webp",
+      "box": [
+        535,
+        1042,
+        1005,
+        1512
+      ],
+      "px": 470,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.pas.3",
+      "file": "art/generated/spell-icons/spell-water-ult/water-pas-3.webp",
+      "box": [
+        1042,
+        1042,
+        1513,
+        1513
+      ],
+      "px": 471,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.pas.4",
+      "file": "art/generated/spell-icons/spell-water-ult/water-pas-4.webp",
+      "box": [
+        1550,
+        1042,
+        2021,
+        1513
+      ],
+      "px": 471,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.react.1",
+      "file": "art/generated/spell-icons/spell-water-ult/water-react-1.webp",
+      "box": [
+        27,
+        1551,
+        497,
+        2021
+      ],
+      "px": 470,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.react.2",
+      "file": "art/generated/spell-icons/spell-water-ult/water-react-2.webp",
+      "box": [
+        535,
+        1551,
+        1005,
+        2021
+      ],
+      "px": 470,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.react.3",
+      "file": "art/generated/spell-icons/spell-water-ult/water-react-3.webp",
+      "box": [
+        1042,
+        1551,
+        1512,
+        2021
+      ],
+      "px": 470,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.react.4",
+      "file": "art/generated/spell-icons/spell-water-ult/water-react-4.webp",
+      "box": [
+        1550,
+        1551,
+        2020,
+        2021
+      ],
+      "px": 470,
+      "key_left": 0.0
+    }
+  ]
+}

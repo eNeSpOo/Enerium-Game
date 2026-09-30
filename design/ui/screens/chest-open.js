@@ -36,7 +36,9 @@ const CO_VIEW = {
      крышки, и сколько % его высоты висит ниже шва; карточка и самая ценная [ш, в]; карточки по бокам сундука: зазор от сундука, между
      столбцами и рядами; верх самой ценной; монеты справа от сундука: зазор и шаг; столп света [ширина, высота], ‰ ширины крышки — px */
   geo: { w: 720, h: 356, ground: 34, scale: 228, depth: 1000, persp: 3000, lock: 190, lockDrop: 64, card: [84, 112], hero: [124, 166],
-    side: 28, colGap: 14, rowGap: 14, heroTop: 14, coin: [18, 36], beam: [760, 1500] },
+    side: 28, colGap: 14, rowGap: 14, heroTop: 14, coin: [18, 36], beam: [760, 1500],
+    /* помост под сундуком (арт --cr-dais, screens/crafthall.js): ширина — ‰ ширины сундука; середина верха помоста — на земле */
+    dais: 1560 },
   /* моменты, мс */
   drop: 460,                                      // сундук падает на место
   settle: 220,                                    // от приземления до первого света в щели
@@ -584,6 +586,7 @@ function coStageHtml(R, e) {
   /* фон сцены: дымка, кольцо под сундуком, ореол каждой ступени света, лучи и столп — после открытия */
   const back = `<div class="co-haze co-a" data-r="${R.r}" style="left:${mx}px;top:${my}px;--hz:${V.haze[R.r - 1]}"><i class="co-a${haze.cls}" style="${haze.st}"></i></div>`
     + (R.r >= V.rune ? `<div class="co-rune co-a" data-r="${R.r}" style="left:${mx}px;top:${gy}px"><i class="co-a${ring.cls}" style="${ring.st}"></i></div>` : '')
+    + `<div class="co-dais" style="left:${mx}px;top:${gy}px;width:${Math.round(C.w * G.dais / 1000)}px"></div>`
     + `<div class="co-shd co-a" style="left:${mx}px;top:${gy}px;width:${C.w}px"></div>`
     + lv.map((x, k) => `<div class="co-lv co-lvx${lvx(k)};--ha:${V.halo[x - 1]}"><i class="co-halo co-a" style="left:${mx}px;top:${my}px;--dp:${d(lt(k))}"></i></div>`).join('')
     + (idle ? '' : (R.b >= V.rays ? `<div class="co-rays co-a" data-r="${R.b}" style="left:${mx}px;top:${my}px;--ra:${V.ray[R.b - 1]}"><i class="co-a${rays.cls}" style="${rays.st}"></i></div>` : '')

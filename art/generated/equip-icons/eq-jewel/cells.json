@@ -1,0 +1,264 @@
+{
+  "sheet": "art/generated/equip-icons/eq-jewel__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/equip-icons.json",
+  "job": "eq-jewel",
+  "grid": [
+    7,
+    3
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "off.1",
+      "file": "art/generated/equip-icons/eq-jewel/eq-off-1.webp",
+      "box": [
+        56,
+        42,
+        889,
+        875
+      ],
+      "px": 833,
+      "key_left": 0.0
+    },
+    {
+      "id": "off.2",
+      "file": "art/generated/equip-icons/eq-jewel/eq-off-2.webp",
+      "box": [
+        955,
+        42,
+        1788,
+        875
+      ],
+      "px": 833,
+      "key_left": 0.0
+    },
+    {
+      "id": "off.3",
+      "file": "art/generated/equip-icons/eq-jewel/eq-off-3.webp",
+      "box": [
+        1853,
+        42,
+        2686,
+        875
+      ],
+      "px": 833,
+      "key_left": 0.0
+    },
+    {
+      "id": "off.4",
+      "file": "art/generated/equip-icons/eq-jewel/eq-off-4.webp",
+      "box": [
+        2751,
+        42,
+        3584,
+        875
+      ],
+      "px": 833,
+      "key_left": 0.03315
+    },
+    {
+      "id": "off.5",
+      "file": "art/generated/equip-icons/eq-jewel/eq-off-5.webp",
+      "box": [
+        3649,
+        42,
+        4482,
+        875
+      ],
+      "px": 833,
+      "key_left": 0.0
+    },
+    {
+      "id": "off.6",
+      "file": "art/generated/equip-icons/eq-jewel/eq-off-6.webp",
+      "box": [
+        4548,
+        42,
+        5381,
+        875
+      ],
+      "px": 833,
+      "key_left": 0.0
+    },
+    {
+      "id": "off.7",
+      "file": "art/generated/equip-icons/eq-jewel/eq-off-7.webp",
+      "box": [
+        5446,
+        42,
+        6279,
+        875
+      ],
+      "px": 833,
+      "key_left": 0.0
+    },
+    {
+      "id": "ring.1",
+      "file": "art/generated/equip-icons/eq-jewel/eq-ring-1.webp",
+      "box": [
+        57,
+        929,
+        889,
+        1761
+      ],
+      "px": 832,
+      "key_left": 0.0
+    },
+    {
+      "id": "ring.2",
+      "file": "art/generated/equip-icons/eq-jewel/eq-ring-2.webp",
+      "box": [
+        955,
+        929,
+        1787,
+        1761
+      ],
+      "px": 832,
+      "key_left": 0.0
+    },
+    {
+      "id": "ring.3",
+      "file": "art/generated/equip-icons/eq-jewel/eq-ring-3.webp",
+      "box": [
+        1854,
+        929,
+        2686,
+        1761
+      ],
+      "px": 832,
+      "key_left": 0.0
+    },
+    {
+      "id": "ring.4",
+      "file": "art/generated/equip-icons/eq-jewel/eq-ring-4.webp",
+      "box": [
+        2752,
+        929,
+        3584,
+        1761
+      ],
+      "px": 832,
+      "key_left": 0.03689
+    },
+    {
+      "id": "ring.5",
+      "file": "art/generated/equip-icons/eq-jewel/eq-ring-5.webp",
+      "box": [
+        3650,
+        929,
+        4482,
+        1761
+      ],
+      "px": 832,
+      "key_left": 0.0
+    },
+    {
+      "id": "ring.6",
+      "file": "art/generated/equip-icons/eq-jewel/eq-ring-6.webp",
+      "box": [
+        4548,
+        929,
+        5380,
+        1761
+      ],
+      "px": 832,
+      "key_left": 0.0
+    },
+    {
+      "id": "ring.7",
+      "file": "art/generated/equip-icons/eq-jewel/eq-ring-7.webp",
+      "box": [
+        5446,
+        929,
+        6278,
+        1761
+      ],
+      "px": 832,
+      "key_left": 0.0
+    },
+    {
+      "id": "amulet.1",
+      "file": "art/generated/equip-icons/eq-jewel/eq-amulet-1.webp",
+      "box": [
+        57,
+        1815,
+        888,
+        2646
+      ],
+      "px": 831,
+      "key_left": 0.0
+    },
+    {
+      "id": "amulet.2",
+      "file": "art/generated/equip-icons/eq-jewel/eq-amulet-2.webp",
+      "box": [
+        956,
+        1815,
+        1787,
+        2646
+      ],
+      "px": 831,
+      "key_left": 0.0
+    },
+    {
+      "id": "amulet.3",
+      "file": "art/generated/equip-icons/eq-jewel/eq-amulet-3.webp",
+      "box": [
+        1854,
+        1815,
+        2685,
+        2646
+      ],
+      "px": 831,
+      "key_left": 0.0
+    },
+    {
+      "id": "amulet.4",
+      "file": "art/generated/equip-icons/eq-jewel/eq-amulet-4.webp",
+      "box": [
+        2752,
+        1815,
+        3583,
+        2646
+      ],
+      "px": 831,
+      "key_left": 0.03063
+    },
+    {
+      "id": "amulet.5",
+      "file": "art/generated/equip-icons/eq-jewel/eq-amulet-5.webp",
+      "box": [
+        3650,
+        1815,
+        4481,
+        2646
+      ],
+      "px": 831,
+      "key_left": 0.0
+    },
+    {
+      "id": "amulet.6",
+      "file": "art/generated/equip-icons/eq-jewel/eq-amulet-6.webp",
+      "box": [
+        4549,
+        1815,
+        5380,
+        2646
+      ],
+      "px": 831,
+      "key_left": 0.0
+    },
+    {
+      "id": "amulet.7",
+      "file": "art/generated/equip-icons/eq-jewel/eq-amulet-7.webp",
+      "box": [
+        5447,
+        1815,
+        6278,
+        2646
+      ],
+      "px": 831,
+      "key_left": 0.0
+    }
+  ]
+}

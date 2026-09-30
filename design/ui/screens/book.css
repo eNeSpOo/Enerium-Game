@@ -262,7 +262,9 @@ button.hs:active{transform:translateY(-5px)}
 .hb-rp .tabs button[aria-selected="true"]{color:var(--gold);background:linear-gradient(180deg,#5c4128,#33241a);box-shadow:inset 0 0 0 1px rgba(233,199,126,.7),inset 0 -2px 0 var(--rc,var(--spirit))}
 .hb-hd.pnl.hd{flex:1 1 0;min-height:0;padding:0;border:0;background:none;box-shadow:none}
 .hb-hd .hd-body{margin-top:0}
-.hb-hd .hd-cols{grid-template-columns:minmax(0,1fr)}
+/* одна колонка на странице книги; !important — «Навыки» (heroKitHtml, index.html) задают две колонки прямо в разметке, а на узкой
+   странице имени способности остаётся 55 px и оно наезжает на долю хода */
+.hb-hd .hd-cols{grid-template-columns:minmax(0,1fr)!important}
 /* на странице книги места снаряжения и талисманов — по ширине страницы (у разворота каждой ступени страница своя) */
 .hb-hd .hd-gear .eq-slots{grid-template-columns:repeat(9,minmax(0,1fr));gap:3px;max-width:360px}
 .hb-hd .hd-gear .eq-slot{width:auto;height:auto;aspect-ratio:1}

@@ -393,8 +393,11 @@ function buildAch({ err, warn, REC, LBX, artifacts, spoilOf }) {
   const ub =[...new Set(REC.drops.enemies.map(e => e.boss && e.boss.uniqueBp))];
   if (ub.length !== 1 || !isInt(ub[0])) err.push('recipes.js: шанс уникального ресурса босса разный по биомам — прогон берёт один');
   if (!isInt(ER.manySummonBp)) err.push('echo-rules.js: нет шанса Многоликого manySummonBp');
-  const heroRecipes = REC.recipes.filter(r => r.kind === 'hero').length;
-  const PR = AP.run(ACH, { cap: CAP, lb: LBX, paceBiomes: PJ, inputs: IN, ct: CT, ctSim: CSIM, arena: AR, rituals: RT, event: EV, uniqueBp: ub[0], manyBp: ER.manySummonBp, heroRecipes, allRecipes: REC.recipes.length, goldHeroes,
+  /* доля рецептов героев — среди рецептов-целей, которые игрок ищет перебором: герои, активации, призывы, награды. Заготовки и изделия —
+     ступени к ним (подсказки ресурсов ведут по цепочке), руны известны по правилу, цикл «для команды» игрок не видит (recipes.js, 30.09.2026) */
+  const GOAL = new Set(['hero', 'act', 'call', 'product']), goalRecipes = REC.recipes.filter(r => !r.team && GOAL.has(r.kind));
+  const heroRecipes = goalRecipes.filter(r => r.kind === 'hero').length;
+  const PR = AP.run(ACH, { cap: CAP, lb: LBX, paceBiomes: PJ, inputs: IN, ct: CT, ctSim: CSIM, arena: AR, rituals: RT, event: EV, uniqueBp: ub[0], manyBp: ER.manySummonBp, heroRecipes, allRecipes: goalRecipes.length, goldHeroes,
     art: artifacts.map(a => ({ id: a.id, from: a.from, lv: a.lv })) });
   for (const e of PR.err || []) err.push('прогон темпа: ' + e);
   if (!PR.val) return empty;

@@ -124,7 +124,7 @@ function rfTalTile(no, big) {
 }
 /* предмет снаряжения по слоту и редкости: арт слота (eqIcon) в рамке; без арта — прежний значок слота */
 function rfEqTile(slot, r, big) {
-  const art = typeof eqIcon === 'function' ? eqIcon(slot, big ? 44 : 26, eqSlotName(slot)) : '';
+  const art = typeof eqIcon === 'function' ? eqIcon(slot, big ? 44 : 26, eqSlotName(slot), r) : '';   // иконка слота своей редкости
   return rfFrame(r, art || eqGlyph(slot), (big ? 'lg' : '') + (art ? '' : ' glyph'));
 }
 /* рабочий — фигура артели (wkIcon, screens/art-icons.js) в рамке редкости, в углу кристалл; без арта — кристалл своей редкости */

@@ -119,6 +119,9 @@ const LJS = read('screens/library.js'), LCSS = read('screens/library.css');
   if (!/\.rs-av::after\{[^}]*var\(--rico\)/.test(CSS)) say('heroes.css: у лица в строке нет кристалла редкости --rico');
   if (!/\.hb-bk>\.hb-cr\{[^}]*var\(--rico\)/.test(BCSS)) say('book.css: у книги нет кристалла редкости --rico');
   if (!/\.hb-bk\{[^}]*aspect-ratio:9\/16/.test(BCSS)) say('book.css: обложка книги — не 9 : 16');
+  /* «Навыки» задают две колонки прямо в разметке (heroKitHtml) — на странице книги их перебивает только !important */
+  if (/class="hd-cols" style="grid-template-columns:[^" ]+ [^"]+"/.test(html) &&!/\.hb-hd \.hd-cols\{grid-template-columns:minmax\(0,1fr\)!important\}/.test(BCSS))
+    say('book.css: «Навыки» на странице книги в две колонки — имя способности наезжает на долю хода');
   /* раскрытая книга берёт вкладки героя из heroDetail без шапки — одна правда вкладок */
   if (!/function heroDetail\(h, o = \{\}\)[\s\S]*?\n\}/.test(main) || !/o\.head === false \? '' : heroHead\(h\)/.test((main.match(/function heroDetail\(h, o = \{\}\)[\s\S]*?\n\}/) || [''])[0])) say('index.html: heroDetail не умеет без шапки (o.head === false) — книге нечего взять');
   if (!/heroDetail\(h, \{ head: false/.test(BJS)) say('book.js: раскрытая книга не берёт вкладки героя из heroDetail');

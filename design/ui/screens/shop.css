@@ -91,3 +91,56 @@
 @media (prefers-reduced-motion:reduce){
   .lv-card,.lv-card *,.lv-card::after{animation:none!important;transition:none!important}
 }
+
+/* ===================================================================================================================
+   Зал «Лавка» (screens/crafthall.js, слово автора 30.09.2026 — «дорого и богато»): тесная лавочка в скале, тёплый свет фонарей.
+   Витрина — два ряда: верхний на полке (доска шкафа Библиотеки), нижний на прилавке (арт --cr-counter, CR_ART). Товар — на бархатной
+   подушке, в рамке своего вида (data-fk, crafthall.css); цена — латунной биркой на кромке полки. Правила воздуха прежние: значок,
+   имя, цена — одно действие; карточка без коробки, рамка — только у наведённой и купленной.
+   =================================================================================================================== */
+.lv-grid{position:relative;isolation:isolate}
+/* полка под верхним рядом и прилавок под нижним: полосы во всю ширину витрины, повторяются по горизонтали */
+.lv-grid::before,.lv-grid::after{content:"";position:absolute;left:-6px;right:-6px;z-index:-1;pointer-events:none}
+.lv-grid::before{top:calc(50% - 6px - 22px);height:24px;border-radius:2px;
+  background:linear-gradient(180deg,#5c4731 0 22%,#2c2117 23% 58%,#1d150e 59% 78%,#0b0806);box-shadow:0 10px 14px -6px rgba(0,0,0,.85),inset 0 1px 0 rgba(255,228,170,.14)}
+html.lb-p .lv-grid::before{background:var(--lb-plank) 0 0/auto 100% repeat-x;box-shadow:0 10px 14px -6px rgba(0,0,0,.85)}
+.lv-grid::after{bottom:-8px;height:48px;border-radius:2px;
+  background:linear-gradient(180deg,#4c3825 0 16%,#20170f 17% 30%,#171009 31% 100%);box-shadow:0 -1px 0 rgba(255,228,170,.12),0 12px 18px -8px rgba(0,0,0,.9)}
+html.cr-sh .lv-grid::after{background:var(--cr-counter) 0 0/auto 100% repeat-x;box-shadow:0 12px 18px -8px rgba(0,0,0,.9)}
+/* карточка — место на полке: без коробки; снизу — бирка цены на кромке */
+.lv-card{isolation:isolate;justify-content:flex-end;gap:6px;padding:6px 6px 4px;border-color:transparent;border-radius:10px;
+  background:radial-gradient(70% 55% at 50% 40%,color-mix(in srgb,var(--rc) 14%,transparent),transparent 72%),radial-gradient(62% 52% at 50% 62%,rgba(4,4,5,.55),transparent 76%)}
+.lv-card:hover{border-color:rgba(201,162,106,.35);background:radial-gradient(70% 60% at 50% 40%,color-mix(in srgb,var(--rc) 22%,transparent),transparent 74%),rgba(20,15,10,.35)}
+.lv-grid>.lv-card:nth-child(n+6){padding-bottom:14px}
+/* товар на бархатной подушке: подушка — под нижней половиной значка */
+.lv-ic{margin-bottom:6px}
+.lv-ic::before{content:"";position:absolute;left:50%;bottom:-17px;z-index:-1;width:150%;aspect-ratio:1563/1000;transform:translateX(-50%);pointer-events:none;
+  border-radius:40%;background:radial-gradient(closest-side,#1f5f59,#0e2c2a 70%,transparent 72%)}
+html.cr-sh .lv-ic::before{border-radius:0;background:var(--cr-cushion) center/contain no-repeat;filter:drop-shadow(0 5px 5px rgba(0,0,0,.7))}
+html.cr-f .lv-ic[data-fk]{width:56px;height:56px}
+html.cr-f .lv-ic[data-fk] .i{width:42%;height:42%;color:color-mix(in srgb,var(--rc) 70%,var(--parch))}
+html.cr-f .lv-ic[data-fk] .lv-q{right:1px;bottom:0;padding:0 3px;border-radius:6px;background:rgba(8,7,5,.82)}
+html.cr-f .lv-ic[data-fk] .lv-cr{left:-4px;top:-4px;z-index:3}
+.lv-nm{color:#ecd9ad;text-shadow:0 1px 2px #000}
+/* цена — латунная бирка */
+.lv-pr,.lv-sold{padding:3px 8px 3px 6px;border-radius:3px;background:linear-gradient(180deg,#7b6038,#5b4526 58%,#4b391e);box-shadow:inset 0 0 0 1px rgba(233,199,126,.45),inset 0 1px 0 rgba(255,236,190,.25),0 2px 3px rgba(0,0,0,.8);
+  color:#fbefcf;text-shadow:0 1px 1px rgba(0,0,0,.85)}
+.lv-pr img{width:16px;height:16px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
+.lv-pr.lack{color:#ffd0c4;filter:saturate(.65) brightness(.85)}
+.lv-sold{background:linear-gradient(180deg,#16453f,#0d2a27);box-shadow:inset 0 0 0 1px rgba(72,229,212,.5),0 2px 3px rgba(0,0,0,.8);color:var(--spirit)}
+.lv-card.sold{background:none;border-color:transparent}
+.lv-card.sold .lv-ic::before{opacity:.5}
+/* шапка витрины: срок и «Обновить» на латунной планке */
+.lv-head{padding:0 6px 0 10px;border-radius:17px;background:linear-gradient(180deg,rgba(24,18,12,.86),rgba(12,9,7,.9));box-shadow:inset 0 0 0 1px rgba(201,162,106,.28),0 8px 16px -10px #000}
+.lv-time b{color:#f0d79c}
+/* лист товара: крупная плитка — рамка своего вида, свет редкости */
+html.cr-f .lv-big[data-fk]{width:68px;height:68px}
+html.cr-f .lv-big[data-fk] b{z-index:2;right:1px;bottom:0;padding:0 3px;border-radius:6px;background:rgba(8,7,5,.82)}
+.lv-deal{border-color:rgba(201,162,106,.3);background:rgba(8,6,4,.55)}
+@container main (max-height: 360px){
+  html.cr-f .lv-ic[data-fk]{width:48px;height:48px}
+  .lv-ic{margin-bottom:4px}
+  .lv-grid>.lv-card:nth-child(n+6){padding-bottom:12px}
+  .lv-grid::before{top:calc(50% - 6px - 20px);height:22px}
+  .lv-grid::after{height:42px}
+}

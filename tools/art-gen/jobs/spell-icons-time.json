@@ -1,0 +1,222 @@
+{
+  "name": "Иконки способностей сеткой — набор «Время» (слово автора 30.09.2026): «Мне нравятся стиль и сами иконки делай всю библиотеку всех скилов». Образец — spell-icons-fire.json: style, negative и категория spell-icons — без правок",
+  "plan": {
+    "Лист активок spell-time-active": "3:2, 4K, сетка 6×4 — 24 активки набора; строка — два вида по три ступени: на всех, на 2–3, на одного",
+    "Лист ульт spell-time-ult": "1:1, 2K, сетка 4×4 — 8 ульт, 4 боевые пассивки, 4 реакции",
+    "Нарезка": "python tools/art-gen/grid_slice.py jobs/spell-icons-time.json <id задания> <лист>"
+  },
+  "notes": [
+    "Палитра — цвет карста школы (art/style/style.md, «Палитра»), эффекты — поле eff набора в library.json",
+    "Язык иконки и уроки пробы — art/style/style.md, «Иконки способностей сеткой»: у каждой клетки один центральный предмет",
+    "cells — [id способности из tools/content-gen/abilities/library.json, имя файла] по строкам сверху, в строке слева направо; grid — [столбцы, строки]"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "spell-icons": {
+      "aspect": "1:1",
+      "size": "2K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square ability icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the picture in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game puts its own frame on top: one clear central image with a bold silhouette that stays readable at 48 px, on a dark near-black stone background with faint cracks and a darker vignette toward the edges of the cell. Light rises from below in the color of the magic school; crisp rim light on the edges of the forms; a few sparks and dust motes in the light. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each icon differs clearly from its neighbours in shape and composition."
+    }
+  },
+  "jobs": [
+    {
+      "id": "spell-time-active",
+      "category": "spell-icons",
+      "title": "Время — 24 активки сеткой 6×4",
+      "source": "tools/content-gen/abilities/library.json, набор «Время», active; docs/content/библиотека-способностей.md",
+      "aspect": "3:2",
+      "size": "4K",
+      "grid": [
+        6,
+        4
+      ],
+      "cells": [
+        [
+          "Время.dmg.all",
+          "time-dmg-all"
+        ],
+        [
+          "Время.dmg.grp",
+          "time-dmg-grp"
+        ],
+        [
+          "Время.dmg.one",
+          "time-dmg-one"
+        ],
+        [
+          "Время.heal.all",
+          "time-heal-all"
+        ],
+        [
+          "Время.heal.grp",
+          "time-heal-grp"
+        ],
+        [
+          "Время.heal.one",
+          "time-heal-one"
+        ],
+        [
+          "Время.shield.all",
+          "time-shield-all"
+        ],
+        [
+          "Время.shield.grp",
+          "time-shield-grp"
+        ],
+        [
+          "Время.shield.one",
+          "time-shield-one"
+        ],
+        [
+          "Время.dot.all",
+          "time-dot-all"
+        ],
+        [
+          "Время.dot.grp",
+          "time-dot-grp"
+        ],
+        [
+          "Время.dot.one",
+          "time-dot-one"
+        ],
+        [
+          "Время.hot.all",
+          "time-hot-all"
+        ],
+        [
+          "Время.hot.grp",
+          "time-hot-grp"
+        ],
+        [
+          "Время.hot.one",
+          "time-hot-one"
+        ],
+        [
+          "Время.ctrl.all",
+          "time-ctrl-all"
+        ],
+        [
+          "Время.ctrl.grp",
+          "time-ctrl-grp"
+        ],
+        [
+          "Время.ctrl.one",
+          "time-ctrl-one"
+        ],
+        [
+          "Время.debuff.all",
+          "time-debuff-all"
+        ],
+        [
+          "Время.debuff.grp",
+          "time-debuff-grp"
+        ],
+        [
+          "Время.debuff.one",
+          "time-debuff-one"
+        ],
+        [
+          "Время.buff.all",
+          "time-buff-all"
+        ],
+        [
+          "Время.buff.grp",
+          "time-buff-grp"
+        ],
+        [
+          "Время.buff.one",
+          "time-buff-one"
+        ]
+      ],
+      "subject": "The magic school of this sheet is Time: green Energium light (#4FDC8B), pale golden sand, old bronze and brass, hourglasses, pendulums and threads; the light from below is green. Attacking spells are sharp and relentless — jagged green light and whipping sand. Supporting spells — healing, turning time back, shields and haste for allies — glow a softer warm gold mixed with gentle green, with rounded, calm shapes. A spell for all targets shows something wide that fills its cell; a spell for two or three targets shows two or three of its thing; a spell for one target shows one focused object. Attacks move to the right, toward the enemies. Every icon, even the widest, is built around one clear central object with a bold silhouette — never only smoke, dust, snow, fog or a scattered pattern.\n\nThe grid: exactly 6 columns and 4 rows, 24 icons.\n\nRow 1: a huge wall of whirling golden sand sweeping to the right across the whole cell, a lone ruined stone arch standing in it, green light flickering inside the sand; three heavy bronze pendulum blades swinging to the right side by side; one thread of glowing green light snapping in two with a sharp spark as a pair of bronze shears closes on it; a large bronze hourglass lying on its side so its sand has stopped, soft warm golden light spreading around it across the whole cell; three wooden spools of glowing golden thread winding back; one small bronze sundial with plain notches and no numerals, its shadow moving backward, soft warm light.\n\nRow 2: a huge translucent dome of frozen time over the ground, water drops and sand grains hanging motionless inside it, a green-gold rim; three glass spheres side by side, each holding a falling drop of water frozen in mid-air; one round shield of translucent green crystal with a falling leaf frozen motionless inside it; a long row of ancient stone pillars crumbling across the whole cell, cracks and dust, green light in the cracks; three small stone figurines crumbling away into streams of sand; one sword whose left half is bright and new and whose right half is ancient, rusted and crumbling.\n\nRow 3: a shattered clay vase in the center reassembling itself, its pieces flying back together in soft warm golden light that spreads across the whole cell; three drops of water rising upward instead of falling, soft golden light; one wilted flower lifting back up and blooming again in soft golden light; a big falling stone frozen in mid-air in the center, leaves and water drops hanging motionless all around it across the whole cell, the air thick like amber; two bronze bells frozen mid-swing, frozen green rings of sound around them; one arrow frozen in mid-flight, concentric green rings of stopped time around it.\n\nRow 4: a huge cracked hourglass in the center, golden sand pouring out through the crack and spreading across the whole ground; two small leather pouches with holes in the bottom, golden sand trickling out of them; one candle almost burned down to its base, its small green-tinged flame guttering; a great bronze clockwork of many gears spinning fast, trails of warm golden light sweeping around the whole cell; two bronze spinning tops whirling fast, trails of golden light around them; one hummingbird in flight, a trail of warm golden light behind it."
+    },
+    {
+      "id": "spell-time-ult",
+      "category": "spell-icons",
+      "title": "Время — 8 ульт, 4 пассивки, 4 реакции сеткой 4×4",
+      "source": "tools/content-gen/abilities/library.json, набор «Время», ult, passive, reaction; docs/content/библиотека-способностей.md",
+      "aspect": "1:1",
+      "size": "2K",
+      "grid": [
+        4,
+        4
+      ],
+      "cells": [
+        [
+          "Время.ult.dmg",
+          "time-ult-dmg"
+        ],
+        [
+          "Время.ult.heal",
+          "time-ult-heal"
+        ],
+        [
+          "Время.ult.shield",
+          "time-ult-shield"
+        ],
+        [
+          "Время.ult.dot",
+          "time-ult-dot"
+        ],
+        [
+          "Время.ult.hot",
+          "time-ult-hot"
+        ],
+        [
+          "Время.ult.ctrl",
+          "time-ult-ctrl"
+        ],
+        [
+          "Время.ult.debuff",
+          "time-ult-debuff"
+        ],
+        [
+          "Время.ult.buff",
+          "time-ult-buff"
+        ],
+        [
+          "Время.pas.1",
+          "time-pas-1"
+        ],
+        [
+          "Время.pas.2",
+          "time-pas-2"
+        ],
+        [
+          "Время.pas.3",
+          "time-pas-3"
+        ],
+        [
+          "Время.pas.4",
+          "time-pas-4"
+        ],
+        [
+          "Время.react.1",
+          "time-react-1"
+        ],
+        [
+          "Время.react.2",
+          "time-react-2"
+        ],
+        [
+          "Время.react.3",
+          "time-react-3"
+        ],
+        [
+          "Время.react.4",
+          "time-react-4"
+        ]
+      ],
+      "subject": "The magic school of this sheet is Time: green Energium light (#4FDC8B), pale golden sand, old bronze and brass, hourglasses, pendulums and threads; the light from below is green. Attacking spells are sharp and relentless — jagged green light and whipping sand. Supporting spells — healing, turning time back, shields and haste for allies — glow a softer warm gold mixed with gentle green, with rounded, calm shapes. Every icon, even the widest, is built around one clear central object with a bold silhouette — never only smoke, dust, snow, fog or a scattered pattern.\n\nThe grid: exactly 4 columns and 4 rows, 16 icons. Rows 1 and 2 are ultimate spells — the grandest, most epic images of the set, bigger in scale, with bright gold highlights in the green light. Row 3 are passive traits — calm, emblem-like single objects, no action. Row 4 are reactions — an instant answer to an event in battle, shown as one moment of action.\n\nRow 1: the moment itself tearing open like a pane of glass shattering in mid-air, jagged green light bursting through the cracks, shards flying to the right; a giant ornate hourglass of bronze and gold being turned over, golden sand pouring back up with brilliant golden light; a colossal sphere of green crystal holding a frozen moment — a still forest with leaves and water drops suspended inside, a golden rim; a whole ancient city in ruins crumbling into sand under a green sky, its towers collapsing.\n\nRow 2: a vast spiral of golden sand and green light flowing backward, broken pillars rising back into place; a battlefield frozen in time — a breaking wave, falling rocks and birds all hanging motionless in the air under green light; an enormous pendulum stopped dead, hanging still over a dark abyss, green light below; a huge whirling vortex of golden sand and green light spinning fast, gears and sparks streaking around it.\n\nRow 3: a small old tortoise with a shell of bronze plates, calm; one incense stick burning slowly, a thin straight line of smoke rising; one sword hanging point down on a single thin thread; one long coiled bronze spring glowing softly.\n\nRow 4: a killing sword stroke crumbling backward into sand the instant before it lands; an enemy's great axe stopped in mid-air by rings of green light, grains of sand frozen around it; a blade striking, its motion smeared into long green afterimages as time stretches; iron shackles springing open and falling off a wrist, green light and sand swirling backward."
+    }
+  ]
+}

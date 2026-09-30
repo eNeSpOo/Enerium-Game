@@ -1,0 +1,204 @@
+{
+  "sheet": "art/generated/spell-icons/spell-earth-ult__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/spell-icons-earth.json",
+  "job": "spell-earth-ult",
+  "grid": [
+    4,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "Земля.ult.dmg",
+      "file": "art/generated/spell-icons/spell-earth-ult/earth-ult-dmg.webp",
+      "box": [
+        32,
+        32,
+        505,
+        505
+      ],
+      "px": 473,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.ult.heal",
+      "file": "art/generated/spell-icons/spell-earth-ult/earth-ult-heal.webp",
+      "box": [
+        536,
+        32,
+        1009,
+        505
+      ],
+      "px": 473,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.ult.shield",
+      "file": "art/generated/spell-icons/spell-earth-ult/earth-ult-shield.webp",
+      "box": [
+        1039,
+        32,
+        1512,
+        505
+      ],
+      "px": 473,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.ult.dot",
+      "file": "art/generated/spell-icons/spell-earth-ult/earth-ult-dot.webp",
+      "box": [
+        1543,
+        32,
+        2016,
+        505
+      ],
+      "px": 473,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.ult.hot",
+      "file": "art/generated/spell-icons/spell-earth-ult/earth-ult-hot.webp",
+      "box": [
+        32,
+        536,
+        505,
+        1009
+      ],
+      "px": 473,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.ult.ctrl",
+      "file": "art/generated/spell-icons/spell-earth-ult/earth-ult-ctrl.webp",
+      "box": [
+        536,
+        536,
+        1009,
+        1009
+      ],
+      "px": 473,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.ult.debuff",
+      "file": "art/generated/spell-icons/spell-earth-ult/earth-ult-debuff.webp",
+      "box": [
+        1039,
+        536,
+        1512,
+        1009
+      ],
+      "px": 473,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.ult.buff",
+      "file": "art/generated/spell-icons/spell-earth-ult/earth-ult-buff.webp",
+      "box": [
+        1543,
+        536,
+        2016,
+        1009
+      ],
+      "px": 473,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.pas.1",
+      "file": "art/generated/spell-icons/spell-earth-ult/earth-pas-1.webp",
+      "box": [
+        32,
+        1039,
+        505,
+        1512
+      ],
+      "px": 473,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.pas.2",
+      "file": "art/generated/spell-icons/spell-earth-ult/earth-pas-2.webp",
+      "box": [
+        536,
+        1039,
+        1009,
+        1512
+      ],
+      "px": 473,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.pas.3",
+      "file": "art/generated/spell-icons/spell-earth-ult/earth-pas-3.webp",
+      "box": [
+        1039,
+        1039,
+        1512,
+        1512
+      ],
+      "px": 473,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.pas.4",
+      "file": "art/generated/spell-icons/spell-earth-ult/earth-pas-4.webp",
+      "box": [
+        1543,
+        1039,
+        2016,
+        1512
+      ],
+      "px": 473,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.react.1",
+      "file": "art/generated/spell-icons/spell-earth-ult/earth-react-1.webp",
+      "box": [
+        32,
+        1543,
+        505,
+        2016
+      ],
+      "px": 473,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.react.2",
+      "file": "art/generated/spell-icons/spell-earth-ult/earth-react-2.webp",
+      "box": [
+        536,
+        1543,
+        1009,
+        2016
+      ],
+      "px": 473,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.react.3",
+      "file": "art/generated/spell-icons/spell-earth-ult/earth-react-3.webp",
+      "box": [
+        1039,
+        1543,
+        1512,
+        2016
+      ],
+      "px": 473,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.react.4",
+      "file": "art/generated/spell-icons/spell-earth-ult/earth-react-4.webp",
+      "box": [
+        1543,
+        1543,
+        2016,
+        2016
+      ],
+      "px": 473,
+      "key_left": 0.0
+    }
+  ]
+}

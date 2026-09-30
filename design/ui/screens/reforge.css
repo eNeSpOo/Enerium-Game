@@ -147,3 +147,32 @@ button.rf-it{cursor:pointer}
 @media (prefers-reduced-motion:reduce){
   .rf-anim *,.rf-anim *::before,.rf-anim *::after{animation:none!important;transition:none!important}
 }
+
+/* ===================================================================================================================
+   Зал «Перековка» — кузня башни (screens/crafthall.js, слово автора 30.09.2026 — «дорого и богато»): круг наковальни — горн сверху
+   (арт --cr-hearth, CR_ART): отмеченное лежит на клёпаном ободе, в середине над углями рождается итог; жар дышит. Лестница редкостей —
+   латунная планка с кристаллами, сетка — железный лоток. Размеры круга и клеток — прежние переменные .rf (их читает check_reforge.js).
+   =================================================================================================================== */
+html.cr-hh .rf-disc{inset:0;border:0;border-radius:50%;background:var(--cr-hearth) center/100% 100% no-repeat;filter:drop-shadow(0 12px 16px rgba(0,0,0,.85))}
+/* жар над углями: мерцает — только прозрачность */
+.rf-ring::after{content:"";position:absolute;left:30%;top:30%;width:40%;height:40%;border-radius:50%;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(closest-side,rgba(255,196,110,.5),rgba(240,110,40,.22) 55%,transparent 75%);animation:rf-heat 2.6s ease-in-out infinite}
+html.cr-hh .rf-core{border-color:color-mix(in srgb,var(--rc) 55%,#2a160b);background:radial-gradient(circle at 50% 60%,rgba(255,170,80,.28),rgba(40,16,6,.55) 70%);box-shadow:0 0 22px -4px var(--rc),inset 0 0 12px rgba(0,0,0,.6)}
+html.cr-hh .rf-core b{text-shadow:0 0 10px var(--rc),0 1px 2px #000}
+html.cr-hh .rf-it>.rf-t,html.cr-hh .rf-it>.tl-t{filter:drop-shadow(0 3px 4px rgba(0,0,0,.85))}
+html.cr-hh .rf-it.none{border-color:rgba(201,162,106,.3);background:radial-gradient(circle,rgba(0,0,0,.45),rgba(0,0,0,.2))}
+/* наковальня — камень кузни, подсвеченный горном */
+.rf-anv{background:radial-gradient(60% 70% at 30% 45%,rgba(240,120,50,.1),transparent 70%),radial-gradient(60% 70% at 30% 40%,color-mix(in srgb,var(--rc,#2b3036) 8%,transparent),transparent 70%),linear-gradient(180deg,rgba(24,17,11,.93),rgba(12,9,7,.95))}
+.rf-out b{color:#f0d79c}
+/* лестница редкостей — латунная планка с кристаллами */
+.rf-lad{background:linear-gradient(90deg,#1a130c,#2a1f14 50%,#1a130c);box-shadow:inset 0 0 0 1px rgba(201,162,106,.3),inset 0 1px 0 rgba(255,228,170,.08)}
+.rf-step[aria-pressed="true"]{background:radial-gradient(90% 90% at 50% 50%,color-mix(in srgb,var(--rc) 16%,transparent),transparent 70%);box-shadow:inset 2px 0 0 var(--spirit),inset -2px 0 0 var(--spirit)}
+/* сетка — железный лоток */
+.rf-grid{border-radius:6px;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.15));box-shadow:inset 0 1px 3px rgba(0,0,0,.8),inset 0 0 0 1px rgba(201,162,106,.14)}
+.rf-cell{transition:transform .14s cubic-bezier(.2,.8,.2,1)}
+.rf-cell:not(.lock):hover{transform:translateY(-2px)}
+@keyframes rf-heat{0%,100%{opacity:.75}30%{opacity:1}55%{opacity:.82}78%{opacity:.95}}
+@media (prefers-reduced-motion:reduce){
+  .rf-ring::after{animation:none}
+  .rf-cell{transition:none}
+}

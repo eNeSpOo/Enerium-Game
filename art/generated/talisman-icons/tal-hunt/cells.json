@@ -1,0 +1,300 @@
+{
+  "sheet": "art/generated/talisman-icons/tal-hunt__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/talisman-icons.json",
+  "job": "tal-hunt",
+  "grid": [
+    6,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "bane_apparat",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-bane-apparat.webp",
+      "box": [
+        18,
+        34,
+        813,
+        829
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "bane_firstborn",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-bane-firstborn.webp",
+      "box": [
+        863,
+        34,
+        1658,
+        829
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "bane_forgotten",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-bane-forgotten.webp",
+      "box": [
+        1708,
+        34,
+        2503,
+        829
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "bane_beast",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-bane-beast.webp",
+      "box": [
+        2552,
+        34,
+        3347,
+        829
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "bane_twisted",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-bane-twisted.webp",
+      "box": [
+        3397,
+        34,
+        4192,
+        829
+      ],
+      "px": 795,
+      "key_left": 0.0016
+    },
+    {
+      "id": "bane_undead",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-bane-undead.webp",
+      "box": [
+        4242,
+        34,
+        5037,
+        829
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "bane_sagan",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-bane-sagan.webp",
+      "box": [
+        18,
+        875,
+        814,
+        1671
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "bane_eter",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-bane-eter.webp",
+      "box": [
+        862,
+        875,
+        1659,
+        1672
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "ward_apparat",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-ward-apparat.webp",
+      "box": [
+        1707,
+        875,
+        2504,
+        1672
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "ward_firstborn",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-ward-firstborn.webp",
+      "box": [
+        2551,
+        875,
+        3348,
+        1672
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "ward_forgotten",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-ward-forgotten.webp",
+      "box": [
+        3396,
+        875,
+        4193,
+        1672
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "ward_beast",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-ward-beast.webp",
+      "box": [
+        4242,
+        875,
+        5038,
+        1671
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "ward_twisted",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-ward-twisted.webp",
+      "box": [
+        18,
+        1719,
+        814,
+        2515
+      ],
+      "px": 796,
+      "key_left": 0.0012
+    },
+    {
+      "id": "ward_undead",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-ward-undead.webp",
+      "box": [
+        862,
+        1719,
+        1659,
+        2516
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "ward_sagan",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-ward-sagan.webp",
+      "box": [
+        1707,
+        1719,
+        2504,
+        2516
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "ward_eter",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-ward-eter.webp",
+      "box": [
+        2551,
+        1719,
+        3348,
+        2516
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "chief",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-chief.webp",
+      "box": [
+        3396,
+        1719,
+        4193,
+        2516
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "lords",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-lords.webp",
+      "box": [
+        4242,
+        1719,
+        5038,
+        2515
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "scythe",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-scythe.webp",
+      "box": [
+        18,
+        2562,
+        814,
+        3358
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "almanac",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-almanac.webp",
+      "box": [
+        862,
+        2562,
+        1659,
+        3359
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "assault",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-assault.webp",
+      "box": [
+        1707,
+        2562,
+        2504,
+        3359
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "flute",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-flute.webp",
+      "box": [
+        2551,
+        2562,
+        3348,
+        3359
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "diary",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-diary.webp",
+      "box": [
+        3396,
+        2562,
+        4193,
+        3359
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "trophy",
+      "file": "art/generated/talisman-icons/tal-hunt/tal-trophy.webp",
+      "box": [
+        4242,
+        2562,
+        5038,
+        3358
+      ],
+      "px": 796,
+      "key_left": 0.0
+    }
+  ]
+}

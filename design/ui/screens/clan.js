@@ -885,7 +885,7 @@ Object.assign(OV, {
       ${guardsHtml(x)}
       ${kv([k ? ['Раса', HOST.race] : null, ['Бой', `${rounds} ${roundWord(rounds)} · пятеро на этаже`], ['За победу', `${fmt(pts)} ${ptsWord(pts)} — по снятому здоровью`],
         x.g === 'b' ? ['Контроль', 'не действует — только дебаффы'] : ['Сопротивлений', 'нет: решает подбор отряда'], mine ? ['Ваш урон', `${fmt(mine)} · ≈${fmt(est)} ${ptsWord(est)}, когда цель падёт`] : null])}
-      ${k ? `<span class="eyebrow">Приёмы</span><div class="cl-abs">${abil.map(a => `<div class="cl-ab"><b>${a.n}</b><small>${a.d}</small></div>`).join('')}</div>` : '<p class="reason">Имя, класс, приёмы и запись сказителя откроет первая победа.</p>'}
+      ${k ? `<span class="eyebrow">Приёмы</span><div class="cl-abs">${abil.map(a => { const art = typeof abArt === 'function' ? abArt(a, 32) : ''; return `<div class="cl-ab">${art ? `${art}<span><b>${a.n}</b><small>${a.d}</small></span>` : `<b>${a.n}</b><small>${a.d}</small>`}</div>`; }).join('')}</div>` : '<p class="reason">Имя, класс, приёмы и запись сказителя откроет первая победа.</p>'}
       ${x.dead || x.burned ? '' : `<p class="reason">Не добьёте до конца недели — счёт сгорит.</p>`}`;
     const foot = x.dead || x.burned ? '' : `${allBtn(x)}<button class="btn go" data-a="clatk" data-v="${x.uid}:${C.boss.n + 1}" ${C.boss.att ? '' : 'disabled'}>${ic('sword')}Атаковать</button>`;
     return sheet(nameOf(x), body, foot);

@@ -73,10 +73,11 @@ const eqNum = (k, v) => eqKind(k).unit ? `+${v} %` : `+${v}`;
 const eqMainTxt = (it, h) => `${eqKindName(it.lines[0][0], h)} ${eqNum(it.lines[0][0], it.lines[0][1])}`;
 const eqPct = bp => { const s = bp < 0 ? '−' : '+', a = Math.abs(bp), i = eqFl(a, 100), f = eqFl(a % 100, 10); return `${s}${i}${f ? ',' + f : ''} %`; };
 const eqGlyph = slot => `<svg class="i eq-g" viewBox="0 0 24 24" aria-hidden="true">${EQ_VIEW.glyph[slot] || EQ_VIEW.glyph.main}</svg>`;
-/* плитка предмета: значок слота, кромка и свет — редкость (ADR-0027). Заглушка CSS до арта */
-/* значок слота: арт (eqIcon, screens/art-icons.js) — предмет нейтральный, редкость рисует рамка; нет арта — контур-заглушка */
-const eqPic = (slot, px = 32) => (typeof eqIcon === 'function' ? eqIcon(slot, px, '') : '') || eqGlyph(slot);
-const eqTile = (it, o = {}) => `<span class="eq-t${o.lg ? ' lg' : ''}" data-r="${it.r}" aria-hidden="true">${eqPic(it.slot, o.lg ? 48 : 32)}</span>`;
+/* плитка предмета: иконка слота и редкости, кромка и свет — тоже редкость (ADR-0027). Без иконки — контур слота */
+/* значок предмета: иконка сеткой по слоту и редкости (eqIcon, screens/art-icons.js) — чем выше редкость, тем богаче вещь; рамка
+   и свет плитки — тоже редкость. r не передана — обычная вещь слота. Мельче 24 px живопись не читается — контур слота */
+const eqPic = (slot, px = 32, r = 0) => (px >= 24 && typeof eqIcon === 'function' ? eqIcon(slot, px, '', r) : '') || eqGlyph(slot);
+const eqTile = (it, o = {}) => `<span class="eq-t${o.lg ? ' lg' : ''}" data-r="${it.r}" aria-hidden="true">${eqPic(it.slot, o.lg ? 48 : 32, it.r)}</span>`;
 const eqCr = (r, px = 16) => `<span class="zp-cr" data-r="${r}" title="${RAR[r]}">${ICON('r' + r, px, RAR[r])}</span>`;
 /* порядок в списках: редкость выше, главная строка больше, цикл новее, раньше пришёл */
 const eqSort = (a, b) => b.r - a.r || b.lines[0][1] - a.lines[0][1] || b.cyc - a.cyc || a.n - b.n;
@@ -203,7 +204,7 @@ function eqGain(h, it, m0) {
    значок. Нажатие открывает окно «Снаряжение героя» на этом месте */
 function eqSlotBtn(h, slot, uid, sel) {
   const it = uid ? eqItem(uid) : null, t = it ? `${eqSlotName(slot)} · ${RAR[it.r].toLowerCase()}: ${eqMainTxt(it, h)}` : `${eqSlotName(slot)}: пусто`;
-  return `<button class="eq-slot${it ? ' on' : ''}${sel ? ' sel' : ''}" ${it ? `data-r="${it.r}"` : ''} data-a="sheet" data-v="eq:${h.id}:${slot}" aria-label="${trEsc(t)}" title="${trEsc(t)}">${eqPic(slot, 32)}</button>`;
+  return `<button class="eq-slot${it ? ' on' : ''}${sel ? ' sel' : ''}" ${it ? `data-r="${it.r}"` : ''} data-a="sheet" data-v="eq:${h.id}:${slot}" aria-label="${trEsc(t)}" title="${trEsc(t)}">${eqPic(slot, 32, it ? it.r : 0)}</button>`;
 }
 /* девять мест во вкладке «Снаряжение» карточки героя, рядом с талисманами: зовёт heroDetail в index.html */
 function eqRow(h) {
@@ -319,7 +320,7 @@ Object.assign(ACT, {
 function eqView(x) {
   const it = x && x.uid ? eqItem(x.uid) : null; if (!it) return null;
   const name = `${eqSlotName(it.slot)} · ${RAR[it.r].toLowerCase()}`;
-  return { icon: eqGlyph(it.slot), name, tip: `${name}: ${eqMainTxt(it)}` };
+  return { icon: eqPic(it.slot, 64, it.r), name, tip: `${name}: ${eqMainTxt(it)}` };
 }
 
 /* ================== раздел UI-кита ================== */
@@ -328,9 +329,10 @@ function eqKitHtml() {
   const R = EQD.rules, c0 = R.openCycle, h = S.heroes[0];
   const demo = (slot, r, k) => Object.assign(EnEquip.mint(EQD, { slot, r, cyc: c0 }, EnEquip.seedOf(['кит-снаряжения', slot, r, k || 0].join('|'))), { uid: '', on: '' });
   const ex = { head: demo('head', 3), chest: demo('chest', 4), hands: demo('hands', 2), main: demo('main', 5), ring: demo('ring', 6) };
-  const slots = `<div class="eq-slots">${R.slots.map((s, i) => { const it = ex[s]; return `<span class="eq-slot${it ? ' on' : ''}${i === 5 ? ' sel' : ''}" ${it ? `data-r="${it.r}"` : ''} title="${eqSlotName(s)}">${eqGlyph(s)}</span>`; }).join('')}</div>`;
+  const slots = `<div class="eq-slots">${R.slots.map((s, i) => { const it = ex[s]; return `<span class="eq-slot${it ? ' on' : ''}${i === 5 ? ' sel' : ''}" ${it ? `data-r="${it.r}"` : ''} title="${eqSlotName(s)}">${eqPic(s, 32, it ? it.r : 0)}</span>`; }).join('')}</div>`;
   const rg = (slot, r) => { const T = EQD.templates[slot + '.' + r], x = EnEquip.rangeOf(EQD, T.main[0], T.main[1], T.main[2], c0); return x[0] === x[1] ? x[0] : `${x[0]}–${x[1]}`; };
-  const ladder = [1, 2, 3, 4, 5, 6, 7].map(r => `<figure><span class="eq-t lg" data-r="${r}">${eqGlyph('main')}</span><figcaption>${RAR[r]}<br><b class="num">${rg('main', r)}</b> · ${r} ${plural(r, 'строка', 'строки', 'строк')}</figcaption></figure>`).join('');
+  const ladder = [1, 2, 3, 4, 5, 6, 7].map(r => `<figure><span class="eq-t lg" data-r="${r}">${eqPic('main', 48, r)}</span><figcaption>${RAR[r]}<br><b class="num">${rg('main', r)}</b> · ${r} ${plural(r, 'строка', 'строки', 'строк')}</figcaption></figure>`).join('');
+  const icons = R.slots.map(s => `<div class="eq-ic-row" title="${eqSlotName(s)}">${[1, 2, 3, 4, 5, 6, 7].map(r => `<span class="eq-t lg" data-r="${r}" title="${eqSlotName(s)} · ${RAR[r].toLowerCase()}">${eqPic(s, 48, r)}</span>`).join('')}</div>`).join('');
   const card = ex.main ? `<div class="eq-card" data-r="${ex.main.r}">${eqHead(ex.main)}${eqLines(ex.main, h)}</div>` : '';
   const cmp = ex.chest ? `<div class="eq-card" data-r="${ex.chest.r}">${eqHead(ex.chest, 'Сравнить с надетым')}${eqLines(ex.chest, h, demo('chest', 2, 1))}</div>` : '';
   const tpl = `<table class="p-table eq-kt"><thead><tr><th>Слот · главная строка</th>${[1, 2, 3, 4, 5, 6, 7].map(r => `<th>${ICON('r' + r, 14, RAR[r])}</th>`).join('')}</tr></thead><tbody>${R.slots.map(s => `<tr><td>${eqGlyph(s)}${eqSlotName(s)} · ${eqKind(EQD.slots[s].main).n.toLowerCase()}</td>${[1, 2, 3, 4, 5, 6, 7].map(r => `<td class="n">${rg(s, r)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
@@ -345,6 +347,7 @@ function eqKitHtml() {
       <div class="k-air-r"><b>Сравнение</b>${cmp}<small>Выбранный против надетого: разница по строкам, потерянная строка — красным.</small></div>
     </div>
     <div class="k-air-r"><b>Редкость — сила и число строк · оружие, цикл ${ROMAN[c0]}</b><div class="k-row eq-lad">${ladder}</div><small>Лучшая строка редкости обгоняет худшую следующей на 10–16 %: каждый дроп стоит взгляда.</small></div>
+    <div class="k-air-r"><b>Иконки · 9 слотов × 7 редкостей</b><div class="eq-icons">${icons}</div><small>Одна иконка на шаблон: чем выше редкость, тем богаче вещь — материал, оковка, свет изнутри цвета редкости.${TM(' ADR-0027. Рисованы сеткой, строка листа — слот: tools/art-gen/jobs/equip-icons.json.')}</small></div>
     <div class="eq-kg">
       <div class="k-air-r"><b>Главная строка · 9 × 7 шаблонов, цикл ${ROMAN[c0]}</b>${tpl}<small>Диапазон — центр редкости × множитель цикла × (1 ± ширина).</small></div>
       <div class="k-air-r team-only"><b>Вклад полного комплекта в БМ · эталон цикла I</b>${bm}<small>§6, слой 2. Эпический комплект — около одной доблести.</small></div>

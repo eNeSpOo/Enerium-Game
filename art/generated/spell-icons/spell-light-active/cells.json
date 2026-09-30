@@ -1,0 +1,300 @@
+{
+  "sheet": "art/generated/spell-icons/spell-light-active__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/spell-icons-light.json",
+  "job": "spell-light-active",
+  "grid": [
+    6,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "Свет.dmg.all",
+      "file": "art/generated/spell-icons/spell-light-active/light-dmg-all.webp",
+      "box": [
+        23,
+        40,
+        811,
+        828
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.dmg.grp",
+      "file": "art/generated/spell-icons/spell-light-active/light-dmg-grp.webp",
+      "box": [
+        868,
+        40,
+        1656,
+        828
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.dmg.one",
+      "file": "art/generated/spell-icons/spell-light-active/light-dmg-one.webp",
+      "box": [
+        1712,
+        40,
+        2500,
+        828
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.heal.all",
+      "file": "art/generated/spell-icons/spell-light-active/light-heal-all.webp",
+      "box": [
+        2556,
+        40,
+        3344,
+        828
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.heal.grp",
+      "file": "art/generated/spell-icons/spell-light-active/light-heal-grp.webp",
+      "box": [
+        3400,
+        40,
+        4188,
+        828
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.heal.one",
+      "file": "art/generated/spell-icons/spell-light-active/light-heal-one.webp",
+      "box": [
+        4244,
+        40,
+        5032,
+        828
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.shield.all",
+      "file": "art/generated/spell-icons/spell-light-active/light-shield-all.webp",
+      "box": [
+        23,
+        882,
+        810,
+        1669
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.shield.grp",
+      "file": "art/generated/spell-icons/spell-light-active/light-shield-grp.webp",
+      "box": [
+        869,
+        882,
+        1656,
+        1669
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.shield.one",
+      "file": "art/generated/spell-icons/spell-light-active/light-shield-one.webp",
+      "box": [
+        1712,
+        882,
+        2499,
+        1669
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.dot.all",
+      "file": "art/generated/spell-icons/spell-light-active/light-dot-all.webp",
+      "box": [
+        2557,
+        882,
+        3344,
+        1669
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.dot.grp",
+      "file": "art/generated/spell-icons/spell-light-active/light-dot-grp.webp",
+      "box": [
+        3400,
+        882,
+        4187,
+        1669
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.dot.one",
+      "file": "art/generated/spell-icons/spell-light-active/light-dot-one.webp",
+      "box": [
+        4245,
+        882,
+        5032,
+        1669
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.hot.all",
+      "file": "art/generated/spell-icons/spell-light-active/light-hot-all.webp",
+      "box": [
+        23,
+        1723,
+        811,
+        2511
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.hot.grp",
+      "file": "art/generated/spell-icons/spell-light-active/light-hot-grp.webp",
+      "box": [
+        868,
+        1723,
+        1656,
+        2511
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.hot.one",
+      "file": "art/generated/spell-icons/spell-light-active/light-hot-one.webp",
+      "box": [
+        1712,
+        1723,
+        2500,
+        2511
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.ctrl.all",
+      "file": "art/generated/spell-icons/spell-light-active/light-ctrl-all.webp",
+      "box": [
+        2556,
+        1723,
+        3344,
+        2511
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.ctrl.grp",
+      "file": "art/generated/spell-icons/spell-light-active/light-ctrl-grp.webp",
+      "box": [
+        3400,
+        1723,
+        4188,
+        2511
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.ctrl.one",
+      "file": "art/generated/spell-icons/spell-light-active/light-ctrl-one.webp",
+      "box": [
+        4244,
+        1723,
+        5032,
+        2511
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.debuff.all",
+      "file": "art/generated/spell-icons/spell-light-active/light-debuff-all.webp",
+      "box": [
+        23,
+        2564,
+        811,
+        3352
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.debuff.grp",
+      "file": "art/generated/spell-icons/spell-light-active/light-debuff-grp.webp",
+      "box": [
+        868,
+        2564,
+        1656,
+        3352
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.debuff.one",
+      "file": "art/generated/spell-icons/spell-light-active/light-debuff-one.webp",
+      "box": [
+        1712,
+        2564,
+        2500,
+        3352
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.buff.all",
+      "file": "art/generated/spell-icons/spell-light-active/light-buff-all.webp",
+      "box": [
+        2556,
+        2564,
+        3344,
+        3352
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.buff.grp",
+      "file": "art/generated/spell-icons/spell-light-active/light-buff-grp.webp",
+      "box": [
+        3400,
+        2564,
+        4188,
+        3352
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "Свет.buff.one",
+      "file": "art/generated/spell-icons/spell-light-active/light-buff-one.webp",
+      "box": [
+        4244,
+        2564,
+        5032,
+        3352
+      ],
+      "px": 788,
+      "key_left": 0.0
+    }
+  ]
+}

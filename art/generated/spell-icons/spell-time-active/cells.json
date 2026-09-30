@@ -1,0 +1,300 @@
+{
+  "sheet": "art/generated/spell-icons/spell-time-active__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/spell-icons-time.json",
+  "job": "spell-time-active",
+  "grid": [
+    6,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "Время.dmg.all",
+      "file": "art/generated/spell-icons/spell-time-active/time-dmg-all.webp",
+      "box": [
+        14,
+        28,
+        809,
+        823
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.dmg.grp",
+      "file": "art/generated/spell-icons/spell-time-active/time-dmg-grp.webp",
+      "box": [
+        860,
+        28,
+        1656,
+        824
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.dmg.one",
+      "file": "art/generated/spell-icons/spell-time-active/time-dmg-one.webp",
+      "box": [
+        1707,
+        28,
+        2503,
+        824
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.heal.all",
+      "file": "art/generated/spell-icons/spell-time-active/time-heal-all.webp",
+      "box": [
+        2554,
+        28,
+        3349,
+        823
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.heal.grp",
+      "file": "art/generated/spell-icons/spell-time-active/time-heal-grp.webp",
+      "box": [
+        3400,
+        28,
+        4196,
+        824
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.heal.one",
+      "file": "art/generated/spell-icons/spell-time-active/time-heal-one.webp",
+      "box": [
+        4248,
+        29,
+        5042,
+        823
+      ],
+      "px": 794,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.shield.all",
+      "file": "art/generated/spell-icons/spell-time-active/time-shield-all.webp",
+      "box": [
+        14,
+        875,
+        809,
+        1670
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.shield.grp",
+      "file": "art/generated/spell-icons/spell-time-active/time-shield-grp.webp",
+      "box": [
+        860,
+        875,
+        1656,
+        1671
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.shield.one",
+      "file": "art/generated/spell-icons/spell-time-active/time-shield-one.webp",
+      "box": [
+        1707,
+        875,
+        2503,
+        1671
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.dot.all",
+      "file": "art/generated/spell-icons/spell-time-active/time-dot-all.webp",
+      "box": [
+        2554,
+        875,
+        3349,
+        1670
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.dot.grp",
+      "file": "art/generated/spell-icons/spell-time-active/time-dot-grp.webp",
+      "box": [
+        3399,
+        874,
+        4197,
+        1672
+      ],
+      "px": 798,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.dot.one",
+      "file": "art/generated/spell-icons/spell-time-active/time-dot-one.webp",
+      "box": [
+        4248,
+        876,
+        5042,
+        1670
+      ],
+      "px": 794,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.hot.all",
+      "file": "art/generated/spell-icons/spell-time-active/time-hot-all.webp",
+      "box": [
+        14,
+        1726,
+        809,
+        2521
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.hot.grp",
+      "file": "art/generated/spell-icons/spell-time-active/time-hot-grp.webp",
+      "box": [
+        860,
+        1726,
+        1656,
+        2522
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.hot.one",
+      "file": "art/generated/spell-icons/spell-time-active/time-hot-one.webp",
+      "box": [
+        1707,
+        1726,
+        2503,
+        2522
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.ctrl.all",
+      "file": "art/generated/spell-icons/spell-time-active/time-ctrl-all.webp",
+      "box": [
+        2554,
+        1726,
+        3349,
+        2521
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.ctrl.grp",
+      "file": "art/generated/spell-icons/spell-time-active/time-ctrl-grp.webp",
+      "box": [
+        3399,
+        1725,
+        4197,
+        2523
+      ],
+      "px": 798,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.ctrl.one",
+      "file": "art/generated/spell-icons/spell-time-active/time-ctrl-one.webp",
+      "box": [
+        4248,
+        1727,
+        5042,
+        2521
+      ],
+      "px": 794,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.debuff.all",
+      "file": "art/generated/spell-icons/spell-time-active/time-debuff-all.webp",
+      "box": [
+        14,
+        2580,
+        809,
+        3375
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.debuff.grp",
+      "file": "art/generated/spell-icons/spell-time-active/time-debuff-grp.webp",
+      "box": [
+        860,
+        2579,
+        1656,
+        3375
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.debuff.one",
+      "file": "art/generated/spell-icons/spell-time-active/time-debuff-one.webp",
+      "box": [
+        1707,
+        2579,
+        2503,
+        3375
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.buff.all",
+      "file": "art/generated/spell-icons/spell-time-active/time-buff-all.webp",
+      "box": [
+        2554,
+        2580,
+        3349,
+        3375
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.buff.grp",
+      "file": "art/generated/spell-icons/spell-time-active/time-buff-grp.webp",
+      "box": [
+        3399,
+        2578,
+        4197,
+        3376
+      ],
+      "px": 798,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.buff.one",
+      "file": "art/generated/spell-icons/spell-time-active/time-buff-one.webp",
+      "box": [
+        4248,
+        2580,
+        5042,
+        3374
+      ],
+      "px": 794,
+      "key_left": 0.0
+    }
+  ]
+}

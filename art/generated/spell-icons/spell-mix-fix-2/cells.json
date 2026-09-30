@@ -1,0 +1,60 @@
+{
+  "sheet": "art/generated/spell-icons/spell-mix-fix-2__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/spell-icons-fix.json",
+  "job": "spell-mix-fix-2",
+  "grid": [
+    2,
+    2
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "Время.dmg.grp",
+      "file": "art/generated/spell-icons/spell-mix-fix-2/time-dmg-grp.webp",
+      "box": [
+        8,
+        8,
+        494,
+        494
+      ],
+      "px": 486,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.pas.3",
+      "file": "art/generated/spell-icons/spell-mix-fix-2/earth-pas-3.webp",
+      "box": [
+        529,
+        8,
+        1015,
+        494
+      ],
+      "px": 486,
+      "key_left": 0.0
+    },
+    {
+      "id": "Тьма.shield.all",
+      "file": "art/generated/spell-icons/spell-mix-fix-2/dark-shield-all.webp",
+      "box": [
+        8,
+        530,
+        494,
+        1016
+      ],
+      "px": 486,
+      "key_left": 0.01555
+    },
+    {
+      "id": "Земля.heal.grp",
+      "file": "art/generated/spell-icons/spell-mix-fix-2/earth-heal-grp.webp",
+      "box": [
+        529,
+        530,
+        1015,
+        1016
+      ],
+      "px": 486,
+      "key_left": 0.0
+    }
+  ]
+}

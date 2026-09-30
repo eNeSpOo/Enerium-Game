@@ -1,0 +1,204 @@
+{
+  "sheet": "art/generated/spell-icons/spell-air-ult__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/spell-icons-air.json",
+  "job": "spell-air-ult",
+  "grid": [
+    4,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "Воздух.ult.dmg",
+      "file": "art/generated/spell-icons/spell-air-ult/air-ult-dmg.webp",
+      "box": [
+        8,
+        8,
+        496,
+        496
+      ],
+      "px": 488,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.ult.heal",
+      "file": "art/generated/spell-icons/spell-air-ult/air-ult-heal.webp",
+      "box": [
+        524,
+        9,
+        1010,
+        495
+      ],
+      "px": 486,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.ult.shield",
+      "file": "art/generated/spell-icons/spell-air-ult/air-ult-shield.webp",
+      "box": [
+        1038,
+        9,
+        1524,
+        495
+      ],
+      "px": 486,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.ult.dot",
+      "file": "art/generated/spell-icons/spell-air-ult/air-ult-dot.webp",
+      "box": [
+        1552,
+        8,
+        2040,
+        496
+      ],
+      "px": 488,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.ult.hot",
+      "file": "art/generated/spell-icons/spell-air-ult/air-ult-hot.webp",
+      "box": [
+        9,
+        524,
+        495,
+        1010
+      ],
+      "px": 486,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.ult.ctrl",
+      "file": "art/generated/spell-icons/spell-air-ult/air-ult-ctrl.webp",
+      "box": [
+        524,
+        524,
+        1010,
+        1010
+      ],
+      "px": 486,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.ult.debuff",
+      "file": "art/generated/spell-icons/spell-air-ult/air-ult-debuff.webp",
+      "box": [
+        1038,
+        524,
+        1524,
+        1010
+      ],
+      "px": 486,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.ult.buff",
+      "file": "art/generated/spell-icons/spell-air-ult/air-ult-buff.webp",
+      "box": [
+        1553,
+        524,
+        2039,
+        1010
+      ],
+      "px": 486,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.pas.1",
+      "file": "art/generated/spell-icons/spell-air-ult/air-pas-1.webp",
+      "box": [
+        9,
+        1038,
+        495,
+        1524
+      ],
+      "px": 486,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.pas.2",
+      "file": "art/generated/spell-icons/spell-air-ult/air-pas-2.webp",
+      "box": [
+        524,
+        1038,
+        1010,
+        1524
+      ],
+      "px": 486,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.pas.3",
+      "file": "art/generated/spell-icons/spell-air-ult/air-pas-3.webp",
+      "box": [
+        1038,
+        1038,
+        1524,
+        1524
+      ],
+      "px": 486,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.pas.4",
+      "file": "art/generated/spell-icons/spell-air-ult/air-pas-4.webp",
+      "box": [
+        1553,
+        1038,
+        2039,
+        1524
+      ],
+      "px": 486,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.react.1",
+      "file": "art/generated/spell-icons/spell-air-ult/air-react-1.webp",
+      "box": [
+        8,
+        1552,
+        496,
+        2040
+      ],
+      "px": 488,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.react.2",
+      "file": "art/generated/spell-icons/spell-air-ult/air-react-2.webp",
+      "box": [
+        524,
+        1553,
+        1010,
+        2039
+      ],
+      "px": 486,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.react.3",
+      "file": "art/generated/spell-icons/spell-air-ult/air-react-3.webp",
+      "box": [
+        1038,
+        1553,
+        1524,
+        2039
+      ],
+      "px": 486,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.react.4",
+      "file": "art/generated/spell-icons/spell-air-ult/air-react-4.webp",
+      "box": [
+        1552,
+        1552,
+        2040,
+        2040
+      ],
+      "px": 488,
+      "key_left": 0.0
+    }
+  ]
+}

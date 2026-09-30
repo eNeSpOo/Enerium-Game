@@ -1,0 +1,204 @@
+{
+  "sheet": "art/generated/spell-icons/spell-time-ult__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/spell-icons-time.json",
+  "job": "spell-time-ult",
+  "grid": [
+    4,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "Время.ult.dmg",
+      "file": "art/generated/spell-icons/spell-time-ult/time-ult-dmg.webp",
+      "box": [
+        35,
+        36,
+        494,
+        495
+      ],
+      "px": 459,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.ult.heal",
+      "file": "art/generated/spell-icons/spell-time-ult/time-ult-heal.webp",
+      "box": [
+        541,
+        36,
+        1000,
+        495
+      ],
+      "px": 459,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.ult.shield",
+      "file": "art/generated/spell-icons/spell-time-ult/time-ult-shield.webp",
+      "box": [
+        1047,
+        36,
+        1506,
+        495
+      ],
+      "px": 459,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.ult.dot",
+      "file": "art/generated/spell-icons/spell-time-ult/time-ult-dot.webp",
+      "box": [
+        1553,
+        36,
+        2012,
+        495
+      ],
+      "px": 459,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.ult.hot",
+      "file": "art/generated/spell-icons/spell-time-ult/time-ult-hot.webp",
+      "box": [
+        35,
+        541,
+        495,
+        1001
+      ],
+      "px": 460,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.ult.ctrl",
+      "file": "art/generated/spell-icons/spell-time-ult/time-ult-ctrl.webp",
+      "box": [
+        541,
+        541,
+        1001,
+        1001
+      ],
+      "px": 460,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.ult.debuff",
+      "file": "art/generated/spell-icons/spell-time-ult/time-ult-debuff.webp",
+      "box": [
+        1047,
+        541,
+        1507,
+        1001
+      ],
+      "px": 460,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.ult.buff",
+      "file": "art/generated/spell-icons/spell-time-ult/time-ult-buff.webp",
+      "box": [
+        1553,
+        541,
+        2013,
+        1001
+      ],
+      "px": 460,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.pas.1",
+      "file": "art/generated/spell-icons/spell-time-ult/time-pas-1.webp",
+      "box": [
+        35,
+        1047,
+        495,
+        1507
+      ],
+      "px": 460,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.pas.2",
+      "file": "art/generated/spell-icons/spell-time-ult/time-pas-2.webp",
+      "box": [
+        541,
+        1047,
+        1001,
+        1507
+      ],
+      "px": 460,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.pas.3",
+      "file": "art/generated/spell-icons/spell-time-ult/time-pas-3.webp",
+      "box": [
+        1047,
+        1047,
+        1507,
+        1507
+      ],
+      "px": 460,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.pas.4",
+      "file": "art/generated/spell-icons/spell-time-ult/time-pas-4.webp",
+      "box": [
+        1553,
+        1047,
+        2013,
+        1507
+      ],
+      "px": 460,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.react.1",
+      "file": "art/generated/spell-icons/spell-time-ult/time-react-1.webp",
+      "box": [
+        35,
+        1553,
+        495,
+        2013
+      ],
+      "px": 460,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.react.2",
+      "file": "art/generated/spell-icons/spell-time-ult/time-react-2.webp",
+      "box": [
+        541,
+        1553,
+        1001,
+        2013
+      ],
+      "px": 460,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.react.3",
+      "file": "art/generated/spell-icons/spell-time-ult/time-react-3.webp",
+      "box": [
+        1047,
+        1553,
+        1507,
+        2013
+      ],
+      "px": 460,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.react.4",
+      "file": "art/generated/spell-icons/spell-time-ult/time-react-4.webp",
+      "box": [
+        1553,
+        1553,
+        2013,
+        2013
+      ],
+      "px": 460,
+      "key_left": 0.0
+    }
+  ]
+}

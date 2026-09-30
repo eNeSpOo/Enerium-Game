@@ -1,0 +1,264 @@
+{
+  "sheet": "art/generated/equip-icons/eq-armor-low__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/equip-icons.json",
+  "job": "eq-armor-low",
+  "grid": [
+    7,
+    3
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "legs.1",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-legs-1.webp",
+      "box": [
+        28,
+        17,
+        878,
+        867
+      ],
+      "px": 850,
+      "key_left": 0.0
+    },
+    {
+      "id": "legs.2",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-legs-2.webp",
+      "box": [
+        934,
+        17,
+        1784,
+        867
+      ],
+      "px": 850,
+      "key_left": 0.0
+    },
+    {
+      "id": "legs.3",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-legs-3.webp",
+      "box": [
+        1839,
+        17,
+        2689,
+        867
+      ],
+      "px": 850,
+      "key_left": 0.0
+    },
+    {
+      "id": "legs.4",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-legs-4.webp",
+      "box": [
+        2744,
+        17,
+        3594,
+        867
+      ],
+      "px": 850,
+      "key_left": 0.03295
+    },
+    {
+      "id": "legs.5",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-legs-5.webp",
+      "box": [
+        3649,
+        17,
+        4499,
+        867
+      ],
+      "px": 850,
+      "key_left": 0.0
+    },
+    {
+      "id": "legs.6",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-legs-6.webp",
+      "box": [
+        4554,
+        17,
+        5404,
+        867
+      ],
+      "px": 850,
+      "key_left": 0.0
+    },
+    {
+      "id": "legs.7",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-legs-7.webp",
+      "box": [
+        5461,
+        17,
+        6311,
+        867
+      ],
+      "px": 850,
+      "key_left": 0.0
+    },
+    {
+      "id": "feet.1",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-feet-1.webp",
+      "box": [
+        28,
+        919,
+        879,
+        1770
+      ],
+      "px": 851,
+      "key_left": 0.0
+    },
+    {
+      "id": "feet.2",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-feet-2.webp",
+      "box": [
+        933,
+        919,
+        1785,
+        1771
+      ],
+      "px": 852,
+      "key_left": 0.0
+    },
+    {
+      "id": "feet.3",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-feet-3.webp",
+      "box": [
+        1838,
+        919,
+        2690,
+        1771
+      ],
+      "px": 852,
+      "key_left": 0.0
+    },
+    {
+      "id": "feet.4",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-feet-4.webp",
+      "box": [
+        2744,
+        919,
+        3595,
+        1770
+      ],
+      "px": 851,
+      "key_left": 0.02509
+    },
+    {
+      "id": "feet.5",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-feet-5.webp",
+      "box": [
+        3648,
+        919,
+        4500,
+        1771
+      ],
+      "px": 852,
+      "key_left": 0.0
+    },
+    {
+      "id": "feet.6",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-feet-6.webp",
+      "box": [
+        4553,
+        919,
+        5405,
+        1771
+      ],
+      "px": 852,
+      "key_left": 0.0
+    },
+    {
+      "id": "feet.7",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-feet-7.webp",
+      "box": [
+        5460,
+        919,
+        6312,
+        1771
+      ],
+      "px": 852,
+      "key_left": 0.0
+    },
+    {
+      "id": "main.1",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-main-1.webp",
+      "box": [
+        28,
+        1823,
+        878,
+        2673
+      ],
+      "px": 850,
+      "key_left": 0.0
+    },
+    {
+      "id": "main.2",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-main-2.webp",
+      "box": [
+        934,
+        1823,
+        1784,
+        2673
+      ],
+      "px": 850,
+      "key_left": 0.0
+    },
+    {
+      "id": "main.3",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-main-3.webp",
+      "box": [
+        1839,
+        1823,
+        2689,
+        2673
+      ],
+      "px": 850,
+      "key_left": 0.0
+    },
+    {
+      "id": "main.4",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-main-4.webp",
+      "box": [
+        2744,
+        1823,
+        3594,
+        2673
+      ],
+      "px": 850,
+      "key_left": 0.03141
+    },
+    {
+      "id": "main.5",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-main-5.webp",
+      "box": [
+        3649,
+        1823,
+        4499,
+        2673
+      ],
+      "px": 850,
+      "key_left": 0.0
+    },
+    {
+      "id": "main.6",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-main-6.webp",
+      "box": [
+        4554,
+        1823,
+        5404,
+        2673
+      ],
+      "px": 850,
+      "key_left": 0.0
+    },
+    {
+      "id": "main.7",
+      "file": "art/generated/equip-icons/eq-armor-low/eq-main-7.webp",
+      "box": [
+        5461,
+        1823,
+        6311,
+        2673
+      ],
+      "px": 850,
+      "key_left": 0.0
+    }
+  ]
+}

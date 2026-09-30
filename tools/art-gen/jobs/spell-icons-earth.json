@@ -1,0 +1,222 @@
+{
+  "name": "Иконки способностей сеткой — набор «Земля» (слово автора 30.09.2026): «Мне нравятся стиль и сами иконки делай всю библиотеку всех скилов». Образец — spell-icons-fire.json: style, negative и категория spell-icons — без правок",
+  "plan": {
+    "Лист активок spell-earth-active": "3:2, 4K, сетка 6×4 — 24 активки набора; строка — два вида по три ступени: на всех, на 2–3, на одного",
+    "Лист ульт spell-earth-ult": "1:1, 2K, сетка 4×4 — 8 ульт, 4 боевые пассивки, 4 реакции",
+    "Нарезка": "python tools/art-gen/grid_slice.py jobs/spell-icons-earth.json <id задания> <лист>"
+  },
+  "notes": [
+    "Палитра — цвет карста школы (art/style/style.md, «Палитра»), эффекты — поле eff набора в library.json",
+    "Язык иконки и уроки пробы — art/style/style.md, «Иконки способностей сеткой»: у каждой клетки один центральный предмет",
+    "cells — [id способности из tools/content-gen/abilities/library.json, имя файла] по строкам сверху, в строке слева направо; grid — [столбцы, строки]"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "spell-icons": {
+      "aspect": "1:1",
+      "size": "2K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square ability icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the picture in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game puts its own frame on top: one clear central image with a bold silhouette that stays readable at 48 px, on a dark near-black stone background with faint cracks and a darker vignette toward the edges of the cell. Light rises from below in the color of the magic school; crisp rim light on the edges of the forms; a few sparks and dust motes in the light. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each icon differs clearly from its neighbours in shape and composition."
+    }
+  },
+  "jobs": [
+    {
+      "id": "spell-earth-active",
+      "category": "spell-icons",
+      "title": "Земля — 24 активки сеткой 6×4",
+      "source": "tools/content-gen/abilities/library.json, набор «Земля», active; docs/content/библиотека-способностей.md",
+      "aspect": "3:2",
+      "size": "4K",
+      "grid": [
+        6,
+        4
+      ],
+      "cells": [
+        [
+          "Земля.dmg.all",
+          "earth-dmg-all"
+        ],
+        [
+          "Земля.dmg.grp",
+          "earth-dmg-grp"
+        ],
+        [
+          "Земля.dmg.one",
+          "earth-dmg-one"
+        ],
+        [
+          "Земля.heal.all",
+          "earth-heal-all"
+        ],
+        [
+          "Земля.heal.grp",
+          "earth-heal-grp"
+        ],
+        [
+          "Земля.heal.one",
+          "earth-heal-one"
+        ],
+        [
+          "Земля.shield.all",
+          "earth-shield-all"
+        ],
+        [
+          "Земля.shield.grp",
+          "earth-shield-grp"
+        ],
+        [
+          "Земля.shield.one",
+          "earth-shield-one"
+        ],
+        [
+          "Земля.dot.all",
+          "earth-dot-all"
+        ],
+        [
+          "Земля.dot.grp",
+          "earth-dot-grp"
+        ],
+        [
+          "Земля.dot.one",
+          "earth-dot-one"
+        ],
+        [
+          "Земля.hot.all",
+          "earth-hot-all"
+        ],
+        [
+          "Земля.hot.grp",
+          "earth-hot-grp"
+        ],
+        [
+          "Земля.hot.one",
+          "earth-hot-one"
+        ],
+        [
+          "Земля.ctrl.all",
+          "earth-ctrl-all"
+        ],
+        [
+          "Земля.ctrl.grp",
+          "earth-ctrl-grp"
+        ],
+        [
+          "Земля.ctrl.one",
+          "earth-ctrl-one"
+        ],
+        [
+          "Земля.debuff.all",
+          "earth-debuff-all"
+        ],
+        [
+          "Земля.debuff.grp",
+          "earth-debuff-grp"
+        ],
+        [
+          "Земля.debuff.one",
+          "earth-debuff-one"
+        ],
+        [
+          "Земля.buff.all",
+          "earth-buff-all"
+        ],
+        [
+          "Земля.buff.grp",
+          "earth-buff-grp"
+        ],
+        [
+          "Земля.buff.one",
+          "earth-buff-one"
+        ]
+      ],
+      "subject": "The magic school of this sheet is Earth: amber-orange Rubidium crystals (#EB9D40) glowing from within cracks in dark brown and grey rock, ochre dust, gnarled roots and warm clay; poison is a thick sickly mustard-yellow venom; the light from below is amber-orange. Attacking spells are heavy, jagged and crushing — dark rock split by glowing amber cracks. Supporting spells — healing, living sap, shields and strength for allies — glow a softer warm gold and honey-amber with rounded, calm shapes. A spell for all targets shows something wide that fills its cell; a spell for two or three targets shows two or three of its thing; a spell for one target shows one focused object. Attacks move to the right, toward the enemies. Every icon, even the widest, is built around one clear central object with a bold silhouette — never only smoke, dust, snow, fog or a scattered pattern.\n\nThe grid: exactly 6 columns and 4 rows, 24 icons.\n\nRow 1: a massive rockfall — a cliff breaking apart and a torrent of dark boulders tumbling down to the right across the whole width, amber light glowing in the cracks of the falling rocks; a round boulder bursting apart in mid-air into three big jagged shards of amber-veined rock that fly to the right; a single huge stone spike erupting from cracked ground and thrusting up and to the right, glowing amber magma in its cracks; an old tree stump cut flat, its rings welling up with glowing golden sap that overflows and spreads across the ground in soft streams; three smooth round cakes of red-brown healing clay on a flat stone, soft golden light seeping from their cracks; a large geode split open into two halves, its hollow heart lined with amber crystals shining warm gold.\n\nRow 2: a wide curved wall of massive standing stones rising from the ground across the whole cell, warm amber light glowing between the stones; three tall rough slabs of stone standing side by side like shields, each edged with warm amber light; one lone tall crag of dark rock standing firm like a tower shield, a warm golden glow along its edge; a big puffball mushroom in the center bursting open and releasing a wide cloud of sickly mustard-yellow spores that spreads over the whole cell; three tall thorns of dark stone growing from the ground in a cluster, thick yellow venom dripping down them into small puddles; the head of a viper with scales like stone, rearing and striking to the right, its fangs bared and dripping yellow venom.\n\nRow 3: a great gnarled root arching across the whole cell like a bridge, many drops of glowing golden dew hanging from it; three young curling roots rising from dark soil, each holding a glowing golden bud; one thick drop of glowing golden resin sliding down the rough bark of a dark pine trunk; an ancient stone cauldron in the center overflowing with heavy mustard-yellow fog that rolls out across the ground over the whole cell; two thick roots bursting out of the cracked ground and twisting into tight coils like snares; one armoured leg sunk up to the knee in a pillar of solid rock that has grown up around it and grips it fast.\n\nRow 4: a row of five dark iron shields standing edge to edge across the whole cell, all cracked and crumbling, grey dust pouring from the cracks; two dark iron shields, each split in half by a jagged crack, amber light glowing in the cracks; one dark iron breastplate crumbling into sand and pebbles from its edges; a range of dark mountain peaks filling the whole width, their tops glowing warm gold under a soft golden sky; two heavy helmets hewn from grey granite, warm golden light glowing in their seams; one bare forearm covered in overlapping plates of stone like scales, warm golden light in the seams between the plates."
+    },
+    {
+      "id": "spell-earth-ult",
+      "category": "spell-icons",
+      "title": "Земля — 8 ульт, 4 пассивки, 4 реакции сеткой 4×4",
+      "source": "tools/content-gen/abilities/library.json, набор «Земля», ult, passive, reaction; docs/content/библиотека-способностей.md",
+      "aspect": "1:1",
+      "size": "2K",
+      "grid": [
+        4,
+        4
+      ],
+      "cells": [
+        [
+          "Земля.ult.dmg",
+          "earth-ult-dmg"
+        ],
+        [
+          "Земля.ult.heal",
+          "earth-ult-heal"
+        ],
+        [
+          "Земля.ult.shield",
+          "earth-ult-shield"
+        ],
+        [
+          "Земля.ult.dot",
+          "earth-ult-dot"
+        ],
+        [
+          "Земля.ult.hot",
+          "earth-ult-hot"
+        ],
+        [
+          "Земля.ult.ctrl",
+          "earth-ult-ctrl"
+        ],
+        [
+          "Земля.ult.debuff",
+          "earth-ult-debuff"
+        ],
+        [
+          "Земля.ult.buff",
+          "earth-ult-buff"
+        ],
+        [
+          "Земля.pas.1",
+          "earth-pas-1"
+        ],
+        [
+          "Земля.pas.2",
+          "earth-pas-2"
+        ],
+        [
+          "Земля.pas.3",
+          "earth-pas-3"
+        ],
+        [
+          "Земля.pas.4",
+          "earth-pas-4"
+        ],
+        [
+          "Земля.react.1",
+          "earth-react-1"
+        ],
+        [
+          "Земля.react.2",
+          "earth-react-2"
+        ],
+        [
+          "Земля.react.3",
+          "earth-react-3"
+        ],
+        [
+          "Земля.react.4",
+          "earth-react-4"
+        ]
+      ],
+      "subject": "The magic school of this sheet is Earth: amber-orange Rubidium crystals (#EB9D40) glowing from within cracks in dark brown and grey rock, ochre dust, gnarled roots and warm clay; poison is a thick sickly mustard-yellow venom; the light from below is amber-orange. Attacking spells are heavy, jagged and crushing — dark rock split by glowing amber cracks. Supporting spells — healing, living sap, shields and strength for allies — glow a softer warm gold and honey-amber with rounded, calm shapes. Every icon, even the widest, is built around one clear central object with a bold silhouette — never only smoke, dust, snow, fog or a scattered pattern.\n\nThe grid: exactly 4 columns and 4 rows, 16 icons. Rows 1 and 2 are ultimate spells — the grandest, most epic images of the set, bigger in scale, with bright gold highlights in the amber light. Row 3 are passive traits — calm, emblem-like single objects, no action. Row 4 are reactions — an instant answer to an event in battle, shown as one moment of action.\n\nRow 1: an enormous stone sarcophagus lid of dark rock crashing down from above onto a single point, the ground around it cracking into glowing amber rifts; a colossal cluster of amber crystals erupting from the ground in a burst of warm golden light, golden motes showering down; a massive fortress tower of dark stone rising from the rock, its walls veined with glowing amber and bright gold; a gigantic bloated toadstool towering over a dead field, releasing a vast storm of mustard-yellow spores over the whole cell.\n\nRow 2: the roots of an ancient colossal tree wrapped around a great boulder, rivers of glowing golden sap running through them; a whole army of warriors turned into grey stone statues, standing in rows that fade into the dark, frozen mid-stride, amber light in their cracks; the ground splitting open in a huge jagged rift across the whole cell, amber magma glowing from below, rocks and a broken shield tumbling into it; a huge round shield carved from one slab of dark granite, rimmed with bright gold and glowing golden veins, boulders shattering against it.\n\nRow 3: a knot of thick roots gripping a round stone tightly; a slab of dark rock with veins of glowing mustard-yellow venom running through it like ore; one deep boot print sunk into cracked stone, cracks radiating from it; a smooth round river stone balanced on top of a larger stone, a thin line of golden light around them.\n\nRow 4: an enemy blade glancing off a round stone buckler that has just sprung up, stone chips and sparks flying; a heavy war hammer striking a stone-armoured chest, the hammer's head shattering into pieces; a cracked stone warrior statue still standing, golden light pouring out of its cracks and holding it together; a dead enemy's iron gauntlet lying open on the ground, a cloud of mustard-yellow spores bursting out of it and drifting to the right."
+    }
+  ]
+}
