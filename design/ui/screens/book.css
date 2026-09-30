@@ -7,8 +7,9 @@
    Без выгруженного арта обложку, разворот, замок и ленту рисует CSS (.hb-cvc, .hb-spc; html без классов hb-lk, hb-rn, hb-sr, hb-ep,
    hb-lf). Цвет редкости на нейтральной ленте и звезде — наложение multiply по контуру clip-path (маска-картинка у страницы с диска не
    грузится). Движение — только transform и opacity; время — от нажатия: задержки --d-* (момент − прошло), перерисовка не рвёт показ;
-   при «меньше движения» — без полёта и листов, плавная смена. Свои классы — hb-*; хвосты прежней карточки: .hk-img, .hk-sil,
-   .hk-sh — в heroes.css. */
+   при «меньше движения» — без полёта и листов, плавная смена. Свои классы — hb-*; корешок книги — hs-* (книга на полке боком:
+   нижняя полка отрядов, отсеки шкафа, грань книги в полёте — «Библиотека Этриона», screens/library.css); хвосты прежней карточки:
+   .hk-img, .hk-sil, .hk-sh — в heroes.css. */
 
 /* ---------- книга: кнопка, обложка 9 : 16, ленты под ней ---------- */
 .hb{position:relative;display:flex;flex-direction:column;width:100%;min-width:0;padding:0;border:0;background:none;color:var(--parch);text-align:left;cursor:pointer;
@@ -36,7 +37,7 @@
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
 /* материал ступеней без арта: 1 — мягкая кожа; 2 — тёмная кожа в воронёном железе; 3 — бронзовый оклад с резьбой; 4 — чёрная кожа,
    железо и кость; 5 — воронёное железо, кость и свет обреза страниц */
-.hb,.hb-win{--hb-mat:radial-gradient(90% 60% at 30% 20%,rgba(255,220,170,.12),transparent 60%),linear-gradient(160deg,#8a5b3a,#5a3a24 45%,#704a2e 70%,#3e2818);
+.hb,.hb-win,.hs{--hb-mat:radial-gradient(90% 60% at 30% 20%,rgba(255,220,170,.12),transparent 60%),linear-gradient(160deg,#8a5b3a,#5a3a24 45%,#704a2e 70%,#3e2818);
   --hb-rim:inset 0 0 0 .8cqw rgba(30,18,10,.8),inset 0 0 0 1.6cqw rgba(160,110,70,.25),inset 0 0 6cqw rgba(0,0,0,.5)}
 [data-t="2"]{--hb-mat:linear-gradient(135deg,#6d7278 0 7%,transparent 7% 93%,#6d7278 93%),linear-gradient(225deg,#6d7278 0 7%,transparent 7% 93%,#6d7278 93%),linear-gradient(160deg,#35383c,#1b1d20 50%,#2c2f33);
   --hb-rim:inset 0 0 0 3cqw #3d4146,inset 0 0 0 3.8cqw #121315,inset 0 0 8cqw rgba(0,0,0,.6)}
@@ -165,6 +166,43 @@ html.hb-sr .hb-rb i.on b::after{content:"";position:absolute;inset:0;background:
 .hb.blank.sel .hb-bk{filter:drop-shadow(0 0 1.6cqw var(--spirit))}
 @media (prefers-reduced-motion:reduce){ .hb-fx i{animation:none;opacity:.55;bottom:calc(8% + var(--x) / 5)} .hb-l.ready::after{animation:none;opacity:.8} .hb{transition:none} }
 
+/* ---------- корешок книги: книга на полке боком ----------
+   Материал — ступень книги (рисунок корешка, HB_ART.spine, или материал ступени --hb-mat без арта); редкость — кристалл --rico и ярлык
+   цвета --rc; класс — значок в круге; уровень — табличка внизу; имя — вдоль ярлыка, снизу вверх. Корешок — контейнер размера: знаки —
+   доли его ширины и высоты, одна раскладка — от корешка в отсеке шкафа до грани книги в полёте. Высота — --sh (задаёт полка), ширина —
+   толщина книги своей ступени (--sr, ‰ высоты) */
+.hs{--sh:96px;position:relative;flex:none;display:block;width:calc(var(--sh) * var(--sr, 280) / 1000);height:var(--sh);padding:0;border:0;background:none;color:var(--parch);
+  container-type:size;cursor:pointer;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;transition:transform .15s ease}
+button.hs:hover{transform:translateY(-3px)}
+button.hs:active{transform:translateY(-5px)}
+.hs:focus-visible{outline:none}
+.hs:focus-visible>.hs-a,.hs:focus-visible>.hs-c{filter:drop-shadow(0 0 3px var(--spirit)) drop-shadow(0 0 1px var(--spirit))}
+.hs-a{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;-webkit-user-drag:none;user-select:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.8))}
+.hs-c{position:absolute;inset:0;border-radius:3px 3px 2px 2px;background:var(--hb-mat);box-shadow:var(--hb-rim),0 2px 4px rgba(0,0,0,.7)}
+.hs-cr{position:absolute;left:50%;top:4%;z-index:2;width:46cqw;aspect-ratio:1;transform:translateX(-50%);
+  background:var(--rico) center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.9)) drop-shadow(0 0 2px color-mix(in srgb,var(--rc) 70%,transparent))}
+.hs-k{position:absolute;left:50%;top:18%;z-index:2;width:64cqw;aspect-ratio:1;transform:translateX(-50%);display:grid;place-items:center;border-radius:50%;
+  background:radial-gradient(circle at 50% 35%,#3a2d20,#120e0a 72%);box-shadow:inset 0 0 0 1px #8f6c3c,0 1px 2px rgba(0,0,0,.8)}
+.hs-k .ico,.hs-k .i{width:74%;height:74%}
+.hs-l{position:absolute;left:20%;right:20%;top:36%;bottom:21%;z-index:1;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:2px;
+  background:linear-gradient(90deg,color-mix(in srgb,var(--rc) 36%,#000),color-mix(in srgb,var(--rc) 56%,#140e08) 50%,color-mix(in srgb,var(--rc) 36%,#000));
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--rc) 45%,#c9a26a),0 0 0 1px rgba(0,0,0,.55)}
+.hs-l b{display:block;max-height:94%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;writing-mode:vertical-rl;transform:rotate(180deg);
+  font:700 34cqw/1 var(--f-u);letter-spacing:.01em;color:#f4ead2;text-shadow:0 1px 1px rgba(0,0,0,.9)}
+.hs-v{position:absolute;left:10%;right:10%;bottom:4%;z-index:2;height:15cqh;display:grid;place-items:center;border-radius:2px;
+  background:linear-gradient(180deg,#2c2723,#141210);box-shadow:inset 0 0 0 1px #6d6252,0 1px 2px rgba(0,0,0,.8);font:700 36cqw/1 var(--f-u);color:#f7e8c6;letter-spacing:-.02em}
+/* корешок в отсеке шкафа: только материал и ярлык цвета редкости — знаки мелкие не читаются */
+.hs[data-z="s"]{cursor:inherit}
+.hs[data-z="s"]>.hs-cr{display:none}
+.hs[data-z="s"]>.hs-l{left:20%;right:20%;top:30%;bottom:24%}
+/* занят (забег): тусклый; выбран — приподнят */
+.hs.dim>.hs-a,.hs.dim>.hs-c{filter:grayscale(.75) brightness(.5)}
+.hs.dim>.hs-l,.hs.dim>.hs-k{opacity:.55}
+.hs.sel{transform:translateY(-6px)}
+/* книгу сняли с полки — она в полёте открытия или закрытия: на своём месте её нет, пока не вернётся */
+.hb.away,.hs.away{opacity:0;transition:none;pointer-events:none}
+@media (prefers-reduced-motion:reduce){ .hs{transition:none} }
+
 /* ---------- окно героя — раскрытая книга ----------
    Слой поверх сетки (коллекция, «За золото») или окно поверх любого экрана (.ov.hb-ov). Разворот своей ступени во всё окно (не шире
    --hb-mw), справа — выступ замков (--hb-lkw), снизу — полоса лент (--hb-rbh). Книга — контейнер размера: знаки — в px и долях */
@@ -283,13 +321,18 @@ html.hb-lk .hb-lks .hb-l.on{filter:drop-shadow(0 0 6px rgba(72,229,212,.8)) drop
    Закрытие — то же назад: страницы гаснут, обложка закрывается, книга летит в сетку */
 .hb-anim{position:absolute;inset:0;z-index:5;pointer-events:none}
 .hb-fly{position:absolute;z-index:4;transform-origin:0 0;perspective:1600px;perspective-origin:0 50%}
+/* объём книги: поворот — вокруг середины объёма (толщина --th — корешок своей ступени); r1 — книга выдвигается с полки и встаёт
+   корешком, r2 — в полёте разворачивается обложкой (у закрытия — к корешку, если летит на нижнюю полку) */
+.hb-r1,.hb-r2{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:50% 50% calc(var(--th,0px) / -2)}
 .hb-cv3{position:absolute;inset:0;z-index:2;transform-origin:0 50%;transform-style:preserve-3d}
+.hb-spn{position:absolute;top:0;bottom:0;left:calc(-1 * var(--th,0px));width:var(--th,0px);transform-origin:100% 50%;transform:rotateY(-90deg);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.hb-spn>.hs{width:100%;height:100%}
 .hb-cvf,.hb-cvb{position:absolute;inset:0;display:block;backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .hb-cvf>.hb-bk{width:100%;height:100%}
 .hb-cvb{transform:rotateY(180deg);border-radius:3% / 2%;background:linear-gradient(135deg,#28303a,#10151a);box-shadow:inset 0 0 0 5px #3b2616,inset 0 0 20px rgba(0,0,0,.6)}
 html.hb-ep .hb-cvb{background:var(--hb-endp) center/100% 100% no-repeat}
 /* обрез страниц под обложкой: видно, пока обложка поднимается */
-.hb-edge{position:absolute;z-index:1;inset:1.5% 1% 1.5% 0;border-radius:0 3px 3px 0;background:linear-gradient(90deg,#8a7148,#e3d1a8 20%,#d8c59a),repeating-linear-gradient(0deg,rgba(0,0,0,.08) 0 2px,transparent 2px 4px)}
+.hb-edge{position:absolute;z-index:1;inset:1.5% 1% 1.5% 0;transform:translateZ(-1px);border-radius:0 3px 3px 0;background:linear-gradient(90deg,#8a7148,#e3d1a8 20%,#d8c59a),repeating-linear-gradient(0deg,rgba(0,0,0,.08) 0 2px,transparent 2px 4px)}
 .hb-leaf{position:absolute;z-index:3;left:calc(var(--rl) * 1% / 10);right:calc(var(--rr) * 1% / 10);top:calc(var(--rt) * 1% / 10);bottom:calc(var(--rb) * 1% / 10);perspective:1600px;perspective-origin:0 50%}
 .hb-leaf::before{content:"";position:absolute;inset:0;transform-origin:0 50%;border-radius:0 6px 6px 0;opacity:0;
   background:linear-gradient(90deg,rgba(90,70,40,.4),transparent 14%),linear-gradient(180deg,#eadab2,#d9c498);box-shadow:0 4px 14px rgba(0,0,0,.35)}
@@ -301,9 +344,11 @@ html.hb-lf .hb-leaf::before{background:linear-gradient(90deg,rgba(60,45,25,.35),
 .hb-dust,.hb-spk{position:absolute;inset:0;z-index:5;pointer-events:none}
 .hb-dust i{position:absolute;left:var(--x);top:var(--y);width:3px;height:3px;border-radius:50%;background:#efdfb8;box-shadow:0 0 4px rgba(239,223,184,.8);opacity:0}
 .hb-spk i{position:absolute;left:calc(var(--gx) * 1% / 10);top:46%;width:4px;height:4px;border-radius:50%;background:color-mix(in srgb,var(--rc) 45%,#fff);box-shadow:0 0 6px 1px var(--rc);opacity:0}
-/* открытие */
-.hb-win.in .hb-scrim{animation:hb-in var(--t-fly) ease-out var(--d-fly) both}
+/* открытие: книга выдвигается с полки к игроку и встаёт корешком, летит в центр и разворачивается обложкой, обложка открывается */
+.hb-win.in .hb-scrim{animation:hb-in var(--t-go) ease-out var(--d-pull) both}
 .hb-win.in .hb-fly{animation:hb-fly var(--t-fly) cubic-bezier(.3,.7,.2,1) var(--d-fly) both,hb-out 200ms linear var(--d-show) both}
+.hb-win.in .hb-r1{animation:hb-pull var(--t-pull) cubic-bezier(.3,.6,.3,1) var(--d-pull) both}
+.hb-win.in .hb-r2{animation:hb-face var(--t-fly) cubic-bezier(.4,.1,.3,1) var(--d-fly) both}
 .hb-win.in .hb-cv3{animation:hb-open var(--t-cv) cubic-bezier(.45,.05,.25,1) var(--d-cv) both}
 .hb-win.in .hb-spa,.hb-win.in .hb-spc,.hb-win.in .hb-aura{animation:hb-appear 360ms ease-out var(--d-cv) both}
 .hb-win.in .hb-pg,.hb-win.in .hb-lks,.hb-win.in .hb-book>.hb-rb,.hb-win.in .hb-book>.hb-cr,.hb-win.in .hb-x{animation:hb-in var(--t-show) ease-out var(--d-show) both}
@@ -318,6 +363,7 @@ html.hb-lf .hb-leaf::before{background:linear-gradient(90deg,rgba(60,45,25,.35),
 .hb-win.out .hb-spa,.hb-win.out .hb-spc,.hb-win.out .hb-aura{animation:hb-appear var(--t-cv) ease-in var(--d-cv) reverse both}
 .hb-win.out .hb-fly{animation:hb-in var(--t-hide) linear var(--d-hide) both,hb-fly var(--t-fly) cubic-bezier(.6,0,.8,.4) var(--d-fly) reverse both}
 .hb-win.out .hb-cv3{animation:hb-open var(--t-cv) cubic-bezier(.45,.05,.25,1) var(--d-cv) reverse both}
+.hb-win.out .hb-r2{animation:hb-back var(--t-fly) cubic-bezier(.6,0,.8,.4) var(--d-fly) both}
 .hb-win.out .hb-scrim{animation:hb-out var(--t-fly) ease-in var(--d-fly) both}
 /* ‹ ›: лист перелистывается вперёд (справа налево) или назад, страницы проступают */
 .hb-leaf.turn{z-index:3}
@@ -330,7 +376,10 @@ html.hb-lf .hb-leaf::before{background:linear-gradient(90deg,rgba(60,45,25,.35),
 .hb-win.fade .hb-stage,.hb-win.fade .hb-scrim{animation:hb-in var(--t-fade) ease-out var(--d-fade) both}
 @keyframes hb-in{from{opacity:0}to{opacity:1}}
 @keyframes hb-out{from{opacity:1}to{opacity:0}}
-@keyframes hb-fly{0%{transform:translate(var(--fx),var(--fy)) scale(calc(var(--fs) / 1000))}26%{transform:translate(var(--fx),calc(var(--fy) - 12px)) scale(calc(var(--fs) / 1000 * 1.06))}100%{transform:translate(0,0) scale(1)}}
+@keyframes hb-fly{0%{transform:translate(var(--fx),var(--fy)) scale(calc(var(--fs) / 1000))}100%{transform:translate(0,0) scale(1)}}
+@keyframes hb-pull{0%{transform:translate3d(0,0,0) rotateY(var(--r0,0deg))}100%{transform:translate3d(0,var(--lift,0px),var(--near,0px)) rotateY(90deg)}}
+@keyframes hb-face{0%{transform:rotateY(0deg) translate3d(0,0,0)}100%{transform:rotateY(-90deg) translate3d(0,calc(-1 * var(--lift,0px)),calc(-1 * var(--near,0px)))}}
+@keyframes hb-back{0%{transform:rotateY(0deg)}100%{transform:rotateY(var(--r1,0deg))}}
 @keyframes hb-open{from{transform:rotateY(0deg)}to{transform:rotateY(-180deg)}}
 @keyframes hb-appear{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
 @keyframes hb-leaf{0%{opacity:0;transform:rotateY(0deg)}10%{opacity:1}100%{opacity:1;transform:rotateY(-180deg)}}

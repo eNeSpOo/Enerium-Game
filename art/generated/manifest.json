@@ -47110,6 +47110,521 @@
         1152
       ],
       "sha256": "9e51ee978367bb714c10df295e1b87f9418cb4d23615b311d05f8e3b6c7a3f6c"
+    },
+    {
+      "file": "art/generated/lb-texture/lb-wall__nb2.jpg",
+      "category": "lb-texture",
+      "job": "lb-wall",
+      "title": "Задняя стенка шкафа — тёмные доски старого дуба, бесшовно",
+      "source": "Слово автора 30.09.2026: «задний фон показывает, что они условно находятся на полках огромного древнего шкафа». Фон за книгами «Моих», каталога, «За золото» и отрядов. К выгрузке — design/ui/assets/art/library/wall.jpg",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-30T08:16:39+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: dark fantasy game art for a mobile RPG — gloomy, heavy, ancient and uneasy. Hand-painted digital painting: visible confident brush strokes, simplified planes, deep near-black shadows, crisp rim light on edges. A muted, desaturated palette: soot black (#050607, #121518), graphite (#262B31), very dark old oak, blackened iron, dark bronze, yellowed bone. Everything is matte, worn, dusty and aged: no gloss, no varnish shine, no polished or bright gold, no clean saturated game-UI colors. Light is scarce and precious and comes from below: a cold turquoise glow of karst crystals (#48E5D4) from beneath, and only a few warm amber highlights (#E6A84B). This is the archive of an immense ancient tower that belongs to a keeper of knowledge: vast, cold, silent and dusty — not cosy, not a home library, not a shop. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.\n\nDraw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a flat seamless texture for a game UI, seen perfectly straight on, filling the whole canvas edge to edge: no border, no frame, no margin, no perspective, no vignette, no light spot, no shadow falling on it. The texture tiles seamlessly: whatever touches the left edge continues from the right edge, and whatever touches the top edge continues from the bottom edge. Even, calm and low in contrast, and very dark: it sits behind rows of brightly painted books and must never compete with them.\n\nThe texture: the back wall of an immense ancient bookcase — tall vertical boards of very dark, almost black old oak, worn smooth by centuries: faint vertical grain, fine dry cracks and narrow dark seams between the boards. The boards are all the same width — exactly one sixth of the canvas each, six boards across — and every board runs from the top edge to the bottom edge. A few old iron nail heads, dull and dark. Nearly black overall, from #0B0907 to #1C1612, with only a very faint cold turquoise sheen in the grain; no bright spots, no light falling on it.\n\nNo words, no letters, no digits, no numbers, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no titles or labels on spines, plates or boards, no handwriting, no watermark, no signature, no logo. No skulls, no skeletons, no blood. No pentagrams, no occult signs, no crosses, no religious symbols, no eyes, no faces. No people, no hands, no creatures, no candles with dripping wax. No bright polished gold, no glossy shine, no clean bright mobile-game UI look.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 615,
+        "candidatesTokenCount": 1532,
+        "totalTokenCount": 2147,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 615
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0687,
+      "seconds": 11.1,
+      "status": "референс, не утверждён",
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "a8cbc9af8ca37791c093b49c423e11ad1214da1c370c612aa6e81595fdfdc0c3"
+    },
+    {
+      "file": "art/generated/lb-strip/lb-plank__nb2.png",
+      "category": "lb-strip",
+      "job": "lb-plank",
+      "title": "Полка — толстая доска с железной кромкой, повторяется по горизонтали",
+      "source": "Каждый ряд книг стоит на своей полке (слово автора 30.09.2026: «каждая на своём ряде»). К выгрузке — design/ui/assets/art/library/plank.png",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-30T08:16:51+03:00",
+      "params": {
+        "aspectRatio": "21:9",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: dark fantasy game art for a mobile RPG — gloomy, heavy, ancient and uneasy. Hand-painted digital painting: visible confident brush strokes, simplified planes, deep near-black shadows, crisp rim light on edges. A muted, desaturated palette: soot black (#050607, #121518), graphite (#262B31), very dark old oak, blackened iron, dark bronze, yellowed bone. Everything is matte, worn, dusty and aged: no gloss, no varnish shine, no polished or bright gold, no clean saturated game-UI colors. Light is scarce and precious and comes from below: a cold turquoise glow of karst crystals (#48E5D4) from beneath, and only a few warm amber highlights (#E6A84B). This is the archive of an immense ancient tower that belongs to a keeper of knowledge: vast, cold, silent and dusty — not cosy, not a home library, not a shop. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.\n\nDraw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — ONE long, perfectly straight horizontal strip, seen straight on from the front, perfectly level, no perspective, no tilt, no bending. It runs across the whole width of the canvas: its left and right ends are cut off by the left and right edges of the canvas, so the strip continues seamlessly when copies are placed side by side. It lies in the middle of the canvas and takes about one fifth of the canvas height; above and below it the canvas is solid pure black. Its detail repeats evenly along its length: nothing special or unique happens in the middle or near the ends.\n\nThe strip: the front of one thick, heavy shelf board of an immense ancient bookcase. Its upper quarter is the narrow top surface of the board seen from slightly above — dark oak worn a little lighter where books have stood for centuries, with a thin layer of dust. Below it, the thick front edge of the board: very dark old oak, and along its lower half a straight flat band of blackened iron fixed with small round rivets at even intervals. The lower rim of the iron band catches a thin line of cold turquoise light (#48E5D4) from below. Nothing stands on the shelf, nothing hangs from it, no brackets under it.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no wall, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance.\n\nNo words, no letters, no digits, no numbers, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no titles or labels on spines, plates or boards, no handwriting, no watermark, no signature, no logo. No skulls, no skeletons, no blood. No pentagrams, no occult signs, no crosses, no religious symbols, no eyes, no faces. No people, no hands, no creatures, no candles with dripping wax. No bright polished gold, no glossy shine, no clean bright mobile-game UI look.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 705,
+        "candidatesTokenCount": 1710,
+        "totalTokenCount": 2415,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 705
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0693,
+      "seconds": 12.1,
+      "status": "референс, не утверждён",
+      "raw": "art/generated/lb-strip/lb-plank__nb2.raw.jpg",
+      "cutout": {
+        "key": "black",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.675,
+        "opaque_share": 0.241,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 0.925,
+        "ok": true
+      },
+      "px": [
+        1584,
+        672
+      ],
+      "sha256": "15210e3de732b2cbdf7c6b17a497bdc7b2d35bd64f2ee5d43fbe5e00c50461df"
+    },
+    {
+      "file": "art/generated/lb-strip/lb-cornice__nb2.png",
+      "category": "lb-strip",
+      "job": "lb-cornice",
+      "title": "Карниз шкафа — резной брус, повторяется по горизонтали",
+      "source": "Карниз шкафа: на нём — счётчики, порядок и фильтр (правила воздуха, ADR-0026). К выгрузке — design/ui/assets/art/library/cornice.png",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-30T08:17:01+03:00",
+      "params": {
+        "aspectRatio": "21:9",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: dark fantasy game art for a mobile RPG — gloomy, heavy, ancient and uneasy. Hand-painted digital painting: visible confident brush strokes, simplified planes, deep near-black shadows, crisp rim light on edges. A muted, desaturated palette: soot black (#050607, #121518), graphite (#262B31), very dark old oak, blackened iron, dark bronze, yellowed bone. Everything is matte, worn, dusty and aged: no gloss, no varnish shine, no polished or bright gold, no clean saturated game-UI colors. Light is scarce and precious and comes from below: a cold turquoise glow of karst crystals (#48E5D4) from beneath, and only a few warm amber highlights (#E6A84B). This is the archive of an immense ancient tower that belongs to a keeper of knowledge: vast, cold, silent and dusty — not cosy, not a home library, not a shop. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.\n\nDraw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — ONE long, perfectly straight horizontal strip, seen straight on from the front, perfectly level, no perspective, no tilt, no bending. It runs across the whole width of the canvas: its left and right ends are cut off by the left and right edges of the canvas, so the strip continues seamlessly when copies are placed side by side. It lies in the middle of the canvas and takes about one fifth of the canvas height; above and below it the canvas is solid pure black. Its detail repeats evenly along its length: nothing special or unique happens in the middle or near the ends.\n\nThe strip: the heavy carved cornice that crowns an immense ancient bookcase — a thick horizontal beam of very dark old oak: a stepped moulding along its top edge, below it a calm flat band of dark wood (the widest part of the beam), and along its bottom edge a row of small carved dentils over a thin band of blackened iron with small rivets. Faint warm amber light (#E6A84B) touches the upper edges of the moulding; a thin cold turquoise rim of light (#48E5D4) runs under the dentils from below. The flat middle band stays dark, calm and plain.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no wall, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance.\n\nNo words, no letters, no digits, no numbers, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no titles or labels on spines, plates or boards, no handwriting, no watermark, no signature, no logo. No skulls, no skeletons, no blood. No pentagrams, no occult signs, no crosses, no religious symbols, no eyes, no faces. No people, no hands, no creatures, no candles with dripping wax. No bright polished gold, no glossy shine, no clean bright mobile-game UI look.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 699,
+        "candidatesTokenCount": 1587,
+        "totalTokenCount": 2286,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 699
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.069,
+      "seconds": 9.1,
+      "status": "референс, не утверждён",
+      "raw": "art/generated/lb-strip/lb-cornice__nb2.raw.jpg",
+      "cutout": {
+        "key": "black",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.652,
+        "opaque_share": 0.3,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 0.931,
+        "ok": true
+      },
+      "px": [
+        1584,
+        672
+      ],
+      "sha256": "0d29d3420ad3b9ceaf9378f4aba87997662a019d0b2d5691babd0920a90e8a7f"
+    },
+    {
+      "file": "art/generated/lb-post/lb-post__nb2.png",
+      "category": "lb-post",
+      "job": "lb-post",
+      "title": "Резная боковая стойка шкафа, повторяется по вертикали",
+      "source": "Стойки по бокам шкафа; прокрутка идёт вдоль шкафа, стойки стоят. К выгрузке — design/ui/assets/art/library/post.png",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-30T08:17:12+03:00",
+      "params": {
+        "aspectRatio": "9:16",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: dark fantasy game art for a mobile RPG — gloomy, heavy, ancient and uneasy. Hand-painted digital painting: visible confident brush strokes, simplified planes, deep near-black shadows, crisp rim light on edges. A muted, desaturated palette: soot black (#050607, #121518), graphite (#262B31), very dark old oak, blackened iron, dark bronze, yellowed bone. Everything is matte, worn, dusty and aged: no gloss, no varnish shine, no polished or bright gold, no clean saturated game-UI colors. Light is scarce and precious and comes from below: a cold turquoise glow of karst crystals (#48E5D4) from beneath, and only a few warm amber highlights (#E6A84B). This is the archive of an immense ancient tower that belongs to a keeper of knowledge: vast, cold, silent and dusty — not cosy, not a home library, not a shop. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.\n\nDraw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — ONE tall, perfectly straight vertical post, seen straight on from the front, perfectly upright, no perspective, no tilt. It stands in the middle of the canvas and is about one quarter of the canvas width. It runs through the whole height of the canvas: its top and bottom are cut off by the top and bottom edges of the canvas, so the post continues seamlessly when copies are placed one above another. To its left and right the canvas is solid pure black. Its detail repeats evenly along its length: nothing special or unique happens near the top or the bottom.\n\nThe post: a side post (pilaster) of an immense ancient bookcase in very dark old oak: a flat front face framed by two raised carved mouldings running straight down its whole length; down the middle of the face runs a narrow carved channel of interlaced knotwork in the same dark wood. Exactly in the middle of the canvas height a band of blackened iron with two round rivets crosses the post. A thin cold turquoise rim light (#48E5D4) runs along its left and right edges.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no wall, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance.\n\nNo words, no letters, no digits, no numbers, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no titles or labels on spines, plates or boards, no handwriting, no watermark, no signature, no logo. No skulls, no skeletons, no blood. No pentagrams, no occult signs, no crosses, no religious symbols, no eyes, no faces. No people, no hands, no creatures, no candles with dripping wax. No bright polished gold, no glossy shine, no clean bright mobile-game UI look.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 672,
+        "candidatesTokenCount": 1572,
+        "totalTokenCount": 2244,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 672
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0689,
+      "seconds": 10.1,
+      "status": "референс, не утверждён",
+      "raw": "art/generated/lb-post/lb-post__nb2.raw.jpg",
+      "cutout": {
+        "key": "black",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.791,
+        "opaque_share": 0.167,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 0.919,
+        "ok": true
+      },
+      "px": [
+        768,
+        1376
+      ],
+      "sha256": "1977f22069e471954a29bf198b15cfe6a39182ced13d5a69bd64ea338165b9f8"
+    },
+    {
+      "file": "art/generated/lb-part/lb-bracket__nb2.png",
+      "category": "lb-part",
+      "job": "lb-bracket",
+      "title": "Кованый кронштейн полки",
+      "source": "Полка лежит на кованых кронштейнах у стоек. К выгрузке — design/ui/assets/art/library/bracket.png",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-30T08:17:22+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: dark fantasy game art for a mobile RPG — gloomy, heavy, ancient and uneasy. Hand-painted digital painting: visible confident brush strokes, simplified planes, deep near-black shadows, crisp rim light on edges. A muted, desaturated palette: soot black (#050607, #121518), graphite (#262B31), very dark old oak, blackened iron, dark bronze, yellowed bone. Everything is matte, worn, dusty and aged: no gloss, no varnish shine, no polished or bright gold, no clean saturated game-UI colors. Light is scarce and precious and comes from below: a cold turquoise glow of karst crystals (#48E5D4) from beneath, and only a few warm amber highlights (#E6A84B). This is the archive of an immense ancient tower that belongs to a keeper of knowledge: vast, cold, silent and dusty — not cosy, not a home library, not a shop. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.\n\nDraw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — one small object, centered, seen perfectly straight on and perfectly upright. It floats on pitch black: everything around it is solid pure black, and an empty black margin of at least one tenth of the canvas stays on every side — top, bottom, left and right. It must stay readable at a tiny size, about 20 px: one simple strong silhouette built from a few large shapes, all the painterly detail inside the silhouette; no sparks, embers or particles floating around it. A crisp rim light runs along the outline and separates it from the black.\n\nThe object: one heavy forged shelf bracket (corbel) of blackened iron, seen straight from the front, shaped as a right-angled triangle: its top edge is a straight horizontal bar (a shelf rests on it), its left edge is a straight vertical bar fixed with two big round rivets, and between them a thick curved strut sweeps from the far end of the top bar down to the lower end of the vertical bar and curls into a tight spiral scroll inside the triangle. Worn, heavy, matte iron with a cold grey rim light; a thin turquoise glint (#48E5D4) on its lower edge from below.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no wall, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance.\n\nNo words, no letters, no digits, no numbers, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no titles or labels on spines, plates or boards, no handwriting, no watermark, no signature, no logo. No skulls, no skeletons, no blood. No pentagrams, no occult signs, no crosses, no religious symbols, no eyes, no faces. No people, no hands, no creatures, no candles with dripping wax. No bright polished gold, no glossy shine, no clean bright mobile-game UI look.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 698,
+        "candidatesTokenCount": 1630,
+        "totalTokenCount": 2328,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 698
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0691,
+      "seconds": 9.7,
+      "status": "референс, не утверждён",
+      "raw": "art/generated/lb-part/lb-bracket__nb2.raw.jpg",
+      "cutout": {
+        "key": "black",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.759,
+        "opaque_share": 0.237,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "3c1d1cfa81540e3a2b57062e4bb31179ae6a0cd6065e2f81d77c467ec20f925c"
+    },
+    {
+      "file": "art/generated/lb-part/lb-lamp__nb2.png",
+      "category": "lb-part",
+      "job": "lb-lamp",
+      "title": "Лампада с кристаллом карста",
+      "source": "Свет в шкафу: лампада на кронштейне, внутри — кристалл карста. К выгрузке — design/ui/assets/art/library/lamp.png",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-30T08:17:30+03:00",
+      "params": {
+        "aspectRatio": "9:16",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [],
+      "prompt": "Art style: dark fantasy game art for a mobile RPG — gloomy, heavy, ancient and uneasy. Hand-painted digital painting: visible confident brush strokes, simplified planes, deep near-black shadows, crisp rim light on edges. A muted, desaturated palette: soot black (#050607, #121518), graphite (#262B31), very dark old oak, blackened iron, dark bronze, yellowed bone. Everything is matte, worn, dusty and aged: no gloss, no varnish shine, no polished or bright gold, no clean saturated game-UI colors. Light is scarce and precious and comes from below: a cold turquoise glow of karst crystals (#48E5D4) from beneath, and only a few warm amber highlights (#E6A84B). This is the archive of an immense ancient tower that belongs to a keeper of knowledge: vast, cold, silent and dusty — not cosy, not a home library, not a shop. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.\n\nDraw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — one small object, centered, seen perfectly straight on and perfectly upright. It floats on pitch black: everything around it is solid pure black, and an empty black margin of at least one tenth of the canvas stays on every side — top, bottom, left and right. It must stay readable at a tiny size, about 20 px: one simple strong silhouette built from a few large shapes, all the painterly detail inside the silhouette; no sparks, embers or particles floating around it. A crisp rim light runs along the outline and separates it from the black.\n\nThe object: a small hanging lamp (lampada) of blackened iron: at the top a short straight chain ending in a ring, below it a round openwork iron cage with a pointed iron finial at the bottom; inside the cage a raw crystal of karst glows cold turquoise (#48E5D4) from within, and its light spills softly through the openwork onto the iron bars. The whole lamp, chain and ring included, is inside the canvas with the black margin around it.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no wall, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance.\n\nNo words, no letters, no digits, no numbers, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no titles or labels on spines, plates or boards, no handwriting, no watermark, no signature, no logo. No skulls, no skeletons, no blood. No pentagrams, no occult signs, no crosses, no religious symbols, no eyes, no faces. No people, no hands, no creatures, no candles with dripping wax. No bright polished gold, no glossy shine, no clean bright mobile-game UI look.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 669,
+        "candidatesTokenCount": 1481,
+        "totalTokenCount": 2150,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 669
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0686,
+      "seconds": 7.2,
+      "status": "референс, не утверждён",
+      "raw": "art/generated/lb-part/lb-lamp__nb2.raw.jpg",
+      "cutout": {
+        "key": "black-glow",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.853,
+        "opaque_share": 0.079,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        768,
+        1376
+      ],
+      "sha256": "88a5d78b1b99b97d29dbc4de35afc384d2fbf622abfb3ea5eb79a8b4e79029f0"
+    },
+    {
+      "file": "art/generated/lb-spines/lb-spines__nb2.png",
+      "category": "lb-spines",
+      "job": "lb-spines",
+      "title": "Корешки пяти ступеней книги — кожа, оковка, оклад, кодекс, гримуар",
+      "source": "Нижняя полка отрядов и отсеки шкафа: свободные герои стоят корешками. Ступень — личный максимум доблести, как у обложек books/cover-1…5 (ADR-0032). К выгрузке — design/ui/assets/art/library/spine-1…5.png",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-30T08:17:42+03:00",
+      "params": {
+        "aspectRatio": "16:9",
+        "imageSize": "1K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/book-cover/book-cover-1__nb2.raw.jpg",
+        "art/generated/book-cover/book-cover-2__nb2.raw.jpg",
+        "art/generated/book-cover/book-cover-3__nb2.raw.jpg",
+        "art/generated/book-cover/book-cover-4__nb2.raw.jpg",
+        "art/generated/book-cover/book-cover-5__nb2-v2.raw.jpg"
+      ],
+      "prompt": "Art style: dark fantasy game art for a mobile RPG — gloomy, heavy, ancient and uneasy. Hand-painted digital painting: visible confident brush strokes, simplified planes, deep near-black shadows, crisp rim light on edges. A muted, desaturated palette: soot black (#050607, #121518), graphite (#262B31), very dark old oak, blackened iron, dark bronze, yellowed bone. Everything is matte, worn, dusty and aged: no gloss, no varnish shine, no polished or bright gold, no clean saturated game-UI colors. Light is scarce and precious and comes from below: a cold turquoise glow of karst crystals (#48E5D4) from beneath, and only a few warm amber highlights (#E6A84B). This is the archive of an immense ancient tower that belongs to a keeper of knowledge: vast, cold, silent and dusty — not cosy, not a home library, not a shop. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.\n\nDraw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI sheet for a dark fantasy mobile RPG — FIVE closed books standing upright in one row, seen straight on at their spines: only the five spines are visible and they face the viewer, perfectly vertical, perfectly flat and frontal, no perspective, no tilt, no shelf under them. All five spines have the same height — about three quarters of the canvas height — and stand on one invisible line; each spine is about one ninth of the canvas width, and between the spines there are equal wide gaps of solid pure black, each at least half as wide as a spine. The whole canvas around and between the spines is solid pure black, with an empty black margin above, below and at both sides.\n\nThe attached images are the approved front covers of these five books, in order from book 1 to book 5. Each spine is the spine of its own book: the same material, metal, ornament, colors, wear and brushwork as its cover, only seen from the side. The interface later places a gem, a colored band, a class emblem and a number on each spine, so none of those are painted: the spines carry only their own material, bands and ornament, with a calm empty middle. Never copy the black window of the covers onto the spines.\n\nFrom left to right. BOOK 1: soft, worn, warm brown leather over a rounded spine with two raised leather bands near the top and the bottom, no metal at all. BOOK 2: dark grey-black leather with three bands of blackened iron with small rivets across it and iron caps at the top and the bottom. BOOK 3: brown leather under plates of dark aged bronze with carved interlaced knotwork along both edges and small bronze bosses near the top and the bottom. BOOK 4: black leather bound with riveted iron straps, with long pieces of carved yellowed bone set along it and a heavy round iron boss in the middle. BOOK 5: a grimoire — blackened riveted iron with short sharp spikes at its top and bottom corners, carved yellowed bone along it, and warm amber light (#E6A84B) glowing from the thin edges of the pages at the top of the spine.\n\nThe background is solid pure black (#000000), flat, edge to edge: no gradient, no texture, no floor, no wall, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance.\n\nNo words, no letters, no digits, no numbers, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no titles or labels on spines, plates or boards, no handwriting, no watermark, no signature, no logo. No skulls, no skeletons, no blood. No pentagrams, no occult signs, no crosses, no religious symbols, no eyes, no faces. No people, no hands, no creatures, no candles with dripping wax. No bright polished gold, no glossy shine, no clean bright mobile-game UI look.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 2183,
+        "candidatesTokenCount": 1656,
+        "totalTokenCount": 3839,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 893
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1290
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1120
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.0699,
+      "seconds": 11.6,
+      "status": "референс, не утверждён",
+      "raw": "art/generated/lb-spines/lb-spines__nb2.raw.jpg",
+      "cutout": {
+        "key": "black",
+        "mode": "RGBA",
+        "corners_max_alpha": 0,
+        "transparent_share": 0.422,
+        "opaque_share": 0.572,
+        "key_left_share": 0.0,
+        "raw_border_key_share": 1.0,
+        "ok": true
+      },
+      "px": [
+        1376,
+        768
+      ],
+      "sha256": "7c2ba50d2ce543c5a11039a8003d9543123ddc509272fbf36647b6451bc09395"
+    },
+    {
+      "file": "art/generated/spell-icons/spell-fire-active__nb2.jpg",
+      "category": "spell-icons",
+      "job": "spell-fire-active",
+      "title": "Огонь — 24 активки сеткой 6×4",
+      "source": "tools/content-gen/abilities/library.json, набор «Огонь», active; docs/content/библиотека-способностей.md",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-30T09:14:33+03:00",
+      "params": {
+        "aspectRatio": "3:2",
+        "imageSize": "4K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: a sheet of square ability icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the picture in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game puts its own frame on top: one clear central image with a bold silhouette that stays readable at 48 px, on a dark near-black stone background with faint cracks and a darker vignette toward the edges of the cell. Light rises from below in the color of the magic school; crisp rim light on the edges of the forms; a few sparks and dust motes in the light. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each icon differs clearly from its neighbours in shape and composition.\n\nThe magic school of this sheet is Fire: scarlet fire (#F0564A) with orange and amber flames, glowing embers, grey ash and soot-black stone; the light from below is scarlet and amber. Attacking spells burn a violent, jagged scarlet. Supporting spells — healing, warmth, shields and strength for allies — glow a softer warm gold and amber with rounded, calm shapes. A spell for all targets shows something wide that fills its cell; a spell for two or three targets shows two or three of its thing; a spell for one target shows one focused object. Attacks move to the right, toward the enemies.\n\nThe grid: exactly 6 columns and 4 rows, 24 icons.\n\nRow 1: a towering wave of scarlet fire rolling to the right across the ground, filling the whole width, its crest curling over like a breaking sea wave; a bright white-hot spark leaping to the right in a jagged chain of three arcs, a small burst of flame where each arc lands; a funeral pyre of stacked dark logs erupting into one huge column of scarlet flame, sparks spiralling upward; two cupped hands at the bottom releasing a wide, soft fan of warm golden breath full of glowing motes; three small soft golden flames rising like young sprouts from one bed of embers; a dagger blade glowing orange-hot, pressed flat against a strip of white linen bandage, a small puff of steam rising.\n\nRow 2: a huge translucent dome of warm amber flame arched over the dark ground like a protective vault; a circular wall of warm amber flames standing on the stone floor, seen from slightly above, a protective ring around a calm empty centre; a heavy round iron shield wreathed in amber flame, sparks bursting off its rim where a blow has just struck it; a wide low front of creeping scarlet fire spreading across dry grass and ash, many small flames side by side from edge to edge; a flaming torch flying in an arc to the right, trailing fire and dripping burning pitch that lights three small fires below; a charred log burning from within, deep cracks glowing scarlet, three tongues of flame rising from it.\n\nRow 3: a small campfire in a ring of stones seen from the side, its warm golden glow spreading around in soft rings, a few sparks drifting up; three smouldering golden coals nestled in soft grey ash, each with a gentle warm glow and tiny rising motes; a small stone hearth with an iron cooking pot hanging over a steady golden fire, warm light spilling out; thick choking black smoke billowing across the whole cell, scarlet embers smouldering inside it; two dense columns of grey smoke rising from smouldering coals and twisting together into a screen; a single blinding flash of white-hot flame bursting from one point, sharp radiant rays, the centre almost white.\n\nRow 4: grey ash falling like heavy snow over the whole cell, every flake glowing scarlet at its edge; two simple flame-shaped marks smeared in glowing ash on a dark stone surface, as if drawn with a finger; a red-hot branding iron with a simple flame-shaped head glowing scarlet, smoke curling from it; a wide iron brazier with five tall flames rising side by side and leaning together, scarlet and gold, sparks rushing upward; two crossed battle axes whose blades glow orange-hot, flames running along their edges; one sword standing upright, its blade glowing white-hot from hilt to tip, heat shimmer around it.\n\nNo text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1968,
+        "candidatesTokenCount": 3237,
+        "totalTokenCount": 5205,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 1194
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 774
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 2520
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1543,
+      "seconds": 41.5,
+      "status": "референс, не утверждён",
+      "px": [
+        5056,
+        3392
+      ],
+      "sha256": "ec6c4ff37dafe0ef7719d4a1cacf44f21b045a07d7c1da6b521c6d8ef0fbb7ec"
+    },
+    {
+      "file": "art/generated/spell-icons/spell-fire-ult__nb2.jpg",
+      "category": "spell-icons",
+      "job": "spell-fire-ult",
+      "title": "Огонь — 8 ульт, 4 пассивки, 4 реакции сеткой 4×4",
+      "source": "tools/content-gen/abilities/library.json, набор «Огонь», ult, passive, reaction; docs/content/библиотека-способностей.md",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-09-30T09:14:51+03:00",
+      "params": {
+        "aspectRatio": "1:1",
+        "imageSize": "2K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: a sheet of square ability icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the picture in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game puts its own frame on top: one clear central image with a bold silhouette that stays readable at 48 px, on a dark near-black stone background with faint cracks and a darker vignette toward the edges of the cell. Light rises from below in the color of the magic school; crisp rim light on the edges of the forms; a few sparks and dust motes in the light. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each icon differs clearly from its neighbours in shape and composition.\n\nThe magic school of this sheet is Fire: scarlet fire (#F0564A) with orange and amber flames, glowing embers, grey ash and soot-black stone; the light from below is scarlet and amber. Attacking spells burn a violent, jagged scarlet. Supporting spells — healing, warmth, shields and strength for allies — glow a softer warm gold and amber with rounded, calm shapes.\n\nThe grid: exactly 4 columns and 4 rows, 16 icons. Rows 1 and 2 are ultimate spells — the grandest, most epic images of the set, bigger in scale, with bright gold highlights in the fire. Row 3 are passive traits — calm, emblem-like single objects, no action. Row 4 are reactions — an instant answer to an event in battle, shown as one moment of action.\n\nRow 1: a colossal pillar of scarlet and white fire striking down from above onto a single point, the ground cracking and turning to ash around it; a great phoenix of golden fire with its wings spread wide, rising upward and showering warm golden sparks; a huge dome of fire covered by a lattice of glowing golden lines, flames lashing outward from its surface; an enormous wildfire engulfing everything from edge to edge, towering flames and black smoke in a red glow, sparks everywhere.\n\nRow 2: an ancient massive stone hearth with an eternal golden flame, warm light flooding outward, golden embers floating; a giant swirling vortex of black smoke with glowing embers caught inside it, like a dark storm; a massive round iron seal with a plain face slamming down into a thick layer of ash, a ring of glowing ash exploding outward from under it; a raised armoured fist wrapped in roaring scarlet flame and golden sparks.\n\nRow 3: a trail of smouldering footprints glowing in ash, every third footprint bursting into a small flame; a single drop of blood glowing like molten metal, a tiny flame burning inside it; a leather blacksmith's bellows blowing into a bed of coals, the flames flaring up bright; a lump of coal shaped like a heart, glowing golden from within through its cracks.\n\nRow 4: an enemy blade striking an iron gauntlet, a burst of flame blasting back along the blade toward the attacker; a heavy critical strike — a blade biting deep into dark leather armour, the cut bursting into scarlet flame; a flame leaping in an arc from a falling, dying torch to an unlit torch, setting it ablaze; a fallen warrior's dented helmet lying in ash, the ash rising from it in a column of glowing sparks and flame.\n\nNo text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1788,
+        "candidatesTokenCount": 2484,
+        "totalTokenCount": 4272,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 1014
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 774
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1680
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1041,
+      "seconds": 17.7,
+      "status": "референс, не утверждён",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "10ed1f1ef4b744392a35321023736db5ec6adf586873b334cfbad5ad7e6e6e93"
     }
   ]
 }

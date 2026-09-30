@@ -1,0 +1,98 @@
+{
+  "name": "Иконки способностей сеткой — проба на наборе Огня (слово автора 30.09.2026): «Пришло время иконок заклинаний. Иконки не должны быть огромными по размеру, максимум немного больше обычного, если захочу адаптировать игру под ПК, в тот же Steam. Поэтому генерить сеткой будет самое то, а не по одной штуке, иначе мы сойдём с ума от количества и затрат»",
+  "plan": {
+    "Лист активок spell-fire-active": "3:2, 4K, сетка 6×4 — 24 активки набора; строка — два вида по три ступени: на всех, на 2–3, на одного",
+    "Лист ульт spell-fire-ult": "1:1, 2K, сетка 4×4 — 8 ульт, 4 боевые пассивки, 4 реакции",
+    "Нарезка": "python tools/art-gen/grid_slice.py jobs/spell-icons-fire.json <id задания> <лист> — находит пурпурные швы, режет клетки, срезает кайму шва; клетка — WebP в art/generated/spell-icons/<id задания>/, имя файла — из cells"
+  },
+  "notes": [
+    "Весь набор школы — два запроса: $0,151 + $0,101 против 40 × $0,067 по одной. Библиотека — 339 способностей (docs/content/библиотека-способностей.md): около $2,2 сеткой против $22,7 по одной",
+    "Язык иконки. Школа — цвет карста и материал. Вид: урон летит вправо, к врагам; лечение, тепло, щиты и баффы — мягкое тёплое золото, округлые спокойные формы; контроль — дым и вспышка; дебафф — метка. Ступень — сколько целей: на всех — широко во всю клетку, на 2–3 — две-три вещи, на одного — одна вещь",
+    "Названий способностей в промте нет: модель подписывает клетки. Текст делает интерфейс",
+    "Рамку даёт интерфейс: активку, ульту, пассивку и реакцию различает рамка, а не арт",
+    "cells — [id способности из tools/content-gen/abilities/library.json, имя файла] по строкам сверху, в строке слева направо; grid — [столбцы, строки]"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "spell-icons": {
+      "aspect": "1:1",
+      "size": "2K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square ability icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the picture in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game puts its own frame on top: one clear central image with a bold silhouette that stays readable at 48 px, on a dark near-black stone background with faint cracks and a darker vignette toward the edges of the cell. Light rises from below in the color of the magic school; crisp rim light on the edges of the forms; a few sparks and dust motes in the light. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each icon differs clearly from its neighbours in shape and composition."
+    }
+  },
+  "jobs": [
+    {
+      "id": "spell-fire-active",
+      "category": "spell-icons",
+      "title": "Огонь — 24 активки сеткой 6×4",
+      "source": "tools/content-gen/abilities/library.json, набор «Огонь», active; docs/content/библиотека-способностей.md",
+      "aspect": "3:2",
+      "size": "4K",
+      "grid": [6, 4],
+      "cells": [
+        ["Огонь.dmg.all", "fire-dmg-all"],
+        ["Огонь.dmg.grp", "fire-dmg-grp"],
+        ["Огонь.dmg.one", "fire-dmg-one"],
+        ["Огонь.heal.all", "fire-heal-all"],
+        ["Огонь.heal.grp", "fire-heal-grp"],
+        ["Огонь.heal.one", "fire-heal-one"],
+        ["Огонь.shield.all", "fire-shield-all"],
+        ["Огонь.shield.grp", "fire-shield-grp"],
+        ["Огонь.shield.one", "fire-shield-one"],
+        ["Огонь.dot.all", "fire-dot-all"],
+        ["Огонь.dot.grp", "fire-dot-grp"],
+        ["Огонь.dot.one", "fire-dot-one"],
+        ["Огонь.hot.all", "fire-hot-all"],
+        ["Огонь.hot.grp", "fire-hot-grp"],
+        ["Огонь.hot.one", "fire-hot-one"],
+        ["Огонь.ctrl.all", "fire-ctrl-all"],
+        ["Огонь.ctrl.grp", "fire-ctrl-grp"],
+        ["Огонь.ctrl.one", "fire-ctrl-one"],
+        ["Огонь.debuff.all", "fire-debuff-all"],
+        ["Огонь.debuff.grp", "fire-debuff-grp"],
+        ["Огонь.debuff.one", "fire-debuff-one"],
+        ["Огонь.buff.all", "fire-buff-all"],
+        ["Огонь.buff.grp", "fire-buff-grp"],
+        ["Огонь.buff.one", "fire-buff-one"]
+      ],
+      "subject": "The magic school of this sheet is Fire: scarlet fire (#F0564A) with orange and amber flames, glowing embers, grey ash and soot-black stone; the light from below is scarlet and amber. Attacking spells burn a violent, jagged scarlet. Supporting spells — healing, warmth, shields and strength for allies — glow a softer warm gold and amber with rounded, calm shapes. A spell for all targets shows something wide that fills its cell; a spell for two or three targets shows two or three of its thing; a spell for one target shows one focused object. Attacks move to the right, toward the enemies.\n\nThe grid: exactly 6 columns and 4 rows, 24 icons.\n\nRow 1: a towering wave of scarlet fire rolling to the right across the ground, filling the whole width, its crest curling over like a breaking sea wave; a bright white-hot spark leaping to the right in a jagged chain of three arcs, a small burst of flame where each arc lands; a funeral pyre of stacked dark logs erupting into one huge column of scarlet flame, sparks spiralling upward; two cupped hands at the bottom releasing a wide, soft fan of warm golden breath full of glowing motes; three small soft golden flames rising like young sprouts from one bed of embers; a dagger blade glowing orange-hot, pressed flat against a strip of white linen bandage, a small puff of steam rising.\n\nRow 2: a huge translucent dome of warm amber flame arched over the dark ground like a protective vault; a circular wall of warm amber flames standing on the stone floor, seen from slightly above, a protective ring around a calm empty centre; a heavy round iron shield wreathed in amber flame, sparks bursting off its rim where a blow has just struck it; a wide low front of creeping scarlet fire spreading across dry grass and ash, many small flames side by side from edge to edge; a flaming torch flying in an arc to the right, trailing fire and dripping burning pitch that lights three small fires below; a charred log burning from within, deep cracks glowing scarlet, three tongues of flame rising from it.\n\nRow 3: a small campfire in a ring of stones seen from the side, its warm golden glow spreading around in soft rings, a few sparks drifting up; three smouldering golden coals nestled in soft grey ash, each with a gentle warm glow and tiny rising motes; a small stone hearth with an iron cooking pot hanging over a steady golden fire, warm light spilling out; thick choking black smoke billowing across the whole cell, scarlet embers smouldering inside it; two dense columns of grey smoke rising from smouldering coals and twisting together into a screen; a single blinding flash of white-hot flame bursting from one point, sharp radiant rays, the centre almost white.\n\nRow 4: grey ash falling like heavy snow over the whole cell, every flake glowing scarlet at its edge; two simple flame-shaped marks smeared in glowing ash on a dark stone surface, as if drawn with a finger; a red-hot branding iron with a simple flame-shaped head glowing scarlet, smoke curling from it; a wide iron brazier with five tall flames rising side by side and leaning together, scarlet and gold, sparks rushing upward; two crossed battle axes whose blades glow orange-hot, flames running along their edges; one sword standing upright, its blade glowing white-hot from hilt to tip, heat shimmer around it."
+    },
+    {
+      "id": "spell-fire-ult",
+      "category": "spell-icons",
+      "title": "Огонь — 8 ульт, 4 пассивки, 4 реакции сеткой 4×4",
+      "source": "tools/content-gen/abilities/library.json, набор «Огонь», ult, passive, reaction; docs/content/библиотека-способностей.md",
+      "aspect": "1:1",
+      "size": "2K",
+      "grid": [4, 4],
+      "cells": [
+        ["Огонь.ult.dmg", "fire-ult-dmg"],
+        ["Огонь.ult.heal", "fire-ult-heal"],
+        ["Огонь.ult.shield", "fire-ult-shield"],
+        ["Огонь.ult.dot", "fire-ult-dot"],
+        ["Огонь.ult.hot", "fire-ult-hot"],
+        ["Огонь.ult.ctrl", "fire-ult-ctrl"],
+        ["Огонь.ult.debuff", "fire-ult-debuff"],
+        ["Огонь.ult.buff", "fire-ult-buff"],
+        ["Огонь.pas.1", "fire-pas-1"],
+        ["Огонь.pas.2", "fire-pas-2"],
+        ["Огонь.pas.3", "fire-pas-3"],
+        ["Огонь.pas.4", "fire-pas-4"],
+        ["Огонь.react.1", "fire-react-1"],
+        ["Огонь.react.2", "fire-react-2"],
+        ["Огонь.react.3", "fire-react-3"],
+        ["Огонь.react.4", "fire-react-4"]
+      ],
+      "subject": "The magic school of this sheet is Fire: scarlet fire (#F0564A) with orange and amber flames, glowing embers, grey ash and soot-black stone; the light from below is scarlet and amber. Attacking spells burn a violent, jagged scarlet. Supporting spells — healing, warmth, shields and strength for allies — glow a softer warm gold and amber with rounded, calm shapes.\n\nThe grid: exactly 4 columns and 4 rows, 16 icons. Rows 1 and 2 are ultimate spells — the grandest, most epic images of the set, bigger in scale, with bright gold highlights in the fire. Row 3 are passive traits — calm, emblem-like single objects, no action. Row 4 are reactions — an instant answer to an event in battle, shown as one moment of action.\n\nRow 1: a colossal pillar of scarlet and white fire striking down from above onto a single point, the ground cracking and turning to ash around it; a great phoenix of golden fire with its wings spread wide, rising upward and showering warm golden sparks; a huge dome of fire covered by a lattice of glowing golden lines, flames lashing outward from its surface; an enormous wildfire engulfing everything from edge to edge, towering flames and black smoke in a red glow, sparks everywhere.\n\nRow 2: an ancient massive stone hearth with an eternal golden flame, warm light flooding outward, golden embers floating; a giant swirling vortex of black smoke with glowing embers caught inside it, like a dark storm; a massive round iron seal with a plain face slamming down into a thick layer of ash, a ring of glowing ash exploding outward from under it; a raised armoured fist wrapped in roaring scarlet flame and golden sparks.\n\nRow 3: a trail of smouldering footprints glowing in ash, every third footprint bursting into a small flame; a single drop of blood glowing like molten metal, a tiny flame burning inside it; a leather blacksmith's bellows blowing into a bed of coals, the flames flaring up bright; a lump of coal shaped like a heart, glowing golden from within through its cracks.\n\nRow 4: an enemy blade striking an iron gauntlet, a burst of flame blasting back along the blade toward the attacker; a heavy critical strike — a blade biting deep into dark leather armour, the cut bursting into scarlet flame; a flame leaping in an arc from a falling, dying torch to an unlit torch, setting it ablaze; a fallen warrior's dented helmet lying in ash, the ash rising from it in a column of glowing sparks and flame."
+    }
+  ]
+}

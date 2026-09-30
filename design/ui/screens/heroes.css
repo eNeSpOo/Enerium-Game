@@ -4,8 +4,9 @@
    Стиль «Свет снизу»: редкость — одобренный кристалл --rico и цвет --rc из [data-r] (ADR-0027); доблесть — ленты книги, рунный
    предел — замки книги; в шапке листов — камни (.rp-s, hero-dev.css).
    Правила воздуха: на книге — главное, остальное — в раскрытой книге; отступы — --sp-l, --sp-m, --sp-s. Движение — только transform
-   и opacity. Свои классы — hk-* (сетка, портрет и полоса осколков книги), hcb-buy (действие книги «до покупки»), hcz (портрет крупно),
-   he-* (витрина отряда недели), hr-*; общие — .hc.empty (пустое место отряда), .preset, .sq, .sq-slots, .rs-av. */
+   и opacity. Свои классы — hk-* (строка над полками, портрет и полоса осколков книги), hcb-buy (действие книги «до покупки»), hcz
+   (портрет крупно), he-* (витрина отряда недели), hr-*; общие — .hc.empty (пустое место отряда в листе выбора), .sq-slots, .rs-av.
+   Шкаф с полками («Мои», каталог, «За золото», отряды) — screens/library.css (lb-*). */
 
 /* ---------- пустое место в отряде и на обороне: той же формы, что мелкая книга (screens/book.css) ---------- */
 .hc.empty{position:relative;display:grid;place-items:center;width:100%;aspect-ratio:9/17;padding:0;border-radius:8px;border:1px dashed #2c3238;background:#0b0d10;color:var(--parch-3);box-shadow:none}
@@ -61,8 +62,8 @@
 .hk-sh.full .hk-shb i{box-shadow:0 0 8px var(--spirit)}
 .hk-sh.full small{color:var(--spirit)}
 
-/* ---------- сетка: «Мои», каталог, «За золото»; строка над ней — вид, сила коллекции, порядок и фильтр ----------
-   Ширина карточки — не меньше --hk-w0 (932 × 430) и --hk-w1 (844 × 390) из HC_VIEW.card, высота — 16/9; прокрутка — сетка */
+/* ---------- «Мои», каталог, «За золото»: книги на полках шкафа (screens/library.css); строка на карнизе — вид, сила коллекции, порядок
+   и фильтр. Книг на полке — сколько встаёт в ширину, не уже HC_VIEW.card и HC_VIEW.gold (lbCols, screens/library.js) ---------- */
 .hk-scr{gap:var(--sp-s)}
 .hkh{display:flex;align-items:center;gap:var(--sp-s);flex:none;min-width:0;min-height:32px}
 .hkh .rs-next{margin:0;white-space:nowrap}
@@ -75,10 +76,7 @@
 .hk-fb{position:relative}
 .hk-fb.on{color:var(--gold);border-color:rgba(221,188,122,.5)}
 .hk-fb>b{position:absolute;right:-6px;top:-6px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--gold);color:#16110a;font:700 10px/16px var(--f-u);text-align:center}
-.hkg{flex:1 1 0;min-height:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--hk-w0,112px),1fr));grid-auto-rows:max-content;gap:var(--hk-gap,8px);align-content:start;margin:-4px;padding:4px 6px 8px 4px}
-.hk-empty{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:40px 0;color:var(--parch-3)}
-.hk-hire{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:var(--sp-s)}
-@container main (max-height: 360px){ .hkg{grid-template-columns:repeat(auto-fill,minmax(var(--hk-w1,104px),1fr))} .hk-nm{font-size:14px} }
+.hk-empty{display:flex;flex-direction:column;align-items:center;gap:10px;padding:40px 0;color:var(--parch-2);text-shadow:0 1px 2px #000}
 /* лист фильтра: группы значков, нажатие — выбрать или снять */
 .hkf-g{display:flex;flex-direction:column;gap:6px}
 .hkf-r{display:flex;flex-wrap:wrap;gap:6px}
@@ -109,34 +107,15 @@
 .hcz-x{position:absolute;right:12px;top:12px;z-index:2}
 @media (prefers-reduced-motion:reduce){ .hcz{animation:none} }
 
-/* ---------- отряды: библиотека слева, редактор справа ---------- */
-.sq{display:grid;grid-template-columns:236px minmax(0,1fr);gap:var(--sp-m);height:100%}
-.hr-pres{gap:6px}
-.preset{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;text-align:left;color:var(--parch);width:100%;flex:none}
-.preset[aria-current="true"]{border-color:rgba(72,229,212,.5);box-shadow:inset 0 -12px 16px -14px var(--spirit)}
-.preset>.row{gap:6px}
-.preset b{font:600 17px/1 var(--f-d);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.preset .bm{font:700 12px/1 var(--f-u);color:var(--parch-3)}
-.preset small{font-size:11px;line-height:1.2}
-.preset .faces{display:flex;gap:5px}
-.preset .faces .rs-av,.preset .faces i{display:block;flex:none;width:24px;height:24px;border-radius:6px}
-.preset .faces i{background:#191d21;box-shadow:inset 0 0 0 1px #242a30}
-.preset .faces .rs-av::after{width:10px;height:10px;right:-3px;bottom:-3px}
+/* ---------- отряды: шкаф, полка отряда и нижняя полка — screens/library.css; здесь — шапка отряда, выбранное место, строка режима ---------- */
 .faces .rs-av>img{width:100%;height:100%;border-radius:inherit}   /* общий .faces img — 30 px, лицу в строке он мешает */
 .sq-bm{font:600 24px/1 var(--f-d);color:var(--gold);gap:6px}
 .sq-slots{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
-.hr-sqed{gap:var(--sp-s);min-height:0}
-.hr-sqed .sq-slots{max-width:400px;flex:none;column-gap:12px}   /* мелкие книги: высота книги с лентами — как у прежней плитки 4 : 5 */
 .hr-sqh{gap:6px;flex:none}
 .hr-sqh h2{font-size:24px;line-height:1.05;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hr-sqbar{min-height:32px;flex:none}
-.hr-sqsel{display:inline-flex;align-items:center;gap:6px}
-.hr-sqsel b{font:600 16px/1 var(--f-d);color:var(--parch);margin-right:4px}
+.hr-sqsel{display:inline-flex;align-items:center;gap:6px;min-width:0}
+.hr-sqsel b{font:600 16px/1 var(--f-d);color:var(--parch);margin-right:4px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hr-sqsel .iconbtn[disabled]{opacity:.4;cursor:not-allowed}
-.hr-pool{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;align-content:start}
-.hr-prow{grid-template-columns:30px minmax(0,1fr) auto}
-.hr-prow small{display:flex;align-items:center;gap:4px}
-.hr-prow small .bm{font-size:11.5px;color:var(--parch-2)}
 .hr-from{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 12px;border-radius:10px;border:1px solid rgba(72,229,212,.35);background:rgba(72,229,212,.06);font-size:13px;color:var(--parch-2);flex:none}
 
 /* ---------- лист выбора отряда: пресеты чипами, состав, одна строка о готовности ---------- */
@@ -511,7 +490,6 @@
 
 /* компактный режим низкого экрана (844×390): рабочая область ниже 360 */
 @container main (max-height: 360px){
-  .hr-sqed .sq-slots{max-width:330px}
   .hr-sqh h2{font-size:21px}
   .hr-entry b{font-size:17px}
 }

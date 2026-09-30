@@ -11,10 +11,19 @@
    5. Связка с режимами: «Начать забег» и рунный страж идут отрядом спуска, атака Эхо — отрядом Эхо.
    6. Купленный герой состава встаёт в отряд и идёт в бой: забег и атака Эхо собирают его источник боя.
    7. Из листа режима — в библиотеку и обратно: «Изменить», «Новый», «Выбрать» возвращают в режим с листом.
-   7а. Коллекция и отряды — одни герои: сетка «Мои» (книги героев) — ровно пул отрядов; купленный приходит в обе; в редакторе отряда —
-      мелкие книги, а не крупные книги сетки.
+   7а. Коллекция и отряды — одни герои: сетка «Мои» (книги героев) — ровно пул отрядов; купленный приходит в обе; на полке отряда —
+      книги размера m, а не крупные книги сетки; свободные — корешками на нижней полке.
    8. Режим «Игрок»: библиотека, лист выбора на всех режимах, окно имени и подтверждение удаления — без служебных слов, undefined и NaN;
       режим «Команда» рисуется.
+   9. «Библиотека Этриона» — отряды шкафом (слово автора 30.09.2026: «в отрядах панель слева — это буквально огромный шкаф, а то, где
+      показан отряд, — это по сути полка»): слева — шкаф, отряд — отсек с пятью корешками (пустое место — след) и латунной табличкой
+      имени и мощи (BM.squad) на кромке полки, выбранный отмечен; справа — выбранный отряд на одной полке крупным планом: пять мест,
+      книги размера m, доска полки; нижняя полка — свободные герои корешками по мощи: цвет редкости, ступень книги, значок класса,
+      уровень; нажатие — операция с номером ставит героя в выбранное или первое пустое место, книга встаёт на место (показ по времени);
+      долгое нажатие (по часам песочницы) — книга раскрывается поверх отрядов, щелчок после него героя не ставит, сдвиг — не нажатие,
+      правая кнопка — сразу книга; закрытие — к отрядам; «Выбрать» из листа режима — под шкафом, полка отряда высоты не теряет.
+      Вёрстка расчётом на 932 × 430 и 844 × 390: видно не меньше трёх отсеков, книга на полке отряда не меньше 64 px, на нижней
+      полке видно не меньше 12 корешков, корешки отсека помещаются рядом со строкой режимов.
    Запуск: node tools/content-gen/screens/check_squads.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -28,7 +37,8 @@ const say = m => { if (err.length < 60) err.push(m); else if (err.length === 60)
 function done() {
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
   console.log(`Отряды: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; операций ${cnt.ops}, забегов и атак ${cnt.runs}.`);
-  console.log('Проверка пройдена: библиотека до десяти отрядов с именами, места до пяти героев, один лист выбора на все режимы со своим выбором у каждого, связка со спуском и Эхо, повтор номера ничего не меняет, в режиме «Игрок» служебного нет.');
+  for (const x of cnt.lay || []) console.log('вёрстка ' + x);
+  console.log('Проверка пройдена: библиотека до десяти отрядов с именами, места до пяти героев, один лист выбора на все режимы со своим выбором у каждого, связка со спуском и Эхо, повтор номера ничего не меняет; отряды — шкаф: отсеки с корешками и табличкой имени и мощи, полка отряда крупным планом, нижняя полка корешков — нажатие ставит героя, удержание раскрывает книгу; вёрстка 932 × 430 и 844 × 390; в режиме «Игрок» служебного нет.');
   process.exit(0);
 }
 
@@ -40,6 +50,18 @@ function done() {
 
 /* ================== песочница ================== */
 const scripts = [...html.matchAll(/<script(?:\s+src="([^"]+)")?>([\s\S]*?)<\/script>/g)].map(m => ({ src: m[1], code: m[2] }));
+/* часы песочницы: setTimeout — в очередь, tick(мс) двигает время и выполняет наступившие; слушатели документа — для долгого нажатия */
+const clock = { now: 0, q: [], id: 0 }, dlis = {};
+function tick(ms) {
+  const end = clock.now + ms;
+  for (;;) {
+    clock.q.sort((a, b) => a.at - b.at || a.id - b.id);
+    const t = clock.q[0]; if (!t || t.at > end) break;
+    clock.q.shift(); clock.now = t.at;
+    try { t.f(); } catch (e) { say(`таймер: исключение — ${e.message}`); }
+  }
+  clock.now = end;
+}
 function load() {
   const stubEl = id => {
     const e = { id, innerHTML: '', textContent: '', value: '', hidden: false, style: { setProperty() {} }, dataset: {}, children: [],
@@ -52,15 +74,16 @@ function load() {
   const rootCls = new Set(), root = stubEl('html');
   root.classList = { add: c => rootCls.add(c), remove: c => rootCls.delete(c), toggle: (c, on) => { const v = on === undefined ? !rootCls.has(c) : !!on; if (v) rootCls.add(c); else rootCls.delete(c); return v; }, contains: c => rootCls.has(c) };
   const els = {};
-  const document = { readyState: 'loading', addEventListener() {}, getElementById: id => (els[id] = els[id] || stubEl(id)),
+  const document = { readyState: 'loading', addEventListener: (t, f) => { (dlis[t] = dlis[t] || []).push(f); }, getElementById: id => (els[id] = els[id] || stubEl(id)),
     querySelector: () => null, querySelectorAll: () => [], createElement: () => stubEl(), createElementNS: () => stubEl(), body: stubEl('body'),
     documentElement: root, activeElement: null, fonts: null };
   const noStore = () => { throw new Error('localStorage недоступен'); };
   const win = { document, console, navigator: { userAgent: 'node' }, location: { hash: '', href: '' }, history: { replaceState() {} },
     localStorage: { getItem: noStore, setItem: noStore, removeItem: noStore }, innerWidth: 1400, innerHeight: 900, devicePixelRatio: 1,
     addEventListener() {}, removeEventListener() {}, dispatchEvent() {}, matchMedia: () => ({ matches: false, addEventListener() {}, addListener() {} }),
-    requestAnimationFrame: () => 0, cancelAnimationFrame() {}, setTimeout: () => 0, clearTimeout() {}, setInterval: () => 0, clearInterval() {},
-    getComputedStyle: () => ({ getPropertyValue: () => '' }), CustomEvent: function CustomEvent() {}, performance: { now: () => 0 } };
+    requestAnimationFrame: () => 0, cancelAnimationFrame() {}, setInterval: () => 0, clearInterval() {},
+    setTimeout: (f, ms) => { const id = ++clock.id; clock.q.push({ id, at: clock.now + Math.max(0, +ms || 0), f }); return id; }, clearTimeout: id => { clock.q = clock.q.filter(t => t.id !== id); },
+    getComputedStyle: () => ({ getPropertyValue: () => '' }), CustomEvent: function CustomEvent() {}, performance: { now: () => clock.now } };
   win.window = win; win.self = win;
   const ctx = vm.createContext(win);
   for (const s of scripts) {
@@ -71,6 +94,7 @@ function load() {
   const T = vm.runInContext(`({
     get S() { return S; }, set S(v) { S = v; },
     ACT, OV, FLOWS, KH, RS, RSI, EB, H, SQ, SQ_DATA, render, initialState, setTeam, startRun, advance, busyNote, rsHas, sq, sqBM,
+    LB_VIEW, HC_VIEW, HB_ART, BM, fmt, hrMine, hrV, hbTier, hbSpineR, lbCols, SHELL_SIZE,
   })`, ctx);
   return { T, els, game: () => (els.game ? els.game.innerHTML : '') };
 }
@@ -316,8 +340,116 @@ fresh();
   if (!cards().includes(x.id) || !T.SQ.pool().includes(x.id)) say('коллекция и отряды: купленный герой не пришёл в сетку «Мои» или в пул отрядов');
   T.S.route = 'heroes'; T.S.seg.heroes = 'squads'; T.S.selSquad = 's1';
   const g = view('отряды · редактор');
-  if (/<button class="hb[^"]*" data-z="l"/.test(g)) say('отряды: в редакторе отряда крупные книги сетки вместо мелких');
-  if (!(g.match(/<button class="hb[^"]*" data-z="s"/g) || []).length) say('отряды: в редакторе отряда нет мелких книг героев');
+  if (/<button class="hb[^"]*" data-z="l"/.test(g)) say('отряды: на полке отряда крупные книги сетки вместо книг размера m');
+  if (!(g.match(/<button class="hb[^"]*" data-z="m"/g) || []).length) say('отряды: на полке отряда нет книг героев размера m');
+  const free = T.SQ.pool().filter(id => !T.sq('s1').m.includes(id));
+  if ((g.match(/<button class="hs"[^>]*data-a="sqput"/g) || []).length !== free.length) say(`отряды: на нижней полке не ${free.length} корешков свободных героев`);
+  if (!free.includes(x.id) || !new RegExp(`<button class="hs"[^>]*data-id="${x.id}"`).test(g)) say('отряды: купленный герой не встал корешком на нижнюю полку');
+}
+
+/* ================== 9. «Библиотека Этриона»: шкаф отрядов, полка отряда, нижняя полка корешков ================== */
+{
+  fresh(); T.S.route = 'heroes'; T.S.seg.heroes = 'squads'; T.S.selSquad = 's2'; T.S.sq.slot = -1;
+  const V = T.LB_VIEW, Q = V.sq, h = view('шкаф отрядов'), s = T.sq('s2');
+  const part = (a, b) => { const i = h.indexOf(a); if (i < 0) return ''; const j = b ? h.indexOf(b, i) : -1; return j < 0 ? h.slice(i) : h.slice(i, j); };
+  /* слева — шкаф: отсек на каждый отряд, пять мест — корешок или след, табличка имени и мощи, где выбран — строкой */
+  const left = part('<div class="lb-case tall"', '<div class="lb-case near"');
+  if (!left) say('шкаф отрядов: слева нет шкафа');
+  if (!/<div class="lb-top"><i class="lb-cn"/.test(left) || !left.includes(`Отряды · ${T.S.squads.length} / ${T.SQ_DATA.max}`)) say('шкаф отрядов: на карнизе нет «Отряды · N / 10»');
+  if (!/data-a="sqnew"/.test(left)) say('шкаф отрядов: на карнизе нет «Новый отряд»');
+  for (const k of ['<i class="lb-post l"', '<i class="lb-post r"', '<i class="lb-glow"', '<span class="lb-dust"']) if (!left.includes(k)) say(`шкаф отрядов: нет части шкафа ${k}`);
+  const cmps = [...left.matchAll(/<button class="lb-cmp" data-a="sq" data-v="([^"]+)" aria-current="(true|false)"[\s\S]*?<\/button>/g)];
+  if (cmps.length !== T.S.squads.length) say(`шкаф отрядов: отсеков ${cmps.length}, отрядов ${T.S.squads.length}`);
+  for (const [c, id, cur] of cmps) {
+    const x = T.sq(id), where = `отсек «${x.name}»`;
+    const spines = [...c.matchAll(/<span class="hs[^"]*" data-z="s" data-t="(\d)" data-r="(\d)" data-s="3" data-id="([^"]+)"/g)], gaps = (c.match(/<i class="lb-gap"/g) || []).length;
+    if (spines.length + gaps !== T.SQ_DATA.size || spines.length !== x.m.filter(Boolean).length) say(`${where}: мест ${spines.length + gaps} (корешков ${spines.length}), в отряде ${x.m.filter(Boolean).length} из ${T.SQ_DATA.size}`);
+    spines.forEach(([, t, r, hid], i) => { const hh = T.H(hid); if (!hh || x.m.filter(Boolean)[i] !== hid || +r !== hh.r || +t !== T.hbTier(hh)) say(`${where}: корешок ${i + 1} — не ${x.m.filter(Boolean)[i]} своей ступени и редкости`); });
+    if (!/<i class="lb-pl" aria-hidden="true"><i class="lb-br l"><\/i><i class="lb-br r"><\/i><\/i>/.test(c)) say(`${where}: нет полки с кронштейнами`);
+    if (!c.includes(`<span class="lb-tag w"><b>${x.name.replace(/"/g, '&quot;')}</b>`) || !c.includes(`<span class="num">${T.fmt(T.sqBM(x))}</span>`)) say(`${where}: на табличке нет имени или мощи ${T.sqBM(x)}`);
+    if ((cur === 'true') !== (id === s.id)) say(`${where}: отметка выбранного не у выбранного`);
+    const used = T.SQ.used(id); if (used.length && !c.includes(`<small class="lb-used">${used.join(' · ')}</small>`)) say(`${where}: не сказано, где выбран`);
+  }
+  /* справа — отряд на полке крупным планом: пять мест, книги размера m, доска; на карнизе — имя, мощь, переименовать, удалить */
+  const right = part('<div class="lb-case near"');
+  if (!right) say('шкаф отрядов: справа нет полки отряда');
+  if (!right.includes(`<h2 class="serif gold">${s.name}</h2>`) || !right.includes(`<span class="num">${T.fmt(T.sqBM(s))}</span>`) || !right.includes(`data-v="sqname:${s.id}"`) || !right.includes(`data-a="sqdel" data-v="${s.id}"`)) say('полка отряда: на карнизе нет имени, мощи, «Переименовать» или «Удалить»');
+  const stage = part('<div class="lb-stage">', '<div class="lb-low">');
+  const slots = [...stage.matchAll(/<(?:div|button) class="lb-slot( empty)?[^"]*"/g)];
+  if (slots.length !== T.SQ_DATA.size) say(`полка отряда: мест ${slots.length}, ждали ${T.SQ_DATA.size}`);
+  s.m.forEach((id, i) => {
+    if (!id) { if (!stage.includes(`<button class="lb-slot empty" data-a="sqslot" data-v="q${T.S.sq.seq}|${i}"`)) say(`полка отряда: пустое место ${i + 1} не нажимается`); return; }
+    if (!new RegExp(`<div class="lb-slot" data-hold="sqbook:${id}"><button class="hb[^"]*" data-z="m"[^>]*data-a="sqslot" data-v="q${T.S.sq.seq}\\|${i}"`).test(stage)) say(`полка отряда: на месте ${i + 1} нет книги ${id} размера m с нажатием и удержанием`);
+  });
+  if (!/<i class="lb-pl near" aria-hidden="true">/.test(stage)) say('полка отряда: нет доски полки');
+  /* нижняя полка — свободные корешками по мощи: ступень, редкость, класс, уровень; нажатие — операция с номером, удержание — книга */
+  const low = part('<div class="lb-low">');
+  const pool = T.hrMine().filter(x => !s.m.includes(x.id)).sort((a, b) => b.bm - a.bm);
+  const sp = [...low.matchAll(/<button class="hs[^"]*" data-z="l" data-t="(\d)" data-r="(\d)" data-s="3" data-id="([^"]+)" style="--sr:(\d+)" data-a="sqput" data-v="([^"]+)" data-hold="sqbook:([^"]+)"[\s\S]*?<\/button>/g)];
+  if (sp.map(m => m[3]).join() !== pool.map(x => x.id).join()) say(`нижняя полка: корешки ${sp.map(m => m[3]).slice(0, 4).join(', ')}… — не свободные герои по мощи (${pool.length})`);
+  for (const [t, tier, r, id, sr, v, hold] of sp) {
+    const x = T.H(id), where = `нижняя полка · ${x.name}`;
+    if (+tier !== T.hbTier(x) || +r !== x.r || +sr !== T.hbSpineR(+tier)) say(`${where}: корешок не своей ступени, редкости или толщины`);
+    if (v !== `q${T.S.sq.seq}|${s.id}|${id}` || hold !== id) say(`${where}: нажатие не операция с номером или удержание не книга`);
+    if (!/icons\/cls-[a-z]+\.png/.test(t) || !t.includes(`<b class="hs-v num" aria-hidden="true">${x.lvl}</b>`) || !t.includes('<i class="hs-cr" aria-hidden="true"></i>') || !/<span class="hs-l" aria-hidden="true"><b>[^<]+<\/b><\/span>/.test(t)) say(`${where}: на корешке нет класса, уровня ${x.lvl}, кристалла редкости или ярлыка с именем`);
+  }
+  if (!/<i class="lb-pl" aria-hidden="true">/.test(low) || !/data-keep="sqpool"/.test(low)) say('нижняя полка: нет доски или прокрутка не помнит положение');
+  /* нажатие на корешок: герой — в первое пустое место (операция с номером), книга встаёт на место — показ по времени */
+  const e = s.m.indexOf(null), hid = pool[0].id, op0 = T.S.sq.seq;
+  act('sqput', `q${op0}|${s.id}|${hid}`);
+  if (s.m[e] !== hid || T.S.sq.seq !== op0 + 1) say('нижняя полка: нажатие на корешок не поставило героя в первое пустое место');
+  if (!T.S.lb || !T.S.lb.rise || T.S.lb.rise.i !== e || T.S.lb.rise.hid !== hid) say('нижняя полка: нет показа — книга не встаёт на место');
+  let g = view('нижняя полка · книга встаёт');
+  if (!new RegExp(`<div class="lb-slot rise" data-hold="sqbook:${hid}" style="--lb-d:-?\\d+ms">`).test(g)) say('полка отряда: книга с нижней полки не встаёт на место (нет показа у места)');
+  tick(V.rise + 1); g = view('нижняя полка · книга встала');
+  if (/class="lb-slot rise"/.test(g)) say('полка отряда: показ не закончился в срок');
+  const m1 = JSON.stringify(s.m); act('sqput', `q${op0}|${s.id}|${pool[1].id}`); if (JSON.stringify(s.m) !== m1) say('нижняя полка: повтор номера поставил героя ещё раз');
+  /* выбранное место: нажатие на корешок — в него */
+  act('sqslot', `q${T.S.sq.seq}|1`); const was = s.m[1], nx = T.hrMine().find(x => !s.m.includes(x.id));
+  act('sqput', `q${T.S.sq.seq}|${s.id}|${nx.id}`); if (s.m[1] !== nx.id || s.m.includes(was)) say('нижняя полка: герой не встал в выбранное место');
+  /* долгое нажатие — по часам песочницы: pointerdown, hold мс — книга; щелчок после него героя не ставит; сдвиг — прокрутка, не нажатие */
+  const fire = (k, ev) => { for (const f of dlis[k] || []) f(ev); };
+  const el = id => ({ getAttribute: a => (a === 'data-hold' ? `sqbook:${id}` : null), isConnected: true, disabled: false, classList: { contains: c => c === 'hs' }, querySelector: () => null, getBoundingClientRect: () => ({ left: 0, top: 0, width: 0, height: 0 }) });
+  const ev = (t, o = {}) => Object.assign({ target: { closest: q => (q === '[data-hold]' ? t : null) }, button: 0, clientX: 40, clientY: 300, pd: 0, sp: 0, preventDefault() { this.pd++; }, stopPropagation() { this.sp++; } }, o);
+  if (!(dlis.pointerdown || []).length || !(dlis.click || []).length || !(dlis.contextmenu || []).length) say('долгое нажатие: нет слушателей pointerdown, click и contextmenu');
+  const free2 = T.hrMine().find(x => !s.m.includes(x.id)), b = el(free2.id);
+  T.S.sq.book = ''; fire('pointerdown', ev(b)); tick(Math.floor(V.hold / 2)); fire('pointerup', ev(b)); tick(V.hold);
+  const c1 = ev(b); fire('click', c1);
+  if (T.S.sq.book || c1.sp) say('короткое нажатие: раскрылась книга или щелчок не дошёл до действия');
+  fire('pointerdown', ev(b)); fire('pointermove', ev(b, { clientX: 40 + V.slop + 4 })); tick(V.hold + 1);
+  if (T.S.sq.book) say('сдвиг пальца по полке: раскрылась книга — это прокрутка, не нажатие');
+  fire('pointerdown', ev(b)); tick(V.hold + 1);
+  if (T.S.sq.book !== free2.id) say('долгое нажатие на корешок: книга героя не раскрылась');
+  if (!T.S.hb.anim || T.S.hb.anim.kind !== 'in' || T.S.hb.anim.id !== free2.id) say('долгое нажатие: книга раскрылась без анимации открытия');
+  const c2 = ev(b); fire('click', c2); if (!c2.sp || !c2.pd) say('долгое нажатие: щелчок после него поставил бы героя в отряд');
+  g = view('книга героя поверх отрядов');
+  if (!/<div class="hb-win/.test(g) || !g.includes('data-a="hbclose" data-v="sq"') || (g.match(/data-a="seg" data-v="hero:(?:power|gear|skills|path)"/g) || []).length !== 4) say('книга героя поверх отрядов: нет книги с вкладками героя или закрытие не к отрядам');
+  if (!g.includes('<div class="lb-case tall"')) say('книга героя поверх отрядов: под книгой нет шкафа отрядов');
+  run('книга · закрыть', () => T.ACT.hbclose('sq'));
+  if (T.S.sq.book || T.S.hb.anim || /<div class="hb-win/.test(view('отряды после книги'))) say('книга героя поверх отрядов: закрытие не вернуло к отрядам');
+  T.S.sq.book = ''; const c3 = ev(b); fire('contextmenu', c3);
+  if (T.S.sq.book !== free2.id || !c3.pd) say('правая кнопка на корешке: книга не раскрылась сразу');
+  run('книга · закрыть 2', () => T.ACT.hbclose('sq'));
+  tick(10000);
+  /* «Выбрать» из листа режима — под шкафом: полка отряда справа высоты не теряет */
+  fresh(); T.S.route = 'echo'; run('лист Эхо', () => T.SQ.pick('echo')); act('sqedit', 'echo|s2');
+  { const h2 = view('шкаф · выбор для режима'), l2 = h2.slice(h2.indexOf('<div class="lb-sql">'), h2.indexOf('<div class="lb-sqr">'));
+    if (!l2.includes('Выбор для режима «Эхо»') || !/data-a="sqpick"/.test(l2) || !/data-a="sqback"/.test(l2)) say('шкаф отрядов: «Выбрать» и «Назад» режима — не под шкафом'); }
+  /* вёрстка — расчётом на 932 × 430 и 844 × 390: числа — LB_VIEW, поля экрана — токены index.html */
+  const spM = +((html.match(/--sp-m:(\d+)px/) || [])[1] || 12), maxR = Math.max(...[1, 2, 3, 4, 5].map(t => T.HB_ART.spines[t].ratio));
+  for (const [W, Hh, top, rail] of T.SHELL_SIZE.frames) {
+    const n = `${W} × ${Hh}`, i = Hh - top <= V.low ? 1 : 0, inW = W - rail - 2 * spM, inH = Hh - top - 2 * spM;
+    const body = inH - V.top[i], lw = Q.case[i], vis = body / Q.cmp[i];
+    if (vis < 3) say(`вёрстка ${n}: в шкафу отрядов видно ${vis.toFixed(1)} отсека — меньше трёх`);
+    const cmpIn = lw - 2 * V.post[i] - 2 * V.pad, mini = 5 * Q.mini[i] * maxR / 1000 + 4 * 2;
+    if (mini > cmpIn * 0.5) say(`вёрстка ${n}: корешкам отсека тесно рядом со строкой режимов (${mini.toFixed(0)} из ${cmpIn} px)`);
+    const rin = inW - lw - spM - 2 * V.post[i], low = Q.head[i] + V.air + Q.spine[i] + V.plank - V.sink, stage = body - low;
+    const bw = Math.min((rin - 2 * V.pad - 4 * Q.fgap) / 5, (stage - V.air - Q.near + V.sink) * 9 / 16);
+    if (bw < 64) say(`вёрстка ${n}: книга на полке отряда ${bw.toFixed(0)} px — мелко`);
+    const spw = Q.spine[i] * maxR / 1000, many = Math.floor((rin - 2 * V.pad + Q.sgap) / (spw + Q.sgap));
+    if (many < 12) say(`вёрстка ${n}: на нижней полке видно ${many} корешков — мало`);
+    cnt.lay = (cnt.lay || []).concat(`${n}: отсеков видно ${vis.toFixed(1)}, книга на полке отряда ${bw.toFixed(0)} × ${(bw * 16 / 9).toFixed(0)}, на нижней полке — ${many} корешков ${spw.toFixed(0)} × ${Q.spine[i]}`);
+  }
 }
 
 /* ================== 8. отрисовка в режимах «Игрок» и «Команда» ================== */

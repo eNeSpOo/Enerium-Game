@@ -1,0 +1,115 @@
+{
+  "name": "Библиотека Этриона — шкаф героев (слово автора 30.09.2026): «У нас очень хорошо прослеживается тема книг, а что если теперь сделать на всех вкладках вместо серой панели задний фон а-ля полки древней библиотеки? Идея какая: по сути души нам даёт Этрион, и по сути именно он нам даёт эти знания из своей картотеки из башни, и у нас уже герои в виде книг — пусть задний фон показывает, что они условно находятся на полках огромного древнего шкафа, каждая на своём ряде. И получается, что в отрядах панель слева — это буквально огромный шкаф, а то, где показан отряд, — это по сути полка». Арт шкафа: задняя стенка (повторяется по вертикали и горизонтали), полка-доска (повторяется по горизонтали) и кованый кронштейн, резная боковая стойка (повторяется по вертикали) и карниз (повторяется по горизонтали), лампада с кристаллом карста, корешки книг пяти ступеней — как обложки books/cover-1…5. Всё, что зависит от героя (кристалл редкости, цвет редкости, класс, уровень, имя), кладёт интерфейс: на арте их нет.",
+  "plan": {
+    "Задняя стенка lb-wall": "1:1, 1K, без вырезки: тёмные вертикальные доски старого дуба, ровно и тихо — фон не спорит с книгами; швы снимает tools/art-gen/shelf_layers.py tile",
+    "Полка lb-plank, карниз lb-cornice": "21:9, 1K, ключ black: полоса во всю ширину холста, обрезана краями — повторяется по горизонтали; shelf_layers.py strip — вырезка полосы и шов",
+    "Стойка lb-post": "9:16, 1K, ключ black: резная стойка сверху донизу, обрезана краями — повторяется по вертикали; shelf_layers.py post",
+    "Кронштейн lb-bracket, лампада lb-lamp": "1:1, 1K, ключ black и black-glow: один предмет с полем вокруг",
+    "Корешки lb-spines": "16:9, 1K, ключ black: пять корешков в ряд, ступени 1…5 по обложкам books/cover-1…5 (образцы); shelf_layers.py spines — нарезка по пустым столбцам"
+  },
+  "notes": [
+    "Сначала --dry-run, потом запуск с --budget. Каждая картинка смотрится глазами, повторов — не больше двух",
+    "После генерации: python tools/art-gen/shelf_layers.py <команда> <файлы> — бесшовность, вырезка полос, нарезка корешков, геометрия в ‰; выгрузка — ui-art.json → design/ui/assets/art/bookcase/ и export_ui.py --no-stamp; пути — в LB_ART.ready (design/ui/screens/library.js)"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: dark fantasy game art for a mobile RPG — gloomy, heavy, ancient and uneasy. Hand-painted digital painting: visible confident brush strokes, simplified planes, deep near-black shadows, crisp rim light on edges. A muted, desaturated palette: soot black (#050607, #121518), graphite (#262B31), very dark old oak, blackened iron, dark bronze, yellowed bone. Everything is matte, worn, dusty and aged: no gloss, no varnish shine, no polished or bright gold, no clean saturated game-UI colors. Light is scarce and precious and comes from below: a cold turquoise glow of karst crystals (#48E5D4) from beneath, and only a few warm amber highlights (#E6A84B). This is the archive of an immense ancient tower that belongs to a keeper of knowledge: vast, cold, silent and dusty — not cosy, not a home library, not a shop. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.",
+  "negative": "No words, no letters, no digits, no numbers, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no titles or labels on spines, plates or boards, no handwriting, no watermark, no signature, no logo. No skulls, no skeletons, no blood. No pentagrams, no occult signs, no crosses, no religious symbols, no eyes, no faces. No people, no hands, no creatures, no candles with dripping wax. No bright polished gold, no glossy shine, no clean bright mobile-game UI look.",
+  "cutout_rule": "The background is solid pure black ({hex}), flat, edge to edge: no gradient, no texture, no floor, no wall, no cast shadow, no vignette, no checkerboard. Any glow stays close to the subject and fades into the black within a short distance.",
+  "categories": {
+    "lb-texture": {
+      "aspect": "1:1",
+      "size": "1K",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a flat seamless texture for a game UI, seen perfectly straight on, filling the whole canvas edge to edge: no border, no frame, no margin, no perspective, no vignette, no light spot, no shadow falling on it. The texture tiles seamlessly: whatever touches the left edge continues from the right edge, and whatever touches the top edge continues from the bottom edge. Even, calm and low in contrast, and very dark: it sits behind rows of brightly painted books and must never compete with them."
+    },
+    "lb-strip": {
+      "aspect": "21:9",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — ONE long, perfectly straight horizontal strip, seen straight on from the front, perfectly level, no perspective, no tilt, no bending. It runs across the whole width of the canvas: its left and right ends are cut off by the left and right edges of the canvas, so the strip continues seamlessly when copies are placed side by side. It lies in the middle of the canvas and takes about one fifth of the canvas height; above and below it the canvas is solid pure black. Its detail repeats evenly along its length: nothing special or unique happens in the middle or near the ends."
+    },
+    "lb-post": {
+      "aspect": "9:16",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — ONE tall, perfectly straight vertical post, seen straight on from the front, perfectly upright, no perspective, no tilt. It stands in the middle of the canvas and is about one quarter of the canvas width. It runs through the whole height of the canvas: its top and bottom are cut off by the top and bottom edges of the canvas, so the post continues seamlessly when copies are placed one above another. To its left and right the canvas is solid pure black. Its detail repeats evenly along its length: nothing special or unique happens near the top or the bottom."
+    },
+    "lb-part": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — one small object, centered, seen perfectly straight on and perfectly upright. It floats on pitch black: everything around it is solid pure black, and an empty black margin of at least one tenth of the canvas stays on every side — top, bottom, left and right. It must stay readable at a tiny size, about 20 px: one simple strong silhouette built from a few large shapes, all the painterly detail inside the silhouette; no sparks, embers or particles floating around it. A crisp rim light runs along the outline and separates it from the black."
+    },
+    "lb-spines": {
+      "aspect": "16:9",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [
+        "art/generated/book-cover/book-cover-1__nb2.raw.jpg",
+        "art/generated/book-cover/book-cover-2__nb2.raw.jpg",
+        "art/generated/book-cover/book-cover-3__nb2.raw.jpg",
+        "art/generated/book-cover/book-cover-4__nb2.raw.jpg",
+        "art/generated/book-cover/book-cover-5__nb2-v2.raw.jpg"
+      ],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI sheet for a dark fantasy mobile RPG — FIVE closed books standing upright in one row, seen straight on at their spines: only the five spines are visible and they face the viewer, perfectly vertical, perfectly flat and frontal, no perspective, no tilt, no shelf under them. All five spines have the same height — about three quarters of the canvas height — and stand on one invisible line; each spine is about one ninth of the canvas width, and between the spines there are equal wide gaps of solid pure black, each at least half as wide as a spine. The whole canvas around and between the spines is solid pure black, with an empty black margin above, below and at both sides.\n\nThe attached images are the approved front covers of these five books, in order from book 1 to book 5. Each spine is the spine of its own book: the same material, metal, ornament, colors, wear and brushwork as its cover, only seen from the side. The interface later places a gem, a colored band, a class emblem and a number on each spine, so none of those are painted: the spines carry only their own material, bands and ornament, with a calm empty middle. Never copy the black window of the covers onto the spines."
+    }
+  },
+  "jobs": [
+    {
+      "id": "lb-wall",
+      "category": "lb-texture",
+      "title": "Задняя стенка шкафа — тёмные доски старого дуба, бесшовно",
+      "source": "Слово автора 30.09.2026: «задний фон показывает, что они условно находятся на полках огромного древнего шкафа». Фон за книгами «Моих», каталога, «За золото» и отрядов. К выгрузке — design/ui/assets/art/bookcase/wall.jpg",
+      "subject": "The texture: the back wall of an immense ancient bookcase — tall vertical boards of very dark, almost black old oak, worn smooth by centuries: faint vertical grain, fine dry cracks and narrow dark seams between the boards. The boards are all the same width — exactly one sixth of the canvas each, six boards across — and every board runs from the top edge to the bottom edge. A few old iron nail heads, dull and dark. Nearly black overall, from #0B0907 to #1C1612, with only a very faint cold turquoise sheen in the grain; no bright spots, no light falling on it."
+    },
+    {
+      "id": "lb-plank",
+      "category": "lb-strip",
+      "title": "Полка — толстая доска с железной кромкой, повторяется по горизонтали",
+      "source": "Каждый ряд книг стоит на своей полке (слово автора 30.09.2026: «каждая на своём ряде»). К выгрузке — design/ui/assets/art/bookcase/plank.png",
+      "subject": "The strip: the front of one thick, heavy shelf board of an immense ancient bookcase. Its upper quarter is the narrow top surface of the board seen from slightly above — dark oak worn a little lighter where books have stood for centuries, with a thin layer of dust. Below it, the thick front edge of the board: very dark old oak, and along its lower half a straight flat band of blackened iron fixed with small round rivets at even intervals. The lower rim of the iron band catches a thin line of cold turquoise light (#48E5D4) from below. Nothing stands on the shelf, nothing hangs from it, no brackets under it."
+    },
+    {
+      "id": "lb-cornice",
+      "category": "lb-strip",
+      "title": "Карниз шкафа — резной брус, повторяется по горизонтали",
+      "source": "Карниз шкафа: на нём — счётчики, порядок и фильтр (правила воздуха, ADR-0026). К выгрузке — design/ui/assets/art/bookcase/cornice.png",
+      "subject": "The strip: the heavy carved cornice that crowns an immense ancient bookcase — a thick horizontal beam of very dark old oak: a stepped moulding along its top edge, below it a calm flat band of dark wood (the widest part of the beam), and along its bottom edge a row of small carved dentils over a thin band of blackened iron with small rivets. Faint warm amber light (#E6A84B) touches the upper edges of the moulding; a thin cold turquoise rim of light (#48E5D4) runs under the dentils from below. The flat middle band stays dark, calm and plain."
+    },
+    {
+      "id": "lb-post",
+      "category": "lb-post",
+      "title": "Резная боковая стойка шкафа, повторяется по вертикали",
+      "source": "Стойки по бокам шкафа; прокрутка идёт вдоль шкафа, стойки стоят. К выгрузке — design/ui/assets/art/bookcase/post.png",
+      "subject": "The post: a side post (pilaster) of an immense ancient bookcase in very dark old oak: a flat front face framed by two raised carved mouldings running straight down its whole length; down the middle of the face runs a narrow carved channel of interlaced knotwork in the same dark wood. Exactly in the middle of the canvas height a band of blackened iron with two round rivets crosses the post. A thin cold turquoise rim light (#48E5D4) runs along its left and right edges."
+    },
+    {
+      "id": "lb-bracket",
+      "category": "lb-part",
+      "title": "Кованый кронштейн полки",
+      "source": "Полка лежит на кованых кронштейнах у стоек. К выгрузке — design/ui/assets/art/bookcase/bracket.png",
+      "subject": "The object: one heavy forged shelf bracket (corbel) of blackened iron, seen straight from the front, shaped as a right-angled triangle: its top edge is a straight horizontal bar (a shelf rests on it), its left edge is a straight vertical bar fixed with two big round rivets, and between them a thick curved strut sweeps from the far end of the top bar down to the lower end of the vertical bar and curls into a tight spiral scroll inside the triangle. Worn, heavy, matte iron with a cold grey rim light; a thin turquoise glint (#48E5D4) on its lower edge from below."
+    },
+    {
+      "id": "lb-lamp",
+      "category": "lb-part",
+      "title": "Лампада с кристаллом карста",
+      "cutout": "black-glow",
+      "aspect": "9:16",
+      "source": "Свет в шкафу: лампада на кронштейне, внутри — кристалл карста. К выгрузке — design/ui/assets/art/bookcase/lamp.png",
+      "subject": "The object: a small hanging lamp (lampada) of blackened iron: at the top a short straight chain ending in a ring, below it a round openwork iron cage with a pointed iron finial at the bottom; inside the cage a raw crystal of karst glows cold turquoise (#48E5D4) from within, and its light spills softly through the openwork onto the iron bars. The whole lamp, chain and ring included, is inside the canvas with the black margin around it."
+    },
+    {
+      "id": "lb-spines",
+      "category": "lb-spines",
+      "title": "Корешки пяти ступеней книги — кожа, оковка, оклад, кодекс, гримуар",
+      "source": "Нижняя полка отрядов и отсеки шкафа: свободные герои стоят корешками. Ступень — личный максимум доблести, как у обложек books/cover-1…5 (ADR-0032). К выгрузке — design/ui/assets/art/books/spine-1…5.png",
+      "subject": "From left to right. BOOK 1: soft, worn, warm brown leather over a rounded spine with two raised leather bands near the top and the bottom, no metal at all. BOOK 2: dark grey-black leather with three bands of blackened iron with small rivets across it and iron caps at the top and the bottom. BOOK 3: brown leather under plates of dark aged bronze with carved interlaced knotwork along both edges and small bronze bosses near the top and the bottom. BOOK 4: black leather bound with riveted iron straps, with long pieces of carved yellowed bone set along it and a heavy round iron boss in the middle. BOOK 5: a grimoire — blackened riveted iron with short sharp spikes at its top and bottom corners, carved yellowed bone along it, and warm amber light (#E6A84B) glowing from the thin edges of the pages at the top of the spine."
+    }
+  ]
+}

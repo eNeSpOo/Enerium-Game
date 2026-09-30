@@ -19,7 +19,12 @@
    — героев аккаунта: hrOwn собирает купленного и пробуждённого героя состава в той же форме, что герои боя прототипа (S.heroes), — H(id)
      в index.html находит и его: карточка, развитие, отряды и бой работают одинаково;
    — отряды: библиотеку пресетов S.squads (§2.1: до десяти, имена, до пяти героев) и один лист выбора отряда на все режимы — OV.prep;
-     у каждого режима свой сохранённый выбор. API для экранов режимов — SQ (описан в screens/README.md);
+     у каждого режима свой сохранённый выбор. API для экранов режимов — SQ (описан в screens/README.md). Вид отрядов — «Библиотека
+     Этриона» (слово автора 30.09.2026, screens/library.js): слева — высокий шкаф, отряд — отсек с пятью корешками и латунной табличкой
+     имени и мощи; справа — выбранный отряд на одной полке крупным планом (книги размера m) и нижняя полка свободных героев корешками:
+     нажатие — книга выезжает и встаёт в выбранное место (или в первое пустое), удержание — книга раскрывается (ACT.sqbook);
+   — «Мои», «Каталог» и «За золото» — книги на полках шкафа (lbCase, lbShelves — screens/library.js): каждый ряд — на своей полке,
+     на карнизе — строка счётчиков, порядка и фильтра; у «За золото» цена — латунной табличкой на кромке полки под книгой;
    — «Призыв»: hireView и вкладки «За золото», «За Энериум», «За души». «За золото» — та же сетка книг героев каталога цикла (будущий
      цикл не виден), нажатие — раскрытая книга «до покупки» с ценой и «Купить» (покупка — ACT.gbuy, index.html). «За души» — сцена алтаря
      Возрождения душ (hrSoulsView, её зовёт rsSoulsView в index.html; слово автора 29.09.2026 — «дорого-богато»): зеркало душ, перед ним
@@ -104,7 +109,8 @@ const HR_VIEW = {
    говорить игроку, насколько сильный герой находится перед ним». Карточка — книга (screens/book.js): ступень книги — личный максимум
    доблести, редкость — кристалл и свет книги; вид книги — HB_VIEW и HB_ART там же */
 const HC_VIEW = {
-  card: [112, 104],        // сетка: книга не уже, px — [932 × 430, 844 × 390]; обложка 9 : 16, под ней — ленты доблести
+  card: [112, 104],        // полка «Мои» и каталога: книга не уже, px — [932 × 430, 844 × 390]; обложка 9 : 16, ленты — на кромке полки
+  gold: [100, 92],         // полка «За золото»: книга не уже, px — над шкафом ещё вкладки Призыва, видно больше одного ряда
   gap: 8,                  // между книгами сетки, px
   short: 100000,           // мощь от этого числа — коротко: «128,4К»
   echo: 12,                // витрина отряда недели: между книгами, px
@@ -378,7 +384,6 @@ function hcCatCard(v, o = {}) {
   const sh = hcShardOf(v), full = !!sh && sh[0] >= sh[1];
   return hbCard(v, Object.assign({ z: 'l', gray: v.st === 2 && !full, shard: sh }, o));
 }
-const hcGridVars = () => `--hk-w0:${HC_VIEW.card[0]}px;--hk-w1:${HC_VIEW.card[1]}px;--hk-gap:${HC_VIEW.gap}px`;
 
 /* ---------- порядок и фильтр ---------- */
 /* сетка сейчас: all — каталог, own — герои аккаунта; раскрытая книга лежит поверх сетки, из которой её открыли (S.hgrid) */
@@ -417,15 +422,16 @@ function hcBar(kind, shown, found) {
   return `<div class="hkh">${tabs}${n ? `<span class="hk-cnt num">${shown} из ${all ? found : mine}</span>` : scale}<span class="g-spacer"></span>${pow}${sel}${hcFBtn(kind, n)}</div>`;
 }
 const hcEmpty = () => `<div class="hk-empty"><p>Под фильтр никто не подходит</p><button class="btn sm" data-a="hcclr">Сбросить фильтр</button></div>`;
-/* сетка: «Мои» — книги героев аккаунта; каталог — найденные герои состава */
+/* сетка: «Мои» — книги героев аккаунта; каталог — найденные герои состава. Книги стоят на полках шкафа («Библиотека Этриона»,
+   screens/library.js): каждый ряд — на своей полке, строка счётчиков, порядка и фильтра — на карнизе, прокрутка — вдоль шкафа */
 function hcGridView() {
   const kind = hcKind();
   if (kind === 'all' && !RS.heroes.length) return HR_NODATA;
   const found = hcFound().length, list = kind === 'all' ? hcCatList() : hcOwnList();
   const card = v => kind === 'all' ? hcCatCard(v) : hbCard(v, { z: 'l' });
   const none = kind === 'all' && !found ? `<div class="hk-empty"><p>Героев пока не найдено: осколки приходят из Возрождения душ и сундуков Эхо, героев за золото открывает Призыв.</p></div>` : '';
-  return `<section class="scr hk-scr">${hcBar(kind, list.length, found)}
-    <div class="hkg scroll" style="${hcGridVars()}" data-keep="hk:${kind}">${list.map(card).join('') || none || hcEmpty()}</div></section>`;
+  const sh = lbShelves(list.map(card), { min: HC_VIEW.card, empty: list.length ? '' : none || hcEmpty() });
+  return `<section class="scr hk-scr">${lbCase({ cls: 'hk-case', top: hcBar(kind, list.length, found), body: `<div class="hkg lb-shv scroll" style="--n:${sh.n}" data-keep="hk:${kind}">${sh.html}</div>` })}</section>`;
 }
 
 /* ---------- страницы раскрытой книги (сама книга — hbWin, screens/book.js) ----------
@@ -627,37 +633,46 @@ const SQ = {
   used: id => sqUsed(id),
 };
 
-/* ---------- библиотека: список пресетов и редактор ---------- */
+/* ---------- библиотека: шкаф отрядов, полка отряда, нижняя полка ----------
+   «Библиотека Этриона» (слово автора 30.09.2026: «в отрядах панель слева — это буквально огромный шкаф, а то, где показан отряд, — это
+   по сути полка»; «снизу пока неудобная панель, её нужно будет продумать»). Слева — высокий шкаф: отряд — отсек с пятью маленькими
+   корешками и латунной табличкой имени и мощи на кромке полки, где отряд выбран — строкой. Справа — выбранный отряд на одной полке
+   крупным планом: пять мест, книги размера m стоят в ряд; нажатие — выбрать место, другое место — поменяться; удержание — книга героя.
+   Внизу — нижняя полка: свободные герои корешками (цвет редкости, класс, уровень, имя), по мощи; нажатие — книга выезжает и встаёт
+   в выбранное место отряда (или в первое пустое, ACT.sqput), удержание — книга раскрывается (ACT.sqbook). Логика — прежняя: SQ_SRV */
 function hrSquadsView() {
   const s = sq(S.selSquad); S.selSquad = s.id;
   const op = sqOp(), slot = S.sq.slot, n = s.m.filter(Boolean).length, full = S.squads.length >= SQ_DATA.max;
-  const rows = S.squads.map(x => { const u = sqUsed(x.id); return `<button class="preset" data-a="sq" data-v="${x.id}" aria-current="${x.id === s.id}">
-      <span class="row"><b>${hrEsc(x.name)}</b><span class="g-spacer"></span>${bmHtml(sqBM(x), 12)}</span>
-      <span class="faces">${sqFaces(x)}</span>${u.length ? `<small class="faint">${u.join(' · ')}</small>` : ''}</button>`; }).join('');
-  const slots = s.m.map((id, i) => { const h = id && H(id); return h ? heroCard(h, { act: 'sqslot', val: `${op}|${i}`, sel: slot === i, bm: false })
-    : `<button class="hc empty${slot === i ? ' sel' : ''}" data-a="sqslot" data-v="${op}|${i}" aria-label="Пустое место ${i + 1}">${ic('plus')}</button>`; }).join('');
+  /* отсек шкафа: пять корешков (пустое место — пыльный след), где отряд выбран, табличка имени и мощи */
+  const cmp = x => {
+    const u = sqUsed(x.id), k = x.m.filter(Boolean).length, bm = sqBM(x);
+    const spines = x.m.map(id => { const h = id && H(id); return h ? hbSpine(hrV(h), { z: 's', tag: 'span' }) : '<i class="lb-gap" aria-hidden="true"></i>'; }).join('');
+    return `<button class="lb-cmp" data-a="sq" data-v="${x.id}" aria-current="${x.id === s.id}" aria-label="${hrEsc(x.name)}: ${k} из ${SQ_DATA.size}, мощь ${fmt(bm)}${u.length ? ' · ' + u.join(', ') : ''}">
+      <span class="lb-cmpb">${spines}${u.length ? `<small class="lb-used">${u.join(' · ')}</small>` : ''}</span>${lbPlank()}${lbTag(`<b>${hrEsc(x.name)}</b>${bmHtml(bm, 11)}`, 'w')}</button>`;
+  };
+  const lhead = `<div class="hkh lb-toph"><span class="eyebrow">Отряды · ${S.squads.length} / ${SQ_DATA.max}</span><span class="g-spacer"></span><button class="iconbtn lb-new" data-a="sqnew" data-v="${op}"${full ? ' disabled' : ''} aria-label="Новый отряд" title="${full ? `В библиотеке уже ${SQ_DATA.max} отрядов` : 'Новый отряд'}">${ic('plus')}</button></div>`;
+  const left = lbCase({ cls: 'tall', top: lhead, lamps: false, body: `<div class="lb-shv lb-cmps scroll" data-keep="sqlist" role="group" aria-label="Шкаф отрядов">${S.squads.map(cmp).join('')}</div>` });
+  /* полка отряда крупным планом: пустое место — «+», книга — нажатие выбирает место, удержание раскрывает книгу; только что
+     поставленная с нижней полки — встаёт на место (lbRise) */
+  const five = s.m.map((id, i) => {
+    const h = id && H(id), on = slot === i;
+    if (!h) return `<button class="lb-slot empty${on ? ' sel' : ''}" data-a="sqslot" data-v="${op}|${i}" aria-label="Пустое место ${i + 1}">${ic('plus')}</button>`;
+    const r = lbRiseOf(i, h.id);
+    return `<div class="lb-slot${r ? ' rise' : ''}" data-hold="sqbook:${h.id}"${r ? ` style="--lb-d:${r.d}ms"` : ''}>${heroCard(h, { act: 'sqslot', val: `${op}|${i}`, sel: on, bm: false, z: 'm' })}</div>`;
+  }).join('');
   const sel = slot >= 0 && s.m[slot] ? H(s.m[slot]) : null;
   const bar = sel ? `<span class="hr-sqsel"><b>${hrEsc(sel.name)}</b><button class="iconbtn" data-a="sqmv" data-v="${op}|${s.id}|${slot}|-1" aria-label="Сдвинуть влево" ${slot > 0 ? '' : 'disabled'}>${ic('back')}</button><button class="iconbtn" data-a="sqmv" data-v="${op}|${s.id}|${slot}|1" aria-label="Сдвинуть вправо" ${slot < SQ_DATA.size - 1 ? '' : 'disabled'}>${ic('arrow')}</button><button class="btn sm" data-a="sqrem" data-v="${op}|${s.id}|${slot}">${ic('x')}Убрать</button></span>`
-    : `<span class="reason">${slot >= 0 ? `Место ${slot + 1}: выберите героя ниже.` : 'Нажмите героя, затем другое место — поменяются местами.'}</span>`;
+    : `<span class="reason">${slot >= 0 ? `Место ${slot + 1}: нажмите корешок на нижней полке.` : 'Корешок — в отряд, удержание — книга. Место, потом другое — поменяются.'}</span>`;
+  /* нижняя полка: свободные герои корешками, сильнейшие слева */
   const pool = hrMine().filter(h => !s.m.includes(h.id)).sort((a, b) => b.bm - a.bm);
-  const prow = h => { const b = busyNote(h.id); return `<button class="rs-row hr-prow" data-r="${h.r}" data-a="sqput" data-v="${op}|${s.id}|${h.id}">${hrAv(h)}<span class="tx"><b>${hrEsc(h.name)}</b><small>${CLS(h.clsN || h.cls, 13)}ур. ${h.lvl} · ${bmHtml(h.bm, 11)}</small></span>${b ? `<span class="chip warn" title="${b}">занят</span>` : ''}</button>`; };
-  const F = S.sq.from, from = F ? `<div class="hr-from"><span>Выбор для режима «${SQM[F.mode].n}»</span><span class="g-spacer"></span><button class="link" data-a="sqback">${ic('back')}Назад</button><button class="btn sm go" data-a="sqpick" data-v="${op}|${F.mode}|${s.id}|${S.sq.round}">Выбрать «${hrEsc(s.name)}»</button></div>` : '';
-  return `<section class="scr"><div class="sq">
-    <div class="pnl pad col">
-      <div class="row"><span class="eyebrow">Отряды · ${S.squads.length} / ${SQ_DATA.max}</span></div>
-      <div class="col scroll grow hr-pres" data-keep="sqlist">${rows}</div>
-      <button class="btn sm" data-a="sqnew" data-v="${op}" ${full ? `disabled title="В библиотеке уже ${SQ_DATA.max} отрядов"` : ''}>${ic('plus')}Новый отряд</button>
-    </div>
-    <div class="pnl pad col hr-sqed">
-      ${from}
-      <div class="row hr-sqh"><h2 class="serif gold">${hrEsc(s.name)}</h2><button class="iconbtn" data-a="sheet" data-v="sqname:${s.id}" aria-label="Переименовать отряд" title="Переименовать">${HR_PEN}</button><button class="iconbtn" data-a="sqdel" data-v="${s.id}" aria-label="Удалить отряд" title="Удалить" ${S.squads.length > 1 ? '' : 'disabled'}>${ic('trash')}</button><span class="chip">${n} / ${SQ_DATA.size}</span><span class="g-spacer"></span><b class="bm sq-bm" title="Боевая мощь отряда">${ICON('power', 22, 'Боевая мощь')}<span class="num">${fmt(sqBM(s))}</span></b></div>
-      <div class="sq-slots">${slots}</div>
-      <div class="row hr-sqbar">${bar}</div>
-      <div class="hr"></div>
-      <span class="eyebrow">${pool.length ? `Герои · ${pool.length}` : 'Все герои в отряде'}</span>
-      <div class="hr-pool scroll grow" data-keep="sqpool">${pool.map(prow).join('')}</div>
-    </div>
-  </div></section>`;
+  const spine = h => hbSpine(hrV(h), { act: 'sqput', val: `${op}|${s.id}|${h.id}`, hold: `sqbook:${h.id}`, say: 'Нажмите — в отряд, удерживайте — книга героя' });
+  /* пришли из листа режима — под шкафом: для какого режима, «Назад» и «Выбрать» (полка отряда справа не теряет высоты) */
+  const F = S.sq.from, from = F ? `<div class="hr-from lb-from"><span>Выбор для режима «${SQM[F.mode].n}»</span><span class="row"><button class="link" data-a="sqback">${ic('back')}Назад</button><span class="g-spacer"></span><button class="btn sm go" data-a="sqpick" data-v="${op}|${F.mode}|${s.id}|${S.sq.round}" aria-label="Выбрать «${hrEsc(s.name)}» для режима «${SQM[F.mode].n}»">Выбрать</button></span></div>` : '';
+  const head = `<div class="hkh hr-sqh"><h2 class="serif gold">${hrEsc(s.name)}</h2><button class="iconbtn" data-a="sheet" data-v="sqname:${s.id}" aria-label="Переименовать отряд" title="Переименовать">${HR_PEN}</button><button class="iconbtn" data-a="sqdel" data-v="${s.id}" aria-label="Удалить отряд" title="Удалить" ${S.squads.length > 1 ? '' : 'disabled'}>${ic('trash')}</button><span class="chip">${n} / ${SQ_DATA.size}</span><span class="g-spacer"></span><b class="bm sq-bm" title="Боевая мощь отряда">${ICON('power', 22, 'Боевая мощь')}<span class="num">${fmt(sqBM(s))}</span></b></div>`;
+  const stage = `<div class="lb-stage"><div class="lb-five" role="group" aria-label="Полка отряда «${hrEsc(s.name)}»: пять мест">${five}</div>${lbPlank('near')}</div>`;
+  const low = `<div class="lb-low"><div class="lb-lowh"><span class="eyebrow">${pool.length ? `Герои · ${pool.length}` : 'Все герои в отряде'}</span><span class="g-spacer"></span>${bar}</div>
+      <div class="lb-lows scroll" data-keep="sqpool"><div class="lb-lowr" role="group" aria-label="Нижняя полка: свободные герои">${pool.map(spine).join('')}${lbPlank()}</div></div></div>`;
+  return `<section class="scr"><div class="lb-sq" style="${lbVars()}"><div class="lb-sql">${left}${from}</div><div class="lb-sqr">${lbCase({ cls: 'near', top: head, body: stage + low })}</div></div></section>`;
 }
 const HR_PEN = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/></svg>';
 
@@ -712,21 +727,25 @@ function hireView() {
   </section>`;
 }
 /* за золото — слова автора 30.09.2026: «в призыве за золото то же самое: сетка героев и вся информация по герою до его покупки, чтобы
-   игрок понимал, что он покупает». Каталог цикла книгами, «№» — только порядок; купленный — отметка; цена k-й покупки цикла растёт
-   линейно — одна строка над сеткой и на кнопке «Купить» в книге; максимум доблести — 1, книга — первой ступени. Герои будущего цикла
-   не видны до его открытия (стадии знакомства, решение автора 30.09.2026): каталог говорит, когда откроется */
+   игрок понимал, что он покупает». Картотека Этриона цикла — книги на полках того же шкафа («Библиотека Этриона», screens/library.js),
+   «№» — только порядок; купленный — отметка «в коллекции»; цена k-й покупки цикла растёт линейно — строка на карнизе, латунная табличка
+   на кромке полки под каждой книгой и кнопка «Купить» в книге; максимум доблести — 1, книга — первой ступени, её ленты на полке прячет
+   табличка. Герои будущего цикла не видны до его открытия (стадии знакомства, решение автора 30.09.2026): картотека говорит, когда
+   откроется */
 function rsGoldView() {
-  const cur = rsCyc(), c = S.rs.gcyc || cur, open = c <= cur, k = rsBought(c) + 1;
+  const cur = rsCyc(), c = S.rs.gcyc || cur, open = c <= cur, k = rsBought(c) + 1, price = rsGold(c, k), lack = Math.max(0, price - S.wallet.gold);
   const cat = RS.heroes.filter(h => h.src === 'gold' && h.c === c).sort((a, b) => a.no - b.no);
   const list = open ? cat.map(hcView).filter(v => v && hcPass(v, 'gold')) : [];
-  const opts = ROMAN.slice(1).map((r, i) => `<option value="${i + 1}" ${i + 1 === c ? 'selected' : ''}>Каталог цикла ${r}${i + 1 > cur ? ' · закрыт' : ''}</option>`).join('');
-  const cards = !open ? `<div class="hk-empty"><p>${ic('lock')} Каталог цикла ${ROMAN[c]} откроется при переходе на цикл ${ROMAN[c]}: тогда станут известны и его герои.</p></div>`
-    : list.map(v => hbCard(v, { z: 'l', act: 'gsel', val: v.rh ? v.rh.id : v.id, own: true })).join('') || hcEmpty();
-  return `<div class="hk-hire">
-    <div class="hkh"><select class="rs-sel hk-cyc" data-a="gcyc" aria-label="Каталог героев за золото">${opts}</select>${open ? `<span class="chip" title="Нанято героев этого каталога">${k - 1} / ${cat.length}</span>` : ''}
-      <p class="rs-next">${open ? `Следующий найм — ${k}-й в цикле:${money('gold', rsGold(c, k))}` : `${ic('lock')}Каталог откроется в цикле ${ROMAN[c]}`}</p><span class="g-spacer"></span>${hcFBtn('gold', hcFN('gold'))}</div>
-    <div class="hkg scroll" style="${hcGridVars()}" data-keep="gold:${c}">${cards}</div>
-  </div>`;
+  const opts = ROMAN.slice(1).map((r, i) => `<option value="${i + 1}" ${i + 1 === c ? 'selected' : ''}>Картотека Этриона · цикл ${r}${i + 1 > cur ? ' · закрыта' : ''}</option>`).join('');
+  /* под книгой — латунная табличка на кромке полки: цена следующего найма; купленный — «в коллекции»; нехватка — табличка тусклее */
+  const tag = v => v.own ? lbTag(`${ic('check')}в коллекции`, 'own')
+    : lbTag(`<img src="${curImg('gold')}" alt="Золото"><b class="num">${fmt(price)}</b>`, lack ? 'lack' : '', lack ? `Не хватает ${fmt(lack)} золота` : `${k}-й найм цикла`);
+  const cells = list.map(v => hbCard(v, { z: 'l', act: 'gsel', val: v.rh ? v.rh.id : v.id, own: true }) + tag(v));
+  const shut = `<div class="hk-empty"><p>${ic('lock')} Картотека цикла ${ROMAN[c]} откроется при переходе на цикл ${ROMAN[c]}: тогда станут известны и его герои.</p></div>`;
+  const sh = lbShelves(cells, { min: HC_VIEW.gold, empty: cells.length ? '' : open ? hcEmpty() : shut });
+  const top = `<div class="hkh"><select class="rs-sel hk-cyc" data-a="gcyc" aria-label="Картотека героев за золото">${opts}</select>${open ? `<span class="chip" title="Нанято героев этой картотеки">${k - 1} / ${cat.length}</span>` : ''}
+      <p class="rs-next">${open ? `Следующий найм — ${k}-й в цикле:${money('gold', price)}` : `${ic('lock')}Картотека откроется в цикле ${ROMAN[c]}`}</p><span class="g-spacer"></span>${hcFBtn('gold', hcFN('gold'))}</div>`;
+  return lbCase({ cls: 'hk-hire gold', top, body: `<div class="hkg lb-shv scroll" style="--n:${sh.n}" data-keep="gold:${c}">${sh.html}</div>` });
 }
 /* одно действие карточки «до покупки» за золото: цена у кнопки «Купить» (покупка — ACT.gbuy в index.html, подтверждение с ценой
    следующей); не хватает — сколько; будущий цикл — витрина; купленный — к развитию. Формула цены — команде */
@@ -1292,13 +1311,23 @@ Object.assign(ACT, {
     const r = SQ_SRV.swap(op, s.id, j, i);
     S.sq.slot = -1; sqSay(r); render();
   },
-  /* герой в отряд: в выбранное место или в первое свободное; отряд полон и место не выбрано — просьба выбрать */
-  sqput(v) {
+  /* герой в отряд: в выбранное место или в первое свободное; отряд полон и место не выбрано — просьба выбрать. После операции —
+     только показ: книга выезжает с нижней полки и встаёт на место (lbRise, screens/library.js) */
+  sqput(v, t) {
     const [op, id, hid] = sqParse(v), s = sqFind(id); if (!s) return;
     const i = S.sq.slot >= 0 ? S.sq.slot : s.m.indexOf(null);
     if (i < 0) return toast('В отряде уже пятеро: нажмите, кого заменить');
     const r = SQ_SRV.put(op, id, i, hid);
+    if (r.res && !r.again && r.res.swap == null && typeof lbRise === 'function') lbRise(i, hid, t);
     S.sq.slot = -1; sqSay(r); render();
+  },
+  /* удержание корешка нижней полки или книги полки отряда — книга героя раскрывается поверх отрядов (слой — screens/book.js, hbLayer);
+     закрытие — к отрядам. Вид: отряд не меняется */
+  sqbook(v, t) {
+    const h = H(v); if (!h) return;
+    S.route = 'heroes'; S.seg.heroes = 'squads'; S.overlay = null; S.sq.book = h.id; S.selHero = h.id;
+    if (typeof hbOpenFx === 'function') hbOpenFx(t, h.id);
+    render();
   },
   sqrem(v) { const [op, id, i] = sqParse(v), r = SQ_SRV.take(op, id, +i); S.sq.slot = -1; sqSay(r); render(); },
   sqmv(v) {
@@ -1458,8 +1487,13 @@ function sqFocusName() {
   requestAnimationFrame(() => { const i = document.getElementById('sqName'); if (i) { i.focus(); try { i.select(); } catch (_) { } } });
 }
 document.addEventListener('input', e => { const t = e.target; if (t && t.id === 'sqName' && S.overlay && S.overlay.t === 'sqname') S.sq.name = { id: S.overlay.arg, v: t.value }; });
-/* ушли из библиотеки не через «Назад» и не «Выбрать» — выбор для режима забыт: строка режима в библиотеке больше не висит */
-window.addEventListener('en-render', () => { if (S.sq && S.sq.from && !(S.route === 'heroes' && S.seg.heroes === 'squads')) S.sq.from = null; });
+/* ушли из библиотеки не через «Назад» и не «Выбрать» — выбор для режима забыт: строка режима в библиотеке больше не висит; книга
+   героя отряда закрыта */
+window.addEventListener('en-render', () => {
+  if (!S.sq || (S.route === 'heroes' && S.seg.heroes === 'squads')) return;
+  if (S.sq.from) S.sq.from = null;
+  if (S.sq.book) S.sq.book = '';
+});
 document.addEventListener('keydown', e => {
   const t = e.target; if (!t || t.id !== 'sqName' || e.key !== 'Enter') return;
   e.preventDefault(); const b = document.querySelector('.g [data-a="sqrendo"]'); if (b) b.click();
@@ -1468,10 +1502,10 @@ document.addEventListener('keydown', e => {
 /* ================== состояние ==================
    S.sq: seq и ops — «сервер» библиотеки; sel — выбор режимов, у которых нет своего поля (оборона Арены, Лига, Клановый босс);
    slot — выбранное место в редакторе, round — раунд Лиги в листе, from — из какого режима пришли в библиотеку и куда вернуться,
-   name — черновик имени. Маршрут возврата листа — поле back его слоя (S.overlay.back): лист открыт поверх экрана режима */
+   name — черновик имени, book — чья книга раскрыта поверх отрядов (удержание корешка). Маршрут возврата листа — поле back его слоя (S.overlay.back): лист открыт поверх экрана режима */
 function sqState(s) {
   const D = SQ_DATA.demo;
-  s.sq = { seq: 1, ops: {}, sel: { arena: D.arena, league: D.league.slice(), clan: D.clan }, slot: -1, round: 0, from: null, name: null };
+  s.sq = { seq: 1, ops: {}, sel: { arena: D.arena, league: D.league.slice(), clan: D.clan }, slot: -1, round: 0, from: null, name: null, book: '' };
   /* S.dn — «сервер» покупок за Энериум: seq — номер следующей, ops — итоги по номерам; got — окно получения: номер и время покупки */
   s.dn = { seq: 1, ops: {}, got: null };
   /* S.du — «сервер» лавки праха и пробуждения (SOUL_SRV): seq, ops; q — сколько брать (0 — до комплекта), cyc — цикл витрины (0 — все),
@@ -1489,13 +1523,13 @@ sqState(S);
 
 /* ================== сценарии презентации ================== */
 FLOWS.push(
-  ['Коллекция · книги героев', 'Купленные герои сеткой книг: ступень книги — максимум доблести, кристалл и свет — редкость, замки — рунные пределы, ленты — взятая доблесть; уровень, стихия, класс и мощь',
+  ['Коллекция · книги героев', 'Купленные герои — книги на полках шкафа Библиотеки Этриона, каждый ряд на своей полке: ступень книги — максимум доблести, кристалл и свет — редкость, замки — рунные пределы, ленты — взятая доблесть; уровень, стихия, класс и мощь',
     () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'own'; S.overlay = null; }],
   ['Книга героя', 'Нажатие на книгу: она летит в центр и раскрывается — слева портрет, справа развитие, снаряжение, навыки и путь; замки на переплёте, ленты снизу',
     () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'mine'; S.hgrid = 'own'; S.selHero = 'h2'; S.seg.hero = 'power'; S.overlay = null; }],
   ['Каталог · найденные герои', 'Только найденные: неизвестная душа — силуэт и полоса осколков, известный — книга «до покупки»; не найденных не видно — только счётчик',
     () => { S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'all'; S.overlay = null; }],
-  ['За золото · до покупки', 'Сетка книг каталога цикла; нажатие — книга «до покупки»: портрет, редкость, класс, стихия, доблесть, навыки по доблести, история, цена и «Купить»',
+  ['За золото · до покупки', 'Картотека цикла на полках того же шкафа, цена найма — латунной табличкой под книгой; нажатие — книга «до покупки»: портрет, редкость, класс, стихия, доблесть, навыки по доблести, история, цена и «Купить»',
     () => {
       S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'gold'; S.rs.gcyc = 0; S.overlay = null; S.seg.rhero = 'who';
       const h = RS.heroes.find(x => x.src === 'gold' && x.c === rsCyc() && !rsHas(x)); S.rs.gsel = h ? h.id : '';
@@ -1507,8 +1541,14 @@ FLOWS.push(
       if (h) { S.rs.shards[h.id] = Math.max(S.rs.shards[h.id] || 0, hrNeed()); S.rs.ssel = h.id; S.wallet.souls = Math.max(S.wallet.souls, RS.rules.stub.activateSouls); }
       S.overlay = { t: 'hrecho' };
     }],
-  ['Отряды · библиотека', 'До десяти отрядов: создать, назвать, собрать до пяти героев и переставить; где какой отряд выбран',
-    () => { S.route = 'heroes'; S.seg.heroes = 'squads'; S.selSquad = 's2'; S.sq.slot = -1; S.overlay = null; }],
+  ['Отряды · библиотека', 'Шкаф отрядов: отряд — отсек с корешками и табличкой имени и мощи; справа — отряд на полке крупным планом, внизу — свободные герои корешками: нажатие — в отряд, удержание — книга',
+    () => { S.route = 'heroes'; S.seg.heroes = 'squads'; S.selSquad = 's2'; S.sq.slot = -1; S.sq.book = ''; S.overlay = null; }],
+  ['Отряды · книга с нижней полки', 'Удержание корешка: книга выдвигается с полки корешком, разворачивается обложкой и раскрывается поверх отрядов; закрытие — к отрядам',
+    () => {
+      S.route = 'heroes'; S.seg.heroes = 'squads'; S.selSquad = 's2'; S.sq.slot = -1; S.overlay = null;
+      const s = sq('s2'), h = hrMine().filter(x => !s.m.includes(x.id)).sort((a, b) => b.bm - a.bm)[0]; if (!h) return;
+      S.sq.book = h.id; S.selHero = h.id; if (typeof hbOpenFx === 'function') hbOpenFx(null, h.id);
+    }],
   ['Отряд для режима · один лист', 'Спуск, Эхо, оборона Арены, Лига и Клановый босс — один лист выбора, у каждого режима свой сохранённый отряд',
     () => { S.route = 'echo'; S.overlay = { t: 'prep', arg: 'echo', back: 'echo' }; }],
   ['Лига · три отряда', 'Три отряда по пять, герой не повторяется: повторы и нехватка героев видны до боя',
@@ -1555,7 +1595,8 @@ KIT_EXTRA.push({
     const pres = S.squads.map(x => `<span class="chip">${hrEsc(x.name)} · ${x.m.filter(Boolean).length}</span>`).join('');
     return `<section class="k-box" style="grid-column:1/-1"><h3>Отряды и мелкая книга</h3>
       <div class="k-demo" style="display:grid;grid-template-columns:repeat(4,minmax(0,84px));gap:10px">${tiles}</div>
-      <p class="k-note">В отрядах, листе выбора отряда, витринах Арены и профилях — та же книга, мелкая: только главное — кристалл редкости, ступень книги (максимум доблести), замки рунных пределов, ленты взятой доблести и уровень. Имя, класс и мощь — по нажатию и в раскрытой книге; у витрин (пятёрка сильнейших, оборона) — мощь под книгой. Занятость — поверх портрета.</p>
+      <p class="k-note">В листе выбора отряда, витринах Арены и профилях — та же книга, мелкая: только главное — кристалл редкости, ступень книги (максимум доблести), замки рунных пределов, ленты взятой доблести и уровень. Имя, класс и мощь — по нажатию и в раскрытой книге; у витрин (пятёрка сильнейших, оборона) — мощь под книгой. Занятость — поверх портрета.</p>
+      <p class="k-note">Сами отряды — шкаф (раздел «Библиотека Этриона»): слева отряд — отсек с пятью корешками и табличкой имени и мощи, справа — выбранный отряд на полке крупным планом (книги размера m), внизу — свободные герои корешками: нажатие — книга встаёт в выбранное место или в первое пустое, удержание — книга раскрывается.</p>
       <div class="k-row">${pres}</div>
       <p class="k-note">Библиотека «Отряды» (§2.1): до ${SQ_DATA.max} пресетов с именами, в каждом до ${SQ_DATA.size} героев; пресет героев не занимает. Создать, переименовать, удалить, собрать и переставить — операции с номером: повтор ничего не меняет. Один лист выбора на все режимы — <code>OV.prep</code>, у каждого режима свой выбор:</p>
       <table class="rk-tab"><tr><th>Режим</th><th>Героев</th><th>Занятые</th><th>Где выбор</th></tr>${rows}</table>

@@ -1,0 +1,177 @@
+/* screens/library.css — «Библиотека Этриона» (screens/library.js): шкаф героев на вкладках «Герои» — карниз, резные стойки с ножками
+   в свете кристалла, задняя стенка, полки с коваными кронштейнами, латунные таблички, лампады, свет карста снизу, пыль в луче;
+   в отрядах — высокий шкаф с отсеками, полка отряда крупным планом и нижняя полка корешков. Слово автора 30.09.2026: «пусть задний
+   фон показывает, что они условно находятся на полках огромного древнего шкафа, каждая на своём ряде».
+   Числа — из LB_VIEW (переменные --lb-* у шкафа), арт — LB_ART (адреса --lb-wall… у <html> и классы lb-w, lb-p, lb-c, lb-s, lb-f,
+   lb-b, lb-l); без арта шкаф рисует CSS. Корешок книги — .hs (screens/book.css). Фон тёмный и тихий — он не спорит с книгами.
+   Движение — только transform и opacity; «меньше движения» — без движения. Свои классы — lb-*. */
+
+/* ---------- шкаф: карниз сверху, между стойками — задняя стенка и полки ---------- */
+.lb-case{--lb-top:var(--lb-top0,36px);--lb-pw:var(--lb-pw0,14px);position:relative;flex:1 1 0;min-width:0;min-height:0;display:flex;flex-direction:column;isolation:isolate;
+  border-radius:5px 5px 3px 3px;background:#0b0907;box-shadow:0 0 0 1px rgba(0,0,0,.65),0 18px 34px -20px rgba(0,0,0,.95)}
+@container main (max-height: 360px){ .lb-case{--lb-top:var(--lb-top1,34px);--lb-pw:var(--lb-pw1,12px)} }
+/* карниз: резной брус; на тихой полосе — строка счётчиков, порядка и фильтра (правила воздуха) */
+.lb-top{position:relative;z-index:6;flex:none;height:var(--lb-top);display:flex;align-items:center;min-width:0;padding:0 calc(var(--lb-pw) + 6px)}
+.lb-cn{position:absolute;top:0;bottom:0;left:-3px;right:-3px;z-index:-1;pointer-events:none;border-radius:4px 4px 0 0;
+  background:linear-gradient(180deg,#3b2c1d 0,#21180f 14%,#140e09 30%,#110c08 68%,#1d150d 82%,#0a0806 100%);box-shadow:inset 0 1px 0 rgba(233,199,126,.22),0 6px 10px -4px rgba(0,0,0,.9)}
+html.lb-c .lb-cn{background:var(--lb-cornice) 0 0/auto 100% repeat-x}
+.lb-top .hkh{flex:1 1 auto;min-width:0;min-height:0;height:100%}
+.lb-top .tabs{padding:2px;background:rgba(7,6,5,.8);border-color:rgba(201,162,106,.3)}
+.lb-top .tabs button{height:22px}
+.lb-top .iconbtn,.lb-top .rs-sel,.lb-top .collpow,.lb-top .chip{background:rgba(8,7,6,.82);border-color:rgba(201,162,106,.3)}
+.lb-top .iconbtn,.lb-top .rs-sel,.lb-top .collpow{height:26px;min-height:26px}
+.lb-top .iconbtn{width:26px}
+.lb-top .chip{height:20px}
+.lb-top .eyebrow,.lb-top .hk-scale,.lb-top .hk-cnt,.lb-top .rs-next{color:#c2ad84;text-shadow:0 1px 2px #000}
+.lb-top .rs-next{font-size:12.5px}
+/* тело шкафа: стойки по бокам, между ними — задняя стенка; тень от карниза */
+.lb-body{position:relative;flex:1 1 0;min-height:0;display:flex;flex-direction:column;padding:0 var(--lb-pw);isolation:isolate;
+  background:repeating-linear-gradient(90deg,#15100c 0 58px,#0d0a07 58px 61px),#0d0a08}
+html.lb-w .lb-body{background:var(--lb-wall) 0 0/var(--lb-wt) auto repeat,#0d0a08}
+.lb-body::before{content:"";position:absolute;left:0;right:0;top:0;height:18px;z-index:5;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.72),transparent)}
+/* прокрутка вдоль шкафа: задняя стенка едет вместе с полками, у стоек — тень глубины */
+.lb-shv{position:relative;z-index:1;flex:1 1 0;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;
+  background:linear-gradient(90deg,rgba(0,0,0,.5),transparent 6%,transparent 94%,rgba(0,0,0,.5)) local,repeating-linear-gradient(90deg,#15100c 0 58px,#0d0a07 58px 61px) local,#0d0a08}
+html.lb-w .lb-shv{background:linear-gradient(90deg,rgba(0,0,0,.5),transparent 6%,transparent 94%,rgba(0,0,0,.5)) local,var(--lb-wall) 0 0/var(--lb-wt) auto repeat local,#0d0a08}
+.lb-shv::-webkit-scrollbar{display:none}
+
+/* ---------- ряд: книги стоят на своей полке ---------- */
+.lb-row{position:relative;padding:var(--lb-air) var(--lb-pad) 0}
+.lb-bks{position:relative;z-index:2;display:grid;grid-template-columns:repeat(var(--n,6),minmax(0,1fr));column-gap:var(--lb-gap);align-items:end}
+.lb-c{position:relative;min-width:0}
+.lb-c>.hb{width:100%}
+/* на полке ленты доблести свисают с кромки доски — места в ряду не занимают */
+.lb-c>.hb>.hb-rb,.lb-slot>.hb>.hb-rb{position:absolute;left:0;right:0;top:100%}
+.lb-ph{display:block;width:100%;aspect-ratio:9/16}   /* пустая полка — высотой в книгу */
+.lb-row.say .lb-c{grid-row:1;grid-column:1}
+.lb-row.say .lb-c.wide{grid-column:1/-1;z-index:3;align-self:center;display:grid;place-items:center}
+.lb-row.say .hk-empty{padding:0 var(--sp-l);text-align:center}
+/* полка: доска — верх (на нём книги) и кромка с железной полосой; кронштейны у стоек; тень на задней стенке */
+.lb-pl{position:relative;z-index:1;display:block;height:var(--lb-pl);margin:calc(-1 * var(--lb-sink)) calc(-1 * var(--lb-pad)) 0;pointer-events:none;
+  background:linear-gradient(180deg,#5c4731 0,#3e2f20 calc(var(--lb-pl) * var(--lb-su) / 1000),#1c150e calc(var(--lb-pl) * var(--lb-su) / 1000 + 1px),#130e09 60%,#262c33 61%,#171b20 82%,#0b0d0f 100%);
+  box-shadow:0 1px 0 rgba(72,229,212,.2)}
+html.lb-p .lb-pl{background:var(--lb-plank) 0 0/auto 100% repeat-x}
+.lb-pl::after{content:"";position:absolute;left:0;right:0;top:100%;height:14px;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.62),rgba(0,0,0,.16) 55%,transparent)}
+.lb-br{position:absolute;top:calc(100% - 3px);z-index:1;width:var(--lb-br);height:calc(var(--lb-br) * 1000 / var(--lb-brr));pointer-events:none;
+  background:linear-gradient(180deg,#34393f 0 16%,transparent 16%) 0 0/100% 100% no-repeat,linear-gradient(90deg,#34393f 0 16%,transparent 16%) 0 0/100% 100% no-repeat,radial-gradient(100% 100% at 100% 100%,transparent 64%,#2b2f34 65% 76%,transparent 77%) 0 0/100% 100% no-repeat}
+.lb-br.l{left:0}
+.lb-br.r{right:0;transform:scaleX(-1)}
+html.lb-b .lb-br{background:var(--lb-bracket) 0 0/100% 100% no-repeat}
+/* латунная табличка на кромке полки: цена «За золото», имя и мощь отряда */
+.lb-tag{display:inline-flex;align-items:center;justify-content:center;gap:4px;height:15px;padding:0 6px;border-radius:2px;white-space:nowrap;
+  background:linear-gradient(180deg,#7b6038,#5b4526 58%,#4b391e);box-shadow:inset 0 0 0 1px rgba(233,199,126,.4),inset 0 1px 0 rgba(255,236,190,.25),0 1px 2px rgba(0,0,0,.85);
+  color:#f3e6c0;font:700 11px/1 var(--f-u);letter-spacing:.02em;text-shadow:0 1px 1px rgba(0,0,0,.85)}
+.lb-tag::before,.lb-tag::after{content:"";flex:none;width:3px;height:3px;border-radius:50%;background:#2b1f0f;box-shadow:inset 0 1px 0 rgba(255,236,190,.45)}
+.lb-tag img{width:11px;height:11px;object-fit:contain}
+.lb-tag .i{width:10px;height:10px}
+.lb-tag .num{font:inherit}
+.lb-tag.lack{color:#d9a998;filter:saturate(.7) brightness(.85)}
+.lb-tag.own{color:#bff5ec}
+.lb-c>.lb-tag{position:absolute;left:50%;top:calc(100% + 2px);z-index:3;max-width:100%;transform:translateX(-50%)}
+.hk-hire.gold .lb-c>.hb>.hb-rb{visibility:hidden}   /* «За золото»: на кромке — цена, ленты под табличкой не видны */
+
+/* ---------- стойки, лампады, свет снизу, пыль в луче ---------- */
+.lb-post{position:absolute;top:0;bottom:0;z-index:4;width:var(--lb-pw);pointer-events:none;
+  background:linear-gradient(90deg,#070605,#2a2016 18%,#3a2c1e 34%,#1d160e 50%,#2e2317 68%,#140f0a 88%,#060504);box-shadow:0 0 10px rgba(0,0,0,.85)}
+html.lb-s .lb-post{background:var(--lb-post) 0 0/100% auto repeat-y}
+.lb-post.l{left:0}
+.lb-post.r{right:0}
+/* ножка стойки: низ в свете кристалла карста — главный свет шкафа снизу */
+.lb-post::after{content:"";position:absolute;left:-60%;right:-60%;bottom:0;height:40px;pointer-events:none;background:radial-gradient(50% 70% at 50% 100%,rgba(72,229,212,.45),rgba(72,229,212,.08) 60%,transparent)}
+html.lb-f .lb-post::after{--lb-fw:calc(var(--lb-pw) * 1000 / (1000 - var(--lb-fl) - var(--lb-fp)));left:calc(-1 * var(--lb-fw) * var(--lb-fl) / 1000);right:auto;width:var(--lb-fw);height:calc(var(--lb-fw) * 1000 / var(--lb-fr));
+  background:var(--lb-foot) 0 0/100% 100% no-repeat}
+/* лампада на стойке: кристалл карста в кованой клетке, мягкий свет вокруг */
+.lb-lamp{position:absolute;top:var(--lb-la);z-index:5;width:var(--lb-lw);height:calc(var(--lb-lw) * 1000 / var(--lb-lr));pointer-events:none}
+.lb-lamp.l{left:calc(var(--lb-pw) / 2);transform:translateX(-50%)}
+.lb-lamp.r{right:calc(var(--lb-pw) / 2);transform:translateX(50%)}
+.lb-lamp::before{content:"";position:absolute;left:50%;top:64%;width:320%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);
+  background:radial-gradient(closest-side,rgba(72,229,212,.2),rgba(72,229,212,.05) 55%,transparent);animation:lb-flick 5.2s ease-in-out infinite}
+.lb-lamp::after{content:"";position:absolute;inset:0;background:radial-gradient(40% 24% at 50% 64%,#bff7ef,#48e5d4 45%,transparent 70%),linear-gradient(90deg,transparent 46%,#2b2f34 46% 54%,transparent 54%) 0 0/100% 40% no-repeat}
+html.lb-l .lb-lamp::after{background:var(--lb-lamp) 0 0/100% 100% no-repeat}
+/* свет карста снизу — поверх полок, едва заметно */
+.lb-glow{position:absolute;left:0;right:0;bottom:0;height:44%;z-index:3;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(70% 100% at 50% 100%,rgba(72,229,212,.13),rgba(72,229,212,.035) 55%,transparent 76%)}
+/* пыль в луче: тонкий луч света сверху, пылинки плывут — transform и opacity */
+.lb-dust{position:absolute;top:0;bottom:0;left:calc(var(--lb-pw) + 6%);width:34%;z-index:3;overflow:hidden;pointer-events:none;
+  background:linear-gradient(100deg,transparent 12%,rgba(233,214,170,.03) 40%,rgba(233,214,170,.05) 54%,transparent 86%)}
+.lb-dust i{position:absolute;left:var(--x);top:var(--y);width:2px;height:2px;border-radius:50%;background:#eadcbc;box-shadow:0 0 4px rgba(234,220,188,.7);opacity:0;
+  animation:lb-mote var(--s) linear var(--d) infinite}
+@keyframes lb-mote{0%{opacity:0;transform:translate(0,0)}20%{opacity:.55}80%{opacity:.35}100%{opacity:0;transform:translate(var(--dx),var(--dy))}}
+@keyframes lb-flick{0%,100%{opacity:.75}45%{opacity:1}70%{opacity:.86}}
+
+/* ---------- отряды: слева — шкаф с отсеками, справа — полка отряда крупным планом и нижняя полка корешков ---------- */
+.lb-sq{--lb-sqw:var(--lb-sqw0,220px);--lb-cmh:var(--lb-cm0,74px);--lb-mnh:var(--lb-mn0,42px);--lb-sph:var(--lb-sp0,96px);--lb-lhh:var(--lb-lh0,26px);
+  display:grid;grid-template-columns:var(--lb-sqw) minmax(0,1fr);gap:var(--sp-m);height:100%;min-height:0}
+@container main (max-height: 360px){ .lb-sq{--lb-sqw:var(--lb-sqw1,196px);--lb-cmh:var(--lb-cm1,70px);--lb-mnh:var(--lb-mn1,38px);--lb-sph:var(--lb-sp1,84px);--lb-lhh:var(--lb-lh1,24px)} }
+.lb-sql,.lb-sqr{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0;min-height:0}
+/* пришли из листа режима: под шкафом — для какого режима, «Назад» и «Выбрать» */
+.lb-from{flex:none;flex-direction:column;align-items:stretch;gap:4px;padding:6px 8px}
+.lb-from>span:first-child{font-size:12px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-from .row{gap:6px}
+.lb-from .btn.sm{min-height:28px}
+/* высокий шкаф: карниз — «Отряды · N / 10» и «Новый»; отсек — пять корешков на полке и табличка имени и мощи */
+.lb-toph{gap:6px}
+.lb-cmps{padding-bottom:4px}
+.lb-cmp{position:relative;display:flex;flex-direction:column;justify-content:flex-end;width:100%;height:var(--lb-cmh);padding:0 0 9px;border:0;border-radius:0;background:none;color:var(--parch);text-align:left;cursor:pointer}
+.lb-cmp:focus-visible{outline:none}
+.lb-cmp:focus-visible .lb-tag{box-shadow:inset 0 0 0 1px var(--spirit),0 0 0 1px var(--spirit)}
+.lb-cmpb{position:relative;z-index:2;display:flex;align-items:flex-end;gap:2px;height:var(--lb-mnh);padding:0 var(--lb-pad)}
+.lb-cmpb>.hs{--sh:var(--lb-mnh)}
+.lb-gap{display:block;flex:none;width:calc(var(--lb-mnh) * 28 / 100);height:calc(var(--lb-mnh) * 70 / 100);border-radius:2px;border:1px dashed rgba(201,162,106,.2);background:rgba(0,0,0,.25)}
+.lb-used{position:absolute;right:var(--lb-pad);top:4px;max-width:52%;font:700 10px/1.2 var(--f-u);letter-spacing:.03em;color:#a8946c;text-align:right;text-shadow:0 1px 2px #000}
+.lb-cmp>.lb-pl{margin:calc(-1 * var(--lb-sink)) 0 0}
+.lb-cmp>.lb-pl::after{height:9px}
+.lb-cmp>.lb-tag{position:absolute;left:var(--lb-pad);right:var(--lb-pad);bottom:6px;z-index:3;justify-content:space-between;height:16px}
+.lb-cmp>.lb-tag b{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;font:600 13px/1 var(--f-d);letter-spacing:0}
+.lb-cmp>.lb-tag .bm{display:inline-flex;align-items:center;gap:3px;font:700 11px/1 var(--f-u);color:#f3e6c0}
+.lb-cmp>.lb-tag .bm .ico{width:11px;height:11px}
+.lb-cmp[aria-current="true"]::before{content:"";position:absolute;left:0;right:0;top:3px;bottom:9px;pointer-events:none;background:radial-gradient(60% 80% at 50% 100%,rgba(72,229,212,.16),transparent 72%)}
+.lb-cmp[aria-current="true"]>.lb-tag{color:var(--gold);box-shadow:inset 0 0 0 1px rgba(233,199,126,.8),0 0 10px rgba(72,229,212,.35),0 1px 2px rgba(0,0,0,.85)}
+.lb-cmp:hover>.lb-tag{box-shadow:inset 0 0 0 1px rgba(233,199,126,.7),0 1px 2px rgba(0,0,0,.85)}
+/* полка отряда крупным планом: книги размера m стоят в ряд — по ширине пятой части и по высоте полки (контейнер stage) */
+.lb-case.near .lb-top .hr-sqh{gap:6px}
+.lb-case.near .lb-top h2{font-size:22px;line-height:1.05;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-case.near .lb-top .sq-bm{font-size:22px}
+.lb-stage{position:relative;flex:1 1 0;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;container:stage/size}
+.lb-five{position:relative;z-index:2;display:flex;justify-content:center;align-items:flex-end;gap:var(--lb-fg);padding:0 var(--lb-pad);
+  --bw:min(calc((100cqw - 2 * var(--lb-pad) - 4 * var(--lb-fg)) / 5),calc((100cqh - var(--lb-air) - var(--lb-pn) + var(--lb-sink)) * 9 / 16))}
+.lb-slot{position:relative;flex:none;display:block;width:var(--bw)}
+.lb-slot>.hb{width:100%}
+.lb-slot.empty{display:grid;place-items:center;aspect-ratio:9/16;padding:0;border-radius:4px;border:1px dashed rgba(201,162,106,.32);color:#8f7d5c;cursor:pointer;
+  background:radial-gradient(60% 40% at 50% 100%,rgba(72,229,212,.08),transparent 70%),rgba(0,0,0,.28)}
+.lb-slot.empty .i{width:18px;height:18px}
+.lb-slot.empty:hover{border-color:rgba(221,188,122,.55);color:var(--gold-2)}
+.lb-slot.empty.sel{border-color:var(--spirit);color:var(--spirit);box-shadow:0 0 0 1px var(--spirit)}
+.lb-pl.near{height:var(--lb-pn);margin:calc(-1 * var(--lb-sink)) 0 0}
+/* книга с нижней полки встаёт на место: выезжает корешком и разворачивается обложкой — transform и opacity */
+.lb-slot.rise>.hb{animation:lb-rise var(--lb-rt,460ms) cubic-bezier(.2,.7,.2,1) var(--lb-d,0ms) both}
+@keyframes lb-rise{0%{opacity:.25;transform:perspective(700px) translate(var(--lb-dx,0px),var(--lb-dy,120px)) scale(calc(var(--lb-sc,420) / 1000)) rotateY(80deg)}55%{opacity:1}100%{opacity:1;transform:perspective(700px) translate(0,0) scale(1) rotateY(0deg)}}
+@keyframes lb-fade{from{opacity:0}to{opacity:1}}
+/* нижняя полка: свободные герои корешками; строка над ней — сколько героев и выбранное место */
+.lb-low{position:relative;z-index:2;flex:none;display:flex;flex-direction:column;min-width:0}
+.lb-lowh{display:flex;align-items:center;gap:var(--sp-s);height:var(--lb-lhh);min-width:0;padding:0 var(--lb-pad);background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,.22))}
+.lb-lowh .eyebrow{flex:none;color:#c2ad84}
+.lb-lowh .reason{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:11.5px}
+.lb-lowh .hr-sqsel{gap:4px}
+.lb-lowh .hr-sqsel b{font-size:14px}
+.lb-lowh .iconbtn{width:24px;height:24px}
+.lb-lowh .btn.sm{min-height:22px;padding:0 8px;font-size:11px}
+.lb-lows{overflow-x:auto;overflow-y:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#3a2c1e transparent}
+.lb-lowr{position:relative;display:flex;align-items:flex-end;gap:var(--lb-sg);width:max-content;min-width:100%;padding:var(--lb-air) var(--lb-pad) calc(var(--lb-pl) - var(--lb-sink))}
+.lb-lowr>.hs{--sh:var(--lb-sph);z-index:2}
+.lb-lowr>.lb-pl{position:absolute;left:0;right:0;bottom:0;margin:0}
+
+/* ---------- «меньше движения»: пыль и свет лампад стоят, книга встаёт на место плавной сменой ---------- */
+@media (prefers-reduced-motion:reduce){
+  .lb-dust i{animation:none;opacity:.3}
+  .lb-lamp::before{animation:none}
+  .lb-slot.rise>.hb{animation-name:lb-fade}
+}
+
+/* ---------- раздел UI-кита «Библиотека Этриона» ---------- */
+.lbk-demo{position:relative;display:flex;height:330px;max-width:760px;margin:var(--sp-m) 0}
+.lbk-demo.gold{height:270px;max-width:520px}
+.lbk-row{display:flex;flex-wrap:wrap;gap:var(--sp-l);align-items:flex-end;margin:var(--sp-m) 0}
+.lbk-sp{display:flex;align-items:flex-end;gap:4px;padding:10px 12px 6px;border-radius:8px;background:#0d0a08}
+.lbk-sp>.hs{--sh:96px}
+.lbk-sp.mini>.hs{--sh:42px}

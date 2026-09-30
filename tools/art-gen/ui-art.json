@@ -1,5 +1,5 @@
 {
-  "note": "Какой арт из art/generated/ идёт в прототип design/ui/. Враги — ADR-0013, отряд — герои сета 1 «Хранители Песочных Часов», арена — вторая раскладка. mirror — отражение: корпус героя на карте развёрнут вправо, к врагам, корпус врага — влево, к героям (решение автора 27.09.2026). Выгрузка: python tools/art-gen/export_ui.py Эхо, неделя эльфов — арена и портреты Иш-Кантуна, одобрены автором 28.09.2026 (ADR-0025, п. 8): ik-01…ik-14 — ступени лестницы 1–14, ik-15 — Многоликий. Значки атрибутов, редкостей (ADR-0027), классов и доблести одобрены автором 28.09.2026: PNG 128×128 с прозрачностью, эмблема вписана в 80 % кадра (fit). Окно «Спуск» — фон биома во всё окно: место и его обитатели на одном арте (слова автора 30.09.2026), задание tools/art-gen/jobs/descent-backdrops.json; descent/b1…b4.jpg, 1688×716. Карточка героя — книга (выбор автора 30.09.2026, ADR-0032): обложки пяти ступеней с прозрачным окном, развороты, замок закрытый и отпертый, лента и звёздочка (нейтральные, цвет редкости даёт интерфейс), изнанка обложки и лист — books/*, задание tools/art-gen/jobs/hero-books.json, геометрия — tools/art-gen/book_layers.py → HB_ART в design/ui/screens/book.js; крупный арт с альфой — WebP. Карты боя — рамки по типу бойца (jobs/battle-frames.json): bframes/<тип>.png ← battle-frames/*.bf.png — окно вычищено, рисунок обрезан по альфе (tools/art-gen/battle_frame.py); 320 px в ширину, высота — по пропорции рисунка, без fit: доли окна и нарезки в BF (screens/battle-cards.js) совпадают с выгрузкой.",
+  "note": "Какой арт из art/generated/ идёт в прототип design/ui/. Враги — ADR-0013, отряд — герои сета 1 «Хранители Песочных Часов», арена — вторая раскладка. mirror — отражение: корпус героя на карте развёрнут вправо, к врагам, корпус врага — влево, к героям (решение автора 27.09.2026). Выгрузка: python tools/art-gen/export_ui.py Эхо, неделя эльфов — арена и портреты Иш-Кантуна, одобрены автором 28.09.2026 (ADR-0025, п. 8): ik-01…ik-14 — ступени лестницы 1–14, ik-15 — Многоликий. Значки атрибутов, редкостей (ADR-0027), классов и доблести одобрены автором 28.09.2026: PNG 128×128 с прозрачностью, эмблема вписана в 80 % кадра (fit). Окно «Спуск» — фон биома во всё окно: место и его обитатели на одном арте (слова автора 30.09.2026), задание tools/art-gen/jobs/descent-backdrops.json; descent/b1…b4.jpg, 1688×716. Карточка героя — книга (выбор автора 30.09.2026, ADR-0032): обложки пяти ступеней с прозрачным окном, развороты, замок закрытый и отпертый, лента и звёздочка (нейтральные, цвет редкости даёт интерфейс), изнанка обложки и лист — books/*, задание tools/art-gen/jobs/hero-books.json, геометрия — tools/art-gen/book_layers.py → HB_ART в design/ui/screens/book.js; крупный арт с альфой — WebP. Карты боя — рамки по типу бойца (jobs/battle-frames.json): bframes/<тип>.png ← battle-frames/*.bf.png — окно вычищено, рисунок обрезан по альфе (tools/art-gen/battle_frame.py); 320 px в ширину, высота — по пропорции рисунка, без fit: доли окна и нарезки в BF (screens/battle-cards.js) совпадают с выгрузкой. Библиотека Этриона — шкаф героев (слово автора 30.09.2026: «задний фон показывает, что они условно находятся на полках огромного древнего шкафа»): bookcase/* — задняя стенка (бесшовная), полка и карниз (повторяются по горизонтали), стойка (по вертикали) и её ножка со светом кристалла, кованый кронштейн, лампада; корешки пяти ступеней книги — books/spine-1…5 (часть книги, HB_ART в design/ui/screens/book.js); задание tools/art-gen/jobs/library-shelves.json, бесшовность и нарезка — tools/art-gen/shelf_layers.py, геометрия — LB_ART в design/ui/screens/library.js и HB_ART.spines.",
   "out": "design/ui/assets/art",
   "size": [
     464,
@@ -1767,6 +1767,90 @@
     "heroes/c2-12.jpg": "heroes/hero-c2-12-eyvind-v2__nb2.jpg",
     "heroes/c2-13.jpg": "heroes/hero-c2-13-rummat-v2__nb2.jpg",
     "heroes/c2-14.jpg": "heroes/hero-c2-14-bera-v2__nb2.jpg",
-    "heroes/c2-15.jpg": "heroes/hero-c2-15-nazir-v2__nb2.jpg"
+    "heroes/c2-15.jpg": "heroes/hero-c2-15-nazir-v2__nb2.jpg",
+    "bookcase/wall.jpg": {
+      "from": "lb-texture/lb-wall__nb2.tile.jpg",
+      "size": [
+        466,
+        470
+      ]
+    },
+    "bookcase/plank.png": {
+      "from": "lb-strip/lb-plank__nb2.strip.png",
+      "size": [
+        227,
+        40
+      ]
+    },
+    "bookcase/cornice.png": {
+      "from": "lb-strip/lb-cornice__nb2.strip.png",
+      "size": [
+        437,
+        72
+      ]
+    },
+    "bookcase/post.png": {
+      "from": "lb-post/lb-post__nb2.post.png",
+      "size": [
+        32,
+        178
+      ]
+    },
+    "bookcase/post-foot.png": {
+      "from": "lb-post/lb-post__nb2.foot.png",
+      "size": [
+        62,
+        65
+      ]
+    },
+    "bookcase/bracket.png": {
+      "from": "lb-part/lb-bracket__nb2.png",
+      "size": [
+        64,
+        61
+      ]
+    },
+    "bookcase/lamp.png": {
+      "from": "lb-part/lb-lamp__nb2.png",
+      "size": [
+        50,
+        128
+      ]
+    },
+    "books/spine-1.png": {
+      "from": "lb-spines/lb-spines__nb2-1.png",
+      "size": [
+        91,
+        320
+      ]
+    },
+    "books/spine-2.png": {
+      "from": "lb-spines/lb-spines__nb2-2.png",
+      "size": [
+        85,
+        320
+      ]
+    },
+    "books/spine-3.png": {
+      "from": "lb-spines/lb-spines__nb2-3.png",
+      "size": [
+        93,
+        320
+      ]
+    },
+    "books/spine-4.png": {
+      "from": "lb-spines/lb-spines__nb2-4.png",
+      "size": [
+        87,
+        320
+      ]
+    },
+    "books/spine-5.png": {
+      "from": "lb-spines/lb-spines__nb2-5.png",
+      "size": [
+        102,
+        320
+      ]
+    }
   }
 }
