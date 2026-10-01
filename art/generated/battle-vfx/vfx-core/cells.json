@@ -1,0 +1,300 @@
+{
+  "sheet": "art/generated/battle-vfx/vfx-core__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/battle-vfx.json",
+  "job": "vfx-core",
+  "grid": [
+    6,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "slash",
+      "file": "art/generated/battle-vfx/vfx-core/vx-slash.webp",
+      "box": [
+        18,
+        33,
+        813,
+        828
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "slash2",
+      "file": "art/generated/battle-vfx/vfx-core/vx-slash2.webp",
+      "box": [
+        863,
+        33,
+        1658,
+        828
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "flare",
+      "file": "art/generated/battle-vfx/vfx-core/vx-flare.webp",
+      "box": [
+        1708,
+        33,
+        2503,
+        828
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "sparks",
+      "file": "art/generated/battle-vfx/vfx-core/vx-sparks.webp",
+      "box": [
+        2553,
+        33,
+        3348,
+        828
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "crit",
+      "file": "art/generated/battle-vfx/vfx-core/vx-crit.webp",
+      "box": [
+        3397,
+        33,
+        4192,
+        828
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "ring",
+      "file": "art/generated/battle-vfx/vfx-core/vx-ring.webp",
+      "box": [
+        4242,
+        33,
+        5037,
+        828
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "orb",
+      "file": "art/generated/battle-vfx/vfx-core/vx-orb.webp",
+      "box": [
+        17,
+        876,
+        813,
+        1672
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "rays",
+      "file": "art/generated/battle-vfx/vfx-core/vx-rays.webp",
+      "box": [
+        862,
+        876,
+        1658,
+        1672
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "halo",
+      "file": "art/generated/battle-vfx/vfx-core/vx-halo.webp",
+      "box": [
+        1707,
+        876,
+        2503,
+        1672
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "hex",
+      "file": "art/generated/battle-vfx/vfx-core/vx-hex.webp",
+      "box": [
+        2553,
+        876,
+        3349,
+        1672
+      ],
+      "px": 796,
+      "key_left": 0.00281
+    },
+    {
+      "id": "buff",
+      "file": "art/generated/battle-vfx/vfx-core/vx-buff.webp",
+      "box": [
+        3397,
+        876,
+        4193,
+        1672
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "heal",
+      "file": "art/generated/battle-vfx/vfx-core/vx-heal.webp",
+      "box": [
+        4242,
+        876,
+        5038,
+        1672
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "dome",
+      "file": "art/generated/battle-vfx/vfx-core/vx-dome.webp",
+      "box": [
+        17,
+        1720,
+        813,
+        2516
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "shards",
+      "file": "art/generated/battle-vfx/vfx-core/vx-shards.webp",
+      "box": [
+        862,
+        1720,
+        1658,
+        2516
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "stun",
+      "file": "art/generated/battle-vfx/vfx-core/vx-stun.webp",
+      "box": [
+        1707,
+        1720,
+        2503,
+        2516
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "ice",
+      "file": "art/generated/battle-vfx/vfx-core/vx-ice.webp",
+      "box": [
+        2553,
+        1720,
+        3349,
+        2516
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "sand",
+      "file": "art/generated/battle-vfx/vfx-core/vx-sand.webp",
+      "box": [
+        3397,
+        1720,
+        4193,
+        2516
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "seal",
+      "file": "art/generated/battle-vfx/vfx-core/vx-seal.webp",
+      "box": [
+        4242,
+        1720,
+        5038,
+        2516
+      ],
+      "px": 796,
+      "key_left": 0.00656
+    },
+    {
+      "id": "roar",
+      "file": "art/generated/battle-vfx/vfx-core/vx-roar.webp",
+      "box": [
+        17,
+        2565,
+        813,
+        3361
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "whoosh",
+      "file": "art/generated/battle-vfx/vfx-core/vx-whoosh.webp",
+      "box": [
+        862,
+        2565,
+        1658,
+        3361
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "soul",
+      "file": "art/generated/battle-vfx/vfx-core/vx-soul.webp",
+      "box": [
+        1707,
+        2565,
+        2503,
+        3361
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "dust",
+      "file": "art/generated/battle-vfx/vfx-core/vx-dust.webp",
+      "box": [
+        2553,
+        2565,
+        3349,
+        3361
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "drain",
+      "file": "art/generated/battle-vfx/vfx-core/vx-drain.webp",
+      "box": [
+        3397,
+        2565,
+        4193,
+        3361
+      ],
+      "px": 796,
+      "key_left": 0.01633
+    },
+    {
+      "id": "chain",
+      "file": "art/generated/battle-vfx/vfx-core/vx-chain.webp",
+      "box": [
+        4242,
+        2565,
+        5038,
+        3361
+      ],
+      "px": 796,
+      "key_left": 0.0
+    }
+  ]
+}

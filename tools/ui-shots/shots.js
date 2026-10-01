@@ -44,14 +44,25 @@ async function target() {
     await cmd('Page.enable'); await cmd('Runtime.enable');
     await cmd('Network.enable'); await cmd('Network.setCacheDisabled', { cacheDisabled: true });   // у стилей нет штампа версии: иначе долгоживущий Chrome покажет старые
     await cmd('Emulation.setDeviceMetricsOverride', { width: 1600, height: 1000, deviceScaleFactor: 2, mobile: false });
+    /* свой скрипт или стиль страницы не загрузился (сервер под нагрузкой сбросил соединение) — браузер молча идёт дальше без него, и
+       кадры снимаются без экрана: запоминаем такие сбои до первого скрипта страницы; внешние шрифты не в счёт — без сети их нет */
+    await cmd('Page.addScriptToEvaluateOnNewDocument', { source: "window.__shotLoadFail = []; addEventListener('error', e => { const x = e.target; const u = x && (x.tagName === 'SCRIPT' || x.tagName === 'LINK') ? x.src || x.href : ''; if (u && u.startsWith(location.origin)) window.__shotLoadFail.push(u); }, true);" });
     /* ждём, пока прототип поднимется: без кэша ~90 скриптов и сотни картинок грузятся дольше фиксированной паузы; сервер превью под
-       нагрузкой иногда отказывает в соединении — тогда страница без скриптов, и её грузим заново (до трёх раз) */
-    let up = false;
+       нагрузкой иногда отказывает в соединении — тогда страница без скриптов, и её грузим заново (до трёх раз). Основной скрипт
+       index.html заводит S и render раньше, чем грузятся screens/*.js: ждём ещё и полной загрузки (document.readyState === 'complete'),
+       иначе кадр начнётся без экранов — «sq is not defined», «bfView is not defined». Не загрузился хоть один скрипт или стиль —
+       страница грузится заново */
+    let up = false, failed = [];
     for (let t = 0; t < 3 && !up; t++) {
       await cmd('Page.navigate', { url: URL0 });
-      for (let i = 0; i < 60; i++) { await sleep(500); if (await ev(`typeof S !== 'undefined' && typeof render === 'function' && !!document.querySelector('.p-device')`)) { up = true; break; } }
+      for (let i = 0; i < 60; i++) {
+        await sleep(500);
+        if (!(await ev(`typeof S !== 'undefined' && typeof render === 'function' && !!document.querySelector('.p-device') && document.readyState === 'complete'`))) continue;
+        failed = (await ev('(window.__shotLoadFail || []).slice(0, 5)')) || [];
+        up = !failed.length; break;
+      }
     }
-    if (!up) throw new Error('прототип не поднялся за три загрузки');
+    if (!up) throw new Error('прототип не поднялся за три загрузки' + (failed.length ? ': не загрузились ' + failed.join(', ') : ''));
     await sleep(800);
     const log = [];
     for (const s of shots) {

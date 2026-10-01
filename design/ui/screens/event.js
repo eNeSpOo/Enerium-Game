@@ -77,12 +77,14 @@ function evNew(s, empty) {
 }
 /* клан в демо: очки остальных участников — «сервер» клана. Считаются под нынешний состав: клан заводит свой файл (screens/clan.js),
    поэтому состав сверяется при каждой сверке. Остальные к этому часу недели в среднем набрали столько же, сколько обычный игрок своего
-   цикла (EN_EVENT.demo.cyc[цикл].pts), но играют не все — доля clanActiveBp (EN_EVENT.demo) */
+   цикла (EN_EVENT.demo.cyc[цикл].pts), но играют не все — доля clanActiveBp (EN_EVENT.demo). Очки участника другого цикла — в очках цикла
+   игрока, по первым личным порогам (ADR-0042, EnEvent.clanPts) */
 function evClanKey(s) { const C = s.clan; return !C || C.in === false ? '' : `${C.n}|${(evMembers(s) || []).join('')}`; }
 function evClanSeed(E, s) {
   const M = evMembers(s), mid = c => ((EVD.demo.cyc[c] || {}).pts || 0);   // очки обычного игрока цикла c к этому часу недели
   E.clan.key = evClanKey(s);
-  E.clan.others = M && s.acc.cycle >= EVD.from ? Math.floor((M.reduce((a, c) => a + mid(c), 0) - mid(s.acc.cycle)) * EVD.demo.clanActiveBp / EVD.bp) : 0;
+  const me = s.acc.cycle;
+  E.clan.others = M && me >= EVD.from ? Math.floor((M.reduce((a, c) => a + EVA.clanPts(EVD, mid(c), c, me), 0) - mid(me)) * EVD.demo.clanActiveBp / EVD.bp) : 0;
 }
 /* циклы участников клана, «я» — цикл аккаунта: у клана screens/clan.js — поле cyc участника; без списка — число мест mem; без клана — null.
    Вступивший на этой неделе (weeks — 0) приносит очки клану со следующей недели — в пороги и очки клана он пока не входит (§25.3) */
@@ -116,11 +118,12 @@ function evPlanks() {
   });
 }
 window.evPlanks = evPlanks;
-/* клан: очки — сумма очков участников; планка k — сумма личных порогов (k + 2) участников, каждого по его циклу.
+/* клан (ADR-0042): очки — сумма очков участников, у других циклов — в очках цикла игрока по первым личным порогам; планка k — участников ×
+   первый порог цикла игрока × clanX[k] / 100. Так планки и место клана у всех участников одни, в каком бы цикле каждый ни смотрел.
    Остальные участники в демо — в среднем чуть выше своего третьего порога (EN_EVENT.demo). Без клана — null */
 function evClan() {
   const M = evMembers(); if (!M) return null;
-  const c = S.acc.cycle, needs = EVA.clanPlanks(EVD, M), ly = evLy('clan'), pts = S.event.pts + S.event.clan.others;
+  const c = S.acc.cycle, needs = EVA.clanPlanks(EVD, M, c), ly = evLy('clan'), pts = S.event.pts + S.event.clan.others;
   return { n: M.length, cycles: M, needs, pts, mine: S.event.pts, rows: needs.map((need, i) => ({ k: i + 1, need, pay: ly && ly.rows[i] ? ly.rows[i].cyc[c] || [] : [], got: pts >= need })) };
 }
 /* опоры рейтинга цикла: игроки — доли пятой личной планки, кланы — доли суммы пятых планок клана из clanRef участников */
@@ -372,9 +375,9 @@ Object.assign(OV, {
         body = `<div class="row wk-stats">${evStat(fmt(K.pts), 'очков клана')}${evStat(fmt(K.mine), 'ваш вклад')}</div>
           <p class="ev-cn">${ic('shield')}<b>${trEsc(S.clan.n)}</b><span class="faint">планок ${got} из ${rows.length}</span></p>
           <div class="ev-pks">${rows.map(r => evRung(r, K.pts, ' · каждому')).join('')}</div>
-          <p class="reason">Очки клана — сумма очков участников. Первая планка — будто каждый участник взял третью личную, вторая — четвёртую, третья — пятую.</p>
+          <p class="reason">Очки клана — сумма очков участников; очки других циклов — в пересчёте на ваш цикл по первой личной планке: взяли одинаково планок — принесли поровну. Первая планка — будто каждый участник взял третью личную, вторая — четвёртую, третья — пятую.</p>
           <p class="reason">Сундуки — каждому участнику: половину делит сервер по вкладу, половину — глава клана; журнал раздачи видят все. Вступивший приносит очки новому клану со следующей недели.</p>
-          ${TM(`Клановая планка k — сумма первых личных порогов участников по их циклам × ${EVD.clanX.map(x => evFrac(x, 100, 2)).join(' / ')} (EN_EVENT.clanX; третья — ×1,5 второй): участников ${K.n}, циклы ${cy}; остальные в демо к этому часу недели набрали в среднем столько же, сколько обычный игрок своего цикла, играет ${evPct(EVD.demo.clanActiveBp)}. Прогон: обычный клан из 25 берёт первую, клан увлечённых — вторую, третью — в части недель.`, 'p', 'reason')}`;
+          ${TM(`Клановая планка k — участников × первый личный порог цикла игрока × ${EVD.clanX.map(x => evFrac(x, 100, 2)).join(' / ')} (EN_EVENT.clanX; третья — ×1,5 второй); очки участника другого цикла — × порог цикла игрока / порог его цикла (ADR-0042, EnEvent.clanPts): участников ${K.n}, циклы ${cy}; остальные в демо к этому часу недели набрали в среднем столько же, сколько обычный игрок своего цикла, играет ${evPct(EVD.demo.clanActiveBp)}. Прогон: обычный клан из 25 берёт первую, клан увлечённых — вторую, третью — в части недель.`, 'p', 'reason')}`;
         foot = `<button class="btn go" data-a="sheet" data-v="gifts:clan">Дары · клан ${ic('chev')}</button>`;
       }
     } else {

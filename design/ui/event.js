@@ -16,8 +16,9 @@ window.EN_EVENT = {"meta":{"builder":"tools/content-gen/event/build.js","rules":
    Сила коллекции — то же правило, что collRp прототипа (index.html, §10.3; ADR-0031, п. 18): за героя — 5 б. п. × редкость × цикл
    героя × круг; круг — 2^доблесть, если предел k нового круга пройден; не пройденный заново предел держит прошлый круг — 2^(доблесть − 1),
    если был пройден до доблести; иначе 0. Сумма — не выше потолка. Дневные потолки единиц одинаковы для всех (§1.2).
-   Планки личные: пороги цикла из данных, соседние — ×2 (лутбоксы). Клановые: планка k — сумма по участникам клана первого личного
-   порога его цикла × clanX[k] / 100 (ADR-0031, п. 12: третья — ×1,5 второй).
+   Планки личные: пороги цикла из данных, соседние — ×2 (лутбоксы). Клановые: планка k — участников × первый личный порог цикла
+   × clanX[k] / 100 (ADR-0031, п. 12: третья — ×1,5 второй); очки участника другого цикла — в пересчёте по первым порогам (ADR-0042):
+   и пороги, и очки — в очках цикла того, кто смотрит, поэтому планка и место клана у всех участников одни.
    Место: линейно между опорами «место → очки» своего цикла; выше первой опоры — место 1. */
 (function (root) {
 'use strict';
@@ -62,9 +63,17 @@ function room(D, unit, usedToday) {
 /* пороги личных планок цикла; до первого цикла События — пусто */
 const planks = (D, c) => (D.planks[c] || []).slice();
 
-/* клановые планки по составу: cycles — циклы участников клана; каждый приносит первый личный порог своего цикла × clanX / 100 */
-function clanPlanks(D, cycles) {
-  return D.clanX.map(x => cycles.reduce((a, c) => a + Math.floor(((D.planks[c] || [])[0] || 0) * x / 100), 0));
+/* клановые планки (ADR-0042, «Клан и разные циклы»): клан складывает очки участников по долям первой личной планки их цикла, все — в очках
+   цикла to, того, кто смотрит. Планка k — участников × первый порог цикла to × clanX[k] / 100: как у клана из одного цикла to, для клана
+   из одного цикла — прежняя сумма порогов участников. cycles — циклы участников; без to — цикл первого из них */
+function clanPlanks(D, cycles, to) {
+  const p = (D.planks[to != null ? to : cycles[0]] || [])[0] || 0;
+  return D.clanX.map(x => cycles.length * Math.floor(p * x / 100));
+}
+/* очки участника цикла from — в очках цикла to, по первым личным порогам: взяли одинаково планок — принесли клану поровну (ADR-0042) */
+function clanPts(D, pts, from, to) {
+  const a = (D.planks[from] || [])[0] || 0, b = (D.planks[to] || [])[0] || 0;
+  return a && b ? Math.floor(pts * b / a) : 0;
 }
 
 /* сколько порогов взято */
@@ -96,7 +105,7 @@ function pointsAt(anchors, p) {
 /* опоры рейтинга цикла в очках: доли пятой личной планки (или клановой суммы) в б. п. */
 const anchorsOf = (rows, base) => rows.map(([p, bp]) => [p, Math.floor(base * bp / BP)]);
 
-const api = { BP, accentBp, rpHero, rp1Bp, pts, room, planks, clanPlanks, reached, place, pointsAt, anchorsOf };
+const api = { BP, accentBp, rpHero, rp1Bp, pts, room, planks, clanPlanks, clanPts, reached, place, pointsAt, anchorsOf };
 if (typeof module !== 'undefined' && module.exports) module.exports = api;
 if (root) root.EnEvent = api;
 })(typeof window !== 'undefined' ? window : null);

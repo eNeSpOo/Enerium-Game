@@ -7,8 +7,9 @@
    - карточки бестиария биомов в S.foes: поле biome, art — выгруженный портрет или заглушка без битой картинки.
      Числа карточек — ядро на этаже первой встречи; Мастерская получает те же числа ядра (EN_BIOME_FOES.workshop);
    - демо-аккаунт: биомы 1–2 пройдены, 3 — рубеж спуска, 4 закрыт для игрока — команда может начать (режим «Команда»);
-   - сценарии презентации: быстрый бой и рунный страж каждого нового биома;
-   - раздел UI-кита «Биомы спуска» (KIT_EXTRA).
+   - сценарии презентации: быстрый бой и рунный страж каждого нового биома, «Фарм старого биома» (ADR-0044);
+   - вариант биомов 1–2 по циклу аккаунта (ADR-0044): перед отрисовкой и стартом забега — EB.atCycle; слово Этриона — только в цикле I;
+   - разделы UI-кита «Биомы спуска» и «Полные биомы 1–2 · ритуал этажа · фарм старых биомов» (KIT_EXTRA).
    Правила: §7, §8, §11 GDD, ADR-0010, ADR-0011, ADR-0016, ADR-0018, ADR-0020. Все числа — демонстрация. */
 (function () {
 'use strict';
@@ -16,6 +17,8 @@ const X = window.EN_BIOME_FOES;
 if (!X || !EB.BIOMES.b2) return;   // без данных биомов «Спуск» остаётся на Мастерской
 
 /* ================== данные экрана ================== */
+/* сценарий «Фарм старого биома» (ADR-0044): сильный отряд — герои цикла cyc на уровне lvl — в полном биоме biome с этажа floor */
+const FARM_FLOW = { biome: 'b1', cyc: 3, lvl: 350, floor: 1 };
 const BV = {
   done: ['b2'],                    // пройденные биомы с данными: босс и рунный страж повержены, забеги — ради добычи
   frontWall: { b3: 26 },           // рубеж спуска: игрок знает тех, кого встречал до своей стены — у обычного в цикле II со 2-го по 12-й день это 26-й этаж (pace.json; демо — 11-й день, ADR-0031, п. 17)
@@ -82,6 +85,42 @@ const initBase = initialState;
 initialState = function () { return fresh(initBase()); };
 fresh(S);
 
+/* ================== вариант биома по циклу игрока (ADR-0044) ==================
+   Биомы 1–2: в цикле I — короткие обучающие (15 и 25 этажей, ослабленные стражи), с цикла II — полные: 35 этажей, осада, стражи нормальной
+   силы. Биом один, id один: вариант выбирает «сервер» по циклу аккаунта — перед отрисовкой и стартом забега ядро ставит его (EB.atCycle),
+   и «Спуск», бой и итог видят тот, что нужен. Слово Этриона после стража леса — конец обучения: только у короткого варианта */
+const WORD_B2 = BIOME_UI.b2 ? BIOME_UI.b2.word : null;
+function syncCycle() {
+  const c = S && S.acc && S.acc.cycle ? S.acc.cycle : 1;
+  if (EB.cycleAt() !== c) EB.atCycle(c);
+  if (BIOME_UI.b2) BIOME_UI.b2.word = EB.BIOMES.b2 && EB.BIOMES.b2.variant === 'full' ? null : WORD_B2;
+}
+{
+  const render0 = render, startRun0 = startRun;
+  render = function () { syncCycle(); return render0.apply(this, arguments); };
+  startRun = function () { syncCycle(); return startRun0.apply(this, arguments); };
+}
+syncCycle();
+
+/* ================== ритуал этажа во времени показа (ADR-0044) ==================
+   Ядро считает взятый этаж не короче ритуала: b.t = max(бой, RULES.floor.minMs вида), b.ritualMs — добавка. Показ идёт тем же временем:
+   этаж кончается не раньше b.t — и на экране, и свёрнутым; пока идёт ритуал, хода боя нет — враги пали, добыча летит, затем переход.
+   Что рисуется во время ритуала — «Бой AAA» (screens/battle-scene.js); здесь — только время. Бой со своей сценой (Эхо) — как был */
+{
+  const inRitual = R => { const b = R && R.b; return !!(b && b.over && b.ritualMs > 0 && !R.scene && !R.done && !(R.gap > 0) && R.view < b.t); };
+  const advance0 = advance, floorDone0 = floorDone;
+  advance = function (R, ms) {
+    if (inRitual(R)) {
+      if (R.view + ms < R.b.t) { R.view += ms; if (visible(R)) paintHud(R); return; }
+      /* последний такт ритуала: время прибавит прежний advance — один раз; этаж кончается на этом такте, к b.t (последний удар давно показан) */
+      if (R.endAt == null || R.endAt > R.b.t) R.endAt = R.b.t;
+    }
+    return advance0.apply(this, arguments);
+  };
+  /* свёрнутый забег прежде кончал этаж в тот же миг, что и бой: этаж ждёт свой ритуал и без экрана — сворачивание не ускоряет */
+  floorDone = function (R) { if (inRitual(R)) return; return floorDone0.apply(this, arguments); };
+}
+
 /* ================== сценарии презентации ================== */
 {
   const flows = [];
@@ -92,6 +131,25 @@ fresh(S);
   }
   const at = FLOWS.findIndex(x => x[0].startsWith('Бестиарий'));
   FLOWS.splice(at < 0 ? FLOWS.length : at + 1, 0, ...flows);
+  /* страж Мастерской: заголовок сценария собран до выбора варианта — по циклу аккаунта демо он полный */
+  const gi = FLOWS.findIndex(x => x[0].startsWith('Рунный страж · ')), G1 = EB.BIOMES.b1.guard.m;
+  if (gi >= 0) FLOWS[gi] = [`Рунный страж · ${guardCards('b1')}`, `${G1.map(m => EB.FOES[m].name).join(', ')} — страж Мастерской форм: ${EB.RULES.rounds.by.rune} раундов, каждая обычная атака Мастера отнимает раунд. В обучении цикла I — Мастер и две элиты. Вход — со «Спуска»`, FLOWS[gi][2]];
+  /* «Фарм старого биома» (ADR-0044): сильный отряд цикла III в полной Мастерской форм — враги падают с одного удара, а этаж всё равно идёт
+     свой ритуал (RULES.floor.minMs): враги выходят, падают, добыча летит в кошелёк, переход. Демо-забег: осаду и стену не трогает */
+  const mm = EB.RULES.floor.minMs, sec = ms => (ms / 1000).toLocaleString('ru-RU') + ' с';
+  FLOWS.splice(at < 0 ? FLOWS.length : at + 1 + flows.length, 0, ['Фарм старого биома · удар насмерть',
+    `Герои цикла ${ROMAN[FARM_FLOW.cyc]} на ${FARM_FLOW.lvl}-м в полной Мастерской форм: враги падают с одного удара, этаж всё равно идёт свой ритуал — рядовые ${sec(mm.o)}, элита ${sec(mm.e)}, босс ${sec(mm.b)}, затем переход`, farmFlow]);
+}
+function farmFlow() {
+  S.overlay = null;
+  if (!(S.acc && S.acc.cycle >= 2)) return toast('Фарм старого биома — с цикла II: в обучении биомы короткие');
+  S.route = 'descent'; S.selBiome = FARM_FLOW.biome; syncCycle();
+  const no = S.runNo, sq0 = S.squads[0];
+  startRun(sq0.id, FARM_FLOW.biome, FARM_FLOW.floor);
+  const R = S.runs[S.runs.length - 1];
+  if (!R || R.runNo === no || R.biome !== FARM_FLOW.biome) return;
+  R.heroes = R.heroes.map(h => Object.assign({}, h, { lvl: FARM_FLOW.lvl, cyc: FARM_FLOW.cyc, hp: null, dead: false, used: [] }));
+  newFloor(R); render();
 }
 
 /* ================== UI-кит · биомы спуска ==================
@@ -121,9 +179,29 @@ KIT_EXTRA.push({
     <p class="k-note">Данные — <code>design/ui/biome-foes.js</code> (сборщик <code>tools/content-gen/biomes/build.js</code>, черновик <code>docs/content/биомы-2-4.md</code>). Окно «Спуск» одно на все биомы (раздел «Окно «Спуск»» ниже): фон — место и обитатели на одном арте, бестиарий — листом; забег и бой — на арене своего биома. Приёмы — библиотека по классу и стихии врага (ADR-0016), ★ — ульта, ◆ — пассивка. Числа — демонстрация.</p>
     <div class="bk-grid">${Object.keys(X.biomes).map(kitBiome).join('')}</div>
     <div class="bk-stubs"><div class="bk-st">${['o', 'e', 'b', 'rune'].map(r => `<img src="${stubFoe('b3', r)}" alt="">`).join('')}<img class="wide" src="${stubArena('b2')}" alt=""></div>
-      <p class="k-note">Заглушки арта: пока портрет или арена не выгружены, прототип рисует силуэт в свете карста биома — знак ранга у элиты, босса и стража. Готов тот арт, что стоит в <code>tools/art-gen/ui-art.json</code> и выгружен <code>export_ui.py</code>; после выгрузки — пересобрать <code>build.js</code>. Бестиарий: у кого нет записи сказителя, карточка показывает облик и не даёт совета (§7.1). После рунного стража биома 2 итог забега показывает слово Этриона (ADR-0018). Закрытый биом игрок не выбирает; в режиме «Команда» его можно начать.</p></div>
+      <p class="k-note">Заглушки арта: пока портрет или арена не выгружены, прототип рисует силуэт в свете карста биома — знак ранга у элиты, босса и стража. Готов тот арт, что стоит в <code>tools/art-gen/ui-art.json</code> и выгружен <code>export_ui.py</code>; после выгрузки — пересобрать <code>build.js</code>. Бестиарий: у кого нет записи сказителя, карточка показывает облик и не даёт совета (§7.1). После рунного стража биома 2 в цикле I итог забега показывает слово Этриона (ADR-0018); с цикла II лес — полный, слова нет. Закрытый биом игрок не выбирает; в режиме «Команда» его можно начать.</p></div>
   </section>`,
 });
 
-window.EN_BIOMES_UI = { cardOf, stubFoe, stubArena, knownIds, READY };   // для проверки tools/content-gen/screens/check_biomes.js
+/* UI-кит · полные биомы 1–2, ритуал этажа и фарм старых биомов (ADR-0044): варианты по циклу игрока, ритуал по виду этажа, рунный ключ
+   и уникальный, вердикт калькулятора фарма (biome-foes.js, farm — tools/content-gen/biomes/farm.py) */
+function kitFarm() {
+  const F = X.farm, mm = EB.RULES.floor.minMs, D = EB.RULES.drop.b, sec = ms => (ms / 1000).toLocaleString('ru-RU') + ' с';
+  const name = id => (EB.FOES[id] || {}).name || id;
+  const row = (id, c) => {
+    const V = EB.variantOf(id, c), el = V.floors.reduce((a, Fl) => a + Fl.m.filter(m => EB.FOES[m].rank === 'e').length, 0);
+    return `<tr><td>${V.name}</td><td>${V.variant === 'full' ? 'полный' : 'короткий'}</td><td>${V.variant === 'full' ? 'с ' + ROMAN[V.full.from] : 'I, обучение'}</td><td>${V.floors.length}</td><td>${el}</td><td>${V.siege === false ? 'нет' : 'да'}</td><td>${V.guard.m.length}: ${V.guard.m.map(name).join(', ')}${V.guardHpPct ? ` · ${V.guardHpPct} %` : ''}</td></tr>`;
+  };
+  const ver = F ? F.verdict.map(v => `<li class="${v.ok ? '' : 'warn'}">${v.ok ? '✓' : '✗'} ${v.what}: ${v.got}</li>`).join('') : '<li class="warn">Калькулятора фарма на этих данных нет — python tools/content-gen/biomes/farm.py, затем build.js</li>';
+  const est = F && F.est ? Object.entries(F.est).map(([c, e]) => `${ROMAN[c]} — ${e.needX != null ? sec(e.needX) : 'не найден'}`).join(', ') : '—';
+  return `<section class="k-box" style="grid-column:1/-1"><h3>Полные биомы 1–2 · ритуал этажа · фарм старых биомов</h3>
+    <table class="k-tbl"><tr><th>Биом</th><th>Вариант</th><th>Цикл игрока</th><th>Этажей</th><th>Элит</th><th>Осада</th><th>Рунный страж</th></tr>${['b1', 'b2'].filter(id => EB.BIOMES[id] && EB.BIOMES[id].full).map(id => row(id, 1) + row(id, EB.BIOMES[id].full.from)).join('')}</table>
+    <p class="k-note">Вариант выбирает «сервер» по циклу игрока (EB.atCycle): сейчас ${EB.BIOMES.b1.variant === 'full' ? 'полный' : 'короткий'}. Ритуал этажа — взятый этаж не короче: рядовые ${sec(mm.o)}, элита ${sec(mm.e)}, босс ${sec(mm.b)}, рунный страж ${sec(mm.guard)}; переход — ${sec(EB.RULES.floor.gapMs)}. Рунный ключ — с каждого босса биома с цикла ${ROMAN[D.runeKeyFrom]}: ${D.runeKeyBp / 100} %, с отмычками — до ${D.runeKeyMaxBp / 100} %; ключей — цикл биома. Уникальный босса в старом биоме — ${D.uniqueOldPct} % обычного шанса. Сценарий — «Фарм старого биома · удар насмерть».</p>
+    <ul class="k-note">${ver}</ul>
+    <p class="k-note">Оценка циклов III–VI по образцам подъёма: ритуал рядовых, при котором удары насмерть по старому биому не выгоднее своего, — ${est}. Сроки циклов пересчитает следующая задача (ADR-0043).</p>
+  </section>`;
+}
+KIT_EXTRA.push({ html: kitFarm });
+
+window.EN_BIOMES_UI = { cardOf, stubFoe, stubArena, knownIds, READY, syncCycle, farmFlow, FARM_FLOW };   // для проверки tools/content-gen/screens/check_biomes.js
 })();

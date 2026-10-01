@@ -1,0 +1,223 @@
+{
+  "sheet": "chest-sheet/chs-talisman__nb2.raw.jpg",
+  "box": "talisman",
+  "chests": [
+    {
+      "r": 1,
+      "frame": [
+        0,
+        0,
+        1354,
+        1090
+      ],
+      "seam": 498,
+      "lid": [
+        0,
+        0,
+        1354,
+        500
+      ],
+      "body": [
+        1,
+        496,
+        1353,
+        594
+      ],
+      "auto": 498,
+      "score": 27.44,
+      "rim": 55974,
+      "files": {
+        "whole": "chest-sheet/chs-talisman/r1.png",
+        "lid": "chest-sheet/chs-talisman/r1.lid.png",
+        "body": "chest-sheet/chs-talisman/r1.body.png"
+      }
+    },
+    {
+      "r": 2,
+      "frame": [
+        0,
+        0,
+        1355,
+        1089
+      ],
+      "seam": 500,
+      "lid": [
+        0,
+        0,
+        1355,
+        502
+      ],
+      "body": [
+        0,
+        498,
+        1350,
+        591
+      ],
+      "auto": 500,
+      "score": 64.01,
+      "rim": 55987,
+      "files": {
+        "whole": "chest-sheet/chs-talisman/r2.png",
+        "lid": "chest-sheet/chs-talisman/r2.lid.png",
+        "body": "chest-sheet/chs-talisman/r2.body.png"
+      }
+    },
+    {
+      "r": 3,
+      "frame": [
+        0,
+        0,
+        1357,
+        1089
+      ],
+      "seam": 499,
+      "lid": [
+        1,
+        0,
+        1356,
+        501
+      ],
+      "body": [
+        0,
+        497,
+        1357,
+        592
+      ],
+      "auto": 499,
+      "score": 59.13,
+      "rim": 55965,
+      "files": {
+        "whole": "chest-sheet/chs-talisman/r3.png",
+        "lid": "chest-sheet/chs-talisman/r3.lid.png",
+        "body": "chest-sheet/chs-talisman/r3.body.png"
+      }
+    },
+    {
+      "r": 4,
+      "frame": [
+        0,
+        0,
+        1355,
+        1090
+      ],
+      "seam": 502,
+      "lid": [
+        0,
+        0,
+        1355,
+        504
+      ],
+      "body": [
+        1,
+        500,
+        1348,
+        590
+      ],
+      "auto": 594,
+      "score": 20.25,
+      "rim": 55982,
+      "files": {
+        "whole": "chest-sheet/chs-talisman/r4.png",
+        "lid": "chest-sheet/chs-talisman/r4.lid.png",
+        "body": "chest-sheet/chs-talisman/r4.body.png"
+      }
+    },
+    {
+      "r": 5,
+      "frame": [
+        0,
+        0,
+        1374,
+        1100
+      ],
+      "seam": 510,
+      "lid": [
+        0,
+        0,
+        1374,
+        512
+      ],
+      "body": [
+        1,
+        508,
+        1373,
+        592
+      ],
+      "auto": 510,
+      "score": 60.0,
+      "rim": 56573,
+      "files": {
+        "whole": "chest-sheet/chs-talisman/r5.png",
+        "lid": "chest-sheet/chs-talisman/r5.lid.png",
+        "body": "chest-sheet/chs-talisman/r5.body.png"
+      }
+    },
+    {
+      "r": 6,
+      "frame": [
+        0,
+        0,
+        1374,
+        1101
+      ],
+      "seam": 510,
+      "lid": [
+        0,
+        0,
+        1374,
+        512
+      ],
+      "body": [
+        1,
+        508,
+        1373,
+        593
+      ],
+      "auto": 603,
+      "score": 21.9,
+      "rim": 56556,
+      "files": {
+        "whole": "chest-sheet/chs-talisman/r6.png",
+        "lid": "chest-sheet/chs-talisman/r6.lid.png",
+        "body": "chest-sheet/chs-talisman/r6.body.png"
+      }
+    },
+    {
+      "r": 7,
+      "frame": [
+        0,
+        0,
+        1371,
+        1101
+      ],
+      "seam": 514,
+      "lid": [
+        0,
+        0,
+        1371,
+        516
+      ],
+      "body": [
+        5,
+        512,
+        1366,
+        589
+      ],
+      "auto": 433,
+      "score": 32.47,
+      "rim": 56573,
+      "files": {
+        "whole": "chest-sheet/chs-talisman/r7.png",
+        "lid": "chest-sheet/chs-talisman/r7.lid.png",
+        "body": "chest-sheet/chs-talisman/r7.body.png"
+      }
+    }
+  ],
+  "lock": {
+    "file": "chest-sheet/chs-talisman/lock.png",
+    "px": [
+      796,
+      1129
+    ]
+  }
+}

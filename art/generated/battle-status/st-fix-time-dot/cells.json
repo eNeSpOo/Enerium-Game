@@ -1,0 +1,24 @@
+{
+  "sheet": "art/generated/battle-status/st-fix-time-dot__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/battle-status-fix.json",
+  "job": "st-fix-time-dot",
+  "grid": [
+    1,
+    1
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "dot-Время",
+      "file": "art/generated/battle-status/st-fix-time-dot/st-time-dot.webp",
+      "box": [
+        60,
+        60,
+        964,
+        964
+      ],
+      "px": 904,
+      "key_left": 0.0
+    }
+  ]
+}

@@ -9,7 +9,10 @@
      xp — опыт всего, от нуля; lvl — уровень (0 — аккаунт только создан, уровень 1 выдаёт первая операция); ops — { номер операции: ответ }; seq — номер следующей операции.
    Вехи этапов (F) сервер знает сам: этажи, боссы и стражи биомов, найденные рецепты, потолок уровня героев, цикл.
    claim(M, op, F) — одна операция: все уровни, что можно взять сейчас, с наградами. Повтор того же номера возвращает прежний ответ
-   и ничего не выдаёт; без новых уровней номер не тратится. */
+   и ничего не выдаёт; без новых уровней номер не тратится.
+   skip(M, op, E, live) — пропуск обучения (ADR-0040): одна операция с номером переводит аккаунт в итог сценария E (EN_START.skip) —
+   уровень, опыт и вехи такие же, как у прошедшего обучение самого. Итог один с любого шага: пропуск ставит его, а не прибавляет.
+   live — обучение ещё идёт (решает сервер по своему шагу сценария); иначе — отказ. Повтор номера — прежний ответ, ничего не меняет. */
 (function (root) {
 'use strict';
 
@@ -87,6 +90,17 @@ function make(D) {
     M.ops[op] = res; M.seq++;
     return { res };
   }
+  /* пропуск обучения: аккаунт — в итог сценария одной операцией; вехи — те же, что у прошедшего сам, поэтому повторно опыта не дадут */
+  function skip(M, op, E, live) {
+    if (!op) return { refuse: 'op' };
+    if (M.ops[op]) return { again: true, res: M.ops[op] };
+    if (!live || !E) return { refuse: 'done' };
+    const from = M.lvl;
+    M.facts = Object.assign({}, E.facts); M.xp = E.xp; M.lvl = E.lvl;
+    const res = { op, kind: 'skip', from, to: E.lvl };
+    M.ops[op] = res; M.seq++;
+    return { res };
+  }
   /* мест в отряде на уровне L: таблица сценария, дальше — все пять */
   const slots = L => D.gates.slots[Math.max(0, Math.min(D.gates.slots.length, L) - 1)];
   /* с какого уровня открыто: kind — nav, seg, hire; нет записи — открыто с 1-го */
@@ -94,7 +108,7 @@ function make(D) {
   /* опыт внутри уровня и до следующего: для полосы и листа */
   const bar = M => ({ lvl: M.lvl, xp: M.xp - thr(M.lvl), next: need(M.lvl), total: M.xp });
   const fresh = () => ({ facts: {}, xp: 0, lvl: 0, ops: {}, seq: 1 });   // аккаунт с нуля: первая операция выдаёт уровень 1 — «Начало»
-  return { N, need, thr, gift, reward, xpOf, fact, stageOk, canNext, claim, slots, opensAt, bar, fresh, isqrtCeil };
+  return { N, need, thr, gift, reward, xpOf, fact, stageOk, canNext, claim, skip, slots, opensAt, bar, fresh, isqrtCeil };
 }
 
 const api = { make };

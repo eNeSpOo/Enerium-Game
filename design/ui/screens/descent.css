@@ -1,5 +1,9 @@
 /* Энериум · прототип — окно «Спуск» (screens/descent.js). Фон во всё окно — место биома и его обитатели на одном арте, частицы биома,
-   тень под интерфейс; слева — путь вниз, сверху — название, снизу — состояние и одно главное действие. Лист «Бестиарий» и раздел UI-кита.
+   тень под интерфейс; слева — путь вниз со слотами биомов, сверху — название и метка состояния, под ними — путь внутри биома тремя
+   камнями, снизу — бестиарий и одно главное действие. Лист «Отряд для спуска» и «Бестиарий» — в материале окна (.ds-sheet); раздел UI-кита.
+   Слова автора 01.10.2026: «…окно спуска тоже в АА уровень перевести… всё остальное старое под нынешний UI уже не катит». Линии и рамки —
+   одна нить: толщина — переменные --shl-ln и --shl-fr из SHL_VIEW (screens/shell.js); рамка тенью — не толще нити (check_biomes.js).
+   Главная кнопка — плита старого золота с кристаллами, та же, что «Спуститься» в Убежище (SH_ART.cta, переменные --sh-cta, --sh-c*).
    Отступы — токены воздуха --sp-l / --sp-m / --sp-s. Движется только transform и opacity; «меньше движения» — частиц нет, фон не плывёт.
    Грузится до screens/echo.css: узлы руин (.bnode.ruin) и их середина (.biome, .banner) перекрашиваются там. */
 
@@ -11,10 +15,10 @@
 .ds-bg.out{z-index:1;animation:ds-out var(--fade) ease var(--dl,0ms) both}
 .ds-fx{position:absolute;inset:0;z-index:2;overflow:hidden}
 .ds-veil{position:absolute;inset:0;z-index:3;background:
-  linear-gradient(90deg,rgba(5,6,8,.9) 0,rgba(5,6,8,.66) 20%,rgba(5,6,8,.24) 42%,rgba(5,6,8,0) 64%),
-  linear-gradient(0deg,rgba(5,6,8,.94) 0,rgba(5,6,8,.6) 20%,rgba(5,6,8,.12) 42%,rgba(5,6,8,0) 56%),
-  linear-gradient(180deg,rgba(5,6,8,.58) 0,rgba(5,6,8,0) 24%),
-  radial-gradient(130% 110% at 62% 45%,transparent 58%,rgba(0,0,0,.5))}
+  linear-gradient(90deg,rgba(5,6,8,.92) 0,rgba(5,6,8,.78) 22%,rgba(5,6,8,.42) 44%,rgba(5,6,8,.08) 62%,rgba(5,6,8,0) 72%),
+  linear-gradient(0deg,rgba(5,6,8,.9) 0,rgba(5,6,8,.5) 16%,rgba(5,6,8,.08) 34%,rgba(5,6,8,0) 46%),
+  linear-gradient(180deg,rgba(5,6,8,.55) 0,rgba(5,6,8,0) 22%),
+  radial-gradient(130% 110% at 64% 45%,transparent 58%,rgba(0,0,0,.5))}
 
 /* частицы: вид — data-k, числа — переменные разметки (DS_KIND); отрицательная задержка — в окне они уже летят */
 .ds-p{position:absolute;display:block;width:var(--s);height:var(--s);border-radius:50%;opacity:0;background:radial-gradient(circle,#fff 0,var(--c) 40%,transparent 72%);animation:ds-rise var(--d) linear var(--dl) infinite}
@@ -22,78 +26,149 @@
 .ds-p[data-k="shaving"]{width:calc(var(--s) * .3);height:var(--s);border-radius:2px;background:linear-gradient(180deg,var(--c),#7d5130);animation-name:ds-fall;animation-timing-function:ease-in-out}
 .ds-p[data-k="spore"]{box-shadow:0 0 calc(var(--s) * 2) var(--c);animation-name:ds-sway;animation-timing-function:ease-in-out}
 .ds-p[data-k="mote"]{animation-name:ds-sway;animation-timing-function:ease-in-out}
-.ds-p[data-k="page"]{height:calc(var(--s) * 1.3);border-radius:1px;background:linear-gradient(160deg,var(--c),#8f8466);box-shadow:0 0 0 1px rgba(0,0,0,.28);animation-name:ds-flut;animation-timing-function:ease-in-out}
+.ds-p[data-k="page"]{height:calc(var(--s) * 1.3);border-radius:1px;background:linear-gradient(160deg,var(--c),#8f8466);animation-name:ds-flut;animation-timing-function:ease-in-out}
 .ds-p[data-k="ink"]{background:radial-gradient(circle,#1a1109 0,#1a1109 28%,var(--c) 46%,transparent 76%);box-shadow:0 0 6px var(--c)}   /* капля чернил в янтарном свете */
 .ds-p[data-k="spark"]{background:radial-gradient(circle,#fff6de 0,var(--c) 45%,transparent 75%);box-shadow:0 0 5px var(--c);animation-timing-function:cubic-bezier(.2,.6,.4,1)}
 .ds-p[data-k="steam"]{background:radial-gradient(circle,var(--c) 0,transparent 68%);animation-name:ds-steam;animation-timing-function:ease-out}
 
 /* ================== интерфейс поверх сцены ================== */
-.ds-ui{position:absolute;inset:0;z-index:4;display:grid;grid-template-columns:176px minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:var(--sp-l);padding:var(--sp-m) var(--sp-l) var(--sp-m) var(--sp-m)}
+.ds-ui{position:absolute;inset:0;z-index:4;display:grid;grid-template-columns:186px minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:var(--sp-l);padding:var(--sp-m) var(--sp-l) var(--sp-m) var(--sp-m)}
 
-/* путь вниз: циклы, биомы на нити шахты, нераскрытая глубина одной строкой */
-.ds-nav{display:flex;flex-direction:column;gap:2px;min-height:0;overflow:auto;scrollbar-width:none;padding:var(--sp-s) 6px var(--sp-s) var(--sp-s);border-radius:14px;background:linear-gradient(180deg,rgba(13,16,19,.82),rgba(9,11,13,.64));border:1px solid rgba(255,255,255,.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 18px 40px -24px #000}
+/* ---------- путь вниз: без коробки — нить справа, циклы строкой, биом — медальон с картиной ---------- */
+.ds-nav{position:relative;display:flex;flex-direction:column;gap:2px;min-height:0;overflow:auto;scrollbar-width:none;padding:0 10px 24px 0;
+  -webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(180deg,#000 calc(100% - 24px),transparent);
+  border-right:var(--shl-ln,1px) solid transparent;border-image:linear-gradient(180deg,rgba(221,188,122,0),rgba(221,188,122,.42) 16%,rgba(177,145,90,.22) 60%,rgba(72,229,212,.4) 92%,rgba(72,229,212,0)) 1}
 .ds-nav::-webkit-scrollbar{display:none}
-.ds-nav>.eyebrow{padding:2px 4px 6px 6px}
-.ds-nav .cyc{display:grid;grid-template-columns:22px minmax(0,1fr);gap:2px;align-items:start}
-.ds-nav .cyc>b{font:600 16px/38px var(--f-d);color:var(--gold-2);text-align:center}
+.ds-nav-h{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:2px 0 4px 2px}
+.ds-nav-h .eyebrow{color:var(--gold)}
+/* слоты биомов: камни — занятые старым золотом, свободные — нитью */
+.ds-slots{display:inline-flex;align-items:center;gap:6px;flex:none;font:700 11px/1 var(--f-u);color:var(--parch-2);white-space:nowrap}
+.ds-slots .num{color:var(--parch-2)}
+.ds-slots b{color:var(--parch);font-size:12.5px}
+.ds-pips{display:inline-flex;align-items:center;gap:5px}
+.ds-pips i{display:block;width:7px;height:7px;transform:rotate(45deg);border:var(--shl-fr,1px) solid rgba(221,188,122,.62);background:rgba(10,12,14,.6)}
+.ds-pips i.on{border-color:#f0d79c;background:linear-gradient(135deg,#f0d79c,#8c7650);box-shadow:0 0 6px -1px rgba(221,188,122,.7)}
+.ds-slots.full,.ds-slots.full b{color:var(--amber)}
+.ds-slots.full .ds-pips i.on{border-color:var(--amber);background:linear-gradient(135deg,#f2c27a,#a8691f)}
+.ds-nav .cyc{display:flex;flex-direction:column;gap:2px}
+.ds-nav .cyc>b{display:block;padding:7px 2px 3px;font:700 9.5px/1 var(--f-u);letter-spacing:.18em;text-transform:uppercase;color:var(--gold-2);white-space:nowrap}
+.ds-nav .cyc>b::before{content:"Цикл "}
 .ds-nav .cyc.dim>b{color:var(--parch-3)}
-.ds-nav .cyc>b .i{width:15px;height:15px;vertical-align:-2px}
-.ds-nav .cyc>div{position:relative;display:flex;flex-direction:column;gap:2px;min-width:0}
-.ds-nav .cyc>div::before{content:"";position:absolute;left:12px;top:12px;bottom:12px;width:1px;background:linear-gradient(rgba(221,188,122,.32),rgba(72,229,212,.24));pointer-events:none}
-.ds-nav .bnode{position:relative;display:flex;align-items:center;gap:8px;width:100%;min-height:38px;padding:4px 8px 4px 7px;border-radius:9px;border:1px solid transparent;background:none;text-align:left;color:var(--parch);font-size:13px;line-height:1.12;transition:background-color .15s,border-color .15s}
-.ds-nav .bnode::before{content:"";position:relative;z-index:1;flex:none;width:10px;height:13px;clip-path:polygon(50% 0,100% 38%,50% 100%,0 38%);background:#5b6168}
-.ds-nav .bnode>span{min-width:0}
-.ds-nav .bnode small{display:block;margin-top:2px;font-size:11px;line-height:1.15;color:var(--parch-3)}
-.ds-nav .bnode.done::before{background:var(--gold)}
-.ds-nav .bnode.front::before{background:var(--spirit);filter:drop-shadow(0 0 5px var(--spirit))}
-.ds-nav .bnode.front small{color:var(--spirit)}
+.ds-nav .cyc>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ds-nav .bnode{position:relative;display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:5px 8px 5px 4px;border-radius:12px;border:0;background:none;text-align:left;color:var(--parch);transition:background-color .15s,box-shadow .15s}
+.ds-nav .bnode .bn-ph{position:relative;flex:none;width:30px;height:30px;border-radius:50%;background:#0a0c0e var(--ph,none) var(--pp,60% 50%)/auto 250% no-repeat;
+  box-shadow:0 0 0 var(--shl-fr,1px) rgba(177,145,90,.55),0 0 0 2px rgba(0,0,0,.6),0 4px 8px -3px #000;transition:box-shadow .15s}
+.ds-nav .bnode .bn-ph .ds-em.lk{position:absolute;inset:0;width:auto;height:auto;border:0;box-shadow:none;background:rgba(5,6,8,.62)}
+.ds-nav .bnode .bn-ph .ds-em.lk img{width:15px;height:15px}
+.ds-nav .bnode .bn-ph .ds-em.lk .i{width:12px;height:12px;color:var(--parch-2)}
+.ds-nav .bn-t{display:flex;flex-direction:column;gap:3px;min-width:0;font:600 15px/1.06 var(--f-d)}
+.ds-nav .bn-t small{font:700 9px/1.1 var(--f-u);letter-spacing:.12em;text-transform:uppercase;color:var(--parch-3)}
+.ds-nav .bnode.done .bn-t small{color:var(--gold-2)}
+.ds-nav .bnode.front .bn-ph{box-shadow:0 0 0 var(--shl-fr,1px) rgba(72,229,212,.85),0 0 0 2px rgba(0,0,0,.6),0 0 12px -2px rgba(72,229,212,.6)}
+.ds-nav .bnode.front .bn-t small{color:var(--spirit)}
 .ds-nav .bnode.lock{color:var(--parch-3)}
-.ds-nav .bnode.lock::before{background:#2e3338}
-.ds-nav button.bnode:hover:not([disabled]){background:rgba(255,255,255,.045)}
-.ds-nav .bnode[aria-current="true"]{border-color:rgba(72,229,212,.32);background:linear-gradient(90deg,rgba(72,229,212,.16),rgba(72,229,212,.03));box-shadow:inset 2px 0 0 var(--spirit)}
+.ds-nav .bnode.lock .bn-ph{box-shadow:0 0 0 var(--shl-fr,1px) rgba(120,128,138,.4),0 0 0 2px rgba(0,0,0,.6)}
+@media (hover:hover){ .ds-nav button.bnode:hover:not([disabled]){background:rgba(255,255,255,.04)} }
+.ds-nav .bnode[aria-current="true"]{background:linear-gradient(90deg,rgba(72,229,212,.15),rgba(72,229,212,.02) 85%);box-shadow:inset 2px 0 0 var(--spirit)}
+.ds-nav .bnode[aria-current="true"] .bn-t{color:var(--gold)}
 .ds-nav .bnode[disabled]{cursor:default}
 .ds-nav .ds-run{margin-left:auto;flex:none;width:7px;height:7px;border-radius:50%;background:var(--spirit);box-shadow:0 0 8px var(--spirit);animation:ds-pulse 1.6s ease-in-out infinite}
-.ds-nav .ds-deep>div::before,.ds-nav .ech-rs>div::before{display:none}
-.ds-nav .ds-deep>b{font-size:14px}
-.ds-nav .ech-rs{margin-top:6px;padding-top:4px;border-top:1px solid rgba(255,255,255,.06)}
+.ds-nav .ds-deep .bnode{min-height:40px}
+.ds-nav .ech-rs{margin-top:4px}
+/* руины и биом Многоликого (screens/echo.js) — строкой «Руины», медальон янтаря со знаком */
+.ds-nav .ech-rs>b::before{content:none}
+.ds-nav .bnode.ruin .bn-ph{display:grid;place-items:center;background:radial-gradient(circle at 50% 40%,rgba(230,168,75,.32),#0a0c0e 72%);box-shadow:0 0 0 var(--shl-fr,1px) rgba(230,168,75,.75),0 0 0 2px rgba(0,0,0,.6)}
+.ds-nav .bnode.ruin .bn-ph .i{width:14px;height:14px;color:var(--amber)}
+.ds-nav .bnode.ruin .bn-ph img{width:20px;height:20px;object-fit:contain}   /* нарисованный знак оболочки: врата руины, корона Многоликого */
+.ds-nav .bnode.ruin .bn-t small{color:var(--amber)}
+.ds-nav .bnode.ech-mb .bn-ph{background:radial-gradient(circle at 50% 40%,rgba(221,188,122,.32),#0a0c0e 72%);box-shadow:0 0 0 var(--shl-fr,1px) rgba(221,188,122,.85),0 0 0 2px rgba(0,0,0,.6)}
+.ds-nav .bnode.ech-mb .bn-ph .i{color:var(--gold)}
 
-/* середина: строка места, название, цитата — сверху; состояние и действие — снизу */
-.ds-main{position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:var(--sp-m);min-width:0;min-height:0}
-.ds-head{display:flex;flex-direction:column;align-items:flex-start;gap:6px;max-width:min(480px,100%);padding:6px 0 0 4px;text-shadow:0 2px 14px rgba(0,0,0,.9),0 0 2px rgba(0,0,0,.6)}
+/* ---------- середина: строка места с меткой, название, цитата; путь внутри биома; бестиарий и главное действие ---------- */
+.ds-main{position:relative;display:flex;flex-direction:column;gap:var(--sp-m);min-width:0;min-height:0}
+.ds-head{display:flex;flex-direction:column;align-items:flex-start;gap:5px;max-width:min(560px,100%);padding:2px 0 0 2px;text-shadow:0 2px 14px rgba(0,0,0,.9),0 0 2px rgba(0,0,0,.6)}
 .g .ds-head .eyebrow{color:var(--gold)}
-.ds-head h2{font-size:42px;line-height:.94;color:var(--parch);letter-spacing:.005em}
-.ds-head .quote{max-width:40ch;font-size:16px;color:var(--parch-2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ds-head h2{font-size:40px;line-height:.95;color:var(--parch);letter-spacing:.005em;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-bottom:3px;margin-bottom:-3px}
+.ds-head h2.long{font-size:32px}   /* длинное имя биома (DS_VIEW.longName) — мельче, одной строкой */
+.ds-head .quote{max-width:42ch;font-size:15.5px;color:var(--parch-2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .ds-head .chip{text-shadow:none}
-.ds-main.swap .ds-head{animation:ds-in .55s cubic-bezier(.2,.8,.2,1) var(--dl,0ms) both}
-.ds-foot{display:flex;flex-direction:column;gap:var(--sp-m);min-width:0}
-.ds-row{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:var(--sp-s) var(--sp-m);min-width:0}
-.ds-state{display:flex;align-items:stretch;min-width:0}
-.ds-st{display:flex;align-items:center;gap:8px;padding:0 14px;border-left:1px solid rgba(255,255,255,.1);min-width:0}
-.ds-st:first-child{padding-left:4px;border-left:0}
-.ds-st>.i{width:18px;height:18px;color:var(--parch-3);filter:drop-shadow(0 1px 4px #000)}
-.ds-st>span{display:flex;flex-direction:column;gap:3px;min-width:0}
-.ds-st b{font:600 20px/1 var(--f-d);color:var(--parch);white-space:nowrap;text-shadow:0 2px 10px #000;font-variant-numeric:lining-nums tabular-nums}
-.ds-st small{max-width:140px;font:700 10px/1.15 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 6px #000}
-.ds-st.down>.i,.ds-st.done>.i,.ds-st.down b,.ds-st.done b{color:var(--gold)}
-.ds-st.siege>.i,.ds-st.siege b{color:var(--amber)}
-.ds-st.open>.i,.ds-st.open b{color:var(--spirit)}
+.ds-tags{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:3px}
+/* метка состояния биома — не кнопка: ромб и слово, цвет — состояние */
+.ds-tag{display:inline-flex;align-items:center;gap:7px;font:700 10px/1 var(--f-u);letter-spacing:.18em;text-transform:uppercase;color:var(--gold);text-shadow:0 1px 6px #000}
+.ds-tag::before{content:"";width:7px;height:7px;transform:rotate(45deg);background:linear-gradient(135deg,#f0d79c,#8c7650)}
+.ds-tag.front{color:var(--spirit)}
+.ds-tag.front::before{background:var(--spirit);box-shadow:0 0 8px var(--spirit)}
+.ds-tag.lock{color:var(--parch-2)}
+.ds-tag.lock::before{background:none;border:var(--shl-fr,1px) solid var(--parch-3)}
+.ds-main.swap .ds-head,.ds-main.swap .ds-state{animation:ds-in .55s cubic-bezier(.2,.8,.2,1) var(--dl,0ms) both}
+
+/* путь внутри биома: три камня на одной нити — этажи, босс, рунный страж */
+.ds-state{position:relative;display:flex;flex-direction:column;gap:6px;width:min(340px,100%);padding-left:1px}
+.ds-state::before{content:"";position:absolute;left:18.5px;top:18px;bottom:18px;width:var(--shl-ln,1px);pointer-events:none;background:linear-gradient(180deg,rgba(221,188,122,.55),rgba(177,145,90,.3) 50%,rgba(72,229,212,.5))}
+.ds-st{position:relative;display:flex;align-items:center;gap:10px;min-width:0;min-height:40px}
+.ds-em{position:relative;z-index:1;flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;
+  border:var(--shl-fr,1px) solid rgba(177,145,90,.55);background:radial-gradient(circle at 50% 32%,#1f2a31,#0b1013 72%);box-shadow:0 0 0 1px rgba(0,0,0,.75),inset 0 -6px 9px -6px rgba(72,229,212,.35),0 4px 10px -4px #000}
+.ds-em img{display:block;width:26px;height:26px;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.75))}
+.ds-em .i{width:17px;height:17px;color:var(--gold)}
+.ds-st-t{display:flex;flex-direction:column;gap:2px;min-width:0;text-shadow:0 1px 8px #000}
+.ds-st-t>b{font:600 19px/1 var(--f-d);color:var(--parch);white-space:nowrap;font-variant-numeric:lining-nums tabular-nums}
+.ds-st-l{display:flex;align-items:baseline;gap:8px;min-width:0}
+.ds-st-l small{max-width:200px;font:700 9.5px/1.15 var(--f-u);letter-spacing:.12em;text-transform:uppercase;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ds-st-l em{font:italic 500 12.5px/1.1 var(--f-d);color:var(--parch-2);white-space:nowrap}
+/* рунный ключ с босса биома: знак валюты, сколько и шанс — шрифтом интерфейса, старым золотом; строкой подписи — по её линии */
+.ds-key{display:inline;font:700 11.5px/1 var(--f-u);font-style:normal;letter-spacing:.03em;color:var(--gold)}
+.ds-key img{width:15px;height:15px;margin-right:4px;vertical-align:-3px;object-fit:contain}
+.ds-st.fl .ds-em{border-color:rgba(221,188,122,.62)}
+.ds-st.down .ds-em,.ds-st.done .ds-em{border-color:rgba(221,188,122,.9);box-shadow:0 0 0 1px rgba(0,0,0,.75),0 0 10px -3px rgba(221,188,122,.65),0 4px 10px -4px #000}
+.ds-st.down b,.ds-st.done b{color:var(--gold)}
+.ds-st.siege .ds-em{border-color:rgba(230,168,75,.85);box-shadow:0 0 0 1px rgba(0,0,0,.75),0 0 10px -3px rgba(230,168,75,.6),0 4px 10px -4px #000}
+.ds-st.siege b{color:var(--amber)}
+.ds-st.open .ds-em{border-color:rgba(72,229,212,.88);box-shadow:0 0 0 1px rgba(0,0,0,.75),0 0 12px -2px rgba(72,229,212,.65),0 4px 10px -4px #000}
+.ds-st.open b{color:var(--spirit)}
+.ds-st.wait .ds-em{border-color:rgba(120,128,138,.45)}
+.ds-st.wait .ds-em img{filter:grayscale(.85) brightness(.62)}
 .ds-st.wait b{color:var(--parch-2)}
-.ds-gd{flex:none;gap:6px}
-.ds-know{display:flex;align-items:center;gap:var(--sp-m);min-width:0}
-.ds-know-t{display:flex;flex-direction:column;gap:6px;min-width:112px}
-.ds-know-t span{font-size:13px;color:var(--parch-2);white-space:nowrap;text-shadow:0 1px 8px #000}
-.ds-know-t b{color:var(--parch);font-size:15px}
-.ds-know .bar{height:4px}
+.ds-st .ds-sg{width:132px;height:3px;margin-top:3px}
+.ds-gd{flex:none;gap:6px;margin-left:12px}
+.ds-gd .btn.sm{min-height:30px;padding:0 10px 0 12px;border-radius:15px;border-color:rgba(72,229,212,.6);background:linear-gradient(180deg,rgba(18,40,38,.92),rgba(10,24,22,.95));color:#dffcf7;
+  box-shadow:inset 0 -8px 12px -8px rgba(72,229,212,.6),0 6px 12px -8px #000}
+.ds-gd .btn.sm .cost{border-left-color:rgba(72,229,212,.35)}
+.ds-gd .btn.ghost{border-color:transparent;background:none;box-shadow:none;color:var(--gold-2)}
+
+/* низ: бестиарий слева, одно главное действие справа */
+.ds-acts{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--sp-m);margin-top:auto;min-width:0}
+.ds-best{display:flex;align-items:center;gap:10px;flex:none;min-height:48px;padding:5px 16px 5px 5px;border-radius:25px;border:var(--shl-fr,1px) solid rgba(177,145,90,.5);
+  background:linear-gradient(180deg,rgba(22,27,31,.84),rgba(9,11,13,.9));color:var(--parch);text-align:left;box-shadow:inset 0 1px 0 rgba(255,236,190,.06),0 10px 20px -14px #000;transition:border-color .15s,filter .15s}
+@media (hover:hover){ .ds-best:hover{border-color:rgba(221,188,122,.85);filter:brightness(1.08)} }
+.ds-best:active{transform:scale(.98)}
+.ds-best-t{display:flex;flex-direction:column;gap:3px;min-width:106px}
+.ds-best-t>b{font:700 11.5px/1 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.ds-best-t>span{font-size:12.5px;line-height:1.1;color:var(--parch-2);white-space:nowrap}
+.ds-best-t>span b{color:var(--parch);font-size:14px}
+.ds-best .bar{height:3px}
 .ds-go{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none;margin-left:auto}
-.ds-go .row{gap:var(--sp-s)}
+.ds-go .row{gap:var(--sp-s);align-items:center}
 .ds-go .reason{text-align:right;text-shadow:0 1px 8px #000}
-.ds-go .btn.go.big{min-width:196px;min-height:52px;border-radius:14px;letter-spacing:.14em}
+.ds-sq{display:inline-flex;align-items:center;gap:6px;padding:0 6px;font:700 12px/1 var(--f-u);color:var(--parch-2);white-space:nowrap;text-shadow:0 1px 6px #000}
+.ds-sq b{color:var(--gold);letter-spacing:.04em}
+.ds-sq .num{color:var(--parch);font-size:13.5px}
+.ds-sq .ico{width:15px;height:15px}
 .ds-live{display:inline-flex;align-items:center;gap:6px;font:700 11px/1 var(--f-u);letter-spacing:.1em;text-transform:uppercase;color:var(--spirit);text-shadow:0 1px 8px #000}
 .ds-live .i{width:14px;height:14px}
+/* главная кнопка — плита старого золота с кристаллами (как «Спуститься» в Убежище): высота --cth, срезы — SH_ART.cta */
+.ds-go .btn.go.big,.ds-sheet .sheet-f .btn.go{--cth:56px;height:var(--cth);min-height:0;min-width:214px;padding:0 30px;border-radius:12px;font-size:15px;letter-spacing:.16em}
+html.sha-cta .ds-go .btn.go.big,html.sha-cta .ds-sheet .sheet-f .btn.go{padding:0 6px;border-radius:0;border-style:solid;border-color:transparent;background:none;box-shadow:none;
+  --ct:calc(var(--cth) * var(--sh-c0) / var(--sh-ch));--cr:calc(var(--cth) * var(--sh-c1) / var(--sh-ch));--cb:calc(var(--cth) * var(--sh-c2) / var(--sh-ch));--cl:calc(var(--cth) * var(--sh-c3) / var(--sh-ch));
+  border-width:var(--ct) var(--cr) var(--cb) var(--cl);border-image:var(--sh-cta) var(--sh-cs) fill / var(--ct) var(--cr) var(--cb) var(--cl) stretch;filter:drop-shadow(0 10px 12px rgba(0,0,0,.6))}
+@media (hover:hover){ html.sha-cta .ds-go .btn.go.big:not([disabled]):hover,html.sha-cta .ds-sheet .sheet-f .btn.go:not([disabled]):hover{filter:brightness(1.12) drop-shadow(0 0 14px rgba(72,229,212,.35))} }
+html.sha-cta .ds-go .btn.go.big:active,html.sha-cta .ds-sheet .sheet-f .btn.go:active{transform:scale(.97)}
+/* закрытая главная кнопка — плита в серой тени (правило сильнее плиты с рисунком) */
+.ds-go .btn.go.big[disabled],.ds-sheet .sheet-f .btn.go[disabled],html.sha-cta .ds-go .btn.go.big[disabled],html.sha-cta .ds-sheet .sheet-f .btn.go[disabled]{filter:grayscale(.85) brightness(.6);color:var(--parch-2);text-shadow:none}
+.ds-go .btn:not(.go){min-height:42px;border-color:rgba(177,145,90,.55);background:linear-gradient(180deg,rgba(29,34,39,.92),rgba(14,17,20,.94))}
 
 /* середина руины и биома Многоликого — screens/echo.js рисует её на классах .biome и .banner */
 .ds .biome{display:grid;grid-template-rows:auto minmax(0,1fr);gap:var(--sp-m);min-width:0;min-height:0}
-.ds .banner{position:relative;height:150px;border-radius:12px;overflow:hidden;border:1px solid var(--iron);background:#0a0c0e}
+.ds .banner{position:relative;height:150px;border-radius:12px;overflow:hidden;border:var(--shl-fr,1px) solid rgba(177,145,90,.35);background:#0a0c0e}
 .ds .banner>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 58%}
 .ds .banner::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(7,9,11,.95) 0,rgba(7,9,11,.7) 38%,rgba(7,9,11,.1) 72%),linear-gradient(0deg,rgba(7,9,11,.85),transparent 45%)}
 .ds .banner.plain{background:radial-gradient(80% 120% at 80% 100%,rgba(72,229,212,.12),transparent 60%),var(--noise),#0d1013}
@@ -107,51 +182,91 @@
 
 /* низкий экран (844 × 390 и ниже) и узкий телефон */
 @container main (max-height: 360px){
-  .ds-ui{grid-template-columns:166px minmax(0,1fr);gap:var(--sp-m)}
-  .ds-head h2{font-size:35px}
-  .ds-head .quote{font-size:14.5px}
-  .ds-nav .bnode{min-height:34px}
-  .ds-nav .cyc>b{line-height:34px}
-  .ds-st{padding:0 10px}
-  .ds-st b{font-size:18px}
-  .ds-go .btn.go.big{min-width:172px;min-height:46px}
+  .ds-ui{grid-template-columns:172px minmax(0,1fr);gap:var(--sp-m)}
+  .ds-head{gap:4px}
+  .ds-head h2{font-size:34px}
+  .ds-head h2.long{font-size:28px}
+  .ds-head .quote{max-width:62ch;font-size:14px;-webkit-line-clamp:2}
+  .ds-tags{margin-top:1px}
+  .ds-state{gap:4px}
+  .ds-st{min-height:34px}
+  .ds-state .ds-em{width:32px;height:32px}
+  .ds-state .ds-em img{width:23px;height:23px}
+  .ds-state::before{left:16.5px;top:16px;bottom:16px}
+  .ds-st-t>b{font-size:17px}
+  .ds-nav .bnode{min-height:40px;gap:8px}
+  .ds-nav .bnode .bn-ph{width:28px;height:28px}
+  .ds-nav .bn-t{font-size:14px}
+  .ds-best{min-height:44px}
+  .ds-best .ds-em{width:32px;height:32px}
+  .ds-best .ds-em img{width:23px;height:23px}
+  .ds-go .btn.go.big{--cth:50px;min-width:196px}
+  .ds-sheet .sheet-f .btn.go{--cth:46px;min-width:184px}
   .ds .banner{height:140px}
 }
 @container main (max-width: 640px){
   .ds-ui{grid-template-columns:148px minmax(0,1fr)}
   .ds-head h2{font-size:30px}
-  .ds-st>.i{display:none}
-  .ds-st small{max-width:96px}
-  .ds-know-t{min-width:0}
+  .ds-st-l small{max-width:110px}
+  .ds-best-t{min-width:0}
 }
 
-/* ================== лист «Бестиарий» ================== */
+/* ================== листы в материале окна: «Отряд для спуска» и «Бестиарий» ================== */
+.ds-sheet{border-left-color:rgba(221,188,122,.45);background:linear-gradient(180deg,rgba(16,19,22,.3) 0,rgba(16,19,22,.86) 92px,#101316 170px),var(--ph,none) var(--pp,60% 50%)/cover no-repeat,#101316}
+.ds-sheet .sheet-h{border-bottom-color:rgba(221,188,122,.28);background:linear-gradient(180deg,rgba(5,6,8,.35),transparent)}
+.ds-sh-t{display:flex;flex-direction:column;gap:4px;min-width:0}
+.ds-sh-t .eyebrow{color:var(--gold-2);text-shadow:0 1px 6px #000}
+.ds-sheet .sheet-h h2{text-shadow:0 2px 12px #000}
+.ds-sheet .sheet-f{border-top-color:rgba(221,188,122,.25);background:linear-gradient(180deg,rgba(8,10,12,.55),rgba(8,10,12,.9))}
+.ds-sheet .sheet-f{padding-top:8px;padding-bottom:8px}
+.ds-sheet .sheet-f .btn.go{--cth:50px;min-width:200px}
+.ds-sheet .sheet-b{gap:10px}
+.ds-sheet .sheet-f .ds-slots{margin-right:4px}
+/* вторая строка главной кнопки листа — мощь отряда */
+.ds-cta-t{display:flex;flex-direction:column;align-items:center;gap:3px;line-height:1}
+.ds-cta-t small{display:inline-flex;align-items:center;gap:4px;font:700 11px/1 var(--f-u);letter-spacing:.06em;text-transform:none;color:#cfeee8;text-shadow:0 1px 2px #000}
+.ds-cta-t small .ico{width:13px;height:13px}
+/* тело листа «Отряд для спуска»: карты отряда — слева, стихии зала — колонкой справа от них; мощь отряда — на главной кнопке
+   (вторая строка). Так лист помещается без прокрутки на 932 × 430 и 844 × 390, а карты не мельчают. Пустая строка причины места не берёт */
+.ds-sheet .sheet-b:has(>.sq-slots){display:grid;grid-template-columns:var(--ds-cards,390px) minmax(0,1fr);align-content:start;gap:10px 14px}
+.ds-sheet .sheet-b:has(>.sq-slots)>*{grid-column:1/-1;min-width:0}
+.ds-sheet .sheet-b>.sq-slots{grid-column:1;max-width:none}
+.ds-sheet .sheet-b>.hr-sqi{grid-column:2;flex-direction:column;align-items:flex-end;justify-content:flex-start;gap:8px;text-align:right}
+.ds-sheet .hr-sqi>.stat,.ds-sheet .hr-sqi>.g-spacer{display:none}
+.ds-sheet .hr-sqi .col>.row{flex-wrap:wrap;justify-content:flex-end}
+.ds-sheet .sheet-b>.reason:empty{display:none}
+.g.sm .ds-sheet{--ds-cards:340px}
+
+/* бестиарий биома */
 .ds-bs-h{display:flex;flex-direction:column;gap:6px}
 .ds-bs-k{gap:var(--sp-m)}
+.ds-bs-k .ds-em{width:32px;height:32px}
+.ds-bs-k .ds-em img{width:23px;height:23px}
 .ds-bs-k span{font-size:14px;color:var(--parch-2);white-space:nowrap}
 .ds-bs-k b{color:var(--parch);font-size:16px}
-.ds-bs-k .bar{flex:1 1 0;height:5px}
+.ds-bs-k .bar{flex:1 1 0;height:4px}
 .ds-bs-grp{display:flex;flex-direction:column;gap:6px}
-.ds-bs-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px var(--sp-s)}
-.ds-bf{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;width:100%;padding:4px 8px 4px 4px;border-radius:9px;border:1px solid transparent;background:rgba(255,255,255,.025);color:var(--parch);text-align:left}
-.ds-bf:hover{border-color:var(--iron-2);background:rgba(255,255,255,.045)}
-.ds-bf-ph{position:relative;width:40px;height:50px;border-radius:7px;overflow:hidden;border:1px solid #262b31;background:#0a0c0e}
+.ds-bs-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px var(--sp-s)}
+.ds-bf{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;padding:5px 10px 5px 5px;border-radius:10px;
+  border:var(--shl-fr,1px) solid rgba(255,255,255,.05);background:linear-gradient(90deg,rgba(255,255,255,.035),rgba(255,255,255,.012));color:var(--parch);text-align:left;transition:border-color .15s,background-color .15s}
+@media (hover:hover){ .ds-bf:hover{border-color:rgba(221,188,122,.4);background:rgba(255,255,255,.05)} }
+.ds-bf-ph{position:relative;width:44px;height:56px;border-radius:8px;overflow:hidden;background:#0a0c0e;box-shadow:0 0 0 var(--shl-fr,1px) rgba(120,128,138,.45),0 4px 8px -4px #000}
 .ds-bf-ph img{display:block;width:100%;height:100%;object-fit:cover}
-.ds-bf.elite .ds-bf-ph{border-color:rgba(221,188,122,.45)}
-.ds-bf.boss .ds-bf-ph{border-color:var(--gold)}
-.ds-bf.unk .ds-bf-ph{border-color:rgba(72,229,212,.4)}
+.ds-bf.elite .ds-bf-ph{box-shadow:0 0 0 var(--shl-fr,1px) rgba(221,188,122,.6),0 4px 8px -4px #000}
+.ds-bf.boss .ds-bf-ph{box-shadow:0 0 0 var(--shl-fr,1px) var(--gold),0 0 10px -3px rgba(221,188,122,.6),0 4px 8px -4px #000}
+.ds-bf.unk .ds-bf-ph{box-shadow:0 0 0 var(--shl-fr,1px) rgba(72,229,212,.5),0 4px 8px -4px #000}
 .ds-bf.unk .ds-bf-ph img{filter:blur(4px) brightness(.35) saturate(.5)}
-.ds-bf-ph i{position:absolute;inset:0;display:grid;place-items:center;font:600 18px/1 var(--f-d);font-style:normal;color:var(--spirit);text-shadow:0 0 10px var(--spirit)}
-.ds-bf-t{display:flex;flex-direction:column;gap:2px;min-width:0}
-.ds-bf-t b{font-size:14px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ds-bf-ph i{position:absolute;inset:0;display:grid;place-items:center;font:600 20px/1 var(--f-d);font-style:normal;color:var(--spirit);text-shadow:0 0 10px var(--spirit)}
+.ds-bf-t{display:flex;flex-direction:column;gap:3px;min-width:0}
+.ds-bf-t b{font:600 15px/1.1 var(--f-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ds-bf.unk .ds-bf-t b{color:var(--parch-3)}
 .ds-bf-t small{font-size:11.5px;color:var(--parch-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ds-bf .chip{height:20px}
 
-/* ================== UI-кит: окно на каждом биоме ================== */
+/* ================== UI-кит: окно на каждом биоме и вещи окна ================== */
 .ds-kit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(427px,1fr));gap:var(--sp-m)}
 .ds-kit-f{margin:0;display:flex;flex-direction:column;gap:6px;min-width:0}
-.ds-kit-cell{position:relative;width:427px;max-width:100%;height:192px;overflow:hidden;border-radius:10px;border:1px solid #1b1f24;background:var(--ink)}
+.ds-kit-cell{position:relative;width:427px;max-width:100%;height:192px;overflow:hidden;border-radius:10px;border:var(--shl-fr,1px) solid #1b1f24;background:var(--ink)}
 .g.ds-kit-g{position:absolute;left:0;top:0;display:block;width:854px;height:384px;transform:scale(.5);transform-origin:0 0;pointer-events:none;border-radius:0}
 .ds-kit-g .g-main{width:100%;height:100%}
 .ds-kit-f figcaption{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;color:var(--parch-3)}
@@ -161,6 +276,23 @@
 .ds-kit-acts figcaption{font-size:12px;color:var(--parch-3)}
 .ds-kit-act{padding:var(--sp-s);border-radius:10px;background:radial-gradient(90% 90% at 70% 100%,rgba(72,229,212,.08),transparent 70%),#07090b}
 .ds-kit-act .ds-go{margin-left:0}
+.ds-kit-act{max-width:100%;overflow:hidden}
+.ds-kit-act .ds-go{align-items:flex-start}
+.ds-kit-act .ds-go .row{flex-wrap:wrap}
+.ds-kit-act .ds-go .btn.go.big{min-width:150px;padding:0 18px}
+.ds-kit-nav{display:flex;flex-direction:column;gap:2px;width:220px;padding:var(--sp-s);border-radius:10px;background:#07090b}
+.ds-kit-nav .bnode{position:relative;display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:5px 8px 5px 4px;border-radius:12px;border:0;background:none;text-align:left;color:var(--parch)}
+.ds-kit-nav .bnode .bn-ph{position:relative;flex:none;width:30px;height:30px;border-radius:50%;background:#0a0c0e var(--ph,none) var(--pp,60% 50%)/auto 250% no-repeat;box-shadow:0 0 0 var(--shl-fr,1px) rgba(177,145,90,.55),0 0 0 2px rgba(0,0,0,.6)}
+.ds-kit-nav .bnode.front .bn-ph{box-shadow:0 0 0 var(--shl-fr,1px) rgba(72,229,212,.85),0 0 12px -2px rgba(72,229,212,.6)}
+.ds-kit-nav .bnode.lock .bn-ph .ds-em.lk{position:absolute;inset:0;width:auto;height:auto;border:0;box-shadow:none;background:rgba(5,6,8,.62)}
+.ds-kit-nav .bnode.lock .bn-ph .ds-em.lk img{width:15px;height:15px}
+.ds-kit-nav .bn-t{display:flex;flex-direction:column;gap:3px;min-width:0;font:600 15px/1.06 var(--f-d)}
+.ds-kit-nav .bn-t small{font:700 9px/1.1 var(--f-u);letter-spacing:.12em;text-transform:uppercase;color:var(--parch-3)}
+.ds-kit-nav .bnode[aria-current="true"]{background:linear-gradient(90deg,rgba(72,229,212,.15),rgba(72,229,212,.02) 85%);box-shadow:inset 2px 0 0 var(--spirit)}
+.ds-kit-nav .ds-slots{margin-top:6px;align-self:flex-start}
+.ds-kit-st{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px 14px;padding:var(--sp-s);border-radius:10px;background:#07090b}
+.ds-kit-st .ds-st{min-height:40px}
+.ds-kit-st .ds-st-l{flex-wrap:wrap;row-gap:3px}   /* в узкой колонке кита заметка (ключ с босса) — под подписью, подпись не режется */
 
 /* ================== движение: только transform и opacity ================== */
 @keyframes ds-drift{from{transform:scale(1.02)}to{transform:scale(1.07) translate3d(-1%,-.6%,0)}}
@@ -174,5 +306,5 @@
 @keyframes ds-steam{0%{opacity:0;transform:translate3d(0,0,0) scale(.5)}30%{opacity:var(--o)}100%{opacity:0;transform:translate3d(var(--dx),var(--dy),0) scale(1.6)}}
 @media (prefers-reduced-motion:reduce){
   .ds-fx,.ds-bg.out{display:none}
-  .ds-bg,.ds-main.swap .ds-head,.ds-nav .ds-run{animation:none}
+  .ds-bg,.ds-main.swap .ds-head,.ds-main.swap .ds-state,.ds-nav .ds-run{animation:none}
 }

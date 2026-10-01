@@ -506,7 +506,7 @@ reset();
   /* колокол и «Чат» в Убежище, портрет над шахтой */
   T.S.overlay = null; T.S.route = 'shelter';
   const h = view(P, 'Убежище · бейджи');
-  const chat = (h.match(/data-v="chat">[\s\S]*?<\/button>/) || [''])[0], n = T.socChatN();
+  const chat = (h.match(/data-v="chat"(?:\s[^>]*)?>[\s\S]*?<\/button>/) || [''])[0], n = T.socChatN();   // у медальона — подпись с непрочитанным (aria-label)
   if (!n) say('Убежище: в демо нет непрочитанного в чате');
   if (!chat.includes(`<span class="bdg" aria-hidden="true">${n > 9 ? '9+' : n}</span>`)) say(`Убежище: у «Чата» бейдж не ${n}`);
   T.S.overlay = { t: 'chat' }; view(P, 'чат · прочитан'); T.S.overlay = null;

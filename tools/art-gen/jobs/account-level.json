@@ -9,7 +9,8 @@
  "notes": [
   "Генерации нет: предоплата API в минусе, HTTP 402 (01.10.2026). Задание ждёт; запуск — после пополнения: сначала --dry-run, потом --budget 0.5. Оценка — около $0,39: два 1K, один 2K и лист 4K на nb2",
   "Нарезка: медальон и рама — cutout по ключу; рама — border-image, углы не тянутся; лист — grid_slice.py jobs/account-level.json lv-opens art/generated/lv-icons/lv-opens__nb2.jpg. Выгрузка — design/ui/assets/art/start/: medal.webp, burst.webp, frame.webp, open-<id>.webp",
-  "Подключение в прототипе: design/ui/screens/start.css — .ob-hd (медальон под .ob-ring), .ob-glow (вспышка), .ob-card (рама), .ob-ops li и строки листа уровней (знак открытия). Код окна — design/ui/screens/start.js, obPopHtml; ключи знаков — OPEN в tools/content-gen/start/data.js"
+  "Подключение в прототипе: design/ui/screens/start.css — .ob-hd (медальон под .ob-ring), .ob-glow (вспышка), .ob-card (рама), .ob-ops li и строки листа уровней (знак открытия). Код окна — design/ui/screens/start.js, obPopHtml; ключи знаков — OPEN в tools/content-gen/start/data.js",
+  "01.10.2026: сгенерировано всё с первого раза, $0,40. Лист знаков — grid_slice.py, свет снизу приглушён hue_fix.py (13 клеток, .fix.webp). Вспышка — с точками альфы 9 в углах (lv-burst__nb2.anchor.png): выгрузка не режет поля, середина на месте. Выгрузка — ui-art.json → design/ui/assets/art/start/: medal.webp 256, burst.webp 512, frame.webp 1272 × 675 (срез border-image — 150 px со всех сторон, рама ~80 px), open-<id>.webp 256. Подключение в screens/start.* — за агентом «Обучение»"
  ],
  "models": [
   "nb2"

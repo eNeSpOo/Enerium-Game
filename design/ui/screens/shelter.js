@@ -107,12 +107,12 @@ const SH_TEXT = {
 
 /* арт: выгруженные пути (design/ui/assets/art/…); пути нет — CSS. Геометрия — px выгрузки, только целые:
    sign и cta — border-image: px — сторона рисунка, slice — срезы [сверху, справа, снизу, слева].
-   Чужие выгруженные вещи: гербы ролей и медальон — разговора (talk/), пар — частица «Ремесла» (craft/fx-smoke.png) */
+   Чужие выгруженные вещи: гербы ролей — разговора (talk/), пар — частица «Ремесла» (craft/fx-smoke.png); значки медальонов — оболочки (SHL_ART.ico) */
 const SH_ART = {
   ready: ['shelter/sign.webp', 'shelter/cta.webp', 'shelter/chain.png', 'shelter/corner.png', 'shelter/flourish.png',
-    'shelter/lantern.webp', 'talk/medallion.png', 'craft/fx-smoke.png'],   // выгрузка 30.09.2026
+    'shelter/lantern.webp', 'craft/fx-smoke.png'],   // выгрузка 30.09.2026; медальон разговора снят 01.10.2026 — медальоны Убежища в одну нить (shelter.css)
   img: { sign: 'shelter/sign.webp', cta: 'shelter/cta.webp', chain: 'shelter/chain.png', corner: 'shelter/corner.png', flourish: 'shelter/flourish.png',
-    lantern: 'shelter/lantern.webp', medal: 'talk/medallion.png', smoke: 'craft/fx-smoke.png' },
+    lantern: 'shelter/lantern.webp', smoke: 'craft/fx-smoke.png' },
   sign: { px: [749, 188], slice: [23, 116, 29, 116] },
   cta: { px: [727, 244], slice: [28, 150, 29, 150] },
 };
@@ -151,7 +151,7 @@ function shCrest(k, cls = '') {
   const I = SH_ART.img;
   const set = (k, p, flag) => { if (!shArt(p)) return; try { st.setProperty(k, `url("${abs(p)}")`); } catch (_) { } if (flag && R.classList) R.classList.add(flag); };
   set('--sh-sign', I.sign, 'sha-sign'); set('--sh-cta', I.cta, 'sha-cta'); set('--sh-chain', I.chain, 'sha-chain'); set('--sh-corner', I.corner, 'sha-corner');
-  set('--sh-flourish', I.flourish, 'sha-flour'); set('--sh-medal', I.medal, 'sha-medal');
+  set('--sh-flourish', I.flourish, 'sha-flour');
   set('--sh-smoke', I.smoke, 'sha-fx');
   try {
     const S1 = SH_ART.sign, C1 = SH_ART.cta;
@@ -242,7 +242,7 @@ function shActs() {
 /* «Чат» — медальон слева снизу; «Дар дня» и «Пропуск» — медальоны справа сверху (screens/pass.js рисует их кнопки) */
 function shChat() {
   const n = typeof socChatN === 'function' ? socChatN() : 0;
-  return `<button class="sh-md" data-a="sheet" data-v="chat">${ic('chat')}<span class="sh-md-t">${SH_TEXT.chat}</span>${n ? bdgN(n) : ''}</button>`;
+  return `<button class="sh-md" data-a="sheet" data-v="chat" aria-label="${SH_TEXT.chat}${n ? `: ${n} ${plural(n, 'непрочитанное', 'непрочитанных', 'непрочитанных')}` : ''}">${ic('chat')}<span class="sh-md-t">${SH_TEXT.chat}</span>${n ? bdgN(n) : ''}</button>`;
 }
 function shMeds() { return typeof psShelterBtns === 'function' ? psShelterBtns() : '<button class="btn sm" data-a="dlg" data-v="gift">Дар дня</button>'; }
 /* «Следующий шаг» — записка Хранителя знаний: место Памяти открыто — «Вспомнить», иначе — рубеж спуска */
@@ -395,7 +395,7 @@ function shKitHtml() {
       <div class="k-air-r"><b>Проводники</b><small>Дышат: грудь и полы — от пояса, вес — от ступней. Наведение — кромка света по силуэту. Тот, кто ждёт разговора, — с меткой над табличкой.</small></div>
       <div class="k-air-r"><b>Отклик</b><small>Нажатие вдавливает вещь и зажигает её свет, после — искры в цвете вещи. «Спуститься» — камера уходит вниз, свет шахты поднимается, потом «Спуск». «Меньше движения» — всё стоит, переход сразу.</small></div>
     </div>
-    ${TM(`<p class="k-note">Слово автора 30.09.2026 — «Убежище … ААА уровня». Арт — tools/art-gen/jobs/shelter.json → shelter_layers.py (вывеска без ушек, тон золота, кромка без сиреневого) → ui-art.json → assets/art/shelter/; выгружено путей: ${ready} (SH_ART.ready); гербы ролей и медальон — разговора (talk/), пар — частица «Ремесла» (craft/fx-smoke.png). Числа вида — SH_VIEW, кадр сцены — SH_CAST и SH_ROOM (‰ кадра), пояс и вдох проводников — TK_CAST. Проверка — check_shelter.js.</p>`, 'div')}
+    ${TM(`<p class="k-note">Слово автора 30.09.2026 — «Убежище … ААА уровня». Арт — tools/art-gen/jobs/shelter.json → shelter_layers.py (вывеска без ушек, тон золота, кромка без сиреневого) → ui-art.json → assets/art/shelter/; выгружено путей: ${ready} (SH_ART.ready); гербы ролей — разговора (talk/), пар — частица «Ремесла» (craft/fx-smoke.png), значки медальонов «Дар дня», «Пропуск» и «Чат» — оболочки (SHL_ART.ico, медальон в одну нить, 01.10.2026). Числа вида — SH_VIEW, кадр сцены — SH_CAST и SH_ROOM (‰ кадра), пояс и вдох проводников — TK_CAST. Проверка — check_shelter.js.</p>`, 'div')}
   </section>`;
 }
 if (typeof KIT_EXTRA !== 'undefined') KIT_EXTRA.push({ html: shKitHtml });

@@ -381,6 +381,21 @@ def sheet_preview(sid, cells, lock, folder):
     return path
 
 
+def apply_patch(c, p):
+    """Правка клетки листа (docs/art-queue.md): ответ модели на вырезку box сундука — art/generated/<from> — вклеивается в цвет по
+    мягкому эллипсу ellipse [x, y, полуось x, полуось y] с краем feather px; альфа, шов и рамка сундука прежние. box и ellipse — px
+    вырезанного сундука (r<N>.png). Раздел patch в layers.sheets jobs/chest-sheets.json: {"5": {...}} — заново при каждой нарезке."""
+    x0, y0, x1, y1 = p["box"]
+    fix = np.asarray(Image.open(GEN / p["from"]).convert("RGB").resize((x1 - x0, y1 - y0), Image.LANCZOS)).astype(np.float32)
+    cx, cy, rx, ry = p["ellipse"]
+    yy, xx = np.mgrid[y0:y1, x0:x1]
+    d = np.sqrt(((xx - cx) / rx) ** 2 + ((yy - cy) / ry) ** 2)
+    m = np.clip(1 - (d - 1) * min(rx, ry) / p.get("feather", 8), 0, 1)[..., None]
+    part = c[y0:y1, x0:x1, :3].astype(np.float32)
+    c[y0:y1, x0:x1, :3] = (part * (1 - m) + fix * m).round().astype(np.uint8)
+    return c
+
+
 def sheets(only=None, folder=None):
     """Листы режимов: вырезка, нарезка на восемь пятен, шов и слои каждого сундука, замок. Геометрия — layers.json у клеток
     и строкой JSON для CO_ART.sets (screens/chest-open.js)."""
@@ -405,6 +420,8 @@ def sheets(only=None, folder=None):
             x0, y0, x1, y1 = bbox(c)
             c = c[y0:y1, x0:x1].copy()
             c[c[..., 3] <= A_CUT] = 0
+            if str(r) in s.get("patch", {}):
+                c = apply_patch(c, s["patch"][str(r)])
             auto, score = find_seam(c)
             seam = int(s.get("seams", {}).get(str(r), auto))
             g, layer = split_arr(c, seam)

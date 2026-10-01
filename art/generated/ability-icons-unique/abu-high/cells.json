@@ -1,0 +1,300 @@
+{
+  "sheet": "art/generated/ability-icons-unique/abu-high__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/ability-icons-unique.json",
+  "job": "abu-high",
+  "grid": [
+    6,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "Эхо.Забытые.act1",
+      "file": "art/generated/ability-icons-unique/abu-high/echo-forgotten-act1.webp",
+      "box": [
+        41,
+        51,
+        820,
+        830
+      ],
+      "px": 779,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Забытые.act2",
+      "file": "art/generated/ability-icons-unique/abu-high/echo-forgotten-act2.webp",
+      "box": [
+        881,
+        51,
+        1660,
+        830
+      ],
+      "px": 779,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Забытые.pas",
+      "file": "art/generated/ability-icons-unique/abu-high/echo-forgotten-pas.webp",
+      "box": [
+        1719,
+        51,
+        2498,
+        830
+      ],
+      "px": 779,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Забытые.ult1",
+      "file": "art/generated/ability-icons-unique/abu-high/echo-forgotten-ult1.webp",
+      "box": [
+        2558,
+        51,
+        3337,
+        830
+      ],
+      "px": 779,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Забытые.ult2",
+      "file": "art/generated/ability-icons-unique/abu-high/echo-forgotten-ult2.webp",
+      "box": [
+        3396,
+        51,
+        4175,
+        830
+      ],
+      "px": 779,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Многоликий.act1",
+      "file": "art/generated/ability-icons-unique/abu-high/echo-many-act1.webp",
+      "box": [
+        4235,
+        51,
+        5014,
+        830
+      ],
+      "px": 779,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Многоликий.act2",
+      "file": "art/generated/ability-icons-unique/abu-high/echo-many-act2.webp",
+      "box": [
+        41,
+        889,
+        820,
+        1668
+      ],
+      "px": 779,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Многоликий.pas",
+      "file": "art/generated/ability-icons-unique/abu-high/echo-many-pas.webp",
+      "box": [
+        881,
+        889,
+        1660,
+        1668
+      ],
+      "px": 779,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Многоликий.react",
+      "file": "art/generated/ability-icons-unique/abu-high/echo-many-react.webp",
+      "box": [
+        1719,
+        889,
+        2498,
+        1668
+      ],
+      "px": 779,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Многоликий.ult1",
+      "file": "art/generated/ability-icons-unique/abu-high/echo-many-ult1.webp",
+      "box": [
+        2558,
+        889,
+        3337,
+        1668
+      ],
+      "px": 779,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Многоликий.ult2",
+      "file": "art/generated/ability-icons-unique/abu-high/echo-many-ult2.webp",
+      "box": [
+        3396,
+        889,
+        4175,
+        1668
+      ],
+      "px": 779,
+      "key_left": 0.0
+    },
+    {
+      "id": "Спуск.b2b1.pas",
+      "file": "art/generated/ability-icons-unique/abu-high/b2b1-pas.webp",
+      "box": [
+        4235,
+        889,
+        5014,
+        1668
+      ],
+      "px": 779,
+      "key_left": 0.0
+    },
+    {
+      "id": "Спуск.b2b1.ult",
+      "file": "art/generated/ability-icons-unique/abu-high/b2b1-ult.webp",
+      "box": [
+        42,
+        1726,
+        820,
+        2504
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Спуск.b2e2.act",
+      "file": "art/generated/ability-icons-unique/abu-high/b2e2-act.webp",
+      "box": [
+        881,
+        1726,
+        1659,
+        2504
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Спуск.b2e6.act",
+      "file": "art/generated/ability-icons-unique/abu-high/b2e6-act.webp",
+      "box": [
+        1720,
+        1726,
+        2498,
+        2504
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Спуск.b3b1.pas",
+      "file": "art/generated/ability-icons-unique/abu-high/b3b1-pas.webp",
+      "box": [
+        2558,
+        1726,
+        3336,
+        2504
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Спуск.b3b1.ult",
+      "file": "art/generated/ability-icons-unique/abu-high/b3b1-ult.webp",
+      "box": [
+        3397,
+        1726,
+        4175,
+        2504
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Спуск.b3e6.act",
+      "file": "art/generated/ability-icons-unique/abu-high/b3e6-act.webp",
+      "box": [
+        4236,
+        1726,
+        5014,
+        2504
+      ],
+      "px": 778,
+      "key_left": 0.0
+    },
+    {
+      "id": "Спуск.b3e6.ctrl",
+      "file": "art/generated/ability-icons-unique/abu-high/b3e6-ctrl.webp",
+      "box": [
+        42,
+        2563,
+        819,
+        3340
+      ],
+      "px": 777,
+      "key_left": 0.0
+    },
+    {
+      "id": "Спуск.b3g1.act",
+      "file": "art/generated/ability-icons-unique/abu-high/b3g1-act.webp",
+      "box": [
+        882,
+        2563,
+        1659,
+        3340
+      ],
+      "px": 777,
+      "key_left": 0.0
+    },
+    {
+      "id": "Спуск.b4b1.pas",
+      "file": "art/generated/ability-icons-unique/abu-high/b4b1-pas.webp",
+      "box": [
+        1720,
+        2563,
+        2497,
+        3340
+      ],
+      "px": 777,
+      "key_left": 0.0
+    },
+    {
+      "id": "Спуск.b4e6.act",
+      "file": "art/generated/ability-icons-unique/abu-high/b4e6-act.webp",
+      "box": [
+        2559,
+        2563,
+        3336,
+        3340
+      ],
+      "px": 777,
+      "key_left": 0.0
+    },
+    {
+      "id": "Спуск.b4g1.act",
+      "file": "art/generated/ability-icons-unique/abu-high/b4g1-act.webp",
+      "box": [
+        3397,
+        2563,
+        4174,
+        3340
+      ],
+      "px": 777,
+      "key_left": 0.0
+    },
+    {
+      "id": "spare",
+      "file": "art/generated/ability-icons-unique/abu-high/spare.webp",
+      "box": [
+        4236,
+        2563,
+        5013,
+        3340
+      ],
+      "px": 777,
+      "key_left": 0.0
+    }
+  ]
+}

@@ -4,7 +4,13 @@
    порядком бросков, что lootItems прототипа (index.html): базовые, ключи ремёсел, уникальный, руны стража; сид — номер забега.
    Уровень и награды — алгоритм rules.js (EnStart), тот же, что в прототипе. Только целые; время — мс боя и переходов между этажами.
    make(D, opt) → мир для bot.js; opt.stageOnly — первый проход сборщика: пороги опыта ещё не известны, уровень берётся по этапу,
-   а мир запоминает, сколько опыта было в этот миг (moments). */
+   а мир запоминает, сколько опыта было в этот миг (moments).
+   Добыча обучения (ADR-0040): мир пишет добычу каждого этажа каждого забега и стража — S.lootLog[номер забега] = [[этаж, золото, дух,
+   души, [[предмет, сколько], …]], …]. Это и есть добыча сценария: прототип в обучении выдаёт её из данных, а не бросками.
+   opt.loot — такая же таблица: мир берёт добычу из неё, а не из ядра и генератора, — так сборщик проверяет, что таблица ведёт к тому же итогу.
+   Шаги сценария сверх боя (ADR-0040; D.tut — их собирает build.js, tutOf): сундук уровня chest.L открывается с заданным содержимым,
+   в Лавке — одна покупка витрины обучения по цене Лавки, первый артефакт — покупка за золото и уровни за души по правилу артефактов
+   (screens/wanderer.js, WN_SRV: купить — a.gold, уровень k — a.soul × k). Сундуки помнят номер выдачи (no) — как ch<номер> прототипа. */
 'use strict';
 const path = require('path');
 const ROOT = path.join(__dirname, '..', '..', '..');
@@ -12,7 +18,38 @@ const SIM = require(path.join(ROOT, 'tools', 'content-gen', 'biomes', 'sim.js'))
 const { EB, SQUAD } = SIM;
 const RX = (() => { globalThis.window = globalThis; require(path.join(ROOT, 'design', 'ui', 'recipes.js')); return globalThis.EN_RECIPES; })();
 const ROSTER = (() => { require(path.join(ROOT, 'design', 'ui', 'roster.js')); return globalThis.EN_ROSTER; })();
+const LBX = (() => { require(path.join(ROOT, 'design', 'ui', 'lootboxes.js')); return globalThis.EN_LOOTBOXES; })();   // сундуки и алгоритм открытия EnLoot
+const WNA = (() => { require(path.join(ROOT, 'design', 'ui', 'wanderer.js')); return globalThis.EN_WANDERER.art; })();  // артефакты Странника
 const EnStart = require(path.join(__dirname, 'rules.js'));
+
+/* шаги сценария сверх боя — из данных сценария (data.js, SCRIPT): содержимое сундука, витрина и цена покупки Лавки, цена артефакта.
+   Сундук — сундук странника своей редкости, как выпал бы по своему сиду (EnLoot.resolve и roll, сид «сундук|ch<номер>» — как у
+   прототипа, zpSeed), без валют из drop. Номер сундука — по порядку сундуков в наградах уровней. Цена Лавки — правило Лавки
+   (screens/shop.js, shopCost: за золото — минимальная рынка × количество, mkMin). Только целые */
+function tutOf(SC, levels) {
+  const out = {};
+  if (SC.chest) {
+    const no = levels.filter(l => l.reward.chest && l.L <= SC.chest.L).length, lv = levels.find(l => l.L === SC.chest.L), sp = lv && lv.reward.chest;
+    if (!sp) throw new Error(`сценарий: у уровня ${SC.chest.L} нет сундука`);
+    const def = globalThis.EnLoot.resolve(LBX, { box: sp.box, r: sp.r, win: 'step', cyc: 1 });
+    const res = globalThis.EnLoot.roll(def, globalThis.EnLoot.seedOf('сундук|ch' + no));
+    out.chest = { L: SC.chest.L, no, box: sp.box, r: sp.r, cur: res.cur.filter(([k]) => !(SC.chest.drop || []).includes(k)).map(x => x.slice()),
+      items: res.items.filter(x => x.kind === 'item').map(x => [x.id, x.q]) };
+  }
+  if (SC.shop) {
+    const goods = SC.shop.goods.map(g => g.slice()), i = goods.findIndex(g => g[0] === SC.shop.buy && g[2] === 'gold');
+    const it = RX.items.find(x => x.id === SC.shop.buy), p = it && RX.drops.market[it.tier];
+    if (i < 0 || !Array.isArray(p)) throw new Error(`сценарий: покупки ${SC.shop.buy} нет на витрине за золото`);
+    out.shop = { buy: SC.shop.buy, i, q: goods[i][1], cost: p[it.cyc - 1] * goods[i][1], goods };
+  }
+  if (SC.art) {
+    const a = WNA.list.find(x => x.id === SC.art.id);
+    if (!a) throw new Error(`сценарий: артефакта ${SC.art.id} нет`);
+    let souls = 0; for (let k = 1; k <= SC.art.lv; k++) souls += a.soul * k;
+    out.art = { id: a.id, n: a.n, lv: SC.art.lv, gold: a.gold, souls };
+  }
+  return out;
+}
 
 /* предметы добычи — как lootItems в index.html: общий пул базовых, ключи и уникальный биома, руны и осколки стража */
 const poolItems = RX.items.filter(i => i.pool && !i.team);
@@ -25,7 +62,7 @@ const guardOf = b => (RX.drops.guardians || []).find(g => g.biome === b) || null
 function lootItems(biome, floor, got, seed, guardWin) {
   const roll = EB.makeRng(EB.floorSeed(seed >>> 0, floor)), out = {}, put = (id, n) => { out[id] = (out[id] || 0) + n; };
   const add = list => { if (list.length) put(list[roll(list.length)].id, 1); };
-  const Dd = dropOf(biome), max = Dd ? Dd.basicsPerTriggerMax : EB.BIOMES[biome] ? EB.BIOMES[biome].n : 1;
+  const Dd = dropOf(biome), max = got.baseMax || (Dd ? Dd.basicsPerTriggerMax : EB.BIOMES[biome] ? EB.BIOMES[biome].n : 1);   // ларцы — got.baseMax (ADR-0044)
   for (let t = 0; t < (got.base || 0); t++) { const n = 1 + roll(max); for (let k = 0; k < n; k++) add(poolItems); }
   const keys = biomeItems('key', biome); for (let k = 0; k < (got.keys || 0); k++) add(keys);
   const un = biomeItems('unique', biome); for (let k = 0; k < (got.unique || 0); k++) add(un);
@@ -51,7 +88,10 @@ function make(D, opt = {}) {
   const R = EnStart.make(D), M = R.fresh();
   const byId = Object.fromEntries(D.heroes.map(h => [h.id, h]));
   const S = { gold: D.start.wallet.gold, spirit: D.start.wallet.spirit, souls: D.start.wallet.souls, keys: D.start.wallet.keys, train: 0, items: {}, cycle: D.start.cycle,
-    heroes: [], known: {}, best: {}, boss: {}, guard: {}, recipe: 0, runNo: 0, ms: 0, msBy: {}, runsBy: {}, chests: [], shards: {},
+    heroes: [], known: {}, best: {}, boss: {}, guard: {}, recipe: 0, recipes: [], runNo: 0, ms: 0, msBy: {}, runsBy: {}, chests: [], shards: {},
+    lootLog: {}, lastRun: {},   // добыча по забегам и этажам (ADR-0040); последний забег биома — как S.lastRun прототипа
+    held: new Set(),            // что игрок держал в руках: всё, что прошло через запасы (как S.ws.seen мастерской прототипа)
+    chestSeq: 0, opened: [], bought: null, art: {},   // сундуков выдано, открытые (номера), покупка Лавки, артефакты: уровень
     tot: {} };   // по биомам: этажей взято, убито по рангам, дух и золото, забегов, попыток у стража и побед — счётчики для калькуляторов
   const tot = b => S.tot[b] || (S.tot[b] = { floors: 0, o: 0, e: 0, b: 0, spirit: 0, gold: 0, souls: 0, runs: 0, ms: 0, guardTries: 0, guardWins: 0, guardMs: 0 });
   const RANK = u => u.rank === 'e' ? 'e' : u.rank === 'b' ? 'b' : u.rank === 'rune' ? null : 'o';
@@ -65,9 +105,9 @@ function make(D, opt = {}) {
     for (const x of levels) {
       const r = x.reward;
       S.gold += r.gold; S.spirit += r.spirit; S.keys += r.keys; S.train += r.train;
-      if (r.runes) { const rn = limitRune(1, 1); S.items[rn.id] = (S.items[rn.id] || 0) + r.runes; }
-      for (const [id, n] of r.items) S.items[id] = (S.items[id] || 0) + n;
-      if (r.chest) S.chests.push(r.chest);
+      if (r.runes) { const rn = limitRune(1, 1); S.items[rn.id] = (S.items[rn.id] || 0) + r.runes; S.held.add(rn.id); }
+      for (const [id, n] of r.items) { S.items[id] = (S.items[id] || 0) + n; S.held.add(id); }
+      if (r.chest) S.chests.push({ box: r.chest.box, r: r.chest.r, cyc: S.cycle, L: x.L, no: ++S.chestSeq });   // цикл — тот, в котором выдан: как в прототипе
       for (const [id, n] of r.shards) S.shards[id] = (S.shards[id] || 0) + n;
     }
   }
@@ -88,11 +128,25 @@ function make(D, opt = {}) {
   }
   const heroSrc = h => EB.heroSrcValor(Object.assign({}, SQUAD.find(x => x.id === byId[h.id].bot), { lvl: h.lvl, valor: h.valor }));
   const killFacts = b => { for (const u of b.u[1]) if (!u.alive && !S.known[u.id]) { S.known[u.id] = 1; fact('kill:' + u.id, 'kill'); } };
-  const addItems = items => { for (const [id, n] of Object.entries(items)) S.items[id] = (S.items[id] || 0) + n; };
+  const addItems = items => { for (const [id, n] of Object.entries(items)) { S.items[id] = (S.items[id] || 0) + n; if (n > 0) S.held.add(id); } };
+  /* добыча этажа: из ядра и генератора — или, с opt.loot, из таблицы сценария; запись — в журнал добычи забега */
+  function lootOf(biome, floor, b, seed, guardWin) {
+    let got, items;
+    if (opt.loot) {
+      const row = ((opt.loot[S.runNo - 1] || []).find(x => x[0] === floor)) || [floor, 0, 0, 0, []];
+      got = { gold: row[1], spirit: row[2], souls: row[3] }; items = Object.fromEntries(row[4]);
+    } else { got = EB.floorLoot(biome, floor, b, 0); items = lootItems(biome, floor, got, seed, guardWin); }
+    const L = S.lootLog[S.runNo] || (S.lootLog[S.runNo] = []);
+    L.push([floor, got.gold, got.spirit, got.souls, Object.entries(items).filter(([, n]) => n > 0)]);
+    return { got, items };
+  }
+  const TUT = D.tut || {};
   const W = {
-    st: () => ({ lvl: M.lvl, cycle: S.cycle, slots: R.slots(M.lvl), gold: S.gold, spirit: S.spirit, keys: S.keys, train: S.train,
+    st: () => ({ lvl: M.lvl, cycle: S.cycle, slots: R.slots(M.lvl), gold: S.gold, spirit: S.spirit, souls: S.souls, keys: S.keys, train: S.train,
       runes: S.items[limitRune(1, 1).id] || 0, heroes: S.heroes.map(h => ({ id: h.id, lvl: h.lvl, cap: capOf(h), lim: h.lim, valor: h.valor, maxV: h.maxV })),
       front: front(), boss: Object.assign({}, S.boss), guard: Object.assign({}, S.guard), recipe: S.recipe, craft: M.lvl >= R.opensAt('seg', 'craft:work'),
+      stock: M.lvl >= R.opensAt('seg', 'craft:stock'), shop: M.lvl >= R.opensAt('seg', 'craft:shop'), arts: M.lvl >= (D.gates.art || 1),
+      chest: !!TUT.chest && S.chests.some(c => c.no === TUT.chest.no), bought: S.bought, art: Object.assign({}, S.art),
       has: (id, n) => (S.items[id] || 0) >= n }),
     ms: () => S.ms,
     price: k => goldPrice(1, k),
@@ -125,9 +179,32 @@ function make(D, opt = {}) {
       fact(`limit:${id}:${h.valor}:${h.lim}`, 'limit');
       return true;
     },
-    craft(cells) {
+    /* сундук сценария: валюта и предметы — заданные (TUT.chest), сундук уходит из запасов */
+    open() {
+      const C = TUT.chest, i = C ? S.chests.findIndex(c => c.no === C.no) : -1; if (i < 0) return false;
+      S.chests.splice(i, 1); S.opened.push(C.no);
+      for (const [k, a] of C.cur) { if (k === 'gold') S.gold += a; else if (k === 'spirit') S.spirit += a; else if (k === 'souls') S.souls += a; else if (k === 'keys') S.keys += a; }
+      addItems(Object.fromEntries(C.items));
+      return true;
+    },
+    /* Лавка: покупка витрины обучения — цена Лавки, товар в запасы; одна */
+    buy(id) {
+      const P = TUT.shop; if (!P || P.buy !== id || S.bought || S.gold < P.cost) return false;
+      S.gold -= P.cost; addItems({ [id]: P.q }); S.bought = id;
+      return true;
+    },
+    /* артефакт: купить за золото, уровни до lv — за души */
+    art(id, lv) {
+      const A = TUT.art; if (!A || A.id !== id || A.lv !== lv || S.art[id] != null) return false;
+      if (S.gold < A.gold || S.souls < A.souls) return false;
+      S.gold -= A.gold; S.souls -= A.souls; S.art[id] = lv;
+      return true;
+    },
+    craft(cells, rid) {
       if (!cells.every(([id, q]) => (S.items[id] || 0) >= q)) return false;
+      const r = rid ? RX.recipes.find(x => x.id === rid) : null;
       for (const [id, q] of cells) S.items[id] -= q;
+      if (r) { S.items[r.out[0]] = (S.items[r.out[0]] || 0) + r.out[1]; S.recipes.push(r.id); S.held.add(r.out[0]); }   // итог рецепта — в запасы, как в мастерской прототипа
       S.recipe++;
       return true;
     },
@@ -140,11 +217,11 @@ function make(D, opt = {}) {
         const b = EB.run(EB.floorBattle(cur, biome, f, null, 'rounds')), dt = b.t + (f < B.floors.length ? EB.RULES.floor.gapMs : 0);
         ms += dt; S.ms += dt;   // миг уровня — время к концу этажа, где взят этап
         killFacts(b);
-        const got = EB.floorLoot(biome, f, b, 0), T = tot(biome);
+        const { got, items } = lootOf(biome, f, b, seed, false), T = tot(biome);
         S.gold += got.gold; S.spirit += got.spirit; S.souls += got.souls; spirit += got.spirit;
         T.gold += got.gold; T.spirit += got.spirit; T.souls += got.souls;
         for (const u of b.u[1]) if (!u.alive && RANK(u)) T[RANK(u)]++;
-        addItems(lootItems(biome, f, got, seed, false));
+        addItems(items);
         cur = EB.carry(cur, b); wall = f;
         if (b.win) { S.best[biome] = Math.max(S.best[biome] || 0, f); T.floors++; }
         if (B.floors[f - 1].g === 'b' && !b.u[1][0].alive && !S.boss[biome]) { S.boss[biome] = 1; fact('closure:' + biome, 'closure'); }
@@ -154,6 +231,8 @@ function make(D, opt = {}) {
       }
       S.msBy[biome] = (S.msBy[biome] || 0) + ms; S.runsBy[biome] = (S.runsBy[biome] || 0) + 1;
       tot(biome).runs++; tot(biome).ms += ms;
+      /* последний забег биома — как S.lastRun прототипа (endRun): стена, босс или отказ */
+      S.lastRun[biome] = win ? { wall: null, kind: 'boss', floor: wall } : { wall, kind: 'wall', floor: wall };
       return { wall, win, ms, spirit };
     },
     guard(biome) {
@@ -163,11 +242,11 @@ function make(D, opt = {}) {
       const seed = EB.seedOf(`${biome}|добыча|${S.runNo}`);
       const b = EB.run(EB.guardBattle(S.heroes.map(heroSrc), biome, 'rounds'));
       killFacts(b);
-      const got = EB.floorLoot(biome, B.floors.length + 1, b, 0), T = tot(biome);
+      const { got, items } = lootOf(biome, B.floors.length + 1, b, seed, b.win), T = tot(biome);
       S.gold += got.gold; S.spirit += got.spirit; S.souls += got.souls;
       T.gold += got.gold; T.spirit += got.spirit; T.souls += got.souls; T.guardTries++; T.guardMs += b.t; T.ms += b.t;
       if (b.win) T.guardWins++;
-      addItems(lootItems(biome, B.floors.length + 1, got, seed, b.win));
+      addItems(items);
       if (b.win && !S.guard[biome]) {
         S.guard[biome] = 1; fact('guard:' + biome, 'guard');
         if (biome === 'b2') { fact('cycle:' + (S.cycle + 1), 'cycle'); S.cycle++; }
@@ -180,4 +259,4 @@ function make(D, opt = {}) {
   return { W, S, M, R, moments };
 }
 
-module.exports = { make, levelCost, goldPrice, lootItems, limitRune };
+module.exports = { make, levelCost, goldPrice, lootItems, limitRune, tutOf };

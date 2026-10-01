@@ -162,16 +162,20 @@ reset();
   {
     const IH = html.replace(/\s+/g, ' '), RC = CSS.replace(/\s+/g, ' ');
     const px = (src, re) => { const m = src.match(re); return m ? +m[1] : NaN; };
+    /* размер числом или переменной с запасным числом: толщины и колокол оболочки — SHL_VIEW (screens/shell.js) через var(--shl-*, N px).
+       Колокол — сторона из данных на своём экране (SHL_VIEW.bell: 932 и 844), без данных — запасное число CSS */
     const CH = 0.5, DIG = 0.52, SP = 0.25;
+    const SV = ctx.EN_SHELL && ctx.EN_SHELL.SHL_VIEW, bellM = px(IH, /\.g-icon\{margin-right:(\d+)px\}/);
+    const bellAt = (i, css) => (SV && SV.bell ? SV.bell[i] : css) + bellM;
     const v = {
       gap: px(IH, /\.g-top\{[^}]*?gap:(\d+)px/), padR: px(IH, /\.g-top\{[^}]*?padding-right:(\d+)px/),
-      wGap: px(IH, /\.g-wallet\{[^}]*?gap:(\d+)px/), wPad: px(IH, /\.g-wallet\{[^}]*?padding:0 (\d+)px/), wBord: px(IH, /\.g-wallet\{[^}]*?border:(\d+)px/),
+      wGap: px(IH, /\.g-wallet\{[^}]*?gap:(\d+)px/), wPad: px(IH, /\.g-wallet\{[^}]*?padding:0 (\d+)px/), wBord: px(IH, /\.g-wallet\{[^}]*?border:(?:var\(--[\w-]+,\s*)?(\d+)px/),
       cGap: px(IH, /\.g-cur\{[^}]*?gap:(\d+)px/), cPad: px(IH, /\.g-cur\{[^}]*?padding:0 (\d+)px/), cFont: px(IH, /\.g-cur\{[^}]*?font:700 (\d+)px/), cImg: px(IH, /\.g-cur img\{[^}]*?width:(\d+)px/),
-      plus: px(IH, /\.g-plus\{[^}]*?width:(\d+)px/) - px(IH, /\.g-plus\{[^}]*?margin-left:-(\d+)px/), bell: px(IH, /\.g-icon\{[^}]*?width:(\d+)px/) + px(IH, /\.g-icon\{margin-right:(\d+)px\}/),
+      plus: px(IH, /\.g-plus\{[^}]*?width:(\d+)px/) - px(IH, /\.g-plus\{[^}]*?margin-left:-(\d+)px/),
       segGap: px(IH, /\.g-seg\{[^}]*?gap:(\d+)px/),
     };
-    const frames = [{ n: 932, w: px(IH, /\.g\{[^}]*?width:(\d+)px/), rail: px(IH, /\.g\{[^}]*?--rail:(\d+)px/), f: px(RC, /\.g-seg:has\(>button:nth-child\(5\)\) button\{padding:0 (?:\d+)px;font-size:([\d.]+)px/), fs: px(RC, /\.g-seg:has\(>button:nth-child\(5\)\) button\[aria-selected="true"\]\{font-size:([\d.]+)px/), p: px(RC, /\.g-seg:has\(>button:nth-child\(5\)\) button\{padding:0 (\d+)px/) },
-      { n: 844, w: px(IH, /\.g\.sm\{[^}]*?width:(\d+)px/), rail: px(IH, /\.g\.sm\{[^}]*?--rail:(\d+)px/), f: px(RC, /\.g\.sm \.g-seg:has\(>button:nth-child\(5\)\) button\{padding:0 (?:\d+)px;font-size:([\d.]+)px/), fs: px(RC, /\.g\.sm \.g-seg:has\(>button:nth-child\(5\)\) button\[aria-selected="true"\]\{font-size:([\d.]+)px/), p: px(RC, /\.g\.sm \.g-seg:has\(>button:nth-child\(5\)\) button\{padding:0 (\d+)px/) }];
+    const frames = [{ n: 932, w: px(IH, /\.g\{[^}]*?width:(\d+)px/), rail: px(IH, /\.g\{[^}]*?--rail:(\d+)px/), f: px(RC, /\.g-seg:has\(>button:nth-child\(5\)\) button\{padding:0 (?:\d+)px;font-size:([\d.]+)px/), fs: px(RC, /\.g-seg:has\(>button:nth-child\(5\)\) button\[aria-selected="true"\]\{font-size:([\d.]+)px/), p: px(RC, /\.g-seg:has\(>button:nth-child\(5\)\) button\{padding:0 (\d+)px/), bell: bellAt(0, px(IH, /\.g-icon\{[^}]*?width:(?:var\(--[\w-]+,\s*)?(\d+)px/)) },
+      { n: 844, w: px(IH, /\.g\.sm\{[^}]*?width:(\d+)px/), rail: px(IH, /\.g\.sm\{[^}]*?--rail:(\d+)px/), f: px(RC, /\.g\.sm \.g-seg:has\(>button:nth-child\(5\)\) button\{padding:0 (?:\d+)px;font-size:([\d.]+)px/), fs: px(RC, /\.g\.sm \.g-seg:has\(>button:nth-child\(5\)\) button\[aria-selected="true"\]\{font-size:([\d.]+)px/), p: px(RC, /\.g\.sm \.g-seg:has\(>button:nth-child\(5\)\) button\{padding:0 (\d+)px/), bell: bellAt(1, px(IH, /\.g\.sm \.g-icon\{[^}]*?width:(?:var\(--[\w-]+,\s*)?(\d+)px/)) }];
     const bad = Object.entries(v).concat(...frames.map(f => Object.entries(f))).filter(([, x]) => !Number.isFinite(x));
     if (bad.length) say(`шапка «Ремесла»: не прочитаны размеры — ${bad.map(x => x[0]).join(', ')}`);
     else {
@@ -181,7 +185,7 @@ reset();
       const wallet = ['gold', 'spirit', 'souls', 'enerium'].reduce((a, k) => a + 2 * v.cPad + v.cImg + v.cGap + num(T.S.wallet[k] || 0), 0) + 3 * v.wGap + 2 * v.wPad + 2 * v.wBord + v.plus;
       for (const f of frames) for (let s = 0; s < labels.length; s++) {
         const seg = labels.reduce((a, l, i) => a + l.length * CH * (i === s ? f.fs : f.f) + 2 * f.p, 0) + (labels.length - 1) * v.segGap;
-        const total = f.rail + 4 * v.gap + seg + wallet + v.bell + v.padR;
+        const total = f.rail + 4 * v.gap + seg + wallet + f.bell + v.padR;
         cnt['head' + f.n] = Math.max(cnt['head' + f.n] || 0, Math.round(total));
         if (total > f.w) say(`шапка «Ремесла» ${f.n} px, выбрана «${labels[s]}»: около ${Math.round(total)} px — не влезает`);
       }

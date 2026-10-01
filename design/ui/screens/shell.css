@@ -1,78 +1,111 @@
-/* screens/shell.css — оболочка игры: кованые кромки шапки и шахты, узел на их стыке, гнёзда картинок разделов, кованый кошелёк,
-   колокол-медальон, ромб выбранной вкладки (screens/shell.js). Слово автора 30.09.2026: «…добавь
-   декоративные элементы в интерфейс общий».
-   Только украшения: фоны, тени, псевдоэлементы и position: relative без сдвига. Размеры, отступы, шрифты и шаг шахты — прежние
-   (index.html; их считает check_shell.js), экраны читаются, как раньше. Подключается последним: у правил оболочки тот же вес,
-   что в index.html, — последнее слово за этим файлом.
-   Арт — переменные <html> из SHL_ART (--shl-edge, --shl-knot, --shl-frame…) и флаги shla-*; без арта — CSS или ничего.
+/* screens/shell.css — оболочка игры (screens/shell.js): тонкие линии шапки и шахты, ромб на их стыке, рамки кнопок одной нитью,
+   нарисованные значки и состояния кнопок, портрет Странника в своей ячейке. Слова автора 01.10.2026: «Линии общего интерфейся слишком
+   толстые… рамки тоже толстые, иконка странника вылезает на интерфейс и сами кнопки слабые».
+   Только вид: фоны, цвета, тени, border-image по готовым рамкам index.html и украшения-псевдоэлементы (position: absolute,
+   pointer-events: none). Размеры, отступы и толщины решает index.html переменными --shl-* из SHL_VIEW: check_shelter.js сверяет
+   каскад с этим файлом и без него, check_shell.js — толщины с данными. Подключается последним: последнее слово за этим файлом.
+   Арт — переменные <html> из SHL_ART (--shl-diamond, --shl-iron, --shl-ico-*) и флаги shla-*; без арта — CSS и SVG index.html.
    Движение — только transform и opacity; «меньше движения» — как везде. */
 
-/* ---------- числа вида: пара [932 × 430, 844 × 390] ---------- */
-.g{--shl-e:var(--shl-edge0,9px);--shl-k:var(--shl-knot0,26px)}
-.g.sm{--shl-e:var(--shl-edge1,8px);--shl-k:var(--shl-knot1,24px)}
+/* ---------- числа вида: пара [932 × 430, 844 × 390] — переменные <html> из SHL_VIEW ---------- */
+.g,.k-shell-dev,.shl-kit-w{--shl-sw:var(--shl-sw0,8px);--shl-sh:var(--shl-sh0,10px);--shl-gly:var(--shl-gly0,24px)}
+.g.sm{--shl-sw:var(--shl-sw1,7px);--shl-sh:var(--shl-sh1,9px);--shl-gly:var(--shl-gly1,22px)}
 
-/* ---------- шапка: кованое железо, светлая нить сверху, кромка снизу ---------- */
-.g-top{--shl-ti:none;background:linear-gradient(180deg,rgba(22,26,31,.62),rgba(7,9,11,.9)),var(--shl-ti) 0 0/var(--shl-iron-s,240px) auto,linear-gradient(#0e1114,#0a0c0e)}
+/* ---------- шапка: тёмное железо, нить старого золота снизу, тень на экран ---------- */
+.g-top{--shl-ti:none;background:linear-gradient(180deg,rgba(24,28,33,.55),rgba(7,9,11,.92)),var(--shl-ti) 0 0/var(--shl-iron-s,240px) auto,linear-gradient(#0e1114,#0a0c0e);
+  border-image:linear-gradient(90deg,rgba(177,145,90,.1),rgba(221,188,122,.62) 9%,rgba(221,188,122,.62) 91%,rgba(177,145,90,.1)) 1;
+  box-shadow:0 1px 0 rgba(0,0,0,.75),0 12px 18px -14px #000}
 html.shla-iron .g-top{--shl-ti:var(--shl-iron)}
 .g-top::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;pointer-events:none;
-  background:linear-gradient(90deg,transparent,rgba(221,188,122,.2) 18%,rgba(221,188,122,.2) 82%,transparent)}
-/* кромка под шапкой: без арта — две нити старого золота, с артом — полоса кованого железа с заклёпками */
-.g-top::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:5px;z-index:1;pointer-events:none;
-  background:linear-gradient(rgba(177,145,90,.5),rgba(177,145,90,.5)) 0 0/100% 1px no-repeat,linear-gradient(#101316,#0b0d10) 0 1px/100% 3px no-repeat,linear-gradient(rgba(72,229,212,.28),rgba(72,229,212,.28)) 0 4px/100% 1px no-repeat}
-html.shla-edge .g-top::after{bottom:calc(var(--shl-e) * -.5);height:var(--shl-e);background:var(--shl-edge) 0 50%/auto 100% repeat-x;filter:drop-shadow(0 2px 3px rgba(0,0,0,.75))}
-/* выбранная вкладка: свет над кромкой, ромб старого золота посередине */
+  background:linear-gradient(90deg,transparent,rgba(221,188,122,.16) 18%,rgba(221,188,122,.16) 82%,transparent)}
+/* выбранная вкладка: свет духа над нитью, маленький ромб старого золота на ней */
 .g-seg button[aria-selected="true"]::after{z-index:2}
-.g-seg button[aria-selected="true"]::before{content:"";position:absolute;left:50%;bottom:-4px;z-index:3;width:7px;height:9px;margin-left:-3.5px;pointer-events:none;
+.g-seg button[aria-selected="true"]::before{content:"";position:absolute;left:50%;bottom:-3px;z-index:3;width:6px;height:8px;margin-left:-3px;pointer-events:none;
   background:linear-gradient(135deg,#f0d79c,#8c7650);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
-html.shla-dia .g-seg button[aria-selected="true"]::before{width:8px;height:10px;margin-left:-4px;bottom:-5px;clip-path:none;background:var(--shl-diamond) center/contain no-repeat}
-/* заголовок экрана — над кромкой: длинный заголовок на узком экране переносится (правило index.html), вторая строка не уходит под кромку */
+html.shla-dia .g-seg button[aria-selected="true"]::before{width:7px;height:9px;margin-left:-3.5px;bottom:-4px;clip-path:none;background:var(--shl-diamond) center/contain no-repeat}
 .g-title h1{position:relative;z-index:2}
 .g-back{border-color:rgba(177,145,90,.42);background:linear-gradient(180deg,#1d2226,#121518);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 2px 4px rgba(0,0,0,.5)}
 
-/* ---------- портрет Странника над шахтой: правая кромка шахты поднимается до верха, узел на стыке шапки и шахты ---------- */
-.g-ava{--shl-ae:none;background:var(--shl-ae) 100% 0/var(--shl-e) auto repeat-y,linear-gradient(90deg,#0d1013,#0b0d10 80%)}
-html.shla-edge .g-ava{--shl-ae:var(--shl-edge-v);border-right-color:transparent}
-.g-ava .lv{z-index:6}   /* уровень Странника — над узлом стыка */
-.g-ava::after{content:"";position:absolute;z-index:5;right:-5px;bottom:-5px;width:9px;height:9px;pointer-events:none;
+/* ---------- ячейка портрета Странника: нить справа, кольцо опыта, уровень и бейдж — внутри ячейки ---------- */
+.g-ava{background:radial-gradient(60% 70% at 50% 55%,rgba(72,229,212,.07),transparent 72%),linear-gradient(90deg,#0d1013,#0b0d10 80%);
+  border-image:linear-gradient(180deg,rgba(221,188,122,.14),rgba(221,188,122,.62)) 1}
+.g-ava .ring{box-shadow:0 0 0 1px rgba(0,0,0,.85),0 3px 8px -2px rgba(0,0,0,.75)}
+.g-ava .ring::after{content:"";position:absolute;inset:-2px;border-radius:50%;border:var(--shl-fr,1px) solid rgba(221,188,122,.32);pointer-events:none}
+.g-ava[aria-current="page"] .ring{box-shadow:0 0 0 1px var(--spirit),0 0 12px -2px var(--spirit)}
+.g-ava .lv{z-index:6;background:linear-gradient(180deg,#1b2025,#0a0c0e);border-color:rgba(221,188,122,.62);box-shadow:0 1px 3px rgba(0,0,0,.75)}
+/* стык шапки и шахты — ромб старого золота на пересечении нитей */
+.g-ava::after{content:"";position:absolute;z-index:7;width:var(--shl-sw,8px);height:var(--shl-sh,10px);pointer-events:none;
+  right:calc(var(--shl-sw,8px) * -.5 - var(--shl-ln,1px) * .5);bottom:calc(var(--shl-sh,10px) * -.5 - var(--shl-ln,1px) * .5);
   background:linear-gradient(135deg,#f0d79c,#8c7650);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
-html.shla-knot .g-ava::after{right:calc(var(--shl-k) * -.5 + var(--shl-e) * .5);bottom:calc(var(--shl-k) * -.5);width:var(--shl-k);height:var(--shl-k);clip-path:none;
-  background:var(--shl-knot) center/contain no-repeat;filter:drop-shadow(0 2px 4px rgba(0,0,0,.8))}
+html.shla-dia .g-ava::after{clip-path:none;background:var(--shl-diamond) center/contain no-repeat;filter:drop-shadow(0 1px 2px rgba(0,0,0,.9))}
 
-/* ---------- шахта: кованое железо, правая кромка, гнёзда картинок разделов ---------- */
-.g-rail{--shl-re:none;--shl-ri:none;background:var(--shl-re) 100% 0/var(--shl-e) auto repeat-y,linear-gradient(90deg,rgba(12,14,17,.74),rgba(9,11,13,.9) 80%),var(--shl-ri) 0 0/var(--shl-iron-s,240px) auto,linear-gradient(90deg,#0b0d10,#0a0c0e 80%)}
-html.shla-edge .g-rail{--shl-re:var(--shl-edge-v);border-right-color:transparent}
+/* ---------- шахта: железо, нить справа — старое золото сверху, свет карста снизу ---------- */
+.g-rail{--shl-ri:none;background:radial-gradient(130% 30% at 50% 100%,rgba(72,229,212,.08),transparent 72%),linear-gradient(90deg,rgba(12,14,17,.72),rgba(9,11,13,.9) 80%),var(--shl-ri) 0 0/var(--shl-iron-s,240px) auto,linear-gradient(90deg,#0b0d10,#0a0c0e 80%);
+  border-image:linear-gradient(180deg,rgba(221,188,122,.62),rgba(177,145,90,.26) 42%,rgba(72,229,212,.5)) 1}
 html.shla-iron .g-rail{--shl-ri:var(--shl-iron)}
-/* гнездо картинки раздела: кованая рамка с уголками старого золота обнимает картинку; выбранный раздел — гнездо светится */
-.g-nav .nv::before{content:"";position:absolute;left:50%;top:50%;z-index:1;width:var(--shl-fs,54px);height:var(--shl-fs,54px);margin:calc(var(--shl-fs,54px) * -.5) 0 0 calc(var(--shl-fs,54px) * -.5);
-  pointer-events:none;border-radius:14px;box-shadow:inset 0 0 0 1px rgba(177,145,90,.28);transition:filter .2s,opacity .2s}
-html.shla-frame .g-nav .nv::before{border-radius:0;box-shadow:none;background:var(--shl-frame) center/100% 100% no-repeat;filter:drop-shadow(0 3px 4px rgba(0,0,0,.65)) brightness(.86)}
-html.shla-frame .g-nav[aria-current="page"] .nv::before{filter:drop-shadow(0 0 6px rgba(72,229,212,.7)) brightness(1.12)}
-html.shla-frame .g-nav.lock .nv::before{filter:grayscale(1) brightness(.55)}
-@media (hover:hover){ html.shla-frame .g-nav:not([aria-current="page"]):hover .nv::before{filter:drop-shadow(0 3px 4px rgba(0,0,0,.65)) brightness(1.05)} }
-.g-nav .lbl{position:relative;z-index:2}
 
-/* ---------- кошелёк: кованая полоса, ромбы на концах, тонкие разделители старого золота ---------- */
+/* ---------- кнопка раздела: картинка в одной нити на зазоре; состояния — обычная, с делами, выбранная, закрытая ---------- */
+.g-nav .pic{border-radius:10px;box-shadow:0 0 0 1px rgba(0,0,0,.8),0 6px 10px -6px rgba(0,0,0,.9)}
+.g-nav .pic img{opacity:.8;filter:saturate(.7) brightness(.85)}
+.g-nav .nv::before{content:"";position:absolute;inset:calc(var(--shl-gap,3px) * -1);z-index:1;pointer-events:none;border-radius:13px;
+  border:var(--shl-fr,1px) solid rgba(177,145,90,.38);transition:box-shadow .2s}
+.g-nav .lbl{position:relative;z-index:2}
+/* с делами — картинка ярче, нить старого золота ярче; число дел — бейдж */
+.g-nav:has(.bdg) .pic img{opacity:.95;filter:saturate(.9) brightness(.96)}
+.g-nav:has(.bdg) .nv::before{border-color:rgba(221,188,122,.72)}
+/* выбранная — картинка в полном цвете, нить света духа, свет снизу; подпись золотом, у края — язычок */
+.g-nav[aria-current="page"] .pic{box-shadow:0 0 0 1px rgba(0,0,0,.8),0 8px 16px -6px rgba(72,229,212,.65)}
+.g-nav[aria-current="page"] .pic img{opacity:1;filter:none}
+.g-nav[aria-current="page"] .nv::before{border-color:rgba(72,229,212,.9);box-shadow:0 0 12px -2px rgba(72,229,212,.6),inset 0 0 10px -4px rgba(72,229,212,.55)}
+/* закрытая — картинка в серой тени, нить железа, замок и уровень открытия */
+.g-nav.lock .pic img{opacity:.26;filter:grayscale(1) brightness(.7)}
+.g-nav.lock .nv::before{border-color:rgba(120,128,138,.32)}
+.g-nav.lock .lk{background:radial-gradient(circle at 50% 40%,rgba(5,6,8,.15),rgba(5,6,8,.7))}
+.g-nav.lock .lk .i{color:var(--parch-2)}
+.g-nav.lock .lk b{color:var(--gold-2);text-shadow:0 1px 2px #000}
+html.shla-ico .g-nav.lock .lk .i{opacity:0}
+html.shla-ico .g-nav.lock .lk::before{content:"";position:absolute;left:50%;top:5px;width:16px;height:20px;margin-left:-8px;pointer-events:none;
+  background:var(--shl-ico-lock) center/contain no-repeat;filter:drop-shadow(0 2px 2px rgba(0,0,0,.85))}
+.g-nav.lock .lbl{opacity:.55}
+@media (hover:hover){ .g-nav:not([aria-current="page"]):not(.lock):hover .nv::before{border-color:rgba(221,188,122,.78)} }
+/* бейдж дел — камень ржавчины в нити старого золота */
+.g-nav .bdg,.g-ava>.bdg,.g-icon .bdg{background:radial-gradient(circle at 50% 30%,#e2705a,#a5301e 72%);box-shadow:0 0 0 1px rgba(240,215,156,.5),0 0 0 2px rgba(5,6,8,.9),0 2px 4px rgba(0,0,0,.6);text-shadow:0 1px 1px rgba(0,0,0,.45)}
+
+/* ---------- кошелёк: тёмная полоса, ромбы на концах, тонкие разделители ---------- */
 .g-wallet{position:relative;border-color:rgba(177,145,90,.34);background:linear-gradient(180deg,#0e1114,#07090b);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.045),inset 0 0 0 1px rgba(0,0,0,.55),inset 0 -8px 10px -9px rgba(72,229,212,.35),0 2px 6px -2px rgba(0,0,0,.6)}
-.g-wallet::before,.g-wallet::after{content:"";position:absolute;top:50%;z-index:1;width:8px;height:10px;margin-top:-5px;pointer-events:none;
+.g-wallet::before,.g-wallet::after{content:"";position:absolute;top:50%;z-index:1;width:6px;height:8px;margin-top:-4px;pointer-events:none;
   background:linear-gradient(135deg,#f0d79c,#8c7650);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
-.g-wallet::before{left:-4.5px}
-.g-wallet::after{right:-4.5px}
-html.shla-dia .g-wallet::before,html.shla-dia .g-wallet::after{width:9px;height:12px;margin-top:-6px;clip-path:none;background:var(--shl-diamond) center/contain no-repeat;filter:drop-shadow(0 1px 1px #000)}
+.g-wallet::before{left:-3.5px}
+.g-wallet::after{right:-3.5px}
+html.shla-dia .g-wallet::before,html.shla-dia .g-wallet::after{width:7px;height:9px;margin-top:-4.5px;clip-path:none;background:var(--shl-diamond) center/contain no-repeat;filter:drop-shadow(0 1px 1px #000)}
 .g-cur{position:relative}
-.g-cur+.g-cur::before{content:"";position:absolute;left:-1px;top:7px;bottom:7px;width:1px;pointer-events:none;background:linear-gradient(transparent,rgba(221,188,122,.32),transparent)}
+.g-cur+.g-cur::before{content:"";position:absolute;left:-1px;top:7px;bottom:7px;width:1px;pointer-events:none;background:linear-gradient(transparent,rgba(221,188,122,.3),transparent)}
 
-/* ---------- колокол — медальон кованого железа с кромкой старого золота ---------- */
-.g-icon{transition:box-shadow .18s,color .18s}
-html.shla-medal .g-icon{border-color:transparent;border-radius:50%;background:var(--shl-medal) center/contain no-repeat;color:var(--gold);box-shadow:0 4px 10px -4px #000}
-html.shla-medal .g-icon:hover{color:#f0d79c;box-shadow:0 4px 10px -4px #000,0 0 12px 1px rgba(221,188,122,.4)}
-html.shla-medal .g-icon .i{filter:drop-shadow(0 0 4px rgba(221,188,122,.3))}
+/* ---------- колокол Входящих: тёмное стекло в нити старого золота, нарисованный колокол; есть письма — нить ярче и тёплый свет ---------- */
+.g-icon{border-radius:50%;border-color:rgba(177,145,90,.55);color:var(--gold);background:radial-gradient(circle at 50% 30%,#1e272d,#0b0f12 72%);
+  box-shadow:inset 0 1px 0 rgba(255,236,190,.08),inset 0 -7px 10px -7px rgba(72,229,212,.4),0 3px 8px -3px #000;transition:box-shadow .18s}
+html.shla-ico .g-icon[data-v="inbox"] .i,html.shla-ico .k-box .g-icon .i{opacity:0}
+html.shla-ico .g-icon[data-v="inbox"]::before,html.shla-ico .k-box .g-icon::before{content:"";position:absolute;left:50%;top:50%;width:var(--shl-gly,22px);height:var(--shl-gly,22px);
+  margin:calc(var(--shl-gly,22px) * -.5) 0 0 calc(var(--shl-gly,22px) * -.5);pointer-events:none;background:var(--shl-ico-bell) center/contain no-repeat;
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.7));transition:transform .12s ease-out}
+.g-icon:has(>.bdg){border-color:rgba(221,188,122,.88);box-shadow:inset 0 1px 0 rgba(255,236,190,.1),inset 0 -7px 10px -7px rgba(72,229,212,.45),0 0 12px -3px rgba(221,188,122,.6),0 3px 8px -3px #000}
+@media (hover:hover){ .g-icon:hover{border-color:rgba(240,215,156,.92)} }
+.g-icon:active::before{transform:scale(.88)}
 
-/* ---------- UI-кит: «Оболочка: кованые кромки» ---------- */
-.shl-kit-row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;padding:12px;border-radius:10px;background:#07090b}
-.shl-kit-f{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px;width:110px;text-align:center}
-.shl-kit-f.wide{width:260px}
-.shl-kit-f img{max-width:100%;height:56px;object-fit:contain}
-.shl-kit-f.wide img{height:auto;max-height:40px;width:100%;object-fit:cover;object-position:left center}
+/* ---------- UI-кит: «Оболочка: линии и кнопки» ---------- */
+.shl-kit-w{display:flex;flex-direction:column;gap:14px;padding:14px;border-radius:10px;background:radial-gradient(90% 120% at 50% 110%,rgba(72,229,212,.07),transparent 60%),#07090b}
+.shl-kit-row{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px}
+.shl-kit-row>.eyebrow{flex:0 0 100%}
+.shl-kit-st figure{width:92px}
+.shl-kit-st .cell{width:78px;height:80px}
+.shl-kit-bells{display:flex;gap:18px;padding:6px 4px}
+.shl-kit-f{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px;width:82px;text-align:center}
+.shl-kit-f img{width:40px;height:40px;object-fit:contain}
 .shl-kit-f figcaption{font-size:12px;line-height:1.2;color:var(--parch-2)}
-.shl-kit-none{display:block;width:48px;height:48px;border-radius:8px;border:1px dashed var(--iron-2)}
+.shl-kit-none{display:block;width:40px;height:40px;border-radius:8px;border:var(--shl-fr,1px) dashed var(--iron-2)}
+.shl-kit-joint{position:relative;width:180px;height:70px;background:linear-gradient(90deg,rgba(177,145,90,.1),rgba(221,188,122,.62) 20%) 0 34px/100% var(--shl-ln0,1px) no-repeat,
+  linear-gradient(180deg,rgba(221,188,122,.14),rgba(221,188,122,.62) 48%,rgba(72,229,212,.5)) 60px 0/var(--shl-ln0,1px) 100% no-repeat,linear-gradient(#0e1114,#0a0c0e)}
+.shl-kit-joint::after{content:"";position:absolute;left:calc(60.5px - var(--shl-sw) * .5);top:calc(34.5px - var(--shl-sh) * .5);width:var(--shl-sw);height:var(--shl-sh);pointer-events:none;
+  background:linear-gradient(135deg,#f0d79c,#8c7650);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+html.shla-dia .shl-kit-joint::after{clip-path:none;background:var(--shl-diamond) center/contain no-repeat}

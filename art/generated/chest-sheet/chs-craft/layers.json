@@ -1,0 +1,223 @@
+{
+  "sheet": "chest-sheet/chs-craft__nb2.raw.jpg",
+  "box": "craft",
+  "chests": [
+    {
+      "r": 1,
+      "frame": [
+        0,
+        0,
+        1479,
+        1096
+      ],
+      "seam": 514,
+      "lid": [
+        0,
+        0,
+        1478,
+        516
+      ],
+      "body": [
+        7,
+        512,
+        1472,
+        584
+      ],
+      "auto": 514,
+      "score": 63.01,
+      "rim": 57665,
+      "files": {
+        "whole": "chest-sheet/chs-craft/r1.png",
+        "lid": "chest-sheet/chs-craft/r1.lid.png",
+        "body": "chest-sheet/chs-craft/r1.body.png"
+      }
+    },
+    {
+      "r": 2,
+      "frame": [
+        0,
+        0,
+        1444,
+        1097
+      ],
+      "seam": 515,
+      "lid": [
+        0,
+        0,
+        1443,
+        517
+      ],
+      "body": [
+        0,
+        513,
+        1444,
+        584
+      ],
+      "auto": 515,
+      "score": 63.2,
+      "rim": 56877,
+      "files": {
+        "whole": "chest-sheet/chs-craft/r2.png",
+        "lid": "chest-sheet/chs-craft/r2.lid.png",
+        "body": "chest-sheet/chs-craft/r2.body.png"
+      }
+    },
+    {
+      "r": 3,
+      "frame": [
+        0,
+        0,
+        1441,
+        1097
+      ],
+      "seam": 515,
+      "lid": [
+        0,
+        0,
+        1440,
+        517
+      ],
+      "body": [
+        5,
+        513,
+        1436,
+        584
+      ],
+      "auto": 515,
+      "score": 57.24,
+      "rim": 56808,
+      "files": {
+        "whole": "chest-sheet/chs-craft/r3.png",
+        "lid": "chest-sheet/chs-craft/r3.lid.png",
+        "body": "chest-sheet/chs-craft/r3.body.png"
+      }
+    },
+    {
+      "r": 4,
+      "frame": [
+        0,
+        0,
+        1443,
+        1096
+      ],
+      "seam": 516,
+      "lid": [
+        0,
+        0,
+        1443,
+        518
+      ],
+      "body": [
+        8,
+        514,
+        1435,
+        582
+      ],
+      "auto": 516,
+      "score": 41.21,
+      "rim": 56651,
+      "files": {
+        "whole": "chest-sheet/chs-craft/r4.png",
+        "lid": "chest-sheet/chs-craft/r4.lid.png",
+        "body": "chest-sheet/chs-craft/r4.body.png"
+      }
+    },
+    {
+      "r": 5,
+      "frame": [
+        0,
+        0,
+        1465,
+        1130
+      ],
+      "seam": 531,
+      "lid": [
+        0,
+        0,
+        1465,
+        533
+      ],
+      "body": [
+        9,
+        529,
+        1451,
+        601
+      ],
+      "auto": 531,
+      "score": 43.26,
+      "rim": 57869,
+      "files": {
+        "whole": "chest-sheet/chs-craft/r5.png",
+        "lid": "chest-sheet/chs-craft/r5.lid.png",
+        "body": "chest-sheet/chs-craft/r5.body.png"
+      }
+    },
+    {
+      "r": 6,
+      "frame": [
+        0,
+        0,
+        1459,
+        1126
+      ],
+      "seam": 518,
+      "lid": [
+        0,
+        0,
+        1459,
+        520
+      ],
+      "body": [
+        0,
+        516,
+        1454,
+        610
+      ],
+      "auto": 518,
+      "score": 23.46,
+      "rim": 57744,
+      "files": {
+        "whole": "chest-sheet/chs-craft/r6.png",
+        "lid": "chest-sheet/chs-craft/r6.lid.png",
+        "body": "chest-sheet/chs-craft/r6.body.png"
+      }
+    },
+    {
+      "r": 7,
+      "frame": [
+        0,
+        0,
+        1451,
+        1130
+      ],
+      "seam": 532,
+      "lid": [
+        0,
+        0,
+        1451,
+        534
+      ],
+      "body": [
+        9,
+        530,
+        1442,
+        600
+      ],
+      "auto": 532,
+      "score": 58.62,
+      "rim": 56456,
+      "files": {
+        "whole": "chest-sheet/chs-craft/r7.png",
+        "lid": "chest-sheet/chs-craft/r7.lid.png",
+        "body": "chest-sheet/chs-craft/r7.body.png"
+      }
+    }
+  ],
+  "lock": {
+    "file": "chest-sheet/chs-craft/lock.png",
+    "px": [
+      873,
+      1218
+    ]
+  }
+}

@@ -4,13 +4,15 @@
    — parseHtml(html): дерево разметки {tag, id, cls, attrs, kids, parent, style}; wrap(chain, html) — цепочка предков вокруг разметки
      (html с классами, body, рамка устройства, #game);
    — new Cascade(rules, env): win(el, prop) — победившее объявление {v, src, sel, spec, imp} или null; value(el, prop) — значение
-     с наследованием и подстановкой var(); rulesFor(el, test) — все подходящие правила.
+     с наследованием и подстановкой var(); rulesFor(el, test) — все подходящие правила. Псевдоэлемент — последним аргументом:
+     win(el, prop, 'before'), pvalue(el, 'after', prop) — правила с ::before / ::after у этого элемента; наследует от самого элемента.
    Условия: @media — по экрану устройства env.w × env.h (наведения нет — сенсор, «меньше движения» — env.reduced), @container — по
    размеру ближайшего предка-контейнера с этим именем (env.containers[имя] = [ширина, высота]; неизвестный — условие ложно),
    @supports — да. Селекторы: тег, #id, .класс, [атрибут] и [атрибут(=|~=|^=|$=|*=||=)"…"], :is, :where, :not, :has, :root,
-   :first-child, :last-child, :only-child, :nth-child(an+b), :disabled, :checked; прочие состояния (:hover, :focus…) и ::before,
-   ::after — не элемент в покое: такие селекторы мимо. Комбинаторы: потомок, >, +, ~. Специфичность — CSS Selectors 4; !important;
-   style="" — выше правил. Сокращения: inset, overflow, flex, gap, padding, margin, font (размер), grid-column. */
+   :first-child, :last-child, :only-child, :nth-child(an+b), :disabled, :checked; прочие состояния (:hover, :focus…) — не элемент
+   в покое: такие селекторы мимо; ::before и ::after — только по запросу псевдоэлемента. Комбинаторы: потомок, >, +, ~.
+   Специфичность — CSS Selectors 4; !important; style="" — выше правил. Сокращения: inset, overflow, flex, gap, padding, margin,
+   font (размер), grid-column, border и border-<сторона> (толщина: border-<сторона>-width), border-width. */
 'use strict';
 const fs = require('fs'), path = require('path');
 
@@ -291,10 +293,34 @@ const SHORT = {
   'padding-top': [['padding', 0]], 'padding-right': [['padding', 1]], 'padding-bottom': [['padding', 2]], 'padding-left': [['padding', 3]],
   'margin-top': [['margin', 0]], 'margin-right': [['margin', 1]], 'margin-bottom': [['margin', 2]], 'margin-left': [['margin', 3]],
   'font-size': [['font', 'size']], 'grid-column-start': [['grid-column', 0]], 'grid-column-end': [['grid-column', 1]],
+  'border-top-width': [['border', 'w'], ['border-top', 'w'], ['border-width', 0]], 'border-right-width': [['border', 'w'], ['border-right', 'w'], ['border-width', 1]],
+  'border-bottom-width': [['border', 'w'], ['border-bottom', 'w'], ['border-width', 2]], 'border-left-width': [['border', 'w'], ['border-left', 'w'], ['border-width', 3]],
+  'border-top-color': [['border', 'c'], ['border-top', 'c'], ['border-color', 0]], 'border-right-color': [['border', 'c'], ['border-right', 'c'], ['border-color', 1]],
+  'border-bottom-color': [['border', 'c'], ['border-bottom', 'c'], ['border-color', 2]], 'border-left-color': [['border', 'c'], ['border-left', 'c'], ['border-color', 3]],
 };
+/* толщина из сокращения рамки: «1px solid …», «var(--w,1px) solid var(--c)» — первое значение до слова стиля; стиль none — 0 */
+const BORDER_STYLE = /^(none|hidden|dotted|dashed|solid|double|groove|ridge|inset|outset)$/;
+function borderWidth(v) {
+  const t = splitTop(v, ' ').filter(Boolean);
+  if (t.some(x => x === 'none' || x === 'hidden') || v.trim() === '0') return '0';
+  for (const x of t) {
+    if (BORDER_STYLE.test(x)) break;
+    if (/^(?:-?[\d.]+(?:px|em|rem)?|thin|medium|thick)$/.test(x) || /^(?:var|calc)\(/.test(x)) return x;
+  }
+  return null;
+}
+/* цвет из сокращения рамки: значение после слова стиля, без стиля — последнее, если похоже на цвет */
+function borderColor(v) {
+  const t = splitTop(v, ' ').filter(Boolean), i = t.findIndex(x => BORDER_STYLE.test(x));
+  if (i >= 0) return t.slice(i + 1).join(' ') || null;
+  const last = t[t.length - 1];
+  return last && /^(?:#|rgba?\(|hsla?\(|var\(|[a-z]+$)/i.test(last) && !/^(?:thin|medium|thick)$/.test(last) && t.length > 1 ? last : null;
+}
 function fromShort(sh, part, v) {
   const t = splitTop(v, ' ').filter(Boolean);
-  if (sh === 'inset' || sh === 'padding' || sh === 'margin') { const [a, b = a, c = a, d = b] = t; return [a, b, c, d][part]; }
+  if (sh === 'inset' || sh === 'padding' || sh === 'margin' || sh === 'border-width' || sh === 'border-color') { const [a, b = a, c = a, d = b] = t; return [a, b, c, d][part]; }
+  if (part === 'w') return borderWidth(v);
+  if (part === 'c') return borderColor(v);
   if (sh === 'overflow' || sh === 'gap') return t[part] || t[0];
   if (sh === 'grid-column') { const s = splitTop(v, '/'); return (s[part] || (part ? 'auto' : s[0])).trim(); }
   if (sh === 'flex') {
@@ -312,20 +338,43 @@ class Cascade {
     this.memo = new Map();
   }
   condOk(r, e) { return r.conds.every(c => c.kind === 'media' ? mediaOk(c.q, this.env) : c.kind === 'container' ? containerOk(c.q, e, this) : true); }
-  /* объявления свойства (и его сокращений) у элемента — по возрастанию силы */
-  decls(e, prop) {
+  /* объявления свойства (и его сокращений) у элемента — по возрастанию силы; pe — псевдоэлемент ('before', 'after'): только его правила */
+  decls(e, prop, pe) {
     const names = [[prop, null]].concat(SHORT[prop] || []), out = [];
+    const peOk = s => (pe ? s.parts.length && s.parts[s.parts.length - 1].comp.pe === pe : !s.pe);
     for (const r of this.rules) {
       const ds = r.decls.filter(d => names.some(([n]) => n === d.p)); if (!ds.length) continue;
-      let best = null; for (const s of r.sels) if (!s.pe && matchSel(e, s) && (!best || cmp(s.spec, best) > 0)) best = s.spec;
+      let best = null; for (const s of r.sels) if (peOk(s) && matchSel(e, s) && (!best || cmp(s.spec, best) > 0)) best = s.spec;
       if (!best || !this.condOk(r, e)) continue;
       for (const d of ds) { const nm = names.find(([n]) => n === d.p); const v = nm[1] === null ? d.v : fromShort(d.p, nm[1], d.v); if (v != null) out.push({ v, imp: d.imp, spec: best, order: r.order, src: r.src, sel: r.sel, p: d.p }); }
     }
-    for (const d of e.style || []) { const nm = names.find(([n]) => n === d.p); if (nm) { const v = nm[1] === null ? d.v : fromShort(d.p, nm[1], d.v); if (v != null) out.push({ v, imp: d.imp, spec: [9, 9, 9], order: 1e9, src: 'style=""', sel: 'style', p: d.p }); } }
+    if (!pe) for (const d of e.style || []) { const nm = names.find(([n]) => n === d.p); if (nm) { const v = nm[1] === null ? d.v : fromShort(d.p, nm[1], d.v); if (v != null) out.push({ v, imp: d.imp, spec: [9, 9, 9], order: 1e9, src: 'style=""', sel: 'style', p: d.p }); } }
     out.sort((a, b) => (a.imp - b.imp) || cmp(a.spec, b.spec) || (a.order - b.order));
     return out;
   }
-  win(e, prop) { const d = this.decls(e, prop); return d.length ? d[d.length - 1] : null; }
+  win(e, prop, pe) { const d = this.decls(e, prop, pe); return d.length ? d[d.length - 1] : null; }
+  /* значение у псевдоэлемента: свои правила, иначе наследуемое — от самого элемента; var() — по цепочке элемента */
+  pvalue(e, pe, prop) {
+    if (!e || e.tag === '#root') return null;
+    const key = prop + '::' + pe; let mm = this.memo.get(e); if (!mm) this.memo.set(e, (mm = new Map()));
+    if (mm.has(key)) return mm.get(key);
+    const w = this.win(e, prop, pe), inh = prop.startsWith('--') || INHERIT.has(prop);
+    let v = w ? w.v : null;
+    if (v === 'inherit' || (v == null && inh) || (v === 'unset' && inh)) v = this.value(e, prop);
+    else if (v === 'initial' || v === 'unset') v = null;
+    if (v != null) {
+      let guard = 0;
+      while (/var\(/.test(v) && guard++ < 20) {
+        const i = v.indexOf('var('), j = readBalanced(v, i + 3, '(', ')'), args = splitTop(v.slice(i + 4, j), ',');
+        const name = args[0].trim(), fb = args.length > 1 ? args.slice(1).join(',').trim() : null;
+        let r = this.pvalue(e, pe, name); if (r == null) r = fb;
+        if (r == null) { v = null; break; }
+        v = v.slice(0, i) + r + v.slice(j + 1);
+      }
+    }
+    mm.set(key, v);
+    return v;
+  }
   value(e, prop, depth = 0) {
     if (!e || e.tag === '#root') return null;
     const key = prop; let mm = this.memo.get(e); if (!mm) this.memo.set(e, (mm = new Map()));

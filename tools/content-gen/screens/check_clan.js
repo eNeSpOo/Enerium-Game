@@ -5,6 +5,11 @@
       capacity.json совпадает с калькуляторами экономики (если есть Python). Все числа целые.
    3. Алгоритмы EnClan: требование резервуара растёт, первое очко — за пару дней, сотое — к концу второго года; круги растут;
       доля по весам сходится с суммой; элиты круга — на сиде, тот же сид — те же элиты.
+   3а. Клан и разные циклы (ADR-0042): вклад нормирован по циклу — нормы — первые личные планки режимов из их данных, первая планка
+      любого цикла засчитывается как первая планка базового; своя копия цели — круг 1 по норме силы цикла; клан из одного цикла
+      и смешанный приходят к очкам кланового босса, резервуару и клановой планке Событий не дальше допуска из данных; на экране —
+      игрок цикла IV бьёт копию в силе своего цикла, доля здоровья цели общая, повтор номера ничего не повторяет; очки контрактов
+      засчитываются по первой планке его цикла, повтор сверки — без двойного счёта; цикл у каждого участника, лист «Как засчитан вклад».
    4. «Сервер» экрана:
       — атака: без отряда — лист выбора; одна атака из кошелька, бой ядром на сиде — повтор того же боя даёт тот же итог; повтор номера
         ничего не списывает; пустой кошелёк — отказ; урон копится, выплата — в момент смерти по снятому здоровью, сумма — очки врага;
@@ -212,6 +217,44 @@ walkInt(D, 'EN_CLAN');
 }
 function EB0() { return T.EB; }
 
+/* ================== 3а. клан и разные циклы (ADR-0042) ==================
+   Законы: вклад нормирован по циклу — первая планка любого цикла засчитывается как первая планка базового, нормы — первые личные планки
+   режимов из их данных; своя копия цели — круг 1 копии цикла c по норме силы цикла; клан из одного цикла и смешанный приходят к очкам
+   кланового босса, резервуару и клановой планке Событий не дальше допуска из данных (EN_CLAN.calc.mixTolBp), вес каждого — 1 / участников */
+{
+  const N = D.norm, base = N.base, CTD = P.ctx.EN_CONTRACTS, EVD = P.ctx.EN_EVENT, ERD = P.ctx.EN_ECHO_RULES;
+  if (!N || !D.cycles || !D.cycles.includes(base)) say('ADR-0042: в EN_CLAN нет норм циклов или базового цикла');
+  else {
+    const src = { ct: c => CTD.planks[c][0], ev: c => EVD.planks[c][0], echo: c => ERD.plank1[c] };
+    for (const [mode, f] of Object.entries(src)) for (const c of D.cycles) {
+      if (N[mode][c] !== f(c)) say(`нормы: ${mode}, цикл ${c} — ${N[mode][c]}, а первая личная планка режима — ${f(c)}`);
+      if (EC.counted(D, mode, N[mode][c], c) !== N[mode][base]) say(`вклад не нормирован: первая планка цикла ${c} (${mode}) засчитана как ${EC.counted(D, mode, N[mode][c], c)}, а не ${N[mode][base]}`);
+      if (c !== base && EC.counted(D, mode, N[mode][c], c) === N[mode][c] && N[mode][c] !== N[mode][base]) say(`вклад не нормирован: очки цикла ${c} (${mode}) засчитаны как есть`);
+    }
+    const B0 = D.boss.circle, CAPJ = JSON.parse(fs.readFileSync(path.join(ROOT, 'tools', 'content-gen', 'clan', 'capacity.json'), 'utf8'));
+    /* норма силы — средняя сила отряда обычного за все дни цикла по калькуляторам: иначе неверная норма прошла бы незамеченной —
+       в прогоне «по норме» участники стоят на ней же */
+    for (const c of D.cycles) { const days = CAPJ.power.o[String(c)], mean = Math.floor(days.reduce((a, x) => a + x, 0) / days.length); if (B0.norm[c] !== mean) say(`норма силы цикла ${c} — ${B0.norm[c]}, а средняя сила обычного за цикл — ${mean}`); }
+    for (const c of D.cycles) {
+      if (EC.circlePow(D, 1, c) !== B0.byCyc[c] || B0.byCyc[c] !== Math.floor(B0.pow1 * B0.norm[c] / B0.norm[base])) say(`своя копия цикла ${c}: круг 1 — ${EC.circlePow(D, 1, c)}, по норме силы — ${Math.floor(B0.pow1 * B0.norm[c] / B0.norm[base])}`);
+      if (c > base && !(EC.circleLvl(D, 4, c) > EC.circleLvl(D, 4, c - 1))) say(`своя копия цикла ${c}: цель не сильнее копии цикла ${c - 1}`);
+    }
+    const M = D.calc.mix || [], tol = D.calc.mixTolBp, near = (v, w) => Math.abs(v - w) * D.bp <= w * tol;
+    if (!M.length || !Number.isInteger(tol) || tol <= 0) say('смешанные кланы: нет прогона или допуска в EN_CLAN.calc');
+    else {
+      const r0 = M[0], name = r => r[0].map(([c, n]) => `${n} в ${c}`).join(' + ');
+      if (r0[0].length !== 1 || r0[0][0][0] !== base) say('смешанные кланы: первым должен идти клан базового цикла');
+      for (const r of M) {
+        if (!near(r[5], r0[5])) say(`клан «${name(r)}»: клановый босс — ${r[5]} очков, клан цикла ${base} — ${r0[5]}: дальше допуска`);
+        if (!near(r[7], r0[7])) say(`клан «${name(r)}»: резервуар засчитал ${r[7]}, клан цикла ${base} — ${r0[7]}: дальше допуска`);
+        if (!near(r[9], r0[9])) say(`клан «${name(r)}»: клановая планка Событий — ${r[9]}, клан цикла ${base} — ${r0[9]}: дальше допуска`);
+        if (r[12] * r[0].reduce((a, [, n]) => a + n, 0) > D.bp) say(`клан «${name(r)}»: вес участника по долям больше 1 / участников`);
+      }
+      if (!M.some(r => !near(r[2], r0[2]))) say('смешанные кланы: прежний счёт — общая лестница — не расходится с кланом цикла II: прогон не меряет разницу циклов');
+    }
+  }
+}
+
 /* ================== 4. «сервер» экрана ================== */
 reset();
 {
@@ -245,7 +288,7 @@ reset();
     const y = C().boss.targets.find(t => t.uid === uid) || x;
     if (L.hp0 !== hp0 || (!L.kill && y.hp !== L.hp) || L.removed !== Math.max(0, hp0 - L.hp)) say('атака: здоровье цели и снятое не сходятся с итогом');
     const b2 = T.EB.run(CU.battleOf(L.F));
-    if (b2.u[1][0].hp !== L.hp || b2.round !== L.rounds) say('атака: тот же бой на том же сиде дал другой итог — исход не детерминирован');
+    if (b2.u[1][0].hp !== L.hpOut || b2.round !== L.rounds) say('атака: тот же бой на том же сиде дал другой итог — исход не детерминирован');
     /* правила боя 29.09.2026: раунды — таблица ядра (элита — 10, босс — 100, древо прибавляет своё); у элиты — свита из четырёх её стихии,
        у босса — никого; осада — остаток здоровья цели на входе — её максимум в атаке, прежний — max0 */
     const b3 = CU.battleOf(L.F), m3 = b3.u[1][0], RB = T.EB.RULES.rounds.by, want = L.g === 'b' ? RB.clan : RB.e, cap = L.g === 'b' ? D.boss.roundsCap.roundB : D.boss.roundsCap.roundE;
@@ -256,7 +299,10 @@ reset();
     if (sv.length !== HF.length || sv.some(u => u.el !== m3.el || u.rank !== D.boss.host.rank.core) || G.length !== HF.length || G.some((u, j) => !HR[u.fig] || HR[u.fig].role !== HF[j] || HR[u.fig].el !== m3.el)) say(`атака: свита ${sv.length} — не ${HF.join(', ')} стихии цели`);
     if (!HR[L.F.src.fig] || HR[L.F.src.fig].role !== (L.g === 'b' ? 'boss' : 'elite') || m3.cls !== 'Маг. ДД') say(`атака: цель — не Голос или Хозяин сонма, класс ${m3.cls}`);
     if (m3.maxHp !== L.hp0 || m3.max0 !== L.max) say(`осада: цель вышла в бой с максимумом ${m3.maxHp} (прежний ${m3.max0}), а остаток на входе — ${L.hp0} из ${L.max}`);
-    if (L.removed && (y.dmg.m1 || 0) < L.removed && !L.kill) say('атака: урон игрока не записан в счёт цели');
+    if (L.share && (y.dmg.m1 || 0) < L.share && !L.kill) say('атака: урон игрока не записан в счёт цели долей здоровья');
+    /* доля здоровья (ADR-0042): снятое — по итогу боя копии, счёт цели — остаток до атаки минус снятое */
+    if (L.share !== EC.shareOff(D, L.left0, L.max, L.hpOut) || (L.hpOut < L.hp0 && !(L.share > 0))) say('доля здоровья: снятая доля — не по итогу боя');
+    if (!L.kill && y.left !== L.left0 - L.share) say(`доля здоровья: у цели ${y.left} долей, а до атаки ${L.left0} минус снято ${L.share}`);
   }
   if (R) {
     T.S.focus = R.id; view(P, 'бой клана');
@@ -276,7 +322,7 @@ reset();
   T.S.overlay = null; T.S.route = 'clan';
   const e3 = C().boss.targets.find(t => !t.dead && !t.burned && t.g === 'e');
   if (e3) {
-    e3.hp = 1; e3.dmg.m2 = (e3.dmg.m2 || 0) + 1000;
+    e3.left = 1; e3.dmg.m2 = (e3.dmg.m2 || 0) + 1000;   // доля здоровья цели — общий счёт (ADR-0042)
     const mine0 = C().boss.mine, my0 = C().members.find(m => m.me).boss;
     for (let a = 0; a < 10 && !e3.dead; a++) { run('добить элиту', () => T.ACT.clatk(`${e3.uid}:${C().boss.n + 1}`)); cnt.ops++; cnt.fights++; }   // свита может закрыть элиту в одной атаке
     const L2 = C().boss.last;
@@ -296,7 +342,7 @@ reset();
   /* босс пал: новый круг, элиты — на сиде круга */
   const bs = C().boss.targets.find(t => t.g === 'b' && !t.dead);
   if (bs) {
-    const k0 = C().boss.circle; bs.hp = 1;
+    const k0 = C().boss.circle; bs.left = 1;
     run('добить босса', () => T.ACT.clatk(`${bs.uid}:${C().boss.n + 1}`)); cnt.ops++; cnt.fights++;
     const L3 = C().boss.last;
     if (!L3 || !L3.kill || C().boss.circle !== k0 + 1 || C().boss.kills !== 0) say('босс пал, а новый круг не открылся');
@@ -312,13 +358,64 @@ reset();
   if (C().boss.targets.length !== D.boss.pool + 1) say(`пул элит с вилкой «Шире круг» — ${C().boss.targets.length}, ждали ${D.boss.pool + 1}`);
   C().boss.att = 99;
   /* элита с 1 здоровья падает не всегда с первой атаки: свита закрывает её, пока жива, — бьём, пока не падёт (не больше десяти атак) */
-  for (let j = 0; j < 3; j++) { const t = C().boss.targets.filter(x => !x.dead && !x.burned && x.g === 'e')[0]; t.hp = 1; for (let a = 0; a < 10 && !t.dead; a++) { run('элита', () => T.ACT.clatk(`${t.uid}:${C().boss.n + 1}`)); cnt.fights++; } }
+  for (let j = 0; j < 3; j++) { const t = C().boss.targets.filter(x => !x.dead && !x.burned && x.g === 'e')[0]; t.left = 1; for (let a = 0; a < 10 && !t.dead; a++) { run('элита', () => T.ACT.clatk(`${t.uid}:${C().boss.n + 1}`)); cnt.fights++; } }
   if (C().boss.targets.filter(x => x.burned).length !== 1 || !C().boss.targets.some(x => x.g === 'b')) say('три победы при пуле из четырёх: висящая элита не сгорела или босс не пришёл');
   C().boss.att = 0; const n0 = C().boss.n;
   const tb = C().boss.targets.find(x => x.g === 'b');
   run('пустой кошелёк', () => T.ACT.clatk(`${tb.uid}:${n0 + 1}`));
   if (C().boss.n !== n0) say('пустой кошелёк: атака прошла');
   if (boss2 === undefined) note.push('проверка сгорания шла без прежнего босса');
+}
+
+/* клан и разные циклы (ADR-0042) на экране: у участников демо — засчитанное по первой планке их цикла; игрок цикла IV бьёт копию цели
+   в силе своего цикла — общая доля здоровья, свои числа, игрок другого цикла видит ту же долю; повтор номера атаки ничего не повторяет;
+   очки контрактов игрока засчитываются по первой планке его цикла, повтор сверки не считает их второй раз; вид — цикл у каждого
+   участника, лист «Как засчитан вклад» с пересчётом очков другого цикла, в листе участника — засчитанное */
+reset();
+{
+  const c = C(), base = D.norm.base, cyc = 4;
+  for (const m of c.members) if (m.res !== EC.counted(D, 'ct', m.resRaw || 0, m.cyc)) say(`участник ${m.n}: засчитано ${m.res}, по первой планке цикла ${m.cyc} — ${EC.counted(D, 'ct', m.resRaw || 0, m.cyc)}`);
+  if (new Set(c.members.map(m => m.cyc)).size < 3) say('демо: клан не смешанный — циклов у участников меньше трёх');
+  T.S.acc.cycle = cyc; T.SQ.set('clan', 's1'); CU.sync();
+  /* игрок цикла IV — так же силён для своего цикла, как отряд демо для цикла II: уровни отряда — × норма силы IV / норма II */
+  const CB = D.boss.circle, sq = T.SQ.ready('clan').go.map(id => T.S.heroes.find(h => h.id === id)).filter(Boolean);
+  sq.forEach(h => { h.lvl = Math.floor((CB.lvlDiv + h.lvl) * CB.norm[cyc] / CB.norm[base]) - CB.lvlDiv; });
+  const me = c.members.find(m => m.me), x = c.boss.targets.find(t => !t.dead && !t.burned), copy = CU.copyOf(x, cyc), copyB = CU.copyOf(x, base);
+  if (me.cyc !== cyc) say('цикл игрока не дошёл до его строки в клане');
+  if (x.max !== copy.maxHp || x.hp !== EC.hpIn(D, x.left, copy.maxHp)) say('своя копия: цель на экране — не в силе цикла игрока');
+  if (!(copy.lvl > copyB.lvl)) say('своя копия: цель цикла IV не сильнее цели цикла II');
+  const left0 = x.left, n = c.boss.n + 1;
+  run('атака в цикле IV', () => T.ACT.clatk(`${x.uid}:${n}`)); cnt.ops++; cnt.fights++;
+  const L = c.boss.last;
+  if (!L || L.cyc !== cyc || L.F.src.lvl !== EC.circleLvl(D, x.k, cyc)) say('своя копия: атака шла не с копией цели в силе цикла игрока');
+  else if (!(L.share > 0)) say('своя копия: отряд не ранил цель первого круга — доля здоровья не проверена');
+  else {
+    if (L.left0 !== left0 || (!L.kill && x.left !== left0 - L.share) || L.share < 0) say('доля здоровья: счёт цели — не по снятой доле');
+    if (L.share !== EC.shareOff(D, L.left0, L.max, L.hpOut)) say('доля здоровья: снятая доля — не по итогу боя');
+    T.S.acc.cycle = base; CU.sync();
+    if (!L.kill && (x.left !== left0 - L.share || x.max !== copyB.maxHp)) say('доля здоровья: игрок другого цикла видит другой счёт цели');
+    T.S.acc.cycle = cyc; CU.sync();
+  }
+  const snapA = () => JSON.stringify([c.boss.targets.map(t => [t.uid, t.left, t.dmg, t.dead]), c.boss.att, c.boss.n, c.boss.mine]), a0 = snapA();
+  run('повтор атаки в цикле IV', () => T.ACT.clatk(`${x.uid}:${n}`));
+  const again = CU.srv.attack(CU.atkOp(c, n), x.uid, ['h1']);
+  if (!again.again || snapA() !== a0) say('повтор номера атаки изменил счёт цели или кошелёк');
+  const r0 = me.res, raw0 = me.resRaw || 0, add = 2900, want = EC.counted(D, 'ct', add, cyc);
+  T.S.contracts.clan = (T.S.contracts.clan || 0) + add; CU.sync();
+  if (me.resRaw !== raw0 + add || me.res !== r0 + want) say(`резервуар: игрок цикла IV внёс ${add}, засчитано ${me.res - r0}, по первой планке — ${want}`);
+  if (want !== Math.floor(add * D.norm.ct[base] / D.norm.ct[cyc])) say('резервуар: засчитано не по первой планке контрактов');
+  const snapR = JSON.stringify([me.res, me.resRaw, c.res, c.earned]);
+  CU.sync(); CU.sync();
+  if (JSON.stringify([me.res, me.resRaw, c.res, c.earned]) !== snapR) say('резервуар: повтор сверки засчитал очки ещё раз');
+  T.S.overlay = null; T.S.route = 'clan'; T.S.runs = []; T.S.seg.clan = 'mem'; const hm = view(P, 'клан · участники разных циклов');
+  for (const cc of new Set(c.members.map(m => m.cyc))) if (!hm.includes(`data-c="${cc}"`)) say(`участники: у строки участника нет цикла ${cc}`);
+  if (!hm.includes('data-v="clcount"')) say('участники: нет пути к листу «Как засчитан вклад»');
+  T.S.overlay = { t: 'clcount' }; const hc = view(P, 'лист «Как засчитан вклад»');
+  if (!/→/.test(hc) || !hc.includes(String(D.norm.ct[cyc]))) say('«Как засчитан вклад»: нет пересчёта очков другого цикла или первых планок по циклам');
+  const other = c.members.find(m => m.cyc !== cyc && m.resRaw);
+  T.S.overlay = { t: 'clmem', arg: other.id }; if (!/засчитано/.test(view(P, 'лист участника другого цикла'))) say('лист участника: не видно, как засчитан его вклад');
+  T.S.overlay = { t: 'clresv' }; if (!/→/.test(view(P, 'резервуар · разные циклы'))) say('резервуар: не видно пересчёта очков другого цикла');
+  T.S.overlay = null; T.S.acc.cycle = base;
 }
 
 /* сонмы стихий (слово автора 29.09.2026): Хозяин недели по таблице недель; бестиарий — запись открывает победа, свита открыта вместе
@@ -426,7 +523,7 @@ reset();
   T.S.route = 'clan'; view(P, 'поиск клана');
   run('вход в открытый клан', () => T.ACT.cljoin(`tg:${op()}`)); cnt.ops++;
   if (!C().in || C().id !== 'tg' || !C().hop) say('вход: не в «Тихой гавани» или нет пометки анти-прыгуна');
-  const t = C().boss.targets.find(y => !y.dead); t.hp = 1;
+  const t = C().boss.targets.find(y => !y.dead); t.left = 1;
   const me = C().members.find(m => m.me);
   for (let a = 0; a < 10 && !t.dead; a++) run('атака в новом клане', () => T.ACT.clatk(`${t.uid}:${C().boss.n + 1}`));
   const L = C().boss.last;
@@ -659,7 +756,7 @@ function tour(team) {
   const c = C(), m = c.members.find(x => !x.me), x = c.boss.targets[0];
   const sheets = [['clpass'], ['clroles'], ['clresv'], ['cltgt', x.uid], ['clledger'], ['clrules'], ['clmem', m.id], ['clmem', c.members.find(y => y.me).id], ['clapps'], ['clgifts'], ['cllog'],
     ['cllvl', '13'], ['clbonus'], ['clreset'], ['cllead', m.id], ['clkick', m.id], ['clleave'], ['gifts', 'clan'], ['rank', 'Клановый босс'],
-    ['clhosts'], ['clfoe', 'water-elite'], ['clfoe', 'time-boss'], ['clfoe', 'fire-dd2']];
+    ['clhosts'], ['clfoe', 'water-elite'], ['clfoe', 'time-boss'], ['clfoe', 'fire-dd2'], ['clcount']];
   for (const [t, arg] of sheets) { reset(); T.SQ.set('clan', 's1'); T.S.overlay = { t, arg }; view(P, `лист ${t} ${arg || ''}${tag}`); }
   for (const f of ['gifts', 'tree', 'join', 'boss', 'roles']) { reset(); T.S.clan.logF = f; T.S.overlay = { t: 'cllog' }; view(P, `журнал · ${f}${tag}`); }
   reset(); T.S.seg.clan = 'boss'; view(P, `клан · босс без отряда${tag}`);

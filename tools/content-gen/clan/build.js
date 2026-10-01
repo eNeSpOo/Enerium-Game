@@ -21,6 +21,10 @@
       Элиты каждую неделю одни и те же: стихии круга — случай из семи без повторов. Босс недели — Хозяин стихии, которую будит Эхо недели.
    4. Награды (§24.4, §23): пул клана — сундуки места клана из lootboxes.js на каждого участника; половина — сервер по вкладу,
       половина — глава. Ступень сундука — от цикла получателя.
+   4а. Клан и разные циклы (ADR-0042, слова автора 01.10.2026): вклад — в долях нормы своего цикла. Норма цикла режима — его первая
+      личная планка: контракты (резервуар), Событие, Эхо — из данных режимов. Клановый босс — своя копия: атакующий бьёт цель в силе
+      своего цикла, урон засчитывается долей её здоровья; сила копии — по норме цикла из capacity.json. Прогон смешанных кланов
+      сравнивает это с прежним счётом: общая лестница, сырые суммы, планки по составу.
    5. Проверки: целые числа; каркас древа, вехи и вилки; потолки видов; примитивы — делом в ядре боя и по данным достижений и Памяти;
       прибавки боя клана ложатся в карты ядра; вилка не делает круг дороже; полное древо на боссе не хуже вех, вехи — не хуже пустого
       древа; наборы врагов в библиотеке; цели резервуара; калибровка круга 1; рост кругов; ступени наград; ×1,7 (§1.2) — уровни древа
@@ -31,6 +35,7 @@
    - docs/content/клан.md — только таблицы между метками «<!-- @таблица имя -->» и «<!-- /таблица имя -->»; текст — ручной.
    Читает: capacity.json (python tools/content-gen/clan/capacity.py), design/ui/battle.js, abilities.js, kits.js — ядро боя и
    библиотека; contracts.js — очки контрактов; lootboxes.js — сундуки места клана; roster.js — недели рас и цивилизации Эхо;
+   event.js и echo-rules.js — первые личные планки Событий и Эхо по циклам: нормы циклов (ADR-0042);
    foes.js — сонмы стихий: имена, облик, совет старика, неделя Хозяина; tools/art-gen/jobs/clan-foes.json — задание арта сонмов,
    tools/art-gen/ui-art.json и design/ui/assets/art/clan/ — что из арта уже выгружено; tools/content-gen/lore/spoilers.js — спойлеры.
    Любая ошибка — файлы не пишутся. Пересборка даёт те же байты.
@@ -51,7 +56,7 @@ const FILES = {
   manifest: path.join(ROOT, 'art', 'generated', 'manifest.json'),
   out: path.join(UI, 'clan.js'),
   doc: path.join(ROOT, 'docs', 'content', 'клан.md'),
-  ui: ['battle.js', 'abilities.js', 'kits.js', 'lootboxes.js', 'contracts.js', 'roster.js', 'wanderer.js'].map(f => path.join(UI, f)),   // wanderer.js — только сверка примитивов: виды пассивок достижений и семейства Памяти
+  ui: ['battle.js', 'abilities.js', 'kits.js', 'lootboxes.js', 'contracts.js', 'roster.js', 'wanderer.js', 'event.js', 'echo-rules.js'].map(f => path.join(UI, f)),   // wanderer.js — только сверка примитивов: виды пассивок достижений и семейства Памяти; event.js, echo-rules.js — нормы циклов
 };
 
 /* ================================ ДАННЫЕ ================================ */
@@ -114,7 +119,9 @@ const RULES = {
 const RES = {
   targets: { firstDays: 2, lastDays: 730, tolBp: 1000 },   // §24.3: первое очко — за пару дней, сотое — к концу второго года; допуск ±10 %
   baseStep: 100,                                            // база кратна 100
-  exps: [[1, 2], [5, 9], [4, 7], [7, 12], [3, 5], [5, 8], [2, 3], [3, 2]],   // кандидаты показателя; 3/2 — прежний §24.3, для сравнения
+  // кандидаты показателя; 3/2 — прежний §24.3, для сравнения. С ADR-0042 приток засчитывается в очках цикла II и с циклом почти не растёт —
+  // кандидаты меньше 1/2 нужны, чтобы сотое очко пришло к концу второго года
+  exps: [[2, 5], [3, 7], [4, 9], [1, 2], [5, 9], [4, 7], [3, 5], [2, 3], [3, 2]],
   gdd: [3, 2],
   ref: { prof: 'o', startMembers: 25 },                    // эталон: «активный клан» — полный состав обычных игроков (3 ч в день)
   horizonDays: 40000,                                       // предел прогона, дней
@@ -323,13 +330,54 @@ const PROF = { o: 'обычный', e: 'увлечённый' };
 /* законы калькулятора */
 const LAWS = { x17: 170, circleTolBp: 1500, maxCircles: 80, forkNoiseBp: 300 };   // forkNoiseBp — шум сида: вилка не делает круг дороже больше чем на 3 %
 
+/* Клан и разные циклы — ADR-0042. Слова автора 01.10.2026: «новый цикл это новая ступень аккаунта игрока, больше планки для игроков, вот
+   как рассчитать баланс клана когда и достижение планок кланом, когда игроки будут в разных циклах». Уточнение: «у игроков в других циклах
+   будут больше рейтинговые очки чем у прошлого цикла, вот и вопрос как это расчитать».
+   Правило: вклад участника — в долях нормы своего цикла. Норма цикла режима — первая личная планка режима в этом цикле, из данных самого
+   режима: контракты — EN_CONTRACTS.planks (резервуар наполняет половина их очков, §24.3), Событие — EN_EVENT.planks, Эхо —
+   EN_ECHO_RULES.plank1. Клан складывает вклады в очках базового цикла base: очко цикла c весит норма base / норма c. Множители очков
+   самих режимов клан не трогает. Клановый босс нормирует сам бой: атакующий бьёт копию цели в силе своего цикла — круг 1 копии цикла c
+   сильнее круга 1 базового цикла во столько раз, во сколько норма силы цикла c (capacity.json, norm — средняя сила отряда обычного игрока
+   за цикл) больше нормы базового; урон — доля здоровья цели, bar частей на цель; очки врага от цикла не зависят */
+const CYC = {
+  base: 2,          // кланы открывает цикл II (§16): в его очках клан складывает вклады
+  bar: 1000000,     // общий счёт цели — миллионные доли здоровья: у стены атака снимает сотые доли процента, их тоже надо засчитать
+  modes: {          // чьи нормы берёт клан: первые личные планки режимов по циклам
+    ct: { n: 'Контракты · резервуар', src: 'EN_CONTRACTS.planks' },
+    ev: { n: 'Событие', src: 'EN_EVENT.planks' },
+    echo: { n: 'Эхо', src: 'EN_ECHO_RULES.plank1' },
+  },
+};
+/* прогон смешанных кланов (ADR-0042): 25 обычных игроков, каждый — типичный для своего цикла: сила отряда — норма цикла (capacity.json,
+   средняя за цикл), очки контрактов и Событий — неделя обычного игрока своего цикла; все бьют все атаки поровну всю неделю; древо пустое
+   у всех составов — разница только в циклах. Клан из одного цикла и смешанный должны приходить к очкам, резервуару и планкам не дальше
+   tolBp от клана цикла II: допуск — как у калибровки круга 1 (LAWS.circleTolBp) */
+const MIX = {
+  /* week — второй прогон, для сравнения: те же составы, но сила каждого — 2-я неделя его цикла по дням калькуляторов (capacity.json, power).
+     Законом не служит: у циклов разной длины (ADR-0043) N-я неделя — разные точки пути. Неверную норму ловит свой закон: норма силы —
+     средняя сила за все дни цикла; у прогона «по норме» она сокращается сама с собой */
+  prof: 'o', lvl: 0, week: 2, tolBp: LAWS.circleTolBp,
+  sets: [
+    ['все в цикле II', { 2: 25 }],
+    ['половина в II, половина в IV', { 2: 13, 4: 12 }],
+    ['один в VI, остальные в II', { 6: 1, 2: 24 }],
+    ['один в II, остальные в VI', { 2: 1, 6: 24 }],
+    ['по пять в циклах II–VI', { 2: 5, 3: 5, 4: 5, 5: 5, 6: 5 }],
+    ['пятнадцать в III, десять в V', { 3: 15, 5: 10 }],
+    ['все в цикле III', { 3: 25 }],
+    ['все в цикле IV', { 4: 25 }],
+    ['все в цикле V', { 5: 25 }],
+    ['все в цикле VI', { 6: 25 }],
+  ],
+};
+
 /* ================================ ЗАГРУЗКА ================================ */
 
 const err = [], warn = [];
 const fail = m => err.push(m);
 const ctx = { console }; ctx.window = ctx; ctx.globalThis = ctx; vm.createContext(ctx);
 for (const f of FILES.ui.concat(FILES.core)) vm.runInContext(fs.readFileSync(f, 'utf8'), ctx, { filename: path.basename(f) });
-const EB = ctx.EnBattle, EC = ctx.EnClan, LBX = ctx.EN_LOOTBOXES, CT = ctx.EN_CONTRACTS, RS = ctx.EN_ROSTER, WN = ctx.EN_WANDERER;
+const EB = ctx.EnBattle, EC = ctx.EnClan, LBX = ctx.EN_LOOTBOXES, CT = ctx.EN_CONTRACTS, RS = ctx.EN_ROSTER, WN = ctx.EN_WANDERER, EVD = ctx.EN_EVENT, ERD = ctx.EN_ECHO_RULES;
 const CAP = JSON.parse(fs.readFileSync(FILES.cap, 'utf8'));
 const FOES = require(FILES.foes), SP = require('../lore/spoilers.js');   // сонмы стихий; спойлеры дайджеста — общие с Летописью
 const readJson = (f, d) => fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : d;
@@ -346,6 +394,8 @@ function build() {
     sources: ['GDD §24', 'GDD §25', 'GDD §1.2', 'GDD §6', 'GDD §23', 'ADR-0010', 'ADR-0016', 'ADR-0022', 'ADR-0026', 'design/ui/contracts.js', 'design/ui/lootboxes.js', 'design/ui/roster.js'] } };
   D.bp = RULES.bp;
   D.open = RULES.open;
+  D.cycles = Object.keys(CAP.cycleDays).map(Number).sort((a, b) => a - b);
+  D.norm = buildNorm(D.cycles);
   const races = RS.weeks.map(w => w.race);
   D.lists = { els: RULES.lists.els.slice(), classes: RULES.lists.classes.slice(), races, gen: Object.fromEntries(RS.weeks.map(w => [w.race, w.gen])) };
   D.capacity = RULES.capacity;
@@ -357,11 +407,24 @@ function build() {
     rank: BOSS.rank, kinds: BOSS.kinds, bmC: BOSS.bmC, antiHop: BOSS.antiHop,
     host: buildHost(), weeks: buildWeeks(races), art: buildArt(),
     roundsCap: { roundB: 0, roundE: TREE.kinds.kbRound.cap } };   // раунды древо прибавляет только элите — вилкой «Долгий бой»
-  const F = BOSS.circle.from, pow1 = CAP.power[F.prof][String(F.c)][F.day - 1];
-  D.boss.circle = { pow1, xBp: BOSS.circle.xBp, lvlDiv: CAP.lvlDiv };
+  /* круг 1 — отряд обычного игрока в первый день базового цикла; копия цикла c сильнее во столько раз, во сколько норма силы цикла c
+     больше нормы базового (ADR-0042) */
+  const F = BOSS.circle.from, pow1 = CAP.power[F.prof][String(F.c)][F.day - 1], NB = CAP.norm;
+  if (F.c !== CYC.base) fail(`круг 1 считан не в базовом цикле: ${F.c}, базовый — ${CYC.base}`);
+  D.boss.circle = { pow1, xBp: BOSS.circle.xBp, lvlDiv: CAP.lvlDiv,
+    norm: Object.fromEntries(D.cycles.map(c => [c, NB[String(c)]])), byCyc: Object.fromEntries(D.cycles.map(c => [c, fl(pow1 * NB[String(c)], NB[String(CYC.base)])])) };
+  D.boss.bar = CYC.bar;
   D.rewards = { splitBp: REWARDS.splitBp, contrib: REWARDS.contrib, headH: REWARDS.headH, mode: REWARDS.mode };
   D.res = { splitBp: CT.rules.splitBp, targets: RES.targets, gdd: RES.gdd };
   return D;
+}
+/* нормы циклов (ADR-0042): первая личная планка режима в каждом цикле — из данных самого режима */
+function buildNorm(cycles) {
+  const pick = (mode, f) => Object.fromEntries(cycles.map(c => { const v = f(c); if (!(Number.isInteger(v) && v > 0)) fail(`норма цикла ${ROMAN[c]} у режима «${CYC.modes[mode].n}» — нет первой личной планки в ${CYC.modes[mode].src}`); return [c, v]; }));
+  return { base: CYC.base, modes: Object.fromEntries(Object.entries(CYC.modes).map(([k, m]) => [k, m.n])),
+    ct: pick('ct', c => CT.planks[String(c)] && CT.planks[String(c)][0]),
+    ev: pick('ev', c => EVD && EVD.planks[String(c)] && EVD.planks[String(c)][0]),
+    echo: pick('echo', c => ERD && ERD.plank1[String(c)]) };
 }
 
 /* сонмы стихий (foes.js, BOSS.host): роли — класс, ранг и набор; этажи; образцы характеристик; записи сказителя — EN_CLAN.boss.host.
@@ -436,8 +499,10 @@ function refPicks(D) {
 
 let REFP = null;   // эталонный выбор на всех уровнях (refPicks) — задаёт calc()
 
-/* приток резервуара с участника в день, сотые очка: половина очков контракта недели / 7 (EN_CONTRACTS.econ) */
-const inflow = (c, prof) => fl(CT.econ[String(c)][prof].pts * 100 * CT.rules.splitBp, CT.rules.bp * 7);
+/* приток резервуара с участника в день, сотые очка: половина очков контракта недели / 7 (EN_CONTRACTS.econ). inflowRaw — очки его цикла,
+   inflow — засчитано клану: в очках базового цикла, по норме цикла контрактов (ADR-0042) */
+const inflowRaw = (c, prof) => fl(CT.econ[String(c)][prof].pts * 100 * CT.rules.splitBp, CT.rules.bp * 7);
+const inflow = (c, prof) => fl(CT.econ[String(c)][prof].pts * 100 * CT.rules.splitBp * CT.planks[String(CYC.base)][0], CT.rules.bp * 7 * CT.planks[String(c)][0]);
 const cycDays = Object.fromEntries(Object.entries(CAP.cycleDays).map(([c, n]) => [+c, n]));
 function cycleOfDay(d) { let t = 0; for (const c of Object.keys(cycDays).map(Number).sort((a, b) => a - b)) { t += cycDays[c]; if (d < t) return c; } return 6; }
 const dayOf = (c, w) => { let t = 0; for (let k = 2; k < c; k++) t += cycDays[k]; return t + (w - 1) * 7 + 3; };   // середина недели w цикла c от создания клана
@@ -471,9 +536,10 @@ function hit(p, src, seed, rounds, D, M) {
   const u = b.u[1][0];
   return { dmg: Math.max(0, u.maxHp - u.hp), max: u.maxHp, fallen: b.u[0].filter(x => !x.alive).length, rounds: b.round };
 }
-/* карты круга k для прогона: семь Голосов сонмов — элиты, семь Хозяев — боссы; у каждой цели своя свита стихии (EnClan.retinue) */
-function eliteCards(D, k) { return D.lists.els.map(el => EC.card(D, { g: 'e', uid: 'e', el, k })); }
-function bossCards(D, k) { return D.lists.els.map(el => EC.card(D, { g: 'b', uid: 'b', el, k })); }
+/* карты круга k для прогона: семь Голосов сонмов — элиты, семь Хозяев — боссы; у каждой цели своя свита стихии (EnClan.retinue).
+   c — цикл атакующего: копия круга в силе его цикла (ADR-0042); без цикла — базовый */
+function eliteCards(D, k, c) { return D.lists.els.map(el => EC.card(D, { g: 'e', uid: 'e', el, k, c })); }
+function bossCards(D, k, c) { return D.lists.els.map(el => EC.card(D, { g: 'b', uid: 'b', el, k, c })); }
 /* атак на убийство, сотые: здоровье цели / средний урон одной атаки по сидам; не меньше одной атаки. Цель теряет здоровье атака за атакой,
    сиды атак независимы — поэтому делим на средний урон, а не усредняем «здоровье / урон»: одна атака без урона иначе делала бы цель
    «непробиваемой» (29.09.2026, древо: вилки так меряются честно). list — по каждой карте, a100 — среднее по картам */
@@ -528,18 +594,19 @@ function treeFight(D, T) {
   const e = EC.fightMods(D, T.picks, T.lvl, 'e'), b = EC.fightMods(D, T.picks, T.lvl, 'b'), rE = EC.rounds(D, 'e', T.picks, T.lvl);
   return noMods(e) && noMods(b) && rE === D.boss.rounds.e ? null : { e, b, rE };
 }
-function costOf(D, p, k, T) {
-  const F = treeFight(D, T), key = p + ':' + k + ':' + (F ? JSON.stringify(F) : '');
-  if (!costCache.has(key)) costCache.set(key, { e: attacks(p, eliteCards(D, k), 'e', D, F && F.e, F && F.rE), b: attacks(p, bossCards(D, k), 'b', D, F && F.b) });
+function costOf(D, p, k, T, cyc) {
+  const cc = cyc || CYC.base, F = treeFight(D, T), key = p + ':' + k + ':' + cc + ':' + (F ? JSON.stringify(F) : '');
+  if (!costCache.has(key)) costCache.set(key, { e: attacks(p, eliteCards(D, k, cc), 'e', D, F && F.e, F && F.rE), b: attacks(p, bossCards(D, k, cc), 'b', D, F && F.b) });
   return costCache.get(key);
 }
 /* неделя клана силы p: круги по порядку, пока хватает атак недели; в круге — три самые дешёвые элиты пула и босс;
-   незаконченный круг — только добитые элиты. Бюджет — участники × атаки в день × 7: весь клан бьёт все атаки */
-function weekOf(D, p, members, perDay, pool, T) {
+   незаконченный круг — только добитые элиты. Бюджет — участники × атаки в день × 7: весь клан бьёт все атаки. cyc — цикл клана:
+   копии целей в силе этого цикла (ADR-0042) */
+function weekOf(D, p, members, perDay, pool, T, cyc) {
   const budget = members * perDay * 7 * 100;
   let left = budget, k = 1, pts = 0, circles = 0, elitesLast = 0, top = null;
   for (; k <= LAWS.maxCircles; k++) {
-    const c = costOf(D, p, k, T), ce = cheapest(c.e.list, pool, D.boss.kills), cost = ce + c.b.a100;
+    const c = costOf(D, p, k, T, cyc), ce = cheapest(c.e.list, pool, D.boss.kills), cost = ce + c.b.a100;
     top = { e: fl(ce, D.boss.kills), b: c.b.a100, ce };
     if (left < cost) { elitesLast = Math.min(D.boss.kills, fl(left, Math.max(1, fl(ce, D.boss.kills)))); pts += elitesLast * EC.points(D, k, 'e'); break; }
     left -= cost; circles++; pts += D.boss.kills * EC.points(D, k, 'e') + EC.points(D, k, 'b');
@@ -550,8 +617,73 @@ const powOf = W => { const pw = CAP.power[W.prof][String(W.c)], days = pw.slice(
 /* неделя эталонного клана — вехи древа (атаки, места) без вилок: чистая сила клана по дням его жизни */
 function weekRun(D, W, lvlAt) {
   const p = powOf(W), lvl = lvlAt(W.prof, dayOf(W.c, W.w)), members = EC.capacity(D, lvl), perDay = EC.attacksDay(D, lvl);
-  const r = weekOf(D, p, members, perDay, D.boss.pool, null);
+  const r = weekOf(D, p, members, perDay, D.boss.pool, null, W.c);
   return Object.assign({ W, p, lvl, members, perDay, perMember: fl(r.pts, members) }, r);
+}
+
+/* ================================ КЛАН И РАЗНЫЕ ЦИКЛЫ (ADR-0042) ================================ */
+/* неделя клана, где у каждого своя сила: ms — [{ c, p }]. Все бьют поровну всю неделю: каждый тратит атаки на ту цель, что стоит сейчас,
+   как в игре. Круги по порядку; в круге — этап элит (три самые дешёвые из пула) и этап босса. Работа этапа — WORK долей; за «ход» — по
+   атаке от каждого — этап получает сумму долей, которые снимает атака каждого: WORK × 100 / цена этапа у него, сотые атаки. У стены удары
+   слабых к своей цели почти ничего не снимают — «слабые кормят нижние круги, сильные пробивают верх» (§25). own — своя копия цели
+   в цикле каждого (ADR-0042), иначе — общая лестница базового цикла, как было. Личные очки — по доле работы этапа.
+   pts — очки за павших: незаконченный этап элит платит за добитых, босс не пал — счёт сгорел. exp — ожидание с долей незаконченного этапа:
+   им сравниваются правила, у одного клана целый круг — грубый шаг */
+const WORK = 1000000;
+function mixWeek(D, ms, perDay, pool, own) {
+  const mine = ms.map(() => 0);
+  let left = perDay * 7 * 100, pts = 0, exp = 0, circles = 0, partial = 0, k = 1;   // left — сотые «хода»: у всех бюджет один — древо одно
+  for (; k <= LAWS.maxCircles && left > 0; k++) {
+    const rate = ms.map(m => { const x = costOf(D, m.p, k, null, own ? m.c : CYC.base); return { e: fl(WORK * 100, Math.max(1, cheapest(x.e.list, pool, D.boss.kills))), b: fl(WORK * 100, Math.max(1, x.b.a100)) }; });
+    const stage = key => {
+      const R = rate.reduce((a, r) => a + r[key], 0); if (!R) { left = 0; return 0; }
+      const need = Math.ceil(WORK * 100 / R);   // сотые хода на этап
+      if (need <= left) { left -= need; return WORK; }
+      const done = fl(R * left, 100); left = 0; return Math.min(WORK - 1, done);
+    };
+    /* ожидание v очков этапа: в exp и личным — по доле, которую снимает атака каждого */
+    const pay = (key, v) => { const R = rate.reduce((a, r) => a + r[key], 0); exp += v; rate.forEach((r, i) => { mine[i] += fl(v * r[key], Math.max(1, R)); }); };
+    const pe = D.boss.kills * EC.points(D, k, 'e'), E = stage('e');
+    if (E < WORK) { partial = fl(E * D.boss.kills, WORK); pts += partial * EC.points(D, k, 'e'); pay('e', fl(pe * E, WORK)); break; }
+    pts += pe; pay('e', pe);
+    const pb = EC.points(D, k, 'b'), Bw = stage('b');
+    if (Bw < WORK) { pay('b', fl(pb * Bw, WORK)); break; }
+    pts += pb; pay('b', pb); circles++;
+  }
+  return { circles, partial, pts, exp, mine, k };
+}
+/* смешанные кланы MIX: клановый босс как было (общая лестница), «очки ÷ норма» на общей лестнице, своя копия; резервуар сырой и засчитанный;
+   клановые планки Событий — по составу (сумма порогов) и по долям (сумма засчитанных очков); вес одного участника в клановой сумме */
+function mixCalc(D) {
+  const per = EC.attacksDay(D, MIX.lvl), NB = D.boss.circle.norm, base = CYC.base;
+  const half = c => fl(CT.econ[String(c)][MIX.prof].pts * CT.rules.splitBp, CT.rules.bp);   // очков контрактов в резервуар за неделю
+  const evWeek = c => EVD.econ[String(c)].week[MIX.prof];                                    // очки Событий обычного за неделю
+  const rows = MIX.sets.map(([n, of]) => {
+    const ms = [], msW = [];
+    for (const [c, cnt] of Object.entries(of)) for (let j = 0; j < cnt; j++) { ms.push({ c: +c, p: NB[+c] }); msW.push({ c: +c, p: powOf({ prof: MIX.prof, c: +c, w: MIX.week }) }); }
+    const old = mixWeek(D, ms, per, D.boss.pool, false), own = mixWeek(D, ms, per, D.boss.pool, true), ownW = mixWeek(D, msW, per, D.boss.pool, true);
+    const v1 = old.mine.reduce((a, x, i) => a + fl(x * NB[base], NB[ms[i].c]), 0);   // «очки ÷ норма цикла» на общей лестнице
+    const by = (R, f) => Object.fromEntries(Object.keys(of).map(c => { const ids = ms.map((m, i) => i).filter(i => ms[i].c === +c); return [c, fl(ids.reduce((a, i) => a + f(R, i), 0), ids.length)]; }));
+    const resRaw = ms.reduce((a, m) => a + half(m.c), 0), resCnt = ms.reduce((a, m) => a + EC.counted(D, 'ct', half(m.c), m.c), 0);
+    /* Событие, первая клановая планка: по составу — Σ очков / Σ порогов участников; по долям — Σ засчитанных / (участников × порог базового).
+       Доля — б. п. от порога, клан из обычных играет весь: сравнение составов, а не прогноз недели */
+    const X1 = EVD.clanX[0], P1 = c => EVD.planks[String(c)][0];
+    const evComp = fl(ms.reduce((a, m) => a + evWeek(m.c), 0) * D.bp, ms.reduce((a, m) => a + fl(P1(m.c) * X1, 100), 0));
+    const evShare = fl(ms.reduce((a, m) => a + EC.counted(D, 'ev', evWeek(m.c), m.c), 0) * D.bp, ms.length * fl(P1(base) * X1, 100));
+    /* вес участника в клановой сумме: по составу — его порог / сумма порогов, по долям — 1 / участников; наибольший — у старшего цикла */
+    const wMax = mode => { const N = D.norm[mode], top = Math.max(...ms.map(m => N[m.c])); return fl(top * D.bp, ms.reduce((a, m) => a + N[m.c], 0)); };
+    return { n, of, ms, old, own, ownW, v1, mineOld: by(old, (R, i) => R.mine[i]), mineOwn: by(own, (R, i) => R.mine[i]), resRaw, resCnt, evComp, evShare,
+      wEv: wMax('ev'), wEcho: wMax('echo'), wFair: fl(D.bp, ms.length), top: Math.max(...ms.map(m => m.c)) };
+  });
+  /* ×1,7 в клановых суммах (§1.2): плательщик против обычного — в одном цикле и на цикл впереди (он быстрее проходит циклы).
+     Сырые очки режима растут с циклом — на цикл впереди плательщик приносит клану больше ×1,7; засчитанные — нет. Сотые доли */
+  const x17 = [['ct', 'Контракты · резервуар', c => CT.econ[String(c)].p.pts, c => CT.econ[String(c)].o.pts],
+    ['ev', 'Событие', c => EVD.econ[String(c)].week.p, c => EVD.econ[String(c)].week.o]].map(([mode, n, P, O]) => {
+    const same = D.cycles.map(c => fl(P(c) * 100, O(c))), pairs = D.cycles.slice(0, -1).map(c => [c, c + 1]);
+    const raw = pairs.map(([c, d]) => fl(P(d) * 100, O(c))), cnt = pairs.map(([c, d]) => fl(EC.counted(D, mode, P(d), d) * 100, EC.counted(D, mode, O(c), c)));
+    return { mode, n, same: Math.max(...same), raw: Math.max(...raw), cnt: Math.max(...cnt), at: pairs[raw.indexOf(Math.max(...raw))] };
+  });
+  return { rows, per, x17 };
 }
 
 /* ================================ ТАБЛИЦЫ ================================ */
@@ -572,14 +704,15 @@ const TREE_CALC = {
 function treeCalc(D, weeks, got) {
   const lvlOf = (g, d) => { let l = 0; for (let n = 1; n <= TREE.levels; n++) if (g[n] && g[n] <= d) l = n; return l; };
   const only = (L, i) => { const p = D.tree.levels.map(() => null); p[L - 1] = i; return p; };
-  const circleCost = (p, k, T, pool) => { const c = costOf(D, p, k, T); return cheapest(c.e.list, pool, D.boss.kills) + c.b.a100; };
-  /* вилки поодиночке: атак на круг 1 силой круга и на последний круг, который эталонный клан цикла VI ещё берёт, — дальше стена */
-  const W = weeks[TREE_CALC.forkAt], pow1 = D.boss.circle.pow1, wall = W.k - 1;
-  const base1 = circleCost(pow1, 1, null, D.boss.pool), baseW = circleCost(W.p, wall, null, D.boss.pool);
+  const circleCost = (p, k, T, pool, cyc) => { const c = costOf(D, p, k, T, cyc); return cheapest(c.e.list, pool, D.boss.kills) + c.b.a100; };
+  /* вилки поодиночке: атак на круг 1 силой круга и на последний круг, который эталонный клан цикла VI ещё берёт, — дальше стена;
+     копии целей — в цикле клана (ADR-0042) */
+  const W = weeks[TREE_CALC.forkAt], pow1 = D.boss.circle.pow1, wall = Math.max(1, W.k - 1), wc = W.W.c;
+  const base1 = circleCost(pow1, 1, null, D.boss.pool), baseW = circleCost(W.p, wall, null, D.boss.pool, wc);
   const forks = [];
   for (const x of D.tree.levels.filter(y => y.kind === 'fork')) x.alts.forEach((a, i) => {
     const T = { picks: only(x.L, i), lvl: x.L }, pool = EC.elitePool(D, x.L, T.picks), F = D.tree.kinds[a.k].fx;
-    const c1 = F.t === 'carry' ? null : circleCost(pow1, 1, T, pool), cw = F.t === 'carry' ? null : circleCost(W.p, wall, T, pool);
+    const c1 = F.t === 'carry' ? null : circleCost(pow1, 1, T, pool), cw = F.t === 'carry' ? null : circleCost(W.p, wall, T, pool, wc);
     forks.push({ L: x.L, i, k: a.k, n: a.n, v: a.v, s: a.s, c1, cw });
   });
   /* эталонный выбор на силе недель WEEKS: уровни древа; «вехи» — тот же уровень без пассивок и вилок */
@@ -588,12 +721,12 @@ function treeCalc(D, weeks, got) {
     const R = weeks[B.w], p = R.p;
     for (const L of B.lvls) for (const mode of L === TREE.levels ? ['miles', 'ref'] : [L ? 'ref' : 'none']) {
       const T = mode === 'ref' ? { picks: REFP, lvl: L } : null, pool = mode === 'ref' ? EC.elitePool(D, L, REFP) : D.boss.pool;
-      const r = weekOf(D, p, EC.capacity(D, L), EC.attacksDay(D, L), pool, T);
+      const r = weekOf(D, p, EC.capacity(D, L), EC.attacksDay(D, L), pool, T, R.W.c);
       boss.push(Object.assign({ W: R.W, p, L, mode, members: EC.capacity(D, L), perDay: EC.attacksDay(D, L), pool, wallet: EC.walletCap(D, L, mode === 'ref' ? REFP : null) }, r));
     }
     /* тот же клан, когда играют не все: атаки древа без вилок — бюджет × act.bp */
     for (const L of [0, TREE.levels]) {
-      const members = EC.capacity(D, L), perDay = EC.attacksDay(D, L), r = weekOf(D, p, 1, fl(members * perDay * TREE_CALC.act.bp, D.bp), D.boss.pool, null);
+      const members = EC.capacity(D, L), perDay = EC.attacksDay(D, L), r = weekOf(D, p, 1, fl(members * perDay * TREE_CALC.act.bp, D.bp), D.boss.pool, null, R.W.c);
       boss.push(Object.assign({ W: R.W, p, L, mode: 'miles', act: true, members, perDay, pool: D.boss.pool, wallet: EC.walletCap(D, L, null) }, r));
     }
   }
@@ -630,6 +763,8 @@ function calc() {
       bmE: fl(e.reduce((a, x) => a + EC.cardBm(D, x), 0), e.length), bmB: fl(b.reduce((a, x) => a + EC.cardBm(D, x), 0), b.length), ptsE: EC.points(D, k, 'e'), ptsB: EC.points(D, k, 'b') });
   }
   const weeks = WEEKS.map(W => weekRun(D, W, lvlAt));
+  /* 2а. клан и разные циклы (ADR-0042): смешанные кланы — как было и по правилу нормы цикла */
+  const MX = mixCalc(D);
 
   /* 3. древо: вилки, эталонный выбор на клановом боссе, сроки и потолки */
   const TC = treeCalc(D, weeks, { o: refGot, e: eGot, p: pGot });
@@ -637,7 +772,14 @@ function calc() {
     weeks: weeks.map(r => [r.W.prof, r.W.c, r.W.w, r.p, r.lvl, r.members, r.perDay, r.budget, r.circles, r.partial, r.pts, r.perMember]),
     forks: TC.forks.map(f => [f.L, f.i, f.c1 == null ? -1 : f.c1, f.cw == null ? -1 : f.cw]), forkBase: [TC.base1, TC.baseW, TC.wall],
     treeBoss: TC.boss.map(r => [r.W.prof, r.W.c, r.W.w, r.p, r.L, r.mode === 'ref' ? 2 : r.mode === 'miles' ? 1 : 0, r.act ? 1 : 0, r.members, r.perDay, r.pool, r.circles, r.partial, r.pts]), actBp: TREE_CALC.act.bp,
-    when: TC.when.map(w => [w.d, w.o, w.e, w.p]) };
+    when: TC.when.map(w => [w.d, w.o, w.e, w.p]),
+    /* смешанные кланы (ADR-0042): состав по циклам [[цикл, участников]]; клановый босс — общая лестница: кругов, очков с долей недобитой цели,
+       «очки ÷ норма»; своя копия: кругов, очков с долей; резервуар за неделю — сырой и засчитанный; Событие — первая клановая планка
+       по составу и по долям, б. п. порога; наибольший вес участника — Событие и Эхо по составу, по долям, б. п.; своя копия на 2-й неделе
+       цикла каждого — очков с долей. mixTolBp — допуск
+       «клан из одного цикла и смешанный приходят сопоставимо» */
+    mix: MX.rows.map(r => [Object.entries(r.of).map(([c, n]) => [+c, n]), r.old.circles, r.old.exp, r.v1, r.own.circles, r.own.exp, r.resRaw, r.resCnt, r.evComp, r.evShare, r.wEv, r.wEcho, r.wFair, r.ownW.exp]),
+    mixTolBp: MIX.tolBp };
 
   /* 3. награды: ступени мест кланов по циклам */
   const M = LBX.modes[REWARDS.mode], ly = M ? M.layers.find(x => x.kind === 'place' && x.clan) : null;
@@ -647,12 +789,12 @@ function calc() {
   D.rewards.from = M ? M.from : 2;
   D.rewards.box = M ? M.box : 'talisman';
 
-  checks(D, S, circles, weeks, ly, M, TC);
-  const tables = mkTables(D, S, circles, weeks, tiers, TC);
-  return { data: D, tables, S, circles, weeks, TC };
+  checks(D, S, circles, weeks, ly, M, TC, MX);
+  const tables = mkTables(D, S, circles, weeks, tiers, TC, MX);
+  return { data: D, tables, S, circles, weeks, TC, MX };
 }
 
-function mkTables(D, S, circles, weeks, tiers, TC) {
+function mkTables(D, S, circles, weeks, tiers, TC, MX) {
   const TBL = {};
   let T;
   // резервуар: кандидаты показателя
@@ -737,6 +879,49 @@ function mkTables(D, S, circles, weeks, tiers, TC) {
   for (const r of weeks) T.push(cells([`${PROF[r.W.prof]}, цикл ${ROMAN[r.W.c]}, ${r.W.w}-я неделя`, fmt(r.p), r.lvl, `${r.members} × ${r.perDay}`, fmt(r.budget), `${r.circles}${r.partial ? ` + ${r.partial} ${r.partial === 1 ? 'элита' : 'элиты'}` : ''}`,
     `круг ${r.k}: ${dec(r.lastCost.e, 100)} / ${dec(r.lastCost.b, 100)}`, fmt(r.pts), fmt(r.perMember)]));
   TBL.weeks = T.join('\n');
+  // клан и разные циклы (ADR-0042): нормы циклов
+  const NM = D.norm, NB = D.boss.circle.norm, base = CYC.base, x2 = (a, b) => `×${dec(a, b, 2)}`;
+  T = head(['Цикл', 'Контракты: первая планка', 'Событие: первая планка', 'Эхо: первая планка', 'Клановый босс: средняя сила отряда обычного', 'Круг 1 своей копии: уровень врагов',
+    `Очко этого цикла засчитывается клану как очков цикла ${ROMAN[base]}: контракты / Событие / Эхо`]);
+  for (const c of D.cycles) T.push(cells([ROMAN[c], fmt(NM.ct[c]), fmt(NM.ev[c]), fmt(NM.echo[c]), fmt(NB[c]), fmt(EC.circleLvl(D, 1, c)),
+    ['ct', 'ev', 'echo'].map(m => dec(NM[m][base], NM[m][c], NM[m][base] * 10 < NM[m][c] ? 3 : 2)).join(' / ')]));
+  TBL.cycNorm = T.join('\n');
+  // клан и разные циклы: клановый босс — как было, «очки ÷ норма», своя копия
+  const R0 = MX.rows[0], cyc = of => Object.entries(of).map(([c, n]) => `${n} в ${ROMAN[c]}`).join(' + ');
+  const per = g => Object.entries(g).map(([c, v]) => `${ROMAN[c]} — ${fmt(v)}`).join(' · ');
+  const run = R => `${R.circles}${R.partial ? ` + ${R.partial} ${R.partial === 1 ? 'элита' : 'элиты'}` : ''} · ${fmt(R.exp)}`;
+  T = head(['Состав клана', 'Как было — общая лестница: кругов · очков', 'к циклу II', 'Как было: очков на участника, по циклам',
+    'Очки ÷ норма цикла на общей лестнице', 'к циклу II', 'Своя копия: кругов · очков', 'к циклу II', 'Своя копия: очков на участника, по циклам', `Своя копия, ${MIX.week}-я неделя цикла каждого: кругов · очков`, 'к циклу II']);
+  for (const r of MX.rows) T.push(cells([`${r.n} (${cyc(r.of)})`, run(r.old), x2(r.old.exp, R0.old.exp), per(r.mineOld), fmt(r.v1), x2(r.v1, R0.v1), run(r.own), x2(r.own.exp, R0.own.exp), per(r.mineOwn), run(r.ownW), x2(r.ownW.exp, R0.ownW.exp)]));
+  TBL.mixBoss = T.join('\n');
+  // клан и разные циклы: резервуар, клановые планки, вес участника в клановой сумме
+  const bpT = v => pct(v, D.bp);
+  T = head(['Состав клана', 'Резервуар за неделю: очков в их циклах', 'к циклу II', `Засчитано: очков цикла ${ROMAN[base]}`, 'к циклу II',
+    'Событие, первая клановая планка: по составу / по долям, от порога', 'к циклу II, по долям', 'Наибольший вес участника: Событие — по составу / по долям', 'Эхо — по составу / по долям']);
+  for (const r of MX.rows) T.push(cells([r.n, fmt(r.resRaw), x2(r.resRaw, R0.resRaw), fmt(r.resCnt), x2(r.resCnt, R0.resCnt), `${bpT(r.evComp)} / ${bpT(r.evShare)}`, x2(r.evShare, R0.evShare),
+    `${bpT(r.wEv)} / ${bpT(r.wFair)}`, `${bpT(r.wEcho)} / ${bpT(r.wFair)}`]));
+  TBL.mixSums = T.join('\n');
+  // клан и разные циклы: варианты правила — сводка прогона
+  const mono = c => MX.rows.find(r => Object.keys(r.of).length === 1 && r.of[c]), one = MX.rows.find(r => r.of[6] === 1 && r.of[2] > 1), mixed = MX.rows.filter(r => Object.keys(r.of).length > 1);
+  const rng = (f, r0) => { const v = mixed.map(f), a = Math.min(...v), b = Math.max(...v); return a === b ? x2(a, r0) : `${x2(a, r0)} – ${x2(b, r0)}`; };
+  T = head(['Вариант', 'Клан цикла VI к клану цикла II', 'Смешанные кланы к клану цикла II', 'Один в VI среди 24 в II: его вклад к вкладу участника цикла II', 'Итог']);
+  T.push(cells(['Как было: общая лестница, сырые суммы', x2(mono(6).old.exp, R0.old.exp), rng(r => r.old.exp, R0.old.exp), x2(one.mineOld[6], Math.max(1, one.mineOld[2])),
+    'нет: старшие циклы перевешивают в разы, младшие у стены бьют впустую']));
+  T.push(cells(['Очки ÷ норма цикла на общей лестнице', x2(mono(6).v1, R0.v1), rng(r => r.v1, R0.v1), x2(fl(one.mineOld[6] * NB[base], NB[6]), Math.max(1, one.mineOld[2])),
+    'нет: состав меняет итог, младшие у стены бьют впустую']));
+  T.push(cells(['Своя копия в цикле атакующего, доли нормы — **принят**', x2(mono(6).own.exp, R0.own.exp), rng(r => r.own.exp, R0.own.exp), x2(one.mineOwn[6], Math.max(1, one.mineOwn[2])),
+    `да: в пределах ±${fl(MIX.tolBp, 100)} %`]));
+  T.push(cells(['Рейтинг по «циклу клана» — по старшему циклу участников', '×1 — среди кланов цикла VI', `${x2(one.old.exp, mono(6).old.exp)} — «${one.n}» среди кланов цикла VI`, '—',
+    'нет: смешанный клан наказан, клан из одного цикла в выигрыше']));
+  T.push(cells(['Клановые планки по составу — сумма порогов участников', x2(mono(6).evComp, R0.evComp), rng(r => r.evComp, R0.evComp),
+    `вес старшего: Событие ${bpT(one.wEv)}, Эхо ${bpT(one.wEcho)} вместо ${bpT(one.wFair)}`, 'нет: в Эхо старший решает за весь клан']));
+  T.push(cells(['Клановые планки по долям — сумма засчитанных очков — **принят**', x2(mono(6).evShare, R0.evShare), rng(r => r.evShare, R0.evShare), `вес каждого — ${bpT(one.wFair)}`, 'да']));
+  TBL.mixRules = T.join('\n');
+  // клан и разные циклы: ×1,7 в клановых суммах — плательщик в одном цикле с обычным и на цикл впереди
+  T = head(['Клановая сумма', 'Плательщик к обычному в одном цикле, наибольшее', 'Плательщик на цикл впереди: сырые очки', 'Плательщик на цикл впереди: засчитано клану', 'Закон ×1,7']);
+  for (const x of MX.x17) T.push(cells([x.n, x2(x.same, 100), `${x2(x.raw, 100)} — ${ROMAN[x.at[1]]} к ${ROMAN[x.at[0]]}`, x2(x.cnt, 100), x.cnt <= LAWS.x17 && x.same <= LAWS.x17 ? 'держится' : 'нет']));
+  T.push(cells(['Клановый босс', 'отряд к норме своего цикла', 'на общей лестнице — сила отряда целиком', 'своя копия: отряд к норме своего цикла', 'держится — его держит экономика цикла']));
+  TBL.mixX17 = T.join('\n');
   // награды
   T = head(['Место клана', 'На участника · ступени', 'Пул клана из 25', 'Сервер по вкладу', 'Глава']);
   for (const t of tiers) {
@@ -886,7 +1071,60 @@ function hostChecks(D, L) {
   }
 }
 
-function checks(D, S, circles, weeks, ly, M, TC) {
+/* клан и разные циклы (ADR-0042): законы правила «вклад — в долях нормы своего цикла».
+   1. Нормы — первые личные планки режимов из их данных; цикл старше — норма не меньше.
+   2. Вклад нормирован: первая планка любого цикла засчитывается как первая планка базового; пересчёт между циклами — по нормам.
+   3. Своя копия: круг 1 копии цикла c — сила базового круга × норма силы c / норма базового; очки врага от цикла не зависят.
+   4. Смешанные кланы MIX: клан из одного цикла и смешанный приходят к очкам кланового босса, резервуару и клановой планке Событий
+      не дальше tolBp от клана цикла II; на участника — у каждого цикла не дальше tolBp от среднего по клану; вес каждого — 1 / участников.
+   5. Прежний счёт правда ломался: на общей лестнице клан цикла VI берёт больше клана цикла II дальше допуска — иначе прогон не о том */
+function cycleLaws(D, MX) {
+  const base = CYC.base, tol = MIX.tolBp, near = (v, w) => Math.abs(v - w) * D.bp <= w * tol;
+  for (const mode of Object.keys(CYC.modes)) {
+    const N = D.norm[mode];
+    D.cycles.forEach((c, i) => {
+      if (i && N[c] < N[D.cycles[i - 1]]) fail(`нормы: у режима «${CYC.modes[mode].n}» норма цикла ${ROMAN[c]} меньше нормы цикла ${ROMAN[D.cycles[i - 1]]}`);
+      if (EC.counted(D, mode, N[c], c) !== N[base]) fail(`вклад не нормирован: первая планка цикла ${ROMAN[c]} режима «${CYC.modes[mode].n}» засчитана как ${EC.counted(D, mode, N[c], c)}, а не ${N[base]}`);
+      for (const to of D.cycles) if (EC.toCycle(D, mode, N[c], c, to) !== N[to]) fail(`пересчёт: первая планка цикла ${ROMAN[c]} в цикле ${ROMAN[to]} — ${EC.toCycle(D, mode, N[c], c, to)}, а не ${N[to]}`);
+    });
+  }
+  if (D.norm.ct[base] !== CT.planks[String(base)][0] || D.norm.ev[base] !== EVD.planks[String(base)][0] || D.norm.echo[base] !== ERD.plank1[String(base)]) fail('нормы: не первые личные планки режимов');
+  const C = D.boss.circle;
+  if (C.byCyc[base] !== C.pow1) fail(`своя копия: круг 1 базового цикла — ${C.byCyc[base]}, а прежний круг 1 — ${C.pow1}`);
+  for (const c of D.cycles) {
+    if (C.byCyc[c] !== fl(C.pow1 * C.norm[c], C.norm[base]) || EC.circlePow(D, 1, c) !== C.byCyc[c]) fail(`своя копия цикла ${ROMAN[c]}: круг 1 — ${EC.circlePow(D, 1, c)}, по норме — ${fl(C.pow1 * C.norm[c], C.norm[base])}`);
+    if (EC.card(D, { g: 'b', uid: 'проба', el: D.lists.els[0], k: 3, c }).lvl !== EC.circleLvl(D, 3, c)) fail(`своя копия цикла ${ROMAN[c]}: карта цели не в силе цикла атакующего`);
+  }
+  /* доля здоровья: копия любого цикла входит с тем же остатком и снимает ту же долю за тот же процент здоровья */
+  const bar = D.boss.bar;
+  for (const [left, maxHp, out] of [[bar, 27667, 13833], [bar, 219480, 1], [377777, 836000, 0], [5, 1000000, 999999], [bar, 3, 2]]) {
+    const hin = EC.hpIn(D, left, maxHp), off = EC.shareOff(D, left, maxHp, Math.min(out, hin));
+    if (out === 0 && off !== left) fail(`доля здоровья: копия пала, а цель — нет (${left} → ${left - off})`);
+    if (out > 0 && Math.min(out, hin) > 0 && off >= left) fail(`доля здоровья: копия жива, а цель пала (${left}, ${maxHp}, ${out})`);
+    if (EC.shareOff(D, left, maxHp, hin) !== 0) fail(`доля здоровья: атака без урона сняла ${EC.shareOff(D, left, maxHp, hin)}`);
+  }
+  /* норма силы — средняя сила отряда обычного игрока за все дни цикла по калькуляторам (capacity.json, power): прогон «по норме» неверную
+     норму не заметит — участники в нём стоят на ней же */
+  for (const c of D.cycles) { const days = CAP.power[MIX.prof][String(c)], mean = fl(days.reduce((a, x) => a + x, 0), days.length);
+    if (C.norm[c] !== mean) fail(`норма силы цикла ${ROMAN[c]} — ${C.norm[c]}, а средняя сила обычного игрока за цикл — ${mean}`); }
+  /* смешанные кланы */
+  const R0 = MX.rows[0];
+  if (!R0 || Object.keys(R0.of).join() !== String(base)) { fail('смешанные кланы: первым должен идти клан базового цикла'); return; }
+  for (const r of MX.rows) {
+    if (!near(r.own.exp, R0.own.exp)) fail(`клан «${r.n}»: своя копия — ${r.own.exp} очков, клан цикла II — ${R0.own.exp}: дальше ±${fl(tol, 100)} %`);
+    if (!near(r.resCnt, R0.resCnt)) fail(`клан «${r.n}»: резервуар засчитал ${r.resCnt}, клан цикла II — ${R0.resCnt}: дальше ±${fl(tol, 100)} %`);
+    if (!near(r.evShare, R0.evShare)) fail(`клан «${r.n}»: первая клановая планка Событий — ${r.evShare} б. п. порога, клан цикла II — ${R0.evShare}: дальше ±${fl(tol, 100)} %`);
+    const avg = fl(r.own.mine.reduce((a, x) => a + x, 0), r.own.mine.length);
+    for (const [c, v] of Object.entries(r.mineOwn)) if (!near(v, avg)) fail(`клан «${r.n}»: участник цикла ${ROMAN[c]} приносит ${v} очков, в среднем по клану — ${avg}: вклад не сопоставим`);
+    if (r.wFair * r.ms.length > D.bp) fail(`клан «${r.n}»: вес участника по долям — ${r.wFair} б. п., больше 1 / ${r.ms.length}`);
+  }
+  const m6 = MX.rows.find(r => Object.keys(r.of).length === 1 && r.of[6]);
+  if (m6 && near(m6.old.exp, R0.old.exp)) fail('прогон смешанных кланов: на общей лестнице клан цикла VI не сильнее клана цикла II — прогон не меряет разницу циклов');
+  /* ×1,7 (§1.2): засчитанный вклад плательщика — не больше ×1,7 к обычному, даже когда он на цикл впереди */
+  for (const x of MX.x17) if (x.same > LAWS.x17 || x.cnt > LAWS.x17) fail(`×1,7 в клановых суммах, ${x.n}: плательщик ×${dec(Math.max(x.same, x.cnt), 100, 2)} к обычному`);
+}
+
+function checks(D, S, circles, weeks, ly, M, TC, MX) {
   // целые числа во всех данных
   (function walk(x, where) {
     if (typeof x === 'number') { if (!Number.isInteger(x)) fail(`не целое: ${where} = ${x}`); return; }
@@ -986,7 +1224,11 @@ function checks(D, S, circles, weeks, ly, M, TC) {
     if (r.circles < 1) fail(`неделя ${PROF[r.W.prof]} цикла ${ROMAN[r.W.c]}: ни одного круга`);
     if (r.k > LAWS.maxCircles) fail(`неделя ${PROF[r.W.prof]} цикла ${ROMAN[r.W.c]}: лестница без потолка силы — кругов больше ${LAWS.maxCircles}`);
   }
-  for (let i = 1; i < weeks.length; i++) if (weeks[i].W.prof === weeks[i - 1].W.prof && weeks[i].p > weeks[i - 1].p && weeks[i].circles < weeks[i - 1].circles) fail(`неделя: клан сильнее, а кругов меньше — ${weeks[i].W.c}`);
+  /* сила для своего цикла: копии целей — в цикле клана (ADR-0042), поэтому сравнивается сила отряда к норме его цикла, а не сама сила */
+  const rel = r => fl(r.p * D.boss.circle.norm[CYC.base], D.boss.circle.norm[r.W.c]);
+  for (let i = 1; i < weeks.length; i++) if (weeks[i].W.prof === weeks[i - 1].W.prof && rel(weeks[i]) > rel(weeks[i - 1]) && weeks[i].perDay >= weeks[i - 1].perDay && weeks[i].circles < weeks[i - 1].circles) fail(`неделя: клан сильнее для своего цикла, а кругов меньше — ${PROF[weeks[i].W.prof]}, цикл ${ROMAN[weeks[i].W.c]}`);
+  // клан и разные циклы (ADR-0042): нормы, пересчёт, своя копия, смешанные кланы
+  cycleLaws(D, MX);
   // награды: ступени одинаковы во всех циклах, лучше место — не меньше
   if (ly && M) {
     const cycles = Object.keys(ly.rows[0].cyc).map(Number);
@@ -1021,12 +1263,16 @@ function render(data) {
    - tree — 100 уровней: ветка br, место в ветке pos, круг древа circle, вид kind (regular, fork — вилка кланового босса, key — ключ ветки),
      вехи mile [{ k, v }], альтернативы alts { k, p, v, n, d, s, live }; kinds — вид пассивки: примитив prim, действие в бою клана fx,
      потолок cap; caps — потолки; calc.forks, calc.treeBoss, calc.when — вилки поодиночке, древо на клановом боссе, сроки уровней;
+   - cycles, norm — клан и разные циклы (ADR-0042): нормы циклов по режимам — первые личные планки (ct — контракты, ev — Событие, echo —
+     Эхо); очко цикла c засчитывается клану как норма base / норма c очков базового цикла (EnClan.counted, EnClan.toCycle);
    - boss — атаки, пул и победы круга, раунды, круг: сила (12 + уровень) = pow1 × xBp^(k − 1), очки: elite, boss × yBp^(k − 1),
-     здоровье hp (% образца), наборы kinds по рангу rank;
+     здоровье hp (% образца), наборы kinds по рангу rank; своя копия цели в цикле атакующего: circle.byCyc — сила круга 1 по циклам
+     (pow1 × circle.norm[c] / circle.norm[base]), счёт цели — bar долей здоровья (EnClan.hpIn, EnClan.shareOff);
      host — сонмы стихий: роли roles (класс, имя роли, вид способности свиты), этажи floors (e — свита Голоса, b — свита Хозяина),
      образцы характеристик tpl и здоровье свиты hp по роли, семь сонмов hosts, фигуры figs «<стихия>-<роль>»: n, look, tip; lore — запись
      сказителя; weeks — Хозяин недели: неделя расы → стихия, цивилизация Эхо, почему (§25.4); art — выгруженные портреты ready (clan/…);
-   - rewards — половина по вкладу, половина — глава; ступени мест кланов tiers; calc — таблицы калькулятора для UI-кита.
+   - rewards — половина по вкладу, половина — глава; ступени мест кланов tiers; calc — таблицы калькулятора для UI-кита, calc.mix —
+     прогон смешанных кланов (ADR-0042).
    Обоснование и таблицы — docs/content/клан.md. В игре исходы, очки, места и раздачу решает сервер (§36.16).
    Ниже данных — алгоритмы клана tools/content-gen/clan/core.js как есть. */\n`;
   return headTxt + 'window.EN_CLAN = ' + JSON.stringify(data) + ';\n' + core;

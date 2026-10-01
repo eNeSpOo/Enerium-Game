@@ -1,5 +1,6 @@
-/* EnClan — алгоритмы клана (§24, §25 GDD), общие для калькулятора tools/content-gen/clan/build.js и прототипа: сборщик вставляет
-   этот файл в design/ui/clan.js как есть, после данных EN_CLAN. Числа — только из данных D = EN_CLAN, здесь — алгоритм.
+/* EnClan — алгоритмы клана (§24, §25 GDD; ADR-0042 — клан и разные циклы), общие для калькулятора tools/content-gen/clan/build.js
+   и прототипа: сборщик вставляет этот файл в design/ui/clan.js как есть, после данных EN_CLAN. Числа — только из данных D = EN_CLAN,
+   здесь — алгоритм.
    Только целые: доли — в базисных пунктах (10 000 = 100 %), большие произведения — BigInt. Случайность — генератор ядра боя
    (EnBattle.makeRng на сиде EnBattle.seedOf): в игре сид выдаёт сервер. Ядро боя подключено раньше — battle.js. */
 (function (root) {
@@ -88,10 +89,41 @@ const heroDmg = (D, M, u, el) => M.dmg + (M.cls[clsOf(D, u.cls)] || 0) + (M.el[u
 const heroHp = (D, M, h) => M.hp + (M.hpCls[clsOf(D, h.cls)] || 0);
 const hasMods = M => !!M && Object.values(M).some(v => typeof v === 'number' ? v : Object.keys(v).length);
 
+/* ---------- клан и разные циклы (ADR-0042) ----------
+   Вклад участника засчитывается в долях нормы своего цикла: у каждого режима норма цикла — его первая личная планка (D.norm[режим][цикл]).
+   Клановые суммы — резервуар, клановые планки, места клана — складывают вклады в одних единицах: в очках базового цикла D.norm.base
+   или в очках цикла того, кто смотрит. Клановый босс нормирует сам бой: атакующий бьёт копию цели в силе своего цикла,
+   урон засчитывается долей её здоровья (D.boss.bar). Очки врага от цикла не зависят */
+/* цикл в пределах данных: ниже первого — первый, выше последнего — последний */
+const cycOf = (D, c) => { const L = D.cycles; return L.includes(c) ? c : c < L[0] ? L[0] : L[L.length - 1]; };
+/* очки режима mode из цикла from в очки цикла to: × норма to / норма from, вниз; без нормы режима — как есть */
+function toCycle(D, mode, pts, from, to) {
+  const N = D.norm[mode]; if (!N) return pts;
+  const a = N[cycOf(D, from)], b = N[cycOf(D, to)];
+  return a === b ? pts : Number(BigInt(Math.max(0, pts)) * BigInt(b) / BigInt(a));
+}
+/* засчитано клану: очки режима в очках базового цикла */
+const counted = (D, mode, pts, c) => toCycle(D, mode, pts, c, D.norm.base);
+/* клановая сумма в очках цикла to: members — [{ c, pts }], каждый — в пересчёте из своего цикла */
+const clanSum = (D, mode, members, to) => members.reduce((a, m) => a + toCycle(D, mode, m.pts || 0, m.c, to), 0);
+
 /* ---------- клановый босс (§25) ---------- */
-/* сила врагов круга: 12 + уровень, × xBp за круг — «статы элит и КБ × X» (§25.2, главная ручка режима) */
-function circlePow(D, k) { const C = D.boss.circle; let v = C.pow1; for (let i = 1; i < k; i++) v = fl(v * C.xBp, D.bp); return v; }
-const circleLvl = (D, k) => circlePow(D, k) - D.boss.circle.lvlDiv;
+/* сила врагов круга: 12 + уровень, × xBp за круг — «статы элит и КБ × X» (§25.2, главная ручка режима). c — цикл атакующего:
+   круг 1 его копии — byCyc[c] (сила базового круга × норма цикла c / норма базового цикла); без цикла — базовый */
+function circlePow(D, k, c) { const C = D.boss.circle; let v = c && C.byCyc ? C.byCyc[cycOf(D, c)] : C.pow1; for (let i = 1; i < k; i++) v = fl(v * C.xBp, D.bp); return v; }
+const circleLvl = (D, k, c) => circlePow(D, k, c) - D.boss.circle.lvlDiv;
+/* общий счёт цели — доля её здоровья, D.boss.bar частей. Копия цикла c с максимумом maxHp входит в атаку с остатком hpIn; после боя
+   доля left' такова, что жива копия — жива и цель, пала копия — пала цель. Целые, произведения — BigInt */
+const B_ = x => BigInt(Math.max(0, x));
+const ceilDiv = (a, b) => (a + b - 1n) / b;
+function hpIn(D, left, maxHp) { return left <= 0 ? 0 : Number(ceilDiv(B_(maxHp) * B_(left), B_(D.boss.bar))); }
+function leftAfter(D, left, maxHp, hpOut) {
+  if (hpOut <= 0 || left <= 0) return 0;
+  const v = Number(ceilDiv(B_(hpOut) * B_(D.boss.bar), B_(Math.max(1, maxHp))));
+  return Math.min(left, Math.max(1, v));
+}
+/* сколько долей сняла атака: остаток до боя минус остаток после */
+const shareOff = (D, left, maxHp, hpOut) => left - leftAfter(D, left, maxHp, hpOut);
 /* очки врага круга: элита платит меньше КБ, очки растут с кругом (§25.3) */
 function points(D, k, g) { const P = D.boss.points; let v = g === 'b' ? P.boss : P.elite; for (let i = 1; i < k; i++) v = fl(v * P.yBp, D.bp); return v; }
 /* ---------- сонмы стихий (слово автора 29.09.2026; данные — D.boss.host из tools/content-gen/clan/foes.js) ----------
@@ -116,10 +148,11 @@ function kit(D, g, el) {
 }
 /* Хозяин недели расы (§25.4 — таблица контента): { el, civ, why } — стихия, цивилизация Эхо недели и почему он встаёт */
 const bossOf = (D, race) => D.boss.weeks[race] || D.boss.weeks[Object.keys(D.boss.weeks)[0]];
-/* карта цели для ядра: o — { g: 'e' | 'b', uid, el, k — круг, name }; Голос или Хозяин стихии el; раса — сонмов; здоровье — maxHp ядра */
+/* карта цели для ядра: o — { g: 'e' | 'b', uid, el, k — круг, c — цикл атакующего, name }; Голос или Хозяин стихии el; раса — сонмов;
+   сила — копия круга k в цикле c (ADR-0042); здоровье — maxHp ядра этой копии */
 function card(D, o) {
   const B = D.boss, g = o.g, role = leadRole(g), f = fig(D, o.el, role);
-  const src = { key: 'клан:' + o.uid + '#0', id: 'клан:' + o.uid, name: o.name || (f ? f.n : ''), cls: HO(D).roles[role].cls, el: o.el, lvl: circleLvl(D, o.k),
+  const src = { key: 'клан:' + o.uid + '#0', id: 'клан:' + o.uid, name: o.name || (f ? f.n : ''), cls: HO(D).roles[role].cls, el: o.el, lvl: circleLvl(D, o.k, o.c),
     st: HO(D).tpl[role].slice(), hpPct: B.hp[g], rank: g === 'b' ? B.rank.b.core : B.rank.e.core, race: HO(D).race, fig: f ? f.id : '', kit: kit(D, g, o.el) };
   src.maxHp = EB().foeMaxHp(src);
   return src;
@@ -219,5 +252,6 @@ function bm(D, u) {
 function cardBm(D, src) { const b = EB().create({ mode: 'rounds', seed: 1, heroes: [], foes: [src] }); return bm(D, b.u[1][0]); }
 
 root.EnClan = { iroot, need, capacity, milestones, attacksDay, walletCap, elitePool, resSpeedBp, picked, bonus, fxSum, rounds, clsOf, edge, fightMods, heroDmg, heroHp,
+  cycOf, toCycle, counted, clanSum, hpIn, leftAfter, shareOff,
   circlePow, circleLvl, points, fig, roll, kit, bossOf, card, retinue, battle, share, payout, tier, stepsOf, rOf, pool, halves, contrib, serverSplit, bm, cardBm };
 })(typeof window !== 'undefined' ? window : globalThis);

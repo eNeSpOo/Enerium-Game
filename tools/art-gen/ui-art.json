@@ -2754,34 +2754,6 @@
         540
       ]
     },
-    "shell/edge.png": {
-      "from": "sh-strip/sh-edge__nb2.strip.png",
-      "size": [
-        722,
-        84
-      ]
-    },
-    "shell/edge-v.png": {
-      "from": "sh-strip/sh-edge__nb2.strip.v.png",
-      "size": [
-        84,
-        722
-      ]
-    },
-    "shell/knot.png": {
-      "from": "sh-parts/sh-parts__nb2-knot.png",
-      "size": [
-        96,
-        98
-      ]
-    },
-    "shell/frame.png": {
-      "from": "sh-parts/sh-parts__nb2-frame.png",
-      "size": [
-        128,
-        128
-      ]
-    },
     "shell/diamond.png": {
       "from": "sh-parts/sh-parts__nb2-diamond.png",
       "size": [
@@ -3811,6 +3783,1995 @@
       "size": [
         240,
         341
+      ]
+    },
+    "chests/talisman/r1-body.webp": {
+      "from": "chest-sheet/chs-talisman/r1.body.png",
+      "size": [
+        959,
+        421
+      ]
+    },
+    "chests/talisman/r1-lid.webp": {
+      "from": "chest-sheet/chs-talisman/r1.lid.png",
+      "size": [
+        960,
+        355
+      ]
+    },
+    "chests/talisman/r1.webp": {
+      "from": "chest-sheet/chs-talisman/r1.png",
+      "size": [
+        256,
+        206
+      ]
+    },
+    "chests/talisman/r2-body.webp": {
+      "from": "chest-sheet/chs-talisman/r2.body.png",
+      "size": [
+        956,
+        419
+      ]
+    },
+    "chests/talisman/r2-lid.webp": {
+      "from": "chest-sheet/chs-talisman/r2.lid.png",
+      "size": [
+        960,
+        356
+      ]
+    },
+    "chests/talisman/r2.webp": {
+      "from": "chest-sheet/chs-talisman/r2.png",
+      "size": [
+        256,
+        206
+      ]
+    },
+    "chests/talisman/r3-body.webp": {
+      "from": "chest-sheet/chs-talisman/r3.body.png",
+      "size": [
+        960,
+        419
+      ]
+    },
+    "chests/talisman/r3-lid.webp": {
+      "from": "chest-sheet/chs-talisman/r3.lid.png",
+      "size": [
+        959,
+        354
+      ]
+    },
+    "chests/talisman/r3.webp": {
+      "from": "chest-sheet/chs-talisman/r3.png",
+      "size": [
+        256,
+        205
+      ]
+    },
+    "chests/talisman/r4-body.webp": {
+      "from": "chest-sheet/chs-talisman/r4.body.png",
+      "size": [
+        955,
+        418
+      ]
+    },
+    "chests/talisman/r4-lid.webp": {
+      "from": "chest-sheet/chs-talisman/r4.lid.png",
+      "size": [
+        960,
+        357
+      ]
+    },
+    "chests/talisman/r4.webp": {
+      "from": "chest-sheet/chs-talisman/r4.png",
+      "size": [
+        256,
+        206
+      ]
+    },
+    "chests/talisman/r5-body.webp": {
+      "from": "chest-sheet/chs-talisman/r5.body.png",
+      "size": [
+        959,
+        414
+      ]
+    },
+    "chests/talisman/r5-lid.webp": {
+      "from": "chest-sheet/chs-talisman/r5.lid.png",
+      "size": [
+        960,
+        358
+      ]
+    },
+    "chests/talisman/r5.webp": {
+      "from": "chest-sheet/chs-talisman/r5.png",
+      "size": [
+        256,
+        205
+      ]
+    },
+    "chests/talisman/r6-body.webp": {
+      "from": "chest-sheet/chs-talisman/r6.body.png",
+      "size": [
+        959,
+        414
+      ]
+    },
+    "chests/talisman/r6-lid.webp": {
+      "from": "chest-sheet/chs-talisman/r6.lid.png",
+      "size": [
+        960,
+        358
+      ]
+    },
+    "chests/talisman/r6.webp": {
+      "from": "chest-sheet/chs-talisman/r6.png",
+      "size": [
+        256,
+        205
+      ]
+    },
+    "chests/talisman/r7-body.webp": {
+      "from": "chest-sheet/chs-talisman/r7.body.png",
+      "size": [
+        956,
+        412
+      ]
+    },
+    "chests/talisman/r7-lid.webp": {
+      "from": "chest-sheet/chs-talisman/r7.lid.png",
+      "size": [
+        960,
+        361
+      ]
+    },
+    "chests/talisman/r7.webp": {
+      "from": "chest-sheet/chs-talisman/r7.png",
+      "size": [
+        256,
+        206
+      ]
+    },
+    "chests/talisman/lock.webp": {
+      "from": "chest-sheet/chs-talisman/lock.png",
+      "size": [
+        240,
+        340
+      ]
+    },
+    "chests/craft/r1-body.webp": {
+      "from": "chest-sheet/chs-craft/r1.body.png",
+      "size": [
+        955,
+        379
+      ]
+    },
+    "chests/craft/r1-lid.webp": {
+      "from": "chest-sheet/chs-craft/r1.lid.png",
+      "size": [
+        959,
+        335
+      ]
+    },
+    "chests/craft/r1.webp": {
+      "from": "chest-sheet/chs-craft/r1.png",
+      "size": [
+        256,
+        190
+      ]
+    },
+    "chests/craft/r2-body.webp": {
+      "from": "chest-sheet/chs-craft/r2.body.png",
+      "size": [
+        960,
+        388
+      ]
+    },
+    "chests/craft/r2-lid.webp": {
+      "from": "chest-sheet/chs-craft/r2.lid.png",
+      "size": [
+        959,
+        344
+      ]
+    },
+    "chests/craft/r2.webp": {
+      "from": "chest-sheet/chs-craft/r2.png",
+      "size": [
+        256,
+        194
+      ]
+    },
+    "chests/craft/r3-body.webp": {
+      "from": "chest-sheet/chs-craft/r3.body.png",
+      "size": [
+        957,
+        389
+      ]
+    },
+    "chests/craft/r3-lid.webp": {
+      "from": "chest-sheet/chs-craft/r3.lid.png",
+      "size": [
+        959,
+        344
+      ]
+    },
+    "chests/craft/r3.webp": {
+      "from": "chest-sheet/chs-craft/r3.png",
+      "size": [
+        256,
+        195
+      ]
+    },
+    "chests/craft/r4-body.webp": {
+      "from": "chest-sheet/chs-craft/r4.body.png",
+      "size": [
+        955,
+        387
+      ]
+    },
+    "chests/craft/r4-lid.webp": {
+      "from": "chest-sheet/chs-craft/r4.lid.png",
+      "size": [
+        960,
+        345
+      ]
+    },
+    "chests/craft/r4.webp": {
+      "from": "chest-sheet/chs-craft/r4.png",
+      "size": [
+        256,
+        194
+      ]
+    },
+    "chests/craft/r5-body.webp": {
+      "from": "chest-sheet/chs-craft/r5.body.png",
+      "size": [
+        951,
+        394
+      ]
+    },
+    "chests/craft/r5-lid.webp": {
+      "from": "chest-sheet/chs-craft/r5.lid.png",
+      "size": [
+        960,
+        349
+      ]
+    },
+    "chests/craft/r5.webp": {
+      "from": "chest-sheet/chs-craft/r5.png",
+      "size": [
+        256,
+        197
+      ]
+    },
+    "chests/craft/r6-body.webp": {
+      "from": "chest-sheet/chs-craft/r6.body.png",
+      "size": [
+        957,
+        401
+      ]
+    },
+    "chests/craft/r6-lid.webp": {
+      "from": "chest-sheet/chs-craft/r6.lid.png",
+      "size": [
+        960,
+        342
+      ]
+    },
+    "chests/craft/r6.webp": {
+      "from": "chest-sheet/chs-craft/r6.png",
+      "size": [
+        256,
+        198
+      ]
+    },
+    "chests/craft/r7-body.webp": {
+      "from": "chest-sheet/chs-craft/r7.body.png",
+      "size": [
+        954,
+        397
+      ]
+    },
+    "chests/craft/r7-lid.webp": {
+      "from": "chest-sheet/chs-craft/r7.lid.png",
+      "size": [
+        960,
+        353
+      ]
+    },
+    "chests/craft/r7.webp": {
+      "from": "chest-sheet/chs-craft/r7.png",
+      "size": [
+        256,
+        199
+      ]
+    },
+    "chests/craft/lock.webp": {
+      "from": "chest-sheet/chs-craft/lock.png",
+      "size": [
+        240,
+        335
+      ]
+    },
+    "shell/ico-bell.png": {
+      "from": "sd-sheet/sd-glyphs__nb2-bell.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 100
+    },
+    "shell/ico-gift.png": {
+      "from": "sd-sheet/sd-glyphs__nb2-gift.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 100
+    },
+    "shell/ico-pass.png": {
+      "from": "sd-sheet/sd-glyphs__nb2-pass.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 100
+    },
+    "shell/ico-chat.png": {
+      "from": "sd-sheet/sd-glyphs__nb2-chat.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 100
+    },
+    "shell/ico-lock.png": {
+      "from": "sd-sheet/sd-glyphs__nb2-lock.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 100
+    },
+    "shell/ico-best.png": {
+      "from": "sd-sheet/sd-glyphs__nb2-best.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 100
+    },
+    "shell/ico-floors.png": {
+      "from": "sd-sheet/sd-glyphs__nb2-floors.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 100
+    },
+    "shell/ico-boss.png": {
+      "from": "sd-sheet/sd-glyphs__nb2-boss.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 100
+    },
+    "shell/ico-guard.png": {
+      "from": "sd-sheet/sd-glyphs__nb2-guard.png",
+      "size": [
+        128,
+        128
+      ],
+      "fit": 100
+    },
+    "bframes-sq/hero.png": {
+      "from": "battle-frames-square/bfs-hero__nb2.body.png",
+      "size": [
+        200,
+        208
+      ]
+    },
+    "bframes-sq/hero-crest.png": {
+      "from": "battle-frames-square/bfs-hero__nb2.crest.png",
+      "size": [
+        640,
+        70
+      ]
+    },
+    "bframes-sq/hero-full.png": {
+      "from": "battle-frames-square/bfs-hero__nb2.bf.png",
+      "size": [
+        320,
+        320
+      ]
+    },
+    "bframes-sq/o.png": {
+      "from": "battle-frames-square/bfs-o__nb2.body.png",
+      "size": [
+        200,
+        191
+      ]
+    },
+    "bframes-sq/o-crest.png": {
+      "from": "battle-frames-square/bfs-o__nb2.crest.png",
+      "size": [
+        640,
+        62
+      ]
+    },
+    "bframes-sq/o-full.png": {
+      "from": "battle-frames-square/bfs-o__nb2.bf.png",
+      "size": [
+        320,
+        317
+      ]
+    },
+    "bframes-sq/e.png": {
+      "from": "battle-frames-square/bfs-e__nb2.body.png",
+      "size": [
+        200,
+        216
+      ]
+    },
+    "bframes-sq/e-crest.png": {
+      "from": "battle-frames-square/bfs-e__nb2.crest.png",
+      "size": [
+        414,
+        72
+      ]
+    },
+    "bframes-sq/e-full.png": {
+      "from": "battle-frames-square/bfs-e__nb2.bf.png",
+      "size": [
+        320,
+        339
+      ]
+    },
+    "bframes-sq/b.png": {
+      "from": "battle-frames-square/bfs-b__nb2.body.png",
+      "size": [
+        200,
+        224
+      ]
+    },
+    "bframes-sq/b-crest.png": {
+      "from": "battle-frames-square/bfs-b__nb2.crest.png",
+      "size": [
+        317,
+        72
+      ]
+    },
+    "bframes-sq/b-full.png": {
+      "from": "battle-frames-square/bfs-b__nb2.bf.png",
+      "size": [
+        320,
+        321
+      ]
+    },
+    "bframes-sq/echo.png": {
+      "from": "battle-frames-square/bfs-echo__nb2.body.png",
+      "size": [
+        200,
+        210
+      ]
+    },
+    "bframes-sq/echo-crest.png": {
+      "from": "battle-frames-square/bfs-echo__nb2.crest.png",
+      "size": [
+        317,
+        72
+      ]
+    },
+    "bframes-sq/echo-full.png": {
+      "from": "battle-frames-square/bfs-echo__nb2.bf.png",
+      "size": [
+        320,
+        357
+      ]
+    },
+    "bframes-sq/voice.png": {
+      "from": "battle-frames-square/bfs-voice__nb2.body.png",
+      "size": [
+        200,
+        206
+      ]
+    },
+    "bframes-sq/voice-crest.png": {
+      "from": "battle-frames-square/bfs-voice__nb2.crest.png",
+      "size": [
+        378,
+        72
+      ]
+    },
+    "bframes-sq/voice-full.png": {
+      "from": "battle-frames-square/bfs-voice__nb2.bf.png",
+      "size": [
+        320,
+        352
+      ]
+    },
+    "bframes-sq/rune.png": {
+      "from": "battle-frames-square/bfs-rune-v2__nb2.body.png",
+      "size": [
+        200,
+        200
+      ]
+    },
+    "bframes-sq/rune-crest.png": {
+      "from": "battle-frames-square/bfs-rune-v2__nb2.crest.png",
+      "size": [
+        372,
+        72
+      ]
+    },
+    "bframes-sq/rune-full.png": {
+      "from": "battle-frames-square/bfs-rune-v2__nb2.bf.png",
+      "size": [
+        320,
+        325
+      ]
+    },
+    "bframes-sq/uber.png": {
+      "from": "battle-frames-square/bfs-uber__nb2.body.png",
+      "size": [
+        200,
+        218
+      ]
+    },
+    "bframes-sq/uber-crest.png": {
+      "from": "battle-frames-square/bfs-uber__nb2.crest.png",
+      "size": [
+        272,
+        72
+      ]
+    },
+    "bframes-sq/uber-full.png": {
+      "from": "battle-frames-square/bfs-uber__nb2.bf.png",
+      "size": [
+        320,
+        339
+      ]
+    },
+    "bframes-sq/host.png": {
+      "from": "battle-frames-square/bfs-host__nb2.body.png",
+      "size": [
+        200,
+        240
+      ]
+    },
+    "bframes-sq/host-crest.png": {
+      "from": "battle-frames-square/bfs-host__nb2.crest.png",
+      "size": [
+        222,
+        72
+      ]
+    },
+    "bframes-sq/host-full.png": {
+      "from": "battle-frames-square/bfs-host__nb2.bf.png",
+      "size": [
+        320,
+        361
+      ]
+    },
+    "bframes-sq/forgotten.png": {
+      "from": "battle-frames-square/bfs-forgotten__nb2.body.png",
+      "size": [
+        200,
+        243
+      ]
+    },
+    "bframes-sq/forgotten-crest.png": {
+      "from": "battle-frames-square/bfs-forgotten__nb2.crest.png",
+      "size": [
+        298,
+        72
+      ]
+    },
+    "bframes-sq/forgotten-full.png": {
+      "from": "battle-frames-square/bfs-forgotten__nb2.bf.png",
+      "size": [
+        320,
+        320
+      ]
+    },
+    "bframes-sq/many.png": {
+      "from": "battle-frames-square/bfs-many__nb2.body.png",
+      "size": [
+        200,
+        188
+      ]
+    },
+    "bframes-sq/many-crest.png": {
+      "from": "battle-frames-square/bfs-many__nb2.crest.png",
+      "size": [
+        440,
+        72
+      ]
+    },
+    "bframes-sq/many-full.png": {
+      "from": "battle-frames-square/bfs-many__nb2.bf.png",
+      "size": [
+        320,
+        327
+      ]
+    },
+    "st/st-fire-dot.webp": {
+      "from": "battle-status/st-sheet-1/st-fire-dot.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-fire-hot.webp": {
+      "from": "battle-status/st-sheet-1/st-fire-hot.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-fire-ctrl.webp": {
+      "from": "battle-status/st-sheet-1/st-fire-ctrl.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-fire-debuff.webp": {
+      "from": "battle-status/st-sheet-1/st-fire-debuff.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-fire-buff.webp": {
+      "from": "battle-status/st-sheet-1/st-fire-buff.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-shield.webp": {
+      "from": "battle-status/st-sheet-1/st-shield.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-earth-dot.webp": {
+      "from": "battle-status/st-sheet-1/st-earth-dot.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-earth-hot.webp": {
+      "from": "battle-status/st-sheet-1/st-earth-hot.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-earth-ctrl.webp": {
+      "from": "battle-status/st-sheet-1/st-earth-ctrl.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-earth-debuff.webp": {
+      "from": "battle-status/st-sheet-1/st-earth-debuff.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-earth-buff.webp": {
+      "from": "battle-status/st-sheet-1/st-earth-buff.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-iceblock.webp": {
+      "from": "battle-status/st-sheet-1/st-iceblock.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-air-dot.webp": {
+      "from": "battle-status/st-sheet-1/st-air-dot.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-air-hot.webp": {
+      "from": "battle-status/st-sheet-1/st-air-hot.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-air-ctrl.webp": {
+      "from": "battle-status/st-sheet-1/st-air-ctrl.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-air-debuff.webp": {
+      "from": "battle-status/st-sheet-1/st-air-debuff.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-air-buff.webp": {
+      "from": "battle-status/st-sheet-1/st-air-buff.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-immune.webp": {
+      "from": "battle-status/st-sheet-1/st-immune.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-dark-dot.webp": {
+      "from": "battle-status/st-sheet-1/st-dark-dot.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-dark-hot.webp": {
+      "from": "battle-status/st-sheet-1/st-dark-hot.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-dark-ctrl.webp": {
+      "from": "battle-status/st-sheet-1/st-dark-ctrl.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-dark-debuff.webp": {
+      "from": "battle-status/st-sheet-1/st-dark-debuff.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-dark-buff.webp": {
+      "from": "battle-status/st-sheet-1/st-dark-buff.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-taunt.webp": {
+      "from": "battle-status/st-sheet-1/st-taunt.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-water-dot.webp": {
+      "from": "battle-status/st-sheet-2/st-water-dot.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-water-hot.webp": {
+      "from": "battle-status/st-sheet-2/st-water-hot.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-water-ctrl.webp": {
+      "from": "battle-status/st-sheet-2/st-water-ctrl.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-water-debuff.webp": {
+      "from": "battle-status/st-sheet-2/st-water-debuff.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-water-buff.webp": {
+      "from": "battle-status/st-sheet-2/st-water-buff.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-doom.webp": {
+      "from": "battle-status/st-sheet-2/st-doom.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-light-dot.webp": {
+      "from": "battle-status/st-sheet-2/st-light-dot.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-light-hot.webp": {
+      "from": "battle-status/st-sheet-2/st-light-hot.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-light-ctrl.webp": {
+      "from": "battle-status/st-sheet-2/st-light-ctrl.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-light-debuff.webp": {
+      "from": "battle-status/st-sheet-2/st-light-debuff.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-light-buff.webp": {
+      "from": "battle-status/st-sheet-2/st-light-buff.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-nameless.webp": {
+      "from": "battle-status/st-sheet-2/st-nameless.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-time-dot.webp": {
+      "from": "battle-status/st-fix-time-dot/st-time-dot.webp",
+      "crop": [
+        90,
+        90,
+        814,
+        814
+      ],
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-time-hot.webp": {
+      "from": "battle-status/st-sheet-2/st-time-hot.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-time-ctrl.webp": {
+      "from": "battle-status/st-sheet-2/st-time-ctrl.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-time-debuff.webp": {
+      "from": "battle-status/st-sheet-2/st-time-debuff.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-time-buff.webp": {
+      "from": "battle-status/st-sheet-2/st-time-buff.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-trophy.webp": {
+      "from": "battle-status/st-sheet-2/st-trophy.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-steel-dot.webp": {
+      "from": "battle-status/st-sheet-2/st-steel-dot.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-steel-hot.webp": {
+      "from": "battle-status/st-sheet-2/st-steel-hot.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-steel-ctrl.webp": {
+      "from": "battle-status/st-sheet-2/st-steel-ctrl.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-steel-debuff.webp": {
+      "from": "battle-status/st-sheet-2/st-steel-debuff.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-steel-buff.webp": {
+      "from": "battle-status/st-sheet-2/st-steel-buff.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "st/st-greed.webp": {
+      "from": "battle-status/st-sheet-2/st-greed.webp",
+      "size": [
+        128,
+        128
+      ]
+    },
+    "vfx/slash.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-slash.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/slash2.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-slash2.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/flare.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-flare.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/sparks.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-sparks.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/crit.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-crit.png",
+      "size": [
+        288,
+        288
+      ]
+    },
+    "vfx/ring.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-ring.png",
+      "size": [
+        288,
+        288
+      ]
+    },
+    "vfx/orb.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-orb.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/rays.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-rays.png",
+      "size": [
+        320,
+        320
+      ]
+    },
+    "vfx/halo.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-halo.png",
+      "size": [
+        320,
+        320
+      ]
+    },
+    "vfx/hex.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-hex.png",
+      "size": [
+        288,
+        288
+      ]
+    },
+    "vfx/buff.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-buff.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/heal.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-heal.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/dome.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-dome.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/shards.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-shards.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/stun.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-stun.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/ice.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-ice.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/sand.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-sand.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/seal.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-seal.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/roar.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-roar.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/whoosh.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-whoosh.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/soul.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-soul.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/dust.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-dust.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/drain.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-drain.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/chain.webp": {
+      "from": "battle-vfx/vfx-core/sprites/vx-chain.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/proj-fire.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-proj-fire.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/proj-earth.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-proj-earth.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/proj-air.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-proj-air.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/proj-dark.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-proj-dark.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/proj-water.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-proj-water.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/proj-light.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-proj-light.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/proj-time.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-proj-time.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/proj-steel.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-proj-steel.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/hit-fire.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-hit-fire.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/hit-earth.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-hit-earth.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/hit-air.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-hit-air.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/hit-dark.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-hit-dark.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/hit-water.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-hit-water.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/hit-light.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-hit-light.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/hit-time.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-hit-time.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/hit-steel.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-hit-steel.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/tick-fire.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-tick-fire.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/tick-earth.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-tick-earth.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/tick-air.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-tick-air.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/tick-dark.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-tick-dark.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/tick-water.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-tick-water.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/tick-light.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-tick-light.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/tick-time.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-tick-time.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/tick-steel.webp": {
+      "from": "battle-vfx/vfx-school/sprites/vx-tick-steel.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "vfx/boom-strip.webp": {
+      "from": "battle-vfx-flip/vfx-flip/strips/vx-boom.png",
+      "size": [
+        1344,
+        192
+      ]
+    },
+    "vfx/burst-strip.webp": {
+      "from": "battle-vfx-flip/vfx-flip/strips/vx-burst.png",
+      "size": [
+        1344,
+        192
+      ]
+    },
+    "vfx/puff-strip.webp": {
+      "from": "battle-vfx-flip/vfx-flip/strips/vx-puff.png",
+      "size": [
+        1344,
+        192
+      ]
+    },
+    "bhud/round.png": {
+      "from": "battle-hud/bh-round__nb2.png",
+      "size": [
+        192,
+        202
+      ]
+    },
+    "bhud/plaque.png": {
+      "from": "battle-hud/bh-plaque__nb2.png",
+      "size": [
+        900,
+        161
+      ]
+    },
+    "bhud/victory.webp": {
+      "from": "battle-hud/bh-victory__nb2.png",
+      "size": [
+        960,
+        410
+      ]
+    },
+    "bhud/defeat.webp": {
+      "from": "battle-hud/bh-defeat__nb2.png",
+      "size": [
+        960,
+        493
+      ]
+    },
+    "bhud/panel.png": {
+      "from": "battle-hud/bh-panel__nb2.clean.png",
+      "size": [
+        1071,
+        652
+      ]
+    },
+    "start/medal.webp": {
+      "from": "lv-medal/lv-medal__nb2.png",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "start/burst.webp": {
+      "from": "lv-fx/lv-burst__nb2.anchor.png",
+      "size": [
+        512,
+        512
+      ]
+    },
+    "start/frame.webp": {
+      "from": "lv-frame/lv-frame__nb2.png",
+      "size": [
+        1272,
+        675
+      ]
+    },
+    "start/open-hire.webp": {
+      "from": "lv-icons/lv-opens/open-hire.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "start/open-descent.webp": {
+      "from": "lv-icons/lv-opens/open-descent.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "start/open-dev.webp": {
+      "from": "lv-icons/lv-opens/open-dev.fix.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "start/open-slot.webp": {
+      "from": "lv-icons/lv-opens/open-slot.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "start/open-stock.webp": {
+      "from": "lv-icons/lv-opens/open-stock.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "start/open-shop.webp": {
+      "from": "lv-icons/lv-opens/open-shop.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "start/open-guard.webp": {
+      "from": "lv-icons/lv-opens/open-guard.fix.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "start/open-b2.webp": {
+      "from": "lv-icons/lv-opens/open-b2.fix.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "start/open-craft.webp": {
+      "from": "lv-icons/lv-opens/open-craft.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "start/open-valor.webp": {
+      "from": "lv-icons/lv-opens/open-valor.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "start/open-artifacts.webp": {
+      "from": "lv-icons/lv-opens/open-artifacts.fix.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "start/open-limit.webp": {
+      "from": "lv-icons/lv-opens/open-limit.fix.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "start/open-cycle2.webp": {
+      "from": "lv-icons/lv-opens/open-cycle2.fix.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "start/open-echo.webp": {
+      "from": "lv-icons/lv-opens/open-echo.fix.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "start/open-week.webp": {
+      "from": "lv-icons/lv-opens/open-week.fix.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "start/open-souls.webp": {
+      "from": "lv-icons/lv-opens/open-souls.fix.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "start/open-market.webp": {
+      "from": "lv-icons/lv-opens/open-market.fix.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "start/open-memory.webp": {
+      "from": "lv-icons/lv-opens/open-memory.fix.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "start/open-lock.webp": {
+      "from": "lv-icons/lv-opens/open-lock.fix.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "start/open-xp.webp": {
+      "from": "lv-icons/lv-opens/open-xp.fix.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "bab/basic-melee.webp": {
+      "from": "battle-ability-icons/bab-sheet/basic-melee.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "bab/basic-arrow.webp": {
+      "from": "battle-ability-icons/bab-sheet/basic-arrow.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "bab/basic-magic.webp": {
+      "from": "battle-ability-icons/bab-sheet/basic-magic.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "bab/basic-all.webp": {
+      "from": "battle-ability-icons/bab-sheet/basic-all.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "bab/basic-rune.webp": {
+      "from": "battle-ability-icons/bab-sheet/basic-rune.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "bab/none-revive-one.webp": {
+      "from": "battle-ability-icons/bab-sheet/none-revive-one.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-people-act1.webp": {
+      "from": "ability-icons-unique/abu-uber-1/echo-people-act1.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-people-act2.webp": {
+      "from": "ability-icons-unique/abu-uber-1/echo-people-act2.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-people-pas.webp": {
+      "from": "ability-icons-unique/abu-uber-1/echo-people-pas.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-people-ult1.webp": {
+      "from": "ability-icons-unique/abu-uber-1/echo-people-ult1.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-people-ult2.webp": {
+      "from": "ability-icons-unique/abu-uber-1/echo-people-ult2.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-dwarfs-act1.webp": {
+      "from": "ability-icons-unique/abu-uber-1/echo-dwarfs-act1.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-dwarfs-act2.webp": {
+      "from": "ability-icons-unique/abu-uber-1/echo-dwarfs-act2.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-dwarfs-react.webp": {
+      "from": "ability-icons-unique/abu-uber-1/echo-dwarfs-react.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-dwarfs-ult1.webp": {
+      "from": "ability-icons-unique/abu-uber-1/echo-dwarfs-ult1.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-dwarfs-ult2.webp": {
+      "from": "ability-icons-unique/abu-uber-1/echo-dwarfs-ult2.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-elves-act.webp": {
+      "from": "ability-icons-unique/abu-uber-1/echo-elves-act.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-elves-pas.webp": {
+      "from": "ability-icons-unique/abu-uber-1/echo-elves-pas.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-elves-react.webp": {
+      "from": "ability-icons-unique/abu-uber-1/echo-elves-react.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-elves-ult1.webp": {
+      "from": "ability-icons-unique/abu-uber-1/echo-elves-ult1.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-elves-ult2.webp": {
+      "from": "ability-icons-unique/abu-uber-1/echo-elves-ult2.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-beasts-act1.webp": {
+      "from": "ability-icons-unique/abu-uber-1/echo-beasts-act1.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-beasts-act2.webp": {
+      "from": "ability-icons-unique/abu-uber-1/echo-beasts-act2.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-beasts-react.webp": {
+      "from": "ability-icons-unique/abu-uber-1/echo-beasts-react.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-beasts-ult1.webp": {
+      "from": "ability-icons-unique/abu-uber-1/echo-beasts-ult1.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-beasts-ult2.webp": {
+      "from": "ability-icons-unique/abu-uber-1/echo-beasts-ult2.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-sagans-act.webp": {
+      "from": "ability-icons-unique/abu-uber-2/echo-sagans-act.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-sagans-pas.webp": {
+      "from": "ability-icons-unique/abu-uber-2/echo-sagans-pas.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-sagans-react.webp": {
+      "from": "ability-icons-unique/abu-uber-2/echo-sagans-react.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-sagans-ult1.webp": {
+      "from": "ability-icons-unique/abu-uber-2/echo-sagans-ult1.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-sagans-ult2.webp": {
+      "from": "ability-icons-unique/abu-uber-2/echo-sagans-ult2.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-machines-act.webp": {
+      "from": "ability-icons-unique/abu-uber-2/echo-machines-act.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-machines-pas1.webp": {
+      "from": "ability-icons-unique/abu-uber-2/echo-machines-pas1.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-machines-pas2.webp": {
+      "from": "ability-icons-unique/abu-uber-2/echo-machines-pas2.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-machines-ult1.webp": {
+      "from": "ability-icons-unique/abu-uber-2/echo-machines-ult1.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-machines-ult2.webp": {
+      "from": "ability-icons-unique/abu-uber-2/echo-machines-ult2.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-twisted-act1.webp": {
+      "from": "ability-icons-unique/abu-uber-2/echo-twisted-act1.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-twisted-act2.webp": {
+      "from": "ability-icons-unique/abu-uber-2/echo-twisted-act2.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-twisted-react.webp": {
+      "from": "ability-icons-unique/abu-uber-2/echo-twisted-react.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-twisted-ult1.webp": {
+      "from": "ability-icons-unique/abu-uber-2/echo-twisted-ult1.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-twisted-ult2.webp": {
+      "from": "ability-icons-unique/abu-uber-2/echo-twisted-ult2.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-undead-act1.webp": {
+      "from": "ability-icons-unique/abu-uber-2/echo-undead-act1.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-undead-act2.webp": {
+      "from": "ability-icons-unique/abu-uber-2/echo-undead-act2.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-undead-react.webp": {
+      "from": "ability-icons-unique/abu-uber-2/echo-undead-react.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-undead-ult1.webp": {
+      "from": "ability-icons-unique/abu-uber-2/echo-undead-ult1.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-undead-ult2.webp": {
+      "from": "ability-icons-unique/abu-uber-2/echo-undead-ult2.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-forgotten-act1.webp": {
+      "from": "ability-icons-unique/abu-high/echo-forgotten-act1.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-forgotten-act2.webp": {
+      "from": "ability-icons-unique/abu-high/echo-forgotten-act2.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-forgotten-pas.webp": {
+      "from": "ability-icons-unique/abu-high/echo-forgotten-pas.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-forgotten-ult1.webp": {
+      "from": "ability-icons-unique/abu-high/echo-forgotten-ult1.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-forgotten-ult2.webp": {
+      "from": "ability-icons-unique/abu-high/echo-forgotten-ult2.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-many-act1.webp": {
+      "from": "ability-icons-unique/abu-high/echo-many-act1.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-many-act2.webp": {
+      "from": "ability-icons-unique/abu-high/echo-many-act2.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-many-pas.webp": {
+      "from": "ability-icons-unique/abu-high/echo-many-pas.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-many-react.webp": {
+      "from": "ability-icons-unique/abu-high/echo-many-react.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-many-ult1.webp": {
+      "from": "ability-icons-unique/abu-high/echo-many-ult1.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/echo-many-ult2.webp": {
+      "from": "ability-icons-unique/abu-high/echo-many-ult2.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/b2b1-pas.webp": {
+      "from": "ability-icons-unique/abu-high/b2b1-pas.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/b2b1-ult.webp": {
+      "from": "ability-icons-unique/abu-high/b2b1-ult.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/b2e2-act.webp": {
+      "from": "ability-icons-unique/abu-high/b2e2-act.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/b2e6-act.webp": {
+      "from": "ability-icons-unique/abu-high/b2e6-act.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/b3b1-pas.webp": {
+      "from": "ability-icons-unique/abu-high/b3b1-pas.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/b3b1-ult.webp": {
+      "from": "ability-icons-unique/abu-high/b3b1-ult.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/b3e6-act.webp": {
+      "from": "ability-icons-unique/abu-high/b3e6-act.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/b3e6-ctrl.webp": {
+      "from": "ability-icons-unique/abu-high/b3e6-ctrl.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/b3g1-act.webp": {
+      "from": "ability-icons-unique/abu-high/b3g1-act.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/b4b1-pas.webp": {
+      "from": "ability-icons-unique/abu-high/b4b1-pas.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/b4e6-act.webp": {
+      "from": "ability-icons-unique/abu-high/b4e6-act.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "abu/b4g1-act.webp": {
+      "from": "ability-icons-unique/abu-high/b4g1-act.webp",
+      "size": [
+        256,
+        256
       ]
     }
   }

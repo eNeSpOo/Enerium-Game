@@ -1,0 +1,334 @@
+{
+  "name": "Иконки уникальных способностей сеткой — всё, чего нет в библиотеке: Убер-боссы девяти недель, Забытый, Многоликий, боссы, элита и стражи биомов (ответ координатора 01.10.2026: «нарисуй иконки уникальных наборов… всё, где способность не из библиотеки»). Образец — spell-icons-none.json: style, negative, refs и рамка листа категории spell-icons — без правок, одна манера с библиотекой",
+  "plan": {
+    "Листы abu-uber-1, abu-uber-2": "5:4, 2K, сетка 5×4 — строка на Убер-босса: две активки, пассивка или реакция, две ульты",
+    "Лист abu-high": "3:2, 4K, сетка 6×4 — Забытый Чистый Камень, Многоликий, боссы, элита и стражи биомов 2–4; последняя клетка — запасная",
+    "Нарезка": "python tools/art-gen/grid_slice.py jobs/ability-icons-unique.json <id листа> <лист>",
+    "Выгрузка": "ui-art.json → design/ui/assets/art/abu/<имя>.webp 256 px; таблица id → путь — BS_ART.abUnique (design/ui/screens/battle-scene.js)"
+  },
+  "notes": [
+    "Опись — по настоящим боям всех режимов: биомы обоих вариантов, стражи, Эхо девяти недель по всем ступеням и Многоликий, призыв из рецептов, клан; 63 способности вне EN_ABILITIES",
+    "cells — [id способности ядра, имя файла] по строкам сверху, в строке слева направо; grid — [столбцы, строки]; spare — запасная клетка, не выгружается",
+    "Спойлеры (ADR-0038): иконка видна только у изученного врага; в промтах — образы, без имён и текстов игрока"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "ability-icons-unique": {
+      "aspect": "1:1",
+      "size": "2K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square ability icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the picture in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game puts its own frame on top: one clear central image with a bold silhouette that stays readable at 48 px, on a dark near-black stone background with faint cracks and a darker vignette toward the edges of the cell. Light rises from below in the color of the magic school; crisp rim light on the edges of the forms; a few sparks and dust motes in the light. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each icon differs clearly from its neighbours in shape and composition."
+    }
+  },
+  "jobs": [
+    {
+      "category": "ability-icons-unique",
+      "source": "design/ui/echo-foes.js, design/ui/biome-foes.js — способности ядра вне библиотеки",
+      "id": "abu-uber-1",
+      "title": "Убер-боссы недель: Люди, Дворфы, Эльфы, Звери — по пять способностей строкой",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "Эхо.Люди.act1",
+          "echo-people-act1"
+        ],
+        [
+          "Эхо.Люди.act2",
+          "echo-people-act2"
+        ],
+        [
+          "Эхо.Люди.pas",
+          "echo-people-pas"
+        ],
+        [
+          "Эхо.Люди.ult1",
+          "echo-people-ult1"
+        ],
+        [
+          "Эхо.Люди.ult2",
+          "echo-people-ult2"
+        ],
+        [
+          "Эхо.Дворфы.act1",
+          "echo-dwarfs-act1"
+        ],
+        [
+          "Эхо.Дворфы.act2",
+          "echo-dwarfs-act2"
+        ],
+        [
+          "Эхо.Дворфы.react",
+          "echo-dwarfs-react"
+        ],
+        [
+          "Эхо.Дворфы.ult1",
+          "echo-dwarfs-ult1"
+        ],
+        [
+          "Эхо.Дворфы.ult2",
+          "echo-dwarfs-ult2"
+        ],
+        [
+          "Эхо.Эльфы.act",
+          "echo-elves-act"
+        ],
+        [
+          "Эхо.Эльфы.pas",
+          "echo-elves-pas"
+        ],
+        [
+          "Эхо.Эльфы.react",
+          "echo-elves-react"
+        ],
+        [
+          "Эхо.Эльфы.ult1",
+          "echo-elves-ult1"
+        ],
+        [
+          "Эхо.Эльфы.ult2",
+          "echo-elves-ult2"
+        ],
+        [
+          "Эхо.Звери.act1",
+          "echo-beasts-act1"
+        ],
+        [
+          "Эхо.Звери.act2",
+          "echo-beasts-act2"
+        ],
+        [
+          "Эхо.Звери.react",
+          "echo-beasts-react"
+        ],
+        [
+          "Эхо.Звери.ult1",
+          "echo-beasts-ult1"
+        ],
+        [
+          "Эхо.Звери.ult2",
+          "echo-beasts-ult2"
+        ]
+      ],
+      "subject": "These are the skills of four great bosses, one boss per row; each row is lit in the color of its boss's magic. Time is green (#4FDC8B) with glowing sand and starlight; Fire is scarlet (#F0564A), amber and gold. Colors never spill from one cell to another. Every icon, even the widest, is built around one clear central object with a bold silhouette — never only smoke, dust, fog or a scattered pattern. Ultimate spells are the grandest, most epic images, bigger in scale, with bright highlights. Passive traits are calm, emblem-like single objects with no action. Reactions are one instant answer to an event in battle, one moment of action. Nothing anywhere looks like writing: no letters, no numbers, no runes, no tally marks, no rows of notches or dots.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons. In every row: two active skills, one passive trait or reaction, then two ultimate spells.\n\nRow 1 — the Named Night, Time, green starlight on a deep night-blue sky: a shower of falling green-white stars streaking down onto dark ground, each star trailing glowing sand; a single large cold star stretched into a long downward shard like a dagger, a faint green ring glowing on the ground under its point; a dark steel breastplate studded with small glowing star points joined by thin lines into a constellation; a vast night sky folding down over the land like a curtain, full of burning stars around a huge crescent moon; a wide ring of stars falling all at once toward a circle of dark ground, the brightest star at the top about to fall last.\n\nRow 2 — the Knot of All Valleys, Time, green light in old rope and iron: a thick rope tied into one heavy knot around an iron ring, green light seeping out of the knot; three old bronze coins bound together with a glowing green thread, their edges crumbling into sand; a fist striking a rope that instantly ties itself into a small tight knot around the wrist, green sparks at the touch; a colossal knot of ropes and chains pulling everything around it into its center, a whirl of green light; a massive iron seal-hammer slamming down onto stone, a ring of green sand bursting outward.\n\nRow 3 — the Last Day of the Circle, Time, green light in pale carved stone: a great carved stone wheel rolling forward, streaks of green light flying from its rim, dust thrown up; a carved stone wheel made of many segments, every segment glowing green except one dark empty gap; a stone wheel turning backwards, a spiral of green sand flowing back around it; a gigantic stone wheel eclipsing the sky, drawing pale streams of breath up from below into its hub; a stone wheel glowing warm gold-green from its hub, a full circle of soft light closing around it.\n\nRow 4 — the Golden Stag, Fire, scarlet flame and burnished gold: a great golden antler sweeping through flames, sparks flying from it; golden plaques hanging on a stag's antler, ringing out waves of warm amber light; a stag's hoof stamping down hard, a burst of embers rising around it; a stampede of fiery golden deer charging out of a wall of flame, dust and embers; a golden stag rearing up on its hind legs, its antlers blazing, above a burning steppe."
+    },
+    {
+      "category": "ability-icons-unique",
+      "source": "design/ui/echo-foes.js, design/ui/biome-foes.js — способности ядра вне библиотеки",
+      "id": "abu-uber-2",
+      "title": "Убер-боссы недель: Саганы, Аппараты, Искажённые, Нежить — по пять способностей строкой",
+      "aspect": "5:4",
+      "size": "2K",
+      "grid": [
+        5,
+        4
+      ],
+      "cells": [
+        [
+          "Эхо.Саганы.act",
+          "echo-sagans-act"
+        ],
+        [
+          "Эхо.Саганы.pas",
+          "echo-sagans-pas"
+        ],
+        [
+          "Эхо.Саганы.react",
+          "echo-sagans-react"
+        ],
+        [
+          "Эхо.Саганы.ult1",
+          "echo-sagans-ult1"
+        ],
+        [
+          "Эхо.Саганы.ult2",
+          "echo-sagans-ult2"
+        ],
+        [
+          "Эхо.Аппараты.act",
+          "echo-machines-act"
+        ],
+        [
+          "Эхо.Аппараты.pas1",
+          "echo-machines-pas1"
+        ],
+        [
+          "Эхо.Аппараты.pas2",
+          "echo-machines-pas2"
+        ],
+        [
+          "Эхо.Аппараты.ult1",
+          "echo-machines-ult1"
+        ],
+        [
+          "Эхо.Аппараты.ult2",
+          "echo-machines-ult2"
+        ],
+        [
+          "Эхо.Искажённые.act1",
+          "echo-twisted-act1"
+        ],
+        [
+          "Эхо.Искажённые.act2",
+          "echo-twisted-act2"
+        ],
+        [
+          "Эхо.Искажённые.react",
+          "echo-twisted-react"
+        ],
+        [
+          "Эхо.Искажённые.ult1",
+          "echo-twisted-ult1"
+        ],
+        [
+          "Эхо.Искажённые.ult2",
+          "echo-twisted-ult2"
+        ],
+        [
+          "Эхо.Нежить.act1",
+          "echo-undead-act1"
+        ],
+        [
+          "Эхо.Нежить.act2",
+          "echo-undead-act2"
+        ],
+        [
+          "Эхо.Нежить.react",
+          "echo-undead-react"
+        ],
+        [
+          "Эхо.Нежить.ult1",
+          "echo-undead-ult1"
+        ],
+        [
+          "Эхо.Нежить.ult2",
+          "echo-undead-ult2"
+        ]
+      ],
+      "subject": "These are the skills of four great bosses, one boss per row; each row is lit in the color of its boss's magic. Fire is scarlet (#F0564A), amber and gold; Time is green (#4FDC8B) with glowing sand; Earth is amber-orange (#EB9D40) with dry dust. Colors never spill from one cell to another. Every icon, even the widest, is built around one clear central object with a bold silhouette — never only smoke, dust, fog or a scattered pattern. Ultimate spells are the grandest, most epic images, bigger in scale, with bright highlights. Passive traits are calm, emblem-like single objects with no action. Reactions are one instant answer to an event in battle, one moment of action. Nothing anywhere looks like writing: no letters, no numbers, no runes, no tally marks, no rows of notches or dots.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons. In every row: one or two active skills, passive traits or reactions, then two ultimate spells, in the order listed.\n\nRow 1 — the Fifth Sun, Fire, black obsidian and blazing sunlight: a round black obsidian mirror catching a beam of sunlight and throwing it on as a burning ray; a ring of small obsidian mirrors standing around a glowing sun disk; four small suns in a row going dark one after another while the fifth blazes brighter; several burning suns falling from a black sky like meteors, long trails of fire behind them; an enormous blazing sun rising over dark stepped stone pyramids, fierce radiant rays.\n\nRow 2 — the First Guardian of the Isle, Fire, a bronze giant and red-hot copper: a giant bronze foot stomping down and cracking the ground, sparks bursting out; a bronze heel with a single iron nail driven deep into it, one thin vein glowing red around the nail; three bronze bells hanging from a beam, the third bell glowing red-hot; a red-hot bronze arm of a giant sweeping in a full circle, molten copper splashing from it; a huge glowing copper nail being driven into a bronze heel, warm golden healing light around it.\n\nRow 3 — the Tide of Faces, Time, grey flesh, pale masks and green light: a pale mask being torn away by a crashing green wave; a wave of grey flesh with two masks rising from it, pulling a glowing round shield into itself; a pale mask mirroring a burst of crown-shaped light that is aimed at it, copying it; a towering tidal wave made of countless masks and faces crashing down; a thick faceless fog rolling over a stone gate, eerie green light inside the fog.\n\nRow 4 — the Unwithering King, Earth, linen wrappings, salt, gold and amber dust: a procession of bandaged mummified feet marching through dust; a bandaged hand rising out of an open stone sarcophagus, amber light pouring in; a cracked golden death mask that refuses to fall, the crack glowing amber; many stone sarcophagi opening at once under an amber sun, wrapped figures rising; a living figure being bound tight in salt-white linen wrappings, salt crystals glittering on them."
+    },
+    {
+      "category": "ability-icons-unique",
+      "source": "design/ui/echo-foes.js, design/ui/biome-foes.js — способности ядра вне библиотеки",
+      "id": "abu-high",
+      "title": "Забытый Чистый Камень, Многоликий, боссы, элита и стражи биомов — сеткой 6×4",
+      "aspect": "3:2",
+      "size": "4K",
+      "grid": [
+        6,
+        4
+      ],
+      "cells": [
+        [
+          "Эхо.Забытые.act1",
+          "echo-forgotten-act1"
+        ],
+        [
+          "Эхо.Забытые.act2",
+          "echo-forgotten-act2"
+        ],
+        [
+          "Эхо.Забытые.pas",
+          "echo-forgotten-pas"
+        ],
+        [
+          "Эхо.Забытые.ult1",
+          "echo-forgotten-ult1"
+        ],
+        [
+          "Эхо.Забытые.ult2",
+          "echo-forgotten-ult2"
+        ],
+        [
+          "Эхо.Многоликий.act1",
+          "echo-many-act1"
+        ],
+        [
+          "Эхо.Многоликий.act2",
+          "echo-many-act2"
+        ],
+        [
+          "Эхо.Многоликий.pas",
+          "echo-many-pas"
+        ],
+        [
+          "Эхо.Многоликий.react",
+          "echo-many-react"
+        ],
+        [
+          "Эхо.Многоликий.ult1",
+          "echo-many-ult1"
+        ],
+        [
+          "Эхо.Многоликий.ult2",
+          "echo-many-ult2"
+        ],
+        [
+          "Спуск.b2b1.pas",
+          "b2b1-pas"
+        ],
+        [
+          "Спуск.b2b1.ult",
+          "b2b1-ult"
+        ],
+        [
+          "Спуск.b2e2.act",
+          "b2e2-act"
+        ],
+        [
+          "Спуск.b2e6.act",
+          "b2e6-act"
+        ],
+        [
+          "Спуск.b3b1.pas",
+          "b3b1-pas"
+        ],
+        [
+          "Спуск.b3b1.ult",
+          "b3b1-ult"
+        ],
+        [
+          "Спуск.b3e6.act",
+          "b3e6-act"
+        ],
+        [
+          "Спуск.b3e6.ctrl",
+          "b3e6-ctrl"
+        ],
+        [
+          "Спуск.b3g1.act",
+          "b3g1-act"
+        ],
+        [
+          "Спуск.b4b1.pas",
+          "b4b1-pas"
+        ],
+        [
+          "Спуск.b4e6.act",
+          "b4e6-act"
+        ],
+        [
+          "Спуск.b4g1.act",
+          "b4g1-act"
+        ],
+        [
+          "spare",
+          "spare"
+        ]
+      ],
+      "subject": "These are the skills of the strongest enemies of the game, each lit in the color of its own magic: Time is green (#4FDC8B) with glowing sand; no school is plain steel, white porcelain and warm torchlight; Earth is amber-orange (#EB9D40) with dust; Air is pale white with a hint of green (#DFF4E5) and silver; Fire is scarlet (#F0564A) and amber. Colors never spill from one cell to another. Every icon, even the widest, is built around one clear central object with a bold silhouette — never only smoke, dust, fog or a scattered pattern. Ultimate spells are the grandest, most epic images, bigger in scale, with bright highlights. Passive traits are calm, emblem-like single objects with no action. Reactions are one instant answer to an event in battle, one moment of action. Nothing anywhere looks like writing: no letters, no numbers, no runes, no tally marks, no rows of notches or dots.\n\nThe grid: exactly 6 columns and 4 rows, 24 icons.\n\nRow 1: Time — a sharp chisel slicing a thin glowing green ribbon in two above a grey stone; Time — grey dust pouring down from a smooth stone, glowing faintly green as it falls; Time, passive — a perfectly smooth blank grey standing stone with no marks at all, a faint green aura around it; Time, ultimate — a ring of smooth blank standing stones around a circle of pale green light; Time, ultimate — a colossal stone falling from above, its shadow covering a small tower below; no school — a white porcelain mask being pressed onto a face of glinting steel, torchlight on it.\n\nRow 2: no school — a cracked porcelain mask rising out of a heap of grey ash, warm gold light seeping from its empty eyes; no school, passive — a crown made of many small white porcelain masks; no school, reaction — a porcelain mask shattering while a fresh mask forms beneath it, shards flying; no school, ultimate — a huge crown of countless porcelain masks opening like a flower, all of them staring; no school, ultimate — a fresh unbroken porcelain mask glowing warm gold while an old cracked mask falls away; Earth, passive — a big wolf paw print pressed into amber earth with small paw prints around it.\n\nRow 3: Earth, ultimate — a pack of wolves charging out of a dark forest, amber dust behind them; Air — a curved hunting horn blowing a stream of pale wind toward one glowing ring; Air — a bark knife peeling a long strip of birch bark, pale wind around it; Earth, passive — a big bronze gear meshed with a smaller one, one tooth of the big gear glowing; Earth, ultimate — huge interlocking bronze gears making a full turn, sparks flying; Earth — a counting cord with a few knots tightening around a forearm.\n\nRow 4: Earth — a heavy knot tied over a closed hand, muffling its amber glow; Earth — a pale stone hand pressed over a glowing amber oil lamp, smothering its light; Earth, passive — a hollow bronze crown, dark and empty inside, standing on a stone pedestal; Fire — a casting mould split open, molten metal glowing scarlet inside; Earth — a pair of armoured hands lowering a sword, its blade dimming; a spare cell — a small dark sealed stone box with a faint amber glow at its seam."
+    }
+  ]
+}

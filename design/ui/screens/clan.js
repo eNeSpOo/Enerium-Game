@@ -39,25 +39,27 @@ const CL = {
     no: 2,                                // номер недели клана: сид кругов
   },
   role: 'head',
-  /* участники: имя, роль, уровень Странника, цикл, очков в резервуар за неделю, вес урона по врагам, атак осталось сегодня, в сети — часов назад, недель в клане */
+  /* участники: имя, роль, уровень Странника, цикл, очков контрактов в резервуар за неделю — в очках своего цикла, вес урона по врагам,
+     атак осталось сегодня, в сети — часов назад, недель в клане. Клан смешанный (ADR-0042): основатели — цикла II, с ними игроки III–VI;
+     вклад каждого засчитывается в долях нормы своего цикла — очки контрактов по первой планке цикла, урон — долей здоровья цели */
   members: [
     ['Странник', 'head', 24, 2, 0, 3, 6, 0, 1],
-    ['Тихий ветер', 'treasurer', 41, 3, 640, 14, 1, 0, 1],
-    ['Северный странник', 'treasurer', 38, 3, 590, 12, 0, 2, 1],
+    ['Тихий ветер', 'treasurer', 41, 3, 850, 14, 1, 0, 1],
+    ['Северный странник', 'treasurer', 38, 3, 790, 12, 0, 2, 1],
     ['Собиратель искр', 'member', 33, 2, 520, 10, 3, 1, 1],
     ['Лунный страж', 'member', 31, 2, 480, 9, 6, 5, 1],
     ['Искатель', 'member', 30, 2, 0, 7, 6, 30, 1],
     ['Светлый пепел', 'member', 29, 2, 450, 7, 2, 3, 1],
-    ['Тихий шаг', 'member', 28, 2, 410, 6, 4, 8, 1],
-    ['Синий огонь', 'member', 27, 2, 380, 6, 0, 1, 1],
+    ['Тихий шаг', 'member', 52, 4, 660, 6, 4, 8, 1],
+    ['Синий огонь', 'member', 66, 5, 700, 6, 0, 1, 1],
     ['Пепельная тропа', 'member', 26, 2, 350, 5, 6, 26, 1],
-    ['Ночная ива', 'member', 25, 2, 330, 4, 1, 4, 1],
+    ['Ночная ива', 'member', 47, 4, 530, 4, 1, 4, 1],
     ['Ржавый ключ', 'member', 25, 2, 0, 4, 6, 70, 0],
     ['Серая сова', 'member', 23, 2, 300, 3, 3, 6, 0],
-    ['Долгий путь', 'member', 22, 2, 280, 3, 5, 12, 0],
+    ['Долгий путь', 'member', 83, 6, 510, 3, 5, 12, 0],
     ['Каменный шёпот', 'member', 21, 2, 260, 2, 6, 40, 0],
     ['Янтарная нить', 'member', 20, 2, 240, 2, 2, 2, 0],
-    ['Белый ворон', 'member', 19, 2, 200, 1, 0, 9, 0],
+    ['Белый ворон', 'member', 30, 3, 270, 1, 0, 9, 0],
     ['Старый колокол', 'member', 17, 2, 150, 1, 6, 20, 0],
   ],
   /* клановый босс: неделя идёт четвёртый день; взяты круги 1–3 и две элиты круга 4, у третьей — остаток здоровья, б. п. */
@@ -131,6 +133,22 @@ function placeOf(pts) {
 }
 const weekPts = (C = S.clan) => C.members.reduce((a, m) => a + m.boss, 0);
 
+/* ================== клан и разные циклы (ADR-0042) ==================
+   Цикл игрока — цикл его копии цели: игрок бьёт цель в силе своего цикла, урон засчитывается долей её здоровья (x.left из D.boss.bar),
+   x.hp и x.max — его копии. Очки контрактов других циклов клан засчитывает по первой планке их цикла: m.resRaw — в очках цикла участника,
+   m.res — засчитано клану, в очках базового цикла D.norm.base; на экране — в очках цикла игрока */
+const myC = () => EC.cycOf(D, Math.max(D.open.cycle, S.acc.cycle));
+const copyOf = (x, c) => EC.card(D, { g: x.g, uid: x.uid, el: x.el, k: x.k, c });
+/* цель глазами игрока: здоровье и максимум его копии по общей доле */
+function seenBy(x) { const m = copyOf(x, myC()).maxHp; x.max = m; x.hp = x.dead || x.left <= 0 ? 0 : EC.hpIn(D, x.left, m); return x; }
+/* доля здоровья цели в процентах: целые — без дробной части, до десятых — у малых долей */
+const shareTxt = v => { const t = Math.floor(v * 1000 / D.boss.bar); return t >= 100 || t % 10 === 0 ? `${Math.floor(t / 10)} %` : t ? `${Math.floor(t / 10)},${t % 10} %` : 'меньше 0,1 %'; };
+const hpBar = x => Math.floor((x.left == null ? x.hp * D.boss.bar / Math.max(1, x.max) : x.left) * 100 / D.boss.bar);
+/* очки контрактов: засчитано клану (база) → в очках цикла игрока */
+const ctMine = v => EC.toCycle(D, 'ct', v, D.norm.base, myC());
+/* очки участника в резервуар: своего цикла — как есть; другого — его очки и засчитано, в очках цикла игрока */
+const resTxt = m => { const r = m.resRaw || 0; return m.cyc === myC() ? `${fmt(r)} ${ptsWord(r)}` : `${fmt(r)} ${ptsWord(r)} цикла ${ROMAN[m.cyc]} · засчитано ${fmt(ctMine(m.res))}`; };
+
 /* ================== эмблема и облик врагов — заглушки до арта (tools/art-gen/jobs/clan.json) ================== */
 const EMB = ['M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z', 'M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z',
   'M4 18l1.5-10 4.5 4 2-6 2 6 4.5-4L20 18z', 'M12 3c.5 3.5 5 5.5 5 10.2A5 5 0 0 1 7 13.2c0-2.6 1.6-4 2.2-6.2.9 1 1.5 2.1 1.7 3.5.8-2.2 1.1-4.7 1.1-7.5z',
@@ -173,24 +191,27 @@ const beatsOf = el => D.lists.els.filter(x => EC.edge(x, el));
 /* ================== состояние ==================
    S.clan: n — имя (профиль, Неделя), in — игрок в клане; паспорт: id, emblem, type, join, req, note, dir, goals, founded;
    earned — очков навыков заработано, lvl — уровень (очков потрачено хоть раз), res — очков в резервуаре к следующему очку, picks — выбор по уровням;
-   members — { id, n, role, lvl, cyc, res, boss, atk, seen, weeks, me } — res и boss за неделю; apps — заявки;
+   members — { id, n, role, lvl, cyc, res, resRaw, boss, atk, seen, weeks, me } — за неделю: resRaw — очки контрактов в резервуар в очках цикла
+   участника, res — засчитано клану (ADR-0042), boss — очки кланового босса; apps — заявки;
    boss — { wk — раса недели, no — номер недели, circle, kills, targets, att — атак игрока, known — бестиарий, n — атак игрока за неделю,
-   last — итог последней атаки, mine — личные очки недели }; past — подсчёт прошлой недели: место, пул, половина сервера, план главы;
+   last — итог последней атаки, mine — личные очки недели }; цель — { left — доля здоровья из D.boss.bar, общая на клан; hp, max — копии
+   в цикле игрока; dmg — доли здоровья по участникам }; past — подсчёт прошлой недели: место, пул, половина сервера, план главы;
    log — журнал; hop — очки клану со следующей недели (анти-прыгун); role — роль игрока; seenCt — учтённые очки контрактов;
    srch — поиск: фильтр, заявки, прежний клан. Номера операций «сервера» — S.clOps { seq, ops }: сквозные, через выход и вход в другой клан */
 function mkMember(id, row, me) {
   const [n, role, lvl, cyc, res, w, atk, seen, weeks] = row;
-  return { id, n, role, lvl, cyc, res, boss: 0, w, atk, seen, weeks, me: !!me };
+  return { id, n, role, lvl, cyc, resRaw: res, res: EC.counted(D, 'ct', res, cyc), boss: 0, w, atk, seen, weeks, me: !!me };
 }
 /* цели круга: элиты — Голоса сонмов, стихии на сиде круга без повторов; сила — круг */
 function circleTargets(C, k) {
   const got = EC.roll(D, `клан|${C.id}|неделя|${C.boss.no}|круг|${k}`, EC.elitePool(D, C.lvl, C.picks));   // пул — вилка «Шире круг»
   return got.map((x, i) => target(C, 'e', k, i, x.el));
 }
-/* цель: Голос (g 'e') или Хозяин (g 'b') стихии el на круге k; fig — фигура сонма, race — раса сонмов */
+/* цель: Голос (g 'e') или Хозяин (g 'b') стихии el на круге k; fig — фигура сонма, race — раса сонмов. Здоровье — общая доля left,
+   числа — копии в цикле игрока */
 function target(C, g, k, i, el) {
-  const uid = `${C.boss.no}-${k}-${g}${i}`, src = EC.card(D, { g, uid, el, k });
-  return { uid, g, k, cls: src.cls, el, race: src.race, fig: src.fig, hp: src.maxHp, max: src.maxHp, dmg: {}, dead: false, burned: false, used: [] };
+  const uid = `${C.boss.no}-${k}-${g}${i}`, src = EC.card(D, { g, uid, el, k, c: myC() });
+  return { uid, g, k, cls: src.cls, el, race: src.race, fig: src.fig, left: D.boss.bar, hp: src.maxHp, max: src.maxHp, dmg: {}, dead: false, burned: false, used: [] };
 }
 /* вклад демо-недели: павшие цели и урон — по весам участников, генератором на сиде клана */
 function history(C, rng, upTo, killsIn) {
@@ -210,19 +231,20 @@ function fresh(s) {
   s.clOps = { seq: 1, ops: {} };   // операции «сервера» клана: номера — сквозные, через выход и вход в другой клан
   C.res = Math.floor(EC.need(D, C.earned + 1) * d.resBp / BP);
   const me = meOf(C); me.atk = EC.attacksDay(D, C.lvl); C.boss.att = me.atk;   // игрок начинает день с полной нормой — по вехам древа
+  me.cyc = EC.cycOf(D, Math.max(D.open.cycle, s.acc.cycle));   // игрок — в своём цикле
   history(C, rng, CL.boss.circle, CL.boss.killsIn);
-  /* круг 4: две элиты пали, у третьей — остаток здоровья; её урон — у трёх участников */
+  /* круг 4: две элиты пали, у третьей — остаток здоровья; её урон — у трёх участников, доли здоровья цели */
   C.boss.targets = circleTargets(C, CL.boss.circle);
   C.boss.targets.forEach((x, i) => {
-    if (i < CL.boss.killsIn) { x.dead = true; x.hp = 0; C.boss.known[fidOf(x)] = true; return; }
-    x.hp = Math.max(1, Math.floor(x.max * CL.boss.leftBp / BP));
-    const got = EC.share(x.max - x.hp, CL.boss.onLast.map(([, w]) => w)); CL.boss.onLast.forEach(([id], j) => { x.dmg[id] = got[j]; });
+    if (i < CL.boss.killsIn) { x.dead = true; x.left = 0; x.hp = 0; C.boss.known[fidOf(x)] = true; return; }
+    x.left = Math.max(1, Math.floor(D.boss.bar * CL.boss.leftBp / BP)); x.hp = EC.hpIn(D, x.left, x.max);
+    const got = EC.share(D.boss.bar - x.left, CL.boss.onLast.map(([, w]) => w)); CL.boss.onLast.forEach(([id], j) => { x.dmg[id] = got[j]; });
   });
   /* бестиарий демо: прежние круги недели взяты — их Голоса и Хозяин недели изучены (§7.1: одна победа открывает запись навсегда) */
   for (let k = 1; k < CL.boss.circle; k++) circleTargets(C, k).slice(0, D.boss.kills).forEach(x => { C.boss.known[fidOf(x)] = true; });
   if (CL.boss.circle > 1) C.boss.known[weekBoss(C.boss.wk).id] = true;
   /* прошлая неделя подсчитана: пул, половина сервера роздана, половина главы ждёт */
-  const prevRace = prevOf(C.boss.wk), members = C.members.map(m => ({ id: m.id, n: m.n, cyc: m.cyc, res: m.res, boss: 0 })), got = EC.share(CL.past.pts, C.members.map(m => m.w));
+  const prevRace = prevOf(C.boss.wk), members = C.members.map(m => ({ id: m.id, n: m.n, cyc: m.cyc, res: m.res, resRaw: m.resRaw, boss: 0 })), got = EC.share(CL.past.pts, C.members.map(m => m.w));
   members.forEach((m, j) => { m.boss = got[j]; });
   C.past = countWeek(C, prevRace, CL.past.pts, members, s.acc.cycle, CL.leaders.past);
   for (const m of C.members) m.w = undefined;
@@ -249,12 +271,12 @@ function weekEnd(s) {
   const C = s.clan; if (!C.in) return;
   const burn = C.boss.targets.filter(x => !x.dead && !x.burned && Object.keys(x.dmg).length);
   if (burn.length) log(C, 'boss', `Неделя кончилась: не добиты ${burn.map(x => nameOf(x)).join(', ')} — их счёт сгорел.`);
-  const pts = weekPts(C), members = C.members.map(m => ({ id: m.id, n: m.n, cyc: m.cyc, res: m.res, boss: m.boss }));
+  const pts = weekPts(C), members = C.members.map(m => ({ id: m.id, n: m.n, cyc: m.cyc, res: m.res, resRaw: m.resRaw, boss: m.boss }));
   C.past = countWeek(C, C.boss.wk, pts, members, s.acc.cycle, CL.leaders.now);
   const P = C.past, total = P.groups.reduce((a, g) => a + g.count, 0);
   log(C, 'gifts', P.place ? `Неделя ${genOf(P.race)} подсчитана: место ${fmt(P.place)}, ${fmt(pts)} ${ptsWord(pts)}. Пул — ${fmt(total)} ${chestWord(total)}: половину сервер раздал по вкладу, половина ждёт главу.` : `Неделя ${genOf(P.race)} подсчитана: очков нет — наград нет.`);
   C.boss.no++; C.boss.wk = raceOf(s); C.boss.circle = 1; C.boss.kills = 0; C.boss.n = 0; C.boss.mine = 0; C.boss.last = null; C.hop = false;
-  C.members.forEach(m => { m.res = 0; m.boss = 0; });
+  C.members.forEach(m => { m.res = 0; m.resRaw = 0; m.boss = 0; });
   C.boss.targets = circleTargets(C, 1);
   refillDay(C, true);
 }
@@ -264,7 +286,8 @@ function refillDay(C, full) {
   C.boss.att = full ? Math.min(cap, Math.max(C.boss.att, per)) : Math.min(cap, C.boss.att + per);
   C.members.forEach(m => { if (!m.me) m.atk = Math.min(cap, m.atk + per); else m.atk = C.boss.att; });
 }
-/* сверка: неделя расы сменилась — подсчёт; очки контрактов игрока — в резервуар и в его вклад */
+/* сверка: неделя расы сменилась — подсчёт; очки контрактов игрока — в резервуар и в его вклад: засчитано — по первой планке контрактов
+   его цикла (ADR-0042); цели — глазами игрока: числа его копии */
 function sync() {
   if (!S.clan) fresh(S);
   const C = S.clan;
@@ -272,9 +295,10 @@ function sync() {
   const ct = S.contracts ? S.contracts.clan || 0 : 0;
   if (ct !== C.seenCt) {
     const add = ct - C.seenCt; C.seenCt = ct;
-    if (C.in && add > 0) { const me = meOf(C); if (me) me.res += add; feed(C, add); }
+    if (C.in && add > 0) { const me = meOf(C), got = EC.counted(D, 'ct', add, myC()); if (me) { me.resRaw = (me.resRaw || 0) + add; me.res += got; } feed(C, got); }
   }
-  if (C.in) { const me = meOf(C); if (me) me.atk = C.boss.att; }
+  if (C.in) { const me = meOf(C); if (me) { me.atk = C.boss.att; me.cyc = myC(); } }
+  for (const x of C.boss.targets || []) if (x.left != null) seenBy(x);
 }
 /* резервуар: очки контрактов → очки навыков; скорость — ключ ветки «Клан» (§24.2) */
 function feed(C, add) {
@@ -288,19 +312,23 @@ function feed(C, add) {
 function log(C, k, t, who) { C.log.unshift({ d: 0, k, t, who: who || '' }); }
 
 /* атака по цели клана — одна на одиночную операцию и на каждую атаку пакета «всеми»: из кошелька, номер атаки недели, бой ядром на сиде
-   атаки (fightOf), урон — в счёт цели; цель пала — выплата по снятому здоровью, призыв Хозяина или новый круг (kill) */
+   атаки (fightOf) — с копией цели в силе цикла атакующего (ADR-0042); снятое — доля здоровья цели (EnClan.shareOff), в счёт цели;
+   цель пала — выплата по снятым долям, призыв Хозяина или новый круг (kill). hp0, hp, max, removed — числа копии атакующего; hpOut —
+   здоровье копии по итогу боя, hp — по общей доле */
 const atkOp = (C, n) => `atk:${C.id}:${C.boss.no}:${n}`;
 const atkWhy = (C, x, ids) => !C || !C.in ? 'noclan' : !x || x.dead || x.burned ? 'gone' : C.boss.att <= 0 ? 'att' : !ids || !ids.length ? 'squad' : '';
 function strike(C, x, ids, op) {
   C.boss.att--; C.boss.n++;
-  const me = meOf(C), n = C.boss.n, F = fightOf(x, ids, n), known0 = isKnown(x), hp0 = x.hp;
+  const me = meOf(C), n = C.boss.n, F = fightOf(x, ids, n), known0 = isKnown(x), left0 = x.left, max = F.src.maxHp, hp0 = F.src.hp;
   const b = EB.run(battleOf(F)), u = b.u[1][0];
-  const removed = Math.max(0, hp0 - u.hp);
-  x.hp = u.hp; x.used = u.usedBiome.slice();
-  if (removed) x.dmg[me.id] = (x.dmg[me.id] || 0) + removed;
-  const L = { uid: x.uid, n, op, g: x.g, k: x.k, el: x.el, cls: x.cls, race: x.race, fig: fidOf(x), known0, hp0, hp: x.hp, max: x.max, removed, kill: false, pay: null, mine: 0, summoned: false, burned: [], circle: 0,
+  const share = EC.shareOff(D, left0, max, u.hp);
+  x.left = left0 - share; x.used = u.usedBiome.slice(); seenBy(x);
+  if (share) x.dmg[me.id] = (x.dmg[me.id] || 0) + share;
+  const hp = EC.hpIn(D, x.left, max);
+  const L = { uid: x.uid, n, op, g: x.g, k: x.k, el: x.el, cls: x.cls, race: x.race, fig: fidOf(x), known0, hp0, hp, hpOut: u.hp, max, removed: Math.max(0, hp0 - hp), left0, left: x.left, share, cyc: F.cyc,
+    kill: false, pay: null, mine: 0, summoned: false, burned: [], circle: 0,
     rounds: b.round, maxRounds: b.maxRounds, why: b.why, heroes: b.u[0].map(h => ({ id: h.id, name: h.name, dealt: h.dealt, healed: h.healed, alive: h.alive })), seed: F.o.seed, F };
-  if (x.hp <= 0) kill(C, x, L);
+  if (x.left <= 0) kill(C, x, L);
   return L;
 }
 
@@ -335,14 +363,14 @@ const CL_SRV = {
     return CL_SRV.run(op, () => {
       const C = S.clan, x = C.in ? C.boss.targets.find(t => t.uid === uid) : null, why = atkWhy(C, x, ids);
       if (why) return { refuse: why };
-      const att0 = C.boss.att, hp0 = x.hp, known0 = isKnown(x), mine0 = C.boss.mine, Ls = [];
+      const att0 = C.boss.att, hp0 = x.hp, left0 = x.left, known0 = isKnown(x), mine0 = C.boss.mine, Ls = [];
       while (C.boss.att > 0 && !x.dead && !x.burned) { const sub = atkOp(C, C.boss.n + 1), L = strike(C, x, ids, sub); S.clOps.ops[sub] = { L }; Ls.push(L); }
       const last = Ls[Ls.length - 1];
       C.boss.last = last;
-      const A = { op, uid, g: x.g, k: x.k, el: x.el, fig: fidOf(x), known0, hp0, hp: x.hp, max: x.max, att0, attLeft: C.boss.att, count: Ls.length,
+      const A = { op, uid, g: x.g, k: x.k, el: x.el, fig: fidOf(x), known0, hp0, hp: x.hp, max: x.max, left0, left: x.left, share: left0 - x.left, att0, attLeft: C.boss.att, count: Ls.length,
         removed: Ls.reduce((a, L) => a + L.removed, 0), kill: last.kill, pts: last.pts || 0, mine: C.boss.mine - mine0, first: Ls.some(L => L.first),
         summoned: last.summoned, circle: last.circle, burned: last.burned.slice(),
-        rows: Ls.map(L => ({ n: L.n, removed: L.removed, rounds: L.rounds, maxRounds: L.maxRounds, fell: L.heroes.filter(h => !h.alive).length, seed: L.seed })) };
+        rows: Ls.map(L => ({ n: L.n, removed: L.removed, share: L.share, rounds: L.rounds, maxRounds: L.maxRounds, fell: L.heroes.filter(h => !h.alive).length, seed: L.seed })) };
       C.boss.lastAll = A;
       return { A };
     });
@@ -432,7 +460,7 @@ const CL_SRV = {
       if (!can('apps') || !a) return { refuse: 'right' };
       if (C.members.length >= EC.capacity(D, C.lvl)) return { refuse: 'full' };
       C.apps = C.apps.filter(x => x !== a);
-      C.members.push({ id: 'n' + S.clOps.seq, n: a.n, role: 'member', lvl: a.lvl, cyc: a.cyc, res: 0, boss: 0, atk: EC.attacksDay(D, C.lvl), seen: 0, weeks: 0, me: false });
+      C.members.push({ id: 'n' + S.clOps.seq, n: a.n, role: 'member', lvl: a.lvl, cyc: a.cyc, res: 0, resRaw: 0, boss: 0, atk: EC.attacksDay(D, C.lvl), seen: 0, weeks: 0, me: false });
       log(C, 'join', `${roleOf(C.role).n} ${meOf(C).n} принял заявку: в клане ${a.n}.`);
       return { id };
     });
@@ -521,16 +549,16 @@ const say = r => { if (r && r.refuse) { toast(r.why || CL_WHY[r.refuse] || 'Не
    Щит, Лекарь, Клинок и Стрела; свита свежая в каждой атаке.
    Прибавки древа — пассивки Силы и Клана и вилки — сервер кладёт в карты при сборке боя (EnClan.fightMods) */
 function fightOf(x, ids, n) {
-  const C = S.clan, src = EC.card(D, { g: x.g, uid: x.uid, el: x.el, k: x.k, name: nameOf(x) });
-  src.maxHp = x.max; src.hp = x.hp; src.used = (x.used || []).slice();
+  const C = S.clan, cyc = myC(), src = EC.card(D, { g: x.g, uid: x.uid, el: x.el, k: x.k, c: cyc, name: nameOf(x) });   // копия в силе цикла атакующего (ADR-0042)
+  src.hp = EC.hpIn(D, x.left, src.maxHp); src.used = (x.used || []).slice();
   const maxRounds = EC.rounds(D, x.g, C.picks, C.lvl), mods = EC.fightMods(D, C.picks, C.lvl, x.g);
-  return { src, guards: EC.retinue(D, src), heroes: ids.map(id => EB.heroSrc(H(id))), mods, o: { seed: EB.seedOf(`клан|${C.id}|неделя|${C.boss.no}|${x.uid}|атака|${n}`), maxRounds } };
+  return { src, cyc, guards: EC.retinue(D, src), heroes: ids.map(id => EB.heroSrc(H(id))), mods, o: { seed: EB.seedOf(`клан|${C.id}|неделя|${C.boss.no}|${x.uid}|атака|${n}`), maxRounds } };
 }
 /* бой одной атаки: цель и её свита, бой кончается, когда цель пала (EnClan.battle — тот же, что у калькулятора клана) */
 const battleOf = F => EC.battle(D, F.heroes, F.src, F.o.seed, F.o.maxRounds, F.mods || null);
 /* цель пала: выплата по снятому здоровью (§25.3), бестиарий, круг — дальше */
 function kill(C, x, L) {
-  x.dead = true; x.hp = 0; L.kill = true;
+  x.dead = true; x.hp = 0; x.left = 0; L.kill = true;
   const pts = EC.points(D, x.k, x.g), pay = EC.payout(pts, x.dmg), me = meOf(C);
   for (const [id, v] of Object.entries(pay)) { const m = C.members.find(z => z.id === id); if (!m) continue; if (m.me) { C.boss.mine += v; L.mine = v; if (C.hop) continue; } m.boss += v; }
   L.pay = pay; L.pts = pts;
@@ -652,7 +680,7 @@ function cardPow(src) {
 }
 /* карточка цели: облик, имя, ранг и стихия, здоровье полосой; два числа — здоровье и мощь; одно действие — «Атаковать» */
 function tgtCard(x, big) {
-  const hpP = Math.floor(x.hp * 100 / x.max), bm = cardPow(EC.card(D, { g: x.g, uid: x.uid, el: x.el, k: x.k }));
+  const hpP = hpBar(x), bm = cardPow(copyOf(x, myC()));   // полоса — общая доля здоровья, числа — копии в цикле игрока (ADR-0042)
   const st = x.dead ? `<span class="chip">${ic('check')}пала</span>` : x.burned ? '<span class="chip warn">сгорела</span>' : '';
   const act = x.dead || x.burned ? '' : `<div class="row cl-acts"><button class="btn ${big ? '' : 'sm'} go" data-a="clatk" data-v="${x.uid}:${S.clan.boss.n + 1}" ${S.clan.boss.att ? '' : 'disabled'} title="${tmT('Исход решён при оплате атаки: просмотр можно пропустить', 'Бой ядром на сиде атаки: исход решён при оплате, просмотр можно пропустить')}">${ic('sword')}Атаковать</button>${allLink(x)}</div>`;
   return `<div class="cl-card ${x.dead ? 'dead' : ''} ${x.burned ? 'burned' : ''} ${big ? 'big' : ''}" data-g="${x.g}" data-el="${esc(x.el)}" data-uid="${x.uid}">
@@ -678,13 +706,15 @@ function memHtml() {
   const C = S.clan, cap = EC.capacity(D, C.lvl), w = EC.contrib(D, C.members), sum = w.reduce((a, x) => a + x, 0);
   const order = C.members.map((m, i) => ({ m, w: w[i] })).sort((a, b) => (b.m.role === 'head') - (a.m.role === 'head') || (b.m.role === 'treasurer') - (a.m.role === 'treasurer') || b.w - a.w || a.m.n.localeCompare(b.m.n));
   const P = C.past, gifts = P && !P.done && can('gifts');
-  const top = `<div class="row cl-mhead"><div class="stat"><b>${C.members.length}<span class="faint">/${cap}</span></b><small>участников</small></div><span class="g-spacer"></span>
+  const top = `<div class="row cl-mhead"><div class="stat"><b>${C.members.length}<span class="faint">/${cap}</span></b><small>участников</small></div>
+      <button class="link cl-count" data-a="sheet" data-v="clcount" title="Очки других циклов засчитываются по планкам их цикла">Как засчитан вклад ${ic('chev')}</button><span class="g-spacer"></span>
       ${can('apps') && C.apps.length ? `<button class="btn sm" data-a="sheet" data-v="clapps">Заявки<span class="bdg">${C.apps.length}</span></button>` : ''}
       ${gifts ? `<button class="btn sm go" data-a="sheet" data-v="clgifts">${ic('flag')}Раздача</button>` : `<button class="btn sm" data-a="sheet" data-v="clgifts">Раздача</button>`}
       <button class="btn sm" data-a="sheet" data-v="cllog">${ic('book')}Журнал</button></div>`;
+  /* строка участника: цикл — рядом с ролью; вклад недели — доля, засчитанная по планкам своего цикла (ADR-0042) */
   const rows = order.map(({ m, w: x }) => `<button class="cl-mrow ${m.me ? 'me' : ''}" data-a="sheet" data-v="clmem:${m.id}">
       <span class="cl-av" data-role="${m.role}">${initials(m.n)}</span>
-      <span class="cl-mt"><b>${esc(m.n)}${m.me ? ' · вы' : ''}</b><small>${m.role !== 'member' ? roleOf(m.role).n + ' · ' : ''}${ago(m.seen)}</small></span>
+      <span class="cl-mt"><b>${esc(m.n)}${m.me ? ' · вы' : ''}</b><small>${m.role !== 'member' ? roleOf(m.role).n + ' · ' : ''}<span class="cl-cyc" data-c="${m.cyc}">цикл ${ROMAN[m.cyc]}</span> · ${ago(m.seen)}</small></span>
       <span class="cl-mv"><b class="num">${sum ? Math.round(x * 100 / sum) : 0} %</b><small>вклад недели</small></span>
     </button>`).join('');
   return `${top}<div class="col scroll grow cl-mlist" data-keep="clmem">${rows}</div>`;
@@ -788,14 +818,14 @@ function enter(x) {
     founded: x.founder ? 0 : 1 + rng(20), earned: x.lvl, lvl: x.lvl, res: 0, picks: Array.from({ length: D.tree.levels.length }, (_, i) => i < x.lvl ? rng(D.tree.levels[i].alts.length) : null), resetWk: null,
     members: [], apps: [], boss: { wk: raceOf(S), no: 1, circle: 1, kills: 0, targets: [], att: was.boss.att, known: was.boss.known || {}, n: 0, last: null, mine: 0 },
     past: null, log: [], hop, role: x.founder ? 'head' : 'member', seenCt: S.contracts ? S.contracts.clan || 0 : 0, srch: { f: '', applied: {}, left: null } };
-  for (let i = 0; i < x.mem; i++) { const n = names.splice(rng(names.length), 1)[0] || 'Странник ' + (i + 1); C.members.push({ id: 'g' + (i + 1), n, role: i === 0 ? 'head' : i === 1 ? 'treasurer' : 'member', lvl: 15 + rng(30), cyc: 2 + rng(2), res: 0, boss: 0, atk: EC.attacksDay(D, x.lvl), seen: rng(48), weeks: 1 + rng(10), me: false }); }
+  for (let i = 0; i < x.mem; i++) { const n = names.splice(rng(names.length), 1)[0] || 'Странник ' + (i + 1); C.members.push({ id: 'g' + (i + 1), n, role: i === 0 ? 'head' : i === 1 ? 'treasurer' : 'member', lvl: 15 + rng(30), cyc: 2 + rng(2), res: 0, resRaw: 0, boss: 0, atk: EC.attacksDay(D, x.lvl), seen: rng(48), weeks: 1 + rng(10), me: false }); }
   C.members.push(mkMe(C)); if (x.founder) C.members[C.members.length - 1].role = 'head';
   C.res = x.founder ? 0 : Math.floor(EC.need(D, C.earned + 1) * rng(BP) / BP);
   C.boss.targets = circleTargets(C, 1);
   S.clan = C;
   log(C, 'join', x.founder ? `Клан «${C.n}» основан. Глава — ${meOf(C).n}.` : `В клан вступил ${meOf(C).n}.${hop ? ' Очки кланового босса он приносит со следующей недели.' : ''}`);
 }
-const mkMe = C => ({ id: 'me', n: 'Странник', role: 'member', lvl: S.acc.level, cyc: S.acc.cycle, res: 0, boss: 0, atk: C.boss.att, seen: 0, weeks: 0, me: true });
+const mkMe = C => ({ id: 'me', n: 'Странник', role: 'member', lvl: S.acc.level, cyc: myC(), res: 0, resRaw: 0, boss: 0, atk: C.boss.att, seen: 0, weeks: 0, me: true });
 
 /* ================== листы ================== */
 const kv = rows => `<dl class="kv cl-kv">${rows.filter(Boolean).map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
@@ -864,27 +894,30 @@ Object.assign(OV, {
     const week = C.members.reduce((a, m) => a + m.res, 0), days = Math.max(1, CL.boss.days), left = Math.max(0, nx - C.res);
     const eta = week && nx ? Math.max(1, Math.ceil(left * days / week)) : 0;
     const top = C.members.filter(m => m.res > 0).sort((a, b) => b.res - a.res).slice(0, CL_VIEW.list);
+    /* засчитанное — в очках цикла игрока: у участника другого цикла — его очки и засчитано (ADR-0042) */
     const body = `<div class="row cl-stats"><div class="stat"><b>${pct} %</b><small>до ${C.earned + 1}-го очка</small></div><div class="stat"><b>${eta ? `≈${eta} ${plural(eta, 'день', 'дня', 'дней')}` : '—'}</b><small>в нынешнем темпе</small></div></div>
       ${bar(pct, 'sp lg')}
       <p class="reason">Резервуар наполняют контракты участников: половина очков каждого исполненного. Полный — очко навыков, его тратит глава в древе.</p>
-      <span class="eyebrow">Кто наполнял на этой неделе · ${fmt(week)}</span>
-      <div class="cl-list">${top.map(m => `<div class="cl-lrow"><span>${esc(m.n)}${m.me ? ' · вы' : ''}</span><b class="num">${fmt(m.res)}</b></div>`).join('') || '<p class="faint">Пока никто.</p>'}</div>
-      ${TM(`<p class="reason">Требование n-го очка — ${fmt(D.res.base)} × n^(${D.res.exp[0]}/${D.res.exp[1]}): первое — за пару дней, сотое — к концу второго года активного клана. Сейчас: ${fmt(C.res)} / ${fmt(nx)}. Ключ ветки «Клан» — 40-й и 80-й уровни — ускоряет приток на 10 %.</p>`, 'div')}`;
-    return sheet('Резервуар', body, `<button class="btn" data-a="go" data-v="contracts">${ic('flag')}К контрактам</button>`);
+      <span class="eyebrow">Кто наполнял на этой неделе · ${fmt(ctMine(week))} в очках вашего цикла</span>
+      <div class="cl-list">${top.map(m => `<div class="cl-lrow"><span>${esc(m.n)}${m.me ? ' · вы' : ''}<small class="faint"> · цикл ${ROMAN[m.cyc]}</small></span><b class="num">${m.cyc === myC() ? fmt(m.resRaw || 0) : `${fmt(m.resRaw || 0)} → ${fmt(ctMine(m.res))}`}</b></div>`).join('') || '<p class="faint">Пока никто.</p>'}</div>
+      <p class="reason">Очки другого цикла засчитываются по его первой планке контрактов: так игрок цикла V приносит клану столько же, сколько игрок цикла II, если оба взяли одинаково планок.</p>
+      ${TM(`<p class="reason">Требование n-го очка — ${fmt(D.res.base)} × n^(${D.res.exp[0]}/${D.res.exp[1]}) очков цикла ${ROMAN[D.norm.base]}: первое — за пару дней, сотое — к концу второго года активного клана. Сейчас: ${fmt(C.res)} / ${fmt(nx)}. Ключ ветки «Клан» — 40-й и 80-й уровни — ускоряет приток на 10 %.</p>`, 'div')}`;
+    return sheet('Резервуар', body, `<button class="link" data-a="sheet" data-v="clcount">Как засчитан вклад ${ic('chev')}</button><button class="btn" data-a="go" data-v="contracts">${ic('flag')}К контрактам</button>`);
   },
   /* цель круга: облик, ранг, стихия, здоровье и мощь; после первой победы — класс и приёмы; очки и мой урон */
   cltgt(o) {
     sync(); const C = S.clan, x = C.boss.targets.find(t => t.uid === o.arg); if (!x) return '';
-    const k = isKnown(x), src = EC.card(D, { g: x.g, uid: x.uid, el: x.el, k: x.k }), bm = cardPow(src), mine = x.dmg[meOf(C).id] || 0, f = figOf(fidOf(x));
+    const k = isKnown(x), src = copyOf(x, myC()), bm = cardPow(src), mine = x.dmg[meOf(C).id] || 0, f = figOf(fidOf(x));
     const L = EB.lib(), abil = k ? src.kit.kit.map(e => L[e.id]).filter(Boolean) : [];
-    const pts = EC.points(D, x.k, x.g), took = Object.values(x.dmg).reduce((a, v) => a + v, 0), est = took ? Math.floor(pts * mine / Math.max(took, x.max - x.hp)) : 0;
+    const pts = EC.points(D, x.k, x.g), took = Object.values(x.dmg).reduce((a, v) => a + v, 0), est = took ? Math.floor(pts * mine / Math.max(took, D.boss.bar - x.left)) : 0;
     const rounds = fightOf(x, [], 0).o.maxRounds;
     const body = `<div class="row cl-thd">${ph(x, 'lg')}<div class="col"><div class="row cl-chips">${rankChip(x)}${el(x.el)}${k ? `<span class="chip">${CLS(clsName(x.cls), 14)}${clsName(x.cls)}</span>` : ''}</div>
         <div class="row cl-nums">${icoNum('hp', `${fmt(x.hp)} / ${fmt(x.max)}`, 'Здоровье')}${bmHtml(bm, 16)}</div></div></div>
       ${k && f ? recordHtml(f) : ''}
       ${guardsHtml(x)}
-      ${kv([k ? ['Раса', HOST.race] : null, ['Бой', `${rounds} ${roundWord(rounds)} · пятеро на этаже`], ['За победу', `${fmt(pts)} ${ptsWord(pts)} — по снятому здоровью`],
-        x.g === 'b' ? ['Контроль', 'не действует — только дебаффы'] : ['Сопротивлений', 'нет: решает подбор отряда'], mine ? ['Ваш урон', `${fmt(mine)} · ≈${fmt(est)} ${ptsWord(est)}, когда цель падёт`] : null])}
+      ${kv([k ? ['Раса', HOST.race] : null, ['Бой', `${rounds} ${roundWord(rounds)} · пятеро на этаже`], ['За победу', `${fmt(pts)} ${ptsWord(pts)} — по снятой доле здоровья`],
+        x.g === 'b' ? ['Контроль', 'не действует — только дебаффы'] : ['Сопротивлений', 'нет: решает подбор отряда'], mine ? ['Ваш урон', `${shareTxt(mine)} здоровья · ≈${fmt(est)} ${ptsWord(est)}, когда цель падёт`] : null])}
+      <p class="reason">Цель — в силе вашего цикла: каждый в клане бьёт её в силе своего, а урон идёт в общий счёт долей её здоровья.</p>
       ${k ? `<span class="eyebrow">Приёмы</span><div class="cl-abs">${abil.map(a => { const art = typeof abArt === 'function' ? abArt(a, 32) : ''; return `<div class="cl-ab">${art ? `${art}<span><b>${a.n}</b><small>${a.d}</small></span>` : `<b>${a.n}</b><small>${a.d}</small>`}</div>`; }).join('')}</div>` : '<p class="reason">Имя, класс, приёмы и запись сказителя откроет первая победа.</p>'}
       ${x.dead || x.burned ? '' : `<p class="reason">Не добьёте до конца недели — счёт сгорит.</p>`}`;
     const foot = x.dead || x.burned ? '' : `${allBtn(x)}<button class="btn go" data-a="clatk" data-v="${x.uid}:${C.boss.n + 1}" ${C.boss.att ? '' : 'disabled'}>${ic('sword')}Атаковать</button>`;
@@ -896,7 +929,7 @@ Object.assign(OV, {
     const C = S.clan, x = C.boss.targets.find(t => t.uid === L.uid), live = !!x && !x.dead && !x.burned, pc = v => Math.floor(Math.max(0, v) * 100 / L.max);
     const WHY = { sand: 'Раунды вышли — урон сохранён', wipe: 'Отряд пал — урон сохранён', time: 'Раунды вышли — урон сохранён' };
     const title = L.kill ? (L.g === 'b' ? 'Клановый босс пал' : 'Элита пала') : 'Урон нанесён';
-    const kpi = [[L.removed ? '−' + fmt(L.removed) : '0', 'снято здоровья', '']].concat(L.kill ? [[`+${fmt(L.mine)}`, 'ваши очки', 'win']] : [[`${pc(L.removed)} %`, 'здоровья цели', '']]);
+    const kpi = [[L.removed ? '−' + fmt(L.removed) : '0', 'снято здоровья', '']].concat(L.kill ? [[`+${fmt(L.mine)}`, 'ваши очки', 'win']] : [[shareTxt(L.share != null ? L.share : 0), 'здоровья цели', '']]);
     const marks = (L.first ? `<span class="chip spirit">${ic('book')}новое в бестиарии</span>` : '') + (L.summoned ? `<span class="chip gold">${ic('crown')}встал Хозяин недели</span>` : '') + (L.circle ? `<span class="chip spirit">${ic('up')}открыт круг ${L.circle}</span>` : '');
     const pay = L.pay ? Object.entries(L.pay).sort((a, b) => b[1] - a[1]).map(([id, v]) => { const m = C.members.find(z => z.id === id); return `<div class="cl-lrow"><span>${m ? esc(m.n) + (m.me ? ' · вы' : '') : 'вышел из клана'}</span><b class="num">+${fmt(v)}</b></div>`; }).join('') : '';
     const heroes = L.heroes.map(h => `<tr class="${h.alive ? '' : 'fell'}"><td>${esc(h.name)}${h.alive ? '' : ' <small>пал</small>'}</td><td class="num">${fmt(h.dealt)}</td><td class="num">${fmt(h.healed)}</td></tr>`).join('');
@@ -920,7 +953,7 @@ Object.assign(OV, {
     const C = S.clan, A = C && C.boss ? C.boss.lastAll : null; if (!A || (o.arg && A.op !== o.arg)) return '';
     const pc = v => Math.floor(Math.max(0, v) * 100 / A.max), x = { g: A.g, el: A.el, fig: A.fig }, k = A.kill || A.known0, atk = n => plural(n, 'атака', 'атаки', 'атак');
     const title = A.kill ? (A.g === 'b' ? 'Хозяин пал' : 'Элита пала') : 'Урон нанесён';
-    const kpi = [[String(A.count), atk(A.count), ''], [A.removed ? '−' + fmt(A.removed) : '0', 'снято здоровья', '']].concat(A.kill ? [[`+${fmt(A.mine)}`, 'ваши очки', 'win']] : [[`${pc(A.removed)} %`, 'здоровья цели', '']]);
+    const kpi = [[String(A.count), atk(A.count), ''], [A.removed ? '−' + fmt(A.removed) : '0', 'снято здоровья', '']].concat(A.kill ? [[`+${fmt(A.mine)}`, 'ваши очки', 'win']] : [[shareTxt(A.share != null ? A.share : 0), 'здоровья цели', '']]);
     const marks = (A.first ? `<span class="chip spirit">${ic('book')}новое в бестиарии</span>` : '') + (A.summoned ? `<span class="chip gold">${ic('crown')}встал Хозяин недели</span>` : '') + (A.circle ? `<span class="chip spirit">${ic('up')}открыт круг ${A.circle}</span>` : '') + (A.burned.length ? '<span class="chip warn">висящие элиты сгорели</span>' : '');
     const why = A.kill ? (A.attLeft ? `Цель пала на ${A.count}-й атаке — ещё ${A.attLeft} ${plural(A.attLeft, 'атака осталась', 'атаки остались', 'атак остались')} в кошельке.` : 'Цель пала последней атакой.')
       : 'Очки придут, когда цель падёт: по снятому здоровью, без бонуса за добивание.';
@@ -943,9 +976,10 @@ Object.assign(OV, {
     const me = meOf(C), pts = weekPts(), place = placeOf(pts), pend = C.boss.targets.filter(x => !x.dead && !x.burned && x.dmg[me.id]);
     const top = C.members.slice().sort((a, b) => b.boss - a.boss).slice(0, CL_VIEW.list);
     const body = `<div class="row cl-stats"><div class="stat"><b class="num">${fmt(C.boss.mine)}</b><small>ваши очки</small></div><div class="stat"><b class="num">${fmt(pts)}</b><small>очки клана${place ? ' · #' + fmt(place) : ''}</small></div></div>
-      ${pend.length ? `<span class="eyebrow">Ваш урон в пути</span><div class="cl-list">${pend.map(x => `<div class="cl-lrow"><span>${nameOf(x)}</span><b class="num">${fmt(x.dmg[me.id])}</b></div>`).join('')}</div><p class="reason">Очки за него придут, когда цель падёт. Не добьёте до конца недели — счёт сгорит.</p>` : ''}
+      ${pend.length ? `<span class="eyebrow">Ваш урон в пути</span><div class="cl-list">${pend.map(x => `<div class="cl-lrow"><span>${nameOf(x)}</span><b class="num">${shareTxt(x.dmg[me.id])}</b></div>`).join('')}</div><p class="reason">Очки за него придут, когда цель падёт. Не добьёте до конца недели — счёт сгорит.</p>` : ''}
       <span class="eyebrow">Вклад недели · очки кланового босса</span>
-      <div class="cl-list">${top.map(m => `<div class="cl-lrow ${m.me ? 'me' : ''}"><span>${esc(m.n)}</span><b class="num">${fmt(m.boss)}</b></div>`).join('')}</div>
+      <div class="cl-list">${top.map(m => `<div class="cl-lrow ${m.me ? 'me' : ''}"><span>${esc(m.n)}<small class="faint"> · цикл ${ROMAN[m.cyc]}</small></span><b class="num">${fmt(m.boss)}</b></div>`).join('')}</div>
+      <p class="reason">Каждый бьёт цель в силе своего цикла: урон идёт в общий счёт долей её здоровья, очки за врага у всех одни.</p>
       <p class="reason">${C.hop ? 'На этой неделе вы били врагов другого клана: ваши очки — ваши, клану они пойдут со следующей недели.' : 'Личные очки и их награды от главы не зависят.'}</p>`;
     return sheet('Вклад и итоги', body, `<button class="link" data-a="sheet" data-v="rank:Клановый босс">Рейтинг ${ic('chev')}</button>`);
   },
@@ -958,6 +992,7 @@ Object.assign(OV, {
       ['Босс', `${D.boss.kills} победы над Голосами поднимают Хозяина недели — сейчас стихии «${W.el}»; висящие элиты сгорают. Контроль на Хозяина не действует — только дебаффы`],
       ['Очки', 'по снятому здоровью, в момент смерти цели; бонуса за добивание нет. Не добили до конца недели — счёт сгорел'],
       ['Лестница', 'после босса — новый круг: враги сильнее, очки выше. Каждую неделю — с первого круга'],
+      ['Циклы', 'каждый бьёт цель в силе своего цикла; урон — доля её здоровья в общем счёте, очки за врага у всех одни'],
       ['Переход', 'кто на этой неделе бил врагов другого клана, новому клану приносит очки со следующей недели']];
     return sheet('Как устроен круг', `${kv(rows)}<p class="quote"><b>Совет старика</b>${esc(HOST.aversionTip)}</p>${TM(`<p class="reason">Раунды: элита — ${EC.rounds(D, 'e', C.picks, C.lvl || 0)}, босс — ${D.boss.rounds.b}; сила круга (12 + уровень) × ${D.boss.circle.xBp / 100} %, очки × ${D.boss.points.yBp / 100} % за круг.</p>`, 'div')}`, `<button class="link" data-a="sheet" data-v="clhosts">Сонмы стихий ${ic('chev')}</button>`);
   },
@@ -967,16 +1002,39 @@ Object.assign(OV, {
     const w = EC.contrib(D, C.members), sum = w.reduce((a, x) => a + x, 0), i = C.members.indexOf(m), P = C.past;
     const got = P && P.done ? P.groups.reduce((a, g, gi) => a + (P.server[gi][P.members.findIndex(z => z.id === m.id)] || 0) + (P.plan[gi][m.id] || 0), 0) : null;
     const body = `<div class="row cl-phead"><span class="cl-av lg" data-role="${m.role}">${initials(m.n)}</span><div class="col"><b class="serif cl-name">${esc(m.n)}</b><small class="faint">${roleOf(m.role).n} · уровень ${m.lvl} · цикл ${ROMAN[m.cyc]}</small></div></div>
-      ${kv([['Вклад недели', `${sum ? Math.round(w[i] * 100 / sum) : 0} %`], ['Резервуар', `${fmt(m.res)} ${ptsWord(m.res)}`], ['Клановый босс', `${fmt(m.boss)} ${ptsWord(m.boss)}`], ['Атак на сегодня', m.atk], ['В клане', m.weeks ? `${m.weeks} ${plural(m.weeks, 'неделю', 'недели', 'недель')}` : 'с этой недели'], ['В сети', ago(m.seen)],
-        got != null ? ['Награды прошлой недели', `${got} ${chestWord(got)}`] : null])}`;
-    let foot = '';
-    if (m.me) foot = `<button class="btn ghost warn" data-a="dlg" data-v="clleave">Выйти из клана</button>`;
+      ${kv([['Вклад недели', `${sum ? Math.round(w[i] * 100 / sum) : 0} %`], ['Резервуар', resTxt(m)], ['Клановый босс', `${fmt(m.boss)} ${ptsWord(m.boss)}`], ['Атак на сегодня', m.atk], ['В клане', m.weeks ? `${m.weeks} ${plural(m.weeks, 'неделю', 'недели', 'недель')}` : 'с этой недели'], ['В сети', ago(m.seen)],
+        got != null ? ['Награды прошлой недели', `${got} ${chestWord(got)}`] : null])}
+      ${m.cyc !== myC() ? `<p class="reason">Очки цикла ${ROMAN[m.cyc]} засчитаны в очках вашего цикла: по первой планке контрактов — ${fmt(D.norm.ct[m.cyc])} у цикла ${ROMAN[m.cyc]}, ${fmt(D.norm.ct[myC()])} у вашего.</p>` : ''}`;
+    let foot = `<button class="link" data-a="sheet" data-v="clcount">Как засчитан вклад ${ic('chev')}</button>`;
+    if (m.me) foot += `<button class="btn ghost warn" data-a="dlg" data-v="clleave">Выйти из клана</button>`;
     else if (can('roles') && m.role !== 'head') {
       const tr = m.role === 'treasurer';
-      foot = `<button class="btn sm" data-a="clrole" data-v="${m.id}:${tr ? 'member' : 'treasurer'}:${clOp()}">${tr ? 'Снять казначея' : 'Сделать казначеем'}</button>
-        <button class="btn sm" data-a="dlg" data-v="cllead:${m.id}">Передать главенство</button><button class="btn sm ghost warn" data-a="dlg" data-v="clkick:${m.id}">Исключить</button>`;
+      foot = `<div class="cl-mfoot"><button class="btn sm" data-a="clrole" data-v="${m.id}:${tr ? 'member' : 'treasurer'}:${clOp()}">${tr ? 'Снять казначея' : 'Сделать казначеем'}</button>
+        <button class="btn sm" data-a="dlg" data-v="cllead:${m.id}">Передать главенство</button><button class="btn sm ghost warn" data-a="dlg" data-v="clkick:${m.id}">Исключить</button></div>`;
     }
     return sheet(esc(m.n), body, foot);
+  },
+  /* как засчитан вклад (ADR-0042): очки растут с циклом, клан складывает их по первым планкам циклов; клановый босс — каждый бьёт цель
+     в силе своего цикла. Игроку — его неделя, планки по циклам и участники: их очки → засчитано в очках цикла игрока */
+  clcount() {
+    sync(); const C = S.clan; if (!C.in) return '';
+    const me = meOf(C), c = myC(), cs = D.cycles, w = EC.contrib(D, C.members), sum = w.reduce((a, x) => a + x, 0), pc = i => sum ? Math.round(w[i] * 100 / sum) : 0;
+    const byCyc = (n, f) => `<div class="cl-lrow"><span>${n}</span><b class="num">${cs.map(x => `<span class="${x === c ? 'gold' : ''}">${ROMAN[x]} — ${fmt(f(x))}</span>`).join(' · ')}</b></div>`;
+    /* участники других циклов — первыми: на них видно, как засчитан вклад; дальше — по вкладу недели */
+    const rows = C.members.map((m, i) => ({ m, i })).sort((a, b) => (b.m.cyc !== c) - (a.m.cyc !== c) || b.m.cyc - a.m.cyc || w[b.i] - w[a.i] || a.m.n.localeCompare(b.m.n)).slice(0, CL_VIEW.list).map(({ m, i }) =>
+      `<div class="cl-crow ${m.me ? 'me' : ''}"><span class="cl-mt"><b>${esc(m.n)}${m.me ? ' · вы' : ''}</b><small>цикл ${ROMAN[m.cyc]}</small></span>
+        <span class="cl-cv"><small>резервуар</small><b class="num">${m.cyc === c ? fmt(m.resRaw || 0) : `${fmt(m.resRaw || 0)} → ${fmt(ctMine(m.res))}`}</b></span>
+        <span class="cl-cv"><small>босс</small><b class="num">${fmt(m.boss)}</b></span><span class="cl-cv"><small>вклад</small><b class="num">${pc(i)} %</b></span></div>`).join('');
+    const body = `<div class="row cl-stats"><div class="stat"><b class="num">${pc(C.members.indexOf(me))} %</b><small>ваш вклад недели</small></div><div class="stat"><b class="num">${fmt(me.resRaw || 0)}</b><small>ваши очки в резервуар</small></div><div class="stat"><b class="num">${fmt(C.boss.mine)}</b><small>ваши очки босса</small></div></div>
+      <p class="muted">Очки растут с циклом, поэтому клан засчитывает каждого по первой планке его цикла: взяли одинаково планок — принесли поровну, в каком бы цикле ни были.</p>
+      <span class="eyebrow">Участники · резервуар: их очки → в очках вашего цикла</span><div class="col cl-clist">${rows}</div>
+      <span class="eyebrow">Первая планка контрактов · ваш цикл — золотом</span><div class="cl-list">${byCyc('Контракты', x => D.norm.ct[x])}</div>
+      <p class="muted">Клановый босс: каждый бьёт цель в силе своего цикла, урон идёт в общий счёт долей её здоровья. Очки за врага у всех одни.</p>
+      <div class="cl-list">${byCyc('Сила цели в первом круге, уровень', x => EC.circleLvl(D, 1, x))}</div>
+      <details class="cl-det"><summary>${ic('chev')}Клановые планки Событий и Эхо</summary><div class="col"><p class="reason">Складываются так же — по первой личной планке цикла каждого участника.</p>
+        <div class="cl-list">${byCyc('Событие', x => D.norm.ev[x])}${byCyc('Эхо', x => D.norm.echo[x])}</div></div></details>
+      ${TM(`<p class="reason">ADR-0042: засчитано = очки × норма цикла ${ROMAN[D.norm.base]} / норма цикла участника (EN_CLAN.norm — первые личные планки режимов); на экране — в очках цикла игрока (EnClan.toCycle). Клановый босс — своя копия: круг 1 цикла c — ${D.boss.circle.pow1} × средняя сила цикла c / ${D.boss.circle.norm[D.norm.base]} (boss.circle.byCyc), счёт цели — ${fmt(D.boss.bar)} долей здоровья.</p>`, 'div')}`;
+    return sheet('Как засчитан вклад', body, `<button class="link" data-a="sheet" data-v="clresv">Резервуар ${ic('chev')}</button>`, true);
   },
   /* заявки: принять или отклонить; мест нет — нельзя принять */
   clapps() {
@@ -1254,6 +1312,8 @@ function clKitHtml() {
   const circ = D.calc.circles.map(r => `<tr><td class="num">${r[0]}</td><td class="num">${fmt(r[1])}</td><td class="num">${fmt(r[2])}</td><td class="num">${fmt(r[3])}</td><td class="num">${fmt(r[6])} / ${fmt(r[7])}</td></tr>`).join('');
   const PROF = { o: 'обычный', e: 'увлечённый' };
   const weeks = D.calc.weeks.map(r => `<tr><td>${PROF[r[0]]}, ${ROMAN[r[1]]} · ${r[2]}-я</td><td class="num">${fmt(r[3])}</td><td class="num">${r[5]} × ${r[6]}</td><td class="num">${r[8]}${r[9] ? ' + ' + r[9] : ''}</td><td class="num">${fmt(r[10])}</td></tr>`).join('');
+  /* клан и разные циклы (ADR-0042): прогон смешанных кланов калькулятора — как было и по правилу нормы цикла */
+  const mix = (D.calc.mix || []).map(r => `<tr><td>${r[0].map(([c, n]) => `${n} в ${ROMAN[c]}`).join(' + ')}</td><td class="num">${fmt(r[2])}</td><td class="num">${fmt(r[5])}</td><td class="num">${fmt(r[6])} → ${fmt(r[7])}</td></tr>`).join('');
   const ref = D.res.ref.o.map(([n, d]) => `<tr><td class="num">${n}</td><td class="num">${fmt(need(n))}</td><td class="num">${d ? fmt(d) : '—'}</td></tr>`).join('');
   const rights = Object.keys(D.rights).map(k2 => `<tr><td>${D.rights[k2]}</td>${D.roles.map(r => `<td class="c">${r.rights.includes(k2) ? '●' : ''}</td>`).join('')}</tr>`).join('');
   const knots = `<div class="cl-knots static"><span class="cl-k on" title="выбрано"></span><span class="cl-k now" title="можно выбрать"></span><span class="cl-k" title="впереди"></span><span class="cl-k big on" data-kind="fork" title="вилка кланового босса — пятый уровень ветки">${ic('sword')}</span><span class="cl-k big" data-kind="key" title="ключ ветки — десятый уровень">${ic('star')}</span></div>`;
@@ -1285,6 +1345,8 @@ function clKitHtml() {
         <p class="k-note">Сила врагов круга ×${D.boss.circle.xBp / 100} %, очки — так же. Круг 1 — отряд обычного игрока в первый день цикла II: элита падает за ${D.calc.c1.e / 100} атак, босс — за ${D.calc.c1.b / 100}.</p></div>
       <div class="col"><span class="eyebrow">Неделя эталонных кланов</span><table class="cl-t k"><thead><tr><th>Клан</th><th>Сила</th><th>Атаки</th><th>Кругов</th><th>Очков</th></tr></thead><tbody>${weeks}</tbody></table>
         <p class="k-note">Прогон ядром: круги по порядку, пока хватает атак недели. Потолок клана — его сила.</p></div>
+      <div class="col" style="grid-column:1/-1"><span class="eyebrow">Клан и разные циклы · прогон смешанных кланов</span><table class="cl-t k"><thead><tr><th>Состав</th><th>Клановый босс, как было</th><th>Своя копия</th><th>Резервуар: сырые → засчитано</th></tr></thead><tbody>${mix}</tbody></table>
+        <p class="k-note">ADR-0042: вклад — в долях нормы своего цикла. Норма — первая личная планка режима в цикле (<code>EN_CLAN.norm</code>); клановый босс — своя копия цели в силе цикла атакующего, урон — доля её здоровья (<code>boss.bar</code>). Допуск «клан из одного цикла и смешанный» — ±${(D.calc.mixTolBp || 0) / 100} %. Таблицы — <code>docs/content/клан.md</code>, «Клан и разные циклы».</p></div>
       <div class="col"><span class="eyebrow">Законы клана</span><ul class="cl-laws">${D.laws.map(l => `<li>${l}</li>`).join('')}</ul></div>
     </div></section>`;
 }
@@ -1325,5 +1387,5 @@ FLOWS.push(
 
 /* для автопроверки tools/content-gen/screens/check_clan.js и консоли */
 window.EN_CLAN_UI = { data: CL, view: CL_VIEW, srv: CL_SRV, sync, fresh, weekEnd, refillDay, placeOf, weekPts, nextPick, pointsFree, fightOf, battleOf, circleTargets, searchList, joinWhy, countWeek, planFull, tgtCard, choiceHtml, mileHtml,
-  face, figKnown, figId, weekBoss, nextBoss, guardsHtml, artOf, ART_READY, atkOp, allCan };
+  face, figKnown, figId, weekBoss, nextBoss, guardsHtml, artOf, ART_READY, atkOp, allCan, myC, copyOf, seenBy, shareTxt, ctMine, resTxt };
 })();

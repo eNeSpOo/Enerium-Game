@@ -1,0 +1,556 @@
+/* Автопроверка «Бой AAA»: сцена, окна в бою, эффекты, ритуал этажа (design/ui/screens/battle-scene.js, design/ui/fx.js) — без браузера.
+   Слова автора 01.10.2026: «покажи мне боевую сцену и все попапы в ней на ааа уровне и понятной информацией по бафам, дебафам, скиллам
+   шансам, количество хп на хп баре надо, ну и сама боевая система в виде нынешних партиклов не годится, попробуй сделай ААА уровень».
+   Законы — на настоящих боях прототипа: биом (рядовые, элита, босс), рунный страж, Эхо (Убер, Многоликий), Арена.
+   A. Здоровье числом: у каждой карты на полосе — число здоровья, ровно показанное; щит — отдельным числом, когда он есть; во всех трёх
+      видах карт. Значки эффектов на карте — с числом раундов и стаков, рисованный медальон; не встали — «+N» ровно по числу скрытых.
+   B. Окно карты: здоровье «N / M» и щит; у врага — иммунитет к контролю по рангу и раунды его типа из таблицы ядра; у изученного —
+      каждая способность таблицы шансов строкой с рисованной иконкой (библиотеки; у уникальной — своей из BS_ART.abUnique), шансом ядра
+      и тем, что делает, обычная атака — остатком шанса и иконкой своего вида удара; каждый эффект — строкой: значок, имя, что делает, раунды, стаки,
+      кто наложил; у неизученного — ни имени, ни способностей; классы окна не задевают сетку и ширину, которые index.html даёт классу.
+   C. Эффекты — только transform и opacity: кадры Web Animations сцены EnFx.scene у каждого вида; @keyframes, которые крутят бой
+      (index.html, battle-cards.css, battle-scene.css, с учётом каскада); «меньше движения» — снаряды не летят, поле не трясётся, спрайты
+      только гаснут, ленты кадров играют на месте; числа, надписи и плашки видны свою длительность (--bs-d сильнее общего правила
+      index.html), враги не прячутся при выходе.
+   D. Режим «Игрок»: в бою, в окне карты врага и героя, в легенде «Знаки», на баннере, в итоге этажа и в «Стене» — ни одного служебного слова.
+   E. Данные и арт: значок у каждого эффекта, который ядро может наложить, урон и лечение со временем — у каждой школы; спрайты и ленты
+      VFX, рамки-квадраты (тело, венец, целиком), украшения HUD, иконки боя — на диске и в tools/art-gen/ui-art.json с исходником; клетки
+      листов jobs/ability-icons-unique.json — ровно таблица BS_ART.abUnique; лента — столько кадров, сколько в данных; фазы ритуала
+      RULES.floor.ritual и минимум RULES.floor.minMs — целые мс; взятый этаж с ритуалом кончается не раньше b.t (конец боя по ядру) — и на
+      экране, и у свёрнутого забега, время показа идёт ровно тактом (и на последнем такте ритуала), ритуал на экране показан, его «+N» —
+      ровно то, что зачислено в кошелёк, с циклом и артефактами игрока. UI-кит: раздел «Бой AAA» рисуется.
+   Мутации: каждая ломает закон — он обязан упасть.
+   Запуск: node tools/content-gen/screens/check_battle_scene.js */
+'use strict';
+const fs = require('fs'), path = require('path'), vm = require('vm');
+const { SERVICE, playerText } = require('./check_player_view.js');
+
+/* проверочные числа: минимум этажа для пробы ритуала (данные калькулятора фарма могут быть любыми, проба — своим числом), шаг хода
+   пробы и предел шагов, мс */
+const RITUAL_TEST_MS = 120000, STEP_MS = 50, STEPS_MAX = 4000;
+/* «меньше движения»: сведения, которым battle-scene.css возвращает длительность; песок тает сжатием — ему transform можно */
+const CALM_INFO = ['.fly', '.fly.crit', '.bs-call', '.bs-call.ult', '.bt-banner.bs-ban', '.bs-rflash', '.bs-transit', '.bs-loot', '.bs-taken', '.bs-taken .sand>i'];
+const CALM_MOVE_OK = ['.bs-taken .sand>i'];
+/* селектор боя: поле, карты, числа, надписи, плашки, спрайты, значки, рамки */
+const BATTLE_SEL = /\.(?:bt(?:-[\w-]+)?|bc|fly|bs-[\w-]+|vx[\w-]*|vf|si2|fxl|sfc?|sfa|bsf|bsi-[\w-]+)(?![\w-])/;
+
+const ROOT = path.join(__dirname, '..', '..', '..'), UI = path.join(ROOT, 'design', 'ui');
+const read = f => fs.readFileSync(path.join(UI, f), 'utf8');
+const err = [];
+const say = m => { if (err.length < 60) err.push(m); else if (err.length === 60) err.push('… и ещё ошибки'); };
+const cnt = { battles: 0, cards: 0, badges: 0, insp: 0, abs: 0, art: 0, uniq: 0, sts: 0, kinds: 0, frames: 0, kf: 0 };
+let CNT = null;   // счёт первого прохода — мутации прогоняют законы снова
+function done(extra) {
+  const c = CNT || cnt;
+  if (err.length) { console.log('ОШИБКИ:\n' + err.map(e => '  ✗ ' + e).join('\n')); process.exit(1); }
+  console.log(`Бой AAA: боёв ${c.battles}, карт ${c.cards} (в трёх видах), значков ${c.badges}; окон карты ${c.insp}: способностей ${c.abs} (рисованная иконка — у ${c.art}, своя уникальная — у ${c.uniq}), эффектов ${c.sts}; видов эффекта ${c.kinds} — и с «меньше движения», кадров анимации ${c.frames}, анимаций CSS боя ${c.kf}.${extra ? ' ' + extra : ''}`);
+  console.log('Проверка пройдена: здоровье числом и щит отдельно, значки эффектов с раундами и стаками; окно карты — способности с иконкой и шансом, эффекты с раундами и тем, кто наложил, иммунитет и раунды типа; эффекты — только transform и opacity, «меньше движения»; режим «Игрок»; значки, спрайты, рамки и HUD на диске; ритуал этажа; мутации пойманы.');
+  process.exit(0);
+}
+
+/* ================== 1. файлы ================== */
+const html = read('index.html');
+for (const f of ['screens/battle-scene.js', 'screens/battle-scene.css']) {
+  if (!fs.existsSync(path.join(UI, f))) { say('нет design/ui/' + f); continue; }
+  const t = read(f); if ((t.match(/\r\n/g) || []).length !== (t.match(/\n/g) || []).length) say(`${f}: концы строк не CRLF`);
+}
+if (!html.includes('<link rel="stylesheet" href="screens/battle-scene.css">')) say('index.html: не подключён screens/battle-scene.css');
+{
+  const order = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]), at = order.indexOf('screens/battle-scene.js');
+  if (at < 0) say('index.html: не подключён screens/battle-scene.js');
+  else for (const f of ['fx.js', 'screens/battle-cards.js', 'screens/biomes.js', 'screens/art-icons.js']) if (order.indexOf(f) > at) say(`index.html: screens/battle-scene.js — раньше ${f}: он оборачивает её функции`);
+}
+if (err.length) done();
+
+/* ================== 2. песочница — как у check_battle_cards.js ================== */
+const scripts = [...html.matchAll(/<script(?:\s+src="([^"]+)")?>([\s\S]*?)<\/script>/g)].map(m => ({ src: m[1], code: m[2] }));
+const stubEl = id => {
+  const e = { id, innerHTML: '', textContent: '', value: '', hidden: false, style: { setProperty() {} }, dataset: {}, children: [],
+    classList: { add() {}, remove() {}, toggle() {}, contains: () => false }, addEventListener() {}, removeEventListener() {}, appendChild: x => x, remove() {},
+    animate: () => ({}), insertAdjacentHTML() {}, setAttribute() {}, getAttribute: () => null, querySelectorAll: () => [], closest: () => null,
+    getBoundingClientRect: () => ({ left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 }), scrollIntoView() {}, focus() {}, clientWidth: 1200, clientHeight: 800 };
+  e.querySelector = () => stubEl();
+  return e;
+};
+const els = {}, store = {};
+const document = { readyState: 'loading', addEventListener() {}, getElementById: id => (els[id] = els[id] || stubEl(id)), querySelector: () => null, querySelectorAll: () => [],
+  createElement: () => stubEl(), createElementNS: () => stubEl(), body: stubEl('body'), documentElement: stubEl('html'), activeElement: null, fonts: null };
+const win = { document, console: { log() {}, warn() {}, error() {}, info() {} }, navigator: { userAgent: 'node' }, location: { hash: '', href: '' }, history: { replaceState() {} },
+  localStorage: { getItem: k => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: k => { delete store[k]; } }, innerWidth: 1400, innerHeight: 900, devicePixelRatio: 1,
+  addEventListener() {}, removeEventListener() {}, dispatchEvent() {}, matchMedia: () => ({ matches: false, addEventListener() {}, addListener() {} }),
+  requestAnimationFrame: () => 0, cancelAnimationFrame() {}, setTimeout: () => 0, clearTimeout() {}, setInterval: () => 0, clearInterval() {},
+  getComputedStyle: () => ({ getPropertyValue: () => '' }), CustomEvent: function CustomEvent() {}, performance: { now: () => 0 } };
+win.window = win; win.self = win;
+const ctx = vm.createContext(win);
+for (const s of scripts) {
+  try { vm.runInContext(s.src ? read(s.src) : s.code, ctx, { filename: s.src || 'index.html' }); }
+  catch (e) { say(`выполнение ${s.src || 'встроенного скрипта'}: ${e.message}`); }
+}
+if (err.length) done();
+const T = vm.runInContext(`({ get S() { return S; }, set S(v) { S = v; }, render, initialState, startRun, advance, paintInsp, statusHtml, setTeam, FLOWS, ACT, RS, rsSetWeek, EB, BF,
+  bsStatuses, bsHpTxt, bsBanner, bsRoundsOf, bsAbArt, BS_DATA, BS_ART, BS_FRAME, abArt, uName, unitKnown, roundWord, pctBp, fmt, dkey, OV, KIT_EXTRA, legendHtml, FOE_LOOK })`, ctx);
+const LIB_IDS = new Set(vm.runInContext('window.EN_ABILITIES', ctx).sets.flatMap(s => s.items.map(x => x.id)));
+const run = (where, f) => { try { return f(); } catch (e) { say(`${where}: исключение — ${e.message} | ${(e.stack || '').split('\n').slice(1, 3).join(' | ').trim()}`); return undefined; } };
+const draw = where => { run(where, () => T.render()); return els.game ? els.game.innerHTML : ''; };
+const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const CARD = /<div class="bc [^"]*" id="bc(\d)(\d+)"[^>]*>[\s\S]*?<div class="rot"><\/div>\s*<\/div>/g;
+const fresh = () => { T.S = T.initialState(); T.S.overlay = null; T.S.runs = []; T.S.insp = null; T.S.legend = false; T.S.bfv = 'square'; T.setTeam(true); T.S.heroes.forEach(h => { h.busy = null; }); };
+const lastRun = kind => T.S.runs.filter(r => kind ? r.kind === kind : !r.kind).slice(-1)[0];
+const dispOf = (R, u) => R.disp[T.dkey(u)] || { hp: u.hp, sh: u.sh, dead: !u.alive };
+
+/* бои всех видов: биом — рядовые, элита, босс; рунный страж; Эхо — Убер и Многоликий; Арена */
+const BATTLES = [];
+{
+  const EB = T.EB;
+  for (const [id, g] of [['b3', 'o'], ['b3', 'e'], ['b3', 'b']]) {
+    const B = EB.BIOMES[id], fl = B ? B.floors.findIndex(f => f.g === g) + 1 : 0;
+    if (!fl) { say(`нет этажа «${g}» у биома ${id}`); continue; }
+    BATTLES.push([`биом ${id} · этаж ${fl} (${g})`, () => { fresh(); T.startRun('s1', id, fl); return lastRun(); }]);
+  }
+  BATTLES.push(['рунный страж b2', () => { fresh(); T.startRun('s1', 'b2', 0, true); return lastRun(); }]);
+  const E = vm.runInContext('window.EN_ECHO', ctx);
+  for (const g of ['u', 'm']) BATTLES.push([`Эхо · ${g === 'u' ? 'Убер' : 'Многоликий'}`, () => {
+    fresh(); T.rsSetWeek(T.RS.weeks[0].race); T.S.acc.cycle = 3; T.S.route = 'echo'; T.S.wallet.souls = 1e9; E.sync();
+    const x = E.target('step', g === 'm' ? E.steps.length + 1 : E.steps.indexOf(g) + 1);
+    T.S.echo.slots[0] = x; T.S.echo.sel = 0; T.ACT.echatk(x.uid + ':1'); return lastRun('echo');
+  }]);
+  BATTLES.push(['Арена', () => { fresh(); const f = T.FLOWS.find(y => y[0] === 'Арена · атака и итог'); f[2](); return lastRun('pvp'); }]);
+}
+/* эффекты, как их кладёт ядро: урон со временем со стаками и наложившим, бафф и дебаффы с наложившим (вредных больше, чем встаёт, —
+   «+N»), контроль, лечение со временем, эффект до конца этажа; щит — числом */
+function seed(R) {
+  const [hs, fs_] = R.b.u, h0 = hs[0], f0 = fs_[0];
+  h0.st.push({ k: 'dot', school: 'Огонь', per: 37, coef: 40, stacks: 2, max: 3, left: 2, left0: 3, src: f0, drain: 0, n: 0 });
+  h0.st.push({ k: 'guard', left: 1, left0: 2, pow: 2500, by: hs[1] || h0 });
+  h0.st.push({ k: 'weak', left: 2, left0: 3, pow: 2000, by: f0 });
+  h0.st.push({ k: 'slow', left: 1, left0: 2, pow: 1500, by: f0 });   // третий вредный — за «+N»
+  h0.aura = Object.assign({}, h0.aura, { dmgUp: 1500 });
+  f0.st.push({ k: 'stun', left: 1, left0: 1, pow: 0, by: h0 });
+  f0.st.push({ k: 'mark', left: 3, left0: 3, pow: 2000, by: h0 });
+  f0.st.push({ k: 'hot', school: 'Земля', per: 21, coef: 30, stacks: 1, max: 3, left: 2, left0: 3, src: fs_[1] || f0, drain: 0, n: 0 });
+  R.disp[T.dkey(h0)] = { hp: Math.floor(h0.maxHp * 2 / 3), sh: Math.floor(h0.maxHp / 5), dead: false };
+}
+/* враги изучены (on) или нет — окно показывает способности или хранит тайну; возвращает, как было */
+function know(R, on) {
+  const saved = [];
+  for (const u of R.b.u[1]) {
+    const Lk = T.FOE_LOOK[u.id];
+    saved.push([u, Lk ? Lk.known : null, T.S.known.includes(u.id)]);
+    if (Lk) Lk.known = on;
+    if (on && !T.S.known.includes(u.id)) T.S.known.push(u.id);
+    if (!on) T.S.known = T.S.known.filter(x => x !== u.id);
+  }
+  return () => { for (const [u, k, had] of saved) { const Lk = T.FOE_LOOK[u.id]; if (Lk) Lk.known = k; T.S.known = T.S.known.filter(x => x !== u.id); if (had) T.S.known.push(u.id); } };
+}
+
+/* ================== законы A, B, D — на каждом бою ================== */
+const L = {};
+L.A = (R, key) => {
+  const out = [], b = R.b, sq = {};
+  try {
+    for (const v of ['square', 'portrait', 'old']) {
+      T.S.bfv = v;
+      const h = draw(`${key} · ${v}`), cards = [...h.matchAll(CARD)];
+      if (cards.length !== b.u[0].length + b.u[1].length) out.push(`${key} · ${v}: карт ${cards.length}, бойцов ${b.u[0].length + b.u[1].length}`);
+      for (const m of cards) {
+        const u = b.u[+m[1]][+m[2]], d = dispOf(R, u), c = m[0], where = `${key} · ${v} · ${u.name}`;
+        if (v === 'square') sq[T.dkey(u)] = c;
+        const hn = (c.match(/<b class="hpn">([^<]*)<\/b>/) || [])[1], sn = (c.match(/<b class="shn">([^<]*)<\/b>/) || [])[1];
+        const want = T.bsHpTxt(d.dead ? 0 : d.hp), wsh = d.sh > 0 && !d.dead ? T.bsHpTxt(d.sh, true) : '';
+        if (hn == null) out.push(`${where}: на полосе нет числа здоровья`);
+        else if (hn !== want || !/\d/.test(hn)) out.push(`${where}: на полосе «${hn}», а здоровье ${want}`);
+        if (sn == null) out.push(`${where}: на полосе нет места числу щита`);
+        else if (sn !== wsh) out.push(`${where}: щит на полосе «${sn}», ждали «${wsh}»`);
+        cnt.cards++;
+      }
+    }
+  } finally { T.S.bfv = 'square'; }
+  /* значки — столбики карты-квадрата, их рисует paintCards нынешней statusHtml: столько, сколько встаёт, остальные — «+N» */
+  for (const u of [b.u[0][0], b.u[1][0]]) {
+    const d = dispOf(R, u), all = T.bsStatuses(u, d, b.mode === 'rounds'), cap = T.BS_DATA.cap.square;
+    const c = run(`${key} · значки`, () => vm.runInContext('statusHtml', ctx)(u, d, b.mode === 'rounds').join('')) || '';
+    if (!sq[T.dkey(u)] || !/class="buffs"/.test(sq[T.dkey(u)]) || !/class="debuffs"/.test(sq[T.dkey(u)])) out.push(`${key} · ${u.name}: на карте-квадрате нет столбиков значков`);
+    const shown = c.match(/<span class="si2 (?:good|bad)/g) || [], more = [...c.matchAll(/<span class="si2 more"[^>]*>\+(\d+)</g)].reduce((a, x) => a + +x[1], 0);
+    const nG = all.filter(I => I.good).length, nB = all.length - nG;
+    if (shown.length !== Math.min(cap, nG) + Math.min(cap, nB)) out.push(`${key} · значки ${u.name}: на карте ${shown.length}, ждали ${Math.min(cap, nG) + Math.min(cap, nB)}`);
+    if (more !== Math.max(0, nG - cap) + Math.max(0, nB - cap)) out.push(`${key} · значки ${u.name}: «+N» — ${more}, скрыто ${Math.max(0, nG - cap) + Math.max(0, nB - cap)}`);
+    for (const I of all) {
+      const at = c.indexOf(`title="${esc(I.name)}:`);
+      if (at < 0) continue;   // не встал — за «+N»
+      cnt.badges++;
+      const badge = c.slice(c.lastIndexOf('<span class="si2', at), c.indexOf('</span>', at) + 7);
+      if (!badge.includes(`<span class="si2 ${I.good ? 'good' : 'bad'}`)) out.push(`${key} · значок «${I.name}» у ${u.name}: не в своём столбике — ${I.good ? 'полезный' : 'вредный'}`);
+      if (I.left != null && !badge.includes(`<b class="l">${I.left}</b>`)) out.push(`${key} · значок «${I.name}» у ${u.name}: нет числа раундов ${I.left}`);
+      if (I.stacks > 1 && !badge.includes(`<b class="k">${I.stacks}</b>`)) out.push(`${key} · значок «${I.name}» у ${u.name}: нет стаков ${I.stacks}`);
+      if (!I.icon || !badge.includes(`<img src="${I.icon}"`)) out.push(`${key} · значок «${I.name}» у ${u.name}: нет рисованного медальона`);
+    }
+  }
+  return out;
+};
+/* строка окна по имени: от начала строки до её конца */
+const rowOf = (h, name) => { const at = h.indexOf(`<b>${esc(name)}`); if (at < 0) return ''; const s = h.lastIndexOf('<div class="bsi-r', at), e = h.indexOf('</div></div>', at); return h.slice(s, e < 0 ? undefined : e + 12); };
+/* классы, которым index.html сам по себе задаёт сетку или ширину (.g — сетка игры 932 px, .ch — строка 190 px): в окне карты они ломают
+   вёрстку — строка эффекта вытягивалась на всю высоту окна. Свои классы окна — с приставкой bsi-, общие детали — из списка */
+const LAYOUT_CLS = (() => {
+  const css = [...html.matchAll(/<style>([\s\S]*?)<\/style>/g)].map(m => m[1]).join('\n').replace(/\/\*[\s\S]*?\*\//g, ''), out = new Set();
+  for (const m of css.matchAll(/(?:^|\})\s*\.([\w-]+)\s*\{([^}]*)\}/g)) if (/display:\s*(?:grid|flex)|(?:^|;)\s*width:/.test(m[2])) out.add(m[1]);
+  return out;
+})();
+const WINDOW_SHARED = new Set(['chip', 'iconbtn', 'x', 'bar', 'ico', 'i', 'ivl', 'btn']);
+L.B = (R, key) => {
+  const out = [], b = R.b;
+  const insp = u => {
+    T.S.insp = T.dkey(u); els.btInsp = null; run(`${key} · окно`, () => T.paintInsp(R));
+    const h = (els.btInsp || {}).innerHTML || '';
+    for (const m of h.matchAll(/class="([^"]+)"/g)) for (const c of m[1].split(/\s+/)) if (LAYOUT_CLS.has(c) && !WINDOW_SHARED.has(c)) out.push(`${key} · окно ${u.name}: класс «${c}» — у index.html это сетка или ширина, вёрстка окна ломается`);
+    return h;
+  };
+  const back = know(R, true);
+  try {
+    for (const sd of [0, 1]) for (const u of b.u[sd]) {
+      const h = insp(u), where = `${key} · окно ${sd ? 'врага' : 'героя'} ${u.name}`, d = dispOf(R, u);
+      cnt.insp++;
+      if (!h.includes(`<b>${T.fmt(Math.max(0, d.dead ? 0 : d.hp))}</b> / ${T.fmt(u.maxHp)}`)) out.push(`${where}: нет здоровья «N / M»`);
+      if (d.sh > 0 && !d.dead && !h.includes(`<b>${T.fmt(d.sh)}</b><small>щит</small>`)) out.push(`${where}: нет щита числом`);
+      if (sd) {
+        const imm = u.rank ? T.EB.RULES.resist[u.rank] || 0 : 0, rn = T.bsRoundsOf(R, u);
+        if (!h.includes(`иммунитет к контролю ${T.pctBp(imm)}`)) out.push(`${where}: нет иммунитета к контролю ${T.pctBp(imm)}`);
+        if (!rn) out.push(`${where}: у врага нет раундов его типа (ранг «${u.rank}»)`);
+        else if (!h.includes(` — бой ${rn} ${T.roundWord(rn)}`)) out.push(`${where}: нет раундов его типа (${rn})`);
+      }
+      for (const I of d.dead ? [] : T.bsStatuses(u, d, b.mode === 'rounds')) {
+        cnt.sts++;
+        const r = rowOf(h, I.name);
+        if (!r) { out.push(`${where}: нет эффекта «${I.name}»`); continue; }
+        if (!I.line || !r.includes(`<p>${esc(I.line)}</p>`)) out.push(`${where}: эффект «${I.name}» — не сказано, что он делает`);
+        if (I.left != null && !r.includes(`>${I.left}<small>${T.roundWord(I.left)}</small>`)) out.push(`${where}: эффект «${I.name}» без раундов ${I.left}`);
+        if (I.left == null && !r.includes('до конца этажа')) out.push(`${where}: эффект «${I.name}» без срока`);
+        if (I.stacks > 1 && !r.includes(`×${I.stacks}`)) out.push(`${where}: эффект «${I.name}» без стаков ×${I.stacks}`);
+        if (I.by && I.by !== true && !r.includes(`наложил: ${esc(T.uName(I.by))}`)) out.push(`${where}: эффект «${I.name}» — не сказано, кто наложил`);
+        if (!I.icon || !r.includes(`<img src="${I.icon}"`)) out.push(`${where}: эффект «${I.name}» без значка`);
+      }
+      if (b.mode !== 'rounds') continue;
+      for (const ab of u.table || []) {
+        cnt.abs++;
+        const r = rowOf(h, ab.n);
+        if (!r) { out.push(`${where}: нет способности «${ab.n}»`); continue; }
+        if (!r.includes(`<em class="bsi-ch" title="Шанс в свой ход">${T.pctBp(ab.ch)}</em>`)) out.push(`${where}: «${ab.n}» без шанса ${T.pctBp(ab.ch)}`);
+        const art = T.bsAbArt(ab, 30);   // своя иконка библиотеки, уникальной способности — своя, прочее — той же школы, вида и охвата
+        if (!LIB_IDS.has(ab.id)) {   // способность вне библиотеки — уникальная: своя иконка из BS_ART.abUnique
+          cnt.uniq++;
+          const stem = T.BS_ART.abUnique[ab.id];
+          if (!stem) out.push(`${where}: уникальная способность «${ab.n}» (${ab.id}) — нет своей иконки в BS_ART.abUnique`);
+          else if (!r.includes(`assets/art/abu/${stem}.webp`)) out.push(`${where}: «${ab.n}» — не своя иконка уникальной способности abu/${stem}`);
+        }
+        if (!/<span class="bsi-ic">(?:<img |<span class="bsi-vic"><svg )/.test(r)) out.push(`${where}: «${ab.n}» без иконки`);
+        else if (art && !r.includes(art)) out.push(`${where}: «${ab.n}» — не рисованная иконка способности`);
+        if (art) cnt.art++;
+        if (ab.d && !r.includes(`<p>${esc(ab.d)}</p>`)) out.push(`${where}: «${ab.n}» — не сказано, что делает`);
+      }
+      const rest = 10000 - (u.table || []).reduce((a, ab) => a + ab.ch, 0), basic = rowOf(h, 'Обычная атака');
+      if (!basic.includes(`<em class="bsi-ch" title="Шанс в свой ход">${T.pctBp(rest)}</em>`)) out.push(`${where}: обычная атака без остатка шанса ${T.pctBp(rest)}`);
+      const kind = u.basicAll ? 'all' : u.rank === 'rune' ? 'rune' : T.EB.fxOf(u, u.main);   // вид обычной атаки — по ядру
+      if (!basic.includes(`assets/art/${T.BS_ART.abIcons.basic[kind]}`)) out.push(`${where}: обычная атака без рисованной иконки своего вида «${kind}»`);
+    }
+  } finally { back(); }
+  /* неизученный враг: ни имени, ни способностей — только эффекты на нём */
+  const back2 = know(R, false);
+  try {
+    const u = b.u[1][0], h = insp(u);
+    if (T.unitKnown(u)) out.push(`${key}: враг ${u.name} не стал неизученным — проверка тайны не идёт`);
+    else if (h.includes(`<b class="bsi-nm">${esc(u.name)}</b>`) || /class="bsi-sec bsi-ab"/.test(h) || (u.table || []).some(ab => h.includes(`<b>${esc(ab.n)}</b>`))) out.push(`${key} · окно неизученного ${u.name}: видны имя или способности`);
+  } finally { back2(); T.S.insp = null; }
+  return out;
+};
+L.D = (R, key) => {
+  const out = [], check = (what, h) => { const t = playerText(h); for (const [w, re] of SERVICE) { const m = t.match(re); if (m) out.push(`${key} · ${what}: игрок видит «${w}» — «${t.slice(Math.max(0, m.index - 30), m.index + 30).replace(/\n/g, ' ')}»`); } };
+  T.setTeam(false);
+  try {
+    T.S.insp = T.dkey(R.b.u[1][0]); check('бой', draw(key + ' · игрок'));
+    run(key, () => T.paintInsp(R)); check('окно врага', (els.btInsp || {}).innerHTML || '');
+    T.S.insp = T.dkey(R.b.u[0][0]); run(key, () => T.paintInsp(R)); check('окно героя', (els.btInsp || {}).innerHTML || '');
+    check('легенда «Знаки»', T.legendHtml('rounds'));
+    const ban0 = R.banner; if (!R.banner) R.banner = [T.uName(R.b.u[1][0]), ''];
+    try { check('баннер', vm.runInContext('bsBanner', ctx)(R)); } finally { R.banner = ban0; }
+  } finally { T.setTeam(true); T.S.insp = null; }
+  return out;
+};
+const tested = [];
+for (const [key, make] of BATTLES) {
+  const R = run(key, make);
+  if (!R || !R.b) { say(`${key}: бой не начался`); continue; }
+  T.S.focus = R.id; T.S.route = 'battle'; T.S.overlay = null; T.S.bfv = 'square';
+  seed(R); cnt.battles++; tested.push([key, R, T.S]);
+  for (const k of ['A', 'B', 'D']) for (const e of L[k](R, key)) say(`закон ${k}: ${e}`);
+}
+/* итог этажа и «Стена» глазами игрока: герб победы и стены, ни одного служебного слова */
+L.D2 = R => {
+  const out = [];
+  const runs0 = T.S.runs; T.S.runs = [R];   // итог ищет забег по номеру: номера у свежих состояний повторяются
+  T.S.focus = R.id; T.setTeam(false);
+  try {
+    for (const [kind, crest] of [['boss', 'bs-win'], ['wall', 'bs-wall']]) {
+      R.end = kind === 'wall' ? { kind, floor: R.floor, why: 'sand', foes: R.b.u[1].map(u => u.id) } : { kind };
+      const h = run(`итог «${kind}»`, () => T.OV.result({ arg: R.id })) || '';
+      if (!new RegExp(`<div class="dlg fit bs-res ${crest} `).test(h)) out.push(`итог «${kind}»: окно без класса ${crest}`);
+      const k = crest.slice(3), img = T.BS_ART.crest[k];
+      if (!h.includes(`<span class="bs-crest ${k}" style="background-image:url('`) || !h.includes(img + (h.includes(img + '?') ? '?' : "')"))) out.push(`итог «${kind}»: нет герба ${img} над окном`);
+      const t = playerText(h); for (const [w, re] of SERVICE) if (re.test(t)) out.push(`итог «${kind}»: игрок видит «${w}»`);
+    }
+  } finally { T.setTeam(true); R.end = null; T.S.runs = runs0; }
+  return out;
+};
+if (tested.length) for (const e of L.D2(tested[0][1])) say(`закон D: ${e}`);
+
+/* ================== закон C: эффекты — только transform и opacity ================== */
+const ALLOWED = new Set(['transform', 'opacity', 'offset', 'easing', 'composite']);
+const fxSrc = read('fx.js');
+/* сцена EnFx.scene из исходника fx.js — в своей песочнице: элементы пишут кадры каждой анимации */
+function lawFx(src) {
+  const out = [];
+  for (const calm of [false, true]) {
+    const frames = [];
+    const mk = (w, h, x, y) => ({ style: {}, className: '', isConnected: true, children: [], parentElement: null, src: '', alt: '',
+      appendChild(c) { this.children.push(c); c.parentElement = this; return c; }, remove() { this.isConnected = false; },
+      getBoundingClientRect: () => ({ left: x, top: y, width: w, height: h, right: x + w, bottom: y + h }), clientWidth: w, clientHeight: h,
+      animate(kf) { frames.push({ el: this, kf }); return {}; } });
+    const box = vm.createContext({ document: { createElement: () => mk(0, 0, 0, 0) }, setTimeout: f => { f(); return 0; }, AV: p => 'assets/art/' + p, matchMedia: () => ({ matches: calm }) });
+    box.window = box;
+    try { vm.runInContext(src, box, { filename: 'fx.js' }); } catch (e) { out.push(`fx.js: исключение при загрузке — ${e.message}`); return out; }
+    const Fx = box.EnFx;
+    if (!Fx || typeof Fx.scene !== 'function') { out.push('fx.js: нет EnFx.scene'); return out; }
+    const host = mk(800, 300, 0, 0), parent = mk(900, 400, 0, 0); host.parentElement = parent;
+    const fx = Fx.scene(host, { speed: () => 1 }), a = mk(80, 99, 100, 100), b = mk(80, 99, 600, 120), c = mk(80, 99, 620, 20);
+    const calls = { slash: () => fx.slash(b, null, null, true, 'Огонь'), arrow: () => fx.arrow(a, b), bolt: () => fx.bolt(a, b, null, null, true, 'Тьма'), wave: () => fx.wave(b, [a, c], null, null, 'Воздух'),
+      heal: () => fx.heal(a), hot: () => fx.hot(a), shield: () => fx.shield(a), taunt: () => fx.taunt(a, [b, c]), dot: () => fx.dot(b, 'Огонь'), debuff: () => fx.debuff(b), ctrl: () => fx.ctrl(b, 'stun'),
+      drain: () => fx.drain(b, a), dispel: () => fx.dispel(a), ult: () => fx.ult(a, null, 'Огонь'), crit: () => fx.crit(b), miss: () => fx.miss(b, 1), resist: () => fx.resist(b), death: () => fx.death(b),
+      buff: () => fx.buff(a), revive: () => fx.revive(a), icon: () => fx.icon('assets/art/st/st-fire-dot.webp', b, 1), flip: () => fx.flip('boom', fx.center(b), 2000, 600) };
+    for (const [k, f] of Object.entries(calls)) {
+      const n0 = frames.length;
+      try { f(); } catch (e) { out.push(`эффект «${k}»: исключение — ${e.message}`); continue; }
+      if (!calm) cnt.kinds++;
+      if (frames.length === n0 && !(calm && k === 'drain')) out.push(`${calm ? '«меньше движения»: ' : ''}эффект «${k}» не рисует ни кадра`);
+    }
+    for (const F of frames) {
+      if (!calm) cnt.frames++;
+      for (const k of F.kf) for (const p of Object.keys(k)) if (!ALLOWED.has(p)) out.push(`${calm ? '«меньше движения»: ' : ''}кадр анимации двигает «${p}» — только transform и opacity`);
+      if (!calm) continue;
+      const strip = F.el.parentElement && /\bvf\b/.test(F.el.parentElement.className || '');   // лента кадров: шаг кадра — на месте
+      if (F.el === parent || F.el === host) out.push('«меньше движения»: поле трясётся');
+      else if (!strip && F.kf.some(k => k.transform)) out.push(`«меньше движения»: спрайт «${F.el.className}» движется — ${F.kf.map(k => k.transform).filter(Boolean)[0]}`);
+    }
+    if (!calm) for (const k of Fx.KINDS || []) if (!Array.isArray(k) || k.length !== 3 || !k[1] || !k[2]) out.push('EnFx.KINDS: вид без имени или описания');
+  }
+  return out;
+}
+/* CSS боя: каскад index.html → battle-cards.css → battle-scene.css; «меньше движения» — отдельным слоем поверх */
+function cssSheets(sceneCss) {
+  const style = [...html.matchAll(/<style>([\s\S]*?)<\/style>/g)].map(m => m[1]).join('\n');
+  return [style, read('screens/battle-cards.css'), sceneCss].map(s => s.replace(/\/\*[\s\S]*?\*\//g, ''));
+}
+function splitCalm(css) {
+  let normal = '', calm = '', i = 0; const re = /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{/g; let m;
+  while ((m = re.exec(css))) {
+    normal += css.slice(i, m.index);
+    let d = 1, j = re.lastIndex;
+    for (; j < css.length && d; j++) { if (css[j] === '{') d++; else if (css[j] === '}') d--; }
+    calm += css.slice(re.lastIndex, j - 1) + '\n'; i = j; re.lastIndex = j;
+  }
+  return [normal + css.slice(i), calm];
+}
+function lawCss(sceneCss) {
+  const out = [], kf = {}, norm = {}, calm = {}, calmDur = {};
+  const KF = /@keyframes ([\w-]+)\s*\{((?:[^{}]*\{[^{}]*\})*)\s*\}/g;
+  const take = (css, map, dur) => {
+    for (const m of css.replace(KF, '').matchAll(/([^{}@]+)\{([^{}]*)\}/g)) {
+      const body = m[2], a = body.match(/(?:^|;)\s*animation(?:-name)?\s*:\s*([^;!]+)/), du = body.match(/(?:^|;)\s*animation-duration\s*:\s*([^;]+)/);
+      for (const s of m[1].split(',').map(x => x.trim()).filter(Boolean)) {
+        if (a) map[s] = a[1].trim().split(/[\s,]+/).filter(n => n === 'none' || kf[n]);
+        if (du && dur) dur[s] = du[1].trim();
+      }
+    }
+  };
+  const sheets = cssSheets(sceneCss).map(splitCalm);
+  for (const [n, c] of sheets) for (const src of [n, c]) for (const m of src.matchAll(KF)) kf[m[1]] = [...new Set([...m[2].matchAll(/([\w-]+)\s*:/g)].map(x => x[1]))];
+  for (const [n] of sheets) take(n, norm);
+  Object.assign(calm, norm);
+  for (const [, c] of sheets) take(c, calm, calmDur);
+  const seen = new Set();
+  for (const [layer, map] of [['', norm], ['«меньше движения»: ', calm]]) for (const [s, names] of Object.entries(map)) {
+    if (!BATTLE_SEL.test(s)) continue;
+    for (const n of names) {
+      if (n === 'none') continue;
+      if (!layer && !seen.has(n)) { seen.add(n); cnt.kf++; }
+      const bad = kf[n].filter(p => p !== 'opacity' && p !== 'transform');
+      if (bad.length) out.push(`${layer}${s} — анимация ${n} крутит ${bad.join(', ')}: только transform и opacity`);
+      if (layer && kf[n].includes('transform') && CALM_INFO.includes(s) && !CALM_MOVE_OK.includes(s)) out.push(`${layer}${s} движется (${n}) — сведения только гаснут`);
+    }
+  }
+  for (const s of CALM_INFO) if (!/^var\(--bs-d\b[^)]*\)\s*!important$/.test(calmDur[s] || '')) out.push(`«меньше движения»: у ${s} нет длительности var(--bs-d) !important — общее правило index.html погасит его мгновенно`);
+  if ((calm['.bt-side.f.enter .bc'] || []).join() !== 'none') out.push('«меньше движения»: выход врагов идёт анимацией — с общим правилом index.html карты врагов замрут в её последнем кадре');
+  return out;
+}
+const sceneCss = read('screens/battle-scene.css');
+L.C = () => lawFx(fxSrc).concat(lawCss(sceneCss));
+for (const e of L.C()) say(`закон C: ${e}`);
+
+/* ================== закон E: данные, арт, ритуал ================== */
+const ART = JSON.parse(fs.readFileSync(path.join(ROOT, 'tools', 'art-gen', 'ui-art.json'), 'utf8')).items;
+const onDisk = p => fs.existsSync(path.join(UI, 'assets', 'art', p));
+const inSpec = p => !!ART[p] && fs.existsSync(path.join(ROOT, 'art', 'generated', typeof ART[p] === 'string' ? ART[p] : ART[p].from));
+/* ход забега до конца первого этажа рядовых: свёрнутый или на экране — конец этажа не раньше b.t, ритуал на экране показан; на экране —
+   цикл II и все артефакты Странника с добычей на пределе: «+N» ритуала — ровно то, что floorDone зачислил в кошелёк */
+function ritualRun(vis) {
+  const out = [], EB = T.EB, F = EB.RULES.floor, mm0 = F.minMs;
+  F.minMs = Object.assign({}, mm0, { o: RITUAL_TEST_MS });
+  try {
+    fresh();
+    if (vis) {
+      T.S.acc.cycle = 2; T.S.wn = T.S.wn || {}; T.S.wn.art = T.S.wn.art || {};
+      for (const a of vm.runInContext('window.EN_WANDERER', ctx).art.list) if (a.loot) T.S.wn.art[a.id] = a.lv;
+    }
+    vm.runInContext('typeof syncCycle === "function" && syncCycle()', ctx);   // вариант биома по циклу — как перед стартом забега
+    const B = EB.BIOMES.b1, fl = B.floors.findIndex(f => f.g === 'o') + 1;
+    run('ритуал · старт', () => T.startRun('s1', 'b1', fl));
+    const R = lastRun(), what = vis ? 'на экране' : 'свёрнутый';
+    if (!R || !R.b) return [`ритуал ${what}: забег не начался`];
+    if (vis) { T.S.focus = R.id; T.S.route = 'battle'; } else T.S.route = 'descent';
+    let early = false, shown = null, step = 0;
+    for (let n = 0; n < STEPS_MAX && !R.over && R.floor === fl && !(R.gap > 0); n++) {
+      const v0 = R.view;
+      run(`ритуал ${what} · ход`, () => vm.runInContext('advance', ctx)(R, STEP_MS));   // нынешний advance: мутации подменяют глобальный
+      if (R.view - v0 !== STEP_MS && !step) step = R.view - v0;   // время показа идёт ровно тактом — и на последнем такте ритуала
+      const b = R.b;
+      if (b.over && b.win && b.ritualMs > 0 && shown == null) shown = R.bsRit === b;
+      if (b.over && R.view < b.t && (R.gap > 0 || R.floor !== fl)) early = true;
+    }
+    const b = R.b;
+    if (!b.over || !b.win) out.push(`ритуал ${what}: этаж ${fl} Мастерской не взят — проверить нечем`);
+    else if (!(b.ritualMs > 0)) out.push(`ритуал ${what}: ядро не дотянуло этаж до минимума — ritualMs ${b.ritualMs}`);
+    else if (early) out.push(`ритуал ${what}: этаж кончился раньше конца боя по ядру (b.t ${b.t} мс)`);
+    else if (!(R.gap > 0) && R.floor === fl) out.push(`ритуал ${what}: этаж не кончился за ${STEPS_MAX * STEP_MS} мс`);
+    if (vis && b.ritualMs > 0 && !shown) out.push('ритуал на экране: «Этаж взят» и добыча не показаны — advance не позвал bsRitual');
+    if (step) out.push(`ритуал ${what}: за такт ${STEP_MS} мс время показа прибавило ${step} мс`);
+    if (vis && b.ritualMs > 0 && shown) {
+      const G = R.bsLoot || {}, Lt = R.loot, pairs = [['gold', G.gold, Lt.gold], ['spirit', G.spirit, Lt.spirit], ['souls', G.souls, Lt.souls], ['рунный ключ', G.runeKeys || 0, Lt.keys || 0]];
+      for (const [k, a, z] of pairs) if (a !== z) out.push(`ритуал на экране: «+N» добычи (${k} ${a}) не сходится с кошельком (${z}) — артефакты и цикл игрока (lootCtx)`);
+      if (!vm.runInContext('lootCtx()', ctx)) out.push('ритуал на экране: у пробы нет прибавок цикла и артефактов — сверять нечего');
+    }
+  } finally { F.minMs = mm0; }
+  return out;
+}
+L.E = () => {
+  const out = [], D = T.BS_DATA, EB = T.EB, A = vm.runInContext('window.EN_ABILITIES', ctx);
+  const keys = new Set(['stun', 'silence', 'stop', 'paralyze', 'freeze', 'terror', 'knock', 'blind', 'nameless', 'iceblock', 'doom', 'trophy', 'greed', 'shield', 'immune']);
+  for (const s of A.sets) for (const x of s.items) if (x.data && x.data.st) keys.add(x.data.st);
+  for (const k of EB.GOOD_ST || []) keys.add(k);
+  for (const k of keys) {
+    if (!D.st[k]) { out.push(`значок эффекта «${k}»: нет в BS_DATA.st`); continue; }
+    const p = 'st/' + D.st[k] + '.webp';
+    if (!onDisk(p)) out.push(`значок эффекта «${k}»: нет файла ${p}`); else if (!inSpec(p)) out.push(`значок эффекта «${k}»: нет в ui-art.json или нет исходника`);
+  }
+  for (const s of A.sets) if (s.eff) for (const kind of ['dot', 'hot']) if (s.eff[kind]) {
+    const p = `st/st-${D.school[s.n] || 'steel'}-${kind}.webp`;
+    if (!onDisk(p) || !inSpec(p)) out.push(`${kind} школы «${s.n}»: нет значка ${p}`);
+  }
+  const V = vm.runInContext('EnFx.VFX_ART', ctx);
+  for (const k of V.ready) { const p = 'vfx/' + k + '.webp'; if (!onDisk(p) || !inSpec(p)) out.push(`спрайт эффекта ${p}: нет на диске или в ui-art.json`); }
+  for (const [k, n] of Object.entries(V.strips)) {
+    const it = ART['vfx/' + k + '-strip.webp'], sz = it && it.size;
+    if (!V.ready.includes(k + '-strip')) out.push(`лента «${k}»: нет в VFX_ART.ready`);
+    if (!sz || sz[0] !== sz[1] * n) out.push(`лента flipbook «${k}»: ${sz ? sz.join(' × ') : 'нет в ui-art.json'}, а кадров в данных ${n}`);
+  }
+  for (const s of new Set(Object.values(V.school))) for (const p of ['proj', 'hit', 'tick']) if (!V.ready.includes(p + '-' + s)) out.push(`школа ${s}: нет спрайта ${p}-${s}`);
+  for (const t of T.BS_ART.frames) {
+    if (!T.BF.types[t]) out.push(`рамка-квадрат ${t}: такого типа нет в BF.types`);
+    for (const p of [`bframes-sq/${t}.png`, `bframes-sq/${t}-crest.png`, `bframes-sq/${t}-full.png`]) if (!onDisk(p) || !inSpec(p)) out.push(`рамка-квадрат ${t}: нет ${p} на диске или в ui-art.json`);
+    for (const [nm, g] of [['тело', T.BS_FRAME.body[t]], ['целиком', T.BS_FRAME.full[t]]]) if (!g || g.length !== 4 || g.some(v => !Number.isInteger(v) || v < 0 || v >= 500)) out.push(`рамка-квадрат ${t} (${nm}): геометрия — не четыре целые тысячные`);
+  }
+  for (const p of [T.BS_ART.plaque, T.BS_ART.round, T.BS_ART.panel, T.BS_ART.crest.win, T.BS_ART.crest.wall]) if (!onDisk(p) || !inSpec(p)) out.push(`украшение боя ${p}: нет на диске или в ui-art.json`);
+  for (const p of Object.values(T.BS_ART.abIcons.basic).concat(Object.values(T.BS_ART.abIcons.own))) if (!onDisk(p) || !inSpec(p)) out.push(`иконка боя ${p}: нет на диске или в ui-art.json`);
+  /* иконки уникальных способностей: каждая клетка листов задания — в таблице BS_ART.abUnique, на диске и в описи; лишних в таблице нет */
+  const AJ = JSON.parse(fs.readFileSync(path.join(ROOT, 'tools', 'art-gen', 'jobs', 'ability-icons-unique.json'), 'utf8'));
+  const cells = AJ.jobs.flatMap(j => j.cells).filter(c => c[0] !== 'spare');
+  for (const [id, stem] of cells) {
+    if (T.BS_ART.abUnique[id] !== stem) out.push(`уникальная способность ${id}: в BS_ART.abUnique «${T.BS_ART.abUnique[id]}», в задании «${stem}»`);
+    const p = `abu/${stem}.webp`; if (!onDisk(p) || !inSpec(p)) out.push(`иконка уникальной способности ${p}: нет на диске или в ui-art.json`);
+    if (LIB_IDS.has(id)) out.push(`уникальная способность ${id} — на деле из библиотеки: у неё своя иконка`);
+  }
+  for (const id of Object.keys(T.BS_ART.abUnique)) if (!cells.some(c => c[0] === id)) out.push(`BS_ART.abUnique: ${id} — нет в задании ability-icons-unique.json`);
+  for (const k of ['melee', 'arrow', 'magic']) if (!T.BS_ART.abIcons.basic[k]) out.push(`обычная атака вида «${k}» (RULES.cls, fx): нет иконки в BS_ART.abIcons.basic`);
+  const F = EB.RULES.floor;
+  if (!F.minMs || ['o', 'e', 'b', 'guard'].some(k => !Number.isInteger(F.minMs[k]) || F.minMs[k] < 0)) out.push('RULES.floor.minMs: не целые мс по виду этажа');
+  if (!F.ritual || ['enterMs', 'stepMs', 'fallMs', 'takenMs', 'lootMs'].some(k => !Number.isInteger(F.ritual[k]) || F.ritual[k] <= 0)) out.push('RULES.floor.ritual: фазы показа — не целые мс');
+  return out.concat(ritualRun(false), ritualRun(true));
+};
+for (const e of L.E()) say(`закон E: ${e}`);
+{
+  const kit = T.KIT_EXTRA.find(x => { try { return String(x.html()).includes('Бой AAA'); } catch (_) { return false; } });
+  if (!kit) say('UI-кит: нет раздела «Бой AAA»');
+  else { const h = run('UI-кит', () => kit.html()) || ''; const m = h.match(/.{0,50}(?:undefined|NaN|\[object ).{0,30}/); if (m) say(`UI-кит «Бой AAA»: в разметке undefined, NaN или [object — «${m[0]}»`); }
+}
+if (err.length) done();
+
+/* ================== мутации: ломаем — закон обязан упасть ================== */
+CNT = Object.assign({}, cnt);
+const [K0, R0, S0] = tested.find(([k]) => /Убер/.test(k)) || tested[0];   // бой Убер-босса: в нём и способности библиотеки, и уникальные
+const [K1, R1, S1] = tested.find(([k]) => /\(e\)/.test(k)) || tested[0];    // итог этажа и «Стена» — у забега по биому
+/* закон — в том состоянии, где бой начался: закон E и мутации заводят свежие состояния */
+const lawOn = k => {
+  if (k === 'C') return L.C(); if (k === 'E') return L.E();
+  const [Kx, Rx, Sx] = k === 'D2' ? [K1, R1, S1] : [K0, R0, S0];
+  T.S = Sx; T.S.focus = Rx.id; T.S.route = 'battle'; T.S.overlay = null;
+  return k === 'D2' ? L.D2(Rx) : L[k](Rx, Kx);
+};
+const MUT = [
+  ['A', 'на полосе — не то здоровье', 'bsHpTxt__ = bsHpTxt; bsHpTxt = (n, s) => s ? bsHpTxt__(n, s) : bsHpTxt__(n + 1);', 'bsHpTxt = bsHpTxt__;'],
+  ['A', 'щит на полосе пропал', 'bsHpTxt__ = bsHpTxt; bsHpTxt = (n, s) => s ? \'\' : bsHpTxt__(n);', 'bsHpTxt = bsHpTxt__;'],
+  ['A', 'значок без числа раундов', 'bsSi__ = bsSi; bsSi = I => bsSi__(Object.assign({}, I, { left: null }));', 'bsSi = bsSi__;'],
+  ['A', 'значок — вектор вместо медальона', 'bsSi__ = bsSi; bsSi = I => bsSi__(Object.assign({}, I, { icon: \'\' }));', 'bsSi = bsSi__;'],
+  ['A', '«+N» врёт', 'statusHtml__ = statusHtml; statusHtml = (u, d, r) => statusHtml__(u, d, r).map(s => s.replace(/>\\+(\\d+)</, (m, n) => \'>+\' + (+n + 1) + \'<\'));', 'statusHtml = statusHtml__;'],
+  ['B', 'способность без шанса', 'bsAbRow__ = bsAbRow; bsAbRow = (ab, ch, on, o) => bsAbRow__(ab, null, on, o);', 'bsAbRow = bsAbRow__;'],
+  ['B', 'способность без иконки', 'bsAbRow__ = bsAbRow; bsAbRow = (ab, ch, on, o) => bsAbRow__(ab, ch, on, o).replace(/<span class="bsi-ic">[\\s\\S]*?<\\/span><div class="bsi-tx">/, \'<span class="bsi-ic"></span><div class="bsi-tx">\');', 'bsAbRow = bsAbRow__;'],
+  ['B', 'эффект без раундов', 'bsStRow__ = bsStRow; bsStRow = I => bsStRow__(Object.assign({}, I, { left: I.left == null ? null : I.left + 1 }));', 'bsStRow = bsStRow__;'],
+  ['B', 'не сказано, кто наложил', 'bsStRow__ = bsStRow; bsStRow = I => bsStRow__(Object.assign({}, I, { by: null }));', 'bsStRow = bsStRow__;'],
+  ['B', 'строка эффекта с классом сетки игры', 'bsStRow__ = bsStRow; bsStRow = I => bsStRow__(I).replace(\'bsi-r e \', \'bsi-r e g \');', 'bsStRow = bsStRow__;'],
+  ['B', 'у врага нет раундов его типа', 'bsRoundsOf__ = bsRoundsOf; bsRoundsOf = () => null;', 'bsRoundsOf = bsRoundsOf__;'],
+  ['B', 'уникальная способность — иконка библиотеки вместо своей', 'bsAbArt__ = bsAbArt; bsAbArt = (ab, px) => bsAbArt__(Object.assign({}, ab, { id: null }), px);', 'bsAbArt = bsAbArt__;'],
+  ['E', 'у уникальной способности нет своей иконки', 'BS_ART.abUnique__ = BS_ART.abUnique; BS_ART.abUnique = {};', 'BS_ART.abUnique = BS_ART.abUnique__; delete BS_ART.abUnique__;'],
+  ['B', 'обычная атака — вектор вместо рисованной', 'BS_ART.abIcons.basic__ = BS_ART.abIcons.basic; BS_ART.abIcons.basic = {};', 'BS_ART.abIcons.basic = BS_ART.abIcons.basic__; delete BS_ART.abIcons.basic__;'],
+  ['B', 'неизученный раскрыт', 'bsInspHtml__ = bsInspHtml; bsInspHtml = (R, u) => bsInspHtml__(R, u).replace(\'Неизвестный противник\', bsEsc(u.name));', 'bsInspHtml = bsInspHtml__;'],
+  ['D', 'на баннере — служебное слово', 'bsBanner__ = bsBanner; bsBanner = R => bsBanner__(R).replace(\'</b>\', \' демо</b>\');', 'bsBanner = bsBanner__;'],
+  ['D2', 'итог без герба', 'BS_RES.boss__ = BS_RES.boss; BS_RES.boss = \'\';', 'BS_RES.boss = BS_RES.boss__; delete BS_RES.boss__;'],
+  ['E', 'у эффекта нет значка', 'BS_DATA.st.weak__ = BS_DATA.st.weak; delete BS_DATA.st.weak;', 'BS_DATA.st.weak = BS_DATA.st.weak__; delete BS_DATA.st.weak__;'],
+  ['E', 'лента — не столько кадров, сколько в данных', 'EnFx.VFX_ART.strips.boom -= 1;', 'EnFx.VFX_ART.strips.boom += 1;'],
+  ['E', 'конец этажа не ждёт конца боя по ядру', 'floorDone__ = floorDone; floorDone = function (R, vis) { const b = R.b, t = b ? b.t : 0; if (b) b.t = Math.min(b.t, R.view); try { return floorDone__(R, vis); } finally { if (b) b.t = t; } };', 'floorDone = floorDone__;'],
+  ['E', 'ритуал на экране не показан', 'advance__ = advance; advance = bsAdvance0;', 'advance = advance__;'],
+  ['E', 'последний такт ритуала прибавляет время дважды', 'advance__ = advance; advance = function (R, ms) { const b = R.b; if (b && b.over && b.ritualMs > 0 && !(R.gap > 0) && R.view < b.t && R.view + ms >= b.t) R.view += ms; return advance__(R, ms); };', 'advance = advance__;'],
+  ['E', 'добыча ритуала — без цикла и артефактов игрока', `bsRitual__ = bsRitual; bsRitual = ${(read('screens/battle-scene.js').replace(/\r\n/g, '\n').match(/function bsRitual\(R\) \{\n[\s\S]*?\n\}\n/) || [''])[0]
+    .replace("typeof lootCtx === 'function' ? lootCtx() : null", 'null').replace('function bsRitual(R)', 'function (R)') || 'bsRitual'};`, 'bsRitual = bsRitual__;'],
+];
+let caught = 0;
+for (const [k, what, brk, fix] of MUT) {
+  try { vm.runInContext(brk, ctx); } catch (e) { say(`мутация «${what}»: не применилась — ${e.message}`); continue; }
+  let got = [];
+  try { got = lawOn(k); } catch (e) { got = ['исключение ' + e.message]; }
+  try { vm.runInContext(fix, ctx); } catch (e) { say(`мутация «${what}»: не снялась — ${e.message}`); }
+  if (got.length) caught++; else say(`мутация «${what}»: закон ${k} её не поймал`);
+}
+/* эффекты — мутации исходника fx.js и battle-scene.css */
+const FXMUT = [
+  ['кадр сцены двигает left', () => lawFx(fxSrc.replace("[{ transform: 'scale(.3)', opacity: 0 }, { transform: 'scale(1.2)', opacity: .9, offset: .25 }, { transform: 'scale(3.4)', opacity: 0 }]", "[{ left: '0px', opacity: 0 }, { left: '9px', opacity: .9, offset: .25 }, { left: '20px', opacity: 0 }]"))],
+  ['снаряд летит и при «меньше движения»', () => lawFx(fxSrc.replace('if (calm() || !has(k)) { later(Math.min(ms, 160), hit); return; }', 'if (!has(k)) { later(Math.min(ms, 160), hit); return; }'))],
+  ['поле трясётся и при «меньше движения»', () => lawFx(fxSrc.replace('if (calm() || dead) return;', 'if (dead) return;'))],
+  ['анимация CSS боя крутит фильтр', () => lawCss(sceneCss.replace('@keyframes bsCutPulse{0%,100%{transform:scale(1)}20%{transform:scale(1.08)}}', '@keyframes bsCutPulse{0%,100%{filter:none}20%{filter:brightness(1.4)}}'))],
+  ['прежняя анимация удара — свойства rotate и translate', () => lawCss(sceneCss.replace(/@keyframes cshake\{(?:[^{}]*\{[^{}]*\})*\}/, ''))],
+  ['песок гаснет мгновенно при «меньше движения»', () => lawCss(sceneCss.replace(',.bs-taken .sand>i{animation-duration:var(--bs-d,1s)!important}', '{animation-duration:var(--bs-d,1s)!important}'))],
+  ['враги прячутся при выходе при «меньше движения»', () => lawCss(sceneCss.replace('  .bt-side.f.enter .bc{animation:none}', '  .bt-side.f.enter .bc{animation-name:bsFade}'))],
+];
+for (const [what, f] of FXMUT) {
+  let got = [];
+  try { got = f(); } catch (e) { got = ['исключение ' + e.message]; }
+  if (got.length) caught++; else say(`мутация «${what}»: закон C её не поймал`);
+}
+/* мутации сняты — законы снова чисты */
+for (const k of ['A', 'B', 'D', 'C']) for (const e of lawOn(k)) say(`закон ${k} после мутаций: ${e}`);
+done(`Мутаций ${MUT.length + FXMUT.length}, поймано ${caught}.`);

@@ -1,0 +1,300 @@
+{
+  "sheet": "art/generated/battle-status/st-sheet-2__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/battle-status-icons.json",
+  "job": "st-sheet-2",
+  "grid": [
+    6,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "dot-Вода",
+      "file": "art/generated/battle-status/st-sheet-2/st-water-dot.webp",
+      "box": [
+        19,
+        33,
+        810,
+        824
+      ],
+      "px": 791,
+      "key_left": 0.0
+    },
+    {
+      "id": "hot-Вода",
+      "file": "art/generated/battle-status/st-sheet-2/st-water-hot.webp",
+      "box": [
+        864,
+        33,
+        1655,
+        824
+      ],
+      "px": 791,
+      "key_left": 0.0
+    },
+    {
+      "id": "freeze",
+      "file": "art/generated/battle-status/st-sheet-2/st-water-ctrl.webp",
+      "box": [
+        1709,
+        33,
+        2500,
+        824
+      ],
+      "px": 791,
+      "key_left": 0.0
+    },
+    {
+      "id": "slow",
+      "file": "art/generated/battle-status/st-sheet-2/st-water-debuff.webp",
+      "box": [
+        2555,
+        33,
+        3346,
+        824
+      ],
+      "px": 791,
+      "key_left": 0.0
+    },
+    {
+      "id": "healTaken",
+      "file": "art/generated/battle-status/st-sheet-2/st-water-buff.webp",
+      "box": [
+        3400,
+        33,
+        4191,
+        824
+      ],
+      "px": 791,
+      "key_left": 0.0
+    },
+    {
+      "id": "doom",
+      "file": "art/generated/battle-status/st-sheet-2/st-doom.webp",
+      "box": [
+        4246,
+        33,
+        5037,
+        824
+      ],
+      "px": 791,
+      "key_left": 0.0
+    },
+    {
+      "id": "dot-Свет",
+      "file": "art/generated/battle-status/st-sheet-2/st-light-dot.webp",
+      "box": [
+        18,
+        876,
+        811,
+        1669
+      ],
+      "px": 793,
+      "key_left": 0.0
+    },
+    {
+      "id": "hot-Свет",
+      "file": "art/generated/battle-status/st-sheet-2/st-light-hot.webp",
+      "box": [
+        863,
+        876,
+        1656,
+        1669
+      ],
+      "px": 793,
+      "key_left": 0.0
+    },
+    {
+      "id": "blind",
+      "file": "art/generated/battle-status/st-sheet-2/st-light-ctrl.webp",
+      "box": [
+        1708,
+        876,
+        2502,
+        1670
+      ],
+      "px": 794,
+      "key_left": 0.0
+    },
+    {
+      "id": "rend",
+      "file": "art/generated/battle-status/st-sheet-2/st-light-debuff.webp",
+      "box": [
+        2554,
+        876,
+        3348,
+        1670
+      ],
+      "px": 794,
+      "key_left": 0.0
+    },
+    {
+      "id": "defUp",
+      "file": "art/generated/battle-status/st-sheet-2/st-light-buff.webp",
+      "box": [
+        3399,
+        876,
+        4193,
+        1670
+      ],
+      "px": 794,
+      "key_left": 0.0
+    },
+    {
+      "id": "nameless",
+      "file": "art/generated/battle-status/st-sheet-2/st-nameless.webp",
+      "box": [
+        4245,
+        876,
+        5038,
+        1669
+      ],
+      "px": 793,
+      "key_left": 0.0
+    },
+    {
+      "id": "dot-Время",
+      "file": "art/generated/battle-status/st-sheet-2/st-time-dot.webp",
+      "box": [
+        18,
+        1722,
+        811,
+        2515
+      ],
+      "px": 793,
+      "key_left": 0.0
+    },
+    {
+      "id": "hot-Время",
+      "file": "art/generated/battle-status/st-sheet-2/st-time-hot.webp",
+      "box": [
+        863,
+        1722,
+        1656,
+        2515
+      ],
+      "px": 793,
+      "key_left": 0.0
+    },
+    {
+      "id": "stop",
+      "file": "art/generated/battle-status/st-sheet-2/st-time-ctrl.webp",
+      "box": [
+        1708,
+        1722,
+        2501,
+        2515
+      ],
+      "px": 793,
+      "key_left": 0.0
+    },
+    {
+      "id": "chanceDown",
+      "file": "art/generated/battle-status/st-sheet-2/st-time-debuff.webp",
+      "box": [
+        2554,
+        1722,
+        3347,
+        2515
+      ],
+      "px": 793,
+      "key_left": 0.0
+    },
+    {
+      "id": "chanceUp",
+      "file": "art/generated/battle-status/st-sheet-2/st-time-buff.webp",
+      "box": [
+        3399,
+        1722,
+        4192,
+        2515
+      ],
+      "px": 793,
+      "key_left": 0.0
+    },
+    {
+      "id": "trophy",
+      "file": "art/generated/battle-status/st-sheet-2/st-trophy.webp",
+      "box": [
+        4245,
+        1722,
+        5038,
+        2515
+      ],
+      "px": 793,
+      "key_left": 0.0
+    },
+    {
+      "id": "dot-класс",
+      "file": "art/generated/battle-status/st-sheet-2/st-steel-dot.webp",
+      "box": [
+        18,
+        2567,
+        811,
+        3360
+      ],
+      "px": 793,
+      "key_left": 0.0
+    },
+    {
+      "id": "hot-класс",
+      "file": "art/generated/battle-status/st-sheet-2/st-steel-hot.webp",
+      "box": [
+        863,
+        2567,
+        1656,
+        3360
+      ],
+      "px": 793,
+      "key_left": 0.0
+    },
+    {
+      "id": "stun",
+      "file": "art/generated/battle-status/st-sheet-2/st-steel-ctrl.webp",
+      "box": [
+        1708,
+        2567,
+        2502,
+        3361
+      ],
+      "px": 794,
+      "key_left": 0.0
+    },
+    {
+      "id": "break",
+      "file": "art/generated/battle-status/st-sheet-2/st-steel-debuff.webp",
+      "box": [
+        2554,
+        2567,
+        3348,
+        3361
+      ],
+      "px": 794,
+      "key_left": 0.0
+    },
+    {
+      "id": "critUp",
+      "file": "art/generated/battle-status/st-sheet-2/st-steel-buff.webp",
+      "box": [
+        3399,
+        2567,
+        4193,
+        3361
+      ],
+      "px": 794,
+      "key_left": 0.0
+    },
+    {
+      "id": "greed",
+      "file": "art/generated/battle-status/st-sheet-2/st-greed.webp",
+      "box": [
+        4245,
+        2567,
+        5038,
+        3360
+      ],
+      "px": 793,
+      "key_left": 0.0
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "name": "Иконки боя сеткой: обычная атака и способность без иконки библиотеки — задача «Бой AAA» (слова автора 01.10.2026: «покажи мне боевую сцену и все попапы в ней на ааа уровне», «сгенери то, что нужно»). Стиль, negative и рамка листа — spell-icons-none.json без правок: одна манера с иконками способностей",
+  "plan": {
+    "Лист bab-sheet": "3:2, 1K, сетка 3×2 — обычная атака: оружием, выстрелом, силой, по всем, удар стража, отнимающий раунд; способность «Без школы» вида revive (своя способность Многоликого — в библиотеке такого вида нет)",
+    "Нарезка": "python tools/art-gen/grid_slice.py jobs/battle-ability-icons.json bab-sheet <лист>",
+    "Выгрузка": "tools/art-gen/ui-art.json → design/ui/assets/art/bab/<имя>.webp 128 px; папка своя: spells — только библиотека (check_icons.js)"
+  },
+  "notes": [
+    "В окне сведений карты (screens/battle-scene.js) у каждой способности — нарисованная иконка библиотеки; без неё оставались обычная атака и одна способность Многоликого — вектор среди живописи",
+    "Обычная атака по виду удара карты: RULES.cls[*].fx ядра — melee, arrow, magic; по всем — приём Убер-босса (basicAll); у рунного стража обычная атака отнимает у боя раунд (ADR-0020)",
+    "cells — [ключ BS_ART.abIcons, имя файла] по строкам сверху, в строке слева направо; grid — [столбцы, строки]"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "battle-ability-icons": {
+      "aspect": "3:2",
+      "size": "1K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square ability icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the picture in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game puts its own frame on top: one clear central image with a bold silhouette that stays readable at 48 px, on a dark near-black stone background with faint cracks and a darker vignette toward the edges of the cell. Light rises from below in the color of the magic school; crisp rim light on the edges of the forms; a few sparks and dust motes in the light. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each icon differs clearly from its neighbours in shape and composition."
+    }
+  },
+  "jobs": [
+    {
+      "id": "bab-sheet",
+      "category": "battle-ability-icons",
+      "title": "Обычная атака пяти видов и «возвращённое лицо» — сеткой 3×2",
+      "source": "design/ui/battle.js — RULES.cls (fx), basicAll, RULES.rounds.runeCut; design/ui/echo-foes.js — Многоликий, «Возвращённое лицо»",
+      "aspect": "3:2",
+      "size": "1K",
+      "grid": [
+        3,
+        2
+      ],
+      "cells": [
+        [
+          "basic.melee",
+          "basic-melee"
+        ],
+        [
+          "basic.arrow",
+          "basic-arrow"
+        ],
+        [
+          "basic.magic",
+          "basic-magic"
+        ],
+        [
+          "basic.all",
+          "basic-all"
+        ],
+        [
+          "basic.rune",
+          "basic-rune"
+        ],
+        [
+          "Без школы.revive.one",
+          "none-revive-one"
+        ]
+      ],
+      "subject": "This sheet shows the plain basic attack of a fighter — no magic school, the everyday blow every fighter makes on its turn — and one strange revival skill. Steel, iron, worn leather, wood, stone; the light from below is the warm orange light of torches, with one cold pale light where noted. Every icon is built around one clear central object with a bold silhouette — never only smoke, dust or a scattered pattern.\n\nThe grid: exactly 3 columns and 2 rows, 6 icons.\n\nRow 1: a single plain steel sword caught in one hard diagonal slash, a bright white arc of motion trailing the blade, a few sparks where it cuts the air; a single iron-headed arrow in flight toward the viewer at an angle, grey fletching, a thin streak of air behind it; a fist-sized orb of pale silver-white force flying forward with a short comet tail, faint ripples in the air around it — pale and neutral, not the color of any magic school.\n\nRow 2: one heavy curved great-blade sweeping in a wide crescent that runs across the whole cell, a low wave of dust and pebbles thrown up along the whole arc — one blow that hits everyone in front; a massive stone hammer smashing down onto an hourglass, the glass bursting, sand spraying out, thin cracks of cold pale cyan light in the stone head of the hammer; a pale cracked porcelain mask rising out of a heap of grey ash, warm gold light seeping from its empty eye holes and through the crack, a few motes of ash drifting upward."
+    }
+  ]
+}

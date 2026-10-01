@@ -31,10 +31,13 @@ const BUILDERS = [
   ['node', 'tools/content-gen/economy/enerium.js'],
   ['node', 'tools/content-gen/start/build.js'],
   [PY, 'tools/content-gen/biomes/pace.py'],
+  [PY, 'tools/content-gen/biomes/farm.py'],
   [PY, 'tools/content-gen/economy/echo.py'],
   [PY, 'tools/content-gen/contracts/capacity.py'],
   [PY, 'tools/content-gen/clan/capacity.py'],
   [PY, 'tools/content-gen/wanderer/pace_inputs.py'],
+  [PY, 'tools/content-gen/cycle/climb.py'],
+  ['node', 'tools/content-gen/cycle/build.js'],
   [PY, 'tools/content-gen/tables/build.py'],
 ].map(([cmd, file]) => [cmd, file, '--check']);
 

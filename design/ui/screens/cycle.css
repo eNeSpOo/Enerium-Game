@@ -1,0 +1,95 @@
+/* screens/cycle.css — окно «Событие нового цикла» (§2.9, ADR-0041), вход у зеркала Памяти и записка в Убежище, итог прошлых циклов.
+   Материал — как у окна уровня (screens/start.css): тёмный камень, кромка старого золота; свет снизу — цвет карста бога цикла (--cy-k).
+   Движение — только transform и opacity; «меньше движения» — окно сразу. Кадры: 932 × 430 и 844 × 390. */
+
+/* ===== окно: поверх листов, над окном уровня ===== */
+.g .cy-pop{position:absolute;inset:0;z-index:31;display:flex;align-items:center;justify-content:center}
+.g .cy-scrim{position:absolute;inset:0;background:radial-gradient(70% 90% at 50% 70%,color-mix(in srgb,var(--cy-k) 14%,rgba(10,9,8,.5)),rgba(3,4,5,.88));animation:cy-fade .35s ease both}
+.g .cy-card{position:relative;width:min(900px,calc(100% - 24px));max-height:calc(100% - 14px);display:grid;grid-template-columns:212px minmax(0,1fr);column-gap:16px;
+  padding:12px 16px 12px 14px;border-radius:6px;overflow:hidden;
+  background:radial-gradient(60% 55% at 12% 108%,color-mix(in srgb,var(--cy-k) 26%,transparent),transparent 70%),radial-gradient(80% 60% at 92% 120%,rgba(221,188,122,.08),transparent 70%),linear-gradient(180deg,#171a1d,#0d0f11);
+  border:1px solid rgba(177,145,90,.6);box-shadow:0 0 0 1px rgba(0,0,0,.6),inset 0 1px 0 rgba(236,228,211,.08),inset 0 -30px 46px -30px color-mix(in srgb,var(--cy-k) 60%,transparent),0 40px 90px rgba(0,0,0,.85);
+  animation:cy-in .5s cubic-bezier(.2,.9,.25,1.04) both}
+.g .cy-card::before,.g .cy-card::after{content:"";position:absolute;width:26px;height:26px;border:2px solid var(--gold-2);pointer-events:none;opacity:.8}
+.g .cy-card::before{left:6px;top:6px;border-right:0;border-bottom:0;border-radius:4px 0 0 0}
+.g .cy-card::after{right:6px;bottom:6px;border-left:0;border-top:0;border-radius:0 0 4px 0}
+.g .cy-glow{position:absolute;left:-60px;top:-40px;width:320px;height:320px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--cy-k) 34%,transparent),transparent);pointer-events:none;animation:cy-glow 2.8s ease-in-out infinite alternate}
+.g .cy-x{position:absolute;right:8px;top:8px;z-index:2}
+
+/* левая колонка: номер цикла, имя, суть, «Сразу» */
+.g .cy-side{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0;min-height:0;padding:4px 0 2px 4px}
+.g .cy-ey{color:color-mix(in srgb,var(--cy-k) 70%,var(--parch-2))}
+.g .cy-num{font:600 76px/.95 var(--f-d);letter-spacing:.02em;color:var(--parch);
+  text-shadow:0 0 22px color-mix(in srgb,var(--cy-k) 75%,transparent),0 0 2px color-mix(in srgb,var(--cy-k) 90%,#fff),0 2px 0 #000;animation:cy-num .8s cubic-bezier(.2,.9,.2,1.15) .2s both}
+.g .cy-t{margin:2px 0 0;font:600 22px/1.08 var(--f-d);color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;animation:cy-up .4s ease .35s both}
+.g .cy-lead{margin:0;font:14px/1.3 var(--f-u);color:var(--parch-2);animation:cy-up .4s ease .45s both}
+.g .cy-got{margin-top:auto;display:flex;flex-direction:column;gap:5px;width:100%}
+.g .cy-gl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.g .cy-g{display:flex;align-items:center;min-height:24px;padding:3px 8px;border-radius:6px;background:#0f1215;border:1px solid var(--iron);font:700 12px/1.15 var(--f-u);letter-spacing:.02em;color:var(--parch);
+  box-shadow:inset 0 -8px 12px -9px var(--cy-k);animation:cy-up .4s ease calc(.6s + var(--i) * .12s) both}
+
+/* правая часть: что открылось — шесть блоков, слово проводника, действия */
+.g .cy-main{display:flex;flex-direction:column;gap:7px;min-width:0;min-height:0}
+.g .cy-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:7px;min-height:0}
+.g .cy-tile{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0;min-height:86px;padding:7px 9px 8px;border-radius:5px;text-align:left;cursor:pointer;
+  background:linear-gradient(180deg,rgba(20,23,26,.92),rgba(10,12,14,.95));border:1px solid rgba(88,97,106,.6);color:var(--parch);
+  box-shadow:inset 0 -14px 18px -16px color-mix(in srgb,var(--cy-k) 70%,transparent);animation:cy-tile .42s cubic-bezier(.2,.9,.25,1.1) both}
+.g .cy-tile:nth-child(1){animation-delay:.5s}.g .cy-tile:nth-child(2){animation-delay:.58s}.g .cy-tile:nth-child(3){animation-delay:.66s}
+.g .cy-tile:nth-child(4){animation-delay:.74s}.g .cy-tile:nth-child(5){animation-delay:.82s}.g .cy-tile:nth-child(6){animation-delay:.9s}
+.g .cy-tile:hover,.g .cy-tile:focus-visible{border-color:color-mix(in srgb,var(--cy-k) 70%,var(--gold-3))}
+.g .cy-th{display:flex;align-items:center;gap:5px;width:100%;font:700 11px/1 var(--f-u);letter-spacing:.08em;text-transform:uppercase;color:var(--parch-2)}
+.g .cy-th .i{width:14px;height:14px;color:color-mix(in srgb,var(--cy-k) 80%,var(--parch-2))}
+.g .cy-th b{font:inherit;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.g .cy-tn{margin-left:auto;font:700 11px/1 var(--f-u);color:var(--parch-3)}
+.g .cy-tm{font:600 15px/1.18 var(--f-u);color:var(--parch);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.g .cy-ts{font:12px/1.25 var(--f-u);color:var(--parch-2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.g .cy-say{display:flex;gap:10px;align-items:center;padding:6px 10px;border-radius:4px;background:linear-gradient(180deg,rgba(8,10,12,.55),rgba(8,10,12,.85));border:1px solid rgba(88,97,106,.5);animation:cy-up .4s ease 1s both}
+.g .cy-say .cy-crest,.g .cy-say .sh-crest{flex:none;width:38px;height:38px}
+.g .cy-say p{margin:0;font:14px/1.3 var(--f-u);color:var(--parch);display:flex;flex-direction:column;gap:2px}
+.g .cy-team{margin:0;font-size:12px}
+.g .cy-act{display:flex;align-items:center;justify-content:flex-end;gap:14px;margin-top:auto;padding:0 12px 6px 0}   /* отступ — от уголка рамки */
+.g .cy-act .btn.go{min-width:190px;animation:cy-cta 2.6s ease-in-out 1.6s infinite}
+
+/* узкий кадр 844 × 390 */
+.g.sm .cy-card{grid-template-columns:176px minmax(0,1fr);column-gap:12px;padding:10px 12px 10px 10px}
+.g.sm .cy-num{font-size:60px}
+.g.sm .cy-t{font-size:19px}
+.g.sm .cy-lead{font-size:13px}
+.g.sm .cy-g{font-size:11px;min-height:22px}
+.g.sm .cy-tile{min-height:74px;padding:6px 8px 7px}
+.g.sm .cy-tm{font-size:14px}
+.g.sm .cy-ts{font-size:11px;-webkit-line-clamp:1}
+.g.sm .cy-say p{font-size:13px}
+.g.sm .cy-say .cy-crest,.g.sm .cy-say .sh-crest{width:32px;height:32px}
+.g.sm .cy-act .btn.go{min-width:160px}
+
+@keyframes cy-fade{from{opacity:0}}
+@keyframes cy-in{from{opacity:0;transform:translateY(16px) scale(.95)}}
+@keyframes cy-up{from{opacity:0;transform:translateY(8px)}}
+@keyframes cy-num{from{opacity:0;transform:scale(1.8)}}
+@keyframes cy-tile{from{opacity:0;transform:translateY(12px) scale(.94)}}
+@keyframes cy-glow{from{opacity:.55;transform:scale(.92)}to{opacity:1;transform:scale(1.06)}}
+@keyframes cy-cta{0%,100%{box-shadow:inset 0 -14px 20px -10px rgba(72,229,212,.62),0 0 0 0 rgba(72,229,212,0)}50%{box-shadow:inset 0 -14px 20px -10px rgba(72,229,212,.8),0 0 18px 2px rgba(72,229,212,.35)}}
+@media (prefers-reduced-motion:reduce){
+  .g .cy-scrim,.g .cy-card,.g .cy-glow,.g .cy-num,.g .cy-t,.g .cy-lead,.g .cy-g,.g .cy-tile,.g .cy-say,.g .cy-act .btn.go{animation:none}
+}
+
+/* ===== лист блока и итог циклов ===== */
+.g .cy-rows{gap:8px}
+.g .cy-row{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:6px;background:#0e1114;border:1px solid var(--iron)}
+.g .cy-row .col{flex:1 1 auto;min-width:0;gap:2px}
+.g .cy-row b{font:600 15px/1.2 var(--f-u);color:var(--parch)}
+.g .cy-row small{font:13px/1.3 var(--f-u);color:var(--parch-2)}
+.g .cy-hist{gap:4px;margin-bottom:8px}
+
+/* ===== входы и рейтинг цикла ===== */
+.g .wk-top .wk-cyc{flex:none;align-self:center;white-space:nowrap}
+.g .cy-memb .i{margin-right:4px}
+.g.sm .cy-memb .cy-mbx{display:none}   /* на 844 у зеркала тесно: подпись — «Цикл N», полная — в aria-label */
+.g .cy-histb{font-size:12px}
+.g .sh-next.cy-next h2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ===== UI-кит ===== */
+.cy-kit{width:100%;border-collapse:collapse;font:13px/1.35 var(--f-u);color:var(--parch)}
+.cy-kit th,.cy-kit td{padding:5px 8px;border-bottom:1px solid var(--iron);text-align:left;vertical-align:top}
+.cy-kit th{color:var(--parch-2);font-weight:700;letter-spacing:.04em}

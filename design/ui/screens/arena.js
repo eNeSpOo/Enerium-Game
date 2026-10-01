@@ -459,7 +459,7 @@ function plankStrip(kind, have) {
 function arenaTab() {
   const A = S.arena;
   const head = `<div class="ar-top">
-      <button class="ar-me" data-a="sheet" data-v="rank:Арена"><b class="num">${fmt(A.rating)}</b><small>рейтинг · место ${fmt(arPlace(A.rating))}</small></button>
+      <button class="ar-me" data-a="sheet" data-v="rank:Арена" title="Рейтинг цикла ${ROM[S.acc.cycle]}: соперники и места — игроки вашего цикла"><b class="num">${fmt(A.rating)}</b><small>рейтинг цикла ${ROM[S.acc.cycle]} · место ${fmt(arPlace(A.rating))}</small></button>
       <div class="ar-att"><b class="num">${A.att}<span class="faint"> / ${A.max}</span></b><small>атак · +${AD.arena.att.day} в сутки</small></div>
       <span class="g-spacer"></span>${refreshBtn('arena')}
       <button class="iconbtn" data-a="sheet" data-v="arrules:arena" aria-label="Как устроена Арена" title="Как устроена Арена">${ic('info')}</button></div>`;
@@ -479,7 +479,7 @@ function leagueTab() {
   }
   const L = SQ.ready('league'), sel = SQ.squad('league'), d = divOf(G.rating);
   const head = `<div class="ar-top">
-      <button class="ar-me" data-a="sheet" data-v="rank:Лига"><b class="num">${fmt(G.rating)}</b><small>рейтинг Лиги · дивизион ${d.n}</small></button>
+      <button class="ar-me" data-a="sheet" data-v="rank:Лига" title="Рейтинг Лиги цикла ${ROM[S.acc.cycle]}: соперники — игроки вашего цикла"><b class="num">${fmt(G.rating)}</b><small>Лига цикла ${ROM[S.acc.cycle]} · дивизион ${d.n}</small></button>
       <div class="ar-att"><b class="num">${G.att}<span class="faint"> / ${G.max}</span></b><small>матчей · +${AD.league.att.day} в сутки</small></div>
       <span class="g-spacer"></span>${refreshBtn('league')}
       <button class="iconbtn" data-a="sheet" data-v="arrules:league" aria-label="Как устроена Лига" title="Как устроена Лига">${ic('info')}</button></div>`;

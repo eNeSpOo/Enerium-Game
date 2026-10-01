@@ -18,6 +18,14 @@
    8. UI-кит: раздел «Оболочка и навигация» (KIT_EXTRA) рисуется без исключений, undefined и NaN, размеры в нём — расчётные.
    9. Хвосты задачи: в recipes.js нет заглушки drops.contracts; в лутбоксах «Контракты» заканчивают неделю на планке прогона
       контрактов (contracts.js) во всех циклах.
+   10. Тонкие линии, портрет в ячейке, сильные кнопки (слова автора 01.10.2026) — законы по каскаду стилей (css_cascade.js) на 932 × 430
+       и 844 × 390, с переменными <html> из screens/shell.js; каждый закон проверен мутацией:
+       а) толщины — из данных: SHL_VIEW.line и frame — от 1 до THIN px; нить шапки, шахты и ячейки портрета — line, рамки кнопок — frame;
+          в стилях оболочки толщина рамки — только переменной --shl-*, кольцо тенью — не толще THIN;
+       б) портрет Странника с уровнем и бейджем — в своей ячейке над шахтой и вне скруглённого угла экрана; колокол с бейджем «9+» —
+          вне скруглённого угла справа;
+       в) состояния кнопок: обычная, с делами, выбранная, закрытая — различимы видом; выбранная — светом духа, закрытая — серой
+          картинкой, замком и «ур. N»; колокол с письмами и без, медальоны Убежища «ждёт игрока» и нет — разные.
    Запуск: node tools/content-gen/screens/check_shell.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -58,14 +66,18 @@ const stubEl = id => {
   return e;
 };
 const els = {};
+/* <html>: флаги «арт загружен» и переменные --shl-* из screens/shell.js — их читает каскад законов раздела 10 */
+const rootCls = new Set(), rootVars = {}, rootEl = stubEl('html');
+rootEl.classList = { add: c => rootCls.add(c), remove: c => rootCls.delete(c), toggle: (c, on) => { const v = on === undefined ? !rootCls.has(c) : !!on; if (v) rootCls.add(c); else rootCls.delete(c); return v; }, contains: c => rootCls.has(c) };
+rootEl.style = { setProperty: (k, v) => { rootVars[k] = v; } };
 const document = { readyState: 'loading', addEventListener() {}, getElementById: id => (els[id] = els[id] || stubEl(id)),
   querySelector: () => null, querySelectorAll: () => [], createElement: () => stubEl(), createElementNS: () => stubEl(), body: stubEl('body'),
-  documentElement: stubEl('html'), activeElement: null, fonts: null };
+  documentElement: rootEl, activeElement: null, fonts: null, baseURI: 'file:///ui/index.html' };
 const win = { document, console, navigator: { userAgent: 'node' }, location: { hash: '', href: '' }, history: { replaceState() {} },
   localStorage: { getItem: () => null, setItem() {} }, innerWidth: 1400, innerHeight: 900, devicePixelRatio: 1,
   addEventListener() {}, removeEventListener() {}, dispatchEvent() {}, matchMedia: () => ({ matches: false, addEventListener() {}, addListener() {} }),
   requestAnimationFrame: () => 0, cancelAnimationFrame() {}, setTimeout: () => 0, clearTimeout() {}, setInterval: () => 0, clearInterval() {},
-  getComputedStyle: () => ({ getPropertyValue: () => '' }), CustomEvent: function CustomEvent() {}, performance: { now: () => 0 } };
+  getComputedStyle: () => ({ getPropertyValue: () => '' }), CustomEvent: function CustomEvent() {}, performance: { now: () => 0 }, URL };
 win.window = win; win.self = win;
 const ctx = vm.createContext(win);
 for (const s of scripts) {
@@ -75,8 +87,9 @@ for (const s of scripts) {
 if (err.length) done();
 const T = vm.runInContext(`({
   get S() { return S; }, set S(v) { S = v; }, render, initialState, SCREENS, ACT, NAV, NAV_OPEN, NAV_TODO, navSection, navHeroes, navStep,
-  NPCS, MAP, PATH, KIT_EXTRA, SHELL_SIZE, FLOWS, startRun, RS, rsHas, rsCyc, heroDev,
+  NPCS, MAP, PATH, KIT_EXTRA, SHELL_SIZE, FLOWS, startRun, RS, rsHas, rsCyc, heroDev, navItem, avaHtml, bellHtml, navTodo,
   hrMine: typeof hrMine === 'function' ? hrMine : null, darRows: typeof darRows === 'function' ? darRows : null,
+  shChat: typeof shChat === 'function' ? shChat : null, psShelterBtns: typeof psShelterBtns === 'function' ? psShelterBtns : null,
 })`, ctx);
 const RX = ctx.EN_RECIPES, LBX = ctx.EN_LOOTBOXES, CT = ctx.EN_CONTRACTS;
 
@@ -375,10 +388,204 @@ if (LBX && CT) {
   }
 } else say('lootboxes.js или contracts.js не прочитаны');
 
+/* ================== 10. тонкие линии, портрет в ячейке, сильные кнопки ==================
+   Слова автора 01.10.2026 со снимками оболочки: «Линии общего интерфейся слишком толстые что-ли, то есть они прям зибирают много
+   воздуха, рамки тоже толстые, иконка странника вылезает на интерфейс и сами кнопки слабые». Законы — функции от стилей, переменных
+   <html> и разметки: проверка мутацией зовёт их с поломкой и ждёт ошибку. */
+const CC = require('./css_cascade.js');
+const THIN = 2;                    // линия и рамка оболочки — не толще, px
+const AVA_PAD = 2;                 // поле портрета, уровня и бейджа до краёв своей ячейки — не меньше, px
+const DIGIT_EM = 0.62;             // ширина цифры уровня и бейджа в em — с запасом для PT Sans Narrow Bold
+const SPIRIT = '72,229,212';       // свет духа — цвет выбранного
+const SHELL_SEL = /\.g-(?:top|rail|nav|ava|icon|wallet|back)\b|\.sh-md|\.sh-meds/;   // правила оболочки и медальонов Убежища
+const SH = ctx.EN_SHELL;
+const FR = [{ n: '932 × 430', i: 0, small: false }, { n: '844 × 390', i: 1, small: true }];
+const pxOf = v => { const m = String(v == null ? '' : v).trim().match(/^(-?[\d.]+)px$/); return m ? +m[1] : null; };
+/* длина: px, % от base, calc() из px и % — так пишутся смещения оболочки */
+function lenOf(v, base) {
+  const s = String(v == null ? '' : v).trim(), c = s.match(/^calc\((.*)\)$/), body = c ? c[1] : s;
+  let sum = 0, ok = false;
+  for (const m of body.replace(/\s*([+-])\s*/g, ' $1').trim().split(/\s+(?=[+-])/)) {
+    const t = m.replace(/\s+/g, ''), x = t.match(/^([+-]?[\d.]+)(px|%)$/); if (!x) return null;
+    sum += x[2] === '%' ? +x[1] * base / 100 : +x[1]; ok = true;
+  }
+  return ok ? sum : null;
+}
+const borderW = v => { for (const x of String(v).trim().split(/\s+(?![^(]*\))/)) { if (/^(none|hidden)$/.test(x)) return '0'; if (/^(solid|dashed|dotted|double|groove|ridge|inset|outset)$/.test(x)) return null; if (/^(?:-?[\d.]+(?:px)?|thin|medium|thick|var\(.*\)|calc\(.*\))$/.test(x)) return x; } return null; };
+const CORNER = +((html.match(/\.p-device-inner\{border-radius:(\d+)px/) || [])[1]);   // скругление угла экрана прототипа
+const RULES_ALL = CC.sheets(UI, html);
+const rootStyle = vars => Object.entries(vars).map(([k, v]) => `${k}:${v}`).join(';');
+const treeOf = (small, markup, vars) => CC.wrap([['html', { class: [...rootCls].join(' '), lang: 'ru', style: rootStyle(vars) }], ['body', {}], ['div', { class: 'p-device', id: 'device' }],
+  ['div', { class: 'p-device-inner' }], ['div', { class: small ? 'g sm' : 'g', id: 'game', lang: 'ru' }]], markup);
+const envOf = fr => { const [w, h, top, rail] = T.SHELL_SIZE.frames[fr.i]; return { w, h, reduced: false, hover: false, containers: { main: [w - rail, h - top], rail: [rail, h - top] } }; };
+const in1 = (root, pred) => CC.q(root, pred)[0];
+const has = (...c) => e => c.every(k => e.cls.has(k));
+const inside = (k, ...c) => e => c.every(x => e.cls.has(x)) && CC.within(e.parent || e, a => a.cls.has(k));
+
+/* а) толщины — из данных */
+function lawThin(rules, view, vars, g) {
+  const out = [];
+  for (const k of ['line', 'frame']) for (const v of view[k]) if (!Number.isInteger(v) || v < 1 || v > THIN) out.push(`SHL_VIEW.${k}: ${v} px — нить не толще ${THIN} px (слово автора: «слишком толстые»)`);
+  for (const fr of FR) {
+    const root = treeOf(fr.small, g, vars), C = new CC.Cascade(rules, envOf(fr)), want = { line: view.line[fr.i], frame: view.frame[fr.i] };
+    const chk = (what, e, prop, pe, kind) => {
+      if (!e) { out.push(`${fr.n}: в разметке нет — ${what}`); return; }
+      const v = pe ? C.pvalue(e, pe, prop) : C.value(e, prop);
+      if (pxOf(v) !== want[kind]) out.push(`${fr.n}: ${what} — ${v || 'нет'}, а SHL_VIEW.${kind} — ${want[kind]} px`);
+    };
+    chk('нить под шапкой (.g-top)', in1(root, has('g-top')), 'border-bottom-width', null, 'line');
+    chk('кромка шахты (.g-rail)', in1(root, has('g-rail')), 'border-right-width', null, 'line');
+    chk('кромка ячейки портрета (.g-ava)', in1(root, has('g-ava')), 'border-right-width', null, 'line');
+    chk('рамка колокола (.g-icon)', in1(root, has('g-icon')), 'border-top-width', null, 'frame');
+    chk('рамка уровня Странника (.g-ava .lv)', in1(root, inside('g-ava', 'lv')), 'border-top-width', null, 'frame');
+    chk('нить картинки раздела (.g-nav .nv::before)', in1(root, has('nv')), 'border-top-width', 'before', 'frame');
+    chk('медальон «Чат» (.sh-md::before)', in1(root, has('sh-md')), 'border-top-width', 'before', 'frame');
+    chk('медальон «Дар дня» (.ps-sb::before)', in1(root, has('ps-sb')), 'border-top-width', 'before', 'frame');
+  }
+  /* в стилях оболочки толщина рамки — только переменной, кольцо тенью — не толще THIN */
+  for (const r of rules) {
+    if (!(r.src === 'screens/shell.css' || ((r.src === 'index.html' || r.src === 'screens/shelter.css') && SHELL_SEL.test(r.sel)))) continue;
+    for (const d of r.decls) {
+      if (/^border(?:-(?:top|right|bottom|left))?(?:-width)?$/.test(d.p)) {
+        const w = /-width$/.test(d.p) ? d.v.trim().split(/\s+(?![^(]*\))/)[0] : borderW(d.v);
+        if (w && w !== '0' && !/^var\(--shl-(?:ln|fr)\b/.test(w)) out.push(`${r.src} «${r.sel}»: толщина рамки «${w}» — не из данных (var(--shl-ln) или var(--shl-fr))`);
+      }
+      if (d.p === 'box-shadow') for (const m of d.v.matchAll(/(?:^|,)\s*(?:inset\s+)?0(?:px)?\s+0(?:px)?\s+0(?:px)?\s+([\d.]+)px/g)) if (+m[1] > THIN) out.push(`${r.src} «${r.sel}»: кольцо тенью ${m[1]} px — толще нити ${THIN} px`);
+    }
+  }
+  return out;
+}
+
+/* б) портрет Странника — в своей ячейке; колокол и бейджи — вне скруглённых углов экрана */
+function lawAva(rules, vars, g) {
+  const out = [];
+  if (!Number.isFinite(CORNER)) return ['index.html: не нашёл скругление угла экрана (.p-device-inner)'];
+  /* угол: точка прямоугольника в квадрате угла дальше радиуса от его середины — уходит под скругление */
+  const corner = (b, cx, cy, left) => { for (const [x, y] of [[b.x, b.y], [b.x + b.w, b.y], [b.x, b.y + b.h], [b.x + b.w, b.y + b.h]]) { const dx = left ? cx - x : x - cx, dy = cy - y; if (dx > 0 && dy > 0 && dx * dx + dy * dy > CORNER * CORNER + 0.01) return true; } return false; };
+  for (const fr of FR) {
+    const [W, , TOP, RAIL] = T.SHELL_SIZE.frames[fr.i], root = treeOf(fr.small, g, vars), C = new CC.Cascade(rules, envOf(fr));
+    const top = in1(root, has('g-top')), ava = in1(root, has('g-ava')), ring = in1(root, inside('g-ava', 'ring')), lv = in1(root, inside('g-ava', 'lv'));
+    const bdg = in1(root, e => e.cls.has('bdg') && e.parent === ava), bell = in1(root, has('g-icon')), bb = bell && in1(bell, has('bdg'));
+    if (!top || !ava || !ring || !lv || !bell) { out.push(`${fr.n}: в разметке нет шапки, портрета, кольца, уровня или колокола`); continue; }
+    const line = pxOf(C.value(top, 'border-bottom-width')) || 0, lineR = pxOf(C.value(ava, 'border-right-width')) || 0;
+    const cw = RAIL - lineR, ch = TOP - line, s = pxOf(C.value(ring, 'width'));
+    if (!Number.isFinite(s)) { out.push(`${fr.n}: каскад не дал стороны кольца портрета`); continue; }
+    const x0 = (cw - s) / 2, y0 = (ch - s) / 2, boxes = [{ n: 'кольцо портрета', x: x0, y: y0, w: s, h: s }];
+    /* уровень: смещения — от кольца; ширина — по самому длинному уровню, трёхзначному */
+    const fs = pxOf(C.value(lv, 'font-size')) || 11, pad = (pxOf(C.value(lv, 'padding-left')) || 0) + (pxOf(C.value(lv, 'padding-right')) || 0), bw = 2 * (pxOf(C.value(lv, 'border-left-width')) || 0);
+    const lvW = Math.max(pxOf(C.value(lv, 'min-width')) || 0, 3 * DIGIT_EM * fs + pad + bw), lvH = pxOf(C.value(lv, 'height')) || 0;
+    const lvR = lenOf(C.value(lv, 'right'), s), lvB = lenOf(C.value(lv, 'bottom'), s);
+    if (lvR == null || lvB == null) out.push(`${fr.n}: уровень Странника стоит не смещениями right и bottom от кольца`);
+    else boxes.push({ n: 'уровень Странника', x: x0 + s - lvR - lvW, y: y0 + s - lvB - lvH, w: lvW, h: lvH });
+    /* бейдж мест Памяти — «9+» */
+    const bdgEl = bdg || bb, bH = bdgEl ? pxOf(C.value(bdgEl, 'height')) || 17 : 17, bFs = bdgEl ? pxOf(C.value(bdgEl, 'font-size')) || 10.5 : 10.5;
+    const bPad = bdgEl ? (pxOf(C.value(bdgEl, 'padding-left')) || 0) + (pxOf(C.value(bdgEl, 'padding-right')) || 0) : 8, bW = Math.max(bdgEl ? pxOf(C.value(bdgEl, 'min-width')) || 17 : 17, 2 * DIGIT_EM * bFs + bPad);
+    if (bdg) {
+      const bx = lenOf(C.value(bdg, 'left'), cw), by = lenOf(C.value(bdg, 'top'), ch);
+      if (bx == null || by == null) out.push(`${fr.n}: бейдж Странника стоит не смещениями left и top`);
+      else boxes.push({ n: 'бейдж Странника «9+»', x: bx, y: by, w: bW, h: bH });
+    }
+    for (const b of boxes) {
+      if (b.x < AVA_PAD - 0.01 || b.y < AVA_PAD - 0.01 || b.x + b.w > cw - AVA_PAD + 0.01 || b.y + b.h > ch - AVA_PAD + 0.01)
+        out.push(`${fr.n}: ${b.n} вылезает из ячейки портрета ${cw} × ${ch}: ${b.x.toFixed(1)}…${(b.x + b.w).toFixed(1)} × ${b.y.toFixed(1)}…${(b.y + b.h).toFixed(1)}, поле ${AVA_PAD} px`);
+      if (corner(b, CORNER, CORNER, true)) out.push(`${fr.n}: ${b.n} заходит в скруглённый угол экрана слева (${CORNER} px)`);
+    }
+    /* колокол — последний в шапке, у правого поля; его бейдж «9+» — вне скруглённого угла */
+    const padR = pxOf(C.value(top, 'padding-right')), bs = pxOf(C.value(bell, 'width'));
+    if (!Number.isFinite(padR) || !Number.isFinite(bs)) { out.push(`${fr.n}: каскад не дал поля шапки или стороны колокола`); continue; }
+    const bellBox = { n: 'колокол', x: W - padR - bs, y: (ch - bs) / 2, w: bs, h: bs };
+    const bTop = bb ? lenOf(C.value(bb, 'top'), bs) : -3, bRight = bb ? lenOf(C.value(bb, 'right'), bs) : -3;
+    const badge = { n: 'бейдж колокола «9+»', x: bellBox.x + bs - bRight - bW, y: bellBox.y + bTop, w: bW, h: bH };
+    for (const b of [bellBox, badge]) {
+      if (b.y < 0 || b.x + b.w > W) out.push(`${fr.n}: ${b.n} выходит за экран`);
+      if (corner(b, W - CORNER, CORNER, false)) out.push(`${fr.n}: ${b.n} заходит в скруглённый угол экрана справа (${CORNER} px): ${b.x.toFixed(1)}…${(b.x + b.w).toFixed(1)} × ${b.y.toFixed(1)}`);
+    }
+  }
+  return out;
+}
+
+/* в) состояния кнопок различимы видом и говорят своё */
+function lawStates(rules, vars, m) {
+  const out = [];
+  for (const fr of FR) {
+    const root = treeOf(fr.small, m, vars), C = new CC.Cascade(rules, envOf(fr));
+    const navs = CC.q(root, has('g-nav')), sig = {};
+    for (const b of navs) {
+      const st = b.attrs.get('data-state'), img = in1(b, e => e.tag === 'img'), nv = in1(b, has('nv')), lbl = in1(b, has('lbl'));
+      if (!st || !img || !nv) continue;
+      sig[st] = { img: `${C.value(img, 'opacity')} ${C.value(img, 'filter')}`, frame: `${C.pvalue(nv, 'before', 'border-top-color')} ${C.pvalue(nv, 'before', 'box-shadow')}`, lbl: `${C.value(lbl, 'color')} ${C.value(lbl, 'opacity')}` };
+    }
+    const S4 = ['обычная', 'с делами', 'выбранная', 'закрытая'];
+    const miss = S4.filter(k => !sig[k]);
+    if (miss.length) { out.push(`${fr.n}: нет кнопки раздела в состоянии ${miss.map(k => `«${k}»`).join(', ')}`); continue; }
+    for (let i = 0; i < S4.length; i++) for (let j = i + 1; j < S4.length; j++) { const a = sig[S4[i]], b = sig[S4[j]]; if (a.img === b.img && a.frame === b.frame && a.lbl === b.lbl) out.push(`${fr.n}: кнопки «${S4[i]}» и «${S4[j]}» не различить — картинка, нить и подпись одинаковы`); }
+    if (sig['с делами'].frame === sig['обычная'].frame) out.push(`${fr.n}: у кнопки с делами нить — как у обычной`);
+    if (!sig['выбранная'].frame.includes(SPIRIT)) out.push(`${fr.n}: выбранная кнопка не светится духом — нить ${sig['выбранная'].frame}`);
+    if (!/grayscale\(1\)/.test(sig['закрытая'].img)) out.push(`${fr.n}: картинка закрытого раздела не серая — ${sig['закрытая'].img}`);
+    /* колокол: письма есть и нет */
+    const bells = CC.q(root, has('g-icon')), bsig = bells.map(e => `${C.value(e, 'border-top-color')} ${C.value(e, 'box-shadow')}`);
+    if (bells.length < 2) out.push(`${fr.n}: нет двух колоколов — с письмами и без`); else if (bsig[0] === bsig[1]) out.push(`${fr.n}: колокол с письмами и без не различить`);
+    /* медальоны Убежища: ждёт игрока и нет */
+    for (const [n, sel] of [['«Дар дня»', 'gift'], ['«Пропуск»', 'pass'], ['«Чат»', 'chat']]) {
+      const two = CC.q(root, e => e.attrs.get('data-med') === sel);
+      if (two.length !== 2) { out.push(`${fr.n}: нет двух медальонов ${n} — ждёт игрока и нет`); continue; }
+      const s2 = two.map(e => `${C.pvalue(e, 'before', 'border-top-color')} ${C.pvalue(e, 'before', 'box-shadow')}`);
+      if (s2[0] === s2[1]) out.push(`${fr.n}: медальон ${n} «ждёт игрока» не отличить от спокойного`);
+    }
+  }
+  /* разметка: закрытая — замок и уровень открытия, с делами — число, выбранная — язычок */
+  const lock = (m.match(/<button data-state="закрытая"[\s\S]*?<\/button>/) || [''])[0];
+  if (!/class="lk"/.test(lock) || !lock.includes(`<b>ур. ${T.NAV_OPEN.week}</b>`)) out.push(`закрытый раздел: нет замка или «ур. ${T.NAV_OPEN.week}» на картинке`);
+  const todo = (m.match(/<button data-state="с делами"[\s\S]*?<\/button>/) || [''])[0];
+  if (!/<span class="bdg"[^>]*>\d+<\/span>/.test(todo)) out.push('кнопка с делами: нет бейджа с числом');
+  const cur = (m.match(/<button data-state="выбранная"[\s\S]*?<\/button>/) || [''])[0];
+  if (!/aria-current="page"/.test(cur) || !/class="lamp/.test(cur)) out.push('выбранная кнопка: нет aria-current или язычка');
+  return out;
+}
+
+{
+  if (!SH) say('screens/shell.js: нет window.EN_SHELL — числа вида оболочки не прочитаны');
+  else {
+    const V = SH.SHL_VIEW;
+    /* разметка: игра на Убежище (шапка, шахта, медальоны) и образцы состояний */
+    reset(); T.S.route = 'shelter'; T.S.overlay = null;
+    const g = draw('законы оболочки · Убежище');
+    const it = k => T.NAV.find(x => x[0] === k), mark = (h, st) => h.replace(/^<button /, `<button data-state="${st}" `);
+    const navs = [mark(T.navItem(it('craft')), 'обычная'), mark(T.navItem(it('craft'), { todo: [{ n: 2, q: 2, t: 'сундука в запасах' }] }), 'с делами'),
+      mark(T.navItem(it('heroes'), { cur: true, mv: {} }), 'выбранная'), mark(T.navItem(it('week'), { lock: T.NAV_OPEN.week }), 'закрытая')].join('');
+    const bell = n => `<button class="g-icon" data-a="sheet" data-v="inbox" aria-label="Входящие: ${n}">${n ? `<span class="bdg" aria-hidden="true">${n}</span>` : ''}</button>`;
+    const meds0 = T.psShelterBtns ? T.psShelterBtns() : '', chat0 = T.shChat ? T.shChat() : '';
+    const gift = (meds0.match(/<button class="btn sm ps-sb[^"]*" data-a="dlg" data-v="gift"[\s\S]*?<\/button>/) || [''])[0], pass = (meds0.match(/<button class="btn sm ps-sb[^"]*" data-a="go" data-v="store:pass"[\s\S]*?<\/button>/) || [''])[0];
+    const med = (h, k) => h.replace(/^<button /, `<button data-med="${k}" `);
+    const calm = h => h.replace(/ hot"/, '"').replace(/<i class="dot"[^>]*><\/i>/, '').replace(/<span class="bdg"[^>]*>[^<]*<\/span>/, '');
+    if (!/ hot"/.test(gift) || !/class="dot"/.test(pass) || !/class="bdg"/.test(chat0)) say('законы оболочки: в демо «Дар дня» не ждёт, у «Пропуска» нет точки или у «Чата» нет непрочитанного — состояния медальонов не сверить');
+    const meds = `<section class="scr flush sh"><div class="sh-ui"><div class="sh-top"><div class="sh-meds">${med(gift, 'gift')}${med(calm(gift), 'gift')}${med(pass, 'pass')}${med(calm(pass), 'pass')}</div></div><div class="sh-bot">${med(chat0, 'chat')}${med(calm(chat0), 'chat')}</div></div></section>`;
+    const states = `<header class="g-top">${bell(7)}${bell(0)}</header><nav class="g-rail" aria-label="Разделы">${navs}</nav><main class="g-main">${meds}</main>`;
+    const laws = [['а', () => lawThin(RULES_ALL, V, rootVars, g)], ['б', () => lawAva(RULES_ALL, rootVars, g)], ['в', () => lawStates(RULES_ALL, rootVars, states)]];
+    for (const [k, f] of laws) for (const e of run(`закон ${k}`, f) || []) say(`закон ${k}: ${e}`);
+    /* проверка мутацией: ломаем — закон обязан упасть */
+    const plus = (css, src) => RULES_ALL.concat(CC.parseCss(css, src));
+    const thick = Object.assign({}, rootVars, { '--shl-ln0': '9px', '--shl-ln1': '8px' });
+    const MUT = [
+      ['а', 'кромка 9 px в данных — как была', () => lawThin(RULES_ALL, Object.assign({}, V, { line: [9, 8] }), thick, g)],
+      ['а', 'толщина кромки шахты числом, не из данных', () => lawThin(plus('.g-rail{border-right:9px solid #000}', 'screens/shell.css'), V, rootVars, g)],
+      ['а', 'толстое кольцо тенью вокруг картинки раздела', () => lawThin(plus('.g-nav .pic{box-shadow:0 0 0 6px #0a0d0f}', 'screens/shell.css'), V, rootVars, g)],
+      ['б', 'уровень Странника опущен на линию шапки', () => lawAva(plus('.g-ava .lv{bottom:-9px}', 'index.html'), rootVars, g)],
+      ['б', 'колокол прижат к правому краю — бейдж в скруглённом углу', () => lawAva(plus('.g-top{padding-right:4px}', 'index.html'), rootVars, g)],
+      ['в', 'у кнопки с делами нет своего вида', () => lawStates(RULES_ALL.filter(r => !/:has\(\.bdg\)/.test(r.sel)), rootVars, states)],
+      ['в', 'у закрытого раздела нет уровня открытия', () => lawStates(RULES_ALL, rootVars, states.replace(/<b>ур\. \d+<\/b>/, ''))],
+      ['в', 'медальон «ждёт игрока» как спокойный', () => lawStates(RULES_ALL.filter(r => !/\.ps-sb\.hot::before/.test(r.sel)), rootVars, states)],
+    ];
+    let caught = 0;
+    for (const [k, what, f] of MUT) { const e = run(`мутация «${what}»`, f) || []; if (e.length) caught++; else say(`мутация «${what}»: закон ${k} её не поймал`); }
+    console.log(`Законы оболочки: толщины — линия ${V.line.join(' / ')} px, рамка ${V.frame.join(' / ')} px; портрет и колокол в своих границах; четыре состояния кнопки различимы; мутаций ${MUT.length}, поймано ${caught}.`);
+  }
+}
+
 done();
 
 function done() {
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
   console.log(`Оболочка: маршрутов ${cnt.routes}, отрисовок ${cnt.draws}, бейджей сверено ${cnt.badges} в ${cnt.cases} состояниях, переходов ${cnt.moves}.`);
-  console.log('Проверка пройдена: шахта из пяти разделов на каждом маршруте, бейджи — число дел, закрытый раздел объясняет условие, переход — transform и opacity, вёрстка на 932 × 430 и 844 × 390, раздел UI-кита, хвосты.');
+  console.log('Проверка пройдена: шахта из пяти разделов на каждом маршруте, бейджи — число дел, закрытый раздел объясняет условие, переход — transform и opacity, вёрстка на 932 × 430 и 844 × 390, раздел UI-кита, хвосты; линии и рамки — тонкие и из данных, портрет Странника — в своей ячейке, состояния кнопок различимы, мутации пойманы.');
 }

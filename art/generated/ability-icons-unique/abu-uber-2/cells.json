@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/ability-icons-unique/abu-uber-2__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/ability-icons-unique.json",
+  "job": "abu-uber-2",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "Эхо.Саганы.act",
+      "file": "art/generated/ability-icons-unique/abu-uber-2/echo-sagans-act.webp",
+      "box": [
+        9,
+        15,
+        447,
+        453
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Саганы.pas",
+      "file": "art/generated/ability-icons-unique/abu-uber-2/echo-sagans-pas.webp",
+      "box": [
+        471,
+        15,
+        909,
+        453
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Саганы.react",
+      "file": "art/generated/ability-icons-unique/abu-uber-2/echo-sagans-react.webp",
+      "box": [
+        933,
+        15,
+        1371,
+        453
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Саганы.ult1",
+      "file": "art/generated/ability-icons-unique/abu-uber-2/echo-sagans-ult1.webp",
+      "box": [
+        1395,
+        15,
+        1833,
+        453
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Саганы.ult2",
+      "file": "art/generated/ability-icons-unique/abu-uber-2/echo-sagans-ult2.webp",
+      "box": [
+        1857,
+        15,
+        2295,
+        453
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Аппараты.act",
+      "file": "art/generated/ability-icons-unique/abu-uber-2/echo-machines-act.webp",
+      "box": [
+        9,
+        477,
+        447,
+        915
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Аппараты.pas1",
+      "file": "art/generated/ability-icons-unique/abu-uber-2/echo-machines-pas1.webp",
+      "box": [
+        471,
+        477,
+        909,
+        915
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Аппараты.pas2",
+      "file": "art/generated/ability-icons-unique/abu-uber-2/echo-machines-pas2.webp",
+      "box": [
+        933,
+        477,
+        1371,
+        915
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Аппараты.ult1",
+      "file": "art/generated/ability-icons-unique/abu-uber-2/echo-machines-ult1.webp",
+      "box": [
+        1395,
+        477,
+        1833,
+        915
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Аппараты.ult2",
+      "file": "art/generated/ability-icons-unique/abu-uber-2/echo-machines-ult2.webp",
+      "box": [
+        1857,
+        477,
+        2295,
+        915
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Искажённые.act1",
+      "file": "art/generated/ability-icons-unique/abu-uber-2/echo-twisted-act1.webp",
+      "box": [
+        9,
+        940,
+        447,
+        1378
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Искажённые.act2",
+      "file": "art/generated/ability-icons-unique/abu-uber-2/echo-twisted-act2.webp",
+      "box": [
+        471,
+        940,
+        909,
+        1378
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Искажённые.react",
+      "file": "art/generated/ability-icons-unique/abu-uber-2/echo-twisted-react.webp",
+      "box": [
+        933,
+        940,
+        1371,
+        1378
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Искажённые.ult1",
+      "file": "art/generated/ability-icons-unique/abu-uber-2/echo-twisted-ult1.webp",
+      "box": [
+        1395,
+        940,
+        1833,
+        1378
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Искажённые.ult2",
+      "file": "art/generated/ability-icons-unique/abu-uber-2/echo-twisted-ult2.webp",
+      "box": [
+        1857,
+        940,
+        2295,
+        1378
+      ],
+      "px": 438,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Нежить.act1",
+      "file": "art/generated/ability-icons-unique/abu-uber-2/echo-undead-act1.webp",
+      "box": [
+        9,
+        1402,
+        446,
+        1839
+      ],
+      "px": 437,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Нежить.act2",
+      "file": "art/generated/ability-icons-unique/abu-uber-2/echo-undead-act2.webp",
+      "box": [
+        471,
+        1402,
+        908,
+        1839
+      ],
+      "px": 437,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Нежить.react",
+      "file": "art/generated/ability-icons-unique/abu-uber-2/echo-undead-react.webp",
+      "box": [
+        933,
+        1402,
+        1370,
+        1839
+      ],
+      "px": 437,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Нежить.ult1",
+      "file": "art/generated/ability-icons-unique/abu-uber-2/echo-undead-ult1.webp",
+      "box": [
+        1395,
+        1402,
+        1832,
+        1839
+      ],
+      "px": 437,
+      "key_left": 0.0
+    },
+    {
+      "id": "Эхо.Нежить.ult2",
+      "file": "art/generated/ability-icons-unique/abu-uber-2/echo-undead-ult2.webp",
+      "box": [
+        1857,
+        1402,
+        2294,
+        1839
+      ],
+      "px": 437,
+      "key_left": 0.0
+    }
+  ]
+}

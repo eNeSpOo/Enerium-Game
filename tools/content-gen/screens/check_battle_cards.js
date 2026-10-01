@@ -8,7 +8,8 @@
       элита, босс, Убер, Многоликий, призванные враги всех типов — элита, босс, Убер, Забытый; биом Многоликого по этажам; клан — Голос, Хозяин и свита; Арена и Лига — рамка героя
       с обеих сторон; свои герои — всегда рамка героя. Каждая рамка набора встречается в бою.
    4. Карта с рамкой: класс fr, тип, переменные геометрии, рамка в кадре портрета; у героя — метка: кристалл редкости героя и звёзды по
-      личному максимуму, взятые — по доблести; имя, полоса здоровья и щита, класс, эффекты, цель, контроль, «пал» — на месте; ход боя
+      личному максимуму, взятые — по доблести; имя, полоса здоровья и щита с числами (hpn, shn — «Бой AAA»), класс, эффекты, цель,
+      контроль, «пал» — на месте; ход боя
       (paintCards) идёт без исключений; в легенде знаков — строка о рамке.
    5. Без выгрузки (BF.ready пуст) — карта прежняя: разметка боя та же, что с рамками, за вычетом рамки, метки, класса fr и ранга
       в подсказке; ни следа рамок ни на картах, ни в легенде.
@@ -247,7 +248,7 @@ function checkBattle(key, R, want) {
     if (!c.html.includes(` data-bf="${t}"`) || !/class="bc [^"]*\bfr"/.test(c.html)) fail(`${where}: у карты нет рамки своего типа`);
     if (!c.html.includes(`<i class="bf" style="border-image-source:url('assets/art/${BF.path(t)}`)) fail(`${where}: в кадре нет рамки ${BF.path(t)}`);
     for (const v of ['--bf-ar', '--bf-wt', '--bf-wr', '--bf-wb', '--bf-wl', '--bf-ct', '--bf-cr', '--bf-cb', '--bf-cl']) if (!c.html.includes(v + ':')) fail(`${where}: нет ${v}`);
-    for (const part of ['class="buffs"', 'class="debuffs"', 'class="cls"', 'class="tgt"', 'class="ctl"', 'class="nm"', 'class="bar hp"', 'class="sh"', 'class="rot"']) if (!c.html.includes(part)) fail(`${where}: нет ${part}`);
+    for (const part of ['class="buffs"', 'class="debuffs"', 'class="cls"', 'class="tgt"', 'class="ctl"', 'class="nm"', 'class="bar hp"', 'class="sh"', 'class="hpn"', 'class="shn"', 'class="rot"']) if (!c.html.includes(part)) fail(`${where}: нет ${part}`);
     if (!c.side && !c.html.includes('class="fell"')) fail(`${where}: у героя нет «пал»`);
     if (t === 'hero') markOk(where, c, u);
     else if (c.html.includes('bf-mk')) fail(`${where}: метка героя на карте врага`);
@@ -312,7 +313,7 @@ function portraitView(key, R, h0) {
       if (!!u.lead !== /class="bc [^"]*\blead\b/.test(c.html)) fail(`${where}: главный враг и класс lead не совпадают`);
       if (!c.html.includes(`<i class="pf" aria-hidden="true"><svg class="pc" style="--pcw:${w}" viewBox="0 0 ${w} 14" aria-hidden="true"><use href="#bfp-${t}"></use></svg>`)) fail(`${where}: нет рамки .pf с украшением ранга bfp-${t}`);
       if (BV.corner.includes(t) !== c.html.includes(`<use href="#bfk-${t}">`)) fail(`${where}: угловые украшения не по BF_VIEW.corner`);
-      for (const part of ['class="buffs"', 'class="debuffs"', 'class="cls"', 'class="tgt"', 'class="ctl"', 'class="nm"', 'class="bar hp"', 'class="sh"', 'class="rot"']) if (!c.html.includes(part)) fail(`${where}: нет ${part}`);
+      for (const part of ['class="buffs"', 'class="debuffs"', 'class="cls"', 'class="tgt"', 'class="ctl"', 'class="nm"', 'class="bar hp"', 'class="sh"', 'class="hpn"', 'class="shn"', 'class="rot"']) if (!c.html.includes(part)) fail(`${where}: нет ${part}`);
       if (!c.side && !c.html.includes('class="fell"')) fail(`${where}: у героя нет «пал»`);
       if (t === 'hero') markOk(where, c, u); else if (c.html.includes('bf-mk')) fail(`${where}: метка героя на карте врага`);
       const src = (c.html.match(/<div class="face"><img src="([^"]+)"/) || [])[1];
@@ -339,12 +340,12 @@ function squareView(key, R, h0) {
       const team = R.b.u[c.side], u = team[c.i], t = T.bfType(R, u), at = (T.SLOT[team.length] || [])[c.i];
       const where = `${key} · квадрат · ${c.side ? 'враг' : 'герой'} ${u.name}`, w = BV.crest[t];
       cntS.cards++; cntS.seen.add(t);
-      if (!/class="bc [^"]*\bsq"/.test(c.html) || !c.html.includes(` data-pf="${t}"`)) fail(`${where}: нет карты-квадрата с рамкой «${t}»`);
+      if (!/class="bc [^"]*\bsq(?: sfa)?"/.test(c.html) || !c.html.includes(` data-pf="${t}"`)) fail(`${where}: нет карты-квадрата с рамкой «${t}»`);
       if (!at || !c.html.includes(`style="--k:${at[0]};--r:${at[1]};--fy:`)) fail(`${where}: место не прежнее — не из SLOT (карт ${team.length}, №${c.i})`);
       if (!!u.lead !== /class="bc [^"]*\blead\b/.test(c.html)) fail(`${where}: главный враг и класс lead не совпадают`);
       if (!c.html.includes(`<i class="pf" aria-hidden="true"><svg class="pc" style="--pcw:${w}" viewBox="0 0 ${w} 14" aria-hidden="true"><use href="#bfp-${t}"></use></svg>`)) fail(`${where}: нет рамки .pf с украшением ранга bfp-${t}`);
       if (BV.corner.includes(t) !== c.html.includes(`<use href="#bfk-${t}">`)) fail(`${where}: угловые украшения не по BF_VIEW.corner`);
-      for (const part of ['class="buffs"', 'class="debuffs"', 'class="cls"', 'class="tgt"', 'class="ctl"', 'class="nm"', 'class="bar hp"', 'class="sh"', 'class="rot"']) if (!c.html.includes(part)) fail(`${where}: нет ${part}`);
+      for (const part of ['class="buffs"', 'class="debuffs"', 'class="cls"', 'class="tgt"', 'class="ctl"', 'class="nm"', 'class="bar hp"', 'class="sh"', 'class="hpn"', 'class="shn"', 'class="rot"']) if (!c.html.includes(part)) fail(`${where}: нет ${part}`);
       if (!c.side && !c.html.includes('class="fell"')) fail(`${where}: у героя нет «пал»`);
       if (t === 'hero') markOk(where, c, u); else if (c.html.includes('bf-mk')) fail(`${where}: метка героя на карте врага`);
       const m = c.html.match(/;--fy:(\d+);--nll:(\d);--nls:(\d);--nfl:(\d+);--nfs:(\d+);--ntl:(-?\d+);--nts:(-?\d+);--crl:(\d);--crs:(\d)"/);
@@ -714,12 +715,12 @@ const hasRule = (sel, re) => rules.some(r => r.sel.includes(sel) && re.test(r.bo
     for (const st of stages) {
       const v = st.includes('class="bt pv bf-stg"') ? 'pt' : st.includes('class="bt sv bf-stg"') ? 'sq' : 'fr', cards = (st.match(/<div class="bc /g) || []).length;
       if (cards !== 10) fail(`UI-кит · вид: в сцене ${v} карт ${cards}, не пять на пять`);
-      if (v === 'fr' ? /data-pf=/.test(st) : !new RegExp(`class="bc [^"]*\\b${v}"`).test(st) || /data-bf=/.test(st)) fail('UI-кит · вид: в сцене карты чужого вида');
+      if (v === 'fr' ? /data-pf=/.test(st) : !new RegExp(`class="bc [^"]*\\b${v}(?: sfa)?"`).test(st) || /data-bf=/.test(st)) fail('UI-кит · вид: в сцене карты чужого вида');
       if (/ id="bc\d/.test(st)) fail('UI-кит · вид: у карт сцены id боя — совпадут с картами прототипа');
     }
     for (const v of ['sq', 'pt']) {
-      for (const t of TYPES) if (!new RegExp(`class="bc [^"]*\\b${v}" data-pf="${t}"`).test(h)) fail(`UI-кит · вид: нет рамки «${t}» вида ${v}`);
-      for (const st of ['aimed many', 'ctl-on', 'shielded', 'unk', 'dead', 'sel']) if (!new RegExp(`class="bc [^"]*${st}[^"]*\\b${v}"`).test(h)) fail(`UI-кит · вид: нет состояния «${st}» вида ${v}`);
+      for (const t of TYPES) if (!new RegExp(`class="bc [^"]*\\b${v}(?: sfa)?" data-pf="${t}"`).test(h)) fail(`UI-кит · вид: нет рамки «${t}» вида ${v}`);
+      for (const st of ['aimed many', 'ctl-on', 'shielded', 'unk', 'dead', 'sel']) if (!new RegExp(`class="bc [^"]*${st}[^"]*\\b${v}(?: sfa)?"`).test(h)) fail(`UI-кит · вид: нет состояния «${st}» вида ${v}`);
     }
     const faces = n(/<span class="bf-fc" style="--fy:\d+">/g);
     if (faces !== 2 * T.BF_KIT.faces) fail(`UI-кит · срез портретов: лиц ${faces}, ждали ${2 * T.BF_KIT.faces}`);

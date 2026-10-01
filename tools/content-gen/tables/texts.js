@@ -26,6 +26,7 @@ const OWNERS = {
   wanderer: { src: 'tools/content-gen/wanderer/build.js (PAS_FIX, ART), achievements.js', mine: true },
   biomes: { src: 'tools/content-gen/biomes/data/*.js', mine: true },
   start: { src: 'tools/content-gen/start/data.js', mine: true },
+  cycle: { src: 'tools/content-gen/cycle/data.js (SAY, TEXT) и данные игры, из которых их собирает cycle/build.js', mine: true },
 };
 
 function load(name) {
@@ -145,6 +146,16 @@ function collect() {
   const ST = load('start').EN_START;
   for (const [k, o] of Object.entries(ST.open || {})) for (const x of ['n', 'd']) add('start', 1, false, `открытие ${k} · ${x}`, o[x]);
   (ST.levels || []).forEach((l, i) => walk(l, `уровень ${i + 1}`, 'start', 1));
+
+  /* --- новый цикл: окно «Событие нового цикла» (ADR-0041) — игрок видит его с цикла, в который вошёл --- */
+  if (fs.existsSync(path.join(UI, 'cycle.js'))) {
+    const CY = load('cycle').EN_CYCLE;
+    for (const [c, s] of Object.entries(CY.steps || {})) {
+      add('cycle', +c, false, `переход в цикл ${s.roman} · окно`, [s.title, s.lead, s.say && s.say[1]]);
+      for (const g of s.got || []) add('cycle', +c, false, `переход в цикл ${s.roman} · сразу ${g.k}`, g.n);
+      for (const x of s.open || []) add('cycle', +c, !!x.team, `переход в цикл ${s.roman} · ${x.sec}.${x.k}`, [x.n, x.d]);
+    }
+  }
 
   return out;
 }

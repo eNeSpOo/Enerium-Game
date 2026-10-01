@@ -660,7 +660,7 @@ function rewardOf(x, f, c) {
 function headHtml(W, c) {
   const squad = W.squad.map(id => RSI[id]).filter(Boolean), need = RS.rules.stub.shards, claim = planks(W, c).filter(r => r.reached && !r.claimed).length;
   const faces = squad.map(h => { const on = h.c <= c, own = rsHas(h), n = S.rs.shards[h.id] || 0; return `<span class="ech-face ${on ? '' : 'lock'}" data-r="${h.r}" title="${h.n}${on ? (own ? ' · в коллекции' : ` · осколков ${n} из ${need}`) : ' · с цикла ' + ROMAN[h.c]}">${rsFace(h)}<i style="--v:${own ? 100 : Math.min(100, Math.floor(n * 100 / need))}"></i></span>`; }).join('');
-  const kpi = c >= EM.from ? `<div class="stat"><b>${fmt(S.echo.score)}</b><small>очков недели</small></div><button class="stat ech-rank" data-a="sheet" data-v="rank:Эхо"><b>${S.echo.score ? S.echo.place : '—'}</b><small>место</small></button>`
+  const kpi = c >= EM.from ? `<div class="stat"><b>${fmt(S.echo.score)}</b><small>очков недели</small></div><button class="stat ech-rank" data-a="sheet" data-v="rank:Эхо" title="Рейтинг цикла ${ROMAN[c]}: места среди игроков вашего цикла"><b>${S.echo.score ? S.echo.place : '—'}</b><small>место · цикл ${ROMAN[c]}</small></button>`
     : `<span class="chip" title="Цикл ${ROMAN[c]}: без очков и рейтинга">${ic('book')}обучение</span>`;
   return `<div class="pnl ech-head">
     <b class="serif ech-civ">${W.civ}</b>
@@ -820,7 +820,8 @@ function resolveAttack(i, x, ids, no) {
 }
 /* победа: очки, запись бестиария, ступень лестницы, добыча; слот освобождается */
 function winApply(i, x, L) {
-  const f = foe(x.fid, x), c = S.acc.cycle;
+  /* очки — по циклу цели (ADR-0041): цель, призванная до перехода в новый цикл, доживает своё — цена атаки, сила и очки её цикла */
+  const f = foe(x.fid, x), c = x.cyc || S.acc.cycle;
   L.first = !kn(x.fid);
   S.ech.known[x.fid] = true;
   L.pts = x.kind === 'craft' ? 0 : ptsOf(x.step, c);
@@ -993,13 +994,18 @@ function ruinParts(cb) {
   </div>`;
 }
 const weekGen = race => { const W = RS.weeks.find(w => w.race === race); return W ? W.gen : race; };
+/* руины и биомы Многоликого на пути вниз «Спуска» — строкой «Руины» и узлами в материале пути (screens/descent.css), сразу под шапкой
+   пути со слотами биомов (screens/descent.js, EN_ECHO.bio: забеги, руины и биомы Многоликого делят одни слоты) — видны без прокрутки.
+   Руин нет — строки нет */
 function ruinShaft() {
-  const cap = bioCap(), runs = bioRuns(), used = runs + S.ech.biomes.length;
+  if (!S.ech.biomes.length) return '';
+  /* знак узла — нарисованный значок оболочки (shlIco, screens/shell.js): врата руины, корона Многоликого; без арта — SVG */
+  const pic = k => { const p = typeof shlIco === 'function' ? shlIco(k) : ''; return p ? `<img src="${AV(p)}" alt="">` : ic(k === 'boss' ? 'crown' : 'door'); };
   const nodes = S.ech.biomes.map(x => {
     const lbl = x.many ? `Биом Многоликого<small>неделя ${weekGen(x.race)} · попытка одна</small>` : `${CBIOME[x.cb].name}<small>руина · цикл ${ROMAN[CBIOME[x.cb].cyc]}</small>`;
-    return `<button class="bnode ruin ${x.many ? 'ech-mb' : ''}" data-a="echcb" data-v="${x.uid}" aria-current="${x.uid === S.ech.cb}"><span>${lbl}</span></button>`;
+    return `<button class="bnode ruin ${x.many ? 'ech-mb' : ''}" data-a="echcb" data-v="${x.uid}" aria-current="${x.uid === S.ech.cb}"><span class="bn-ph" aria-hidden="true">${pic(x.many ? 'boss' : 'guard')}</span><span class="bn-t">${lbl}</span></button>`;
   }).join('');
-  return `<div class="cyc ech-rs"><b title="Активные биомы">${ic('door')}</b><div><small class="ech-slots">Слоты биомов · ${used} из ${cap}${runs ? ` · ${runs} ${plural(runs, 'забег', 'забега', 'забегов')}` : ''}</small>${nodes || '<small class="ech-slots">Руин нет: их активируют из запасов</small>'}</div></div>`;
+  return `<div class="cyc ech-rs"><b title="Руины и биомы Многоликого занимают слоты биомов, как забеги">Руины</b><div>${nodes}</div></div>`;
 }
 function ruinMain(x) {
   if (x.many) return manyMain(x);
@@ -1094,8 +1100,12 @@ SCREENS.descent = function () {
   const scr = descentBase(), cut = scr.html.indexOf('</nav>');
   if (!S.ech || cut < 0) return scr;
   const x = S.ech.cb && S.ech.biomes.find(b => b.uid === S.ech.cb);
-  if (!x) return { ...scr, html: scr.html.slice(0, cut) + ruinShaft() + scr.html.slice(cut) };
-  return { ...scr, html: scr.html.slice(0, cut).replace(/aria-current="true"/g, 'aria-current="false"') + ruinShaft() + '</nav>' + ruinMain(x) + '</div></section>' };
+  /* выбрана руина — у биомов выбора нет; руины — сразу под шапкой пути (договор screens/descent.js: в шапке нет вложенных div) */
+  let nav = scr.html.slice(0, cut);
+  if (x) nav = nav.replace(/aria-current="true"/g, 'aria-current="false"');
+  const h = nav.indexOf('<div class="ds-nav-h">'), end = h < 0 ? -1 : nav.indexOf('</div>', h), at = end < 0 ? nav.length : end + '</div>'.length;
+  nav = nav.slice(0, at) + ruinShaft() + nav.slice(at);
+  return { ...scr, html: x ? nav + '</nav>' + ruinMain(x) + '</div></section>' : nav + scr.html.slice(cut) };
 };
 /* забег занимает тот же слот биомов, что и руина; демо-прыжок и рунный страж — сценарии прототипа, их не держим */
 const runBase = startRun;

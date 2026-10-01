@@ -107,9 +107,11 @@ if (!D || !A) { say('event.js: нет window.EN_EVENT или window.EnEvent'); d
   if (one({ r: 2, c: 1, lim: 0, valor: 3, keep: 0 }) !== 0) say('алгоритм: предел не был пройден и до доблести — а сила есть');
   if (one({ r: 3, c: 2, lim: 1, valor: 2 }) !== R1.perBp * 3 * 2 * 4) say('алгоритм: пройденный предел — не круг 2^доблесть');
   if (A.rpHero(D, { r: 3, c: 2, lim: 2, valor: 1, keep: 1 }, 2) !== R1.perBp * 3 * 2 * 2 || A.rpHero(D, { r: 3, c: 2, lim: 1, valor: 1, keep: 1 }, 2) !== 0) say('алгоритм: РП2 — не по пределу 2');
-  const cp = A.clanPlanks(D, [2, 2, 3]);
-  const want = D.clanX.map(x => Math.floor(D.planks[2][0] * x / 100) * 2 + Math.floor(D.planks[3][0] * x / 100));
-  if (JSON.stringify(cp) !== JSON.stringify(want)) say(`алгоритм: клановые планки ${cp} вместо суммы долей первых порогов ${want}`);
+  /* клан и разные циклы (ADR-0042): пороги и очки клана — в очках цикла того, кто смотрит; клан из одного цикла — прежняя сумма порогов */
+  const cp = A.clanPlanks(D, [2, 2, 3], 3), cp2 = A.clanPlanks(D, [2, 2, 2]);
+  const want = D.clanX.map(x => Math.floor(D.planks[3][0] * x / 100) * 3), want2 = D.clanX.map(x => Math.floor(D.planks[2][0] * x / 100) * 3);
+  if (JSON.stringify(cp) !== JSON.stringify(want) || JSON.stringify(cp2) !== JSON.stringify(want2)) say(`алгоритм: клановые планки ${cp} / ${cp2} — не участников × первый порог цикла игрока × доля (${want} / ${want2})`);
+  if (A.clanPts(D, D.planks[3][0], 3, 2) !== D.planks[2][0] || A.clanPts(D, D.planks[2][0] * 2, 2, 6) !== D.planks[6][0] * 2) say('алгоритм: очки другого цикла — не по первым личным порогам');
   if (D.clanX.length !== 3 || D.clanX[2] * 2 !== D.clanX[1] * 3) say(`данные: третья клановая планка — не ×1,5 второй (${D.clanX})`);
   const anc = A.anchorsOf(D.top.players, D.planks[2][4]);
   let last = 1;
@@ -365,7 +367,7 @@ function suite() {
       if ((h.match(/class="ev-pk[ "]/g) || []).length !== 3 || !h.includes('data-v="gifts:clan"')) fail(`${key}: в листе клана нет трёх планок или пути в «Дары»`);
       const K = X.clan();
       if (!K) fail(`${key}: демо-аккаунт без клана`);
-      else if (K.pts !== E().pts + E().clan.others || K.needs.join() !== A.clanPlanks(D, K.cycles).join() || K.cycles.length !== K.n) fail(`${key}: клан — очки или пороги не по правилу`);
+      else if (K.pts !== E().pts + E().clan.others || K.needs.join() !== A.clanPlanks(D, K.cycles, c).join() || K.cycles.length !== K.n) fail(`${key}: клан — очки или пороги не по правилу`);
       else if (A.reached(K.needs, K.pts) !== LBX.modes.event.typical.free.clan) fail(`${key}: клан демо берёт ${A.reached(K.needs, K.pts)} клановых планки, в «Дарах» у обычного — ${LBX.modes.event.typical.free.clan}`);
       for (const x of D.sources) {
         S.overlay = { t: 'evsrc', arg: x.id }; h = draw(`${key} · источник ${x.id}`); out.sheets++;

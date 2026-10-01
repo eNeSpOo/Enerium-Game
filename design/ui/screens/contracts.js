@@ -372,7 +372,7 @@ function ctHead(X) {
   const C = S.contracts, n = X.tasks.length, k = X.tasks.filter(ctDone).length, next = X.t === 'w' ? 'на следующей неделе' : 'завтра';
   const R = CT.rules.rer, rr = C.rer.free > 0 ? `<span class="chip" title="Бесплатные замены на сегодня — на оба контракта">${ic('swap')}замен: ${C.rer.free}</span>`
     : `<span class="chip" title="Бесплатные замены кончились">${ic('swap')}замена · ${R.price} Энериума</span>`;
-  const pts = `<button class="chip ct-wk" data-a="sheet" data-v="rank:Контракты" title="Рейтинг контрактов недели">${ic('flag')}неделя · ${fmt(C.pts)} ${plural(C.pts, 'очко', 'очка', 'очков')}</button>`;
+  const pts = `<button class="chip ct-wk" data-a="sheet" data-v="rank:Контракты" title="Рейтинг контрактов цикла ${ROMAN[S.acc.cycle]}: места недели — среди игроков вашего цикла">${ic('flag')}неделя · ${fmt(C.pts)} ${plural(C.pts, 'очко', 'очка', 'очков')}</button>`;
   const L = {
     draft: [`Составьте контракт · ${n} ${plural(n, 'задание', 'задания', 'заданий')}`, ctLeftChip(X) + `<span class="g-spacer"></span>${rr}<button class="link" data-a="sheet" data-v="codds:${X.t}">Шансы ${ic('chev')}</button>`],
     signed: [`Подписан · выполнено ${k} из ${n}`, ctLeftChip(X) + `<span class="g-spacer"></span>${pts}`],

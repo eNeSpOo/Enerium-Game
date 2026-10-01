@@ -1,0 +1,300 @@
+{
+  "sheet": "art/generated/battle-vfx/vfx-school__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/battle-vfx.json",
+  "job": "vfx-school",
+  "grid": [
+    8,
+    3
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "proj-fire",
+      "file": "art/generated/battle-vfx/vfx-school/vx-proj-fire.webp",
+      "box": [
+        99,
+        116,
+        826,
+        843
+      ],
+      "px": 727,
+      "key_left": 0.0
+    },
+    {
+      "id": "proj-earth",
+      "file": "art/generated/battle-vfx/vfx-school/vx-proj-earth.webp",
+      "box": [
+        873,
+        116,
+        1599,
+        842
+      ],
+      "px": 726,
+      "key_left": 0.0
+    },
+    {
+      "id": "proj-air",
+      "file": "art/generated/battle-vfx/vfx-school/vx-proj-air.webp",
+      "box": [
+        1647,
+        116,
+        2374,
+        843
+      ],
+      "px": 727,
+      "key_left": 0.0
+    },
+    {
+      "id": "proj-dark",
+      "file": "art/generated/battle-vfx/vfx-school/vx-proj-dark.webp",
+      "box": [
+        2420,
+        117,
+        3145,
+        842
+      ],
+      "px": 725,
+      "key_left": 0.04616
+    },
+    {
+      "id": "proj-water",
+      "file": "art/generated/battle-vfx/vfx-school/vx-proj-water.webp",
+      "box": [
+        3192,
+        117,
+        3917,
+        842
+      ],
+      "px": 725,
+      "key_left": 0.0
+    },
+    {
+      "id": "proj-light",
+      "file": "art/generated/battle-vfx/vfx-school/vx-proj-light.webp",
+      "box": [
+        3964,
+        116,
+        4690,
+        842
+      ],
+      "px": 726,
+      "key_left": 0.0
+    },
+    {
+      "id": "proj-time",
+      "file": "art/generated/battle-vfx/vfx-school/vx-proj-time.webp",
+      "box": [
+        4740,
+        116,
+        5466,
+        842
+      ],
+      "px": 726,
+      "key_left": 0.0
+    },
+    {
+      "id": "proj-steel",
+      "file": "art/generated/battle-vfx/vfx-school/vx-proj-steel.webp",
+      "box": [
+        5516,
+        116,
+        6242,
+        842
+      ],
+      "px": 726,
+      "key_left": 0.0
+    },
+    {
+      "id": "hit-fire",
+      "file": "art/generated/battle-vfx/vfx-school/vx-hit-fire.webp",
+      "box": [
+        99,
+        984,
+        826,
+        1711
+      ],
+      "px": 727,
+      "key_left": 0.0
+    },
+    {
+      "id": "hit-earth",
+      "file": "art/generated/battle-vfx/vfx-school/vx-hit-earth.webp",
+      "box": [
+        873,
+        984,
+        1599,
+        1710
+      ],
+      "px": 726,
+      "key_left": 0.0
+    },
+    {
+      "id": "hit-air",
+      "file": "art/generated/battle-vfx/vfx-school/vx-hit-air.webp",
+      "box": [
+        1647,
+        984,
+        2374,
+        1711
+      ],
+      "px": 727,
+      "key_left": 0.0
+    },
+    {
+      "id": "hit-dark",
+      "file": "art/generated/battle-vfx/vfx-school/vx-hit-dark.webp",
+      "box": [
+        2420,
+        985,
+        3145,
+        1710
+      ],
+      "px": 725,
+      "key_left": 0.02892
+    },
+    {
+      "id": "hit-water",
+      "file": "art/generated/battle-vfx/vfx-school/vx-hit-water.webp",
+      "box": [
+        3192,
+        985,
+        3917,
+        1710
+      ],
+      "px": 725,
+      "key_left": 0.0
+    },
+    {
+      "id": "hit-light",
+      "file": "art/generated/battle-vfx/vfx-school/vx-hit-light.webp",
+      "box": [
+        3964,
+        984,
+        4690,
+        1710
+      ],
+      "px": 726,
+      "key_left": 0.0
+    },
+    {
+      "id": "hit-time",
+      "file": "art/generated/battle-vfx/vfx-school/vx-hit-time.webp",
+      "box": [
+        4740,
+        984,
+        5466,
+        1710
+      ],
+      "px": 726,
+      "key_left": 0.0
+    },
+    {
+      "id": "hit-steel",
+      "file": "art/generated/battle-vfx/vfx-school/vx-hit-steel.webp",
+      "box": [
+        5516,
+        984,
+        6242,
+        1710
+      ],
+      "px": 726,
+      "key_left": 0.0
+    },
+    {
+      "id": "tick-fire",
+      "file": "art/generated/battle-vfx/vfx-school/vx-tick-fire.webp",
+      "box": [
+        99,
+        1853,
+        826,
+        2580
+      ],
+      "px": 727,
+      "key_left": 0.0
+    },
+    {
+      "id": "tick-earth",
+      "file": "art/generated/battle-vfx/vfx-school/vx-tick-earth.webp",
+      "box": [
+        873,
+        1853,
+        1599,
+        2579
+      ],
+      "px": 726,
+      "key_left": 0.0
+    },
+    {
+      "id": "tick-air",
+      "file": "art/generated/battle-vfx/vfx-school/vx-tick-air.webp",
+      "box": [
+        1647,
+        1853,
+        2374,
+        2580
+      ],
+      "px": 727,
+      "key_left": 0.0
+    },
+    {
+      "id": "tick-dark",
+      "file": "art/generated/battle-vfx/vfx-school/vx-tick-dark.webp",
+      "box": [
+        2420,
+        1854,
+        3145,
+        2579
+      ],
+      "px": 725,
+      "key_left": 0.00748
+    },
+    {
+      "id": "tick-water",
+      "file": "art/generated/battle-vfx/vfx-school/vx-tick-water.webp",
+      "box": [
+        3192,
+        1854,
+        3917,
+        2579
+      ],
+      "px": 725,
+      "key_left": 0.0
+    },
+    {
+      "id": "tick-light",
+      "file": "art/generated/battle-vfx/vfx-school/vx-tick-light.webp",
+      "box": [
+        3964,
+        1853,
+        4690,
+        2579
+      ],
+      "px": 726,
+      "key_left": 0.0
+    },
+    {
+      "id": "tick-time",
+      "file": "art/generated/battle-vfx/vfx-school/vx-tick-time.webp",
+      "box": [
+        4740,
+        1853,
+        5466,
+        2579
+      ],
+      "px": 726,
+      "key_left": 0.0
+    },
+    {
+      "id": "tick-steel",
+      "file": "art/generated/battle-vfx/vfx-school/vx-tick-steel.webp",
+      "box": [
+        5516,
+        1853,
+        6242,
+        2579
+      ],
+      "px": 726,
+      "key_left": 0.0
+    }
+  ]
+}

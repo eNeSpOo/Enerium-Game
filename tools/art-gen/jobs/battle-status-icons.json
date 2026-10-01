@@ -1,0 +1,251 @@
+{
+  "name": "Значки эффектов боя — бафы, дебафы, контроль, урон и лечение со временем по восьми школам и особые (задача «Бой AAA», слово автора 01.10.2026: «покажи мне боевую сцену и все попапы в ней на ааа уровне и понятной информацией по бафам, дебафам, скиллам шансам»). Медальоны по art/style/style.md, «Эффект: бафф, дебафф»: круглый медальон, полезный — бирюзовая нить по ободу, вредный — ржаво-красная. Обод и кольцо длительности рисует интерфейс, арт — живопись в край клетки: игра режет клетку в круг",
+  "plan": {
+    "Лист st-sheet-1": "3:2, 4K, сетка 6×4: Огонь, Земля, Воздух, Тьма — по пять эффектов школы (урон и лечение со временем, контроль, дебафф, бафф) — и щит, ледяной панцирь, иммунитет к контролю, провокация",
+    "Лист st-sheet-2": "3:2, 4K, сетка 6×4: Вода, Свет, Время, без школы — по пять эффектов — и отложенный удар, срезанное имя, метка трофея, жадный взгляд",
+    "Нарезка": "python tools/art-gen/grid_slice.py jobs/battle-status-icons.json <id листа> art/generated/battle-status/<лист>__nb2.jpg — клетки WebP в art/generated/battle-status/<id листа>/",
+    "Выгрузка": "ui-art.json: st/<имя>.webp ← battle-status/<лист>/<имя>.webp, 128 px; помощник прототипа — bsIcon в design/ui/screens/battle-scene.js"
+  },
+  "notes": [
+    "Эффекты школ и их имена — данные библиотеки: EN_ABILITIES.sets[i].eff (design/ui/abilities.js) — dot, hot, ctrl, debuff, buff; ключ эффекта ядра — поле st способностей ctrl, debuff и buff своей школы",
+    "Два листа — $0,30 вместо 48 × $0,067. Мельче 24 px живопись не читается (design/ui/README.md): на карте значок — 16–18 px, поэтому мотив крупный и один, без мелочи; в окне карты и легенде — 28–32 px",
+    "cells — [ключ эффекта, имя файла]: ключ — st ядра; урон и лечение со временем — dot-<школа> и hot-<школа>, школа «класс» — без школы"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "battle-status": {
+      "aspect": "3:2",
+      "size": "4K",
+      "refs": [
+        "art/generated/effects/fx-ward__nb2.png",
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg"
+      ],
+      "frame": "Format: a sheet of round status-effect medallions for the battle screen of a dark fantasy mobile RPG, painted together as one consistent set. The medallions stand in a precise grid of equal square cells; the number of columns and rows and the picture in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is filled edge to edge with dark near-black stone with faint cracks; in its middle stands ONE bold central motif that fills the inner two thirds of the cell and stays completely inside an imaginary circle touching the cell edges: the game cuts every cell into a circle and draws its own colored rim around it. The motif has a big, simple, instantly readable silhouette: in the game the medallion is seen only 18 to 32 pixels wide, so there are no thin lines and no fine detail, only bold shapes, strong contrast and one bright accent; crisp rim light on the edges of the motif, light rising from below in the color of the effect. Helpful effects (warmth, healing, shields, strength for allies) glow soft warm gold and calm colors with rounded shapes; harmful effects (burning, poison, wounds, weakness, curses, control) look sharp and threatening, lit in their own color. All medallions share the same brushwork, lighting, level of detail and palette, and each one differs clearly from its neighbours in shape and silhouette."
+    }
+  },
+  "jobs": [
+    {
+      "id": "st-sheet-1",
+      "category": "battle-status",
+      "title": "Эффекты боя — Огонь, Земля, Воздух, Тьма и особые, сетка 6×4",
+      "source": "design/ui/abilities.js, EN_ABILITIES.sets[].eff; design/ui/battle.js, addStatus",
+      "grid": [
+        6,
+        4
+      ],
+      "cells": [
+        [
+          "dot-Огонь",
+          "st-fire-dot"
+        ],
+        [
+          "hot-Огонь",
+          "st-fire-hot"
+        ],
+        [
+          "silence",
+          "st-fire-ctrl"
+        ],
+        [
+          "mark",
+          "st-fire-debuff"
+        ],
+        [
+          "dmgUp",
+          "st-fire-buff"
+        ],
+        [
+          "shield",
+          "st-shield"
+        ],
+        [
+          "dot-Земля",
+          "st-earth-dot"
+        ],
+        [
+          "hot-Земля",
+          "st-earth-hot"
+        ],
+        [
+          "paralyze",
+          "st-earth-ctrl"
+        ],
+        [
+          "pierce",
+          "st-earth-debuff"
+        ],
+        [
+          "guard",
+          "st-earth-buff"
+        ],
+        [
+          "iceblock",
+          "st-iceblock"
+        ],
+        [
+          "dot-Воздух",
+          "st-air-dot"
+        ],
+        [
+          "hot-Воздух",
+          "st-air-hot"
+        ],
+        [
+          "knock",
+          "st-air-ctrl"
+        ],
+        [
+          "miss",
+          "st-air-debuff"
+        ],
+        [
+          "evade",
+          "st-air-buff"
+        ],
+        [
+          "immune",
+          "st-immune"
+        ],
+        [
+          "dot-Тьма",
+          "st-dark-dot"
+        ],
+        [
+          "hot-Тьма",
+          "st-dark-hot"
+        ],
+        [
+          "terror",
+          "st-dark-ctrl"
+        ],
+        [
+          "weak",
+          "st-dark-debuff"
+        ],
+        [
+          "lifesteal",
+          "st-dark-buff"
+        ],
+        [
+          "taunt",
+          "st-taunt"
+        ]
+      ],
+      "subject": "Status effects of battle. Each medallion is lit in the color of its magic school: Fire - scarlet (#F0564A) and amber; Earth - amber-orange (#EB9D40) with yellow-green venom; Air - pale white with a hint of green (#DFF4E5) and silver; Darkness - violet (#A986EE) and deep crimson; the special medallions - turquoise (#48E5D4), pale gold and battle red. Colors never spill from one cell to another.\n\nThe grid: exactly 6 columns and 4 rows, 24 medallions.\n\nRow 1: a single tall tongue of scarlet flame licking up from a bed of glowing coals; a small round bronze brazier holding a calm warm golden-amber flame, soft round glow; a heavy closed iron padlock wreathed in thick scarlet smoke; a smouldering round brand of glowing scarlet embers burned into dark stone, one bright spark in its centre; an upright sword whose blade glows orange-hot from the hilt to the tip, heat rising around it; a round bronze shield seen from the front, haloed by soft turquoise light (#48E5D4).\n\nRow 2: one fat drop of yellow-green venom falling, a small splash of venom below it; a thick glowing golden drop of amber tree resin oozing from a knot in dark bark; a leather boot stuck in cracked grey stone up to the ankle, amber light in the cracks; a round stone shield cracking apart, chunks crumbling away from its edge; a clenched fist and forearm covered in rough grey stone plates, amber light glowing in the seams; a thick dome-shaped shell of pale blue ice with a soft turquoise light trapped inside.\n\nRow 3: three thin parallel diagonal slashes of pale silver wind cutting across the cell; a soft spiral of pale green breeze carrying two small glowing leaves; a fallen iron helmet tipped on its side, a heavy downward spiral of wind pressing on it; a single wide eye half-closed behind a stream of blowing sand; a single white feather riding a curling gust of pale wind; a heavy iron shackle with its chain snapped, broken links flying apart, a pale golden gleam.\n\nRow 4: a black flower wilting and drooping, violet mist dripping from its petals; a small dark goblet brimming with glowing deep crimson-violet blood; a pair of wide, frightened glowing violet eyes staring out of total darkness; a sword with its blade bent and drooping limply downward, violet haze around it; a curved dagger with a single drop of dark red blood at its tip; a horned iron war helmet with three jagged red rings of a war cry bursting out of it."
+    },
+    {
+      "id": "st-sheet-2",
+      "category": "battle-status",
+      "title": "Эффекты боя — Вода, Свет, Время, без школы и особые, сетка 6×4",
+      "source": "design/ui/abilities.js, EN_ABILITIES.sets[].eff; design/ui/battle.js, addStatus; design/ui/echo-foes.js",
+      "grid": [
+        6,
+        4
+      ],
+      "cells": [
+        [
+          "dot-Вода",
+          "st-water-dot"
+        ],
+        [
+          "hot-Вода",
+          "st-water-hot"
+        ],
+        [
+          "freeze",
+          "st-water-ctrl"
+        ],
+        [
+          "slow",
+          "st-water-debuff"
+        ],
+        [
+          "healTaken",
+          "st-water-buff"
+        ],
+        [
+          "doom",
+          "st-doom"
+        ],
+        [
+          "dot-Свет",
+          "st-light-dot"
+        ],
+        [
+          "hot-Свет",
+          "st-light-hot"
+        ],
+        [
+          "blind",
+          "st-light-ctrl"
+        ],
+        [
+          "rend",
+          "st-light-debuff"
+        ],
+        [
+          "defUp",
+          "st-light-buff"
+        ],
+        [
+          "nameless",
+          "st-nameless"
+        ],
+        [
+          "dot-Время",
+          "st-time-dot"
+        ],
+        [
+          "hot-Время",
+          "st-time-hot"
+        ],
+        [
+          "stop",
+          "st-time-ctrl"
+        ],
+        [
+          "chanceDown",
+          "st-time-debuff"
+        ],
+        [
+          "chanceUp",
+          "st-time-buff"
+        ],
+        [
+          "trophy",
+          "st-trophy"
+        ],
+        [
+          "dot-класс",
+          "st-steel-dot"
+        ],
+        [
+          "hot-класс",
+          "st-steel-hot"
+        ],
+        [
+          "stun",
+          "st-steel-ctrl"
+        ],
+        [
+          "break",
+          "st-steel-debuff"
+        ],
+        [
+          "critUp",
+          "st-steel-buff"
+        ],
+        [
+          "greed",
+          "st-greed"
+        ]
+      ],
+      "subject": "Status effects of battle. Each medallion is lit in the color of its magic school: Water - blue (#5A94F7) and pale ice; Light - pale gold (#F4E6AE) and white-gold; Time - green (#4FDC8B) and glowing sand; no school - steel, leather, dark blood and warm torchlight, no magic; the special medallions - dark iron, old parchment and gold. Colors never spill from one cell to another.\n\nThe grid: exactly 6 columns and 4 rows, 24 medallions.\n\nRow 1: a jagged shard of blue ice with white frost creeping along it; a small spring of clear blue water bubbling up from a round stone basin; a solid cube of pale blue ice with deep cracks, cold mist around it; a boot frozen into a block of blue ice up to the ankle; a round glass flask of glowing blue living water, light swirling inside it; a heavy dark iron pendulum blade hanging on a short chain, poised to fall.\n\nRow 2: a narrow beam of white-gold light searing down onto a smoking spot of stone; a small round orb of soft golden light with a bright warm core, calm rays; a blinding white-gold flash bursting from one point, sharp rays in every direction; a cracked crystal of pale light with bright light leaking through the cracks; a round shield catching a bright golden gleam of light on its rim; a blank strip of old parchment cut cleanly in two by a blade, nothing written on it.\n\nRow 3: an old cracked hourglass with green glowing sand pouring fast, cracks spreading over its glass; a spiral of glowing green sand flowing upward, as if time runs backward; an hourglass with its green sand frozen in mid-air, grains hanging still; a candle burned down to a short stub, its small green flame guttering; a swirling pocket of green time-light with three bright motes speeding forward; a hunting hook of dark iron with a single golden coin hanging from it.\n\nRow 4: three heavy drops of dark red blood falling; a strip of clean linen tied in a firm knot, warm torchlight on it; a dented iron helmet ringing, a small circle of golden sparks spinning above it; a wooden spear shaft snapped in two, splinters flying; a curved war horn blowing, warm torchlight and a gust of sparks from its mouth; a single glinting golden eye reflected in a small heap of golden coins."
+    }
+  ]
+}

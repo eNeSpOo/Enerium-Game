@@ -331,7 +331,8 @@ function nowHtml() {
     ? `<button class="wk-id" data-a="sheet" data-v="echweek" aria-label="Неделя ${W.gen}: ${trEsc(W.civ)} — отряд, награды, история"><b>Неделя ${W.gen}</b><small>${W.civ}${ic('chev')}</small></button>`
     : `<div class="wk-id"><b>Неделя ${W.gen}</b><small>${W.civ}</small></div>`;
   const clock = `<button class="wk-clock" data-a="sheet" data-v="wkclock" aria-label="Сроки недели"><span class="eyebrow">${L ? 'До отсечки' : 'Подсчёт'}</span><b class="num"${L ? ' data-cd="week"' : ''}>${L ? dur(L) : 'итоги скоро'}</b></button>`;
-  return `<div class="pnl wk-top">${id}${clock}${giftsBtn()}</div>
+  const cy = S.acc.cycle >= 2 ? `<span class="chip wk-cyc" title="Места недели — среди игроков вашего цикла">${ic('flag')}Рейтинг цикла ${ROMAN[S.acc.cycle]}</span>` : '';
+  return `<div class="pnl wk-top">${id}${cy}${clock}${giftsBtn()}</div>
     <div class="wk-list">${rows.map(rowHtml).join('')}</div>
     ${ritHtml()}`;
 }
@@ -484,10 +485,13 @@ const rankBase = OV.rank;
 OV.rank = function (o) {
   const m = modeByName(o.arg); if (!m) return typeof rankBase === 'function' ? rankBase(o) : '';
   const t = o.rt === 'past' ? 'past' : 'now', st = stateOf(m, t), W = weeks();
+  /* рейтинг — своего цикла (слово автора 01.10.2026, ADR-0041): лидеры — игроки цикла таблицы; переход на этой неделе — прошлая неделя в таблице прошлого цикла */
+  const rc = typeof cyRankCycle === 'function' ? cyRankCycle(t) : S.acc.cycle;
+  if (st.topLabel === 'Лидеры') st.topLabel = `Лидеры цикла ${ROMAN[rc]}`;
   const tabs = `<div class="tabs" role="tablist" aria-label="Неделя">${[['now', 'Эта неделя'], ['past', 'Прошлая']].map(([k, l]) => `<button role="tab" aria-selected="${t === k}" data-a="wkrt" data-v="${k}">${l}</button>`).join('')}</div>`;
   const body = st.lock ? `${tabs}<p class="rs-line">${ic('lock')}${cap1(st.lock)}.</p>`
-    : `${tabs}${statsHtml(st)}${boardHtml(st)}${t === 'now' ? tierHtml(st) : ''}<p class="reason">Цикл ${ROMAN[S.acc.cycle]} · неделя ${t === 'now' ? W.cur.gen : W.prev.gen}. ${t === 'now' ? 'Места станут наградой после подсчёта.' : 'Итог подсчитан.'}</p>`;
-  return sheet('Рейтинг · ' + m.n, body, `<button class="link" data-a="sheet" data-v="wkmode:${m.id}:${t}">Подробнее ${ic('chev')}</button>`);
+    : `${tabs}${statsHtml(st)}${boardHtml(st)}${t === 'now' ? tierHtml(st) : ''}<p class="reason">Места — среди игроков цикла ${ROMAN[rc]} · неделя ${t === 'now' ? W.cur.gen : W.prev.gen}. ${t === 'now' ? 'Места станут наградой после подсчёта.' : 'Итог подсчитан.'}</p>`;
+  return sheet(`Рейтинг цикла ${ROMAN[rc]} · ${m.n}`, body, `<button class="link" data-a="sheet" data-v="wkmode:${m.id}:${t}">Подробнее ${ic('chev')}</button>`);
 };
 
 /* ================== действия ================== */

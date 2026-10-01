@@ -204,7 +204,8 @@ reset();
 const pool = new Set(T.poolItems().map(i => i.id));
 const drop = b => T.RX.drops.enemies.find(e => e.biome === b);
 function checkFloor(where, biome, got, items, guardWin) {
-  const D = drop(biome), max = D ? D.basicsPerTriggerMax : 1, keys = new Set(T.biomeItems('key', biome).map(i => i.id)), un = new Set(T.biomeItems('unique', biome).map(i => i.id));
+  /* верхняя граница базовых за срабатывание — номер биома; ларцы Странника её поднимают, и тогда её даёт ядро (got.baseMax, ADR-0044) */
+  const D = drop(biome), max = got.baseMax || (D ? D.basicsPerTriggerMax : 1), keys = new Set(T.biomeItems('key', biome).map(i => i.id)), un = new Set(T.biomeItems('unique', biome).map(i => i.id));
   let nb = 0, nk = 0, nu = 0, nr = 0;
   for (const [id, n] of Object.entries(items)) {
     const it = T.BAG.item(id);

@@ -625,7 +625,7 @@ function wnMemTab() {
         <h2 class="wn-plt">Память Странника<span class="num">${set} / ${WN.mem.places.length}</span></h2>
         <div class="wn-slots">${M.slots.map(wnSlot).join('')}</div></div>
       <div class="row wn-mfoot"><p class="reason">${note}</p><span class="g-spacer"></span>
-        <button class="btn sm" data-a="sheet" data-v="wncat">${ic('book')}Каталог</button>
+        ${typeof cyMemBtn === 'function' ? cyMemBtn() : ''}<button class="btn sm" data-a="sheet" data-v="wncat">${ic('book')}Каталог</button>
         <button class="btn sm" data-a="dlg" data-v="memreset"${set ? '' : ' disabled'}>Полный сброс${costTag('enerium', WN.mem.reset)}</button></div>
       ${TM(`<p class="reason">Тройка — сначала редкость (${WN.mem.rarBp.map((b, k) => `${RAR[k + 1].toLowerCase()} ${b / 100} %`).join(', ')}), затем пассивка по весу внутри редкости (§2.6). Решает сервер до анимации: сид места и номер тройки. Эффекты — заглушки представления, в расчёты не входят (§2.8). Бесплатный переброс — один на место, демонстрация. Ещё один забег даёт «${wnP('p' + WN.mem.slot).n}» (ADR-0014) — только в бесплатных тройках: за Энериум её вес 0 (решение 28.09, ×1,7 §1).</p>
         <div class="row"><button class="link" data-a="wngive">Демо: +${fmt(WN_DEMO.give)} Энериума</button><button class="link" data-a="wnhigh" aria-pressed="${!!M.demoHigh}">Демо: вневременная в следующей тройке${M.demoHigh ? ' · включено' : ''}</button></div>`)}
@@ -1477,7 +1477,7 @@ function lkOverview() {
   const body = `<div class="col wn-ov">
       <section class="wn-five"><h2 class="wn-plt">Пятёрка сильнейших<b class="bm sq-bm" title="Сумма боевой мощи пятёрки">${ICON('power', 18, 'Боевая мощь')}<span class="num">${fmt(BM.squad(top5.map(h => h.id)))}</span></b></h2>
         <div class="wn-shelf"><div class="sq-slots">${top5.map(h => heroCard(h, { act: 'hero-open' })).join('')}</div></div></section>
-      <section class="wn-wk"><div class="row wn-wkh"><span class="eyebrow">Рейтинги недели</span><span class="g-spacer"></span><small class="faint">текущий период</small></div>
+      <section class="wn-wk"><div class="row wn-wkh"><span class="eyebrow">${typeof cyRankName === 'function' ? cyRankName('now') : 'Рейтинги недели'}</span><span class="g-spacer"></span>${typeof cyHistBtn === 'function' && cyHistBtn() ? cyHistBtn() : '<small class="faint">эта неделя</small>'}</div>
         <div class="ranks">${S.ranks.map(([n, p, s]) => `<button class="rk" data-a="sheet" data-v="rank:${n}" ${p ? '' : 'disabled'}><span class="rk-i">${lkRankIco(n)}</span><span>${n}</span><b class="num">${p ? '#' + p : '—'}</b><small>${s}</small></button>`).join('')}</div></section>
     </div>`;
   return { title: 'Странник', seg: wnSeg(), html: `<section class="scr"><div class="pf wn-pf">${wnIdCol()}${body}</div></section>` };

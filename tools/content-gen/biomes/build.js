@@ -28,6 +28,7 @@ const FILES = {
   data: path.join(__dirname, 'data'),
   doc: path.join(__dirname, 'doc.md'),
   pace: path.join(__dirname, 'pace.json'),
+  farm: path.join(__dirname, 'farm.json'),
   art: path.join(UI, 'assets', 'art'),
   outUi: path.join(UI, 'biome-foes.js'),
   outMd: path.join(ROOT, 'docs', 'content', 'биомы-2-4.md'),
@@ -132,7 +133,9 @@ for (const [fid, f] of Object.entries(KITS.foes)) for (const x of f.kit) if (x.a
   const L = LIB[x.id]; names[x.as] = { lib: x.id, sig: `${L.kind}.${L.tier}.${x.tgt || L.tgt}`, who: fid + ' Мастерской' };
 }
 for (const b of DATA) {
-  const F = floors(b), used = new Set(F.flat().concat(b.guard));
+  /* полный вариант биома цикла I — с цикла II (ADR-0044): своя колода и страж, те же враги */
+  const FF = b.full ? b.full.deck.map(s => s.trim().split(/\s+/)) : [];
+  const F = floors(b), used = new Set(F.flat().concat(b.guard, FF.flat(), b.full ? b.full.guard : []));
   for (const short of Object.keys(b.foes)) if (!used.has(short)) fail(`${b.id}${short}: враг не встречается ни в колоде, ни в свите стража`);
   for (const short of used) if (!b.foes[short]) fail(`${b.id}: в колоде или свите «${short}», а такого врага нет`);
   const n = { o: 0, e: 0, b: 0, g: 0 }; for (const k of Object.keys(b.foes)) n[k[0]]++;
@@ -171,8 +174,21 @@ for (const b of DATA) {
   if (!G || G.name !== b.foes.g1.name) fail(`${b.id}: рунный страж «${b.foes.g1.name}», в recipes.js — «${G && G.name}»`);
   const un = RX.items.find(i => i.tier === 'unique' && i.b === b.id);
   if (!un || !String(un.src || '').includes(b.foes.b1.name)) fail(`${b.id}: уникальный ресурс босса не называет «${b.foes.b1.name}» (recipes.js)`);
+  /* полный вариант (ADR-0044): только у биома цикла I, с цикла II; колода — 35 этажей и 12 элит, как образец цикла II и черновик добычи после
+     обучения (recipes.js, perRunAfterTutorial); босс — только на последнем этаже; на этаже до пяти врагов; страж — рунный босс и четыре элиты */
+  let full = null;
+  if (b.full) {
+    const fd = FF.map(ids => floorOf(b, ids)), fel = fd.reduce((a, x) => a + x.m.filter(m => m.slice(2)[0] === 'e').length, 0);
+    if (b.cycle !== 1 || !(b.full.from > b.cycle)) fail(`${b.id}: полный вариант — только у биома цикла I и с цикла выше его (ADR-0044)`);
+    if (fd[fd.length - 1].g !== 'b' || fd.slice(0, -1).some(x => x.g === 'b')) fail(`${b.id}: в полном варианте босс — не на последнем этаже или не только там`);
+    if (FF.some(ids => ids.length > 5)) fail(`${b.id}: в полном варианте на этаже больше пяти врагов`);
+    if (!b.full.guard.length || b.full.guard[0] !== 'g1' || b.full.guard.length !== 5 || b.full.guard.slice(1).some(x => x[0] !== 'e')) fail(`${b.id}: страж полного варианта — рунный босс и четыре элиты (ADR-0010)`);
+    if (D && D.perRunAfterTutorial && (D.perRunAfterTutorial.specKeys !== fel)) fail(`${b.id}: элит в полном варианте ${fel}, а черновик добычи после обучения считает ${D.perRunAfterTutorial.specKeys} (recipes.js)`);
+    if (b.full.core.dropPct !== b.core.dropPct) fail(`${b.id}: валюта полного варианта — по циклу биома, как у обучающего (ADR-0044): ${b.full.core.dropPct} против ${b.core.dropPct}`);
+    full = Object.assign({ from: b.full.from }, b.full.core, { floors: fd, guard: { g: 'r', m: b.full.guard.map(x => fullId(b, x)) } });
+  }
   biomes[b.id] = {
-    core: Object.assign({ n: b.n, cycle: b.cycle, name: b.name }, b.core, { floors: deck, guard: { g: 'r', m: b.guard.map(x => fullId(b, x)) } }),
+    core: Object.assign({ n: b.n, cycle: b.cycle, name: b.name }, b.core, { floors: deck, guard: { g: 'r', m: b.guard.map(x => fullId(b, x)) } }, full ? { full } : {}),
     ui: Object.assign({ god: b.god, kind: b.kind, el: b.el, karst: b.karst, els: b.els, races: b.races, tone: b.tone, intro: b.intro, demoFloor: b.demoFloor }, b.ui),
   };
 }
@@ -246,16 +262,18 @@ const FORMAT = `/* Собрано tools/content-gen/biomes/build.js из tools/c
      cards: { b2o1: { biome, g, type, tag, look, desc, tip, rare, tpl, pos?, lvl, floor, hp, bm } },
          // бестиарий: запись сказителя — desc и tip; у кого записи нет — облик и без совета; hp и bm — ядро на этаже первой встречи
      workshop: { o1: { lvl, floor, hp, bm } },   // Мастерская форм — те же числа ядра для её карточек бестиария (index.html держит фикстуры)
-     biomes: { b2: { core: { n, cycle, name, siege, foeLvl, foeHpPct?, bossHpPct?, guardHpPct, dropPct, floors, guard },   // EnBattle.addBiome
+     biomes: { b2: { core: { n, cycle, name, siege, foeLvl, foeHpPct?, bossHpPct?, guardHpPct, dropPct, floors, guard,   // EnBattle.addBiome
+                             full? },   // полный вариант биома цикла I с цикла full.from (ADR-0044): те же поля, вариант ставит EnBattle.atCycle
                      ui: { god, kind, el, karst, els, races, tone, intro, demoFloor, eyebrow, quote, shelf, boss, guardWin, guardLose, word?, next } } },
      pace: прогон темпа pace.py или null,
+     farm: калькулятор фарма farm.py — { sig, pick, minMs, verdict, est } или null (ADR-0044: ритуал этажа, ключи, уникальный в старом биоме),
    };
    В конце файл регистрирует всё в ядре — грузить после battle.js и abilities.js. */`;
 
-function js(pace) {
+function js(pace, farm) {
   const X = {
     rules: { sig: sigOf(), ranks: Object.fromEntries(Object.entries(RANK_KEY).map(([r, k]) => [r, Object.assign({ n: k }, RANKS[k])])), template: TEMPLATE, archer: ARCHER_ST, bmC: BM_C_X100 },
-    art: artReady(), abilities: uniques, foes, cards, workshop, biomes, pace,
+    art: artReady(), abilities: uniques, foes, cards, workshop, biomes, pace, farm: farm || null,
   };
   return `${FORMAT}\nwindow.EN_BIOME_FOES = ${JSON.stringify(X)};\n` +
     `/* регистрация в ядре: уникальные способности, карты врагов, биомы */\n` +
@@ -291,6 +309,23 @@ function doc(pace, stale) {
         c.floor > B_(b).floors.length ? 'рунный бой' : `этаж ${c.floor}, ур. ${c.lvl}`, `${fmt(c.hp)} · ${fmt(c.bm)}`];
     }))).join('\n\n');
   parts.unique = T(['Способность', 'Чья', 'Что делает', 'Почему уникальная'], uniques.map(u => [u.n, foes[u.owner].name, u.d, u.why]));
+  /* полные биомы 1–2 с цикла II (ADR-0044): Мастерская — в ядре (battle.js, BIOMES.b1.full), Подземный лес — здесь (data/b2.js, full) */
+  {
+    const W = EB0.BIOMES.b1, rows = [], name = id => (foes[id] || EB0.FOES[id] || {}).name || id;
+    const lvOf = (L, f) => L.base + Math.floor(f * L.perFloor / (L.div || 1));
+    const row = (nm, v, R) => {
+      const L = R.foeLvl || EB0.RULES.foeLvl, n = R.floors.length, el = R.floors.reduce((a, x) => a + x.m.filter(m => (foes[m] || EB0.FOES[m]).rank === 'e').length, 0);
+      return [nm, v, R.full ? 'I, обучение' : `с ${['I', 'II', 'III'][(R.from || 2) - 1]}`, n, el, `${lvOf(L, 1)}–${lvOf(L, n)}, страж ${lvOf(L, n + 1)}`,
+        `${R.foeHpPct ? 'врагов ' + R.foeHpPct + ' %, ' : ''}${R.bossHpPct ? 'босса ' + R.bossHpPct + ' %, ' : ''}стража ${R.guardHpPct || '—'} %`, R.siege === false ? 'нет' : 'да',
+        `${R.guard.m.length}: ${R.guard.m.map(name).join(', ')}`, `${R.dropPct || 100} %`];
+    };
+    rows.push(row('1. Мастерская форм', 'короткий', W.tut ? Object.assign({ full: true }, W, W.tut) : W));
+    if (W.full) rows.push(row('1. Мастерская форм', 'полный', W.full));
+    const B2 = biomes.b2 && biomes.b2.core;
+    if (B2) { rows.push(row('2. Подземный лес', 'короткий', Object.assign({}, B2, { full: true }))); if (B2.full) rows.push(row('2. Подземный лес', 'полный', B2.full)); }
+    parts.full = T(['Биом', 'Вариант', 'Цикл игрока', 'Этажей', 'Элит', 'Уровень врагов', 'Здоровье', 'Осада', 'Рунный страж', 'Золото и дух'], rows)
+      + (B2 && B2.full ? `\n\n**Подземный лес, полный** — ${B2.full.floors.length} этажей:\n\n` + T(['Этаж', 'Колода'], B2.full.floors.map((F, i) => [i + 1, F.m.map(id => foes[id].name).join(', ') + (F.g === 'e' ? ' · элита' : F.g === 'b' ? ' · босс' : '')])) : '');
+  }
   parts.decks = DATA.map(b => `**${b.name}** — ${B_(b).floors.length} этажей:\n\n` + T(['Этаж', 'Колода'], B_(b).floors.map((F, i) => [i + 1, F.m.map(id => foes[id].name).join(', ') + (F.g === 'e' ? ' · элита' : F.g === 'b' ? ' · босс' : '')]))
     + `\n\nРунный страж: ${B_(b).guard.m.map(id => foes[id].name).join(', ')}.`).join('\n\n');
   parts.art = `Выгружено: ${artReady().length} из ${DATA.length * 15} — арены arena-b2…b4.jpg и портреты foes/<id>.jpg (1688×716 и 464×576).`;
@@ -305,15 +340,17 @@ if (!err.length) {
   const sig = sigOf();
   let pace = null, stale = false;
   if (fs.existsSync(FILES.pace)) { const P = JSON.parse(read(FILES.pace)); stale = P.sig !== sig; pace = P; }
-  const probe = js(null), ctx = sandbox(probe);   // ядро с этими данными: наборы, таблицы шансов, карточки
+  const probe = js(null, null), ctx = sandbox(probe);   // ядро с этими данными: наборы, таблицы шансов, карточки
   if (!ctx.EnBattle.BIOMES.b2) fail('biome-foes.js не зарегистрировал биомы в ядре');
   else core(ctx);
   if (!err.length) {
-    const out = js(pace && !stale ? { sig: pace.sig, rows: pace.rows, verdict: pace.verdict } : null), md = doc(pace, stale);
+    /* калькулятор фарма — если сделан на этих же данных (подпись); его вердикт и оценка циклов III–VI — в UI-кит */
+    const F = fs.existsSync(FILES.farm) ? JSON.parse(read(FILES.farm)) : null, farm = F && F.sig === sig ? { sig: F.sig, pick: F.pick, minMs: F.minMs, verdict: F.verdict, est: F.est } : null;
+    const out = js(pace && !stale ? { sig: pace.sig, rows: pace.rows, verdict: pace.verdict } : null, farm), md = doc(pace, stale);
     if (!err.length) {
       fs.writeFileSync(FILES.outUi, out);
       fs.writeFileSync(FILES.outMd, md);
-      console.log(`biome-foes.js: врагов ${Object.keys(foes).length}, уникальных способностей ${uniques.length}, биомов ${DATA.length}, арта ${artReady().length}; подпись ${sig}${pace ? stale ? ', прогон темпа устарел' : ', прогон темпа свежий' : ', прогона темпа нет'}`);
+      console.log(`biome-foes.js: врагов ${Object.keys(foes).length}, уникальных способностей ${uniques.length}, биомов ${DATA.length}, арта ${artReady().length}; подпись ${sig}${pace ? stale ? ', прогон темпа устарел' : ', прогон темпа свежий' : ', прогона темпа нет'}${farm ? ', фарм свежий' : ', фарма на этих данных нет — python tools/content-gen/biomes/farm.py'}`);
     }
   }
 }

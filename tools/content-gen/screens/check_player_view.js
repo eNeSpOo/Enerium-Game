@@ -10,6 +10,9 @@
    4. Из разметки выкидываются элементы team-only вместе с содержимым. В оставшемся тексте, в подсказках title и placeholder
       и в текстах всплывающих сообщений ищутся служебные слова и шаблоны из SERVICE. Нашлось — проверка падает и печатает, что и где.
    5. Режим «Команда»: те же экраны рисуются без исключений, служебное на месте.
+   6. Кнопки говорят своё состояние игроку (слова автора 01.10.2026: «сами кнопки слабые»): закрытый раздел — замок, «ур. N» и условие,
+      раздел с делами — что за дела, колокол и портрет — числа в подписи, медальоны Убежища — «можно забрать», «ждут награды»,
+      непрочитанное; «Спуск» — закрытая главная кнопка с причиной рядом, слоты биомов и бестиарий — подписи с числами. Закон проверен мутацией.
    Флаг --dump печатает весь текст, который видит игрок, по экранам — для ручного прохода.
    Другие проверки берут отсюда strip — вид игрока без team-only: require('./check_player_view.js').strip.
    Запуск: node tools/content-gen/screens/check_player_view.js [--dump] */
@@ -345,6 +348,69 @@ function main() {
   const teamViews = views;
   if (!teamEls) say('режим «Команда»: ни одного элемента team-only — служебное не размечено');
   run('режим «Игрок»', () => T.setTeam(false));
+
+  /* ---------- кнопки говорят своё состояние: игроку видно или слышно (слова автора 01.10.2026: «сами кнопки слабые») ----------
+     Закон — функция от разметки игрока (strip: без team-only); проверка мутацией зовёт её с поломкой и ждёт ошибку.
+     Оболочка: закрытый раздел — замок и «ур. N» на картинке, условие — в подсказке; раздел с делами — что за дела в подсказке;
+     выбранный — aria-current; колокол — «Входящие: N»; портрет — «Странник, уровень L». Убежище: «Дар дня» ждёт — «можно забрать»,
+     у «Пропуска» — «ждут награды», у «Чата» — сколько непрочитанного. «Спуск»: закрытый биом — состояние строкой, закрытая главная
+     кнопка — причина рядом, слоты биомов и бестиарий — подписи с числами. */
+  function lawSay(P) {
+    const o = [], ev = x => vm.runInContext(x, ctx), lvl = ev('NAV_OPEN.week'), level = P.level;
+    const tagOf = (h, re) => (h.match(re) || [''])[0], lab = t => decode((t.match(/\saria-label="([^"]*)"/) || [, ''])[1]), tip = t => decode((t.match(/\stitle="([^"]*)"/) || [, ''])[1]);
+    const lock = tagOf(P.shell, /<button class="g-nav lock[^"]*"[^>]*>[\s\S]*?<\/button>/);
+    if (!lock) o.push('оболочка: на уровне ниже открытия нет закрытого раздела');
+    else {
+      if (!lock.includes(`<b>ур. ${lvl}</b>`)) o.push(`закрытый раздел: на картинке нет «ур. ${lvl}»`);
+      if (!/class="lk"/.test(lock)) o.push('закрытый раздел: нет замка');
+      if (!tip(lock).includes(`откроется на ${lvl}-м уровне Странника`)) o.push('закрытый раздел: подсказка не говорит, когда он откроется');
+    }
+    const todo = [...P.shell.matchAll(/<button class="g-nav(?! lock)[^"]*"[^>]*>[\s\S]*?<\/button>/g)].map(m => m[0]).filter(t => /<span class="bdg"/.test(t));
+    if (!todo.length) o.push('оболочка: нет раздела с делами — нечего сверить');
+    for (const t of todo) { const l = lab(t), name = (t.match(/<span class="lbl"[^>]*>([^<]*)<\/span>/) || [, ''])[1]; if (!l.startsWith(name + ': ') || l.length <= name.length + 2) o.push(`раздел «${name}» с делами: подпись не говорит, что за дела — «${l}»`); }
+    const cur = [...P.shell.matchAll(/<button class="g-nav[^"]*"[^>]*>/g)].filter(m => /aria-current="page"/.test(m[0]));
+    if (cur.length !== 1) o.push(`оболочка: выбранных разделов ${cur.length}, а нужен один с aria-current`);
+    const bell = tagOf(P.shell, /<button class="g-icon"[^>]*data-v="inbox"[^>]*>/), inbox = P.inbox;
+    if (lab(bell) !== `Входящие: ${inbox}`) o.push(`колокол: подпись «${lab(bell)}», а писем ${inbox}`);
+    const ava = tagOf(P.shell, /<button class="g-ava"[^>]*>/);
+    if (!lab(ava).startsWith(`Странник, уровень ${level}`)) o.push(`портрет: подпись «${lab(ava)}» не называет уровень ${level}`);
+    const gift = tagOf(P.shelter, /<button class="btn sm ps-sb[^"]*" data-a="dlg" data-v="gift"[^>]*>/), pass = tagOf(P.shelter, /<button class="btn sm ps-sb[^"]*" data-a="go" data-v="store:pass"[\s\S]*?<\/button>/);
+    if (/ hot"/.test(gift) && lab(gift) !== 'Дар дня: можно забрать') o.push(`«Дар дня» ждёт, а подпись — «${lab(gift)}»`);
+    if (/class="dot"/.test(pass) && lab(pass) !== 'Пропуск: ждут награды') o.push(`у «Пропуска» ждут награды, а подпись — «${lab(pass)}»`);
+    const chat = tagOf(P.shelter, /<button class="sh-md"[\s\S]*?<\/button>/), unread = ev("typeof socChatN === 'function' ? socChatN() : 0");
+    if (unread && !new RegExp(`^Чат: ${unread} непрочитанн`).test(lab(chat))) o.push(`«Чат»: непрочитанного ${unread}, а подпись — «${lab(chat)}»`);
+    const node4 = tagOf(P.dsLock, /<button class="bnode lock"[^>]*>[\s\S]*?<\/button>/);
+    if (!/ disabled/.test(node4.split('>')[0]) || !node4.includes('<small>после рунного стража</small>')) o.push('«Спуск»: закрытый биом не закрыт для нажатия или не говорит, когда откроется');
+    for (const [h, why, k] of [[P.dsLock, 'Откроется после рунного стража', 'закрытый биом'], [P.dsFull, 'Слоты биомов: занято', 'слоты заняты']]) {
+      const go = (h.match(/<div class="ds-go">[\s\S]*$/) || [''])[0];
+      if (!/<button class="btn go big"[^>]*disabled/.test(go) || !new RegExp(`<span class="reason[^"]*">${why}`).test(go)) o.push(`«Спуск», ${k}: главная кнопка не закрыта или рядом нет причины «${why}…»`);
+    }
+    const slots = tagOf(P.dsFull, /<span class="ds-slots[^"]*"[^>]*>/), best = tagOf(P.dsFull, /<button class="ds-best"[^>]*>/);
+    if (!/^Слоты биомов: занято \d+ из \d+/.test(lab(slots))) o.push(`«Спуск»: у слотов биомов нет подписи с числами — «${lab(slots)}»`);
+    if (!/^Бестиарий: изучено \d+ из \d+$/.test(lab(best))) o.push(`«Спуск»: у бестиария нет подписи «изучено N из M» — «${lab(best)}»`);
+    return o;
+  }
+  {
+    run('режим «Игрок»', () => T.setTeam(false));
+    const P = {};
+    reset(); T.S.route = 'shelter'; T.S.acc.level = vm.runInContext('NAV_OPEN.week', ctx) - 1; P.level = T.S.acc.level; run('кнопки · оболочка', () => T.render()); P.shell = strip(game()); P.inbox = vm.runInContext('inboxN()', ctx);
+    reset(); T.S.route = 'shelter'; run('кнопки · Убежище', () => T.render()); P.shelter = strip(game());
+    reset(); T.S.route = 'descent'; T.S.selBiome = 'b4'; run('кнопки · «Спуск» b4', () => T.render()); P.dsLock = strip(game());
+    const E = ctx.EN_ECHO, bio0 = E && E.bio;
+    reset(); T.S.route = 'descent'; T.S.selBiome = 'b3';
+    if (bio0) E.bio = () => ({ cap: 2, used: 2 });
+    try { run('кнопки · «Спуск» слоты заняты', () => T.render()); P.dsFull = strip(game()); } finally { if (bio0) E.bio = bio0; }
+    for (const e of lawSay(P)) say(`кнопки говорят своё: ${e}`);
+    const MUT = [
+      ['у закрытого раздела нет «ур. N»', Object.assign({}, P, { shell: P.shell.replace(/<b>ур\. \d+<\/b>/, '') })],
+      ['у «Чата» нет подписи с непрочитанным', Object.assign({}, P, { shelter: P.shelter.replace(/(<button class="sh-md"[^>]*?) aria-label="[^"]*"/, '$1') })],
+      ['у колокола подпись без числа', Object.assign({}, P, { shell: P.shell.replace(/aria-label="Входящие: \d+"/, 'aria-label="Входящие"') })],
+      ['закрытая кнопка «Спуска» без причины', Object.assign({}, P, { dsFull: P.dsFull.replace(/<span class="reason[^"]*">Слоты биомов[^<]*<\/span>/, '') })],
+    ];
+    let caught = 0;
+    for (const [what, PP] of MUT) { if (lawSay(PP).length) caught++; else say(`мутация «${what}»: закон «кнопки говорят своё» её не поймал`); }
+    console.log(`Кнопки говорят своё: оболочка, Убежище и «Спуск» — состояния словами; мутаций ${MUT.length}, поймано ${caught}.`);
+  }
 
   if (DUMP) {
     let cur = '';

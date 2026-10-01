@@ -1,0 +1,33 @@
+{
+  "name": "Рамка-квадрат рунного стража — правка: на верхней планке светятся насечки «III IIII», похожие на письмо (вопрос автору 01.10.2026, ответ координатора: перерисовать без насечек и без любых знаков, похожих на буквы — как «S» с кристалла сундука). Правится только верхняя планка: остальное — исходник bfs-rune без изменений, геометрия окна та же",
+  "notes": [
+    "Исходник — art/generated/battle-frames-square/bfs-rune__nb2.raw.jpg (на чёрном); ответ — bfs-rune-v2 в той же папке, вырезка ключом black, затем battle_frame.py и frame_square.py, выгрузка bframes-sq/rune*.png"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Keep the painterly style of the attached picture exactly: the same brush strokes, the same dark stone and blackened iron, the same turquoise light, the same proportions.",
+  "negative": "No text, no letters, no numbers, no symbols, no runes, no tally marks, no notches, no dots in a row, no marks that look like writing, no watermark, no signature, no logo, no UI elements.",
+  "cutout_rule": "",
+  "categories": {
+    "battle-frames-square": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Edit the attached picture: a square stone card frame of a dark fantasy card game on a pure black background, with an empty pure black square window in the middle. Keep the whole picture exactly as it is — the shape and position of every bar, the window, the bottom plate, the top corners, the stone wings with the turquoise diamond crystal at the top centre, the colors and the light — and the same framing and size. Change only what is listed below."
+    }
+  },
+  "jobs": [
+    {
+      "id": "bfs-rune-v2",
+      "category": "battle-frames-square",
+      "title": "Рунный страж: верхняя планка без насечек",
+      "source": "docs/decisions/ADR-0046, вопросы автору, п. 2; art/generated/battle-frames-square/bfs-rune__nb2.raw.jpg",
+      "refs": [
+        "art/generated/battle-frames-square/bfs-rune__nb2.raw.jpg"
+      ],
+      "subject": "On the top bar, to the left and to the right of the winged crystal, there are rows of short glowing turquoise notches and dots that look like tally marks or letters. Remove all of them completely: the top bar there becomes plain smooth dark stone, the same stone as the rest of the bar, with only one thin continuous line of soft turquoise light running along its lower edge, from the crystal wings to the corners. No notches, no dots, no marks, no signs anywhere on the frame. Everything else stays exactly the same."
+    }
+  ]
+}

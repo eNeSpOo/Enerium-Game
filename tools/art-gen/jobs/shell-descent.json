@@ -1,0 +1,35 @@
+{
+ "name": "Оболочка и «Спуск» на уровне AAA (слова автора 01.10.2026: «…окно спуска тоже в АА уровень перевести, там уже есть красивые картинки но всё остальное старое… Линии общего интерфейся слишком толстые… рамки тоже толстые, иконка странника вылезает на интерфейс и сами кнопки слабые»). Линии, рамки и кромки оболочки стали тонкими — их рисует CSS. Здесь — значки кнопок, которые должны читаться с 20 px: колокол Входящих, «Дар дня», «Пропуск», «Чат», замок закрытого раздела; и знаки «Спуска»: бестиарий, этажи, босс биома, рунный страж. Материал — оболочки и Убежища (jobs/shelter.json): кованое железо, старое золото, свет карста снизу. Текста, цифр, лиц и спойлеров на арте нет.",
+ "plan": {
+  "Значки sd-glyphs": "1:1, 1K, ключ black-glow: лист 3 × 3 — колокол, дар дня, пропуск, чат, замок, бестиарий, этажи, босс, рунный страж (craft_layers.py sheet); выгрузка 128 px PNG в design/ui/assets/art/shell/"
+ },
+ "notes": [
+  "01.10.2026: первый запрос после пополнения API — дешёвый 1K: проверка, что HTTP 402 ушёл. Сначала --dry-run, потом --budget 0.2",
+  "Нарезка: python tools/art-gen/craft_layers.py sheet art/generated/sd-sheet/sd-glyphs__nb2.png 3 3 bell gift pass chat lock best floors boss guard; выгрузка — ui-art.json → design/ui/assets/art/shell/ico-<имя>.png, export_ui.py --spec ui-art.json --no-stamp; пути — SHL_ART.ready (screens/shell.js) и DS_ART (screens/descent.js)",
+  "01.10.2026: лист sd-glyphs вышел с первого раза, $0,07 (он же — проверка, что HTTP 402 ушёл). Все девять значков читаются с 20 px: колокол, мешочек дара с узлом и звездой, флажок пропуска, облачко чата с тремя камнями, навесной замок, том с когтями, лестница в шахту, корона с шипами, дверь стража с печатью. Выгрузка — ui-art.json → design/ui/assets/art/shell/ico-*.png, 128 px, fit 100"
+ ],
+ "models": [
+  "nb2"
+ ],
+ "style": "Art style: dark fantasy game art for a premium mobile RPG — gloomy, ancient, rich and a little menacing. Hand-painted digital painting: visible confident brush strokes, simplified planes, deep near-black shadows, crisp rim light on the edges, rich material detail and masterful craftsmanship. The materials of the Refuge, the Wanderer's shelter in Endalor: dark forged iron with hammer marks and soot, raised edges and fine filigree of old gold (#B1915A, #DDBC7A), weathered dark stone, aged dark leather. Light is scarce and precious and comes from below: a soft cold turquoise glow of karst crystals (#48E5D4) catches the lower edges, and a few warm amber highlights (#E6A84B) glint like the reflection of a forge. Everything is old, heavy, precious and made by a master: no cheap shine, no plastic, no clean flat game-UI look. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.",
+ "negative": "No words, no letters, no digits, no numbers, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no labels, no watermark, no signature, no logo, no UI frames or buttons around the objects. No skulls, no bones, no blood. No pentagrams, no occult signs, no crosses, no religious symbols, no eyes, no faces, no people, no hands, no creatures. No purple or violet light, no neon. No bright polished gold, no glossy plastic shine.",
+ "cutout_rule": "The background is one solid flat color {hex}, perfectly even from edge to edge: no gradient, no texture, no floor, no wall, no cast shadow, no vignette, no checkerboard. The object itself never uses this background color. Any glow stays close to the object and fades out within a short distance.",
+ "categories": {
+  "sd-sheet": {
+   "aspect": "1:1",
+   "size": "1K",
+   "cutout": "black-glow",
+   "refs": [],
+   "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a sheet of NINE separate game interface icons for a dark fantasy mobile RPG, painted together as one consistent set, laid out in a strict grid of three columns and three rows: every object stands alone, centered in its own equal cell, seen straight on and frontal, upright and level. Between the objects and around them the canvas is solid pure black, with wide equal empty gaps: no object touches another object or the edge of the canvas. Nothing connects the objects: no lines, no gutters, no shared background, no shadows. Each object fills about three quarters of its cell. Each one must read at a tiny size, 20 to 32 pixels, on a dark button: one simple, bold, instantly recognizable silhouette built from a few large shapes, with all the painterly detail inside the silhouette; a crisp rim light runs along its whole outline and separates it from the black; no sparks, embers, dust or particles floating around it."
+  }
+ },
+ "jobs": [
+  {
+   "id": "sd-glyphs",
+   "category": "sd-sheet",
+   "title": "Значки кнопок оболочки и знаки «Спуска» — лист 3 × 3",
+   "source": "design/ui/screens/shell.css (колокол, дар дня, пропуск, чат, замок раздела), screens/descent.css (бестиарий, этажи, босс, страж)",
+   "subject": "The nine icons, row by row from the top, each row from left to right.\nRow 1: (1) the bell of the inbox: a small hand bell of old gold, upright, with a short handle of dark forged iron on top, a thin turquoise glint along its lower rim and a dark clapper showing below the rim; (2) the gift of the day: a small round bundle of dark teal velvet gathered at the top and tied with a cord of old gold in a neat bow, a small four-pointed old-gold star charm hanging from the knot; (3) the season pass: a long pennant banner of dark teal cloth with a forked tail and a fringe of old gold, hanging from a short old-gold crossbar on top of a spear head, a small plain four-pointed star of old gold embroidered in its middle.\nRow 2: (4) the chat: a rounded speech-bubble shaped plaque of dark forged iron with a raised old-gold rim and a short pointed tail at its lower left, three small round turquoise gems in a row across its middle; (5) the padlock of a closed path: a heavy old padlock of dark iron with an old-gold rim and a thick old-gold shackle, a dark keyhole in its center with a faint turquoise glow inside; (6) the bestiary: a thick closed old tome bound in dark leather, seen from the front, three deep parallel claw marks torn diagonally across its cover, old-gold corner guards and a heavy old-gold clasp.\nRow 3: (7) the floors of the descent: a narrow stair of worn dark stone going down into a round black shaft, seen from slightly above, the steps curving down out of sight, a cold turquoise glow rising from the depth of the shaft; (8) the boss of the biome: a heavy crown of blackened iron with five tall jagged spikes, a band of old gold around it and one large amber crystal glowing in its front; (9) the rune guardian's gate: a massive arched door of dark stone banded with forged iron, a round seal of old gold in its center with a glowing turquoise karst crystal in the middle of the seal."
+  }
+ ]
+}

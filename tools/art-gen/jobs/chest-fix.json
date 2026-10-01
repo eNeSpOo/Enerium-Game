@@ -1,0 +1,33 @@
+{
+ "name": "Правка одной клетки листа сундуков: древний (r5) реликварий Эхо — в кристалле узор пламени похож на букву «S» (docs/art-queue.md, п. 2). Правится только середина кристалла: вырезка вокруг кристалла из art/generated/chest-sheet/chs-shards/r5.png на пурпуре уходит модели, её ответ вклеивается обратно по мягкой маске внутри кристалла — шов, рамка и геометрия сундука не меняются (CO_ART.sets.shards).",
+ "notes": [
+  "Вырезка: r5.png, рамка [545, 17, 905, 377] px вырезанного сундука, увеличена ×2 — art/generated/chest-fix/chs-shards-r5.crystal.png",
+  "Вклейка — эллипс вокруг пламени (середина 725, 197; полуоси 62 × 96 px), край мягкий; затем r5.png и r5.lid.png пересобраны, выгрузка — chests/shards/r5.webp и r5-lid.webp"
+ ],
+ "models": [
+  "nb2"
+ ],
+ "style": "Keep the painterly style of the attached picture exactly: the same brush strokes, the same red crystal facets, the same light and colors.",
+ "negative": "No text, no letters, no numbers, no symbols, no runes, no watermark, no signature, no logo, no UI elements, no border or frame around the picture.",
+ "cutout_rule": "",
+ "categories": {
+  "chest-fix": {
+   "aspect": "1:1",
+   "size": "1K",
+   "refs": [],
+   "frame": "Edit the attached picture: a close-up of a cluster of dark red crystals on top of an ancient chest, on a flat magenta background. Keep the whole picture exactly as it is — every crystal, its facets, outline and position, the chest below and the flat magenta background — and the same framing and size. Change only what is listed below."
+  }
+ },
+ "jobs": [
+  {
+   "id": "chs-shards-r5-fix",
+   "category": "chest-fix",
+   "title": "Древний реликварий Эхо (r5): пламя в кристалле без «S»",
+   "source": "docs/art-queue.md, п. 2; art/generated/chest-sheet/chs-shards/r5.png",
+   "refs": [
+    "art/generated/chest-fix/chs-shards-r5.crystal.png"
+   ],
+   "subject": "Inside the big central red crystal burns an orange flame shaped like a curled S-swirl. Repaint only that flame: make it one single upright tongue of fire — a simple teardrop flame, wide and round at the bottom, narrowing to one soft point at the top, glowing hot yellow-orange at its heart and fading into the red of the crystal at its edges, like a candle flame trapped in a gem. No curl, no spiral, no hook, no loop, nothing that looks like a letter, a digit or a sign. Everything else stays exactly the same."
+  }
+ ]
+}

@@ -16,15 +16,17 @@
       зоны нажатия — не меньше 44 px. Каскад стилей (css_cascade.js): размеры вещей Убежища решает shelter.css, чужие правила их
       не перебивают.
    5. Арт: каждый путь SH_ART.ready и SHL_ART.ready лежит в assets/art и есть в tools/art-gen/ui-art.json; геометрия — целые числа
-      в пределах рисунка, размеры рисунка на диске совпадают с описью; с артом — переменные и флаги у <html>, без арта — ни одной
-      ссылки на shelter/ и shell/, флагов нет, всё рисуется. Флаги — не классы элементов.
+      в пределах рисунка, размеры рисунка на диске совпадают с описью; с артом — переменные и флаги у <html> (значки кнопок оболочки —
+      флаг shla-ico, только когда выгружены все), без арта — ни одной ссылки на shelter/ и shell/, флагов нет, всё рисуется. Флаги —
+      не классы элементов.
    6. Движение: в кадрах shelter.css и shell.css — только transform и opacity; у повторяющихся анимаций фаза от часов страницы (--t);
       «меньше движения» выключает анимации.
    7. Оболочка: shell.css не меняет вёрстку оболочки — у шапки, шахты, кнопок разделов, картинок, подписей, кошелька и колокола
       размеры, отступы и шрифт решает index.html (каскад с shell.css и без него — одно и то же); украшения-псевдоэлементы —
-      position: absolute и pointer-events: none; гнездо картинки раздела обнимает картинку и помещается в шахту.
+      position: absolute и pointer-events: none; числа SHL_VIEW — целые, не больше шапки. Толщины линий и рамок, портрет в ячейке
+      и состояния кнопок — законы check_shell.js (раздел 10).
    8. Режим «Игрок»: на Убежище и в разделах UI-кита нет служебных слов; UI-кит — разделы «Убежище: сцена и вещи» и «Оболочка:
-      кованые кромки» рисуются в обоих режимах.
+      линии и кнопки» рисуются в обоих режимах.
    Запуск: node tools/content-gen/screens/check_shelter.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -115,7 +117,7 @@ function load(o = {}) {
   const T = vm.runInContext(`({
     get S() { return S; }, set S(v) { S = v; }, ACT, OV, SCREENS, NPCS, NAV_TODO, KIT_EXTRA, FLOWS, KH, render, initialState, setTeam, AV, ART, PATH, navTodo,
     SH: typeof SH_VIEW !== 'undefined' ? { VIEW: SH_VIEW, CAST: SH_CAST, ROOM: SH_ROOM, ART: SH_ART, TEXT: SH_TEXT, view: shelterView, fig: shFig } : null,
-    SHL: typeof SHL_ART !== 'undefined' ? { ART: SHL_ART, VIEW: SHL_VIEW, side: shlFrameSide } : null,
+    SHL: typeof SHL_ART !== 'undefined' ? { ART: SHL_ART, VIEW: SHL_VIEW } : null,
     socChatN: typeof socChatN === 'function' ? socChatN : null,
   })`, ctx);
   return { T, els, rootCls, rootVars, game: () => (els.game ? els.game.innerHTML : '') };
@@ -197,9 +199,14 @@ function signs(h0) { return [...h0.matchAll(/<button class="sh-sign( hot)?" data
 {
   reset(A);
   const g = mainOf(draw(A, 'Убежище · медальоны'));
-  const chat = (g.match(/<button class="sh-md" data-a="sheet" data-v="chat">[\s\S]*?<\/button>/) || [''])[0], n = T.socChatN ? T.socChatN() : 0;
+  const chat = (g.match(/<button class="sh-md" data-a="sheet" data-v="chat"[^>]*>[\s\S]*?<\/button>/) || [''])[0], n = T.socChatN ? T.socChatN() : 0;
   if (!chat) say('Убежище: нет медальона «Чат»');
-  else if (n && !chat.includes(`<span class="bdg" aria-hidden="true">${n > 9 ? '9+' : n}</span>`)) say(`Убежище: у «Чата» нет числа непрочитанного ${n}`);
+  else {
+    if (n && !chat.includes(`<span class="bdg" aria-hidden="true">${n > 9 ? '9+' : n}</span>`)) say(`Убежище: у «Чата» нет числа непрочитанного ${n}`);
+    /* подпись говорит состояние (слова автора 01.10.2026: «сами кнопки слабые»): «Чат» или «Чат: N непрочитанных» */
+    const lab = (chat.match(/\saria-label="([^"]*)"/) || [, ''])[1];
+    if (n ? !lab.startsWith(`Чат: ${n} непрочитанн`) : lab !== 'Чат') say(`Убежище: подпись «Чата» «${lab}», а непрочитанного ${n}`);
+  }
   const meds = (g.match(/<div class="sh-meds">([\s\S]*?)<\/div>/) || [, ''])[1];
   if (!/data-a="dlg" data-v="gift"/.test(meds) || !/data-a="go" data-v="store:pass"/.test(meds)) say('Убежище: в медальонах справа нет «Дар дня» и «Пропуск»');
   const m0 = T.S.mem.slots[0];
@@ -325,7 +332,7 @@ function imgSize(p) {
     cnt.art++;
     if (!fs.existsSync(path.join(UI, 'assets', 'art', p))) say(`${who}: ${p} в ready, а файла нет`);
     if (!uiArt[p]) say(`${who}: ${p} нет в tools/art-gen/ui-art.json`);
-    if (!Object.values(R.img).includes(p)) say(`${who}: ${p} в ready, а в img его нет`);
+    if (!Object.values(R.img).concat(Object.values(R.ico || {})).includes(p)) say(`${who}: ${p} в ready, а в img и ico его нет`);
   }
   const ints = (n, a) => { for (const v of [].concat(a)) if (!Number.isInteger(v) || v < 0) say(`арт: ${n} — не целое неотрицательное (${v})`); };
   for (const k of ['sign', 'cta']) {
@@ -334,15 +341,12 @@ function imgSize(p) {
     const sz = fs.existsSync(p) ? imgSize(p) : null; if (sz && (sz[0] !== G0.px[0] || sz[1] !== G0.px[1])) say(`SH_ART.${k}: рисунок на диске ${sz.join(' × ')}, а в описи ${G0.px.join(' × ')}`);
     const u = uiArt[I.img[k]]; if (u && u.size && (u.size[0] !== G0.px[0] || u.size[1] !== G0.px[1])) say(`SH_ART.${k}: ui-art.json выгружает ${u.size.join(' × ')}, а геометрия — для ${G0.px.join(' × ')}`);
   }
-  { const F = L.frame, p = path.join(UI, 'assets', 'art', L.img.frame), sz = fs.existsSync(p) ? imgSize(p) : null; ints('SHL_ART.frame', [F.px].concat(F.win));
-    if (sz && sz[0] !== F.px) say(`SHL_ART.frame: гнездо на диске ${sz[0]} px, а в описи ${F.px}`);
-    const side = T.SHL.side(), win = side * (F.win[1] - F.win[0]) / F.px;
-    if (Math.abs(win - T.SHL.VIEW.pic) > 1) say(`гнездо: окно ${win.toFixed(1)} px не обнимает картинку раздела ${T.SHL.VIEW.pic} px`);
-    for (const r of [G.rail, G.railS]) if (side > r - 8) say(`гнездо ${side} px не помещается в шахту ${r} px с полями`); }
+  { const D = L.diamond, p = path.join(UI, 'assets', 'art', L.img.diamond), sz = fs.existsSync(p) ? imgSize(p) : null; ints('SHL_ART.diamond', D);
+    if (sz && (sz[0] !== D[0] || sz[1] !== D[1])) say(`SHL_ART.diamond: ромб на диске ${sz.join(' × ')}, а в описи ${D.join(' × ')}`); }
   /* геометрия сцены — целые тысячные доли */
   for (const [k, c] of Object.entries(CAST)) { ints(`SH_CAST.${k}`, [c.x, c.h, c.tag.x, c.tag.y].concat(...(c.glow || []).map(g => g.slice(0, 3)))); if (!Number.isInteger(c.b)) say(`SH_CAST.${k}.b — не целое`); if (!['back', 'front'].includes(c.layer)) say(`SH_CAST.${k}: план «${c.layer}»`); }
   /* с артом — переменные и флаги у <html> */
-  for (const [k, flag] of [['--sh-sign', 'sha-sign'], ['--sh-cta', 'sha-cta'], ['--sh-chain', 'sha-chain'], ['--sh-corner', 'sha-corner'], ['--shl-edge-v', 'shla-edge'], ['--shl-knot', 'shla-knot'], ['--shl-frame', 'shla-frame'], ['--shl-medal', 'shla-medal']])
+  for (const [k, flag] of [['--sh-sign', 'sha-sign'], ['--sh-cta', 'sha-cta'], ['--sh-chain', 'sha-chain'], ['--sh-corner', 'sha-corner'], ['--shl-diamond', 'shla-dia'], ['--shl-iron', 'shla-iron'], ['--shl-ico-bell', 'shla-ico'], ['--shl-ico-lock', 'shla-ico']])
     if (!A.rootVars[k] || !A.rootCls.has(flag)) say(`арт: ${k} не в переменных <html> или нет флага ${flag}`);
   /* флаги — не классы элементов: правило из одних флагов легло бы на весь документ */
   const flags = [...A.rootCls].filter(c => /^(sha|shla)-/.test(c));
@@ -409,7 +413,7 @@ function imgSize(p) {
     if (!('content' in d)) continue;
     if (d.position !== 'absolute' || d['pointer-events'] !== 'none') say(`shell.css «${r.sel}»: украшение не position: absolute и pointer-events: none`);
   }
-  const V2 = T.SHL.VIEW; for (const [k, pair] of [['edge', V2.edge], ['knot', V2.knot]]) for (const v of pair) if (!Number.isInteger(v) || v <= 0 || v > G.topS) say(`SHL_VIEW.${k}: ${v} px — не целое или больше шапки`);
+  const V2 = T.SHL.VIEW; for (const k of ['line', 'frame', 'stud', 'ava', 'bell', 'glyph']) for (const v of V2[k] || [NaN]) if (!Number.isInteger(v) || v <= 0 || v > G.topS) say(`SHL_VIEW.${k}: ${v} px — не целое или больше шапки`);
 }
 
 /* ================== 8. режим «Игрок» и UI-кит ================== */
@@ -419,7 +423,7 @@ function imgSize(p) {
   service('Убежище', mainOf(draw(A, 'Убежище · игрок')));
   for (const team of [false, true]) {
     run('режим', () => T.setTeam(team));
-    for (const [name, id] of [['Убежище: сцена и вещи', 'kitShelter'], ['Оболочка: кованые кромки', 'kitShellDecor']]) {
+    for (const [name, id] of [['Убежище: сцена и вещи', 'kitShelter'], ['Оболочка: линии и кнопки', 'kitShellDecor']]) {
       const K = T.KIT_EXTRA.find(x => { try { return x.html().includes(`id="${id}"`); } catch (_) { return false; } });
       if (!K) { say(`UI-кит: нет раздела «${name}»`); continue; }
       const k = run(`UI-кит «${name}»`, () => K.html()) || '';

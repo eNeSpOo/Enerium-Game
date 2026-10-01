@@ -1,0 +1,264 @@
+{
+  "sheet": "art/generated/battle-vfx-flip/vfx-flip__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/battle-vfx.json",
+  "job": "vfx-flip",
+  "grid": [
+    7,
+    3
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "boom-1",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-boom-1.webp",
+      "box": [
+        59,
+        42,
+        894,
+        877
+      ],
+      "px": 835,
+      "key_left": 0.0
+    },
+    {
+      "id": "boom-2",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-boom-2.webp",
+      "box": [
+        956,
+        42,
+        1791,
+        877
+      ],
+      "px": 835,
+      "key_left": 0.0
+    },
+    {
+      "id": "boom-3",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-boom-3.webp",
+      "box": [
+        1853,
+        42,
+        2688,
+        877
+      ],
+      "px": 835,
+      "key_left": 0.0
+    },
+    {
+      "id": "boom-4",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-boom-4.webp",
+      "box": [
+        2750,
+        42,
+        3585,
+        877
+      ],
+      "px": 835,
+      "key_left": 0.0
+    },
+    {
+      "id": "boom-5",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-boom-5.webp",
+      "box": [
+        3647,
+        42,
+        4482,
+        877
+      ],
+      "px": 835,
+      "key_left": 0.0
+    },
+    {
+      "id": "boom-6",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-boom-6.webp",
+      "box": [
+        4544,
+        42,
+        5379,
+        877
+      ],
+      "px": 835,
+      "key_left": 0.0
+    },
+    {
+      "id": "boom-7",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-boom-7.webp",
+      "box": [
+        5441,
+        42,
+        6276,
+        877
+      ],
+      "px": 835,
+      "key_left": 0.0
+    },
+    {
+      "id": "burst-1",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-burst-1.webp",
+      "box": [
+        59,
+        928,
+        895,
+        1764
+      ],
+      "px": 836,
+      "key_left": 0.0
+    },
+    {
+      "id": "burst-2",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-burst-2.webp",
+      "box": [
+        955,
+        928,
+        1791,
+        1764
+      ],
+      "px": 836,
+      "key_left": 0.0
+    },
+    {
+      "id": "burst-3",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-burst-3.webp",
+      "box": [
+        1852,
+        928,
+        2688,
+        1764
+      ],
+      "px": 836,
+      "key_left": 0.0
+    },
+    {
+      "id": "burst-4",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-burst-4.webp",
+      "box": [
+        2750,
+        928,
+        3586,
+        1764
+      ],
+      "px": 836,
+      "key_left": 0.0
+    },
+    {
+      "id": "burst-5",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-burst-5.webp",
+      "box": [
+        3647,
+        928,
+        4483,
+        1764
+      ],
+      "px": 836,
+      "key_left": 0.0
+    },
+    {
+      "id": "burst-6",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-burst-6.webp",
+      "box": [
+        4544,
+        928,
+        5380,
+        1764
+      ],
+      "px": 836,
+      "key_left": 0.0
+    },
+    {
+      "id": "burst-7",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-burst-7.webp",
+      "box": [
+        5441,
+        928,
+        6277,
+        1764
+      ],
+      "px": 836,
+      "key_left": 0.0
+    },
+    {
+      "id": "puff-1",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-puff-1.webp",
+      "box": [
+        60,
+        1816,
+        893,
+        2649
+      ],
+      "px": 833,
+      "key_left": 0.0
+    },
+    {
+      "id": "puff-2",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-puff-2.webp",
+      "box": [
+        957,
+        1816,
+        1790,
+        2649
+      ],
+      "px": 833,
+      "key_left": 0.0
+    },
+    {
+      "id": "puff-3",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-puff-3.webp",
+      "box": [
+        1854,
+        1816,
+        2687,
+        2649
+      ],
+      "px": 833,
+      "key_left": 0.0
+    },
+    {
+      "id": "puff-4",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-puff-4.webp",
+      "box": [
+        2751,
+        1816,
+        3584,
+        2649
+      ],
+      "px": 833,
+      "key_left": 0.0
+    },
+    {
+      "id": "puff-5",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-puff-5.webp",
+      "box": [
+        3648,
+        1816,
+        4481,
+        2649
+      ],
+      "px": 833,
+      "key_left": 0.0
+    },
+    {
+      "id": "puff-6",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-puff-6.webp",
+      "box": [
+        4545,
+        1816,
+        5378,
+        2649
+      ],
+      "px": 833,
+      "key_left": 0.0
+    },
+    {
+      "id": "puff-7",
+      "file": "art/generated/battle-vfx-flip/vfx-flip/vx-puff-7.webp",
+      "box": [
+        5442,
+        1816,
+        6275,
+        2649
+      ],
+      "px": 833,
+      "key_left": 0.0
+    }
+  ]
+}

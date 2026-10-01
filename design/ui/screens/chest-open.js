@@ -121,7 +121,7 @@ const CO_ART = {
     'chests/equip-lid.png', 'chests/talisman-body.png', 'chests/talisman-lid.png', 'chests/workers-body.png', 'chests/workers-lid.png',
     'chests/craft-body.png', 'chests/craft-lid.png', 'chests/wander-body.png', 'chests/wander-lid.png', 'chests/lock.png',
     'chests/fx-rays.png', 'chests/fx-flash.png', 'chests/fx-ring.png', 'chests/fx-haze.png', 'chests/fx-beam.png', 'chests/fx-dust.png',   // выгрузка 29.09.2026
-    ...['shards', 'keys', 'equip', 'workers', 'wander'].flatMap(b => [1, 2, 3, 4, 5, 6, 7].flatMap(r => [`chests/${b}/r${r}-body.webp`, `chests/${b}/r${r}-lid.webp`, `chests/${b}/r${r}.webp`]).concat(`chests/${b}/lock.webp`))],   // листы режимов, 01.10.2026
+    ...['shards', 'keys', 'equip', 'talisman', 'workers', 'craft', 'wander'].flatMap(b => [1, 2, 3, 4, 5, 6, 7].flatMap(r => [`chests/${b}/r${r}-body.webp`, `chests/${b}/r${r}-lid.webp`, `chests/${b}/r${r}.webp`]).concat(`chests/${b}/lock.webp`))],   // листы режимов, 01.10.2026; шкатулка духа и каменный сундук руин — после пополнения API
   sets: {
     shards: { scale: 171, lock: [774, 1132], by: [
       { frame: [0, 0, 1379, 1120], seam: 615, lid: [0, 0, 1379, 617], body: [2, 613, 1376, 507] },
@@ -147,6 +147,14 @@ const CO_ART = {
       { frame: [0, 0, 1431, 1108], seam: 539, lid: [0, 0, 1431, 541], body: [15, 537, 1405, 571] },
       { frame: [0, 0, 1443, 1108], seam: 539, lid: [0, 0, 1443, 541], body: [22, 537, 1408, 571] },
       { frame: [0, 0, 1444, 1108], seam: 538, lid: [0, 0, 1444, 540], body: [14, 536, 1415, 572] }] },
+    talisman: { scale: 174, lock: [796, 1129], by: [
+      { frame: [0, 0, 1354, 1090], seam: 498, lid: [0, 0, 1354, 500], body: [1, 496, 1353, 594] },
+      { frame: [0, 0, 1355, 1089], seam: 500, lid: [0, 0, 1355, 502], body: [0, 498, 1350, 591] },
+      { frame: [0, 0, 1357, 1089], seam: 499, lid: [1, 0, 1356, 501], body: [0, 497, 1357, 592] },
+      { frame: [0, 0, 1355, 1090], seam: 502, lid: [0, 0, 1355, 504], body: [1, 500, 1348, 590] },
+      { frame: [0, 0, 1374, 1100], seam: 510, lid: [0, 0, 1374, 512], body: [1, 508, 1373, 592] },
+      { frame: [0, 0, 1374, 1101], seam: 510, lid: [0, 0, 1374, 512], body: [1, 508, 1373, 593] },
+      { frame: [0, 0, 1371, 1101], seam: 514, lid: [0, 0, 1371, 516], body: [5, 512, 1366, 589] }] },
     workers: { scale: 160, lock: [782, 1165], by: [
       { frame: [0, 0, 1473, 1072], seam: 389, lid: [70, 0, 1333, 391], body: [0, 387, 1473, 685] },
       { frame: [0, 0, 1474, 1072], seam: 387, lid: [71, 0, 1331, 389], body: [0, 385, 1474, 687] },
@@ -155,6 +163,14 @@ const CO_ART = {
       { frame: [0, 0, 1475, 1063], seam: 382, lid: [73, 0, 1330, 384], body: [0, 380, 1475, 683] },
       { frame: [0, 0, 1475, 1063], seam: 379, lid: [73, 0, 1329, 381], body: [0, 377, 1475, 686] },
       { frame: [0, 0, 1486, 1064], seam: 382, lid: [81, 0, 1332, 384], body: [0, 380, 1486, 684] }] },
+    craft: { scale: 163, lock: [873, 1218], by: [
+      { frame: [0, 0, 1479, 1096], seam: 514, lid: [0, 0, 1478, 516], body: [7, 512, 1472, 584] },
+      { frame: [0, 0, 1444, 1097], seam: 515, lid: [0, 0, 1443, 517], body: [0, 513, 1444, 584] },
+      { frame: [0, 0, 1441, 1097], seam: 515, lid: [0, 0, 1440, 517], body: [5, 513, 1436, 584] },
+      { frame: [0, 0, 1443, 1096], seam: 516, lid: [0, 0, 1443, 518], body: [8, 514, 1435, 582] },
+      { frame: [0, 0, 1465, 1130], seam: 531, lid: [0, 0, 1465, 533], body: [9, 529, 1451, 601] },
+      { frame: [0, 0, 1459, 1126], seam: 518, lid: [0, 0, 1459, 520], body: [0, 516, 1454, 610] },
+      { frame: [0, 0, 1451, 1130], seam: 532, lid: [0, 0, 1451, 534], body: [9, 530, 1442, 600] }] },
     wander: { scale: 165, lock: [775, 1102], by: [
       { frame: [0, 0, 1438, 1112], seam: 554, lid: [0, 0, 1438, 556], body: [2, 552, 1435, 560] },
       { frame: [0, 0, 1433, 1113], seam: 554, lid: [0, 0, 1433, 556], body: [1, 552, 1429, 561] },

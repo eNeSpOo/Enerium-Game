@@ -1,0 +1,359 @@
+/* ================== Бой AAA — screens/battle-scene.js ==================
+   Сцена боя, сведения карты, числа урона, баннеры, ритуал этажа, итог. Движется только transform и opacity; «меньше движения» —
+   без полётов, тряски и пульса (эффекты — design/ui/fx.js, EnFx.scene). Размеры — 932 × 430, ниже — 844 × 390 (контейнер main ниже 360). */
+
+/* ---------- HUD: медальон раунда, часы, этаж ---------- */
+.bt-hud{top:5px;gap:10px;height:34px}
+.bt-hud>.chip{min-width:0;flex:0 0 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bt-hud>.bt-floor+.chip{flex-shrink:1;min-width:92px}   /* сжимается имя главного врага — не до нуля; иммунитет и удар стража — целиком */
+/* 844 × 390: у удара стража и иммунитета остаются значок и число — «−1 раунд», «25 %»; смысл — в подсказке чипа */
+@container main (max-width: 800px){ .bt-hud .bs-long{display:none} }
+.bt-hud:has(.bt-cutchip) .bt-ctrl .btn[data-a="minimize"]{font-size:0;gap:0;padding:0 11px}
+.bt-hud:has(.bt-cutchip) .bt-clock .bt-clk{width:112px}
+.bt-floor b{font-size:27px}
+.bt-floor span{font-size:16px}
+.bt-clock{flex-direction:row;align-items:center;gap:7px;width:auto}
+.bt-clock .bt-clk{display:flex;flex-direction:column;gap:3px;width:128px}
+.bt-clock .row{font-size:11px}
+.bt-rnd{position:relative;flex:none;display:grid;place-items:center;width:34px;height:36px;background:url('../assets/art/bhud/round.png') center/contain no-repeat;filter:drop-shadow(0 2px 4px rgba(0,0,0,.8))}
+.bt-rnd b{margin-top:5px;font:700 15px/1 var(--f-d);font-variant-numeric:lining-nums tabular-nums;color:var(--parch);text-shadow:0 0 6px rgba(221,188,122,.5),0 1px 2px #000}
+.bt-clock.last .bt-rnd b{color:#ffb08a;text-shadow:0 0 8px rgba(255,120,80,.8),0 1px 2px #000}
+.bt-clock.last #btClock{color:#ffb08a}
+.bt-clock.last .bar.sand>i{background:linear-gradient(90deg,#7d2a22,#ff8a5c)}
+/* страж отнял раунд: медальон толкается, вокруг — красное кольцо; прежняя вспышка cutflash (index.html) шла фильтром — здесь transform и opacity */
+.bt-clock.cut{animation:bsCutPulse .9s ease}
+.bt-clock.cut .bt-rnd::after{content:'';position:absolute;inset:-2px;border-radius:50%;box-shadow:0 0 0 2px #ff7a5c,0 0 14px 2px rgba(255,90,68,.8);opacity:0;animation:bsFlash .9s ease;pointer-events:none}
+@keyframes bsCutPulse{0%,100%{transform:scale(1)}20%{transform:scale(1.08)}}
+@container main (max-width: 800px){ .bt-clock .bt-clk{width:112px} }
+
+/* очередь раунда — крупнее, в золотой рамке; кто ходит — светится */
+.bt-queue{top:1px;gap:4px}
+.bt-queue i{width:21px;height:21px;border-radius:6px;border-color:#3d6f6a}
+.bt-queue i.f{border-color:#7a4038}
+.bt-queue i.now{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold-3),0 0 10px var(--gold);transform:translateY(2px) scale(1.12)}
+@container main (max-height: 360px){ .bt-queue i{width:18px;height:18px} }
+
+/* лента — плашка последнего действия: верхняя строка ярче */
+.bt-feed p{font-size:12.5px;padding:3px 10px;border-radius:8px;background:linear-gradient(90deg,rgba(7,9,11,.4),rgba(7,9,11,.82) 20%,rgba(7,9,11,.82) 80%,rgba(7,9,11,.4));box-shadow:inset 0 0 0 1px rgba(221,188,122,.12)}
+.bt-feed p:last-child{color:var(--parch);box-shadow:inset 0 0 0 1px rgba(221,188,122,.3),0 4px 12px -6px #000}
+
+/* ---------- карта: плита здоровья с числом, щит отдельно ---------- */
+.bc>.bar.hp{overflow:visible}
+.bc .bar.hp>.hpn,.bc .bar.hp>.shn{position:absolute;z-index:2;top:50%;transform:translateY(-50%);font:700 8.5px/1 var(--f-u);letter-spacing:.02em;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 0 2px #000,0 0 3px #000,0 1px 1px #000;pointer-events:none;white-space:nowrap}
+.bc .bar.hp>.hpn{left:0;right:0;text-align:center}
+.bc .bar.hp>.shn{right:3px;color:#bfeaff}
+.bc .bar.hp>.shn:empty{display:none}
+.bc .bar.hp>.shn:not(:empty)::before{content:"";display:inline-block;width:6px;height:7px;margin-right:2px;vertical-align:-1px;background:var(--shield);clip-path:polygon(50% 0,100% 18%,92% 70%,50% 100%,8% 70%,0 18%)}
+.bc:has(.shn:not(:empty)) .bar.hp>.hpn{right:auto;left:3px;text-align:left}
+.bc.low .bar.hp>.hpn{color:#ffb4a4}
+.bc.dead .bar.hp>.hpn{color:var(--parch-3)}
+/* прежний вид и портрет: полоса прежней высоты, число — поверх неё, с тёмной обводкой */
+.bc:not(.sq)>.bar.hp>.hpn{font-size:8px}
+/* квадрат: полоса — в нижней плите рамки */
+.bc.sq>.bar.hp{bottom:1px;height:calc(var(--shp) - 2px);border-radius:2px;background:#07080a}
+.bc.sq.sfa>.bar.hp{left:calc(var(--pfw) + 3px);right:calc(var(--pfw) + 3px);bottom:2px;height:calc(var(--shp) - 4px);box-shadow:inset 0 0 0 1px rgba(0,0,0,.7),0 0 0 1px rgba(0,0,0,.35)}
+.bc.sq.sfa>.bar.hp>.hpn{font-size:8px}
+
+/* рисованная рамка ранга: тело — border-image поверх портрета, плита — под полосой здоровья; венец — над картой */
+.bc.sq .face>.sf{position:absolute;z-index:1;pointer-events:none;left:calc(-1 * var(--pfw));right:calc(-1 * var(--pfw));top:calc(-1 * var(--pfw));bottom:calc(-1 * var(--shp));
+  border-style:solid;border-color:transparent;border-width:var(--pfw) var(--pfw) var(--shp) var(--pfw);border-image-repeat:stretch;border-image-width:var(--pfw) var(--pfw) var(--shp) var(--pfw)}
+.bc.sq .face>.sfc{position:absolute;z-index:2;pointer-events:none;left:50%;bottom:calc(100% - 4px * var(--sk));
+  --h:calc(14px * var(--sk));--w:min(calc(var(--h) * var(--car) / 1000),calc((var(--sp) + 2 * var(--pfw)) * 1.06));
+  width:var(--w);height:calc(var(--w) * 1000 / var(--car));transform:translateX(-50%);background:center bottom/100% 100% no-repeat}
+@container main (max-height: 360px){ .bc.sq .face>.sfc{--h:calc(12px * var(--sk))} }
+.bc.sq.sfa .face>.pf{border-color:transparent;border-image:none;background:none}
+.bc.sq.sfa .face>.pf::before,.bc.sq.sfa .face>.pf>.pc,.bc.sq.sfa .face>.pf>.pk{display:none}
+.bc.sq.sfa .face>.pf::after{inset:calc(-1 * var(--pfw) - 1px)}
+/* кристалл героя — в гнезде венца */
+.bc.sq.sfa>.bf-mk{top:calc(var(--pcr) * var(--sk) - 2px)}
+
+/* чья очередь: золотой свет снизу и метка над картой */
+.bc.turn .face::after{content:"";position:absolute;inset:-4px;border-radius:3px;pointer-events:none;box-shadow:0 0 0 1px var(--gold),0 0 14px 2px rgba(221,188,122,.75);opacity:1;animation:bsTurn 1.2s ease-in-out infinite alternate}
+.bc.turn::before{content:"";position:absolute;z-index:6;left:50%;top:-9px;width:10px;height:7px;margin-left:-5px;background:var(--gold);clip-path:polygon(0 0,100% 0,50% 100%);filter:drop-shadow(0 0 4px var(--gold));animation:bsTurnArrow .7s ease-in-out infinite alternate}
+@keyframes bsTurn{from{opacity:.55}to{opacity:1}}
+@keyframes bsTurnArrow{from{transform:translateY(-2px)}to{transform:translateY(1px)}}
+.bc.shielded.turn .face::after{box-shadow:0 0 0 1px var(--gold),0 0 14px 2px rgba(221,188,122,.75),inset 0 0 0 1px rgba(143,220,255,.8)}
+
+/* вспышка по портрету: удар — белая, крит — золотая, лечение — зелёная; только opacity */
+.bc .face>.fxl{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0;background:radial-gradient(70% 70% at 50% 45%,rgba(255,255,255,.85),rgba(255,240,220,.25) 60%,transparent 80%)}
+.bc .face>.fxl.crit{background:radial-gradient(70% 70% at 50% 45%,rgba(255,214,120,.95),rgba(255,150,60,.35) 60%,transparent 80%)}
+.bc .face>.fxl.heal{background:radial-gradient(70% 80% at 50% 70%,rgba(126,240,168,.7),rgba(126,240,168,.15) 60%,transparent 80%)}
+.bc .face>.fxl.go{animation:bsFlash .32s ease-out}
+@keyframes bsFlash{0%{opacity:0}20%{opacity:1}100%{opacity:0}}
+.bc.hit .face{filter:none}
+
+/* удар и каст — только transform (прежние rotate и scale) */
+@keyframes cshake{0%,100%{transform:translate(0,0) rotate(0deg)}20%{transform:translate(-3px,1px) rotate(-2deg)}40%{transform:translate(3px,-1px) rotate(2deg)}60%{transform:translate(-2px,0) rotate(-1deg)}80%{transform:translate(2px,0) rotate(1deg)}}
+@keyframes cgrow{0%{transform:scale(1)}35%{transform:scale(1.14)}100%{transform:scale(1)}}
+@keyframes cgrowU{0%{transform:scale(1)}30%{transform:scale(1.24)}100%{transform:scale(1)}}
+/* гибель: карта оседает и тускнеет */
+.bc.falling{animation:bsFall .6s ease-in both}
+@keyframes bsFall{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(6px) scale(.96);opacity:.26}}
+.bc.dead{transform:translateY(6px) scale(.96)}
+
+/* значок эффекта на карте: медальон, кольцо длительности, раунды и стаки */
+.si2{position:relative;display:block;flex:none;width:16px;height:16px;border-radius:50%;background:conic-gradient(var(--rc) calc(var(--p) * 1%),rgba(255,255,255,.16) 0);box-shadow:0 1px 3px rgba(0,0,0,.85)}
+.si2.good{--rc:#5fe9d6}
+.si2.bad{--rc:#ff7a5c}
+.si2.ctl{--rc:#ffd08a}
+.si2>img,.si2>.i{position:absolute;inset:1.5px;width:calc(100% - 3px);height:calc(100% - 3px);border-radius:50%;object-fit:cover;background:#0b0d10}
+.si2>.i{padding:2px;color:var(--rc)}
+.si2>b{position:absolute;min-width:9px;height:9px;padding:0 1.5px;border-radius:5px;background:#07090b;color:#fff;font:700 7.5px/9px var(--f-u);text-align:center;box-shadow:0 0 0 1px rgba(255,255,255,.22)}
+.si2>b.l{right:-4px;bottom:-3px}
+.si2>b.k{right:-4px;top:-3px;color:#ffd7a8;box-shadow:0 0 0 1px rgba(255,138,92,.6)}
+.si2.good>b.k{color:#bff5ea;box-shadow:0 0 0 1px rgba(95,233,214,.55)}
+.si2.more{display:grid;place-items:center;background:rgba(7,9,11,.85);color:var(--parch-2);font:700 8px/1 var(--f-u);box-shadow:0 0 0 1px var(--iron-2)}
+.bc.sq .face>.buffs,.bc.sq .face>.debuffs{gap:3px}
+@container main (max-height: 360px){ .si2{width:14px;height:14px} .si2>b{min-width:8px;height:8px;font-size:7px;line-height:8px} }
+
+/* ---------- числа урона и лечения ---------- */
+.fly{position:absolute;z-index:7;pointer-events:none;white-space:nowrap;transform:translate(-50%,-50%);animation:bsFly 1s cubic-bezier(.2,.8,.3,1) forwards;font:800 17px/1 var(--f-u);letter-spacing:.01em;font-variant-numeric:tabular-nums;color:#fff;
+  -webkit-text-stroke:3px rgba(6,7,9,.92);paint-order:stroke fill;text-shadow:0 2px 6px rgba(0,0,0,.7)}
+.fly>b{display:block;font:inherit}
+.fly.dmg{color:#ff8a74}
+.fly.foe{color:#ffe7c2}
+.fly.small{font-size:13px}
+.fly.crit{font-size:23px;color:#ffd36a;animation-name:bsFlyCrit;text-align:center}
+.fly.crit>small{display:block;margin-bottom:1px;font:800 9.5px/1 var(--f-u);letter-spacing:.18em;text-transform:uppercase;color:#ffb347;-webkit-text-stroke:2px rgba(6,7,9,.9)}
+.fly.heal{color:#7ef0a8}
+.fly.heal.crit-h{font-size:20px}
+.fly.shield{color:#9fdcff;font-size:14px}
+.fly.shield>b::after{content:" щит";font-size:10px}
+.fly.miss{color:#c9c3b5;font:700 italic 12px/1 var(--f-u)}
+.fly.info{color:#ffd08a;font-size:12px;letter-spacing:.04em}
+.fly.info.imm{color:#f2e6c8;font-size:12px}
+.fly.abil{color:var(--spirit);font-size:12.5px;letter-spacing:.04em}
+.fly.ult{font:700 18px/1 var(--f-d);color:var(--spirit)}
+@keyframes bsFly{0%{transform:translate(-50%,-30%) scale(.55);opacity:0}12%{transform:translate(-50%,-62%) scale(1.15);opacity:1}24%{transform:translate(-50%,-70%) scale(1)}100%{transform:translate(-50%,-190%) scale(.96);opacity:0}}
+@keyframes bsFlyCrit{0%{transform:translate(-50%,-30%) scale(.4);opacity:0}10%{transform:translate(-50%,-60%) scale(1.45);opacity:1}22%{transform:translate(-50%,-66%) scale(1)}78%{opacity:1}100%{transform:translate(-50%,-170%) scale(1);opacity:0}}
+
+/* надпись способности над кастующим; ульта — посреди поля */
+.bs-call{position:absolute;z-index:7;pointer-events:none;display:flex;align-items:center;gap:4px;padding:2px 8px 2px 3px;border-radius:12px;white-space:nowrap;transform:translate(-50%,-100%);
+  background:linear-gradient(180deg,rgba(18,21,24,.95),rgba(8,10,12,.95));box-shadow:0 0 0 1px color-mix(in srgb,var(--sc) 60%,transparent),0 4px 14px -4px #000,0 0 12px -4px var(--sc);animation:bsCall 1.1s ease both}
+.bs-call>.bsc-ic{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;overflow:hidden;flex:none;box-shadow:0 0 0 1px color-mix(in srgb,var(--sc) 70%,#000)}
+.bs-call>.bsc-ic>img,.bs-call>.bsc-ic>.ab-art{width:100%;height:100%;object-fit:cover}
+.bs-call>.bsc-ic>.i{width:13px;height:13px;color:var(--sc)}
+.bs-call>b{font:700 11.5px/1 var(--f-u);color:var(--parch)}
+.bs-call>em{font:700 10.5px/1 var(--f-u);font-style:normal;color:var(--sc)}
+@keyframes bsCall{0%{transform:translate(-50%,-80%) scale(.7);opacity:0}14%{transform:translate(-50%,-110%) scale(1.04);opacity:1}24%{transform:translate(-50%,-105%) scale(1)}80%{opacity:1}100%{transform:translate(-50%,-125%);opacity:0}}
+.bs-call.ult{left:50%;top:40%;padding:8px 22px 8px 8px;border-radius:14px;gap:12px;transform:translate(-50%,-50%);animation-name:bsCallU;
+  background:linear-gradient(90deg,rgba(6,7,9,0),rgba(10,12,14,.96) 18%,rgba(10,12,14,.96) 82%,rgba(6,7,9,0));box-shadow:0 0 0 1px color-mix(in srgb,var(--sc) 50%,transparent),0 0 40px -6px var(--sc)}
+.bs-call.ult>.bsc-ic{width:46px;height:46px;border-radius:10px;box-shadow:0 0 0 2px var(--gold-3),0 0 18px -2px var(--sc)}
+.bs-call.ult .bsc-tx{display:flex;flex-direction:column;gap:3px}
+.bs-call.ult small{font:700 10px/1 var(--f-u);letter-spacing:.16em;text-transform:uppercase;color:var(--gold-2)}
+.bs-call.ult b{font:600 26px/1 var(--f-d);color:var(--parch);text-shadow:0 0 18px var(--sc),0 2px 4px #000}
+.bs-call.ult em{font:700 11px/1 var(--f-u);font-style:normal;color:var(--sc)}
+.bs-call.ult.foe b{color:#ffd8cc}
+@keyframes bsCallU{0%{transform:translate(-50%,-50%) scale(1.35);opacity:0}12%{transform:translate(-50%,-50%) scale(.97);opacity:1}20%{transform:translate(-50%,-50%) scale(1)}82%{opacity:1}100%{transform:translate(-50%,-56%) scale(1.02);opacity:0}}
+
+/* ---------- слой эффектов сцены (fx.js, EnFx.scene) ---------- */
+.vx-layer{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:visible}
+.vx-layer>.vx,.vx-layer>.vf,.vx-layer>.vx-ico{position:absolute;display:block;will-change:transform,opacity;backface-visibility:hidden}
+.vx-layer>.vx{background:center/100% 100% no-repeat}
+.vx-layer>.vf{overflow:hidden}
+.vx-layer>.vf>i{display:block;height:100%;background:left center/100% 100% no-repeat;will-change:transform}
+.vx-layer>.vx-ico{border-radius:50%;box-shadow:0 0 0 2px rgba(7,9,11,.9),0 0 14px rgba(255,214,140,.55)}
+.vx-layer>.vx-veil{position:absolute;inset:-40px;display:block;pointer-events:none}
+.vx-layer>.vx-veil.dim{background:radial-gradient(60% 70% at 50% 50%,rgba(3,4,6,.35),rgba(3,4,6,.82))}
+.fx-stage .vx-layer{z-index:4}
+
+/* ---------- сведения карты по нажатию: слева — кто это, справа — эффекты и способности ---------- */
+.bt-insp.bs-insp{z-index:8;left:12px;right:12px;top:0;bottom:0;max-height:none;display:grid;grid-template-columns:var(--bsi-lw,222px) minmax(0,1fr);gap:14px;padding:8px 10px 8px 12px;border-radius:0;font-size:12px;overflow:hidden;
+  background:radial-gradient(90% 60% at 50% 115%,rgba(72,229,212,.07),transparent 70%),linear-gradient(180deg,#14171b,#0a0c0e);
+  border:14px solid transparent;border-image:url('../assets/art/bhud/panel.png') 115 70 115 70 / 14px 14px 14px 14px stretch;box-shadow:0 18px 40px -14px #000}
+.bt-insp.bs-insp.on-l{right:calc(var(--colw) * 2 + 34px)}
+.bt-insp.bs-insp.on-r{left:calc(var(--colw) * 2 + 34px)}
+.bt-insp.bs-insp.unk{bottom:auto}
+.bs-insp>.x{position:absolute;top:-8px;right:-8px;z-index:2;width:26px;height:26px}
+/* окно закрывает сторону поля: числа и надписи над ней, баннер, «Раунд N», ульта и плашки этажа — не поверх окна */
+.bt.bs-cov0 .fly.s0,.bt.bs-cov1 .fly.s1,.bt.bs-cov0 .bs-call.s0,.bt.bs-cov1 .bs-call.s1,.bt.bs-cov1 .bs-loot,
+.bt:is(.bs-cov0,.bs-cov1,.bs-leg) :is(.bs-call.ult,.bs-rflash,.bs-transit,.bs-taken,.bt-banner){visibility:hidden}
+/* вид «портрет»: окно уже — левая колонка тоньше */
+.bt.pv .bt-insp.bs-insp{--bsi-lw:160px}
+/* левая колонка */
+.bs-insp .bsi-l{display:flex;flex-direction:column;gap:7px;min-width:0;min-height:0;overflow:hidden}
+.bs-insp .bsi-h{display:flex;align-items:center;gap:10px;min-width:0;padding-right:14px}
+.bs-insp .bsi-id{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1 1 auto}
+.bs-insp .bsi-rk{font:700 9.5px/1.15 var(--f-u);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-2)}
+.bs-insp .bsi-nm{font:600 19px/1.05 var(--f-d);color:var(--parch);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bs-insp .bsi-sub{display:flex;flex-wrap:wrap;align-items:center;gap:2px 5px;color:var(--parch-3);font-size:11px;line-height:1.2}
+.bs-insp .bsi-sub .ico,.bs-insp .bsi-sub .i{width:13px;height:13px}
+.bs-insp .bsi-hp{display:flex;flex-wrap:wrap;align-items:center;gap:5px 8px}
+.bs-insp .bsi-hp .bar{flex:1 1 100%;height:9px;border-radius:5px}
+.bs-insp .bsi-hp .n{font:600 13px/1 var(--f-d);color:var(--parch-2);font-variant-numeric:lining-nums tabular-nums;white-space:nowrap}
+.bs-insp .bsi-hp .n b{font-size:17px;color:var(--parch)}
+.bs-insp .bsi-hp .n img.ico{width:15px;height:15px;margin-right:4px;vertical-align:-2px}
+.bs-insp .bsi-hp .shp{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:9px;background:rgba(143,220,255,.12);box-shadow:inset 0 0 0 1px rgba(143,220,255,.45);color:#bfeaff;white-space:nowrap;font-size:12px}
+.bs-insp .bsi-hp .shp .i{width:12px;height:12px}
+.bs-insp .bsi-hp .shp small{color:var(--parch-3)}
+.bs-insp .bsi-at{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 6px}
+.bs-insp .bsi-at .ivl{gap:4px;min-width:0}
+.bs-insp .bsi-at .ivl b{font-size:12.5px}
+.bs-insp .bsi-chips{display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+.bs-insp .bsi-chips .chip{height:auto;min-height:21px;padding:3px 8px;font-size:11px;line-height:1.2;gap:5px;white-space:normal;text-align:left}
+.bs-insp .bsi-chips .chip .ico,.bs-insp .bsi-chips .chip .i{flex:none;width:14px;height:14px}
+.bs-insp .bsi-th>p{display:flex;flex-wrap:wrap;gap:2px 10px;margin:0;font-size:11.5px;line-height:1.35;color:var(--parch-2)}
+/* правая колонка: списки, прокрутка своя */
+.bs-insp .bsi-main{display:flex;flex-direction:column;gap:9px;min-width:0;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#3a4047 transparent;padding:2px 4px 2px 0}
+.bs-insp .bsi-sec{display:flex;flex-direction:column;gap:4px;min-width:0}
+.bs-insp .bsi-sec>h4{margin:0 0 1px;font:700 9.5px/1.2 var(--f-u);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-2)}
+.bs-insp .bsi-sec.none>h4{color:var(--parch-3)}
+.bs-insp .bsi-sec>h4.sub{margin-top:4px}
+.bs-insp .bsi-r{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px;align-items:center;padding:4px 8px 4px 4px;border-radius:8px;background:rgba(255,255,255,.025);box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+.bs-insp .bsi-r.on{box-shadow:inset 0 0 0 1px var(--gold-2),0 0 12px -4px var(--gold);background:rgba(221,188,122,.08)}
+.bs-insp .bsi-r.u .bsi-ic{box-shadow:0 0 0 1px var(--gold),0 0 8px -2px var(--gold)}
+.bs-insp .bsi-r>.bsi-ic{display:grid;place-items:center;width:30px;height:30px;border-radius:7px;overflow:hidden;background:#0b0d10;box-shadow:0 0 0 1px var(--iron-2);align-self:start}
+.bs-insp .bsi-r>.bsi-ic>img,.bs-insp .bsi-r>.bsi-ic .ab-art{display:block;width:100%;height:100%;object-fit:cover}
+.bs-insp .bsi-r>.bsi-ic .bsi-vic{display:grid;place-items:center;width:100%;height:100%}
+.bs-insp .bsi-r>.bsi-ic .i{width:17px;height:17px;color:var(--parch-2)}
+.bs-insp .bsi-r.e>.bsi-ic{border-radius:50%}
+.bs-insp .bsi-r.e.bsi-gd>.bsi-ic{box-shadow:0 0 0 2px #2fb8a8}
+.bs-insp .bsi-r.e.bsi-bd>.bsi-ic{box-shadow:0 0 0 2px #c4553f}
+.bs-insp .bsi-r>.bsi-tx{display:flex;flex-direction:column;gap:1px;min-width:0}
+.bs-insp .bsi-r>.bsi-tx>b{font:600 14px/1.1 var(--f-d);color:var(--parch)}
+.bs-insp .bsi-r>.bsi-tx>b .bsi-k{font:700 10.5px/1 var(--f-u);font-style:normal;color:#ffb88f}
+.bs-insp .bsi-r.e.bsi-gd>.bsi-tx>b .bsi-k{color:#9ff0de}
+.bs-insp .bsi-r>.bsi-tx>small{font-size:10.5px;color:var(--parch-3);line-height:1.2}
+.bs-insp .bsi-r>.bsi-tx>small.by{color:#c9a46a}
+.bs-insp .bsi-r>.bsi-tx>p{margin:0;font-size:11.5px;line-height:1.25;color:var(--parch-2)}
+.bs-insp .bsi-r>em{font-style:normal;text-align:right;white-space:nowrap}
+.bs-insp .bsi-r>em.bsi-ch{font:700 15px/1 var(--f-d);color:var(--gold);font-variant-numeric:lining-nums tabular-nums}
+.bs-insp .bsi-r.u>em.bsi-ch{color:var(--spirit)}
+.bs-insp .bsi-r>em.bsi-tag{font:700 10px/1.2 var(--f-u);color:var(--parch-3);max-width:90px;white-space:normal}
+.bs-insp .bsi-r>em.bsi-lf{display:flex;flex-direction:column;align-items:flex-end;font:700 16px/1 var(--f-d);color:var(--parch)}
+.bs-insp .bsi-r>em.bsi-lf small{font:700 9px/1.2 var(--f-u);color:var(--parch-3);letter-spacing:.04em}
+@container main (max-height: 360px){
+  .bt-insp.bs-insp{--bsi-lw:196px;gap:10px;padding:6px 8px 6px 10px;border-width:12px}
+  .bs-insp .bsi-nm{font-size:17px}
+  .bs-insp .bsi-hp .n b{font-size:15px}
+  .bs-insp .bsi-r{grid-template-columns:26px minmax(0,1fr) auto;gap:6px}
+  .bs-insp .bsi-r>.bsi-ic{width:26px;height:26px}
+  .bs-insp .bsi-r>.bsi-tx>b{font-size:13px}
+  .bs-insp .bsi-r>.bsi-tx>p{font-size:11px}
+}
+/* рамка ранга целиком вокруг портрета: окно рамки — ровно портрет (окно — тысячные рисунка: --wt, --wr, --wb, --wl) */
+.bsf{position:relative;display:inline-block;flex:none;width:var(--px);height:var(--px);margin:calc(var(--px) * var(--wt) / (1000 - var(--wt) - var(--wb))) calc(var(--px) * var(--wr) / (1000 - var(--wl) - var(--wr))) calc(var(--px) * var(--wb) / (1000 - var(--wt) - var(--wb))) calc(var(--px) * var(--wl) / (1000 - var(--wl) - var(--wr)))}
+.bsf>img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 18%}
+.bsf>i{position:absolute;pointer-events:none;background:center/100% 100% no-repeat;
+  left:calc(var(--px) * var(--wl) / (1000 - var(--wl) - var(--wr)) * -1);right:calc(var(--px) * var(--wr) / (1000 - var(--wl) - var(--wr)) * -1);
+  top:calc(var(--px) * var(--wt) / (1000 - var(--wt) - var(--wb)) * -1);bottom:calc(var(--px) * var(--wb) / (1000 - var(--wt) - var(--wb)) * -1)}
+.bsf.plain{border-radius:8px;overflow:hidden;box-shadow:0 0 0 1px var(--iron-2);--wt:0;--wr:0;--wb:0;--wl:0}
+.bs-insp .bsi-h .bsf{--px:56px}
+@container main (max-height: 360px){ .bs-insp .bsi-h .bsf{--px:46px} }
+
+/* ---------- баннеры: этаж, элита, босс, страж, Эхо — плашка; «Раунд N»; переход; добыча ---------- */
+.bt-banner.bs-ban{--bs-d:2.2s;top:42%;flex-direction:row;align-items:center;gap:10px;animation:bsBan var(--bs-d) ease both}
+.bs-ban .bsf{--px:52px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.8))}
+.bs-ban>.pl{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:300px;padding:25px 54px 14px;background:center/100% 100% no-repeat}
+.bs-ban.has-face>.pl{margin-left:-30px;padding-left:64px}
+.bs-ban .bsf{position:relative;z-index:1}
+.bs-ban>.pl>small{font:700 10px/1 var(--f-u);letter-spacing:.2em;text-transform:uppercase;color:var(--gold-2)}
+.bs-ban>.pl>b{font:600 25px/1 var(--f-d);color:var(--parch);text-shadow:0 0 14px rgba(221,188,122,.35),0 2px 4px #000;white-space:nowrap}
+.bs-ban>.pl>.sub{font:700 10.5px/1.2 var(--f-u);letter-spacing:.06em;color:var(--parch-2);text-transform:none}
+.bs-ban>.pl>.facts{display:flex;gap:6px;margin-top:2px}
+.bs-ban>.pl>.facts i{font:700 9.5px/1 var(--f-u);font-style:normal;letter-spacing:.06em;color:var(--parch);padding:3px 6px;border-radius:6px;background:rgba(7,9,11,.75);box-shadow:inset 0 0 0 1px rgba(221,188,122,.3)}
+.bs-ban.k-b>.pl>b,.bs-ban.k-echo>.pl>b,.bs-ban.k-voice>.pl>b{color:#ffd3b8}
+.bs-ban.k-rune>.pl>b{color:#c8fff8;text-shadow:0 0 14px rgba(72,229,212,.45),0 2px 4px #000}
+.bs-ban.k-uber>.pl>b,.bs-ban.k-host>.pl>b,.bs-ban.k-forgotten>.pl>b,.bs-ban.k-many>.pl>b{color:#ffe7a8;text-shadow:0 0 18px rgba(255,190,80,.6),0 2px 4px #000}
+.bs-ban.k-floor>.pl{min-width:220px;padding:24px 44px 12px}
+.bs-ban.k-floor>.pl>b{font-size:22px}
+@keyframes bsBan{0%{transform:translate(-50%,-50%) scale(1.15);opacity:0}9%{transform:translate(-50%,-50%) scale(.98);opacity:1}16%{transform:translate(-50%,-50%) scale(1)}85%{opacity:1}100%{transform:translate(-50%,-52%);opacity:0}}
+@container main (max-height: 360px){ .bs-ban>.pl{min-width:260px;padding:10px 40px 11px} .bs-ban>.pl>b{font-size:21px} }
+
+.bs-rflash,.bs-transit{position:absolute;left:50%;top:38%;z-index:6;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:190px;padding:22px 40px 11px;
+  background:center/100% 100% no-repeat;transform:translate(-50%,-50%);animation:bsRnd .7s ease both}
+.bs-rflash>small,.bs-transit>small{font:700 9.5px/1 var(--f-u);letter-spacing:.2em;text-transform:uppercase;color:var(--gold-2)}
+.bs-rflash>b{font:600 30px/1 var(--f-d);color:var(--gold);text-shadow:0 0 16px rgba(221,188,122,.45),0 2px 6px #000;font-variant-numeric:lining-nums}
+.bs-rflash>em{font:700 10px/1 var(--f-u);font-style:normal;color:var(--parch-3);letter-spacing:.08em}
+.bs-rflash.last>b{color:#ff9c7a;text-shadow:0 0 16px rgba(255,110,70,.6),0 2px 6px #000}
+.bs-rflash.last>small{color:#ffb08a}
+.bs-transit>b{font:600 22px/1 var(--f-d);color:var(--parch)}
+@keyframes bsRnd{0%{transform:translate(-50%,-30%) scale(.9);opacity:0}22%{transform:translate(-50%,-50%) scale(1.04);opacity:1}32%{transform:translate(-50%,-50%) scale(1)}78%{opacity:1}100%{transform:translate(-50%,-62%);opacity:0}}
+.bs-transit{top:30%;animation-name:bsTransit}
+@keyframes bsTransit{0%{opacity:0;transform:translate(-50%,-40%)}15%{opacity:1;transform:translate(-50%,-50%)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-56%)}}
+/* «Этаж взят»: плашка и песок до спуска — время этажа не короче ритуала (ADR-0044) */
+.bs-taken{position:absolute;left:50%;top:40%;z-index:6;pointer-events:none;transform:translate(-50%,-50%);animation:bsTaken 2s ease both}
+.bs-taken>.pl{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:220px;padding:24px 44px 13px;background:center/100% 100% no-repeat}
+.bs-taken small{font:700 9.5px/1 var(--f-u);letter-spacing:.2em;text-transform:uppercase;color:var(--gold-2)}
+.bs-taken b{font:600 24px/1 var(--f-d);color:var(--gold);text-shadow:0 0 16px rgba(221,188,122,.45),0 2px 6px #000}
+.bs-taken .sand{position:relative;display:block;width:120px;height:3px;margin-top:3px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden}
+.bs-taken .sand>i{position:absolute;inset:0;border-radius:inherit;background:linear-gradient(90deg,#6d5530,var(--sand,#e9d48f));transform-origin:left center;animation:bsSand linear both}
+@keyframes bsTaken{0%{opacity:0;transform:translate(-50%,-40%) scale(.95)}8%{opacity:1;transform:translate(-50%,-50%) scale(1)}92%{opacity:1}100%{opacity:0;transform:translate(-50%,-56%)}}
+@keyframes bsSand{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+.bs-loot{position:absolute;right:120px;top:30%;z-index:7;pointer-events:none;display:flex;flex-direction:column;align-items:flex-end;gap:4px;animation:bsLoot 1.8s ease both}
+.bs-loot span{display:flex;align-items:center;gap:5px;padding:3px 9px 3px 4px;border-radius:10px;background:rgba(7,9,11,.85);box-shadow:inset 0 0 0 1px rgba(221,188,122,.35);font:700 14px/1 var(--f-u);color:var(--gold)}
+.bs-loot span.spirit{color:var(--spirit)}
+.bs-loot span.souls{color:#bfe0ff}
+.bs-loot span.runeKeys{color:#f0d79a;box-shadow:inset 0 0 0 1px rgba(240,215,154,.6),0 0 12px -2px rgba(240,215,154,.5)}
+.bs-loot span small{font:600 11px/1 var(--f-u);color:var(--parch-2)}
+.coin-fly.bs-key{width:24px;height:24px}
+.bs-loot img{width:18px;height:18px;object-fit:contain}
+@keyframes bsLoot{0%{opacity:0;transform:translateY(10px) scale(.9)}15%{opacity:1;transform:translateY(0) scale(1)}75%{opacity:1}100%{opacity:0;transform:translateY(-16px)}}
+
+/* переход между этажами: отряд шагает — transform вместо свойства translate прежнего walk (index.html) */
+@keyframes walk{to{transform:translateY(-3px)}}
+/* выход врагов: из тени и снизу, по очереди — шаг между картами из RULES.floor.ritual.stepMs (--bs-step ставит battle-scene.js) */
+.bt-side.f.enter .bc{animation-delay:calc((var(--k) * 2 + var(--r)) * var(--bs-step,80ms))}
+@keyframes foeIn{0%{transform:translateY(14px) scale(.92);opacity:0}60%{opacity:1}100%{transform:translateY(0) scale(1);opacity:1}}
+
+/* ---------- итог этажа и забега, окно «Стена»: герб над окном ---------- */
+.dlg.bs-res{overflow:visible;margin-top:28px;border-color:rgba(221,188,122,.35);border-width:14px;border-style:solid;border-image:url('../assets/art/bhud/panel.png') 115 70 115 70 / 14px stretch;border-radius:0;
+  background:radial-gradient(90% 60% at 50% 115%,rgba(72,229,212,.08),transparent 70%),linear-gradient(180deg,#171b1f,#101316)}
+.dlg.bs-res .dlg-h{justify-content:center;text-align:center;padding-top:44px}
+.dlg.bs-res .dlg-h h2{flex:1;font-size:27px}
+.dlg.bs-res.bs-wall .dlg-h h2{color:#ffb4a0}
+.bs-crest{position:absolute;left:50%;top:-60px;width:min(330px,70%);height:100px;transform:translateX(-50%);background:center bottom/contain no-repeat;pointer-events:none;filter:drop-shadow(0 6px 12px rgba(0,0,0,.8));animation:bsCrest .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes bsCrest{from{transform:translate(-50%,10px) scale(.92);opacity:0}}
+@container main (max-height: 360px){ .bs-crest{top:-50px;height:82px} .dlg.bs-res .dlg-h{padding-top:34px} }
+
+/* ---------- легенда «Знаки» ---------- */
+.bt-legend{border:12px solid transparent;border-image:url('../assets/art/bhud/panel.png') 115 70 115 70 / 12px stretch;border-radius:0}
+.bt-legend.static{border-image:none;border:1px solid var(--iron);border-radius:10px}
+.bt-legend .si2{width:20px;height:20px}
+.bs-lg-hp{display:block;position:relative;width:62px}
+.bs-lg-hp>.bar.hp{display:block;height:11px;border-radius:2px;overflow:visible}
+.bs-lg-hp>.bar.hp>.hpn,.bs-lg-hp>.bar.hp>.shn{position:absolute;z-index:2;top:50%;transform:translateY(-50%);font:700 8.5px/1 var(--f-u);color:#fff;text-shadow:0 0 2px #000,0 0 3px #000;white-space:nowrap}
+.bs-lg-hp>.bar.hp>.hpn{left:3px}
+.bs-lg-hp>.bar.hp>.shn{right:3px;color:#bfeaff}
+.bs-lg-rnd{display:grid;place-items:center;width:30px;height:32px;background:url('../assets/art/bhud/round.png') center/contain no-repeat;font:700 13px/1 var(--f-d);color:var(--parch);padding-top:4px}
+.bs-lg-num{display:flex;gap:6px;align-items:baseline}
+.bs-lg-num b{font:800 13px/1 var(--f-u);-webkit-text-stroke:2px rgba(6,7,9,.9);paint-order:stroke fill}
+.bs-lg-num b.bsn-d{color:#ff8a74}
+.bs-lg-num b.bsn-c{color:#ffd36a;font-size:14px}
+.bs-lg-num b.bsn-g{color:#7ef0a8}
+.bs-lg-num b.bsn-s{color:#9fdcff}
+
+/* ---------- UI-кит ---------- */
+.bs-k-frs{display:flex;flex-wrap:wrap;gap:18px 26px;align-items:flex-end;padding-top:20px}
+.bs-k-fr{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.bs-k-fr figcaption{font-size:11px;color:var(--parch-2)}
+.bs-k-fr .bsf>img{object-position:50% 18%}
+.bs-k-sts{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:8px}
+.bs-k-st{margin:0;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bs-k-st img{width:40px;height:40px;border-radius:50%;box-shadow:0 0 0 2px var(--iron-2)}
+.bs-k-st figcaption{font-size:10px;color:var(--parch-3)}
+.bs-k-abs{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px}
+.bs-k-ab{margin:0;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
+.bs-k-ab img{width:48px;height:48px;border-radius:8px;box-shadow:0 0 0 1px var(--iron-2)}
+.bs-k-ab figcaption{max-width:100%;font-size:9.5px;line-height:1.2;color:var(--parch-3);text-align:center;overflow-wrap:anywhere}
+.bs-k-vxs{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px}
+.bs-k-vx{margin:0;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bs-k-vx span{display:block;width:64px;height:64px;border-radius:8px;background:#0a0c0e center/contain no-repeat;box-shadow:0 0 0 1px var(--iron)}
+.bs-k-vx figcaption{font-size:10px;color:var(--parch-3)}
+.bs-k-tbl td{font-size:12px}
+
+/* ---------- «меньше движения» ---------- */
+@media (prefers-reduced-motion:reduce){
+  .bc.turn .face::after,.bc.turn::before{animation:none}
+  .fly,.fly.crit{animation-name:bsFlyCalm}
+  .bs-call,.bs-call.ult,.bt-banner.bs-ban,.bs-rflash,.bs-transit,.bs-loot,.bs-taken{animation-name:bsFade}
+  /* общее правило index.html гасит все анимации мгновенно — сведениям (числа, надписи, плашки, песок) их длительность возвращает --bs-d:
+     видны столько же, сколько без «меньше движения», только гаснут на месте */
+  .fly,.fly.crit,.bs-call,.bs-call.ult,.bt-banner.bs-ban,.bs-rflash,.bs-transit,.bs-loot,.bs-taken,.bs-taken .sand>i{animation-duration:var(--bs-d,1s)!important}
+  .bs-crest{animation:none}
+  .bc.falling{animation:none}
+  .bt-side.f.enter .bc{animation:none}
+  .bc .face>.fxl.go{animation:none}
+}
+@keyframes bsFlyCalm{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+@keyframes bsFade{0%{opacity:0}20%{opacity:1}80%{opacity:1}100%{opacity:0}}

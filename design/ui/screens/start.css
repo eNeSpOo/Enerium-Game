@@ -69,6 +69,119 @@
   .g .ob-scrim,.g .ob-card,.g .ob-glow,.g .ob-r1,.g .ob-n,.g .ob-t,.g .ob-rw,.g .ob-rw::after,.g .ob-open,.g .ob-act .btn.go{animation:none}
 }
 :is(.g,.ob-kit) .ob-card.still,:is(.g,.ob-kit) .ob-card.still *{animation:none!important}
+/* арт окна уровня — п. 4 очереди (assets/art/start/): рама листа — border-image со срезом листа (--ob-sl) и выносом наружу, чтобы
+   рама не съела место содержимого; середина листа — тёмный камень со светом снизу — вместо прежнего фона. Медальон — под числом вместо
+   кольца опыта, вспышка — за ним один раз и у каждой награды вместо прежнего кольца. Без выгрузки классов fr, bs, md нет — вид прежний */
+:is(.g,.ob-kit) .ob-card.fr{width:min(720px,calc(100% - 56px));border:1px solid transparent;border-image-source:var(--ob-fr);border-image-slice:var(--ob-sl,150) fill;border-image-width:40px;border-image-outset:10px;border-image-repeat:stretch;
+  background:#121518;box-shadow:0 40px 90px rgba(0,0,0,.85)}
+:is(.g,.ob-kit) .ob-card.fr::before,:is(.g,.ob-kit) .ob-card.fr::after{display:none}
+:is(.g,.ob-kit) .ob-card.fr .ob-glow{opacity:.6}
+.g .ob-pop:has(.ob-card.fr) .ob-card{max-height:calc(100% - 26px)}
+:is(.g,.ob-kit) .ob-hd .ob-md{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 8px 16px rgba(0,0,0,.75));animation:ob-md .6s cubic-bezier(.2,.9,.25,1.15) .08s both}
+:is(.g,.ob-kit) .ob-hd.md .ob-ring{display:none}
+:is(.g,.ob-kit) .ob-hd.md .ob-n{font-size:56px;padding-bottom:6px}
+:is(.g,.ob-kit) .ob-hd .ob-bs{position:absolute;left:-45%;top:-45%;width:190%;height:190%;max-width:none;pointer-events:none;opacity:0;animation:ob-bs 1.7s ease-out .22s both}
+:is(.g,.ob-kit) .ob-card.bs .ob-rw::after{border:0;border-radius:0;width:96px;height:96px;margin:-48px 0 0 -48px;background:var(--ob-bs) center/contain no-repeat}
+:is(.g,.ob-kit) .ob-ops li:has(.ob-oi){height:26px;padding-left:3px;gap:5px}
+:is(.g,.ob-kit) .ob-oi{width:20px;height:20px;flex:none;border-radius:4px;object-fit:cover;box-shadow:0 0 0 1px rgba(177,145,90,.35)}
+:is(.g,.ob-kit) .ob-xpi{width:18px;height:18px;margin-right:5px;vertical-align:-4px;border-radius:3px;object-fit:cover}
+.g .ob-lock .ob-lka{width:72px;height:72px;border-radius:8px;object-fit:cover;box-shadow:0 0 0 1px rgba(177,145,90,.35),0 10px 24px rgba(0,0,0,.6)}
+/* узкий кадр 844 × 390: окно уровня 6 с рецептом занимает почти всю высоту — рама тоньше и выносится наружу на 9 px */
+.g.sm .ob-card.fr{border-image-width:32px;border-image-outset:9px}
+.g.sm .ob-pop:has(.ob-card.fr) .ob-card{max-height:calc(100% - 22px)}
+.g.sm .ob-hd.md .ob-n{font-size:46px}
+/* узкий кадр: у длинного списка (больше OB_VIEW.opsMany — уровень 10) знак только у главного открытия, иначе список не помещается по высоте */
+.g.sm .ob-ops.many li:not(.main) .ob-oi{display:none}
+.g.sm .ob-ops.many li:not(.main):has(.ob-oi){height:22px;padding-left:8px}
+.g.sm .ob-ops li:has(.ob-oi){height:24px;gap:5px}
+.g.sm .ob-ops .ob-oi{width:18px;height:18px}
+@keyframes ob-md{from{opacity:0;transform:scale(.72) rotate(-10deg)}}
+@keyframes ob-bs{0%{opacity:0;transform:scale(.5) rotate(0deg)}22%{opacity:1}100%{opacity:0;transform:scale(1.15) rotate(36deg)}}
+@media (prefers-reduced-motion:reduce){
+  .g .ob-hd .ob-md{animation:none}
+  .g .ob-hd .ob-bs{animation:none;opacity:0}
+}
+
+/* ===== обучение по сценарию и пропуск (ADR-0040) ===== */
+/* «Пропустить обучение» — тихая ссылка слева в ряду действий окна уровня */
+:is(.g,.ob-kit) .ob-act .ob-skip{margin-right:auto;font-size:12px;letter-spacing:.06em;color:var(--parch-3)}
+:is(.g,.ob-kit) .ob-act .ob-skip:hover{color:var(--parch)}
+/* первый рецепт целиком: ресурсы с количеством → итог; в окне уровня — под словом проводника, у стола — в пометке Этриона */
+:is(.g,.ob-kit) .ob-rcp{display:flex;flex-direction:column;gap:4px;margin-top:2px}
+.g .ob-rc{display:flex;align-items:center;flex-wrap:nowrap;gap:6px;min-width:0}
+.g .ob-rc-w{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0;text-align:center}
+.g .ob-rc-w .well{--s:44px}
+.g .ob-rc-w b{font:700 13px/1.1 var(--f-u);color:var(--parch)}
+.g .ob-rc-w small{font:11.5px/1.1 var(--f-u);color:var(--parch-2);max-width:84px;overflow-wrap:anywhere}
+.g .ob-rc-w.out b{font:600 14px/1.1 var(--f-d);color:var(--gold);max-width:96px}
+.g .ob-rc-op{font:600 18px/1 var(--f-d);font-style:normal;color:var(--gold-2);padding:0 1px;margin-bottom:22px}
+.g .ob-rc-op.eq .i{width:18px;height:18px;color:var(--gold)}
+.g .ob-card.rc .ob-say p{font-size:14px}
+.g.sm .ob-rc-w .well{--s:38px}
+.g.sm .ob-rc-op{margin-bottom:16px}
+/* пометка Этриона у стола: тот же лист, что у ресурса, — с рецептом целиком и кнопкой «Выложить на стол»; ячейки рецепта светятся.
+   Лист тёмный: подписи — светлым пергаментом, как текст пометки */
+.g .ws-note.ob-hint{max-width:236px;padding-bottom:12px}
+.g .ob-hint .cr-hint-h{text-wrap:balance}
+.g .ob-hint .ob-rc{justify-content:center;gap:4px;margin:4px 0 2px}
+.g .ob-hint .ob-rc-w .well{--s:36px}
+.g .ob-hint .ob-rc-w small{display:none}
+.g .ob-hint .ob-rc-w b{font-size:12.5px;color:#f0d79c}
+.g .ob-hint .ob-rc-w.out b{font:600 13px/1.1 var(--f-d);color:#f0d79c;max-width:76px}
+.g .ob-hint .ob-rc-op{font-size:15px;color:#cdb37a;margin-bottom:16px}
+.g .ob-hint .ob-rc-op.eq .i{width:15px;height:15px;color:#cdb37a}
+.g .ob-hint .cr-hint-t p{margin:0}
+.g .ob-hint .ob-hint-go{align-self:center;margin-top:6px;max-width:100%;white-space:nowrap}
+.g.sm .ob-hint .ob-rc-w .well{--s:32px}
+.g .ws-cell.ob-hl{box-shadow:0 0 0 3px rgba(72,229,212,.75),0 0 22px 4px rgba(72,229,212,.45);animation:ob-hl 1.6s ease-in-out infinite}
+@keyframes ob-hl{50%{box-shadow:0 0 0 3px rgba(72,229,212,.35),0 0 10px 2px rgba(72,229,212,.2)}}
+/* замок действия вне шага обучения: приглушено, замок перед подписью, причина — подсказкой и сообщением при нажатии */
+.g .ob-lk{opacity:.5;filter:grayscale(.55);cursor:not-allowed}
+.g .ob-lk .ob-lki{width:13px;height:13px;margin-right:4px;flex:none;vertical-align:-1px}
+/* кнопка текущего шага светится */
+.g .ob-nx{outline:2px solid rgba(72,229,212,.8);outline-offset:3px;animation:ob-nx 1.6s ease-in-out infinite}
+@keyframes ob-nx{50%{outline-color:rgba(72,229,212,.25)}}
+.g .ob-cta .i{width:16px;height:16px;margin-right:6px}
+/* настройки: строка «Обучение» */
+.g .ob-setrow .btn{white-space:nowrap}
+@media (prefers-reduced-motion:reduce){ .g .ws-cell.ob-hl,.g .ob-nx{animation:none} }
+/* подтверждение пропуска: что получит игрок — плотно, чтобы итог читался без прокрутки */
+.g .ob-sk .dlg-b{display:flex;flex-direction:column;gap:5px}
+.g .ob-sk-lead{margin:0;font:14px/1.3 var(--f-u);color:var(--parch-2)}
+.g .ob-sk-hs,.g .ob-sk-cur,.g .ob-sk-ru{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:5px}
+.g .ob-sk-cur li,.g .ob-sk-ru li{display:flex;align-items:center;gap:5px;min-height:34px;padding:2px 8px;border-radius:4px;background:#0e1114;border:1px solid var(--iron)}
+.g .ob-sk-cur small,.g .ob-sk-ru small{font:12px/1.15 var(--f-u);color:var(--parch-2)}
+.g .ob-sk-cur li.ob-sk-lv,.g .ob-sk-cur li.ob-sk-cy{border-color:rgba(177,145,90,.5)}
+.g .ob-sk-lv b{font:600 22px/1 var(--f-d);color:var(--gold);font-variant-numeric:lining-nums}
+.g .ob-sk-cy b{font:600 16px/1 var(--f-d);color:var(--parch)}
+.g .ob-sk-art b{font:600 13.5px/1.15 var(--f-u);white-space:nowrap}
+.g .ob-sk-ai{flex:none;width:26px;height:26px;display:grid;place-items:center;border-radius:50%;overflow:hidden;background:#0a0c0e}
+.g .ob-sk-ai img{width:100%;height:100%;object-fit:cover}
+.g .ob-sk-ai .wn-relic-c{display:grid;place-items:center;width:100%;height:100%;color:var(--gold)}
+.g.sm .ob-sk-art small{display:none}
+.g .ob-sk-hs{flex-wrap:nowrap}
+.g .ob-sk-h{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:6px;padding:3px 6px 3px 3px;border-radius:4px;background:#0e1114;border:1px solid var(--iron)}
+.g .ob-sk-h img{flex:none;width:28px;height:34px;object-fit:cover;object-position:50% 18%;border-radius:3px}
+.g .ob-sk-ht{display:flex;flex-direction:column;min-width:0}
+.g .ob-sk-h b{font:600 13px/1.15 var(--f-u);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g .ob-sk-h small{font:11.5px/1.15 var(--f-u);color:var(--parch-2)}
+.g .ob-sk-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.g .ob-sk-ru .well{--s:28px}
+.g .ob-sk-st{flex:1 1 220px;margin:0;display:flex;align-items:center;gap:8px;font:12.5px/1.3 var(--f-u);color:var(--parch-2)}
+.g .ob-sk-ch{display:flex;gap:2px;flex:none}
+.g .ob-sk-ch .zp-cp{width:34px}
+.g .ob-sk-op{margin:0;font:12px/1.35 var(--f-u);color:var(--parch-2)}
+.g .ob-sk-opw{display:flex;flex-direction:column;gap:5px}
+/* узкий экран: «Открыто» — строкой с текстом, иначе подтверждение не помещается по высоте */
+.g.sm .ob-sk-opw{display:block}
+.g.sm .ob-sk-opw .eyebrow{display:inline;margin-right:8px}
+.g.sm .ob-sk-opw .ob-sk-op{display:inline}
+.g.sm .ob-sk-ru small,.g.sm .ob-sk-m small{display:none}
+.g.sm .ob-hint .cr-hint-t p{display:none}
+.g .ob-sk-op::first-letter{text-transform:uppercase}
+/* записка Убежища: «Пропустить обучение» — тихо в правом верхнем углу, рядом с «Шаг обучения» */
+.g .sh-next-b .ob-skip{position:absolute;top:11px;right:14px;font-size:10.5px;letter-spacing:.06em;color:var(--parch-3)}
+.g .sh-next-b .ob-skip:hover{color:var(--parch)}
 
 /* ===== лист «Уровень Странника» ===== */
 .g .ob-sh-h{gap:14px;align-items:center}

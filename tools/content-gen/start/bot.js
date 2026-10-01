@@ -10,14 +10,20 @@
    5. пробить предел первому, кто упёрся в потолок, если рун хватает;
    6. дух — в уровни: первым качается самый низкий, пока хватает духа и не упёрлись в потолок;
    7. босс биома пал, страж ещё нет, ключи есть и отряд не тот, что уже проиграл стражу, — к стражу; иначе — забег.
-   Мир W: st() — снимок; claim() — уровни и награды, окна закрыты; hire(id), levelUp(id), valor(id), limit(id), craft(cells),
-   run(биом), guard(биом) — операции; entry(биом) — ключей за вход к стражу; levelCost(n) — дух за уровень n.
-   Снимок: { lvl, cycle, slots, gold, spirit, keys, train, runes, heroes: [{ id, lvl, cap, lim, valor, maxV }], front, boss, guard,
-   recipe, craft, has(id, n) }. Только целые. */
+   Шаги сценария сверх боя (D.tut, ADR-0040) — сразу, как только открыты и по карману: сундук уровня (2а — после найма), покупка Лавки
+   (2б), первый артефакт — купить и поднять до своего уровня (5а — после найма и предела, до духа).
+   Каждое действие пишется в журнал (log) по порядку: из него сборщик собирает сценарий обучения (ADR-0040) — шаги, которые прототип
+   разрешает игроку по одному. Дух в уровни — запись 'lvl' на каждый поднятый уровень: подряд идущие сборщик сводит в один шаг.
+   Мир W: st() — снимок; claim() — уровни и награды, окна закрыты; hire(id), levelUp(id), valor(id), limit(id), craft(cells, рецепт),
+   open() — сундук сценария, buy(предмет) — покупка Лавки, art(артефакт, уровень), run(биом), guard(биом) — операции; entry(биом) —
+   ключей за вход к стражу; levelCost(n) — дух за уровень n.
+   Снимок: { lvl, cycle, slots, gold, spirit, souls, keys, train, runes, heroes: [{ id, lvl, cap, lim, valor, maxV }], front, boss, guard,
+   recipe, craft, stock, shop, arts — открыты ли Запасы, Лавка, артефакты; chest — сундук сценария в запасах; bought — покупка Лавки;
+   art — { артефакт: уровень }; has(id, n) }. Только целые. */
 'use strict';
 
 function play(W, D, opt = {}) {
-  const B = D.bot, order = D.heroes.map(h => h.id), log = [], steps = [];
+  const B = D.bot, order = D.heroes.map(h => h.id), log = [], steps = [], TUT = D.tut || {};
   const lastLoss = {};
   const say = (kind, x) => { const s = W.st(); log.push(Object.assign({ kind, lvl: s.lvl, ms: W.ms() }, x || {})); };
   /* уровни с прошлого раза: [{ L, ms }] — посреди забега их берёт мир, миг — его время */
@@ -37,9 +43,15 @@ function play(W, D, opt = {}) {
         if (!W.hire(order[k])) break;
         say('hire', { id: order[k] }); claim(); acted = true;
       }
+      /* 2а. сундук сценария — как только он в запасах */
+      s = W.st();
+      if (TUT.chest && s.stock && s.chest && W.open()) { say('chest', { no: TUT.chest.no }); claim(); acted = true; }
+      /* 2б. Лавка — покупка сценария, как только Лавка открыта и золота хватает */
+      s = W.st();
+      if (TUT.shop && s.shop && !s.bought && s.gold >= TUT.shop.cost && W.buy(TUT.shop.buy)) { say('shop', { id: TUT.shop.buy }); claim(); acted = true; }
       /* 3. первый рецепт */
       s = W.st();
-      if (s.craft && !s.recipe && B.recipe.cells.every(([id, q]) => s.has(id, q)) && W.craft(B.recipe.cells)) { say('recipe'); claim(); acted = true; }
+      if (s.craft && !s.recipe && B.recipe.cells.every(([id, q]) => s.has(id, q)) && W.craft(B.recipe.cells, B.recipe.r)) { say('recipe', { r: B.recipe.r }); claim(); acted = true; }
       /* 4. руна обучения */
       s = W.st();
       if (s.train > 0) { const h = s.heroes.find(x => x.id === D.train && x.valor === 0 && x.maxV > 0); if (h && W.valor(h.id)) { say('valor', { id: h.id }); claim(); acted = true; } }
@@ -51,6 +63,11 @@ function play(W, D, opt = {}) {
         if (!W.limit(h.id)) break;
         say('limit', { id: h.id }); claim(); acted = true;
       }
+      /* 5а. первый артефакт — как только артефакты открыты, а золота и душ хватает */
+      s = W.st();
+      if (TUT.art && s.arts && s.art[TUT.art.id] == null && s.gold >= TUT.art.gold && s.souls >= TUT.art.souls && W.art(TUT.art.id, TUT.art.lv)) {
+        say('art', { id: TUT.art.id, lv: TUT.art.lv }); claim(); acted = true;
+      }
       /* 6. дух — в уровни, первым самый низкий; при равных — по порядку найма */
       for (;;) {
         s = W.st();
@@ -59,6 +76,7 @@ function play(W, D, opt = {}) {
         const h = c[0];
         if (s.spirit < W.levelCost(h.lvl + 1)) break;
         if (!W.levelUp(h.id)) break;
+        say('lvl', { id: h.id, to: h.lvl + 1 });
         acted = true;
       }
       if (claim()) acted = true;

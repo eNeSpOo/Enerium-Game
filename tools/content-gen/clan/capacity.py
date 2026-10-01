@@ -7,6 +7,9 @@
 - sets.py — длина циклов II и III (CYCLE_LEN). Циклы IV–VI — длиной цикла III: так их считает echo.py (TEMPLATE).
 Сила отряда нужна кланову боссу: круг 1 ставится по отряду обычного игрока на первый день цикла II, неделя эталонных кланов —
 по силе их отрядов в неделях цикла. Очки контрактов в резервуар калькулятор клана берёт из design/ui/contracts.js (EN_CONTRACTS.econ).
+Норма цикла (ADR-0042, «Клан и разные циклы»): norm — средняя сила главного отряда обычного игрока за цикл, по всем дням цикла.
+Клановый босс ставит цель в цикле атакующего: копия круга k для цикла c сильнее копии цикла II во столько раз, во сколько норма цикла c
+больше нормы цикла II. Так игрок цикла V бьёт свою копию так же, как игрок цикла II — свою, и урон засчитывается долей здоровья цели.
 
     python tools/content-gen/clan/capacity.py           # записать capacity.json рядом
     python tools/content-gen/clan/capacity.py --check   # только сверить, что capacity.json свежий
@@ -43,17 +46,25 @@ def power(prof, c):
     return [int(p) for _, p in EC.cycle_days(prof, c)]
 
 
+def norm(c):
+    """Норма цикла c для кланового босса: средняя сила отряда обычного игрока за все дни цикла, вниз до целого (ADR-0042)."""
+    days = power('обычный', c)
+    return sum(days) // len(days)
+
+
 def build():
     data = {
         'meta': {
             'builder': 'tools/content-gen/clan/capacity.py',
             'sources': ['tools/content-gen/economy/echo.py', 'tools/content-gen/economy/sets.py', 'tools/content-gen/economy/economy.py'],
-            'note': 'power — 12 + уровень главного отряда на начало каждого дня цикла; циклы IV–VI — по образцу III, как в echo.py',
+            'note': 'power — 12 + уровень главного отряда на начало каждого дня цикла; циклы IV–VI — по образцу III, как в echo.py; '
+                    'norm — средняя сила отряда обычного игрока за цикл: копия цели кланового босса в цикле атакующего (ADR-0042)',
         },
         'hours': {k: dict(E.PROFILES)[v] for k, v in PROFILES.items()},
         'lvlDiv': EC.LVL_DIV,
         'cycleDays': {str(c): cycle_len(c) for c in CYCLES},
         'power': {k: {str(c): power(prof, c) for c in CYCLES} for k, prof in PROFILES.items()},
+        'norm': {str(c): norm(c) for c in CYCLES},
     }
     for k in PROFILES:
         for c in CYCLES:

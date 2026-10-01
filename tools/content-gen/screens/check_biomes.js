@@ -18,6 +18,10 @@
       смена биома — прежний фон гаснет поверх нового; демо открывает «Спуск» на рубеже.
       Бестиарий — лист OV.dsbest: 14 обитателей своего биома по полкам, неизученные без имени, карточка — с возвратом к списку,
       «В Летописи» — книга на враге этого биома. Фоны выгружены и стоят в tools/art-gen/ui-art.json.
+   8б. «Спуск» на уровне AAA (слова автора 01.10.2026) — законы descent_laws.js, каждый проверен мутацией: путь вниз со слотами биомов
+      и медальонами биомов; путь внутри биома тремя камнями, вход к стражу — в его строке; метка состояния; одна главная кнопка с отрядом
+      и мощью, заняты слоты — закрыта с причиной; лист «Отряд для спуска» в материале окна; толщины нитей и рамок — из данных (SHL_VIEW);
+      состояния различимы; окно помещается на 932 × 430 и 844 × 390.
    9. Арт: портрет и арена — выгруженный файл из списка готовых или заглушка data:, битых адресов нет; без готовности — заглушка.
    10. Забег и бой — на арене и с врагами своего биома; итог забега — тексты своего биома, после стража биома 2 — слово Этриона.
    11. Рунный страж: у пройденного биома 2 вход открыт, у рубежа 3 — после босса, демо-вход — всегда; удар стража отнимает раунд.
@@ -37,8 +41,9 @@ const err = [], out = { battles: 0, runs: 0, views: 0, uniques: 0 };
 const fail = m => { if (err.length < 80) err.push(m); };
 const done = () => {
   if (err.length) { console.log('ОШИБКИ:\n' + err.map(e => '  ✗ ' + e).join('\n')); process.exit(1); }
-  console.log(`Биомы 2–4: боёв ядра ${out.battles}, забегов прототипа ${out.runs}, отрисовок ${out.views}, уникальных способностей сработало ${out.uniques}.`);
-  console.log('Проверка пройдена: данные и ядро биомов 2–4, темп, «Спуск», арены и портреты, забег, страж, бестиарий и сценарии — без исключений, undefined и NaN.');
+  console.log(`Биомы 2–4: боёв ядра ${out.battles}, забегов прототипа ${out.runs}, отрисовок ${out.views}, уникальных способностей сработало ${out.uniques}; законы фарма поймали поломок ${out.mut || '—'}.`);
+  if (out.ds) console.log(`«Спуск» AAA: законов сверено ${out.ds.laws}, мутаций поймано ${out.ds.mut}; ${(out.dsNote || []).join('; ')}.`);
+  console.log('Проверка пройдена: данные и ядро биомов 2–4, темп, «Спуск», арены и портреты, забег, страж, бестиарий и сценарии — без исключений, undefined и NaN; фарм старых биомов — ритуал этажа, полные биомы 1–2 с цикла II, рунный ключ с каждого босса, уникальный реже, артефакты в добыче.');
   process.exit(0);
 };
 const scan = (key, h) => { const m = String(h).match(/.{0,50}(?:undefined|NaN|\[object ).{0,30}/); if (m) fail(`${key}: в разметке undefined, NaN или [object — «${m[0]}»`); return h; };
@@ -158,6 +163,184 @@ try {
   else for (const v of X.pace.verdict || []) if (!v.ok) fail(`темп: «${v.what}» — ${v.got}, цель — ${v.goal}`);
 } catch (e) { fail('ядро: исключение — ' + String(e && e.stack || e).split('\n').slice(0, 3).join(' | ')); }
 
+/* ================== 15. фарм старых биомов (ADR-0044) — законы ядра ==================
+   Каждый закон — функция (tag) → список нарушений: её же зовёт проверка мутацией (раздел 16).
+   Р — ритуал этажа: время взятого этажа ядра — max(бой, минимум своего вида), проигранного — бой; сверхсильный отряд проходит всё,
+       и у этажа с одним врагом ритуал добавляет время — удар насмерть не короче ритуала.
+   В — варианты: короткие биомы 1–2 — только в цикле I; с цикла II — полные (35 этажей, 12 элит, осада, страж — рунный и четыре элиты,
+       здоровье без поправок обучения); id биома один, вариант ставит atCycle, variantOf — та же запись.
+   К — рунный ключ с каждого босса биома с шансом: с цикла II, частота — шанс ядра (тот же, что в recipes.js), ключей — цикл биома;
+       отмычки Странника поднимают шанс ровно до потолка, выше потолка — нет; с элит и в цикле I — никогда.
+   У — уникальный босса в старом биоме реже: доля обычного шанса меньше 100 %, частота в старом — доля от частоты в своём.
+   А — артефакты Странника в добыче: у каждого артефакта с примитивом добычи ядро его знает; золото, дух, души с босса, верхняя граница
+       базовых, шансы рунного ключа и уникального — сдвигаются ровно на прибавку. */
+globalThis.window = globalThis; require(path.join(UI, 'wanderer.js'));
+const WNA = globalThis.EN_WANDERER && globalThis.EN_WANDERER.art;
+const FARM_N = 4000;   // бросков на частоту: при 10 % три сигмы — около 1,4 п. п.
+const strongSq = (k, L) => S0.SQUAD.map(h => EB.heroSrcValor(Object.assign({}, h, { lvl: L, valor: h.valor, cycle: k })));
+/* бой с павшим боссом последнего этажа — без героев (без фарм-пассивок): только добыча ядра */
+function bossDown(id) {
+  const B = EB.BIOMES[id], b = EB.create({ mode: 'rounds', seed: 1, heroes: [], foes: EB.floorFoes(id, B.floors.length, null) });
+  b.win = true; b.over = true; for (const u of b.u[1]) { u.alive = false; u.hp = 0; }
+  return b;
+}
+/* частота: сколько раз из FARM_N бросков сработало, б. п.; этаж — сид потока добычи (за последним этажом биома — свой сид на каждый бросок) */
+function freqBp(id, b, X0, key) {
+  let hit = 0, sum = 0; const off = EB.BIOMES[id].floors.length + 1000;
+  for (let i = 0; i < FARM_N; i++) { const L = EB.floorLoot(id, off + i, b, X0); if (L[key] > 0) { hit++; sum += L[key]; } }
+  return { bp: Math.floor(hit * 10000 / FARM_N), per: hit ? sum / hit : 0 };
+}
+function lawRitual(tag) {
+  const o = [], M = EB.RULES.floor.minMs, was = EB.cycleAt();
+  if (!M || ['o', 'e', 'b', 'guard'].some(k => !Number.isInteger(M[k]) || M[k] <= 0)) return [`${tag}: RULES.floor.minMs — нет целого минимума по видам o, e, b, guard`];
+  try {
+    for (const c of [1, 2]) {
+      EB.atCycle(c);
+      for (const id of ['b1', 'b2', 'b3']) {
+        const B = EB.BIOMES[id]; let cur = strongSq(6, 1200), padded = 0;
+        for (let f = 1; f <= B.floors.length; f++) {
+          const g = B.floors[f - 1].g, b = EB.run(EB.floorBattle(cur, id, f, null, 'rounds'));
+          if (!b.win) { o.push(`${tag}: ${id} · цикл ${c}: сверхсильный отряд не взял ${f}-й этаж`); break; }
+          if (b.t !== Math.max(b.fightMs, M[g]) || b.ritualMs !== b.t - b.fightMs) { o.push(`${tag}: ${id} · цикл ${c} · ${f}-й этаж (${g}): бой ${b.fightMs}, этаж ${b.t}, минимум ${M[g]}`); break; }
+          if (b.ritualMs > 0) padded++;
+          cur = EB.carry(cur, b);
+        }
+        if (!padded) o.push(`${tag}: ${id} · цикл ${c}: ни один этаж удара насмерть не дотянут до ритуала`);
+        const gb = EB.run(EB.guardBattle(strongSq(6, 1200), id, 'rounds'));
+        if (!gb.win || gb.t !== Math.max(gb.fightMs, M.guard)) o.push(`${tag}: ${id} · цикл ${c} · страж: бой ${gb.fightMs}, время ${gb.t}, минимум ${M.guard}`);
+      }
+      /* проигранный этаж — время боя, ритуала нет */
+      const lost = EB.run(EB.floorBattle(S0.SQUAD.map(h => S0.hero(h.id, 1, 0)), 'b3', 35, null, 'rounds'));
+      if (lost.win || lost.t !== lost.fightMs || lost.ritualMs) o.push(`${tag}: проигранный этаж дотянут до ритуала — бой ${lost.fightMs}, время ${lost.t}`);
+    }
+  } finally { EB.atCycle(was); }
+  return o;
+}
+function lawVariant(tag) {
+  const o = [], was = EB.cycleAt(), keys = Object.keys(EB.BIOMES).join();
+  const tut = { b1: EB.FLOORS_TUTOR, b2: X.biomes.b2.core.floors };
+  try {
+    for (const c of [1, 2, 3, 6]) {
+      EB.atCycle(c);
+      for (const id of ['b1', 'b2']) {
+        const B = EB.BIOMES[id], V = EB.variantOf(id, c), full = B.full;
+        if (!full) { o.push(`${tag}: у ${id} нет полного варианта`); continue; }
+        if (V.floors !== B.floors || V.variant !== B.variant) o.push(`${tag}: ${id} · цикл ${c}: variantOf и atCycle дают разное`);
+        if (c === 1) {
+          if (B.variant !== 'tut' || JSON.stringify(B.floors) !== JSON.stringify(tut[id]) || B.siege !== false) o.push(`${tag}: ${id} в цикле I — не короткий обучающий (${B.floors.length} этажей, осада ${B.siege})`);
+          continue;
+        }
+        const el = B.floors.reduce((a, F) => a + F.m.filter(m => EB.FOES[m].rank === 'e').length, 0);
+        if (B.variant !== 'full' || B.floors.length !== EB.FLOORS.length || el !== 12 || B.siege !== true) o.push(`${tag}: ${id} в цикле ${c} — не полный: ${B.floors.length} этажей, ${el} элит, осада ${B.siege}`);
+        if (B.floors.some(F => F.m.length > 5) || B.floors[B.floors.length - 1].g !== 'b') o.push(`${tag}: ${id} в цикле ${c}: колода полного варианта — больше пяти врагов или босс не последним`);
+        if (B.guard.m.length !== 5 || EB.FOES[B.guard.m[0]].rank !== 'rune' || B.guard.m.slice(1).some(m => EB.FOES[m].rank !== 'e')) o.push(`${tag}: ${id} в цикле ${c}: страж — не рунный босс и четыре элиты`);
+        if (B.foeHpPct || B.bossHpPct || !(B.guardHpPct > (B.tut.guardHpPct || 0))) o.push(`${tag}: ${id} в цикле ${c}: силы обучения — враги ${B.foeHpPct}, босс ${B.bossHpPct}, страж ${B.guardHpPct}`);
+      }
+    }
+    if (Object.keys(EB.BIOMES).join() !== keys) o.push(`${tag}: переключение варианта завело новый id биома`);
+  } finally { EB.atCycle(was); }
+  return o;
+}
+function lawRuneKey(tag) {
+  const o = [], D = EB.RULES.drop.b, was = EB.cycleAt();
+  try {
+    EB.atCycle(2);
+    for (const id of ['b1', 'b2', 'b3', 'b4']) {
+      const e = RX.drops.enemies.find(x => x.biome === id);
+      if (!e || e.boss.runeKeyBp !== D.runeKeyBp) o.push(`${tag}: ${id}: шанс рунного ключа ядра ${D.runeKeyBp} б. п., в recipes.js — ${e && e.boss.runeKeyBp}`);
+    }
+    const lock = WNA ? EB.lootArt(WNA.list.filter(a => a.loot === 'runeKeyPp').map(a => ({ loot: a.loot, step: a.step, lv: a.lv }))) : {};
+    if (D.runeKeyBp + (lock.runeKeyBp || 0) !== D.runeKeyMaxBp) o.push(`${tag}: шанс ${D.runeKeyBp} б. п. и все отмычки (${lock.runeKeyBp || 0}) — не потолок ${D.runeKeyMaxBp} (§11: 10 % → 25 %)`);
+    const tol = 250;
+    for (const id of ['b1', 'b3']) {
+      const b = bossDown(id), B = EB.BIOMES[id];
+      const none = [freqBp(id, b, 0, 'runeKeys'), freqBp(id, b, { cyc: 1 }, 'runeKeys')];
+      if (none.some(x => x.bp)) o.push(`${tag}: ${id}: рунный ключ в цикле I или без цикла игрока — ${none.map(x => x.bp).join(' / ')} б. п.`);
+      const base = freqBp(id, b, { cyc: 2 }, 'runeKeys');
+      if (Math.abs(base.bp - D.runeKeyBp) > tol || base.per !== B.cycle) o.push(`${tag}: ${id}: с цикла II ключ — ${base.bp} б. п. по ${base.per}, а шанс ${D.runeKeyBp}, ключей — цикл биома ${B.cycle}`);
+      const lk = freqBp(id, b, { cyc: 2, art: lock }, 'runeKeys');
+      if (Math.abs(lk.bp - Math.min(D.runeKeyMaxBp, D.runeKeyBp + (lock.runeKeyBp || 0))) > tol || lk.bp <= base.bp + tol) o.push(`${tag}: ${id}: отмычки не подняли шанс — ${base.bp} → ${lk.bp} б. п.`);
+      const over = freqBp(id, b, { cyc: 2, art: { runeKeyBp: 9000 } }, 'runeKeys');
+      if (over.bp > D.runeKeyMaxBp + tol) o.push(`${tag}: ${id}: шанс выше потолка — ${over.bp} б. п. при потолке ${D.runeKeyMaxBp}`);
+    }
+    /* с элит — никогда: этаж элиты, павшие — элиты */
+    const B1 = EB.BIOMES.b1, ef = B1.floors.findIndex(F => F.g === 'e') + 1, be = EB.create({ mode: 'rounds', seed: 1, heroes: [], foes: EB.floorFoes('b1', ef, null) });
+    be.win = true; for (const u of be.u[1]) { u.alive = false; u.hp = 0; }
+    if (freqBp('b1', be, { cyc: 2, art: lock }, 'runeKeys').bp) o.push(`${tag}: рунный ключ падает с элиты`);
+  } finally { EB.atCycle(was); }
+  return o;
+}
+function lawUnique(tag) {
+  const o = [], D = EB.RULES.drop.b, was = EB.cycleAt(), tol = 120;
+  if (!(D.uniqueOldPct > 0 && D.uniqueOldPct < 100)) o.push(`${tag}: доля уникального в старом биоме ${D.uniqueOldPct} % — не «ниже обычного»`);
+  try {
+    EB.atCycle(3);
+    for (const [id, own, old] of [['b1', 1, 2], ['b3', 2, 3]]) {
+      const b = bossDown(id), a = freqBp(id, b, { cyc: own }, 'unique').bp, z = freqBp(id, b, { cyc: old }, 'unique').bp;
+      const want = Math.floor(D.uniqueBp * D.uniqueOldPct / 100);
+      if (Math.abs(a - D.uniqueBp) > tol || Math.abs(z - want) > tol || z >= a) o.push(`${tag}: ${id}: уникальный в своём цикле ${a} б. п., в старом ${z}, а нужно ${D.uniqueBp} и ${want}`);
+    }
+  } finally { EB.atCycle(was); }
+  return o;
+}
+function lawArt(tag) {
+  const o = [], T = EB.RULES.drop.art;
+  if (!WNA) return [`${tag}: нет design/ui/wanderer.js — артефактов Странника`];
+  const withLoot = WNA.list.filter(a => a.loot);
+  for (const a of withLoot) if (!T[a.loot]) o.push(`${tag}: артефакт «${a.n}»: примитив добычи «${a.loot}» ядру незнаком`);
+  if (withLoot.length < 7) o.push(`${tag}: артефактов с примитивом добычи ${withLoot.length} — кошель, сосуд, чаша, отмычки, чутьё, ларцы потерялись`);
+  const was = EB.cycleAt();
+  try {
+    EB.atCycle(2);
+    const b = bossDown('b1'), off = EB.BIOMES.b1.floors.length + 7, x0 = EB.floorLoot('b1', off, b, { cyc: 2 });
+    const lv = { goldPct: ['a4', 6], spiritPct: ['a5', 6], bossSouls: ['a6', 5], baseMaxE: ['a3', 6] };
+    const A = EB.lootArt(withLoot.map(a => ({ loot: a.loot, step: a.step, lv: a.lv })));
+    const x1 = EB.floorLoot('b1', off, b, { cyc: 2, art: A });
+    const step = id => (WNA.list.find(a => a.id === id) || {});
+    const g = step('a4'), s = step('a5'), c = step('a6'), e = step('a3');
+    if (x1.gold !== Math.floor(x0.gold * (100 + g.step * g.lv) / 100)) o.push(`${tag}: «${g.n}» на ${g.lv}-м: золото ${x0.gold} → ${x1.gold}`);
+    if (x1.spirit !== Math.floor(x0.spirit * (100 + s.step * s.lv) / 100)) o.push(`${tag}: «${s.n}» на ${s.lv}-м: дух ${x0.spirit} → ${x1.spirit}`);
+    if (x1.souls !== x0.souls + c.step * c.lv) o.push(`${tag}: «${c.n}» на ${c.lv}-м: души с босса ${x0.souls} → ${x1.souls}`);
+    if (x1.baseMax !== EB.BIOMES.b1.n + e.step * e.lv) o.push(`${tag}: «${e.n}» на ${e.lv}-м: верхняя граница базовых ${x1.baseMax}`);
+    const u0 = freqBp('b1', b, { cyc: 1 }, 'unique').bp, u1 = freqBp('b1', b, { cyc: 1, art: EB.lootArt([{ loot: 'uniquePp', step: 3, lv: 3 }]) }, 'unique').bp;
+    if (u1 < u0 + 600) o.push(`${tag}: «Чутьё старьёвщика» не подняло шанс уникального — ${u0} → ${u1} б. п.`);
+    void lv;
+  } finally { EB.atCycle(was); }
+  return o;
+}
+const FARM_LAWS = [['ритуал', lawRitual], ['варианты', lawVariant], ['рунный ключ', lawRuneKey], ['уникальный', lawUnique], ['артефакты', lawArt]];
+try {
+  for (const [, law] of FARM_LAWS) for (const e of law('фарм')) fail(e);
+  if (!X.farm || X.farm.sig !== X.rules.sig) fail('фарм: в biome-foes.js нет калькулятора фарма на этих данных — python tools/content-gen/biomes/farm.py, затем build.js');
+  else for (const v of X.farm.verdict || []) if (!v.ok) fail(`фарм: «${v.what}» — ${v.got}, цель — ${v.goal}`);
+  if (X.farm && ['o', 'e', 'b', 'guard'].some(k => X.farm.minMs[k] !== EB.RULES.floor.minMs[k])) fail(`фарм: ритуал ядра ${JSON.stringify(EB.RULES.floor.minMs)}, калькулятор считал ${JSON.stringify(X.farm.minMs)}`);
+} catch (e) { fail('фарм: исключение — ' + String(e && e.stack || e).split('\n').slice(0, 3).join(' | ')); }
+
+/* ================== 16. проверка мутацией: законы фарма ловят поломки ================== */
+const MUT = [];
+function mutant(name, apply, revert, law) {
+  let found = [];
+  try { apply(); found = law('мутация') || []; } catch (e) { found = ['исключение: ' + e.message]; } finally { try { revert(); } catch (_) { } }
+  MUT.push([name, found.length > 0]);
+  if (process.argv.includes('--mut')) console.log(`мутация «${name}»: ${found.length ? found.slice(0, 2).join(' | ').slice(0, 300) : 'НЕ ПОЙМАНА'}`);
+}
+{
+  const R = EB.RULES, fb0 = EB.floorBattle, mm0 = Object.assign({}, R.floor.minMs), d0 = Object.assign({}, R.drop.b), art0 = R.drop.art, from0 = EB.BIOMES.b1.full.from;
+  mutant('ритуал не соблюдён — этаж короче минимума', () => { EB.floorBattle = (...a) => { const b = fb0(...a); b.minMs = 0; return b; }; }, () => { EB.floorBattle = fb0; }, lawRitual);
+  mutant('ритуал рядовых — ноль', () => { R.floor.minMs.o = 0; }, () => { Object.assign(R.floor.minMs, mm0); }, lawRitual);
+  mutant('короткий биом 1 и в цикле II', () => { EB.BIOMES.b1.full.from = 7; }, () => { EB.BIOMES.b1.full.from = from0; }, lawVariant);
+  mutant('рунный ключ и в цикле I', () => { R.drop.b.runeKeyFrom = 1; }, () => { Object.assign(R.drop.b, d0); }, lawRuneKey);
+  mutant('рунный ключ без шанса', () => { R.drop.b.runeKeyBp = 0; }, () => { Object.assign(R.drop.b, d0); }, lawRuneKey);
+  mutant('отмычки не работают', () => { R.drop.art = Object.assign({}, art0, { runeKeyPp: ['nothing', 100] }); }, () => { R.drop.art = art0; }, lawRuneKey);
+  mutant('потолок шанса снят', () => { R.drop.b.runeKeyMaxBp = 10000; }, () => { Object.assign(R.drop.b, d0); }, lawRuneKey);
+  mutant('уникальный в старом биоме — как в своём', () => { R.drop.b.uniqueOldPct = 100; }, () => { Object.assign(R.drop.b, d0); }, lawUnique);
+  mutant('уникальный в старом биоме — чаще', () => { R.drop.b.uniqueOldPct = 150; }, () => { Object.assign(R.drop.b, d0); }, lawUnique);
+  mutant('артефакты не в добыче', () => { R.drop.art = {}; }, () => { R.drop.art = art0; }, lawArt);
+  const caught = MUT.filter(m => m[1]).length;
+  for (const [n, ok] of MUT) if (!ok) fail(`проверка мутацией: поломку «${n}» законы фарма не поймали`);
+  out.mut = `${caught} из ${MUT.length}`;
+}
+
 /* ================== прототип в песочнице ================== */
 const html = read('index.html');
 if (!html.includes('<script src="biome-foes.js"></script>') || !html.includes('<script src="screens/biomes.js"></script>')) fail('index.html не подключает biome-foes.js или screens/biomes.js');
@@ -172,13 +355,17 @@ const stubEl = id => {
   return e;
 };
 const els = {};
+/* <html>: флаги «арт загружен» и переменные (--shl-*, --sh-*) — их читает каскад законов «Спуска» (descent_laws.js) */
+const rootCls = new Set(), rootVars = {}, rootEl = stubEl('html');
+rootEl.classList = { add: c => rootCls.add(c), remove: c => rootCls.delete(c), toggle: (c, on) => { const v = on === undefined ? !rootCls.has(c) : !!on; if (v) rootCls.add(c); else rootCls.delete(c); return v; }, contains: c => rootCls.has(c) };
+rootEl.style = { setProperty: (k, v) => { rootVars[k] = v; } };
 const document = { readyState: 'loading', addEventListener() {}, getElementById: id => (els[id] = els[id] || stubEl(id)), querySelector: () => null, querySelectorAll: () => [],
-  createElement: () => stubEl(), createElementNS: () => stubEl(), body: stubEl('body'), documentElement: stubEl('html'), activeElement: null, fonts: null };
+  createElement: () => stubEl(), createElementNS: () => stubEl(), body: stubEl('body'), documentElement: rootEl, activeElement: null, fonts: null, baseURI: 'file:///ui/index.html' };
 const win = { document, console, navigator: { userAgent: 'node' }, location: { hash: '', href: '' }, history: { replaceState() {} },
   localStorage: { getItem: () => null, setItem() {} }, innerWidth: 1400, innerHeight: 900, devicePixelRatio: 1,
   addEventListener() {}, removeEventListener() {}, dispatchEvent() {}, matchMedia: () => ({ matches: false, addEventListener() {}, addListener() {} }),
   requestAnimationFrame: () => 0, cancelAnimationFrame() {}, setTimeout: () => 0, clearTimeout() {}, setInterval: () => 0, clearInterval() {},
-  getComputedStyle: () => ({ getPropertyValue: () => '' }), CustomEvent: function CustomEvent() {}, performance: { now: () => 0 } };
+  getComputedStyle: () => ({ getPropertyValue: () => '' }), CustomEvent: function CustomEvent() {}, performance: { now: () => 0 }, URL };
 win.window = win; win.self = win;
 const ctx = vm.createContext(win);
 for (const s of scripts) {
@@ -189,7 +376,7 @@ if (err.length) done();
 const T = vm.runInContext(`({
   get S() { return S; }, set S(v) { S = v; },
   ACT, OV, SCREENS, FLOWS, KH, EB, render, initialState, startRun, advance, runById, F, FA, G, BIOME_UI, ARENAS, KIT_EXTRA, renderKit, setTeam, AV,
-  BU: window.EN_BIOMES_UI, X: window.EN_BIOME_FOES, RX, gdCost, gdSame, DS: window.EN_DESCENT, bioFoes, known,
+  BU: window.EN_BIOMES_UI, X: window.EN_BIOME_FOES, RX, gdCost, gdSame, DS: window.EN_DESCENT, bioFoes, known, lootCtx,
 })`, ctx);
 const draw = key => { out.views++; T.render(); return scan(key, els.game ? els.game.innerHTML : ''); };
 const reset = () => { T.S = T.initialState(); T.S.overlay = null; T.S.wallet.souls = 1e9; };
@@ -237,7 +424,7 @@ try {
         const mine = T.bioFoes(id), k = mine.filter(f => T.known(f.id)).length;
         if (/data-a="foe"/.test(h) || /class="fig[ "]/.test(h) || /shelf/.test(h) || /\/foes\//.test(h)) fail(`${key}: в окне осталась сетка портретов обитателей`);
         if (!h.includes(`Изучено <b class="num">${k}</b> из ${mine.length}`)) fail(`${key}: нет строки «Изучено ${k} из ${mine.length}»`);
-        if (!h.includes(`data-a="sheet" data-v="dsbest:${id}"`) || !h.includes('Бестиарий</button>')) fail(`${key}: нет кнопки «Бестиарий»`);
+        if (!h.includes(`<button class="ds-best" data-a="sheet" data-v="dsbest:${id}" aria-label="Бестиарий: изучено ${k} из ${mine.length}">`)) fail(`${key}: нет кнопки «Бестиарий» с «изучено ${k} из ${mine.length}»`);
         /* состояние: этажи, босс, рунный страж */
         const B = T.EB.BIOMES[id], g = T.G(id);
         if (!h.includes(`<b>${B.floors.length}</b>`)) fail(`${key}: нет числа этажей`);
@@ -336,6 +523,9 @@ try {
       if (!uiArt.items[p]) fail(`фон ${id}: ${p} нет в tools/art-gen/ui-art.json`);
       if (!fs.existsSync(path.join(UI, 'assets', 'art', p))) fail(`фон ${id}: ${p} не выгружен`);
     }
+    /* 8б. «Спуск» на уровне AAA — законы и проверка мутацией (descent_laws.js) */
+    out.dsNote = [];
+    out.ds = require('./descent_laws.js')({ T, ctx, UI, html, fail, draw, reset, rootVars, rootCls, note: out.dsNote });
   }
   for (const id of ['b2', 'b3', 'b4']) {
     const a = T.ARENAS[id];
@@ -367,8 +557,14 @@ try {
       R.end = { kind, why: 'sand', rounds: 20 }; T.S.overlay = { t: 'result', arg: R.id };
       h = draw(`${key} · итог ${kind}`);
       if (!h.includes(want)) fail(`${key}: в итоге «${kind}» нет «${want}»`);
-      if (kind === 'guardWin' && id === 'b2' && !h.includes('Виал — это только начало')) fail('итог стража биома 2: нет слова Этриона (ADR-0018)');
-      if (kind === 'guardWin' && id !== 'b2' && h.includes('Виал — это только начало')) fail(`${key}: слово Этриона не на своём биоме`);
+      /* слово Этриона — конец обучения (ADR-0018): только у короткого леса цикла I; демо — цикл II, полный лес, слова нет (ADR-0044) */
+      if (kind === 'guardWin' && h.includes('Виал — это только начало')) fail(`${key}: слово Этриона в цикле ${T.S.acc.cycle} — оно только в цикле I`);
+      if (kind === 'guardWin' && id === 'b2') {
+        const cv = R.curve; R.curve = [];   // этажи забега — полного леса: короткий их не знает
+        T.S.acc.cycle = 1; const h1 = draw(`${key} · итог стража · цикл I`); T.S.acc.cycle = 2; R.curve = cv;
+        if (!h1.includes('Виал — это только начало')) fail('итог стража биома 2 в цикле I: нет слова Этриона (ADR-0018)');
+        draw(`${key} · снова цикл II`);
+      }
     }
   }
 
@@ -469,6 +665,44 @@ try {
     }
   }
   if (!T.FLOWS.find(x => x[0].startsWith('Рунный страж')).toString().length) fail('сценарий стража Мастерской пропал');
+
+  /* 17. фарм старых биомов в прототипе (ADR-0044): вариант по циклу аккаунта, сценарий «Фарм старого биома», цикл и артефакты в добыче */
+  const lawProto = tag => {
+    const o = [];
+    reset(); T.S.route = 'descent'; T.S.selBiome = 'b1'; draw(`${tag} · демо`);
+    if (T.EB.BIOMES.b1.variant !== 'full' || T.EB.BIOMES.b2.variant !== 'full') o.push(`${tag}: демо — цикл ${T.S.acc.cycle}, а биомы 1–2 — ${T.EB.BIOMES.b1.variant} / ${T.EB.BIOMES.b2.variant}`);
+    const ctxII = T.lootCtx();
+    if (!ctxII || ctxII.cyc !== T.S.acc.cycle || !ctxII.art) o.push(`${tag}: добыча в цикле II зовёт ядро без цикла и артефактов игрока`);
+    T.S.acc.cycle = 1; draw(`${tag} · цикл I`);
+    if (T.EB.BIOMES.b1.variant !== 'tut' || T.EB.BIOMES.b1.floors.length !== T.EB.FLOORS_TUTOR.length) o.push(`${tag}: цикл I — а биом 1 не короткий`);
+    if (T.lootCtx() !== null) o.push(`${tag}: в цикле I добыча зовёт ядро с прибавками — а её задаёт сценарий обучения`);
+    T.S.acc.cycle = 2; draw(`${tag} · снова цикл II`);
+    /* сценарий: сильный отряд бьёт с одного удара, этаж всё равно идёт свой ритуал */
+    const fl = T.FLOWS.find(x => x[0] === 'Фарм старого биома · удар насмерть');
+    if (!fl) { o.push(`${tag}: нет сценария «Фарм старого биома · удар насмерть»`); return o; }
+    reset(); fl[2]();
+    const R = T.S.runs[T.S.runs.length - 1], FF = T.BU.FARM_FLOW;
+    if (!R || R.biome !== FF.biome || R.heroes.some(h => h.cyc !== FF.cyc || h.lvl !== FF.lvl)) { o.push(`${tag}: сценарий начал не тот забег`); return o; }
+    const b0 = R.b, M = T.EB.RULES.floor.minMs;
+    T.EB.run(b0);
+    if (!(b0.win && b0.fightMs < M.o && b0.t === M.o)) o.push(`${tag}: первый этаж сценария — бой ${b0.fightMs}, этаж ${b0.t}, ритуал ${M.o}: не удар насмерть или ритуал не доигран`);
+    const k0 = T.S.wallet.keys; T.S.route = 'descent';
+    R.b = T.EB.floorBattle(R.heroes, R.biome, R.floor, null, R.mode); R.view = 0; R.endAt = null;   // тот же этаж с начала — показом
+    play(R, `${tag} · сценарий`);
+    const B = T.EB.BIOMES.b1, bound = B.floors.reduce((a, F) => a + M[F.g], 0) + (B.floors.length - 1) * T.EB.RULES.floor.gapMs;
+    if (!R.end || R.end.kind !== 'boss' || R.curve.length !== B.floors.length) o.push(`${tag}: сильный отряд не взял полную Мастерскую за забег — ${R.end && R.end.kind}, этажей ${R.curve.length}`);
+    if (R.runMs < bound) o.push(`${tag}: забег ударами насмерть — ${R.runMs} мс, короче ритуалов всех этажей (${bound})`);
+    if (T.S.wallet.keys - k0 !== (R.loot.keys || 0)) o.push(`${tag}: рунные ключи забега ${R.loot.keys || 0}, а в кошельке +${T.S.wallet.keys - k0}`);
+    return o;
+  };
+  for (const e of lawProto('фарм · прототип')) fail(e);
+  {
+    const at0 = T.EB.atCycle;
+    mutant('прототип не выбирает вариант по циклу', () => { T.EB.atCycle = () => 1; }, () => { T.EB.atCycle = at0; T.EB.atCycle(T.S.acc.cycle); }, lawProto);
+    const caught = MUT.filter(m => m[1]).length;
+    if (!MUT[MUT.length - 1][1]) fail('проверка мутацией: поломку «прототип не выбирает вариант по циклу» законы фарма не поймали');
+    out.mut = `${caught} из ${MUT.length}`;
+  }
 
   /* 14. разделы UI-кита: «Биомы спуска» и окно «Спуск» на каждом биоме */
   try {

@@ -1,0 +1,252 @@
+{
+  "sheet": "art/generated/lv-icons/lv-opens__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/account-level.json",
+  "job": "lv-opens",
+  "grid": [
+    5,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "hire",
+      "file": "art/generated/lv-icons/lv-opens/open-hire.webp",
+      "box": [
+        14,
+        26,
+        887,
+        899
+      ],
+      "px": 873,
+      "key_left": 0.0
+    },
+    {
+      "id": "descent",
+      "file": "art/generated/lv-icons/lv-opens/open-descent.webp",
+      "box": [
+        939,
+        25,
+        1815,
+        901
+      ],
+      "px": 876,
+      "key_left": 0.0
+    },
+    {
+      "id": "dev",
+      "file": "art/generated/lv-icons/lv-opens/open-dev.webp",
+      "box": [
+        1867,
+        25,
+        2743,
+        901
+      ],
+      "px": 876,
+      "key_left": 0.0
+    },
+    {
+      "id": "slot",
+      "file": "art/generated/lv-icons/lv-opens/open-slot.webp",
+      "box": [
+        2795,
+        25,
+        3671,
+        901
+      ],
+      "px": 876,
+      "key_left": 0.0
+    },
+    {
+      "id": "stock",
+      "file": "art/generated/lv-icons/lv-opens/open-stock.webp",
+      "box": [
+        3722,
+        26,
+        4595,
+        899
+      ],
+      "px": 873,
+      "key_left": 0.0
+    },
+    {
+      "id": "shop",
+      "file": "art/generated/lv-icons/lv-opens/open-shop.webp",
+      "box": [
+        14,
+        955,
+        887,
+        1828
+      ],
+      "px": 873,
+      "key_left": 0.0
+    },
+    {
+      "id": "guard",
+      "file": "art/generated/lv-icons/lv-opens/open-guard.webp",
+      "box": [
+        939,
+        953,
+        1815,
+        1829
+      ],
+      "px": 876,
+      "key_left": 0.0
+    },
+    {
+      "id": "b2",
+      "file": "art/generated/lv-icons/lv-opens/open-b2.webp",
+      "box": [
+        1867,
+        953,
+        2743,
+        1829
+      ],
+      "px": 876,
+      "key_left": 0.0
+    },
+    {
+      "id": "craft",
+      "file": "art/generated/lv-icons/lv-opens/open-craft.webp",
+      "box": [
+        2795,
+        953,
+        3671,
+        1829
+      ],
+      "px": 876,
+      "key_left": 0.0
+    },
+    {
+      "id": "valor",
+      "file": "art/generated/lv-icons/lv-opens/open-valor.webp",
+      "box": [
+        3722,
+        955,
+        4595,
+        1828
+      ],
+      "px": 873,
+      "key_left": 0.0
+    },
+    {
+      "id": "artifacts",
+      "file": "art/generated/lv-icons/lv-opens/open-artifacts.webp",
+      "box": [
+        14,
+        1887,
+        887,
+        2760
+      ],
+      "px": 873,
+      "key_left": 0.0
+    },
+    {
+      "id": "limit",
+      "file": "art/generated/lv-icons/lv-opens/open-limit.webp",
+      "box": [
+        939,
+        1885,
+        1815,
+        2761
+      ],
+      "px": 876,
+      "key_left": 0.0
+    },
+    {
+      "id": "cycle2",
+      "file": "art/generated/lv-icons/lv-opens/open-cycle2.webp",
+      "box": [
+        1867,
+        1885,
+        2743,
+        2761
+      ],
+      "px": 876,
+      "key_left": 0.0
+    },
+    {
+      "id": "echo",
+      "file": "art/generated/lv-icons/lv-opens/open-echo.webp",
+      "box": [
+        2795,
+        1885,
+        3671,
+        2761
+      ],
+      "px": 876,
+      "key_left": 0.0
+    },
+    {
+      "id": "week",
+      "file": "art/generated/lv-icons/lv-opens/open-week.webp",
+      "box": [
+        3722,
+        1887,
+        4595,
+        2760
+      ],
+      "px": 873,
+      "key_left": 0.0
+    },
+    {
+      "id": "souls",
+      "file": "art/generated/lv-icons/lv-opens/open-souls.webp",
+      "box": [
+        14,
+        2820,
+        887,
+        3693
+      ],
+      "px": 873,
+      "key_left": 0.0
+    },
+    {
+      "id": "market",
+      "file": "art/generated/lv-icons/lv-opens/open-market.webp",
+      "box": [
+        939,
+        2819,
+        1815,
+        3695
+      ],
+      "px": 876,
+      "key_left": 0.0
+    },
+    {
+      "id": "memory",
+      "file": "art/generated/lv-icons/lv-opens/open-memory.webp",
+      "box": [
+        1867,
+        2819,
+        2743,
+        3695
+      ],
+      "px": 876,
+      "key_left": 0.0
+    },
+    {
+      "id": "lock",
+      "file": "art/generated/lv-icons/lv-opens/open-lock.webp",
+      "box": [
+        2795,
+        2819,
+        3671,
+        3695
+      ],
+      "px": 876,
+      "key_left": 0.0
+    },
+    {
+      "id": "xp",
+      "file": "art/generated/lv-icons/lv-opens/open-xp.webp",
+      "box": [
+        3722,
+        2820,
+        4595,
+        3693
+      ],
+      "px": 873,
+      "key_left": 0.0
+    }
+  ]
+}

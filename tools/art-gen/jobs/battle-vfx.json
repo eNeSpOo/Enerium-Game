@@ -1,0 +1,352 @@
+{
+  "name": "Эффекты боя — рисованные спрайты и flipbook-листы (задача «Бой AAA», слово автора 01.10.2026: «сама боевая система в виде нынешних партиклов не годится, попробуй сделай ААА уровень и сгенери то, что нужно»). Листы на чёрном с пурпурными швами: свет — альфой из яркости (vfx_layers.py), игра двигает спрайты только transform и opacity",
+  "plan": {
+    "Лист vfx-core": "3:2, 4K, сетка 6×4 — удары, крит, кольцо, сфера, лучи, корона ульты, порча, бафф, лечение, купол щита, осколки щита, оглушение, лёд, песок, печать безмолвия, клич, промах, душа, пыль, выпивание, разорванная цепь",
+    "Лист vfx-school": "21:9, 4K, сетка 8×3 — по школам: снаряд, разрыв попадания, след урона и лечения со временем; восьмая колонка — без школы: стрела, искры клинка, кровь",
+    "Лист vfx-flip": "21:9, 4K, сетка 7×3 — три flipbook по 7 кадров: взрыв огня, вспышка духа, облако пыли и глины",
+    "Нарезка": "python tools/art-gen/grid_slice.py jobs/battle-vfx.json <id листа> <лист>, затем python tools/art-gen/vfx_layers.py — альфа из яркости, спрайты 256 px и ленты кадров",
+    "Выгрузка": "ui-art.json: vfx/<имя>.webp ← battle-vfx/…; данные вида — VFX_ART в design/ui/fx.js"
+  },
+  "notes": [
+    "Три листа — $0,45. Спрайт — один элемент по центру клетки на чёрном, свет тает в чёрное до шва: нарезка берёт альфу из яркости, цвет делится на альфу — свет ложится на арену без чёрной каймы",
+    "Flipbook: строка — одна анимация, кадр за кадром на той же точке и в том же масштабе; игра крутит ленту сдвигом transform по шагам — только transform и opacity",
+    "cells — [имя спрайта, имя файла] по строкам сверху, в строке слева направо; grid — [столбцы, строки]"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized visual effects (VFX) for a dark fantasy mobile RPG battle screen. Painterly digital painting with confident brush strokes, soft glowing light, bright hot cores that fade into colored glow and then into pure black, crisp bright edges on the strongest shapes. Light is the subject: every element glows from within like magic light seen at night. Colors are the carst colors of the game: scarlet fire #F0564A, amber earth #EB9D40, pale air #DFF4E5, violet darkness #A986EE, blue water #5A94F7, pale gold light #F4E6AE, green time #4FDC8B, turquoise spirit #48E5D4, old gold #DDBC7A. No photorealism, no 3D-render look, no anime, no cartoon outlines, no flat vector style.",
+  "negative": "No text, no letters, no numbers, no runes, no glyphs or marks that look like writing, no watermark, no signature, no logo, no interface elements, no frames or borders drawn inside the cells, no characters, no faces, no hands, no creatures, no ground, no floor, no scenery, no background other than pure black. No skulls, no blood splatter gore, no pentagrams, no occult signs, no crosses, no religious symbols. No magenta or pink anywhere inside the cells: magenta appears only in the gutters.",
+  "categories": {
+    "battle-vfx": {
+      "aspect": "3:2",
+      "size": "4K",
+      "refs": [],
+      "frame": "Format: a sprite sheet of separate visual effect elements for a game, painted together as one consistent set. The elements stand in a precise grid of equal cells; the number of columns and rows and the element in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Inside every cell the background is flat pure black (#000000), edge to edge, with no texture, no gradient, no vignette. Each cell holds exactly ONE effect element, centered in the cell, glowing on the black: the element fills about two thirds of the cell and stays well inside it — an empty black margin surrounds it on every side, and its glow fades to pure black before it reaches the gutters. Every element is a single, clean, bold shape that reads instantly when it flashes for a fraction of a second on a small phone screen: strong silhouette, a bright hot core, soft colored glow. All elements share the same brushwork and lighting, so they read as one set."
+    },
+    "battle-vfx-flip": {
+      "aspect": "21:9",
+      "size": "4K",
+      "refs": [],
+      "frame": "Format: a sprite sheet of flipbook animations for a game — each ROW of the grid is one animation, its frames in order from left to right. The grid has equal cells; the number of columns and rows and the animation of every row are listed below. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Inside every cell the background is flat pure black (#000000), edge to edge. In every frame the effect is centered on exactly the same point of its cell and drawn at the same scale and from the same view, so that played one after another the frames make one smooth animation; each frame differs from its neighbour only by the next step of the motion. The largest frame of each row still leaves an empty black margin on every side of its cell, and the glow fades to pure black before it reaches the gutters."
+    }
+  },
+  "jobs": [
+    {
+      "id": "vfx-core",
+      "category": "battle-vfx",
+      "title": "Эффекты боя — общие спрайты, сетка 6×4",
+      "source": "design/ui/fx.js, EnFx.KINDS",
+      "grid": [
+        6,
+        4
+      ],
+      "cells": [
+        [
+          "slash",
+          "vx-slash"
+        ],
+        [
+          "slash2",
+          "vx-slash2"
+        ],
+        [
+          "flare",
+          "vx-flare"
+        ],
+        [
+          "sparks",
+          "vx-sparks"
+        ],
+        [
+          "crit",
+          "vx-crit"
+        ],
+        [
+          "ring",
+          "vx-ring"
+        ],
+        [
+          "orb",
+          "vx-orb"
+        ],
+        [
+          "rays",
+          "vx-rays"
+        ],
+        [
+          "halo",
+          "vx-halo"
+        ],
+        [
+          "hex",
+          "vx-hex"
+        ],
+        [
+          "buff",
+          "vx-buff"
+        ],
+        [
+          "heal",
+          "vx-heal"
+        ],
+        [
+          "dome",
+          "vx-dome"
+        ],
+        [
+          "shards",
+          "vx-shards"
+        ],
+        [
+          "stun",
+          "vx-stun"
+        ],
+        [
+          "ice",
+          "vx-ice"
+        ],
+        [
+          "sand",
+          "vx-sand"
+        ],
+        [
+          "seal",
+          "vx-seal"
+        ],
+        [
+          "roar",
+          "vx-roar"
+        ],
+        [
+          "whoosh",
+          "vx-whoosh"
+        ],
+        [
+          "soul",
+          "vx-soul"
+        ],
+        [
+          "dust",
+          "vx-dust"
+        ],
+        [
+          "drain",
+          "vx-drain"
+        ],
+        [
+          "chain",
+          "vx-chain"
+        ]
+      ],
+      "subject": "Elements of strikes, spells, healing, shields and control for a battle of cards. Each element in its own color as named.\n\nThe grid: exactly 6 columns and 4 rows, 24 elements.\n\nRow 1: a single sweeping crescent slash trail of white-gold light curving from the upper left down to the lower right, a thin blazing core and a soft fading tail; two crossing crescent slash trails of white-gold light forming a sharp X, blazing thin cores; a sharp four-pointed star of white light with a blinding white core and four long thin rays; a burst of hot orange-gold sparks and short bright streaks flying outward in every direction from one bright point; a large jagged starburst of orange and gold light with many sharp uneven spikes and a white-hot centre; a single thin perfect ring of bright white light with a soft glow, completely empty and black inside.\n\nRow 2: a soft round glowing orb of white light with a bright core, fading smoothly into black; a radial burst of soft golden god-rays streaming out from a bright white-gold centre; a huge corona of white-gold light: a bright ring with long radiant spikes around a dark centre, like an eclipse; a dark violet-black swirling vortex seen from the front, thin crimson sparks caught in its spiral arms; a glowing ring of old gold light lying flat, seen from slightly above, with small golden sparkles rising from it; a soft upward column of green-gold motes of light and tiny glowing leaves rising from a warm glow below.\n\nRow 3: a translucent half-dome of turquoise light seen from the front, a bright glowing rim and a faint glassy shine on its curve; turquoise glass shards of a broken shield of light flying apart in every direction from the centre; a flat circle of small golden stars and sparks seen from slightly above, spinning; a cluster of sharp pale blue ice crystals bursting upward from one point, cold mist around them; a spiral of glowing green sand grains swirling around an empty dark centre; a circular seal of violet-white light: a glowing ring with four short sharp spikes pointing inward to an empty dark centre.\n\nRow 4: three concentric jagged red rings of a war cry bursting outward from the centre; a horizontal streak of grey-white wind, a fast whoosh line that fades to the left; a rising wisp of pale blue-grey ghostly smoke shaped like a tall flame, fading at its top; a soft burst of brown-grey dust with small pebbles of dark clay flying outward; three thin violet wisps of stolen life streaming from the left to the right, each with a small glowing head; a broken chain: three heavy dark iron links bursting apart with a flash of golden sparks."
+    },
+    {
+      "id": "vfx-school",
+      "category": "battle-vfx",
+      "title": "Эффекты боя — по школам: снаряд, разрыв, след, сетка 8×3",
+      "source": "design/ui/fx.js; школы — design/ui/abilities.js",
+      "aspect": "21:9",
+      "grid": [
+        8,
+        3
+      ],
+      "cells": [
+        [
+          "proj-fire",
+          "vx-proj-fire"
+        ],
+        [
+          "proj-earth",
+          "vx-proj-earth"
+        ],
+        [
+          "proj-air",
+          "vx-proj-air"
+        ],
+        [
+          "proj-dark",
+          "vx-proj-dark"
+        ],
+        [
+          "proj-water",
+          "vx-proj-water"
+        ],
+        [
+          "proj-light",
+          "vx-proj-light"
+        ],
+        [
+          "proj-time",
+          "vx-proj-time"
+        ],
+        [
+          "proj-steel",
+          "vx-proj-steel"
+        ],
+        [
+          "hit-fire",
+          "vx-hit-fire"
+        ],
+        [
+          "hit-earth",
+          "vx-hit-earth"
+        ],
+        [
+          "hit-air",
+          "vx-hit-air"
+        ],
+        [
+          "hit-dark",
+          "vx-hit-dark"
+        ],
+        [
+          "hit-water",
+          "vx-hit-water"
+        ],
+        [
+          "hit-light",
+          "vx-hit-light"
+        ],
+        [
+          "hit-time",
+          "vx-hit-time"
+        ],
+        [
+          "hit-steel",
+          "vx-hit-steel"
+        ],
+        [
+          "tick-fire",
+          "vx-tick-fire"
+        ],
+        [
+          "tick-earth",
+          "vx-tick-earth"
+        ],
+        [
+          "tick-air",
+          "vx-tick-air"
+        ],
+        [
+          "tick-dark",
+          "vx-tick-dark"
+        ],
+        [
+          "tick-water",
+          "vx-tick-water"
+        ],
+        [
+          "tick-light",
+          "vx-tick-light"
+        ],
+        [
+          "tick-time",
+          "vx-tick-time"
+        ],
+        [
+          "tick-steel",
+          "vx-tick-steel"
+        ]
+      ],
+      "subject": "Elements of the eight schools of the game, one column per school, in this order from left to right: Fire (scarlet and orange), Earth (amber-orange), Air (pale silver-white with a faint green), Darkness (violet and black), Water (blue), Light (white-gold), Time (green sand), and no school (steel, wood and blood, no magic). Row 1 — the missile of each school flying to the right; Row 2 — the impact burst of each school; Row 3 — a small lingering effect of each school that repeats on a wounded fighter. Colors never spill from one cell to another.\n\nThe grid: exactly 8 columns and 3 rows, 24 elements.\n\nRow 1: a comet of scarlet fire flying to the right: an orange-white core and a short tail of flame streaming behind it to the left; a jagged rock shard flying to the right, amber light glowing in its cracks, a short trail of amber dust behind it; a crescent blade of pale silver-white wind with a faint green tint flying to the right, thin wisps of air trailing behind it; an orb of violet-black darkness flying to the right, wispy violet tendrils trailing behind it; a sphere of clear blue water flying to the right, a short trail of droplets behind it; a lance of white-gold light flying to the right: a bright spear-shaped beam with a blazing tip; an orb of glowing green sand flying to the right, grains of sand orbiting it and trailing behind; a painted arrow flying to the right: dark wooden shaft, iron arrowhead, grey feather fletching, a faint white motion streak behind it.\n\nRow 2: an explosion of scarlet and orange fire bursting outward with a white-hot centre; a burst of amber rock fragments and dust flying outward from a bright amber flash; a whirling burst of pale wind with a few glowing leaves spinning outward; an implosion of violet-black darkness, dark tendrils pulled inward to a dark core with a violet rim; a splash of blue water bursting outward in round droplets and a ring of spray; a radiant flash of white-gold light with short sharp rays; a burst of glowing green sand and light, grains frozen in mid-air around a bright centre; a clash of bright white sparks from a blade striking metal, short sharp streaks.\n\nRow 3: a few small scarlet flames licking upward; small yellow-green poison bubbles rising and popping; three small thin silver cuts of wind across the cell; thin violet wisps of withering rising and curling; small blue frost shards and snowflakes falling; searing white-gold motes of light falling like sparks; a thin trickle of glowing green sand falling; three heavy drops of dark red blood falling."
+    },
+    {
+      "id": "vfx-flip",
+      "category": "battle-vfx-flip",
+      "title": "Эффекты боя — flipbook: взрыв, вспышка духа, пыль, сетка 7×3",
+      "source": "design/ui/fx.js",
+      "grid": [
+        7,
+        3
+      ],
+      "cells": [
+        [
+          "boom-1",
+          "vx-boom-1"
+        ],
+        [
+          "boom-2",
+          "vx-boom-2"
+        ],
+        [
+          "boom-3",
+          "vx-boom-3"
+        ],
+        [
+          "boom-4",
+          "vx-boom-4"
+        ],
+        [
+          "boom-5",
+          "vx-boom-5"
+        ],
+        [
+          "boom-6",
+          "vx-boom-6"
+        ],
+        [
+          "boom-7",
+          "vx-boom-7"
+        ],
+        [
+          "burst-1",
+          "vx-burst-1"
+        ],
+        [
+          "burst-2",
+          "vx-burst-2"
+        ],
+        [
+          "burst-3",
+          "vx-burst-3"
+        ],
+        [
+          "burst-4",
+          "vx-burst-4"
+        ],
+        [
+          "burst-5",
+          "vx-burst-5"
+        ],
+        [
+          "burst-6",
+          "vx-burst-6"
+        ],
+        [
+          "burst-7",
+          "vx-burst-7"
+        ],
+        [
+          "puff-1",
+          "vx-puff-1"
+        ],
+        [
+          "puff-2",
+          "vx-puff-2"
+        ],
+        [
+          "puff-3",
+          "vx-puff-3"
+        ],
+        [
+          "puff-4",
+          "vx-puff-4"
+        ],
+        [
+          "puff-5",
+          "vx-puff-5"
+        ],
+        [
+          "puff-6",
+          "vx-puff-6"
+        ],
+        [
+          "puff-7",
+          "vx-puff-7"
+        ]
+      ],
+      "subject": "Three flipbook animations of battle effects, one per row.\n\nThe grid: exactly 7 columns and 3 rows, 21 frames.\n\nRow 1 — one explosion of orange-gold fire in 7 frames: 1, a tiny bright white spark; 2, a small bright ball of white-yellow fire; 3, a bigger fireball bursting with orange tongues of flame; 4, the largest fireball, orange and red around a bright core; 5, the fireball breaking up into separate flames and dark smoke; 6, fading embers in grey smoke; 7, a faint wisp of grey smoke, almost gone.\n\nRow 2 — one burst of turquoise-white spirit magic (#48E5D4) in 7 frames: 1, a tiny bright point; 2, a small glowing four-pointed star; 3, an expanding ring of light around a bright core; 4, the widest ring with sparks flying outward; 5, the ring thinning while the sparks disperse; 6, a faint ring and a few sparks; 7, a few faint motes, almost gone.\n\nRow 3 — one puff of grey-brown dust and clay crumbs in 7 frames: 1, a few crumbs; 2, a small burst of dust; 3, a larger cloud with flying clay chips; 4, the largest billowing cloud; 5, the cloud spreading wider and thinning; 6, a thin haze; 7, a faint haze, almost gone."
+    }
+  ]
+}

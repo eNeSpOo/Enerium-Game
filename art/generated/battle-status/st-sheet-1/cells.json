@@ -1,0 +1,300 @@
+{
+  "sheet": "art/generated/battle-status/st-sheet-1__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/battle-status-icons.json",
+  "job": "st-sheet-1",
+  "grid": [
+    6,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "dot-Огонь",
+      "file": "art/generated/battle-status/st-sheet-1/st-fire-dot.webp",
+      "box": [
+        14,
+        30,
+        799,
+        815
+      ],
+      "px": 785,
+      "key_left": 0.0
+    },
+    {
+      "id": "hot-Огонь",
+      "file": "art/generated/battle-status/st-sheet-1/st-fire-hot.webp",
+      "box": [
+        861,
+        30,
+        1647,
+        816
+      ],
+      "px": 786,
+      "key_left": 0.0
+    },
+    {
+      "id": "silence",
+      "file": "art/generated/battle-status/st-sheet-1/st-fire-ctrl.webp",
+      "box": [
+        1710,
+        30,
+        2496,
+        816
+      ],
+      "px": 786,
+      "key_left": 0.0
+    },
+    {
+      "id": "mark",
+      "file": "art/generated/battle-status/st-sheet-1/st-fire-debuff.webp",
+      "box": [
+        2559,
+        30,
+        3345,
+        816
+      ],
+      "px": 786,
+      "key_left": 0.0
+    },
+    {
+      "id": "dmgUp",
+      "file": "art/generated/battle-status/st-sheet-1/st-fire-buff.webp",
+      "box": [
+        3409,
+        30,
+        4195,
+        816
+      ],
+      "px": 786,
+      "key_left": 0.0
+    },
+    {
+      "id": "shield",
+      "file": "art/generated/battle-status/st-sheet-1/st-shield.webp",
+      "box": [
+        4257,
+        30,
+        5042,
+        815
+      ],
+      "px": 785,
+      "key_left": 0.0
+    },
+    {
+      "id": "dot-Земля",
+      "file": "art/generated/battle-status/st-sheet-1/st-earth-dot.webp",
+      "box": [
+        14,
+        879,
+        799,
+        1664
+      ],
+      "px": 785,
+      "key_left": 0.0
+    },
+    {
+      "id": "hot-Земля",
+      "file": "art/generated/battle-status/st-sheet-1/st-earth-hot.webp",
+      "box": [
+        861,
+        878,
+        1648,
+        1665
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "paralyze",
+      "file": "art/generated/battle-status/st-sheet-1/st-earth-ctrl.webp",
+      "box": [
+        1710,
+        878,
+        2497,
+        1665
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "pierce",
+      "file": "art/generated/battle-status/st-sheet-1/st-earth-debuff.webp",
+      "box": [
+        2559,
+        878,
+        3346,
+        1665
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "guard",
+      "file": "art/generated/battle-status/st-sheet-1/st-earth-buff.webp",
+      "box": [
+        3408,
+        877,
+        4196,
+        1665
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "iceblock",
+      "file": "art/generated/battle-status/st-sheet-1/st-iceblock.webp",
+      "box": [
+        4257,
+        879,
+        5042,
+        1664
+      ],
+      "px": 785,
+      "key_left": 0.0
+    },
+    {
+      "id": "dot-Воздух",
+      "file": "art/generated/battle-status/st-sheet-1/st-air-dot.webp",
+      "box": [
+        14,
+        1728,
+        799,
+        2513
+      ],
+      "px": 785,
+      "key_left": 0.0
+    },
+    {
+      "id": "hot-Воздух",
+      "file": "art/generated/battle-status/st-sheet-1/st-air-hot.webp",
+      "box": [
+        861,
+        1727,
+        1648,
+        2514
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "knock",
+      "file": "art/generated/battle-status/st-sheet-1/st-air-ctrl.webp",
+      "box": [
+        1710,
+        1727,
+        2497,
+        2514
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "miss",
+      "file": "art/generated/battle-status/st-sheet-1/st-air-debuff.webp",
+      "box": [
+        2559,
+        1727,
+        3346,
+        2514
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "evade",
+      "file": "art/generated/battle-status/st-sheet-1/st-air-buff.webp",
+      "box": [
+        3408,
+        1727,
+        4195,
+        2514
+      ],
+      "px": 787,
+      "key_left": 0.0
+    },
+    {
+      "id": "immune",
+      "file": "art/generated/battle-status/st-sheet-1/st-immune.webp",
+      "box": [
+        4257,
+        1728,
+        5042,
+        2513
+      ],
+      "px": 785,
+      "key_left": 0.0
+    },
+    {
+      "id": "dot-Тьма",
+      "file": "art/generated/battle-status/st-sheet-1/st-dark-dot.webp",
+      "box": [
+        14,
+        2574,
+        799,
+        3359
+      ],
+      "px": 785,
+      "key_left": 0.07226
+    },
+    {
+      "id": "hot-Тьма",
+      "file": "art/generated/battle-status/st-sheet-1/st-dark-hot.webp",
+      "box": [
+        861,
+        2573,
+        1648,
+        3360
+      ],
+      "px": 787,
+      "key_left": 0.01534
+    },
+    {
+      "id": "terror",
+      "file": "art/generated/battle-status/st-sheet-1/st-dark-ctrl.webp",
+      "box": [
+        1710,
+        2573,
+        2497,
+        3360
+      ],
+      "px": 787,
+      "key_left": 0.04024
+    },
+    {
+      "id": "weak",
+      "file": "art/generated/battle-status/st-sheet-1/st-dark-debuff.webp",
+      "box": [
+        2559,
+        2573,
+        3346,
+        3360
+      ],
+      "px": 787,
+      "key_left": 0.05835
+    },
+    {
+      "id": "lifesteal",
+      "file": "art/generated/battle-status/st-sheet-1/st-dark-buff.webp",
+      "box": [
+        3408,
+        2573,
+        4196,
+        3361
+      ],
+      "px": 788,
+      "key_left": 0.0
+    },
+    {
+      "id": "taunt",
+      "file": "art/generated/battle-status/st-sheet-1/st-taunt.webp",
+      "box": [
+        4257,
+        2574,
+        5042,
+        3359
+      ],
+      "px": 785,
+      "key_left": 0.0
+    }
+  ]
+}

@@ -70,7 +70,19 @@ const RULES = {
   foeLvl: { base: 20, perFloor: 1 },    // уровень карт врага растёт с этажом; у биома может быть свой (BIOMES.foeLvl)
   tempoPct: 250,                        // скорость атаки из §3.2, растянутая для экрана: интервал ×2,5
   act: { attack: 900, cast: 1300, mass: 1700, ult: 2400, skip: 600 },  // сколько действие идёт на экране; раньше карта снова не ходит
-  floor: { limitMs: { o: 150000, e: 240000, b: 360000 }, gapMs: 2500 }, // предел боя этажа и переход к следующему, мс
+  floor: { limitMs: { o: 150000, e: 240000, b: 360000 }, gapMs: 2500,   // предел боя этажа и переход к следующему, мс
+    /* ритуал этажа (ADR-0044): взятый этаж не короче своего ритуала, даже если отряд убивает с одного удара — враги выходят, падают,
+       добыча летит в кошелёк; затем переход gapMs. Мс по виду этажа: o — рядовые, e — элита, b — босс, guard — рунный страж.
+       Ядро соблюдает его во времени боя (finish: время взятого этажа не меньше минимума; fightMs — сам бой, ritualMs — добавка ритуала),
+       экран доигрывает ритуал (задача «Бой AAA»). Числа подбирает калькулятор фарма tools/content-gen/biomes/farm.py: наименьший ритуал,
+       при котором удары насмерть по старому биому не дают золота, духа и душ в минуту больше, чем свой биом цикла II. По виду — ритуал
+       растёт с добычей: элита вдвое, босс и страж втрое дольше рядовых; рядовые — не короче зрелища (фазы ritual ниже и ход раунда).
+       Без ритуала удар насмерть по Мастерской давал 413 духа в минуту, по лесу — 7,15 души, а свой биом — 406 и 5,48 */
+    minMs: { o: 7000, e: 14000, b: 21000, guard: 21000 },
+    /* фазы ритуала на экране (задача «Бой AAA», screens/battle-scene.js): выход врагов и шаг между ними; после последнего удара —
+       «Этаж взят» и полёт добычи в кошелёк, затем ожидание до минимума этажа и переход gapMs. Это показ: время этажа задаёт minMs.
+       fallMs — последний удар доигрывается до конца этажа, если бой длиннее минимума (прежде 1400 мс в advance index.html) */
+    ritual: { enterMs: 1200, stepMs: 90, fallMs: 1400, takenMs: 300, lootMs: 900 } },
   rounds: {                             // модель раундов (ADR-0010)
     /* раундов в бою — по типу боя, одна таблица на все режимы (решение автора 29.09.2026, заменяет «10 раундов» ADR-0010;
        числа — слово автора 01.10.2026, прежде 5 / 10 / 20 / 25 / 50 / 75 / 100): чем достойнее враг, тем дольше бой.
@@ -98,9 +110,17 @@ const RULES = {
   drop: {                               // добыча по рангу убитой карты (§5.8): ставки ADR-0014, золото — половина духа; только за взятый этаж
     o: { gold: 5, spirit: 10 },
     e: { gold: 25, spirit: 50, soulsPerBiome: 1, keys: 1 },     // элита: душ = номер биома × 1 (ADR-0011) и ключ ремесла своего биома
-    b: { gold: 125, spirit: 250, soulsPerBiome: 5, uniqueBp: 500 },  // босс биома: душ = номер биома × 5, шанс уникального ресурса
+    b: { gold: 125, spirit: 250, soulsPerBiome: 5, uniqueBp: 500,    // босс биома: душ = номер биома × 5, шанс уникального ресурса
+      /* фарм старых биомов (ADR-0044): уникальный босса в биоме цикла ниже цикла игрока — доля обычного шанса, % (подбор — biomes/farm.py);
+         рунный ключ — с каждого босса биома с шансом, с цикла II (§11: 10 %, отмычки Странника — до 25 %), ключей за срабатывание — цикл
+         биома. Шанс тот же, что у калькуляторов (recipes.js, drops.enemies: boss.runeKeyBp) — сверяет tools/content-gen/screens/check_biomes.js */
+      uniqueOldPct: 50, runeKeyBp: 1000, runeKeyMaxBp: 2500, runeKeyFrom: 2 },
     rune: { gold: 250, spirit: 500 },                           // рунный страж за победу; руны пределов — отдельно (§11); его свита — элиты
     basePerFloorBp: 1000,               // шанс базового ресурса за взятый этаж; артефакты прибавляют свои б. п.
+    /* артефакты Странника в добыче (§14.1, ADR-0044): примитив артефакта (EN_WANDERER.art, поле loot) → [поле прибавки floorLoot, множитель
+       единицы]: п. п. шанса — в б. п. (× 100); остальное — в своих единицах: %, души, верхняя граница базовых. Свод — lootArt */
+    art: { goldPct: ['goldPct', 1], spiritPct: ['spiritPct', 1], bossSouls: ['bossSouls', 1], baseMaxO: ['baseMaxO', 1], baseMaxE: ['baseMaxE', 1],
+      runeKeyPp: ['runeKeyBp', 100], uniquePp: ['uniqueBp', 100] },
   },
   echo: {                               // бой в Эхо (ADR-0025, §17.3); числа — демонстрация
     /* тип главного врага → тип боя в таблице раундов RULES.rounds.by. Лестница: рядовой, элита, босс недели, Убер-босс, Многоликий.
@@ -114,6 +134,12 @@ const RULES = {
   aversionBp: 2000,                     // расовая неприязнь героя Эхо: +20 % урона по врагам расы своей недели (ADR-0024); у героя может быть своя
   valorPct: 30,                         // доблесть: +30 % к пяти базовым характеристикам за ступень, накопительно — пять ступеней ×3,7 (§3.3, §10.2, ADR-0016);
                                         // одно число на прототип и калькуляторы: INV.hero.valorPct прототипа берёт его отсюда
+  /* кривая силы §3.3 × 10 — «множитель базы» цикла героя (слово автора 01.10.2026: «герои нового цикла они должны быть больше по базовым
+     статам», ADR-0041). Герой цикла c на том же уровне сильнее героя цикла I во столько раз: атака, здоровье и защита — так же, как враг
+     цикла c (у врага цикл — в его уровне, калькуляторы: economy.py, eff_level). Скорость, уклонение и крит — от самих характеристик,
+     кривая их не трогает. Цикл героя — поле cycle (или c) героя; без него — цикл I. Та же кривая — у снаряжения (equipment.js, cycMul)
+     и калькуляторов (economy.py, POWER_X10): проверка tools/content-gen/screens/check_cycle.js */
+  cycleX10: [10, 16, 26, 41, 66, 105],
   basicAllPct: 100,                     // обычная атака по всем (basicAll: true) — доля главного стата по каждой цели, %
   levelExp: [12, 10],                   // дух за уровень n — ⌈n^(12/10)⌉ (§9.3, «ручка темпа»): одно правило на прототип и калькуляторы,
                                         // показатель — тот же, что LEVEL_EXP в tools/content-gen/economy/economy.py (сверяет start/build.js)
@@ -259,7 +285,8 @@ function floorSeed(biomeSeed, floor) { return mix32((biomeSeed ^ Math.imul(floor
    Сид — сам биом: один и тот же биом с тем же отрядом всегда даёт тот же сценарий.
    n — номер биома: от него растут души. foeLvl — уровень врагов: base + этаж × perFloor, без него — RULES.foeLvl.
    siege: false — босс берётся за один забег, урон по нему не копится: осада — с цикла II (ADR-0018).
-   foeHpPct — здоровье врагов биома, % от их hpPct: этажи и свита стража; bossHpPct и guardHpPct — здоровье босса и стража этого биома. */
+   foeHpPct — здоровье врагов биома, % от их hpPct: этажи и свита стража; bossHpPct и guardHpPct — здоровье босса и стража этого биома.
+   full — полный вариант биомов 1–2 с цикла full.from (ADR-0044): те же поля VARIANT_KEYS, его ставит atCycle по циклу игрока. */
 const BIOMES = {
   b1: { n: 1, cycle: 1, name: 'Мастерская форм', seed: seedOf('Мастерская форм'), floors: FLOORS_TUTOR,
     // Старт с чистого листа (01.10.2026, tools/content-gen/start): босс — 550 % (было 675 %), пара берёт его с 29-го уровня (было с 33-го):
@@ -268,7 +295,14 @@ const BIOMES = {
     // его с 30-го, с доблестью бойца — с 21-го, и выше — только победы: start/build.js сверяет до 160-го уровня
     foeLvl: { base: 1, perFloor: 1 }, foeHpPct: 50, bossHpPct: 550, guardHpPct: 90, siege: false,
     // рунный страж обучения — три карты (ADR-0018): Мастер и две элиты, по силам двум героям. Подмастерье бьёт, Мех — по всем
-    guard: { g: 'r', m: ['g1', 'e1', 'e4'] } },
+    guard: { g: 'r', m: ['g1', 'e1', 'e4'] },
+    /* полный вариант — с цикла II (ADR-0044, слово автора: «после обучающего цикла 1 и 2 биом становятся длиннее по этажам и сами РБ
+       становятся нормальными по силе»). Колода — образец FLOORS: 35 этажей и 12 элит, как у биомов цикла II (§8.1): короче быть нельзя —
+       глубже биом, длиннее спуск, а биом 1 не длиннее биома 3. Уровень врагов — 20 + этаж: та же кривая, что у всех биомов
+       ((12 + L) = (32 + этаж) × P(цикл), cycle/climb-sim.js), здоровье — самих карт, без поправок обучения. Осада босса. Рунный страж —
+       Мастер и четыре бьющие элиты, 1 200 %, как у биомов 3–4 (ADR-0010): отряд прихода в цикл II на 50–59-м встаёт на 20-м этаже,
+       обычный берёт босса с 150-го, стража — с 250-го; почему так — tools/content-gen/biomes/farm.py, docs/content/биомы-и-фарм.md */
+    full: { from: 2, floors: FLOORS, foeLvl: { base: 20, perFloor: 1 }, siege: true, guardHpPct: 1200, guard: { g: 'r', m: ['g1', 'e1', 'e2', 'e4', 'e6'] } } },
   // образец длинного биома цикла II — для калькулятора экономики; сид прежней Мастерской, чтобы прогоны были сравнимы
   c2: { n: 1, cycle: 2, name: 'Образец биома цикла II', seed: seedOf('Мастерская форм'), floors: FLOORS, siege: true },
 };
@@ -298,7 +332,29 @@ function addLib(items) {
 /* Биомы из данных (biome-foes.js, биомы 2–4): карты врагов — в FOES, набор — поле kit карты, если его нет в kits.js;
    биом — в BIOMES, сид — от имени биома, как у Мастерской. Уникальные способности набора — addLib */
 function addFoes(foes) { Object.assign(FOES, foes); return FOES; }
-function addBiome(id, B) { BIOMES[id] = Object.assign({ seed: seedOf(B.name) }, B); return BIOMES[id]; }
+function addBiome(id, B) { BIOMES[id] = setVariant(tutOf(Object.assign({ seed: seedOf(B.name) }, B)), CYCLE_AT); return BIOMES[id]; }
+/* ================== вариант биома по циклу игрока (ADR-0044) ==================
+   Биомы 1–2: в цикле I — короткие обучающие (ADR-0018), с цикла full.from — полные. Один биом — один id: вариант выбирает «сервер» по циклу
+   игрока. Поля варианта — VARIANT_KEYS: обучающий вариант — сами поля записи (снимок — tut), полный — full. atCycle(c) ставит поля варианта
+   прямо в запись BIOMES[id]: экраны и калькуляторы, что читают BIOMES[id], видят нужный вариант без правок. variantOf(id, c) — копия варианта
+   без переключения. Без вызова atCycle — цикл I: прогоны обучения и калькуляторы идут как прежде */
+const VARIANT_KEYS = ['floors', 'foeLvl', 'foeHpPct', 'bossHpPct', 'guardHpPct', 'siege', 'guard', 'dropPct'];
+let CYCLE_AT = 1;
+function tutOf(B) {
+  if (B.full && !B.tut) { B.tut = {}; for (const k of VARIANT_KEYS) if (B[k] !== undefined) B.tut[k] = B[k]; }
+  if (B.full && !B.variant) B.variant = 'tut';
+  return B;
+}
+function setVariant(B, c) {
+  if (!B.full) return B;
+  const V = c >= B.full.from ? B.full : B.tut;
+  for (const k of VARIANT_KEYS) B[k] = V[k];
+  B.variant = V === B.full ? 'full' : 'tut';
+  return B;
+}
+function atCycle(c) { CYCLE_AT = Math.max(1, c | 0); for (const id in BIOMES) setVariant(tutOf(BIOMES[id]), CYCLE_AT); return CYCLE_AT; }
+function variantOf(id, c) { const B = BIOMES[id]; return B ? setVariant(tutOf(Object.assign({}, B)), c) : null; }
+for (const id in BIOMES) tutOf(BIOMES[id]);   // снимок обучающего варианта — до первого переключения
 const KITS = () => root.EN_KITS || { heroes: {}, foes: {} };
 const schoolEntry = (school, kind, tier) => lib2()[school + '.' + kind + '.' + tier] || null;
 const schoolDebuffSt = school => { const e = schoolEntry(school, 'debuff', 'one'); return e ? e.st : null; };
@@ -574,23 +630,26 @@ function basicAllOf(src) {
 /* Расовая неприязнь героя Эхо (ADR-0024): раса врага и прибавка, б. п.; без своей — RULES.aversionBp */
 const aversOf = src => src.avers && src.avers.race ? { race: src.avers.race, bp: src.avers.bp != null ? src.avers.bp : RULES.aversionBp } : null;
 const aversBp = (src, t) => src.avers && t.race && src.avers.race === t.race ? src.avers.bp : 0;
+/* кривая силы цикла героя × 10 (RULES.cycleX10, ADR-0041): цикл I и карта без цикла (враги — их цикл в уровне) — 10, то есть ×1 */
+const cycX10 = c => { const K = RULES.cycleX10, n = Math.min(Math.max(c | 0, 1), K.length); return K[n - 1]; };
 function mkUnit(src, side, i) {
-  const s = RULES.stat, L = s.lvlDiv + src.lvl;
+  const s = RULES.stat, L = s.lvlDiv + src.lvl, cx = src.cyc ? cycX10(src.cyc) : 10;
   const [str, int, agi, sta, spd] = src.st;
-  const A = v => fl(s.atk * (100 + v) * L, 100 * s.lvlDiv);
+  const A = v => fl(s.atk * (100 + v) * L * cx, 100 * s.lvlDiv * 10);
   // здоровье — от выносливости и уровня; режим с собственной шкалой здоровья (Эхо) даёт его данными как есть
-  const max0 = src.maxHp != null ? Math.max(1, src.maxHp) : fl(s.hp * (100 + sta) * L * (src.hpPct || 100), 100 * s.lvlDiv * 100);
+  const max0 = src.maxHp != null ? Math.max(1, src.maxHp) : fl(s.hp * (100 + sta) * L * (src.hpPct || 100) * cx, 100 * s.lvlDiv * 100 * 10);
   // осада (RULES.siege): враг пришёл с остатком здоровья прошлых попыток — остаток и есть его максимум в этой попытке; max0 — прежний
   const maxHp = side === 1 && src.hp != null && !src.dead && RULES.siege.startIsMax ? clamp(src.hp, 1, max0) : max0;
   const as = clamp(RULES.caps.asMin + spd, RULES.caps.asMin, RULES.caps.asMax);
   const C = RULES.cls[src.cls] || { main: 'str', fx: 'melee' };
   const u = {
     key: src.key, id: src.id, name: src.name, side, i, cls: src.cls, el: src.el, lvl: src.lvl, lead: !!src.lead, rank: src.rank || null,
+    cyc: src.cyc || null,                                            // цикл героя — кривая силы §3.3 (ADR-0041)
     race: src.race || null, avers: aversOf(src), basicAll: basicAllOf(src),   // раса — для неприязни героев Эхо (ADR-0024)
     main: src.main || C.main, fx: src.fx || C.fx,
     maxHp, max0, hp: src.dead ? 0 : src.hp != null ? clamp(src.hp, 1, maxHp) : maxHp, sh: 0,
     atk: { str: A(str), int: A(int), agi: A(agi), sta: A(sta) },   // обычная атака — от главного стата, способность — от своей характеристики
-    def: { str: fl(s.def * str * L, s.lvlDiv), int: fl(s.def * int * L, s.lvlDiv) },
+    def: { str: fl(s.def * str * L * cx, s.lvlDiv * 10), int: fl(s.def * int * L * cx, s.lvlDiv * 10) },
     eva: Math.min(RULES.caps.evaBp, fl(agi * 10000, s.evaDiv)),
     crit: Math.min(RULES.caps.critBp, fl(agi * 10000, s.critDiv)),
     critDmg: RULES.critDmgPct,
@@ -618,6 +677,7 @@ function mkUnit(src, side, i) {
 
 function heroSrc(h) {
   return { key: h.id, id: h.id, name: h.name, cls: h.cls, fx: h.fx, el: h.el, lvl: h.lvl, st: h.st,
+    cyc: h.cycle || h.c || 1,                                               // цикл героя: кривая силы §3.3 (RULES.cycleX10, ADR-0041)
     abs: h.ab.map(a => a.n), ult: h.ult && h.valor >= h.ult.at ? h.ult.n : null,
     pas: h.pas.filter(p => p.t === 'боевая').map(p => p.n),
     kit: h.draft && KITS().heroes[h.draft] || null, valor: h.valor || 0,   // набор из распределения (ADR-0016): черновик героя h.draft
@@ -663,7 +723,8 @@ const foeHpOf = (B, id) => B.foeHpPct ? fl(FOES[id].hpPct * B.foeHpPct, 100) : n
 function create(o) {
   const mode = o.mode === 'tempo' ? 'tempo' : 'rounds';   // основная модель — «10 раундов» (ADR-0010)
   const b = { mode, t: 0, limit: mode === 'rounds' ? Infinity : o.limitMs, rng: makeRng(o.seed), seed: o.seed, u: [[], []], over: false, win: false, why: '', ev: [],
-    round: 0, maxRounds: o.maxRounds || roundsOf(o.kind), queue: [], farm: [], cov: {}, deaths: 0 };
+    round: 0, maxRounds: o.maxRounds || roundsOf(o.kind), queue: [], farm: [], cov: {}, deaths: 0,
+    minMs: o.minMs || 0, fightMs: 0, ritualMs: 0 };   // ритуал этажа (RULES.floor.minMs, ADR-0044): минимум взятого этажа, сам бой, добавка
   // порядок героев в отряде на бой не влияет: иначе перестановка отряда перебрасывала бы случайность
   const heroCard = mode === 'rounds' ? s => s : s => Object.assign({}, s, { kit: null });   // прежняя модель темпа — на прежней библиотеке, без наборов
   o.heroes.slice().sort((x, y) => x.key < y.key ? -1 : x.key > y.key ? 1 : 0).forEach((s, i) => b.u[0].push(mkUnit(heroCard(s), 0, i)));
@@ -718,7 +779,14 @@ function step(b) {
   if (!a1) finish(b, true, 'win'); else if (!a0) finish(b, false, 'wipe');
   return { at, dur, s: u, kind: a.kind, ab: a.ab || null, fx: a.fx || null, school: a.school || null, ev: b.ev.splice(0) };
 }
-function finish(b, win, why) { b.over = true; b.win = win; b.why = why; emit(b, { k: 'end', win, why }); }
+/* Конец боя. Ритуал взятого этажа (RULES.floor.minMs, ADR-0044): время этажа не короче минимума — b.t дотягивается до него, fightMs — конец
+   самого боя, ritualMs — сколько добавил ритуал; событие конца — в миг конца боя. Проигранный этаж и бой без минимума (Эхо, клан, Арена) —
+   как были. Генератор ритуал не трогает: исход и добыча те же */
+function finish(b, win, why) {
+  b.over = true; b.win = win; b.why = why; b.fightMs = b.t;
+  emit(b, { k: 'end', win, why });
+  if (win && b.minMs > b.t) { b.ritualMs = b.minMs - b.t; b.t = b.minMs; }
+}
 function run(b) { while (!b.over) step(b); return b; }
 function nextAt(b) {
   if (b.mode === 'rounds') return b.t;   // ходы идут подряд: следующий начинается, когда кончился предыдущий
@@ -1200,7 +1268,9 @@ function addStatus(b, src, t, s, isCtrl, reflected) {
   if (dl && dl.id) cov(b, dl);
   if (s.st === 'miss' || s.st === 'blind') { const bs = alive(b.u[t.side]).map(v => libPas(v, 'blindShorter')).find(Boolean); if (bs) { left = Math.max(1, left + bs.add); cov(b, bs); } }   // «Незамутнённость»
   const ex = has(t, s.st);                       // одинаковые обновляют длительность, разные стакаются (§5.4)
-  const tie = Object.assign({}, s.coef ? { coef: s.coef, src } : {}, s.focus ? { focus: true, src } : {});   // отложенный удар и цель для всех помнят наложившего
+  /* отложенный удар и цель для всех помнят наложившего (src — для расчёта); by — кто наложил эффект последним, для сведений карты на экране
+     (задача «Бой AAA», 01.10.2026): на исход и генератор не влияет. У урона и лечения со временем наложивший — их src */
+  const tie = Object.assign({ by: src }, s.coef ? { coef: s.coef, src } : {}, s.focus ? { focus: true, src } : {});
   if (ex) { ex.left = Math.max(ex.left, left); ex.left0 = Math.max(ex.left, ex.left0); ex.pow = Math.max(ex.pow, s.pow || 0); Object.assign(ex, tie); }
   else t.st.push(Object.assign({ k: s.st, left, left0: left, pow: s.pow || 0, breakPct: s.breakPct || 0, evadeDown: s.evadeDown || 0 }, tie));
   if (s.st === 'knock') { const opp = b.u[1 - t.side]; for (let j = 0; j < t.th.length; j++) t.th[j] = fl(RULES.threat.base * thrMul(opp[j]), 100); t.cur = -1; }   // сброс: угроза цели ко всем обнуляется
@@ -1243,17 +1313,18 @@ function tickPeriodic(b, u) {
    Этажи идут подряд, здоровье и павшие переходят дальше: биом — испытание на истощение.
    Щиты, эффекты и зарядка способностей обнуляются между этажами. mode — 'tempo' (ADR-0007) или 'rounds'. */
 /* Раундов на этаже — по старшему врагу колоды (RULES.rounds.by: g — o, e или b). Босс в осаде приходит с остатком здоровья,
-   и этот остаток — его максимум в попытке (RULES.siege) */
+   и этот остаток — его максимум в попытке (RULES.siege). Взятый этаж не короче ритуала своего вида (RULES.floor.minMs, ADR-0044) */
 function floorBattle(heroes, biome, floor, siegeHp, mode) {
   const B = BIOMES[biome], g = B.floors[floor - 1].g;
-  return create({ heroes, foes: floorFoes(biome, floor, siegeHp), seed: floorSeed(B.seed, floor), limitMs: RULES.floor.limitMs[g], mode, maxRounds: roundsOf(g) });
+  return create({ heroes, foes: floorFoes(biome, floor, siegeHp), seed: floorSeed(B.seed, floor), limitMs: RULES.floor.limitMs[g], mode, maxRounds: roundsOf(g),
+    minMs: RULES.floor.minMs[g] });
 }
 /* Рунный страж — отдельный бой после биома (§8.6, §11, ADR-0010): страж и свита, в обучении цикла I — три карты (ADR-0018).
-   Бой идёт до RULES.rounds.by.rune раундов, каждая обычная атака рунного босса отнимает раунд (ADR-0020). */
+   Бой идёт до RULES.rounds.by.rune раундов, каждая обычная атака рунного босса отнимает раунд (ADR-0020). Победа — не короче ритуала стража */
 function guardBattle(heroes, biome, mode) {
   const B = BIOMES[biome], G = B.guard, lvl = B.floors.length + 1;
   const foes = G.m.map((id, k) => foeSrc(id, foeLvlOf(B, lvl), k, k === 0, null, k === 0 ? B.guardHpPct : foeHpOf(B, id)));
-  return create({ heroes, foes, seed: floorSeed(B.seed, lvl), limitMs: RULES.floor.limitMs.b, mode, maxRounds: roundsOf('rune') });
+  return create({ heroes, foes, seed: floorSeed(B.seed, lvl), limitMs: RULES.floor.limitMs.b, mode, maxRounds: roundsOf('rune'), minMs: RULES.floor.minMs.guard });
 }
 /* Бой в Эхо (ADR-0025, §17.3) — тот же детерминированный бой «10 раундов» на сиде от сервера, этаж один, перехода нет.
    Врагов пятеро: главный враг и RULES.echo.guards[тип] защитников — и у Многоликого: он вершина лестницы и бьётся с лицами недели.
@@ -1300,33 +1371,56 @@ function echoStats(b) {
   };
 }
 /* Добыча этажа по рангам убитых карт. Шансы — свой поток генератора от сида этажа,
-   чтобы бросок добычи не сдвигал случайность боя. bonusBp — прибавка к шансу ресурса от артефактов.
+   чтобы бросок добычи не сдвигал случайность боя.
    Фарм (ADR-0015, §4.6): добыча с павшего — его метки и «Обыск»; бонусы этажа — фарм-пассивки живых героев и эффекты этажа, проценты складываются.
+   X — что «сервер» знает об игроке (ADR-0044): число — прежняя прибавка к шансу базового ресурса, б. п.; объект — { cyc, art, baseBp }:
+   cyc — цикл игрока, art — прибавки артефактов Странника (lootArt). Цикл I — сценарий обучения (ADR-0040): его добычу задаёт таблица, «сервер»
+   зовёт ядро без X, и бросков сверх прежних нет. С цикла II (cyc):
+   - уникальный босса в старом биоме (цикл биома ниже цикла игрока) — доля обычного шанса RULES.drop.b.uniqueOldPct;
+   - рунный ключ с каждого босса биома — шанс runeKeyBp и отмычки, не выше runeKeyMaxBp; ключей за срабатывание — цикл биома (§11);
+   - артефакты: золото и дух за убийство, %, — в сумму процентов этажа, как фарм; души с босса — к душам босса; шанс уникального — к шансу
+     босса; ларцы — верхняя граница базовых baseMax: номер биома и ларец своего вида этажа (элита и страж — с элитой, иначе — без).
    Порядок бросков: базовый ресурс, уникальный ресурс босса, затем по каждому павшему — двойная добыча и второй ключ элиты,
-   только если такой бонус есть в отряде: без фарма поток тот же, что раньше. */
-function floorLoot(biome, floor, b, bonusBp) {
-  const D = RULES.drop, L = { gold: 0, spirit: 0, souls: 0, keys: 0, base: 0, unique: 0, farm: null };
+   только если такой бонус есть в отряде; последним — рунный ключ с босса. Без фарма и без X поток тот же, что раньше. */
+function floorLoot(biome, floor, b, X) {
+  const D = RULES.drop, B = BIOMES[biome], L = { gold: 0, spirit: 0, souls: 0, keys: 0, base: 0, unique: 0, runeKeys: 0, baseMax: 0, farm: null };
   if (!b.win) return L;   // добыча — только за взятый этаж: убиты все враги (§5.6, решение автора 27.09.2026)
+  const x = X && typeof X === 'object' ? X : { baseBp: X || 0 }, A = x.art || {}, cyc = x.cyc || 0;
   const F = farmBonus(b), dead = b.u[1].filter(u => !u.alive);
-  const rng = makeRng(mix32((floorSeed(BIOMES[biome].seed, floor) ^ 0x4C4F4F54) >>> 0));   // 'LOOT'
-  const baseBp = fl((D.basePerFloorBp + (bonusBp || 0) + dead.reduce((a, u) => a + u.lootBase, 0)) * (100 + F.basePct), 100);
+  const rng = makeRng(mix32((floorSeed(B.seed, floor) ^ 0x4C4F4F54) >>> 0));   // 'LOOT'
+  const baseBp = fl((D.basePerFloorBp + (x.baseBp || 0) + dead.reduce((a, u) => a + u.lootBase, 0)) * (100 + F.basePct), 100);
   if (rng(10000) < baseBp || F.baseSure) L.base = 1;
-  const boss = b.u[1].find(u => u.rank === 'b');
-  if (boss && !boss.alive && rng(10000) < fl((D.b.uniqueBp + F.uniqueAdd) * (100 + F.rarePct), 100)) L.unique = 1;
-  const M = BIOMES[biome].dropPct || 100;   // золото и дух биома, % ставок: × номер цикла, во втором биоме цикла ещё +0,5 (ADR-0014)
+  const boss = b.u[1].find(u => u.rank === 'b'), bossDead = !!boss && !boss.alive;
+  let uniqueBp = fl((D.b.uniqueBp + (A.uniqueBp || 0) + F.uniqueAdd) * (100 + F.rarePct), 100);
+  if (cyc > B.cycle) uniqueBp = fl(uniqueBp * D.b.uniqueOldPct, 100);   // старый биом — уникальный реже (ADR-0044)
+  if (bossDead && rng(10000) < uniqueBp) L.unique = 1;
+  const M = B.dropPct || 100;   // золото и дух биома, % ставок: × номер цикла, во втором биоме цикла ещё +0,5 (ADR-0014)
   for (const u of dead) {
     const d = D[u.rank] || {};
     let gold = fl(fl((d.gold || 0) * M, 100) * (100 + u.lootPct + u.lootGold), 100), spirit = fl(fl((d.spirit || 0) * M, 100) * (100 + u.lootPct + u.lootSpirit), 100);
-    let souls = (d.soulsPerBiome || 0) * BIOMES[biome].n; if (souls) souls = fl((souls + (F.souls[u.rank] || 0)) * (100 + u.lootPct), 100);   // «Ловец душ» — там, где души положены
+    let souls = (d.soulsPerBiome || 0) * B.n;   // «Ловец душ» — там, где души положены; «Чаша поминовения» — души с босса
+    if (souls) souls = fl((souls + (F.souls[u.rank] || 0) + (u.rank === 'b' ? A.bossSouls || 0 : 0)) * (100 + u.lootPct), 100);
     let keys = d.keys || 0;
     if (F.doubleCh && rng(10000) < F.doubleCh) { gold *= 2; spirit *= 2; souls *= 2; keys *= 2; }   // «Удачливый»: двойная добыча
     if (d.keys && (F.keySure || F.keyCh && rng(10000) < fl(F.keyCh * (100 + F.rarePct), 100))) keys += d.keys;   // второй ключ ремесла; «Кладоискатель» — без броска
     L.gold += gold; L.spirit += spirit; L.souls += souls; L.keys += keys;
   }
-  L.gold = fl(L.gold * (100 + F.goldPct + F.allPct), 100); L.spirit = fl(L.spirit * (100 + F.spiritPct + F.allPct), 100);
+  L.gold = fl(L.gold * (100 + F.goldPct + F.allPct + (A.goldPct || 0)), 100); L.spirit = fl(L.spirit * (100 + F.spiritPct + F.allPct + (A.spiritPct || 0)), 100);
   for (const k of ['souls', 'keys', 'base', 'unique']) L[k] = fl(L[k] * (100 + F.allPct), 100);   // «Богатый улов»: вся добыча
+  /* рунный ключ — с каждого босса биома с шансом, с цикла II (ADR-0044, §11); бросок последним — прежние броски не сдвигаются */
+  if (bossDead && cyc >= D.b.runeKeyFrom && rng(10000) < Math.min(D.b.runeKeyMaxBp, D.b.runeKeyBp + (A.runeKeyBp || 0))) L.runeKeys = B.cycle;
+  const g = floor <= B.floors.length ? B.floors[floor - 1].g : 'guard', box = g === 'e' || g === 'guard' ? A.baseMaxE : A.baseMaxO;
+  if (box) L.baseMax = B.n + box;   // ларец: верхняя граница базовых за срабатывание
   L.farm = F;
   return L;
+}
+/* Прибавки артефактов Странника к добыче (§14.1, ADR-0044): [{ loot, step, lv }] — примитив артефакта (EN_WANDERER.art, поле loot),
+   прибавка за уровень в единицах артефакта и уровень у игрока → { goldPct, spiritPct, bossSouls, baseMaxO, baseMaxE, runeKeyBp, uniqueBp }
+   по таблице RULES.drop.art. Артефакт без примитива добычи или не купленный — ничего */
+function lootArt(list) {
+  const A = {}, T = RULES.drop.art;
+  for (const a of list || []) { const t = a && T[a.loot]; if (t && a.lv > 0) A[t[0]] = (A[t[0]] || 0) + a.step * a.lv * t[1]; }
+  return A;
 }
 function carry(heroes, b) {   // used — реакции «раз за биом», которые уже сработали
   return heroes.map(h => { const u = b.u[0].find(v => v.key === h.key); return Object.assign({}, h, { hp: u.hp, dead: !u.alive, used: u.usedBiome.slice() }); });
@@ -1346,5 +1440,6 @@ function simRun(heroes, biome, siegeHp, mode) {
   return { floors, runMs, bossHp };
 }
 
-root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, FLOORS_TUTOR, BIOMES, lib: lib2, addLib, addFoes, addBiome, kitTable, GOOD_ST, SKIP_ST, seedOf, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, carry, simRun, guardBattle, echoBattle, targetBattle, echoStats, foeMaxHp, roundsOf, valorSt, heroSrcValor, levelCost, floorLoot, elemMul, ready, readyRound, order, chanceTable, pct, fxOf };
+root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, FLOORS_TUTOR, BIOMES, lib: lib2, addLib, addFoes, addBiome, kitTable, GOOD_ST, SKIP_ST, seedOf, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, carry, simRun, guardBattle, echoBattle, targetBattle, echoStats, foeMaxHp, roundsOf, valorSt, heroSrcValor, cycX10, levelCost, floorLoot, elemMul, ready, readyRound, order, chanceTable, pct, fxOf,
+  atCycle, variantOf, cycleAt: () => CYCLE_AT, VARIANT_KEYS, lootArt };   // вариант биома по циклу игрока и артефакты в добыче (ADR-0044)
 })(typeof window !== 'undefined' ? window : globalThis);

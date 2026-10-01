@@ -1,0 +1,83 @@
+{
+  "name": "Украшения HUD боя — медальон раунда, плашка баннеров, гербы итога, рама окон (задача «Бой AAA», слово автора 01.10.2026: «покажи мне боевую сцену и все попапы в ней на ааа уровне»). Язык — кованое железо, кромка старого золота, кость, свет карста снизу: тот же, что у рамок карт и оболочки",
+  "plan": {
+    "bh-round": "1:1, 1K — медальон счётчика раундов: в середине — число раунда интерфейсом",
+    "bh-plaque": "21:9, 2K — плашка баннеров «Этаж N», «Элита», «Босс биома», «Рунный страж», «Раунд N»: border-image, середина тянется",
+    "bh-victory, bh-defeat": "21:9, 2K, ключ black-glow — гербы над окном итога: победа и стена (образцы автора — art/style/ref-05-victory.jpg, ref-06-defeat.jpg, без надписей)",
+    "bh-panel": "3:2, 2K — рама окон боя: сведения карты, легенда «Знаки», итог этажа и забега, окно «Стена»; border-image"
+  },
+  "notes": [
+    "Пять картинок — $0,47. Вырезка — ключ black (cutout.py), гербы с огнём — black-glow; окна и пустые плашки — ровная тёмная середина под текст интерфейса",
+    "Нарезка border-image — tools/art-gen/hud_layers.py, выгрузка — ui-art.json → design/ui/assets/art/bhud/"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: dark fantasy game UI art for a mobile RPG — gloomy, heavy, noble and uneasy. Hand-painted digital painting: visible confident brush strokes, simplified planes, deep near-black shadows, crisp rim light on the edges. A muted, desaturated palette: soot black (#050607, #121518), graphite (#262B31), blackened iron, old dark leather, dark bronze, yellowed bone, weathered stone. Everything is matte, worn and aged: no bright polished gold, no gloss, no shiny jewellery, no clean saturated game-UI colors. Light is scarce and precious: the frame is lit from below with a crisp rim light along its edges; only its magical parts glow from within. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.",
+  "negative": "No text, no letters, no numbers, no real-world alphabets, no runes or markings that look like writing, no watermark, no signature, no logo, no buttons, no bars, no gauges, no lettering of any kind. No skulls, no blood, no gore. No pentagrams, no occult signs, no crosses, no religious symbols. No bright polished gold, no glossy plastic shine.",
+  "cutout_rule": "The background is solid pure black ({hex}), flat, edge to edge: no gradient, no texture, no floor, no cast shadow, no vignette, no checkerboard. Any glow stays close to the frame and fades into the black within a short distance. The whole frame with all its ornament fits inside the central 90% of the canvas: an empty black margin stays on every side — top, bottom, left and right.",
+  "categories": {
+    "battle-hud": {
+      "aspect": "1:1",
+      "size": "1K",
+      "cutout": "black",
+      "refs": [],
+      "frame": "Draw exactly one image in a single pass: no alternative versions, no text in the reply.\n\nFormat: an ornament of the battle screen interface of a dark fantasy mobile card battler, seen straight on, flat, not in perspective, perfectly symmetric from left to right. Materials of the interface: blackened forged iron with hammer marks, thin edges of old dark gold, old bone, weathered stone; light of the carst comes from below. In the game it is seen small on a phone screen: bold, simple, strong silhouettes and one clear accent rather than fine filigree; a thin crisp light rim runs along the edges. Every empty space that the game fills with its own text or numbers is a flat, plain, dark area with nothing drawn in it."
+    }
+  },
+  "jobs": [
+    {
+      "id": "bh-round",
+      "category": "battle-hud",
+      "title": "Медальон счётчика раундов",
+      "aspect": "1:1",
+      "size": "1K",
+      "subject": "A round medallion for the round counter of a battle: a heavy ring of blackened forged iron with a thin rim of old dark gold and four small iron studs at the quarters; set into the top of the ring a small upright hourglass of dark bronze whose sand glows warm gold; the centre of the medallion is a flat, plain, dark recessed disc, completely empty — the game writes the round number in it. A faint golden glow rises from below along the lower part of the ring.",
+      "source": "design/ui/screens/battle-scene.js; art/style/style.md"
+    },
+    {
+      "id": "bh-plaque",
+      "category": "battle-hud",
+      "title": "Плашка баннеров боя: этаж, элита, босс, страж, «Раунд N»",
+      "aspect": "21:9",
+      "size": "2K",
+      "subject": "A long horizontal title plaque for the battle banners: a slim flat plate of blackened forged iron, about one fifth as tall as it is long, its two ends drawn out into sharp arrowhead points; a thin double edge of old dark gold runs all around it, with small gold filigree curls near each end; in the middle of its top edge a small round socket of dark gold, empty. The whole face of the plate between the ends is flat, plain and dark — the game writes the title on it. A thin glow of old gold rises from the lower edge.",
+      "source": "design/ui/screens/battle-scene.js; art/style/style.md"
+    },
+    {
+      "id": "bh-victory",
+      "category": "battle-hud",
+      "title": "Герб итога — победа, этаж взят",
+      "aspect": "21:9",
+      "size": "2K",
+      "cutout": "black-glow",
+      "refs": [
+        "art/style/ref-05-victory.jpg"
+      ],
+      "subject": "A heraldic crest for the victory screen of a battle, in the mood of the attached picture but with nothing written: two wide branching antlers of old pale bone rising to the left and to the right from a central post of dark wood bound with old leather straps; a calm tall flame of pale green time-fire (#4FDC8B) burning on top of the post; small bone charms hanging from the antlers on short cords; thin wisps of green ghost-fire curling around the antler tips. Below the post, across the crest, a flat empty band of dark wood — the game writes the title there. The crest is wide and low, about three times wider than tall. No skull, no animal head, no ghosts with faces, no letters, no runes.",
+      "source": "design/ui/screens/battle-scene.js; art/style/style.md"
+    },
+    {
+      "id": "bh-defeat",
+      "category": "battle-hud",
+      "title": "Герб итога — стена, отряд не прошёл",
+      "aspect": "21:9",
+      "size": "2K",
+      "cutout": "black-glow",
+      "refs": [
+        "art/style/ref-06-defeat.jpg"
+      ],
+      "subject": "A heraldic crest for the defeat screen of a battle, the broken twin of a victory crest: two antlers of old grey bone rising to the left and to the right from a split post of charred dark wood, one antler snapped in half; on top of the post a dying ember-red flame (#DC6A52) sinking into grey ash, a few sparks falling; torn leather straps hanging loose; cold grey ash drifting down. Below the post, across the crest, a flat empty band of charred wood — the game writes the title there. The crest is wide and low, about three times wider than tall. No skull, no animal head, no letters, no runes.",
+      "source": "design/ui/screens/battle-scene.js; art/style/style.md"
+    },
+    {
+      "id": "bh-panel",
+      "category": "battle-hud",
+      "title": "Рама окон боя: сведения карты, «Знаки», итог",
+      "aspect": "3:2",
+      "size": "2K",
+      "subject": "A rectangular window frame for the panels of the battle screen: a slim border of blackened forged iron, about one fortieth of the width thick, with a thin inner line of old dark gold; at each of the four corners a small square corner piece of dark iron with an old gold rivet and a short gold filigree curl; in the middle of the top edge a small pointed gold clasp. The inside of the frame is completely empty and pure black. The frame is the same on all four sides: plain straight bars between the corner pieces, nothing else.",
+      "source": "design/ui/screens/battle-scene.js; art/style/style.md"
+    }
+  ]
+}

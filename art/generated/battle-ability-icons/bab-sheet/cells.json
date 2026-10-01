@@ -1,0 +1,84 @@
+{
+  "sheet": "art/generated/battle-ability-icons/bab-sheet__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/battle-ability-icons.json",
+  "job": "bab-sheet",
+  "grid": [
+    3,
+    2
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "basic.melee",
+      "file": "art/generated/battle-ability-icons/bab-sheet/basic-melee.webp",
+      "box": [
+        12,
+        16,
+        410,
+        414
+      ],
+      "px": 398,
+      "key_left": 0.0
+    },
+    {
+      "id": "basic.arrow",
+      "file": "art/generated/battle-ability-icons/bab-sheet/basic-arrow.webp",
+      "box": [
+        433,
+        16,
+        831,
+        414
+      ],
+      "px": 398,
+      "key_left": 0.0
+    },
+    {
+      "id": "basic.magic",
+      "file": "art/generated/battle-ability-icons/bab-sheet/basic-magic.webp",
+      "box": [
+        854,
+        16,
+        1252,
+        414
+      ],
+      "px": 398,
+      "key_left": 0.0
+    },
+    {
+      "id": "basic.all",
+      "file": "art/generated/battle-ability-icons/bab-sheet/basic-all.webp",
+      "box": [
+        12,
+        435,
+        409,
+        832
+      ],
+      "px": 397,
+      "key_left": 0.0
+    },
+    {
+      "id": "basic.rune",
+      "file": "art/generated/battle-ability-icons/bab-sheet/basic-rune.webp",
+      "box": [
+        433,
+        435,
+        830,
+        832
+      ],
+      "px": 397,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.revive.one",
+      "file": "art/generated/battle-ability-icons/bab-sheet/none-revive-one.webp",
+      "box": [
+        854,
+        435,
+        1251,
+        832
+      ],
+      "px": 397,
+      "key_left": 0.0
+    }
+  ]
+}

@@ -208,6 +208,7 @@ html.team .g .team-only{outline:1px dashed rgba(169,134,238,.55);outline-offset:
    ============================================================ */
 .g{--top:46px;--rail:78px;position:relative;width:932px;height:430px;display:grid;grid-template-columns:var(--rail) minmax(0,1fr);grid-template-rows:var(--top) minmax(0,1fr);background:var(--ink);color:var(--parch);font:14px/1.35 var(--f-u);overflow:hidden;isolation:isolate;-webkit-user-select:none;user-select:none;text-align:left}
 .g.sm{width:844px;height:390px;--top:44px;--rail:72px}
+.g{--shl-ln:var(--shl-ln0,1px);--shl-fr:var(--shl-fr0,1px)}.g.sm{--shl-ln:var(--shl-ln1,1px);--shl-fr:var(--shl-fr1,1px)}   /* толщины линий и рамок оболочки — SHL_VIEW (screens/shell.js) через переменные <html> */
 .g.full{width:100vw;height:100vh;height:100dvh;border-radius:0}
 .g *{-webkit-tap-highlight-color:transparent}
 .g button{cursor:pointer}
@@ -223,11 +224,12 @@ html.team .g .team-only{outline:1px dashed rgba(169,134,238,.55);outline-offset:
 .g p,.tr-page p,#kitRoster p{margin:0}
 
 /* верхняя строка */
-.g-top{grid-column:1/-1;grid-row:1;display:flex;align-items:center;gap:10px;padding-right:8px;background:linear-gradient(#0e1114,#0a0c0e);border-bottom:1px solid var(--iron);position:relative;z-index:6;min-width:0}
-.g-ava{position:relative;width:var(--rail);height:100%;display:grid;place-items:center;flex:none;border:0;background:linear-gradient(90deg,#0d1013,#0b0d10 80%);padding:0;border-right:1px solid var(--iron)}
-.g-ava .ring{position:relative;width:36px;height:36px;border-radius:50%;background:conic-gradient(var(--gold) calc(var(--p)*1%),#2a2f35 0);padding:2px}
+.g-top{grid-column:1/-1;grid-row:1;display:flex;align-items:center;gap:10px;padding-right:14px;background:linear-gradient(#0e1114,#0a0c0e);border-bottom:var(--shl-ln,1px) solid var(--iron);position:relative;z-index:6;min-width:0}   /* поле справа — колокол и его бейдж не заходят в скруглённый угол экрана; толщина линии — SHL_VIEW (screens/shell.js) */
+.g-ava{position:relative;width:var(--rail);height:100%;display:grid;place-items:center;flex:none;border:0;background:linear-gradient(90deg,#0d1013,#0b0d10 80%);padding:0;border-right:var(--shl-ln,1px) solid var(--iron)}
+.g-ava .ring{position:relative;width:var(--shl-ava0,36px);height:var(--shl-ava0,36px);border-radius:50%;background:conic-gradient(var(--gold) calc(var(--p)*1%),#2a2f35 0);padding:2px}
 .g-ava .ring img{width:100%;height:100%;border-radius:50%;object-fit:cover;background:#07090a;display:block}
-.g-ava .lv{position:absolute;right:-6px;bottom:-4px;min-width:19px;height:17px;padding:0 4px;border-radius:9px;background:#0a0c0e;border:1px solid var(--gold-3);color:var(--gold);font:700 11px/15px var(--f-u);text-align:center}
+.g-ava .lv{position:absolute;right:-5px;bottom:-2px;min-width:18px;height:15px;padding:0 4px;border-radius:8px;background:#0a0c0e;border:var(--shl-fr,1px) solid var(--gold-3);color:var(--gold);font:700 10.5px/13px var(--f-u);text-align:center}   /* уровень — внутри ячейки портрета: не заходит на линию шапки (check_shell.js)*/
+.g.sm .g-ava .ring{width:var(--shl-ava1,34px);height:var(--shl-ava1,34px)}
 .g-ava[aria-current="page"] .ring{box-shadow:0 0 0 1px var(--spirit),0 0 14px -2px var(--spirit)}
 .g-ava>.bdg{position:absolute;top:3px;left:calc(50% + 9px);z-index:2}   /* дела Странника — места Памяти, ждущие выбора */
 .g-title{display:flex;align-items:baseline;gap:10px;min-width:0;flex:0 1 auto;white-space:nowrap}
@@ -236,7 +238,7 @@ html.team .g .team-only{outline:1px dashed rgba(169,134,238,.55);outline-offset:
 .g.sm .g-title.long h1{font-size:20px}   /* 844: длинный заголовок (бой, Эхо, Арена) — мельче и без подзаголовка: то же есть в полосе боя */
 .g.sm .g-title.long small{display:none}
 .g.sm .g-seg~.wk-chip .wkc-l{display:none}   /* 844, вкладки и срок недели в одной шапке: у срока остаются песочные часы и время — иначе вкладки заходят под плашку */
-.g-back{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:8px;border:1px solid var(--iron-2);background:var(--stone-2);color:var(--gold);flex:none;margin-right:-2px}
+.g-back{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:8px;border:var(--shl-fr,1px) solid var(--iron-2);background:var(--stone-2);color:var(--gold);flex:none;margin-right:-2px}
 .g-seg{display:flex;align-items:stretch;gap:2px;height:100%;min-width:0}
 .g-seg button{position:relative;appearance:none;border:0;background:none;padding:0 11px;height:100%;color:var(--parch-3);font:600 18px/1 var(--f-d);white-space:nowrap;letter-spacing:.01em}
 .g-seg button:hover{color:var(--parch-2)}
@@ -244,7 +246,7 @@ html.team .g .team-only{outline:1px dashed rgba(169,134,238,.55);outline-offset:
 .g-seg button[aria-selected="true"]::after{content:"";position:absolute;left:10px;right:10px;bottom:-1px;height:2px;border-radius:2px;background:var(--spirit);box-shadow:0 -4px 12px 1px var(--spirit-a)}
 .g-seg .bdg{position:absolute;top:11px;right:1px;min-width:0;width:7px;height:7px;padding:0;font-size:0;background:var(--spirit);box-shadow:0 0 8px var(--spirit)}
 .g-spacer{flex:1 1 0;min-width:4px}
-.g-wallet{display:flex;align-items:center;gap:2px;height:32px;padding:0 4px;border-radius:9px;background:#0b0d10;border:1px solid var(--iron);flex:none}
+.g-wallet{display:flex;align-items:center;gap:2px;height:32px;padding:0 4px;border-radius:9px;background:#0b0d10;border:var(--shl-fr,1px) solid var(--iron);flex:none}
 .g-cur{display:flex;align-items:center;gap:5px;height:100%;padding:0 7px;border:0;background:none;border-radius:7px;color:var(--parch);font:700 14px/1 var(--f-u)}
 .g-cur:hover{background:#12161a}
 .g-cur img{width:20px;height:20px;object-fit:contain}
@@ -254,11 +256,12 @@ html.team .g .team-only{outline:1px dashed rgba(169,134,238,.55);outline-offset:
 .g-plus i{display:grid;place-items:center;width:16px;height:16px;border-radius:4px;background:var(--spirit-3);color:var(--spirit);font:700 13px/1 var(--f-u);font-style:normal}
 .g-plus:hover i{filter:brightness(1.35)}
 .g-plus[aria-current="page"] i{box-shadow:0 0 0 1px var(--spirit),0 0 10px -2px var(--spirit)}
-.g-icon{position:relative;display:grid;place-items:center;width:36px;height:36px;border-radius:9px;border:1px solid var(--iron);background:#0b0d10;color:var(--parch-2);flex:none}
+.g-icon{position:relative;display:grid;place-items:center;width:var(--shl-bell0,36px);height:var(--shl-bell0,36px);border-radius:9px;border:var(--shl-fr,1px) solid var(--iron);background:#0b0d10;color:var(--parch-2);flex:none}
+.g.sm .g-icon{width:var(--shl-bell1,34px);height:var(--shl-bell1,34px)}
 .g-icon:hover{color:var(--gold);border-color:var(--iron-2)}
 .g-icon .i{width:18px;height:18px}
 .bdg{display:inline-grid;place-items:center;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--rust);color:#fff4ef;font:700 10.5px/1 var(--f-u);box-shadow:0 0 0 2px var(--ink)}
-.g-icon .bdg{position:absolute;top:-5px;right:-5px}
+.g-icon .bdg{position:absolute;top:-3px;right:-3px}
 .bdg.ok{background:var(--spirit-2);color:#021614}
 .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--spirit);box-shadow:0 0 8px var(--spirit)}
 
@@ -267,24 +270,26 @@ html.team .g .team-only{outline:1px dashed rgba(169,134,238,.55);outline-offset:
    Бейдж — число дел: одно дело — одна кнопка, которая ждёт игрока; «!» нет. Закрытый раздел — замок, условие — в подсказке (§28.4).
    Подписи прячутся, когда шахте мало высоты или ширины: имя остаётся в aria-label и подсказке.
    Переход между разделами — язычок едет к новому разделу, экран входит снизу или сверху: только transform и opacity */
-.g-rail{grid-column:1;grid-row:2;position:relative;display:flex;flex-direction:column;padding:var(--sp-s) 0;background:linear-gradient(90deg,#0b0d10,#0a0c0e 80%);border-right:1px solid var(--iron);z-index:4;container:rail/size}
+.g-rail{grid-column:1;grid-row:2;position:relative;display:flex;flex-direction:column;padding:var(--sp-s) 0;background:linear-gradient(90deg,#0b0d10,#0a0c0e 80%);border-right:var(--shl-ln,1px) solid var(--iron);z-index:4;container:rail/size}
 .g-rail::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;transform:translateX(-.5px);background:linear-gradient(rgba(72,229,212,0),rgba(72,229,212,.08) 25%,rgba(72,229,212,.22) 75%,rgba(72,229,212,.5));pointer-events:none}
 .g-rail::after{content:"";position:absolute;left:0;right:0;bottom:0;height:64px;background:radial-gradient(60% 100% at 50% 100%,rgba(72,229,212,.13),transparent 70%);pointer-events:none}
 .g-nav{position:relative;z-index:1;flex:1 1 0;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:0;background:none;padding:0;color:var(--parch-3);transition:color .2s}
 .g-nav .nv{position:relative;flex:none}
-.g-nav .pic{position:relative;display:block;width:40px;height:40px;border-radius:12px;overflow:hidden;background:#07090a;box-shadow:0 0 0 1px #20262b,0 0 0 4px #0a0d0f;transition:box-shadow .2s}
+.g-nav .pic{position:relative;display:block;width:40px;height:40px;border-radius:10px;overflow:hidden;background:#07090a;box-shadow:0 0 0 1px #20262b;transition:box-shadow .2s}   /* рамка — одна нить: гнездо рисует screens/shell.css */
 .g-nav .pic img{display:block;width:100%;height:100%;object-fit:cover;opacity:.5;filter:grayscale(.6) brightness(.9);transition:opacity .2s,filter .2s}
 .g-nav .lbl{padding:0 3px;background:#0a0d0f;font:700 10px/1 var(--f-u);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
 @media (hover:hover){.g-nav:hover{color:var(--parch-2)}.g-nav:hover .pic img{opacity:.82;filter:grayscale(.2)}}   /* на телефоне наведения нет — нажатая кнопка не «залипает» */
 .g-nav[aria-current="page"]{color:var(--gold)}
 .g-nav[aria-current="page"]::before{content:"";position:absolute;inset:6px 8px;border-radius:16px;background:radial-gradient(70% 60% at 50% 72%,rgba(72,229,212,.14),transparent 72%);pointer-events:none}
-.g-nav[aria-current="page"] .pic{box-shadow:0 0 0 1px rgba(72,229,212,.85),0 0 0 4px #0a0d0f,0 10px 18px -6px var(--spirit)}
+.g-nav[aria-current="page"] .pic{box-shadow:0 0 0 1px rgba(72,229,212,.85),0 10px 18px -6px var(--spirit)}
 .g-nav[aria-current="page"] .pic img{opacity:1;filter:none}
 .g-nav .bdg{position:absolute;top:-6px;right:-9px;z-index:2}
 .g-nav .lamp{position:absolute;top:0;bottom:0;right:-1px;width:3px;pointer-events:none}
 .g-nav .lamp::before{content:"";position:absolute;left:0;right:0;top:50%;height:34px;margin-top:-17px;border-radius:2px 0 0 2px;background:var(--spirit);box-shadow:0 0 10px var(--spirit),-6px 0 16px -2px var(--spirit-a)}
 .g-nav.lock .pic img{opacity:.22;filter:grayscale(1)}
 .g-nav.lock .lk{position:absolute;inset:0;display:grid;place-items:center;color:var(--parch-2)}
+.g-nav.lock .lk .i{width:16px;height:16px;margin-top:-9px}
+.g-nav.lock .lk b{position:absolute;left:0;right:0;bottom:3px;font:700 9px/1 var(--f-u);letter-spacing:.06em;text-align:center;color:var(--gold-2);white-space:nowrap}   /* закрытый раздел: замок и уровень открытия на картинке */
 .g-nav.lock .lbl{opacity:.6}
 @container rail (max-height:299px){.g-nav .lbl{display:none}}
 @container rail (max-width:62px){.g-nav .lbl{display:none}}
@@ -491,7 +496,7 @@ button.well:hover{border-color:var(--iron-3)}
 .bt-clock .row{justify-content:space-between;font-size:11.5px;color:var(--parch-2);gap:8px}
 .bt-clock .row .i{width:13px;height:13px}
 .bt-ctrl{margin-left:auto;display:flex;gap:6px;align-items:center}
-.bt-field{position:absolute;left:0;right:0;top:50px;bottom:34px;z-index:2}
+.bt-field{position:absolute;left:0;right:0;top:44px;bottom:22px;z-index:2}   /* «Бой AAA»: HUD и линейка этажей ниже — поле выше: плита здоровья с числом на каждой карте (screens/battle-scene.css) */
 .bt-side{position:absolute;top:0;bottom:0;width:calc(var(--colw) + 86px)}
 .bt-side.h{left:12px}
 .bt-side.f{right:12px}
@@ -719,10 +724,10 @@ button.well:hover{border-color:var(--iron-3)}
 .fly.miss{color:var(--parch-3);font-size:12px}
 .fly.info{color:var(--amber);font-size:12px;letter-spacing:.04em}
 @keyframes fly{0%{transform:translateY(0) scale(.8);opacity:0}15%{opacity:1;transform:translateY(-6px) scale(1.05)}100%{transform:translateY(-40px) scale(1);opacity:0}}
-.ruler{position:absolute;left:14px;right:14px;bottom:10px;z-index:3;height:22px;display:flex;align-items:flex-end;gap:2px}
-.ruler i{position:relative;flex:1 1 0;height:6px;border-radius:2px;background:#262b30;overflow:hidden}
-.ruler i.el5{height:12px;background:#4c4335}
-.ruler i.boss{height:18px;background:#3a2c1b}
+.ruler{position:absolute;left:14px;right:14px;bottom:5px;z-index:3;height:12px;display:flex;align-items:flex-end;gap:2px}
+.ruler i{position:relative;flex:1 1 0;height:4px;border-radius:2px;background:#262b30;overflow:hidden}
+.ruler i.el5{height:8px;background:#4c4335}
+.ruler i.boss{height:12px;background:#3a2c1b}
 .ruler i.boss::after{content:"";position:absolute;left:0;right:0;bottom:0;height:calc(var(--sg,0)*1%);background:linear-gradient(0deg,var(--gold-3),var(--gold))}
 .ruler i.past{background:var(--gold-3)}
 .ruler i.past.el5{background:var(--gold-2)}
@@ -1053,7 +1058,7 @@ button.well:hover{border-color:var(--iron-3)}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
 
-/* ===== Убежище — screens/shelter.css; кованые кромки оболочки — screens/shell.css ===== */
+/* ===== Убежище — screens/shelter.css; линии и кнопки оболочки — screens/shell.css ===== */
 
 /* ===== Герои ===== */
 .collpow{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;color:var(--parch);text-align:left}
@@ -1096,8 +1101,15 @@ button.well:hover{border-color:var(--iron-3)}
 .rkrow b.serif{font-size:20px;color:var(--gold);text-align:center}
 .rkrow.me{border-color:rgba(72,229,212,.45);box-shadow:inset 0 -10px 14px -12px var(--spirit)}
 /* чат, почта, друзья и профиль игрока — screens/social.css */
-.newfoe{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;border:1px solid rgba(72,229,212,.45);background:radial-gradient(60% 120% at 10% 100%,rgba(72,229,212,.14),transparent 70%),#0e1114}
+.newfoe{display:flex;align-items:center;gap:12px;min-width:0;padding:8px 12px;border-radius:12px;border:1px solid rgba(72,229,212,.45);background:radial-gradient(60% 120% at 10% 100%,rgba(72,229,212,.14),transparent 70%),#0e1114}
 .newfoe img{height:84px;width:auto;aspect-ratio:4/5;object-fit:cover;border-radius:8px;border:1px solid #262b31;box-shadow:0 6px 10px -6px #000}
+/* много новых врагов за забег: до NEWFOE.show портретов стопкой внахлёст и «+N», имена — первые NEWFOE.names и «и ещё N» (иначе блок растягивал окно итога вширь) */
+.nf-faces{display:flex;align-items:center;flex:none}
+.nf-faces img{height:72px;margin-left:-26px;box-shadow:-6px 0 10px -4px rgba(0,0,0,.85)}
+.nf-faces img:first-child{margin-left:0}
+.nf-more{margin-left:8px;font:600 18px/1 var(--f-d);color:var(--spirit);font-variant-numeric:lining-nums}
+.nf-tx{min-width:0;flex:1 1 auto}
+.nf-nm{font-size:18px;line-height:1.15;overflow-wrap:anywhere}
 .foe-art{height:150px;width:auto;aspect-ratio:4/5;object-fit:cover;border-radius:10px;border:1px solid #262b31;box-shadow:0 8px 14px -6px #000}
 .dlg.wide{width:min(700px,calc(100% - 30px))}
 /* дар дня — screens/pass.css */
@@ -1159,6 +1171,15 @@ body.phone .p-device-wrap{position:fixed;inset:0;height:auto!important}
 body.phone .p-device{transform:none!important;padding:0;border-radius:0;box-shadow:none;width:100%;height:100%}
 body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 .kit-g{font:14px/1.35 var(--f-u);color:var(--parch)}
+/* UI-кит блоками: строка-заголовок, содержимое — по раскрытию (renderKit с KIT_ONLY), свёрнутый блок пуст */
+.k-blk{grid-column:1/-1;min-width:0;border:1px solid #1b1f24;border-radius:14px;background:var(--ink);background-image:var(--noise)}
+.k-blk>summary{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;list-style:none;font:600 19px/1.2 var(--f-d);color:var(--gold)}
+.k-blk>summary::-webkit-details-marker{display:none}
+.k-blk>summary::before{content:'';flex:none;width:8px;height:8px;border-right:2px solid var(--gold-2);border-bottom:2px solid var(--gold-2);transform:rotate(-45deg);transition:transform .15s}
+.k-blk[open]>summary::before{transform:rotate(45deg)}
+.k-blk>summary:hover{color:var(--parch)}
+.k-blk>.kit-g{padding:0 14px 14px}
+.k-blk:not([open])>.kit-g{display:none}
 
 /* ===== Древо рецептов: шесть циклов, узлы по ярусам, связи — рецепты «входы → выход» ===== */
 /* вкладка «Древо рецептов» — инструмент команды во всю ширину, не экран телефона (ADR-0008) */
@@ -1379,7 +1400,9 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <link rel="stylesheet" href="screens/shelter.css">
 <link rel="stylesheet" href="screens/social.css">
 <link rel="stylesheet" href="screens/battle-cards.css">
+<link rel="stylesheet" href="screens/battle-scene.css">
 <link rel="stylesheet" href="screens/start.css">
+<link rel="stylesheet" href="screens/cycle.css">
 <link rel="stylesheet" href="screens/shell.css">
 </head>
 <body>
@@ -1515,6 +1538,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <script src="pass.js"></script>
 <script src="store.js"></script>
 <script src="start.js"></script>
+<script src="cycle.js"></script>
 <script>
 'use strict';
 /* Все числа ниже — демонстрационные фикстуры: взяты из текущего UIKit
@@ -2005,7 +2029,7 @@ function navItem([k, l, p], o = {}) {
   const why = lvl ? `откроется на ${lvl}-м уровне Странника` : todoText(o.todo), name = trEsc(why ? `${l}: ${why}` : l);   // подписи дел — из строк NAV_TODO экранов
   const lamp = cur ? `<i class="lamp${mv.d ? ' go' : mv.lit ? ' lit' : ''}"${mv.d ? ` style="--d:${mv.d}"` : ''}></i>` : '';
   return `<button class="g-nav${lvl ? ' lock' : ''}${cur && (mv.d || mv.lit) ? ' lit' : ''}${o.cls ? ' ' + o.cls : ''}" data-k="${k}" data-a="${lvl ? 'toast' : 'go'}" data-v="${lvl ? `${l} ${why}` : k}"${cur ? ' aria-current="page"' : ''} aria-label="${name}" title="${name}">`
-    + `<span class="nv"><span class="pic"><img src="${PATH(p)}" alt="">${lvl ? `<span class="lk">${ic('lock')}</span>` : ''}</span>${bdgN(n)}</span><span class="lbl" aria-hidden="true">${l}</span>${lamp}</button>`;
+    + `<span class="nv"><span class="pic"><img src="${PATH(p)}" alt="">${lvl ? `<span class="lk">${ic('lock')}<b>ур. ${lvl}</b></span>` : ''}</span>${bdgN(n)}</span><span class="lbl" aria-hidden="true">${l}</span>${lamp}</button>`;
 }
 /* портрет Странника над шахтой — быстрый вход в «Странника»; лицо — выбранный портрет облика (screens/wanderer.js), бейдж — места Памяти, ждущие выбора */
 function avaHtml(sec, todo) {
@@ -2214,12 +2238,15 @@ function cardHtml(R, u, n, k) {
   const [col, row] = SLOT[n][k], kn = unitKnown(u), d = R.disp[dkey(u)] || { hp: u.hp, sh: u.sh, dead: !u.alive };
   const fr = (typeof bfCard === 'function' && bfCard(R, u)) || BC_PLAIN;
   return `<div class="bc ${u.side ? 'foe' : ''} ${u.lead ? 'lead' : ''} ${kn ? '' : 'unk'} ${d.dead ? 'dead' : ''} ${S.insp === dkey(u) ? 'sel' : ''}${fr.cls}" id="bc${u.side}${u.i}" data-a="insp" data-v="${dkey(u)}" data-el="${u.el}"${fr.data} style="--k:${col};--r:${row}${fr.style}" title="${kn ? u.name + fr.tip + ' · ' + u.cls + ' · ' + u.el : 'Не изучен' + fr.tip + ': имя и способности откроет первая победа'}">
-    <div class="face">${unitFace(u, true)}${fr.face}<div class="buffs"></div><div class="debuffs"></div><span class="cls">${kn ? CLS(u.cls, 18, u.cls) : ''}</span><span class="tgt"></span><span class="ctl"></span>${u.side ? '' : '<span class="fell">пал</span>'}</div>
+    <div class="face">${unitFace(u, true)}<i class="fxl" aria-hidden="true"></i>${fr.face}<div class="buffs"></div><div class="debuffs"></div><span class="cls">${kn ? CLS(u.cls, 18, u.cls) : ''}</span><span class="tgt"></span><span class="ctl"></span>${u.side ? '' : '<span class="fell">пал</span>'}</div>
     ${fr.mark}<span class="nm">${kn ? u.name : 'Не изучен'}</span>
-    ${bar(d.hp / u.maxHp * 100, 'hp', `<span class="sh" style="left:0;width:${Math.min(100, d.sh * 100 / u.maxHp)}%"></span>`)}
+    ${bar(d.hp / u.maxHp * 100, 'hp', `<span class="sh" style="left:0;width:${Math.min(100, d.sh * 100 / u.maxHp)}%"></span>${hpNum(d)}`)}
     <div class="rot"></div>
   </div>`;
 }
+/* здоровье числом на полосе (слово автора 01.10.2026: «количество хп на хп баре надо»), щит — отдельным числом синим; показ и сокращение
+   больших чисел — screens/battle-scene.js (bsHpTxt), без него — полное число */
+const hpNum = d => { const t = typeof bsHpTxt === 'function' ? bsHpTxt : fmt; return `<b class="hpn">${t(d.dead ? 0 : Math.max(0, d.hp))}</b><b class="shn">${d.sh > 0 && !d.dead ? t(d.sh, true) : ''}</b>`; };
 /* Один просмотрщик на все режимы: забег по биому, рунный страж, Эхо. Бой не биома несёт сцену R.scene: заголовок, значок, чип,
    фон, куда вернуться, действие «Пропустить» и лист итога. Сцена одна — без перехода между комнатами. */
 function battle() {
@@ -2240,7 +2267,7 @@ function battle() {
     badge = R.guard ? `<b>${ic('crown')}</b><span>страж</span>` : `<b>${R.floor}</b><span>/ ${B.floors.length}</span>`;
     // рунный страж: его обычная атака отнимает у боя раунд (ADR-0020) — видно в чипе, в часах и в ленте
     chip = `<span class="chip ${FL.g !== 'o' ? 'gold' : ''}">${FL.g === 'e' ? ic('gem') : FL.g === 'b' || FL.g === 'r' ? ic('crown') : ''}${typ}${lead ? ' · ' + uName(lead) : ''}${FL.g === 'b' && B.siege !== false ? ` · осада ${siegeDone(R.biome)}%` : ''}</span>`
-      + (R.guard && b.mode === 'rounds' ? `<span class="chip warn bt-cutchip" title="${tmT('Обычная атака рунного босса отнимает у боя раунд, текущий бой доигрывается', 'Особенность каждого рунного босса: его обычная атака отнимает у предела раунд, текущий бой доигрывается (ADR-0020)')}">${ic('hour')}удар стража · −${EB.RULES.rounds.runeCut} раунд</span>` : '');
+      + (R.guard && b.mode === 'rounds' ? `<span class="chip warn bt-cutchip" title="${tmT('Обычная атака рунного босса отнимает у боя раунд, текущий бой доигрывается', 'Особенность каждого рунного босса: его обычная атака отнимает у предела раунд, текущий бой доигрывается (ADR-0020)')}">${ic('hour')}<span class="bs-long">удар стража · </span>−${EB.RULES.rounds.runeCut} раунд</span>` : '');
     if (R.guard && b.mode === 'rounds') row2 = ['Отнял страж', 'btCut', guardCut(R)];
     const bgA = biomeArena(R.biome);   // арена своего биома
     bgs = `<img class="bg${R.floor % 2 ? '' : ' flip'}" src="${bgA}" alt=""><img class="bg bg2${R.floor % 2 ? ' flip' : ''}" src="${bgA}" alt="">`;
@@ -2249,9 +2276,9 @@ function battle() {
     <div class="bt-bgs">${bgs}</div>
     <div class="bt-hud">
       <div class="bt-floor">${badge}</div>
-      ${chip}
+      ${chip}${typeof bsImmChip === 'function' ? bsImmChip(R, chip) : ''}
       ${b.mode === 'rounds'
-        ? `<div class="bt-clock" id="btClockBox"><div class="row"><span>${ic('hour')} Раунд</span><span class="num" id="btClock">${b.round} / ${b.maxRounds}</span></div>${bar(b.round * 100 / b.maxRounds, 'sand')}<div class="row"><span>${row2[0]}</span><span class="num" id="${row2[1]}">${row2[2]}</span></div></div>`
+        ? `<div class="bt-clock" id="btClockBox"><span class="bt-rnd" aria-hidden="true"><b id="btRoundN">${Math.max(1, b.round)}</b></span><div class="bt-clk"><div class="row"><span>${ic('hour')} Раунд</span><span class="num" id="btClock">${b.round} / ${b.maxRounds}</span></div>${bar(b.round * 100 / b.maxRounds, 'sand')}<div class="row"><span>${row2[0]}</span><span class="num" id="${row2[1]}">${row2[2]}</span></div></div></div>`
         : `<div class="bt-clock"><div class="row"><span>${ic('hour')} Бой</span><span class="num" id="btClock">${clock(R.view / 1000)} / ${clock(b.limit / 1000)}</span></div>${bar(Math.min(100, R.view * 100 / b.limit), 'sand')}<div class="row"><span>Забег идёт</span><span class="num" id="btRun">${clock((R.runMs + R.view) / 1000)}</span></div></div>`}
       <span class="chip team-only" title="${sc ? 'Сид атаки выдаёт сервер: бой посчитан целиком до показа, исход известен' : 'Сид — сам биом: тот же отряд с той же ротацией всегда получает тот же сценарий'}">${ic('lock')}сценарий ${seedTag(R)}</span>${b.mode === 'rounds' && !sc && !R.guard ? `<span class="chip spirit team-only" title="Модель боя для сравнения, ADR-0008">10 раундов</span>` : ''}
       <div class="bt-ctrl">
@@ -2268,7 +2295,7 @@ function battle() {
       <div class="bt-insp" id="btInsp" hidden></div>
       <div class="bt-legend" id="btLegend" ${S.legend ? '' : 'hidden'}>${legendHtml(b.mode)}</div>
     </div>
-    ${R.banner ? `<div class="bt-banner"><b>${R.banner[0]}</b><small>${R.banner[1]}</small></div>` : ''}
+    ${R.banner ? (typeof bsBanner === 'function' ? bsBanner(R) : `<div class="bt-banner"><b>${R.banner[0]}</b><small>${R.banner[1]}</small></div>`) : ''}
     <div class="ruler" aria-hidden="true">${sc ? (sc.ruler ? sc.ruler(R) : '') : R.guard ? '' : rulerHtml(R)}</div>
   </div></section>` };
 }
@@ -2855,6 +2882,7 @@ function dialog(title, body, foot = '', cls = '') {
   return `<div class="ov" role="dialog" aria-modal="true" aria-label="${title.replace(/<[^>]+>/g, '')}"><button class="ov-scrim" data-a="close" aria-label="Закрыть" tabindex="-1"></button>
     <div class="dlg fit ${cls}"><div class="dlg-h"><h2>${title}</h2><button class="iconbtn x" data-a="close" aria-label="Закрыть">${ic('x')}</button></div><div class="dlg-b">${body}</div>${foot ? `<div class="dlg-f">${foot}</div>` : ''}</div></div>`;
 }
+const NEWFOE = { show: 4, names: 3 };   // «Новое в бестиарии» в итоге забега: портретов стопкой и имён строкой, остальное — «+N» и «и ещё N»
 const OV = {
   /* полная карточка героя состава поверх любого экрана (§15.1: из каталога праха — полная карточка) */
   rhero(o) {
@@ -2943,9 +2971,9 @@ const OV = {
       <div class="row" style="gap:18px;flex-wrap:wrap">${R.guard ? '' : `<div class="stat"><b>${passed}</b><small>этажей пройдено</small></div>`}<div class="stat"><b>${R.kills}</b><small>побед</small></div><div class="stat"><b>${clock(R.runMs / 1000)}</b><small>время забега</small></div>${R.mode === 'rounds' ? '<div class="stat team-only"><b>10 раундов</b><small>модель боя</small></div>' : ''}${B.siege !== false && (E.kind === 'boss' || sg) ? `<div class="stat"><b>${E.kind === 'boss' ? 100 : sg}%</b><small>осада босса</small></div>` : ''}</div>
       ${curve}
       <span class="eyebrow">Добыча · в запасах</span>
-      <div class="row" style="gap:14px;flex-wrap:wrap">${money('gold', L.gold)}${money('spirit', L.spirit)}${money('souls', L.souls)}${lootHtml(L.items)}</div>
+      <div class="row" style="gap:14px;flex-wrap:wrap">${money('gold', L.gold)}${money('spirit', L.spirit)}${money('souls', L.souls)}${L.keys ? money('keys', L.keys) : ''}${lootHtml(L.items)}</div>
       ${Object.keys(L.items || {}).length ? '' : `<p class="reason">Ресурсов не выпало${TM(`: базовый — за взятый этаж с шансом ${pctBp(EB.RULES.drop.basePerFloorBp)}, ключ ремесла — с каждой элиты`)}.</p>`}
-      ${nk.length ? `<div class="newfoe">${nk.map(f => `<img src="${FA(f)}" alt="" style="object-position:${FPOS(f)}">`).join('')}<div class="col" style="gap:3px"><span class="eyebrow" style="color:var(--spirit)">Новое в бестиарии</span><b class="serif" style="font-size:20px">${nk.map(f => f.name).join(', ')}</b></div><button class="link" data-a="foe" data-v="${nk[0].id}" style="margin-left:auto">Прочитать ${ic('chev')}</button></div>` : ''}
+      ${nk.length ? `<div class="newfoe"><span class="nf-faces">${nk.slice(0, NEWFOE.show).map(f => `<img src="${FA(f)}" alt="" style="object-position:${FPOS(f)}">`).join('')}${nk.length > NEWFOE.show ? `<b class="nf-more">+${nk.length - NEWFOE.show}</b>` : ''}</span><div class="col nf-tx" style="gap:3px"><span class="eyebrow" style="color:var(--spirit)">Новое в бестиарии${nk.length > 1 ? ' · ' + nk.length : ''}</span><b class="serif nf-nm">${nk.slice(0, NEWFOE.names).map(f => f.name).join(', ')}${nk.length > NEWFOE.names ? ` и ещё ${nk.length - NEWFOE.names}` : ''}</b></div><button class="link" data-a="foe" data-v="${nk[0].id}" style="margin-left:auto">Прочитать ${ic('chev')}</button></div>` : ''}
       ${E.kind === 'boss' ? '' : `<p class="reason">${PL('Тот же отряд пройдёт биом так же — меняйте состав или стихии.', 'Сид — сам биом: тот же отряд с той же ротацией пройдёт его так же. Чтобы пройти дальше, поменяй состав или стихии.')}</p>`}`;
     return dialog(title, body, `<button class="btn ghost" data-a="leave" data-v="${R.id}">В Убежище</button><button class="btn" data-a="resquad" data-v="${R.id}">${ic('users')}Сменить отряд</button><button class="btn go" data-a="again" data-v="${R.id}">${ic('down')}Ещё забег</button>`);
   },
@@ -3174,12 +3202,12 @@ function advance(R, ms) {
   if (R.gap > 0) { R.gap -= ms; if (R.gap <= 0) { R.floor++; newFloor(R); if (vis) render(); } return; }
   const b = R.b;
   R.view += ms;
-  if (R.enter && R.view > 1200) R.enter = false;
+  if (R.enter && R.view > EB.RULES.floor.ritual.enterMs) R.enter = false;   // выход врагов нового этажа — RULES.floor.ritual
   if (R.banner && R.view > 2200) { R.banner = null; if (vis) { const x = document.querySelector('.bt-banner'); x && x.remove(); } }
   while (!b.over && EB.nextAt(b) <= R.view) onAction(R, EB.step(b), vis);
   if (!b.over && R.view > b.limit) onAction(R, EB.step(b), vis);   // время боя вышло
   if (vis) paintHud(R);
-  if (b.over) { if (R.endAt == null) R.endAt = R.view + 1400; if (!vis || R.view >= R.endAt) (R.done || floorDone)(R, vis); }   // дать доиграть последний удар; у боя со сценой — свой итог
+  if (b.over) { if (R.endAt == null) R.endAt = R.view + EB.RULES.floor.ritual.fallMs; if (!vis || R.view >= R.endAt) (R.done || floorDone)(R, vis); }   // дать доиграть последний удар (RULES.floor.ritual.fallMs); у боя со сценой — свой итог
 }
 function onAction(R, a, vis) {
   if (!a) return;
@@ -3208,13 +3236,14 @@ function farmText(F) {
    Сработал ли базовый ресурс, сколько ключей с элит и выпал ли уникальный с босса — решает ядро (EB.floorLoot, свой поток генератора этажа).
    Какие именно — здесь, на генераторе ядра (EB.makeRng) с сидом забега и номером этажа. Порядок бросков — базовые, ключи, уникальный, добыча стража.
    Числа — EN_RECIPES.drops: за срабатывание — от 1 до basicsPerTriggerMax базовых из общих 36, это номер биома (ADR-0023, п. 1);
-   ключ — один из шести ключей биома наугад (п. 2); стражи — drops.guardians. Всё ложится в запасы через BAG. */
+   ларцы Странника поднимают верхнюю границу — её даёт ядро (got.baseMax, ADR-0044); ключ — один из шести ключей биома наугад (п. 2);
+   стражи — drops.guardians. Всё ложится в запасы через BAG. */
 const dropOf = biome => (RX.drops.enemies || []).find(e => e.biome === biome) || null;
 const guardOf = biome => (RX.drops.guardians || []).find(g => g.biome === biome) || null;
 function lootItems(biome, floor, got, seed, guardWin) {
   const roll = EB.makeRng(EB.floorSeed(seed >>> 0, floor)), out = {}, put = (id, n) => { out[id] = (out[id] || 0) + n; };
   const add = list => { if (list.length) put(list[roll(list.length)].id, 1); };
-  const D = dropOf(biome), max = D ? D.basicsPerTriggerMax : EB.BIOMES[biome] ? EB.BIOMES[biome].n : 1, pool = poolItems();
+  const D = dropOf(biome), max = got.baseMax || (D ? D.basicsPerTriggerMax : EB.BIOMES[biome] ? EB.BIOMES[biome].n : 1), pool = poolItems();
   for (let t = 0; t < (got.base || 0); t++) { const n = 1 + roll(max); for (let k = 0; k < n; k++) add(pool); }
   const keys = biomeItems('key', biome); for (let k = 0; k < (got.keys || 0); k++) add(keys);
   const un = biomeItems('unique', biome); for (let k = 0; k < (got.unique || 0); k++) add(un);
@@ -3236,18 +3265,27 @@ function lootHtml(items) {
     .sort(([a], [b]) => ord.indexOf(BAG.item(a).tier) - ord.indexOf(BAG.item(b).tier) || at.get(a) - at.get(b))
     .map(([id, n]) => `<span class="row" style="gap:4px">${itWell(id, { act: 'noop', size: 30 })}<b class="num">×${fmt(n)}</b></span>`).join('');
 }
+/* что «сервер» знает об игроке для добычи этажа (ADR-0044): цикл аккаунта и артефакты Странника (EN_WANDERER.art: примитив loot, уровень —
+   S.wn.art). Цикл I — сценарий обучения: его добычу задаёт таблица (ADR-0040), ядро зовётся без прибавок — эффект артефакта там шаг сценария */
+const lootCtx = () => {
+  if (!(S.acc && S.acc.cycle >= 2)) return null;
+  const W = window.EN_WANDERER, lv = id => S.wn && S.wn.art && S.wn.art[id] != null ? S.wn.art[id] : -1;
+  return { cyc: S.acc.cycle, art: EB.lootArt(W && W.art ? W.art.list.filter(a => a.loot).map(a => ({ loot: a.loot, step: a.step, lv: lv(a.id) })) : []) };
+};
 function floorDone(R, vis) {
   const b = R.b, B = EB.BIOMES[R.biome], g = deckOf(R).g;
   R.runMs += b.t;
   R.heroes = EB.carry(R.heroes, b);
   R.curve.push(partyPctOf(b));
-  const fl = R.guard ? B.floors.length + 1 : R.floor, got = EB.floorLoot(R.biome, fl, b, 0), L = R.loot;   // 0 — прибавка артефактов к шансу ресурса
+  const fl = R.guard ? B.floors.length + 1 : R.floor, got = EB.floorLoot(R.biome, fl, b, lootCtx()), L = R.loot;   // цикл и артефакты игрока (ADR-0044)
   const items = lootItems(R.biome, fl, got, R.lootSeed || 0, R.guard && b.win);
   L.gold += got.gold; L.spirit += got.spirit; L.souls += got.souls;
   // добыча этажа — сразу, как убиты все враги этажа: валюта летит в панель, как магнитом (§5.6), ресурсы ложатся в запасы
   S.wallet.gold += got.gold; S.wallet.spirit += got.spirit; S.wallet.souls += got.souls;
+  if (got.runeKeys) { S.wallet.keys += got.runeKeys; L.keys = (L.keys || 0) + got.runeKeys; }   // рунный ключ с босса биома — с цикла II (ADR-0044, §11)
   for (const [id, n] of Object.entries(items)) { BAG.add(id, n); L.items[id] = (L.items[id] || 0) + n; }
   if (vis) magnet(got);
+  if (vis && got.runeKeys) feed(R, `<span class="gd">Рунный ключ</span> · +${got.runeKeys}`);
   if (vis && Object.keys(items).length) feed(R, `<span class="gd">Добыча</span> · ${Object.entries(items).map(([id, n]) => `${itName(BAG.item(id))} ×${n}`).join(', ')}`);
   const fm = farmText(got.farm); if (vis && fm) feed(R, `<span class="gd">Фарм</span> · ${fm}`);
   if (R.guard) {
@@ -3772,6 +3810,8 @@ function kitIconsHtml() {
 /* разделы UI-кита из файлов экранов: KIT_EXTRA.push({ html: () => '<section class="k-box">…</section>', paint: () => {…} }) —
    screens/*.js дописывают свои разделы сюда, не трогая renderKit; paint вызывается после вставки разметки */
 const KIT_EXTRA = [];
+/* у раздела — файл его экрана (пока скрипт выполняется, document.currentScript — он): по файлу раздел попадает в свой блок кита */
+KIT_EXTRA.push = function (...xs) { const s = typeof document !== 'undefined' && document.currentScript, src = s && s.getAttribute ? s.getAttribute('src') || '' : ''; for (const x of xs) { if (x && x.file == null) x.file = src.replace(/[?#].*$/, '').replace(/^.*\//, ''); Array.prototype.push.call(this, x); } return this.length; };
 
 /* ================== UI-кит · оболочка и навигация ==================
    Раздел через KIT_EXTRA, как у экранов: живая шахта с портретом Странника и шапкой — нажатие по разделу играет тот же переход, что
@@ -3826,25 +3866,39 @@ function kitShellPaint() {
 }
 KIT_EXTRA.push({ html: kitShellHtml, paint: kitShellPaint });
 
-function renderKit() {
-  const k = document.getElementById('kitGrid'); if (!k) return;
+/* UI-кит — раскрывающимися блоками (слово автора 01.10.2026: кит рос, рисовался целиком при запуске, даже скрытый, и тормозил
+   прокрутку; старые разделы — убрать). Заголовки блоков — сразу, содержимое — когда блок раскрыли; свернули — содержимое
+   очищается. renderKit() без KIT_ONLY рисует весь кит раскрытым — так его читают проверки без браузера; с KIT_ONLY — один блок.
+   Убраны 01.10.2026: «Карта бойца · прежняя модель темпа» (ADR-0007, модель заменил ADR-0010) и «Герои черновиков · прежняя
+   редакция» (состав игры — раздел «Состав героев») */
+let KIT_ONLY = null;
+/* блок разделов экрана — по его файлу: KIT_EXTRA.push запоминает файл; подпись блока */
+const KIT_FILES = {
+  '': 'Оболочка и навигация', 'arena.js': 'Арена и Лига', 'art-icons.js': 'Осколок героя', 'bag.js': 'Запасы', 'battle-cards.js': 'Карты боя',
+  'biomes.js': 'Биомы спуска', 'book-pages.js': 'Страницы книги героя', 'book.js': 'Карточка-книга', 'chambers.js': 'Странник: покои',
+  'chest-open.js': 'Открытие сундука', 'chronicle.js': 'Летопись', 'clan.js': 'Клан', 'contracts.js': 'Контракты', 'craft.js': 'Мастерская и крафт',
+  'crafthall.js': 'Ремесло: залы', 'cycle.js': 'Новый цикл', 'descent.js': 'Спуск', 'equipment.js': 'Снаряжение', 'event.js': 'Событие недели',
+  'hero-dev.js': 'Развитие героя', 'heroes.js': 'Герои: пробуждение и отряды', 'library.js': 'Библиотека Этриона', 'pass.js': 'Пропуск и дар дня',
+  'recipe-book.js': 'Книга рецептов', 'reforge.js': 'Перековка', 'rituals.js': 'Ритуалы и рабочие', 'roulette.js': 'Возрождение душ',
+  'shell.js': 'Оболочка: линии и кнопки', 'shelter.js': 'Убежище', 'shop.js': 'Лавка', 'social.js': 'Общение', 'start.js': 'Окно уровня',
+  'store.js': 'Лавка Энериума', 'talismans.js': 'Духовные талисманы', 'talk.js': 'Диалог проводника', 'wanderer.js': 'Странник', 'week.js': 'Неделя',
+};
+/* блоки основы кита; всё, что зависит от S, считается при рисовании блока — «Чистый лист» подменяет S демо-состоянием в renderKit */
+function kitCoreBlocks() {
   const sw = (c, n, s) => `<div><i style="background:${c}"></i><span><b>${n}</b>${s}</span></div>`;
   const carst = [['var(--air)', 'Воздух', 'Элазиум'], ['var(--earth)', 'Земля', 'Рубидиум'], ['var(--fire)', 'Огонь', 'Нитриум'], ['var(--water)', 'Вода', 'Паладиум'], ['var(--time)', 'Время', 'Энериум'], ['var(--light)', 'Свет', 'без покровителя'], ['var(--dark)', 'Тьма', 'без покровителя']];
-  const h = S.heroes[1], f1 = F('o1'), f6 = F('o6');
   const kc = (id, img, name, el, x, foe, lead) => `<div class="bc ${foe ? 'foe' : ''} ${lead ? 'lead' : ''}" id="${id}" data-el="${el}" style="${foe ? 'right' : 'left'}:${x}%;top:${lead ? 44 : 56}px"><div class="face"><img src="${img}" alt=""></div><span class="nm">${name}</span>${bar(foe ? 72 : 86, 'hp')}<div class="chg"><i style="--v:40"></i></div></div>`;
-  k.innerHTML = `${kitAirHtml(h)}
-  <section class="k-box" style="grid-column:1/-1"><h3>Карта бойца · прежняя модель темпа (ADR-0007)</h3>
-    <div class="card-demo">${kitCards()}</div>
-    <div class="bt-legend static">${legendHtml()}</div></section>
-  <section class="k-box" style="grid-column:1/-1"><h3>Карта бойца: индикаторы и эффекты · модель раундов (ADR-0010)</h3>
+  return [
+    { id: 'air', t: 'Правила воздуха', html: () => kitAirHtml(S.heroes[1]) },
+    { id: 'fight', t: 'Бой: карта бойца и эффекты', html: () => `  <section class="k-box" style="grid-column:1/-1"><h3>Карта бойца: индикаторы и эффекты · модель раундов (ADR-0010)</h3>
     <div class="card-demo">${kitCardsRounds()}</div>
     <p class="k-note">Основная модель: вместо сегментов и ромбов — шанс каждой способности в свой ход, сработавшая светится. Бледная карта уже сходила в этом раунде.</p>
     <div class="bt-legend static">${legendHtml('rounds')}</div></section>
   <section class="k-box" style="grid-column:1/-1"><h3>Эффекты боя · ${EnFx.KINDS.length} видов</h3>
     <div class="fx-stage" id="fxStage">${kc('kh1', S.heroes[0].img, S.heroes[0].name, S.heroes[0].el, 6)}${kc('kh2', S.heroes[3].img, S.heroes[3].name, S.heroes[3].el, 22)}${kc('kf1', FA(F('e1')), F('e1').name, 'Земля', 38, true, true)}${kc('kf2', FA(F('o3')), F('o3').name, 'Воздух', 22, true)}${kc('kf3', FA(F('o5')), F('o5').name, 'Земля', 6, true)}</div>
     <div class="fx-list">${EnFx.KINDS.map(([key, n, d]) => `<button class="fx-btn" data-fx="${key}"><b>${n}</b><small>${d}</small></button>`).join('')}</div>
-    <p class="k-note">Нажмите вид — он сыграет на сцене. Каждый вид — отдельная работа художника и в Unity: частицы, анимация, звук. Цвет заклинаний и урона со временем берётся из школы стихии, у каждой школы свой урон со временем.</p></section>
-  <section class="k-box"><h3>Материал</h3><div class="k-sw">${sw('var(--ink)', 'Уголь', '#0a0c0e · фон')}${sw('var(--stone)', 'Камень', '#121518 · панель')}${sw('var(--iron-2)', 'Железо', '#394047 · рамка')}${sw('var(--parch)', 'Пергамент', '#ece4d3 · текст')}${sw('var(--gold)', 'Золото', '#ddbc7a · заголовки')}${sw('var(--spirit)', 'Свет духа', '#48e5d4 · выбор')}</div><p class="k-note">Бирюза — только у выбранного и у главного действия. Больше нигде.</p></section>
+    <p class="k-note">Нажмите вид — он сыграет на сцене. Каждый вид — отдельная работа художника и в Unity: частицы, анимация, звук. Цвет заклинаний и урона со временем берётся из школы стихии, у каждой школы свой урон со временем.</p></section>` },
+    { id: 'base', t: 'Основа: материал, стихии, редкости, значки, шрифты, кнопки, шкалы', html: () => `  <section class="k-box"><h3>Материал</h3><div class="k-sw">${sw('var(--ink)', 'Уголь', '#0a0c0e · фон')}${sw('var(--stone)', 'Камень', '#121518 · панель')}${sw('var(--iron-2)', 'Железо', '#394047 · рамка')}${sw('var(--parch)', 'Пергамент', '#ece4d3 · текст')}${sw('var(--gold)', 'Золото', '#ddbc7a · заголовки')}${sw('var(--spirit)', 'Свет духа', '#48e5d4 · выбор')}</div><p class="k-note">Бирюза — только у выбранного и у главного действия. Больше нигде.</p></section>
   <section class="k-box"><h3>Стихии = карсты</h3><div class="k-sw">${carst.map(([c, n, s]) => sw(c, n, s)).join('')}</div><div class="k-row">${carst.map(([, n]) => el(n)).join('')}</div><p class="k-note">Цвет берётся из лора, форма кристалла и подпись дублируют цвет.</p></section>
   <section class="k-box"><h3>Семь редкостей</h3><div class="k-row">${[1, 2, 3, 4, 5, 6, 7].map(r => rar(r)).join('')}</div><div class="k-row">${[1, 2, 3, 4, 5, 6, 7].map(r => well({ n: RAR[r], img: [0, ART('item-cinder-heart.png'), ART('item-cinder-heart.png'), ART('item-stormglass.png'), ART('item-gravebloom.png'), ART('item-hollow-crown.png'), ART('item-ashen-seal.png'), ART('item-silent-bell.png')][r], r }, { act: 'noop', q: r * 3, size: 48 })).join('')}</div><div class="k-row">${well({ n: RAR[3], img: ART('item-stormglass.png'), r: 3 }, { act: 'noop', size: 48 })}<span class="k-note">уникальная</span>${well({ n: RAR[3], img: ART('item-stormglass.png'), r: 3 }, { act: 'noop', size: 48, sel: true })}<span class="k-note">она же выбрана</span></div>
     <p class="k-note">Редкость — нижняя кромка колодца и кристалл у названия (<code>.rar</code>, значок r1…r7). Цвета — по ADR-0027: белая, жёлтая, бирюзовая, фиолетовая, красная, оранжевая, зелёная. Бирюза уникальной (<code>--r3</code>) взята темнее и синее света духа (<code>--spirit</code>): выбор — кольцо и свечение, редкость — кромка и камень.</p></section>
@@ -3858,31 +3912,64 @@ function renderKit() {
     <p class="k-note">Cormorant Garamond — заголовки, числа, лор. PT Sans Narrow — всё остальное, узкий и русский по рождению.</p></section>
   <section class="k-box"><h3>Действия</h3><div class="k-demo col" style="gap:10px"><div class="k-row"><button class="btn go">Атаковать${costTag('souls', 2)}</button><button class="btn">Изменить</button><button class="btn ghost">Отмена</button></div><div class="k-row"><button class="btn go big">${ic('down')}Спуститься</button></div><div class="k-row" style="align-items:flex-start"><button class="btn" disabled>Пробить</button><span class="reason">Откроется на уровне 50</span></div></div><p class="k-note">Главная кнопка одна на экран и светится снизу. Цена — на кнопке, причина недоступности — рядом.</p></section>
   <section class="k-box"><h3>Вкладки, чипы, метки</h3><div class="k-demo col" style="gap:10px"><div class="tabs"><button aria-selected="true">Сила</button><button aria-selected="false">Навыки</button><button aria-selected="false">Путь</button></div><div class="k-row"><span class="chip gold">${ic('gem')}Элита</span><span class="chip spirit">${ic('check')}готово</span><span class="chip warn">${ic('lock')}цикл III</span><span class="chip">${ic('hour')}3 д 5 ч</span></div><div class="k-row"><span class="stars lg">${stars(1, 3)}</span><span class="faint">доблесть: позиций = личный максимум</span></div><div class="k-row">${typeof rpRow === 'function' ? rpRow(2) : ''}<span class="faint">рунный предел: пять рунных камней, горят пройденные</span></div></div></section>
-  <section class="k-box"><h3>Шкалы</h3><div class="k-demo col" style="gap:10px"><div class="col" style="gap:4px"><small class="faint">Здоровье и щит</small>${bar(64, 'hp lg', '<span class="sh" style="left:0;width:18%"></span>')}</div><div class="col" style="gap:4px"><small class="faint">Бюджет попытки — песок</small>${bar(46, 'sand')}</div><div class="col" style="gap:4px"><small class="faint">Опыт и прогресс</small>${bar(62)}</div><div class="col" style="gap:4px"><small class="faint">Резервуар и готовность</small>${bar(80, 'sp')}</div></div></section>
-  <section class="k-box"><h3>Герой</h3><div class="k-demo" style="display:grid;grid-template-columns:repeat(3,minmax(0,110px));gap:8px">${heroCard(S.heroes[0], { act: 'noop' })}${heroCard(h, { act: 'noop', sel: true })}${heroCard(S.heroes[3], { act: 'noop', note: 'Ритуал · 42 мин', dim: true })}</div><p class="k-note">Кристалл в углу — редкость (значок r1…r7). Значков доблести ровно столько, сколько доблестей доступно герою; по бокам портрета — пять рунных камней предела, свет поднимается снизу; внизу — имя, класс значком, уровень и у витрин боевая мощь. Занятость написана поверх портрета. Вся анатомия — раздел «Отряды и плитка героя» ниже.</p></section>
-  <section class="k-box" style="grid-column:1/-1"><h3>Состав героев · ${RS.heroes.length} · по источникам</h3>
-    <p class="k-note">Состав игры по ADR-0019 и ADR-0021 — ADR-0024: золото, донат за Энериум, возрождение душ, Эхо, крафт. Данные — <code>docs/content/герои/состав-героев.csv</code> и главы <code>docs/content/герои/главы/</code>, выгрузка <code>tools/content-gen/heroes/export_roster.py</code> в <code>roster.js</code>. Черновик, ждёт автора. Орден игрок видит на последней доблести героя; «для команды» показывает орден, черновик и заметки — флажок общий с разделом «Герои черновиков». Числа — демонстрация, заглушки прототипа помечены. Этот же состав — в прототипе: «Герои → Коллекция» и «Герои → Призыв».</p>
-    <div id="kitRoster"></div></section>
-  <section class="k-box" style="grid-column:1/-1"><h3>Герои черновиков · ${window.EN_HEROES ? EN_HEROES.heroes.length : 0} · прежняя редакция</h3>
-    <p class="k-note">Данные — <code>docs/content/герои/</code>, выгрузка <code>tools/content-gen/heroes/export_ui.py</code> в <code>heroes.js</code>. Черновик, ждёт автора. Портреты пока заглушки: свет стихии снизу, нижняя кромка — редкость. Арт рисуется отдельно в <code>art/generated/</code>. Наборы способностей отряда боя прототипа — отсюда; новый состав — раздел «Состав героев» выше.</p>
-    <div id="kitHeroes"></div></section>
-  <section class="k-box" style="grid-column:1/-1"><h3>Библиотека способностей · ${window.EN_ABILITIES ? EN_ABILITIES.total : 0}</h3>
-    <p class="k-note">Данные — <code>docs/content/библиотека-способностей.md</code>, выгрузка <code>tools/content-gen/abilities/library.py</code> в <code>abilities.js</code>, решения — ADR-0015. Черновик: названия с номером — из таблицы автора, остальные автор принял как рабочие; числа — демонстрация. Набор без фильтров показан матрицей «вид × ступень», фильтр или поиск ищут по всей библиотеке. По героям способности ещё не распределены. Иконки — живопись сеткой, листом на набор школы (<code>tools/art-gen/jobs/spell-icons-*.json</code>, выгрузка — <code>tools/art-gen/ui-icons.json</code>): школа — цвет и материал, вид — мотив, ступень — сколько вещей в клетке; рамку даёт интерфейс.</p>
-    <div id="kitLib" class="kl"></div></section>
+  <section class="k-box"><h3>Шкалы</h3><div class="k-demo col" style="gap:10px"><div class="col" style="gap:4px"><small class="faint">Здоровье и щит</small>${bar(64, 'hp lg', '<span class="sh" style="left:0;width:18%"></span>')}</div><div class="col" style="gap:4px"><small class="faint">Бюджет попытки — песок</small>${bar(46, 'sand')}</div><div class="col" style="gap:4px"><small class="faint">Опыт и прогресс</small>${bar(62)}</div><div class="col" style="gap:4px"><small class="faint">Резервуар и готовность</small>${bar(80, 'sp')}</div></div></section>` },
+    { id: 'figures', t: 'Герой и враг, иконки путей, слой поверх', html: () => { const h = S.heroes[1], f1 = F('o1'), f6 = F('o6'); return `  <section class="k-box"><h3>Герой</h3><div class="k-demo" style="display:grid;grid-template-columns:repeat(3,minmax(0,110px));gap:8px">${heroCard(S.heroes[0], { act: 'noop' })}${heroCard(h, { act: 'noop', sel: true })}${heroCard(S.heroes[3], { act: 'noop', note: 'Ритуал · 42 мин', dim: true })}</div><p class="k-note">Кристалл в углу — редкость (значок r1…r7). Значков доблести ровно столько, сколько доблестей доступно герою; по бокам портрета — пять рунных камней предела, свет поднимается снизу; внизу — имя, класс значком, уровень и у витрин боевая мощь. Занятость написана поверх портрета. Вся анатомия — раздел «Отряды и плитка героя» ниже.</p></section>
   <section class="k-box"><h3>Враг</h3><div class="k-demo row" style="gap:18px;justify-content:center;height:170px"><div class="fig" style="height:150px"><img src="${FA(f1)}" alt=""></div><div class="fig unk" style="height:150px"><img src="${FA(f6)}" alt=""><span class="qm">?</span></div></div><p class="k-note">Изучен — картина целиком. До первой победы картина затемнена и размыта, поверх — знак вопроса.</p></section>
   <section class="k-box"><h3>Иконки путей</h3><div class="k-row">${[[12, 'Убежище'], [10, 'Спуск'], [24, 'Герои'], [11, 'Ремесло'], [6, 'Неделя'], [18, 'Эхо'], [38, 'Контракты'], [33, 'Ритуалы'], [3, 'Арена'], [26, 'Клан'], [21, 'Событие'], [29, 'Странник']].map(([p, n]) => `<figure style="margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;width:64px"><img src="${PATH(p)}" alt="" style="width:48px;height:48px;border-radius:12px;box-shadow:0 0 0 1px #262c32"><figcaption style="font-size:11px;color:var(--parch-2);text-align:center;line-height:1.1">${n}</figcaption></figure>`).join('')}</div><p class="k-note">Авторский набор. Иконка узнаётся, подпись остаётся всегда.</p></section>
-  <section class="k-box"><h3>Слой поверх: лист и диалог</h3><div class="k-demo" style="height:170px;position:relative;overflow:hidden;border:1px solid var(--iron)"><div style="position:absolute;inset:0;background:rgba(3,4,5,.55)"></div><div class="sheet" style="width:52%;animation:none"><div class="sheet-h" style="min-height:40px;padding:6px 8px 6px 12px"><h2 style="font-size:17px">Сведения</h2><span class="iconbtn x" style="width:26px;height:26px">${ic('x')}</span></div><div class="sheet-b" style="padding:8px 12px;gap:6px"><span class="faint" style="font-size:12px">уточняет работу, не уводит с экрана</span>${bar(60)}</div><div class="sheet-f" style="padding:6px 12px"><button class="btn go sm" style="margin-left:auto">Действие</button></div></div></div><p class="k-note">Лист справа — сведения и настройка. Диалог по центру — только цена, последствия и итог.</p></section>
-  ${RX.stats ? `<section class="k-box" style="grid-column:1/-1"><h3>Ресурсы Этериоса · ${RX.stats.total.resources}</h3>
+  <section class="k-box"><h3>Слой поверх: лист и диалог</h3><div class="k-demo" style="height:170px;position:relative;overflow:hidden;border:1px solid var(--iron)"><div style="position:absolute;inset:0;background:rgba(3,4,5,.55)"></div><div class="sheet" style="width:52%;animation:none"><div class="sheet-h" style="min-height:40px;padding:6px 8px 6px 12px"><h2 style="font-size:17px">Сведения</h2><span class="iconbtn x" style="width:26px;height:26px">${ic('x')}</span></div><div class="sheet-b" style="padding:8px 12px;gap:6px"><span class="faint" style="font-size:12px">уточняет работу, не уводит с экрана</span>${bar(60)}</div><div class="sheet-f" style="padding:6px 12px"><button class="btn go sm" style="margin-left:auto">Действие</button></div></div></div><p class="k-note">Лист справа — сведения и настройка. Диалог по центру — только цена, последствия и итог.</p></section>`; } },
+    { id: 'roster', t: 'Состав героев', html: () => `  <section class="k-box" style="grid-column:1/-1"><h3>Состав героев · ${RS.heroes.length} · по источникам</h3>
+    <p class="k-note">Состав игры по ADR-0019 и ADR-0021 — ADR-0024: золото, донат за Энериум, возрождение душ, Эхо, крафт. Данные — <code>docs/content/герои/состав-героев.csv</code> и главы <code>docs/content/герои/главы/</code>, выгрузка <code>tools/content-gen/heroes/export_roster.py</code> в <code>roster.js</code>. Черновик, ждёт автора. Орден игрок видит на последней доблести героя; «для команды» показывает орден, черновик и заметки. Числа — демонстрация, заглушки прототипа помечены. Этот же состав — в прототипе: «Герои → Коллекция» и «Герои → Призыв».</p>
+    <div id="kitRoster"></div></section>`, paint: rkPaint },
+    { id: 'lib', t: 'Библиотека способностей', html: () => `  <section class="k-box" style="grid-column:1/-1"><h3>Библиотека способностей · ${window.EN_ABILITIES ? EN_ABILITIES.total : 0}</h3>
+    <p class="k-note">Данные — <code>docs/content/библиотека-способностей.md</code>, выгрузка <code>tools/content-gen/abilities/library.py</code> в <code>abilities.js</code>, решения — ADR-0015. Черновик: названия с номером — из таблицы автора, остальные автор принял как рабочие; числа — демонстрация. Набор без фильтров показан матрицей «вид × ступень», фильтр или поиск ищут по всей библиотеке. По героям способности ещё не распределены. Иконки — живопись сеткой, листом на набор школы (<code>tools/art-gen/jobs/spell-icons-*.json</code>, выгрузка — <code>tools/art-gen/ui-icons.json</code>): школа — цвет и материал, вид — мотив, ступень — сколько вещей в клетке; рамку даёт интерфейс.</p>
+    <div id="kitLib" class="kl"></div></section>`, paint: klPaint },
+    RX.stats && { id: 'res', t: 'Ресурсы Этериоса', html: () => `  ${RX.stats ? `<section class="k-box" style="grid-column:1/-1"><h3>Ресурсы Этериоса · ${RX.stats.total.resources}</h3>
     <p class="k-note">Все ресурсы игры по шести циклам и ярусам. Базовые — общий пул на все циклы: падают в каждом биоме с первого. Ключи — по биомам, любая элита роняет один из шести наугад. Уникальные — с боссов биомов, крафтовые — в руинах и у призванных врагов в Эхо. Иконка — заглушка: ремесло или ярус, нижняя кромка — редкость. Наведите или выберите клавиатурой — подсказка с загадкой и источником; нажмите — узел откроется в «Древе рецептов». Данные — <code>recipes.js</code>, обоснование и летопись Этриона — <code>docs/content/ресурсы-рецепты-дроп.md</code>. Цикл VI — спойлер, только для команды.</p>
-    <div id="kitRes" class="rz"></div></section>` : ''}
-  ${window.EN_LOOTBOXES ? `<section class="k-box" style="grid-column:1/-1"><h3>Лутбоксы · ${Object.keys(EN_LOOTBOXES.boxes).length} сундуков · ${Object.keys(EN_LOOTBOXES.modes).length} источников</h3>
+    <div id="kitRes" class="rz"></div></section>` : ''}`, paint: rzPaint },
+    window.EN_LOOTBOXES && { id: 'loot', t: 'Лутбоксы', html: () => `  ${window.EN_LOOTBOXES ? `<section class="k-box" style="grid-column:1/-1"><h3>Лутбоксы · ${Object.keys(EN_LOOTBOXES.boxes).length} сундуков · ${Object.keys(EN_LOOTBOXES.modes).length} источников</h3>
     <p class="k-note">Черновик <code>docs/content/лутбоксы.md</code>, данные и алгоритм открытия — <code>lootboxes.js</code>, сборка — <code>tools/content-gen/lootboxes/</code>. Числа — демонстрация, ждут автора. Сетка — «вид сундука × редкость»: в клетке ожидаемое главной меры в выбранном цикле и окне, яркие клетки в этом цикле кто-то выдаёт. Карточка — по §14.4. Пробное открытие — не выдача: в игре таблицы наград и итог открытия — на сервере (§36.16).</p>
-    <div id="kitLoot"></div></section>` : ''}
-  ${RXI.sand ? `<section class="k-box"><h3>Древо рецептов · узлы</h3><div class="k-demo tr-cols">${[['sand', ''], ['k1_ench', 'up'], ['u4', ''], ['p_clay', 'sel'], ['act_cb1', 'down'], ['k4_hunt', '', 1]].map(([id, st, unk]) => { const it = RXI[id]; if (!it) return ''; return `<span class="tn ${it.tier === 'key' ? 'key' : it.tier === 'unique' ? 'uniq' : TR_MADE.includes(it.tier) ? 'made' : ''} ${unk ? 'unk' : ''} ${st}"><span class="ti" data-r="${unk ? 1 : it.r}">${unk ? '<span class="gl">?</span>' : trIcon(it)}</span><b>${unk ? 'Не найдено' : it.n}</b></span>`; }).join('')}</div>
+    <div id="kitLoot"></div></section>` : ''}`, paint: lbPaint },
+    RXI.sand && { id: 'tree', t: 'Древо рецептов · узлы', html: () => `  ${RXI.sand ? `<section class="k-box"><h3>Древо рецептов · узлы</h3><div class="k-demo tr-cols">${[['sand', ''], ['k1_ench', 'up'], ['u4', ''], ['p_clay', 'sel'], ['act_cb1', 'down'], ['k4_hunt', '', 1]].map(([id, st, unk]) => { const it = RXI[id]; if (!it) return ''; return `<span class="tn ${it.tier === 'key' ? 'key' : it.tier === 'unique' ? 'uniq' : TR_MADE.includes(it.tier) ? 'made' : ''} ${unk ? 'unk' : ''} ${st}"><span class="ti" data-r="${unk ? 1 : it.r}">${unk ? '<span class="gl">?</span>' : trIcon(it)}</span><b>${unk ? 'Не найдено' : it.n}</b></span>`; }).join('')}</div>
     <div class="tr-leg"><span><i></i>что нужно выбранному</span><span><i class="d"></i>куда оно идёт</span><span><i class="s"></i>выбранный узел</span></div>
-    <p class="k-note">Вкладка «Древо рецептов» рядом с «Картой экранов» — инструмент команды и конструктора, игрок древо не видит (ADR-0008). Узлы стоят по слоям: добыча, ключи мастерской и творения, заготовки, изделия, руины и Эхо, герои и награды; внизу — руны стражей. Цвет узла — редкость, пунктир — вход из прошлого цикла.</p></section>` : ''}
-  ${KIT_EXTRA.map(x => { try { return x.html(); } catch (e) { console.error(e); return ''; } }).join('')}`;
-  for (const x of KIT_EXTRA) if (x.paint) try { x.paint(); } catch (e) { console.error(e); }
+    <p class="k-note">Вкладка «Древо рецептов» рядом с «Картой экранов» — инструмент команды и конструктора, игрок древо не видит (ADR-0008). Узлы стоят по слоям: добыча, ключи мастерской и творения, заготовки, изделия, руины и Эхо, герои и награды; внизу — руны стражей. Цвет узла — редкость, пунктир — вход из прошлого цикла.</p></section>` : ''}` },
+  ].filter(Boolean);
+}
+/* все блоки: основа и разделы экранов по файлам, в порядке подключения */
+function kitBlocks() {
+  const by = new Map();
+  for (const x of KIT_EXTRA) { const f = x.file || ''; if (!by.has(f)) by.set(f, []); by.get(f).push(x); }
+  const extra = [...by].map(([f, xs]) => ({
+    id: 'x-' + (f.replace(/\.js$/, '') || 'index'), t: KIT_FILES[f] || f.replace(/\.js$/, ''),
+    html: () => xs.map(x => { try { return x.html(); } catch (e) { console.error(e); return ''; } }).join(''),
+    paint: () => { for (const x of xs) if (x.paint) try { x.paint(); } catch (e) { console.error(e); } },
+  }));
+  return kitCoreBlocks().concat(extra);
+}
+const kitBlk = (B, open) => `<details class="k-blk" data-k="${B.id}"${open ? ' open' : ''}><summary>${B.t}</summary><div class="k-grid kit-g">${open ? B.html() : ''}</div></details>`;
+function renderKit() {
+  const k = document.getElementById('kitGrid'); if (!k) return;
+  const blocks = kitBlocks();
+  if (KIT_ONLY == null) {   // весь кит раскрытым: проверки без браузера
+    k.innerHTML = blocks.map(B => kitBlk(B, true)).join('');
+    for (const B of blocks) if (B.paint) try { B.paint(); } catch (e) { console.error(e); }
+    return;
+  }
+  const B = blocks.find(b => b.id === KIT_ONLY), box = k.querySelector && k.querySelector(`.k-blk[data-k="${KIT_ONLY}"] > .kit-g`);
+  if (!B || !box) return;
+  box.innerHTML = B.html();
+  if (B.paint) try { B.paint(); } catch (e) { console.error(e); }
+}
+/* браузер: список блоков свёрнутым — только заголовки; раскрыли — блок рисуется через renderKit, свернули — очищается.
+   toggle у details не всплывает — слушаем на погружении */
+function kitMount() {
+  const k = document.getElementById('kitGrid'); if (!k || k.dataset.lazy) return;
+  k.dataset.lazy = '1';
+  k.innerHTML = kitBlocks().map(B => kitBlk(B, false)).join('');
+  k.addEventListener('toggle', e => {
+    const d = e.target; if (!d || !d.classList || !d.classList.contains('k-blk')) return;
+    if (d.open) { KIT_ONLY = d.dataset.k; try { renderKit(); } finally { KIT_ONLY = null; } }
+    else { const g = d.querySelector('.kit-g'); if (g) g.innerHTML = ''; }
+  }, true);
 }
 
 /* ================== UI-кит · ресурсы Этериоса ==================
@@ -4586,7 +4673,7 @@ function boot() {
   paintTeam();
   document.getElementById('devMode').addEventListener('click', e => { const b = e.target.closest('[data-mode]'); if (b) setTeam(b.dataset.mode === 'team'); });
   render();
-  renderMap(); renderKit(); rkPaint(); khPaint(); klPaint(); rzPaint(); lbPaint();
+  renderMap(); kitMount();   // UI-кит — блоками по раскрытию, а не целиком при запуске
   const fl = document.getElementById('flows');
   fl.innerHTML = FLOWS.map(([t, d], i) => `<li><button class="p-flow" data-flow="${i}"><span><b>${t}</b><small>${d}</small></span></button></li>`).join('');
   fl.addEventListener('click', e => { const b = e.target.closest('[data-flow]'); if (!b) return; FLOWS[+b.dataset.flow][2](); render(); if (S.overlay) focusOverlay(); if (window.innerWidth < 1200) document.getElementById('devWrap').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
@@ -4656,6 +4743,8 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 <script src="screens/social.js"></script>
 <script src="screens/chambers.js"></script>
 <script src="screens/battle-cards.js"></script>
+<script src="screens/battle-scene.js"></script>
 <script src="screens/start.js"></script>
+<script src="screens/cycle.js"></script>
 </body>
 </html>
