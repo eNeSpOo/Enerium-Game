@@ -164,7 +164,11 @@
 .bt-insp.bs-insp.on-l{right:calc(var(--colw) * 2 + 34px)}
 .bt-insp.bs-insp.on-r{left:calc(var(--colw) * 2 + 34px)}
 .bt-insp.bs-insp.unk{bottom:auto}
-.bs-insp>.x{position:absolute;top:-8px;right:-8px;z-index:2;width:26px;height:26px}
+.bs-insp>.x{position:absolute;top:-8px;right:-8px;z-index:2;width:30px;height:30px}
+/* крестик — палец не промахнётся: поле нажатия 46 × 46 вокруг значка. Закрытое окно — display:none: правило .bt-insp.bs-insp{display:grid}
+   сильнее .bt-insp[hidden] из index.html, и окно оставалось на экране, хотя состояние уже закрыто */
+.bs-insp>.x::after{content:"";position:absolute;inset:-8px}
+.bt-insp.bs-insp[hidden]{display:none}
 /* окно закрывает сторону поля: числа и надписи над ней, баннер, «Раунд N», ульта и плашки этажа — не поверх окна */
 .bt.bs-cov0 .fly.s0,.bt.bs-cov1 .fly.s1,.bt.bs-cov0 .bs-call.s0,.bt.bs-cov1 .bs-call.s1,.bt.bs-cov1 .bs-loot,
 .bt:is(.bs-cov0,.bs-cov1,.bs-leg) :is(.bs-call.ult,.bs-rflash,.bs-transit,.bs-taken,.bt-banner){visibility:hidden}

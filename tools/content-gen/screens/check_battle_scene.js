@@ -388,6 +388,8 @@ function lawCss(sceneCss) {
   }
   for (const s of CALM_INFO) if (!/^var\(--bs-d\b[^)]*\)\s*!important$/.test(calmDur[s] || '')) out.push(`«меньше движения»: у ${s} нет длительности var(--bs-d) !important — общее правило index.html погасит его мгновенно`);
   if ((calm['.bt-side.f.enter .bc'] || []).join() !== 'none') out.push('«меньше движения»: выход врагов идёт анимацией — с общим правилом index.html карты врагов замрут в её последнем кадре');
+  /* окно карты закрывают атрибутом hidden: правило с display у .bt-insp.bs-insp сильнее .bt-insp[hidden] из index.html — нужно своё */
+  if (/\.bt-insp\.bs-insp\{[^}]*display\s*:/.test(sceneCss) && !/\.bt-insp\.bs-insp\[hidden\]\{display:none\}/.test(sceneCss)) out.push('окно карты: закрытое остаётся на экране — нет .bt-insp.bs-insp[hidden]{display:none}');
   return out;
 }
 const sceneCss = read('screens/battle-scene.css');
@@ -545,6 +547,7 @@ const FXMUT = [
   ['прежняя анимация удара — свойства rotate и translate', () => lawCss(sceneCss.replace(/@keyframes cshake\{(?:[^{}]*\{[^{}]*\})*\}/, ''))],
   ['песок гаснет мгновенно при «меньше движения»', () => lawCss(sceneCss.replace(',.bs-taken .sand>i{animation-duration:var(--bs-d,1s)!important}', '{animation-duration:var(--bs-d,1s)!important}'))],
   ['враги прячутся при выходе при «меньше движения»', () => lawCss(sceneCss.replace('  .bt-side.f.enter .bc{animation:none}', '  .bt-side.f.enter .bc{animation-name:bsFade}'))],
+  ['закрытое окно карты остаётся на экране', () => lawCss(sceneCss.replace('.bt-insp.bs-insp[hidden]{display:none}', ''))],
 ];
 for (const [what, f] of FXMUT) {
   let got = [];
