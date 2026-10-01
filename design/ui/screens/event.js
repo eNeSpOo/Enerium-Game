@@ -362,7 +362,7 @@ Object.assign(OV, {
         <div class="ev-pks">${P.map(r => evRung(r, E.pts)).join('')}</div>
         <p class="reason">Планка засчитывается сразу. Сундуки рабочих получают в «Дарах», открывают — в запасах.</p>
         ${W ? `<p class="ev-line">${W.line}</p>` : ''}<p class="reason">${EVD.world}</p>
-        ${TM(`Пороги цикла ${ROMAN[c]} — EN_EVENT.planks, соседние ×2; прогон: обычный берёт третью в ${evPct(EVD.econ[c].oP3Bp)} недель, четвёртую — в ${evPct(EVD.econ[c].oP4Bp)}; увлечённый пятую — в ${evPct(EVD.econ[c].eP5Bp)}. Сундуки — EN_LOOTBOXES.modes.event, слой «Личные планки».`, 'p', 'reason')}`;
+        ${TM(`Пороги цикла ${ROMAN[c]} — EN_EVENT.planks, соседние ×2; прогон: обычный берёт третью в ${evPct(EVD.econ[c].oP3Bp)} недель, четвёртую — в ${evPct(EVD.econ[c].oP4Bp)}; увлечённый четвёртую — в ${evPct(EVD.econ[c].eP4Bp)}, пятую — в ${evPct(EVD.econ[c].eP5Bp)}; первая планка — типичная неделя обычного / ${String(EVD.plankR / 100).replace('.', ',')}, одна мерка на все циклы. Сундуки — EN_LOOTBOXES.modes.event, слой «Личные планки».`, 'p', 'reason')}`;
       foot = `<button class="btn go" data-a="sheet" data-v="gifts:me">Дары ${ic('chev')}</button>`;
     } else if (t === 'clan') {
       const K = evClan();

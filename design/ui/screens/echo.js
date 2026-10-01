@@ -9,7 +9,7 @@
    Враги недели — по строкам «Враги недели» в docs/content/герои/состав-героев.md, «Отряды Эхо — древние цивилизации»:
    имена и облик — черновик прототипа. Игроку — только «древняя цивилизация задолго до этеров»; поля team не показываем.
    Атака — бой ядром (battle.js, EB.echoBattle, ADR-0025): один этаж, главный враг и четыре защитника, раунды по типу врага — только
-   из ядра (RULES.echo.rounds по таблице RULES.rounds.by, ADR-0039); Многоликий — вершина, один из Забытых, бьётся с лицами недели;
+   из ядра (RULES.echo.rounds по таблице RULES.rounds.by, ADR-0039); Многоликий — вершина, один из Забытых, бьётся один, без свиты;
    здоровье главного врага сохраняется между атаками. Исход решён при оплате, просмотр — только показ: «Пропустить» сразу
    открывает итог, повтор атаки с тем же номером ничего не списывает и не начисляет.
    Цена одной атаки в душах — главный довод при выборе цели (слово автора): крупно у каждого варианта призыва, в слоте рядом с именем,
@@ -78,7 +78,7 @@ const ECH = {
       'Дебаффер': ['debuff.grp', 'ctrl.one', 'debuff.one', 'dot.grp', 'ctrl.grp', 'ult.debuff', 'ult.ctrl'],
       'Босс': ['dmg.one', 'dmg.all', 'debuff.grp', 'ctrl.one', 'dot.all', 'ult.dmg', 'ult.ctrl'],
     },
-    guards: { o: 'oooo', e: 'eooo', b: 'eeoo', u: 'beee', f: 'bbbe', m: 'bbbe' },   // ранги защитников по типу главного врага; Многоликий и Забытый — три босса и элита (ADR-0039)
+    guards: { o: 'oooo', e: 'eooo', b: 'eeoo', u: 'beee', f: 'bbbe', m: '' },   // ранги защитников по типу главного врага; Забытый — три босса и элита, Многоликий — один (ADR-0039)
     uberAll: 60,                        // Убер-босс демо бьёт обычной атакой всех — по 60 % главного стата (приём ADR-0025)
     craftCls: 'Босс', noSchool: 'Без школы',   // призванный враг без лица: класс и школа способностей
     manyLvlPct: 110,                    // Многоликий — вершина (ADR-0039): без правил режима — уровень 14-й ступени × 110 %, демо
@@ -348,6 +348,15 @@ function hpOf(step, c, race) {
   return at(step === MANY ? ECH.many.hp : ECH.hp[step - 1], c);
 }
 const ptsOf = (step, c) => { if (c < EM.from) return 0; const v = ruleOf(step, 'points', c); return v != null ? v : (step === MANY ? ECH.manyPoints : ECH.points[step - 1]) * ipow(XE.pointsCycleMul, c - EM.from); };
+/* очки КрафБосса — врага из предмета рецепта (слово автора 01.10.2026, ADR-0043): все враги Эхо приносят очки рейтинга; у КрафБосса — по
+   месту в общей лестнице всех врагов Эхо, от слабого к сильному и по типу: правило summon.types[g].points по циклу силы врага (pc — его цикл,
+   у пробуждённого — выше на powerCycleStep). Цикл игрока очки не умножает; лестницу недели КрафБосс не растит. Рейтинг — с цикла II: в
+   обучении очков нет. Без правил режима — очки ступени его уровня (step) в цикле силы, демо */
+const craftPts = (g, pc) => {
+  if (S.acc.cycle < EM.from) return 0;
+  const r = sumRule(g), v = r && r.points ? r.points[String(pc)] : null;
+  return Number.isInteger(v) ? v : ptsOf((r && r.step) || TOP - 1, Math.max(EM.from, Math.min(pc, ROMAN.length - 1)));
+};
 /* очки этажа биома Многоликого: правила (manyPoints), иначе демо — очки победы над этой ступенью в Эхо */
 const floorPts = (step, c) => { if (c < EM.from) return 0; const v = ruleOf(step, 'manyPoints', c); return v != null ? v : ptsOf(step, c); };
 /* цена раунда атаки по циклу: правила (roundSouls, с цикла I), иначе нет */
@@ -386,7 +395,7 @@ function stepFoe(fid) {
   const row = civ && civ.foes[step - 1];
   return row ? { fid, race, step, g: STEPS[step - 1], n: row[0], el: row[1], cls: row[2], look: row[3] } : null;
 }
-/* Многоликий — пятнадцатая ступень, вершина недели и один из Забытых (ADR-0039): бьётся с лицами недели, за победу — очки и ресурс «Многоликий» (ADR-0025). Имя видно всегда — это предмет */
+/* Многоликий — пятнадцатая ступень, вершина недели и один из Забытых (ADR-0039): бьётся один, без свиты, за победу — очки и ресурс «Многоликий» (ADR-0025). Имя видно всегда — это предмет */
 function manyFoe(race, el) {
   const it = BAG.item('many'), u = stepFoe(fidOf(race, TOP)), d = dataFoe({ fid: 'many', race }) || {};
   return { fid: 'many', race, step: MANY, g: 'm', n: it ? it.n : ECH.rank.m, el: el || d.el || u.el, cls: d.cls || ECH.rank.m, look: d.look || (it ? it.lore : ''), named: true };
@@ -652,7 +661,10 @@ const atkHtml = a => `<span class="ech-cost" title="Цена одной атак
 const atkMini = a => `<span class="ech-sc" title="Цена одной атаки: ${fmt(a)} ${souls(a)}"><img src="${curImg('souls')}" alt=""><b class="num">${fmt(a)}</b></span>`;
 /* что даёт победа над целью: очки недели, ресурс «Многоликий» или добыча призванного врага */
 function rewardOf(x, f, c) {
-  if (x.kind === 'craft') { const ch = chestRule(f.fb, x.race, c); return ch ? (ch.box === 'shards' ? 'сундук осколков недели' : 'трофей, ключи, валюта и сундук') : isLik(f.fb) ? 'осколки героев недели' : 'ресурсы'; }
+  if (x.kind === 'craft') {
+    const ch = chestRule(f.fb, x.race, c), p = craftPts(x.g, x.pcyc), pts = p ? `${fmt(p)} ${plural(p, 'очко', 'очка', 'очков')}, ` : '';
+    return pts + (ch ? (ch.box === 'shards' ? 'сундук осколков недели' : 'трофей, ключи, валюта и сундук') : isLik(f.fb) ? 'осколки героев недели' : 'ресурсы');
+  }
   const p = ptsOf(x.step, c), pts = p ? `${fmt(p)} ${plural(p, 'очко', 'очка', 'очков')}` : '';
   if (x.g === 'm') return pts ? pts + ' и ресурс «Многоликий»' : 'ресурс «Многоликий»';
   return c >= EM.from ? pts || 'без очков' : 'обучение — без очков';
@@ -764,7 +776,7 @@ function ladderHtml(W) {
   const inSlot = new Set(S.echo.slots.filter(x => x && x.kind !== 'craft' && x.race === W.race).map(x => x.step));
   const cells = STEPS.map((g, j) => { const st = j + 1, f = stepFoe(fidOf(W.race, st)), k = kn(f.fid); return `<i class="${g === 'o' ? '' : g} ${j && STEPS[j - 1] !== g ? 'gs' : ''} ${st <= S.ech.avail ? 'av' : ''} ${st === S.ech.avail ? 'top' : ''} ${inSlot.has(st) ? 'on' : ''}" title="Ступень ${st} · ${ECH.rank[g]}${k ? ' · ' + f.n : ''}${st > S.ech.avail ? ' · закрыта' : ''}"></i>`; }).join('');
   return `<button class="pnl ladder14 ech-ladder" data-a="echbest" aria-label="Лестница недели: открыто ступеней ${S.ech.avail} из ${TOP}. Бестиарий" title="${tmT('Лестница недели · бестиарий', `Лестница недели: победа над верхней открытой ступенью открывает следующую; Многоликий — ${pctBp2(manyBp())} призыва. Нажатие — бестиарий`)}">
-    <span class="l14">${cells}<span class="sep"></span><i class="m ${kn('many') ? 'kn' : ''} ${inSlot.has(MANY) ? 'on' : ''}" title="${tmT(`Ступень ${MANY} · Многоликий`, `Ступень ${MANY} · Многоликий — вершина недели, один из Забытых: выпадает при призыве с шансом ${pctBp2(manyBp())}, без ограничения «раз в неделю»; бьётся с лицами недели, за победу — очки и ресурс «Многоликий»`)}"></i></span>
+    <span class="l14">${cells}<span class="sep"></span><i class="m ${kn('many') ? 'kn' : ''} ${inSlot.has(MANY) ? 'on' : ''}" title="${tmT(`Ступень ${MANY} · Многоликий`, `Ступень ${MANY} · Многоликий — вершина недели, один из Забытых: выпадает при призыве с шансом ${pctBp2(manyBp())}, без ограничения «раз в неделю»; бьётся один, без свиты: найденного можно убить сразу, за победу — очки и ресурс «Многоликий»`)}"></i></span>
     ${ic('book')}</button>`;
 }
 SCREENS.echo = function () {
@@ -824,7 +836,7 @@ function winApply(i, x, L) {
   const f = foe(x.fid, x), c = x.cyc || S.acc.cycle;
   L.first = !kn(x.fid);
   S.ech.known[x.fid] = true;
-  L.pts = x.kind === 'craft' ? 0 : ptsOf(x.step, c);
+  L.pts = x.kind === 'craft' ? craftPts(x.g, x.pcyc) : ptsOf(x.step, c);   // КрафБосс — по общей лестнице, цикл игрока не умножает (ADR-0043)
   S.echo.score += L.pts;
   if (x.kind === 'step' && x.race === S.ech.wk && x.step === S.ech.avail && S.ech.avail < TOP) L.opened = ++S.ech.avail;   // лестница растёт после сильнейшего доступного (§17.4)
   if (x.g === 'm') {   // победа над Многоликим — ресурс «Многоликий», привязанный к своей неделе (ADR-0025)
@@ -1378,23 +1390,27 @@ Object.assign(OV, {
     const WHY = { kill: 'Главный враг пал', win: r.foes.length > 1 ? 'Пали все враги' : 'Главный враг пал', wipe: 'Отряд пал — урон сохранён', sand: 'Раунды вышли — урон сохранён' };
     const t = r.main.taken, rw = n => plural(n, 'раунд', 'раунда', 'раундов'), pc = v => Math.floor(Math.max(0, v) * 100 / L.max);
     const kpi = [[t > 0 ? '−' + fmt(t) : t < 0 ? '+' + fmt(-t) : '0', t >= 0 ? 'отнято здоровья' : 'защитники вылечили', '']]
-      .concat(!L.kill || craft ? [] : L.cyc < EM.from ? [['—', 'обучение без очков', '']] : L.pts ? [['+' + fmt(L.pts), 'очков недели', 'win']] : []);
+      .concat(!L.kill ? [] : L.cyc < EM.from ? [['—', 'обучение без очков', '']] : L.pts ? [['+' + fmt(L.pts), 'очков недели', 'win']] : []);
     const marks = L.kill ? (L.first ? `<span class="chip spirit">${ic('book')}новое в бестиарии</span>` : '') + (L.opened ? `<span class="chip spirit">${ic('up')}открыта ступень ${L.opened}</span>` : '') : '';
     /* сундук за победу над призванным врагом — первым и крупно: это главная награда; остальная добыча — сеткой ниже */
     const chests = L.loot.filter(l => l.k === 'chest').map(lootHtml).join(''), loot = L.loot.filter(l => l.k !== 'chest').map(lootHtml).join('');
     const rows = r.heroes.map(h => { const hh = H(h.id); return `<tr class="${h.alive ? '' : 'fell'}"><td><span class="ech-rf">${hh ? `<img src="${hh.img}" alt="">` : RSI[h.id] ? `<span class="rs-av">${rsFace(RSI[h.id])}</span>` : ''}<b>${h.name}</b>${h.alive ? '' : '<small>пал</small>'}</span></td><td class="num">${fmt(h.dealt)}</td><td class="num">${fmt(h.toMain)}</td><td class="num">${fmt(h.healed)}</td></tr>`; }).join('');
     const foesTxt = r.foes.map((u, k) => { const sf = k === 0 ? f : stepFoe(u.id.slice(4)), nm = sf ? (k === 0 ? nameOf(sf) : shortOf(sf)) : u.name; return `${k === 0 ? '<b>' + nm + '</b>' : nm}${u.dead ? ' ✝' : ` · ${Math.floor(u.hp * 100 / u.maxHp)} %`}`; }).join(' · ');
-    const more = `<details class="ech-det"><summary>${ic('chev')}Подробности боя</summary><div class="col">
+    /* полоса здоровья цели — над числами, пока цель жива; при победе она пуста — уходит в «Подробности боя», и отметки победы
+       («новое в бестиарии») остаются на виду и на низком экране (844 × 390) */
+    const hpB = `<div class="col ech-res-hp">${bar(pc(r.main.hp), 'hp lg', `<span class="ghost" style="--g:${pc(L.hp0)}"></span>`)}<div class="row"><span>здоровье цели</span><span class="num">${fmt(r.main.hp)}</span></div></div>`;
+    const more = `<details class="ech-det"><summary>${ic('chev')}Подробности боя</summary><div class="col">${L.kill ? hpB : ''}
         <div class="row ech-res-kpi sm">${[[`${r.rounds} / ${r.maxRounds}`, rw(r.maxRounds)], [`${r.kills} / ${r.foes.length}`, 'врагов пало'], [`${r.fallen} / ${r.heroes.length}`, 'героев пало']].map(([v, s]) => `<div class="stat"><b class="num">${v}</b><small>${s}</small></div>`).join('')}</div>
         <table class="ech-res-t"><thead><tr><th>Герой</th><th>урон</th><th>по главному</th><th>лечение</th></tr></thead><tbody>${rows}</tbody></table>
         <p class="reason ech-res-foes">${foesTxt}</p>
         <p class="reason">Атака ${L.no} · ${fmt(L.cost)} ${souls(L.cost)}${TM(' · бой посчитан целиком при оплате: просмотр и «Пропустить» итог не меняют')}.</p>
       </div></details>`;
-    /* победа над призванным врагом: сундук — сразу под именем, до здоровья и чисел, чтобы был виден и на низком экране (844 × 390) */
+    /* победа над призванным врагом: сундук — сразу под именем, до чисел, чтобы был виден и на низком экране (844 × 390);
+       при победе числа — очки недели, у КрафБосса тоже (ADR-0043) */
+    const kpiB = `<div class="row ech-res-kpi">${kpi.map(([v, s, w]) => `<div class="stat ${w}"><b class="num">${v}</b><small>${s}</small></div>`).join('')}</div>`;
     const body = `<div class="ech-res-top">${ph(f, 'sm')}<div class="col"><b class="serif">${nameOf(f)}</b><small class="faint">${WHY[r.why] || r.why}</small></div></div>
       ${chests ? `<span class="eyebrow">Сундук за победу</span><div class="ech-loot">${chests}</div>` : ''}
-      <div class="col ech-res-hp">${bar(pc(r.main.hp), 'hp lg', `<span class="ghost" style="--g:${pc(L.hp0)}"></span>`)}<div class="row"><span>здоровье цели</span><span class="num">${fmt(r.main.hp)}</span></div></div>
-      <div class="row ech-res-kpi">${kpi.map(([v, s, w]) => `<div class="stat ${w}"><b class="num">${v}</b><small>${s}</small></div>`).join('')}</div>
+      ${L.kill ? kpiB : hpB + kpiB}
       ${marks ? `<div class="row ech-res-marks">${marks}</div>` : ''}
       ${loot ? `<span class="eyebrow">Добыча</span><div class="ech-loot">${loot}</div>` : ''}
       ${more}`;
@@ -1483,6 +1499,6 @@ if (typeof itemCard === 'function') {
 
 /* для автопроверки tools/content-gen/screens/check_echo.js и консоли */
 window.EN_ECHO = { data: ECH, steps: STEPS, foe, stepFoe, faceArt, fidOf, sync, draw, checks, planks: () => planks(weekOf(S), S.acc.cycle), bio: () => ({ cap: bioCap(), used: bioUsed() }), target: (kind, x, o) => target(S, kind, x, o),
-  cost: x => atkCost(x), pts: ptsOf, floorPts, rounds: roundsOf, lvl: lvlOf, hp: hpOf, sumLvl, sumHp: sumHpOf, sumLife, fight: (x, ids, no) => fightOf(x, ids, no || x.atk + 1), kit: demoKit,
+  cost: x => atkCost(x), pts: ptsOf, craftPts, floorPts, rounds: roundsOf, lvl: lvlOf, hp: hpOf, sumLvl, sumHp: sumHpOf, sumLife, fight: (x, ids, no) => fightOf(x, ids, no || x.atk + 1), kit: demoKit,
   manyFree, face: faceArt, arena: arenaOf, manyBp, likShards, est: estOf, ghost, short: x => shortLife(x), chest: chestRule, callBoss, reward: rewardHtml };
 })();

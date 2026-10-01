@@ -320,10 +320,11 @@ const ART_PICK = {
 const SQUAD = require('../biomes/sim.js').SQUAD;
 
 /* эталонные недели кланового босса: профиль, цикл, неделя цикла; сила отряда — средняя за неделю (capacity.json),
-   участники и атаки — по древу эталонного клана на середину той недели */
-const WEEKS = [
-  { prof: 'o', c: 2, w: 1 }, { prof: 'o', c: 2, w: 2 }, { prof: 'o', c: 3, w: 2 }, { prof: 'o', c: 4, w: 2 }, { prof: 'o', c: 5, w: 2 }, { prof: 'o', c: 6, w: 2 },
-  { prof: 'e', c: 2, w: 2 }, { prof: 'e', c: 3, w: 2 }, { prof: 'e', c: 6, w: 2 },
+   участники и атаки — по древу эталонного клана на середину той недели. Циклы III–VI — средняя неделя цикла ('mid'): циклы годовые
+   (ADR-0043), и 2-я неделя — неделя прихода, отряд прошлого цикла ещё упирается; было — 2-я неделя каждого цикла */
+const WEEKS0 = [
+  { prof: 'o', c: 2, w: 1 }, { prof: 'o', c: 2, w: 2 }, { prof: 'o', c: 3, w: 'mid' }, { prof: 'o', c: 4, w: 'mid' }, { prof: 'o', c: 5, w: 'mid' }, { prof: 'o', c: 6, w: 'mid' },
+  { prof: 'e', c: 2, w: 2 }, { prof: 'e', c: 3, w: 'mid' }, { prof: 'e', c: 6, w: 'mid' },
 ];
 const PROF = { o: 'обычный', e: 'увлечённый' };
 
@@ -379,6 +380,8 @@ const ctx = { console }; ctx.window = ctx; ctx.globalThis = ctx; vm.createContex
 for (const f of FILES.ui.concat(FILES.core)) vm.runInContext(fs.readFileSync(f, 'utf8'), ctx, { filename: path.basename(f) });
 const EB = ctx.EnBattle, EC = ctx.EnClan, LBX = ctx.EN_LOOTBOXES, CT = ctx.EN_CONTRACTS, RS = ctx.EN_ROSTER, WN = ctx.EN_WANDERER, EVD = ctx.EN_EVENT, ERD = ctx.EN_ECHO_RULES;
 const CAP = JSON.parse(fs.readFileSync(FILES.cap, 'utf8'));
+/* средняя неделя цикла профиля — по дням калькуляторов (capacity.json, power) */
+const WEEKS = WEEKS0.map(W => W.w !== 'mid' ? W : Object.assign({}, W, { w: Math.max(1, Math.ceil(Math.floor(CAP.power[W.prof][String(W.c)].length / 7) / 2)) }));
 const FOES = require(FILES.foes), SP = require('../lore/spoilers.js');   // сонмы стихий; спойлеры дайджеста — общие с Летописью
 const readJson = (f, d) => fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : d;
 const fl = (a, b) => Math.floor(a / b);
@@ -505,7 +508,10 @@ const inflowRaw = (c, prof) => fl(CT.econ[String(c)][prof].pts * 100 * CT.rules.
 const inflow = (c, prof) => fl(CT.econ[String(c)][prof].pts * 100 * CT.rules.splitBp * CT.planks[String(CYC.base)][0], CT.rules.bp * 7 * CT.planks[String(c)][0]);
 const cycDays = Object.fromEntries(Object.entries(CAP.cycleDays).map(([c, n]) => [+c, n]));
 function cycleOfDay(d) { let t = 0; for (const c of Object.keys(cycDays).map(Number).sort((a, b) => a - b)) { t += cycDays[c]; if (d < t) return c; } return 6; }
-const dayOf = (c, w) => { let t = 0; for (let k = 2; k < c; k++) t += cycDays[k]; return t + (w - 1) * 7 + 3; };   // середина недели w цикла c от создания клана
+const dayOf = (c, w, prof) => {   // середина недели w цикла c от создания клана — по длинам циклов профиля (capacity.json, cycleDaysBy)
+  const L = prof && CAP.cycleDaysBy && CAP.cycleDaysBy[prof] ? CAP.cycleDaysBy[prof] : CAP.cycleDays;
+  let t = 0; for (let k = 2; k < c; k++) t += +L[k]; return t + (w - 1) * 7 + 3;
+};
 
 /* прогон резервуара эталонного клана: день получения каждого очка; mulPct — множитель притока (плательщик). Глава тратит очко сразу,
    ключ ветки «Клан» ускоряет резервуар — выбор эталонный (у ключа альтернатив нет) */
@@ -616,7 +622,7 @@ function weekOf(D, p, members, perDay, pool, T, cyc) {
 const powOf = W => { const pw = CAP.power[W.prof][String(W.c)], days = pw.slice((W.w - 1) * 7, W.w * 7); return fl(days.reduce((a, x) => a + x, 0), days.length); };
 /* неделя эталонного клана — вехи древа (атаки, места) без вилок: чистая сила клана по дням его жизни */
 function weekRun(D, W, lvlAt) {
-  const p = powOf(W), lvl = lvlAt(W.prof, dayOf(W.c, W.w)), members = EC.capacity(D, lvl), perDay = EC.attacksDay(D, lvl);
+  const p = powOf(W), lvl = lvlAt(W.prof, dayOf(W.c, W.w, W.prof)), members = EC.capacity(D, lvl), perDay = EC.attacksDay(D, lvl);
   const r = weekOf(D, p, members, perDay, D.boss.pool, null, W.c);
   return Object.assign({ W, p, lvl, members, perDay, perMember: fl(r.pts, members) }, r);
 }
@@ -694,12 +700,14 @@ const yearsDays = d => d >= 365 ? `${fmt(d)} дн. · ${dec(d, 365)} г.` : `${f
 
 /* древо на клановом боссе: вилки поодиночке и эталонный выбор целиком (TREE.ref). Прогон ядром тем же боем, что у прототипа */
 const TREE_CALC = {
-  forkAt: 5,                          // вилки меряются на последнем взятом круге недели эталонных кланов WEEKS[5]: обычный, цикл VI, 2-я неделя
+  forkAt: 5,                          // вилки меряются на последнем взятом круге недели эталонных кланов WEEKS[5]: обычный, цикл VI, средняя неделя
   boss: [{ w: 1, lvls: [0, 100] }, { w: 5, lvls: [0, 20, 50, 100] }],   // сила — неделя WEEKS[w]; уровни древа — эталонный выбор, и 100 — одни вехи
   /* клан, где играют не все: 70 % участников заходят за неделю (Событие, SIM.clan.activeBp) и тратят 4 атаки из 5 (контракты, ASSUME.clan) —
      бюджет атак 56 %. На нём видно, чего стоят атаки древа: у полного клана их с запасом */
   act: { bp: 5600 },
-  when: [['конец цикла II', 14], ['конец цикла III', 35], ['конец цикла IV', 56], ['конец цикла V', 77], ['конец цикла VI', 98], ['год', 365], ['два года', 730]],
+  /* вехи календаря: концы циклов — по длинам циклов обычного (capacity.json, cycleDays; сроки автора, ADR-0043), и круглые сроки */
+  when: () => { let t = 0; return Object.keys(CAP.cycleDays).map(Number).sort((a, b) => a - b).map(c => { t += +CAP.cycleDays[c]; return [`конец цикла ${ROMAN[c]}`, t]; })
+    .concat([['год', 365], ['два года', 730]]).sort((a, b) => a[1] - b[1]); },
 };
 function treeCalc(D, weeks, got) {
   const lvlOf = (g, d) => { let l = 0; for (let n = 1; n <= TREE.levels; n++) if (g[n] && g[n] <= d) l = n; return l; };
@@ -731,7 +739,7 @@ function treeCalc(D, weeks, got) {
     }
   }
   /* когда приходит: уровень обычных, увлечённых и плательщиков к вехам календаря */
-  const when = TREE_CALC.when.map(([n, d]) => ({ n, d, o: lvlOf(got.o, d), e: lvlOf(got.e, d), p: lvlOf(got.p, d) }));
+  const when = TREE_CALC.when().map(([n, d]) => ({ n, d, o: lvlOf(got.o, d), e: lvlOf(got.e, d), p: lvlOf(got.p, d) }));
   /* потолки видов: наибольшая сумма, которую вид набирает на всём древе, если клан берёт его везде, где он есть */
   const most = {}, seen = {};
   for (const x of D.tree.levels) for (const a of x.alts) { const key = a.k + (a.p ? ':' + a.p : ''); most[key] = (most[key] || 0) + a.v; seen[key] = (seen[key] || 0) + 1; }

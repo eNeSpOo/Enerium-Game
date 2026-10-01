@@ -63,13 +63,16 @@ const RULES = {
   accentBp: 15000,             // акцент недели: очки одного занятия ×1,5 (предложение)
   /* клановые планки (ADR-0031, п. 12): планка k — сумма по участникам первого личного порога его цикла × clanX[k] / 100. Шаги — x:
      вторая ×4 первой, третья ×1,5 второй — те же, что у строк клановых планок в лутбоксах (EN_LOOTBOXES.modes.event, clan). Первая
-     доля clanX[0] — не ручка: сборщик берёт наименьшую, при которой клан увлечённых берёт третью не чаще LAWS.clanFan3[1] недель
-     ни в одном цикле. Прежнее правило — сумма третьих, четвёртых и пятых личных порогов — делало третью ×2 второй: её не брал
+     доля clanX[0] — не ручка: сборщик берёт середину отрезка долей, при которых законы кланов держатся во всех циклах. Прежнее правило — сумма третьих, четвёртых и пятых личных порогов — делало третью ×2 второй: её не брал
      и клан увлечённых */
   clan: { x: [1, 4, 6], per: 100 },
   plankDigits: 3,              // порог первой личной планки — вниз до трёх значащих цифр: при двух у порогов около 10 000 шаг —
                                // 10 %, и с доблестью в ядре (29.09.2026) порог цикла V упал с 10 900 до 10 000 — неделя этажей
                                // давала обычному четвёртую планку в 45 % недель
+  /* мерка первой личной планки (ADR-0042, ADR-0043): типичная неделя обычного (медиана) — во столько первых планок, × 100; одна на все
+     циклы — клан любого цикла берёт клановую планку одинаково. Перебор: от, до, шаг; сборщик берёт середину самого длинного отрезка,
+     где законы держатся во всех циклах */
+  plankR: [400, 1200, 5],
   shop: false,                 // магазина События в GDD нет: очки — мера недели, не валюта (§27, §36.3)
 };
 
@@ -164,9 +167,12 @@ const LAWS = {
   oP3Bp: 9000,        // обычный берёт третью планку не меньше чем в 90 % недель
   oP4Bp: 2500,        // и четвёртую — не чаще чем в 25 % недель (в среднем по девяти неделям)
   oP4WeekBp: 4000,    // в самую щедрую неделю акцента — не чаще 40 %
-  eP5Bp: 7500,        // увлечённый берёт пятую не меньше чем в 75 % недель
+  eP4Bp: 7500,        // увлечённый берёт четвёртую не меньше чем в 75 % недель. Было — пятую: в годовых циклах (ADR-0043) увлечённый —
+                      // ×2,1–2,3 обычного по очкам недели, а не ×3: темп его забегов упирается в ритуал этажа, а не в силу отряда
   clanLo: 9000, clanHi: 1000,   // обычный клан — первая клановая планка в 90 % недель, вторая — не чаще 10 %; клан увлечённых — вторая в 90 %
-  clanFan3: [300, 2500],        // клан увлечённых берёт третью в части недель (ADR-0031, п. 12): в каждом цикле — от 3 до 25 %
+  clanFan3Max: 2500,            // клан увлечённых берёт третью не чаще четверти недель. Было — «в части недель, от 3 до 25 %» (ADR-0031, п. 12):
+                                // в годовых циклах (ADR-0043) клан увлечённых — ×2,1 клана обычных, неделя клана — сумма 17 недель и почти
+                                // не гуляет; третья (×6 первой) — у кланов сильнее клана увлечённых
   x17: 170,           // §1.2: плательщик при времени обычного — не больше ×1,7
   plankStep: 2,       // соседние планки ×2 (лутбоксы)
 };
@@ -214,13 +220,13 @@ function dayUnits(CAP, caps, ER, c, pk, econ, leagueBp) {
   const ar = Math.floor(C.echoTop.reduce((a, t) => a + avgRounds100(ER, t), 0) / C.echoTop.length);
   return {
     floor: C.floors, elite: C.el, boss: C.boss, guard: caps.guard[i],
-    echoRound: Math.floor(C.echoAtk * ar / 100),
+    echoRound: Number.isInteger(C.echoRoundsDay) ? C.echoRoundsDay : Math.floor(C.echoAtk * ar / 100),   // раунды — калькулятор Эхо: лестница и КрафБоссы (ADR-0043)
     ritualHalf: Math.floor(caps.ritual[i] * SIM.ritualMin[pk] / 30),
     contractD: econ ? Math.floor(econ.dayDoneBp / 100) : 0, contractW: econ ? Math.floor(econ.weekDoneBp / 700) : 0,
     arenaWin: caps.arenaWin[i],
     leagueWin: Math.floor(Math.floor(caps.league[i] * SIM.leagueWinBp / BP) * (leagueBp == null ? BP : leagueBp) / BP),
     clanAtk: caps.clan[i], craftItem: caps.craft[i], recipe: caps.recipe[i],
-    _rounds: ar,
+    _rounds: Number.isInteger(C.echoRoundsDay) && C.echoAtk ? Math.floor(C.echoRoundsDay * 100 / C.echoAtk) : ar,
   };
 }
 /* очки среднего дня × 100, без акцента: цена единицы × единицы дня, дневные потолки — как у «сервера» */
@@ -311,25 +317,37 @@ function build() {
   const median = xs => { const s = xs.slice().sort((a, b) => a - b); return s[Math.floor(s.length / 2)]; };
   const shareAt = (xs, need) => Math.floor(xs.filter(x => x >= need).length * BP / xs.length);
 
-  /* --- пороги личных планок: наибольший красивый порог первой, при котором законы держатся --- */
-  const planks = {}, pick = {};
-  for (const c of RULES.cycles) {
-    const O = all(c, 'o'), E = all(c, 'e');
-    const need = P1 => [P1, P1 * 2, P1 * 4, P1 * 8, P1 * 16];
-    // верх: увлечённый берёт пятую в 75 % недель, обычный третью — в 90 %
-    let hi = Math.min(...[0.25, 0.1].map((q, i) => { const xs = (i ? O : E).slice().sort((a, b) => a - b); return Math.floor(xs[Math.floor(xs.length * q)] / (i ? 4 : 16)); }));
-    let P1 = niceDown(hi);
-    while (P1 > 1 && (shareAt(E, P1 * 16) < LAWS.eP5Bp || shareAt(O, P1 * 4) < LAWS.oP3Bp)) P1 = niceDown(P1 - 1);
-    planks[c] = need(P1);
-    pick[c] = { hi, P1 };
+  /* --- пороги личных планок — одна мерка на все циклы (ADR-0042, ADR-0043): первая планка цикла — типичная неделя обычного (медиана)
+         / plankR. Тогда клан любого цикла берёт свою клановую планку одинаково: её порог — сумма первых личных порогов участников × доля.
+         Мерка — не ручка: перебор RULES.plankR, середина самого длинного отрезка, где законы держатся во всех циклах; округление порога
+         вниз — внутри проверки. Было: в каждом цикле — наибольший порог, при котором законы держатся, и мерка гуляла от цикла к циклу —
+         клан цикла VI брал первую клановую при ×0,86 клана цикла II (ADR-0042), неделя Забытых сидела ровно на пороге --- */
+  const need = P1 => [P1, P1 * 2, P1 * 4, P1 * 8, P1 * 16];
+  const lawsAt = (c, P1) => {   // законы личных планок цикла c при пороге первой P1 — список нарушений
+    const O = all(c, 'o'), E = all(c, 'e'), out = [];
+    if (shareAt(O, P1 * 4) < LAWS.oP3Bp) out.push(`обычный берёт третью реже ${pct(LAWS.oP3Bp, BP)} недель`);
     const oP4 = shareAt(O, P1 * 8);
-    if (oP4 > LAWS.oP4Bp) err.push(`цикл ${ROMAN[c]}: обычный берёт четвёртую планку в ${pct(oP4, BP)} недель — больше ${pct(LAWS.oP4Bp, BP)}`);
-    for (const race of RACES) { const x = shareAt(sims[c].o[race], P1 * 8); if (x > LAWS.oP4WeekBp) err.push(`цикл ${ROMAN[c]}, неделя ${race}: обычный берёт четвёртую в ${pct(x, BP)} недель`); }
-    if (shareAt(E, P1 * 16) < LAWS.eP5Bp) err.push(`цикл ${ROMAN[c]}: увлечённый берёт пятую реже ${pct(LAWS.eP5Bp, BP)} недель`);
-    if (shareAt(O, P1 * 4) < LAWS.oP3Bp) err.push(`цикл ${ROMAN[c]}: обычный берёт третью реже ${pct(LAWS.oP3Bp, BP)} недель`);
-    // типичная неделя лутбоксов: медиана обычного — на третьей, увлечённого — на пятой
-    const mo = EV.reached(planks[c], median(O)), me = EV.reached(planks[c], median(E));
-    if (mo !== typ.free.me || me !== typ.fan.me) err.push(`цикл ${ROMAN[c]}: медиана обычного — планка ${mo}, увлечённого — ${me}; в лутбоксах — ${typ.free.me} и ${typ.fan.me}`);
+    if (oP4 > LAWS.oP4Bp) out.push(`обычный берёт четвёртую планку в ${pct(oP4, BP)} недель — больше ${pct(LAWS.oP4Bp, BP)}`);
+    for (const race of RACES) { const x = shareAt(sims[c].o[race], P1 * 8); if (x > LAWS.oP4WeekBp) out.push(`неделя ${race}: обычный берёт четвёртую в ${pct(x, BP)} недель`); }
+    if (shareAt(E, P1 * 8) < LAWS.eP4Bp) out.push(`увлечённый берёт четвёртую реже ${pct(LAWS.eP4Bp, BP)} недель`);
+    // типичная неделя лутбоксов: медиана обычного — на третьей, увлечённого — на четвёртой
+    const mo = EV.reached(need(P1), median(O)), me = EV.reached(need(P1), median(E));
+    if (mo !== typ.free.me || me !== typ.fan.me) out.push(`медиана обычного — планка ${mo}, увлечённого — ${me}; в лутбоксах — ${typ.free.me} и ${typ.fan.me}`);
+    return out;
+  };
+  const p1Of = (c, R) => niceDown(Math.floor(median(all(c, 'o')) * 100 / R));
+  let best = [], run = [];
+  for (let R = RULES.plankR[0]; R <= RULES.plankR[1]; R += RULES.plankR[2]) {
+    if (!RULES.cycles.every(c => !lawsAt(c, p1Of(c, R)).length)) { run = []; continue; }
+    run.push(R);
+    if (run.length > best.length) best = run.slice();
+  }
+  if (!best.length) err.push(`личные планки: ни одна мерка ${RULES.plankR[0] / 100}–${RULES.plankR[1] / 100} не держит законы во всех циклах`);
+  const plankR = best.length ? best[Math.floor(best.length / 2)] : RULES.plankR[0];
+  const planks = {};
+  for (const c of RULES.cycles) {
+    planks[c] = need(p1Of(c, plankR));
+    for (const e of lawsAt(c, planks[c][0])) err.push(`цикл ${ROMAN[c]}: ${e}`);
   }
 
   /* --- кланы: типичный клан из обычных и клан увлечённых; планки — сумма личных порогов участников --- */
@@ -339,23 +357,34 @@ function build() {
     for (let w = 0; w < SIM.weeks * 3; w++) { let s = 0; for (let m = 0; m < act; m++) s += pool[rng(pool.length)]; res.push(s); }
     return res;
   }
-  /* доли клановых планок clanX: первая — наименьшая, при которой клан увлечённых берёт третью не чаще LAWS.clanFan3[1] недель
-     ни в одном цикле; вторая и третья — шагами RULES.clan.x */
+  /* доли клановых планок clanX: первая — середина самого длинного отрезка долей, при которых законы кланов держатся во всех циклах
+     (запас в обе стороны: закон не сидит на пороге); вторая и третья — шагами RULES.clan.x. Личные планки — одной меркой (plankR),
+     поэтому отрезок у всех циклов почти один */
   const clanSims = {};
   for (const c of RULES.cycles) clanSims[c] = { free: simClan(c, 'o'), fan: simClan(c, 'e') };
   const clanXOf = x1 => RULES.clan.x.map(k => x1 * k);
   const needsOf = (x1, c) => EV.clanPlanks({ clanX: clanXOf(x1), planks }, Array(SIM.clan.members).fill(c));
-  let clanX1 = 1;
-  while (clanX1 < RULES.clan.per * 16 && RULES.cycles.some(c => shareAt(clanSims[c].fan, needsOf(clanX1, c)[2]) > LAWS.clanFan3[1])) clanX1++;
+  const clanLaws = (x1, c) => {   // законы кланов цикла c при первой доле x1 — список нарушений
+    const needs = needsOf(x1, c), fr = clanSims[c].free, fn = clanSims[c].fan, out = [];
+    const r1 = shareAt(fr, needs[0]), r2 = shareAt(fr, needs[1]), f2 = shareAt(fn, needs[1]), f3 = shareAt(fn, needs[2]);
+    if (r1 < LAWS.clanLo || r2 > LAWS.clanHi) out.push(`обычный клан — первая клановая в ${pct(r1, BP)}, вторая в ${pct(r2, BP)} недель`);
+    if (f2 < LAWS.clanLo || f3 > LAWS.clanFan3Max) out.push(`клан увлечённых — вторая в ${pct(f2, BP)}, третья в ${pct(f3, BP)} недель`);
+    if (EV.reached(needs, median(fr)) !== typ.free.clan || EV.reached(needs, median(fn)) !== typ.fan.clan) out.push('клановые планки не сходятся с типичной неделей лутбоксов');
+    return out;
+  };
+  let cBest = [], cRun = [];
+  for (let x1 = 1; x1 <= RULES.clan.per * 16; x1++) {
+    if (!RULES.cycles.every(c => !clanLaws(x1, c).length)) { cRun = []; continue; }
+    cRun.push(x1);
+    if (cRun.length > cBest.length) cBest = cRun.slice();
+  }
+  if (!cBest.length) err.push('клановые планки: ни одна первая доля не держит законы кланов во всех циклах');
+  const clanX1 = cBest.length ? cBest[Math.floor(cBest.length / 2)] : RULES.clan.per;
   const clanX = clanXOf(clanX1);
   const clan = {};
   for (const c of RULES.cycles) {
-    const needs = needsOf(clanX1, c), fr = clanSims[c].free, fn = clanSims[c].fan;
-    clan[c] = { needs, free: fr, fan: fn };
-    const r1 = shareAt(fr, needs[0]), r2 = shareAt(fr, needs[1]), f2 = shareAt(fn, needs[1]), f3 = shareAt(fn, needs[2]);
-    if (r1 < LAWS.clanLo || r2 > LAWS.clanHi) err.push(`цикл ${ROMAN[c]}: обычный клан — первая клановая в ${pct(r1, BP)}, вторая в ${pct(r2, BP)} недель`);
-    if (f2 < LAWS.clanLo || f3 < LAWS.clanFan3[0] || f3 > LAWS.clanFan3[1]) err.push(`цикл ${ROMAN[c]}: клан увлечённых — вторая в ${pct(f2, BP)}, третья в ${pct(f3, BP)} недель`);
-    if (EV.reached(needs, median(fr)) !== typ.free.clan || EV.reached(needs, median(fn)) !== typ.fan.clan) err.push(`цикл ${ROMAN[c]}: клановые планки не сходятся с типичной неделей лутбоксов`);
+    clan[c] = { needs: needsOf(clanX1, c), free: clanSims[c].free, fan: clanSims[c].fan };
+    for (const e of clanLaws(clanX1, c)) err.push(`цикл ${ROMAN[c]}: ${e}`);
   }
 
   /* --- ×1,7: плательщик при времени обычного; сила коллекции на потолке --- */
@@ -410,14 +439,14 @@ function build() {
     bp: BP, from: RULES.from, cycles: RULES.cycles, cutoffH: RULES.cutoffH, countH: RULES.countH, shop: RULES.shop ? 1 : 0,
     units: UNITS, caps: CAPS, sources: SOURCES, echoRounds: rounds,
     weeks: Object.fromEntries(Object.entries(WEEKS).map(([race, W]) => [race, { n: W.n, an: W.an, line: W.line, accent: { units: W.units, bp: RULES.accentBp } }])),
-    world: WORLD, rp1: RP1, clanX, planks,
+    world: WORLD, rp1: RP1, clanX, planks, plankR,
     top: { players: TOP.players, clans: TOP.clans, names: TOP.names, clanNames: TOP.clanNames, clanRef: SIM.clan.members },
     demo: { elapsedBp, clanActiveBp: SIM.clan.activeBp, pastFracBp: DEMO.pastFracBp, cyc: demo },
     econ: Object.fromEntries(RULES.cycles.map(c => [c, {
       day: { o: shares[c].o.tot, e: shares[c].e.tot },
       share: { o: shares[c].o.by, e: shares[c].e.by },
       week: { o: median(all(c, 'o')), e: median(all(c, 'e')), p: median(all(c, 'p')) },
-      oP3Bp: shareAt(all(c, 'o'), planks[c][2]), oP4Bp: shareAt(all(c, 'o'), planks[c][3]), eP5Bp: shareAt(all(c, 'e'), planks[c][4]),
+      oP3Bp: shareAt(all(c, 'o'), planks[c][2]), oP4Bp: shareAt(all(c, 'o'), planks[c][3]), eP4Bp: shareAt(all(c, 'e'), planks[c][3]), eP5Bp: shareAt(all(c, 'e'), planks[c][4]),
       x17: x17[c].ratio, rounds: { o: days[c].o._rounds, e: days[c].e._rounds },
     }])),
   };
@@ -458,17 +487,17 @@ function build() {
   TBL.share = T.join('\n');
 
   // планки и прогон
-  T = head(['Цикл', 'Планки 1–5', 'Обычный: неделя → планка', 'Третья / четвёртая, доля недель', 'Увлечённый: неделя → планка', 'Пятая, доля недель', 'Плательщик: неделя → планка']);
+  T = head(['Цикл', 'Планки 1–5', 'Обычный: неделя → планка', 'Третья / четвёртая, доля недель', 'Увлечённый: неделя → планка', 'Четвёртая / пятая, доля недель', 'Плательщик: неделя → планка', 'Неделя обычного — первых планок']);
   for (const c of RULES.cycles) {
     const E = data.econ[c];
-    T.push(cells([ROMAN[c], planks[c].map(fmt).join(' / '), `${fmt(E.week.o)} → ${EV.reached(planks[c], E.week.o)}`, `${pct(E.oP3Bp, BP)} / ${pct(E.oP4Bp, BP)}`, `${fmt(E.week.e)} → ${EV.reached(planks[c], E.week.e)}`, pct(E.eP5Bp, BP), `${fmt(E.week.p)} → ${EV.reached(planks[c], E.week.p)}`]));
+    T.push(cells([ROMAN[c], planks[c].map(fmt).join(' / '), `${fmt(E.week.o)} → ${EV.reached(planks[c], E.week.o)}`, `${pct(E.oP3Bp, BP)} / ${pct(E.oP4Bp, BP)}`, `${fmt(E.week.e)} → ${EV.reached(planks[c], E.week.e)}`, `${pct(E.eP4Bp, BP)} / ${pct(E.eP5Bp, BP)}`, `${fmt(E.week.p)} → ${EV.reached(planks[c], E.week.p)}`, '×' + dec(E.week.o, planks[c][0], 2)]));
   }
   TBL.planks = T.join('\n');
 
   // недели акцентов: цикл II и VI
-  T = head(['Неделя', 'Акцент', 'II: обычный, медиана', 'II: четвёртая у обычного', 'II: пятая у увлечённого', 'VI: обычный, медиана', 'VI: четвёртая у обычного', 'VI: пятая у увлечённого']);
+  T = head(['Неделя', 'Акцент', 'II: обычный, медиана', 'II: четвёртая у обычного', 'II: четвёртая у увлечённого', 'VI: обычный, медиана', 'VI: четвёртая у обычного', 'VI: четвёртая у увлечённого']);
   for (const race of RACES) {
-    const r = c => [fmt(median(sims[c].o[race])), pct(shareAt(sims[c].o[race], planks[c][3]), BP), pct(shareAt(sims[c].e[race], planks[c][4]), BP)];
+    const r = c => [fmt(median(sims[c].o[race])), pct(shareAt(sims[c].o[race], planks[c][3]), BP), pct(shareAt(sims[c].e[race], planks[c][3]), BP)];
     T.push(cells([race, WEEKS[race].an, ...r(2), ...r(6)]));
   }
   TBL.accents = T.join('\n');

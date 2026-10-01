@@ -184,7 +184,10 @@ for (const b of DATA) {
     if (FF.some(ids => ids.length > 5)) fail(`${b.id}: в полном варианте на этаже больше пяти врагов`);
     if (!b.full.guard.length || b.full.guard[0] !== 'g1' || b.full.guard.length !== 5 || b.full.guard.slice(1).some(x => x[0] !== 'e')) fail(`${b.id}: страж полного варианта — рунный босс и четыре элиты (ADR-0010)`);
     if (D && D.perRunAfterTutorial && (D.perRunAfterTutorial.specKeys !== fel)) fail(`${b.id}: элит в полном варианте ${fel}, а черновик добычи после обучения считает ${D.perRunAfterTutorial.specKeys} (recipes.js)`);
-    if (b.full.core.dropPct !== b.core.dropPct) fail(`${b.id}: валюта полного варианта — по циклу биома, как у обучающего (ADR-0044): ${b.full.core.dropPct} против ${b.core.dropPct}`);
+    /* валюта полного варианта — общее правило ADR-0014: × цикл биома, у второго биома цикла ещё +0,5 (решение координатора, ADR-0044):
+       исключение 80 % — только у короткого варианта обучения */
+    const rateFull = b.cycle * 100 + (b.n % 2 === 0 ? 50 : 0);
+    if ((b.full.core.dropPct || 100) !== rateFull) fail(`${b.id}: валюта полного варианта — × (цикл + 0,5) у второго биома цикла (ADR-0014, ADR-0044): ${b.full.core.dropPct} против ${rateFull}`);
     full = Object.assign({ from: b.full.from }, b.full.core, { floors: fd, guard: { g: 'r', m: b.full.guard.map(x => fullId(b, x)) } });
   }
   biomes[b.id] = {

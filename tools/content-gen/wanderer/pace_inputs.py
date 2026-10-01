@@ -53,7 +53,7 @@ def build():
     for k, p in PROFILES.items():
         data['guards'][k] = {str(c): S.kills_avg(S.KEY_PICK, days[p], c, prof=p) for c in (2, 3)}
         data['limitSquad'][k] = [int(d) for d in E.pace_of(dict(E.PROFILES)[p])['runes']]
-        data['heroGold'][k] = [sum(b.values()) for b, _, _ in S.gold_buy(price, inc[p], heroes)]
+        data['heroGold'][k] = [sum(b.values()) for b, _, _ in S.gold_buy(price, inc[p], heroes, S.cycles_of(days[p]))]
     return data
 
 

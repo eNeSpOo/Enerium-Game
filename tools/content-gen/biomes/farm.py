@@ -23,12 +23,14 @@
   чем свои, — старый биом и есть ферма; шанс с отмычками — не выше потолка §11.
 - У1. Уникальный в старом биоме: шанс — доля обычного, меньше 100 %; ударами насмерть в минуту его меньше, чем у отряда конца цикла
   в своём биоме.
-Циклы III–VI — оценка: законы В1 и У1 печатаются по образцам подъёма, проверка их не требует (сроки циклов пересчитает следующая задача,
-ADR-0043).
+- В1 циклов III–VI: то же в каждом цикле — свой биом у отряда, которым обычный берёт стража второго биома цикла (калькулятор подъёма,
+  cycle/climb-days.json: цикл героев, уровень и доблесть главного забега в последний день цикла), против ударов насмерть по каждому
+  старому биому (биомы 1–4 и образцы прошлых циклов). Биомы 5–12 не собраны — образцы подъёма (cycle/climb-sim.js, ручка силы KX).
 
 Подбор ритуала: по видам этажа — доли RITUAL_PCT от ритуала рядовых (ритуал растёт с добычей этажа); ритуал рядовых — наименьший шаг
 STEP_MS, не короче зрелища — раунд, удар, выход врагов, «Этаж взят», полёт добычи (фазы показа RULES.floor.ritual), — при котором
-держатся законы цикла II. Сколько ритуал удлиняет честную игру цикла II (забеги своего биома по дням) — печатается.
+держатся законы цикла II и В1 циклов III–VI. Ритуал обучения (короткие варианты биомов 1–2 в цикле I, RULES.floor.tutMs) подбор
+не трогает: на нём выверен сценарий обучения (ADR-0040). Сколько ритуал удлиняет честную игру цикла II (забеги своего биома по дням) — печатается.
 
     python tools/content-gen/biomes/farm.py          # таблицы, farm.json, docs/content/биомы-и-фарм.md; затем node tools/content-gen/biomes/build.js
     python tools/content-gen/biomes/farm.py --check  # законы и свежесть: код выхода 1, если не держатся
@@ -50,6 +52,7 @@ SIM = HERE / 'farm-sim.js'
 OUT = HERE / 'farm.json'
 PACE = HERE / 'pace.json'
 CLIMB = ROOT / 'tools' / 'content-gen' / 'cycle' / 'climb.json'
+CLIMB_DAYS = ROOT / 'tools' / 'content-gen' / 'cycle' / 'climb-days.json'
 DOC = ROOT / 'docs' / 'content' / 'биомы-и-фарм.md'
 BP = 10000
 
@@ -157,12 +160,19 @@ def deck_loot(d, rune_bp=None):
 
 
 def run_loot(r, d):
-    """Добыча честного забега: валюта и ключи — ядро; уникальный и рунный ключ — ожидание, если пал босс; базовые — ожидание за взятые этажи."""
+    """Добыча честного забега: валюта и ключи — ядро; уникальный и рунный ключ — ожидание, если пал босс; базовые — ожидание за взятые этажи.
+    Босс в осаде (дошёл и не взял, siegeRuns — забегов до его падения): фарм своего биома — забег за забегом, добыча босса приходит раз
+    в siegeRuns забегов — её доля на забег. Осада не движется — добычи босса нет."""
     won = sum(1 for _, _, w in r['floors'] if w)
     base = d['baseX100'] * won // len(d['floors'])
-    boss = 1 if r['bossDead'] else 0
-    return {'gold': r['gold'], 'spirit': r['spirit'], 'souls': r['souls'], 'keys': r['keys'], 'baseX100': base,
-            'uniqueBp': d['uniqueBp'] * boss, 'runeBp': d['runeKeyBp'] * d['runeKeys'] * boss}
+    if r['bossDead']:
+        n, extra = 1, {k: 0 for k in CUR}
+    else:
+        n = r.get('siegeRuns')
+        extra = {k: d['boss'][k] // n for k in CUR} if n else {k: 0 for k in CUR}
+    share = 1 if r['bossDead'] or n else 0
+    return {'gold': r['gold'] + extra['gold'], 'spirit': r['spirit'] + extra['spirit'], 'souls': r['souls'] + extra['souls'], 'keys': r['keys'],
+            'baseX100': base, 'uniqueBp': d['uniqueBp'] * share // (n or 1), 'runeBp': d['runeKeyBp'] * d['runeKeys'] * share // (n or 1)}
 
 
 def pace_days():
@@ -211,11 +221,20 @@ def compute():
     for c, own in VIRT.items():
         olds = OLD_II + OWN_II + [v for cc in range(3, c) for v in VIRT[cc]]
         Dc = {d['id']: d for d in node({'mode': 'deck', 'biomes': olds + own, 'cyc': c})['biomes']}
-        need = climb['need'][str(c)]['lvl']
-        rr = node({'mode': 'runs', 'list': [{'biome': b, 'k': 1, 'L': need} for b in own] + [{'biome': b, 'k': OP_SQUAD[0], 'L': OP_SQUAD[1]} for b in olds], 'cyc': c})['runs']
-        est[c] = {'D': Dc, 'need': need, 'own': {r['biome']: r for r in rr if r['k'] == 1}, 'op': {r['biome']: r for r in rr if r['k'] == OP_SQUAD[0]}, 'olds': olds}
+        k, L, v, j = end_squad(c)
+        rr = node({'mode': 'runs', 'list': [{'biome': b, 'k': k, 'L': L, 'v': v, 'j': j} for b in own] + [{'biome': b, 'k': OP_SQUAD[0], 'L': OP_SQUAD[1]} for b in olds], 'cyc': c})['runs']
+        est[c] = {'D': Dc, 'need': (k, L, v, j), 'own': {r['biome']: r for r in rr if r['biome'] in own}, 'op': {r['biome']: r for r in rr if r['biome'] in olds}, 'olds': olds}
     return {'D2': D2, 'rit': rit, 'core': core_min, 'gap': gap, 'drop': drop, 'show': rit.get('show'), 'runs': runs, 'days': days, 'end_lvl': end_lvl,
             'est': est, 'RS': RS, 'pdays': pdays, 'climb': climb, 'pace_sig': pace_sig, 'sig': rit.get('sig')}
+
+
+def end_squad(c):
+    """Отряд обычного, которым он берёт стража второго биома цикла c (калькулятор подъёма: climb-days.json, последний день цикла) —
+    цикл героев, уровень, доблесть главного забега."""
+    J = json.loads(CLIMB_DAYS.read_text(encoding='utf-8'))
+    d = J['meta']['ends']['o'][str(c)]
+    row = J['days']['o'][d - 1]
+    return row[1], row[2], row[3], row[13]
 
 
 def oneshot(D, r, mins, gap, rune_bp=None):
@@ -286,11 +305,26 @@ def ritual_of(x):
     return {g: x * p // 100 // STEP_MS * STEP_MS for g, p in RITUAL_PCT.items()}
 
 
+def laws_late(X, mins):
+    """Закон В1 в циклах III–VI: удары насмерть по любому старому биому не дают золота, духа и душ в минуту больше, чем свой биом у отряда,
+    которым обычный берёт стража второго биома цикла. Возвращает (держится ли, худшие случаи по циклам)."""
+    bad = {}
+    for c, e in X['est'].items():
+        own = best([honest(e['D'][b], e['own'][b], mins, X['gap'])[0] for b in VIRT[c]])
+        for b in e['olds']:
+            r = oneshot(e['D'][b], e['op'][b], mins, X['gap'])[0]
+            ks = [k for k in CUR if r[k] > own[k]]
+            if ks:
+                bad.setdefault(c, []).append((b, ks))
+    return not bad, bad
+
+
 def pick(X):
-    """Наименьший ритуал рядовых — шагом STEP_MS, не короче зрелища, — при котором держатся законы цикла II; по видам — доли RITUAL_PCT."""
+    """Наименьший ритуал рядовых — шагом STEP_MS, не короче зрелища, — при котором держатся законы цикла II и закон В1 в циклах III–VI;
+    по видам — доли RITUAL_PCT."""
     for x in range(show_min(X), SEARCH_MS + 1, STEP_MS):
         m = ritual_of(x)
-        if laws_ii(X, m)[0]:
+        if laws_ii(X, m)[0] and laws_late(X, m)[0]:
             return m
     return None
 
@@ -438,6 +472,12 @@ def build(X):
     bad1 = {b: k for b, k in L2['v1'].items() if k}
     v.append({'what': 'В1. Цикл II: удары насмерть по старым биомам не выгоднее своего', 'goal': 'золото, дух, души в минуту — не больше, чем у отряда конца цикла в своём',
               'got': 'держится' if not bad1 else '; '.join(f'{bname(b)}: ' + ', '.join(CUR_RU[k] for k in ks) for b, ks in bad1.items()), 'ok': not bad1})
+    okl, badl = laws_late(X, X['core'])
+    v.append({'what': 'В1. Циклы III–VI: удары насмерть по старым биомам не выгоднее своего',
+              'goal': 'в каждом цикле золото, дух, души в минуту — не больше, чем у отряда, которым обычный берёт стража второго биома, в своём',
+              'got': ', '.join(f"{E.CYCLE_NAMES[c - 1]} — худший {bname(e['worst'][0])}: {CUR_RU[e['worst'][1]]} {e['worst'][2]} % своего" for c, e in est.items())
+              + ('' if okl else '; не держится: ' + '; '.join(f"{E.CYCLE_NAMES[c - 1]}: " + ', '.join(f'{bname(b)} ({", ".join(CUR_RU[k] for k in ks)})' for b, ks in xs[:2]) for c, xs in badl.items())),
+              'ok': okl})
     v.append({'what': 'В2. Цикл II: тот же отряд в тот же день', 'goal': 'свой биом не хуже старого — обычный и увлечённый',
               'got': 'держится' if not L2['v2'] else '; '.join(f'{n}, {d}-й день, {L}-й: {bname(b)} лучше по ' + ', '.join(CUR_RU[k] for k in ks) for n, d, L, fb, b, ks in L2['v2'][:3]), 'ok': not L2['v2']})
     k1ok = K['k1min'] is not None and K['k1min'] <= REST_MAX_MIN
@@ -468,7 +508,7 @@ def markdown(X, x, mins, L2, est, K, u_max):
     parts['ritual'] = table(['Вид этажа', 'Ритуал, ядро', 'Подбор калькулятора'],
                             [[{'o': 'рядовые', 'e': 'элита', 'b': 'босс', 'guard': 'рунный страж'}[g], sec(X['core'][g]), sec(x[g]) if x else 'не найден'] for g in KINDS]) + \
         f"\n\nПереход между этажами — {sec(gap)} (`RULES.floor.gapMs`). Рядовые — не короче зрелища: раунд, удар, выход врагов, «Этаж взят», полёт добычи — {sec(show_min(X))}. " + \
-        f"Подбор — наименьший ритуал рядовых шагом {sec(STEP_MS)}, при котором держатся законы цикла II; по виду — доли от ритуала рядовых: элита {RITUAL_PCT['e']} %, босс и страж {RITUAL_PCT['b']} % — " + \
+        f"Подбор — наименьший ритуал рядовых шагом {sec(STEP_MS)}, при котором держатся законы цикла II и закон В1 циклов III–VI; по виду — доли от ритуала рядовых: элита {RITUAL_PCT['e']} %, босс и страж {RITUAL_PCT['b']} % — " + \
         f"ритуал растёт с добычей этажа. Честная игра цикла II — забеги своего биома у обычного и увлечённого по дням — с ним длиннее в среднем на {x100(slowdown_bp(X, X['core']))} %."
     rows = []
     own = L2['own']
@@ -494,10 +534,13 @@ def markdown(X, x, mins, L2, est, K, u_max):
     erows = []
     for c, e in est.items():
         w = e['worst']
-        erows.append([E.CYCLE_NAMES[c - 1], f"{e['need']}-й", x100(e['own']['spirit']), x100(e['own']['souls']), f"{bname(w[0])}: {CUR_RU[w[1]]} — {w[2]} %",
-                      ('×' + x100(e['needX'])) if e['needX'] is not None else 'не найден', 'реже' if e['uOld'] < e['uOwn'] else '**чаще**'])
-    parts['est'] = table(['Цикл', 'Отряд конца цикла (герои I)', 'Свой: дух в мин', 'Свой: души в мин', 'Худший старый: удар насмерть, % своего', 'Ритуал длиннее, чтобы закон держался', 'Уникальный в старом'], erows) + \
-        '\n\nОценка по образцам подъёма (`cycle/climb.json`): биомы 5–12 не собраны, сроки циклов пересчитает следующая задача (ADR-0043). Больше 100 % — удары насмерть по старому биому выгоднее своего.'
+        k, L, vv, jj = e['need']
+        erows.append([E.CYCLE_NAMES[c - 1], f"герои цикла {E.CYCLE_NAMES[k - 1]}, {L}-й, доблесть {vv}" + (f', у {jj} — {vv + 1}' if jj else ''), x100(e['own']['gold']), x100(e['own']['spirit']), x100(e['own']['souls']),
+                      f"{bname(w[0])}: {CUR_RU[w[1]]} — {w[2]} %", ('×' + x100(e['needX'])) if e['needX'] is not None else 'не найден', 'реже' if e['uOld'] < e['uOwn'] else '**чаще**'])
+    parts['est'] = table(['Цикл', 'Отряд, которым обычный берёт стража второго биома', 'Свой: золото в мин', 'Свой: дух в мин', 'Свой: души в мин',
+                          'Худший старый: удар насмерть, % своего', 'Ритуал длиннее, чтобы закон держался', 'Уникальный в старом'], erows) + \
+        '\n\nОтряд — калькулятор подъёма (`cycle/climb-days.json`, последний день цикла); биомы 5–12 не собраны — образцы подъёма с ручкой силы `KX` ' + \
+        '(`cycle/climb.py`). Больше 100 % — удары насмерть по старому биому выгоднее своего; закон В1 циклов III–VI — в проверке `farm.py --check`, ритуал этажа подобран под него.'
     krows = [[bname(b), mins_of(K['farm'][b]['ms']), K['farm'][b]['elites'], x100(K['farm'][b]['rates']['keys']), 'да' if K['farm'][b]['boss'] else 'нет'] for b in OLD_II]
     parts['keys'] = table(['Старый биом, отряд обычного на плато цикла II', 'Забег', 'Элит за забег', 'Ключей ремёсел в мин', 'Босс пал'], krows) + \
         f"\n\n- Ключей ремёсел цикла I, которых не дало обучение (модель стока): {x100(K['restX100'])} — это {K['k1min']} мин такого фарма.\n" + \

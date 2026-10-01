@@ -52,8 +52,8 @@
     "table": "Enerium_Враги.xlsx",
     "built": "2026-10-01",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "27ef13e424081b3ae9bcbe06ebc0ae498b70075b360ed1a8a09ca453baa8a33e",
-    "sha256": "d2ecef8e569b04365b2b2498168f32ec510798181455fd5d54fe32a7f7176d6b",
+    "data_sha256": "0c5b34e0458c2dd7e177227cabcb9df7cfbb9dd2661c58391edea662c41f6422",
+    "sha256": "4f3423229d10e755b9833b5751c23bd913b7cd98cc4683463ac841bb113517cc",
     "sheets": {
       "Биомы": 12,
       "Мастерская форм": 14,
@@ -83,8 +83,8 @@
     "table": "Enerium_Достижения.xlsx",
     "built": "2026-10-01",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "9ae132d7a59a886648b88b86404f6e3125823937355195ce8cb1d1863a25bba1",
-    "sha256": "616c191d18b244fc8d5cd90e0586f58bbc244c6c45055b48fae8b29b37d80da1",
+    "data_sha256": "f3608b18bcabb61a28572bb1812f6699be520eee7db0a5cc92ad7b3a67627182",
+    "sha256": "7348e05935390a34309b15681442cfbb9e17c9d63f4567dda6763369ab81f922",
     "sheets": {
       "Достижения": 102,
       "Первенства": 28,
@@ -109,8 +109,8 @@
     "table": "Enerium_Лавка.xlsx",
     "built": "2026-10-01",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "9014ebd7919d1c0ebc48d0b06aabb16156f614a5240839aed9b2c713f4b43cf5",
-    "sha256": "8b59d58a4bdc03e5dc464b6a3e922f4cf68993f898088aba28466679a8eeb49a",
+    "data_sha256": "23b618f1224f4feb6ea36b9aff929b1a163d3f0433fc9ae2878258a914c5c0bf",
+    "sha256": "811bf4cc0264b8e31b88b7dfe15b56bd288cb910052720f11cc1eb54f62c3aff",
     "sheets": {
       "Цены": 10,
       "Стартовые наборы": 5,
@@ -163,8 +163,8 @@
     "table": "Enerium_Реестр_имён.xlsx",
     "built": "2026-10-01",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "9844206c9fa221f7feee2508436b13e6a933d11ed87fe07d56ab3d3b0fb6a917",
-    "sha256": "6169bb645c5309dfb24057274ce230a1d6e0c58c292dbedaaaeb135088ffca5f",
+    "data_sha256": "581ee12833dcd83f4ff3118347d32b155cd7a9a7381441f47acf2206dc9f70a9",
+    "sha256": "06b261e8c14a4e4189eaff6d783aefebf0893b8bfe13bfa4dd98f1322b097860",
     "sheets": {
       "Имена": 3267,
       "Повторы": 19,

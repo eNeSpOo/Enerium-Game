@@ -17,6 +17,8 @@
       призванных врагов (EN_LOOTBOXES.summon): вид, редкость, окно, цикл пула, неделя у Лика недели, сид от боя; повтор атаки второго
       сундука не даёт; итог боя показывает сундук с «Шансы» и «Открыть», «Открыть» — в запасах окном сундука, повтор не выдаёт;
       «Сведения» о предмете призыва, лист «Состав и шансы» и бестиарий показывают сундук за победу, имени врага до призыва нет;
+      победа над КрафБоссом приносит очки рейтинга по общей лестнице — правило summon.types[g].points цикла силы врага (ADR-0043), одни
+      и те же в любом цикле игрока, в обучении — без очков;
       руина видна в «Спуске»; слоты биомов общие с забегами — сверх них не встать ни руине, ни забегу.
    Везде: без исключений, без undefined, NaN и [object; до первой победы имя врага не видно — и в просмотре боя, который её принёс;
    тема недели «для команды» не видна. На карточке цели отряд атаки на виду: мощь, «Сменить», неполный отряд помечен на месте.
@@ -67,7 +69,7 @@ if (err.length) done();
 
 /* 3–4. сценарии — выполняются внутри песочницы */
 function suite() {
-  const out = { errors: [], screens: 0, sheets: 0, kills: 0, offers: 0, calls: 0, many: 0, ruins: 0, chests: 0, ests: 0 };
+  const out = { errors: [], screens: 0, sheets: 0, kills: 0, offers: 0, calls: 0, many: 0, ruins: 0, chests: 0, ests: 0, craftPts: {} };
   const E = window.EN_ECHO, D = E.data, TOP = E.steps.length, XE = RX.drops.echo, FROM = LBX.modes.echo.from;
   const fail = m => { if (out.errors.length < 80) out.errors.push(m); };
   const draw = () => { render(); return document.getElementById('game').innerHTML; };
@@ -317,7 +319,15 @@ function suite() {
         }
         S.overlay = null; S.echo.sel = i; S.route = 'echo';
         const ch0 = S.bag.chests.length, tr0 = fb.trophy ? BAG.qty(fb.trophy) : 0, gold0 = S.wallet.gold, sh0 = JSON.stringify(S.rs.shards), dust0 = S.wallet.dust;
+        const sc0 = S.echo.score;
         if (!kill(k2, i)) continue;
+        /* КрафБосс приносит очки рейтинга (слово автора 01.10.2026, ADR-0043): по месту в общей лестнице — правило summon.types[g].points
+           цикла силы врага; цикл игрока их не умножает — у одного врага одни очки в любом цикле игрока; в обучении очков нет */
+        const pc = fb.cyc + (fb.powerCycleStep || 0), R0 = window.EN_ECHO_RULES, rp = R0 && R0.summon && R0.summon.types[fb.g] && R0.summon.types[fb.g].points;
+        const want = c < FROM ? 0 : rp ? rp[String(pc)] : E.craftPts(fb.g, pc), gotPts = S.echo.score - sc0;
+        if (gotPts !== want) fail(`${k2}: КрафБосс дал ${gotPts} очков, а по общей лестнице — ${want} (ADR-0043)`);
+        if (c >= FROM && !(gotPts > 0)) fail(`${k2}: КрафБосс без очков рейтинга (ADR-0043)`);
+        if (c >= FROM) { const seen = out.craftPts[fb.id] = out.craftPts[fb.id] || new Set(); seen.add(gotPts); }
         if (fb.trophy && BAG.qty(fb.trophy) !== tr0 + fb.trophies) fail(k2 + ': нет трофея');
         if (fb.gold && S.wallet.gold !== gold0 + fb.gold) fail(k2 + ': золото не зачислено');
         /* сундук за победу — по модели призванных врагов (EN_LOOTBOXES.summon): вид, редкость, окно, цикл пула, неделя у Лика, сид от боя */
@@ -425,6 +435,9 @@ function suite() {
       }
     } catch (x) { fail(key + ': исключение — ' + (x && x.stack ? x.stack.split('\n').slice(0, 3).join(' | ') : x)); }
   }
+  /* цикл игрока очки КрафБосса не умножает (ADR-0043): победа над одним и тем же врагом в любом цикле игрока — одни очки */
+  for (const [id, seen] of Object.entries(out.craftPts)) if (seen.size !== 1) fail(`КрафБосс ${id}: очки меняются с циклом игрока — ${[...seen].join(' / ')}`);
+  out.craftPts = Object.keys(out.craftPts).length;
   return out;
 }
 const t0 = Date.now();
@@ -457,7 +470,7 @@ if (res.leak) for (const [id, why] of Object.entries(res.leak)) warn.push(`recip
     console.log(`Портреты врагов крафта: ${A.art.length} (пробуждённых — по портрету своего босса: ${A.aw.length}), без портрета — ${A.none.length}.`);
   }
 }
-console.log(`Эхо проверено за ${Math.round((Date.now() - t0) / 1000)} с: экранов ${res.screens}, листов ${res.sheets}, вариантов призыва ${res.offers}, побед ${res.kills}, призванных врагов ${res.calls}, Многоликих ${res.many}, руин ${res.ruins}, сундуков ${res.chests}, открыто из итога ${res.opened || 0}, оценок до призыва ${res.ests}.`);
+console.log(`Эхо проверено за ${Math.round((Date.now() - t0) / 1000)} с: экранов ${res.screens}, листов ${res.sheets}, вариантов призыва ${res.offers}, побед ${res.kills}, призванных врагов ${res.calls}, Многоликих ${res.many}, руин ${res.ruins}, сундуков ${res.chests}, открыто из итога ${res.opened || 0}, оценок до призыва ${res.ests}, КрафБоссов с очками по общей лестнице ${res.craftPts}.`);
 done();
 
 function done() {

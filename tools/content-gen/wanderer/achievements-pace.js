@@ -38,8 +38,10 @@ function byCycle(obj, c) {
 /* прогон: { start, len, cyc, H, val: { профиль: { счётчик: [×100 по дням] } }, err } */
 function run(A, src) {
   const P = A.PACE, H = P.horizon, CAP = src.cap, LB = src.lb, SIM = src.ctSim, err = [];
-  const len = { 1: 0, 2: +CAP.cycleDays['2'], 3: +CAP.cycleDays['3'] };
-  for (let c = 4; c <= 6; c++) len[c] = P.lenLate;
+  /* длины циклов у обычного — capacity.json (cycleDays: цикл II — прогон темпа, III–VI — калькулятор подъёма, сроки автора ADR-0043);
+     нет записи цикла — lenLate */
+  const len = { 1: 0 };
+  for (let c = 2; c <= 6; c++) len[c] = CAP.cycleDays[String(c)] ? +CAP.cycleDays[String(c)] : P.lenLate;
   const start = { 1: 0, 2: 1 };
   for (let c = 3; c <= 6; c++) start[c] = start[c - 1] + len[c - 1];
   const cyc = d => { let c = 1; for (let k = 2; k <= 6; k++) if (d >= start[k]) c = k; return c; };

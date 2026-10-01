@@ -75,10 +75,16 @@ const RULES = {
        добыча летит в кошелёк; затем переход gapMs. Мс по виду этажа: o — рядовые, e — элита, b — босс, guard — рунный страж.
        Ядро соблюдает его во времени боя (finish: время взятого этажа не меньше минимума; fightMs — сам бой, ritualMs — добавка ритуала),
        экран доигрывает ритуал (задача «Бой AAA»). Числа подбирает калькулятор фарма tools/content-gen/biomes/farm.py: наименьший ритуал,
-       при котором удары насмерть по старому биому не дают золота, духа и душ в минуту больше, чем свой биом цикла II. По виду — ритуал
-       растёт с добычей: элита вдвое, босс и страж втрое дольше рядовых; рядовые — не короче зрелища (фазы ritual ниже и ход раунда).
-       Без ритуала удар насмерть по Мастерской давал 413 духа в минуту, по лесу — 7,15 души, а свой биом — 406 и 5,48 */
-    minMs: { o: 7000, e: 14000, b: 21000, guard: 21000 },
+       при котором удары насмерть по старому биому не дают золота, духа и душ в минуту больше, чем свой биом — в цикле II и в каждом цикле
+       III–VI (отряд, которым обычный берёт стража второго биома, фармит свой первый биом, босса — осадой). По виду — ритуал растёт с добычей:
+       элита вдвое, босс и страж втрое дольше рядовых; рядовые — не короче зрелища (фазы ritual ниже и ход раунда). Было 7 / 14 / 21 с —
+       подбор по одному циклу II при лесе в 80 % ставки. Стало длиннее: полный Подземный лес платит × 1,5 (ADR-0044), а ставки шагают на
+       половину цикла — второй биом прошлого цикла платит 83–92 % своего первого, и в циклах III–VI ударам насмерть нужен ритуал в 1,6 раза
+       длиннее (ADR-0043, пересчёт). Честная игра цикла II с ним на 14 % дольше, чем без ритуала. Обучение — свой ритуал tutMs */
+    minMs: { o: 11500, e: 23000, b: 34500, guard: 34500 },
+    /* ритуал обучения — короткие варианты биомов 1–2 в цикле I (ADR-0040): на нём выверены сценарий обучения и его темп (биом 1 — 7–10 минут
+       боя, биом 2 — полтора–три часа); подбор фарма его не трогает. С цикла II, у полных вариантов и всех прочих биомов — minMs (ritualOf) */
+    tutMs: { o: 7000, e: 14000, b: 21000, guard: 21000 },
     /* фазы ритуала на экране (задача «Бой AAA», screens/battle-scene.js): выход врагов и шаг между ними; после последнего удара —
        «Этаж взят» и полёт добычи в кошелёк, затем ожидание до минимума этажа и переход gapMs. Это показ: время этажа задаёт minMs.
        fallMs — последний удар доигрывается до конца этажа, если бой длиннее минимума (прежде 1400 мс в advance index.html) */
@@ -127,8 +133,9 @@ const RULES = {
        Призванный из предмета крафта враг — по силе: элита, босс, Убер или Забытый (f, высшая ступень, выше кланового босса) — те же
        ключи e, b, u и f (ADR-0039: отдельного «крафтового босса» нет). Многоликий — один из Забытых: его раунды — ссылка на Забытого */
     kind: { o: 'o', e: 'e', b: 'b', u: 'uber', f: 'forgotten', m: 'many' },
-    guards: { o: 4, e: 4, b: 4, u: 4, f: 4, m: 4 },          // защитников у главного врага: врагов всегда пятеро (ADR-0025, п. 1);
-                                                             // Многоликий — вершина лестницы, бьётся с лицами недели (ADR-0039)
+    guards: { o: 4, e: 4, b: 4, u: 4, f: 4, m: 0 },          // защитников у главного врага: врагов пятеро (ADR-0025, п. 1); Многоликий —
+                                                             // один, без свиты (слово автора 01.10.2026, ADR-0039: «Сделай чтобы многоликий
+                                                             // был без свиты, и тогда его сразу же смогут убивать»); пробуждённые — со свитой
     endOnMain: true,                    // бой кончается, когда пал главный враг: цель взята, защитников добивать незачем
   },
   aversionBp: 2000,                     // расовая неприязнь героя Эхо: +20 % урона по врагам расы своей недели (ADR-0024); у героя может быть своя
@@ -143,6 +150,11 @@ const RULES = {
   basicAllPct: 100,                     // обычная атака по всем (basicAll: true) — доля главного стата по каждой цели, %
   levelExp: [12, 10],                   // дух за уровень n — ⌈n^(12/10)⌉ (§9.3, «ручка темпа»): одно правило на прототип и калькуляторы,
                                         // показатель — тот же, что LEVEL_EXP в tools/content-gen/economy/economy.py (сверяет start/build.js)
+  /* цена уровня героя × цикл героя (ADR-0043, «Мнение координатора»: длину цикла держат стоки, первый из них — цена уровня по циклу героя):
+     уровень героя цикла c стоит levelCycle[c − 1] × ⌈n^1,2⌉ духа. Герой цикла I — как прежде: обучение и цикл II не сдвигаются.
+     Новая ступень сильнее по кривой §3.3 (cycleX10), но и дороже: круг героя цикла c — c кругов героя цикла I. Одно правило на прототип
+     (index.html, lvlCost) и калькуляторы (cycle/climb.py; economy.py — level_cost) */
+  levelCycle: [1, 2, 3, 4, 5, 6],
 };
 /* раундов в бою по типу боя — только из таблицы RULES.rounds.by; строка — ссылка на другой тип (Многоликий → Забытый);
    неизвестный тип — как бой без типа (base) */
@@ -693,16 +705,20 @@ function valorSt(st, v, pct) {
    чтобы прогоны и прототип считали героя одинаково. Снаряжение и талисманы — слои экранов, в прогоны не входят */
 function heroSrcValor(h) { const s = heroSrc(h); return h.valor ? Object.assign({}, s, { st: valorSt(h.st, h.valor) }) : s; }
 /* Дух за уровень n (с n − 1 на n): ⌈n^(p/q)⌉ — целый корень q-й степени из n^p, без дробей (§9.3; RULES.levelExp). Уровень 1 стоит 1 духа,
-   50-й — 110; от нуля до 50-го — 2 562. Прототип (index.html, lvlCost) и калькуляторы (economy.py, biomes/sim.js) считают по этому правилу */
+   50-й — 110; от нуля до 50-го — 2 562. У героя цикла cyc — × RULES.levelCycle[cyc − 1] (ADR-0043); без цикла — цикл I.
+   Прототип (index.html, lvlCost) и калькуляторы (economy.py, biomes/sim.js, cycle/climb.py) считают по этому правилу */
 const LVL_MEMO = new Map();
-function levelCost(n) {
+const lvlCycMul = cyc => { const K = RULES.levelCycle, n = Math.min(Math.max(cyc | 0, 1), K.length); return K[n - 1]; };
+function levelCost(n, cyc) {
   if (!(n >= 1)) return 0;
-  let c = LVL_MEMO.get(n); if (c != null) return c;
-  const [p, q] = RULES.levelExp, x = BigInt(n) ** BigInt(p);
-  let lo = 0n, hi = 1n; while (hi ** BigInt(q) < x) hi *= 2n;
-  while (lo < hi) { const m = (lo + hi) / 2n; if (m ** BigInt(q) >= x) hi = m; else lo = m + 1n; }
-  c = Number(lo); LVL_MEMO.set(n, c);
-  return c;
+  let c = LVL_MEMO.get(n);
+  if (c == null) {
+    const [p, q] = RULES.levelExp, x = BigInt(n) ** BigInt(p);
+    let lo = 0n, hi = 1n; while (hi ** BigInt(q) < x) hi *= 2n;
+    while (lo < hi) { const m = (lo + hi) / 2n; if (m ** BigInt(q) >= x) hi = m; else lo = m + 1n; }
+    c = Number(lo); LVL_MEMO.set(n, c);
+  }
+  return cyc ? c * lvlCycMul(cyc) : c;
 }
 function foeSrc(id, lvl, k, lead, hp, hpPct) {
   const f = FOES[id];
@@ -1314,20 +1330,22 @@ function tickPeriodic(b, u) {
    Щиты, эффекты и зарядка способностей обнуляются между этажами. mode — 'tempo' (ADR-0007) или 'rounds'. */
 /* Раундов на этаже — по старшему врагу колоды (RULES.rounds.by: g — o, e или b). Босс в осаде приходит с остатком здоровья,
    и этот остаток — его максимум в попытке (RULES.siege). Взятый этаж не короче ритуала своего вида (RULES.floor.minMs, ADR-0044) */
+/* ритуал этажа биома: короткий вариант обучения (цикл I) — RULES.floor.tutMs, иначе — RULES.floor.minMs (ADR-0044) */
+function ritualOf(B) { return B && B.full && B.variant === 'tut' ? RULES.floor.tutMs : RULES.floor.minMs; }
 function floorBattle(heroes, biome, floor, siegeHp, mode) {
   const B = BIOMES[biome], g = B.floors[floor - 1].g;
   return create({ heroes, foes: floorFoes(biome, floor, siegeHp), seed: floorSeed(B.seed, floor), limitMs: RULES.floor.limitMs[g], mode, maxRounds: roundsOf(g),
-    minMs: RULES.floor.minMs[g] });
+    minMs: ritualOf(B)[g] });
 }
 /* Рунный страж — отдельный бой после биома (§8.6, §11, ADR-0010): страж и свита, в обучении цикла I — три карты (ADR-0018).
    Бой идёт до RULES.rounds.by.rune раундов, каждая обычная атака рунного босса отнимает раунд (ADR-0020). Победа — не короче ритуала стража */
 function guardBattle(heroes, biome, mode) {
   const B = BIOMES[biome], G = B.guard, lvl = B.floors.length + 1;
   const foes = G.m.map((id, k) => foeSrc(id, foeLvlOf(B, lvl), k, k === 0, null, k === 0 ? B.guardHpPct : foeHpOf(B, id)));
-  return create({ heroes, foes, seed: floorSeed(B.seed, lvl), limitMs: RULES.floor.limitMs.b, mode, maxRounds: roundsOf('rune'), minMs: RULES.floor.minMs.guard });
+  return create({ heroes, foes, seed: floorSeed(B.seed, lvl), limitMs: RULES.floor.limitMs.b, mode, maxRounds: roundsOf('rune'), minMs: ritualOf(B).guard });
 }
 /* Бой в Эхо (ADR-0025, §17.3) — тот же детерминированный бой «10 раундов» на сиде от сервера, этаж один, перехода нет.
-   Врагов пятеро: главный враг и RULES.echo.guards[тип] защитников — и у Многоликого: он вершина лестницы и бьётся с лицами недели.
+   Врагов пятеро: главный враг и RULES.echo.guards[тип] защитников; Многоликий — один, без свиты (ADR-0039, ответ автора 01.10.2026).
    Предел раундов — по типу главного врага (RULES.echo.kind → RULES.rounds.by) или свой из данных режима (o.maxRounds). Здоровье
    главного врага приходит на вход — hp и maxHp — и после боя уходит в итог: оно сохраняется между атаками. Остаток на входе — его
    максимум в этой атаке (осада, RULES.siege), прежний максимум — max0. Защитники всегда полные.
@@ -1441,5 +1459,5 @@ function simRun(heroes, biome, siegeHp, mode) {
 }
 
 root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, FLOORS_TUTOR, BIOMES, lib: lib2, addLib, addFoes, addBiome, kitTable, GOOD_ST, SKIP_ST, seedOf, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, carry, simRun, guardBattle, echoBattle, targetBattle, echoStats, foeMaxHp, roundsOf, valorSt, heroSrcValor, cycX10, levelCost, floorLoot, elemMul, ready, readyRound, order, chanceTable, pct, fxOf,
-  atCycle, variantOf, cycleAt: () => CYCLE_AT, VARIANT_KEYS, lootArt };   // вариант биома по циклу игрока и артефакты в добыче (ADR-0044)
+  atCycle, variantOf, cycleAt: () => CYCLE_AT, VARIANT_KEYS, lootArt, ritualOf };   // вариант биома по циклу игрока и артефакты в добыче (ADR-0044)
 })(typeof window !== 'undefined' ? window : globalThis);

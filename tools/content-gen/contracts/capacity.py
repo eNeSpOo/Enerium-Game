@@ -6,10 +6,10 @@
 (tools/content-gen/contracts/build.js) собирает объём заданий по редкости, время на них и награды.
 
 Берёт всё из калькуляторов экономики через importlib и их не меняет:
-- economy.py и sets.py — средний день циклов II и III, все отряды (таблица С1 черновика сет-бонусов);
-- echo.py — неделя Эхо по циклам II–VI (таблица Э8): атаки, победы, очки, души.
-Циклы IV–VI у биомов — по образцу цикла III, как в echo.py: отряд той же силы к врагам своего цикла,
-забегов одновременно — номер цикла (ADR-0014; ADR-0031, п. 3), золото и дух × номер цикла (ADR-0014), души — × номер биома.
+- economy.py и sets.py — средний день каждого цикла II–VI, все отряды: цикл II — калькулятор экономики, циклы III–VI — записи дня
+  калькулятора подъёма (cycle/climb-days.json; сроки автора, ADR-0043), у каждого профиля — свой календарь;
+- echo.py — неделя Эхо по циклам II–VI (таблица Э8): атаки, победы, очки, души, КрафБоссы.
+Прежнее «циклы IV–VI по образцу цикла III» снято: у годовых циклов средний день — свой.
 
     python tools/content-gen/contracts/capacity.py           # записать capacity.json рядом
     python tools/content-gen/contracts/capacity.py --check   # только сверить, что capacity.json свежий
@@ -31,12 +31,7 @@ OUT = HERE / 'capacity.json'
 # ======================= ДАННЫЕ =======================
 
 CYCLES = [2, 3, 4, 5, 6]          # контракты открывает 10-й уровень — начало цикла II (§16, §18)
-TEMPLATE = 3                      # циклы IV–VI — по образцу цикла III, как в echo.py (калькулятор экономики ведёт дни циклов II и III)
 PROFILES = {'o': 'обычный', 'e': 'увлечённый'}
-# счётчики биомов, которые растут только числом забегов одновременно
-COUNTS = ('rf', 'el', 'boss', 'kills', 'floors', 'runs', 'base')
-# счётчики, которые растут ещё и ставкой цикла (ADR-0014: всё × номер цикла)
-CURRENCY = ('gold', 'spirit')
 
 # ======================= РАСЧЁТ =======================
 
@@ -47,10 +42,10 @@ def slots(c):
 
 
 def biome_days(hours):
-    """Средний день циклов II и III по калькулятору сет-бонусов: счётчики в сотых, базовые ресурсы — тоже в сотых."""
+    """Средний день каждого цикла II–VI по калькулятору сет-бонусов (sets.cycle_days): счётчики в сотых, базовые ресурсы — тоже в сотых."""
     days = S.cycle_days(hours)
     out = {}
-    for c in (2, 3):
+    for c in CYCLES:
         a = S.average(days, c)
         a['base'] = S.base_of(a)
         out[c] = a
@@ -58,18 +53,8 @@ def biome_days(hours):
 
 
 def biome_counters(avg, c):
-    """Цикл c: циклы II и III — как есть; IV–VI — по образцу III."""
-    if c <= TEMPLATE:
-        return dict(avg[c])
-    a3, k_num, k_den = avg[TEMPLATE], slots(c), slots(TEMPLATE)
-    out = {}
-    for k in COUNTS:
-        out[k] = a3[k] * k_num // k_den
-    for k in CURRENCY:
-        out[k] = a3[k] * k_num * c // (k_den * TEMPLATE)
-    out['clean'] = a3['clean'] * k_num // k_den
-    out['souls'] = a3['souls'] * EC.soul_scale(c) // EC.soul_scale(TEMPLATE)
-    return out
+    """Цикл c — средний день своего цикла, все отряды."""
+    return dict(avg[c])
 
 
 def echo_counters(prof, c):
@@ -77,15 +62,20 @@ def echo_counters(prof, c):
     он вершина недели (ADR-0039), и не всякий отряд его берёт — сундуки призванных и достижения считают по ним, а не по шансу призыва."""
     res = EC.week_results(prof, c)
     n = len(res)
-    tot = {k: sum(t[k] for _, _, t in res) for k in ('att', 'kills', 'pts', 'souls', 'many')}
+    tot = {k: sum(t[k] for _, _, t in res) for k in ('att', 'rounds', 'kills', 'pts', 'souls', 'many', 'craft', 'craftKills')}
     # итоги echo.py — × 1000; в день — делим ещё на 7 дней недели; в сотых — × 100
     return {
         'echoAtk': tot['att'] * 100 // (1000 * n * EC.WEEK),
+        'echoRoundsDay': tot['rounds'] * 100 // (1000 * n * EC.WEEK),   # раундов атак Эхо в день (лестница и КрафБоссы) — Событие, × 100
         'echoKill': tot['kills'] * 100 // (1000 * n * EC.WEEK),
         'echoPtsWeek': tot['pts'] * 100 // (1000 * n),
         'echoSoulsDay': tot['souls'] * 100 // (1000 * n * EC.WEEK),
         'echoManyX1e6': tot['many'] // (n * EC.WEEK),   # итог echo.py по Многоликому — штук × 10^6 за неделю
+        'echoCraftWeek': tot['craft'] * 100 // (1000 * n),   # очки КрафБоссов за неделю (ADR-0043), × 100
+        'echoCraftKillX1e6': tot['craftKills'] * 1000 // (n * EC.WEEK),   # побед над КрафБоссами в день × 10^6
         'echoTop': [top for top, _, _ in res],
+        'echoWeekPts': [t['pts'] // 1000 for _, _, t in res],          # очки Эхо по неделям цикла (с КрафБоссами) — год цикла IV в окне цикла
+        'echoWeekCraftX1000': [t['craftKills'] for _, _, t in res],    # побед над КрафБоссами по неделям × 1000
     }
 
 
@@ -95,11 +85,13 @@ def build():
             'builder': 'tools/content-gen/contracts/capacity.py',
             'sources': ['tools/content-gen/economy/economy.py', 'tools/content-gen/economy/sets.py', 'tools/content-gen/economy/echo.py'],
             'x': 100,
-            'note': 'средний день цикла, все отряды; счётчики — в сотых; echoPtsWeek — очки Эхо за неделю; echoManyX1e6 — побед над Многоликим в день × 10^6; циклы IV–VI у биомов — по образцу III',
+            'note': 'средний день цикла, все отряды; счётчики — в сотых; echoPtsWeek — очки Эхо за неделю (с КрафБоссами); echoCraftWeek — из них КрафБоссы; '
+                    'echoManyX1e6 — побед над Многоликим в день × 10^6; cycleDays — длина цикла у обычного (сроки автора, ADR-0043), cycleDaysBy — у каждого профиля',
         },
         'hours': {k: dict(E.PROFILES)[v] for k, v in PROFILES.items()},
         'slots': {str(c): slots(c) for c in CYCLES},
-        'cycleDays': {'2': S.CYCLE_LEN[2], '3': S.CYCLE_LEN[3]},
+        'cycleDays': {str(c): S.CYCLE_LEN[c] for c in CYCLES},
+        'cycleDaysBy': {k: {str(c): sum(1 for _, cc, _ in S.cycle_days(dict(E.PROFILES)[p]) if cc == c) for c in CYCLES} for k, p in PROFILES.items()},
         'cycles': {},
     }
     avg = {k: biome_days(data['hours'][k]) for k in PROFILES}

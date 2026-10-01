@@ -191,13 +191,21 @@ function freqBp(id, b, X0, key) {
   return { bp: Math.floor(hit * 10000 / FARM_N), per: hit ? sum / hit : 0 };
 }
 function lawRitual(tag) {
-  const o = [], M = EB.RULES.floor.minMs, was = EB.cycleAt();
-  if (!M || ['o', 'e', 'b', 'guard'].some(k => !Number.isInteger(M[k]) || M[k] <= 0)) return [`${tag}: RULES.floor.minMs — нет целого минимума по видам o, e, b, guard`];
+  const o = [], F = EB.RULES.floor, was = EB.cycleAt();
+  for (const k of ['minMs', 'tutMs']) {
+    const X = F[k];
+    if (!X || ['o', 'e', 'b', 'guard'].some(g => !Number.isInteger(X[g]) || X[g] <= 0)) return [`${tag}: RULES.floor.${k} — нет целого минимума по видам o, e, b, guard`];
+  }
   try {
     for (const c of [1, 2]) {
       EB.atCycle(c);
       for (const id of ['b1', 'b2', 'b3']) {
-        const B = EB.BIOMES[id]; let cur = strongSq(6, 1200), padded = 0;
+        /* минимум этажа — ritualOf ядра: короткий вариант обучения (цикл I) — tutMs, прежний ритуал; полные варианты и прочие биомы — minMs */
+        const B = EB.BIOMES[id], M = EB.ritualOf(B), want = B.full && B.variant === 'tut' ? F.tutMs : F.minMs;
+        if (M !== want) o.push(`${tag}: ${id} · цикл ${c}: ритуал этажа — ${JSON.stringify(M)}, а по варианту «${B.variant || 'один'}» — ${JSON.stringify(want)}`);
+        if (c === 1 && id !== 'b3' && M !== F.tutMs) o.push(`${tag}: ${id} · цикл I: в обучении ритуал не прежний (RULES.floor.tutMs)`);
+        if (c > 1 && M !== F.minMs) o.push(`${tag}: ${id} · цикл ${c}: ритуал этажа не RULES.floor.minMs`);
+        let cur = strongSq(6, 1200), padded = 0;
         for (let f = 1; f <= B.floors.length; f++) {
           const g = B.floors[f - 1].g, b = EB.run(EB.floorBattle(cur, id, f, null, 'rounds'));
           if (!b.win) { o.push(`${tag}: ${id} · цикл ${c}: сверхсильный отряд не взял ${f}-й этаж`); break; }

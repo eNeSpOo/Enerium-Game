@@ -287,12 +287,16 @@ const COLLECTOR = { prefix: 'Знак сборщика: ', ico: 'res', need: 'lo
 /* Экономика: откуда игрок берёт талисманы. Сундуки и их выплаты — design/ui/lootboxes.js, здесь — только допущения. */
 const ECON = {
   cycles: [2, 3, 4, 5, 6],
-  /* недель в цикле: цикл II — полные недели длины цикла II по прогону темпа (tools/content-gen/biomes/pace.json, cycleDays — одна длина на все
-     калькуляторы, ADR-0031, п. 4), нет прогона — 14 дней; III — 21 день, допущение sets.py; IV–VI — по образцу III, как echo.py */
+  /* недель в цикле у обычного: полные недели длины цикла — одна длина на все калькуляторы, tools/content-gen/contracts/capacity.json
+     (cycleDays: цикл II — прогон темпа, III–VI — калькулятор подъёма, сроки автора ADR-0043). Нет файла — цикл II по прогону темпа
+     (biomes/pace.json), III–VI — прежнее допущение в три недели */
   weeks: (() => {
-    let d2 = 14;
+    let d2 = 14, cap = null;
     try { d2 = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'biomes', 'pace.json'), 'utf8')).cycleDays || d2; } catch (e) { /* нет прогона темпа */ }
-    return { 2: Math.floor(d2 / 7), 3: 3, 4: 3, 5: 3, 6: 3 };
+    try { cap = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'contracts', 'capacity.json'), 'utf8')).cycleDays; } catch (e) { /* нет ёмкости */ }
+    const out = { 2: Math.floor(d2 / 7), 3: 3, 4: 3, 5: 3, 6: 3 };
+    if (cap) for (const c of [2, 3, 4, 5, 6]) if (cap[String(c)]) out[c] = Math.floor(cap[String(c)] / 7);
+    return out;
   })(),
   who: ['free', 'fan'], whoName: { free: 'обычный', fan: 'увлечённый' },
   squad: 20,                                 // мест у отряда: 5 героев × 4

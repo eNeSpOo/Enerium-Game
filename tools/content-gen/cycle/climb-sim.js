@@ -1,6 +1,6 @@
-/* Подъём по циклам — бои ядром для калькулятора tools/content-gen/cycle/climb.py (ADR-0041: «новый цикл — новая ступень аккаунта»).
-   Без браузера, только Node. Ядро, данные и отряд прогонов — как у темпа: tools/content-gen/biomes/sim.js (battle.js, abilities.js,
-   kits.js, biome-foes.js; отряд SQUAD — пятеро золотых героев, характеристики и наборы прототипа).
+/* Подъём по циклам — бои ядром для калькулятора tools/content-gen/cycle/climb.py (ADR-0041: «новый цикл — новая ступень аккаунта»;
+   ADR-0043: сроки циклов автора). Без браузера, только Node. Ядро, данные и отряд прогонов — как у темпа: tools/content-gen/biomes/sim.js
+   (battle.js, abilities.js, kits.js, biome-foes.js; отряд SQUAD — пятеро золотых героев, характеристики и наборы прототипа).
 
    Биомы циклов III–VI в ядре ещё не собраны (враги биомов 5–12 — черновик docs/content/враги-биомов.md). Калькулятор меряет их по образцу
    цикла II, как калькуляторы экономики и сетов («биом цикла — образец цикла II, враги — по кривой §3.3»): первый биом цикла c — колода,
@@ -10,14 +10,20 @@
    kX — сила врагов, % кривой (K × kX / 100), hpX — здоровье босса и стража, % образца. Образец цикла II по этой формуле совпадает с b3
    и b4 этаж в этаж — это проверяется.
 
-   Герой цикла k — тот же герой отряда с полем cycle: ядро умножает его атаку, здоровье и защиту на кривую §3.3 (RULES.cycleX10, ADR-0041).
+   Отряд ступени: герои цикла k на уровне L с доблестью v (squad). Ядро умножает атаку, здоровье и защиту героя цикла k на кривую §3.3
+   (RULES.cycleX10, ADR-0041), доблесть — +30 % к характеристикам за ступень (RULES.valorPct, valorSt). Руна обучения (ADR-0031, п. 2) — только
+   у героев цикла I: их доблесть — своя у героя отряда прогонов, не ниже v. Новая ступень (цикл II и выше) — новые герои, у них её нет.
 
-   Командная строка: node climb-sim.js '<json>' — печатает JSON:
+   Командная строка: node climb-sim.js '<json>' или node climb-sim.js - (JSON — в stdin) — печатает JSON:
    - { mode: 'biomes', hpX } — уровни врагов виртуальных биомов по этажам и сверка образца цикла II с b3 и b4;
    - { mode: 'grid', biome, k, levels: [L…], valor?, max?, hpX } — по уровням отряда героев цикла k: стена, забегов до падения босса осадой,
      доля здоровья босса за первый бой, победа над рунным стражем;
-   - { mode: 'guard', biome, k, from, to, step, hpX } — первый уровень, с которого страж пал, и провалы выше него;
-   - { mode: 'days', biomes: [id…], plan: [[k, L] по дням, с дня 1], hours, hpX } — биомы по очереди: забеги hours часов в день, осада
+   - { mode: 'guard', biome, k, v?, from, to, stepBp } — уровни с from до to, каждый следующий на stepBp б. п. выше (не меньше чем на 1):
+     первый уровень, с которого страж пал, начало последней полосы побед (stable) и провалы выше первой победы;
+   - { mode: 'valor', biome, k, from, to, stepBp, max } — во сколько доблесть v = 0…max прибавляет отряду силы: начало полосы побед над
+     стражем при каждой v, отношение (12 + L₀) / (12 + Lᵥ) × 100 — множитель мощи доблести в единицах уровня;
+   - { mode: 'clear', list: [{ biome, k, L, v, j }] } — стена и забегов до падения босса с осадой у каждого отряда (1 — биом за забег);
+   - { mode: 'days', biomes: [id…], plan: [[k, L, v, j] по дням, с дня 1], hours, hpX } — биомы по очереди: забеги hours часов в день, осада
      копится между забегами и днями, страж — раз в день на уровне дня. Итог по биому: день и уровень падения босса и стража, стены.
    Только целые числа. */
 'use strict';
@@ -54,8 +60,14 @@ function setup(o) {
   return ids;
 }
 const lvlOf = (id, f) => { const B = EB.BIOMES[id], L = B.foeLvl || EB.RULES.foeLvl; return L.base + Math.floor(f * L.perFloor / (L.div || 1)); };
-/* отряд героев цикла k на уровне L: доблесть — своя у героя отряда или общая */
-const squad = (k, L, valor) => SQUAD.map(h => EB.heroSrcValor(Object.assign({}, h, { lvl: L, valor: valor != null ? valor : h.valor, cycle: k })));
+/* доблесть берут по одному герою (§10.2): сначала бойцы урона, затем танк, лекарь и контроль — порядок героев отряда прогонов */
+const VALOR_ORDER = ['h2', 'h3', 'h1', 'h4', 'h5'];
+/* отряд героев цикла k на уровне L с доблестью v, j героев по VALOR_ORDER — на доблести v + 1. У героев цикла I — руна обучения отряда
+   прогонов (доблесть бойца урона), не ниже этого; у новой ступени (k ≥ 2) её нет. valor (режим grid) — доблесть всем пятерым, как прежде */
+const squad = (k, L, v, valor, j) => SQUAD.map(h => {
+  const vv = (v || 0) + (VALOR_ORDER.indexOf(h.id) < (j || 0) ? 1 : 0);
+  return EB.heroSrcValor(Object.assign({}, h, { lvl: L, cycle: k, valor: valor != null ? valor : k === 1 ? Math.max(h.valor || 0, vv) : vv }));
+});
 
 function campaign(heroes, biome, max) {
   const B = EB.BIOMES[biome], last = B.floors.length, pre = run(heroes, biome, null);
@@ -73,41 +85,58 @@ function campaign(heroes, biome, max) {
   return Object.assign(base, { runs: null, reach: true, dmgBp });
 }
 
+/* уровни скана: от from до to, каждый следующий на stepBp б. п. выше, но не меньше чем на 1 */
+function levelsOf(o) {
+  const out = [];
+  for (let L = o.from; L <= o.to; L = Math.max(L + 1, Math.floor(L * (10000 + (o.stepBp || 100)) / 10000))) out.push(L);
+  return out;
+}
+/* страж: first — первая победа; stable — начало последней полосы побед до to: с него провалов нет (как «страж без провалов» темпа) */
+function guardScan(o) {
+  let first = null, stable = null; const lost = [];
+  for (const L of levelsOf(o)) {
+    const w = guardWin(squad(o.k, L, o.v || 0), o.biome).win;
+    if (w) { if (first == null) first = L; if (stable == null) stable = L; } else { if (first != null) lost.push(L); stable = null; }
+  }
+  return { first, stable, lost };
+}
+
 function days(o) {
   const cache = {}, out = {};
-  const at = (biome, k, L) => {
-    const key = biome + '|' + k + '|' + L; if (cache[key]) return cache[key];
-    const heroes = squad(k, L), r = run(heroes, biome, null);
+  const at = (biome, k, L, v, j) => {
+    const key = biome + '|' + k + '|' + L + '|' + v + '|' + j; if (cache[key]) return cache[key];
+    const heroes = squad(k, L, v, null, j), r = run(heroes, biome, null);
     return (cache[key] = { heroes, r });
   };
   let bi = 0, siege = null, bossDead = false;
   for (let d = 1; d <= o.plan.length && bi < o.biomes.length; d++) {
-    const [k, L] = o.plan[d - 1]; let budget = o.hours * 3600000, guardTried = false;
+    const [k, L, v0, j0] = o.plan[d - 1], v = v0 || 0, j = j0 || 0; let budget = o.hours * 3600000, guardTried = false;
     while (budget > 0 && bi < o.biomes.length) {
       const biome = o.biomes[bi], B = EB.BIOMES[biome], last = B.floors.length, x = out[biome] || (out[biome] = { runs: 0, from: d, walls: [] });
       if (!bossDead) {
-        const c = at(biome, k, L);
-        if (c.r.wall < last) { x.runs++; x.wall = c.r.wall; if (!x.walls.length || x.walls[x.walls.length - 1][1] !== c.r.wall) x.walls.push([d, c.r.wall, k, L]); budget -= c.r.ms; continue; }
+        const c = at(biome, k, L, v, j);
+        if (c.r.wall < last) { x.runs++; x.wall = c.r.wall; if (!x.walls.length || x.walls[x.walls.length - 1][1] !== c.r.wall) x.walls.push([d, c.r.wall, k, L, v, j]); budget -= c.r.ms; continue; }
         const b = EB.run(EB.floorBattle(c.r.entry, biome, last, siege, 'rounds')), boss = b.u[1][0];
         x.runs++; budget -= c.r.ms;
-        if (!boss.alive) { bossDead = true; siege = null; x.boss = { day: d, k, lvl: L, runs: x.runs }; }
+        if (!boss.alive) { bossDead = true; siege = null; x.boss = { day: d, k, lvl: L, v, j, runs: x.runs }; }
         else { siege = boss.hp; x.siege = Math.floor(10000 - boss.hp * 10000 / boss.maxHp); }
         continue;
       }
       if (guardTried) break;
       guardTried = true;
-      const g = guardWin(squad(k, L), biome);
-      if (!g.win) { x.guardLost = [k, L]; continue; }
-      x.guard = { day: d, k, lvl: L }; bi++; bossDead = false; siege = null; guardTried = false;
+      const g = guardWin(squad(k, L, v, null, j), biome);
+      if (!g.win) { x.guardLost = [k, L, v, j]; continue; }
+      x.guard = { day: d, k, lvl: L, v, j }; bi++; bossDead = false; siege = null; guardTried = false;
     }
   }
   return out;
 }
 
-module.exports = { P, kOf, setup, lvlOf, squad, campaign, days };
+module.exports = { P, kOf, setup, lvlOf, squad, campaign, days, guardScan, VALOR_ORDER };
 
 if (require.main === module) {
-  const o = JSON.parse(process.argv[2] || '{}'), out = {};
+  /* задание — JSON строкой аргумента или, при '-', из stdin: план дней длинный, в командную строку не влезает */
+  const arg = process.argv[2] || '{}', o = JSON.parse(arg === '-' ? require('fs').readFileSync(0, 'utf8') : arg), out = {};
   const ids = setup(o);
   if (o.mode === 'biomes') {
     out.biomes = ids.map(id => { const B = EB.BIOMES[id]; return { id, n: B.n, cycle: B.cycle, foeLvl: B.foeLvl, bossHpPct: B.bossHpPct, guardHpPct: B.guardHpPct,
@@ -118,17 +147,17 @@ if (require.main === module) {
       return B.bossHpPct === EB.BIOMES[v].bossHpPct && B.guardHpPct === EB.BIOMES[v].guardHpPct; });
   } else if (o.mode === 'grid') {
     out.rows = o.levels.map(L => {
-      const h = squad(o.k, L, o.valor), c = campaign(h, o.biome, o.max || 60), g = guardWin(h, o.biome);
+      const h = squad(o.k, L, 0, o.valor), c = campaign(h, o.biome, o.max || 60), g = guardWin(h, o.biome);
       return { lvl: L, wall: c.wall, reach: c.reach, runs: c.runs, dmgBp: c.dmgBp, ms: c.ms, spirit: c.spirit, gold: c.gold, guard: g.win };
     });
-  } else if (o.mode === 'guard') {
-    /* first — первая победа; stable — начало последней полосы побед до to: с него провалов нет (как «страж без провалов» темпа) */
-    let first = null, stable = null; const lost = [];
-    for (let L = o.from; L <= o.to; L += o.step) {
-      const w = guardWin(squad(o.k, L), o.biome).win;
-      if (w) { if (first == null) first = L; if (stable == null) stable = L; } else { if (first != null) lost.push(L); stable = null; }
-    }
-    out.first = first; out.stable = stable; out.lost = lost;
+  } else if (o.mode === 'guard') Object.assign(out, guardScan(o));
+  else if (o.mode === 'valor') {
+    /* множитель мощи доблести: отряд новой ступени (руны обучения нет) с доблестью v против того же стража — где начинается полоса побед */
+    out.rows = [];
+    for (let v = 0; v <= o.max; v++) { const g = guardScan(Object.assign({}, o, { v })); out.rows.push({ v, stable: g.stable, first: g.first }); }
+  } else if (o.mode === 'clear') {
+    /* отряды против биомов: стена и забегов до падения босса с осадой (1 — биом за забег) — закон «конец цикла берёт свой первый биом за забег» */
+    out.rows = o.list.map(x => { const r = campaign(squad(x.k, x.L, x.v || 0, null, x.j || 0), x.biome, 60); return { biome: x.biome, k: x.k, L: x.L, v: x.v || 0, j: x.j || 0, wall: r.wall, runs: r.runs, dmgBp: r.dmgBp }; });
   } else if (o.mode === 'days') out.biomes = days(o);
   process.stdout.write(JSON.stringify(out));
 }

@@ -1890,7 +1890,7 @@ const bar = (v, cls = '', extra = '') => `<div class="bar ${cls}" style="--v:${M
 const curImg = k => CUR[k] ? CUR[k].img : '';
 const money = (k, n) => `<span class="row" style="gap:4px;display:inline-flex"><img src="${curImg(k)}" alt="${CUR[k] ? CUR[k].n : ''}" width="18" height="18" style="object-fit:contain"><b class="num">${fmt(n)}</b></span>`;
 const costTag = (k, n) => `<span class="cost"><img src="${curImg(k)}" alt="${CUR[k] ? CUR[k].n : ''}">${fmt(n)}</span>`;
-const lvlCost = (from, q) => { let c = 0; for (let l = from; l < from + q; l++) c += EB.levelCost(l + 1); return c; };   // уровень n — ⌈n^1,2⌉ духа: правило ядра, одно с калькуляторами (battle.js, levelCost)
+const lvlCost = (from, q, cyc) => { let c = 0; for (let l = from; l < from + q; l++) c += EB.levelCost(l + 1, cyc); return c; };   // уровень n — ⌈n^1,2⌉ духа × цикл героя (RULES.levelCycle, ADR-0043): правило ядра, одно с калькуляторами (battle.js, levelCost)
 function well(it, { act = 'item', val, q, sel, size, extra = '', dis } = {}) {
   const inner = it ? (it.img ? `<img src="${it.img}" alt="">` : `<span class="serif gold" style="font-size:22px;font-weight:600">${it.glyph || '?'}</span>`) : ic('plus');
   return `<button class="well ${it ? '' : 'empty'} ${sel ? 'sel' : ''}" ${it ? `data-r="${it.r}"` : ''} ${size ? `style="--s:${size}px"` : ''} data-a="${act}" data-v="${val ?? (it && it.id != null ? it.id : '')}" aria-label="${it ? it.n + (q != null ? ', ' + q + ' шт.' : '') : 'Пустая ячейка'}" ${dis ? 'disabled' : ''}>${inner}${q != null ? `<span class="q">${fmt(q)}</span>` : ''}${it && it.isNew ? '<span class="new dot"></span>' : ''}${extra}</button>`;

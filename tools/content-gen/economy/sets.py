@@ -37,8 +37,30 @@ ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI']
 TIER_HEROES = (1, 3)                       # §30: ступень I — один участник с доблестью ≥ 1, II — трое; III — все на личных максимумах
 TIER_BY_SUM = ((15, 3), (10, 2), (5, 1))   # ADR-0022: сумма личных максимумов пятерых от — ступеней у сета
 
-# --- циклы: дни считает economy.timeline с начала цикла II ---
-CYCLE_LEN = {2: E.CYCLE_DAYS, 3: 21}   # цикл II — прогон темпа (economy.CYCLE_DAYS, pace.json); цикл III — допущение: длиннее II (ADR-0018)
+# --- циклы: дни цикла II считает economy.timeline с начала цикла II; длины циклов III–VI и записи их дней — калькулятор подъёма
+# (cycle/climb.py → climb.json, climb-days.json): сроки автора, ADR-0043 — III 3 месяца, IV год, V 2 года, VI 2+. Цикл II — у всех профилей
+# прогон темпа (economy.CYCLE_DAYS, 14 дней), дальше каждый профиль идёт своим календарём подъёма: увлечённый проходит циклы быстрее.
+# Нет калькулятора подъёма — прежнее допущение: цикл III — 21 день по калькулятору экономики, циклы IV–VI в счёт не идут ---
+CLIMB_JSON = E.ROOT / 'tools' / 'content-gen' / 'cycle' / 'climb.json'
+CLIMB_DAYS = E.ROOT / 'tools' / 'content-gen' / 'cycle' / 'climb-days.json'
+CLIMB_PROF = {'обычный': 'o', 'увлечённый': 'e'}       # профиль калькулятора → профиль подъёма
+CYCLE_LEN_FALLBACK = {3: 21}
+
+
+def _climb():
+    try:
+        return json.loads(CLIMB_JSON.read_text(encoding='utf-8')), json.loads(CLIMB_DAYS.read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        return None, None
+
+
+CLIMB, CLIMB_D = _climb()
+if CLIMB:
+    CYCLE_LEN = {2: E.CYCLE_DAYS, **{int(c): v for c, v in CLIMB['profiles'][0]['len'].items() if int(c) >= 3 and v}}
+else:
+    print('!! sets.py: нет cycle/climb.json и climb-days.json — циклы III–VI по прежнему допущению; собрать python tools/content-gen/cycle/climb.py', file=sys.stderr)
+    CYCLE_LEN = {2: E.CYCLE_DAYS, **CYCLE_LEN_FALLBACK}
+CYCLES_ON = sorted(CYCLE_LEN)                          # циклы, чьи дни ведёт калькулятор
 # забегов одновременно — номер цикла (ADR-0014; ADR-0031, п. 3): economy.slots, recipes.js. «Право владыки» не считаем
 
 # --- цикл I — обучение на часы (ADR-0018): ступень I возможна только во втором биоме, руной уровня аккаунта 7 (§16).
@@ -145,13 +167,15 @@ DONAT = [
 # ======================= РАСЧЁТ =======================
 
 
-def squad_day(level, cycle, hours, in_cycle=1):
-    """Один отряд за день забегов на образце: счётчики в сотых. Души — × номер биома (ADR-0011)."""
-    eff = E.eff_level(level, cycle)
+def squad_day(level, cycle, hours, in_cycle=1, eff=None, cc=None):
+    """Один отряд за день забегов на образце: счётчики в сотых. Души — × номер биома (ADR-0011). eff и cc — уровень отряда против врагов
+    образца и цикл образца, где он фармит (калькулятор подъёма, climb_eff); без них — уровень level героев цикла I против врагов цикла cycle."""
+    cc = cycle if cc is None else cc
+    eff = E.eff_level(level, cycle) if eff is None else eff
     row = E.sim_row(eff)
     runs, rf, el, boss, ms, wall = row[1:]
-    g, s, _ = E.yield_of(row, E.RATES_NEW, E.mult_new(cycle, in_cycle))
-    biome = 2 * cycle - 2 + in_cycle
+    g, s, _ = E.yield_of(row, E.RATES_NEW, E.mult_new(cc, in_cycle))
+    biome = 2 * cc - 2 + in_cycle
     v = dict(rf=rf, el=el, boss=boss, kills=rf + el + boss, clean=boss if row[0] >= CLEAN_FROM else 0,
              floors=runs * (wall - 1) + boss, runs=runs, gold=g, spirit=s,
              souls=(el * E.RATES_NEW['elite'][2] + boss * E.RATES_NEW['boss'][2]) * biome)
@@ -168,8 +192,38 @@ def levels(hours):
     return E.timeline(E.RATES_NEW, E.mult_new, hours)[2]
 
 
+def climb_eff(w, cc):
+    """Уровень отряда силы w (десятые единицы кривой §3.3) против врагов образца цикла cc — как у калькулятора подъёма (climb.eff): сила,
+    делённая на кривую цикла и на ручку силы его первого биома (KX)."""
+    kx = CLIMB['kX'].get(str(cc), {}).get('A', 100)
+    return max(1, w * 100 * 100 // (CLIMB['curve'][cc - 1] * kx * CLIMB['fixX']) - E.LEVEL_DIV)
+
+
+def climb_recs(hours):
+    """Записи дня калькулятора подъёма у профиля часов hours: с первого дня цикла III его календаря до конца цикла VI (climb-days.json)."""
+    p = CLIMB_PROF[dict((h, n) for n, h in E.PROFILES)[hours]]
+    return [r for r in CLIMB_D['days'][p] if r[0] >= 3]
+
+
+def rec_day(rec, hours, squads=None):
+    """День циклов III–VI по записи калькулятора подъёма: главный отряд — в образце, где он фармит (поле 11), вторые отряды — героями
+    цикла I на своём уровне (поле 4) в своём образце (поле 12). Счётчики — те же, что у дня цикла II."""
+    c = rec[0]
+    acc = {}
+    for k in range(squads or E.slots(c)):
+        if k == 0:
+            add(acc, squad_day(0, c, hours, eff=climb_eff(rec[5], rec[11]), cc=rec[11]))
+        else:
+            add(acc, squad_day(0, c, hours, eff=climb_eff(CLIMB['curve'][0] * (E.LEVEL_DIV + rec[4]) * CLIMB['fixX'] // 100, rec[12]), cc=rec[12]))
+    return c, acc
+
+
 def day_of(lv, d, hours, squads=None):
-    """День d с начала цикла II: цикл и счётчики всех отрядов; squads — сколько отрядов, по умолчанию все слоты."""
+    """День d с начала цикла II: цикл и счётчики всех отрядов; squads — сколько отрядов, по умолчанию все слоты. Цикл II — калькулятор
+    экономики; дальше — записи калькулятора подъёма (нет его — цикл III по калькулятору экономики)."""
+    if d > CYCLE_LEN[2] and CLIMB:
+        recs = climb_recs(hours)
+        return rec_day(recs[min(d - CYCLE_LEN[2], len(recs)) - 1], hours, squads)
     a, b = lv[min(d - 1, len(lv) - 1)]
     c = E.FIRST_CYCLE if d <= CYCLE_LEN[2] else E.FIRST_CYCLE + 1
     acc = {}
@@ -178,9 +232,34 @@ def day_of(lv, d, hours, squads=None):
     return c, acc
 
 
+_CD = {}
+
+
 def cycle_days(hours):
+    """Дни с начала цикла II: (день, цикл, счётчики дня). Цикл II — CYCLE_LEN[2] дней калькулятора экономики у всех профилей; циклы III–VI —
+    свой календарь профиля по калькулятору подъёма (у увлечённого циклы короче)."""
+    if hours not in _CD:
+        lv = levels(hours)
+        n2 = CYCLE_LEN[2]
+        if CLIMB:
+            out = [(d,) + day_of(lv, d, hours) for d in range(1, n2 + 1)]
+            out += [(n2 + i + 1,) + rec_day(r, hours) for i, r in enumerate(climb_recs(hours))]
+        else:
+            out = [(d,) + day_of(lv, d, hours) for d in range(1, n2 + CYCLE_LEN[3] + 1)]
+        _CD[hours] = out
+    return _CD[hours]
+
+
+def cycle_power(hours):
+    """Сила главного отряда по дням с начала цикла II, в единицах уровня героя цикла I (12 + уровень): цикл II — уровень калькулятора экономики,
+    дальше — мощь калькулятора подъёма (поле 5: кривая §3.3 цикла героев × (12 + уровень) × множитель доблести, в десятых). Дни — как cycle_days."""
     lv = levels(hours)
-    return [(d,) + day_of(lv, d, hours) for d in range(1, CYCLE_LEN[2] + CYCLE_LEN[3] + 1)]
+    out = [E.LEVEL_DIV + lv[min(d - 1, len(lv) - 1)][0] for d in range(1, CYCLE_LEN[2] + 1)]
+    if CLIMB:
+        out += [r[5] // 10 for r in climb_recs(hours)]
+    else:
+        out += [E.LEVEL_DIV + lv[min(d - 1, len(lv) - 1)][0] for d in range(CYCLE_LEN[2] + 1, CYCLE_LEN[2] + CYCLE_LEN[3] + 1)]
+    return out
 
 
 def average(days, c):
@@ -368,16 +447,35 @@ def gold_income(days):
     return out
 
 
-def gold_buy(variant, income, heroes):
-    """Покупки по дням: на героев идёт GOLD_BUDGET_BP золота, каждый раз — самый дешёвый следующий герой открытых циклов.
-    Возвращает по дням: куплено героев по циклам, потрачено, получено."""
-    bought, wallet, spent, got, log = {1: 0, 2: 0, 3: 0}, 0, 0, 0, []
+def cycle_at(d):
+    """Цикл дня d с начала цикла II по календарю обычного (CYCLE_LEN); 0 — цикл I."""
+    if d <= 0:
+        return 1
+    acc = 0
+    for c in CYCLES_ON:
+        acc += CYCLE_LEN[c]
+        if d <= acc:
+            return c
+    return CYCLES_ON[-1]
+
+
+def cycles_of(days):
+    """Цикл по дням профиля: [цикл I на день 0, цикл дня 1, …] — из cycle_days."""
+    return [1] + [c for _, c, _ in days]
+
+
+def gold_buy(variant, income, heroes, cycles=None):
+    """Покупки по дням: на героев идёт GOLD_BUDGET_BP золота, каждый раз — самый дешёвый следующий герой открытых циклов (не выше цикла
+    дня: cycles — цикл по дням профиля, cycles_of; без него — календарь обычного). Возвращает по дням: куплено героев по циклам,
+    потрачено, получено."""
+    bought, wallet, spent, got, log = {c: 0 for c in range(1, len(ROMAN) + 1)}, 0, 0, 0, []
     for d, g in enumerate(income):
         got += g
         wallet += g * GOLD_BUDGET_BP // BP
-        open_c = (1,) if d == 0 else (1, 2) if d <= CYCLE_LEN[2] else (1, 2, 3)
+        cyc = cycles[d] if cycles and d < len(cycles) else cycle_at(d)
+        open_c = range(1, cyc + 1)
         while True:
-            cand = [(gold_price(c, bought[c] + 1, variant), c) for c in open_c if bought[c] < heroes[c]]
+            cand = [(gold_price(c, bought[c] + 1, variant), c) for c in open_c if bought[c] < heroes.get(c, 0)]
             if not cand or min(cand)[0] > wallet:
                 break
             price, c = min(cand)
@@ -729,11 +827,12 @@ def gold_table(days):
     """Сколько героев за золото выкуплено к концу циклов II и III и какую долю дохода это забрало (ADR-0023, п. 18).
     Правило автора держится, если к концу цикла не выкуплены все герои за золото этого цикла."""
     heroes, inc = gold_heroes(), gold_income(days)
-    end2, end3 = CYCLE_LEN[2], CYCLE_LEN[2] + CYCLE_LEN[3]
     rows = []
     for variant in GOLD_VARIANTS:
         for p, _ in E.PROFILES:
-            log = gold_buy(variant, inc[p], heroes)
+            cyc = cycles_of(days[p])
+            end2, end3 = max(d for d, c in enumerate(cyc) if c == 2), max(d for d, c in enumerate(cyc) if c == 3)
+            log = gold_buy(variant, inc[p], heroes, cyc)
             (b2, s2, g2), (b3, s3, g3) = log[end2], log[end3]
             full = [f'{ROMAN[c - 1]} — {"да" if b[c] == heroes[c] else "нет"}' for c, b in ((2, b2), (3, b3))]
             rows.append([variant[0] if p == E.PROFILES[0][0] else '', p,

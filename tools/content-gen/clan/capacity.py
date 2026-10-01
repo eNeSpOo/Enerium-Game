@@ -2,9 +2,10 @@
 """Клан: вход калькулятора клана (tools/content-gen/clan/build.js) из калькуляторов экономики — черновик.
 
 Что берёт через importlib, калькуляторы не меняет:
-- echo.py — сила главного отряда по дням циклов II–VI: 12 + уровень на начало дня (cycle_days), у обычного (3 ч) и увлечённого (8 ч)
-  игрока. Циклы IV–VI — по образцу цикла III, как в самом echo.py: отряд в той же силе к врагам своего цикла (× кривая §3.3);
-- sets.py — длина циклов II и III (CYCLE_LEN). Циклы IV–VI — длиной цикла III: так их считает echo.py (TEMPLATE).
+- echo.py — сила главного отряда по дням циклов II–VI в единицах уровня героя цикла I (12 + уровень; cycle_days), у обычного (3 ч)
+  и увлечённого (8 ч) игрока: цикл II — калькулятор экономики, III–VI — калькулятор подъёма (cycle/climb-days.json), у каждого профиля
+  свой календарь: сроки автора (ADR-0043);
+- sets.py — длина циклов II–VI у обычного (CYCLE_LEN).
 Сила отряда нужна кланову боссу: круг 1 ставится по отряду обычного игрока на первый день цикла II, неделя эталонных кланов —
 по силе их отрядов в неделях цикла. Очки контрактов в резервуар калькулятор клана берёт из design/ui/contracts.js (EN_CONTRACTS.econ).
 Норма цикла (ADR-0042, «Клан и разные циклы»): norm — средняя сила главного отряда обычного игрока за цикл, по всем дням цикла.
@@ -37,8 +38,8 @@ PROFILES = {'o': 'обычный', 'e': 'увлечённый'}
 
 
 def cycle_len(c):
-    """Дней в цикле: II и III — sets.py; IV–VI — как III, по образцу echo.py."""
-    return S.CYCLE_LEN[min(c, EC.TEMPLATE)]
+    """Дней в цикле у обычного: sets.py (CYCLE_LEN) — цикл II калькулятора экономики, III–VI — калькулятора подъёма."""
+    return S.CYCLE_LEN[c]
 
 
 def power(prof, c):
@@ -57,19 +58,23 @@ def build():
         'meta': {
             'builder': 'tools/content-gen/clan/capacity.py',
             'sources': ['tools/content-gen/economy/echo.py', 'tools/content-gen/economy/sets.py', 'tools/content-gen/economy/economy.py'],
-            'note': 'power — 12 + уровень главного отряда на начало каждого дня цикла; циклы IV–VI — по образцу III, как в echo.py; '
-                    'norm — средняя сила отряда обычного игрока за цикл: копия цели кланового босса в цикле атакующего (ADR-0042)',
+            'note': 'power — сила главного отряда на каждый день цикла в единицах уровня героя цикла I (12 + уровень): цикл II — калькулятор '
+                    'экономики, III–VI — калькулятор подъёма, свой календарь профиля; norm — средняя сила отряда обычного игрока за цикл: '
+                    'копия цели кланового босса в цикле атакующего (ADR-0042); cycleDays — длина цикла у обычного, cycleDaysBy — у профиля',
         },
         'hours': {k: dict(E.PROFILES)[v] for k, v in PROFILES.items()},
         'lvlDiv': EC.LVL_DIV,
         'cycleDays': {str(c): cycle_len(c) for c in CYCLES},
+        'cycleDaysBy': {k: {str(c): len(EC.cycle_days(prof, c)) for c in CYCLES} for k, prof in PROFILES.items()},
         'power': {k: {str(c): power(prof, c) for c in CYCLES} for k, prof in PROFILES.items()},
         'norm': {str(c): norm(c) for c in CYCLES},
     }
-    for k in PROFILES:
-        for c in CYCLES:
-            if len(data['power'][k][str(c)]) != data['cycleDays'][str(c)]:
-                raise SystemExit(f'Дней цикла {c} у профиля {k}: {len(data["power"][k][str(c)])}, а длина цикла — {data["cycleDays"][str(c)]}')
+    for c in CYCLES:
+        if len(data['power']['o'][str(c)]) != data['cycleDays'][str(c)]:
+            raise SystemExit(f'Дней цикла {c} у обычного: {len(data["power"]["o"][str(c)])}, а длина цикла — {data["cycleDays"][str(c)]}')
+        for k in PROFILES:
+            if not data['power'][k][str(c)]:
+                raise SystemExit(f'У профиля {k} нет дней цикла {c}')
     return data
 
 

@@ -161,7 +161,7 @@ function hdQty(h) {
   const room = Math.max(0, h.cap - h.lvl); if (!room) return 0;
   if (S.qty !== 'max') return Math.min(Math.max(1, +S.qty || 1), room);
   let q = 0, c = 0;
-  while (q < room) { const n = lvlCost(h.lvl + q, 1); if (c + n > S.wallet.spirit) break; c += n; q++; }
+  while (q < room) { const n = lvlCost(h.lvl + q, 1, h.cycle); if (c + n > S.wallet.spirit) break; c += n; q++; }
   return Math.max(1, q);
 }
 const hdLimCan = h => { const d = heroDev(h); return !!d.rune && d.atCap && d.have >= d.need; };
@@ -185,7 +185,7 @@ const HD_SRV = {
     return HD_SRV.run(op, () => {
       const h = H(hid); if (!h) return { refuse: 'hero' };
       const room = h.cap - h.lvl; if (room <= 0) return { refuse: 'top' };
-      const n = Math.min(Math.max(1, q | 0), room), cost = lvlCost(h.lvl, n);
+      const n = Math.min(Math.max(1, q | 0), room), cost = lvlCost(h.lvl, n, h.cycle);   // цена уровня × цикл героя (RULES.levelCycle, ADR-0043)
       if (S.wallet.spirit < cost) return { refuse: 'spirit' };
       const bm0 = h.bm, from = h.lvl;
       S.wallet.spirit -= cost; h.lvl = from + n;
@@ -301,7 +301,7 @@ function hdNext(h, d) {
   const now = hdGain(h, {}), same = hdStats(now.st0, now.st0);
   if (d.step === 'lvl') {
     /* внизу — «сколько за раз» (выбор меняет превью и цену) и главная кнопка: подпись, под ней цена — у правого края */
-    const q = hdQty(h), to = h.lvl + q, cost = lvlCost(h.lvl, q), can = cost <= S.wallet.spirit, G = hdGain(h, { lvl: to });
+    const q = hdQty(h), to = h.lvl + q, cost = lvlCost(h.lvl, q, h.cycle), can = cost <= S.wallet.spirit, G = hdGain(h, { lvl: to });
     const qty = `<div class="qty" role="group" aria-label="Сколько уровней за раз">${HD_DATA.qty.map(v => `<button aria-pressed="${S.qty === v}" data-a="qty" data-v="${v}">${v === 'max' ? 'Макс' : '+' + v}</button>`).join('')}</div>`;
     /* нехватка духа — строкой превью: сколько есть и где взять; шаг не меняет характеристик (так считает ядро) — так и сказано */
     const rows = (can ? [] : [hdGNote(ic('info'), `Не хватает духа: есть ${fmt(S.wallet.spirit)} из ${fmt(cost)} · <button class="link" data-a="sheet" data-v="cur:spirit">Где взять дух</button>`, 'warn')]).concat(hdGainRows(G))

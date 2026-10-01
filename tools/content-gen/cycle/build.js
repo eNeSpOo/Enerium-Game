@@ -24,6 +24,8 @@ const FILES = {
   data: path.join(__dirname, 'data.js'),
   rules: path.join(__dirname, 'rules.js'),
   climb: path.join(__dirname, 'climb.json'),
+  days: path.join(__dirname, 'climb-days.json'),
+  cap: path.join(ROOT, 'tools', 'content-gen', 'contracts', 'capacity.json'),
   out: path.join(UI, 'cycle.js'),
   doc: path.join(ROOT, 'docs', 'content', 'переход-цикла.md'),
   economy: path.join(ROOT, 'tools', 'content-gen', 'economy', 'economy.py'),
@@ -54,7 +56,7 @@ const x100 = v => { const t = Math.floor(v / 10); return x10(t); };
 const plural = (n, a, b, c) => { const m10 = n % 10, m100 = n % 100; return m10 === 1 && m100 !== 11 ? a : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? b : c; };
 const ORD = ['', 'первый', 'второй', 'третий', 'четвёртый', 'пятый', 'шестой', 'седьмой'];
 
-function stepOf(G, c, climb) {
+function stepOf(G, c, climb, days) {
   const { EB, R, RO, ER, W, CT, EV, AR, RI, LB, EQ, ST, CH, SS, PS } = G;
   const rc = ROMAN[c], rp = ROMAN[c - 1], cyc = R.cycles[c - 1], team = !!cyc.team;
   /* первый рейтинг — цикл II (RULES.first): прошлый цикл — обучение, рейтинга и недели в нём нет — сравнивать не с чем */
@@ -134,11 +136,16 @@ function stepOf(G, c, climb) {
   if (of) got.push({ k: 'offer', n: `${K.n} · ${Math.floor(K.life / 3600)} ч` });
 
   /* подъём по циклам — калькулятор climb.py, только команде */
-  const reg = climb.profiles[0], fan = climb.profiles[1], pay = climb.profiles[2], pk = reg.picks[String(c)] || {}, wl = reg.walls[String(c)] || {};
+  const reg = climb.profiles[0], fan = climb.profiles[1], pay = climb.profiles[2], wl = reg.walls[String(c)] || {};
+  /* отряд прихода — запись последнего дня прошлого цикла (climb-days.json: цикл героев главного забега, уровень, доблесть); путь — новые
+     ступени цикла из вех калькулятора: есть — «новая ступень» (первая из них), нет — «тот же отряд» */
+  const start = (reg.ends[String(c - 1)] || 0) + 1, end = reg.ends[String(c)] || 0, r0 = start >= 2 && days ? days.days[reg.prof][start - 2] : null;
+  const st1 = (reg.events || []).find(x => x[1] === 'step' && x[0] >= start && x[0] <= end);
   const team2 = {
     days: { o: reg.len[String(c)], e: fan.len[String(c)], p: pay.len[String(c)] },
     corridor: climb.corridor[String(c)], kX: climb.kX[String(c)], need: climb.need[String(c)] ? climb.need[String(c)].w : null,
-    came: pk.from || null, way: pk.way || null, wayK: pk.k || null, wall: wl.wall || null, wallBoss: wl.boss || null,
+    came: r0 ? [r0[1], r0[2], r0[3]] : null, way: st1 ? 'новая ступень' : 'тот же отряд', wayK: st1 ? +String(st1[2])[0] : null,
+    wall: wl.wall || null, wallBoss: wl.boss || null,
   };
   const say = D.SAY[c];
   return {
@@ -155,7 +162,8 @@ function build() {
   if (!G.EB.RULES.cycleX10) err.push('ядро: нет RULES.cycleX10 — кривой силы героя (ADR-0041)');
   const climb = JSON.parse(fs.readFileSync(FILES.climb, 'utf8'));
   const steps = {};
-  for (let c = D.RULES.from; c <= D.RULES.last; c++) steps[c] = stepOf(G, c, climb);
+  const days = fs.existsSync(FILES.days) ? JSON.parse(fs.readFileSync(FILES.days, 'utf8')) : null;
+  for (let c = D.RULES.from; c <= D.RULES.last; c++) steps[c] = stepOf(G, c, climb, days);
   const data = {
     meta: { builder: 'tools/content-gen/cycle/build.js', rules: 'tools/content-gen/cycle/rules.js', climb: 'tools/content-gen/cycle/climb.py',
       sources: ['GDD §1', 'GDD §2.9', 'GDD §3.3', 'GDD §16', 'GDD §17.6', 'GDD §20.5', 'ADR-0041'], doc: 'docs/content/переход-цикла.md' },
@@ -233,7 +241,71 @@ function tables(data, climb) {
     s.open.map(x => [sec[x.sec], x.n, x.d, x.team ? 'команда' : 'игрок']))).join('\n\n');
   out.got = T(['Переход', 'Сразу — операцией сервера'], Object.values(data.steps).map(s => [`${ROMAN[s.from]} → ${s.roman}`, s.got.map(g => g.n).join('; ')]));
   out.climb = climb.md;
+  const Y = yearTables(climb);
+  out.year = Y.year;
+  out.week = Y.week;
   return out;
+}
+
+/* ================================ ГОД ЦИКЛА IV ================================
+   Чем обычный занят в годовом цикле IV и почему он не стоит месяцами без дела (ADR-0043): по четырёхнедельным отрезкам — главная
+   ступень развития и вехи (калькулятор подъёма: climb-days.json, climb.json), фронт биомов, Эхо — очки недели, планка, КрафБоссы
+   (ёмкость: contracts/capacity.json, echoWeekPts); ниже — то, что идёт каждую неделю: контракты, Событие, Арена и Лига, клан, ритуалы,
+   крафт и призывы (данные режимов). Чисел здесь нет — только выборка из данных */
+const YEAR = { c: 4, block: 28, prof: 'o' };
+function yearTables(climb) {
+  const G = load(), J = JSON.parse(fs.readFileSync(FILES.days, 'utf8')), CAP = JSON.parse(fs.readFileSync(FILES.cap, 'utf8'));
+  const T = (h, rows) => ['| ' + h.join(' | ') + ' |', '|' + h.map(() => '---').join('|') + '|'].concat(rows.map(r => '| ' + r.join(' | ') + ' |')).join('\n');
+  const c = YEAR.c, rc = ROMAN[c], P = climb.profiles.find(p => p.prof === YEAR.prof), days = J.days[YEAR.prof];
+  const start = (P.ends[String(c - 1)] || 0) + 1, end = P.ends[String(c)];
+  if (!end) return { year: 'Цикл IV у обычного не пройден в горизонте калькулятора подъёма.', week: '' };
+  const cap = CAP.cycles[String(c)][YEAR.prof], p1 = G.ER.plank1[String(c)], mul = G.ER.plankMul;
+  const plank = pts => { let k = 0; while (k < 5 && pts >= p1 * mul ** k) k++; return k; };
+  const SRC = { g: 'за золото', e: 'Эхо', d: 'донат' };
+  const stepAt = d => {
+    const r = days[d - 1], hl = r[15];
+    const v = r[8], j = r[14], val = `доблесть ${v}${j ? `, у ${j} — ${v + 1}` : ''}`;
+    return hl >= 0 ? `герои ${ROMAN[r[6]]}: ${val}; герой после доблести — ${fmt(hl)}-й` : r[7] < 1200 || r[9] < 5 ? `герои ${ROMAN[r[6]]}: ${fmt(r[7])}-й, пределов ${r[9]}` : `герои ${ROMAN[r[6]]}: 1 200-й, ${val}`;
+  };
+  const ev = P.events.filter(x => x[0] >= start && x[0] <= end);
+  const front = [];
+  for (const [id, B] of Object.entries(P.biomes)) {
+    const cc = +id[1], ab = id[2] === 'A' ? 'первого' : 'второго';
+    if (cc !== c) continue;
+    if (B.boss) front.push([B.boss.day, `босс ${ab} биома`]);
+    if (B.guard) front.push([B.guard.day, `страж ${ab} биома`]);
+  }
+  const weeks = cap.echoWeekPts || [], craft = cap.echoWeekCraftX1000 || [];
+  const rows = [];
+  for (let a = start, i = 1; a <= end; a += YEAR.block, i++) {
+    const b = Math.min(end, a + YEAR.block - 1), wa = Math.floor((a - start) / 7), wb = Math.floor((b - start + 1) / 7);
+    const ws = weeks.slice(wa, Math.max(wa + 1, wb)), cs = craft.slice(wa, Math.max(wa + 1, wb));
+    const avg = ws.length ? Math.floor(ws.reduce((x, y) => x + y, 0) / ws.length) : 0, kills = cs.length ? Math.floor(cs.reduce((x, y) => x + y, 0) / cs.length) : 0;
+    const e = ev.filter(x => x[0] >= a && x[0] <= b);
+    const lim = e.filter(x => x[1] === 'limit').length, val = e.filter(x => x[1] === 'valor').length, st = e.filter(x => x[1] === 'step');
+    const marks = [].concat(st.map(x => `новая ступень — герои ${ROMAN[+x[2][0]]} · ${SRC[x[2][1]]}`), lim ? [`рунных пределов — ${lim}`] : [], val ? [`доблесть — ${val} ${plural(val, 'герою', 'героям', 'героям')}`] : [],
+      front.filter(([d]) => d >= a && d <= b).map(([, n]) => n));
+    rows.push([`${i}-й · ${a - start + 1}–${b - start + 1}`, stepAt(b), marks.join('; ') || 'уровни', ws.length ? `${fmt(avg)} → ${plank(avg)}-я` : '—', (kills / 1000).toLocaleString('ru-RU', { maximumFractionDigits: 1 })]);
+  }
+  const year = `Цикл ${rc} у обычного — ${fmt(end - start + 1)} ${plural(end - start + 1, 'день', 'дня', 'дней')} (дни ${fmt(start)}–${fmt(end)} от начала цикла II). Отрезок — четыре недели. Планка Эхо — средняя неделя отрезка против планок цикла ${rc} (первая — ${fmt(p1)}).\n\n`
+    + T(['Отрезок · дни цикла', 'Главная ступень в конце отрезка', 'Вехи отрезка', 'Эхо: очков в неделю → планка', 'КрафБоссов в неделю'], rows);
+  /* каждую неделю цикла IV — режимы недели у обычного: планки из данных режимов, сундуки — лутбоксы */
+  const LB = G.LB, typ = m => (LB.modes[m] && LB.modes[m].typical && LB.modes[m].typical.free) || {};
+  const EVc = G.EV.econ[String(c)], evP = G.EV.planks[String(c)], evPl = EVc ? evP.filter(x => EVc.week.o >= x).length : 0;
+  const sink = G.R.stats.sink.find(x => x.cyc === c) || {}, RIc = G.RI.sim[String(c)] && G.RI.sim[String(c)].o;
+  const once = G.R.recipes.filter(r => r.cyc === c).length;
+  const wk = [
+    ['Эхо', `лестница недели и КрафБоссы: в среднем ${fmt(cap.echoPtsWeek / 100 | 0)} очков, из них КрафБоссы — ${fmt((cap.echoCraftWeek || 0) / 100 | 0)}; сундуки осколков героев недели по планкам`],
+    ['Контракты', `обычно — ${typ('contract').me}-я планка недели: сундук ключей`],
+    ['Событие', `${fmt(EVc ? EVc.week.o : 0)} очков в неделю → ${evPl}-я планка; клановая планка — ${typ('event').clan}-я`],
+    ['Арена и Лига', `${typ('arena').me}-я и ${typ('league').me}-я планки побед: сундуки снаряжения`],
+    ['Клан', 'клановый босс по дням недели, резервуар и древо клана'],
+    ['Ритуалы', RIc ? `${fmt(Math.floor(RIc.rituals / 100))} ритуалов в день: золото, дух, души и базовые` : 'ритуалы героев и рабочих'],
+    ['Крафт и КрафБоссы', `крафтовых биомов в день — ${(sink.runsX100 / 100).toLocaleString('ru-RU')}, призывов КрафБоссов — ${(sink.summonsX100 / 100).toLocaleString('ru-RU')}; рецептов цикла — ${fmt(once)}, каждый — хоть раз`],
+  ];
+  const week = `Каждую неделю цикла ${rc} у обычного — недельные режимы и их сундуки: новые таблицы рейтинга, раса недели и её отряд героев.\n\n`
+    + T(['Режим', 'Неделя обычного'], wk);
+  return { year, week };
 }
 
 function writeDoc(t) {
