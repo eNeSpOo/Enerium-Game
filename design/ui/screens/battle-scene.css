@@ -171,7 +171,7 @@
 .bt-insp.bs-insp[hidden]{display:none}
 /* окно закрывает сторону поля: числа и надписи над ней, баннер, «Раунд N», ульта и плашки этажа — не поверх окна */
 .bt.bs-cov0 .fly.s0,.bt.bs-cov1 .fly.s1,.bt.bs-cov0 .bs-call.s0,.bt.bs-cov1 .bs-call.s1,.bt.bs-cov1 .bs-loot,
-.bt:is(.bs-cov0,.bs-cov1,.bs-leg) :is(.bs-call.ult,.bs-rflash,.bs-transit,.bs-taken,.bt-banner){visibility:hidden}
+.bt:is(.bs-cov0,.bs-cov1,.bs-leg) :is(.bs-call.ult,.bs-rflash,.bt-banner){visibility:hidden}
 /* вид «портрет»: окно уже — левая колонка тоньше */
 .bt.pv .bt-insp.bs-insp{--bsi-lw:160px}
 /* левая колонка */
@@ -264,26 +264,14 @@
 @keyframes bsBan{0%{transform:translate(-50%,-50%) scale(1.15);opacity:0}9%{transform:translate(-50%,-50%) scale(.98);opacity:1}16%{transform:translate(-50%,-50%) scale(1)}85%{opacity:1}100%{transform:translate(-50%,-52%);opacity:0}}
 @container main (max-height: 360px){ .bs-ban>.pl{min-width:260px;padding:10px 40px 11px} .bs-ban>.pl>b{font-size:21px} }
 
-.bs-rflash,.bs-transit{position:absolute;left:50%;top:38%;z-index:6;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:190px;padding:22px 40px 11px;
+.bs-rflash{position:absolute;left:50%;top:38%;z-index:6;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:190px;padding:22px 40px 11px;
   background:center/100% 100% no-repeat;transform:translate(-50%,-50%);animation:bsRnd .7s ease both}
-.bs-rflash>small,.bs-transit>small{font:700 9.5px/1 var(--f-u);letter-spacing:.2em;text-transform:uppercase;color:var(--gold-2)}
+.bs-rflash>small{font:700 9.5px/1 var(--f-u);letter-spacing:.2em;text-transform:uppercase;color:var(--gold-2)}
 .bs-rflash>b{font:600 30px/1 var(--f-d);color:var(--gold);text-shadow:0 0 16px rgba(221,188,122,.45),0 2px 6px #000;font-variant-numeric:lining-nums}
 .bs-rflash>em{font:700 10px/1 var(--f-u);font-style:normal;color:var(--parch-3);letter-spacing:.08em}
 .bs-rflash.last>b{color:#ff9c7a;text-shadow:0 0 16px rgba(255,110,70,.6),0 2px 6px #000}
 .bs-rflash.last>small{color:#ffb08a}
-.bs-transit>b{font:600 22px/1 var(--f-d);color:var(--parch)}
 @keyframes bsRnd{0%{transform:translate(-50%,-30%) scale(.9);opacity:0}22%{transform:translate(-50%,-50%) scale(1.04);opacity:1}32%{transform:translate(-50%,-50%) scale(1)}78%{opacity:1}100%{transform:translate(-50%,-62%);opacity:0}}
-.bs-transit{top:30%;animation-name:bsTransit}
-@keyframes bsTransit{0%{opacity:0;transform:translate(-50%,-40%)}15%{opacity:1;transform:translate(-50%,-50%)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-56%)}}
-/* «Этаж взят»: плашка и песок до спуска — время этажа не короче ритуала (ADR-0044) */
-.bs-taken{position:absolute;left:50%;top:40%;z-index:6;pointer-events:none;transform:translate(-50%,-50%);animation:bsTaken 2s ease both}
-.bs-taken>.pl{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:220px;padding:24px 44px 13px;background:center/100% 100% no-repeat}
-.bs-taken small{font:700 9.5px/1 var(--f-u);letter-spacing:.2em;text-transform:uppercase;color:var(--gold-2)}
-.bs-taken b{font:600 24px/1 var(--f-d);color:var(--gold);text-shadow:0 0 16px rgba(221,188,122,.45),0 2px 6px #000}
-.bs-taken .sand{position:relative;display:block;width:120px;height:3px;margin-top:3px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden}
-.bs-taken .sand>i{position:absolute;inset:0;border-radius:inherit;background:linear-gradient(90deg,#6d5530,var(--sand,#e9d48f));transform-origin:left center;animation:bsSand linear both}
-@keyframes bsTaken{0%{opacity:0;transform:translate(-50%,-40%) scale(.95)}8%{opacity:1;transform:translate(-50%,-50%) scale(1)}92%{opacity:1}100%{opacity:0;transform:translate(-50%,-56%)}}
-@keyframes bsSand{from{transform:scaleX(1)}to{transform:scaleX(0)}}
 .bs-loot{position:absolute;right:120px;top:30%;z-index:7;pointer-events:none;display:flex;flex-direction:column;align-items:flex-end;gap:4px;animation:bsLoot 1.8s ease both}
 .bs-loot span{display:flex;align-items:center;gap:5px;padding:3px 9px 3px 4px;border-radius:10px;background:rgba(7,9,11,.85);box-shadow:inset 0 0 0 1px rgba(221,188,122,.35);font:700 14px/1 var(--f-u);color:var(--gold)}
 .bs-loot span.spirit{color:var(--spirit)}
@@ -299,6 +287,12 @@
 /* выход врагов: из тени и снизу, по очереди — шаг между картами из RULES.floor.ritual.stepMs (--bs-step ставит battle-scene.js) */
 .bt-side.f.enter .bc{animation-delay:calc((var(--k) * 2 + var(--r)) * var(--bs-step,80ms))}
 @keyframes foeIn{0%{transform:translateY(14px) scale(.92);opacity:0}60%{opacity:1}100%{transform:translateY(0) scale(1);opacity:1}}
+/* поход на новый этаж (ADR-0048, bsTrip в battle-scene.js): фон — петля из трёх копий арены (третья — как первая), живые герои шагают,
+   лента и очередь бледнеют; завеса — затемнение и новая арена за ней. Завеса — над полем, шапка и линейка этажей — над завесой */
+.bt-bgs>.bg3{left:200%}
+.bt.bs-march .bt-side.h .bc:not(.dead){animation:walk .42s ease-in-out infinite alternate}
+.bt.bs-trip .bt-feed,.bt.bs-trip .bt-queue{opacity:.3;transition:opacity .3s}
+.bs-veil{position:absolute;inset:0;z-index:3;display:block;pointer-events:none;opacity:0;background:radial-gradient(130% 150% at 50% 50%,#07090b 40%,#020304)}
 
 /* ---------- итог этажа и забега, окно «Стена»: герб над окном ---------- */
 .dlg.bs-res{overflow:visible;margin-top:28px;border-color:rgba(221,188,122,.35);border-width:14px;border-style:solid;border-image:url('../assets/art/bhud/panel.png') 115 70 115 70 / 14px stretch;border-radius:0;
@@ -345,18 +339,27 @@
 .bs-k-vx span{display:block;width:64px;height:64px;border-radius:8px;background:#0a0c0e center/contain no-repeat;box-shadow:0 0 0 1px var(--iron)}
 .bs-k-vx figcaption{font-size:10px;color:var(--parch-3)}
 .bs-k-tbl td{font-size:12px}
+.bs-k-arb{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.bs-k-arb>b{font-size:12px;color:var(--parch-2)}
+.bs-k-ars{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.bs-k-ar{margin:0;display:flex;flex-direction:column;gap:3px;min-width:0}
+.bs-k-ar img,.bs-k-ar>span{display:block;width:100%;aspect-ratio:1688/716;object-fit:cover;border-radius:6px;box-shadow:0 0 0 1px var(--iron-2)}
+.bs-k-ar>span{display:grid;place-items:center;background:repeating-linear-gradient(135deg,#0d1012 0 8px,#121518 8px 16px);color:var(--parch-3);font-size:11px}
+.bs-k-ar figcaption{font-size:10px;color:var(--parch-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* ---------- «меньше движения» ---------- */
 @media (prefers-reduced-motion:reduce){
   .bc.turn .face::after,.bc.turn::before{animation:none}
   .fly,.fly.crit{animation-name:bsFlyCalm}
-  .bs-call,.bs-call.ult,.bt-banner.bs-ban,.bs-rflash,.bs-transit,.bs-loot,.bs-taken{animation-name:bsFade}
-  /* общее правило index.html гасит все анимации мгновенно — сведениям (числа, надписи, плашки, песок) их длительность возвращает --bs-d:
+  .bs-call,.bs-call.ult,.bt-banner.bs-ban,.bs-rflash,.bs-loot{animation-name:bsFade}
+  /* общее правило index.html гасит все анимации мгновенно — сведениям (числа, надписи, плашки) их длительность возвращает --bs-d:
      видны столько же, сколько без «меньше движения», только гаснут на месте */
-  .fly,.fly.crit,.bs-call,.bs-call.ult,.bt-banner.bs-ban,.bs-rflash,.bs-transit,.bs-loot,.bs-taken,.bs-taken .sand>i{animation-duration:var(--bs-d,1s)!important}
+  .fly,.fly.crit,.bs-call,.bs-call.ult,.bt-banner.bs-ban,.bs-rflash,.bs-loot{animation-duration:var(--bs-d,1s)!important}
   .bs-crest{animation:none}
   .bc.falling{animation:none}
   .bt-side.f.enter .bc{animation:none}
+  /* поход на новый этаж без движения: отряд стоит; фон не едет, павшие гаснут, затемнение и новая арена — прозрачностью (bsTripKf) */
+  .bt.bs-march .bt-side.h .bc:not(.dead){animation:none}
   .bc .face>.fxl.go{animation:none}
 }
 @keyframes bsFlyCalm{0%{opacity:0}15%{opacity:1}100%{opacity:0}}

@@ -10,7 +10,12 @@
    opt.loot — такая же таблица: мир берёт добычу из неё, а не из ядра и генератора, — так сборщик проверяет, что таблица ведёт к тому же итогу.
    Шаги сценария сверх боя (ADR-0040; D.tut — их собирает build.js, tutOf): сундук уровня chest.L открывается с заданным содержимым,
    в Лавке — одна покупка витрины обучения по цене Лавки, первый артефакт — покупка за золото и уровни за души по правилу артефактов
-   (screens/wanderer.js, WN_SRV: купить — a.gold, уровень k — a.soul × k). Сундуки помнят номер выдачи (no) — как ch<номер> прототипа. */
+   (screens/wanderer.js, WN_SRV: купить — a.gold, уровень k — a.soul × k). Сундуки помнят номер выдачи (no) — как ch<номер> прототипа.
+   Погружения Подземного леса (ADR-0049, D.dives; собирает build.js): сид добычи забега — сид сценария, seeds[номер забега] — номер забега
+   полного пути, чью добычу даёт этот забег (без записи — свой номер); дар погружения — в конце забега, gifts[номер забега] — [золото, дух,
+   души, [[предмет, сколько], …]]: добыча однообразных забегов, которые погружение заменило. opt.gift(номер, S) — дар считается по ходу
+   (первый проход сборщика). Выданные дары — S.giftLog, в счётчиках биома — и в золоте, духе и душах, и отдельно (tot.gift). Уровни,
+   взятые посреди забега, — S.lvRun[номер забега]: по ним сборщик находит забеги, где взят этап. */
 'use strict';
 const path = require('path');
 const ROOT = path.join(__dirname, '..', '..', '..');
@@ -92,8 +97,22 @@ function make(D, opt = {}) {
     lootLog: {}, lastRun: {},   // добыча по забегам и этажам (ADR-0040); последний забег биома — как S.lastRun прототипа
     held: new Set(),            // что игрок держал в руках: всё, что прошло через запасы (как S.ws.seen мастерской прототипа)
     chestSeq: 0, opened: [], bought: null, art: {},   // сундуков выдано, открытые (номера), покупка Лавки, артефакты: уровень
+    giftLog: {}, lvRun: {}, inRun: 0,   // дары погружений по номеру забега; уровни, взятые посреди забега; номер идущего забега (ADR-0049)
     tot: {} };   // по биомам: этажей взято, убито по рангам, дух и золото, забегов, попыток у стража и побед — счётчики для калькуляторов
   const tot = b => S.tot[b] || (S.tot[b] = { floors: 0, o: 0, e: 0, b: 0, spirit: 0, gold: 0, souls: 0, runs: 0, ms: 0, guardTries: 0, guardWins: 0, guardMs: 0 });
+  /* погружения (ADR-0049): сид добычи — сервера сценария; дар погружения — в конце забега, тем же порядком, что у прототипа */
+  const DV = D.dives || {};
+  const seedNo = no => (DV.seeds && DV.seeds[no]) || no;
+  function giveGift(biome, no) {
+    const g = opt.gift ? opt.gift(no, S) : (DV.gifts && DV.gifts[no]) || null;
+    if (!g || !(g[0] || g[1] || g[2] || (g[3] || []).length)) return null;
+    const T = tot(biome), G = T.gift || (T.gift = { gold: 0, spirit: 0, souls: 0, items: 0, n: 0 });
+    S.gold += g[0]; S.spirit += g[1]; S.souls += g[2]; addItems(Object.fromEntries(g[3] || []));
+    T.gold += g[0]; T.spirit += g[1]; T.souls += g[2];
+    G.gold += g[0]; G.spirit += g[1]; G.souls += g[2]; G.items += (g[3] || []).reduce((a, x) => a + x[1], 0); G.n++;
+    S.giftLog[no] = [g[0], g[1], g[2], (g[3] || []).map(x => x.slice())];
+    return S.giftLog[no];
+  }
   const RANK = u => u.rank === 'e' ? 'e' : u.rank === 'b' ? 'b' : u.rank === 'rune' ? null : 'o';
   const moments = [];   // первый проход: уровень, опыт и миг
   const granted = [];   // уровни, взятые с прошлого W.claim(): посреди забега их берёт сам мир — бот узнаёт о них после
@@ -113,6 +132,7 @@ function make(D, opt = {}) {
   }
   /* уровни: второй проход — по правилу сервера (опыт и этап); первый — только по этапу, опыт запоминается */
   function claimNow() {
+    const during = Ls => { if (S.inRun && Ls.length) (S.lvRun[S.inRun] || (S.lvRun[S.inRun] = [])).push(...Ls); return Ls; };
     if (opt.stageOnly) {
       const got = [];
       while (M.lvl < R.N && R.stageOk(D.levels[M.lvl].stage, F())) {
@@ -120,10 +140,10 @@ function make(D, opt = {}) {
         got.push({ L: M.lvl, reward: R.reward(M.lvl) });
       }
       grant(got); for (const x of got) granted.push({ L: x.L, ms: S.ms });
-      return got.map(x => x.L);
+      return during(got.map(x => x.L));
     }
     const r = R.claim(M, 'op' + M.seq, F());
-    if (r.res) { grant(r.res.levels); for (const x of r.res.levels) granted.push({ L: x.L, ms: S.ms }); return r.res.levels.map(x => x.L); }
+    if (r.res) { grant(r.res.levels); for (const x of r.res.levels) granted.push({ L: x.L, ms: S.ms }); return during(r.res.levels.map(x => x.L)); }
     return [];
   }
   const heroSrc = h => EB.heroSrcValor(Object.assign({}, SQUAD.find(x => x.id === byId[h.id].bot), { lvl: h.lvl, valor: h.valor }));
@@ -210,8 +230,8 @@ function make(D, opt = {}) {
     },
     /* забег — этажи подряд до стены или до конца биома, как startRun → advance → floorDone прототипа */
     run(biome) {
-      const B = EB.BIOMES[biome]; S.runNo++;
-      const seed = EB.seedOf(`${biome}|добыча|${S.runNo}`);
+      const B = EB.BIOMES[biome]; S.runNo++; S.inRun = S.runNo;
+      const seed = EB.seedOf(`${biome}|добыча|${seedNo(S.runNo)}`);
       let cur = S.heroes.map(heroSrc), ms = 0, wall = 0, win = false, spirit = 0;
       for (let f = 1; f <= B.floors.length; f++) {
         const b = EB.run(EB.floorBattle(cur, biome, f, null, 'rounds')), dt = b.t + (f < B.floors.length ? EB.RULES.floor.gapMs : 0);
@@ -233,13 +253,14 @@ function make(D, opt = {}) {
       tot(biome).runs++; tot(biome).ms += ms;
       /* последний забег биома — как S.lastRun прототипа (endRun): стена, босс или отказ */
       S.lastRun[biome] = win ? { wall: null, kind: 'boss', floor: wall } : { wall, kind: 'wall', floor: wall };
-      return { wall, win, ms, spirit };
+      const gift = giveGift(biome, S.runNo); S.inRun = 0;   // дар погружения — после добычи этажей, в конце забега (ADR-0049)
+      return { wall, win, ms, spirit, gift };
     },
     guard(biome) {
       const B = EB.BIOMES[biome], g = guardOf(biome);
       if (!g || S.keys < g.entryKeys) return { win: false, ms: 0 };
-      S.keys -= g.entryKeys; S.runNo++;
-      const seed = EB.seedOf(`${biome}|добыча|${S.runNo}`);
+      S.keys -= g.entryKeys; S.runNo++; S.inRun = S.runNo;
+      const seed = EB.seedOf(`${biome}|добыча|${seedNo(S.runNo)}`);
       const b = EB.run(EB.guardBattle(S.heroes.map(heroSrc), biome, 'rounds'));
       killFacts(b);
       const { got, items } = lootOf(biome, B.floors.length + 1, b, seed, b.win), T = tot(biome);
@@ -253,7 +274,8 @@ function make(D, opt = {}) {
       }
       S.ms += b.t; S.msBy[biome] = (S.msBy[biome] || 0) + b.t; S.guardMs = (S.guardMs || 0) + b.t;
       claimNow();
-      return { win: b.win, ms: b.t };
+      const gift = giveGift(biome, S.runNo); S.inRun = 0;
+      return { win: b.win, ms: b.t, gift };
     },
   };
   return { W, S, M, R, moments };

@@ -146,6 +146,8 @@ function collect() {
   const ST = load('start').EN_START;
   for (const [k, o] of Object.entries(ST.open || {})) for (const x of ['n', 'd']) add('start', 1, false, `открытие ${k} · ${x}`, o[x]);
   (ST.levels || []).forEach((l, i) => walk(l, `уровень ${i + 1}`, 'start', 1));
+  /* уроки погружений Подземного леса (ADR-0049): заголовок и слово проводника; приёмы и герои урока — из данных, их проверяют свои хозяева */
+  for (const [k, l] of Object.entries((ST.dives && ST.dives.lessons) || {})) add('start', 1, false, `урок погружения ${k}`, [l.n, l.say && l.say[1]]);
 
   /* --- новый цикл: окно «Событие нового цикла» (ADR-0041) — игрок видит его с цикла, в который вошёл --- */
   if (fs.existsSync(path.join(UI, 'cycle.js'))) {

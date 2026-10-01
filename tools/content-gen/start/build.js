@@ -1,12 +1,22 @@
 /* Старт с чистого листа — сборка, прогон и проверки сценария цикла I: уровни Странника 1–10, их пороги и награды (GDD §16, §31,
    ADR-0018, ADR-0019, ADR-0031). Слово автора 01.10.2026 — в data.js.
    Сборка:
+   0. Полный путь (ADR-0049) — тот же игрок проходит Подземный лес забег за забегом, как прежде: мера того, что лес даёт. Погружения —
+      его забеги, где встречается новое (первый забег леса, этап уровня Странника, первая встреча с хозяйкой леса, победа над ней, новые
+      рубежи между ними); однообразные забеги между погружениями заменяет дар погружения — их добыча. Погружений — столько, сколько уроков
+      (data.js, DIVES); урок — перед каждым погружением.
    1. Прогон ядром — канонический игрок (bot.js) в мире ядра (world-sim.js): найм, дух в уровни, руна обучения, предел, рецепт, забеги
-      и стражи — настоящими боями battle.js на данных biome-foes.js. Первый проход берёт уровни по этапам и запоминает, сколько опыта было
-      в этот миг: это и есть пороги уровней 2–10. Второй проход идёт по правилу сервера (rules.js: опыт и этап) и обязан повторить первый.
+      и стражи — настоящими боями battle.js на данных biome-foes.js; в лесу — погружения с сидом добычи сервера сценария и дарами. Первый
+      проход берёт уровни по этапам и запоминает, сколько опыта было в этот миг: это и есть пороги уровней 2–10; дары погружений он считает
+      по ходу — добирают добычу леса до полного пути. Второй проход идёт по правилу сервера (rules.js: опыт и этап) с дарами из данных
+      и обязан повторить первый.
    2. Законы (ошибка — файлы не пишутся):
       — сценарий проходится: уровень 10 и цикл II; пороги растут; каждый уровень — в миг своего этапа;
-      — темп (data.js, PACE): биом 1 — 7–10 минут боя, биом 2 — 90–180 минут забегов;
+      — темп (data.js, PACE): биом 1 — 7–10 минут боя, биом 2 — 20–60 минут боя;
+      — погружения леса (DIVES): заходов в лес и к стражу — 5–10 (слово автора); погружений — столько, сколько уроков; каждое глубже
+        прежнего, хозяйка леса — в последнем, первая встреча с ней — раньше; перед каждым — свой урок, его окно новое (ни уровень, ни
+        прежний урок туда не вели); урок героя — когда герой в отряде, приёмы — из данных; погружение повторяет забег полного пути;
+        дары — целые, не меньше нуля; итог обучения — тот же, что у полного пути;
       — найм не ждёт золота: герой нанят, как только открылось место;
       — ключей хватает на входы к стражам канонического прохождения и ещё GUARD.spareEntries входа;
       — руна обучения и рецепт — в цикле I; рунный предел пробит в цикле I; рун предела I на пятерых хватает к циклу II;
@@ -26,8 +36,8 @@
       пропуск с каждого уровня 1–10 даёт один итог — итог прохождения; ресурсы первого рецепта дарит тот же уровень, что открывает
       Мастерскую, и рецепт — следующий шаг после него.
    4. Вывод:
-      — design/ui/start.js — window.EN_START (данные, пороги, канонический путь для проверки прототипа, сценарий, добыча, итог пропуска)
-        и алгоритм rules.js как есть;
+      — design/ui/start.js — window.EN_START (данные, пороги, канонический путь для проверки прототипа, сценарий, добыча, итог пропуска,
+        погружения леса: сиды, дары, уроки — dives) и алгоритм rules.js как есть;
       — tools/content-gen/start/start.json — итоги цикла I для калькуляторов (biomes/pace.py, economy/economy.py) и итог пропуска;
       — таблицы docs/content/старт-с-чистого-листа.md между метками.
    Запуск: node tools/content-gen/start/build.js            — собрать;
@@ -69,24 +79,141 @@ const mins = ms => dec1(ms, 60000);
 const dec2 = v100 => { const f = v100 % 100; return f ? `${Math.floor(v100 / 100)},${String(f).padStart(2, '0').replace(/0$/, '')}` : String(v100 / 100); };
 const T =(head, rows) => ['| ' + head.join(' | ') + ' |', '|' + head.map(() => '---').join('|') + '|'].concat(rows.map(r => '| ' + r.join(' | ') + ' |')).join('\n');
 
-function dataOf(levelsXp) {
+function dataOf(levelsXp, dives) {
   return {
     meta: { builder: 'tools/content-gen/start/build.js', rules: 'tools/content-gen/start/rules.js', bot: 'tools/content-gen/start/bot.js',
-      sources: ['GDD §16', 'GDD §31', 'ADR-0018', 'ADR-0019', 'ADR-0031', 'design/ui/battle.js', 'design/ui/biome-foes.js', 'design/ui/roster.js', 'design/ui/recipes.js'],
+      sources: ['GDD §16', 'GDD §31', 'ADR-0018', 'ADR-0019', 'ADR-0031', 'ADR-0049', 'design/ui/battle.js', 'design/ui/biome-foes.js', 'design/ui/roster.js', 'design/ui/recipes.js'],
       doc: 'docs/content/старт-с-чистого-листа.md' },
     xp: DATA.XP, formula: Object.assign({ max: LEVEL_MAX }, DATA.FORMULA), heroes: DATA.HEROES, train: DATA.TRAIN, start: DATA.START,
     open: DATA.OPEN, gates: DATA.GATES, pace: DATA.PACE, guard: DATA.GUARD, bot: DATA.BOT,
     levels: DATA.LEVELS.map((l, i) => Object.assign({}, l, { xp: levelsXp ? levelsXp[i] : 0 })),
     /* шаги сценария сверх боя (ADR-0040): содержимое сундука уровня, витрина и покупка Лавки, первый артефакт — world-sim.js, tutOf */
     tut: WS.tutOf(DATA.SCRIPT, DATA.LEVELS),
+    /* погружения Подземного леса (ADR-0049): сиды добычи и дары погружений — их берёт мир (world-sim.js); без них — полный путь */
+    dives: dives || null,
   };
 }
+
+/* ================================ ПОГРУЖЕНИЯ ЛЕСА (ADR-0049) ================================
+   Слово автора 02.10.2026 — в data.js, DIVES. Полный путь — канонический игрок проходит лес забег за забегом, как прежде: мера того, что
+   лес даёт. Погружения — его забеги, где встречается новое; однообразные забеги между ними заменяет дар погружения — их добыча. Поэтому
+   отряд у погружения и итог обучения — те же, что у полного пути */
+const DV = DATA.DIVES;
+const itemOrd = new Map(RX.items.map((it, i) => [it.id, i]));
+const byItem = (a, b) => (itemOrd.get(a) ?? 1e9) - (itemOrd.get(b) ?? 1e9) || (a < b ? -1 : a > b ? 1 : 0);
+/* забеги пути по порядку: номер, вид, биом, стена, победа, уровни, взятые посреди забега (S.lvRun мира) */
+function runsOf(p, w) {
+  const out = []; let no = 0;
+  for (const x of p.log) if (x.kind === 'run' || x.kind === 'guard') { no++; out.push({ no, kind: x.kind, b: x.b, wall: x.wall || 0, win: !!x.win, lv: (w.S.lvRun[no] || []).slice() }); }
+  return out;
+}
+/* какие забеги полного пути становятся погружениями. Обязательные: первый забег леса; забег, в котором взят этап уровня Странника (после
+   него приходит герой — отряд погружения тот же, что у полного пути); первая встреча с хозяйкой леса, если она не пала; победа над ней.
+   Остальные — новые рубежи (забег глубже всех прежних): по промежуткам между обязательными — по глубине промежутка, внутри — ровно по
+   глубине. Погружений столько, сколько уроков */
+function pickDives(full) {
+  const floors = EB.BIOMES[DV.b].floors.length, F = full.filter(r => r.kind === 'run' && r.b === DV.b), err = [], why = new Map();
+  const depth = r => (r.win ? floors + 1 : r.wall);
+  const add = (r, w) => { if (r && !why.has(r.no)) why.set(r.no, w); };
+  if (!F.length) return { err: [`погружения: в полном пути нет забегов ${DV.b}`], why };
+  add(F[0], 'first');
+  for (const r of F) if (r.lv.length) add(r, 'stage');
+  add(F.find(r => !r.win && r.wall >= floors), 'meet');
+  const win = F.find(r => r.win); add(win, 'win');
+  if (!win) err.push('погружения: в полном пути хозяйка леса не пала');
+  else if (F.some(r => r.no > win.no)) err.push('погружения: в полном пути после победы над хозяйкой леса — ещё забеги леса; дары погружений их не сведут');
+  const extra = DV.lessons.length - why.size;
+  if (extra < 0) err.push(`погружения: обязательных ${why.size} — больше, чем уроков (${DV.lessons.length})`);
+  const rec = []; let best = 0;
+  for (const r of F) { if (depth(r) > best && !why.has(r.no)) rec.push(r); best = Math.max(best, depth(r)); }
+  const M = [...why.keys()].sort((a, b) => a - b).map(no => F.find(r => r.no === no));
+  const gaps = M.slice(1).map((hi, i) => ({ lo: M[i], hi, rec: rec.filter(r => r.no > M[i].no && r.no < hi.no), k: 0 })).filter(g => g.rec.length);
+  const span = g => Math.max(1, depth(g.hi) - depth(g.lo));
+  for (let t = 0; t < extra; t++) {
+    const free = gaps.filter(g => g.k < g.rec.length); if (!free.length) break;
+    free.sort((a, b) => span(b) * (a.k + 1) - span(a) * (b.k + 1) || a.lo.no - b.lo.no)[0].k++;
+  }
+  for (const g of gaps) {
+    const lo = depth(g.lo), hi = depth(g.hi), used = new Set();
+    for (let t = 1; t <= g.k; t++) {
+      const aim = lo * (g.k + 1 - t) + hi * t, d = r => Math.abs(depth(r) * (g.k + 1) - aim);
+      const r = g.rec.filter(x => !used.has(x.no)).sort((a, b) => d(a) - d(b) || a.no - b.no)[0];
+      if (r) { used.add(r.no); add(r, 'edge'); }
+    }
+  }
+  if (why.size !== DV.lessons.length) err.push(`погружения: набралось ${why.size} при уроках ${DV.lessons.length} — новых рубежей не хватило`);
+  return { err, why, floors };
+}
+/* короткий путь: забеги полного пути без пропущенных однообразных; seeds — номер забега полного пути у каждого забега короткого
+   (его сид добычи), list — погружения: дар после погружения добирает добычу леса до полного пути по забег перед следующим забегом */
+function planOf(full, why) {
+  const seeds = [null], list = [];
+  for (const r of full) {
+    const forest = r.kind === 'run' && r.b === DV.b;
+    if (forest && !why.has(r.no)) continue;
+    const no = seeds.length; seeds.push(r.no);
+    if (forest) list.push({ j: list.length + 1, no, seed: r.no, why: why.get(r.no), wall: r.wall, win: r.win ? 1 : 0 });
+  }
+  for (const d of list) d.upto = seeds[d.no + 1] ? seeds[d.no + 1] - 1 : full[full.length - 1].no;
+  return { seeds, list };
+}
+/* добыча забегов из журнала мира: золото, дух, души, предметы */
+function lootSum(log, nos) {
+  const a = { gold: 0, spirit: 0, souls: 0, items: {} };
+  for (const no of nos) for (const f of log[no] || []) { a.gold += f[1]; a.spirit += f[2]; a.souls += f[3]; for (const [id, q] of f[4]) a.items[id] = (a.items[id] || 0) + q; }
+  return a;
+}
+/* дар погружения по ходу (первый проход): добыча леса — этажи погружений и прежние дары — добирается до добычи полного пути по забег upto */
+function giftOnline(plan, full, w0) {
+  const forestFull = full.filter(r => r.kind === 'run' && r.b === DV.b).map(r => r.no);
+  return (no, S) => {
+    const d = plan.list.find(x => x.no === no); if (!d) return null;
+    const want = lootSum(w0.S.lootLog, forestFull.filter(x => x <= d.upto)), have = lootSum(S.lootLog, plan.list.filter(x => x.no <= no).map(x => x.no));
+    for (const g of Object.values(S.giftLog)) { have.gold += g[0]; have.spirit += g[1]; have.souls += g[2]; for (const [id, q] of g[3]) have.items[id] = (have.items[id] || 0) + q; }
+    const items = Object.keys(want.items).sort(byItem).map(id => [id, Math.max(0, want.items[id] - (have.items[id] || 0))]).filter(x => x[1] > 0);
+    return [Math.max(0, want.gold - have.gold), Math.max(0, want.spirit - have.spirit), Math.max(0, want.souls - have.souls), items];
+  };
+}
+/* уроки по погружениям: перед каждым — первый по порядку данных урок, о котором уже есть что рассказать: герой — в отряде; доблесть —
+   у героя руны обучения она есть; кто держит удар — танк в отряде; хозяйка леса — встреча с ней уже была; стихии — всегда */
+/* герой урока — из данных: доблесть — кому руна обучения, урок героя и угрозы — герой своей роли среди пятерых обучения (HEROES[].role):
+   замена героя пятёрки — смена данных, уроки её подхватят */
+const lessonHero = l => (l.kind === 'valor' ? DATA.TRAIN : l.role ? (DATA.HEROES.find(h => h.role === l.role) || {}).id || null : null);
+function lessonsOf(p, list, floors) {
+  const err = [], used = new Set();
+  const squad = new Set(), valor = {}; let met = false, j = 0;
+  const ready = l => (l.kind === 'valor' ? (valor[DATA.TRAIN] || 0) > 0 : l.kind === 'hero' || l.kind === 'threat' ? squad.has(lessonHero(l)) : l.kind === 'boss' ? met : true);
+  for (const x of p.log) {
+    if (x.kind === 'hire') squad.add(x.id);
+    else if (x.kind === 'valor') valor[x.id] = (valor[x.id] || 0) + 1;
+    else if (x.kind === 'run' && x.b === DV.b) {
+      const d = list[j++]; if (!d) break;
+      const l = DV.lessons.find(s => !used.has(s.id) && ready(s));
+      if (!l) err.push(`погружение ${d.j}: нечему учить — уроков, для которых всё готово, не осталось`);
+      else { d.lesson = l.id; used.add(l.id); }
+      if (!x.win && x.wall >= floors) met = true;
+    }
+  }
+  for (const l of DV.lessons) if (!used.has(l.id)) err.push(`урок «${l.n}» не встал ни перед одним погружением`);
+  return err;
+}
+/* окно урока или уровня — ключ для закона «каждое погружение открывает новое окно»: маршрут, вкладки, лист, чья книга */
+function goKey(g, l) {
+  if (!g) return '';
+  const sel = g.sel === 'train' ? DATA.TRAIN : g.sel === 'lesson' && l ? lessonHero(l) || '' : g.sel || '';
+  return [g.route, g.heroes, g.hire, g.hero, g.craft, g.zptab, g.profile, g.biome, g.sheet, g.pick, sel].map(x => x || '').join('|');
+}
+/* итог для сверки «короткий путь — тот же итог, что полный»: без номера забега (у короткого пути забегов меньше) */
+const endOf = w => { const x = JSON.parse(snap(w)); delete x.runNo; return x; };
 
 /* ================================ ОБУЧЕНИЕ ПО СЦЕНАРИЮ (ADR-0040) ================================ */
 /* журнал канонического игрока → шаги. L — уровень Странника в начале шага: уровень, взятый посреди забега, бот узнаёт после забега —
    его запись идёт за записью забега, поэтому сам забег — на прежнем уровне. Дух в уровни подряд — один шаг: to — [герой, уровень] */
-function scriptOf(p) {
+function scriptOf(p, dv) {
   const out = [], teach = new Set(DATA.SCRIPT.teach); let L = 0, no = 0;
+  /* забег и страж: seed — номер забега полного пути (сид добычи сервера сценария), у погружения леса — d и урок перед ним (ADR-0049) */
+  const runStep = s => { const sd = dv && dv.seeds ? dv.seeds[s.no] : null, d = dv && dv.list ? dv.list.find(x => x.no === s.no) : null;
+    if (sd) s.seed = sd; if (d) { s.d = d.j; s.lesson = d.lesson; } return s; };
   for (const x of p.log) {
     const last = out[out.length - 1];
     if (x.kind === 'level') { L = Math.max(L, x.L); continue; }
@@ -101,8 +228,8 @@ function scriptOf(p) {
     else if (x.kind === 'art') out.push({ k: 'art', id: x.id, lv: x.lv, L });
     else if (x.kind === 'recipe') out.push({ k: 'craft', r: x.r, L });
     else if (x.kind === 'valor' || x.kind === 'limit') out.push({ k: x.kind, id: x.id, L });
-    else if (x.kind === 'run') out.push({ k: 'run', b: x.b, no: ++no, wall: x.wall, win: x.win ? 1 : 0, L });
-    else if (x.kind === 'guard') out.push({ k: 'guard', b: x.b, no: ++no, win: x.win ? 1 : 0, L });
+    else if (x.kind === 'run') out.push(runStep({ k: 'run', b: x.b, no: ++no, wall: x.wall, win: x.win ? 1 : 0, L }));
+    else if (x.kind === 'guard') out.push(runStep({ k: 'guard', b: x.b, no: ++no, win: x.win ? 1 : 0, L }));
   }
   const seen = new Set();
   for (const s of out) if (teach.has(s.k) && !seen.has(s.k)) { seen.add(s.k); s.teach = 1; }
@@ -239,9 +366,18 @@ function build() {
   }
   if (err.length) return { err, warn };
 
-  /* 1. первый проход: пороги */
-  const D1 = dataOf(null), w1 = WS.make(D1, { stageOnly: true }), p1 = play(w1.W, D1);
+  /* 0. полный путь — лес забег за забегом, как прежде: мера того, что лес даёт; по нему выбираются погружения (ADR-0049) */
+  const D0 = dataOf(null, null), w0 = WS.make(D0, { stageOnly: true }), p0 = play(w0.W, D0);
+  if (!p0.done) { err.push(`полный путь: сценарий не дошёл до цикла II за ${DATA.BOT.maxSteps} шагов — уровень ${w0.M.lvl}`); return { err, warn }; }
+  const full = runsOf(p0, w0), pk = pickDives(full);
+  if (pk.err.length) return { err: err.concat(pk.err), warn };
+  const plan = planOf(full, pk.why);
+  const divesOf = gifts => ({ b: DV.b, seeds: plan.seeds, gifts: gifts || null });
+
+  /* 1. первый проход: пороги; дары погружений — по ходу, добирают добычу леса до полного пути */
+  const D1 = dataOf(null, divesOf(null)), w1 = WS.make(D1, { stageOnly: true, gift: giftOnline(plan, full, w0) }), p1 = play(w1.W, D1);
   if (!p1.done) err.push(`первый проход: сценарий не дошёл до цикла II за ${DATA.BOT.maxSteps} шагов — уровень ${w1.M.lvl}`);
+  const gifts = JSON.parse(JSON.stringify(w1.S.giftLog));
   const mom = DATA.LEVELS.map(l => w1.moments.find(x => x.L === l.L) || null);
   mom.forEach((x, i) => { if (!x) err.push(`уровень ${i + 1}: этап не взят в каноническом прохождении`); });
   if (err.length) return { err, warn };
@@ -249,8 +385,8 @@ function build() {
   for (let i = 1; i < thr.length; i++) if (thr[i] <= thr[i - 1]) err.push(`порог уровня ${i + 1} (${thr[i]}) не выше порога уровня ${i} (${thr[i - 1]}): этапы без нового опыта — уровни слиплись`);
   if (thr[0] !== 0) err.push('уровень 1 — с нуля опыта');
 
-  /* 2. второй проход: правило сервера повторяет первый */
-  const D = dataOf(thr), w2 = WS.make(D, {}), p2 = play(w2.W, D), S = w2.S, M = w2.M;
+  /* 2. второй проход: правило сервера повторяет первый; дары — из данных */
+  const D = dataOf(thr, divesOf(gifts)), w2 = WS.make(D, {}), p2 = play(w2.W, D), S = w2.S, M = w2.M;
   if (!p2.done) err.push('второй проход: сценарий не дошёл до цикла II');
   const lv2 = p2.log.filter(x => x.kind === 'level').map(x => ({ L: x.L, ms: x.ms }));
   for (const x of mom) { const y = lv2.find(z => z.L === x.L); if (!y || y.ms !== x.ms) err.push(`уровень ${x.L}: по правилу сервера взят ${y ? `на ${mins(y.ms)} мин` : 'не взят'}, по этапу — на ${mins(x.ms)} мин: пороги и этапы разошлись`); }
@@ -260,7 +396,55 @@ function build() {
   const b1 = S.tot.b1 || {}, b2 = S.tot.b2 || {};
   const inC = (ms, [lo, hi]) => ms >= lo * 60000 && ms <= hi * 60000;
   if (!inC(b1.ms || 0, DATA.PACE.b1)) err.push(`биом 1: ${mins(b1.ms || 0)} мин боя — вне ${DATA.PACE.b1.join('–')} (ADR-0031, п. 5)`);
-  if (!inC(b2.ms || 0, DATA.PACE.b2)) err.push(`биом 2: ${mins(b2.ms || 0)} мин забегов — вне ${DATA.PACE.b2.join('–')} (ADR-0018, ADR-0031, п. 5)`);
+  if (!inC(b2.ms || 0, DATA.PACE.b2)) err.push(`биом 2: ${mins(b2.ms || 0)} мин боя — вне ${DATA.PACE.b2.join('–')} (ADR-0049)`);
+
+  /* 3а. погружения леса (ADR-0049, слово автора — data.js, DIVES): законы
+     — заходов в лес — коридор автора: погружения и вход к стражу; погружений — столько, сколько уроков;
+     — каждое погружение глубже прежнего, хозяйка леса падает только в последнем — после всех уроков; первая встреча с ней — до него;
+     — перед каждым погружением — свой урок, его окно — новое: ни урок, ни уровень Странника к нему ещё не вели; урок героя — когда герой
+       в отряде, приёмы — из данных героев; доблесть — когда она у героя есть; хозяйка леса — после встречи с ней;
+     — погружение повторяет забег полного пути (тот же забег, та же стена), дар — не меньше нуля, только целые;
+     — итог обучения — тот же, что у полного пути: отряд, кошелёк, запасы, сундуки, осколки, бестиарий, путь вниз, опыт и вехи */
+  const dv = { b: DV.b, runs: DV.runs, floors: pk.floors, seeds: plan.seeds, gifts, list: plan.list.map(d => Object.assign({}, d)),
+    full: { runs: full.filter(r => r.kind === 'run' && r.b === DV.b).length, ms: (w0.S.tot[DV.b] || {}).ms || 0 } };
+  {
+    for (const e of lessonsOf(p2, dv.list, pk.floors)) err.push(e);
+    const L = dv.list, n = L.length, guards = p2.steps.filter(s => s.kind === 'guard' && s.b === DV.b).length;
+    if (n < DV.runs[0] || n + guards > DV.runs[1]) err.push(`погружения: ${n} в лес и ${guards} к стражу — вне ${DV.runs.join('–')} заходов (слово автора, ADR-0049)`);
+    if (n !== DV.lessons.length) err.push(`погружений ${n}, уроков ${DV.lessons.length}: на погружение — один урок`);
+    const runs2 = p2.steps.filter(s => s.kind === 'run' && s.b === DV.b);
+    if (runs2.length !== n) err.push(`погружения: у прогона ${runs2.length} забегов леса, в плане ${n}`);
+    runs2.forEach((s, i) => { const d = L[i]; if (d && (s.wall !== d.wall || (s.win ? 1 : 0) !== d.win)) err.push(`погружение ${i + 1}: стена ${s.win ? 'победа' : s.wall}, у забега ${d.seed} полного пути — ${d.win ? 'победа' : d.wall}`); });
+    const depth = s => (s.win ? pk.floors + 1 : s.wall);
+    runs2.forEach((s, i) => { if (i && depth(s) <= depth(runs2[i - 1])) err.push(`погружение ${i + 1}: стена ${s.win ? 'победа' : s.wall} — не глубже прежнего (${runs2[i - 1].wall}): однообразный повтор`); });
+    if (!runs2.length || !runs2[runs2.length - 1].win || runs2.slice(0, -1).some(s => s.win)) err.push('погружения: хозяйка леса падает не в последнем погружении');
+    const lesson = id => DV.lessons.find(l => l.id === id) || {};
+    const bossAt = L.findIndex(d => lesson(d.lesson).kind === 'boss'), metAt = runs2.findIndex(s => !s.win && s.wall >= pk.floors);
+    if (bossAt >= 0 && (metAt < 0 || metAt >= bossAt)) err.push('урок «хозяйка леса» — до встречи с ней');
+    /* окна: урок ведёт туда, куда ещё не вёл ни уровень, ни прежний урок */
+    const seen = new Map();
+    for (const l of DATA.LEVELS) for (const k of l.opens) { const g = goKey(DATA.OPEN[k].go); if (g && !seen.has(g)) seen.set(g, `уровень ${l.L}, «${DATA.OPEN[k].n}»`); }
+    for (const d of L) { const l = lesson(d.lesson), g = goKey(l.go, l); if (!g) err.push(`урок «${l.n}»: нет окна`); else if (seen.has(g)) err.push(`урок «${l.n}» ведёт в окно, куда уже вёл ${seen.get(g)}: погружение ${d.j} не открывает нового`); else seen.set(g, `урок «${l.n}»`); }
+    /* данные урока: герой — в составе и с приёмами в библиотеке; доблесть открыла приём; хозяйка леса — с приёмами; стихии — круг ядра */
+    const K = globalThis.EN_KITS || { heroes: {} }, LIB = EB.lib();
+    const kitOf = id => { const r = ROSTER.heroes.find(x => x.id === id), d = r && r.team && r.team.draft; return (d && K.heroes[d]) || null; };
+    for (const l of DV.lessons) {
+      const hero = lessonHero(l);
+      if ((l.kind === 'hero' || l.kind === 'threat' || l.kind === 'valor') && !hero) err.push(`урок «${l.n}»: нет героя обучения${l.role ? ` с ролью «${l.role}»` : ''}`);
+      if (hero) {
+        const k = kitOf(hero);
+        if (!k || !k.kit.length || k.kit.some(x => !LIB[x.id] || !LIB[x.id].n || !LIB[x.id].d)) err.push(`урок «${l.n}»: у героя ${hero} нет приёмов с именем и описанием в kits.js и abilities.js`);
+        else if (l.kind === 'valor' && !k.kit.some(x => x.v >= 1)) err.push(`урок «${l.n}»: доблесть не открывает герою ${hero} ни одного приёма`);
+      }
+      if (l.kind === 'threat') { const r = ROSTER.heroes.find(x => x.id === hero), c = SQUAD.find(x => x.id === (DATA.HEROES.find(h => h.id === hero) || {}).bot); if (!c || !EB.RULES.cls[c.cls] || !(EB.RULES.cls[c.cls].thr > EB.RULES.threat.base)) err.push(`урок «${l.n}»: у героя ${r ? r.n : hero} класс без повышенной угрозы`); }
+      if (l.kind === 'boss') { const B = EB.BIOMES[DV.b], id = B.floors[B.floors.length - 1].m[0], f = EB.FOES[id]; if (!f || !f.kit || !f.kit.kit.length || f.kit.kit.some(x => !LIB[x.id])) err.push(`урок «${l.n}»: у хозяйки леса ${id} нет приёмов в ядре`); }
+      if (l.kind === 'elements' && !(EB.RULES.elem && EB.RULES.elem.circle && EB.RULES.elem.circle.length >= 3)) err.push(`урок «${l.n}»: в ядре нет круга стихий`);
+    }
+    /* дары: только целые и не меньше нуля; итог — тот же, что у полного пути */
+    for (const [no, g] of Object.entries(gifts)) if (g.slice(0, 3).some(v => !Number.isInteger(v) || v < 0) || g[3].some(([, q]) => !Number.isInteger(q) || q <= 0)) err.push(`дар погружения после забега ${no}: не целые или отрицательные числа`);
+    const e0 = endOf(w0), e2 = endOf(w2);
+    for (const k of Object.keys(e0)) if (JSON.stringify(e0[k]) !== JSON.stringify(e2[k])) err.push(`итог обучения не тот, что у полного пути: ${k} — ${JSON.stringify(e2[k]).slice(0, 160)} против ${JSON.stringify(e0[k]).slice(0, 160)}`);
+  }
 
   /* 4. найм не ждёт золота: герой нанят до следующего забега после того, как открылось его место (посреди забега — сразу после него) */
   const hires = p2.log.filter(x => x.kind === 'hire');
@@ -296,8 +480,9 @@ function build() {
     if (x.holes.length) err.push(`${x.n}: страж берётся с ${x.first}-го, но проигрывает на ${x.holes.join(', ')} — провалы по уровню`);
   }
 
-  /* 8. обучение по сценарию и пропуск (ADR-0040) */
-  D.script = scriptOf(p2); D.loot = lootTable(S); D.skip = skipOf(w2, D.script); D.hint = hintOf();
+  /* 8. обучение по сценарию и пропуск (ADR-0040); погружения леса с уроками и дарами (ADR-0049) */
+  D.dives = Object.assign(dv, { lessons: Object.fromEntries(DV.lessons.map(l => [l.id, Object.assign({}, l)])) });
+  D.script = scriptOf(p2, dv); D.loot = lootTable(S); D.skip = skipOf(w2, D.script); D.hint = hintOf();
   {
     const SC = D.script, kinds = new Set(['hire', 'lvl', 'chest', 'shop', 'craft', 'valor', 'limit', 'art', 'run', 'guard']);
     for (const s of SC) if (!kinds.has(s.k)) err.push(`сценарий: шаг неизвестного вида ${s.k}`);
@@ -361,8 +546,10 @@ function build() {
       if (!live && !r.refuse) err.push('пропуск после конца сценария не отказан');
     }
     const tot = D.loot.reduce((a, run) => { for (const f of run) { a[0] += f[1]; a[1] += f[2]; a[2] += f[3]; } return a; }, [0, 0, 0]);
-    const tb = [S.tot.b1, S.tot.b2].reduce((a, t) => [a[0] + t.gold, a[1] + t.spirit, a[2] + t.souls], [0, 0, 0]);
-    if (JSON.stringify(tot) !== JSON.stringify(tb)) err.push(`добыча: таблица ${tot.join('/')} — у прогона ${tb.join('/')} (золото/дух/души)`);
+    const tb = [S.tot.b1, S.tot.b2].reduce((a, t) => { const g = t.gift || { gold: 0, spirit: 0, souls: 0 }; return [a[0] + t.gold - g.gold, a[1] + t.spirit - g.spirit, a[2] + t.souls - g.souls]; }, [0, 0, 0]);
+    if (JSON.stringify(tot) !== JSON.stringify(tb)) err.push(`добыча: таблица ${tot.join('/')} — у прогона ${tb.join('/')} (золото/дух/души этажей)`);
+    /* дары погружений в сценарии: у погружения — свой дар из данных, сумма даров — то, что мир выдал */
+    for (const s of SC.filter(x => x.d)) if (!D.dives.list.some(d => d.no === s.no && d.j === s.d && d.lesson === s.lesson)) err.push(`сценарий: погружение ${s.d} (забег ${s.no}) — не то, что в плане погружений`);
   }
 
   /* 9. тексты игрока: спойлеры, лестница по циклам и служебные слова. Окна уровней 1–10 игрок видит в цикле I — на циклах I–II
@@ -371,12 +558,23 @@ function build() {
   for (const l of DATA.LEVELS) texts.push([`уровень ${l.L}`, l.n], [`уровень ${l.L}`, l.why], [`уровень ${l.L}, слово`, l.say[1]]);
   for (const [k, o] of Object.entries(DATA.OPEN)) texts.push([`открытие ${k}`, o.n], [`открытие ${k}`, o.d]);
   if (D.hint) texts.push(['подсказка', D.hint.n]);
+  for (const l of DV.lessons) texts.push([`урок «${l.id}»`, l.n], [`урок «${l.id}», слово`, l.say[1]]);   // уроки погружений (ADR-0049)
   for (const [w, t] of texts) {
     for (const x of SP.scan(t)) err.push(`${w}: спойлер «${x.hit}» — ${x.why}`);
     for (const x of LAD.violations(t, 1, false)) err.push(`${w}: лестница спойлеров, ${x.lvl} «${x.hit}» — ${x.why}`);
     const s = String(t).match(SERVICE); if (s) err.push(`${w}: служебное «${s[0]}» в тексте игрока`);
   }
   for (const l of DATA.LEVELS) if (!/^(mage|enzo|smith|alch)$/.test(l.say[0])) err.push(`уровень ${l.L}: проводник «${l.say[0]}» — не из Убежища`);
+  for (const l of DV.lessons) if (!/^(mage|enzo|smith|alch)$/.test(l.say[0])) err.push(`урок «${l.id}»: проводник «${l.say[0]}» — не из Убежища`);
+  /* уроки не называют ни приёмов, ни героев текстом: приёмы и герои — из данных, иначе после пересборки героев или замены героя пятёрки
+     (ADR-0050) урок соврёт. Имя героя — и целиком, и первым словом («Хравн» из «Хравн Сборщик») */
+  { const L = EB.lib(), esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), word = n => new RegExp(`(^|[^а-яё])${esc(n)}([^а-яё]|$)`, 'i');
+    const names = new Set(Object.values(L).map(a => a.n).filter(n => n && n.length > 3));
+    const heroes = new Set(ROSTER.heroes.filter(h => h.c === 1 && h.src === 'gold').flatMap(h => [h.n, h.n.split(' ')[0]]).filter(n => n && n.length > 3));
+    for (const l of DV.lessons) for (const t of [l.n, l.say[1]]) {
+      for (const n of names) if (word(n).test(t)) err.push(`урок «${l.id}»: в тексте — имя приёма «${n}»; приёмы урок берёт из данных`);
+      for (const n of heroes) if (word(n).test(t)) err.push(`урок «${l.id}»: в тексте — имя героя «${n}»; героя урок берёт из данных`);
+    } }
   /* 10. только целые */
   const ints = []; (function walk(x, k) { if (typeof x === 'number') { if (!Number.isInteger(x)) ints.push(k); } else if (x && typeof x === 'object') for (const [kk, v] of Object.entries(x)) walk(v, k + '.' + kk); })(D, 'EN_START');
   if (ints.length) err.push('не целые числа: ' + ints.join(', '));
@@ -410,8 +608,12 @@ function build() {
     b1: { ms: b1.ms, runs: b1.runs, guardTries: b1.guardTries, bossLvl: summary.b1.boss ? summary.b1.boss.lvls : null, guardLvl: summary.b1.guard ? summary.b1.guard.lvls : null, heroes: 2 },
     b2: { boss: { runs: stepCount(p2, 'b2', firstBoss('b2')), ms: msUntil(p2, w2, firstBoss('b2')), lvl: summary.b2.boss ? summary.b2.boss.lvls : null, heroes: DATA.HEROES.length },
       guard: { runs: b2.runs, ms: b2.ms, tries: b2.guardTries, lvl: summary.b2.guard ? summary.b2.guard.lvls : null, heroes: DATA.HEROES.length },
-      tot: { floors: b2.floors, o: b2.o, e: b2.e, b: b2.b, spirit: b2.spirit, gold: b2.gold, souls: b2.souls, guardWins: b2.guardWins, runs: b2.runs, ms: b2.ms },
-      log: logOf(p2, 'b2') },
+      /* дух, золото и души леса — этажи и дары погружений (ADR-0049): столько же, сколько у полного пути; gift — из них дары */
+      tot: { floors: b2.floors, o: b2.o, e: b2.e, b: b2.b, spirit: b2.spirit, gold: b2.gold, souls: b2.souls, guardWins: b2.guardWins, runs: b2.runs, ms: b2.ms,
+        gift: b2.gift ? { gold: b2.gift.gold, spirit: b2.gift.spirit, souls: b2.gift.souls, items: b2.gift.items } : null },
+      log: logOf(p2, 'b2'),
+      /* погружения (ADR-0049): сколько и чем они заменили полный путь — забегов и минут боя */
+      dives: { n: dv.list.length, runs: DV.runs, full: { runs: dv.full.runs, ms: dv.full.ms } } },
     b1log: logOf(p2, 'b1'),
     levels: DATA.LEVELS.map((l, i) => ({ L: l.L, xp: thr[i], min: Math.round(lvMs(l.L) / 60000) })),
     /* формула уровней с 11-го и опыт вех §16 — калькулятор экономики считает по ним «Дар Страннику» в цикле II (economy.py, ADR-0039) */
@@ -440,7 +642,19 @@ function build() {
   TBL.xp = T(['Веха', 'Опыт', 'Сколько раз'], Object.entries(xpBy).map(([k, v]) => [XN[k] || k, fmt(v), Object.keys(M.facts).filter(x => x.startsWith(k + ':')).length]).concat([['всего', fmt(M.xp), '']]));
   TBL.pace = T(['Биом', 'Цель', 'Забегов', 'Попыток у стража', 'Минут боя', 'Уровни у босса', 'Уровни у стража'], [
     ['Мастерская форм', `${DATA.PACE.b1.join('–')} мин боя, остальное до часа — обучение`, b1.runs, b1.guardTries, mins(b1.ms), (summary.b1.boss || { lvls: [] }).lvls.join(' / '), (summary.b1.guard || { lvls: [] }).lvls.join(' / ')],
-    ['Подземный лес', `${DATA.PACE.b2.join('–')} мин забегов`, b2.runs, b2.guardTries, mins(b2.ms), (summary.b2.boss || { lvls: [] }).lvls.join(' / '), (summary.b2.guard || { lvls: [] }).lvls.join(' / ')]]);
+    ['Подземный лес', `${DV.runs.join('–')} заходов: погружения и страж; ${DATA.PACE.b2.join('–')} мин боя`, b2.runs, b2.guardTries, mins(b2.ms), (summary.b2.boss || { lvls: [] }).lvls.join(' / '), (summary.b2.guard || { lvls: [] }).lvls.join(' / ')]]);
+  /* погружения леса (ADR-0049): забег, отряд, стена, урок перед погружением, дар после; внизу — полный путь, который они заменили */
+  {
+    const giftTxt = g => { if (!g) return '—'; const it = g[3].reduce((a, x) => a + x[1], 0), keys = g[3].filter(([id]) => (RX.items.find(i => i.id === id) || {}).tier === 'key').reduce((a, x) => a + x[1], 0);
+      return [g[0] && `${fmt(g[0])} золота`, g[1] && `${fmt(g[1])} духа`, g[2] && `${fmt(g[2])} ${plural(g[2], 'душа', 'души', 'душ')}`, it && `предметы ×${it}${keys ? ` (ключи ремёсел ×${keys})` : ''}`].filter(Boolean).join(', ') || '—'; };
+    const WHY = { first: 'первый забег леса', stage: 'этап уровня Странника', meet: 'первая встреча с хозяйкой леса', win: 'победа над хозяйкой леса', edge: 'новый рубеж' };
+    const st = no => p2.steps[no - 1] || {}, les = id => (DV.lessons.find(l => l.id === id) || { n: id }), hnS = id => (ROSTER.heroes.find(x => x.id === id) || { n: id }).n;
+    const who = l => (lessonHero(l) ? hnS(lessonHero(l)) : '');
+    TBL.dives = T(['Погружение', 'Забег полного пути', 'Отряд, уровни', 'Стена', 'Урок перед ним', 'Дар после'], dv.list.map(d => {
+      const l = les(d.lesson), s = st(d.no);
+      return [d.j, `${d.seed - plan.list[0].seed + 1}-й · ${WHY[d.why] || d.why}`, (s.lvls || []).join(' / '), d.win ? 'хозяйка леса пала' : `этаж ${d.wall}`, `«${l.n}»${who(l) ? ' · ' + who(l) : ''}`, giftTxt(gifts[d.no])];
+    })) + `\n\nПолный путь — ${dv.full.runs} ${plural(dv.full.runs, 'забег', 'забега', 'забегов')} леса и страж, ${mins(dv.full.ms)} мин боя; погружений — ${dv.list.length} и страж, ${mins(b2.ms || 0)} мин боя, из них у стража — ${mins(b2.guardMs || 0)}. Дары погружений — ${giftTxt([b2.gift ? b2.gift.gold : 0, b2.gift ? b2.gift.spirit : 0, b2.gift ? b2.gift.souls : 0, Object.values(gifts).flatMap(g => g[3])])}.`;
+  }
   TBL.path = T(['Шаг', 'Что', 'Отряд, уровни', 'Итог'], p2.steps.map((s, i) => [i + 1, s.kind === 'run' ? (s.b === 'b1' ? 'Мастерская' : 'Подземный лес') : `рунный страж · ${s.b === 'b1' ? 'Мастер' : 'Отголосок Виала'}`,
     (s.lvls || []).join(' / '), s.kind === 'run' ? (s.win ? 'босс пал' : `стена — этаж ${s.wall}`) : s.win ? 'победа' : 'поражение']));
   TBL.guards = T(['Страж', 'Первая победа, уровень', `Провалы до ${GUARD_SCAN[1]}-го`], scans.map(x => [x.n, x.first, x.holes.length ? x.holes.join(', ') : 'нет']));

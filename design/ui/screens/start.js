@@ -24,7 +24,12 @@
      Лавка — витрина обучения и одна покупка, первый артефакт — свой и до своего уровня (EN_START.tut);
    — пропуск обучения: «Пропустить обучение» в окне уровня, в Убежище и в настройках, подтверждение с итогом (EN_START.skip), одна
      операция OB_SRV.skip с номером; переход I → II — после пропуска и после последнего шага операцией цикла CY_SRV.advance,
-     окно — «Событие нового цикла» (screens/cycle.js, ADR-0041) со своим содержимым для цикла II.
+     окно — «Событие нового цикла» (screens/cycle.js, ADR-0041) со своим содержимым для цикла II;
+   — погружения Подземного леса (ADR-0049, EN_START.dives): перед каждым погружением — урок (obLesPopHtml) тем же окном, что уровень:
+     номер погружения, слово проводника и данные игры — приёмы героя, что открыла доблесть, круг стихий, угроза танка, хозяйка леса;
+     «Попробовать» — к окну урока; урок открывается снова из записки Убежища и листа уровня. Сид добычи погружения — сервера сценария
+     (забег полного пути), дар погружения — в конце забега операцией OB_SRV.gift по номеру забега, повтор ничего не выдаёт; итог забега
+     показывает дар.
    Арт окна уровня — OB_ART (п. 4 очереди docs/art-queue.md): рама, медальон, вспышка выдачи, знаки открытий, фонарь опыта, замок раздела;
    без выгрузки — прежний вид средствами CSS.
    Числа вида — OB_VIEW, тексты — OB_TEXT и OB_STEP_T. Движение — только transform и opacity; «меньше движения» — окно сразу, награды стоят.
@@ -43,6 +48,7 @@ const OB_VIEW = {
   maxShow: 6,        // наград строкой — не больше; остальное — «и ещё N»
   holdMs: 0,         // после «Попробовать» следующее окно ждёт смены экрана
   opsMany: 3,        // открытий больше — на узком кадре знак только у главного: иначе список не помещается по высоте
+  giftShow: 5,       // дар погружения в итоге забега: предметов значками — не больше; остальное — «и ещё N» (всё — в Запасах)
 };
 /* арт окна уровня — п. 4 очереди docs/art-queue.md (задание tools/art-gen/jobs/account-level.json), выгрузка assets/art/start/:
    медальон уровня 256 px — под числом вместо кольца опыта; вспышка выдачи 512 px — за медальоном и у каждой награды; рама окна —
@@ -78,7 +84,25 @@ const OB_TEXT = {
   skipDone: 'Обучение пропущено: цикл II', skipNot: 'Обучение уже пройдено',
   stepDone: 'Обучение пройдено', skipArt: 'артефакт',
   storeLock: 'Лавка Энериума откроется в цикле II',   // слово автора 01.10.2026: «Донатная Лавка во 2 цикле»
+  /* погружения Подземного леса и уроки (ADR-0049) */
+  dive: (j, n) => `Погружение ${j} из ${n}`, diveGo: j => `Погружение ${j}`, lesson: 'Урок', lesAgain: 'Урок погружения',
+  gift: 'Дар погружения', giftNote: 'Лес отдаёт и то, за чем пришлось бы спускаться ещё раз.', giftMore: n => `и ещё ${n}`,
+  dives: 'Погружения леса', diveDone: 'пройдено', diveNow: 'следующее',
+  valorUp: p => `+${p} % ко всем характеристикам за ступень доблести`,
+  elRule: (f, b) => `По следующей стихии круга удар ×${f}, по предыдущей — ×${b}.`, elPair: (a, b, p) => `${a} и ${b} бьют друг друга ×${p}.`,
+  elForest: 'Враги леса', elStrong: 'сильнее по', elWeak: 'слабее по', elEven: 'ровно со всеми',
+  threat: (k, o) => `Угроза танка ×${k}, у остальных в отряде — ×${o}: враги бьют того, чья угроза выше.`,
+  bossRounds: n => `Бой на её этаже — ${n} раундов. Не успел — этаж не взят.`, bossAnon: 'хозяйка леса',
 };
+/* погружения Подземного леса (ADR-0049): план — EN_START.dives (сборщик tools/content-gen/start/build.js): погружения по порядку — номер
+   забега сценария, урок перед погружением, дар после; уроки — данные (data.js, DIVES): проводник, его слово, вид урока и окно. Приёмы
+   героев и хозяйки леса, круг стихий, угроза и раунды — из данных игры (kits.js, abilities.js, biome-foes.js, battle.js): после пересборки
+   героев (ADR-0050) уроки обновятся сами */
+const OB_DV = (OB_D && OB_D.dives) || null;
+const obDiveN = () => (OB_DV ? OB_DV.list.length : 0);
+const obDive = j => (OB_DV && OB_DV.list[(+j) - 1]) || null;
+const obLesOf = j => { const d = obDive(j); return d && OB_DV.lessons[d.lesson] ? OB_DV.lessons[d.lesson] : null; };
+const obIsLes = q => typeof q === 'string' && /^d\d+$/.test(q);
 /* шаг сценария словами игрока: заголовок и пояснение — для записки Убежища, кнопки «Дальше» и причин замка. Имена — из состава и биомов */
 const OB_STEP_T = {
   hire: s => [`Нанять: ${obNm(s.id)}`, 'Место в отряде открыто — герой ждёт в Призыве за золото.', `Нанять: ${obNm(s.id)}`],
@@ -89,7 +113,8 @@ const OB_STEP_T = {
   craft: s => [`${OB_TEXT.first}: «${obRecipeName(s.r)}»`, 'Сложите его на столе Мастерской — подсказка уже там.', 'К рецепту'],
   valor: s => [`Доблесть: ${obNm(s.id)}`, 'Руна обучения ждёт своего героя.', `Доблесть: ${obNm(s.id)}`],
   limit: s => [`Рунный предел: ${obNm(s.id)}`, 'Десять рун предела ломают потолок уровня.', `Предел: ${obNm(s.id)}`],
-  run: s => [`Забег: ${obBiomeNm(s.b)}`, 'Отряд готов — дальше вниз.', s.no > 1 ? 'Ещё забег' : 'Начать забег'],
+  run: s => (s.d ? [OB_TEXT.dive(s.d, obDiveN()), `${obBiomeNm(s.b)}, урок «${(obLesOf(s.d) || { n: '' }).n}». Отряд готов — дальше вниз.`, OB_TEXT.diveGo(s.d)]
+    : [`Забег: ${obBiomeNm(s.b)}`, 'Отряд готов — дальше вниз.', s.no > 1 ? 'Ещё забег' : 'Начать забег']),
   guard: s => ['Рунный страж', 'Вход — за рунные ключи. Страж ждёт за боссом биома.', 'К рунному стражу'],
 };
 /* куда ведёт «Попробовать» и «К делу»: маршрут и вкладки — из OPEN[ключ].go данных; sel — чья книга: next — следующий герой обучения
@@ -127,8 +152,9 @@ const obHero = id => { const r = RSI[id], d = r && r.team && r.team.draft; retur
 /* новый аккаунт: всё, что видит игрок, — с нуля; разделы, которых он ещё не видит, остаются как есть и откроются уровнем */
 function obFresh(s) {
   if (!OB_R) return s;
-  /* k — шаг сценария (EN_START.script), ran — пройдено забегов и стражей сценария */
-  s.ob = { on: true, srv: OB_R.fresh(), queue: [], seen: {}, best: {}, guard: {}, hold: '', got: [], k: 0, ran: 0 };
+  /* k — шаг сценария (EN_START.script), ran — пройдено забегов и стражей сценария; les — уроки погружений, что уже встали в очередь окон,
+     gift — выданные дары погружений по номеру забега сценария (ADR-0049) */
+  s.ob = { on: true, srv: OB_R.fresh(), queue: [], seen: {}, best: {}, guard: {}, hold: '', got: [], k: 0, ran: 0, les: {}, gift: {} };
   s.acc = { level: 0, xp: 0, next: OB_R.need(0) || 1, cycle: OB_D.start.cycle };
   s.wallet = Object.assign({}, OB_D.start.wallet);
   s.heroes = []; s.selHero = '';
@@ -226,6 +252,17 @@ const OB_SRV = {
     obAcc(s);
     return r;
   },
+  /* дар погружения (ADR-0049) — в конце забега погружения, операцией по номеру забега сценария: золото, дух, души и предметы однообразных
+     забегов, которые погружение заменило (EN_START.dives.gifts). Повтор номера — прежний ответ, ничего не выдаёт; забег без дара — отказ */
+  gift(no, s = S) {
+    const g = OB_DV && OB_DV.gifts ? OB_DV.gifts[no] : null;
+    if (!g || !s.ob) return { refuse: 'none' };
+    if (s.ob.gift[no]) return { again: true, res: s.ob.gift[no] };
+    s.wallet.gold += g[0]; s.wallet.spirit += g[1]; s.wallet.souls += g[2];
+    for (const [id, q] of g[3]) s.bag.items[id] = (s.bag.items[id] || 0) + q;
+    s.ob.gift[no] = { no, gift: g };
+    return { res: s.ob.gift[no] };
+  },
   /* пропуск обучения (ADR-0040) — одна операция с номером того же «сервера» аккаунта: всё, что дало бы обучение, пройденное до конца,
      ставится итогом сценария (EN_START.skip) — с любого шага один и тот же. Повтор номера — прежний ответ, ничего не выдаёт;
      обучение уже пройдено — отказ. Энериум, покупки и всё, что не касается обучения, не трогается */
@@ -292,7 +329,14 @@ function obSync(s = S) {
   obAcc(s);
   if (s === S) obAdvance();
   if (s === S) obGates();
-  return s.ob.srv.xp !== xp0 || s.ob.srv.lvl !== lv0 || s.ob.k !== k0;
+  const q0 = s.ob.queue.length; obLesQueue(s);
+  return s.ob.srv.xp !== xp0 || s.ob.srv.lvl !== lv0 || s.ob.k !== k0 || s.ob.queue.length !== q0;
+}
+/* урок погружения встаёт в очередь окон, когда шаг сценария — само погружение: после уровней и шагов, что к нему вели (ADR-0049) */
+function obLesQueue(s = S) {
+  if (!OB_DV || !s || !s.ob || !obTutOf(s)) return;
+  const st = obStepOf(s); if (!st || st.k !== 'run' || !st.d || s.ob.les[st.d] || !obLesOf(st.d)) return;
+  s.ob.les[st.d] = 1; s.ob.queue.push('d' + st.d);
 }
 
 /* ================== обучение по сценарию (ADR-0040) ==================
@@ -306,6 +350,7 @@ function obSync(s = S) {
 const OB_SC = (OB_D && OB_D.script) || [];
 const OB_END_L = OB_SC.length ? OB_SC[OB_SC.length - 1].L : 0;   // уровень Странника, на котором сценарий кончается
 let OB_GATE_OFF = false;   // проверка мутацией: ворота сняты — законы обязаны это поймать (tools/content-gen/screens/check_start.js)
+let OB_SEED_OFF = false;   // проверка мутацией: сид погружения — свой номер забега, а не сервера сценария (ADR-0049)
 const obTutOf = s => !!(s && s.ob && s.ob.on && OB_SC.length && s.ob.k < OB_SC.length);
 const obTut = () => !OB_GATE_OFF && obTutOf(S);
 const obStepOf = (s = S) => (obTutOf(s) ? OB_SC[s.ob.k] : null);
@@ -521,7 +566,8 @@ if (typeof GD_SRV !== 'undefined') {
     const no0 = S.runNo;
     run0.call(this, 's1', biome, null, guard);
     const R = S.runNo > no0 ? S.runs.find(x => x.runNo === S.runNo) : null;
-    if (R) R.ob = s.no;
+    /* сид добычи — сервера сценария (ADR-0049): у погружения — забег полного пути, чью добычу оно даёт; номер забега на экране — свой */
+    if (R) { R.ob = s.no; if (s.d) R.d = s.d; if (s.seed && s.seed !== R.runNo && !OB_SEED_OFF) R.lootSeed = EB.seedOf(`${biome}|добыча|${s.seed}`); }
   };
 }
 /* сундук сценария, Лавка и первый артефакт — шаги сценария с заданным итогом: открыть — только сундук сценария на его шаге, купить —
@@ -601,6 +647,8 @@ endRun = function (R, vis) {
     if (R.biome === 'b2') { OB_R.fact(S.ob.srv, 'cycle:' + (S.acc.cycle + 1), 'cycle', S.acc.cycle); S.acc.cycle++; }   // переход — веха цикла, где взят
   }
   if (obOn() && R && R.ob) S.ob.ran = Math.max(S.ob.ran || 0, R.ob);   // забег сценария пройден: шаг сделан
+  /* дар погружения — в конце забега погружения, до шагов после него: дух — в уровни, золото — на найм (ADR-0049) */
+  if (obOn() && R && R.ob && !R.demo) { const r = OB_SRV.gift(R.ob); if (r.res) R.gift = r.res.gift; }
   if (obOn()) obSync();
   return obEndRun0(R, vis);
 };
@@ -658,6 +706,7 @@ function obRewardItems(L) {
 }
 function obPopHtml() {
   if (!obCanShow()) return '';
+  if (obIsLes(S.ob.queue[0])) return obLesPopHtml(S.ob.queue[0]);   // урок погружения (ADR-0049)
   const L = S.ob.queue[0], lv = obLv(L); if (!lv) return '';
   const items = obRewardItems(L), V = OB_VIEW, more = Math.max(0, items.length - V.maxShow);
   const say = lv.say || ['mage', ''], npc = typeof NPCS !== 'undefined' ? NPCS[say[0]] : null, main = OB_D.open[lv.opens[0]];
@@ -705,6 +754,105 @@ function obRecipeHtml(cls = '') {
     + `<i class="ob-rc-op eq" aria-hidden="true">${ic('arrow')}</i>`
     + (out ? `<span class="ob-rc-w out">${itWell(H.out[0], { stat: true, size: 44 })}<b>${trEsc(name)}</b></span>` : '') + '</div>';
 }
+/* ================== урок погружения (ADR-0049) ==================
+   Слово автора 02.10.2026: «…с каждым новым погружением, показывает новое окно которое не было доступно, рассказывает про навыки героя,
+   систему как и что работает». Окно урока — то же окно уровня: медальон с номером погружения, слово проводника, то, что берётся из данных
+   игры, и «Попробовать» — к окну урока. Встаёт перед погружением (obLesQueue), закрывается «Позже»; из записки Убежища открывается снова */
+const obX = v => { const a = Math.abs(v), s = a % 100 ? (a / 100).toFixed(2).replace(/0$/, '') : String(a / 100); return s.replace('.', ','); };   // 125 → «1,25», 300 → «3»
+/* герой урока — из данных: тот, кому руна обучения, или герой своей роли среди пятерых обучения (EN_START.heroes[].role) — запись
+   отряда боя (фикстура прогонов). Замена героя пятёрки — смена данных */
+const obLesHeroId = l => (l.kind === 'valor' ? OB_D.train : l.role ? (OB_D.heroes.find(h => h.role === l.role) || {}).id || null : null);
+const obLesHero = l => { const id = obLesHeroId(l); return id ? obHero(id) : null; };
+const obBossId = b => { const B = EB.BIOMES[b || (OB_DV && OB_DV.b)]; return B && B.floors.length ? B.floors[B.floors.length - 1].m[0] : ''; };
+/* строки приёмов набора: значок своего вида, имя со школой, вид и доблесть открытия, описание — те же, что на странице «Навыки» книги */
+function obAbRows(kit, valor, keep, mask) {
+  const L = EB.lib(), M = mask || (s => s);   // mask — что бестиарий ещё прячет (имя врага в описании приёма) — словами урока
+  return kit.filter(x => L[x.id] && (!keep || keep(x))).map(x => {
+    const a = Object.assign({}, L[x.id], { d: M(L[x.id].d || '') }), on = x.v <= valor;
+    /* имя приёма — своё у врага (as: «Тяжёлая лапа» у хозяйки леса), иначе — библиотеки; вид и доблесть открытия — в строке имени */
+    const what = `${AB_KIND[x.slot] || 'Способность'} · ${!x.v ? 'есть сразу' : on ? `доблесть ${x.v}` : `откроется на доблести ${x.v}`}`;
+    return abRow({ kind: x.slot, icon: (typeof abArt === 'function' && abArt(a, 32, '', on ? '' : 'off')) || ic(on ? (x.slot === 'ult' ? 'crown' : abIcon(a)) : 'lock'),
+      name: `${schoolMark(a.school)}${trEsc(x.as || a.n)}`, chip: `<small class="ab-k ob-le-k${on ? '' : ' lk'}">${what}</small>`, d: trEsc(a.d || ''), lock: !on });
+  }).join('');
+}
+/* строка героя или врага урока: имя и кто он; портрет — в медальоне окна (obLesPic) */
+const obLesHead = (name, sub) => `<p class="ob-le-h"><b>${trEsc(name)}</b><small>${sub}</small></p>`;
+/* портрет урока в медальоне: герой урока или хозяйка леса; у круга стихий — номер погружения крупно */
+function obLesPic(l) {
+  if (l.kind === 'boss') {   // облик хозяйки леса — после первой победы, как в бестиарии; до неё — номер погружения
+    const id = obBossId(), rec = typeof F === 'function' ? F(id) : null;
+    return rec && typeof FA === 'function' && typeof known === 'function' && known(id) ? { img: FA(rec), pos: typeof FPOS === 'function' ? FPOS(rec) : '50% 22%' } : null;
+  }
+  const h = l.kind === 'elements' ? null : obLesHero(l); return h && h.img ? { img: h.img, pos: '50% 16%' } : null;
+}
+/* содержимое урока — по виду: приёмы героя, что открыла доблесть, круг стихий против врагов леса, угроза и танк, хозяйка леса */
+function obLesBody(l) {
+  if (l.kind === 'hero' || l.kind === 'valor' || l.kind === 'threat') {
+    const h = obLesHero(l), K = h && typeof heroKit === 'function' ? heroKit(h) : null; if (!h || !K) return '';
+    const sub = `${trEsc(h.cls)} · ${trEsc(h.el)} · ${h.lvl} ур.${h.valor ? ` · доблесть ${h.valor}` : ''}`;
+    if (l.kind === 'valor') return obLesHead(h.name, `${sub} · ${OB_TEXT.valorUp(EB.RULES.valorPct)}`) + `<div class="rot-list ob-le-ab">${obAbRows(K.kit, h.valor, x => x.v >= 1 && x.v <= h.valor)}</div>`;
+    if (l.kind === 'threat') {
+      const C = EB.RULES.cls, thr = (C[h.cls] || {}).thr || EB.RULES.threat.base, other = Math.max(...S.heroes.filter(x => x !== h).map(x => (C[x.cls] || {}).thr || EB.RULES.threat.base), EB.RULES.threat.base);
+      return obLesHead(h.name, sub) + `<p class="ob-le-n">${OB_TEXT.threat(obX(thr), obX(other))}</p><div class="rot-list ob-le-ab">${obAbRows(K.kit, h.valor)}</div>`;
+    }
+    return obLesHead(h.name, sub) + `<div class="rot-list ob-le-ab">${obAbRows(K.kit, h.valor)}</div>`;
+  }
+  if (l.kind === 'elements') {
+    const E = EB.RULES.elem, B = EB.BIOMES[OB_DV.b], chip = el => `<span class="el" data-el="${el}">${trEsc(el)}</span>`, ar = `<i class="ob-el-ar" aria-hidden="true">${ic('arrow')}</i>`;
+    const foes = [...new Set(B.floors.flatMap(F => F.m).map(id => (EB.FOES[id] || {}).el).filter(Boolean))];
+    const rows = S.heroes.map(h => {
+      const st = foes.filter(f => EB.elemMul(h.el, f) > E.base), wk = foes.filter(f => EB.elemMul(h.el, f) < E.base);
+      const t = [st.length ? `${OB_TEXT.elStrong} ${st.map(chip).join(' ')}` : '', wk.length ? `${OB_TEXT.elWeak} ${wk.map(chip).join(' ')}` : ''].filter(Boolean).join(' · ') || OB_TEXT.elEven;
+      return `<li><img src="${h.img}" alt=""><b>${trEsc(h.name)}</b>${chip(h.el)}<span>${t}</span></li>`;
+    }).join('');
+    return `<div class="ob-el-c">${E.circle.map(chip).join(ar)}${ar}${chip(E.circle[0])}</div><p class="ob-le-n">${OB_TEXT.elRule(obX(E.fwd), obX(E.back))} ${OB_TEXT.elPair(E.pair[0], E.pair[1], obX(E.pairPct))}</p>
+      <p class="ob-le-n">${OB_TEXT.elForest}: ${foes.map(chip).join(' ')}</p><ul class="ob-el-h">${rows}</ul>`;
+  }
+  if (l.kind === 'boss') {
+    /* бестиарий открывает имя, облик и запись сказителя только после первой победы (§7, §33.4); до неё урок говорит то, что отряд видел
+       в бою: тип, стихию, раунды и её приёмы — она применяла их при встрече. Пала — имя, портрет и совет сказителя */
+    const id = obBossId(), fo = EB.FOES[id], X = window.EN_BIOME_FOES, card = X && X.cards ? X.cards[id] : null; if (!fo || !fo.kit) return '';
+    const kn = typeof known === 'function' && known(id), type = card ? card.type || 'Босс биома' : 'Босс биома';
+    const mask = kn ? null : s => s.split(fo.name).join(OB_TEXT.bossAnon);   // имя — и в описаниях её приёмов
+    return obLesHead(kn ? fo.name : type, `${kn ? trEsc(type) + ' · ' : ''}${trEsc(fo.el)} · ${OB_TEXT.bossRounds(EB.roundsOf ? EB.roundsOf('b') : EB.RULES.rounds.by.b)}`)
+      + `<div class="rot-list ob-le-ab">${obAbRows(fo.kit.kit, 0, null, mask)}</div>${kn && card && card.tip ? `<p class="ob-le-q">${trEsc(card.tip)}</p>` : ''}`;
+  }
+  return '';
+}
+function obLesPopHtml(q) {
+  const j = +String(q).slice(1), l = obLesOf(j); if (!l) return '';
+  const say = l.say || ['mage', ''], npc = typeof NPCS !== 'undefined' ? NPCS[say[0]] : null, crest = typeof shCrest === 'function' ? shCrest(say[0], ' ob-crest') : '';
+  const A = obCardArt(), n = obDiveN(), V = OB_VIEW, C = 2 * Math.PI * V.ring, pic = obLesPic(l);
+  const ring = `<svg class="ob-ring" viewBox="0 0 120 120" aria-hidden="true"><circle class="ob-r0" cx="60" cy="60" r="${V.ring}"/><circle class="ob-r1" cx="60" cy="60" r="${V.ring}" style="--ob-c:${Math.round(C)}"/></svg>`;
+  const left = S.ob.queue.length > 1 ? `<span class="ob-q" aria-label="Ещё окон: ${S.ob.queue.length - 1}">+${S.ob.queue.length - 1}</span>` : '';
+  const skip = obTut() ? `<button class="link ob-skip" data-a="obskip">${OB_TEXT.skip}</button>` : '';
+  /* медальон: портрет героя или хозяйки леса в кольце и номер погружения значком; у круга стихий — номер крупно. Под медальоном — «Погружение j из n» */
+  const face = pic ? `<img class="ob-le-pt" src="${pic.img}" alt="" style="object-position:${pic.pos}">` : '';
+  return `<div class="ob-pop" role="dialog" aria-modal="true" aria-labelledby="obT">
+    <div class="ob-scrim" aria-hidden="true"></div>
+    <div class="ob-card ob-les ob-les-${l.kind}${A.cls}"${A.style}>
+      <i class="ob-glow" aria-hidden="true"></i>
+      <div class="ob-hd${A.md ? ' md' : ''}${pic ? ' pt' : ''}">${A.hd}${ring}${face}<b class="ob-n num">${j}</b>${left}<span class="ob-dv num">${OB_TEXT.dive(j, n)}</span></div>
+      <span class="eyebrow ob-ey">${trEsc(obBiomeNm(OB_DV.b))}</span>
+      <h2 id="obT" class="ob-t">${OB_TEXT.lesson} · ${trEsc(l.n)}</h2>
+      <div class="ob-open ob-le-say">${crest}<div class="ob-say"><span class="eyebrow">${OB_TEXT.lesson} · ${trEsc(npc ? npc.n : '')}</span><p>${trEsc(say[1])}</p></div></div>
+      <div class="ob-le">${obLesBody(l)}</div>
+      <div class="ob-act">${skip}<button class="link" data-a="oblater" data-v="${q}">${OB_TEXT.later}</button><button class="btn go" data-a="obtry" data-v="${q}" aria-label="${OB_TEXT.tryIt}: ${trEsc(l.n)}">${OB_TEXT.tryIt}</button></div>
+    </div></div>`;
+}
+/* «Попробовать» урока — к его окну: книга героя на своей вкладке, бестиарий леса, карточка хозяйки леса (data.js, DIVES.lessons[].go) */
+function obGoLesson(l) {
+  const g = l.go || {}; S.overlay = null;
+  if (g.route === 'heroes') {
+    const h = obLesHero(l);
+    S.route = 'heroes'; S.seg.heroes = g.heroes || 'coll';
+    if (h) { S.hview = 'mine'; S.hgrid = 'own'; S.selHero = h.id; S.seg.hero = g.hero || 'skills'; }
+    return;
+  }
+  S.route = g.route || S.route;
+  if (g.biome && EB.BIOMES[g.biome]) S.selBiome = g.biome;
+  if (g.sheet) { const [t, a] = g.sheet.split(':'); S.overlay = t === 'foe' ? { t: 'foe', arg: a === 'boss' ? obBossId(g.biome) : a, ds: g.biome } : { t, arg: a }; }
+}
 /* ================== переход в цикл II: окно «Событие нового цикла» (GDD §2.9, ADR-0041) ==================
    Переход I → II выдаёт сценарий обучения: после последнего шага или пропуском — той же операцией сервера, что переходы II → VI
    (CY_SRV.advance, screens/cycle.js): цикл, место Памяти, «Дар пути», таблицы рейтингов цикла II с начала, окно. Окно — их, со своим
@@ -748,7 +896,7 @@ OV.obskip = function (o) {
 const obOverlay0 = overlay;
 overlay = function () { return obOverlay0() + obPopHtml(); };
 /* «Попробовать» — к механике первого открытия уровня; «Позже» — закрыть. Окно закрывает только то, что показано */
-function obDone(L) { if (!S.ob || S.ob.queue[0] !== +L) return false; S.ob.queue.shift(); S.ob.seen[L] = 1; return true; }
+function obDone(L) { if (!S.ob || String(S.ob.queue[0]) !== String(L)) return false; S.ob.queue.shift(); S.ob.seen[L] = 1; return true; }
 function obGo(key) {
   const o = OB_D.open[key], g = o && o.go; if (!g) return;
   S.overlay = null;
@@ -806,8 +954,13 @@ function obCtaHtml(s, cls = '') {
 }
 Object.assign(ACT, {
   /* «Попробовать» — к механике уровня; на уровне, где сценарий кончается, — к его последним шагам (руны предела остальным) */
-  obtry(v) { const lv = obLv(+v); if (!obDone(v)) return render(); if (obTut() && +v >= OB_END_L) { S.ob.hold = ''; return obDoStep(); } obGo(lv.opens[0]); S.ob.hold = S.route; render(); },
+  obtry(v) {
+    if (obIsLes(v)) { const l = obLesOf(String(v).slice(1)); if (!obDone(v) || !l) return render(); obGoLesson(l); S.ob.hold = S.route; return render(); }   // урок погружения — к его окну
+    const lv = obLv(+v); if (!obDone(v)) return render(); if (obTut() && +v >= OB_END_L) { S.ob.hold = ''; return obDoStep(); } obGo(lv.opens[0]); S.ob.hold = S.route; render();
+  },
   oblater(v) { obDone(v); render(); },
+  /* урок погружения ещё раз — из записки Убежища: окно встаёт первым в очередь */
+  oblesson(v) { const j = +v; if (!obLesOf(j)) return render(); S.ob.queue = S.ob.queue.filter(q => q !== 'd' + j); S.ob.queue.unshift('d' + j); S.ob.hold = ''; S.overlay = null; render(); },
   obacc(v) { obSwitch(v === 'fresh'); },
   obgo(v) { obGo(v); render(); },
   /* шаг обучения — «Дальше», «К делу», главная кнопка «Спуска» и итога забега */
@@ -872,7 +1025,15 @@ function obLevelSheet() {
       <span class="ob-lr-s">${st === 'got' ? ic('check') + OB_TEXT.done : st === 'next' ? `${fmt(OB_R.thr(l.L))} опыта` : `${fmt(OB_R.thr(l.L))}`}</span></div>`;
   }).join('');
   const src = Object.entries(OB_D.xp).map(([k, v]) => `<div class="srow"><span class="n">${OB_XPN[k] || k}</span><span class="v">${fmt(v * c)}</span><span></span></div>`).join('');
-  const body = `${head}${nx}<span class="eyebrow">Уровни 1–10 · цикл I</span><div class="col ob-lt" data-keep="oblt">${rows}</div>
+  /* погружения леса (ADR-0049): урок каждого погружения; пройденные — со своей глубиной, следующее — подсвечено; урок — открыть ещё раз */
+  const cur = on ? obStepOf() : null;
+  const dvRows = OB_DV ? OB_DV.list.map(d => {
+    const l = OB_DV.lessons[d.lesson] || { n: '' }, st = on && S.ob && (S.ob.ran || 0) >= d.no ? 'got' : cur && cur.d === d.j ? 'next' : 'wait';
+    const s2 = st === 'got' ? `${ic('check')}${d.win ? OB_TEXT.diveDone : `${OB_TEXT.diveDone} · ${d.wall}-й этаж`}` : st === 'next' ? OB_TEXT.diveNow : '';
+    return `<div class="ob-lr ${st}"><b class="num">${d.j}</b><div class="col" style="gap:2px;min-width:0"><span class="ob-lr-n">${trEsc(l.n)}</span></div>${on && st !== 'wait' ? `<button class="link ob-lr-s" data-a="oblesson" data-v="${d.j}">${s2}</button>` : `<span class="ob-lr-s">${s2}</span>`}</div>`;
+  }).join('') : '';
+  const dives = dvRows ? `<span class="eyebrow">${OB_TEXT.dives} · ${OB_TEXT.lesson.toLowerCase()} перед каждым</span><div class="col ob-lt">${dvRows}</div>` : '';
+  const body = `${head}${nx}<span class="eyebrow">Уровни 1–10 · цикл I</span><div class="col ob-lt" data-keep="oblt">${rows}</div>${dives}
     <p class="reason">${OB_TEXT.formula}</p>${TM('<p class="reason">§16: переход L → L+1 — ⌈100 × L^1,5⌉ опыта, «Дар Страннику» — 6 500 × (1 + L × 0,1) золота.</p>')}
     <span class="eyebrow">${OB_TEXT.xpSrc} · цикл ${ROMAN[c]} (×${c})</span><div class="col" style="gap:2px">${src}</div>
     <p class="reason">${OB_TEXT.xpNote}</p>${TM(`<p class="reason">EN_START: пороги ${OB_D.levels.map(l => l.xp).join(' / ')}; уровень — EnStart.claim с номером. Сценарий — docs/content/старт-с-чистого-листа.md.</p>`)}`;
@@ -914,7 +1075,7 @@ if (typeof hireView === 'function') {
 function obNextStep() {
   const s = obStepOf(); if (!s) return null;
   const t = OB_STEP_T[s.k](s);
-  return { h: t[0], p: t[1] };
+  return { h: t[0], p: t[1], d: s.k === 'run' && s.d && obLesOf(s.d) ? s.d : 0 };
 }
 if (typeof shNext === 'function') {
   const shNext0 = shNext;
@@ -925,7 +1086,7 @@ if (typeof shNext === 'function') {
     return `<div class="sh-next">${orn}${typeof shCrest === 'function' ? shCrest('mage', ' sh-next-cr') : ''}<div class="sh-next-b">
       <span class="eyebrow">${OB_TEXT.tut}</span><button class="link ob-skip" data-a="obskip">${OB_TEXT.skip}</button>
       <h2>${trEsc(x.h)}</h2><p>${trEsc(x.p)}</p>
-      <div class="sh-next-a"><button class="btn sm go" data-a="obstep" data-v="${S.ob.k}">${OB_TEXT.toDo}</button><button class="link" data-a="sheet" data-v="level">${OB_TEXT.level} ${ic('chev')}</button></div>
+      <div class="sh-next-a"><button class="btn sm go" data-a="obstep" data-v="${S.ob.k}">${OB_TEXT.toDo}</button>${x.d ? `<button class="link" data-a="oblesson" data-v="${x.d}">${OB_TEXT.lesAgain} ${ic('chev')}</button>` : `<button class="link" data-a="sheet" data-v="level">${OB_TEXT.level} ${ic('chev')}</button>`}</div>
     </div></div>`;
   };
 }
@@ -936,10 +1097,24 @@ if (typeof shActs === 'function') {
 
 /* ================== обучение на экранах: кнопка шага, подсказка рецепта, замки (ADR-0040) ================== */
 /* итог забега: «Сменить отряд» — нет (отряд собирается сам), «Ещё забег» — шаг обучения; совет «меняйте состав» — шаг словами */
+/* дар погружения в итоге забега (ADR-0049): золото, дух, души и ключи ремёсел значками, остальное — счётом; всё уже в запасах */
+function obGiftHtml(g) {
+  const tier = id => (BAG.item(id) || {}).tier || '', rank = { key: 0, unique: 1, basic: 2 };
+  const items = g[3].slice().sort((a, b) => (rank[tier(a[0])] ?? 3) - (rank[tier(b[0])] ?? 3) || b[1] - a[1]), show = items.slice(0, OB_VIEW.giftShow), more = items.length - show.length;
+  return `<div class="ob-gift"><span class="eyebrow">${OB_TEXT.gift}</span><div class="row ob-gift-r">${g[0] ? money('gold', g[0]) : ''}${g[1] ? money('spirit', g[1]) : ''}${g[2] ? money('souls', g[2]) : ''}${lootHtml(Object.fromEntries(show))}${more ? `<small class="ob-gift-m">${OB_TEXT.giftMore(more)}</small>` : ''}</div><p class="reason">${OB_TEXT.giftNote}</p></div>`;
+}
 if (OV.result) {
   const res0 = OV.result;
   OV.result = function (o) {
-    let h = res0(o); if (!h || !obTut()) return h;
+    let h = res0(o); if (!h) return h;
+    const R = runById(o.arg) || focusRun();
+    if (R && R.gift && obOn()) {   // погружение: «Погружение N из M» над итогом и дар — над добычей этажей, на виду без прокрутки
+      h = h.replace('<div class="dlg-b">', `<div class="dlg-b"><span class="eyebrow ob-dive-ey">${OB_TEXT.dive(R.d || 0, obDiveN())}</span>`);
+      const loot = '<span class="eyebrow">Добыча · в запасах</span>';
+      if (h.includes(loot)) h = h.replace(loot, obGiftHtml(R.gift) + loot);
+      else { const at = h.lastIndexOf('</div><div class="dlg-f">'); if (at > 0) h = h.slice(0, at) + obGiftHtml(R.gift) + h.slice(at); }
+    } else if (R && R.d && obOn()) h = h.replace('<div class="dlg-b">', `<div class="dlg-b"><span class="eyebrow ob-dive-ey">${OB_TEXT.dive(R.d, obDiveN())}</span>`);
+    if (!obTut()) return h;
     const s = obStepOf();
     h = h.replace(/<button class="btn" data-a="resquad"[^>]*>[\s\S]*?<\/button>/, '').replace(/<button class="btn go" data-a="again"[^>]*>[\s\S]*?<\/button>/, obCtaHtml(s));
     return h.replace('Тот же отряд пройдёт биом так же — меняйте состав или стихии.', `${OB_TEXT.tut}: ${trEsc(OB_STEP_T[s.k](s)[0])}.`);
@@ -1027,7 +1202,7 @@ function obMapHtml() {
   const P = OB_D.path || {}, m = P.min || {};
   return `<h2>Старт с чистого листа</h2>
     <p class="p-lead">Новый игрок за два биома цикла I знакомится со всеми механиками старта. Уровень Странника берётся, когда выполнен этап и набран опыт; каждый уровень — окно поверх экрана: «Уровень N», полученное, открывшееся голосом проводника и «Попробовать». Включить — «Аккаунт: Чистый лист» в панели прототипа.</p>
-    <div class="p-kpis"><div class="p-kpi"><span class="n">${Math.round((m.b1 || 0) / 60)}<i>мин</i></span><small>боя в Мастерской форм: три забега и страж</small></div><div class="p-kpi"><span class="n">${Math.round((m.b2 || 0) / 60)}<i>мин</i></span><small>забегов в Подземном лесу: ещё трое героев, доблесть и предел</small></div><div class="p-kpi"><span class="n">10</span><small>уровней сценария; дальше — формула §16</small></div></div>
+    <div class="p-kpis"><div class="p-kpi"><span class="n">${Math.round((m.b1 || 0) / 60)}<i>мин</i></span><small>боя в Мастерской форм: три забега и страж</small></div><div class="p-kpi"><span class="n">${obDiveN()}<i>погружений</i></span><small>в Подземный лес, ${Math.round((m.b2 || 0) / 60)} мин боя: перед каждым — урок, после — дар погружения; ещё трое героев, доблесть и предел</small></div><div class="p-kpi"><span class="n">10</span><small>уровней сценария; дальше — формула §16</small></div></div>
     <div class="ob-map-w"><table class="ob-map"><thead><tr><th>Ур.</th><th>Этап</th><th>Открывается</th><th>Награда</th><th>Порог</th></tr></thead><tbody>${rows}</tbody></table></div>
     <p class="p-note">Данные — design/ui/start.js (сборщик tools/content-gen/start/build.js), обоснование — docs/content/старт-с-чистого-листа.md.</p>`;
 }

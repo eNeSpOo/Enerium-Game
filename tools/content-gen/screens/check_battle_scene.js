@@ -19,6 +19,13 @@
       RULES.floor.ritual и минимум RULES.floor.minMs — целые мс; взятый этаж с ритуалом кончается не раньше b.t (конец боя по ядру) — и на
       экране, и у свёрнутого забега, время показа идёт ровно тактом (и на последнем такте ритуала), ритуал на экране показан, его «+N» —
       ровно то, что зачислено в кошелёк, с циклом и артефактами игрока. UI-кит: раздел «Бой AAA» рисуется.
+   F. Поход на новый этаж (ADR-0048, слова автора 02.10.2026): ожидания с плашкой нет — добыча летит в кошелёк, а остаток этажа — путь:
+      отряд переходит дальше и идёт по биому, экран затемняется, в темноте — новая арена того же биома, она открывается, затем новый этаж
+      и выход врагов. Законы: фазы идут ровно в этом порядке, затемнение, темнота и новая арена — своей длительности из данных, шаг — весь
+      остаток; длительность этажа та же — новый этаж приходит ровно тогда, когда кончается путь, и время забега прибавляет b.t + gapMs;
+      затемнение, темнота и новая арена помещаются в переход gapMs; фон едет, отряд шагает, павшие уходят — только transform и opacity,
+      при «меньше движения» — тот же порядок без движения; арены этажей — по четыре на биом 1–4, этаж берёт свою по номеру, соседние —
+      разные, на экране боя — арена своего этажа, в темноте — арена следующего; готовые арены — на диске и в описи выгрузки.
    Мутации: каждая ломает закон — он обязан упасть.
    Запуск: node tools/content-gen/screens/check_battle_scene.js */
 'use strict';
@@ -28,9 +35,13 @@ const { SERVICE, playerText } = require('./check_player_view.js');
 /* проверочные числа: минимум этажа для пробы ритуала (данные калькулятора фарма могут быть любыми, проба — своим числом), шаг хода
    пробы и предел шагов, мс */
 const RITUAL_TEST_MS = 120000, STEP_MS = 50, STEPS_MAX = 4000;
-/* «меньше движения»: сведения, которым battle-scene.css возвращает длительность; песок тает сжатием — ему transform можно */
-const CALM_INFO = ['.fly', '.fly.crit', '.bs-call', '.bs-call.ult', '.bt-banner.bs-ban', '.bs-rflash', '.bs-transit', '.bs-loot', '.bs-taken', '.bs-taken .sand>i'];
-const CALM_MOVE_OK = ['.bs-taken .sand>i'];
+/* «меньше движения»: сведения, которым battle-scene.css возвращает длительность */
+const CALM_INFO = ['.fly', '.fly.crit', '.bs-call', '.bs-call.ult', '.bt-banner.bs-ban', '.bs-rflash', '.bs-loot'];
+/* поход на новый этаж: живые герои шагают — правило battle-scene.css; фазы пути — по порядку автора (ADR-0048) */
+const WALK_SEL = '.bt.bs-march .bt-side.h .bc:not(.dead)';
+const TRIP_ORDER = ['settle', 'march', 'dark', 'black', 'open'];
+/* арены этажей: по стольку на биом, у биомов 1–4 (ADR-0048: нынешняя и три новых) */
+const ARENAS_PER_BIOME = 4, ARENA_BIOMES = ['b1', 'b2', 'b3', 'b4'];
 /* селектор боя: поле, карты, числа, надписи, плашки, спрайты, значки, рамки */
 const BATTLE_SEL = /\.(?:bt(?:-[\w-]+)?|bc|fly|bs-[\w-]+|vx[\w-]*|vf|si2|fxl|sfc?|sfa|bsf|bsi-[\w-]+)(?![\w-])/;
 
@@ -38,13 +49,14 @@ const ROOT = path.join(__dirname, '..', '..', '..'), UI = path.join(ROOT, 'desig
 const read = f => fs.readFileSync(path.join(UI, f), 'utf8');
 const err = [];
 const say = m => { if (err.length < 60) err.push(m); else if (err.length === 60) err.push('… и ещё ошибки'); };
-const cnt = { battles: 0, cards: 0, badges: 0, insp: 0, abs: 0, art: 0, uniq: 0, sts: 0, kinds: 0, frames: 0, kf: 0 };
+const cnt = { battles: 0, cards: 0, badges: 0, insp: 0, abs: 0, art: 0, uniq: 0, sts: 0, kinds: 0, frames: 0, kf: 0, trips: 0, tripMs: [], floors: 0, arenaReady: 0, arenaPlan: 0 };
 let CNT = null;   // счёт первого прохода — мутации прогоняют законы снова
 function done(extra) {
   const c = CNT || cnt;
   if (err.length) { console.log('ОШИБКИ:\n' + err.map(e => '  ✗ ' + e).join('\n')); process.exit(1); }
   console.log(`Бой AAA: боёв ${c.battles}, карт ${c.cards} (в трёх видах), значков ${c.badges}; окон карты ${c.insp}: способностей ${c.abs} (рисованная иконка — у ${c.art}, своя уникальная — у ${c.uniq}), эффектов ${c.sts}; видов эффекта ${c.kinds} — и с «меньше движения», кадров анимации ${c.frames}, анимаций CSS боя ${c.kf}.${extra ? ' ' + extra : ''}`);
-  console.log('Проверка пройдена: здоровье числом и щит отдельно, значки эффектов с раундами и стаками; окно карты — способности с иконкой и шансом, эффекты с раундами и тем, кто наложил, иммунитет и раунды типа; эффекты — только transform и opacity, «меньше движения»; режим «Игрок»; значки, спрайты, рамки и HUD на диске; ритуал этажа; мутации пойманы.');
+  console.log(`Поход на новый этаж: путей ${c.trips} (${c.tripMs.join(', ')}), этажей с ареной по номеру ${c.floors}; арены этажей готовы ${c.arenaReady} из ${c.arenaPlan}${c.arenaReady < c.arenaPlan ? ' — остальные ждут генерации (docs/art-queue.md), этаж берёт готовые' : ''}.`);
+  console.log('Проверка пройдена: здоровье числом и щит отдельно, значки эффектов с раундами и стаками; окно карты — способности с иконкой и шансом, эффекты с раундами и тем, кто наложил, иммунитет и раунды типа; эффекты — только transform и opacity, «меньше движения»; режим «Игрок»; значки, спрайты, рамки и HUD на диске; ритуал этажа и поход на новый этаж; мутации пойманы.');
   process.exit(0);
 }
 
@@ -383,11 +395,25 @@ function lawCss(sceneCss) {
       if (!layer && !seen.has(n)) { seen.add(n); cnt.kf++; }
       const bad = kf[n].filter(p => p !== 'opacity' && p !== 'transform');
       if (bad.length) out.push(`${layer}${s} — анимация ${n} крутит ${bad.join(', ')}: только transform и opacity`);
-      if (layer && kf[n].includes('transform') && CALM_INFO.includes(s) && !CALM_MOVE_OK.includes(s)) out.push(`${layer}${s} движется (${n}) — сведения только гаснут`);
+      if (layer && kf[n].includes('transform') && CALM_INFO.includes(s)) out.push(`${layer}${s} движется (${n}) — сведения только гаснут`);
     }
   }
   for (const s of CALM_INFO) if (!/^var\(--bs-d\b[^)]*\)\s*!important$/.test(calmDur[s] || '')) out.push(`«меньше движения»: у ${s} нет длительности var(--bs-d) !important — общее правило index.html погасит его мгновенно`);
   if ((calm['.bt-side.f.enter .bc'] || []).join() !== 'none') out.push('«меньше движения»: выход врагов идёт анимацией — с общим правилом index.html карты врагов замрут в её последнем кадре');
+  /* поход на новый этаж: живые герои шагают; при «меньше движения» — стоят (ADR-0048: тот же порядок без движения) */
+  if (!(norm[WALK_SEL] || []).includes('walk')) out.push(`поход: отряд не шагает — у ${WALK_SEL} нет анимации walk`);
+  if ((calm[WALK_SEL] || []).join() !== 'none') out.push(`«меньше движения»: отряд шагает в походе — у ${WALK_SEL} не animation:none`);
+  /* завеса затемнения — над полем боя, под шапкой и линейкой этажей; нажатия проходят сквозь неё */
+  {
+    const zOf = (css, sel) => { const m = css.match(new RegExp(sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\{([^}]*)\\}')); const z = m && m[1].match(/z-index:\s*(\d+)/); return z ? +z[1] : null; };
+    const style = [...html.matchAll(/<style>([\s\S]*?)<\/style>/g)].map(m => m[1]).join('\n');
+    const veil = sceneCss.match(/\.bs-veil\{([^}]*)\}/), zv = zOf(sceneCss, '.bs-veil'), zf = zOf(style, '.bt-field'), zh = zOf(style, '.bt-hud');
+    if (!veil) out.push('поход: нет завесы затемнения .bs-veil');
+    else {
+      if (!/pointer-events:\s*none/.test(veil[1])) out.push('поход: завеса затемнения ловит нажатия — нужен pointer-events:none');
+      if (zv == null || zf == null || zh == null || !(zv > zf && zv < zh)) out.push(`поход: завеса затемнения (z-index ${zv}) — не над полем боя (${zf}) и не под шапкой (${zh})`);
+    }
+  }
   /* окно карты закрывают атрибутом hidden: правило с display у .bt-insp.bs-insp сильнее .bt-insp[hidden] из index.html — нужно своё */
   if (/\.bt-insp\.bs-insp\{[^}]*display\s*:/.test(sceneCss) && !/\.bt-insp\.bs-insp\[hidden\]\{display:none\}/.test(sceneCss)) out.push('окно карты: закрытое остаётся на экране — нет .bt-insp.bs-insp[hidden]{display:none}');
   return out;
@@ -400,11 +426,20 @@ for (const e of L.C()) say(`закон C: ${e}`);
 const ART = JSON.parse(fs.readFileSync(path.join(ROOT, 'tools', 'art-gen', 'ui-art.json'), 'utf8')).items;
 const onDisk = p => fs.existsSync(path.join(UI, 'assets', 'art', p));
 const inSpec = p => !!ART[p] && fs.existsSync(path.join(ROOT, 'art', 'generated', typeof ART[p] === 'string' ? ART[p] : ART[p].from));
-/* ход забега до конца первого этажа рядовых: свёрнутый или на экране — конец этажа не раньше b.t, ритуал на экране показан; на экране —
-   цикл II и все артефакты Странника с добычей на пределе: «+N» ритуала — ровно то, что floorDone зачислил в кошелёк */
-function ritualRun(vis) {
-  const out = [], EB = T.EB, F = EB.RULES.floor, mm0 = F.minMs;
-  F.minMs = Object.assign({}, mm0, { o: RITUAL_TEST_MS });
+/* ход забега через первый этаж рядовых — до начала следующего этажа: свёрнутый или на экране — конец этажа не раньше b.t, ритуал на
+   экране показан; на экране — цикл II и все артефакты Странника с добычей на пределе: «+N» ритуала — ровно то, что floorDone зачислил в
+   кошелёк. Закон F — поход на новый этаж, на экране: фазы пути на каждом такте, кадры анимаций пути (фон, павшие, завеса) и то, что ложится
+   в #bt; calm — то же при «меньше движения». Арены на время пробы — все задуманные готовы: смена арены видна и до генерации новых */
+const ANIM_KEYS = new Set(['transform', 'opacity', 'offset', 'easing', 'composite']);
+function ritualRun(vis, calm, noRit) {
+  const out = [], EB = T.EB, F = EB.RULES.floor, mm0 = F.minMs, A = T.BS_ART, ready0 = A.arenaReady, media0 = win.matchMedia;
+  const what = (vis ? (calm ? 'на экране при «меньше движения»' : 'на экране') : 'свёрнутый') + (noRit ? ', бой длиннее минимума' : ''), fn = n => vm.runInContext(n, ctx);
+  /* #bt пробы: фон, павшие и завеса пишут свои кадры анимаций, всё, что ложится в #bt, — в список */
+  const bt = document.getElementById('bt'), q0 = bt.querySelector, a0 = bt.appendChild, rec = [], recEls = {}, added = [];
+  const mkRec = sel => { const e = stubEl(sel); e.animate = (kf, o) => { rec.push({ sel, kf, o }); return {}; }; e.querySelector = () => null; return e; };
+  F.minMs = Object.assign({}, mm0, { o: noRit ? 0 : RITUAL_TEST_MS });   // без ритуала: бой длиннее минимума — путь = доигрыш удара и переход
+  if (vis) A.arenaReady = Object.values(A.arenas).flat();
+  if (calm) win.matchMedia = () => ({ matches: true, addEventListener() {}, addListener() {} });
   try {
     fresh();
     if (vis) {
@@ -414,31 +449,85 @@ function ritualRun(vis) {
     vm.runInContext('typeof syncCycle === "function" && syncCycle()', ctx);   // вариант биома по циклу — как перед стартом забега
     const B = EB.BIOMES.b1, fl = B.floors.findIndex(f => f.g === 'o') + 1;
     run('ритуал · старт', () => T.startRun('s1', 'b1', fl));
-    const R = lastRun(), what = vis ? 'на экране' : 'свёрнутый';
+    const R = lastRun();
     if (!R || !R.b) return [`ритуал ${what}: забег не начался`];
     if (vis) { T.S.focus = R.id; T.S.route = 'battle'; } else T.S.route = 'descent';
-    let early = false, shown = null, step = 0;
-    for (let n = 0; n < STEPS_MAX && !R.over && R.floor === fl && !(R.gap > 0); n++) {
-      const v0 = R.view;
-      run(`ритуал ${what} · ход`, () => vm.runInContext('advance', ctx)(R, STEP_MS));   // нынешний advance: мутации подменяют глобальный
-      if (R.view - v0 !== STEP_MS && !step) step = R.view - v0;   // время показа идёт ровно тактом — и на последнем такте ритуала
-      const b = R.b;
+    bt.__bsTrip = null;
+    bt.querySelector = sel => /^\.(?:bt-bgs|bt-side\.f|bs-veil)$/.test(sel) ? (recEls[sel] = recEls[sel] || mkRec(sel)) : q0.call(bt, sel);
+    bt.appendChild = x => { added.push(String(x && x.className || '')); return x; };
+    const b = R.b, bgsOf = h => (h.match(/<div class="bt-bgs">([\s\S]*?)<\/div>/) || [])[1] || '';
+    const cur = fn('bsArenaUrl')('b1', fl), want = fn('bsArenaUrl')('b1', fl + 1);
+    if (vis && !bgsOf(draw('поход · этаж ' + fl)).includes(`src="${cur}"`)) out.push(`поход: экран этажа ${fl} — не на арене своего этажа (${cur})`);
+    let early = false, shown = null, step = 0, t0 = null, doneAt = null, next = null, runMs = null, tot = null, totBad = false, sp0 = null;
+    const phases = [];
+    for (let n = 0; n < STEPS_MAX && !R.over; n++) {
+      const v0 = R.view, gap0 = R.gap > 0;
+      run(`ритуал ${what} · ход`, () => fn('advance')(R, STEP_MS));   // нынешний advance: мутации подменяют глобальный
+      if (R.floor !== fl) { next = n; break; }   // новый этаж
+      if (!gap0 && R.view - v0 !== STEP_MS && !step) step = R.view - v0;   // время показа идёт ровно тактом — и на последнем такте ритуала
+      if (b.over && t0 == null) t0 = n;
       if (b.over && b.win && b.ritualMs > 0 && shown == null) shown = R.bsRit === b;
-      if (b.over && R.view < b.t && (R.gap > 0 || R.floor !== fl)) early = true;
+      if (b.over && R.view < b.t && R.gap > 0) early = true;
+      if (R.gap > 0 && doneAt == null) { doneAt = n; runMs = R.runMs; }
+      if (vis) {
+        const C = fn('bsTripClock')(R);
+        if (C) { if (tot == null) { tot = C.total; sp0 = fn('bsTripSpans')(C); } else if (C.total !== tot) totBad = true; }
+        phases.push(fn('bsTripPhase')(R));
+      }
     }
-    const b = R.b;
     if (!b.over || !b.win) out.push(`ритуал ${what}: этаж ${fl} Мастерской не взят — проверить нечем`);
-    else if (!(b.ritualMs > 0)) out.push(`ритуал ${what}: ядро не дотянуло этаж до минимума — ritualMs ${b.ritualMs}`);
+    else if (!noRit && !(b.ritualMs > 0)) out.push(`ритуал ${what}: ядро не дотянуло этаж до минимума — ritualMs ${b.ritualMs}`);
+    else if (noRit && b.ritualMs > 0) out.push(`ритуал ${what}: у пробы без минимума ядро добавило ритуал ${b.ritualMs} мс`);
     else if (early) out.push(`ритуал ${what}: этаж кончился раньше конца боя по ядру (b.t ${b.t} мс)`);
-    else if (!(R.gap > 0) && R.floor === fl) out.push(`ритуал ${what}: этаж не кончился за ${STEPS_MAX * STEP_MS} мс`);
-    if (vis && b.ritualMs > 0 && !shown) out.push('ритуал на экране: «Этаж взят» и добыча не показаны — advance не позвал bsRitual');
+    else if (doneAt == null) out.push(`ритуал ${what}: этаж не кончился за ${STEPS_MAX * STEP_MS} мс`);
+    else if (next == null) out.push(`ритуал ${what}: новый этаж не начался за ${STEPS_MAX * STEP_MS} мс`);
+    if (vis && b.ritualMs > 0 && !shown) out.push('ритуал на экране: добыча не показана — advance не позвал bsRitual');
     if (step) out.push(`ритуал ${what}: за такт ${STEP_MS} мс время показа прибавило ${step} мс`);
+    /* стена фарма (ADR-0044): этаж с переходом прибавляет к забегу ровно b.t + gapMs — поход её не меняет */
+    if (runMs != null && runMs !== b.t + F.gapMs) out.push(`ритуал ${what}: этаж прибавил забегу ${runMs} мс, а ядро — b.t + gapMs = ${b.t + F.gapMs}`);
     if (vis && b.ritualMs > 0 && shown) {
       const G = R.bsLoot || {}, Lt = R.loot, pairs = [['gold', G.gold, Lt.gold], ['spirit', G.spirit, Lt.spirit], ['souls', G.souls, Lt.souls], ['рунный ключ', G.runeKeys || 0, Lt.keys || 0]];
       for (const [k, a, z] of pairs) if (a !== z) out.push(`ритуал на экране: «+N» добычи (${k} ${a}) не сходится с кошельком (${z}) — артефакты и цикл игрока (lootCtx)`);
       if (!vm.runInContext('lootCtx()', ctx)) out.push('ритуал на экране: у пробы нет прибавок цикла и артефактов — сверять нечего');
     }
-  } finally { F.minMs = mm0; }
+    /* ================== закон F: поход на новый этаж ================== */
+    if (vis && next != null && t0 != null) {
+      const Q = F.ritual, seq = phases.slice(t0), order = seq.filter((p, i) => p !== seq[i - 1]), len = k => seq.filter(p => p === k).length * STEP_MS;
+      if (tot == null) out.push(`поход ${what}: часов пути нет — путь не начался`);
+      else {
+        if (totBad) out.push(`поход ${what}: длина пути меняется по ходу`);
+        /* длительность этажа та же: новый этаж приходит ровно тогда, когда кончается путь */
+        const real = (next - t0) * STEP_MS;
+        if (real < tot || real - tot >= STEP_MS) out.push(`поход ${what}: новый этаж пришёл через ${real} мс после конца боя, а путь — ${tot} мс: длительность этажа изменилась`);
+        if (order.join() !== TRIP_ORDER.join()) out.push(`поход ${what}: фазы ${order.map(p => p || '—').join(' → ')}, ждали ${TRIP_ORDER.join(' → ')}`);
+        for (const [k, ms] of [['dark', Q.darkMs], ['black', Q.blackMs], ['open', Q.openMs]]) if (Math.abs(len(k) - ms) > STEP_MS) out.push(`поход ${what}: фаза «${k}» идёт ${len(k)} мс, в данных ${ms}`);
+        const march = sp0 ? sp0[1][2] - sp0[1][1] : 0;
+        if (!(len('march') > 0)) out.push(`поход ${what}: отряд не идёт дальше — шага нет`);
+        else if (Math.abs(len('march') - march) > 2 * STEP_MS) out.push(`поход ${what}: шаг идёт ${len('march')} мс, а остаток пути — ${march}`);
+        if (!CNT && !calm) { cnt.trips++; cnt.tripMs.push(`${noRit ? 'бой длиннее минимума' : 'рядовые с ритуалом'}: путь ${tot} мс, шаг ${len('march')}`); }
+      }
+      /* ожидания нет — ни «Этаж взят» с песком, ни «Спуск ниже»; добыча летит в кошелёк */
+      if (added.some(c => /\bbs-(?:taken|transit)\b/.test(c))) out.push(`поход ${what}: вернулась плашка ожидания — ${added.filter(c => /\bbs-(?:taken|transit)\b/.test(c)).join(', ')}`);
+      if (!added.some(c => /\bbs-loot\b/.test(c))) out.push(`поход ${what}: добыча этажа не летит в кошелёк — нет плашки «+N»`);
+      /* кадры: только transform и opacity; фон едет и павшие уходят, при «меньше движения» — ничто не движется; завеса — затемнение, затем новая арена */
+      const kfs = sel => rec.filter(x => x.sel === sel).map(x => x.kf), moved = x => x.kf.some(k => k.transform != null);
+      for (const x of rec) for (const k of x.kf) for (const p of Object.keys(k)) if (!ANIM_KEYS.has(p)) out.push(`поход ${what}: кадр ${x.sel} двигает «${p}» — только transform и opacity`);
+      if (calm) { const m = rec.filter(moved); if (m.length) out.push(`«меньше движения»: в походе движется ${[...new Set(m.map(x => x.sel))].join(', ')}`); }
+      else {
+        if (!kfs('.bt-bgs').some(kf => kf.some(k => k.transform != null))) out.push(`поход ${what}: фон не едет — отряд не переходит дальше`);
+        if (!kfs('.bt-side.f').some(kf => kf.some(k => k.transform != null))) out.push(`поход ${what}: павшие не уходят со своей комнатой`);
+      }
+      if (!kfs('.bt-side.f').some(kf => kf[kf.length - 1].opacity === 0)) out.push(`поход ${what}: павшие не гаснут`);
+      const veil = kfs('.bs-veil').map(kf => `${kf[0].opacity}→${kf[kf.length - 1].opacity}`).join(', ');
+      if (veil !== '0→1, 1→0') out.push(`поход ${what}: завеса ${veil || 'не двигалась'} — ждали затемнение 0→1, затем новую арену 1→0`);
+      /* арена: в темноте — арена следующего этажа, новый этаж — на ней же */
+      if (want === cur) out.push(`поход ${what}: у этажей ${fl} и ${fl + 1} одна арена — смены нет`);
+      if (!((recEls['.bt-bgs'] || {}).innerHTML || '').includes(`src="${want}"`)) out.push(`поход ${what}: в темноте не арена следующего этажа (${want})`);
+      if (!bgsOf(draw('поход · этаж ' + (fl + 1))).includes(`src="${want}"`)) out.push(`поход ${what}: экран этажа ${fl + 1} — не на арене своего этажа (${want})`);
+    }
+  } finally {
+    F.minMs = mm0; A.arenaReady = ready0; win.matchMedia = media0; bt.querySelector = q0; bt.appendChild = a0; bt.__bsTrip = null;
+  }
   return out;
 }
 L.E = () => {
@@ -482,8 +571,42 @@ L.E = () => {
   for (const k of ['melee', 'arrow', 'magic']) if (!T.BS_ART.abIcons.basic[k]) out.push(`обычная атака вида «${k}» (RULES.cls, fx): нет иконки в BS_ART.abIcons.basic`);
   const F = EB.RULES.floor;
   if (!F.minMs || ['o', 'e', 'b', 'guard'].some(k => !Number.isInteger(F.minMs[k]) || F.minMs[k] < 0)) out.push('RULES.floor.minMs: не целые мс по виду этажа');
-  if (!F.ritual || ['enterMs', 'stepMs', 'fallMs', 'takenMs', 'lootMs'].some(k => !Number.isInteger(F.ritual[k]) || F.ritual[k] <= 0)) out.push('RULES.floor.ritual: фазы показа — не целые мс');
-  return out.concat(ritualRun(false), ritualRun(true));
+  const RK = ['enterMs', 'stepMs', 'fallMs', 'takenMs', 'lootMs', 'roomMs', 'darkMs', 'blackMs', 'openMs'];
+  if (!F.ritual || RK.some(k => !Number.isInteger(F.ritual[k]) || F.ritual[k] <= 0)) out.push('RULES.floor.ritual: фазы показа — не целые мс');
+  /* затемнение, темнота и новая арена — в переходе gapMs: конец этажа (добыча, осада) — до затемнения, и при бое длиннее минимума тоже */
+  else if (F.ritual.darkMs + F.ritual.blackMs + F.ritual.openMs > F.gapMs) out.push(`поход: затемнение, темнота и новая арена — ${F.ritual.darkMs + F.ritual.blackMs + F.ritual.openMs} мс, длиннее перехода gapMs ${F.gapMs}`);
+  /* закон F, данные: арены этажей биомов 1–4 — по четыре, первая — нынешняя арена биома; готовые — на диске и в описи, выгруженные — в
+     arenaReady; этаж берёт свою по номеру, соседние этажи — разные, при каждом вызове — та же (пробуем со всеми задуманными готовыми) */
+  {
+    const AR = T.BS_ART.arenas || {}, RD = T.BS_ART.arenaReady || [], all = Object.values(AR).flat();
+    for (const id of ARENA_BIOMES) {
+      const list = AR[id], base = id === 'b1' ? 'arena-workshop.jpg' : `arena-${id}.jpg`;
+      if (!EB.BIOMES[id]) out.push(`арены этажей: биома ${id} нет в ядре`);
+      if (!list) { out.push(`арены этажей: у биома ${id} нет списка в BS_ART.arenas`); continue; }
+      if (list.length !== ARENAS_PER_BIOME || new Set(list).size !== list.length) out.push(`арены этажей ${id}: ${list.length}, ждали ${ARENAS_PER_BIOME} разных`);
+      if (list[0] !== base) out.push(`арены этажей ${id}: первая — ${list[0]}, а нынешняя арена биома — ${base}`);
+    }
+    for (const p of RD) {
+      if (!all.includes(p)) out.push(`BS_ART.arenaReady: ${p} — нет в BS_ART.arenas`);
+      if (!onDisk(p) || !inSpec(p)) out.push(`арена этажа ${p}: в arenaReady, но нет на диске или в ui-art.json с исходником`);
+    }
+    for (const p of all) if (!RD.includes(p) && onDisk(p) && inSpec(p)) out.push(`арена этажа ${p} выгружена, но её нет в BS_ART.arenaReady — этаж её не берёт`);
+    if (!CNT) { cnt.arenaPlan = all.length; cnt.arenaReady = all.filter(p => RD.includes(p)).length; }
+    const of = vm.runInContext('bsArenaOf', ctx);
+    /* этажей у биома — у самого длинного его варианта: короткий обучения и полный с цикла II (ADR-0044) */
+    const floorsOf = id => { const B = EB.BIOMES[id] || {}; return Math.max((B.floors || []).length, ((B.full || {}).floors || []).length); };
+    T.BS_ART.arenaReady = all;
+    try {
+      for (const id of Object.keys(AR)) for (let f = 1; f < floorsOf(id); f++) {
+        const a = of(id, f), z = of(id, f + 1);
+        if (!a || !z || a === z) { out.push(`арены этажей ${id}: этажи ${f} и ${f + 1} — ${a && a === z ? 'одна арена ' + a : 'без арены'}`); break; }
+        if (of(id, f) !== a) { out.push(`арены этажей ${id}: этаж ${f} берёт то одну арену, то другую`); break; }
+        if (!CNT) cnt.floors++;
+      }
+      if (of('b1', 1) !== AR.b1[0]) out.push('арены этажей: первый этаж и страж — не на первой арене биома');
+    } finally { T.BS_ART.arenaReady = RD; }
+  }
+  return out.concat(ritualRun(false), ritualRun(true), ritualRun(true, true), ritualRun(true, false, true));
 };
 for (const e of L.E()) say(`закон E: ${e}`);
 {
@@ -529,6 +652,17 @@ const MUT = [
   ['E', 'последний такт ритуала прибавляет время дважды', 'advance__ = advance; advance = function (R, ms) { const b = R.b; if (b && b.over && b.ritualMs > 0 && !(R.gap > 0) && R.view < b.t && R.view + ms >= b.t) R.view += ms; return advance__(R, ms); };', 'advance = advance__;'],
   ['E', 'добыча ритуала — без цикла и артефактов игрока', `bsRitual__ = bsRitual; bsRitual = ${(read('screens/battle-scene.js').replace(/\r\n/g, '\n').match(/function bsRitual\(R\) \{\n[\s\S]*?\n\}\n/) || [''])[0]
     .replace("typeof lootCtx === 'function' ? lootCtx() : null", 'null').replace('function bsRitual(R)', 'function (R)') || 'bsRitual'};`, 'bsRitual = bsRitual__;'],
+  /* закон F — поход на новый этаж */
+  ['E', 'путь удлиняет этаж', 'floorDone__ = floorDone; floorDone = function (R, vis) { const r = floorDone__(R, vis); if (R.gap > 0) R.gap += 500; return r; };', 'floorDone = floorDone__;'],
+  ['E', 'новая арена раньше затемнения', 'bsTripSpans__ = bsTripSpans; bsTripSpans = T => { const s = bsTripSpans__(T); return [s[0], s[1], s[4], s[3], s[2]]; };', 'bsTripSpans = bsTripSpans__;'],
+  ['E', 'затемнения нет', 'EB.RULES.floor.ritual.darkMs__ = EB.RULES.floor.ritual.darkMs; EB.RULES.floor.ritual.darkMs = 0;', 'EB.RULES.floor.ritual.darkMs = EB.RULES.floor.ritual.darkMs__; delete EB.RULES.floor.ritual.darkMs__;'],
+  ['E', 'затемнение длиннее перехода', 'EB.RULES.floor.ritual.darkMs__ = EB.RULES.floor.ritual.darkMs; EB.RULES.floor.ritual.darkMs = EB.RULES.floor.gapMs;', 'EB.RULES.floor.ritual.darkMs = EB.RULES.floor.ritual.darkMs__; delete EB.RULES.floor.ritual.darkMs__;'],
+  ['E', 'арена этажа не меняется', 'bsArenaOf__ = bsArenaOf; bsArenaOf = (b, f) => bsArenaOf__(b, 1);', 'bsArenaOf = bsArenaOf__;'],
+  ['E', 'в темноте — прежняя арена', 'bsTripPaint__ = bsTrip; bsTrip = function (R) { const f = R.floor; R.floor = f - 1; try { return bsTripPaint__(R); } finally { R.floor = f; } };', 'bsTrip = bsTripPaint__;'],
+  ['E', 'фон стоит — отряд не идёт дальше', 'bsTripKf__ = bsTripKf; bsTripKf = (calm, bw) => Object.assign(bsTripKf__(calm, bw), { march: null });', 'bsTripKf = bsTripKf__;'],
+  ['E', 'при «меньше движения» фон едет', 'bsTripKf__ = bsTripKf; bsTripKf = (calm, bw) => bsTripKf__(false, bw);', 'bsTripKf = bsTripKf__;'],
+  ['E', 'плашка ожидания вернулась', `bsRitual__ = bsRitual; bsRitual = function (R) { const e = document.createElement('div'); e.className = 'bs-taken'; document.getElementById('bt').appendChild(e); return bsRitual__(R); };`, 'bsRitual = bsRitual__;'],
+  ['E', 'добыча этажа не летит', 'bsLootFly__ = bsLootFly; bsLootFly = () => {};', 'bsLootFly = bsLootFly__;'],
 ];
 let caught = 0;
 for (const [k, what, brk, fix] of MUT) {
@@ -545,7 +679,10 @@ const FXMUT = [
   ['поле трясётся и при «меньше движения»', () => lawFx(fxSrc.replace('if (calm() || dead) return;', 'if (dead) return;'))],
   ['анимация CSS боя крутит фильтр', () => lawCss(sceneCss.replace('@keyframes bsCutPulse{0%,100%{transform:scale(1)}20%{transform:scale(1.08)}}', '@keyframes bsCutPulse{0%,100%{filter:none}20%{filter:brightness(1.4)}}'))],
   ['прежняя анимация удара — свойства rotate и translate', () => lawCss(sceneCss.replace(/@keyframes cshake\{(?:[^{}]*\{[^{}]*\})*\}/, ''))],
-  ['песок гаснет мгновенно при «меньше движения»', () => lawCss(sceneCss.replace(',.bs-taken .sand>i{animation-duration:var(--bs-d,1s)!important}', '{animation-duration:var(--bs-d,1s)!important}'))],
+  ['надпись «Раунд N» гаснет мгновенно при «меньше движения»', () => lawCss(sceneCss.replace(',.bs-rflash,.bs-loot{animation-duration:var(--bs-d,1s)!important}', ',.bs-loot{animation-duration:var(--bs-d,1s)!important}'))],
+  ['отряд шагает в походе и при «меньше движения»', () => lawCss(sceneCss.replace('  .bt.bs-march .bt-side.h .bc:not(.dead){animation:none}', ''))],
+  ['отряд не шагает в походе', () => lawCss(sceneCss.replace('.bt.bs-march .bt-side.h .bc:not(.dead){animation:walk .42s ease-in-out infinite alternate}', ''))],
+  ['завеса затемнения — над шапкой', () => lawCss(sceneCss.replace(/(\.bs-veil\{[^}]*z-index:)3/, '$16'))],
   ['враги прячутся при выходе при «меньше движения»', () => lawCss(sceneCss.replace('  .bt-side.f.enter .bc{animation:none}', '  .bt-side.f.enter .bc{animation-name:bsFade}'))],
   ['закрытое окно карты остаётся на экране', () => lawCss(sceneCss.replace('.bt-insp.bs-insp[hidden]{display:none}', ''))],
 ];

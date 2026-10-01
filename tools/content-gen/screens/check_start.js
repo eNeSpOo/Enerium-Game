@@ -25,9 +25,20 @@
       — сундук уровня 3, Лавка и первый артефакт — шаги с заданным итогом (EN_START.tut): карточка сундука и его открытие — содержимое
         сценария; витрина обучения — товары сценария по местам и ценам Лавки, срок и обновление её не меняют, купить — только товар шага;
         артефакт — только свой, золото и души на него набраны к шагу. Сверка — со свежей сборкой, не с данными прототипа.
+   7б. Погружения Подземного леса (ADR-0049, слово автора 02.10.2026: биом 2 — «до условных 5 - 10 заходов», «с каждым новым погружением
+      показывает новое окно… рассказывает про навыки героя, систему как и что работает»):
+      — заходов в лес и к стражу — коридор автора; погружений — столько, сколько уроков; каждое глубже прежнего, хозяйка леса — в последнем;
+      — перед каждым погружением встаёт его урок, по порядку, когда шаг сценария — само погружение; урок показывает данные игры: приёмы
+        героя из его набора (kits.js, abilities.js), что открыла доблесть, круг стихий ядра, угрозу класса, приёмы хозяйки леса, её раунды
+        и совет сказителя — ожидание собрано из данных до мутаций;
+      — «Попробовать» урока ведёт в его окно, и окна уроков — новые: ни уровень Странника, ни прежний урок туда не вели;
+      — дар погружения выдан один раз и ровно данные свежей сборки, повтор номера ничего не выдаёт, итог забега показывает дар;
+        сид добычи погружения — сервера сценария (забег полного пути), добыча — та, что в таблице.
    9. Проверка мутацией: ворота сняты, добыча и итог пропуска испорчены, повтор номера выдаёт заново, у уровня 6 нет подсказки,
       шаги сценария переставлены, сундук и витрина обучения разошлись со сценарием, сценарий пускает другой артефакт, итог пропуска
-      без артефакта — законы ловят каждую поломку.
+      без артефакта; урок погружения не встал, повтор дара выдаёт заново, дар не выдан, сид погружения свой, урок без приёмов из данных,
+      окно урока — старое; и законы сборщика: коридор заходов, старое окно урока, урок о чужом герое, дар без духа — итог не тот, что у
+      полного пути. Законы ловят каждую поломку.
    10. Режим «Команда» и глаза игрока: окна рисуются; подтверждение пропуска — числа итога; «Пропустить обучение» — в окне уровня,
       в Убежище и в настройках.
    11. Арт окна уровня (п. 4 очереди docs/art-queue.md, OB_ART): выгруженное есть на диске и в описи ui-art.json; окна уровней 1, 3, 6, 10
@@ -44,16 +55,18 @@ const err = [], cnt = { views: 0, levels: 0, popups: 0, steps: 0, ops: 0 };
 const say = m => { if (err.length < 80) err.push(m); else if (err.length === 80) err.push('… и ещё ошибки'); };
 function done() {
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
-  console.log(`Проверено: отрисовок ${cnt.views}, окон уровня ${cnt.popups}, шагов сценария ${cnt.steps}, операций сервера ${cnt.ops}, действий вне сценария ${cnt.acts || 0}; поломок поймано ${cnt.mut || '—'}. Проверка пройдена: новый аккаунт с нуля, ворота разделов и мест, уровень и награда — одной операцией с номером, повтор ничего не выдаёт, окна уровня по одному, сценарий проходится через операции прототипа тем же путём, что прогон ядром; обучение по сценарию — вне шага всё закрыто, добыча из таблицы равна ядру, первый рецепт подсказкой, пропуск с любого уровня — итог прохождения.`);
+  console.log(`Проверено: отрисовок ${cnt.views}, окон уровня и уроков ${cnt.popups}, уроков погружений ${cnt.lessons || 0}, шагов сценария ${cnt.steps}, операций сервера ${cnt.ops}, действий вне сценария ${cnt.acts || 0}; поломок поймано ${cnt.mut || '—'}. Проверка пройдена: новый аккаунт с нуля, ворота разделов и мест, уровень и награда — одной операцией с номером, повтор ничего не выдаёт, окна уровня по одному, сценарий проходится через операции прототипа тем же путём, что прогон ядром; обучение по сценарию — вне шага всё закрыто, добыча из таблицы равна ядру, первый рецепт подсказкой, пропуск с любого уровня — итог прохождения; Подземный лес — ${DV0 ? DV0.list.length : 0} погружений в коридоре ${DV0 ? DV0.runs.join('–') : ''} заходов, перед каждым — свой урок с данными игры и новым окном, дар погружения — один раз.`);
   process.exit(0);
 }
 
 /* ---------- 1. данные свежие ---------- */
 let TUT0 = {};   // шаги сверх боя по свежей сборке (EN_START.tut): с ними законы сверяют прототип — не с его же данными
+let DV0 = null;  // погружения леса по свежей сборке (EN_START.dives, ADR-0049): план, уроки и дары
 {
   const B = require(path.join(ROOT, 'tools', 'content-gen', 'start', 'build.js')), R = B.build();
   if (R.err.length) { say('сборка сценария: ' + R.err.join('; ')); done(); }
   TUT0 = JSON.parse(JSON.stringify(R.data.tut || {}));
+  DV0 = JSON.parse(JSON.stringify(R.data.dives || null));
   const js = B.render(R.data);
   if (read('start.js') !== js) say('design/ui/start.js устарел — пересобрать: node tools/content-gen/start/build.js');
   const L = R.data.levels;
@@ -104,7 +117,9 @@ const T = vm.runInContext(`({
   OB: { D: OB_D, R: OB_R, SRV: OB_SRV, sync: obSync, switch: obSwitch, pop: obPopHtml, can: obCanShow, slotLock: obSlotLock, hero: obHero, get mode() { return OB_MODE; },
     SC: OB_SC, gate: obGate, step: () => obStepOf(), tut: () => obTut(), hintOn: () => obHintOn(), TEXT: OB_TEXT, HINT: OB_HINT, VIEW: OB_VIEW_ACT, rid: obRid,
     TU: OB_TU, shopGen: OB_SHOP_GEN, isTutSp: obIsTutChestSp, doStep: () => obDoStep(), ART: OB_ART, openArt: obOpenArt, kit: () => obKitHtml(),
-    set gateOff(v) { OB_GATE_OFF = !!v; }, get chk() { return OB_CHK; }, set chk(v) { OB_CHK = v; } },
+    DV: OB_DV, lesOf: obLesOf, lesHero: obLesHero, lesHeroId: obLesHeroId, bossId: obBossId, goLes: obGoLesson, go: obGo, isLes: obIsLes, fix: obFixOf,
+    set gateOff(v) { OB_GATE_OFF = !!v; }, set seedOff(v) { OB_SEED_OFF = !!v; }, get chk() { return OB_CHK; }, set chk(v) { OB_CHK = v; } },
+  heroKit: h => heroKit(h), get foes() { return window.EN_BIOME_FOES; }, runById: id => runById(id),
 })`, ctx);
 const run = (where, f) => { try { return f(); } catch (e) { say(`${where}: исключение — ${e.message} | ${(e.stack || '').split('\n').slice(1, 3).join(' | ').trim()}`); return undefined; } };
 const game = () => (els.game ? els.game.innerHTML : '');
@@ -257,11 +272,19 @@ function mkW(o = {}) {
       const s = T.S; T.OB.sync(); cnt.ops++;
       if (o.stopL && s.ob.srv.lvl >= o.stopL) throw STOP;
       if (o.stopK) { const st = T.OB.step(); if (st && st.k === o.stopK) throw STOP; }   // остановка перед шагом сценария этого вида
+      if (o.stopD) { const st = T.OB.step(); if (st && st.k === 'run' && st.d === o.stopD) throw STOP; }   // остановка перед погружением леса (ADR-0049)
       const got = s.ob.got.splice(0).map(L => ({ L, ms: msAll }));
       s.route = 'shelter'; s.overlay = null; s.ob.hold = '';
       let guard = 0;
       while (s.ob.queue.length && guard++ < 20) {
         const L = s.ob.queue[0];
+        /* урок погружения (ADR-0049): встаёт, когда шаг сценария — само погружение; его окно — урок с данными игры */
+        if (T.OB.isLes(L)) {
+          const j = +String(L).slice(1), st = T.OB.step();
+          if (o.les) o.les.push({ j, step: st ? { k: st.k, d: st.d } : null });
+          if (o.draw) { const h = popOf(draw(`урок погружения ${j}`)); cnt.popups++; cnt.lessons = (cnt.lessons || 0) + 1; ladder(`урок погружения ${j}`, h); for (const e of lawLessonHtml(j, h)) sink(e); }
+          T.ACT.oblater(String(L)); continue;
+        }
         if (o.draw) {
           const h = draw(`окно уровня ${L}`); cnt.popups++;
           ladder(`окно уровня ${L}`, popOf(h));
@@ -315,6 +338,8 @@ function mkW(o = {}) {
     },
     run(b) {
       const s = T.S; s.selBiome = b; s.prepSquad = 's1'; s.route = 'descent';
+      const st0 = T.OB.step(), dj = st0 && st0.k === 'run' ? st0.d || 0 : 0;   // погружение леса (ADR-0049): урок перед ним уже был?
+      if (o.dives && dj) o.dives.push({ d: dj, les: (o.les || []).some(x => x.j === dj) });
       run('забег ' + b, () => T.startRun('s1', b));
       const Rr = s.runs[s.runs.length - 1]; if (!Rr || Rr.guard || Rr.over) { sink(`забег ${b} не начался`); return { wall: 0, win: false, ms: 0 }; }
       s.focus = Rr.id; s.route = 'descent';
@@ -362,7 +387,8 @@ function fp(s) {
 
 run('свежий лист для сценария', () => T.OB.switch(true));
 T.OB.chk = [];   // что дали бы ядро и генератор на каждом этаже обучения — для закона добычи
-const P = run('сценарий', () => play(mkW({ draw: true }), D)) || { log: [], steps: [], done: false };
+const LES_MAIN = [], DIVES_MAIN = [];   // уроки и погружения прохождения (ADR-0049)
+const P = run('сценарий', () => play(mkW({ draw: true, les: LES_MAIN, dives: DIVES_MAIN }), D)) || { log: [], steps: [], done: false };
 const CHK = T.OB.chk || []; T.OB.chk = null;
 cnt.steps = P.steps.length;
 if (!P.done) say(`сценарий не дошёл до цикла II: уровень ${T.S.ob.srv.lvl}, шагов ${P.steps.length}`);
@@ -408,6 +434,12 @@ const SC = T.OB.SC, FP_END = fp(T.S);
   s.route = 'echo'; draw('цикл II · Эхо');
   s.route = 'week'; draw('цикл II · Неделя');
   s.route = 'shelter';
+  /* погружения леса (ADR-0049): число заходов, урок перед каждым, глубже прежнего, дары, окна уроков */
+  for (const e of lawDives(LES_MAIN, DIVES_MAIN, P.steps, 'прохождение')) say(e);
+  for (const e of lawGift('прохождение')) say(e);
+  for (const e of lawLessonGo('прохождение')) say(e);
+  if (cnt.lessons !== (DV0 ? DV0.list.length : 0)) say(`уроков погружений показано ${cnt.lessons || 0}, в плане ${DV0 ? DV0.list.length : 0}`);
+  s.route = 'shelter'; s.overlay = null;
 }
 
 /* ---------- 7. законы обучения по сценарию и пропуска (ADR-0040). Каждый — функция: проверка мутацией зовёт её с поломкой ---------- */
@@ -665,6 +697,111 @@ function lawArt(where) {
   return out;
 }
 
+/* ---------- 7б. погружения Подземного леса и уроки (ADR-0049) ----------
+   Слово автора 02.10.2026: «…нужно условно врагов в нём до условных 5 - 10 заходов чтобы пройти… с каждым новым погружением, показывает
+   новое окно которое не было доступно, рассказывает про навыки героя, систему как и что работает». Законы:
+   — заходов в лес — коридор автора; погружений — столько, сколько уроков; каждое глубже прежнего, хозяйка леса — в последнем;
+   — перед каждым погружением встаёт его урок, по порядку, когда шаг сценария — само погружение;
+   — урок показывает данные игры: приёмы героя из его набора, то, что открыла доблесть, круг стихий ядра, угрозу класса, приёмы хозяйки
+     леса, её раунды и совет сказителя — ожидание собрано из данных до мутаций;
+   — «Попробовать» урока ведёт в его окно, и окна уроков — новые: ни уровень, ни прежний урок туда не вели;
+   — дар погружения выдан один раз, ровно данные свежей сборки; повтор номера ничего не выдаёт; итог забега показывает дар */
+/* функции, а не константы: урок впервые проверяется в прохождении сценария (раздел 6), раньше этого места файла */
+function fmtX(v) { const a = Math.abs(v), s = a % 100 ? (a / 100).toFixed(2).replace(/0$/, '') : String(a / 100); return s.replace('.', ','); }
+function kitOfId(id) { const r = T.RSI[id], d = r && r.team && r.team.draft; return d ? T.heroKit({ draft: d }) : null; }
+function lesExpect(j) {
+  const l = T.OB.lesOf(j), L = T.EB.lib(), out = []; if (!l) return null;
+  const hid = T.OB.lesHeroId(l);   // герой урока — из данных: роль среди пятерых обучения или руна обучения
+  if (hid) {
+    const K = kitOfId(hid); out.push(T.RSI[hid].n);
+    for (const x of (K ? K.kit : [])) if (L[x.id] && (l.kind !== 'valor' || x.v >= 1)) out.push(x.as || L[x.id].n);
+    if (l.kind === 'valor') out.push(`+${T.EB.RULES.valorPct} %`);
+    if (l.kind === 'threat') { const fx = T.OB.fix(hid); out.push(`×${fmtX(((fx && T.EB.RULES.cls[fx.cls]) || {}).thr || T.EB.RULES.threat.base)}`); }
+  }
+  if (l.kind === 'elements') { const E = T.EB.RULES.elem; out.push(...E.circle, `×${fmtX(E.fwd)}`, `×${fmtX(E.back)}`); }
+  const hide = [];
+  if (l.kind === 'boss') {   // до первой победы — как в бестиарии: ни имени, ни записи сказителя; приёмы — те, что отряд видел в бою
+    const id = T.OB.bossId(), f = T.EB.FOES[id], c = T.foes && T.foes.cards ? T.foes.cards[id] : null;
+    out.push(String(T.EB.roundsOf('b'))); for (const x of f.kit.kit) if (L[x.id]) out.push(x.as || L[x.id].n);   // имя приёма — своё у врага
+    hide.push(f.name); if (c && c.tip) hide.push(c.tip);
+    return { n: l.n, say: l.say[1], want: out, hide, boss: id };
+  }
+  return { n: l.n, say: l.say[1], want: out, hide };
+}
+/* ожидание уроков — из данных, один раз, до мутаций: первый показ урока — в прохождении сценария (раздел 6). Объявление без значения:
+   присваивание здесь стёрло бы ожидание, собранное раньше этого места файла, и мутация собрала бы его заново — уже из сломанных данных */
+var LES_EXP;
+function lesExp(j) {
+  if (!LES_EXP) { LES_EXP = {}; for (let k = 1; k <= ((T.OB.DV && T.OB.DV.list.length) || 0); k++) LES_EXP[k] = lesExpect(k); }
+  return LES_EXP[j];
+}
+lesExp(1);   // ожидание собрано до мутаций, даже если прохождение не дошло до уроков
+function unEsc(h) { return String(h).replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'); }
+function lawLessonHtml(j, html) {
+  const out = [], E = lesExp(j), X = T.OB.TEXT, h = unEsc(html); if (!E) return [`урок погружения ${j}: нет в данных`];
+  if (!/class="ob-pop"/.test(h) || !h.includes(`${X.lesson} · ${E.n}`)) out.push(`урок погружения ${j}: окно не показано или без заголовка «${E.n}»`);
+  if (!h.includes(X.dive(j, (DV0 || { list: [] }).list.length))) out.push(`урок погружения ${j}: нет «${X.dive(j, (DV0 || { list: [] }).list.length)}»`);
+  if (!h.includes(E.say)) out.push(`урок погружения ${j}: нет слова проводника`);
+  const miss = E.want.filter(w => !h.includes(w)); if (miss.length) out.push(`урок погружения ${j} «${E.n}»: из данных игры нет — ${miss.join(', ')}`);
+  if (E.boss && !(T.S.known || []).includes(E.boss)) { const leak = (E.hide || []).filter(w => h.includes(w)); if (leak.length) out.push(`урок погружения ${j} «${E.n}»: до первой победы открыто то, что бестиарий прячет, — ${leak.join(', ')}`); }
+  if (!new RegExp(`data-a="obtry" data-v="d${j}"`).test(h)) out.push(`урок погружения ${j}: нет «${X.tryIt}»`);
+  return out;
+}
+/* погружения сыгранного пути: les — уроки по порядку (номер и шаг в миг показа), dives — погружения (номер и был ли урок до него), steps — путь */
+function lawDives(les, dives, steps, where) {
+  const out = [], n = DV0 ? DV0.list.length : 0, C = DV0 ? DV0.runs : [5, 10], fl = DV0 ? DV0.floors : 25;
+  const forest = steps.filter(s => s.kind === 'run' && s.b === (DV0 || {}).b), guards = steps.filter(s => s.kind === 'guard' && s.b === (DV0 || {}).b).length;
+  if (forest.length < C[0] || forest.length + guards > C[1]) out.push(`${where}: заходов в лес ${forest.length} и к стражу ${guards} — вне ${C.join('–')} (слово автора)`);
+  if (dives.length !== n || forest.length !== n) out.push(`${where}: погружений сыграно ${dives.length} (забегов леса ${forest.length}), в плане ${n}`);
+  dives.forEach((x, i) => { if (x.d !== i + 1) out.push(`${where}: погружение ${x.d} — не по порядку`); if (!x.les) out.push(`${where}: погружение ${x.d} началось без своего урока`); });
+  if (les.map(x => x.j).join() !== dives.map(x => x.d).join()) out.push(`${where}: уроки ${les.map(x => x.j).join(', ')} — не по одному перед погружениями ${dives.map(x => x.d).join(', ')}`);
+  for (const x of les) if (!x.step || x.step.k !== 'run' || x.step.d !== x.j) out.push(`${where}: урок ${x.j} встал не перед своим погружением (шаг ${JSON.stringify(x.step)})`);
+  const depth = s => (s.win ? fl + 1 : s.wall);
+  forest.forEach((s, i) => { if (i && depth(s) <= depth(forest[i - 1])) out.push(`${where}: погружение ${i + 1} не глубже прежнего — однообразный повтор`); });
+  if (!forest.length || !forest[forest.length - 1].win || forest.slice(0, -1).some(s => s.win)) out.push(`${where}: хозяйка леса пала не в последнем погружении`);
+  const ids = (DV0 ? DV0.list : []).map(d => d.lesson); if (new Set(ids).size !== ids.length) out.push(`${where}: урок повторяется`);
+  return out;
+}
+/* дары: у каждого погружения с даром — выдан один раз и ровно данные свежей сборки; повтор номера ничего не меняет; итог забега его показывает */
+function lawGift(where) {
+  const out = [], s = T.S, G = (DV0 && DV0.gifts) || {};
+  for (const d of (DV0 ? DV0.list : [])) {
+    const g = G[d.no], got = s.ob.gift[d.no];
+    if (!g) { if (got) out.push(`${where}: погружение ${d.j} — дар, которого нет в данных`); continue; }
+    if (!got || JSON.stringify(got.gift) !== JSON.stringify(g)) out.push(`${where}: погружение ${d.j} — дар ${JSON.stringify(got && got.gift).slice(0, 80)}, в сборке ${JSON.stringify(g).slice(0, 80)}`);
+    const f0 = fp(s), r = T.OB.SRV.gift(d.no); cnt.ops++;
+    if (!r.again || fp(s) !== f0) out.push(`${where}: повтор дара погружения ${d.j} что-то выдал`);
+  }
+  const R = s.runs.find(x => x.d && x.gift);
+  if (!R) out.push(`${where}: ни у одного забега погружения нет дара в итоге`);
+  else {
+    s.overlay = { t: 'result', arg: R.id }; s.route = 'descent';
+    const h = unEsc(draw(`${where} · итог погружения ${R.d}`)); s.overlay = null;
+    if (!h.includes(T.OB.TEXT.gift) || !h.includes(Number(R.gift[1]).toLocaleString('ru-RU'))) out.push(`${where}: итог погружения ${R.d} не показывает дар (${T.OB.TEXT.gift}, дух ${R.gift[1]})`);
+    if (!h.includes(T.OB.TEXT.dive(R.d, DV0.list.length))) out.push(`${where}: итог погружения ${R.d} без «${T.OB.TEXT.dive(R.d, DV0.list.length)}»`);
+  }
+  return out;
+}
+/* окно урока: «Попробовать» ведёт туда, куда велят данные; окна уроков — новые: ни уровень Странника, ни прежний урок туда не вели */
+function winKey(s) {
+  return [s.route, s.route === 'descent' ? s.selBiome : '', s.route === 'heroes' ? s.seg.heroes : '', s.route === 'heroes' ? s.seg.hero : '', s.route === 'heroes' ? (T.hrTwin(T.H(s.selHero)) || { id: s.selHero }).id : '',
+    s.overlay ? s.overlay.t : '', s.overlay ? String(s.overlay.arg || '') : '', s.route === 'craft' ? s.seg.craft : '', s.route === 'profile' ? s.seg.profile : ''].join('|');
+}
+function lawLessonGo(where) {
+  const out = [], s = T.S, seen = new Map(), keep = JSON.stringify({ route: s.route, seg: s.seg, sel: s.selHero, hold: s.ob.hold });
+  for (const l of D.levels) for (const k of l.opens) { s.overlay = null; s.route = 'shelter'; run('окно уровня', () => T.OB.go(k)); const key = winKey(s); if (!seen.has(key)) seen.set(key, `уровень ${l.L}`); }
+  for (const d of (DV0 ? DV0.list : [])) {
+    const l = T.OB.lesOf(d.j); if (!l) { out.push(`${where}: у погружения ${d.j} нет урока`); continue; }
+    s.overlay = null; s.route = 'shelter'; s.ob.hold = ''; s.ob.queue = ['d' + d.j];
+    run('«Попробовать» урока', () => T.ACT.obtry('d' + d.j));
+    const g = l.go || {}, key = winKey(s);
+    if (s.route !== g.route || (g.hero && s.seg.hero !== g.hero) || (g.sheet && !(s.overlay && s.overlay.t === g.sheet.split(':')[0]))) out.push(`${where}: «Попробовать» урока ${d.j} «${l.n}» привело в ${key}, а не в окно урока`);
+    if (seen.has(key)) out.push(`${where}: урок ${d.j} «${l.n}» ведёт в окно, куда уже вёл ${seen.get(key)}`); else seen.set(key, `урок ${d.j}`);
+  }
+  const k0 = JSON.parse(keep); s.overlay = null; s.route = k0.route; s.seg = k0.seg; s.selHero = k0.sel; s.ob.hold = k0.hold; s.ob.queue = [];
+  return out;
+}
+
 /* ---------- 8. законы на сценарии ---------- */
 for (const e of lawLoot(CHK, 'добыча обучения')) say(e);
 if (CHK.length !== T.OB.D.loot.reduce((a, r) => a + r.length, 0)) say(`добыча обучения: этажей в прохождении ${CHK.length}, в таблице ${T.OB.D.loot.reduce((a, r) => a + r.length, 0)}`);
@@ -740,6 +877,52 @@ mutant('ворота сняты — действия вне сценария п�
 {
   const E = T.OB.D.skip, a0 = E.art;
   mutant('пропуск: итог без первого артефакта', () => { E.art = {}; }, () => { E.art = a0; }, () => lawSkip(1, 'мутация', () => {}));
+}
+/* погружения леса и уроки (ADR-0049): прохождение с записью уроков и погружений; до погружения j — остановка */
+function playDives(sink) {
+  T.OB.switch(true); const les = [], dives = []; let P2 = null;
+  try { P2 = play(mkW({ les, dives, sink }), D); } catch (e) { sink('исключение: ' + e.message); }
+  return { les, dives, steps: P2 ? P2.steps : [], done: !!(P2 && P2.done) };
+}
+function playToD(j, sink) {
+  T.OB.switch(true);
+  try { play(mkW({ stopD: j, sink }), D); return false; } catch (e) { if (e === STOP) return true; (sink || say)(`сценарий до погружения ${j}: исключение — ${e.message}`); return false; }
+}
+if (DV0 && DV0.list.length > 1) {
+  const L2 = DV0.list[1].lesson, keep = T.OB.DV.lessons[L2];
+  mutant('урок второго погружения не встаёт перед ним', () => { delete T.OB.DV.lessons[L2]; }, () => { T.OB.DV.lessons[L2] = keep; },
+    () => { const errs = [], x = playDives(e => errs.push(e)); return lawDives(x.les, x.dives, x.steps, 'мутация'); });
+  const g0 = T.OB.SRV.gift;
+  mutant('дар погружения: повтор номера выдаёт заново', () => { T.OB.SRV.gift = (no, s) => { const st = s || T.S; if (st.ob && st.ob.gift) delete st.ob.gift[no]; return g0(no, st); }; }, () => { T.OB.SRV.gift = g0; },
+    () => { const x = playDives(() => {}); return x.done ? lawGift('мутация') : ['сценарий не прошёл']; });
+  mutant('дар погружения не выдаётся — однообразные забеги вернулись бы', () => { T.OB.SRV.gift = () => ({ refuse: 'none' }); }, () => { T.OB.SRV.gift = g0; },
+    () => { const errs = [], x = playDives(e => errs.push(e)); return lawDives(x.les, x.dives, x.steps, 'мутация').concat(x.done ? [] : ['сценарий не прошёл']); });
+  mutant('сид погружения — свой номер забега, а не сервера сценария', () => { T.OB.seedOff = true; }, () => { T.OB.seedOff = false; },
+    () => { T.OB.chk = []; const ok = playToD(3, () => {}), c = T.OB.chk || []; T.OB.chk = null; return ok ? lawLoot(c, 'мутация') : ['нет погружения 3']; });
+  const l1 = T.OB.lesOf(1), h1 = l1 ? T.OB.lesHeroId(l1) : null, K1 = h1 ? kitOfId(h1) : null, kit1 = K1 ? K1.kit : null;
+  mutant('урок первого погружения — без приёмов героя из данных', () => { if (K1) K1.kit = []; }, () => { if (K1) K1.kit = kit1; },
+    () => { if (!playToD(1, () => {})) return ['нет погружения 1']; T.S.overlay = null; T.S.route = 'shelter'; T.S.ob.hold = ''; T.S.ob.queue = ['d1']; return lawLessonHtml(1, popOf(draw('мутация · урок 1'))); });
+  const lE = Object.values(T.OB.DV.lessons).find(l => l.kind === 'elements'), goE = lE ? lE.go : null;
+  mutant('окно урока — то, куда уже вёл уровень Странника', () => { if (lE) lE.go = Object.assign({}, D.open.b2.go); }, () => { if (lE) lE.go = goE; },
+    () => (playToD(DV0.list.length, () => {}) ? lawLessonGo('мутация') : ['нет последнего погружения']));
+}
+/* законы сборщика погружений (tools/content-gen/start/build.js, ADR-0049): поломка данных или мира — сборка обязана её назвать */
+{
+  const BLD = require(path.join(ROOT, 'tools', 'content-gen', 'start', 'build.js')), DAT = require(path.join(ROOT, 'tools', 'content-gen', 'start', 'data.js'));
+  const WSM = require(path.join(ROOT, 'tools', 'content-gen', 'start', 'world-sim.js')), DVD = DAT.DIVES, errsOf = re => () => (BLD.build().err || []).filter(e => re.test(e));
+  const r0 = DVD.runs.slice();
+  mutant('сборка: коридор заходов автора не держится', () => { DVD.runs = [DVD.lessons.length + 2, 10]; }, () => { DVD.runs = r0; }, errsOf(/заходов/));
+  const lc = DVD.lessons.find(l => l.kind === 'hero'), go0 = lc ? lc.go : null;
+  mutant('сборка: урок ведёт туда, куда уже вёл уровень', () => { if (lc) lc.go = Object.assign({}, DAT.OPEN.craft.go); }, () => { if (lc) lc.go = go0; }, errsOf(/куда уже вёл/));
+  const hv = lc ? lc.role : null;
+  mutant('сборка: урок о герое, которого нет в обучении', () => { if (lc) lc.role = 'фармер'; }, () => { if (lc) lc.role = hv; }, errsOf(/нет героя обучения|нечему учить|не встал/));
+  /* имя героя пятёрки, вшитое в слово урока: после замены героя данными урок соврал бы (ADR-0050; замена — сменой данных) */
+  const sy0 = lc ? lc.say : null, hn0 = lc ? (T.RSI[(DAT.HEROES.find(h => h.role === lc.role) || {}).id] || { n: '' }).n : '';
+  mutant('сборка: имя героя пятёрки в слове урока', () => { if (lc) lc.say = [sy0[0], `${sy0[1]} ${hn0} — первый.`]; }, () => { if (lc) lc.say = sy0; }, errsOf(/имя героя/));
+  const mk0 = WSM.make;
+  mutant('сборка: дар погружения без духа — итог не тот, что у полного пути', () => {
+    WSM.make = (Dx, o = {}) => (o.gift ? mk0(Dx, Object.assign({}, o, { gift: (no, S) => { const g = o.gift(no, S); return g ? [g[0], Math.floor(g[1] / 2), g[2], g[3]] : g; } })) : mk0(Dx, o));
+  }, () => { WSM.make = mk0; }, errsOf(/итог обучения не тот|не дошёл|стена|не глубже/));
 }
 const caught = MUT.filter(m => m[1]).length;
 for (const [n, ok] of MUT) if (!ok) say(`проверка мутацией: поломку «${n}» законы не поймали`);

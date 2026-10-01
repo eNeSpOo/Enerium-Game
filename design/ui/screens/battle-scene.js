@@ -15,8 +15,10 @@
    5. Эффекты — сцена EnFx.scene (fx.js): снаряд и разрыв своей школы, удар, массовая волна, ульта со своим окном, значок наложенного
       эффекта, гибель flipbook-лентой. Только transform и opacity; «меньше движения» — без полётов и тряски.
    6. Баннеры: этаж, элита, босс биома, рунный страж, Эхо, «Раунд N», последний раунд, осада — плашка одного вида (BS_ART.plaque).
-   7. Ритуал этажа (ADR-0044): враги выходят, падают, добыча летит в кошелёк, переход. Длительности — данные RULES.floor ядра: minMs —
-      минимум этажа (его подбирает калькулятор фарма, время ритуала держит screens/biomes.js), ritual — фазы показа.
+   7. Ритуал этажа (ADR-0044) — поход на новый этаж (ADR-0048): враги выходят, падают, добыча летит в кошелёк, отряд идёт дальше по
+      биому, экран затемняется, открывается новая арена того же биома (BS_ART.arenas — по номеру этажа), враги нового этажа выходят
+      справа. Длительности — данные RULES.floor ядра: minMs — минимум этажа (его подбирает калькулятор фарма, время ритуала держит
+      screens/biomes.js), ritual — фазы показа; длительность этажа поход не меняет.
    8. Итог этажа и забега, окно «Стена» — герб победы или стены над окном (BS_ART.crest), тот же язык.
    9. Легенда «Знаки» — по новому виду: плита здоровья, значки эффектов, шансы, очередь, иммунитет, числа.
    Числа вида — в BS_DATA; в функциях только алгоритм. Проверка — tools/content-gen/screens/check_battle_scene.js. */
@@ -56,8 +58,10 @@ const BS_DATA = {
   ult: { ms: 1250 },
   /* рунных ключей летит к кошельку не больше стольких — больше видно числом на плашке добычи */
   keyFly: 3,
-  /* плашка перехода — доля паузы между этажами, % */
-  transitPct: 80,
+  /* сценарий «Бой AAA · переход между этажами»: отряд — герои цикла cyc на уровне lvl, этаж берётся сразу, и виден весь поход */
+  tripFlow: { lvl: 350, cyc: 3 },
+  /* поход на новый этаж: павшие гаснут, пройдя такую долю своей комнаты, % (фазы и их мс — RULES.floor.ritual ядра) */
+  tripFadePct: 50,
   /* медальон раунда на последних раундах — предупреждение: столько раундов до конца */
   lastRounds: 1,
   /* сведения карты: угроза — сколько противников показывать; портрет в рамке ранга, px */
@@ -99,6 +103,17 @@ const BS_ART = {
     'Спуск.b3e6.act': 'b3e6-act', 'Спуск.b3e6.ctrl': 'b3e6-ctrl', 'Спуск.b3g1.act': 'b3g1-act', 'Спуск.b4b1.pas': 'b4b1-pas',
     'Спуск.b4e6.act': 'b4e6-act', 'Спуск.b4g1.act': 'b4g1-act',
   },
+  /* арены этажей (ADR-0048, слова автора 02.10.2026: «новая арена на этом же биоме аля условны этаж»): по четыре на биом — нынешняя и три
+     участка того же места (tools/art-gen/jobs/arena-floors.json). Этаж берёт арену своего биома по номеру: (этаж − 1) по кругу из
+     готовых, соседние этажи — разные арены; страж — первую. arenaReady — выгруженные (tools/art-gen/ui-art.json, export_ui.py): нет в
+     списке — этаж берёт следующую готовую, нет ни одной — арена биома index.html (biomeArena) */
+  arenas: {
+    b1: ['arena-workshop.jpg', 'arena-b1-2.jpg', 'arena-b1-3.jpg', 'arena-b1-4.jpg'],
+    b2: ['arena-b2.jpg', 'arena-b2-2.jpg', 'arena-b2-3.jpg', 'arena-b2-4.jpg'],
+    b3: ['arena-b3.jpg', 'arena-b3-2.jpg', 'arena-b3-3.jpg', 'arena-b3-4.jpg'],
+    b4: ['arena-b4.jpg', 'arena-b4-2.jpg', 'arena-b4-3.jpg', 'arena-b4-4.jpg'],
+  },
+  arenaReady: ['arena-workshop.jpg', 'arena-b2.jpg', 'arena-b3.jpg', 'arena-b4.jpg'],
 };
 /* геометрия рисованной квадратной рамки — tools/art-gen/frame_square.py: тело — нарезка border-image [верх, право, низ, лево] в тысячных
    тела; венец — пропорция ширины к высоте в тысячных (ar) и ширина к телу (rel); рамка целиком (окно сведений) — окно и нарезка battle_frame.py */
@@ -271,7 +286,7 @@ paintHud = function (R) {
 /* легенда «Знаки» открыта — баннер, «Раунд N», плашки этажа и надпись ульты над ней не рисуются (battle-scene.css, .bs-leg) */
 function bsLegendCover() { const bt = document.getElementById('bt'); if (bt && bt.classList) bt.classList.toggle('bs-leg', !!S.legend); }
 window.addEventListener('en-render', bsLegendCover);
-/* баннер этажа снимается раньше срока, когда его место занимает плашка: «Раунд N», «Этаж взят» */
+/* баннер этажа снимается раньше срока: его место занимает «Раунд N» или этаж уже взят и отряд уходит дальше */
 function bsDropBanner(R) {
   if (R) R.banner = null;
   const x = document.querySelector('.bt-banner'); if (x) x.remove();
@@ -592,11 +607,20 @@ roundFlash = function (n) {
   bt.appendChild(e); setTimeout(() => e.remove(), ms + 50);
 };
 
-/* ================== 8. ритуал этажа: выход врагов, падение, добыча в кошелёк, переход ==================
+/* ================== 8. ритуал этажа — поход на новый этаж: добыча в кошелёк, отряд идёт дальше, затемнение, новая арена ==================
    ADR-0044: взятый этаж не короче своего ритуала — ядро дотягивает время боя b.t до RULES.floor.minMs (ritualMs — добавка), время
    ритуала держит screens/biomes.js: пока он идёт, хода боя нет, конец этажа (floorDone) — не раньше b.t, и на экране, и у свёрнутого
-   забега. Здесь — что видно: враги выходят по очереди (RULES.floor.ritual.enterMs в advance index.html), после последнего удара —
-   «Этаж взят», добыча летит в кошелёк, песок тает до конца этажа, затем плашка перехода. Фазы показа — RULES.floor.ritual */
+   забега; затем переход gapMs (index.html). ADR-0048, слова автора 02.10.2026: «Бой внутри сейчас после убийства игрока длится очень
+   долго это будет раздражать игрока 100%, сделаем хитрее, пусть после боя отряд как и раньше переходил бы дальше, но мы сделаем
+   появление игрока дольше, потом затемнение экрана, а потом новая арена на этом же биоме аля условны этаж и как и раньше сами враги
+   появляются анимацией выхода с правой стороны». Ожидания с плашкой больше нет: путь от конца боя до нового этажа — поход, по порядку автора:
+   1. отряд переходит дальше — после последнего удара добыча летит в кошелёк, отряд трогается, павшие уходят со своей комнатой;
+   2. отряд идёт по биому весь остаток пути — «появление дольше»: фон едет комната за комнатой (зеркальные копии арены), отряд шагает;
+   3. экран затемняется; 4. в темноте — арена следующего этажа того же биома (BS_ART.arenas, по номеру этажа), она открывается;
+   5. новый этаж: враги выходят справа своей анимацией, как прежде (RULES.floor.ritual.enterMs в advance index.html).
+   Затемнение и новая арена стоят в конце пути, шаг отряда заполняет остаток: длительность этажа та же. Свёрнутый забег идёт тем же
+   временем без показа; открытый посреди пути — фаза и её место встают по часам пути (bsTripClock). «Меньше движения» — тот же порядок без
+   движения: фон и отряд стоят, павшие гаснут, затемнение и новая арена — прозрачностью. Фазы — RULES.floor.ritual */
 const BS_RUN = { skipMagnet: false };
 /* выход: шаг между картами врагов — из данных (--bs-step для .bt-side.f.enter, battle-scene.css); на первой отрисовке нового этажа
    у каждого врага — облако пыли, у главного — лучи, по очереди через stepMs */
@@ -615,20 +639,18 @@ window.addEventListener('en-render', () => {
     if (u.lead) fx.pop('rays', b, 1900, 900, { s0: .3, s1: 1.1, op: .8 });
   }, (Q.stepMs * i + Q.enterMs * .25) / devSpeed));
 });
-/* «Этаж взят»: плашка, добыча над павшими и в кошелёк, песок до спуска — до b.t, конца этажа по ядру */
+/* взятый этаж с ритуалом: баннер этажа снимается (пока идёт ритуал, хода боя нет — сам он не снимется, advance index.html), через takenMs
+   после последнего удара добыча летит в кошелёк — та же, что зачислит floorDone. Плашки ожидания нет: остаток этажа — поход (bsTrip) */
 function bsRitual(R) {
-  const b = R.b, bt = document.getElementById('bt'), Q = bsRit(); if (!bt) return;
-  const left = Math.max(0, b.t - R.view) / devSpeed;
-  bsDropBanner(R);   // пока идёт ритуал, ход боя стоит — баннер этажа сам не снимется (advance index.html)
-  const e = document.createElement('div'); e.className = 'bs-taken';
-  e.innerHTML = `<span class="pl" style="background-image:url('${bsArt(BS_ART.plaque)}')"><small>Этаж ${R.guard ? 'стража' : R.floor}</small><b>Этаж взят</b><span class="sand"><i style="animation-duration:${Math.round(left)}ms;--bs-d:${Math.round(left)}ms"></i></span></span>`;
-  bsDur(e, left + 300);
-  bt.appendChild(e); setTimeout(() => e.remove(), left + 400);
+  const b = R.b, Q = bsRit();
+  bsDropBanner(R);
   if (R.guard || R.scene) return;
   /* та же добыча, что зачислит floorDone: ядро, свой поток генератора, цикл и артефакты игрока (lootCtx) — «+N» сходится с кошельком */
   const fl = R.floor, got = EB.floorLoot(R.biome, fl, b, typeof lootCtx === 'function' ? lootCtx() : null);
   R.bsLoot = got;   // что показано в ритуале — проверка сверяет с тем, что зачислил floorDone
-  setTimeout(() => { if (R.floor === fl && !R.over) { bsLootFly(got); R.bsLootShown = fl; } }, Q.takenMs / devSpeed);
+  const wait = Math.max(0, b.fightMs - R.view) + Q.takenMs;   // последний удар на экране доигрывается до конца боя по ядру (fightMs)
+  /* ритуал короче ожидания — добычу уже отправил конец этажа (floorDone, магнит): второй раз она не летит */
+  setTimeout(() => { if (R.floor === fl && R.b === b && !(R.gap > 0) && !R.over) { bsLootFly(got); R.bsLootShown = fl; } }, wait / devSpeed);
 }
 /* что летит из добычи этажа: валюта кошелька и рунный ключ (с босса биома, с цикла II — ADR-0044) */
 const BS_LOOT = ['gold', 'spirit', 'souls', 'runeKeys'];
@@ -669,29 +691,166 @@ magnet = function (got) {
   if (BS_RUN.skipMagnet) { for (const k of ['gold', 'spirit', 'souls']) if (got && got[k] > 0) bumpCur(k); return; }   // добыча уже прилетела в ритуале — только числа кошелька (у ключа числа в шапке нет)
   bsLootFly(got);
 };
-/* после последнего удара взятого этажа с ритуалом — «Этаж взят» и добыча */
+/* такт боя: конец боя на экране — начало пути (R.bsT0); взятый этаж с ритуалом — баннер прочь и добыча; путь — каждый такт */
 const bsAdvance0 = advance;
 advance = function (R, ms) {
   bsAdvance0(R, ms);
   const b = R.b;
+  if (b && b.over && R.bsT0b !== b) { R.bsT0b = b; R.bsT0 = R.view; }
   if (b && b.over && b.win && b.ritualMs > 0 && R.bsRit !== b && !R.over) { R.bsRit = b; if (visible(R)) bsRitual(R); }
+  if (visible(R)) bsTrip(R);
 };
-/* конец этажа (его время — screens/biomes.js): добыча, уже прилетевшая в ритуале, второй раз не летит; переход — плашка «Этаж N пройден»
-   на долю паузы между этажами */
+/* конец этажа (его время — screens/biomes.js): добыча, уже прилетевшая в ритуале, второй раз не летит. Плашки перехода нет — переход
+   дальше идёт походом (bsTrip) */
 const bsFloorDone0 = floorDone;
 floorDone = function (R, vis) {
-  const fl = R.floor;
-  BS_RUN.skipMagnet = R.bsLootShown === fl;
-  try { bsFloorDone0(R, vis); } finally { BS_RUN.skipMagnet = false; }
-  if (!vis || !(R.gap > 0) || S.insp || S.legend) return;
-  const bt = document.getElementById('bt'); if (!bt) return;
-  const e = document.createElement('div'); e.className = 'bs-transit';
-  e.style.backgroundImage = `url('${bsArt(BS_ART.plaque)}')`;
-  e.innerHTML = `<small>Этаж ${fl} пройден</small><b>Спуск ниже</b>`;
-  const ms2 = EB.RULES.floor.gapMs * BS_DATA.transitPct / 100 / devSpeed;
-  bsDur(e, ms2);
-  bt.appendChild(e); setTimeout(() => e.remove(), ms2 + 60);
+  BS_RUN.skipMagnet = R.bsLootShown === R.floor;
+  try { return bsFloorDone0(R, vis); } finally { BS_RUN.skipMagnet = false; }
 };
+/* прежний переход — камера на одну зеркальную «комнату» за 80 % паузы — остаётся боям со своей сценой (Эхо, Лига); забег по биому идёт
+   походом на новый этаж */
+const bsCamPan0 = camPan;
+camPan = function () {
+  const R = typeof focusRun === 'function' ? focusRun() : null;
+  if (R && !R.scene) return;
+  return bsCamPan0.apply(this, arguments);
+};
+
+/* ---------- арена этажа: своя у каждого этажа биома, по номеру (BS_ART.arenas) ---------- */
+/* путь арены этажа в assets/art: (этаж − 1) по кругу из готовых арен биома; нет списка или готовых — null (арена биома index.html) */
+function bsArenaOf(biome, floor) {
+  const all = BS_ART.arenas[biome]; if (!all) return null;
+  const ready = all.filter(p => BS_ART.arenaReady.includes(p));
+  return ready.length ? ready[(Math.max(1, floor | 0) - 1) % ready.length] : null;
+}
+const bsArenaUrl = (biome, floor) => { const p = bsArenaOf(biome, floor); return p ? bsArt(p) : biomeArena(biome); };
+/* фон боя — как в battle() index.html: две копии арены, вторая — зеркальная, чётный этаж начинается с зеркала */
+const bsBgsHtml = (floor, url) => `<img class="bg${floor % 2 ? '' : ' flip'}" src="${url}" alt=""><img class="bg bg2${floor % 2 ? ' flip' : ''}" src="${url}" alt="">`;
+/* экран боя: забег по биому — на арене своего этажа; бой со сценой (Эхо, клан, Арена) — на своём фоне */
+{
+  const bsScreen0 = SCREENS.battle;
+  SCREENS.battle = function () {
+    const o = bsScreen0.apply(this, arguments), R = typeof focusRun === 'function' ? focusRun() : null;
+    if (!o || !o.html || !R || !R.b || R.scene) return o;
+    o.html = o.html.replace(/(<div class="bt-bgs">)[\s\S]*?(<\/div>)/, (m, a, z) => a + bsBgsHtml(R.floor, bsArenaUrl(R.biome, R.floor)) + z);
+    return o;
+  };
+}
+/* арена следующего этажа грузится заранее — к концу пути она уже в кэше и открывается без пустого кадра */
+function bsPreload(R) {
+  if (typeof Image !== 'function' || !R || R.scene || R.guard) return;
+  const B = EB.BIOMES[R.biome]; if (!B || !(R.floor < B.floors.length)) return;
+  const im = new Image(); im.src = bsArenaUrl(R.biome, R.floor + 1);
+}
+
+/* ---------- поход на новый этаж ---------- */
+/* часы пути: сколько прошло от конца боя на экране (R.bsT0 — такт, где показ увидел конец боя), сколько всего до нового этажа и когда на
+   экране лёг последний удар (blow). До конца этажа (floorDone) — b.t ядра, если ритуал есть, иначе доигрыш fallMs; затем переход gapMs.
+   Пути нет у проигранного и последнего этажа, у стража и у боя со своей сценой */
+function bsTripClock(R) {
+  const b = R && R.b;
+  if (!b || !b.over || !b.win || R.over || R.scene || R.guard || R.bsT0b !== b) return null;
+  const B = EB.BIOMES[R.biome]; if (!B || !(R.floor < B.floors.length)) return null;
+  const F = EB.RULES.floor, d = b.ritualMs > 0 && b.t > R.bsT0 ? b.t - R.bsT0 : F.ritual.fallMs, total = d + F.gapMs;
+  const since = R.gap > 0 ? total - R.gap : Math.max(0, Math.min(d, R.view - R.bsT0));
+  return { since, total, left: total - since, blow: Math.max(0, Math.min(d, b.fightMs - R.bsT0)) };
+}
+/* фазы пути по порядку автора — [фаза, с мс, до мс]: доигрыш удара и добыча, шаг отряда, затемнение, темнота, новая арена. Затемнение,
+   темнота и новая арена — в конце пути, шаг — остаток: отряд трогается через takenMs после последнего удара */
+function bsTripSpans(T) {
+  const Q = bsRit(), dark = Math.max(0, T.total - Q.darkMs - Q.blackMs - Q.openMs), go = Math.min(T.blow + Q.takenMs, dark);
+  const black = dark + Q.darkMs, open = black + Q.blackMs;
+  return [['settle', 0, go], ['march', go, dark], ['dark', dark, black], ['black', black, open], ['open', open, T.total]];
+}
+function bsTripPhase(R) {
+  const T = bsTripClock(R); if (!T) return null;
+  const sp = bsTripSpans(T), s = sp.find(x => T.since < x[2]);
+  return (s || sp[sp.length - 1])[0];
+}
+/* кадры пути — только transform и opacity. march — фон: петля из трёх копий арены, две комнаты за круг; fallen — павшие уходят со своей
+   комнатой и гаснут; dark и open — завеса. «Меньше движения»: фон и отряд стоят, павшие только гаснут */
+function bsTripKf(calm, bw) {
+  return {
+    march: calm ? null : [{ transform: 'translateX(0)' }, { transform: 'translateX(-200%)' }],
+    fallen: calm ? [{ opacity: 1 }, { opacity: 0 }] : [{ transform: 'translateX(0)', opacity: 1 }, { opacity: 0, offset: BS_DATA.tripFadePct / 100 }, { transform: `translateX(${-Math.round(bw)}px)`, opacity: 0 }],
+    dark: [{ opacity: 0 }, { opacity: 1 }],
+    open: [{ opacity: 1 }, { opacity: 0 }],
+  };
+}
+/* анимация с места: начинается с at мс своего хода (экран перерисован посреди пути — она продолжается, а не начинается заново) */
+function bsPlay(el, kf, opt, at) {
+  if (!el || typeof el.animate !== 'function' || !kf) return null;
+  const a = el.animate(kf, opt);
+  try { if (a && at > 0) a.currentTime = at; } catch (_) { }
+  return a || null;
+}
+function bsStop(el, k) { const a = el && el[k]; if (a && typeof a.cancel === 'function') a.cancel(); if (el) el[k] = null; }
+/* третья копия арены — для петли шага: третья совпадает с первой, и фон едет без шва */
+function bsTiles(bgs) {
+  if (!bgs.querySelector || bgs.querySelector('.bg3')) return;
+  const a = bgs.querySelector('.bg'); if (!a || !a.cloneNode) return;
+  const c = a.cloneNode(false); c.classList.remove('bg2'); c.classList.add('bg3'); bgs.appendChild(c);
+}
+/* показ пути — по фазе и её месту на часах: каждый такт, а после перерисовки экрана (en-render) — заново с того же места */
+function bsTrip(R) {
+  const T = bsTripClock(R), bt = document.getElementById('bt');
+  if (!T || !bt || !bt.querySelector || !visible(R)) return;
+  if (R.banner) bsDropBanner(R);   // этаж взят — баннер его больше не нужен (забег открыли посреди пути: свёрнутому его не снимали)
+  if (R.bsPre !== R.b) { R.bsPre = R.b; bsPreload(R); }
+  const sp = bsTripSpans(T), cur = sp.find(x => T.since < x[2]) || sp[sp.length - 1], ph = cur[0], key = `${R.id}|${R.floor}|${ph}`;
+  if (bt.__bsTrip === key) return;
+  bt.__bsTrip = key;
+  const Q = bsRit(), calm = bsCalm(), K = bsTripKf(calm, bt.clientWidth || 0), go = sp[1][1];
+  const real = ms => Math.max(0, ms) / devSpeed;   // мс пути → мс экрана при скорости прототипа
+  const moving = ph === 'march' || ph === 'dark', there = ph === 'black' || ph === 'open';
+  bt.classList.toggle('bs-trip', ph !== 'settle');
+  bt.classList.toggle('bs-march', moving && !calm);
+  const bgs = bt.querySelector('.bt-bgs'), side = bt.querySelector('.bt-side.f');
+  /* 1–2. отряд переходит дальше и идёт по биому: фон едет комнатами, павшие уходят со своей комнатой; отряд шагает (bs-march, css) */
+  if (moving && bgs && K.march && !bgs.__bsMarch) {
+    bsTiles(bgs);
+    bgs.__bsMarch = bsPlay(bgs, K.march, { duration: real(2 * Q.roomMs), iterations: Infinity, easing: 'linear' }, real(T.since - go));
+  }
+  if (moving && side && !side.__bsGone) side.__bsGone = bsPlay(side, K.fallen, { duration: real(Q.roomMs), easing: 'linear', fill: 'forwards' }, real(T.since - go));
+  /* 4. в темноте — арена следующего этажа того же биома; отряд стоит, павших нет */
+  if (there) {
+    if (bgs) {
+      bsStop(bgs, '__bsMarch');
+      if (bgs.__bsFloor !== R.floor + 1) { bgs.__bsFloor = R.floor + 1; bgs.innerHTML = bsBgsHtml(R.floor + 1, bsArenaUrl(R.biome, R.floor + 1)); }
+    }
+    if (side) { bsStop(side, '__bsGone'); if (side.style) side.style.opacity = '0'; }
+  }
+  /* 3–4. затемнение и новая арена — завеса над полем; шапка и линейка этажей видны над ней */
+  let veil = bt.querySelector('.bs-veil');
+  if (ph === 'dark' || there) {
+    if (!veil) {
+      veil = document.createElement('i'); veil.className = 'bs-veil';
+      const f = document.getElementById('btField');
+      if (f && f.parentNode === bt && typeof f.after === 'function') f.after(veil); else bt.appendChild(veil);
+    }
+    bsStop(veil, '__bsAnim');
+    if (ph === 'black') { if (veil.style) veil.style.opacity = '1'; }
+    else veil.__bsAnim = bsPlay(veil, ph === 'dark' ? K.dark : K.open, { duration: real(ph === 'dark' ? Q.darkMs : Q.openMs), easing: 'ease-in-out', fill: 'forwards' }, real(T.since - cur[1]));
+  } else if (veil && typeof veil.remove === 'function') veil.remove();
+}
+/* экран перерисован посреди пути (свернули и развернули, открыли «Знаки») — путь встаёт с того же места */
+window.addEventListener('en-render', () => {
+  const R = typeof focusRun === 'function' ? focusRun() : null;
+  if (R && R.b && S.route === 'battle') bsTrip(R);
+});
+
+/* сценарий: поход виден целиком — сильный отряд берёт первый этаж биома сразу, остаток минимума этажа идёт походом на новый этаж */
+function bsTripFlow(biome) {
+  S.overlay = null; S.insp = null; S.legend = false; if (typeof bfView === 'function') bfView('square');
+  const sq = S.squads.find(q => q.m.filter(Boolean).length >= 5 && q.m.filter(Boolean).every(id => !runOf(id) && !(H(id) || {}).busy)) || S.squads[0];
+  const no = S.runNo;
+  startRun(sq.id, biome, 1);
+  const R = S.runs[S.runs.length - 1];
+  if (!R || R.runNo === no || R.biome !== biome) return;
+  const P = BS_DATA.tripFlow;
+  R.heroes = R.heroes.map(h => Object.assign({}, h, { lvl: P.lvl, cyc: P.cyc, hp: null, dead: false, used: [] }));
+  newFloor(R); render();
+}
 
 /* ================== 9. итог этажа и забега, окно «Стена» — герб над окном ================== */
 const BS_RES = { boss: 'win', guardWin: 'win', siege: 'wall', wall: 'wall', guardLose: 'wall', abort: '' };
@@ -766,7 +925,9 @@ kitFx = function (kind) {
 };
 
 /* ================== сценарии презентации: бой каждого вида ================== */
-FLOWS.push(['Бой AAA · рядовые', 'Сцена боя нового вида: этаж рядовых, ритуал этажа — враги выходят, падают, добыча летит в кошелёк, переход', () => {
+FLOWS.push(['Бой AAA · переход между этажами', 'Поход на новый этаж (ADR-0048): сильный отряд берёт этаж Мастерской форм сразу — добыча летит в кошелёк, отряд идёт дальше по биому, экран темнеет, открывается новая арена, враги нового этажа выходят справа', () => bsTripFlow('b1')]);
+FLOWS.push(['Бой AAA · переход · Подземный лес', 'Тот же поход в Подземном лесу: свои арены этажей биома', () => bsTripFlow('b2')]);
+FLOWS.push(['Бой AAA · рядовые', 'Сцена боя нового вида: этаж рядовых, ритуал этажа — враги выходят, падают, добыча летит в кошелёк, поход на новый этаж', () => {
   S.overlay = null; if (typeof bfView === 'function') bfView('square');
   const sq5 = S.squads.find(q => q.m.filter(Boolean).length >= 5 && q.m.filter(Boolean).every(id => !runOf(id) && !(H(id) || {}).busy)) || S.squads[0];
   startRun(sq5.id, 'b3', EB.BIOMES.b3 ? EB.BIOMES.b3.floors.findIndex(f => f.g === 'o' && f.m.length >= 4) + 1 || 1 : 1);
@@ -803,6 +964,19 @@ KIT_EXTRA.push({
     <section class="k-box" style="grid-column:1/-1"><h3>Эффекты боя · рисованные спрайты · ${(EnFx.VFX_ART || { ready: [] }).ready.length}</h3>
       <div class="k-demo bs-k-vxs">${vx}</div>
       <p class="k-note">Спрайты и flipbook-ленты (jobs/battle-vfx.json, tools/art-gen/vfx_layers.py): альфа из яркости, только transform и opacity, при «меньше движения» — без полётов и тряски. Каталог видов и проба на сцене — блок «Бой: карта бойца и эффекты».</p></section>
-    <section class="k-box"><h3>Ритуал этажа</h3><p class="k-note">Враги выходят ${fmt(Q.enterMs)} мс, по очереди через ${fmt(Q.stepMs)} мс. После последнего удара — «Этаж взят», через ${fmt(Q.takenMs)} мс добыча летит в кошелёк (${fmt(Q.lootMs)} мс), песок тает до минимума этажа — ${mm}; затем переход ${fmt(EB.RULES.floor.gapMs)} мс. Бой длиннее минимума доигрывает последний удар ${fmt(Q.fallMs)} мс. Свёрнутый забег ждёт тот же минимум. Числа — RULES.floor ядра: minMs подбирает калькулятор фарма (ADR-0044), ritual — фазы показа.</p></section>`;
+    <section class="k-box"><h3>Ритуал этажа — поход на новый этаж</h3><p class="k-note">ADR-0048: ожидания с плашкой нет, остаток минимума этажа — путь. Через ${fmt(Q.takenMs)} мс после последнего удара добыча летит в кошелёк (${fmt(Q.lootMs)} мс), отряд переходит дальше и идёт по биому — комната за ${fmt(Q.roomMs)} мс — весь остаток минимума этажа (${mm}) и перехода ${fmt(EB.RULES.floor.gapMs)} мс; в конце пути экран затемняется ${fmt(Q.darkMs)} мс, в темноте ${fmt(Q.blackMs)} мс — арена следующего этажа того же биома, она открывается ${fmt(Q.openMs)} мс; затем враги нового этажа выходят справа ${fmt(Q.enterMs)} мс, по очереди через ${fmt(Q.stepMs)} мс. Бой длиннее минимума доигрывает последний удар ${fmt(Q.fallMs)} мс, путь — ${fmt(Q.fallMs + EB.RULES.floor.gapMs)} мс. Длительность этажа поход не меняет; свёрнутый забег идёт тем же временем. «Меньше движения» — тот же порядок без движения. Числа — RULES.floor ядра: minMs подбирает калькулятор фарма (ADR-0044), ritual — фазы показа. Сценарии — «Бой AAA · переход между этажами».</p></section>
+    ${bsKitArenas()}`;
   },
 });
+/* UI-кит: арены этажей по биомам — готовые и ждущие генерации */
+function bsKitArenas() {
+  const rows = Object.entries(BS_ART.arenas).map(([id, list]) => {
+    const B = EB.BIOMES[id], n = list.filter(p => BS_ART.arenaReady.includes(p)).length;
+    const cells = list.map((p, i) => BS_ART.arenaReady.includes(p)
+      ? `<figure class="bs-k-ar"><img src="${bsArt(p)}" alt="" loading="lazy" decoding="async"><figcaption>${i + 1} · ${bsEsc(p)}</figcaption></figure>`
+      : `<figure class="bs-k-ar wait"><span>ждёт генерации</span><figcaption>${i + 1} · ${bsEsc(p)}</figcaption></figure>`).join('');
+    return `<div class="bs-k-arb"><b>${bsEsc(B ? B.name : id)} · готово ${n} из ${list.length}</b><div class="bs-k-ars">${cells}</div></div>`;
+  }).join('');
+  return `<section class="k-box" style="grid-column:1/-1"><h3>Арены этажей · по четыре на биом</h3>${rows}
+    <p class="k-note">ADR-0048: этаж берёт арену своего биома по номеру — (этаж − 1) по кругу из готовых, соседние этажи — разные арены, страж — первую (BS_ART.arenas, arenaReady). Новые участки — tools/art-gen/jobs/arena-floors.json, образец — нынешняя арена биома; выгрузка — tools/art-gen/ui-art.json и export_ui.py, затем путь — в BS_ART.arenaReady.</p></section>`;
+}

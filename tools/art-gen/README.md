@@ -286,6 +286,25 @@ python tools/art-gen/export_ui.py --spec ui-art.json --no-stamp --quiet
 - **Иконки боя** — `jobs/battle-ability-icons.json`, та же манера, что у иконок способностей (style, negative и рамка листа — из `spell-icons-none.json`): обычная атака по виду удара ядра (melee, arrow, magic), по всем, удар стража, отнимающий раунд, и «возвращённое лицо» Многоликого. Выгрузка `bab/<имя>.webp` 256 px — своя папка: в `spells/` только библиотека (`check_icons.js`). Пути — `BS_ART.abIcons`.
 - Проверка — `node tools/content-gen/screens/check_battle_scene.js`: файлы на диске и в `ui-art.json` с исходником, лента — столько кадров, сколько в данных.
 
+## Арены этажей
+
+Задача «Переход между этажами» (ADR-0048, слова автора 02.10.2026): этажи биома сменяют арены одного места — по четыре на биом 1–4, нынешняя и три новых участка. Задание — `jobs/arena-floors.json`, 12 картинок 21:9 2K, `--dry-run` — $1,21.
+
+```
+python tools/art-gen/gen.py jobs/arena-floors.json --dry-run
+python tools/art-gen/gen.py jobs/arena-floors.json --only arena-b1-2,arena-b2-2,arena-b3-2,arena-b4-2 --budget 0.5   # пилот: по одной на биом
+python tools/art-gen/gen.py jobs/arena-floors.json --only <остальные> --budget 1
+python tools/art-gen/arena_floors.py spec                  # опись ui-art.json: arena-bN-K.jpg 1688 × 716 из последней картинки задания
+python tools/art-gen/arena_floors.py spec --pick arena-b2-3=arenas/arena-b2-3__nb2-v2.jpg   # свой вариант
+python tools/art-gen/export_ui.py --spec ui-art.json --no-stamp
+python tools/art-gen/arena_floors.py ready                 # BS_ART.arenaReady в design/ui/screens/battle-scene.js
+```
+
+- **Образец каждой арены — нынешняя арена её биома** (`refs` задания): то же место — камера строго сверху, масштаб, зоны, темнота, палитра, материал пола и свет, — но свой участок, свои предметы и места. Рамка категории просит не копировать предметы образца; сюжет участка — из записей сказителя и облика врагов биома (`docs/lore/мастерская-форм-текст.md`, `docs/content/враги-биомов.md`): у Мастерской — месильня, стена набросков, сушильня с холодной печью; у леса — логово у корней, грибная прогалина, стоянка егерей; у Библиотеки — читальня, погрызенный стеллаж, зал больших часов; у Стоун-Хейма — рудничный двор, литейный двор, пошлинный пост.
+- Раскладка — как у нынешних арен: четверти карт — ровный пол, детали — в средней половине у верхнего и нижнего края, середина спокойная, края — тонкая полоса не больше 7 % высоты; пол уходит за левый и правый край (поход едет зеркальными копиями арены). Свет и запреты — как у арен биомов: никаких костей, надписей, людей и зверей; в Мастерской огня нет и печь холодная.
+- Этаж берёт арену своего биома по номеру: (этаж − 1) по кругу из готовых (`BS_ART.arenas`, `arenaReady`). Пока новых нет — этаж берёт нынешнюю.
+- 02.10.2026 генерация не прошла: HTTP 400 «User location is not supported for the API use» — регион; см. `docs/art-queue.md`. Проверка — `node tools/content-gen/screens/check_battle_scene.js`: готовые арены — на диске и в описи, выгруженные — в `arenaReady`.
+
 ## Враги крафта Этриона
 
 Задание — `jobs/craft-bosses.json`, портреты 4:5 1K по «Глубокому промту персонажа»; пробная пятёрка — `jobs`, остальные — `backlog` без генерации. Выгрузка — `ui-art.json`: `foes/<id босса>.jpg` 464 × 576; путь в прототипе — `ECH.craftArt` в `design/ui/screens/echo.js` (эхо боссов биомов 1–4 — готовые портреты боссов биомов, пробуждённый — портрет своего босса). Проверка — `node tools/content-gen/screens/check_echo.js`.

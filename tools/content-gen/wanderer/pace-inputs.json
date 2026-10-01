@@ -12,8 +12,8 @@
   "goldVariant": "+30 % линейно — принято"
  },
  "cycleI": {
-  "floors": 468,
-  "elites": 112,
+  "floors": 136,
+  "elites": 32,
   "bosses": 2,
   "gold": 6444,
   "spirit": 12888,
