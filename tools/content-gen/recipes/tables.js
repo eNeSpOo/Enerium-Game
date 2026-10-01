@@ -3,6 +3,10 @@
    Темп доблести считает tempo.py — его блоки в tempo.md. */
 const fs = require('fs');
 const C = require('./common');
+/* иммунитет к контролю — по рангу типа призванного врага: таблица ядра RULES.resist (ADR-0010, ADR-0039), своих чисел нет */
+const EB = (() => { require('../../../design/ui/battle.js'); return globalThis.EnBattle; })();
+const G_NAME = { e: 'элита', b: 'босс', u: 'Убер', f: 'Забытый' };
+const immBp = g => EB.RULES.resist[EB.RULES.echo.kind[g]] || 0;
 const fmt = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 const pct = bp => (bp % 100 ? (bp / 100).toFixed(2).replace(/0$/, '').replace('.', ',') : String(bp / 100)) + ' %';   // 1350 → 13,5 %
 const x100 = n => (n % 100 ? (n / 100).toFixed(2).replace(/0$/, '').replace('.', ',') : String(n / 100));
@@ -92,12 +96,12 @@ module.exports = function tables({ items, recipes, byId, CYC, ROMAN, places, mem
   block('fams');
   L.push('| Семейство (fam) | Ярус (tier) | Предметов | Откуда | Куда |', '|---|---|---|---|---|');
   const FROM = { basic: 'любой биом, ритуалы, лавка', key: 'элита биома, один из шести', unique: `босс биома, ${pct(C.ENEMY.uniqueBp)}`, res: `этаж крафтового места, ${pct(C.CRAFT.biome.resPerFloorBp)}, по весу вида`,
-    find: `закрытие места: первая — всегда, вторая — ${pct(C.CRAFT.biome.secondFindBp)}`, trophy: 'победа над крафтовым боссом', awtrophy: 'победа над пробуждённым', memtrophy: 'победа над эхом босса биома',
+    find: `закрытие места: первая — всегда, вторая — ${pct(C.CRAFT.biome.secondFindBp)}`, trophy: 'победа над боссом руины или города', awtrophy: 'победа над пробуждённым', memtrophy: 'победа над эхом босса биома',
     wallet: 'кошелёк: покупка, контракты, Арена, кланы, реклама; победа над призванным врагом', echo: 'Эхо, Многоликий',
     rune: 'страж пределов; старшие — перековкой', vshard: 'страж доблести; из пыли и из руны прошлого цикла — рецептом', valor: 'сто осколков доблести',
     hero: 'скрытый рецепт', ener: 'лестница: сто к одному; кристалл — ещё из зелёных крупиц', dust: 'распыление рунных ключей и лишних рун предела I',
     karst: 'рецепт; Некрониум — сюжетный' };
-  const TO = { ruin: 'призывает руину в «Биомы»', city: 'призывает город в «Биомы»', call: 'призывает крафтового босса в Эхо', awcall: 'призывает пробуждённого в Эхо', memcall: 'призывает эхо босса биома в Эхо',
+  const TO = { ruin: 'призывает руину в «Биомы»', city: 'призывает город в «Биомы»', call: 'призывает босса руины или города в Эхо', awcall: 'призывает пробуждённого в Эхо', memcall: 'призывает эхо босса биома в Эхо',
     hero: 'комплект осколков героя', rune: 'предел героя', valor: 'доблесть героя', mask: 'Лик недели в Эхо' };
   for (const f of Object.keys(C.FAMS)) {
     const list = fam(f); if (!list.length) continue;
@@ -148,7 +152,7 @@ module.exports = function tables({ items, recipes, byId, CYC, ROMAN, places, mem
   L.push('| Рецепт | Цикл | Входы | Выход | Зачем |', '|---|---|---|---|---|');
   for (const r of recipes.filter(x => x.fam === 'ener' || x.out[0] === C.ENER.t1)) L.push(`| ${r.n} | ${ROMAN[r.cyc]} | ${ing(r.in)} | ${nm(r.out[0])} ×${r.out[1]} | ${esc(r.why)} |`);
   block('ener-calls');
-  L.push('| Цикл | Призывы крафтовых боссов и городов | Эхо боссов биомов | Пробуждённые | Энериум возвращает победа: крафтовый / эхо |', '|---|---|---|---|---|');
+  L.push('| Цикл | Призывы боссов руин и городов | Эхо боссов биомов | Пробуждённые | Энериум возвращает победа: босс руины / эхо |', '|---|---|---|---|---|');
   const enerOf = r => { const e = r.in.find(([id]) => [C.ENER.t1, C.ENER.t2, C.ENER.t3].includes(id)); return e ? `${nm(e[0])} ×${e[1]}` : '—'; };
   const range = list => { const v = [...new Set(list.map(enerOf))]; return v.join(' / ') || '—'; };
   for (const cy of CYC) {
@@ -194,9 +198,9 @@ module.exports = function tables({ items, recipes, byId, CYC, ROMAN, places, mem
     L.push(`| ${cyLabel(CYC[m.cyc - 1])} | ${m.biome.slice(1)}. ${m.boss} | ${nm(m.unique)} | ${nm(m.recraft)}: ${ing(rc.in)} | ${nm(m.call)}: ${ing(mc.in)} | ${nm(m.trophy)} | ${usedIn(m.trophy, m.cyc)} |`);
   }
 
-  /* ——— крафтовые места и боссы ——— */
+  /* ——— крафтовые места и их боссы ——— */
   block('places');
-  L.push('| Цикл | Место | Вид | Где | Ресурсов | Находки | Крафтовый босс · раса · ремесло | Призыв — из чего | Трофей |', '|---|---|---|---|---|---|---|---|---|');
+  L.push('| Цикл | Место | Вид | Где | Ресурсов | Находки | Босс места · раса · ремесло | Призыв — из чего | Трофей |', '|---|---|---|---|---|---|---|---|---|');
   for (const p of places) {
     const call = OUT[p.boss.call][0];
     L.push(`| ${cyLabel(CYC[p.cyc - 1])} | ${p.n} | ${p.kind === 'city' ? 'город' : 'руина'} | ${esc(p.where)} | ${p.res.length} | ${p.finds.map(nm).join(', ')} | ${p.boss.label} · ${raceLc(p.boss.race)} · ${C.SPECS[p.boss.spec].n.toLowerCase()} | ${ing(call.in)} | ${nm(p.boss.trophy)} |`);
@@ -206,7 +210,7 @@ module.exports = function tables({ items, recipes, byId, CYC, ROMAN, places, mem
   L.push('| С цикла | Пробуждённый | Призыв — из чего | Трофей | Трофей идёт в |', '|---|---|---|---|---|');
   for (const p of places) { const a = p.boss.awake; if (!a) continue; const r = OUT[a.call][0];
     L.push(`| ${ROMAN[a.cyc]} | ${a.label} | ${ing(r.in)} | ${nm(p.boss.awTrophy)} | ${usedIn(p.boss.awTrophy, a.cyc)} |`); }
-  L.push('', `Сила — как у крафтового босса на ${AW.powerCycleStep} цикл выше; трофеев ${AW.trophies}, ключей ремесла ${AW.specKeys}, валюта ×${AW.currencyMul}, рунный ключ ${pct(AW.runeKeyBp)}, сундук на ${AW.chestStep} ступень выше.`);
+  L.push('', `Тип — Забытый, высшая ступень врага (ADR-0039); сила — на ${AW.powerCycleStep} цикл выше; трофеев ${AW.trophies}, ключей ремесла ${AW.specKeys}, валюта ×${AW.currencyMul}, рунный ключ ${pct(AW.runeKeyBp)}, сундук на ${AW.chestStep} ступень выше.`);
 
   /* ——— ключи, пул, уникальные ——— */
   block('keys');
@@ -246,9 +250,9 @@ module.exports = function tables({ items, recipes, byId, CYC, ROMAN, places, mem
   block('craft drops');
   L.push('| Место | Цикл | Этажей | Ресурс за этаж | Находки | Дух / золото / души / осколки сборных героев | Рунный ключ |', '|---|---|---|---|---|---|---|');
   for (const b of drops.craftBiomes) L.push(`| ${b.name} | ${ROMAN[b.cyc]} | ${b.floors} | ${pct(b.resPerFloorBp)}, вид — по весу | ${b.finds} + ${pct(b.secondFindBp)} | ${fmt(b.spirit)} / ${fmt(b.gold)} / ${b.souls} / ${b.heroShards} | ${b.runeKeyBp ? pct(b.runeKeyBp) + " × " + b.runeKeys : "—"} |`);
-  L.push('', '| Враг из призыва | Вид | Цикл | Раса | Ремесло | Трофей / ключи ремесла | Дух / золото / Энериум | Рунный ключ | Сундук, редкость | Иммунитет к контролю |', '|---|---|---|---|---|---|---|---|---|---|');
-  const BK = { ruin: 'крафтовый босс', city: 'босс города', mask: 'Лик недели', memory: 'эхо босса биома', awake: 'пробуждённый' };
-  for (const s of drops.craftBosses) L.push(`| ${s.name} | ${BK[s.kind] || s.kind} | ${ROMAN[s.cyc]} | ${s.race} | ${s.spec ? C.SPECS[s.spec].n.toLowerCase() : '—'} | ${s.trophy ? nm(s.trophy) + ' ×' + s.trophies : pct(s.heroShardsWeekBp || 0) + ' недельных осколков героев'} / ${s.specKeys} | ${fmt(s.spirit)} / ${fmt(s.gold)} / ${s.enerium} | ${s.runeKeyBp ? pct(s.runeKeyBp) + " × " + s.runeKeys : s.workerBoxRarity ? "изредка, в сундуке" : "—"} | ${s.workerBoxRarity || '—'} | ${pct(s.immunityBp)} |`);
+  L.push('', '| Враг из призыва | Вид | Тип по силе | Цикл | Раса | Ремесло | Трофей / ключи ремесла | Дух / золото / Энериум | Рунный ключ | Сундук, редкость | Иммунитет к контролю |', '|---|---|---|---|---|---|---|---|---|---|---|');
+  const BK = { ruin: 'босс руины', city: 'босс города', mask: 'Лик недели', memory: 'эхо босса биома', awake: 'пробуждённый' };
+  for (const s of drops.craftBosses) L.push(`| ${s.name} | ${BK[s.kind] || s.kind} | ${G_NAME[s.g]} | ${ROMAN[s.cyc]} | ${s.race} | ${s.spec ? C.SPECS[s.spec].n.toLowerCase() : '—'} | ${s.trophy ? nm(s.trophy) + ' ×' + s.trophies : pct(s.heroShardsWeekBp || 0) + ' недельных осколков героев'} / ${s.specKeys} | ${fmt(s.spirit)} / ${fmt(s.gold)} / ${s.enerium} | ${s.runeKeyBp ? pct(s.runeKeyBp) + " × " + s.runeKeys : s.workerBoxRarity ? "изредка, в сундуке" : "—"} | ${s.workerBoxRarity || '—'} | ${pct(immBp(s.g))} |`);
   block('pools');
   L.push('| Цикл | Ключи | Уникальные | Ресурсы мест | Находки | Трофеи | Награды мастерской |', '|---|---|---|---|---|---|---|');
   for (const p of drops.lootboxes.pools) L.push(`| ${cyLabel(CYC[p.cyc - 1])} | ${p.key.length} | ${p.unique.length} | ${p.craftres.length} | ${p.find.length} | ${p.trophy.length} | ${p.products.map(nm).join(', ') || '—'} |`);
@@ -272,7 +276,7 @@ module.exports = function tables({ items, recipes, byId, CYC, ROMAN, places, mem
   /* ——— каталог по циклам: предметы и рецепты ——— */
   /* откуда — коротко: биом или место и правило семейства; подробные строки «где падает» — в карточке предмета (src) */
   const bName = b => { const p = places.find(x => x.id === b); if (p) return p.n; for (const cy of CYC) { const x = cy.biomes.find(y => y.id === b); if (x) return x.n; } return b; };
-  const SHORT = { key: 'элита', unique: 'босс биома', res: 'этаж', find: 'закрытие', trophy: 'крафтовый босс', awtrophy: 'пробуждённый', memtrophy: 'эхо босса биома', echo: 'Эхо' };
+  const SHORT = { key: 'элита', unique: 'босс биома', res: 'этаж', find: 'закрытие', trophy: 'босс руины или города', awtrophy: 'пробуждённый', memtrophy: 'эхо босса биома', echo: 'Эхо' };
   const where = it => {
     if (it.pool) return 'общий пул';
     if (isDrop(it)) return `${it.b ? bName(it.b) + ' · ' : ''}${SHORT[it.fam] || 'добыча'}`;

@@ -10,10 +10,10 @@
       после первой атаки цели оставляем 1 здоровья — шкала Эхо растёт ×3 за цикл, а отряд прототипа нет; победа — очки, бестиарий,
       рост лестницы до Убер-босса; Многоликий выпадает при призыве с шансом manySummonBp, победа над ним даёт ресурс «Многоликий» своей недели;
       цель с вышедшим сроком уходит; планки недели → сундуки осколков в запасах, один раз.
-   4. Активации из запасов на каждой неделе и цикле: все крафтовые боссы (ACTIVATE.call), биом Многоликого (ACTIVATE.echo) —
+   4. Активации из запасов на каждой неделе и цикле: все призванные враги (ACTIVATE.call; тип по силе — ADR-0039), биом Многоликого (ACTIVATE.echo) —
       в слот биомов без душ, забег по 14 ступеням с одной попыткой и очками за взятые этажи, все руины (ACTIVATE.act).
       Лист подтверждения не называет будущего врага и руину; недоступная активация ничего не списывает;
-      повтор подтверждения не списывает второй раз; победа над крафтовым боссом — трофей, ключи, валюта и сундук по модели
+      повтор подтверждения не списывает второй раз; победа над призванным врагом — трофей, ключи, валюта и сундук по модели
       призванных врагов (EN_LOOTBOXES.summon): вид, редкость, окно, цикл пула, неделя у Лика недели, сид от боя; повтор атаки второго
       сундука не даёт; итог боя показывает сундук с «Шансы» и «Открыть», «Открыть» — в запасах окном сундука, повтор не выдаёт;
       «Сведения» о предмете призыва, лист «Состав и шансы» и бестиарий показывают сундук за победу, имени врага до призыва нет;
@@ -236,7 +236,7 @@ function suite() {
       S.ech.wide = false; clearEcho(); ACT.echsum('0'); if (!S.ech.pending[0] || S.ech.pending[0].offers.length !== D.offer.base) fail(key + ': без артефакта вариантов не ' + D.offer.base); S.ech.wide = true;
 
       /* каждая ступень до победы: очки, бестиарий, рост лестницы до Убер-босса; Многоликий — не ступень лестницы, выпадает при призыве,
-         победа над Многоликим (лёгкий бой один на один) даёт ресурс «Многоликий» (ADR-0025) */
+         победа над Многоликим (вершина недели, бой с лицами недели — ADR-0039) даёт ресурс «Многоликий» (ADR-0025) */
       for (let st = 1; st <= TOP + 1; st++) {
         clearEcho(); S.ech.avail = Math.min(st, TOP);
         const t = E.target('step', st), score0 = S.echo.score, many0 = BAG.qty(XE.uber.item);
@@ -269,7 +269,7 @@ function suite() {
         S.overlay = { t: 'echweek' }; scan(key + ' · планки забраны', draw());
       }
 
-      /* крафтовые боссы из запасов */
+      /* призванные враги из запасов: тип по силе — из recipes.js (ADR-0039) */
       for (const fb of RX.drops.craftBosses) {
         clearEcho();
         const it = BAG.item(fb.call); BAG.add(it.id, 1);
@@ -278,7 +278,7 @@ function suite() {
         if (!S.overlay || S.overlay.t !== 'echact') { fail(k2 + ': нет листа подтверждения'); continue; }
         h = draw(); out.sheets++; scan(k2 + ' · подтверждение', h);
         if (h.includes(fb.name) || (it.opens && h.includes(it.opens))) fail(k2 + ': лист подтверждения раскрывает врага');
-        /* крафтовый босс живёт час: оценка — до призыва, на той цели, какую даст призыв; кошелёк не трогает */
+        /* призванный враг живёт час: оценка — до призыва, на той цели, какую даст призыв; кошелёк не трогает */
         const avail = !(it.team && c < 6) && E.checks('call', it).every(y => y.ok);
         if (avail !== /На убийство нужно около|оценки нет|Оценку даст/.test(h)) fail(`${k2}: оценка до призыва ${avail ? 'не показана' : 'показана у недоступного'}`);
         const gCraft = avail ? E.est(E.ghost('craft', fb)) : null;
@@ -292,6 +292,7 @@ function suite() {
         if (BAG.qty(it.id) !== q0 - 1 || S.wallet.souls !== s0 - XE.summonSouls) fail(`${k2}: списано ${q0 - BAG.qty(it.id)} предметов и ${s0 - S.wallet.souls} душ`);
         const i = S.echo.slots.findIndex(Boolean), x = S.echo.slots[i];
         if (!x || x.fid !== fb.id || x.kind !== 'craft') { fail(k2 + ': босс не встал в слот'); continue; }
+        if (x.g !== fb.g || !['e', 'b', 'u', 'f'].includes(x.g)) fail(`${k2}: тип цели «${x.g}», а в recipes.js — «${fb.g}»`);
         if (!S.overlay || S.overlay.t !== 'echgot') fail(k2 + ': нет листа «призван»');
         h = draw(); scan(k2 + ' · призван', h);
         if (!S.ech.known[fb.id] && h.includes(fb.name)) fail(k2 + ': имя босса видно до первой победы');
@@ -444,10 +445,10 @@ if (res.leak) for (const [id, why] of Object.entries(res.leak)) warn.push(`recip
         aw: Object.keys(C).filter(id => has.has(id + '_aw')).map(id => [id, C[id], pic(id + '_aw')]),
         none: ids.filter(id => id !== 'lik' && !C[id] && !C[id.replace(/_aw$/, '')]).map(id => [id, pic(id)]) };
     })()`, ctx);
-  } catch (e) { err.push('портреты крафтовых боссов: ' + e.message); }
+  } catch (e) { err.push('портреты призванных врагов: ' + e.message); }
   if (A) {
     for (const [id, p, has, h] of A.art) {
-      if (!has) err.push(`ECH.craftArt.${id}: такого крафтового босса нет в recipes.js`);
+      if (!has) err.push(`ECH.craftArt.${id}: такого призванного врага нет в recipes.js`);
       if (!fs.existsSync(path.join(UI, 'assets', 'art', p))) err.push(`ECH.craftArt.${id}: нет файла assets/art/${p}`);
       if (!h.includes(p + '?v=')) err.push(`ECH.craftArt.${id}: портрет не показан в облике врага`);
     }
@@ -456,7 +457,7 @@ if (res.leak) for (const [id, why] of Object.entries(res.leak)) warn.push(`recip
     console.log(`Портреты врагов крафта: ${A.art.length} (пробуждённых — по портрету своего босса: ${A.aw.length}), без портрета — ${A.none.length}.`);
   }
 }
-console.log(`Эхо проверено за ${Math.round((Date.now() - t0) / 1000)} с: экранов ${res.screens}, листов ${res.sheets}, вариантов призыва ${res.offers}, побед ${res.kills}, крафтовых боссов ${res.calls}, Многоликих ${res.many}, руин ${res.ruins}, сундуков ${res.chests}, открыто из итога ${res.opened || 0}, оценок до призыва ${res.ests}.`);
+console.log(`Эхо проверено за ${Math.round((Date.now() - t0) / 1000)} с: экранов ${res.screens}, листов ${res.sheets}, вариантов призыва ${res.offers}, побед ${res.kills}, призванных врагов ${res.calls}, Многоликих ${res.many}, руин ${res.ruins}, сундуков ${res.chests}, открыто из итога ${res.opened || 0}, оценок до призыва ${res.ests}.`);
 done();
 
 function done() {

@@ -328,7 +328,7 @@ function bookRecipes() {
     sheets: [
       sheet('Рецепты', [col('id', 18), col('Название', 28), col('Цикл', 6), col('Вид', 18), col('Семейство', 22), col('Выход', 30), col('Входы', 70, W_), col('Почему так', 70, TW), col('Скрытый', 8), col('Известен сразу', 8), col('Главный сток', 8), col('Вес', 6), col('Для команды', 9)], rows),
       sheet('Крафтовые места', [col('id', 7), col('Вид', 8), col('Место', 26), col('Город', 14), col('Цикл', 6), col('Где', 40, W_), col('Лор', 60, W_), col('Враги', 34, W_), col('Активация', 26), col('Ресурсы места', 60, W_), col('Находки', 34, W_),
-        col('Крафтовый босс', 22), col('Титул', 22), col('Раса', 10), col('Ремесло', 14), col('Пробуждённый', 26), col('Для команды', 9)], places),
+        col('Призванный враг', 22), col('Титул', 22), col('Раса', 10), col('Ремесло', 14), col('Пробуждённый', 26), col('Для команды', 9)], places),
       sheet('Эхо боссов биомов', [col('id', 6), col('Биом', 22), col('Цикл', 6), col('Босс', 22), col('Эхо', 28), col('Раса', 10), col('Ремесло', 14), col('Уникальный', 24), col('Перекрафт', 26), col('Призыв', 26), col('Трофей', 26), col('Лор', 60, W_), col('Для команды', 9)], mems),
       sheet('Энериум и пыль', [col('Что', 26), col('Значение', 60, W_)], ener),
       sheet('Добыча биомов', [col('Биом', 6), col('Название', 24), col('Цикл', 6), col('Этажей', 7), col('Элит', 6), col('Рядовой', 30, W_), col('Элита', 40, W_), col('Босс', 50, W_), col('Для команды', 9)], drops),
@@ -396,19 +396,22 @@ function bookFoes() {
   const echo = Object.entries(EF.foes).map(([id, f]) => [id, f.race, civ[f.race] || '', f.step, rankN[f.rank] || f.rank, f.name, f.cls, f.el, f.look || '', (f.kit || []).map(abN).join('; ')]);
   const echoAb = EF.abilities.map(a => [a.id, a.owner, (EF.foes[a.owner] || {}).name || '', a.n, a.set, a.t === 'ult' ? 'ульта' : a.t === 'pas' ? 'пассивка' : 'активная', a.d, (a.need || []).join(', ')]);
   const bAb = BF.abilities.map(a => [a.id, a.owner, (BF.foes[a.owner] || {}).name || '', a.n, a.set, a.t, a.d]);
+  /* призванные враги (§12.3): тип по силе — поле g записи drops.craftBosses (ADR-0039: «крафтового босса» как типа нет) */
+  const gN = { e: 'элита', b: 'босс', u: 'Убер', f: 'Забытый' }, cbById = Object.fromEntries(R.drops.craftBosses.map(b => [b.id, b]));
+  const gOf = id => (cbById[id] ? gN[cbById[id].g] || cbById[id].g : '');
   const craft = [];
   for (const p of R.places) {
-    if (p.boss) craft.push([p.boss.id, 'крафтовый босс · ' + (p.kind === 'city' ? 'город' : 'руина'), cyc(p.cyc), p.n, p.boss.n, p.boss.title || '', p.boss.race || '', specN(p.boss.spec), p.boss.lore || '', yes(p.team || p.boss.team)]);
+    if (p.boss) craft.push([p.boss.id, p.kind === 'city' ? 'босс города' : 'босс руины', gOf(p.boss.id), cyc(p.cyc), p.n, p.boss.n, p.boss.title || '', p.boss.race || '', specN(p.boss.spec), p.boss.lore || '', yes(p.team || p.boss.team)]);
     const aw = p.boss && p.boss.awake;
-    if (aw) craft.push([aw.id, 'пробуждённый', cyc(aw.cyc || Math.max(2, p.cyc)), p.n, aw.label, '', p.boss.race || '', specN(p.boss.spec), aw.lore || '', yes(p.team || p.boss.team)]);
+    if (aw) craft.push([aw.id, 'пробуждённый', gOf(aw.id), cyc(aw.cyc || Math.max(2, p.cyc)), p.n, aw.label, '', p.boss.race || '', specN(p.boss.spec), aw.lore || '', yes(p.team || p.boss.team)]);
   }
-  for (const m of R.memories) craft.push([m.id, 'эхо босса биома', cyc(m.cyc), (bioById[m.biome] || {}).n || m.biome, m.label, '', m.race, specN(m.spec), m.lore, yes(m.team)]);
+  for (const m of R.memories) craft.push([m.id, 'эхо босса биома', gOf(m.id), cyc(m.cyc), (bioById[m.biome] || {}).n || m.biome, m.label, '', m.race, specN(m.spec), m.lore, yes(m.team)]);
   const roleN = Object.fromEntries(Object.entries(CF.roles).map(([k, v]) => [k, v.n]));
   const clan = [];
   for (const h of CF.hosts) for (const [role, f] of Object.entries(h.figs)) clan.push([h.id, h.n, h.el, h.place, roleN[role] || role, f.n, f.look, f.tip]);
   return {
-    file: 'Enerium_Враги.xlsx', title: 'Враги: биомы, Мастерская форм, Эхо, крафтовые боссы, клан',
-    what: ['Все враги игры: двенадцать биомов спуска, Мастерская форм, биомы 2–4 (данные), биомы 5–12 (черновик врагов), Эхо девяти недель с Убер-боссами и Многоликим, крафтовые боссы руин и городов, пробуждённые, эхо боссов биомов, сонмы кланового босса.',
+    file: 'Enerium_Враги.xlsx', title: 'Враги: биомы, Мастерская форм, Эхо, призванные враги, клан',
+    what: ['Все враги игры: двенадцать биомов спуска, Мастерская форм, биомы 2–4 (данные), биомы 5–12 (черновик врагов), Эхо девяти недель с Убер-боссами и Многоликим, призванные враги — боссы руин и городов, пробуждённые, эхо боссов биомов — с типом по силе, сонмы кланового босса.',
       'Имена и способности врагов игрок узнаёт после первой победы (§7). Биомы 11–12 и их обитатели — только для команды (§38).'],
     sources: [UI('recipes'), UI('biome-foes'), UI('echo-foes'), rel(KITF), rel(CFF), rel(FOES_DOC), UI('roster')],
     team: ['«Биомы» и «Биомы 5–12» — строки с пометкой «для команды»: биомы 11–12 (§38)', '«Способности Эхо» — «Нужно ядру»: недостающие примитивы ядра боя'],
@@ -420,7 +423,7 @@ function bookFoes() {
       sheet('Эхо', [col('id', 13), col('Раса недели', 12), col('Цивилизация', 16), col('Ступень', 7), col('Ранг', 10), col('Враг', 26), col('Класс', 18), col('Стихия', 10), col('Облик', 60, W_), col('Способности', 60, W_)], echo),
       sheet('Способности Эхо', [col('id', 22), col('Владелец', 13), col('Враг', 24), col('Название', 26), col('Школа', 10), col('Вид', 10), col('Что делает', 70, W_), col('Нужно ядру', 20, T_)], echoAb),
       sheet('Способности биомов', [col('id', 22), col('Владелец', 8), col('Враг', 22), col('Название', 24), col('Школа', 10), col('Вид', 8), col('Что делает', 70, W_)], bAb),
-      sheet('Крафтовые боссы', [col('id', 12), col('Вид', 26), col('Цикл', 6), col('Место', 26), col('Враг', 28), col('Титул', 24), col('Раса', 10), col('Ремесло', 14), col('Лор', 70, W_), col('Для команды', 9)], craft),
+      sheet('Призванные враги', [col('id', 12), col('Вид призыва', 20), col('Тип по силе', 10), col('Цикл', 6), col('Место', 26), col('Враг', 28), col('Титул', 24), col('Раса', 10), col('Ремесло', 14), col('Лор', 70, W_), col('Для команды', 9)], craft),
       sheet('Клан', [col('Сонм', 8), col('Название', 16), col('Стихия', 10), col('Где', 26), col('Роль', 18), col('Фигура', 20), col('Облик', 70, W_), col('Совет старика', 50, W_)], clan),
     ],
   };
@@ -596,7 +599,7 @@ function bookRegistry(books) {
   for (const it of R.items) add('предмет · ' + famN(it.fam), it.id, it.n, it.cyc, it.team, 'Ресурсы · Предметы');
   for (const r of R.recipes) add('рецепт', r.id, r.n, r.cyc, r.team, 'Рецепты · Рецепты');
   for (const c of R.cycles) for (const b of c.biomes) { add('биом', b.id, b.n, c.n, c.team, 'Враги · Биомы'); add('босс биома', b.id, b.boss, c.n, c.team, 'Враги · Биомы'); add('рунный страж', b.id, b.guard, c.n, c.team, 'Враги · Биомы'); }
-  for (const p of R.places) { add('крафтовое место', p.id, p.n, p.cyc, p.team, 'Рецепты · Крафтовые места'); if (p.boss) add('крафтовый босс', p.boss.id, p.boss.n, p.cyc, p.team, 'Враги · Крафтовые боссы'); if (p.boss && p.boss.awake) add('пробуждённый', p.boss.awake.id, p.boss.awake.label, p.boss.awake.cyc || Math.max(2, p.cyc), p.team, 'Враги · Крафтовые боссы'); }
+  for (const p of R.places) { add('крафтовое место', p.id, p.n, p.cyc, p.team, 'Рецепты · Крафтовые места'); if (p.boss) add('призванный враг', p.boss.id, p.boss.n, p.cyc, p.team, 'Враги · Призванные враги'); if (p.boss && p.boss.awake) add('пробуждённый', p.boss.awake.id, p.boss.awake.label, p.boss.awake.cyc || Math.max(2, p.cyc), p.team, 'Враги · Призванные враги'); }
   for (const m of R.memories) add('эхо босса биома', m.id, m.label, m.cyc, m.team, 'Рецепты · Эхо боссов биомов');
   for (const h of RO.heroes) add('герой', h.id, h.n, h.c, false, 'Герои · Герои');
   for (const s of RO.sets) add('сет', s.key, s.name, s.cycle, false, 'Сеты · Сеты');
@@ -651,7 +654,7 @@ function bookRegistry(books) {
     if (cats.has('способность врага биома') && list.some(x => /Уникальный ресурс/.test(x.cat))) return 'уникальный ресурс босса и его пассивка — одно имя: эту вещь босс и роняет';
     if (cats.has('нашествие Эхо') && (cats.has('способность врага Эхо') || cats.has('враг Эхо'))) return 'нашествие — ульта или имя Убер-босса недели: так задумано';
     if (cats.has('враг Эхо') && cats.has('способность врага Эхо') && list.length === 2) return 'Убер-босс и его ульта — одно имя: так задумано';
-    if (cats.has('крафтовый босс') && cats.has('герой') && list.length === 2) return 'один человек: душа-герой и память о нём — крафтовый босс; развести ли имена — вопрос автору';
+    if (cats.has('призванный враг') && cats.has('герой') && list.length === 2) return 'один человек: душа-герой и память о нём — призванный враг; развести ли имена — вопрос автору';
     if ([...cats].every(c => c === 'ритуал' || c === 'ритуал за уникальным')) return '';
     return '';
   };

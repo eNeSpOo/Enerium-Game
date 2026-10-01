@@ -1,7 +1,7 @@
 /* Автопроверка боя Эхо (ADR-0025) в ядре и в прототипе, приёмов Убер-боссов, расовой неприязни (ADR-0024),
    биома Многоликого и рунного стража со «Спуска» (ADR-0018, ADR-0020) — без браузера.
    Ядро (design/ui/battle.js):
-   1. EB.echoBattle — главный враг и защитники по типу (RULES.echo.guards: четверо, у Многоликого — никого), предел раундов
+   1. EB.echoBattle — главный враг и защитники по типу (RULES.echo.guards: четверо у всех, и у Многоликого — ADR-0039), предел раундов
       по типу (RULES.echo.rounds), здоровье главного врага — с входа, защитники полные; тот же сид — тот же итог;
       итог EB.echoStats сходится с самим боем; перестановка отряда боя не меняет; только целые числа.
    2. Здоровье сохраняется между атаками: цепочка атак, вход каждой — выход прошлой.
@@ -16,20 +16,21 @@
    8б. Остальные приёмы: отложенный удар, сила от союзников, забрать эффекты, цель для всех, каждый N-й ход, защита до метки,
        повтор чужой ульты, поднять павшего, срезанное имя, урон по цели под эффектом; правки ядра — удары hits делят коэффициент,
        «тепло» Огня снимает стужу.
-   9.  Девять недель × шесть циклов × 14 ступеней, Многоликий и крафтовые боссы: бой собирается и идёт до конца — дважды:
-       на демо со скрытыми echo-foes.js и echo-rules.js и на данных; на данных уровень, раунды, здоровье по формуле правил,
-       души и очки — из echo-rules.js, ранг, набор и защитники — из echo-foes.js.
+   9.  Девять недель × шесть циклов × 14 ступеней, Многоликий и призванные враги: бой собирается и идёт до конца — дважды:
+       на демо со скрытыми echo-foes.js и echo-rules.js и на данных; раунды — всегда из ядра; на данных уровень, здоровье по формуле
+       правил, души и очки — из echo-rules.js, ранг, набор и защитники — из echo-foes.js. Призванный враг — тип по силе из recipes.js
+       (e, b, u, f, ADR-0039): раунды, ранг и иммунитет его типа; Многоликий — ранг Забытого, свой набор, четверо защитников.
    10. Атака: душа один раз, повтор того же номера — ничего; бой одной сценой; просмотр — тот же бой, что итог; «Пропустить» —
        итог со статистикой, отнятым здоровьем и очками; здоровье переходит в следующую атаку; неприязнь героя доходит до боя.
-       Многоликий — лёгкий бой один на один; ресурс «Многоликий» привязан к своей неделе.
+       Многоликий — вершина, бой с четырьмя защитниками (ADR-0039); ресурс «Многоликий» привязан к своей неделе.
    11. Арт Иш-Кантуна — только у недели эльфов: портреты ступеней и фон арены Эхо.
    12. «Спуск»: вход к рунному стражу — после босса биома, демо-вход — всегда; в бою видно, что удар стража отнимает раунд.
    13. Девять Убер-боссов против своих отрядов недели (герои Эхо echo-foes.js) на циклах II, IV и VI: бой идёт, Убер срабатывает
        каждым приёмом набора и обычной атакой по всем, если она у него есть.
    14. Многоликий при призыве — бросок manySummonBp сверх лестницы; «Лик недели» — likShards по циклу; биом Многоликого —
        здоровье героев переходит с этажа на этаж, главный враг полный, попытка одна.
-   15. Раунды — одна таблица ядра RULES.rounds.by на все режимы (решение автора 29.09.2026). Срок жизни: боссы, Убер и крафтовый
-       босс — час, отсчёт на карточке цели, срок вышел — цель исчезает. Осада: остаток здоровья на входе — максимум в атаке,
+   15. Раунды — одна таблица ядра RULES.rounds.by на все режимы (слово автора 01.10.2026, ADR-0039). Срок жизни: боссы, Убер
+       и призванные враги — час, отсчёт на карточке цели, срок вышел — цель исчезает. Осада: остаток здоровья на входе — максимум в атаке,
        прежний — max0; лечение и доли от максимума — от нового (lifeSave, лекарь-защитник).
    Везде: без исключений, без undefined, NaN и [object. Числа проверки — не баланс.
    Запуск: node tools/content-gen/screens/check_echo_battle.js */
@@ -73,22 +74,27 @@ function helpers() {
     ints(fail, key, x) { const bad = []; const walk = (v, p) => { if (typeof v === 'number' && !Number.isInteger(v)) bad.push(p + '=' + v); else if (v && typeof v === 'object') for (const k in v) walk(v[k], p + '.' + k); }; walk(x, ''); if (bad.length) fail(`${key}: не целые числа — ${bad.slice(0, 4).join(', ')}`); },
     reset(race, c) { S = initialState(); rsSetWeek(race); S.acc.cycle = c; S.route = 'echo'; S.overlay = null; S.wallet.souls = 1e9; window.EN_ECHO.sync(); },
     ids() { return sq(S.echoSquad).m.filter(Boolean); },
-    /* 9. все недели × циклы × ступени, Многоликий, крафтовые боссы: состав боя и бой до конца */
+    /* 9. все недели × циклы × ступени, Многоликий, призванные враги: состав боя и бой до конца */
     specLoop(out, fail, label, data) {
       const E = window.EN_ECHO, EB = window.EnBattle, RU = EB.RULES, TOP = E.steps.length, X = window.EN_ECHO_FOES;
       for (const w of RS.weeks) for (let c = 1; c <= 6; c++) {
         CK.reset(w.race, c);
         const tg = [];
         for (let st = 1; st <= TOP + 1; st++) tg.push(E.target('step', st));
-        for (const fb of RX.drops.craftBosses) tg.push(E.target('craft', fb));
+        for (const fb of RX.drops.craftBosses) tg.push(E.target('craft', fb));   // призванные враги: kind 'craft' — из предмета, g — тип по силе
         for (const x of tg) {
           const key = `${label} · ${w.race} · цикл ${ROMAN[c]} · ${x.kind === 'craft' ? x.fid : x.kind === 'many' ? 'Многоликий' : 'ступень ' + x.step}`;
           try {
             const F = E.fight(x, CK.ids(), 1), o = F.o, L = EB.lib(), need = RU.echo.guards[x.g];
             out.specs++;
             if (o.guards.length !== need) fail(`${key}: защитников ${o.guards.length}, по правилу — ${need}`);
-            if (x.kind === 'many' && o.guards.length) fail(`${key}: у Многоликого защитники`);
-            if (o.maxRounds !== E.rounds(x.g) || (!window.EN_ECHO_RULES && o.maxRounds !== RU.echo.rounds[x.g])) fail(`${key}: раундов ${o.maxRounds}`);
+            if (x.kind === 'many' && (o.guards.length !== 4 || o.main.rank !== 'forgotten')) fail(`${key}: Многоликий — ранг ${o.main.rank}, защитников ${o.guards.length}; нужно forgotten и четверо (ADR-0039)`);
+            if (x.kind === 'craft') {   // тип по силе (ADR-0039): элита, босс, Убер или Забытый — раунды, ранг и иммунитет своего типа
+              const fbx = RX.drops.craftBosses.find(y => y.id === x.fid);
+              if (!fbx || !['e', 'b', 'u', 'f'].includes(x.g) || fbx.g !== x.g) fail(`${key}: тип призванного «${x.g}» не из recipes.js`);
+              if (o.main.rank !== RU.echo.kind[x.g]) fail(`${key}: ранг ${o.main.rank}, а у типа «${x.g}» — ${RU.echo.kind[x.g]}`);
+            }
+            if (o.maxRounds !== RU.echo.rounds[x.g] || o.maxRounds !== E.rounds(x.g)) fail(`${key}: раундов ${o.maxRounds}, в ядре — ${RU.echo.rounds[x.g]}`);
             if (o.main.maxHp !== x.max || o.main.hp !== x.hp) fail(`${key}: здоровье главного врага не из цели`);
             if (x.kind !== 'craft' && [o.main].concat(o.guards).some(u => u.race !== w.race)) fail(`${key}: раса врагов не недели`);
             if (new Set(o.guards.map(u => u.id)).size !== o.guards.length || o.guards.some(u => u.id === o.main.id)) fail(`${key}: защитники повторяются`);
@@ -102,7 +108,7 @@ function helpers() {
               if (!d) fail(`${key}: нет врага в echo-foes.js`);
               else {
                 if (o.main.rank !== d.rank || o.main.kit.kit !== d.kit || o.main.cls !== d.cls) fail(`${key}: ранг, класс или набор не из echo-foes.js`);
-                if (x.kind === 'step' && o.guards.map(u => u.id.slice(4)).join() !== d.def.join()) fail(`${key}: защитники не из echo-foes.js`);
+                if ((x.kind === 'step' || x.kind === 'many') && o.guards.map(u => u.id.slice(4)).join() !== d.def.join()) fail(`${key}: защитники не из echo-foes.js`);
                 if (d.basic && JSON.stringify(o.main.basic) !== JSON.stringify(d.basic)) fail(`${key}: атака по всем не из echo-foes.js`);
               }
             }
@@ -159,12 +165,16 @@ function suite() {
   const spec = (g, seed, main, guards) => ({ seed, g, main: main || MAIN(), guards: guards || (RU.echo.guards[g] ? GUARDS() : []) });
 
   /* 1. состав по типу, раунды, вход здоровья, детерминизм, итог сходится с боем */
-  for (const [g, n] of [['o', 0], ['o', 3], ['e', 5], ['m', 1], ['m', 4]]) { let threw = false; try { EB.echoBattle(HEROES(), { seed: 1, g, main: MAIN(), guards: GUARDS().concat(GUARDS()).slice(0, n) }); } catch (e) { threw = true; } if (!threw) fail(`ядро: бой Эхо «${g}» собрался с ${n} защитниками`); }
-  /* раунды — одна таблица ядра на все режимы (решение автора 29.09.2026): RULES.rounds.by; Эхо — выборка по типу главного врага.
-     Многоликий — 10, как элита: лёгкий бой с набором элиты (решение исполнителя) */
-  const BY = { o: 5, e: 10, b: 20, rune: 25, uber: 50, many: 10, forgotten: 75, clan: 100, pvp: 25 };
+  for (const [g, n] of [['o', 0], ['o', 3], ['e', 5], ['m', 0], ['m', 3], ['f', 5]]) { let threw = false; try { EB.echoBattle(HEROES(), { seed: 1, g, main: MAIN(), guards: GUARDS().concat(GUARDS()).slice(0, n) }); } catch (e) { threw = true; } if (!threw) fail(`ядро: бой Эхо «${g}» собрался с ${n} защитниками`); }
+  /* раунды — одна таблица ядра на все режимы: RULES.rounds.by; Эхо — выборка по типу главного врага. Слово автора 01.10.2026 (ADR-0039):
+     «на обычных врагов пусть будет 10 раундов, на элитных 15 раундов, на боссов 20 раундов, на рунных боссов 25 раундов, на Уберов 30
+     раундов… забытый… будет иметь 50 раундов… ну и на КБ — 35 раундов»; «Пусть многоликий и будет 1 из забытых» — его раунды — ссылка
+     на Забытого. Арена и Лига — 25: автор их не менял. Призванного «крафтового» типа больше нет */
+  const BY = { o: 10, e: 15, b: 20, rune: 25, uber: 30, clan: 35, forgotten: 50, pvp: 25 };
   for (const k in BY) if (RU.rounds.by[k] !== BY[k]) fail(`ядро: RULES.rounds.by.${k} = ${RU.rounds.by[k]}, по слову автора — ${BY[k]}`);
-  const WANT = { o: BY.o, e: BY.e, b: BY.b, u: BY.uber, m: BY.many, craft: BY.forgotten }, GW = { o: 4, e: 4, b: 4, u: 4, m: 0, craft: 4 };
+  if (RU.rounds.by.many !== 'forgotten' || EB.roundsOf('many') !== BY.forgotten) fail(`ядро: Многоликий — ${RU.rounds.by.many} (${EB.roundsOf('many')} раундов), по слову автора он один из Забытых — ${BY.forgotten}`);
+  if ('craft' in RU.echo.kind || 'craft' in RU.echo.guards) fail('ядро: в RULES.echo остался тип craft — «крафтового босса» как типа нет (ADR-0039)');
+  const WANT = { o: BY.o, e: BY.e, b: BY.b, u: BY.uber, f: BY.forgotten, m: BY.forgotten }, GW = { o: 4, e: 4, b: 4, u: 4, f: 4, m: 4 };
   for (const g in WANT) { if (RU.echo.rounds[g] !== WANT[g]) fail(`ядро: RULES.echo.rounds.${g} = ${RU.echo.rounds[g]}, по заданию — ${WANT[g]}`); if (RU.echo.guards[g] !== GW[g]) fail(`ядро: RULES.echo.guards.${g} = ${RU.echo.guards[g]}, а нужно ${GW[g]}`); }
   if (RU.rounds.rune !== BY.rune) fail(`ядро: RULES.rounds.rune = ${RU.rounds.rune}, а в таблице — ${BY.rune}`);
   for (const g of Object.keys(RU.echo.rounds)) for (let seed = 1; seed <= 12; seed++) {
@@ -319,10 +329,13 @@ function suite() {
       { id: 'Проверка.save', n: 'Проверочное спасение', set: 'Время', t: 'react', k: 'reaction', tier: null, trig: 'lethal', d: '', data: { survivePct: 30, once: 'life', unlessDot: 'Огонь' } },
     ]);
     if (!L()['Проверка.ult'] || L()['Проверка.ult'].kind !== 'heal' || !L()['Огонь.dmg.one']) fail('ядро: EB.addLib не положил способность в библиотеку или стёр общую');
-    /* cast: ниже половины здоровья — «Проверочный откат» сразу, раз за бой */
+    /* cast: ниже половины здоровья — «Проверочный откат» сразу, раз за бой. Здоровье главного — столько, сколько отряд снимает за весь
+       бой Убера с «бездонного» главного: половину он теряет к середине боя при любом пределе раундов. Прежде стояло 46 000 — под бой
+       в 50 раундов (ADR-0030); при 30 (ADR-0039) отряд снимал около 9 000, до половины не доходил, и реакция не срабатывала ни разу */
+    const castHp = Math.max(1000, EB.echoStats(EB.run(EB.echoBattle(HEROES(), spec('u', 1, MAIN({ hp: 900000 }), GUARDS())))).main.taken);
     let casts = 0;
     for (let seed = 1; seed <= 15; seed++) {
-      const b = EB.echoBattle(HEROES(), spec('u', seed, MAIN({ hp: 46000, kit: kitOf(['Проверка.react', 'Проверка.ult'], 0, 0) }), GUARDS()));
+      const b = EB.echoBattle(HEROES(), spec('u', seed, MAIN({ hp: castHp, kit: kitOf(['Проверка.react', 'Проверка.ult'], 0, 0) }), GUARDS()));
       let reacted = 0;
       while (!b.over) { const a = EB.step(b); if (!a) continue; const r = a.ev.findIndex(e => e.k === 'react' && e.id === 'Проверка.react'); if (r < 0) continue; reacted++; const c = a.ev.slice(r).find(e => e.k === 'cast' && e.s === b.u[1][0]); const blocked = b.u[1][0].st.some(s => ['stun', 'freeze', 'terror', 'knock', 'iceblock', 'silence', 'stop'].includes(s.k)); if (c && c.n === 'Проверочный откат') casts++; else if (!blocked) fail(`ядро · cast · сид ${seed}: реакция без способности`); }
       if (reacted > 1) fail(`ядро · cast · сид ${seed}: реакция «раз за бой» сработала ${reacted} раз`);
@@ -551,13 +564,13 @@ function suite() {
       }
       if (S.echo.slots[1] === y) fail(key + ': цель с 1 здоровья не пала за 40 атак');
       else { const g2 = scan(key + ' · победа', draw()); if (S.echo.score - sc !== E.pts(3, c) || !g2.includes('>Победа<') || (c >= LBX.modes.echo.from && !g2.includes('+' + fmt(E.pts(3, c))))) fail(key + ': итог победы без очков'); }
-      /* Многоликий: лёгкий бой один на один; ресурс — своей недели */
+      /* Многоликий: вершина недели, бой с лицами недели — четверо защитников (ADR-0039); ресурс — своей недели */
       clear(); const m = E.target('step', TOP + 1); S.echo.slots[2] = m; S.echo.sel = 2; m.hp = 1;
       const many0 = BAG.qty('many');
       for (let n = 1; n <= 40 && S.echo.slots[2] === m; n++) {
         ACT.echatk(`${m.uid}:${n}`); const Rm = S.runs.find(r => r.kind === 'echo' && !r.over);
         if (!Rm) { fail(key + ': атака по Многоликому не началась'); break; }
-        if (n === 1) { if (Rm.b.u[1].length !== 1) fail(`${key}: у Многоликого ${Rm.b.u[1].length - 1} защитников`); if ((scan(key + ' · Многоликий · бой', draw()).match(/class="bc foe/g) || []).length !== 1) fail(key + ': на арене Многоликого не один враг'); }
+        if (n === 1) { if (Rm.b.u[1].length !== 1 + RU.echo.guards.m || Rm.b.maxRounds !== EB.roundsOf('many')) fail(`${key}: у Многоликого ${Rm.b.u[1].length - 1} защитников и ${Rm.b.maxRounds} раундов`); if ((scan(key + ' · Многоликий · бой', draw()).match(/class="bc foe/g) || []).length !== 1 + RU.echo.guards.m) fail(key + ': на арене Многоликого не пятеро врагов'); }
         ACT.echskip(Rm.id); if (S.echo.slots[2] === m) S.overlay = null;
       }
       if (S.echo.slots[2] === m) fail(key + ': Многоликий с 1 здоровья не пал за 40 атак');
@@ -692,17 +705,17 @@ function suite() {
     }
   }
 
-  /* 15. срок жизни и осада (решение автора 29.09.2026): боссы, Убер и крафтовый босс живут час, рядовые и элиты — как было;
+  /* 15. срок жизни и осада (решение автора 29.09.2026): боссы, Убер и призванные враги живут час, рядовые и элиты — как было;
      у цели на час — отсчёт на карточке; срок вышел — цель исчезает. Атака: остаток здоровья цели — её полное здоровье в бою,
-     прежний максимум — только в «Сведениях»; цена атаки крафтового босса — его раунды × цена раунда цикла силы */
+     прежний максимум — только в «Сведениях»; цена атаки призванного врага — раунды его типа × цена раунда цикла силы */
   {
     const R0 = window.EN_ECHO_RULES, hour = E.data.hour;
     CK.reset('Эльфы', 2);
     for (const [st, h] of [[1, 72], [7, 48], [11, 1], [TOP, 1]]) { const x = E.target('step', st); if (x.left !== h * hour) fail(`срок: ступень ${st} живёт ${x.left / hour} ч, а нужно ${h}`); }
     for (const fb of RX.drops.craftBosses) {
       const x = E.target('craft', fb), c = x.pcyc || x.cyc;
-      if (x.left !== hour) fail(`срок: крафтовый босс ${fb.id} живёт ${x.left / hour} ч, а нужно 1`);
-      if (R0 && R0.roundSouls && E.cost(x) !== E.rounds('craft') * R0.roundSouls[Math.min(c, R0.roundSouls.length) - 1]) fail(`крафтовый босс ${fb.id}: цена атаки ${E.cost(x)} — не раунды × цена раунда`);
+      if (x.left !== hour) fail(`срок: призванный враг ${fb.id} живёт ${x.left / hour} ч, а нужно 1`);
+      if (R0 && R0.roundSouls && E.cost(x) !== E.rounds(x.g) * R0.roundSouls[Math.min(c, R0.roundSouls.length) - 1]) fail(`призванный враг ${fb.id}: цена атаки ${E.cost(x)} — не раунды типа × цена раунда`);
     }
     CK.reset('Эльфы', 2); S.echo.slots = [E.target('step', 11), E.target('step', 2), null, null]; S.echo.sel = 0;
     let h = scan('Эхо · босс на час', draw());

@@ -12,10 +12,10 @@
 
 ## Очередь — по порядку
 
-1. **Два листа сундуков** — шкатулка кланового босса и каменный сундук крафтовых боссов. Семь редкостей, своим замком режима.
+1. **Два листа сундуков** — шкатулка кланового босса и каменный сундук призыва (призванные враги). Семь редкостей, своим замком режима.
    - Задания `chs-talisman`, `chs-craft` в `tools/art-gen/jobs/chest-sheets.json`.
    - Дальше: `python tools/art-gen/gen.py tools/art-gen/jobs/chest-sheets.json --only chs-talisman,chs-craft --budget 1.5` → `python tools/art-gen/chest_layers.py sheets` и `spec` → выгрузка `export_ui.py --spec ui-art.json --no-stamp` → строки в `CO_ART.sets` (`design/ui/screens/chest-open.js`).
-   - До них у клана и крафтовых боссов прежний сундук вида на все редкости.
+   - До них у клана и сундука призыва прежний сундук вида на все редкости.
 2. **Древний сундук Эхо — переделка одной клетки:** в кристалле узор похож на букву «S». Лист `chs-shards`, клетка r5, малым листом или правкой.
 3. **Рамки боевых карт — квадратные.** Автор выбрал квадрат (ADR-0038). Сейчас рамки нарисованы CSS и векторными украшениями.
    - 11 рамок по лестнице ADR-0039 в `tools/art-gen/jobs/battle-frames-square.json`: `bfs-hero`, `bfs-o`, `bfs-e`, `bfs-b`, `bfs-echo`, `bfs-voice`, `bfs-rune`, `bfs-uber`, `bfs-host`, `bfs-forgotten`, `bfs-many`.

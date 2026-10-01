@@ -227,7 +227,7 @@ function build() {
   const ctEn = t => CT.rew[t][CYCLES[0]].map(x => x.en).filter(Boolean).join(' / ');
   T.push(cells(['Контракты эпической редкости и выше', `за задание от эпического до вневременного: дневное — ${ctEn('d')}, недельное — ${ctEn('w')}; сколько в неделю — прогон контрактов`, '`tools/content-gen/contracts/build.js`, `TARGET.en`']));
   T.push(cells(['Арена, суточный топ-100', `${AR.enerium.map(([top, n]) => `${top === 1 ? '1-е' : 'до ' + top + '-го'} — ${n}`).join(', ')} в сутки`, '`tools/content-gen/arena/rules.js`, `enerium`']));
-  T.push(cells(['Победа над призванным врагом', 'возврат части Энериума призыва: крафтовый босс — 5 × цикл, эхо босса биома — 10 × цикл', '`tools/content-gen/recipes/common.js`, `CRAFT`']));
+  T.push(cells(['Победа над призванным врагом', 'возврат части Энериума призыва: босс руины или города — 5 × цикл, эхо босса биома — 10 × цикл', '`tools/content-gen/recipes/common.js`, `CRAFT`']));
   T.push(cells(['Реклама по желанию', `${ST.ads.perView} за ролик, до ${ST.ads.dayCap} роликов в сутки — до ${ST.ads.perView * ST.ads.dayCap} в день, сверх ручейка`, '`tools/content-gen/store/build.js`, `ADS`']));
   T.push(cells(['Покупки', `сегменты автора: ${Object.values(seg).map(S => `${S.n} — ${segBuys(S)}`).join('; ')}`, '`tools/content-gen/store/build.js`; `SEGS` калькулятора']));
   TBL.sources = T.join('\n');
@@ -261,7 +261,7 @@ function build() {
   {
     const E = RX.drops.ener, ids = [E.t1, E.t2, E.t3], val = [1, E.step, E.step * E.step];
     const calls = RX.recipes.filter(r => { const it = RX.items.find(i => i.id === r.out[0]); return it && it.tier === 'call'; });
-    T = head(['Цикл', 'Призывов', 'Энериум', 'Кристаллов', 'Друз', 'Призыв крафтового босса и эха: до, в Энериуме · дней', 'Пробуждённый: до, в Энериуме · дней']);
+    T = head(['Цикл', 'Призывов', 'Энериум', 'Кристаллов', 'Друз', 'Призыв босса руины и эха: до, в Энериуме · дней', 'Пробуждённый: до, в Энериуме · дней']);
     for (let c = 1; c <= 6; c++) {
       const list = calls.filter(r => r.cyc === c);
       if (!list.length) continue;

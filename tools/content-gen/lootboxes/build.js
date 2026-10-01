@@ -13,7 +13,7 @@
      модель стока (stats.sink — призывов в день у обычного);
    - tools/content-gen/recipes/common.js — доли видов призыва в модели стока (SINK.summonMixBp);
    - tools/content-gen/recipes/tempo.md — порог темпа доблести и ключи сундука странника в день (вывод recipes/tempo.py);
-   - tools/content-gen/contracts/capacity.json — побед в Эхо в день у обычного: из них — Многоликий;
+   - tools/content-gen/contracts/capacity.json — побед в Эхо и над Многоликим в день у обычного (прогон echo.py);
    - design/ui/echo-rules.js — шанс Многоликого при призыве (manySummonBp);
    - design/ui/roster.js — комплект осколков героя (rules.stub.shards);
    - docs/content/герои/состав-героев.csv — герои Эхо по неделям и циклам;
@@ -21,7 +21,7 @@
    - design/ui/talismans.js — имена, описания и виды талисманов после переработки, линейки «для команды» (собирает
      tools/content-gen/talismans/build.js — его пересобрать первым);
    - docs/lore/дайджест.md — раздел «Нельзя показывать раннему игроку», чтобы найти спойлеры в именах талисманов;
-   - design/ui/battle.js — только чтобы сверить генератор.
+   - design/ui/battle.js — сверить генератор и взять раунды типов призванных врагов (RULES.echo.rounds, ADR-0039).
    Любая ошибка — файлы не пишутся. Пересборка даёт те же байты: нет времени, случайности без сида и зависимости от порядка обхода.
    Запуск: cd tools/content-gen/lootboxes && node build.js; node build.js --check — законы и свежесть выходов, ничего не пишет. */
 'use strict';
@@ -79,7 +79,7 @@ const LINES = {
    main — чем мерить сундук в проверках: осколки, ключи, очки редкости или прах.
    Рунные ключи — слово автора 30.09.2026 (ADR-0033): падают только с боссов биома, у донатного сета ключников, в сундуках с малым шансом
    и за контракты. Сундук ключей — награда контрактов; малый шанс — строка «Рунные ключи» с малым весом в сундуке странника (пропуск,
-   лист даров, достижения, первые победы) и в сундуке крафтового босса: вес 3 — около 3 % записей, в сундуке крафтового босса
+   лист даров, достижения, первые победы) и в сундуке призыва: вес 3 — около 3 % записей, в сундуке призыва
    до цикла IV — 5 %. Прежние прямые источники — ряды пропуска,
    лист даров, крафтовые места, призванные враги и рецепты ключей — убраны. */
 const BOXES = {
@@ -94,7 +94,7 @@ const BOXES = {
   workers: { n: 'Сундук рабочих', lines: [['workers', 75], ['res', 25]], items: [2, 2, 3, 3, 3, 3, 3],
     cur: { gold: [1000, 1500, 2000, 2500, 3000, 3500, 4000] }, main: 'wshV' },
   /* рабочие 57, а не 60: сумма весов с цикла IV — ровно 100, и доля талисманов — прежние 40 % (калькулятор талисманов считает её нацело) */
-  craft: { n: 'Сундук крафтового босса', lines: [['workers', 57], ['tal', 40, 4], ['keys', 3]], items: [2, 2, 3, 3, 3, 3, 3],
+  craft: { n: 'Сундук призыва', lines: [['workers', 57], ['tal', 40, 4], ['keys', 3]], items: [2, 2, 3, 3, 3, 3, 3],
     cur: { gold: [1000, 1500, 2000, 2500, 3000, 3500, 4000] }, main: 'craftV' },
   wander: { n: 'Сундук странника', lines: [['res', 55], ['dust', 45], ['keys', 3]], items: [1, 1, 2, 2, 2, 3, 3],
     cur: { gold: [1000, 1500, 2000, 2500, 3000, 3500, 4000], spirit: [2000, 3000, 4000, 5000, 6000, 7000, 8000] }, main: 'dust' },
@@ -152,7 +152,7 @@ const MODES = {
     ],
     typical: { free: { me: 3, clan: 1 }, fan: { me: 5, clan: 2 } } },
   /* призванные враги (SUMMON ниже): строки — враги recipes.js, сундук — по виду призыва; Лик недели — свой режим, у него сундук осколков */
-  craft: { n: 'Крафтовые боссы', box: 'craft', from: 1, perKill: true, basis: 'победа над врагом, призванным предметом крафта: руина, город, эхо босса биома, пробуждённый (§12.3, §17.1, ADR-0023, п. 4)' },
+  craft: { n: 'Призванные враги', box: 'craft', from: 1, perKill: true, basis: 'победа над врагом, призванным предметом крафта: босс руины, эхо босса биома, босс города, пробуждённый (§12.3, §17.1, ADR-0023, п. 4, ADR-0039)' },
   mask: { n: 'Лик недели', box: 'shards', from: 2, perKill: true, basis: 'победа над Ликом недели — врагом из «Маски недели» (§17.1, ADR-0025)' },
   first: { n: 'Первая победа над боссом биома', box: 'wander', from: 1, once: true, proposal: true, base: [1, 2, 3, 4, 5, 6], biomeOff: [0, 1],
     basis: 'первое убийство босса биома — раз на аккаунт' },
@@ -190,25 +190,34 @@ function calRows(CAL) {
 MODES.calendar.rows = calRows(require('../pass/build.js').CAL);
 
 /* Призванные враги — слово автора 01.10.2026: «смоделировать лутбоксы в награду за убийство врагов в Эхо, которых игрок призвал
-   с крафта, то есть которые вне лестницы недели». Враг из призыва — запись drops.craftBosses в recipes.js, вид — её поле kind.
+   с крафта, то есть которые вне лестницы недели». Враг из призыва — запись drops.craftBosses в recipes.js, вид — её поле kind, тип по силе —
+   поле g (слово автора 01.10.2026, ADR-0039: «крафтового босса» как типа нет). Сундук — по типу: SUMMON_TYPE ниже.
    - Сила врага — его цикл, у пробуждённого — цикл + powerCycleStep (recipes.js). От силы — редкость сундука: сила + 1, не выше
      вневременной (в recipes.js это поле workerBoxRarity — сборщик сверяет), и пул: талисманы в сундуке — с цикла силы IV.
-   - Окно — по цене призыва. Обычный призыв — лестница. Дорогой — чистое, мусора нет (ADR-0023, п. 7): город — победа возвращает
-     не весь Энериум призыва; пробуждённый — в рецепте Многоликий, расходник Эхо, который выпадает с шансом 0,10 %.
+   - Окно — по типу, а тип — по цене призыва и месту в цепочке. Босс (руина, эхо босса биома) — обычный призыв, лестница. Убер (город)
+     и Забытый (пробуждённый) — дорогой призыв, чистое окно, мусора нет (ADR-0023, п. 7): город — победа возвращает не весь Энериум
+     призыва; пробуждённый — в рецепте Многоликий, расходник Эхо, который выпадает с шансом 0,10 % и сам — Забытый.
    - Сундук за победу — один (count): цена призыва меняет окно, а не число сундуков — «конвейером не становятся» (§12.3).
-   - Лик недели (предмет «Маска недели») — сундук осколков своей недели, как у лестницы Эхо: Лик носит лицо врага недели и платит
+   - Лик недели (предмет «Маска недели») — тип «элита», сундук осколков своей недели, как у лестницы Эхо: Лик носит лицо врага недели и платит
      осколками её отряда (ADR-0025). Редкость считает сборщик — самая низкая, у которой ожидание осколков не ниже доли героев недели
      из recipes.js (heroShardsWeekBp: 13,5 % недельных осколков увлечённого — ответ автора). Сейчас это редкость цикла — та же,
      что у четвёртой личной планки Эхо.
    Чего в сундуках призванных врагов нет (законы ниже): ресурсов биомов и мест — крафт главный сток (ADR-0033); снаряжения — Эхо его
-   не даёт (ADR-0029, п. 35), крафтовые боссы ведут к нему рецептами (§21.3); Энериума и душ (§23) — возврат Энериума призыва и
+   не даёт (ADR-0029, п. 35), призванные враги ведут к нему рецептами (§21.3); Энериума и душ (§23) — возврат Энериума призыва и
    трофей — прямая добыча врага, она в recipes.js. why — строка документа. */
+/* Сундук за победу — по типу призванного врага по силе (ADR-0039; тип — поле g в recipes.js, правило — recipes/common.js, CRAFT.type):
+   e — элита, b — босс, u — Убер, f — Забытый. Тип задаёт сундук и окно, редкость — сила врага (цикл силы + 1) */
+const SUMMON_TYPE = {
+  e: { n: 'Элита', box: 'shards', win: 'step', count: 1, why: 'одно снятое лицо врага недели: осколки отряда недели — как у лестницы Эхо' },
+  b: { n: 'Босс', box: 'craft', win: 'step', count: 1, why: 'обычный призыв: билет — уникальный ресурс босса биома, у эха — его перекрафт' },
+  u: { n: 'Убер', box: 'craft', win: 'pure', count: 1, why: 'дорогой призыв: победа возвращает не весь Энериум призыва' },
+  f: { n: 'Забытый', box: 'craft', win: 'pure', count: 1, why: 'дорогой призыв: Многоликий в рецепте; сила — на цикл выше' },
+};
+/* виды призыва — место в цепочке рецептов (поле kind): по ним модель дня и таблицы; тип вида — у его врагов в recipes.js */
+/* тип в тексте документа: «элита», «босс» — строчными, «Убер», «Забытый» — с прописной, как в ядре и на экране */
+const typeLow = g => (g === 'e' || g === 'b' ? SUMMON_TYPE[g].n.toLowerCase() : SUMMON_TYPE[g].n);
 const SUMMON = {
-  ruin: { n: 'Босс руины', box: 'craft', win: 'step', count: 1, why: 'обычный призыв: билет — уникальный ресурс босса биома' },
-  memory: { n: 'Эхо босса биома', box: 'craft', win: 'step', count: 1, why: 'обычный призыв: уникальный ресурс — перекрафт — отзвук' },
-  city: { n: 'Босс города', box: 'craft', win: 'pure', count: 1, why: 'дорогой призыв: победа возвращает не весь Энериум призыва' },
-  awake: { n: 'Пробуждённый босс', box: 'craft', win: 'pure', count: 1, why: 'дорогой призыв: Многоликий в рецепте; сила — на цикл выше' },
-  mask: { n: 'Лик недели', box: 'shards', win: 'step', count: 1, why: 'Многоликий в рецепте; осколки отряда недели — как у лестницы Эхо' },
+  ruin: { n: 'Босс руины' }, memory: { n: 'Эхо босса биома' }, city: { n: 'Босс города' }, awake: { n: 'Пробуждённый босс' }, mask: { n: 'Лик недели' },
 };
 /* День обычного — модель стока крафта (ADR-0033, п. 10): призывов в день — recipes.js, stats.sink; доли видов — recipes/common.js,
    SINK.summonMixBp (ключ craft — босс руины). Пробуждённый и Лик — из Многоликого: побед в Эхо в день у обычного (capacity.json, o)
@@ -219,20 +228,20 @@ const SUMMON = {
    в сундуке — малый шанс: доля записей не выше 5 % (слово автора 30.09.2026). forbid — линии, которых нет в сундуке призванного
    врага. count — сундуков за победу. */
 const SUMMON_DAY = { mix: { craft: 'ruin', memory: 'memory', city: 'city' }, from: 2 };
-const SUMMON_LAW = { keysMaxBp: 500, forbid: ['res', 'item', 'equip'], count: 1 };
+const SUMMON_LAW = { keysMaxBp: 500, forbid: ['res', 'item', 'equip'], count: 1, order: ['b', 'u', 'f'] };   // order — тип сильнее: сундук не хуже
 
 /* Допущения для оценок — не правила игры. */
 const ASSUME = {
   shardsPerHero: null,     // комплект осколков героя: в GDD числа нет (§15.2) — берём из прототипа, design/ui/roster.js, rules.stub.shards
   workerShards: 10,        // шардов на рабочего: в GDD числа нет (§19.1)
   payerPts: [146, 100],    // плательщик набирает очков не больше ×1,46 — худший день Т12 черновика экономики (слотов — номер цикла, ADR-0031)
-  /* побед над крафтовыми боссами в неделю: билет — уникальный ресурс босса биома, 5 % (§9.1). Его берут ритуалы, талисманы и достижения.
+  /* побед над призванными врагами в неделю: билет — уникальный ресурс босса биома, 5 % (§9.1). Его берут ритуалы, талисманы и достижения.
      День обычного в модели призванных врагов — по модели стока (SUMMON_DAY): там призывов больше; расхождение — таблица summon_day */
   craftKills: { free: 1, fan: 3 },
   rb: { cap: 10, shareBp: [7000, 3000] },   // кап побед у рунных стражей в день и доля стражей пределов и доблести (черновик сет-бонусов, С8а)
   day: {   // доход дня всех отрядов — С1 черновика сет-бонусов, вывод sets.py (финальный прогон ADR-0031: реальный отряд, слотов — номер цикла)
-    2: { free: { gold: 41967, spirit: 83935 }, fan: { gold: 128594, spirit: 257188 } },
-    3: { free: { gold: 105446, spirit: 210892 }, fan: { gold: 328856, spirit: 657712 } },
+    2: { free: { gold: 38405, spirit: 76811 }, fan: { gold: 119260, spirit: 238520 } },   // ADR-0039: раунды по типу врага — забег дольше
+    3: { free: { gold: 96503, spirit: 193006 }, fan: { gold: 307366, spirit: 614732 } },
   },
 };
 
@@ -356,6 +365,11 @@ const LB = REC.drops.lootboxes, MARKET = REC.drops.market;
 const SINK = (() => { try { return require(FILES.common).SINK; } catch (e) { err.push('recipes/common.js не читается — ' + e.message); return null; } })();
 const CAPACITY = (() => { try { return JSON.parse(fs.readFileSync(FILES.capacity, 'utf8')); } catch (e) { err.push('contracts/capacity.json не читается — ' + e.message); return null; } })();
 const ECHO_RULES = loadWin(FILES.echoRules, 'EN_ECHO_RULES');
+/* правила ядра боя: раунды по типу призванного врага — RULES.echo.rounds (таблица RULES.rounds.by, ADR-0039); своих чисел у сборщика нет */
+const EB_RULES = (() => {
+  try { const c = { window: {} }; vm.createContext(c); vm.runInContext(fs.readFileSync(FILES.battle, 'utf8'), c, { filename: 'battle.js' }); return JSON.parse(JSON.stringify(c.window.EnBattle.RULES)); }
+  catch (e) { err.push('battle.js не читается — ' + e.message); return { echo: { rounds: {} } }; }
+})();
 
 /* герои Эхо: неделя — из источника «Эхо: неделя …» (ADR-0023, второй круг, п. 3) */
 const WEEK_OF = { 'людей': 'Люди', 'дворфов': 'Дворфы', 'эльфов': 'Эльфы', 'зверей': 'Звери', 'саганов': 'Саганы', 'аппаратов': 'Аппараты', 'искажённых': 'Искажённые', 'нежити': 'Нежить', 'забытых': 'Забытые' };
@@ -534,12 +548,13 @@ for (const [mid, m] of Object.entries(MODES)) {
   if (mid === 'craft') {
     const layer = { id: 'bosses', n: 'Призванные враги', kind: 'kill', rows: [] }; P.layers.push(layer);
     for (const s of REC.drops.craftBosses) {
-      const K = SUMMON[s.kind];
-      if (!K) { err.push(`${s.id} «${s.name}»: вид призыва «${s.kind}» — нет в SUMMON, у врага нет сундука`); continue; }
+      const K = SUMMON_TYPE[s.g];
+      if (!SUMMON[s.kind]) err.push(`${s.id} «${s.name}»: вид призыва «${s.kind}» — нет в SUMMON`);
+      if (!K) { err.push(`${s.id} «${s.name}»: тип по силе «${s.g}» — нет в SUMMON_TYPE, у врага нет сундука (ADR-0039)`); continue; }
       if (K.box !== m.box) continue;   // Лик недели — свой режим
       const pc = s.cyc + (s.powerCycleStep || 0), r = Math.min(7, pc + 1);
       if (s.workerBoxRarity !== r) err.push(`${s.id} «${s.name}»: в recipes.js редкость сундука ${s.workerBoxRarity}, по силе врага — ${r} (цикл силы ${ROMAN[pc] || pc} + 1)`);
-      layer.rows.push({ label: s.team ? 'для команды' : s.name, boss: s.id, kind: s.kind, team: !!s.team, cyc: { [Math.min(6, pc)]: [{ r, count: K.count, win: K.win }] }, only: s.cyc, pc: Math.min(6, pc) });
+      layer.rows.push({ label: s.team ? 'для команды' : s.name, boss: s.id, kind: s.kind, g: s.g, team: !!s.team, cyc: { [Math.min(6, pc)]: [{ r, count: K.count, win: K.win }] }, only: s.cyc, pc: Math.min(6, pc) });
     }
   }
   if (mid === 'mask') P.layers.push({ id: 'mask', n: 'Лик недели', kind: 'kill', rows: [] });   // строки — после недели Эхо: редкость считает закон доли
@@ -791,18 +806,24 @@ for (const [mid, m] of Object.entries(MODES)) if (m.weekly) {
 /* враг из призыва: сундук его вида, пул — цикл силы (row.pc); c — цикл врага */
 const CRAFT = PAY.craft.layers[0].rows.map(row => ({ row, c: row.only, pc: row.pc, ev: evRow('craft', row, row.pc) }));
 const KIND = {};   // вид → цикл врага → первый враг этого вида и цикла: у всех таких сундук один
+const TYPE = {};   // тип → цикл силы → первый враг этого типа: «тип сильнее — сундук не хуже» (ADR-0039)
 for (const x of CRAFT) {
-  const k = x.row.kind, by = KIND[k] = KIND[k] || {};
+  const k = x.row.kind, by = KIND[k] = KIND[k] || {}, ty = TYPE[x.row.g] = TYPE[x.row.g] || {};
   if (!by[x.c]) by[x.c] = x;
   else if (JSON.stringify(by[x.c].row.cyc) !== JSON.stringify(x.row.cyc)) err.push(`${SUMMON[k].n}, цикл ${ROMAN[x.c]}: у врагов одного вида и цикла разные сундуки`);
+  if (!ty[x.pc]) ty[x.pc] = x;
 }
+/* тип вида призыва: у всех врагов вида — один тип (recipes.js) */
+const KT = k => { const gs = [...new Set(REC.drops.craftBosses.filter(s => s.kind === k).map(s => s.g))]; if (gs.length > 1) err.push(`${SUMMON[k].n}: у врагов вида разные типы — ${gs.join(', ')}`); return SUMMON_TYPE[gs[0]] || null; };
+const KG = k => (REC.drops.craftBosses.find(s => s.kind === k) || {}).g;
 /* Лик недели: сундук осколков своей недели; редкость — самая низкая, у которой ожидание осколков не ниже доли героев недели
    (recipes.js, heroShardsWeekBp) от недельных осколков увлечённого — ответ автора ADR-0025. Недели поровну — закон выше */
 const LIK = REC.drops.craftBosses.find(s => s.kind === 'mask') || null, MASK = [];
 if (!LIK) err.push('recipes.js: нет Лика недели (kind mask) — Маске недели нечем платить');
 else if (!Number.isInteger(LIK.heroShardsWeekBp) || LIK.heroShardsWeekBp < 1) err.push('Лик недели: в recipes.js нет доли героев недели heroShardsWeekBp (ADR-0025)');
+else if (!SUMMON_TYPE[LIK.g] || SUMMON_TYPE[LIK.g].box !== 'shards') err.push(`Лик недели: тип «${LIK.g}» — сундук не осколков недели`);
 else {
-  const K = SUMMON.mask, me = PAY.echo.layers.find(l => l.id === 'me');
+  const K = SUMMON_TYPE[LIK.g], me = PAY.echo.layers.find(l => l.id === 'me');
   for (let c = Math.max(LIK.cyc, MODES.mask.from); c <= 6; c++) {
     const target = WEEK.echo[c].fan.ev.shards.mul(new Q(LIK.heroShardsWeekBp, 10000)), at = r => evOf({ box: K.box, r, win: K.win, cyc: c, week: WEEKS[0] }).shards;
     let r = 0; for (let x = 1; x <= 7 && !r; x++) if (at(x).cmp(target) >= 0) r = x;
@@ -810,16 +831,17 @@ else {
     const p4 = me && me.rows[3] && me.rows[3].cyc[c] ? me.rows[3].cyc[c][0].r : 0;
     MASK.push({ c, target, r, ev: at(r), low: r > 1 ? at(r - 1) : Q0, plank4: p4 });
   }
-  PAY.mask.layers[0].rows.push({ label: LIK.name, boss: LIK.id, kind: 'mask', team: !!LIK.team, cyc: Object.fromEntries(MASK.map(x => [x.c, [{ r: x.r, count: K.count, win: K.win }]])), only: LIK.cyc, pc: LIK.cyc });
+  PAY.mask.layers[0].rows.push({ label: LIK.name, boss: LIK.id, kind: 'mask', g: LIK.g, team: !!LIK.team, cyc: Object.fromEntries(MASK.map(x => [x.c, [{ r: x.r, count: K.count, win: K.win }]])), only: LIK.cyc, pc: LIK.cyc });
 }
-/* законы сундука призванного врага: что в нём есть, малый шанс ключей, один сундук за победу, дороже призыв — не хуже сундук */
-for (const [k, K] of Object.entries(SUMMON)) {
+/* законы сундука призванного врага: что в нём есть, малый шанс ключей, один сундук за победу, тип сильнее — сундук не хуже */
+for (const [k, K] of Object.entries(SUMMON_TYPE)) {
   if (!BOXES[K.box]) err.push(`${K.n}: нет сундука ${K.box}`);
   if (!WIN_NAMES[K.win]) err.push(`${K.n}: нет окна ${K.win}`);
   if (K.count !== SUMMON_LAW.count) err.push(`${K.n}: сундуков за победу ${K.count} — закон: ${SUMMON_LAW.count}, призыв не конвейер (§12.3)`);
-  if (!REC.drops.craftBosses.some(s => s.kind === k)) warn.push(`${K.n}: в recipes.js нет врагов этого вида`);
+  if (!REC.drops.craftBosses.some(s => s.g === k)) warn.push(`${K.n}: в recipes.js нет врагов этого типа`);
 }
-const SUMMON_BOXES = [...new Set(Object.values(SUMMON).filter(K => K.box === MODES.craft.box).map(K => K.box))];
+for (const k of Object.keys(SUMMON)) if (!REC.drops.craftBosses.some(s => s.kind === k)) warn.push(`${SUMMON[k].n}: в recipes.js нет врагов этого вида`);
+const SUMMON_BOXES = [...new Set(Object.values(SUMMON_TYPE).filter(K => K.box === MODES.craft.box).map(K => K.box))];
 const keyShare = [];   // по циклам: доля записей с рунными ключами в сундуке призванного врага, б. п.
 for (const id of SUMMON_BOXES) {
   for (const [ln] of BOXES[id].lines) if (SUMMON_LAW.forbid.includes(LINES[ln].kind)) err.push(`${BOXES[id].n}: линия «${LINES[ln].n}» — в сундуке призванного врага её нет: ${LINES[ln].kind === 'equip' ? 'Эхо снаряжения не даёт (ADR-0029, п. 35)' : 'ресурсы съедает крафт, сундук их не возвращает (ADR-0033)'}`);
@@ -832,13 +854,15 @@ for (const id of SUMMON_BOXES) {
 }
 const mainOf = x => x ? x.ev.craftV : Q0;
 for (let c = 1; c <= 6; c++) {
+  /* в одном цикле силы: тип сильнее — сундук не хуже (ADR-0039: босс ≤ Убер ≤ Забытый); виды одного типа — один сундук */
+  const t = g => TYPE[g] && TYPE[g][c], ord = SUMMON_LAW.order.filter(t);
+  for (let i = 1; i < ord.length; i++) if (mainOf(t(ord[i])).cmp(mainOf(t(ord[i - 1]))) < 0) err.push(`цикл силы ${ROMAN[c]}: сундук типа «${SUMMON_TYPE[ord[i]].n}» хуже сундука типа «${SUMMON_TYPE[ord[i - 1]].n}» — тип сильнее, не хуже сундук`);
   const g = k => KIND[k] && KIND[k][c];
-  if (g('city') && g('ruin') && mainOf(g('city')).cmp(mainOf(g('ruin'))) < 0) err.push(`цикл ${ROMAN[c]}: сундук босса города хуже сундука босса руины — дороже призыв, не хуже сундук`);
   if (g('memory') && g('ruin') && mainOf(g('memory')).cmp(mainOf(g('ruin'))) < 0) err.push(`цикл ${ROMAN[c]}: сундук эха босса биома хуже сундука босса руины`);
-  if (g('awake') && g('city') && mainOf(g('awake')).cmp(mainOf(g('city'))) < 0) err.push(`цикл ${ROMAN[c]}: сундук пробуждённого хуже сундука босса города`);
 }
 /* день обычного по модели стока: призывов в день (recipes.js, stats.sink), доли видов (common.js, SINK.summonMixBp); Многоликий —
-   побед в Эхо в день (capacity.json) × шанс при призыве (echo-rules.js). Пробуждённый и Лик — на один Многоликий */
+   побед над ним в день у обычного по прогону Эхо (capacity.json, echoManyX1e6): он вершина недели и не всякий отряд его берёт (ADR-0039);
+   нет поля — побед в Эхо в день × шанс при призыве (echo-rules.js). Пробуждённый и Лик — на один Многоликий */
 const SINK_ROW = Object.fromEntries(((REC.stats && REC.stats.sink) || []).map(r => [r.cyc, r]));
 const MIX = SINK && SINK.summonMixBp ? SINK.summonMixBp : null, MANY_BP = ECHO_RULES && Number.isInteger(ECHO_RULES.manySummonBp) ? ECHO_RULES.manySummonBp : null;
 if (!MIX) err.push('recipes/common.js: нет долей видов призыва SINK.summonMixBp');
@@ -863,7 +887,7 @@ if (MIX && MANY_BP && CAPACITY) for (let c = SUMMON_DAY.from; c <= 6; c++) {
     if (!x) { err.push(`цикл ${ROMAN[c]}: нет врага вида «${SUMMON[SUMMON_DAY.mix[mk]].n}» для модели стока`); continue; }
     ev = addEv(ev, x.ev, S.mul(new Q(bp, 10000)));
   }
-  const M = new Q(cap.echoKill * MANY_BP, 100 * 10000), aw = KIND.awake && KIND.awake[c] ? KIND.awake[c].ev : EMPTY, mk = MASK.find(x => x.c === c);
+  const M = Number.isInteger(cap.echoManyX1e6) ? new Q(cap.echoManyX1e6, 1000000) : new Q(cap.echoKill * MANY_BP, 100 * 10000), aw = KIND.awake && KIND.awake[c] ? KIND.awake[c].ev : EMPTY, mk = MASK.find(x => x.c === c);
   DAY.push({ c, S, ev, M, aw, mask: mk || null, druse: druseOf(c),
     main: { wsh: perDay(WEEK.event[c].free.ev, 'wsh'), wshV: perDay(WEEK.event[c].free.ev, 'wshV'), tal: perDay(WEEK.clan[c].free.ev, 'tal'), talV: perDay(WEEK.clan[c].free.ev, 'talV'), keys: perDay(WEEK.contract[c].free.ev, 'keys') } });
 }
@@ -981,18 +1005,18 @@ const enerOf = s => {   // Энериум в рецепте призыва: ст
   return e ? `${{ [E.t1]: 'Энериум', [E.t2]: 'кристалл', [E.t3]: 'друза' }[e[0]]} ×${e[1]}` : '—';
 };
 block('summon_rule');
-T.push('| Призыв | Врагов | Сундук за победу | Редкость | Окно | Почему так |', '|---|---|---|---|---|---|');
+T.push('| Призыв | Тип по силе | Раундов | Врагов | Сундук за победу | Редкость | Окно | Почему так |', '|---|---|---|---|---|---|---|---|');
 for (const k of Object.keys(SUMMON)) {
-  const K = SUMMON[k], n = REC.drops.craftBosses.filter(s => s.kind === k).length;
+  const K = KT(k), g = KG(k), n = REC.drops.craftBosses.filter(s => s.kind === k).length; if (!K) continue;
   const rTxt = k === 'mask' ? 'самая низкая, у которой ожидание не ниже доли героев недели: сейчас — цикл игрока' : k === 'awake' ? 'цикл врага + 2: сила на цикл выше' : 'цикл врага + 1';
-  T.push(`| ${K.n} | ${n} | ${BOXES[K.box].n} | ${rTxt} | ${WIN_NAMES[K.win]} | ${K.why} |`);
+  T.push(`| ${SUMMON[k].n} | ${K.n} | ${EB_RULES.echo.rounds[g]} | ${n} | ${BOXES[K.box].n} | ${rTxt} | ${WIN_NAMES[K.win]} | ${K.why} |`);
 }
 block('summon_chest');
 T.push(`| Цикл | ${SK.map(kn).join(' | ')} | ${kn('mask')} |`, '|---|' + SK.concat('mask').map(() => '---').join('|') + '|');
 for (let c = 1; c <= 6; c++) {
   const cell = k => { const x = KIND[k] && KIND[k][c]; return x ? gotLabel(x.row.cyc[x.pc]) + (x.pc !== c ? ` · пул ${ROMAN[x.pc]}` : '') : '—'; };
   const mk = MASK.find(x => x.c === c);
-  T.push(`| ${ROMAN[c]}${teamC(c) ? ' · для команды' : ''} | ${SK.map(cell).join(' | ')} | ${mk ? boxLabel({ r: mk.r, count: 1, win: SUMMON.mask.win }) : '—'} |`);
+  T.push(`| ${ROMAN[c]}${teamC(c) ? ' · для команды' : ''} | ${SK.map(cell).join(' | ')} | ${mk ? boxLabel({ r: mk.r, count: 1, win: KT('mask').win }) : '—'} |`);
 }
 block('summon_ev');
 T.push('| Цикл | Призыв | Сундук | Предметов | Шарды рабочих: штук / очки | Талисманы: штук / очки | Рунные ключи | Осколки героев недели | Валюта сундука |', '|---|---|---|---|---|---|---|---|---|');
@@ -1003,7 +1027,7 @@ for (let c = 1; c <= 6; c++) {
     T.push(`| ${ROMAN[c]} | ${kn(k)} | ${boxLabel(g)} | ${BOXES.craft.items[g.r - 1]} | ${fx(ev.wsh, 1)} / ${fx(ev.wshV, 1)} | ${fx(ev.tal, 2)} / ${fx(ev.talV, 1)} | ${fx(ev.keys, 2)} | — | золото ${fmt(ev.gold.int(0))} |`);
   }
   const mk = MASK.find(x => x.c === c);
-  if (mk) { const ev = evOf({ box: SUMMON.mask.box, r: mk.r, win: SUMMON.mask.win, cyc: c, week: WEEKS[0] }); T.push(`| ${ROMAN[c]} | ${kn('mask')} | ${boxN(SUMMON.mask.box, mk.r)} | ${BOXES[SUMMON.mask.box].items[mk.r - 1]} | — | — | — | ${fx(ev.shards, 1)} | дух ${fmt(ev.spirit.int(0))} |`); }
+  if (mk) { const KM = KT('mask'), ev = evOf({ box: KM.box, r: mk.r, win: KM.win, cyc: c, week: WEEKS[0] }); T.push(`| ${ROMAN[c]} | ${kn('mask')} | ${boxN(KM.box, mk.r)} | ${BOXES[KM.box].items[mk.r - 1]} | — | — | — | ${fx(ev.shards, 1)} | дух ${fmt(ev.spirit.int(0))} |`); }
 }
 block('summon_direct');
 T.push('| Призыв | Цикл | Энериум в призыве | Трофей | Ключи ремесла | Дух | Золото | Энериум за победу |', '|---|---|---|---|---|---|---|---|');
@@ -1022,22 +1046,23 @@ block('summon_many');
 T.push('| Цикл | Многоликих в день | Пробуждённый: сундук | шарды рабочих, очки / талисманы, очки | Друза в призыве | Лик недели: сундук | осколков героев недели |', '|---|---|---|---|---|---|---|');
 for (const d of DAY) {
   const x = KIND.awake && KIND.awake[d.c], mk = d.mask;
-  T.push(`| ${ROMAN[d.c]} | ${fx(d.M, 3)} | ${x ? gotLabel(x.row.cyc[x.pc]) : '—'} | ${x ? `${fx(x.ev.wshV, 1)} / ${fx(x.ev.talV, 1)}` : '—'} | ${d.druse ? 'да — обычному не по карману' : 'нет'} | ${mk ? boxN(SUMMON.mask.box, mk.r) : '—'} | ${mk ? fx(mk.ev, 1) : '—'} |`);
+  T.push(`| ${ROMAN[d.c]} | ${fx(d.M, 4)} | ${x ? gotLabel(x.row.cyc[x.pc]) : '—'} | ${x ? `${fx(x.ev.wshV, 1)} / ${fx(x.ev.talV, 1)}` : '—'} | ${d.druse ? 'да — обычному не по карману' : 'нет'} | ${mk ? boxN(KT('mask').box, mk.r) : '—'} | ${mk ? fx(mk.ev, 1) : '—'} |`);
 }
-/* цена победы в душах Эхо: атака — раунды крафтового босса × цена раунда цикла силы (echo-rules.js), «свой» отряд берёт его за design
-   атак; душ Эхо в день у обычного — capacity.json; те же души в лестнице недели — осколков по неделе обычного, в среднем */
+/* цена победы в душах Эхо: атака — раунды типа × цена раунда цикла силы (echo-rules.js, summon.types), «свой» отряд берёт врага за
+   design атак своего типа; душ Эхо в день у обычного — capacity.json; те же души в лестнице недели — осколков по неделе обычного */
 block('summon_cost');
-T.push('| Цикл | Атака, душ | Победа «своим» отрядом, душ | Дней душ Эхо у обычного | Те же души в лестнице — осколков героев недели | Пробуждённый: победа, душ | Лик недели: победа, душ |', '|---|---|---|---|---|---|---|');
+T.push('| Цикл | Босс (руина, эхо босса биома): атака / победа, душ | Дней душ Эхо у обычного | Те же души в лестнице — осколков героев недели | Убер (город): победа, душ | Забытый (пробуждённый, сила цикла +1): победа, душ | Лик недели — элита: победа, душ |', '|---|---|---|---|---|---|---|');
 {
-  const ty = ECHO_RULES && ECHO_RULES.types && ECHO_RULES.types.craft, RS0 = ECHO_RULES && ECHO_RULES.roundSouls;
-  const kill = pc => ty && RS0 && RS0[Math.min(pc, RS0.length) - 1] ? ty.design * ty.rounds * RS0[Math.min(pc, RS0.length) - 1] : 0;
-  if (!ty || !Number.isInteger(ty.design) || !Number.isInteger(ty.rounds) || !RS0) warn.push('echo-rules.js: нет types.craft или roundSouls — цена победы не посчитана');
+  const ST = ECHO_RULES && ECHO_RULES.summon && ECHO_RULES.summon.types, RS0 = ECHO_RULES && ECHO_RULES.roundSouls;
+  const rs = pc => RS0 ? RS0[Math.min(pc, RS0.length) - 1] : 0;
+  const kill = (g, pc) => ST && ST[g] && RS0 ? ST[g].design * ST[g].rounds * rs(pc) : 0;
+  if (!ST || ['e', 'b', 'u', 'f'].some(g => !ST[g] || !Number.isInteger(ST[g].design) || !Number.isInteger(ST[g].rounds)) || !RS0) warn.push('echo-rules.js: нет summon.types или roundSouls — цена победы не посчитана');
   else for (const d of DAY) {
-    const cap = CAPACITY.cycles[d.c].o, sd = new Q(cap.echoSoulsDay, 100), k = kill(d.c), days = new Q(k).div(sd), shards = days.mul(WEEK.echo[d.c].free.ev.shards.div(new Q(7)));
-    T.push(`| ${ROMAN[d.c]} | ${fmt(ty.rounds * RS0[d.c - 1])} | ${fmt(k)} | ${fx(days, 2)} | ${fx(shards, 1)} | ${fmt(kill(d.c + 1))} | ${LIK ? fmt(kill(LIK.cyc + (LIK.powerCycleStep || 0))) : '—'} |`);
+    const cap = CAPACITY.cycles[d.c].o, sd = new Q(cap.echoSoulsDay, 100), k = kill('b', d.c), days = new Q(k).div(sd), shards = days.mul(WEEK.echo[d.c].free.ev.shards.div(new Q(7)));
+    T.push(`| ${ROMAN[d.c]} | ${fmt(ST.b.rounds * rs(d.c))} / ${fmt(k)} | ${fx(days, 2)} | ${fx(shards, 1)} | ${fmt(kill('u', d.c))} | ${fmt(kill('f', d.c + 1))} | ${LIK ? fmt(kill(LIK.g, LIK.cyc + (LIK.powerCycleStep || 0))) : '—'} |`);
     if (d.c === 2) { inline.killSouls2 = fmt(k); inline.killDays2 = fx(days, 1); inline.killShards2 = fx(shards, 0); }
     if (d.c === 4) { inline.killSouls4 = fmt(k); inline.killDays4 = fx(days, 1); inline.killShards4 = fx(shards, 0); }
-    if (LIK) inline.likSouls = fmt(kill(LIK.cyc + (LIK.powerCycleStep || 0)));
+    if (LIK) inline.likSouls = fmt(kill(LIK.g, LIK.cyc + (LIK.powerCycleStep || 0)));
   }
 }
 block('summon_mask');
@@ -1064,7 +1089,7 @@ for (const mid of ['feats', 'calendar']) for (const row of PAY[mid].layers[0].ro
 
 /* пул по циклам */
 block('pool');
-T.push('| Цикл | Ресурсы: базовые / ключи ремёсел цикла / уникальные цикла | Героев недели в сундуке осколков | Многоликий и прах | Талисманы в сундуке крафтового босса |', '|---|---|---|---|---|');
+T.push('| Цикл | Ресурсы: базовые / ключи ремёсел цикла / уникальные цикла | Героев недели в сундуке осколков | Многоликий и прах | Талисманы в сундуке призыва |', '|---|---|---|---|---|');
 for (let c = 1; c <= 6; c++) {
   const team = [...pools.key[c], ...pools.unique[c]].some(id => byId[id].team);
   T.push(`| ${ROMAN[c]}${team ? ' · для команды' : ''} | ${pools.basic.length} / ${pools.key[c].length} / ${pools.unique[c].length} | ${c >= 2 ? heroesByWeek[WEEKS[0]].filter(h => h.cyc <= c).length : '— · Эхо с цикла II'} | ${c >= LINES.many.from ? 'есть' : '—'} | ${c >= BOXES.craft.lines.find(l => l[0] === 'tal')[2] ? 'есть' : '—'} |`);
@@ -1115,8 +1140,8 @@ T.push(`| Событие | рабочих, по ${ASSUME.workerShards} шард�
 {
   const K = ASSUME.craftKills, boss = c => CRAFT.find(x => x.c === c);
   const cell = (c, led) => { const b = boss(c); return b ? `${fx(b.ev[led].mul(new Q(K.free)), 1)} / ${fx(b.ev[led].mul(new Q(K.fan)), 1)}` : '—'; };
-  T.push(`| Крафтовые боссы, побед в неделю: ${K.free} / ${K.fan} | шардов рабочих | ${[2, 3, 4, 5, 6].map(c => cell(c, 'wsh')).join(' | ')} |`);
-  T.push(`| Крафтовые боссы, побед в неделю: ${K.free} / ${K.fan} | талисманов | ${[2, 3, 4, 5, 6].map(c => cell(c, 'tal')).join(' | ')} |`);
+  T.push(`| Призванные враги, побед в неделю: ${K.free} / ${K.fan} | шардов рабочих | ${[2, 3, 4, 5, 6].map(c => cell(c, 'wsh')).join(' | ')} |`);
+  T.push(`| Призванные враги, побед в неделю: ${K.free} / ${K.fan} | талисманов | ${[2, 3, 4, 5, 6].map(c => cell(c, 'tal')).join(' | ')} |`);
 }
 function capKeysWeek(c) {   // ключей на кап побед у рунных стражей за неделю: вход 1 × цикл и 3 × цикл, доля 7 : 3
   const g = REC.drops.guardians.filter(x => x.cyc === c), lim = g.find(x => x.kind === 'limits').entryKeys, val = g.find(x => x.kind === 'valor').entryKeys;
@@ -1270,10 +1295,11 @@ Object.assign(inline, {
     manyChance: MANY_BP ? pct(MANY_BP) : '—', keysMax: pct(SUMMON_LAW.keysMaxBp),
     /* сроки целей — echo-rules.js, types (ADR-0030): лестница и призванный враг */
     lifeLadder: (() => { const t = ECHO_RULES && ECHO_RULES.types; if (!t) return '—'; const h = g => t[g] && t[g].lifeH; return `рядовой ${h('o')} ч, элита ${h('e')} ч, Многоликий ${h('m')} ч, босс и Убер — ${h('b')} ч`; })(),
-    lifeCraft: ECHO_RULES && ECHO_RULES.types && ECHO_RULES.types.craft ? `${ECHO_RULES.types.craft.lifeH} ч` : '—',
-    craftRounds: ECHO_RULES && ECHO_RULES.types && ECHO_RULES.types.craft ? ECHO_RULES.types.craft.rounds : '—',
+    lifeCraft: ECHO_RULES && ECHO_RULES.summon ? `${ECHO_RULES.summon.lifeH} ч` : '—',
+    /* раунды призванных — по типу (ядро, RULES.echo.rounds; ADR-0039) */
+    craftRounds: ['e', 'b', 'u', 'f'].map(g => `${typeLow(g)} — ${EB_RULES.echo.rounds[g]}`).join(', '),
     summonMix: MIX ? Object.entries(MIX).map(([mk, bp]) => `${SUMMON[SUMMON_DAY.mix[mk]].n.toLowerCase()} — ${pct(bp)}`).join(', ') : '—',
-    craftAtk: (() => { const n = ECHO_RULES && ECHO_RULES.types && ECHO_RULES.types.craft ? ECHO_RULES.types.craft.design : 0; return n ? `${n} ${n % 10 === 1 && n % 100 !== 11 ? 'атаку' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'атаки' : 'атак'}` : '—'; })(),
+    craftAtk: (() => { const ST = ECHO_RULES && ECHO_RULES.summon && ECHO_RULES.summon.types; return ST ? ['e', 'b', 'u', 'f'].map(g => `${typeLow(g)} — ${ST[g].design}`).join(', ') : '—'; })(),
     /* доля записей с ключами по циклам: подряд идущие циклы с одной долей — одной группой, «5 % в циклах I–III и 3 % в циклах IV–VI» */
     keysShare: keyShare.reduce((g, x) => { const last = g[g.length - 1]; if (last && last.bp === x.bp) last.to = x.c; else g.push({ bp: x.bp, from: x.c, to: x.c }); return g; }, [])
       .map(g => `${pct(g.bp)} в цикл${g.to > g.from ? `ах ${ROMAN[g.from]}–${ROMAN[g.to]}` : `е ${ROMAN[g.from]}`}`).join(' и '),
@@ -1301,11 +1327,12 @@ for (const mid of Object.keys(WEEK)) { weekOut[mid] = {}; for (const c of Object
 /* призванные враги — для экрана Эхо и листов «Сведения»: вид → правило, враг → сундук за победу; у Лика — редкость по циклу игрока.
    ev — ожидание сундука на одну победу: вид → цикл врага → сотые */
 const summonOut = {
-  kinds: Object.fromEntries(Object.entries(SUMMON).map(([k, K]) => [k, { n: K.n, box: K.box, win: K.win, count: K.count }])),
-  bosses: Object.fromEntries(CRAFT.map(x => { const g = x.row.cyc[x.pc][0]; return [x.row.boss, { k: x.row.kind, cyc: x.c, pc: x.pc, box: MODES.craft.box, r: g.r, win: g.win, n: g.count }]; })
-    .concat(LIK ? [[LIK.id, { k: 'mask', cyc: LIK.cyc, box: SUMMON.mask.box, win: SUMMON.mask.win, n: SUMMON.mask.count, byCyc: Object.fromEntries(MASK.map(x => [x.c, x.r])) }]] : [])),
+  types: Object.fromEntries(Object.entries(SUMMON_TYPE).map(([g, K]) => [g, { n: K.n, box: K.box, win: K.win, count: K.count }])),
+  kinds: Object.fromEntries(Object.keys(SUMMON).filter(k => KT(k)).map(k => { const K = KT(k); return [k, { n: SUMMON[k].n, g: KG(k), box: K.box, win: K.win, count: K.count }]; })),
+  bosses: Object.fromEntries(CRAFT.map(x => { const g = x.row.cyc[x.pc][0]; return [x.row.boss, { k: x.row.kind, g: x.row.g, cyc: x.c, pc: x.pc, box: MODES.craft.box, r: g.r, win: g.win, n: g.count }]; })
+    .concat(LIK && SUMMON_TYPE[LIK.g] ? [[LIK.id, { k: 'mask', g: LIK.g, cyc: LIK.cyc, box: SUMMON_TYPE[LIK.g].box, win: SUMMON_TYPE[LIK.g].win, n: SUMMON_TYPE[LIK.g].count, byCyc: Object.fromEntries(MASK.map(x => [x.c, x.r])) }]] : [])),
   ev: Object.assign(Object.fromEntries(SK.filter(k => KIND[k]).map(k => [k, Object.fromEntries(Object.entries(KIND[k]).map(([c, x]) => [c, ev100(x.ev)]))])),
-    { mask: Object.fromEntries(MASK.map(x => [x.c, ev100(evOf({ box: SUMMON.mask.box, r: x.r, win: SUMMON.mask.win, cyc: x.c, week: WEEKS[0] }))])) }),
+    LIK && SUMMON_TYPE[LIK.g] ? { mask: Object.fromEntries(MASK.map(x => [x.c, ev100(evOf({ box: SUMMON_TYPE[LIK.g].box, r: x.r, win: SUMMON_TYPE[LIK.g].win, cyc: x.c, week: WEEKS[0] }))])) } : {}),
 };
 const DATA = Object.assign({}, L, {
   items: itemsOut, heroInfo, talInfo, talSpoil,
@@ -1325,8 +1352,9 @@ const js = `/* Энериум · лутбоксы — данные протот�
    тип, редкость, количество, возможное содержимое и шансы, — а итог открытия присылает сервер. Здесь полный набор — для проектирования.
    Спойлеры цикла VI — только для команды: у ресурсов team: true, у талисманов третье поле talInfo — 1: линейка «для команды»
    в talismans.js, в сундуках — только с цикла VI. Имена, описания и виды талисманов — из talismans.js.
-   summon — сундук за победу над призванным врагом (крафтовые боссы, города, эхо боссов биомов, пробуждённые, Лик недели): kinds —
-   правило вида, bosses — враг → сундук (Лик — редкость по циклу игрока, byCyc), ev — ожидание сундука на победу, в сотых.
+   summon — сундук за победу над призванным врагом (боссы руин и городов, эхо боссов биомов, пробуждённые, Лик недели): types — правило
+   типа по силе (ADR-0039: элита, босс, Убер, Забытый), kinds — вид призыва и его тип, bosses — враг → сундук (Лик — редкость по циклу
+   игрока, byCyc), ev — ожидание сундука на победу, в сотых.
    Ниже данных — алгоритм открытия (window.EnLoot), тот же, что в сборщике. */
 window.EN_LOOTBOXES = {
 ${Object.entries(DATA).map(([k, v]) => `  ${k}: ${J(v)}`).join(',\n')},

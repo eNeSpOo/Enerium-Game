@@ -5,7 +5,7 @@
       доли: окно внутри рисунка, нарезка не меньше окна (углы и верх с украшением не тянутся), у героя — гнездо метки; выгруженная
       картинка есть, её пропорция — ar; в tools/art-gen/ui-art.json рамка идёт из art/generated, исходник есть.
    3. Тип рамки в каждом режиме — на настоящих боях прототипа: забег по биому 1–4 (рядовые, элита, босс) и рунный страж; Эхо — рядовой,
-      элита, босс, Убер, Многоликий, крафтовый босс; биом Многоликого по этажам; клан — Голос, Хозяин и свита; Арена и Лига — рамка героя
+      элита, босс, Убер, Многоликий, призванные враги всех типов — элита, босс, Убер, Забытый; биом Многоликого по этажам; клан — Голос, Хозяин и свита; Арена и Лига — рамка героя
       с обеих сторон; свои герои — всегда рамка героя. Каждая рамка набора встречается в бою.
    4. Карта с рамкой: класс fr, тип, переменные геометрии, рамка в кадре портрета; у героя — метка: кристалл редкости героя и звёзды по
       личному максимуму, взятые — по доблести; имя, полоса здоровья и щита, класс, эффекты, цель, контроль, «пал» — на месте; ход боя
@@ -419,21 +419,21 @@ for (const id of Object.keys(T.EB.BIOMES).filter(b => /^b\d$/.test(b))) {
   }
 }
 
-/* Эхо: цель каждого типа и крафтовый босс; атака — как у игрока */
+/* Эхо: цель каждого типа и призванный враг каждого типа по силе — элита, босс, Убер, Забытый (ADR-0039); атака — как у игрока */
 {
   const E = vm.runInContext('window.EN_ECHO', ctx), STEPS = E.steps, TOP = STEPS.length;
   const W = vm.runInContext('RS.weeks', ctx)[0], c = 3;
   const targets = [];
   for (const g of ['o', 'e', 'b', 'u']) targets.push(['step', STEPS.indexOf(g) + 1]);
   targets.push(['step', TOP + 1]);
-  for (const fb of T.RX.drops.craftBosses.slice(0, 1)) targets.push(['craft', fb]);
+  for (const g of ['e', 'b', 'u', 'f']) { const fb = T.RX.drops.craftBosses.find(b => b.g === g && !b.team); if (fb) targets.push(['craft', fb]); else fail(`призванного врага типа «${g}» нет в recipes.js`); }
   for (const [kind, x0] of targets) {
     fresh(); T.rsSetWeek(W.race); T.S.acc.cycle = c; T.S.route = 'echo'; T.S.wallet.souls = 1e9; E.sync();
     const x = run('Эхо · цель', () => E.target(kind, x0)); if (!x) continue;
     T.S.echo.slots[0] = x; T.S.echo.sel = 0;
     run('Эхо · атака', () => T.ACT.echatk(x.uid + ':1'));
     const R = lastRun('echo'), guards = { o: 'o', e: 'e', b: 'echo', uber: 'uber', forgotten: 'forgotten' };
-    checkBattle(`Эхо · ${kind === 'craft' ? 'призыв из рецепта' : x.g === 'm' ? 'Многоликий' : 'ступень ' + x.step}`, R,
+    checkBattle(`Эхо · ${kind === 'craft' ? 'призыв из рецепта · ' + x.g : x.g === 'm' ? 'Многоликий' : 'ступень ' + x.step}`, R,
       (u, sd) => !sd ? 'hero' : u.lead ? ECHO_MAIN[x.g] || ECHO_RANK[u.rank] : guards[u.rank] || 'o');
   }
   /* биом Многоликого: этажи по порядку — рамка главного врага по его типу */

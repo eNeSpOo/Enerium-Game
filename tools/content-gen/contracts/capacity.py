@@ -73,16 +73,18 @@ def biome_counters(avg, c):
 
 
 def echo_counters(prof, c):
-    """Эхо цикла c: среднее по неделям цикла — атак и побед в день, очков и душ в неделю (× 100)."""
+    """Эхо цикла c: среднее по неделям цикла — атак и побед в день, очков и душ в неделю (× 100); побед над Многоликим в день — × 10^6:
+    он вершина недели (ADR-0039), и не всякий отряд его берёт — сундуки призванных и достижения считают по ним, а не по шансу призыва."""
     res = EC.week_results(prof, c)
     n = len(res)
-    tot = {k: sum(t[k] for _, _, t in res) for k in ('att', 'kills', 'pts', 'souls')}
+    tot = {k: sum(t[k] for _, _, t in res) for k in ('att', 'kills', 'pts', 'souls', 'many')}
     # итоги echo.py — × 1000; в день — делим ещё на 7 дней недели; в сотых — × 100
     return {
         'echoAtk': tot['att'] * 100 // (1000 * n * EC.WEEK),
         'echoKill': tot['kills'] * 100 // (1000 * n * EC.WEEK),
         'echoPtsWeek': tot['pts'] * 100 // (1000 * n),
         'echoSoulsDay': tot['souls'] * 100 // (1000 * n * EC.WEEK),
+        'echoManyX1e6': tot['many'] // (n * EC.WEEK),   # итог echo.py по Многоликому — штук × 10^6 за неделю
         'echoTop': [top for top, _, _ in res],
     }
 
@@ -93,7 +95,7 @@ def build():
             'builder': 'tools/content-gen/contracts/capacity.py',
             'sources': ['tools/content-gen/economy/economy.py', 'tools/content-gen/economy/sets.py', 'tools/content-gen/economy/echo.py'],
             'x': 100,
-            'note': 'средний день цикла, все отряды; счётчики — в сотых; echoPtsWeek — очки Эхо за неделю; циклы IV–VI у биомов — по образцу III',
+            'note': 'средний день цикла, все отряды; счётчики — в сотых; echoPtsWeek — очки Эхо за неделю; echoManyX1e6 — побед над Многоликим в день × 10^6; циклы IV–VI у биомов — по образцу III',
         },
         'hours': {k: dict(E.PROFILES)[v] for k, v in PROFILES.items()},
         'slots': {str(c): slots(c) for c in CYCLES},

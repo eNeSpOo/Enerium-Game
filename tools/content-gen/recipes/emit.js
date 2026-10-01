@@ -10,7 +10,8 @@
    - каждый ключ ремесла стоит в полной цене хотя бы одного повторяемого рецепта — активации, призыва, заряженного карста или топлива;
    - каждый призыв врага несёт Энериум своей ступени и уникальный ресурс босса биома — сам или через перекрафт (слово автора, 30.09.2026);
    - лестница Энериума: 100 первой ступени — одна второй, 100 второй — одна третьей;
-   - призыв крафтового босса несёт находку своего места; у каждого — пробуждённый: обычный призыв, Многоликий, находка (ADR-0025);
+   - призыв босса руины или города несёт находку своего места; у каждого — пробуждённый: обычный призыв, Многоликий, находка (ADR-0025);
+   - у каждого призванного врага — тип по силе (ADR-0039): элита, босс, Убер или Забытый (CRAFT.type);
    - места идут цепочкой: активация не требует добычи места, которое открывается позже;
    - герой с максимумом доблести 4–5 требует трофея, уникального ресурса или двух находок;
    - все числа — целые.
@@ -225,27 +226,29 @@ function buildDrops(CYC, places, memories, items, recipes, byId) {
     guardians.push({ id: A.id + 'g', name: A.guard, biome: A.id, cyc: c, kind: 'limits', entryKeys: C.GUARD.limits.entryKeysPerCycle * c, runesPerKill: C.GUARD.limits.runesPerKill, weightsBp: C.GUARD.limits.weightsBp, team: !!cy.team });
     guardians.push({ id: B.id + 'g', name: B.guard, biome: B.id, cyc: c, kind: 'valor', entryKeys: C.GUARD.valor.entryKeysPerCycle * c, shardsBp: C.GUARD.valor.shardsBp, undefinedBp: C.GUARD.valor.undefinedBp, team: !!cy.team });
   }
-  const CB = C.CRAFT.biome, CS = C.CRAFT.boss, CM = C.CRAFT.memory;
+  const CB = C.CRAFT.biome, CS = C.CRAFT.boss, CM = C.CRAFT.memory, TY = C.CRAFT.type;   // TY — тип призванного врага по виду призыва (ADR-0039)
   const craftBiomes = places.map(p => ({ id: p.id, name: p.n, kind: p.kind, city: p.city || undefined, cyc: p.cyc, act: p.act, needs: p.needs, res: p.res, find: p.find, finds: CB.finds, findIds: p.finds,
     floors: CB.floors, resPerFloorBp: CB.resPerFloorBp, secondFindBp: CB.secondFindBp, spirit: CB.spirit * p.cyc, gold: CB.spirit * p.cyc / 2, souls: CB.souls * p.cyc, heroShards: CB.heroShards * p.cyc,
     eventPoints: CB.eventPoints, runeKeyBp: CB.runeKeyBp, runeKeys: p.cyc, team: p.team }));
-  const craftBosses = places.map(p => ({ id: p.boss.id, name: p.boss.label, kind: p.kind === 'city' ? 'city' : 'ruin', cyc: p.cyc, spec: p.boss.spec, race: p.boss.race, call: p.boss.call, trophy: p.boss.trophy,
+  const craftBosses = places.map(p => ({ id: p.boss.id, name: p.boss.label, kind: p.kind === 'city' ? 'city' : 'ruin', g: TY[p.kind === 'city' ? 'city' : 'ruin'], cyc: p.cyc, spec: p.boss.spec, race: p.boss.race, call: p.boss.call, trophy: p.boss.trophy,
     trophies: CS.trophies, specKeys: CS.specKeys, spirit: CS.spirit * p.cyc, gold: CS.spirit * p.cyc / 2, enerium: CS.enerium * p.cyc, runeKeyBp: CS.runeKeyBp, runeKeys: p.cyc,
-    workerBoxRarity: Math.min(7, p.cyc + 1), summonSouls: CS.summonSouls, immunityBp: CS.immunityBp, team: p.team }))
-    .concat([{ id: 'lik', name: 'Лик недели', kind: 'mask', cyc: 2, spec: null, race: 'раса недели', call: 'mask', trophy: null, trophies: 0, heroShardsWeekBp: C.CRAFT.lik.heroShardsWeekBp, specKeys: 0, spirit: 0, gold: 0, enerium: 0,
-      runeKeyBp: 0, runeKeys: 0, workerBoxRarity: 0, summonSouls: CS.summonSouls, immunityBp: CS.immunityBp, team: false }]);
+    workerBoxRarity: Math.min(7, p.cyc + 1), summonSouls: CS.summonSouls, team: p.team }))
+    .concat([{ id: 'lik', name: 'Лик недели', kind: 'mask', g: TY.mask, cyc: 2, spec: null, race: 'раса недели', call: 'mask', trophy: null, trophies: 0, heroShardsWeekBp: C.CRAFT.lik.heroShardsWeekBp, specKeys: 0, spirit: 0, gold: 0, enerium: 0,
+      runeKeyBp: 0, runeKeys: 0, workerBoxRarity: 0, summonSouls: CS.summonSouls, team: false }]);
   /* эхо боссов биомов: тот же вид записи; kind — memory */
-  for (const m of memories) craftBosses.push({ id: m.id, name: m.label, kind: 'memory', cyc: m.cyc, spec: m.spec, race: m.race, call: m.call, trophy: m.trophy,
+  for (const m of memories) craftBosses.push({ id: m.id, name: m.label, kind: 'memory', g: TY.memory, cyc: m.cyc, spec: m.spec, race: m.race, call: m.call, trophy: m.trophy,
     trophies: CM.trophies, specKeys: CM.specKeys, spirit: CM.spirit * m.cyc, gold: CM.spirit * m.cyc / 2, enerium: CM.enerium * m.cyc, runeKeyBp: CM.runeKeyBp, runeKeys: m.cyc,
-    workerBoxRarity: Math.min(7, m.cyc + 1 + CM.chestStep), summonSouls: CS.summonSouls, immunityBp: CS.immunityBp, team: m.team, biome: m.biome });
-  /* пробуждённые (ADR-0025): тот же вид записи, что у крафтового босса; cyc — цикл, с которого есть рецепт пробуждения.
-     awake — id обычного босса; powerCycleStep — сила как у крафтового босса на столько циклов выше; трофей — свой. */
+    workerBoxRarity: Math.min(7, m.cyc + 1 + CM.chestStep), summonSouls: CS.summonSouls, team: m.team, biome: m.biome });
+  /* пробуждённые (ADR-0025): тот же вид записи, что у босса руины; cyc — цикл, с которого есть рецепт пробуждения.
+     awake — id обычного босса; тип — Забытый (ADR-0039), powerCycleStep — сила его типа на столько циклов выше; трофей — свой. */
   const AW = C.CRAFT.awake;
   for (const p of places.filter(x => x.boss.awake)) { const a = p.boss.awake, c = a.cyc, cur = CS.spirit * c * AW.currencyMul;
-    craftBosses.push({ id: a.id, name: a.label, kind: 'awake', cyc: c, spec: p.boss.spec, race: p.boss.race, call: a.call, trophy: p.boss.awTrophy,
+    craftBosses.push({ id: a.id, name: a.label, kind: 'awake', g: TY.awake, cyc: c, spec: p.boss.spec, race: p.boss.race, call: a.call, trophy: p.boss.awTrophy,
       trophies: AW.trophies, specKeys: AW.specKeys, spirit: cur, gold: cur / 2, enerium: CS.enerium * c * AW.currencyMul, runeKeyBp: AW.runeKeyBp, runeKeys: c,
-      workerBoxRarity: Math.min(7, c + 1 + AW.chestStep), summonSouls: CS.summonSouls, immunityBp: CS.immunityBp, team: p.team || !!CYC[c - 1].team,
+      workerBoxRarity: Math.min(7, c + 1 + AW.chestStep), summonSouls: CS.summonSouls, team: p.team || !!CYC[c - 1].team,
       awake: p.boss.id, powerCycleStep: AW.powerCycleStep }); }
+  /* тип по силе — у каждого (ADR-0039): от него раунды, рамка, иммунитет и сундук; «крафтового» типа нет */
+  for (const b of craftBosses) if (!['e', 'b', 'u', 'f'].includes(b.g)) throw new Error(`${b.id} «${b.name}»: нет типа по силе (CRAFT.type, вид ${b.kind})`);
   const M = C.MARKET;
   const market = { basic: cyc6.map(c => M.basic * c), key: cyc6.map(c => M.key * c), craftres: cyc6.map(c => M.craftres * c), unique: cyc6.map(c => M.unique * c),
     find: cyc6.map(c => M.find * c), trophy: cyc6.map(c => M.trophy * c), commissionPct: M.commissionPct, soulsTradable: false };

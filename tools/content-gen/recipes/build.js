@@ -24,7 +24,7 @@ const addRecipe = r => { if (recipes.some(x => x.id === r.id)) throw new Error('
 const pct = bp => (bp % 100 ? (bp / 100).toFixed(2).replace('.', ',') : String(bp / 100)) + ' %';
 const lcFirst = s => s.charAt(0).toLowerCase() + s.slice(1);
 const raceLc = r => ['Забытые', 'Перворождённые'].includes(r) ? r : r.toLowerCase();   // имена народов финала и Эхо — с заглавной, как в своде
-/* Пробуждение крафтового босса требует Многоликого: рецепт пробуждения — не раньше цикла, где Многоликий появляется (Эхо). */
+/* Пробуждение босса руины или города требует Многоликого: рецепт пробуждения — не раньше цикла, где Многоликий появляется (Эхо). */
 const AW = C.CRAFT.awake;
 const MANY_CYC = (CYC.find(cy => (cy.echo || []).some(e => e.id === AW.item)) || { n: 0 }).n;
 if (!MANY_CYC) throw new Error('нет предмета пробуждения ' + AW.item + ' в данных циклов');
@@ -61,6 +61,9 @@ function heroRow(h) {
 }
 /* строка «где падает» у предмета, который делает рецепт */
 const MADE_SRC = ['Мастерская · рецепт'];
+/* призванный враг в строке «где падает» — по типу силы (ADR-0039): «крафтового босса» как типа нет, тип — CRAFT.type по виду призыва */
+const SUMMONED_N = { e: 'Призванная элита', b: 'Призванный босс', u: 'Призванный Убер', f: 'Забытый' };
+const summonedOf = kind => SUMMONED_N[C.CRAFT.type[kind]];
 
 /* Общий пул базовых: падают во всех биомах с первого, вперемешку. */
 for (const [id, n, spec, lore, hint, art] of POOL) addItem({ id, n, cyc: 1, b: null, pool: true, tier: 'basic', fam: 'basic', spec, r: 1, lore, hint, art,
@@ -94,7 +97,7 @@ function addPlace(cy, cb, order) {
     why: `${boss.call.why} Босс встаёт в Эхо за предмет и 1 душу; раса — ${raceLc(boss.race)}, ремесло — ${lcFirst(C.SPECS[boss.spec].n)}.`, team });
   const [tid, tn, tlore, thint, tart] = boss.trophy, aw = boss.awake, alabel = `${label} · ${aw.adj}`;
   addItem({ id: tid, n: tn, cyc: c, b: cb.id, place: cb.n, tier: 'trophy', fam: 'trophy', spec: boss.spec, r: 5, foe: label, lore: tlore, hint: thint, art: tart, team,
-    src: [`Крафтовый босс «${label}» · Эхо · ${C.CRAFT.boss.trophies} за победу`] });
+    src: [`${summonedOf(fam)} «${label}» · Эхо · ${C.CRAFT.boss.trophies} за победу`] });
   /* Пробуждённый босс (ADR-0025, «Многоликий и арт», п. 5): обычный призыв своего места, Многоликий, вторая находка и вещи из истории босса */
   const ac = Math.max(c, MANY_CYC), ateam = team || !!CYC[ac - 1].team, acall = boss.call.id + '_aw';
   place.boss.awake = { id: boss.id + '_aw', label: alabel, lore: aw.lore, call: acall, cyc: ac };
@@ -104,20 +107,20 @@ function addPlace(cy, cb, order) {
   addItem({ id: acall, n: aw.call.n, cyc: ac, b: cb.id, place: cb.n, tier: 'call', fam: 'awcall', spec: boss.spec, r: AW.callR, opens: alabel, opensLore: `${boss.lore} ${aw.lore}`,
     race: boss.race, lore: aw.call.lore, hint: aw.call.hint, art: aw.call.art, team: ateam, src: MADE_SRC });
   addRecipe({ id: 'r_' + acall, cyc: ac, n: aw.call.n, kind: 'call', fam: 'awcall', out: [acall, 1], in: aw.call.in, team: ateam,
-    why: `${aw.call.why} Пробуждённый босс встаёт в Эхо за предмет и 1 душу: сила — как у крафтового босса на ${AW.powerCycleStep} цикл выше, трофей — свой, сундук — на ${AW.chestStep} ступень выше.` });
+    why: `${aw.call.why} Пробуждённый встаёт в Эхо за предмет и 1 душу Забытым — высшей ступенью врага (ADR-0039): 50 раундов, сила своего типа на ${AW.powerCycleStep} цикл выше, трофей — свой, сундук — на ${AW.chestStep} ступень выше.` });
 }
 
 let order = 0;
 for (const cy of CYC) {
   const c = cy.n, R = ROMAN[c], team = !!cy.team, [A, B] = cy.biomes;
-  const bossSpec = {};   // ремесло крафтового босса цикла → его имя: он роняет ключи своего ремесла
-  for (const cb of cy.craft) bossSpec[cb.boss.spec] = cb.boss.title ? cb.boss.n + ', ' + cb.boss.title : cb.boss.n;
+  const bossSpec = {};   // ремесло босса руины или города цикла → его тип и имя: он роняет ключи своего ремесла
+  for (const cb of cy.craft) bossSpec[cb.boss.spec] = `${summonedOf(cb.kind === 'city' ? 'city' : 'ruin')} «${cb.boss.title ? cb.boss.n + ', ' + cb.boss.title : cb.boss.n}»`;
   for (const b of cy.biomes) {
     const bn = b.id.slice(1);
     for (const [spec, n, lore, hint, art] of b.keys) {
       const src = [`Любая элита биома «${b.n}» · один из шести ключей биома наугад`, `Ритуалы рабочих · ${b.n} · от эпической редкости`];
       if (c === 1) src.push('Цепочка обучения — недостающие ключи, предложение');
-      if (bossSpec[spec]) src.push(`Крафтовый босс «${bossSpec[spec]}» · Эхо · ключи своего ремесла`);
+      if (bossSpec[spec]) src.push(`${bossSpec[spec]} · Эхо · ключи своего ремесла`);
       addItem({ id: `k${bn}_${spec}`, n, cyc: c, b: b.id, tier: 'key', fam: 'key', spec, r: 2, lore, hint, art, team, src });
     }
     const [uid, un, ulore, uimg, uhint, uart] = b.unique;
@@ -132,7 +135,7 @@ for (const cy of CYC) {
       addItem({ id: m.call.id, n: m.call.n, cyc: c, b: b.id, tier: 'call', fam: 'memcall', spec: m.spec, r: 5, opens: m.label, opensLore: m.lore, race: m.race,
         lore: m.call.lore, hint: m.call.hint, art: m.call.art, team, src: MADE_SRC });
       addRecipe({ id: 'r_' + m.call.id, cyc: c, n: m.call.n, kind: 'call', fam: 'memcall', out: [m.call.id, 1], in: m.call.in, team,
-        why: `${m.call.why} Эхо босса встаёт в Эхо за предмет и 1 душу: сила и бой — как у крафтового босса своего цикла.` });
+        why: `${m.call.why} Эхо босса встаёт в Эхо за предмет и 1 душу боссом, как босс руины своего цикла (ADR-0039).` });
       const [tid, tn, tlore, thint, tart] = m.trophy;
       addItem({ id: tid, n: tn, cyc: c, b: b.id, tier: 'trophy', fam: 'memtrophy', spec: m.spec, r: 5, foe: m.label, lore: tlore, hint: thint, art: tart, team,
         src: [`Эхо босса биома «${m.label}» · Эхо · ${C.CRAFT.memory.trophies} за победу`] });
@@ -194,8 +197,8 @@ const SRC_EXTRA = {
   /* строки видит игрок: без ссылок на ADR и GDD, без служебных слов (проверка check_player_view.js) */
   /* рунный ключ — слово автора 30.09.2026 (ADR-0033): боссы биома, донатный сет ключников «Менялы», сундуки с малым шансом, контракты;
      за деньги — только стартовый набор, раз за игру. Энериум — ручеёк бесплатного игрока (docs/content/экономика-энериум.md) */
-  rkey: ['Контракты — главный источник', 'Босс биома — 10 %; за срабатывание столько ключей, какой цикл. С элит не падает', 'Сет «Менялы» — ключ с каждого N-го босса биома', 'Сундук странника и сундук крафтового босса — изредка', 'Стартовый набор в Лавке Энериума — один раз за игру'],
-  energ: ['Дар дня, бесплатный ряд пропуска, контракты эпической редкости и выше', 'Арена: суточный топ-100', 'Крафтовые боссы и эхо боссов биомов: победа возвращает часть Энериума призыва', 'Рецепт «Энериум из жилы» — с цикла V', 'Лавка Энериума'],
+  rkey: ['Контракты — главный источник', 'Босс биома — 10 %; за срабатывание столько ключей, какой цикл. С элит не падает', 'Сет «Менялы» — ключ с каждого N-го босса биома', 'Сундук странника и сундук призыва — изредка', 'Стартовый набор в Лавке Энериума — один раз за игру'],
+  energ: ['Дар дня, бесплатный ряд пропуска, контракты эпической редкости и выше', 'Арена: суточный топ-100', 'Призванные враги — боссы руин и городов, эхо боссов биомов: победа возвращает часть Энериума призыва', 'Рецепт «Энериум из жилы» — с цикла V', 'Лавка Энериума'],
   necro: ['Мастерская · сюжетный рецепт, открывается после Зарифа'],
 };
 for (const it of items) if (SRC_EXTRA[it.id]) it.src = SRC_EXTRA[it.id];

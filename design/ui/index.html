@@ -730,6 +730,8 @@ button.well:hover{border-color:var(--iron-3)}
 .ruler i.wall{background:var(--rust);box-shadow:0 0 8px rgba(220,106,82,.6)}
 @container main (max-height: 360px){ .bt{--rowh:86px;--colw:84px;--fh:48px} .bt-floor b{font-size:26px} }
 .bt-ctrl .btn[aria-pressed="true"]{color:var(--spirit);border-color:rgba(72,229,212,.45)}
+/* узкий экран (844): у Убера, Многоликого и Забытого в строке боя ещё чип иммунитета — «Свернуть» уезжал за край. Кнопка — значком (подпись остаётся для чтения с экрана), зазоры и часы уже */
+@container main (max-width: 800px){ .bt-hud{gap:8px} .bt-clock{width:126px} .bt-ctrl .btn[data-a="minimize"]{font-size:0;gap:0;padding:0 11px} }
 .bc{cursor:pointer}
 /* легенда знаков на картах */
 .bt-legend{position:absolute;left:calc(var(--colw) + 112px);right:calc(var(--colw) + 112px);top:0;z-index:3;display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;padding:9px 12px;border-radius:10px;background:rgba(9,11,13,.95);border:1px solid var(--iron-2);box-shadow:0 12px 30px -12px #000;font-size:11.5px;line-height:1.3;color:var(--parch-2)}
@@ -2011,12 +2013,13 @@ function avaHtml(sec, todo) {
   return `<button class="g-ava" data-k="wanderer" data-a="go" data-v="profile" aria-label="Странник, уровень ${S.acc.level}${why ? ': ' + why : ''}" title="Странник${why ? ': ' + why : ''}"${sec === 'wanderer' ? ' aria-current="page"' : ''}><span class="ring" style="--p:${pct}"><img src="${face}" alt=""><span class="lv">${S.acc.level}</span></span>${bdgN(todoN(mem))}</button>`;
 }
 const bellHtml = () => { const n = inboxN(); return `<button class="g-icon" data-a="sheet" data-v="inbox" aria-label="Входящие: ${n}" title="Входящие${n ? ': ' + n : ''}">${ic('bell')}${bdgN(n)}</button>`; };
-const TITLE_LONG = 16;   // с этой длины заголовок на 844 мельче и без подзаголовка (.g.sm .g-title.long): «Эхо · ступень 14», «Библиотека Улариона»
+const TITLE_LONG = 16, TITLE_SUM = 30;   // на 844 заголовок мельче и без подзаголовка (.g.sm .g-title.long): с 16 знаков — «Эхо · ступень 14», «Библиотека Улариона»; или вместе с подзаголовком с 30 — «Призыв · Босс · атака 1 · 20 раундов»
+const plainLen = s => String(s || '').replace(/<[^>]*>/g, '').length;
 function topBar(m, sec = navSection(S.route, m), todo = navTodo()) {
   let mid = '';
   if (m.back) mid += `<button class="g-back" data-a="go" data-v="${m.back}" aria-label="Назад">${ic('back')}</button>`;
   if (m.seg) mid += `<div class="g-seg" role="tablist" aria-label="${m.title}">${m.seg.items.map(([k, l, b]) => `<button role="tab" aria-selected="${S.seg[m.seg.key] === k}" data-a="seg" data-v="${m.seg.key}:${k}">${l}${b ? '<span class="bdg" aria-hidden="true"></span><span class="sr">, есть дела</span>' : ''}</button>`).join('')}</div>`;   // у вкладки дело — точка, не «!» и не число
-  else mid += `<div class="g-title${String(m.title).replace(/<[^>]*>/g, '').length >= TITLE_LONG ? ' long' : ''}"><h1>${m.title}</h1>${m.sub ? `<small>${m.sub}</small>` : ''}</div>`;
+  else mid += `<div class="g-title${plainLen(m.title) >= TITLE_LONG || plainLen(m.title) + plainLen(m.sub) >= TITLE_SUM ? ' long' : ''}"><h1>${m.title}</h1>${m.sub ? `<small>${m.sub}</small>` : ''}</div>`;
   if (m.chip) mid += m.chip;
   return `<header class="g-top">
     ${avaHtml(sec, todo)}
@@ -2588,6 +2591,9 @@ const TR_COL = it => ['basic', 'unique', 'vshard', 'rune', 'echo'].includes(it.t
   : ['act', 'call', 'craftres', 'find', 'trophy'].includes(it.tier) ? 5 : 6;
 /* раса в строке: Забытые и Перворождённые — с заглавной, как в своде */
 const trRace = r => ['Забытые', 'Перворождённые'].includes(r) ? r : String(r).toLowerCase();
+/* тип призванного врага по силе — поле g записи craftBosses (ADR-0039: «крафтового босса» как типа нет): [кто, кого] */
+const TR_SUMMON_G = { e: ['элита', 'элиту'], b: ['босс', 'босса'], u: ['Убер', 'Убера'], f: ['Забытый', 'Забытого'] };
+const trSummonG = (call, form) => { const b = ((RX.drops && RX.drops.craftBosses) || []).find(x => x.call === call), t = b && TR_SUMMON_G[b.g]; return t ? t[form] : form ? 'врага' : 'враг'; };
 /* цикл, где узел виден: у базового пула — первый цикл, чьи рецепты его берут */
 const trHome = it => it.pool ? Math.min(...(RX_USE[it.id] || [{ cyc: 1 }]).map(r => r.cyc)) : it.cyc;
 function trLayout(c) {
@@ -2671,7 +2677,7 @@ function trCard(id) {
   const where = it.pool ? 'Общий пул · любой биом с первого' : bm ? `${bm.n} · цикл ${cy.roman}` : it.place ? `${it.place} · цикл ${cy.roman}` : `цикл ${cy.roman}`;
   const sp = it.spec ? it.spec.split('+').map(x => RX.specs[x].n.toLowerCase()).join(' + ') : '';
   const recs = RX_OUT[id] || [], uses = RX_USE[id] || [], ch = trChain(id);
-  const opens = it.opens ? `<p class="muted" style="font-size:12.5px">${it.tier === 'act' ? 'Призывает крафтовый биом в «Биомах», в свободный активный слот:' : `Призывает в Эхо крафтового босса за себя и 1 душу${it.race ? ' · ' + trRace(it.race) : ''}:`} «${it.opens}». ${it.opensLore}</p>` : '';
+  const opens = it.opens ? `<p class="muted" style="font-size:12.5px">${it.tier === 'act' ? 'Призывает крафтовый биом в «Биомах», в свободный активный слот:' : `Призывает в Эхо ${trSummonG(id, 1)} за себя и 1 душу${it.race ? ' · ' + trRace(it.race) : ''}:`} «${it.opens}». ${it.opensLore}</p>` : '';
   const who = it.boss && it.tier === 'unique' ? ' · босс «' + it.boss + '»' : it.foe ? ' · «' + it.foe + '»' : '';
   const hero = it.tier === 'hero' ? `<div class="row" style="gap:8px;flex-wrap:wrap"><span class="chip">${it.cls}</span><span class="chip">${it.race} · ${it.school}</span><span class="chip gold">максимум доблести ${it.maxV}</span></div>` : '';
   return `<div class="row" style="gap:10px;align-items:center"><span class="tr-big" data-r="${it.r}">${trIcon(it)}</span><div class="col" style="gap:3px;min-width:0"><span class="eyebrow">${T.n}${sp ? ' · ' + sp : ''}</span><b class="serif" style="font-size:20px;line-height:1.05">${it.n}</b><span class="faint" style="font-size:12px">${where}${who}</span></div></div>
@@ -2692,9 +2698,9 @@ function trSummary(c, L) {
     <dl class="kv"><dt>Рецептов в цикле</dt><dd>${L.recs.length}</dd>
       ${st ? `<dt>Ресурсов цикла</dt><dd>${st.resources}: ${t.key} ключей · ${t.unique} уникальных · ${t.craftres + t.find + t.trophy} крафтовых</dd><dt>Базовых общего пула</dt><dd>${st.poolUsed} из ${RX.stats.total.pool} в рецептах цикла</dd><dt>Развилок в древе</dt><dd>${st.forks}</dd>` : ''}
       <dt>${places.length > 1 ? 'Крафтовые биомы' : 'Крафтовый биом'}</dt><dd>${places.map(p => p.n).join(', ')}</dd>
-      <dt>${places.length > 1 ? 'Крафтовые боссы' : 'Крафтовый босс'}</dt><dd>${places.map(p => `${p.boss.label} · ${trRace(p.boss.race)}`).join(', ')}</dd></dl>
+      <dt>${places.length > 1 ? 'Призванные враги' : 'Призванный враг'}</dt><dd>${places.map(p => `${p.boss.label} · ${trSummonG(p.boss.call, 0)} · ${trRace(p.boss.race)}`).join(', ')}</dd></dl>
     <div class="tr-leg"><span><i></i>что нужно выбранному</span><span><i class="d"></i>куда оно идёт</span><span><i class="s"></i>выбранный узел</span><span><b class="gold" style="font:700 10px var(--f-u)">→III</b>&nbsp;уходит в рецепт цикла III</span><span><i class="q"></i>из прошлых циклов</span></div>
-    <p class="reason">Нажмите узел: золотом подсветится, что для него нужно, пунктиром — куда он идёт. Справа — вся цепочка по циклам. Все числа — демонстрация. Слои цикла: базовые пула и ключи → заготовки → изделия → активация руины в «Биомах» → её ресурсы и находка → призыв крафтового босса в Эхо → трофей → герои и ларцы. Каждая руина подсказывает дорогу к следующей.</p>`;
+    <p class="reason">Нажмите узел: золотом подсветится, что для него нужно, пунктиром — куда он идёт. Справа — вся цепочка по циклам. Все числа — демонстрация. Слои цикла: базовые пула и ключи → заготовки → изделия → активация руины в «Биомах» → её ресурсы и находка → призыв босса места в Эхо → трофей → герои и ларцы. Каждая руина подсказывает дорогу к следующей.</p>`;
 }
 function treePage() {
   if (!RX.cycles.length) return '<p class="faint">Нет данных: рядом с index.html должен лежать recipes.js.</p>';
@@ -3867,7 +3873,7 @@ function renderKit() {
   <section class="k-box"><h3>Иконки путей</h3><div class="k-row">${[[12, 'Убежище'], [10, 'Спуск'], [24, 'Герои'], [11, 'Ремесло'], [6, 'Неделя'], [18, 'Эхо'], [38, 'Контракты'], [33, 'Ритуалы'], [3, 'Арена'], [26, 'Клан'], [21, 'Событие'], [29, 'Странник']].map(([p, n]) => `<figure style="margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;width:64px"><img src="${PATH(p)}" alt="" style="width:48px;height:48px;border-radius:12px;box-shadow:0 0 0 1px #262c32"><figcaption style="font-size:11px;color:var(--parch-2);text-align:center;line-height:1.1">${n}</figcaption></figure>`).join('')}</div><p class="k-note">Авторский набор. Иконка узнаётся, подпись остаётся всегда.</p></section>
   <section class="k-box"><h3>Слой поверх: лист и диалог</h3><div class="k-demo" style="height:170px;position:relative;overflow:hidden;border:1px solid var(--iron)"><div style="position:absolute;inset:0;background:rgba(3,4,5,.55)"></div><div class="sheet" style="width:52%;animation:none"><div class="sheet-h" style="min-height:40px;padding:6px 8px 6px 12px"><h2 style="font-size:17px">Сведения</h2><span class="iconbtn x" style="width:26px;height:26px">${ic('x')}</span></div><div class="sheet-b" style="padding:8px 12px;gap:6px"><span class="faint" style="font-size:12px">уточняет работу, не уводит с экрана</span>${bar(60)}</div><div class="sheet-f" style="padding:6px 12px"><button class="btn go sm" style="margin-left:auto">Действие</button></div></div></div><p class="k-note">Лист справа — сведения и настройка. Диалог по центру — только цена, последствия и итог.</p></section>
   ${RX.stats ? `<section class="k-box" style="grid-column:1/-1"><h3>Ресурсы Этериоса · ${RX.stats.total.resources}</h3>
-    <p class="k-note">Все ресурсы игры по шести циклам и ярусам. Базовые — общий пул на все циклы: падают в каждом биоме с первого. Ключи — по биомам, любая элита роняет один из шести наугад. Уникальные — с боссов биомов, крафтовые — в руинах и у крафтовых боссов в Эхо. Иконка — заглушка: ремесло или ярус, нижняя кромка — редкость. Наведите или выберите клавиатурой — подсказка с загадкой и источником; нажмите — узел откроется в «Древе рецептов». Данные — <code>recipes.js</code>, обоснование и летопись Этриона — <code>docs/content/ресурсы-рецепты-дроп.md</code>. Цикл VI — спойлер, только для команды.</p>
+    <p class="k-note">Все ресурсы игры по шести циклам и ярусам. Базовые — общий пул на все циклы: падают в каждом биоме с первого. Ключи — по биомам, любая элита роняет один из шести наугад. Уникальные — с боссов биомов, крафтовые — в руинах и у призванных врагов в Эхо. Иконка — заглушка: ремесло или ярус, нижняя кромка — редкость. Наведите или выберите клавиатурой — подсказка с загадкой и источником; нажмите — узел откроется в «Древе рецептов». Данные — <code>recipes.js</code>, обоснование и летопись Этриона — <code>docs/content/ресурсы-рецепты-дроп.md</code>. Цикл VI — спойлер, только для команды.</p>
     <div id="kitRes" class="rz"></div></section>` : ''}
   ${window.EN_LOOTBOXES ? `<section class="k-box" style="grid-column:1/-1"><h3>Лутбоксы · ${Object.keys(EN_LOOTBOXES.boxes).length} сундуков · ${Object.keys(EN_LOOTBOXES.modes).length} источников</h3>
     <p class="k-note">Черновик <code>docs/content/лутбоксы.md</code>, данные и алгоритм открытия — <code>lootboxes.js</code>, сборка — <code>tools/content-gen/lootboxes/</code>. Числа — демонстрация, ждут автора. Сетка — «вид сундука × редкость»: в клетке ожидаемое главной меры в выбранном цикле и окне, яркие клетки в этом цикле кто-то выдаёт. Карточка — по §14.4. Пробное открытие — не выдача: в игре таблицы наград и итог открытия — на сервере (§36.16).</p>
@@ -3887,7 +3893,7 @@ const RZ_ROWS = [
   ['unique', 'Уникальные', 'босс биома, 5 %'],
   ['craftres', 'Ресурсы руин', 'этаж крафтового биома'],
   ['find', 'Находки', 'закрытие крафтового биома'],
-  ['trophy', 'Трофеи', 'крафтовый босс в Эхо, за победу'],
+  ['trophy', 'Трофеи', 'призванный враг в Эхо, за победу'],
 ];
 function rzIt(it) {
   return `<button class="well rz-it" data-rz="${it.id}" data-r="${it.r}"${typeof crK === 'function' ? crK(it) : ''} aria-label="${trEsc(it.n)}">${trIcon(it)}${it.tier === 'key' ? `<span class="rz-k">${ic('key')}</span>` : ''}</button>`;

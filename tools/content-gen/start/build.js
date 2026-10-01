@@ -68,7 +68,9 @@ function dataOf(levelsXp) {
 }
 
 /* Возрождение душ: прокрутка — осколки одного героя пула цикла наугад (RL_DATA.shards, веса — б. п.) или, с шансом fullBp, полный
-   чертёж — комплект. Сколько прокруток до первого собранного героя пула и до выбранного — среднее по trials прогонам на генераторе ядра */
+   чертёж — комплект. Гарантия (RL_DATA.pity, решение автора 01.10.2026): каждая every-я прокрутка — q осколков героя, которого выбрал
+   игрок; броски генератора те же, гарантия заменяет итог своей прокрутки — как на экране (screens/roulette.js). Выбранный — герой 0
+   прогона. Сколько прокруток до первого собранного героя пула и до выбранного — среднее по trials прогонам на генераторе ядра */
 function rouletteCalc() {
   const src = fs.readFileSync(path.join(ROOT, 'design', 'ui', 'screens', 'roulette.js'), 'utf8'), m = src.match(/const RL_DATA = (\{[\s\S]*?\n\});/);
   if (!m) return { err: 'screens/roulette.js: нет RL_DATA' };
@@ -81,8 +83,9 @@ function rouletteCalc() {
     for (let t = 0; t < Q.trials; t++) {
       const got = new Array(pool).fill(0); let k = 0, f = 0, sp = 0;
       while ((!f || !sp) && k < 100000) {
-        k++; const h = rng(pool), full = rng(RL.bp) < RL.fullBp; let q = need;
+        k++; let h = rng(pool), q = need; const full = rng(RL.bp) < RL.fullBp;
         if (!full) { let r = rng(W); for (const [v, w] of RL.shards) { if (r < w) { q = v; break; } r -= w; } }
+        if (RL.pity && k % RL.pity.every === 0) { h = 0; q = RL.pity.q; }   // гарантия: итог прокрутки — осколки выбранного
         got[h] += q;
         if (!f && got[h] >= need) f = k;
         if (!sp && got[0] >= need) sp = k;
@@ -230,6 +233,8 @@ function build() {
       log: logOf(p2, 'b2') },
     b1log: logOf(p2, 'b1'),
     levels: DATA.LEVELS.map((l, i) => ({ L: l.L, xp: thr[i], min: Math.round(lvMs(l.L) / 60000) })),
+    /* формула уровней с 11-го и опыт вех §16 — калькулятор экономики считает по ним «Дар Страннику» в цикле II (economy.py, ADR-0039) */
+    formula: DATA.FORMULA, xp: DATA.XP,
     end: path_.end,
     scans: scans.map(x => ({ n: x.n, first: x.first })),
   };
@@ -275,7 +280,7 @@ function build() {
     RQ.rows.map(r => [ROMAN[r.c], r.pool, r.first, r.spec, fmt(r.first * RQ.spin), r.c === 2 ? Math.round(r.first * RQ.spin / DATA.ROULETTE.enerDay) : '—'])) +
     `
 
-Прокрутка — ${RQ.spin} Энериума: осколки одного героя пула — ${RQ.RL.shards.map(([v, w]) => `${v} с весом ${w / 100} %`).join(', ')}, в среднем ${dec2(RQ.avg100)}; полный чертёж — ${RQ.RL.fullBp / 100} %. Комплект — ${RQ.need} осколков, пробуждение — ${fmt(RQ.souls)} душ.`;
+Прокрутка — ${RQ.spin} Энериума: осколки одного героя пула — ${RQ.RL.shards.map(([v, w]) => `${v} с весом ${w / 100} %`).join(', ')}, в среднем ${dec2(RQ.avg100)}; полный чертёж — ${RQ.RL.fullBp / 100} %.${RQ.RL.pity ? ` Гарантия — каждая ${RQ.RL.pity.every}-я прокрутка: ${RQ.RL.pity.q} осколков героя, которого выбрал игрок.` : ''} Комплект — ${RQ.need} осколков, пробуждение — ${fmt(RQ.souls)} душ.`;
   return { data: D, json, tables: TBL, err, warn, S, M, p2, summary, thr, scans };
 }
 /* забеги биома для таблиц калькулятора темпа (pace.py, Б1): номер, время забегов с начала биома, героев, уровни, стена, дух; попытка

@@ -89,7 +89,7 @@ const leaks = [
   ...R.items.filter(i => i.opens).map(i => ['что откроет предмет (§12.5)', i.opens]),
   ...R.items.filter(i => i.opensLore).map(i => ['что откроет предмет (§12.5)', i.opensLore.slice(0, 40)]),
   ...R.places.map(p => ['крафтовый биом до активации (§12.5)', p.n]),
-  ...R.places.map(p => ['крафтовый босс до призыва (§12.5)', p.boss.n]),
+  ...R.places.map(p => ['призванный враг до призыва (§12.5)', p.boss.n]),
 ].filter(([, s]) => s && !legit.includes(s));
 
 /* служебное глазами игрока — слова и шаблоны check_player_view.js; обход там ограничен, здесь — каждое состояние мастерской.

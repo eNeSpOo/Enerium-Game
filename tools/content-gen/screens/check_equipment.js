@@ -365,7 +365,7 @@ reset();
     if (set ? !hc.includes(ico) : T.CO_ART.ready.includes(body) && !hc.includes(body)) say(`«Сундуки»: у ${e.cs.box} · ${e.cs.r} не рисованный сундук`);
   }
   if (T.CO_ART && T.CO_ART.ready.includes('chests/wander-body.png')) { T.S.overlay = { t: 'gifts', arg: 'me' }; const hg = view(P, 'Дары'); if (!/chests\/[a-z]+(?:-body\.png|\/r\d\.webp)/.test(hg)) say('Дары: плитки сундуков — прежний значок'); T.S.overlay = null; }
-  /* призывы: руины, крафтовые боссы, Многоликий */
+  /* призывы: руины, призванные враги, Многоликий */
   for (const e of T.zpEntries('call')) if (!['act', 'call', 'echo'].includes(e.it.tier)) say(`«Призывы»: ${e.id} яруса ${e.it.tier}`);
   /* талисманы: фильтр «подходит классу» — §26 */
   const TL = T.TL, tals = T.zpEntries('tal').filter(e => e.kind === 'tal');

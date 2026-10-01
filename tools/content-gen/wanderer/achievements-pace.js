@@ -116,7 +116,10 @@ function run(A, src) {
           else if (t >= P.uberStep) { seen.add(W.w % P.races); ev.push([W.end, seen.size * 100]); }
         }
         V[m] = steps(ev);
-      } else if (md.k === 'many') { const k = V.echoKills || flow(capDay('echoKill'), 0); V[m] = k.map(x => Math.floor(x * manyBp / 10000)); }
+      } else if (md.k === 'many') {   // победы над Многоликим — прогон Эхо (capacity.json, echoManyX1e6): он вершина недели (ADR-0039); нет поля — победы × шанс
+        if (Number.isInteger(CAP.cycles[2][rp].echoManyX1e6)) V[m] = flow(capDay('echoManyX1e6'), 0).map(x => Math.floor(x / 10000));
+        else { const k = V.echoKills || flow(capDay('echoKill'), 0); V[m] = k.map(x => Math.floor(x * manyBp / 10000)); }
+      }
       else if (md.k === 'contracts') {   // дневной — в дни игры с долей исполненных, недельный — раз в неделю с долей исполненных (прогон контрактов)
         V[m] = flowWeek(d => { const c = cyc(d); return c >= 2 ? Math.floor(((7 - off) * econ(c).dayDoneBp + econ(c).weekDoneBp) / 100) : 0; }, 0);
       } else if (md.k === 'certified') {   // заверяет недельный тот, у кого так в прогоне контрактов; обычному — допущение

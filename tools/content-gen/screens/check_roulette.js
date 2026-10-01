@@ -23,6 +23,11 @@
       прокрутки и шанс героя целиком, лист «Шансы» — ссылкой, пока лента стоит. Арт: пути RL_ART.ready лежат в assets/art, невыгруженные
       (RL_ART.want без ready) в разметке не встречаются — битых картинок нет. Найденный герой веера открывает книгу «до покупки»
       поверх вкладки (OV.rhero) — без прокачки и снаряжения, с «Закрыть»; не найденный книги не открывает.
+   8. Гарантия (решение автора 01.10.2026): каждая RL_DATA.pity.every-я прокрутка — pity.q осколков героя гарантии. Счётчик идёт сквозь
+      операции: три одиночные и ×10 — гарантия на седьмой прокрутке ×10; в ×100 — ровно десять гарантий. Герой гарантии — выбранный
+      (RL_SRV.choose), а если он в коллекции или уже собран — тот, у кого осколков больше; выбор героя из коллекции и не из пула —
+      отказ, повтор выбора ничего не меняет; отказ прокрутки и повтор операции счётчик не двигают. Строка гарантии — у входа и в окне,
+      «следующая прокрутка», когда осталась одна; лист выбора рисуется глазами игрока.
    Запуск: node tools/content-gen/screens/check_roulette.js */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -123,7 +128,7 @@ function fresh(P, o = {}) {
   T.S.acc.cycle = o.cyc || 2; T.S.rs.cyc = 0; T.S.wallet.enerium = o.en != null ? o.en : 1000000;
   if (o.skip != null) T.S.rl.skip = o.skip;
 }
-const snap = T => JSON.parse(JSON.stringify({ en: T.S.wallet.enerium, dust: T.S.wallet.dust, souls: T.S.wallet.souls, shards: T.S.rs.shards, owned: T.S.rs.owned, seq: T.S.rl.seq }));
+const snap = T => JSON.parse(JSON.stringify({ en: T.S.wallet.enerium, dust: T.S.wallet.dust, souls: T.S.wallet.souls, shards: T.S.rs.shards, owned: T.S.rs.owned, seq: T.S.rl.seq, pity: T.S.rl.srv.pity, pick: T.S.rl.srv.pick }));
 const next = T => 'rl' + T.S.rl.seq;
 /* окно итога из разметки экрана: за ним — вкладка «За души» с теми же именами героев */
 const resOf = h => { const i = h.indexOf('<section class="rl-res'); return i < 0 ? '' : h.slice(i, h.indexOf('</section>', i)); };
@@ -149,6 +154,7 @@ if (!eq(D.counts, [1, 10, 100])) say(`RL_DATA.counts = ${JSON.stringify(D.counts
   const W = D.shards.reduce((a, x) => a + x[1], 0);
   if (W !== D.bp) say(`RL_DATA.shards: сумма весов ${W}, ждали ${D.bp}`);
   if (!(D.fullBp > 0 && D.fullBp < D.bp)) say('RL_DATA.fullBp вне (0; bp)');
+  if (!D.pity || D.pity.every !== 10 || D.pity.q !== 25) say(`RL_DATA.pity = ${JSON.stringify(D.pity)}: слово автора 01.10.2026 — каждая 10-я прокрутка, 25 осколков`);
 }
 
 /* ================== 3. «сервер»: rlRoll ================== */
@@ -190,6 +196,17 @@ if (eq(T.rlRoll(pool, 1, 100), T.rlRoll(pool, 2, 100))) say('rlRoll: разны�
   for (const h of pool) { const got = (by[h.id] || 0) / N, exp = 1 / pool.length; if (Math.abs(got - exp) > 0.015) say(`доля героя ${h.n}: ${(got * 100).toFixed(1)} %, ждали ${(exp * 100).toFixed(1)} %`); }
 }
 
+/* герой гарантии, пересчёт независимо от roulette.js: выбранный, если он в пуле, не в коллекции и осколков ему не хватает; иначе — из таких
+   же тот, у кого осколков больше, затем выше редкость, затем порядок пула; всем хватает — выбранный или первый не из коллекции; все
+   в коллекции — первый в пуле */
+function pityHero(pick, sh, owned) {
+  const wants = h => !owned[h.id] && (sh[h.id] || 0) < need;
+  const p = pool.find(h => h.id === pick);
+  if (p && wants(p)) return p;
+  const by = (a, b) => (sh[b.id] || 0) - (sh[a.id] || 0) || T.RSI[b.id].r - T.RSI[a.id].r;
+  return pool.filter(wants).sort(by)[0] || (p && !owned[p.id] ? p : pool.find(h => !owned[h.id])) || pool[0];
+}
+
 /* ================== 4. операция: расход, выдача, повтор, отказы ================== */
 /* проверка одной операции: кошелёк и запасы изменились ровно на итог сервера; итог — rlRoll на сиде операции */
 function checkOp(where, s0, op) {
@@ -199,7 +216,22 @@ function checkOp(where, s0, op) {
   if (R.list.length !== R.n) say(`${where}: итогов ${R.list.length}, прокруток ${R.n}`);
   if (R.cost !== D.price * R.n) say(`${where}: цена операции ${R.cost}, ждали ${D.price * R.n}`);
   if (s0.en - S.wallet.enerium !== R.cost) say(`${where}: списано Энериума ${s0.en - S.wallet.enerium}, ждали ${R.cost}`);
-  if (!eq(R.list.map(g => ({ id: g.id, full: g.full, q: g.q })), T.rlRoll(pool, R.seed, R.n))) say(`${where}: итог не совпал с rlRoll на сиде операции`);
+  /* итог — rlRoll на сиде операции, кроме прокруток гарантии: каждая pity.every-я по счётчику «сервера» — pity.q осколков героя гарантии
+     на запасах того мига */
+  {
+    const PT = D.pity, roll = T.rlRoll(pool, R.seed, R.n), shNow = Object.assign({}, s0.shards), want = [];
+    if (R.pityAt !== s0.pity) say(`${where}: счётчик гарантии до операции ${R.pityAt}, в запасах был ${s0.pity}`);
+    let c = s0.pity;
+    for (let i = 0; i < R.n; i++) {
+      let x = { id: roll[i].id, full: roll[i].full, q: roll[i].q };
+      if (++c >= PT.every) { c = 0; x = { id: pityHero(s0.pick, shNow, s0.owned).id, full: false, q: PT.q, pity: true }; }
+      if (!s0.owned[x.id]) shNow[x.id] = (shNow[x.id] || 0) + x.q;
+      want.push(x);
+    }
+    const got = R.list.map(g => Object.assign({ id: g.id, full: g.full, q: g.q }, g.pity ? { pity: true } : {}));
+    if (!eq(got, want)) say(`${where}: итог не совпал с rlRoll на сиде операции и гарантией каждой ${PT.every}-й прокрутки`);
+    if (S.rl.srv.pity !== c) say(`${where}: счётчик гарантии после операции ${S.rl.srv.pity}, ждали ${c}`);
+  }
   const sh = {}, own = id => !!s0.owned[id];
   let dust = 0;
   for (const g of R.list) {
@@ -283,7 +315,7 @@ if (summary[100] && !summary[100].R.dust) say('×100 с тремя героям�
     T.S.overlay = { t: 'rl', arg: '' };
     let tries = 0, got = null;
     while (tries++ < 40 && !got) {
-      T.S.rl.demoFull = true;
+      T.S.rl.demoFull = true; T.S.rl.srv.pity = 0;   // гарантия заменила бы чертёж демо: здесь проверяется прах, а не гарантия
       const s1 = snap(T), op2 = spin(P, 1, 'чертёж героя из коллекции'), R2 = checkOp('чертёж героя из коллекции', s1, op2);
       if (R2 && R2.list[0].id === g.id) got = R2;
     }
@@ -357,7 +389,8 @@ for (const [en, lack] of [[340, [10, 100]], [50, [1, 10, 100]], [100000, []]]) {
   /* «Шансы» — ссылка на лист rlodds (§1.2: шансы видны там, где крутят); других действий нет */
   const extra = [...new Set(inDlg)].filter(a => !['rlspin', 'rlskip', 'close', 'sheet'].includes(a));
   if (extra.length) say('окно · воздух: игроку видны лишние действия — ' + extra.join(', '));
-  if ([...dlg.matchAll(/data-a="sheet" data-v="([^"]*)"/g)].some(m => m[1] !== 'rlodds')) say('окно · воздух: лист из окна — не «Шансы»');
+  if ([...dlg.matchAll(/data-a="sheet" data-v="([^"]*)"/g)].some(m => !['rlodds', 'rlpick'].includes(m[1]))) say('окно · воздух: лист из окна — не «Шансы» и не выбор гарантии');
+  if (!/data-a="sheet" data-v="rlpick"/.test(dlg)) say('окно: нет «Выбрать» у строки гарантии');
   if (!/data-a="sheet" data-v="rlodds"/.test(dlg)) say('окно: нет ссылки «Шансы»');
   if (!acts.length || !/id="rlTrack"/.test(dlg) || !/id="rlMark"/.test(dlg)) say('окно · воздух: нет ленты или метки');
   if (!/Прокрутка —/.test(playerText(h))) say('окно · воздух: цена не видна');
@@ -553,6 +586,7 @@ function tour(team) {
     fresh(P, { cyc: c, skip: true });
     v(`колонка · цикл ${c}`);
     T.S.overlay = { t: 'rlodds', arg: '' }; v(`шансы · цикл ${c}`);
+    T.S.overlay = { t: 'rlpick', arg: '' }; v(`гарантия · цикл ${c}`);
     T.S.overlay = { t: 'rl', arg: '' }; v(`окно · цикл ${c}`);
     if (c < 2) continue;
     for (const n of D.counts) { spin(P, n, `цикл ${c} · ×${n}`); v(`итог ×${n} · цикл ${c}`); }
@@ -579,6 +613,62 @@ function tour(team) {
     if (!/team-only[^>]*>[^<]*демонстрация/.test(v('шансы · пометка'))) say('режим «Команда»: в листе «Шансы» нет пометки «демонстрация»');
   }
 }
+/* ================== 8. гарантия ================== */
+{
+  const PT = D.pity, S = () => T.S;
+  /* счётчик сквозь операции: три одиночные, затем ×10 — гарантия одна, на (every − 3)-й прокрутке */
+  fresh(P, { skip: true });
+  for (let i = 1; i <= 3; i++) { const s0 = snap(T), op = spin(P, 1, `гарантия · ×1 №${i}`); checkOp(`гарантия · ×1 №${i}`, s0, op); }
+  if (S().rl.srv.pity !== 3) say(`гарантия: после трёх прокруток счётчик ${S().rl.srv.pity}, ждали 3`);
+  let s0 = snap(T), op = spin(P, 10, 'гарантия · ×10'), R = checkOp('гарантия · ×10', s0, op);
+  if (R) {
+    const at = R.list.map((g, i) => g.pity ? i + 1 : 0).filter(Boolean);
+    if (at.length !== 1 || at[0] !== PT.every - 3) say(`гарантия · ×10: гарантии на прокрутках ${at.join(', ') || 'нигде'}, ждали одну — на ${PT.every - 3}-й`);
+    checkAgain('гарантия · ×10', op, 10);
+  }
+  /* ×100 — ровно сто / every гарантий */
+  s0 = snap(T); op = spin(P, 100, 'гарантия · ×100'); R = checkOp('гарантия · ×100', s0, op);
+  if (R && R.list.filter(g => g.pity).length !== 100 / PT.every) say(`гарантия · ×100: гарантий ${R.list.filter(g => g.pity).length}, ждали ${100 / PT.every}`);
+  /* выбор: выбранный герой получает гарантию */
+  fresh(P, { skip: true });
+  const target = pool[pool.length - 1];
+  const rc = run('гарантия · выбор', () => T.RL_SRV.choose(target.id));
+  if (!rc || !rc.ok || S().rl.srv.pick !== target.id) say('гарантия: выбор героя пула не принят');
+  s0 = snap(T); op = spin(P, 10, 'гарантия · выбранный'); R = checkOp('гарантия · выбранный', s0, op);
+  if (R) { const g = R.list.find(x => x.pity); if (!g || g.id !== target.id || g.q !== PT.q) say(`гарантия · выбранный: гарантия ушла ${g ? g.id : 'никому'}, ждали ${target.id} ×${PT.q}`); }
+  /* выбор героя из коллекции и не из пула — отказ; повтор выбора ничего не меняет */
+  S().rs.owned[pool[0].id] = { lvl: 0, lim: 0, valor: 0, how: 'souls' };
+  const r1 = run('гарантия · выбор из коллекции', () => T.RL_SRV.choose(pool[0].id)), r2 = run('гарантия · выбор не из пула', () => T.RL_SRV.choose('нет-такого'));
+  if (!r1 || !r1.refuse) say('гарантия: выбор героя из коллекции не отказан');
+  if (!r2 || !r2.refuse) say('гарантия: выбор героя не из пула не отказан');
+  if (S().rl.srv.pick !== target.id) say('гарантия: отказ выбора сменил героя гарантии');
+  const s1 = snap(T); run('гарантия · повтор выбора', () => T.RL_SRV.choose(target.id)); if (!eq(s1, snap(T))) say('гарантия: повтор того же выбора изменил состояние');
+  /* выбранный уже собран — гарантия тому, у кого осколков больше; пересчёт — в checkOp */
+  S().rs.shards[target.id] = need;
+  s0 = snap(T); op = spin(P, 10, 'гарантия · выбранный собран'); R = checkOp('гарантия · выбранный собран', s0, op);
+  if (R) { const g = R.list.find(x => x.pity); if (!g || g.id === target.id) say('гарантия: собранный выбранный герой снова получил гарантию'); }
+  /* отказ прокрутки счётчик не двигает */
+  S().wallet.enerium = 0; const pc = S().rl.srv.pity;
+  run('гарантия · отказ', () => T.ACT.rlspin(`1:${next(T)}`));
+  if (S().rl.srv.pity !== pc) say('гарантия: отказ прокрутки сдвинул счётчик');
+  /* вид: строка у входа и в окне, «следующая прокрутка», лист выбора глазами игрока */
+  fresh(P, { skip: true }); T.S.overlay = null;
+  let h = playerText(strip(view(P, 'гарантия · вход')));
+  if (!h.includes(`гарантия через ${PT.every}`)) say(`гарантия · вход: нет пометки «гарантия через ${PT.every}»`);
+  T.S.overlay = { t: 'rl', arg: '' };
+  h = playerText(strip(view(P, 'гарантия · окно')));
+  if (!h.includes(`Гарантия — через ${PT.every} прокруток`)) say(`гарантия · окно: нет строки «Гарантия — через ${PT.every} прокруток»`);
+  T.S.rl.srv.pity = PT.every - 1; T.S.overlay = { t: 'rl', arg: '' };
+  h = playerText(strip(view(P, 'гарантия · окно, следующая')));
+  if (!h.includes('Гарантия — следующая прокрутка')) say('гарантия · окно: при одной оставшейся нет «следующая прокрутка»');
+  T.S.overlay = { t: 'rlpick', arg: '' };
+  const pk = view(P, 'гарантия · лист выбора');
+  if ((pk.match(/data-a="rlpick"/g) || []).length !== pool.length) say('гарантия · лист: не все герои пула в выборе');
+  if ((pk.match(/aria-pressed="true"/g) || []).length !== 1) say('гарантия · лист: отмечен не один герой гарантии');
+  run('гарантия · выбор из листа', () => T.ACT.rlpick(target.id));
+  if (T.S.rl.srv.pick !== target.id) say('гарантия · лист: «Выбрать» не сменило героя гарантии');
+}
+
 tour(false);
 tour(true);
 run('режим «Игрок»', () => T.setTeam(false));
