@@ -47,7 +47,7 @@ const ctUnitG = (k, n) => { const g = ctK(k).g; return n % 10 === 1 && n % 100 !
 const ctBoxR = r => window.EN_LOOTBOXES && EN_LOOTBOXES.boxRarity ? EN_LOOTBOXES.boxRarity[r - 1] : RAR[r].toLowerCase();   // «сундук уникальный»
 const ctLv = (s, id) => s.wn && s.wn.art && s.wn.art[id] != null ? Math.max(0, s.wn.art[id]) : 0;
 const ctPins = s => new Set(((s.mem && s.mem.slots) || []).map(x => x.p).filter(Boolean));
-/* пул заданий: база, «Доска объявлений» — шаг за уровень, «Вторая печать» Памяти — ещё одно */
+/* пул заданий: база, «Доска у ворот» — шаг за уровень, «Второй подряд» Памяти — ещё одно */
 function ctPoolSize(s = S) {
   const P = CT.rules.pool, a = P.artInfo;
   return P.base + (a ? a.step * ctLv(s, P.art) : 0) + (ctPins(s).has(P.mem) ? 1 : 0);

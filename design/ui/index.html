@@ -231,8 +231,11 @@ html.team .g .team-only{outline:1px dashed rgba(169,134,238,.55);outline-offset:
 .g-ava[aria-current="page"] .ring{box-shadow:0 0 0 1px var(--spirit),0 0 14px -2px var(--spirit)}
 .g-ava>.bdg{position:absolute;top:3px;left:calc(50% + 9px);z-index:2}   /* дела Странника — места Памяти, ждущие выбора */
 .g-title{display:flex;align-items:baseline;gap:10px;min-width:0;flex:0 1 auto;white-space:nowrap}
-.g-title h1{font:600 23px/1 var(--f-d);color:var(--gold);letter-spacing:.01em}
-.g-title small{font:700 11px/1 var(--f-u);letter-spacing:.14em;text-transform:uppercase;color:var(--parch-3)}
+.g-title h1{font:600 23px/1 var(--f-d);color:var(--gold);letter-spacing:.01em;flex:none;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-bottom:3px;margin-bottom:-3px}   /* одной строкой: .g h1 даёт text-wrap:balance, и длинный заголовок боя рвался на 2–3 строки и обрезался */
+.g-title small{font:700 11px/1 var(--f-u);letter-spacing:.14em;text-transform:uppercase;color:var(--parch-3);min-width:0;overflow:hidden;text-overflow:ellipsis}   /* тесно — сжимается подзаголовок, заголовок — только когда сам не влез */
+.g.sm .g-title.long h1{font-size:20px}   /* 844: длинный заголовок (бой, Эхо, Арена) — мельче и без подзаголовка: то же есть в полосе боя */
+.g.sm .g-title.long small{display:none}
+.g.sm .g-seg~.wk-chip .wkc-l{display:none}   /* 844, вкладки и срок недели в одной шапке: у срока остаются песочные часы и время — иначе вкладки заходят под плашку */
 .g-back{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:8px;border:1px solid var(--iron-2);background:var(--stone-2);color:var(--gold);flex:none;margin-right:-2px}
 .g-seg{display:flex;align-items:stretch;gap:2px;height:100%;min-width:0}
 .g-seg button{position:relative;appearance:none;border:0;background:none;padding:0 11px;height:100%;color:var(--parch-3);font:600 18px/1 var(--f-d);white-space:nowrap;letter-spacing:.01em}
@@ -775,6 +778,7 @@ button.well:hover{border-color:var(--iron-3)}
 .bi-th{display:flex;gap:10px;flex-wrap:wrap}
 /* свёрнутые забеги в верхней строке: полоса уступает место кошельку и колоколу — сжимается и листается, шапку не распирает (§33.3) */
 .g-runs{display:flex;gap:4px;min-width:0;flex:0 1 auto;overflow-x:auto;overscroll-behavior:contain;scrollbar-width:none}
+.g-runs:has(>.g-run:only-child){flex-shrink:0}   /* один забег — виден целиком; лента прокручивается, когда их несколько */
 .g-runs::-webkit-scrollbar{display:none}
 .g-run{position:relative;display:flex;align-items:center;gap:6px;height:32px;padding:0 8px 0 5px;border-radius:9px;border:1px solid var(--iron);background:#0b0d10;color:var(--parch-2);overflow:hidden;flex:none}
 .g-run .ic{display:grid;place-items:center;width:20px;height:20px;border-radius:6px;background:var(--spirit-3);color:var(--spirit)}
@@ -1373,6 +1377,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <link rel="stylesheet" href="screens/shelter.css">
 <link rel="stylesheet" href="screens/social.css">
 <link rel="stylesheet" href="screens/battle-cards.css">
+<link rel="stylesheet" href="screens/start.css">
 <link rel="stylesheet" href="screens/shell.css">
 </head>
 <body>
@@ -1399,6 +1404,10 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
         <p class="p-note" style="margin-top:6px">«Игрок» — экран, как в игре. «Команда» — ещё служебное: формулы, ссылки на решения, заглушки, демо-переключатели и спойлеры; в кадре оно обведено пунктиром. Флажок «для команды» в UI-ките — этот же.</p>
       </div>
       <div class="p-block">
+        <div class="p-ctrls" id="devAcc" role="group" aria-label="Аккаунт прототипа" style="align-items:center"><span class="p-note">Аккаунт:</span><button class="p-chip" data-acc="demo" aria-pressed="true">Демо</button><button class="p-chip" data-acc="fresh" aria-pressed="false">Чистый лист</button></div>
+        <p class="p-note" style="margin-top:6px">«Демо» — 11-й день цикла II. «Чистый лист» — новый аккаунт с нуля: уровень 1, закрытые разделы шахты, окно уровня и путь до цикла II (screens/start.js, docs/content/старт-с-чистого-листа.md).</p>
+      </div>
+      <div class="p-block">
         <div class="p-ctrls"><button class="p-chip" data-size="lg" aria-pressed="true">932 × 430</button><button class="p-chip" data-size="sm" aria-pressed="false">844 × 390</button><button class="p-chip" id="btnFull">Во весь экран</button><button class="p-chip" id="btnReset">Сбросить</button></div>
         <p class="p-note" style="margin-top:10px">Числа — демонстрационные фикстуры текущего UIKit и GDD, не баланс. Реплики проводников, загадки и главы — заглушки, не канон. Тексты врагов — из «Записей сказителя».</p>
       </div>
@@ -1415,6 +1424,8 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
         <div class="p-ctrls" id="devModel" style="margin-top:12px;align-items:center"><span class="p-note">Модель боя:</span><button class="p-chip" data-model="rounds" aria-pressed="true">Раунды</button><button class="p-chip" data-model="tempo" aria-pressed="false">Прежняя · темп</button></div>
         <p class="p-note" style="margin-top:6px">Основная модель — раунды (ADR-0010). Карты ходят по очереди по скорости, способность срабатывает по шансу, иначе — обычная атака. Биом — испытание на выносливость, раунды — проверка урона: после последнего — «Время скоротечно…», этаж не взят. Раундов — по типу боя, одна таблица на все режимы (<code>RULES.rounds.by</code>, решение автора 29.09.2026): этаж с рядовыми — 5, с элитой — 10, с боссом — 20, рунный страж — 25. Прежняя модель темпа (ADR-0007) — для справки.</p>
         <div class="p-ctrls" style="margin-top:8px"><button class="p-chip" id="devCompare">Сравнить на отряде I</button></div>
+        <div class="p-ctrls" id="devCards" style="margin-top:12px;align-items:center"><span class="p-note">Вид карт:</span><button class="p-chip" data-cards="old" aria-pressed="false">Прежний</button><button class="p-chip" data-cards="portrait" aria-pressed="false">Портрет</button><button class="p-chip" data-cards="square" aria-pressed="true">Квадрат</button></div>
+        <p class="p-note" style="margin-top:6px">Квадрат — по умолчанию, слово автора «сойтись на квадратах»: карта 1 : 1 в прежней расстановке колонками, портрет срезом по лицу, главный враг крупнее. Портрет — карта целиком, два ряда. Прежний — кадр 5 : 4 в рамке-картинке, лицо местами обрезано. Рамки квадрата и портрета пока CSS. Вид — для всех режимов боя. Сравнение рядом — UI-кит, «Карты боя · вид».</p>
         <div id="devCmp"></div>
       </div>
     </aside>
@@ -1450,6 +1461,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
     <div class="p-legend"><span><span class="p-old">имя</span>слит в экран</span><span><span class="p-old lay">имя</span>стал листом или окном поверх</span><span><span class="p-old dup">имя</span>дубль, убран</span><span><span class="p-old ok">имя</span>готово в прототипе</span></div>
     <div class="p-map" id="mapGrid"></div>
   </div>
+  <div class="p-sec" id="obMap"></div>
   <div class="p-sec">
     <h2>Шаблоны окон поверх</h2>
     <div class="p-map" id="tplGrid"></div>
@@ -1500,6 +1512,7 @@ body.phone .p-device-inner{border-radius:0;width:100%;height:100%}
 <script src="chronicle.js"></script>
 <script src="pass.js"></script>
 <script src="store.js"></script>
+<script src="start.js"></script>
 <script>
 'use strict';
 /* Все числа ниже — демонстрационные фикстуры: взяты из текущего UIKit
@@ -1851,7 +1864,7 @@ const bar = (v, cls = '', extra = '') => `<div class="bar ${cls}" style="--v:${M
 const curImg = k => CUR[k] ? CUR[k].img : '';
 const money = (k, n) => `<span class="row" style="gap:4px;display:inline-flex"><img src="${curImg(k)}" alt="${CUR[k] ? CUR[k].n : ''}" width="18" height="18" style="object-fit:contain"><b class="num">${fmt(n)}</b></span>`;
 const costTag = (k, n) => `<span class="cost"><img src="${curImg(k)}" alt="${CUR[k] ? CUR[k].n : ''}">${fmt(n)}</span>`;
-const lvlCost = (from, q) => { let c = 0; for (let l = from; l < from + q; l++) c += Math.ceil(Math.pow(l, 1.2)); return c; };
+const lvlCost = (from, q) => { let c = 0; for (let l = from; l < from + q; l++) c += EB.levelCost(l + 1); return c; };   // уровень n — ⌈n^1,2⌉ духа: правило ядра, одно с калькуляторами (battle.js, levelCost)
 function well(it, { act = 'item', val, q, sel, size, extra = '', dis } = {}) {
   const inner = it ? (it.img ? `<img src="${it.img}" alt="">` : `<span class="serif gold" style="font-size:22px;font-weight:600">${it.glyph || '?'}</span>`) : ic('plus');
   return `<button class="well ${it ? '' : 'empty'} ${sel ? 'sel' : ''}" ${it ? `data-r="${it.r}"` : ''} ${size ? `style="--s:${size}px"` : ''} data-a="${act}" data-v="${val ?? (it && it.id != null ? it.id : '')}" aria-label="${it ? it.n + (q != null ? ', ' + q + ' шт.' : '') : 'Пустая ячейка'}" ${dis ? 'disabled' : ''}>${inner}${q != null ? `<span class="q">${fmt(q)}</span>` : ''}${it && it.isNew ? '<span class="new dot"></span>' : ''}${extra}</button>`;
@@ -1998,11 +2011,12 @@ function avaHtml(sec, todo) {
   return `<button class="g-ava" data-k="wanderer" data-a="go" data-v="profile" aria-label="Странник, уровень ${S.acc.level}${why ? ': ' + why : ''}" title="Странник${why ? ': ' + why : ''}"${sec === 'wanderer' ? ' aria-current="page"' : ''}><span class="ring" style="--p:${pct}"><img src="${face}" alt=""><span class="lv">${S.acc.level}</span></span>${bdgN(todoN(mem))}</button>`;
 }
 const bellHtml = () => { const n = inboxN(); return `<button class="g-icon" data-a="sheet" data-v="inbox" aria-label="Входящие: ${n}" title="Входящие${n ? ': ' + n : ''}">${ic('bell')}${bdgN(n)}</button>`; };
+const TITLE_LONG = 16;   // с этой длины заголовок на 844 мельче и без подзаголовка (.g.sm .g-title.long): «Эхо · ступень 14», «Библиотека Улариона»
 function topBar(m, sec = navSection(S.route, m), todo = navTodo()) {
   let mid = '';
   if (m.back) mid += `<button class="g-back" data-a="go" data-v="${m.back}" aria-label="Назад">${ic('back')}</button>`;
   if (m.seg) mid += `<div class="g-seg" role="tablist" aria-label="${m.title}">${m.seg.items.map(([k, l, b]) => `<button role="tab" aria-selected="${S.seg[m.seg.key] === k}" data-a="seg" data-v="${m.seg.key}:${k}">${l}${b ? '<span class="bdg" aria-hidden="true"></span><span class="sr">, есть дела</span>' : ''}</button>`).join('')}</div>`;   // у вкладки дело — точка, не «!» и не число
-  else mid += `<div class="g-title"><h1>${m.title}</h1>${m.sub ? `<small>${m.sub}</small>` : ''}</div>`;
+  else mid += `<div class="g-title${String(m.title).replace(/<[^>]*>/g, '').length >= TITLE_LONG ? ' long' : ''}"><h1>${m.title}</h1>${m.sub ? `<small>${m.sub}</small>` : ''}</div>`;
   if (m.chip) mid += m.chip;
   return `<header class="g-top">
     ${avaHtml(sec, todo)}
@@ -2228,7 +2242,7 @@ function battle() {
     const bgA = biomeArena(R.biome);   // арена своего биома
     bgs = `<img class="bg${R.floor % 2 ? '' : ' flip'}" src="${bgA}" alt=""><img class="bg bg2${R.floor % 2 ? ' flip' : ''}" src="${bgA}" alt="">`;
   }
-  return { title, sub, back, html: `<section class="scr flush"><div class="bt" id="bt">
+  return { title, sub, back, html: `<section class="scr flush"><div class="bt${typeof bfBtCls === 'function' ? bfBtCls(R) : ''}" id="bt">
     <div class="bt-bgs">${bgs}</div>
     <div class="bt-hud">
       <div class="bt-floor">${badge}</div>
@@ -2737,7 +2751,7 @@ addEventListener('resize', () => { if (treeShown()) requestAnimationFrame(drawTr
 
 /* ================== Неделя ==================
    Экран «Неделя» — screens/week.js: три времени и реестр итогов режимов WEEK_MODES. Здесь — чип срока недели для экранов режимов */
-const weekChip = () => `<span class="chip" style="margin-left:6px">${ic('hour')}Неделя ${S.week.race} · <span class="num" data-cd="week">${dur(S.week.left)}</span></span>`;
+const weekChip = () => `<span class="chip wk-chip" style="margin-left:6px" title="Неделя ${S.week.race}">${ic('hour')}<span class="wkc-l">Неделя ${S.week.race} · </span><span class="num" data-cd="week">${dur(S.week.left)}</span></span>`;
 
 /* ================== Эхо ==================
    Экран «Эхо» — screens/echo.js: слоты, цель, отряд, лестница, бой и итог; действия ech*, прежние esel, summon, eattack — его же.
@@ -3660,7 +3674,7 @@ const MAP = [
     ready: ['city', 'npc-dialog'] },
   { n: 'Спуск', p: 10, where: 'Шахта · 2', d: 'Окно во весь экран: фон биома — место и его обитатели, что ждут отряд, на одном арте, частицы биома. Слева — путь вниз по циклам, сверху — название и цитата, снизу — этажи, босс и осада, рунный страж и вход к нему за ключи; одно главное действие «Начать забег», идущие забеги — «К бою» и «Ещё отряд». Бестиарий — лист по кнопке «Бестиарий»: обитатели по полкам, карточка врага, вся книга — в Летописи. Арена биома — фон боя, а не «Спуска» (screens/descent.js). Биомы 1–4: у каждого свой фон, арена, враги, забег, босс и рунный страж.', o: ['biomes', 'runic', 'bestiary:s', 'biome-setup:s', 'runic-setup:s', 'crafted-biomes:d'],
     ready: ['biomes', 'runic', 'bestiary', 'biome-setup'] },
-  { n: 'Бой', p: 27, where: 'Один на все режимы', d: 'Биом, страж, Эхо, Арена, Лига, Клановый босс — один просмотрщик. «К итогу» доступно всегда.', o: ['battle', 'echo-battle:d', 'pvp-battle:d', 'league-match:d', 'clan-boss-battle:d'] },
+  { n: 'Бой', p: 27, where: 'Один на все режимы', d: 'Биом, страж, Эхо, Арена, Лига, Клановый босс — один просмотрщик. «К итогу» доступно всегда. Карты — три вида на выбор автора: квадрат (по умолчанию) — карта 1 : 1 колонками, портрет срезом по лицу; портрет целиком в два ряда; прежний — кадр 5 : 4 в рамке-картинке (screens/battle-cards.js, переключатель «Вид карт», сценарии «Бой · карты-квадраты», «Бой · карты-портреты», «Бой · прежние карты»).', o: ['battle', 'echo-battle:d', 'pvp-battle:d', 'league-match:d', 'clan-boss-battle:d'] },
   { n: 'Герои', p: 24, where: 'Шахта · 3', d: 'Коллекция — купленные герои сеткой книг (screens/heroes.js, screens/book.js): ступень книги — личный максимум доблести, от кожаной книги до гримуара; редкость — кристалл и свет книги, рунные пределы — пять замков по правому краю, взятая доблесть — ленты-закладки; уровень, стихия, класс и мощь; по мощи сильнейшие сверху, порядок и фильтр значками, счётчик «в коллекции N из 360»; «Каталог» — найденные герои: неизвестная душа — силуэт класса и полоса осколков, известный — чёрно-белый. Нажатие на книгу — книга летит в центр и раскрывается: слева портрет (крупно по нажатию), справа — пергамент с закладками Развитие, Мощь, Снаряжение, Навыки, Путь: способности с описанием, характеристики и главы видны сразу, без нажатий; герой до покупки — та же книга: история, мощь, навыки по доблести, главы, цена и «Купить», без прокачки и снаряжения; неизвестная душа — только осколки и где их брать. «Развитие» (screens/hero-dev.js) — путь героя: уровень, ворота рунных пределов и звезда доблести, одна главная кнопка — следующий шаг; листы предела и доблести с честным превью, анимации пробития предела и доблести. «Снаряжение» — девять мест снаряжения и четыре места духовных талисманов, «Надеть лучшее»; одно окно поверх: места героя слева, запасы справа, перетаскивание и нажатие, сравнение стрелками; «Свойства и сравнение» (screens/equipment.js, screens/talismans.js). Отряды — библиотека до десяти и один лист выбора на все режимы. Призыв — три вкладки; «За золото» — та же сетка книг и книга до покупки; «За души» — алтарь Возрождения душ: зеркало, герои пула веером книг, цена и шанс героя целиком, вход рулетки (screens/roulette.js); отряд Эхо недели — окно-витрина: цивилизация, пятеро крупными книгами своей стадии, неприязнь и «Пробудить»; лавка праха — отдельным окном: найденные герои пула, осколки за прах, пробуждение душами и окно пробуждения (screens/heroes.js). Осколок героя — стекло с его лицом, доля — свет кромки и заживающие трещины (screens/art-icons.js).', o: ['heroes', 'hero', 'hero-story', 'orders', 'equipment', 'equipment-item:s', 'talismans', 'collection-passives:s', 'squads', 'recruitment', 'hire-preview', 'resurrection', 'blueprints'],
     ready: ['heroes', 'hero', 'hero-story', 'orders', 'collection-passives', 'squads', 'recruitment', 'hire-preview', 'talismans', 'resurrection', 'blueprints', 'equipment', 'equipment-item'] },
   { n: 'Ремесло', p: 11, where: 'Шахта · 4', d: 'Мастерская с запасами слева и столом справа: ресурсы — по пять в ряд, у каждого лупа карточки; нажатие — ползунок количества, потом ячейка. Книга рецептов раскрывается на всё окно кнопкой над столом: найденный рецепт — лист древней бумаги, найденный частично — обрывки (screens/recipe-book.js). Попытка — анимация удачи и неудачи, автодокрафт — короткая (screens/craft.js). Лавка — витрина из десяти товаров, подробности и цена — в листе товара (screens/shop.js). Запасы — семь вкладок, сетка 6 × 5 — значок и число, подробности справа (screens/bag.js). Перековка — своё окно: талисманы, снаряжение, рабочие; что сплавить, отмечает игрок — сетка с отметками, счётчик и подсказки; лестница редкостей, наковальня, цена в золоте по циклу (screens/reforge.js).', o: ['craft', 'recipes', 'inventory', 'shop', 'market', 'my-listings', 'reforge'],
@@ -4636,5 +4650,6 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 <script src="screens/social.js"></script>
 <script src="screens/chambers.js"></script>
 <script src="screens/battle-cards.js"></script>
+<script src="screens/start.js"></script>
 </body>
 </html>

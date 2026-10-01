@@ -142,8 +142,9 @@ function suite() {
   const draw = CK.draw, scan = (k, h) => CK.scan(fail, k, h), ints = (k, x) => CK.ints(fail, k, x);
   const events = b => { const ev = []; while (!b.over) { const a = EB.step(b); if (a) for (const e of a.ev) ev.push(e); } return ev; };
 
-  const GUARD_LVL = 5;    // уровень отряда в проверках стража: на нём Мастер обучения успевает ударить обычной атакой. Было 25: у демо-отряда
-                          // ADR-0031 (наборы, сжатые к максимуму, снаряжение демо) страж на 25-м падал на 3-м раунде, не ударив ни разу
+  const GUARD_LVL = 1;    // уровень отряда в проверках стража: на нём Мастер обучения успевает ударить обычной атакой. Было 25: у демо-отряда
+                          // ADR-0031 (наборы, сжатые к максимуму, снаряжение демо) страж на 25-м падал на 3-м раунде, не ударив ни разу; было 5 —
+                          // сценарий старта (01.10.2026) ослабил Мастера до 90 % здоровья, и демо-отряд на 5-м валил его до первого удара
   /* ---------- ядро: карты для проверки ---------- */
   const L = () => EB.lib();
   const kitOf = (ids, actPct, ultPct, extra) => Object.assign({ actPct, ultPct, kit: ids.map(id => ({ v: 0, slot: id.includes('.ult') ? 'ult' : id.includes('.react') ? 'react' : id.includes('.pas') ? 'pas' : 'act', id })) }, extra || {});

@@ -121,14 +121,27 @@ CONTRACT_CYCLE = 2
 CONTRACT_PROFILES = (('обычный', 'o'), ('увлечённый', 'e'))
 RITUAL_PER_HOUR, RITUAL_HOURS = (150, 75, 1), 12    # ритуал героев: золото, дух, души за час; верх сетки §19.4
 CRAFT_BIOME = (3000, 1500, 2)               # закрытие крафтового биома
-ACCOUNT_GOLD = 6500                         # предложение: база золота за уровень аккаунта. Было 6 000: биом 2 цикла I теперь на 80 % ставок
-                                            # (ADR-0031, п. 5) и даёт около 5 тыс. золота вместо 30 тыс. — пачку обучения, пятерых за 80 000,
-                                            # при 80 % золота на героев (sets.py) обычный не выкупал к концу цикла I; с 6 500 — выкупает
+# --- цикл I — сценарий «Старт с чистого листа» (01.10.2026): уровни Странника 1–10, их награды и темп биомов 1–2 на настоящих боях считает
+# сборщик tools/content-gen/start/build.js и пишет в tools/content-gen/start/start.json. Отсюда — золото и дух обучения, темп Т15 и коридоры.
+# Нет файла — прежние допущения ниже (ACCOUNT_*, FIRST_HERO_GOLD, TUTORIAL_SPIRIT_FALLBACK, коридоры)
+START_JSON = ROOT / 'tools' / 'content-gen' / 'start' / 'start.json'
+
+
+def _start_json():
+    try:
+        return json.loads(START_JSON.read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        return {}
+
+
+START = _start_json()
+ACCOUNT_GOLD = 6500                         # §16: «Дар Страннику» — база × (1 + уровень × 0,1) золота; та же база — FORMULA.giftGold сценария
 ACCOUNT_STEP_BP = 1000                      # §16: награда = база × (1 + уровень × 0,1)
-ACCOUNT_LEVELS = 9                          # уровни 1–9 — в цикле I
-FIRST_HERO_GOLD = 10000                     # квест первого героя, ADR-0007
-TUTORIAL_SPIRIT = 1600                      # предложение: цепочка обучения §31. Было 2 000: с наборами, сжатыми к максимуму доблести, пара брала
-                                            # биом 1 за два забега, 6,1 мин — меньше цели 7–10 минут боя (ADR-0031, п. 5); с 1 600 — три забега, 9,3 мин
+ACCOUNT_LEVELS = 9                          # запасное: уровни 1–9 — в цикле I (сценарий берёт 1–10: десятый — страж Подземного леса)
+FIRST_HERO_GOLD = 10000                     # квест первого героя, ADR-0007: в сценарии — награда уровня 1 сверх дара
+TUTORIAL_SPIRIT_FALLBACK = 1600             # запасное: дух цепочки обучения сразу паре
+# дух обучения — награды уровней сценария (100 + 700 + 500 на уровнях 1–3); прежде — 1 600 сразу паре
+TUTORIAL_SPIRIT = START.get('trainSpirit', TUTORIAL_SPIRIT_FALLBACK)
 ARTIFACTS_GOLD_C1 = 49000                   # таблица автора: покупка восьми артефактов, открытых с цикла I
 
 # --- профили: часов забегов в день; забегов одновременно — у всех одинаково, по прогрессу ---
@@ -166,6 +179,9 @@ PACE_I = [('Биом 1 цикла I', 1), ('Биом 2 цикла I', 3)]   # ч
 # сценарий обучения), биом 2 — от полутора до трёх часов («ещё примерно за три», ADR-0018); цикл II у обычного — 14–16 дней.
 # Проверка — tools/content-gen/biomes/pace.py --check
 PACE_B1_MIN, PACE_B2_MIN, PACE_II_DAYS = (7, 10), (90, 180), (14, 16)
+# коридоры цикла I — одни со сценарием (tools/content-gen/start/data.js, PACE): он и меряет биомы 1–2 настоящими боями
+PACE_B1_MIN = tuple(START.get('pace', {}).get('b1', PACE_B1_MIN))
+PACE_B2_MIN = tuple(START.get('pace', {}).get('b2', PACE_B2_MIN))
 TUTOR_IDS = ['h1', 'h2']   # биом 1 закрывают двое героев — к концу часа их у игрока двое: танк и физ ДД из отряда прототипа (ADR-0018)
 
 # --- базовые ресурсы по ADR-0010: малый шанс за взятый этаж ---
@@ -307,6 +323,9 @@ CYCLE_DAYS = cycle_days_of_pace()
 
 
 def account_gold():
+    """Золото наградами уровней Странника цикла I: сценарий (start.json, уровни 1–10) или прежнее допущение — дар 1–9 и первый герой."""
+    if START.get('account'):
+        return START['account']['gold']
     steps = sum(BP + L * ACCOUNT_STEP_BP for L in range(1, ACCOUNT_LEVELS + 1))
     return ACCOUNT_GOLD * steps // BP + FIRST_HERO_GOLD
 
@@ -580,7 +599,8 @@ def t7_other():
              'занимает героев'],
             ['Крафтовый биом, закрытие', fmt(CRAFT_BIOME[0]), fmt(CRAFT_BIOME[1]), CRAFT_BIOME[2], 'нужен рецепт и уникальный'],
             ['Рунный страж', 0, 0, 0, 'только руны и осколки'],
-            ['Уровень аккаунта', '—', '—', '—', '§16: «даёт валюту», чисел нет']]
+            ['Уровни аккаунта 1–10, цикл I', fmt(account_gold()), fmt(TUTORIAL_SPIRIT), '—',
+             '§16: раз за игру, в Т13 и Т15; с 11-го — дар по формуле, в модели не считается']]
     return table(['Источник', 'Золото', 'Дух', 'Души', 'Замечание'], rows)
 
 
@@ -730,8 +750,12 @@ def t13_gold():
 
 
 def tutor_pace(rates=RATES_NEW, start_spirit=TUTORIAL_SPIRIT):
-    """Обучающий биом с нуля (ADR-0018): дух обучения сразу в уровни, затем забег за забегом на текущем уровне отряда,
-    дух за убитых — в уровни, не выше первого предела; до забега, где пал босс. Возвращает мс, забеги, уровень."""
+    """Обучающий биом с нуля (ADR-0018). Есть сценарий «Старт с чистого листа» (start.json) — его прогон настоящими боями: время забегов
+    и стража Мастерской, забегов, уровень пары у стража. Нет — прежняя модель: дух обучения сразу в уровни, затем забег за забегом на текущем
+    уровне отряда, дух за убитых — в уровни, не выше первого предела; до забега, где пал босс. Возвращает мс, забеги, уровень."""
+    b1 = START.get('b1')
+    if b1 and b1.get('ms'):
+        return b1['ms'], b1['runs'], max(b1.get('guardLvl') or [0])
     bank, a, ms, runs, n = start_spirit, 0, 0, 0, len(TUTOR_IDS)
     by_lvl = {r[0]: r for r in SIM_TUTOR}
     while by_lvl and runs < DAYS_MAX:
@@ -764,7 +788,9 @@ def t15_tutor():
     """Цель автора — биом 1 за час, из них 7–10 минут боя (ADR-0018, дополнение; ADR-0031, п. 5), биом 2 — ещё около трёх часов,
     от полутора до трёх часов забегов, — против прогонов: обучающий биом здесь, биом 2 — прогон темпа (pace.json)."""
     got = tutor_pace()
-    first = next((r for r in SIM_TUTOR if r[1]), None)
+    b1s = START.get('b1') or {}
+    first = (max(b1s['bossLvl']),) if b1s.get('bossLvl') else next((r for r in SIM_TUTOR if r[1]), None)
+    guard_lvl = max(b1s['guardLvl']) if b1s.get('guardLvl') else SIM_GUARD
     lo1, hi1 = PACE_B1_MIN
     if not got:
         return table(['Веха', 'Цель автора', 'Итог'], [[PACE_I[0][0], f'{lo1}–{hi1} мин боя', 'не пройден']])
@@ -774,8 +800,8 @@ def t15_tutor():
     lo2, hi2 = PACE_B2_MIN
     rows = [[PACE_I[0][0], f'{lo1}–{hi1} мин боя; остальное до часа — обучение', duo, f'{dec1(ms, MINUTE_MS)} мин, {runs} заб.', lvl,
              f'{first[0]}-й' if first else '—', 'в срок' if in_corridor(ms, PACE_B1_MIN) else 'мимо цели'],
-            ['Рунный страж биома 1', 'после биома', duo, '—', '—', f'{SIM_GUARD}-й' if SIM_GUARD else 'не берётся',
-             'по силам' if SIM_GUARD and SIM_GUARD <= LIMITS[0] else 'не по силам'],
+            ['Рунный страж биома 1', 'после биома', duo, '—', '—', f'{guard_lvl}-й' if guard_lvl else 'не берётся',
+             'по силам' if guard_lvl and guard_lvl <= LIMITS[0] else 'не по силам'],
             [PACE_I[1][0], f'ещё {dec1(lo2, 60)}–{dec1(hi2, 60)} ч забегов', '5 героев: ещё трое до полной пачки',
              f"{dec1(b2['ms'], MINUTE_MS)} мин, {b2['runs']} заб." if b2 else 'нет прогона темпа',
              '/'.join(map(str, b2['lvl'])) if b2 else '—', 'босс и страж — за забег, без осады',

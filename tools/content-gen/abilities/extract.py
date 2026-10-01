@@ -11,7 +11,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
-SRC = ROOT / "source-data/Enerium_Способности_элементов.xlsx"
+SRC = ROOT / "source-data/оригиналы-2026-09-26/Enerium_Способности_элементов.xlsx"   # таблица автора 26.09.2026; на её прежнем месте — таблица из данных игры
 OUT = pathlib.Path(__file__).with_name("source.json")
 NS = {"m": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
 
@@ -35,7 +35,7 @@ def main():
     head = rows[0]
     abilities = [dict(zip(head, r)) for r in rows[1:] if any(r)]
     rules = [" ".join(c for c in r if c).strip() for r in sheet_rows(z, strings, 2)]
-    OUT.write_text(json.dumps({"source": "source-data/Enerium_Способности_элементов.xlsx",
+    OUT.write_text(json.dumps({"source": "source-data/оригиналы-2026-09-26/Enerium_Способности_элементов.xlsx",
                                "rules": [x for x in rules if x], "abilities": abilities},
                               ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"{len(abilities)} способностей, {len([x for x in rules if x])} строк правил → {OUT.relative_to(ROOT)}")

@@ -3,7 +3,8 @@
    Регистрирует: SCREENS.echo; ACTIVATE.act — крафтовый биом, ACTIVATE.call — крафтовый босс, ACTIVATE.echo — Многоликий;
    листы OV.ech*, действия ACT.ech*; обёртки над SCREENS.descent (активные руины в «Спуске») и startRun (слоты биомов общие).
    Правила: §17, §12.2–12.5 и §36 GDD, ADR-0014, ADR-0023, ADR-0024. Недели и отряды — EN_ROSTER.weeks (roster.js);
-   крафтовые боссы, руины, слоты и цены Эхо — EN_RECIPES.drops (recipes.js); сундуки — EN_LOOTBOXES (lootboxes.js).
+   крафтовые боссы, руины, слоты и цены Эхо — EN_RECIPES.drops (recipes.js); сундуки — EN_LOOTBOXES (lootboxes.js), сундук за победу
+   над призванным врагом — EN_LOOTBOXES.summon (раздел «сундук за призванного врага» ниже; docs/content/лутбоксы.md).
    Враги недели — по строкам «Враги недели» в docs/content/герои/состав-героев.md, «Отряды Эхо — древние цивилизации»:
    имена и облик — черновик прототипа. Игроку — только «древняя цивилизация задолго до этеров»; поля team не показываем.
    Атака — бой ядром (battle.js, EB.echoBattle, ADR-0025): один этаж, главный враг и четыре защитника, раунды по типу врага;
@@ -196,7 +197,7 @@ const ECH = {
         ['Заводной щитник', 'Земля', 'Танк', 'Щит приклёпан к руке. Шагает, пока не кончится завод, и не отступает.'],
         ['Медная гончая', 'Воздух', 'Физ. ДД ловкости', 'Гончая из меди с горящими глазами. Обходит берег и чует чужих.'],
         ['Строитель лабиринта', 'Время', 'Дебаффер', 'Ставит стены там, куда ты собирался шагнуть.'],
-        ['Смазчик', 'Вода', 'Лекарь', 'Маслёнка на длинном носике. Зальёт трещину — и медь снова держит.'],
+        ['Медная маслёнка', 'Вода', 'Лекарь', 'Маслёнка на длинном носике. Зальёт трещину — и медь снова держит.'],
         ['Метатель раскалённых шаров', 'Огонь', 'Маг. ДД', 'Чаша на плече, в ней медные шары докрасна. Мечет их через стену.'],
         ['Огненный бык', 'Огонь', 'Физ. ДД силы', 'Бык из меди, в брюхе горн. Дышит огнём и топчет.'],
         ['Береговой обходчик', 'Земля', 'Танк', 'Высокий, как маяк. Обходит берег трижды в день и не пропускает никого.'],
@@ -357,7 +358,7 @@ const hpPct = x => Math.floor(x.hp * 100 / x.max);
 const specOf = id => id && RX.specs[id] ? RX.specs[id].n.toLowerCase() : '';
 const hideIt = it => !!it.team && S.acc.cycle < TEAM_CYC;
 const itIcon = (it, size, hide) => `<span class="well ech-it" data-r="${it.r}"${typeof crK === 'function' ? crK(it) : ''} style="--s:${size}px">${hide ? (typeof resHideIco === 'function' ? resHideIco(size) : ic('lock')) : trIcon(it)}</span>`;
-const boxName = (box, r) => `${LBX.boxes[box].n} · ${LBX.boxRarity[r - 1]}`;
+const boxName = (box, r, win) => `${LBX.boxes[box].n} · ${LBX.boxRarity[r - 1]}${win && win !== 'step' && LBX.winNames[win] ? ' · ' + LBX.winNames[win] : ''}`;
 const freeCount = () => S.echo.slots.filter((x, i) => !x && !S.ech.pending[i]).length;
 const freeSlot = () => S.echo.slots.findIndex((x, i) => !x && !S.ech.pending[i]);
 const bioCap = () => RX.drops.activeSlots.byCycle[S.acc.cycle - 1] || RX.drops.activeSlots.byCycle[0];   // по одному на цикл (ADR-0014)
@@ -629,7 +630,7 @@ const atkHtml = a => `<span class="ech-cost" title="Цена одной атак
 const atkMini = a => `<span class="ech-sc" title="Цена одной атаки: ${fmt(a)} ${souls(a)}"><img src="${curImg('souls')}" alt=""><b class="num">${fmt(a)}</b></span>`;
 /* что даёт победа над целью: очки недели, ресурс «Многоликий» или добыча крафтового босса */
 function rewardOf(x, f, c) {
-  if (x.g === 'craft') return f.fb.workerBoxRarity ? 'ресурсы и сундук' : isLik(f.fb) ? 'осколки героев недели' : 'ресурсы';
+  if (x.g === 'craft') { const ch = chestRule(f.fb, x.race, c); return ch ? (ch.box === 'shards' ? 'сундук осколков недели' : 'трофей, ключи, валюта и сундук') : isLik(f.fb) ? 'осколки героев недели' : 'ресурсы'; }
   const p = ptsOf(x.step, c), pts = p ? `${fmt(p)} ${plural(p, 'очко', 'очка', 'очков')}` : '';
   if (x.g === 'm') return pts ? pts + ' и ресурс «Многоликий»' : 'ресурс «Многоликий»';
   return c >= EM.from ? pts || 'без очков' : 'обучение — без очков';
@@ -835,7 +836,39 @@ function echoDone(R, vis) {
   if (vis) { R.seen = true; S.route = 'echo'; S.overlay = { t: 'echres', arg: R.id }; render(); focusOverlay(); }
   else toast(`Эхо · атака ${R.res.no}: итог — в верхней строке`);
 }
-/* крафтовый босс: трофей, ключи своего ремесла, валюта, рунный ключ по шансу, сундук крафтового босса; Лик — осколки героев недели */
+/* ================== сундук за призванного врага ==================
+   Модель — EN_LOOTBOXES.summon (lootboxes.js; сборщик tools/content-gen/lootboxes, docs/content/лутбоксы.md, «Призванные враги»):
+   враг из призыва — сундук своего вида: редкость — по силе врага, окно — по цене призыва; Лик недели — сундук осколков своей недели,
+   редкость — по циклу игрока. Победа кладёт закрытый сундук в запасы частью итога атаки с номером — повтор номера второй не выдаёт;
+   сид сундука — от цели (заглушка серверного, §34.1). Открывают — в запасах, окном сундука (§36.11, screens/chest-open.js).
+   Шансы — честно и до призыва (§23, §14.4): «Сведения» предмета, подтверждение призыва, бестиарий. Имени врага там нет (§12.5).
+   Нет модели в данных (прежний lootboxes.js) — прежнее правило: сундук крафтового босса редкости workerBoxRarity, Лик — осколки */
+const SUMB = () => (LBX.summon && LBX.summon.bosses) || null;
+/* сундук за победу: { box, r, win, cyc, week, n }; race — неделя лица Лика, c — цикл игрока */
+function chestRule(fb, race, c) {
+  const b = SUMB() && SUMB()[fb.id];
+  if (b && b.byCyc) { const r = b.byCyc[c] || b.byCyc[String(c)]; return r ? { box: b.box, r, win: b.win, cyc: c, week: race, n: b.n } : null; }
+  if (b) return { box: b.box, r: b.r, win: b.win, cyc: b.pc, week: null, n: b.n };
+  return !SUMB() && fb.workerBoxRarity ? { box: 'craft', r: fb.workerBoxRarity, win: 'step', cyc: fb.cyc, week: null, n: 1 } : null;
+}
+const callBoss = id => RX.drops.craftBosses.find(b => b.call === id) || null;
+const chestDef = ch => { try { return LOOT.resolve(LBX, { box: ch.box, r: ch.r, win: ch.win, cyc: ch.cyc, week: ch.box === 'shards' ? ch.week : null }); } catch (_) { return null; } };
+/* одна строка сундука: картинка в рамке редкости, имя, окно и число предметов */
+function chestLine(ch, px) {
+  const d = chestDef(ch), sub = [ch.win !== 'step' ? `окно «${LBX.winNames[ch.win]}»` : '', d ? `${d.n} ${plural(d.n, 'предмет', 'предмета', 'предметов')}` : '', ch.week ? 'неделя ' + weekGen(ch.week) : ''].filter(Boolean).join(' · ');
+  return `<span class="well itf ech-it" data-r="${ch.r}" style="--s:${px}px">${chestPic(ch.box, ch.r)}</span><span class="col ech-chn"><b>${boxName(ch.box, ch.r)}${ch.n > 1 ? ' ×' + ch.n : ''}</b><small class="faint">${sub}</small></span>`;
+}
+/* «За победу» — сундук и прямая добыча врага. Без имени врага и без трофея по имени: до призыва враг не раскрывается (§12.5) */
+function rewardHtml(fb, race, c, compact) {
+  const ch = chestRule(fb, race, c);
+  if (!ch) return '';
+  const direct = compact ? '' : (fb.trophies ? `<span class="chip">${ic('gem')}трофей врага</span>` : '') + (fb.specKeys ? `<span class="chip">${ic('key')}ключи ремесла ×${fb.specKeys}</span>` : '')
+    + ['spirit', 'gold', 'enerium'].filter(k => fb[k]).map(k => money(k, fb[k])).join('');
+  return `<div class="col ech-rw"><span class="eyebrow">За победу</span>
+    <button class="ech-rwc" data-r="${ch.r}" data-a="echbox" data-v="boss:${fb.id}:${race}" aria-label="Состав и шансы сундука">${chestLine(ch, 44)}<span class="link ech-rwl">Шансы ${ic('chev')}</span></button>
+    ${direct ? `<div class="row ech-rwd">${direct}</div>` : ''}</div>`;
+}
+/* крафтовый босс: трофей, ключи своего ремесла, валюта, рунный ключ по шансу; сундук — по модели призванных врагов */
 function craftLoot(x, f, loot) {
   const fb = f.fb, roll = rng(`эхо|${x.race}|лут|${x.uid}`);
   if (fb.trophy && fb.trophies) { BAG.add(fb.trophy, fb.trophies); loot.push({ k: 'item', id: fb.trophy, n: fb.trophies }); }
@@ -846,8 +879,14 @@ function craftLoot(x, f, loot) {
   }
   ['spirit', 'gold', 'enerium'].forEach(k => { if (fb[k]) { S.wallet[k] += fb[k]; loot.push({ k: 'cur', id: k, n: fb[k], stub: k === 'enerium' }); } });
   if (fb.runeKeyBp) { const hit = roll(BP) < fb.runeKeyBp; if (hit) S.wallet.keys += fb.runeKeys; loot.push({ k: 'rune', n: fb.runeKeys, bp: fb.runeKeyBp, hit }); }
-  if (fb.workerBoxRarity) { const spec = { box: 'craft', r: fb.workerBoxRarity, cyc: fb.cyc, win: 'step', src: 'Крафтовый босс · ' + fb.name }; BAG.addChest(spec); loot.push({ k: 'chest', spec }); }
-  if (isLik(fb)) {
+  const ch = chestRule(fb, x.race, S.acc.cycle);
+  if (ch) for (let k = 0; k < ch.n; k++) {
+    const spec = { box: ch.box, r: ch.r, cyc: ch.cyc, win: ch.win, src: `${fb.id === 'lik' ? 'Лик недели · неделя ' + weekGen(x.race) : 'Призванный враг · ' + fb.name}`, seed: LOOT.seedOf(`эхо|${x.race}|сундук|${x.uid}|${k}`) };
+    if (ch.box === 'shards') spec.week = ch.week;
+    BAG.addChest(spec);
+    loot.push({ k: 'chest', spec, id: S.bag.chests[S.bag.chests.length - 1].id });
+  }
+  if (!SUMB() && isLik(fb)) {   // прежний lootboxes.js без модели призванных: Лик платит осколками напрямую
     const W = RS.weeks.find(w => w.race === x.race) || weekOf(S), open = W.squad.map(id => RSI[id]).filter(h => h && h.c <= S.acc.cycle), n = likShards(S.acc.cycle, fb);
     if (!open.length || !n) { loot.push({ k: 'none' }); return; }
     const h = open[roll(open.length)];
@@ -861,7 +900,12 @@ function lootHtml(x) {
   if (x.k === 'item') { const it = BAG.item(x.id); return li(itIcon(it, 30), it.n, `<b class="num">×${fmt(x.n)}</b>`); }
   if (x.k === 'cur') return li(money(x.id, x.n), CUR[x.id].n, x.stub ? '<span class="chip warn team-only">заглушка</span>' : '');
   if (x.k === 'rune') return x.hit ? li(money('keys', x.n), CUR.keys.n) : TM(`Рунный ключ: шанс ${pctBp(x.bp)} — не выпал`, 'div', 'ech-li faint');
-  if (x.k === 'chest') return li(`<span class="well itf ech-it" data-r="${x.spec.r}" style="--s:30px">${chestPic(x.spec.box, x.spec.r)}</span>`, boxName(x.spec.box, x.spec.r));
+  /* сундук призванного врага — крупно, во всю ширину: что внутри — «Шансы», открыть — в запасах окном сундука (§36.11) */
+  if (x.k === 'chest') {
+    const sp = x.spec, has = !!(x.id && BAG.chest(x.id)), ch = { box: sp.box, r: sp.r, win: sp.win || 'step', cyc: sp.cyc, week: sp.week || null, n: 1 };
+    return `<div class="ech-li ech-lch" data-r="${sp.r}">${chestLine(ch, 52)}<button class="link ech-rwl" data-a="echbox" data-v="chest:${x.id || ''}:${sp.box}:${sp.r}:${ch.win}:${sp.cyc}:${sp.week || ''}">Шансы ${ic('chev')}</button>
+      ${has ? `<button class="btn sm go" data-a="echopenbox" data-v="${x.id}" title="Открыть в запасах — окном сундука">Открыть</button>` : `<span class="chip">${ic('check')}открыт</span>`}</div>`;
+  }
   if (x.k === 'shards') { const h = RSI[x.id], g = !x.dust && typeof shardGhost === 'function' ? shardGhost(h, S.rs.shards[h.id] || 0, RS.rules.stub.shards, 34) : ''; return li(g || `<span class="rs-av" data-r="${h.r}">${rsFace(h)}</span>`, h.n, `<b class="num">осколки ×${fmt(x.n)}</b>${x.dust ? `<small class="faint">в прах +${fmt(x.dust)}</small>` : ''}`); }
   return '<p class="faint">Осколков нет: героев недели к этому циклу не открыто.</p>';
 }
@@ -1092,6 +1136,21 @@ Object.assign(ACT, {
     S.echo.sel = i; S.route = 'echo'; ACT.echatk(uid + ':' + n);
   },
   echnext(v) { S.overlay = null; ACT.echsum(v); },
+  /* «Шансы» сундука призванного врага — лист «Состав и шансы»: просмотр не выдаёт (§14.4) */
+  echbox(v) { open('echbox', v); },
+  /* «Открыть» в итоге боя: сундук этой победы открывают в запасах (§36.11) — вкладка «Сундуки», этот сундук первым в своей группе,
+     окно открытия (screens/chest-open.js). Номер операции — от сундука: повтор нажатия ничего не выдаёт */
+  echopenbox(v) {
+    const c = BAG.chest(v);
+    if (!c) { toast('Этот сундук уже открыт'); return render(); }
+    if (typeof zpOpen !== 'function' || typeof zpChestKey !== 'function' || !ACT.zpto) { toast('Сундук — в запасах'); return; }
+    const all = S.bag.chests, i = all.indexOf(c);
+    if (i > 0) { all.splice(i, 1); all.unshift(c); }   // одинаковые сундуки открываются по порядку — этот первым
+    const key = 'g:' + zpChestKey(c);
+    ACT.zpto('chest'); const V = zpV(); V.sel.chest = key; V.n = 1;
+    zpOpen(key, 'ech|' + v, 1);
+    if (!S.overlay) render();
+  },
   echweek() { open('echweek'); },
   echbest() { open('echbest'); },
   echfoe(v) { open('echfoe', v); },
@@ -1215,7 +1274,9 @@ Object.assign(OV, {
     const faces = f.g === 'm' ? STEPS.map((g, j) => stepFoe(fidOf(f.race, j + 1))).filter(x => kn(x.fid)).map(x => x.n) : [];
     const face = f.face ? `<p class="reason">Лицо: ${kn(f.face.fid) ? f.face.n : 'врага недели, ещё не изученного'}.</p>` : '';
     const lore = rec ? loreHtml(f.look + (f.g === 'm' ? ` Лица этой недели: ${faces.length ? faces.join(', ') : 'пока ни одного'}.` : '')) : CLOSED;
-    const body = `<div class="ech-fhead">${ph(f)}<div class="col ech-fside"><div class="row ech-chips">${chips}</div>${nums}</div></div>${tgt}${face}${lore}`;
+    /* призванный враг — сундук за победу и его шансы (§23): и в слоте, и в бестиарии; Многоликий и лестница — без сундука */
+    const rw = f.fb ? rewardHtml(f.fb, f.race, c) : '';
+    const body = `<div class="ech-fhead">${ph(f)}<div class="col ech-fside"><div class="row ech-chips">${chips}</div>${nums}</div></div>${tgt}${rw}${face}${lore}`;
     return sheet(f.named || rec ? f.n : 'Неизвестный противник', body);
   },
   /* выбор босса или Убер-босса (живут час): облик, ранг, здоровье и мощь, честная оценка на сиде первой атаки текущим отрядом
@@ -1241,6 +1302,7 @@ Object.assign(OV, {
       ${hide ? '' : loreHtml(it.lore)}
       ${bad.length ? `<ul class="ech-checks">${bad.map(x => `<li class="no">${ic('x')}<span>${x.t}</span></li>`).join('')}</ul>` : ''}
       ${gx ? estHtml(gx, estOf(gx)) : ''}
+      ${kind === 'call' && !hide && callBoss(it.id) ? rewardHtml(callBoss(it.id), weekOf(S).race, S.acc.cycle, true) : ''}
       <div class="row ech-spend"><span class="eyebrow">Расход</span>${itIcon(it, 28, hide)}<b class="num">×1</b>${kind === 'call' ? `<span class="faint">+</span>${money('souls', cost)}` : ''}</div>
       <ul class="ech-rules">${RULES[kind]().map(r => `<li>${r}</li>`).join('')}</ul>
       ${kind === 'echo' ? '<span class="chip warn team-only" style="align-self:flex-start" title="ADR-0025: этаж — состав ступени, биом — в слот биомов, как руина">как понят ответ автора — поправит автор</span>' : ''}`;
@@ -1285,7 +1347,8 @@ Object.assign(OV, {
     const kpi = [[t > 0 ? '−' + fmt(t) : t < 0 ? '+' + fmt(-t) : '0', t >= 0 ? 'отнято здоровья' : 'защитники вылечили', '']]
       .concat(!L.kill || craft ? [] : L.cyc < EM.from ? [['—', 'обучение без очков', '']] : L.pts ? [['+' + fmt(L.pts), 'очков недели', 'win']] : []);
     const marks = L.kill ? (L.first ? `<span class="chip spirit">${ic('book')}новое в бестиарии</span>` : '') + (L.opened ? `<span class="chip spirit">${ic('up')}открыта ступень ${L.opened}</span>` : '') : '';
-    const loot = L.loot.map(lootHtml).join('');
+    /* сундук за победу над призванным врагом — первым и крупно: это главная награда; остальная добыча — сеткой ниже */
+    const chests = L.loot.filter(l => l.k === 'chest').map(lootHtml).join(''), loot = L.loot.filter(l => l.k !== 'chest').map(lootHtml).join('');
     const rows = r.heroes.map(h => { const hh = H(h.id); return `<tr class="${h.alive ? '' : 'fell'}"><td><span class="ech-rf">${hh ? `<img src="${hh.img}" alt="">` : RSI[h.id] ? `<span class="rs-av">${rsFace(RSI[h.id])}</span>` : ''}<b>${h.name}</b>${h.alive ? '' : '<small>пал</small>'}</span></td><td class="num">${fmt(h.dealt)}</td><td class="num">${fmt(h.toMain)}</td><td class="num">${fmt(h.healed)}</td></tr>`; }).join('');
     const foesTxt = r.foes.map((u, k) => { const sf = k === 0 ? f : stepFoe(u.id.slice(4)), nm = sf ? (k === 0 ? nameOf(sf) : shortOf(sf)) : u.name; return `${k === 0 ? '<b>' + nm + '</b>' : nm}${u.dead ? ' ✝' : ` · ${Math.floor(u.hp * 100 / u.maxHp)} %`}`; }).join(' · ');
     const more = `<details class="ech-det"><summary>${ic('chev')}Подробности боя</summary><div class="col">
@@ -1294,7 +1357,9 @@ Object.assign(OV, {
         <p class="reason ech-res-foes">${foesTxt}</p>
         <p class="reason">Атака ${L.no} · ${fmt(L.cost)} ${souls(L.cost)}${TM(' · бой посчитан целиком при оплате: просмотр и «Пропустить» итог не меняют')}.</p>
       </div></details>`;
+    /* победа над призванным врагом: сундук — сразу под именем, до здоровья и чисел, чтобы был виден и на низком экране (844 × 390) */
     const body = `<div class="ech-res-top">${ph(f, 'sm')}<div class="col"><b class="serif">${nameOf(f)}</b><small class="faint">${WHY[r.why] || r.why}</small></div></div>
+      ${chests ? `<span class="eyebrow">Сундук за победу</span><div class="ech-loot">${chests}</div>` : ''}
       <div class="col ech-res-hp">${bar(pc(r.main.hp), 'hp lg', `<span class="ghost" style="--g:${pc(L.hp0)}"></span>`)}<div class="row"><span>здоровье цели</span><span class="num">${fmt(r.main.hp)}</span></div></div>
       <div class="row ech-res-kpi">${kpi.map(([v, s, w]) => `<div class="stat ${w}"><b class="num">${v}</b><small>${s}</small></div>`).join('')}</div>
       ${marks ? `<div class="row ech-res-marks">${marks}</div>` : ''}
@@ -1303,6 +1368,20 @@ Object.assign(OV, {
     const next = live ? `<button class="btn go" data-a="echagain" data-v="${L.slot}:${x.uid}:${x.atk + 1}">Атаковать ещё${costTag('souls', atkCost(x))}</button>`
       : !S.echo.slots[L.slot] && !S.ech.pending[L.slot] ? `<button class="btn go" data-a="echnext" data-v="${L.slot}">Призвать новую${costTag('souls', XE.summonSouls)}</button>` : '';
     return dialog(L.kill ? 'Победа' : 'Цель устояла', body, `<button class="btn ghost" data-a="close">К целям</button>${next}`, 'wide');
+  },
+  /* состав и шансы сундука призванного врага (§14.4, §23): arg — «boss:id:неделя» (до призыва и в бестиарии) или
+     «chest:id сундука:вид:редкость:окно:цикл:неделя» (из итога боя). Сундук один и тот же — модель EN_LOOTBOXES.summon */
+  echbox(o) {
+    const a = String(o.arg || '').split(':'), c0 = a[1] && a[0] === 'chest' ? BAG.chest(a[1]) : null;
+    const fb = a[0] === 'boss' ? CBOSS[a[1]] : null;
+    const ch = fb ? chestRule(fb, a[2] || weekOf(S).race, S.acc.cycle)
+      : c0 ? { box: c0.box, r: c0.r, win: c0.win || 'step', cyc: c0.cyc, week: c0.week || null, n: 1 }
+        : a[0] === 'chest' && LBX.boxes[a[2]] ? { box: a[2], r: +a[3], win: a[4] || 'step', cyc: +a[5], week: a[6] || null, n: 1 } : null;
+    if (!ch || !LBX.boxes[ch.box]) return sheet('Состав и шансы', '<p class="faint">Такого сундука нет.</p>');
+    const d = chestDef(ch), info = typeof zpInfo === 'function' ? zpInfo({ box: ch.box, r: ch.r, win: ch.win, cyc: ch.cyc, week: ch.week }, d) : '';
+    const why = fb && fb.id === 'lik' ? 'Сундук осколков своей недели — как у лестницы Эхо. Редкость — по циклу.'
+      : 'Сундук — за каждую победу над призванным врагом: лестница недели его не даёт. Редкость — по силе врага, окно — по цене призыва.';
+    return sheet('Состав и шансы', `<div class="row ech-boxh">${chestLine(ch, 64)}</div>${info}<p class="reason">${why}</p>${PL('Открывают в запасах.', 'Открывают в запасах, окном сундука. В игре итог решает сервер: сид приходит вместе с сундуком, каждый сундук открывается один раз (§34.1).', 'p', 'reason')}`, '', true);
   },
   /* итог биома Многоликого: взятые этажи и очки Эхо, здоровье отряда, новые записи бестиария; биом закрыт — попытка одна */
   echmanyres(o) {
@@ -1355,8 +1434,22 @@ FLOWS.push(['Эхо · босс на час', 'Боссы, Убер и краф�
   S.echo.sel = k;
 }]);
 
+/* «Сведения» о предмете запасов (index.html, itemCard) — у предмета призыва ещё «За победу»: сундук того, кого он зовёт, и шансы (§23).
+   Имени врага и трофея по имени нет (§12.5); предмет «для команды» раньше своего цикла — без сведений */
+if (typeof itemCard === 'function') {
+  const itemCardBase = itemCard;
+  itemCard = function (id) {
+    const h = itemCardBase(id), it = BAG.item(id), fb = it && it.tier === 'call' ? callBoss(id) : null;
+    const rw = fb && !hideIt(it) ? rewardHtml(fb, weekOf(S).race, S.acc.cycle) : '';
+    if (!rw) return h;
+    /* сразу под строками «Цикл · рецепты»: выше — описание и пометка Этриона (её ставит screens/crafthall.js перед этими строками) */
+    const kv = h.indexOf('<dl class="kv"'), at = kv < 0 ? -1 : h.indexOf('</dl>', kv);
+    return at < 0 ? h + rw : h.slice(0, at + 5) + rw + h.slice(at + 5);
+  };
+}
+
 /* для автопроверки tools/content-gen/screens/check_echo.js и консоли */
 window.EN_ECHO = { data: ECH, steps: STEPS, foe, stepFoe, faceArt, fidOf, sync, draw, checks, planks: () => planks(weekOf(S), S.acc.cycle), bio: () => ({ cap: bioCap(), used: bioUsed() }), target: (kind, x, o) => target(S, kind, x, o),
   cost: x => atkCost(x), pts: ptsOf, floorPts, rounds: roundsOf, lvl: lvlOf, hp: hpOf, fight: (x, ids, no) => fightOf(x, ids, no || x.atk + 1), kit: demoKit,
-  manyFree, face: faceArt, arena: arenaOf, manyBp, likShards, est: estOf, ghost, short: x => shortLife(x) };
+  manyFree, face: faceArt, arena: arenaOf, manyBp, likShards, est: estOf, ghost, short: x => shortLife(x), chest: chestRule, callBoss, reward: rewardHtml };
 })();

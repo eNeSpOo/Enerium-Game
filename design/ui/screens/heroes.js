@@ -505,6 +505,9 @@ const sqFind = id => (id && S.squads.find(s => s.id === id)) || null;
 /* пресет по id; удалённого нет — первый в библиотеке: режим, забег и «Ещё забег» не остаются без отряда */
 const sq = id => sqFind(id) || S.squads[0];
 const sqBM = s => BM.squad(s.m);   // мощь отряда — сумма BM.hero (index.html, §6)
+/* место отряда закрыто уровнем Странника: 0 — открыто, иначе — уровень, с которого откроется. Решает режим «Чистый лист» (obSlotLock,
+   screens/start.js); у демо-аккаунта открыты все пять */
+const sqLock = i => (typeof obSlotLock === 'function' ? obSlotLock(i) : 0);
 const sqKey = m => SQM[m] ? m : 'descent';   // лист «prep» без режима — спуск
 const sqOp = () => 'q' + S.sq.seq;           // номер следующей операции: его несут кнопки
 function sqGet(mode) {
@@ -599,6 +602,7 @@ const SQ_SRV = {
   put(op, id, i, hid) {
     return SQ_SRV.run(op, () => {
       const s = sqFind(id); if (!s || !(i >= 0 && i < SQ_DATA.size)) return { refuse: 'slot' };
+      if (sqLock(i)) return { refuse: 'lock' };   // место ещё закрыто уровнем Странника (screens/start.js)
       if (!H(hid)) return { refuse: 'hero' };
       const j = s.m.indexOf(hid);
       if (j === i) return { refuse: 'same' };
@@ -614,6 +618,7 @@ const SQ_SRV = {
     return SQ_SRV.run(op, () => {
       const s = sqFind(id), n = SQ_DATA.size;
       if (!s || !(i >= 0 && i < n && j >= 0 && j < n) || i === j || (!s.m[i] && !s.m[j])) return { refuse: 'slot' };
+      if (sqLock(i) || sqLock(j)) return { refuse: 'lock' };
       [s.m[i], s.m[j]] = [s.m[j], s.m[i]];
       return { id, i, j };
     });
@@ -624,7 +629,7 @@ const SQ_SRV = {
   },
 };
 const SQ_WHY = { max: `В библиотеке уже ${SQ_DATA.max} отрядов`, last: 'Последний отряд удалить нельзя', name: 'Имя не может быть пустым', none: 'Такого отряда нет',
-  hero: 'Такого героя нет в коллекции', slot: 'Нет такого места', same: 'Герой уже на этом месте', op: 'Действие устарело' };
+  hero: 'Такого героя нет в коллекции', slot: 'Нет такого места', lock: 'Это место отряда откроет уровень Странника', same: 'Герой уже на этом месте', op: 'Действие устарело' };
 const sqSay = r => { if (r && r.refuse) toast(SQ_WHY[r.refuse] || 'Не вышло'); return !!(r && r.res && !r.again); };
 
 /* API для экранов режимов (описан в screens/README.md): лист выбора, выбор режима, готовность, кто пойдёт */
@@ -672,6 +677,7 @@ function hrSquadsView() {
      поставленная с нижней полки — встаёт на место (lbRise) */
   const five = s.m.map((id, i) => {
     const h = id && H(id), on = slot === i;
+    const lk = sqLock(i); if (lk) return `<div class="lb-slot lock" role="img" aria-label="Место ${i + 1}: откроется на ${lk}-м уровне Странника">${ic('lock')}<span>${lk}-й уровень</span></div>`;
     if (!h) return `<button class="lb-slot empty${on ? ' sel' : ''}" data-a="sqslot" data-v="${op}|${i}" aria-label="Пустое место ${i + 1}">${ic('plus')}</button>`;
     const r = lbRiseOf(i, h.id);
     return `<div class="lb-slot${r ? ' rise' : ''}" data-hold="sqbook:${h.id}"${r ? ` style="--lb-d:${r.d}ms"` : ''}>${heroCard(h, { act: 'sqslot', val: `${op}|${i}`, sel: on, bm: false, z: 'm' })}</div>`;
@@ -1454,8 +1460,8 @@ Object.assign(ACT, {
      только показ: книга выезжает с нижней полки и встаёт на место (lbRise, screens/library.js) */
   sqput(v, t) {
     const [op, id, hid] = sqParse(v), s = sqFind(id); if (!s) return;
-    const i = S.sq.slot >= 0 ? S.sq.slot : s.m.indexOf(null);
-    if (i < 0) return toast('В отряде уже пятеро: нажмите, кого заменить');
+    const i = S.sq.slot >= 0 ? S.sq.slot : s.m.findIndex((x, k) => !x && !sqLock(k));
+    if (i < 0) return toast(s.m.some((x, k) => !x && sqLock(k)) ? 'Свободных мест нет: остальные откроет уровень Странника' : 'В отряде уже пятеро: нажмите, кого заменить');
     const r = SQ_SRV.put(op, id, i, hid);
     if (r.res && !r.again && r.res.swap == null && typeof lbRise === 'function') lbRise(i, hid, t);
     S.sq.slot = -1; S.sq.peek = null; sqSay(r); render();

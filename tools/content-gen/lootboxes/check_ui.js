@@ -4,6 +4,8 @@
    3. Раздел (lbHtml) рисуется на всех сундуках, редкостях, окнах, циклах и неделях, с флажками «герои пробуждены» и «для команды»:
       без исключений, без undefined и NaN, с пометкой «проба — не выдача», по строке на каждый предмет пробного открытия,
       с переводом в прах, когда герои пробуждены; без флажка «для команды» — ни одного спойлерного имени.
+   3а. Призванные враги (EN_LOOTBOXES.summon): у каждого врага recipes.js — сундук своего вида, он открывается на своих циклах,
+      редкость — сила врага + 1; карточка раздела называет источник; имени врага «для команды» без флажка нет.
    4. renderKit() и lbPaint() — в заглушку контейнеров; лист «Дары путешествия» прототипа называет сундуки сундуками.
    Запуск: node tools/content-gen/lootboxes/check_ui.js */
 'use strict';
@@ -45,7 +47,8 @@ if (err.length) done();
 /* 3. все сундуки, редкости, окна, циклы и недели */
 const res = vm.runInContext(`(() => {
   const out = { n: 0, errors: [], dust: 0, hidden: 0 };
-  const E = window.EnLoot, spoil = Object.values(LBX.talInfo).filter(t => t[2]).map(t => t[0]).concat(Object.values(LBX.items).filter(i => i.team).map(i => i.n));
+  /* спойлеры: талисманы и ресурсы «для команды», имена призванных врагов цикла VI — их строки в «Кто выдаёт» подписаны «для команды» */
+  const E = window.EnLoot, spoil = Object.values(LBX.talInfo).filter(t => t[2]).map(t => t[0]).concat(Object.values(LBX.items).filter(i => i.team).map(i => i.n), RX.drops.craftBosses.filter(b => b.team).map(b => b.name));
   for (const box of Object.keys(LBX.boxes)) for (let r = 1; r <= 7; r++) for (const win of Object.keys(LBX.winNames)) for (let cyc = 1; cyc <= 6; cyc++)
     for (const week of box === 'shards' ? LBX.weeks : ['Эльфы']) for (const awake of [false, true]) for (const team of [false, true]) {
       const key = [box, r, win, cyc, week, awake ? 'пробуждены' : '', team ? 'команда' : ''].join(' · ');
@@ -70,6 +73,29 @@ const res = vm.runInContext(`(() => {
 err.push(...res.errors.slice(0, 20));
 if (res.errors.length > 20) err.push(`… и ещё ${res.errors.length - 20}`);
 
+/* 3а. призванные враги (EN_LOOTBOXES.summon): у каждого врага recipes.js — сундук; он открывается на своих циклах; редкость — сила + 1;
+   карточка раздела «Кто выдаёт» называет крафтовых боссов у сундука крафтового босса и Лика недели — у сундука осколков */
+const sres = vm.runInContext(`(() => {
+  const out = { n: 0, errors: [] }, S0 = LBX.summon, E = window.EnLoot;
+  if (!S0 || !S0.bosses || !S0.kinds) { out.errors.push('нет EN_LOOTBOXES.summon — пересобрать лутбоксы'); return out; }
+  for (const b of RX.drops.craftBosses) {
+    const x = S0.bosses[b.id]; if (!x) { out.errors.push(b.id + ': нет сундука призванного врага'); continue; }
+    if (!S0.kinds[x.k] || S0.kinds[x.k].box !== x.box) out.errors.push(b.id + ': вид ' + x.k + ' и сундук ' + x.box + ' расходятся');
+    if (!x.byCyc && x.r !== Math.min(7, b.cyc + (b.powerCycleStep || 0) + 1)) out.errors.push(b.id + ': редкость ' + x.r + ' не по силе врага');
+    const specs = x.byCyc ? Object.entries(x.byCyc).map(([c, r]) => ({ box: x.box, r, win: x.win, cyc: +c, week: LBX.weeks[0] })) : [{ box: x.box, r: x.r, win: x.win, cyc: x.pc }];
+    if (!specs.length) out.errors.push(b.id + ': сундука нет ни в одном цикле');
+    for (const sp of specs) {
+      try { const d = E.resolve(LBX, sp); if (!d.n) out.errors.push(b.id + ': пустой сундук'); out.n++; } catch (e) { out.errors.push(b.id + ': ' + e.message); continue; }
+      Object.assign(LB, { box: sp.box, r: sp.r, win: sp.win, cyc: sp.cyc, week: sp.week || 'Эльфы', awake: false, seed: 'проба-1' }); KH.team = false;
+      const h = lbHtml(), who = x.byCyc ? LBX.modes.mask.n : LBX.modes.craft.n;
+      if (!h.includes(who)) out.errors.push(b.id + ': карточка сундука не называет источник «' + who + '» в цикле ' + sp.cyc);
+      if (b.team && h.includes(b.name)) out.errors.push(b.id + ': имя врага «для команды» в карточке без флажка');
+    }
+  }
+  return out;
+})()`, ctx);
+err.push(...sres.errors.slice(0, 20));
+
 /* 4. раздел целиком и лист Даров прототипа */
 try {
   vm.runInContext('renderKit(); lbPaint();', ctx);
@@ -82,6 +108,7 @@ try {
   if (!/Сундук осколков/.test(g) || /Ларец/.test(g)) err.push('лист «Дары путешествия»: сундуки названы не сундуками');
 } catch (e) { err.push('лист «Дары путешествия»: ' + e.message); }
 
+console.log(`Призванных врагов: ${vm.runInContext('RX.drops.craftBosses.length', ctx)}, сундуков по циклам развёрнуто ${sres.n}.`);
 console.log(`Раздел нарисован ${res.n} раз: сундуков ${vm.runInContext('Object.keys(LBX.boxes).length', ctx)}, редкостей 7, окон 3, циклов 6, недель Эхо 9; перевод в прах — ${res.dust}, со спойлерами под флажком «для команды» — ${res.hidden}.`);
 done();
 

@@ -1,0 +1,170 @@
+{
+ "name": "Окно уровня Странника и лист уровней (сценарий «Старт с чистого листа», 01.10.2026: «…уровне аккаунта и награды в нём за уровень в виде попапа»). Сейчас окно собрано средствами CSS и уже выгруженным артом: кольцо опыта — SVG (.ob-ring), карточка — градиенты (.ob-card), открытия — текстом (.ob-ops), вещи награды — картинки валют, иконки предметов, сундуки и осколки, проводник — его герб. Здесь — то, чего нет: медальон уровня, вспышка выдачи, рама окна и знаки открытий. Материал — Убежища и разговора проводника (jobs/shelter.json, jobs/talk.json): окно ведёт голос проводника. Текста, цифр, лиц и спойлеров на арте нет — номер уровня пишет игра.",
+ "plan": {
+  "Медальон lv-medal": "1:1, 1K, ключ magenta: кованый медальон с пустым тёмным центром — под номер уровня; кольцо опыта ложится по его ободу",
+  "Вспышка lv-burst": "1:1, 1K, ключ black-glow: лучи холодного света снизу и янтарные искры — за медальоном в миг выдачи (анимация ob-flash)",
+  "Рама окна lv-frame": "16:9, 2K, ключ magenta: рама с узорными углами и ровными сторонами, тёмная пустая середина — border-image (9 частей)",
+  "Знаки открытий lv-opens": "5:4, 4K, сетка 5 × 4 на пурпурных швах: 18 открытий уровней 1–10 (места отряда 2–5 — один знак), замок закрытого раздела и фонарь опыта Странника"
+ },
+ "notes": [
+  "Генерации нет: предоплата API в минусе, HTTP 402 (01.10.2026). Задание ждёт; запуск — после пополнения: сначала --dry-run, потом --budget 0.5. Оценка — около $0,39: два 1K, один 2K и лист 4K на nb2",
+  "Нарезка: медальон и рама — cutout по ключу; рама — border-image, углы не тянутся; лист — grid_slice.py jobs/account-level.json lv-opens art/generated/lv-icons/lv-opens__nb2.jpg. Выгрузка — design/ui/assets/art/start/: medal.webp, burst.webp, frame.webp, open-<id>.webp",
+  "Подключение в прототипе: design/ui/screens/start.css — .ob-hd (медальон под .ob-ring), .ob-glow (вспышка), .ob-card (рама), .ob-ops li и строки листа уровней (знак открытия). Код окна — design/ui/screens/start.js, obPopHtml; ключи знаков — OPEN в tools/content-gen/start/data.js"
+ ],
+ "models": [
+  "nb2"
+ ],
+ "style": "Art style: dark fantasy game art for a premium mobile RPG — gloomy, ancient, rich and a little menacing. Hand-painted digital painting: visible confident brush strokes, simplified planes, deep near-black shadows, crisp rim light on the edges, rich material detail and masterful craftsmanship. The materials of the Refuge, the Wanderer's shelter in Endalor, a city of mages that floats above an abyss: dark forged iron with hammer marks and soot, raised edges and fine filigree of old gold (#B1915A, #DDBC7A), weathered dark stone. Light is scarce and precious and comes from below: a soft cold turquoise glow of karst crystals (#48E5D4) catches the lower edges, and a few warm amber highlights (#E6A84B) glint like the reflection of a forge. Everything is old, heavy, precious and made by a master smith: no cheap shine, no plastic, no clean flat game-UI look. No photorealism, no 3D-render look, no anime, no cartoon, no flat vector style.",
+ "negative": "No words, no letters, no digits, no numbers, no real-world alphabets, no Roman numerals, no runes, glyphs or markings that look like writing, no labels, no watermark, no signature, no logo. No skulls, no bones, no blood. No pentagrams, no occult signs, no crosses, no religious symbols, no eyes, no faces, no people, no hands, no creatures. No purple or violet light, no neon. No bright polished gold, no glossy plastic shine.",
+ "cutout_rule": "The background is one solid flat color {hex}, perfectly even from edge to edge: no gradient, no texture, no floor, no wall, no cast shadow, no vignette, no checkerboard. The object itself never uses this background color. Any glow stays close to the object and fades out within a short distance.",
+ "categories": {
+  "lv-medal": {
+   "aspect": "1:1",
+   "size": "1K",
+   "cutout": "magenta",
+   "refs": [],
+   "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — ONE round medallion seen perfectly straight on from the front: orthographic, level, no perspective, no tilt. It is centered and fills about four fifths of the canvas, with an even margin of the flat background around it. The center of the medallion is one calm, flat, very dark disc with no picture and no marks on it — the game writes a number there. It must read clearly when it is shown only 80 to 120 pixels wide."
+  },
+  "lv-fx": {
+   "aspect": "1:1",
+   "size": "1K",
+   "cutout": "black-glow",
+   "refs": [
+    "art/style/ref-03-cave-teal-runes.webp"
+   ],
+   "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: one light effect of a game interface, painted on pitch black, centered on the canvas with an empty black margin on every side: nothing solid, only light. The attached picture shows only the painting style, the brushwork and the cold light of the game — take nothing else from it."
+  },
+  "lv-frame": {
+   "aspect": "16:9",
+   "size": "2K",
+   "cutout": "magenta",
+   "refs": [],
+   "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a game UI piece for a dark fantasy mobile RPG — ONE large flat rectangular object seen perfectly straight on: orthographic, frontal and level, no perspective, no tilt. It fills about nine tenths of the canvas and is centered, with an even margin of the flat background around it. The whole background is one flat pure magenta (#FF00FF): no wall, no floor, no shadow. The object itself contains no magenta and no pink."
+  },
+  "lv-icons": {
+   "aspect": "5:4",
+   "size": "4K",
+   "refs": [
+    "art/generated/abilities/ab-stop__nb2.jpg",
+    "art/style/ref-07-icon-rune-bin.jpg"
+   ],
+   "frame": "Draw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply.\n\nFormat: a sheet of square item icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the picture in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game puts its own frame on top: ONE old object of the Refuge, large and centered, standing in a dark niche of weathered black stone, with a darker vignette toward the edges of the cell. One clear central object with a bold silhouette that stays readable at 48 px. Soft cold turquoise light of karst crystals rises from below — never a spotlight, never a saturated cone — with warm pale-gold highlights on metal; crisp rim light on the edges of the forms; a few grains of golden sand hang in the light. Loose painterly brush strokes, soft painted edges, never black outlines, never a sticker look. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each icon differs clearly from its neighbours in shape and composition. The attached pictures show only the painting style of the game's icons — do not copy their objects."
+  }
+ },
+ "jobs": [
+  {
+   "id": "lv-medal",
+   "category": "lv-medal",
+   "title": "Медальон уровня Странника — кованое кольцо старого золота, пустой тёмный центр",
+   "source": "Окно уровня (obPopHtml, .ob-hd) и шапка листа уровней. Номер уровня — текстом игры поверх центра; кольцо опыта (.ob-ring) — по ободу. К выгрузке — design/ui/assets/art/start/medal.webp",
+   "subject": "The medallion: a heavy round medallion of dark forged iron. Its wide outer rim is a smooth even band of old gold with fine beading along both edges, calm and the same all the way round, so a thin progress ring can be drawn over it. Between the rim and the center runs a narrow ring of dark iron with eight small evenly spaced old-gold rivets. At the very bottom of the rim sits one small turquoise karst crystal set in a gold claw, its cold light catching the lower edge of the rim; a few warm amber highlights glint on the upper edge. The center is a flat, very dark, slightly concave disc of blackened iron, perfectly calm."
+  },
+  {
+   "id": "lv-burst",
+   "category": "lv-fx",
+   "title": "Вспышка выдачи уровня — холодные лучи снизу и янтарные искры",
+   "source": "Окно уровня: слой .ob-glow за медальоном, анимация ob-flash в миг выдачи. К выгрузке — design/ui/assets/art/start/burst.webp",
+   "subject": "The effect: a soft round burst of light around an empty dark center, as if a crystal flared behind a medallion. Thin rays of cold turquoise light (#48E5D4) fan out from the center, longer and brighter toward the bottom, shorter toward the top; a faint ring of light lies around the empty center. A few small warm amber sparks (#E6A84B) float upward around it like embers from a forge. The light fades to pure black well before the edges of the canvas."
+  },
+  {
+   "id": "lv-frame",
+   "category": "lv-frame",
+   "title": "Рама окна уровня — кованое железо, узорные углы, ровные стороны, тёмная середина",
+   "source": "Окно уровня (.ob-card) — border-image (9 частей): углы не тянутся, стороны и середина тянутся — на сторонах нет украшений посередине. К выгрузке — design/ui/assets/art/start/frame.webp",
+   "subject": "The object: the frame of a message window of the Refuge — a wide rectangle about one and a half times as wide as it is tall. Its border is a heavy molding of dark forged iron about one fourteenth of the height thick, with a thin raised bead of old gold along its inner edge; along each of the four sides the molding is calm and exactly the same all along its length — no ornament in the middle of any side. Only the four corners are ornate: at each corner a square old-gold clasp with a small turquoise karst crystal in its center and short forged curls. Inside the frame: a calm, very dark surface of smoked basalt, almost black, perfectly even, with a faint cold turquoise glow only along its lower edge."
+  },
+  {
+   "id": "lv-opens",
+   "category": "lv-icons",
+   "title": "Знаки открытий уровней 1–10, замок и фонарь опыта — сеткой 5 × 4",
+   "source": "Окно уровня: строка «Открыто» (.ob-ops li); лист уровней — столбец открытий; закрытые разделы — замок. Порядок клеток — OPEN в tools/content-gen/start/data.js (места отряда 2–5 — один знак slot), затем lock и xp. К выгрузке — design/ui/assets/art/start/open-<id>.webp (grid_slice.py)",
+   "grid": [
+    5,
+    4
+   ],
+   "cells": [
+    [
+     "hire",
+     "open-hire"
+    ],
+    [
+     "descent",
+     "open-descent"
+    ],
+    [
+     "dev",
+     "open-dev"
+    ],
+    [
+     "slot",
+     "open-slot"
+    ],
+    [
+     "stock",
+     "open-stock"
+    ],
+    [
+     "shop",
+     "open-shop"
+    ],
+    [
+     "guard",
+     "open-guard"
+    ],
+    [
+     "b2",
+     "open-b2"
+    ],
+    [
+     "craft",
+     "open-craft"
+    ],
+    [
+     "valor",
+     "open-valor"
+    ],
+    [
+     "artifacts",
+     "open-artifacts"
+    ],
+    [
+     "limit",
+     "open-limit"
+    ],
+    [
+     "cycle2",
+     "open-cycle2"
+    ],
+    [
+     "echo",
+     "open-echo"
+    ],
+    [
+     "week",
+     "open-week"
+    ],
+    [
+     "souls",
+     "open-souls"
+    ],
+    [
+     "market",
+     "open-market"
+    ],
+    [
+     "memory",
+     "open-memory"
+    ],
+    [
+     "lock",
+     "open-lock"
+    ],
+    [
+     "xp",
+     "open-xp"
+    ]
+   ],
+   "subject": "The palette of this sheet: dark forged iron, old gold, weathered black stone, dark wood and worn leather; small accents of cold turquoise karst light and warm amber. These are the signs of the Refuge for new paths opening to the Wanderer — each one old, heavy and made by a master.\n\nThe grid: exactly 5 columns and 4 rows, 20 icons.\n\nRow 1: a rolled hero contract of old parchment tied with a dark cord and sealed with a blob of dark red wax, lying on a small stack of old gold coins; a narrow spiral stair of worn dark stone winding down into a deep black shaft, a small iron lantern hanging over its first step; a small bronze offering bowl on three short legs, a soft wisp of pale turquoise spirit-light rising from it in a slow curl; an empty high-backed chair of dark forged iron with old-gold edging, seen straight from the front, waiting for its occupant; an iron-bound chest of dark wood with its lid open, inside it lumps of raw ore, a long pale fang and a few small turquoise crystals.\n\nRow 2: an old brass merchant scale in balance: a few gold coins in one pan, a single small turquoise crystal in the other; a heavy key of dark iron with a turquoise crystal set in its bow, lying in front of the lower edge of a massive closed stone door; a twisted dark tree growing inside a cave, its roots spread over black stone, small pale glowing mushrooms clustered at its roots; a dark stone worktable seen from the front, six square hollows cut into its top in two rows, two of them holding a pale fang and a small fan of thin blades; a smooth oval stone of black basalt with an inlaid wreath of old-gold laurel leaves glowing softly amber.\n\nRow 3: an old brass astrolabe with fine rings and pointers resting on a small cushion of dark teal velvet; a heavy chain of dark iron broken in the middle, a turquoise crystal shining in the gap between the two broken links; a tall ancient archway of pale weathered stone opening onto a long stair that descends into deeper darkness, cold turquoise light rising from far below; a large bronze bell hanging perfectly still from a short iron beam, three faint rings of pale turquoise light spreading around it like ripples; an hourglass in a frame of dark iron with seven small turquoise crystals set around its frame, the golden sand half run through.\n\nRow 4: a round altar stone with five small crystal shards floating above it in a slow circle, pale blue motes of light drifting between them; two sealed trade crates of dark wood bound with iron, a brass weight hanging from a cord over them; a small round hand mirror in a frame of dark old silver, its glass smoky grey-blue and empty, reflecting nothing; a heavy closed padlock of dark iron with an old-gold plate around its keyhole; the lantern of the Wanderer: an old brass travelling lantern with a warm golden flame inside, a short worn leather strap on its ring."
+  }
+ ]
+}

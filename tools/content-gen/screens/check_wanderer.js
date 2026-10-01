@@ -109,7 +109,7 @@ const WD = (() => { const ctx = { window: {} }; vm.createContext(ctx); vm.runInC
     if (/(?:ресурс\S*|ключа) с элит(?!ой)/.test(a.d)) say(`${a.id} «${a.n}»: ресурсы или ключ «с элит» — против ADR-0010, ADR-0023`);
   }
   const walk = A.find(a => a.no === 1);
-  if (!walk || walk.base + walk.step * walk.lv + 1 !== 7) say('«Печать открытых троп» и пассивка Памяти: забегов не семь (ADR-0014)');
+  if (!walk || walk.base + walk.step * walk.lv + 1 !== 7) say('«Знак открытых троп» и пассивка Памяти: забегов не семь (ADR-0014)');
   const keys = A.filter(a => /рунного ключа с босса/.test(a.d)).reduce((s, a) => s + a.step * a.lv, 0);
   if (10 + keys !== 25) say(`рунный ключ с босса: 10 % и артефакты дают ${10 + keys} %, по §11 — 25 %`);
   const L = WD.ach.list, byCat = c => L.filter(a => a.cat === c).length;
@@ -715,7 +715,7 @@ function openAnim(P, where) { run('Вспомнить', () => P.T.ACT.wnmem('0')
   if (T.WN_SRV.buy(uop(), 'a9').res === undefined) say('артефакт цикла III не куплен в цикле III');
   if (T.wnCap(a('a2')) !== 3) say('потолок уровня в цикле III для артефакта цикла I — не III');
   T.S.acc.level = 3;
-  if (T.WN_SRV.buy(uop(), 'a18').refuse !== 'level') say('артефакты открыты до 4-го уровня Странника (§16)');
+  if (T.WN_SRV.buy(uop(), 'a18').refuse !== 'level') say('артефакты открыты раньше своего уровня Странника (EN_WANDERER.art.rules.openLevel — сценарий «Старт с чистого листа»)');
   T.S.acc.level = 24; T.S.wallet.gold = 10;
   s = snap(T);
   if (T.WN_SRV.buy(uop(), 'a18').refuse !== 'gold' || !eq(snap(T), s)) say('нехватка золота: не отказ или расход');

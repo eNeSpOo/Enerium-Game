@@ -283,7 +283,8 @@ function checkFloor(where, biome, got, items, guardWin) {
 }
 
 /* 5б'. лента боя (ADR-0031, п. 19): «Время скоротечно…» — число раундов своего боя с верным склонением, не «десять».
-   Бой с боссом биома урезан до двух раундов — он кончается песком; итог этажа пишется в ленту видимого боя */
+   Бой с боссом биома урезан до одного раунда — он кончается песком (отряд демо на 150-м берёт босса Мастерской, 550 %, за два); итог этажа
+   пишется в ленту видимого боя */
 reset();
 {
   const fl = T.EB.BIOMES.b1.floors.length;
@@ -291,10 +292,10 @@ reset();
   const R = T.S.runs[T.S.runs.length - 1];
   if (!R) say('лента: забег не начался');
   else {
-    T.S.route = 'descent'; R.b.maxRounds = 2;
+    T.S.route = 'descent'; R.b.maxRounds = 1;
     for (let n = 0; n < 4000 && !R.b.over; n++) { R.view += 250; while (!R.b.over && T.EB.nextAt(R.b) <= R.view) T.EB.step(R.b); }
     run('лента · итог этажа', () => T.floorDone(R, true));
-    if (R.b.why !== 'sand') say(`лента: бой в два раунда кончился не песком — ${R.b.why}`);
+    if (R.b.why !== 'sand') say(`лента: бой в один раунд кончился не песком — ${R.b.why}`);
     else if (!R.feed.some(x => x.includes('Время скоротечно') && x.includes(T.roundsGone(R.b.maxRounds)))) say(`лента: нет «${T.roundsGone(R.b.maxRounds)}» — ${R.feed.join(' | ')}`);
   }
   const forms = [1, 2, 5, 11, 21, 22, 25].map(T.roundsGone).join(' | ');

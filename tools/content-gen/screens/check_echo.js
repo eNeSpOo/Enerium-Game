@@ -13,7 +13,10 @@
    4. Активации из запасов на каждой неделе и цикле: все крафтовые боссы (ACTIVATE.call), биом Многоликого (ACTIVATE.echo) —
       в слот биомов без душ, забег по 14 ступеням с одной попыткой и очками за взятые этажи, все руины (ACTIVATE.act).
       Лист подтверждения не называет будущего врага и руину; недоступная активация ничего не списывает;
-      повтор подтверждения не списывает второй раз; победа над крафтовым боссом — трофей, ключи, валюта, сундук или осколки;
+      повтор подтверждения не списывает второй раз; победа над крафтовым боссом — трофей, ключи, валюта и сундук по модели
+      призванных врагов (EN_LOOTBOXES.summon): вид, редкость, окно, цикл пула, неделя у Лика недели, сид от боя; повтор атаки второго
+      сундука не даёт; итог боя показывает сундук с «Шансы» и «Открыть», «Открыть» — в запасах окном сундука, повтор не выдаёт;
+      «Сведения» о предмете призыва, лист «Состав и шансы» и бестиарий показывают сундук за победу, имени врага до призыва нет;
       руина видна в «Спуске»; слоты биомов общие с забегами — сверх них не встать ни руине, ни забегу.
    Везде: без исключений, без undefined, NaN и [object; до первой победы имя врага не видно — и в просмотре боя, который её принёс;
    тема недели «для команды» не видна. На карточке цели отряд атаки на виду: мощь, «Сменить», неполный отряд помечен на месте.
@@ -293,24 +296,62 @@ function suite() {
         h = draw(); scan(k2 + ' · призван', h);
         if (!S.ech.known[fb.id] && h.includes(fb.name)) fail(k2 + ': имя босса видно до первой победы');
         S.overlay = null; h = draw(); scan(k2 + ' · в слоте', h); out.calls++;
+        /* «Сведения» о предмете призыва (OV.item): «За победу» — сундук и шансы, без имени врага (§12.5); «для команды» — без сведений.
+           Имя врага ищем в своём блоке: описание и пометка Этриона — данные recipes.js, их сбой — предупреждение соседу */
+        S.overlay = { t: 'item', arg: it.id }; h = draw();
+        if (/undefined|NaN|\[object /.test(h)) fail(k2 + ': «Сведения» о предмете — undefined, NaN или [object');
+        const hidden = !!(it.team && c < 6), rule0 = E.chest(fb, x.race, c), rw = hidden ? '' : E.reward(fb, w.race, c);   // лист берёт неделю аккаунта
+        if (rw && (rw.includes(fb.name) || (it.opens && rw.includes(it.opens)))) fail(k2 + ': «За победу» раскрывает врага');
+        const leak = why => { out.leak = out.leak || {}; (out.leak[it.id] = out.leak[it.id] || {})[why] = 1; };
+        if (!hidden && (h.includes(fb.name) || (it.opens && h.includes(it.opens)))) leak('имя врага в «Сведениях» до призыва');
+        if (!hidden && /(^|[^а-яё])мать([^а-яё]|$)/i.test(h)) leak('«мать» в тексте');
+        if (!hidden && rule0 && (!rw || !h.includes(rw) || !h.includes('За победу') || !h.includes(LBX.boxes[rule0.box].n) || !h.includes('data-a="echbox"'))) fail(k2 + ': в «Сведениях» о предмете нет сундука за победу');
+        if (hidden && h.includes('За победу')) fail(k2 + ': предмет «для команды» показывает сундук до цикла VI');
+        /* «Шансы» — лист «Состав и шансы»: окно редкостей и доли линий, без имени врага, ничего не выдаёт */
+        if (rule0 && !hidden) {
+          const chs = S.bag.chests.length; ACT.echbox(`boss:${fb.id}:${x.race}`); h = draw(); scan(k2 + ' · шансы сундука', h);
+          if (!S.overlay || S.overlay.t !== 'echbox' || !h.includes('Состав и шансы') || !/\d+(,\d)? %/.test(h)) fail(k2 + ': лист «Состав и шансы» пустой');
+          if (h.includes(fb.name)) fail(k2 + ': лист шансов называет врага');
+          if (S.bag.chests.length !== chs) fail(k2 + ': просмотр шансов выдал сундук');
+        }
+        S.overlay = null; S.echo.sel = i; S.route = 'echo';
         const ch0 = S.bag.chests.length, tr0 = fb.trophy ? BAG.qty(fb.trophy) : 0, gold0 = S.wallet.gold, sh0 = JSON.stringify(S.rs.shards), dust0 = S.wallet.dust;
         if (!kill(k2, i)) continue;
         if (fb.trophy && BAG.qty(fb.trophy) !== tr0 + fb.trophies) fail(k2 + ': нет трофея');
         if (fb.gold && S.wallet.gold !== gold0 + fb.gold) fail(k2 + ': золото не зачислено');
-        if (fb.workerBoxRarity) {
-          const ch = S.bag.chests[S.bag.chests.length - 1];
-          if (S.bag.chests.length !== ch0 + 1 || ch.box !== 'craft' || ch.r !== fb.workerBoxRarity) fail(k2 + ': нет сундука крафтового босса');
-          else { try { EnLoot.resolve(LBX, ch); } catch (x2) { fail(k2 + ': сундук не открывается — ' + x2.message); } out.chests++; }
+        /* сундук за победу — по модели призванных врагов (EN_LOOTBOXES.summon): вид, редкость, окно, цикл пула, неделя у Лика, сид от боя */
+        const rule = E.chest(fb, x.race, c), got = S.bag.chests.slice(ch0);
+        if (!LBX.summon || !LBX.summon.bosses[fb.id]) fail(k2 + ': у призванного врага нет сундука в EN_LOOTBOXES.summon');
+        if (!rule) { if (got.length) fail(k2 + ': сундук без правила модели'); }
+        else {
+          if (got.length !== rule.n) fail(`${k2}: сундуков ${got.length}, по модели — ${rule.n}`);
+          for (const ch of got) {
+            if (ch.box !== rule.box || ch.r !== rule.r || (ch.win || 'step') !== rule.win || ch.cyc !== rule.cyc || (rule.box === 'shards' && ch.week !== x.race)) fail(`${k2}: сундук ${ch.box}/${ch.r}/${ch.win}/${ch.cyc} — не по модели ${rule.box}/${rule.r}/${rule.win}/${rule.cyc}`);
+            if (!Number.isInteger(ch.seed)) fail(k2 + ': у сундука нет сида от боя');
+            try { EnLoot.resolve(LBX, ch); } catch (x2) { fail(k2 + ': сундук не открывается — ' + x2.message); }
+            out.chests++;
+          }
+          /* Лик недели — сундуком осколков своей недели: прямых осколков и праха нет */
+          if ((fb.heroShardsWeekBp || fb.heroShardsWeek) && (sh0 !== JSON.stringify(S.rs.shards) || S.wallet.dust !== dust0)) fail(k2 + ': Лик недели заплатил осколками мимо сундука');
         }
-        if (fb.heroShardsWeekBp || fb.heroShardsWeek) {   // Лик недели: осколки одного героя недели — ровно likShards цикла (или прах за них)
-          const want = E.likShards(c, fb), got = S.ech.last && S.ech.last.loot.find(l => l.k === 'shards');
-          const open = (RS.weeks.find(v => v.race === x.race) || w).squad.map(id => RSI[id]).filter(h => h && h.c <= c);
-          if (!want) fail(k2 + ': Лик недели платит 0 осколков');
-          else if (open.length && (!got || got.n !== want)) fail(`${k2}: Лик недели дал ${got ? got.n : 0} осколков, а по правилам — ${want}`);
-          else if (open.length && sh0 === JSON.stringify(S.rs.shards) && S.wallet.dust === dust0) fail(k2 + ': осколки Лика не легли в коллекцию и не ушли в прах');
-        }
+        /* повтор номера последней атаки — второго сундука нет */
+        ACT.echatk(x.uid + ':' + x.atk); if (S.bag.chests.length !== ch0 + got.length) fail(k2 + ': повтор атаки выдал второй сундук');
         h = draw(); scan(k2 + ' · победа', h);
         if (!h.includes(fb.name)) fail(k2 + ': итог победы не назвал босса');
+        if (rule && (!h.includes('data-a="echopenbox"') || !h.includes(LBX.boxes[rule.box].n))) fail(k2 + ': итог победы не показывает сундук и «Открыть»');
+        /* бестиарий: побеждённый призванный враг — «За победу» с сундуком */
+        if (rule) { ACT.echfoe(fb.id); h = draw(); scan(k2 + ' · бестиарий', h); if (!h.includes('За победу') || !h.includes('data-a="echbox"')) fail(k2 + ': бестиарий не показывает сундук за победу'); }
+        /* «Открыть» из итога — в запасах окном сундука: этот сундук открыт, вкладка «Сундуки», повтор не выдаёт */
+        if (rule && got.length && w === RS.weeks[0]) {
+          S.overlay = { t: 'echres', arg: (S.runs.find(r => r.kind === 'echo') || {}).id }; const id0 = got[0].id, n0 = S.bag.chests.length;
+          ACT.echopenbox(id0);
+          if (BAG.chest(id0) || S.bag.chests.length !== n0 - 1) fail(k2 + ': «Открыть» не открыло сундук этой победы');
+          if (S.route !== 'craft' || zpV().tab !== 'chest' || !S.overlay || S.overlay.t !== 'co') fail(k2 + ': «Открыть» — не в запасах окном сундука');
+          scan(k2 + ' · окно сундука', draw());
+          const w0 = JSON.stringify(S.wallet); ACT.echopenbox(id0);
+          if (S.bag.chests.length !== n0 - 1 || JSON.stringify(S.wallet) !== w0) fail(k2 + ': повтор «Открыть» выдал второй раз');
+          out.opened = (out.opened || 0) + 1;
+        }
       }
 
       /* Многоликий из запасов — биом Многоликого своей недели в слот биомов (ADR-0025): души не тратятся, попытка одна,
@@ -389,6 +430,8 @@ const t0 = Date.now();
 let res;
 try { res = vm.runInContext('(' + suite.toString() + ')()', ctx); } catch (e) { err.push('сценарии: ' + (e.stack || e.message)); done(); }
 err.push(...res.errors);
+/* данные recipes.js (сосед): описание или пометка Этриона у предмета призыва называют врага до призыва (§12.5) — предупреждение */
+if (res.leak) for (const [id, why] of Object.entries(res.leak)) warn.push(`recipes.js, ${id}: ${Object.keys(why).join('; ')} — правка текста предмета у сборщика рецептов`);
 /* портреты врагов крафта Этриона (ECH.craftArt, tools/art-gen/jobs/craft-bosses.json): у каждого — выгруженный файл и портрет в облике;
    пробуждённый без своего — портрет своего босса; эхо боссов биомов 1–4 — портреты боссов биомов; прочие крафтовые — заглушка без картинки */
 {
@@ -413,7 +456,7 @@ err.push(...res.errors);
     console.log(`Портреты врагов крафта: ${A.art.length} (пробуждённых — по портрету своего босса: ${A.aw.length}), без портрета — ${A.none.length}.`);
   }
 }
-console.log(`Эхо проверено за ${Math.round((Date.now() - t0) / 1000)} с: экранов ${res.screens}, листов ${res.sheets}, вариантов призыва ${res.offers}, побед ${res.kills}, крафтовых боссов ${res.calls}, Многоликих ${res.many}, руин ${res.ruins}, сундуков ${res.chests}, оценок до призыва ${res.ests}.`);
+console.log(`Эхо проверено за ${Math.round((Date.now() - t0) / 1000)} с: экранов ${res.screens}, листов ${res.sheets}, вариантов призыва ${res.offers}, побед ${res.kills}, крафтовых боссов ${res.calls}, Многоликих ${res.many}, руин ${res.ruins}, сундуков ${res.chests}, открыто из итога ${res.opened || 0}, оценок до призыва ${res.ests}.`);
 done();
 
 function done() {

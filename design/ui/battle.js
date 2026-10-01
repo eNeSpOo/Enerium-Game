@@ -16,8 +16,10 @@
    - длительность эффектов — в ходах носителя, то есть в раундах;
    - после последнего раунда — «Время скоротечно…»: этаж не взят, как при пределе времени в прежней модели.
    Числа модели — в RULES.rounds. Режим по умолчанию — 'rounds'.
-   Раундов в бою — по типу боя, одна таблица на все режимы: RULES.rounds.by (решение автора 29.09.2026, заменяет «10 раундов»):
-   этаж с рядовыми — 5, с элитой — 10, с боссом — 20, рунный босс — 25, Убер — 50, забытый босс — 75, клановый — 100, PvP — 25.
+   Раундов в бою — по типу боя, одна таблица на все режимы: RULES.rounds.by (решение автора 29.09.2026, заменяет «10 раундов»;
+   числа — слово автора 01.10.2026): этаж с рядовыми — 10, с элитой — 15, с боссом — 20, рунный босс — 25, Убер — 30,
+   клановый — 35, Забытый — 50 (высшая ступень, выше кланового босса; Многоликий — один из Забытых), PvP — 25.
+   «Так меньше рандома и больше всё зависит от силы пачки»: промах в коротком бою с пятью рядовыми больше не решает исход.
    Осада (решение автора 29.09.2026): враг, которого бьют за несколько попыток, приходит в попытку с остатком здоровья — этот остаток
    и есть его максимум в попытке (RULES.siege); лечение, доли от максимума и пороги — от него, прежний максимум — max0.
    Способности модели «10 раундов» — из общей библиотеки (ADR-0015): выгрузка abilities.js, наборы героев и врагов — kits.js (ADR-0016).
@@ -70,18 +72,19 @@ const RULES = {
   act: { attack: 900, cast: 1300, mass: 1700, ult: 2400, skip: 600 },  // сколько действие идёт на экране; раньше карта снова не ходит
   floor: { limitMs: { o: 150000, e: 240000, b: 360000 }, gapMs: 2500 }, // предел боя этажа и переход к следующему, мс
   rounds: {                             // модель раундов (ADR-0010)
-    /* раундов в бою — по типу боя, одна таблица на все режимы (решение автора 29.09.2026, заменяет «10 раундов» ADR-0010):
-       чем достойнее враг, тем дольше бой. Этаж биома — по старшему врагу колоды (FLOORS: g), Эхо — по главному врагу (echo.kind),
-       клан, Арена и Лига — своим ключом. После последнего раунда — «Время скоротечно…» */
+    /* раундов в бою — по типу боя, одна таблица на все режимы (решение автора 29.09.2026, заменяет «10 раундов» ADR-0010;
+       числа — слово автора 01.10.2026, прежде 5 / 10 / 20 / 25 / 50 / 75 / 100): чем достойнее враг, тем дольше бой.
+       Этаж биома — по старшему врагу колоды (FLOORS: g), Эхо — по главному врагу (echo.kind), клан, Арена и Лига — своим ключом.
+       Строка вместо числа — ссылка на другой тип: одно число в данных, а не два. После последнего раунда — «Время скоротечно…» */
     by: {
-      o: 5,                             // этаж только с рядовыми; рядовой Эхо
-      e: 10,                            // этаж с элитой; элита Эхо; элита кланового босса со свитой
+      o: 10,                            // этаж только с рядовыми; рядовой Эхо
+      e: 15,                            // этаж с элитой; элита Эхо; элита кланового босса со свитой
       b: 20,                            // этаж с боссом биома; босс Эхо
       rune: 25,                         // рунный босс — страж, на всех циклах (ADR-0020)
-      uber: 50,                         // Убер-босс Эхо
-      many: 10,                         // Многоликий — лёгкий бой один на один с набором элиты: как элита (решение исполнителя 29.09.2026)
-      forgotten: 75,                    // крафтовый «забытый» босс, призванный с ресурсов
-      clan: 100,                        // клановый босс
+      uber: 30,                         // Убер-босс Эхо
+      clan: 35,                         // клановый босс
+      forgotten: 50,                    // Забытый — высшая ступень, выше кланового босса: призыв с активируемого ресурса рецепта
+      many: 'forgotten',                // Многоликий — один из Забытых (слово автора 01.10.2026): раундов — как у Забытого
       pvp: 25,                          // Арена и Лига — каждый бой
     },
     base: 'e',                          // бой без своего типа — как этаж с элитой
@@ -109,9 +112,16 @@ const RULES = {
   valorPct: 30,                         // доблесть: +30 % к пяти базовым характеристикам за ступень, накопительно — пять ступеней ×3,7 (§3.3, §10.2, ADR-0016);
                                         // одно число на прототип и калькуляторы: INV.hero.valorPct прототипа берёт его отсюда
   basicAllPct: 100,                     // обычная атака по всем (basicAll: true) — доля главного стата по каждой цели, %
+  levelExp: [12, 10],                   // дух за уровень n — ⌈n^(12/10)⌉ (§9.3, «ручка темпа»): одно правило на прототип и калькуляторы,
+                                        // показатель — тот же, что LEVEL_EXP в tools/content-gen/economy/economy.py (сверяет start/build.js)
 };
-/* раундов в бою по типу боя — только из таблицы RULES.rounds.by; неизвестный тип — как бой без типа (base) */
-const roundsOf = kind => RULES.rounds.by[kind] || RULES.rounds.by[RULES.rounds.base];
+/* раундов в бою по типу боя — только из таблицы RULES.rounds.by; строка — ссылка на другой тип (Многоликий → Забытый);
+   неизвестный тип — как бой без типа (base) */
+function roundsOf(kind) {
+  let v = RULES.rounds.by[kind];
+  for (let i = 0; typeof v === 'string' && i < 4; i++) v = RULES.rounds.by[v];
+  return Number.isInteger(v) ? v : RULES.rounds.by[RULES.rounds.base];
+}
 /* прежние имена для экранов и калькуляторов — выборки из той же таблицы, своих чисел у них нет */
 RULES.rounds.rune = roundsOf('rune');
 RULES.echo.rounds = Object.fromEntries(Object.entries(RULES.echo.kind).map(([g, k]) => [g, roundsOf(k)]));
@@ -249,8 +259,11 @@ function floorSeed(biomeSeed, floor) { return mix32((biomeSeed ^ Math.imul(floor
    foeHpPct — здоровье врагов биома, % от их hpPct: этажи и свита стража; bossHpPct и guardHpPct — здоровье босса и стража этого биома. */
 const BIOMES = {
   b1: { n: 1, cycle: 1, name: 'Мастерская форм', seed: seedOf('Мастерская форм'), floors: FLOORS_TUTOR,
-    // босс — 675 %: бой с ним 20 раундов, и пара берёт его с 40-го уровня, как прежде при 10 раундах и 400 % (с 39-го), — дольше, а не проще
-    foeLvl: { base: 1, perFloor: 1 }, foeHpPct: 50, bossHpPct: 675, guardHpPct: 175, siege: false,
+    // Старт с чистого листа (01.10.2026, tools/content-gen/start): босс — 550 % (было 675 %), пара берёт его с 29-го уровня (было с 33-го):
+    // первый час — три забега и страж, 8 минут боя при коридоре 7–10. Мастер — 90 % (было 175 %): при 175 % пара брала его с 41-го,
+    // но на 46–52-м снова проигрывала — удары стража съедали раунды (ADR-0020), бой упирался в «Время скоротечно». С 90 % пара берёт
+    // его с 30-го, с доблестью бойца — с 21-го, и выше — только победы: start/build.js сверяет до 160-го уровня
+    foeLvl: { base: 1, perFloor: 1 }, foeHpPct: 50, bossHpPct: 550, guardHpPct: 90, siege: false,
     // рунный страж обучения — три карты (ADR-0018): Мастер и две элиты, по силам двум героям. Подмастерье бьёт, Мех — по всем
     guard: { g: 'r', m: ['g1', 'e1', 'e4'] } },
   // образец длинного биома цикла II — для калькулятора экономики; сид прежней Мастерской, чтобы прогоны были сравнимы
@@ -616,6 +629,18 @@ function valorSt(st, v, pct) {
 /* Источник героя с доблестью — как у «сервера» прототипа (index.html оборачивает heroSrc тем же правилом): калькуляторы зовут его,
    чтобы прогоны и прототип считали героя одинаково. Снаряжение и талисманы — слои экранов, в прогоны не входят */
 function heroSrcValor(h) { const s = heroSrc(h); return h.valor ? Object.assign({}, s, { st: valorSt(h.st, h.valor) }) : s; }
+/* Дух за уровень n (с n − 1 на n): ⌈n^(p/q)⌉ — целый корень q-й степени из n^p, без дробей (§9.3; RULES.levelExp). Уровень 1 стоит 1 духа,
+   50-й — 110; от нуля до 50-го — 2 562. Прототип (index.html, lvlCost) и калькуляторы (economy.py, biomes/sim.js) считают по этому правилу */
+const LVL_MEMO = new Map();
+function levelCost(n) {
+  if (!(n >= 1)) return 0;
+  let c = LVL_MEMO.get(n); if (c != null) return c;
+  const [p, q] = RULES.levelExp, x = BigInt(n) ** BigInt(p);
+  let lo = 0n, hi = 1n; while (hi ** BigInt(q) < x) hi *= 2n;
+  while (lo < hi) { const m = (lo + hi) / 2n; if (m ** BigInt(q) >= x) hi = m; else lo = m + 1n; }
+  c = Number(lo); LVL_MEMO.set(n, c);
+  return c;
+}
 function foeSrc(id, lvl, k, lead, hp, hpPct) {
   const f = FOES[id];
   return { key: id + '#' + k, id, name: f.name, cls: f.cls, el: f.el, lvl, st: f.st, race: f.race,
@@ -1317,5 +1342,5 @@ function simRun(heroes, biome, siegeHp, mode) {
   return { floors, runMs, bossHp };
 }
 
-root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, FLOORS_TUTOR, BIOMES, lib: lib2, addLib, addFoes, addBiome, kitTable, GOOD_ST, SKIP_ST, seedOf, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, carry, simRun, guardBattle, echoBattle, targetBattle, echoStats, foeMaxHp, roundsOf, valorSt, heroSrcValor, floorLoot, elemMul, ready, readyRound, order, chanceTable, pct, fxOf };
+root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, FLOORS_TUTOR, BIOMES, lib: lib2, addLib, addFoes, addBiome, kitTable, GOOD_ST, SKIP_ST, seedOf, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, carry, simRun, guardBattle, echoBattle, targetBattle, echoStats, foeMaxHp, roundsOf, valorSt, heroSrcValor, levelCost, floorLoot, elemMul, ready, readyRound, order, chanceTable, pct, fxOf };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -252,6 +252,12 @@ const out = (hid, slot) => { cnt.ops++; return T.TL_SRV.out(`tl${S().tal.seq}`, 
     hs = T.EB.carry(hs, b);
     if (cov['tal.' + heart] && cov['tal.' + banner]) break;
   }
+  /* «Знаменосец» — первый удар по герою в бою. С 01.10.2026 Мастерская слабее (босс 550 %, сценарий старта): демо-отряд проходит её,
+     не пропустив по первому герою ни удара, — тогда этажи образца цикла II, пока не сработает */
+  if (!cov['tal.' + banner]) {
+    const hs2 = squad(), B2 = T.EB.BIOMES.c2, n = B2 ? B2.floors.length : 0;
+    for (let f = 1; f <= n && !cov['tal.' + banner]; f++) { const b = T.EB.run(T.EB.floorBattle(hs2, 'c2', f, null, 'rounds')); cnt.fights++; if (b.cov['tal.' + banner]) cov['tal.' + banner] = b.cov['tal.' + banner]; }
+  }
   if (!cov['tal.' + banner]) say('бой: «Щит павшего знаменосца» не сработал ни разу');
   /* щит «Сердца»: в обучении по танку попадают редко — вневременное «Сердце», 10 %, на этажах образца цикла II, пока не сработает */
   if (!cov['tal.' + heart]) {
@@ -260,7 +266,7 @@ const out = (hid, slot) => { cnt.ops++; return T.TL_SRV.out(`tl${S().tal.seq}`, 
     for (let f = 1; f <= n && !cov['tal.' + top]; f++) { const b = T.EB.run(T.EB.floorBattle(hs2, 'c2', f, null, 'rounds')); cnt.fights++; if (b.cov['tal.' + top]) cov['tal.' + top] = b.cov['tal.' + top]; }
     if (!cov['tal.' + top]) say('бой: «Сердце Кароксорра» не дало щита ни в одном бою');
   }
-  if (!farm || farm.spiritPct !== TL.fams.vessel.v[0]) say(`бой: «Сосуд шёпотов» не прибавил духа в добыче этажа — ${farm && farm.spiritPct}`);
+  if (!farm || farm.spiritPct !== TL.fams.vessel.v[0]) say(`бой: «${TL.fams.vessel.n}» не прибавил духа в добыче этажа — ${farm && farm.spiritPct}`);
   /* доля способностей: «Беглое слово» */
   reset();
   const fw = byFam('firstword', 6); T.TB.add(fw);

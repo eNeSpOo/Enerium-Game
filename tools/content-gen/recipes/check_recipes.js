@@ -96,6 +96,10 @@ for (const it of R.items) {
   }
   ok(`${it.id}: Этрион в подсказке называет себя`, !/Этрион/.test(it.hint || ''));
 }
+/* §12.5 и правило подсказок Этриона («цель называется узнаваемо, но не прямо»): пометка не называет крафтового босса или пробуждённого
+   по имени — до призыва его имя игроку не раскрывается (01.10.2026: 17 пометок называли боссов, переписаны намёками) */
+const BOSS_NAMES = (R.places || []).flatMap(p => [p.boss && p.boss.n, p.awake && p.awake.n]).filter(n => n && n.length >= 5);
+for (const it of R.items) if (!it.team) for (const n of BOSS_NAMES) if ((it.hint || '').includes(n)) err.push(`${it.id} · подсказка называет крафтового босса «${n}» до призыва (§12.5) — «${it.hint}»`);
 for (const p of R.places || []) if (!p.team) for (const t of [p.n, p.where, p.lore, p.boss.label, p.boss.lore]) for (const re of SPOIL) if (re.test(t || '')) err.push(`место ${p.id}: спойлер ${re} — «${t}»`);
 
 if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }

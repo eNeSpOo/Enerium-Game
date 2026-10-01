@@ -2,22 +2,26 @@
    Зачем: панель браузера в приложении скрыта, когда автор не смотрит, и её снимки устаревают; проверки считают вёрстку арифметикой
    и не видят, например, обрезанный текст. Этот инструмент снимает настоящий кадр устройства прототипа.
 
-   Запуск: node tools/ui-shots/shots.js <spec.json> <папка вывода> [порт]
-   - прототип должен отвечать на http://localhost:8765/ (сервер превью «ui-prototype» из .claude/launch.json);
-   - Chrome берётся из C:/Program Files/Google/Chrome/Application/chrome.exe, профиль — временный, во временной папке системы, профиль автора не трогается;
+   Запуск: node tools/ui-shots/shots.js <spec.json> <папка вывода> [порт Chrome] [адрес прототипа]
+   - адрес по умолчанию — http://localhost:8765/ (сервер превью «ui-prototype» из .claude/launch.json). Несколько агентов разом —
+     каждому свой порт Chrome и свой сервер прототипа (python -m http.server <порт> в design/ui), иначе общий сервер под нагрузкой
+     отказывает, а прогоны управляют одной вкладкой;
+   - Chrome берётся из C:/Program Files/Google/Chrome/Application/chrome.exe, профиль — временный, свой на каждый порт, во временной
+     папке системы; профиль автора не трогается;
    - если на порту уже есть безголовый Chrome, скрипт подключается к нему, иначе запускает свой и закрывает в конце.
    spec — массив кадров: [{ "name": "hb-skills", "dev": "932" | "844", "js": "…код состояния…; render();", "wait": 1800 }]
    Кадр — PNG устройства (.p-device) в deviceScaleFactor 2. Строка отчёта отмечает BAD-MARKUP, если в #game есть undefined, NaN или [object. */
 'use strict';
 const { spawn } = require('child_process');
 const fs = require('fs'), path = require('path');
-const [, , spec, outDir, portArg] = process.argv;
-if (!spec || !outDir) { console.log('node tools/ui-shots/shots.js <spec.json> <папка вывода> [порт]'); process.exit(2); }
+const [, , spec, outDir, portArg, urlArg] = process.argv;
+if (!spec || !outDir) { console.log('node tools/ui-shots/shots.js <spec.json> <папка вывода> [порт Chrome] [адрес прототипа]'); process.exit(2); }
 const shots = JSON.parse(fs.readFileSync(spec, 'utf8'));
 fs.mkdirSync(outDir, { recursive: true });
 const PORT = +portArg || 9333;
+const URL0 = urlArg || 'http://localhost:8765/';
 const CHROME = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
-const prof = path.join(require('os').tmpdir(), 'enerium-ui-shots-chrome');   // временный профиль вне репозитория
+const prof = path.join(require('os').tmpdir(), 'enerium-ui-shots-chrome-' + PORT);   // временный профиль вне репозитория, свой на порт
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let chrome = null;
 const spawnChrome = () => spawn(CHROME, [`--remote-debugging-port=${PORT}`, '--headless=new', '--window-size=1600,1000', '--hide-scrollbars',
@@ -44,7 +48,7 @@ async function target() {
        нагрузкой иногда отказывает в соединении — тогда страница без скриптов, и её грузим заново (до трёх раз) */
     let up = false;
     for (let t = 0; t < 3 && !up; t++) {
-      await cmd('Page.navigate', { url: 'http://localhost:8765/' });
+      await cmd('Page.navigate', { url: URL0 });
       for (let i = 0; i < 60; i++) { await sleep(500); if (await ev(`typeof S !== 'undefined' && typeof render === 'function' && !!document.querySelector('.p-device')`)) { up = true; break; } }
     }
     if (!up) throw new Error('прототип не поднялся за три загрузки');

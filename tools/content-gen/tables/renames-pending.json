@@ -1,0 +1,13 @@
+{
+  "note": "Отложенные переименования. 01.10.2026 все отложенные применены и перенесены в renames-2026-10-01.json; новые отложенные — сюда, в том же виде: { domain, id, was, now, why, where }. Применять в исходниках по полю where, затем пересборка по порядку tools/content-gen/README.md, check_spoilers.js и tables/build.py.",
+  "renames": [],
+  "texts": [],
+  "patches": [],
+  "bugs": [
+    {
+      "id": "myst14",
+      "what": "Достижение «Сам себе ключник» — «Создать рунные ключи в мастерской»: с ADR-0033 рецептов рунных ключей нет, достижение недостижимо.",
+      "where": "tools/content-gen/wanderer/achievements.js"
+    }
+  ]
+}

@@ -38,6 +38,11 @@
 .bf-st i{width:5px;height:5px;background:var(--ico-valor) center/contain no-repeat;opacity:.3}
 .bf-st i.on{opacity:1}
 
+/* лестница опасности — решения автора 01.10.2026: Забытый и Многоликий — вершина, выше Хозяина. Рамки-картинки 30.09 рисовались под
+   прежнюю лестницу: до нарисованных заново вершине — свет по контуру рамки */
+.bc.fr[data-bf="forgotten"] .face>.bf{filter:drop-shadow(0 0 2px rgba(255,196,96,.95)) drop-shadow(0 0 6px rgba(245,170,70,.65))}
+.bc.fr[data-bf="many"] .face>.bf{filter:drop-shadow(0 0 2px rgba(255,226,150,.95)) drop-shadow(0 0 6px rgba(221,188,122,.65))}
+
 /* легенда знаков: образцы рамок в строке «Рамка» */
 .bt-legend .ex.bf-lg{gap:3px}
 .bf-lg img{width:24px;height:auto;display:block}
@@ -49,3 +54,184 @@
 .bf-kit figcaption b{font:700 11px/1.2 var(--f-u);color:var(--parch-2)}
 .bf-kc{position:relative;width:124px;height:calc(var(--fh) + 40px)}
 .bf-kc>.bc{left:50%;margin-left:calc(var(--cw) / -2)}
+
+/* ================== вид карт: портрет — screens/battle-cards.js (BF_VIEW, bfPCard) ==================
+   Карта .bc.pt — портрет целиком, 464 : 576, вписан без обрезки. Рамка .pf — поверх кадра: тонкий металл в цветах ранга (--f1 — свет,
+   --f2 — тень), украшение ранга .pc сверху по центру и .pk в верхних углах (векторные рисунки BF_SPRITE, наружу — не дальше 2 px),
+   свет ранга --fx; самые опасные дышат светом (--fg). Состояния боя — цель, удар, выбор, ульта, лечение — кольцом и светом рамки.
+   Высота карты: полоса украшения --pcr, планка --pfw, портрет --ph, планка, 1 px, здоровье 5, 2, имя 10, 2, шансы 11 —
+   итого --pch = --ph + --pcr + 2 × --pfw + 31 px. Обычная карта — портрет --pw0 в ширину (поле .bt.pv: 84 px на 932 × 430, 68 — на
+   844 × 390), главная (.lead) — в --pk = 1,3 раза шире, рамка и украшение у неё крупнее.
+   Раскладка .bt.pv: шаг карты --pcol = --pw0 + две планки по 3 px + зазор 6; место — --px шагов от внешнего края поля и --py доли
+   свободной высоты (0 — верх, 1 — низ, .5 — середина): два ряда сходятся в поле 300 и 262 px. Очередь раунда — над верхним рядом между
+   отрядами, лента — между нижними рядами, две последние строки; главный враг кончается выше ленты. Проверка расчётом —
+   tools/content-gen/screens/check_battle_cards.js */
+.bc.pt{--pw:var(--pw0,84px);--pfw:3px;--pcr:6px;--pk:1;--ph:calc(var(--pw) * 576 / 464);--cw:calc(var(--pw) + 2 * var(--pfw));
+  --pch:calc(var(--ph) + var(--pcr) + 2 * var(--pfw) + 31px);width:var(--cw);padding-top:calc(var(--pcr) + var(--pfw));gap:0;isolation:isolate}
+.bc.pt.lead{--pk:1.3;--pw:calc(var(--pw0,84px) * var(--pk));--pfw:4px;--pcr:8px}
+.bc.pt .face{flex:none;width:var(--pw);height:var(--ph);margin:0 var(--pfw) var(--pfw);border:0;border-radius:0;overflow:visible;background:#0b0d10}
+.bc.pt .face,.bc.pt.aimed .face,.bc.pt.struck .face,.bc.pt.lead .face,.bc.pt.ready .face,.bc.pt.heal .face,.bc.pt.sel .face{box-shadow:none;border:0}
+/* портрет — целиком: кадр в пропорции портрета, картинка вписана; размытие «не изучен» не выходит за кадр */
+.bc.pt .face>img{display:block;width:100%;height:100%;object-fit:contain;clip-path:inset(0)}
+.bc.pt .face>.buffs,.bc.pt .face>.debuffs,.bc.pt .face>.ctl,.bc.pt .face>.fell{z-index:2}
+.bc.pt .face>.cls,.bc.pt .face>.tgt{z-index:3}
+/* эффекты — столбиком по краям портрета, лицо посередине свободно; много эффектов — второй столбик к середине, нижние углы — классу и «×N» */
+.bc.pt .face>.buffs,.bc.pt .face>.debuffs{flex-direction:column;justify-content:flex-start;max-width:none;max-height:calc(100% - 24px)}
+.bc.pt .face>.debuffs{flex-wrap:wrap-reverse}
+/* под рамкой: здоровье и щит — планкой, под ней имя и шансы */
+.bc.pt>.bar{order:1;margin-top:1px;height:5px;border-radius:1px}
+.bc.pt>.nm{order:2;margin-top:2px;text-align:center}
+.bc.pt>.rot{order:3;margin-top:2px;justify-content:center}
+/* контроль и «пал» — ниже середины портрета: на теле, не на лице */
+.bc.pt .ctl{place-items:end center;padding-bottom:calc(var(--ph) * .16);background:linear-gradient(180deg,rgba(10,8,6,0) 30%,rgba(10,8,6,.62))}
+.bc.pt .fell{top:auto;bottom:16%}
+/* метка героя: кристалл редкости в гнезде над серединой верхней планки, за ним звёзды доблести по планке; у соперника Арены — зеркально */
+.bc.pt>.bf-mk{--d:10px;position:absolute;z-index:4;display:flex;align-items:center;gap:2px;top:calc(var(--pcr) + var(--pfw) / 2);left:calc(50% - var(--d) / 2);transform:translateY(-50%)}
+.bc.pt.foe>.bf-mk{left:auto;right:calc(50% - var(--d) / 2);flex-direction:row-reverse}
+.bc.pt>.bf-mk>b{filter:drop-shadow(0 0 3px color-mix(in srgb,var(--rc) 75%,transparent))}
+.bc.pt .bf-st{filter:drop-shadow(0 1px 1px #000)}
+
+/* рамка CSS — портрет и квадрат. Лестница опасности (решения автора 01.10.2026): рядовой — голое железо; элита — уголки и свет; боссы
+   (биома, Эхо, Голос сонма) — двойная кромка; рунный страж — свет сильнее; Убер — дышит светом; Хозяин — свет ещё сильнее; вершина —
+   Забытый и Многоликий: тройная кромка и самый сильный свет */
+.pf{position:absolute;inset:calc(-1 * var(--pfw,3px));z-index:1;pointer-events:none;border:var(--pfw,3px) solid var(--f2,#1e2226);
+  border-image:linear-gradient(160deg,var(--f1,#6b7279),var(--f2,#1e2226) 40%,var(--f1,#6b7279) 64%,var(--f2,#1e2226)) 1;
+  box-shadow:0 0 0 1px #050607,inset 0 0 0 1px rgba(255,238,205,.1),0 9px 14px -8px #000,var(--fx,0 0 0 transparent)}
+.pf>.pc,.pf>.pk{position:absolute;top:calc(-1 * var(--pfw,3px) - 6px * var(--pk,1));overflow:visible}
+.pf>.pc{left:50%;width:calc(var(--pcw) * 1px * var(--pk,1));height:calc(14px * var(--pk,1));transform:translateX(-50%)}
+.pf>.pk{left:calc(-1 * var(--pfw,3px) - 2px * var(--pk,1));width:calc(10px * var(--pk,1));height:calc(9px * var(--pk,1))}
+.pf>.pk.r{left:auto;right:calc(-1 * var(--pfw,3px) - 2px * var(--pk,1));transform:scaleX(-1)}
+.pf::before{content:"";position:absolute;inset:calc(-1 * var(--pfw,3px) - 2px);pointer-events:none;opacity:0;--bk:color-mix(in srgb,var(--f1,#6b7279) 80%,#fff);
+  background:linear-gradient(var(--bk) 0 0) left bottom/7px 2px,linear-gradient(var(--bk) 0 0) left bottom/2px 7px,linear-gradient(var(--bk) 0 0) right bottom/7px 2px,linear-gradient(var(--bk) 0 0) right bottom/2px 7px;background-repeat:no-repeat}
+.pf::after{content:"";position:absolute;inset:calc(-1 * var(--pfw,3px));pointer-events:none;opacity:0;box-shadow:0 0 calc(12px * var(--pk,1)) 2px var(--fg,transparent)}
+[data-pf="hero"]{--f1:#b48a52;--f2:#33261a;--fx:0 7px 10px -6px rgba(72,229,212,.55)}
+[data-pf="o"]{--f1:#6b7279;--f2:#1e2226}
+[data-pf="e"]{--f1:#857867;--f2:#201c18;--fx:0 0 7px -1px rgba(240,150,60,.5)}
+[data-pf="voice"]{--f1:#7b97cf;--f2:#18243f;--fx:0 0 0 2px #070b14,0 0 0 3px #3d5688,0 0 10px 1px rgba(90,140,255,.5)}
+[data-pf="b"]{--f1:#b8a682;--f2:#2a2419;--fx:0 0 0 2px #0b0806,0 0 0 3px #6e6146,0 0 10px 1px rgba(255,90,40,.5)}
+[data-pf="echo"]{--f1:#88a88b;--f2:#1b2a22;--fx:0 0 0 2px #070d0a,0 0 0 3px #4f6a55,0 0 10px 1px rgba(110,230,170,.5)}
+[data-pf="many"]{--f1:#e0c98e;--f2:#2a2316;--fg:rgba(240,205,120,.85);--fx:0 0 0 2px #0b0a08,0 0 0 3px #8a7a52,0 0 0 4px #0b0a08,0 0 0 5px #c9a85e,0 0 16px 2px rgba(240,205,120,.55)}
+[data-pf="rune"]{--f1:#7aa09c;--f2:#182424;--fx:0 0 0 2px #061010,0 0 0 3px #3f6461,0 0 11px 1px rgba(72,229,212,.6)}
+[data-pf="uber"]{--f1:#6a7067;--f2:#101210;--fg:rgba(120,255,80,.75);--fx:0 0 0 2px #050705,0 0 0 3px #3b4a32,0 0 11px 1px rgba(120,255,80,.45)}
+[data-pf="forgotten"]{--f1:#d6aa5c;--f2:#2a2010;--fg:rgba(245,190,80,.85);--fx:0 0 0 2px #0c0904,0 0 0 3px #7a5c2c,0 0 0 4px #0c0904,0 0 0 5px #c08a3a,0 0 16px 2px rgba(245,190,80,.55)}
+[data-pf="host"]{--f1:#dfe7f0;--f2:#303a46;--fg:rgba(110,175,255,.85);--fx:0 0 0 2px #070a0e,0 0 0 3px #7d8a99,0 0 14px 2px rgba(90,160,255,.6)}
+[data-pf="e"] .pf::before,[data-pf="voice"] .pf::before,[data-pf="b"] .pf::before,[data-pf="echo"] .pf::before,[data-pf="many"] .pf::before,[data-pf="rune"] .pf::before,
+[data-pf="uber"] .pf::before,[data-pf="forgotten"] .pf::before,[data-pf="host"] .pf::before{opacity:1}
+/* герой — уголки книги во всех четырёх углах */
+[data-pf="hero"] .pf::before{opacity:1;background:linear-gradient(var(--bk) 0 0) left top/7px 2px,linear-gradient(var(--bk) 0 0) left top/2px 7px,linear-gradient(var(--bk) 0 0) right top/7px 2px,linear-gradient(var(--bk) 0 0) right top/2px 7px,
+  linear-gradient(var(--bk) 0 0) left bottom/7px 2px,linear-gradient(var(--bk) 0 0) left bottom/2px 7px,linear-gradient(var(--bk) 0 0) right bottom/7px 2px,linear-gradient(var(--bk) 0 0) right bottom/2px 7px;background-repeat:no-repeat}
+/* Убер, Хозяин, Забытый и Многоликий дышат светом: только opacity; «меньше движения» — свет ровный */
+[data-pf="uber"] .pf::after,[data-pf="host"] .pf::after,[data-pf="forgotten"] .pf::after,[data-pf="many"] .pf::after{opacity:.55;animation:pfBreath 2.6s ease-in-out infinite alternate}
+@keyframes pfBreath{from{opacity:.2}to{opacity:.9}}
+@media (prefers-reduced-motion:reduce){ [data-pf] .pf::after{animation:none} }
+/* состояния боя — кольцом и светом рамки */
+.bc.pt.aimed .pf,.bc.sq.aimed .pf{box-shadow:0 0 0 1px #ff5a44,0 0 12px -1px rgba(255,90,68,.85)}
+.bc.pt.struck .pf,.bc.sq.struck .pf{box-shadow:0 0 0 2px #ff7a5c,0 0 18px 1px rgba(255,90,68,.9)}
+.bc.pt.ready .pf,.bc.sq.ready .pf{box-shadow:0 0 0 1px var(--spirit),0 0 16px -2px var(--spirit)}
+.bc.pt.heal .pf,.bc.sq.heal .pf{box-shadow:0 0 0 1px #6fe3a0,0 0 14px -3px #6fe3a0}
+.bc.pt.sel .pf,.bc.sq.sel .pf{box-shadow:0 0 0 2px var(--gold),0 0 16px -2px var(--gold)}
+
+/* поле боя в виде «портрет»: два ряда, шаг карты, место по --px и --py; очередь и лента — между отрядами */
+.bt.pv{--pw0:84px;--pcol:calc(var(--pw0) + 12px)}
+@container main (max-height: 360px){ .bt.pv{--pw0:68px} }
+.bt.pv .bt-side{width:calc(50% - 12px)}   /* отряд — половина поля: место карты --px считается от внешнего края */
+.bt.pv .bc{top:calc(var(--py) * (100% - var(--pch)))}
+.bt.pv .bt-side.h .bc{left:calc(var(--px) * var(--pcol))}
+.bt.pv .bt-side.f .bc{right:calc(var(--px) * var(--pcol))}
+.bt.pv .bt-queue{left:calc(2 * var(--pcol) + var(--pw0) + 24px);right:calc(2 * var(--pcol) + var(--pw0) + 24px)}
+.bt.pv .bt-feed{left:calc(1.5 * var(--pcol) + var(--pw0) + 24px);right:calc(1.5 * var(--pcol) + var(--pw0) + 24px)}
+.bt.pv .bt-feed p:nth-last-child(n+3){display:none}
+/* легенда «Знаки» и карточка бойца не выходят за поле боя: длинные — с прокруткой (и в прежнем виде: на 844 × 390 легенда длиннее поля) */
+.bt-field>.bt-legend,.bt-field>.bt-insp{max-height:100%;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#2c3238 transparent}
+/* портрет: карточка бойца ложится на противоположный отряд — выбранная карта и её кольцо остаются на виду */
+.bt.pv:has(.bt-side.f .bc.sel) .bt-insp{left:12px;right:auto;width:min(440px,calc(100% - 24px))}
+.bt.pv:has(.bt-side.h .bc.sel) .bt-insp{left:auto;right:12px;width:min(440px,calc(100% - 24px))}
+
+/* легенда: маленькие портретные рамки — образцы; строка «Вид карт» — команде */
+.bf-pm{position:relative;display:inline-block;flex:none;width:14px;height:17px;margin:5px 4px 1px;background:linear-gradient(180deg,#1b1f23,#0b0d10);--pfw:2px;--pk:.55}
+.bf-pm>.pf{box-shadow:0 0 0 1px #050607,var(--fx,0 0 0 transparent)}
+.bf-pm.sq{height:14px}
+.bt-legend .ex.bf-vw{gap:4px}
+.bt-legend .bf-vw .btn[aria-pressed="true"]{color:var(--spirit);border-color:rgba(72,229,212,.45)}
+
+/* UI-кит: карта-портрет в ячейке; сцена одного вида — поле прототипа без шапки и шахты (контейнер main, как .g-main), в масштабе --z */
+.bf-kc.pv,.bf-kc.sv{height:auto;display:flex;justify-content:center}
+.bf-kc.pv>.bc,.bf-kc.sv>.bc{position:relative;left:auto;top:auto;margin:0}
+.bf-cmp{display:flex;flex-wrap:wrap;gap:12px}
+.bf-sco{flex:none;width:calc(var(--sw) * var(--z));height:calc(var(--sh) * var(--z));overflow:hidden;border-radius:10px;border:1px solid var(--iron)}
+.bf-scw{position:relative;width:var(--sw);height:var(--sh);transform:scale(var(--z));transform-origin:0 0;container:main/size}
+.bf-stl{position:absolute;left:14px;top:14px;z-index:3;font:700 13px/1 var(--f-u);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-2);text-shadow:0 1px 3px #000}
+
+/* ================== вид карт: квадрат — screens/battle-cards.js (BF_SQ, BF_FACES, bfSCard) ==================
+   Карта .bc.sq — квадрат 1 : 1 в прежней расстановке колонками: место — --k и --r из SLOT (index.html), ряд — доля свободной высоты
+   поля (--r / 2: 0 — верх, .5 — середина, 1 — низ). Сторона портрета --sp: 80 px на 932 × 430 и 68 — на 844 × 390 (BF_SQ.size),
+   главный враг (.lead) — в 1,15 раза больше (BF_SQ.lead), рамка и украшение у него крупнее (--sk).
+   Высота карты --sch: украшение над рамкой 5 px × --sk, планка 3, портрет, нижняя планка — полоса здоровья и щита 5 px: колонка из трёх
+   карт с главным встаёт в поле 300 и 262 px. Портрет — срез по лицу: object-position по высоте из BF_FACES (--fy, тысячные хода).
+   Сведения: эффекты — столбиком по краям от верха, «×N» — на верхнем левом углу рамки; внизу, на теле, полоса --sbt: имя в одну-две строки
+   (--nll, --nls; длинное — кеглем меньше, --nfl, --nfs, самое длинное — и теснее, --ntl, --nts),
+   под ним шансы в один-два ряда (--crl, --crs) и знак класса справа; контроль — знак на верхней планке; «пал» — на месте шансов.
+   Проверка расчётом — tools/content-gen/screens/check_battle_cards.js */
+.bt.sv{--sp0:80px}
+@container main (max-height: 360px){ .bt.sv{--sp0:68px} }
+.bc.sq{--sk:1;--sp:var(--sp0,80px);--pfw:3px;--pcr:5px;--pk:var(--sk);--shp:5px;--slh:10px;--sfs:calc(var(--nfl,10) * 1px);--sls:calc(var(--ntl,0) * .01px);--snl:var(--nll,1);--snc:var(--crl,1);
+  --sch:calc(var(--pcr) * var(--sk) + var(--pfw) + var(--sp) + var(--shp));
+  --scc:calc(var(--snc) * 11px + (var(--snc) - 1) * 2px);
+  --sbt:calc(2px + var(--scc) + 2px + var(--snl) * var(--slh) + 2px);
+  display:block;width:calc(var(--sp) + 2 * var(--pfw));height:var(--sch);padding-top:calc(var(--pcr) * var(--sk) + var(--pfw));gap:0;isolation:isolate}
+.bc.sq.lead{--sk:1.15;--sp:calc(var(--sp0,80px) * 1.15)}
+@container main (max-height: 360px){ .bc.sq{--slh:9px;--sfs:calc(var(--nfs,9) * 1px);--sls:calc(var(--nts,0) * .01px);--snl:var(--nls,1);--snc:var(--crs,1)} }
+.bt.sv .bc{top:calc(var(--r) / 2 * (100% - var(--sch)))}
+.bc.sq .face{flex:none;width:var(--sp);height:var(--sp);margin:0 var(--pfw);border:0;border-radius:0;overflow:visible;background:#0b0d10}
+.bc.sq .face,.bc.sq.aimed .face,.bc.sq.struck .face,.bc.sq.lead .face,.bc.sq.ready .face,.bc.sq.heal .face,.bc.sq.sel .face{box-shadow:none;border:0}
+/* срез по лицу: портрет во всю ширину квадрата, по высоте — из данных; размытие «не изучен» не выходит за кадр */
+.bc.sq .face img{object-fit:cover!important;object-position:50% calc(var(--fy, 300) * .1%)!important;clip-path:inset(0)}
+.bc.sq .face>.pf{bottom:calc(-1 * var(--shp));border-bottom-width:0}
+/* полоса сведений внизу, на теле: тьма снизу, лицо выше неё */
+.bc.sq .face::before{content:"";position:absolute;left:0;right:0;bottom:0;z-index:1;height:calc(var(--sbt) + 10px);pointer-events:none;
+  background:linear-gradient(180deg,rgba(5,6,8,0),rgba(5,6,8,.62) 38%,rgba(5,6,8,.9))}
+.bc.sq .face>.buffs,.bc.sq .face>.debuffs,.bc.sq .face>.fell{z-index:2}
+.bc.sq .face>.cls,.bc.sq .face>.tgt{z-index:3}
+/* эффекты — столбиком по краям от верха до полосы; лишние — вторым столбиком к середине. «×N» — на верхнем левом углу рамки: в портрет
+   заходит только угол над головой; полезные — под ним */
+.bc.sq .face>.buffs,.bc.sq .face>.debuffs{flex-direction:column;justify-content:flex-start;gap:2px;max-width:none;max-height:calc(var(--sp) - var(--sbt) - 5px)}
+.bc.sq .face>.debuffs{flex-wrap:wrap-reverse}
+.bc.sq .si{width:15px;height:15px}
+.bc.sq .si .i{width:9px;height:9px}
+.bc.sq .face>.tgt{left:calc(-1 * var(--pfw) - 1px);top:calc(-1 * var(--pfw) - 1px);bottom:auto;box-shadow:0 0 0 1px rgba(5,6,8,.9)}
+.bc.sq.many .face>.buffs{top:14px;max-height:calc(var(--sp) - var(--sbt) - 16px)}
+/* знак класса — справа в ряду шансов */
+.bc.sq .face>.cls{right:var(--pfw);bottom:2px}
+.bc.sq .cls .ico{width:15px;height:15px}
+.bc.sq .cls .i{width:15px;height:15px;padding:2px}
+/* имя — над шансами, целиком в одну-две строки */
+.bc.sq>.nm{position:absolute;z-index:2;left:calc(var(--pfw) + 2px);right:calc(var(--pfw) + 2px);bottom:calc(var(--shp) + 2px + var(--scc) + 2px);
+  font-size:var(--sfs);line-height:var(--slh);letter-spacing:var(--sls);text-align:center;white-space:normal;text-overflow:clip;overflow:hidden;
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;max-height:calc(2 * var(--slh));text-shadow:0 1px 2px #000,0 0 4px #000}
+/* шансы — у низа портрета, место знака класса справа */
+.bc.sq>.rot{position:absolute;z-index:2;left:calc(var(--pfw) + 2px);right:calc(var(--pfw) + 19px);bottom:calc(var(--shp) + 2px);height:auto;min-height:11px;
+  flex-wrap:wrap-reverse;align-content:flex-start;justify-content:flex-start;gap:2px}
+.bc.sq>.rot .ch{width:17px;justify-content:center;padding:0;gap:0;font-size:8px}   /* шанс — ровно BF_SQ.chip.w: по нему считаются ряды */
+.bc.sq>.rot .ch .i{width:8px;height:8px}
+/* здоровье и щит — нижняя планка рамки */
+.bc.sq>.bar{position:absolute;z-index:2;left:var(--pfw);right:var(--pfw);bottom:0;height:var(--shp);border-radius:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.55)}
+/* контроль — знак на верхней планке, поверх украшения; метка героя на это время уходит */
+.bc.sq .face>.ctl{inset:auto;left:50%;top:calc(var(--pfw) / -2);z-index:4;width:15px;height:15px;transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle,#3a2a10,#140e06);box-shadow:0 0 0 1px #ffd08a,0 0 8px rgba(255,208,138,.75)}
+.bc.sq .face>.ctl .i{width:9px;height:9px;stroke-width:2.4;filter:none}
+.bc.sq.ctl-on>.bf-mk{opacity:0}
+/* «пал» — на месте шансов: у павшего их нет */
+.bc.sq .fell{top:auto;bottom:2px;left:2px;right:2px;padding:1px 0;font-size:9px}
+/* метка героя: кристалл редкости в гнезде над серединой верхней планки, за ним звёзды доблести; у соперника Арены — зеркально */
+.bc.sq>.bf-mk{--d:10px;position:absolute;z-index:4;display:flex;align-items:center;gap:2px;top:calc(var(--pcr) * var(--sk) + var(--pfw) / 2);left:calc(50% - var(--d) / 2);transform:translateY(-50%)}
+.bc.sq.foe>.bf-mk{left:auto;right:calc(50% - var(--d) / 2);flex-direction:row-reverse}
+.bc.sq>.bf-mk>b{filter:drop-shadow(0 0 3px color-mix(in srgb,var(--rc) 75%,transparent))}
+.bc.sq .bf-st{filter:drop-shadow(0 1px 1px #000)}
+/* UI-кит: срез портретов — квадрат, как в бою, контур лица по данным */
+.bf-faces{display:flex;flex-wrap:wrap;gap:10px}
+.bf-faces figure{margin:0;display:flex;flex-direction:column;gap:4px;width:96px}
+.bf-faces figcaption{display:flex;flex-direction:column;font-size:10.5px;line-height:1.2;color:var(--parch-3)}
+.bf-faces figcaption b{font:700 10.5px/1.2 var(--f-u);color:var(--parch-2)}
+.bf-fc{position:relative;display:block;width:96px;height:96px;overflow:hidden;border-radius:4px;box-shadow:0 0 0 1px var(--iron)}
+.bf-fc img{width:100%;height:100%;object-fit:cover;object-position:50% calc(var(--fy, 300) * .1%)}
+.bf-fc i{position:absolute;box-shadow:0 0 0 1px #6fe3a0;border-radius:2px}
