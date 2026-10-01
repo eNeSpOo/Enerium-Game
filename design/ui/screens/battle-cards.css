@@ -93,17 +93,18 @@
 
 /* рамка CSS — портрет и квадрат. Лестница опасности (решения автора 01.10.2026): рядовой — голое железо; элита — уголки и свет; боссы
    (биома, Эхо, Голос сонма) — двойная кромка; рунный страж — свет сильнее; Убер — дышит светом; Хозяин — свет ещё сильнее; вершина —
-   Забытый и Многоликий: тройная кромка и самый сильный свет */
-.pf{position:absolute;inset:calc(-1 * var(--pfw,3px));z-index:1;pointer-events:none;border:var(--pfw,3px) solid var(--f2,#1e2226);
+   Забытый и Многоликий: тройная кромка и самый сильный свет. Рамка — только i.pf: класс .pf — ещё и раскладка экрана «Странник»
+   (index.html), голое .pf гасило там все клики */
+i.pf{position:absolute;inset:calc(-1 * var(--pfw,3px));z-index:1;pointer-events:none;border:var(--pfw,3px) solid var(--f2,#1e2226);
   border-image:linear-gradient(160deg,var(--f1,#6b7279),var(--f2,#1e2226) 40%,var(--f1,#6b7279) 64%,var(--f2,#1e2226)) 1;
   box-shadow:0 0 0 1px #050607,inset 0 0 0 1px rgba(255,238,205,.1),0 9px 14px -8px #000,var(--fx,0 0 0 transparent)}
-.pf>.pc,.pf>.pk{position:absolute;top:calc(-1 * var(--pfw,3px) - 6px * var(--pk,1));overflow:visible}
-.pf>.pc{left:50%;width:calc(var(--pcw) * 1px * var(--pk,1));height:calc(14px * var(--pk,1));transform:translateX(-50%)}
-.pf>.pk{left:calc(-1 * var(--pfw,3px) - 2px * var(--pk,1));width:calc(10px * var(--pk,1));height:calc(9px * var(--pk,1))}
-.pf>.pk.r{left:auto;right:calc(-1 * var(--pfw,3px) - 2px * var(--pk,1));transform:scaleX(-1)}
-.pf::before{content:"";position:absolute;inset:calc(-1 * var(--pfw,3px) - 2px);pointer-events:none;opacity:0;--bk:color-mix(in srgb,var(--f1,#6b7279) 80%,#fff);
+i.pf>.pc,i.pf>.pk{position:absolute;top:calc(-1 * var(--pfw,3px) - 6px * var(--pk,1));overflow:visible}
+i.pf>.pc{left:50%;width:calc(var(--pcw) * 1px * var(--pk,1));height:calc(14px * var(--pk,1));transform:translateX(-50%)}
+i.pf>.pk{left:calc(-1 * var(--pfw,3px) - 2px * var(--pk,1));width:calc(10px * var(--pk,1));height:calc(9px * var(--pk,1))}
+i.pf>.pk.r{left:auto;right:calc(-1 * var(--pfw,3px) - 2px * var(--pk,1));transform:scaleX(-1)}
+i.pf::before{content:"";position:absolute;inset:calc(-1 * var(--pfw,3px) - 2px);pointer-events:none;opacity:0;--bk:color-mix(in srgb,var(--f1,#6b7279) 80%,#fff);
   background:linear-gradient(var(--bk) 0 0) left bottom/7px 2px,linear-gradient(var(--bk) 0 0) left bottom/2px 7px,linear-gradient(var(--bk) 0 0) right bottom/7px 2px,linear-gradient(var(--bk) 0 0) right bottom/2px 7px;background-repeat:no-repeat}
-.pf::after{content:"";position:absolute;inset:calc(-1 * var(--pfw,3px));pointer-events:none;opacity:0;box-shadow:0 0 calc(12px * var(--pk,1)) 2px var(--fg,transparent)}
+i.pf::after{content:"";position:absolute;inset:calc(-1 * var(--pfw,3px));pointer-events:none;opacity:0;box-shadow:0 0 calc(12px * var(--pk,1)) 2px var(--fg,transparent)}
 [data-pf="hero"]{--f1:#b48a52;--f2:#33261a;--fx:0 7px 10px -6px rgba(72,229,212,.55)}
 [data-pf="o"]{--f1:#6b7279;--f2:#1e2226}
 [data-pf="e"]{--f1:#857867;--f2:#201c18;--fx:0 0 7px -1px rgba(240,150,60,.5)}
