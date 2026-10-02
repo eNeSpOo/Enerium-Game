@@ -81,6 +81,8 @@ function hdOpens(h, v) {
   return K.kit.filter(x => x.v === v).map(x => ({ id: x.id, slot: x.slot, n: (L[x.id] || { n: x.id }).n, ab: L[x.id] || null }));
 }
 const HD_SLOT = { act: 'Способность', pas: 'Пассивка', react: 'Реакция', ult: 'Ульта' };
+/* вид записи словом: сочетание (ADR-0050) — способность из двух — названо сочетанием */
+const hdSlot = (slot, ab) => (ab && ab.combo ? (slot === 'ult' ? 'Ульта-сочетание' : 'Сочетание') : HD_SLOT[slot] || 'Способность');
 /* последняя доблесть раскрывает героя (ADR-0022): орден из состава или «вне орденов»; Безликий вспоминает себя */
 function hdReveal(h) {
   const rh = hdTwin(h); if (!rh) return null;
@@ -323,7 +325,7 @@ function hdNext(h, d) {
   if (d.step === 'valor') {
     /* доблесть: характеристики «было → станет» — ядро (valorSt) на копии героя; способность этой доблести; уровень начнётся заново */
     const nv = h.valor + 1, t = `Доблесть <span class="num">${nv}</span> из <span class="num">${h.maxV}</span>`, G = hdGain(h, { valor: nv }), op = hdOpens(h, nv);
-    const rows = [hdGNote(ic('up'), `Навсегда +${INV.hero.valorPct} % к характеристикам`)].concat(op.map(x => hdG(hdAbIco(x), HD_SLOT[x.slot] || 'Способность', '', `«${hdEsc(x.n)}»`, 1)))
+    const rows = [hdGNote(ic('up'), `Навсегда +${INV.hero.valorPct} % к характеристикам`)].concat(op.map(x => hdG(hdAbIco(x), hdSlot(x.slot, x.ab), '', `«${hdEsc(x.n)}»`, 1)))
       .concat([hdGNote(ic('info'), 'Уровень и рунные пределы начнутся заново', 'warn')]).concat(d.vrHave ? [] : [hdG(ICON('valor', 16, 'Руна доблести'), 'Осколки руны доблести', '', `${fmt(d.vsHave)} / ${fmt(d.vsNeed)}`, 0)]);
     const act = d.vrHave ? `<button class="btn go hdv-go" data-v="${h.id}" data-a="valor">Взять доблесть</button>`
       : `<button class="link" data-v="${h.id}" data-a="valor">Что даст</button>${d.craft ? `<button class="btn go hdv-go" data-a="valorcraft" data-v="${d.rec.id}">Собрать руну</button>` : `<button class="btn go hdv-go" data-a="item" data-v="${d.vs ? d.vs.id : ''}">Где взять осколки</button>`}`;
@@ -384,7 +386,7 @@ const hdTrainCost = () => `<span class="cost">${ICON('valor', 18, 'Руна об
 function hdValBody(h, P, train) {
   const gain = [hdRow(ICON('valor', 18, 'Доблесть'), 'Доблесть', String(P.v), `${P.nv} из ${h.maxV}`),
     hdRow(ICON(STAT_IC[hdMainSt(h)], 18, 'Характеристики'), 'Характеристики', '', `+${INV.hero.valorPct} %`, hdStMini(P.st0, P.st1))]
-    .concat(P.opens.map(x => hdRow(hdAbIco(x), HD_SLOT[x.slot] || 'Способность', '', `«${hdEsc(x.n)}»`)))
+    .concat(P.opens.map(x => hdRow(hdAbIco(x), hdSlot(x.slot, x.ab), '', `«${hdEsc(x.n)}»`)))
     .concat(P.ch != null ? [hdRow(ic('book'), `Глава ${ROMAN[P.nv]}`, '', `«${hdEsc(P.ch)}»`)] : [])
     .concat(P.last ? [P.donat ? hdRow(ic('eye'), 'Память', '', 'вспомнит, кем был') : hdRow(ic('flag'), 'Орден', '', 'раскроет последняя глава')] : []);
   const loss = [hdRow(ic('up'), 'Уровень', String(P.lvl), '0'),
@@ -463,7 +465,7 @@ function hdFxLim(r, el, done, h) {
 function hdChanges(r, h) {
   const pct = INV.hero.valorPct, rows = [hdRow(ICON('valor', 18, 'Доблесть'), 'Доблесть', String(r.was.valor), `${r.now.valor} из ${r.maxV}`, '', 'up'),
     hdRow(ICON(STAT_IC[h ? hdMainSt(h) : 0], 18, 'Характеристики'), 'Характеристики', '', `+${pct} %`, hdStMini(r.was.st, r.now.st), 'up')];
-  for (const x of r.opens) rows.push(hdRow(hdAbIco({ slot: x.slot, ab: EB.lib()[x.id] }), HD_SLOT[x.slot] || 'Способность', '', `«${hdEsc(x.n)}»`, '', 'up'));
+  for (const x of r.opens) rows.push(hdRow(hdAbIco({ slot: x.slot, ab: EB.lib()[x.id] }), hdSlot(x.slot, EB.lib()[x.id]), '', `«${hdEsc(x.n)}»`, '', 'up'));
   if (r.ch != null) rows.push(hdRow(ic('book'), `Глава ${ROMAN[r.now.valor]}`, '', `«${hdEsc(r.ch)}»`, '', 'up'));
   if (r.reveal) rows.push(r.reveal.donat ? hdRow(ic('eye'), 'Память', '', 'вернулась', '', 'up')
     : hdRow(ic('flag'), 'Орден', '', r.reveal.orders.length ? r.reveal.orders.map(n => `«${hdEsc(n)}»`).join(', ') : 'вне орденов', '', 'up'));

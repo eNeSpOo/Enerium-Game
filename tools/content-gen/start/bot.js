@@ -32,7 +32,7 @@ function play(W, D, opt = {}) {
   /* шаги 1–6 — пока что-то меняется: уровень, взятый посреди этих дел, может дать место, золото, руну или рецепт */
   function manage() {
     for (let guard = 0; guard < 50; guard++) {
-      let acted = false;
+      let acted = false, fresh = false;   // fresh — уровень Странника взят посреди этих дел: он мог открыть место в отряде
       claim();
       let s = W.st();
       /* 2. найм */
@@ -45,29 +45,33 @@ function play(W, D, opt = {}) {
       }
       /* 2а. сундук сценария — как только он в запасах */
       s = W.st();
-      if (TUT.chest && s.stock && s.chest && W.open()) { say('chest', { no: TUT.chest.no }); claim(); acted = true; }
+      if (TUT.chest && s.stock && s.chest && W.open()) { say('chest', { no: TUT.chest.no }); if (claim()) fresh = true; acted = true; }
       /* 2б. Лавка — покупка сценария, как только Лавка открыта и золота хватает */
       s = W.st();
-      if (TUT.shop && s.shop && !s.bought && s.gold >= TUT.shop.cost && W.buy(TUT.shop.buy)) { say('shop', { id: TUT.shop.buy }); claim(); acted = true; }
+      if (TUT.shop && s.shop && !s.bought && s.gold >= TUT.shop.cost && W.buy(TUT.shop.buy)) { say('shop', { id: TUT.shop.buy }); if (claim()) fresh = true; acted = true; }
       /* 3. первый рецепт */
       s = W.st();
-      if (s.craft && !s.recipe && B.recipe.cells.every(([id, q]) => s.has(id, q)) && W.craft(B.recipe.cells, B.recipe.r)) { say('recipe', { r: B.recipe.r }); claim(); acted = true; }
+      if (s.craft && !s.recipe && B.recipe.cells.every(([id, q]) => s.has(id, q)) && W.craft(B.recipe.cells, B.recipe.r)) { say('recipe', { r: B.recipe.r }); if (claim()) fresh = true; acted = true; }
       /* 4. руна обучения */
       s = W.st();
-      if (s.train > 0) { const h = s.heroes.find(x => x.id === D.train && x.valor === 0 && x.maxV > 0); if (h && W.valor(h.id)) { say('valor', { id: h.id }); claim(); acted = true; } }
+      if (s.train > 0) { const h = s.heroes.find(x => x.id === D.train && x.valor === 0 && x.maxV > 0); if (h && W.valor(h.id)) { say('valor', { id: h.id }); if (claim()) fresh = true; acted = true; } }
       /* 5. предел */
       for (;;) {
         s = W.st();
         const h = s.heroes.find(x => x.lvl >= x.cap && x.lim === 0);
         if (!h || s.runes < B.runesPerLimit) break;
         if (!W.limit(h.id)) break;
-        say('limit', { id: h.id }); claim(); acted = true;
+        say('limit', { id: h.id }); if (claim()) fresh = true; acted = true;
       }
       /* 5а. первый артефакт — как только артефакты открыты, а золота и душ хватает */
       s = W.st();
       if (TUT.art && s.arts && s.art[TUT.art.id] == null && s.gold >= TUT.art.gold && s.souls >= TUT.art.souls && W.art(TUT.art.id, TUT.art.lv)) {
-        say('art', { id: TUT.art.id, lv: TUT.art.lv }); claim(); acted = true;
+        say('art', { id: TUT.art.id, lv: TUT.art.lv }); if (claim()) fresh = true; acted = true;
       }
+      /* найм — раньше духа (порядок 2 → 6): уровень, взятый посреди этих дел, мог открыть место в отряде — сначала нанять героя, и только
+         потом делить дух между всеми. Иначе дух уходит прежним героям, а новичок догоняет их забегами — и отряд зависит от того,
+         пришёл ли дух одним даром погружения или по забегу (ADR-0049, ADR-0050) */
+      if (fresh) continue;
       /* 6. дух — в уровни, первым самый низкий; при равных — по порядку найма */
       for (;;) {
         s = W.st();

@@ -764,13 +764,16 @@ const obX = v => { const a = Math.abs(v), s = a % 100 ? (a / 100).toFixed(2).rep
 const obLesHeroId = l => (l.kind === 'valor' ? OB_D.train : l.role ? (OB_D.heroes.find(h => h.role === l.role) || {}).id || null : null);
 const obLesHero = l => { const id = obLesHeroId(l); return id ? obHero(id) : null; };
 const obBossId = b => { const B = EB.BIOMES[b || (OB_DV && OB_DV.b)]; return B && B.floors.length ? B.floors[B.floors.length - 1].m[0] : ''; };
-/* строки приёмов набора: значок своего вида, имя со школой, вид и доблесть открытия, описание — те же, что на странице «Навыки» книги */
-function obAbRows(kit, valor, keep, mask) {
+/* строки приёмов набора: значок своего вида, имя со школой, вид и доблесть открытия, описание — те же, что на странице «Навыки» книги.
+   K — запись набора героя (kits.js): у героя пассивка или реакция доблести 0 — черта, сочетание названо своими частями (abWhat,
+   index.html, ADR-0050); у врага набора K нет — виды как прежде */
+function obAbRows(kit, valor, keep, mask, K) {
   const L = EB.lib(), M = mask || (s => s);   // mask — что бестиарий ещё прячет (имя врага в описании приёма) — словами урока
   return kit.filter(x => L[x.id] && (!keep || keep(x))).map(x => {
     const a = Object.assign({}, L[x.id], { d: M(L[x.id].d || '') }), on = x.v <= valor;
     /* имя приёма — своё у врага (as: «Тяжёлая лапа» у хозяйки леса), иначе — библиотеки; вид и доблесть открытия — в строке имени */
-    const what = `${AB_KIND[x.slot] || 'Способность'} · ${!x.v ? 'есть сразу' : on ? `доблесть ${x.v}` : `откроется на доблести ${x.v}`}`;
+    const when = !x.v ? 'есть сразу' : on ? `доблесть ${x.v}` : `откроется на доблести ${x.v}`;
+    const what = K && typeof abWhat === 'function' ? abWhat(x, a, K, L, when) : `${AB_KIND[x.slot] || 'Способность'} · ${when}`;
     return abRow({ kind: x.slot, icon: (typeof abArt === 'function' && abArt(a, 32, '', on ? '' : 'off')) || ic(on ? (x.slot === 'ult' ? 'crown' : abIcon(a)) : 'lock'),
       name: `${schoolMark(a.school)}${trEsc(x.as || a.n)}`, chip: `<small class="ab-k ob-le-k${on ? '' : ' lk'}">${what}</small>`, d: trEsc(a.d || ''), lock: !on });
   }).join('');
@@ -790,12 +793,12 @@ function obLesBody(l) {
   if (l.kind === 'hero' || l.kind === 'valor' || l.kind === 'threat') {
     const h = obLesHero(l), K = h && typeof heroKit === 'function' ? heroKit(h) : null; if (!h || !K) return '';
     const sub = `${trEsc(h.cls)} · ${trEsc(h.el)} · ${h.lvl} ур.${h.valor ? ` · доблесть ${h.valor}` : ''}`;
-    if (l.kind === 'valor') return obLesHead(h.name, `${sub} · ${OB_TEXT.valorUp(EB.RULES.valorPct)}`) + `<div class="rot-list ob-le-ab">${obAbRows(K.kit, h.valor, x => x.v >= 1 && x.v <= h.valor)}</div>`;
+    if (l.kind === 'valor') return obLesHead(h.name, `${sub} · ${OB_TEXT.valorUp(EB.RULES.valorPct)}`) + `<div class="rot-list ob-le-ab">${obAbRows(K.kit, h.valor, x => x.v >= 1 && x.v <= h.valor, null, K)}</div>`;
     if (l.kind === 'threat') {
       const C = EB.RULES.cls, thr = (C[h.cls] || {}).thr || EB.RULES.threat.base, other = Math.max(...S.heroes.filter(x => x !== h).map(x => (C[x.cls] || {}).thr || EB.RULES.threat.base), EB.RULES.threat.base);
-      return obLesHead(h.name, sub) + `<p class="ob-le-n">${OB_TEXT.threat(obX(thr), obX(other))}</p><div class="rot-list ob-le-ab">${obAbRows(K.kit, h.valor)}</div>`;
+      return obLesHead(h.name, sub) + `<p class="ob-le-n">${OB_TEXT.threat(obX(thr), obX(other))}</p><div class="rot-list ob-le-ab">${obAbRows(K.kit, h.valor, null, null, K)}</div>`;
     }
-    return obLesHead(h.name, sub) + `<div class="rot-list ob-le-ab">${obAbRows(K.kit, h.valor)}</div>`;
+    return obLesHead(h.name, sub) + `<div class="rot-list ob-le-ab">${obAbRows(K.kit, h.valor, null, null, K)}</div>`;
   }
   if (l.kind === 'elements') {
     const E = EB.RULES.elem, B = EB.BIOMES[OB_DV.b], chip = el => `<span class="el" data-el="${el}">${trEsc(el)}</span>`, ar = `<i class="ob-el-ar" aria-hidden="true">${ic('arrow')}</i>`;

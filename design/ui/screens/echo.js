@@ -513,8 +513,9 @@ function heroAvers(h) {
 const echoHero = id => { const X = XF(); return X && X.heroes ? X.heroes[id] || null : null; };
 function echoHeroSrc(id, lvl, valor) {
   const h = echoHero(id), cls = FT.heroCls[h.cls] || h.cls, v = valor != null ? valor : h.maxV;
-  // доблесть — +30 % к характеристикам за ступень, правило ядра (EB.valorSt), как у героев аккаунта
-  return { key: id, id, name: h.name, cls, el: h.el, lvl, st: EB.valorSt(FT.heroSt[cls] || FT.heroSt['Танк'], v), valor: v,
+  // доблесть — +30 % к характеристикам за ступень, правило ядра (EB.valorSt), как у героев аккаунта;
+  // cyc — цикл героя из состава: базовые характеристики — по кривой цикла героя (RULES.cycleX10, ADR-0041, ADR-0050, п. 5), как у EB.heroSrc
+  return { key: id, id, name: h.name, cls, el: h.el, lvl, cyc: (RSI[id] || {}).c || 1, st: EB.valorSt(FT.heroSt[cls] || FT.heroSt['Танк'], v), valor: v,
     kit: { actPct: h.actPct, ultPct: h.ultPct, rarity: h.rarity, kit: h.kit }, avers: h.avers || null };
 }
 /* своя неприязнь героя Эхо важнее; без неё — расовая прибавка из источника героя: «Бич» духовного талисмана (screens/talismans.js) */

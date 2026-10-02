@@ -1,0 +1,300 @@
+{
+  "sheet": "art/generated/spell-icons/spell-combo-b__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/spell-icons-combo.json",
+  "job": "spell-combo-b",
+  "grid": [
+    6,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "Сочетания.act.25",
+      "file": "art/generated/spell-icons/spell-combo-b/combo-act-25.webp",
+      "box": [
+        16,
+        31,
+        810,
+        825
+      ],
+      "px": 794,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.26",
+      "file": "art/generated/spell-icons/spell-combo-b/combo-act-26.webp",
+      "box": [
+        860,
+        30,
+        1657,
+        827
+      ],
+      "px": 797,
+      "key_left": 2e-05
+    },
+    {
+      "id": "Сочетания.act.27",
+      "file": "art/generated/spell-icons/spell-combo-b/combo-act-27.webp",
+      "box": [
+        1706,
+        30,
+        2503,
+        827
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.28",
+      "file": "art/generated/spell-icons/spell-combo-b/combo-act-28.webp",
+      "box": [
+        2554,
+        31,
+        3349,
+        826
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.29",
+      "file": "art/generated/spell-icons/spell-combo-b/combo-act-29.webp",
+      "box": [
+        3399,
+        30,
+        4196,
+        827
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.30",
+      "file": "art/generated/spell-icons/spell-combo-b/combo-act-30.webp",
+      "box": [
+        4246,
+        31,
+        5040,
+        825
+      ],
+      "px": 794,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.31",
+      "file": "art/generated/spell-icons/spell-combo-b/combo-act-31.webp",
+      "box": [
+        16,
+        876,
+        810,
+        1670
+      ],
+      "px": 794,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.32",
+      "file": "art/generated/spell-icons/spell-combo-b/combo-act-32.webp",
+      "box": [
+        860,
+        875,
+        1656,
+        1671
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.33",
+      "file": "art/generated/spell-icons/spell-combo-b/combo-act-33.webp",
+      "box": [
+        1706,
+        875,
+        2502,
+        1671
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.ult.1",
+      "file": "art/generated/spell-icons/spell-combo-b/combo-ult-1.webp",
+      "box": [
+        2554,
+        875,
+        3349,
+        1670
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.ult.2",
+      "file": "art/generated/spell-icons/spell-combo-b/combo-ult-2.webp",
+      "box": [
+        3399,
+        875,
+        4195,
+        1671
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.ult.3",
+      "file": "art/generated/spell-icons/spell-combo-b/combo-ult-3.webp",
+      "box": [
+        4246,
+        876,
+        5040,
+        1670
+      ],
+      "px": 794,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.ult.4",
+      "file": "art/generated/spell-icons/spell-combo-b/combo-ult-4.webp",
+      "box": [
+        16,
+        1721,
+        810,
+        2515
+      ],
+      "px": 794,
+      "key_left": 0.0
+    },
+    {
+      "id": "Огонь.pas.5",
+      "file": "art/generated/spell-icons/spell-combo-b/fire-pas-5.webp",
+      "box": [
+        860,
+        1720,
+        1656,
+        2516
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.pas.5",
+      "file": "art/generated/spell-icons/spell-combo-b/earth-pas-5.webp",
+      "box": [
+        1706,
+        1720,
+        2502,
+        2516
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.pas.6",
+      "file": "art/generated/spell-icons/spell-combo-b/earth-pas-6.webp",
+      "box": [
+        2554,
+        1720,
+        3349,
+        2515
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "Земля.pas.7",
+      "file": "art/generated/spell-icons/spell-combo-b/earth-pas-7.webp",
+      "box": [
+        3399,
+        1720,
+        4195,
+        2516
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "Воздух.pas.5",
+      "file": "art/generated/spell-icons/spell-combo-b/air-pas-5.webp",
+      "box": [
+        4246,
+        1721,
+        5040,
+        2515
+      ],
+      "px": 794,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.pas.5",
+      "file": "art/generated/spell-icons/spell-combo-b/water-pas-5.webp",
+      "box": [
+        16,
+        2566,
+        810,
+        3360
+      ],
+      "px": 794,
+      "key_left": 0.0
+    },
+    {
+      "id": "Вода.pas.6",
+      "file": "art/generated/spell-icons/spell-combo-b/water-pas-6.webp",
+      "box": [
+        860,
+        2565,
+        1656,
+        3361
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "Время.pas.5",
+      "file": "art/generated/spell-icons/spell-combo-b/time-pas-5.webp",
+      "box": [
+        1706,
+        2565,
+        2502,
+        3361
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.pas.5",
+      "file": "art/generated/spell-icons/spell-combo-b/none-pas-5.webp",
+      "box": [
+        2554,
+        2565,
+        3349,
+        3360
+      ],
+      "px": 795,
+      "key_left": 0.0
+    },
+    {
+      "id": "Без школы.pas.6",
+      "file": "art/generated/spell-icons/spell-combo-b/none-pas-6.webp",
+      "box": [
+        3399,
+        2565,
+        4195,
+        3361
+      ],
+      "px": 796,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.26",
+      "file": "art/generated/spell-icons/spell-combo-b/combo-act-26-alt.webp",
+      "box": [
+        4246,
+        2566,
+        5040,
+        3360
+      ],
+      "px": 794,
+      "key_left": 0.0
+    }
+  ]
+}

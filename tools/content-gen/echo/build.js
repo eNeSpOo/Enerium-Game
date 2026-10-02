@@ -11,6 +11,9 @@
    - tools/content-gen/abilities/library.json — библиотека способностей (ADR-0015);
    - tools/content-gen/abilities/kits.json — ранги врагов, доли хода по редкости, наборы 110 героев черновиков (ADR-0016);
    - docs/content/герои/состав-героев.csv — герои Эхо: класс, школа, редкость, максимум доблести, неприязнь (ADR-0019, ADR-0024);
+     набор героя — по законам ADR-0050: первые две записи — пара доблести 0 (активка и черта), дальше — по одной на доблесть,
+     последняя — ульта; способностей — максимум + 2; у героя с максимумом 4–5 — сочетание. Неповторимость во всей игре, связку
+     черты и потолок «одна черта — трём героям цикла» проверяет tools/content-gen/abilities/assign.py --check;
    - design/ui/roster.js — порядок недель, цивилизации, отряды, число неприязни (rules.aversionBp);
    - design/ui/recipes.js — облик Многоликого (предмет many).
    Любая ошибка — файлы не пишутся. Пересборка даёт те же байты.
@@ -142,7 +145,12 @@ for (const [school, S] of Object.entries(LIB.sets)) {
 for (const x of LIB.farm.passive) BY[x.id] = Object.assign({ slot: 'pas' }, x);
 for (const x of LIB.farm.active) BY[x.id] = Object.assign({ slot: 'act' }, x);
 for (const x of LIB.farm.ult) BY[x.id] = Object.assign({ slot: 'ult' }, x);
+/* сочетания (ADR-0050): способность из двух; set — школа первой части, two — сочетание двух стихий (героям Эхо открыто) */
+for (const x of (LIB.combos || {}).active || []) BY[x.id] = Object.assign({ slot: 'act' }, x);
+for (const x of (LIB.combos || {}).ult || []) BY[x.id] = Object.assign({ slot: 'ult' }, x);
 const SCHOOLS = Object.keys(LIB.sets);
+const NO_SCHOOL = 'Без школы';
+const HERO_LAW = { comboFrom: 4, ult2From: 4 };   // ADR-0050: с какого максимума сочетание обязательно и с какого бывает вторая ульта — как в assign.py
 
 /* что ядро уже понимает: поля и значения из библиотеки */
 const KNOWN = { fields: new Set(['id', 'n', 'set', 'kind', 'tier', 'tgt', 'targets', 'ch', 'coef', 'twist', 'd', 'stat', 'ult', 'left', 'max', 'st', 'pow',
@@ -338,18 +346,22 @@ for (const race of ORDER) {
     if (!spec) { fail(`${where}: нет набора`); continue; }
     const maxV = +h['максимум доблести'], r = h['редкость'], school = h['школа'], sh = shareOf(r);
     if (!sh) { fail(`${where}: редкость «${r}» не из шкалы`); continue; }
-    if (spec.length !== maxV + 1) fail(`${where}: способностей ${spec.length}, а доблестей 0…${maxV} — нужно ${maxV + 1} (ADR-0016)`);
-    const kit = spec.map((aid, v) => {
-      const a = BY[aid];
+    /* набор героя (ADR-0050): первые две записи — пара доблести 0 — активка и черта; дальше — по одной на доблесть 1…maxV, последняя — ульта */
+    if (spec.length !== maxV + 2) fail(`${where}: способностей ${spec.length}, а нужно максимум доблести + 2 — ${maxV + 2} (ADR-0050)`);
+    const kit = spec.map((aid, i) => {
+      const a = BY[aid], v = i < 2 ? 0 : i - 1, trait = i === 1;
       if (!a) { fail(`${where}: нет способности ${aid} в библиотеке`); return null; }
-      if (a.set !== school) fail(`${where}: ${aid} — не школа героя «${school}»`);
+      /* школа (Н5): своя, приём «Без школы», сочетание — школы первой части; черта — любой школы (связку проверяет assign.py) */
+      if (a.set !== school && a.set !== NO_SCHOOL && !trait) fail(`${where}: ${aid} — не школа героя «${school}» и не приём «Без школы»`);
       const it = { v, slot: a.slot, id: aid };
       if (a.slot === 'react') { const c = chR(a.ch, sh.act); if (c) it.chR = c; }
       it.n = a.n;
       return it;
     }).filter(Boolean);
-    if (kit.length && kit[0].slot !== 'act') fail(`${where}: без доблести — активная способность (ADR-0016)`);
+    if (kit.length > 1 && (kit[0].slot !== 'act' || !['pas', 'react'].includes(kit[1].slot))) fail(`${where}: на доблести 0 — пара «активка + черта» (ADR-0050, Н1)`);
     if (kit.length && kit[kit.length - 1].slot !== 'ult') fail(`${where}: последняя доблесть — ульта (ADR-0016)`);
+    kit.forEach((x, i) => { if (x.slot === 'ult' && i !== kit.length - 1 && !(i === kit.length - 2 && maxV >= HERO_LAW.ult2From && BY[x.id].combo)) fail(`${where}: ульта ${x.id} не на последней доблести — вторая ульта бывает только сочетанием на предпоследней доблести героя с максимумом от ${HERO_LAW.ult2From} (ADR-0050, Н2)`); });
+    if (maxV >= HERO_LAW.comboFrom && !kit.some(x => BY[x.id].combo)) fail(`${where}: максимум доблести ${maxV} — в наборе нет сочетания (ADR-0050, Н6)`);
     if (new Set(kit.map(x => x.id)).size !== kit.length) fail(`${where}: способность повторяется`);
     const hero = { id, name: h['имя'], cls: h['класс'], el: school, school, rarity: r, maxV, cycle: h['цикл'], week: race,
       ultPct: sh.ult, actPct: sh.act, avers: { race, bp: AVERSION_BP }, kit };
@@ -411,7 +423,8 @@ const FORMAT = `/* Собрано tools/content-gen/echo/build.js из tools/con
        } },
      heroes: { 'c6-51': { id, name, cls, el, school, rarity, maxV, cycle, week, ultPct, actPct,
        avers: { race, bp },           // неприязнь — особенность, не способность
-       kit: [ { v, slot, id, chR? } ] } },   // по доблести 0…maxV; как EN_KITS.heroes, ключ — id героя состава (roster.js)
+       kit: [ { v, slot, id, chR? } ] } },   // как EN_KITS.heroes, ключ — id героя состава (roster.js); ADR-0050: на доблести 0 — пара
+                                      // «активка + черта», дальше — по одной записи на доблесть 1…maxV, последняя — ульта
      abilities: [ { id, n, set, t, k, tier, trig, d, ch, data, owner, need } ],   // уникальные способности Убер-боссов и Многоликого (owner 'many') — формат EN_ABILITIES:
                                       // ядро кладёт их в lib2() так же: Object.assign({ id, n, d, school: set, t, kind: k, tier, trig }, data)
      need: { ключ: { n, d, used: [id способности или fid врага] } }   // примитивы, которых в ядре ещё нет: что добавить и кто ими пользуется

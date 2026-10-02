@@ -83,6 +83,9 @@ for (const sch of SCHOOLS) {
   for (const [k, slot] of [['active', 'активная'], ['ult', 'ульта'], ['passive', 'пассивка'], ['reaction', 'реакция']]) for (const a of set[k]) abList.push(Object.assign({ slot, school: sch }, a));
 }
 for (const [k, slot] of [['active', 'фарм · активная'], ['ult', 'фарм · ульта'], ['passive', 'фарм · пассивка']]) for (const a of L.farm[k] || []) abList.push(Object.assign({ slot, school: 'Фарм' }, a));
+/* сочетания (ADR-0050): способность из двух записей библиотеки; школа — школа первой части */
+const COMBOS = L.combos || { active: [], ult: [] };
+for (const [k, slot] of [['active', 'сочетание'], ['ult', 'сочетание · ульта']]) for (const a of COMBOS[k] || []) abList.push(Object.assign({ slot, school: a.set }, a));
 const abById = Object.fromEntries(abList.map(a => [a.id, a]));
 const abUsers = {}, abFirst = {};
 const use = (id, who, c) => { if (!id) return; (abUsers[id] = abUsers[id] || new Set()).add(who); if (abFirst[id] == null || c < abFirst[id]) abFirst[id] = c; };
@@ -95,7 +98,8 @@ const trig = t => (t ? (L.rules.triggers[t] || t) : '');
 function bookAbilities() {
   const rows = abList.map(a => {
     const src = a.src || {};
-    return [a.id, a.school, a.slot, KIND[a.kind] || a.kind || '', TIER[a.tier] || '', a.n, a.d, a.ch == null ? '' : a.ch, a.coef == null ? '' : a.coef, a.twist || '',
+    const parts = a.parts ? a.parts.map(id => (abById[id] || {}).n || id).join(' + ') + (a.two ? ' · две стихии' : '') : '';
+    return [a.id, a.school, a.slot, KIND[a.kind] || a.kind || '', TIER[a.tier] || '', a.n, a.d, a.ch == null ? '' : a.ch, a.coef == null ? '' : a.coef, a.twist || '', parts,
       trig(a.trig), abUsers[a.id] ? abUsers[a.id].size : 0, cyc(abFirst[a.id] || 1), src.no || '', src.name && src.name !== a.n ? src.name : (src.name ? '= то же' : ''), src.type || '', src.text || ''];
   });
   const eff = [];
@@ -103,7 +107,9 @@ function bookAbilities() {
   const tpl = [];
   for (const [k, v] of Object.entries(L.rules.tiersTpl)) for (const [t, x] of Object.entries(v)) tpl.push([KIND[k] || k, TIER[t], x.coef == null ? '' : x.coef, x.left == null ? '' : x.left, x.max == null ? '' : x.max, L.rules.groupTargets[k] || '']);
   const kits = Object.entries(K.roster).map(([id, h]) => {
-    const steps = []; for (let v = 0; v <= 5; v++) { const s = (h.kit || []).find(x => x.v === v); steps.push(s ? (abById[s.id] ? abById[s.id].n : s.n || s.id) + (s.slot === 'ult' ? ' · ульта' : '') : ''); }
+    /* на доблести 0 — пара: активная и черта (ADR-0050); на предпоследней доблести у старших героев — ещё и ульта-сочетание */
+    const mark = s => s.slot === 'ult' ? ' · ульта' : s.v === 0 && s.slot !== 'act' ? ' · черта' : '';
+    const steps = []; for (let v = 0; v <= 5; v++) steps.push((h.kit || []).filter(x => x.v === v).map(s => (abById[s.id] ? abById[s.id].n : s.n || s.id) + mark(s)).join('; '));
     return [id, h.name, cyc(h.cycle), h.source || h.src, h.cls, h.school, h.rarity, h.maxV, ...steps, h.how || '', h.draft || ''];
   }).sort((a, b) => String(a[0]).localeCompare(String(b[0]), 'ru', { numeric: true }));
   /* таблица автора → библиотека: каждая из 72 строк и что из неё выросло */
@@ -117,22 +123,22 @@ function bookAbilities() {
   for (const [id, f] of Object.entries(EF.foes)) foes.push(['Эхо · ' + f.race, id, f.name, f.rank, f.cls, f.el, foeKit(f.kit)]);
   return {
     file: 'Enerium_Способности_элементов.xlsx', title: 'Способности: библиотека, эффекты школ, наборы героев и врагов',
-    what: ['Вся библиотека способностей игры — 339 записей: семь школ и «Без школы» по восемь видов в трёх ступенях целей, ульты, пассивки и реакции, и общий набор фарма (ADR-0015).',
+    what: [`Вся библиотека способностей игры — ${abList.length} записей: семь школ и «Без школы» по восемь видов в трёх ступенях целей, ульты, пассивки и реакции, общий набор фарма (ADR-0015), сочетания — способности из двух — и черты (ADR-0050).`,
       'Вместо таблицы автора «Способности элементов» (72 способности восьми школ, 26.09.2026): её строки вошли в библиотеку, механика — новая; часть имён 01.10.2026 сменилась по лору — лист «Таблица автора». Оригинал — source-data/оригиналы-2026-09-26/.',
-      'Наборы — какие способности герой получает на каждой доблести (ADR-0016, ADR-0031): у всех 360 героев состава и у врагов Мастерской, биомов 2–4 и Эхо.'],
+      'Наборы — какие способности герой получает на каждой доблести (ADR-0016, ADR-0031, ADR-0050): у всех 360 героев состава и у врагов Мастерской, биомов 2–4 и Эхо. У героя с доблести 0 — пара: активная и черта.'],
     sources: [rel(LIBF), rel(KITF), 'tools/content-gen/abilities/source.json', UI('biome-foes'), UI('echo-foes'), UI('recipes')],
     team: ['«Способности» — столбцы «№ у автора», «Имя у автора», «Тип у автора», «Текст у автора»: откуда взята способность в таблице автора 26.09.2026',
       '«Наборы героев» — «Откуда набор» и «Черновик»: служебные пометки сборщика наборов', 'лист «Таблица автора» — сверка с оригиналом'],
     sheets: [
       sheet('Способности', [col('id', 22), col('Школа', 12), col('Вид', 16), col('Род', 16), col('Цели', 8), col('Название', 26), col('Что делает', 70, W_), col('Шанс в ходе, б. п.', 10), col('Коэффициент, %', 10),
-        col('Особенность', 36, W_), col('Срабатывает, когда', 30, W_), col('Носителей', 9), col('С цикла', 8), col('№ у автора', 8, T_), col('Имя у автора', 22, T_), col('Тип у автора', 16, T_), col('Текст у автора', 50, TW)], rows,
-      'Шанс в ходе — доля хода, б. п. из 10 000; у героя её поправляет редкость. Носителей — герои состава и враги, у кого способность в наборе.'),
+        col('Особенность', 36, W_), col('Сочетание: из чего', 34, W_), col('Срабатывает, когда', 30, W_), col('Носителей', 9), col('С цикла', 8), col('№ у автора', 8, T_), col('Имя у автора', 22, T_), col('Тип у автора', 16, T_), col('Текст у автора', 50, TW)], rows,
+      'Шанс в ходе — доля хода, б. п. из 10 000; у героя её поправляет редкость. Носителей — герои состава и враги, у кого способность в наборе. Сочетание — способность из двух записей: обе части действуют за один ход, коэффициент — первой части.'),
       sheet('Эффекты школ', [col('Школа', 12), col('Род', 18), col('Эффект', 22), col('Что делает', 80, W_)], eff),
       sheet('Ступени целей', [col('Род', 18), col('Цели', 8), col('Коэффициент, %', 12), col('Раундов', 8), col('Стаков', 8), col('Целей у группы', 12)], tpl,
         `Ульта — та же способность сильнее: ×${L.rules.ultPow}, шанс ${L.rules.ultCh} б. п.; обычная способность — ${L.rules.ch} б. п., контроль — ${L.rules.ctrlCh} б. п.`),
       sheet('Наборы героев', [col('id', 8), col('Герой', 24), col('Цикл', 6), col('Источник', 18), col('Класс', 18), col('Школа', 12), col('Редкость', 12), col('Макс. доблести', 8),
         col('Доблесть 0', 22), col('Доблесть 1', 22), col('Доблесть 2', 22), col('Доблесть 3', 22), col('Доблесть 4', 22), col('Доблесть 5', 22), col('Откуда набор', 10, T_), col('Черновик', 10, T_)], kits,
-        'Без доблести — одна активная, каждая доблесть — новая способность, последняя доблесть — ульта (ADR-0016).'),
+        'С доблести 0 — пара: активная и черта (пассивка или реакция, что работает с этой активной или с навыками соседей); каждая доблесть — новая способность, последняя доблесть — ульта; у героев с максимумом доблести 4–5 на предпоследней — ещё и ульта-сочетание (ADR-0016, ADR-0050).'),
       sheet('Наборы врагов', [col('Где', 24), col('id', 14), col('Враг', 26), col('Ранг', 8), col('Класс', 18), col('Стихия', 10), col('Способности — «своё имя (из библиотеки)»', 90, W_)], foes),
       sheet('Таблица автора', [col('№', 5), col('Элемент', 14), col('Тип у автора', 16), col('Имя у автора', 24), col('Текст у автора', 60, W_), col('id в библиотеке', 22), col('Имя в игре', 24), col('Имя сменилось', 9)], author,
         'Оригинал 26.09.2026 — source-data/оригиналы-2026-09-26/Enerium_Способности_элементов.xlsx. Механика у всех 72 новая (ADR-0015); почему сменились имена — docs/content/переименования-2026-10-01.md.'),

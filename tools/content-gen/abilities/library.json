@@ -165,7 +165,17 @@
    "low": 25
   },
   "farmStacks": true,
-  "noSchool": "фарм-герои и герои без стихии"
+  "noSchool": "приёмы «Без школы» — любому герою (ADR-0050); герою без стихии и фарм-герою — как своя школа",
+  "basePas": 4,
+  "comboPct": 60,
+  "comboShorter": 1,
+  "comboSet": "Сочетания",
+  "comboTwoSrc": [
+   "roulette",
+   "echo",
+   "craft",
+   "donat"
+  ]
  },
  "sets": {
   "Огонь": {
@@ -793,6 +803,17 @@
      "d": "Лечение и щиты героя на 10 % сильнее, пока горит хотя бы один враг.",
      "pas": "supportWhileDot",
      "pct": 10
+    },
+    {
+     "id": "Огонь.pas.5",
+     "n": "Пепельный след",
+     "set": "Огонь",
+     "kind": "passive",
+     "d": "Каждая третья обычная атака героя кладёт на цель метку на 2 раунда.",
+     "pas": "nthBasic",
+     "every": 3,
+     "then": "debuff",
+     "left": 2
     }
    ],
    "reaction": [
@@ -1463,6 +1484,37 @@
      "d": "Щиты героя на 15 % крепче.",
      "pas": "shieldUp",
      "pct": 15
+    },
+    {
+     "id": "Земля.pas.5",
+     "n": "Трещина в броне",
+     "set": "Земля",
+     "kind": "passive",
+     "d": "Каждая третья обычная атака героя кладёт на цель осыпание на 2 раунда.",
+     "pas": "nthBasic",
+     "every": 3,
+     "then": "debuff",
+     "left": 2
+    },
+    {
+     "id": "Земля.pas.6",
+     "n": "Живая опора",
+     "set": "Земля",
+     "kind": "passive",
+     "d": "Союзник под живицей героя получает на 10 % меньше урона.",
+     "pas": "hotAura",
+     "guard": 1000
+    },
+    {
+     "id": "Земля.pas.7",
+     "n": "Общий гудок",
+     "set": "Земля",
+     "kind": "passive",
+     "d": "Пока герой жив, отряд наносит +10 % урона парализованным целям.",
+     "pas": "dmgVsDebuff",
+     "pct": 10,
+     "st": "paralyze",
+     "party": true
     }
    ],
    "reaction": [
@@ -2148,6 +2200,15 @@
      "d": "Порезы героя держатся на раунд дольше.",
      "pas": "dotLeft",
      "add": 1
+    },
+    {
+     "id": "Воздух.pas.5",
+     "n": "Шелест листвы",
+     "set": "Воздух",
+     "kind": "passive",
+     "d": "Союзник под свежим ветром героя получает +8 % уклонения.",
+     "pas": "hotAura",
+     "evade": 800
     }
    ],
    "reaction": [
@@ -3527,6 +3588,27 @@
      "d": "Родник героя держится на раунд дольше.",
      "pas": "hotLeft",
      "add": 1
+    },
+    {
+     "id": "Вода.pas.5",
+     "n": "Крепкий лёд",
+     "set": "Вода",
+     "kind": "passive",
+     "d": "Лёд героя спадает только от удара больше 25 % здоровья цели.",
+     "pas": "ctrlFirm",
+     "st": "freeze",
+     "breakPct": 25
+    },
+    {
+     "id": "Вода.pas.6",
+     "n": "Холодный расчёт",
+     "set": "Вода",
+     "kind": "passive",
+     "d": "Пока герой жив, отряд наносит +10 % урона целям под стужей.",
+     "pas": "dmgVsDebuff",
+     "pct": 10,
+     "st": "slow",
+     "party": true
     }
    ],
    "reaction": [
@@ -4883,6 +4965,15 @@
      "d": "Обратный ход героя держится на раунд дольше.",
      "pas": "hotLeft",
      "add": 1
+    },
+    {
+     "id": "Время.pas.5",
+     "n": "Долгий век",
+     "set": "Время",
+     "kind": "passive",
+     "d": "Старение героя держится на раунд дольше.",
+     "pas": "dotLeft",
+     "add": 1
     }
    ],
    "reaction": [
@@ -5568,6 +5659,26 @@
      "d": "−10 % получаемого периодического урона.",
      "pas": "dotReduce",
      "pct": 10
+    },
+    {
+     "id": "Без школы.pas.5",
+     "n": "Удар по скованному",
+     "set": "Без школы",
+     "kind": "passive",
+     "d": "+15 % урона по целям под любым контролем.",
+     "pas": "dmgVsDebuff",
+     "pct": 15,
+     "ctrl": true
+    },
+    {
+     "id": "Без школы.pas.6",
+     "n": "Плечо к плечу",
+     "set": "Без школы",
+     "kind": "passive",
+     "d": "Пока герой жив, отряд получает на 5 % меньше урона.",
+     "pas": "dmgReduce",
+     "pct": 5,
+     "party": true
     }
    ],
    "reaction": [
@@ -5798,5 +5909,5389 @@
     "keySure": true
    }
   ]
+ },
+ "combos": {
+  "active": [
+   {
+    "id": "Сочетания.act.1",
+    "n": "Огненная плеть",
+    "set": "Огонь",
+    "tier": "grp",
+    "ch": 2000,
+    "kind": "dmg",
+    "tgt": "threat",
+    "targets": 3,
+    "coef": 60,
+    "vsDot": 15,
+    "stat": "main",
+    "also": {
+     "kind": "dot",
+     "tgt": "same",
+     "targets": null,
+     "coef": 24,
+     "left": 3,
+     "max": 3,
+     "stat": "main",
+     "school": "Огонь",
+     "tier": "one"
+    },
+    "parts": [
+     "Огонь.dmg.grp",
+     "Огонь.dot.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Бьёт трёх врагов — по 60 %, горящим +15 %; каждому — стак горения: 24 % за ход, 3 раунда."
+   },
+   {
+    "id": "Сочетания.act.2",
+    "n": "Удар из горна",
+    "set": "Огонь",
+    "tier": "one",
+    "ch": 2000,
+    "kind": "dmg",
+    "tgt": "threat",
+    "targets": 1,
+    "coef": 180,
+    "perStack": 25,
+    "stat": "main",
+    "also": {
+     "kind": "buff",
+     "tgt": "self",
+     "targets": 1,
+     "left": 3,
+     "st": "dmgUp",
+     "pow": 2000,
+     "school": "Огонь",
+     "tier": "one"
+    },
+    "parts": [
+     "Огонь.dmg.one",
+     "Огонь.buff.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Мощный удар по цели — 180 %, +25 % за каждый стак горения на ней; себе — жар: +20 % урона на 3 раунда."
+   },
+   {
+    "id": "Сочетания.act.3",
+    "n": "Пламенная стража",
+    "set": "Огонь",
+    "tier": "one",
+    "ch": 2000,
+    "kind": "shield",
+    "tgt": "ally_lowest",
+    "targets": 1,
+    "coef": 120,
+    "thorns": "dot",
+    "stat": "main",
+    "also": {
+     "kind": "debuff",
+     "tgt": "threat",
+     "targets": 1,
+     "left": 3,
+     "st": "mark",
+     "pow": 2000,
+     "school": "Огонь",
+     "tier": "one"
+    },
+    "parts": [
+     "Огонь.shield.one",
+     "Огонь.debuff.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Щит самому раненому — 120 %: кто бьёт по щиту, загорается; метка на цель, 3 раунда."
+   },
+   {
+    "id": "Сочетания.act.4",
+    "n": "Очищающий огонь",
+    "set": "Огонь",
+    "tier": "one",
+    "ch": 2000,
+    "kind": "heal",
+    "tgt": "ally_lowest",
+    "targets": 1,
+    "coef": 180,
+    "cleanseBleed": true,
+    "stat": "main",
+    "also": {
+     "kind": "hot",
+     "tgt": "same",
+     "targets": null,
+     "coef": 24,
+     "left": 3,
+     "max": 3,
+     "cleanse": "slow",
+     "stat": "main",
+     "school": "Огонь",
+     "tier": "one"
+    },
+    "parts": [
+     "Огонь.heal.one",
+     "Огонь.hot.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Лечит самого раненого — 180 % и снимает с него кровотечение; ему же — тепло: 24 % за ход, 3 раунда, снимает стужу."
+   },
+   {
+    "id": "Сочетания.act.5",
+    "n": "Каменный кулак",
+    "set": "Земля",
+    "tier": "one",
+    "ch": 2000,
+    "kind": "dmg",
+    "tgt": "threat",
+    "targets": 1,
+    "coef": 180,
+    "atStacks": {
+     "n": 3,
+     "st": "paralyze",
+     "left": 1
+    },
+    "stat": "main",
+    "also": {
+     "kind": "ctrl",
+     "tgt": "same",
+     "targets": null,
+     "left": 2,
+     "st": "paralyze",
+     "school": "Земля",
+     "tier": "one"
+    },
+    "parts": [
+     "Земля.dmg.one",
+     "Земля.ctrl.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Мощный удар по цели — 180 %; паралич цели на 2 раунда."
+   },
+   {
+    "id": "Сочетания.act.6",
+    "n": "Живой камень",
+    "set": "Земля",
+    "tier": "one",
+    "ch": 2000,
+    "kind": "shield",
+    "tgt": "ally_lowest",
+    "targets": 1,
+    "coef": 120,
+    "stat": "main",
+    "also": {
+     "kind": "hot",
+     "tgt": "same",
+     "targets": null,
+     "coef": 21,
+     "left": 4,
+     "max": 3,
+     "stat": "main",
+     "school": "Земля",
+     "tier": "one"
+    },
+    "parts": [
+     "Земля.shield.one",
+     "Земля.hot.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Щит самому раненому — 120 %; ему же — живица: 21 % за ход, 4 раунда."
+   },
+   {
+    "id": "Сочетания.act.7",
+    "n": "Ядовитая осыпь",
+    "set": "Земля",
+    "tier": "grp",
+    "ch": 2000,
+    "kind": "dot",
+    "tgt": "threat",
+    "targets": 3,
+    "coef": 15,
+    "left": 4,
+    "max": 2,
+    "stat": "main",
+    "also": {
+     "kind": "debuff",
+     "tgt": "same",
+     "targets": 2,
+     "left": 2,
+     "st": "pierce",
+     "pow": 3000,
+     "school": "Земля",
+     "tier": "grp"
+    },
+    "parts": [
+     "Земля.dot.grp",
+     "Земля.debuff.grp"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Яд на трёх врагов: 15 % за ход, 4 раунда; двум первым — осыпание на 2 раунда."
+   },
+   {
+    "id": "Сочетания.act.8",
+    "n": "Сбивающий шквал",
+    "set": "Воздух",
+    "tier": "grp",
+    "ch": 2000,
+    "kind": "dmg",
+    "tgt": "threat",
+    "targets": 3,
+    "coef": 60,
+    "vsDot": 15,
+    "stat": "main",
+    "also": {
+     "kind": "ctrl",
+     "tgt": "danger",
+     "targets": 1,
+     "left": 2,
+     "st": "knock",
+     "school": "Воздух",
+     "tier": "one"
+    },
+    "parts": [
+     "Воздух.dmg.grp",
+     "Воздух.ctrl.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Бьёт трёх врагов — по 60 %, с порезами +15 %; самого опасного врага сбрасывает на 2 раунда: его угроза обнуляется."
+   },
+   {
+    "id": "Сочетания.act.9",
+    "n": "Пыльный росчерк",
+    "set": "Воздух",
+    "tier": "all",
+    "ch": 2000,
+    "kind": "dmg",
+    "tgt": "all",
+    "targets": null,
+    "coef": 36,
+    "thenDot": 1,
+    "stat": "main",
+    "also": {
+     "kind": "debuff",
+     "tgt": "threat",
+     "targets": 1,
+     "left": 3,
+     "st": "miss",
+     "pow": 5000,
+     "school": "Воздух",
+     "tier": "one"
+    },
+    "parts": [
+     "Воздух.dmg.all",
+     "Воздух.debuff.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Бьёт всех врагов — по 36 %, каждому — стак пореза; слепота на цель, 3 раунда."
+   },
+   {
+    "id": "Сочетания.act.10",
+    "n": "Крылья ветра",
+    "set": "Воздух",
+    "tier": "one",
+    "ch": 2000,
+    "kind": "hot",
+    "tgt": "ally_lowest",
+    "targets": 1,
+    "coef": 21,
+    "left": 2,
+    "max": 4,
+    "stat": "main",
+    "also": {
+     "kind": "buff",
+     "tgt": "same",
+     "targets": null,
+     "left": 3,
+     "st": "evade",
+     "pow": 2000,
+     "school": "Воздух",
+     "tier": "one"
+    },
+    "parts": [
+     "Воздух.hot.one",
+     "Воздух.buff.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Свежий ветер на самого раненого: 21 % за ход, 2 раунда; ему же — попутный ветер: +20 % уклонения на 3 раунда."
+   },
+   {
+    "id": "Сочетания.act.11",
+    "n": "Стылые оковы",
+    "set": "Вода",
+    "tier": "one",
+    "ch": 2000,
+    "kind": "ctrl",
+    "tgt": "danger",
+    "targets": 1,
+    "left": 2,
+    "st": "freeze",
+    "breakPct": 10,
+    "also": {
+     "kind": "debuff",
+     "tgt": "same",
+     "targets": null,
+     "left": 3,
+     "st": "slow",
+     "pow": 3000,
+     "school": "Вода",
+     "tier": "one"
+    },
+    "parts": [
+     "Вода.ctrl.one",
+     "Вода.debuff.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Заморозка самого опасного врага на 2 раунда и стужа на 3 раунда: лёд спадёт — холод останется."
+   },
+   {
+    "id": "Сочетания.act.12",
+    "n": "Талый щит",
+    "set": "Вода",
+    "tier": "one",
+    "ch": 2000,
+    "kind": "shield",
+    "tgt": "ally_lowest",
+    "targets": 1,
+    "coef": 120,
+    "thorns": "debuff",
+    "thornsLeft": 1,
+    "stat": "main",
+    "also": {
+     "kind": "buff",
+     "tgt": "same",
+     "targets": null,
+     "left": 3,
+     "st": "healTaken",
+     "pow": 2500,
+     "school": "Вода",
+     "tier": "one"
+    },
+    "parts": [
+     "Вода.shield.one",
+     "Вода.buff.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Щит самому раненому — 120 %: кто бьёт по щиту, получает стужу; ему же — живая вода: +25 % получаемого лечения на 3 раунда."
+   },
+   {
+    "id": "Сочетания.act.13",
+    "n": "Холодная волна",
+    "set": "Вода",
+    "tier": "grp",
+    "ch": 2000,
+    "kind": "dmg",
+    "tgt": "threat",
+    "targets": 3,
+    "coef": 60,
+    "vsDebuff": 15,
+    "stat": "main",
+    "also": {
+     "kind": "debuff",
+     "tgt": "same",
+     "targets": 2,
+     "left": 2,
+     "st": "slow",
+     "pow": 3000,
+     "school": "Вода",
+     "tier": "grp"
+    },
+    "parts": [
+     "Вода.dmg.grp",
+     "Вода.debuff.grp"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Бьёт трёх врагов — по 60 %, под стужей +15 %; двум первым — стужа на 2 раунда."
+   },
+   {
+    "id": "Сочетания.act.14",
+    "n": "Открывающий луч",
+    "set": "Свет",
+    "tier": "grp",
+    "ch": 2000,
+    "kind": "dmg",
+    "tgt": "threat",
+    "targets": 3,
+    "coef": 60,
+    "vsDebuff": 15,
+    "stat": "main",
+    "also": {
+     "kind": "debuff",
+     "tgt": "threat",
+     "targets": 1,
+     "left": 3,
+     "st": "rend",
+     "pow": 3000,
+     "school": "Свет",
+     "tier": "one"
+    },
+    "parts": [
+     "Свет.dmg.grp",
+     "Свет.debuff.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Бьёт трёх врагов — по 60 %, под засветкой +15 %; засветка на цель, 3 раунда."
+   },
+   {
+    "id": "Сочетания.act.15",
+    "n": "Сияющий заслон",
+    "set": "Свет",
+    "tier": "one",
+    "ch": 2000,
+    "kind": "shield",
+    "tgt": "ally_lowest",
+    "targets": 1,
+    "coef": 120,
+    "stat": "main",
+    "also": {
+     "kind": "hot",
+     "tgt": "same",
+     "targets": null,
+     "coef": 24,
+     "left": 3,
+     "max": 3,
+     "over": true,
+     "stat": "main",
+     "school": "Свет",
+     "tier": "one"
+    },
+    "parts": [
+     "Свет.shield.one",
+     "Свет.hot.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Щит самому раненому — 120 %; ему же — сияние: 24 % за ход, 3 раунда, лишнее лечение становится щитом."
+   },
+   {
+    "id": "Сочетания.act.16",
+    "n": "Слепящий удар",
+    "set": "Свет",
+    "tier": "one",
+    "ch": 2000,
+    "kind": "dmg",
+    "tgt": "threat",
+    "targets": 1,
+    "coef": 180,
+    "vsDebuff": 25,
+    "stat": "main",
+    "also": {
+     "kind": "ctrl",
+     "tgt": "same",
+     "targets": null,
+     "left": 2,
+     "st": "blind",
+     "school": "Свет",
+     "tier": "one"
+    },
+    "parts": [
+     "Свет.dmg.one",
+     "Свет.ctrl.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Мощный удар по цели — 180 %, под засветкой +25 %; цель ослеплена на 2 раунда: её удары уходят мимо."
+   },
+   {
+    "id": "Сочетания.act.17",
+    "n": "Кошмар наяву",
+    "set": "Тьма",
+    "tier": "one",
+    "ch": 2000,
+    "kind": "dot",
+    "tgt": "danger",
+    "targets": 1,
+    "coef": 24,
+    "left": 3,
+    "max": 3,
+    "drain": 1000,
+    "stat": "main",
+    "also": {
+     "kind": "ctrl",
+     "tgt": "same",
+     "targets": null,
+     "left": 2,
+     "st": "terror",
+     "school": "Тьма",
+     "tier": "one"
+    },
+    "parts": [
+     "Тьма.dot.one",
+     "Тьма.ctrl.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Увядание на самого опасного врага: 24 % за ход, 3 раунда; он же в ужасе 2 раунда — увядание ужас не сбивает."
+   },
+   {
+    "id": "Сочетания.act.18",
+    "n": "Пьющая жатва",
+    "set": "Тьма",
+    "tier": "one",
+    "ch": 2000,
+    "kind": "dmg",
+    "tgt": "threat",
+    "targets": 1,
+    "coef": 180,
+    "execute": {
+     "belowPct": 30,
+     "pct": 20
+    },
+    "stat": "main",
+    "also": {
+     "kind": "hot",
+     "tgt": "ally_lowest",
+     "targets": 1,
+     "coef": 24,
+     "left": 3,
+     "max": 3,
+     "lowBoost": {
+      "belowPct": 30,
+      "mul": 2
+     },
+     "stat": "main",
+     "school": "Тьма",
+     "tier": "one"
+    },
+    "parts": [
+     "Тьма.dmg.one",
+     "Тьма.hot.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Мощный удар по цели — 180 %, +20 % по цели ниже 30 % здоровья; самому раненому союзнику — тёмная кровь: 24 % за ход, 3 раунда."
+   },
+   {
+    "id": "Сочетания.act.19",
+    "n": "Сумеречный заслон",
+    "set": "Тьма",
+    "tier": "grp",
+    "ch": 2000,
+    "kind": "shield",
+    "tgt": "ally_lowest",
+    "targets": 3,
+    "coef": 48,
+    "stat": "main",
+    "also": {
+     "kind": "debuff",
+     "tgt": "threat",
+     "targets": 2,
+     "left": 2,
+     "st": "weak",
+     "pow": 2500,
+     "school": "Тьма",
+     "tier": "grp"
+    },
+    "parts": [
+     "Тьма.shield.grp",
+     "Тьма.debuff.grp"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Щит троим самым раненым — по 48 %; двум врагам — ослабление на 2 раунда."
+   },
+   {
+    "id": "Сочетания.act.20",
+    "n": "Удар вне очереди",
+    "set": "Время",
+    "tier": "one",
+    "ch": 2000,
+    "kind": "dmg",
+    "tgt": "threat",
+    "targets": 1,
+    "coef": 180,
+    "vsDebuff": 25,
+    "stat": "main",
+    "also": {
+     "kind": "ctrl",
+     "tgt": "same",
+     "targets": null,
+     "left": 2,
+     "st": "stop",
+     "school": "Время",
+     "tier": "one"
+    },
+    "parts": [
+     "Время.dmg.one",
+     "Время.ctrl.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Мощный удар по цели — 180 %, под истечением +25 %; цель остановлена на 2 раунда: ходит последней, её ульта не срабатывает."
+   },
+   {
+    "id": "Сочетания.act.21",
+    "n": "Возвратный щит",
+    "set": "Время",
+    "tier": "one",
+    "ch": 2000,
+    "kind": "shield",
+    "tgt": "ally_lowest",
+    "targets": 1,
+    "coef": 120,
+    "stat": "main",
+    "also": {
+     "kind": "hot",
+     "tgt": "same",
+     "targets": null,
+     "coef": 24,
+     "left": 3,
+     "max": 3,
+     "grow": 10,
+     "stat": "main",
+     "school": "Время",
+     "tier": "one"
+    },
+    "parts": [
+     "Время.shield.one",
+     "Время.hot.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Щит самому раненому — 120 %; ему же — обратный ход: 24 % за ход, 3 раунда, с каждым ходом сильнее."
+   },
+   {
+    "id": "Сочетания.act.22",
+    "n": "Маятник иссякания",
+    "set": "Время",
+    "tier": "grp",
+    "ch": 2000,
+    "kind": "dmg",
+    "tgt": "threat",
+    "targets": 3,
+    "coef": 60,
+    "vsDebuff": 15,
+    "stat": "main",
+    "also": {
+     "kind": "debuff",
+     "tgt": "same",
+     "targets": 2,
+     "left": 2,
+     "st": "chanceDown",
+     "pow": 3333,
+     "school": "Время",
+     "tier": "grp"
+    },
+    "parts": [
+     "Время.dmg.grp",
+     "Время.debuff.grp"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Бьёт трёх врагов — по 60 %, под истечением +15 %; двум первым — истечение на 2 раунда."
+   },
+   {
+    "id": "Сочетания.act.23",
+    "n": "Оглушающий удар",
+    "set": "Без школы",
+    "tier": "one",
+    "ch": 2000,
+    "kind": "dmg",
+    "tgt": "threat",
+    "targets": 1,
+    "coef": 180,
+    "vsDebuff": 25,
+    "stat": "main",
+    "also": {
+     "kind": "ctrl",
+     "tgt": "same",
+     "targets": null,
+     "left": 2,
+     "st": "stun",
+     "school": "Без школы",
+     "tier": "one"
+    },
+    "parts": [
+     "Без школы.dmg.one",
+     "Без школы.ctrl.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Мощный удар по цели — 180 %, со сломом строя +25 %; оглушение цели на 2 раунда."
+   },
+   {
+    "id": "Сочетания.act.24",
+    "n": "Удар и перевязка",
+    "set": "Без школы",
+    "tier": "grp",
+    "ch": 2000,
+    "kind": "dmg",
+    "tgt": "threat",
+    "targets": 3,
+    "coef": 60,
+    "vsDot": 15,
+    "stat": "main",
+    "also": {
+     "kind": "hot",
+     "tgt": "ally_lowest",
+     "targets": 1,
+     "coef": 24,
+     "left": 3,
+     "max": 3,
+     "pure": true,
+     "stat": "main",
+     "school": "Без школы",
+     "tier": "one"
+    },
+    "parts": [
+     "Без школы.dmg.grp",
+     "Без школы.hot.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Бьёт трёх врагов — по 60 %, с кровотечением +15 %; самому раненому союзнику — перевязка: 24 % за ход, 3 раунда."
+   },
+   {
+    "id": "Сочетания.act.25",
+    "n": "Сомкнутый строй",
+    "set": "Без школы",
+    "tier": "one",
+    "ch": 2000,
+    "kind": "shield",
+    "tgt": "ally_lowest",
+    "targets": 1,
+    "coef": 120,
+    "stat": "main",
+    "also": {
+     "kind": "debuff",
+     "tgt": "threat",
+     "targets": 1,
+     "left": 3,
+     "st": "break",
+     "pow": 2500,
+     "evadeDown": 1000,
+     "school": "Без школы",
+     "tier": "one"
+    },
+    "parts": [
+     "Без школы.shield.one",
+     "Без школы.debuff.one"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Щит самому раненому — 120 %; слом строя на цель, 3 раунда."
+   },
+   {
+    "id": "Сочетания.act.26",
+    "n": "Пар",
+    "set": "Огонь",
+    "tier": "all",
+    "ch": 2000,
+    "kind": "dmg",
+    "tgt": "all",
+    "targets": null,
+    "coef": 36,
+    "stat": "main",
+    "also": {
+     "kind": "debuff",
+     "tgt": "all",
+     "targets": null,
+     "left": 1,
+     "st": "slow",
+     "pow": 3000,
+     "school": "Вода",
+     "tier": "all"
+    },
+    "parts": [
+     "Огонь.dmg.all",
+     "Вода.debuff.all"
+    ],
+    "combo": true,
+    "two": true,
+    "twist": "",
+    "d": "Бьёт всех врагов — по 36 %; стужа на всех врагов, 1 раунд."
+   },
+   {
+    "id": "Сочетания.act.27",
+    "n": "Лава",
+    "set": "Огонь",
+    "tier": "one",
+    "ch": 2000,
+    "kind": "dmg",
+    "tgt": "threat",
+    "targets": 1,
+    "coef": 180,
+    "perStack": 25,
+    "stat": "main",
+    "also": {
+     "kind": "debuff",
+     "tgt": "same",
+     "targets": null,
+     "left": 3,
+     "st": "pierce",
+     "pow": 3000,
+     "school": "Земля",
+     "tier": "one"
+    },
+    "parts": [
+     "Огонь.dmg.one",
+     "Земля.debuff.one"
+    ],
+    "combo": true,
+    "two": true,
+    "twist": "",
+    "d": "Мощный удар по цели — 180 %, +25 % за каждый стак горения на ней; цели — осыпание на 3 раунда."
+   },
+   {
+    "id": "Сочетания.act.28",
+    "n": "Огненный смерч",
+    "set": "Огонь",
+    "tier": "grp",
+    "ch": 2000,
+    "kind": "dmg",
+    "tgt": "threat",
+    "targets": 3,
+    "coef": 60,
+    "vsDot": 15,
+    "stat": "main",
+    "also": {
+     "kind": "dot",
+     "tgt": "same",
+     "targets": 3,
+     "coef": 15,
+     "left": 2,
+     "max": 3,
+     "stat": "main",
+     "school": "Воздух",
+     "tier": "grp"
+    },
+    "parts": [
+     "Огонь.dmg.grp",
+     "Воздух.dot.grp"
+    ],
+    "combo": true,
+    "two": true,
+    "twist": "",
+    "d": "Бьёт трёх врагов — по 60 %, горящим +15 %; каждому — стак пореза: 15 % за ход, 2 раунда."
+   },
+   {
+    "id": "Сочетания.act.29",
+    "n": "Трясина",
+    "set": "Земля",
+    "tier": "grp",
+    "ch": 2000,
+    "kind": "ctrl",
+    "tgt": "danger",
+    "targets": 2,
+    "left": 1,
+    "st": "paralyze",
+    "also": {
+     "kind": "debuff",
+     "tgt": "same",
+     "targets": 2,
+     "left": 2,
+     "st": "slow",
+     "pow": 3000,
+     "school": "Вода",
+     "tier": "grp"
+    },
+    "parts": [
+     "Земля.ctrl.grp",
+     "Вода.debuff.grp"
+    ],
+    "combo": true,
+    "two": true,
+    "twist": "",
+    "d": "Паралич на двух самых опасных врагов, 1 раунд; им же — стужа на 2 раунда."
+   },
+   {
+    "id": "Сочетания.act.30",
+    "n": "Пыльный обвал",
+    "set": "Земля",
+    "tier": "all",
+    "ch": 2000,
+    "kind": "debuff",
+    "tgt": "all",
+    "targets": null,
+    "left": 1,
+    "st": "pierce",
+    "pow": 3000,
+    "also": {
+     "kind": "debuff",
+     "tgt": "all",
+     "targets": null,
+     "left": 1,
+     "st": "miss",
+     "pow": 5000,
+     "school": "Воздух",
+     "tier": "all"
+    },
+    "parts": [
+     "Земля.debuff.all",
+     "Воздух.debuff.all"
+    ],
+    "combo": true,
+    "two": true,
+    "twist": "",
+    "d": "Осыпание и слепота на всех врагов, 1 раунд."
+   },
+   {
+    "id": "Сочетания.act.31",
+    "n": "Буран",
+    "set": "Вода",
+    "tier": "all",
+    "ch": 2000,
+    "kind": "dmg",
+    "tgt": "all",
+    "targets": null,
+    "coef": 36,
+    "stat": "main",
+    "also": {
+     "kind": "ctrl",
+     "tgt": "all",
+     "targets": null,
+     "left": 1,
+     "st": "knock",
+     "school": "Воздух",
+     "tier": "all"
+    },
+    "parts": [
+     "Вода.dmg.all",
+     "Воздух.ctrl.all"
+    ],
+    "combo": true,
+    "two": true,
+    "twist": "",
+    "d": "Бьёт всех врагов — по 36 %; сброс на всех врагов, 1 раунд."
+   },
+   {
+    "id": "Сочетания.act.32",
+    "n": "Рассветный жар",
+    "set": "Свет",
+    "tier": "all",
+    "ch": 2000,
+    "kind": "heal",
+    "tgt": "allies",
+    "targets": null,
+    "coef": 36,
+    "stat": "main",
+    "also": {
+     "kind": "buff",
+     "tgt": "allies",
+     "targets": null,
+     "left": 1,
+     "st": "dmgUp",
+     "pow": 2000,
+     "school": "Огонь",
+     "tier": "all"
+    },
+    "parts": [
+     "Свет.heal.all",
+     "Огонь.buff.all"
+    ],
+    "combo": true,
+    "two": true,
+    "twist": "",
+    "d": "Лечит всех своих — по 36 %; жар всему отряду, 1 раунд."
+   },
+   {
+    "id": "Сочетания.act.33",
+    "n": "Спешный ветер",
+    "set": "Время",
+    "tier": "grp",
+    "ch": 2000,
+    "kind": "buff",
+    "tgt": "ally_strong",
+    "targets": 2,
+    "left": 2,
+    "st": "chanceUp",
+    "pow": 2500,
+    "also": {
+     "kind": "buff",
+     "tgt": "ally_lowest",
+     "targets": 2,
+     "left": 2,
+     "st": "evade",
+     "pow": 2000,
+     "school": "Воздух",
+     "tier": "grp"
+    },
+    "parts": [
+     "Время.buff.grp",
+     "Воздух.buff.grp"
+    ],
+    "combo": true,
+    "two": true,
+    "twist": "",
+    "d": "Ускорение двум самым сильным союзникам и попутный ветер двум самым раненым, 2 раунда."
+   }
+  ],
+  "ult": [
+   {
+    "id": "Сочетания.ult.1",
+    "n": "Огненная буря",
+    "set": "Огонь",
+    "tier": "all",
+    "ch": 1000,
+    "ult": true,
+    "kind": "dot",
+    "tgt": "all",
+    "targets": null,
+    "coef": 24,
+    "left": 3,
+    "max": 3,
+    "stacks": 3,
+    "stat": "main",
+    "also": {
+     "kind": "dot",
+     "tgt": "all",
+     "targets": null,
+     "coef": 18,
+     "left": 2,
+     "max": 3,
+     "stacks": 3,
+     "stat": "main",
+     "school": "Воздух",
+     "tier": "all"
+    },
+    "parts": [
+     "Огонь.ult.dot",
+     "Воздух.ult.dot"
+    ],
+    "combo": true,
+    "two": true,
+    "twist": "",
+    "d": "Горение и порезы на всех врагов: сразу по 3 стака — 24 % и 18 % за ход, 3 раунда и 2 раунда."
+   },
+   {
+    "id": "Сочетания.ult.2",
+    "n": "Ледяная крепость",
+    "set": "Вода",
+    "tier": "all",
+    "ch": 1000,
+    "ult": true,
+    "kind": "shield",
+    "tgt": "allies",
+    "targets": null,
+    "coef": 60,
+    "stat": "main",
+    "also": {
+     "kind": "ctrl",
+     "tgt": "all",
+     "targets": null,
+     "left": 1,
+     "st": "freeze",
+     "breakPct": 10,
+     "school": "Вода",
+     "tier": "all"
+    },
+    "parts": [
+     "Вода.ult.shield",
+     "Вода.ult.ctrl"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Крепкий щит всему отряду — по 60 %; заморозка всех врагов, 1 раунд."
+   },
+   {
+    "id": "Сочетания.ult.3",
+    "n": "Ярость и пепел",
+    "set": "Огонь",
+    "tier": "all",
+    "ch": 1000,
+    "ult": true,
+    "kind": "buff",
+    "tgt": "allies",
+    "targets": null,
+    "left": 3,
+    "st": "dmgUp",
+    "pow": 3000,
+    "also": {
+     "kind": "debuff",
+     "tgt": "all",
+     "targets": null,
+     "left": 3,
+     "st": "mark",
+     "pow": 3000,
+     "school": "Огонь",
+     "tier": "all"
+    },
+    "parts": [
+     "Огонь.ult.buff",
+     "Огонь.ult.debuff"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Жар всему отряду и метка на всех врагов: +30 % урона и +30 % получаемого урона, 3 раунда."
+   },
+   {
+    "id": "Сочетания.ult.4",
+    "n": "Каменный гимн",
+    "set": "Земля",
+    "tier": "all",
+    "ch": 1000,
+    "ult": true,
+    "kind": "buff",
+    "tgt": "allies",
+    "targets": null,
+    "left": 3,
+    "st": "guard",
+    "pow": 3500,
+    "also": {
+     "kind": "buff",
+     "tgt": "allies",
+     "targets": null,
+     "left": 3,
+     "st": "critUp",
+     "pow": 2500,
+     "school": "Без школы",
+     "tier": "all"
+    },
+    "parts": [
+     "Земля.ult.buff",
+     "Без школы.ult.buff"
+    ],
+    "combo": true,
+    "two": false,
+    "twist": "",
+    "d": "Каменная кожа и боевой дух всему отряду: −35 % получаемого урона и +25 % шанса крита, 3 раунда."
+   }
+  ]
+ },
+ "tags": {
+  "Огонь.dmg.all": {
+   "give": [
+    "hit"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Огонь.dmg.grp": {
+   "give": [
+    "hit"
+   ],
+   "take": [
+    "dot:Огонь"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Огонь.dmg.one": {
+   "give": [
+    "hit"
+   ],
+   "take": [
+    "dot:Огонь"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Огонь.heal.all": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Огонь.heal.grp": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [
+    "hot:Огонь"
+   ],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Огонь.heal.one": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Огонь.shield.all": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Огонь.shield.grp": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Огонь.shield.one": {
+   "give": [
+    "dot:Огонь",
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Огонь.dot.all": {
+   "give": [
+    "dot:Огонь"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Огонь.dot.grp": {
+   "give": [
+    "dot:Огонь"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Огонь.dot.one": {
+   "give": [
+    "dot:Огонь"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Огонь.hot.all": {
+   "give": [
+    "heal",
+    "hot:Огонь",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Огонь.hot.grp": {
+   "give": [
+    "heal",
+    "hot:Огонь",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Огонь.hot.one": {
+   "give": [
+    "heal",
+    "hot:Огонь",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Огонь.ctrl.all": {
+   "give": [
+    "ctrl",
+    "st:silence"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Огонь.ctrl.grp": {
+   "give": [
+    "ctrl",
+    "st:silence"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Огонь.ctrl.one": {
+   "give": [
+    "ctrl",
+    "st:silence"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Огонь.debuff.all": {
+   "give": [
+    "debuff",
+    "st:mark"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Огонь.debuff.grp": {
+   "give": [
+    "debuff",
+    "st:mark"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Огонь.debuff.one": {
+   "give": [
+    "debuff",
+    "st:mark"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Огонь.buff.all": {
+   "give": [
+    "buff:dmgUp"
+   ],
+   "take": [],
+   "roles": [
+    "усиление"
+   ]
+  },
+  "Огонь.buff.grp": {
+   "give": [
+    "buff:dmgUp"
+   ],
+   "take": [],
+   "roles": [
+    "усиление"
+   ]
+  },
+  "Огонь.buff.one": {
+   "give": [
+    "buff:dmgUp"
+   ],
+   "take": [],
+   "roles": [
+    "усиление"
+   ]
+  },
+  "Огонь.ult.dmg": {
+   "give": [
+    "hit"
+   ],
+   "take": [
+    "dot:Огонь"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Огонь.ult.heal": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Огонь.ult.shield": {
+   "give": [
+    "dot:Огонь",
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Огонь.ult.dot": {
+   "give": [
+    "dot:Огонь"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Огонь.ult.hot": {
+   "give": [
+    "heal",
+    "hot:Огонь",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Огонь.ult.ctrl": {
+   "give": [
+    "ctrl",
+    "st:silence"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Огонь.ult.debuff": {
+   "give": [
+    "debuff",
+    "st:mark"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Огонь.ult.buff": {
+   "give": [
+    "buff:dmgUp"
+   ],
+   "take": [],
+   "roles": [
+    "усиление"
+   ]
+  },
+  "Огонь.pas.1": {
+   "give": [
+    "dot:Огонь"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "give": [
+     "dot:Огонь"
+    ]
+   }
+  },
+  "Огонь.pas.2": {
+   "give": [],
+   "take": [
+    "dot:Огонь"
+   ],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "any": [
+     "dot:Огонь"
+    ]
+   }
+  },
+  "Огонь.pas.3": {
+   "give": [],
+   "take": [
+    "dot:Огонь"
+   ],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "own": [
+     "dot:Огонь"
+    ]
+   }
+  },
+  "Огонь.pas.4": {
+   "give": [],
+   "take": [
+    "dot:Огонь"
+   ],
+   "roles": [
+    "лечение"
+   ],
+   "link": {
+    "any": [
+     "dot:Огонь"
+    ],
+    "own": [
+     "support"
+    ]
+   }
+  },
+  "Огонь.pas.5": {
+   "give": [
+    "st:mark"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ],
+   "link": {
+    "give": [
+     "st:mark"
+    ]
+   }
+  },
+  "Огонь.react.1": {
+   "give": [
+    "dot:Огонь"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "gate": [
+     "tank"
+    ],
+    "give": [
+     "dot:Огонь"
+    ]
+   }
+  },
+  "Огонь.react.2": {
+   "give": [
+    "dot:Огонь"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "crit": true,
+    "give": [
+     "dot:Огонь"
+    ]
+   }
+  },
+  "Огонь.react.3": {
+   "give": [],
+   "take": [
+    "dot:Огонь"
+   ],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "kill": true,
+    "any": [
+     "dot:Огонь"
+    ]
+   }
+  },
+  "Огонь.react.4": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "усиление"
+   ]
+  },
+  "Земля.dmg.all": {
+   "give": [
+    "hit"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Земля.dmg.grp": {
+   "give": [
+    "hit"
+   ],
+   "take": [
+    "dot:Земля"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Земля.dmg.one": {
+   "give": [
+    "hit"
+   ],
+   "take": [
+    "dot:Земля"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Земля.heal.all": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Земля.heal.grp": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [
+    "hot:Земля"
+   ],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Земля.heal.one": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [
+    "hot:Земля"
+   ],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Земля.shield.all": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Земля.shield.grp": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Земля.shield.one": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Земля.dot.all": {
+   "give": [
+    "dot:Земля"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Земля.dot.grp": {
+   "give": [
+    "dot:Земля"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Земля.dot.one": {
+   "give": [
+    "dot:Земля"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Земля.hot.all": {
+   "give": [
+    "heal",
+    "hot:Земля",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Земля.hot.grp": {
+   "give": [
+    "heal",
+    "hot:Земля",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Земля.hot.one": {
+   "give": [
+    "heal",
+    "hot:Земля",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Земля.ctrl.all": {
+   "give": [
+    "ctrl",
+    "st:paralyze"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Земля.ctrl.grp": {
+   "give": [
+    "ctrl",
+    "st:paralyze"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Земля.ctrl.one": {
+   "give": [
+    "ctrl",
+    "st:paralyze"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Земля.debuff.all": {
+   "give": [
+    "debuff",
+    "st:pierce"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Земля.debuff.grp": {
+   "give": [
+    "debuff",
+    "st:pierce"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Земля.debuff.one": {
+   "give": [
+    "debuff",
+    "st:pierce"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Земля.buff.all": {
+   "give": [
+    "buff:guard"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Земля.buff.grp": {
+   "give": [
+    "buff:guard"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Земля.buff.one": {
+   "give": [
+    "buff:guard"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Земля.ult.dmg": {
+   "give": [
+    "ctrl",
+    "hit",
+    "st:paralyze"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Земля.ult.heal": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Земля.ult.shield": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Земля.ult.dot": {
+   "give": [
+    "dot:Земля"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Земля.ult.hot": {
+   "give": [
+    "heal",
+    "hot:Земля",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Земля.ult.ctrl": {
+   "give": [
+    "ctrl",
+    "st:paralyze"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Земля.ult.debuff": {
+   "give": [
+    "debuff",
+    "st:pierce"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Земля.ult.buff": {
+   "give": [
+    "buff:guard"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Земля.pas.1": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "gate": [
+     "tank"
+    ]
+   }
+  },
+  "Земля.pas.2": {
+   "give": [],
+   "take": [
+    "dot:Земля"
+   ],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "own": [
+     "dot:Земля"
+    ]
+   }
+  },
+  "Земля.pas.3": {
+   "give": [],
+   "take": [
+    "st:pierce"
+   ],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "any": [
+     "st:pierce"
+    ]
+   }
+  },
+  "Земля.pas.4": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "own": [
+     "shield"
+    ]
+   }
+  },
+  "Земля.pas.5": {
+   "give": [
+    "st:pierce"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ],
+   "link": {
+    "give": [
+     "st:pierce"
+    ]
+   }
+  },
+  "Земля.pas.6": {
+   "give": [],
+   "take": [
+    "hot:Земля"
+   ],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "own": [
+     "hot:Земля"
+    ]
+   }
+  },
+  "Земля.pas.7": {
+   "give": [],
+   "take": [
+    "st:paralyze"
+   ],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "any": [
+     "st:paralyze"
+    ]
+   }
+  },
+  "Земля.react.1": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "gate": [
+     "tank"
+    ]
+   }
+  },
+  "Земля.react.2": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "gate": [
+     "tank"
+    ]
+   }
+  },
+  "Земля.react.3": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "gate": [
+     "tank"
+    ]
+   }
+  },
+  "Земля.react.4": {
+   "give": [
+    "dot:Земля"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "kill": true,
+    "give": [
+     "dot:Земля"
+    ]
+   }
+  },
+  "Воздух.dmg.all": {
+   "give": [
+    "dot:Воздух",
+    "hit"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Воздух.dmg.grp": {
+   "give": [
+    "hit"
+   ],
+   "take": [
+    "dot:Воздух"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Воздух.dmg.one": {
+   "give": [
+    "hit"
+   ],
+   "take": [
+    "dot:Воздух"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Воздух.heal.all": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Воздух.heal.grp": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [
+    "hot:Воздух"
+   ],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Воздух.heal.one": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [
+    "hot:Воздух"
+   ],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Воздух.shield.all": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Воздух.shield.grp": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Воздух.shield.one": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Воздух.dot.all": {
+   "give": [
+    "dot:Воздух"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Воздух.dot.grp": {
+   "give": [
+    "dot:Воздух"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Воздух.dot.one": {
+   "give": [
+    "dot:Воздух"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Воздух.hot.all": {
+   "give": [
+    "heal",
+    "hot:Воздух",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Воздух.hot.grp": {
+   "give": [
+    "heal",
+    "hot:Воздух",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Воздух.hot.one": {
+   "give": [
+    "heal",
+    "hot:Воздух",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Воздух.ctrl.all": {
+   "give": [
+    "ctrl",
+    "st:knock"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Воздух.ctrl.grp": {
+   "give": [
+    "ctrl",
+    "st:knock"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Воздух.ctrl.one": {
+   "give": [
+    "ctrl",
+    "st:knock"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Воздух.debuff.all": {
+   "give": [
+    "debuff",
+    "st:miss"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Воздух.debuff.grp": {
+   "give": [
+    "debuff",
+    "st:miss"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Воздух.debuff.one": {
+   "give": [
+    "debuff",
+    "st:miss"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Воздух.buff.all": {
+   "give": [
+    "buff:evade"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Воздух.buff.grp": {
+   "give": [
+    "buff:evade"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Воздух.buff.one": {
+   "give": [
+    "buff:evade"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Воздух.ult.dmg": {
+   "give": [
+    "dot:Воздух",
+    "hit"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Воздух.ult.heal": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Воздух.ult.shield": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Воздух.ult.dot": {
+   "give": [
+    "dot:Воздух"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Воздух.ult.hot": {
+   "give": [
+    "heal",
+    "hot:Воздух",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Воздух.ult.ctrl": {
+   "give": [
+    "ctrl",
+    "st:knock"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Воздух.ult.debuff": {
+   "give": [
+    "debuff",
+    "st:miss"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Воздух.ult.buff": {
+   "give": [
+    "buff:evade"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Воздух.ult.birds": {
+   "give": [
+    "dot:Воздух",
+    "hit"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Воздух.pas.1": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "gate": [
+     "tank"
+    ]
+   }
+  },
+  "Воздух.pas.2": {
+   "give": [],
+   "take": [
+    "dot:Воздух"
+   ],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "any": [
+     "dot:Воздух"
+    ]
+   }
+  },
+  "Воздух.pas.3": {
+   "give": [],
+   "take": [
+    "st:miss"
+   ],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "any": [
+     "st:miss"
+    ]
+   }
+  },
+  "Воздух.pas.4": {
+   "give": [],
+   "take": [
+    "dot:Воздух"
+   ],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "own": [
+     "dot:Воздух"
+    ]
+   }
+  },
+  "Воздух.pas.5": {
+   "give": [],
+   "take": [
+    "hot:Воздух"
+   ],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "own": [
+     "hot:Воздух"
+    ]
+   }
+  },
+  "Воздух.react.1": {
+   "give": [
+    "dot:Воздух"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "gate": [
+     "tank",
+     "agi"
+    ],
+    "give": [
+     "dot:Воздух"
+    ]
+   }
+  },
+  "Воздух.react.2": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "gate": [
+     "tank"
+    ]
+   }
+  },
+  "Воздух.react.3": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "crit": true
+   }
+  },
+  "Воздух.react.4": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "gate": [
+     "tank"
+    ]
+   }
+  },
+  "Тьма.dmg.all": {
+   "give": [
+    "hit"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Тьма.dmg.grp": {
+   "give": [
+    "hit"
+   ],
+   "take": [
+    "dot:Тьма"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Тьма.dmg.one": {
+   "give": [
+    "hit"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Тьма.heal.all": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Тьма.heal.grp": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Тьма.heal.one": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [
+    "hot:Тьма"
+   ],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Тьма.shield.all": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Тьма.shield.grp": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Тьма.shield.one": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Тьма.dot.all": {
+   "give": [
+    "dot:Тьма"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Тьма.dot.grp": {
+   "give": [
+    "dot:Тьма"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Тьма.dot.one": {
+   "give": [
+    "dot:Тьма"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Тьма.hot.all": {
+   "give": [
+    "heal",
+    "hot:Тьма",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Тьма.hot.grp": {
+   "give": [
+    "heal",
+    "hot:Тьма",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Тьма.hot.one": {
+   "give": [
+    "heal",
+    "hot:Тьма",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Тьма.ctrl.all": {
+   "give": [
+    "ctrl",
+    "st:terror"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Тьма.ctrl.grp": {
+   "give": [
+    "ctrl",
+    "st:terror"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Тьма.ctrl.one": {
+   "give": [
+    "ctrl",
+    "st:terror"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Тьма.debuff.all": {
+   "give": [
+    "debuff",
+    "st:weak"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Тьма.debuff.grp": {
+   "give": [
+    "debuff",
+    "st:weak"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Тьма.debuff.one": {
+   "give": [
+    "debuff",
+    "st:weak"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Тьма.buff.all": {
+   "give": [
+    "buff:lifesteal"
+   ],
+   "take": [],
+   "roles": [
+    "усиление"
+   ]
+  },
+  "Тьма.buff.grp": {
+   "give": [
+    "buff:lifesteal"
+   ],
+   "take": [],
+   "roles": [
+    "усиление"
+   ]
+  },
+  "Тьма.buff.one": {
+   "give": [
+    "buff:lifesteal"
+   ],
+   "take": [],
+   "roles": [
+    "усиление"
+   ]
+  },
+  "Тьма.ult.dmg": {
+   "give": [
+    "hit"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Тьма.ult.heal": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Тьма.ult.shield": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Тьма.ult.dot": {
+   "give": [
+    "dot:Тьма"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Тьма.ult.hot": {
+   "give": [
+    "heal",
+    "hot:Тьма",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Тьма.ult.ctrl": {
+   "give": [
+    "ctrl",
+    "st:terror"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Тьма.ult.debuff": {
+   "give": [
+    "debuff",
+    "st:weak"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Тьма.ult.buff": {
+   "give": [
+    "buff:lifesteal"
+   ],
+   "take": [],
+   "roles": [
+    "усиление"
+   ]
+  },
+  "Тьма.pas.1": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "gate": [
+     "dps"
+    ]
+   }
+  },
+  "Тьма.pas.2": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "контроль"
+   ],
+   "link": {
+    "own": [
+     "debuff"
+    ]
+   }
+  },
+  "Тьма.pas.3": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "gate": [
+     "dps"
+    ]
+   }
+  },
+  "Тьма.pas.4": {
+   "give": [],
+   "take": [
+    "dot:Тьма"
+   ],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "own": [
+     "dot:Тьма"
+    ]
+   }
+  },
+  "Тьма.react.1": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "kill": true
+   }
+  },
+  "Тьма.react.2": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "gate": [
+     "tank"
+    ]
+   }
+  },
+  "Тьма.react.3": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "gate": [
+     "tank"
+    ]
+   }
+  },
+  "Тьма.react.4": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "усиление"
+   ]
+  },
+  "Вода.dmg.all": {
+   "give": [
+    "hit"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Вода.dmg.grp": {
+   "give": [
+    "hit"
+   ],
+   "take": [
+    "st:slow"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Вода.dmg.one": {
+   "give": [
+    "hit"
+   ],
+   "take": [
+    "st:slow"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Вода.heal.all": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [
+    "hot:Вода"
+   ],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Вода.heal.grp": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [
+    "hot:Вода"
+   ],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Вода.heal.one": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [
+    "hot:Вода"
+   ],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Вода.shield.all": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Вода.shield.grp": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Вода.shield.one": {
+   "give": [
+    "shield",
+    "st:slow",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Вода.dot.all": {
+   "give": [
+    "dot:Вода",
+    "st:slow"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Вода.dot.grp": {
+   "give": [
+    "dot:Вода",
+    "st:slow"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Вода.dot.one": {
+   "give": [
+    "dot:Вода",
+    "st:slow"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Вода.hot.all": {
+   "give": [
+    "heal",
+    "hot:Вода",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Вода.hot.grp": {
+   "give": [
+    "heal",
+    "hot:Вода",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Вода.hot.one": {
+   "give": [
+    "heal",
+    "hot:Вода",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Вода.ctrl.all": {
+   "give": [
+    "ctrl",
+    "st:freeze"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Вода.ctrl.grp": {
+   "give": [
+    "ctrl",
+    "st:freeze"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Вода.ctrl.one": {
+   "give": [
+    "ctrl",
+    "st:freeze"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Вода.debuff.all": {
+   "give": [
+    "debuff",
+    "st:slow"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Вода.debuff.grp": {
+   "give": [
+    "debuff",
+    "st:slow"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Вода.debuff.one": {
+   "give": [
+    "debuff",
+    "st:slow"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Вода.buff.all": {
+   "give": [
+    "buff:healTaken"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Вода.buff.grp": {
+   "give": [
+    "buff:healTaken"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Вода.buff.one": {
+   "give": [
+    "buff:healTaken"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Вода.ult.dmg": {
+   "give": [
+    "hit"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Вода.ult.heal": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Вода.ult.shield": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Вода.ult.dot": {
+   "give": [
+    "dot:Вода",
+    "st:slow"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Вода.ult.hot": {
+   "give": [
+    "heal",
+    "hot:Вода",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Вода.ult.ctrl": {
+   "give": [
+    "ctrl",
+    "st:freeze"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Вода.ult.debuff": {
+   "give": [
+    "debuff",
+    "st:slow"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Вода.ult.buff": {
+   "give": [
+    "buff:healTaken"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Вода.pas.1": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "лечение"
+   ],
+   "link": {
+    "own": [
+     "heal"
+    ]
+   }
+  },
+  "Вода.pas.2": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "лечение"
+   ],
+   "link": {
+    "own": [
+     "heal"
+    ]
+   }
+  },
+  "Вода.pas.3": {
+   "give": [],
+   "take": [
+    "st:slow"
+   ],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "any": [
+     "st:slow"
+    ]
+   }
+  },
+  "Вода.pas.4": {
+   "give": [],
+   "take": [
+    "hot:Вода"
+   ],
+   "roles": [
+    "лечение"
+   ],
+   "link": {
+    "own": [
+     "hot:Вода"
+    ]
+   }
+  },
+  "Вода.pas.5": {
+   "give": [],
+   "take": [
+    "st:freeze"
+   ],
+   "roles": [
+    "контроль"
+   ],
+   "link": {
+    "own": [
+     "st:freeze"
+    ]
+   }
+  },
+  "Вода.pas.6": {
+   "give": [],
+   "take": [
+    "st:slow"
+   ],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "any": [
+     "st:slow"
+    ]
+   }
+  },
+  "Вода.react.1": {
+   "give": [
+    "heal",
+    "hot:Вода"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ],
+   "link": {
+    "give": [
+     "heal",
+     "hot:Вода"
+    ]
+   }
+  },
+  "Вода.react.2": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "gate": [
+     "tank"
+    ]
+   }
+  },
+  "Вода.react.3": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "лечение"
+   ],
+   "link": {
+    "own": [
+     "heal"
+    ]
+   }
+  },
+  "Вода.react.4": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "gate": [
+     "tank"
+    ]
+   }
+  },
+  "Свет.dmg.all": {
+   "give": [
+    "hit"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Свет.dmg.grp": {
+   "give": [
+    "hit"
+   ],
+   "take": [
+    "st:rend"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Свет.dmg.one": {
+   "give": [
+    "hit"
+   ],
+   "take": [
+    "st:rend"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Свет.heal.all": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Свет.heal.grp": {
+   "give": [
+    "buff:defUp",
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Свет.heal.one": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Свет.shield.all": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Свет.shield.grp": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Свет.shield.one": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Свет.dot.all": {
+   "give": [
+    "dot:Свет"
+   ],
+   "take": [
+    "st:rend"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Свет.dot.grp": {
+   "give": [
+    "dot:Свет"
+   ],
+   "take": [
+    "st:rend"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Свет.dot.one": {
+   "give": [
+    "dot:Свет"
+   ],
+   "take": [
+    "st:rend"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Свет.hot.all": {
+   "give": [
+    "heal",
+    "hot:Свет",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Свет.hot.grp": {
+   "give": [
+    "heal",
+    "hot:Свет",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Свет.hot.one": {
+   "give": [
+    "heal",
+    "hot:Свет",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Свет.ctrl.all": {
+   "give": [
+    "ctrl",
+    "st:blind"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Свет.ctrl.grp": {
+   "give": [
+    "ctrl",
+    "st:blind"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Свет.ctrl.one": {
+   "give": [
+    "ctrl",
+    "st:blind"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Свет.debuff.all": {
+   "give": [
+    "debuff",
+    "st:rend"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Свет.debuff.grp": {
+   "give": [
+    "debuff",
+    "st:rend"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Свет.debuff.one": {
+   "give": [
+    "debuff",
+    "st:rend"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Свет.buff.all": {
+   "give": [
+    "buff:defUp"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Свет.buff.grp": {
+   "give": [
+    "buff:defUp"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Свет.buff.one": {
+   "give": [
+    "buff:defUp"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Свет.ult.dmg": {
+   "give": [
+    "hit"
+   ],
+   "take": [
+    "st:rend"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Свет.ult.heal": {
+   "give": [
+    "buff:guard",
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Свет.ult.shield": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Свет.ult.dot": {
+   "give": [
+    "dot:Свет"
+   ],
+   "take": [
+    "st:rend"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Свет.ult.hot": {
+   "give": [
+    "heal",
+    "hot:Свет",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Свет.ult.ctrl": {
+   "give": [
+    "ctrl",
+    "st:blind"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Свет.ult.debuff": {
+   "give": [
+    "debuff",
+    "st:rend"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Свет.ult.buff": {
+   "give": [
+    "buff:defUp"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Свет.pas.1": {
+   "give": [],
+   "take": [
+    "hot:Свет"
+   ],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "own": [
+     "hot:Свет"
+    ]
+   }
+  },
+  "Свет.pas.2": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Свет.pas.3": {
+   "give": [],
+   "take": [
+    "st:rend"
+   ],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "any": [
+     "st:rend"
+    ]
+   }
+  },
+  "Свет.pas.4": {
+   "give": [],
+   "take": [
+    "hot:Свет"
+   ],
+   "roles": [
+    "лечение"
+   ],
+   "link": {
+    "own": [
+     "hot:Свет"
+    ]
+   }
+  },
+  "Свет.react.1": {
+   "give": [
+    "shield"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "give": [
+     "shield"
+    ]
+   }
+  },
+  "Свет.react.2": {
+   "give": [],
+   "take": [
+    "heal"
+   ],
+   "roles": [
+    "лечение"
+   ],
+   "link": {
+    "any": [
+     "heal"
+    ]
+   }
+  },
+  "Свет.react.3": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "усиление"
+   ]
+  },
+  "Свет.react.4": {
+   "give": [
+    "ctrl",
+    "st:blind"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ],
+   "link": {
+    "give": [
+     "ctrl",
+     "st:blind"
+    ]
+   }
+  },
+  "Время.dmg.all": {
+   "give": [
+    "hit"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Время.dmg.grp": {
+   "give": [
+    "hit"
+   ],
+   "take": [
+    "st:chanceDown"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Время.dmg.one": {
+   "give": [
+    "hit"
+   ],
+   "take": [
+    "st:chanceDown"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Время.heal.all": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Время.heal.grp": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [
+    "hot:Время"
+   ],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Время.heal.one": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Время.shield.all": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Время.shield.grp": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Время.shield.one": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Время.dot.all": {
+   "give": [
+    "dot:Время"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Время.dot.grp": {
+   "give": [
+    "dot:Время"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Время.dot.one": {
+   "give": [
+    "dot:Время"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Время.hot.all": {
+   "give": [
+    "heal",
+    "hot:Время",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Время.hot.grp": {
+   "give": [
+    "heal",
+    "hot:Время",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Время.hot.one": {
+   "give": [
+    "heal",
+    "hot:Время",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Время.ctrl.all": {
+   "give": [
+    "ctrl",
+    "st:stop"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Время.ctrl.grp": {
+   "give": [
+    "ctrl",
+    "st:stop"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Время.ctrl.one": {
+   "give": [
+    "ctrl",
+    "st:stop"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Время.debuff.all": {
+   "give": [
+    "debuff",
+    "st:chanceDown"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Время.debuff.grp": {
+   "give": [
+    "debuff",
+    "st:chanceDown"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Время.debuff.one": {
+   "give": [
+    "debuff",
+    "st:chanceDown"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Время.buff.all": {
+   "give": [
+    "buff:chanceUp"
+   ],
+   "take": [],
+   "roles": [
+    "усиление"
+   ]
+  },
+  "Время.buff.grp": {
+   "give": [
+    "buff:chanceUp"
+   ],
+   "take": [],
+   "roles": [
+    "усиление"
+   ]
+  },
+  "Время.buff.one": {
+   "give": [
+    "buff:chanceUp"
+   ],
+   "take": [],
+   "roles": [
+    "усиление"
+   ]
+  },
+  "Время.ult.dmg": {
+   "give": [
+    "hit"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Время.ult.heal": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Время.ult.shield": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Время.ult.dot": {
+   "give": [
+    "dot:Время"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Время.ult.hot": {
+   "give": [
+    "heal",
+    "hot:Время",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Время.ult.ctrl": {
+   "give": [
+    "ctrl",
+    "st:stop"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Время.ult.debuff": {
+   "give": [
+    "debuff",
+    "st:chanceDown"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Время.ult.buff": {
+   "give": [
+    "buff:chanceUp"
+   ],
+   "take": [],
+   "roles": [
+    "усиление"
+   ]
+  },
+  "Время.pas.1": {
+   "give": [
+    "heal"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ],
+   "link": {
+    "give": [
+     "heal"
+    ]
+   }
+  },
+  "Время.pas.2": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "усиление"
+   ]
+  },
+  "Время.pas.3": {
+   "give": [],
+   "take": [
+    "st:chanceDown"
+   ],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "any": [
+     "st:chanceDown"
+    ]
+   }
+  },
+  "Время.pas.4": {
+   "give": [],
+   "take": [
+    "hot:Время"
+   ],
+   "roles": [
+    "лечение"
+   ],
+   "link": {
+    "own": [
+     "hot:Время"
+    ]
+   }
+  },
+  "Время.pas.5": {
+   "give": [],
+   "take": [
+    "dot:Время"
+   ],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "own": [
+     "dot:Время"
+    ]
+   }
+  },
+  "Время.react.1": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "gate": [
+     "tank"
+    ]
+   }
+  },
+  "Время.react.2": {
+   "give": [
+    "ctrl",
+    "st:stop"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ],
+   "link": {
+    "give": [
+     "ctrl",
+     "st:stop"
+    ]
+   }
+  },
+  "Время.react.3": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "gate": [
+     "tank"
+    ]
+   }
+  },
+  "Время.react.4": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "gate": [
+     "tank"
+    ]
+   }
+  },
+  "Без школы.dmg.all": {
+   "give": [
+    "hit"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Без школы.dmg.grp": {
+   "give": [
+    "hit"
+   ],
+   "take": [
+    "dot:Без школы"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Без школы.dmg.one": {
+   "give": [
+    "hit"
+   ],
+   "take": [
+    "st:break"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Без школы.heal.all": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Без школы.heal.grp": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Без школы.heal.one": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Без школы.shield.all": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Без школы.shield.grp": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Без школы.shield.one": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Без школы.dot.all": {
+   "give": [
+    "dot:Без школы"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Без школы.dot.grp": {
+   "give": [
+    "dot:Без школы"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Без школы.dot.one": {
+   "give": [
+    "dot:Без школы"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Без школы.hot.all": {
+   "give": [
+    "heal",
+    "hot:Без школы",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Без школы.hot.grp": {
+   "give": [
+    "heal",
+    "hot:Без школы",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Без школы.hot.one": {
+   "give": [
+    "heal",
+    "hot:Без школы",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Без школы.ctrl.all": {
+   "give": [
+    "ctrl",
+    "st:stun"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Без школы.ctrl.grp": {
+   "give": [
+    "ctrl",
+    "st:stun"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Без школы.ctrl.one": {
+   "give": [
+    "ctrl",
+    "st:stun"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Без школы.debuff.all": {
+   "give": [
+    "debuff",
+    "st:break"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Без школы.debuff.grp": {
+   "give": [
+    "debuff",
+    "st:break"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Без школы.debuff.one": {
+   "give": [
+    "debuff",
+    "st:break"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Без школы.buff.all": {
+   "give": [
+    "buff:critUp"
+   ],
+   "take": [],
+   "roles": [
+    "усиление"
+   ]
+  },
+  "Без школы.buff.grp": {
+   "give": [
+    "buff:critUp"
+   ],
+   "take": [],
+   "roles": [
+    "усиление"
+   ]
+  },
+  "Без школы.buff.one": {
+   "give": [
+    "buff:critUp"
+   ],
+   "take": [],
+   "roles": [
+    "усиление"
+   ]
+  },
+  "Без школы.ult.dmg": {
+   "give": [
+    "hit"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Без школы.ult.heal": {
+   "give": [
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Без школы.ult.shield": {
+   "give": [
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ]
+  },
+  "Без школы.ult.dot": {
+   "give": [
+    "dot:Без школы"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Без школы.ult.hot": {
+   "give": [
+    "heal",
+    "hot:Без школы",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Без школы.ult.ctrl": {
+   "give": [
+    "ctrl",
+    "st:stun"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Без школы.ult.debuff": {
+   "give": [
+    "debuff",
+    "st:break"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Без школы.ult.buff": {
+   "give": [
+    "buff:critUp"
+   ],
+   "take": [],
+   "roles": [
+    "усиление"
+   ]
+  },
+  "Без школы.pas.1": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "gate": [
+     "dps"
+    ]
+   }
+  },
+  "Без школы.pas.2": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "gate": [
+     "dps"
+    ]
+   }
+  },
+  "Без школы.pas.3": {
+   "give": [],
+   "take": [
+    "dot:Без школы"
+   ],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "any": [
+     "dot:Без школы"
+    ]
+   }
+  },
+  "Без школы.pas.4": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "gate": [
+     "tank"
+    ]
+   }
+  },
+  "Без школы.pas.5": {
+   "give": [],
+   "take": [
+    "ctrl"
+   ],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "any": [
+     "ctrl"
+    ]
+   }
+  },
+  "Без школы.pas.6": {
+   "give": [
+    "party"
+   ],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "give": [
+     "party"
+    ]
+   }
+  },
+  "Без школы.react.1": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "gate": [
+     "tank"
+    ]
+   }
+  },
+  "Без школы.react.2": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "gate": [
+     "dps"
+    ]
+   }
+  },
+  "Без школы.react.3": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "защита"
+   ],
+   "link": {
+    "gate": [
+     "tank"
+    ]
+   }
+  },
+  "Без школы.react.4": {
+   "give": [],
+   "take": [],
+   "roles": [
+    "урон"
+   ],
+   "link": {
+    "crit": true
+   }
+  },
+  "фарм.pas.1": {
+   "give": [
+    "farm"
+   ],
+   "take": [],
+   "roles": [
+    "фарм"
+   ],
+   "link": {
+    "gate": [
+     "farm"
+    ]
+   }
+  },
+  "фарм.pas.2": {
+   "give": [
+    "farm"
+   ],
+   "take": [],
+   "roles": [
+    "фарм"
+   ],
+   "link": {
+    "gate": [
+     "farm"
+    ]
+   }
+  },
+  "фарм.pas.3": {
+   "give": [
+    "farm"
+   ],
+   "take": [],
+   "roles": [
+    "фарм"
+   ],
+   "link": {
+    "gate": [
+     "farm"
+    ]
+   }
+  },
+  "фарм.pas.4": {
+   "give": [
+    "farm"
+   ],
+   "take": [],
+   "roles": [
+    "фарм"
+   ],
+   "link": {
+    "gate": [
+     "farm"
+    ]
+   }
+  },
+  "фарм.pas.5": {
+   "give": [
+    "farm"
+   ],
+   "take": [],
+   "roles": [
+    "фарм"
+   ],
+   "link": {
+    "gate": [
+     "farm"
+    ]
+   }
+  },
+  "фарм.pas.6": {
+   "give": [
+    "farm"
+   ],
+   "take": [],
+   "roles": [
+    "фарм"
+   ],
+   "link": {
+    "gate": [
+     "farm"
+    ]
+   }
+  },
+  "фарм.pas.7": {
+   "give": [
+    "farm"
+   ],
+   "take": [],
+   "roles": [
+    "фарм"
+   ],
+   "link": {
+    "gate": [
+     "farm"
+    ]
+   }
+  },
+  "фарм.pas.8": {
+   "give": [
+    "farm"
+   ],
+   "take": [],
+   "roles": [
+    "фарм"
+   ],
+   "link": {
+    "gate": [
+     "farm"
+    ]
+   }
+  },
+  "фарм.act.1": {
+   "give": [
+    "farm"
+   ],
+   "take": [],
+   "roles": [
+    "фарм"
+   ]
+  },
+  "фарм.act.2": {
+   "give": [
+    "farm"
+   ],
+   "take": [],
+   "roles": [
+    "фарм"
+   ]
+  },
+  "фарм.act.3": {
+   "give": [
+    "farm"
+   ],
+   "take": [],
+   "roles": [
+    "фарм"
+   ]
+  },
+  "фарм.act.4": {
+   "give": [
+    "farm"
+   ],
+   "take": [],
+   "roles": [
+    "фарм"
+   ]
+  },
+  "фарм.act.5": {
+   "give": [
+    "farm"
+   ],
+   "take": [],
+   "roles": [
+    "фарм"
+   ]
+  },
+  "фарм.act.6": {
+   "give": [
+    "farm"
+   ],
+   "take": [],
+   "roles": [
+    "фарм"
+   ]
+  },
+  "фарм.ult.1": {
+   "give": [
+    "farm"
+   ],
+   "take": [],
+   "roles": [
+    "фарм"
+   ]
+  },
+  "фарм.ult.2": {
+   "give": [
+    "farm"
+   ],
+   "take": [],
+   "roles": [
+    "фарм"
+   ]
+  },
+  "фарм.ult.3": {
+   "give": [
+    "farm"
+   ],
+   "take": [],
+   "roles": [
+    "фарм"
+   ]
+  },
+  "фарм.ult.4": {
+   "give": [
+    "farm"
+   ],
+   "take": [],
+   "roles": [
+    "фарм"
+   ]
+  },
+  "Сочетания.act.1": {
+   "give": [
+    "dot:Огонь",
+    "hit"
+   ],
+   "take": [
+    "dot:Огонь"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Сочетания.act.2": {
+   "give": [
+    "buff:dmgUp",
+    "hit"
+   ],
+   "take": [
+    "dot:Огонь"
+   ],
+   "roles": [
+    "урон",
+    "усиление"
+   ]
+  },
+  "Сочетания.act.3": {
+   "give": [
+    "debuff",
+    "dot:Огонь",
+    "shield",
+    "st:mark",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита",
+    "контроль"
+   ]
+  },
+  "Сочетания.act.4": {
+   "give": [
+    "heal",
+    "hot:Огонь",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение"
+   ]
+  },
+  "Сочетания.act.5": {
+   "give": [
+    "ctrl",
+    "hit",
+    "st:paralyze"
+   ],
+   "take": [
+    "dot:Земля"
+   ],
+   "roles": [
+    "контроль",
+    "урон"
+   ]
+  },
+  "Сочетания.act.6": {
+   "give": [
+    "heal",
+    "hot:Земля",
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита",
+    "лечение"
+   ]
+  },
+  "Сочетания.act.7": {
+   "give": [
+    "debuff",
+    "dot:Земля",
+    "st:pierce"
+   ],
+   "take": [],
+   "roles": [
+    "контроль",
+    "урон"
+   ]
+  },
+  "Сочетания.act.8": {
+   "give": [
+    "ctrl",
+    "hit",
+    "st:knock"
+   ],
+   "take": [
+    "dot:Воздух"
+   ],
+   "roles": [
+    "контроль",
+    "урон"
+   ]
+  },
+  "Сочетания.act.9": {
+   "give": [
+    "debuff",
+    "dot:Воздух",
+    "hit",
+    "st:miss"
+   ],
+   "take": [],
+   "roles": [
+    "контроль",
+    "урон"
+   ]
+  },
+  "Сочетания.act.10": {
+   "give": [
+    "buff:evade",
+    "heal",
+    "hot:Воздух",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита",
+    "лечение"
+   ]
+  },
+  "Сочетания.act.11": {
+   "give": [
+    "ctrl",
+    "debuff",
+    "st:freeze",
+    "st:slow"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Сочетания.act.12": {
+   "give": [
+    "buff:healTaken",
+    "shield",
+    "st:slow",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита",
+    "лечение"
+   ]
+  },
+  "Сочетания.act.13": {
+   "give": [
+    "debuff",
+    "hit",
+    "st:slow"
+   ],
+   "take": [
+    "st:slow"
+   ],
+   "roles": [
+    "контроль",
+    "урон"
+   ]
+  },
+  "Сочетания.act.14": {
+   "give": [
+    "debuff",
+    "hit",
+    "st:rend"
+   ],
+   "take": [
+    "st:rend"
+   ],
+   "roles": [
+    "контроль",
+    "урон"
+   ]
+  },
+  "Сочетания.act.15": {
+   "give": [
+    "heal",
+    "hot:Свет",
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита",
+    "лечение"
+   ]
+  },
+  "Сочетания.act.16": {
+   "give": [
+    "ctrl",
+    "hit",
+    "st:blind"
+   ],
+   "take": [
+    "st:rend"
+   ],
+   "roles": [
+    "контроль",
+    "урон"
+   ]
+  },
+  "Сочетания.act.17": {
+   "give": [
+    "ctrl",
+    "dot:Тьма",
+    "st:terror"
+   ],
+   "take": [],
+   "roles": [
+    "контроль",
+    "урон"
+   ]
+  },
+  "Сочетания.act.18": {
+   "give": [
+    "heal",
+    "hit",
+    "hot:Тьма",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение",
+    "урон"
+   ]
+  },
+  "Сочетания.act.19": {
+   "give": [
+    "debuff",
+    "shield",
+    "st:weak",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита",
+    "контроль"
+   ]
+  },
+  "Сочетания.act.20": {
+   "give": [
+    "ctrl",
+    "hit",
+    "st:stop"
+   ],
+   "take": [
+    "st:chanceDown"
+   ],
+   "roles": [
+    "контроль",
+    "урон"
+   ]
+  },
+  "Сочетания.act.21": {
+   "give": [
+    "heal",
+    "hot:Время",
+    "shield",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита",
+    "лечение"
+   ]
+  },
+  "Сочетания.act.22": {
+   "give": [
+    "debuff",
+    "hit",
+    "st:chanceDown"
+   ],
+   "take": [
+    "st:chanceDown"
+   ],
+   "roles": [
+    "контроль",
+    "урон"
+   ]
+  },
+  "Сочетания.act.23": {
+   "give": [
+    "ctrl",
+    "hit",
+    "st:stun"
+   ],
+   "take": [
+    "st:break"
+   ],
+   "roles": [
+    "контроль",
+    "урон"
+   ]
+  },
+  "Сочетания.act.24": {
+   "give": [
+    "heal",
+    "hit",
+    "hot:Без школы",
+    "support"
+   ],
+   "take": [
+    "dot:Без школы"
+   ],
+   "roles": [
+    "лечение",
+    "урон"
+   ]
+  },
+  "Сочетания.act.25": {
+   "give": [
+    "debuff",
+    "shield",
+    "st:break",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита",
+    "контроль"
+   ]
+  },
+  "Сочетания.act.26": {
+   "give": [
+    "debuff",
+    "hit",
+    "st:slow"
+   ],
+   "take": [],
+   "roles": [
+    "контроль",
+    "урон"
+   ]
+  },
+  "Сочетания.act.27": {
+   "give": [
+    "debuff",
+    "hit",
+    "st:pierce"
+   ],
+   "take": [
+    "dot:Огонь"
+   ],
+   "roles": [
+    "контроль",
+    "урон"
+   ]
+  },
+  "Сочетания.act.28": {
+   "give": [
+    "dot:Воздух",
+    "hit"
+   ],
+   "take": [
+    "dot:Огонь"
+   ],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Сочетания.act.29": {
+   "give": [
+    "ctrl",
+    "debuff",
+    "st:paralyze",
+    "st:slow"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Сочетания.act.30": {
+   "give": [
+    "debuff",
+    "st:miss",
+    "st:pierce"
+   ],
+   "take": [],
+   "roles": [
+    "контроль"
+   ]
+  },
+  "Сочетания.act.31": {
+   "give": [
+    "ctrl",
+    "hit",
+    "st:knock"
+   ],
+   "take": [],
+   "roles": [
+    "контроль",
+    "урон"
+   ]
+  },
+  "Сочетания.act.32": {
+   "give": [
+    "buff:dmgUp",
+    "heal",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "лечение",
+    "усиление"
+   ]
+  },
+  "Сочетания.act.33": {
+   "give": [
+    "buff:chanceUp",
+    "buff:evade"
+   ],
+   "take": [],
+   "roles": [
+    "защита",
+    "усиление"
+   ]
+  },
+  "Сочетания.ult.1": {
+   "give": [
+    "dot:Воздух",
+    "dot:Огонь"
+   ],
+   "take": [],
+   "roles": [
+    "урон"
+   ]
+  },
+  "Сочетания.ult.2": {
+   "give": [
+    "ctrl",
+    "shield",
+    "st:freeze",
+    "support"
+   ],
+   "take": [],
+   "roles": [
+    "защита",
+    "контроль"
+   ]
+  },
+  "Сочетания.ult.3": {
+   "give": [
+    "buff:dmgUp",
+    "debuff",
+    "st:mark"
+   ],
+   "take": [],
+   "roles": [
+    "контроль",
+    "усиление"
+   ]
+  },
+  "Сочетания.ult.4": {
+   "give": [
+    "buff:critUp",
+    "buff:guard"
+   ],
+   "take": [],
+   "roles": [
+    "защита",
+    "усиление"
+   ]
+  }
  }
 }

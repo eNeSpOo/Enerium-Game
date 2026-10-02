@@ -86,6 +86,8 @@ function collect() {
     add('abilities', abCyc[a.id] || 1, false, `способность ${a.id} · d`, a.d);
   }
   for (const [k, v] of Object.entries(L.farm)) for (const a of v) { add('abilities', abCyc[a.id] || 1, false, `способность ${a.id} · n`, a.n); add('abilities', abCyc[a.id] || 1, false, `способность ${a.id} · d`, a.d); }
+  /* сочетания (ADR-0050) — способности из двух: тексты видит игрок, цикл — самый ранний носитель */
+  for (const v of Object.values(L.combos || {})) for (const a of v) { add('abilities', abCyc[a.id] || 1, false, `способность ${a.id} · n`, a.n); add('abilities', abCyc[a.id] || 1, false, `способность ${a.id} · d`, a.d); }
 
   /* --- талисманы: открыты с цикла II, «для команды» — цикл VI --- */
   const T = load('talismans').EN_TALISMANS, tOpen = T.rules.openCycle || 2;

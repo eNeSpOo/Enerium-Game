@@ -59923,6 +59923,116 @@
         1344
       ],
       "sha256": "7a429065d3a7885d0cd80c03c77f95a5e14d2a3ed056574b1f627d89d397fd4b"
+    },
+    {
+      "file": "art/generated/spell-icons/spell-combo-a__nb2.jpg",
+      "category": "spell-icons",
+      "job": "spell-combo-a",
+      "title": "Сочетания одной школы — 24 иконки сеткой 6×4",
+      "source": "tools/content-gen/abilities/library.json, combos.active 1–24; docs/content/библиотека-способностей.md, раздел «Сочетания»",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-10-02T18:48:13+03:00",
+      "params": {
+        "aspectRatio": "3:2",
+        "imageSize": "4K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: a sheet of square ability icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the picture in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game puts its own frame on top: one clear central image with a bold silhouette that stays readable at 48 px, on a dark near-black stone background with faint cracks and a darker vignette toward the edges of the cell. Light rises from below in the color of the magic school; crisp rim light on the edges of the forms; a few sparks and dust motes in the light. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each icon differs clearly from its neighbours in shape and composition.\n\nThis sheet holds combination spells: each joins two spells of one magic school into a single image — the icon shows both parts together as one clear object. Every cell names its own school and palette in brackets, and each cell keeps strictly to its own palette — colours never spill from one cell to another. A spell for all targets shows something wide that fills its cell; a spell for two or three targets shows two or three of its thing; a spell for one target shows one focused object. Attacks move to the right, toward the enemies. Supporting spells — healing, shields and strength for allies — glow a softer warm gold with rounded, calm shapes. Every icon, even the widest, is built around one clear central object with a bold silhouette — never only smoke, dust, snow, fog or a scattered pattern. Paint all cells on the same dark near-black stone background, with loose, confident painterly brush strokes and soft painted edges, never black outlines, never a flat cartoon or sticker look.\n\nThe grid: exactly 6 columns and 4 rows, 24 icons.\n\nRow 1: (Fire — scarlet fire #F0564A, orange and amber flames, embers, soot-black stone) a long whip of scarlet fire cracking to the right in three bright loops, a small flame left burning where each loop strikes; (Fire — scarlet fire #F0564A, orange and amber flames, embers, soot-black stone) a blacksmith's heavy hammer with a white-hot head straight from the forge, swinging down to the right, a trail of sparks and the red glow of the forge behind it; (Fire, supporting — soft warm gold and amber flame) a round iron shield wreathed in a ring of amber flames, a red-hot branding iron lying across its face; (Fire, supporting — soft warm gold and amber flame) a small clay hearth bowl with a calm golden flame, a strip of white linen bandage curling in its warm glow, golden sparks rising; (Earth — dark rock, amber-orange Rubidium light #EB9D40, ochre dust) a huge fist of dark rock with glowing amber cracks slamming to the right, heavy stone shackles snapping shut around the spot it strikes; (Earth, supporting — honey-amber and warm gold, dark rock) a rounded boulder shaped like a shield, thick golden sap flowing from a crack down its face, one small green sprout growing on top.\n\nRow 2: (Earth — dark rock, amber light, thick mustard-yellow venom) three jagged thorns of rock dripping mustard-yellow venom, falling to the right together with crumbling shards of stone; (Air — pale, almost white wind #DFF4E5, silver-white streaks, white feathers) three curved silver-white blades of wind slicing to the right, the last one tossing a dark iron helmet high into the air; (Air — pale, almost white wind #DFF4E5, silver-white streaks, white feathers) one long sweeping arc of silver-white wind across the whole cell, like a single stroke of a great blade, a thick puff of pale grey dust thrown up at its right end; (Air, supporting — soft warm gold with pale white-green wind) a pair of large white feathered wings spread wide, a gentle golden breeze curling between them; (Water — deep blue water, Paladium-blue light #5A94F7, pale blue ice and white frost) a pair of heavy shackles carved from pale blue ice, locked shut, white frost creeping outward from them over the dark stone; (Water, supporting — clear blue water and warm gold) a round shield of pale ice, the lower half of its face melting into clear running water that glows with soft gold.\n\nRow 3: (Water — deep blue water, Paladium-blue light #5A94F7, pale blue ice and white frost) a heavy wave of dark blue water breaking to the right in three crests, the foam of each crest frozen into white frost spikes; (Light — pale gold and white light #F4E6AE, hard white rays, polished silver) one hard white beam of light striking a dark steel shield from the left and bursting through it to the right as three bright rays, the hole in the shield glowing; (Light, supporting — warm gold, soft halo, polished silver) a tall polished silver mirror-shield standing upright, a wide soft golden halo glowing around it; (Light — pale gold and white light #F4E6AE, hard white rays, polished silver) a spear of white light flying to the right into a round blinding white flare, like a small sun bursting; (Darkness — black shadow, violet light #A986EE, pale bone, dark crimson blood) a pale bone mask with wide empty eye holes, black withered thorny vines crawling over it and through its eyes, violet light behind; (Darkness — black shadow, violet light #A986EE, pale bone, dark crimson blood) a curved black scythe sweeping to the right, a stream of dark crimson blood flowing from its blade down into a small dark chalice.\n\nRow 4: (Darkness, supporting — dusky violet, black shadow, warm gold) three tall veils of black shadow hanging side by side like three shields, a violet glow along their edges, a faint gold light behind them; (Time — green Energium light #4FDC8B, old bronze, pale golden sand) a bronze dagger shaped like a clock hand stabbing to the right through a round bronze clock face, the face cracked and stopped, green sparks; (Time, supporting — gentle green light, bronze and warm gold) a round bronze shield with an hourglass set in its centre, golden sand flowing upward inside the hourglass; (Time — green Energium light #4FDC8B, old bronze, pale golden sand) a heavy bronze pendulum blade swinging to the right in a wide arc, three fading ghost images of it trailing behind, pale sand pouring from a crack in its rod; (a fighting skill with no magic — steel, iron, worn leather, warm torchlight, no glowing magic) a heavy iron war mace crashing down to the right onto a dented steel helmet, a bright white star of impact; (a fighting skill with no magic — steel, white linen, warm torchlight, no glowing magic) a broad steel sword in mid-swing to the right, a roll of white linen bandage tied around its grip, the loose end of the bandage streaming behind.\n\nNo text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 2610,
+        "candidatesTokenCount": 3756,
+        "totalTokenCount": 6366,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 1836
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 774
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 2520
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1562,
+      "seconds": 32.5,
+      "status": "референс, не утверждён",
+      "px": [
+        5056,
+        3392
+      ],
+      "sha256": "c54b68a13fa8edcafa940f90791e0f5c40b1867dcced78a84a0a79ab0315f1bc"
+    },
+    {
+      "file": "art/generated/spell-icons/spell-combo-b__nb2.jpg",
+      "category": "spell-icons",
+      "job": "spell-combo-b",
+      "title": "Сочетания двух стихий, ульты-сочетания и черты — 24 иконки сеткой 6×4",
+      "source": "tools/content-gen/abilities/library.json, combos.active 25–33, combos.ult, пассивки 5–7 наборов; docs/content/библиотека-способностей.md",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-10-02T18:48:45+03:00",
+      "params": {
+        "aspectRatio": "3:2",
+        "imageSize": "4K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.\n\nFormat: a sheet of square ability icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the picture in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game puts its own frame on top: one clear central image with a bold silhouette that stays readable at 48 px, on a dark near-black stone background with faint cracks and a darker vignette toward the edges of the cell. Light rises from below in the color of the magic school; crisp rim light on the edges of the forms; a few sparks and dust motes in the light. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each icon differs clearly from its neighbours in shape and composition.\n\nThis sheet holds combination spells and passive traits. A combination spell joins two spells into a single image — the icon shows both parts together as one clear object; where two schools are named together, their two palettes meet inside that one cell. Every cell names its own school and palette in brackets, and each cell keeps strictly to its own palette — colours never spill from one cell to another. A spell for all targets shows something wide that fills its cell; a spell for two or three targets shows two or three of its thing; a spell for one target shows one focused object. Attacks move to the right, toward the enemies. Supporting spells — healing, shields and strength for allies — glow a softer warm gold with rounded, calm shapes. Every icon, even the widest, is built around one clear central object with a bold silhouette — never only smoke, dust, snow, fog or a scattered pattern. Paint all cells on the same dark near-black stone background, with loose, confident painterly brush strokes and soft painted edges, never black outlines, never a flat cartoon or sticker look. Ultimate spells are the grandest, most epic images of the sheet, bigger in scale, with bright gold highlights. Passive traits are calm, emblem-like single objects, no action.\n\nThe grid: exactly 6 columns and 4 rows, 24 icons. Row 1 and the first three icons of row 2 are combination spells. The last three icons of row 2 and the first icon of row 3 are ultimate spells. The other five icons of row 3 and the first five icons of row 4 are passive traits. The last icon of row 4 is one more combination spell.\n\nRow 1: (a fighting skill with no magic, supporting — wood, iron, white linen, warm torchlight, no glowing magic) two large wooden shields with iron rims overlapped edge to edge like a wall, a snapped spear lying at their foot; (Fire and Water together — scarlet fire on the left, blue water on the right) a wide wave of scarlet fire crashing into a wide wave of blue water, a tall white wall of steam rising along the line where they meet, across the whole cell; (Fire and Earth together — glowing orange lava, dark rock with amber cracks) a thick stream of glowing orange lava pouring to the right over a ledge of dark rock, the rock cracking and crumbling under it; (Fire and Air together — scarlet fire, silver-white wind) a spinning tornado of scarlet fire leaning to the right, curved silver-white blades of wind whirling around it; (Earth and Water together — dark mud, amber light, blue frost) a dark pool of thick mud with two armoured boots sunk in it up to the ankles, blue frost creeping over the surface of the mud; (Earth and Air together — dark rock, ochre dust, pale wind) a collapsing cliff: big rocks rolling to the right across the whole cell, a huge pale ochre dust cloud billowing over them.\n\nRow 2: (Water and Air together — pale blue ice, white wind) a great curling wave of white wind full of sharp shards of blue ice, sweeping to the right across the whole cell; (Light and Fire together, supporting — pale gold light, warm amber flame) a rising sun of pale gold, its lower edge wrapped in warm amber flames, wide golden rays filling the whole cell; (Time and Air together, supporting — bronze, green light, white feathers) two bronze sandals side by side with small white wings at their heels, a thread of golden sand and green light streaming behind them; (Fire and Air together, ultimate — scarlet fire, silver-white wind, bright gold) a colossal storm cloud of fire filling the sky, tongues of scarlet flame and silver blades of wind raining down from it across the whole cell, bright gold highlights; (Water, ultimate — pale blue ice, white frost, bright gold) a colossal fortress of pale blue ice with towers and a great gate, golden light glowing from inside it, frost spreading over the ground in front; (Fire, ultimate — scarlet fire, grey ash, bright gold) a great war banner made of scarlet flame streaming to the right on a blackened pole, a rain of glowing ash falling beneath it, bright gold highlights in the fire.\n\nRow 3: (Earth with a war hymn of plain warriors, ultimate — dark rock, amber light, bright gold) a colossal war drum carved from one rock with glowing amber cracks, struck by a great stone hammer, a ring of golden sound bursting outward; (Fire passive — scarlet embers, grey ash, soot-black stone) three glowing scarlet footprints of hot ash in a row on the dark stone floor, the third one the brightest; (Earth passive — dark steel, amber light) a dark steel breastplate with one deep jagged crack across it, amber light glowing from inside the crack; (Earth passive — honey-amber, warm gold, dark rock) a thick living root arching like a buttress and holding up a heavy slab of rock, golden sap glistening on the root; (Earth passive — dark horn, copper, amber light) a big miner's signal horn made of dark horn, bound with copper bands that glow amber, hanging on an iron hook; (Air passive — pale, almost white light, silver-green leaves) one small branch with pale silver-green leaves trembling in a gentle breeze, a soft white glow around it.\n\nRow 4: (Water passive — thick clear blue ice, iron) a solid cube of thick clear blue ice with a heavy iron band around it, whole and unbroken; (Water passive — dark wood, blue ice, frost) a wooden abacus whose beads are round beads of blue ice, frost on its dark frame; (Time passive — old bronze, pale golden sand, green light) a tall old bronze hourglass, its upper bulb almost full of pale golden sand, one thin thread of sand falling, a soft green glow; (a fighting skill with no magic, passive — steel, iron, warm torchlight) a steel sword laid across a pair of closed iron shackles on the stone floor; (a fighting skill with no magic, passive — steel, leather, warm torchlight) two steel shoulder guards pressed side by side, bound together with one leather strap; (Fire and Water together — red-hot iron, blue water, white steam) a huge red-hot iron anvil half sunk in blue water, a tall thick column of white steam rising from it.\n\nNo text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 2589,
+        "candidatesTokenCount": 3583,
+        "totalTokenCount": 6172,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 1815
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 774
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 2520
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1557,
+      "seconds": 31.4,
+      "status": "референс, не утверждён",
+      "px": [
+        5056,
+        3392
+      ],
+      "sha256": "e282abe50e67d69db0e23b4927d78af7b5cf0af18ac3e34fa70b1a6f0e30553f"
     }
   ]
 }

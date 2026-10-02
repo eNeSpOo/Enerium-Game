@@ -1,0 +1,300 @@
+{
+  "sheet": "art/generated/spell-icons/spell-combo-a__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/spell-icons-combo.json",
+  "job": "spell-combo-a",
+  "grid": [
+    6,
+    4
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "Сочетания.act.1",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-1.webp",
+      "box": [
+        14,
+        29,
+        812,
+        827
+      ],
+      "px": 798,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.2",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-2.webp",
+      "box": [
+        858,
+        29,
+        1657,
+        828
+      ],
+      "px": 799,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.3",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-3.webp",
+      "box": [
+        1705,
+        29,
+        2504,
+        828
+      ],
+      "px": 799,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.4",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-4.webp",
+      "box": [
+        2552,
+        29,
+        3351,
+        828
+      ],
+      "px": 799,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.5",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-5.webp",
+      "box": [
+        3399,
+        29,
+        4198,
+        828
+      ],
+      "px": 799,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.6",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-6.webp",
+      "box": [
+        4245,
+        30,
+        5042,
+        827
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.7",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-7.webp",
+      "box": [
+        14,
+        874,
+        812,
+        1672
+      ],
+      "px": 798,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.8",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-8.webp",
+      "box": [
+        859,
+        874,
+        1657,
+        1672
+      ],
+      "px": 798,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.9",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-9.webp",
+      "box": [
+        1705,
+        874,
+        2503,
+        1672
+      ],
+      "px": 798,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.10",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-10.webp",
+      "box": [
+        2553,
+        874,
+        3351,
+        1672
+      ],
+      "px": 798,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.11",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-11.webp",
+      "box": [
+        3399,
+        874,
+        4197,
+        1672
+      ],
+      "px": 798,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.12",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-12.webp",
+      "box": [
+        4245,
+        874,
+        5042,
+        1671
+      ],
+      "px": 797,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.13",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-13.webp",
+      "box": [
+        14,
+        1719,
+        812,
+        2517
+      ],
+      "px": 798,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.14",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-14.webp",
+      "box": [
+        858,
+        1719,
+        1657,
+        2518
+      ],
+      "px": 799,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.15",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-15.webp",
+      "box": [
+        1705,
+        1719,
+        2504,
+        2518
+      ],
+      "px": 799,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.16",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-16.webp",
+      "box": [
+        2552,
+        1719,
+        3351,
+        2518
+      ],
+      "px": 799,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.17",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-17.webp",
+      "box": [
+        3399,
+        1719,
+        4198,
+        2518
+      ],
+      "px": 799,
+      "key_left": 0.07577
+    },
+    {
+      "id": "Сочетания.act.18",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-18.webp",
+      "box": [
+        4245,
+        1720,
+        5042,
+        2517
+      ],
+      "px": 797,
+      "key_left": 0.02631
+    },
+    {
+      "id": "Сочетания.act.19",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-19.webp",
+      "box": [
+        14,
+        2566,
+        812,
+        3364
+      ],
+      "px": 798,
+      "key_left": 0.01391
+    },
+    {
+      "id": "Сочетания.act.20",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-20.webp",
+      "box": [
+        858,
+        2565,
+        1658,
+        3365
+      ],
+      "px": 800,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.21",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-21.webp",
+      "box": [
+        1704,
+        2565,
+        2504,
+        3365
+      ],
+      "px": 800,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.22",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-22.webp",
+      "box": [
+        2552,
+        2565,
+        3352,
+        3365
+      ],
+      "px": 800,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.23",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-23.webp",
+      "box": [
+        3399,
+        2565,
+        4198,
+        3364
+      ],
+      "px": 799,
+      "key_left": 0.0
+    },
+    {
+      "id": "Сочетания.act.24",
+      "file": "art/generated/spell-icons/spell-combo-a/combo-act-24.webp",
+      "box": [
+        4245,
+        2566,
+        5042,
+        3363
+      ],
+      "px": 797,
+      "key_left": 0.0
+    }
+  ]
+}

@@ -13,8 +13,12 @@ const PY = process.env.PYTHON || (process.platform === 'win32' ? 'python' : 'pyt
 const TIMEOUT_MS = 10 * 60 * 1000;   // одна команда — не дольше десяти минут
 const TAIL = 15;                     // строк хвоста у упавшей команды
 
-/* сборщики с --check — в порядке шага 13 README, последним — шаг 14 (таблицы Excel) */
+/* сборщики с --check — в порядке шага 13 README, последним — шаг 14 (таблицы Excel). Третьим полем — свой флаг вместо --check:
+   --mut у сборщика наборов — проверка мутацией: законы Н1–Н9 (ADR-0050) ловят каждую из поломок */
 const BUILDERS = [
+  [PY, 'tools/content-gen/abilities/library.py'],
+  [PY, 'tools/content-gen/abilities/assign.py'],
+  [PY, 'tools/content-gen/abilities/assign.py', '--mut'],
   [PY, 'tools/content-gen/recipes/tempo.py'],
   ['node', 'tools/content-gen/lootboxes/build.js'],
   ['node', 'tools/content-gen/contracts/build.js'],
@@ -39,7 +43,7 @@ const BUILDERS = [
   [PY, 'tools/content-gen/cycle/climb.py'],
   ['node', 'tools/content-gen/cycle/build.js'],
   [PY, 'tools/content-gen/tables/build.py'],
-].map(([cmd, file]) => [cmd, file, '--check']);
+].map(([cmd, file, flag]) => [cmd, file, flag || '--check']);
 
 function findChecks(dir, acc = []) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {

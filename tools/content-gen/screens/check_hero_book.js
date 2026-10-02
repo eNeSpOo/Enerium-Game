@@ -61,7 +61,7 @@ const cnt = { pages: 0, player: 0, abilities: 0, chapters: 0, slots: 0, layout: 
 const say = m => { if (err.length < 60) err.push(m); else if (err.length === 60) err.push('… и ещё ошибки'); };
 function done() {
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
-  console.log(`Страницы книги героя: страниц ${cnt.pages}, из них глазами игрока ${cnt.player}; способностей с описанием ${cnt.abilities}, глав ${cnt.chapters}, мест ${cnt.slots}; расчётов вёрстки ${cnt.layout}; сверок контраста ${cnt.contrast || 0}.`);
+  console.log(`Страницы книги героя: страниц ${cnt.pages}, из них глазами игрока ${cnt.player}; способностей с описанием ${cnt.abilities} (наборов с парой доблести 0 — ${cnt.pairs || 0}, черт ${cnt.traits || 0}, сочетаний ${cnt.combos || 0}), глав ${cnt.chapters}, мест ${cnt.slots}; расчётов вёрстки ${cnt.layout}; сверок контраста ${cnt.contrast || 0}.`);
   for (const x of lay) console.log('вёрстка ' + x);
   console.log('Проверка пройдена: страницы книги — белилами и золотом по листу чернёного пергамента, контраст текста не ниже 4,5 : 1; закладки «Развитие», «Мощь», «Снаряжение», «Навыки», «Путь»; главная кнопка шага — внизу справа, не ниже 44 px; описание способности видно без нажатия; характеристики и атрибуты — на странице; места — гнёзда, пустое говорит, что туда кладут; главы читаются целиком; листы поверх книги — тем же чернёным пергаментом; всё помещается на 932 × 430 и 844 × 390.');
   process.exit(0);
@@ -242,6 +242,17 @@ function checkSkills(p, pseudo, where) {
   const kit = rows.filter(r => r[2] !== 'basic');
   if (kit.length !== K.kit.length) { say(`${where}: способностей на странице ${kit.length}, в наборе ${K.kit.length}`); return; }
   const KIND = { act: 'Активная', ult: 'Ульта', pas: 'Пассивка', react: 'Реакция' };
+  /* каждый герой сборный (ADR-0050): пассивка или реакция доблести 0 — черта, у неё названа пара — своя активная (kits.js, link 3)
+     или навыки соседей (link 2); способность из двух записей — сочетание, названо своими частями */
+  const trait = x => !x.v && (x.slot === 'pas' || x.slot === 'react'), act0 = K.kit.find(y => !y.v && y.slot === 'act');
+  const kindOf = (x, a) => a.combo ? (x.slot === 'ult' ? 'Ульта-сочетание' : 'Сочетание') : trait(x) ? 'Черта' : KIND[x.slot];
+  const pairOf = (x, a) => a.parts ? a.parts.map(id => (L[id] || { n: id }).n).join(' + ')
+    : trait(x) ? (K.link === 3 && act0 && L[act0.id] ? `пара — «${L[act0.id].n}»` : K.link === 2 ? 'пара — навыки соседей' : '') : '';
+  if (K.link != null) {   // набор состава: с доблести 0 — ровно пара «активная и черта»
+    cnt.pairs = (cnt.pairs || 0) + 1;
+    const v0 = K.kit.filter(x => !x.v);
+    if (v0.length !== 2 || v0.filter(x => x.slot === 'act').length !== 1 || v0.filter(trait).length !== 1) say(`${where}: на доблести 0 — не пара «активная и черта» (${v0.map(x => x.slot).join(', ')})`);
+  }
   K.kit.forEach((x, i) => {
     const r = kit[i], a = L[x.id] || { n: x.id, d: '' }, on = x.v <= pseudo.valor; cnt.abilities++;
     if (r[2] !== x.slot) say(`${where}: «${a.n}» — рамка вида ${r[2]}, ждали ${x.slot}`);
@@ -249,7 +260,10 @@ function checkSkills(p, pseudo, where) {
     if (a.d && (r[7] || '') !== a.d) say(`${where}: «${a.n}» — описание не видно на странице (ждали «${a.d.slice(0, 40)}…»)`);
     if (a.d && !visibleText(p, `<p class="ab-x">${a.d}</p>`)) say(`${where}: «${a.n}» — описание внутри свёрнутого блока`);
     const when = !x.v ? 'есть сразу' : on ? `доблесть ${x.v}` : `откроется на доблести ${x.v}`;
-    if ((r[6] || '') !== `${KIND[x.slot]} · ${when}`) say(`${where}: «${a.n}» — вид и доблесть «${r[6] || ''}», ждали «${KIND[x.slot]} · ${when}»`);
+    const what = [kindOf(x, a), when, pairOf(x, a)].filter(Boolean).join(' · ');
+    if ((r[6] || '') !== what) say(`${where}: «${a.n}» — вид и доблесть «${r[6] || ''}», ждали «${what}»`);
+    if (a.combo) cnt.combos = (cnt.combos || 0) + 1;
+    if (trait(x)) cnt.traits = (cnt.traits || 0) + 1;
     if (!!r[1] === on) say(`${where}: «${a.n}» — ${on ? 'открытая приглушена' : 'закрытая не приглушена'}`);
     if (!on && !/<span class="ab-sh lock"[^>]*>[\s\S]*?доблесть \d+<\/span>/.test(r[5])) say(`${where}: «${a.n}» — у закрытой нет «доблесть ${x.v}» вместо доли хода`);
     if (on && !/<span class="ab-sh[^"]*"[^>]*>(?:\d+ %|шанс \d+ %|всегда)<\/span>/.test(r[5])) say(`${where}: «${a.n}» — у открытой нет доли хода, шанса или «всегда»`);

@@ -1638,11 +1638,11 @@ function initialState() {
       { id: 'h1', name: 'Гарт Нишевой', cls: 'Танк', el: 'Земля', race: 'Дворфы', draft: 'h01_2', r: 1, cycle: 1, img: AV('heroes/h1.jpg'), lvl: 146, cap: 150, lim: 1, valor: 0, maxV: 1, st: [128, 54, 72, 246, 62], gr: [2, 3, 3, 1, 3],
         ab: ['Вызов', 'Удар щитом', 'Осыпание'].map(AB),
         pas: [{ n: 'Несгибаемость', t: 'боевая', d: 'Щит, когда здоровье ниже половины.' }, { n: 'Трофейщик', t: 'фарм', d: 'Больше золота с элит.' }], ult: null, busy: null, },
-      { id: 'h2', name: 'Хравн Сборщик', cls: 'Физ. ДД ловкости', fx: 'melee', el: 'Огонь', race: 'Люди', draft: 'h01_3', r: 1, cycle: 1, img: AV('heroes/h2.jpg'), lvl: 150, cap: 150, lim: 1, valor: 1, maxV: 1, st: [128, 54, 245, 72, 62], gr: [2, 3, 1, 3, 3],
-        ab: ['Горение', 'Быстрый выпад', 'Погребальный костёр'].map(AB),
+      { id: 'h2', name: 'Хравн Сборщик', cls: 'Физ. ДД силы', fx: 'melee', el: 'без стихии', race: 'Люди', draft: 'h01_3', r: 1, cycle: 1, img: AV('heroes/h2.jpg'), lvl: 150, cap: 150, lim: 1, valor: 1, maxV: 1, st: [245, 54, 128, 72, 62], gr: [1, 3, 2, 3, 3],
+        ab: ['Удар щитом', 'Быстрый выпад'].map(AB),
         pas: [{ n: 'Точность', t: 'боевая', d: 'Выше шанс крита.' }, { n: 'Охотник', t: 'фарм', d: 'Больше духа с рядовых.' }], ult: null, busy: null, },
-      { id: 'h3', name: 'Лаэйра', cls: 'Маг. ДД', el: 'Время', race: 'Эльфы', draft: 'h01_5', r: 2, cycle: 1, img: AV('heroes/h3.jpg'), lvl: 150, cap: 150, lim: 1, valor: 0, maxV: 1, st: [72, 246, 54, 62, 128], gr: [3, 1, 3, 3, 2],
-        ab: ['Разряд', 'Остановка'].map(AB),
+      { id: 'h3', name: 'Самир Недоучка', cls: 'Маг. ДД', el: 'Огонь', race: 'Люди', draft: 'h04_2', r: 2, cycle: 1, img: AV('heroes/c1-11.jpg'), lvl: 150, cap: 150, lim: 1, valor: 0, maxV: 1, st: [72, 246, 54, 62, 128], gr: [3, 1, 3, 3, 2],
+        ab: ['Разряд', 'Горение'].map(AB),
         pas: [{ n: 'Средоточие', t: 'боевая', d: 'Каждая третья способность сильнее.' }, { n: 'Знаток', t: 'фарм', d: 'Чаще падают базовые ресурсы.' }], ult: { n: 'Испепеление', at: 5, d: 'Откроется на доблести 5.' }, busy: null, },
       { id: 'h4', name: 'Ильмерра', cls: 'Хилер', el: 'Воздух', race: 'Эльфы', draft: 'h01_1', r: 2, cycle: 1, img: AV('heroes/h4.jpg'), lvl: 150, cap: 150, lim: 1, valor: 0, maxV: 1, st: [62, 246, 54, 128, 72], gr: [3, 1, 3, 2, 3],
         ab: ['Живая вода', 'Лёгкая поступь', 'Оберег'].map(AB),
@@ -1662,7 +1662,7 @@ function initialState() {
       owned: {
         'c2-01': { lvl: 50, lim: 0, valor: 0, how: 'gold' }, 'c1-06': { lvl: 50, lim: 0, valor: 0, how: 'gold' }, 'c2-05': { lvl: 50, lim: 0, valor: 0, how: 'gold' },
         'c1-13': { lvl: 50, lim: 0, valor: 0, how: 'gold' }, 'c1-09': { lvl: 50, lim: 0, valor: 0, how: 'gold' }, 'c2-02': { lvl: 50, lim: 0, valor: 0, how: 'gold' },
-        'c1-11': { lvl: 50, lim: 0, valor: 0, how: 'gold' }, 'c1-07': { lvl: 44, lim: 0, valor: 0, how: 'gold' }, 'c2-03': { lvl: 36, lim: 0, valor: 0, how: 'gold' },
+        'c1-03': { lvl: 50, lim: 0, valor: 0, how: 'gold' }, 'c1-07': { lvl: 44, lim: 0, valor: 0, how: 'gold' }, 'c2-03': { lvl: 36, lim: 0, valor: 0, how: 'gold' },
         'c1-10': { lvl: 22, lim: 0, valor: 0, how: 'gold' }, 'c1-15': { lvl: 6, lim: 0, valor: 0, how: 'gold' },
       }, shards: {}, spins: 0, last: '' },
     squads: [
@@ -1672,7 +1672,7 @@ function initialState() {
       { id: 's4', name: 'Авангард', m: ['h1', 'h2', 'h4', null, null] },
       { id: 's5', name: 'Тени', m: ['h3', 'h5', null, null, null] },
       /* второй отряд забегов (в цикле II — два забега разом) и третий отряд Лиги: купленные за золото (rs.owned) */
-      { id: 's6', name: 'Отряд II', m: ['c1-06', 'c1-13', 'c1-09', 'c1-11', 'c2-01'] },
+      { id: 's6', name: 'Отряд II', m: ['c1-06', 'c1-13', 'c1-09', 'c1-03', 'c2-01'] },
       { id: 's7', name: 'Лига · III', m: ['c1-10', 'c2-05', 'c2-03', 'c2-02', 'c1-07'] },
     ],
     selSquad: 's1', prepSquad: 's1', echoSquad: 's1', act: null,
@@ -2155,6 +2155,18 @@ const si = (icon, n, p, cls, title, color) => `<span class="si ${cls}" style="--
    сверху — доли хода одной полосой: способности, ульта, обычная атака. Вид — screens/book-pages.css */
 const heroKit = h => h.draft && window.EN_KITS && EN_KITS.heroes[h.draft] || null;
 const AB_KIND = { act: 'Активная', ult: 'Ульта', pas: 'Пассивка', react: 'Реакция' };
+/* Каждый герой сборный (ADR-0050): с доблести 0 — пара «активная и черта». Черта — пассивка или реакция доблести 0: она работает
+   со своей активной (kits.js, link 3) или с навыками соседей (link 2). Сочетание — способность из двух записей библиотеки (parts).
+   abKindOf — вид способности словом, abPairOf — с чем она в паре: имя активной у черты, части у сочетания */
+const abTrait = x => !x.v && (x.slot === 'pas' || x.slot === 'react');
+const abKindOf = (x, a) => a && a.combo ? (x.slot === 'ult' ? 'Ульта-сочетание' : 'Сочетание') : abTrait(x) ? 'Черта' : AB_KIND[x.slot] || 'Способность';
+function abPairOf(x, a, K, L) {
+  if (a && a.parts) return a.parts.map(id => (L[id] || {}).n || id).join(' + ');
+  if (!abTrait(x)) return '';
+  const act = K.kit.find(y => !y.v && y.slot === 'act'), n = act && L[act.id] ? L[act.id].n : '';
+  return K.link === 3 && n ? `пара — «${n}»` : K.link === 2 ? 'пара — навыки соседей' : '';
+}
+const abWhat = (x, a, K, L, when) => [abKindOf(x, a), when, abPairOf(x, a, K, L)].filter(Boolean).join(' · ');
 function heroKitHtml(h) {
   const K = heroKit(h), L = EB.lib(), acts = K.kit.filter(x => x.slot === 'act' && L[x.id]), ults = K.kit.filter(x => x.slot === 'ult');
   const w = acts.reduce((a, x) => a + L[x.id].ch, 0);
@@ -2167,7 +2179,7 @@ function heroKitHtml(h) {
     const chip = on ? `<span class="ab-sh${x.slot === 'ult' ? ' u' : ''}" title="${s ? 'Доля хода: столько ходов из ста' : x.chR ? 'Шанс реакции: растёт с редкостью героя' : 'Действует всегда'}">${s ? pctBp(s) : x.chR ? 'шанс ' + pctBp(x.chR) : 'всегда'}</span>`
       : `<span class="ab-sh lock" title="Откроется на доблести ${x.v}">${ic('lock')}доблесть ${x.v}</span>`;
     return abRow({ kind: x.slot, icon: (typeof abArt === 'function' && abArt(a, 40, '', on ? '' : 'off')) || ic(on ? (x.slot === 'ult' ? 'crown' : abIcon(a)) : 'lock'),
-      name: `${schoolMark(a.school)}${a.n}`, what: `${AB_KIND[x.slot] || 'Способность'} · ${when}`, d: a.d, lock: !on, chip });
+      name: `${schoolMark(a.school)}${a.n}`, what: abWhat(x, a, K, L, when), d: a.d, lock: !on, chip });
   }).join('');
   /* доли хода полосой: открытые способности и ульта — по одной, остальное — обычная атака */
   const sum = k => open.filter(x => x.slot === k).reduce((a, x) => a + share(x), 0), sa = sum('act'), su = sum('ult');
@@ -2177,7 +2189,7 @@ function heroKitHtml(h) {
   const leg = `<p class="ab-leg"><span><i class="a"></i>способности <b class="num">${pctBp(sa)}</b></span>${su ? `<span><i class="u"></i>ульта <b class="num">${pctBp(su)}</b></span>` : ''}<span><i class="b"></i>обычная атака <b class="num">${pctBp(basic)}</b></span></p>`;
   return `<div class="ab-page scroll" data-keep="kit:${h.id || h.draft}"><div class="ab-turn"><span class="eyebrow">Доли хода · ${K.rarity}</span>${bar}${leg}</div>
     <div class="rot-list">${rows}${abRow({ kind: 'basic', icon: ic('sword'), name: 'Обычная атака', what: 'Если ни одна способность не сработала', chip: `<span class="ab-sh">${pctBp(basic)}</span>` })}</div>
-    ${TM('<p class="reason">Редкость задаёт, как часто срабатывают способности и ульта: у обычного героя — 29 % и 1 %, у вневременного — 50 % и 10 % (ADR-0016). Активные делят долю по весу, закрытые доблестью отдают свою часть обычной атаке; последняя доблесть — ульта. В свой ход герой бросает шанс по долям хода.</p>')}</div>`;
+    ${TM('<p class="reason">Редкость задаёт, как часто срабатывают способности и ульта: у обычного героя — 29 % и 1 %, у вневременного — 50 % и 10 % (ADR-0016). Активные делят долю по весу, закрытые доблестью отдают свою часть обычной атаке; последняя доблесть — ульта. В свой ход герой бросает шанс по долям хода. С доблести 0 у каждого героя пара — активная и черта: пассивка или реакция, что работает с этой активной или с навыками соседей; сочетание — способность из двух, обе части действуют за один ход (ADR-0050).</p>')}</div>`;
 }
 function statusHtml(u, d, rounds) {
   const good = [], bad = [], per = rounds ? 'в каждый ход носителя' : 'в каждую атаку носителя', word = rounds ? roundWord : atkWord;
@@ -2360,7 +2372,7 @@ function rsAdd(h, how) { S.rs.owned[h.id] = { lvl: 0, lim: 0, valor: 0, how }; }
 /* портреты героев состава — выгрузка tools/art-gen/export_ui.py в assets/art/heroes/<id>.jpg (ui-art.json); сет 1 рисуют герои отряда (rsOld).
    28.09.2026: десять героев рулетки цикла II и десять героев каталога золота цикла I после сета 1; 29.09.2026 — ещё пятеро каталога цикла I;
    30.09.2026 — все герои Эхо, рулетки и доната: у каждого героя этих источников свой портрет */
-const RS_ART = new Set(['c1-06', 'c1-07', 'c1-08', 'c1-09', 'c1-10', 'c1-11', 'c1-12', 'c1-13', 'c1-14', 'c1-15', 'c1-16', 'c1-17', 'c1-19', 'c1-21', 'c1-22',
+const RS_ART = new Set(['c1-03', 'c1-06', 'c1-07', 'c1-08', 'c1-09', 'c1-10', 'c1-11', 'c1-12', 'c1-13', 'c1-14', 'c1-15', 'c1-16', 'c1-17', 'c1-19', 'c1-21', 'c1-22',
   'c2-41', 'c2-42', 'c2-43', 'c2-44', 'c2-45', 'c2-46', 'c2-66', 'c2-67', 'c2-68', 'c2-69',
   'c2-59', 'c2-60', 'c2-61', 'c2-62', 'c2-63', 'c3-59', 'c3-60', 'c3-61', 'c3-62', 'c3-63',
   'c2-51', 'c3-51', 'c4-51', 'c5-57', 'c6-51',   // + отряд Эхо недели Иш-Кантун, 29.09   // + Безликие донатных сетов II и III, 29.09
@@ -4528,11 +4540,14 @@ const klData = () => window.EN_ABILITIES || { total: 0, sets: [], kinds: {}, tie
 const klAll = () => klData().sets.flatMap(s => s.items);
 const klFind = id => klAll().find(a => a.id === id);
 const klSetOf = a => klData().sets.find(s => s.n === a.set);
+/* набор, в котором запись лежит: у сочетания (ADR-0050) set — школа первой части (цвет, эффект набора), а лежит оно в «Сочетаниях» */
+let KL_HOME = null;
+const klHome = a => { if (!KL_HOME) { KL_HOME = {}; for (const s of klData().sets) for (const x of s.items) KL_HOME[x.id] = s.n; } return KL_HOME[a.id] || a.set; };
 const klWords = s => String(s).toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean);
 const cap1 = s => String(s).replace(/^./, c => c.toUpperCase());
 const klEsc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 function klMatch(a) {
-  if (KL.set && a.set !== KL.set) return false;
+  if (KL.set && a.set !== KL.set && klHome(a) !== KL.set) return false;   // набор школы показывает и её сочетания
   if (KL.kind && a.k !== KL.kind) return false;
   if (KL.tier && a.tier !== KL.tier) return false;
   if (KL.type && a.t !== KL.type) return false;
@@ -4566,7 +4581,10 @@ function klDetail() {
   const a = klFind(KL.sel); if (!a) return '<p class="faint">Выберите способность.</p>';
   const D = klData(), S_ = klSetOf(a);
   const kind = a.k === 'farm' ? KL_ONE[a.t] : (D.kinds[a.k] || '').toLowerCase();
-  const eyebrow = [a.set, a.t === 'ult' && a.k !== 'farm' ? 'ульта' : '', kind, a.tier && D.tiers[a.tier] ? D.tiers[a.tier].toLowerCase() : ''].filter(Boolean).join(' · ');
+  /* сочетание (ADR-0050) — способность из двух записей: названо частями, каждая — ссылкой на свою запись */
+  const parts = a.data && a.data.parts ? a.data.parts.map(id => klFind(id)).filter(Boolean) : [];
+  const combo = parts.length ? `<span class="eyebrow">Сочетание — из двух</span><p class="muted" style="font-size:13.5px">${parts.map(x => `<button class="link" data-kl="sel" data-v="${x.id}">«${x.n}»</button>`).join(' + ')} — обе части действуют за один ход, одна строка в таблице шансов.</p>` : '';
+  const eyebrow = [a.set, parts.length ? 'сочетание' : '', a.t === 'ult' && a.k !== 'farm' ? 'ульта' : '', kind, a.tier && D.tiers[a.tier] ? D.tiers[a.tier].toLowerCase() : ''].filter(Boolean).join(' · ');
   const eff = S_.eff && S_.eff[a.k] ? `<span class="eyebrow">Эффект набора</span><p class="muted" style="font-size:13.5px"><b style="color:var(--parch)">${S_.eff[a.k][0]}</b> — ${S_.eff[a.k][1]}</p>` : '';
   const trig = a.trig ? `<span class="eyebrow">Когда срабатывает</span><p class="muted" style="font-size:13.5px">${cap1(D.triggers[a.trig])}</p>` : '';
   const src = a.src
@@ -4576,7 +4594,7 @@ function klDetail() {
   const data = Object.entries(a.data).map(([k, v]) => `<tr><td>${k}</td><td>${klEsc(typeof v === 'object' ? JSON.stringify(v) : v)}</td></tr>`).join('');
   return `<div class="row" style="gap:10px"><span class="kl-ico">${(typeof abArt === 'function' && abArt(a, 46)) || ic(KL_IC[a.k] || 'gem')}</span><div class="col" style="gap:3px"><span class="eyebrow">${eyebrow}</span><b class="nm">${a.n}</b></div></div>`
     + (a.k === 'reaction' ? '' : `<div class="kl-meta">${a.ch ? `<span class="chip">шанс ${a.ch / 100} %</span>` : ''}<span class="chip">${a.num}</span>${a.t === 'ult' ? '<span class="chip gold">ульта</span>' : ''}</div>`)
-    + `<p style="font-size:14.5px;color:var(--parch)">${a.d}</p>${trig}${eff}${src}<span class="eyebrow">Данные для ядра</span><table class="kl-data">${data}</table>`;
+    + `<p style="font-size:14.5px;color:var(--parch)">${a.d}</p>${combo}${trig}${eff}${src}<span class="eyebrow">Данные для ядра</span><table class="kl-data">${data}</table>`;
 }
 function klPaint() {
   const root = document.getElementById('kitLib'); if (!root) return;

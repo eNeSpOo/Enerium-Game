@@ -36,6 +36,15 @@
    уникальные способности Убер-боссов — addLib из echo-foes.js.
    Биомы 2–4 — данные biome-foes.js (tools/content-gen/biomes): карты и колоды регистрирует addFoes и addBiome, уникальное — addLib;
    золото и дух биома — dropPct, уровень врагов этажа — foeLvl с дробным шагом.
+   Сборные герои (ADR-0050, слова автора 02.10.2026): у каждого героя с доблести 0 — активка и черта-пассивка, в библиотеке —
+   сочетания двух способностей. Шесть примитивов, каждый — обобщение прежнего:
+   - also — вторая часть способности (сочетание): свой вид, своё правило цели или цели первой части (same), свои числа; одна строка
+     таблицы шансов и один бросок хода, сначала броски первой части, затем второй (castLib, libPart);
+   - nthBasic — каждая N-я обычная атака кладёт дебафф своей школы; «Тлеющий след» (nthBasicDot) — им же (attack);
+   - hotAura — союзнику под лечением по времени героя: уклонение или меньше урона (hit, damage);
+   - ctrlFirm — свой контроль крепче: порог, от которого спадает лёд, — из пассивки наложившего (addStatus);
+   - party — поправка пассивки действует на весь отряд, пока герой жив: dmgVsDebuff (dmgPct) и dmgReduce — меньше любого урона (damage);
+   - ctrl — условие «цель под любым контролем», список CTL_ST (dmgPct).
 
    Инварианты ядра соблюдены и в прототипе:
    - только целые числа: время в мс, доли — в процентах или базисных пунктах (10 000 = 100 %);
@@ -319,8 +328,11 @@ const BIOMES = {
     // Старт с чистого листа (01.10.2026, tools/content-gen/start): босс — 550 % (было 675 %), пара берёт его с 29-го уровня (было с 33-го):
     // первый час — три забега и страж, 8 минут боя при коридоре 7–10. Мастер — 90 % (было 175 %): при 175 % пара брала его с 41-го,
     // но на 46–52-м снова проигрывала — удары стража съедали раунды (ADR-0020), бой упирался в «Время скоротечно». С 90 % пара берёт
-    // его с 30-го, с доблестью бойца — с 21-го, и выше — только победы: start/build.js сверяет до 160-го уровня
-    foeLvl: { base: 1, perFloor: 1 }, foeHpPct: 50, bossHpPct: 550, guardHpPct: 90, siege: false,
+    // его с 30-го, с доблестью бойца — с 21-го, и выше — только победы: start/build.js сверяет до 160-го уровня.
+    // Сборные герои (02.10.2026, ADR-0050): у пары обучения — пары «активка + черта», Хравн — воин силы: пара брала Мастера при 90 % уже
+    // на 21-м, но на 24–27-м снова проигрывала. Мастер — 150 % (было 90 %): пара берёт его с 28-го, с доблестью бойца — с 19-го, выше —
+    // только победы; первый час — те же три забега и страж, 8,4 минуты боя
+    foeLvl: { base: 1, perFloor: 1 }, foeHpPct: 50, bossHpPct: 550, guardHpPct: 150, siege: false,
     // рунный страж обучения — три карты (ADR-0018): Мастер и две элиты, по силам двум героям. Подмастерье бьёт, Мех — по всем
     guard: { g: 'r', m: ['g1', 'e1', 'e4'] },
     /* полный вариант — с цикла II (ADR-0044, слово автора: «после обучающего цикла 1 и 2 биом становятся длиннее по этажам и сами РБ
@@ -433,7 +445,13 @@ function once(u, p) {   // «раз за биом», «раз за жизнь» 
 function dmgPct(b, src, t) {
   let add = 0;
   for (const p of pasOf(src, 'dmgWhileDot')) if (foeDot(b, src, p.school)) { add += p.pct; cov(b, p); }                        // «Жар в крови»
-  for (const p of pasOf(src, 'dmgVsDebuff')) { const sd = p.st || schoolDebuffSt(p.school); if (sd && has(t, sd)) { add += p.pct; cov(b, p); } }   // по цели под дебаффом своей школы или под своим эффектом st (dmgVsSt)
+  /* по цели под дебаффом своей школы, под своим эффектом st (dmgVsSt) или под любым контролем (ctrl, ADR-0050: «Удар по скованному»).
+     Пассивка с party действует на весь отряд, пока её хозяин жив («Холодный расчёт», «Общий гудок»); без party — только на хозяина */
+  for (const v of b.u[src.side]) for (const p of pasOf(v, 'dmgVsDebuff')) {
+    if (v !== src && !(p.party && v.alive)) continue;
+    const sd = p.st || schoolDebuffSt(p.school);
+    if (p.ctrl ? t.st.some(s => CTL_ST.includes(s.k)) : sd && has(t, sd)) { add += p.pct; cov(b, p); }
+  }
   for (const p of pasOf(src, 'guardPerAlly')) { const n = b.u[src.side].filter(v => v !== src && !v.alive).length; if (n) { add += p.dmgPct * n; cov(b, p); } }   // сила от союзников: за каждого павшего
   for (const p of pasOf(src, 'dmgVsDot')) if (periodicOf(t, 'dot', p.school)) { add += p.pct; cov(b, p); }                     // «Мясник»
   for (const p of pasOf(src, 'dmgVsLow')) if (below(t, p.belowPct)) { add += p.pct; cov(b, p); }                               // «Хищник»
@@ -1004,18 +1022,44 @@ function attack(b, u) {
   let d = 0;
   for (const v of all) if (v.alive) { const x = hit(b, u, v, mainStat(u), u.basicAll || 100, { basic: true, mass: !!u.basicAll }); if (v === t) d = x; }
   u.nBasic++;
-  const nb = libPas(u, 'nthBasicDot');   // «Тлеющий след»: каждая N-я обычная атака — стак урона по времени своей школы
-  if (nb && d > 0 && u.nBasic % nb.every === 0 && t.alive) { cov(b, nb); addPeriodicLib(b, u, t, schoolEntry(nb.school, 'dot', 'one'), u.main, 1); }
+  /* каждая N-я обычная атака (ADR-0050, nthBasic): «Тлеющий след» (nthBasicDot) — стак урона по времени своей школы; «Трещина в броне»
+     и «Пепельный след» — дебафф своей школы (then: 'debuff') на left раундов, сила — как у записи школы «на одного». Считаются попавшие
+     и не попавшие атаки, эффект — только с попавшей; бросков нет (у цели может ответить реакция на дебафф — её бросок, §5.9) */
+  if (d > 0) for (const nb of pasOf(u, 'nthBasicDot').concat(pasOf(u, 'nthBasic'))) {
+    if (u.nBasic % nb.every !== 0 || !t.alive) continue;
+    cov(b, nb);
+    if (nb.pas === 'nthBasicDot') { addPeriodicLib(b, u, t, schoolEntry(nb.school, 'dot', 'one'), u.main, 1); continue; }
+    const e = schoolEntry(nb.school, nb.then, 'one');
+    if (e) addStatus(b, u, t, { st: e.st, left: nb.left, pow: e.pow, evadeDown: e.evadeDown }, CTL_ST.includes(e.st));
+  }
 }
 const periodicOf = (t, kind, school) => t.st.find(s => s.k === kind && s.school === school);
-/* Способность из общей библиотеки (ADR-0015): ступень целей, характеристика — главный стат наложившего, связки школы. */
+/* Способность из общей библиотеки (ADR-0015): ступень целей, характеристика — главный стат наложившего, связки школы.
+   Сочетание (ADR-0050) — способность из двух частей: ab.also — вторая часть со своим видом, школой и числами. Строка в таблице шансов
+   одна, бросок хода один, событие cast одно. Сначала действует первая часть со всеми её бросками (уклонение и крит по её целям),
+   затем вторая — это часть формата боя (§5.9). Цели второй части — по её правилу или цели первой (tgt: 'same'; targets — сколько первых
+   из них, без targets — все). Угроза — как у первой части: массовая первая часть угрозы не создаёт и во второй. От ульты уклоняются
+   целиком: бросок «Уклона от бури» — один на цель, при первом попадании под ульту. */
 function castLib(b, u, ab, isUlt, opt) {
   const self = ab.kind === 'farm' && !ab.coef && !ab.targets;   // фарм на весь этаж и «Жадный взгляд» — на себя
   let tg = self ? [u] : ab.kind === 'revive' ? reviveTargets(b, u, ab) : pickN(b, u, ab.tgt || 'threat', ab.targets);
   const mass = ab.tgt === 'all' || ab.tgt === 'allies';
   emit(b, { k: 'cast', s: u, n: ab.n, ult: isUlt, mass, school: ab.school, t: tg });
   if (!mass) { const fix = isUlt ? RULES.threat.ult : RULES.threat.cast; for (const v of b.u[1 - u.side]) if (v.alive) v.th[u.i] += fl(fix * thrMul(u), 100); }
-  if (isUlt) tg = tg.filter(t => !dodgeUlt(b, u, t));   // «Уклон от бури»
+  const dodged = new Map(), dodge = t => { if (!dodged.has(t)) dodged.set(t, dodgeUlt(b, u, t)); return dodged.get(t); };
+  if (isUlt) tg = tg.filter(t => !dodge(t));   // «Уклон от бури»
+  libPart(b, u, ab, tg, mass);
+  if (ab.also) {
+    const p = Object.assign({ id: ab.id, n: ab.n }, ab.also);
+    let tg2 = p.tgt === 'same' ? (p.targets ? tg.slice(0, p.targets) : tg) : pickN(b, u, p.tgt || 'threat', p.targets);
+    if (isUlt && p.tgt !== 'same') tg2 = tg2.filter(t => !dodge(t));
+    libPart(b, u, p, tg2, mass);
+  }
+  if (ab.steal) for (const t of tg) if (t.alive && t.side !== u.side) steal(b, u, t, ab.steal);   // забрать эффекты — после действия
+  if (isUlt) ultAnswers(b, u, ab, opt);   // «Слепящий ответ», «Задержка», повтор чужой ульты
+}
+/* Одна часть способности: действие по виду на свои цели. mass — массовая ли способность: по нему считается угроза обеих частей */
+function libPart(b, u, ab, tg, mass) {
   const stat = !ab.stat || ab.stat === 'main' ? u.main : ab.stat;
   switch (ab.kind) {
     case 'dmg': for (const t of tg) for (let h = 0; h < (ab.hits || 1); h++) {   // coef — на все удары: «пять ударов по 120 %» — это 600 % на пять
@@ -1039,8 +1083,6 @@ function castLib(b, u, ab, isUlt, opt) {
     case 'farm': farmCast(b, u, ab, tg); break;
     case 'revive': for (const t of tg) revive(b, u, t, ab); break;
   }
-  if (ab.steal) for (const t of tg) if (t.alive && t.side !== u.side) steal(b, u, t, ab.steal);   // забрать эффекты — после действия
-  if (isUlt) ultAnswers(b, u, ab, opt);   // «Слепящий ответ», «Задержка», повтор чужой ульты
 }
 /* Поднять павшего (echo-foes.js): павшие союзники — последние павшие первыми, targets — сколько, null — все. Каждая карта встаёт
    раз за бой; сгоревший — на ком в миг гибели был урон по времени школы unlessDot — не встаёт */
@@ -1163,7 +1205,8 @@ function debuffThreat(u, t) { if (t.alive) t.th[u.i] += fl(RULES.threat.debuff *
 function hit(b, src, t, stat, coef, o) {
   const r = b.rng(10000);   // бросок уклонения делается всегда: порядок обращений к генератору не зависит от эффектов
   const ms = has(src, 'miss'), ev = has(t, 'evade'), br = has(t, 'break'), sw = t.sh > 0 && t.shWhile;
-  const eva = clamp(t.eva - (mute(t) ? t.evaPas : 0) + (ms ? ms.pow : 0) + (ev ? ev.pow : 0) + t.aura.evade + (sw ? sw.pow : 0) - (br ? br.evadeDown : 0), 0, RULES.buffCaps.evaBp);
+  const eva = clamp(t.eva - (mute(t) ? t.evaPas : 0) + (ms ? ms.pow : 0) + (ev ? ev.pow : 0) + t.aura.evade + (sw ? sw.pow : 0) - (br ? br.evadeDown : 0)
+    + hotAura(b, t, 'evade'), 0, RULES.buffCaps.evaBp);   // «Шелест листвы»: уклонение под лечением по времени героя (ADR-0050)
   if (has(src, 'blind')) { emit(b, { k: 'miss', s: src, t }); return 0; }   // ослепление: удары мимо
   if (r < eva) { if (sw) cov(b, sw.ab); emit(b, { k: 'miss', s: src, t }); onDodge(b, src, t, o); return 0; }
   let base = fl(src.atk[stat] * coef, 100);
@@ -1199,10 +1242,21 @@ function hit(b, src, t, stat, coef, o) {
   if (t.alive && src.side !== t.side) onHit(b, src, t, o);
   return d;
 }
+/* Поправка союзнику под лечением по времени героя (ADR-0050, hotAura): key — evade (уклонение, б. п.) или guard (меньше урона, б. п.).
+   Действует, пока наложивший жив и не под «срезанным именем»; лечение — школы пассивки. «Ореол» (defWhileHot) — та же связка для
+   защиты, в hit. Бросков нет */
+function hotAura(b, t, key) {
+  let v = 0;
+  for (const s of t.st) if (s.k === 'hot' && s.src && s.src.alive) for (const p of pasOf(s.src, 'hotAura')) if (p.school === s.school && p[key]) { v += p[key]; cov(b, p); }
+  return v;
+}
 /* Урон по карте. Возвращает прошедший урон: 0 — если карта во льду «Ледяного панциря». */
 function damage(b, src, t, d, o) {
   if (has(t, 'iceblock')) { emit(b, { k: 'unhurt', s: src, t }); return 0; }   // «Ледяной панцирь»: пока во льду, урон не проходит
   const gd = has(t, 'guard'); if (gd) d = Math.max(1, fl(d * (10000 - gd.pow), 10000));   // каменная кожа: меньше получаемого урона
+  const ha = hotAura(b, t, 'guard'); if (ha) d = Math.max(1, fl(d * (10000 - ha), 10000));   // «Живая опора»: под живицей героя — меньше урона (ADR-0050)
+  /* «Плечо к плечу» (dmgReduce, ADR-0050): меньше любого урона; с party — всему отряду, пока хозяин пассивки жив */
+  for (const v of b.u[t.side]) for (const p of pasOf(v, 'dmgReduce')) if (v === t || p.party && v.alive) { d = Math.max(1, fl(d * (100 - p.pct), 100)); cov(b, p); }
   const foe = src && src.side !== t.side;
   if (foe && !o.dot) {
     if (o.crit) for (const p of reacts(t, 'critTaken')) { d = Math.max(1, fl(d * (100 - p.pct), 100)); react(b, t, p, src); }   // «Твёрдость»
@@ -1302,8 +1356,11 @@ function addStatus(b, src, t, s, isCtrl, reflected) {
   /* отложенный удар и цель для всех помнят наложившего (src — для расчёта); by — кто наложил эффект последним, для сведений карты на экране
      (задача «Бой AAA», 01.10.2026): на исход и генератор не влияет. У урона и лечения со временем наложивший — их src */
   const tie = Object.assign({ by: src }, s.coef ? { coef: s.coef, src } : {}, s.focus ? { focus: true, src } : {});
-  if (ex) { ex.left = Math.max(ex.left, left); ex.left0 = Math.max(ex.left, ex.left0); ex.pow = Math.max(ex.pow, s.pow || 0); Object.assign(ex, tie); }
-  else t.st.push(Object.assign({ k: s.st, left, left0: left, pow: s.pow || 0, breakPct: s.breakPct || 0, evadeDown: s.evadeDown || 0 }, tie));
+  /* свой контроль крепче (ADR-0050, ctrlFirm): порог удара, от которого спадает лёд, — из пассивки наложившего, если он выше («Крепкий лёд») */
+  let breakPct = s.breakPct || 0;
+  if (isCtrl) for (const p of pasOf(src, 'ctrlFirm')) if (p.st === s.st && p.breakPct > breakPct) { breakPct = p.breakPct; cov(b, p); }
+  if (ex) { ex.left = Math.max(ex.left, left); ex.left0 = Math.max(ex.left, ex.left0); ex.pow = Math.max(ex.pow, s.pow || 0); ex.breakPct = Math.max(ex.breakPct || 0, breakPct); Object.assign(ex, tie); }
+  else t.st.push(Object.assign({ k: s.st, left, left0: left, pow: s.pow || 0, breakPct, evadeDown: s.evadeDown || 0 }, tie));
   if (s.st === 'knock') { const opp = b.u[1 - t.side]; for (let j = 0; j < t.th.length; j++) t.th[j] = fl(RULES.threat.base * thrMul(opp[j]), 100); t.cur = -1; }   // сброс: угроза цели ко всем обнуляется
   if (s.st === 'stop') {
     if (b.mode === 'rounds') { const q = b.queue.indexOf(t); if (q >= 0) { b.queue.splice(q, 1); b.queue.push(t); } }   // ходит последней в раунде
@@ -1473,6 +1530,6 @@ function simRun(heroes, biome, siegeHp, mode) {
   return { floors, runMs, bossHp };
 }
 
-root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, FLOORS_TUTOR, BIOMES, lib: lib2, addLib, addFoes, addBiome, kitTable, GOOD_ST, SKIP_ST, seedOf, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, carry, simRun, guardBattle, echoBattle, targetBattle, echoStats, foeMaxHp, roundsOf, valorSt, heroSrcValor, cycX10, levelCost, floorLoot, elemMul, ready, readyRound, order, chanceTable, pct, fxOf,
+root.EnBattle = { RULES, LIB, PAS, FOES, FLOORS, FLOORS_TUTOR, BIOMES, lib: lib2, addLib, addFoes, addBiome, kitTable, GOOD_ST, SKIP_ST, CTL_ST, seedOf, floorSeed, makeRng, create, step, nextAt, run, heroSrc, floorFoes, floorBattle, carry, simRun, guardBattle, echoBattle, targetBattle, echoStats, foeMaxHp, roundsOf, valorSt, heroSrcValor, cycX10, levelCost, floorLoot, elemMul, ready, readyRound, order, chanceTable, pct, fxOf,
   atCycle, variantOf, cycleAt: () => CYCLE_AT, VARIANT_KEYS, lootArt, ritualOf };   // вариант биома по циклу игрока и артефакты в добыче (ADR-0044)
 })(typeof window !== 'undefined' ? window : globalThis);
