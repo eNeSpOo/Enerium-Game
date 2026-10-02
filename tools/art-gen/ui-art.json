@@ -94,7 +94,7 @@
       "from": "heroes/hero-hravn__nb2.jpg",
       "mirror": true
     },
-    "heroes/h3.jpg": "heroes/hero-laeira__nb2.jpg",
+    "heroes/c1-03.jpg": "heroes/hero-laeira__nb2.jpg",
     "heroes/h4.jpg": {
       "from": "heroes/hero-ilmerra__nb2.jpg",
       "mirror": true
@@ -5772,6 +5772,90 @@
       "size": [
         256,
         256
+      ]
+    },
+    "arena-b1-2.jpg": {
+      "from": "arenas/arena-b1-2__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-b1-3.jpg": {
+      "from": "arenas/arena-b1-3__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-b1-4.jpg": {
+      "from": "arenas/arena-b1-4__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-b2-2.jpg": {
+      "from": "arenas/arena-b2-2__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-b2-3.jpg": {
+      "from": "arenas/arena-b2-3__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-b2-4.jpg": {
+      "from": "arenas/arena-b2-4__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-b3-2.jpg": {
+      "from": "arenas/arena-b3-2__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-b3-3.jpg": {
+      "from": "arenas/arena-b3-3__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-b3-4.jpg": {
+      "from": "arenas/arena-b3-4__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-b4-2.jpg": {
+      "from": "arenas/arena-b4-2__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-b4-3.jpg": {
+      "from": "arenas/arena-b4-3__nb2.jpg",
+      "size": [
+        1688,
+        716
+      ]
+    },
+    "arena-b4-4.jpg": {
+      "from": "arenas/arena-b4-4__nb2.jpg",
+      "size": [
+        1688,
+        716
       ]
     }
   }

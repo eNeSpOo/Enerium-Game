@@ -15,9 +15,10 @@
    5. Эффекты — сцена EnFx.scene (fx.js): снаряд и разрыв своей школы, удар, массовая волна, ульта со своим окном, значок наложенного
       эффекта, гибель flipbook-лентой. Только transform и opacity; «меньше движения» — без полётов и тряски.
    6. Баннеры: этаж, элита, босс биома, рунный страж, Эхо, «Раунд N», последний раунд, осада — плашка одного вида (BS_ART.plaque).
-   7. Ритуал этажа (ADR-0044) — поход на новый этаж (ADR-0048): враги выходят, падают, добыча летит в кошелёк, отряд идёт дальше по
-      биому, экран затемняется, открывается новая арена того же биома (BS_ART.arenas — по номеру этажа), враги нового этажа выходят
-      справа. Длительности — данные RULES.floor ядра: minMs — минимум этажа (его подбирает калькулятор фарма, время ритуала держит
+   7. Ритуал этажа (ADR-0044) — поход на новый этаж (ADR-0048): враги падают, добыча летит в кошелёк, отряд идёт дальше по биому,
+      экран затемняется, новая арена того же биома (BS_ART.arenas — по номеру этажа) открывается, пока отряд ещё идёт; отряд
+      останавливается — враги нового этажа выходят из-за правого края поля и идут влево, к своим местам, затем начинается бой.
+      Длительности — данные RULES.floor ядра: minMs — минимум этажа (его подбирает калькулятор фарма, время ритуала держит
       screens/biomes.js), ritual — фазы показа; длительность этажа поход не меняет.
    8. Итог этажа и забега, окно «Стена» — герб победы или стены над окном (BS_ART.crest), тот же язык.
    9. Легенда «Знаки» — по новому виду: плита здоровья, значки эффектов, шансы, очередь, иммунитет, числа.
@@ -62,6 +63,11 @@ const BS_DATA = {
   tripFlow: { lvl: 350, cyc: 3 },
   /* поход на новый этаж: павшие гаснут, пройдя такую долю своей комнаты, % (фазы и их мс — RULES.floor.ritual ядра) */
   tripFadePct: 50,
+  /* остановка отряда после темноты: фон тормозит равномерно — кривая времени равнозамедленного движения (точная кубическая кривая Безье) */
+  tripStop: 'cubic-bezier(.33,.67,.67,1)',
+  /* выход врагов из-за правого края поля: col — задняя колонка выходит позже передней на столько шагов stepMs; dustMs — пыль из-под
+     ног за столько мс до того, как карта встала */
+  foeIn: { col: 2, dustMs: 120 },
   /* медальон раунда на последних раундах — предупреждение: столько раундов до конца */
   lastRounds: 1,
   /* сведения карты: угроза — сколько противников показывать; портрет в рамке ранга, px */
@@ -113,7 +119,7 @@ const BS_ART = {
     b3: ['arena-b3.jpg', 'arena-b3-2.jpg', 'arena-b3-3.jpg', 'arena-b3-4.jpg'],
     b4: ['arena-b4.jpg', 'arena-b4-2.jpg', 'arena-b4-3.jpg', 'arena-b4-4.jpg'],
   },
-  arenaReady: ['arena-workshop.jpg', 'arena-b2.jpg', 'arena-b3.jpg', 'arena-b4.jpg'],
+  arenaReady: ['arena-workshop.jpg', 'arena-b1-2.jpg', 'arena-b1-3.jpg', 'arena-b1-4.jpg', 'arena-b2.jpg', 'arena-b2-2.jpg', 'arena-b2-3.jpg', 'arena-b2-4.jpg', 'arena-b3.jpg', 'arena-b3-2.jpg', 'arena-b3-3.jpg', 'arena-b3-4.jpg', 'arena-b4.jpg', 'arena-b4-2.jpg', 'arena-b4-3.jpg', 'arena-b4-4.jpg'],
 };
 /* геометрия рисованной квадратной рамки — tools/art-gen/frame_square.py: тело — нарезка border-image [верх, право, низ, лево] в тысячных
    тела; венец — пропорция ширины к высоте в тысячных (ar) и ширина к телу (rel); рамка целиком (окно сведений) — окно и нарезка battle_frame.py */
@@ -278,6 +284,9 @@ paintHud = function (R) {
   if (n && b) {
     const t = String(Math.max(1, b.round));
     if (n.textContent !== t) n.textContent = t;
+    /* до первого раунда — пока выходят враги нового этажа — строка часов показывает тот же раунд, что и медальон, а не «0 / N» */
+    const c = document.getElementById('btClock');
+    if (c && b.mode === 'rounds' && b.round < 1) c.textContent = `${t} / ${b.maxRounds}`;
     const box = document.getElementById('btClockBox');
     if (box) box.classList.toggle('last', b.mode === 'rounds' && b.round > 0 && b.maxRounds - b.round < BS_DATA.lastRounds);
   }
@@ -617,27 +626,74 @@ roundFlash = function (n) {
    1. отряд переходит дальше — после последнего удара добыча летит в кошелёк, отряд трогается, павшие уходят со своей комнатой;
    2. отряд идёт по биому весь остаток пути — «появление дольше»: фон едет комната за комнатой (зеркальные копии арены), отряд шагает;
    3. экран затемняется; 4. в темноте — арена следующего этажа того же биома (BS_ART.arenas, по номеру этажа), она открывается;
-   5. новый этаж: враги выходят справа своей анимацией, как прежде (RULES.floor.ritual.enterMs в advance index.html).
-   Затемнение и новая арена стоят в конце пути, шаг отряда заполняет остаток: длительность этажа та же. Свёрнутый забег идёт тем же
-   временем без показа; открытый посреди пути — фаза и её место встают по часам пути (bsTripClock). «Меньше движения» — тот же порядок без
-   движения: фон и отряд стоят, павшие гаснут, затемнение и новая арена — прозрачностью. Фазы — RULES.floor.ritual */
+   5. новый этаж: враги выходят справа.
+   Правка автора после просмотра, 02.10.2026: «Переход между этажами, посмотрел - нравится, только вот такая правка, нам нужно как бы
+   после чёрного экрана показывать ещё движение небольшое якобы мы всё это время шли и уже когда остановились двое врагов как бы выходят
+   из-за экрана в левую сторону и бой начинается. Так создаётся глубина похода и игрок понимает почему так долго». Порядок конца пути:
+   4а. новая арена открывается, пока отряд ещё идёт: фон едет, герои шагают — и после темноты ещё walkMs, фон тормозит, отряд встаёт;
+   5а. отряд остановился — на экране новый этаж, и его враги выходят из-за правого края поля и идут влево, к своим местам: сколько
+       врагов в колоде этажа, столько и выходит; выход идёт enterMs и кончается ровно к первому ходу боя — бой начинается, когда враги
+       встали. Первый ход ядро даёт через rounds.gapMs после начала этажа, поэтому выход начинается за enterMs − rounds.gapMs до него:
+       новый этаж рисуется в конце пути, а часы его боя стоят до конца пути (R.bsHold) — длительность этажа та же.
+   Затемнение, новая арена, шаг после темноты и начало выхода стоят в конце пути, шаг отряда до темноты заполняет остаток. Свёрнутый
+   забег идёт тем же временем без показа; открытый посреди пути — фаза и её место встают по часам пути (bsTripClock). «Меньше движения» —
+   тот же порядок без движения: фон и отряд стоят, павшие гаснут, затемнение и новая арена — прозрачностью, враги проявляются на
+   местах. Фазы — RULES.floor.ritual */
 const BS_RUN = { skipMagnet: false };
-/* выход: шаг между картами врагов — из данных (--bs-step для .bt-side.f.enter, battle-scene.css); на первой отрисовке нового этажа
-   у каждого врага — облако пыли, у главного — лучи, по очереди через stepMs */
+
+/* ---------- выход врагов нового этажа: из-за правого края поля, влево, к своим местам ---------- */
+/* выход кончается к первому ходу нового боя: в модели раундов первый ход — после паузы раунда RULES.rounds.gapMs, поэтому выход
+   начинается за enterMs − gapMs до начала этажа — в конце пути. Бой со своей сценой, страж и прежняя модель темпа — выход с начала боя */
+function bsLead(R) { return !R || R.scene || R.guard || R.mode === 'tempo' ? 0 : Math.max(0, bsRit().enterMs - EB.RULES.rounds.gapMs); }
+/* сколько идёт выход врагов у этого боя — до первого хода: то, что выход успел пройти до начала этажа (bsLead), и пауза раунда.
+   У забега по биому это весь enterMs; у боя со своей сценой выход идёт с начала боя и укладывается в паузу раунда — карты идут
+   быстрее, но под удар не попадают. Прежняя модель темпа первого хода не ждёт — весь enterMs */
+function bsEnterMs(R) {
+  const Q = bsRit();
+  return R && R.b && R.b.mode === 'rounds' ? Math.min(Q.enterMs, bsLead(R) + EB.RULES.rounds.gapMs) : Q.enterMs;
+}
+/* очередь выхода по месту карты [колонка, ряд] (SLOT index.html): передняя колонка — ближе к отряду, ей идти дальше — выходит первой,
+   задняя — на BS_DATA.foeIn.col шагов позже; в колонке — сверху вниз */
+function bsFoeOrder([k, r]) { return (1 - k) * BS_DATA.foeIn.col + r; }
+/* выход n врагов за total мс (без него — enterMs): шаг между картами (stepMs), с какого шага очереди начинается первая (o0), когда
+   трогается каждая (at) и сколько идёт одна карта (foeMs) — последняя встаёт ровно через total после начала выхода */
+function bsFoeIn(n, total) {
+  const Q = bsRit(), all = total > 0 ? total : Q.enterMs;
+  const os = (SLOT[n] || []).map(bsFoeOrder), o0 = os.length ? Math.min(...os) : 0, o1 = os.length ? Math.max(...os) : 0;
+  const span = Math.round((o1 - o0) * Q.stepMs);
+  return { o0, stepMs: Q.stepMs, foeMs: Math.max(Q.stepMs, all - span), at: os.map(o => Math.round((o - o0) * Q.stepMs)) };
+}
+/* сколько выхода уже прошло, мс: у забега по биому он начинается за bsLead до начала этажа (R.bsHold — сколько осталось до него),
+   у боя со сценой — с начала боя; null — выхода нет */
+const bsEnterAt = R => (!R || !R.enter ? null : R.bsHold > 0 ? bsLead(R) - R.bsHold : bsLead(R) + R.view);
+/* выход кончился — враги встали: класс выхода снимается с их стороны, иначе его анимация сильнее удара, каста и гибели карты
+   (.bt-side.f.enter .bc против .bc.shake, .bc.casting, .bc.falling) и до конца этажа враги не дрожат и не оседают */
+function bsEnterEnd(R) {
+  if (R.enter && bsEnterAt(R) >= bsEnterMs(R)) R.enter = false;
+  if (R.enter || !visible(R)) return;
+  const bt = document.getElementById('bt'), side = bt && bt.querySelector ? bt.querySelector('.bt-side.f.enter') : null;
+  if (side && side.classList) side.classList.remove('enter');
+}
+/* отрисовка экрана: шаг, длительность и место выхода — из данных (--bs-* для .bt-side.f.enter, battle-scene.css); экран перерисован
+   посреди выхода — карты продолжают с того же места (--bs-at). Когда карта врага встала — пыль из-под ног, у главного — лучи */
 window.addEventListener('en-render', () => {
   const R = typeof focusRun === 'function' ? focusRun() : null;
   if (!R || !R.b || S.route !== 'battle') return;
-  const bt = document.getElementById('bt'), Q = bsRit();
-  if (bt && bt.style) bt.style.setProperty('--bs-step', Q.stepMs + 'ms');
+  const bt = document.getElementById('bt'); if (!bt || !bt.style) return;
+  const P = BS_DATA.foeIn, F = bsFoeIn(R.b.u[1].length, bsEnterMs(R)), at = bsEnterAt(R) || 0, ms = v => Math.round(v / devSpeed) + 'ms';
+  for (const [k, v] of [['step', ms(F.stepMs)], ['foe', ms(F.foeMs)], ['at', ms(at)], ['o0', F.o0], ['col', P.col]]) bt.style.setProperty('--bs-' + k, v);
   if (!R.enter || R.__enterFx === R.b) return;
   R.__enterFx = R.b;
-  const fx = fxFor(); if (!fx || bsCalm()) return;
-  R.b.u[1].forEach((u, i) => setTimeout(() => {
-    const el = document.getElementById('bc1' + i); if (!el || !fx.flip) return;
-    const b = fx.center(el);
-    fx.flip('puff', { x: b.x, y: b.y + b.h * .35, w: b.w, h: b.h }, 1500, 700);
-    if (u.lead) fx.pop('rays', b, 1900, 900, { s0: .3, s1: 1.1, op: .8 });
-  }, (Q.stepMs * i + Q.enterMs * .25) / devSpeed));
+  const fx = fxFor(), b0 = R.b; if (!fx || bsCalm()) return;
+  R.b.u[1].forEach((u, i) => {
+    const wait = F.at[i] + F.foeMs - P.dustMs - at; if (wait < 0) return;   // карта уже встала — пыль осела
+    setTimeout(() => {
+      const el = R.b === b0 && visible(R) ? document.getElementById('bc1' + i) : null, fx2 = el ? fxFor() : null; if (!fx2 || !fx2.flip) return;
+      const b = fx2.center(el);
+      fx2.flip('puff', { x: b.x, y: b.y + b.h * .35, w: b.w, h: b.h }, 1500, 700);
+      if (u.lead) fx2.pop('rays', b, 1900, 900, { s0: .3, s1: 1.1, op: .8 });
+    }, wait / devSpeed);
+  });
 });
 /* взятый этаж с ритуалом: баннер этажа снимается (пока идёт ритуал, хода боя нет — сам он не снимется, advance index.html), через takenMs
    после последнего удара добыча летит в кошелёк — та же, что зачислит floorDone. Плашки ожидания нет: остаток этажа — поход (bsTrip) */
@@ -691,13 +747,28 @@ magnet = function (got) {
   if (BS_RUN.skipMagnet) { for (const k of ['gold', 'spirit', 'souls']) if (got && got[k] > 0) bumpCur(k); return; }   // добыча уже прилетела в ритуале — только числа кошелька (у ключа числа в шапке нет)
   bsLootFly(got);
 };
-/* такт боя: конец боя на экране — начало пути (R.bsT0); взятый этаж с ритуалом — баннер прочь и добыча; путь — каждый такт */
+/* отряд остановился — новый этаж на экране до конца пути: колода нового этажа собрана и нарисована, её враги выходят из-за края, а часы
+   боя стоят оставшиеся hold мс пути (R.bsHold). Делает то же, что конец перехода в advance index.html, только раньше: время забега
+   (runMs) и длительность этажа те же — переход gapMs уже учтён в конце этажа (floorDone) */
+function bsFoesOut(R, T, hold) {
+  R.gap = 0; R.floor++; newFloor(R);
+  R.bsHold = hold; R.bsHoldT = { b: R.b, total: T.total, blow: T.blow, lead: T.lead };
+  render();
+}
+/* такт боя: конец боя на экране — начало пути (R.bsT0); взятый этаж с ритуалом — баннер прочь и добыча; путь — каждый такт; в конце пути
+   отряд останавливается и выходят враги нового этажа — на экране; у свёрнутого забега новый этаж приходит в конце перехода, как прежде */
 const bsAdvance0 = advance;
 advance = function (R, ms) {
+  if (R.bsHold > 0) { R.bsHold = Math.max(0, R.bsHold - ms); return; }   // часы нового боя стоят до конца пути; последний такт — тот, на котором кончился бы переход
+  if (R.gap > ms && R.gap - ms <= bsLead(R) && !R.over && visible(R)) {
+    const T = bsTripClock(R);
+    if (T) return bsFoesOut(R, T, R.gap - ms);
+  }
   bsAdvance0(R, ms);
   const b = R.b;
   if (b && b.over && R.bsT0b !== b) { R.bsT0b = b; R.bsT0 = R.view; }
   if (b && b.over && b.win && b.ritualMs > 0 && R.bsRit !== b && !R.over) { R.bsRit = b; if (visible(R)) bsRitual(R); }
+  bsEnterEnd(R);
   if (visible(R)) bsTrip(R);
 };
 /* конец этажа (его время — screens/biomes.js): добыча, уже прилетевшая в ритуале, второй раз не летит. Плашки перехода нет — переход
@@ -746,21 +817,25 @@ function bsPreload(R) {
 /* ---------- поход на новый этаж ---------- */
 /* часы пути: сколько прошло от конца боя на экране (R.bsT0 — такт, где показ увидел конец боя), сколько всего до нового этажа и когда на
    экране лёг последний удар (blow). До конца этажа (floorDone) — b.t ядра, если ритуал есть, иначе доигрыш fallMs; затем переход gapMs.
-   Пути нет у проигранного и последнего этажа, у стража и у боя со своей сценой */
+   lead — сколько пути в его конце идёт выход врагов нового этажа (bsLead); held — новый этаж уже на экране, его часы стоят до конца
+   пути (bsFoesOut). Пути нет у проигранного и последнего этажа, у стража и у боя со своей сценой */
 function bsTripClock(R) {
-  const b = R && R.b;
+  const b = R && R.b, H = R && R.bsHoldT;
+  if (b && R.bsHold > 0 && H && H.b === b) return { since: H.total - R.bsHold, total: H.total, left: R.bsHold, blow: H.blow, lead: H.lead, held: true };
   if (!b || !b.over || !b.win || R.over || R.scene || R.guard || R.bsT0b !== b) return null;
   const B = EB.BIOMES[R.biome]; if (!B || !(R.floor < B.floors.length)) return null;
   const F = EB.RULES.floor, d = b.ritualMs > 0 && b.t > R.bsT0 ? b.t - R.bsT0 : F.ritual.fallMs, total = d + F.gapMs;
   const since = R.gap > 0 ? total - R.gap : Math.max(0, Math.min(d, R.view - R.bsT0));
-  return { since, total, left: total - since, blow: Math.max(0, Math.min(d, b.fightMs - R.bsT0)) };
+  return { since, total, left: total - since, blow: Math.max(0, Math.min(d, b.fightMs - R.bsT0)), lead: Math.min(bsLead(R), F.gapMs), held: false };
 }
-/* фазы пути по порядку автора — [фаза, с мс, до мс]: доигрыш удара и добыча, шаг отряда, затемнение, темнота, новая арена. Затемнение,
-   темнота и новая арена — в конце пути, шаг — остаток: отряд трогается через takenMs после последнего удара */
+/* фазы пути по порядку автора — [фаза, с мс, до мс]: доигрыш удара и добыча, шаг отряда, затемнение, темнота, новая арена открывается
+   на ходу, шаг после темноты, отряд встал — выход врагов. Конец пути отсчитан от его конца: выход врагов (lead), перед ним шаг после
+   темноты, открытие, темнота и затемнение; шаг до темноты — остаток: отряд трогается через takenMs после последнего удара */
 function bsTripSpans(T) {
-  const Q = bsRit(), dark = Math.max(0, T.total - Q.darkMs - Q.blackMs - Q.openMs), go = Math.min(T.blow + Q.takenMs, dark);
-  const black = dark + Q.darkMs, open = black + Q.blackMs;
-  return [['settle', 0, go], ['march', go, dark], ['dark', dark, black], ['black', black, open], ['open', open, T.total]];
+  const Q = bsRit(), back = (to, ms) => Math.max(0, to - ms);
+  const stop = back(T.total, T.lead || 0), walk = back(stop, Q.walkMs), open = back(walk, Q.openMs), black = back(open, Q.blackMs), dark = back(black, Q.darkMs);
+  const go = Math.min(T.blow + Q.takenMs, dark);
+  return [['settle', 0, go], ['march', go, dark], ['dark', dark, black], ['black', black, open], ['open', open, walk], ['walk', walk, stop], ['foes', stop, T.total]];
 }
 function bsTripPhase(R) {
   const T = bsTripClock(R); if (!T) return null;
@@ -768,10 +843,15 @@ function bsTripPhase(R) {
   return (s || sp[sp.length - 1])[0];
 }
 /* кадры пути — только transform и opacity. march — фон: петля из трёх копий арены, две комнаты за круг; fallen — павшие уходят со своей
-   комнатой и гаснут; dark и open — завеса. «Меньше движения»: фон и отряд стоят, павшие только гаснут */
+   комнатой и гаснут; dark и open — завеса; arrive — новая арена после темноты: фон едет с прежней скоростью, пока завеса открывается
+   (openMs), и равномерно тормозит до места (walkMs) — конец круга петли, где третья копия арены встаёт как первая. Скорость шага —
+   комната за roomMs, тормозной путь — половина пути шага за то же время. «Меньше движения»: фон и отряд стоят, павшие только гаснут */
 function bsTripKf(calm, bw) {
+  const Q = bsRit(), room = ms => ms * 100 / Q.roomMs, at = left => `translateX(${(left - 200).toFixed(2)}%)`;   // доля комнаты за ms шага, %; место петли за left % до конца круга
+  const brake = room(Q.walkMs) / 2, far = brake + room(Q.openMs), all = Q.openMs + Q.walkMs;
   return {
     march: calm ? null : [{ transform: 'translateX(0)' }, { transform: 'translateX(-200%)' }],
+    arrive: calm || !(all > 0) ? null : [{ transform: at(far), easing: 'linear' }, { transform: at(brake), offset: Q.openMs / all, easing: BS_DATA.tripStop }, { transform: at(0) }],
     fallen: calm ? [{ opacity: 1 }, { opacity: 0 }] : [{ transform: 'translateX(0)', opacity: 1 }, { opacity: 0, offset: BS_DATA.tripFadePct / 100 }, { transform: `translateX(${-Math.round(bw)}px)`, opacity: 0 }],
     dark: [{ opacity: 0 }, { opacity: 1 }],
     open: [{ opacity: 1 }, { opacity: 0 }],
@@ -795,34 +875,42 @@ function bsTiles(bgs) {
 function bsTrip(R) {
   const T = bsTripClock(R), bt = document.getElementById('bt');
   if (!T || !bt || !bt.querySelector || !visible(R)) return;
+  if (T.held) return;   // 5а. отряд встал, новый этаж уже нарисован: его враги выходят из-за края (класс выхода и кадры — battle-scene.css)
   if (R.banner) bsDropBanner(R);   // этаж взят — баннер его больше не нужен (забег открыли посреди пути: свёрнутому его не снимали)
   if (R.bsPre !== R.b) { R.bsPre = R.b; bsPreload(R); }
   const sp = bsTripSpans(T), cur = sp.find(x => T.since < x[2]) || sp[sp.length - 1], ph = cur[0], key = `${R.id}|${R.floor}|${ph}`;
   if (bt.__bsTrip === key) return;
   bt.__bsTrip = key;
-  const Q = bsRit(), calm = bsCalm(), K = bsTripKf(calm, bt.clientWidth || 0), go = sp[1][1];
+  const Q = bsRit(), calm = bsCalm(), K = bsTripKf(calm, bt.clientWidth || 0), go = sp[1][1], open = sp[4][1];
   const real = ms => Math.max(0, ms) / devSpeed;   // мс пути → мс экрана при скорости прототипа
-  const moving = ph === 'march' || ph === 'dark', there = ph === 'black' || ph === 'open';
+  const before = ph === 'march' || ph === 'dark';   // отряд идёт по арене взятого этажа
+  const there = ph === 'black' || ph === 'open' || ph === 'walk' || ph === 'foes';   // арена следующего этажа
   bt.classList.toggle('bs-trip', ph !== 'settle');
-  bt.classList.toggle('bs-march', moving && !calm);
+  bt.classList.toggle('bs-march', ph !== 'settle' && ph !== 'foes' && !calm);   // отряд шагает до самой остановки — и под завесой, и после темноты
   const bgs = bt.querySelector('.bt-bgs'), side = bt.querySelector('.bt-side.f');
   /* 1–2. отряд переходит дальше и идёт по биому: фон едет комнатами, павшие уходят со своей комнатой; отряд шагает (bs-march, css) */
-  if (moving && bgs && K.march && !bgs.__bsMarch) {
+  if (before && bgs && K.march && !bgs.__bsMarch) {
     bsTiles(bgs);
     bgs.__bsMarch = bsPlay(bgs, K.march, { duration: real(2 * Q.roomMs), iterations: Infinity, easing: 'linear' }, real(T.since - go));
   }
-  if (moving && side && !side.__bsGone) side.__bsGone = bsPlay(side, K.fallen, { duration: real(Q.roomMs), easing: 'linear', fill: 'forwards' }, real(T.since - go));
-  /* 4. в темноте — арена следующего этажа того же биома; отряд стоит, павших нет */
+  if (before && side && !side.__bsGone) side.__bsGone = bsPlay(side, K.fallen, { duration: real(Q.roomMs), easing: 'linear', fill: 'forwards' }, real(T.since - go));
+  /* 4. в темноте — арена следующего этажа того же биома, павших нет. 4а. Она открывается на ходу: фон едет под завесой и после неё —
+     «якобы мы всё это время шли», — тормозит и встаёт на место к концу шага после темноты; в темноте кадр ждёт начала открытия */
   if (there) {
     if (bgs) {
       bsStop(bgs, '__bsMarch');
       if (bgs.__bsFloor !== R.floor + 1) { bgs.__bsFloor = R.floor + 1; bgs.innerHTML = bsBgsHtml(R.floor + 1, bsArenaUrl(R.biome, R.floor + 1)); }
+      if (ph === 'foes') bsStop(bgs, '__bsArrive');   // отряд встал: арена на месте
+      else if (K.arrive && !bgs.__bsArrive) {
+        bsTiles(bgs);
+        bgs.__bsArrive = bsPlay(bgs, K.arrive, { duration: real(Q.openMs + Q.walkMs), delay: real(open - T.since), easing: 'linear', fill: 'both' }, real(T.since - open));
+      }
     }
     if (side) { bsStop(side, '__bsGone'); if (side.style) side.style.opacity = '0'; }
   }
   /* 3–4. затемнение и новая арена — завеса над полем; шапка и линейка этажей видны над ней */
   let veil = bt.querySelector('.bs-veil');
-  if (ph === 'dark' || there) {
+  if (ph === 'dark' || ph === 'black' || ph === 'open') {
     if (!veil) {
       veil = document.createElement('i'); veil.className = 'bs-veil';
       const f = document.getElementById('btField');
@@ -925,9 +1013,9 @@ kitFx = function (kind) {
 };
 
 /* ================== сценарии презентации: бой каждого вида ================== */
-FLOWS.push(['Бой AAA · переход между этажами', 'Поход на новый этаж (ADR-0048): сильный отряд берёт этаж Мастерской форм сразу — добыча летит в кошелёк, отряд идёт дальше по биому, экран темнеет, открывается новая арена, враги нового этажа выходят справа', () => bsTripFlow('b1')]);
+FLOWS.push(['Бой AAA · переход между этажами', 'Поход на новый этаж (ADR-0048): сильный отряд берёт этаж Мастерской форм сразу — добыча летит в кошелёк, отряд идёт дальше по биому, экран темнеет, новая арена открывается на ходу, отряд останавливается — и враги нового этажа выходят из-за правого края поля, затем бой', () => bsTripFlow('b1')]);
 FLOWS.push(['Бой AAA · переход · Подземный лес', 'Тот же поход в Подземном лесу: свои арены этажей биома', () => bsTripFlow('b2')]);
-FLOWS.push(['Бой AAA · рядовые', 'Сцена боя нового вида: этаж рядовых, ритуал этажа — враги выходят, падают, добыча летит в кошелёк, поход на новый этаж', () => {
+FLOWS.push(['Бой AAA · рядовые', 'Сцена боя нового вида: этаж рядовых, ритуал этажа — враги падают, добыча летит в кошелёк, поход на новый этаж, враги выходят из-за края', () => {
   S.overlay = null; if (typeof bfView === 'function') bfView('square');
   const sq5 = S.squads.find(q => q.m.filter(Boolean).length >= 5 && q.m.filter(Boolean).every(id => !runOf(id) && !(H(id) || {}).busy)) || S.squads[0];
   startRun(sq5.id, 'b3', EB.BIOMES.b3 ? EB.BIOMES.b3.floors.findIndex(f => f.g === 'o' && f.m.length >= 4) + 1 || 1 : 1);
@@ -964,7 +1052,7 @@ KIT_EXTRA.push({
     <section class="k-box" style="grid-column:1/-1"><h3>Эффекты боя · рисованные спрайты · ${(EnFx.VFX_ART || { ready: [] }).ready.length}</h3>
       <div class="k-demo bs-k-vxs">${vx}</div>
       <p class="k-note">Спрайты и flipbook-ленты (jobs/battle-vfx.json, tools/art-gen/vfx_layers.py): альфа из яркости, только transform и opacity, при «меньше движения» — без полётов и тряски. Каталог видов и проба на сцене — блок «Бой: карта бойца и эффекты».</p></section>
-    <section class="k-box"><h3>Ритуал этажа — поход на новый этаж</h3><p class="k-note">ADR-0048: ожидания с плашкой нет, остаток минимума этажа — путь. Через ${fmt(Q.takenMs)} мс после последнего удара добыча летит в кошелёк (${fmt(Q.lootMs)} мс), отряд переходит дальше и идёт по биому — комната за ${fmt(Q.roomMs)} мс — весь остаток минимума этажа (${mm}) и перехода ${fmt(EB.RULES.floor.gapMs)} мс; в конце пути экран затемняется ${fmt(Q.darkMs)} мс, в темноте ${fmt(Q.blackMs)} мс — арена следующего этажа того же биома, она открывается ${fmt(Q.openMs)} мс; затем враги нового этажа выходят справа ${fmt(Q.enterMs)} мс, по очереди через ${fmt(Q.stepMs)} мс. Бой длиннее минимума доигрывает последний удар ${fmt(Q.fallMs)} мс, путь — ${fmt(Q.fallMs + EB.RULES.floor.gapMs)} мс. Длительность этажа поход не меняет; свёрнутый забег идёт тем же временем. «Меньше движения» — тот же порядок без движения. Числа — RULES.floor ядра: minMs подбирает калькулятор фарма (ADR-0044), ritual — фазы показа. Сценарии — «Бой AAA · переход между этажами».</p></section>
+    <section class="k-box"><h3>Ритуал этажа — поход на новый этаж</h3><p class="k-note">ADR-0048: ожидания с плашкой нет, остаток минимума этажа — путь. Через ${fmt(Q.takenMs)} мс после последнего удара добыча летит в кошелёк (${fmt(Q.lootMs)} мс), отряд переходит дальше и идёт по биому — комната за ${fmt(Q.roomMs)} мс — весь остаток минимума этажа (${mm}) и перехода ${fmt(EB.RULES.floor.gapMs)} мс; в конце пути экран затемняется ${fmt(Q.darkMs)} мс, в темноте ${fmt(Q.blackMs)} мс — арена следующего этажа того же биома, она открывается ${fmt(Q.openMs)} мс, пока отряд ещё идёт; после темноты отряд идёт ещё ${fmt(Q.walkMs)} мс и останавливается. Отряд встал — враги нового этажа выходят из-за правого края поля и идут влево, к своим местам: весь выход — ${fmt(Q.enterMs)} мс, карты трогаются по очереди через ${fmt(Q.stepMs)} мс, передняя колонка первой; выход начинается за ${fmt(bsLead({}))} мс до начала этажа и кончается к первому ходу боя (пауза раунда — ${fmt(EB.RULES.rounds.gapMs)} мс): бой начинается, когда враги встали. Бой длиннее минимума доигрывает последний удар ${fmt(Q.fallMs)} мс, путь — ${fmt(Q.fallMs + EB.RULES.floor.gapMs)} мс. Длительность этажа поход не меняет; свёрнутый забег идёт тем же временем. «Меньше движения» — тот же порядок без движения: враги проявляются на местах. Числа — RULES.floor ядра: minMs подбирает калькулятор фарма (ADR-0044), ritual — фазы показа. Сценарии — «Бой AAA · переход между этажами».</p></section>
     ${bsKitArenas()}`;
   },
 });

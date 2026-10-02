@@ -59287,6 +59287,642 @@
         3392
       ],
       "sha256": "aa05ebc7f838f68f3f5dfa608f8e69259b2425b8e95bf88dd62d6d8e77b7c1e5"
+    },
+    {
+      "file": "art/generated/arenas/arena-b1-2__nb2.jpg",
+      "category": "arenas",
+      "job": "arena-b1-2",
+      "title": "Арена биома 1 «Мастерская форм» · этаж-участок 2: месильня — 21:9, дорога дальше вправо",
+      "source": "ADR-0048: этажи сменяют арены одного биома; docs/lore/мастерская-форм-текст.md, с. 2 и 11–17 (прислуга: Подмастерье месит глину, Мех раздувал горны, Упор держал работу); образец — нынешняя арена биома (art/generated/arenas/arena-workshop-wide__nb2-v2.jpg)",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-10-02T15:43:46+03:00",
+      "params": {
+        "aspectRatio": "21:9",
+        "imageSize": "2K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/arenas/arena-workshop-wide__nb2-v2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources that glow from within throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and tiny glowing grains float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon. Match the brushwork, lighting and color handling of the attached reference image (approved game art).\n\nDraw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective, no side views, no ceiling, no sky. The attached image is another stretch of this very place, already in the game: the new picture must read as the same place — keep its straight-down camera, its scale, the layout of its zones, its darkness, its palette, the material of its floor, its light and its painting style. Do NOT copy its objects or where they lie: this stretch has its own details, described below. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit floor over their whole height: only the floor itself, dust and fine glowing cracks — no objects there. The zones are invisible: no lines, no seams, no panels and no change of color or texture where the quarters meet the central half — the floor is one continuous surface. This stretch is one floor of a long way down: the squad comes in from the left and goes on to the right, so the floor continues beyond the left and right edges of the picture — no side walls, nothing closes the sides. The surroundings — walls, bookcases or the edge of the forest — appear only as a thin strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there.\n\nSubject: another stretch of the Workshop of Forms, the first hall under the city of Endalor, where a god once sculpted living beings from clay and abandoned the work halfway, seen straight from above: the kneading floor, where the clay for the whole Workshop was prepared. Light: it is cold and dark, the floor lies in deep shadow; white-green crystals glowing from within grow in the cracks and throw their cold light upward; the only warm color is the ochre clay of the unfinished works. Floor: the same large worn grey stone slabs with cracks, drifts and still ripples of pale sand. Along the very top and bottom edges runs a thin strip of the dark foot of stone walls, no more than 7% of the height. In the central half only: near the top edge, two large round stone troughs full of smooth wet ochre clay, side by side, a heavy wooden paddle lying across one of them, deep handprints and finger marks pressed into the clay; a few lumps of clay and a clay-stained cloth on the floor beside them. Near the bottom edge, a long low stone bench with a row of rough clay blanks laid out on it — plain rounded lumps shaped like loaves, none of them a figure; beside it a wooden bucket of grey water and a wooden mallet; one thin stream of sand falls from the unseen vault into a small round pile. The middle of the central half is plain open floor. No cards, no grid.\n\nNo text, no letters, no numbers, no glyphs, no runes, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no heraldry, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. Tablets, cylinders, cords, crates and walls carry no writing and no signs: only fine worn grooves and texture. No characters, no people, no animals, no gore, no blood, no wounds, no bones, no skulls, no horror grotesque. No purple, no violet, no magenta light.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1239,
+        "candidatesTokenCount": 2153,
+        "totalTokenCount": 3392,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 981
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1680
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1028,
+      "seconds": 18.1,
+      "status": "референс, не утверждён",
+      "px": [
+        3168,
+        1344
+      ],
+      "sha256": "4ccf2a36ebd9ac1d9b417ecbebd51ccaab6423738e64302d7f5b4a41859d62e6"
+    },
+    {
+      "file": "art/generated/arenas/arena-b2-2__nb2.jpg",
+      "category": "arenas",
+      "job": "arena-b2-2",
+      "title": "Арена биома 2 «Подземный лес» · этаж-участок 2: логово у корней — 21:9, дорога дальше вправо",
+      "source": "ADR-0048: этажи сменяют арены одного биома; docs/content/враги-биомов.md, раздел 2 (Матерь стаи, Листовей, Знахарка, Настильщик, Старший егерь); образец — нынешняя арена биома (art/generated/arenas/arena-b2-forest__nb2-v2.jpg)",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-10-02T15:44:30+03:00",
+      "params": {
+        "aspectRatio": "21:9",
+        "imageSize": "2K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/arenas/arena-b2-forest__nb2-v2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources that glow from within throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and tiny glowing grains float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon. Match the brushwork, lighting and color handling of the attached reference image (approved game art).\n\nDraw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective, no side views, no ceiling, no sky. The attached image is another stretch of this very place, already in the game: the new picture must read as the same place — keep its straight-down camera, its scale, the layout of its zones, its darkness, its palette, the material of its floor, its light and its painting style. Do NOT copy its objects or where they lie: this stretch has its own details, described below. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit floor over their whole height: only the floor itself, dust and fine glowing cracks — no objects there. The zones are invisible: no lines, no seams, no panels and no change of color or texture where the quarters meet the central half — the floor is one continuous surface. This stretch is one floor of a long way down: the squad comes in from the left and goes on to the right, so the floor continues beyond the left and right edges of the picture — no side walls, nothing closes the sides. The surroundings — walls, bookcases or the edge of the forest — appear only as a thin strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there.\n\nSubject: another stretch of the Underground Forest, the finished creation of the god Vial, seen straight from above: the edge of the pack's lair. Light: it is dark, the ground lies in deep shadow and the light comes only from below — from glowing veins and cracks in the earth, glowing fallen leaves and glowing fungi, cold white-green light; glowing spores drift above the ground. Ground: one continuous surface of dark soft earth covered with short pale grey-green moss and a litter of fallen pale leaves, some of them still glowing faintly white-green; fine cracks in the earth glow from within with cold white-green light. Along the very top and bottom edges runs a thin strip of dark roots and pale leaves, no more than 7% of the height; no ferns, no big leaves and no roots in the left and right quarters. In the central half only: near the top edge, the huge pale roots of a giant tree come in from the top edge and form a wide hollow lined with pale moss and dry leaves — a resting place of the pack, empty now; tufts of pale fur caught on the roots and long deep claw marks in the pale bark. Near the bottom edge, a small spring of glowing white-green water rises between pale stones, runs a short way along the bottom edge and goes back into it; beside it a few pale stones overgrown with moss and small clusters of glowing mushrooms. The middle of the central half is plain open floor. No cards, no grid.\n\nNo text, no letters, no numbers, no glyphs, no runes, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no heraldry, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. Tablets, cylinders, cords, crates and walls carry no writing and no signs: only fine worn grooves and texture. No characters, no people, no animals, no gore, no blood, no wounds, no bones, no skulls, no horror grotesque. No purple, no violet, no magenta light.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1248,
+        "candidatesTokenCount": 2247,
+        "totalTokenCount": 3495,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 990
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1680
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1031,
+      "seconds": 19.4,
+      "status": "референс, не утверждён",
+      "px": [
+        3168,
+        1344
+      ],
+      "sha256": "b383ba7e92459ab04ce11aa1e8aaf2bcf63ca1c8480430b49fda2f5ab50d17e6"
+    },
+    {
+      "file": "art/generated/arenas/arena-b3-2__nb2.jpg",
+      "category": "arenas",
+      "job": "arena-b3-2",
+      "title": "Арена биома 3 «Библиотека Улариона» · этаж-участок 2: читальня — 21:9, дорога дальше вправо",
+      "source": "ADR-0048: этажи сменяют арены одного биома; docs/content/враги-биомов.md, раздел 3 (Узловяз, Точильщик и каменные жуки, Смазчик, Смотритель); образец — нынешняя арена биома (art/generated/arenas/arena-b3-library__nb2.jpg)",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-10-02T15:44:48+03:00",
+      "params": {
+        "aspectRatio": "21:9",
+        "imageSize": "2K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/arenas/arena-b3-library__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources that glow from within throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and tiny glowing grains float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon. Match the brushwork, lighting and color handling of the attached reference image (approved game art).\n\nDraw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective, no side views, no ceiling, no sky. The attached image is another stretch of this very place, already in the game: the new picture must read as the same place — keep its straight-down camera, its scale, the layout of its zones, its darkness, its palette, the material of its floor, its light and its painting style. Do NOT copy its objects or where they lie: this stretch has its own details, described below. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit floor over their whole height: only the floor itself, dust and fine glowing cracks — no objects there. The zones are invisible: no lines, no seams, no panels and no change of color or texture where the quarters meet the central half — the floor is one continuous surface. This stretch is one floor of a long way down: the squad comes in from the left and goes on to the right, so the floor continues beyond the left and right edges of the picture — no side walls, nothing closes the sides. The surroundings — walls, bookcases or the edge of the forest — appear only as a thin strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there.\n\nSubject: another stretch of the Library of Ularion, the stone library of the god of knowledge, seen straight from above: a reading place between the bookcases. Light: it is dark, the floor lies in deep shadow and the light comes only from below — from amber-glowing cracks in the floor and the amber sand of hourglasses, warm amber light; the only cold notes are the grey-blue shadows. Floor: large, precisely fitted slabs of dark grey basalt, worn smooth, fine dust and a few chips of stone on them; thin cracks glow from within with warm amber light. Along the very top and bottom edges, the tops of long stone bookcases, seen straight from above, form a thin strip no more than 7% of the height, stacked with plain stone tablets and stone cylinders lying on their sides; the bookcases run on through the left and right edges of the picture. In the central half only: near the top edge, a heavy stone reading stand with one large plain stone tablet lying on it, two bronze hourglasses with glowing amber sand at its corners, and a long cord with many small knots coiled on the floor beside it. Near the bottom edge, a low stone rack with plain stone cylinders standing upright in two short rows, amber light glowing between them; two cylinders lie on the floor beside the rack. The middle of the central half is plain open floor. No cards, no grid.\n\nNo text, no letters, no numbers, no glyphs, no runes, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no heraldry, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. Tablets, cylinders, cords, crates and walls carry no writing and no signs: only fine worn grooves and texture. No characters, no people, no animals, no gore, no blood, no wounds, no bones, no skulls, no horror grotesque. No purple, no violet, no magenta light.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1229,
+        "candidatesTokenCount": 2123,
+        "totalTokenCount": 3352,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 971
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1680
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1027,
+      "seconds": 17.9,
+      "status": "референс, не утверждён",
+      "px": [
+        3168,
+        1344
+      ],
+      "sha256": "85091c9935462005b865a2a721994b0db68dc613adb5784154254e1a89fedb8a"
+    },
+    {
+      "file": "art/generated/arenas/arena-b4-2__nb2.jpg",
+      "category": "arenas",
+      "job": "arena-b4-2",
+      "title": "Арена биома 4 «Искусственный Стоун-Хейм» · этаж-участок 2: рудничный двор — 21:9, дорога дальше вправо",
+      "source": "ADR-0048: этажи сменяют арены одного биома; docs/content/враги-биомов.md, раздел 4 (Рудокоп, Гружёная вагонетка, Цепник, Литейщик, Пошлинник); образец — нынешняя арена биома (art/generated/arenas/arena-b4-stonehaim__nb2.jpg)",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-10-02T15:45:08+03:00",
+      "params": {
+        "aspectRatio": "21:9",
+        "imageSize": "2K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/arenas/arena-b4-stonehaim__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources that glow from within throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and tiny glowing grains float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon. Match the brushwork, lighting and color handling of the attached reference image (approved game art).\n\nDraw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective, no side views, no ceiling, no sky. The attached image is another stretch of this very place, already in the game: the new picture must read as the same place — keep its straight-down camera, its scale, the layout of its zones, its darkness, its palette, the material of its floor, its light and its painting style. Do NOT copy its objects or where they lie: this stretch has its own details, described below. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit floor over their whole height: only the floor itself, dust and fine glowing cracks — no objects there. The zones are invisible: no lines, no seams, no panels and no change of color or texture where the quarters meet the central half — the floor is one continuous surface. This stretch is one floor of a long way down: the squad comes in from the left and goes on to the right, so the floor continues beyond the left and right edges of the picture — no side walls, nothing closes the sides. The surroundings — walls, bookcases or the edge of the forest — appear only as a thin strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there.\n\nSubject: another stretch of Artificial Stoneheim, the full-size living sketch of a dwarven city made by the god Ularion, seen straight from above: the mine yard. Light: it is dark, the pavement lies in deep shadow, darkened by soot, and the light comes only from below — from glowing coals, molten metal and amber-glowing cracks, warm amber and molten orange light; the only cold notes are blue-grey smoke and shadows. Pavement: big, precisely fitted square blocks of warm sandstone-colored stone, worn smooth and darkened by soot, soot in the seams, a few iron rivets and flakes of ash on them; thin cracks glow from within with warm amber light. Along the very top and bottom edges runs a thin dark strip of the foot of stone walls and iron railings, no more than 7% of the height, running on through the left and right edges of the picture. In the central half only: near the top edge, an iron mine cart on short iron feet loaded with lumps of glowing amber ore, standing on a short piece of rail that begins and ends inside the central half; beside it two pickaxes and a leather helmet lying on the pavement. Near the bottom edge, the square mouth of a lifting shaft in a heavy iron frame, a thick chain hanging down into it from a winch drum, amber light rising from deep below; a few lumps of amber ore beside it. The middle of the central half is plain open floor. No cards, no grid.\n\nNo text, no letters, no numbers, no glyphs, no runes, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no heraldry, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. Tablets, cylinders, cords, crates and walls carry no writing and no signs: only fine worn grooves and texture. No characters, no people, no animals, no gore, no blood, no wounds, no bones, no skulls, no horror grotesque. No purple, no violet, no magenta light.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1248,
+        "candidatesTokenCount": 2177,
+        "totalTokenCount": 3425,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 990
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1680
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1029,
+      "seconds": 19.1,
+      "status": "референс, не утверждён",
+      "px": [
+        3168,
+        1344
+      ],
+      "sha256": "8bddd0e0276d681e7535627707734551c019eba02cfabfe96aae22a62796b854"
+    },
+    {
+      "file": "art/generated/arenas/arena-b1-3__nb2.jpg",
+      "category": "arenas",
+      "job": "arena-b1-3",
+      "title": "Арена биома 1 «Мастерская форм» · этаж-участок 3: стена набросков — 21:9, дорога дальше вправо",
+      "source": "ADR-0048: этажи сменяют арены одного биома; docs/lore/мастерская-форм-текст.md, с. 2 и 11–17 (прислуга: Подмастерье месит глину, Мех раздувал горны, Упор держал работу); образец — нынешняя арена биома (art/generated/arenas/arena-workshop-wide__nb2-v2.jpg)",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-10-02T15:45:52+03:00",
+      "params": {
+        "aspectRatio": "21:9",
+        "imageSize": "2K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/arenas/arena-workshop-wide__nb2-v2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources that glow from within throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and tiny glowing grains float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon. Match the brushwork, lighting and color handling of the attached reference image (approved game art).\n\nDraw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective, no side views, no ceiling, no sky. The attached image is another stretch of this very place, already in the game: the new picture must read as the same place — keep its straight-down camera, its scale, the layout of its zones, its darkness, its palette, the material of its floor, its light and its painting style. Do NOT copy its objects or where they lie: this stretch has its own details, described below. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit floor over their whole height: only the floor itself, dust and fine glowing cracks — no objects there. The zones are invisible: no lines, no seams, no panels and no change of color or texture where the quarters meet the central half — the floor is one continuous surface. This stretch is one floor of a long way down: the squad comes in from the left and goes on to the right, so the floor continues beyond the left and right edges of the picture — no side walls, nothing closes the sides. The surroundings — walls, bookcases or the edge of the forest — appear only as a thin strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there.\n\nSubject: another stretch of the Workshop of Forms, the first hall under the city of Endalor, where a god once sculpted living beings from clay and abandoned the work halfway, seen straight from above: a gallery along the walls, where unfinished works come out of the stone. Light: it is cold and dark, the floor lies in deep shadow; white-green crystals glowing from within grow in the cracks and throw their cold light upward; the only warm color is the ochre clay of the unfinished works. Floor: the same large worn grey stone slabs with cracks, drifts and still ripples of pale sand. Along the very top and bottom edges runs a thin strip of the dark foot of stone walls, no more than 7% of the height. In the central half only: near the top edge, the dark foot of the stone wall, and out of it unfinished clay works emerge as smooth reliefs lying against the wall — an arm without a hand reaching out of the stone, the smooth rounded back of a figure without a head; a thin stream of sand pours from the unseen vault into a round pile with a faint haze, like an hourglass nobody turns. Near the bottom edge, the dark foot of the stone wall, and out of it half of a small beast emerges as a smooth relief, its other half still raw stone; a second stream of sand pours into a round pile beside it. Everything is made precisely and calmly, unfinished, not grotesque: no faces, no eyes, no complete figures. The middle of the central half is plain open floor. No cards, no grid.\n\nNo text, no letters, no numbers, no glyphs, no runes, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no heraldry, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. Tablets, cylinders, cords, crates and walls carry no writing and no signs: only fine worn grooves and texture. No characters, no people, no animals, no gore, no blood, no wounds, no bones, no skulls, no horror grotesque. No purple, no violet, no magenta light.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1262,
+        "candidatesTokenCount": 2279,
+        "totalTokenCount": 3541,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 1004
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1680
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1032,
+      "seconds": 17.4,
+      "status": "референс, не утверждён",
+      "px": [
+        3168,
+        1344
+      ],
+      "sha256": "d1e805ed295933e3bf538c1c9bde24625145fb34391fa178f3ccd2ecdaa9166c"
+    },
+    {
+      "file": "art/generated/arenas/arena-b1-4__nb2.jpg",
+      "category": "arenas",
+      "job": "arena-b1-4",
+      "title": "Арена биома 1 «Мастерская форм» · этаж-участок 4: сушильня — 21:9, дорога дальше вправо",
+      "source": "ADR-0048: этажи сменяют арены одного биома; docs/lore/мастерская-форм-текст.md, с. 2 и 11–17 (прислуга: Подмастерье месит глину, Мех раздувал горны, Упор держал работу); образец — нынешняя арена биома (art/generated/arenas/arena-workshop-wide__nb2-v2.jpg)",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-10-02T15:46:10+03:00",
+      "params": {
+        "aspectRatio": "21:9",
+        "imageSize": "2K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/arenas/arena-workshop-wide__nb2-v2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources that glow from within throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and tiny glowing grains float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon. Match the brushwork, lighting and color handling of the attached reference image (approved game art).\n\nDraw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective, no side views, no ceiling, no sky. The attached image is another stretch of this very place, already in the game: the new picture must read as the same place — keep its straight-down camera, its scale, the layout of its zones, its darkness, its palette, the material of its floor, its light and its painting style. Do NOT copy its objects or where they lie: this stretch has its own details, described below. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit floor over their whole height: only the floor itself, dust and fine glowing cracks — no objects there. The zones are invisible: no lines, no seams, no panels and no change of color or texture where the quarters meet the central half — the floor is one continuous surface. This stretch is one floor of a long way down: the squad comes in from the left and goes on to the right, so the floor continues beyond the left and right edges of the picture — no side walls, nothing closes the sides. The surroundings — walls, bookcases or the edge of the forest — appear only as a thin strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there.\n\nSubject: another stretch of the Workshop of Forms, the first hall under the city of Endalor, where a god once sculpted living beings from clay and abandoned the work halfway, seen straight from above: the drying room, where finished blanks once waited for the kiln. Light: it is cold and dark, the floor lies in deep shadow; white-green crystals glowing from within grow in the cracks and throw their cold light upward; the only warm color is the ochre clay of the unfinished works. Floor: the same large worn grey stone slabs with cracks, drifts and still ripples of pale sand. Along the very top and bottom edges runs a thin strip of the dark foot of stone walls, no more than 7% of the height. In the central half only: near the top edge, a long low wooden drying rack with rows of small simple clay blanks drying on its slats — smooth rounded forms, unfinished, none of them a figure; a folded clay-stained cloth lies on one end. Near the bottom edge, a round cold kiln of old fired brick, its domed top cracked, its iron door closed, no fire inside, a little grey ash at its mouth; beside it lies a large old leather bellows with a wooden frame. The kiln is cold: no fire, no glow from it. The middle of the central half is plain open floor. No cards, no grid.\n\nNo text, no letters, no numbers, no glyphs, no runes, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no heraldry, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. Tablets, cylinders, cords, crates and walls carry no writing and no signs: only fine worn grooves and texture. No characters, no people, no animals, no gore, no blood, no wounds, no bones, no skulls, no horror grotesque. No purple, no violet, no magenta light.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1223,
+        "candidatesTokenCount": 2251,
+        "totalTokenCount": 3474,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 965
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1680
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1031,
+      "seconds": 17.8,
+      "status": "референс, не утверждён",
+      "px": [
+        3168,
+        1344
+      ],
+      "sha256": "1fc0a6bd103d308499ce3ebcbee4b3b2de7f3ea3fbf9b427cca3cca3b80adc1c"
+    },
+    {
+      "file": "art/generated/arenas/arena-b2-3__nb2.jpg",
+      "category": "arenas",
+      "job": "arena-b2-3",
+      "title": "Арена биома 2 «Подземный лес» · этаж-участок 3: грибная прогалина — 21:9, дорога дальше вправо",
+      "source": "ADR-0048: этажи сменяют арены одного биома; docs/content/враги-биомов.md, раздел 2 (Матерь стаи, Листовей, Знахарка, Настильщик, Старший егерь); образец — нынешняя арена биома (art/generated/arenas/arena-b2-forest__nb2-v2.jpg)",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-10-02T15:46:28+03:00",
+      "params": {
+        "aspectRatio": "21:9",
+        "imageSize": "2K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/arenas/arena-b2-forest__nb2-v2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources that glow from within throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and tiny glowing grains float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon. Match the brushwork, lighting and color handling of the attached reference image (approved game art).\n\nDraw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective, no side views, no ceiling, no sky. The attached image is another stretch of this very place, already in the game: the new picture must read as the same place — keep its straight-down camera, its scale, the layout of its zones, its darkness, its palette, the material of its floor, its light and its painting style. Do NOT copy its objects or where they lie: this stretch has its own details, described below. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit floor over their whole height: only the floor itself, dust and fine glowing cracks — no objects there. The zones are invisible: no lines, no seams, no panels and no change of color or texture where the quarters meet the central half — the floor is one continuous surface. This stretch is one floor of a long way down: the squad comes in from the left and goes on to the right, so the floor continues beyond the left and right edges of the picture — no side walls, nothing closes the sides. The surroundings — walls, bookcases or the edge of the forest — appear only as a thin strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there.\n\nSubject: another stretch of the Underground Forest, the finished creation of the god Vial, seen straight from above: a clearing where the wind gathers the fallen leaves. Light: it is dark, the ground lies in deep shadow and the light comes only from below — from glowing veins and cracks in the earth, glowing fallen leaves and glowing fungi, cold white-green light; glowing spores drift above the ground. Ground: one continuous surface of dark soft earth covered with short pale grey-green moss and a litter of fallen pale leaves, some of them still glowing faintly white-green; fine cracks in the earth glow from within with cold white-green light. Along the very top and bottom edges runs a thin strip of dark roots and pale leaves, no more than 7% of the height; no ferns, no big leaves and no roots in the left and right quarters. In the central half only: near the top edge, a thicket of tall pale mushrooms with wide flat caps, glowing white-green from under their caps, spores drifting; a broken pale stump with shelf fungi beside them. Near the bottom edge, a long drift of fallen pale leaves heaped by the wind against two mossy stones, some of the leaves glowing white-green, a few leaves lifted in the air above the drift. The middle of the central half is plain open floor. No cards, no grid.\n\nNo text, no letters, no numbers, no glyphs, no runes, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no heraldry, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. Tablets, cylinders, cords, crates and walls carry no writing and no signs: only fine worn grooves and texture. No characters, no people, no animals, no gore, no blood, no wounds, no bones, no skulls, no horror grotesque. No purple, no violet, no magenta light.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1220,
+        "candidatesTokenCount": 2193,
+        "totalTokenCount": 3413,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 962
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1680
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1029,
+      "seconds": 17.9,
+      "status": "референс, не утверждён",
+      "px": [
+        3168,
+        1344
+      ],
+      "sha256": "6053fb5741fdbfbd53c91229db0dd2ed04db6951d0e52afd2349d10bec5c814b"
+    },
+    {
+      "file": "art/generated/arenas/arena-b2-4__nb2.jpg",
+      "category": "arenas",
+      "job": "arena-b2-4",
+      "title": "Арена биома 2 «Подземный лес» · этаж-участок 4: стоянка егерей — 21:9, дорога дальше вправо",
+      "source": "ADR-0048: этажи сменяют арены одного биома; docs/content/враги-биомов.md, раздел 2 (Матерь стаи, Листовей, Знахарка, Настильщик, Старший егерь); образец — нынешняя арена биома (art/generated/arenas/arena-b2-forest__nb2-v2.jpg)",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-10-02T15:46:46+03:00",
+      "params": {
+        "aspectRatio": "21:9",
+        "imageSize": "2K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/arenas/arena-b2-forest__nb2-v2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources that glow from within throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and tiny glowing grains float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon. Match the brushwork, lighting and color handling of the attached reference image (approved game art).\n\nDraw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective, no side views, no ceiling, no sky. The attached image is another stretch of this very place, already in the game: the new picture must read as the same place — keep its straight-down camera, its scale, the layout of its zones, its darkness, its palette, the material of its floor, its light and its painting style. Do NOT copy its objects or where they lie: this stretch has its own details, described below. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit floor over their whole height: only the floor itself, dust and fine glowing cracks — no objects there. The zones are invisible: no lines, no seams, no panels and no change of color or texture where the quarters meet the central half — the floor is one continuous surface. This stretch is one floor of a long way down: the squad comes in from the left and goes on to the right, so the floor continues beyond the left and right edges of the picture — no side walls, nothing closes the sides. The surroundings — walls, bookcases or the edge of the forest — appear only as a thin strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there.\n\nSubject: another stretch of the Underground Forest, the finished creation of the god Vial, seen straight from above: a hunters' resting place on the way down, nobody there. Light: it is dark, the ground lies in deep shadow and the light comes only from below — from glowing veins and cracks in the earth, glowing fallen leaves and glowing fungi, cold white-green light; glowing spores drift above the ground. Ground: one continuous surface of dark soft earth covered with short pale grey-green moss and a litter of fallen pale leaves, some of them still glowing faintly white-green; fine cracks in the earth glow from within with cold white-green light. Along the very top and bottom edges runs a thin strip of dark roots and pale leaves, no more than 7% of the height; no ferns, no big leaves and no roots in the left and right quarters. In the central half only: near the top edge, a low lean-to frame of pale branches tied with honey-tan bark ribbons, and beside it a flat mossy stone with a pale wooden bow, a bundle of arrows and a curved hunting horn bound with bark lying on it. Near the bottom edge, a woven mat of springy pale boughs laid over a glowing crack in the earth, and beside it a carved bowl of bark in which white-green light glows like water; a coil of rope twisted from bark. The only warm color is the honey-tan of the bark ribbons and the rope. The middle of the central half is plain open floor. No cards, no grid.\n\nNo text, no letters, no numbers, no glyphs, no runes, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no heraldry, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. Tablets, cylinders, cords, crates and walls carry no writing and no signs: only fine worn grooves and texture. No characters, no people, no animals, no gore, no blood, no wounds, no bones, no skulls, no horror grotesque. No purple, no violet, no magenta light.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1260,
+        "candidatesTokenCount": 2150,
+        "totalTokenCount": 3410,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 1002
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1680
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1028,
+      "seconds": 17.7,
+      "status": "референс, не утверждён",
+      "px": [
+        3168,
+        1344
+      ],
+      "sha256": "0b3931aff4e76c634a1474509eb602e2cd67c6323393fda239c0a2b79068fc81"
+    },
+    {
+      "file": "art/generated/arenas/arena-b3-3__nb2.jpg",
+      "category": "arenas",
+      "job": "arena-b3-3",
+      "title": "Арена биома 3 «Библиотека Улариона» · этаж-участок 3: погрызенный стеллаж — 21:9, дорога дальше вправо",
+      "source": "ADR-0048: этажи сменяют арены одного биома; docs/content/враги-биомов.md, раздел 3 (Узловяз, Точильщик и каменные жуки, Смазчик, Смотритель); образец — нынешняя арена биома (art/generated/arenas/arena-b3-library__nb2.jpg)",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-10-02T15:47:04+03:00",
+      "params": {
+        "aspectRatio": "21:9",
+        "imageSize": "2K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/arenas/arena-b3-library__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources that glow from within throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and tiny glowing grains float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon. Match the brushwork, lighting and color handling of the attached reference image (approved game art).\n\nDraw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective, no side views, no ceiling, no sky. The attached image is another stretch of this very place, already in the game: the new picture must read as the same place — keep its straight-down camera, its scale, the layout of its zones, its darkness, its palette, the material of its floor, its light and its painting style. Do NOT copy its objects or where they lie: this stretch has its own details, described below. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit floor over their whole height: only the floor itself, dust and fine glowing cracks — no objects there. The zones are invisible: no lines, no seams, no panels and no change of color or texture where the quarters meet the central half — the floor is one continuous surface. This stretch is one floor of a long way down: the squad comes in from the left and goes on to the right, so the floor continues beyond the left and right edges of the picture — no side walls, nothing closes the sides. The surroundings — walls, bookcases or the edge of the forest — appear only as a thin strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there.\n\nSubject: another stretch of the Library of Ularion, the stone library of the god of knowledge, seen straight from above: an aisle where the stone beetles live. Light: it is dark, the floor lies in deep shadow and the light comes only from below — from amber-glowing cracks in the floor and the amber sand of hourglasses, warm amber light; the only cold notes are the grey-blue shadows. Floor: large, precisely fitted slabs of dark grey basalt, worn smooth, fine dust and a few chips of stone on them; thin cracks glow from within with warm amber light. Along the very top and bottom edges, the tops of long stone bookcases, seen straight from above, form a thin strip no more than 7% of the height, stacked with plain stone tablets and stone cylinders lying on their sides; the bookcases run on through the left and right edges of the picture. In the central half only: near the top edge, a short section of the bookcase strip has collapsed into the aisle: plain stone tablets spilled on the floor, their edges gnawed smooth, a heap of fine stone shavings and dust around them. Near the bottom edge, the old empty shed shell of a huge stone beetle, plates of grey stone with fine worn grooves and amber light glowing in its seams; beside it a bronze hourglass lying on its side, its amber sand glowing. The middle of the central half is plain open floor. No cards, no grid.\n\nNo text, no letters, no numbers, no glyphs, no runes, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no heraldry, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. Tablets, cylinders, cords, crates and walls carry no writing and no signs: only fine worn grooves and texture. No characters, no people, no animals, no gore, no blood, no wounds, no bones, no skulls, no horror grotesque. No purple, no violet, no magenta light.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1237,
+        "candidatesTokenCount": 2175,
+        "totalTokenCount": 3412,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 979
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1680
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1029,
+      "seconds": 17.8,
+      "status": "референс, не утверждён",
+      "px": [
+        3168,
+        1344
+      ],
+      "sha256": "9136bc5befdd58007b9977dc04b2b5c47cd1a48c8a1c605eddc002451e594f35"
+    },
+    {
+      "file": "art/generated/arenas/arena-b3-4__nb2.jpg",
+      "category": "arenas",
+      "job": "arena-b3-4",
+      "title": "Арена биома 3 «Библиотека Улариона» · этаж-участок 4: зал больших часов — 21:9, дорога дальше вправо",
+      "source": "ADR-0048: этажи сменяют арены одного биома; docs/content/враги-биомов.md, раздел 3 (Узловяз, Точильщик и каменные жуки, Смазчик, Смотритель); образец — нынешняя арена биома (art/generated/arenas/arena-b3-library__nb2.jpg)",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-10-02T15:47:20+03:00",
+      "params": {
+        "aspectRatio": "21:9",
+        "imageSize": "2K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/arenas/arena-b3-library__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources that glow from within throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and tiny glowing grains float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon. Match the brushwork, lighting and color handling of the attached reference image (approved game art).\n\nDraw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective, no side views, no ceiling, no sky. The attached image is another stretch of this very place, already in the game: the new picture must read as the same place — keep its straight-down camera, its scale, the layout of its zones, its darkness, its palette, the material of its floor, its light and its painting style. Do NOT copy its objects or where they lie: this stretch has its own details, described below. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit floor over their whole height: only the floor itself, dust and fine glowing cracks — no objects there. The zones are invisible: no lines, no seams, no panels and no change of color or texture where the quarters meet the central half — the floor is one continuous surface. This stretch is one floor of a long way down: the squad comes in from the left and goes on to the right, so the floor continues beyond the left and right edges of the picture — no side walls, nothing closes the sides. The surroundings — walls, bookcases or the edge of the forest — appear only as a thin strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there.\n\nSubject: another stretch of the Library of Ularion, the stone library of the god of knowledge, seen straight from above: the hall where the great clocks are kept and oiled. Light: it is dark, the floor lies in deep shadow and the light comes only from below — from amber-glowing cracks in the floor and the amber sand of hourglasses, warm amber light; the only cold notes are the grey-blue shadows. Floor: large, precisely fitted slabs of dark grey basalt, worn smooth, fine dust and a few chips of stone on them; thin cracks glow from within with warm amber light. Along the very top and bottom edges, the tops of long stone bookcases, seen straight from above, form a thin strip no more than 7% of the height, stacked with plain stone tablets and stone cylinders lying on their sides; the bookcases run on through the left and right edges of the picture. In the central half only: near the top edge, a giant bronze hourglass lying on its side in a heavy bronze cradle on the floor, its amber sand glowing from within; beside it an oil can with a long thin spout and a bundle of oily rags. Near the bottom edge, a square bronze grate set into the floor with warm amber light rising through it, and beside it a round stone basin of dark oil with a bronze ladle and a short stack of plain stone tablets. No gear wheels in this stretch. The middle of the central half is plain open floor. No cards, no grid.\n\nNo text, no letters, no numbers, no glyphs, no runes, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no heraldry, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. Tablets, cylinders, cords, crates and walls carry no writing and no signs: only fine worn grooves and texture. No characters, no people, no animals, no gore, no blood, no wounds, no bones, no skulls, no horror grotesque. No purple, no violet, no magenta light.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1247,
+        "candidatesTokenCount": 2199,
+        "totalTokenCount": 3446,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 989
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1680
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.103,
+      "seconds": 16.3,
+      "status": "референс, не утверждён",
+      "px": [
+        3168,
+        1344
+      ],
+      "sha256": "bc5f31a52d9ea105d626715d6ffb8fcb53badc1d0e84ffb14766e866696bc091"
+    },
+    {
+      "file": "art/generated/arenas/arena-b4-3__nb2.jpg",
+      "category": "arenas",
+      "job": "arena-b4-3",
+      "title": "Арена биома 4 «Искусственный Стоун-Хейм» · этаж-участок 3: литейный двор — 21:9, дорога дальше вправо",
+      "source": "ADR-0048: этажи сменяют арены одного биома; docs/content/враги-биомов.md, раздел 4 (Рудокоп, Гружёная вагонетка, Цепник, Литейщик, Пошлинник); образец — нынешняя арена биома (art/generated/arenas/arena-b4-stonehaim__nb2.jpg)",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-10-02T15:47:39+03:00",
+      "params": {
+        "aspectRatio": "21:9",
+        "imageSize": "2K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/arenas/arena-b4-stonehaim__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources that glow from within throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and tiny glowing grains float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon. Match the brushwork, lighting and color handling of the attached reference image (approved game art).\n\nDraw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective, no side views, no ceiling, no sky. The attached image is another stretch of this very place, already in the game: the new picture must read as the same place — keep its straight-down camera, its scale, the layout of its zones, its darkness, its palette, the material of its floor, its light and its painting style. Do NOT copy its objects or where they lie: this stretch has its own details, described below. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit floor over their whole height: only the floor itself, dust and fine glowing cracks — no objects there. The zones are invisible: no lines, no seams, no panels and no change of color or texture where the quarters meet the central half — the floor is one continuous surface. This stretch is one floor of a long way down: the squad comes in from the left and goes on to the right, so the floor continues beyond the left and right edges of the picture — no side walls, nothing closes the sides. The surroundings — walls, bookcases or the edge of the forest — appear only as a thin strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there.\n\nSubject: another stretch of Artificial Stoneheim, the full-size living sketch of a dwarven city made by the god Ularion, seen straight from above: the casting yard. Light: it is dark, the pavement lies in deep shadow, darkened by soot, and the light comes only from below — from glowing coals, molten metal and amber-glowing cracks, warm amber and molten orange light; the only cold notes are blue-grey smoke and shadows. Pavement: big, precisely fitted square blocks of warm sandstone-colored stone, worn smooth and darkened by soot, soot in the seams, a few iron rivets and flakes of ash on them; thin cracks glow from within with warm amber light. Along the very top and bottom edges runs a thin dark strip of the foot of stone walls and iron railings, no more than 7% of the height, running on through the left and right edges of the picture. In the central half only: near the top edge, a big iron crucible on a tilting iron frame with glowing molten metal inside, and beside it a short row of sand molds on the pavement, two of them filled with glowing orange metal; long iron tongs and a ladle. Near the bottom edge, a stone quench trough of dark water with a curl of white steam, a stack of cooled dark iron ingots, and a heavy leather apron burned through in many small places hanging over the trough's edge. The middle of the central half is plain open floor. No cards, no grid.\n\nNo text, no letters, no numbers, no glyphs, no runes, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no heraldry, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. Tablets, cylinders, cords, crates and walls carry no writing and no signs: only fine worn grooves and texture. No characters, no people, no animals, no gore, no blood, no wounds, no bones, no skulls, no horror grotesque. No purple, no violet, no magenta light.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1247,
+        "candidatesTokenCount": 2254,
+        "totalTokenCount": 3501,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 989
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1680
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1031,
+      "seconds": 18.3,
+      "status": "референс, не утверждён",
+      "px": [
+        3168,
+        1344
+      ],
+      "sha256": "4637b4a6e281691edfa45159e1ca8972255b744fb945e866316507747f727df3"
+    },
+    {
+      "file": "art/generated/arenas/arena-b4-4__nb2.jpg",
+      "category": "arenas",
+      "job": "arena-b4-4",
+      "title": "Арена биома 4 «Искусственный Стоун-Хейм» · этаж-участок 4: пошлинный пост — 21:9, дорога дальше вправо",
+      "source": "ADR-0048: этажи сменяют арены одного биома; docs/content/враги-биомов.md, раздел 4 (Рудокоп, Гружёная вагонетка, Цепник, Литейщик, Пошлинник); образец — нынешняя арена биома (art/generated/arenas/arena-b4-stonehaim__nb2.jpg)",
+      "model": "gemini-3.1-flash-image",
+      "model_name": "Nano Banana 2",
+      "date": "2026-10-02T15:47:58+03:00",
+      "params": {
+        "aspectRatio": "21:9",
+        "imageSize": "2K",
+        "responseModalities": [
+          "TEXT",
+          "IMAGE"
+        ]
+      },
+      "refs": [
+        "art/generated/arenas/arena-b4-stonehaim__nb2.jpg"
+      ],
+      "prompt": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources that glow from within throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and tiny glowing grains float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime, no cartoon. Match the brushwork, lighting and color handling of the attached reference image (approved game art).\n\nDraw exactly one image in a single pass: no alternative versions, no second attempts, no text in the reply. Format: wide horizontal battle background for a landscape phone screen, 21:9. Strict top-down orthographic view, the camera looks straight down at the floor like a tabletop RPG battle map: no horizon, no perspective, no side views, no ceiling, no sky. The attached image is another stretch of this very place, already in the game: the new picture must read as the same place — keep its straight-down camera, its scale, the layout of its zones, its darkness, its palette, the material of its floor, its light and its painting style. Do NOT copy its objects or where they lie: this stretch has its own details, described below. The game puts its cards along the left and right sides: five hero cards in the left quarter and five enemy cards in the right quarter, from the top edge to the bottom edge. So the left quarter (0-25% of the width) and the right quarter (75-100% of the width) must be open, flat, evenly lit floor over their whole height: only the floor itself, dust and fine glowing cracks — no objects there. The zones are invisible: no lines, no seams, no panels and no change of color or texture where the quarters meet the central half — the floor is one continuous surface. This stretch is one floor of a long way down: the squad comes in from the left and goes on to the right, so the floor continues beyond the left and right edges of the picture — no side walls, nothing closes the sides. The surroundings — walls, bookcases or the edge of the forest — appear only as a thin strip along the very top and bottom edges, no more than 7% of the height. All details are placed only in the central half (25-75% of the width), close to the top and bottom edges; the middle of the central half stays calm and open, because the game shows banners there.\n\nSubject: another stretch of Artificial Stoneheim, the full-size living sketch of a dwarven city made by the god Ularion, seen straight from above: a toll post at a crossing of streets. Light: it is dark, the pavement lies in deep shadow, darkened by soot, and the light comes only from below — from glowing coals, molten metal and amber-glowing cracks, warm amber and molten orange light; the only cold notes are blue-grey smoke and shadows. Pavement: big, precisely fitted square blocks of warm sandstone-colored stone, worn smooth and darkened by soot, soot in the seams, a few iron rivets and flakes of ash on them; thin cracks glow from within with warm amber light. Along the very top and bottom edges runs a thin dark strip of the foot of stone walls and iron railings, no more than 7% of the height, running on through the left and right edges of the picture. In the central half only: near the top edge, a heavy stone table with big bronze scales on it, a closed iron-bound coffer and a few stacked amber ingots; beside it an iron post with a glowing amber lamp. Near the bottom edge, a wide round iron grate in the pavement over a ventilation shaft, warm amber light and thin curls of blue-grey smoke rising through it; beside it a stack of wooden crates bound with iron and a big iron-rimmed wheel lying flat. The middle of the central half is plain open floor. No cards, no grid.\n\nNo text, no letters, no numbers, no glyphs, no runes, no real-world scripts, no carvings that look like writing or numerals, no occult symbols, no heraldry, no watermark, no signature, no logo, no UI elements, no border or frame around the picture. Tablets, cylinders, cords, crates and walls carry no writing and no signs: only fine worn grooves and texture. No characters, no people, no animals, no gore, no blood, no wounds, no bones, no skulls, no horror grotesque. No purple, no violet, no magenta light.",
+      "model_text": "",
+      "usage": {
+        "promptTokenCount": 1252,
+        "candidatesTokenCount": 2148,
+        "totalTokenCount": 3400,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 994
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 258
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1680
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "cost_usd": 0.1028,
+      "seconds": 19.1,
+      "status": "референс, не утверждён",
+      "px": [
+        3168,
+        1344
+      ],
+      "sha256": "7a429065d3a7885d0cd80c03c77f95a5e14d2a3ed056574b1f627d89d397fd4b"
     }
   ]
 }

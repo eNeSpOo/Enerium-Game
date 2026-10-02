@@ -11,7 +11,7 @@
    C. Эффекты — только transform и opacity: кадры Web Animations сцены EnFx.scene у каждого вида; @keyframes, которые крутят бой
       (index.html, battle-cards.css, battle-scene.css, с учётом каскада); «меньше движения» — снаряды не летят, поле не трясётся, спрайты
       только гаснут, ленты кадров играют на месте; числа, надписи и плашки видны свою длительность (--bs-d сильнее общего правила
-      index.html), враги не прячутся при выходе.
+      index.html), враги не идут из-за края, а проявляются на местах.
    D. Режим «Игрок»: в бою, в окне карты врага и героя, в легенде «Знаки», на баннере, в итоге этажа и в «Стене» — ни одного служебного слова.
    E. Данные и арт: значок у каждого эффекта, который ядро может наложить, урон и лечение со временем — у каждой школы; спрайты и ленты
       VFX, рамки-квадраты (тело, венец, целиком), украшения HUD, иконки боя — на диске и в tools/art-gen/ui-art.json с исходником; клетки
@@ -20,12 +20,21 @@
       экране, и у свёрнутого забега, время показа идёт ровно тактом (и на последнем такте ритуала), ритуал на экране показан, его «+N» —
       ровно то, что зачислено в кошелёк, с циклом и артефактами игрока. UI-кит: раздел «Бой AAA» рисуется.
    F. Поход на новый этаж (ADR-0048, слова автора 02.10.2026): ожидания с плашкой нет — добыча летит в кошелёк, а остаток этажа — путь:
-      отряд переходит дальше и идёт по биому, экран затемняется, в темноте — новая арена того же биома, она открывается, затем новый этаж
-      и выход врагов. Законы: фазы идут ровно в этом порядке, затемнение, темнота и новая арена — своей длительности из данных, шаг — весь
-      остаток; длительность этажа та же — новый этаж приходит ровно тогда, когда кончается путь, и время забега прибавляет b.t + gapMs;
-      затемнение, темнота и новая арена помещаются в переход gapMs; фон едет, отряд шагает, павшие уходят — только transform и opacity,
-      при «меньше движения» — тот же порядок без движения; арены этажей — по четыре на биом 1–4, этаж берёт свою по номеру, соседние —
-      разные, на экране боя — арена своего этажа, в темноте — арена следующего; готовые арены — на диске и в описи выгрузки.
+      отряд переходит дальше и идёт по биому, экран затемняется, в темноте — новая арена того же биома. Правка автора после просмотра:
+      «после чёрного экрана показывать ещё движение небольшое якобы мы всё это время шли и уже когда остановились двое врагов как бы
+      выходят из-за экрана в левую сторону и бой начинается» — новая арена открывается, пока отряд ещё идёт, после темноты он идёт ещё и
+      останавливается; тогда враги нового этажа выходят из-за правого края поля и идут влево, к своим местам, и только потом — бой.
+      Законы: фазы идут ровно в этом порядке — доигрыш и добыча, шаг, затемнение, темнота, открытие, шаг после темноты, выход врагов;
+      затемнение, темнота, открытие и шаг после темноты — своей длительности из данных, шаг до темноты — весь остаток; после темноты фон
+      едет и тормозит до места, отряд шагает до самой остановки; новый этаж рисуется, только когда отряд встал, и его часы стоят до конца
+      пути; выходит вся колода этажа, из-за края поля (кадры — только transform, первый — за краем), передняя колонка первой, последняя
+      карта встаёт ровно через enterMs; ни один ход нового боя не идёт, пока враги выходят, и первый ход — на том же такте, где они
+      встали; класс выхода с карт снимается; у боя со своей сценой выход идёт с начала боя и укладывается в паузу раунда.
+      Длительность этажа та же — часы нового боя идут ровно с конца пути, время забега
+      прибавляет b.t + gapMs; затемнение, темнота, открытие, шаг после темноты и начало выхода помещаются в переход gapMs; фон едет, отряд
+      шагает, павшие уходят — только transform и opacity, при «меньше движения» — тот же порядок без движения, враги проявляются на
+      местах; арены этажей — по четыре на биом 1–4, этаж берёт свою по номеру, соседние — разные, на экране боя — арена своего этажа,
+      в темноте — арена следующего; готовые арены — на диске и в описи выгрузки.
    Мутации: каждая ломает закон — он обязан упасть.
    Запуск: node tools/content-gen/screens/check_battle_scene.js */
 'use strict';
@@ -37,9 +46,13 @@ const { SERVICE, playerText } = require('./check_player_view.js');
 const RITUAL_TEST_MS = 120000, STEP_MS = 50, STEPS_MAX = 4000;
 /* «меньше движения»: сведения, которым battle-scene.css возвращает длительность */
 const CALM_INFO = ['.fly', '.fly.crit', '.bs-call', '.bs-call.ult', '.bt-banner.bs-ban', '.bs-rflash', '.bs-loot'];
-/* поход на новый этаж: живые герои шагают — правило battle-scene.css; фазы пути — по порядку автора (ADR-0048) */
+/* поход на новый этаж: живые герои шагают — правило battle-scene.css; фазы пути — по порядку автора (ADR-0048 и правка после просмотра:
+   после темноты — ещё шаг, отряд встал — выход врагов); выход врагов — правило карт врага на стороне с классом выхода */
 const WALK_SEL = '.bt.bs-march .bt-side.h .bc:not(.dead)';
-const TRIP_ORDER = ['settle', 'march', 'dark', 'black', 'open'];
+const FOE_SEL = '.bt-side.f.enter .bc';
+const TRIP_ORDER = ['settle', 'march', 'dark', 'black', 'open', 'walk', 'foes'];
+/* мест карт на стороне поля — от одной до пяти (SLOT index.html): выход врагов проверяется на каждой колоде */
+const FOES_MAX = 5;
 /* арены этажей: по стольку на биом, у биомов 1–4 (ADR-0048: нынешняя и три новых) */
 const ARENAS_PER_BIOME = 4, ARENA_BIOMES = ['b1', 'b2', 'b3', 'b4'];
 /* селектор боя: поле, карты, числа, надписи, плашки, спрайты, значки, рамки */
@@ -399,7 +412,26 @@ function lawCss(sceneCss) {
     }
   }
   for (const s of CALM_INFO) if (!/^var\(--bs-d\b[^)]*\)\s*!important$/.test(calmDur[s] || '')) out.push(`«меньше движения»: у ${s} нет длительности var(--bs-d) !important — общее правило index.html погасит его мгновенно`);
-  if ((calm['.bt-side.f.enter .bc'] || []).join() !== 'none') out.push('«меньше движения»: выход врагов идёт анимацией — с общим правилом index.html карты врагов замрут в её последнем кадре');
+  /* выход врагов нового этажа (правка автора): карты выходят из-за правого края поля и идут влево, к своим местам — кадры только
+     transform, первый — за краем (--bs-x: колонка карты, её ширина и запас), последний — на месте; шаг между картами, длительность
+     и пройденная часть выхода — из данных (--bs-*). «Меньше движения» — карты проявляются на местах: кадры только opacity, последний
+     виден, длительность возвращает --bs-foe (общее правило index.html гасит анимации мгновенно) */
+  {
+    const [sceneNorm] = sheets[2];
+    const frames = n => { const m = sceneNorm.match(new RegExp('@keyframes ' + n + '\\s*\\{((?:[^{}]*\\{[^{}]*\\})*)\\s*\\}')); return m ? [...m[1].matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(x => [x[1].trim(), x[2].trim()]) : []; };
+    const rule = (sceneNorm.replace(KF, '').match(/\.bt-side\.f\.enter \.bc\{([^{}]*)\}/) || [])[1] || '';
+    const fIn = frames('foeIn'), first = fIn[0] || ['', ''], last = fIn[fIn.length - 1] || ['', ''];
+    if ((norm[FOE_SEL] || []).join() !== 'foeIn') out.push(`выход врагов: у ${FOE_SEL} анимация «${(norm[FOE_SEL] || []).join()}», ждали foeIn`);
+    if ((kf.foeIn || []).join() !== 'transform') out.push(`выход врагов: кадры foeIn крутят ${(kf.foeIn || []).join(', ') || 'ничего'} — карты выходят из-за края, а не проявляются: только transform`);
+    if (!/^(?:0%|from)$/.test(first[0]) || !first[1].includes('translate(var(--bs-x)')) out.push(`выход врагов: первый кадр foeIn — «${first.join(' ')}», а карта начинает за правым краем поля: translate(var(--bs-x), …)`);
+    if (!/^(?:100%|to)$/.test(last[0]) || !/transform:translate\(0,0\)$/.test(last[1])) out.push(`выход врагов: последний кадр foeIn — «${last.join(' ')}», а карта встаёт на своё место`);
+    if (!/\.bt-side\.f \.bc\{--bs-x:calc\(var\(--k\) \* var\(--colw\) \+ 100% \+ \d+px\)\}/.test(sceneNorm)) out.push('выход врагов: --bs-x — не «колонка карты, её ширина и запас»: карта начинает не за краем поля');
+    for (const v of ['var(--bs-foe', 'var(--bs-step', 'var(--bs-at', 'var(--bs-o0', '(1 - var(--k)) * var(--bs-col']) if (!rule.includes(v)) out.push(`выход врагов: в правиле ${FOE_SEL} нет «${v}» — шаг, длительность и очередь не из данных`);
+    if ((calm[FOE_SEL] || []).join() !== 'bsFoeShow') out.push(`«меньше движения»: выход врагов — анимация «${(calm[FOE_SEL] || []).join()}», ждали bsFoeShow: карты проявляются на местах`);
+    const fShow = frames('bsFoeShow'), end = fShow[fShow.length - 1] || ['', ''];
+    if ((kf.bsFoeShow || []).join() !== 'opacity' || !/^(?:100%|to)$/.test(end[0]) || end[1] !== 'opacity:1') out.push('«меньше движения»: кадры bsFoeShow — не «только opacity, в конце карта видна»: враги двигались бы или остались скрыты');
+    if (!/^var\(--bs-foe\b[^)]*\)\s*!important$/.test(calmDur[FOE_SEL] || '')) out.push(`«меньше движения»: у ${FOE_SEL} нет длительности var(--bs-foe) !important — общее правило index.html покажет врагов разом`);
+  }
   /* поход на новый этаж: живые герои шагают; при «меньше движения» — стоят (ADR-0048: тот же порядок без движения) */
   if (!(norm[WALK_SEL] || []).includes('walk')) out.push(`поход: отряд не шагает — у ${WALK_SEL} нет анимации walk`);
   if ((calm[WALK_SEL] || []).join() !== 'none') out.push(`«меньше движения»: отряд шагает в походе — у ${WALK_SEL} не animation:none`);
@@ -426,17 +458,22 @@ for (const e of L.C()) say(`закон C: ${e}`);
 const ART = JSON.parse(fs.readFileSync(path.join(ROOT, 'tools', 'art-gen', 'ui-art.json'), 'utf8')).items;
 const onDisk = p => fs.existsSync(path.join(UI, 'assets', 'art', p));
 const inSpec = p => !!ART[p] && fs.existsSync(path.join(ROOT, 'art', 'generated', typeof ART[p] === 'string' ? ART[p] : ART[p].from));
-/* ход забега через первый этаж рядовых — до начала следующего этажа: свёрнутый или на экране — конец этажа не раньше b.t, ритуал на
+/* ход забега через первый этаж рядовых — до первого хода следующего этажа: свёрнутый или на экране — конец этажа не раньше b.t, ритуал на
    экране показан; на экране — цикл II и все артефакты Странника с добычей на пределе: «+N» ритуала — ровно то, что floorDone зачислил в
-   кошелёк. Закон F — поход на новый этаж, на экране: фазы пути на каждом такте, кадры анимаций пути (фон, павшие, завеса) и то, что ложится
-   в #bt; calm — то же при «меньше движения». Арены на время пробы — все задуманные готовы: смена арены видна и до генерации новых */
+   кошелёк. Закон F — поход на новый этаж, на экране: фазы пути на каждом такте, кадры анимаций пути (фон, павшие, завеса) с фазой, на
+   которой они начались, классы #bt и то, что в него ложится; новый этаж — когда нарисован и что на экране в этот миг, когда пошли его
+   часы, когда встали враги и когда сделан первый ход; calm — то же при «меньше движения». Арены на время пробы — все задуманные
+   готовы: смена арены видна и без выгрузки новых */
 const ANIM_KEYS = new Set(['transform', 'opacity', 'offset', 'easing', 'composite']);
 function ritualRun(vis, calm, noRit) {
   const out = [], EB = T.EB, F = EB.RULES.floor, mm0 = F.minMs, A = T.BS_ART, ready0 = A.arenaReady, media0 = win.matchMedia;
   const what = (vis ? (calm ? 'на экране при «меньше движения»' : 'на экране') : 'свёрнутый') + (noRit ? ', бой длиннее минимума' : ''), fn = n => vm.runInContext(n, ctx);
-  /* #bt пробы: фон, павшие и завеса пишут свои кадры анимаций, всё, что ложится в #bt, — в список */
-  const bt = document.getElementById('bt'), q0 = bt.querySelector, a0 = bt.appendChild, rec = [], recEls = {}, added = [];
-  const mkRec = sel => { const e = stubEl(sel); e.animate = (kf, o) => { rec.push({ sel, kf, o }); return {}; }; e.querySelector = () => null; return e; };
+  /* #bt пробы: фон, павшие и завеса пишут свои кадры анимаций и фазу пути, на которой те начались; классы #bt и снятый с врагов класс
+     выхода — в запись; всё, что ложится в #bt, — в список */
+  const bt = document.getElementById('bt'), q0 = bt.querySelector, a0 = bt.appendChild, tg0 = bt.classList.toggle, rec = [], recEls = {}, added = [], cls = {};
+  let R = null, tick = 0, enterCut = null;
+  const mkRec = sel => { const e = stubEl(sel); e.animate = (kf, o) => { rec.push({ sel, kf, o: o || {}, ph: fn('bsTripPhase')(R) }); return {}; }; e.querySelector = () => null; return e; };
+  const foeSide = stubEl('.bt-side.f.enter'); foeSide.classList.remove = c => { if (c === 'enter' && enterCut == null) enterCut = tick; };
   F.minMs = Object.assign({}, mm0, { o: noRit ? 0 : RITUAL_TEST_MS });   // без ритуала: бой длиннее минимума — путь = доигрыш удара и переход
   if (vis) A.arenaReady = Object.values(A.arenas).flat();
   if (calm) win.matchMedia = () => ({ matches: true, addEventListener() {}, addListener() {} });
@@ -449,30 +486,51 @@ function ritualRun(vis, calm, noRit) {
     vm.runInContext('typeof syncCycle === "function" && syncCycle()', ctx);   // вариант биома по циклу — как перед стартом забега
     const B = EB.BIOMES.b1, fl = B.floors.findIndex(f => f.g === 'o') + 1;
     run('ритуал · старт', () => T.startRun('s1', 'b1', fl));
-    const R = lastRun();
+    R = lastRun();
     if (!R || !R.b) return [`ритуал ${what}: забег не начался`];
     if (vis) { T.S.focus = R.id; T.S.route = 'battle'; } else T.S.route = 'descent';
     bt.__bsTrip = null;
-    bt.querySelector = sel => /^\.(?:bt-bgs|bt-side\.f|bs-veil)$/.test(sel) ? (recEls[sel] = recEls[sel] || mkRec(sel)) : q0.call(bt, sel);
+    /* сторона врагов с классом выхода есть на экране только у нового этажа, пока класс не снят */
+    bt.querySelector = sel => sel === FOE_SEL.split(' ')[0] ? (R.floor !== fl && enterCut == null ? foeSide : null)
+      : /^\.(?:bt-bgs|bt-side\.f|bs-veil)$/.test(sel) ? (recEls[sel] = recEls[sel] || mkRec(sel)) : q0.call(bt, sel);
     bt.appendChild = x => { added.push(String(x && x.className || '')); return x; };
+    bt.classList.toggle = (c, on) => { cls[c] = !!on; };
     const b = R.b, bgsOf = h => (h.match(/<div class="bt-bgs">([\s\S]*?)<\/div>/) || [])[1] || '';
     const cur = fn('bsArenaUrl')('b1', fl), want = fn('bsArenaUrl')('b1', fl + 1);
     if (vis && !bgsOf(draw('поход · этаж ' + fl)).includes(`src="${cur}"`)) out.push(`поход: экран этажа ${fl} — не на арене своего этажа (${cur})`);
     let early = false, shown = null, step = 0, t0 = null, doneAt = null, next = null, runMs = null, tot = null, totBad = false, sp0 = null;
-    const phases = [];
+    let drawnAt = null, drawn = null, enterOff = null, actAt = null, actEarly = false;
+    const phases = [], walkBy = {};
     for (let n = 0; n < STEPS_MAX && !R.over; n++) {
       const v0 = R.view, gap0 = R.gap > 0;
+      tick = n;
       run(`ритуал ${what} · ход`, () => fn('advance')(R, STEP_MS));   // нынешний advance: мутации подменяют глобальный
-      if (R.floor !== fl) { next = n; break; }   // новый этаж
-      if (!gap0 && R.view - v0 !== STEP_MS && !step) step = R.view - v0;   // время показа идёт ровно тактом — и на последнем такте ритуала
-      if (b.over && t0 == null) t0 = n;
-      if (b.over && b.win && b.ritualMs > 0 && shown == null) shown = R.bsRit === b;
-      if (b.over && R.view < b.t && R.gap > 0) early = true;
-      if (R.gap > 0 && doneAt == null) { doneAt = n; runMs = R.runMs; }
-      if (vis) {
+      const p = vis && next == null ? fn('bsTripPhase')(R) : null;
+      if (R.floor === fl) {
+        if (!gap0 && R.view - v0 !== STEP_MS && !step) step = R.view - v0;   // время показа идёт ровно тактом — и на последнем такте ритуала
+        if (b.over && t0 == null) t0 = n;
+        if (b.over && b.win && b.ritualMs > 0 && shown == null) shown = R.bsRit === b;
+        if (b.over && R.view < b.t && R.gap > 0) early = true;
+        if (R.gap > 0 && doneAt == null) { doneAt = n; runMs = R.runMs; }
+      } else {
+        /* новый этаж нарисован: что на экране в этот миг, на какой фазе пути, стоят ли часы его боя и с какого места идёт выход врагов */
+        if (drawnAt == null) {
+          const C = vis ? fn('bsTripClock')(R) : null;
+          drawnAt = n;
+          drawn = { before: phases[phases.length - 1], ph: p, held: !!(C && C.held), html: vis && els.game ? els.game.innerHTML : '', at: fn('bsEnterAt')(R), enter: !!R.enter };
+        }
+        if (next == null && R.view > 0) next = n - 1;   // часы нового боя пошли: путь кончился тактом раньше
+        else if (next != null && R.view - v0 !== STEP_MS && !step) step = R.view - v0;
+        if (R.enter && R.acted.length) actEarly = true;   // ход боя, пока враги ещё выходят
+        if (!R.enter && enterOff == null) enterOff = n;
+        if (R.acted.length && actAt == null) actAt = n;
+        if (actAt != null && enterOff != null) break;   // враги встали и первый ход сделан
+      }
+      if (vis && next == null) {
         const C = fn('bsTripClock')(R);
         if (C) { if (tot == null) { tot = C.total; sp0 = fn('bsTripSpans')(C); } else if (C.total !== tot) totBad = true; }
-        phases.push(fn('bsTripPhase')(R));
+        if (p || R.floor === fl) phases.push(p);   // путь кончился — у нового этажа фазы нет: его часы пойдут со следующего такта
+        if (p && R.floor === fl) walkBy[p] = !!cls['bs-march'];
       }
     }
     if (!b.over || !b.win) out.push(`ритуал ${what}: этаж ${fl} Мастерской не взят — проверить нечем`);
@@ -480,7 +538,7 @@ function ritualRun(vis, calm, noRit) {
     else if (noRit && b.ritualMs > 0) out.push(`ритуал ${what}: у пробы без минимума ядро добавило ритуал ${b.ritualMs} мс`);
     else if (early) out.push(`ритуал ${what}: этаж кончился раньше конца боя по ядру (b.t ${b.t} мс)`);
     else if (doneAt == null) out.push(`ритуал ${what}: этаж не кончился за ${STEPS_MAX * STEP_MS} мс`);
-    else if (next == null) out.push(`ритуал ${what}: новый этаж не начался за ${STEPS_MAX * STEP_MS} мс`);
+    else if (next == null) out.push(`ритуал ${what}: бой нового этажа не начался за ${STEPS_MAX * STEP_MS} мс`);
     if (vis && b.ritualMs > 0 && !shown) out.push('ритуал на экране: добыча не показана — advance не позвал bsRitual');
     if (step) out.push(`ритуал ${what}: за такт ${STEP_MS} мс время показа прибавило ${step} мс`);
     /* стена фарма (ADR-0044): этаж с переходом прибавляет к забегу ровно b.t + gapMs — поход её не меняет */
@@ -491,31 +549,71 @@ function ritualRun(vis, calm, noRit) {
       if (!vm.runInContext('lootCtx()', ctx)) out.push('ритуал на экране: у пробы нет прибавок цикла и артефактов — сверять нечего');
     }
     /* ================== закон F: поход на новый этаж ================== */
+    /* выход врагов и первый ход — и на экране, и у свёрнутого забега: пока враги выходят, ходов боя нет; встали они на том же такте, на
+       котором сделан первый ход, — бой начинается, когда враги встали */
+    if (next != null) {
+      if (!drawn || !drawn.enter) out.push(`выход врагов ${what}: у нового этажа выхода врагов нет`);
+      else if (actEarly) out.push(`выход врагов ${what}: ход боя сделан, пока враги ещё выходят`);
+      else if (actAt == null || enterOff == null) out.push(`выход врагов ${what}: ${actAt == null ? 'первого хода боя' : 'конца выхода'} не дождались`);
+      else if (actAt !== enterOff) out.push(`выход врагов ${what}: враги встали на такте ${enterOff}, первый ход — на такте ${actAt}: бой начинается не тогда, когда они встали`);
+    }
     if (vis && next != null && t0 != null) {
-      const Q = F.ritual, seq = phases.slice(t0), order = seq.filter((p, i) => p !== seq[i - 1]), len = k => seq.filter(p => p === k).length * STEP_MS;
+      const Q = F.ritual, lead = Math.max(0, Q.enterMs - EB.RULES.rounds.gapMs);
+      const seq = phases.slice(t0), order = seq.filter((p, i) => p !== seq[i - 1]), len = k => seq.filter(p => p === k).length * STEP_MS;
       if (tot == null) out.push(`поход ${what}: часов пути нет — путь не начался`);
       else {
         if (totBad) out.push(`поход ${what}: длина пути меняется по ходу`);
-        /* длительность этажа та же: новый этаж приходит ровно тогда, когда кончается путь */
+        /* длительность этажа та же: часы нового боя идут ровно с конца пути — хотя этаж нарисован раньше, когда отряд встал */
         const real = (next - t0) * STEP_MS;
-        if (real < tot || real - tot >= STEP_MS) out.push(`поход ${what}: новый этаж пришёл через ${real} мс после конца боя, а путь — ${tot} мс: длительность этажа изменилась`);
+        if (real < tot || real - tot >= STEP_MS) out.push(`поход ${what}: часы нового этажа пошли через ${real} мс после конца боя, а путь — ${tot} мс: длительность этажа изменилась`);
         if (order.join() !== TRIP_ORDER.join()) out.push(`поход ${what}: фазы ${order.map(p => p || '—').join(' → ')}, ждали ${TRIP_ORDER.join(' → ')}`);
-        for (const [k, ms] of [['dark', Q.darkMs], ['black', Q.blackMs], ['open', Q.openMs]]) if (Math.abs(len(k) - ms) > STEP_MS) out.push(`поход ${what}: фаза «${k}» идёт ${len(k)} мс, в данных ${ms}`);
+        for (const [k, ms] of [['dark', Q.darkMs], ['black', Q.blackMs], ['open', Q.openMs], ['walk', Q.walkMs], ['foes', lead]]) if (Math.abs(len(k) - ms) > STEP_MS) out.push(`поход ${what}: фаза «${k}» идёт ${len(k)} мс, в данных ${ms}`);
         const march = sp0 ? sp0[1][2] - sp0[1][1] : 0;
         if (!(len('march') > 0)) out.push(`поход ${what}: отряд не идёт дальше — шага нет`);
         else if (Math.abs(len('march') - march) > 2 * STEP_MS) out.push(`поход ${what}: шаг идёт ${len('march')} мс, а остаток пути — ${march}`);
-        if (!CNT && !calm) { cnt.trips++; cnt.tripMs.push(`${noRit ? 'бой длиннее минимума' : 'рядовые с ритуалом'}: путь ${tot} мс, шаг ${len('march')}`); }
+        if (!CNT && !calm) { cnt.trips++; cnt.tripMs.push(`${noRit ? 'бой длиннее минимума' : 'рядовые с ритуалом'}: путь ${tot} мс, шаг до темноты ${len('march')}, после темноты ${len('open') + len('walk')}, выход врагов ${Q.enterMs}`); }
+      }
+      /* отряд встал — новый этаж на экране: до него шёл шаг после темноты, часы боя стоят до конца пути, выход врагов идёт с начала,
+         выходит вся колода этажа — на арене этого этажа; встали враги через enterMs, и класс выхода с их карт снят на том же такте */
+      if (!drawn) out.push(`поход ${what}: новый этаж не нарисован`);
+      else {
+        if (drawn.before !== 'walk' || drawn.ph !== 'foes') out.push(`поход ${what}: новый этаж нарисован на переходе фаз «${drawn.before || '—'}» → «${drawn.ph || '—'}», а враги выходят, когда отряд встал: walk → foes`);
+        if (!drawn.held) out.push(`поход ${what}: новый этаж нарисован, а часы его боя не стоят до конца пути`);
+        if (drawn.at == null || drawn.at < 0 || drawn.at > STEP_MS) out.push(`поход ${what}: на первом кадре нового этажа выход врагов идёт с ${drawn.at} мс — не с начала`);
+        const deck = B.floors[fl].m.length, cards = (drawn.html.match(/<div class="bc foe /g) || []).length;
+        if (!drawn.html.includes('<div class="bt-side f enter">')) out.push(`поход ${what}: враги нового этажа уже стоят на местах — класса выхода нет`);
+        if (cards !== deck) out.push(`поход ${what}: в колоде этажа ${fl + 1} врагов ${deck}, а выходит ${cards}`);
+        if (!bgsOf(drawn.html).includes(`src="${want}"`)) out.push(`поход ${what}: враги выходят не на арене своего этажа (${want})`);
+        const went = enterOff != null ? (enterOff - drawnAt) * STEP_MS + (drawn.at || 0) : null;
+        if (went == null || Math.abs(went - Q.enterMs) > STEP_MS) out.push(`поход ${what}: выход врагов шёл ${went == null ? '—' : went} мс, в данных ${Q.enterMs}`);
+        if (enterCut == null || enterCut !== enterOff) out.push(`поход ${what}: класс выхода с карт врагов ${enterCut == null ? 'не снят' : `снят на такте ${enterCut}, а встали они на такте ${enterOff}`} — его анимация сильнее удара, каста и гибели карты`);
       }
       /* ожидания нет — ни «Этаж взят» с песком, ни «Спуск ниже»; добыча летит в кошелёк */
       if (added.some(c => /\bbs-(?:taken|transit)\b/.test(c))) out.push(`поход ${what}: вернулась плашка ожидания — ${added.filter(c => /\bbs-(?:taken|transit)\b/.test(c)).join(', ')}`);
       if (!added.some(c => /\bbs-loot\b/.test(c))) out.push(`поход ${what}: добыча этажа не летит в кошелёк — нет плашки «+N»`);
-      /* кадры: только transform и opacity; фон едет и павшие уходят, при «меньше движения» — ничто не движется; завеса — затемнение, затем новая арена */
+      /* кадры: только transform и opacity; до темноты фон едет и павшие уходят; после темноты фон едет по новой арене — с открытия завесы —
+         и тормозит до места: конец круга петли, последний отрезок — кривая остановки; при «меньше движения» — ничто не движется;
+         завеса — затемнение, затем новая арена */
       const kfs = sel => rec.filter(x => x.sel === sel).map(x => x.kf), moved = x => x.kf.some(k => k.transform != null);
+      const bgs = (...ph) => rec.filter(x => x.sel === '.bt-bgs' && ph.includes(x.ph) && moved(x));
       for (const x of rec) for (const k of x.kf) for (const p of Object.keys(k)) if (!ANIM_KEYS.has(p)) out.push(`поход ${what}: кадр ${x.sel} двигает «${p}» — только transform и opacity`);
-      if (calm) { const m = rec.filter(moved); if (m.length) out.push(`«меньше движения»: в походе движется ${[...new Set(m.map(x => x.sel))].join(', ')}`); }
-      else {
-        if (!kfs('.bt-bgs').some(kf => kf.some(k => k.transform != null))) out.push(`поход ${what}: фон не едет — отряд не переходит дальше`);
+      if (calm) {
+        const m = rec.filter(moved); if (m.length) out.push(`«меньше движения»: в походе движется ${[...new Set(m.map(x => x.sel))].join(', ')}`);
+        const on = Object.keys(walkBy).filter(k => walkBy[k]); if (on.length) out.push(`«меньше движения»: отряд шагает в походе — на фазах ${on.join(', ')}`);
+      } else {
+        if (!bgs('march', 'dark').length) out.push(`поход ${what}: фон не едет — отряд не переходит дальше`);
         if (!kfs('.bt-side.f').some(kf => kf.some(k => k.transform != null))) out.push(`поход ${what}: павшие не уходят со своей комнатой`);
+        const arr = bgs('black', 'open', 'walk')[0];
+        if (!arr) out.push(`поход ${what}: после темноты фон стоит — отряд не идёт по новой арене`);
+        else {
+          const k = arr.kf, rest = 'translateX(-200.00%)';
+          if (arr.ph === 'walk') out.push(`поход ${what}: фон поехал только после открытия — новая арена открывается, пока отряд ещё идёт`);
+          if (arr.o.duration !== Q.openMs + Q.walkMs) out.push(`поход ${what}: шаг по новой арене идёт ${arr.o.duration} мс, в данных открытие и шаг после темноты — ${Q.openMs + Q.walkMs}`);
+          if (k.length < 3 || k[k.length - 1].transform !== rest || k[0].transform === rest) out.push(`поход ${what}: шаг по новой арене — ${k.map(x => x.transform).join(' → ')}: фон должен приехать на своё место ${rest}`);
+          else if (k[k.length - 2].easing !== T.BS_DATA.tripStop) out.push(`поход ${what}: фон встаёт рывком — последний отрезок идёт «${k[k.length - 2].easing}», а не кривой остановки BS_DATA.tripStop`);
+        }
+        for (const k of ['march', 'dark', 'open', 'walk']) if (!walkBy[k]) out.push(`поход ${what}: на фазе «${k}» отряд не шагает — класса bs-march нет`);
+        if (walkBy.settle) out.push(`поход ${what}: отряд шагает, пока доигрывается последний удар`);
       }
       if (!kfs('.bt-side.f').some(kf => kf[kf.length - 1].opacity === 0)) out.push(`поход ${what}: павшие не гаснут`);
       const veil = kfs('.bs-veil').map(kf => `${kf[0].opacity}→${kf[kf.length - 1].opacity}`).join(', ');
@@ -526,7 +624,7 @@ function ritualRun(vis, calm, noRit) {
       if (!bgsOf(draw('поход · этаж ' + (fl + 1))).includes(`src="${want}"`)) out.push(`поход ${what}: экран этажа ${fl + 1} — не на арене своего этажа (${want})`);
     }
   } finally {
-    F.minMs = mm0; A.arenaReady = ready0; win.matchMedia = media0; bt.querySelector = q0; bt.appendChild = a0; bt.__bsTrip = null;
+    F.minMs = mm0; A.arenaReady = ready0; win.matchMedia = media0; bt.querySelector = q0; bt.appendChild = a0; bt.classList.toggle = tg0; bt.__bsTrip = null;
   }
   return out;
 }
@@ -571,10 +669,33 @@ L.E = () => {
   for (const k of ['melee', 'arrow', 'magic']) if (!T.BS_ART.abIcons.basic[k]) out.push(`обычная атака вида «${k}» (RULES.cls, fx): нет иконки в BS_ART.abIcons.basic`);
   const F = EB.RULES.floor;
   if (!F.minMs || ['o', 'e', 'b', 'guard'].some(k => !Number.isInteger(F.minMs[k]) || F.minMs[k] < 0)) out.push('RULES.floor.minMs: не целые мс по виду этажа');
-  const RK = ['enterMs', 'stepMs', 'fallMs', 'takenMs', 'lootMs', 'roomMs', 'darkMs', 'blackMs', 'openMs'];
+  const RK = ['enterMs', 'stepMs', 'fallMs', 'takenMs', 'lootMs', 'roomMs', 'darkMs', 'blackMs', 'openMs', 'walkMs'];
   if (!F.ritual || RK.some(k => !Number.isInteger(F.ritual[k]) || F.ritual[k] <= 0)) out.push('RULES.floor.ritual: фазы показа — не целые мс');
-  /* затемнение, темнота и новая арена — в переходе gapMs: конец этажа (добыча, осада) — до затемнения, и при бое длиннее минимума тоже */
-  else if (F.ritual.darkMs + F.ritual.blackMs + F.ritual.openMs > F.gapMs) out.push(`поход: затемнение, темнота и новая арена — ${F.ritual.darkMs + F.ritual.blackMs + F.ritual.openMs} мс, длиннее перехода gapMs ${F.gapMs}`);
+  else {
+    /* затемнение, темнота, открытие, шаг после темноты и начало выхода врагов — в переходе gapMs: конец этажа (добыча, осада) — до
+       затемнения, и при бое длиннее минимума тоже. Выход начинается за enterMs − rounds.gapMs до начала этажа: кончается к первому ходу */
+    const Q = F.ritual, lead = Math.max(0, Q.enterMs - EB.RULES.rounds.gapMs), tail = Q.darkMs + Q.blackMs + Q.openMs + Q.walkMs + lead;
+    if (tail > F.gapMs) out.push(`поход: затемнение, темнота, открытие, шаг после темноты и начало выхода врагов — ${tail} мс, длиннее перехода gapMs ${F.gapMs}`);
+    if (vm.runInContext('bsLead', ctx)({ mode: 'rounds' }) !== lead) out.push(`выход врагов: начинается за ${vm.runInContext('bsLead', ctx)({ mode: 'rounds' })} мс до начала этажа, а до первого хода боя — enterMs − rounds.gapMs = ${lead}`);
+    /* сколько идёт выход — до первого хода боя: у забега по биому — весь enterMs (он начинается до начала этажа); у боя со своей
+       сценой выход идёт с начала боя и укладывается в паузу раунда; прежняя модель темпа первого хода не ждёт — весь enterMs */
+    const enterMsOf = vm.runInContext('bsEnterMs', ctx), short = Math.min(Q.enterMs, EB.RULES.rounds.gapMs);
+    for (const [who, R, want] of [['забег по биому', { mode: 'rounds', b: { mode: 'rounds' } }, Q.enterMs], ['бой со своей сценой', { scene: {}, b: { mode: 'rounds' } }, short],
+      ['прежняя модель темпа', { mode: 'tempo', b: { mode: 'tempo' } }, Q.enterMs]]) if (enterMsOf(R) !== want) out.push(`выход врагов · ${who}: идёт ${enterMsOf(R)} мс, а до первого хода боя — ${want}`);
+    /* выход врагов на каждой колоде — от одной до пяти карт, и весь, и уложенный в паузу раунда: выходят все, передняя колонка — раньше
+       задней, шаг между картами — из данных, последняя карта встаёт ровно в конце выхода */
+    const foeIn = vm.runInContext('bsFoeIn', ctx), SLOT = vm.runInContext('SLOT', ctx);
+    for (const total of [...new Set([Q.enterMs, short])]) for (let n = 1; n <= FOES_MAX; n++) {
+      const I = foeIn(n, total), slots = SLOT[n] || [], tag = `${n} за ${total} мс`;
+      if (slots.length !== n || !I || I.at.length !== n) { out.push(`выход врагов: у колоды в ${n} карт мест ${slots.length}, выходит ${I ? I.at.length : 0}`); continue; }
+      if (!Number.isInteger(I.foeMs) || I.foeMs <= 0 || I.at.some(t => !Number.isInteger(t) || t < 0) || Math.min(...I.at) !== 0) out.push(`выход врагов (${tag}): времена — не целые мс от нуля: карта идёт ${I.foeMs}, трогаются в ${I.at.join(', ')}`);
+      else if (Math.max(...I.at) + I.foeMs !== total) out.push(`выход врагов (${tag}): последняя карта встаёт через ${Math.max(...I.at) + I.foeMs} мс: к первому ходу боя враги не встали`);
+      const front = slots.map((s, i) => s[0] ? I.at[i] : -1).filter(t => t >= 0), back = slots.map((s, i) => s[0] ? -1 : I.at[i]).filter(t => t >= 0);
+      if (front.length && back.length && Math.max(...front) >= Math.min(...back)) out.push(`выход врагов (${tag}): задняя колонка трогается не позже передней — ${back.join(', ')} против ${front.join(', ')}`);
+      if (I.stepMs !== Q.stepMs) out.push(`выход врагов (${tag}): шаг между картами ${I.stepMs} мс, в данных stepMs ${Q.stepMs}`);
+    }
+    if (foeIn(FOES_MAX).foeMs !== foeIn(FOES_MAX, Q.enterMs).foeMs) out.push('выход врагов: без названной длительности выход идёт не enterMs');
+  }
   /* закон F, данные: арены этажей биомов 1–4 — по четыре, первая — нынешняя арена биома; готовые — на диске и в описи, выгруженные — в
      arenaReady; этаж берёт свою по номеру, соседние этажи — разные, при каждом вызове — та же (пробуем со всеми задуманными готовыми) */
   {
@@ -654,7 +775,21 @@ const MUT = [
     .replace("typeof lootCtx === 'function' ? lootCtx() : null", 'null').replace('function bsRitual(R)', 'function (R)') || 'bsRitual'};`, 'bsRitual = bsRitual__;'],
   /* закон F — поход на новый этаж */
   ['E', 'путь удлиняет этаж', 'floorDone__ = floorDone; floorDone = function (R, vis) { const r = floorDone__(R, vis); if (R.gap > 0) R.gap += 500; return r; };', 'floorDone = floorDone__;'],
-  ['E', 'новая арена раньше затемнения', 'bsTripSpans__ = bsTripSpans; bsTripSpans = T => { const s = bsTripSpans__(T); return [s[0], s[1], s[4], s[3], s[2]]; };', 'bsTripSpans = bsTripSpans__;'],
+  ['E', 'новая арена раньше затемнения', 'bsTripSpans__ = bsTripSpans; bsTripSpans = T => { const s = bsTripSpans__(T); return [s[0], s[1], s[4], s[3], s[2], s[5], s[6]]; };', 'bsTripSpans = bsTripSpans__;'],
+  /* правка автора: после темноты — ещё движение, отряд встал — враги выходят из-за края, затем бой */
+  ['E', 'после темноты отряд стоит — движения нет', 'bsTripKf__ = bsTripKf; bsTripKf = (calm, bw) => Object.assign(bsTripKf__(calm, bw), { arrive: null });', 'bsTripKf = bsTripKf__;'],
+  ['E', 'после темноты фон встаёт рывком — без торможения', 'bsTripKf__ = bsTripKf; bsTripKf = (calm, bw) => { const K = bsTripKf__(calm, bw); if (K.arrive) K.arrive = K.arrive.map(k => Object.assign({}, k, { easing: \'linear\' })); return K; };', 'bsTripKf = bsTripKf__;'],
+  ['E', 'шага после темноты нет в пути', 'bsTripSpans__ = bsTripSpans; bsTripSpans = T => { const s = bsTripSpans__(T); return [s[0], s[1], s[2], s[3], [\'open\', s[4][1], s[5][2]], [\'walk\', s[5][2], s[5][2]], s[6]]; };', 'bsTripSpans = bsTripSpans__;'],
+  ['E', 'шаг после темноты не помещается в переход', 'EB.RULES.floor.ritual.walkMs__ = EB.RULES.floor.ritual.walkMs; EB.RULES.floor.ritual.walkMs = EB.RULES.floor.gapMs;', 'EB.RULES.floor.ritual.walkMs = EB.RULES.floor.ritual.walkMs__; delete EB.RULES.floor.ritual.walkMs__;'],
+  ['E', 'враги выходят, пока отряд ещё идёт', 'bsLead__ = bsLead; bsLead = R => bsLead__(R) + (bsLead__(R) ? EB.RULES.floor.ritual.walkMs : 0);', 'bsLead = bsLead__;'],
+  ['E', 'бой начинается, пока враги ещё выходят', 'bsLead__ = bsLead; bsLead = () => 0;', 'bsLead = bsLead__;'],
+  ['E', 'часы нового боя идут, пока враги выходят, — этаж короче', 'bsFoesOut__ = bsFoesOut; bsFoesOut = (R, T, hold) => { bsFoesOut__(R, T, hold); R.bsHold = 0; };', 'bsFoesOut = bsFoesOut__;'],
+  ['E', 'класс выхода с карт врагов не снимается', 'bsEnterEnd__ = bsEnterEnd; bsEnterEnd = R => { if (R.enter && bsEnterAt(R) >= bsEnterMs(R)) R.enter = false; };', 'bsEnterEnd = bsEnterEnd__;'],
+  ['E', 'выход врагов не кончается к первому ходу', 'bsEnterEnd__ = bsEnterEnd; bsEnterEnd = () => {};', 'bsEnterEnd = bsEnterEnd__;'],
+  ['E', 'последний враг встаёт позже первого хода', 'bsFoeIn__ = bsFoeIn; bsFoeIn = (n, total) => Object.assign(bsFoeIn__(n, total), { foeMs: bsRit().enterMs });', 'bsFoeIn = bsFoeIn__;'],
+  ['E', 'у боя со своей сценой враги выходят дольше паузы до первого хода', 'bsEnterMs__ = bsEnterMs; bsEnterMs = () => bsRit().enterMs;', 'bsEnterMs = bsEnterMs__;'],
+  ['E', 'задняя колонка врагов выходит раньше передней', 'bsFoeOrder__ = bsFoeOrder; bsFoeOrder = ([k, r]) => k * BS_DATA.foeIn.col + r;', 'bsFoeOrder = bsFoeOrder__;'],
+  ['E', 'выход врагов длиннее пути до первого хода', 'EB.RULES.floor.ritual.enterMs__ = EB.RULES.floor.ritual.enterMs; EB.RULES.floor.ritual.enterMs += EB.RULES.floor.gapMs;', 'EB.RULES.floor.ritual.enterMs = EB.RULES.floor.ritual.enterMs__; delete EB.RULES.floor.ritual.enterMs__;'],
   ['E', 'затемнения нет', 'EB.RULES.floor.ritual.darkMs__ = EB.RULES.floor.ritual.darkMs; EB.RULES.floor.ritual.darkMs = 0;', 'EB.RULES.floor.ritual.darkMs = EB.RULES.floor.ritual.darkMs__; delete EB.RULES.floor.ritual.darkMs__;'],
   ['E', 'затемнение длиннее перехода', 'EB.RULES.floor.ritual.darkMs__ = EB.RULES.floor.ritual.darkMs; EB.RULES.floor.ritual.darkMs = EB.RULES.floor.gapMs;', 'EB.RULES.floor.ritual.darkMs = EB.RULES.floor.ritual.darkMs__; delete EB.RULES.floor.ritual.darkMs__;'],
   ['E', 'арена этажа не меняется', 'bsArenaOf__ = bsArenaOf; bsArenaOf = (b, f) => bsArenaOf__(b, 1);', 'bsArenaOf = bsArenaOf__;'],
@@ -683,7 +818,12 @@ const FXMUT = [
   ['отряд шагает в походе и при «меньше движения»', () => lawCss(sceneCss.replace('  .bt.bs-march .bt-side.h .bc:not(.dead){animation:none}', ''))],
   ['отряд не шагает в походе', () => lawCss(sceneCss.replace('.bt.bs-march .bt-side.h .bc:not(.dead){animation:walk .42s ease-in-out infinite alternate}', ''))],
   ['завеса затемнения — над шапкой', () => lawCss(sceneCss.replace(/(\.bs-veil\{[^}]*z-index:)3/, '$16'))],
-  ['враги прячутся при выходе при «меньше движения»', () => lawCss(sceneCss.replace('  .bt-side.f.enter .bc{animation:none}', '  .bt-side.f.enter .bc{animation-name:bsFade}'))],
+  ['враги прячутся при выходе при «меньше движения»', () => lawCss(sceneCss.replace('.bt-side.f.enter .bc{animation-name:bsFoeShow;', '.bt-side.f.enter .bc{animation-name:bsFade;'))],
+  ['при «меньше движения» враги идут из-за края', () => lawCss(sceneCss.replace(/  \.bt-side\.f\.enter \.bc\{animation-name:bsFoeShow;[^}]*\}/, ''))],
+  ['при «меньше движения» враги встают разом — длительность выхода не возвращена', () => lawCss(sceneCss.replace('animation-name:bsFoeShow;animation-duration:var(--bs-foe)!important', 'animation-name:bsFoeShow'))],
+  ['враги проявляются на месте, а не выходят из-за края', () => lawCss(sceneCss.replace(/@keyframes foeIn\{(?:[^{}]*\{[^{}]*\})*\}/, '@keyframes foeIn{0%{transform:translateY(14px) scale(.92);opacity:0}60%{opacity:1}100%{transform:translateY(0) scale(1);opacity:1}}'))],
+  ['враги выходят не из-за края поля — без своей колонки и ширины', () => lawCss(sceneCss.replace(/--bs-x:calc\(var\(--k\) \* var\(--colw\) \+ 100% \+ \d+px\)/, '--bs-x:120px'))],
+  ['шаг между картами врагов — числом в стиле, а не из данных', () => lawCss(sceneCss.replace('* var(--bs-step) - var(--bs-at,0ms))', '* 90ms)'))],
   ['закрытое окно карты остаётся на экране', () => lawCss(sceneCss.replace('.bt-insp.bs-insp[hidden]{display:none}', ''))],
 ];
 for (const [what, f] of FXMUT) {

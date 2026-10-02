@@ -284,11 +284,21 @@
 
 /* переход между этажами: отряд шагает — transform вместо свойства translate прежнего walk (index.html) */
 @keyframes walk{to{transform:translateY(-3px)}}
-/* выход врагов: из тени и снизу, по очереди — шаг между картами из RULES.floor.ritual.stepMs (--bs-step ставит battle-scene.js) */
-.bt-side.f.enter .bc{animation-delay:calc((var(--k) * 2 + var(--r)) * var(--bs-step,80ms))}
-@keyframes foeIn{0%{transform:translateY(14px) scale(.92);opacity:0}60%{opacity:1}100%{transform:translateY(0) scale(1);opacity:1}}
-/* поход на новый этаж (ADR-0048, bsTrip в battle-scene.js): фон — петля из трёх копий арены (третья — как первая), живые герои шагают,
-   лента и очередь бледнеют; завеса — затемнение и новая арена за ней. Завеса — над полем, шапка и линейка этажей — над завесой */
+/* выход врагов нового этажа (ADR-0048, правка автора 02.10.2026: «уже когда остановились двое врагов как бы выходят из-за экрана в
+   левую сторону и бой начинается»): отряд встал — карты врагов выходят из-за правого края поля и идут влево, к своим местам, шагом.
+   --bs-x — от места карты до места за краем поля: её колонка, её ширина и запас на отступ стороны и венец рамки. Передняя колонка
+   трогается первой, задняя — на --bs-col шагов позже, в колонке — сверху вниз. Шаг между картами, длительность, очередь и сколько
+   выхода уже прошло — из RULES.floor.ritual и BS_DATA.foeIn (--bs-step, --bs-foe, --bs-col, --bs-o0, --bs-at ставит battle-scene.js):
+   последняя карта встаёт к первому ходу боя. Без них анимации нет — карты стоят на местах.
+   Класс выхода снимается, когда враги встали (bsEnterEnd): его анимация сильнее удара, каста и гибели карты */
+.bt-side.f .bc{--bs-x:calc(var(--k) * var(--colw) + 100% + 24px)}
+.bt-side.f.enter .bc{animation:foeIn var(--bs-foe) linear both;animation-delay:calc(((1 - var(--k)) * var(--bs-col) + var(--r) - var(--bs-o0,0)) * var(--bs-step) - var(--bs-at,0ms))}
+@keyframes foeIn{0%{transform:translate(var(--bs-x),0)}25%{transform:translate(calc(var(--bs-x) * .72),-3px)}50%{transform:translate(calc(var(--bs-x) * .44),0)}75%{transform:translate(calc(var(--bs-x) * .17),-3px)}100%{transform:translate(0,0)}}
+/* «меньше движения»: враги не идут, а проявляются на своих местах — по очереди, тем же шагом */
+@keyframes bsFoeShow{0%{opacity:0}100%{opacity:1}}
+/* поход на новый этаж (ADR-0048, bsTrip в battle-scene.js): фон — петля из трёх копий арены (третья — как первая), живые герои шагают —
+   и после темноты, пока новая арена не встала на место; лента и очередь бледнеют; завеса — затемнение и новая арена за ней. Завеса —
+   над полем, шапка и линейка этажей — над завесой */
 .bt-bgs>.bg3{left:200%}
 .bt.bs-march .bt-side.h .bc:not(.dead){animation:walk .42s ease-in-out infinite alternate}
 .bt.bs-trip .bt-feed,.bt.bs-trip .bt-queue{opacity:.3;transition:opacity .3s}
@@ -357,7 +367,9 @@
   .fly,.fly.crit,.bs-call,.bs-call.ult,.bt-banner.bs-ban,.bs-rflash,.bs-loot{animation-duration:var(--bs-d,1s)!important}
   .bs-crest{animation:none}
   .bc.falling{animation:none}
-  .bt-side.f.enter .bc{animation:none}
+  /* выход врагов без движения: карты проявляются на своих местах; общее правило index.html гасит анимации мгновенно — длительность
+     выходу возвращает --bs-foe, иначе карты встали бы разом */
+  .bt-side.f.enter .bc{animation-name:bsFoeShow;animation-duration:var(--bs-foe)!important}
   /* поход на новый этаж без движения: отряд стоит; фон не едет, павшие гаснут, затемнение и новая арена — прозрачностью (bsTripKf) */
   .bt.bs-march .bt-side.h .bc:not(.dead){animation:none}
   .bc .face>.fxl.go{animation:none}
