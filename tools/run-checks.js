@@ -43,6 +43,7 @@ const BUILDERS = [
   [PY, 'tools/content-gen/cycle/climb.py'],
   ['node', 'tools/content-gen/cycle/build.js'],
   [PY, 'tools/content-gen/tables/build.py'],
+  [PY, 'tools/docs/adr_index.py'],
 ].map(([cmd, file, flag]) => [cmd, file, flag || '--check']);
 
 function findChecks(dir, acc = []) {
