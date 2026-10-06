@@ -14,7 +14,8 @@ const TIMEOUT_MS = 10 * 60 * 1000;   // одна команда — не дол�
 const TAIL = 15;                     // строк хвоста у упавшей команды
 
 /* сборщики с --check — в порядке шага 13 README, последним — шаг 14 (таблицы Excel). Третьим полем — свой флаг вместо --check:
-   --mut у сборщика наборов — проверка мутацией: законы Н1–Н9 (ADR-0050) ловят каждую из поломок */
+   --mut у сборщика наборов — проверка мутацией: законы Н1–Н9 (ADR-0050) ловят каждую из поломок; у проверки документов
+   tools/docs/check_docs.py — законы Д1–Д8 о шапках ADR, ссылках и карте (ADR-0053) */
 const BUILDERS = [
   [PY, 'tools/content-gen/abilities/library.py'],
   [PY, 'tools/content-gen/abilities/assign.py'],
@@ -44,6 +45,8 @@ const BUILDERS = [
   ['node', 'tools/content-gen/cycle/build.js'],
   [PY, 'tools/content-gen/tables/build.py'],
   [PY, 'tools/docs/adr_index.py'],
+  [PY, 'tools/docs/check_docs.py'],
+  [PY, 'tools/docs/check_docs.py', '--mut'],
 ].map(([cmd, file, flag]) => [cmd, file, flag || '--check']);
 
 function findChecks(dir, acc = []) {
