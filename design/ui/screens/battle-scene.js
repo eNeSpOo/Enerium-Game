@@ -171,34 +171,30 @@ function bsEff() {
   return BS_EFF;
 }
 const bsCap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
-/* что делает эффект с его числами: сила pow — б. п., у трофея и жадности — проценты добычи */
+/* словарь эффектов библиотеки (EN_ABILITIES.fx, ADR-0052): одно объяснение эффекта на описания способностей и на окно карты.
+   t — шаблон контроля, дебаффа и баффа: {p} — сила в процентах, {b} — порог удара, от которого спадает лёд, {e} — уклонение;
+   часть шаблона в квадратных скобках встаёт, только если у эффекта есть её число. Числа — из самого эффекта ядра: под «Крепким
+   льдом» порог удара свой, у ульты сила своя. base.breakPct — порог льда набора: он встаёт у эффекта без своего порога */
+const bsFx = k => (window.EN_ABILITIES && EN_ABILITIES.fx && EN_ABILITIES.fx[k]) || null;
+function bsFxLine(k, x) {
+  const F = bsFx(k); if (!F || !F.t) return '';
+  const B = F.base || {}, e = x.evadeDown ? bsP(x.evadeDown) : 0;
+  return F.t.replace(/\[([^\]]*)\]/, (_, s) => (e ? s : '')).replace('{p}', bsP(x.pow)).replace('{b}', x.breakPct || B.breakPct || '').replace('{e}', e);
+}
+/* что делает эффект с его числами: урон и лечение со временем — числами ядра; контроль, дебафф и бафф — словами словаря эффектов
+   с числами ядра; у трофея и жадности — проценты добычи */
 function bsStLine(x, E, rounds) {
-  const p = bsP(x.pow), per = rounds ? 'в начале каждого хода' : 'в каждую атаку';
+  const per = rounds ? 'в начале каждого хода' : 'в каждую атаку';
   switch (x.k) {
     case 'dot': return `${fmt(x.per * x.stacks)} урона ${per}${x.max > 1 ? ` · стаков ${x.stacks} из ${x.max}` : ''}`;
     case 'hot': return `+${fmt(x.per * x.stacks)} здоровья ${per}${x.max > 1 ? ` · стаков ${x.stacks} из ${x.max}` : ''}`;
-    case 'weak': return `−${p} % урона`;
-    case 'mark': return `+${p} % получаемого урона`;
-    case 'pierce': return `−${p} % физической защиты`;
-    case 'rend': return `−${p} % магической защиты`;
-    case 'slow': return `−${p} % скорости: ходит позже`;
-    case 'miss': return `+${p} % промахов`;
-    case 'chanceDown': return `шансы способностей и ульты −${p} %`;
-    case 'chanceUp': return `шансы способностей и ульты +${p} %`;
-    case 'break': return `−${p} % крит. урона${x.evadeDown ? `, −${bsP(x.evadeDown)} % уклонения` : ''}`;
-    case 'dmgUp': return `+${p} % урона`;
-    case 'guard': return `−${p} % получаемого урона`;
-    case 'evade': return `+${p} % уклонения`;
-    case 'lifesteal': return `${p} % урона лечит носителя`;
-    case 'healTaken': return `+${p} % получаемого лечения`;
-    case 'defUp': return `+${p} % физической и магической защиты`;
-    case 'critUp': return `+${p} % шанса крита`;
     case 'trophy': return `+${x.pow} % добычи при гибели`;
     case 'greed': return `павшие враги дают +${x.pow} % добычи`;
-    case 'freeze': return `не действует; лёд спадает от удара больше ${x.breakPct || 10} % здоровья`;
   }
-  return E ? E.desc : '';
+  return bsFxLine(x.k, x) || (E ? E.desc : '');
 }
+/* имена и пояснения эффектов наборов в запасных словарях index.html (ST_ICON) — тоже из словаря библиотеки: одно имя на игру */
+if (typeof ST_ICON !== 'undefined') for (const k in ST_ICON) { const F = bsFx(k); if (F) ST_ICON[k][1] = `${bsCap(F.n)}: ${F.gloss}`; }
 /* один эффект карты для показа: значок, имя, полезный ли, контроль ли, строка, раунды, стаки, кто наложил */
 function bsSt(x, u, rounds) {
   const L = bsEff(), sc = x.school === 'класс' ? 'Без школы' : x.school;
@@ -400,7 +396,8 @@ function bsInspHtml(R, u) {
     const fired = R.fired && R.fired.key === dkey(u) && R.view < R.fired.until ? R.fired.n : null;
     const rest = 10000 - (u.table || []).reduce((a, ab) => a + ab.ch, 0);
     abs = (u.table || []).map(ab => bsAbRow(ab, pctBp(ab.ch), fired === ab.n)).join('')
-      + bsAbRow({ n: 'Обычная атака', d: u.basicAll ? `По всем противникам, по ${u.basicAll} % главной характеристики` : 'По цели угрозы — 100 % главной характеристики', kind: 'dmg',
+      /* «атака» — тем же словом, что в описаниях способностей (ADR-0052): процент — от атаки карты, её главной характеристики */
+      + bsAbRow({ n: 'Обычная атака', d: u.basicAll ? `По всем противникам — по ${u.basicAll} % атаки` : 'По цели угрозы — 100 % атаки', kind: 'dmg',
         basic: u.basicAll ? 'all' : u.rank === 'rune' ? 'rune' : EB.fxOf(u, u.main) }, pctBp(rest), false);
   } else {
     abs = (u.abs || []).map(ab => bsAbRow(ab, null, false, { tag: `${ab.price} ${atkWord(ab.price)}` })).join('') + (u.ult ? bsAbRow(Object.assign({ ult: true }, u.ult), null, false, { tag: 'ульта' }) : '');

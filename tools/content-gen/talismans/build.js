@@ -127,7 +127,8 @@ const proc = (key, id, eff, ico, side, note) => L(key, id, { cat: 'fight', type:
   fx: `Обычная атака: {v} % шанс наложить на цель ${EFF[eff][4]} — ${EFF[eff][1]} — на ${RULES.procLeft} раунда`, note: note ? PROC_NOTE + ' ' + note : PROC_NOTE });
 const SEAL_NOTE = 'Имя: «Печать…» у автора → «Заговор…» (01.10.2026): «печать» — слово тайны, в циклах I–II не звучит (лестница спойлеров).';
 const seal = (name, id, eff, note) => L(name, id, { n: name.replace(/^Печать /, 'Заговор '), cat: 'seal', type: 'seal', ico: 'def-mag', eff, v: null, need: 'immune',
-  fx: `Защита от эффекта «${EFF[eff][0]}»: он не ложится на героя`, note: note ? note + ' ' + SEAL_NOTE : SEAL_NOTE });
+  /* заговор называет эффект и тут же говорит, что тот делает (ADR-0052): название без объяснения игроку ничего не говорит */
+  fx: `Эффект «${EFF[eff][0]}» (${EFF[eff][1]}) не ложится на героя`, note: note ? note + ' ' + SEAL_NOTE : SEAL_NOTE });
 const FAMS = [
   /* ---------- боевые: сквозные линейки ---------- */
   L('Боевые: Багряная чаша', 'cup', { cat: 'fight', type: 'line', ico: 'hp', fx: 'Вампиризм: герой лечится на {v} % нанесённого урона',

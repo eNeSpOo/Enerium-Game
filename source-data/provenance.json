@@ -50,10 +50,10 @@
   },
   {
     "table": "Enerium_Враги.xlsx",
-    "built": "2026-10-01",
+    "built": "2026-10-06",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "0c5b34e0458c2dd7e177227cabcb9df7cfbb9dd2661c58391edea662c41f6422",
-    "sha256": "4f3423229d10e755b9833b5751c23bd913b7cd98cc4683463ac841bb113517cc",
+    "data_sha256": "c8c7880958251f9fabd13b17e8546fe993ede72c88287886b47d59fc60735f65",
+    "sha256": "2a6695ef4fedb4324aa49d69c78612afc1e7556514606cbd0fd2083b556cd2d3",
     "sheets": {
       "Биомы": 12,
       "Мастерская форм": 14,
@@ -248,10 +248,10 @@
   },
   {
     "table": "Enerium_Способности_элементов.xlsx",
-    "built": "2026-10-02",
+    "built": "2026-10-06",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "4c35c2b16b230a2def6b10b199a3f58e344d14868e8e97965d0187cfc4843c32",
-    "sha256": "5f6009dbde29aeab02fcefa69a3b724967d698e720f66cd04af82505801b15b7",
+    "data_sha256": "278287cae2578fabe290cda428150457d66c44e77a31445c1e929b6dd6b351b5",
+    "sha256": "4c63427733bf7b9a30c29f90d330d09c14e52d6257b2ce831c0482ad0356dfc0",
     "sheets": {
       "Способности": 386,
       "Эффекты школ": 40,
@@ -277,10 +277,10 @@
   },
   {
     "table": "Enerium_Талисманы_Финал.xlsx",
-    "built": "2026-10-01",
+    "built": "2026-10-06",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "78f8bae1b86c14536b39065e940e6274bb73eefada91be502f3f6666b3bbdd0b",
-    "sha256": "056589efe65b9ece4df1ab2b8dc4691200ab9430403baf3750108e9ed12a9845",
+    "data_sha256": "fc47f842f7aaa0ba0ba68745c288f9114ce1322c9a2474d373461ba63c126e0a",
+    "sha256": "499ce1d8f035afff24d86ff6fcd62645c65b06e104a67f40cb56da1f17865a7f",
     "sheets": {
       "Талисманы": 359,
       "Линейки": 118,

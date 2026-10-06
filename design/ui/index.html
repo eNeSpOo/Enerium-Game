@@ -2531,6 +2531,19 @@ function heroDetail(h, o = {}) {
 function abRow({ icon, name, what = '', d = '', chip = '', lock = false, kind = 'act' }) {
   return `<div class="ab${lock ? ' lock' : ''}" data-k="${kind}"><span class="ab-ic">${icon}</span><div class="ab-t"><div class="ab-n"><b>${name}</b>${chip}</div>${what ? `<small class="ab-k">${what}</small>` : ''}${d ? `<p class="ab-x">${d}</p>` : ''}</div></div>`;
 }
+/* приёмы врага в карточке бестиария (§7.1: первая победа открывает активные навыки, пассивки и ульту): те же строки, что на странице
+   «Навыки» книги героя, — значок, имя (у врага своё — as), вид и описание. Описание — запись библиотеки или уникальная запись биома
+   в ядре (EB.lib): одно описание на все экраны, название эффекта в нём объяснено (ADR-0052). Набор — как у ядра (foeSrc): kits.js
+   или поле kit карты врага. Доли хода и числа боя — в окне карты в бою */
+function foeKitHtml(id) {
+  const C = EB.FOES[id], K = (window.EN_KITS && EN_KITS.foes && EN_KITS.foes[id]) || (C && C.kit) || null, L = EB.lib();
+  if (!K || !K.kit) return '';
+  const rows = K.kit.filter(x => L[x.id]).map(x => {
+    const a = L[x.id], art = (typeof bsAbArt === 'function' && bsAbArt(Object.assign({}, a, { ult: x.slot === 'ult' }), 40)) || (typeof abArt === 'function' && abArt(a, 40, ''));
+    return abRow({ kind: x.slot, icon: art || ic(x.slot === 'ult' ? 'crown' : abIcon(a)), name: `${schoolMark(a.school)}${x.as || a.n}`, what: AB_KIND[x.slot] || 'Способность', d: a.d || '' });
+  }).join('');
+  return rows ? `<span class="eyebrow">Приёмы</span><div class="rot-list foe-ab">${rows}</div>` : '';
+}
 /* ================== Призыв ==================
    Отряды и вкладки Призыва (hireView: за золото, за Энериум, за души) — screens/heroes.js. Здесь — строки списков Призыва и вкладка
    «За души»: её вход рулетки — rlCol (screens/roulette.js), входы отряда Эхо и каталога праха — hrSoulsSide (screens/heroes.js) */
@@ -2922,7 +2935,7 @@ const OV = {
       <div class="row" style="flex-wrap:wrap;gap:6px"><span class="chip ${f.g !== 'o' ? 'gold' : ''}">${f.g === 'e' ? ic('gem') : f.g === 'b' ? ic('crown') : ''}${f.type}</span>${el(f.el)}</div>
       ${k ? `<div class="hd-line"><span class="hd-cls">${CLS(f.cls, 18)}${f.cls}</span><span>${f.race}</span></div>` : ''}
       ${nums}
-      ${k ? `${st}${foldLore(f.desc, 'muted')}${f.tip ? `<p class="quote"><b>Совет старика</b>${f.tip}</p>` : ''}<p class="faint" style="font-size:13px">Повадки: ${f.tag}.</p>`
+      ${k ? `${st}${foldLore(f.desc, 'muted')}${f.tip ? `<p class="quote"><b>Совет старика</b>${f.tip}</p>` : ''}<p class="faint" style="font-size:13px">Повадки: ${f.tag}.</p>${foeKitHtml(f.id)}`
         : `<div class="rs-none"><b class="serif">Запись закрыта</b><p class="faint">До первой победы видны только мощь, здоровье, стихия и тип.</p></div>`}`;
     return sheet(k ? f.name : 'Неизвестный противник', body, `<button class="link" data-a="lorego" data-v="${f.id}">${ic('book')}В Летописи</button>`);
   },

@@ -18,6 +18,7 @@ const TAIL = 15;                     // строк хвоста у упавше�
    tools/docs/check_docs.py — законы Д1–Д8 о шапках ADR, ссылках и карте (ADR-0053) */
 const BUILDERS = [
   [PY, 'tools/content-gen/abilities/library.py'],
+  [PY, 'tools/content-gen/abilities/library.py', '--mut'],   // законы описаний О1–О4 (ADR-0052) ловят каждую поломку; число из данных меняет текст
   [PY, 'tools/content-gen/abilities/assign.py'],
   [PY, 'tools/content-gen/abilities/assign.py', '--mut'],
   [PY, 'tools/content-gen/recipes/tempo.py'],
