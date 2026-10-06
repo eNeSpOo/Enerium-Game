@@ -244,20 +244,28 @@ def m_title_num(w):
     w.docs[p] = sub1(w.docs[p], f'# ADR-{a["n"]}', '# ADR-9999')
 
 
+def add_replaces(text, b, what):
+    """Дописать пробу в «Заменяет» последнего ADR: в готовое поле, а если поля нет — новой строкой под датой.
+    Второе поле «Заменяет» разбор не видит: он берёт последнее, и мутация прошла бы мимо закона Д2."""
+    if re.search(r'^- \*\*Заменяет:\*\*', text, flags=re.M):
+        return re.sub(r'^(- \*\*Заменяет:\*\*.*)$', lambda m: m.group(1) + ' ' + what, text, count=1, flags=re.M)
+    return sub1(text, f'- **Дата:** {b["date"]}', f'- **Дата:** {b["date"]}\n- **Заменяет:** {what}')
+
+
 def m_new_replaces_silently(w):
     """Новое решение называет прежнее в «Заменяет», а статус прежнего молчит."""
     adrs, _ = w.adrs()
     b = adrs[-1]
     a = next(a for a in adrs if a['n'] not in b['repl'] and a['n'] != b['n'] and not any(f'ADR-{b["n"]}' in s for s in a['repl_lines']))
     p = 'docs/decisions/' + b['file']
-    w.docs[p] = sub1(w.docs[p], f'- **Дата:** {b["date"]}', f'- **Дата:** {b["date"]}\n- **Заменяет:** ADR-{a["n"]}, п. 1 — проба.')
+    w.docs[p] = add_replaces(w.docs[p], b, f'ADR-{a["n"]}, п. 1 — проба.')
 
 
 def m_replaces_missing(w):
     adrs, _ = w.adrs()
     b = adrs[-1]
     p = 'docs/decisions/' + b['file']
-    w.docs[p] = sub1(w.docs[p], f'- **Дата:** {b["date"]}', f'- **Дата:** {b["date"]}\n- **Заменяет:** ADR-9998 — проба.')
+    w.docs[p] = add_replaces(w.docs[p], b, 'ADR-9998 — проба.')
 
 
 def m_status_line_dropped(w):
