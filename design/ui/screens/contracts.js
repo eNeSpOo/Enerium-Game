@@ -1,8 +1,12 @@
 /* screens/contracts.js — «Неделя → Контракты» (§18 GDD). Договор — screens/model.js.
    Регистрирует: SCREENS.contracts — день и неделя сегментами шапки; раскладка — задания списком слева, сведения справа (награда,
    заверение, главное действие; слово автора 29.09.2026); листы OV.ctask (задание), OV.cpool (награда), OV.ccert (заверение),
-   OV.codds (шансы и замены), OV.ctgot (итог); действия ACT.ct*; итоги недели — в реестр WEEK_MODES (screens/week.js); раздел UI-кита
+   OV.codds (шансы и замены), OV.ctgot (итог), OV.ctrew (планки недели: личная лестница на все циклы и клановые ступени — вкладками);
+   действия ACT.ct*; итоги недели — в реестр WEEK_MODES (screens/week.js); раздел UI-кита
    через KIT_EXTRA; сценарии презентации. На карте экранов экран отмечен готовым — поле ready карточки «Контракты» (MAP в index.html).
+   Планки рейтинга (§18.7, ADR-0047): личные — ступени лестницы режима на все циклы, их собирает общий помощник Недели (EN_WEEK.steps),
+   рисует EN_WEEK.ladderHtml; клановые — три ступени по очкам клана (§18.1: «½ личный + клановый рейтинг»; ADR-0042): пороги и пересчёт
+   очков участников других циклов — EnContracts.clanPlanks и clanPts, доли — данные EN_CONTRACTS.clan. Сундуки — только в «Дарах».
    Своё состояние — S.contracts (заводится как S.bag); поля signed, tasks[].p, tasks[].goal и left читают Убежище, шахта и тик index.html.
    Данные — EN_CONTRACTS (design/ui/contracts.js, собирает tools/content-gen/contracts/build.js): каталог заданий, объём по редкости и циклу,
    награды, ставки, пороги планок. Алгоритм пула — EnContracts (tools/content-gen/contracts/offer.js, лежит там же).
@@ -22,7 +26,8 @@ const CT_DEMO = {
   day: 11, week: 2,                      // номера периодов демо: день цикла II и неделя цикла — сиды пулов
   weekSigned: { cert: true, prog: [6000, 10000, 2500, 0, 0, 0, 0, 0, 0, 0, 0, 0] },   // недельный — подписан и заверен; прогресс заданий, б. п. цели
   /* очки исполненных контрактов этой недели: три дневных за три прошлых дня — третья планка; неделя обычного — 1 896 (прогон контрактов,
-     econ), четвёртая планка — к концу недели с недельным */
+     econ), четвёртая планка — к концу недели с недельным. Клан демо (screens/clan.js) к этому дню взял первую клановую ступень:
+     очки участников — по их вкладу в резервуар за неделю */
   pts: 760,
   place: 57,                             // место в рейтинге контрактов, если нет в S.ranks
   past: { frac: 4000, pts: 1650, place: 41 },   // прошлая неделя для «Недели»: доля пути от взятой планки к следующей, б. п.; очки и место — если «Даров» нет
@@ -388,7 +393,12 @@ function ctSide(X) {
   const P = X.st === 'paid' && X.got ? X.got.P : ctPool(S, X), op = `ct${S.contracts.seq}`, pts = X.st === 'paid' && X.got ? X.got.pts : ctPts(X.tasks);
   const cap = X.st === 'paid' ? 'Получено' : X.cert ? `Награда ×${CT.rules.cert.mul} · заверено` : 'Если выполнить всё';
   const rew = `<button class="ct-rew" data-a="sheet" data-v="cpool:${X.t}" aria-label="Награда контракта: подробно"><span class="eyebrow">${cap}</span><span class="row ct-rewi">${ctRewShort(P)}</span><small class="ct-more">Вся награда ${ic('chev')}</small></button>`;
-  const stat = X.tasks.length ? `<div class="ct-ptsb"><b class="num">+${fmt(pts)}</b><small>${plural(pts, 'очко', 'очка', 'очков')} рейтинга · половина — в резервуар клана</small></div>` : '';
+  /* очки рейтинга — вход к планкам недели (лист OV.ctrew): что дают очки — личная лестница сундуков ключей и клановые ступени.
+     Есть задания — очки этого контракта; пустой или уже оплаченный — очки недели */
+  const wk = S.contracts.pts;
+  const stat = X.tasks.length && X.st !== 'paid'
+    ? `<button class="ct-ptsb" data-a="sheet" data-v="ctrew:me" aria-label="Планки недели: что дают очки рейтинга" title="Планки недели"><b class="num">+${fmt(pts)}</b><small>${plural(pts, 'очко', 'очка', 'очков')} рейтинга · половина — в резервуар клана</small>${ic('chev')}</button>`
+    : `<button class="ct-ptsb" data-a="sheet" data-v="ctrew:me" aria-label="Планки недели: что дают очки рейтинга" title="Планки недели"><b class="num">${fmt(wk)}</b><small>${plural(wk, 'очко', 'очка', 'очков')} за неделю · планки и сундуки</small>${ic('chev')}</button>`;
   let mid = '', main = '', line = '';
   if (X.st === 'draft') {
     mid = `<button class="ct-cb${X.cert ? ' on' : ''}" data-a="sheet" data-v="ccert:${X.t}">${ic('shield')}<span><b>${X.cert ? 'Заверено' : 'Заверение золотом'}</b><small>${X.cert ? `ставка ${fmt(X.stake)} золота` : 'награда ×' + CT.rules.cert.mul + ', очки те же'}</small></span>${ic('chev')}</button>`;
@@ -403,7 +413,7 @@ function ctSide(X) {
   } else if (X.st === 'paid') line = X.tasks.length ? `Получено: ${fmt(X.got.pts)} ${plural(X.got.pts, 'очко', 'очка', 'очков')} — половина в рейтинг, половина в резервуар клана.` : 'Пустой контракт закрыт.';
   else if (X.st === 'failed') line = `Не выполнено: ${X.tasks.filter(x => !ctDone(x)).map(x => ctK(x.kind).n.toLowerCase()).join(', ')}. Наград и очков нет${X.cert ? ', ставка сгорела' : ''}.`;
   else line = X.t === 'w' ? 'Неделя подсчитывается. Новый контракт — после подсчёта.' : 'Контракт не подписан — день прошёл без него.';
-  return `<div class="pnl ct-side">${rew}${X.st === 'paid' ? '' : stat}${mid}<div class="ct-go">${main}<p class="reason ct-line">${line}</p></div></div>`;
+  return `<div class="pnl ct-side">${rew}${stat}${mid}<div class="ct-go">${main}<p class="reason ct-line">${line}</p></div></div>`;
 }
 /* команде: прогресс, срок и новый период — без наблюдателя */
 function ctTeam(X) {
@@ -504,7 +514,45 @@ Object.assign(OV, {
       <p class="reason">+${fmt(G.pts)} ${plural(G.pts, 'очко', 'очка', 'очков')}: ${fmt(G.pts - G.half)} — в рейтинг, ${fmt(G.half)} — в резервуар клана.</p>`;
     return dialog('Контракт исполнен', body, `${G.chests.length ? '<button class="btn" data-a="go" data-v="craft:stock">В запасы</button>' : ''}<button class="btn go" data-a="close">Хорошо</button>`);
   },
+  /* планки недели (§18.7, ADR-0047) — два слоя вкладками одного листа: личные — лестница сундуков ключей сразу на все циклы
+     (EN_WEEK.ladderHtml), клан — три клановые ступени по очкам клана. Сундуки получают в «Дарах»; места — лист «Рейтинг» */
+  ctrew(o) {
+    const t = o.arg === 'clan' ? 'clan' : 'me', C = S.contracts, c = ctCyc(), W = window.EN_WEEK;
+    const tabs = `<div class="tabs ct-tabs" role="tablist" aria-label="Планки контрактов">${CT_REW.map(([k, l]) => `<button role="tab" aria-selected="${t === k}" data-a="sheet" data-v="ctrew:${k}">${l}</button>`).join('')}</div>`;
+    if (!CT || !C) return sheet('Планки контрактов', '<p class="faint">Нет данных контрактов.</p>');
+    if (!ctOpen()) return sheet('Планки контрактов', `<p class="rs-line">${ic('lock')}Контракты откроются на ${CT.rules.openLevel}-м уровне Странника.</p>`);
+    const stat = (v, s) => `<div class="stat"><b class="num">${v}</b><small>${s}</small></div>`;
+    let body = '', foot = '';
+    if (t === 'me') {
+      const P = ctPlanks(C.pts), got = P.filter(p => p.reached).length, R = window.EN_LOOTBOXES && EN_LOOTBOXES.modes.contract ? EN_LOOTBOXES.modes.contract.ladder : null;
+      const road = W && typeof W.ladderHtml === 'function' ? W.ladderHtml('contract', { steps: P, have: C.pts }) : '';
+      body = `<div class="row wk-stats">${stat(fmt(C.pts), `${plural(C.pts, 'очко', 'очка', 'очков')} недели`)}${road ? '' : stat(fmt(got), plural(got, 'планка взята', 'планки взяты', 'планок взято'))}</div>
+        ${road || `<div class="ct-rlist">${P.map(p => `<div class="ct-rrow"><span class="well itf ct-chest" data-r="${p.pay.reduce((a, g) => Math.max(a, g.r), 0)}" style="--s:26px">${chestPic('keys', p.pay.reduce((a, g) => Math.max(a, g.r), 0))}</span><span class="n">${fmt(p.need)}</span>${p.reached ? `<span class="chip spirit">${ic('check')}взята</span>` : '<span></span>'}</div>`).join('')}</div>`}
+        <p class="reason">Очки приходят, когда контракт исполнен целиком. Планка засчитывается сразу. Сундуки ключей получают в «Дарах», открывают — в запасах.</p>
+        ${TM(`Пороги своей полосы — EN_CONTRACTS.planks цикла ${ROMAN[c]}: ${(CT.planks[c] || []).map(fmt).join(' / ')}, соседние ×2; первая — такая, чтобы увлечённый в среднем брал пятую. Прогон: обычный — ${fmt(CT.econ[c].o.pts)} очков недели, увлечённый — ${fmt(CT.econ[c].e.pts)}.${R ? ` Лестница — EnLoot.ladder (ADR-0047): за верхней планкой полосы — планки следующей, первая — ×${R.next} от верхней, без перехода в новый цикл; сундук ступени — своей полосы.` : ''}`, 'p', 'reason')}`;
+      foot = `<button class="link" data-a="sheet" data-v="rank:Контракты">Рейтинг ${ic('chev')}</button><button class="btn go" data-a="sheet" data-v="gifts:me">Дары ${ic('chev')}</button>`;
+    } else {
+      const K = ctClan();
+      if (!K) {
+        body = `<p class="rs-line">${ic('shield')}Вы не в клане: клановые планки — вместе с кланом.</p>
+          <p class="reason">Ваши очки идут в личные планки и место. Вступившему клан засчитывает очки со следующей недели.</p>`;
+        foot = `<button class="btn go" data-a="go" data-v="clan">Найти клан ${ic('chev')}</button>`;
+      } else {
+        const got = K.rows.filter(r => r.reached).length;
+        body = `<div class="row wk-stats">${stat(fmt(K.pts), `${plural(K.pts, 'очко', 'очка', 'очков')} клана`)}${stat(fmt(K.mine), 'ваш вклад')}</div>
+          <p class="ct-cn">${ic('shield')}<b>${trEsc(S.clan.n)}</b><span class="faint">в счёте участников: ${fmt(K.n)}</span></p>
+          ${W && typeof W.clanHtml === 'function' ? W.clanHtml('contract', { steps: K.rows, have: K.pts }) : ''}
+          <p class="reason">Очки клана — сумма очков контрактов участников за неделю. Очки других циклов — в пересчёте на ваш цикл по первой личной планке: взяли одинаково планок — принесли поровну.</p>
+          <p class="reason">Сундуки ключей — каждому участнику: половину делит сервер по вкладу, половину — глава клана; журнал раздачи видят все. Вступивший приносит очки новому клану со следующей недели.</p>
+          ${TM(`Клановая планка k — участников × ⌊первая личная планка цикла игрока × ${CT.clan.x.map(x => String(x / CT.clan.per).replace('.', ',')).join(' / ')}⌋ (EN_CONTRACTS.clan.x, EnContracts.clanPlanks); очки участника другого цикла — × первая планка цикла игрока / первая планка его цикла (ADR-0042, EnContracts.clanPts). Клан модели — ${CT.clan.members} мест, играют ${CT.clan.activeBp / 100} %: пороги ${(CT.clan.needs[c] || []).map(fmt).join(' / ')}; клан обычных — на ${CT.econ[c].o.clanStep}-й (${fmt(CT.econ[c].o.clanPts)} очков недели), клан увлечённых — на ${CT.econ[c].e.clanStep}-й (${fmt(CT.econ[c].e.clanPts)}). Очки участников демо — по их вкладу в резервуар клана (screens/clan.js, resRaw): в резервуар идёт ${CT.rules.splitBp / 100} % очков. Взято ступеней: ${got}.`, 'p', 'reason')}`;
+        foot = `<button class="link" data-a="go" data-v="clan">Клан ${ic('chev')}</button><button class="btn go" data-a="sheet" data-v="gifts:clan">Дары · клан ${ic('chev')}</button>`;
+      }
+    }
+    return sheet('Планки контрактов', tabs + body, foot);
+  },
 });
+/* вкладки листа планок недели */
+const CT_REW = [['me', 'Личные'], ['clan', 'Клан']];
 
 /* ================== действия ================== */
 const ctRes = (r, ok) => { if (r.again) return; if (r.refuse) { toast(CT_WHY[r.refuse] ? CT_WHY[r.refuse]() : 'Нельзя'); return; } ok(r); };
@@ -561,11 +609,36 @@ Object.assign(ACT, {
 });
 
 /* ================== неделя: итоги в реестр WEEK_MODES (screens/week.js) ==================
-   Строка «Контракты» на экране «Неделя»: очки исполненных контрактов недели, личные планки с сундуками ключей, место и лидеры;
-   прошлая неделя — «Дары» и валюта недельного контракта. Пороги планок — EN_CONTRACTS.planks: соседние ×2 */
-function ctPlanks(pts) {
-  const c = ctCyc(), P = CT.planks[c] || [], L = window.EN_LOOTBOXES, ly = L && L.modes.contract ? L.modes.contract.layers.find(l => l.kind === 'plank' && !l.clan) : null;
-  return P.map((need, i) => ({ k: i + 1, need, pay: ly && ly.rows[i] ? ly.rows[i].cyc[c] || [] : [], reached: pts >= need }));
+   Строка «Контракты» на экране «Неделя»: очки исполненных контрактов недели, личные планки с сундуками ключей, клановые ступени,
+   место и лидеры; прошлая неделя — «Дары» и валюта недельного контракта. Пороги своей полосы — EN_CONTRACTS.planks: соседние ×2 */
+/* личные планки — ступени лестницы режима на все циклы (ADR-0047): пороги своей полосы — данные цикла, за её верхней планкой сразу,
+   без перехода в новый цикл, идут планки следующих полос — множителем первой планки; сундук ступени — своей полосы. Ступени собирает
+   общий помощник Недели (EN_WEEK.steps); без него — планки своего цикла. Каждая: { k, band, i, need, pay, reached, cap } */
+function ctPlanks(pts, s = S) {
+  const c = ctCyc(s), P = CT.planks[c] || [], W = window.EN_WEEK;
+  if (W && typeof W.steps === 'function') { const st = W.steps('contract', { have: pts, needs: P, cycle: c }); if (st.length) return st; }
+  const L = window.EN_LOOTBOXES, ly = L && L.modes.contract ? L.modes.contract.layers.find(l => l.kind === 'plank' && !l.clan) : null;
+  return P.map((need, i) => ({ k: i + 1, band: c, i: i + 1, need, pay: ly && ly.rows[i] ? ly.rows[i].cyc[c] || [] : [], reached: pts >= need, cap: false }));
+}
+/* верхняя планка своей полосы — мерка лидеров демо */
+const ctOwnTop = (s = S) => { const P = CT.planks[ctCyc(s)] || []; return P.length ? P[P.length - 1] : 0; };
+/* цикл участника клана — в пределах циклов контрактов */
+const ctCycOf = c => Math.max(CT.rules.cycles[0], Math.min(CT.rules.cycles[CT.rules.cycles.length - 1], c));
+/* очки контрактов участника за неделю — по его вкладу в резервуар клана: в резервуар идёт доля очков splitBp (§18.1) */
+const ctFromRes = r => { const k = CTB - CT.rules.splitBp; return k > 0 && r > 0 ? Math.floor(r * CTB / k) : 0; };
+/* клан в рейтинге контрактов (§18.1: «½ личный + клановый рейтинг»; ADR-0042, ADR-0047): очки клана — сумма очков контрактов участников
+   за неделю, у других циклов — в очках цикла игрока по первым личным планкам (EnContracts.clanPts); ступень k — участников × первая
+   личная планка цикла игрока × доля (EnContracts.clanPlanks, EN_CONTRACTS.clan.x). В счёте — игрок и участники, вступившие до этой
+   недели: вступивший приносит очки со следующей (§25.3). Очки участников демо — по их вкладу в резервуар (screens/clan.js, resRaw);
+   список участников клан заводит свой файл — без него в счёте только игрок. Без клана — null */
+function ctClan(s = S) {
+  const C = s.clan;
+  if (!CT.clan || typeof CTE.clanPlanks !== 'function' || !C || C.in === false || !s.contracts) return null;
+  const c = ctCyc(s), mine = s.contracts.pts, L = Array.isArray(C.members) ? C.members.filter(m => m && !m.me && m.weeks !== 0) : [];
+  const n = Array.isArray(C.members) && C.members.length ? L.length + 1 : Math.max(1, C.mem || 1);
+  const pts = mine + L.reduce((a, m) => a + CTE.clanPts(CT, ctFromRes(m.resRaw), Number.isInteger(m.cyc) ? ctCycOf(m.cyc) : c, c), 0);
+  const needs = CTE.clanPlanks(CT, n, c), W = window.EN_WEEK;
+  return { n, pts, mine, needs, rows: W && typeof W.clanSteps === 'function' ? W.clanSteps('contract', { have: pts, needs, cycle: c }) : [] };
 }
 const ctTop = (need, t) => CT_DEMO.names.map((n, j) => [n, Math.floor(need * (t === 'past' ? CT_DEMO.top[j] * 2 : CT_DEMO.top[j]) / CTB)]);
 (window.WEEK_MODES = window.WEEK_MODES || []).push({
@@ -573,15 +646,16 @@ const ctTop = (need, t) => CT_DEMO.names.map((n, j) => [n, Math.floor(need * (t 
   now() {
     if (!CT || !S.contracts) return { lock: 'нет данных' };
     if (!ctOpen()) return { lock: `откроются на ${CT.rules.openLevel}-м уровне` };
-    const pts = S.contracts.pts, pk = ctPlanks(pts), r = (S.ranks || []).find(x => x[0] === 'Контракты'), place = pts ? (r && Number.isInteger(r[1]) ? r[1] : CT_DEMO.place) : null;
+    const pts = S.contracts.pts, pk = ctPlanks(pts), K = ctClan(), r = (S.ranks || []).find(x => x[0] === 'Контракты'), place = pts ? (r && Number.isInteger(r[1]) ? r[1] : CT_DEMO.place) : null;
     const D = S.contracts.day, W = S.contracts.week;
     const alert = D.st === 'draft' ? 'Дневной контракт не подписан' : D.st === 'done' || W.st === 'done' ? 'Награда контракта ждёт' : '';
-    return { place, points: pts, planks: pk, top: ctTop(pk.length ? pk[pk.length - 1].need : 0, 'now'), alert,
+    /* личные планки — ступени лестницы на все циклы; клановые — взятые кланом ждут подсчёта недели и распределения («Дары», bag.js) */
+    return { place, points: pts, planks: pk, clanPlanks: K ? K.rows : [], clanHave: K ? K.pts : null, top: ctTop(ctOwnTop(), 'now'), alert,
       note: `Недельный: ${{ draft: 'не подписан', signed: `выполнено ${W.tasks.filter(ctDone).length} из ${W.tasks.length}`, done: 'исполнен', paid: 'награда получена', failed: 'сорван', closed: 'приём закрыт' }[W.st]}` };
   },
   past() {
     if (!CT || !S.contracts || !ctOpen()) return { lock: 'нет данных' };
-    const c = ctCyc(), P0 = CT.planks[c] || [];
+    const c = ctCyc(), P0 = ctPlanks(0).map(p => p.need);
     /* итог прошлой недели — тот, за который платят «Дары» (bag.js): место — из выплаты за место, очки — в пределах взятых планок */
     const rows = typeof darRows === 'function' && S.zp ? darRows(S, 'prev').filter(p => p.id === 'contract') : [];
     const k = rows.filter(p => p.kind === 'plank').length, placeRow = rows.find(p => p.kind === 'place' && p.place);
@@ -590,7 +664,7 @@ const ctTop = (need, t) => CT_DEMO.names.map((n, j) => [n, Math.floor(need * (t 
     const place = placeRow ? placeRow.place : CT_DEMO.past.place;
     /* недельный контракт прошлой недели — тот же алгоритм на сиде прошлого периода, заверенный */
     const prev = CTE.offer(CT, ctSpec(S, 'w', 'неделя-' + (S.contracts.weekNo - 1)), ctPoolSize()), P = CTE.reward(CT, 'w', c, prev, CT.rules.cert.mul);
-    return { place, points: pts, planks: pk, top: ctTop(pk.length ? pk[pk.length - 1].need : 0, 'past'),
+    return { place, points: pts, planks: pk, top: ctTop(ctOwnTop(), 'past'),
       rewards: rows.map(p => ({ label: p.label, box: p.box, groups: p.groups.map(g => ({ r: g.r, count: g.count, win: g.win })), st: p.st, cat: p.cat, kind: p.kind })),
       cur: [['keys', P.keys], ['gold', P.gold], ['spirit', P.spirit], ['enerium', P.en]].filter(x => x[1] > 0) };
   },
@@ -618,7 +692,7 @@ function ctKitHtml() {
       <div class="k-air-r"><b>Награда задания · неделя, цикл ${ROMAN[c]}</b>${rew('w')}<small>Недельный — ещё сундук ключей редкости самого редкого задания.</small></div>
     </div>
     <div class="k-air-r"><b>Группы дел — в контракте одна на группу</b><div class="row" style="flex-wrap:wrap;gap:6px">${kinds}</div></div>
-    ${TM(`<p class="k-note">Прогон калькулятора, цикл ${ROMAN[c]}: обычный исполняет дневной в ${e.o.dayDoneBp / 100} % дней, недельный — в ${e.o.weekDoneBp / 100} %; ключей в неделю со всех источников — ${fmt(e.o.keys)} из капа ${fmt(e.capKeys)}; очков — ${fmt(e.o.pts)}, Энериума — ${fmt(e.o.en)} в неделю. Увлечённый — ${fmt(e.e.keys)} ключей, ${fmt(e.e.pts)} очков. Плательщик при том же времени — не быстрее ×${e.x17 / 100}. Пороги планок — ${CT.planks[c].map(fmt).join(' / ')}.</p>`)}
+    ${TM(`<p class="k-note">Прогон калькулятора, цикл ${ROMAN[c]}: обычный исполняет дневной в ${e.o.dayDoneBp / 100} % дней, недельный — в ${e.o.weekDoneBp / 100} %; ключей в неделю со всех источников — ${fmt(e.o.keys)} из капа ${fmt(e.capKeys)}; очков — ${fmt(e.o.pts)}, Энериума — ${fmt(e.o.en)} в неделю. Увлечённый — ${fmt(e.e.keys)} ключей, ${fmt(e.e.pts)} очков. Плательщик при том же времени — не быстрее ×${e.x17 / 100}. Пороги планок своей полосы — ${CT.planks[c].map(fmt).join(' / ')}; дальше — лестница на все циклы (ADR-0047), лист «Планки контрактов».${CT.clan ? ` Клановые ступени — участников × ${CT.clan.x.map(x => String(x / CT.clan.per).replace('.', ',')).join(' / ')} первой личной планки: клан модели из ${CT.clan.members} — ${(CT.clan.needs[c] || []).map(fmt).join(' / ')}; клан обычных — на ${e.o.clanStep}-й, клан увлечённых — на ${e.e.clanStep}-й.` : ''}</p>`)}
   </section>`;
 }
 /* перерисовка раздела при смене режима «Игрок / Команда» */
@@ -646,4 +720,6 @@ FLOWS.push(
       if (D.st === 'draft' && D.tasks.length) { CT_SRV.sign(`ct${S.contracts.seq}`, 'd'); CT_SRV.note(D.tasks[0].kind, D.tasks[0].goal); }
       D.left = 0; CT_SRV.expire();
     }],
+  ['Контракты · планки недели', 'Что дают очки рейтинга: личная лестница сундуков ключей сразу на все циклы; вкладка «Клан» — три клановые ступени по очкам клана',
+    () => { S.route = 'contracts'; S.seg.contracts = 'week'; S.overlay = { t: 'ctrew', arg: 'clan' }; }],
 );

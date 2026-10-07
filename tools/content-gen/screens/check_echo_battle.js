@@ -8,7 +8,8 @@
    3. Бой кончается, когда пал главный враг (RULES.echo.endOnMain).
    4. Две ульты в наборе: обе в таблице, обе срабатывают; своя доля ch у места набора — мимо деления.
    5. Обычная атака по всем — basic: { tgt: 'all', coef } (echo-foes.js), basicAll: число или true: бьёт всех живых, угрозы не создаёт.
-   6. Неприязнь: +RULES.aversionBp урона по расе цели — ударом и уроном по времени; по чужой расе — нет; число как в roster.js.
+   6. Неприязнь — по циклу героя (RULES.aversion.byCycleBp, ADR-0054): прибавка урона по расе цели — ударом и уроном по времени;
+      по чужой расе — нет. Расы: враги Мастерской форм — саганы, Многоликий — Забытый в любую неделю; неприязнь по ним срабатывает.
    7. Рунный страж: каждая его обычная атака, даже промах, отнимает у предела раунд, текущий доигрывается.
    8. Приёмы из echo-foes.js: cast — способность по реакции вне очереди, ctrlBypass — контроль мимо иммунитета,
       lifeSave — спасение раз за жизнь цели, помнится между атаками; способности вне библиотеки — EB.addLib.
@@ -19,7 +20,7 @@
    9.  Девять недель × шесть циклов × 14 ступеней, Многоликий и призванные враги: бой собирается и идёт до конца — дважды:
        на демо со скрытыми echo-foes.js и echo-rules.js и на данных; раунды — всегда из ядра; на данных уровень, здоровье по формуле
        правил, души и очки — из echo-rules.js, ранг, набор и защитники — из echo-foes.js. Призванный враг — тип по силе из recipes.js
-       (e, b, u, f, ADR-0039): раунды, ранг и иммунитет его типа; Многоликий — ранг Забытого, свой набор, один, без свиты (ответ автора 01.10.2026).
+       (e, b, u, a, ADR-0039): раунды, ранг и иммунитет его типа; Многоликий — ранг Пробуждённого, свой набор, один, без свиты (ответ автора 01.10.2026).
    10. Атака: душа один раз, повтор того же номера — ничего; бой одной сценой; просмотр — тот же бой, что итог; «Пропустить» —
        итог со статистикой, отнятым здоровьем и очками; здоровье переходит в следующую атаку; неприязнь героя доходит до боя.
        Многоликий — вершина, бьётся один, без свиты (ADR-0039); ресурс «Многоликий» привязан к своей неделе.
@@ -88,15 +89,17 @@ function helpers() {
             const F = E.fight(x, CK.ids(), 1), o = F.o, L = EB.lib(), need = RU.echo.guards[x.g];
             out.specs++;
             if (o.guards.length !== need) fail(`${key}: защитников ${o.guards.length}, по правилу — ${need}`);
-            if (x.kind === 'many' && (o.guards.length !== 0 || o.main.rank !== 'forgotten')) fail(`${key}: Многоликий — ранг ${o.main.rank}, защитников ${o.guards.length}; нужно forgotten и ни одного: он без свиты (ADR-0039, ответ автора)`);
-            if (x.kind === 'craft') {   // тип по силе (ADR-0039): элита, босс, Убер или Забытый — раунды, ранг и иммунитет своего типа
+            if (x.kind === 'many' && (o.guards.length !== 0 || o.main.rank !== 'awakened')) fail(`${key}: Многоликий — ранг ${o.main.rank}, защитников ${o.guards.length}; нужно awakened и ни одного: он без свиты (ADR-0039, ответ автора)`);
+            if (x.kind === 'craft') {   // тип по силе (ADR-0039): элита, босс, Убер или Пробуждённый — раунды, ранг и иммунитет своего типа
               const fbx = RX.drops.craftBosses.find(y => y.id === x.fid);
-              if (!fbx || !['e', 'b', 'u', 'f'].includes(x.g) || fbx.g !== x.g) fail(`${key}: тип призванного «${x.g}» не из recipes.js`);
+              if (!fbx || !['e', 'b', 'u', 'a'].includes(x.g) || fbx.g !== x.g) fail(`${key}: тип призванного «${x.g}» не из recipes.js`);
               if (o.main.rank !== RU.echo.kind[x.g]) fail(`${key}: ранг ${o.main.rank}, а у типа «${x.g}» — ${RU.echo.kind[x.g]}`);
             }
             if (o.maxRounds !== RU.echo.rounds[x.g] || o.maxRounds !== E.rounds(x.g)) fail(`${key}: раундов ${o.maxRounds}, в ядре — ${RU.echo.rounds[x.g]}`);
             if (o.main.maxHp !== x.max || o.main.hp !== x.hp) fail(`${key}: здоровье главного врага не из цели`);
-            if (x.kind !== 'craft' && [o.main].concat(o.guards).some(u => u.race !== w.race)) fail(`${key}: раса врагов не недели`);
+            /* раса карт — раса недели; Многоликий по расе — Забытый в любую неделю (ADR-0054): из данных, без них — демо FT.manyRace */
+            if (x.kind === 'step' && [o.main].concat(o.guards).some(u => u.race !== w.race)) fail(`${key}: раса врагов не недели`);
+            if (x.kind === 'many' && o.main.race !== 'Забытые') fail(`${key}: Многоликий — раса «${o.main.race}», а по слову автора он Забытый`);
             if (new Set(o.guards.map(u => u.id)).size !== o.guards.length || o.guards.some(u => u.id === o.main.id)) fail(`${key}: защитники повторяются`);
             for (const u of [o.main].concat(o.guards)) {
               if (!RU.cls[u.cls]) fail(`${key}: класс «${u.cls}» не знаком ядру`);
@@ -165,18 +168,20 @@ function suite() {
   const spec = (g, seed, main, guards) => ({ seed, g, main: main || MAIN(), guards: guards || (RU.echo.guards[g] ? GUARDS() : []) });
 
   /* 1. состав по типу, раунды, вход здоровья, детерминизм, итог сходится с боем */
-  for (const [g, n] of [['o', 0], ['o', 3], ['e', 5], ['m', 1], ['m', 4], ['f', 5]]) { let threw = false; try { EB.echoBattle(HEROES(), { seed: 1, g, main: MAIN(), guards: GUARDS().concat(GUARDS()).slice(0, n) }); } catch (e) { threw = true; } if (!threw) fail(`ядро: бой Эхо «${g}» собрался с ${n} защитниками`); }
+  for (const [g, n] of [['o', 0], ['o', 3], ['e', 5], ['m', 1], ['m', 4], ['a', 5]]) { let threw = false; try { EB.echoBattle(HEROES(), { seed: 1, g, main: MAIN(), guards: GUARDS().concat(GUARDS()).slice(0, n) }); } catch (e) { threw = true; } if (!threw) fail(`ядро: бой Эхо «${g}» собрался с ${n} защитниками`); }
   /* раунды — одна таблица ядра на все режимы: RULES.rounds.by; Эхо — выборка по типу главного врага. Слово автора 01.10.2026 (ADR-0039):
      «на обычных врагов пусть будет 10 раундов, на элитных 15 раундов, на боссов 20 раундов, на рунных боссов 25 раундов, на Уберов 30
      раундов… забытый… будет иметь 50 раундов… ну и на КБ — 35 раундов»; «Пусть многоликий и будет 1 из забытых» — его раунды — ссылка
-     на Забытого. Арена и Лига — 25: автор их не менял. Призванного «крафтового» типа больше нет */
-  const BY = { o: 10, e: 15, b: 20, rune: 25, uber: 30, clan: 35, forgotten: 50, pvp: 25 };
+     на Пробуждённого (так тип зовётся с 06.10.2026, ADR-0054). Две верхние ступени автор поменял местами 06.10.2026: «У КБ - 50 раундов,
+     Пробуждённого - 35» (ADR-0054, п. 14). Арена и Лига — 25: автор их не менял. Призванного «крафтового» типа больше нет.
+     Порядок типов и иммунитет — закон лестницы в tools/content-gen/abilities/check_core.js */
+  const BY = { o: 10, e: 15, b: 20, rune: 25, uber: 30, awakened: 35, clan: 50, pvp: 25 };
   for (const k in BY) if (RU.rounds.by[k] !== BY[k]) fail(`ядро: RULES.rounds.by.${k} = ${RU.rounds.by[k]}, по слову автора — ${BY[k]}`);
-  if (RU.rounds.by.many !== 'forgotten' || EB.roundsOf('many') !== BY.forgotten) fail(`ядро: Многоликий — ${RU.rounds.by.many} (${EB.roundsOf('many')} раундов), по слову автора он один из Забытых — ${BY.forgotten}`);
+  if (RU.rounds.by.many !== 'awakened' || EB.roundsOf('many') !== BY.awakened) fail(`ядро: Многоликий — ${RU.rounds.by.many} (${EB.roundsOf('many')} раундов), по слову автора его тип — Пробуждённый — ${BY.awakened}`);
   if ('craft' in RU.echo.kind || 'craft' in RU.echo.guards) fail('ядро: в RULES.echo остался тип craft — «крафтового босса» как типа нет (ADR-0039)');
   /* защитников: четверо у всех, у Многоликого — ни одного: «Сделай чтобы многоликий был без свиты, и тогда его сразу же смогут убивать»
-     (ответ автора 01.10.2026, ADR-0039); пробуждённые — тоже Забытые — свиту сохраняют */
-  const WANT = { o: BY.o, e: BY.e, b: BY.b, u: BY.uber, f: BY.forgotten, m: BY.forgotten }, GW = { o: 4, e: 4, b: 4, u: 4, f: 4, m: 0 };
+     (ответ автора 01.10.2026, ADR-0039); пробуждённые из призыва — тот же тип — свиту сохраняют */
+  const WANT = { o: BY.o, e: BY.e, b: BY.b, u: BY.uber, a: BY.awakened, m: BY.awakened }, GW = { o: 4, e: 4, b: 4, u: 4, a: 4, m: 0 };
   for (const g in WANT) { if (RU.echo.rounds[g] !== WANT[g]) fail(`ядро: RULES.echo.rounds.${g} = ${RU.echo.rounds[g]}, по заданию — ${WANT[g]}`); if (RU.echo.guards[g] !== GW[g]) fail(`ядро: RULES.echo.guards.${g} = ${RU.echo.guards[g]}, а нужно ${GW[g]}`); }
   if (RU.rounds.rune !== BY.rune) fail(`ядро: RULES.rounds.rune = ${RU.rounds.rune}, а в таблице — ${BY.rune}`);
   for (const g of Object.keys(RU.echo.rounds)) for (let seed = 1; seed <= 12; seed++) {
@@ -276,29 +281,62 @@ function suite() {
 
   /* 6. расовая неприязнь героя Эхо */
   {
-    const R = window.EN_ROSTER;
-    if (R && R.rules && R.rules.aversionBp !== RU.aversionBp) fail(`ядро: неприязнь в ядре ${RU.aversionBp} б. п., в составе героев ${R.rules.aversionBp}`);
-    const bp = RU.aversionBp, firstHit = (b, kind) => { while (!b.over) { const a = EB.step(b); if (a) for (const e of a.ev) if (e.k === kind && e.s && e.s.side === 0 && e.t.side === 1 && e.v > 0) return e; } return null; };
+    /* неприязнь — по циклу героя (слово автора 06.10.2026, ADR-0054): «у финального 5 героя это 50% у 1 героя 10% за место 20% как сейчас» —
+       герой Эхо цикла II — 10 %, III — 20 %, IV — 30 %, V — 40 %, VI — 50 %. Числа — правило ядра RULES.aversion.byCycleBp; прежних
+       20 % у всех нет ни в ядре, ни в составе героев */
+    const R = window.EN_ROSTER, AV = { 2: 1000, 3: 2000, 4: 3000, 5: 4000, 6: 5000 };
+    if (JSON.stringify(RU.aversion && RU.aversion.byCycleBp) !== JSON.stringify(AV)) fail(`ядро: неприязнь по циклу героя ${JSON.stringify(RU.aversion && RU.aversion.byCycleBp)}, по слову автора — ${JSON.stringify(AV)}`);
+    if ('aversionBp' in RU || (R && R.rules && 'aversionBp' in R.rules)) fail('неприязнь: в правилах ядра или состава героев осталось прежнее число — 20 % у всех');
+    for (const [c, want] of Object.entries(AV)) if (EB.aversionBp(+c) !== want) fail(`ядро: EB.aversionBp(${c}) = ${EB.aversionBp(+c)}, а в правилах ${want}`);
+    if (EB.aversionBp(1) !== 0 || EB.aversionBp(7) !== 0) fail('ядро: неприязнь у героя вне циклов II–VI');
+    const firstHit = (b, kind) => { while (!b.over) { const a = EB.step(b); if (a) for (const e of a.ev) if (e.k === kind && e.s && e.s.side === 0 && e.t.side === 1 && e.v > 0) return e; } return null; };
     for (let seed = 1; seed <= 12; seed++) {
-      const base = firstHit(EB.echoBattle(HEROES(), spec('e', seed)), 'hit'), av = firstHit(EB.echoBattle(HEROES(null, { avers: { race: 'Эльфы' } }), spec('e', seed)), 'hit');
-      const no = firstHit(EB.echoBattle(HEROES(null, { avers: { race: 'Звери' } }), spec('e', seed)), 'hit');
+      const cyc = 2 + seed % 5, bp = AV[cyc];   // герой цикла II–VI: база героя — по его циклу, поэтому и удар без неприязни берётся у героя того же цикла
+      const base = firstHit(EB.echoBattle(HEROES(null, { cyc }), spec('e', seed)), 'hit'), av = firstHit(EB.echoBattle(HEROES(null, { cyc, avers: { race: 'Эльфы' } }), spec('e', seed)), 'hit');
+      const no = firstHit(EB.echoBattle(HEROES(null, { cyc, avers: { race: 'Звери' } }), spec('e', seed)), 'hit');
       if (!base || !av || !no) { fail(`ядро · неприязнь · сид ${seed}: нет удара героя`); continue; }
       if (av.s.key !== base.s.key || av.t.key !== base.t.key) { fail(`ядро · неприязнь · сид ${seed}: первый удар другой`); continue; }
-      if (av.v !== Math.floor(base.v * (10000 + bp) / 10000) || !av.av) fail(`ядро · неприязнь · сид ${seed}: ${base.v} → ${av.v}, ждали ${Math.floor(base.v * (10000 + bp) / 10000)}`);
+      if (av.s.avers.bp !== bp) fail(`ядро · неприязнь · сид ${seed}: у героя цикла ${cyc} прибавка ${av.s.avers.bp} б. п., по правилу — ${bp}`);
+      if (av.v !== Math.floor(base.v * (10000 + bp) / 10000) || !av.av) fail(`ядро · неприязнь · сид ${seed}: герой цикла ${cyc}: ${base.v} → ${av.v}, ждали ${Math.floor(base.v * (10000 + bp) / 10000)}`);
       if (no.v !== base.v || no.av) fail(`ядро · неприязнь · сид ${seed}: по чужой расе ${no.v} вместо ${base.v}`);
-      const own = EB.echoBattle(HEROES(null, { avers: { race: 'Эльфы', bp: 5000 } }), spec('e', seed)).u[0][0].avers;
+      const own = EB.echoBattle(HEROES(null, { cyc, avers: { race: 'Эльфы', bp: 5000 } }), spec('e', seed)).u[0][0].avers;
       if (!own || own.bp !== 5000) fail('ядро: своя прибавка неприязни героя не взята');
       out.avers++;
     }
     const dotKit = kitOf(['Огонь.dot.one'], 10000, 0), dot = (extra, seed) => firstHit(EB.echoBattle(HEROES(dotKit, extra), spec('e', seed)), 'dot');
     let dots = 0;
     for (let seed = 1; seed <= 12; seed++) {
-      const d0 = dot(null, seed), d1 = dot({ avers: { race: 'Эльфы' } }, seed);
+      const cyc = 2 + seed % 5, bp = AV[cyc], d0 = dot({ cyc }, seed), d1 = dot({ cyc, avers: { race: 'Эльфы' } }, seed);
       if (!d0 || !d1 || d0.s.key !== d1.s.key || d0.t.key !== d1.t.key) continue;
       dots++;
-      if (d1.v < Math.floor(d0.v * (10000 + bp) / 10000) - 1 || d1.v <= d0.v) fail(`ядро · неприязнь · сид ${seed}: урон по времени ${d0.v} → ${d1.v}`);
+      /* прибавка ложится на стак и округляется вниз у каждого: за тик теряется не больше единицы на стак */
+      if (d1.v < Math.floor(d0.v * (10000 + bp) / 10000) - (L()['Огонь.dot.one'].max || 1) || d1.v <= d0.v) fail(`ядро · неприязнь · сид ${seed}: урон по времени ${d0.v} → ${d1.v}`);
     }
     if (!dots) fail('ядро: урон по времени героя ни разу не сработал');
+    /* расы (слова автора 06.10.2026, ADR-0054): враги Мастерской форм — саганы — и неприязнь героев недели Саганов по ним работает;
+       Многоликий по расе — Забытый в любую неделю — и по нему работает неприязнь героев недели Забытых, а героев его недели — нет */
+    for (const [id, f] of Object.entries(EB.FOES)) if (/^[oebg]\d$/.test(id) && f.race !== 'Саганы') fail(`Мастерская форм: у карты ${id} «${f.name}» раса «${f.race}», а враги Мастерской — саганы`);
+    /* карточка бестиария говорит ту же расу, что карта ядра: игрок читает расу там, а неприязнь бьёт по расе карты */
+    { const best = initialState().foes || [], shop = best.filter(f => /^[oebg]\d$/.test(f.id));
+      if (shop.length !== 14) fail(`бестиарий Мастерской: записей ${shop.length}, а врагов 14`);
+      for (const f of best) { const c = EB.FOES[f.id]; if (!c) fail(`бестиарий: записи ${f.id} «${f.name}» нет в ядре`); else if (f.race !== c.race) fail(`бестиарий: у «${f.name}» раса «${f.race}», а у карты ядра — «${c.race}»`); } }
+    let sag = 0;
+    for (const floor of [1, 5, 10, 15]) for (const [race, want] of [['Саганы', true], ['Эльфы', false]]) {
+      const cyc = 3, b = EB.floorBattle(HEROES(null, { cyc, lvl: 30, avers: { race } }), 'b1', floor, null, 'rounds'), e = firstHit(b, 'hit');
+      if (!e) { fail(`Мастерская · этаж ${floor}: нет удара героя`); continue; }
+      if (!!e.av !== want) fail(`Мастерская · этаж ${floor}: неприязнь к расе «${race}» по врагу расы «${e.t.race}» — ${e.av ? 'сработала' : 'не сработала'}`);
+      if (want) { const e0 = firstHit(EB.floorBattle(HEROES(null, { cyc, lvl: 30 }), 'b1', floor, null, 'rounds'), 'hit'); if (!e0 || e.v !== Math.floor(e0.v * (10000 + AV[cyc]) / 10000)) fail(`Мастерская · этаж ${floor}: удар с неприязнью ${e.v}, без неё ${e0 && e0.v} — не +${AV[cyc] / 100} %`); sag++; }
+    }
+    if (!sag) fail('Мастерская: неприязнь к саганам ни разу не проверена');
+    const XD = window.EN_ECHO_FOES;
+    if (XD) {
+      if (XD.rules.manyRace !== 'Забытые') fail(`echo-foes.js: раса Многоликого «${XD.rules.manyRace}», а по слову автора он Забытый`);
+      for (const w of XD.weeks) {
+        const m = XD.foes[w.many];
+        if (!m || m.race !== 'Забытые' || m.week !== w.race) fail(`echo-foes.js: Многоликий недели «${w.race}» — раса «${m && m.race}», неделя «${m && m.week}»`);
+        for (const fid of w.steps) if (fid !== w.many && (XD.foes[fid].race !== w.race || XD.foes[fid].week !== w.race)) fail(`echo-foes.js: ${fid} — раса не своей недели`);
+      }
+    }
   }
 
   /* 7. рунный страж: удар отнимает раунд (ADR-0020) */
@@ -521,7 +559,7 @@ function suite() {
     try {
       CK.reset(w.race, c); clear();
       S.heroes.forEach(h => { h.lvl = Math.max(h.lvl, E.lvl(TOP, c)); });
-      H(CK.ids()[1]).avers = { race: w.race };   // неприязнь героя доходит до боя: прибавка — RULES.aversionBp
+      H(CK.ids()[1]).avers = { race: w.race }; H(CK.ids()[1]).cycle = Math.max(2, c);   // неприязнь героя доходит до боя: прибавка — по циклу героя (EB.aversionBp)
       const x = E.target('step', 7 + (c % 4)); S.echo.slots[0] = x; S.echo.sel = 0;
       const souls0 = S.wallet.souls, cost = E.cost(x), hp0 = x.hp;
       if (!scan(key + ' · цель', draw()).includes(`data-a="echatk" data-v="${x.uid}:1"`)) fail(key + ': у кнопки атаки нет номера атаки');
@@ -534,7 +572,7 @@ function suite() {
       if (/class="ruler"[^>]*>\s*<i/.test(h)) fail(key + ': у боя Эхо линейка этажей');
       if ((h.match(/class="bc foe/g) || []).length !== 5) fail(key + ': на арене не пять врагов');
       if (R.b.u[1].length !== 5 || R.b.maxRounds !== E.rounds(x.g)) fail(key + ': бой не тот');
-      if (!R.b.u[0].some(u => u.avers && u.avers.race === w.race && u.avers.bp === RU.aversionBp)) fail(key + ': неприязнь героя не дошла до боя');
+      if (!R.b.u[0].some(u => u.avers && u.avers.race === w.race && u.avers.bp === EB.aversionBp(Math.max(2, c)) && u.avers.bp > 0)) fail(key + ': неприязнь героя не дошла до боя');
       const art = w.race === 'Эльфы';
       if (art !== h.includes('arena-echo-ishkantun.jpg') || art !== /echo\/ik-\d\d\.jpg/.test(h)) fail(`${key}: арт арены и портретов Иш-Кантуна ${art ? 'не показан' : 'показан не своей неделе'}`);
       const snap = () => JSON.stringify([S.wallet.souls, S.echo.score, x.hp, x.atk, S.runs.length]), s1 = snap();
@@ -662,14 +700,10 @@ function suite() {
       if (none) fail(`призыв: при шансе 0 Многоликий выпал ${none} раз`);
       if (real > bp * 100000 / 10000 * 4 + 5) fail(`призыв: при шансе ${bp} б. п. Многоликий выпал ${real} раз из 100 000`);
       out.manyDraw = `${real} из 100 000 при ${bp} б. п.`;
-      const lik = RX.drops.craftBosses.find(b => b.id === 'lik');
-      window.EN_ECHO_RULES = Object.assign({}, R0 || {}, { likShards: { '2': 7, '3': 11 } });
-      if (E.likShards(2, lik) !== 7 || E.likShards(3, lik) !== 11) fail('Лик недели: осколки не из likShards по циклу');
-      window.EN_ECHO_RULES = Object.assign({}, R0 || {}, { likShards: undefined });
-      for (let c = 2; c <= 6; c++) {   // без likShards — доля heroShardsWeekBp от недельных осколков Эхо увлечённого (lootboxes.js, в сотых)
-        const wk = LBX.week.echo[String(c)], want = lik.heroShardsWeekBp ? Math.floor(wk.fan.shards * lik.heroShardsWeekBp / 1000000) : lik.heroShardsWeek;
-        if (E.likShards(c, lik) !== want || !(want > 0)) fail(`Лик недели · цикл ${ROMAN[c]}: без likShards ${E.likShards(c, lik)} осколков, а доля недельных — ${want}`);
-      }
+      /* «Лик недели» платит сундуком осколков своей недели (ADR-0047): прямой выплаты осколками в правилах и на экране нет */
+      const lik = RX.drops.craftBosses.find(b => b.id === 'lik'), likBox = lik && E.chest(lik, 'Эльфы', 2);
+      if (!likBox || likBox.box !== 'shards') fail('Лик недели: сундук за победу — не сундук осколков недели');
+      if (typeof E.likShards === 'function' || (R0 && 'likShards' in R0)) fail('Лик недели: прежняя прямая выплата осколками (likShards) осталась в правилах или на экране');
     } finally { window.EN_ECHO_RULES = R0; }
     /* биом Многоликого */
     CK.reset('Эльфы', 3); S.heroes.forEach(h => { h.lvl = Math.max(h.lvl, 3 * E.lvl(TOP, 3)); });   // отряд сильнее биома: этажей должно быть несколько — проверяем переход здоровья
@@ -707,23 +741,27 @@ function suite() {
     }
   }
 
-  /* 15. срок жизни и осада (решение автора 29.09.2026): боссы, Убер и призванные враги живут час, рядовые и элиты — как было;
-     у цели на час — отсчёт на карточке; срок вышел — цель исчезает. Атака: остаток здоровья цели — её полное здоровье в бою,
+  /* 15. срок жизни и осада: срок цели — по типу, у ступени лестницы и у призванного врага один (слова автора 06.10.2026, ADR-0054):
+     рядовой 10 минут, элита 30, босс час, Убер 3 часа, Многоликий и Пробуждённый 6 часов; отсчёт — на карточке любой цели;
+     срок вышел — цель исчезает. Атака: остаток здоровья цели — её полное здоровье в бою,
      прежний максимум — только в «Сведениях»; цена атаки призванного врага — раунды его типа × цена раунда цикла силы */
   {
-    const R0 = window.EN_ECHO_RULES, hour = E.data.hour;
+    const R0 = window.EN_ECHO_RULES, min = E.data.minute, SUM_MIN = { e: 30, b: 60, u: 180, a: 360 };
     CK.reset('Эльфы', 2);
-    for (const [st, h] of [[1, 72], [7, 48], [11, 1], [TOP, 1]]) { const x = E.target('step', st); if (x.left !== h * hour) fail(`срок: ступень ${st} живёт ${x.left / hour} ч, а нужно ${h}`); }
+    for (const [st, m] of [[1, 10], [7, 30], [11, 60], [TOP, 180], [TOP + 1, 360]]) { const x = E.target('step', st); if (x.left !== m * min) fail(`срок: ступень ${st} живёт ${x.left / min} мин, а нужно ${m}`); }
     for (const fb of RX.drops.craftBosses) {
       const x = E.target('craft', fb), c = x.pcyc || x.cyc;
-      if (x.left !== hour) fail(`срок: призванный враг ${fb.id} живёт ${x.left / hour} ч, а нужно 1`);
+      if (x.left !== SUM_MIN[fb.g] * min) fail(`срок: призванный враг ${fb.id} типа ${fb.g} живёт ${x.left / min} мин, а нужно ${SUM_MIN[fb.g]}`);
       if (R0 && R0.roundSouls && E.cost(x) !== E.rounds(x.g) * R0.roundSouls[Math.min(c, R0.roundSouls.length) - 1]) fail(`призванный враг ${fb.id}: цена атаки ${E.cost(x)} — не раунды типа × цена раунда`);
     }
     CK.reset('Эльфы', 2); S.echo.slots = [E.target('step', 11), E.target('step', 2), null, null]; S.echo.sel = 0;
     let h = scan('Эхо · босс на час', draw());
     if (!h.includes('ech-left')) fail('Эхо: у босса на час нет отсчёта на карточке цели');
     S.echo.sel = 1; h = scan('Эхо · рядовой', draw());
-    if (h.includes('ech-left')) fail('Эхо: отсчёт на карточке у цели не на час');
+    if (!h.includes('ech-left')) fail('Эхо: у рядового на десять минут нет отсчёта на карточке цели');
+    /* отсчёт короче часа — минуты и секунды */
+    S.echo.slots[1].left = 9 * min + 30;
+    if (E.leftT(S.echo.slots[1].left) !== '9:30' || !draw().includes('>9:30<')) fail(`Эхо: отсчёт рядового — «${E.leftT(S.echo.slots[1].left)}», а нужно «9:30»`);
     S.echo.slots[0].left = 0; E.sync();
     if (S.echo.slots[0] || !/срок цели в слоте 1 вышел/i.test(S.ech.note)) fail('Эхо: босс с вышедшим сроком не исчез');
     /* осада на экране: вторая атака по той же цели — в бой она выходит с остатком, и он — её максимум */

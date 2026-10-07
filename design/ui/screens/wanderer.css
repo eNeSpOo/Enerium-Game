@@ -326,6 +326,16 @@ button.wn-slot{appearance:none;font:inherit;cursor:pointer;transition:transform 
 .wn-sec{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0}
 .wn-sec>.eyebrow{display:flex;align-items:center;gap:8px;color:#c9ced6;text-shadow:0 1px 2px #000}
 .wn-sec>.eyebrow::after{content:"";flex:1 1 auto;height:1px;background:linear-gradient(90deg,rgba(200,206,214,.3),transparent)}
+/* блок «Серии цикла N»: открытый — заголовок золотом и «получено / всего»; закрытый — одна строка под замком: когда откроется и сколько в нём */
+.wn-blk>.eyebrow{color:#e2cf9c}
+.wn-bn{font:500 11px/1 var(--f-u);letter-spacing:.02em;text-transform:none;color:var(--parch-3);white-space:nowrap}
+.wn-blkbar{display:flex;align-items:center;gap:var(--sp-s);min-width:0;padding:var(--sp-s) var(--sp-m);border-radius:3px;
+  background:linear-gradient(180deg,rgba(16,19,23,.86),rgba(8,10,12,.92));box-shadow:inset 0 0 0 1px rgba(200,206,214,.1),0 10px 18px -12px #000;color:var(--parch-3)}
+.wn-blkbar b{flex:none;font:600 15px/1.1 var(--f-d);color:#c9ced6}
+.wn-blkbar small{min-width:0;font-size:12px;text-align:right}
+.wn-blkbar .i{flex:none;width:15px;height:15px}
+.wn-blkbar.done{box-shadow:inset 0 0 0 1px rgba(214,194,142,.28),0 10px 18px -12px #000}
+.wn-blkbar.done b{color:#e2cf9c}
 .wn-feat{position:relative;display:flex;flex-direction:column;gap:6px;min-width:0;padding:8px 10px 8px 8px;border:0;border-radius:3px;
   background:linear-gradient(180deg,rgba(26,30,35,.9),rgba(11,13,16,.94));box-shadow:inset 0 0 0 1px rgba(200,206,214,.16),inset 0 1px 0 rgba(236,242,248,.05),0 10px 18px -12px #000}
 .wn-feat.ready{box-shadow:inset 0 0 0 1px rgba(88,226,176,.5),inset 0 -16px 20px -18px #58e2b0,0 10px 18px -12px #000}
@@ -342,7 +352,8 @@ button.wn-slot{appearance:none;font:inherit;cursor:pointer;transition:transform 
 .wn-feat.hid .wn-fi{box-shadow:0 0 0 1px rgba(200,206,214,.2)}
 .wn-feat.hid .wn-fi .wn-medal{opacity:.8}
 .wn-fn{font:600 16px/1.1 var(--f-d);color:#efe6cc}
-.wn-fd{font-size:12px;color:var(--parch-2);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1;overflow:hidden}
+/* условие — до двух строк: условия серий блоков циклов с числом и циклом в одну строку на 844 × 390 не входят, а обрезать их нельзя */
+.wn-fd{font-size:12px;line-height:1.25;color:var(--parch-2);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .wn-fp{font-size:12px;color:#8fe9c9}
 .wn-ff{justify-content:flex-end;margin-top:auto;gap:var(--sp-s)}
 .wn-steps{display:inline-flex;gap:3px}

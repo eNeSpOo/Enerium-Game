@@ -25,6 +25,11 @@
       личная планка: контракты (резервуар), Событие, Эхо — из данных режимов. Клановый босс — своя копия: атакующий бьёт цель в силе
       своего цикла, урон засчитывается долей её здоровья; сила копии — по норме цикла из capacity.json. Прогон смешанных кланов
       сравнивает это с прежним счётом: общая лестница, сырые суммы, планки по составу.
+   4б. Ступени кланового босса (ADR-0047, LAD): личные — по личным очкам недели на своей копии цели, клановые — по кругам недели.
+      Множители личных ступеней, круги клановых и сундуки — режим «Клановый босс» в lootboxes.js; первая личная ступень — из прогона:
+      кратная десяти, при которой недели обычного лежат в его ступени с наибольшим запасом. Законы: обычный — на своей ступени, выше —
+      только в сильные недели; увлечённый — на своей и выше; плательщик — не выше обычного больше чем на ступень; клан обычных без
+      древа, клан увлечённых и клан с полным древом — каждый на своей клановой ступени. Пул клана — сундуки места и взятых ступеней.
    5. Проверки: целые числа; каркас древа, вехи и вилки; потолки видов; примитивы — делом в ядре боя и по данным достижений и Памяти;
       прибавки боя клана ложатся в карты ядра; вилка не делает круг дороже; полное древо на боссе не хуже вех, вехи — не хуже пустого
       древа; наборы врагов в библиотеке; цели резервуара; калибровка круга 1; рост кругов; ступени наград; ×1,7 (§1.2) — уровни древа
@@ -292,6 +297,31 @@ const REWARDS = {
   contrib: { resBp: 5000, bossBp: 5000 }, // вклад: доля в резервуаре недели и доля в очках КБ — поровну
   headH: 48,                              // срок раздачи главой после подсчёта недели; не успел — сервер по вкладу
   mode: 'clan',                           // строки мест кланов — EN_LOOTBOXES.modes.clan
+};
+
+/* Ступени кланового босса — ADR-0047. Слова автора 02.10.2026: «в Клановом боссе оно как бы это всё и должно учитывать, то есть личные планки
+   клана, и личные планки игрока уже давно просчитаны за них до самого конца игры… давать слишком много, значит обесценивать лут внутри них,
+   давать мало, значит не ценить усилия игрока, нужно найти планки с золотой серединой». §25.3 «планок нет» правится.
+   Личные ступени — по личным очкам недели на своей копии цели; первая — одна на все циклы: очки врага от цикла не зависят (ADR-0042).
+   Клановые — по кругам, взятым кланом за неделю. Множители личных ступеней, пороги кругов, сундуки талисманов и «кто где стоит»
+   (typical) ведёт сборщик сундуков — EN_LOOTBOXES.modes[mode]; здесь — первая личная ступень из прогона и законы.
+   Кто считается (всё — на своей копии цели, ADR-0042):
+   - обычный — участник эталонного клана обычных из недель калькулятора (WEEKS); участник клана на норме силы цикла без древа; активный
+     участник клана, где играют не все (lazy: заходят activeBp участников, каждый бьёт atkBp своих атак — бюджет TREE_CALC.act);
+   - увлечённый — в том же клане бьёт все атаки; участник клана с полным древом и выбором главы под босса (TREE.ref);
+   - плательщик — обычный с очками × assume.payerPts сундуков: лишний отряд силы — больше снятого здоровья.
+   Первая личная ступень — кратная round, при которой недели обычного лежат в ступени typical.free с наибольшим запасом в обе стороны.
+   Клановые ступени: на норме силы цикла клан без древа — на typical.free, клан увлечённых — все бьют все атаки, древо в росте: вехи
+   сотого уровня без выбора или половина древа (half) с выбором под босса — на typical.fan, верхняя — полное древо с выбором.
+   Прогоны с выбором древа дороги, а копия цели каждого цикла — по норме силы: их считаем в крайних циклах (ends) */
+const LAD = {
+  mode: 'clan',
+  round: 10,
+  lazy: { activeBp: 7000, atkBp: 8000 },   // 70 % участников заходят за неделю (Событие, SIM.clan.activeBp), бьют 4 атаки из 5 (контракты, ASSUME.clan)
+  strongBp: 4000,                           // обычный берёт ступень выше своей не чаще 40 % эталонных недель — «в сильные недели»
+  edgeBp: 300,                              // «на пороге»: очки не дальше 3 % от порога ступени — расхождение с typical тогда предупреждение
+  half: 50,                                 // половина древа
+  ends: true,
 };
 
 /* Арт сонмов — задание tools/art-gen/jobs/clan-foes.json, отбор 29.09.2026: файл art/generated/clan/ для каждой фигуры <стихия>-<роль>.
@@ -746,6 +776,90 @@ function treeCalc(D, weeks, got) {
   return { forks, base1, baseW, wall, W, boss, when, most, seen };
 }
 
+/* ================================ СТУПЕНИ КЛАНОВОГО БОССА (ADR-0047) ================================ */
+/* первая личная ступень: кратная LAD.round, при которой очки от lo до hi лежат в ступени want (множители ступеней xs) с наибольшим
+   запасом в обе стороны: наибольший меньший из двух запасов — «lo к порогу своей ступени» и «порог следующей к hi». Нет такой — 0.
+   Запасы — дроби, сравнение — целыми */
+function pickPlank1(xs, want, lo, hi) {
+  const xa = xs[want - 1], xb = xs[want];
+  let best = 0, bn = 0n, bd = 1n;
+  for (let p = LAD.round; p * xa <= lo; p += LAD.round) {
+    if (xb && !(hi < p * xb)) continue;
+    const a = [BigInt(lo), BigInt(p * xa)], b = xb ? [BigInt(p * xb), BigInt(hi)] : a, m = a[0] * b[1] <= b[0] * a[1] ? a : b;
+    if (m[0] * bd > bn * m[1]) { best = p; bn = m[0]; bd = m[1]; }
+  }
+  return best;
+}
+/* кто где стоит на лестнице кланового босса: эталонные кланы на норме силы своего цикла (LAD) и эталонные недели калькулятора (WEEKS).
+   Возвращает слои сундуков, первую личную ступень, строки личных очков me и кланов clans; законы — здесь же */
+function ladCalc(D, weeks) {
+  const M = LBX.modes[LAD.mode], lyMe = M && M.ladder ? M.layers.find(l => l.id === M.ladder.layer) : null, lyClan = M ? M.layers.find(l => l.kind === 'plank' && l.clan) : null;
+  if (!lyMe || lyMe.kind !== 'plank' || lyMe.clan || !lyClan) { fail(`ступени кланового босса: в lootboxes.js у режима «${LAD.mode}» нет слоя личных или клановых ступеней`); return null; }
+  const xs = lyMe.rows.map(r => r.x), circles = lyClan.rows.map(r => r.at), typ = M.typical || {}, pp = LBX.assume && LBX.assume.payerPts;
+  const want = { o: typ.free ? typ.free[lyMe.id] : null, e: typ.fan ? typ.fan[lyMe.id] : null, co: typ.free ? typ.free[lyClan.id] : null, ce: typ.fan ? typ.fan[lyClan.id] : null };
+  if (xs[0] !== 1 || xs.some((x, i) => !Number.isInteger(x) || (i && x <= xs[i - 1]))) { fail('ступени кланового босса: множители личных ступеней lootboxes.js — не целые по возрастанию от 1'); return null; }
+  if (circles.some((a, i) => !Number.isInteger(a) || a < 1 || (i && a <= circles[i - 1]))) { fail('ступени кланового босса: круги клановых ступеней lootboxes.js — не целые по возрастанию'); return null; }
+  if (Object.values(want).some(v => !Number.isInteger(v) || v < 1) || want.o >= xs.length || !pp || pp.length !== 2) { fail('ступени кланового босса: в lootboxes.js нет typical режима или assume.payerPts'); return null; }
+  const NB = D.boss.circle.norm, act = TREE_CALC.act.bp, Z = LAD.lazy, top = TREE.levels, cyc = D.cycles, ends = LAD.ends ? [cyc[0], cyc[cyc.length - 1]] : cyc;
+  if (fl(Z.activeBp * Z.atkBp, D.bp) !== act) fail(`ступени кланового босса: доля активных ${Z.activeBp} × доля атак ${Z.atkBp} — не бюджет клана, где играют не все (${act})`);
+  /* эталонный клан на норме силы цикла c: участников и атак — по вехам уровня lvl; pick — выбор древа под босса (TREE.ref); bp — доля
+     бюджета атак, если играют не все */
+  const run = (c, lvl, pick, bp) => {
+    const members = EC.capacity(D, lvl), per = EC.attacksDay(D, lvl), T = pick ? { picks: REFP, lvl } : null, pool = pick ? EC.elitePool(D, lvl, REFP) : D.boss.pool;
+    const r = bp ? weekOf(D, NB[c], 1, fl(members * per * bp, D.bp), pool, T, c) : weekOf(D, NB[c], members, per, pool, T, c);
+    return { c, lvl, members, per, circles: r.circles, partial: r.partial, pts: r.pts };
+  };
+  const clans = [
+    { id: 'none', n: 'клан обычных без древа', want: want.co, rows: cyc.map(c => run(c, 0, false)) },
+    { id: 'lazy', n: `клан обычных без древа, играют не все: ${fl(act, 100)} % атак`, want: want.co, rows: cyc.map(c => run(c, 0, false, act)) },
+    { id: 'miles', n: `клан увлечённых: все бьют все атаки, вехи ${top}-го уровня без выбора`, want: want.ce, rows: cyc.map(c => run(c, top, false)) },
+    { id: 'half', n: `клан увлечённых: половина древа — ${LAD.half}-й уровень, выбор под босса`, want: want.ce, rows: ends.map(c => run(c, LAD.half, true)) },
+    { id: 'full', n: `полное древо: ${top}-й уровень, выбор под босса`, want: circles.length, rows: ends.map(c => run(c, top, true)) },
+  ];
+  const by = id => clans.find(x => x.id === id).rows;
+  /* личные очки недели: все бьют поровну — очки клана / участников; в клане, где играют не все, очки делят активные: обычный бьёт atkBp
+     своих атак, увлечённый — все */
+  const even = r => fl(r.pts, r.members), lazyO = r => fl(r.pts * D.bp, r.members * Z.activeBp), lazyE = r => fl(r.pts * D.bp, r.members * act);
+  const me = [
+    { id: 'norm', who: 'o', n: 'обычный', clan: 'без древа, все бьют все атаки', rows: by('none').map(r => ({ c: r.c, pts: even(r) })) },
+    { id: 'lazy', who: 'o', n: 'обычный', clan: `без древа, играют не все; он бьёт ${fl(Z.atkBp * BOSS.attacks.day, D.bp)} ${plural(fl(Z.atkBp * BOSS.attacks.day, D.bp), 'атаку', 'атаки', 'атак')} из ${BOSS.attacks.day}`, rows: by('lazy').map(r => ({ c: r.c, pts: lazyO(r) })) },
+    { id: 'all', who: 'e', n: 'увлечённый', clan: 'тот же клан; он бьёт все атаки', rows: by('lazy').map(r => ({ c: r.c, pts: lazyE(r) })) },
+    { id: 'full', who: 'e', n: 'увлечённый', clan: 'полное древо с выбором под босса', rows: by('full').map(r => ({ c: r.c, pts: even(r) })) },
+  ];
+  const ref = weeks.map(r => ({ who: r.W.prof, c: r.W.c, w: r.W.w, lvl: r.lvl, circles: r.circles, partial: r.partial, pts: r.perMember }));
+  /* первая личная ступень — по неделям обычного: эталонные недели и кланы на норме силы */
+  const oPts = ref.filter(r => r.who === 'o').map(r => r.pts).concat(...me.filter(x => x.who === 'o').map(x => x.rows.map(r => r.pts)));
+  const lo = Math.min(...oPts), hi = Math.max(...oPts), plank1 = pickPlank1(xs, want.o, lo, hi);
+  if (!plank1) { fail(`ступени кланового босса: недели обычного — от ${lo} до ${hi} личных очков — не помещаются в одну ступень: первой ступени нет`); return null; }
+  D.boss.ladder = { mode: LAD.mode, plank1, circles };
+  const stepOf = pts => EC.myStep(D, xs, pts), payer = pts => fl(pts * pp[0], pp[1]);
+  for (const x of me) for (const r of x.rows) { r.step = stepOf(r.pts); r.pay = payer(r.pts); r.payStep = stepOf(r.pay); }
+  for (const r of ref) { r.step = stepOf(r.pts); r.pay = payer(r.pts); r.payStep = stepOf(r.pay); }
+  for (const x of clans) for (const r of x.rows) r.step = EC.clanStep(D, r.circles);
+  /* законы личных ступеней.
+     1. Обычный — на ступени typical.free: ниже не бывает; выше — «в сильные недели», не чаще strongBp недель.
+     2. Увлечённый — на typical.fan и выше: и когда бьёт все атаки в клане, где играют не все, и в клане с полным древом. «На пороге» —
+        очки не дальше edgeBp от порога: предупреждение, не ошибка.
+     3. Эталонный клан увлечённых из недель калькулятора — не ниже обычного: на своей копии цели увлечённый силён для своего цикла так же,
+        как обычный (ADR-0042), выше его поднимают атаки и древо. Ниже typical.fan — предупреждение.
+     4. Плательщик — не выше обычного больше чем на ступень. */
+  const need = k => EC.myNeed(D, xs[k - 1]), near = (pts, k) => Math.abs(pts - need(k)) * D.bp <= need(k) * LAD.edgeBp;
+  const oRows = ref.filter(r => r.who === 'o').map(r => Object.assign({ t: `эталонная неделя, цикл ${ROMAN[r.c]}` }, r)).concat(...me.filter(x => x.who === 'o').map(x => x.rows.map(r => Object.assign({ t: `${x.clan}, цикл ${ROMAN[r.c]}` }, r))));
+  for (const r of oRows) if (r.step < want.o) fail(`личные ступени: обычный (${r.t}) — ${r.pts} очков, ${r.step}-я ступень; сундуки ставят его на ${want.o}-ю`);
+  const strong = oRows.filter(r => r.step > want.o);
+  if (strong.length * D.bp > oRows.length * LAD.strongBp) fail(`личные ступени: обычный выше ${want.o}-й ступени в ${strong.length} неделях из ${oRows.length} — чаще, чем «в сильные недели»`);
+  for (const x of me.filter(y => y.who === 'e')) for (const r of x.rows) if (r.step < want.e) (near(r.pts, want.e) ? warn : err).push(`личные ступени: увлечённый (${x.clan}, цикл ${ROMAN[r.c]}) — ${r.pts} очков, ${r.step}-я ступень; сундуки ставят его на ${want.e}-ю${near(r.pts, want.e) ? ' — на пороге' : ''}`);
+  for (const r of ref.filter(x => x.who === 'e')) {
+    if (r.step < want.o) fail(`личные ступени: участник эталонного клана увлечённых (цикл ${ROMAN[r.c]}) — ${r.pts} очков, ${r.step}-я ступень: ниже обычного`);
+    else if (r.step < want.e) warn.push(`личные ступени: участник эталонного клана увлечённых (цикл ${ROMAN[r.c]}, ${r.w}-я неделя, без выбора древа) — ${r.pts} очков, ${r.step}-я ступень; сундуки ставят увлечённого на ${want.e}-ю`);
+  }
+  for (const r of oRows) if (r.payStep > r.step + 1) fail(`личные ступени: плательщик (${r.t}) — ${r.pay} очков, ${r.payStep}-я ступень при ${r.step}-й у обычного`);
+  /* законы клановых ступеней: клан обычных без древа — на typical.free, клан увлечённых — на typical.fan, верхняя — только полное древо
+     с выбором под босса */
+  for (const x of clans) for (const r of x.rows) if (r.step !== x.want) fail(`клановые ступени: ${x.n}, цикл ${ROMAN[r.c]} — ${r.circles} ${plural(r.circles, 'круг', 'круга', 'кругов')}, ${r.step}-я ступень; ждали ${x.want}-ю`);
+  return { M, lyMe, lyClan, xs, circles, want, plank1, lo, hi, me, ref, clans, pp, ends };
+}
+
 function calc() {
   const D = build();
   REFP = refPicks(D);
@@ -789,6 +903,13 @@ function calc() {
     mix: MX.rows.map(r => [Object.entries(r.of).map(([c, n]) => [+c, n]), r.old.circles, r.old.exp, r.v1, r.own.circles, r.own.exp, r.resRaw, r.resCnt, r.evComp, r.evShare, r.wEv, r.wEcho, r.wFair, r.ownW.exp]),
     mixTolBp: MIX.tolBp };
 
+  /* 3а. ступени кланового босса (ADR-0047): первая личная ступень — из прогона; кто где стоит на личных и клановых ступенях.
+     calc.ladder — для UI-кита и проверки: me — [профиль o | e, кто, клан, [[цикл, очков, ступень, очков плательщика, его ступень], …]]; clans — [клан, ждали ступень,
+     [[цикл, участников, атак в день, кругов, элит сверх, ступень], …]] */
+  const LD = ladCalc(D, weeks);
+  if (LD) D.calc.ladder = { me: LD.me.map(x => [x.who, x.n, x.clan, x.rows.map(r => [r.c, r.pts, r.step, r.pay, r.payStep])]),
+    clans: LD.clans.map(x => [x.n, x.want, x.rows.map(r => [r.c, r.members, r.per, r.circles, r.partial, r.step])]) };
+
   /* 3. награды: ступени мест кланов по циклам */
   const M = LBX.modes[REWARDS.mode], ly = M ? M.layers.find(x => x.kind === 'place' && x.clan) : null;
   if (!ly) fail('lootboxes.js: нет строк мест кланов у режима «Клановый босс»');
@@ -798,13 +919,38 @@ function calc() {
   D.rewards.box = M ? M.box : 'talisman';
 
   checks(D, S, circles, weeks, ly, M, TC, MX);
-  const tables = mkTables(D, S, circles, weeks, tiers, TC, MX);
-  return { data: D, tables, S, circles, weeks, TC, MX };
+  const tables = mkTables(D, S, circles, weeks, tiers, TC, MX, LD);
+  return { data: D, tables, S, circles, weeks, TC, MX, LD };
 }
 
-function mkTables(D, S, circles, weeks, tiers, TC, MX) {
+function mkTables(D, S, circles, weeks, tiers, TC, MX, LD) {
   const TBL = {};
   let T;
+  // ступени кланового босса (ADR-0047): личные — пороги и сундуки; кто где стоит; клановые — круги и пул; эталонные кланы
+  if (LD) {
+    const boxR = LBX.boxRarity, payTxt = pay => (pay || []).map(g => `${g.count > 1 ? g.count + ' × ' : ''}${boxR[g.r - 1]}`).join(' + ') || '—';
+    const cs = D.cycles, csHead = cs.map(c => ROMAN[c]).join(' / '), stepTxt = k => k ? `${k}-я` : 'нет';
+    const byCyc = (rows, f) => cs.map(c => { const r = rows.find(x => x.c === c); return r ? f(r) : '—'; }).join(' / ');
+    const steps = rows => { const v = [...new Set(rows.map(r => r.step))].sort((a, b) => a - b); return v.length === 1 ? stepTxt(v[0]) : `${v[0] ? v[0] : 'нет'}–${v[v.length - 1]}-я`; };
+    T = head(['Личная ступень', 'Порог, личных очков недели', `Сундук талисманов: цикл ${csHead}`]);
+    LD.lyMe.rows.forEach((row, i) => T.push(cells([i + 1, fmt(EC.myNeed(D, row.x)), cs.map(c => payTxt(row.cyc[c])).join(' / ')])));
+    TBL.ladMe = T.join('\n');
+    T = head(['Кто', 'Клан на норме силы своего цикла', `Личных очков за неделю: цикл ${csHead}`, 'Ступень', 'Сундуки ставят', `Плательщик, очки ×${dec(LD.pp[0], LD.pp[1], 2)}: ступень`]);
+    for (const x of LD.me) T.push(cells([x.n, x.clan, byCyc(x.rows, r => fmt(r.pts)), steps(x.rows), `на ${x.who === 'o' ? LD.want.o : LD.want.e}-ю`, x.who === 'o' ? steps(x.rows.map(r => ({ step: r.payStep }))) : '—']));
+    TBL.ladWho = T.join('\n');
+    T = head(['Эталонная неделя калькулятора', 'Уровень клана', 'Кругов', 'Очков на участника', 'Ступень', 'Плательщик: очков · ступень']);
+    for (const r of LD.ref) T.push(cells([`${PROF[r.who]}, цикл ${ROMAN[r.c]}, ${r.w}-я неделя`, r.lvl, `${r.circles}${r.partial ? ` + ${r.partial} ${r.partial === 1 ? 'элита' : 'элиты'}` : ''}`, fmt(r.pts), stepTxt(r.step), r.who === 'o' ? `${fmt(r.pay)} · ${stepTxt(r.payStep)}` : '—']));
+    TBL.ladRef = T.join('\n');
+    T = head(['Клановая ступень', 'Кругов за неделю', 'На участника · ступени сундука', 'Пул клана из 25', 'Сервер по вкладу', 'Глава']);
+    LD.lyClan.rows.forEach((row, i) => {
+      const st = EC.stepsOf(row, LD.M.from), H = EC.halves(D, st.map(g => ({ step: g.step, win: g.win, count: g.count * RULES.capacity.base })));
+      T.push(cells([i + 1, row.at, st.map(g => `${g.count} × ступень ${g.step}`).join(' + '), st.reduce((a, g) => a + g.count * RULES.capacity.base, 0), H.reduce((a, g) => a + g.server, 0), H.reduce((a, g) => a + g.head, 0)]));
+    });
+    TBL.ladClan = T.join('\n');
+    T = head(['Клан на норме силы своего цикла', 'Участников × атак в день', `Кругов за неделю и элит сверх: цикл ${csHead}`, 'Клановая ступень', 'Сундуки ставят']);
+    for (const x of LD.clans) T.push(cells([x.n, `${x.rows[0].members} × ${x.rows[0].per}`, byCyc(x.rows, r => `${r.circles}${r.partial ? ' + ' + r.partial : ''}`), steps(x.rows), x.id === 'full' ? 'верхняя' : `на ${x.want}-ю`]));
+    TBL.ladClans = T.join('\n');
+  }
   // резервуар: кандидаты показателя
   T = head(['Показатель', 'Первое очко', '10-е', '50-е', 'Сотое', 'Цель «сотое к концу второго года»']);
   for (const r of S.rows) {
@@ -1247,6 +1393,18 @@ function checks(D, S, circles, weeks, ly, M, TC, MX) {
     }
     const sorted = ly.rows.slice().sort((a, b) => (a.top || 1e9) - (b.top || 1e9));
     for (let i = 1; i < sorted.length; i++) for (const c of cycles) if (val(sorted[i], c) > val(sorted[i - 1], c)) fail(`награды: место «${sorted[i].label}» даёт больше, чем «${sorted[i - 1].label}»`);
+    /* строки «все с очками» больше нет (ADR-0047): её место заняла первая клановая ступень — клан вне топа получает пул за круги */
+    if (ly.rows.some(r => !r.top)) fail('награды: у мест кланов осталась строка «все с очками» — её место заняла первая клановая ступень');
+    /* клановые ступени: ступени сундука одинаковы во всех циклах — клан из разных циклов делит одни ступени; пул — места и ступеней вместе */
+    const lyC = M.layers.find(x => x.kind === 'plank' && x.clan);
+    if (lyC) {
+      for (const row of lyC.rows) { const s0 = JSON.stringify(EC.stepsOf(row, cycles[0])); for (const c of cycles) if (JSON.stringify(EC.stepsOf(row, c)) !== s0) fail(`клановые ступени: у строки «${row.label}» ступени сундука цикла ${ROMAN[c]} не как у цикла ${ROMAN[cycles[0]]}`); }
+      const n = RULES.capacity.base, c0 = cycles[0], cnt = P => P.groups.reduce((a, g) => a + g.count, 0), per = r => (r.cyc[c0] || []).reduce((a, g) => a + g.count, 0);
+      const top = lyC.rows[lyC.rows.length - 1].at, P0 = EC.pool(LBX, null, 1, n, c0, top), P1 = EC.pool(LBX, sorted[0].top, 1, n, c0, top), P2 = EC.pool(LBX, sorted[0].top, 1, n, c0, 0);
+      if (cnt(P0) !== n * lyC.rows.reduce((a, r) => a + per(r), 0) || P0.steps !== lyC.rows.length || P0.row) fail('пул клана: все клановые ступени без места — не сундуки ступеней на каждого участника');
+      if (cnt(P1) !== cnt(P0) + cnt(P2) || cnt(P2) !== n * per(sorted[0])) fail('пул клана: место и клановые ступени не складываются');
+      if (cnt(EC.pool(LBX, null, 1, n, c0, lyC.rows[0].at - 1))) fail('пул клана: клан вне топа и без первой клановой ступени получил сундуки');
+    }
   }
   // ×1,7 (§1.2): атаки и очки не продаются, плательщик наполняет резервуар не быстрее ×1,7, сброс древа не даёт очков
   if (D.res.ref.x17 > LAWS.x17) fail(`×1,7: плательщик наполняет резервуар ×${dec(D.res.ref.x17, 100, 2)}`);
@@ -1279,8 +1437,12 @@ function render(data) {
      host — сонмы стихий: роли roles (класс, имя роли, вид способности свиты), этажи floors (e — свита Голоса, b — свита Хозяина),
      образцы характеристик tpl и здоровье свиты hp по роли, семь сонмов hosts, фигуры figs «<стихия>-<роль>»: n, look, tip; lore — запись
      сказителя; weeks — Хозяин недели: неделя расы → стихия, цивилизация Эхо, почему (§25.4); art — выгруженные портреты ready (clan/…);
-   - rewards — половина по вкладу, половина — глава; ступени мест кланов tiers; calc — таблицы калькулятора для UI-кита, calc.mix —
-     прогон смешанных кланов (ADR-0042).
+     ladder — ступени кланового босса (ADR-0047): mode — режим лестницы в EN_LOOTBOXES.modes (множители личных ступеней и сундуки —
+     там), plank1 — первая личная ступень в личных очках недели на своей копии цели, одна на все циклы, circles — пороги клановых
+     ступеней: сколько кругов клан взял за неделю (EnClan.myNeed, myStep, clanStep, circlesDone);
+   - rewards — половина по вкладу, половина — глава; ступени мест кланов tiers; пул клана — сундуки места и взятых клановых ступеней
+     на каждого участника (EnClan.pool); calc — таблицы калькулятора для UI-кита, calc.mix — прогон смешанных кланов (ADR-0042),
+     calc.ladder — кто где стоит на личных и клановых ступенях.
    Обоснование и таблицы — docs/content/клан.md. В игре исходы, очки, места и раздачу решает сервер (§36.16).
    Ниже данных — алгоритмы клана tools/content-gen/clan/core.js как есть. */\n`;
   return headTxt + 'window.EN_CLAN = ' + JSON.stringify(data) + ';\n' + core;
@@ -1296,7 +1458,7 @@ function withTables(doc, tables) {
   return doc;
 }
 
-module.exports = { calc, render, withTables, markA, markB, FILES, RULES, RES, TREE, BOSS, REWARDS, ART_PICK, artRows, err, warn };
+module.exports = { calc, render, withTables, markA, markB, FILES, RULES, RES, TREE, BOSS, REWARDS, LAD, ART_PICK, artRows, err, warn };
 
 if (require.main === module) {
   const R = calc();

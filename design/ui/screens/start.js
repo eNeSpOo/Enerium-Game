@@ -21,7 +21,8 @@
      (HD_SRV, WS_SRV, GD_SRV, startRun, Лавка LV_SRV, сундуки zpOpen, артефакты WN_SRV); закрытое — с замком и причиной «откроется на N-м
      уровне»; кнопка шага — в итоге забега, на «Спуске», в записке Убежища; добыча забега обучения — из таблицы EN_START.loot; первый
      рецепт — карточкой в окне уровня 6, пометкой Этриона у стола и найденным листом в книге; сундук уровня 3 — с содержимым сценария,
-     Лавка — витрина обучения и одна покупка, первый артефакт — свой и до своего уровня (EN_START.tut);
+     Лавка — витрина обучения и одна покупка, первый артефакт — свой и до своего уровня (EN_START.tut); артефакт активных биомов —
+     шаг trail (ADR-0054): покупка на «Спуске» до первого забега — без неё активного биома нет, она открывает один;
    — пропуск обучения: «Пропустить обучение» в окне уровня, в Убежище и в настройках, подтверждение с итогом (EN_START.skip), одна
      операция OB_SRV.skip с номером; переход I → II — после пропуска и после последнего шага операцией цикла CY_SRV.advance,
      окно — «Событие нового цикла» (screens/cycle.js, ADR-0041) со своим содержимым для цикла II;
@@ -57,7 +58,7 @@ const OB_VIEW = {
 const OB_ART = {
   medal: 'start/medal.webp', burst: 'start/burst.webp', frame: 'start/frame.webp', open: 'start/open-{id}.webp', lock: 'start/open-lock.webp', xp: 'start/open-xp.webp',
   slice: 150,                                                      // срез рамы на листе, px
-  icon: { slot2: 'slot', slot3: 'slot', slot4: 'slot', slot5: 'slot' },   // ключ открытия → знак, если знак общий
+  icon: { slot2: 'slot', slot3: 'slot', slot4: 'slot', slot5: 'slot', trail: 'artifacts' },   // ключ открытия → знак, если знак общий
   ready: ['start/medal.webp', 'start/burst.webp', 'start/frame.webp'].concat(['hire', 'descent', 'dev', 'slot', 'stock', 'shop', 'guard', 'b2', 'craft', 'valor',
     'artifacts', 'limit', 'cycle2', 'echo', 'week', 'souls', 'market', 'memory', 'lock', 'xp'].map(k => `start/open-${k}.webp`)),   // выгрузка 01.10.2026
 };
@@ -82,7 +83,7 @@ const OB_TEXT = {
   skipSquad: 'Отряд', skipWallet: 'Кошелёк', skipRunes: 'Руны', skipStock: 'Запасы', skipOpen: 'Открыто', skipLvl: 'Уровень Странника',
   skipCur: { gold: 'золото', spirit: 'дух', souls: 'души', keys: 'рунные ключи' }, skipAll: n => `всё, что открывают уровни 1–${n}, в том числе:`,
   skipDone: 'Обучение пропущено: цикл II', skipNot: 'Обучение уже пройдено',
-  stepDone: 'Обучение пройдено', skipArt: 'артефакт',
+  stepDone: 'Обучение пройдено', skipArt: 'артефакт', skipTrail: n => `${n} ${plural(n, 'активный биом', 'активных биома', 'активных биомов')}`,
   storeLock: 'Лавка Энериума откроется в цикле II',   // слово автора 01.10.2026: «Донатная Лавка во 2 цикле»
   /* погружения Подземного леса и уроки (ADR-0049) */
   dive: (j, n) => `Погружение ${j} из ${n}`, diveGo: j => `Погружение ${j}`, lesson: 'Урок', lesAgain: 'Урок погружения',
@@ -110,6 +111,7 @@ const OB_STEP_T = {
   chest: () => ['Открыть сундук странника', 'Награда уровня ждёт в Запасах — что внутри, видно на его карточке.', 'Открыть сундук'],
   shop: s => [`Купить в Лавке: ${obItemNm(s.id)} ×${OB_TU.shop ? OB_TU.shop.q : 1}`, 'Алхимик продаёт то, чего этажи не дают.', 'В Лавку'],
   art: s => [`Первый артефакт: ${OB_TU.art ? OB_TU.art.n : s.id}`, 'Души с элит — в постоянную силу аккаунта: купить и поднять до первого уровня.', 'К артефакту'],
+  trail: s => [`Купить артефакт: ${OB_TU.trail ? OB_TU.trail.n : s.id}`, 'Без него пути вниз нет: покупка открывает один активный биом.', 'К Спуску'],
   craft: s => [`${OB_TEXT.first}: «${obRecipeName(s.r)}»`, 'Сложите его на столе Мастерской — подсказка уже там.', 'К рецепту'],
   valor: s => [`Доблесть: ${obNm(s.id)}`, 'Руна обучения ждёт своего героя.', `Доблесть: ${obNm(s.id)}`],
   limit: s => [`Рунный предел: ${obNm(s.id)}`, 'Десять рун предела ломают потолок уровня.', `Предел: ${obNm(s.id)}`],
@@ -379,6 +381,7 @@ function obStepDone(s, st = S) {
     case 'chest': return st.ob.srv.lvl >= s.L && !(st.bag.chests || []).some(obIsTutChestRec);
     case 'shop': return !!st.lv && st.lv.gen === OB_SHOP_GEN && (st.sold || []).includes(OB_TU.shop ? OB_TU.shop.i : -1);
     case 'art': return !!st.wn && st.wn.art[s.id] != null && st.wn.art[s.id] >= s.lv;
+    case 'trail': return !!st.wn && st.wn.art[s.id] != null;   // артефакт активных биомов куплен — активный биом открыт (ADR-0054)
   }
   return false;
 }
@@ -477,7 +480,8 @@ function obGate(a, v) {
     case 'zpopen': return s.k === 'chest' && obIsTutGroup(V) ? null : obLock('chest');
     case 'buydo': { const g = S.shop && S.shop[+V.split(':')[0]]; return s.k === 'shop' && g && g[0] === s.id ? null : obLock('shop', g ? g[0] : ''); }
     case 'wnbuy': case 'wnup': {
-      const id = V.split(':')[0], L = typeof wnLv === 'function' ? wnLv(id) : -1;
+      const id = V.split(':')[0], L = typeof wnLv === 'function' ? wnLv(id) : -1, tr = !!OB_TU.trail && OB_TU.trail.id === id;
+      if (tr) return s.k === 'trail' && a === 'wnbuy' && L < 0 ? null : obLock('trail', id);   // артефакт активных биомов: в обучении — только покупка, на своём шаге
       return s.k === 'art' && id === s.id && (a === 'wnbuy' ? L < 0 : L >= 0 && L < s.lv) ? null : obLock('art', id);
     }
   }
@@ -597,8 +601,8 @@ if (typeof WN_SRV !== 'undefined') for (const m of ['buy', 'up']) {
   const f = WN_SRV[m]; if (typeof f !== 'function') continue;
   WN_SRV[m] = function (op, id) {
     if (obTut() && !(S.wn && S.wn.ops && S.wn.ops[op])) {
-      const s = obStepOf(), L = typeof wnLv === 'function' ? wnLv(id) : -1;
-      if (!(s.k === 'art' && s.id === id && (m === 'buy' || L < s.lv))) return obRef(obLockWhy('art', id));
+      const s = obStepOf(), L = typeof wnLv === 'function' ? wnLv(id) : -1, tr = !!OB_TU.trail && OB_TU.trail.id === id;
+      if (tr ? !(s.k === 'trail' && m === 'buy') : !(s.k === 'art' && s.id === id && (m === 'buy' || L < s.lv))) return obRef(obLockWhy(tr ? 'trail' : 'art', id));
     }
     const r = f.apply(this, arguments); if (r && r.res && !r.again) obAdvance(); return r;
   };
@@ -884,8 +888,9 @@ OV.obskip = function (o) {
   const sh = E.shards.map(([id, n]) => { const h = RSI[id]; return `${h && hrStage(h) >= 2 ? `осколки · ${trEsc(h.n)}` : 'осколки неизвестной души'} ×${fmt(n)}`; });
   /* первый артефакт — плиткой в ряду кошелька: реликвия, имя и уровень */
   const arts = Object.entries(E.art || {}).map(([id, lv]) => {
-    const nm = trEsc(OB_TU.art && OB_TU.art.id === id ? OB_TU.art.n : id);
-    return `<li class="ob-sk-cy ob-sk-art" title="${OB_TEXT.skipArt}: ${nm} · ${ROMAN[lv] || lv}"><span class="ob-sk-ai">${typeof wnRelic === 'function' ? wnRelic(id) : ''}</span><b>«${nm}» · ${ROMAN[lv] || lv}</b><small>${OB_TEXT.skipArt}</small></li>`;
+    const tr = OB_TU.trail && OB_TU.trail.id === id, nm = trEsc(tr ? OB_TU.trail.n : OB_TU.art && OB_TU.art.id === id ? OB_TU.art.n : id);
+    const what = tr ? OB_TEXT.skipTrail(OB_TU.trail.slots) : ROMAN[lv] || lv;   // артефакт активных биомов куплен — уровней в обучении нет
+    return `<li class="ob-sk-cy ob-sk-art" title="${OB_TEXT.skipArt}: ${nm} · ${what}"><span class="ob-sk-ai">${typeof wnRelic === 'function' ? wnRelic(id) : ''}</span><b>«${nm}» · ${what}</b><small>${OB_TEXT.skipArt}</small></li>`;
   }).join('');
   const chests = E.chests.map(c => (typeof zpChestPic === 'function' ? zpChestPic(c.box, c.r) : '')).join('');
   const last = OB_D.levels[OB_D.levels.length - 1], opened = `${OB_TEXT.skipAll(OB_D.levels.length)} ${last.opens.map(k => trEsc(OB_D.open[k].n)).join(' · ')}`;
@@ -936,6 +941,8 @@ function obDoStep() {
   }
   if (s.k === 'shop') { S.route = 'craft'; S.seg.craft = 'shop'; const i = OB_TU.shop ? OB_TU.shop.i : -1; return i >= 0 && ACT.buy ? ACT.buy(String(i)) : render(); }
   if (s.k === 'art') { S.route = 'profile'; S.seg.profile = 'arts'; return ACT.sheet('wnart:' + s.id); }
+  /* артефакт активных биомов — на «Спуске»: там видно, что активного биома нет, и главная кнопка окна — его покупка */
+  if (s.k === 'trail') { S.route = 'descent'; const f = (S.biomes.find(x => x.state === 'front') || {}).id; if (f && EB.BIOMES[f]) S.selBiome = f; return render(); }
   if (s.k === 'valor' || s.k === 'limit') { const h = obHero(s.id); if (!h) return render(); book(h); return ACT[s.k](h.id); }
   if (s.k === 'lvl') {
     const left = s.to.filter(([id, to]) => (obHero(id) || { lvl: to }).lvl < to);
@@ -952,7 +959,7 @@ function obDoStep() {
 /* кнопка шага: подпись — что сделать; cls — вид кнопки места (big — главная кнопка «Спуска») */
 function obCtaHtml(s, cls = '') {
   if (!s) return '';
-  const t = OB_STEP_T[s.k](s), ico = { hire: 'users', lvl: 'up', chest: 'key', shop: 'swap', craft: 'spark', valor: 'star', limit: 'gem', art: 'crown', run: 'down', guard: 'door' }[s.k] || 'chev';
+  const t = OB_STEP_T[s.k](s), ico = { hire: 'users', lvl: 'up', chest: 'key', shop: 'swap', craft: 'spark', valor: 'star', limit: 'gem', art: 'crown', trail: 'crown', run: 'down', guard: 'door' }[s.k] || 'chev';
   return `<button class="btn go${cls} ob-cta" data-a="obstep" data-v="${S.ob.k}" title="${OB_TEXT.tut}: ${trEsc(t[0])}">${ic(ico)}${trEsc(t[2])}</button>`;
 }
 Object.assign(ACT, {
@@ -1133,13 +1140,15 @@ if (OV.settings) {
     return at < 0 ? h : h.slice(0, at) + row + h.slice(at);
   };
 }
-/* «Спуск»: главная кнопка — шаг обучения, если шаг — не забег этого биома */
+/* «Спуск»: главная кнопка — шаг обучения, если шаг — не забег этого биома. Пока артефакт активных биомов не куплен, главная кнопка
+   окна — его покупка (screens/descent.js, dsTrailBuy): на шаге trail она и есть шаг, на шаге до него — на её месте кнопка шага */
 if (typeof SCREENS !== 'undefined' && SCREENS.descent) {
   const ds0 = SCREENS.descent;
   SCREENS.descent = function () {
     const m = ds0.apply(this, arguments); if (!m || !m.html || !obTut()) return m;
-    const s = obStepOf(); if (s.k === 'run' && s.b === S.selBiome) return m;
-    return Object.assign({}, m, { html: m.html.replace(/<button class="btn go big" data-a="sheet" data-v="prep">[\s\S]*?<\/button>/, obCtaHtml(s, ' big')) });
+    const s = obStepOf(); if ((s.k === 'run' && s.b === S.selBiome) || s.k === 'trail') return m;
+    return Object.assign({}, m, { html: m.html.replace(/<button class="btn go big" data-a="sheet" data-v="prep">[\s\S]*?<\/button>/, obCtaHtml(s, ' big'))
+      .replace(/<button class="btn go big" data-a="wnbuy"[^>]*>[\s\S]*?<\/button>/, obCtaHtml(s, ' big')) });
   };
 }
 /* Мастерская: пока первый рецепт не найден — пометка Этриона с рецептом целиком у стола и подсветка ячеек; стол с рецептом — «Попробовать» */
@@ -1178,6 +1187,7 @@ function obPaintLocks() {
       : s.k === 'chest' ? (a === 'zpsel' || a === 'zptab') && (obIsTutGroup(v) || (a === 'zptab' && v === 'chest'))
       : s.k === 'shop' ? a === 'buy' && !!S.shop[+v] && S.shop[+v][0] === s.id
       : s.k === 'art' ? (a === 'sheet' && v === 'wnart:' + s.id) || (a === 'seg' && v === 'profile:arts')
+      : s.k === 'trail' ? a === 'sheet' && v === 'wnart:' + s.id
       : (a === 'hero-open' || a === 'hero') && ids.includes(obRid(H(v))));
     g.querySelectorAll('[data-a]').forEach(el => {
       const a = el.getAttribute('data-a'), v = el.getAttribute('data-v'); if (!a || /^ob/.test(a)) return;

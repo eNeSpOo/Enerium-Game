@@ -54,7 +54,8 @@ const TEMPLATE = {
 };
 /* Обычный рядовой-стрелок: у Мастерской ловкий рядовой только один — редкий убийца. Стрелок — медленнее и крепче его */
 const ARCHER_ST = [60, 25, 100, 90, 70];
-/* Боевая мощь карточки бестиария — §6: БМ = C × √(УВС × ЭЗ), слой 0 (К_ротации = 1). C — косметическая, × 100 */
+/* Боевая мощь карточки бестиария — §6: БМ = C × √(УВС × ЭЗ) со слоем 1 — вкладом способностей (ADR-0051): одна функция ядра EnBattle.bm
+   на героев и врагов. C — косметическая, × 100 */
 const BM_C_X100 = 4000;   // C = 40 — косметическая ручка §6; её же берёт общая функция мощи героев BM (design/ui/index.html) и клан
 /* Поля уникальной способности, которые ядро понимает (как в abilities.js и echo-foes.js). Чужое поле — ошибка сборки */
 const UNIQUE_FIELDS = ['tgt', 'targets', 'ch', 'coef', 'stat', 'ult', 'st', 'pow', 'left', 'focus', 'steal', 'pas', 'dmgPct', 'guardPct', 'every', 'cast', 'then', 'drain'];
@@ -68,6 +69,8 @@ const read = p => fs.readFileSync(p, 'utf8');
 const LIBJ = JSON.parse(read(FILES.library)), KITS = JSON.parse(read(FILES.kits));
 const LIB = {};
 for (const s of Object.values(LIBJ.sets)) for (const [k, t] of [['active', 'act'], ['ult', 'ult'], ['passive', 'pas'], ['reaction', 'react']]) for (const x of s[k] || []) LIB[x.id] = Object.assign({ t }, x);
+/* черты врагов (ADR-0051) — набор «Черты врагов» библиотеки: пассивки и реакции именных врагов */
+for (const [k, t] of [['passive', 'pas'], ['reaction', 'react']]) for (const x of (LIBJ.foeTraits || {})[k] || []) LIB[x.id] = Object.assign({ t, foe: true }, x);
 const LIBNAME = {};
 for (const x of Object.values(LIB)) (LIBNAME[x.n] = LIBNAME[x.n] || []).push(x.id);
 const RANKS = KITS.rules.rankAbilities, SHARES = KITS.rules.rarityShares;
@@ -113,6 +116,14 @@ function kitOf(b, short, f) {
   }).filter(Boolean);
   const ults = kit.filter(x => x.slot === 'ult').length;
   if (kit.length !== R.abilities || ults !== R.ults) fail(`${b.id}${short}: способностей ${kit.length}, из них ульт ${ults}; ранг «${RANK_KEY[rank]}» — ${R.abilities} и ${R.ults} (ADR-0016)`);
+  /* черта именного врага (ADR-0051): элите, боссу и рунному стражу — запись набора «Черты врагов» по имени (поле trait врага);
+     рядовому черта не положена. В число способностей по рангу черта не входит; шанс реакции — по рангу, как у героя по редкости */
+  if ((rank !== 'o') !== !!f.trait) fail(`${b.id}${short}: ${rank === 'o' ? 'у рядового черты нет — рядовые остаются простыми' : 'у именного врага нет черты'} (ADR-0051)`);
+  if (f.trait) {
+    const tid = (LIBNAME[f.trait] || []).find(id => LIB[id].foe);
+    if (!tid) fail(`${b.id}${short}: черты «${f.trait}» нет в наборе «Черты врагов» библиотеки`);
+    else { const a = LIB[tid], it = { v: 0, slot: a.t, id: tid, trait: true }; if (a.t === 'react' && a.ch) it.chR = Math.floor(a.ch * sh.act / SHARES['эпическая'].act); kit.push(it); }
+  }
   return { rank, ultPct: R.ults ? sh.ult : 0, actPct: sh.act, kit };
 }
 
@@ -149,7 +160,7 @@ for (const b of DATA) {
   }
   for (const [short, f] of Object.entries(b.foes)) {
     const id = fullId(b, short), rank = rankOf(short), kit = kitOf(b, short, f), s = statsOf(b, short, f);
-    for (const x of kit.kit) if (x.as) {   // имя приёма у врага не должно совпасть с чужой записью библиотеки или с другим по действию приёмом под тем же именем
+    for (const x of kit.kit) if (x.as && !x.trait) {   // имя приёма у врага не должно совпасть с чужой записью библиотеки или с другим по действию приёмом под тем же именем
       if (LIBNAME[x.as] && !LIBNAME[x.as].includes(x.id)) fail(`${id}: имя «${x.as}» в библиотеке у другой способности (${LIBNAME[x.as].join(', ')})`);
       const L = LIB[x.id], sig = `${L.kind}.${L.tier}.${x.tgt || L.tgt}`;   // одно имя — одно действие; школа может быть разной
       const seen = names[x.as]; if (seen && seen.sig !== sig) fail(`${id}: «${x.as}» уже зовётся приём ${seen.lib} у ${seen.who} с другим действием`); else names[x.as] = { lib: x.id, sig, who: id };
@@ -198,17 +209,8 @@ for (const b of DATA) {
 
 /* ================================ ЯДРО: КАРТОЧКИ БЕСТИАРИЯ ================================ */
 
-const isqrt = n => { if (n < 2) return n; let x = Math.floor(Math.sqrt(n)); while (x * x > n) x--; while ((x + 1) * (x + 1) <= n) x++; return x; };
-/* §6, слой 0: УВС = урон обычной атаки × скорость × (1 + крит × (критурон − 1)); ЭЗ = здоровье / ((1 − смягчение) × (1 − уклонение));
-   смягчение — эталон своего уровня, среднее физической и магической защиты, не выше предела защиты ядра */
-function bmOf(u, R) {
-  const kl = R.K * u.lvl, cap = R.caps.defPct * 100;
-  const mit = k => Math.min(cap, Math.floor(u.def[k] * 10000 / (kl + u.def[k])));
-  const m = Math.floor((mit('str') + mit('int')) / 2);
-  const dps = Math.floor(u.atk[u.main] * u.as * (1000000 + u.crit * (u.critDmg - 100)) / 100000000);
-  const ehp = Math.floor(Math.floor(u.maxHp * 10000 / (10000 - m)) * 10000 / (10000 - u.eva));
-  return Math.floor(BM_C_X100 * isqrt(dps * ehp) / 100);
-}
+/* §6: мощь считает ядро — EnBattle.bm(карта, C): слой 0 — характеристики, слой 1 — вклад способностей набора (ADR-0051).
+   Своей формулы у сборщика нет */
 /* здоровье и мощь карточки — ядро на этаже первой встречи врага: уровень этажа, здоровье биома, набор; для любого биома ядра */
 function cardNums(ctx, biome, ids) {
   const EB = ctx.EnBattle, B = EB.BIOMES[biome], L = B.foeLvl || EB.RULES.foeLvl, lvlAt = f => L.base + Math.floor(f * L.perFloor / (L.div || 1)), first = {}, out = {};
@@ -222,8 +224,9 @@ function cardNums(ctx, biome, ids) {
     const bt = EB.create({ mode: 'rounds', seed: 1, heroes: [], foes: [{ key: id, id, name: f.name, cls: f.cls, el: f.el, lvl, st: f.st, hpPct, main: f.main, rank: f.rank, kit }] });
     const u = bt.u[1][0], table = EB.kitTable(u);
     if (table.length !== kit.kit.filter(x => x.slot === 'act' || x.slot === 'ult').length) fail(`${id}: ядро собрало таблицу шансов не из всех способностей`);
+    for (const x of kit.kit.filter(y => y.trait)) if (!u.lpas.some(p => p.id === x.id)) fail(`${id}: черта «${x.id}» не встала в пассивки карты ядра`);
     for (const x of kit.kit) if (!EB.lib()[x.id]) fail(`${id}: ядро не знает «${x.id}»`);
-    out[id] = { lvl, floor: at.floor, hp: u.maxHp, bm: bmOf(u, EB.RULES) };
+    out[id] = { lvl, floor: at.floor, hp: u.maxHp, bm: EB.bm(u, BM_C_X100) };
   }
   return out;
 }
@@ -260,7 +263,8 @@ const FORMAT = `/* Собрано tools/content-gen/biomes/build.js из tools/c
      rules: { sig, ranks, template, archer, bmC },   // подпись данных боя (pace.json), состав врага по рангу (ADR-0016), образцы, C мощи (§6)
      art: [путь от assets/art/],                // выгруженный арт биомов; чего нет — прототип рисует заглушку
      abilities: [запись как в abilities.js],    // уникальные способности — EnBattle.addLib; why — зачем уникальная, для команды
-     foes: { b2o1: { biome, rank, name, cls, el, race, st, hpPct, main?, fx?, kit: { rank, ultPct, actPct, kit: [{ v, slot, id, as?, tgt? }] } } },
+     foes: { b2o1: { biome, rank, name, cls, el, race, st, hpPct, main?, fx?, kit: { rank, ultPct, actPct, kit: [{ v, slot, id, as?, tgt?, trait?, chR? }] } } },
+         // trait — черта именного врага из набора «Черты врагов» (ADR-0051): сверх числа способностей по рангу; chR — шанс её реакции
          // карта ядра — EnBattle.addFoes: те же поля, что у FOES Мастерской, набор — как EN_KITS.foes
      cards: { b2o1: { biome, g, type, tag, look, desc, tip, rare, tpl, pos?, lvl, floor, hp, bm } },
          // бестиарий: запись сказителя — desc и tip; у кого записи нет — облик и без совета; hp и bm — ядро на этаже первой встречи
@@ -293,6 +297,7 @@ const fmt = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 function abRow(id, x) {
   const u = uniques.find(y => y.id === x.id), L = LIB[x.id];
   const nm = u ? u.n : x.as || L.n, what = u ? `уникальная: ${KIND[u.k] || u.k}${u.tier ? ' ' + (TIER[u.tier] || '') : ''}` : `${L.id}${x.as ? ` «${L.n}»` : ''}`;
+  if (x.trait) return `«${L.n}» — черта${x.chR ? `, шанс ${(x.chR / 100).toFixed(1).replace('.', ',').replace(',0', '')} %` : ''}: ${L.d}`;
   return `«${nm}»${x.slot === 'ult' ? ' — ульта' : x.slot === 'pas' ? ' — пассивка' : ''} · ${what}${x.tgt ? ' · цель: ' + TGT_RU[x.tgt] : ''}`;
 }
 function doc(pace, stale) {

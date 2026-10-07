@@ -24,21 +24,26 @@
       чисел, одного чипа, одно действие. Итог — тот же вид, что итог Эхо: классы «Подробностей боя» есть в echo.css. Режим «Игрок»:
       служебных слов нет; «Команда» — служебное есть.
    8. Неделя: строки «Арена» и «Лига» в WEEK_MODES — настоящие, целые, планки — порог × x, Энериум прошлой недели — суточные срезы.
+   8а. Лестница планок (ADR-0047) — законы Л1–Л4 (ladder_laws.js), проверены мутацией: планки побед Арены и Лиги — ступени лестницы
+      на все циклы, та же, что даёт EnLoot.ladder для цикла игрока; пороги — по победам: первая планка (EN_ARENA) × множитель ступени,
+      рейтинг планок не берёт; в листе наград видны все пять полос — прошлые «пройдено», будущие с порогом и сундуком; за верхней
+      планкой своей полосы — планки следующей, без перехода в новый цикл: полоса внизу экрана ведёт к ней, «Дары» платят её сундуки.
    9. UI-кит: итог со статистикой и правило списка; сценарии презентации, у пропуска — итог с раскрытой статистикой.
-   Запуск: node tools/content-gen/screens/check_arena.js */
+   Запуск: node tools/content-gen/screens/check_arena.js [--mut]   (--mut — какой закон поймал каждую поломку лестницы) */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const { SERVICE, strip, playerText } = require('./check_player_view.js');
+const LL = require('./ladder_laws.js');   // законы лестницы планок (ADR-0047) — общие с проверками Недели и экранов режимов
 const ROOT = path.join(__dirname, '..', '..', '..'), UI = path.join(ROOT, 'design', 'ui');
 const read = f => fs.readFileSync(path.join(UI, f), 'utf8');
 const html = read('index.html');
 const err = [], note = [];
-const cnt = { views: 0, player: 0, ops: 0, cards: 0, fights: 0 };
+const cnt = { views: 0, player: 0, ops: 0, cards: 0, fights: 0, ladders: 0, mut: '' };
 const say = m => { if (err.length < 60) err.push(m); else if (err.length === 60) err.push('… и ещё ошибки'); };
 function done() {
   for (const n of note) console.log('предупреждение: ' + n);
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
-  console.log(`Арена и Лига: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; карточек ${cnt.cards}; операций ${cnt.ops}; боёв ${cnt.fights}.`);
+  console.log(`Арена и Лига: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; карточек ${cnt.cards}; операций ${cnt.ops}; боёв ${cnt.fights}. Лестница планок: состояний сверено ${cnt.ladders}, мутаций поймано ${cnt.mut || 'нет'}.`);
   console.log('Проверка пройдена: данные свежие и целые, Эло и подбор — по правилам, бой решён на сиде и показ его не меняет, операции не повторяются, Лига закрыта до 15 героев и «Дары» ей не платят, итоги недели — в реестре, игроку служебного не видно.');
   process.exit(0);
 }
@@ -167,6 +172,7 @@ function load() {
     get S() { return S; }, set S(v) { S = v; },
     ACT, OV, FLOWS, KH, KIT_EXTRA, MAP, RS, RSI, EB, H, SQ, SQ_DATA, ZP_DEMO: typeof ZP_DEMO !== 'undefined' ? ZP_DEMO : null, render, initialState, setTeam, advance,
     darRows: typeof darRows === 'function' ? darRows : null, WEEK: window.EN_WEEK, UIA: window.EN_ARENA_UI, AD: window.EN_ARENA, AE: window.EnArena,
+    LBX: window.EN_LOOTBOXES, EnLoot: window.EnLoot, fmt, lbRowLabel: typeof lbRowLabel === 'function' ? lbRowLabel : null,
   })`, ctx);
   return { T, els, game: () => (els.game ? els.game.innerHTML : '') };
 }
@@ -470,13 +476,99 @@ fresh();
     if (st.lock) say('Неделя: Арена закрыта в цикле II');
     else {
       if (st.points !== T.S.arena.rating || st.have !== T.S.arena.wins || st.place !== U.arPlace(T.S.arena.rating)) say('Неделя: Арена — не рейтинг, победы или место экрана');
-      st.planks.forEach((p, i) => { if (p.need !== D.arena.plank * [1, 2, 4, 8][i]) say(`Неделя: планка Арены ${i + 1} — ${p.need}`); });
     }
     const past = W.state('arena', 'past'), en = (T.S.arena.past.days || []).reduce((a, p) => a + T.AE.dailyEn(D, p), 0);
     if ((past.cur.find(x => x[0] === 'enerium') || [0, 0])[1] !== en) say('Неделя: Энериум Арены прошлой недели — не суточные срезы');
     T.S.route = 'week'; T.S.seg.week = 'now'; view('Неделя · эта'); T.S.seg.week = 'past'; view('Неделя · прошлая');
     for (const t of ['now', 'past']) for (const id of ['arena', 'league']) { T.S.overlay = { t: 'wkmode', arg: `${id}:${t}` }; view(`Неделя · лист ${id} ${t}`); }
   }
+}
+
+/* ================== 8а. лестница планок ==================
+   Планки побед Арены и Лиги — ступени лестницы на все циклы (ADR-0047): пороги — по победам. Законы — ladder_laws.js */
+const LAD0 = T.EnLoot && T.EnLoot.ladder;
+const ROAD_END = ['<p class="reason">', '<span class="eyebrow">Энериум', 'class="team-only', 'class="sheet-f"'];   // чем кончается лестница в листе наград
+const WINS = { arena: v => { T.S.arena.wins = v; }, league: v => { T.S.arena.lg.wins = v; } }, PLANK1 = { arena: D.arena.plank, league: D.league.plank };
+const sheetOf = (kind, where) => { T.S.route = 'arena'; T.S.seg.arena = kind; T.S.overlay = { t: 'arrew', arg: kind }; return ovOf(view(where)); };
+/* Л1–Л4 по состоянию режима и листу наград во всех циклах: список нарушений */
+function arLadder() {
+  const e = [];
+  if (typeof LAD0 !== 'function' || !T.WEEK || !T.LBX) { e.push('нет EnLoot.ladder, EN_WEEK или EN_LOOTBOXES — планки побед не сверить'); return e; }
+  for (const kind of ['arena', 'league']) for (let c = T.LBX.modes[kind].from; c <= 6; c++) {
+    fresh(); T.S.acc.cycle = c;
+    const key = `${kind} · цикл ${LL.ROMAN[c]}`, st = T.WEEK.state(kind, 'now');
+    if (!st || st.lock) { if (kind === 'arena') e.push(`${key}: режим закрыт — ${st && st.lock}`); continue; }
+    cnt.ladders++;
+    LL.stateLaw(T.LBX, key, st, c, LAD0).forEach(x => e.push(x));
+    /* пороги — по победам: первая планка режима × множитель ступени; «набрано» — победы недели, а не рейтинг */
+    const wins = kind === 'league' ? T.S.arena.lg.wins : T.S.arena.wins, want = LL.needs(T.LBX, kind, c, PLANK1[kind]);
+    if (st.planks.map(p => p.need).join() !== want.join()) e.push(`${key}: пороги — ${st.planks.slice(0, 6).map(p => p.need).join('/')}…, по победам из данных — ${want.slice(0, 6).join('/')}…`);
+    if (st.have !== wins || st.points === st.have) e.push(`${key}: «набрано» к планкам — ${st.have}, побед недели — ${wins}, рейтинг — ${st.points}`);
+    if (!Array.isArray(st.plankUnit) || !/побед/.test(st.plankUnit.join())) e.push(`${key}: единица планок — не победы`);
+    LL.roadLaw(T.LBX, key + ' · лист наград', sheetOf(kind, key + ' · лист наград'), st, c, ROAD_END).forEach(x => e.push(x));
+  }
+  return e;
+}
+/* рейтинг планок не берёт: рейтинг вырос — планки те же; победа добавилась — «набрано» выросло */
+function arByWins() {
+  const e = [];
+  fresh();
+  const a = T.WEEK.state('arena', 'now').planks.map(p => p.reached).join(), w0 = T.S.arena.wins;
+  T.S.arena.rating += 500;
+  if (T.WEEK.state('arena', 'now').planks.map(p => p.reached).join() !== a) e.push('Арена: планки берёт рейтинг, а не победы');
+  T.S.arena.wins = w0 + 1;
+  if (T.WEEK.state('arena', 'now').have !== w0 + 1) e.push('Арена: победа недели не дошла до планок');
+  return e;
+}
+/* за верхней планкой своей полосы — планки следующей, без перехода (Л3, Л4): побед — ровно порог первой планки следующей полосы по
+   эталону. Полоса внизу экрана ведёт ко второй с её сундуком, в листе следующая полоса раскрыта, «Дары» платят сундуки её полосы.
+   arBeyond() — список нарушений: его же зовёт проверка мутацией */
+function arBeyond() {
+  const e = [];
+  for (const kind of ['arena', 'league']) {
+    fresh();
+    const c = T.S.acc.cycle, key = `за верхней планкой · ${kind}`, st0 = T.WEEK.state(kind, 'now');
+    if (!st0 || st0.lock) { e.push(`${key}: режим закрыт в демо`); continue; }
+    const ref = LL.ref(T.LBX, kind, c), n = LL.ownCount(T.LBX, kind, c), own = ref[0].band, need = PLANK1[kind] * ref[n].x / ref[0].x;
+    WINS[kind](need);
+    const st = T.WEEK.state(kind, 'now'), p = st.planks[n];
+    LL.stateLaw(T.LBX, key, st, c, LAD0).forEach(x => e.push(x));
+    if (!p || !p.reached || p.band !== own + 1 || p.need !== need) { e.push(`${key}: Л3 — побед ${need}, а первая планка следующей полосы не взята: ${p ? `порог ${p.need}, полоса ${p.band}` : 'её нет в лестнице'}`); continue; }
+    T.S.overlay = null; T.S.route = 'arena'; T.S.seg.arena = kind;
+    const h = view(key + ' · экран'), strip = (h.match(/<button class="ar-plank"[\s\S]*?<\/button>/) || [''])[0], nx = st.planks[n + 1];
+    if (!strip.includes(`сундук за <b class="num">${T.fmt(nx.need)}</b>`) || !new RegExp(`class="well itf ar-chest" data-r="${LL.topR(ref[n + 1].pay)}"`).test(strip) || !decode(strip).includes(`цикл ${LL.ROMAN[own + 1]}`)) e.push(`${key}: Л3 — полоса побед не ведёт ко второй планке следующей полосы с её сундуком`);
+    const s = sheetOf(kind, key + ' · лист');
+    LL.roadLaw(T.LBX, key + ' · лист', s, st, c, ROAD_END).forEach(x => e.push(x));
+    if (!s.includes(`<div class="wk-ld-band" data-band="${own + 1}">`)) e.push(`${key}: Л4 — полоса, по которой игрок идёт, не раскрыта`);
+    /* «Дары»: взятая планка следующей полосы — под подписью с её циклом, сундуки — её полосы */
+    if (T.darRows && T.lbRowLabel) {
+      const ly = T.LBX.modes[kind].layers.find(l => l.id === T.LBX.modes[kind].ladder.layer), lab = LL.label(T.LBX, kind, p, c, T.lbRowLabel);
+      const row = T.darRows(T.S).find(x => x.wk.id === 'now' && x.id === kind && x.label === lab);
+      if (!row || !LL.same(row.groups, ref[n].pay)) e.push(`${key}: в «Дарах» нет строки «${lab}» с сундуками её полосы — ${row ? JSON.stringify(row.groups) : 'строки нет'}`);
+      if (!lab.includes(`цикл ${LL.ROMAN[own + 1]}`) || !ly) e.push(`${key}: подпись выплаты не называет полосу — «${lab}»`);
+    }
+  }
+  return e;
+}
+{
+  arLadder().forEach(say); arByWins().forEach(say); arBeyond().forEach(say);
+  if (typeof LAD0 === 'function') {
+    const MUT = LL.mutations(LAD0);   // замок по циклу вернули; планка следующей полосы платит сундук своей; порог продолжения — не ×next
+    let caught = 0;
+    for (const [what, f] of MUT) {
+      const n0 = err.length;   // что сломанный экран наговорит сам — тоже «поймано», а не ошибка проверки
+      T.EnLoot.ladder = f;
+      let got = [];
+      try { got = arBeyond(); } catch (x) { got = ['исключение ' + x.message]; }
+      T.EnLoot.ladder = LAD0;
+      got = got.concat(err.splice(n0));
+      if (got.length) caught++; else say(`мутация «${what}»: законы лестницы её не поймали`);
+      if (process.argv.includes('--mut')) console.log(`мутация «${what}»: ${got.length ? got.slice(0, 2).join(' | ').slice(0, 320) : 'НЕ ПОЙМАНА'}`);
+    }
+    cnt.mut = `${caught} из ${MUT.length}`;
+    arBeyond().forEach(x => say('после мутаций: ' + x));
+  }
+  fresh();
 }
 
 /* ================== 9. UI-кит и сценарии ================== */

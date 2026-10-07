@@ -54,9 +54,13 @@
 .ct-ri>img{width:20px;height:20px;object-fit:contain}
 .ct-ri b{font:700 15px/1 var(--f-u);color:var(--parch)}
 .ct-chest img{width:78%;height:78%;object-fit:contain}
-.ct-ptsb{display:flex;align-items:baseline;gap:8px;padding-top:var(--sp-s);border-top:1px solid var(--iron)}
+/* очки рейтинга — кнопка: вход к планкам недели (лист OV.ctrew) */
+.ct-ptsb{appearance:none;display:flex;align-items:baseline;gap:8px;width:100%;min-width:0;padding:var(--sp-s) 0 0;border:0;border-top:1px solid var(--iron);background:none;color:inherit;font:inherit;text-align:left;flex:none}
 .ct-ptsb b{font:600 24px/1 var(--f-d);color:var(--gold);flex:none}
-.ct-ptsb small{font-size:11.5px;line-height:1.25;color:var(--parch-3)}
+.ct-ptsb small{flex:1 1 auto;min-width:0;font-size:11.5px;line-height:1.25;color:var(--parch-3)}
+.ct-ptsb>.i{flex:none;align-self:center;width:13px;height:13px;color:var(--gold-2);opacity:.7}
+.ct-ptsb:hover small{color:var(--parch-2)}
+.ct-ptsb:hover>.i{opacity:1}
 .ct-cb{display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;color:var(--parch-2);text-align:left;flex:none}
 .ct-cb>span{flex:1 1 auto;min-width:0}
 .ct-cb>.i:last-child{flex:none;color:var(--gold-2)}
@@ -110,6 +114,13 @@
 .ct-rules{display:flex;flex-direction:column;gap:6px}
 .ct-rules p{margin:0;display:flex;gap:8px;align-items:flex-start;font-size:13.5px;line-height:1.35;color:var(--parch)}
 .ct-rules .i{margin-top:2px;color:var(--gold-2)}
+
+/* лист планок недели: вкладки «Личные» и «Клан»; строка клана — имя и сколько участников в счёте */
+.ct-tabs{flex:none}
+.ct-cn{display:flex;align-items:center;gap:var(--sp-s);margin:0;min-width:0;font-size:14px;color:var(--parch)}
+.ct-cn .i{width:16px;height:16px;flex:none;color:var(--gold-2)}
+.ct-cn b{font:600 17px/1.1 var(--f-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ct-cn .faint{margin-left:auto;flex:none;font-size:12px}
 
 /* лист шансов */
 .ct-odds{display:flex;flex-direction:column}

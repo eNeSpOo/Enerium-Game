@@ -34,18 +34,23 @@
      Эхо недели (окно-витрина OV.hrecho: цивилизация, пятеро крупными книгами, неприязнь, откуда осколки, пробуждение за души) и лавка
      праха (окно OV.dust). Лавка праха — отдельное окно: витрина найденных героев пула рулетки доступных циклов — книги с ценой осколка
      и полосой осколков; справа — выбранный: осколки за прах (1, 10 или до комплекта) и пробуждение за души; после пробуждения — окно
-     OV.hrwake: трещины заживают, герой выходит из стекла в раме. Героев Эхо прахом не собрать (слово автора 29.09.2026): лавка продаёт
+     OV.hrwake: трещины заживают, герой выходит из стекла в раме. Героев Эхо общим прахом душ не собрать (слово автора 29.09.2026): лавка продаёт
      осколки только героев из EN_ROSTER.rules.dustSrc (rsDustable, index.html) и говорит почему; героя Эхо собирают осколки из сундуков
      Эхо, пробуждают — души (окно отряда недели). Покупка осколков и пробуждение — операции SOUL_SRV с номером. Герой, которого собирают,
      в сетках и витринах — книга с полосой осколков (неизвестная душа — закрытая, с «?»), в списках — осколок: стекло с его лицом
      (shardGhost, screens/art-icons.js);
+   — героев Эхо (ADR-0047): комплект осколков у каждого героя свой — hrNeed(h): у героя Эхо — по его циклу (EN_ROSTER.rules.echoSet),
+     у героев рулетки и крафта — прежний (rules.stub.shards); его считает «сервер» героев Эхо (EN_ECHO_HEROES, screens/echo.js).
+     Прах Эха — свой, не общий прах душ (S.wallet.edust): в него уходят лишние осколки героя Эхо при пробуждении (hrSpare), игрок сам
+     вливает его в героя Эхо любой недели, открытого по циклу и ещё не собранного, — кнопка «Влить» (ehBtn) в книге героя, витрине
+     отряда недели и в запасах, окно выбора количества (ehAsk: остаток, сколько, итог) и операция EN_ECHO_HEROES.pour с номером;
    — «За Энериум» — витрина донатного сета (dnView): зал, пятеро Безликих на ступенях цены — дороже герой, выше ступень и ярче свет;
      сет — коллекция: сколько из пяти уже в коллекции и какую ступень сет-бонуса это даёт (лист OV.hrset — ступени наглядно).
      Справа — выбранный герой, что он даёт и одна кнопка покупки с ценой. Честно (§1.2, §32): цена и с чем герой приходит видны
      до покупки, подтверждение OV.dnbuy называет остаток Энериума. Покупка — операция DN_SRV с номером, после неё — окно получения
      героя OV.hrgot: свет снизу, песок времени, рама и имя; нажатие — сразу итог. Арт витрины — DN_ART: пока путь не выгружен,
      зал, раму и эмблемы рисует CSS;
-   — действия ACT.hc*, ACT.sq*, ACT.d*, ACT.dn*, ACT.du*, ACT.dustbuy, activate и activatedo, лист имени OV.sqname, разделы UI-кита
+   — действия ACT.hc*, ACT.sq*, ACT.d*, ACT.dn*, ACT.du*, ACT.eh* («Влить прах Эха»), ACT.dustbuy, activate и activatedo, лист имени OV.sqname, разделы UI-кита
      «Отряды», «За Энериум» и «За души · лавка праха» через KIT_EXTRA (раздел «Карточка-книга» — screens/book.js), сценарии.
    Своё состояние — S.hf, S.hgrid, S.sq, S.dn и S.du, заводятся как S.bag. Вид коллекции — S.hview: own — сетка героев аккаунта,
    all — каталог, mine — раскрытая книга героя аккаунта S.selHero (прежнее имя: так её открывают другие экраны и сценарии), rs — книга
@@ -115,6 +120,7 @@ const HC_VIEW = {
   gold: [100, 92],         // полка «За золото»: книга не уже, px — над шкафом ещё вкладки Призыва, видно больше одного ряда
   gap: 8,                  // между книгами сетки, px
   short: 100000,           // мощь от этого числа — коротко: «128,4К»
+  shard: 1000,             // осколки на книге от этого числа — коротко: «2,4К/2,5К» (комплект героя Эхо — тысячи); точно — в подсказке и в книге
   echo: 12,                // витрина отряда недели: между книгами, px
 };
 /* порядок сетки: «Мои» — по мощи, сильнейшие сверху; каталог — по циклу, как в составе */
@@ -166,11 +172,42 @@ const DU_ART = {
   want: ['souls/dust-shop.jpg'],
   shop: 'souls/dust-shop.jpg',
 };
+/* «Влить прах Эха» (ADR-0047): числа вида, не баланс. Комплект героя Эхо — EN_ROSTER.rules.echoSet, курс праха Эха — rules.echoDust:
+   их читает «сервер» героев Эхо (EN_ECHO_HEROES, screens/echo.js) */
+const EP_VIEW = {
+  qty: [10, 100, 1000],      // сколько вливать за раз — кнопки; последняя — «всё»: сколько хватает праха и сколько недостаёт до комплекта
+  ask: 64,                   // осколок героя в окне «Влить прах Эха», px
+};
 
 /* ================== помощники ================== */
 const hrEsc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 const HR_ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
 const hrFl = (a, b) => Math.floor(a / b);
+
+/* ================== комплект осколков героя и прах Эха (ADR-0047) ==================
+   Слова автора 02.10.2026: «осколков на первом героев нужно условно 1000, потом 2 500, 5 000, 10 000, 25 000»; «вводим новый прах,
+   именно с Эхо, а уже игрок сам решит, в какого героя ему потратить и на какой недели… пока он не собрал полного».
+   Комплект у каждого героя свой: у героя Эхо — по его циклу (EN_ROSTER.rules.echoSet), у героев рулетки и крафта — прежний
+   (rules.stub.shards). Считает его «сервер» героев Эхо (EN_ECHO_HEROES.need, screens/echo.js); без героя (книга-образец UI-кита) и без
+   «сервера» — тот же ряд из данных. Числа — только в roster.js */
+const hrEH = () => (typeof window !== 'undefined' && window.EN_ECHO_HEROES) || null;
+const hrIsEcho = h => !!h && h.src === 'echo';
+function hrNeed(h) {
+  const E = hrEH(), R = RS.rules;
+  if (h && E) return E.need(h);
+  return (hrIsEcho(h) && Array.isArray(R.echoSet) && R.echoSet[h.c - 1]) || R.stub.shards;
+}
+/* курс праха Эха: perShard — праха за лишний осколок героя Эхо, shard — праха за осколок, когда его вливают */
+const hrEchoRate = () => { const E = hrEH(); return (E && E.rules()) || RS.rules.echoDust || { perShard: 0, shard: 0 }; };
+/* остаток праха Эха: у аккаунта «с чистого листа» поля в кошельке ещё нет — это ноль */
+const hrEDust = () => { const E = hrEH(); return E ? E.dust() : (S.wallet && S.wallet.edust) || 0; };
+/* куда уходят лишние осколки героя при пробуждении (§15.2): у героя Эхо — в прах Эха по курсу, у прочих — в общий прах душ (§15.3) */
+function hrSpare(h, extra) {
+  const n = Math.max(0, extra || 0);
+  return hrIsEcho(h) ? { dust: 0, edust: n * hrEchoRate().perShard } : { dust: n * rsDustOf(h), edust: 0 };
+}
+/* слово о лишних осколках — какой прах: игрок не путает прах Эха с прахом душ */
+function hrSpareWord(h) { return hrIsEcho(h) ? 'прах Эха' : 'прах душ'; }
 
 /* ================== герои аккаунта ==================
    Герой аккаунта — герой боя прототипа (S.heroes) или купленный и пробуждённый герой состава (S.rs.owned). Для героя состава hrOwn
@@ -210,7 +247,7 @@ function hrBuild(h) {
   const put = k => v => { const o = S.rs.owned[id]; if (o) o[k] = v; };
   const x = { id, name: h.n, cls: core, clsN: h.cls, el: h.sch, race: h.race, draft: hrDraft(h), r: h.r, cycle: h.c, img: hrImg(h), maxV: h.maxV,
     st: T[0].slice(), gr: T[1].slice(), ab: [], pas: [], ult: null, busy: null, rid: id,
-    avers: h.avers && h.avers.race ? { race: h.avers.race, bp: h.avers.bp != null ? h.avers.bp : RS.rules.aversionBp } : null };
+    avers: h.avers && h.avers.race ? { race: h.avers.race, bp: h.avers.bp != null ? h.avers.bp : EB.aversionBp(h.c) } : null };   // по циклу героя (ADR-0054)
   Object.defineProperties(x, {
     lvl: { enumerable: true, get: () => rec().lvl, set: put('lvl') },
     lim: { enumerable: true, get: () => rec().lim, set: put('lim') },
@@ -243,7 +280,7 @@ function hrStage(rh) {
   if (rh.c > rsCyc()) return 0;
   if (rh.src === 'gold' || rh.src === 'donat') return rh.c >= rsFrom(rh.src) ? 2 : 0;
   const n = (S.rs.shards && S.rs.shards[rh.id]) || 0;
-  return n >= hrNeed() ? 2 : n > 0 ? 1 : 0;
+  return n >= hrNeed(rh) ? 2 : n > 0 ? 1 : 0;   // комплект — свой у каждого героя: у героя Эхо — по его циклу (ADR-0047)
 }
 const HR_STAGE = ['не найден', 'неизвестная душа', 'известен', 'в коллекции'];
 /* мощь героя вне коллекции — по базовым статам: уровень 0, без вещей; та же функция BM (index.html, §6) на герое, собранном как
@@ -346,9 +383,10 @@ SCREENS.heroes = hrScreen;
 const hcRom = c => ROMAN[c] || '';
 /* путь пройден: доблесть на личном максимуме, все пределы круга пройдены, уровень на потолке */
 const hcMax = v => !!v.own && v.maxV > 0 && v.valor >= v.maxV && v.lim >= hrLimTop() && v.lvl >= v.cap;
-/* мощь на книге: до HC_VIEW.short — полностью, дальше коротко — «128,4К», «1,2М»; только целые */
-function hcNum(n) {
-  if (!(n >= HC_VIEW.short)) return fmt(n || 0);
+/* мощь на книге: до HC_VIEW.short — полностью, дальше коротко — «128,4К», «1,2М»; только целые. from — с какого числа коротко:
+   у осколков на книге — HC_VIEW.shard */
+function hcNum(n, from = HC_VIEW.short) {
+  if (!(n >= from)) return fmt(n || 0);
   const [d, s] = n >= 1000000 ? [100000, 'М'] : [100, 'К'], k = Math.floor(n / d);
   return `${fmt(Math.floor(k / 10))}${k % 10 ? ',' + (k % 10) : ''}${s}`;
 }
@@ -375,16 +413,18 @@ function hcFace(v) {
   const sil = p && typeof artReady === 'function' && artReady(p) ? `<img${fit} src="${AV(p)}" alt="" loading="lazy" decoding="async">` : key && typeof shardClsSvg === 'function' ? shardClsSvg(key, true) : '';
   return `<span class="hk-sil" data-el="${hrEsc(v.el)}"><span class="hk-fit">${sil}</span></span>`;
 }
-/* полоса осколков: стекло осколка, доля, «собрано / нужно»; полный комплект светится. У неизвестной души стекло — с силуэтом класса */
+/* полоса осколков: стекло осколка, доля, «собрано / нужно»; полный комплект светится. У неизвестной души стекло — с силуэтом класса.
+   Числа — от комплекта этого героя; тысячи (комплект героя Эхо) на книге — коротко, точно — в подсказке */
 function hcShard(v, got, need) {
   const p = need > 0 ? Math.min(100, Math.floor(got * 100 / need)) : 0, g = v.rh && typeof shardGhost === 'function' ? shardGhost(v.rh, got, need, 18) : '';
-  return `<span class="hk-sh${got >= need ? ' full' : ''}" title="Осколки ${fmt(got)} из ${fmt(need)}">${g}<span class="hk-shb"><i style="--v:${p}"></i></span><small class="num">${fmt(got)}/${fmt(need)}</small></span>`;
+  return `<span class="hk-sh${got >= need ? ' full' : ''}" title="Осколки ${fmt(got)} из ${fmt(need)}">${g}<span class="hk-shb"><i style="--v:${p}"></i></span><small class="num">${hcNum(got, HC_VIEW.shard)}/${hcNum(need, HC_VIEW.shard)}</small></span>`;
 }
-/* осколки героя вне коллекции для полосы в книге: у кого они есть или могут быть (рулетка, Эхо, рецепт крафта) — [собрано, нужно] */
+/* осколки героя вне коллекции для полосы в книге: у кого они есть или могут быть (рулетка, Эхо, рецепт крафта) — [собрано, нужно];
+   нужно — комплект этого героя (hrNeed) */
 function hcShardOf(v) {
   if (v.st === 3 || !v.rh) return null;
   const n = S.rs.shards[v.rh.id] || 0;
-  return RS_SHARD.includes(v.rh.src) || n > 0 ? [n, hrNeed()] : null;
+  return RS_SHARD.includes(v.rh.src) || n > 0 ? [n, hrNeed(v.rh)] : null;
 }
 /* книга в сетке каталога: купленный — в цвете с уровнем, замками и мощью; известный — чёрно-белый, комплект осколков — в цвете;
    неизвестная душа — закрытая книга с «?»; у сборных — полоса осколков */
@@ -460,10 +500,11 @@ function hcPreBody(rh) {
     : `<div class="hb-sc pg-who scroll" data-keep="hcwho:${rh.id}"><p class="pg-kick">${rar(rh.r)}<span>${hrEsc(rh.cls)}</span><span>цикл ${ROMAN[rh.c]}</span></p>${rsWhoHtml(rh, { book: true })}</div>`;
   return `<div class="hb-tb">${nav}${pgBody(body, 'rhero')}</div>`;
 }
-/* где брать осколки — по источнику героя */
-const HC_WHERE = { roulette: 'Осколки — в Возрождении душ и в лавке праха.', echo: 'Осколки — только в сундуках Эхо за места недели.', craft: 'Осколки — из скрытого рецепта Мастерской.' };
+/* где брать осколки — по источнику героя. Герой Эхо собирается только из осколков сундуков Эхо; лишние осколки героев Эхо — прах Эха,
+   его вливают в несобранного героя (ADR-0047) */
+const HC_WHERE = { roulette: 'Осколки — в Возрождении душ и в лавке праха.', echo: 'Собирается осколками Эхо и прахом Эха. Осколки — только в сундуках Эхо за места недели.', craft: 'Осколки — из скрытого рецепта Мастерской.' };
 function hcSoulBody(rh) {
-  const n = S.rs.shards[rh.id] || 0, need = hrNeed(), p = Math.min(100, hrFl(n * 100, need));
+  const n = S.rs.shards[rh.id] || 0, need = hrNeed(rh), p = Math.min(100, hrFl(n * 100, need));
   /* навыки неизвестной души — столько закрытых книг, сколько способностей в наборе: «способность скрыта» (abHiddenArt, art-icons.js) */
   const K = typeof heroKit === 'function' ? heroKit({ draft: hrDraft(rh) }) : null, cnt = K ? K.kit.length : 0;
   const hid = cnt && typeof abHiddenArt === 'function' ? `<div class="hb-hid" role="img" aria-label="Навыков: ${cnt}, пока скрыты" title="Навыки скрыты: откроются вместе с книгой">${Array.from({ length: cnt }, () => abHiddenArt(30)).join('')}</div>` : '';
@@ -472,11 +513,14 @@ function hcSoulBody(rh) {
     <div class="hb-sbar">${bar(p, '')}<small class="num">${fmt(n)} / ${fmt(need)}</small></div>
     <p class="reason">${HC_WHERE[rh.src] || ''}</p></div>`;
 }
-/* одно действие неизвестной души — туда, где берут осколки */
+/* одно действие неизвестной души — туда, где берут осколки. У героя Эхо слева — остаток праха Эха; есть что влить — главное действие
+   «Влить» (окно выбора количества, ehAsk), путь к сундукам Эхо — ссылкой рядом */
 function hcSoulFoot(rh) {
   const W = rsWeek(), week = rh.src === 'echo' && !!W && W.squad.includes(rh.id);
   if (rh.src === 'craft') return `<span class="g-spacer"></span><button class="btn go" data-a="go" data-v="craft">${ic('arrow')}В Мастерскую</button>`;
-  return `<span class="g-spacer"></span><button class="btn go" data-a="rsgo" data-v="${rh.id}">${ic('arrow')}${rh.src === 'echo' ? week ? 'К отряду недели' : 'В Эхо' : 'К душам'}</button>`;
+  const to = rh.src === 'echo' ? week ? 'К отряду недели' : 'В Эхо' : 'К душам';
+  if (hrIsEcho(rh) && ehCan(rh)) return `${ehBal()}<span class="g-spacer"></span><button class="link" data-a="rsgo" data-v="${rh.id}">${week ? 'Отряд недели' : 'В Эхо'} ${ic('chev')}</button>${ehBtn(rh)}`;
+  return `${hrIsEcho(rh) ? ehBal() : ''}<span class="g-spacer"></span><button class="btn go" data-a="rsgo" data-v="${rh.id}">${ic('arrow')}${to}</button>`;
 }
 /* одно действие книги героя состава: купленный — к развитию; известный — купить или пробудить по источнику (решение автора
    30.09.2026): за золото — найм (ACT.gbuy), донатный — покупка за Энериум (подтверждение OV.dnbuy, DN_SRV), комплект осколков —
@@ -490,10 +534,10 @@ function hcGetFoot(rh) {
     return `<div class="hcb-buy"><b>Донатный сет «${RSS[rh.dset] ? RSS[rh.dset].name : ''}»</b><span class="reason${lack ? ' warn' : ''}">${lack ? `Не хватает ${fmt(lack)} Энериума` : 'Сет-бонус растёт с доблестью'}</span></div>
       <span class="g-spacer"></span><button class="btn go big hcb-cta" data-a="dbuy" data-v="${dnOp()}|${rh.id}"${lack ? ' disabled' : ''}>Купить${costTag('enerium', p)}</button>`;
   }
-  const need = hrNeed(), n = S.rs.shards[rh.id] || 0, souls = RS.rules.stub.activateSouls, lack = Math.max(0, souls - S.wallet.souls);
+  const need = hrNeed(rh), n = S.rs.shards[rh.id] || 0, souls = RS.rules.stub.activateSouls, lack = Math.max(0, souls - S.wallet.souls);
   const sh = `<span class="hcb-shb">${bar(Math.min(100, hrFl(n * 100, need)), n >= need ? 'sp' : '')}<small class="num">${fmt(n)} / ${fmt(need)}</small></span>`;
   if (n < need) return `<div class="hcb-buy"><span class="reason">${HC_WHERE[rh.src] || ''}</span>${sh}</div>${hcSoulFoot(rh)}`;
-  return `<div class="hcb-buy"><b>Осколки собраны</b><span class="reason${lack ? ' warn' : ''}">${lack ? `Не хватает ${fmt(lack)} душ` : 'Лишние — в прах'}</span></div>
+  return `<div class="hcb-buy"><b>Осколки собраны</b><span class="reason${lack ? ' warn' : ''}">${lack ? `Не хватает ${fmt(lack)} душ` : `Лишние — в ${hrSpareWord(rh)}`}</span></div>
     <span class="g-spacer"></span><button class="btn go big hcb-cta" data-a="activate" data-v="${duOp()}|${rh.id}"${lack ? ' disabled' : ''}>Пробудить${costTag('souls', souls)}</button>`;
 }
 
@@ -1013,8 +1057,8 @@ function dnView() {
 /* ================== «За души»: сцена алтаря ==================
    Слово автора 29.09.2026: «рулетка — это тоже для людей, которые донатят… красиво и дорого-богато». Сцена — одна рама: алтарь душ
    (RL_ART.altar или CSS), перед зеркалом — вход рулетки веером героев пула (rlCol), справа — два входа: отряд Эхо недели (окно-витрина
-   OV.hrecho) и лавка праха (окно OV.dust). В лавке — только герои из rules.dustSrc (rsDustable): героев Эхо прахом не собрать, их
-   осколки — сундуки Эхо, пробуждение — души. И только найденные (стадии знакомства, решение автора 30.09.2026): у кого в запасах
+   OV.hrecho) и лавка праха (окно OV.dust). В лавке — только герои из rules.dustSrc (rsDustable): героев Эхо общим прахом душ не собрать,
+   их осколки — сундуки Эхо, комплект добирает прах Эха (ehAsk), пробуждение — души. И только найденные (стадии знакомства, решение автора 30.09.2026): у кого в запасах
    уже есть осколок — первый осколок героя даёт Возрождение душ */
 const hrDustCat = () => RS.heroes.filter(h => rsDustable(h) && h.c <= rsCyc() && !rsHas(h) && hrStage(h) >= 1);
 /* арена цивилизации недели — рисунок Эхо (screens/echo.js отдаёт свои данные как EN_ECHO.data: ECH живёт внутри его обёртки);
@@ -1023,28 +1067,97 @@ function hrEchoArt(race) {
   const E = window.EN_ECHO && window.EN_ECHO.data, a = E && E.art && E.art[race];
   return a && a.arena ? AV(a.arena) : '';
 }
-const hrNeed = () => RS.rules.stub.shards;
 /* герой, которого собирают из осколков, — осколок: стекло с его лицом, доля собранного — светом кромки и заживающими трещинами
-   (shardGhost, screens/art-icons.js); собранный и пробуждённый — портрет: null, строка берёт портрет */
+   (shardGhost, screens/art-icons.js); собранный и пробуждённый — портрет: null, строка берёт портрет. Доля — от комплекта героя */
 function hrGhost(h, px) {
   if (!h || rsHas(h) || typeof shardGhost !== 'function') return null;
-  return shardGhost(h, S.rs.shards[h.id] || 0, hrNeed(), px) || null;
+  return shardGhost(h, S.rs.shards[h.id] || 0, hrNeed(h), px) || null;
 }
-/* витрина отряда недели — выбранный герой одной строкой: имя, редкость и доблесть, осколки; одно действие — пробудить за души (комплект
-   собран), к развитию (в коллекции) или карточка героя. Пробуждение — подтверждение в том же окне (duAsk), операция SOUL_SRV.wake */
+
+/* ================== прах Эха: «Влить» (ADR-0047) ==================
+   Прах Эха вливают в героя Эхо любой недели, открытого по циклу и ещё не собранного. Решает «сервер» героев Эхо —
+   EN_ECHO_HEROES.pour(номер, герой, сколько): осколок за rules.echoDust.shard праха, не больше недостающего до комплекта; повтор
+   номера ничего не меняет. Здесь — только показ: остаток, сколько можно влить, кнопка «Влить» и окно выбора количества */
+/* сколько можно влить: не больше остатка праха Эха по курсу и не больше недостающего до комплекта */
+function ehMax(h) {
+  const R = hrEchoRate(), left = Math.max(0, hrNeed(h) - (S.rs.shards[h.id] || 0));
+  return R.shard > 0 ? Math.max(0, Math.min(hrFl(hrEDust(), R.shard), left)) : 0;
+}
+/* почему нельзя влить q осколков — в том же порядке, что у «сервера»: не герой Эхо, закрыт по циклу аккаунта, собран, мало праха.
+   Пусто — можно. Отказ решает «сервер», это — чтобы кнопка и строка причины говорили то же заранее */
+function ehWhy(h, q) {
+  const E = hrEH(), R = hrEchoRate();
+  if (!E || !hrIsEcho(h)) return 'none';
+  if (h.c > S.acc.cycle) return 'cycle';
+  if (E.done(h)) return 'done';
+  if (hrEDust() < R.shard * Math.max(1, q || 0)) return 'dust';
+  return q >= 1 ? '' : 'qty';
+}
+const ehCan = h => hrIsEcho(h) && ehMax(h) >= 1 && !ehWhy(h, 1);
+/* выбранный шаг (S.du.pq): шаг, которого уже не хватает, не действует — тогда «всё»; сколько вливать — шаг или всё, что можно */
+const ehStep = h => { const q = S.du.pq; return q > 0 && q <= ehMax(h) ? q : 0; };
+function ehQty(h) { return ehStep(h) || ehMax(h); }
+/* номер следующей операции «влить»: его несёт кнопка. Счёт — по ответам «сервера» (S.ech.ops): после удачной операции номер новый,
+   повтор прежнего ничего не меняет */
+function ehOp() { return 'ehp' + (1 + Object.values((S.ech && S.ech.ops) || {}).filter(x => x && x.kind === 'ehpour').length); }
+/* остаток праха Эха — значок и число */
+const ehBal = () => `<span class="ep-bal" title="Прах Эха — лишние осколки героев Эхо: его вливают в героя Эхо, пока тот не собран">${money('edust', hrEDust())}</span>`;
+/* кнопка «Влить» у несобранного героя Эхо: открывает окно выбора количества (ehAsk). o.tag — показать, сколько праха уйдёт, если влить всё */
+function ehBtn(h, o = {}) {
+  const m = ehMax(h);
+  return `<button class="btn go ep-btn${o.cls ? ' ' + o.cls : ''}" data-a="ehpour" data-v="${h.id}" aria-label="Влить прах Эха: до ${fmt(m)} ${plural(m, 'осколка', 'осколков', 'осколков')}" title="Влить прах Эха в героя: на руках ${fmt(hrEDust())}">Влить${o.tag ? costTag('edust', m * hrEchoRate().shard) : ''}</button>`;
+}
+const EH_WHY = {
+  none: () => 'Прах Эха вливают только в героев Эхо',
+  cycle: h => `Герой откроется в цикле ${ROMAN[h.c] || ''}`,
+  done: h => (rsHas(h) ? `${h.n} уже в коллекции` : 'Комплект уже собран — героя пробуждают души'),
+  qty: () => 'Столько осколков не влить',
+  dust: (h, r) => (hrEDust() > 0 ? `Не хватает праха Эха: нужно ${fmt((r && r.cost) || hrEchoRate().shard)}, есть ${fmt(hrEDust())}` : 'Праха Эха нет: им становятся лишние осколки героев Эхо'),
+  op: () => 'Действие устарело',
+};
+const ehSay = (r, h) => toast(EH_WHY[r.refuse] ? EH_WHY[r.refuse](h || {}, r) : 'Не вышло');
+/* окно «Влить прах Эха»: герой и его осколки от своего комплекта, остаток праха, сколько вливать (шаги EP_VIEW.qty и «всё»), что
+   выйдет; кнопка «Влить» несёт «номер|герой|сколько». Не найденный герой (стадия 0) — без имени и лица: «Неизвестная душа» */
+function ehAsk(id) {
+  const h = RSI[id]; if (!hrIsEcho(h)) return '';
+  const need = hrNeed(h), n = S.rs.shards[h.id] || 0, d = hrEDust(), R = hrEchoRate(), m = ehMax(h), q = ehQty(h), why = ehWhy(h, q), cost = q * R.shard;
+  const known = hrStage(h) >= 1, name = known ? hrEsc(h.n) : 'Неизвестная душа';
+  const glass = known && typeof shardGhost === 'function' ? shardGhost(h, n, need, EP_VIEW.ask) : `<span class="ep-q" style="--px:${EP_VIEW.ask}px" aria-hidden="true">?</span>`;
+  const step = ehStep(h), steps = EP_VIEW.qty.map(k => `<button aria-pressed="${step === k}" data-a="ehq" data-v="${k}"${k > m ? ' disabled' : ''}>${fmt(k)}</button>`).join('');
+  const after = Math.min(need, n + q), full = !why && after >= need;
+  const line = why ? `<p class="reason warn">${EH_WHY[why](h, { cost: R.shard })}</p>`
+    : `<p class="ep-res">Станет <b class="num">${fmt(after)} / ${fmt(need)}</b>${full ? ' — комплект собран, героя пробудят души' : ''} · праха Эха останется <b class="num">${fmt(d - cost)}</b></p>`;
+  return `<section class="du-ask ep-ask" role="dialog" aria-label="Влить прах Эха">
+      <div class="ep-h"><h3>Влить прах Эха</h3>${ehBal()}</div>
+      <div class="du-ah">${glass}<div class="col ep-who"><b class="serif">${name}</b>${known ? rar(h.r) : `<small class="faint">герой отряда недели · цикл ${ROMAN[h.c]}</small>`}
+        <span class="ep-bar">${bar(Math.min(100, hrFl(n * 100, need)), n >= need ? 'sp' : '')}<small class="num">${fmt(n)} / ${fmt(need)}</small></span></div></div>
+      <div class="ep-row"><span class="eyebrow">Сколько осколков</span><div class="qty ep-qty" role="group" aria-label="Сколько осколков влить">${steps}<button aria-pressed="${!step}" data-a="ehq" data-v="0"${m < 1 ? ' disabled' : ''}>всё · ${fmt(m)}</button></div></div>
+      ${line}
+      ${TM(`<p class="reason warn">Курс — rules.echoDust: осколок — ${fmt(R.shard)} праха Эха, лишний осколок — ${fmt(R.perShard)}. Операция ${ehOp()}: повтор ничего не спишет.</p>`)}
+      <div class="du-af"><button class="btn ghost" data-a="ehno">Отмена</button><button class="btn go ep-cta" data-a="ehpourdo" data-v="${ehOp()}|${h.id}|${q}"${why ? ' disabled' : ''}>Влить ×${fmt(q)}${costTag('edust', cost)}</button></div>
+    </section>`;
+}
+/* витрина отряда недели — выбранный герой одной строкой: имя, редкость и доблесть, осколки от своего комплекта; одно действие —
+   пробудить за души (комплект собран), к развитию (в коллекции) или карточка героя; есть что влить — «Влить» прах Эха (окно в той же
+   витрине, ehAsk). Пробуждение — подтверждение в том же окне (duAsk), операция SOUL_SRV.wake */
 function heSel(h) {
   if (!h) return '';
   if (h.c > rsCyc()) return `<div class="he-sel"><span class="he-sn"><b>Неизвестная душа</b><small><span>герой цикла ${ROMAN[h.c]} — откроется с циклом</span></small></span></div>`;
-  if (!hrStage(h)) return `<div class="he-sel"><span class="he-sn"><b>Неизвестная душа</b><small><span>первый осколок — в сундуках Эхо</span></small></span><button class="btn go" data-a="go" data-v="echo">${ic('arrow')}В Эхо</button></div>`;
-  const need = hrNeed(), n = S.rs.shards[h.id] || 0, own = rsHas(h), lock = h.c > rsCyc(), souls = RS.rules.stub.activateSouls, lack = Math.max(0, souls - S.wallet.souls);
+  const pour = ehCan(h);
+  if (!hrStage(h)) return `<div class="he-sel"><span class="he-sn"><b>Неизвестная душа</b><small><span>${pour ? 'первого осколка ещё нет' : 'первый осколок — в сундуках Эхо'}</span></small></span>${pour ? ehBtn(h, { tag: true }) : ''}<button class="btn${pour ? '' : ' go'}" data-a="go" data-v="echo">${ic('arrow')}В Эхо</button></div>`;
+  const need = hrNeed(h), n = S.rs.shards[h.id] || 0, own = rsHas(h), lock = h.c > rsCyc(), souls = RS.rules.stub.activateSouls, lack = Math.max(0, souls - S.wallet.souls);
   const sub = own ? 'в коллекции' : lock ? `откроется в цикле ${ROMAN[h.c]}` : n >= need ? `осколков ${fmt(n)} / ${fmt(need)} — можно пробудить` : `осколков ${fmt(n)} / ${fmt(need)}`;
   const act = own ? `<button class="btn go" data-a="dngo" data-v="${h.id}">${ic('up')}К развитию</button>`
     : n >= need && !lock ? `<button class="btn" data-a="rhero" data-v="${h.id}">Карточка</button><button class="btn go he-cta" data-a="activate" data-v="${duOp()}|${h.id}"${lack ? ` disabled title="Не хватает ${fmt(lack)} душ"` : ''}>Пробудить${costTag('souls', souls)}</button>`
-    : `<button class="btn go" data-a="rhero" data-v="${h.id}">Книга героя</button>`;
-  return `<div class="he-sel" data-r="${h.r}"><span class="he-sn"><b>${hrEsc(h.n)}</b><small>${rar(h.r)}<span>доблесть до ${h.maxV} · ${sub}</span></small></span>${act}</div>`;
+    : `${pour ? ehBtn(h, { tag: true }) : ''}<button class="btn${pour ? '' : ' go'}" data-a="rhero" data-v="${h.id}">Книга героя</button>`;
+  /* осколки — первыми: строка узкая, а счёт «собрано / нужно» у героя Эхо — тысячи; обрезается хвост, не счёт */
+  return `<div class="he-sel" data-r="${h.r}"><span class="he-sn"><b>${hrEsc(h.n)}</b><small>${rar(h.r)}<span>${sub} · доблесть до ${h.maxV}</span></small></span>${act}</div>`;
 }
 let heWas = false;   // витрина была открыта в прошлой отрисовке: при выборе героя она не всплывает заново
-window.addEventListener('en-render', () => { heWas = !!(S.overlay && S.overlay.t === 'hrecho'); });
+window.addEventListener('en-render', () => {
+  heWas = !!(S.overlay && S.overlay.t === 'hrecho');
+  if (S.du && S.du.pour && !heWas) S.du.pour = null;   // витрину закрыли — окно «Влить» в ней не ждёт следующего открытия
+});
 /* сцена «За души» — её зовёт rsSoulsView (index.html): алтарь, огоньки душ, вход рулетки и два входа справа */
 function hrSoulsView() {
   const art = typeof RL_ART !== 'undefined' && RL_ART.ready.includes(RL_ART.altar);
@@ -1052,10 +1165,11 @@ function hrSoulsView() {
   return `<div class="hr-souls${art ? ' art' : ''}">${scene}${motes}${typeof rlCol === 'function' ? rlCol() : ''}${hrSoulsSide()}</div>`;
 }
 /* справа в сцене — два входа. Отряд Эхо недели компактно: цивилизация и пять осколков по циклам II–VI (будущие — тусклые), фон — арена
-   недели. Лавка праха: прах на руках, сколько героев в лавке и сколько можно пробудить, фон — лавка */
+   недели; есть прах Эха — его остаток строкой (свой ресурс, рядом с общим прахом душ у лавки). Лавка праха: прах душ на руках, сколько
+   героев в лавке и сколько можно пробудить, фон — лавка */
 function hrSoulsSide() {
   const cur = rsCyc(), from = rsFrom('echo'), W = rsWeek(), squad = W ? W.squad.map(id => RSI[id]).filter(Boolean) : [];
-  const cat = hrDustCat(), need = hrNeed(), ready = cat.filter(h => (S.rs.shards[h.id] || 0) >= need).length, dfrom = rsFrom('roulette');
+  const cat = hrDustCat(), ready = cat.filter(h => (S.rs.shards[h.id] || 0) >= hrNeed(h)).length, dfrom = rsFrom('roulette'), ed = hrEDust();
   const bg = src => src ? `<img class="hr-ebg" src="${src}" alt="" loading="lazy" decoding="async">` : '';
   const eArt = W ? hrEchoArt(W.race) : '';
   const dArt = DU_ART.ready.includes(DU_ART.shop) ? AV(DU_ART.shop) : '';
@@ -1063,7 +1177,7 @@ function hrSoulsSide() {
   const echo = `<button class="hr-entry hr-echo" data-a="sheet" data-v="hrecho" aria-label="Эхо: отряд недели">${bg(eArt)}
       <span class="eyebrow">Эхо · отряд недели</span><b>${W && W.civ ? W.civ : 'Отряд недели'}</b>
       <span class="hr-ef">${squad.map(face).join('')}</span>
-      <small>${cur < from ? `Откроется с цикла ${ROMAN[from]}` : 'Осколки — только в сундуках Эхо'}</small><span class="hr-go">${ic('chev')}</span></button>`;
+      <small${cur >= from && ed > 0 ? ' class="hr-ed"' : ''}>${cur < from ? `Откроется с цикла ${ROMAN[from]}` : ed > 0 ? `${money('edust', ed)}<span>прах Эха</span>` : 'Осколки — только в сундуках Эхо'}</small><span class="hr-go">${ic('chev')}</span></button>`;
   const dust = `<button class="hr-entry hr-dust" data-a="dlg" data-v="dust" aria-label="Лавка праха">${bg(dArt)}
       <span class="eyebrow">Лавка праха</span><b>${money('dust', S.wallet.dust)}</b>
       <small>${cat.length ? `${cat.length} ${plural(cat.length, 'герой', 'героя', 'героев')} · осколки за прах` : cur < dfrom ? `Откроется с цикла ${ROMAN[dfrom]}` : RS.heroes.some(h => rsDustable(h) && h.c <= cur && !rsHas(h)) ? 'Первый осколок героя — в Возрождении душ' : 'Все герои собраны'}</small>
@@ -1083,23 +1197,23 @@ const duCycs = () => [...new Set(hrDustCat().map(h => h.c))].sort((a, b) => b - 
 const duCat = () => hrDustCat().filter(h => !S.du.cyc || h.c === S.du.cyc).sort((a, b) => b.c - a.c || b.r - a.r || a.n.localeCompare(b.n, 'ru'));
 /* выбранный: нажатый, иначе тот, кого можно пробудить, иначе с большей долей, иначе первый */
 function duSel(cat) {
-  const has = h => S.rs.shards[h.id] || 0, need = hrNeed();
-  return cat.find(h => h.id === S.rs.ssel) || cat.find(h => has(h) >= need) || [...cat].sort((a, b) => has(b) - has(a))[0] || null;
+  const has = h => S.rs.shards[h.id] || 0;
+  return cat.find(h => h.id === S.rs.ssel) || cat.find(h => has(h) >= hrNeed(h)) || [...cat].sort((a, b) => has(b) - has(a))[0] || null;
 }
 /* сколько брать: 1, 10 или до комплекта — не больше, чем осталось до комплекта */
 function duQty(h) {
-  const left = Math.max(1, hrNeed() - (S.rs.shards[h.id] || 0)), q = S.du.q;
+  const left = Math.max(1, hrNeed(h) - (S.rs.shards[h.id] || 0)), q = S.du.q;
   return Math.min(left, q > 0 ? q : left);
 }
 /* книга витрины (hbCard, screens/book.js): редкость, ступень, имя, полоса осколков и цена осколка; неизвестная душа — закрытая, с «?» */
 function duCard(h, sel) {
-  const n = S.rs.shards[h.id] || 0, need = hrNeed(), p = rsShardPrice(h);
+  const n = S.rs.shards[h.id] || 0, need = hrNeed(h), p = rsShardPrice(h);
   const foot = `<span class="du-cp" title="Осколок — ${fmt(p)} праха"><img src="${curImg('dust')}" alt="">${fmt(p)}</span>`;
   return hbCard(hcView(h), { z: 'm', act: 'ssel', val: h.id, sel, shard: [n, need], foot, bm: false });
 }
 /* выбранный герой: осколок крупно на свету, имя, редкость и класс, доля собранного; одно действие — осколки за прах или пробуждение */
 function duPick(h) {
-  const n = S.rs.shards[h.id] || 0, need = hrNeed(), full = n >= need, p = rsShardPrice(h), q = duQty(h), cost = p * q, souls = RS.rules.stub.activateSouls, op = duOp();
+  const n = S.rs.shards[h.id] || 0, need = hrNeed(h), full = n >= need, p = rsShardPrice(h), q = duQty(h), cost = p * q, souls = RS.rules.stub.activateSouls, op = duOp();
   const lackD = full ? 0 : Math.max(0, cost - S.wallet.dust), lackS = full ? Math.max(0, souls - S.wallet.souls) : 0;
   const qty = full ? '' : `<div class="qty du-qty" role="group" aria-label="Сколько осколков">${DU_VIEW.qty.map(k => `<button aria-pressed="${S.du.q === k}" data-a="duq" data-v="${k}">${k}</button>`).join('')}<button aria-pressed="${S.du.q === 0}" data-a="duq" data-v="0">до ${need}</button></div>`;
   const act = full
@@ -1116,15 +1230,16 @@ function duPick(h) {
     <div class="du-pa">${act}<small class="reason${lackD || lackS ? ' warn' : ''}">${why}</small></div>
   </div>`;
 }
-/* подтверждение пробуждения в том же окне: кто, с чем приходит, куда уйдут лишние осколки, цена; кнопка несёт номер операции */
+/* подтверждение пробуждения в том же окне: кто, с чем приходит, куда уйдут лишние осколки (у героя Эхо — в прах Эха, у прочих —
+   в прах душ: hrSpare), цена; кнопка несёт номер операции */
 function duAsk() {
   const A = S.du.ask, h = A && RSI[A.id]; if (!h) return '';
-  const need = hrNeed(), n = S.rs.shards[h.id] || 0, extra = Math.max(0, n - need);
+  const need = hrNeed(h), n = S.rs.shards[h.id] || 0, extra = Math.max(0, n - need), sp = hrSpare(h, extra);
   return `<button class="du-scrim" data-a="duno" aria-label="Отмена" tabindex="-1"></button>
     <section class="du-ask" role="dialog" aria-label="Пробудить героя">
       <h3>Пробудить героя</h3>
       <div class="du-ah">${shardGhost(h, n, need, DU_VIEW.ask)}<div class="col" style="gap:4px;min-width:0"><b class="serif">${hrEsc(h.n)}</b>${rar(h.r)}</div></div>
-      <p>${hrEsc(h.n)} соберётся из ${need} осколков и придёт с 0 уровнем, 0 рунных пределов и 0 доблести.${extra ? ` Лишние осколки — ${extra} — уйдут в прах: +${fmt(extra * rsDustOf(h))}.` : ''}</p>
+      <p>${hrEsc(h.n)} соберётся из ${fmt(need)} осколков и придёт с 0 уровнем, 0 рунных пределов и 0 доблести.${extra ? ` Лишние осколки — ${fmt(extra)} — уйдут в ${hrSpareWord(h)}: +${fmt(sp.dust + sp.edust)}.` : ''}</p>
       ${TM('<p class="reason warn">Число осколков и цена в душах — заглушки: таблица не утверждена (§15.1).</p>')}
       <div class="du-af"><button class="btn ghost" data-a="duno">Отмена</button><button class="btn go" data-a="activatedo" data-v="${A.op}|${h.id}">Пробудить${costTag('souls', RS.rules.stub.activateSouls)}</button></div>
     </section>`;
@@ -1158,12 +1273,14 @@ Object.assign(OV, {
      будут хотеть все»): за окном — арена цивилизации недели; цивилизация, нашествие и неприязнь; пятеро по циклам II–VI крупными
      книгами — неизвестная душа — закрытая книга с «?» и полосой осколков, собранный комплект и пробуждённый — в цвете, не найденный —
      закрытая книга своей ступени с «?» без имени, будущий цикл — она же, на плашке — когда откроется.
-     Внизу — откуда осколки (только сундуки Эхо за места недели, прахом нельзя) и выбранный герой с одним действием: «Пробудить» за души —
-     подтверждение в том же окне, операция SOUL_SRV с номером */
+     Внизу — откуда осколки (только сундуки Эхо за места недели; лишние — в прах Эха, общим прахом душ героя Эхо не собрать) и выбранный
+     герой с одним действием: «Пробудить» за души — подтверждение в том же окне, операция SOUL_SRV с номером; у несобранного, когда есть
+     прах Эха, — «Влить»: окно количества в той же витрине (ehAsk), операция EN_ECHO_HEROES.pour с номером. В шапке — остаток праха Эха.
+     Полоса осколков каждой книги — от комплекта своего героя: по его циклу (ADR-0047) */
   hrecho() {
-    const cur = rsCyc(), from = rsFrom('echo'), W = rsWeek(), squad = W ? W.squad.map(id => RSI[id]).filter(Boolean) : [], need = hrNeed();
+    const cur = rsCyc(), from = rsFrom('echo'), W = rsWeek(), squad = W ? W.squad.map(id => RSI[id]).filter(Boolean) : [];
     const has = h => S.rs.shards[h.id] || 0, open = h => h.c <= cur;
-    const sel = squad.find(h => h.id === S.rs.ssel) || squad.find(h => open(h) && !rsHas(h) && has(h) >= need) || squad.find(h => open(h) && !rsHas(h)) || squad.find(open) || squad[0] || null;
+    const sel = squad.find(h => h.id === S.rs.ssel) || squad.find(h => open(h) && !rsHas(h) && has(h) >= hrNeed(h)) || squad.find(h => open(h) && !rsHas(h)) || squad.find(open) || squad[0] || null;
     const to = squad.length ? squad[squad.length - 1].c : from, av = squad.find(h => h.avers && h.avers.race);
     const art = W ? hrEchoArt(W.race) : '';
     /* книга героя недели: найденный — своей стадии (неизвестная душа — закрытая книга с «?» и полосой осколков, комплект — в цвете,
@@ -1177,14 +1294,15 @@ Object.assign(OV, {
     };
     const wsel = `<select class="rs-sel team-only" data-a="sweek" aria-label="Неделя расы, демо">${RS.weeks.map(w => `<option value="${w.race}" ${w === W ? 'selected' : ''}>Неделя ${w.gen}</option>`).join('')}</select>`;
     const src = cur < from ? `${ic('lock')}<span>Эхо откроется с цикла ${ROMAN[from]}.</span>`
-      : `${ic('gem')}<span>Осколки героев Эхо — только из сундуков Эхо за места недели: прахом их не собрать. Собранного пробуждают души.</span><button class="link" data-a="go" data-v="echo">В Эхо ${ic('chev')}</button>`;
+      : `${ic('gem')}<span>Осколки героев Эхо — только из сундуков Эхо за места недели; лишние — в прах Эха. Собранного пробуждают души.</span><button class="link" data-a="go" data-v="echo">В Эхо ${ic('chev')}</button>`;
+    const pour = S.du.pour && squad.some(h => h.id === S.du.pour.id) ? S.du.pour.id : '';
     return `<div class="ov he-ov${heWas ? ' still' : ''}" role="dialog" aria-modal="true" aria-label="Эхо: отряд недели"><button class="ov-scrim" data-a="close" aria-label="Закрыть" tabindex="-1"></button>
       <div class="he" style="--he-gap:${HC_VIEW.echo}px">${art ? `<img class="he-bg" src="${art}" alt="" decoding="async">` : '<i class="he-bg css" aria-hidden="true"></i>'}
         <div class="he-h"><div class="he-t"><span class="eyebrow">Эхо · отряд недели</span><h2>${W && W.civ ? W.civ : 'Отряд недели'}</h2><small>${W && W.raid ? `нашествие «${W.raid}» · ` : ''}по герою за цикл, ${ROMAN[from]}–${ROMAN[to]}</small></div>
-          ${av ? `<span class="chip he-av" title="Неприязнь героев Эхо — особенность, не способность: действует везде, где встречаются враги этой расы">${ic('target')}${rsAversShort(av)}</span>` : ''}<span class="g-spacer"></span>${wsel}<button class="iconbtn x" data-a="close" aria-label="Закрыть">${ic('x')}</button></div>
+          ${av ? `<span class="chip he-av" title="Неприязнь героев Эхо — особенность, не способность: действует везде, где встречаются враги этой расы; у каждого героя своя — по его циклу">${ic('target')}${rsAversSquad(squad)}</span>` : ''}<span class="g-spacer"></span>${cur >= from ? ehBal() : ''}${wsel}<button class="iconbtn x" data-a="close" aria-label="Закрыть">${ic('x')}</button></div>
         <div class="he-row"><div class="he-cards" role="group" aria-label="Пятеро недели">${squad.map(card).join('')}</div></div>
         <div class="he-f"><p class="he-src">${src}</p>${heSel(sel)}</div>
-        ${S.du.ask ? duAsk() : ''}
+        ${S.du.ask ? duAsk() : pour ? `<button class="du-scrim" data-a="ehno" aria-label="Отмена" tabindex="-1"></button>${ehAsk(pour)}` : ''}
       </div></div>`;
   },
   /* книга героя состава поверх любого экрана — «до покупки», неизвестная душа или с прогрессом купленного: из рулетки, лавки праха,
@@ -1193,6 +1311,12 @@ Object.assign(OV, {
   rhero(o) {
     const rh = RSI[o.arg]; if (!rh || !hrStage(rh)) return '';
     return `<div class="ov hb-ov">${hbRsBook(rh, { close: o.back ? 'ov:' + o.back : 'ov' })}</div>`;
+  },
+  /* «Влить прах Эха» поверх книги героя и запасов — то же окно, что в витрине отряда недели (ehAsk): остаток, сколько, что выйдет.
+     Закрытие возвращает окно, из которого открыли (книга героя поверх экрана), — его хранит слой (back) */
+  ehpour(o) {
+    const body = ehAsk(o.arg); if (!body) return '';
+    return `<div class="ov ep-ov" role="dialog" aria-modal="true" aria-label="Влить прах Эха"><button class="ov-scrim" data-a="ehno" aria-label="Отмена" tabindex="-1"></button>${body}</div>`;
   },
   /* портрет крупно — по нажатию на портрет в книге: рисунок целиком (выгрузка 4 : 5) в тонкой раме цвета редкости; закрытие возвращает
      прежнее окно. У неизвестной души портрета нет — окна нет */
@@ -1233,7 +1357,7 @@ Object.assign(OV, {
           <span class="du-bal" title="Прах душ — из повторных осколков героев, которые уже в коллекции">${money('dust', S.wallet.dust)}</span>
           <button class="iconbtn x" data-a="close" aria-label="Закрыть">${ic('x')}</button></div>
         <div class="du-b${h && !empty ? '' : ' one'}"><div class="du-shelf">${tabs}${shelf}</div>${h && !empty ? duPick(h) : ''}</div>
-        <p class="du-echo">${ic('lock')}<span>Героев Эхо здесь нет: их осколки — только из сундуков Эхо за места.</span><button class="link" data-a="sheet" data-v="hrecho">Отряд недели ${ic('chev')}</button></p>
+        <p class="du-echo">${ic('lock')}<span>Героев Эхо здесь нет: герой Эхо собирается осколками Эхо и прахом Эха, прах душ ему не подходит.</span><button class="link" data-a="sheet" data-v="hrecho">Отряд недели ${ic('chev')}</button></p>
         ${S.du.ask ? duAsk() : ''}
       </div></div>`;
   },
@@ -1241,7 +1365,7 @@ Object.assign(OV, {
      (S.du.got.at): перерисовка продолжает с того же места; нажатие — сразу итог; «меньше движения» — сразу итог (общее правило) */
   hrwake(o) {
     const R = S.du.ops[o.arg], h = R && R.kind === 'wake' && RSI[R.id]; if (!h) return '';
-    const G = DU_VIEW.wake, at = S.du.got && S.du.got.op === R.op ? S.du.got.at : 0, need = hrNeed();
+    const G = DU_VIEW.wake, at = S.du.got && S.du.got.op === R.op ? S.du.got.at : 0, need = hrNeed(h), spare = (R.dust || 0) + (R.edust || 0);
     const t = at ? Math.max(0, Math.min(G.end, Date.now() - at)) : G.end, done = t >= G.end;
     const vars = `--t0:-${t}ms;` + Object.entries(G).map(([k, v]) => `--w-${k}:${v}ms`).join(';') + (typeof rlFrVars === 'function' ? ';' + rlFrVars() : '');
     const back = o.back === 'dust' ? '<button class="btn" data-a="dlg" data-v="dust">В лавку</button>' : o.back === 'hrecho' ? '<button class="btn" data-a="dlg" data-v="hrecho">К отряду недели</button>' : '';
@@ -1252,7 +1376,7 @@ Object.assign(OV, {
         <i class="hw-pillar" aria-hidden="true"></i><i class="hw-ring" aria-hidden="true"></i>${typeof rlMotes === 'function' ? rlMotes(RL_VIEW.motes) : ''}
         <div class="hw-stage"><span class="hw-glass">${shardGhost(h, need, need, DU_VIEW.glass)}</span><span class="hw-hero" data-r="${h.r}"><span class="rl-face">${rsFace(h)}</span>${typeof rlFr === 'function' ? rlFr() : ''}</span></div>
         <div class="hw-say"><span class="eyebrow">${cap1(woke)} душами</span><h2>${hrEsc(h.n)}</h2><p>${rar(h.r)}<span>${hrEsc(h.cls)}</span></p>
-          <small class="faint">В коллекции · 0 ур. · доблесть до ${h.maxV}${R.dust ? ` · лишние осколки — в прах: +${fmt(R.dust)}` : ''}</small></div>
+          <small class="faint">В коллекции · 0 ур. · доблесть до ${h.maxV}${spare ? ` · лишние осколки — в ${hrSpareWord(h)}: +${fmt(spare)}` : ''}</small></div>
       </div>
       <div class="hw-acts">${back || '<button class="btn" data-a="close">Закрыть</button>'}<button class="btn go" data-a="dngo" data-v="${h.id}">${ic('up')}К развитию</button></div>
       <button class="iconbtn x hw-x" data-a="close" aria-label="Закрыть">${ic('x')}</button>
@@ -1353,11 +1477,12 @@ const dnSay = r => toast(DN_WHY[r.refuse] ? DN_WHY[r.refuse](RSI[r.id]) : 'Не 
 
 /* ================== «сервер» лавки праха и пробуждения ==================
    Осколки за прах (§15.1, §15.3) и пробуждение душами (§15.2) — операции с номером (§34, §36): проверка, расход и выдача — одним
-   вызовом. Повтор того же номера возвращает прежний ответ и ничего не списывает и не выдаёт; отказ номер не тратит. Героев Эхо прахом
-   не собрать — правило данных rules.dustSrc (rsDustable). В игре цену, выдачу и номер подтверждает сервер */
+   вызовом. Повтор того же номера возвращает прежний ответ и ничего не списывает и не выдаёт; отказ номер не тратит. Героев Эхо общим
+   прахом душ не собрать — правило данных rules.dustSrc (rsDustable); их добирает свой прах — прах Эха (EN_ECHO_HEROES.pour,
+   screens/echo.js). Комплект — свой у каждого героя (hrNeed). В игре цену, выдачу и номер подтверждает сервер */
 const SOUL_WHY = {
   none: () => 'Такого героя нет в лавке',
-  echo: () => RS_NODUST,
+  echo: () => 'Героя Эхо прахом душ не собрать: он собирается осколками Эхо и прахом Эха',
   own: h => `${h.n} уже в коллекции`,
   cyc: h => `${h.n} откроется в цикле ${ROMAN[h.c]}`,
   full: h => `Осколков ${h.n} хватает — пробудите героя`,
@@ -1379,7 +1504,7 @@ const SOUL_SRV = {
     if (!rsDustable(h)) return { refuse: 'echo', id };
     if (rsHas(h)) return { refuse: 'own', id };
     if (h.c > rsCyc()) return { refuse: 'cyc', id };
-    const need = hrNeed(), have = S.rs.shards[id] || 0;
+    const need = hrNeed(h), have = S.rs.shards[id] || 0;
     if (!have) return { refuse: 'unknown', id };   // лавка продаёт осколки найденных: первый осколок — только Возрождение душ (стадии знакомства)
     if (have >= need) return { refuse: 'full', id };
     if (!Number.isInteger(q) || q < 1 || q > need - have) return { refuse: 'qty', id };
@@ -1390,20 +1515,21 @@ const SOUL_SRV = {
     O[op] = res; S.du.seq++;
     return { res };
   },
-  /* пробуждение: комплект осколков и души; герой приходит с 0 ур., 0 РП и 0 Добл (ADR-0019), остаток осколков — в прах (§15.2) */
+  /* пробуждение: комплект осколков своего героя и души; герой приходит с 0 ур., 0 РП и 0 Добл (ADR-0019). Остаток осколков (§15.2) —
+     hrSpare: у героя Эхо — в прах Эха по курсу (ADR-0047), общий прах душ не растёт; у прочих — в прах душ, как было */
   wake(op, id) {
     const O = S.du.ops;
     if (!op) return { refuse: 'op' };
     if (O[op]) return { again: true, res: O[op] };
-    const h = RSI[id], need = hrNeed(), cost = RS.rules.stub.activateSouls;
+    const h = RSI[id], cost = RS.rules.stub.activateSouls;
     if (!h) return { refuse: 'none', id };
     if (rsHas(h)) return { refuse: 'own', id };
-    const have = S.rs.shards[id] || 0;
+    const need = hrNeed(h), have = S.rs.shards[id] || 0;
     if (have < need) return { refuse: 'shards', id };
     if (S.wallet.souls < cost) return { refuse: 'souls', id, cost };
-    const dust = (have - need) * rsDustOf(h);
-    S.wallet.souls -= cost; delete S.rs.shards[id]; S.wallet.dust += dust; rsAdd(h, 'souls');
-    const res = { op, kind: 'wake', id, cost, dust };
+    const { dust, edust } = hrSpare(h, have - need);
+    S.wallet.souls -= cost; delete S.rs.shards[id]; S.wallet.dust += dust; if (edust) S.wallet.edust = hrEDust() + edust; rsAdd(h, 'souls');
+    const res = { op, kind: 'wake', id, cost, dust, edust };
     O[op] = res; S.du.seq++;
     return { res };
   },
@@ -1589,7 +1715,7 @@ Object.assign(ACT, {
   /* как получить: герой Эхо этой недели — витрина отряда недели; остальные — как прежде (index.html) */
   rsgo(v) {
     const h = RSI[v], W = rsWeek();
-    if (h && h.src === 'echo' && W && W.squad.includes(h.id) && h.c <= rsCyc()) { S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'souls'; S.rs.ssel = v; S.du.ask = null; open('hrecho'); return; }
+    if (h && h.src === 'echo' && W && W.squad.includes(h.id) && h.c <= rsCyc()) { S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'souls'; S.rs.ssel = v; S.du.ask = null; S.du.pour = null; open('hrecho'); return; }
     return hcRsGo0 ? hcRsGo0(v) : undefined;
   },
 });
@@ -1610,10 +1736,10 @@ Object.assign(ACT, {
   /* «Пробудить»: в лавке праха и витрине отряда недели — подтверждение в том же окне, в остальных местах — общее подтверждение;
      кнопка несёт номер операции */
   activate(v) {
-    const { op, id } = duArgs(v), h = RSI[id], need = hrNeed();
+    const { op, id } = duArgs(v), h = RSI[id], need = hrNeed(h);
     if (!h || rsHas(h) || (S.rs.shards[id] || 0) < need) return;
-    if (S.overlay && (S.overlay.t === 'dust' || S.overlay.t === 'hrecho')) { S.du.ask = { op, id }; render(); return; }
-    S.overlay = { t: 'confirm', title: 'Пробудить героя', text: `${h.n} соберётся из ${need} осколков и придёт с 0 уровнем, 0 рунных пределов и 0 доблести. Лишние осколки уйдут в прах.`,
+    if (S.overlay && (S.overlay.t === 'dust' || S.overlay.t === 'hrecho')) { S.du.ask = { op, id }; S.du.pour = null; render(); return; }
+    S.overlay = { t: 'confirm', title: 'Пробудить героя', text: `${h.n} соберётся из ${fmt(need)} осколков и придёт с 0 уровнем, 0 рунных пределов и 0 доблести. Лишние осколки уйдут в ${hrSpareWord(h)}.`,
       warnTeam: 'Число осколков и цена в душах — заглушки: таблица не утверждена (§15.1).', ok: 'Пробудить', act: 'activatedo', v: `${op}|${id}`, cost: ['souls', RS.rules.stub.activateSouls] };
     render(); focusOverlay();
   },
@@ -1628,6 +1754,42 @@ Object.assign(ACT, {
   },
   /* окно пробуждения: нажатие — сразу итог */
   hrwskip() { if (S.du.got) S.du.got.at = Date.now() - DU_VIEW.wake.end; render(); focusOverlay(); },
+});
+/* прах Эха: «Влить» — окно выбора количества (вид), затем операция EN_ECHO_HEROES.pour с номером: кнопка окна несёт
+   «номер|герой|сколько». В витрине отряда недели окно открывается в ней же (S.du.pour), в остальных местах — слоем поверх (OV.ehpour):
+   слой помнит окно, из которого его открыли, и возвращает его */
+Object.assign(ACT, {
+  /* «Влить» у героя: нельзя — причина словами; можно — окно количества, выбрано «всё» */
+  ehpour(v) {
+    const h = RSI[v], why = ehWhy(h, Math.max(1, hrIsEcho(h) ? ehMax(h) : 0));
+    if (why) return ehSay({ refuse: why }, h);
+    S.du.pq = 0; S.du.ask = null;
+    if (S.overlay && S.overlay.t === 'hrecho') { S.du.pour = { id: v }; render(); return; }
+    S.overlay = { t: 'ehpour', arg: v, back: S.overlay && S.overlay.t !== 'ehpour' ? S.overlay : null }; render(); focusOverlay();
+  },
+  ehq(v) { S.du.pq = Math.max(0, +v || 0); render(); },
+  /* закрыть окно «Влить»: в витрине — убрать окно, слой — вернуть прежнее окно */
+  ehno() {
+    if (S.du.pour) { S.du.pour = null; render(); return; }
+    if (S.overlay && S.overlay.t === 'ehpour') S.overlay = S.overlay.back || null;
+    render();
+  },
+  /* операция: «номер|герой|сколько». Отказ — причиной словами, окно остаётся; повтор номера ничего не меняет; удача — окно закрыто,
+     итог — сообщением: сколько осколков пришло и собран ли комплект */
+  ehpourdo(v) {
+    const [op, id, a] = sqParse(v), h = RSI[id], E = hrEH(), q = +a;
+    if (!E || !hrIsEcho(h)) return ehSay({ refuse: 'none' }, h);
+    if (!op) return ehSay({ refuse: 'op' }, h);
+    if (!Number.isInteger(q) || q < 1) return ehSay({ refuse: 'qty' }, h);
+    const r = E.pour(op, id, q);
+    if (r.refuse) return ehSay(r, h);
+    if (S.du.pour) S.du.pour = null; else if (S.overlay && S.overlay.t === 'ehpour') S.overlay = S.overlay.back || null;
+    if (r.again) return render();   // повтор: ничего не списано и не выдано
+    const name = hrStage(h) >= 1 ? h.n : 'Неизвестная душа';
+    toast(`${name}: +${fmt(r.res.q)} ${plural(r.res.q, 'осколок', 'осколка', 'осколков')}${E.done(h) ? ' — комплект собран' : ''}`, curImg('edust'));
+  },
+  /* «К героям Эхо» из запасов и листа кошелька: каталог найденных героев Эхо — в книге каждого несобранного есть «Влить» */
+  ehcat() { S.overlay = null; S.route = 'heroes'; S.seg.heroes = 'coll'; S.hview = 'all'; S.hgrid = 'all'; Object.assign(S.hf, HC_ZERO, { src: 'echo' }); render(); },
 });
 /* окно имени: фокус и выделение; черновик — в S.sq.name, чтобы перерисовка его не стёрла; Enter — «Сохранить» */
 function sqFocusName() {
@@ -1659,8 +1821,10 @@ function sqState(s) {
   /* S.dn — «сервер» покупок за Энериум: seq — номер следующей, ops — итоги по номерам; got — окно получения: номер и время покупки */
   s.dn = { seq: 1, ops: {}, got: null };
   /* S.du — «сервер» лавки праха и пробуждения (SOUL_SRV): seq, ops; q — сколько брать (0 — до комплекта), cyc — цикл витрины (0 — все),
-     ask — подтверждение пробуждения в окне лавки, got — окно пробуждения: номер и время операции */
-  s.du = { seq: 1, ops: {}, q: DU_VIEW.qty[0], cyc: 0, ask: null, got: null };
+     ask — подтверждение пробуждения в окне лавки, got — окно пробуждения: номер и время операции. «Влить прах Эха» — вид: pq — сколько
+     вливать (0 — всё), pour — окно количества в витрине отряда недели: { id }. Сам прах Эха — S.wallet.edust, ответы операций «влить» —
+     у «сервера» героев Эхо (S.ech.ops, screens/echo.js) */
+  s.du = { seq: 1, ops: {}, q: DU_VIEW.qty[0], cyc: 0, ask: null, got: null, pq: 0, pour: null };
   /* коллекция: S.hview — own (сетка героев аккаунта), all (каталог), mine (большая карточка героя аккаунта S.selHero), rs (карточка героя
      состава S.rs.sel); S.hgrid — из какой сетки открыта карточка; S.hf — порядок и фильтр сетки, у «Моих» и каталога порядок свой */
   s.hview = 'own'; s.hgrid = 'own';
@@ -1686,10 +1850,17 @@ FLOWS.push(
     }],
   ['Отряд недели · витрина', 'Цивилизация недели и пятеро крупными книгами: неизвестная душа с полосой осколков, собранный комплект — в цвете и «Пробудить» за души',
     () => {
-      S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'souls'; S.du.ask = null;
+      S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'souls'; S.du.ask = null; S.du.pour = null;
       const W = rsWeek(), h = W && W.squad.map(id => RSI[id]).find(x => x && x.c <= rsCyc() && !rsHas(x));
-      if (h) { S.rs.shards[h.id] = Math.max(S.rs.shards[h.id] || 0, hrNeed()); S.rs.ssel = h.id; S.wallet.souls = Math.max(S.wallet.souls, RS.rules.stub.activateSouls); }
+      if (h) { S.rs.shards[h.id] = Math.max(S.rs.shards[h.id] || 0, hrNeed(h)); S.rs.ssel = h.id; S.wallet.souls = Math.max(S.wallet.souls, RS.rules.stub.activateSouls); }
       S.overlay = { t: 'hrecho' };
+    }],
+  ['Герой Эхо · влить прах Эха', 'Комплект героя Эхо — по его циклу: полоса осколков от своего комплекта. Лишние осколки героев Эхо — прах Эха: «Влить» у несобранного героя, окно количества в той же витрине, операция с номером',
+    () => {
+      S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'souls'; S.du.ask = null; S.du.pq = 0;
+      const W = rsWeek(), h = W && W.squad.map(id => RSI[id]).find(x => x && x.c <= S.acc.cycle && !rsHas(x) && (S.rs.shards[x.id] || 0) < hrNeed(x));
+      S.overlay = { t: 'hrecho' }; S.du.pour = null; if (!h) return;
+      S.rs.ssel = h.id; if (ehCan(h)) S.du.pour = { id: h.id };
     }],
   ['Отряды · библиотека', 'Шкаф отрядов: отряд — отсек с корешками и табличкой имени и мощи; справа — отряд на полке крупным планом, внизу — свободные герои корешками с мощью: нажатие — в отряд, удержание — сведения',
     () => { S.route = 'heroes'; S.seg.heroes = 'squads'; S.selSquad = 's2'; S.sq.slot = -1; S.sq.book = ''; S.overlay = null; }],
@@ -1717,22 +1888,22 @@ FLOWS.push(
       const r = DN_SRV.buy(dnOp(), h.id); if (!r.res) return;
       S.rs.dsel = h.id; S.dn.got = { op: r.res.op, at: Date.now() }; S.overlay = { t: 'hrgot', arg: r.res.op };
     }],
-  ['За души · отряд Эхо недели', 'Витрина отряда недели: героя Эхо собирают только осколки из сундуков Эхо — прахом нельзя; собранного пробуждают души',
-    () => { S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'souls'; S.du.ask = null; S.overlay = { t: 'hrecho' }; }],
+  ['За души · отряд Эхо недели', 'Витрина отряда недели: героя Эхо собирают только осколки из сундуков Эхо — общим прахом душ нельзя, лишние осколки — в прах Эха; собранного пробуждают души',
+    () => { S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'souls'; S.du.ask = null; S.du.pour = null; S.overlay = { t: 'hrecho' }; }],
   ['За души · алтарь Возрождения', 'Сцена алтаря: зеркало душ, герои пула веером в раме, цена и шанс героя целиком, «К рулетке»; справа — отряд Эхо и лавка праха',
     () => { S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'souls'; S.overlay = null; if (rsCyc() < rsFrom('roulette')) S.rs.cyc = rsFrom('roulette'); }],
   ['Лавка праха', 'Отдельное окно: витрина героев пула — стекло с лицом, цена осколка и доля собранного; осколки за прах — 1, 10 или до комплекта; героев Эхо нет — сказано почему',
     () => {
       S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'souls'; if (rsCyc() < rsFrom('roulette')) S.rs.cyc = rsFrom('roulette');
-      S.du.cyc = 0; const cat = duCat(); if (cat[1]) S.rs.shards[cat[1].id] = Math.max(S.rs.shards[cat[1].id] || 0, Math.floor(hrNeed() * 2 / 5));
-      S.rs.ssel = cat[1] ? cat[1].id : ''; S.wallet.dust = Math.max(S.wallet.dust, rsShardPrice(cat[1] || cat[0] || { r: 1, c: 1 }) * hrNeed());
+      S.du.cyc = 0; const cat = duCat(); if (cat[1]) S.rs.shards[cat[1].id] = Math.max(S.rs.shards[cat[1].id] || 0, Math.floor(hrNeed(cat[1]) * 2 / 5));
+      S.rs.ssel = cat[1] ? cat[1].id : ''; S.wallet.dust = Math.max(S.wallet.dust, rsShardPrice(cat[1] || cat[0] || { r: 1, c: 1 }) * hrNeed(cat[1] || cat[0]));
       S.du.ask = null; S.overlay = { t: 'dust' };
     }],
   ['Лавка праха · пробуждение', 'Комплект собран: «Пробудить» за души — подтверждение в том же окне, операция с номером; трещины заживают, герой выходит из стекла в раме',
     () => {
       S.route = 'heroes'; S.seg.heroes = 'hire'; S.seg.hire = 'souls'; if (rsCyc() < rsFrom('roulette')) S.rs.cyc = rsFrom('roulette');
       S.du.cyc = 0; const h = duCat()[0]; if (!h) return;
-      S.rs.shards[h.id] = Math.max(S.rs.shards[h.id] || 0, hrNeed() + 3); S.rs.ssel = h.id; S.wallet.souls = Math.max(S.wallet.souls, RS.rules.stub.activateSouls);
+      S.rs.shards[h.id] = Math.max(S.rs.shards[h.id] || 0, hrNeed(h) + 3); S.rs.ssel = h.id; S.wallet.souls = Math.max(S.wallet.souls, RS.rules.stub.activateSouls);
       S.du.ask = { op: duOp(), id: h.id }; S.overlay = { t: 'dust' };
     }],
 );
@@ -1788,7 +1959,8 @@ KIT_EXTRA.push({
       <p class="k-note">${TM('Слова автора: «рулетка — это тоже для людей, которые донатят… красиво и дорого-богато», «магазин праха… отдельным окном». ')}Вкладка — одна рама: алтарь душ, зеркало, из стекла выходят контуры героев. Перед зеркалом — вход рулетки: герои пула веером в раме, цена прокрутки и шанс героя целиком, «К рулетке» и «Шансы» (screens/roulette.js). Справа — два входа: отряд Эхо недели — цивилизация и пять осколков по циклам, будущие тусклые; лавка праха — прах на руках, сколько героев и сколько можно пробудить.</p>
       ${shop ? `<div class="k-demo du-kit">${shop}</div>` : ''}
       <p class="k-note">Лавка праха — отдельное окно: витрина героев пула рулетки доступных циклов — стекло осколка с лицом, имя, цена осколка (§15.3 × цикл героя) и доля собранного; циклы — вкладками, когда их больше одного. Справа — выбранный: осколки за прах — ${DU_VIEW.qty.join(', ')} или до комплекта, — когда комплект собран — «Пробудить» за души с подтверждением в том же окне; после — окно пробуждения: трещины заживают, герой выходит из стекла в раме. Героев Эхо здесь нет (правило данных <code>rules.dustSrc</code>) — сказано почему, ссылка на отряд недели.</p>
-      <p class="k-note">Честно (§1.2): цена на карточке и на кнопке, нехватка — сколько; прах берётся только из повторных осколков. Покупка и пробуждение — операции <code>SOUL_SRV.buy(номер, герой, сколько)</code> и <code>SOUL_SRV.wake(номер, герой)</code>: номер несёт кнопка, повтор ничего не списывает и не выдаёт. Герой приходит с 0 ур., 0 РП и 0 Добл, лишние осколки — в прах (§15.2).</p>
+      <p class="k-note">Честно (§1.2): цена на карточке и на кнопке, нехватка — сколько; прах берётся только из повторных осколков. Покупка и пробуждение — операции <code>SOUL_SRV.buy(номер, герой, сколько)</code> и <code>SOUL_SRV.wake(номер, герой)</code>: номер несёт кнопка, повтор ничего не списывает и не выдаёт. Герой приходит с 0 ур., 0 РП и 0 Добл, лишние осколки — в прах душ (§15.2).</p>
+      <p class="k-note">Герой Эхо — только из осколков (ADR-0047): комплект — по циклу героя, ${(RS.rules.echoSet || []).filter(Boolean).map(fmt).join(' / ')} осколков (<code>rules.echoSet</code>); у героев рулетки и крафта — прежний, ${fmt(RS.rules.stub.shards)}. Полоса и числа на книге — от комплекта своего героя; тысячи на обложке — коротко. Лишние осколки героя Эхо — не в прах душ, а в прах Эха (<code>S.wallet.edust</code>): «Влить» у несобранного героя — в книге, в витрине отряда недели и в запасах — открывает окно количества: ${EP_VIEW.qty.map(fmt).join(', ')} или всё, не больше остатка и недостающего до комплекта; операция <code>EN_ECHO_HEROES.pour(номер, герой, сколько)</code> — повтор номера ничего не меняет.</p>
       <p class="k-note">Арт — <code>tools/art-gen/jobs/souls-altar.json</code> и <code>heroes-echo-ishkantun.json</code>: алтарь, лавка, рама — выгружено ${got} из ${want.length} (<code>RL_ART.ready</code>, <code>DU_ART.ready</code>); портретов отряда недели — ${faces} из ${W ? W.squad.length : 0} (<code>RS_ART</code>). Пока пути нет, алтарь, лавку и раму рисует CSS — битых картинок нет.</p></section>`;
   },
 });

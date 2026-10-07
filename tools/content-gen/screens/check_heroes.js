@@ -45,6 +45,19 @@
       с номером, окно пробуждения с возвратом.
    5в. Лавка праха — книги найденных героев, цена осколка; операции SOUL_SRV; дыра праха закрыта (героев Эхо прахом не собрать).
    5г. Стекло осколка: без маски-картинки; портрет — у собранного комплекта, у неизвестной души — силуэт класса.
+   5ж. Герои Эхо — комплект по циклу и прах Эха (ADR-0047). Каждый закон — функция, её же зовёт проверка мутацией (раздел 12:
+      ломаем правило в песочнице — закон обязан упасть; `--mut` покажет, чем пойман каждый слом):
+      — комплект: у каждого героя Эхо — число его цикла из roster.js (rules.echoSet), у героев рулетки и крафта — прежний
+        (rules.stub.shards); независимый расчёт сверен с hrNeed и «сервером» EN_ECHO_HEROES у всех 360 героев;
+      — полоса и числа: на книге каталога и витрины отряда недели, в книге героя, в карточке запасов и в окне «Влить» — «собрано /
+        нужно» от комплекта своего героя; тысячи на обложке — коротко, точно — в подсказке;
+      — «Влить»: кнопка — только у несобранного героя Эхо, открытого по циклу, когда есть прах Эха; окно — остаток, шаги и «всё»,
+        не больше остатка и недостающего; кнопка окна несёт «номер|герой|сколько»; после операции остаток падает, осколки растут
+        ровно на столько же по курсу; повтор номера ничего не меняет; собранному и закрытому по циклу — отказ словами, больше
+        недостающего не вольёшь, без праха — отказ; окно в витрине отряда недели — в ней же, поверх книги — возвращает книгу;
+      — лишние осколки: при пробуждении героя Эхо остаток уходит в прах Эха по курсу, общий прах душ не растёт; у героя рулетки —
+        в прах душ, как прежде, прах Эха не растёт; пробуждение героя Эхо требует комплект своего цикла — прежних 50 мало;
+      — кошелёк: «Прах Эха» — отдельная запись CUR со своим значком (не значок праха душ), поле кошелька, лист «Подробнее».
    5д. «За Энериум» — книги сета на ступенях цены, покупка DN_SRV; сила коллекции — одна функция collRp. Пятеро парят (слово автора
       30.09.2026: «левитация… плавно и подсвечивание»): книга поднимается и опускается, свет за ней дышит, блик по обложке — только
       transform и opacity, фаза — от места; при «меньше движения» — без движения.
@@ -78,13 +91,15 @@ const UI = path.join(__dirname, '..', '..', '..', 'design', 'ui');
 const read = f => fs.readFileSync(path.join(UI, f), 'utf8');
 const html = read('index.html');
 const err = [];
-const cnt = { views: 0, player: 0, cards: 0, tiles: 0, bigs: 0, cycles: 0, bm: 0, stage: 0, anim: 0, lay: [] };
+const cnt = { views: 0, player: 0, cards: 0, tiles: 0, bigs: 0, cycles: 0, bm: 0, stage: 0, anim: 0, lay: [], sets: 0, pours: 0, laws: 0, mut: 0 };
+const SHOW_MUT = process.argv.includes('--mut');   // показать, какой закон поймал каждую мутацию
 const say = m => { if (err.length < 60) err.push(m); else if (err.length === 60) err.push('… и ещё ошибки'); };
 function done() {
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
   console.log(`«Герои»: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; книг проверено ${cnt.cards}, книг на полке отряда ${cnt.tiles}, раскрытых книг ${cnt.bigs}, циклов «Призыва» ${cnt.cycles}; стадий знакомства сверено ${cnt.stage}; моментов анимации ${cnt.anim}; мощь сверена с формулой §6 ${cnt.bm} раз.`);
   for (const x of cnt.lay) console.log('вёрстка ' + x);
-  console.log('Проверка пройдена: карточка героя — книга: ступень — максимум доблести, кристалл и свет — редкость, замки — рунные пределы, ленты — взятая доблесть; стадии знакомства — не найденных не видно, неизвестная душа — закрытая книга своей ступени с «?» и закрытые сведения, в веере и отряде недели не найденный — та же закрытая книга без имени; «Мои» и каталог, порядок и фильтр — на полках шкафа Библиотеки Этриона, у каждого ряда своя полка; «За золото» — без купленных, цена латунной табличкой на кромке, счётчик «в коллекции N из M»; раскрытая книга — портрет и вкладки развития, «до покупки» — без прокачки и снаряжения; анимация открытия по времени — книга выдвигается с полки корешком и разворачивается обложкой, от корешка нижней полки — корешком, пропуск, «меньше движения»; отряд недели, лавка праха и «За Энериум» — книгами, пятеро «За Энериум» парят и светятся; вёрстка 932 × 430 и 844 × 390; в режиме «Игрок» служебного нет.');
+  console.log(`Герои Эхо: комплектов сверено ${cnt.sets}, операций «влить» ${cnt.pours}; законов ${cnt.laws}, мутаций ${cnt.mut} — пойманы все.`);
+  console.log('Проверка пройдена: карточка героя — книга: ступень — максимум доблести, кристалл и свет — редкость, замки — рунные пределы, ленты — взятая доблесть; стадии знакомства — не найденных не видно, неизвестная душа — закрытая книга своей ступени с «?» и закрытые сведения, в веере и отряде недели не найденный — та же закрытая книга без имени; «Мои» и каталог, порядок и фильтр — на полках шкафа Библиотеки Этриона, у каждого ряда своя полка; «За золото» — без купленных, цена латунной табличкой на кромке, счётчик «в коллекции N из M»; раскрытая книга — портрет и вкладки развития, «до покупки» — без прокачки и снаряжения; анимация открытия по времени — книга выдвигается с полки корешком и разворачивается обложкой, от корешка нижней полки — корешком, пропуск, «меньше движения»; отряд недели, лавка праха и «За Энериум» — книгами, пятеро «За Энериум» парят и светятся; комплект героя Эхо — по его циклу, полоса и числа — от своего комплекта, лишние осколки героя Эхо — в прах Эха, «Влить» — операция с номером; вёрстка 932 × 430 и 844 × 390; в режиме «Игрок» служебного нет.');
   process.exit(0);
 }
 
@@ -203,6 +218,10 @@ function load(o = {}) {
     EQ_SRV: typeof EQ_SRV !== 'undefined' ? EQ_SRV : null, eqMulOf: typeof eqMulOf === 'function' ? eqMulOf : null, eqWornList: typeof eqWornList === 'function' ? eqWornList : null,
     collRp, collHero, collPct, collRule, EV: window.EN_EV || null, wsGive: typeof wsGive === 'function' ? wsGive : null, RX: typeof EN_RECIPES !== 'undefined' ? EN_RECIPES : null, hrBuild,
     LB_VIEW, LB_ART, lbCols, lbFrame, lbVars, lbKitHtml, hbSpine, hbSpineR, hbIsSpine, SHELL_SIZE, hbTimes, curImg,
+    /* герои Эхо (раздел 5е): функции — живыми именами, не слепком: проверка мутацией подменяет их, закон должен звать подменённую */
+    get hrNeed() { return hrNeed; }, get hrSpare() { return hrSpare; }, get ehMax() { return ehMax; }, get ehOp() { return ehOp; },
+    get zpHero() { return typeof zpCardHero === 'function' ? zpCardHero : null; }, get zpEntries() { return typeof zpEntries === 'function' ? zpEntries : null; },
+    get zpCell() { return typeof zpCell === 'function' ? zpCell : null; }, EP_VIEW, EH: window.EN_ECHO_HEROES || null, CUR,
   })`, ctx);
   const tick = ms => {
     const end = clock.now + ms;
@@ -214,7 +233,7 @@ function load(o = {}) {
     }
     clock.now = end;
   };
-  return { T, els, doc: document, rootCls, rootVars, clock, tick, listeners: t => lis[t] || [], game: () => (els.game ? els.game.innerHTML : '') };
+  return { T, ctx, els, doc: document, rootCls, rootVars, clock, tick, listeners: t => lis[t] || [], game: () => (els.game ? els.game.innerHTML : '') };
 }
 const P = load(), T = P.T;
 const run = (where, f) => { try { return f(); } catch (e) { say(`${where}: исключение — ${e.message} | ${(e.stack || '').split('\n').slice(1, 3).join(' | ').trim()}`); return undefined; } };
@@ -246,7 +265,14 @@ const ovOf = h => { const i = h.indexOf('<div class="ov'); return i < 0 ? '' : h
 const count = (s, re) => (s.match(re) || []).length;
 const TOP = () => T.INV.hero.capByLim.length - 1;
 const nxOf = h => (h && T.rpNext ? T.rpNext(h) : '');
+/* комплект осколков — независимо от экрана, прямо из данных: общий (рулетка, крафт) — rules.stub.shards; у героя Эхо — число его
+   цикла из rules.echoSet (ADR-0047) */
 const need = () => T.RS.rules.stub.shards;
+const needOf = h => (h && h.src === 'echo' ? T.RS.rules.echoSet[h.c - 1] : need());
+/* число из подписи: fmt ставит пробел между тысячами */
+const numOf = s => +String(s).replace(/[^\d]/g, '');
+/* осколки на обложке: до HC_VIEW.shard — полностью, дальше коротко — «1К», «2,4К», «12,4К»; только целые */
+const shortSh = n => { if (n < T.HC_VIEW.shard) return T.fmt(n); const k = Math.floor(n / 100); return `${T.fmt(Math.floor(k / 10))}${k % 10 ? ',' + (k % 10) : ''}К`; };
 const tierOf = maxV => Math.max(1, Math.min(5, maxV || 1));
 const shortBM = n => { if (n < T.HC_VIEW.short) return T.fmt(n); const [d, s] = n >= 1000000 ? [100000, 'М'] : [100, 'К'], k = Math.floor(n / d); return `${T.fmt(Math.floor(k / 10))}${k % 10 ? ',' + (k % 10) : ''}${s}`; };
 /* замки: состояния I…V сверху вниз — on, off, wait, ready */
@@ -296,9 +322,16 @@ function checkBook(t, where, x) {
   if (!!x.gray !== /^<button class="hb[^"]* gray/.test(t)) say(`${where}: ${x.gray ? 'известный, но не купленный — не чёрно-белый' : 'чёрно-белый без причины'}`);
   if (!!x.soul !== /^<button class="hb[^"]* soul/.test(t)) say(`${where}: ${x.soul ? 'неизвестная душа — без своего вида' : 'вид неизвестной души у найденного'}`);
   if (x.shard) {
-    const m = t.match(/<span class="hk-sh( full)?" title="Осколки (\d+) из (\d+)">([\s\S]*?)<\/small><\/span>/);
-    if (!m || +m[2] !== x.shard[0] || +m[3] !== x.shard[1]) say(`${where}: полоса осколков не ${x.shard[0]} из ${x.shard[1]}`);
-    else { if (!m[4].includes('class="hsg"')) say(`${where}: в полосе осколков нет стекла`); if (!!m[1] !== x.shard[0] >= x.shard[1]) say(`${where}: полный комплект не светится`); }
+    /* подсказка — точные числа «собрано из нужно»; на обложке — они же, тысячи коротко; полоса — доля от комплекта этого героя */
+    const m = t.match(/<span class="hk-sh( full)?" title="Осколки ([\d\s  ]+) из ([\d\s  ]+)">([\s\S]*?)<\/small><\/span>/);
+    if (!m || numOf(m[2]) !== x.shard[0] || numOf(m[3]) !== x.shard[1]) say(`${where}: полоса осколков не ${x.shard[0]} из ${x.shard[1]}`);
+    else {
+      if (!m[4].includes('class="hsg"')) say(`${where}: в полосе осколков нет стекла`);
+      if (!!m[1] !== x.shard[0] >= x.shard[1]) say(`${where}: полный комплект не светится`);
+      const pct = Math.min(100, Math.floor(x.shard[0] * 100 / x.shard[1])), txt = `${shortSh(x.shard[0])}/${shortSh(x.shard[1])}`;
+      if (!m[4].includes(`<i style="--v:${pct}"></i>`)) say(`${where}: полоса осколков не ${pct} % — доля не от комплекта героя (${x.shard[1]})`);
+      if (!m[4].endsWith(`<small class="num">${txt}`)) say(`${where}: числа на обложке не «${txt}»`);
+    }
   } else if (/class="hk-sh/.test(t)) say(`${where}: полоса осколков у героя без осколков`);
   const fx = /class="hb-fx"/.test(t), wantFx = tier >= 5 && !x.gray;
   if (fx !== wantFx) say(`${where}: угольки гримуара ${wantFx ? 'пропали' : 'не у гримуара или у чёрно-белого'}`);
@@ -362,8 +395,9 @@ fresh();
 
 /* ================== 2б. стадии знакомства с героем ==================
    Независимое правило (решение автора 30.09.2026 и поправка): в коллекции — 3; будущий цикл — 0; за золото и донатные — 2; иначе по
-   осколкам в запасах: комплект — 2, хоть один — 1, ни одного — 0. Рецепт стадию не меняет */
-const stageOf = (h, S) => { if (T.rsHas(h)) return 3; if (h.c > T.rsCyc()) return 0; if (h.src === 'gold' || h.src === 'donat') return 2; const n = S.rs.shards[h.id] || 0; return n >= need() ? 2 : n > 0 ? 1 : 0; };
+   осколкам в запасах: комплект — 2, хоть один — 1, ни одного — 0. Рецепт стадию не меняет. Комплект — свой у каждого героя
+   (needOf): у героя Эхо — по его циклу (ADR-0047), прежних 50 ему мало */
+const stageOf = (h, S) => { if (T.rsHas(h)) return 3; if (h.c > T.rsCyc()) return 0; if (h.src === 'gold' || h.src === 'donat') return 2; const n = S.rs.shards[h.id] || 0; return n >= needOf(h) ? 2 : n > 0 ? 1 : 0; };
 {
   for (let c = 1; c <= 6; c++) {
     fresh(); T.S.acc.cycle = c;
@@ -706,8 +740,9 @@ fresh();
   const B = T.BM, fl = (a, b) => Math.floor(a / b), BP = 10000;
   const isqrt = n => { if (n < 2) return n; let x = n, y = fl(x + 1, 2); while (y < x) { x = y; y = fl(x + fl(n, x), 2); } return x; };
   const C = T.BF && T.BF.rules ? T.BF.rules.bmC : 0;
+  /* мощь карты — формула §6 заново: слой 0 — характеристики, слой 1 — К_ротации ядра (EB.kRot, ADR-0051); закон самой К_ротации — в check_core.js */
   const f0 = u => { cnt.bm++; const R = T.EB.RULES, kl = R.K * u.lvl, cap = R.caps.defPct * 100, mit = k => Math.min(cap, fl(u.def[k] * BP, Math.max(1, kl + u.def[k]))), m = fl(mit('str') + mit('int'), 2);
-    return fl(C * isqrt(fl(u.atk[u.main] * u.as * (1000000 + u.crit * (u.critDmg - 100)), 100000000) * fl(fl(u.maxHp * BP, BP - m) * BP, BP - u.eva)), 100); };
+    return fl(C * isqrt(fl(fl(u.atk[u.main] * u.as * (1000000 + u.crit * (u.critDmg - 100)), 100000000) * T.EB.kRot(u), BP) * fl(fl(u.maxHp * BP, BP - m) * BP, BP - u.eva)), 100); };
   const heroU = src => T.EB.create({ mode: 'rounds', heroes: [src], foes: [], seed: 1 }).u[0][0];
   const foeU = src => T.EB.create({ mode: 'rounds', heroes: [], foes: [src], seed: 1 }).u[1][0];
   const num = n => `<span class="num">${T.fmt(n)}</span>`;
@@ -880,7 +915,7 @@ function souls(c, team) {
   const W = T.rsWeek(), eb = body.slice(body.indexOf('data-v="hrecho"')), eIn = eb.slice(0, eb.indexOf('</button>'));
   const want = (W ? W.squad : []).filter(id => T.RSI[id] && !T.rsHas(T.RSI[id])).length;
   if (count(eIn, /class="hsg"/g) !== want) say(`${tag}: во входе отряда Эхо осколков ${count(eIn, /class="hsg"/g)}, героев недели не в коллекции ${want}`);
-  for (const id of (W ? W.squad : [])) { const x = T.RSI[id]; if (x && !T.rsHas(x) && (T.S.rs.shards[id] || 0) < need() && eIn.includes(`heroes/${id}.jpg`)) say(`${tag}: во входе отряда Эхо у неизвестной души ${x.n} виден портрет`); }
+  for (const id of (W ? W.squad : [])) { const x = T.RSI[id]; if (x && !T.rsHas(x) && (T.S.rs.shards[id] || 0) < needOf(x) && eIn.includes(`heroes/${id}.jpg`)) say(`${tag}: во входе отряда Эхо у неизвестной души ${x.n} виден портрет`); }
   if (!/<img class="hr-ebg" src="[^"]*arena-echo-/.test(eIn)) say(`${tag}: у входа отряда Эхо нет арены цивилизации недели`);
   T.S.overlay = { t: 'hrecho' }; if (!/^<div class="ov he-ov/.test(ovOf(view(`${tag} · витрина отряда недели`)))) say(`${tag}: витрина отряда недели не открылась окном`);
   T.S.overlay = { t: 'dust' }; if (!/^<div class="ov du-ov/.test(ovOf(view(`${tag} · окно лавки`)))) say(`${tag}: окно лавки праха не открылось`);
@@ -894,7 +929,7 @@ run('режим «Игрок»', () => T.setTeam(false));
 {
   for (let c = 2; c <= 6; c++) {
     fresh(); T.S.acc.cycle = c; T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = 'souls'; T.S.overlay = { t: 'hrecho' };
-    const W = T.rsWeek(), sq5 = W.squad.map(id => T.RSI[id]).filter(Boolean), N = need(), tag = `витрина отряда недели · цикл ${c}`, o = ovOf(view(tag));
+    const W = T.rsWeek(), sq5 = W.squad.map(id => T.RSI[id]).filter(Boolean), tag = `витрина отряда недели · цикл ${c}`, o = ovOf(view(tag));
     if (!/^<div class="ov he-ov/.test(o) || /class="sheet/.test(o)) { say(`${tag}: не окно-витрина`); continue; }
     if (!o.includes(`<h2>${W.civ}</h2>`) || !o.includes(W.raid)) say(`${tag}: нет цивилизации и нашествия недели`);
     if (!/<img class="he-bg" src="[^"]*arena-echo-/.test(o)) say(`${tag}: за окном не арена цивилизации недели`);
@@ -911,12 +946,14 @@ run('режим «Игрок»', () => T.setTeam(false));
         if (h.c > c && (!/ lock/.test(t.slice(0, 40)) || !t.includes(`цикл ${T.ROMAN[h.c]}</b>`))) say(`${tag}: у героя будущего цикла нет замка и «цикл ${T.ROMAN[h.c]}» на плашке`);
         continue;
       }
-      checkBook(t, `${tag} · ${h.n}`, own ? Object.assign(accX(T.H(h.id)), { bm: null }) : rsX(h, { shard: [n, N], img: st === 2 && T.RS_ART.has(h.id) ? h.id : null, bm: null }));
+      /* полоса осколков — от комплекта своего героя: у героя Эхо — по его циклу (ADR-0047) */
+      checkBook(t, `${tag} · ${h.n}`, own ? Object.assign(accX(T.H(h.id)), { bm: null }) : rsX(h, { shard: [n, needOf(h)], img: st === 2 && T.RS_ART.has(h.id) ? h.id : null, bm: null }));
     }
     if (!/class="he-sel"/.test(o)) say(`${tag}: нет выбранного героя с действием`);
+    if (!new RegExp(`<span class="ep-bal"[^>]*>[\\s\\S]*?<b class="num">${T.fmt(T.S.wallet.edust || 0)}</b>`).test(o.slice(0, o.indexOf('<div class="he-row"')))) say(`${tag}: в шапке витрины не виден остаток праха Эха`);
   }
   fresh(); T.S.acc.cycle = 3; T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = 'souls';
-  const W = T.rsWeek(), N = need(), x = W.squad.map(id => T.RSI[id]).find(h => h && h.c <= 3 && !T.rsHas(h));
+  const W = T.rsWeek(), x = W.squad.map(id => T.RSI[id]).find(h => h && h.c <= 3 && !T.rsHas(h)), N = needOf(x);
   T.S.rs.shards[x.id] = N + 2; T.S.wallet.souls = 1e6; T.S.overlay = { t: 'hrecho' };
   run('витрина · выбор', () => T.ACT.ssel(x.id));
   let o = ovOf(view('витрина · собран'));
@@ -929,8 +966,12 @@ run('режим «Игрок»', () => T.setTeam(false));
     if (!T.S.overlay || T.S.overlay.t !== 'hrecho' || !T.S.du.ask) say('витрина: подтверждение пробуждения — не в том же окне');
     o = ovOf(view('витрина · подтверждение'));
     if (!o.includes(`data-a="activatedo" data-v="${m[1]}|${x.id}"`)) say('витрина: в подтверждении нет номера операции');
-    const s0 = T.S.wallet.souls; run('витрина · пробуждение', () => T.ACT.activatedo(`${m[1]}|${x.id}`));
+    /* герой Эхо: комплект — по его циклу, лишние осколки — в прах Эха по курсу, общий прах душ не растёт (ADR-0047) */
+    const spare = 2 * T.RS.rules.echoDust.perShard;
+    if (!o.includes(`из ${T.fmt(N)} осколков`) || !o.includes(`уйдут в прах Эха: +${T.fmt(spare)}`)) say(`витрина: подтверждение не называет комплект героя Эхо (${N}) или прах Эха за лишние осколки (+${spare})`);
+    const s0 = T.S.wallet.souls, d0 = T.S.wallet.dust, e0 = T.S.wallet.edust || 0; run('витрина · пробуждение', () => T.ACT.activatedo(`${m[1]}|${x.id}`));
     if (!T.rsHas(x) || T.S.wallet.souls !== s0 - T.RS.rules.stub.activateSouls) say('витрина: пробуждение не привело героя или цена не та');
+    if (T.S.wallet.dust !== d0 || (T.S.wallet.edust || 0) !== e0 + spare) say(`витрина: лишние осколки героя Эхо — прах душ ${T.S.wallet.dust - d0}, прах Эха ${(T.S.wallet.edust || 0) - e0}; ждали 0 и ${spare}`);
     if (!T.S.overlay || T.S.overlay.t !== 'hrwake' || T.S.overlay.back !== 'hrecho') say('витрина: после пробуждения нет окна пробуждения с возвратом в витрину');
     if (!ovOf(view('витрина · окно пробуждения')).includes('data-a="dlg" data-v="hrecho"')) say('окно пробуждения: нет «К отряду недели»');
     const s1 = T.S.wallet.souls; run('витрина · повтор', () => T.ACT.activatedo(`${m[1]}|${x.id}`)); if (T.S.wallet.souls !== s1) say('витрина: повтор номера списал души ещё раз');
@@ -968,7 +1009,7 @@ run('режим «Игрок»', () => T.setTeam(false));
     if (!b.includes(`${T.fmt(T.S.rs.shards[h.id] || 0)}/${T.fmt(N)}`)) say(`лавка: у ${h.n} на книге нет доли собранного`);
     checkBook(b, `лавка · ${h.n}`, rsX(h, { z: 'm', shard: [T.S.rs.shards[h.id] || 0, N], bm: null }));
   }
-  if (!/Героев Эхо здесь нет/.test(o)) say('лавка: не объяснено, почему в ней нет героев Эхо');
+  if (!/Героев Эхо здесь нет/.test(o) || !/собирается осколками Эхо и прахом Эха/.test(o)) say('лавка: не объяснено, почему в ней нет героев Эхо, — честной строки «собирается осколками Эхо и прахом Эха» нет');
   if (!o.includes(T.fmt(T.S.wallet.dust))) say('лавка: не виден прах на руках');
   const buyRe = id => new RegExp(`data-a="dustbuy" data-v="(du\\d+)\\|${id}\\|(\\d+)"([^>]*)>`);
   T.S.du.q = 1; run('лавка · выбор', () => T.ACT.ssel(x.id));
@@ -1042,7 +1083,7 @@ run('режим «Игрок»', () => T.setTeam(false));
     T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = 'souls'; T.S.overlay = { t: 'dust' };
     const o = ovOf(view(`лавка праха · цикл ${c}`));
     if (T.RS.heroes.some(h => h.src === 'echo' && new RegExp(`data-a="(?:ssel|dustbuy|activate)" data-v="(?:du\\d+\\|)?${h.id}[|"]`).test(o))) say(`лавка праха · цикл ${c}: в витрине герои Эхо`);
-    if (!/Героев Эхо здесь нет/.test(o)) say(`лавка праха · цикл ${c}: не объяснено, почему в ней нет героев Эхо`);
+    if (!/Героев Эхо здесь нет/.test(o) || !/собирается осколками Эхо и прахом Эха/.test(o)) say(`лавка праха · цикл ${c}: не объяснено, почему в ней нет героев Эхо, — честной строки «собирается осколками Эхо и прахом Эха» нет`);
     if (cat.length && (o.match(/class="hsg"/g) || []).length < cat.length) say(`лавка праха · цикл ${c}: не у каждого собираемого героя стекло осколка`);
   }
   fresh(); T.S.acc.cycle = 6;
@@ -1060,7 +1101,7 @@ run('режим «Игрок»', () => T.setTeam(false));
     const cardE = run('запасы · осколки героя Эхо', () => T.zpCardHero({ h: y, q: 7, key: 'hero:' + y.id })) || '';
     const cardR = run('запасы · осколки героя рулетки', () => T.zpCardHero({ h: r0, q: 7, key: 'hero:' + r0.id })) || '';
     if (/data-a="dustbuy"/.test(cardE)) say('запасы: у героя Эхо есть «Осколок» за прах');
-    if (!/только из сундуков Эхо/.test(cardE) || !cardE.includes(`data-a="activate" data-v="${y.id}"`)) say('запасы: у героя Эхо нет объяснения или «Пробудить»');
+    if (!/Собирается осколками Эхо и прахом Эха/.test(cardE) || !/прахом душ этого героя не собрать/.test(cardE) || !cardE.includes(`data-a="activate" data-v="${y.id}"`)) say('запасы: у героя Эхо нет честной строки «Собирается осколками Эхо и прахом Эха», слов о прахе душ или «Пробудить»');
     if (!cardR.includes(`data-a="dustbuy" data-v="${r0.id}"`)) say('запасы: у героя рулетки пропал «Осколок» за прах');
   }
 }
@@ -1220,6 +1261,262 @@ run('сила коллекции', () => {
   if (vs.join('|') !== rp.map(v => '+' + X.collPct(v)).join('|')) say(`сила коллекции: в листе «${vs.join(' ')}», collRp — ${rp.map(X.collPct).join(' ')}`);
   if (X.EV && X.EV.rp1() !== rp[0]) say(`сила коллекции: Событие считает РП1 ${X.EV.rp1()}, collRp — ${rp[0]}`);
 });
+
+/* ================== 5ж. герои Эхо: комплект по циклу и прах Эха (ADR-0047) ==================
+   Слова автора 02.10.2026: «осколков на первом героев нужно условно 1000, потом 2 500, 5 000, 10 000, 25 000»; «вводим новый прах,
+   именно с Эхо, а уже игрок сам решит, в какого героя ему потратить и на какой недели… пока он не собрал полного».
+   Каждый закон — функция без аргументов; нарушения она называет через say. lawRun(k) возвращает их списком: так закон зовёт и обычный
+   прогон, и проверка мутацией (раздел 12). Правило считается заново, прямо из данных roster.js: needOf — комплект, rules.echoDust — курс */
+const EDR = () => T.RS.rules.echoDust;                       // курс праха Эха: perShard — за лишний осколок, shard — за осколок при вливании
+const ED = () => T.S.wallet.edust || 0;                      // остаток праха Эха
+const echoFree = c => T.RS.heroes.find(h => h.src === 'echo' && h.c === c && !T.rsHas(h));
+const rlFree = c => T.RS.heroes.find(h => h.src === 'roulette' && h.c <= c && !T.rsHas(h));
+const toastT = () => (T.S.toast ? String(T.S.toast.t) : '');
+const toSouls = () => { T.S.route = 'heroes'; T.S.seg.heroes = 'hire'; T.S.seg.hire = 'souls'; };
+const showcase = (tag, id) => { toSouls(); T.S.overlay = { t: 'hrecho' }; if (id) T.S.rs.ssel = id; return ovOf(view(tag)); };
+const pourBtn = (o, id) => o.includes(`data-a="ehpour" data-v="${id}"`);
+const pourDo = o => o.match(/data-a="ehpourdo" data-v="(ehp\d+)\|([^|"]+)\|(\d+)"([^>]*)>/);
+const askOf = o => { const i = o.indexOf('<section class="du-ask ep-ask"'); return i < 0 ? '' : o.slice(i, o.indexOf('</section>', i)); };
+const snapEcho = () => JSON.stringify([T.S.wallet, T.S.rs.shards, Object.keys(T.S.rs.owned).length]);
+const pours = () => { if (!lawQuiet) cnt.pours++; };   // счётчики итога растут только в обычном прогоне, не под мутацией
+const LAW = {
+  /* К — комплект: у каждого героя свой, у героя Эхо — по его циклу, из данных */
+  set() {
+    const R = T.RS.rules, E = R.echoSet, from = T.rsFrom('echo');
+    fresh();
+    if (!Array.isArray(E) || E.length !== 6 || E.some(x => !Number.isInteger(x) || x < 0)) { say('комплект: в данных нет комплекта героя Эхо по циклам — rules.echoSet'); return; }
+    for (let c = from; c <= 6; c++) {
+      if (!(E[c - 1] > R.stub.shards)) say(`комплект героя Эхо цикла ${c} — ${E[c - 1]}: не больше комплекта героя рулетки (${R.stub.shards})`);
+      if (c > from && !(E[c - 1] > E[c - 2])) say(`комплект героя Эхо не растёт с циклом: цикл ${c} — ${E[c - 1]}, цикл ${c - 1} — ${E[c - 2]}`);
+      if (!T.RS.heroes.some(h => h.src === 'echo' && h.c === c)) say(`комплект: в составе нет героя Эхо цикла ${c}`);
+    }
+    let bad = 0;
+    for (const h of T.RS.heroes) {
+      if (!lawQuiet) cnt.sets++;
+      const w = needOf(h), a = T.hrNeed(h), b = T.EH ? T.EH.need(h) : NaN;
+      if ((a !== w || b !== w) && ++bad <= 3) say(`комплект ${h.n} (${h.src}, цикл ${h.c}): на экране ${a}, у «сервера» героев Эхо ${b}, по данным ${w}`);
+    }
+    if (T.hrNeed() !== need()) say(`комплект без героя (книга-образец) — ${T.hrNeed()}, ждали прежний ${need()}`);
+    /* прежнего комплекта герою Эхо мало: не «известен» и не пробудить; свой комплект без осколка — тоже мало; свой — «известен» */
+    fresh(); T.S.acc.cycle = 6; T.S.wallet.souls = 1e6;
+    for (let c = from; c <= 6; c++) {
+      const e = echoFree(c); if (!e) continue;
+      for (const [n, st] of [[need(), 1], [needOf(e) - 1, 1], [needOf(e), 2]]) {
+        T.S.rs.shards[e.id] = n;
+        if (T.hrStage(e) !== st) say(`герой Эхо цикла ${c}, осколков ${n} из ${needOf(e)}: стадия ${T.hrStage(e)}, ждали ${st}`);
+        if (st === 1) { const r = T.SOUL_SRV.wake('du' + T.S.du.seq, e.id); if (r.refuse !== 'shards' || T.rsHas(e) || T.S.rs.shards[e.id] !== n) say(`герой Эхо цикла ${c} пробуждён из ${n} осколков — нужен комплект ${needOf(e)}`); }
+      }
+    }
+    const r0 = rlFree(6);
+    T.S.rs.shards[r0.id] = need(); if (T.hrStage(r0) !== 2) say(`герой рулетки с ${need()} осколками — стадия ${T.hrStage(r0)}: его комплект прежний`);
+  },
+  /* П — полоса и числа: от комплекта своего героя — на книге, в книге, в витрине и в запасах */
+  bar() {
+    fresh(); T.S.acc.cycle = 6; T.S.rs.shards = {};
+    const W = T.rsWeek(), sq = W.squad.map(id => T.RSI[id]).filter(h => h && !T.rsHas(h)), r0 = rlFree(6);
+    if (sq.length < 2 || new Set(sq.map(needOf)).size !== sq.length) { say('полоса: у героев недели не разные комплекты — сверять нечего'); return; }
+    /* осколков у всех поровну — доля у каждого своя */
+    const n = Math.floor(needOf(sq[0]) * 3 / 5), nr = Math.floor(need() * 3 / 5);
+    for (const h of sq) T.S.rs.shards[h.id] = n;
+    T.S.rs.shards[r0.id] = nr;
+    const books = booksOf(showcase('закон · полоса · витрина'));
+    for (const h of sq) {
+      checkBook(books.find(x => x.includes(`data-a="ssel" data-v="${h.id}"`)) || '', `полоса · витрина · ${h.n}`, rsX(h, { shard: [n, needOf(h)], bm: null }));
+      const s = showcase(`закон · полоса · выбран ${h.n}`, h.id), sel = s.slice(s.indexOf('<div class="he-sel"'));
+      if (!sel.includes(`осколков ${T.fmt(n)} / ${T.fmt(needOf(h))}`)) say(`полоса · витрина · ${h.n}: в строке выбранного не «осколков ${n} / ${needOf(h)}»`);
+    }
+    const g = collView('закон · полоса · каталог', { all: true });
+    for (const h of sq) checkBook(cardOf(g, h.id), `полоса · каталог · ${h.n}`, rsX(h, { shard: [n, needOf(h)] }));
+    checkBook(cardOf(g, r0.id), 'полоса · каталог · герой рулетки', rsX(r0, { shard: [nr, need()] }));
+    for (const h of [sq[0], sq[sq.length - 1], r0]) {
+      const q = h === r0 ? nr : n, pct = Math.floor(q * 100 / needOf(h));
+      collView('закон · полоса · к книге', { all: true }); run('закон · полоса · книга', () => T.ACT.hc(h.id)); calm();
+      const w = winOf(view(`закон · полоса · книга ${h.n}`));
+      if (!w.includes(`${T.fmt(q)} / ${T.fmt(needOf(h))}`) || !w.includes(`style="--v:${pct}"`)) say(`полоса · книга ${h.n}: нет «${q} / ${needOf(h)}» или полосы ${pct} %`);
+      if (T.zpHero) {
+        const card = run('закон · полоса · запасы', () => T.zpHero({ h, q, key: 'h:' + h.id })) || '';
+        if (!card.includes(`${T.fmt(q)}<span class="zp-of">/${T.fmt(needOf(h))}</span>`) || !card.includes(`style="--v:${pct}"`)) say(`полоса · запасы · ${h.n}: в карточке не «${q}/${needOf(h)}» или полоса не ${pct} %`);
+      }
+    }
+    T.S.overlay = null;
+  },
+  /* В — «Влить»: остаток падает, осколки растут, повтор номера ничего не меняет, собранному и закрытому по циклу — отказ, больше
+     недостающего не вольёшь */
+  pour() {
+    const R = EDR(), Q = T.EP_VIEW.qty;
+    fresh(); T.S.acc.cycle = 3; T.S.rs.shards = {};
+    const sq = T.rsWeek().squad.map(id => T.RSI[id]).filter(Boolean), e2 = sq.find(h => h.c === 2 && !T.rsHas(h)), e3 = sq.find(h => h.c === 3 && !T.rsHas(h)), e4 = sq.find(h => h.c === 4), r0 = rlFree(3);
+    if (!e2 || !e3 || !e4 || !r0 || !T.EH) { say('«Влить»: в отряде недели нет героев циклов II–IV, героя рулетки или «сервера» героев Эхо'); return; }
+    const s2 = Math.floor(need() * 4 / 5), d0 = 3 * Q[1] * R.shard, max = Math.min(Math.floor(d0 / R.shard), needOf(e2) - s2);
+    T.S.rs.shards[e2.id] = s2; T.S.wallet.edust = d0;
+    /* 1. кнопка: у несобранного героя недели, открытого по циклу, — есть (и у не найденного); у закрытого по циклу и героя рулетки — нет */
+    let o = showcase('закон · влить · витрина', e2.id);
+    if (!pourBtn(o, e2.id)) say('«Влить»: у несобранного героя Эхо в витрине отряда недели нет кнопки');
+    if (!pourBtn(showcase('закон · влить · не найден', e3.id), e3.id)) say('«Влить»: у не найденного героя недели, открытого по циклу, нет кнопки — прах Эха вливают в героя любой недели');
+    if (pourBtn(showcase('закон · влить · закрыт', e4.id), e4.id)) say('«Влить»: кнопка у героя, закрытого по циклу');
+    collView('закон · влить · каталог', { all: true }); run('закон · влить · книга', () => T.ACT.hc(e2.id)); calm();
+    { const w = winOf(view('закон · влить · книга героя'));
+      if (!pourBtn(w, e2.id) || !new RegExp(`<span class="ep-bal"[^>]*>[\\s\\S]*?<b class="num">${T.fmt(d0)}</b>`).test(w)) say('«Влить»: в книге несобранного героя Эхо нет остатка праха Эха или кнопки'); }
+    run('закон · влить · назад', () => T.ACT.hcback());
+    if (T.zpHero) {
+      const ce = run('закон · влить · запасы', () => T.zpHero({ h: e2, q: s2, key: 'h:' + e2.id })) || '', cr = run('закон · влить · запасы', () => T.zpHero({ h: r0, q: 7, key: 'h:' + r0.id })) || '';
+      if (!pourBtn(ce, e2.id) || !ce.includes(`на руках ${T.fmt(d0)}`)) say('«Влить»: в запасах у несобранного героя Эхо нет кнопки или остатка праха Эха');
+      if (/data-a="ehpour"/.test(cr)) say('«Влить»: кнопка у героя рулетки');
+    }
+    /* 2. окно — в той же витрине: остаток, осколки от своего комплекта, шаги и «всё», кнопка с номером */
+    showcase('закон · влить · витрина', e2.id); run('закон · влить · открыть', () => T.ACT.ehpour(e2.id));
+    if (!T.S.overlay || T.S.overlay.t !== 'hrecho' || !T.S.du.pour || T.S.du.pour.id !== e2.id) say('«Влить»: окно количества — не в той же витрине');
+    let ask = askOf(ovOf(view('закон · влить · окно'))), m = pourDo(ask);
+    if (!ask) { say('«Влить»: окно количества не нарисовано'); return; }
+    if (!ask.includes(`<b class="num">${T.fmt(d0)}</b>`) || !ask.includes(`${T.fmt(s2)} / ${T.fmt(needOf(e2))}`)) say('«Влить» · окно: нет остатка праха Эха или осколков «собрано / нужно» от комплекта героя');
+    for (const k of Q) { const b = ask.match(new RegExp(`data-a="ehq" data-v="${k}"([^>]*)>`)); if (!b || /disabled/.test(b[1]) !== k > max) say(`«Влить» · окно: шаг ${k} ${!b ? 'пропал' : k > max ? 'доступен, а влить столько нельзя' : 'закрыт без причины'}`); }
+    if (!new RegExp(`data-a="ehq" data-v="0"[^>]*>всё · ${T.fmt(max)}<`).test(ask)) say(`«Влить» · окно: «всё» — не ${max}: не больше остатка и недостающего до комплекта`);
+    if (!m || m[2] !== e2.id || +m[3] !== max || /disabled/.test(m[4])) say(`«Влить» · окно: кнопка не несёт «номер|герой|${max}»`);
+    if (!ask.includes(`${T.fmt(s2 + max)} / ${T.fmt(needOf(e2))}`)) say('«Влить» · окно: не сказано, сколько осколков станет');
+    run('закон · влить · шаг', () => T.ACT.ehq(String(Q[2]))); m = pourDo(askOf(ovOf(view('закон · влить · шаг больше возможного'))));
+    if (!m || +m[3] !== max) say(`«Влить» · окно: шаг ${Q[2]} при остатке ${d0} — ×${m ? m[3] : '—'}, ждали «всё» ×${max}`);
+    run('закон · влить · шаг', () => T.ACT.ehq(String(Q[1]))); m = pourDo(askOf(ovOf(view('закон · влить · шаг'))));
+    if (!m || +m[3] !== Q[1]) { say(`«Влить» · окно: шаг ${Q[1]} не встал на кнопку`); return; }
+    /* 3. операция: остаток падает, осколки растут ровно на столько же по курсу; прах душ и души не тронуты */
+    const op1 = m[1], q1 = +m[3], w0 = [T.S.wallet.dust, T.S.wallet.souls];
+    T.S.toast = null; run('закон · влить · операция', () => T.ACT.ehpourdo(`${op1}|${e2.id}|${q1}`)); pours();
+    if (ED() !== d0 - q1 * R.shard || T.S.rs.shards[e2.id] !== s2 + q1) say(`«Влить» ×${q1}: праха Эха ${ED()}, осколков ${T.S.rs.shards[e2.id]} — ждали ${d0 - q1 * R.shard} и ${s2 + q1}`);
+    if (T.S.wallet.dust !== w0[0] || T.S.wallet.souls !== w0[1]) say('«Влить»: тронут общий прах душ или души');
+    if (T.S.du.pour || !T.S.overlay || T.S.overlay.t !== 'hrecho') say('«Влить»: после операции окно количества не закрылось или закрылась витрина');
+    if (!toastT().includes(`+${T.fmt(q1)}`)) say('«Влить»: итог операции не сообщён игроку');
+    /* повтор номера ничего не меняет */
+    { const a = snapEcho(); run('закон · влить · повтор', () => T.ACT.ehpourdo(`${op1}|${e2.id}|${q1}`)); const r = T.EH.pour(op1, e2.id, q1);
+      if (snapEcho() !== a || !r.again) say('«Влить»: повтор номера операции влил ещё раз или не назван повтором'); }
+    /* новая кнопка — новый номер: второе вливание проходит */
+    run('закон · влить · открыть снова', () => T.ACT.ehpour(e2.id)); m = pourDo(askOf(ovOf(view('закон · влить · второе окно'))));
+    if (!m || m[1] === op1) say('«Влить»: после операции кнопка несёт прежний номер — следующее вливание не пройдёт');
+    else { const d1 = ED(), s1 = T.S.rs.shards[e2.id], q = +m[3]; run('закон · влить · второе', () => T.ACT.ehpourdo(`${m[1]}|${e2.id}|${q}`)); pours();
+      if (ED() !== d1 - q * R.shard || T.S.rs.shards[e2.id] !== s1 + q) say(`«Влить»: второе вливание ×${q} — праха Эха ${ED()}, осколков ${T.S.rs.shards[e2.id]}; ждали ${d1 - q * R.shard} и ${s1 + q}`); }
+    /* 4. больше недостающего не вольёшь: «всё» — недостающее; запрос сверх него вливает только недостающее */
+    const lack = 5; T.S.rs.shards[e2.id] = needOf(e2) - lack; T.S.wallet.edust = d0;
+    run('закон · влить · почти комплект', () => T.ACT.ehpour(e2.id)); m = pourDo(askOf(ovOf(view('закон · влить · почти комплект'))));
+    if (!m || +m[3] !== lack) say(`«Влить»: недостаёт ${lack} — «всё» ×${m ? m[3] : '—'}: больше недостающего вливать нельзя`);
+    run('закон · влить · сверх комплекта', () => T.ACT.ehpourdo(`${T.ehOp()}|${e2.id}|${d0}`)); pours();
+    if (T.S.rs.shards[e2.id] !== needOf(e2) || ED() !== d0 - lack * R.shard) say(`«Влить»: запрос сверх недостающего — осколков ${T.S.rs.shards[e2.id]} из ${needOf(e2)}, праха Эха списано ${d0 - ED()}; ждали комплект и ${lack * R.shard}`);
+    /* 5. собранному — кнопки нет, отказ словами, ничего не меняется; пробуждённому — тоже */
+    if (pourBtn(showcase('закон · влить · собран', e2.id), e2.id)) say('«Влить»: кнопка у героя с собранным комплектом');
+    for (const own of [false, true]) {
+      if (own) { T.S.wallet.souls = 1e6; T.SOUL_SRV.wake('du' + T.S.du.seq, e2.id); if (!T.rsHas(e2)) { say('«Влить»: собранный герой Эхо не пробудился'); break; } }
+      const a = snapEcho(), what = own ? 'герою в коллекции' : 'герою с собранным комплектом';
+      T.S.toast = null; T.S.overlay = null; run('закон · влить · отказ', () => T.ACT.ehpour(e2.id));
+      if (T.S.du.pour || (T.S.overlay && T.S.overlay.t === 'ehpour') || !toastT()) say(`«Влить» ${what}: окно открылось или отказ без причины`);
+      T.S.toast = null; run('закон · влить · отказ', () => T.ACT.ehpourdo(`${T.ehOp()}|${e2.id}|1`));
+      const r = T.EH.pour(T.ehOp(), e2.id, 1);
+      if (r.refuse !== 'done' || snapEcho() !== a || !/собран|в коллекции/.test(toastT())) say(`«Влить» ${what}: прах влит, или отказ — не «собран» словами игрока (${r.refuse || 'без отказа'}: «${toastT()}»)`);
+    }
+    /* 6. закрытому по циклу — отказ словами */
+    { const a = snapEcho(); T.S.toast = null; T.S.overlay = null; run('закон · влить · закрыт', () => T.ACT.ehpour(e4.id));
+      if (T.S.du.pour || (T.S.overlay && T.S.overlay.t === 'ehpour') || !toastT().includes(`цикле ${T.ROMAN[e4.c]}`)) say('«Влить» герою, закрытому по циклу: окно открылось или не сказано, в каком цикле он откроется');
+      T.S.toast = null; run('закон · влить · закрыт', () => T.ACT.ehpourdo(`${T.ehOp()}|${e4.id}|1`)); const r = T.EH.pour(T.ehOp(), e4.id, 1);
+      if (r.refuse !== 'cycle' || snapEcho() !== a || !toastT().includes(`цикле ${T.ROMAN[e4.c]}`)) say(`«Влить» герою, закрытому по циклу: прах влит или отказ без причины (${r.refuse || 'без отказа'})`); }
+    /* 7. без праха Эха — кнопки нет, отказ словами; запрошено больше остатка — отказ, ничего не списано */
+    T.S.wallet.edust = 0;
+    if (pourBtn(showcase('закон · влить · нет праха', e3.id), e3.id)) say('«Влить»: кнопка без праха Эха');
+    { const a = snapEcho(); T.S.toast = null; run('закон · влить · нет праха', () => T.ACT.ehpour(e3.id)); if (!/Праха Эха нет/.test(toastT()) || T.S.du.pour) say('«Влить» без праха Эха: окно открылось или не сказано, что праха нет');
+      T.S.toast = null; run('закон · влить · нет праха', () => T.ACT.ehpourdo(`${T.ehOp()}|${e3.id}|1`)); const r = T.EH.pour(T.ehOp(), e3.id, 1);
+      if (r.refuse !== 'dust' || snapEcho() !== a || !/Праха Эха нет/.test(toastT())) say('«Влить» без праха Эха: осколки выданы или отказ без причины'); }
+    T.S.wallet.edust = 3 * R.shard;
+    { const a = snapEcho(); T.S.toast = null; T.S.overlay = null; run('закон · влить · мало праха', () => T.ACT.ehpourdo(`${T.ehOp()}|${e3.id}|${Q[0]}`));
+      if (snapEcho() !== a || !/Не хватает праха Эха/.test(toastT())) say(`«Влить» ×${Q[0]} при остатке ${3 * R.shard}: что-то списано или не сказано, что праха не хватает`); }
+    /* 8. не герой Эхо, без номера операции, ноль и дробное число — отказ словами, ничего не меняется */
+    for (const [v, what] of [[`${T.ehOp()}|${r0.id}|1`, 'герою рулетки'], [`|${e3.id}|1`, 'без номера операции'], [`${T.ehOp()}|${e3.id}|0`, 'ноль осколков'], [`${T.ehOp()}|${e3.id}|1.5`, 'дробное число осколков']]) {
+      const a = snapEcho(); T.S.toast = null; run(`закон · влить · ${what}`, () => T.ACT.ehpourdo(v));
+      if (snapEcho() !== a || !toastT()) say(`«Влить» ${what}: что-то изменилось или отказ без слов`);
+    }
+    /* 9. не найденный герой недели: первый осколок из праха Эха — и он найден */
+    if (T.hrStage(e3) !== 0) say('«Влить»: герой цикла III найден до первого осколка');
+    run('закон · влить · не найденному', () => T.ACT.ehpourdo(`${T.ehOp()}|${e3.id}|2`)); pours();
+    if (T.S.rs.shards[e3.id] !== 2 || T.hrStage(e3) !== 1) say('«Влить» не найденному герою недели: осколки не пришли или он не стал «неизвестной душой»');
+    /* 10. из книги героя поверх экрана: окно — слоем, «Отмена» и операция возвращают книгу */
+    T.S.wallet.edust = d0; T.S.overlay = null; run('закон · влить · книга окном', () => T.ACT.rhero(e3.id)); calm();
+    o = ovOf(view('закон · влить · книга окном'));
+    if (!T.S.overlay || T.S.overlay.t !== 'rhero' || !pourBtn(o, e3.id)) say('«Влить»: в книге героя Эхо поверх экрана нет кнопки');
+    run('закон · влить · из книги', () => T.ACT.ehpour(e3.id));
+    if (!T.S.overlay || T.S.overlay.t !== 'ehpour' || !T.S.overlay.back || T.S.overlay.back.t !== 'rhero') say('«Влить» из книги: окно — не слой поверх с возвратом в книгу');
+    if (!pourDo(askOf(ovOf(view('закон · влить · окно поверх книги'))))) say('«Влить» из книги: в окне нет кнопки с номером операции');
+    run('закон · влить · отмена', () => T.ACT.ehno()); if (!T.S.overlay || T.S.overlay.t !== 'rhero' || T.S.overlay.arg !== e3.id) say('«Влить» из книги: «Отмена» не вернула книгу');
+    run('закон · влить · из книги', () => T.ACT.ehpour(e3.id));
+    { const s = T.S.rs.shards[e3.id]; run('закон · влить · из книги', () => T.ACT.ehpourdo(`${T.ehOp()}|${e3.id}|${Q[0]}`)); pours();
+      if (T.S.rs.shards[e3.id] !== s + Q[0] || !T.S.overlay || T.S.overlay.t !== 'rhero') say('«Влить» из книги: осколки не выросли или после операции книга не вернулась'); }
+    /* 11. витрину закрыли — окно количества не ждёт следующего открытия */
+    showcase('закон · влить · витрина', e3.id); run('закон · влить · открыть', () => T.ACT.ehpour(e3.id));
+    if (!T.S.du.pour) say('«Влить»: окно в витрине не открылось');
+    T.S.overlay = null; run('закон · влить · после отрисовки', () => P.listeners('en-render').forEach(f => f()));
+    if (T.S.du.pour) say('«Влить»: витрину закрыли, а окно количества осталось ждать');
+  },
+  /* Л — лишние осколки: у героя Эхо — в прах Эха по курсу, общий прах душ не растёт; у героя рулетки — в прах душ, как прежде */
+  spare() {
+    const R = EDR(), k = 7;
+    fresh(); T.S.acc.cycle = 6; T.S.wallet.souls = 1e6;
+    const e = echoFree(4) || echoFree(2), r0 = rlFree(6);
+    const a = T.hrSpare(e, k), b = T.hrSpare(r0, k);
+    if (a.dust !== 0 || a.edust !== k * R.perShard) say(`лишние осколки героя Эхо ×${k}: прах душ ${a.dust}, прах Эха ${a.edust} — ждали 0 и ${k * R.perShard}`);
+    if (b.edust !== 0 || b.dust !== k * T.rsDustOf(r0)) say(`лишние осколки героя рулетки ×${k}: прах душ ${b.dust}, прах Эха ${b.edust} — ждали ${k * T.rsDustOf(r0)} и 0`);
+    for (const [h, word] of [[e, 'прах Эха'], [r0, 'прах душ']]) {
+      const echo = h === e, tag = echo ? 'героя Эхо' : 'героя рулетки', N = needOf(h), wantD = echo ? 0 : k * T.rsDustOf(h), wantE = echo ? k * R.perShard : 0;
+      T.S.rs.shards[h.id] = N + k; T.S.overlay = null; T.S.route = 'heroes';
+      const op = 'du' + T.S.du.seq;
+      run(`закон · остаток · ${tag}`, () => T.ACT.activate(`${op}|${h.id}`));
+      const c = ovOf(view(`закон · остаток · подтверждение ${tag}`));
+      if (!c.includes(`из ${T.fmt(N)} осколков`) || !c.includes(`уйдут в ${word}`)) say(`подтверждение пробуждения ${tag}: не назван комплект ${N} или «${word}» для лишних осколков`);
+      const d0 = T.S.wallet.dust, x0 = ED();
+      run(`закон · остаток · пробуждение ${tag}`, () => T.ACT.activatedo(`${op}|${h.id}`));
+      if (!T.rsHas(h) || T.S.rs.shards[h.id]) say(`пробуждение ${tag}: герой не в коллекции или осколки остались`);
+      if (T.S.wallet.dust - d0 !== wantD || ED() - x0 !== wantE) say(`пробуждение ${tag} с ${k} лишними осколками: прах душ +${T.S.wallet.dust - d0}, прах Эха +${ED() - x0} — ждали +${wantD} и +${wantE}`);
+      const w = ovOf(view(`закон · остаток · окно пробуждения ${tag}`));
+      if (!w.includes(`в ${word}: +${T.fmt(wantD + wantE)}`)) say(`окно пробуждения ${tag}: не сказано, что лишние осколки ушли в ${word}`);
+      const d1 = T.S.wallet.dust, x1 = ED(); run(`закон · остаток · повтор ${tag}`, () => T.ACT.activatedo(`${op}|${h.id}`));
+      if (T.S.wallet.dust !== d1 || ED() !== x1) say(`пробуждение ${tag}: повтор номера начислил прах ещё раз`);
+      if (T.zpHero) { const card = run('закон · остаток · запасы', () => T.zpHero({ h, q: 3, key: 'h:' + h.id })) || ''; if (!card.includes(`новые осколки уходят в ${word}`)) say(`запасы · пробуждённый ${tag.replace('героя', 'герой')}: не сказано, что новые осколки уходят в ${word}`); }
+    }
+    T.S.overlay = null;
+  },
+  /* Ш — кошелёк: «Прах Эха» — своя запись валюты со своим значком, поле кошелька, лист и место в запасах — у осколков */
+  wallet() {
+    fresh();
+    const C = T.CUR;
+    if (!C.edust || C.edust.n !== 'Прах Эха' || !C.edust.img) { say('кошелёк: нет записи валюты «Прах Эха» (CUR.edust)'); return; }
+    if (C.edust.img === C.dust.img) say('кошелёк: у праха Эха значок праха душ — их не отличить');
+    if (!Number.isInteger(T.S.wallet.edust) || T.S.wallet.edust < 0) say('кошелёк: в состоянии нет поля праха Эха (wallet.edust)');
+    else if (!T.S.wallet.edust) say('демо: праха Эха нет — «Влить» не видно');
+    const sh = scan(run('закон · кошелёк · лист', () => T.OV.cur({ t: 'cur', arg: 'edust' })) || '', 'закон · кошелёк · лист праха Эха');
+    if (!sh.includes('Прах Эха') || !sh.includes(`>${T.fmt(ED())}</b>`) || !sh.includes('data-a="ehcat"')) say('кошелёк: в листе праха Эха нет имени, остатка или пути «К героям Эхо»');
+    run('закон · кошелёк · к героям Эхо', () => T.ACT.ehcat());
+    if (T.S.route !== 'heroes' || T.S.hview !== 'all' || T.S.hf.src !== 'echo') say('«К героям Эхо»: не каталог с фильтром «Эхо»');
+    { const ids = idsOf(view('закон · кошелёк · каталог героев Эхо')); if (!ids.length || ids.some(id => !T.RSI[id] || T.RSI[id].src !== 'echo')) say('«К героям Эхо»: каталог пуст или в нём не только герои Эхо'); }
+    run('закон · кошелёк · сброс фильтра', () => T.ACT.hcclr());
+    if (T.zpEntries) {
+      const es = T.zpEntries('shard'), ru = T.zpEntries('rune'), w = es.find(x => x.key === 'w:edust');
+      if (!w || w.q !== ED()) say('запасы: во вкладке осколков нет праха Эха или остаток не тот');
+      else if (T.zpCell && !T.zpCell(w, false).includes(`>${T.fmt(ED())}</span>`)) say('запасы: в клетке праха Эха нет остатка');
+      if (!ru.some(x => x.key === 'w:dust') || ru.some(x => x.key === 'w:edust') || es.some(x => x.key === 'w:dust')) say('запасы: прах душ и прах Эха — не отдельные записи на своих вкладках');
+    }
+    toSouls(); T.S.overlay = null;
+    { const h = view('закон · кошелёк · «За души»'), eb = h.slice(h.indexOf('data-v="hrecho"')), eIn = eb.slice(0, eb.indexOf('</button>')), db = h.slice(h.indexOf('data-v="dust"')), dIn = db.slice(0, db.indexOf('</button>'));
+      if (!eIn.includes(`<b class="num">${T.fmt(ED())}</b>`) || !/прах Эха/.test(eIn)) say('«За души»: у входа отряда недели не виден остаток праха Эха');
+      if (!dIn.includes(`<b class="num">${T.fmt(T.S.wallet.dust)}</b>`)) say('«За души»: у лавки праха не виден прах душ'); }
+    /* аккаунт «с чистого листа»: поля в кошельке ещё нет — это ноль, без NaN */
+    delete T.S.wallet.edust;
+    { const e = T.rsWeek().squad.map(id => T.RSI[id]).find(h => h && h.c <= T.S.acc.cycle && !T.rsHas(h)), o = showcase('закон · кошелёк · без поля', e && e.id);
+      if (!e) say('кошелёк без поля праха Эха: в отряде недели нет героя, открытого по циклу');
+      else if (T.ehMax(e) !== 0 || pourBtn(o, e.id)) say('кошелёк без поля праха Эха: можно «влить» или остаток не ноль');
+      if (!/<span class="ep-bal"[^>]*>[\s\S]*?<b class="num">0<\/b>/.test(o)) say('кошелёк без поля праха Эха: остаток в витрине — не ноль'); }
+    T.S.overlay = null;
+  },
+};
+const lawRun = k => { const n0 = err.length; run(`закон ${k}`, LAW[k]); return err.splice(n0); };
+let lawBad = 0, lawQuiet = false;   // нарушений законов в обычном прогоне: с ними проверка мутацией ничего не докажет — закон «ловит» всё подряд
+for (const k of Object.keys(LAW)) { cnt.laws++; const e = lawRun(k); lawBad += e.length; e.forEach(say); }
+lawQuiet = true;
+/* сценарий презентации: витрина с окном «Влить» — у несобранного героя недели */
+{ fresh(); const f = T.FLOWS.find(x => x[0] === 'Герой Эхо · влить прах Эха');
+  if (!f) say('сценарий «Герой Эхо · влить прах Эха» пропал');
+  else { run('сценарий «Влить»', () => f[2]()); const o = ovOf(view('сценарий «Герой Эхо · влить прах Эха»')); if (!askOf(o) || !pourDo(askOf(o))) say('сценарий «Герой Эхо · влить прах Эха»: окно количества с кнопкой операции не открыто'); } }
 
 /* ================== 6. режим «Команда»: сетки и книги рисуются ================== */
 run('режим «Команда»', () => T.setTeam(true));
@@ -1596,4 +1893,54 @@ run('режим «Игрок»', () => T.setTeam(false));
   }
   run('режим «Игрок»', () => T.setTeam(false));
 }
+
+/* ================== 12. мутации законов героев Эхо: ломаем — закон обязан упасть ==================
+   Слом — код в песочнице прототипа: подмена функции экрана, метода «сервера» или данных; затем закон раздела 5ж, затем слом снят.
+   Закон, который слома не заметил, — ошибка проверки. После всех сломов законы снова чисты. `--mut` печатает, чем пойман каждый.
+   Законы нарушены уже в обычном прогоне — мутации не запускаются: нарушенный закон «ловит» любой слом и ничего не доказывает */
+if (lawBad) { say(`мутации законов героев Эхо не запускались: в обычном прогоне законы нарушены ${lawBad} раз`); done(); }
+run('режим «Игрок»', () => T.setTeam(false));
+const MUT = [
+  ['set', 'комплект героя Эхо на экране — прежний общий', `var __n0 = hrNeed; hrNeed = function () { return RS.rules.stub.shards; };`, `hrNeed = __n0;`],
+  ['set', '«сервер» героев Эхо отдаёт экрану прежний общий комплект', `var __en0 = EN_ECHO_HEROES.need; EN_ECHO_HEROES.need = function () { return RS.rules.stub.shards; };`, `EN_ECHO_HEROES.need = __en0;`],
+  ['set', 'в данных комплект героя Эхо — как у героя рулетки', `var __es0 = RS.rules.echoSet; RS.rules.echoSet = __es0.map(function (x, i) { return i ? RS.rules.stub.shards : x; });`, `RS.rules.echoSet = __es0;`],
+  ['set', 'комплект героя Эхо не растёт с циклом — у всех как у первого', `var __es1 = RS.rules.echoSet; RS.rules.echoSet = __es1.map(function (x, i) { return i ? __es1[1] : x; });`, `RS.rules.echoSet = __es1;`],
+  ['set', 'героя Эхо пробуждают из прежних 50 осколков', `var __wk0 = SOUL_SRV.wake; SOUL_SRV.wake = function (op, id) { var h = RSI[id], c = RS.rules.stub.activateSouls; if (h && h.src === 'echo' && !rsHas(h) && (S.rs.shards[id] || 0) >= RS.rules.stub.shards && S.wallet.souls >= c) { S.wallet.souls -= c; delete S.rs.shards[id]; rsAdd(h, 'souls'); return { res: { op: op, kind: 'wake', id: id, cost: c, dust: 0, edust: 0 } }; } return __wk0.call(SOUL_SRV, op, id); };`, `SOUL_SRV.wake = __wk0;`],
+  ['bar', 'полоса на книге — от общего комплекта', `var __so0 = hcShardOf; hcShardOf = function (v) { var r = __so0(v); return r ? [r[0], RS.rules.stub.shards] : r; };`, `hcShardOf = __so0;`],
+  ['bar', 'числа на обложке — от общего комплекта, полоса верная', `var __hs0 = hcShard; hcShard = function (v, got, need) { return __hs0(v, got, need).replace(/(<small class="num">)[^<]*/, '$1' + fmt(got) + '/' + fmt(RS.rules.stub.shards)); };`, `hcShard = __hs0;`],
+  ['bar', 'в книге героя «собрано / нужно» — от общего комплекта', `var __sb0 = hcSoulBody; hcSoulBody = function (rh) { var n = S.rs.shards[rh.id] || 0; return __sb0(rh).replace(/(<small class="num">)[^<]*(<\\/small>)/, '$1' + fmt(n) + ' / ' + fmt(RS.rules.stub.shards) + '$2'); };`, `hcSoulBody = __sb0;`],
+  ['bar', 'в запасах комплект героя — прежний общий', `var __zc0 = zpCardHero; zpCardHero = function (e) { return __zc0(e).replace(/(<span class="zp-of">\\/)[^<]*/, '$1' + fmt(RS.rules.stub.shards)); };`, `zpCardHero = __zc0;`],
+  ['bar', 'строка выбранного в витрине — от общего комплекта', `var __he0 = heSel; heSel = function (h) { return __he0(h).replace(/(осколков [^/<]*\\/ )[^<— ]*/, '$1' + fmt(RS.rules.stub.shards)); };`, `heSel = __he0;`],
+  ['pour', 'кнопка «Влить» всегда несёт один и тот же номер операции', `var __op0 = ehOp; ehOp = function () { return 'ehp1'; };`, `ehOp = __op0;`],
+  ['pour', '«сервер» не помнит номер операции: повтор вливает ещё раз', `var __p0 = EN_ECHO_HEROES.pour; EN_ECHO_HEROES.pour = function (op, id, q) { if (S.ech && S.ech.ops) delete S.ech.ops[op]; return __p0.call(EN_ECHO_HEROES, op, id, q); };`, `EN_ECHO_HEROES.pour = __p0;`],
+  ['pour', '«всё» не смотрит на недостающее до комплекта', `var __m0 = ehMax; ehMax = function () { var R = hrEchoRate(); return R.shard > 0 ? hrFl(hrEDust(), R.shard) : 0; };`, `ehMax = __m0;`],
+  ['pour', '«всё» не смотрит на остаток праха Эха', `var __m1 = ehMax; ehMax = function (h) { return Math.max(0, hrNeed(h) - (S.rs.shards[h.id] || 0)); };`, `ehMax = __m1;`],
+  ['pour', '«Влить» предлагают собранному и закрытому по циклу', `var __w0 = ehWhy; ehWhy = function () { return ''; };`, `ehWhy = __w0;`],
+  ['pour', 'вливание не списывает прах Эха', `var __p1 = EN_ECHO_HEROES.pour; EN_ECHO_HEROES.pour = function (op, id, q) { var d = S.wallet.edust, r = __p1.call(EN_ECHO_HEROES, op, id, q); if (r.res && !r.again) S.wallet.edust = d; return r; };`, `EN_ECHO_HEROES.pour = __p1;`],
+  ['pour', 'вливание даёт на осколок больше, чем списано праха', `var __p2 = EN_ECHO_HEROES.pour; EN_ECHO_HEROES.pour = function (op, id, q) { var r = __p2.call(EN_ECHO_HEROES, op, id, q); if (r.res && !r.again) S.rs.shards[id] += 1; return r; };`, `EN_ECHO_HEROES.pour = __p2;`],
+  ['pour', '«сервер» вливает сверх комплекта', `var __p3 = EN_ECHO_HEROES.pour; EN_ECHO_HEROES.pour = function (op, id, q) { var n = S.rs.shards[id] || 0, d = S.wallet.edust || 0, r = __p3.call(EN_ECHO_HEROES, op, id, q); if (r.res && !r.again && q > r.res.q && d >= q) { S.rs.shards[id] = n + q; S.wallet.edust = d - q; } return r; };`, `EN_ECHO_HEROES.pour = __p3;`],
+  ['pour', '«сервер» вливает собранному герою', `var __p4 = EN_ECHO_HEROES.pour; EN_ECHO_HEROES.pour = function (op, id, q) { var r = __p4.call(EN_ECHO_HEROES, op, id, q); if (r.refuse === 'done' && (S.wallet.edust || 0) >= q) { S.wallet.edust -= q; S.rs.shards[id] = (S.rs.shards[id] || 0) + q; return { res: { op: op, kind: 'ehpour', id: id, q: q, cost: q } }; } return r; };`, `EN_ECHO_HEROES.pour = __p4;`],
+  ['pour', '«сервер» вливает герою, закрытому по циклу', `var __p5 = EN_ECHO_HEROES.pour; EN_ECHO_HEROES.pour = function (op, id, q) { var r = __p5.call(EN_ECHO_HEROES, op, id, q); if (r.refuse === 'cycle' && (S.wallet.edust || 0) >= q) { S.wallet.edust -= q; S.rs.shards[id] = (S.rs.shards[id] || 0) + q; return { res: { op: op, kind: 'ehpour', id: id, q: q, cost: q } }; } return r; };`, `EN_ECHO_HEROES.pour = __p5;`],
+  ['pour', 'отказ «сервера» молчит: игроку причина не названа', `var __sy0 = EH_WHY.done, __sy1 = EH_WHY.cycle, __sy2 = EH_WHY.dust; EH_WHY.done = EH_WHY.cycle = EH_WHY.dust = function () { return ''; };`, `EH_WHY.done = __sy0; EH_WHY.cycle = __sy1; EH_WHY.dust = __sy2;`],
+  ['pour', 'окно «Влить» из витрины открывается отдельным слоем — витрина закрыта', `var __ep0 = ACT.ehpour; ACT.ehpour = function (v) { S.du.pq = 0; S.overlay = { t: 'ehpour', arg: v, back: null }; render(); };`, `ACT.ehpour = __ep0;`],
+  ['pour', '«Отмена» окна поверх книги закрывает и книгу', `var __no0 = ACT.ehno; ACT.ehno = function () { S.du.pour = null; S.overlay = null; render(); };`, `ACT.ehno = __no0;`],
+  ['spare', 'лишние осколки героя Эхо — в общий прах душ', `var __sp0 = hrSpare; hrSpare = function (h, x) { return { dust: Math.max(0, x || 0) * rsDustOf(h), edust: 0 }; };`, `hrSpare = __sp0;`],
+  ['spare', 'лишние осколки героя рулетки — в прах Эха', `var __sp1 = hrSpare; hrSpare = function (h, x) { return { dust: 0, edust: Math.max(0, x || 0) * hrEchoRate().perShard }; };`, `hrSpare = __sp1;`],
+  ['spare', 'лишние осколки героя Эхо пропадают', `var __sp2 = hrSpare; hrSpare = function (h, x) { return h && h.src === 'echo' ? { dust: 0, edust: 0 } : __sp2(h, x); };`, `hrSpare = __sp2;`],
+  ['spare', 'пробуждение героя Эхо кладёт остаток в прах душ мимо правила', `var __wk1 = SOUL_SRV.wake; SOUL_SRV.wake = function (op, id) { var h = RSI[id], e0 = S.wallet.edust || 0, r = __wk1.call(SOUL_SRV, op, id); if (r.res && !r.again && h && h.src === 'echo') { var x = (S.wallet.edust || 0) - e0; S.wallet.edust = e0; S.wallet.dust += x; } return r; };`, `SOUL_SRV.wake = __wk1;`],
+  ['spare', 'подтверждение пробуждения героя Эхо обещает прах душ', `var __sw0 = hrSpareWord; hrSpareWord = function () { return 'прах душ'; };`, `hrSpareWord = __sw0;`],
+  ['wallet', 'у праха Эха значок праха душ', `var __ci0 = CUR.edust.img; CUR.edust.img = CUR.dust.img;`, `CUR.edust.img = __ci0;`],
+  ['wallet', 'прах Эха лежит во вкладке «Руны и ключи», а не у осколков', `ZP_WALLET.push('edust'); ZP_WALLET_SHARD.length = 0;`, `ZP_WALLET.pop(); ZP_WALLET_SHARD.push('edust');`],
+  ['wallet', 'демо-аккаунт без праха Эха', `var __zd0 = ZP_DEMO.edust; ZP_DEMO.edust = 0;`, `ZP_DEMO.edust = __zd0;`],
+  ['wallet', 'остаток праха Эха не виден у входа отряда недели', `var __ss0 = hrSoulsSide; hrSoulsSide = function () { var d = S.wallet.edust; S.wallet.edust = 0; try { return __ss0(); } finally { S.wallet.edust = d; } };`, `hrSoulsSide = __ss0;`],
+];
+for (const [k, what, brk, fix] of MUT) {
+  try { vm.runInContext(brk, P.ctx); } catch (e) { say(`мутация «${what}»: не применилась — ${e.message}`); continue; }
+  const got = lawRun(k);
+  try { vm.runInContext(fix, P.ctx); } catch (e) { say(`мутация «${what}»: не снялась — ${e.message}`); }
+  if (SHOW_MUT) console.log(`мутация «${what}» [${k}]: ${got.length ? got[0].slice(0, 200) : 'НЕ ПОЙМАНА'}`);
+  if (got.length) cnt.mut++; else say(`мутация «${what}»: закон ${k} её не поймал`);
+}
+/* мутации сняты — законы снова чисты */
+for (const k of Object.keys(LAW)) for (const e of lawRun(k)) say(`закон ${k} после мутаций: ${e}`);
 done();

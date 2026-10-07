@@ -121,11 +121,19 @@ function power(their, mine) {
   const d = mine ? Math.floor((their - mine) * BP / mine) : BP;
   return d > AR_VIEW.near ? ['сильнее', 'warn'] : d < -AR_VIEW.near ? ['слабее', 'spirit'] : ['наравне', ''];
 }
-/* планки побед режима: первая × x строк EN_LOOTBOXES, сундуки — строка своего цикла */
+/* планки побед режима — ступени его лестницы на все циклы (ADR-0047): пороги — в победах, первая планка (EN_ARENA) × множитель ступени;
+   за верхней планкой своей полосы сразу идут планки следующей — без перехода в новый цикл; сундук ступени — своей полосы. Ступени
+   собирает общий помощник Недели (EN_WEEK.steps, screens/week.js); без него — планки своего цикла. Каждая: { k, band, i, need, pay, reached, cap } */
 function planks(kind, have) {
-  const L = window.EN_LOOTBOXES, ly = L && L.modes[kind] ? L.modes[kind].layers.find(l => l.kind === 'plank' && !l.clan) : null, c = S.acc.cycle;
-  return ly ? ly.rows.map((row, i) => ({ k: i + 1, need: M(kind).plank * row.x, pay: row.cyc[c] || [], reached: have >= M(kind).plank * row.x })) : [];
+  const W = window.EN_WEEK, c = S.acc.cycle;
+  if (W && typeof W.steps === 'function') { const st = W.steps(kind, { have, plank1: M(kind).plank, cycle: c }); if (st.length) return st; }
+  const L = window.EN_LOOTBOXES, ly = L && L.modes[kind] ? L.modes[kind].layers.find(l => l.kind === 'plank' && !l.clan) : null;
+  return ly ? ly.rows.map((row, i) => ({ k: i + 1, band: c, i: i + 1, need: M(kind).plank * row.x, pay: row.cyc[c] || [], reached: have >= M(kind).plank * row.x, cap: false })) : [];
 }
+/* единица порогов: победы Арены и победы в матчах Лиги */
+const WINS = ['победа', 'победы', 'побед'], WINS_LG = ['победа в матче', 'победы в матчах', 'побед в матчах'];
+const winsOf = kind => kind === 'league' ? WINS_LG : WINS;
+const plankName = (kind, p) => window.EN_WEEK && EN_WEEK.stepName ? EN_WEEK.stepName(kind, p) : `Планка ${p.k}`;
 /* выплата за место, если неделя кончится сейчас: наименьший «топ-N», куда место входит */
 function tierOf(kind, place) {
   const L = window.EN_LOOTBOXES, ly = L && L.modes[kind] ? L.modes[kind].layers.find(l => l.kind === 'place' && !l.clan) : null;
@@ -452,9 +460,9 @@ function oppCard(kind, oid) {
 function plankStrip(kind, have) {
   const pk = planks(kind, have), nx = pk.find(p => !p.reached), prev = nx ? pk.filter(p => p.need < nx.need).reduce((a, p) => Math.max(a, p.need), 0) : 0;
   const v = nx ? Math.floor((have - prev) * 100 / Math.max(1, nx.need - prev)) : 100;
-  const unit = kind === 'league' ? ['победа в матче', 'победы в матчах', 'побед в матчах'] : ['победа', 'победы', 'побед'];
+  const unit = winsOf(kind);
   return `<button class="ar-plank" data-a="sheet" data-v="arrew:${kind}"><span class="ar-pl-t"><b class="num">${fmt(have)}</b> <small>${plural(have, ...unit)} за неделю</small></span>
-    ${bar(v, nx ? '' : 'sp')}<span class="ar-pl-n">${nx ? `сундук за <b class="num">${fmt(nx.need)}</b>` : 'все планки взяты'}</span>${nx ? chestTok(nx.pay, `Планка ${nx.k}: ${chestName(nx.pay)}`) : ''}${ic('chev')}</button>`;
+    ${bar(v, nx ? '' : 'sp')}<span class="ar-pl-n">${nx ? `сундук за <b class="num">${fmt(nx.need)}</b>` : 'все планки взяты'}</span>${nx ? chestTok(nx.pay, `${plankName(kind, nx)}: ${chestName(nx.pay)}`) : ''}${ic('chev')}</button>`;
 }
 function arenaTab() {
   const A = S.arena;
@@ -623,15 +631,19 @@ Object.assign(OV, {
     return sheet('Нападения на оборону', `<div class="col ar-loglist">${rows || '<p class="faint">Нападений пока не было.</p>'}</div>
       <p class="reason">Отбитое нападение даёт половину рейтинга. Поражения обороны снимают рейтинг не больше ${AD.elo.def.lossCap} раз за сутки.</p>`);
   },
-  /* награды: планки побед недели — сундуки в «Дарах»; место в конце недели; у Арены — Энериум за место каждые сутки */
+  /* награды: планки побед недели — лестница на все циклы (EN_WEEK.ladderHtml), сундуки — в «Дарах»; место в конце недели; у Арены —
+     Энериум за место каждые сутки. Без помощника Недели — планки строками */
   arrew(o) {
-    const kind = o.arg === 'league' ? 'league' : 'arena', A = kind === 'league' ? S.arena.lg : S.arena, pk = planks(kind, A.wins);
-    const place = kind === 'league' ? lgPlace(A.rating) : arPlace(A.rating), tier = tierOf(kind, place);
-    const rows = pk.map(p => `<div class="ar-pk ${p.reached ? 'got' : ''}">${chestTok(p.pay, chestName(p.pay))}<span class="tx"><b>${fmt(p.need)} ${plural(p.need, 'победа', 'победы', 'побед')}</b><small>${esc(chestName(p.pay))}</small></span>${p.reached ? `<span class="chip spirit">${ic('check')}взята</span>` : ''}</div>`).join('');
+    const kind = o.arg === 'league' ? 'league' : 'arena', A = kind === 'league' ? S.arena.lg : S.arena, pk = planks(kind, A.wins), unit = winsOf(kind);
+    const place = kind === 'league' ? lgPlace(A.rating) : arPlace(A.rating), tier = tierOf(kind, place), W = window.EN_WEEK, LM = window.EN_LOOTBOXES && EN_LOOTBOXES.modes[kind];
+    const road = W && typeof W.ladderHtml === 'function' ? W.ladderHtml(kind, { steps: pk, have: A.wins, unit }) : '';
+    const rows = pk.map(p => `<div class="ar-pk ${p.reached ? 'got' : ''}">${chestTok(p.pay, chestName(p.pay))}<span class="tx"><b>${fmt(p.need)} ${plural(p.need, ...unit)}</b><small>${esc(chestName(p.pay))}</small></span>${p.reached ? `<span class="chip spirit">${ic('check')}взята</span>` : ''}</div>`).join('');
     const en = kind === 'arena' ? `<span class="eyebrow">Энериум каждые сутки</span><div class="stats">${AD.enerium.map(([top, n], i) => `<div class="srow"><span class="n">${i ? `места ${AD.enerium[i - 1][0] + 1}–${top}` : 'место 1'}</span><span class="v">${money('enerium', n)}</span><span></span></div>`).join('')}</div>
       <p class="reason">Раз в сутки — срез рейтинга сервера. Сейчас место ${fmt(place)}: ${AE.dailyEn(AD, place) ? `${AE.dailyEn(AD, place)} Энериума` : 'вне сотни'}.</p>` : '';
-    return sheet(kind === 'league' ? 'Награды Лиги' : 'Награды Арены', `<span class="eyebrow">Победы недели</span><div class="col ar-pks">${rows}</div>
-      ${tier ? `<p class="reason">Если неделя кончится сейчас: ${esc(tier.label)} — ${esc(chestName(tier.pay))}.</p>` : ''}${en}`, `<button class="btn go" data-a="sheet" data-v="gifts">Дары путешествия</button>`);
+    const team = LM && LM.ladder ? TM(`<p class="reason">Пороги — в победах: первая планка ${M(kind).plank} (EN_ARENA.${kind}.plank) × множитель ступени; лестница — EnLoot.ladder (ADR-0047): первая планка следующей полосы — ×${LM.ladder.next} от верхней своей, без перехода в новый цикл. Попыток — ${M(kind).att.day} в сутки, копятся до ${M(kind).att.cap}.</p>`) : '';
+    return sheet(kind === 'league' ? 'Награды Лиги' : 'Награды Арены', `<div class="row wk-stats"><div class="stat"><b class="num">${fmt(A.wins)}</b><small>${plural(A.wins, ...unit)} за неделю</small></div></div>
+      ${road || `<span class="eyebrow">Победы недели</span><div class="col ar-pks">${rows}</div>`}
+      ${tier ? `<p class="reason">Если неделя кончится сейчас: ${esc(tier.label)} — ${esc(chestName(tier.pay))}.</p>` : ''}${en}${team}`, `<button class="btn go" data-a="sheet" data-v="gifts">Дары путешествия</button>`);
   },
   /* как устроено: пять строк правил; команде — Эло и асимметрия */
   arrules(o) {
@@ -696,11 +708,11 @@ Object.assign(ACT, {
 });
 
 /* ================== неделя: итоги в реестр WEEK_MODES (screens/week.js) ==================
-   Арена: место и рейтинг, планки побед недели, лидеры, выплата за место, если неделя кончится сейчас. Прошлая — место и выплаты из
-   «Даров» (darRows, screens/bag.js), рейтинг конца недели, Энериум суточных срезов. Лига — так же; закрыта — причина */
+   Арена: место и рейтинг, планки побед недели — ступени лестницы на все циклы, пороги — в победах (have — победы, а не рейтинг),
+   лидеры, выплата за место, если неделя кончится сейчас. Прошлая — место и выплаты из «Даров» (darRows, screens/bag.js), рейтинг
+   конца недели, Энериум суточных срезов. Лига — так же; закрыта — причина */
 const darPrev = id => typeof darRows === 'function' && S.zp ? darRows(S, 'prev').filter(p => p.id === id) : [];
 const pastRows = rows => rows.map(p => ({ label: p.label, box: p.box, groups: p.groups.map(g => ({ r: g.r, count: g.count, win: g.win })), st: p.st, cat: p.cat, kind: p.kind }));
-const WINS = ['победа', 'победы', 'побед'];
 (window.WEEK_MODES = window.WEEK_MODES || []).push({
   id: 'arena', n: 'Арена', icon: 3, go: 'arena:arena', order: 50, unit: 'рейтинг',
   now() {
@@ -722,7 +734,7 @@ const WINS = ['победа', 'победы', 'побед'];
   now() {
     const why = lgWhy(); if (why) return { lock: why };
     const G = S.arena.lg, place = lgPlace(G.rating);
-    return { place, points: G.rating, have: G.wins, planks: planks('league', G.wins), plankUnit: ['победа в матче', 'победы в матчах', 'побед в матчах'], top: AD.top.league.now.map(x => x.slice()),
+    return { place, points: G.rating, have: G.wins, planks: planks('league', G.wins), plankUnit: WINS_LG, top: AD.top.league.now.map(x => x.slice()),
       tier: tierOf('league', place), note: `Дивизион ${divOf(G.rating).n}` };
   },
   past() {
@@ -785,7 +797,7 @@ function arKitHtml() {
     </div>
     ${Mo ? TM(`<div class="ar-kg">
       <div class="k-air-r"><b>Прогон: ${fmt(Mo.players)} игроков × ${Mo.seasons} сезона</b><table class="p-table ar-kt"><thead><tr><th>Профиль</th><th>Атак</th><th>Побед</th><th>Доля</th><th>Энериум</th><th>На обновления</th></tr></thead><tbody>${prof}</tbody></table>
-        <small>Планки ${[1, 2, 4, 8].map(x => AD.arena.plank * x).join(' / ')} побед: обычный — третья, увлечённый — четвёртая. Плательщик при той же силе — не больше ×1,7 по победам и Энериуму, обновления не окупаются.</small></div>
+        <small>Планки ${planks('arena', 0).filter(p => !p.cap && p.band === planks('arena', 0)[0].band).map(p => p.need).join(' / ')} побед: обычный — третья, увлечённый — четвёртая. Плательщик при той же силе — не больше ×1,7 по победам и Энериуму, обновления не окупаются.</small></div>
       <div class="k-air-r"><b>Сдвиг защиты: выгода равной атаки</b><table class="p-table ar-kt"><thead><tr><th>Сдвиг</th><th>За атаку</th><th>Средний рейтинг по сезонам</th></tr></thead><tbody>${sh}</tbody></table>
         <small>Выбор отряда под соперника — +${Mo.puzzle.pts} ${plural(Mo.puzzle.pts, 'очко', 'очка', 'очков')} Эло. Сдвиг ${E.def.shift} в пользу атакующего возвращает выгоду равной атаки к нулю; буквальное «+50 защитнику» — рост рейтинга от числа атак. Предел — ${EB.roundsOf('pvp')} раундов, таблица ядра: гибель стороны решает ${pct1((Mo.rounds.find(x => x.rounds === EB.roundsOf('pvp')) || { decBp: 0 }).decBp)} боёв.</small></div>
     </div>

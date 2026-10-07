@@ -5,7 +5,8 @@
    межсерверные места игроков и кланов; главная награда — сундуки рабочих (§23). Магазина События в GDD нет.
    Регистрирует: SCREENS.event; листы OV.evrew (три слоя наград, вкладки — тот же лист с аргументом), OV.evsrc (источник очков);
    действие ACT.evdemo (кнопки команды); строку «Событие» в реестре WEEK_MODES (screens/week.js); раздел UI-кита через KIT_EXTRA;
-   сценарии презентации. Глобал evPlanks — личные планки с сундуками (его зовут week.js и check_all.js); window.EN_EV — для проверки.
+   сценарии презентации. Глобал evPlanks — личные планки с сундуками: ступени лестницы режима на все циклы (ADR-0047; его зовут week.js
+   и check_all.js); лестницу в листе наград рисует общий помощник Недели EN_WEEK.ladderHtml; window.EN_EV — для проверки.
    Своё состояние — S.event (заводится как S.bag): очки недели, очки по источникам, сделанное по единицам, журнал «сервера».
    Сервер решает, клиент показывает: очки начисляет «сервер» EV_SRV по подтверждённому делу — операция с номером, повтор номера
    ничего не начисляет; после отсечки приём закрыт; дневные потолки одинаковы для всех. Дела в игре превращает в операции
@@ -108,14 +109,22 @@ function evSync() {
 }
 
 /* ================== планки, клан, места ================== */
-/* личные планки: пороги цикла из данных, сундук каждой — строка планки EN_LOOTBOXES.modes.event цикла игрока */
+/* личные планки — ступени лестницы режима (ADR-0047): лестница одна, сквозная, по очкам, видна сразу на все циклы. Пороги своей полосы —
+   данные цикла (EN_EVENT.planks); за её верхней планкой сразу, без перехода в новый цикл, идут планки следующих полос — множителем
+   первой планки; сундук ступени — своей полосы (EnLoot.ladder). Ступени собирает общий помощник Недели (EN_WEEK.steps, screens/week.js);
+   без него — планки своего цикла. Каждая: { k, band, i, need, pay, reached, cap } */
+function evSteps(pts, c = S.acc.cycle) {
+  if (!evOk() || c < EVD.from) return [];
+  const own = EVA.planks(EVD, c), W = window.EN_WEEK;
+  if (W && typeof W.steps === 'function') { const L = W.steps('event', { have: pts, needs: own, cycle: c }); if (L.length) return L; }
+  const ly = evLy('me');
+  return own.map((need, i) => ({ k: i + 1, band: c, i: i + 1, need, pay: ly && ly.rows[i] ? ly.rows[i].cyc[c] || [] : [], reached: pts >= need, cap: false }));
+}
+/* сколько планок лестницы взято при стольких очках */
+const evReached = (pts, c = S.acc.cycle) => evSteps(pts, c).filter(p => p.reached).length;
 function evPlanks() {
   if (!evOk() || !S.event) return [];
-  const c = S.acc.cycle, ly = evLy('me'), pts = S.event.pts;
-  return (c >= EVD.from ? EVA.planks(EVD, c) : []).map((need, i) => {
-    const row = ly && ly.rows[i], got = pts >= need;
-    return { k: i + 1, need, box: evM().box, pay: row ? row.cyc[c] || [] : [], got, reached: got };
-  });
+  return evSteps(S.event.pts).map(p => Object.assign({ box: evM().box, got: p.reached }, p));
 }
 window.evPlanks = evPlanks;
 /* клан (ADR-0042): очки — сумма очков участников, у других циклов — в очках цикла игрока по первым личным порогам; планка k — участников ×
@@ -153,7 +162,7 @@ function evTier(place, clan) {
 }
 /* прошлая неделя — та, за которую платят «Дары» (bag.js): взятые планки, место; очки — порог взятой и доля пути к следующей */
 function evPast() {
-  const c = S.acc.cycle, needs = EVA.planks(EVD, c);
+  const needs = evSteps(0).map(p => p.need);
   const rows = typeof darRows === 'function' && S.zp ? darRows(S, 'prev').filter(p => p.id === 'event') : [];
   const k = rows.length ? rows.filter(p => p.kind === 'plank').length : (evM().typical.free.me || 0);
   const lo = k ? needs[Math.min(k, needs.length) - 1] : 0, hi = k < needs.length ? needs[k] : lo * 2;
@@ -178,12 +187,12 @@ const EV_SRV = {
     if (!evLeft()) return { refuse: 'closed' };
     const d = EV_SRV.day(); if (E.srv.day.n !== d) E.srv.day = { n: d, used: {} };
     const k = Math.min(n, EVA.room(EVD, unit, E.srv.day.used[unit]));
-    const was = EVA.reached(EVA.planks(EVD, S.acc.cycle), E.pts);
+    const was = evReached(E.pts);   // взятые планки лестницы: за верхней своей полосы — планки следующей, без перехода
     const p = k > 0 ? EVA.pts(EVD, unit, k, { race: E.race, rp1: evRp1() }) : 0;
     E.srv.ops[op] = p; E.srv.seq++;
     if (k > 0) { E.srv.day.used[unit] = (E.srv.day.used[unit] || 0) + k; E.cnt[unit] = (E.cnt[unit] || 0) + k; }
     if (p > 0) { E.pts += p; E.by[U.src] = (E.by[U.src] || 0) + p; evRank(S); }   // место — сразу по новым очкам
-    const now = EVA.reached(EVA.planks(EVD, S.acc.cycle), E.pts);
+    const now = evReached(E.pts);
     return { ok: true, pts: p, n: k, cut: n - k, plank: now > was ? now : 0 };
   },
   /* новая неделя: счёт с нуля, журнал — новый; клан начинает с демо-вклада остальных участников */
@@ -286,7 +295,7 @@ function heroHtml() {
     <div class="ev-ban">${art ? `<img class="ev-art" src="${art}" alt="">` : ''}<div class="ev-id"><span class="eyebrow">Событие недели</span><b class="serif">${W ? W.n : 'Событие'}</b><small>Неделя ${w.gen} · ${w.civ}</small></div></div>
     <div class="ev-body">
       <div class="ev-pts"><b class="num">${fmt(E.pts)}</b><small>${evWord(E.pts)} за неделю</small></div>
-      <div class="ev-next">${bar(pct, nx ? '' : 'sp')}${nx ? evChest(nx.pay, 'Планка ' + nx.k) : ''}</div>
+      <div class="ev-next">${bar(pct, nx ? '' : 'sp')}${nx ? evChest(nx.pay, window.EN_WEEK && EN_WEEK.stepName ? EN_WEEK.stepName('event', nx) : 'Планка ' + nx.k) : ''}</div>
       ${line}
       <div class="ev-foot">${W ? `<span class="chip spirit ev-acc" title="${trEsc(W.line)}">${ic('spark')}<span>Акцент — ${W.an}</span></span>` : ''}<button class="btn go ev-rew" data-a="sheet" data-v="evrew:me">Награды ${ic('chev')}</button></div>
     </div></div>`;
@@ -357,12 +366,14 @@ Object.assign(OV, {
     if (!evOpen()) return sheet('Награды События', `${head}<p class="rs-line">${ic('lock')}Событие недели — со второго цикла.</p>`);
     let body = '', foot = '';
     if (t === 'me') {
-      const P = evFirst(evPlanks()), got = P.filter(p => p.got).length;
-      body = `<div class="row wk-stats">${evStat(fmt(E.pts), evWord(E.pts))}${evStat(`${got} из ${P.length}`, 'планок')}</div>
-        <div class="ev-pks">${P.map(r => evRung(r, E.pts)).join('')}</div>
+      /* личные планки — лестница на все циклы: «дорога» общего помощника Недели (EN_WEEK.ladderHtml); без него — планки строками */
+      const P = evPlanks(), got = P.filter(p => p.got).length, WKH = window.EN_WEEK, R = evM().ladder;
+      const road = WKH && typeof WKH.ladderHtml === 'function' ? WKH.ladderHtml('event', { steps: P, have: E.pts }) : '';
+      body = `<div class="row wk-stats">${evStat(fmt(E.pts), evWord(E.pts))}${road ? '' : evStat(fmt(got), plural(got, 'планка взята', 'планки взяты', 'планок взято'))}</div>
+        ${road || `<div class="ev-pks">${evFirst(P).map(r => evRung(r, E.pts)).join('')}</div>`}
         <p class="reason">Планка засчитывается сразу. Сундуки рабочих получают в «Дарах», открывают — в запасах.</p>
         ${W ? `<p class="ev-line">${W.line}</p>` : ''}<p class="reason">${EVD.world}</p>
-        ${TM(`Пороги цикла ${ROMAN[c]} — EN_EVENT.planks, соседние ×2; прогон: обычный берёт третью в ${evPct(EVD.econ[c].oP3Bp)} недель, четвёртую — в ${evPct(EVD.econ[c].oP4Bp)}; увлечённый четвёртую — в ${evPct(EVD.econ[c].eP4Bp)}, пятую — в ${evPct(EVD.econ[c].eP5Bp)}; первая планка — типичная неделя обычного / ${String(EVD.plankR / 100).replace('.', ',')}, одна мерка на все циклы. Сундуки — EN_LOOTBOXES.modes.event, слой «Личные планки».`, 'p', 'reason')}`;
+        ${TM(`Пороги цикла ${ROMAN[c]} — EN_EVENT.planks, соседние ×2; прогон: обычный берёт третью в ${evPct(EVD.econ[c].oP3Bp)} недель, четвёртую — в ${evPct(EVD.econ[c].oP4Bp)}; увлечённый четвёртую — в ${evPct(EVD.econ[c].eP4Bp)}, пятую — в ${evPct(EVD.econ[c].eP5Bp)}; первая планка — типичная неделя обычного / ${String(EVD.plankR / 100).replace('.', ',')}, одна мерка на все циклы. Сундуки — EN_LOOTBOXES.modes.event, слой «Личные планки».${R ? ` Лестница — EnLoot.ladder (ADR-0047): за верхней планкой полосы — планки следующей, первая — ×${R.next} от верхней, без перехода в новый цикл; сундук ступени — своей полосы.` : ''}`, 'p', 'reason')}`;
       foot = `<button class="btn go" data-a="sheet" data-v="gifts:me">Дары ${ic('chev')}</button>`;
     } else if (t === 'clan') {
       const K = evClan();
@@ -452,8 +463,10 @@ if (S) evRank(S);
     evSync();
     if (!evOpen()) return { lock: `рейтинг — с цикла ${ROMAN[EVD.from]}` };
     const W = evW(), pl = evPlace(), K = evClan();
-    return { place: pl, points: S.event.pts, planks: evPlanks().map(p => ({ k: p.k, need: p.need, pay: p.pay, reached: p.got })), top: evLeaders('me', EV_VIEW.top),
+    /* личные планки — ступени лестницы на все циклы (k — сквозной номер, band — полоса): взятая ступень следующей полосы — тоже «Дарам» */
+    return { place: pl, points: S.event.pts, planks: evPlanks().map(p => ({ k: p.k, band: p.band, i: p.i, need: p.need, pay: p.pay, reached: p.got, cap: p.cap })), top: evLeaders('me', EV_VIEW.top),
       clanPlanks: K ? K.rows.map(r => ({ k: r.k, need: r.need, pay: r.pay, reached: r.got })) : [],   // взятые клановые — «Дарам» этой недели (bag.js)
+      clanHave: K ? K.pts : null,
       tier: evTier(pl), note: W ? `${W.n}: акцент недели — ${W.an}, очки ${evMul(W.accent.bp)}` : '' };
   },
   past() {
@@ -494,6 +507,6 @@ FLOWS.push(
 );
 
 /* для автопроверки tools/content-gen/screens/check_event.js и консоли */
-window.EN_EV = { srv: EV_SRV, observe: evObserve, sync: evSync, fresh: evNew, planks: evPlanks, clan: evClan, place: evPlace, clanPlace: evClanPlace,
+window.EN_EV = { srv: EV_SRV, observe: evObserve, sync: evSync, fresh: evNew, planks: evPlanks, steps: evSteps, clan: evClan, place: evPlace, clanPlace: evClanPlace,
   leaders: evLeaders, tier: evTier, past: evPast, rp1: evRp1, kit: evKitHtml, hero: heroHtml, rank: rankHtml, row: srcRow, view: EV_VIEW, team: EV_TEAM };
 })();

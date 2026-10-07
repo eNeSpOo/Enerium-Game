@@ -15,22 +15,37 @@
       Раскладка (слово автора 29.09.2026): задания строками слева под шапкой статуса, сведения справа — награда, заверение, главное действие.
       Правила воздуха на карточке: не больше двух чисел и одного действия. Режим «Игрок»: служебных слов нет; «Команда» — есть служебное.
    7. Неделя: строка «Контракты» в реестре WEEK_MODES — настоящая, пороги планок и валюта прошлой недели из данных контрактов.
-   Запуск: node tools/content-gen/screens/check_contracts.js [--dump] */
+   8. Лестница планок (ADR-0047) — законы Л1–Л4 (ladder_laws.js), проверены мутацией: личные планки контрактов — ступени лестницы
+      на все циклы, та же, что даёт EnLoot.ladder для цикла игрока; пороги своей полосы — EN_CONTRACTS.planks, дальше — множителем
+      первой планки; в листе «Планки контрактов» видны все пять полос; за верхней планкой своей полосы — планки следующей, без
+      перехода в новый цикл, и «Дары» платят сундуки её полосы.
+   9. Клановые ступени (§18.1, ADR-0042, ADR-0047): данные — доли и пороги клана модели по циклам (участников × ⌊первая личная
+      планка × доля⌋), клан обычных — на первой с запасом не меньше 5 %, клан увлечённых — на второй, во всех циклах, как записано
+      в typical контрактов лутбоксов; ключи клановых сундуков — внутри цели «75 % капа рунных стражей»: вычтены из цели наград
+      заданий. Экран: лист «Планки контрактов», вкладка «Клан» — три ступени, сундуки каждому; очки клана — сумма очков участников,
+      у других циклов — в пересчёте по первым личным планкам, вступивший на этой неделе не в счёте; без клана — «Найти клан»;
+      Неделя получает клановые ступени (clanPlanks), «Дары» держат взятую ждущей распределения.
+   Запуск: node tools/content-gen/screens/check_contracts.js [--dump] [--mut] [--stale-ok]
+   --stale-ok — свежесть данных, таблиц и capacity.json — предупреждением, а не ошибкой: когда соседние калькуляторы в середине
+   правок и экран нужно проверить на тех данных, что есть; полный прогон перед коммитом — без флага.
+   --mut — какой закон поймал каждую поломку лестницы. */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm'), cp = require('child_process');
 const { SERVICE, strip, playerText } = require('./check_player_view.js');
+const LL = require('./ladder_laws.js');   // законы лестницы планок (ADR-0047) — общие с проверками Недели и экранов режимов
 const ROOT = path.join(__dirname, '..', '..', '..'), UI = path.join(ROOT, 'design', 'ui');
 const read = f => fs.readFileSync(path.join(UI, f), 'utf8');
 const html = read('index.html');
-const DUMP = process.argv.includes('--dump');
+const DUMP = process.argv.includes('--dump'), STALE_OK = process.argv.includes('--stale-ok');
 const err = [], note = [];
-const cnt = { views: 0, player: 0, ops: 0, cards: 0 };
+const cnt = { views: 0, player: 0, ops: 0, cards: 0, ladders: 0, mut: '', stale: 0 };
 const say = m => { if (err.length < 60) err.push(m); else if (err.length === 60) err.push('… и ещё ошибки'); };
+const stale = m => { if (STALE_OK) { note.push(m); cnt.stale++; } else say(m); };   // устаревшие данные: ошибка, с --stale-ok — предупреждение
 function done() {
   for (const n of note) console.log('предупреждение: ' + n);
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
-  console.log(`Контракты: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; строк заданий ${cnt.cards}, раскладок «слева — справа» ${cnt.layouts || 0}; операций ${cnt.ops}.`);
-  console.log('Проверка пройдена: данные свежие и целые, пул решается на сиде, операции не повторяются, прогресс — с подписи, награда — один раз, игроку служебного не видно.');
+  console.log(`Контракты: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; строк заданий ${cnt.cards}, раскладок «слева — справа» ${cnt.layouts || 0}; операций ${cnt.ops}. Лестница планок: состояний сверено ${cnt.ladders}, мутаций поймано ${cnt.mut || 'нет'}.`);
+  console.log(`Проверка пройдена: ${cnt.stale ? 'данные — как есть, их свежесть не подтверждена (--stale-ok, см. предупреждения)' : 'данные свежие'} и целые, пул решается на сиде, операции не повторяются, прогресс — с подписи, награда — один раз, лестница планок — сразу на все циклы и без замка, клановые ступени — по очкам клана, игроку служебного не видно.`);
   process.exit(0);
 }
 
@@ -60,13 +75,13 @@ const ctxD = { window: {} }; ctxD.window = ctxD; vm.createContext(ctxD); vm.runI
 const D = ctxD.EN_CONTRACTS, OC = ctxD.EnContracts;
 {
   if (!D || !OC) say('contracts.js: нет window.EN_CONTRACTS или window.EnContracts');
-  else if (B.render(built.data) !== read('contracts.js')) say('contracts.js устарел: пересобрать — node tools/content-gen/contracts/build.js');
+  else if (B.render(built.data) !== read('contracts.js')) stale('contracts.js устарел: пересобрать — node tools/content-gen/contracts/build.js');
   const doc = fs.existsSync(B.FILES.doc) ? fs.readFileSync(B.FILES.doc, 'utf8') : null;
   if (!doc) say('нет черновика docs/content/контракты.md');
-  else { const fresh = B.withTables(doc, built.tables); if (fresh == null) say('контракты.md: нет меток таблиц'); else if (fresh !== doc) say('контракты.md: таблицы устарели — пересобрать'); }
+  else { const fresh = B.withTables(doc, built.tables); if (fresh == null) say('контракты.md: нет меток таблиц'); else if (fresh !== doc) stale('контракты.md: таблицы устарели — пересобрать'); }
   const py = cp.spawnSync('python', [path.join(ROOT, 'tools', 'content-gen', 'contracts', 'capacity.py'), '--check'], { encoding: 'utf8', env: Object.assign({}, process.env, { PYTHONIOENCODING: 'utf-8' }) });
   if (py.error) note.push('Python не найден — свежесть capacity.json не проверена');
-  else if (py.status !== 0) say('capacity.json устарел: ' + (py.stdout || py.stderr || '').trim().split('\n').pop());
+  else if (py.status !== 0) stale('capacity.json устарел: ' + (py.stdout || py.stderr || '').trim().split('\n').pop());
 }
 if (err.length) done();
 {
@@ -93,6 +108,41 @@ if (err.length) done();
   for (const [k, n] of Object.entries(need)) if (!D.kinds[k]) say(`каталог: нет задания на «${n}»`);
   /* донат не нужен: ни одно задание не требует Энериума */
   for (const [k, K] of Object.entries(D.kinds)) if (/Энериум/.test(K.n) || /прокрут/i.test(K.n)) say(`каталог: задание «${K.n}» требует Энериума`);
+}
+/* лестница планок и клановые ступени в данных (ADR-0047, §18.1, ADR-0042). Лутбоксы — слои планок контрактов и typical: где стоят
+   обычный и увлечённый; сборщик контрактов подтверждает typical прогоном во всех циклах */
+const ctxL = { window: {} }; ctxL.window = ctxL; vm.createContext(ctxL); vm.runInContext(read('lootboxes.js'), ctxL);
+const LB = ctxL.EN_LOOTBOXES;
+if (built.data) {
+  const M = LB.modes.contract, TYP = M.typical || {}, lc = M.layers.find(l => l.kind === 'plank' && l.clan), CL = D.clan, bp = D.rules.bp;
+  if (!M.ladder || !lc) say('lootboxes.js: у контрактов нет лестницы планок или слоя клановых планок');
+  else if (!CL || !Array.isArray(CL.x) || !CL.needs) say('данные: нет клановых ступеней EN_CONTRACTS.clan (доли x и пороги needs) — §18.1, ADR-0047');
+  else {
+    if (CL.members !== 25 || CL.activeBp !== 7000) say(`клан модели — ${CL.members} мест, играют ${CL.activeBp / 100} %: у Эхо и Событий — 25 мест и 70 %`);
+    if (CL.x.length !== lc.rows.length || CL.x.some((x, i) => !Number.isInteger(x) || x <= 0 || x * lc.rows[0].x !== CL.x[0] * lc.rows[i].x)) say(`клановые ступени: доли ${CL.x} — не первая доля × шаги строк клановых планок лутбоксов (${lc.rows.map(r => r.x)})`);
+    for (const c of D.rules.cycles) {
+      const p1 = D.planks[c][0], want = CL.x.map(x => CL.members * Math.floor(p1 * x / CL.per)), E = D.econ[c], key = `клановые ступени, цикл ${c}`;
+      if (JSON.stringify(CL.needs[c]) !== JSON.stringify(want) || JSON.stringify(OC.clanPlanks(D, CL.members, c)) !== JSON.stringify(want)) say(`${key}: пороги ${CL.needs[c]} — не участников × ⌊первая личная планка × доля⌋ (${want})`);
+      /* где стоят кланы: обычных — на первой с запасом не меньше 5 %, увлечённых — на второй; это же — typical контрактов в лутбоксах */
+      const stepOf = v => want.filter(n => v >= n).length;
+      if (stepOf(E.o.clanPts) !== 1 || E.o.clanStep !== 1 || E.o.clanPts * 100 < want[0] * 105) say(`${key}: клан обычных (${E.o.clanPts} очков недели) — не на первой ступени с запасом 5 %: пороги ${want}`);
+      if (stepOf(E.e.clanPts) !== 2 || E.e.clanStep !== 2) say(`${key}: клан увлечённых (${E.e.clanPts} очков недели) — не на второй ступени: пороги ${want}`);
+      if (!TYP.free || !TYP.fan || E.o.clanStep !== TYP.free.clan || E.e.clanStep !== TYP.fan.clan) say(`${key}: typical контрактов в лутбоксах (клан: ${TYP.free && TYP.free.clan} / ${TYP.fan && TYP.fan.clan}) не сходится с прогоном (${E.o.clanStep} / ${E.e.clanStep})`);
+      /* личные планки: обычный — 4-я, увлечённый — 5-я — typical лутбоксов подтверждён прогоном; считаем по лестнице на все циклы */
+      const lad = LL.needs(LB, 'contract', c, p1), own = LL.ownCount(LB, 'contract', c), took = v => lad.filter(n => v >= n).length;
+      if (JSON.stringify(lad.slice(0, own)) !== JSON.stringify(D.planks[c])) say(`личные планки, цикл ${c}: пороги своей полосы ${D.planks[c]} — не первая планка × шаги строк лутбоксов (${lad.slice(0, own)})`);
+      if (!TYP.free || took(E.o.pts) !== TYP.free.me || took(E.e.pts) !== TYP.fan.me) say(`личные планки, цикл ${c}: обычный берёт ${took(E.o.pts)}-ю, увлечённый — ${took(E.e.pts)}-ю, а typical контрактов в лутбоксах — ${TYP.free && TYP.free.me} / ${TYP.fan && TYP.fan.me}`);
+      /* ключи клановых сундуков — внутри цели «75 % капа рунных стражей»: цель наград заданий — кап × 75 % без ключей с боссов и без
+         сундуков рейтинга — личных планок и клановых ступеней; итог обычного со всех источников — около 75 % капа */
+      const I = built.income[c].o, cap = E.capKeys, all = built.keysGoal[c] + I.boss + I.rating + I.clanKeys, goal = cap * B.TARGET.keysAllBp / bp;
+      if (!(I.clanKeys > 0)) say(`${key}: у обычного нет ключей клановых сундуков — клан обычных берёт первую ступень`);
+      if (Math.abs(all - goal) > 1) say(`${key}: ключи клановых сундуков не вычтены из цели наград заданий — цель ${Math.round(built.keysGoal[c])} + боссы ${Math.round(I.boss)} + личные планки ${Math.round(I.rating)} + клановые ${Math.round(I.clanKeys)} ≠ ${Math.round(goal)} (75 % капа ${cap})`);
+      if (I.keysAll * bp < cap * B.TARGET.keysCoverMin || I.keysAll * bp > cap * (B.TARGET.keysAllBp + B.TARGET.tolBp / 4)) say(`${key}: ключи обычного со всех источников — ${Math.round(I.keysAll)} из капа ${cap}: не около 75 %`);
+    }
+    /* очки участника другого цикла — в долях первой личной планки его цикла (ADR-0042) */
+    const [ca, cb] = [D.rules.cycles[0], D.rules.cycles[1]];
+    if (OC.clanPts(D, D.planks[cb][0] * 3, cb, ca) !== D.planks[ca][0] * 3 || OC.clanPts(D, 100, ca, ca) !== 100 || OC.clanPts(D, 100, 99, ca) !== 0) say('алгоритм: очки участника другого цикла — не по первым личным планкам (EnContracts.clanPts)');
+  }
 }
 
 /* ================== 3. алгоритм пула ================== */
@@ -400,8 +450,10 @@ if (!T.KIT_EXTRA.some(x => x.html === T.ctKitHtml)) say('UI-кит: раздел
   if (!M.length) say('WEEK_MODES: нет настоящей строки «Контракты»');
   else {
     const m = M[M.length - 1], now = run('WEEK_MODES now', () => m.now()), past = run('WEEK_MODES past', () => m.past());
-    const P2 = T.CT.planks[Math.max(2, T.S.acc.cycle)];
-    if (!now || now.points !== T.S.contracts.pts || !now.planks || JSON.stringify(now.planks.map(p => p.need)) !== JSON.stringify(P2)) say('WEEK_MODES: очки или пороги планок — не из контрактов');
+    const cyc = Math.max(2, T.S.acc.cycle), P2 = T.CT.planks[cyc];
+    /* личные планки — ступени лестницы на все циклы: пороги своей полосы — данные цикла, дальше — множителем первой планки */
+    if (!now || now.points !== T.S.contracts.pts || !now.planks || JSON.stringify(now.planks.filter(p => p.band === cyc && !p.cap).map(p => p.need)) !== JSON.stringify(P2)) say('WEEK_MODES: очки или пороги планок своей полосы — не из контрактов');
+    else if (JSON.stringify(now.planks.map(p => p.need)) !== JSON.stringify(LL.needs(LB, 'contract', cyc, P2[0]))) say('WEEK_MODES: пороги лестницы — не первая планка цикла × множитель ступени');
     if (!past || !Array.isArray(past.cur) || !past.cur.length) say('WEEK_MODES: у прошлой недели нет валюты недельного контракта');
     for (let i = 1; i < P2.length; i++) if (P2[i] < P2[i - 1] * 2) say('пороги планок ближе ×2');
     /* прошлая неделя сходится с «Дарами»: место — за которое платят, очки — в пределах оплаченных планок */
@@ -409,9 +461,135 @@ if (!T.KIT_EXTRA.some(x => x.html === T.ctKitHtml)) say('UI-кит: раздел
     if (past && dar.length) {
       const pr = dar.find(p => p.kind === 'place' && p.place), k = dar.filter(p => p.kind === 'plank').length;
       if (pr && past.place !== pr.place) say(`WEEK_MODES: место прошлой недели ${past.place}, а «Дары» платят за место ${pr.place}`);
-      const got = P2.filter(x => past.points >= x).length;
+      const got = LL.needs(LB, 'contract', cyc, P2[0]).filter(x => past.points >= x).length;
       if (got !== k) say(`WEEK_MODES: очки прошлой недели ${past.points} берут планок ${got}, а «Дары» платят за ${k}`);
     }
   }
+}
+
+/* ================== 8. лестница планок ================== */
+const WK = vm.runInContext('window.EN_WEEK', P.ctx), ENL = vm.runInContext('window.EnLoot', P.ctx), LBX = vm.runInContext('window.EN_LOOTBOXES', P.ctx);
+const X = vm.runInContext(`({ ctPlanks, ctClan, fmt, lbRowLabel: typeof lbRowLabel === 'function' ? lbRowLabel : null, darRows: typeof darRows === 'function' ? darRows : null })`, P.ctx);
+const LAD0 = ENL && ENL.ladder, ROAD_END = ['<p class="reason">', 'class="sheet-f"'];   // чем кончается лестница в листе планок
+const ovOf = h => { const i = h.indexOf('<div class="ov'); return i < 0 ? '' : h.slice(i); };
+const rewSheet = (tab, where) => { T.S.route = 'contracts'; T.S.overlay = { t: 'ctrew', arg: tab }; return ovOf(view(P, where)); };
+/* Л1–Л4 по строке «Контракты» реестра Недели и листу «Планки контрактов» во всех циклах: список нарушений */
+function ctLadder() {
+  const e = [];
+  if (typeof LAD0 !== 'function' || !WK || typeof WK.ladderHtml !== 'function') { e.push('нет EnLoot.ladder или помощника лестницы EN_WEEK — планки контрактов не сверить'); return e; }
+  for (const c of T.CT.rules.cycles) {
+    reset(); T.S.acc.cycle = c;
+    const key = `лестница · цикл ${LL.ROMAN[c]}`, st = WK.state('contract', 'now');
+    if (!st || st.lock || st.m.demo) { e.push(`${key}: строка «Контракты» закрыта или демо`); continue; }
+    cnt.ladders++;
+    LL.stateLaw(LBX, key, st, c, LAD0).forEach(x => e.push(x));
+    if (st.planks.filter(p => p.band === c && !p.cap).map(p => p.need).join() !== T.CT.planks[c].join()) e.push(`${key}: пороги своей полосы — не EN_CONTRACTS.planks`);
+    if (JSON.stringify(X.ctPlanks(T.S.contracts.pts).map(p => [p.k, p.band, p.need, p.reached])) !== JSON.stringify(st.planks.map(p => [p.k, p.band, p.need, p.reached]))) e.push(`${key}: планки экрана и строки «Недели» разошлись`);
+    const h = rewSheet('me', key + ' · лист');
+    LL.roadLaw(LBX, key + ' · лист', h, st, c, ROAD_END).forEach(x => e.push(x));
+    if (!h.includes('data-v="gifts:me"') || !h.includes('data-v="rank:Контракты"')) e.push(`${key}: из листа планок нет пути в «Дары» или «Рейтинг»`);
+  }
+  return e;
+}
+/* за верхней планкой своей полосы — планки следующей, без перехода (Л3, Л4): очков — ровно порог первой планки следующей полосы по
+   эталону. В листе следующая полоса раскрыта, «Дары» платят сундуки её полосы под подписью с её циклом.
+   ctBeyond() — список нарушений: его же зовёт проверка мутацией */
+function ctBeyond() {
+  const e = [];
+  for (const c of T.CT.rules.cycles) {
+    reset(); T.S.acc.cycle = c;
+    const key = `за верхней планкой · цикл ${LL.ROMAN[c]}`, ref = LL.ref(LBX, 'contract', c), n = LL.ownCount(LBX, 'contract', c), own = ref[0].band;
+    if (ref.length <= n + 1) continue;   // полоса последняя — продолжения нет
+    const need = T.CT.planks[c][0] * ref[n].x / ref[0].x;
+    T.S.contracts.pts = need;
+    const st = WK.state('contract', 'now'), p = st.planks[n];
+    LL.stateLaw(LBX, key, st, c, LAD0).forEach(x => e.push(x));
+    if (!p || !p.reached || p.band !== own + 1 || p.need !== need) { e.push(`${key}: Л3 — набрано ${need}, а первая планка следующей полосы не взята: ${p ? `порог ${p.need}, полоса ${p.band}` : 'её нет в лестнице'}`); continue; }
+    if (!st.next || st.next.k !== n + 2) e.push(`${key}: Л3 — ближайшая планка — не вторая следующей полосы`);
+    const h = rewSheet('me', key + ' · лист');
+    LL.roadLaw(LBX, key + ' · лист', h, st, c, ROAD_END).forEach(x => e.push(x));
+    if (!h.includes(`<div class="wk-ld-band" data-band="${own + 1}">`)) e.push(`${key}: Л4 — полоса, по которой игрок идёт, не раскрыта`);
+    if (X.darRows && X.lbRowLabel) {
+      const lab = LL.label(LBX, 'contract', p, c, X.lbRowLabel), row = X.darRows(T.S).find(x => x.wk.id === 'now' && x.id === 'contract' && x.label === lab);
+      if (!row || !LL.same(row.groups, ref[n].pay) || !lab.includes(`цикл ${LL.ROMAN[own + 1]}`)) e.push(`${key}: в «Дарах» нет строки «${lab}» с сундуками её полосы — ${row ? JSON.stringify(row.groups) : 'строки нет'}`);
+    }
+  }
+  return e;
+}
+if (!err.length) {
+  ctLadder().forEach(say); ctBeyond().forEach(say);
+  if (typeof LAD0 === 'function') {
+    const MUT = LL.mutations(LAD0);   // замок по циклу вернули; планка следующей полосы платит сундук своей; порог продолжения — не ×next
+    let caught = 0;
+    for (const [what, f] of MUT) {
+      const n0 = err.length;   // что сломанный экран наговорит сам — тоже «поймано», а не ошибка проверки
+      ENL.ladder = f;
+      let got = [];
+      try { got = ctBeyond(); } catch (x) { got = ['исключение ' + x.message]; }
+      ENL.ladder = LAD0;
+      got = got.concat(err.splice(n0));
+      if (got.length) caught++; else say(`мутация «${what}»: законы лестницы её не поймали`);
+      if (process.argv.includes('--mut')) console.log(`мутация «${what}»: ${got.length ? got.slice(0, 2).join(' | ').slice(0, 320) : 'НЕ ПОЙМАНА'}`);
+    }
+    cnt.mut = `${caught} из ${MUT.length}`;
+    ctBeyond().forEach(x => say('после мутаций: ' + x));
+  }
+}
+
+/* ================== 9. клановые ступени на экране ================== */
+{
+  reset();
+  const c = T.S.acc.cycle, CL = T.CT.clan, lc = LBX.modes.contract.layers.find(l => l.kind === 'plank' && l.clan);
+  const K = run('ctClan', () => X.ctClan());
+  if (!K) say('клановые ступени: у демо-аккаунта в клане нет счёта клана (ctClan)');
+  else {
+    /* очки клана — мои очки недели и очки участников, вступивших до этой недели: у других циклов — в пересчёте по первым личным планкам;
+       очки участника демо — по его вкладу в резервуар (в резервуар идёт доля splitBp) */
+    const mem = T.S.clan.members.filter(m => !m.me && m.weeks !== 0), fromRes = r => r > 0 ? Math.floor(r * T.CT.rules.bp / (T.CT.rules.bp - T.CT.rules.splitBp)) : 0;
+    const want = T.S.contracts.pts + mem.reduce((a, m) => a + T.CTE.clanPts(T.CT, fromRes(m.resRaw), m.cyc, c), 0);
+    if (K.n !== mem.length + 1 || K.pts !== want || K.mine !== T.S.contracts.pts) say(`клановые ступени: в счёте ${K.n} участников и ${K.pts} очков, ждали ${mem.length + 1} и ${want}`);
+    if (!T.S.clan.members.some(m => !m.me && m.weeks === 0 && m.resRaw > 0)) note.push('клановые ступени: в клане демо нет вступившего на этой неделе с очками — правило «со следующей недели» не проверено');
+    if (!mem.some(m => m.cyc !== c)) note.push('клановые ступени: в клане демо нет участника другого цикла — пересчёт очков не проверен');
+    if (JSON.stringify(K.needs) !== JSON.stringify(T.CTE.clanPlanks(T.CT, K.n, c)) || JSON.stringify(K.needs) !== JSON.stringify(CL.x.map(x => K.n * Math.floor(T.CT.planks[c][0] * x / CL.per)))) say(`клановые ступени: пороги ${K.needs} — не участников × ⌊первая личная планка × доля⌋`);
+    if (K.rows.length !== lc.rows.length || K.rows.some((r, i) => r.k !== i + 1 || r.need !== K.needs[i] || r.reached !== (K.pts >= K.needs[i]) || !LL.same(r.pay, lc.rows[i].cyc[c]))) say('клановые ступени: строки — не пороги клана с сундуками слоя клановых планок своего цикла');
+    /* Неделя получает клановые ступени, «Дары» держат взятую ждущей распределения */
+    const st = WK.state('contract', 'now');
+    if (JSON.stringify(st.clanPlanks.map(p => [p.k, p.need, p.reached])) !== JSON.stringify(K.rows.map(r => [r.k, r.need, r.reached])) || st.clanHave !== K.pts) say('клановые ступени: Неделя получила не те ступени или не те очки клана (clanPlanks, clanHave)');
+    if (X.darRows) {
+      const dar = X.darRows(T.S).filter(p => p.wk.id === 'now' && p.id === 'contract' && p.cat === 'clan'), took = K.rows.filter(r => r.reached);
+      if (dar.length !== took.length || dar.some(p => p.st !== 'wait') || took.some((r, i) => !LL.same(dar[i] && dar[i].groups, r.pay))) say(`клановые ступени: взято ${took.length}, в клановых наградах «Даров» — ${dar.length}; до распределения — только «ждёт», сундуки — ступени`);
+    }
+    /* лист: вкладка «Клан» — очки клана и вклад, три ступени, сундуки каждому; из листа — в «Дары» клана */
+    for (const team of [false, true]) {
+      run('режим', () => T.setTeam(team));
+      const h = rewSheet('clan', 'лист планок · клан' + (team ? ' [команда]' : ''));
+      const blk = (h.split('<div class="wk-ld clan"')[1] || '').split('class="sheet-f"')[0];
+      if ((blk.match(/class="wk-ld-st/g) || []).length !== K.rows.length || (blk.match(/· каждому/g) || []).length !== K.rows.length) say('лист планок · клан: не три ступени с сундуками каждому');
+      K.rows.forEach(r => { if (!blk.includes(`data-need="${r.need}"`)) say(`лист планок · клан: нет порога ${r.need}`); });
+      if (!h.includes(`<b class="num">${X.fmt(K.pts)}</b>`) || !h.includes(`<b class="num">${X.fmt(K.mine)}</b>`) || !h.includes('data-v="gifts:clan"')) say('лист планок · клан: нет очков клана, своего вклада или пути в «Дары» клана');
+      if (!h.includes('aria-selected="true" data-a="sheet" data-v="ctrew:clan"')) say('лист планок · клан: вкладка «Клан» не выбрана');
+      if (team && !/team-only/.test(h)) say('лист планок · клан [команда]: нет служебного');
+      rewSheet('me', 'лист планок · личные' + (team ? ' [команда]' : ''));
+    }
+    run('режим', () => T.setTeam(false));
+    /* клан взял больше — ступень взята; вне клана — пустое состояние и «Найти клан» */
+    reset(); T.S.contracts.pts = K.needs[1];
+    const K2 = X.ctClan(); if (!K2 || K2.rows.filter(r => r.reached).length < 2) say('клановые ступени: очки клана выросли до второй ступени, а она не взята');
+    reset(); T.S.clan = Object.assign({}, T.S.clan, { in: false });
+    if (X.ctClan()) say('клановые ступени: вне клана у игрока есть счёт клана');
+    const h0 = rewSheet('clan', 'лист планок · без клана');
+    if (!h0.includes('Вы не в клане') || !h0.includes('data-a="go" data-v="clan"')) say('лист планок · без клана: нет пустого состояния и «Найти клан»');
+    if (WK.state('contract', 'now').clanPlanks.length) say('клановые ступени: вне клана Неделя получила клановые ступени');
+  }
+  /* вход к планкам — кнопка очков рейтинга справа: во всех состояниях контракта, оба сегмента */
+  for (const seg of ['day', 'week']) for (const st of ['draft', 'signed', 'done', 'paid', 'failed', 'closed']) {
+    reset(); T.S.seg.contracts = seg; T.S.route = 'contracts'; T.S.overlay = null;
+    const Xc = T.S.contracts[seg]; Xc.st = st; Xc.signed = st !== 'draft';
+    if (st === 'paid') Xc.got = { P: T.ctPool(T.S, Xc) || { keys: 0, gold: 0, spirit: 0, base: 0, ckeys: 0, uniq: 0, en: 0, chest: null }, items: {}, chests: [], pts: Xc.pts || 0, half: 0 };
+    const h = view(P, `вход к планкам · ${seg} · ${st}`), side = h.slice(h.indexOf('<div class="pnl ct-side">'));
+    if (!/<button class="ct-ptsb" data-a="sheet" data-v="ctrew:me"/.test(side)) say(`вход к планкам: в состоянии «${st}» (${seg}) справа нет кнопки очков рейтинга с листом планок`);
+  }
+  for (const n of ['Контракты · планки недели']) { const fl = T.FLOWS.find(x => x[0] === n); if (!fl) say(`нет сценария «${n}»`); else { reset(); run('сценарий ' + n, () => fl[2]()); const h = view(P, `сценарий «${n}»`); if (!h.includes('class="wk-ld clan"')) say(`сценарий «${n}»: не лист клановых ступеней`); } }
+  reset();
 }
 done();

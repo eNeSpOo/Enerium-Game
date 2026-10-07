@@ -26,7 +26,9 @@
    - дымовой бой: пятеро героев каждого источника на личном максимуме доблести — без исключений, числа целые.
    Закон базы по циклу (слово автора 02.10.2026, ADR-0050: «герои… с новых циклов по базовым статам больше, чем герои с низких циклов»):
    у героя старшего цикла атака, здоровье и защита на том же уровне и без доблести выше, чем у героя младшего цикла того же класса, —
-   при любом источнике; внутри цикла источник базу не меняет. */
+   при любом источнике; внутри цикла источник базу не меняет.
+   Черты именных врагов и боевая мощь со слоем 1 (ADR-0051), лестница типов (ADR-0054) — законы в конце файла: у каждого свои
+   проверки по делу или мутации. */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const UI = path.join(__dirname, '../../../design/ui/');
@@ -174,7 +176,9 @@ function check(x) {
   return { ok: false, why: 'условие не наступило' };
 }
 
-const all = A.sets.flatMap(s => s.items);
+/* набор «Черты врагов» (ADR-0051) проверяется отдельно, ниже: его записи носит враг, а не герой */
+const FOE_IDS = new Set(A.sets.filter(s => s.foe).flatMap(s => s.items).map(x => x.id));
+const all = A.sets.flatMap(s => s.items).filter(x => !FOE_IDS.has(x.id));
 let ok = 0; const bad = [], notes = [];
 for (const x of all) {
   let r;
@@ -331,5 +335,197 @@ const baseBad = [];
   }
   for (const s of baseBad.slice(0, 20)) console.log('  ✗ ' + s);
 }
+/* ---------- черты именных врагов (ADR-0051) ----------
+   Набор «Черты врагов»: каждая запись срабатывает у врага в бою против отряда со связками, на которые она отвечает, — метка и урон
+   по времени, щит и лечение по времени, контроль, криты, ульта по врагу. Четыре новых примитива ядра проверены по делу:
+   - shed: урон по времени в ход сброса не срабатывает — он снят до своего тика;
+   - ccd с floor: ход под контролем прибавляет урон до конца этажа, шагом pow и не выше cap;
+   - debuffed с ctrl: контроль возвращается наложившему;
+   - nthBasic с then: dispel: щит и лечение по времени цели сорваны.
+   Кому черта положена: именным врагам Мастерской (kits.js) — по одной, с меткой trait, сверх числа способностей ранга; рядовым — нет;
+   героям черты врагов не раздаются. */
+const foeBad = [];
+{
+  const FOE = A.sets.filter(s => s.foe).flatMap(s => s.items);
+  if (!FOE.length) foeBad.push('в библиотеке нет набора «Черты врагов»');
+  const squad = () => [
+    unit('h0', 'Танк', 60, [120, 120, 60, 260, 60], kitOf(['Без школы.ctrl.one>threat', 'Огонь.debuff.one'], 6000, 0)),
+    unit('h1', 'Хилер', 60, [60, 200, 60, 150, 70], kitOf(['Вода.shield.all', 'Вода.hot.all'], 6000, 0)),
+    unit('h2', 'Маг. ДД', 60, [40, 220, 60, 120, 80], kitOf(['Огонь.dot.one', 'Огонь.ult.dmg'], 4000, 3000)),
+    unit('h3', 'Физ. ДД силы', 60, [200, 60, 80, 120, 60], kitOf(['Земля.debuff.one'], 4000, 0)),
+    unit('h4', 'Физ. ДД ловкости', 60, [80, 60, 240, 120, 90], kitOf(['Без школы.dot.one'], 4000, 0)),
+  ];
+  const traitKit = tid => ({ rank: 'b', actPct: 0, ultPct: 0, kit: [Object.assign({ v: 0, slot: L[tid].t, id: tid, trait: true }, L[tid].ch ? { chR: L[tid].ch } : {})] });
+  const boss = tid => unit('f0', 'Босс', 60, [150, 150, 60, 300, 55], traitKit(tid), { rank: 'b', hpPct: 6000 });
+  const battle = (tid, seed) => EB.create({ heroes: squad(), foes: [boss(tid)], seed, mode: 'rounds', maxRounds: 30 });
+  let fired = 0;
+  for (const x of FOE) {
+    let seen = false;
+    try {
+      for (let seed = 1; seed <= SEEDS && !seen; seed++) {
+        const b = battle(x.id, seed); run(b); seen = !!b.cov[x.id];
+      }
+    } catch (e) { foeBad.push(`${x.id} «${x.n}» — ошибка: ${String(e && e.stack || e).split('\n').slice(0, 2).join(' | ')}`); continue; }
+    if (seen) fired++; else foeBad.push(`${x.id} «${x.n}» — у врага ни разу не сработала`);
+  }
+  const idOf = f => (FOE.find(x => f(L[x.id])) || {}).id;
+  /* shed: в ход сброса урон по времени на враге не срабатывает; дебафф — снят */
+  for (const what of ['debuff', 'dot']) {
+    const tid = idOf(p => p.pas === 'shed' && p.what === what); if (!tid) { foeBad.push(`нет черты shed · ${what}`); continue; }
+    let n = 0;
+    for (let seed = 1; seed <= 12; seed++) {
+      const b = battle(tid, seed), f = b.u[1][0];
+      while (!b.over) {
+        const a = EB.step(b); if (!a || a.s !== f) continue;
+        if (!a.ev.some(e => e.k === 'react' && e.id === tid)) continue;
+        n++;
+        if (what === 'dot' && a.ev.some(e => e.k === 'dot' && e.t === f)) foeBad.push(`${tid}: в ход сброса урон по времени всё равно сработал (сид ${seed})`);
+        if (f.nStart % L[tid].every !== 0) foeBad.push(`${tid}: сброс не на своём ходу — ход ${f.nStart}`);
+      }
+    }
+    if (!n) foeBad.push(`${tid}: сброс «${what}» ни разу не случился`);
+  }
+  /* ccd с floor: ярость копится шагом pow и не выше cap */
+  { const tid = idOf(p => p.trig === 'ccd' && p.floor), p = tid && L[tid]; let grew = 0;
+    if (!tid) foeBad.push('нет черты ccd с floor');
+    else for (let seed = 1; seed <= 12; seed++) { const b = battle(tid, seed), f = b.u[1][0]; let reacts = 0;
+      while (!b.over) { const a = EB.step(b); if (a) reacts += a.ev.filter(e => e.k === 'react' && e.id === tid).length; }
+      if (f.alive && (f.aura.dmgUp > p.cap || f.aura.dmgUp !== Math.min(p.cap, reacts * p.pow))) foeBad.push(`${tid}: ярость ${f.aura.dmgUp} б. п. при ${reacts} срабатываниях — шаг ${p.pow}, предел ${p.cap}`);
+      if (reacts) grew++; }
+    if (tid && !grew) foeBad.push(`${tid}: ярость ни разу не выросла — контроль героев не дошёл до врага`); }
+  /* debuffed с ctrl: контроль возвращается наложившему */
+  { const tid = idOf(p => p.trig === 'debuffed' && p.ctrl); let back = 0;
+    if (!tid) foeBad.push('нет черты debuffed с ctrl');
+    else for (let seed = 1; seed <= 20; seed++) { const b = battle(tid, seed), f = b.u[1][0];
+      while (!b.over) { const a = EB.step(b); if (!a) continue; const i = a.ev.findIndex(e => e.k === 'react' && e.id === tid); if (i < 0) continue;
+        const st = a.ev.slice(i + 1).find(e => e.k === 'status' && e.st === 'stun');
+        if (!st || st.t.side !== 0 || st.s !== f) foeBad.push(`${tid}: контроль не вернулся наложившему (сид ${seed})`); else back++; } }
+    if (tid && !back) foeBad.push(`${tid}: контроль ни разу не отражён`); }
+  /* nthBasic с then: dispel: щит и лечение по времени цели сорваны */
+  { const tid = idOf(p => p.pas === 'nthBasic' && p.then === 'dispel'); let torn = 0;
+    if (!tid) foeBad.push('нет черты nthBasic с dispel');
+    else for (let seed = 1; seed <= 12; seed++) { const b = battle(tid, seed);
+      while (!b.over) { const a = EB.step(b); if (!a) continue; a.ev.forEach((e, i) => { if (e.k !== 'dispel') return; torn++;
+        if (a.ev.slice(0, i).some(z => z.k === 'shield' && z.t === e.t) === false && (e.t.sh !== 0 && !a.ev.slice(i + 1).some(z => z.k === 'shield' && z.t === e.t))) foeBad.push(`${tid}: после срыва у цели остался щит (сид ${seed})`); }); } }
+    if (tid && !torn) foeBad.push(`${tid}: щит и лечение по времени ни разу не сорваны`); }
+  /* кому черта положена — враги Мастерской форм (kits.js) */
+  const RANK_N = Object.fromEntries(Object.entries(JSON.parse(fs.readFileSync(path.join(__dirname, 'kits.json'), 'utf8')).rules.rankAbilities).map(([n, v]) => [n, v.abilities]));
+  const RANK_KEY = { o: 'рядовой', e: 'элита', b: 'босс биома', rune: 'рунный' };
+  let named = 0;
+  for (const [fid, f] of Object.entries(K.foes)) {
+    const tr = f.kit.filter(x => x.trait), rest = f.kit.filter(x => !x.trait), rank = f.rank;
+    if (rank === 'o' ? tr.length : tr.length !== 1) foeBad.push(`${fid}: черт ${tr.length} — ${rank === 'o' ? 'рядовые остаются простыми' : 'именному врагу положена одна'}`);
+    for (const x of tr) { if (!FOE_IDS.has(x.id)) foeBad.push(`${fid}: черта ${x.id} не из набора «Черты врагов»`); if (x.slot !== 'pas' && x.slot !== 'react') foeBad.push(`${fid}: черта ${x.id} — не пассивка и не реакция`); }
+    if (rest.length !== RANK_N[RANK_KEY[rank]]) foeBad.push(`${fid}: способностей без черты ${rest.length}, по рангу — ${RANK_N[RANK_KEY[rank]]}`);
+    if (tr.length) named++;
+  }
+  for (const [hid, h] of Object.entries(K.heroes)) for (const x of h.kit) if (FOE_IDS.has(x.id)) foeBad.push(`набор героя ${hid}: ${x.id} — черта врагов героям не раздаётся`);
+  console.log(`Черты врагов (ADR-0051): записей ${FOE.length}, у врага сработали ${fired}; примитивы shed, ccd с floor, debuffed с ctrl и nthBasic с dispel проверены по делу; именных врагов Мастерской с чертой — ${named}${foeBad.length ? `, нарушений ${foeBad.length}` : ', нарушений нет'}.`);
+  for (const s of foeBad.slice(0, 30)) console.log('  ✗ ' + s);
+}
+
+/* ---------- закон боевой мощи (§6, ADR-0051) ----------
+   БМ — витринное число: одна функция ядра EB.bm на героев и врагов, слой 0 — характеристики, слой 1 — вклад способностей (К_ротации).
+   М1 — карта без способностей: К_ротации — 10 000, мощь — формула слоя 0, сосчитанная здесь заново;
+   М2 — одинаково для героев и врагов: та же карта на любой стороне даёт ту же мощь;
+   М3 — способности и черта мощь не снижают: К_ротации не ниже 10 000, с чертой — выше, чем без неё; ход способностью не дешевле атаки;
+   М4 — витрина: исход боя от чисел RULES.bm не зависит — бой с другими числами мощи идёт событие в событие так же;
+   М5 — только целые. */
+const bmBad = [];
+{
+  const BPX = 10000, flo = (a, b) => Math.floor(a / b), R = EB.RULES;
+  const isq = n => { let x = Math.floor(Math.sqrt(n)); while (x * x > n) x--; while ((x + 1) * (x + 1) <= n) x++; return x; };
+  const layer0 = (u, c) => { const kl = R.K * u.lvl, cap = R.caps.defPct * 100, mit = k => Math.min(cap, flo(u.def[k] * BPX, Math.max(1, kl + u.def[k]))), m = flo(mit('str') + mit('int'), 2);
+    return flo(c * isq(flo(u.atk[u.main] * u.as * (1000000 + u.crit * (u.critDmg - 100)), 100000000) * flo(flo(u.maxHp * BPX, BPX - m) * BPX, BPX - u.eva)), 100); };
+  const card = (side, kit) => { const src = unit('x', 'Физ. ДД силы', 50, [200, 80, 120, 150, 70], kit, { maxHp: 50000 }); const b = EB.create({ heroes: side ? [] : [src], foes: side ? [src] : [], seed: 1, mode: 'rounds' }); return b.u[side][0]; };
+  const C = R.bm.cX100, bare = kitOf([], 0, 0);
+  for (const side of [0, 1]) { const u = card(side, bare); if (EB.kRot(u) !== BPX) bmBad.push(`М1: у карты без способностей К_ротации ${EB.kRot(u)}`); if (EB.bm(u) !== layer0(u, C)) bmBad.push(`М1: мощь карты без способностей ${EB.bm(u)}, по формуле слоя 0 — ${layer0(u, C)}`); }
+  const kits = [kitOf(['Огонь.dmg.one'], 3000, 0), kitOf(['Вода.hot.one', 'Вода.ctrl.one'], 4000, 0), kitOf(['Земля.dmg.all', 'Земля.ult.dmg'], 3000, 1000), kitOf(all.filter(x => L[x.id].also).slice(0, 2).map(x => x.id), 4000, 0)];
+  for (const k of kits) {
+    const h = card(0, k), f = card(1, k);
+    if (EB.bm(h) !== EB.bm(f) || EB.kRot(h) !== EB.kRot(f)) bmBad.push(`М2: одна карта — у героя мощь ${EB.bm(h)}, у врага ${EB.bm(f)}`);
+    if (EB.kRot(h) < BPX) bmBad.push(`М3: К_ротации ${EB.kRot(h)} — способности снизили мощь`);
+    if (!Number.isInteger(EB.bm(h)) || !Number.isInteger(EB.kRot(h))) bmBad.push('М5: мощь или К_ротации — не целое');
+    for (const ab of h.table) if (EB.bmValue(ab) < R.bm.other) bmBad.push(`М3: ход способностью «${ab.n}» дешевле обычной атаки`);
+  }
+  { const tid = [...FOE_IDS][0], k0 = kitOf(['Огонь.dmg.one'], 3000, 0), k1 = kitOf(['Огонь.dmg.one'], 3000, 0); k1.kit.push({ v: 0, slot: L[tid].t, id: tid, trait: true });
+    const a = card(1, k0), b = card(1, k1); if (!(EB.kRot(b) > EB.kRot(a) && EB.bm(b) > EB.bm(a))) bmBad.push(`М3: враг с чертой не сильнее своего числа без черты — ${EB.bm(b)} против ${EB.bm(a)}`); }
+  /* М4: бой не знает о мощи */
+  { const play = () => { const b = hardBattle(kitOf(['Огонь.dmg.one', 'Огонь.dot.one'], 5000, 0), 7, true), out = []; while (!b.over) { const a = EB.step(b); if (a && a.ev) for (const e of a.ev) out.push(e.k + ':' + (e.v || 0) + ':' + (e.s ? e.s.key : '') + ':' + (e.t && e.t.key ? e.t.key : '')); } return out.join('|') + '#' + b.round + b.why; };
+    const one = play(), keep = JSON.stringify(R.bm);
+    Object.assign(R.bm, { cX100: 1, allTargets: 1, other: 7, traitBp: 9999, util: { ctrl: 1, debuff: 1, buff: 1 } });
+    const two = play(); Object.assign(R.bm, JSON.parse(keep));
+    if (one !== two) bmBad.push('М4: исход боя изменился от чисел мощи — БМ вошла в формулу боя'); }
+  console.log(`Боевая мощь (§6, ADR-0051): слой 1 — К_ротации; наборов сверено ${kits.length}, герой и враг — одно число, без способностей — слой 0, бой от чисел мощи не зависит${bmBad.length ? `; нарушений ${bmBad.length}` : '; нарушений нет'}.`);
+  for (const s of bmBad.slice(0, 20)) console.log('  ✗ ' + s);
+}
+
+/* ---------- закон лестницы типов (слова автора 06.10.2026, ADR-0054) ----------
+   «1 - Обычный, 2 - Элитный, 3 - Босс, 4 - Рунный Босс, 5 - Убер Босс, 6 - "Новое название", 7 - Клановый Босс»; шестая ступень —
+   «Пробуждённый»; «у него [кланового босса] должен быть 100% имунитет к контролю… у пробуждённого тогда будет 75%, у Убера 50%, Рб - 25%,
+   у Босса - нет»; «У КБ - 50 раундов, Пробуждённого - 35». Порядок типов и числа — данные ядра: RULES.ladder, RULES.rounds.by,
+   RULES.resist. Здесь — слова автора числами и законы:
+   Л1 — порядок типов тот, что назвал автор, и в таблицах раундов и иммунитета есть каждый тип лестницы;
+   Л2 — раунды по типу — как у автора, и вверх по лестнице бой не короче;
+   Л3 — иммунитет к контролю по типу — как у автора, вверх по лестнице не ниже, у вершины — полный;
+   Л4 — Многоликий берёт раунды у Пробуждённого ссылкой, тип цели Эхо ведёт на тип лестницы, «Забытого» среди типов нет;
+   Л5 — состав врага по рангу (kits.js) вверх по лестнице не беднее: способностей не меньше.
+   Мутации: каждая поломка правил должна быть поймана своим законом — иначе закон ничего не держит. */
+const LADDER = ['o', 'e', 'b', 'rune', 'uber', 'awakened', 'clan'];                                   // лестница автора: ключи ранга ядра
+const LADDER_NAME = { o: 'обычный', e: 'элитный', b: 'босс', rune: 'рунный босс', uber: 'Убер-босс', awakened: 'Пробуждённый', clan: 'клановый босс' };
+const LADDER_ROUNDS = { o: 10, e: 15, b: 20, rune: 25, uber: 30, awakened: 35, clan: 50 };            // раундов в бою по типу
+const LADDER_RESIST = { o: 0, e: 0, b: 0, rune: 2500, uber: 5000, awakened: 7500, clan: 10000 };      // иммунитет к контролю, б. п.
+const PVP_ROUNDS = 25;                                                                                 // Арена и Лига — как были
+const RACE_ONLY = ['forgotten'];                                                                       // «Забытые» — только раса: такого ключа типа нет
+function ladderLaws(R, rankAb) {
+  const out = [], lad = R.ladder || [], by = (R.rounds || {}).by || {}, rs = R.resist || {};
+  const roundsOf = k => { let v = by[k]; for (let i = 0; typeof v === 'string' && i < 4; i++) v = by[v]; return v; };
+  if (lad.join() !== LADDER.join()) out.push(`Л1: лестница типов ${lad.join(' < ') || 'пуста'}, у автора — ${LADDER.join(' < ')}`);
+  for (const k of LADDER) { if (!Number.isInteger(roundsOf(k))) out.push(`Л1: у типа «${LADDER_NAME[k]}» нет раундов в RULES.rounds.by`); if (!Number.isInteger(rs[k])) out.push(`Л1: у типа «${LADDER_NAME[k]}» нет иммунитета в RULES.resist`); }
+  for (const k of LADDER) if (roundsOf(k) !== LADDER_ROUNDS[k]) out.push(`Л2: раундов у типа «${LADDER_NAME[k]}» — ${roundsOf(k)}, у автора — ${LADDER_ROUNDS[k]}`);
+  for (let i = 1; i < lad.length; i++) if (!(roundsOf(lad[i]) >= roundsOf(lad[i - 1]))) out.push(`Л2: бой с «${LADDER_NAME[lad[i]] || lad[i]}» короче, чем с «${LADDER_NAME[lad[i - 1]] || lad[i - 1]}»`);
+  if (roundsOf('pvp') !== PVP_ROUNDS) out.push(`Л2: раундов на Арене и в Лиге — ${roundsOf('pvp')}, а автор их не менял — ${PVP_ROUNDS}`);
+  for (const k of LADDER) if (rs[k] !== LADDER_RESIST[k]) out.push(`Л3: иммунитет к контролю у типа «${LADDER_NAME[k]}» — ${rs[k]} б. п., у автора — ${LADDER_RESIST[k]}`);
+  for (let i = 1; i < lad.length; i++) if (!(rs[lad[i]] >= rs[lad[i - 1]])) out.push(`Л3: иммунитет у «${LADDER_NAME[lad[i]] || lad[i]}» ниже, чем у «${LADDER_NAME[lad[i - 1]] || lad[i - 1]}»`);
+  if (lad.length && rs[lad[lad.length - 1]] !== 10000) out.push('Л3: вершину лестницы можно взять под контроль — у кланового босса иммунитет не 100 %');
+  for (const k of Object.keys(rs)) if (!LADDER.includes(k)) out.push(`Л3: в RULES.resist лишний тип «${k}»`);
+  if (by.many !== 'awakened') out.push(`Л4: раунды Многоликого — «${by.many}», а должны быть ссылкой на Пробуждённого`);
+  for (const [g, k] of Object.entries((R.echo || {}).kind || {})) if (k !== 'many' && !LADDER.includes(k)) out.push(`Л4: тип цели Эхо «${g}» ведёт на «${k}» — такого типа в лестнице нет`);
+  for (const k of RACE_ONLY) if (k in by || k in rs || lad.includes(k) || Object.values((R.echo || {}).kind || {}).includes(k)) out.push(`Л4: в правилах остался тип «${k}» — «Забытые» только раса`);
+  if (rankAb) { let prev = null; for (const k of lad) { const a = rankAb[k]; if (!a) { out.push(`Л5: у типа «${LADDER_NAME[k] || k}» нет состава по рангу`); continue; } if (prev && !(a.abilities >= prev.abilities)) out.push(`Л5: у «${LADDER_NAME[k]}» способностей ${a.abilities} — меньше, чем ступенью ниже (${prev.abilities})`); prev = a; } }
+  return out;
+}
+const ladderBad = [];
+{
+  const KJ = JSON.parse(fs.readFileSync(path.join(__dirname, 'kits.json'), 'utf8'));
+  /* состав по рангу — kits.json, rankAbilities по русскому имени ранга; ключ ядра → имя — как у сборщика наборов (assign.py, RANK) */
+  const RANK_RU = { o: 'рядовой', e: 'элита', b: 'босс биома', rune: 'рунный', uber: 'убер', awakened: 'пробуждённый', clan: 'клановый' };
+  const rankAb = Object.fromEntries(Object.entries(RANK_RU).map(([k, n]) => [k, KJ.rules.rankAbilities[n]]));
+  ladderBad.push(...ladderLaws(EB.RULES, rankAb));
+  /* мутации: правила с одной поломкой — закон обязан её назвать */
+  const clone = () => JSON.parse(JSON.stringify(EB.RULES));
+  const MUT = [
+    ['Л1', 'Пробуждённый выше кланового босса — лестница 01.10.2026', R => { R.ladder = ['o', 'e', 'b', 'rune', 'uber', 'clan', 'awakened']; }],
+    ['Л1', 'из лестницы пропал рунный босс', R => { R.ladder = R.ladder.filter(k => k !== 'rune'); }],
+    ['Л2', 'прежние раунды: клановый босс 35', R => { R.rounds.by.clan = 35; }],
+    ['Л2', 'прежние раунды: Пробуждённый 50', R => { R.rounds.by.awakened = 50; }],
+    ['Л2', 'босс бьётся столько же, сколько рядовой', R => { R.rounds.by.b = 10; }],
+    ['Л2', 'Арена — 30 раундов', R => { R.rounds.by.pvp = 30; }],
+    ['Л3', 'клановый босс с иммунитетом 75 %', R => { R.resist.clan = 7500; }],
+    ['Л3', 'Пробуждённый с иммунитетом 100 %', R => { R.resist.awakened = 10000; }],
+    ['Л3', 'у босса биома появился иммунитет', R => { R.resist.b = 2500; }],
+    ['Л3', 'у рунного босса пропал иммунитет', R => { delete R.resist.rune; }],
+    ['Л4', 'Многоликий со своим числом раундов', R => { R.rounds.by.many = 50; }],
+    ['Л4', 'тип «forgotten» вернулся в таблицу раундов', R => { R.rounds.by.forgotten = 50; }],
+    ['Л4', 'цель Эхо ведёт на тип вне лестницы', R => { R.echo.kind.a = 'forgotten'; }],
+  ];
+  let caught = 0;
+  for (const [law, what, f] of MUT) { const R = clone(); f(R); const got = ladderLaws(R, rankAb); if (got.some(s => s.startsWith(law))) caught++; else ladderBad.push(`мутация «${what}» не поймана законом ${law}${got.length ? ` (сработало: ${got[0]})` : ''}`); }
+  { const ab = JSON.parse(JSON.stringify(rankAb)); ab.clan.abilities = 5; if (ladderLaws(EB.RULES, ab).some(s => s.startsWith('Л5'))) caught++; else ladderBad.push('мутация «у кланового босса пять способностей» не поймана законом Л5'); }
+  const R = EB.RULES;
+  console.log(`Лестница типов (ADR-0054): ${R.ladder.map(k => `${LADDER_NAME[k] || k} ${EB.roundsOf(k)} р. · ${R.resist[k] / 100} %`).join(' < ')}; Арена и Лига — ${EB.roundsOf('pvp')} р.; `
+    + `мутаций поймано ${caught} из ${MUT.length + 1}${ladderBad.length ? `, нарушений ${ladderBad.length}` : ', нарушений нет'}.`);
+  for (const s of ladderBad) console.log('  ✗ ' + s);
+}
 if (ints.length) console.log('  ✗ не целые числа: ' + ints.slice(0, 10).join(', '));
-process.exitCode = bad.length || ints.length || kitBad.length || primBad.length || baseBad.length ? 1 : 0;
+process.exitCode = bad.length || ints.length || kitBad.length || primBad.length || baseBad.length || ladderBad.length || foeBad.length || bmBad.length ? 1 : 0;

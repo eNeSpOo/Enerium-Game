@@ -261,7 +261,7 @@ function build() {
   const rounds = {};
   for (const [g, T] of Object.entries(ER.types)) rounds[g] = T.rounds;
   /* призванный враг — раунды своего типа по силе (ADR-0039: «крафтового босса» как типа нет): экран Эхо пишет в атаку поле g врага,
-     у Забытого — f, 50 раундов, как у Многоликого */
+     у Пробуждённого — a, раунды его типа, как у Многоликого */
   for (const [g, T] of Object.entries((ER.summon && ER.summon.types) || {})) if (!(g in rounds)) rounds[g] = T.rounds;
 
   /* --- Лига: доля дней цикла, когда она открыта у профиля, — одно место на все калькуляторы (leagueOpen: темп героев прогона

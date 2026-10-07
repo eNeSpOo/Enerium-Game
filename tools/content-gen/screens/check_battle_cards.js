@@ -5,7 +5,7 @@
       доли: окно внутри рисунка, нарезка не меньше окна (углы и верх с украшением не тянутся), у героя — гнездо метки; выгруженная
       картинка есть, её пропорция — ar; в tools/art-gen/ui-art.json рамка идёт из art/generated, исходник есть.
    3. Тип рамки в каждом режиме — на настоящих боях прототипа: забег по биому 1–4 (рядовые, элита, босс) и рунный страж; Эхо — рядовой,
-      элита, босс, Убер, Многоликий, призванные враги всех типов — элита, босс, Убер, Забытый; биом Многоликого по этажам; клан — Голос, Хозяин и свита; Арена и Лига — рамка героя
+      элита, босс, Убер, Многоликий, призванные враги всех типов — элита, босс, Убер, Пробуждённый; биом Многоликого по этажам; клан — Голос, Хозяин и свита; Арена и Лига — рамка героя
       с обеих сторон; свои герои — всегда рамка героя. Каждая рамка набора встречается в бою.
    4. Карта с рамкой: класс fr, тип, переменные геометрии, рамка в кадре портрета; у героя — метка: кристалл редкости героя и звёзды по
       личному максимуму, взятые — по доблести; имя, полоса здоровья и щита с числами (hpn, shn — «Бой AAA»), класс, эффекты, цель,
@@ -26,7 +26,7 @@
       всё прежнее на карте — эффекты, класс, цель, контроль, «пал», имя, здоровье и щит, шансы, метка героя; портрет — файл
       464 × 576; ход боя идёт; режим «Игрок» чист; вернули прежний вид — разметка карт та же, что до портрета.
    11. Данные и рамки-портреты: места BF_VIEW целы; у каждого типа — украшение в BF_SPRITE, цвета в CSS, угловые — где обещаны,
-      градиенты определены; лестница опасности (TIERS, решения автора 01.10.2026: Забытый и Многоликий — вершина, выше Хозяина) —
+      градиенты определены; лестница опасности (TIERS — лестница типов автора 06.10.2026, ADR-0054: порядок — RULES.ladder ядра, Хозяин стихии — вершина) —
       каждая ступень тяжелее прежней: уголки, свет, кромки, дыхание;
       анимации — только opacity и transform, при «меньше движения» свет не дышит.
    12. Раскладка вида «портрет» расчётом по CSS на 932 × 430 и 844 × 390, все раскладки по числу карт и с главным врагом: карты — в поле
@@ -50,14 +50,15 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const { SERVICE, strip, playerText } = require('./check_player_view.js');
 
 /* ================== ДАННЫЕ ПРОВЕРКИ ================== */
-const TYPES = ['hero', 'o', 'e', 'b', 'echo', 'voice', 'rune', 'uber', 'host', 'forgotten', 'many'];   // набор рамок 30.09.2026, порядок — лестница 01.10.2026
+const TYPES = ['hero', 'o', 'e', 'b', 'echo', 'voice', 'rune', 'uber', 'awakened', 'many', 'host'];   // набор рамок 30.09.2026, порядок — лестница типов автора 06.10.2026 (ADR-0054)
 const ECHO_MAIN = { m: 'many' };                                                    // главный враг Эхо по типу цели → рамка
-const ECHO_RANK = { o: 'o', e: 'e', b: 'echo', uber: 'uber', forgotten: 'forgotten' };   // остальные в Эхо — по рангу карты из данных (крафтового типа нет)
+const ECHO_RANK = { o: 'o', e: 'e', b: 'echo', uber: 'uber', awakened: 'awakened' };   // остальные в Эхо — по рангу карты из данных (крафтового типа нет)
 const PORTRAIT_MIN = 36;   // кадр портрета под рамкой не ниже, px
 const WIDE = 1.45;         // рамка с украшением не шире карты больше чем во столько раз
 const SIZES = [['932 × 430', 'lg'], ['844 × 390', 'sm']];
 /* вид «портрет» */
-const TIERS = [['o'], ['e'], ['b', 'echo', 'voice'], ['rune'], ['uber'], ['host'], ['forgotten', 'many']];   // лестница опасности — решения автора 01.10.2026
+const TIERS = [['o'], ['e'], ['b', 'echo', 'voice'], ['rune'], ['uber'], ['awakened', 'many'], ['host']];   // лестница опасности — лестница типов автора 06.10.2026 (ADR-0054)
+const TIER_RANK = ['o', 'e', 'b', 'rune', 'uber', 'awakened', 'clan'];   // ранг ядра каждой ступени TIERS: порядок сверяется с RULES.ladder
 const FACE = { x: [300, 700], y: [100, 380] };   // зона лица в портрете, тысячные: голова — в верхней трети, по центру (art/style/style.md)
 const PORTRAIT = [464, 576];                     // портрет героя и врага, px: пропорция кадра карты-портрета
 const ART_DIRS = ['heroes', 'foes', 'echo', 'clan'];   // портреты боя в assets/art
@@ -227,7 +228,7 @@ const BF = T.BF;
     const src = art.items[p];
     if (!src || !src.from || !fs.existsSync(path.join(ROOT, 'art', 'generated', src.from))) fail(`${key}: в tools/art-gen/ui-art.json нет исходника ${p} или его файла`);
   }
-  for (const r of ['o', 'e', 'b', 'rune', 'uber', 'forgotten', 'clan']) if (!BF.types[BF.rank[r]]) fail(`BF.rank: у ранга ${r} нет рамки`);
+  for (const r of ['o', 'e', 'b', 'rune', 'uber', 'awakened', 'clan']) if (!BF.types[BF.rank[r]]) fail(`BF.rank: у ранга ${r} нет рамки`);
 }
 
 /* ================== 3–4. тип рамки по режимам, карта с рамкой ================== */
@@ -393,7 +394,7 @@ function plainView(key, R, h) {
     if (/data-bf=|class="bf"|bf-mk|bf-lg|--bf-|\bfr"|Рамка — ранг врага/.test(g)) fail(`${key}: без выгрузки на карте или в легенде следы рамки`);
     const wipe = s => s.replace(/ fr"/g, '"').replace(/ data-bf="\w+"/g, '').replace(/;--bf-[\w-]+:\d+/g, '').replace(/<i class="bf" [^>]*><\/i>/g, '')
       .replace(/<span class="bf-mk"[^>]*><b><\/b>(?:<span class="bf-st">(?:<i class="(?:on)?"><\/i>)*<\/span>)?<\/span>/g, '')
-      .replace(/ · (?:Рядовой|Элита|Голос сонма|Босс биома|Босс Эхо|Многоликий|Рунный страж|Убер-босс|Забытый|Хозяин стихии)(?=[ :])/g, '');
+      .replace(/ · (?:Рядовой|Элита|Голос сонма|Босс биома|Босс Эхо|Многоликий|Рунный страж|Убер-босс|Пробуждённый|Хозяин стихии)(?=[ :])/g, '');
     const a = cardsOf(wipe(h)).map(c => c.html).join('\n'), b = cardsOf(g).map(c => c.html).join('\n');
     if (a !== b) { const i = [...a].findIndex((ch, j) => ch !== b[j]); fail(`${key}: без выгрузки карта не прежняя — «${a.slice(Math.max(0, i - 60), i + 40)}» против «${b.slice(Math.max(0, i - 60), i + 40)}»`); }
   } finally { BF.ready = ready; T.setTeam(true); }
@@ -420,20 +421,20 @@ for (const id of Object.keys(T.EB.BIOMES).filter(b => /^b\d$/.test(b))) {
   }
 }
 
-/* Эхо: цель каждого типа и призванный враг каждого типа по силе — элита, босс, Убер, Забытый (ADR-0039); атака — как у игрока */
+/* Эхо: цель каждого типа и призванный враг каждого типа по силе — элита, босс, Убер, Пробуждённый (ADR-0039); атака — как у игрока */
 {
   const E = vm.runInContext('window.EN_ECHO', ctx), STEPS = E.steps, TOP = STEPS.length;
   const W = vm.runInContext('RS.weeks', ctx)[0], c = 3;
   const targets = [];
   for (const g of ['o', 'e', 'b', 'u']) targets.push(['step', STEPS.indexOf(g) + 1]);
   targets.push(['step', TOP + 1]);
-  for (const g of ['e', 'b', 'u', 'f']) { const fb = T.RX.drops.craftBosses.find(b => b.g === g && !b.team); if (fb) targets.push(['craft', fb]); else fail(`призванного врага типа «${g}» нет в recipes.js`); }
+  for (const g of ['e', 'b', 'u', 'a']) { const fb = T.RX.drops.craftBosses.find(b => b.g === g && !b.team); if (fb) targets.push(['craft', fb]); else fail(`призванного врага типа «${g}» нет в recipes.js`); }
   for (const [kind, x0] of targets) {
     fresh(); T.rsSetWeek(W.race); T.S.acc.cycle = c; T.S.route = 'echo'; T.S.wallet.souls = 1e9; E.sync();
     const x = run('Эхо · цель', () => E.target(kind, x0)); if (!x) continue;
     T.S.echo.slots[0] = x; T.S.echo.sel = 0;
     run('Эхо · атака', () => T.ACT.echatk(x.uid + ':1'));
-    const R = lastRun('echo'), guards = { o: 'o', e: 'e', b: 'echo', uber: 'uber', forgotten: 'forgotten' };
+    const R = lastRun('echo'), guards = { o: 'o', e: 'e', b: 'echo', uber: 'uber', awakened: 'awakened' };
     checkBattle(`Эхо · ${kind === 'craft' ? 'призыв из рецепта · ' + x.g : x.g === 'm' ? 'Многоликий' : 'ступень ' + x.step}`, R,
       (u, sd) => !sd ? 'hero' : u.lead ? ECHO_MAIN[x.g] || ECHO_RANK[u.rank] : guards[u.rank] || 'o');
   }
@@ -611,8 +612,12 @@ const hasRule = (sel, re) => rules.some(r => r.sel.includes(sel) && re.test(r.bo
     if (!(cmp(hi, lo) > 0)) fail(`лестница опасности: ${TIERS[i].join(', ')} (${hi}) не тяжелее ${TIERS[i - 1].join(', ')} (${lo})`);
   }
   if (weight('o')[0] !== 0) fail('рамка-портрет рядового: украшена — рядовой должен быть голым железом');
-  /* прежний вид: вершине — свет по контуру рамки-картинки, рисунки 30.09 — под прежнюю лестницу */
-  for (const t of TIERS[TIERS.length - 1]) if (!new RegExp(`\\.bc\\.fr\\[data-bf="${t}"\\] \\.face>\\.bf\\{filter:drop-shadow`).test(cssB)) fail(`прежний вид: у рамки-картинки вершины «${t}» нет света`);
+  /* лестница рамок — лестница типов ядра: ступени TIERS идут в порядке RULES.ladder, рамка ранга стоит на своей ступени */
+  { const LAD = T.EB.RULES.ladder;
+    if (LAD.join() !== TIER_RANK.join()) fail(`лестница опасности: ступени проверки ${TIER_RANK.join(' < ')}, а лестница типов ядра RULES.ladder — ${LAD.join(' < ')}`);
+    LAD.forEach((r, i) => { const fr = T.BF.rank[r]; if (!TIERS[i] || !TIERS[i].includes(fr)) fail(`лестница опасности: рамка «${fr}» ранга ${r} стоит не на ступени ${i + 1}`); }); }
+  /* прежний вид: рамки-картинки 30.09 рисовались под лестницу с Хозяином стихии на вершине — она и действует; костыля-света у рамок нет */
+  if (/\.bc\.fr\[data-bf="[\w-]+"\] \.face>\.bf\{filter:/.test(cssB)) fail('прежний вид: у рамки-картинки остался свет по контуру — костыль лестницы 01.10.2026');
   /* анимации — только opacity и transform; «меньше движения» — свет ровный */
   for (const m of cssB.matchAll(/@keyframes ([\w-]+)\{((?:[^{}]*\{[^{}]*\})*)\}/g)) {
     const props = [...m[2].matchAll(/([\w-]+)\s*:/g)].map(x => x[1]);

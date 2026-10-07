@@ -56,7 +56,8 @@ module.exports = function sink({ items, recipes, byId, CYC, places, memories, OU
     const baseDay = tut ? S.tutorial.basics * SCALE : Math.floor((K.base * keep / 10000 + R.basics) * SCALE / 100);
     const uniqDay = tut ? S.tutorial.uniques * SCALE : Math.floor((K.boss * keep / 10000 * C.ENEMY.uniqueBp / 10000 + R.uniq) * SCALE / 100);
     /* закрытий крафтовых биомов в день × 100: время × слоты × доля / минут на закрытие; в обучении — по одному на место */
-    const runsX100 = tut ? 100 * cplaces.length : Math.floor(S.hours * S.slotsByCycle[c - 1] * 60 * phiBp / 100 / S.runMin);
+    /* слотов — сколько даёт артефакт активных биомов в цикле (ёмкость, capacity.json: slots — economy.slots, ADR-0054) */
+    const runsX100 = tut ? 100 * cplaces.length : Math.floor(S.hours * cap.slots[String(c)] * 60 * phiBp / 100 / S.runMin);
     const perPlace = cplaces.length ? Math.floor(runsX100 / cplaces.length) : 0;
     const sum = tut ? 100 : S.summonsPerDayX100[c], mix = S.summonMixBp;
     const ruinBosses = cplaces.filter(p => p.kind === 'ruin'), city = cplaces.filter(p => p.kind === 'city');

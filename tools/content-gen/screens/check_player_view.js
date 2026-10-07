@@ -209,7 +209,8 @@ function main() {
       draw(where + ' · бой'); run(where + ' · пропустить', () => T.ACT.echskip(R.id)); draw(where + ' · итог');
     };
     clear(); run(key + ' · призыв', () => T.ACT.echsum('2')); draw(key + ' · выбор цели');
-    const p = T.S.ech.pending[2]; if (p) { run(key + ' · выбор', () => T.ACT.echpick('2:' + p.offers[0])); draw(key + ' · цель выбрана'); win2(key + ' · победа', 2); }
+    /* выбор цели: сперва лист с честной оценкой (§17.1), затем «Выбрать» */
+    const p = T.S.ech.pending[2]; if (p) { run(key + ' · выбор', () => T.ACT.echpick('2:' + p.offers[0])); draw(key + ' · оценка до выбора'); run(key + ' · выбрать', () => T.ACT.echpick('2:' + p.offers[0] + ':ok')); draw(key + ' · цель выбрана'); win2(key + ' · победа', 2); }
     clear(); T.S.echo.slots[0] = E.target('step', E.steps.length + 1); draw(key + ' · Многоликий в слоте'); win2(key + ' · Многоликий', 0);
     for (const fb of T.RX.drops.craftBosses.slice(0, 3)) {
       clear(); T.BAG.add(fb.call, 1); run(key + ' · призыв босса', () => T.ACTIVATE.call(fb.call)); draw(`${key} · ${fb.id} · подтверждение`);
@@ -263,9 +264,10 @@ function main() {
     /* состав героев: книга каждого героя, его последняя доблесть и лист поверх. Книгу не найденного героя не открыть (стадии знакомства,
        30.09.2026): обход делает каждого известным — все циклы открыты, у сборных комплект осколков; неизвестная душа — одним осколком */
     reset(); T.S.rs.cyc = 6;
-    const need = T.RS.rules.stub.shards;
+    /* комплект — свой у героя: у героя Эхо — по его циклу (rules.echoSet, ADR-0047), у прочих сборных — общий */
+    const need = h => (h.src === 'echo' && Array.isArray(T.RS.rules.echoSet) && T.RS.rules.echoSet[h.c - 1]) || T.RS.rules.stub.shards;
     for (const h of T.RS.heroes) {
-      T.S.rs.shards = T.S.rs.owned[h.id] || h.src === 'gold' || h.src === 'donat' ? {} : { [h.id]: need };   // только он: сетка под книгой не разрастается
+      T.S.rs.shards = T.S.rs.owned[h.id] || h.src === 'gold' || h.src === 'donat' ? {} : { [h.id]: need(h) };   // только он: сетка под книгой не разрастается
       T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'rs'; T.S.rs.sel = h.id; T.S.rs.val = null; T.S.overlay = null;
       draw(`состав · ${h.n}${tag}`);
       T.S.rs.val = { id: h.id, v: h.maxV }; draw(`состав · ${h.n} · последняя доблесть${tag}`);

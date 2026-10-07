@@ -91,7 +91,9 @@ function draftOf(h) {
 }
 const srcOf = (h, lvl, valor) => {
   const c = coreCls(h), T = HR.st[c] || HR.st['Танк'];
-  return EB.heroSrcValor({ id: h.id, name: h.n, cls: c, el: h.sch, lvl, st: T[0].slice(), ab: [], pas: [], ult: null, draft: draftOf(h), valor });   // доблесть — правило ядра, как в прототипе
+  /* цикл героя — в карту: кривая силы §3.3 (RULES.cycleX10, ADR-0041) действует и на Арене — герой цикла II на том же уровне сильнее
+     героя цикла I (ADR-0050, решение координатора 5; прежде модель брала героев без множителя цикла) */
+  return EB.heroSrcValor({ id: h.id, name: h.n, cls: c, el: h.sch, lvl, c: h.c, st: T[0].slice(), ab: [], pas: [], ult: null, draft: draftOf(h), valor });   // доблесть — правило ядра, как в прототипе
 };
 const POOL = RS.heroes.filter(h => h.c <= SIM.cyc && draftOf(h));
 const byCls = c => POOL.filter(h => coreCls(h) === c);
@@ -144,7 +146,9 @@ function calib(D) {
         const t = [], add = h => { if (h && !t.includes(h)) t.push(h); };
         add(tanks.length ? pick(tanks) : null); add(heals.length ? pick(heals) : null);
         while (t.length < 5) add(pick(col));
-        presets.push(t.map(h => ({ h, lvl: SIM.level, valor: Math.min(h.maxV, 1) })));
+        /* доблесть пресетов — как у соперника (SIM.valorMax): прежде у игрока стояла доблесть до 1 против нуля у соперника — пресет
+           по умолчанию выигрывал 92 %, и выгода выбора в хвосте таблицы Эло раздувалась (общий пересчёт 07.10.2026) */
+        presets.push(t.map(h => ({ h, lvl: SIM.level, valor: Math.min(h.maxV, SIM.valorMax) })));
       }
       const foe = team(r, SIM.level).map(x => Object.assign(x, { lvl: SIM.level })), seed = A.seedOf('головоломка|' + k);
       const est = presets.map((t, p) => { let s = 0; for (let q = 0; q < P.probe; q++) s += fight(t, foe, A.seedOf(`оценка|${k}|${p}|${q}`), D.arena.rounds).half; return s; });

@@ -65,6 +65,10 @@ BP = 10000
 RITUAL_PCT = {'o': 100, 'e': 200, 'b': 300, 'guard': 300}
 STEP_MS = 500                            # шаг подбора ритуала рядовых и округления по видам, мс
 SEARCH_MS = 30000                        # потолок поиска ритуала рядовых
+# Ритуал ядра против подбора: не короче подбора — иначе законы фарма не держатся, и не длиннее его больше чем на запас — стена не
+# тяжелее нужного. Равенства не требуем (общий пересчёт 07.10.2026): подбор шагает по STEP_MS вслед за ручками силы биомов
+# (cycle/climb.py, KX), а ритуал ядра двигает темп и сроки циклов — равенство держалось только узким окном ручки первого биома цикла III
+RITUAL_SLACK_MS = 1500
 # зрелище ритуала рядовых, если в ядре нет фаз показа (RULES.floor.ritual — задача «Бой AAA»): выход врагов, «Этаж взят», полёт добычи, мс
 SHOW_FALLBACK = {'enterMs': 1200, 'takenMs': 300, 'lootMs': 900}
 KINDS = ['o', 'e', 'b', 'guard']
@@ -467,8 +471,9 @@ def build(X):
     v = []
     v.append({'what': 'Р. Ритуал этажа', 'goal': 'взятый этаж — max(бой, минимум вида), сверхсильный отряд берёт всё',
               'got': 'держится' if not rbad else '; '.join(rbad[:3]), 'ok': not rbad})
-    v.append({'what': 'Ритуал в ядре — подбор калькулятора', 'goal': 'RULES.floor.minMs = подбор',
-              'got': f"ядро {X['core']}, подбор {mins}", 'ok': mins is not None and all(mins[k] == X['core'][k] for k in KINDS)})
+    v.append({'what': 'Ритуал в ядре — не короче подбора калькулятора', 'goal': f'RULES.floor.minMs — от подбора до подбора + {sec(RITUAL_SLACK_MS)} у рядовых, по видам — те же доли',
+              'got': f"ядро {X['core']}, подбор {mins}",
+              'ok': mins is not None and mins['o'] <= X['core']['o'] <= mins['o'] + RITUAL_SLACK_MS and all(X['core'][k] == ritual_of(X['core']['o'])[k] for k in KINDS)})
     bad1 = {b: k for b, k in L2['v1'].items() if k}
     v.append({'what': 'В1. Цикл II: удары насмерть по старым биомам не выгоднее своего', 'goal': 'золото, дух, души в минуту — не больше, чем у отряда конца цикла в своём',
               'got': 'держится' if not bad1 else '; '.join(f'{bname(b)}: ' + ', '.join(CUR_RU[k] for k in ks) for b, ks in bad1.items()), 'ok': not bad1})

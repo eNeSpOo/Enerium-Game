@@ -68,7 +68,8 @@ function stepOf(G, c, climb, days) {
   /* --- рейтинг --- */
   const p1 = ER.plank1[String(c)], ev1 = EV.planks[String(c)][0], ct1 = CT.planks[String(c)][0];
   add('rating', 'rating', `Рейтинг цикла ${rc}`, `Эхо, Событие, контракты, Арена и Лига — среди игроков цикла ${rc}. ${first ? `Первый рейтинг: цикл ${rp} — обучение, без рейтинга.` : `Итог цикла ${rp} — в профиле.`}`, { go: { route: 'week' }, main: true });
-  add('rating', 'planks', first ? 'Планки недели' : 'Планки недели выше', `первая: Эхо — ${fmt(p1)} очков, Событие — ${fmt(ev1)}, контракты — ${fmt(ct1)}`, { go: { route: 'week' } });
+  /* лестница планок — одна на все циклы (ADR-0047): новый цикл — своя полоса, её первая ступень — первая планка цикла */
+  add('rating', 'planks', first ? 'Планки недели' : `Планки недели: полоса цикла ${rc}`, `первая ступень: Эхо — ${fmt(p1)} очков, Событие — ${fmt(ev1)}, контракты — ${fmt(ct1)}; дальше — ступени следующих циклов`, { go: { route: 'week' } });
   const firsts = W.ach.firsts.filter(f => f.c === c);
   add('rating', 'firsts', `Первенства сервера цикла ${rc}: ${firsts.length}`, 'кто первым на сервере возьмёт рубежи нового цикла', { go: { route: 'profile', profile: 'ach' } });
 
@@ -79,16 +80,23 @@ function stepOf(G, c, climb, days) {
   add('heroes', 'gold', `За золото — ${by('gold').length} ${plural(by('gold').length, 'герой', 'героя', 'героев')}`, `первый — ${fmt(gold1)} золота, каждый следующий дороже на ${RO.rules.gold.stepBp / 100} %`,
     { go: { route: 'heroes', heroes: 'hire', hire: 'gold', gcyc: c } });
   if (by('roulette').length) add('heroes', 'roulette', `Возрождение душ — ${by('roulette').length} ${plural(by('roulette').length, 'новый герой', 'новых героя', 'новых героев')}`, `доблесть до ${mv('roulette')}`, { go: { route: 'heroes', heroes: 'hire', hire: 'souls' } });
-  if (by('echo').length) add('heroes', 'echo', `Герои Эхо цикла ${rc}`, `по одному на расу недели — в сундуках Эхо; доблесть до ${mv('echo')}`, { go: { route: 'echo' } });
+  /* героя Эхо собирают только из осколков: комплект — по циклу героя (roster.js, rules.echoSet; ADR-0047) */
+  const eset = Array.isArray(RO.rules.echoSet) ? RO.rules.echoSet[c - 1] : 0;
+  if (!(eset > 0)) throw new Error(`roster.js: нет комплекта осколков героя Эхо цикла ${rc} (rules.echoSet)`);
+  if (by('echo').length) add('heroes', 'echo', `Герои Эхо цикла ${rc}`, `по одному на расу недели — из осколков сундуков Эхо: комплект — ${fmt(eset)}; доблесть до ${mv('echo')}`, { go: { route: 'echo' }, num: eset });
   const ds = RO.sets.find(s => s.kind === 'donat' && s.cycle === c);
   if (ds) add('heroes', 'donat', `Донатный сет «${ds.name}»`, `пятеро Безликих за Энериум; доблесть до ${mv('donat')}`, { go: { route: 'heroes', heroes: 'hire', hire: 'donat' }, team });
   if (by('craft').length) add('heroes', 'craftHeroes', `Герои из рецептов — ${by('craft').length}`, 'скрытые рецепты цикла', { team });
 
   /* --- спуск и ремесло --- */
-  const gd = R.drops.guardians.filter(g => g.cyc === c), slots = R.drops.activeSlots.byCycle[c - 1];
+  /* активные биомы (ADR-0054): слот забега даёт артефакт активных биомов — новый цикл открывает его следующий уровень, а сам слот игрок
+     покупает за души (цена уровня — база × номер уровня); «слотов столько, каков номер цикла» отменено */
+  const TRL = W.art.list.find(a => a.id === W.art.rules.trail), trLvOf = k => Math.min(TRL.lv, Math.max(0, k - TRL.from + 1));
+  const trLv = trLvOf(c), slots = TRL.base + TRL.own + TRL.step * trLv, trNew = trLv > trLvOf(c - 1);
+  const gd = R.drops.guardians.filter(g => g.cyc === c);
   if (team) add('descent', 'biomes', D.TEXT.descentTeam, `вход к стражам — ${gd.map(g => g.entryKeys).join(' и ')} рунных ключей`, { go: { route: 'descent', biome: 'front' }, main: true });
   else add('descent', 'biomes', cyc.biomes.map(b => b.n).join(' · '), `стражи ${gd.map(g => g.name).join(' и ')}; вход — ${gd.map(g => g.entryKeys).join(' и ')} рунных ключей`, { go: { route: 'descent', biome: 'front' }, main: true });
-  add('descent', 'slots', `Забегов разом — ${slots}`, `${ORD[slots]} отряд идёт вниз одновременно с остальными`, { num: slots });
+  if (trNew) add('descent', 'slots', `«${TRL.n}»: уровень ${ROMAN[trLv]}`, `за ${fmt(TRL.soul * trLv)} душ — ${ORD[slots]} отряд идёт вниз одновременно с остальными`, { num: slots, go: { route: 'profile', profile: 'arts' } });
   const st = R.stats.byCycle[c - 1], pl = R.places.filter(p => p.cyc === c), ruins = pl.filter(p => p.kind === 'ruin').length, city = pl.find(p => p.kind === 'city');
   add('descent', 'recipes', `Рецепты цикла — ${st.recipes}`, team ? `предметов — ${st.items}` : `${ruins} ${plural(ruins, 'руина', 'руины', 'руин')} и город «${city.n}»; предметов — ${st.items}`, { go: { route: 'craft', craft: 'work' }, team });
   add('descent', 'market', `Рынок и Лавка: цены ${x10(c * 10)}`, `базовый ресурс — от ${R.drops.market.basic[c - 1]} золота; в Лавке — ресурсы новых биомов`, { go: { route: 'craft', craft: 'shop' } });
@@ -105,8 +113,11 @@ function stepOf(G, c, climb, days) {
   const cur = RI.tabs.hero.cur, curH = RI.tabs.hero.curH;
   add('week', 'rituals', first ? 'Ритуалы героев' : `Ритуалы героев: награды ${x10(c * 10)}`, `за ${curH} ч — ${cur.map(([k, v]) => `${fmt(v * c)} ${{ gold: 'золота', spirit: 'духа', souls: 'душ' }[k]}`).join(', ')}`, { go: { route: 'rituals' } });
   const chestR = LB.modes.echo.layers[0].rows[0].cyc[String(c)][0].r, rowP = LB.modes.echo.layers[0].rows[0].cyc[String(c - 1)], chestR0 = rowP ? rowP[0].r : chestR;
-  if (rowP) add('week', 'chests', 'Сундуки недели — редкость выше', `первая планка Эхо — сундук редкости «${LB.rarity[chestR - 1]}», был «${LB.rarity[chestR0 - 1]}»`);
-  else add('week', 'chests', 'Сундуки недели', `за планки и места: первая планка Эхо — сундук редкости «${LB.rarity[chestR - 1]}»`);
+  /* гарантия сундука осколков — герою-цели недели, по редкости сундука (lootboxes.js, линия target) */
+  const sureQ = LB.lines && LB.lines.target && LB.lines.target.q ? LB.lines.target.q[chestR - 1] : 0;
+  if (!(sureQ > 0)) throw new Error(`lootboxes.js: нет гарантии осколков у сундука редкости ${chestR} (lines.target.q)`);
+  if (rowP) add('week', 'chests', 'Сундуки недели — редкость выше', `первая планка Эхо — сундук редкости «${LB.rarity[chestR - 1]}», был «${LB.rarity[chestR0 - 1]}»; наверняка — ${fmt(sureQ)} осколков герою-цели`);
+  else add('week', 'chests', 'Сундуки недели', `за планки и места: первая планка Эхо — сундук редкости «${LB.rarity[chestR - 1]}», наверняка — ${fmt(sureQ)} осколков герою-цели`);
   add('week', 'equipment', `Снаряжение цикла: ${x100(EQ.rules.cycMul[c - 1])}`, `основные строки вещей цикла ${rc}; вещи цикла ${rp} — ${x100(EQ.rules.cycMul[c - 2])}`, { go: { route: 'heroes', heroes: 'coll', hero: 'gear' } });
   const talFrom = Math.min(...Object.entries(LB.summon.ev.ruin).filter(([, v]) => v.tal).map(([k]) => +k));   // сундук призыва: талисманы — с цикла силы
   if (c === talFrom) add('week', 'talismans', 'Талисманы в сундуках призыва', `призванные враги цикла силы ${rc} и выше`);
@@ -132,7 +143,8 @@ function stepOf(G, c, climb, days) {
   add('store', 'pass', 'Пропуск и Дар дня', `сундуки странника — от редкости «${LB.rarity[chB]}»`, { go: { route: 'store', store: 'pass' } });
 
   /* «сразу» — что сервер выдаёт операцией перехода */
-  const got = [{ k: 'xp', n: `+${fmt(xp)} опыта` }, { k: 'memory', n: `место Памяти ${rc}` }, { k: 'slots', n: `забегов разом — ${slots}` }];
+  const got = [{ k: 'xp', n: `+${fmt(xp)} опыта` }, { k: 'memory', n: `место Памяти ${rc}` }];
+  if (trNew) got.push({ k: 'trail', n: `«${TRL.n}»: открыт уровень ${ROMAN[trLv]}` });   // сам слот — покупкой уровня за души (ADR-0054)
   if (of) got.push({ k: 'offer', n: `${K.n} · ${Math.floor(K.life / 3600)} ч` });
 
   /* подъём по циклам — калькулятор climb.py, только команде */

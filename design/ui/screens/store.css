@@ -1,4 +1,4 @@
-/* screens/store.css — Лавка Энериума (screens/store.js): стартовые наборы, наборы Энериума, выдача, предложения, реклама.
+/* screens/store.css — Лавка Энериума (screens/store.js): разовые наборы, наборы Энериума, выдача, предложения, реклама.
    «Дорого-богато» — правило автора для донатных окон: зал-сокровищница (store/hall.jpg), чёрный мрамор, старое золото, свет Энериума
    снизу. Правила воздуха (ADR-0026): карточка — картинка, имя, до двух чисел, до двух чипов и одно действие; отступы — токены
    --sp-l / --sp-m / --sp-s. Свои классы — с префиксом st-. Движение — только transform и opacity; «меньше движения» — без движения. */
@@ -26,17 +26,18 @@
 .st-ped{position:relative;display:block;flex:none}
 .st-ped::after{content:"";position:absolute;left:12%;right:12%;bottom:2%;height:14%;border-radius:50%;z-index:0;background:radial-gradient(closest-side,rgba(var(--st-en),.55),transparent)}
 .st-pic{position:relative;z-index:1;display:block;object-fit:contain;filter:drop-shadow(0 10px 14px rgba(0,0,0,.65))}
-/* в пьедестале и ступени лесенки арт лежит по коробке: процент высоты у элемента сетки не держится */
-.st-ped>.st-pic,.st-rp>.st-pic{position:absolute;left:0;bottom:0;width:100%;height:100%;object-position:50% 100%}
+/* в пьедестале и плитке ряда наборов арт лежит по коробке: процент высоты у элемента сетки не держится */
+.st-ped>.st-pic,.st-setp>.st-pic{position:absolute;left:0;bottom:0;width:100%;height:100%;object-position:50% 100%}
 .st-pic.stub{border-radius:50%;background:radial-gradient(38% 46% at 50% 55%,rgba(var(--st-en),.75),rgba(var(--st-en),.12) 60%,transparent 72%);filter:none}
 .st-ico{width:20px;height:20px;object-fit:contain;flex:none}
 
-/* печать «×2» сургучом */
+/* печать «×2» сургучом: стоит там, где число уже удвоено, — на наборе Энериума до его первой покупки, на витрине разового набора
+   до самой первой покупки разового набора, на листе «что придёт» */
 .st-x2{position:absolute;top:-10px;right:-8px;z-index:3;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;font:700 15px/1 var(--f-d);font-style:normal;color:#fbe7b0;
   background:radial-gradient(circle at 42% 36%,#b5342a,#6d1510 62%,#420a07);box-shadow:inset 0 0 0 2px rgba(0,0,0,.25),inset 0 -5px 8px rgba(0,0,0,.35),0 3px 6px rgba(0,0,0,.6);transform:rotate(-8deg);text-shadow:0 1px 1px #000}
 .st-x2.sm{top:-8px;right:-6px;width:34px;height:34px;font-size:12.5px}
 
-/* ================== «Наборы»: ступень крупно, лесенка, предложения ================== */
+/* ================== «Наборы»: разовый набор крупно, ряд пяти наборов, предложения ================== */
 .st-start{flex:1 1 0;min-height:0;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:var(--sp-m)}
 .st-main{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0;min-height:0}
 .st-show{flex:1 1 0;min-height:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:var(--sp-m);align-items:center;padding:var(--sp-m) var(--sp-m) var(--sp-m) var(--sp-s);
@@ -52,21 +53,23 @@
 .st-it b{font:700 19px/1 var(--f-u);color:var(--gold);font-variant-numeric:lining-nums tabular-nums}
 .st-it small{font-size:11px;line-height:1.1;color:var(--parch-3)}
 .st-sub{font-size:12px;line-height:1.3;color:var(--parch-2);white-space:normal;overflow-wrap:anywhere}
+/* общая пометка разовых наборов: «×2 — на первую покупку, набор на ваш выбор» — золотом, пока удвоение ждёт */
+.st-x2n b{font-weight:700;color:#f0d79c}
 .st-show .st-buy{align-self:flex-start;min-width:150px;justify-content:center}
 .st-done{align-self:flex-start}
-.st-rungs{flex:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--sp-s)}
-.st-rung{position:relative;appearance:none;display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 2px 5px;border-radius:10px;border:1px solid rgba(var(--st-au),.26);background:rgba(8,12,11,.78);color:var(--parch);font:inherit;min-width:0}
-.st-rung:hover{border-color:rgba(var(--st-au),.55)}
-.st-rp{position:relative;display:block;width:40px;height:34px}
-.st-rk{position:absolute;right:-6px;top:-2px;display:grid;color:var(--spirit)}
-.st-rk .i{width:13px;height:13px}
-.st-rk.lk{color:var(--gold-2)}
-.st-rn{font:600 14px/1 var(--f-d);color:var(--gold)}
-.st-rung small{font-size:11px;line-height:1.1;color:var(--parch-2);white-space:nowrap}
-.st-rung.got{opacity:.6}
-.st-rung.lock{opacity:.58}
-.st-rung.lock .st-pic{filter:grayscale(.7) brightness(.7)}
-.st-rung.cur{border-color:rgba(var(--st-au),.8);background:linear-gradient(180deg,rgba(var(--st-au),.14),rgba(8,12,11,.8));box-shadow:0 0 16px -6px rgba(var(--st-au),.7)}
+.st-show.got .st-sh-l .st-pic{filter:grayscale(.45) brightness(.82) drop-shadow(0 10px 14px rgba(0,0,0,.65))}
+/* ряд пяти разовых наборов: плитка выбирает набор для витрины; замков нет — порядок покупки любой */
+.st-sets{flex:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--sp-s)}
+.st-set{position:relative;appearance:none;display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 2px 5px;border-radius:10px;border:1px solid rgba(var(--st-au),.26);background:rgba(8,12,11,.78);color:var(--parch);font:inherit;min-width:0}
+.st-set:hover{border-color:rgba(var(--st-au),.55)}
+.st-setp{position:relative;display:block;width:40px;height:34px}
+.st-setk{position:absolute;right:-6px;top:-2px;display:grid;color:var(--spirit)}
+.st-setk .i{width:13px;height:13px}
+.st-setn{font:600 14px/1 var(--f-d);color:var(--gold)}
+.st-set small{font-size:11px;line-height:1.1;color:var(--parch-2);white-space:nowrap}
+.st-set.got{opacity:.6}
+.st-set.got .st-pic{filter:grayscale(.6) brightness(.8)}
+.st-set.cur{opacity:1;border-color:rgba(var(--st-au),.8);background:linear-gradient(180deg,rgba(var(--st-au),.14),rgba(8,12,11,.8));box-shadow:0 0 16px -6px rgba(var(--st-au),.7)}
 .st-offers{display:flex;flex-direction:column;gap:var(--sp-s);min-width:0;min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:#2c3238 transparent}
 .st-offers>.eyebrow{flex:none;color:#e9cf93;text-shadow:0 1px 2px #000}
 .st-of{flex:none;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:var(--sp-s);align-items:center;padding:6px var(--sp-s)}
@@ -153,7 +156,7 @@
 .g.sm .st-it .st-ico{width:22px;height:22px}
 .g.sm .st-it b{font-size:17px}
 .g.sm .st-sub{font-size:11.5px}
-.g.sm .st-rp{height:28px}
+.g.sm .st-setp{height:28px}
 .g.sm .st-of .st-ped{width:46px;height:46px}
 .g.sm .st-pn{font-size:13.5px}
 .g.sm .st-pa b{font-size:17px}

@@ -61,7 +61,9 @@ else:
     print('!! sets.py: нет cycle/climb.json и climb-days.json — циклы III–VI по прежнему допущению; собрать python tools/content-gen/cycle/climb.py', file=sys.stderr)
     CYCLE_LEN = {2: E.CYCLE_DAYS, **CYCLE_LEN_FALLBACK}
 CYCLES_ON = sorted(CYCLE_LEN)                          # циклы, чьи дни ведёт калькулятор
-# забегов одновременно — номер цикла (ADR-0014; ADR-0031, п. 3): economy.slots, recipes.js. «Право владыки» не считаем
+# забегов одновременно — по артефакту активных биомов (ADR-0054): economy.slots — когда уровень своего цикла взят, до покупки — как
+# в прошлом цикле; день покупки — калькулятор экономики (цикл II) и записи подъёма (поле 16). Души за уровень — счётчик дня «trail»:
+# их калькулятор Эхо вычитает из своего бюджета душ. «Право владыки» не считаем
 
 # --- цикл I — обучение на часы (ADR-0018): ступень I возможна только во втором биоме, руной уровня аккаунта 7 (§16).
 # Биом 2 — прогон темпа (pace.json, rows.b2.tot: этажи, убитые, дух, золото до победы над стражем); нет прогона — допущения ниже ---
@@ -210,7 +212,7 @@ def rec_day(rec, hours, squads=None):
     цикла I на своём уровне (поле 4) в своём образце (поле 12). Счётчики — те же, что у дня цикла II."""
     c = rec[0]
     acc = {}
-    for k in range(squads or E.slots(c)):
+    for k in range(squads or (rec[16] if len(rec) > 16 else E.slots(c))):   # забегов разом в этот день — по артефакту активных биомов
         if k == 0:
             add(acc, squad_day(0, c, hours, eff=climb_eff(rec[5], rec[11]), cc=rec[11]))
         else:
@@ -218,18 +220,37 @@ def rec_day(rec, hours, squads=None):
     return c, acc
 
 
+def slots_ii(hours):
+    """Забегов одновременно по дням с начала цикла II — калькулятор экономики: уровень артефакта активных биомов берётся, как хватит душ."""
+    return E.pace_of(hours)['slots']
+
+
 def day_of(lv, d, hours, squads=None):
-    """День d с начала цикла II: цикл и счётчики всех отрядов; squads — сколько отрядов, по умолчанию все слоты. Цикл II — калькулятор
-    экономики; дальше — записи калькулятора подъёма (нет его — цикл III по калькулятору экономики)."""
+    """День d с начала цикла II: цикл и счётчики всех отрядов; squads — сколько отрядов, по умолчанию все слоты этого дня. Цикл II —
+    калькулятор экономики; дальше — записи калькулятора подъёма (нет его — цикл III по калькулятору экономики)."""
     if d > CYCLE_LEN[2] and CLIMB:
         recs = climb_recs(hours)
         return rec_day(recs[min(d - CYCLE_LEN[2], len(recs)) - 1], hours, squads)
     a, b = lv[min(d - 1, len(lv) - 1)]
     c = E.FIRST_CYCLE if d <= CYCLE_LEN[2] else E.FIRST_CYCLE + 1
     acc = {}
-    for k in range(squads or E.slots(c)):
+    sl = slots_ii(hours)
+    for k in range(squads or sl[min(d, len(sl) - 1)]):
         add(acc, squad_day(a if k == 0 else b, c, hours))
     return c, acc
+
+
+def trail_sink(days):
+    """Счётчик «trail» — души дня, что уходят на уровень артефакта активных биомов своего цикла (ADR-0054), в сотых: цена уровня
+    (в цикле II — за вычетом душ обучения) берётся из душ первых дней цикла, пока не набрана. Это сток: калькулятор Эхо вычитает его
+    из бюджета душ дня. Меняет записи дней на месте."""
+    left = {}
+    for d, c, x in days:
+        if c not in left:
+            left[c] = max(0, E.trail_cost(c) - (E.start_souls() if c == E.FIRST_CYCLE else 0)) * 100
+        x['trail'] = min(x['souls'], left[c])
+        left[c] -= x['trail']
+    return days
 
 
 _CD = {}
@@ -246,7 +267,7 @@ def cycle_days(hours):
             out += [(n2 + i + 1,) + rec_day(r, hours) for i, r in enumerate(climb_recs(hours))]
         else:
             out = [(d,) + day_of(lv, d, hours) for d in range(1, n2 + CYCLE_LEN[3] + 1)]
-        _CD[hours] = out
+        _CD[hours] = trail_sink(out)
     return _CD[hours]
 
 

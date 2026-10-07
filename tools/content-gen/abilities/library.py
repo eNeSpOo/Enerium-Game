@@ -516,6 +516,41 @@ FARM = {
 }
 
 
+# ---------------- черты врагов: ответ на связки героев (ADR-0051) ----------------
+# Именным врагам — по черте: элита, боссы, рунные стражи, Уберы и Пробуждённые; рядовые остаются простыми. Черта отвечает на связки
+# героев: снять с себя дебафф или урон по времени, наказать за контроль, сломать чужую синергию. Собрана из примитивов ядра
+# (design/ui/battle.js: shed, ccd с floor, debuffed с ctrl, nthBasic с then: dispel — и прежние dotReduce, lifesteal, реакции на удар,
+# крит и ульту). Кому какая черта — данные врагов: биомы — biomes/data/*.js, Мастерская — assign.py (FOE_TRAIT), Эхо — echo/build.js.
+# Описание — тем же сборщиком и по тем же законам О1–О4, что у героев (ADR-0052): шаблоны без цифр, числа — из данных записи.
+# Карточка врага говорит о нём «он», о противнике — «герой»: событие реакции — словами врага, TRIG_TPL_FOE; поле when — чьё событие
+# назвать в тексте, если оно не совпадает с ключом ядра (контроль ядро приносит событием debuffed с полем ctrl).
+# passive — (название, что делает — шаблон, данные); reaction — (событие ядра, название, что делает — шаблон, данные). Числа — демонстрация.
+FOE_SET = "Черты врагов"
+TRIG_TPL_FOE = {
+    "hit": "его бьют", "debuffed": "на него накладывают дебафф", "ctrled": "на него накладывают контроль",
+    "ccd": "он начинает свой ход под контролем", "critTaken": "по нему проходит крит", "foeUlt": "герой применяет ульту",
+}
+FOE_TRAITS = {
+    "passive": [
+        ("Стряхнуть порчу", "Каждый {every:om} свой ход начинает с того, что снимает с себя один дебафф.", {"pas": "shed", "what": "debuff", "every": 2}),
+        ("Сбить пламя", "Каждый {every:om} свой ход начинает с того, что сбрасывает с себя весь урон по времени — со всеми стаками.",
+         {"pas": "shed", "what": "dot", "every": 3}),
+        ("Дублёная шкура", "Урон по времени по нему слабее на {pct} %.", {"pas": "dotReduce", "pct": 40}),
+        ("Срыв покрова", "Каждая {every:of} его обычная атака срывает с цели щит и всё лечение по времени.", {"pas": "nthBasic", "every": 3, "then": "dispel"}),
+        ("Ненасытность", "{pct} % нанесённого им урона лечат его самого.", {"pas": "lifesteal", "pct": 10}),
+    ],
+    "reaction": [
+        ("ccd", "Ярость скованного", "Каждый раз, когда {when}, он злится: до конца этажа наносит на {pow:bp} % больше урона — и так до +{cap:bp} %.",
+         {"st": "dmgUp", "pow": 1500, "cap": 6000, "floor": True}),
+        ("debuffed", "Зеркало воли", "Когда {when}, есть шанс, что тот не ляжет, а вернётся наложившему.", {"when": "ctrled", "ch": 2500, "ctrl": True, "reflect": True}),
+        ("debuffed", "Глухая оборона", "Когда {when}, есть шанс, что тот не ляжет.", {"ch": 3000}),
+        ("hit", "Ответный выпад", "Когда {when}, есть шанс ответить обычной атакой.", {"ch": 2000, "then": "counter"}),
+        ("critTaken", "Каменный лоб", "Когда {when}, тот наносит на {pct} % меньше урона.", {"pct": 40}),
+        ("foeUlt", "Мимо бури", "Когда {when}, есть шанс уклониться от неё целиком.", {"ch": 3000, "dodge": True}),
+    ],
+}
+
+
 # ---------------- сборка ----------------
 def plural(n, one, few, many):
     n10, n100 = abs(n) % 10, abs(n) % 100
@@ -871,9 +906,10 @@ def unproved(text):
     return sorted(fx.n for fx in FX.values() if re.search(fx.stems, low) and not re.search(fx.proof, low))
 
 
-# кого берёт способность — по правилу цели и числу целей: «на кого» у эффектов и «кому» у баффов
+# кого берёт способность — по правилу цели и числу целей: «на кого» у эффектов и «кому» у баффов. Правило «самый готовый» (danger, §5.3)
+# названо прямо: кто ходит раньше всех из ещё не ходивших — «ходит следующим»; слов «самый опасный» в описаниях нет (ADR-0052)
 WHO = {("all", None): "на всех врагов", ("threat", 3): "на трёх врагов", ("threat", 2): "на двух врагов", ("threat", 1): "на цель",
-       ("danger", 2): "на двух самых опасных врагов", ("danger", 1): "на самого опасного врага",
+       ("danger", 2): "на двух врагов, которые ходят следующими", ("danger", 1): "на врага, который ходит следующим",
        ("allies", None): "на всех своих", ("ally_lowest", 3): "на троих самых раненых", ("ally_lowest", 1): "на самого раненого"}
 WHOM = {("allies", None): "всему отряду", ("ally_strong", 2): "двум самым сильным союзникам", ("ally_lowest", 2): "двум самым раненым союзникам",
         ("ally_strong", 1): "самому сильному союзнику", ("ally_lowest", 1): "самому раненому союзнику"}
@@ -1026,6 +1062,26 @@ def build_farm():
         add("active", {"id": f"фарм.act.{len(f['active']) + 1}", "n": name, "set": "Фарм", "kind": "farm", "tier": tier, "ch": CH, "d": None, **fields}, text)
     for name, text, fields in FARM["ult"]:
         add("ult", {"id": f"фарм.ult.{len(f['ult']) + 1}", "n": name, "set": "Фарм", "kind": "farm", "ult": True, "ch": ULT_CH, "d": None, **fields}, text)
+    return f
+
+
+def build_foe_traits():
+    """Черты врагов (ADR-0051): пассивки и реакции набора FOE_SET. Законы те же, что у наборов героев: О4 — у реакции сказано, когда она
+    срабатывает; событие — словами врага (TRIG_TPL_FOE), поле whenFoe уходит в подпись плитки UI-кита."""
+    f = {"passive": [], "reaction": []}
+    for name, text, fields in FOE_TRAITS["passive"]:
+        p = {"id": f"враг.pas.{len(f['passive']) + 1}", "n": name, "set": FOE_SET, "kind": "passive", "d": None, **fields}
+        p["d"] = done(p["id"], fmt(tpl(text, f"черта врага «{name}»"), FOE_SET, p).rstrip("."))
+        f["passive"].append(p)
+    for trig, name, text, fields in FOE_TRAITS["reaction"]:
+        assert trig in TRIG, trig
+        fields = dict(fields)
+        when = TRIG_TPL_FOE[fields.pop("when", trig)]
+        if "{when}" not in text:
+            raise LawError(f"О4: «{name}» — в описании черты врага не сказано, когда она срабатывает: «{text}»")
+        r = {"id": f"враг.react.{len(f['reaction']) + 1}", "n": name, "set": FOE_SET, "kind": "reaction", "trig": trig, "d": None, "whenFoe": when, **fields}
+        r["d"] = done(r["id"], fmt(tpl(text, f"черта врага «{name}»"), FOE_SET, r, when=when).rstrip("."))
+        f["reaction"].append(r)
     return f
 
 
@@ -1305,7 +1361,7 @@ def laws(every):
     О3 — описание не длиннее DESC_MAX знаков и без служебных знаков. Возвращает нарушения. О4 — у реакции сказано, когда она
     срабатывает — сверяет build_set, пока собирает запись."""
     bad = []
-    for where, text in TEMPLATES + [(f"событие «{k}»", v) for k, v in TRIG_TPL.items()]:
+    for where, text in TEMPLATES + [(f"событие «{k}»", v) for k, v in TRIG_TPL.items()] + [(f"событие врага «{k}»", v) for k, v in TRIG_TPL_FOE.items()]:
         if re.search(r"\d", re.sub(r"\{[^{}]*\}", "", text)):
             bad.append(f"О2: цифра в шаблоне — числа описания только из данных: {where}: «{text}»")
     for fx in FX.values():   # словарь сходится сам с собой: название эффекта видно по его основам, его объяснения проходят свой образец
@@ -1354,9 +1410,12 @@ def build():
            "sets": {name: build_set(name, S) for name, S in SETS.items()}, "farm": build_farm()}
     lib["combos"] = build_combos(lib)
     lib["tags"] = tag_all(lib)
+    lib["foeTraits"] = build_foe_traits()   # черты врагов (ADR-0051): героям не раздаются — меток связок у них нет
+    lib["rules"]["foeSet"] = FOE_SET
     every = [x for s in lib["sets"].values() for part in ("active", "ult", "passive", "reaction") for x in s[part]]
     every += [x for part in ("passive", "active", "ult") for x in lib["farm"][part]]
     every += [x for part in ("active", "ult") for x in lib["combos"][part]]
+    every += [x for part in ("passive", "reaction") for x in lib["foeTraits"][part]]
     bad = laws(every)
     if bad:
         raise LawError("\n".join(bad))
@@ -1398,7 +1457,9 @@ def write_md(lib, every):
       f"из пассивок {plural(n_new, 'новая черта', 'новые черты', 'новых черт')} (ADR-0050);")
     A(f"- сочетания: {plural(len(combos['active']), 'активное', 'активных', 'активных')} и {plural(len(combos['ult']), 'ульта', 'ульты', 'ульт')} — способность из двух (ADR-0050);")
     A(f"- фарм: {plural(len(farm['passive']), 'пассивка', 'пассивки', 'пассивок')}, "
-      f"{plural(len(farm['active']), 'активная', 'активные', 'активных')} и {plural(len(farm['ult']), 'ульта', 'ульты', 'ульт')}.")
+      f"{plural(len(farm['active']), 'активная', 'активные', 'активных')} и {plural(len(farm['ult']), 'ульта', 'ульты', 'ульт')};")
+    A(f"- черты врагов: {plural(len(lib['foeTraits']['passive']), 'пассивка', 'пассивки', 'пассивок')} и "
+      f"{plural(len(lib['foeTraits']['reaction']), 'реакция', 'реакции', 'реакций')} — ответ именных врагов на связки героев (ADR-0051).")
     A("")
     A("Наборы героев — `docs/content/распределение-способностей.md`.")
     A("")
@@ -1520,6 +1581,26 @@ def write_md(lib, every):
                     "dotLeft": "`dotLeft` — был в ядре"}.get(p_["pas"]) or ("`dmgVsDebuff` с `party` — на весь отряд" if p_.get("party") else "`dmgVsDebuff` с `ctrl` — цель под любым контролем")
             A(f"| {p_['n']} | {sname} | {p_['d']} | {prim} |")
     A("")
+    foe = lib["foeTraits"]
+    A("## Черты врагов (ADR-0051)")
+    A("")
+    A("Именным врагам — по черте: элита, боссы, рунные стражи, Уберы и Пробуждённые; рядовые остаются простыми. Черта отвечает на связки героев: "
+      "снять с себя дебафф или урон по времени, наказать за контроль, сломать чужую синергию. Героям эти записи не раздаются. "
+      "Кому какая черта — данные врагов: `tools/content-gen/biomes/data/`, `tools/content-gen/echo/`, Мастерская форм — `assign.py`. "
+      "Шанс реакции — как у героев: у босса — как у эпического героя, у прочих рангов — по их доле способностей.")
+    A("")
+    A("| Черта | Вид | Что делает | Примитив ядра |")
+    A("|---|---|---|---|")
+    prim_foe = {"shed": "`shed` — каждый N-й свой ход снять с себя", "dotReduce": "`dotReduce` — был в ядре", "lifesteal": "`lifesteal` — был в ядре",
+                "nthBasic": "`nthBasic` с `then: dispel` — каждая N-я обычная атака"}
+    for p_ in foe["passive"]:
+        A(f"| {p_['n']} | пассивка | {p_['d']} | {prim_foe[p_['pas']]} |")
+    for r_ in foe["reaction"]:
+        prim = ("`ccd` с `floor` — ход под контролем копит эффект до конца этажа" if r_["trig"] == "ccd"
+                else "`debuffed` с `ctrl` — контроль возвращается наложившему" if r_.get("ctrl") else f"`{r_['trig']}` — было в ядре")
+        chance = f" Шанс у босса — {r_['ch'] // 100} %." if r_.get("ch") else ""
+        A(f"| {r_['n']} | реакция | {r_['d']}{chance} | {prim} |")
+    A("")
     A("## Фарм")
     A("")
     A("Общий набор для фарм-героев. Бонусы нескольких фарм-героев в отряде складываются: отряд платит за них уроном или другим свойством. "
@@ -1563,7 +1644,7 @@ def write_md(lib, every):
 
 
 # ---------------- выгрузка в UI-кит ----------------
-UI_SKIP = {"id", "n", "set", "kind", "tier", "twist", "d", "src", "trig", "two"}
+UI_SKIP = {"id", "n", "set", "kind", "tier", "twist", "d", "src", "trig", "two", "whenFoe"}
 
 
 def ui_num(x):
@@ -1586,7 +1667,7 @@ def ui_num(x):
     if k in ("ctrl", "debuff", "buff"):
         return f"{rounds(left)}{grp}"
     if k == "reaction":
-        return "когда " + TRIG[x["trig"]]
+        return "когда " + (_nb_trig(x["whenFoe"]) if x.get("whenFoe") else TRIG[x["trig"]])   # у черты врага событие — его словами
     if k == "farm":
         return "ульта" if x.get("ult") else "активка"
     return "пассивка"
@@ -1611,16 +1692,20 @@ def write_ui(lib, every):
     # девятый набор UI-кита — сочетания (ADR-0050): set записи — школа первой части (по ней ядро ищет связки школы), parts — из чего она
     sets.append({"n": COMBO_SET, "eff": None, "combo": True,
                  "items": [ui_item(x, typ) for part, typ in (("active", "act"), ("ult", "ult")) for x in lib["combos"][part]]})
+    # набор «Черты врагов» (ADR-0051): пассивки и реакции именных врагов; героям не раздаются — foe: true
+    sets.append({"n": FOE_SET, "eff": None, "foe": True,
+                 "items": [ui_item(x, typ) for part, typ in (("passive", "pas"), ("reaction", "react")) for x in lib["foeTraits"][part]]})
     # словарь эффектов для экранов (ADR-0052): имя, что это коротко, определение с числами набора и шаблон объяснения с числами ядра
     fx = {k: {f: v[f] for f in ("n", "school", "kind", "gloss", "t", "base", "def") if f in v} for k, v in lib["fx"].items()}
     data = {"total": len(every), "sets": sets,
             "kinds": {**KIND_NAME, "passive": "Пассивка", "reaction": "Реакция", "farm": "Фарм"},
             "tiers": {**TIER_NAME, "self": "На этаж"}, "triggers": TRIG, "fx": fx,
             "rules": {"ch": CH, "ctrlCh": CTRL_CH, "ultCh": ULT_CH, "ultPow": ULT_POW, "capBp": 6000, "farmStacks": True, "trigPct": TRIG_PCT,
-                      "basePas": BASE_PAS, "comboPct": COMBO_PCT, "comboSet": COMBO_SET, "descMax": DESC_MAX}}
+                      "basePas": BASE_PAS, "comboPct": COMBO_PCT, "comboSet": COMBO_SET, "foeSet": FOE_SET, "descMax": DESC_MAX}}
     emit(OUT_UI, "/* Собрано tools/content-gen/abilities/library.py — библиотека способностей по ADR-0015, ADR-0050 и ADR-0052. Руками не править.\n"
                       "   Черновик: номер — строка таблицы автора (имя могло смениться по лору 01.10.2026), остальные названия автор принял как рабочие; числа — демонстрация.\n"
                       "   Набор «Сочетания» (ADR-0050): запись — способность из двух, data.parts — id частей, data.also — вторая часть, set — школа первой части.\n"
+                      "   Набор «Черты врагов» (ADR-0051, foe: true): пассивки и реакции именных врагов — ответ на связки героев; героям не раздаются.\n"
                       "   Описания d (ADR-0052) объясняют эффекты; fx — словарь эффектов по ключу ядра: n — название, gloss — что это коротко, def — определение,\n"
                       "   t — шаблон объяснения контроля, дебаффа и баффа: {p} — сила в процентах, {b} — порог удара, {e} — уклонение в процентах;\n"
                       "   часть шаблона в квадратных скобках — только если у эффекта есть её число; base — числа эффекта набора. */\n"

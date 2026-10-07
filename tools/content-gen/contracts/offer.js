@@ -92,6 +92,19 @@ const points = (D, tasks) => tasks.reduce((a, x) => a + D.rules.points[x.r - 1],
 /* самое редкое задание пула — «редкость контракта» для цвета и сундука */
 const topRarity = tasks => tasks.reduce((a, x) => Math.max(a, x.r), 0);
 
+/* клановые ступени рейтинга контрактов (§18.1, ADR-0042, ADR-0047): клан складывает очки контрактов участников по долям первой личной
+   планки их цикла, все — в очках цикла to, того, кто смотрит. Ступень k — участников × ⌊первая личная планка цикла to × x[k] / per⌋:
+   как у клановых планок Эхо и Событий. n — участников в счёте клана; нет данных — пусто */
+function clanPlanks(D, n, to) {
+  const p = (D.planks[to] || [])[0] || 0, C = D.clan;
+  return C && p ? C.x.map(x => n * Math.floor(p * x / C.per)) : [];
+}
+/* очки участника цикла from — в очках цикла to, по первым личным планкам: взяли одинаково планок — принесли клану поровну (ADR-0042) */
+function clanPts(D, pts, from, to) {
+  const a = (D.planks[from] || [])[0] || 0, b = (D.planks[to] || [])[0] || 0;
+  return a && b ? Math.floor(pts * b / a) : 0;
+}
+
 /* какие именно ресурсы: n штук из списка на сиде выдачи — по броску на штуку */
 function pickItems(seedStr, n, list) {
   const out = {};
@@ -101,7 +114,7 @@ function pickItems(seedStr, n, list) {
   return out;
 }
 
-const api = { mix32, seedOf, makeRng, taskSeed, eligible, rollTask, offer, reroll, reward, stake, points, topRarity, pickItems };
+const api = { mix32, seedOf, makeRng, taskSeed, eligible, rollTask, offer, reroll, reward, stake, points, topRarity, pickItems, clanPlanks, clanPts };
 if (typeof module !== 'undefined' && module.exports) module.exports = api;
 if (root) root.EnContracts = api;
 })(typeof window !== 'undefined' ? window : null);

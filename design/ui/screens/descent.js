@@ -8,7 +8,8 @@
    - фон во всё окно — арт биома (DS_DATA.art: задание tools/art-gen/jobs/descent-backdrops.json, выгрузка tools/art-gen/export_ui.py),
      поверх — частицы биома и тень под интерфейс. Смена биома — плавная: прежний фон гаснет поверх нового. Отрисовка сама замечает,
      что биом другой, — кто бы его ни сменил: нажатие, сценарий, «Ещё забег», обёртка screens/echo.js;
-   - слева — путь вниз: в шапке — слоты биомов (камни: занято N из M, забеги и руины делят одни слоты); циклы — строкой «Цикл N»,
+   - слева — путь вниз: в шапке — слоты биомов (камни: занято N из M, забеги и руины делят одни слоты; слот даёт артефакт активных
+     биомов «Знак открытых троп» — нажатие ведёт к его листу, ADR-0054); циклы — строкой «Цикл N»,
      биом — медальон с картиной биома, имя и состояние; нераскрытая глубина — одной строкой; у биома, где идёт забег, — огонёк;
    - сверху — строка места, название, цитата и метка состояния биома: рубеж спуска, пройден, закрыт;
    - под названием — путь внутри биома тремя камнями на одной нити: этажи (и где кончился прошлый забег), босс биома (стоит · осада N %
@@ -16,13 +17,14 @@
      в строке · пройден). Страж ещё за боссом — входа нет. Этажи, осада и страж — вариант биома по циклу аккаунта (EB.atCycle,
      screens/biomes.js): окно читает EB.BIOMES при отрисовке;
    - снизу — бестиарий («Изучено N из M» и полоса) и одно главное действие: «Начать забег» с отрядом спуска и его мощью; идут забеги
-     в этом биоме — «К бою» и «Ещё отряд»; заняты все слоты биомов — кнопка закрыта и говорит почему;
+     в этом биоме — «К бою» и «Ещё отряд»; заняты все слоты биомов — кнопка закрыта и говорит почему; артефакт активных биомов ещё
+     не куплен — активного биома нет: главное действие — купить его (операция WN_SRV.buy с номером, screens/wanderer.js);
    - лист «Отряд для спуска» (OV.prep, screens/heroes.js) — в материале окна: картина биома, слоты биомов, та же главная кнопка, на ней —
      мощь тех, кто пойдёт; карты отряда и стихии зала — рядом, без прокрутки (descent.css);
    - бестиарий биома — лист OV.dsbest: обитатели по полкам (BIOME_UI.shelf) и путь вниз; карточка — OV.foe с возвратом к списку;
      вся книга — Летопись (ACT.lorego). Портретов обитателей в самом окне нет.
    Сервер решает, клиент показывает: вход к стражу — GD_SRV (index.html, операция с номером), забег — startRun, слоты — обёртка
-   startRun в screens/echo.js; здесь только показ.
+   startRun в screens/echo.js, сколько их — EN_TRAIL (screens/wanderer.js: артефакт активных биомов и пассивка Памяти); здесь только показ.
    Частицы — показ, а не расчёт: раскладка — генератор ядра EB.makeRng на сиде биома (при каждой отрисовке та же), числа — целые,
    в данных DS_FX и DS_KIND; движение — только transform и opacity (CSS); prefers-reduced-motion — частиц нет, фон не плывёт.
    Тексты зала и итога — BIOME_UI (index.html; биомы 2–4 кладёт screens/biomes.js), обитатели — bioFoes (index.html).
@@ -96,15 +98,34 @@ function dsEm(k, cls = '') {
   const [ico, svg] = DS_DATA.ico[k] || [k, k], p = typeof shlIco === 'function' ? shlIco(ico) : '';
   return `<i class="ds-em${cls ? ' ' + cls : ''}" aria-hidden="true">${p ? `<img src="${AV(p)}" alt="" draggable="false">` : ic(svg)}</i>`;
 }
-/* слоты биомов: забеги и руины делят одни слоты (screens/echo.js, EN_ECHO.bio — по одному на цикл); без Эхо — слотов не показываем */
+/* слоты биомов — активные биомы (§5.6, ADR-0054): слот даёт артефакт активных биомов «Знак открытых троп» (EN_TRAIL,
+   screens/wanderer.js): без него активного биома нет (none), покупка открывает один, уровень — ещё один; забеги и руины делят одни
+   слоты — сколько занято, знает screens/echo.js (EN_ECHO.bio). Нет ни артефактов, ни Эхо — слотов не показываем */
 function dsSlots() {
   const B = window.EN_ECHO && typeof EN_ECHO.bio === 'function' ? EN_ECHO.bio() : null;
-  if (!B || !B.cap) return null;
-  return { cap: B.cap, used: B.used, full: B.used >= B.cap };
+  const T = typeof window.EN_TRAIL === 'function' && window.EN_WANDERER ? EN_TRAIL(S) : null;
+  if (!B && !T) return null;
+  const cap = T ? T.slots : B.cap, used = B ? B.used : S.runs.filter(r => !r.over && !r.scene).length;
+  if (!T && !cap) return null;
+  return { cap, used, full: used >= cap, none: cap < 1, art: T && T.art ? T.art : null, lv: T ? T.lv : -1 };
 }
-const dsSlotsWhy = s => `Слоты биомов: занято ${s.used} из ${s.cap} — забеги и руины делят одни слоты`;
-const dsSlotsHtml = s => !s ? '' : `<span class="ds-slots${s.full ? ' full' : ''}" title="${dsSlotsWhy(s)}" aria-label="${dsSlotsWhy(s)}">`
-  + `<span class="ds-pips" aria-hidden="true">${Array.from({ length: s.cap }, (_, i) => `<i${i < s.used ? ' class="on"' : ''}></i>`).join('')}</span><span class="num"><b>${Math.min(s.used, s.cap)}</b>/${s.cap}</span></span>`;
+const dsSlotsWhy = s => (s.none ? `Активных биомов нет: первый открывает${s.art ? ` «${s.art.n}»` : ' артефакт активных биомов'}`
+  : `Слоты биомов: занято ${s.used} из ${s.cap} — забеги и руины делят одни слоты${s.art ? `; слоты даёт «${s.art.n}»` : ''}`);
+/* камни слотов — нажатие ведёт к листу артефакта активных биомов: там покупка и следующий уровень (plain — без перехода: в листе
+   отряда, где свой лист уже открыт); без данных артефакта — просто показ. Разметка — <span class="ds-slots…">: договор с проверками */
+const dsSlotsHtml = (s, plain) => { if (!s) return '';
+  const go = s.art && !plain ? ` role="button" tabindex="0" data-a="sheet" data-v="wnart:${s.art.id}"` : '';
+  return `<span class="ds-slots${s.none ? ' none' : s.full ? ' full' : ''}"${go} title="${dsEsc(dsSlotsWhy(s))}" aria-label="${dsEsc(dsSlotsWhy(s))}">`
+    + (s.none ? `${ic('lock')}<span class="num"><b>0</b></span>` : `<span class="ds-pips" aria-hidden="true">${Array.from({ length: s.cap }, (_, i) => `<i${i < s.used ? ' class="on"' : ''}></i>`).join('')}</span><span class="num"><b>${Math.min(s.used, s.cap)}</b>/${s.cap}</span>`)
+    + `</span>`; };
+/* активного биома нет — главное действие окна: купить артефакт активных биомов. Покупка — операция «сервера» WN_SRV.buy с номером
+   (screens/wanderer.js): повтор номера ничего не покупает; не хватает золота — кнопка закрыта и говорит сколько нужно */
+function dsTrailBuy(s) {
+  const a = s.art; if (!a || typeof wnOp !== 'function') return `<div class="ds-go"><span class="reason warn">${dsSlotsWhy(s)}</span><button class="btn go big" disabled>${ic('lock')}Начать забег</button></div>`;
+  const lack = S.wallet.gold < a.gold;
+  return `<div class="ds-go ds-trail"><span class="reason${lack ? ' warn' : ''}">${lack ? `Не хватает золота: нужно ${fmt(a.gold)}, есть ${fmt(S.wallet.gold)}` : `Активных биомов нет. «${dsEsc(a.n)}» откроет один`}</span>`
+    + `<button class="btn go big" data-a="wnbuy" data-v="${a.id}:${wnOp()}"${lack ? ' disabled' : ''} aria-label="Купить «${dsEsc(a.n)}»: ${fmt(a.gold)} золота">${ic('crown')}Купить артефакт${costTag('gold', a.gold)}</button></div>`;
+}
 /* сцена окна: фон, его кадр, свет и частицы — биома или нейтральная (руина, биом без данных) */
 function dsStage(id, ruin) {
   if (ruin) return { key: 'ruin', url: '', pos: '', tone: DS_DATA.plain, fx: 'plain' };
@@ -215,6 +236,7 @@ function dsSquad() {
 function dsGo(b) {
   const live = dsLive(b.id), sl = dsSlots(), full = !!(sl && sl.full);
   if (b.state === 'lock' && !KH.team) return `<div class="ds-go"><span class="reason">Откроется после рунного стража</span><button class="btn go big" disabled>${ic('lock')}Начать забег</button></div>`;
+  if (sl && sl.none && !live.length) return dsTrailBuy(sl);   // активного биома нет — сначала артефакт активных биомов (ADR-0054)
   if (!live.length) {
     if (full) return `<div class="ds-go"><span class="reason warn">${dsSlotsWhy(sl)}</span><button class="btn go big" disabled>${ic('down')}Начать забег</button></div>`;
     return `<div class="ds-go">${dsSquad()}<button class="btn go big" data-a="sheet" data-v="prep">${ic('down')}Начать забег</button></div>`;
@@ -286,7 +308,7 @@ function dsPrepDress(h) {
     .replace('<div class="sheet-h"><h2>', `<div class="sheet-h"><div class="ds-sh-t"><span class="eyebrow">${b ? `${dsEsc(b.name)} · ${DS_DATA.node[b.state] || ''}` : 'Спуск'}</span><h2>`)
     .replace(/<\/h2>(<button class="iconbtn x")/, '</h2></div>$1');
   if (sl) {
-    out = out.replace('<div class="sheet-f">', `<div class="sheet-f">${dsSlotsHtml(sl)}`);
+    out = out.replace('<div class="sheet-f">', `<div class="sheet-f">${dsSlotsHtml(sl, true)}`);
     if (sl.full) out = out.replace(/<button class="btn go" data-a="start"[^>]*>/, m => m.replace('data-a="start"', `data-a="start" disabled title="${dsSlotsWhy(sl)}"`));
   }
   /* мощь тех, кто пойдёт, — второй строкой главной кнопки */
@@ -367,6 +389,7 @@ const dsDone = s => { for (const b of s.biomes || []) if (b.state === 'done' && 
 
 /* ================== UI-кит · окно «Спуск» ================== */
 function dsKitHtml() {
+  const trail = window.EN_WANDERER ? EN_WANDERER.art.list.find(a => a.id === EN_WANDERER.art.rules.trail) : null;   // артефакт активных биомов — из данных
   const bs = S.biomes.filter(b => BIOME_UI[b.id] && EB.BIOMES[b.id] && EB.BIOMES[b.id].guard);
   const fxOf = id => (DS_FX[id] || DS_FX.plain).map(([k, q]) => `${DS_KIND[k].n} · ${q}`).join(', ');
   const cell = b => `<figure class="ds-kit-f"><div class="ds-kit-cell"><div class="g ds-kit-g"><div class="g-main">${dsHtml(b, { kit: true })}</div></div></div>
@@ -376,6 +399,7 @@ function dsKitHtml() {
     ['Главное действие', `<span class="ds-sq"><b>Отряд I</b>${ICON('power', 15, 'Боевая мощь')}<span class="num">${fmt(345760)}</span></span><button class="btn go big" type="button">${ic('down')}Начать забег</button>`],
     ['Идёт забег', `<span class="ds-live">${ic('users')}Забег идёт · этаж ${DS_VIEW.kitFloor}</span><div class="row"><button class="btn" type="button">${ic('plus')}Ещё отряд</button><button class="btn go big" type="button">${ic('eye')}К бою</button></div>`],
     ['Слоты биомов заняты', `<span class="reason warn">${dsSlotsWhy({ used: 2, cap: 2 })}</span><button class="btn go big" type="button" disabled>${ic('down')}Начать забег</button>`],
+    ...(trail ? [['Активного биома нет', `<span class="reason">Активных биомов нет. «${dsEsc(trail.n)}» откроет один</span><button class="btn go big" type="button">${ic('crown')}Купить артефакт${costTag('gold', trail.gold)}</button>`]] : []),
   ].map(([t, h]) => `<figure><div class="ds-kit-act"><div class="ds-go">${h}</div></div><figcaption>${t}</figcaption></figure>`).join('');
   const D0 = EB.RULES.drop && EB.RULES.drop.b, kk = D0 && D0.runeKeyBp ? dsKeyNote({ n: 2, bp: D0.runeKeyBp }) : '';
   const steps = [['fl', 'floors', '35', 'этажей', 'прошлый забег — стена на 27-м'], ['up', 'boss', 'стоит', 'босс биома', kk], ['siege', 'boss', 'осада 42 %', 'босс биома', bar(42, 'ds-sg')],

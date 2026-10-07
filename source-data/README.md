@@ -45,7 +45,7 @@ python tools/content-gen/tables/build.py --check   # только провери
 - III — слабые, почти незаметные намёки;
 - IV — заметнее, но всё ещё намёки;
 - V — намёки очевиднее, прямого раскрытия §38 нет;
-- VI — только для команды.
+- VI — раскрытие: игрок получает его в игре, в цикле VI; раньше — нет (ADR-0054).
 
 Проверка — `node tools/content-gen/tables/check_spoilers.js`, слова — `tools/content-gen/lore/ladder.js`. Переименования этого дня — `docs/content/переименования-2026-10-01.md`.
 

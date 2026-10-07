@@ -261,7 +261,11 @@ run('вещи вкладок', () => {
   W.art.list.forEach((a, i) => { const c = cards[i] || ''; if (!c.includes(`src="${T.AV(T.WN_ART.relic.replace('{id}', a.id))}"`)) say(`витрина ${a.id}: не вещь своего артефакта`); });
   ok('«Артефакты»: нет таблички «Реликварий»', /<h2 class="wn-plt">Реликварий<span class="num">\d+ \/ \d+<\/span><\/h2>/.test(h));
   T.S.acc.level = W.art.rules.openLevel - 1; h = view('Артефакты · закрыто');
-  ok('реликварий до открытия: нет вещи под покрывалом', /class="col wn-arts wn-shut"><span class="wn-relic"><img src="[^"]*chambers\/art-lock\.webp/.test(h));
+  /* до общего уровня артефактов в реликварии — только те, что продаются раньше: артефакт активных биомов открыт с первого уровня
+     Странника (ADR-0054); об остальных — строка; нет ранних — вещь под покрывалом */
+  const early = W.art.list.filter(a => Number.isInteger(a.open) && a.open <= T.S.acc.level), shown = h.split('<div class="wn-art').slice(1);
+  if (early.length) ok('реликварий до открытия: в витрине не только ранние артефакты или нет строки об остальных', shown.length === early.length && early.every((a, i) => shown[i].includes(a.id)) && /Остальные артефакты откроются на \d+-м уровне Странника/.test(h));
+  else ok('реликварий до открытия: нет вещи под покрывалом', /class="col wn-arts wn-shut"><span class="wn-relic"><img src="[^"]*chambers\/art-lock\.webp/.test(h));
   fresh(); T.S.seg.profile = 'ach';
   for (const cat of ['pers', 'rev', 'myst', 'first']) {
     T.S.seg.wnach = cat; h = view(`Достижения · ${cat}`);

@@ -1756,7 +1756,7 @@
         241
       ]
     },
-    "bframes/forgotten.png": {
+    "bframes/awakened.png": {
       "from": "battle-frames/bf-forgotten-fix__nb2.bf.png",
       "size": [
         320,
@@ -4354,21 +4354,21 @@
         361
       ]
     },
-    "bframes-sq/forgotten.png": {
+    "bframes-sq/awakened.png": {
       "from": "battle-frames-square/bfs-forgotten__nb2.body.png",
       "size": [
         200,
         243
       ]
     },
-    "bframes-sq/forgotten-crest.png": {
+    "bframes-sq/awakened-crest.png": {
       "from": "battle-frames-square/bfs-forgotten__nb2.crest.png",
       "size": [
         298,
         72
       ]
     },
-    "bframes-sq/forgotten-full.png": {
+    "bframes-sq/awakened-full.png": {
       "from": "battle-frames-square/bfs-forgotten__nb2.bf.png",
       "size": [
         320,

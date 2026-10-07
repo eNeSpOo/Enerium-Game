@@ -66,7 +66,9 @@ const CL = {
   boss: { circle: 4, killsIn: 2, leftBp: 900, days: 4,
     spread: [50, 100],                   // урон демо-недели по участникам: вес × (50 + случай до 100)
     onLast: [['m2', 5], ['m3', 3], ['m4', 2]] },   // кто и в какой доле уже бил третью элиту круга
-  past: { pts: 5400 },                  // прошлая неделя — первая неделя клана: одиннадцать основателей, очки — по весам урона участников
+  /* прошлая неделя — первая неделя клана: взято пять кругов — первая клановая ступень (ADR-0047); очки — сумма очков пяти кругов,
+     по весам урона участников. Клан вне топа: его пул — сундуки клановой ступени, а не места */
+  past: { pts: 7378, circles: 5 },
   apps: [['Быстрый лис', 21, 2, 'Играю вечером, босса бью каждый день.'], ['Каменная ива', 33, 3, '']],
   /* журнал: дней назад, вид, текст — события до сессии; новые пишет сервер */
   log: [
@@ -94,7 +96,7 @@ const CL = {
   day: 86400,                            // секунд в сутках
 };
 /* вид; значки веток и видов древа — только облик карточек выбора, чисел в них нет */
-const CL_VIEW = { knot: 18, knotBig: 24, face: 40, list: 12, logShow: 40, planMax: 99,
+const CL_VIEW = { knot: 18, knotBig: 24, face: 40, list: 12, logShow: 40, planMax: 99, chest: 24, chestRow: 28,
   brIcon: { power: 'sword', loot: 'gem', growth: 'up', clan: 'users' },
   kindIcon: { kbBoss: 'crown', kbElite: 'sword', kbPool: 'users', kbRound: 'hour', kbCarry: 'flag', kbHp: 'heal', kbLeech: 'drop', kbRetinue: 'cut', kbEdge: 'spark',
     hp: 'heal', hpCls: 'heal', clanHp: 'heal', shield: 'shield', crit: 'star', keyPower: 'flag', keyLoot: 'gem', keyGrowth: 'up', keyClan: 'drop',
@@ -117,6 +119,8 @@ const ago = h => h <= 0 ? 'в сети' : h < 24 ? `${h} ч назад` : `${Mat
 const dayWord = d => d <= 0 ? 'сегодня' : d === 1 ? 'вчера' : `${d} ${plural(d, 'день', 'дня', 'дней')} назад`;
 const ptsWord = n => plural(n, 'очко', 'очка', 'очков');
 const chestWord = n => plural(n, 'сундук', 'сундука', 'сундуков');
+const circleWord = n => plural(n, 'круг', 'круга', 'кругов');
+const circlesTxt = n => `${n} ${plural(n, 'круг взят', 'круга взято', 'кругов взято')}`;
 const rarName = r => (LB && LB.boxRarity ? LB.boxRarity[r - 1] : RAR[r].toLowerCase());
 const boxName = r => `Сундук талисманов · ${rarName(r)}`;
 const pointsFree = () => Math.max(0, S.clan.earned - S.clan.picks.filter(x => x != null).length);
@@ -148,6 +152,39 @@ const hpBar = x => Math.floor((x.left == null ? x.hp * D.boss.bar / Math.max(1, 
 const ctMine = v => EC.toCycle(D, 'ct', v, D.norm.base, myC());
 /* очки участника в резервуар: своего цикла — как есть; другого — его очки и засчитано, в очках цикла игрока */
 const resTxt = m => { const r = m.resRaw || 0; return m.cyc === myC() ? `${fmt(r)} ${ptsWord(r)}` : `${fmt(r)} ${ptsWord(r)} цикла ${ROMAN[m.cyc]} · засчитано ${fmt(ctMine(m.res))}`; };
+
+/* ================== ступени кланового босса (ADR-0047) ==================
+   Личные — по личным очкам недели (S.clan.boss.mine): порог — множитель строки × EN_CLAN.boss.ladder.plank1, один на все циклы.
+   Клановые — по кругам, взятым кланом за неделю (EnClan.circlesDone): пороги — EN_CLAN.boss.ladder.circles. Множители, сундуки талисманов
+   и полосы циклов — EN_LOOTBOXES.modes.clan. Общий помощник лестницы — EN_WEEK.steps и EN_WEEK.ladderHtml (screens/week.js): он рисует
+   «дорогу» полос; пока его нет — ступени своей полосы из EnLoot.ladder. Личные сундуки «Дары» дают сразу, клановые идут в пул клана:
+   половину делит сервер по вкладу, половину — глава (§24.4) */
+const LAD = D.boss.ladder || null;
+const ladM = () => (LB && LAD ? LB.modes[LAD.mode] : null);
+const ladOn = () => !!(ladM() && window.EnLoot && EnLoot.ladder);
+const ladCyc = (c = S.acc.cycle) => Math.max(ladM() ? ladM().from : D.open.cycle, c);
+const lyClan = () => { const M = ladM(); return M ? M.layers.find(l => l.kind === 'plank' && l.clan) : null; };
+/* личные ступени игрока: { k, band, i, need, pay, reached, cap } — need в личных очках недели */
+function mySteps(pts = S.clan.boss.mine || 0, c = S.acc.cycle) {
+  if (!ladOn()) return [];
+  const W = window.EN_WEEK; let rows = null;
+  if (W && typeof W.steps === 'function') { try { rows = W.steps(LAD.mode, { have: pts, plank1: LAD.plank1, cycle: ladCyc(c) }); } catch (_) { rows = null; } }
+  if (!Array.isArray(rows) || !rows.length) {
+    const all = EnLoot.ladder(LB, LAD.mode, ladCyc(c)).filter(x => x.x != null && !x.cap), band = all.length ? all[0].band : 0;
+    rows = all.filter(x => x.band === band).map(x => ({ k: x.k, band: x.band, i: x.i, need: EC.myNeed(D, x.x), pay: x.pay, cap: false }));
+  }
+  return rows.filter(x => x && Number.isInteger(x.need)).map(x => Object.assign({}, x, { reached: pts >= x.need }));
+}
+/* клановые ступени: { k, need — кругов, pay — на участника, reached } */
+function clanSteps(done = EC.circlesDone(S.clan.boss.circle || 1), c = S.acc.cycle) {
+  const ly = lyClan(); if (!ladOn() || !ly) return [];
+  return ly.rows.filter(r => r.at != null).map((row, i) => ({ k: i + 1, need: row.at, pay: row.cyc[ladCyc(c)] || [], reached: done >= row.at }));
+}
+const payTopR = pay => (pay || []).reduce((a, g) => Math.max(a, g.r), 0);
+const payTxt = pay => (pay || []).map(g => `${g.count > 1 ? g.count + ' × ' : ''}${boxName(g.r)}`).join(', ');
+/* строка ступени в листе: порог, сундук, имя сундуков, состояние */
+const stRow = (x, nx, need, state) => `<div class="cl-st ${x.reached ? 'got' : x === nx ? 'next' : ''}" data-k="${x.k}"><b class="num">${need}</b>${ladChest(x.pay, CL_VIEW.chestRow)}<span class="cl-st-n">${payTxt(x.pay) || '—'}</span>${state || '<span></span>'}</div>`;
+const ladChest = (pay, px, lead) => (pay && pay.length ? `<span class="well itf cl-chest" data-r="${payTopR(pay)}" style="--s:${px}px" title="${esc((lead ? lead + ': ' : '') + payTxt(pay))}">${chestPic(ladM().box, payTopR(pay))}</span>` : '');
 
 /* ================== эмблема и облик врагов — заглушки до арта (tools/art-gen/jobs/clan.json) ================== */
 const EMB = ['M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z', 'M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z',
@@ -246,19 +283,21 @@ function fresh(s) {
   /* прошлая неделя подсчитана: пул, половина сервера роздана, половина главы ждёт */
   const prevRace = prevOf(C.boss.wk), members = C.members.map(m => ({ id: m.id, n: m.n, cyc: m.cyc, res: m.res, resRaw: m.resRaw, boss: 0 })), got = EC.share(CL.past.pts, C.members.map(m => m.w));
   members.forEach((m, j) => { m.boss = got[j]; });
-  C.past = countWeek(C, prevRace, CL.past.pts, members, s.acc.cycle, CL.leaders.past);
+  C.past = countWeek(C, prevRace, CL.past.pts, members, s.acc.cycle, CL.leaders.past, CL.past.circles);
   for (const m of C.members) m.w = undefined;
   return s;
 }
 const raceOf = s => { const W = RS.weeks.find(w => w.gen.toLowerCase() === String(s.week.race).toLowerCase()) || RS.weeks[0]; return W.race; };
 const prevOf = race => { const W = RS.weeks, i = Math.max(0, W.findIndex(w => w.race === race)); return W[(i + W.length - 1) % W.length].race; };
-/* подсчёт недели (сервер): место по очкам, пул сундуков места на каждого участника, половина — по вкладу сразу */
-function countWeek(C, race, pts, members, c, leaders) {
-  const place = placeOf(pts), P = EC.pool(LB, place, pts, members.length, Math.max(D.rewards.from, c));
+/* подсчёт недели (сервер): место по очкам и клановые ступени по кругам done, взятым за неделю (ADR-0047); пул — сундуки места и взятых
+   ступеней на каждого участника, половина — по вкладу сразу. circles — кругов взято, steps — клановых ступеней в пуле.
+   Пула нет (ни ступени, ни места в топе) — раздавать нечего: неделя сразу закрыта, главу раздача не ждёт */
+function countWeek(C, race, pts, members, c, leaders, done) {
+  const place = placeOf(pts), P = EC.pool(LB, place, pts, members.length, Math.max(D.rewards.from, c), done || 0);
   const H = EC.halves(D, P.groups), srv = EC.serverSplit(D, P.groups, members);
   const me = (C.members.find(x => x.me) || { id: '' }).id;   // участник-игрок: его доля в журнале раздачи — для «Даров»
-  return { race, place, pts, me, mine: (members.find(m => m.id === me) || { boss: 0 }).boss, members, row: P.row ? P.row.label : '', groups: H,
-    server: srv.map(g => g.got), plan: H.map(() => ({})), done: false, by: '', auto: false, leaders: (leaders || []).map(x => x.slice()) };
+  return { race, place, pts, circles: done || 0, steps: P.steps, me, mine: (members.find(m => m.id === me) || { boss: 0 }).boss, members, row: P.row ? P.row.label : '', groups: H,
+    server: srv.map(g => g.got), plan: H.map(() => ({})), done: !H.length, by: '', auto: false, leaders: (leaders || []).map(x => x.slice()) };
 }
 /* пустое состояние: игрок без клана — поиск; S.clan держит имя для профиля и кошелёк атак для наблюдателя контрактов */
 function noClan(s, left) {
@@ -272,9 +311,10 @@ function weekEnd(s) {
   const burn = C.boss.targets.filter(x => !x.dead && !x.burned && Object.keys(x.dmg).length);
   if (burn.length) log(C, 'boss', `Неделя кончилась: не добиты ${burn.map(x => nameOf(x)).join(', ')} — их счёт сгорел.`);
   const pts = weekPts(C), members = C.members.map(m => ({ id: m.id, n: m.n, cyc: m.cyc, res: m.res, resRaw: m.resRaw, boss: m.boss }));
-  C.past = countWeek(C, C.boss.wk, pts, members, s.acc.cycle, CL.leaders.now);
-  const P = C.past, total = P.groups.reduce((a, g) => a + g.count, 0);
-  log(C, 'gifts', P.place ? `Неделя ${genOf(P.race)} подсчитана: место ${fmt(P.place)}, ${fmt(pts)} ${ptsWord(pts)}. Пул — ${fmt(total)} ${chestWord(total)}: половину сервер раздал по вкладу, половина ждёт главу.` : `Неделя ${genOf(P.race)} подсчитана: очков нет — наград нет.`);
+  C.past = countWeek(C, C.boss.wk, pts, members, s.acc.cycle, CL.leaders.now, EC.circlesDone(C.boss.circle));
+  const P = C.past, total = P.groups.reduce((a, g) => a + g.count, 0), sum = `место ${P.place ? fmt(P.place) : '—'}, ${fmt(pts)} ${ptsWord(pts)}, ${circlesTxt(P.circles)}`;
+  log(C, 'gifts', total ? `Неделя ${genOf(P.race)} подсчитана: ${sum}. Пул — ${fmt(total)} ${chestWord(total)}: половину сервер раздал по вкладу, половина ждёт главу.`
+    : pts ? `Неделя ${genOf(P.race)} подсчитана: ${sum}. Клановой ступени и места в топе нет — пула нет.` : `Неделя ${genOf(P.race)} подсчитана: очков нет — наград нет.`);
   C.boss.no++; C.boss.wk = raceOf(s); C.boss.circle = 1; C.boss.kills = 0; C.boss.n = 0; C.boss.mine = 0; C.boss.last = null; C.hop = false;
   C.members.forEach(m => { m.res = 0; m.resRaw = 0; m.boss = 0; });
   C.boss.targets = circleTargets(C, 1);
@@ -661,7 +701,12 @@ function bossHtml() {
   else if (boss) main = `<div class="cl-targets one">${tgtCard(boss, true)}</div>`;
   else main = `<div class="cl-targets">${B.targets.filter(x => x.g === 'e').map(x => tgtCard(x)).join('')}</div>`;
   const place = placeOf(weekPts());
-  const foot = `<div class="row cl-bfoot"><button class="cl-mine" data-a="sheet" data-v="clledger"><span class="stat"><b class="num">${fmt(C.boss.mine)}</b><small>ваши очки</small></span><span class="stat"><b class="num">${place ? '#' + fmt(place) : '—'}</b><small>место клана</small></span>${ic('chev')}</button>
+  /* внизу — итог недели одной кнопкой: ваши очки и сундук ближайшей личной ступени, круги клана и сундук ближайшей клановой, место
+     клана; лист — ступени недели (ADR-0047). Без лестницы в данных — прежний лист вклада */
+  const lad = ladOn(), done = EC.circlesDone(B.circle), nxM = lad ? mySteps().find(x => !x.reached) : null, nxC = lad ? clanSteps().find(x => !x.reached) : null;
+  const foot = `<div class="row cl-bfoot"><button class="cl-mine" data-a="sheet" data-v="${lad ? 'clsteps' : 'clledger'}" aria-label="${lad ? 'Ступени недели' : 'Вклад и итоги'}"><span class="stat"><b class="num">${fmt(C.boss.mine)}</b><small>ваши очки</small></span>${nxM ? ladChest(nxM.pay, CL_VIEW.chest, `Личная ступень ${nxM.k} · ${fmt(nxM.need)} ${ptsWord(nxM.need)}`) : ''}
+      ${lad ? `<span class="stat"><b class="num">${done}</b><small>${plural(done, 'круг взят', 'круга взято', 'кругов взято')}</small></span>${nxC ? ladChest(nxC.pay, CL_VIEW.chest, `Клановая ступень ${nxC.k} · ${nxC.need} ${circleWord(nxC.need)}, на участника`) : ''}` : ''}
+      <span class="stat"><b class="num">${place ? '#' + fmt(place) : '—'}</b><small>место клана</small></span>${ic('chev')}</button>
       ${boss ? '' : nextBoss()}${C.hop ? `<span class="chip warn" title="Вы били врагов другого клана на этой неделе">очки клану — со следующей недели</span>` : ''}<span class="g-spacer"></span><button class="link" data-a="sheet" data-v="clrules">Как устроен круг ${ic('chev')}</button></div>`;
   return headRow + main + foot;
 }
@@ -981,7 +1026,29 @@ Object.assign(OV, {
       <div class="cl-list">${top.map(m => `<div class="cl-lrow ${m.me ? 'me' : ''}"><span>${esc(m.n)}<small class="faint"> · цикл ${ROMAN[m.cyc]}</small></span><b class="num">${fmt(m.boss)}</b></div>`).join('')}</div>
       <p class="reason">Каждый бьёт цель в силе своего цикла: урон идёт в общий счёт долей её здоровья, очки за врага у всех одни.</p>
       <p class="reason">${C.hop ? 'На этой неделе вы били врагов другого клана: ваши очки — ваши, клану они пойдут со следующей недели.' : 'Личные очки и их награды от главы не зависят.'}</p>`;
-    return sheet('Вклад и итоги', body, `<button class="link" data-a="sheet" data-v="rank:Клановый босс">Рейтинг ${ic('chev')}</button>`);
+    return sheet('Вклад и итоги', body, `${ladOn() ? `<button class="link" data-a="sheet" data-v="clsteps">Ступени недели ${ic('chev')}</button>` : ''}<button class="link" data-a="sheet" data-v="rank:Клановый босс">Рейтинг ${ic('chev')}</button>`);
+  },
+  /* ступени недели (ADR-0047): личные — по вашим очкам недели, сундуки сразу в «Дарах»; клановые — по кругам, взятым кланом, сундуки
+     на каждого участника — в пул клана. Личную лестницу рисует общий помощник Недели, без него — ступени своей полосы списком */
+  clsteps() {
+    sync(); const C = S.clan; if (!C.in || !ladOn()) return '';
+    const mine = C.boss.mine, done = EC.circlesDone(C.boss.circle), me = mySteps(), cl = clanSteps(), place = placeOf(weekPts());
+    const nM = me.find(x => !x.reached), nC = cl.find(x => !x.reached), inBag = k => typeof darGot === 'function' && darGot(LAD.mode, k);
+    /* оба ряда рисует общий помощник Недели по готовым ступеням: личные — «дорогой» полос (EN_WEEK.ladderHtml), клановые — строками
+       (EN_WEEK.clanHtml); без помощника — свои строки */
+    const W = window.EN_WEEK, by = (f, o) => { if (!W || typeof W[f] !== 'function') return ''; try { const h = W[f](LAD.mode, o); return typeof h === 'string' ? h : ''; } catch (_) { return ''; } };
+    const road = by('ladderHtml', { steps: me, have: mine, cycle: ladCyc() }), rows = by('clanHtml', { steps: cl, have: done });
+    const meHtml = road ? `<div class="cl-lad" data-by="week">${road}</div>` : `<div class="cl-lad" data-by="own"><span class="eyebrow">Личные ступени · взято ${me.filter(x => x.reached).length}</span>${me.map(x => stRow(x, nM, fmt(x.need),
+      x.reached ? `<span class="chip ${inBag(x.k) ? '' : 'spirit'}">${ic('check')}${inBag(x.k) ? 'в запасах' : 'взята'}</span>` : x === nM ? `<span class="faint num">ещё ${fmt(x.need - mine)}</span>` : '')).join('')}</div>`;
+    const clHtml = rows ? `<div class="cl-lad" data-by="week">${rows}</div>` : `<div class="cl-lad" data-by="own"><span class="eyebrow">Клановые ступени: круги · взято ${cl.filter(x => x.reached).length} из ${cl.length}</span>${cl.map(x => stRow(x, nC, `${x.need} ${circleWord(x.need)}`,
+      x.reached ? `<span class="chip spirit">${ic('check')}взята</span>` : x === nC ? `<span class="faint num">ещё ${x.need - done}</span>` : '')).join('')}</div>`;
+    const body = `<div class="row cl-stats"><div class="stat"><b class="num">${fmt(mine)}</b><small>ваши очки</small></div><div class="stat"><b class="num">${done}</b><small>${plural(done, 'круг взят', 'круга взято', 'кругов взято')}</small></div><div class="stat"><b class="num">${place ? '#' + fmt(place) : '—'}</b><small>место клана</small></div></div>
+      ${meHtml}
+      <p class="reason">Личные — по вашим очкам недели: очки приходят, когда цель падёт, по снятому здоровью. Сундуки взятых ступеней ждут в «Дарах» и от главы не зависят.</p>
+      ${clHtml}
+      <p class="reason">Клановые — по кругам: круг взят, когда пал его Хозяин. Сундуки ступени — каждому участнику, в пул клана: после подсчёта недели половину сервер делит по вкладу, половину раздаёт глава.</p>
+      ${TM(`<p class="reason">Первая личная ступень — ${fmt(LAD.plank1)} личных очков недели на своей копии цели, одна на все циклы (EN_CLAN.boss.ladder.plank1, подбор — tools/content-gen/clan/build.js); клановые — круги ${LAD.circles.join(' / ')} (EN_CLAN.boss.ladder.circles). Множители, сундуки и полосы циклов — EN_LOOTBOXES.modes.${LAD.mode}; редкость сундука — по циклу получателя.</p>`, 'div')}`;
+    return sheet('Ступени недели', body, `<button class="link" data-a="sheet" data-v="clledger">Вклад и итоги ${ic('chev')}</button><button class="btn go" data-a="sheet" data-v="gifts:me">Дары ${ic('chev')}</button>`, true);
   },
   clrules() {
     const per = EC.attacksDay(D, S.clan.lvl || 0);
@@ -992,6 +1059,7 @@ Object.assign(OV, {
       ['Босс', `${D.boss.kills} победы над Голосами поднимают Хозяина недели — сейчас стихии «${W.el}»; висящие элиты сгорают. Контроль на Хозяина не действует — только дебаффы`],
       ['Очки', 'по снятому здоровью, в момент смерти цели; бонуса за добивание нет. Не добили до конца недели — счёт сгорел'],
       ['Лестница', 'после босса — новый круг: враги сильнее, очки выше. Каждую неделю — с первого круга'],
+      ladOn() ? ['Ступени', `личные — по вашим очкам недели, от ${fmt(LAD.plank1)}; клановые — по взятым кругам: ${LAD.circles.join(', ')}. Сундуки талисманов — в «Дарах»`] : null,
       ['Циклы', 'каждый бьёт цель в силе своего цикла; урон — доля её здоровья в общем счёте, очки за врага у всех одни'],
       ['Переход', 'кто на этой неделе бил врагов другого клана, новому клану приносит очки со следующей недели']];
     return sheet('Как устроен круг', `${kv(rows)}<p class="quote"><b>Совет старика</b>${esc(HOST.aversionTip)}</p>${TM(`<p class="reason">Раунды: элита — ${EC.rounds(D, 'e', C.picks, C.lvl || 0)}, босс — ${D.boss.rounds.b}; сила круга (12 + уровень) × ${D.boss.circle.xBp / 100} %, очки × ${D.boss.points.yBp / 100} % за круг.</p>`, 'div')}`, `<button class="link" data-a="sheet" data-v="clhosts">Сонмы стихий ${ic('chev')}</button>`);
@@ -1046,7 +1114,7 @@ Object.assign(OV, {
   /* раздача наград главы (§24.4): пул недели, половина сервера — по вкладу, половину раздаёт глава; журнал виден всем */
   clgifts() {
     sync(); const C = S.clan, P = C.past; if (!C.in) return '';
-    if (!P || !P.groups.length) return sheet('Раздача наград', `<p class="muted">${P ? `Неделя ${genOf(P.race)}: очков нет — наград нет.` : 'Подсчёта ещё не было.'}</p>`);
+    if (!P || !P.groups.length) return sheet('Раздача наград', `<p class="muted">${P ? (P.pts ? `Неделя ${genOf(P.race)}: ${circlesTxt(P.circles || 0)}, место ${P.place ? fmt(P.place) : '—'} — клановой ступени и места в топе нет, пула нет.` : `Неделя ${genOf(P.race)}: очков нет — наград нет.`) : 'Подсчёта ещё не было.'}</p>`);
     const total = P.groups.reduce((a, g) => a + g.count, 0), head = P.groups.reduce((a, g) => a + g.head, 0), ed = !P.done && can('gifts');
     const idx = id => P.members.findIndex(m => m.id === id), myCyc = S.acc.cycle;
     const left = P.groups.map((g, gi) => g.head - Object.values(P.plan[gi]).reduce((a, x) => a + x, 0));
@@ -1057,11 +1125,11 @@ Object.assign(OV, {
       return `<div class="cl-grow ${C.members.some(x => x.me && x.id === m.id) ? 'me' : ''}"><span class="cl-mt"><b>${esc(m.n)}</b><small>по вкладу: ${srv.reduce((a, x) => a + x, 0)}</small></span>${step}</div>`;
     }).join('');
     const fills = ed ? `<div class="row cl-fills"><button class="btn sm" data-a="clfill" data-v="even">Поровну</button><button class="btn sm" data-a="clfill" data-v="contrib">По вкладу</button><button class="btn sm ghost" data-a="clfill" data-v="zero">Сбросить</button><span class="g-spacer"></span><span class="faint">осталось: <b class="num">${left.reduce((a, x) => a + x, 0)}</b></span></div>` : '';
-    const body = `<div class="row cl-gtop">${wells}<div class="col"><b class="serif">${fmt(total)} ${chestWord(total)} талисманов</b><small class="faint">неделя ${genOf(P.race)} · место ${P.place ? fmt(P.place) : '—'}</small></div></div>
+    const body = `<div class="row cl-gtop">${wells}<div class="col"><b class="serif">${fmt(total)} ${chestWord(total)} талисманов</b><small class="faint">неделя ${genOf(P.race)} · ${circlesTxt(P.circles || 0)} · место ${P.place ? fmt(P.place) : '—'}</small></div></div>
       <div class="row cl-stats"><div class="stat"><b>${fmt(total - head)}</b><small>по вкладу · роздано сервером</small></div><div class="stat ${P.done ? '' : 'win'}"><b>${fmt(head)}</b><small>${P.done ? (P.auto ? 'роздано сервером: глава не успел' : `раздал ${esc(P.by)}`) : 'от главы · ждут раздачи'}</small></div></div>
       ${fills}
       <div class="col cl-glist">${rows}</div>
-      <p class="reason">Редкость сундука — по циклу получателя. Раздача пишется в журнал и видна всем; не раздано за ${D.rewards.headH} ч — половину главы раздаст сервер по вкладу.${TM(' Дары пока показывают долю типичной недели — связать их с журналом раздачи — задача интеграции.')}</p>`;
+      <p class="reason">В пуле — сундуки клановых ступеней, взятых кругами недели, и места клана, на каждого участника. Редкость сундука — по циклу получателя. Раздача пишется в журнал и видна всем; не раздано за ${D.rewards.headH} ч — половину главы раздаст сервер по вкладу.${TM(` Пул — EnClan.pool: ступеней в пуле — ${P.steps || 0}, строка места — ${P.row || 'нет'}. «Дары» берут долю игрока из этого журнала (DAR_CLAN.clan).`)}</p>`;
     const foot = ed ? `<button class="btn go" data-a="clgive" data-v="${clOp()}" ${planFull(P) ? '' : 'disabled'}>Раздать · ${fmt(head)}</button>` : `<button class="link" data-a="sheet" data-v="cllog">Журнал ${ic('chev')}</button>`;
     return sheet('Раздача наград', body, foot, true);
   },
@@ -1239,7 +1307,9 @@ const screenBase = SCREENS.clan;
 SCREENS.clan = function () { const s = screenBase(); s.html = s.html.replace('</section>', teamBar() + '</section>'); return s; };
 
 /* ================== Неделя: итоги режима (WEEK_MODES, screens/week.js) ==================
-   Планок нет (§25.3): место клана и очки клана; личный вклад — в листе; лидеры — кланы. Прошлая неделя — выплаты из «Даров» */
+   Место и очки — клана; личный вклад — в листе; лидеры — кланы. Ступени (ADR-0047): planks — личные, по личным очкам недели (have);
+   clanPlanks — клановые, по кругам, взятым за неделю. Личные «Дары» дают получить сразу, клановые — долей клана из журнала раздачи
+   (DAR_CLAN.clan ниже). Прошлая неделя — выплаты из «Даров» */
 const T_CL = { placeLabel: 'место клана', meTag: 'ваш клан', topLabel: 'Кланы-лидеры' };
 (window.WEEK_MODES = window.WEEK_MODES || []).push({
   id: 'clan', n: 'Клановый босс', icon: 26, go: 'clan:boss', order: 40, unit: ['очко', 'очка', 'очков'],
@@ -1249,8 +1319,11 @@ const T_CL = { placeLabel: 'место клана', meTag: 'ваш клан', to
     if (M && c < M.from) return { lock: `рейтинг — с цикла ${ROMAN[M.from]}` };
     if (!inClan()) return { lock: 'вы не в клане' };
     const C = S.clan, pts = weekPts(), place = placeOf(pts), row = EC.tier(LB, place, pts), ly = M ? M.layers.find(l => l.kind === 'place' && l.clan) : null;
+    const done = EC.circlesDone(C.boss.circle);
     return Object.assign({ place, points: pts, mine: C.boss.mine, me: C.n, top: CL.leaders.now.map(x => x.slice()),
-      tier: row ? { label: row.label, one: ly ? ly.one : 'Место клана', pay: row.cyc[c] || [] } : null, alert: C.boss.att > 0 ? `Атак на сегодня: ${C.boss.att}` : '' }, T_CL);
+      have: C.boss.mine, plankUnit: ['личное очко', 'личных очка', 'личных очков'], planks: mySteps(), clanPlanks: clanSteps(), clanHave: done,
+      tier: row ? { label: row.label, one: ly ? ly.one : 'Место клана', pay: row.cyc[c] || [] } : null, alert: C.boss.att > 0 ? `Атак на сегодня: ${C.boss.att}` : '',
+      note: ladOn() ? `Личные ступени — по вашим очкам недели. Клановые — по кругам: ${circlesTxt(done)}` : '' }, T_CL);
   },
   past() {
     sync();
@@ -1272,11 +1345,14 @@ if (window.DAR_CLAN) window.DAR_CLAN.clan = (st, wk) => {
   const C = st.clan; if (!C) return null;
   const c = st.acc.cycle, M = LB && LB.modes.clan, ly = M ? M.layers.find(l => l.kind === 'place' && l.clan) : null, one = ly ? ly.one : 'Место клана';
   const pack = (groups, n) => groups.map((g, gi) => ({ r: EC.rOf(g.step, c), win: g.win, count: n(g, gi) })).filter(g => g.count > 0);
+  const lyC = lyClan(), oneC = lyC ? lyC.one : 'Клановая ступень';
   if (wk.id === 'prev') {
     const P = C.past, i = P ? P.members.findIndex(m => m.id === P.me) : -1; if (i < 0) return [];
-    const where = `${one}: ${P.row || '—'}`, rows = [];
+    /* пул недели — сундуки клановых ступеней и места клана вместе: доля игрока — одна, подпись называет оба источника */
+    const src = [P.steps ? (P.steps > 1 ? `Клановые ступени 1–${P.steps}` : `${oneC} 1`) : '', P.row ? `${one}: ${P.row}` : ''].filter(Boolean);
+    const where = src.join(', ') || one, sum = `${circlesTxt(P.circles || 0)}${P.place ? ' · место ' + fmt(P.place) : ''}`, rows = [];
     const srv = pack(P.groups, (g, gi) => (P.server[gi] || [])[i] || 0);
-    if (srv.length) rows.push({ label: `${where} · по вкладу`, groups: srv, st: 'ok', why: `итог недели подсчитан · место ${fmt(P.place)} · половину пула сервер раздал по вкладу` });
+    if (srv.length) rows.push({ label: `${where} · по вкладу`, groups: srv, st: 'ok', why: `итог недели подсчитан · ${sum} · половину пула сервер раздал по вкладу` });
     const head = pack(P.groups, (g, gi) => P.done ? (P.plan[gi] || {})[P.me] || 0 : Math.floor(g.head / Math.max(1, P.members.length)));
     if (head.length) rows.push({ label: `${where} · от главы`, groups: head, st: P.done ? 'ok' : 'wait',
       why: P.done ? `${P.auto ? 'срок вышел — половину главы раздал сервер по вкладу' : 'глава раздал свою половину'} · журнал клана`
@@ -1284,9 +1360,13 @@ if (window.DAR_CLAN) window.DAR_CLAN.clan = (st, wk) => {
     return rows;
   }
   if (!C.in) return [];
-  const pts = weekPts(C), place = placeOf(pts), row = EC.tier(LB, place, pts); if (!row) return [];
-  const g = (row.cyc[c] || []).map(x => ({ r: x.r, win: x.win, count: x.count }));
-  return g.length ? [{ label: `${one}: ${row.label}`, groups: g, st: 'wait', why: `ждёт подсчёта недели · сейчас место ${fmt(place)} · половину раздаст сервер по вкладу, половину — глава` }] : [];
+  /* эта неделя: взятые клановые ступени — по строке на ступень, сундуков на участника; место клана сейчас. Всё ждёт подсчёта недели */
+  const pts = weekPts(C), place = placeOf(pts), row = EC.tier(LB, place, pts), done = EC.circlesDone(C.boss.circle || 1), out = [];
+  const grp = r => (r.cyc[ladCyc(c)] || []).map(x => ({ r: x.r, win: x.win, count: x.count }));
+  if (lyC) for (const r of EC.circleRows(LB, done)) { const g = grp(r); if (g.length) out.push({ label: `${oneC} ${lyC.rows.indexOf(r) + 1}`, groups: g, st: 'wait',
+    why: `клан взял ступень: ${circlesTxt(done)} · ждёт подсчёта недели · половину раздаст сервер по вкладу, половину — глава` }); }
+  if (row) { const g = grp(row); if (g.length) out.push({ label: `${one}: ${row.label}`, groups: g, st: 'wait', why: `ждёт подсчёта недели · сейчас место ${fmt(place)} · половину раздаст сервер по вкладу, половину — глава` }); }
+  return out;
 };
 
 /* ================== состояние: и у сброса, и у текущей сессии ================== */
@@ -1321,6 +1401,17 @@ function clKitHtml() {
   const fork = D.tree.levels.find(x => x.kind === 'fork'), keyL = D.tree.levels.find(x => x.kind === 'key');
   const forkCards = `<div class="cl-picks">${fork.alts.map(a => `<div class="cl-pick" data-kind="fork"><span class="cl-pick-i">${ic(kindIc(a))}</span><b class="serif">${a.n}</b><small>${a.d}</small><button class="btn sm go" disabled>Выбрать</button></div>`).join('')}</div>`;
   const forks = D.tree.levels.filter(x => x.kind === 'fork').map(x => `<tr><td class="num">${x.L}</td><td>${D.tree.branches[x.br].n}</td><td>${x.alts.map(a => `${a.n} ${a.s}`).join(' · ')}</td></tr>`).join('');
+  /* ступени кланового босса (ADR-0047): личные и клановые — строками, как в листе; прогон калькулятора — кто где стоит */
+  const kMe = ladOn() ? mySteps(C ? C.boss.mine : 0) : [], kCl = ladOn() ? clanSteps(C ? EC.circlesDone(C.boss.circle) : 0) : [], LC = D.calc.ladder || { me: [], clans: [] };
+  const ladMe = LC.me.map(x => `<tr><td>${x[1]}</td><td>${x[2]}</td><td class="num">${x[3].map(r => fmt(r[1])).join(' / ')}</td><td class="num">${[...new Set(x[3].map(r => r[2]))].join('–')}</td></tr>`).join('');
+  const ladCl = LC.clans.map(x => `<tr><td>${x[0]}</td><td class="num">${x[2][0][1]} × ${x[2][0][2]}</td><td class="num">${x[2].map(r => r[3]).join(' / ')}</td><td class="num">${[...new Set(x[2].map(r => r[5]))].join('–')}</td></tr>`).join('');
+  const ladKit = kMe.length ? `<div class="col" style="grid-column:1/-1"><span class="eyebrow">Ступени недели · личные — по очкам, клановые — по кругам</span>
+      <div class="cl-kit-lad"><div class="cl-lad">${kMe.map(x => stRow(x, kMe.find(y => !y.reached), fmt(x.need), x.reached ? `<span class="chip spirit">${ic('check')}взята</span>` : '')).join('')}</div>
+        <div class="cl-lad">${kCl.map(x => stRow(x, kCl.find(y => !y.reached), `${x.need} ${circleWord(x.need)}`, x.reached ? `<span class="chip spirit">${ic('check')}взята</span>` : '')).join('')}</div></div>
+      <p class="k-note">Внизу вкладки «Босс» — одна кнопка: ваши очки и сундук ближайшей личной ступени, взятые круги и сундук ближайшей клановой, место клана. Лист «Ступени недели» — оба ряда: личные сундуки ждут в «Дарах» сразу, клановые идут в пул клана — половину делит сервер по вкладу, половину — глава. Ступень платит один раз за неделю.</p>
+      ${TM(`<table class="cl-t k"><thead><tr><th>Кто</th><th>Клан на норме силы своего цикла</th><th>Личных очков за неделю по циклам</th><th>Ступень</th></tr></thead><tbody>${ladMe}</tbody></table>
+        <table class="cl-t k"><thead><tr><th>Клан</th><th>Участников × атак</th><th>Кругов за неделю по циклам</th><th>Клановая ступень</th></tr></thead><tbody>${ladCl}</tbody></table>
+        <p class="k-note">Прогон калькулятора (<code>EN_CLAN.calc.ladder</code>). Первая личная ступень — ${LAD ? fmt(LAD.plank1) : '—'} очков (<code>EN_CLAN.boss.ladder.plank1</code>), круги клановых — ${LAD ? LAD.circles.join(' / ') : '—'}; множители, сундуки и полосы циклов — <code>EN_LOOTBOXES.modes.clan</code>. Таблицы — <code>docs/content/клан.md</code>, «Ступени».</p>`, 'div')}</div>` : '';
   const PRF = { o: 'обычный', e: 'увлечённый' }, boss = (D.calc.treeBoss || []).map(r => `<tr><td>${PRF[r[0]]}, ${ROMAN[r[1]]}</td><td>${r[4] ? `${r[4]} · ${r[5] === 2 ? 'эталон' : 'вехи'}` : 'нет'}${r[6] ? ' · играют не все' : ''}</td><td class="num">${r[7]} × ${r[8]}</td><td class="num">${r[9]}</td><td class="num">${r[10]}${r[11] ? ' + ' + r[11] : ''}</td><td class="num">${fmt(r[12])}</td></tr>`).join('');
   return `<section class="k-box" style="grid-column:1/-1"><h3>Клан · паспорт, клановый босс, участники, древо</h3>
     <p class="k-note">Экран — <code>screens/clan.js</code>, данные и алгоритмы — <code>clan.js</code> (<code>EN_CLAN</code>, <code>EnClan</code>), сборка — <code>tools/content-gen/clan/build.js</code>, черновик — <code>docs/content/клан.md</code>. Четыре вкладки: паспорт с резервуаром, босс, участники, древо; без клана — поиск. Атака — бой ядром на сиде атаки, итог — до показа; раздача половины наград — лист главы; журнал виден всем. Числа — демонстрация.</p>
@@ -1347,6 +1438,7 @@ function clKitHtml() {
         <p class="k-note">Прогон ядром: круги по порядку, пока хватает атак недели. Потолок клана — его сила.</p></div>
       <div class="col" style="grid-column:1/-1"><span class="eyebrow">Клан и разные циклы · прогон смешанных кланов</span><table class="cl-t k"><thead><tr><th>Состав</th><th>Клановый босс, как было</th><th>Своя копия</th><th>Резервуар: сырые → засчитано</th></tr></thead><tbody>${mix}</tbody></table>
         <p class="k-note">ADR-0042: вклад — в долях нормы своего цикла. Норма — первая личная планка режима в цикле (<code>EN_CLAN.norm</code>); клановый босс — своя копия цели в силе цикла атакующего, урон — доля её здоровья (<code>boss.bar</code>). Допуск «клан из одного цикла и смешанный» — ±${(D.calc.mixTolBp || 0) / 100} %. Таблицы — <code>docs/content/клан.md</code>, «Клан и разные циклы».</p></div>
+      ${ladKit}
       <div class="col"><span class="eyebrow">Законы клана</span><ul class="cl-laws">${D.laws.map(l => `<li>${l}</li>`).join('')}</ul></div>
     </div></section>`;
 }
@@ -1370,6 +1462,7 @@ FLOWS.push(
     if (x) ACT.clatkall(`${x.uid}:${C.boss.n + 1}`);
   }],
   ['Клан · раздача главы', 'Половина сундуков — по вкладу, половину раздаёт глава; запись — в журнал', () => { sync(); S.route = 'clan'; S.seg.clan = 'mem'; S.overlay = { t: 'clgifts' }; }],
+  ['Клан · ступени недели', 'Личные ступени — по очкам недели, клановые — по кругам, взятым кланом; сундуки талисманов — в «Дарах»', () => { sync(); S.route = 'clan'; S.seg.clan = 'boss'; S.overlay = ladOn() && inClan() ? { t: 'clsteps' } : null; }],
   ['Клан · очко навыков', 'Резервуар дал очко: глава выбирает пассивку следующего уровня древа', () => { sync(); S.route = 'clan'; S.seg.clan = 'tree'; const L = nextPick(); S.overlay = L ? { t: 'cllvl', arg: String(L) } : null; }],
   /* вилка: первая в древе — пятый уровень Силы, примеры автора. Клан её уже прошёл — сброс древа и выбор уровней до неё, всё операциями «сервера» */
   ['Клан · вилка кланового босса', 'Пятый уровень ветки: глава выбирает тактику — урон по боссу, по элитам или ещё элита в круге', () => {
@@ -1387,5 +1480,6 @@ FLOWS.push(
 
 /* для автопроверки tools/content-gen/screens/check_clan.js и консоли */
 window.EN_CLAN_UI = { data: CL, view: CL_VIEW, srv: CL_SRV, sync, fresh, weekEnd, refillDay, placeOf, weekPts, nextPick, pointsFree, fightOf, battleOf, circleTargets, searchList, joinWhy, countWeek, planFull, tgtCard, choiceHtml, mileHtml,
-  face, figKnown, figId, weekBoss, nextBoss, guardsHtml, artOf, ART_READY, atkOp, allCan, myC, copyOf, seenBy, shareTxt, ctMine, resTxt };
+  face, figKnown, figId, weekBoss, nextBoss, guardsHtml, artOf, ART_READY, atkOp, allCan, myC, copyOf, seenBy, shareTxt, ctMine, resTxt,
+  ladOn, mySteps, clanSteps, lyClan };
 })();

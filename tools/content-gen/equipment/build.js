@@ -5,8 +5,10 @@
    Пишет:
    - design/ui/equipment.js — данные прототипа (window.EN_EQUIPMENT) и алгоритм генерации (window.EnEquip) из mint.js, руками не править;
    - docs/content/снаряжение.md — только таблицы: каждая между метками «<!-- @таблица имя -->» и «<!-- /таблица имя -->»; текст — ручной.
-   Только читает: design/ui/lootboxes.js (сундук снаряжения, окна, Арена и Лига — экономика), design/ui/battle.js (правила и карта
-   бойца — вклад в БМ), design/ui/recipes.js (ларцы снаряжения из крафта).
+   Только читает: design/ui/lootboxes.js (сундук снаряжения, окна, Арена и Лига — экономика; день обычного у сундуков КрафБоссов —
+   summon.day: источник «сундук КрафБосса», ADR-0047), design/ui/battle.js (правила и карта бойца — вклад в БМ), design/ui/recipes.js
+   (ларцы снаряжения из крафта).
+   Закон источника «сундук КрафБосса»: по очкам редкости — не больше RULES.craftShare потока Арены и Лиги у обычного, в каждом цикле.
    Любая ошибка — файлы не пишутся. Пересборка даёт те же байты.
    Запуск: node tools/content-gen/equipment/build.js           — собрать и записать;
            node tools/content-gen/equipment/build.js --check   — только проверить, что файлы свежие.
@@ -46,6 +48,9 @@ const RULES = {
   lines: { char: [0, 1, 2, 2, 3, 4, 4], sec: [0, 0, 0, 1, 1, 1, 2] },
   reforge: { need: 10, gold: [2500, 5000, 10000, 20000, 40000, 80000] },   // §22: 10 → 1 редкостью выше; золото за вход × цикл итога
   caskets: { chest_eq4: 4, chest_eq6: 6 },       // ларцы крафта (recipes.js): один предмет своей редкости, слот случайный
+  /* сундуки КрафБоссов (ADR-0047, п. 1): «Горн» и сильная линия дают предметы снаряжения. Закон: их поток у обычного — не больше этой
+     доли потока Арены и Лиги по очкам редкости, в каждом цикле: главный источник — рейтинг Арены (§21.3) */
+  craftShare: [1, 2],
   lowPct: 50,                   // «ниже половины здоровья» — порог «Хищника» и «Течения» библиотеки (Тьма, Вода)
 };
 
@@ -110,8 +115,18 @@ const SAMPLE = {
   ],
 };
 /* Экономика: планки Арены и Лиги, где заканчивает неделю обычный и увлечённый игрок, — typical из lootboxes.js. Недель в цикле —
-   как у талисманов и сет-бонусов: II — 2, III–VI — по 3. Отряд — 45 мест: пять героев по девять слотов */
-const ECON = { who: ['free', 'fan'], cycles: [2, 3, 4, 5, 6], weeks: { 2: 2, 3: 3, 4: 3, 5: 3, 6: 3 }, modes: ['arena', 'league'], squad: 45 };
+   полные недели длины цикла у обычного, как у талисманов: одна длина на все калькуляторы — tools/content-gen/contracts/capacity.json
+   (cycleDays: сроки автора, ADR-0043). Прежде циклы III–VI считались по три недели, и «за цикл» было занижено в разы (общий пересчёт
+   07.10.2026). Нет файла — цикл II по прогону темпа, III–VI — прежние три недели. Отряд — 45 мест: пять героев по девять слотов */
+const ECON = { who: ['free', 'fan'], cycles: [2, 3, 4, 5, 6], modes: ['arena', 'league'], squad: 45,
+  weeks: (() => {
+    let d2 = 14, cap = null;
+    try { d2 = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'biomes', 'pace.json'), 'utf8')).cycleDays || d2; } catch (e) { /* нет прогона темпа */ }
+    try { cap = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'contracts', 'capacity.json'), 'utf8')).cycleDays; } catch (e) { /* нет ёмкости */ }
+    const out = { 2: Math.floor(d2 / 7), 3: 3, 4: 3, 5: 3, 6: 3 };
+    if (cap) for (const c of [2, 3, 4, 5, 6]) if (cap[String(c)]) out[c] = Math.floor(cap[String(c)] / 7);
+    return out;
+  })() };
 
 /* ================================ СБОРКА ================================ */
 
@@ -270,6 +285,25 @@ function build() {
     }
     econ.rows.push(row);
   }
+  /* --- источник «сундук КрафБосса» (слова автора 02.10.2026, ADR-0047: «получает сильные руны и снаряжение»): предмет снаряжения —
+     запись темы «Горна» и сильной линии с силы IV. День обычного — модель сундуков (lootboxes.js, summon.day: призывы по модели стока,
+     пробуждённые — когда призыв по карману); предметы по редкостям — eqR. Закон: по очкам редкости (lootboxes.js, rvalue) — не больше
+     craftShare потока Арены и Лиги у обычного, в каждом цикле --- */
+  const craft = { rows: [], share: RULES.craftShare, x: X };
+  const SD = LB.summon && LB.summon.day, RV = LB.rvalue;
+  if (!SD || !Array.isArray(RV) || RV.length !== 7) err.push('lootboxes.js: нет дня обычного у сундуков КрафБоссов (summon.day) или очков редкости (rvalue) — собрать лутбоксы');
+  else for (const r of econ.rows) {
+    const D = SD[r.c];
+    if (!D || !Array.isArray(D.parts) || D.parts.some(p => !Array.isArray(p.eqR) || p.eqR.length !== 7)) { err.push(`сундуки КрафБоссов: в lootboxes.js нет снаряжения по редкостям для цикла ${ROMAN(r.c)} (summon.day, eqR)`); continue; }
+    /* предметов в неделю по редкости, в десятитысячных: день × 7, округление до целого */
+    const week = Array(7).fill(0);
+    for (const p of D.parts) p.eqR.forEach((q, i) => { week[i] += q * 7; });
+    const wk = week.map(q => Math.round(q * X / D.x)), pts = v => v.reduce((a, x, i) => a + x * RV[i], 0);
+    const mine = pts(wk), main = pts(r.free.week), ok = mine * RULES.craftShare[1] <= main * RULES.craftShare[0];
+    craft.rows.push({ c: r.c, week: wk, pts: mine, main, kills: Math.round(D.kills * 7 * X / D.x) });
+    if (!ok) err.push(`сундуки КрафБоссов, цикл ${ROMAN(r.c)}: снаряжение — ${Math.round(mine / X * 10) / 10} очков редкости в неделю у обычного, больше ${RULES.craftShare[0]}/${RULES.craftShare[1]} потока Арены и Лиги (${Math.round(main / X * 10) / 10}) — главный источник снаряжения — рейтинг (§21.3, ADR-0047)`);
+  }
+  econ.craft = craft;
   data.econ = econ;
   data.bm = { lvl: SAMPLE.lvl, rows: bmRows };
 
@@ -277,6 +311,7 @@ function build() {
   const walk = (x, where) => { if (typeof x === 'number' && !isInt(x)) err.push(`не целое ${x} — ${where}`); else if (x && typeof x === 'object') for (const [k, v] of Object.entries(x)) walk(v, where + '.' + k); };
   walk(Object.assign({}, data, { econ: null }), 'EN_EQUIPMENT');
   for (const r of econ.rows) for (const who of ECON.who) for (const k of ['week', 'cycle', 'cum']) r[who][k].forEach((v, i) => { if (!isInt(v)) err.push(`экономика: не целое ${v}`); });
+  walk(craft, 'EN_EQUIPMENT.econ.craft');
 
   /* --- таблицы документа --- */
   const fmt = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
@@ -327,6 +362,13 @@ function build() {
   T = [`| Цикл | ${RARITY.join(' | ')} |`, `|---|${RARITY.map(() => '---').join('|')}|`];
   for (const r of econ.rows) T.push(`| ${ROMAN(r.c)} | ${r.free.cum.map((x, i) => `${dec(x)} / ${dec(r.fan.cum[i])}`).join(' | ')} |`);
   TBL.rarity = T.join('\n');
+  /* сундуки КрафБоссов против Арены и Лиги: неделя обычного, предметов и очков редкости; самая частая редкость — где лежит поток */
+  T = ['| Цикл | Сундуков КрафБоссов в неделю | Предметов из них | Очков редкости | Арена и Лига: предметов | Очков редкости | Доля от Арены и Лиги | Закон |', '|---|---|---|---|---|---|---|---|'];
+  for (const r of craft.rows) {
+    const m = econ.rows.find(x => x.c === r.c).free.week, pct = r.main ? Math.round(r.pts * 1000 / r.main) / 10 : 0;
+    T.push(`| ${ROMAN(r.c)} | ${dec(r.kills, 2)} | ${dec(sum(r.week), 2)} | ${dec(r.pts)} | ${dec(sum(m))} | ${dec(r.main)} | ${String(pct).replace('.', ',')} % | не больше ${Math.round(RULES.craftShare[0] * 100 / RULES.craftShare[1])} % |`);
+  }
+  TBL.craft = T.join('\n');
   data.meta.sha256 = crypto.createHash('sha256').update(JSON.stringify(templates)).digest('hex');
   return { data, tables: TBL, warn, err, minted, mintSrc: MINT_SRC };
 }

@@ -10,7 +10,8 @@
    opt.loot — такая же таблица: мир берёт добычу из неё, а не из ядра и генератора, — так сборщик проверяет, что таблица ведёт к тому же итогу.
    Шаги сценария сверх боя (ADR-0040; D.tut — их собирает build.js, tutOf): сундук уровня chest.L открывается с заданным содержимым,
    в Лавке — одна покупка витрины обучения по цене Лавки, первый артефакт — покупка за золото и уровни за души по правилу артефактов
-   (screens/wanderer.js, WN_SRV: купить — a.gold, уровень k — a.soul × k). Сундуки помнят номер выдачи (no) — как ch<номер> прототипа.
+   (screens/wanderer.js, WN_SRV: купить — a.gold, уровень k — a.soul × k); артефакт активных биомов — только покупка: она открывает
+   активный биом, без неё мир не пускает в забег (ADR-0054). Сундуки помнят номер выдачи (no) — как ch<номер> прототипа.
    Погружения Подземного леса (ADR-0049, D.dives; собирает build.js): сид добычи забега — сид сценария, seeds[номер забега] — номер забега
    полного пути, чью добычу даёт этот забег (без записи — свой номер); дар погружения — в конце забега, gifts[номер забега] — [золото, дух,
    души, [[предмет, сколько], …]]: добыча однообразных забегов, которые погружение заменило. opt.gift(номер, S) — дар считается по ходу
@@ -52,6 +53,12 @@ function tutOf(SC, levels) {
     if (!a) throw new Error(`сценарий: артефакта ${SC.art.id} нет`);
     let souls = 0; for (let k = 1; k <= SC.art.lv; k++) souls += a.soul * k;
     out.art = { id: a.id, n: a.n, lv: SC.art.lv, gold: a.gold, souls };
+  }
+  /* артефакт активных биомов (ADR-0054): покупка за золото сама открывает активные биомы (own) — уровней в обучении нет */
+  if (SC.trail) {
+    const a = WNA.list.find(x => x.id === SC.trail.id);
+    if (!a || a.id !== WNA.rules.trail || !a.own) throw new Error(`сценарий: ${SC.trail.id} — не артефакт активных биомов (wanderer.js, art.rules.trail)`);
+    out.trail = { id: a.id, n: a.n, gold: a.gold, slots: a.base + a.own, open: a.open || WNA.rules.openLevel };
   }
   return out;
 }
@@ -220,6 +227,12 @@ function make(D, opt = {}) {
       S.gold -= A.gold; S.souls -= A.souls; S.art[id] = lv;
       return true;
     },
+    /* артефакт активных биомов: покупка за золото — куплен (уровень 0), активных биомов — TUT.trail.slots */
+    trail(id) {
+      const A = TUT.trail; if (!A || A.id !== id || S.art[id] != null || M.lvl < A.open || S.gold < A.gold) return false;
+      S.gold -= A.gold; S.art[id] = 0;
+      return true;
+    },
     craft(cells, rid) {
       if (!cells.every(([id, q]) => (S.items[id] || 0) >= q)) return false;
       const r = rid ? RX.recipes.find(x => x.id === rid) : null;
@@ -230,6 +243,7 @@ function make(D, opt = {}) {
     },
     /* забег — этажи подряд до стены или до конца биома, как startRun → advance → floorDone прототипа */
     run(biome) {
+      if (TUT.trail && S.art[TUT.trail.id] == null) return { refuse: 'trail', wall: 0, win: false, ms: 0, spirit: 0 };   // нет активного биома — нет забега (ADR-0054)
       const B = EB.BIOMES[biome]; S.runNo++; S.inRun = S.runNo;
       const seed = EB.seedOf(`${biome}|добыча|${seedNo(S.runNo)}`);
       let cur = S.heroes.map(heroSrc), ms = 0, wall = 0, win = false, spirit = 0;

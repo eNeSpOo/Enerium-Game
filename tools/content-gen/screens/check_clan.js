@@ -44,13 +44,13 @@ const read = f => fs.readFileSync(path.join(UI, f), 'utf8');
 const html = read('index.html');
 const DUMP = process.argv.includes('--dump');
 const err = [], note = [];
-const cnt = { views: 0, player: 0, ops: 0, cards: 0, fights: 0 };
+const cnt = { views: 0, player: 0, ops: 0, cards: 0, fights: 0, laws: 0, mut: 0 };
 const say = m => { if (err.length < 80) err.push(m); else if (err.length === 80) err.push('… и ещё ошибки'); };
 function done() {
   for (const n of note) console.log('предупреждение: ' + n);
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
-  console.log(`Клан: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; карточек целей ${cnt.cards}; боёв ${cnt.fights}; операций ${cnt.ops}.`);
-  console.log('Проверка пройдена: данные свежие и целые, бой клана решается ядром на сиде, операции не повторяются, выплаты сходятся с очками врага, раздача — ровно половина, игроку служебного не видно.');
+  console.log(`Клан: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; карточек целей ${cnt.cards}; боёв ${cnt.fights}; операций ${cnt.ops}; ступени кланового босса — законов ${cnt.laws}, мутаций поймано ${cnt.mut}.`);
+  console.log('Проверка пройдена: данные свежие и целые, бой клана решается ядром на сиде, операции не повторяются, выплаты сходятся с очками врага, раздача — ровно половина, личные ступени — по личным очкам и один раз, клановые — по взятым кругам и в пул клана, игроку служебного не видно.');
   process.exit(0);
 }
 
@@ -128,7 +128,7 @@ function load() {
     get S() { return S; }, set S(v) { S = v; },
     ACT, OV, FLOWS, KH, MAP, KIT_EXTRA, SCREENS, SQ, EB, render, initialState, setTeam, advance, runById,
     rsSetWeek: typeof rsSetWeek === 'function' ? rsSetWeek : null, darRows: typeof darRows === 'function' ? darRows : null,
-    D: window.EN_CLAN, EC: window.EnClan, UI: window.EN_CLAN_UI, W: window.EN_WEEK || null, LB: window.EN_LOOTBOXES,
+    D: window.EN_CLAN, EC: window.EnClan, UI: window.EN_CLAN_UI, W: window.EN_WEEK || null, LB: window.EN_LOOTBOXES, EL: window.EnLoot || null,
   })`, ctx);
   return { T, ctx, els, game: () => (els.game ? els.game.innerHTML : '') };
 }
@@ -644,9 +644,12 @@ reset();
 reset();
 {
   const c = C(), P0 = c.past, M = T.LB.modes.clan, cyc = Math.max(M.from, S().acc.cycle);
-  const row = EC.tier(T.LB, P0.place, P0.pts), per = (row.cyc[cyc] || []).reduce((a, g) => a + g.count, 0);
+  /* пул — сундуки места клана и клановых ступеней, взятых кругами недели (ADR-0047), на каждого участника; демо — пять кругов, вне топа */
+  const row = EC.tier(T.LB, P0.place, P0.pts), stepRows = EC.circleRows(T.LB, P0.circles), cntRow = r => (r.cyc[cyc] || []).reduce((a, g) => a + g.count, 0);
+  const per = (row ? cntRow(row) : 0) + stepRows.reduce((a, r) => a + cntRow(r), 0);
   const total = P0.groups.reduce((a, g) => a + g.count, 0);
-  if (total !== per * P0.members.length) say(`пул: ${total} сундуков, а на участника ${per} × ${P0.members.length}`);
+  if (!per || total !== per * P0.members.length) say(`пул: ${total} сундуков, а на участника ${per} × ${P0.members.length}`);
+  if (P0.circles !== CU.data.past.circles || P0.steps !== stepRows.length || P0.steps !== EC.clanStep(D, P0.circles)) say(`пул демо: кругов ${P0.circles}, клановых ступеней ${P0.steps} — не из данных демо`);
   P0.groups.forEach((g, gi) => {
     if (P0.server[gi].reduce((a, x) => a + x, 0) !== g.server || g.server + g.head !== g.count || g.server !== Math.floor(g.count * D.rewards.splitBp / D.bp)) say('пул: половина сервера не половина');
   });
@@ -688,8 +691,9 @@ if (T.darRows) {
   if (!P0.done || sum(by('от главы')) !== mine || by('от главы').some(p => p.st !== 'ok')) say(`«Дары»: после раздачи доля главы ${sum(by('от главы'))}, расписано игроку ${mine}`);
   for (const p of by('от главы')) { const n0 = T.S.bag.chests.length; run('получить долю главы', () => T.ACT.darget(p.key)); if (T.S.bag.chests.length - n0 !== sum([p])) say('«Дары»: «Получить» выдало не долю из журнала'); }
   const now = dar().filter(p => p.wk.id === 'now'), pts = CU.weekPts(c), row = EC.tier(T.LB, CU.placeOf(pts), pts);
-  const nowWant = row ? (row.cyc[cyc] || []).reduce((a, g) => a + g.count, 0) : 0;
-  if (sum(now) !== nowWant || now.some(p => p.st !== 'wait')) say(`«Дары»: эта неделя — ${sum(now)} сундуков, по месту клана сейчас — ${nowWant}`);
+  const cntRow = r => (r.cyc[cyc] || []).reduce((a, g) => a + g.count, 0);
+  const nowWant = (row ? cntRow(row) : 0) + EC.circleRows(T.LB, EC.circlesDone(c.boss.circle)).reduce((a, r) => a + cntRow(r), 0);
+  if (sum(now) !== nowWant || now.some(p => p.st !== 'wait')) say(`«Дары»: эта неделя — ${sum(now)} сундуков, по месту клана и взятым клановым ступеням сейчас — ${nowWant}`);
   run('выйти', () => CU.srv.leave(op())); cnt.ops++;
   if (T.S.clan.in) say('«Дары»: выход из клана не прошёл');
   else if (dar().some(p => p.wk.id === 'now')) say('«Дары»: без клана — клановая доля этой недели');
@@ -698,10 +702,18 @@ if (T.darRows) {
 /* подсчёт недели и смена недели расы */
 reset();
 {
-  const c = C(), pts = CU.weekPts(), no = c.boss.no;
+  const c = C(), pts = CU.weekPts(), no = c.boss.no, done0 = EC.circlesDone(c.boss.circle), n0 = c.members.length, place0 = CU.placeOf(pts);
+  /* пул недели считаем сами, по слоям сундуков: клановые ступени, взятые кругами, и строка места (строки «все с очками» нет, ADR-0047) */
+  const lys = T.LB.modes.clan.layers, cyc0 = Math.max(T.LB.modes.clan.from, S().acc.cycle), cntRow = r => (r.cyc[cyc0] || []).reduce((a, g) => a + g.count, 0);
+  const rows0 = lys.find(l => l.kind === 'plank' && l.clan).rows.filter(r => done0 >= r.at)
+    .concat(pts > 0 && place0 ? lys.find(l => l.kind === 'place' && l.clan).rows.filter(r => r.top && place0 <= r.top).sort((a, b) => a.top - b.top).slice(0, 1) : []);
+  const want0 = rows0.reduce((a, r) => a + cntRow(r), 0) * n0;
   run('подсчёт недели', () => T.ACT.clweek());
   if (c.past.pts !== pts || c.boss.circle !== 1 || c.boss.no !== no + 1 || c.members.some(m => m.res || m.boss) || c.boss.targets.length !== EC.elitePool(D, c.lvl, c.picks)) say('подсчёт недели: очки, круг или вклад не сброшены');
-  if (!c.past.groups.length || c.past.done) say('подсчёт недели: нет пула или раздача уже отмечена');
+  const got0 = c.past.groups.reduce((a, g) => a + g.count, 0);
+  if (got0 !== want0 || c.past.circles !== done0) say(`подсчёт недели: пул ${got0} сундуков при ${done0} взятых кругах и месте ${place0 || '—'}, а по сундукам — ${want0}`);
+  /* раздача ждёт главу, только когда есть что раздавать: пустой пул закрыт сразу */
+  if (c.past.done !== !want0) say(`подсчёт недели: пул ${want0 ? 'есть, а раздача уже отмечена' : 'пуст, а раздача ждёт главу'}`);
   reset();
   if (T.rsSetWeek) {
     const i = D.lists.races.indexOf(C().boss.wk), race = D.lists.races[(i + 1) % D.lists.races.length];
@@ -743,6 +755,178 @@ reset();
   if (heir.role !== 'head' || c.role === 'head') say('главенство не передано');
 }
 
+/* ================== 4а. ступени кланового босса (ADR-0047) ==================
+   Законы — функции → список нарушений: их же зовёт проверка мутацией (флаг --mut печатает, что поймано).
+   S1 — личные ступени: лестница сундуков (Л1–Л4 общих законов ladder_laws.js), первая — plank1 калькулятора клана, одна на все циклы;
+        считаются по личным очкам недели, а не очкам клана; взята — набран порог; «Дары» дают её сундуки сразу и один раз; следующая
+        полоса — без перехода цикла;
+   S2 — клановые ступени: по кругам, взятым за неделю, — круг взят, когда пал его Хозяин; пороги — круги сундуков; взятая ждёт подсчёта
+        недели строкой на ступень, сундуки — на участника; строка места в «Дарах» — только у клана в топе: строки «все с очками» нет;
+   S3 — пул недели: подсчёт кладёт в пул сундуки взятых клановых ступеней и места клана в топе на каждого участника, половина — сервер
+        по вкладу, половина — глава; без ступени и места пула нет; новая неделя — ступени с нуля;
+   S4 — калькулятор: обычный — на своей ступени (typical сундуков), выше — не чаще, чем «в сильные недели»; увлечённый — на своей
+        и выше; плательщик — не выше обычного больше чем на ступень; кланы — каждый на своей клановой ступени */
+const LL = require('./ladder_laws.js');
+const LAD0 = T.EL ? T.EL.ladder : null;   // алгоритм лестницы прототипа до мутаций
+const wkClan = () => T.W.state('clan', 'now');
+const lyOf = clan => T.LB.modes.clan.layers.find(l => (clan ? l.kind === 'plank' && l.clan : l.id === T.LB.modes.clan.ladder.layer));
+const cntG = groups => groups.reduce((a, g) => a + g.count, 0);
+/* строка места клана по строкам сундуков — эталон без алгоритма клана: наименьший «топ-N», куда место входит; вне топа — нет */
+const tierRef = (place, pts) => (place && pts > 0 ? T.LB.modes.clan.layers.find(l => l.kind === 'place' && l.clan).rows.filter(r => r.top && place <= r.top).sort((a, b) => a.top - b.top)[0] || null : null);
+const chestsN = () => T.S.bag.chests.length;
+const LAW = {
+  S1() {
+    const e = []; reset(); T.SQ.set('clan', 's1');
+    const c = S().acc.cycle, L = D.boss.ladder, calc = built.data.boss.ladder, law = t => LL.stateLaw(T.LB, 'личные ступени · ' + t, wkClan(), c, LAD0);
+    if (!L || !Number.isInteger(L.plank1) || L.plank1 !== calc.plank1) return ['первая личная ступень на экране — не из сборки калькулятора клана'];
+    const taken = () => wkClan().planks.filter(p => p.reached).length, s0 = wkClan(), k0 = taken();
+    e.push(...law('демо'));
+    if (s0.planks[0].need !== calc.plank1 || s0.have !== C().boss.mine) e.push(`личные ступени: первая — ${s0.planks[0].need} (калькулятор — ${calc.plank1}), набрано ${s0.have}, личных очков недели — ${C().boss.mine}`);
+    if (JSON.stringify(CU.mySteps().map(p => [p.k, p.need, p.reached])) !== JSON.stringify(s0.planks.map(p => [p.k, p.need, p.reached]))) e.push('личные ступени: на экране клана и в Неделе — разные');
+    for (const cc of D.cycles) { S().acc.cycle = cc; if (wkClan().planks[0].need !== calc.plank1) e.push(`первая личная ступень в цикле ${cc} — ${wkClan().planks[0].need}: она одна на все циклы`); }
+    S().acc.cycle = c;
+    /* очки клана выросли, личные — нет: ступень не берётся */
+    C().members.find(m => !m.me).boss += 1000000;
+    if (taken() !== k0) e.push('личная ступень взята очками клана, а не личными очками недели');
+    /* до порога не хватает очка — не взята; на пороге — взята */
+    const need = s0.planks[k0].need;
+    C().boss.mine = need - 1; if (taken() !== k0) e.push(`личная ступень ${k0 + 1} взята до порога ${need}`);
+    C().boss.mine = need; if (taken() !== k0 + 1) e.push(`набран порог ${need}, а личная ступень ${k0 + 1} не взята`);
+    e.push(...law('после порога'));
+    /* «Дары»: сундуки взятых ступеней — сразу, один раз; следующая платит только себя */
+    const rows = () => (T.darRows ? T.darRows(T.S).filter(p => p.id === 'clan' && p.cat === 'me' && p.kind === 'plank' && p.wk.id === 'now') : []), ly = lyOf(false);
+    if (!T.darRows) note.push('ступени кланового босса: «Дары» не подключены — выплата ступеней не проверена');
+    else {
+      const R1 = rows();
+      if (R1.length !== k0 + 1) e.push(`«Дары»: личных ступеней этой недели ${R1.length}, взято ${k0 + 1}`);
+      R1.forEach((p, i) => { const want = cntG(ly.rows[i].cyc[Math.max(T.LB.modes.clan.from, c)] || []); if (cntG(p.groups) !== want) e.push(`«Дары»: личная ступень ${i + 1} — ${cntG(p.groups)} сундуков, в лестнице — ${want}`); });
+      for (const p of R1.filter(q => q.st === 'ok')) {
+        const n0 = chestsN(); T.ACT.darget(p.key); if (chestsN() - n0 !== cntG(p.groups)) e.push(`«Дары»: «${p.label}» выдала ${chestsN() - n0} сундуков из ${cntG(p.groups)}`);
+        const n1 = chestsN(); T.ACT.darget(p.key); if (chestsN() !== n1) e.push(`«Дары»: «${p.label}» заплатила второй раз`);
+      }
+      C().boss.mine = s0.planks[k0 + 1].need;
+      const R2 = rows(), fresh = R2.filter(p => p.st === 'ok');
+      if (R2.length !== k0 + 2 || fresh.length !== 1 || R2.filter(p => p.st === 'got').length !== k0 + 1) e.push(`следующая личная ступень: строк в «Дарах» ${R2.length}, к получению ${fresh.length}`);
+    }
+    /* следующая полоса — без перехода цикла: набран порог её первой ступени — взята, сундук — своей полосы */
+    const nb = s0.planks.find(p => p.band > s0.planks[0].band);
+    if (nb) { C().boss.mine = nb.need; const p = wkClan().planks.find(x => x.k === nb.k); if (!p.reached || S().acc.cycle !== c) e.push('ступень следующей полосы не берётся очками без перехода цикла'); e.push(...law('следующая полоса')); }
+    /* лист: личная лестница — «дорогой» общего помощника Недели (Л4) или своими строками */
+    C().boss.mine = need; T.S.route = 'clan'; T.S.seg.clan = 'boss'; T.S.overlay = { t: 'clsteps' }; T.render();
+    const h = P.game();
+    if (h.includes('class="cl-lad" data-by="week"><div class="wk-ld" data-mode="clan"')) e.push(...LL.roadLaw(T.LB, 'лист ступеней', h, wkClan(), c, ['<p class="reason">']));
+    else if ((h.match(/<div class="cl-st[ "]/g) || []).length < s0.planks.filter(p => p.band === s0.planks[0].band).length) e.push('лист ступеней: личных ступеней своей полосы на экране меньше, чем в лестнице');
+    T.S.overlay = null;
+    return e;
+  },
+  S2() {
+    const e = []; reset(); T.SQ.set('clan', 's1');
+    const L = D.boss.ladder, c = Math.max(T.LB.modes.clan.from, S().acc.cycle), lyC = lyOf(true), A = lyC.rows.map(r => r.at);
+    if (JSON.stringify(A) !== JSON.stringify(L.circles) || JSON.stringify(L.circles) !== JSON.stringify(built.data.boss.ladder.circles)) e.push(`круги клановых ступеней: в данных клана ${L.circles.join('/')}, у сундуков ${A.join('/')}`);
+    const darAll = () => (T.darRows ? T.darRows(T.S).filter(p => p.id === 'clan' && p.cat === 'clan' && p.wk.id === 'now') : []);
+    const dar = () => darAll().filter(p => p.label.startsWith(lyC.one));
+    /* круг стоит — взято на один меньше: ступень берётся, когда пал Хозяин её круга */
+    for (const [circle, want] of [[1, 0], [A[0], 0], [A[0] + 1, 1], [A[1], 1], [A[1] + 1, 2], [A[2] + 1, 3], [A[2] + 6, 3]]) {
+      C().boss.circle = circle; C().boss.kills = 0; C().boss.targets = CU.circleTargets(C(), circle);
+      const s = wkClan(), got = s.clanPlanks.filter(p => p.reached).length;
+      if (got !== want || s.clanHave !== circle - 1 || CU.clanSteps().filter(p => p.reached).length !== want || EC.clanStep(D, EC.circlesDone(circle)) !== want) e.push(`стоит круг ${circle} — взято ${circle - 1}: клановых ступеней ${got}, ждали ${want}`);
+      if (s.clanPlanks.some((p, i) => p.need !== A[i] || cntG(p.pay) !== cntG(lyC.rows[i].cyc[c] || []))) e.push('клановые ступени: порог или сундуки — не строки сундуков');
+      if (T.darRows) {
+        const rows = dar();
+        if (rows.length !== want || rows.some(p => p.st !== 'wait')) e.push(`«Дары»: взято клановых ступеней ${want}, строк — ${rows.length}; до подсчёта недели они ждут`);
+        rows.forEach((p, i) => { if (cntG(p.groups) !== cntG(lyC.rows[i].cyc[c] || [])) e.push(`«Дары»: клановая ступень ${i + 1} — ${cntG(p.groups)} сундуков на участника, в лестнице — ${cntG(lyC.rows[i].cyc[c] || [])}`); });
+        /* строка места — только у клана в топе: строки «все с очками» нет (ADR-0047), вне топа клановая доля — одни ступени */
+        const pts = CU.weekPts(C()), place = CU.placeOf(pts), extra = darAll().length - rows.length, wantRow = tierRef(place, pts) ? 1 : 0;
+        if (extra !== wantRow) e.push(`«Дары»: место клана ${place || '—'} — строк места ${extra}, по строкам сундуков — ${wantRow}: вне топа строки места нет`);
+      }
+    }
+    /* вкладка «Босс»: внизу — сундуки ближайших ступеней и путь в лист; в листе — оба ряда */
+    reset(); T.SQ.set('clan', 's1'); T.S.seg.clan = 'boss'; T.S.overlay = null; T.render();
+    const h = P.game(), foot = (h.match(/<button class="cl-mine"[\s\S]*?<\/button>/) || [''])[0];
+    if (!foot.includes('data-v="clsteps"') || (foot.match(/class="well itf cl-chest"/g) || []).length !== 2) e.push('вкладка «Босс»: внизу нет сундуков ближайших ступеней — личной и клановой — или пути в лист ступеней');
+    T.S.overlay = { t: 'clsteps' }; T.render();
+    const hs = P.game(), rowsC = (hs.match(/<div class="wk-ld clan" data-mode="clan"[\s\S]*?<\/div><\/div>/) || [''])[0];
+    if (!/Клановые ступени/.test(hs) || (rowsC ? (rowsC.match(/class="wk-ld-st/g) || []).length : (hs.match(/<div class="cl-lad" data-by="own"><span class="eyebrow">Клановые[\s\S]*?<\/div><\/div>/) || [''])[0].split('class="cl-st').length - 1) !== A.length) e.push('лист ступеней: клановых ступеней на экране не столько, сколько кругов в лестнице');
+    T.S.overlay = null;
+    return e;
+  },
+  S3() {
+    const e = [];
+    const M = T.LB.modes.clan, A = D.boss.ladder.circles;
+    for (const circle of [A[0], A[0] + 1, A[1] + 1, A[2] + 2]) {
+      reset();
+      const cc = C(), cyc = Math.max(M.from, S().acc.cycle), cntRow = r => cntG(r.cyc[cyc] || []), n = cc.members.length, done = circle - 1;
+      cc.boss.circle = circle; cc.boss.mine = D.boss.ladder.plank1 * 2;
+      run('подсчёт недели', () => T.ACT.clweek());
+      const P1 = C().past, rows = lyOf(true).rows.filter(r => done >= r.at), row = tierRef(P1.place, P1.pts), per = (row ? cntRow(row) : 0) + rows.reduce((a, r) => a + cntRow(r), 0), total = cntG(P1.groups);
+      if (P1.circles !== done || P1.steps !== rows.length || rows.length !== EC.clanStep(D, done)) e.push(`подсчёт: взято кругов ${done} — в журнале кругов ${P1.circles}, клановых ступеней ${P1.steps}, по лестнице ${EC.clanStep(D, done)}`);
+      if (total !== per * n) e.push(`подсчёт: взято кругов ${done} — пул ${total} сундуков, ждали ${per} × ${n} участников`);
+      if (P1.groups.some((g, gi) => g.server + g.head !== g.count || g.server !== Math.floor(g.count * D.rewards.splitBp / D.bp) || P1.server[gi].reduce((a, x) => a + x, 0) !== g.server)) e.push('подсчёт: половина сервера — не половина пула');
+      if (C().boss.circle !== 1 || C().boss.mine !== 0 || CU.clanSteps().some(p => p.reached) || CU.mySteps().some(p => p.reached)) e.push('новая неделя: круги, личные очки или ступени — не с нуля');
+      if (T.darRows) {
+        const prev = T.darRows(T.S).filter(p => p.id === 'clan' && p.cat === 'clan' && p.wk.id === 'prev'), i = P1.members.findIndex(m => m.id === P1.me);
+        const mine = P1.groups.reduce((a, g, gi) => a + (P1.server[gi][i] || 0) + Math.floor(g.head / n), 0);
+        if (prev.reduce((a, p) => a + cntG(p.groups), 0) !== mine) e.push(`«Дары» после подсчёта: доля игрока ${prev.reduce((a, p) => a + cntG(p.groups), 0)}, по журналу пула — ${mine}`);
+        if (rows.length ? prev.some(p => !/Клановая ступень 1|Клановые ступени 1–/.test(p.label)) : prev.length) e.push('«Дары» после подсчёта: строки клановой доли не называют взятые ступени');
+      }
+    }
+    return e;
+  },
+  S4() {
+    const e = [], LC = D.calc.ladder, M = T.LB.modes.clan, typ = M.typical, xs = lyOf(false).rows.map(r => r.x), pp = T.LB.assume.payerPts, K = B.LAD, RM = ['', 'I', 'II', 'III', 'IV', 'V', 'VI'];
+    if (!LC || !LC.me.length || !LC.clans.length) return ['нет прогона ступеней — EN_CLAN.calc.ladder'];
+    const stepOf = pts => EC.myStep(D, xs, pts), need = k => EC.myNeed(D, xs[k - 1]);
+    if (D.boss.ladder.plank1 % K.round || D.boss.ladder.plank1 <= 0) e.push(`первая личная ступень ${D.boss.ladder.plank1} — не кратна ${K.round}`);
+    let oRows = 0, strong = 0;
+    for (const [who, n, clan, rows] of LC.me) for (const [c, pts, step, pay, payStep] of rows) {
+      const key = `${n}, ${clan}, цикл ${RM[c]}`;
+      if (step !== stepOf(pts) || pay !== Math.floor(pts * pp[0] / pp[1]) || payStep !== stepOf(pay)) e.push(`${key}: ступень или очки плательщика — не по данным (${pts} очков)`);
+      if (who === 'o') {
+        oRows++; if (step > typ.free.me) strong++;
+        if (step < typ.free.me) e.push(`${key}: обычный на ${step}-й ступени — ниже ${typ.free.me}-й`);
+        if (payStep > step + 1) e.push(`${key}: плательщик на ${payStep}-й ступени при ${step}-й у обычного`);
+      } else if (step < typ.fan.me && Math.abs(pts - need(typ.fan.me)) * D.bp > need(typ.fan.me) * K.edgeBp) e.push(`${key}: увлечённый на ${step}-й ступени — ниже ${typ.fan.me}-й`);
+    }
+    if (!oRows || strong * D.bp > oRows * K.strongBp) e.push(`обычный выше своей ступени в ${strong} строках прогона из ${oRows}`);
+    for (const [n, want, rows] of LC.clans) for (const [c, , , circles, , step] of rows) if (step !== EC.clanStep(D, circles) || step !== want) e.push(`${n}, цикл ${RM[c]}: ${circles} кругов — ${step}-я клановая ступень, ждали ${want}-ю`);
+    if (LC.clans[0][1] !== typ.free.clan || !LC.clans.some(x => x[1] === typ.fan.clan) || !LC.clans.some(x => x[1] === D.boss.ladder.circles.length)) e.push('прогон кланов: нет клана обычных на typical, клана увлечённых или клана на верхней ступени');
+    return e;
+  },
+};
+const lawRun = k => { try { return LAW[k](); } catch (x) { return ['исключение: ' + x.message + ' | ' + String(x.stack || '').split('\n').slice(1, 3).join(' | ').trim()]; } };
+if (!D.boss.ladder || !T.W || !T.EL) say('ступени кланового босса: нет данных ступеней, Недели или лестницы сундуков');
+else {
+  let nLaw = 0, caught = 0;
+  for (const k of Object.keys(LAW)) { nLaw++; for (const x of lawRun(k)) say(`ступени кланового босса, закон ${k}: ${x}`); }
+  if (err.length) done();
+  /* проверка мутацией: ломаем — закон обязан упасть; слом снят — законы снова чисты. Строка — код для песочницы, функция — правка из проверки */
+  const LC = D.calc.ladder;
+  const MUT = LL.mutations(LAD0).map(([what, f]) => ['S1', what, () => { T.EL.ladder = f; }, () => { T.EL.ladder = LAD0; }]).concat([
+    ['S1', 'первая личная ступень — не из калькулятора клана', 'EN_CLAN.boss.ladder.plank10 = EN_CLAN.boss.ladder.plank1; EN_CLAN.boss.ladder.plank1 = 60;', 'EN_CLAN.boss.ladder.plank1 = EN_CLAN.boss.ladder.plank10; delete EN_CLAN.boss.ladder.plank10;'],
+    ['S1', 'первая личная ступень растёт с циклом игрока', 'EN_WEEK.steps0 = EN_WEEK.steps; EN_WEEK.steps = (id, o) => EN_WEEK.steps0(id, id === "clan" && o && o.plank1 ? Object.assign({}, o, { plank1: o.plank1 * (o.cycle - 1) }) : o);', 'EN_WEEK.steps = EN_WEEK.steps0;'],
+    ['S2', 'круг считается взятым, пока его Хозяин ещё стоит', 'EnClan.circlesDone0 = EnClan.circlesDone; EnClan.circlesDone = c => c;', 'EnClan.circlesDone = EnClan.circlesDone0;'],
+    ['S2', 'пороги клановых ступеней в данных клана разошлись с сундуками', 'EN_CLAN.boss.ladder.circles[1] -= 1;', 'EN_CLAN.boss.ladder.circles[1] += 1;'],
+    ['S2', 'взятая клановая ступень не доходит до «Даров»', 'EnClan.circleRows0 = EnClan.circleRows; EnClan.circleRows = () => [];', 'EnClan.circleRows = EnClan.circleRows0;'],
+    ['S3', 'клановые ступени не входят в пул недели', 'EnClan.pool0 = EnClan.pool; EnClan.pool = (L, place, pts, members, c) => EnClan.pool0(L, place, pts, members, c, 0);', 'EnClan.pool = EnClan.pool0;'],
+    ['S2', 'клан вне топа видит в «Дарах» прежнюю строку «все с очками»', 'EnClan.tier0 = EnClan.tier; EnClan.tier = (L, place, pts) => EnClan.tier0(L, place, pts) || (pts > 0 ? L.modes.clan.layers.find(x => x.kind === "place" && x.clan).rows.slice(-1)[0] : null);', 'EnClan.tier = EnClan.tier0;'],
+    ['S3', 'клан вне топа получает в пул прежнюю строку «все с очками»', 'EnClan.pool1 = EnClan.pool; EnClan.pool = (L, place, pts, members, c, done) => { const P = EnClan.pool1(L, place, pts, members, c, done); if (P.row || !(pts > 0)) return P; const r = L.modes.clan.layers.find(x => x.kind === "place" && x.clan).rows.slice(-1)[0]; return { row: r, steps: P.steps, groups: P.groups.concat(EnClan.stepsOf(r, c).map(g => ({ step: g.step, win: g.win, count: g.count * members }))) }; };', 'EnClan.pool = EnClan.pool1;'],
+    ['S4', 'обычный в прогоне — ниже своей ступени', () => { const r = LC.me.find(x => x[0] === 'o')[3][0]; r.push(r[1], r[2]); r[1] = D.boss.ladder.plank1; r[2] = 1; }, () => { const r = LC.me.find(x => x[0] === 'o')[3][0]; r[2] = r.pop(); r[1] = r.pop(); }],
+    ['S4', 'клан обычных без древа — на второй клановой ступени', () => { const r = LC.clans[0][2][0]; r.push(r[3], r[5]); r[3] = D.boss.ladder.circles[1]; r[5] = 2; }, () => { const r = LC.clans[0][2][0]; r[5] = r.pop(); r[3] = r.pop(); }],
+  ]);
+  const apply = f => (typeof f === 'function' ? f() : vm.runInContext(f, P.ctx));
+  for (const [k, what, brk, fix] of MUT) {
+    try { apply(brk); } catch (x) { say(`мутация «${what}»: не применилась — ${x.message}`); continue; }
+    const got = lawRun(k);
+    try { apply(fix); } catch (x) { say(`мутация «${what}»: не снялась — ${x.message}`); }
+    if (got.length) caught++; else say(`мутация «${what}»: закон ${k} её не поймал`);
+    if (process.argv.includes('--mut')) console.log(`мутация «${what}»: ${got.length ? 'закон ' + k + ' — ' + got.slice(0, 2).join(' | ').slice(0, 300) : 'НЕ ПОЙМАНА'}`);
+  }
+  for (const k of Object.keys(LAW)) for (const x of lawRun(k)) say(`ступени кланового босса, закон ${k} после мутаций: ${x}`);
+  cnt.laws = nLaw; cnt.mut = caught;
+  reset();
+}
+if (err.length) done();
+
 /* ================== 5. вид ================== */
 function tour(team) {
   const tag = team ? ' [команда]' : '';
@@ -755,7 +939,7 @@ function tour(team) {
   }
   const c = C(), m = c.members.find(x => !x.me), x = c.boss.targets[0];
   const sheets = [['clpass'], ['clroles'], ['clresv'], ['cltgt', x.uid], ['clledger'], ['clrules'], ['clmem', m.id], ['clmem', c.members.find(y => y.me).id], ['clapps'], ['clgifts'], ['cllog'],
-    ['cllvl', '13'], ['clbonus'], ['clreset'], ['cllead', m.id], ['clkick', m.id], ['clleave'], ['gifts', 'clan'], ['rank', 'Клановый босс'],
+    ['cllvl', '13'], ['clbonus'], ['clreset'], ['cllead', m.id], ['clkick', m.id], ['clleave'], ['gifts', 'clan'], ['rank', 'Клановый босс'], ['clsteps'], ['wkmode', 'clan:now'],
     ['clhosts'], ['clfoe', 'water-elite'], ['clfoe', 'time-boss'], ['clfoe', 'fire-dd2'], ['clcount']];
   for (const [t, arg] of sheets) { reset(); T.SQ.set('clan', 's1'); T.S.overlay = { t, arg }; view(P, `лист ${t} ${arg || ''}${tag}`); }
   for (const f of ['gifts', 'tree', 'join', 'boss', 'roles']) { reset(); T.S.clan.logF = f; T.S.overlay = { t: 'cllog' }; view(P, `журнал · ${f}${tag}`); }
@@ -800,7 +984,11 @@ reset();
     if (st.lock) say(`Неделя: строка клана закрыта — «${st.lock}»`);
     else {
       if (st.points !== CU.weekPts() || st.mine !== C().boss.mine || st.place !== CU.placeOf(CU.weekPts())) say('Неделя: очки, вклад или место клана не с экрана клана');
-      if (!st.tier || !st.tier.pay.length) say('Неделя: нет выплаты за место клана');
+      /* клан демо — вне топа: выплаты за место нет, её место заняли ступени (ADR-0047): личные — по личным очкам, клановые — по кругам */
+      const tr = EC.tier(T.LB, st.place, st.points);
+      if (tr ? !st.tier || !st.tier.pay.length : st.tier) say('Неделя: выплата за место клана — не по строке мест сундуков');
+      if (st.have !== C().boss.mine || !st.planks.length || st.planks[0].need !== D.boss.ladder.plank1) say('Неделя: личные ступени кланового босса — не по личным очкам недели или первая — не из данных клана');
+      if (st.clanPlanks.length !== D.boss.ladder.circles.length || st.clanPlanks.some((p, i) => p.need !== D.boss.ladder.circles[i]) || st.clanHave !== EC.circlesDone(C().boss.circle)) say('Неделя: клановые ступени кланового босса — не по кругам недели');
     }
     const ps = W.state('clan', 'past'), rows = T.darRows ? T.darRows(T.S).filter(p => p.id === 'clan' && p.wk && p.wk.id === 'prev') : [];
     if (ps.lock) say(`Неделя: прошлая неделя клана закрыта — «${ps.lock}»`);

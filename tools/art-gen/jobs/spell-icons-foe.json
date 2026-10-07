@@ -1,0 +1,99 @@
+{
+  "name": "Иконки способностей сеткой — черты врагов (ADR-0051, задание координатора 06.10.2026: «Иконки новых способностей врагов нарисуй в конце работы, как рисовались иконки уникальных способностей»): 5 пассивок и 6 реакций набора «Черты врагов» одним листом 4×3. Образец — spell-icons-none.json: style, negative и категория spell-icons — без правок",
+  "plan": {
+    "Лист spell-foe-traits": "4:3, 2K, сетка 4×3 — 5 пассивок, 6 реакций и запасная клетка «Мимо бури»",
+    "Нарезка": "python tools/art-gen/grid_slice.py jobs/spell-icons-foe.json spell-foe-traits <лист>; клетки — в art/generated/spell-icons/spell-foe-traits/",
+    "Выгрузка": "python tools/art-gen/ui_icons.py, затем export_ui.py --spec ui-icons.json: design/ui/assets/art/spells/foe-<вид>-<номер>.webp 256 px; путь строит ART_ICONS.spell (набор «враг» → foe)"
+  },
+  "notes": [
+    "Черта врага — не школа: её носят враги любой стихии. Палитра — кость, рог, шкура, ржавое железо, чёрная смола, кровь; свет снизу — холодный костяной с тёмным багрянцем, чтобы не спорить ни с тёплым факелом «Без школы», ни с алым Огня",
+    "Язык иконки — как у библиотеки (art/style/style.md, «Иконки способностей сеткой»): пассивка — спокойный предмет-эмблема, реакция — миг ответа на событие. Ответный удар врага идёт влево, к героям: на карте враг смотрит влево",
+    "Мотив клетки — что черта делает: «Стряхнуть порчу» — сброшенная змеиная кожа; «Сбить пламя» — гасильник над огнём; «Дублёная шкура» — шкура на раме с подпалинами; «Срыв покрова» — крюк с сорванной завесой; «Ненасытность» — пасть; «Ярость скованного» — кулак рвёт цепь; «Зеркало воли» — оковы отлетают от зеркала; «Глухая оборона» — глухой шлем; «Ответный выпад» — лапа бьёт в ответ; «Каменный лоб» — клинок разбивается о лоб; «Мимо бури» — плащ уходит из-под молнии",
+    "Запасная клетка — второй вариант «Мимо бури» (foe-react-6-alt): буря без предмета — слабое место правила «один ясный предмет». Имя с -alt в выгрузку не идёт (ui_icons.py)",
+    "Названий способностей в промте нет: модель подписывает клетки. Текст делает интерфейс",
+    "Спойлеры (ADR-0038): в промте — образы без имён врагов и без текстов игрока; черта видна только у изученного врага",
+    "cells — [id способности из tools/content-gen/abilities/library.json, имя файла] по строкам сверху, в строке слева направо; grid — [столбцы, строки]"
+  ],
+  "models": [
+    "nb2"
+  ],
+  "style": "Art style: hand-painted stylized dark-fantasy game art for a mobile RPG. Painterly digital illustration with visible, confident brush strokes and simplified planar shapes, crisp rim light on edges, strong readable silhouettes, deep near-black shadows. Light tells the story: a few strong sources — crystals and cracks that glow from within — throw colored light upward, the light comes from below. Cold and warm light contrast. Dust motes and grains of sand float in the light. Moderate detail, clean readable forms. No photorealism, no 3D-render look, no anime. Match the brushwork, lighting and color handling of the attached style reference images, but do NOT copy their subjects, objects, letters or composition.",
+  "negative": "No text, no letters, no numbers, no captions, titles or labels under, over or inside the icons, no real-world alphabets, no runes or marks that look like writing, no watermark, no signature, no logo, no UI elements, no frames or borders drawn inside the cells. No pentagrams, no occult signs. No magenta or pink anywhere inside the icons: magenta appears only in the gutters.",
+  "categories": {
+    "spell-icons": {
+      "aspect": "1:1",
+      "size": "2K",
+      "refs": [
+        "art/generated/abilities/ab-stop__nb2.jpg",
+        "art/style/ref-07-icon-rune-bin.jpg",
+        "art/style/ref-04-beast-gold-cracks.jpg"
+      ],
+      "frame": "Format: a sheet of square ability icons for a mobile RPG, painted together as one consistent set. The icons stand in a precise grid of equal square cells; the number of columns and rows and the picture in every cell are listed below, row by row from the top, each row from left to right. Between the cells run narrow straight gutters of flat, uniform pure magenta (#FF00FF), and the same magenta gutter runs around the outside of the whole grid. All gutters have the same width, all cells have the same size, and nothing crosses a gutter. Every cell is its own complete square painting filled from edge to edge — the game puts its own frame on top: one clear central image with a bold silhouette that stays readable at 48 px, on a dark near-black stone background with faint cracks and a darker vignette toward the edges of the cell. Light rises from below in the color of the magic school; crisp rim light on the edges of the forms; a few sparks and dust motes in the light. All icons share the same brushwork, lighting, level of detail and palette, so they read as one set, and each icon differs clearly from its neighbours in shape and composition."
+    }
+  },
+  "jobs": [
+    {
+      "id": "spell-foe-traits",
+      "category": "spell-icons",
+      "title": "Черты врагов — 11 иконок сеткой 4×3 и запасная",
+      "source": "tools/content-gen/abilities/library.json, foeTraits.passive и foeTraits.reaction; docs/content/библиотека-способностей.md, раздел «Черты врагов (ADR-0051)»",
+      "aspect": "4:3",
+      "size": "2K",
+      "grid": [
+        4,
+        3
+      ],
+      "cells": [
+        [
+          "враг.pas.1",
+          "foe-pas-1"
+        ],
+        [
+          "враг.pas.2",
+          "foe-pas-2"
+        ],
+        [
+          "враг.pas.3",
+          "foe-pas-3"
+        ],
+        [
+          "враг.pas.4",
+          "foe-pas-4"
+        ],
+        [
+          "враг.pas.5",
+          "foe-pas-5"
+        ],
+        [
+          "враг.react.1",
+          "foe-react-1"
+        ],
+        [
+          "враг.react.2",
+          "foe-react-2"
+        ],
+        [
+          "враг.react.3",
+          "foe-react-3"
+        ],
+        [
+          "враг.react.4",
+          "foe-react-4"
+        ],
+        [
+          "враг.react.5",
+          "foe-react-5"
+        ],
+        [
+          "враг.react.6",
+          "foe-react-6"
+        ],
+        [
+          "враг.react.6",
+          "foe-react-6-alt"
+        ]
+      ],
+      "subject": "This sheet has no magic school: these are the instincts and tricks of the monsters of the deep — bone, horn, thick scarred hide, scales, rusted iron chains and black tar, dark red blood. No glowing magic crystals anywhere. The light from below is a cold, pale bone-white glow with a faint dark crimson tint, like moonlight in a cave. Every icon is built around one clear central object with a bold silhouette — never only smoke, dust, snow, fog or a scattered pattern. Paint all cells on the same dark near-black stone background, with loose, confident painterly brush strokes and soft painted edges, never black outlines, never a flat cartoon or sticker look. No human faces.\n\nThe grid: exactly 4 columns and 3 rows, 12 icons. Row 1 and the first icon of row 2 are passive traits — calm, emblem-like single objects, no action. The other three icons of row 2 and all four icons of row 3 are reactions — an instant answer to an event in battle, shown as one moment of action; a monster strikes back to the left.\n\nRow 1: an empty shed snake skin, pale and translucent, lying coiled on a dark stone, a few drops of black tar sliding off it; a bell-shaped iron candle snuffer lowered over a small dying flame, one thin curl of smoke rising from under it; a thick tanned beast hide stretched tight on a wooden frame with leather cords, two dark scorch marks on it that did not burn through; a large curved iron hook with a long torn strip of thin shimmering golden veil caught on its point.\n\nRow 2: a fanged beast skull with its jaws wide open, a dark red glow deep in its throat and dark red blood dripping from the fangs; a huge clawed fist straining against heavy rusted iron chains wrapped around it, one link snapping apart with sparks; a round mirror of polished dark steel in a bone frame, a chain with an open shackle flung at it and bouncing straight back off its surface with a bright flash; a closed iron helmet with its visor shut tight and no eye slits, drops of black poison splashing against it and sliding off.\n\nRow 3: a huge clawed paw swiping back to the left at the very instant a sword glances off its thick hide, sparks at the point of impact; a massive horned skull of grey stone facing forward, a sword blade shattering into pieces against its forehead; a tattered dark cloak whirling aside, empty, while a huge bolt of lightning strikes the bare ground right beside it; a hunched faceless shape in a dark hooded cloak slipping sideways out of a falling column of golden fire, only the edge of its cloak singed."
+    }
+  ]
+}

@@ -1,23 +1,28 @@
-/* screens/store.js — Лавка Энериума: пять стартовых наборов цепочкой, пять наборов Энериума, три выдачи, лимитированные предложения,
-   реклама за Энериум; покупка платного ряда пропуска — тем же «сервером» (GDD §32, §1.2, §9.3, §36; ADR-0033, ADR-0034).
-   Слово автора 30.09.2026: «Я Вижу это как 5 стартовых наборов, все с х2 и 5 градаций, покупая 1 - открывается 2 ,и т.д.»; «наборы
-   малого, среднего, большого, огромного и великого энериума, подписки дающие энериум раз в день, всего 3 штуки, боевой пропуск,
-   лимитированные предложения»; «реклама… от 10 в день и смотреть или нет игрок решит сам вместе с попапом»; правило «дорого-богато».
-   Черновик для автора — docs/content/монетизация.md. Данные — design/ui/store.js (EN_STORE и алгоритм EnStore): собирает
+/* screens/store.js — Лавка Энериума: пять разовых наборов, пять комплектов Энериума, три выдачи, лимитированные предложения,
+   реклама за Энериум; покупка платного ряда пропуска — тем же «сервером» (GDD §32, §1.2, §9.3, §36; ADR-0033, ADR-0034, ADR-0047,
+   ADR-0054). Слово автора 30.09.2026: «наборы малого, среднего, большого, огромного и великого энериума, подписки дающие энериум
+   раз в день, всего 3 штуки, боевой пропуск, лимитированные предложения»; «реклама… от 10 в день и смотреть или нет игрок решит сам
+   вместе с попапом»; правило «дорого-богато». Слово автора 02.10.2026: «1 рубль = 1 Энериум». Слово автора 06.10.2026 — ×2:
+   «…именно он решает какой набор будет х2 но только самая первая покупка, касается только разовых наборов… На комплекты Энериума будет
+   действовать х2 на каждый набор но только 1 раз на 1 набор». Прежняя «цепочка стартовых наборов, все ×2» отменена.
+   Расчёт и законы — docs/content/монетизация.md. Данные — design/ui/store.js (EN_STORE и алгоритм EnStore): собирает
    tools/content-gen/store/build.js, руками не править.
    Регистрирует:
-   — вкладки Лавки Энериума обёрткой SCREENS.store: «Наборы» — стартовая цепочка и предложения, «Энериум» — пять наборов и реклама,
+   — вкладки Лавки Энериума обёрткой SCREENS.store: «Наборы» — разовые наборы и предложения, «Энериум» — пять комплектов и реклама,
      «Выдача» — три подписки; «Пропуск» рисует screens/pass.js; облик не продаётся — строкой внизу витрины;
    — «сервер» покупок SH_SRV: buy(номер, товар), ad(номер), day() — новые сутки, open(предложение, ключ) — предложение открывает сервер;
-     номер несут кнопки, повтор ничего не повторяет, отказ ничего не меняет; сервер помнит покупки — S.store;
+     номер несут кнопки, повтор ничего не повторяет, отказ ничего не меняет; сервер помнит покупки и использованное ×2 — S.store;
    — листы: OV.stbuy — что придёт, до оплаты; OV.stgot — получение; OV.stad — попап рекламы и ролик;
    — для других экранов: stPriceTxt(товар) — цена платформы игрока (пропуск), stAdLink() — строка рекламы в «Даре дня»;
    — раздел UI-кита «Лавка Энериума» (KIT_EXTRA), сценарии презентации.
-   Честность: что придёт — до оплаты; «×2» — от настоящего курса; срок предложения — датой, без таймера и торопящих слов; попапов
-   у предложений нет; реклама — только по нажатию игрока; облик, очки и попытки не продаются.
+   ×2 на витрине: печать «×2» стоит там, где число уже удвоено. У комплекта Энериума — своя, пока его первая покупка не сделана.
+   У разовых наборов — одна общая пометка «×2 — на первую покупку, набор на ваш выбор», пока удвоение не использовано: витрина
+   показывает, что придёт, если купить этот набор первым; после первой покупки пометки нет, состав — без удвоения.
+   Честность: что придёт — до оплаты, честным числом; «×2» — от настоящего курса; срок предложения — датой, без таймера и торопящих
+   слов; попапов у предложений нет; реклама — только по нажатию игрока; облик, очки и попытки не продаются.
    Анимация получения — только transform и opacity, моменты — целые мс от начала показа; нажатие — сразу итог; «меньше движения» —
    без анимации. Арт — AV('store/…'), только если путь в EN_STORE.art.ready; до выгрузки — заглушки CSS.
-   Правила воздуха (ADR-0026): карточка — картинка, имя, до двух чисел, до двух чипов и одно действие; витрина стартового набора —
+   Правила воздуха (ADR-0026): карточка — картинка, имя, до двух чисел, до двух чипов и одно действие; витрина разового набора —
    главный блок вкладки: состав — три значка с числами (что придёт — видно сразу). Стили — screens/store.css.
    Автопроверка — tools/content-gen/screens/check_store.js. */
 'use strict';
@@ -34,9 +39,11 @@ const ST_ROMAN = ['', 'I', 'II', 'III', 'IV', 'V'];
 const ST_WEEKDAY = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
 const ST_REFUSE = {
   data: 'Лавка недоступна', op: 'Операция без номера', none: 'Такого товара нет', once: 'Этот набор уже куплен: он продаётся раз за игру',
-  order: 'Сначала — предыдущая ступень', days: 'Выдача уже оплачена на столько дней вперёд, сколько можно', open: 'Пропуск ещё закрыт', bought: 'Платный ряд уже открыт',
+  days: 'Выдача уже оплачена на столько дней вперёд, сколько можно', open: 'Пропуск ещё закрыт', bought: 'Платный ряд уже открыт',
   gone: 'Предложение закрылось', limit: 'Предложение уже куплено', cap: 'На сегодня ролики кончились — завтра снова',
 };
+/* общая пометка разовых наборов — слово в слово; стоит, пока ×2 самой первой покупки не использовано */
+const ST_X2_ONCE = 'на первую покупку, набор на ваш выбор';
 
 /* ================== помощники ================== */
 const stOk = () => !!(STD && STA);
@@ -68,15 +75,17 @@ const stOfferName = o => { const K = STD.offers.kinds[o.of]; return `${K.n}${o.c
 
 /* ================== состояние: S.store ==================
    region — платёжная область (ru — рубли, us — доллары; решает платформа, команда переключает для показа); bought — сколько раз куплен
-   товар; subs — дней выдачи впереди; subDay — сутки последней порции; offers — открытые предложения [{ id, left, n }]; opened — ключи
-   открытий, чтобы сервер не открывал одно дважды; ads — { day, n }; srv — ответы по номерам операций; fx — идущий показ; play — ролик */
+   товар; x2 — использованное удвоение разовых наборов: once — id набора, которому оно досталось, пусто — ждёт (у комплекта Энериума
+   удвоение использовано, как только он куплен: bought); subs — дней выдачи впереди; subDay — сутки последней порции; offers — открытые
+   предложения [{ id, left, n }]; opened — ключи открытий, чтобы сервер не открывал одно дважды; ads — { day, n }; srv — ответы
+   по номерам операций. Не память сервера, а вид: pick — какой разовый набор игрок выбрал на витрине; fx — идущий показ; play — ролик */
 function stNew(s, demo) {
   const D = STD.demo, offers = [], opened = {};
   if (demo) for (const id of D.offers) {
     const o = STD.offers.list.find(x => x.id === id), left = o ? STA.offerLife(STD, o.of, s.week ? s.week.left : 0) : 0;
     if (left > 0) { offers.push({ id, left, n: 0 }); opened[stOpenKey(o, s)] = 1; }
   }
-  return { v: 2, region: D.region, bought: {}, subs: {}, subDay: {}, offers, opened, ads: { day: s.gift ? s.gift.today : 1, n: 0 }, srv: { ops: {}, seq: 1 }, fx: null, play: null };
+  return { v: 3, region: D.region, bought: {}, x2: { once: '' }, pick: '', subs: {}, subDay: {}, offers, opened, ads: { day: s.gift ? s.gift.today : 1, n: 0 }, srv: { ops: {}, seq: 1 }, fx: null, play: null };
 }
 /* ключ открытия: «Дар пути» — раз за цикл (свой id), «Лавка недели» — раз в серверную неделю, праздник — раз за праздник */
 function stOpenKey(o, s = S) {
@@ -88,7 +97,9 @@ function stState(s) { if (stOk()) s.store = stNew(s, true); return s; }
 /* ================== «сервер» Лавки ==================
    buy(op, id) — покупка: платёж проводит платформа, сервер проверяет квитанцию с этим номером и выдаёт товар один раз; ad(op) — ролик
    досмотрен: награду засчитывает сервер по подтверждению рекламной сети; day() — новые серверные сутки: письма выдачи; open(id) —
-   предложение открывает сервер. Ответ: { res } — сделано; { again, res } — повтор номера, ничего не меняет; { refuse } — отказ */
+   предложение открывает сервер. Ответ: { res } — сделано; { again, res } — повтор номера, ничего не меняет; { refuse } — отказ.
+   ×2 решает сервер (EnStore.mult) до выдачи и сразу запоминает: разовому набору — запись x2.once, одна на игру; комплекту Энериума —
+   счёт покупок bought, раз на комплект. В ответе x — множитель этой покупки */
 const SH_SRV = {
   buy(op, id) {
     const T = S.store;
@@ -97,13 +108,14 @@ const SH_SRV = {
     if (T.srv.ops[op]) return { again: true, res: T.srv.ops[op] };
     const P = STA.product(STD, id); if (!P) return { refuse: 'none' };
     const day = stDay(), why = STA.refuse(STD, T, id, stCtx()); if (why) return { refuse: why };
-    const got = STA.gets(STD, T, id, day), price = STA.price(STD, id, T.region);
+    const x = STA.mult(STD, T, id), got = STA.gets(STD, T, id, day), price = STA.price(STD, id, T.region);
     if (P.kind === 'sub') { const A = STA.subAdd(STD, T, id, day); T.subs[id] = (T.subs[id] || 0) + A.days; T.subDay[id] = day; }
     if (P.kind === 'offer') { const O = STA.offerOf(T, id); O.n = (O.n || 0) + 1; }
+    if (P.kind === 'chain' && x > 1) T.x2 = Object.assign({}, T.x2, { once: id });
     if (P.kind === 'pass') { S.pass.paid = true; T.bought['pass:' + S.pass.no] = 1; }
     else T.bought[id] = (T.bought[id] || 0) + 1;
     for (const [k, n] of got) S.wallet[k] = (S.wallet[k] || 0) + n;
-    const res = { op, id, kind: P.kind, got, price };
+    const res = { op, id, kind: P.kind, got, price, x };
     T.srv.ops[op] = res; T.srv.seq++;
     return { res };
   },
@@ -143,28 +155,39 @@ const SH_SRV = {
 };
 
 /* ================== витрина: «Наборы» ================== */
-/* ступень цепочки крупно: арт, имя, что придёт ×2 и цена; купил — открылась следующая; все пять — «собраны» */
-function stChainShow(o = {}) {
-  const C = STD.chain, n = C.steps.length, at = o.at != null ? o.at : STA.chainAt(STD, S.store), done = !at;
-  const s = C.steps[(done ? n : at) - 1], got = s.get.map(([k, v]) => [k, v * C.x]), op = o.kit ? '' : stOp();
-  const pic = `<span class="st-ped big">${stPic(s.id, 'lg')}</span>`;
-  const items = got.map(([k, v]) => `<span class="st-it" data-k="${k}">${stIco(k)}<b class="num">${fmt(v)}</b><small>${ST_KIND[k]}</small></span>`).join('');
-  const act = done ? `<span class="chip spirit st-done">${ic('check')}все пять собраны</span>`
-    : `<button class="btn go st-buy"${o.kit ? '' : ` data-a="stbuy" data-v="${s.id}"`}>${stPriceTxt(s.id)}</button>`;
-  return `<div class="st-show${done ? ' done' : ''}"${o.kit ? '' : ` data-st="${s.id}"`}>${done ? '' : `<i class="st-x2" aria-hidden="true">×${C.x}</i>`}
-    <div class="st-sh-l">${pic}</div>
-    <div class="st-sh-r"><span class="eyebrow">${done ? 'Стартовые наборы' : `Стартовый набор · ${ST_ROMAN[at]} из ${ST_ROMAN[n]} · раз за игру`}</span>
-      <b class="st-nm">«${trEsc(s.n)}»</b><div class="st-its">${items}</div>
-      <small class="st-sub">${done ? 'Рунные ключи и души дальше — только игрой: боссы биомов, контракты, сундуки.' : `Всё уже ×${C.x}: покупка ступени — всегда первая. ${at < n ? `Купите — откроется «${trEsc(C.steps[at].n)}».` : 'Это последняя ступень цепочки.'}`}</small>
-      ${act}</div></div>`;
+/* разовый набор на витрине: выбор игрока в ряду пяти; выбора нет — первый из тех, что ещё продаются; '' — куплены все пять */
+function stPick(T = S.store) {
+  if (STD.chain.steps.some(s => s.id === T.pick)) return T.pick;
+  return STA.onceLeft(STD, T)[0] || '';
 }
-/* лесенка из пяти ступеней: куплена — отметка, текущая — свет, впереди — замок; нажатие — лист ступени */
-function stRungs(o = {}) {
-  const C = STD.chain, at = o.at != null ? o.at : STA.chainAt(STD, S.store);
-  return `<div class="st-rungs" role="list" aria-label="Стартовые наборы">${C.steps.map((s, i) => {
-    const k = i + 1, st = STA.count(S.store, s.id) || (o.at != null && (!at || k < at)) ? 'got' : k === at ? 'cur' : 'lock';
-    const lbl = `Ступень ${ST_ROMAN[k]} — «${s.n}», ${stPriceTxt(s.id)}${st === 'got' ? ', куплена' : st === 'cur' ? ', продаётся' : ', откроется после предыдущей'}`;
-    return `<button class="st-rung ${st}" role="listitem"${o.kit ? '' : ` data-a="stbuy" data-v="${s.id}"`} aria-label="${trEsc(lbl)}" title="${trEsc(lbl)}"><span class="st-rp">${stPic(s.id, 'sm')}${st === 'got' ? `<span class="st-rk">${ic('check')}</span>` : st === 'lock' ? `<span class="st-rk lk">${ic('lock')}</span>` : ''}</span><b class="st-rn">${ST_ROMAN[k]}</b><small class="num">${stPriceTxt(s.id)}</small></button>`;
+/* разовый набор крупно: арт, имя, что придёт сейчас и цена. Пока ×2 самой первой покупки ждёт — числа удвоены, стоят печать «×2»
+   и общая пометка; после первой покупки пометки нет, состав — как есть. Куплен — отметка вместо цены; куплены все — «все пять собраны».
+   o.st — память сервера для показа (UI-кит), o.id — какой набор */
+function stOnceShow(o = {}) {
+  const C = STD.chain, T = o.st || S.store, id = o.id != null ? o.id : stPick(T), done = !id;
+  const s = done ? C.steps[C.steps.length - 1] : C.steps.find(x => x.id === id), k = C.steps.indexOf(s) + 1;
+  const bought = !done && !!STA.count(T, s.id), x2 = !done && !bought && STA.onceX2(STD, T);
+  const got = done || bought ? s.get : STA.gets(STD, T, s.id, stDay());
+  const pic = `<span class="st-ped big">${stPic(s.id, 'lg')}</span>`;
+  const items = got.map(([k2, v]) => `<span class="st-it" data-k="${k2}">${stIco(k2)}<b class="num">${fmt(v)}</b><small>${ST_KIND[k2]}</small></span>`).join('');
+  const act = done ? `<span class="chip spirit st-done">${ic('check')}все пять собраны</span>`
+    : bought ? `<span class="chip spirit st-done">${ic('check')}куплен</span>`
+    : `<button class="btn go st-buy"${o.kit ? '' : ` data-a="stbuy" data-v="${s.id}"`}>${stPriceTxt(s.id)}</button>`;
+  const sub = done ? '<small class="st-sub">Рунные ключи и души дальше — только игрой: боссы биомов, контракты, сундуки.</small>'
+    : x2 ? `<small class="st-sub st-x2n"><b>×${C.x} — ${ST_X2_ONCE}.</b> Остальные придут без удвоения.</small>` : '';
+  return `<div class="st-show${done ? ' done' : ''}${bought ? ' got' : ''}"${o.kit ? '' : ` data-st="${s.id}"`}>${x2 ? `<i class="st-x2" aria-hidden="true">×${C.x}</i>` : ''}
+    <div class="st-sh-l">${pic}</div>
+    <div class="st-sh-r"><span class="eyebrow">${done ? 'Разовые наборы' : `Разовый набор ${ST_ROMAN[k]} · раз за игру`}</span>
+      <b class="st-nm">«${trEsc(s.n)}»</b><div class="st-its">${items}</div>
+      ${sub}${act}</div></div>`;
+}
+/* ряд пяти разовых наборов — выбор набора для витрины: купленный — отметка, выбранный — свет. Замков нет: порядок покупки — любой */
+function stOnceRow(o = {}) {
+  const C = STD.chain, T = o.st || S.store, cur = o.id != null ? o.id : stPick(T);
+  return `<div class="st-sets" role="group" aria-label="Разовые наборы">${C.steps.map((s, i) => {
+    const k = i + 1, got = !!STA.count(T, s.id), on = s.id === cur;
+    const lbl = `Набор ${ST_ROMAN[k]} — «${s.n}», ${stPriceTxt(s.id)}${got ? ', куплен' : ''}`;
+    return `<button class="st-set${got ? ' got' : ''}${on ? ' cur' : ''}"${o.kit ? '' : ` data-a="stpick" data-v="${s.id}"`} aria-pressed="${on}" aria-label="${trEsc(lbl)}" title="${trEsc(lbl)}"><span class="st-setp">${stPic(s.id, 'sm')}${got ? `<span class="st-setk">${ic('check')}</span>` : ''}</span><b class="st-setn">${ST_ROMAN[k]}</b><small class="num">${stPriceTxt(s.id)}</small></button>`;
   }).join('')}</div>`;
 }
 /* предложение: арт, имя, Энериум, «до …» и цена; купленное — отметка */
@@ -181,12 +204,14 @@ function stOffersHtml() {
   return `<div class="st-offers"><span class="eyebrow">Предложения</span>${body}</div>`;
 }
 function stStartView() {
-  return `<div class="st-start"><div class="st-main">${stChainShow()}${stRungs()}</div>${stOffersHtml()}</div>`;
+  return `<div class="st-start"><div class="st-main">${stOnceShow()}${stOnceRow()}</div>${stOffersHtml()}</div>`;
 }
 
 /* ================== витрина: «Энериум» ================== */
+/* комплект Энериума: арт, имя, сколько придёт сейчас, прибавка и цена. Печать «×2» — у каждого своя и стоит, пока этот комплект
+   не куплен ни разу: число на карточке уже удвоено. o.first — состояние для показа (UI-кит) */
 function stPackCard(p, o = {}) {
-  const e = STA.packEn(STD, p.id), first = o.first != null ? o.first : !STA.count(S.store, p.id), n = first ? e.first : e.n, i = STD.packs.indexOf(p);
+  const e = STA.packEn(STD, p.id), first = o.first != null ? o.first : STA.mult(STD, S.store, p.id) > 1, n = first ? e.first : e.n, i = STD.packs.indexOf(p);
   return `<div class="st-pk${first ? ' first' : ''}" data-i="${i + 1}">${first ? `<i class="st-x2 sm" aria-hidden="true">×${p.firstX}</i>` : ''}
     <span class="st-ped">${stPic(p.id)}</span><b class="st-pn">${trEsc(p.n.replace(' набор Энериума', ''))}</b>
     <span class="st-pa">${stIco('enerium')}<b class="num">${fmt(n)}</b></span>
@@ -221,13 +246,13 @@ function stSubsView() {
 function stHall(body, tab) {
   const bg = stArt('hall');
   return `<div class="st-hall${bg ? ' art' : ''}" data-tab="${tab}">${bg ? `<img class="st-bg" src="${bg}" alt="">` : ''}${body}
-    <p class="reason st-note">За деньги — только больше возможностей. Рунные ключи и души — только в стартовых наборах. Облик не продаётся — его зарабатывают: <button class="link" data-a="sheet" data-v="look">Облик ${ic('chev')}</button></p>
+    <p class="reason st-note">За деньги — только больше возможностей. Рунные ключи и души — только в разовых наборах. Облик не продаётся — его зарабатывают: <button class="link" data-a="sheet" data-v="look">Облик ${ic('chev')}</button></p>
     ${stTeam()}</div>`;
 }
 function stTeam() {
   const T = S.store;
   return TM(`<div class="row st-team"><span class="eyebrow">Команда</span><button class="btn sm" data-a="stteam" data-v="region">${T.region === 'us' ? 'цены: Запад' : 'цены: Россия'}</button><button class="btn sm" data-a="stteam" data-v="path">новый цикл</button><button class="btn sm" data-a="stteam" data-v="fest">праздник</button><button class="btn sm" data-a="stteam" data-v="day">новые сутки</button><button class="btn sm" data-a="stteam" data-v="reset">сбросить покупки</button>
-    <span class="faint st-tnote">EN_STORE: куплено ${Object.values(T.bought).reduce((a, x) => a + x, 0)}, выдача — ${Object.entries(T.subs).filter(([, x]) => x > 0).map(([k, x]) => `${k} ${x}`).join(', ') || 'нет'}, реклама — ${T.ads.day === stDay() ? T.ads.n : 0} из ${STD.ads.dayCap}; журнал — ${Object.keys(T.srv.ops).length} операций. Оплата — окно платформы; здесь «сервер» выдаёт сразу.</span></div>`, 'div');
+    <span class="faint st-tnote">EN_STORE: куплено ${Object.values(T.bought).reduce((a, x) => a + x, 0)}; ×${STD.chain.x} разовых наборов — ${STA.onceX2(STD, T) ? 'ждёт первой покупки' : `использовано${T.x2 && T.x2.once ? ': ' + T.x2.once : ''}`}; ×2 наборов Энериума осталось у ${STD.packs.filter(p => STA.mult(STD, T, p.id) > 1).length} из ${STD.packs.length}; выдача — ${Object.entries(T.subs).filter(([, x]) => x > 0).map(([k, x]) => `${k} ${x}`).join(', ') || 'нет'}, реклама — ${T.ads.day === stDay() ? T.ads.n : 0} из ${STD.ads.dayCap}; журнал — ${Object.keys(T.srv.ops).length} операций. Оплата — окно платформы; здесь «сервер» выдаёт сразу.</span></div>`, 'div');
 }
 
 /* ================== листы ================== */
@@ -241,16 +266,19 @@ Object.assign(OV, {
     const id = o && o.arg, P = STA.product(STD, id);
     if (!P) return '';
     if (P.kind === 'pass') return typeof OV.pspaid === 'function' ? OV.pspaid() : '';
-    const why = stWhy(id), got = stGets(id), op = stOp(), C = STD.chain;
+    /* x — множитель, с которым сервер выдаст покупку сейчас: печать «×2» на листе стоит только тогда, когда числа ниже уже удвоены */
+    const why = stWhy(id), got = stGets(id), op = stOp(), C = STD.chain, x = why ? 1 : STA.mult(STD, S.store, id);
     let title = P.n, art = id, li = [];
     if (P.kind === 'chain') {
       title = `«${P.n}»`;
-      li = [`Стартовый набор ${ST_ROMAN[P.step]} из ${ST_ROMAN[C.steps.length]} — раз за игру. Покупка всегда первая, поэтому всё ×${C.x}: без удвоения было бы ${P.get.map(([k, n]) => `${k === 'enerium' ? ST_KIND[k] : ST_KIND[k].toLowerCase()} ${fmt(n)}`).join(', ')}.`,
-        P.step < C.steps.length ? `После покупки откроется следующая ступень — «${C.steps[P.step].n}».` : 'Это последняя ступень цепочки.',
-        'Рунные ключи и души за деньги — только в стартовых наборах. Дальше — игрой: боссы биомов, контракты, сундуки.'];
+      /* коротко: на экране 844 × 390 лист с тремя наградами вмещает четыре-пять строк без прокрутки — главное о ×2 стоит первым */
+      const base = P.get.map(([k, n]) => `${k === 'enerium' ? ST_KIND[k] : ST_KIND[k].toLowerCase()} ${fmt(n)}`).join(', ');
+      li = x > 1 ? [`Первая покупка разового набора — весь состав ×${x}. Без удвоения: ${base}.`, 'Удвоение одно: остальные наборы придут без него.']
+        : why === 'once' ? [] : [`×${C.x} первой покупки уже использовано: набор придёт как есть.`];
+      li.push('Раз за игру. Ключи и души за деньги — только здесь.');
     } else if (P.kind === 'pack') {
-      const e = STA.packEn(STD, id), first = !STA.count(S.store, id);
-      li = [first ? `Первая покупка этого набора — ×${P.firstX}: ${fmt(e.first)} вместо ${fmt(e.n)}.` : `Первая покупка ×${P.firstX} уже была: дальше — ${fmt(e.n)} за покупку.`,
+      const e = STA.packEn(STD, id);
+      li = [x > 1 ? `Первая покупка этого набора — ×${x}: ${fmt(e.first)} вместо ${fmt(e.n)}. У каждого набора Энериума своё ×${x} — один раз.` : `×${P.firstX} первой покупки этого набора уже использовано: дальше — ${fmt(e.n)} за покупку.`,
         P.bonusBp ? `Прибавка набора — +${Math.floor(P.bonusBp / 100)} % к Энериуму.` : 'Малый набор — базовый курс Лавки.', 'Покупать можно сколько угодно.'];
     } else if (P.kind === 'sub') {
       const A = STA.subAdd(STD, S.store, id, stDay()), left = S.store.subs[id] || 0;
@@ -263,7 +291,7 @@ Object.assign(OV, {
       const B = STD.econ.base, cur = stRegion() === 'us' ? 'usd' : 'rub', pr = STA.price(STD, id, stRegion()).n, k10 = Math.round(stEn(P.get) * B[cur] * 10 / (B.en * pr));
       li = [`${K.what[0].toUpperCase() + K.what.slice(1)}.`, O ? `Открыто ${stUntil(O.left)} по серверу.` : 'Закрыто.', `Курс — ×${Math.floor(k10 / 10)}${k10 % 10 ? ',' + (k10 % 10) : ''} к малому набору Энериума.`, `Купить можно ${K.limit} ${plural(K.limit, 'раз', 'раза', 'раз')} за открытие.`];
     }
-    const body = `<div class="st-shd"><span class="st-ped">${stPic(art)}</span><div class="st-gl">${got.length ? stGotRows(got) : '<p class="reason">Сегодняшняя порция уже пришла.</p>'}</div></div>
+    const body = `<div class="st-shd"><span class="st-ped">${stPic(art)}${x > 1 ? `<i class="st-x2 sm" aria-hidden="true">×${x}</i>` : ''}</span><div class="st-gl">${got.length ? stGotRows(got) : '<p class="reason">Сегодняшняя порция уже пришла.</p>'}</div></div>
       <ul class="ps-li">${li.map(x => `<li>${trEsc(x)}</li>`).join('')}</ul>
       ${TM(`<p class="reason">Прототип: окно оплаты платформы не вызывается, «сервер» выдаёт товар сразу. SH_SRV.buy — операция с номером: повтор ничего не выдаёт, отказ ничего не меняет. Цена — ступень ${P.tier}: ${stMoney(STA.price(STD, id, 'ru'))} · ${stMoney(STA.price(STD, id, 'us'))}.</p>`)}`;
     const foot = why ? `<span class="chip">${ST_REFUSE[why] || ''}</span><span class="g-spacer"></span><button class="btn" data-a="close">Закрыть</button>`
@@ -275,7 +303,10 @@ Object.assign(OV, {
     const fx = S.store && S.store.fx; if (!fx) return '';
     const R = fx.res, e = fx.done ? 0 : Math.max(0, stNow() - fx.t0);
     const rows = stGotRows(R.got, fx.done ? {} : { anim: i => i * ST_VIEW.step - e });
-    const P = STA.product(STD, R.id), sub = P && P.kind === 'sub' ? 'Дальше — письмом во Входящие, раз в сутки.' : P && P.kind === 'chain' && STA.chainAt(STD, S.store) ? `Открылась следующая ступень — «${trEsc(STD.chain.steps[STA.chainAt(STD, S.store) - 1].n)}».` : '';
+    /* ×2 этой покупки — из ответа сервера (R.x): сказать, что удвоение использовано, — сразу, а не при следующей покупке */
+    const P = STA.product(STD, R.id), sub = P && P.kind === 'sub' ? 'Дальше — письмом во Входящие, раз в сутки.'
+      : P && P.kind === 'chain' && R.x > 1 ? `×${R.x} первой покупки использовано: остальные разовые наборы придут без удвоения.`
+      : P && P.kind === 'pack' && R.x > 1 ? `×${R.x} этого набора использовано: дальше он — без удвоения.` : '';
     const art = P ? (P.kind === 'offer' ? P.of : R.id) : '', head = art ? `<div class="st-gothd"${fx.done ? '' : ` style="--dt:${-e}ms;--tt:${ST_VIEW.rise}ms"`}><span class="st-ped">${stPic(art)}</span></div>` : '';
     return dialog(P ? trEsc(P.kind === 'offer' ? stOfferName(P) : P.kind === 'chain' ? `«${P.n}»` : P.n) : 'Покупка', `<div class="st-got${fx.done ? '' : ' anim'}">${head}${rows}${fx.done ? '' : '<button class="ps-tap" data-a="stskip" aria-label="Сразу итог" tabindex="-1"></button>'}</div>`,
       `${sub ? `<small class="st-gotnote">${sub}</small>` : ''}<span class="g-spacer"></span><button class="btn go" data-a="close">Готово</button>`, 'st-dlg');
@@ -320,11 +351,14 @@ function stShow(res) {
 /* ================== действия ================== */
 Object.assign(ACT, {
   stbuy(v) { S.overlay = { t: 'stbuy', arg: v }; render(); },
+  /* выбор разового набора для витрины: только вид, сервер о нём не знает */
+  stpick(v) { if (S.store && STD.chain.steps.some(s => s.id === v)) { S.store.pick = v; render(); } },
   stbuydo(v) {
     const [op, id] = String(v || '').split('|'), x = SH_SRV.buy(op, id);
     if (x.again) return;
     if (x.refuse === 'days') { const P = STA.product(STD, id); return toast(`Выдача уже оплачена на ${P.maxDays} дней вперёд — больше нельзя`); }
     if (x.refuse) return toast(ST_REFUSE[x.refuse] || ST_REFUSE.op);
+    if (x.res.kind === 'chain') S.store.pick = '';   // купленный набор уходит с витрины: на ней — следующий из тех, что продаются
     if (!x.res.got.length) { S.overlay = null; toast(`${STA.product(STD, id).n}: дни прибавлены`, curImg('enerium')); return; }
     stShow(x.res);
   },
@@ -384,7 +418,7 @@ if (typeof DG_SRV !== 'undefined' && DG_SRV && !DG_SRV.stWrapped) {
 }
 /* срок предложений идёт каждую секунду: на экране меняется только дата конца, когда сервер закрывает предложение */
 if (typeof setInterval === 'function') setInterval(() => {
-  const T = S && S.store; if (!T || T.v !== 2 || !T.offers.length) return;
+  const T = S && S.store; if (!T || T.v !== 3 || !T.offers.length) return;
   let gone = false;
   for (const o of T.offers) if (o.left > 0) { o.left--; if (o.left <= 0) gone = true; }
   if (gone) { T.offers = T.offers.filter(o => o.left > 0); if (S.route === 'store') render(); }
@@ -394,17 +428,23 @@ if (typeof setInterval === 'function') setInterval(() => {
 function stKitHtml() {
   if (!stOk() || !S.store) return '<section class="k-box"><h3>Лавка Энериума</h3><p class="k-note">Нет данных: store.js.</p></section>';
   const fig = (h, c, cls = '') => `<figure class="st-kf${cls ? ' ' + cls : ''}">${h}<figcaption>${c}</figcaption></figure>`;
-  const chain = [fig(stChainShow({ kit: true, at: 3 }), 'ступень III продаётся', 'wide'), fig(stChainShow({ kit: true, at: 0 }), 'все пять собраны', 'wide')].join('');
-  const rungs = fig(stRungs({ kit: true, at: 3 }), 'лесенка: куплены, продаётся, впереди', 'wide');
-  const packs = [fig(stPackCard(STD.packs[1], { kit: true, first: true }), 'первая покупка ×2'), fig(stPackCard(STD.packs[1], { kit: true, first: false }), 'после первой')].join('');
+  /* память сервера для показа: ничего не куплено — ×2 ждёт; набор II куплен первым — ×2 использовано; куплены все пять */
+  const L = STD.chain.steps, s0 = { bought: {}, x2: { once: '' } }, s1 = { bought: { [L[1].id]: 1 }, x2: { once: L[1].id } };
+  const sAll = { bought: Object.fromEntries(L.map(s => [s.id, 1])), x2: { once: L[L.length - 1].id } };
+  const once = [fig(stOnceShow({ kit: true, st: s0, id: L[2].id }), '×2 ждёт: числа — если купить этот набор первым', 'wide'),
+    fig(stOnceShow({ kit: true, st: s1, id: L[2].id }), '×2 использовано: состав как есть, пометки нет', 'wide'),
+    fig(stOnceShow({ kit: true, st: s1, id: L[1].id }), 'куплен', 'wide'), fig(stOnceShow({ kit: true, st: sAll, id: '' }), 'все пять собраны', 'wide')].join('');
+  const row = fig(stOnceRow({ kit: true, st: s1, id: L[2].id }), 'ряд пяти: выбран III, куплен II; порядок любой, замков нет', 'wide');
+  const packs = [fig(stPackCard(STD.packs[1], { kit: true, first: true }), 'первая покупка ×2 — у каждого набора своя'), fig(stPackCard(STD.packs[1], { kit: true, first: false }), 'после первой: печати нет')].join('');
   const subs = [fig(stSubCard(STD.subs[0], { kit: true, left: 0 }), 'выдача не идёт'), fig(stSubCard(STD.subs[0], { kit: true, left: 12 }), 'идёт, 12 дней впереди')].join('');
   const offer = fig(stOfferCard({ id: 'week', left: 3 * 86400, n: 0 }, { kit: true }), 'предложение недели');
   const ad = [fig(stAdStrip({ kit: true, left: 2 }), 'ролики есть', 'wide'), fig(stAdStrip({ kit: true, left: 0 }), 'на сегодня всё', 'wide')].join('');
-  const E = STD.econ, team = TM(`<p class="k-note">Сборщик — tools/content-gen/store/build.js: цепочка ${fmt(E.chain.rub)} ₽ — ключи ${E.chain.keys}, души ${fmt(E.chain.souls)}, Энериум ${fmt(E.chain.enerium)}; к концу цикла II плательщик ×${(E.chain.x17.keys / 100).toFixed(2).replace('.', ',')} по ключам и ×${(E.chain.x17.souls / 100).toFixed(2).replace('.', ',')} по душам. Базовый курс — ${fmt(E.base.en)} Энериума за ${fmt(E.base.rub)} ₽. Реклама — до ${E.adsDay} в день. Черновик — docs/content/монетизация.md.</p>`, 'div');
+  const E = STD.econ, x100 = v => (v / 100).toFixed(2).replace('.', ',');
+  const team = TM(`<p class="k-note">Сборщик — tools/content-gen/store/build.js: курс автора — ${STD.rate.rub} ₽ = ${STD.rate.en} Энериум, малый набор — ${fmt(E.base.en)} Энериума за ${fmt(E.base.rub)} ₽; разовые наборы — ${fmt(E.chain.rub)} ₽ за все пять, худший случай (×${STD.chain.x} достался самому большому) — ключи ${E.chain.max.keys}, души ${fmt(E.chain.max.souls)}, Энериум ${fmt(E.chain.max.enerium)}; к концу цикла II плательщик ×${x100(E.chain.x17.keys)} по ключам и ×${x100(E.chain.x17.souls)} по душам. Реклама — до ${E.adsDay} в день. Расчёт — docs/content/монетизация.md.</p>`, 'div');
   return `<section class="k-box st-kbox" style="grid-column:1/-1"><h3>Лавка Энериума</h3>
-    <p class="k-note">Пять стартовых наборов цепочкой — все ×2, каждый раз за игру, купил один — открылся следующий; пять наборов Энериума — больше набор, не хуже курс, первая покупка ×2; три выдачи — Энериум раз в сутки письмом; предложения — датой, без таймера; реклама — только по нажатию игрока, попап спрашивает. Что придёт — листом до оплаты.</p>
-    <div class="st-kit"><div class="k-air-r"><b>Стартовый набор</b><div class="k-row">${chain}</div></div>
-      <div class="k-air-r"><b>Лесенка</b><div class="k-row">${rungs}</div></div>
+    <p class="k-note">Пять разовых наборов — каждый раз за игру, в любом порядке; ×2 — только самой первой покупке, набор выбирает игрок: одна общая пометка, пока удвоение ждёт. Пять наборов Энериума — больше набор, не хуже курс; ×2 первой покупки — у каждого своё, один раз. Три выдачи — Энериум раз в сутки письмом; предложения — датой, без таймера; реклама — только по нажатию игрока, попап спрашивает. Что придёт — листом до оплаты, честным числом.</p>
+    <div class="st-kit"><div class="k-air-r"><b>Разовый набор</b><div class="k-row">${once}</div></div>
+      <div class="k-air-r"><b>Ряд пяти наборов</b><div class="k-row">${row}</div></div>
       <div class="k-air-r"><b>Набор Энериума</b><div class="k-row">${packs}</div></div>
       <div class="k-air-r"><b>Выдача</b><div class="k-row">${subs}</div></div>
       <div class="k-air-r"><b>Предложение</b><div class="k-row">${offer}</div></div>
@@ -414,9 +454,10 @@ KIT_EXTRA.push({ html: stKitHtml });
 
 /* ================== сценарии презентации ================== */
 FLOWS.push(
-  ['Лавка · стартовые наборы', 'Пять наборов цепочкой: ступень крупно, всё ×2, раз за игру; купил — открылась следующая', () => { S.overlay = null; S.route = 'store'; S.seg.store = 'start'; }],
-  ['Лавка · стартовый набор — что внутри', 'Лист до оплаты: ключи, души и Энериум уже ×2, что откроется следом, цена платформы', () => { S.route = 'store'; S.seg.store = 'start'; const at = STA.chainAt(STD, S.store); S.overlay = { t: 'stbuy', arg: STD.chain.steps[(at || STD.chain.steps.length) - 1].id }; }],
-  ['Лавка · наборы Энериума', 'Малый, средний, большой, огромный, великий: больше набор — больше прибавка, первая покупка ×2', () => { S.overlay = null; S.route = 'store'; S.seg.store = 'en'; }],
+  ['Лавка · разовые наборы', 'Пять наборов в любом порядке, каждый раз за игру; ×2 — на первую покупку, набор на выбор игрока', () => { S.overlay = null; S.route = 'store'; S.seg.store = 'start'; }],
+  ['Лавка · разовый набор — что внутри', 'Лист до оплаты: что придёт честным числом — с ×2, пока это первая покупка, — и цена платформы', () => { S.route = 'store'; S.seg.store = 'start'; S.overlay = { t: 'stbuy', arg: stPick() || STD.chain.steps[0].id }; }],
+  ['Лавка · разовые наборы после первой покупки', `Игрок купил первым «${stOk() ? STD.chain.steps[2].n : ''}» — он удвоен: пометки ×2 больше нет, остальные наборы — как есть`, () => { S.overlay = null; S.route = 'store'; S.seg.store = 'start'; if (STA.onceX2(STD, S.store)) SH_SRV.buy(stOp(), STD.chain.steps[2].id); S.store.pick = ''; }],
+  ['Лавка · наборы Энериума', 'Малый, средний, большой, огромный, великий: больше набор — больше прибавка; ×2 первой покупки — у каждого своё', () => { S.overlay = null; S.route = 'store'; S.seg.store = 'en'; }],
   ['Лавка · выдача', 'Три выдачи: Энериум раз в сутки письмом, не сгорает, сама не продлевается', () => { S.overlay = null; S.route = 'store'; S.seg.store = 'subs'; }],
   ['Лавка · предложение недели', 'Лимитированное — курс первой покупки снова, ненадолго: срок датой, без таймера', () => { S.route = 'store'; S.seg.store = 'start'; const o = S.store.offers.find(x => x.left > 0); S.overlay = o ? { t: 'stbuy', arg: o.id } : null; }],
   ['Лавка · реклама за Энериум', 'Попап спрашивает: ролик до 30 секунд — +5 Энериума, два в сутки; «Не сейчас» ничего не меняет', () => { S.route = 'store'; S.seg.store = 'en'; S.store.play = null; S.overlay = { t: 'stad' }; }],

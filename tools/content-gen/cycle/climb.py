@@ -12,13 +12,16 @@
 Что считает. Игрок приходит в цикл c с отрядом, которым кончил цикл c − 1, и упирается в первый биом нового цикла. Дальше он качает
 лучшую доступную ступень — пятёрку героев с наибольшей мощью на пределе: P(цикл героя) × (12 + 1200) × множитель доблести личного максимума.
 Ступени: герои за золото цикла не выше своего (личный максимум доблести — 1, ADR-0030) — сразу, как хватает золота; герои Эхо цикла
-(максимум — номер цикла − 1) — когда собраны осколки пятерых: у обычного и увлечённого — по недельным сундукам Эхо, у плательщика —
-донатный сет того же максимума с первого дня цикла. Дух — в уровни главной ступени по цене × цикл героя; руны пределов — с побед у рунных
+(максимум — номер цикла − 1) — когда собраны осколки пятерых: у обычного и увлечённого — по недельным сундукам Эхо (ADR-0047: комплект
+героя — по его циклу, гарантия сундука — герою-цели недели, лишнее — в прах Эха, его вливают в героя нового цикла), у плательщика —
+донатный сет того же максимума с первого дня цикла. Обычный и увлечённый берут и донатный сет — за накопленный бесплатный Энериум
+(economy/enerium.js): высокая ступень цикла — та, что готова раньше, пятёрка Эхо или сет (лестница-лутбоксов.md, раздел 4). Дух — в уровни главной ступени по цене × цикл героя; руны пределов — с побед у рунных
 стражей за ключи (вариант Б); на пятом пределе и 1200-м — доблесть, если есть руна: уровень и пределы — заново. На время круга доблести место
 в отряде держит запасной: отряд в бою не слабее, чем до доблести. Бои — ядром (climb-sim.js): биомы циклов III–VI — образец цикла II
 по кривой §3.3 × ручка силы KX, пока биомы 5–12 не собраны. KX — и цель силы для их будущей сборки.
 
-Доход по дням — те же правила, что у калькулятора экономики (economy.py, timeline_ex): забеги часов профиля, забегов разом — номер цикла,
+Доход по дням — те же правила, что у калькулятора экономики (economy.py, timeline_ex): забеги часов профиля, забегов разом — по уровню
+артефакта активных биомов (ADR-0054: уровень своего цикла игрок берёт, как только хватает душ; до того — как в прошлом цикле),
 ставки × цикл (mult_new), руны пределов — с побед у рунных стражей за ключи контрактов и босса, излишки пройденных пределов — в перековку
 вверх. Цикл II этой модели совпадает с калькулятором экономики день в день — это проверяется; новых ступеней в цикле II нет.
 
@@ -79,7 +82,19 @@ CORRIDOR = {2: E.PACE_II_DAYS, 3: (84, 98), 4: (335, 395), 5: (670, 790), 6: (73
 # - VI — первый биом 1250 %: отряд конца цикла V встаёт на 32-м этаже (закон стены; при 1100 % он доходил до босса в первый день);
 #   здоровье его босса и стража — 70 %: отряд конца цикла VI берёт босса за забег (закон фарма). Второй биом — 1000 %: середина
 #   полки 980–1025 %, стража берёт отряд на доблести 3, трое — уже на 4: 964 дня; 1040–1100 % — на круг доблести дольше.
-KX = {3: {'A': 502, 'B': 454}, 4: {'A': 750, 'B': 750}, 5: {'A': 990, 'B': 990}, 6: {'A': 1250, 'B': 1000}}
+# Подбор 07.10.2026 — общий пересчёт (ADR-0051: лестница врагов и черты именных; ADR-0054: слоты по артефакту, сроки целей Эхо;
+# ADR-0047: пятёрка Эхо по гарантии сундуков и праху Эха, донатный сет за накопленный Энериум). Рунный страж стал тяжелее относительно
+# босса — при прежних ручках цикл III шёл 145 дней, а цикл VI не кончался: отряд героев Эхо цикла V по оценке брал стража VI и на новую
+# ступень игрок не шёл. Ручки — скан у обычного (ритуал этажа 11,5 с):
+# - III — второй биом 365 %: 91 день (350 % — 83, 358 % — 87, 372 % — 94, 380 % — 99). Первый биом — 460 %: середина полки 420–480 %, на
+#   которой отряд конца цикла берёт его за забег (500 % — осада, два забега). Ритуал этажа первый биом больше не держит: подбор фарма
+#   на этих ручках — 10,5 с, в ядре — 11,5 с с запасом (biomes/farm.py, RITUAL_SLACK_MS);
+# - IV — первый биом 700 % (полка до 720 %; 735 % — два забега), второй — 750 %: полка 750–790 %, 352 дня; с 810 % стража на героях
+#   за золото уже не взять — цикл уходит за тысячу дней;
+# - V — прежние 990 % и здоровье 90 %: 686 дней; пятёрка Эхо цикла V приходит в первый день — прах Эха, накопленный за год цикла IV;
+# - VI — второй биом 1100 % (было 1000 %): страж VI снова выше потолка отряда цикла V, игрок берёт героев Эхо цикла VI в первый день,
+#   827 дней (1200 % — 945).
+KX = {3: {'A': 460, 'B': 365}, 4: {'A': 700, 'B': 750}, 5: {'A': 990, 'B': 990}, 6: {'A': 1250, 'B': 1100}}
 HP_X = {3: {'A': 100, 'B': 100}, 4: {'A': 100, 'B': 100}, 5: {'A': 100, 'B': 90}, 6: {'A': 70, 'B': 100}}
 # профили: имя, часов забегов в день, профиль ключей контрактов, недельные сундуки Эхо (лутбоксы: free / fan), источник ступени
 # с высоким максимумом доблести: обычный и увлечённый собирают героев Эхо, плательщик покупает донатный сет (тот же максимум) за Энериум
@@ -132,12 +147,21 @@ if not CURVE:
     sys.exit('climb.py: в ядре нет кривой силы героя RULES.cycleX10 (ADR-0041)')
 if not LVL_CYC:
     sys.exit('climb.py: в ядре нет цены уровня по циклу героя RULES.levelCycle (ADR-0043)')
-# личный максимум доблести по источнику и циклу героя, комплект осколков героя, отряды Эхо по неделям рас — состав героев (roster.js);
-# осколки Эхо за неделю — недельные сундуки (lootboxes.js, week.echo: × 100)
+# личный максимум доблести по источнику и циклу героя, комплект осколков героя Эхо по его циклу и курс праха Эха, отряды Эхо по неделям
+# рас — состав героев (roster.js); осколки Эхо за неделю — недельные сундуки (lootboxes.js, week.echo, × 100): shards — все, sure — гарантия
 ROS = _js("require('./design/ui/roster.js');require('./design/ui/lootboxes.js');const R=globalThis.EN_ROSTER,L=globalThis.EN_LOOTBOXES;"
-          "process.stdout.write(JSON.stringify({maxV:R.rules.maxV,shards:R.rules.stub.shards,souls:R.rules.stub.activateSouls,"
+          "process.stdout.write(JSON.stringify({maxV:R.rules.maxV,echoSet:R.rules.echoSet,echoDust:R.rules.echoDust,souls:R.rules.stub.activateSouls,"
           "races:R.weeks.length,echo:L.week.echo}))")
 RACES = ROS['races']
+if not ROS['echoSet'] or not ROS['echoDust']:
+    sys.exit('climb.py: в roster.js нет комплекта героя Эхо по циклам (rules.echoSet) или курса праха Эха (rules.echoDust) — ADR-0047')
+# бесплатный Энериум игрой — сотые в день по профилю контрактов и циклу, цены пяти донатных героев цикла (economy/enerium.js --json):
+# обычный и увлечённый копят его на донатный сет своего цикла. Мягкая петля: ручеёк читает контракты, Арену и пропуск — после них
+# `climb.py --check`; устарел — подъём заново
+_en = subprocess.run(['node', str(ROOT / 'tools' / 'content-gen' / 'economy' / 'enerium.js'), '--json'], cwd=ROOT, capture_output=True, text=True, encoding='utf-8')
+if _en.returncode:
+    sys.exit('climb.py: ручеёк Энериума (economy/enerium.js --json) — ' + (_en.stderr or _en.stdout))
+ENER = json.loads(_en.stdout)
 
 
 def vmax_of(src, k):
@@ -208,7 +232,8 @@ _FARM = {}
 
 
 def farm(wx10, c):
-    """Час забегов отряда силы wx10 в цикле c: золото, дух и боссы × ключей с босса × 100. С цикла III отряд идёт туда, где за час больше
+    """Час забегов отряда силы wx10 в цикле c: золото, дух, боссы × ключей с босса × 100, цикл образца и души (× номер биома образца,
+    ADR-0011). С цикла III отряд идёт туда, где за час больше
     духа: в образец своего цикла или старшего из прошлых, по ставке его цикла (ADR-0014; старый биом — по циклу биома, ADR-0044): отряд прихода
     у стены нового цикла фармит прошлый. Цикл II — только свой образец, как калькулятор экономики (сверка день в день)."""
     key = (wx10, c)
@@ -216,10 +241,10 @@ def farm(wx10, c):
         best = None
         for cc in ([c] if c < STEP_FROM else range(2, c + 1)):
             row = E.sim_row(eff(wx10, cc))
-            g, sp, _ = E.per_hour(row, E.RATES_NEW, E.mult_new(cc))
+            g, sp, sd = E.per_hour(row, E.RATES_NEW, E.mult_new(cc))
             bk = row[4] * E.HOUR_MS * 100 // row[5] * cc        # ключей с босса за срабатывание — цикл биома (§11)
             if best is None or sp > best[1]:
-                best = (g, sp, bk, cc)
+                best = (g, sp, bk, cc, sd * E.souls_biome(cc))
         _FARM[key] = best
     return _FARM[key]
 
@@ -271,7 +296,9 @@ def new_squad(k, src, day, lvl=0, nxt=0):
 
 def fresh():
     return {'sq': {'1g': new_squad(1, 'gold', 0, E.START_LEVEL, E.START_LIMITS)}, 'b': E.START_LEVEL, 'bank': 0, 'gold': 0,
-            'hero_gold': 0, 'boss_prev': 0, 'shards': 0, 'focus': '1g', 'ev': [], 'fc': [2, 2]}
+            'hero_gold': 0, 'boss_prev': 0, 'shards': 0, 'focus': '1g', 'ev': [], 'fc': [2, 2],
+            # активные биомы (ADR-0054): души игрока, цикл, чей уровень артефакта взят, забегов разом сегодня и души, отданные за уровень сегодня
+            'souls': E.start_souls(), 'trail': E.FIRST_CYCLE - 1, 'sl': E.slots(E.FIRST_CYCLE - 1), 'paid': 0}
 
 
 def main_k(st):
@@ -284,28 +311,72 @@ def w_main(st):
 
 def echo_days(ends, lbp, src):
     """День (от начала цикла II), когда у профиля готова ступень с высоким максимумом доблести каждого цикла k ≥ II. Донат — первый день
-    цикла k. Эхо — неделя за неделей: осколки недели (lootboxes.js, week.echo своего цикла) делятся поровну между открытыми героями Эхо
-    расы недели (циклы II…текущий), герой готов на комплекте (roster.js, stub.shards); ступень — пятеро готовых героев цикла k."""
+    цикла k. Эхо — неделя за неделей, по правилам ADR-0047 (экран Эхо, EN_ECHO_HEROES). Герой Эхо — у каждой расы по одному на цикл,
+    комплект — по циклу героя (roster.js, rules.echoSet). Сундуки недели (lootboxes.js, week.echo своего цикла):
+    - связки сверх гарантии (shards − sure) — поровну открытым героям расы недели; собранному — дальше, как гарантия;
+    - гарантия (sure) — герою-цели: старший несобранный из открытых героев расы недели, излишек — следующей цели;
+    - отряд недели собран — остаток в прах Эха (rules.echoDust.perShard за осколок).
+    Прах Эха игрок вливает в героя старшего открытого цикла, пока его пятёрка не собрана: тому, кому осталось меньше (rules.echoDust.shard
+    праха за осколок); пятёрка собрана — прах копится до нового цикла и вливается в его первый день. Ступень — пятеро готовых героев
+    цикла k. Счёт — в сотых осколка."""
     if src == 'donat':
         return {k: (ends.get(k - 1) or 0) + 1 for k in range(2, 7)}
-    got, ready, done = {}, {}, {}
+    D, got, ready, done, st = ROS['echoDust'], {}, {}, {}, {'dust': 0, 'c': 0}
+
+    def need(k):
+        return ROS['echoSet'][k - 1] * 100
+
+    def give(key, q, d):
+        """Осколки герою до комплекта; возвращает, что не поместилось."""
+        if key in done or q <= 0:
+            return q
+        n = min(q, need(key[0]) - got.get(key, 0))
+        got[key] = got.get(key, 0) + n
+        if got[key] >= need(key[0]):
+            done[key] = d
+            ready.setdefault(key[0], []).append(d)
+        return q - n
+
+    def pour(c, d):
+        """Прах Эха — в героев цикла c, пока пятёрка не собрана: сперва тому, кому осталось меньше."""
+        while st['dust'] >= D['shard'] and len(ready.get(c, [])) < SQUAD_N:
+            key = min(((c, r) for r in range(RACES) if (c, r) not in done), key=lambda x: (need(c) - got.get(x, 0), x[1]))
+            n = min(st['dust'] // D['shard'], need(c) - got.get(key, 0))
+            st['dust'] -= n * D['shard']
+            give(key, n, d)
+
     for w in range(DAYS_MAX // 7):
         d = 7 * w + 7
         c = cycle_of(d, ends)
         if c < 2:
             continue
-        sh = ROS['echo'][str(c)][lbp]['shards']           # × 100
-        per = sh // (c - 1)
-        r = w % RACES
-        for k in range(2, c + 1):
-            key = (k, r)
-            if key in done:
-                continue
-            got[key] = got.get(key, 0) + per
-            if got[key] >= ROS['shards'] * 100:
-                done[key] = d
-                ready.setdefault(k, []).append(d)
+        if c != st['c']:                                  # новый цикл: накопленный прах — в его героев в первый же день
+            st['c'] = c
+            pour(c, min(d, (ends.get(c - 1) or 0) + 1))
+        wk, r = ROS['echo'][str(c)][lbp], w % RACES
+        left = wk['sure']
+        for k in range(2, c + 1):                         # связки — поровну открытым героям расы недели
+            left += give((k, r), (wk['shards'] - wk['sure']) // (c - 1), d)
+        for k in range(c, 1, -1):                         # гарантия и остаток связок — по цепочке целей, старший первым
+            left = give((k, r), left, d)
+        st['dust'] += left * D['perShard']
+        pour(c, d)
     return {k: sorted(v)[SQUAD_N - 1] for k, v in ready.items() if len(v) >= SQUAD_N}
+
+
+def ener_days(ends, prof):
+    """День (от начала цикла II), когда профиль купил донатный сет цикла k за накопленный бесплатный Энериум: копится весь ручеёк игрой
+    (economy/enerium.js: дар дня, бесплатный ряд пропуска, контракты, Арена) с первого дня цикла II; сет своего цикла — цель каждого
+    цикла (экономика-энериум.md, «Цели»), покупается в первый день, когда хватает на пятерых (roster.js, stub.donatPrice). В цикле II
+    новых ступеней нет (STEP_FROM): Энериум копится к циклу III. Счёт — в сотых."""
+    price, bank, out = sum(ENER['donat']) * 100, 0, {}
+    for d in range(1, DAYS_MAX + 1):
+        c = cycle_of(d, ends)
+        bank += ENER['play'][prof][str(c)]
+        if c >= STEP_FROM and c not in out and bank >= price:
+            bank -= price
+            out[c] = d
+    return out
 
 
 def cycle_of(day, ends):
@@ -342,8 +413,8 @@ def spirit_to(S, need_w):
 
 
 def policy(st, c, day, ready, src, need_w):
-    """Ступень дня (с цикла III). Кандидаты — герои за золото цикла не выше своего, как хватает золота, и ступень с высоким максимумом
-    доблести, когда готова. Игрок берёт ту, на которой раньше выйдет на силу стража второго биома цикла: меньше духа до неё (spirit_to);
+    """Ступень дня (с цикла III). Кандидаты — герои за золото цикла не выше своего, как хватает золота, и ступени с высоким максимумом
+    доблести, когда готовы: ready — дни готовности по источникам ({'echo': …, 'donat': …}; у плательщика — только донат). Игрок берёт ту, на которой раньше выйдет на силу стража второго биома цикла: меньше духа до неё (spirit_to);
     если не выходит ни одна — ту, что сильнее на пределе. Нынешняя ступень остаётся, пока новая не короче пути. Новая ступень — главная:
     ей идут дух и руны."""
     if c < STEP_FROM:
@@ -355,7 +426,7 @@ def policy(st, c, day, ready, src, need_w):
         return (0, sp) if sp is not None else (1, -pot(S))
     best, cand = rank(F), None
     for k in range(2, c + 1):
-        for s, ok in (('gold', st['hero_gold'] >= squad_price(k)), (src, ready.get(k, DAYS_MAX + 1) <= day)):
+        for s, ok in [('gold', st['hero_gold'] >= squad_price(k))] + [(q, days.get(k, DAYS_MAX + 1) <= day) for q, days in ready.items()]:
             key = f'{k}{s[0]}'
             if key in st['sq'] or not ok:
                 continue
@@ -395,14 +466,22 @@ def step(st, c, hours, prof, day):
     st['bank'] += wins * E.RATES_NEW['guard'][1] * m // (BP * 100)
     st['gold'] += g0
     st['hero_gold'] += g0 * GOLD_SHARE_BP // BP
-    n_sl = E.slots(c)
+    # забегов разом — по артефакту активных биомов (ADR-0054): уровень своего цикла — утром первого дня, когда на него хватает душ
+    st['paid'] = 0
+    if st['trail'] < c and st['souls'] >= E.trail_cost(c):
+        st['paid'] = E.trail_cost(c)
+        st['souls'] -= st['paid']
+        st['trail'] = c
+        st['ev'].append((day, 'trail', c))
+    n_sl = st['sl'] = E.slots(c) if st['trail'] >= c else E.slots_before(c)
     boss = 0
     for _ in range(hours):
         M = main_k(st)
         for s in range(n_sl):
             wx = w_main(st) if s == 0 else w_of(1, st['b'], 0, 1)   # вторые отряды — герои цикла I отряда прогонов
-            g, sp, bk, cc = farm(wx, c)
+            g, sp, bk, cc, sd = farm(wx, c)
             st['fc'][min(s, 1)] = cc
+            st['souls'] += sd
             st['bank'] += sp
             st['gold'] += g
             st['hero_gold'] += g * GOLD_SHARE_BP // BP
@@ -464,7 +543,11 @@ def guard_need():
 def plan_of(hours, prof, lbp, src, ends, need):
     """Дни от начала цикла II: отряд главного забега (цикл героев, уровень, доблесть) по дням, ступени, вехи и записи дня для калькуляторов."""
     st, plan, lv2, rec = fresh(), [], [], []
-    ready = echo_days(ends, lbp, src)
+    # высокая ступень: у плательщика — донатный сет с первого дня цикла; у обычного и увлечённого — что раньше: пятёрка Эхо или сет
+    # за накопленный бесплатный Энериум
+    ready = {src: echo_days(ends, lbp, src)}
+    if src != 'donat':
+        ready['donat'] = ener_days(ends, prof)
     for day in range(1, DAYS_MAX + 1):
         c = cycle_of(day, ends)
         F0 = st['sq'][st['focus']]
@@ -478,7 +561,7 @@ def plan_of(hours, prof, lbp, src, ends, need):
         # главная ступень выросла: уровень, предел, доблесть героя, его уровень и пределы или новая ступень
         grow = int((st['focus'], F['lvl'], F['nxt'], F['v'], F['j'], F['hl'], F['hn']) != was)
         rec.append([c, M['k'], ml, mv, st['b'], w_sq(M), F['k'], F['lvl'], F['v'], F['nxt'], grow,
-                    st['fc'][0], st['fc'][1], mj, F['j'], -1 if F['hl'] is None else F['hl']])
+                    st['fc'][0], st['fc'][1], mj, F['j'], -1 if F['hl'] is None else F['hl'], st['sl'], st['paid']])
         if c == 2:
             lv2.append(st['sq']['1g']['lvl'])
     return plan, lv2, rec, st['ev'], ready
@@ -649,9 +732,10 @@ def table(head, rows):
 SRC_RU = {'g': 'за золото', 'e': 'Эхо', 'd': 'донат'}
 
 
-def step_name(key):
+def step_name(key, free=False):
+    """Имя ступени; free — профиль без покупок: донатный сет он берёт за накопленный бесплатный Энериум."""
     k, s = int(key[0]), key[1]
-    return f'герои цикла {roman(k)} · {SRC_RU[s]}'
+    return f'герои цикла {roman(k)} · {SRC_RU[s]}' + (' за накопленный Энериум' if free and s == 'd' else '')
 
 
 def years(n):
@@ -682,7 +766,7 @@ def md(res):
         came = reg['rec'][start - 2] if start >= 2 else None
         came_s = f'герои цикла {roman(came[1])}, {came[2]}-й, {valor_txt(came[3], came[13])}' if came else '—'
         wall = (f"{w['wall']}-й этаж" if w['wall'] else 'осада босса') + (f", босс — {w['boss']}-й день" if w['boss'] else '')
-        steps = [f'{d - start + 1}-й день — {step_name(key)}' for d, kind, key, *_ in reg['ev'] if kind == 'step' and start <= d <= (reg['ends'].get(c) or 0)]
+        steps = [f'{d - start + 1}-й день — {step_name(key, True)}' for d, kind, key, *_ in reg['ev'] if kind == 'step' and start <= d <= (reg['ends'].get(c) or 0)]
         end = reg['rec'][(reg['ends'].get(c) or 1) - 1]
         fin = f'герои цикла {roman(end[1])}, {end[2]}-й, {valor_txt(end[3], end[13])}'
         rows.append([roman(c), came_s, wall, '; '.join(steps) or 'та же ступень', fin, f"{res['need'][c]['w'] // 10}"])
@@ -747,7 +831,8 @@ def run():
 FIELDS = ['цикл', 'цикл героев главного забега', 'его уровень', 'доблесть', 'уровень вторых отрядов', 'мощь главного отряда × 10',
           'цикл героев главной ступени развития', 'её уровень', 'её доблесть', 'пределов', 'выросла ли за день',
           'цикл образца, где фармит главный отряд', 'цикл образца, где фармят вторые отряды',
-          'героев главного забега на доблести выше', 'героев главной ступени на доблести выше', 'уровень героя главной ступени после доблести (−1 — нет)']
+          'героев главного забега на доблести выше', 'героев главной ступени на доблести выше', 'уровень героя главной ступени после доблести (−1 — нет)',
+          'забегов одновременно — по артефакту активных биомов', 'душ отдано в этот день за уровень артефакта активных биомов']
 
 
 def days_of(p):
@@ -778,7 +863,7 @@ def dump(res):
         'profiles': [{'name': p['name'], 'hours': p['hours'], 'prof': p['prof'], 'ends': {str(c): v for c, v in p['ends'].items()},
                       'len': {str(c): v for c, v in lengths(p).items()},
                       'walls': {str(c): v for c, v in walls(p).items()},
-                      'ready': {str(k): v for k, v in sorted(p['ready'].items())},
+                      'ready': {q: {str(k): v for k, v in sorted(days.items())} for q, days in p['ready'].items()},
                       'events': [list(x) for x in p['ev'] if x[0] <= (p['ends'].get(CYCLES[-1]) or DAYS_MAX)],
                       'biomes': {k: {x: v[x] for x in ('boss', 'guard', 'from') if x in v} for k, v in p['biomes'].items()}}
                      for p in res['profiles']],

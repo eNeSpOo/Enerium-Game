@@ -226,6 +226,7 @@ function scriptOf(p, dv) {
     else if (x.kind === 'chest') out.push({ k: 'chest', no: x.no, L });
     else if (x.kind === 'shop') out.push({ k: 'shop', id: x.id, L });
     else if (x.kind === 'art') out.push({ k: 'art', id: x.id, lv: x.lv, L });
+    else if (x.kind === 'trail') out.push({ k: 'trail', id: x.id, L });
     else if (x.kind === 'recipe') out.push({ k: 'craft', r: x.r, L });
     else if (x.kind === 'valor' || x.kind === 'limit') out.push({ k: x.kind, id: x.id, L });
     else if (x.kind === 'run') out.push(runStep({ k: 'run', b: x.b, no: ++no, wall: x.wall, win: x.win ? 1 : 0, L }));
@@ -279,6 +280,7 @@ function replay(D, opt = {}) {
     else if (s.k === 'chest') ok = W.open();
     else if (s.k === 'shop') ok = W.buy(s.id);
     else if (s.k === 'art') ok = W.art(s.id, s.lv);
+    else if (s.k === 'trail') ok = W.trail(s.id);
     else if (s.k === 'valor') ok = W.valor(s.id);
     else if (s.k === 'limit') ok = W.limit(s.id);
     else if (s.k === 'run') { const r = W.run(s.b); steps.push(['run', s.b, r.wall, r.win ? 1 : 0]); }
@@ -293,7 +295,7 @@ function snap(w) {
   const S = w.S, M = w.M, sorted = o => Object.fromEntries(Object.entries(o).filter(([, v]) => v).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
   return JSON.stringify({ lvl: M.lvl, xp: M.xp, facts: sorted(M.facts), cycle: S.cycle, heroes: S.heroes.map(h => [h.id, h.lvl, h.lim, h.valor]),
     wallet: [S.gold, S.spirit, S.souls, S.keys], items: sorted(S.items), recipes: S.recipes, chests: S.chests, chestSeq: S.chestSeq, opened: S.opened,
-    shards: sorted(S.shards), train: S.train, bought: S.bought, art: sorted(S.art),
+    shards: sorted(S.shards), train: S.train, bought: S.bought, art: Object.entries(S.art).sort(),   // артефакт куплен и на нулевом уровне: «Знак открытых троп»
     known: Object.keys(S.known).sort(), best: sorted(S.best), boss: sorted(S.boss), guard: sorted(S.guard), runNo: S.runNo });
 }
 /* итог пропуска как снимок мира: та же форма, что snap, — чтобы сверить итог пропуска с итогом прохождения */
@@ -301,7 +303,7 @@ function snapOfSkip(E) {
   const sorted = o => Object.fromEntries(Object.entries(o).filter(([, v]) => v).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
   return JSON.stringify({ lvl: E.lvl, xp: E.xp, facts: sorted(E.facts), cycle: E.cycle, heroes: E.heroes.map(h => h.slice(0, 4)), wallet: [E.wallet.gold, E.wallet.spirit, E.wallet.souls, E.wallet.keys],
     items: sorted(Object.fromEntries(E.items)), recipes: E.recipes, chests: E.chests, chestSeq: E.chestSeq, opened: E.opened,
-    shards: sorted(Object.fromEntries(E.shards)), train: E.train, bought: E.bought, art: sorted(E.art),
+    shards: sorted(Object.fromEntries(E.shards)), train: E.train, bought: E.bought, art: Object.entries(E.art).sort(),
     known: E.known.slice().sort(), best: sorted(E.best), boss: sorted(E.boss), guard: sorted(E.guard), runNo: E.runNo });
 }
 
@@ -484,7 +486,7 @@ function build() {
   D.dives = Object.assign(dv, { lessons: Object.fromEntries(DV.lessons.map(l => [l.id, Object.assign({}, l)])) });
   D.script = scriptOf(p2, dv); D.loot = lootTable(S); D.skip = skipOf(w2, D.script); D.hint = hintOf();
   {
-    const SC = D.script, kinds = new Set(['hire', 'lvl', 'chest', 'shop', 'craft', 'valor', 'limit', 'art', 'run', 'guard']);
+    const SC = D.script, kinds = new Set(['hire', 'lvl', 'chest', 'shop', 'craft', 'valor', 'limit', 'art', 'trail', 'run', 'guard']);
     for (const s of SC) if (!kinds.has(s.k)) err.push(`сценарий: шаг неизвестного вида ${s.k}`);
     if (!SC.length || SC[0].k !== 'hire' || SC[0].id !== DATA.HEROES[0].id) err.push('сценарий: первый шаг — не найм первого героя обучения');
     const hiresS = SC.filter(s => s.k === 'hire').map(s => s.id);
@@ -526,6 +528,27 @@ function build() {
     if (TU.art) {
       const c = one('art');
       if (c.length !== 1 || c[0].L !== DATA.GATES.art || c[0].id !== TU.art.id || c[0].lv !== TU.art.lv) err.push(`артефакт: шаг ${JSON.stringify(c)} — не один «${TU.art.id}» на уровне ${DATA.GATES.art}`);
+    }
+    /* артефакт активных биомов (слова автора 06.10.2026, ADR-0054, п. 3 и п. 15): он обязан быть в обучении, игрок покупает его сам —
+       один шаг на 1-м уровне, после найма первого героя и до первого забега: без него активного биома нет. Покупка открывает один
+       активный биом — единственный в обучении; уровней артефакта в цикле I нет. Цену оплачивает награда уровня 1: золото сверх дара —
+       ровно первый герой и артефакт */
+    if (!TU.trail) err.push('сценарий: нет шага покупки артефакта активных биомов (SCRIPT.trail, ADR-0054)');
+    else {
+      const c = one('trail'), i = SC.indexOf(c[0]), run1 = SC.findIndex(s => s.k === 'run' || s.k === 'guard'), hire1 = SC.findIndex(s => s.k === 'hire');
+      if (c.length !== 1 || c[0].id !== TU.trail.id || c[0].L !== 1) err.push(`активные биомы: шаг ${JSON.stringify(c)} — не одна покупка «${TU.trail.id}» на уровне 1`);
+      else if (!(hire1 < i && i < run1)) err.push('активные биомы: покупка артефакта — не между наймом первого героя и первым забегом');
+      if (TU.trail.slots !== 1) err.push(`активные биомы: покупка открывает ${TU.trail.slots} — в обучении активный биом один и единственный (ADR-0054, п. 15)`);
+      if (TU.trail.open !== 1) err.push(`активные биомы: артефакт продаётся с ${TU.trail.open}-го уровня Странника, а шаг — на 1-м`);
+      if (!DATA.LEVELS[0].opens.includes('trail')) err.push('активные биомы: окно уровня 1 не знакомит с артефактом (OPEN.trail)');
+      const need1 = WS.goldPrice(1, 1) + TU.trail.gold;
+      if ((DATA.LEVELS[0].reward.gold || 0) !== need1) err.push(`награда уровня 1: золота сверх дара ${DATA.LEVELS[0].reward.gold}, а первый герой и артефакт активных биомов стоят ${need1}`);
+      /* мир без артефакта в забег не пускает; покупка проходит один раз, повтор — отказ */
+      const w9 = WS.make(D, {}); w9.W.claim(); w9.W.hire(DATA.HEROES[0].id);
+      if (w9.W.run('b1').refuse !== 'trail') err.push('активные биомы: без артефакта мир пустил в забег — активного биома быть не должно');
+      if (!w9.W.trail(TU.trail.id) || w9.W.st().art[TU.trail.id] !== 0) err.push('активные биомы: покупка артефакта в новом мире не прошла');
+      if (w9.W.trail(TU.trail.id)) err.push('активные биомы: артефакт куплен дважды');
+      if (S.art[TU.trail.id] !== 0) err.push('активные биомы: к концу обучения артефакт не куплен или у него есть уровень — уровни идут с цикла II');
     }
     /* сценарий без политики бота — тот же путь и тот же итог; с добычей из таблицы — тоже */
     const end = snap(w2), R1 = replay(D), R2 = replay(D, { loot: D.loot });
@@ -675,7 +698,7 @@ function build() {
   ]);
   /* обучение по сценарию (ADR-0040): шаги по уровням, добыча по забегам, итог пропуска */
   const hn = id => (ROSTER.heroes.find(x => x.id === id) || { n: id }).n, itn = id => (RX.items.find(i => i.id === id) || { n: id }).n;
-  const KN = { hire: 'найм', lvl: 'дух в уровни', chest: 'сундук', shop: 'Лавка', craft: 'рецепт', valor: 'доблесть', limit: 'предел', art: 'артефакт', run: 'забег', guard: 'страж' };
+  const KN = { hire: 'найм', lvl: 'дух в уровни', chest: 'сундук', shop: 'Лавка', craft: 'рецепт', valor: 'доблесть', limit: 'предел', art: 'артефакт', trail: 'активный биом', run: 'забег', guard: 'страж' };
   const TU = D.tut, curN = { gold: 'золота', spirit: 'духа', souls: 'душ', keys: 'рунных ключей' };
   const chestTxt = C => C.cur.map(([k, a]) => `${fmt(a)} ${curN[k] || k}`).concat(C.items.map(([id, n]) => `${itn(id)} ×${n}`)).join(', ');
   const byL = {}; for (const s of D.script) (byL[s.L] || (byL[s.L] = [])).push(s);
@@ -687,6 +710,7 @@ function build() {
       else if (s.k === 'chest') parts.push([i, `сундук странника уровня ${TU.chest.L} — открыть: ${chestTxt(TU.chest)}`]);
       else if (s.k === 'shop') parts.push([i, `Лавка — ${itn(s.id)} ×${TU.shop.q} за ${fmt(TU.shop.cost)} золота`]);
       else if (s.k === 'art') parts.push([i, `артефакт «${TU.art.n}» — купить за ${fmt(TU.art.gold)} золота и поднять до ${ROMAN[s.lv]} за ${fmt(TU.art.souls)} душ`]);
+      else if (s.k === 'trail') parts.push([i, `артефакт «${TU.trail.n}» — купить за ${fmt(TU.trail.gold)} золота: открыт ${TU.trail.slots} активный биом`]);
       else if (s.k === 'valor') parts.push([i, `доблесть — ${hn(s.id)}, руной обучения`]); else if (s.k === 'limit') parts.push([i, `предел I — ${hn(s.id)}`]);
       else if (s.k === 'guard') parts.push([i, `рунный страж · ${s.b === 'b1' ? 'Мастер' : 'Отголосок Виала'}`]);
     });
@@ -716,7 +740,8 @@ function build() {
     ['Запасы', `${stockN.length} ${plural(stockN.length, 'вид', 'вида', 'видов')}, ${fmt(stockN.reduce((a, [, n]) => a + n, 0))} шт.: ресурсы, ключи ремёсел, ${E.recipes.map(r => `«${(RX.recipes.find(x => x.id === r) || { n: r }).n}»`).join(', ')}`],
     ['Сундуки — закрыты', E.chests.map(c => `сундук странника, ${['', 'обычный', 'редкий'][c.r] || c.r} — уровень ${c.L}`).join('; ') || '—'],
     ['Сундук, Лавка, артефакт — шаги обучения', [TU.chest && `сундук уровня ${TU.chest.L} открыт: ${chestTxt(TU.chest)}`, TU.shop && E.bought && `в Лавке куплено: ${itn(E.bought)} ×${TU.shop.q} за ${fmt(TU.shop.cost)} золота`,
-      ...Object.entries(E.art).map(([id, lv]) => `артефакт «${TU.art && TU.art.id === id ? TU.art.n : id}» — уровень ${ROMAN[lv]}`)].filter(Boolean).join('; ') || '—'],
+      ...Object.entries(E.art).map(([id, lv]) => (TU.trail && TU.trail.id === id ? `артефакт «${TU.trail.n}» куплен — активных биомов: ${TU.trail.slots}`
+        : `артефакт «${TU.art && TU.art.id === id ? TU.art.n : id}» — уровень ${ROMAN[lv]}`))].filter(Boolean).join('; ') || '—'],
     ['Осколки', E.shards.map(([id, n]) => `«${hn(id)}» ×${n} — в каталоге неизвестная душа`).join('; ')],
     ['Бестиарий, путь вниз', `${E.known.length} врагов изучено; Мастерская форм и Подземный лес пройдены, рубеж — Библиотека Улариона`],
     ['Открыто', opened.join('; ')],

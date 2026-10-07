@@ -119,6 +119,20 @@
 .co-lock>svg{position:absolute;inset:0;width:100%;height:100%}
 .co-kh{position:absolute;left:24%;right:24%;top:46%;height:36%;border-radius:50%;mix-blend-mode:screen;background:radial-gradient(closest-side,#fff6dc,rgba(255,214,140,.55) 45%,transparent);
   animation:co-crack var(--wait) linear var(--dc0) both}
+/* отметка темы — бирка со значком ремесла на корпусе: у сундуков КрафБоссов и сундука артели, пока своего рисунка у них нет
+   (screens/chest-open.js, coMark). Тип врага — оковка бирки: босс — бронза, Убер — золото, Пробуждённый — свет духа. Та же бирка,
+   меньше, — на плитке сундука в запасах и наградах (.zp-tm, screens/bag.js) */
+.co-thm,.zp-tm{--tm:#a08a5e;display:grid;place-items:center;border-radius:50%;pointer-events:none;color:var(--tm);
+  background:radial-gradient(circle at 50% 32%,#2d3236,#0d1012 74%);box-shadow:0 0 0 2px var(--tm),0 0 0 3px rgba(0,0,0,.6),0 3px 7px rgba(0,0,0,.7)}
+.co-thm[data-ty="u"],.zp-tm[data-ty="u"]{--tm:var(--gold)}
+.co-thm[data-ty="a"],.zp-tm[data-ty="a"]{--tm:var(--spirit);box-shadow:0 0 0 2px var(--tm),0 0 0 3px rgba(0,0,0,.6),0 0 12px -1px var(--tm)}
+.co-thm{position:absolute;z-index:4;width:30px;height:30px;margin:-15px 0 0 -15px}
+.co-thm>.i{width:17px;height:17px;stroke-width:1.9}
+.zp-tm{position:absolute;right:-1px;bottom:-1px;z-index:2;width:38%;min-width:13px;aspect-ratio:1;box-shadow:0 0 0 1px var(--tm),0 1px 3px rgba(0,0,0,.8)}
+.zp-tm[data-ty="a"]{box-shadow:0 0 0 1px var(--tm),0 0 6px -1px var(--tm)}
+.zp-tm>.i{width:64%;height:64%;stroke-width:2.2}
+/* в клетке сетки запасов правый нижний угол занят числом — отметка встаёт слева */
+.zp-cell .zp-tm{left:-1px;right:auto}
 /* пачка: сколько сундуков открывается разом; точка щели — для частиц */
 .co-n{position:absolute;right:-12px;top:10px;z-index:3;padding:3px 8px;border-radius:8px;background:#0c0f12;border:1px solid color-mix(in srgb,var(--rc) 60%,var(--iron-2));
   font:700 13px/1 var(--f-u);letter-spacing:.04em;color:var(--parch);box-shadow:0 0 14px -4px var(--rc)}
@@ -223,6 +237,18 @@
 .co-dust{display:flex;align-items:center;gap:var(--sp-s);font-size:12.5px;color:var(--parch-2)}
 .co-dust img{width:20px;height:20px;object-fit:contain}
 .co-dust b{color:var(--sand);font-weight:700}
+/* прах Эха: осколкам героев Эхо не нашлось цели — своя строка итога (и в карточке сундука в запасах, .zp-edl); свет духа, не прах душ */
+.co-edl b,.zp-edl b{color:var(--spirit);font-weight:700}
+.zp-edl{display:flex;align-items:center;gap:var(--sp-s);margin:0;font-size:12.5px;color:var(--parch-2)}
+.zp-edl img{width:20px;height:20px;object-fit:contain}
+.co-card.edust .co-cq,.co-ti.edust .co-tq{color:var(--spirit)}
+/* гарантированная запись — золотая точка на карточке и плитке: гарантия осколков, запись темы и сильная линия сундука КрафБосса */
+.co-pin{position:absolute;right:6px;top:6px;z-index:2;width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 2px rgba(0,0,0,.55),0 0 8px var(--gold)}
+.co-ti>.co-pin{right:4px;top:4px;width:6px;height:6px}
+/* запасы, карточка сундука: «наверняка» — строкой в «Внутри» (перенос разрешён) и своим блоком листа «Состав и шансы» */
+.zp-sch{height:auto;min-height:22px;padding:3px 8px;white-space:normal;text-align:left;line-height:1.25;letter-spacing:.03em}
+.zp-sch>span{min-width:0}
+.zp-sure th{color:var(--gold-2)}
 
 /* итог и проба без анимации: всё на местах; лучи, дымка и кольцо продолжают медленно вращаться, сияние самой ценной — дышать */
 .co-done .co-scene *,.co-done .co-hint{animation:none!important}

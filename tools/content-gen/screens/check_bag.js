@@ -12,16 +12,27 @@
       пять рядов видно целиком на 932 × 430 и 844 × 390 (расчёт по CSS), шестой — прокрутка; выбор — карточка справа с именем.
       Значки талисманов, снаряжения и осколков героев — арт screens/art-icons.js, редкость — рамкой; у талисмана и предмета —
       переход в окно «Перековка» своим режимом и редкостью. Большие числа — коротко: «124К», «1,2М».
+   3б. Осколки героев (ADR-0047): комплект — свой у каждого героя: у героя Эхо — по его циклу из roster.js, у героя рулетки — прежний;
+      клетка, подсказка, карточка и полоса — от своего комплекта; прежних 50 герою Эхо мало. Прах Эха — запись кошелька во вкладке
+      осколков со своим значком: отдельный ресурс, прах душ остаётся в «Рунах и ключах»; у несобранного героя Эхо — «Влить», когда прах
+      Эха есть, и нет «Осколка» за прах душ; у героя рулетки — как прежде. До Эхо и без праха записи нет.
    4. Призывы: без обработчика — «недоступно»; с обработчиком кнопка зовёт ACTIVATE[ярус](id).
    5. Сундуки: во вкладке — только сундуки; каждый демо-сундук открывается по одному и пачкой; итог — крупно в той же карточке —
       сходится с запасами, кошельком, осколками и снаряжением; тот же сундук второй раз не открывается. Состав и шансы — лист по нажатию.
-      Все виды × редкости × окна × циклы (× недели у осколков) — карточка, лист состава и открытие,
-      осколки пробуждённых героев уходят в прах, без флажка «для команды» — ни одного спойлерного имени.
+      Все виды × редкости × окна × циклы (× недели у сундуков с неделей) — карточка, лист состава и открытие,
+      осколки пробуждённых героев возрождения душ уходят в прах, без флажка «для команды» — ни одного спойлерного имени.
+      Новые записи (ADR-0047): гарантированные записи сундука — в карточке строкой «наверняка», в листе состава — блоком
+      «Наверняка»; осколки героев Эхо делит цепочка целей недели — что ушло в прах Эха, итог называет строкой «прах Эха ×N»,
+      кошелёк праха Эха сходится с итогом; сундуки КрафБоссов и артели — с отметкой темы на плитке.
    6. Дары: прошлая неделя (подсчитана) сходится с типичной EN_LOOTBOXES.week (кроме клановой доли режима со своим журналом — её
       сверяет check_clan.js); эта неделя — только взятые планки по состоянию режима (EN_WEEK.state, ADR-0031, п. 16), незаработанного
       нет; взятая планка Эхо после «Получить» на экране Эхо — «в запасах» (darGot); две категории, история и попап сундуков; одно действие на строку;
       «Получить» по строке и «Получить всё»; ждущее и полученное второй раз не выдаётся; полученное — в истории;
       кнопка «Дары» на экране недели; цикл I — без Даров.
+   6а. Лестница планок в «Дарах» (ADR-0047), закон проверен мутацией: личная планка — ступень лестницы режима; набрали порог первой
+      планки следующей полосы — она в «Дарах» под подписью с циклом полосы и платит сундуки своей полосы (редкость и число — строки
+      полосы, содержимое — цикла игрока), планки своей полосы — свои; «Получить» выдаёт один раз, повтор — ничего, полученная —
+      «в запасах» (darGot); клановые ступени контрактов — в клановых наградах, ждут распределения.
    7. Экран не читает прежний демо-инвентарь S.items; сброс состояния и сценарии презентации работают.
    Запуск: node tools/content-gen/screens/check_bag.js */
 'use strict';
@@ -74,6 +85,7 @@ const T = vm.runInContext(`({
   zpEntries, zpView, zpChestGroups, zpOpenOne, zpCard, zpSrc, darRows, darCount, lbGiftRows, lbRowLabel, ZP_DEMO, ZP_FILT, trNorm, trEsc, DAR_CLAN: window.DAR_CLAN || {},
   WEEK: window.EN_WEEK, ECHO: window.EN_ECHO, darGot: typeof darGot === 'function' ? darGot : null,
   zpNum, zpCell, eqIcon: typeof eqIcon === 'function' ? eqIcon : null, talIcon: typeof talIcon === 'function' ? talIcon : null, shardGhost: typeof shardGhost === 'function' ? shardGhost : null,
+  fmt, ZP_VIEW, CUR,
 })`, ctx);
 const BAD = /undefined|NaN|\[object /;
 /* служебное глазами игрока — те же слова и шаблоны, что у check_player_view.js; обход там ограничен, здесь — каждая отрисовка
@@ -106,9 +118,11 @@ const cnt = { tabs: 0, cards: 0, sheets: 0, filters: 0, open: 0, synth: 0, dust:
   if (miss.length) say(`сундуки: предметов нет в recipes.js — ${miss.slice(0, 5).join(', ')}`);
   if (hmiss.length) say(`сундуки: героев пула нет в roster.js — ${hmiss.slice(0, 5).join(', ')}`);
 }
-/* спойлеры для игрока: талисманы со спойлером в имени, ресурсы цикла VI и записи recipes.js с team */
+/* спойлеры для игрока: талисманы со спойлером в имени, ресурсы цикла VI и записи recipes.js с team. Имя, которое совпадает со своей
+   маской «ярус · цикл» (осколок и руна доблести цикла VI — их кладут сундуки КрафБоссов), спойлером не считается: маску игрок видит */
+const spoilMask = new Set(T.RX.items.filter(i => i.team && T.RX.tiers[i.tier]).map(i => `${T.RX.tiers[i.tier].n} · цикл ${['', 'I', 'II', 'III', 'IV', 'V', 'VI'][i.cyc]}`));
 const spoil = [...new Set(Object.values(T.LBX.talInfo).filter(t => t[2]).map(t => t[0])
-  .concat(Object.values(T.LBX.items).filter(i => i.team).map(i => i.n), T.RX.items.filter(i => i.team).map(i => i.n)))];
+  .concat(Object.values(T.LBX.items).filter(i => i.team).map(i => i.n), T.RX.items.filter(i => i.team).map(i => i.n)))].filter(n => !spoilMask.has(n));
 const leak = (h, where) => { const l = spoil.filter(n => h.includes(n)); if (l.length) say(`${where}: спойлер без флажка «для команды» — ${l.slice(0, 3).join(', ')}`); };
 
 /* 3. запасы: вкладки, карточки, фильтры, поиск */
@@ -259,6 +273,107 @@ reset();
     }
   }
 }
+/* осколки героев (ADR-0047): комплект — свой у каждого героя: у героя Эхо — по его циклу (rules.echoSet), у героя рулетки — прежний.
+   Клетка — «собрано/нужно», пока запись входит в клетку (ZP_VIEW.frac знаков), иначе — только «собрано»; подсказка клетки, карточка
+   и полоса — от комплекта своего героя. Прах Эха — запись кошелька во вкладке осколков: свой ресурс, а не прах душ (тот остаётся
+   в «Рунах и ключах»). У несобранного героя Эхо, когда прах Эха есть, — «Влить» (окно количества — screens/heroes.js); общим прахом душ
+   его не собрать — кнопки «Осколок» нет; у героя рулетки — «Осколок» за прах душ, как прежде, и «Влить» нет.
+   zpShardLaw() — список нарушений: его же зовёт проверка мутацией. Функции экрана закон берёт живыми именами (live): мутация подменяет их */
+const live = name => vm.runInContext(name, ctx);
+function zpShardLaw() {
+  const out = [];
+  reset();
+  const R = T.RS.rules, setOf = h => (h.src === 'echo' ? R.echoSet[h.c - 1] : R.stub.shards), pctOf = (n, h) => Math.min(100, Math.floor(n * 100 / setOf(h)));
+  T.S.acc.cycle = 6; T.S.rs.shards = {};
+  const pick = (src, c) => T.RS.heroes.find(h => h.src === src && h.c === c && !T.S.rs.owned[h.id]);
+  const e2 = pick('echo', 2), e5 = pick('echo', 5), r2 = pick('roulette', 2), have = 3 * R.stub.shards;
+  if (!e2 || !e5 || !r2 || !(setOf(e5) > setOf(e2)) || !(setOf(e2) > setOf(r2))) out.push('осколки: в составе нет героев Эхо циклов II и V с разными комплектами или героя рулетки');
+  else {
+    const n = Math.floor(setOf(e2) * 2 / 5), nr = Math.floor(setOf(r2) * 3 / 5), give = [[e2, n], [e5, n], [r2, nr]];
+    for (const [h, q] of give) T.S.rs.shards[h.id] = q;
+    T.S.wallet.edust = have;
+    stock('shard', 'осколки · комплект');
+    const es = T.zpEntries('shard'), ru = T.zpEntries('rune'), w = es.find(x => x.key === 'w:edust');
+    if (!w || w.q !== have || es[0] !== w) out.push('осколки: праха Эха нет во вкладке осколков, остаток не тот или он не первым, рядом с осколками героев');
+    if (!ru.some(x => x.key === 'w:dust') || ru.some(x => x.key === 'w:edust') || es.some(x => x.key === 'w:dust')) out.push('осколки: прах душ и прах Эха — не отдельные записи на своих вкладках');
+    if (!T.CUR.edust || T.CUR.edust.img === T.CUR.dust.img) out.push('осколки: у праха Эха нет своего значка — его не отличить от праха душ');
+    for (const [h, q] of give) {
+      const e = es.find(x => x.key === 'h:' + h.id), tag = `осколки · ${h.n}`, N = setOf(h), echo = h.src === 'echo';
+      if (!e) { out.push(`${tag}: нет записи во вкладке осколков`); continue; }
+      const cell = live('zpCell')(e, false), frac = `${T.fmt(q)}/${T.fmt(N)}`, want = frac.length <= T.ZP_VIEW.frac ? frac : T.zpNum(q);
+      if (!cell.includes(`<span class="q">${want}</span>`)) out.push(`${tag}: в клетке не «${want}»`);
+      if (!cell.includes(`осколков ${T.fmt(q)} из ${T.fmt(N)}`)) out.push(`${tag}: в подсказке клетки нет «осколков ${q} из ${N}» — комплект не свой`);
+      if (cell.includes('class="hsg"') && !new RegExp(`--s:${pctOf(q, h)}[;"]`).test(cell)) out.push(`${tag}: стекло осколка — не ${pctOf(q, h)} % комплекта героя`);
+      run(`${tag} · выбор`, () => T.ACT.zpsel(e.key));
+      const g = game(`${tag} · карточка`), card = g.slice(g.indexOf('zp-card'));
+      if (!card.includes(`${T.fmt(q)}<span class="zp-of">/${T.fmt(N)}</span>`)) out.push(`${tag}: в карточке не «${q}/${N}»`);
+      if (!card.includes(`style="--v:${pctOf(q, h)}"`)) out.push(`${tag}: полоса в карточке — не ${pctOf(q, h)} % комплекта героя`);
+      if (echo) {
+        if (/data-a="dustbuy"/.test(card) || !/Собирается осколками Эхо и прахом Эха: прахом душ этого героя не собрать/.test(card)) out.push(`${tag}: у героя Эхо есть «Осколок» за прах душ или нет честной строки «Собирается осколками Эхо и прахом Эха: прахом душ этого героя не собрать»`);
+        if (!card.includes(`data-a="ehpour" data-v="${h.id}"`) || !card.includes(`на руках ${T.fmt(have)}`)) out.push(`${tag}: у несобранного героя Эхо нет «Влить» или остатка праха Эха`);
+      } else if (!card.includes(`data-a="dustbuy" data-v="${h.id}"`) || /data-a="ehpour"/.test(card)) out.push(`${tag}: у героя рулетки пропал «Осколок» за прах душ или появился «Влить»`);
+      if (!new RegExp(`data-a="activate" data-v="${h.id}"[^>]*disabled`).test(card)) out.push(`${tag}: «Пробудить» доступно без комплекта`);
+    }
+    /* комплект собран: клетка светится, «Пробудить» открыто, вливать нечего */
+    T.S.rs.shards[e2.id] = setOf(e2);
+    { const e = T.zpEntries('shard').find(x => x.key === 'h:' + e2.id), cell = live('zpCell')(e, false); run('осколки · комплект собран', () => T.ACT.zpsel(e.key));
+      const g = game('осколки · комплект собран'), card = g.slice(g.indexOf('zp-card'));
+      if (!/<span class="q full">/.test(cell)) out.push('осколки: собранный комплект героя Эхо в клетке не светится');
+      if (new RegExp(`data-a="activate" data-v="${e2.id}"[^>]*disabled`).test(card) || /data-a="ehpour"/.test(card)) out.push('осколки: у героя Эхо с комплектом своего цикла «Пробудить» закрыто или осталось «Влить»'); }
+    /* прежнего общего комплекта герою Эхо мало */
+    T.S.rs.shards[e5.id] = R.stub.shards;
+    { const e = T.zpEntries('shard').find(x => x.key === 'h:' + e5.id); run('осколки · прежний комплект', () => T.ACT.zpsel(e.key));
+      const g = game('осколки · прежний комплект'), card = g.slice(g.indexOf('zp-card'));
+      if (/<span class="q full">/.test(live('zpCell')(e, false)) || !new RegExp(`data-a="activate" data-v="${e5.id}"[^>]*disabled`).test(card)) out.push(`осколки: герой Эхо цикла V с ${R.stub.shards} осколками считается собранным — его комплект ${setOf(e5)}`); }
+    /* праха Эха нет — «Влить» нет; запись кошелька остаётся: Эхо аккаунту открыто */
+    T.S.wallet.edust = 0;
+    { const e = T.zpEntries('shard').find(x => x.key === 'h:' + e5.id); run('осколки · без праха Эха', () => T.ACT.zpsel(e.key));
+      const g = game('осколки · без праха Эха'), card = g.slice(g.indexOf('zp-card'));
+      if (/data-a="ehpour"/.test(card) || !card.includes('на руках 0')) out.push('осколки: без праха Эха у героя Эхо есть «Влить» или не назван нулевой остаток');
+      if (!T.zpEntries('shard').some(x => x.key === 'w:edust')) out.push('осколки: при нулевом остатке запись праха Эха пропала, хотя Эхо аккаунту открыто'); }
+    /* карточка праха Эха: имя, остаток, что это отдельный ресурс, «Подробнее» и путь к героям Эхо */
+    T.S.wallet.edust = have;
+    { stock('shard', 'осколки · прах Эха'); run('осколки · прах Эха', () => T.ACT.zpsel('w:edust'));
+      const g = game('осколки · карточка праха Эха'), card = g.slice(g.indexOf('zp-card'));
+      if (!card.includes('Прах Эха') || !card.includes(`<b class="num">${T.fmt(have)}</b>`) || !/Отдельный ресурс/.test(card)) out.push('осколки · прах Эха: в карточке нет имени, остатка или слов «отдельный ресурс»');
+      if (!card.includes('data-v="cur:edust"') || (T.ACT.ehcat && !card.includes('data-a="ehcat"'))) out.push('осколки · прах Эха: нет «Подробнее» или пути «К героям Эхо»');
+      const sh = sheetOf('cur', 'edust', 'осколки · лист праха Эха'); cnt.sheets++;
+      if (!sh.includes('Прах Эха') || !sh.includes(T.fmt(have))) out.push('осколки · лист праха Эха: нет имени или остатка'); }
+    /* до Эхо (цикл I) и без праха Эха записи нет; прах появился — запись есть */
+    reset(); T.S.acc.cycle = 1; T.S.wallet.edust = 0; T.S.rs.shards = {};
+    if (T.zpEntries('shard').some(x => x.key === 'w:edust')) out.push('осколки: прах Эха виден до открытия Эхо и без единицы праха');
+    stock('shard', 'осколки · цикл I'); T.S.wallet.edust = 1;
+    if (!T.zpEntries('shard').some(x => x.key === 'w:edust')) out.push('осколки: прах Эха на руках, а записи во вкладке осколков нет');
+    delete T.S.wallet.edust; stock('shard', 'осколки · кошелёк без поля праха Эха');
+  }
+  return out;
+}
+{
+  zpShardLaw().forEach(say);
+  /* проверка мутацией: ломаем правило вкладки осколков в песочнице — закон обязан упасть; затем слом снят и закон снова чист */
+  const MUT = [
+    ['комплект героя Эхо во вкладке осколков — прежний общий', `var __zn0 = zpNeed; zpNeed = function () { return RS.rules.stub.shards; };`, `zpNeed = __zn0;`],
+    ['полоса в карточке — не от комплекта героя', `var __zc0 = zpCardHero; zpCardHero = function (x) { return __zc0(x).replace(/style="--v:\\d+"/, 'style="--v:100"'); };`, `zpCardHero = __zc0;`],
+    ['клетка героя Эхо светится с прежнего общего комплекта', `var __ce0 = zpCell; zpCell = function (x, on) { var h = __ce0(x, on); return x.kind === 'hero' && x.q >= RS.rules.stub.shards ? h.replace('class="q"', 'class="q full"') : h; };`, `zpCell = __ce0;`],
+    ['«Влить» в карточке героя Эхо пропал', `var __zc1 = zpCardHero; zpCardHero = function (x) { return __zc1(x).replace(/<button class="btn go ep-btn[\\s\\S]*?<\\/button>/, ''); };`, `zpCardHero = __zc1;`],
+    ['герою Эхо в запасах продают «Осколок» за прах душ', `RS.rules.dustSrc.push('echo');`, `RS.rules.dustSrc.pop();`],
+    ['прах Эха лежит в «Рунах и ключах», а не у осколков', `ZP_WALLET.push('edust'); ZP_WALLET_SHARD.length = 0;`, `ZP_WALLET.pop(); ZP_WALLET_SHARD.push('edust');`],
+    ['запись праха Эха видна до Эхо и без праха', `var __eo0 = zpEchoOpen; zpEchoOpen = function () { return true; };`, `zpEchoOpen = __eo0;`],
+    ['у праха Эха значок праха душ', `var __ci0 = CUR.edust.img; CUR.edust.img = CUR.dust.img;`, `CUR.edust.img = __ci0;`],
+  ];
+  let caught = 0;
+  for (const [what, brk, fix] of MUT) {
+    const n0 = err.length;   // что сломанный экран наговорит сам — тоже «поймано»
+    let got = [];
+    try { vm.runInContext(brk, ctx); got = zpShardLaw(); } catch (x) { got = ['исключение ' + x.message]; }
+    try { vm.runInContext(fix, ctx); } catch (x) { say(`мутация «${what}»: не снялась — ${x.message}`); }
+    got = got.concat(err.splice(n0));
+    if (got.length) caught++; else say(`мутация «${what}»: закон вкладки осколков её не поймал`);
+    if (process.argv.includes('--mut')) console.log(`мутация «${what}»: ${got.length ? got.slice(0, 2).join(' | ').slice(0, 320) : 'НЕ ПОЙМАНА'}`);
+  }
+  cnt.mutShard = `${caught} из ${MUT.length}`;
+  zpShardLaw().forEach(x => say('осколки после мутаций: ' + x));
+}
 /* «новое»: демо-предметы из ZP_DEMO.fresh помечены, после выбора — нет */
 reset();
 {
@@ -347,7 +462,8 @@ for (const tab of ['res', 'rune', 'shard', 'call', 'chest', 'tal', 'eq']) {
 const sumCheck = (before, after, sum, where) => {
   const dust = Object.values(sum.dust).reduce((a, x) => a + x, 0);
   for (const k of new Set([...Object.keys(before.wallet), ...Object.keys(after.wallet)])) {
-    const d = (after.wallet[k] || 0) - (before.wallet[k] || 0), want = (sum.cur[k] || 0) + (k === 'dust' ? dust : 0);
+    /* прах душ — за осколки пробуждённых героев возрождения душ; прах Эха — осколки героев Эхо, которым не нашлось цели (sum.edust) */
+    const d = (after.wallet[k] || 0) - (before.wallet[k] || 0), want = (sum.cur[k] || 0) + (k === 'dust' ? dust : 0) + (k === 'edust' ? sum.edust || 0 : 0);
     if (d !== want) say(`${where}: кошелёк ${k} изменился на ${d}, итог говорит ${want}`);
   }
   for (const id of new Set([...Object.keys(before.items), ...Object.keys(after.items)])) {
@@ -411,14 +527,18 @@ reset();
   stock('chest', 'после открытия всех');
   for (const tab of ['res', 'rune', 'shard', 'call', 'chest', 'tal', 'eq']) for (const e of T.zpEntries(tab)) { T.S.zp.tab = tab; T.ACT.zpsel(e.key); game(`после открытия · ${e.key}`); }
 }
-/* все виды × редкости × окна × циклы (× недели): половина героев недели пробуждена — их осколки уходят в прах */
+/* все виды × редкости × окна × циклы (× недели у сундуков с неделей): половина героев недель и героев возрождения душ пробуждена —
+   осколки героев возрождения душ уходят в прах, осколки героев Эхо — цели недели или в прах Эха */
 reset();
 {
-  const pool = Object.values(T.LBX.pools.heroes).flat();
+  const pool = Object.values(T.LBX.pools.heroes).flat().concat(Object.values(T.LBX.pools.roulette || {}).flat());
   pool.forEach((h, i) => { if (i % 2 === 0 && T.RSI[h.id]) T.S.rs.owned[h.id] = { lvl: 0, lim: 0, valor: 0, how: 'souls' }; });
   const boxes = Object.keys(T.LBX.boxes), wins = Object.keys(T.LBX.winNames);
-  let k = 0;
-  for (const box of boxes) for (let r = 1; r <= 7; r++) for (const win of wins) for (let cyc = 1; cyc <= 6; cyc++) for (const week of box === 'shards' ? T.LBX.weeks : [null]) {
+  /* неделя — у сундука, который её помнит: сундук осколков — все недели Эхо, «Урна имён» — две */
+  const weeksOf = box => (!T.LBX.boxes[box].week ? [null] : box === 'shards' ? T.LBX.weeks : [T.LBX.weeks[0], T.LBX.weeks[2]]);
+  const coMarkOf = vm.runInContext("typeof coMark === 'function' ? coMark : null", ctx);   // отметка темы сундука — screens/chest-open.js
+  let k = 0, edustN = 0, sureN = 0, markN = 0;
+  for (const box of boxes) for (let r = 1; r <= 7; r++) for (const win of wins) for (let cyc = 1; cyc <= 6; cyc++) for (const week of weeksOf(box)) {
     const spec = { box, r, cyc, win, src: 'проверка', seed: T.EnLoot.seedOf('проверка-' + (k++)) };
     if (week) spec.week = week;
     T.BAG.addChest(spec);
@@ -431,6 +551,15 @@ reset();
     if (card.includes('Возможное содержимое')) say(`${where}: состав снова на карточке — ему место в листе`);
     const info = sheetOf('zpbox', g.key, where + ' · состав'); cnt.sheets++;
     if (!info.includes('Возможное содержимое')) say(`${where}: нет возможного содержимого`);
+    /* гарантированные записи: карточка — строкой «наверняка», лист состава — блоком «Наверняка»; без них — ни того, ни другого */
+    const def0 = T.EnLoot.resolve(T.LBX, { box, r, win, cyc, week: week || null }), sure = (def0.sure || []).length;
+    if (card.includes('class="chip gold zp-sch"') !== sure > 0) say(`${where}: строка «наверняка» в карточке ${sure ? 'пропала' : 'лишняя'}`);
+    if (info.includes('<table class="rk-tab lb-tab zp-sure">') !== sure > 0) say(`${where}: блок «Наверняка» в листе состава ${sure ? 'пропал' : 'лишний'}`);
+    if (sure) { sureN++; if (!new RegExp('Наверняка · ' + sure + ' предмет').test(info)) say(`${where}: лист состава не называет ${sure} гарантированных`); }
+    /* сундук с чужим рисунком — с отметкой темы на плитке: сундуки КрафБоссов и артели */
+    const mark = coMarkOf ? coMarkOf(box) : null;
+    if (!!mark !== /<i class="zp-tm" data-th="/.test(card)) say(`${where}: отметка темы на плитке сундука ${mark ? 'пропала' : 'лишняя'}`);
+    if (mark) markN++;
     leak(card + info, where + ' · карточка');
     const before = snap();
     run(where, () => T.ACT.zpopen(g.key));
@@ -440,6 +569,15 @@ reset();
     if (Object.keys(L.sum.dust).length) cnt.dust++;
     const res = clean(run(where, () => T.zpCard(T.zpView('chest').sel, 'chest')) || '', where + ' · итог');
     if (!res.includes('class="zp-res"') || !res.includes('Открыто: ')) say(`${where}: итог не показан`);
+    /* что ушло в прах Эха — строкой «прах Эха ×N»; не ушло — строки нет */
+    const ed = L.sum.edust || 0;
+    if (ed) edustN++;
+    if (res.includes('class="zp-edl"') !== ed > 0) say(`${where}: строка праха Эха в итоге ${ed ? 'пропала' : 'лишняя'}`);
+    if (ed && !res.includes(`прах Эха ×${T.fmt(ed)}`)) say(`${where}: итог не называет «прах Эха ×${T.fmt(ed)}»`);
+    /* гарантированные записи выданы: в журнале итога они первыми и их столько, сколько в сундуке */
+    const got = L.sum.log && L.sum.log[0] ? L.sum.log[0].items : [];
+    if (got.filter(it => it.sure).length !== sure || got.slice(0, sure).some(it => !it.sure)) say(`${where}: гарантированных записей в итоге не ${sure} или они не первыми`);
+    if (got.length !== sure + def0.n) say(`${where}: записей в итоге ${got.length}, в сундуке ${sure + def0.n}`);
     const kinds = ['items', 'shards', 'dust', 'extra', 'eq'].reduce((a, k) => a + Object.keys(L.sum[k] || {}).length, 0), rl = (res.match(/class="zp-rl[ "]/g) || []).length;
     if (rl !== kinds) say(`${where}: в итоге плиток ${rl}, получено видов ${kinds}`);
     const curN = Object.keys(L.sum.cur).length, rc = (res.match(/class="zp-rc"/g) || []).length;
@@ -449,10 +587,20 @@ reset();
     cnt.synth++;
   }
   if (!cnt.dust) say('осколки пробуждённых героев ни разу не ушли в прах');
+  if (!edustN) say('осколки героев Эхо ни разу не стали прахом Эха — проверка строки «прах Эха» ничего не сторожит');
+  if (!sureN) say('ни у одного сундука нет гарантированных записей — проверка «наверняка» ничего не сторожит');
+  if (!markN) say('ни у одного сундука нет отметки темы — проверка отметки ничего не сторожит');
+  cnt.edust = edustN; cnt.sure = sureN;
   for (const tab of ['res', 'rune', 'shard', 'call', 'chest', 'tal', 'eq']) { const h = stock(tab, `после всех видов · ${tab}`); leak(h, `после всех видов · ${tab}`); for (const e of T.zpEntries(tab)) { T.ACT.zpsel(e.key); leak(game(`после всех видов · ${e.key}`), `после всех видов · ${e.key}`); } }
 }
 
 /* 6. Дары путешествия */
+/* лестница планок (ADR-0047) для «Даров» — эталон правила, подпись выплаты и мутации общие с проверками экранов режимов (ladder_laws.js):
+   ступени игрока цикла c — своя полоса, за её верхней планкой — следующие полосы (первая — × next от верхней), сундуки — своей полосы */
+const LADL = require('./ladder_laws.js'), ROMAN = LADL.ROMAN, darSame = LADL.same;
+const darRef = (id, c) => LADL.ref(T.LBX, id, c);
+/* подпись выплаты личной планки: своя полоса — как строка слоя, планка следующей полосы называет её цикл, потолок — себя */
+const darLabel = (id, ly, p, c) => LADL.label(T.LBX, id, p, c, T.lbRowLabel);
 reset();
 {
   const c = T.S.acc.cycle, who = T.ZP_DEMO.gifts.who;
@@ -477,8 +625,13 @@ reset();
     const lm = m.layers.find(l => l.kind === 'plank' && !l.clan), lc = m.layers.find(l => l.kind === 'plank' && l.clan);
     for (const [ly, list, cat] of [[lm, st && !st.lock && !shut ? st.planks : [], 'me'], [lc, st && !st.lock && !shut ? st.clanPlanks : [], 'clan']]) {
       if (!ly || (cat === 'clan' && T.DAR_CLAN[mid])) continue;
-      const want = list.filter(p => p.reached).map(p => T.lbRowLabel(ly, ly.rows[p.k - 1])).sort().join(), have = nowP.filter(p => p.id === mid && p.cat === cat).map(p => p.label).sort().join();
+      /* подпись выплаты: личная планка — ступень лестницы (своя полоса — как строка слоя, иначе называет цикл полосы), клановая — строка слоя */
+      const lab = p => cat === 'me' ? darLabel(mid, ly, p, c) : T.lbRowLabel(ly, ly.rows[p.k - 1]);
+      const want = list.filter(p => p.reached).map(lab).sort().join(), have = nowP.filter(p => p.id === mid && p.cat === cat).map(p => p.label).sort().join();
       if (want !== have) say(`Дары: ${mid}, эта неделя, ${cat} — в строках «${have}», взято по режиму «${want}»`);
+      /* незаработанного в «Дарах» нет: ни одной строки с подписью невзятой планки */
+      const not = list.filter(p => !p.reached).map(lab), bad = nowP.filter(p => p.id === mid && p.cat === cat && not.includes(p.label));
+      if (bad.length) say(`Дары: ${mid}, ${cat} — выдаётся незаработанная планка «${bad[0].label}»`);
     }
   }
   for (const p of nowP) if (p.kind === 'plank' && p.st !== 'ok' && p.st !== 'got') say(`Дары: взятая планка ${p.key} без «Получить»`);
@@ -486,7 +639,12 @@ reset();
   /* демо: незаработанная планка Эхо не выдаётся — порог из данных режима (echo-rules.js, plank1 × x сундука); контракты 760 из 1 440 — три планки */
   const echoNeed = k => { const pk = T.ECHO ? T.ECHO.planks() : []; return pk[k - 1] ? pk[k - 1].need : Infinity; };
   for (const k of [1, 2, 3, 4, 5]) if (T.S.echo.score < echoNeed(k) && nowP.some(p => p.id === 'echo' && p.label.endsWith(' ' + k))) say(`Дары: планка Эхо ${k} выдаётся, а очков меньше порога`);
-  if (nowP.some(p => p.id === 'contract' && T.WEEK.state('contract', 'now').planks.some(x => !x.reached && p.label.endsWith(' ' + x.k)))) say('Дары: незаработанная планка контрактов выдаётся');
+  /* контракты: клан демо взял первую клановую ступень — она в клановых наградах и ждёт распределения, как клановые планки Эхо и Событий */
+  {
+    const ct = T.WEEK.state('contract', 'now'), took = ct && !ct.lock ? ct.clanPlanks.filter(p => p.reached).length : 0, inDar = nowP.filter(p => p.id === 'contract' && p.cat === 'clan');
+    if (ct && !ct.lock && !ct.clanPlanks.length) say('Дары: контракты не сообщили клановые ступени (clanPlanks) — §18.1, ADR-0047');
+    if (inDar.length !== took || inDar.some(p => p.st !== 'wait')) say(`Дары: клановых ступеней контрактов взято ${took}, в «Дарах» — ${inDar.length}; до распределения — только «ждёт»`);
+  }
   for (const p of rows) {
     if (!p.mode || !p.label || !p.period || !p.basis || !p.groups.length || !p.why) say(`Дары: строка ${p.key} без режима, периода, основания, планки или состава`);
     if (/ADR|§/.test(p.basis)) say(`Дары: в основании ссылка — ${p.basis}`);
@@ -579,6 +737,63 @@ reset();
   T.S.acc.cycle = 2;
 }
 
+/* 6а. Лестница планок в «Дарах» (ADR-0047). Лестница режима одна, сквозная, по очкам: за верхней планкой своей полосы сразу идут планки
+   следующей — без перехода в новый цикл. Набрали порог первой планки следующей полосы — она взята и платит сундуки своей полосы:
+   редкость и число — строки полосы, содержимое — цикла игрока; планки своей полосы платят свои; «Получить» выдаёт один раз.
+   Порог — по эталону: первая планка режима × множитель ступени. darLadder() — список нарушений: его же зовёт проверка мутацией */
+const DAR_SET = { contract: v => { T.S.contracts.pts = v; }, event: v => { T.S.event.pts = v; }, arena: v => { T.S.arena.wins = v; } };
+function darLadder() {
+  const e = []; let seen = 0;
+  for (const [id, set] of Object.entries(DAR_SET)) {
+    reset();
+    const c = T.S.acc.cycle, M = T.LBX.modes[id], R = M && M.ladder, st0 = T.WEEK.state(id, 'now');
+    if (!R || !st0 || st0.lock || !st0.planks.length) { e.push(`${id}: нет лестницы в данных или режим не сообщил планки`); continue; }
+    const ly = M.layers.find(l => l.id === R.layer), ref = darRef(id, c), own = ref[0].band, n = ref.filter(r => r.band === own && !r.cap).length;
+    if (ref.length <= n || ref[n].cap) continue;   // полоса последняя — продолжения нет
+    const need = st0.planks[0].need * ref[n].x / ref[0].x, label = `${ly.one} ${n + 1} · цикл ${ROMAN[own + 1]}`, where = `лестница · ${id}`;
+    if (darSame(ref[n].pay, ref[0].pay)) { e.push(`${where}: сундуки первой планки следующей полосы — те же, что своей: проверке нечего различать`); continue; }
+    set(need); seen++;
+    const rows = T.darRows(T.S).filter(p => p.wk.id === 'now' && p.id === id && p.kind === 'plank'), p = rows.find(x => x.label === label);
+    if (rows.length !== n + 1) e.push(`${where}: набрано ${need} — взято планок ${n + 1}, а строк в «Дарах» ${rows.length}: ${rows.map(x => x.label).join(', ')}`);
+    ref.slice(0, n).forEach((r, j) => { const q = rows.find(x => x.label === T.lbRowLabel(ly, ly.rows[j])); if (!q || !darSame(q.groups, r.pay)) e.push(`${where}: планка ${j + 1} своей полосы — в «Дарах» не её сундуки`); });
+    if (!p) { e.push(`${where}: взятой планки следующей полосы нет в «Дарах» под подписью «${label}»`); continue; }
+    if (p.st !== 'ok') e.push(`${where}: «${label}» взята, а «Получить» нет — ${p.st}`);
+    if (!darSame(p.groups, ref[n].pay)) e.push(`${where}: «${label}» платит ${JSON.stringify(p.groups)}, а сундуки её полосы — ${JSON.stringify(ref[n].pay)}`);
+    T.S.route = 'week'; T.S.zp.gifts.tab = 'me'; T.S.overlay = { t: 'gifts', arg: 'me' }; run(where, () => T.render());
+    const h = game(where); cnt.gifts++;
+    if (!h.includes(`<b>${M.n} · ${label}</b>`)) e.push(`${where}: подпись выплаты не называет полосу — «${M.n} · ${label}»`);
+    /* «Получить»: сундуки редкости своей полосы и цикла игрока — в запасы, один раз */
+    const n0 = T.S.bag.chests.length, want = ref[n].pay.reduce((a, g) => a + g.count, 0);
+    run(`${where} · получить`, () => T.ACT.darget(p.key));
+    const got = T.S.bag.chests.slice(n0);
+    if (got.length !== want || got.some(ch => ch.box !== M.box || ch.cyc !== c || !ref[n].pay.some(g => g.r === ch.r && (g.win || 'step') === (ch.win || 'step')))) e.push(`${where}: «Получить» — сундуков +${got.length} (редкость/цикл: ${got.map(ch => ch.r + '/' + ch.cyc).join(', ')}), ждали ${want} — редкости полосы, цикла игрока ${c}`);
+    run(`${where} · повтор`, () => T.ACT.darget(p.key));
+    if (T.S.bag.chests.length !== n0 + want) e.push(`${where}: повтор «Получить» выдал планку следующей полосы второй раз`);
+    if (T.darGot && (!T.darGot(id, n + 1) || T.darGot(id, n + 2))) e.push(`${where}: «в запасах» (darGot) — не у полученной планки ${n + 1} или у невзятой ${n + 2}`);
+    cnt.claimed++;
+  }
+  if (!seen) e.push('лестница: ни один режим не проверен');
+  return e;
+}
+{
+  darLadder().forEach(say);
+  /* проверка мутацией: ломаем алгоритм лестницы прототипа (EnLoot.ladder — его зовут «Дары» и помощник Недели) — закон обязан упасть */
+  const LAD0 = T.EnLoot.ladder, MUT = LADL.mutations(LAD0);   // замок по циклу вернули; планка следующей полосы платит сундук своей; порог продолжения — не ×next
+  let caught = 0;
+  for (const [what, f] of MUT) {
+    const n0 = err.length;   // что сломанный экран наговорит сам — это тоже «поймано», а не ошибка проверки
+    T.EnLoot.ladder = f;
+    let got = [];
+    try { got = darLadder(); } catch (x) { got = ['исключение ' + x.message]; }
+    T.EnLoot.ladder = LAD0;
+    got = got.concat(err.splice(n0));
+    if (got.length) caught++; else say(`мутация «${what}»: закон лестницы в «Дарах» её не поймал`);
+    if (process.argv.includes('--mut')) console.log(`мутация «${what}»: ${got.length ? got.slice(0, 2).join(' | ').slice(0, 320) : 'НЕ ПОЙМАНА'}`);
+  }
+  cnt.mut = `${caught} из ${MUT.length}`;
+  darLadder().forEach(x => say('после мутаций: ' + x));
+}
+
 /* 7. без S.items, сброс и сценарии презентации */
 reset();
 {
@@ -594,7 +809,7 @@ if (!T.S.zp || !T.S.bag || !Object.keys(T.S.rs.shards).length) say('сброс: 
 for (const [t, , f] of T.FLOWS.filter(([t]) => /Запасы|Дары/.test(t))) { run(`сценарий ${t}`, () => { f(); T.render(); }); game(`сценарий ${t}`); }
 for (const t of ['Запасы · сундуки', 'Дары путешествия', 'Запасы · талисманы', 'Запасы · снаряжение']) if (!T.FLOWS.some(([x]) => x === t)) say(`сценарии презентации: нет «${t}»`);
 
-console.log(`Запасы: вкладок ${cnt.tabs}, карточек ${cnt.cards}, листов подробностей ${cnt.sheets}, наборов фильтров ${cnt.filters}. Сундуков открыто: демо и Дары ${cnt.open}, всех видов ${cnt.synth}, с переводом осколков в прах ${cnt.dust}. Дары: отрисовок ${cnt.gifts}, получено выплат ${cnt.claimed}.`);
+console.log(`Запасы: вкладок ${cnt.tabs}, карточек ${cnt.cards}, листов подробностей ${cnt.sheets}, наборов фильтров ${cnt.filters}. Сундуков открыто: демо и Дары ${cnt.open}, всех видов ${cnt.synth}, с переводом осколков в прах ${cnt.dust}, с прахом Эха ${cnt.edust || 0}, с гарантированными записями ${cnt.sure || 0}. Дары: отрисовок ${cnt.gifts}, получено выплат ${cnt.claimed}; лестница планок — мутаций поймано ${cnt.mut || 'нет'}; осколки героев и прах Эха — мутаций поймано ${cnt.mutShard || 'нет'}.`);
 done();
 
 function done() {

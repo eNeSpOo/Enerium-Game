@@ -77,7 +77,7 @@ const BS_DATA = {
 /* арт: рамки-квадраты (тело, венец, рамка целиком для окна сведений и баннера), значки эффектов, украшения HUD — выгрузка 01.10.2026,
    tools/art-gen/ui-art.json; нет файла — CSS-рамка прежняя */
 const BS_ART = {
-  frames: ['hero', 'o', 'e', 'b', 'echo', 'voice', 'rune', 'uber', 'host', 'forgotten', 'many'],
+  frames: ['hero', 'o', 'e', 'b', 'echo', 'voice', 'rune', 'uber', 'awakened', 'many', 'host'],
   plaque: 'bhud/plaque.png', round: 'bhud/round.png', panel: 'bhud/panel.png', crest: { win: 'bhud/victory.webp', wall: 'bhud/defeat.webp' },
   /* иконки боя вне библиотеки способностей (jobs/battle-ability-icons.json): обычная атака по виду удара ядра (EB.fxOf), по всем, удар
      стража, отнимающий раунд; своя способность без вида в библиотеке — по ключу «школа.вид.охват» */
@@ -125,11 +125,11 @@ const BS_ART = {
    тела; венец — пропорция ширины к высоте в тысячных (ar) и ширина к телу (rel); рамка целиком (окно сведений) — окно и нарезка battle_frame.py */
 const BS_FRAME = {
   body: { hero: [62, 72, 233, 57], o: [56, 54, 261, 54], e: [63, 68, 165, 68], b: [64, 72, 176, 72], echo: [91, 96, 185, 96], voice: [85, 110, 169, 66],
-    rune: [124, 124, 124, 124], uber: [97, 106, 201, 106], host: [33, 42, 202, 38], forgotten: [28, 34, 251, 34], many: [81, 76, 184, 76] },
+    rune: [124, 124, 124, 124], uber: [97, 106, 201, 106], host: [33, 42, 202, 38], awakened: [28, 34, 251, 34], many: [81, 76, 184, 76] },
   crest: { hero: [9083, 1032], o: [10289, 1017], e: [5750, 1147], b: [4398, 1369], echo: [4404, 1087], voice: [5255, 1040], rune: [5169, 1089],
-    uber: [3774, 1244], host: [3085, 1455], forgotten: [4139, 1564], many: [6110, 1016] },
+    uber: [3774, 1244], host: [3085, 1455], awakened: [4139, 1564], many: [6110, 1016] },
   full: { hero: [95, 108, 245, 111], o: [92, 57, 250, 54], e: [158, 117, 143, 117], b: [221, 178, 150, 187], echo: [198, 122, 163, 122], voice: [167, 107, 148, 88],
-    rune: [185, 148, 124, 150], uber: [245, 177, 165, 177], host: [282, 181, 147, 174], forgotten: [236, 196, 191, 197], many: [154, 76, 168, 77] },
+    rune: [185, 148, 124, 150], uber: [245, 177, 165, 177], host: [282, 181, 147, 174], awakened: [236, 196, 191, 197], many: [154, 76, 168, 77] },
   /* венец над картой: высота, px при --sk 1 (на 932 × 430; на 844 × 390 — × sm), заходит на портрет, px; не шире карты в rel тысячных */
   crestH: 14, crestIn: 4, sm: 86, maxRel: 1060,
 };
@@ -305,7 +305,7 @@ function bsImmChip(R, chip) {
 
 /* ================== 4. сведения карты по нажатию ================== */
 /* ключ раундов в таблице ядра по рангу карты: тип врага → его раунды (RULES.rounds.by) */
-const BS_RANK_ROUNDS = { o: 'o', e: 'e', b: 'b', rune: 'rune', uber: 'uber', forgotten: 'forgotten', clan: 'clan' };
+const BS_RANK_ROUNDS = { o: 'o', e: 'e', b: 'b', rune: 'rune', uber: 'uber', awakened: 'awakened', clan: 'clan' };
 function bsTypeOf(R, u) {
   const t = typeof bfType === 'function' ? bfType(R, u) : (u.side ? 'o' : 'hero');
   const T = typeof BF !== 'undefined' && BF.types[t];
@@ -336,7 +336,9 @@ const bsKindName = k => (window.EN_ABILITIES && EN_ABILITIES.kinds && EN_ABILITI
 const bsTierName = t => (window.EN_ABILITIES && EN_ABILITIES.tiers && EN_ABILITIES.tiers[t]) || '';
 function bsAbRow(ab, ch, on, opt = {}) {
   const icon = bsAbArt(ab, 30) || `<span class="bsi-vic">${ic(ab.ult ? 'crown' : typeof abIcon === 'function' ? abIcon(ab) : 'spark')}</span>`;
-  const what = [ab.ult ? 'Ульта' : bsKindName(ab.kind), bsTierName(ab.tier), ab.school && ab.school !== 'класс' ? ab.school : ''].filter(Boolean).join(' · ');
+  /* черта именного врага (ADR-0051) — запись набора «Черты врагов»: подпись «Черта», школы у неё нет */
+  const foeTrait = !!(window.EN_ABILITIES && EN_ABILITIES.rules && ab.school === EN_ABILITIES.rules.foeSet);
+  const what = foeTrait ? ['Черта', bsKindName(ab.kind)].filter(Boolean).join(' · ') : [ab.ult ? 'Ульта' : bsKindName(ab.kind), bsTierName(ab.tier), ab.school && ab.school !== 'класс' ? ab.school : ''].filter(Boolean).join(' · ');
   return `<div class="bsi-r${ab.ult ? ' u' : ''}${on ? ' on' : ''}"><span class="bsi-ic">${icon}</span><div class="bsi-tx"><b>${bsEsc(ab.n)}</b>${what ? `<small>${bsEsc(what)}</small>` : ''}${ab.d ? `<p>${bsEsc(ab.d)}</p>` : ''}</div>${ch != null ? `<em class="bsi-ch" title="Шанс в свой ход">${ch}</em>` : opt.tag ? `<em class="bsi-tag">${opt.tag}</em>` : ''}</div>`;
 }
 function bsStRow(I) {

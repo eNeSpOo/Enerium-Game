@@ -86,6 +86,11 @@ for (const [k, slot] of [['active', 'фарм · активная'], ['ult', 'ф
 /* сочетания (ADR-0050): способность из двух записей библиотеки; школа — школа первой части */
 const COMBOS = L.combos || { active: [], ult: [] };
 for (const [k, slot] of [['active', 'сочетание'], ['ult', 'сочетание · ульта']]) for (const a of COMBOS[k] || []) abList.push(Object.assign({ slot, school: a.set }, a));
+/* черты врагов (ADR-0051): пассивки и реакции именных врагов — набор «Черты врагов» библиотеки; героям не раздаются */
+for (const [k, slot] of [['passive', 'черта врага · пассивка'], ['reaction', 'черта врага · реакция']]) for (const a of (L.foeTraits || {})[k] || []) abList.push(Object.assign({ slot, school: a.set }, a));
+/* общая лестница врагов (ADR-0051): замер и мощь каждой карты — tools/content-gen/foes/ladder.js */
+const FOE_LADF = path.join(ROOT, 'tools', 'content-gen', 'foes', 'ladder.json');
+const FOE_LAD = readJSON(FOE_LADF) || { meta: { typeName: {}, rounds: {} }, rows: [], diverge: [] };
 const abById = Object.fromEntries(abList.map(a => [a.id, a]));
 const abUsers = {}, abFirst = {};
 const use = (id, who, c) => { if (!id) return; (abUsers[id] = abUsers[id] || new Set()).add(who); if (abFirst[id] == null || c < abFirst[id]) abFirst[id] = c; };
@@ -116,11 +121,11 @@ function bookAbilities() {
   const SRCJ = JSON.parse(fs.readFileSync(path.join(ROOT, 'tools', 'content-gen', 'abilities', 'source.json'), 'utf8'));
   const bySrc = {}; for (const a of abList) if (a.src && a.src.no) bySrc[a.src.no] = a;
   const author = SRCJ.abilities.map(r => { const no = +r['№'], a = bySrc[no] || {}; return [no, r['Элемент'], r['Тип'], r['Название'], r['Эффект'], a.id || '', a.n || '', a.n && a.n !== r['Название'] ? 'да' : '']; });
-  const foeKit = (kit, nameOf) => (kit || []).map(s => { const a = abById[s.id]; const base = a ? a.n : (s.n || s.id); return (s.as && s.as !== base ? `${s.as} (${base})` : base) + (s.slot === 'ult' ? ' · ульта' : ''); }).join('; ');
+  const foeKit = (kit, nameOf) => (kit || []).map(s => { const a = abById[s.id]; const base = a ? a.n : (s.n || s.id); return (s.as && s.as !== base ? `${s.as} (${base})` : base) + (s.slot === 'ult' ? ' · ульта' : '') + (s.trait ? ' · черта' : ''); }).join('; ');
   const foes = [];
   for (const [id, f] of Object.entries(K.foes)) foes.push(['Мастерская форм', id, f.name, f.rank, f.cls, f.el, foeKit(f.kit)]);
   for (const [id, f] of Object.entries(BF.foes)) foes.push([(bioById[f.biome] || {}).n || f.biome, id, f.name, f.rank, f.cls, f.el, foeKit(f.kit && f.kit.kit)]);
-  for (const [id, f] of Object.entries(EF.foes)) foes.push(['Эхо · ' + f.race, id, f.name, f.rank, f.cls, f.el, foeKit(f.kit)]);
+  for (const [id, f] of Object.entries(EF.foes)) foes.push(['Эхо · ' + (f.week || f.race), id, f.name, f.rank, f.cls, f.el, foeKit(f.kit)]);
   return {
     file: 'Enerium_Способности_элементов.xlsx', title: 'Способности: библиотека, эффекты школ, наборы героев и врагов',
     what: [`Вся библиотека способностей игры — ${abList.length} записей: семь школ и «Без школы» по восемь видов в трёх ступенях целей, ульты, пассивки и реакции, общий набор фарма (ADR-0015), сочетания — способности из двух — и черты (ADR-0050).`,
@@ -393,17 +398,23 @@ function parseFoesDoc() {
 }
 function bookFoes() {
   const biomes = R.cycles.flatMap(c => c.biomes.map(b => { const d = R.drops.enemies.find(e => e.biome === b.id) || {}; return [b.id, b.n, cyc(c.n), c.god, c.el, c.karst, b.kind, b.boss, b.guard, b.guardKind === 'valor' ? 'страж доблести' : 'страж пределов', d.floors || '', d.elites || '', yes(c.team)]; }));
-  const abN = s => { const a = abById[s.id]; const base = a ? a.n : s.n || s.id; return (s.as && s.as !== base ? `${s.as} (${base})` : base) + (s.slot === 'ult' ? ' · ульта' : ''); };
+  const abN = s => { const a = abById[s.id]; const base = a ? a.n : s.n || s.id; return (s.as && s.as !== base ? `${s.as} (${base})` : base) + (s.slot === 'ult' ? ' · ульта' : '') + (s.trait ? ' · черта' : ''); };
   const work = Object.entries(K.foes).map(([id, f]) => [id, f.name, f.rank, f.cls, f.el, (f.kit || []).map(abN).join('; ')]);
-  const rankN = { o: 'рядовой', e: 'элита', b: 'босс', rune: 'рунный страж', uber: 'Убер-босс' };
+  const rankN = { o: 'рядовой', e: 'элита', b: 'босс', rune: 'рунный страж', uber: 'Убер-босс', awakened: 'Пробуждённый', clan: 'клановый босс' };
   const bio = Object.entries(BF.foes).map(([id, f]) => { const c = BF.cards[id] || {}; return [id, (bioById[f.biome] || {}).n || f.biome, cyc((bioById[f.biome] || {}).cyc), rankN[f.rank] || f.rank, f.name, f.cls, f.race, f.el, ((f.kit && f.kit.kit) || []).map(abN).join('; '), c.look || '', c.desc || '']; });
   const doc = parseFoesDoc();
   const civ = Object.fromEntries(RO.weeks.map(w => [w.race, w.civ]));
-  const echo = Object.entries(EF.foes).map(([id, f]) => [id, f.race, civ[f.race] || '', f.step, rankN[f.rank] || f.rank, f.name, f.cls, f.el, f.look || '', (f.kit || []).map(abN).join('; ')]);
+  /* у врага Эхо — неделя (week) и раса карты (race): Многоликий по расе — Забытый в любую неделю (ADR-0054) */
+  const echo = Object.entries(EF.foes).map(([id, f]) => { const wk = f.week || f.race; return [id, wk, civ[wk] || '', f.race, f.step, rankN[f.rank] || f.rank, f.name, f.cls, f.el, f.look || '', (f.kit || []).map(abN).join('; ')]; });
+  /* общая лестница врагов (ADR-0051): каждая карта игры и две её меры — боевая мощь и сила по замеру ядром */
+  const divOf = Object.fromEntries((FOE_LAD.diverge || []).map(d => [`${d.grp}|${d.id}|${d.cyc}`, d.pct]));
+  const dec = (v, d) => (v >= ((FOE_LAD.meta.measure || {}).maxX100 || Infinity) ? 'не взять' : (v / d).toFixed(2).replace('.', ','));
+  const ladder = (FOE_LAD.rows || []).map(r => [r.place, r.mode, cyc(r.cyc), r.id, r.name, (FOE_LAD.meta.typeName || {})[r.rank] || r.rank, r.cls, r.race || '', r.where, r.lvl, r.hp, r.bm, dec(r.rnd100, 100), dec(r.rnd100, 100 * (r.rounds || 1)),
+    r.fight100 != null ? dec(r.fight100, 100) : '', r.trait || '', divOf[`${r.grp}|${r.id}|${r.cyc}`] != null ? divOf[`${r.grp}|${r.id}|${r.cyc}`] + ' %' : '']);
   const echoAb = EF.abilities.map(a => [a.id, a.owner, (EF.foes[a.owner] || {}).name || '', a.n, a.set, a.t === 'ult' ? 'ульта' : a.t === 'pas' ? 'пассивка' : 'активная', a.d, (a.need || []).join(', ')]);
   const bAb = BF.abilities.map(a => [a.id, a.owner, (BF.foes[a.owner] || {}).name || '', a.n, a.set, a.t, a.d]);
   /* призванные враги (§12.3): тип по силе — поле g записи drops.craftBosses (ADR-0039: «крафтового босса» как типа нет) */
-  const gN = { e: 'элита', b: 'босс', u: 'Убер', f: 'Забытый' }, cbById = Object.fromEntries(R.drops.craftBosses.map(b => [b.id, b]));
+  const gN = { e: 'элита', b: 'босс', u: 'Убер', a: 'Пробуждённый' }, cbById = Object.fromEntries(R.drops.craftBosses.map(b => [b.id, b]));
   const gOf = id => (cbById[id] ? gN[cbById[id].g] || cbById[id].g : '');
   const craft = [];
   for (const p of R.places) {
@@ -419,18 +430,22 @@ function bookFoes() {
     file: 'Enerium_Враги.xlsx', title: 'Враги: биомы, Мастерская форм, Эхо, призванные враги, клан',
     what: ['Все враги игры: двенадцать биомов спуска, Мастерская форм, биомы 2–4 (данные), биомы 5–12 (черновик врагов), Эхо девяти недель с Убер-боссами и Многоликим, призванные враги — боссы руин и городов, пробуждённые, эхо боссов биомов — с типом по силе, сонмы кланового босса.',
       'Имена и способности врагов игрок узнаёт после первой победы (§7). Биомы 11–12 и их обитатели — только для команды (§38).'],
-    sources: [UI('recipes'), UI('biome-foes'), UI('echo-foes'), rel(KITF), rel(CFF), rel(FOES_DOC), UI('roster')],
-    team: ['«Биомы» и «Биомы 5–12» — строки с пометкой «для команды»: биомы 11–12 (§38)', '«Способности Эхо» — «Нужно ядру»: недостающие примитивы ядра боя'],
+    sources: [UI('recipes'), UI('biome-foes'), UI('echo-foes'), rel(KITF), rel(CFF), rel(FOES_DOC), UI('roster'), rel(FOE_LADF)],
+    team: ['«Биомы» и «Биомы 5–12» — строки с пометкой «для команды»: биомы 11–12 (§38)', '«Способности Эхо» — «Нужно ядру»: недостающие примитивы ядра боя',
+      '«Лестница» — замер ядром и «Сила к мощи»: рабочие меры баланса (ADR-0051), игрок видит только боевую мощь'],
     sheets: [
       sheet('Биомы', [col('id', 5), col('Биом', 26), col('Цикл', 6), col('Бог', 10), col('Стихия', 12), col('Карст', 11), col('Вид', 12), col('Босс биома', 24), col('Рунный страж', 26), col('Страж', 16), col('Этажей', 7), col('Элит', 6), col('Для команды', 9)], biomes),
       sheet('Мастерская форм', [col('id', 5), col('Враг', 22), col('Ранг', 6), col('Класс', 18), col('Стихия', 10), col('Способности', 60, W_)], work),
       sheet('Биомы 2–4', [col('id', 7), col('Биом', 24), col('Цикл', 6), col('Ранг', 12), col('Враг', 24), col('Класс', 18), col('Раса', 10), col('Стихия', 10), col('Способности', 50, W_), col('Облик', 50, W_), col('Запись сказителя', 70, W_)], bio),
       sheet('Биомы 5–12 черновик', [col('№', 4), col('Биом', 26), col('Ранг', 12), col('Враг', 26), col('Класс · раса · стихия', 30), col('Способности', 60, W_), col('Облик', 60, W_), col('Для команды', 9)], doc),
-      sheet('Эхо', [col('id', 13), col('Раса недели', 12), col('Цивилизация', 16), col('Ступень', 7), col('Ранг', 10), col('Враг', 26), col('Класс', 18), col('Стихия', 10), col('Облик', 60, W_), col('Способности', 60, W_)], echo),
+      sheet('Эхо', [col('id', 13), col('Раса недели', 12), col('Цивилизация', 16), col('Раса врага', 12), col('Ступень', 7), col('Ранг', 10), col('Враг', 26), col('Класс', 18), col('Стихия', 10), col('Облик', 60, W_), col('Способности', 60, W_)], echo),
       sheet('Способности Эхо', [col('id', 22), col('Владелец', 13), col('Враг', 24), col('Название', 26), col('Школа', 10), col('Вид', 10), col('Что делает', 70, W_), col('Нужно ядру', 20, T_)], echoAb),
       sheet('Способности биомов', [col('id', 22), col('Владелец', 8), col('Враг', 22), col('Название', 24), col('Школа', 10), col('Вид', 8), col('Что делает', 70, W_)], bAb),
       sheet('Призванные враги', [col('id', 12), col('Вид призыва', 20), col('Тип по силе', 10), col('Цикл', 6), col('Место', 26), col('Враг', 28), col('Титул', 24), col('Раса', 10), col('Ремесло', 14), col('Лор', 70, W_), col('Для команды', 9)], craft),
       sheet('Клан', [col('Сонм', 8), col('Название', 16), col('Стихия', 10), col('Где', 26), col('Роль', 18), col('Фигура', 20), col('Облик', 70, W_), col('Совет старика', 50, W_)], clan),
+      sheet('Лестница', [col('Где', 34), col('Режим', 9), col('Цикл', 6), col('id', 14), col('Враг', 28), col('Тип', 14), col('Класс', 18), col('Раса', 12), col('Место', 14), col('Уровень', 8), col('Здоровье', 12),
+        col('Боевая мощь', 12), col('Замер, раундов', 12, T_), col('Замер, атак', 10, T_), col('Бой, раундов', 10, T_), col('Черта', 20), col('Сила к мощи', 10, T_)], ladder,
+        'Общая лестница врагов (ADR-0051): боевая мощь — формула §6 со слоем способностей; замер — сколько боя нужно эталонному отряду один на один; «Бой» — босс и страж биома со свитой, как их встречает игрок; «Сила к мощи» — расхождение мер, список на пересмотр. Законы и нарушения — docs/content/лестница-врагов.md'),
     ],
   };
 }
@@ -469,7 +484,8 @@ function bookStore() {
   const getN = { keys: 'рунные ключи', souls: 'души', enerium: 'Энериум', gold: 'золото', spirit: 'дух' };
   const gets = g => (g || []).map(([k, n]) => `${getN[k] || k} ${n}`).join(', ');
   const tiers = Object.entries(ST.tiers).map(([k, v]) => [k, v.rub, (v.usd / 100).toFixed(2)]);
-  const chain = ST.chain.steps.map((s, i) => [i + 1, s.id, s.n, price(s.tier), gets(s.get), `×${ST.chain.x}`]);
+  /* разовые наборы: порядок покупки любой; ×2 — только самой первой покупке, набор выбирает игрок (ADR-0054) */
+  const chain = ST.chain.steps.map((s, i) => [i + 1, s.id, s.n, price(s.tier), gets(s.get), `×${ST.chain.x} — если куплен первым`]);
   const packs = ST.packs.map(p => [p.id, p.n, price(p.tier), p.en, p.bonusBp, `×${p.firstX}`]);
   const subs = ST.subs.map(s => [s.id, s.n, price(s.tier), s.daily, s.days, s.maxDays]);
   const offers = Object.entries(ST.offers.kinds).map(([k, o]) => [k, o.n, o.when, S(o.life), o.limit, o.what]);
@@ -477,12 +493,12 @@ function bookStore() {
   const misc = [['Платный ряд пропуска', ST.pass.n + ' · ' + price(ST.pass.tier)], ['Реклама: Энериума за ролик', ST.ads.perView], ['Реклама: роликов в день', ST.ads.dayCap], ['Реклама: секунд', ST.ads.sec]];
   return {
     file: 'Enerium_Лавка.xlsx', title: 'Лавка Энериума и монетизация',
-    what: ['Витрина доната (§32, ADR-0036): ступени цен для России и Запада, пять стартовых наборов цепочкой (все ×2), пять наборов Энериума (первая покупка ×2), три выдачи раз в сутки, платный ряд пропуска, лимитированные предложения, реклама за Энериум по желанию.'],
+    what: ['Витрина доната (§32, ADR-0036, ADR-0047, ADR-0054): курс — 1 ₽ = 1 Энериум; ступени цен для России и Запада; пять разовых наборов — каждый раз за игру, в любом порядке, ×2 получает только самая первая покупка, набор выбирает игрок; пять наборов Энериума — ×2 первой покупке каждого набора; три выдачи раз в сутки, платный ряд пропуска, лимитированные предложения, реклама за Энериум по желанию.'],
     sources: [UI('store'), 'tools/content-gen/store/build.js'],
     team: [],
     sheets: [
       sheet('Цены', [col('Ступень', 8), col('Рубли', 8), col('Доллары', 9)], tiers),
-      sheet('Стартовые наборы', [col('Шаг', 5), col('id', 8), col('Набор', 24), col('Цена', 18), col('Что внутри', 50, W_), col('Множитель', 9)], chain),
+      sheet('Разовые наборы', [col('№', 5), col('id', 8), col('Набор', 24), col('Цена', 18), col('Что внутри', 50, W_), col('Удвоение', 24)], chain),
       sheet('Наборы Энериума', [col('id', 6), col('Набор', 28), col('Цена', 18), col('Энериум', 9), col('Бонус, б. п.', 10), col('Первая покупка', 10)], packs),
       sheet('Выдачи', [col('id', 6), col('Выдача', 22), col('Цена', 18), col('Энериум в день', 10), col('Дней', 6), col('Не больше дней вперёд', 10)], subs),
       sheet('Предложения', [col('id', 8), col('Предложение', 22), col('Когда', 8), col('Живёт, с', 10), col('Лимит', 6), col('Что это', 60, W_)], offers),
@@ -495,7 +511,8 @@ function bookStore() {
 /* ---------------- достижения ---------------- */
 function bookAchievements() {
   const A = W.ach, catN = Object.fromEntries(A.cats.map(c => [c.id, c.n])), gN = k => (A.groups[k] ? A.groups[k].n : k), kN = k => (A.kinds[k] ? A.kinds[k].n : k), mN = k => (A.metrics[k] ? A.metrics[k].n : k);
-  const rows = A.list.map(a => [a.id, catN[a.cat] || a.cat, gN(a.g), a.s || '', `${a.k}/${a.ks}`, a.n, a.d, a.goal == null ? '' : a.goal, mN(a.m), kN(a.pk), a.v == null ? '' : a.v, rar(a.r), a.at ? S(a.at.o) : '', a.at ? S(a.at.e) : '', a.hint || '', a.from ? cyc(a.from) : '', ...pendRow('achievement', a.id)]);
+  /* «Блок цикла» — достижение блока «Серии цикла N» (ADR-0047): игрок видит его с этого цикла; пусто — веха начала пути */
+  const rows = A.list.map(a => [a.id, catN[a.cat] || a.cat, gN(a.g), a.s || '', `${a.k}/${a.ks}`, a.n, a.d, a.goal == null ? '' : a.goal, mN(a.m), kN(a.pk), a.v == null ? '' : a.v, rar(a.r), a.at ? S(a.at.o) : '', a.at ? S(a.at.e) : '', a.hint || '', a.from ? cyc(a.from) : '', a.c ? cyc(a.c) : '', yes(!!a.team), ...pendRow('achievement', a.id)]);
   const firsts = A.firsts.map(f => [f.id, f.kind, cyc(f.c), f.n, f.d, f.title]);
   const cats = A.cats.map(c => [c.id, c.n, c.label, c.d]);
   const groups = Object.entries(A.groups).map(([k, g]) => [k, g.n]);
@@ -508,7 +525,7 @@ function bookAchievements() {
     team: ['«День у обычного» и «День у увлечённого» — прогон темпа для команды', ...PEND_TEAM],
     sheets: [
       sheet('Достижения', [col('id', 8), col('Категория', 14), col('Тема', 18), col('Серия', 12), col('Ступень', 7), col('Название', 26), col('Условие', 50, W_), col('Цель', 8), col('Счётчик', 24), col('Награда', 24), col('Сила', 6), col('Редкость', 12),
-        col('День у обычного', 9, T_), col('День у увлечённого', 9, T_), col('Подсказка', 40, W_), col('С цикла', 7), ...pendCols], rows),
+        col('День у обычного', 9, T_), col('День у увлечённого', 9, T_), col('Подсказка', 40, W_), col('С цикла', 7), col('Блок цикла', 7), col('Для команды', 9), ...pendCols], rows),
       sheet('Первенства', [col('id', 18), col('Вид', 8), col('Цикл', 6), col('Название', 34), col('Условие', 50, W_), col('Титул', 28)], firsts),
       sheet('Категории', [col('id', 6), col('Категория', 14), col('Строка сундука', 20), col('Что это', 60, W_)], cats),
       sheet('Темы', [col('id', 8), col('Тема', 26)], groups),
@@ -615,7 +632,7 @@ function bookRegistry(books) {
   for (const [k, f] of Object.entries(T.fams)) add('талисман', k, f.n, f.team ? 6 : 2, f.team, 'Талисманы · Линейки');
   for (const p of W.passives) add('пассивка Памяти', p.id, p.n, 2, false, 'Пассивки · Пассивки Памяти');
   for (const a of W.art.list) add('артефакт', a.id, a.n, a.from, false, 'Артефакты · Артефакты');
-  for (const a of W.ach.list) add('достижение', a.id, a.n, a.from || 1, false, 'Достижения · Достижения');
+  for (const a of W.ach.list) add('достижение', a.id, a.n, a.c || a.from || 1, !!a.team, 'Достижения · Достижения');   // блок цикла — со своего цикла; цикл VI — для команды
   for (const f of W.ach.firsts) { add('первенство', f.id, f.n, f.c, false, 'Достижения · Первенства'); add('титул', f.id, f.title, f.c, false, 'Достижения · Первенства'); }
   for (const [k, f] of Object.entries(EF.foes)) add('враг Эхо', k, f.name, 2, false, 'Враги · Эхо');
   for (const a of EF.abilities) add('способность врага Эхо', a.id, a.n, 2, false, 'Враги · Способности Эхо');
@@ -626,7 +643,7 @@ function bookRegistry(books) {
   for (const [k, s] of Object.entries(EQ.slots)) add('место снаряжения', k, s.n, 2, false, 'Снаряжение · Места');
   for (const [k, t] of Object.entries(EQ.templates)) add('шаблон снаряжения', k, t.n, 2, false, 'Снаряжение · Шаблоны');
   for (const [k, b] of Object.entries(LB.boxes)) add('сундук', k, b.n, 1, false, 'Лутбоксы · Сундуки');
-  for (const s of ST.chain.steps) add('товар Лавки', s.id, s.n, 1, false, 'Лавка · Стартовые наборы');
+  for (const s of ST.chain.steps) add('товар Лавки', s.id, s.n, 1, false, 'Лавка · Разовые наборы');
   for (const s of ST.packs) add('товар Лавки', s.id, s.n, 1, false, 'Лавка · Наборы Энериума');
   for (const s of ST.subs) add('товар Лавки', s.id, s.n, 1, false, 'Лавка · Выдачи');
   for (const [k, o] of Object.entries(ST.offers.kinds)) add('предложение Лавки', k, o.n, 1, false, 'Лавка · Предложения');

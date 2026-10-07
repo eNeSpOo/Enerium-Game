@@ -440,6 +440,12 @@ function build() {
     const row = { c, weeks: ECON.weeks[c] };
     for (const who of ECON.who) {
       let wk = Array(7).fill(0);
+      /* клановый босс: ступени лестницы — личные по очкам и клановые по кругам (ADR-0047), где стоит профиль в типичную неделю
+         (typical лутбоксов), и место клана. Прежде считалось только место — у обычного выходил ноль талисманов в неделю */
+      for (const ly of clan.layers.filter(l => l.kind === 'plank')) {
+        const k = (clan.typical[who] || {})[ly.id] || 0;
+        for (const rw of ly.rows.slice(0, k)) for (const ch of rw.cyc[c] || []) wk = addTo(wk, expect({ box: clan.box, r: ch.r, win: ch.win, cyc: c }, ch.count));
+      }
       const top = clan.typical[who].clanTop, layer = clan.layers.find(l => l.id === 'clanTop'), cr = layer.rows.find(x => x.top === top);
       for (const ch of (cr && cr.cyc[c]) || []) wk = addTo(wk, expect({ box: clan.box, r: ch.r, win: ch.win, cyc: c }, ch.count));
       if (c >= ECON.craftFrom) {

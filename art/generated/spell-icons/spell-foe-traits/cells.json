@@ -1,0 +1,156 @@
+{
+  "sheet": "art/generated/spell-icons/spell-foe-traits__nb2.jpg",
+  "jobs": "tools/art-gen/jobs/spell-icons-foe.json",
+  "job": "spell-foe-traits",
+  "grid": [
+    4,
+    3
+  ],
+  "seams": "найдены",
+  "cells": [
+    {
+      "id": "враг.pas.1",
+      "file": "art/generated/spell-icons/spell-foe-traits/foe-pas-1.webp",
+      "box": [
+        14,
+        11,
+        587,
+        584
+      ],
+      "px": 573,
+      "key_left": 0.0
+    },
+    {
+      "id": "враг.pas.2",
+      "file": "art/generated/spell-icons/spell-foe-traits/foe-pas-2.webp",
+      "box": [
+        614,
+        11,
+        1187,
+        584
+      ],
+      "px": 573,
+      "key_left": 0.0
+    },
+    {
+      "id": "враг.pas.3",
+      "file": "art/generated/spell-icons/spell-foe-traits/foe-pas-3.webp",
+      "box": [
+        1213,
+        10,
+        1787,
+        584
+      ],
+      "px": 574,
+      "key_left": 0.0
+    },
+    {
+      "id": "враг.pas.4",
+      "file": "art/generated/spell-icons/spell-foe-traits/foe-pas-4.webp",
+      "box": [
+        1813,
+        11,
+        2386,
+        584
+      ],
+      "px": 573,
+      "key_left": 0.0
+    },
+    {
+      "id": "враг.pas.5",
+      "file": "art/generated/spell-icons/spell-foe-traits/foe-pas-5.webp",
+      "box": [
+        14,
+        611,
+        587,
+        1184
+      ],
+      "px": 573,
+      "key_left": 0.0
+    },
+    {
+      "id": "враг.react.1",
+      "file": "art/generated/spell-icons/spell-foe-traits/foe-react-1.webp",
+      "box": [
+        614,
+        611,
+        1187,
+        1184
+      ],
+      "px": 573,
+      "key_left": 0.0
+    },
+    {
+      "id": "враг.react.2",
+      "file": "art/generated/spell-icons/spell-foe-traits/foe-react-2.webp",
+      "box": [
+        1213,
+        611,
+        1787,
+        1185
+      ],
+      "px": 574,
+      "key_left": 0.0
+    },
+    {
+      "id": "враг.react.3",
+      "file": "art/generated/spell-icons/spell-foe-traits/foe-react-3.webp",
+      "box": [
+        1813,
+        611,
+        2386,
+        1184
+      ],
+      "px": 573,
+      "key_left": 0.0
+    },
+    {
+      "id": "враг.react.4",
+      "file": "art/generated/spell-icons/spell-foe-traits/foe-react-4.webp",
+      "box": [
+        14,
+        1211,
+        586,
+        1783
+      ],
+      "px": 572,
+      "key_left": 0.0
+    },
+    {
+      "id": "враг.react.5",
+      "file": "art/generated/spell-icons/spell-foe-traits/foe-react-5.webp",
+      "box": [
+        614,
+        1211,
+        1186,
+        1783
+      ],
+      "px": 572,
+      "key_left": 0.0
+    },
+    {
+      "id": "враг.react.6",
+      "file": "art/generated/spell-icons/spell-foe-traits/foe-react-6.webp",
+      "box": [
+        1214,
+        1211,
+        1786,
+        1783
+      ],
+      "px": 572,
+      "key_left": 0.0
+    },
+    {
+      "id": "враг.react.6",
+      "file": "art/generated/spell-icons/spell-foe-traits/foe-react-6-alt.webp",
+      "box": [
+        1813,
+        1211,
+        2385,
+        1783
+      ],
+      "px": 572,
+      "key_left": 0.0
+    }
+  ]
+}

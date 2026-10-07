@@ -5,7 +5,7 @@
                                 node tools/content-gen/abilities/check_texts.js --list   — все названия эффектов по текстам, для глаз.
    Закон О1 — тот же, что у сборщика библиотеки (library.py): в описании нет названия эффекта без объяснения. Название эффекта видно
    по основам слов (stems), объяснение — по образцу (proof); оба — в словаре эффектов library.json, fx: один словарь на сборщик
-   и на эту проверку. Сборщик сверяет свои 386 записей при сборке; здесь — всё, что игрок видит о способностях на экранах:
+   и на эту проверку. Сборщик сверяет свои 397 записей при сборке — с чертами врагов (ADR-0051); здесь — всё, что игрок видит о способностях на экранах:
    - библиотека (abilities.js) — книга героя, книга «до покупки», урок, окно карты в бою, бестиарий, лист цели клана;
    - уникальные способности врагов: Эхо (echo-foes.js) и биомов (biome-foes.js) — окно карты в бою, урок о хозяйке леса, бестиарий;
    - талисманы и свойства снаряжения (talismans.js, equipment.js): в бою они — строки «пассивка» и «реакция» окна карты.
@@ -59,6 +59,7 @@ function same() {
   for (const s of Object.values(LIB.sets)) for (const p of ['active', 'ult', 'passive', 'reaction']) for (const x of s[p]) byId[x.id] = x;
   for (const p of ['passive', 'active', 'ult']) for (const x of LIB.farm[p]) byId[x.id] = x;
   for (const p of ['active', 'ult']) for (const x of LIB.combos[p]) byId[x.id] = x;
+  for (const p of ['passive', 'reaction']) for (const x of (LIB.foeTraits || {})[p] || []) byId[x.id] = x;   // черты врагов (ADR-0051)
   let n = 0;
   for (const s of A.sets) for (const x of s.items) { n++; if (!byId[x.id] || byId[x.id].d !== x.d) bad.push(`abilities.js: описание «${x.n}» (${x.id}) не то, что в library.json`); }
   if (n !== Object.keys(byId).length) bad.push(`abilities.js: записей ${n}, в library.json — ${Object.keys(byId).length}`);

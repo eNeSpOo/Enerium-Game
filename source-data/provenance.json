@@ -37,23 +37,23 @@
   },
   {
     "table": "Enerium_Артефакты_Финал.xlsx",
-    "built": "2026-10-01",
+    "built": "2026-10-07",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "7f0966d22ef3b359cbcda5812f29b27eae0e6667690f93b8319a4ce70e2b295c",
-    "sha256": "ce6ae9b718a39f51cf2c11131bf94c01aa862941ebd287cee31890dc8a1364fb",
+    "data_sha256": "a6fd69a2ae85153c4bc9f62e7e3f26f693d27cd9ce4c28a7e22052886d31da71",
+    "sha256": "4e93f83a55c60f044eec8f13cdc03dc0ca2e8c99196723007549ebcaa482b91b",
     "sheets": {
       "Артефакты": 18,
       "Уровни": 77,
-      "Правила": 3,
-      "Правки под систему": 13
+      "Правила": 4,
+      "Правки под систему": 14
     }
   },
   {
     "table": "Enerium_Враги.xlsx",
-    "built": "2026-10-06",
+    "built": "2026-10-07",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "c8c7880958251f9fabd13b17e8546fe993ede72c88287886b47d59fc60735f65",
-    "sha256": "2a6695ef4fedb4324aa49d69c78612afc1e7556514606cbd0fd2083b556cd2d3",
+    "data_sha256": "c31be66c56a2a78ed1a559394597fce00eaaf602bf0807d2892f77527db68f49",
+    "sha256": "1cbdfe95ee85a5cb5e4b71a5a987dcb38df7bd538faca6b32282292456d9609d",
     "sheets": {
       "Биомы": 12,
       "Мастерская форм": 14,
@@ -63,15 +63,16 @@
       "Способности Эхо": 51,
       "Способности биомов": 12,
       "Призванные враги": 66,
-      "Клан": 56
+      "Клан": 56,
+      "Лестница": 893
     }
   },
   {
     "table": "Enerium_Герои.xlsx",
-    "built": "2026-10-02",
+    "built": "2026-10-07",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "07803d62df93af80f8e5c9cdba6290d9e3884645e759820db59778a79230fa6c",
-    "sha256": "a2c450f02ba49a34a543504388b4c854347b36e124427ebb91b99c2118886df7",
+    "data_sha256": "af60ea8272e704240a88c1de49d667235eeeef8f670876f0eb62a39f7d9442dd",
+    "sha256": "f3d2efed5daca05bc1270c70aaf60146473c708eff9612ddf023a385e1198ae0",
     "sheets": {
       "Герои": 360,
       "Источники": 5,
@@ -81,24 +82,24 @@
   },
   {
     "table": "Enerium_Достижения.xlsx",
-    "built": "2026-10-02",
+    "built": "2026-10-07",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "6058f4f78540692688c83507d233f4f0276e24decfd9ade51606911f7e804b8e",
-    "sha256": "a2d023e2ed0dd866488942dfdab7147d2ccf3fe14a426c8387124f5c3a83ff99",
+    "data_sha256": "5667a82ce03aed34ec5aa070a4fd0b96ff7d67f226bc89c9363bf5542edb834a",
+    "sha256": "515f563ea738a36882f1fcb94386d89e7e4c91368d9713b6ded5d2da6d919974",
     "sheets": {
-      "Достижения": 102,
+      "Достижения": 219,
       "Первенства": 28,
       "Категории": 4,
       "Темы": 9,
-      "Виды наград": 15
+      "Виды наград": 18
     }
   },
   {
     "table": "Enerium_Контракты.xlsx",
-    "built": "2026-10-01",
+    "built": "2026-10-07",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "1a4e82a507b3deab2910ec13834e78b3e4dbe66f33c27aa41d3999a3200de2af",
-    "sha256": "2c86b892bf06b2e10edbc2962b60173dd3adc98e7ca60563510288a4a71dc0b4",
+    "data_sha256": "e298d3dd1de9ab85b2b7a7462b61934dd94267f7750abd014bf0934c90bab427",
+    "sha256": "d2af020053c423b3b96d3fd65885592b9c296b3b85d7992f67a2f9ad52bc296c",
     "sheets": {
       "Виды заданий": 24,
       "Группы": 13,
@@ -107,13 +108,13 @@
   },
   {
     "table": "Enerium_Лавка.xlsx",
-    "built": "2026-10-01",
+    "built": "2026-10-07",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "23b618f1224f4feb6ea36b9aff929b1a163d3f0433fc9ae2878258a914c5c0bf",
-    "sha256": "811bf4cc0264b8e31b88b7dfe15b56bd288cb910052720f11cc1eb54f62c3aff",
+    "data_sha256": "d8cdca5b69541d31b242593dd140ed993b8cfa640627e43836ee9dcc39404a3d",
+    "sha256": "e84b0fde946385fec6988a63aa3606beee4da2aeeeac2c5c64648d029e9698d7",
     "sheets": {
       "Цены": 10,
-      "Стартовые наборы": 5,
+      "Разовые наборы": 5,
       "Наборы Энериума": 5,
       "Выдачи": 3,
       "Предложения": 3,
@@ -123,10 +124,10 @@
   },
   {
     "table": "Enerium_Летопись.xlsx",
-    "built": "2026-10-01",
+    "built": "2026-10-07",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "37d060b787b10e7deb9c69f7f24a9632c00055c00a9e03b3a0310e9e8c891c7a",
-    "sha256": "d08dc9f2b3ad1efb03f841e15653beb003df36dbe319501abe37536a7763ab9e",
+    "data_sha256": "d13709a16182db8fb0b20f77d017415a11d86668c9e4581b591257626a0520e5",
+    "sha256": "9e7de3e4238dae788b1b370192969e909b11154d91f7d29e9271de6693a272fe",
     "sheets": {
       "Главы": 23,
       "Разделы": 7
@@ -134,25 +135,25 @@
   },
   {
     "table": "Enerium_Лутбоксы.xlsx",
-    "built": "2026-10-01",
+    "built": "2026-10-07",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "3a70944c50589edc7b9dc418dd431d69d4f3db7c3d8478db89722569f428f310",
-    "sha256": "bc9243298242e9599e0ff205666c55f5c86082d77ae7541847707c52e3221fa8",
+    "data_sha256": "b7a77bef9232971a04480e0c8d352ed8c1f4bcbc26daacb8293bbf27d2479855",
+    "sha256": "187b5e13a7c968c228cb33a7223663ecf67311551e052b9699348022d2dce502",
     "sheets": {
-      "Сундуки": 7,
-      "Линии": 8,
+      "Сундуки": 23,
+      "Линии": 24,
       "Редкости и окна": 7,
-      "Источники": 11,
+      "Источники": 27,
       "Призванные враги": 67,
-      "Пулы": 5
+      "Пулы": 13
     }
   },
   {
     "table": "Enerium_Неделя.xlsx",
-    "built": "2026-10-01",
+    "built": "2026-10-07",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "5e7c652117778a9418e61a20e10e1ac2361d6c966a11f237e86513a178d6ebb7",
-    "sha256": "155b687bb2d481ec60958a0b73240365149315a32f653e96b12a238dfc8383dd",
+    "data_sha256": "d4c1182931cf94789214376a97afeccaeb10132d01995b3c9cc5701643a5dd89",
+    "sha256": "8130dbaa23e04e8f4b5efc7770e723b573bb4093e2f29c3d5b05d379e778b422",
     "sheets": {
       "Недели": 9,
       "Источники очков": 7,
@@ -161,13 +162,13 @@
   },
   {
     "table": "Enerium_Реестр_имён.xlsx",
-    "built": "2026-10-02",
+    "built": "2026-10-07",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "92defe8f8c08be0d9ec3faa84cdbb9fe91afa4c8a457c32e68b17297190a0cdd",
-    "sha256": "b0c5395b66245de0637339b07b474ecbfc98ca4564b4a4eda3bf592f363fa696",
+    "data_sha256": "610ba2e4800d642c5488a30a7909f0953596819743f307456b313f6664a64525",
+    "sha256": "9afe910656304efd5c02a5f34851fed7dbc39f1d63450b222fed88d17b8df184",
     "sheets": {
-      "Имена": 3314,
-      "Повторы": 19,
+      "Имена": 3458,
+      "Повторы": 20,
       "Лестница спойлеров": 5,
       "Слова лестницы": 42,
       "Намёки по циклам": 158,
@@ -177,10 +178,10 @@
   },
   {
     "table": "Enerium_Ресурсы.xlsx",
-    "built": "2026-10-01",
+    "built": "2026-10-07",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "967e3e12e5c6d4e3a80210e21791976ef935b3ecbfbc492233954ef58484016a",
-    "sha256": "63bb81d9ce0aa92e99f1d7d158d4e6e879a76562e33d50a37a762a62141ad24c",
+    "data_sha256": "ad08ab6673f81a3d3bb96001503ae8ba9c6a2189110954b9d10be67942520c4f",
+    "sha256": "3a14120722b2f84ca326a1e10b5c67d9b4734c478800173b7df086c7b0024ce5",
     "sheets": {
       "Предметы": 948,
       "Ремёсла": 6,
@@ -191,10 +192,10 @@
   },
   {
     "table": "Enerium_Рецепты.xlsx",
-    "built": "2026-10-01",
+    "built": "2026-10-07",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "13da343c6e69b2a37b4bbe37d4d7ee9723984825d8c0662e8375453997e26708",
-    "sha256": "f77f25059759ea66da0c9f4eb964cbf12be5a18542236e5c7028e2918c01bdc6",
+    "data_sha256": "2f76202093f275350fa77af05caba20a0ba2d2686764f9b4ed602c7ea9484666",
+    "sha256": "0d13d4f111bd4d729f67c55f35e1c48d648b31cea9423f2e0965b5d3c6c6f88f",
     "sheets": {
       "Рецепты": 527,
       "Крафтовые места": 27,
@@ -206,24 +207,24 @@
   },
   {
     "table": "Enerium_Ритуалы.xlsx",
-    "built": "2026-10-01",
+    "built": "2026-10-07",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "8d0ab64bd187cd14f4afb9e7d5565057ec96fb1c0034e73d61be34549ba2e7c2",
-    "sha256": "450bcc6d19b0043ac9b84c3eece348b25bd50d6318a3a5043c8c3b07ae84ea00",
+    "data_sha256": "741dbcb440e4ad83166ed702b1429a9d2cceb271d31d03a749cc70c9e2696e28",
+    "sha256": "d2c7b3ea329c4da207001cd2ef6d9460f281d3920b7a1973cd442b450d3fd461",
     "sheets": {
       "Вкладки": 2,
       "Имена ритуалов": 31,
       "Пассивки Памяти": 24,
-      "Правила": 14,
+      "Правила": 15,
       "Тексты": 6
     }
   },
   {
     "table": "Enerium_Сет_бонусы_героев_ФИНАЛ.xlsx",
-    "built": "2026-10-02",
+    "built": "2026-10-07",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "a6044d63401b807e9b1bda39170f43b466392a4ec2524f1ef773cabedf50e4be",
-    "sha256": "f906aff06bf9a3647c032d0ddbff658e755a5f4f2957f051cf3cb38ec4eccc3c",
+    "data_sha256": "82f4117ff5db28a4bd38ee5023bfc34270b63eca533cd6e3ba1dafa6f6994ab5",
+    "sha256": "e11f9a14e31e68211eb80940b98204469c1e06f8697233ecc3bc8f08e0070eee",
     "sheets": {
       "Сеты": 25,
       "Состав сетов": 125,
@@ -233,27 +234,27 @@
   },
   {
     "table": "Enerium_Снаряжение.xlsx",
-    "built": "2026-10-01",
+    "built": "2026-10-07",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "2d5aff5b25d5fe7c7bab2128aac2d99bd41e4fdcd9f8f94d6685662215bd745d",
-    "sha256": "4cb1e1caff3aef22a9591d6900d9e6202181fe4cfae581c3c39788415fbcd623",
+    "data_sha256": "687539f0f32f2b1075bd3c50aef8babd2f8f5362868b89925a4a60116da3eff7",
+    "sha256": "ca1929f32fa33745dbb12baa6bff7f72a99edf2a9e7f7356f5ec9c8a3a10f834",
     "sheets": {
       "Места": 9,
       "Строки": 17,
       "Шаблоны": 63,
       "Редкости": 7,
       "Ларцы": 2,
-      "Правила": 13
+      "Правила": 14
     }
   },
   {
     "table": "Enerium_Способности_элементов.xlsx",
-    "built": "2026-10-06",
+    "built": "2026-10-07",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "278287cae2578fabe290cda428150457d66c44e77a31445c1e929b6dd6b351b5",
-    "sha256": "4c63427733bf7b9a30c29f90d330d09c14e52d6257b2ce831c0482ad0356dfc0",
+    "data_sha256": "30601548a2722a37ba0ca2686f4ef4be6f3e5f3e557189555447de9d4ce8726f",
+    "sha256": "bcb98c2bf8f13582d8320424e71835d38e98f66505b7ae5af9f3a47dcaff1473",
     "sheets": {
-      "Способности": 386,
+      "Способности": 397,
       "Эффекты школ": 40,
       "Ступени целей": 24,
       "Наборы героев": 360,
@@ -263,10 +264,10 @@
   },
   {
     "table": "Enerium_Странник_пассивки_Финал.xlsx",
-    "built": "2026-10-01",
+    "built": "2026-10-07",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "1bd6cf043d9e9ea3395813338f911376596ea1c3a25b133b66c5ac6d5b2c4960",
-    "sha256": "63b8838d16d2d9b920636dacdca81135cce483b966c46f36291fd2577a3a2455",
+    "data_sha256": "b6eb6362138f1fe88f4086133c7a26986b5e5d68c9538420447211e0cb46b41c",
+    "sha256": "83c1721ed6cd33d058e4b34dd2866fb44b6ac3b9bda673d28a646061f135db8b",
     "sheets": {
       "Пассивки Памяти": 146,
       "Редкости и веса": 7,
@@ -277,10 +278,10 @@
   },
   {
     "table": "Enerium_Талисманы_Финал.xlsx",
-    "built": "2026-10-06",
+    "built": "2026-10-07",
     "builder": "tools/content-gen/tables/build.py",
-    "data_sha256": "fc47f842f7aaa0ba0ba68745c288f9114ce1322c9a2474d373461ba63c126e0a",
-    "sha256": "499ce1d8f035afff24d86ff6fcd62645c65b06e104a67f40cb56da1f17865a7f",
+    "data_sha256": "509b5b0f21871410dcf2c003764ec631e65d1b8af685ec813c2014a44cf337aa",
+    "sha256": "a886306a27c417360246aa299914e6e2f85a157e8c0eb533ffa804389793ef81",
     "sheets": {
       "Талисманы": 359,
       "Линейки": 118,

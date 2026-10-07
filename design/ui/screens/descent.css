@@ -49,6 +49,16 @@
 .ds-pips i{display:block;width:7px;height:7px;transform:rotate(45deg);border:var(--shl-fr,1px) solid rgba(221,188,122,.62);background:rgba(10,12,14,.6)}
 .ds-pips i.on{border-color:#f0d79c;background:linear-gradient(135deg,#f0d79c,#8c7650);box-shadow:0 0 6px -1px rgba(221,188,122,.7)}
 .ds-slots.full,.ds-slots.full b{color:var(--amber)}
+/* камни слотов — кнопка к артефакту активных биомов (ADR-0054); без артефакта активного биома нет — замок и ноль */
+.ds-slots[data-a]{padding:6px 4px;margin:-6px -4px;cursor:pointer;border-radius:8px}
+.ds-slots[data-a]:focus-visible{outline:2px solid var(--spirit);outline-offset:1px}
+@media (hover:hover){ .ds-slots[data-a]:hover b{color:#fff} }
+.ds-slots.none,.ds-slots.none b{color:var(--amber)}
+.ds-slots.none .i{width:13px;height:13px}
+.ds-trail{gap:12px}
+.ds-trail .reason{max-width:300px;padding-right:16px;color:var(--parch);font-weight:600;text-shadow:0 1px 8px #000,0 0 2px #000}
+.ds-trail .btn.go.big{min-width:0;padding:0 22px;letter-spacing:.06em;font-size:14px;gap:8px}
+.ds-trail .btn.go.big .cost{margin-left:6px}
 .ds-slots.full .ds-pips i.on{border-color:var(--amber);background:linear-gradient(135deg,#f2c27a,#a8691f)}
 .ds-nav .cyc{display:flex;flex-direction:column;gap:2px}
 .ds-nav .cyc>b{display:block;padding:7px 2px 3px;font:700 9.5px/1 var(--f-u);letter-spacing:.18em;text-transform:uppercase;color:var(--gold-2);white-space:nowrap}

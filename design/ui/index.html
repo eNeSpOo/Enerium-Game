@@ -735,7 +735,7 @@ button.well:hover{border-color:var(--iron-3)}
 .ruler i.wall{background:var(--rust);box-shadow:0 0 8px rgba(220,106,82,.6)}
 @container main (max-height: 360px){ .bt{--rowh:86px;--colw:84px;--fh:48px} .bt-floor b{font-size:26px} }
 .bt-ctrl .btn[aria-pressed="true"]{color:var(--spirit);border-color:rgba(72,229,212,.45)}
-/* узкий экран (844): у Убера, Многоликого и Забытого в строке боя ещё чип иммунитета — «Свернуть» уезжал за край. Кнопка — значком (подпись остаётся для чтения с экрана), зазоры и часы уже */
+/* узкий экран (844): у Убера, Многоликого и Пробуждённого в строке боя ещё чип иммунитета — «Свернуть» уезжал за край. Кнопка — значком (подпись остаётся для чтения с экрана), зазоры и часы уже */
 @container main (max-width: 800px){ .bt-hud{gap:8px} .bt-clock{width:126px} .bt-ctrl .btn[data-a="minimize"]{font-size:0;gap:0;padding:0 11px} }
 .bc{cursor:pointer}
 /* легенда знаков на картах */
@@ -1569,6 +1569,9 @@ const ARENA = AV('arena-workshop.jpg');
 const ARENAS = { b1: ARENA };
 const biomeArena = b => ARENAS[b] || ARENA;
 const DUST = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><radialGradient id="g" cx="50%" cy="80%" r="60%"><stop offset="0" stop-color="#f3e2b4"/><stop offset=".6" stop-color="#b08d55"/><stop offset="1" stop-color="#5d4a2c"/></radialGradient></defs><path d="M6 52c6-12 14-22 26-22s20 10 26 22z" fill="url(#g)"/><path d="M20 44c3-4 7-7 12-7" stroke="#fff3cf" stroke-opacity=".5" stroke-width="2" fill="none"/><circle cx="22" cy="18" r="2.2" fill="#f7e9c2"/><circle cx="38" cy="12" r="1.6" fill="#f7e9c2" opacity=".8"/><circle cx="31" cy="22" r="1.3" fill="#f7e9c2" opacity=".7"/><circle cx="44" cy="24" r="1.8" fill="#f7e9c2" opacity=".6"/></svg>');
+/* прах Эха (ADR-0047) — свой ресурс, не общий прах душ: пока своего рисунка нет — нынешний значок праха с отметкой: кольцо эха
+   в углу. Рисунок — в очереди арта (docs/art-queue.md) */
+const EDUST = 'data:image/svg+xml,' + encodeURIComponent(decodeURIComponent(DUST.slice(DUST.indexOf(',') + 1)).replace('</svg>', '<circle cx="49" cy="15" r="12" fill="#07211e" stroke="#48e5d4" stroke-width="3.5"/><circle cx="49" cy="15" r="5.5" fill="none" stroke="#48e5d4" stroke-width="2.5"/><circle cx="49" cy="15" r="1.8" fill="#d4fff9"/></svg>'));
 /* Сундук — заглушка до генерации в стиле ADR-0009: арт GPT убран */
 const CHEST = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><radialGradient id="l" cx="50%" cy="100%" r="70%"><stop offset="0" stop-color="#ddbc7a" stop-opacity=".35"/><stop offset="1" stop-color="#121518" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" rx="10" fill="#121518"/><rect width="64" height="64" rx="10" fill="url(#l)"/><path d="M14 31h36v16a3 3 0 0 1-3 3H17a3 3 0 0 1-3-3z" fill="#2b241c" stroke="#ddbc7a" stroke-width="2"/><path d="M14 31c0-9 8-15 18-15s18 6 18 15z" fill="#3a3024" stroke="#ddbc7a" stroke-width="2"/><path d="M24 17.5V50M40 17.5V50" stroke="#b1915a" stroke-width="1.5" opacity=".55"/><rect x="28" y="28" width="8" height="10" rx="1.5" fill="#ddbc7a"/><circle cx="32" cy="33" r="1.6" fill="#121518"/></svg>');
 /* сундук в наградах режимов — рисованный сундук своего режима и редкости (zpChestPic, screens/bag.js; арт — CO_ART, screens/chest-open.js), без него — значок CHEST */
@@ -1577,10 +1580,11 @@ const chestPic = (box, r) => typeof zpChestPic === 'function' ? zpChestPic(box, 
 const CUR = {
   gold: { n: 'Золото', img: ART('gold.png'), src: 'Каждый враг, контракты, ритуалы героев' },
   spirit: { n: 'Дух', img: ART('spirit.png'), src: 'Враги биомов, ритуалы героев. Тратится на уровни героев' },
-  souls: { n: 'Души', img: ART('souls.png'), src: 'Элиты и боссы, ритуалы героев. За деньги — только стартовые наборы, каждый раз за игру' },
+  souls: { n: 'Души', img: ART('souls.png'), src: 'Элиты и боссы, ритуалы героев. За деньги — только разовые наборы, каждый раз за игру' },
   enerium: { n: 'Энериум', img: ART('enerium.png'), src: 'Дар дня, пропуск, контракты эпик+, Арена топ-100, реклама по желанию; Лавка Энериума' },
-  keys: { n: 'Рунические ключи', img: ART('rune-key.png'), src: 'Контракты — главный источник; боссы биомов, сундуки — изредка. За деньги — только стартовые наборы, каждый раз за игру' },
+  keys: { n: 'Рунические ключи', img: ART('rune-key.png'), src: 'Контракты — главный источник; боссы биомов, сундуки — изредка. За деньги — только разовые наборы, каждый раз за игру' },
   dust: { n: 'Прах душ', img: DUST, src: 'Повторные осколки пробуждённых героев' },
+  edust: { n: 'Прах Эха', img: EDUST, src: 'Лишние осколки героев Эхо: из сундуков Эхо, когда отряд недели собран, и при пробуждении героя Эхо' },
 };
 const RAR = ['', 'Обычная', 'Редкая', 'Уникальная', 'Эпическая', 'Древняя', 'Первородная', 'Вневременная'];
 const STATS = ['Сила', 'Интеллект', 'Ловкость', 'Выносливость', 'Скорость'];
@@ -1626,7 +1630,7 @@ function initialState() {
   return {
     route: 'shelter', from: null,
     seg: { heroes: 'coll', craft: 'work', arena: 'arena', clan: 'pass', profile: 'over', contracts: 'day', store: 'en', rituals: 'work', chron: 'best', hero: 'power', market: 'buy', hire: 'gold', rhero: 'who' },
-    wallet: { gold: 124850, spirit: 8420, souls: 1260, enerium: 340, keys: 20, dust: 180 },
+    wallet: { gold: 124850, spirit: 8420, souls: 1260, enerium: 340, keys: 20, dust: 180, edust: 0 },   // edust — прах Эха (ADR-0047): демо-остаток кладут запасы (ZP_DEMO, screens/bag.js)
     acc: { level: 24, xp: 7289, next: 11758, cycle: 2 },
     week: { race: 'Эльфов', next: 'Зверей', left: 3 * 86400 + 5 * 3600 + 12 * 60 },
     /* отряд демо — реальный (ADR-0031, п. 1): золотые герои цикла I c1-01…c1-05, личный максимум доблести 1 по составу; доблесть 0,
@@ -1684,20 +1688,20 @@ function initialState() {
     ],
     selBiome: 'b1',
     foes: [
-      { id: 'o1', g: 'o', name: 'Безликий образец', type: 'Рядовой', tag: 'Сила · ближний бой', cls: 'Физ. ДД силы', el: 'Земля', race: 'Эльфы', hp: 4800, bm: 12400, desc: 'Первый, кого встречает каждый спустившийся. Лица нет — только два следа там, где должны быть глаза.', tip: 'Он честный противник — на таких и учатся.' },
-      { id: 'o2', g: 'o', name: 'Долгорукий образец', type: 'Рядовой', tag: 'Контроль · достаёт издалека', cls: 'Дебаффер', el: 'Земля', race: 'Эльфы', hp: 5400, bm: 13100, desc: 'Одна рука тянется почти до земли и кончается тяжёлой каменной кистью.', tip: 'Не оставляй слабых в хвосте без присмотра.' },
-      { id: 'o3', g: 'o', name: 'Пустотелый образец', type: 'Рядовой', tag: 'Маг · воздух', cls: 'Маг. ДД', el: 'Воздух', race: 'Эльфы', hp: 6000, bm: 13800, desc: 'Скорлупа с раскрытой грудью. Внутри ничего, кроме ветра.', tip: 'Держи строй покрепче. Кого он разбросает, тех легче добить.' },
-      { id: 'o4', g: 'o', name: 'Безголовый образец', type: 'Рядовой', tag: 'Держит удар', cls: 'Танк', el: 'Земля', race: 'Звери', pos: '50% 62%', hp: 6600, bm: 14500, desc: 'Зверь размером с быка, а головы у него нет. Идёт вперёд, пока перед ним что-то стоит.', tip: 'Помогут терпение и хороший удар.' },
-      { id: 'o5', g: 'o', name: 'Сырой образец', type: 'Рядовой', tag: 'Лекарь', cls: 'Лекарь', el: 'Земля', race: 'Эльфы', hp: 7200, bm: 15200, desc: 'Его так и не высушили. Латает себя — и не жалеет, пока не кончится.', tip: 'Бей быстрее, чем он успеет замазаться.' },
-      { id: 'o6', g: 'o', name: 'Однорукий образец', type: 'Рядовой', tag: 'Убийца · редкий', cls: 'Физ. ДД ловкости', el: 'Земля', race: 'Эльфы', hp: 7800, bm: 15900, rare: true, desc: 'Сделан наспех и потому быстрее всех. Сразу уходит к заднему ряду.', tip: 'Береги тех, кто лечит и колдует. Он придёт за ними.' },
-      { id: 'e1', g: 'e', name: 'Подмастерье', type: 'Элита', tag: 'Сила', cls: 'Физ. ДД силы', el: 'Земля', race: 'Эльфы', hp: 18500, bm: 32600, desc: 'Месит глину для всей Мастерской и не заметил, что месить больше не для кого.', tip: 'Поставь вперёд того, кто выдержит.' },
-      { id: 'e2', g: 'e', name: 'Резчик', type: 'Элита', tag: 'Ловкость', cls: 'Физ. ДД ловкости', el: 'Земля', race: 'Эльфы', hp: 19200, bm: 33000, desc: 'Снимал лишнее с каждой заготовки. Теперь лишним считает тебя.', tip: 'Не давай ему выбирать. Прикрой слабого.' },
-      { id: 'e3', g: 'e', name: 'Упор', type: 'Элита', tag: 'Держит удар', cls: 'Танк', el: 'Земля', race: 'Эльфы', hp: 19900, bm: 33400, desc: 'Держит перед собой каменную плиту со знаком Мастерской, как щит.', tip: 'Стену не ломают лбом. Бей туда, где плиты нет.' },
-      { id: 'e4', g: 'e', name: 'Мех', type: 'Элита', tag: 'Маг · воздух', cls: 'Маг. ДД', el: 'Воздух', race: 'Эльфы', hp: 20600, bm: 33800, desc: 'Грудь собрана из складок, как кузнечные меха. Бьёт порывами.', tip: 'Кто стоит крепко, тот и не улетит.' },
-      { id: 'e5', g: 'e', name: 'Штопарь', type: 'Элита', tag: 'Лекарь', cls: 'Лекарь', el: 'Земля', race: 'Эльфы', hp: 21300, bm: 34200, desc: 'Всё, что треснуло, зашивает. Раньше чужую работу, теперь себя.', tip: 'Бей сильно и сразу.' },
-      { id: 'e6', g: 'e', name: 'Съёмщик', type: 'Элита', tag: 'Снимает силу', cls: 'Дебаффер', el: 'Земля', race: 'Эльфы', hp: 22000, bm: 34600, desc: 'Снимает с героев то, чем они сильны, как снимают форму с готовой работы.', tip: 'Не копи силу на один удар.' },
-      { id: 'b1', g: 'b', name: 'Первый набросок', type: 'Босс биома', tag: 'Хозяин последней ступени', cls: 'Босс', el: 'Земля', race: 'Не определена', hp: 86000, bm: 76200, desc: 'Самая первая попытка, брошенная на середине. Он очень давно ищет, чем себя закончить.', tip: 'Силы не растрачивай в начале — под конец он опаснее всего.' },
-      { id: 'g1', g: 'b', name: 'Мастер', type: 'Рунный страж', tag: 'Страж дороги вниз', cls: 'Страж', el: 'Земля', race: 'Эльфы', hp: 78000, bm: 64500, desc: 'Единственный законченный во всей Мастерской. Решает, можно ли пустить чужого дальше.', tip: 'Он ждёт и отвечает. Мастер не любит суеты.' },
+      { id: 'o1', g: 'o', name: 'Безликий образец', type: 'Рядовой', tag: 'Сила · ближний бой', cls: 'Физ. ДД силы', el: 'Земля', race: 'Саганы', hp: 4800, bm: 12400, desc: 'Первый, кого встречает каждый спустившийся. Лица нет — только два следа там, где должны быть глаза.', tip: 'Он честный противник — на таких и учатся.' },
+      { id: 'o2', g: 'o', name: 'Долгорукий образец', type: 'Рядовой', tag: 'Контроль · достаёт издалека', cls: 'Дебаффер', el: 'Земля', race: 'Саганы', hp: 5400, bm: 13100, desc: 'Одна рука тянется почти до земли и кончается тяжёлой каменной кистью.', tip: 'Не оставляй слабых в хвосте без присмотра.' },
+      { id: 'o3', g: 'o', name: 'Пустотелый образец', type: 'Рядовой', tag: 'Маг · воздух', cls: 'Маг. ДД', el: 'Воздух', race: 'Саганы', hp: 6000, bm: 13800, desc: 'Скорлупа с раскрытой грудью. Внутри ничего, кроме ветра.', tip: 'Держи строй покрепче. Кого он разбросает, тех легче добить.' },
+      { id: 'o4', g: 'o', name: 'Безголовый образец', type: 'Рядовой', tag: 'Держит удар', cls: 'Танк', el: 'Земля', race: 'Саганы', pos: '50% 62%', hp: 6600, bm: 14500, desc: 'Зверь размером с быка, а головы у него нет. Идёт вперёд, пока перед ним что-то стоит.', tip: 'Помогут терпение и хороший удар.' },
+      { id: 'o5', g: 'o', name: 'Сырой образец', type: 'Рядовой', tag: 'Лекарь', cls: 'Лекарь', el: 'Земля', race: 'Саганы', hp: 7200, bm: 15200, desc: 'Его так и не высушили. Латает себя — и не жалеет, пока не кончится.', tip: 'Бей быстрее, чем он успеет замазаться.' },
+      { id: 'o6', g: 'o', name: 'Однорукий образец', type: 'Рядовой', tag: 'Убийца · редкий', cls: 'Физ. ДД ловкости', el: 'Земля', race: 'Саганы', hp: 7800, bm: 15900, rare: true, desc: 'Сделан наспех и потому быстрее всех. Сразу уходит к заднему ряду.', tip: 'Береги тех, кто лечит и колдует. Он придёт за ними.' },
+      { id: 'e1', g: 'e', name: 'Подмастерье', type: 'Элита', tag: 'Сила', cls: 'Физ. ДД силы', el: 'Земля', race: 'Саганы', hp: 18500, bm: 32600, desc: 'Месит глину для всей Мастерской и не заметил, что месить больше не для кого.', tip: 'Поставь вперёд того, кто выдержит.' },
+      { id: 'e2', g: 'e', name: 'Резчик', type: 'Элита', tag: 'Ловкость', cls: 'Физ. ДД ловкости', el: 'Земля', race: 'Саганы', hp: 19200, bm: 33000, desc: 'Снимал лишнее с каждой заготовки. Теперь лишним считает тебя.', tip: 'Не давай ему выбирать. Прикрой слабого.' },
+      { id: 'e3', g: 'e', name: 'Упор', type: 'Элита', tag: 'Держит удар', cls: 'Танк', el: 'Земля', race: 'Саганы', hp: 19900, bm: 33400, desc: 'Держит перед собой каменную плиту со знаком Мастерской, как щит.', tip: 'Стену не ломают лбом. Бей туда, где плиты нет.' },
+      { id: 'e4', g: 'e', name: 'Мех', type: 'Элита', tag: 'Маг · воздух', cls: 'Маг. ДД', el: 'Воздух', race: 'Саганы', hp: 20600, bm: 33800, desc: 'Грудь собрана из складок, как кузнечные меха. Бьёт порывами.', tip: 'Кто стоит крепко, тот и не улетит.' },
+      { id: 'e5', g: 'e', name: 'Штопарь', type: 'Элита', tag: 'Лекарь', cls: 'Лекарь', el: 'Земля', race: 'Саганы', hp: 21300, bm: 34200, desc: 'Всё, что треснуло, зашивает. Раньше чужую работу, теперь себя.', tip: 'Бей сильно и сразу.' },
+      { id: 'e6', g: 'e', name: 'Съёмщик', type: 'Элита', tag: 'Снимает силу', cls: 'Дебаффер', el: 'Земля', race: 'Саганы', hp: 22000, bm: 34600, desc: 'Снимает с героев то, чем они сильны, как снимают форму с готовой работы.', tip: 'Не копи силу на один удар.' },
+      { id: 'b1', g: 'b', name: 'Первый набросок', type: 'Босс биома', tag: 'Хозяин последней ступени', cls: 'Босс', el: 'Земля', race: 'Саганы', hp: 86000, bm: 76200, desc: 'Самая первая попытка, брошенная на середине. Он очень давно ищет, чем себя закончить.', tip: 'Силы не растрачивай в начале — под конец он опаснее всего.' },
+      { id: 'g1', g: 'b', name: 'Мастер', type: 'Рунный страж', tag: 'Страж дороги вниз', cls: 'Страж', el: 'Земля', race: 'Саганы', hp: 78000, bm: 64500, desc: 'Единственный законченный во всей Мастерской. Решает, можно ли пустить чужого дальше.', tip: 'Он ждёт и отвечает. Мастер не любит суеты.' },
     ],
     known: ['o1', 'o2', 'o3', 'o4', 'o5', 'e1', 'e2', 'e3', 'e4', 'e5', 'e6', 'b1', 'g1'],
     /* запасы игрока — S.bag: его заводит screens/model.js из DEMO_BAG, здесь инвентаря нет */
@@ -1796,29 +1800,23 @@ const valorSt = (st, v) => EB.valorSt(st, v, INV.hero.valorPct);   // прави
 const heroSt = h => valorSt(h.st, h.valor || 0);
 { const src0 = EB.heroSrc; EB.heroSrc = h => { const s = src0(h); return s && h && h.valor ? Object.assign({}, s, { st: valorSt(s.st, h.valor) }) : s; }; }
 /* ================== Боевая мощь (§6) — одна функция на весь прототип ==================
-   БМ героя = C × √(УВС × ЭЗ) по карте ядра. Слой 0 — только характеристики, К_ротации = 1; источник героя — без вещей (BM_SRC0:
+   БМ героя = C × √(УВС × ЭЗ) по карте ядра — считает ядро, EB.bm (battle.js): слой 0 — характеристики, слой 1 — вклад способностей
+   набора, К_ротации (ADR-0051): с чертой и сочетанием герой сильнее своего числа, враг с чертой — тоже. Источник героя — без вещей (BM_SRC0:
    талисманы и снаряжение оборачивают EB.heroSrc позже, в своих экранах). Слой 2 — множители вещей в б. п. (BM_LAYERS): их кладут
    screens/talismans.js и screens/equipment.js. БМ отряда — сумма БМ героев. Число не хранится: h.bm — свойство только для чтения,
    оно зовёт BM.hero; кэш — по отпечатку всего, от чего число зависит. C — та же, что у бестиария и кланового босса (§6, «ручка»):
    EN_BIOME_FOES.rules.bmC, без данных биомов — HR_DATA.bmC (screens/heroes.js). Враги считаются той же формулой: BM.unit.
-   BM.unit(u) — формула по карте ядра; BM.parts(h) — { base, mul: { слой: б. п. }, bm }; BM.hero(h); BM.squad(ids) — сумма */
+   BM.unit(u) — мощь карты ядра (EB.bm с C экранов); BM.parts(h) — { base, mul: { слой: б. п. }, bm }; BM.hero(h); BM.squad(ids) — сумма.
+   Витринное число: ни в одну формулу боя не входит (§6) */
 const BM_SRC0 = EB.heroSrc;
 const BM_LAYERS = [];   // { id, key(h) — отпечаток вещей героя, mul(h) — множитель слоя, б. п. }
 const BM = (() => {
   const fl = (a, b) => Math.floor(a / b), BPX = 10000;
-  const isqrt = n => { if (n < 2) return n; let x = n, y = fl(x + 1, 2); while (y < x) { x = y; y = fl(x + fl(n, x), 2); } return x; };
   const cX100 = () => (window.EN_BIOME_FOES && EN_BIOME_FOES.rules && EN_BIOME_FOES.rules.bmC) || (typeof HR_DATA !== 'undefined' && HR_DATA.bmC) || 0;
-  /* формула по карте ядра: УВС — урон главной характеристики × скорость × крит; ЭЗ — здоровье за смягчением своего уровня и уклонением */
-  function unit(u) {
-    const R = EB.RULES, kl = R.K * u.lvl, cap = R.caps.defPct * 100;
-    const mit = k => Math.min(cap, fl(u.def[k] * BPX, Math.max(1, kl + u.def[k])));
-    const m = fl(mit('str') + mit('int'), 2);
-    const dps = fl(u.atk[u.main] * u.as * (1000000 + u.crit * (u.critDmg - 100)), 100000000);
-    const ehp = fl(fl(u.maxHp * BPX, BPX - m) * BPX, BPX - u.eva);
-    return fl(cX100() * isqrt(dps * ehp), 100);
-  }
+  /* мощь карты ядра — функция ядра: слои 0 и 1 (battle.js, bm и kRot); C — косметическая ручка экранов */
+  const unit = u => EB.bm(u, cX100());
   function base(h) { let u = null; try { u = EB.create({ mode: 'rounds', heroes: [BM_SRC0(h)], foes: [], seed: 1 }).u[0][0] || null; } catch (_) { u = null; } return u ? unit(u) : 0; }
-  const keyOf = h => [h.id, h.lvl, h.valor, h.cls, h.draft || '', (h.st || []).join(',')].concat(BM_LAYERS.map(L => L.id + ':' + L.key(h))).join('|');
+  const keyOf = h => [h.id, h.lvl, h.valor, h.cls, h.draft || '', h.cycle || h.c || '', (h.st || []).join(',')].concat(BM_LAYERS.map(L => L.id + ':' + L.key(h))).join('|');
   const memo = new Map();
   function parts(h) {
     if (!h) return { base: 0, mul: {}, bm: 0 };
@@ -2002,8 +2000,9 @@ function navTodo() {
 function navHeroes() {
   const mine = typeof hrMine === 'function' ? hrMine() : S.heroes;
   const grow = typeof heroDev !== 'function' ? 0 : mine.filter(h => { const d = heroDev(h); return (d.atCap && !!d.rune && d.have >= d.need) || (d.open && h.valor < h.maxV && d.vrHave > 0); }).length;   // heroDev — screens/hero-dev.js
-  const need = RS.rules ? RS.rules.stub.shards : 0;
-  const wake = need ? RS.heroes.filter(h => (S.rs.shards[h.id] || 0) >= need && !rsHas(h) && h.c <= rsCyc()).length : 0;
+  /* комплект осколков — у каждого героя свой: у героя Эхо — по его циклу (hrNeed, screens/heroes.js; ADR-0047) */
+  const need = h => (typeof hrNeed === 'function' ? hrNeed(h) : RS.rules ? RS.rules.stub.shards : 0);
+  const wake = RS.rules ? RS.heroes.filter(h => need(h) > 0 && (S.rs.shards[h.id] || 0) >= need(h) && !rsHas(h) && h.c <= rsCyc()).length : 0;
   return { grow, wake };
 }
 const todoN = list => (list || []).reduce((a, x) => a + x.n, 0);
@@ -2392,7 +2391,12 @@ function rsFace(h) {
   return `<span class="rs-ph" data-el="${h.sch}"><b>${rsInit(h.n)}</b></span>`;
 }
 const rsSrcChip = h => `<span class="chip ${h.src === 'donat' ? 'spirit' : h.src === 'echo' ? 'gold' : ''}">${RS_SRC_ONE[h.src]}${h.src === 'gold' ? ' · №' + h.no : h.src === 'donat' ? ' · ' + h.place + '-й' : ''}</span>`;
-const rsAversShort = h => `+${pctBp(h.avers.bp != null ? h.avers.bp : RS.rules.aversionBp)} урона по расе «${h.avers.race}»`;
+/* неприязнь героя Эхо — по циклу героя (ADR-0054): число — правило ядра EB.aversionBp(цикл), у героя может быть своя прибавка */
+const rsAversBp = h => (h.avers.bp != null ? h.avers.bp : EB.aversionBp(h.c || h.cycle));
+const rsAversShort = h => `+${pctBp(rsAversBp(h))} урона по расе «${h.avers.race}»`;
+/* неприязнь отряда недели: у каждого героя своя — от первого героя, цикла II, до пятого, цикла VI */
+const rsAversSquad = sq => { const hs = (sq || []).filter(h => h && h.avers && h.avers.race); if (!hs.length) return ''; const v = hs.map(rsAversBp), lo = Math.min(...v), hi = Math.max(...v);
+  return lo === hi ? rsAversShort(hs[0]) : `+${Math.round(lo / 100)}–${pctBp(hi)} урона по расе «${hs[0].avers.race}»`; };
 /* книга героя (hbCard, раскрытая — hbWin: screens/book.js), мелкая книга (rsCard) и шапка (rsHead) — screens/heroes.js; строка списка — здесь.
    Кристалл редкости у лица в строке рисует CSS (.rs-av, screens/heroes.css) */
 function rsRow(h, o = {}) {
@@ -2534,13 +2538,15 @@ function abRow({ icon, name, what = '', d = '', chip = '', lock = false, kind = 
 /* приёмы врага в карточке бестиария (§7.1: первая победа открывает активные навыки, пассивки и ульту): те же строки, что на странице
    «Навыки» книги героя, — значок, имя (у врага своё — as), вид и описание. Описание — запись библиотеки или уникальная запись биома
    в ядре (EB.lib): одно описание на все экраны, название эффекта в нём объяснено (ADR-0052). Набор — как у ядра (foeSrc): kits.js
-   или поле kit карты врага. Доли хода и числа боя — в окне карты в бою */
+   или поле kit карты врага. Доли хода и числа боя — в окне карты в бою. Черта именного врага (ADR-0051) — запись набора «Черты врагов»
+   с меткой trait: подписана «Черта», школы у неё нет */
 function foeKitHtml(id) {
   const C = EB.FOES[id], K = (window.EN_KITS && EN_KITS.foes && EN_KITS.foes[id]) || (C && C.kit) || null, L = EB.lib();
   if (!K || !K.kit) return '';
   const rows = K.kit.filter(x => L[x.id]).map(x => {
     const a = L[x.id], art = (typeof bsAbArt === 'function' && bsAbArt(Object.assign({}, a, { ult: x.slot === 'ult' }), 40)) || (typeof abArt === 'function' && abArt(a, 40, ''));
-    return abRow({ kind: x.slot, icon: art || ic(x.slot === 'ult' ? 'crown' : abIcon(a)), name: `${schoolMark(a.school)}${x.as || a.n}`, what: AB_KIND[x.slot] || 'Способность', d: a.d || '' });
+    return abRow({ kind: x.slot, icon: art || ic(x.slot === 'ult' ? 'crown' : abIcon(a)), name: `${x.trait ? '' : schoolMark(a.school)}${x.as || a.n}`,
+      what: x.trait ? `Черта · ${(AB_KIND[x.slot] || '').toLowerCase()}` : AB_KIND[x.slot] || 'Способность', d: a.d || '' });
   }).join('');
   return rows ? `<span class="eyebrow">Приёмы</span><div class="rot-list foe-ab">${rows}</div>` : '';
 }
@@ -2555,7 +2561,7 @@ function rsSoulsView() {
   if (typeof hrSoulsView === 'function') return hrSoulsView();   // сцена алтаря: вход рулетки rlCol и входы hrSoulsSide — screens/heroes.js
   return `<div class="hr-souls">${typeof rlCol === 'function' ? rlCol() : ''}${typeof hrSoulsSide === 'function' ? hrSoulsSide() : ''}</div>`;
 }
-const rsShardTag = h => rsHas(h) ? `<span class="chip gold">${ic('check')}есть</span>` : `<span class="faint num">${S.rs.shards[h.id] || 0}/${RS.rules.stub.shards}</span>`;
+const rsShardTag = h => rsHas(h) ? `<span class="chip gold">${ic('check')}есть</span>` : `<span class="faint num">${fmt(S.rs.shards[h.id] || 0)}/${fmt(typeof hrNeed === 'function' ? hrNeed(h) : RS.rules.stub.shards)}</span>`;   // комплект — свой у героя (ADR-0047)
 
 /* ================== Ремесло ==================
    «Мастерская», «Запасы» и «Лавка» — файлы экранов: CRAFT_SEGS.work (screens/craft.js), CRAFT_SEGS.stock (screens/bag.js),
@@ -2644,7 +2650,7 @@ const TR_COL = it => ['basic', 'unique', 'vshard', 'rune', 'echo'].includes(it.t
 /* раса в строке: Забытые и Перворождённые — с заглавной, как в своде */
 const trRace = r => ['Забытые', 'Перворождённые'].includes(r) ? r : String(r).toLowerCase();
 /* тип призванного врага по силе — поле g записи craftBosses (ADR-0039: «крафтового босса» как типа нет): [кто, кого] */
-const TR_SUMMON_G = { e: ['элита', 'элиту'], b: ['босс', 'босса'], u: ['Убер', 'Убера'], f: ['Забытый', 'Забытого'] };
+const TR_SUMMON_G = { e: ['элита', 'элиту'], b: ['босс', 'босса'], u: ['Убер', 'Убера'], a: ['Пробуждённый', 'Пробуждённого'] };
 const trSummonG = (call, form) => { const b = ((RX.drops && RX.drops.craftBosses) || []).find(x => x.call === call), t = b && TR_SUMMON_G[b.g]; return t ? t[form] : form ? 'врага' : 'враг'; };
 /* цикл, где узел виден: у базового пула — первый цикл, чьи рецепты его берут */
 const trHome = it => it.pool ? Math.min(...(RX_USE[it.id] || [{ cyc: 1 }]).map(r => r.cyc)) : it.cyc;
@@ -2855,7 +2861,7 @@ function storeView() {
   const t = S.seg.store;
   const meta = { title: 'Лавка Энериума', seg: { key: 'store', items: [['en', 'Энериум'], ['pass', 'Пропуск'], ['look', 'Облик']] } };
   let body;
-  /* витрина Лавки — screens/store.js (EN_STORE): вкладки «Наборы» — пять стартовых наборов цепочкой и предложения, «Энериум» — пять
+  /* витрина Лавки — screens/store.js (EN_STORE): вкладки «Наборы» — пять разовых наборов в любом порядке и предложения, «Энериум» — пять
      наборов и реклама, «Выдача» — три подписки; обёртка SCREENS.store заменяет ими этот список вкладок, «Облик» — строкой витрины */
   if (t === 'en') body = '<div class="pnl pad"><p class="faint">Витрина Лавки Энериума не подключена.</p></div>';
   /* пропуск сезона — screens/pass.js: он рисует вкладку поверх storeView (обёртка SCREENS.store) */
@@ -2944,10 +2950,10 @@ const OV = {
   /* «Входящие» — почта с вкладками, письма друзей, заявки — screens/social.js (OV.inbox) */
   cur(o) {
     const k = o.arg, c = CUR[k];
-    const spend = { gold: 'Лавка, рынок (комиссия 10%), заверение контрактов, артефакты', spirit: 'Уровни героев', souls: 'Эхо, активация чертежей и рабочих, артефакты', enerium: 'Донатные герои, прокрутка возрождения, пропуск, призывы крафта, перебросы Памяти, обновления', keys: 'Вход к рунному стражу; лишние — в руническую пыль', dust: 'Осколки героев в лавке праха' }[k];
+    const spend = { gold: 'Лавка, рынок (комиссия 10%), заверение контрактов, артефакты', spirit: 'Уровни героев', souls: 'Эхо, активация чертежей и рабочих, артефакты', enerium: 'Донатные герои, прокрутка возрождения, пропуск, призывы крафта, перебросы Памяти, обновления', keys: 'Вход к рунному стражу; лишние — в руническую пыль', dust: 'Осколки героев в лавке праха', edust: 'Вливается осколками в героя Эхо любой недели, пока тот не собран. Это не прах душ: в лавке праха его не тратят' }[k];
     return sheet(c.n, `<div class="row" style="gap:14px"><img src="${c.img}" alt="" style="width:64px;height:64px;object-fit:contain"><div class="stat"><b style="font-size:34px">${fmt(S.wallet[k])}</b><small>на руках</small></div></div>
       <dl class="kv" style="grid-template-columns:1fr;gap:2px"><dt>Откуда</dt><dd style="text-align:left;margin-bottom:8px">${c.src}</dd><dt>На что</dt><dd style="text-align:left">${spend}</dd></dl>
-      ${k === 'souls' || k === 'keys' ? '<p class="reason">За деньги — только стартовые наборы, каждый раз за игру. Дальше — только игрой.</p>' : ''}`, k === 'enerium' ? `<button class="btn go" data-a="go" data-v="store">В лавку Энериума</button>` : k === 'dust' && OV.dust ? '<button class="btn go" data-a="dlg" data-v="dust">В лавку праха</button>' : '');
+      ${k === 'souls' || k === 'keys' ? '<p class="reason">За деньги — только разовые наборы, каждый раз за игру. Дальше — только игрой.</p>' : ''}`, k === 'enerium' ? `<button class="btn go" data-a="go" data-v="store">В лавку Энериума</button>` : k === 'dust' && OV.dust ? '<button class="btn go" data-a="dlg" data-v="dust">В лавку праха</button>' : k === 'edust' && ACT.ehcat ? '<button class="btn go" data-a="ehcat">К героям Эхо</button>' : '');
   },
   level() {
     const src = [['Первое убийство нового существа', 50], ['Первое закрытие биома', 500], ['Первый рунный страж цикла', 500], ['Пробитие рунного предела', 150], ['Доблесть герою', 300], ['Первая победа над врагом в Эхо', 100], ['Новый герой', 200], ['Переход на новый цикл', 2000]];
@@ -3766,7 +3772,7 @@ const MAP = [
     ready: ['profile', 'wanderer-passives', 'artifacts', 'achievements', 'server-firsts', 'public-profile', 'friends', 'cosmetics'] },
   { n: 'Летопись', p: 19, where: 'Странник · вкладка', d: 'Одна книга знаний во вкладке Странника: боги, мир, города, Спуск, Странник — главы лора; бестиарий и механики — справка. Глава — одна мысль: картинка сверху, две строки и «ещё». Закрытая глава — условие; новые — точка у вкладки и дело у портрета (screens/chronicle.js).', o: ['cycles'],
     ready: ['cycles'] },
-  { n: 'Лавка Энериума', p: 30, where: '«+» у Энериума', d: 'Зал-сокровищница, четыре вкладки (screens/store.js, EN_STORE). «Наборы» — пять стартовых наборов цепочкой: все ×2, каждый раз за игру, купил один — открылся следующий; ступень крупно и лесенка из пяти; справа — лимитированные предложения, срок датой. «Энериум» — малый, средний, большой, огромный, великий: первая покупка ×2; внизу — реклама за Энериум, попап по нажатию. «Выдача» — три подписки: Энериум раз в сутки письмом. Цена — ступень платформы игрока, рубли или доллары; что придёт — листом до оплаты, покупка — операция с номером. Пропуск — сезон «Осенний путь», платный ряд за деньги: баннер, ступень и очки, лента из 30 ступеней, два ряда; что даёт платный ряд — лист до покупки (screens/pass.js). Облик не продаётся: строка витрины ведёт в лист «Облик» Странника. Подтверждение оплаты — системное.', o: ['forbidden-shop', 'battle-pass', 'subscriptions', 'checkout:s', 'ad-reward'],
+  { n: 'Лавка Энериума', p: 30, where: '«+» у Энериума', d: 'Зал-сокровищница, четыре вкладки (screens/store.js, EN_STORE). «Наборы» — пять разовых наборов, каждый раз за игру, в любом порядке: ×2 получает только самая первая покупка, набор выбирает игрок (ADR-0054); выбранный набор крупно и ряд из пяти; справа — лимитированные предложения, срок датой. «Энериум» — малый, средний, большой, огромный, великий, курс 1 ₽ = 1 Энериум (ADR-0047): ×2 — первой покупке каждого комплекта, один раз на комплект; внизу — реклама за Энериум, попап по нажатию. «Выдача» — три подписки: Энериум раз в сутки письмом. Цена — ступень платформы игрока, рубли или доллары; что придёт — листом до оплаты, покупка — операция с номером. Пропуск — сезон «Осенний путь», платный ряд за деньги: баннер, ступень и очки, лента из 30 ступеней, два ряда; что даёт платный ряд — лист до покупки (screens/pass.js). Облик не продаётся: строка витрины ведёт в лист «Облик» Странника. Подтверждение оплаты — системное.', o: ['forbidden-shop', 'battle-pass', 'subscriptions', 'checkout:s', 'ad-reward'],
     ready: ['forbidden-shop', 'battle-pass', 'subscriptions', 'checkout', 'ad-reward'] },
 ];
 const TEMPLATES = [
@@ -4465,7 +4471,7 @@ function rkEchoHtml() {
   const rows = RS.weeks.map(w => {
     const sq = w.squad.map(id => RSI[id]), av = sq.find(h => h.avers && h.avers.race);
     const civ = w.civ ? `<small>${w.civ} · «${w.raid}»${KH.team && w.team ? ' · ' + w.team.theme : ''}</small>` : '';
-    return `<tr><th>Неделя ${w.gen}${civ}<small>${av ? rsAversShort(av) : ''}</small></th>${cyc.map(c => { const h = sq.find(x => x.c === c); return `<td>${h ? `<button class="rk-hn" ${rkPick(h.id)}>${h.n}</button><small>${h.cls} · ${h.race} · доблесть до ${h.maxV}</small>` : '—'}</td>`; }).join('')}</tr>`;
+    return `<tr><th>Неделя ${w.gen}${civ}<small>${av ? rsAversSquad(sq) : ''}</small></th>${cyc.map(c => { const h = sq.find(x => x.c === c); return `<td>${h ? `<button class="rk-hn" ${rkPick(h.id)}>${h.n}</button><small>${h.cls} · ${h.race} · доблесть до ${h.maxV}</small>` : '—'}</td>`; }).join('')}</tr>`;
   }).join('');
   return `<div class="rk-scroll"><table class="rk-tab"><tr><th>Отряд</th>${cyc.map(c => `<th>Цикл ${ROMAN[c]}</th>`).join('')}</tr>${rows}</table></div>
     <p class="k-note" style="margin-top:8px">Эхо — память о древних цивилизациях, живших задолго до этеров (ADR-0024). Пятеро одной недели — отряд, отбивший её нашествие: игрок собирает его по герою за цикл, максимум доблести — номер цикла героя − 1. Сундук Эхо недели даёт осколки героев отряда, открытых к текущему циклу. Неприязнь — особенность, а не способность: действует везде, где встречаются враги этой расы.</p>`;
@@ -4484,7 +4490,7 @@ function rkRulesHtml() {
     <div><span class="eyebrow">Источники · ADR-0019</span><table class="rk-tab"><tr><th>Источник</th><th>С цикла</th><th>Героев</th><th>Максимум доблести</th></tr>${src}</table>
       <p class="k-note">Любой герой приходит с 0 уровнем, 0 рунных пределов и 0 доблести.</p></div>
     <div><span class="eyebrow">Ступени сетов · ADR-0022, §30</span><table class="rk-tab"><tr><th>Сумма максимумов</th><th>Ступеней</th></tr>${tiers}</table><table class="rk-tab"><tr><th>Ступень</th><th>Условие</th></tr>${conds}</table></div>
-    <div><span class="eyebrow">Неприязнь героев Эхо · ADR-0024</span><p class="k-note">+${pctBp(R.aversionBp)} урона по врагам расы своей недели — демонстрация, число в данных.</p>
+    <div><span class="eyebrow">Неприязнь героев Эхо · ADR-0024</span><p class="k-note">Урон по врагам расы своей недели — по циклу героя: ${Object.entries(EB.RULES.aversion.byCycleBp).map(([c, bp]) => `${ROMAN[c]} — +${pctBp(bp)}`).join(', ')} (слово автора 06.10.2026, ADR-0054); числа — в правилах ядра.</p>
       <span class="eyebrow">Возрождение душ · §15.1</span><p class="k-note">Прокрутка — ${fmt(R.spin)} Энериума, пул привязан к циклу: в прототипе — герои рулетки текущего цикла, героев прошлых циклов продаёт каталог праха.</p>
       <span class="eyebrow">Заглушки прототипа — ждут автора</span><p class="k-note">Осколков на героя — ${st.shards}, осколков за прокрутку — ${st.spinShards}, пробуждение — ${fmt(st.activateSouls)} душ, донатные герои с 1-го по 5-го — ${st.donatPrice.map(fmt).join(' / ')} Энериума. Этих чисел нет в источниках (§15.1, ADR-0021).</p></div>
     <div><span class="eyebrow">Цена героя за золото · k-я покупка цикла · ADR-0023</span><p class="k-note">${fmt(R.gold.first)} × цикл × (1 + ${pctBp(R.gold.stepBp)} × (k − 1)); строк — по размеру каталога цикла.</p>

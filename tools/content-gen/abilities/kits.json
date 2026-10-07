@@ -141,7 +141,7 @@
     "ults": 1,
     "sharesAs": "первородная"
    },
-   "забытый": {
+   "пробуждённый": {
     "abilities": 6,
     "ults": 1,
     "sharesAs": "вневременная"
@@ -28086,6 +28086,18 @@
      "share": 1800,
      "as": "Тяжёлая рука",
      "tgt": null
+    },
+    {
+     "v": 0,
+     "slot": "pas",
+     "id": "враг.pas.3",
+     "n": "Дублёная шкура",
+     "set": "Черты врагов",
+     "w": null,
+     "as": null,
+     "tgt": null,
+     "trait": true,
+     "chR": null
     }
    ]
   },
@@ -28121,6 +28133,18 @@
      "share": 1800,
      "as": "Снять лишнее",
      "tgt": "lowest"
+    },
+    {
+     "v": 0,
+     "slot": "pas",
+     "id": "враг.pas.4",
+     "n": "Срыв покрова",
+     "set": "Черты врагов",
+     "w": null,
+     "as": null,
+     "tgt": null,
+     "trait": true,
+     "chR": null
     }
    ]
   },
@@ -28156,6 +28180,18 @@
      "share": 1800,
      "as": "Плита",
      "tgt": null
+    },
+    {
+     "v": 0,
+     "slot": "pas",
+     "id": "враг.pas.2",
+     "n": "Сбить пламя",
+     "set": "Черты врагов",
+     "w": null,
+     "as": null,
+     "tgt": null,
+     "trait": true,
+     "chR": null
     }
    ]
   },
@@ -28191,6 +28227,18 @@
      "share": 1542,
      "as": "Сквозняк",
      "tgt": null
+    },
+    {
+     "v": 0,
+     "slot": "react",
+     "id": "враг.react.6",
+     "n": "Мимо бури",
+     "set": "Черты врагов",
+     "w": null,
+     "as": null,
+     "tgt": null,
+     "trait": true,
+     "chR": 2734
     }
    ]
   },
@@ -28226,6 +28274,18 @@
      "share": 1800,
      "as": "Шов",
      "tgt": null
+    },
+    {
+     "v": 0,
+     "slot": "react",
+     "id": "враг.react.3",
+     "n": "Глухая оборона",
+     "set": "Черты врагов",
+     "w": null,
+     "as": null,
+     "tgt": null,
+     "trait": true,
+     "chR": 2734
     }
    ]
   },
@@ -28261,6 +28321,18 @@
      "share": 1542,
      "as": null,
      "tgt": null
+    },
+    {
+     "v": 0,
+     "slot": "pas",
+     "id": "враг.pas.1",
+     "n": "Стряхнуть порчу",
+     "set": "Черты врагов",
+     "w": null,
+     "as": null,
+     "tgt": null,
+     "trait": true,
+     "chR": null
     }
    ]
   },
@@ -28308,6 +28380,18 @@
      "share": 550,
      "as": "Последний штрих",
      "tgt": null
+    },
+    {
+     "v": 0,
+     "slot": "react",
+     "id": "враг.react.1",
+     "n": "Ярость скованного",
+     "set": "Черты врагов",
+     "w": null,
+     "as": null,
+     "tgt": null,
+     "trait": true,
+     "chR": null
     }
    ]
   },
@@ -28367,6 +28451,18 @@
      "share": 700,
      "as": null,
      "tgt": null
+    },
+    {
+     "v": 0,
+     "slot": "react",
+     "id": "враг.react.2",
+     "n": "Зеркало воли",
+     "set": "Черты врагов",
+     "w": null,
+     "as": null,
+     "tgt": null,
+     "trait": true,
+     "chR": 2721
     }
    ]
   }

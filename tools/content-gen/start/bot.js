@@ -11,11 +11,13 @@
    6. дух — в уровни: первым качается самый низкий, пока хватает духа и не упёрлись в потолок;
    7. босс биома пал, страж ещё нет, ключи есть и отряд не тот, что уже проиграл стражу, — к стражу; иначе — забег.
    Шаги сценария сверх боя (D.tut, ADR-0040) — сразу, как только открыты и по карману: сундук уровня (2а — после найма), покупка Лавки
-   (2б), первый артефакт — купить и поднять до своего уровня (5а — после найма и предела, до духа).
+   (2б), артефакт активных биомов (2в — после найма первого героя, до первого забега: без него спуска нет, ADR-0054), первый артефакт —
+   купить и поднять до своего уровня (5а — после найма и предела, до духа).
    Каждое действие пишется в журнал (log) по порядку: из него сборщик собирает сценарий обучения (ADR-0040) — шаги, которые прототип
    разрешает игроку по одному. Дух в уровни — запись 'lvl' на каждый поднятый уровень: подряд идущие сборщик сводит в один шаг.
    Мир W: st() — снимок; claim() — уровни и награды, окна закрыты; hire(id), levelUp(id), valor(id), limit(id), craft(cells, рецепт),
-   open() — сундук сценария, buy(предмет) — покупка Лавки, art(артефакт, уровень), run(биом), guard(биом) — операции; entry(биом) —
+   open() — сундук сценария, buy(предмет) — покупка Лавки, art(артефакт, уровень), trail(артефакт) — покупка артефакта активных биомов,
+   run(биом), guard(биом) — операции; entry(биом) —
    ключей за вход к стражу; levelCost(n) — дух за уровень n.
    Снимок: { lvl, cycle, slots, gold, spirit, souls, keys, train, runes, heroes: [{ id, lvl, cap, lim, valor, maxV }], front, boss, guard,
    recipe, craft, stock, shop, arts — открыты ли Запасы, Лавка, артефакты; chest — сундук сценария в запасах; bought — покупка Лавки;
@@ -49,6 +51,9 @@ function play(W, D, opt = {}) {
       /* 2б. Лавка — покупка сценария, как только Лавка открыта и золота хватает */
       s = W.st();
       if (TUT.shop && s.shop && !s.bought && s.gold >= TUT.shop.cost && W.buy(TUT.shop.buy)) { say('shop', { id: TUT.shop.buy }); if (claim()) fresh = true; acted = true; }
+      /* 2в. артефакт активных биомов — как только есть герой и золото: до первого забега */
+      s = W.st();
+      if (TUT.trail && s.art[TUT.trail.id] == null && s.heroes.length && s.gold >= TUT.trail.gold && W.trail(TUT.trail.id)) { say('trail', { id: TUT.trail.id }); if (claim()) fresh = true; acted = true; }
       /* 3. первый рецепт */
       s = W.st();
       if (s.craft && !s.recipe && B.recipe.cells.every(([id, q]) => s.has(id, q)) && W.craft(B.recipe.cells, B.recipe.r)) { say('recipe', { r: B.recipe.r }); if (claim()) fresh = true; acted = true; }
@@ -102,6 +107,7 @@ function play(W, D, opt = {}) {
       continue;
     }
     if (!s.heroes.length) break;   // без героев не спуститься: сценарий сломан
+    if (TUT.trail && s.art[TUT.trail.id] == null) break;   // без артефакта активных биомов забега нет: сценарий сломан
     const r = W.run(b);
     steps.push({ i, kind: 'run', b, wall: r.wall, win: !!r.win, ms: r.ms, spirit: r.spirit || 0, lvls: s.heroes.map(h => h.lvl), ids: s.heroes.map(h => h.id) });
     say('run', { b, wall: r.wall, win: !!r.win });

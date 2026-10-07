@@ -294,6 +294,32 @@
 .du-ah b{font-size:19px;color:var(--parch)}
 .du-ask p{font-size:13.5px;line-height:1.4;color:var(--parch)}
 .du-af{display:flex;justify-content:flex-end;gap:var(--sp-s)}
+/* ---------- прах Эха (ADR-0047): остаток, кнопка «Влить» и окно количества (ehBal, ehBtn, ehAsk — screens/heroes.js) ----------
+   Остаток — табличка тёмного стекла со значком праха Эха: в шапке витрины отряда недели, в низу книги героя, в окне «Влить».
+   Окно — та же табличка, что подтверждение пробуждения (.du-ask): герой и полоса осколков от его комплекта, шаги количества, что
+   выйдет, одна главная кнопка. Не найденный герой — без лица: «?» в тёмном стекле */
+.ep-bal{display:inline-flex;align-items:center;flex:none;height:30px;padding:0 10px;border-radius:9px;border:1px solid rgba(72,229,212,.34);background:rgba(8,12,12,.82);font-size:14px;color:var(--parch)}
+.ep-bal img{width:20px!important;height:20px!important}
+.ep-btn{flex:none}
+.ep-ov>.ov-scrim{background:rgba(2,4,4,.72)}
+.ep-ask{width:min(420px,calc(100% - 40px))}
+.ep-h{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-m);min-width:0}
+.ep-who{flex:1 1 auto;gap:5px;min-width:0}
+.ep-who>b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ep-bar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px}
+.ep-bar small{font:700 12px/1 var(--f-u);color:var(--parch-2)}
+.ep-q{flex:none;display:grid;place-items:center;width:var(--px,64px);height:var(--px,64px);border-radius:12px;font:600 34px/1 var(--f-d);color:var(--parch-3);
+  border:1px solid rgba(221,188,122,.3);background:radial-gradient(70% 60% at 50% 110%,rgba(72,229,212,.2),transparent 70%),linear-gradient(180deg,#141a1b,#090c0d)}
+.ep-row{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-m);min-width:0}
+.ep-qty{flex:none}
+.ep-qty button[disabled]{opacity:.38;cursor:not-allowed}
+.du-ask p.ep-res{color:var(--parch-2)}
+.ep-res b{color:var(--parch)}
+/* остаток праха Эха строкой во входе отряда недели («За души») и в низу книги героя */
+.hr-entry small.hr-ed{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.hr-entry small.hr-ed b{font:700 14px/1 var(--f-u);color:var(--parch);text-shadow:0 1px 2px #000}
+.hb-f .ep-bal{height:28px;padding:0 8px}
+.hb-f .link{flex:none;white-space:nowrap}
 /* низкий экран (844×390): осколки меньше, у выбранного — строка причины только при нехватке */
 .g.sm .du-t h2{font-size:24px}
 .g.sm .du-b{grid-template-columns:minmax(0,1fr) 232px}

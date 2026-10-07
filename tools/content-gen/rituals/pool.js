@@ -7,7 +7,8 @@
        уникальный ли (из 10 000), редкость (из суммы весов), бригада (из lo…hi своей редкости), биом (из суммы весов открытых), имя;
      на карточку героев — три броска: редкость, бригада, имя.
    Итог старта — свой генератор на сид карточки: по броску на каждый базовый ресурс из общего пула, затем на каждый ключ
-   из шести ключей биома, затем на уникальный ресурс хозяина биома. Валюта героев — без бросков. */
+   из шести ключей биома, затем на уникальный ресурс хозяина биома. Валюта героев — без бросков.
+   Ступени загрузки (ADR-0047) — мера недели без бросков: weekMs, capMs, load, stepOf в конце файла. */
 (function (root) {
 'use strict';
 
@@ -93,6 +94,20 @@ function resolve(D, card, cyc, seed, lists) {
 /* цена пробуждения рабочего в душах: душ за процент ускорения × его процент */
 function awaken(D, r) { const W = D.rules.awaken; return W.soulsPerPct * D.rules.speed.perRBp * r / 100; }
 
-root.EnRitual = { seedOf, makeRng, pickIdx, slots, freeRolls, cardsN, openW, pool, amount, speedBp, time, resolve, awaken };
+/* ---------- ступени загрузки (ADR-0047): мера недели ----------
+   Загрузка мест — целые проценты: мс ритуалов, завершённых за неделю, по карточкам / мс мест недели. Время ритуала — по карточке
+   (card.ms), без ускорения рабочих: редкая бригада освобождает место раньше, но часов карточке не прибавляет. В счёт идёт только
+   завершённый ритуал: ролл — и бесплатный, и за Энериум — часов не прибавляет (§19.5), отменённый ритуал — тоже.
+   Место недели — weekH часов; место, которое артефакт открыл посреди недели, считается с часа, когда открылось. */
+const PCT = 100;
+const weekMs = D => D.rules.ladder.weekH * D.rules.hourMs;
+/* мс мест недели: slots мест на всю неделю и ещё add мест на остаток leftMs — места, открытые посреди недели */
+function capMs(D, slots, add, leftMs) { return Math.max(0, slots) * weekMs(D) + Math.max(0, add || 0) * Math.max(0, Math.min(weekMs(D), leftMs || 0)); }
+/* загрузка, целые проценты, вниз; сверх ста не бывает — и когда рабочие закрывают карточки быстрее их времени */
+function load(doneMs, cap) { return cap > 0 ? Math.min(PCT, Math.floor(Math.max(0, doneMs) * PCT / cap)) : 0; }
+/* сколько ступеней взято: ats — пороги ступеней по возрастанию, в процентах загрузки (их ведёт сборщик сундуков) */
+function stepOf(ats, pct) { let k = 0; for (const at of ats) if (pct >= at) k++; return k; }
+
+root.EnRitual = { seedOf, makeRng, pickIdx, slots, freeRolls, cardsN, openW, pool, amount, speedBp, time, resolve, awaken, weekMs, capMs, load, stepOf };
 if (typeof module !== 'undefined' && module.exports) module.exports = root.EnRitual;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -71,6 +71,9 @@ if (err.length) done();
 function suite() {
   const out = { errors: [], screens: 0, sheets: 0, kills: 0, offers: 0, calls: 0, many: 0, ruins: 0, chests: 0, ests: 0, craftPts: {} };
   const E = window.EN_ECHO, D = E.data, TOP = E.steps.length, XE = RX.drops.echo, FROM = LBX.modes.echo.from;
+  /* сроки жизни целей, минуты — слова автора 06.10.2026 (ADR-0054, п. 7–8): рядовой 10, элита 30, босс час, Убер 3 часа, Многоликий
+     и Пробуждённый 6 часов; призванный живёт срок своего типа */
+  const LIFE_MIN = { o: 10, e: 30, b: 60, u: 180, m: 360, a: 360 };
   const fail = m => { if (out.errors.length < 80) out.errors.push(m); };
   const draw = () => { render(); return document.getElementById('game').innerHTML; };
   const TEAM = RS.weeks.map(w => w.team && w.team.theme).filter(Boolean).concat(['Иридиум']);
@@ -83,7 +86,11 @@ function suite() {
   const RULED = !!window.EN_ECHO_RULES;   // данные режима подключены: очки и цены — их, иначе прежняя сетка §17.5
   const pts = (st, c) => RULED ? E.pts(st > TOP ? TOP + 1 : st, c) : c < FROM ? 0 : (st > TOP ? D.manyPoints : D.points[st - 1]) * ipow(XE.pointsCycleMul, c - FROM);
   /* отряд прототипа — на уровне верхней ступени цикла: проверяем механику боя Эхо, а не баланс; числа проверки — не баланс */
-  const reset = (race, c) => { S = initialState(); rsSetWeek(race); S.acc.cycle = c; S.route = 'echo'; S.overlay = null; S.wallet.souls = 1e9; E.sync(); S.heroes.forEach(h => { h.lvl = Math.max(h.lvl, E.lvl(TOP, c)); }); };
+  /* активные биомы — слоты по артефакту активных биомов (ADR-0054): аккаунт проверки держит уровень своего цикла — покупка и по уровню
+     за цикл с цикла уровней; слотов тогда — что даёт артефакт, а не номер цикла сам по себе */
+  const TR = window.EN_WANDERER.art.list.find(a => a.id === window.EN_WANDERER.art.rules.trail);
+  const trailLv = c => Math.max(0, Math.min(TR.lv, c - TR.from + 1)), trailCap = c => TR.base + TR.own + TR.step * trailLv(c);
+  const reset = (race, c) => { S = initialState(); rsSetWeek(race); S.acc.cycle = c; S.wn.art[TR.id] = trailLv(c); S.route = 'echo'; S.overlay = null; S.wallet.souls = 1e9; E.sync(); S.heroes.forEach(h => { h.lvl = Math.max(h.lvl, E.lvl(TOP, c)); }); };
   const clearEcho = () => { S.overlay = null; S.echo.slots = S.echo.slots.map(() => null); S.ech.pending = {}; S.echo.sel = 0; S.route = 'echo'; S.runs = []; };
   /* бьём цель в слоте i до победы. Атака — бой ядром (ADR-0025): цена один раз, повтор того же номера ничего не меняет,
      здоровье цели — из итога боя, «Пропустить» открывает итог. После первой атаки цели оставляем 1 здоровья — проверяем победу */
@@ -112,6 +119,78 @@ function suite() {
     if (!S.overlay || S.overlay.t !== 'echres') fail(key + ': нет итога победы');
     return true;
   };
+
+  /* герои Эхо: комплект по циклу героя, герой-цель недели, прах Эха (слова автора 02.10.2026, ADR-0047) */
+  {
+    const EH = window.EN_ECHO_HEROES, SET = [0, 1000, 2500, 5000, 10000, 25000];   // комплект осколков героя Эхо циклов I–VI — числа автора
+    if (!EH) fail('герои Эхо: нет «сервера» EN_ECHO_HEROES');
+    else {
+      if (JSON.stringify(RS.rules.echoSet) !== JSON.stringify(SET)) fail(`герои Эхо: комплект в данных ${JSON.stringify(RS.rules.echoSet)}, а автор назвал ${JSON.stringify(SET)}`);
+      for (const h of RS.heroes) {
+        const need = EH.need(h);
+        if (h.src === 'echo' ? need !== SET[h.c - 1] : need !== RS.rules.stub.shards) { fail(`герои Эхо: комплект ${h.id} (${h.src}, цикл ${h.c}) — ${need}`); break; }
+      }
+      for (const w of RS.weeks) for (const c of [2, 4, 6]) {
+        const key = `герои Эхо · ${w.race} · цикл ${c}`;
+        reset(w.race, c); S.rs.shards = {}; S.wallet.edust = 0; S.ech.targets = {};
+        const sq = EH.squad(w.race), d0 = S.wallet.dust;
+        if (sq.some(h => h.c > c) || sq.length !== w.squad.map(id => RSI[id]).filter(h => h && h.c <= c).length) fail(key + ': в отряде цели — закрытые по циклу');
+        if (!sq.length) continue;
+        /* цель по умолчанию — старший несобранный из открытых; гарантия идёт ей */
+        const t0 = EH.target(w.race);
+        if (!t0 || t0.id !== sq[sq.length - 1].id) fail(key + ': цель по умолчанию — не старший открытый герой');
+        let g = EH.grant(w.race, 40);
+        if (JSON.stringify(g) !== JSON.stringify({ parts: [[t0.id, 40]], dust: 0 }) || EH.have(t0) !== 40) fail(`${key}: гарантия 40 осколков ушла не цели — ${JSON.stringify(g)}`);
+        /* выбор цели: операция с номером, повтор ничего не меняет; собранного и закрытого выбрать нельзя */
+        const other = sq[0];
+        if (other.id !== t0.id) {
+          const r1 = EH.pick('op-a', w.race, other.id), r2 = EH.pick('op-a', w.race, t0.id);
+          if (!r1.res || !r2.again || EH.target(w.race).id !== other.id) fail(key + ': выбор цели — не операция с номером');
+          S.overlay = { t: 'echweek' }; const hw = draw(); scan(key + ' · лист недели', hw); S.overlay = null;
+          if (!hw.includes('цель недели') || !hw.includes(`data-a="echtarget" data-v="${t0.id}:`)) fail(key + ': в листе недели нет отметки цели и «Сделать целью» у другого героя');
+          ACT.echtarget(`${t0.id}:op-b`); ACT.echtarget(`${other.id}:op-b`);
+          if (EH.target(w.race).id !== t0.id) fail(key + ': «Сделать целью» с тем же номером сработало дважды');
+          EH.pick('op-c', w.race, other.id);
+        }
+        const closed = w.squad.map(id => RSI[id]).find(h => h && h.c > c);
+        if (closed && !EH.pick('op-d', w.race, closed.id).refuse) fail(key + ': закрытый по циклу герой стал целью');
+        /* гарантия больше недостающего: цели — до комплекта, остаток — следующей цели, отряд собран — в прах Эха; общий прах не растёт */
+        const tg = EH.target(w.race), lack = EH.need(tg) - EH.have(tg), total = sq.reduce((a, h) => a + EH.need(h) - EH.have(h), 0);
+        g = EH.grant(w.race, lack + 7);
+        if (EH.have(tg) !== EH.need(tg) || !EH.done(tg)) fail(key + ': цель не собрана гарантией');
+        if (sq.length > 1 ? (g.dust !== 0 || g.parts.length !== 2 || g.parts[1][1] !== 7) : (g.dust !== 7 * EH.rules().perShard)) fail(`${key}: излишек гарантии ушёл не следующей цели и не в прах Эха — ${JSON.stringify(g)}`);
+        if (EH.pick('op-e', w.race, tg.id).refuse !== 'done') fail(key + ': собранный герой стал целью');
+        g = EH.grant(w.race, total);   // собрать весь открытый отряд: всё, что сверх, — прах Эха
+        const sum = g.parts.reduce((a, x) => a + x[1], 0);
+        if (!sq.every(h => EH.done(h)) || EH.target(w.race) !== null) fail(key + ': открытый отряд недели не собран');
+        if (sum + g.dust / EH.rules().perShard !== total) fail(`${key}: осколки гарантии не сошлись — выдано ${sum}, в прах ${g.dust}, пришло ${total}`);
+        if (S.wallet.dust !== d0) fail(key + ': лишние осколки героя Эхо ушли в общий прах душ');
+        const e0 = EH.dust(); g = EH.shard(sq[0].id, 30);
+        if (g.parts.length || g.dust !== 30 * EH.rules().perShard || EH.dust() !== e0 + g.dust) fail(key + ': связка осколков собранного героя — не в прах Эха');
+        /* влить прах Эха: в героя любой недели, открытого и не собранного; операция с номером; больше недостающего не вольёшь */
+        const w2 = RS.weeks.find(x => x !== w), h2 = EH.squad(w2.race)[0];
+        if (h2) {
+          S.wallet.edust = 50; const have0 = EH.have(h2);
+          const r1 = EH.pour('op-p', h2.id, 20), r2 = EH.pour('op-p', h2.id, 20);
+          if (!r1.res || r1.res.q !== 20 || !r2.again || EH.have(h2) !== have0 + 20 || EH.dust() !== 50 - 20 * EH.rules().shard) fail(key + ': «Влить» — не операция с номером или счёт не сошёлся');
+          if (EH.pour('op-q', h2.id, 1000).refuse !== 'dust') fail(key + ': влито больше праха, чем есть');
+          S.wallet.edust = 1e9; const r3 = EH.pour('op-r', h2.id, 1e9);
+          if (!r3.res || EH.have(h2) !== EH.need(h2) || r3.res.q !== EH.need(h2) - have0 - 20) fail(key + ': влито больше недостающего до комплекта');
+          if (EH.pour('op-s', h2.id, 1).refuse !== 'done') fail(key + ': прах влит в собранного героя');
+        }
+        if (closed && EH.pour('op-t', closed.id, 1).refuse !== 'cycle') fail(key + ': прах влит в героя, закрытого по циклу');
+        const gold = RS.heroes.find(h => h.src !== 'echo');
+        if (gold && EH.pour('op-u', gold.id, 1).refuse !== 'none') fail(key + ': прах Эха влит не в героя Эхо');
+        /* лист недели: остаток праха Эха и «Влить в цель» — одно нажатие, повтор номера ничего не меняет */
+        reset(w.race, c); S.rs.shards = {}; S.ech.targets = {}; S.wallet.edust = 30;
+        S.overlay = { t: 'echweek' }; const hw = draw(); scan(key + ' · лист недели с прахом', hw);
+        const m = hw.match(/data-a="echpour" data-v="([^"]+)"/), t1 = EH.target(w.race);
+        if (!hw.includes('Прах Эха') || !m) fail(key + ': в листе недели нет праха Эха или «Влить в цель»');
+        else { ACT.echpour(m[1]); ACT.echpour(m[1]); if (EH.have(t1) !== 30 || EH.dust() !== 0) fail(`${key}: «Влить в цель» — у цели ${EH.have(t1)}, праха ${EH.dust()}`); }
+        S.overlay = null;
+      }
+    }
+  }
 
   /* данные экрана */
   const EL = ['Воздух', 'Земля', 'Огонь', 'Вода', 'Время'], CLS = ['Танк', 'Физ. ДД силы', 'Физ. ДД ловкости', 'Маг. ДД', 'Лекарь', 'Дебаффер'], names = new Set();
@@ -157,7 +236,7 @@ function suite() {
       for (const t of ['echweek', 'echbest']) { S.overlay = { t }; h = draw(); out.sheets++; scan(`${key} · лист ${t}`, h); }
       S.overlay = { t: 'echweek' }; h = draw();
       for (const id of w.squad) { const hr = RSI[id]; if (!h.includes(hr.n)) fail(`${key}: в отряде недели нет ${hr.n}`); }
-      if (c >= FROM && !h.includes('class="ech-plank')) fail(key + ': нет планок недели');
+      if (c >= FROM && !h.includes('class="ech-plank') && !h.includes('class="wk-ld"')) fail(key + ': нет лестницы планок недели');
       for (let st = 1; st <= TOP + 1; st++) {
         const fid = st > TOP ? 'many' : E.fidOf(w.race, st), f = E.foe(fid);
         S.overlay = { t: 'echfoe', arg: fid }; h = draw(); out.sheets++; scan(`${key} · сведения ${st}`, h);
@@ -188,14 +267,12 @@ function suite() {
         else if (pi >= 0 && pi < ci) fail(`${key}: у варианта ${st} мощь стоит раньше цены атаки`);
         if ((row.match(/class="ech-n"/g) || []).length > 1) fail(`${key}: у варианта ${st} больше двух чисел`);
       }
-      /* босс и Убер живут час: «Выбрать» сперва открывает лист с честной оценкой (ADR-0031, п. 8); оценка — целые, кошелёк и цель
+      /* срок цели короток у любого типа (ADR-0054): «Выбрать» сперва открывает лист с честной оценкой (§17.1, ADR-0031, п. 8); оценка — целые, кошелёк и цель
          не меняются, исход словами не раскрыт; оценка на цели призыва и на цели в слоте — одна: номер цели и сид первой атаки те же */
       const pickEst = (k, st) => {
-        const g = st > TOP ? 'm' : E.stepFoe(E.fidOf(w.race, st)).g;
-        if (!E.short({ g })) { ACT.echpick('2:' + st); return null; }
         const w0 = S.wallet.souls, g0 = E.ghost('step', st), e0 = E.est(g0); out.ests++;
         ACT.echpick('2:' + st);
-        if (!S.overlay || S.overlay.t !== 'echest' || S.echo.slots[2]) fail(`${k}: у ${g === 'u' ? 'Убера' : 'босса'} нет листа оценки до выбора`);
+        if (!S.overlay || S.overlay.t !== 'echest' || S.echo.slots[2]) fail(`${k}: у ступени ${st} нет листа оценки до выбора`);
         const hs = draw(); out.sheets++; scan(k + ' · оценка до выбора', hs);
         if (e0 && e0.atks) {
           for (const q of ['dmg', 'atks', 'cost', 'souls', 'have']) if (!Number.isInteger(e0[q]) || e0[q] < 0) fail(`${k}: оценка ${q} — ${e0[q]}`);
@@ -223,7 +300,7 @@ function suite() {
       pickEst(key, p.offers[p.offers.length - 1]);
       const x = S.echo.slots[2];
       if (!x || x.step !== p.offers[p.offers.length - 1] || S.ech.pending[2]) fail(key + ': выбор не занял слот');
-      else if (x.left !== D.lifeH[x.g] * D.hour || x.hp !== x.max) fail(key + ': у новой цели не тот срок или здоровье');
+      else if (x.left !== E.lifeX(x) * D.minute || E.lifeX(x) !== LIFE_MIN[x.g] || x.hp !== x.max) fail(`${key}: у новой цели не тот срок или здоровье — ${x.left} с, тип ${x.g}`);
       h = draw(); scan(key + ' · цель', h);
       /* та же цена — в слоте рядом с именем и в «Сведениях» цели */
       if (x) {
@@ -232,7 +309,8 @@ function suite() {
         const snapX = JSON.stringify([x.hp, x.atk, x.used || null, S.wallet.souls, S.ech.last, S.echo.score]);
         S.overlay = { t: 'echfoe', arg: x.fid }; const hf = draw(); S.overlay = null;
         if (!hf.includes(`<span>Цена атаки</span><b>${fmt(cost)} `)) fail(`${key}: в «Сведениях» цели нет цены атаки ${cost}`);
-        if (E.short(x) !== /На убийство нужно около|оценки нет|Оценку даст/.test(hf)) fail(`${key}: оценка в «Сведениях» ${E.short(x) ? 'нет у цели на час' : 'у цели не на час'}`);
+        if (!/На убийство нужно около|оценки нет|Оценку даст/.test(hf)) fail(`${key}: в «Сведениях» цели нет оценки — срок короток у любого типа`);
+        if (!h.includes('ech-left')) fail(`${key}: на карточке цели нет отсчёта срока`);
         if (JSON.stringify([x.hp, x.atk, x.used || null, S.wallet.souls, S.ech.last, S.echo.score]) !== snapX) fail(`${key}: оценка изменила цель, кошелёк или очки`);
       }
       S.ech.wide = false; clearEcho(); ACT.echsum('0'); if (!S.ech.pending[0] || S.ech.pending[0].offers.length !== D.offer.base) fail(key + ': без артефакта вариантов не ' + D.offer.base); S.ech.wide = true;
@@ -260,10 +338,32 @@ function suite() {
       scan(key + ' · срок вышел', draw());
       if (S.echo.slots[1] || S.echo.score !== sc || !S.ech.note) fail(key + ': цель с вышедшим сроком не ушла');
 
-      /* планки недели: сундуки забирают только в «Дарах» (§17.6, §23.1) — кнопка планки открывает Дары и ничего не выдаёт */
+      /* планки недели: сундуки забирают только в «Дарах» (§17.6, §23.1) — кнопка планки открывает Дары и ничего не выдаёт.
+         Планки — ступени сквозной лестницы режима (ADR-0047): те же, что даёт EnLoot.ladder для цикла игрока; своя полоса, за ней
+         сразу — ступени следующих полос (первая — × next от верхней, замка по циклу нет), в конце — потолок */
       const pk = E.planks();
       if (c < FROM) { if (pk.length) fail(key + ': планки в цикле обучения'); }
       else {
+        const LD = window.EnLoot.ladder(LBX, 'echo', c), M = LBX.modes.echo, ly = M.layers.find(l => l.id === M.ladder.layer), p1 = window.EN_ECHO_RULES ? window.EN_ECHO_RULES.plank1[c] : null;
+        const bands = M.ladder.bands.filter(b => b >= c), n = ly.rows.length;
+        if (pk.length !== LD.length || pk.length !== bands.length * n + (M.ladder.cap ? 1 : 0)) fail(`${key}: ступеней лестницы на экране ${pk.length}, по данным ${LD.length}, полос ${bands.length} × ${n}`);
+        pk.forEach((r, j) => {
+          const st = LD[j]; if (!st) return;
+          if (r.k !== st.k || r.band !== st.band || r.i !== st.i || !!r.cap !== !!st.cap || r.need !== p1 * st.x || JSON.stringify(r.pay) !== JSON.stringify(st.pay)) fail(`${key}: ступень ${j + 1} на экране — не ступень лестницы данных`);
+          if (j && !(r.need > pk[j - 1].need)) fail(`${key}: порог ступени ${j + 1} не выше прежней`);
+          if (!r.cap && JSON.stringify(r.pay) !== JSON.stringify(ly.rows[r.i - 1].cyc[r.band])) fail(`${key}: ступень ${j + 1} платит сундуки не своей полосы`);
+        });
+        if (pk[0].band !== c || pk[0].need !== p1 * ly.rows[0].x) fail(`${key}: первая ступень — не первая планка своего цикла`);
+        if (bands.length > 1 && pk[n].need !== pk[n - 1].need * M.ladder.next) fail(`${key}: первая ступень следующей полосы — не ×${M.ladder.next} от верхней своей`);
+        if (M.ladder.cap && !pk[pk.length - 1].cap) fail(`${key}: у лестницы Эхо нет потолка`);
+        /* лестница видна в листе недели целиком: своя полоса — порог каждой ступени, следующие полосы — порог первой ступени
+           (общий помощник Недели сворачивает их в строку «цикл N»), потолок — отдельной строкой */
+        S.echo.score = 0; S.overlay = { t: 'echweek' }; const hw = draw(); S.overlay = null;
+        for (const r of pk) {
+          const must = r.band === c || r.i === 1 || r.cap;
+          if (must && !hw.includes(fmt(r.need)) && !hw.includes(`data-need="${r.need}"`)) { fail(`${key}: в листе недели нет порога ступени ${r.k} — ${fmt(r.need)}`); break; }
+        }
+        for (const b of bands) if (b > c && !hw.includes(`Цикл ${ROMAN[b]}`) && !hw.includes(`цикл ${ROMAN[b]}`)) fail(`${key}: в листе недели нет полосы цикла ${ROMAN[b]}`);
         S.echo.score = pk[pk.length - 1].need; const ch0 = S.bag.chests.length;
         pk.forEach(r => ACT.echplank(String(r.k)));
         if (S.bag.chests.length !== ch0) fail(`${key}: планка выдала сундук мимо «Даров»`);
@@ -280,7 +380,7 @@ function suite() {
         if (!S.overlay || S.overlay.t !== 'echact') { fail(k2 + ': нет листа подтверждения'); continue; }
         h = draw(); out.sheets++; scan(k2 + ' · подтверждение', h);
         if (h.includes(fb.name) || (it.opens && h.includes(it.opens))) fail(k2 + ': лист подтверждения раскрывает врага');
-        /* призванный враг живёт час: оценка — до призыва, на той цели, какую даст призыв; кошелёк не трогает */
+        /* призванный враг живёт срок своего типа: оценка — до призыва, на той цели, какую даст призыв; кошелёк не трогает */
         const avail = !(it.team && c < 6) && E.checks('call', it).every(y => y.ok);
         if (avail !== /На убийство нужно около|оценки нет|Оценку даст/.test(h)) fail(`${k2}: оценка до призыва ${avail ? 'не показана' : 'показана у недоступного'}`);
         const gCraft = avail ? E.est(E.ghost('craft', fb)) : null;
@@ -294,7 +394,7 @@ function suite() {
         if (BAG.qty(it.id) !== q0 - 1 || S.wallet.souls !== s0 - XE.summonSouls) fail(`${k2}: списано ${q0 - BAG.qty(it.id)} предметов и ${s0 - S.wallet.souls} душ`);
         const i = S.echo.slots.findIndex(Boolean), x = S.echo.slots[i];
         if (!x || x.fid !== fb.id || x.kind !== 'craft') { fail(k2 + ': босс не встал в слот'); continue; }
-        if (x.g !== fb.g || !['e', 'b', 'u', 'f'].includes(x.g)) fail(`${k2}: тип цели «${x.g}», а в recipes.js — «${fb.g}»`);
+        if (x.g !== fb.g || !['e', 'b', 'u', 'a'].includes(x.g)) fail(`${k2}: тип цели «${x.g}», а в recipes.js — «${fb.g}»`);
         if (!S.overlay || S.overlay.t !== 'echgot') fail(k2 + ': нет листа «призван»');
         h = draw(); scan(k2 + ' · призван', h);
         if (!S.ech.known[fb.id] && h.includes(fb.name)) fail(k2 + ': имя босса видно до первой победы');
@@ -417,8 +517,8 @@ function suite() {
         ACT.echgo('descent:' + S.ech.biomes[0].uid); h = draw(); scan(k2 + ' · Спуск', h);
         if (!h.includes(cb.name) || !h.includes('Забег — позже') || !h.includes('Слоты биомов')) fail(k2 + ': руины нет в «Спуске»');
         out.ruins++;
-        const cap = RX.drops.activeSlots.byCycle[c - 1];
-        if (E.bio().cap !== cap) fail(`${k2}: слотов биомов ${E.bio().cap}, а в данных цикла — ${cap}`);
+        const cap = trailCap(c);
+        if (E.bio().cap !== cap) fail(`${k2}: слотов биомов ${E.bio().cap}, а артефакт активных биомов на уровне ${trailLv(c)} даёт ${cap}`);
         for (let n = 0; E.bio().used < cap && n <= cap; n++) { BAG.add(ai.id, 1); ACTIVATE.act(ai.id); ACT.echactdo(S.overlay.op); S.overlay = null; }
         if (S.ech.biomes.length !== cap) fail(`${k2}: встало руин ${S.ech.biomes.length} при ${cap} слотах`);
         BAG.add(ai.id, 1); const q1 = BAG.qty(ai.id); ACTIVATE.act(ai.id); scan(k2 + ' · слоты заняты', draw()); ACT.echactdo(S.overlay.op);
@@ -435,6 +535,25 @@ function suite() {
       }
     } catch (x) { fail(key + ': исключение — ' + (x && x.stack ? x.stack.split('\n').slice(0, 3).join(' | ') : x)); }
   }
+  /* слот даёт артефакт, а не цикл (ADR-0054): в любом цикле без артефакта активного биома нет — ни руина, ни забег не встают; куплен без
+     уровня — слот один, даже в цикле VI; каждый уровень — ещё один */
+  try {
+    const w0 = RS.weeks[0], cb0 = RX.drops.craftBiomes.find(x => BAG.item(x.act).cyc <= 2), ai0 = BAG.item(cb0.act);
+    for (const [c, lv, want] of [[2, -1, TR.base], [6, -1, TR.base], [6, 0, TR.base + TR.own], [2, 0, TR.base + TR.own], [3, 2, TR.base + TR.own + TR.step * 2]]) {
+      reset(w0.race, c); clearEcho(); S.ech.biomes = []; S.ech.cb = null; S.runs = [];
+      if (lv < 0) delete S.wn.art[TR.id]; else S.wn.art[TR.id] = lv;
+      const k3 = `слоты по артефакту · цикл ${ROMAN[c]}, ${lv < 0 ? 'артефакта нет' : 'уровень ' + lv}`;
+      if (E.bio().cap !== want) fail(`${k3}: слотов биомов ${E.bio().cap}, ждали ${want}`);
+      for (let n = 0; n <= want; n++) { BAG.add(ai0.id, 1); ACTIVATE.act(ai0.id); ACT.echactdo(S.overlay.op); S.overlay = null; }
+      if (S.ech.biomes.length !== want) fail(`${k3}: встало руин ${S.ech.biomes.length} при ${want} слотах`);
+      const r0 = S.runs.length; startRun(S.prepSquad, 'b1'); if (S.runs.length !== r0) fail(`${k3}: забег встал сверх слотов`);
+      S.ech.biomes = []; S.ech.cb = null; S.overlay = null;
+      startRun(S.prepSquad, 'b1'); if ((S.runs.length !== r0) !== (want > 0)) fail(`${k3}: забег ${want > 0 ? 'не начался при свободном слоте' : 'начался без активного биома'}`);
+      S.route = 'descent'; S.runs = []; const h = draw(); scan(k3 + ' · Спуск', h);
+      if ((want < 1) !== /class="ds-slots none"/.test(h)) fail(`${k3}: «Спуск» ${want < 1 ? 'не показывает, что активного биома нет' : 'показывает замок при открытом слоте'}`);
+      if (want < 1 && !new RegExp(`data-a="wnbuy" data-v="${TR.id}:`).test(h)) fail(`${k3}: «Спуск» без активного биома не предлагает купить артефакт`);
+    }
+  } catch (x) { fail('слоты по артефакту: исключение — ' + (x && x.stack ? x.stack.split('\n').slice(0, 3).join(' | ') : x)); }
   /* цикл игрока очки КрафБосса не умножает (ADR-0043): победа над одним и тем же врагом в любом цикле игрока — одни очки */
   for (const [id, seen] of Object.entries(out.craftPts)) if (seen.size !== 1) fail(`КрафБосс ${id}: очки меняются с циклом игрока — ${[...seen].join(' / ')}`);
   out.craftPts = Object.keys(out.craftPts).length;

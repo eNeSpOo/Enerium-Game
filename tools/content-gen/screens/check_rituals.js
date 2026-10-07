@@ -13,8 +13,20 @@
    5. Занятость: герой в ритуале занят (busyNote) — Эхо не готово, «Спуск» идёт без него, Арена берёт; после срока — свободен.
    6. Вид: обе вкладки, все листы, закрытый экран, сценарии, раздел UI-кита — без исключений, undefined и NaN. Правила воздуха на карточке:
       не больше двух чисел, двух чипов и одного действия. Режим «Игрок»: служебных слов нет; «Команда» — служебное есть.
-   7. Неделя и Убежище: строка «Ритуалы» и счётчики сходятся со слотами. Анимация сбора — только transform и opacity.
-   Запуск: node tools/content-gen/screens/check_rituals.js [--dump] */
+   4а. Ступени загрузки (ADR-0047) — законы, каждый проверен мутацией (флаг --mut печатает, что поймано):
+      A — мера: загрузка — часы завершённых ритуалов по карточкам к часам мест недели; ритуал идёт в счёт один раз — когда досыпался;
+          старт, сбор, повтор сбора и отмена часов не прибавляют; время — по карточке, а не с ускорением бригады;
+      B — роллы: ни бесплатный, ни платный ролл загрузку не растят; карточка из платного ролла даёт ровно своё время;
+      C — ступени: лестница — та же, что у сундуков (Л1–Л4 общих законов ladder_laws.js); ступень взята, как только набран порог;
+          «Дары» дают сундуки взятой ступени один раз; следующая ступень платит только себя;
+      D — неделя и места: место, открытое посреди недели, считается с этого часа и взятую ступень не роняет; ритуал, досыпавшийся
+          после конца недели, в счёт не идёт; новая неделя расы — счёт с нуля;
+      E — калькулятор: увлечённый — на ступени, куда его ставят сундуки (typical); обычный — на своей или на пороге следующей; верхняя
+          ступень — только места без простоя; плательщик — не выше обычного больше чем на ступень; ритуалы вместе с сундуками
+          артели — не больше потолка золота забегов обычного.
+   7. Неделя и Убежище: строка «Ритуалы» — режим реестра WEEK_MODES: загрузка и ступени, счётчик готовых — сходятся со слотами; прошлая
+      неделя — выплаты из «Даров». Анимация сбора — только transform и opacity.
+   Запуск: node tools/content-gen/screens/check_rituals.js [--dump] [--mut] */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const { SERVICE, strip, playerText } = require('./check_player_view.js');
@@ -23,13 +35,13 @@ const read = f => fs.readFileSync(path.join(UI, f), 'utf8');
 const html = read('index.html');
 const DUMP = process.argv.includes('--dump');
 const err = [], note = [];
-const cnt = { views: 0, player: 0, ops: 0, cards: 0, starts: 0, claims: 0 };
+const cnt = { views: 0, player: 0, ops: 0, cards: 0, starts: 0, claims: 0, laws: 0, mut: 0 };
 const say = m => { if (err.length < 60) err.push(m); else if (err.length === 60) err.push('… и ещё ошибки'); };
 function done() {
   for (const n of note) console.log('предупреждение: ' + n);
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
-  console.log(`Ритуалы: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; карточек ${cnt.cards}; операций ${cnt.ops}, стартов ${cnt.starts}, сборов ${cnt.claims}.`);
-  console.log('Проверка пройдена: данные свежие и целые, пул и исход решаются на сиде, операции не повторяются, выдача — ровно исход, занятость героев держится, игроку служебного не видно.');
+  console.log(`Ритуалы: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; карточек ${cnt.cards}; операций ${cnt.ops}, стартов ${cnt.starts}, сборов ${cnt.claims}; ступени загрузки — законов ${cnt.laws}, мутаций поймано ${cnt.mut}.`);
+  console.log('Проверка пройдена: данные свежие и целые, пул и исход решаются на сиде, операции не повторяются, выдача — ровно исход, занятость героев держится, загрузка недели — часы завершённых ритуалов по карточкам, ролл её не растит, ступень платит один раз, игроку служебного не видно.');
   process.exit(0);
 }
 
@@ -88,6 +100,12 @@ if (err.length) done();
   if (D.rules.slots.cap !== 7 || D.rules.rolls.free !== 3 || D.rules.rolls.paid.length !== 5) say('данные: слоты до 7, роллы 3 бесплатных и 5 за Энериум (§19.2, таблица автора)');
   if (D.rules.speed.perRBp !== 200 || D.rules.speed.capBp !== 5000) say('данные: ускорение рабочего — 2 % × редкость, кап 50 % (§19.1)');
   if (D.heroAwaken && E.awaken(D, 7) * 2 > D.heroAwaken) say('данные: вневременной рабочий не «заметно дешевле» героя');
+  /* ступени загрузки (ADR-0047): мера — в правилах, прогон — в данных; счёт — в общем алгоритме */
+  const LR = D.rules.ladder, LD = D.ladder;
+  if (!LR || !LR.mode || !(LR.weekH > 0) || LR.weekH % 24) say('данные: нет правила ступеней загрузки (rules.ladder: mode, weekH — целые сутки)');
+  if (!LD || !LD.load || !LD.step || !LD.withBoxBp) say('данные: нет прогона ступеней загрузки (ladder: load, step, withBoxBp)');
+  else for (const c of B.SIM.cycles) for (const pk of B.SIM.ladder.prof.concat(B.SIM.ladder.top.id)) if (!(LD.load[c] && LD.load[c][pk] >= 0 && LD.load[c][pk] <= 100 && LD.step[c][pk] >= 0)) say(`данные: у цикла ${c} нет загрузки профиля ${pk}`);
+  for (const f of ['weekMs', 'capMs', 'load', 'stepOf']) if (typeof E[f] !== 'function') say(`алгоритм: нет EnRitual.${f}`);
 }
 
 /* ================== 3. алгоритм ================== */
@@ -129,6 +147,14 @@ if (err.length) done();
     if (!Number.isInteger(E.time(D, c, [1, 2, 3]))) say('ускорение: время не целое');
     if (E.time(D, { tab: 'hero', r, ms: D.tabs.hero.ms[r - 1] }, [7, 7]) !== D.tabs.hero.ms[r - 1]) say('герои ускорились: ускоряют только рабочие');
   }
+  /* мера ступеней загрузки: неделя — weekH часов; места — целыми неделями, новое место — с остатка недели; проценты — целые, вниз, не выше ста */
+  const WK = E.weekMs(D), HM = D.rules.hourMs;
+  if (WK !== D.rules.ladder.weekH * HM) say('загрузка: неделя — не weekH часов');
+  if (E.capMs(D, 3) !== 3 * WK || E.capMs(D, 0) !== 0) say('загрузка: часы мест — не мест × неделя');
+  if (E.capMs(D, 3, 2, WK / 2) !== 4 * WK || E.capMs(D, 3, 2, 2 * WK) !== 5 * WK || E.capMs(D, 3, 2, -HM) !== 3 * WK) say('загрузка: место, открытое посреди недели, считается не с остатка недели');
+  if (E.load(0, WK) !== 0 || E.load(WK / 2, WK) !== 50 || E.load(WK / 2 - 1, WK) !== 49 || E.load(3 * WK, WK) !== 100 || E.load(HM, 0) !== 0) say('загрузка: проценты — не целые вниз или выше ста');
+  if (!Number.isInteger(E.load(123456789, 7 * WK))) say('загрузка: не целое');
+  if (E.stepOf([20, 35, 50], 19) !== 0 || E.stepOf([20, 35, 50], 20) !== 1 || E.stepOf([20, 35, 50], 49) !== 2 || E.stepOf([20, 35, 50], 100) !== 3) say('загрузка: ступень берётся не с порога');
 }
 if (err.length) done();
 
@@ -168,6 +194,8 @@ function load() {
     ACT, OV, FLOWS, KH, KIT_EXTRA, SCREENS, BAG, render, initialState, setTeam, busyNote, poolItems, biomeItems,
     RT: window.EN_RITUALS, RTE: window.EnRitual, RT_SRV, RT_DEMO, rtKitHtml, rtBusyNote, rtSlotsN, rtFreeN, rtCardsN,
     SQ: typeof SQ !== 'undefined' ? SQ : null, CT_SRV: typeof CT_SRV !== 'undefined' ? CT_SRV : null, WEEK: window.EN_WEEK || null,
+    LB: window.EN_LOOTBOXES || null, EL: window.EnLoot || null, RSW: typeof RS !== 'undefined' && RS.weeks ? RS.weeks : [],
+    rsSetWeek: typeof rsSetWeek === 'function' ? rsSetWeek : null, darRows: typeof darRows === 'function' ? darRows : null,
   })`, ctx);
   return { T, ctx, els, events, game: () => (els.game ? els.game.innerHTML : '') };
 }
@@ -435,6 +463,219 @@ if (!R()) { say('S.rituals не заведён'); done(); }
 }
 if (err.length) done();
 
+/* ================== 4а. ступени загрузки (ADR-0047) ==================
+   Законы — функции → список нарушений: их же зовёт проверка мутацией. Каждый закон начинает с чистого состояния демо.
+   Функции экрана законы зовут живыми именами (live): мутация подменяет их в песочнице */
+const LL = require('./ladder_laws.js');
+const live = n => vm.runInContext(n, P.ctx);
+const MODE = D.rules.ladder.mode, HMS = D.rules.hourMs;
+const LAD0 = T.EL ? T.EL.ladder : null;   // алгоритм лестницы прототипа до мутаций
+const ladLayer = () => { const M = T.LB.modes[MODE]; return M.layers.find(l => l.id === M.ladder.layer); };
+const ats = () => ladLayer().rows.map(r => r.at);
+const wk = () => R().wk;
+const wkState = () => T.WEEK.state(MODE, 'now');
+const loadNow = () => live('rtLoad')();
+const taken = () => live('rtSteps')().filter(x => x.reached).length;
+let fakeNo = 0;
+/* ритуал-проба, который досыпается в миг t1 (по умолчанию — сейчас): время по карточке ms; в слоты — вместо свободного */
+const fake = (ms, t1) => ({ st: 'run', uid: 'проба' + (++fakeNo), n: 'проба', kind: 'hero', r: 1, ppl: 1, biome: null, unique: false, cyc: T.S.acc.cycle, card: 'проба',
+  crew: [], t0: (t1 == null ? R().now : t1) - ms, t1: t1 == null ? R().now : t1, ms, nominal: ms, got: { cur: [], items: {} } });
+function addMs(ms, t1) {
+  const Rr = R(); let k = Rr.slots.findIndex(s => s.st === 'free');
+  if (k < 0) { k = Rr.slots.length - 1; Rr.slots[k] = { st: 'free' }; }
+  Rr.slots[k] = fake(ms, t1); T.RT_SRV.tick(); Rr.slots[k] = { st: 'free' };
+}
+/* сколько мс не хватает до k-й ступени */
+const msTo = k => Math.max(0, Math.ceil(ats()[k - 1] * wk().cap / 100) - wk().done);
+const chests = () => T.S.bag.chests.length;
+const darNowRows = () => (T.darRows ? T.darRows(T.S).filter(p => p.id === MODE && p.wk && p.wk.id === 'now') : []);
+const cntOf = p => p.groups.reduce((a, g) => a + g.count, 0);
+
+const LAW = {
+  /* A — мера: часы завершённых ритуалов по карточкам к часам мест недели; в счёт — один раз, когда ритуал досыпался */
+  A() {
+    const e = []; reset();
+    const W0 = wk(); if (!W0) return ['нет счёта недели — S.rituals.wk'];
+    const ready = R().slots.filter(s => s.st === 'ready');
+    if (W0.cap !== E.capMs(D, T.rtSlotsN())) e.push(`часы мест недели — ${W0.cap}, по местам — ${E.capMs(D, T.rtSlotsN())}`);
+    if (W0.t1 - W0.t0 !== E.weekMs(D) || !(W0.t0 <= R().now && R().now < W0.t1)) e.push('неделя счёта — не weekH часов или «сейчас» вне её');
+    if (W0.done !== T.RT_DEMO.week.doneH * HMS + ready.reduce((a, x) => a + x.nominal, 0) || ready.some(x => !x.wk)) e.push('демо: завершённое до сессии и готовый ритуал — не в счёте недели');
+    if (loadNow() !== E.load(W0.done, W0.cap) || !Number.isInteger(loadNow())) e.push(`загрузка ${loadNow()} % — не по счёту недели (${E.load(W0.done, W0.cap)} %)`);
+    if (W0.top !== E.stepOf(ats(), loadNow()) || taken() !== W0.top) e.push(`взято ступеней ${taken()} (счёт — ${W0.top}), по загрузке — ${E.stepOf(ats(), loadNow())}`);
+    /* ритуал рабочих с бригадой, что ускоряет: в счёт — время по карточке, и только когда досыпался */
+    const Rr = R(); Rr.slots = Rr.slots.map(s => (s.st === 'free' ? s : { st: 'free' })); Rr.now = Rr.day * 86400000 + 60000;
+    const i = Rr.work.findIndex(c => !c.taken && !c.unique), card = Rr.work[i], d0 = wk().done;
+    T.RT_SRV.start(op(), 'work', i, []);
+    const k = Rr.slots.findIndex(s => s.st === 'run'), x = Rr.slots[k];
+    if (!x) return e.concat('ритуал рабочих не начался');
+    if (x.ms >= card.ms) note.push('ступени загрузки: бригада демо не ускорила ритуал — «по карточке, а не с ускорением» не проверено');
+    if (wk().done !== d0) e.push('старт ритуала прибавил часы: в счёт идёт только завершённый');
+    Rr.now = x.t1 - 1; T.RT_SRV.tick(); if (wk().done !== d0) e.push('часы прибавились до срока ритуала');
+    Rr.now = x.t1; T.RT_SRV.tick();
+    if (wk().done - d0 !== card.ms) e.push(`досыпавшийся ритуал прибавил ${wk().done - d0} мс, время по карточке — ${card.ms}, с ускорением бригады — ${x.ms}`);
+    const d1 = wk().done; T.RT_SRV.tick(); Rr.now += 60000; T.RT_SRV.tick();
+    if (wk().done !== d1) e.push('ход часов прибавил часы готового ритуала ещё раз');
+    const o2 = op(); T.RT_SRV.claim(o2, k); if (wk().done !== d1) e.push('сбор прибавил часы'); T.RT_SRV.claim(o2, k); if (wk().done !== d1) e.push('повтор сбора прибавил часы');
+    /* отмена: участники свободны, часов нет — ни сразу, ни когда вышел бы срок */
+    const j = Rr.hero.findIndex(c => !c.taken), hc = Rr.hero[j], ids = live('rtHeroPool')().slice(0, hc.crew).map(q => q.h.id);
+    T.RT_SRV.start(op(), 'hero', j, ids);
+    const k2 = Rr.slots.findIndex(s => s.st === 'run'), y = Rr.slots[k2];
+    if (!y) return e.concat('ритуал героев не начался');
+    T.RT_SRV.cancel(op(), k2); Rr.now = y.t1 + 1000; T.RT_SRV.tick();
+    if (wk().done !== d1) e.push('отменённый ритуал пошёл в счёт недели');
+    if (loadNow() !== E.load(wk().done, wk().cap)) e.push('после сбора и отмены загрузка — не по счёту недели');
+    return e;
+  },
+  /* B — роллы: ни бесплатный, ни платный загрузку не растят; карточка из платного ролла даёт ровно своё время */
+  B() {
+    const e = []; reset();
+    const Rr = R(), same0 = () => JSON.stringify([wk().done, wk().cap, wk().top, loadNow()]), s0 = same0();
+    if (!(Rr.free > 0)) return ['у демо нет бесплатного ролла'];
+    const r1 = T.RT_SRV.roll(op(), 'work'); if (!r1.ok || r1.paid) e.push('бесплатный ролл не прошёл');
+    if (same0() !== s0) e.push('бесплатный ролл изменил счёт недели');
+    Rr.free = 0; T.S.wallet.enerium = 1000;
+    const r2 = T.RT_SRV.roll(op(), 'hero'); if (!r2.ok || !(r2.paid > 0)) e.push('ролл за Энериум не прошёл');
+    if (same0() !== s0) e.push('ролл за Энериум прибавил часы или ступень: Энериум покупает роллы, не время (§19.5)');
+    const j = Rr.hero.findIndex(c => c.paid && !c.taken);
+    if (j < 0) return e.concat('после платного ролла нет карточки из него');
+    Rr.slots = Rr.slots.map(s => (s.st === 'free' ? s : { st: 'free' })); Rr.now = Rr.day * 86400000 + 60000;
+    const card = Rr.hero[j], d0 = wk().done, ids = live('rtHeroPool')().slice(0, card.crew).map(q => q.h.id);
+    T.RT_SRV.start(op(), 'hero', j, ids);
+    const x = Rr.slots.find(s => s.st === 'run'); if (!x) return e.concat('карточка платного ролла не началась');
+    Rr.now = x.t1; T.RT_SRV.tick();
+    if (wk().done - d0 !== card.ms) e.push(`карточка из платного ролла прибавила ${wk().done - d0} мс, её время — ${card.ms}`);
+    return e;
+  },
+  /* C — ступени: лестница сундуков; взята — набран порог; «Дары» дают сундуки взятой ступени один раз */
+  C() {
+    const e = []; reset();
+    if (!T.WEEK || !T.darRows) return ['нет Недели или «Даров» — ступени платить некому'];
+    const c = T.S.acc.cycle, A = ats(), n0 = taken(), law = t => LL.stateLaw(T.LB, 'ступени · ' + t, wkState(), c, LAD0);
+    e.push(...law('демо'));
+    const st0 = wkState();
+    if (st0.lock || st0.points !== loadNow() || st0.planks.length !== A.length || st0.planks.filter(p => p.reached).length !== n0) e.push(`Неделя: строка режима — загрузка ${st0.points}, ступеней ${st0.planks.length}, взято ${st0.planks.filter(p => p.reached).length}; на экране — ${loadNow()} %, ${A.length}, ${n0}`);
+    if (n0 >= A.length - 1) return e.concat('демо взяло почти все ступени — проверять нечего');
+    /* до порога не хватает одной миллисекунды — ступень не взята; с порогом — взята */
+    const need = msTo(n0 + 1);
+    if (need > 1) { addMs(need - 1); if (taken() !== n0) e.push(`ступень ${n0 + 1} взята до порога: загрузка ${loadNow()} % при пороге ${A[n0]} %`); addMs(1); } else addMs(need);
+    if (taken() !== n0 + 1 || loadNow() < A[n0]) e.push(`набран порог ${A[n0]} %, а ступень ${n0 + 1} не взята`);
+    e.push(...law('после порога'));
+    /* «Дары»: строка на каждую взятую ступень, сундуки — строки её слоя; «Получить» выдаёт их один раз */
+    const rows = darNowRows(), ly = ladLayer();
+    if (rows.length !== n0 + 1 || rows.some(p => p.cat !== 'me' || p.kind !== 'plank')) e.push(`«Дары»: строк этой недели ${rows.length}, взятых ступеней ${n0 + 1}`);
+    rows.forEach((p, i) => { const want = (ly.rows[i].cyc[c] || []).reduce((a, g) => a + g.count, 0); if (cntOf(p) !== want) e.push(`«Дары»: ступень ${i + 1} — ${cntOf(p)} сундуков, в лестнице — ${want}`); });
+    for (const p of rows.filter(q => q.st === 'ok')) {
+      const c0 = chests(); T.ACT.darget(p.key);
+      if (chests() - c0 !== cntOf(p)) e.push(`«Дары»: «${p.label}» выдала ${chests() - c0} сундуков из ${cntOf(p)}`);
+      const c1 = chests(); T.ACT.darget(p.key);
+      if (chests() !== c1) e.push(`«Дары»: «${p.label}» заплатила второй раз`);
+    }
+    if (darNowRows().some(p => p.st !== 'got')) e.push('«Дары»: полученная ступень не отмечена полученной');
+    /* следующая ступень платит только себя; полученные — «в запасах» и в листе */
+    addMs(msTo(n0 + 2));
+    const after = darNowRows(), fresh = after.filter(p => p.st === 'ok');
+    if (taken() !== n0 + 2 || after.length !== n0 + 2 || fresh.length !== 1 || cntOf(fresh[0]) !== (ly.rows[n0 + 1].cyc[c] || []).reduce((a, g) => a + g.count, 0)) e.push(`следующая ступень: взято ${taken()}, строк в «Дарах» ${after.length}, к получению ${fresh.length}`);
+    e.push(...law('две ступени'));
+    /* лист: лестница — «дорогой» общего помощника Недели (Л4) или своими строками; отметка «в запасах» у полученной */
+    T.S.route = 'rituals'; T.S.seg.rituals = 'work'; T.S.overlay = { t: 'rtload' }; T.render();
+    const h = P.game();
+    if (h.includes('class="rt-lad" data-by="week"')) e.push(...LL.roadLaw(T.LB, 'лист ступеней', h, wkState(), c, ['<p class="reason">']));
+    else if ((h.match(/<div class="rt-st[ "]/g) || []).length !== A.length) e.push('лист ступеней: строк не столько, сколько ступеней');
+    if (!/в запасах/.test(h)) e.push('лист ступеней: полученная в «Дарах» ступень не отмечена «в запасах»');
+    T.S.overlay = null;
+    return e;
+  },
+  /* D — неделя и места: новое место — с этого часа, взятая ступень остаётся; после конца недели — не в счёт; новая неделя расы — с нуля */
+  D() {
+    const e = []; reset();
+    R().slots = R().slots.map(s => (s.st === 'free' ? s : { st: 'free' }));   // идущий ритуал демо досыпался бы посреди проверки — снимаем
+    const A = ats(), a = D.rules.slots.art, W = wk(), n0 = taken();
+    addMs(msTo(n0 + 1));
+    const top0 = taken(), cap0 = W.cap, lv0 = T.S.wn.art[a] || 0;
+    if (top0 !== n0 + 1) return e.concat('не удалось взять следующую ступень перед проверкой мест');
+    if (lv0 >= D.art.slots.lv) note.push('ступени загрузки: «Караванный шатёр» демо уже на потолке — новое место посреди недели не проверено');
+    else {
+      T.S.wn.art[a] = lv0 + 1; live('rtSync')();
+      const add = T.rtSlotsN() - cap0 / E.weekMs(D), want = cap0 + add * (W.t1 - R().now);
+      if (!(add > 0) || wk().cap !== want) e.push(`новое место посреди недели: часы мест ${wk().cap}, ждали ${want} — место считается с часа, когда открылось`);
+      live('rtSync')(); if (wk().cap !== want) e.push('повтор сверки мест прибавил часы мест ещё раз');
+      if (loadNow() !== E.load(wk().done, wk().cap)) e.push('после нового места загрузка — не по счёту недели');
+      if (taken() !== top0) e.push(`новое место уронило взятую ступень: было ${top0}, стало ${taken()} при загрузке ${loadNow()} %`);
+      if (T.WEEK && wkState().planks.filter(p => p.reached).length !== top0) e.push('Неделя: после нового места взятая ступень пропала');
+    }
+    /* ритуал, досыпавшийся в последний миг недели, — в счёт; после её конца — нет */
+    const d0 = wk().done;
+    addMs(HMS, wk().t1 - 1); if (wk().done !== d0) e.push('ритуал с будущим сроком пошёл в счёт раньше срока');
+    R().now = wk().t1 - 1; addMs(HMS, wk().t1 - 1); if (wk().done - d0 !== HMS) e.push('ритуал, досыпавшийся в последний миг недели, не засчитан');
+    const d1 = wk().done; R().now = wk().t1 + HMS; addMs(HMS, wk().t1); addMs(HMS);
+    if (wk().done !== d1) e.push('ритуал, досыпавшийся после конца недели, пошёл в её счёт');
+    /* новая неделя расы: счёт с нуля, ступени не взяты, прежние часы не переходят */
+    if (!T.rsSetWeek || !T.RSW.length) note.push('ступени загрузки: нет смены недели расы (rsSetWeek) — новая неделя не проверена');
+    else {
+      const no0 = wk().no, cur = T.RSW.findIndex(w => String(w.gen).toLowerCase() === String(T.S.week.race).toLowerCase()), next = T.RSW[(cur + 1) % T.RSW.length];
+      T.rsSetWeek(next.race); T.RT_SRV.tick();
+      const N = wk();
+      if (N.no !== no0 + 1 || N.done !== 0 || N.top !== 0 || N.t0 !== R().now || N.cap !== E.capMs(D, T.rtSlotsN())) e.push(`новая неделя расы: счёт не с нуля — неделя ${N.no}, часов ${N.done}, ступеней ${N.top}`);
+      if (taken() !== 0 || loadNow() !== 0) e.push('новая неделя расы: загрузка или ступени остались с прошлой');
+      addMs(msTo(1)); if (taken() !== 1) e.push('новая неделя: первая ступень не берётся заново');
+    }
+    return e;
+  },
+  /* E — калькулятор: кто где стоит — по данным прогона (EN_RITUALS.ladder), порогам сундуков и целям сборщика */
+  E() {
+    const e = [], L = D.ladder, TG = B.TARGET.ladder, M = T.LB.modes[MODE], ly = ladLayer(), A = ats(), n = A.length, top = B.SIM.ladder.top.id;
+    const want = { o: M.typical.free[ly.id], e: M.typical.fan[ly.id] }, RM = ['', 'I', 'II', 'III', 'IV', 'V', 'VI'];
+    if (ly.unit !== '%' || M.ladder.next != null) e.push('сундуки: порог ступеней загрузки — не проценты или у лестницы есть продолжение');
+    for (const c of B.SIM.cycles) {
+      const S2 = L.step[c], Ld = L.load[c];
+      for (const pk of Object.keys(Ld)) if (S2[pk] !== E.stepOf(A, Ld[pk])) e.push(`цикл ${RM[c]}: у профиля ${pk} ступень ${S2[pk]} не по загрузке ${Ld[pk]} %`);
+      if (S2.e !== want.e) e.push(`цикл ${RM[c]}: увлечённый — на ${S2.e}-й ступени, сундуки ставят его на ${want.e}-ю`);
+      if (S2.o !== want.o && !(S2.o === want.o + 1 && Ld.o - A[want.o] <= TG.edge)) e.push(`цикл ${RM[c]}: обычный — на ${S2.o}-й ступени при загрузке ${Ld.o} %: не на ${want.o}-й и не на пороге следующей`);
+      for (const pk of B.SIM.ladder.prof) if (S2[pk] >= n) e.push(`цикл ${RM[c]}: профиль ${pk} берёт верхнюю ступень — она только для мест без простоя`);
+      if (S2[top] < n && A[n - 1] - Ld[top] > TG.edge) e.push(`цикл ${RM[c]}: и без простоя верхняя ступень не берётся — ${Ld[top]} % при пороге ${A[n - 1]} %`);
+      if (S2.p > S2.o + TG.payerSteps) e.push(`цикл ${RM[c]}: плательщик — на ${S2.p}-й ступени, обычный — на ${S2.o}-й`);
+      if (!(L.withBoxBp[c] > 0) || L.withBoxBp[c] > TG.withBoxMaxBp) e.push(`цикл ${RM[c]}: ритуалы с сундуками артели — ${L.withBoxBp[c] / 100} % золота забегов обычного, потолок ${TG.withBoxMaxBp / 100} %`);
+    }
+    return e;
+  },
+};
+const lawRun = k => { try { return LAW[k](); } catch (x) { return ['исключение: ' + x.message + ' | ' + String(x.stack || '').split('\n').slice(1, 3).join(' | ').trim()]; } };
+if (!T.LB || !T.LB.modes[MODE] || !T.EL || !wk()) say('ступени загрузки: нет лестницы режима в сундуках или счёта недели');
+else {
+  for (const k of Object.keys(LAW)) { cnt.laws++; for (const x of lawRun(k)) say(`ступени загрузки, закон ${k}: ${x}`); }
+  if (err.length) done();
+  /* проверка мутацией: ломаем — закон обязан упасть; слом снят — закон снова чист. Строка — код для песочницы, функция — правка данных */
+  const CREDIT = (cond, ms) => `rtCredit0 = rtCredit; rtCredit = function (x) { const W = S.rituals.wk; if (!W || x.wk || !(${cond})) return; x.wk = W.no; W.done += ${ms}; rtLatch(); };`;
+  const MUT = [
+    ['A', 'в счёт идёт время с ускорением бригады, а не по карточке', CREDIT('x.t1 >= W.t0 && x.t1 < W.t1', 'x.ms'), 'rtCredit = rtCredit0;'],
+    ['A', 'ритуал засчитан дважды — когда досыпался и при сборе', `RT_SRV.claim0 = RT_SRV.claim; RT_SRV.claim = (o, k) => { const x = S.rituals.slots[k], r = RT_SRV.claim0(o, k); if (r.ok && !r.again && x) S.rituals.wk.done += x.nominal; return r; };`, 'RT_SRV.claim = RT_SRV.claim0;'],
+    ['A', 'отменённый ритуал идёт в счёт', `RT_SRV.cancel0 = RT_SRV.cancel; RT_SRV.cancel = (o, k) => { const x = S.rituals.slots[k], r = RT_SRV.cancel0(o, k); if (r.ok && !r.again && x) S.rituals.wk.done += x.nominal; return r; };`, 'RT_SRV.cancel = RT_SRV.cancel0;'],
+    ['A', 'часы идут в счёт при старте, а не когда ритуал досыпался', `RT_SRV.start0 = RT_SRV.start; RT_SRV.start = (o, t, i, ids) => { const r = RT_SRV.start0(o, t, i, ids); if (r.ok && !r.again) { const x = S.rituals.slots[r.k]; S.rituals.wk.done += x.nominal; x.wk = S.rituals.wk.no; } return r; };`, 'RT_SRV.start = RT_SRV.start0;'],
+    ['B', 'ролл за Энериум прибавляет час', `RT_SRV.roll0 = RT_SRV.roll; RT_SRV.roll = (o, t) => { const r = RT_SRV.roll0(o, t); if (r.ok && !r.again && r.paid) { S.rituals.wk.done += RT_HOUR; rtLatch(); } return r; };`, 'RT_SRV.roll = RT_SRV.roll0;'],
+    ['B', 'карточка из платного ролла считается вдвое', CREDIT('x.t1 >= W.t0 && x.t1 < W.t1', '(S.rituals.hero.concat(S.rituals.work).some(c => c.id === x.card && c.paid) ? 2 : 1) * x.nominal'), 'rtCredit = rtCredit0;'],
+    ['C', 'ступень берётся раньше порога', `rtLatch0 = rtLatch; rtLatch = function (s = S) { const W = s.rituals.wk; W.top = Math.max(W.top, Math.min(rtLadRows(s).length, RTE.stepOf(rtLadRows(s).map(x => x.at), rtLoad(s)) + 1)); };`, 'rtLatch = rtLatch0;'],
+    ['C', 'лестница экрана — без верхней ступени сундуков', `EnLoot.ladder0 = EnLoot.ladder; EnLoot.ladder = (L, id, c) => EnLoot.ladder0(L, id, c).slice(0, -1);`, 'EnLoot.ladder = EnLoot.ladder0;'],
+    ['C', 'взятая ступень не доходит до Недели и «Даров»', `rtSteps0 = rtSteps; rtSteps = function (s = S) { return rtSteps0(s).map((x, i) => Object.assign(x, { reached: i ? false : x.reached })); };`, 'rtSteps = rtSteps0;'],
+    ['D', 'новое место посреди недели роняет взятую ступень', `rtSteps1 = rtSteps; rtSteps = function (s = S) { return rtSteps1(s).map(x => Object.assign(x, { reached: rtLoad(s) >= x.need })); };`, 'rtSteps = rtSteps1;'],
+    ['D', 'новое место считается за всю неделю, а не с часа, когда открылось', `RTE.capMs0 = RTE.capMs; RTE.capMs = (D0, slots, add, left) => RTE.capMs0(D0, slots, add, add ? RTE.weekMs(D0) : left);`, 'RTE.capMs = RTE.capMs0;'],
+    ['D', 'ритуал, досыпавшийся после конца недели, идёт в счёт', CREDIT('x.t1 >= W.t0', 'x.nominal'), 'rtCredit = rtCredit0;'],
+    ['D', 'новая неделя расы не сбрасывает счёт', `rtWeekSync0 = rtWeekSync; rtWeekSync = function () { };`, 'rtWeekSync = rtWeekSync0;'],
+    ['E', 'обычный стоит на две ступени выше, чем ставят сундуки', () => { D.ladder.step0 = D.ladder.step[3].o; D.ladder.load0 = D.ladder.load[3].o; D.ladder.load[3].o = ats()[ats().length - 1]; D.ladder.step[3].o = ats().length; }, () => { D.ladder.step[3].o = D.ladder.step0; D.ladder.load[3].o = D.ladder.load0; delete D.ladder.step0; delete D.ladder.load0; }],
+    ['E', 'ритуалы с сундуками артели — выше потолка дохода', () => { D.ladder.box0 = D.ladder.withBoxBp[6]; D.ladder.withBoxBp[6] = B.TARGET.ladder.withBoxMaxBp + 1; }, () => { D.ladder.withBoxBp[6] = D.ladder.box0; delete D.ladder.box0; }],
+  ];
+  const apply = f => (typeof f === 'function' ? f() : vm.runInContext(f, P.ctx));
+  for (const [k, what, brk, fix] of MUT) {
+    try { apply(brk); } catch (x) { say(`мутация «${what}»: не применилась — ${x.message}`); continue; }
+    const got = lawRun(k);
+    try { apply(fix); } catch (x) { say(`мутация «${what}»: не снялась — ${x.message}`); }
+    if (got.length) cnt.mut++; else say(`мутация «${what}»: закон ${k} её не поймал`);
+    if (process.argv.includes('--mut')) console.log(`мутация «${what}»: ${got.length ? 'закон ' + k + ' — ' + got.slice(0, 2).join(' | ').slice(0, 300) : 'НЕ ПОЙМАНА'}`);
+  }
+  for (const k of Object.keys(LAW)) for (const x of lawRun(k)) say(`ступени загрузки, закон ${k} после мутаций: ${x}`);
+  reset();
+}
+if (err.length) done();
+
 /* ================== 6. вид ================== */
 {
   for (const team of [false, true]) {
@@ -447,9 +688,16 @@ if (err.length) done();
       if (!/class="rt-slots"/.test(h) || !/data-a="rtclaim"/.test(h)) say(`экран ${tab}: нет слотов сверху или «Забрать» у готового`);
       if (!/data-v="rituals:work"/.test(h) || !/data-v="rituals:hero"/.test(h)) say(`экран ${tab}: нет вкладок «Рабочие» и «Герои»`);
       if (team && !/team-only/.test(h)) say('режим «Команда»: нет служебного на экране');
+      /* ступени загрузки: полоса под карточками — число, засечки всех ступеней, сундук ближайшей; одно действие — лист */
+      const strip = (h.match(/<button class="rt-load"[\s\S]*?<\/button>/) || [''])[0];
+      if (!strip || !strip.includes('data-v="rtload"') || !strip.includes(`>${loadNow()} %<`)) say(`экран ${tab}: нет полосы «Загрузка недели» с числом загрузки`);
+      else if ((strip.match(/<i class="(?:on)?" style="--v:\d+">/g) || []).length !== ats().length || !/class="well itf rt-chest"/.test(strip)) say(`экран ${tab}: в полосе загрузки не все ступени или нет сундука ближайшей`);
       R()[tab].forEach((_, i) => { T.S.overlay = { t: 'ritual', arg: `${tab}:${i}` }; view(P, `лист · ${tab}:${i}${team ? ' · команда' : ''}`); });
     }
-    for (const [t, arg] of [['rtart', ''], ['rtslot', '0'], ['rtslot', '1'], ['rtslot', '2']]) { T.S.overlay = { t, arg }; view(P, `лист ${t}:${arg}${team ? ' · команда' : ''}`); }
+    for (const [t, arg] of [['rtart', ''], ['rtslot', '0'], ['rtslot', '1'], ['rtslot', '2'], ['rtload', '']]) {
+      T.S.overlay = { t, arg }; const hs = view(P, `лист ${t}:${arg}${team ? ' · команда' : ''}`);
+      if (t === 'rtload' && (!/class="rt-lad"/.test(hs) || !/data-v="gifts:me"/.test(hs))) say('лист «Загрузка недели»: нет лестницы ступеней или пути в «Дары»');
+    }
     /* окно сбора: итог сразу — нажатие на сцену */
     const k = R().slots.findIndex(s => s.st === 'ready');
     run('сбор · вид', () => T.ACT.rtclaim(`${op()}:${k}`)); view(P, 'окно сбора' + (team ? ' · команда' : ''));
@@ -459,6 +707,7 @@ if (err.length) done();
     reset(); T.S.acc.level = 5; T.S.acc.cycle = 1; T.S.route = 'rituals'; T.S.overlay = null;
     const h3 = view(P, 'закрыто' + (team ? ' · команда' : ''));
     if (!/rt-lock/.test(h3)) say('закрытый экран: нет объяснения, когда откроется');
+    if (/class="rt-load"/.test(h3)) say('закрытый экран: показана полоса загрузки');
   }
   run('режим', () => T.setTeam(false));
   /* раздел UI-кита */
@@ -468,7 +717,7 @@ if (err.length) done();
   if (!T.KIT_EXTRA.some(x => x.html === T.rtKitHtml)) say('UI-кит: раздел не зарегистрирован в KIT_EXTRA');
   /* сценарии презентации */
   const flows = T.FLOWS.filter(f => /Ритуал|Рабочие/.test(f[0]));
-  if (flows.length < 4) say(`сценариев ритуалов ${flows.length}, ждали 4`);
+  if (flows.length < 5 || !flows.some(f => /ступени загрузки/.test(f[0]))) say(`сценариев ритуалов ${flows.length}, ждали 5 — со ступенями загрузки`);
   for (const [t, , f] of flows) { reset(); run('сценарий ' + t, () => f()); view(P, 'сценарий ' + t); }
 }
 
@@ -477,9 +726,27 @@ if (err.length) done();
   reset();
   const Rr = R(), cnts = () => ({ ready: Rr.slots.filter(s => s.st === 'ready').length, run: Rr.slots.filter(s => s.st === 'run').length });
   T.S.route = 'week'; T.S.seg.week = 'now'; let h = view(P, 'Неделя');
-  const row = (h.match(/<button class="wk-rit[\s\S]*?<\/button>/) || [''])[0];
-  if (!row) say('Неделя: нет строки «Ритуалы»');
-  else { const c = cnts(); if (c.ready && !row.includes(`готово: ${c.ready}`)) say('Неделя: в строке «Ритуалы» не то число готовых'); if (c.run && !row.includes(`идёт: ${c.run}`)) say('Неделя: в строке «Ритуалы» не то число идущих'); }
+  /* строка «Ритуалы» — режим реестра WEEK_MODES: загрузка недели и ступени; прежняя строка под режимами — только пока режима нет */
+  const W = T.WEEK, m = W ? W.modes().find(x => x.id === MODE) : null;
+  if (!m || m.demo) say('Неделя: ритуалы не сообщили режим в реестр WEEK_MODES');
+  else {
+    const st = W.state(MODE, 'now'), c = cnts(), A = ats(), sum = rs => rs.reduce((a, r) => a + r.groups.reduce((b, g) => b + g.count, 0), 0);
+    if (st.lock || st.points !== loadNow() || st.place != null) say(`Неделя: строка «Ритуалы» — ${st.lock || st.points + ' %'}, на экране — ${loadNow()} %; места у ритуалов нет`);
+    if (st.planks.length !== A.length || st.planks.some((p, i) => p.need !== A[i])) say('Неделя: ступени строки «Ритуалы» — не ступени загрузки сундуков');
+    if (c.ready ? !st.alert || !st.alert.includes(String(c.ready)) : st.alert) say('Неделя: отметка готовых ритуалов не сходится со слотами');
+    if (!new RegExp(`<div class="wk-row[^"]*" data-mode="${MODE}"`).test(h)) say('Неделя: нет строки режима «Ритуалы»');
+    if ((h.match(/data-a="go" data-v="rituals"/g) || []).length !== 1) say('Неделя: путь в ритуалы — не один: строка режима и прежняя строка вместе');
+    T.S.overlay = { t: 'wkmode', arg: MODE + ':now' }; view(P, 'Неделя · лист «Ритуалы»'); T.S.overlay = null;
+    /* прошлая неделя — та, за которую платят «Дары»: сундуки сходятся, загрузка — между порогами взятых ступеней */
+    const ps = W.state(MODE, 'past'), rows = T.darRows ? T.darRows(T.S, 'prev').filter(p => p.id === MODE) : [], k = rows.filter(p => p.kind === 'plank').length;
+    if (ps.lock || sum(ps.rewards) !== sum(rows)) say(`Неделя: прошлая неделя ритуалов — ${ps.lock || sum(ps.rewards) + ' сундуков'}, в «Дарах» — ${sum(rows)}`);
+    else if (k && (ps.points < A[k - 1] || (k < A.length && ps.points >= A[k]))) say(`Неделя: прошлая загрузка ${ps.points} % — не между порогами взятых ступеней (${k})`);
+    T.S.seg.week = 'past'; view(P, 'Неделя · прошлая'); T.S.overlay = { t: 'wkmode', arg: MODE + ':past' }; view(P, 'Неделя · прошлая · лист «Ритуалы»'); T.S.overlay = null; T.S.seg.week = 'now';
+    const lv = T.S.acc.level, cy = T.S.acc.cycle;
+    T.S.acc.level = T.RT.rules.open.level - 1; T.S.acc.cycle = T.RT.rules.open.cycle - 1;
+    if (!W.state(MODE, 'now').lock) say('Неделя: до открытия ритуалов строка «Ритуалы» не закрыта');
+    T.S.acc.level = lv; T.S.acc.cycle = cy;
+  }
   T.S.route = 'shelter'; h = view(P, 'Убежище');
   if (!/data-v="rituals"/.test(h)) say('Убежище: нет перехода к ритуалам');
   if (cnts().ready && !/Ритуал готов/.test(h)) say('Убежище: не видно готового ритуала');

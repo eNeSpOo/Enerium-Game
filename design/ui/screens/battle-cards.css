@@ -38,10 +38,9 @@
 .bf-st i{width:5px;height:5px;background:var(--ico-valor) center/contain no-repeat;opacity:.3}
 .bf-st i.on{opacity:1}
 
-/* лестница опасности — решения автора 01.10.2026: Забытый и Многоликий — вершина, выше Хозяина. Рамки-картинки 30.09 рисовались под
-   прежнюю лестницу: до нарисованных заново вершине — свет по контуру рамки */
-.bc.fr[data-bf="forgotten"] .face>.bf{filter:drop-shadow(0 0 2px rgba(255,196,96,.95)) drop-shadow(0 0 6px rgba(245,170,70,.65))}
-.bc.fr[data-bf="many"] .face>.bf{filter:drop-shadow(0 0 2px rgba(255,226,150,.95)) drop-shadow(0 0 6px rgba(221,188,122,.65))}
+/* лестница опасности — лестница типов по мощи, слова автора 06.10.2026 (ADR-0054): Хозяин стихии (клановый босс) — вершина, Пробуждённый
+   и Многоликий — ступень под ним. Рамки-картинки 30.09 рисовались под эту же лестницу: Хозяин в них самый тяжёлый, и свет по контуру,
+   добавленный Пробуждённому и Многоликому на время лестницы 01.10, снят */
 
 /* легенда знаков: образцы рамок в строке «Рамка» */
 .bt-legend .ex.bf-lg{gap:3px}
@@ -91,9 +90,9 @@
 .bc.pt>.bf-mk>b{filter:drop-shadow(0 0 3px color-mix(in srgb,var(--rc) 75%,transparent))}
 .bc.pt .bf-st{filter:drop-shadow(0 1px 1px #000)}
 
-/* рамка CSS — портрет и квадрат. Лестница опасности (решения автора 01.10.2026): рядовой — голое железо; элита — уголки и свет; боссы
-   (биома, Эхо, Голос сонма) — двойная кромка; рунный страж — свет сильнее; Убер — дышит светом; Хозяин — свет ещё сильнее; вершина —
-   Забытый и Многоликий: тройная кромка и самый сильный свет. Рамка — только i.pf: класс .pf — ещё и раскладка экрана «Странник»
+/* рамка CSS — портрет и квадрат. Лестница опасности — лестница типов автора 06.10.2026 (ADR-0054): рядовой — голое железо; элита —
+   уголки и свет; боссы (биома, Эхо, Голос сонма) — двойная кромка; рунный страж — свет сильнее; Убер — дышит светом; Пробуждённый и
+   Многоликий — свет ещё сильнее; вершина — Хозяин стихии, клановый босс: тройная кромка и самый сильный свет. Рамка — только i.pf: класс .pf — ещё и раскладка экрана «Странник»
    (index.html), голое .pf гасило там все клики */
 i.pf{position:absolute;inset:calc(-1 * var(--pfw,3px));z-index:1;pointer-events:none;border:var(--pfw,3px) solid var(--f2,#1e2226);
   border-image:linear-gradient(160deg,var(--f1,#6b7279),var(--f2,#1e2226) 40%,var(--f1,#6b7279) 64%,var(--f2,#1e2226)) 1;
@@ -111,18 +110,18 @@ i.pf::after{content:"";position:absolute;inset:calc(-1 * var(--pfw,3px));pointer
 [data-pf="voice"]{--f1:#7b97cf;--f2:#18243f;--fx:0 0 0 2px #070b14,0 0 0 3px #3d5688,0 0 10px 1px rgba(90,140,255,.5)}
 [data-pf="b"]{--f1:#b8a682;--f2:#2a2419;--fx:0 0 0 2px #0b0806,0 0 0 3px #6e6146,0 0 10px 1px rgba(255,90,40,.5)}
 [data-pf="echo"]{--f1:#88a88b;--f2:#1b2a22;--fx:0 0 0 2px #070d0a,0 0 0 3px #4f6a55,0 0 10px 1px rgba(110,230,170,.5)}
-[data-pf="many"]{--f1:#e0c98e;--f2:#2a2316;--fg:rgba(240,205,120,.85);--fx:0 0 0 2px #0b0a08,0 0 0 3px #8a7a52,0 0 0 4px #0b0a08,0 0 0 5px #c9a85e,0 0 16px 2px rgba(240,205,120,.55)}
+[data-pf="many"]{--f1:#e0c98e;--f2:#2a2316;--fg:rgba(240,205,120,.85);--fx:0 0 0 2px #0b0a08,0 0 0 3px #8a7a52,0 0 14px 2px rgba(240,205,120,.55)}
 [data-pf="rune"]{--f1:#7aa09c;--f2:#182424;--fx:0 0 0 2px #061010,0 0 0 3px #3f6461,0 0 11px 1px rgba(72,229,212,.6)}
 [data-pf="uber"]{--f1:#6a7067;--f2:#101210;--fg:rgba(120,255,80,.75);--fx:0 0 0 2px #050705,0 0 0 3px #3b4a32,0 0 11px 1px rgba(120,255,80,.45)}
-[data-pf="forgotten"]{--f1:#d6aa5c;--f2:#2a2010;--fg:rgba(245,190,80,.85);--fx:0 0 0 2px #0c0904,0 0 0 3px #7a5c2c,0 0 0 4px #0c0904,0 0 0 5px #c08a3a,0 0 16px 2px rgba(245,190,80,.55)}
-[data-pf="host"]{--f1:#dfe7f0;--f2:#303a46;--fg:rgba(110,175,255,.85);--fx:0 0 0 2px #070a0e,0 0 0 3px #7d8a99,0 0 14px 2px rgba(90,160,255,.6)}
+[data-pf="awakened"]{--f1:#d6aa5c;--f2:#2a2010;--fg:rgba(245,190,80,.85);--fx:0 0 0 2px #0c0904,0 0 0 3px #7a5c2c,0 0 14px 2px rgba(245,190,80,.55)}
+[data-pf="host"]{--f1:#dfe7f0;--f2:#303a46;--fg:rgba(110,175,255,.85);--fx:0 0 0 2px #070a0e,0 0 0 3px #7d8a99,0 0 0 4px #070a0e,0 0 0 5px #b9c6d6,0 0 16px 2px rgba(90,160,255,.6)}
 [data-pf="e"] .pf::before,[data-pf="voice"] .pf::before,[data-pf="b"] .pf::before,[data-pf="echo"] .pf::before,[data-pf="many"] .pf::before,[data-pf="rune"] .pf::before,
-[data-pf="uber"] .pf::before,[data-pf="forgotten"] .pf::before,[data-pf="host"] .pf::before{opacity:1}
+[data-pf="uber"] .pf::before,[data-pf="awakened"] .pf::before,[data-pf="host"] .pf::before{opacity:1}
 /* герой — уголки книги во всех четырёх углах */
 [data-pf="hero"] .pf::before{opacity:1;background:linear-gradient(var(--bk) 0 0) left top/7px 2px,linear-gradient(var(--bk) 0 0) left top/2px 7px,linear-gradient(var(--bk) 0 0) right top/7px 2px,linear-gradient(var(--bk) 0 0) right top/2px 7px,
   linear-gradient(var(--bk) 0 0) left bottom/7px 2px,linear-gradient(var(--bk) 0 0) left bottom/2px 7px,linear-gradient(var(--bk) 0 0) right bottom/7px 2px,linear-gradient(var(--bk) 0 0) right bottom/2px 7px;background-repeat:no-repeat}
-/* Убер, Хозяин, Забытый и Многоликий дышат светом: только opacity; «меньше движения» — свет ровный */
-[data-pf="uber"] .pf::after,[data-pf="host"] .pf::after,[data-pf="forgotten"] .pf::after,[data-pf="many"] .pf::after{opacity:.55;animation:pfBreath 2.6s ease-in-out infinite alternate}
+/* Убер, Хозяин, Пробуждённый и Многоликий дышат светом: только opacity; «меньше движения» — свет ровный */
+[data-pf="uber"] .pf::after,[data-pf="host"] .pf::after,[data-pf="awakened"] .pf::after,[data-pf="many"] .pf::after{opacity:.55;animation:pfBreath 2.6s ease-in-out infinite alternate}
 @keyframes pfBreath{from{opacity:.2}to{opacity:.9}}
 @media (prefers-reduced-motion:reduce){ [data-pf] .pf::after{animation:none} }
 /* состояния боя — кольцом и светом рамки */

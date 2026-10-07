@@ -3,7 +3,8 @@
 Иконки рисуются листами (grid_slice.py режет их на клетки). Слабую клетку перерисовывают малым листом — задание с «fix» в id:
 его клетка заменяет клетку большого листа. Клетка, поправленная обработкой, лежит рядом как <имя>.fix.webp и заменяет исходную.
 Скрипт собирает из описей нарезки (cells.json) итоговую клетку на каждую иконку и пишет опись выгрузки для export_ui.py:
-- способности — spells/<имя>.webp, имя — набор латиницей и id способности: «Огонь.dmg.all» → fire-dmg-all, «Сочетания.act.1» → combo-act-1
+- способности — spells/<имя>.webp, имя — набор латиницей и id способности: «Огонь.dmg.all» → fire-dmg-all, «Сочетания.act.1» → combo-act-1,
+  черта врага «враг.pas.1» → foe-pas-1
   (ART_ICONS.spell, art-icons.js);
 - талисманы — tal/<ключ линейки>.webp (EN_TALISMANS.fams);
 - снаряжение — gear/<слот>-<редкость>.webp (EN_EQUIPMENT.templates «слот.редкость»);
@@ -23,7 +24,7 @@ GEN = ROOT / "art" / "generated"
 OUT = pathlib.Path(__file__).resolve().parent / "ui-icons.json"
 SIZE = [256, 256]
 SLUG = {"Огонь": "fire", "Земля": "earth", "Воздух": "air", "Тьма": "dark", "Вода": "water", "Свет": "light", "Время": "time",
-        "Без школы": "none", "фарм": "farm", "Сочетания": "combo"}   # набор → латиница имени файла; то же в ART_ICONS.slug (design/ui/screens/art-icons.js)
+        "Без школы": "none", "фарм": "farm", "Сочетания": "combo", "враг": "foe"}   # набор → латиница имени файла; то же в ART_ICONS.slug (design/ui/screens/art-icons.js); «враг» — черты врагов (ADR-0051)
 KINDS = {
     "spell-icons": lambda cid, stem: None if stem.endswith("-alt") else f"spells/{stem}.webp",   # -alt — запасной вариант клетки, в выгрузку не идёт
     "talisman-icons": lambda cid, stem: None if stem.endswith("-alt") else f"tal/{cid}.webp",
@@ -84,6 +85,7 @@ def main():
     ids = [a["id"] for s in lib["sets"].values() for part in s.values() if isinstance(part, list) for a in part]
     ids += [a["id"] for part in lib["farm"].values() for a in part]
     ids += [a["id"] for part in lib.get("combos", {}).values() for a in part]   # сочетания — способности из двух (ADR-0050): «Сочетания.act.1» → combo-act-1
+    ids += [a["id"] for part in lib.get("foeTraits", {}).values() for a in part]   # черты врагов (ADR-0051): «враг.pas.1» → foe-pas-1
     need = {f"spells/{spell_stem(i)}.webp": i for i in ids}
     need["spells/ability-hidden.webp"] = "способность скрыта"
     need.update({f"tal/{k}.webp": k for k in js_keys("talismans.js", "window.EN_TALISMANS.fams")})

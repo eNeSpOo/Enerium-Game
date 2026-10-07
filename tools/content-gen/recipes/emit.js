@@ -11,7 +11,7 @@
    - каждый призыв врага несёт Энериум своей ступени и уникальный ресурс босса биома — сам или через перекрафт (слово автора, 30.09.2026);
    - лестница Энериума: 100 первой ступени — одна второй, 100 второй — одна третьей;
    - призыв босса руины или города несёт находку своего места; у каждого — пробуждённый: обычный призыв, Многоликий, находка (ADR-0025);
-   - у каждого призванного врага — тип по силе (ADR-0039): элита, босс, Убер или Забытый (CRAFT.type);
+   - у каждого призванного врага — тип по силе (ADR-0039): элита, босс, Убер или Пробуждённый (CRAFT.type);
    - места идут цепочкой: активация не требует добычи места, которое открывается позже;
    - герой с максимумом доблести 4–5 требует трофея, уникального ресурса или двух находок;
    - все числа — целые.
@@ -240,7 +240,7 @@ function buildDrops(CYC, places, memories, items, recipes, byId) {
     trophies: CM.trophies, specKeys: CM.specKeys, spirit: CM.spirit * m.cyc, gold: CM.spirit * m.cyc / 2, enerium: CM.enerium * m.cyc, runeKeyBp: CM.runeKeyBp, runeKeys: m.cyc,
     workerBoxRarity: Math.min(7, m.cyc + 1 + CM.chestStep), summonSouls: CS.summonSouls, team: m.team, biome: m.biome });
   /* пробуждённые (ADR-0025): тот же вид записи, что у босса руины; cyc — цикл, с которого есть рецепт пробуждения.
-     awake — id обычного босса; тип — Забытый (ADR-0039), powerCycleStep — сила его типа на столько циклов выше; трофей — свой. */
+     awake — id обычного босса; тип — Пробуждённый (ADR-0039, ADR-0054), powerCycleStep — сила его типа на столько циклов выше; трофей — свой. */
   const AW = C.CRAFT.awake;
   for (const p of places.filter(x => x.boss.awake)) { const a = p.boss.awake, c = a.cyc, cur = CS.spirit * c * AW.currencyMul;
     craftBosses.push({ id: a.id, name: a.label, kind: 'awake', g: TY.awake, cyc: c, spec: p.boss.spec, race: p.boss.race, call: a.call, trophy: p.boss.awTrophy,
@@ -248,7 +248,7 @@ function buildDrops(CYC, places, memories, items, recipes, byId) {
       workerBoxRarity: Math.min(7, c + 1 + AW.chestStep), summonSouls: CS.summonSouls, team: p.team || !!CYC[c - 1].team,
       awake: p.boss.id, powerCycleStep: AW.powerCycleStep }); }
   /* тип по силе — у каждого (ADR-0039): от него раунды, рамка, иммунитет и сундук; «крафтового» типа нет */
-  for (const b of craftBosses) if (!['e', 'b', 'u', 'f'].includes(b.g)) throw new Error(`${b.id} «${b.name}»: нет типа по силе (CRAFT.type, вид ${b.kind})`);
+  for (const b of craftBosses) if (!['e', 'b', 'u', 'a'].includes(b.g)) throw new Error(`${b.id} «${b.name}»: нет типа по силе (CRAFT.type, вид ${b.kind})`);
   const M = C.MARKET;
   const market = { basic: cyc6.map(c => M.basic * c), key: cyc6.map(c => M.key * c), craftres: cyc6.map(c => M.craftres * c), unique: cyc6.map(c => M.unique * c),
     find: cyc6.map(c => M.find * c), trophy: cyc6.map(c => M.trophy * c), commissionPct: M.commissionPct, soulsTradable: false };
@@ -262,7 +262,7 @@ function buildDrops(CYC, places, memories, items, recipes, byId) {
     echo: Object.assign({}, C.ECHO, { uber: C.ECHO.many }),   // uber — прежнее имя той же записи: его читают экран Эхо и его проверки; снять, когда перейдут на echo.many
     payouts: 'design/ui/lootboxes.js',
     lootboxes: { basicPool: items.filter(i => i.pool).map(i => i.id), pools },
-    activeSlots: { shared: true, byCycle: C.CRAFT.activeCap },
+    activeSlots: { shared: true, art: C.CRAFT.activeArt },   // слот даёт артефакт активных биомов (wanderer.js), не номер цикла (ADR-0054)
     craftBiomes, craftBosses, market,
     ener: { t1: C.ENER.t1, t2: C.ENER.t2, t3: C.ENER.t3, step: C.ENER.step },
     dust: Object.assign({}, C.DUST),

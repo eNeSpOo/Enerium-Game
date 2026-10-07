@@ -172,8 +172,9 @@ function expectTodo() {
   for (const r of S.runs) if (r.over && !r.seen) add(r.scene ? (EXPECT[r.scene.back] || '') : 'descent', 1);
   const mine = T.hrMine ? T.hrMine() : S.heroes;
   add('heroes', mine.filter(h => { const d = T.heroDev(h); return (d.atCap && d.rune && d.have >= d.need) || (d.open && h.valor < h.maxV && d.vrHave > 0); }).length);
-  const need = T.RS.rules ? T.RS.rules.stub.shards : 0;
-  if (need) add('heroes', T.RS.heroes.filter(h => (S.rs.shards[h.id] || 0) >= need && !T.rsHas(h) && h.c <= T.rsCyc()).length);
+  /* комплект — свой у героя: у героя Эхо — по его циклу (rules.echoSet, ADR-0047) */
+  const need = h => (T.RS.rules ? (h.src === 'echo' && Array.isArray(T.RS.rules.echoSet) && T.RS.rules.echoSet[h.c - 1]) || T.RS.rules.stub.shards : 0);
+  if (T.RS.rules) add('heroes', T.RS.heroes.filter(h => need(h) > 0 && (S.rs.shards[h.id] || 0) >= need(h) && !T.rsHas(h) && h.c <= T.rsCyc()).length);
   add('craft', S.bag.chests.length ? 1 : 0);
   add('craft', S.market.mine.filter(l => l.st === 'sold').length);
   add('week', S.rituals && S.rituals.slots ? S.rituals.slots.filter(s => s.st === 'ready').length : 0);

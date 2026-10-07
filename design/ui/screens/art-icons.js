@@ -61,7 +61,7 @@ const artEsc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/<
 Object.assign(ART_ICONS, {
   grid: { spells: true, tal: true, gear: true, res: true },   // выгрузка 30.09.2026
   slug: { 'Огонь': 'fire', 'Земля': 'earth', 'Воздух': 'air', 'Тьма': 'dark', 'Вода': 'water', 'Свет': 'light', 'Время': 'time',
-    'Без школы': 'none', 'фарм': 'farm', 'Сочетания': 'combo' },   // набор → латиница имени файла; то же в tools/art-gen/ui_icons.py; «Сочетания» — ADR-0050
+    'Без школы': 'none', 'фарм': 'farm', 'Сочетания': 'combo', 'враг': 'foe' },   // набор → латиница имени файла; то же в tools/art-gen/ui_icons.py; «Сочетания» — ADR-0050, «враг» — черты врагов, ADR-0051
   spell: id => { const s = String(id || '').split('.'), k = ART_ICONS.slug[s[0]]; return k && s.length > 1 ? 'spells/' + k + '-' + s.slice(1).join('-') + '.webp' : ''; },
   spellHidden: 'spells/ability-hidden.webp',      // «способность скрыта» — неизвестная душа: закрытая книга в тумане
   talLine: key => 'tal/' + key + '.webp',

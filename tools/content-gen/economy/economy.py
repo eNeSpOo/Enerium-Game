@@ -56,17 +56,17 @@ DECK = {'rf': 104, 'elite': 12, 'boss': 1, 'floors': 35}
 SIM = [
     (1, 1, 3, 0, 0, 114400, 4),
     (5, 1, 7, 1, 0, 178100, 7),
-    (10, 1, 14, 1, 0, 243500, 10),
+    (10, 1, 14, 1, 0, 243300, 10),
     (15, 1, 18, 2, 0, 250700, 12),
     (20, 1, 27, 2, 0, 347700, 15),
-    (30, 1, 35, 4, 0, 405300, 18),
-    (35, 1, 40, 4, 0, 421600, 20),
-    (43, 1, 40, 4, 0, 397800, 20),
-    (50, 1, 50, 6, 0, 467400, 23),
-    (60, 1, 57, 7, 0, 510100, 25),
-    (65, 1, 63, 9, 0, 539600, 27),
-    (75, 1, 71, 9, 0, 572900, 28),
-    (90, 1, 78, 9, 0, 579500, 30),
+    (30, 1, 36, 4, 0, 412000, 19),
+    (35, 1, 39, 4, 0, 403100, 19),
+    (43, 1, 40, 5, 0, 407100, 20),
+    (50, 1, 52, 6, 0, 472300, 23),
+    (60, 1, 57, 8, 0, 504200, 25),
+    (65, 1, 63, 9, 0, 533100, 27),
+    (75, 1, 66, 9, 0, 542000, 27),
+    (90, 1, 78, 9, 0, 564700, 30),
     (100, 1, 91, 12, 0, 644700, 33),
     (110, 60, 6060, 720, 0, 39828000, 35),
     (120, 2, 208, 24, 1, 1355000, 35),
@@ -194,7 +194,8 @@ FIRST_HERO_GOLD = 10000                     # квест первого геро
 TUTORIAL_SPIRIT_FALLBACK = 1600             # запасное: дух цепочки обучения сразу паре
 # дух обучения — награды уровней сценария (100 + 700 + 500 на уровнях 1–3); прежде — 1 600 сразу паре
 TUTORIAL_SPIRIT = START.get('trainSpirit', TUTORIAL_SPIRIT_FALLBACK)
-ARTIFACTS_GOLD_C1 = 49000                   # таблица автора: покупка восьми артефактов, открытых с цикла I
+# покупка артефактов, что продаются с цикла I, — таблица автора (design/ui/wanderer.js): artifacts_gold_c1(). С артефактом активных биомов,
+# который покупают в обучении (ADR-0054), их девять; его 30 000 золота оплачивает награда уровня 1 сценария (start/data.js)
 # --- «Дар Страннику» с 11-го уровня (§16; ADR-0038, п. 6; ADR-0039, следствия): опыт за вехи цикла II × номер цикла → уровни по формуле §16
 # (переход L → L + 1 — ⌈√(k2 × L³)⌉ опыта) → дар золотом база × (1 + уровень × 0,1) на каждом уровне. Формула, опыт вех, уровень и опыт
 # на входе в цикл II — сценарий старта (start.json: formula, xp, levels, end). Вехи модели и их дни: новые существа и закрытия биомов
@@ -212,8 +213,15 @@ CAPACITY_JSON = ROOT / 'tools' / 'content-gen' / 'contracts' / 'capacity.json'
 # --- профили: часов забегов в день; забегов одновременно — у всех одинаково, по прогрессу ---
 PROFILES = [('обычный', 3), ('увлечённый', 8)]
 PROFILE_KEY = {'обычный': 'o', 'увлечённый': 'e', 'плательщик': 'p'}   # профиль калькулятора → профиль прогона контрактов (econ)
-# забегов одновременно — столько, каков номер цикла (ADR-0014; ADR-0031, п. 3): recipes.js, drops.activeSlots.byCycle — rx().
-# «Право владыки» — редкая вневременная пассивка Памяти (+1 забег, только бесплатные тройки): калькуляторы её не считают
+# забегов одновременно — слоты активных биомов (слова автора 06.10.2026, ADR-0054, п. 3 и п. 15): слот даёт артефакт активных биомов
+# Странника — «Знак открытых троп» (design/ui/wanderer.js, art.rules.trail): без него слота нет, покупка — в обучении — открывает один,
+# каждый уровень — ещё один; уровень — не раньше своего цикла, по одному за цикл; цена уровня — души, база × номер уровня (таблица
+# автора) — сток душ. Прежнее «слотов столько, каков номер цикла» (ADR-0031, п. 3) отменено: в цикле c слотов по-прежнему не больше c,
+# но слот своего цикла игрок сначала покупает. Допущение модели — слово автора: «его должны качать в моём понимании всегда в первую
+# очередь, если хотят эффективно фармить»: уровень своего цикла берётся, как только хватает душ, раньше трат в Эхо; до покупки
+# забегов — как в прошлом цикле. «Право владыки» — редкая вневременная пассивка Памяти (+1 забег, только бесплатные тройки):
+# калькуляторы её не считают
+WANDERER_JS = ROOT / 'design' / 'ui' / 'wanderer.js'
 EXTRA_CAP = {1: 50, 2: 150, 3: 150}         # вторые отряды: руны уходят главному, выше предела им не подняться
 # --- дневная модель — цикл II (ADR-0018): цикл I — обучение на часы, считается отдельно (Т15) ---
 FIRST_CYCLE = 2                             # с какого цикла идёт счёт по дням
@@ -343,13 +351,13 @@ _RX = {}
 
 def rx():
     """Числа рецептов и добычи из design/ui/recipes.js (EN_RECIPES): стражи пределов и доблести, общий кап побед, шанс рунного ключа
-    с босса, забегов одновременно по циклам, рецепты руны доблести и перековки рун. Читается один раз через Node; калькуляторы
-    своих копий не держат (ручка — tools/content-gen/recipes/common.js, затем пересобрать рецепты)."""
+    с босса, рецепты руны доблести и перековки рун. Читается один раз через Node; калькуляторы своих копий не держат (ручка —
+    tools/content-gen/recipes/common.js, затем пересобрать рецепты). Слоты забегов — не отсюда: их даёт артефакт (trail)."""
     if not _RX:
         js = ("globalThis.window=globalThis;require('./design/ui/recipes.js');const R=globalThis.EN_RECIPES,D=R.drops;"
               "const rec=id=>R.recipes.find(r=>r.id===id);"
               "process.stdout.write(JSON.stringify({guardians:D.guardians,cap:D.dailyGuardianCap,enemies:D.enemies,"
-              "slots:D.activeSlots.byCycle,valorRune:rec('r_vr1').in[0][1],reforge:rec('r_rn1_2').in[0][1]}))")
+              "valorRune:rec('r_vr1').in[0][1],reforge:rec('r_rn1_2').in[0][1]}))")
         res = subprocess.run(['node', '-e', js], cwd=ROOT, capture_output=True, text=True, encoding='utf-8')
         if res.returncode:
             sys.exit('economy.py: не прочитать design/ui/recipes.js — ' + res.stderr)
@@ -364,15 +372,74 @@ def rx():
             'shards_x100': sum(n * bp for n, bp in val['shardsBp']) // 100,   # осколков доблести за победу, в среднем × 100
             'shards_bp': val['shardsBp'],
             'boss_key_bp': boss['runeKeyBp'],                             # шанс рунного ключа с босса биома; ключей — цикл биома
-            'slots': {c + 1: n for c, n in enumerate(d['slots'])},        # забегов одновременно по циклам
             'valor_rune': d['valorRune'], 'reforge': d['reforge'],
         })
     return _RX
 
 
-def slots(c):
-    """Забегов одновременно в цикле c — номер цикла (ADR-0014; ADR-0031, п. 3), recipes.js drops.activeSlots."""
-    return rx()['slots'][c]
+_WN = {}
+
+
+def wanderer():
+    """Артефакты Странника из design/ui/wanderer.js (EN_WANDERER.art): trail — артефакт активных биомов (art.rules.trail), c1_gold —
+    золото на покупку всех артефактов, что продаются с цикла I. Читается один раз через Node; своих копий у калькуляторов нет."""
+    if not _WN:
+        js = ("globalThis.window=globalThis;require('./design/ui/wanderer.js');const A=globalThis.EN_WANDERER.art;"
+              "process.stdout.write(JSON.stringify({trail:A.list.find(x=>x.id===A.rules.trail)||null,"
+              "c1Gold:A.list.filter(x=>(x.buyFrom||x.from)===1).reduce((s,x)=>s+x.gold,0)}))")
+        res = subprocess.run(['node', '-e', js], cwd=ROOT, capture_output=True, text=True, encoding='utf-8')
+        if res.returncode:
+            sys.exit('economy.py: не прочитать design/ui/wanderer.js — ' + res.stderr)
+        d = json.loads(res.stdout)
+        if not d['trail']:
+            sys.exit('economy.py: в design/ui/wanderer.js нет артефакта активных биомов (art.rules.trail, ADR-0054)')
+        _WN.update(trail=d['trail'], c1_gold=d['c1Gold'])
+    return _WN
+
+
+def trail():
+    """Артефакт активных биомов: base — слотов без него, own — за покупку, step — за уровень, lv — уровней, from — с какого цикла
+    уровни, gold — покупка, soul — база цены уровня в душах (таблица автора)."""
+    return wanderer()['trail']
+
+
+def artifacts_gold_c1():
+    """Золото на покупку артефактов, что продаются с цикла I (таблица автора): с артефактом активных биомов их девять."""
+    return wanderer()['c1_gold']
+
+
+def trail_level(c):
+    """Сколько уровней артефакта активных биомов доступно в цикле c: по одному за цикл с цикла уровней, не больше числа уровней."""
+    t = trail()
+    return min(t['lv'], max(0, c - t['from'] + 1))
+
+
+def slots(c, level=None):
+    """Забегов одновременно в цикле c — что даёт артефакт активных биомов на уровне level (по умолчанию — на уровне своего цикла,
+    когда он взят): покупка — own, каждый уровень — step (ADR-0054). Куплен он в обучении: меньше слотов у игрока не бывает."""
+    t = trail()
+    return t['base'] + t['own'] + t['step'] * (trail_level(c) if level is None else level)
+
+
+def slots_before(c):
+    """Забегов одновременно в начале цикла c, пока уровень артефакта этого цикла не куплен: как в прошлом цикле."""
+    return slots(c, max(0, trail_level(c) - 1))
+
+
+def trail_cost(c):
+    """Души за уровень артефакта активных биомов, что открывается в цикле c: база × номер уровня; 0 — нового уровня в цикле нет."""
+    L = trail_level(c)
+    return trail()['soul'] * L if L > trail_level(c - 1) else 0
+
+
+def souls_biome(c):
+    """Множитель душ забега в цикле c — номер первого биома цикла (ADR-0011): души × номер биома."""
+    return BIOMES_PER_CYCLE * (c - 1) + 1
+
+
+def start_souls():
+    """Души на входе в цикл II — итог обучения (start.json, skip.wallet); нет сценария — ноль."""
+    return ((START.get('skip') or {}).get('wallet') or {}).get('souls', 0)
 
 
 def cycle_days_of_pace():
@@ -467,8 +534,10 @@ def timeline_ex(rates, mult, hours, caps=True, exp=LEVEL_EXP, days=DAYS_MAX, cyc
                 full_cap=False, squads=None):
     """Дни с начала цикла II (ADR-0018): отряд входит на START_LEVEL, пределы START_LIMITS пробиты в обучении.
     Главный отряд A и вторые отряды B растут уровнями по мере дохода, весь дух сначала — A; первый забег одновременно ведёт A,
-    остальные — B. Забегов одновременно — номер цикла (slots), squads — сколько отрядов у игрока по дням (функция дня; по умолчанию
-    все слоты). caps: A не выше предела, пока нет рун; B — не выше EXTRA_CAP. cycle2: после CYCLE_DAYS — следующий цикл, враги
+    остальные — B. Забегов одновременно — по артефакту активных биомов (slots, ADR-0054): уровень своего цикла игрок покупает утром
+    первого дня, когда на него хватает душ (trail_cost; души — итог обучения и добыча забегов, × номер биома), до того забегов — как
+    в прошлом цикле; squads — сколько отрядов у игрока по дням (функция дня; по умолчанию все слоты). caps: A не выше предела, пока
+    нет рун; B — не выше EXTRA_CAP. cycle2: после CYCLE_DAYS — следующий цикл, враги
     сильнее по §3.3. Рунные стражи — из ключей (вариант Б, ADR-0031, п. 4): утром — ключи контрактов профиля prof и ключ с босса
     за вчерашние забеги (+ keys_add_x100 в день), побед — сколько хватит ключей, не выше капа; full_cap — полный кап, как без ключей.
     Руны пределов — по весам стража, излишки уже пройденных пределов — в перековку вверх; осколки доблести копятся с первого дня.
@@ -476,7 +545,8 @@ def timeline_ex(rates, mult, hours, caps=True, exp=LEVEL_EXP, days=DAYS_MAX, cyc
     Дар Страннику с 11-го уровня (§16) — в золото дня, когда взят уровень: опыт вех цикла II (gift_events) и рунных пределов.
     Возвращает словарь: reached — {уровень A: день}, gold — золото нарастающим итогом, lv — уровни (A, B) по дням, runes — день рун
     на пределы I–V, wins — побед у РБ по дням × 100, keys — ключей по дням × 100, limit5 — день пятого предела, shards — осколков
-    доблести нарастающим итогом × 100 по дням, gift — дар нарастающим итогом, wlv — уровень Странника по дням."""
+    доблести нарастающим итогом × 100 по дням, gift — дар нарастающим итогом, wlv — уровень Странника по дням, slots — забегов
+    одновременно по дням, trail — {цикл: день покупки уровня артефакта активных биомов}."""
     prof = prof or PROFILE_KEY[dict((h, p) for p, h in PROFILES)[hours]]
     R, n = rx(), len(LIMITS)
     per_win = [R['runes_per_win'] * 100 * w // BP for w in R['weights']]
@@ -484,8 +554,9 @@ def timeline_ex(rates, mult, hours, caps=True, exp=LEVEL_EXP, days=DAYS_MAX, cyc
     stock, nxt, runes = [0] * n, START_LIMITS, [0] * START_LIMITS
     a = b = START_LEVEL
     bank, gold, reached, shards, boss_prev = start_spirit, 0, {}, 0, 0
-    out = {'gold': [0], 'lv': [(a, b)], 'wins': [0], 'keys': [0], 'shards': [0], 'gift': [0]}
+    out = {'gold': [0], 'lv': [(a, b)], 'wins': [0], 'keys': [0], 'shards': [0], 'gift': [0], 'slots': [slots(FIRST_CYCLE - 1)]}
     limit5 = None
+    souls, tr_have, trail_days = start_souls(), FIRST_CYCLE - 1, {}   # души игрока; цикл, чей уровень артефакта активных биомов взят
     gev = gift_events(prof)                              # дар Страннику: опыт вех по дням, уровень и опыт на входе в цикл II
     wl, wxp, gift = (START['end']['lvl'], START['end']['xp'], 0) if gev is not None else (0, 0, 0)
     wthr = START['levels'][-1]['xp'] + sum(gift_need(k) for k in range(len(START['levels']), wl + 1)) if gev is not None else 0
@@ -514,14 +585,21 @@ def timeline_ex(rates, mult, hours, caps=True, exp=LEVEL_EXP, days=DAYS_MAX, cyc
             bank += wins * rates['guard'][1] * mult(c) // (BP * 100)
             gold += wins * rates['guard'][0] * mult(c) // (BP * 100)
         cap_a = LIMITS[min(nxt, n - 1)] if caps else LIMITS[-1]
-        n_sl = slots(c) if squads is None else min(slots(c), squads(day, c))
+        if tr_have < c and souls >= trail_cost(c):       # уровень артефакта активных биомов своего цикла — первым делом (ADR-0054)
+            souls -= trail_cost(c)
+            tr_have = c
+            trail_days[c] = day
+        sl_now = slots(c) if tr_have >= c else slots_before(c)
+        n_sl = sl_now if squads is None else min(sl_now, squads(day, c))
+        out['slots'].append(n_sl)
         boss = 0
         for _ in range(hours):
             for k in range(n_sl):
                 row = sim_row(eff_level(a if k == 0 else b, c))
-                g, s, _ = per_hour(row, rates, mult(c))
+                g, s, d = per_hour(row, rates, mult(c))
                 bank += s
                 gold += g
+                souls += d * souls_biome(c)
                 boss += row[4] * HOUR_MS * 100 // row[5]
             while a < cap_a and bank >= SQUAD * level_cost(a + 1, exp):
                 bank -= SQUAD * level_cost(a + 1, exp)
@@ -552,7 +630,7 @@ def timeline_ex(rates, mult, hours, caps=True, exp=LEVEL_EXP, days=DAYS_MAX, cyc
         out['shards'].append(shards)
         if limit5 is not None:
             break
-    out.update(reached=reached, runes=runes + [DAYS_MAX] * (n - len(runes)), limit5=limit5 or DAYS_MAX)
+    out.update(reached=reached, runes=runes + [DAYS_MAX] * (n - len(runes)), limit5=limit5 or DAYS_MAX, trail=trail_days)
     return out
 
 
@@ -876,10 +954,10 @@ def t13_gold():
         t = timeline(rates, mult_new, PROFILES[0][1], full=True)
         g, gift = t['gold'], t['gift'][min(CYCLE_DAYS, len(t['gift']) - 1)]   # дар Страннику с 11-го уровня — в золоте дня
         inc = g[CYCLE_DAYS] + acc
-        pack = hero_total(1, SQUAD)
-        bought, spent = heroes_buy(inc - ARTIFACTS_GOLD_C1 - pack, (1, 2), {1: SQUAD})
-        rest = inc - ARTIFACTS_GOLD_C1 - pack - spent
-        rows.append([name, fmt(g[CYCLE_DAYS] - gift), fmt(gift), fmt(acc), fmt(ARTIFACTS_GOLD_C1), f'{bought[1]} / {bought.get(2, 0)}',
+        pack, art1 = hero_total(1, SQUAD), artifacts_gold_c1()
+        bought, spent = heroes_buy(inc - art1 - pack, (1, 2), {1: SQUAD})
+        rest = inc - art1 - pack - spent
+        rows.append([name, fmt(g[CYCLE_DAYS] - gift), fmt(gift), fmt(acc), fmt(art1), f'{bought[1]} / {bought.get(2, 0)}',
                      fmt(pack + spent), fmt(rest), dec1((pack + spent) * 100, all12) + ' %'])
     return table(['Золото за врага', 'Биомы и страж, цикл II', 'Дар Страннику с 11-го уровня, цикл II', 'Обучение, уровни аккаунта', 'Артефакты цикла I',
                   f'Героев за золото: цикла I из {GOLD_HEROES[1]} / цикла II из {GOLD_HEROES[2]}', 'Потрачено на героев',

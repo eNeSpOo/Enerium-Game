@@ -98,7 +98,9 @@ function collect() {
   const W = load('wanderer').EN_WANDERER, memFrom = Math.min(...W.mem.places);
   for (const p of W.passives) for (const x of ['n', 'd']) add('wanderer', memFrom, false, `пассивка ${p.id} · ${x}`, p[x]);
   for (const a of W.art.list) for (const x of ['n', 'd', 'what']) add('wanderer', a.from, false, `артефакт ${a.id} · ${x}`, a[x]);
-  for (const a of W.ach.list) for (const x of ['n', 'd', 'hint']) add('wanderer', a.from || 1, false, `достижение ${a.id} · ${x}`, a[x]);
+  /* веха начала пути — с цикла I (таинственная — со своего цикла); достижение блока «Серии цикла N» игрок видит с цикла блока (a.c),
+     блок цикла «для команды» (a.team) игроку не рисуется */
+  for (const a of W.ach.list) for (const x of ['n', 'd', 'hint']) add('wanderer', a.c || a.from || 1, !!a.team, `достижение ${a.id} · ${x}`, a[x]);
   for (const a of W.ach.firsts) for (const x of ['n', 'd', 'title']) add('wanderer', a.c, false, `первенство ${a.id} · ${x}`, a[x]);
 
   /* --- враги Эхо --- */

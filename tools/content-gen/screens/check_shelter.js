@@ -181,7 +181,9 @@ function signs(h0) { return [...h0.matchAll(/<button class="sh-sign( hot)?" data
   if (S0.map(x => x.v).join() !== 'rituals,echo,contracts') say(`дела: вывески ${S0.map(x => x.v).join(', ')}, ждали ритуалы, Эхо, контракт`);
   const R = T.S.rituals.slots;
   if (R.some(s => s.st === 'ready')) { const r = S0[0]; if (!r || r.t !== TX.rit[0] || r.s !== TX.rit[2] || !r.hot) say(`дела · ритуал готов: «${r && r.t} / ${r && r.s}», свет ${r && r.hot}`); }
-  R.forEach(s => { if (s.st === 'ready') s.st = 'run'; });
+  /* «идёт» — ритуал, чей час ещё не вышел: досыпавшийся «сервер» ритуалов сам переводит в «готов» и засчитывает в загрузку недели
+     (ступени загрузки, ADR-0047) — поэтому вместе с состоянием двигаем и срок */
+  R.forEach(s => { if (s.st === 'ready') { s.st = 'run'; s.t1 = (T.S.rituals.now || 0) + (s.t1 - s.t0 > 0 ? s.t1 - s.t0 : 3600000); } });
   S0 = st('дела · ритуалы идут');
   { const r = S0[0], n = R.filter(s => s.st === 'run').length; if (!r || r.t !== TX.rit[1] || r.hot || r.s !== (n ? TX.rit[3](n) : TX.rit[4])) say(`дела · ритуалы идут: «${r && r.t} / ${r && r.s}»`); }
   const live = T.S.echo.slots.filter(Boolean), soon = Math.min(...live.map(s => s.left));

@@ -14,6 +14,11 @@
    Сервер решает, клиент показывает: пул — на сиде игрока, дня и номера ролла; старт, сбор, отмена, ролл и пробуждение — операции
    RT_SRV с номером: проверка, расход и итог одним вызовом, повтор того же номера ничего не повторяет. Время — целые миллисекунды
    часов «сервера» S.rituals.now; в игре их ведёт сервер, здесь — таймер прототипа раз в секунду.
+   Ступени загрузки (ADR-0047): мера — загрузка своих мест за неделю, целые проценты: часы завершённых ритуалов по карточкам /
+   часы мест недели (EnRitual.load, capMs — pool.js); счёт недели ведёт «сервер» — S.rituals.wk. Пороги ступеней и сундуки артели —
+   EN_LOOTBOXES.modes.ritual. На экране — полоса «Загрузка недели» под карточками и лист OV.rtload: ступени — общим помощником
+   EN_WEEK.ladderHtml (screens/week.js), без него — списком своей полосы. Неделе режим сообщает себя сам — WEEK_MODES, id ritual:
+   загрузка и ступени; взятые ступени платят «Дары» (bag.js).
    Служебное — только команде: TM, PL, tmT из index.html. Автопроверка — tools/content-gen/screens/check_rituals.js. */
 'use strict';
 
@@ -34,9 +39,15 @@ const RT_DEMO = {
   ],
   skip: [3600000, 3 * 3600000, 12 * 3600000],   // команда: перемотка времени
   give: { r: 2, n: 10 },                        // команда: шарды рабочих для пробуждения
+  /* ступени загрузки: идёт четвёртый день недели (тот же календарь демо); до сессии завершено ритуалов на doneH часов по карточкам —
+     темп обычного игрока цикла II: срединная неделя — 56 % мест (EN_RITUALS.ladder.load). С готовым ритуалом демо выходит 31 % трёх
+     мест: первая ступень взята, до второй — рукой подать */
+  week: { day: 4, doneH: 154 },
+  past: { fracBp: 6000 },                       // прошлая неделя: доля пути от взятой ступени к следующей — те же 56 %
 };
-/* вид: моменты анимации сбора, мс от её начала; сколько предметов показать в итоге, остальное — числом */
-const RT_VIEW = { flip: 520, first: 560, step: 140, end: 1400, items: 6, crystal: 18 };
+/* вид: моменты анимации сбора, мс от её начала; сколько предметов показать в итоге, остальное — числом; chest — сундук ступени в полосе
+   загрузки и в листе, px; order — место строки «Ритуалы» в реестре Недели, icon — её картинка пути */
+const RT_VIEW = { flip: 520, first: 560, step: 140, end: 1400, items: 6, crystal: 18, chest: 20, chestRow: 28, order: 70, icon: 33 };
 
 /* ================== помощники ================== */
 const RT = window.EN_RITUALS || null, RTE = window.EnRitual || null;
@@ -69,6 +80,43 @@ const rtShardKey = r => `wsh:w${r}:${r}`;
 const rtShards = r => (S.zp && S.zp.extra ? S.zp.extra[rtShardKey(r)] || 0 : 0);
 /* сколько: пул карточек и роллы дня */
 const rtCost = n => RT.rules.rolls.paid[n];
+
+/* ================== ступени загрузки (ADR-0047) ==================
+   Мера и её счёт — данные и алгоритм ритуалов (EN_RITUALS.rules.ladder, EnRitual.weekMs / capMs / load / stepOf). Пороги ступеней
+   и сундуки артели — режим лестницы в EN_LOOTBOXES.modes: строки своей полосы собирает EnLoot.ladder. В игре счёт ведёт сервер */
+const rtMode = () => (RT && RT.rules.ladder ? RT.rules.ladder.mode : '');
+const rtLadOn = () => !!(rtMode() && RTE && RTE.load && window.EN_LOOTBOXES && EN_LOOTBOXES.modes[rtMode()] && window.EnLoot && EnLoot.ladder);
+const rtRace = (s = S) => String((s.week && s.week.race) || '');
+/* ступени своей полосы: { k, band, i, at, pay } — порог at в процентах загрузки */
+const rtLadRows = (s = S) => (rtLadOn() ? EnLoot.ladder(EN_LOOTBOXES, rtMode(), s.acc.cycle).filter(x => x.at != null && !x.cap) : []);
+/* загрузка недели, целые проценты */
+const rtLoad = (s = S) => { const W = s.rituals && s.rituals.wk; return W ? RTE.load(W.done, W.cap) : 0; };
+/* взятая ступень остаётся взятой: место, открытое посреди недели, прибавляет часов мест — загрузка на миг ниже, ступень — нет */
+function rtLatch(s = S) { const W = s.rituals.wk; W.top = Math.max(W.top, RTE.stepOf(rtLadRows(s).map(x => x.at), rtLoad(s))); }
+/* новая неделя «сервера»: часы недели — weekH от t0 на часах ритуалов; места — сколько их сейчас; done — уже завершено, мс */
+function rtWeekNew(s, t0, done) {
+  const R = s.rituals;
+  R.wk = { no: R.wk ? R.wk.no + 1 : 1, race: rtRace(s), t0, t1: t0 + RTE.weekMs(RT), done: done || 0, cap: RTE.capMs(RT, rtSlotsN(s)), top: 0 };
+  rtLatch(s);
+}
+/* неделя расы сменилась — счёт с нуля, как у Событий и клана */
+function rtWeekSync() { const R = S.rituals; if (rtLadOn() && R.wk && R.wk.race !== rtRace()) rtWeekNew(S, R.now, 0); }
+/* ритуал досыпался: его время по карточке — в счёт недели, в которую он закончился; один раз */
+function rtCredit(x) {
+  const W = S.rituals.wk;
+  if (!W || x.wk || !(x.t1 >= W.t0 && x.t1 < W.t1)) return;
+  x.wk = W.no; W.done += x.nominal; rtLatch();
+}
+/* ступени игрока для экрана, Недели и «Даров»: { k, band, i, need, pay, reached, cap } — общим помощником Недели (EN_WEEK.steps), без
+   него — своя полоса. reached — по счёту «сервера»: взятая ступень */
+function rtSteps(s = S) {
+  if (!rtLadOn() || !s.rituals || !s.rituals.wk) return [];
+  const W = window.EN_WEEK, top = s.rituals.wk.top;
+  let rows = null;
+  if (s === S && W && typeof W.steps === 'function') { try { rows = W.steps(rtMode(), { have: rtLoad(s), cycle: s.acc.cycle }); } catch (_) { rows = null; } }
+  if (!Array.isArray(rows) || !rows.length) rows = rtLadRows(s).map(x => ({ k: x.k, band: x.band, i: x.i, need: x.at, pay: x.pay, cap: false }));
+  return rows.filter(x => x && Number.isInteger(x.need)).map(x => Object.assign({}, x, { reached: x.k <= top }));
+}
 
 /* занятость героя ритуалом — её спрашивает busyNote (index.html): «Ритуал · Долгая дорога» */
 function rtBusyNote(id) {
@@ -111,6 +159,12 @@ function rtState(s) {
     R.slots[k] = x;
   }
   s.inbox = letters.concat((s.inbox || []).filter(m => !m.rit));
+  /* счёт недели: неделя началась RT_DEMO.week.day − 1 суток назад, в полночь; завершённое до сессии и готовый ритуал демо — уже в счёте */
+  if (rtLadOn()) {
+    const ready = R.slots.filter(x => x.st === 'ready');
+    rtWeekNew(s, (R.day - (RT_DEMO.week.day - 1)) * RT_DAY, RT_DEMO.week.doneH * RT_HOUR + ready.reduce((a, x) => a + x.nominal, 0));
+    for (const x of ready) x.wk = R.wk.no;
+  }
   return s;
 }
 /* ритуал в слоте: исход решён при старте на сиде карточки — какие именно ресурсы, узнают при сборе */
@@ -125,11 +179,12 @@ const rtLetter = x => ({ id: 'rt-' + x.uid, k: 'away', t: `Ритуал «${x.n}
 const rtInitBase = initialState;
 initialState = function () { return rtState(rtInitBase()); };
 rtState(S);
-/* слотов больше — артефакт прокачан: новые слоты свободны; идущие не трогаем */
+/* слотов больше — артефакт прокачан: новые слоты свободны; идущие не трогаем. Новое место входит в часы мест недели с этого часа */
 function rtSync() {
   if (!S || !S.rituals || !RT) return;
-  const n = rtSlotsN();
-  while (S.rituals.slots.length < n) S.rituals.slots.push({ st: 'free' });
+  const R = S.rituals, n = rtSlotsN(), add = n - R.slots.length;
+  while (R.slots.length < n) R.slots.push({ st: 'free' });
+  if (add > 0 && R.wk && RTE.capMs) R.wk.cap += RTE.capMs(RT, 0, add, R.wk.t1 - R.now);
 }
 
 /* ================== «сервер» ==================
@@ -143,10 +198,12 @@ const RT_SRV = {
     if (!r.refuse) { O[op] = r; R.seq++; }
     return r;
   },
-  /* часы: готовые ритуалы; новый серверный день — новый пул и бесплатные роллы */
+  /* часы: готовые ритуалы — по порядку срока, каждый — в счёт своей недели (ступени загрузки); новый серверный день — новый пул
+     и бесплатные роллы; сменилась неделя расы — счёт недели с нуля */
   tick() {
     const R = S.rituals; let changed = false;
-    for (const x of R.slots) if (x.st === 'run' && R.now >= x.t1) { x.st = 'ready'; changed = true; }
+    rtWeekSync();
+    for (const x of R.slots.filter(y => y.st === 'run' && R.now >= y.t1).sort((a, b) => a.t1 - b.t1)) { x.st = 'ready'; rtCredit(x); changed = true; }
     while (R.now >= (R.day + 1) * RT_DAY) { RT_SRV.newDay(); changed = true; }
     return changed;
   },
@@ -352,7 +409,8 @@ function rtBarHtml(tab) {
 function rtTeam() {
   return TM(`<div class="row rt-team"><span class="eyebrow">Команда</span>${RT_DEMO.skip.map(ms => `<button class="btn sm" data-a="rtdemo" data-v="skip:${ms}">+${rtDur(ms)}</button>`).join('')}
     <button class="btn sm" data-a="rtdemo" data-v="day">новый день</button><button class="btn sm" data-a="rtdemo" data-v="shards">+${RT_DEMO.give.n} шардов · ${RAR[RT_DEMO.give.r].toLowerCase()}</button>
-    <span class="faint rt-tn">день ${S.rituals.day} · ${rtHm(S.rituals.now)} · слотов ${rtSlotsN()} · роллов ${rtFreeN()} + ${RT.rules.rolls.paid.length} · карточек ${rtCardsN()} · цикл ${ROMAN[S.acc.cycle]} · сид «${S.rituals.seed}»</span></div>`);
+    <span class="faint rt-tn">день ${S.rituals.day} · ${rtHm(S.rituals.now)} · слотов ${rtSlotsN()} · роллов ${rtFreeN()} + ${RT.rules.rolls.paid.length} · карточек ${rtCardsN()} · цикл ${ROMAN[S.acc.cycle]} · сид «${S.rituals.seed}»${
+      S.rituals.wk ? ` · неделя ${S.rituals.wk.no}: ${Math.floor(S.rituals.wk.done / RT_HOUR)} ч из ${Math.floor(S.rituals.wk.cap / RT_HOUR)} ч мест` : ''}</span></div>`);
 }
 
 SCREENS.rituals = function () {
@@ -368,10 +426,39 @@ SCREENS.rituals = function () {
     <div class="rt-slots">${R.slots.map((x, k) => rtSlotHtml(x, k)).join('')}${rtLockHtml()}</div>
     ${rtBarHtml(tab)}
     ${grid}
-    <p class="reason rt-line">${RT.text.law}</p>
+    ${rtLoadHtml()}
     ${rtTeam()}
   </section>` };
 };
+
+/* ---------- ступени загрузки: полоса под карточками и лист ---------- */
+/* сундуки ступени: колодец с сундуком старшей редкости; имя — в подсказке */
+const rtPayTop = pay => (pay || []).reduce((a, g) => Math.max(a, g.r), 0);
+const rtPayName = pay => (pay || []).map(g => `${g.count > 1 ? g.count + ' × ' : ''}${lbBoxName(EN_LOOTBOXES.modes[rtMode()].box, g.r, g.win)}`).join(', ');
+const rtChest = (pay, px) => (pay && pay.length ? `<span class="well itf rt-chest" data-r="${rtPayTop(pay)}" style="--s:${px}px" title="${trEsc(rtPayName(pay))}">${chestPic(EN_LOOTBOXES.modes[rtMode()].box, rtPayTop(pay))}</span>` : '');
+/* полоса недели от нуля до ста с засечками ступеней: взятые — светлые */
+const rtLoadBar = (st, load, cls = '') => `<span class="rt-ld-bar ${cls}" aria-hidden="true"><span class="rt-ld-fill" style="--v:${load}"></span>${st.map(x => `<i class="${x.reached ? 'on' : ''}" style="--v:${x.need}"></i>`).join('')}</span>`;
+/* полоса «Загрузка недели»: число, полоса со ступенями, сундук ближайшей ступени; одно действие — лист. Без лестницы — строка закона */
+function rtLoadHtml() {
+  const st = rtSteps();
+  if (!st.length) return `<p class="reason rt-line">${RT.text.law}</p>`;
+  const load = rtLoad(), nx = st.find(x => !x.reached), got = st.filter(x => x.reached).length;
+  const tail = nx ? `<span class="rt-ld-nx">${rtChest(nx.pay, RT_VIEW.chest)}<small class="num">${nx.need} %</small></span>` : `<span class="rt-ld-nx all">${ic('check')}<small>все ступени</small></span>`;
+  const label = `Загрузка недели: ${load} %, ступеней взято ${got} из ${st.length}${nx ? `, до следующей — ${nx.need - load} %` : ''}`;
+  return `<button class="rt-load" data-a="sheet" data-v="rtload" aria-label="${trEsc(label)}" title="Ступени загрузки">
+      <span class="eyebrow">Загрузка недели</span><b class="num rt-ld-n">${load} %</b>${rtLoadBar(st, load)}${tail}<span class="rt-ld-go" aria-hidden="true">${ic('chev')}</span></button>`;
+}
+/* лестница ступеней: общий помощник Недели (EN_WEEK.ladderHtml) рисует «дорогу» полос по готовым ступеням — прошлые циклы «пройдено»,
+   свой — строками, будущие — свёрнуты: пороги те же, сундуки богаче. Без помощника — ступени своей полосы списком */
+function rtLadderHtml(st, load) {
+  const W = window.EN_WEEK;
+  if (W && typeof W.ladderHtml === 'function') {
+    try { const h = W.ladderHtml(rtMode(), { steps: st, have: load, cycle: S.acc.cycle }); if (typeof h === 'string' && h) return `<div class="rt-lad" data-by="week">${h}</div>`; } catch (_) { }
+  }
+  const nx = st.find(x => !x.reached), inBag = k => typeof darGot === 'function' && darGot(rtMode(), k);
+  return `<div class="rt-lad" data-by="own"><span class="eyebrow">Ступени загрузки · взято ${st.filter(x => x.reached).length}</span>${st.map(x => `<div class="rt-st ${x.reached ? 'got' : x === nx ? 'next' : ''}" data-k="${x.k}"><b class="num">${x.need} %</b>${rtChest(x.pay, RT_VIEW.chestRow)}<span class="rt-st-n">${rtPayName(x.pay) || '—'}</span>${
+    x.reached ? `<span class="chip ${inBag(x.k) ? '' : 'spirit'}">${ic('check')}${inBag(x.k) ? 'в запасах' : 'взята'}</span>` : x === nx ? `<span class="faint num">ещё ${x.need - load} %</span>` : '<span></span>'}</div>`).join('')}</div>`;
+}
 
 /* ================== листы ================== */
 /* герои под ритуал: свободные; сначала те, кого нет в отрядах спуска и Эхо, затем слабейшие — главный отряд остаётся в деле */
@@ -412,6 +499,7 @@ Object.assign(OV, {
     const body = `<div class="rt-sh-top" data-r="${card.r}">${rtCrystal(card.r, 30)}<span class="col" style="gap:4px"><b class="serif rt-sh-n">${card.n}</b><span class="row" style="gap:6px">${rtChipTime(ms)}${card.biome ? `<span class="chip">${biomeName(card.biome)}</span>` : ''}</span></span></div>
       <p class="rt-lore">${card.unique ? RT.text.unique : RT.text[tab]}</p>
       <span class="eyebrow">Награда · наверняка</span>${rtRewRows(card, S.acc.cycle)}
+      <p class="reason">${RT.text.law}</p>
       ${who}
       ${TM(`Карточка ${card.id}: ${RAR[card.r].toLowerCase()}, ${rtDur(card.ms)} по сетке, бригада ${card.crew}${card.paid ? ', из платного ролла' : ''}. Награда за единицу времени × ${tab === 'hero' ? 'цикл ' + ROMAN[S.acc.cycle] : 'длительность'} — EN_RITUALS.tabs; исход — EnRitual.resolve на сиде карточки при старте. §19, docs/content/ритуалы.md.`, 'p', 'reason')}`;
     return sheet('Ритуал', body, `${why ? `<span class="reason warn rt-why">${why}</span>` : '<span class="g-spacer"></span>'}<button class="btn go" data-a="rtstart" data-v="${op}:${tab}:${si}" ${ok ? '' : 'disabled'}>Начать · ${rtDur(ms)}</button>`);
@@ -466,6 +554,22 @@ Object.assign(OV, {
     const n = items.reduce((a, [, q]) => a + q, 0);
     const body = `${scene}<p class="muted rt-sum">${x.kind === 'hero' ? 'Валюта — в кошельке.' : x.unique ? 'Уникальный ресурс — в запасах.' : `Ресурсы ×${fmt(n)} — в запасах.`} Завершено ритуалов: ${fmt(R.done)}.</p>`;
     return dialog(`«${x.n}»`, body, `${n ? '<button class="btn" data-a="go" data-v="craft:stock">В запасы</button>' : ''}<button class="btn go" data-a="close">Хорошо</button>`, 'rt-dlg');
+  },
+  /* ступени загрузки: загрузка недели числом и полосой, часы завершённых ритуалов из часов мест, лестница ступеней с сундуками артели;
+     одно действие — «Дары»: сундуки взятых ступеней забирают там */
+  rtload() {
+    if (!S.rituals || !rtOpen()) return '';
+    rtSync(); RT_SRV.tick();
+    const W = S.rituals.wk, st = rtSteps(); if (!W || !st.length) return sheet('Загрузка недели', '<p class="faint">Ступеней загрузки нет.</p>');
+    const load = rtLoad(), got = st.filter(x => x.reached).length, hrs = ms => fmt(Math.floor(ms / RT_HOUR));
+    const body = `<div class="row rt-ld-top"><div class="stat"><b class="num">${load} %</b><small>загрузка мест</small></div>
+        <div class="stat"><b class="num">${hrs(W.done)} ч</b><small>ритуалов из ${hrs(W.cap)} ч мест</small></div>
+        <div class="stat ${got ? 'win' : ''}"><b class="num">${got}</b><small>${plural(got, 'ступень', 'ступени', 'ступеней')} из ${st.length}</small></div></div>
+      ${rtLoadBar(st, load, 'lg')}
+      ${rtLadderHtml(st, load)}
+      <p class="reason">В счёт идут завершённые ритуалы — по времени на карточке. Обновление карточек часов не прибавляет. Сундуки взятых ступеней ждут в «Дарах».</p>
+      ${TM(`Мера — EnRitual.load: ${fmt(W.done)} мс завершённых ритуалов / ${fmt(W.cap)} мс мест, неделя ${W.no} — ${RT.rules.ladder.weekH} ч от ${rtHm(W.t0)} дня ${Math.floor(W.t0 / RT_DAY)} на часах ритуалов; новая — со сменой недели расы. Место, открытое посреди недели, считается с часа, когда открылось; взятая ступень остаётся взятой (wk.top). Пороги и сундуки — EN_LOOTBOXES.modes.${rtMode()}; прогон калькулятора, цикл ${ROMAN[S.acc.cycle]}: ${RT.ladder && RT.ladder.load[S.acc.cycle] ? `обычный — ${RT.ladder.load[S.acc.cycle].o} %, увлечённый — ${RT.ladder.load[S.acc.cycle].e} %, без простоя — ${RT.ladder.load[S.acc.cycle].n} %` : 'нет данных'}.`, 'p', 'reason')}`;
+    return sheet('Загрузка недели', body, `<span class="g-spacer"></span><button class="btn go" data-a="sheet" data-v="gifts:me">Дары ${ic('chev')}</button>`);
   },
 });
 /* песочные часы сбора: рамка, две колбы, песок светится цветом редкости */
@@ -541,6 +645,30 @@ Object.assign(ACT, {
   },
 });
 
+/* ================== Неделя: итоги режима (WEEK_MODES, screens/week.js) ==================
+   Строка «Ритуалы»: очки — загрузка недели в процентах, планки — ступени загрузки с сундуками артели; мест нет — время мест у всех одно.
+   Взятые ступени этой недели «Дары» дают получить (bag.js, darNow). Прошлая неделя — та, за которую платят «Дары»: взятые ступени
+   и загрузка между порогом взятой и следующей */
+if (RT && RT.rules.ladder) (window.WEEK_MODES = window.WEEK_MODES || []).push({
+  id: RT.rules.ladder.mode, n: 'Ритуалы', icon: RT_VIEW.icon, go: 'rituals', order: RT_VIEW.order, unit: '%',
+  now() {
+    if (!RTE || !S.rituals || !rtLadOn()) return { lock: 'нет данных' };
+    if (!rtOpen()) return { lock: `откроются на ${RT.rules.open.level}-м уровне` };
+    rtSync(); RT_SRV.tick();
+    const R = S.rituals.slots, ready = R.filter(x => x.st === 'ready').length, run = R.filter(x => x.st === 'run').length;
+    return { place: null, points: rtLoad(), planks: rtSteps(), alert: ready ? `Готово ритуалов: ${ready}` : '',
+      note: `Загрузка мест за неделю: завершённые ритуалы — по времени на карточке. Сейчас идёт: ${run}, готово: ${ready}` };
+  },
+  past() {
+    if (!RTE || !S.rituals || !rtLadOn()) return { lock: 'нет данных' };
+    if (!rtOpen()) return { lock: `откроются на ${RT.rules.open.level}-м уровне` };
+    const ats = rtLadRows().map(x => x.at), rows = typeof darRows === 'function' && S.zp ? darRows(S, 'prev').filter(p => p.id === rtMode()) : [];
+    const k = Math.min(ats.length, rows.filter(p => p.kind === 'plank').length), lo = k ? ats[k - 1] : 0, hi = k < ats.length ? ats[k] : lo;
+    return { place: null, points: lo + Math.floor((hi - lo) * RT_DEMO.past.fracBp / RT.rules.bp),
+      rewards: rows.map(p => ({ label: p.label, box: p.box, groups: p.groups.map(g => ({ r: g.r, count: g.count, win: g.win })), st: p.st, cat: p.cat, kind: p.kind })) };
+  },
+});
+
 /* ================== раздел UI-кита ================== */
 function rtKitHtml() {
   if (!RT || !RTE || !S.rituals) return '';
@@ -554,6 +682,10 @@ function rtKitHtml() {
   const ladder = [1, 2, 3, 4, 5, 6, 7].map(r => `<figure>${ICON('r' + r, 30, RAR[r])}<figcaption>${RAR[r]}<br><b class="num">${rtDur(TW.ms[r - 1])}</b> · <b class="num">${rtDur(TH.ms[r - 1])}</b></figcaption></figure>`).join('');
   const speed = [1, 3, 5, 7].map(r => `<span class="rt-kit-sp">${rtWorker(r, 30)}<b class="num">−${R.speed.perRBp * r / 100} %</b><small>${RTE.awaken(RT, r)} душ</small></span>`).join('');
   const sim = RT.sim && RT.sim[c], sh = (p, k) => sim && sim[p] ? `${sim[p].shareBp[k] / 100} %` : '—';
+  /* ступени загрузки: полоса экрана и прогон калькулятора — срединная неделя профилей по циклам */
+  const LD = RT.ladder, ldRow = cc => `<tr><td>${ROMAN[cc]}</td>${['o', 'e', 'z', 'p', 'n'].map(p => `<td class="n">${LD.load[cc][p]} % · ${LD.step[cc][p]}</td>`).join('')}<td class="n">${LD.withBoxBp[cc] / 100} %</td></tr>`;
+  const ladKit = rtSteps().length ? `<div class="k-air-r"><b>Ступени загрузки</b>${noop(rtLoadHtml())}<small>Полоса под карточками: загрузка недели числом, полоса со ступенями, сундук ближайшей ступени. Лист — ступени с сундуками артели; сундуки взятых — в «Дарах». Ступень платит один раз за неделю.</small>
+      ${TM(LD ? `<table class="rk-tab"><tr><th>Цикл</th><th>Обычный</th><th>Увлечённый</th><th>Занятый</th><th>Плательщик</th><th>Без простоя</th><th>С сундуками, золото забегов</th></tr>${Object.keys(LD.load).map(ldRow).join('')}</table><p class="k-note">Прогон калькулятора: загрузка срединной недели и сколько ступеней она берёт. Мера — EN_RITUALS.rules.ladder, счёт — EnRitual.load; пороги и сундуки — EN_LOOTBOXES.modes.${rtMode()}.</p>` : '', 'div')}</div>` : '';
   return `<section class="k-box rt-kit" style="grid-column:1/-1" id="kitRituals"><h3>Ритуалы и рабочие</h3>
     <p class="k-note">Офлайн-доход: поставил — забрал. Слоты общие на две вкладки, карточка — лот дневного пула. Редкость ритуала — длительность: рабочие ${rtDur(TW.ms[0])}–${rtDur(TW.ms[6])}, герои вдвое дольше. Провала нет, награда решена при старте. Души — только у героев.${TM(' §19; данные — design/ui/rituals.js, калькулятор — tools/content-gen/rituals/build.js, черновик — docs/content/ритуалы.md, экран — screens/rituals.js.')}</p>
     <div class="rt-kg">
@@ -565,6 +697,7 @@ function rtKitHtml() {
       <div class="k-air-r"><b>Рабочие ускоряют</b><div class="row" style="gap:12px;flex-wrap:wrap">${speed}</div><small>−${R.speed.perRBp / 100} % × редкость за участника, не больше −${R.speed.capBp / 100} %. Пробуждение — души, заметно дешевле героя.</small></div>
       <div class="k-air-r"><b>Сбор</b><div class="rt-kit-fx">${RT_GLASS}</div><small>Часы переворачиваются, награда поднимается по одной, потом — сводка. Итог выдан до анимации; нажатие — сразу итог.</small></div>
     </div>
+    ${ladKit}
     ${TM(`<p class="k-note">Прогон калькулятора, цикл ${ROMAN[c]}: ритуалы обычного — ${sh('o', 'gold')} золота, ${sh('o', 'souls')} душ и ${sh('o', 'basics')} базовых его забегов в день; увлечённого — ${sh('e', 'souls')} душ. Плательщик роллами за Энериум почти не выигрывает: выбор, а не время. Сетка: рабочие ${TW.ms.map(rtDur).join(' / ')}; бригада ${TW.crew.lo.map((x, i) => x === TW.crew.hi[i] ? x : x + '–' + TW.crew.hi[i]).join(' / ')}; герои за ${TH.curH || 1} ч — ${TH.cur.map(([k, n]) => CUR[k].n.toLowerCase() + ' ' + n).join(', ')} × цикл; рабочие — ${TW.basics} базовых за полчаса, ключ — с эпической за каждые 2 ч.</p>`)}
   </section>`;
 }
@@ -595,5 +728,8 @@ FLOWS.push(
   }],
   ['Рабочие · артель', 'Рабочие по редкостям, шарды и пробуждение душами', () => {
     S.route = 'rituals'; S.seg.rituals = 'work'; S.overlay = { t: 'rtart' };
+  }],
+  ['Ритуалы · ступени загрузки', 'Загрузка мест за неделю, ступени и сундуки артели; сундуки взятых ступеней — в «Дарах»', () => {
+    S.route = 'rituals'; S.seg.rituals = 'work'; S.overlay = { t: 'rtload' };
   }],
 );

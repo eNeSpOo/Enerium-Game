@@ -5,7 +5,7 @@ const fs = require('fs');
 const C = require('./common');
 /* иммунитет к контролю — по рангу типа призванного врага: таблица ядра RULES.resist (ADR-0010, ADR-0039), своих чисел нет */
 const EB = (() => { require('../../../design/ui/battle.js'); return globalThis.EnBattle; })();
-const G_NAME = { e: 'элита', b: 'босс', u: 'Убер', f: 'Забытый' };
+const G_NAME = { e: 'элита', b: 'босс', u: 'Убер', a: 'Пробуждённый' };
 const immBp = g => EB.RULES.resist[EB.RULES.echo.kind[g]] || 0;
 const fmt = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 const pct = bp => (bp % 100 ? (bp / 100).toFixed(2).replace(/0$/, '').replace('.', ',') : String(bp / 100)) + ' %';   // 1350 → 13,5 %
@@ -57,7 +57,7 @@ module.exports = function tables({ items, recipes, byId, CYC, ROMAN, places, mem
     recraft: TF.recraft, lure: TF.lure || 0, hero: TF.hero, rune: TF.rune, vshard: TF.vshard, valor: TF.valor, product: TF.product,
     places: places.length, ruins: places.filter(p => p.kind === 'ruin').length, cities: places.filter(p => p.kind === 'city').length,
     placesByCycle: CYC.map(cy => places.filter(p => p.cyc === cy.n).length).join(' / '), memories: memories.length,
-    placesCum: CYC.map(cy => places.filter(p => p.cyc <= cy.n).length).join(' → '), activeCap: C.CRAFT.activeCap.join(' / '),
+    placesCum: CYC.map(cy => places.filter(p => p.cyc <= cy.n).length).join(' → '),
     heroes: heroRecs.length, heroesByCycle: S.map(s => s.kinds.hero).join(' / '),
     sheets: sheets.length, sheets24: s24, sheets16: s16,
     keysPct: keysRange, basicsPct: basicsRange,
@@ -210,7 +210,7 @@ module.exports = function tables({ items, recipes, byId, CYC, ROMAN, places, mem
   L.push('| С цикла | Пробуждённый | Призыв — из чего | Трофей | Трофей идёт в |', '|---|---|---|---|---|');
   for (const p of places) { const a = p.boss.awake; if (!a) continue; const r = OUT[a.call][0];
     L.push(`| ${ROMAN[a.cyc]} | ${a.label} | ${ing(r.in)} | ${nm(p.boss.awTrophy)} | ${usedIn(p.boss.awTrophy, a.cyc)} |`); }
-  L.push('', `Тип — Забытый, высшая ступень врага (ADR-0039); сила — на ${AW.powerCycleStep} цикл выше; трофеев ${AW.trophies}, ключей ремесла ${AW.specKeys}, валюта ×${AW.currencyMul}, рунный ключ ${pct(AW.runeKeyBp)}, сундук на ${AW.chestStep} ступень выше.`);
+  L.push('', `Тип — Пробуждённый, шестая ступень врага (ADR-0039, ADR-0054); сила — на ${AW.powerCycleStep} цикл выше; трофеев ${AW.trophies}, ключей ремесла ${AW.specKeys}, валюта ×${AW.currencyMul}, рунный ключ ${pct(AW.runeKeyBp)}, сундук на ${AW.chestStep} ступень выше.`);
 
   /* ——— ключи, пул, уникальные ——— */
   block('keys');

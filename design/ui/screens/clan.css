@@ -91,6 +91,20 @@
 .cl-mine{display:flex;align-items:center;gap:var(--sp-l);padding:4px 10px;border-radius:10px;border:1px solid var(--iron);background:#0e1114;color:var(--parch)}
 .cl-mine:hover{border-color:var(--gold-3)}
 .cl-mine .stat b{font-size:18px}
+/* ступени недели (ADR-0047): в кнопке итога — сундук ближайшей личной ступени после «ваших очков» и клановой — после кругов; сундук
+   стоит вплотную к своему числу, пары разделяет обычный зазор кнопки */
+.cl-mine .cl-chest{margin-left:calc(var(--sp-l) * -1 + 6px)}
+.cl-chest{flex:none}
+/* лист «Ступени недели»: два ряда ступеней строками — порог, сундук, имя сундуков, состояние */
+.cl-lad{display:flex;flex-direction:column;gap:6px}
+.cl-st{display:grid;grid-template-columns:76px 30px minmax(0,1fr) auto;align-items:center;gap:var(--sp-s);padding:6px 10px;border-radius:10px;background:#0e1114;box-shadow:inset 0 0 0 1px var(--iron)}
+.cl-st>b{font:600 17px/1 var(--f-d);color:var(--parch-2);white-space:nowrap}
+.cl-st-n{min-width:0;font-size:13.5px;color:var(--parch-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cl-st.got{box-shadow:inset 0 0 0 1px rgba(72,229,212,.35)}
+.cl-st.got>b{color:var(--spirit)}
+.cl-st.next{box-shadow:inset 0 0 0 1px var(--gold-3)}
+.cl-st.next>b,.cl-st.next .cl-st-n{color:var(--parch)}
+.cl-kit-lad{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--sp-m)}
 /* Хозяин недели внизу вкладки «Босс»: маленький портрет, имя и стихия, победы над Голосами до него */
 .cl-next{display:flex;align-items:center;gap:var(--sp-s);padding:4px 10px 4px 5px;border-radius:10px;border:1px solid var(--gold-3);background:radial-gradient(120% 90% at 30% 120%,rgba(221,188,122,.1),transparent 60%),#0e1114;color:var(--parch);min-width:0}
 .cl-next:hover{border-color:var(--gold-2)}

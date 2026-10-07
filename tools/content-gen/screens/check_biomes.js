@@ -56,6 +56,7 @@ const S0 = require(path.join(ROOT, 'tools', 'content-gen', 'biomes', 'sim.js'));
 const EB = S0.EB, X = S0.X, L = EB.lib(), RX = (() => { const c = { window: {} }; c.window = c; vm.createContext(c); vm.runInContext(read('recipes.js'), c); return c.EN_RECIPES; })();
 const BIO = ['b2', 'b3', 'b4'];
 const RANKS = { o: [1, 0], e: [2, 0], b: [3, 1], rune: [4, 1] };
+const FOE_SET = 'Черты врагов';   // набор библиотеки с чертами именных врагов (ADR-0051)
 try {
   /* 1–3. регистрация, состав, колоды */
   for (const id of BIO) {
@@ -70,8 +71,13 @@ try {
       if (!EB.RULES.cls[F.cls]) fail(`${f}: класс «${F.cls}» не знаком ядру`);
       if (F.st.length !== 5 || F.st.some(v => !Number.isInteger(v) || v <= 0) || !Number.isInteger(F.hpPct)) fail(`${f}: характеристики ${F.st} / ${F.hpPct}`);
       const [n, u] = RANKS[F.rank] || [];
-      if (!k || k.kit.length !== n || k.kit.filter(x => x.slot === 'ult').length !== u) fail(`${f}: набор не по рангу «${F.rank}» (ADR-0016)`);
-      for (const x of (k ? k.kit : [])) {
+      /* черта именного врага (ADR-0051): элите, боссу и стражу — одна запись набора «Черты врагов», сверх числа способностей по рангу;
+         рядовому черта не положена. Школа стихии — закон способностей, черты он не касается */
+      const own = k ? k.kit.filter(x => !x.trait) : [], tr = k ? k.kit.filter(x => x.trait) : [];
+      if (!k || own.length !== n || own.filter(x => x.slot === 'ult').length !== u) fail(`${f}: набор не по рангу «${F.rank}» (ADR-0016)`);
+      if (tr.length !== (F.rank === 'o' ? 0 : 1)) fail(`${f}: черт ${tr.length} — ${F.rank === 'o' ? 'рядовые остаются простыми' : 'именному врагу положена одна'} (ADR-0051)`);
+      for (const x of tr) { const a = L[x.id]; if (!a || a.school !== FOE_SET || (x.slot !== 'pas' && x.slot !== 'react')) fail(`${f}: черта «${x.id}» не из набора «${FOE_SET}»`); }
+      for (const x of own) {
         const a = L[x.id];
         if (!a) { fail(`${f}: ядро не знает «${x.id}»`); continue; }
         if (!x.id.startsWith('Спуск.' + id) && a.school !== F.el) fail(`${f}: «${x.id}» — не школа стихии врага ${F.el}`);

@@ -2,7 +2,7 @@
    Черновик · предложение · ждёт автора. Все числа — демонстрация. Только целые числа.
 
    Данные — по неделям, файлы weeks/*.js: наборы 14 врагов лестницы, защитники каждой ступени (у Многоликого — ни одного), уникальные способности
-   Убер-босса и наборы пятерых героев Эхо недели; Многоликий — вершина недели и один из Забытых (ADR-0039): его уникальный набор
+   Убер-босса и наборы пятерых героев Эхо недели; Многоликий — вершина недели, по типу — Пробуждённый (ADR-0039, ADR-0054): его уникальный набор
    один на все недели — many.js. Здесь — сборка, проверки и вывод:
    - design/ui/echo-foes.js — данные для ядра боя и прототипа, руками не править. Формат — в шапке файла (FORMAT ниже);
    - docs/content/эхо-враги.md — текст doc.md, таблицы вместо @@имя@@.
@@ -14,7 +14,8 @@
      набор героя — по законам ADR-0050: первые две записи — пара доблести 0 (активка и черта), дальше — по одной на доблесть,
      последняя — ульта; способностей — максимум + 2; у героя с максимумом 4–5 — сочетание. Неповторимость во всей игре, связку
      черты и потолок «одна черта — трём героям цикла» проверяет tools/content-gen/abilities/assign.py --check;
-   - design/ui/roster.js — порядок недель, цивилизации, отряды, число неприязни (rules.aversionBp);
+   - design/ui/roster.js — порядок недель, цивилизации, отряды;
+   - design/ui/battle.js — правило неприязни героя Эхо по циклу героя (RULES.aversion.byCycleBp, ADR-0054);
    - design/ui/recipes.js — облик Многоликого (предмет many).
    Любая ошибка — файлы не пишутся. Пересборка даёт те же байты.
    Запуск: node tools/content-gen/echo/build.js */
@@ -39,13 +40,13 @@ const FILES = {
 /* ================================ ПРАВИЛА ================================ */
 
 /* Ступень лестницы → ранг ядра (RULES.resist и доли хода в battle.js).
-   Многоликий — один из Забытых, вершина лестницы (слово автора 01.10.2026, ADR-0039): ранг «Забытый», свой уникальный набор (many.js).
+   Многоликий — вершина лестницы недели, по типу — Пробуждённый (слова автора 01.10 и 06.10.2026, ADR-0039, ADR-0054): ранг «Пробуждённый», свой уникальный набор (many.js).
    Бьётся один, без свиты (ответ автора 01.10.2026: «Сделай чтобы многоликий был без свиты, и тогда его сразу же смогут убивать»):
-   лица недели — в его венце. Прежний «лёгкий бой один на один с набором элиты» (ADR-0025) не вернулся: набор — свой, ранг — Забытый. */
-const RANK_OF = { o: 'o', e: 'e', b: 'b', u: 'uber', m: 'forgotten' };
-const RANK_KITS = { o: 'рядовой', e: 'элита', b: 'босс биома', uber: 'убер', forgotten: 'забытый' };   // ключи rankAbilities в kits.json
-const RANK_ORDER = ['o', 'e', 'b', 'uber', 'forgotten'];                                           // «сила защитников не выше главного» — по рангу
-const RANK_NAME = { o: 'рядовой', e: 'элита', b: 'босс недели', uber: 'убер', forgotten: 'Забытый' };
+   лица недели — в его венце. Прежний «лёгкий бой один на один с набором элиты» (ADR-0025) не вернулся: набор — свой, ранг — Пробуждённый. */
+const RANK_OF = { o: 'o', e: 'e', b: 'b', u: 'uber', m: 'awakened' };
+const RANK_KITS = { o: 'рядовой', e: 'элита', b: 'босс биома', uber: 'убер', awakened: 'пробуждённый' };   // ключи rankAbilities в kits.json
+const RANK_ORDER = ['o', 'e', 'b', 'uber', 'awakened'];                                            // «сила защитников не выше главного» — по рангу
+const RANK_NAME = { o: 'рядовой', e: 'элита', b: 'босс недели', uber: 'убер', awakened: 'Пробуждённый' };
 const G_NAME = { o: 'рядовой', e: 'элита', b: 'босс', u: 'Убер-босс', m: 'Многоликий' };
 const UBER_ULTS = [1, 2];         // ADR-0025: «варианты и с 2 ультами» — у Убер-босса одна или две ульты в пяти способностях
 const DEFENDERS = 4;              // ADR-0025, п. 1: главный враг и четыре защитника; у Многоликого — ни одного (ADR-0039, ответ автора)
@@ -61,6 +62,14 @@ const DEF_MIX = [
   [15, 15, {}],               // Многоликий — вершина и бьётся один, без свиты (ADR-0039, ответ автора 01.10.2026)
 ];
 const TGT = ['threat', 'danger', 'lowest', 'healer', 'ally_lowest', 'ally_strong', 'all', 'allies', 'self'];
+/* Черта именного врага Эхо (ADR-0051) — запись набора «Черты врагов» библиотеки по имени: ответ на связки героев. Элите, боссу недели
+   и Убер-боссу — по классу карты; неделя может дать ступени свою — поле trait её записи в weeks/*.js. У Многоликого — своя, many.js.
+   Рядовым черта не положена: они остаются простыми. В число способностей по рангу (ADR-0016) черта не входит */
+const TRAIT_BY = {
+  e: { 'Физ. ДД силы': 'Ответный выпад', 'Физ. ДД ловкости': 'Срыв покрова', 'Танк': 'Каменный лоб', 'Маг. ДД': 'Мимо бури', 'Лекарь': 'Глухая оборона', 'Дебаффер': 'Стряхнуть порчу' },
+  b: { 'Физ. ДД силы': 'Ярость скованного', 'Физ. ДД ловкости': 'Ненасытность', 'Танк': 'Дублёная шкура', 'Маг. ДД': 'Сбить пламя', 'Лекарь': 'Глухая оборона', 'Дебаффер': 'Зеркало воли' },
+  u: { 'Физ. ДД силы': 'Ярость скованного', 'Физ. ДД ловкости': 'Срыв покрова', 'Танк': 'Каменный лоб', 'Маг. ДД': 'Сбить пламя', 'Лекарь': 'Стряхнуть порчу', 'Дебаффер': 'Зеркало воли' },
+};
 
 /* Что ядру нужно добавить для уникальных способностей Уберов. Поля и значения здесь — единственное, что разрешено сверх библиотеки:
    поле уникальной способности, которого нет ни в библиотеке, ни в этом списке, — ошибка сборки. */
@@ -148,6 +157,10 @@ for (const x of LIB.farm.ult) BY[x.id] = Object.assign({ slot: 'ult' }, x);
 /* сочетания (ADR-0050): способность из двух; set — школа первой части, two — сочетание двух стихий (героям Эхо открыто) */
 for (const x of (LIB.combos || {}).active || []) BY[x.id] = Object.assign({ slot: 'act' }, x);
 for (const x of (LIB.combos || {}).ult || []) BY[x.id] = Object.assign({ slot: 'ult' }, x);
+/* черты врагов (ADR-0051): набор «Черты врагов» — по имени */
+const FOE_TRAIT = {};
+for (const [part, slot] of [['passive', 'pas'], ['reaction', 'react']]) for (const x of (LIB.foeTraits || {})[part] || []) FOE_TRAIT[x.n] = Object.assign({ slot }, x);
+if (!Object.keys(FOE_TRAIT).length) throw new Error('library.json: нет набора «Черты врагов» (foeTraits) — пересоберите библиотеку');
 const SCHOOLS = Object.keys(LIB.sets);
 const NO_SCHOOL = 'Без школы';
 const HERO_LAW = { comboFrom: 4, ult2From: 4 };   // ADR-0050: с какого максимума сочетание обязательно и с какого бывает вторая ульта — как в assign.py
@@ -178,8 +191,16 @@ const TOP = STEPS.length, MANY = TOP + 1;
 const MANY_ITEM = (RX.items || []).find(x => x.id === 'many');
 if (!MANY_ITEM) throw new Error('recipes.js: нет предмета many — Многоликого');
 const MANY_SET = require(FILES.many);   // уникальный набор Многоликого — один на все недели (ADR-0039)
-const AVERSION_BP = RS.rules && RS.rules.aversionBp;
-if (!Number.isInteger(AVERSION_BP)) throw new Error('roster.js: нет rules.aversionBp — числа неприязни');
+/* неприязнь героя Эхо — по циклу героя, правило ядра (слово автора 06.10.2026, ADR-0054): своих чисел у сборщика нет */
+require(path.join(ROOT, 'design/ui/battle.js'));
+const EB = globalThis.EnBattle;
+const AVERSION = EB.RULES.aversion && EB.RULES.aversion.byCycleBp;
+if (!AVERSION || !Object.values(AVERSION).every(Number.isInteger)) throw new Error('battle.js: нет RULES.aversion.byCycleBp — правила неприязни по циклу героя');
+const CYCLE_NO = { I: 1, II: 2, III: 3, IV: 4, V: 5, VI: 6 };
+const aversionOf = (cyc, where) => { const bp = EB.aversionBp(CYCLE_NO[cyc]); if (!bp) fail(`${where}: у героя Эхо цикла «${cyc}» нет неприязни в правилах ядра`); return bp; };
+const aversionSpan = () => { const v = Object.values(AVERSION).map(x => x / 100); return `от +${Math.min(...v)} до +${Math.max(...v)} % урона по циклу героя`; };
+/* раса карты Многоликого: по расе он Забытый в любую неделю (слово автора 06.10.2026, ADR-0054: «Многоликий это - Забытый») */
+const MANY_RACE = 'Забытые';
 const BASIC_ALL_COEF = LIB.rules.tiersTpl.dmg.all.coef;   // удар по всем — как ступень «на всех» урона библиотеки
 const DEF_CH = { ult: LIB.rules.ultCh, ctrl: LIB.rules.ctrlCh, other: LIB.rules.ch };
 const shareOf = r => KITS.rules.rarityShares[r];
@@ -298,6 +319,14 @@ for (const race of ORDER) {
     const wantU = f.g === 'u' ? UBER_ULTS : f.g === 'm' ? [MANY_SET.ults] : [R.ults];
     if (!wantU.includes(nU)) fail(`${where}: ульт ${nU}, а положено ${wantU.join(' или ')} (ADR-0016${f.g === 'u' ? ', ADR-0025' : f.g === 'm' ? ', ADR-0039' : ''})`);
     if (kit.length && kit[0].slot !== 'act') fail(`${where}: первая способность — активная`);
+    /* черта (ADR-0051): именному врагу — одна, сверх числа способностей по рангу; рядовому — нет */
+    const traitName = f.g === 'm' ? MANY_SET.trait : f.g === 'o' ? null : f.F.trait || (TRAIT_BY[f.g] || {})[f.cls];
+    if (f.g === 'o' && f.F.trait) fail(`${where}: у рядового черты нет — рядовые остаются простыми (ADR-0051)`);
+    if (f.g !== 'o') {
+      const t = FOE_TRAIT[traitName];
+      if (!t) fail(`${where}: нет черты для ${G_NAME[f.g]} класса «${f.cls}»${traitName ? ` — «${traitName}» не из набора «Черты врагов»` : ''} (ADR-0051)`);
+      else { const it = { v: 0, slot: t.slot, id: t.id, trait: true }; if (t.slot === 'react') { const c = chR(t.ch, f.R.actPct); if (c) it.chR = c; } it.n = t.n; f.trait = it; }
+    }
     if (new Set(kit.map(x => x.id)).size !== kit.length) fail(`${where}: способность повторяется`);
     if ((f.g === 'u' || f.g === 'm') && !kit.every(x => UNIQ[x.id])) fail(`${where}: у ${f.g === 'u' ? 'Убер-босса' : 'Многоликого'} весь набор — уникальный (${f.g === 'u' ? 'ADR-0025, п. 7' : 'ADR-0039'})`);
     if (f.g === 'u' && (!W.memo || !W.hook)) fail(`${where}: нет абзаца «чем запоминается» или строки hook`);
@@ -328,8 +357,8 @@ for (const race of ORDER) {
     }
     if (!f.F.idea) fail(`${where}: нет замысла состава`);
     f.kit = kit; f.basic = basic;
-    f.out = Object.assign({ race, step: f.step, g: f.g, rank: f.rank, name: f.name, cls: f.cls, el: f.el, look: f.look },
-      f.was ? { was: f.was } : {}, { ultPct: R.ultPct, actPct: R.actPct, kit: kit.map(({ n, ...x }) => x) },
+    f.out = Object.assign({ race: f.g === 'm' ? MANY_RACE : race, week: race, step: f.step, g: f.g, rank: f.rank, name: f.name, cls: f.cls, el: f.el, look: f.look },
+      f.was ? { was: f.was } : {}, { ultPct: R.ultPct, actPct: R.actPct, kit: kit.concat(f.trait ? [f.trait] : []).map(({ n, ...x }) => x) },
       basic ? { basic } : {}, { def: def.map(d => fidOf(race, d)), idea: f.F.idea });
     OUT.foes[f.fid] = f.out;
   }
@@ -364,7 +393,7 @@ for (const race of ORDER) {
     if (maxV >= HERO_LAW.comboFrom && !kit.some(x => BY[x.id].combo)) fail(`${where}: максимум доблести ${maxV} — в наборе нет сочетания (ADR-0050, Н6)`);
     if (new Set(kit.map(x => x.id)).size !== kit.length) fail(`${where}: способность повторяется`);
     const hero = { id, name: h['имя'], cls: h['класс'], el: school, school, rarity: r, maxV, cycle: h['цикл'], week: race,
-      ultPct: sh.ult, actPct: sh.act, avers: { race, bp: AVERSION_BP }, kit };
+      ultPct: sh.ult, actPct: sh.act, avers: { race, bp: aversionOf(h['цикл'], where) }, kit };
     heroes.push(hero);
     OUT.heroes[id] = Object.assign({}, hero, { kit: kit.map(({ n, ...x }) => x) });
   }
@@ -399,10 +428,11 @@ const FORMAT = `/* Собрано tools/content-gen/echo/build.js из tools/con
 
    window.EN_ECHO_FOES = {
      rules: {
-       ranks: { o | e | b | uber | forgotten: { n, abilities, ults, sharesAs, ultPct, actPct } }   // ADR-0016: состав врага по рангу, доли хода — как у редкости
-         // uber.ultsUber — у Убер-босса одна или две ульты в тех же пяти способностях (ADR-0025); forgotten — Многоликий, один из Забытых (ADR-0039)
+       ranks: { o | e | b | uber | awakened: { n, abilities, ults, sharesAs, ultPct, actPct } }   // ADR-0016: состав врага по рангу, доли хода — как у редкости
+         // uber.ultsUber — у Убер-босса одна или две ульты в тех же пяти способностях (ADR-0025); awakened — Многоликий, по типу — Пробуждённый (ADR-0039, ADR-0054)
        defenders: 4,                  // главный враг ступени и четверо защитников своей недели (ADR-0025, п. 1); Многоликий — один, без свиты (ADR-0039)
-       aversionBp: 2000,              // расовая неприязнь героя Эхо: +20 % урона по расе своей недели (ADR-0024), из roster.js
+       aversionByCycleBp: { 2: 1000, … 6: 5000 },   // расовая неприязнь героя Эхо по циклу героя (ADR-0024, ADR-0054) — копия правила ядра RULES.aversion
+       manyRace: 'Забытые',           // раса карты Многоликого в любую неделю (ADR-0054)
        basicAllCoef: 60,              // обычная атака по всем — coef ступени «на всех» урона библиотеки
        count: 'способности врага — все записи набора: активные, ульты, пассивки, реакции; иммунитет и обычная атака по всем — особенности, не способности'
      },
@@ -411,18 +441,19 @@ const FORMAT = `/* Собрано tools/content-gen/echo/build.js из tools/con
          // биом Многоликого по неделе (ADR-0025, «Многоликий и арт»): этажи 1–14 — ступени лестницы, этаж — главный враг и его защитники, как в бою Эхо
      foes: {
        'Эльфы#7': {                   // fid — «раса#ступень», как fidOf в screens/echo.js; ступень 15 — Многоликий (там — 'many' с расой недели)
-         race, step, g,               // g — место в лестнице: o рядовой, e элита, b босс, u Убер-босс, m Многоликий
-         rank,                        // ранг ядра: o, e, b, uber — иммунитет RULES.resist и доли хода; у Многоликого — forgotten: он один из Забытых
+         race, week, step, g,         // race — раса карты (у Многоликого — rules.manyRace), week — раса недели; g — место в лестнице: o рядовой, e элита, b босс, u Убер-босс, m Многоликий
+         rank,                        // ранг ядра: o, e, b, uber — иммунитет RULES.resist и доли хода; у Многоликого — awakened: по типу он Пробуждённый
          name, cls, el, look,         // имя, класс RULES.cls, стихия, облик — из ECH screens/echo.js
          ultPct, actPct,              // доли хода по рангу, б. п. (у рядового и элиты ульты нет — доля идёт в обычную атаку)
-         kit: [ { v: 0, slot: 'act' | 'ult' | 'pas' | 'react', id, as?, tgt?, chR? } ],   // как EN_KITS.foes: as — имя способности у врага,
+         kit: [ { v: 0, slot: 'act' | 'ult' | 'pas' | 'react', id, as?, tgt?, chR?, trait? } ],   // как EN_KITS.foes: as — имя способности у врага; trait — черта именного врага
+                                      // из набора «Черты врагов» (ADR-0051), сверх числа способностей по рангу: последняя запись набора,
                                       // tgt — своё правило цели (targets: 1), chR — шанс реакции по рангу; у Многоликого — его набор из many.js
          basic?: { tgt: 'all', coef }, // только у части Убер-боссов: обычная атака по всем (нужно ядру — basicAll)
          def: [fid × 4],              // защитники ступени: ранг не выше главного; уровень и здоровье — калькулятор Эхо; у Многоликого — [] (ADR-0039)
          idea                         // замысел состава
        } },
      heroes: { 'c6-51': { id, name, cls, el, school, rarity, maxV, cycle, week, ultPct, actPct,
-       avers: { race, bp },           // неприязнь — особенность, не способность
+       avers: { race, bp },           // неприязнь — особенность, не способность; bp — по циклу героя
        kit: [ { v, slot, id, chR? } ] } },   // как EN_KITS.heroes, ключ — id героя состава (roster.js); ADR-0050: на доблести 0 — пара
                                       // «активка + черта», дальше — по одной записи на доблесть 1…maxV, последняя — ульта
      abilities: [ { id, n, set, t, k, tier, trig, d, ch, data, owner, need } ],   // уникальные способности Убер-боссов и Многоликого (owner 'many') — формат EN_ABILITIES:
@@ -436,7 +467,7 @@ const abilityOut = x => {
   return { id, n, set, t: slot, k: kind, tier: tier || null, trig: trig || null, d, ch: data.ch != null ? data.ch : null, data, owner, need: need || [] };
 };
 const ui = {
-  rules: { ranks: RANKS, defenders: DEFENDERS, aversionBp: AVERSION_BP, basicAllCoef: BASIC_ALL_COEF,
+  rules: { ranks: RANKS, defenders: DEFENDERS, aversionByCycleBp: AVERSION, manyRace: MANY_RACE, basicAllCoef: BASIC_ALL_COEF,
     count: 'способности врага — все записи набора: активные, ульты, пассивки, реакции; иммунитет и обычная атака по всем — особенности, не способности' },
   weeks: OUT.weeks, manyBiome: OUT.manyBiome, foes: OUT.foes, heroes: OUT.heroes, abilities: OUT.abilities.map(abilityOut),
   need: Object.fromEntries(Object.entries(NEED).filter(([k]) => needUsed[k]).map(([k, v]) => [k, { n: v.n, d: v.d, used: needUsed[k] }])),
@@ -457,9 +488,9 @@ function weekMd(race) {
   L.push('| № | Враг | Ранг · класс · стихия | Набор | Защитники — замысел |', '|---|---|---|---|---|');
   for (const f of B.foes) {
     const def = f.out.def.map(fid => { const x = B.foes.find(y => y.fid === fid); return `${x.step} ${x.name}`; }).join(', ');
-    const rank = f.g === 'm' ? 'Многоликий, Забытый' : f.g === 'u' ? 'Убер-босс' : G_NAME[f.g];
+    const rank = f.g === 'm' ? 'Многоликий, Пробуждённый' : f.g === 'u' ? 'Убер-босс' : G_NAME[f.g];
     const trait = f.basic ? `; особенность — обычная атака по всем, ${f.basic.coef} %` : '';
-    const kitTxt = f.g === 'm' ? 'свой набор — таблица «Многоликий» выше' : kitLine(f.kit);
+    const kitTxt = (f.g === 'm' ? 'свой набор — таблица «Многоликий» выше' : kitLine(f.kit)) + (f.trait ? `; черта «${f.trait.n}»${f.trait.chR ? ` (${pct(f.trait.chR)})` : ''}` : '');
     L.push(`| ${f.step} | ${esc(f.name)}${f.was ? ` (было «${esc(f.was)}»)` : ''} | ${rank} · ${f.cls[0].toLowerCase() + f.cls.slice(1)} · ${f.el} | ${esc(kitTxt)}${trait} | ${esc(def)} — ${esc(f.F.idea)} |`);
   }
   const U = B.foes.find(f => f.g === 'u');
@@ -470,21 +501,21 @@ function weekMd(race) {
     L.push(`| «${a.n}» | ${{ act: 'активная', ult: 'ульта', pas: 'пассивка', react: 'реакция' }[x.slot]}${x.chR ? `, шанс ${pct(x.chR)}` : ''} | ${esc(a.d)} | ${nd.length ? nd.join('; ') : 'есть в ядре'} |`);
   }
   if (U.basic) L.push(`| Обычная атака по всем | особенность | Обычная атака бьёт весь отряд, каждого — ${U.basic.coef} % главного стата. | **нужно ядру:** ${NEED.basicAll.n} |`);
-  L.push('', `**Отряд недели** — неприязнь к расе «${race}», +${AVERSION_BP / 100} % урона. ${W.squad.answer}`, '');
+  L.push('', `**Отряд недели** — неприязнь к расе «${race}», ${aversionSpan()}. ${W.squad.answer}`, '');
   L.push('| Герой | Класс · школа | Редкость · максимум доблести | Набор по доблести |', '|---|---|---|---|');
-  for (const h of B.heroes) L.push(`| ${h.name} | ${h.cls} · ${h.school} | ${h.rarity} · ${h.maxV} | ${h.kit.map(x => `${x.v} — ${slotName[x.slot]}«${x.n}»${x.chR ? ` (${pct(x.chR)})` : ''}`).join('; ')} |`);
+  for (const h of B.heroes) L.push(`| ${h.name} · цикл ${h.cycle}, неприязнь +${h.avers.bp / 100} % | ${h.cls} · ${h.school} | ${h.rarity} · ${h.maxV} | ${h.kit.map(x => `${x.v} — ${slotName[x.slot]}«${x.n}»${x.chR ? ` (${pct(x.chR)})` : ''}`).join('; ')} |`);
   L.push('');
   return L.join('\n');
 }
 const T = {};
 T.ranks = ['| Ранг | Кто в Эхо | Способностей | Из них ульт | Доли хода как у редкости | Ульта · способности · обычная атака |', '|---|---|---|---|---|---|',
-  ...Object.entries(RANKS).map(([k, R]) => `| ${R.n} | ${{ o: 'ступени 1–6', e: 'ступени 7–10', b: 'ступени 11–13', uber: 'Убер-босс — 14', forgotten: 'Многоликий — 15' }[k]} | ${R.abilities} | ${k === 'uber' ? `${R.ults}; у Убер-босса — ${UBER_ULTS.join(' или ')} (ADR-0025)` : k === 'forgotten' ? `${R.ults}; у Многоликого — ${MANY_SET.ults} (ADR-0039)` : R.ults} | ${R.sharesAs} | ${pct(R.ultPct)} · ${pct(R.actPct)} · ${pct(10000 - R.ultPct - R.actPct)} |`)].join('\n');
+  ...Object.entries(RANKS).map(([k, R]) => `| ${R.n} | ${{ o: 'ступени 1–6', e: 'ступени 7–10', b: 'ступени 11–13', uber: 'Убер-босс — 14', awakened: 'Многоликий — 15' }[k]} | ${R.abilities} | ${k === 'uber' ? `${R.ults}; у Убер-босса — ${UBER_ULTS.join(' или ')} (ADR-0025)` : k === 'awakened' ? `${R.ults}; у Многоликого — ${MANY_SET.ults} (ADR-0039)` : R.ults} | ${R.sharesAs} | ${pct(R.ultPct)} · ${pct(R.actPct)} · ${pct(10000 - R.ultPct - R.actPct)} |`)].join('\n');
 const MIX_NAME = { o: ['рядовой', 'рядовых', 'рядовых'], e: ['элита', 'элиты', 'элит'], b: ['босс', 'босса', 'боссов'] };
 const mixText = m => Object.entries(m).map(([r, n]) => `${n} ${MIX_NAME[r][n === 1 ? 0 : n < 5 ? 1 : 2]}`).join(' и ') || 'без свиты: бьётся один';
 T.defmix = DEF_MIX.map(([a, b, m]) => `   - ${a === b ? `ступень ${a}` : `ступени ${a}–${b}`} (${[...new Set((STEPS.concat(['m'])).slice(a - 1, b))].map(g => G_NAME[g]).join(', ')}) — ${mixText(m)};`).join('\n');
 /* Многоликий — свой набор (many.js): таблица способностей и чем запоминается */
-T.many = [`**Многоликий.** ${MANY_SET.memo}`, '', '| Способность | Место | Что делает | Примитивы |', '|---|---|---|---|',
-  ...(MANY_SET.unique || []).map(x => { const a = UNIQ[x.id], nd = (a.need || []).map(k => `**нужно ядру:** ${NEED[k].n}`), rk = RANKS.forgotten, c = a.slot === 'react' ? chR(a.ch, rk.actPct) : null;
+T.many = [`**Многоликий.** ${MANY_SET.memo} Черта — «${MANY_SET.trait}»: ${(FOE_TRAIT[MANY_SET.trait] || {}).d || ''}`, '', '| Способность | Место | Что делает | Примитивы |', '|---|---|---|---|',
+  ...(MANY_SET.unique || []).map(x => { const a = UNIQ[x.id], nd = (a.need || []).map(k => `**нужно ядру:** ${NEED[k].n}`), rk = RANKS.awakened, c = a.slot === 'react' ? chR(a.ch, rk.actPct) : null;
     return `| «${a.n}» | ${{ act: 'активная', ult: 'ульта', pas: 'пассивка', react: 'реакция' }[a.slot]}${c ? `, шанс ${pct(c)}` : ''} | ${esc(a.d)} | ${nd.length ? nd.join('; ') : 'есть в ядре'} |`; })].join('\n');
 T.weeks = ORDER.filter(r => DATA[r] && DATA[r].built).map(weekMd).join('\n');
 T.ubers = ['| Неделя | Убер-босс | Чем запоминается | Особенность | Новое для ядра |', '|---|---|---|---|---|',

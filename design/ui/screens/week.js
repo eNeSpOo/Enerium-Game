@@ -3,12 +3,17 @@
    этот файл пишет то же число сам, поэтому обёртка ничего не меняет.
    Регистрирует: SCREENS.week; листы OV.wkmode (режим на эту или прошлую неделю), OV.wkpast (итог прошлой недели), OV.wkclock (сроки),
    OV.wknext (следующая неделя); OV.rank — «Рейтинг» с любого экрана из того же реестра; действие ACT.wkrt; раздел UI-кита «Неделя»;
-   сценарии презентации. Глобал window.WEEK_MODES — реестр итогов режимов, window.EN_WEEK — для проверки check_week.js.
+   сценарии презентации. Глобал window.WEEK_MODES — реестр итогов режимов; window.EN_WEEK — общий помощник лестницы планок для экранов
+   режимов (steps, ladderHtml, clanSteps, clanHtml) и доступ для проверки check_week.js.
+   Лестница планок режима (ADR-0047) — одна, сквозная, по очкам, видна сразу на все циклы: пять полос — циклы II–VI. Ступени игрока
+   собирает EnLoot.ladder (lootboxes.js); здесь — пороги в единицах режима и вид «дороги»: прошлые полосы — «пройдено», своя — крупно,
+   будущие — свёрнуты, потолок — отдельной строкой. Замка по циклу нет: ступени следующей полосы берут очками. Чисел лестницы в экране нет.
    Три времени — сегменты шапки (S.seg.week): «Прошлая», «Эта неделя», «Следующая».
    - Эта неделя: раса и цивилизация Эхо недели, срок до отсечки, «Дары»; шесть режимов строкой — место, очки, полоса до ближайшей
-     планки с её сундуком. Слово автора 29.09.2026: переход в режим был неочевиден — поменяли местами. Строка и её «›» открывают
-     сведения (лист: подробности, планки, лидеры); в режим ведёт явная кнопка «Войти» справа в строке и такая же в листе.
-     Ритуалы — одной строкой ниже, у них нет рейтинга и листа: строка сама ведёт в ритуалы, справа — то же «Войти».
+     планки лестницы с её сундуком: она может быть уже из следующей полосы. Слово автора 29.09.2026: переход в режим был неочевиден —
+     поменяли местами. Строка и её «›» открывают сведения (лист: подробности, лестница, клановые планки, лидеры); в режим ведёт явная
+     кнопка «Войти» справа в строке и такая же в листе.
+     Ритуалы — одной строкой ниже, пока их экран не сообщил ступени загрузки в реестр: строка сама ведёт в ритуалы, справа — то же «Войти».
    - Прошлая: итог — сундуки и Энериум недели; по режимам место и очки, лучший сундук и где он; лидеры и награды — лист; «Дары» — ссылка.
    - Следующая: раса и цивилизация, герои Эхо недели и их неприязнь, стихии нашествия, что готовить.
    Режимы сообщают Неделе своё состояние сами: WEEK_MODES.push({ id, n, icon, go, order, unit, now, past }) — договор в screens/README.md.
@@ -29,8 +34,9 @@ const WK = {
   modes: [['echo', 10, 18, 'echo'], ['event', 20, 21, 'event'], ['contract', 30, 38, 'contracts'], ['clan', 40, 26, 'clan:boss'], ['arena', 50, 3, 'arena:arena'], ['league', 60, 3, 'arena:league']],
   rituals: [33, 'rituals'],                             // ритуалы — не рейтинговый режим: строка под режимами
   leagueHeroes: 15,                                     // §20.4: Лига — для собравших 15 героев
-  /* пороги личных планок в экране не хранятся — они в данных режимов (NEEDS ниже): контракты — EN_CONTRACTS.planks, Арена и Лига —
-     EN_ARENA.arena.plank и .league.plank, Эхо — echo.js (EN_ECHO.planks), Событие — evPlanks (event.js) */
+  /* пороги личных планок в экране не хранятся — они в данных режимов (P1 и OWN ниже): контракты — EN_CONTRACTS.planks, Арена и Лига —
+     EN_ARENA.arena.plank и .league.plank, Эхо — echo.js (EN_ECHO.planks) и echo-rules.js (plank1), Событие — EN_EVENT.planks;
+     ступени и сундуки лестницы — EnLoot.ladder (lootboxes.js) */
   /* эта неделя: чего нет в состоянии прототипа. Место — из S.ranks, как в профиле и «Дарах». Запасные числа — те же, что у демо режимов
      (CT_DEMO, AR_DEMO): один календарь демо, 11-й день цикла II (ADR-0031, п. 17) */
   now: {
@@ -54,7 +60,7 @@ const WK = {
   names: ['Тихий ветер', 'Северный странник', 'Собиратель искр', 'Лунный страж', 'Искатель', 'Светлый пепел', 'Тихий шаг', 'Синий огонь', 'Пепельная тропа'],
   clans: ['Северный дозор', 'Серые крылья', 'Тихая гавань', 'Ночной караван', 'Светлый круг'],
   me: 'Странник',
-  view: { chest: 24, crystal: 16, els: 3 },             // вид: размер сундука на строке, кристалла, сколько стихий нашествия на экране
+  view: { chest: 24, crystal: 16, els: 3, ladCr: 13 },  // вид: размер сундука на строке, кристалла, сколько стихий нашествия на экране; кристалл сундуков будущей полосы лестницы
 };
 
 if (!window.EN_ROSTER || !RS.weeks.length || !LBX) {
@@ -115,10 +121,16 @@ function stateOf(m, t) {
   st.points = int(raw.points); st.place = int(raw.place) && raw.place > 0 ? raw.place : null;
   st.have = int(raw.have) != null ? raw.have : st.points || 0;
   st.box = raw.box || (LBX.modes[m.id] ? LBX.modes[m.id].box : '');
-  st.plankUnit = raw.plankUnit || st.unit;
-  st.planks = (Array.isArray(raw.planks) ? raw.planks : []).filter(p => p && int(p.need) != null).map((p, i) => ({ k: p.k || i + 1, need: p.need, pay: Array.isArray(p.pay) ? p.pay : [], reached: p.reached != null ? !!p.reached : st.have >= p.need }));
+  /* единицы порога: что сказал режим, иначе — единица слоя лестницы в данных (загрузка мест — «%»), иначе — очки режима */
+  const lyU = ladLayer(m.id), lcU = clanLayer(m.id);
+  st.plankUnit = raw.plankUnit || (lyU && lyU.unit) || st.unit;
+  /* личные планки — ступени лестницы режима (EN_WEEK.steps): k — сквозной номер, band — полоса (цикл), i — ступень в полосе, cap — потолок.
+     Режим без полос отдаёт { k, need, pay } — это ступени своей полосы */
+  st.planks = (Array.isArray(raw.planks) ? raw.planks : []).filter(p => p && int(p.need) != null).map((p, i) => ({ k: p.k || i + 1, band: int(p.band), i: int(p.i), need: p.need,
+    pay: Array.isArray(p.pay) ? p.pay : [], reached: p.reached != null ? !!p.reached : st.have >= p.need, cap: !!p.cap }));
   /* клановые планки недели, если режим их ведёт: взятые клановые планки этой недели «Дары» показывают ждущими распределения (bag.js) */
   st.clanPlanks = (Array.isArray(raw.clanPlanks) ? raw.clanPlanks : []).filter(p => p && int(p.need) != null).map((p, i) => ({ k: p.k || i + 1, need: p.need, pay: Array.isArray(p.pay) ? p.pay : [], reached: !!p.reached }));
+  st.clanHave = int(raw.clanHave); st.clanUnit = raw.clanUnit || (lcU && lcU.unit) || null;
   st.next = raw.next && int(raw.next.need) != null ? Object.assign({ pay: [] }, raw.next) : st.planks.find(p => !p.reached) || null;
   const top = (Array.isArray(raw.top) ? raw.top : []).filter(x => Array.isArray(x) && x[0] && int(x[1]) != null).slice().sort((a, b) => b[1] - a[1]);
   st.meName = raw.me || WK.me;
@@ -134,7 +146,6 @@ function stateOf(m, t) {
   return st;
 }
 const unitOf = (st, n) => Array.isArray(st.unit) ? plural(n || 0, ...st.unit) : st.unit;
-const plankUnitOf = (st, n) => Array.isArray(st.plankUnit) ? plural(n || 0, ...st.plankUnit) : st.plankUnit;
 /* путь к ближайшей планке: от прошлой планки до неё, в процентах */
 function pctTo(st) {
   const nx = st.next; if (!nx) return 100;
@@ -152,25 +163,136 @@ const allGroups = rs => rs.reduce((a, r) => a.concat(r.groups), []);
 const crystals = groups => { const by = {}; groups.forEach(g => { by[g.r] = (by[g.r] || 0) + g.count; }); return Object.keys(by).map(Number).sort((a, b) => b - a).map(r => `<span class="wk-cr" data-r="${r}" title="${RAR[r]}">${ICON('r' + r, WK.view.crystal, RAR[r])}<b class="num">×${fmt(by[r])}</b></span>`).join(''); };
 const placeTxt = p => p ? '#' + fmt(p) : '—';
 
-/* ================== демо режимов: пока их экраны не сообщают итоги сами ================== */
+/* ================== лестница планок режима (ADR-0047) ==================
+   Одна, сквозная, по очкам, видна сразу на все циклы: пять полос — циклы II–VI. Полоса — строки слоя личных планок режима
+   (EN_LOOTBOXES.modes[режим], слой ladder.layer), сундуки ступени — своей полосы. Игрок цикла c: полосы ниже своей пройдены и не платят;
+   своя — ступени 1…n; за её верхней ступенью сразу, без перехода в новый цикл, идут ступени следующих полос — по очкам: их держат сила
+   отряда и души, а не замок; у Эхо за верхней ступенью полосы VI — потолок. У слоя с порогами в своих единицах (загрузка мест, круги)
+   продолжения нет. Ступени собирает EnLoot.ladder (lootboxes.js) — здесь только пороги в единицах режима и вид.
+   Порог ступени: at — своя единица; иначе в своей полосе — готовый порог режима (o.needs), дальше и без списка — первая планка цикла
+   игрока × x ступени. Первую планку считает калькулятор режима: её передаёт экран (o.plank1) или она берётся из данных режима (P1) */
 const LM = id => LBX.modes[id] || null;
 const cyc = () => S.acc.cycle;
+const ladLayer = id => { const M = LM(id), R = M && M.ladder; return R ? M.layers.find(l => l.id === R.layer) || null : null; };
+const clanLayer = id => { const M = LM(id); return M ? M.layers.find(l => l.kind === 'plank' && l.clan) || null : null; };
+const firstX = kind => { const A = window.EN_ARENA && EN_ARENA[kind]; return A && Number.isInteger(A.plank) ? A.plank : 0; };
+/* первая планка цикла c — из данных режима, если экран её не передал: одна мерка на цикл (ADR-0043) */
+const P1 = {
+  echo: c => { const R = window.EN_ECHO_RULES; return R && R.plank1 ? R.plank1[c] : 0; },
+  event: c => { const D = window.EN_EVENT; return D && D.planks && D.planks[c] ? D.planks[c][0] : 0; },
+  contract: c => { const D = window.EN_CONTRACTS; return D && D.planks && D.planks[c] ? D.planks[c][0] : 0; },
+  arena: () => firstX('arena'),
+  league: () => firstX('league'),
+};
+/* ступени лестницы игрока для реестра Недели: [{ k, band, i, need, pay, reached, cap }] — k сквозной с единицы, band — полоса (цикл),
+   i — ступень в полосе, need — порог в единицах режима, pay — сундуки [{ r, count, win }], cap — потолок лестницы.
+   o: have — сколько набрано в единицах порога; plank1 — первая планка цикла игрока (лестницы с множителями); needs — готовые пороги
+   своей полосы, если режим даёт их списком (дальше — множителем от первой); cycle — цикл игрока, по умолчанию — аккаунта.
+   Порог не посчитать — лестницы нет: пусто лучше неверного */
+function steps(id, o) {
+  o = o || {};
+  const M = LM(id), f = window.EnLoot && EnLoot.ladder;
+  if (!M || !M.ladder || typeof f !== 'function') return [];
+  const c = int(o.cycle) != null ? o.cycle : cyc(), L = f(LBX, id, c);
+  if (!L.length) return [];
+  const own = L[0].band, x0 = L[0].x, needs = (Array.isArray(o.needs) ? o.needs : []).map(int), d = P1[id] ? int(P1[id](c)) : null;
+  /* мерка множителей: [первая планка, её множитель] */
+  const unit = int(o.plank1) > 0 ? [o.plank1, 1] : needs[0] > 0 && x0 > 0 ? [needs[0], x0] : d > 0 ? [d, 1] : null;
+  const have = int(o.have) != null ? o.have : 0, out = [];
+  for (const s of L) {
+    const need = s.at != null ? s.at : s.band === own && !s.cap && needs[s.i - 1] > 0 ? needs[s.i - 1] : unit && s.x != null ? Math.floor(unit[0] * s.x / unit[1]) : null;
+    if (!(need > 0) || (out.length && need <= out[out.length - 1].need)) return [];
+    out.push({ k: s.k, band: s.band, i: s.i, need, pay: s.pay, reached: have >= need, cap: !!s.cap });
+  }
+  return out;
+}
+/* клановые планки режима: строки слоя клановых планок, сундуки — на участника, цикла игрока; порог — из данных режима (o.needs[k − 1])
+   или своя единица строки (круги). Продолжения в следующие полосы у клановых планок нет. o: have — очки клана, needs, cycle */
+function clanSteps(id, o) {
+  o = o || {};
+  const ly = clanLayer(id); if (!ly) return [];
+  const c = int(o.cycle) != null ? o.cycle : cyc(), needs = Array.isArray(o.needs) ? o.needs : [], have = int(o.have) != null ? o.have : 0, out = [];
+  ly.rows.forEach((row, j) => { const need = row.at != null ? row.at : int(needs[j]), pay = row.cyc[c] || []; if (need > 0 && pay.length) out.push({ k: j + 1, need, pay, reached: have >= need }); });
+  return out;
+}
+/* подпись порога: единица — формы слова для plural, «%» или слово; очки — без подписи */
+const unitTxt = (unit, n) => !unit ? '' : Array.isArray(unit) ? ' ' + plural(n || 0, ...unit) : unit === '%' ? ' %' : ' ' + unit;
+/* порог в строке ступени: число крупно, «%» — вплотную, слово единицы — мелко после числа */
+const needHtml = (unit, n) => `${fmt(n)}${unit === '%' ? ' %' : unit ? `<small>${unitTxt(unit, n)}</small>` : ''}`;
+/* порог свёрнутой полосы и потолка: коротко, из единиц — только «%»; слово единицы уже сказано в строках своей полосы */
+const needShort = (unit, n) => `${big(n)}${unit === '%' ? ' %' : ''}`;
+/* сундуки ступени коротко: «2 × редкий», окно не «лестница» — словом; полное имя — в подсказке */
+const payShort = pay => pay.map(g => `${g.count > 1 ? g.count + ' × ' : ''}${LBX.boxRarity[g.r - 1]}${g.win && g.win !== 'step' ? ' · ' + LBX.winNames[g.win] : ''}`).join(', ');
+const cycSpan = L => L.length > 1 ? `Циклы ${ROMAN[L[0]]}–${ROMAN[L[L.length - 1]]}` : `Цикл ${ROMAN[L[0]]}`;
+/* порог дальней полосы коротко: до миллиона — целиком, дальше — «3,5 млн», «3,6 млрд», вниз до десятой; точное число — в подсказке */
+const BIG = [[1000000000, 'млрд'], [1000000, 'млн']];
+const big = n => { for (const [d, w] of BIG) if (n >= d) { const t = Math.floor(n / (d / 10)); return `${fmt(Math.floor(t / 10))}${t % 10 ? ',' + (t % 10) : ''} ${w}`; } return fmt(n); };
+/* строка ступени: сундук цвета редкости, порог, сундуки коротко и отметка — взята, в запасах, сколько осталось */
+function stepRow(box, s, mark, unit) {
+  return `<div class="wk-ld-st ${s.reached ? 'got' : mark.next ? 'next' : ''}" data-k="${s.k}"${s.band != null ? ` data-band="${s.band}"` : ''} data-need="${s.need}" data-r="${payTop(s.pay)}">${chestTok(box, s.pay, '')}<b class="num">${needHtml(unit, s.need)}</b><span class="wk-ld-pay" title="${trEsc(payName(box, s.pay))}">${payShort(s.pay)}${mark.per || ''}</span>${mark.html}</div>`;
+}
+/* «дорога» из полос по готовым ступеням L (EN_WEEK.steps): прошлые полосы — одной строкой «пройдено»; своя — крупно; будущая —
+   свёрнута: «цикл N», сундуки полосы и порог её первой ступени в единицах игрока; будущая полоса, по которой игрок уже идёт, раскрыта;
+   потолок — отдельной строкой. o: have, cycle, unit — единица порога (по умолчанию — слоя лестницы), box — вид сундука */
+function roadHtml(id, L, o) {
+  o = o || {};
+  const M = LM(id), R = M && M.ladder, ly = ladLayer(id);
+  if (!R || !ly || !Array.isArray(L) || !L.length) return '';
+  const c = int(o.cycle) != null ? o.cycle : cyc(), own = Math.max(c, M.from), box = o.box || M.box, have = int(o.have) != null ? o.have : 0;
+  const unit = o.unit || ly.unit || null, U = n => unitTxt(unit, n), B = LBX.boxes[box];
+  const band = s => s.band != null ? s.band : own, nx = L.find(s => !s.reached) || null, got = L.filter(s => s.reached).length;
+  const inStock = s => typeof darGot === 'function' && darGot(id, s.k);
+  const mark = s => ({ next: s === nx, html: s.reached ? (inStock(s) ? `<span class="chip">${ic('check')}в запасах</span>` : `<span class="chip spirit" title="Сундуки — в «Дарах»">${ic('check')}взята</span>`)
+    : s === nx ? `<span class="faint num wk-ld-left">ещё ${fmt(s.need - have)}</span>` : '<span></span>' });
+  const of = b => L.filter(s => !s.cap && band(s) === b), capS = L.find(s => s.cap) || null;
+  const past = R.bands.filter(b => b < own), fut = R.bands.filter(b => b > own);
+  /* будущая полоса раскрыта, когда игрок по ней идёт: в ней взятая ступень или ближайшая невзятая */
+  const walk = b => of(b).some(s => s.reached) || (!!nx && !nx.cap && band(nx) === b);
+  const bandHtml = (b, sub) => `<div class="wk-ld-band${b === own ? ' own' : ''}" data-band="${b}"><div class="wk-ld-h"><b>Цикл ${ROMAN[b]}</b><small>${sub}</small></div>${of(b).map(s => stepRow(box, s, mark(s), unit)).join('')}</div>`;
+  /* свёрнутая полоса: её ступеней у игрока может не быть (порог — в своих единицах) — тогда сундуки и порог берутся из строк слоя */
+  const futHtml = b => {
+    const S2 = of(b), pay = mergePay(S2.length ? S2.reduce((a, s) => a.concat(s.pay), []) : ly.rows.reduce((a, r) => a.concat(r.cyc[b] || []), []));
+    if (!pay.length) return '';
+    const need = S2.length ? S2[0].need : ly.rows[0] && ly.rows[0].at != null ? ly.rows[0].at : null;
+    return `<div class="wk-ld-fut" data-band="${b}"${need != null ? ` data-need="${need}"` : ''} data-r="${payTop(pay)}" title="${trEsc(`Цикл ${ROMAN[b]}${need != null ? ` · с ${fmt(need)}${U(need)}` : ''} · ${payName(box, pay)}`)}">${chestTok(box, pay, '')}<span class="wk-ld-ft"><b>Цикл ${ROMAN[b]}</b>${need != null ? `<small class="num">с ${needShort(unit, need)}</small>` : ''}</span><span class="wk-ld-crs">${pay.map(g => `<span class="wk-cr" data-r="${g.r}">${ICON('r' + g.r, WK.view.ladCr, RAR[g.r])}<b class="num">×${fmt(g.count)}</b></span>`).join('')}</span></div>`;
+  };
+  const open = fut.filter(walk), fold = fut.filter(b => !walk(b)).map(futHtml).filter(Boolean);
+  /* замка по циклу нет (ADR-0047): ступени следующих полос держат сила отряда и души. Порог в своих единицах — продолжения нет */
+  const cont = R.next ? 'Дальше — без перехода в новый цикл: решают сила отряда и души.' : 'В следующих циклах пороги те же — сундуки богаче.';
+  return `<div class="wk-ld" data-mode="${id}"><span class="eyebrow">${o.head || `${ly.n} · взято ${fmt(got)}`}</span>
+    ${past.length ? `<p class="wk-ld-past" data-bands="${past.join()}">${ic('check')}<span>${cycSpan(past)} — пройдено</span></p>` : ''}
+    ${bandHtml(own, `ваш цикл · ${B ? B.n.toLowerCase() : 'сундук'}`)}
+    ${open.map(b => bandHtml(b, 'следующая полоса')).join('')}
+    ${fold.length ? `<div class="wk-ld-next">${fold.join('')}</div>` : ''}
+    ${capS ? `<div class="wk-ld-cap ${capS.reached ? 'got' : capS === nx ? 'next' : ''}" data-k="${capS.k}" data-need="${capS.need}" data-r="${payTop(capS.pay)}" title="${trEsc(`Потолок · ${fmt(capS.need)}${U(capS.need)} · ${payName(box, capS.pay)}`)}">${chestTok(box, capS.pay, '')}<span class="wk-ld-ft"><b>Потолок</b><small class="num">${capS === nx || capS.reached ? fmt(capS.need) + (unit === '%' ? ' %' : '') : needShort(unit, capS.need)}</small></span><span class="wk-ld-pay">${payShort(capS.pay)}</span>${mark(capS).html}</div>` : ''}
+    ${fut.length ? `<p class="reason wk-ld-note">${cont}</p>` : ''}</div>`;
+}
+/* лестница режима для экрана режима: o — как у steps (have, plank1, needs, cycle), ещё unit, box, head и готовые ступени steps */
+const ladderHtml = (id, o) => roadHtml(id, o && Array.isArray(o.steps) ? o.steps : steps(id, o), o);
+/* клановые планки строками: порог, сундуки на участника, отметка. o: have, needs, cycle, unit, steps — готовые ступени, head */
+function clanHtml(id, o) {
+  o = o || {};
+  const M = LM(id), ly = clanLayer(id), L = Array.isArray(o.steps) ? o.steps : clanSteps(id, o);
+  if (!M || !ly || !L.length) return '';
+  const unit = o.unit || ly.unit || null, have = int(o.have), nx = L.find(s => !s.reached) || null, got = L.filter(s => s.reached).length;
+  const mark = s => ({ next: s === nx, per: ' · каждому', html: s.reached ? `<span class="chip spirit" title="После подсчёта недели — в «Дарах»">${ic('check')}взята</span>`
+    : s === nx && have != null ? `<span class="faint num wk-ld-left">ещё ${fmt(s.need - have)}</span>` : '<span></span>' });
+  return `<div class="wk-ld clan" data-mode="${id}"><span class="eyebrow">${o.head || `${ly.n} · взято ${fmt(got)} из ${L.length}`}</span>
+    <div class="wk-ld-band">${L.map(s => stepRow(M.box, s, mark(s), unit)).join('')}</div></div>`;
+}
+
+/* ================== демо режимов: пока их экраны не сообщают итоги сами ================== */
 const who = () => (typeof ZP_DEMO !== 'undefined' && ZP_DEMO.gifts && ZP_DEMO.gifts.who) || 'free';
 const closed = id => { const M = LM(id); return M && cyc() < M.from ? `рейтинг — с цикла ${ROMAN[M.from]}` : ''; };
 const rankPlace = n => { const r = (S.ranks || []).find(x => x[0] === n); return r && Number.isInteger(r[1]) ? r[1] : null; };
-const lastNeed = pk => pk.length ? pk[pk.length - 1].need : 0;
-/* пороги личных планок — из данных режима: контракты — список порогов цикла (EN_CONTRACTS.planks), Арена и Лига — первая планка
-   (EN_ARENA.arena.plank, .league.plank), дальше × x строки планки EN_LOOTBOXES. Нет данных — нет планок */
-const firstX = kind => { const A = window.EN_ARENA && EN_ARENA[kind]; return A && Number.isInteger(A.plank) ? A.plank : 0; };
-const NEEDS = {
-  contract: (ly, c) => { const P = (window.EN_CONTRACTS && EN_CONTRACTS.planks && EN_CONTRACTS.planks[c]) || []; return ly.rows.map((_, i) => P[i]).filter(Number.isInteger); },
-  arena: ly => firstX('arena') ? ly.rows.map(r => firstX('arena') * r.x) : [],
-  league: ly => firstX('league') ? ly.rows.map(r => firstX('league') * r.x) : [],
-};
-/* личные планки режима: порог из данных, сундуки — строка своего цикла */
+/* верхняя планка своей полосы — мерка лидеров демо: за ней лестница уходит в пороги следующих циклов */
+const lastNeed = pk => { const own = pk.filter(p => !p.cap && (p.band == null || p.band === pk[0].band)); return own.length ? own[own.length - 1].need : 0; };
+/* готовые пороги своей полосы, если режим даёт их списком: контракты — EN_CONTRACTS.planks цикла. Арена и Лига — первая планка
+   (EN_ARENA.arena.plank, .league.plank) × x ступени, Эхо и Событие — первая планка цикла из данных режима (P1). Нет данных — нет планок */
+const OWN = { contract: c => (window.EN_CONTRACTS && EN_CONTRACTS.planks && EN_CONTRACTS.planks[c]) || [] };
+/* личные планки режима — ступени его лестницы: пороги — из данных режима */
 function plankRows(id, have) {
-  const M = LM(id), ly = M ? M.layers.find(l => l.kind === 'plank' && !l.clan) : null, c = cyc();
-  return ly && NEEDS[id] ? NEEDS[id](ly, c).map((need, i) => ({ k: i + 1, need, pay: ly.rows[i].cyc[c] || [], reached: have >= need })) : [];
+  return steps(id, { have, needs: OWN[id] ? OWN[id](cyc()) : null });
 }
 /* место → выплата за место, если неделя кончится сейчас: наименьший «топ-N», куда место входит; у клана вне топа — «все с очками» */
 function tierOf(id, place, clan) {
@@ -202,8 +324,9 @@ function pastPts(needs, k, frac) {
   return lo + Math.floor((hi - lo) * frac / WK.bp);
 }
 const enOf = place => { const r = WK.arenaEnerium.find(([top]) => place <= top); return r ? r[1] : 0; };
-const echoPlanks = () => { const E = window.EN_ECHO; if (!E) return []; E.sync(); return E.planks().map(p => ({ k: p.k, need: p.need, pay: p.pay, reached: p.reached })); };
-const eventPlanks = () => typeof evPlanks === 'function' ? evPlanks().map(p => ({ k: p.k, need: p.need, pay: p.pay, reached: p.got })) : [];
+/* Эхо: пороги своей полосы — с экрана Эхо (EN_ECHO.planks), чтобы оба экрана сходились; дальше — множителем первой планки */
+const echoPlanks = () => { const E = window.EN_ECHO; if (!E) return []; E.sync(); return steps('echo', { have: S.echo.score, needs: E.planks().filter(p => !p.cap && (p.band == null || p.band === cyc())).map(p => p.need) }); };
+const eventPlanks = () => typeof evPlanks === 'function' ? evPlanks().map(p => ({ k: p.k, band: p.band, i: p.i, need: p.need, pay: p.pay, reached: p.got, cap: p.cap })) : [];
 /* демо-строка: id, имя, единица очков и два ответа */
 function demo(id, n, unit, now, past) {
   const d = WK.modes.find(x => x[0] === id) || [id, 0, WK.rituals[0], id];
@@ -217,8 +340,8 @@ demo('echo', 'Эхо', ['очко', 'очка', 'очков'],
   },
   () => {
     const lock = closed('echo'); if (lock || !window.EN_ECHO) return { lock: lock || 'нет данных' };
-    const needs = echoPlanks().map(p => p.need);
-    return { place: pastPlace('echo'), points: pastPts(needs, pastPlanks('echo'), WK.past.frac.echo), top: topRel('echo', 'past', needs[needs.length - 1]), rewards: pastRewards('echo') };
+    const pk = echoPlanks(), needs = pk.map(p => p.need);
+    return { place: pastPlace('echo'), points: pastPts(needs, pastPlanks('echo'), WK.past.frac.echo), top: topRel('echo', 'past', lastNeed(pk)), rewards: pastRewards('echo') };
   });
 demo('event', 'Событие', ['очко', 'очка', 'очков'],
   () => {
@@ -228,8 +351,8 @@ demo('event', 'Событие', ['очко', 'очка', 'очков'],
   },
   () => {
     const lock = closed('event'); if (lock) return { lock };
-    const needs = eventPlanks().map(p => p.need);
-    return { place: pastPlace('event'), points: pastPts(needs, pastPlanks('event'), WK.past.frac.event), top: topRel('event', 'past', needs[needs.length - 1]), rewards: pastRewards('event') };
+    const pk = eventPlanks(), needs = pk.map(p => p.need);
+    return { place: pastPlace('event'), points: pastPts(needs, pastPlanks('event'), WK.past.frac.event), top: topRel('event', 'past', lastNeed(pk)), rewards: pastRewards('event') };
   });
 demo('contract', 'Контракты', ['очко', 'очка', 'очков'],
   () => {
@@ -239,11 +362,12 @@ demo('contract', 'Контракты', ['очко', 'очка', 'очков'],
   },
   () => {
     const lock = closed('contract'); if (lock) return { lock };
-    const needs = plankRows('contract', 0).map(p => p.need);
-    return { place: pastPlace('contract'), points: pastPts(needs, pastPlanks('contract'), WK.past.frac.contract), top: topRel('contract', 'past', needs[needs.length - 1]),
+    const pk = plankRows('contract', 0), needs = pk.map(p => p.need);
+    return { place: pastPlace('contract'), points: pastPts(needs, pastPlanks('contract'), WK.past.frac.contract), top: topRel('contract', 'past', lastNeed(pk)),
       rewards: pastRewards('contract'), cur: WK.past.contract.cur.map(x => x.slice()) };
   });
-/* Клановый босс (§25.3): планок нет — место клана и очки клана; личный вклад — в листе, лидеры — кланы */
+/* Клановый босс (§25.3): демо — место клана и очки клана; личный вклад — в листе, лидеры — кланы. Личные и клановые ступени
+   сообщает экран клана (screens/clan.js) — пороги считает его калькулятор */
 const CLAN_T = { placeLabel: 'место клана', meTag: 'ваш клан', topLabel: 'Кланы-лидеры' };
 demo('clan', 'Клановый босс', ['очко', 'очка', 'очков'],
   () => {
@@ -297,14 +421,19 @@ const pic = m => typeof m.icon === 'number' ? `<img src="${PATH(m.icon)}" alt=""
 /* «Войти» — явный переход в режим: дверь и слово, цвет действия. «›» — сведения, это другое */
 const ENTER = 'Войти';
 const goBtn = m => `<button class="wk-go" data-a="go" data-v="${m.go}" aria-label="${ENTER} в «${m.n}»" title="${ENTER} в «${m.n}»">${ic('door')}<small>${ENTER}</small></button>`;
-/* строка режима. Эта неделя: значок, имя, полоса до ближайшей планки и её сундук; справа место и очки. Строка со «›» — сведения
-   (лист), «Войти» — в режим. Прошлая: вместо полосы — лучший сундук недели и где он, «Войти» нет. Два числа, два чипа, строка
-   и одно действие (правила воздуха) */
+/* подпись ступени: имя слоя и сквозной номер; ступень не своей полосы называет цикл, потолок — себя */
+function stepName(id, p) {
+  const M = LM(id), ly = ladLayer(id), own = M ? Math.max(cyc(), M.from) : cyc();
+  return `${ly ? ly.one : 'Планка'} ${p.k || ''}`.trim() + (p.cap ? ' · потолок' : p.band != null && p.band !== own ? ` · цикл ${ROMAN[p.band]}` : '');
+}
+/* строка режима. Эта неделя: значок, имя, полоса до ближайшей планки лестницы и её сундук — она может быть уже из следующей полосы;
+   справа место и очки. Строка со «›» — сведения (лист), «Войти» — в режим. Прошлая: вместо полосы — лучший сундук недели и где он,
+   «Войти» нет. Два числа, два чипа, строка и одно действие (правила воздуха) */
 function rowHtml(st) {
   const m = st.m, now = st.t === 'now', lock = st.lock;
   let sub = '';
   if (lock) sub = `<span class="wk-why">${ic('lock')}${lock}</span>`;
-  else if (now && st.next) sub = `${bar(pctTo(st))}${chestTok(st.box, st.next.pay || [], `Планка ${st.next.k || ''}`.trim())}`;
+  else if (now && st.next) sub = `${bar(pctTo(st))}${chestTok(st.box, st.next.pay || [], stepName(m.id, st.next))}`;
   else if (now && st.planks.length) sub = `${bar(100, 'sp')}<span class="wk-why">${ic('check')}все планки</span>`;
   else if (now && st.tier) sub = `<span class="wk-why">${st.placeLabel}</span>${chestTok(st.box, st.tier.pay, st.tier.label)}`;
   else if (!now) {
@@ -332,9 +461,10 @@ function nowHtml() {
     : `<div class="wk-id"><b>Неделя ${W.gen}</b><small>${W.civ}</small></div>`;
   const clock = `<button class="wk-clock" data-a="sheet" data-v="wkclock" aria-label="Сроки недели"><span class="eyebrow">${L ? 'До отсечки' : 'Подсчёт'}</span><b class="num"${L ? ' data-cd="week"' : ''}>${L ? dur(L) : 'итоги скоро'}</b></button>`;
   const cy = S.acc.cycle >= 2 ? `<span class="chip wk-cyc" title="Места недели — среди игроков вашего цикла">${ic('flag')}Рейтинг цикла ${ROMAN[S.acc.cycle]}</span>` : '';
+  /* ритуалы — строкой под режимами, пока их экран не сообщил ступени загрузки в реестр: тогда у них своя строка режима */
   return `<div class="pnl wk-top">${id}${cy}${clock}${giftsBtn()}</div>
     <div class="wk-list">${rows.map(rowHtml).join('')}</div>
-    ${ritHtml()}`;
+    ${rows.some(st => st.m.id === 'ritual') ? '' : ritHtml()}`;
 }
 /* итог прошлой недели: сундуки — все выплаты режимов, Энериум — Арена и контракты; валюты и разбивка — лист */
 function pastSum(rows) {
@@ -360,7 +490,7 @@ function demoNote(rows) {
 /* лица героев Эхо недели: открытые к циклу, в коллекции — портрет с отметкой; собираемый — осколок-стекло с его лицом
    (shardGhost, screens/art-icons.js): доля собранного — светом кромки */
 function faceHtml(h, c) {
-  const on = h.c <= c, own = rsHas(h), n = S.rs.shards[h.id] || 0, need = RS.rules.stub.shards;
+  const on = h.c <= c, own = rsHas(h), n = S.rs.shards[h.id] || 0, need = typeof hrNeed === 'function' ? hrNeed(h) : RS.rules.stub.shards;   // комплект — свой у героя Эхо (ADR-0047)
   const tip = `${trEsc(h.n)}${on ? (own ? ' · в коллекции' : ` · осколков ${n} из ${need}`) : ' · с цикла ' + ROMAN[h.c]}`;
   if (on && !own && typeof shardGhost === 'function') return `<span class="wk-face glass" data-r="${h.r}" title="${tip}">${shardGhost(h, n, need, 60)}</span>`;
   return `<span class="wk-face ${on ? '' : 'lock'}" data-r="${h.r}" title="${tip}">${rsFace(h)}${own ? `<span class="wk-own">${ic('check')}</span>` : on ? `<i style="--v:${Math.min(100, Math.floor(n * 100 / need))}"></i>` : ''}</span>`;
@@ -379,7 +509,7 @@ function nextHtml() {
       <button class="pnl wk-card" data-a="sheet" data-v="wknext" aria-label="Герои Эхо недели ${W.gen}">
         <span class="eyebrow">Герои Эхо недели</span>
         <span class="wk-faces">${squad.map(h => faceHtml(h, c)).join('')}</span>
-        ${av ? `<b class="wk-big">${rsAversShort(av)}</b>` : ''}
+        ${av ? `<b class="wk-big">${rsAversSquad(squad)}</b>` : ''}
         <small class="wk-why">отряд, что отбил нашествие, — в Эхо и у Кланового босса</small>
       </button>
       <div class="pnl wk-card">
@@ -409,14 +539,19 @@ function boardHtml(st) {
   return `<span class="eyebrow">${st.topLabel}</span>
     <div class="wk-board">${B.rows.map(row).join('')}${B.gap ? '<div class="wk-gap" aria-hidden="true">···</div>' : ''}${B.me ? row(B.me) : ''}</div>`;
 }
+/* личные планки режима в листе — лестница на все циклы: «дорога» из полос (roadHtml). Единица порога — если планки не по очкам режима:
+   победы, загрузка мест. Режим без лестницы в данных — прежний список планок своего цикла */
 function planksHtml(st) {
   if (!st.planks.length) return '';
+  const unit = st.plankUnit !== st.unit ? st.plankUnit : null;
+  const road = roadHtml(st.m.id, st.planks, { have: st.have, unit, box: st.box });
+  if (road) return road;
   const got = st.planks.filter(p => p.reached).length;
-  const rows = st.planks.map(p => { const nx = st.next && p.need === st.next.need && !p.reached;
-    return `<div class="wk-pk ${p.reached ? 'got' : nx ? 'next' : ''}"><b class="num">${fmt(p.need)}</b><span title="${trEsc(payName(st.box, p.pay))}">${payName(st.box, p.pay) || '—'}</span>${p.reached ? `<span class="chip spirit">${ic('check')}взята</span>` : nx ? `<span class="faint num">ещё ${fmt(p.need - st.have)}</span>` : '<span></span>'}</div>`; }).join('');
-  const by = st.plankUnit !== st.unit ? ' ' + plankUnitOf(st, 0) : '';   // планки не по очкам — по победам
-  return `<span class="eyebrow">Планки${by} · ${got} из ${st.planks.length}</span><div class="wk-pks">${rows}</div>`;
+  const rows = st.planks.map(p => stepRow(st.box, p, { next: p === st.next, html: p.reached ? `<span class="chip spirit">${ic('check')}взята</span>` : p === st.next ? `<span class="faint num wk-ld-left">ещё ${fmt(p.need - st.have)}</span>` : '<span></span>' }, unit)).join('');
+  return `<div class="wk-ld"><span class="eyebrow">Планки · взято ${got} из ${st.planks.length}</span><div class="wk-ld-band">${rows}</div></div>`;
 }
+/* клановые планки режима, если он их ведёт: порог, сундуки каждому участнику, взята или сколько осталось клану */
+const clanPlanksHtml = st => st.clanPlanks.length ? clanHtml(st.m.id, { steps: st.clanPlanks, have: st.clanHave, unit: st.clanUnit }) : '';
 const tierHtml = st => st.tier ? `<p class="rs-line wk-tier">${chestTok(st.box, st.tier.pay, st.tier.label)}<span>Если неделя закончится сейчас: ${(st.tier.one || st.placeLabel).toLowerCase()} — ${st.tier.label}${st.tier.pay.length ? ', ' + payName(st.box, st.tier.pay) : ''}.</span></p>` : '';
 const ST_T = { got: 'получено', ok: 'в «Дарах»', wait: 'ждёт подсчёта' };
 function rewardsHtml(st) {
@@ -426,14 +561,15 @@ function rewardsHtml(st) {
   return `<span class="eyebrow">Награды · ${fmt(N)} ${plural(N, 'сундук', 'сундука', 'сундуков')}</span>${rows ? `<div class="wk-rws">${rows}</div>` : '<p class="faint">Сундуков нет.</p>'}${cur}${st.note ? `<p class="reason">${st.note}</p>` : ''}`;
 }
 Object.assign(OV, {
-  /* режим на эту или прошлую неделю: место и очки, планки или награды, лидеры; одно действие — в режим или в «Дары» */
+  /* режим на эту или прошлую неделю: место и очки, лестница планок и клановые планки или награды, лидеры; одно действие — в режим или в «Дары» */
   wkmode(o) {
     const [id, t0] = String(o.arg || '').split(':'), m = modeOf(id); if (!m) return '';
     const t = t0 === 'past' ? 'past' : 'now', W = weeks(), st = stateOf(m, t);
     const title = `${m.n} · ${t === 'now' ? 'эта неделя' : 'неделя ' + W.prev.gen}`;
-    const team = TM(m.demo ? 'Демо Недели: состояние — S и данные экранов, недостающее — WK в screens/week.js. Настоящий экран режима заменит строку через WEEK_MODES.' : 'Данные режима — WEEK_MODES.', 'p', 'reason');
+    const M = LM(id), R = M && M.ladder;
+    const team = TM(`${m.demo ? 'Демо Недели: состояние — S и данные экранов, недостающее — WK в screens/week.js. Настоящий экран режима заменит строку через WEEK_MODES.' : 'Данные режима — WEEK_MODES.'}${t === 'now' && R && st.planks.length ? ` Лестница — EnLoot.ladder (lootboxes.js): полосы — циклы ${R.bands.map(b => ROMAN[b]).join(', ')}, первая ступень следующей полосы — ×${R.next || '—'} от верхней своей; порог — первая планка цикла игрока × множитель ступени.` : ''}`, 'p', 'reason');
     const body = st.lock ? `<p class="rs-line">${ic('lock')}${cap1(st.lock)}.</p>${team}`
-      : `${statsHtml(st)}${t === 'now' ? planksHtml(st) + tierHtml(st) : rewardsHtml(st)}${boardHtml(st)}${team}`;
+      : `${statsHtml(st)}${t === 'now' ? planksHtml(st) + clanPlanksHtml(st) + tierHtml(st) : rewardsHtml(st)}${boardHtml(st)}${team}`;
     const cat = st.rewards.some(r => r.cat === 'me') || !st.rewards.length ? 'me' : 'clan';
     const foot = t === 'now' ? (m.go ? `<button class="btn go" data-a="go" data-v="${m.go}">${ic('door')}${ENTER} в «${m.n}»</button>` : '')
       : `<button class="btn" data-a="sheet" data-v="gifts:${cat}">Дары ${ic('chev')}</button>`;
@@ -474,7 +610,7 @@ Object.assign(OV, {
     const body = `<div class="col wk-civ"><b class="serif">${W.civ}</b>${civ ? foldLore(`Нашествие «${W.raid}». ${civ.raid} ${civ.look} Жила на Этериосе задолго до этеров.`) : ''}</div>
       <span class="eyebrow">Герои Эхо недели · открыто ${open.length} из ${squad.length}</span>
       <div class="rs-list">${rows}</div>
-      ${av ? `<p class="rs-line">${ic('target')}Неприязнь: ${rsAversShort(av)}</p><p class="reason">Действует везде, где встречаются враги этой расы: в Эхо, у Кланового босса недели и в спуске.</p>` : ''}
+      ${av ? `<p class="rs-line">${ic('target')}Неприязнь: ${rsAversSquad(squad)}</p><p class="reason">Действует везде, где встречаются враги этой расы: в Эхо, у Кланового босса недели и в спуске.</p>` : ''}
       ${els.length ? `<span class="eyebrow">Стихии нашествия</span><div class="wk-els">${els.map(([e, n]) => `<span class="wk-el">${el(e)}<b class="num">×${n}</b></span>`).join('')}</div>` : ''}
       <p class="reason">Лестница Эхо, очки и места начнутся заново — через ${dur(startIn())}.</p>`;
     return sheet(`Неделя ${W.gen}`, body, '', true);
@@ -515,17 +651,32 @@ if (typeof KIT_EXTRA !== 'undefined') KIT_EXTRA.push({
       <div class="k-demo wk-kit"><span class="eyebrow">Эта неделя</span><div class="wk-list">${now}</div><span class="eyebrow">Прошлая</span><div class="wk-list">${past}</div></div>
       <p class="k-note">Строка режима: значок, имя; место и очки — два числа; полоса до ближайшей планки и её сундук цвета редкости — на этой неделе, лучший сундук недели и «получено» или «ждёт в „Дарах“» — на прошлой. Нажатие на строку и её «›» — сведения, лист. Переход в режим — явная кнопка «Войти» с дверью справа в строке и в листе${TM(' — слово автора 29.09.2026: переход был неочевиден')}. У прошлой недели «Войти» нет.</p>
       <p class="k-note">Реестр итогов: <code>(window.WEEK_MODES = window.WEEK_MODES || []).push({ id, n, icon, go, order, unit, now: () =&gt; ({ place, points, planks, next, top }), past: () =&gt; ({ place, points, top, rewards, cur }) })</code>. Строка с тем же <code>id</code> заменяет демо. Договор — <code>design/ui/screens/README.md</code>.</p>
-      <ul class="k-note wk-kreg">${reg}</ul></section>`;
+      <ul class="k-note wk-kreg">${reg}</ul>
+      ${kitLadder()}</section>`;
   },
 });
+/* UI-кит: лестница планок — три вида одной дороги: начало пути, середина игры, игрок уже идёт по следующей полосе */
+function kitLadder() {
+  const id = ['event', 'echo', 'contract'].find(x => LM(x) && LM(x).ladder && steps(x, { cycle: LM(x).from }).length); if (!id) return '';
+  const M = LM(id), last = M.ladder.bands[M.ladder.bands.length - 1], mid = Math.min(last, M.from + 2);
+  const at = (c, k, frac) => { const L = steps(id, { cycle: c }), lo = k ? L[Math.min(k, L.length) - 1].need : 0, hi = L[Math.min(k, L.length - 1)].need; return lo + Math.floor((hi - lo) * frac / WK.bp); };
+  const show = (c, k, t) => { const have = at(c, k, WK.past.frac.event || 0); return `<div class="k-air-r"><b>${t}</b>${ladderHtml(id, { cycle: c, have })}</div>`; };
+  const per = ladLayer(id).rows.length;
+  return `<h3>Лестница планок · сразу на все циклы</h3>
+    <p class="k-note">Лестница режима одна, сквозная, по очкам: пять полос — циклы II–VI. Прошлые полосы — одной строкой «пройдено», своя — крупно: порог, сундук цвета редкости, «взята» или сколько осталось; будущие свёрнуты — «цикл N», сундуки полосы и порог её первой ступени в очках игрока; потолок — отдельной строкой. За верхней планкой своей полосы сразу идут планки следующей — без перехода в новый цикл.${TM(' Слова автора 02.10.2026, ADR-0047: «у игрока они должны быть сразу и на все циклы… его ресурс время». Ступени — EnLoot.ladder (lootboxes.js), пороги — первая планка цикла игрока × множитель ступени; вид — EN_WEEK.ladderHtml (screens/week.js), его зовут экраны режимов.')}</p>
+    <div class="wk-kld">${show(M.from, 2, `Цикл ${ROMAN[M.from]} · начало пути`)}${show(mid, 3, `Цикл ${ROMAN[mid]} · прошлые полосы пройдены`)}${show(M.from, per + 1, 'Идёт по следующей полосе — без перехода')}</div>`;
+}
 
 /* ================== сценарии презентации ================== */
 FLOWS.push(
   ['Неделя · три времени', 'Эта неделя: раса и цивилизация Эхо, срок до отсечки, шесть режимов строкой — место, очки, полоса до планки', () => { S.route = 'week'; S.seg.week = 'now'; S.overlay = null; }],
   ['Неделя · итог прошлой', 'Сундуки и Энериум недели, по режимам место и очки; награды и лидеры — в листе, ссылка в «Дары»', () => { S.route = 'week'; S.seg.week = 'past'; S.overlay = { t: 'wkpast' }; }],
   ['Неделя · следующая', 'Раса и цивилизация, герои Эхо недели с неприязнью, стихии нашествия', () => { S.route = 'week'; S.seg.week = 'next'; S.overlay = null; }],
+  ['Неделя · лестница планок', 'Лист режима: лестница сразу на все циклы — своя полоса крупно, будущие свёрнуты с сундуками и порогом, клановые планки', () => { S.route = 'week'; S.seg.week = 'now'; S.overlay = { t: 'wkmode', arg: 'event:now' }; }],
 );
 
-/* для автопроверки tools/content-gen/screens/check_week.js и консоли */
-window.EN_WEEK = { data: WK, modes, state: (id, t) => { const m = modeOf(id); return m ? stateOf(m, t === 'past' ? 'past' : 'now') : null; }, weeks, board, pastSum: () => pastSum(modes().map(m => stateOf(m, 'past'))), enOf, startIn };
+/* общий помощник лестницы для экранов режимов — steps, ladderHtml, clanSteps, clanHtml (договор — screens/README.md);
+   остальное — для автопроверки tools/content-gen/screens/check_week.js и консоли */
+window.EN_WEEK = { data: WK, modes, state: (id, t) => { const m = modeOf(id); return m ? stateOf(m, t === 'past' ? 'past' : 'now') : null; }, weeks, board, pastSum: () => pastSum(modes().map(m => stateOf(m, 'past'))), enOf, startIn,
+  steps, ladderHtml, clanSteps, clanHtml, stepName };
 })();

@@ -12,6 +12,13 @@
    4. Награды: цель — доля недельного дохода обычного игрока (ключи — доля капа рунных стражей), делённая на исполненные
       задание-дни. Энериум — с эпической редкости, без цикла. Заверение — ×2 наград, не очков, ставка — 2 × золото пула.
    5. Проверки: объёмы и время, цели наград, ключи против капа, правило ×1,7 (§1.2), Энериум не окупает платные замены, пороги планок.
+   6. Лестница планок (ADR-0047): личные планки — ступени лестницы режима на все циклы (EnLoot.ladder, lootboxes.js): пороги своей
+      полосы — первая планка цикла × шаг строки, за верхней — планки следующих полос, без перехода. Где стоят профили — сверяется с typical
+      лутбоксов: обычный — 4-я, увлечённый — 5-я.
+   7. Клановые ступени (§18.1: «½ личный + клановый рейтинг»; ADR-0042, ADR-0047): счёт клана — сумма очков контрактов участников,
+      порог ступени — участников × доля × первая личная планка цикла. Клан — 25 мест, в неделю играют 70 %, как у Эхо и Событий. Доли
+      подбирает прогон: клан обычных — на первой с запасом не меньше 5 %, клан увлечённых — на второй, во всех циклах. Ключи клановых
+      сундуков — внутри цели «75 % капа рунных стражей»: вычитаются из цели наград заданий, как личные.
 
    Пишет:
    - design/ui/contracts.js — данные прототипа (window.EN_CONTRACTS) и алгоритм пула (window.EnContracts из offer.js), руками не править;
@@ -173,18 +180,23 @@ const SIM = {
   weeks: 200, seed: 'прогон контрактов', tau: [40, 140],
   typical: { artPool: { 2: 1, 3: 2, 4: 3, 5: 4, 6: 4 }, artRer: { 2: 1, 3: 2, 4: 2, 5: 2, 6: 2 } },   // уровень «Доски объявлений» и «Костей писаря»: не выше одного за цикл (ADR-0028)
   prof: {
-    o: { n: 'обычный', cap: 'o', lg: 'o', off: 1, keepDayBp: 6000, keepWeekBp: 42000, below: 3, paid: 0, cert: '' },
-    e: { n: 'увлечённый', cap: 'e', lg: 'e', off: 0, keepDayBp: 10000, keepWeekBp: 70000, below: 3, paid: 0, cert: 'w' },
-    p: { n: 'плательщик, время обычного', cap: 'o', lg: 'p', off: 1, keepDayBp: 10000, keepWeekBp: 70000, below: 7, paid: 'cap', cert: '' },
-    q: { n: 'тот же риск без платных замен', cap: 'o', lg: 'p', off: 1, keepDayBp: 10000, keepWeekBp: 70000, below: 7, paid: 0, cert: '' },
+    o: { n: 'обычный', cap: 'o', lg: 'o', clan: 'o', off: 1, keepDayBp: 6000, keepWeekBp: 42000, below: 3, paid: 0, cert: '' },
+    e: { n: 'увлечённый', cap: 'e', lg: 'e', clan: 'e', off: 0, keepDayBp: 10000, keepWeekBp: 70000, below: 3, paid: 0, cert: 'w' },
+    p: { n: 'плательщик, время обычного', cap: 'o', lg: 'p', clan: 'o', off: 1, keepDayBp: 10000, keepWeekBp: 70000, below: 7, paid: 'cap', cert: '' },
+    q: { n: 'тот же риск без платных замен', cap: 'o', lg: 'p', clan: 'o', off: 1, keepDayBp: 10000, keepWeekBp: 70000, below: 7, paid: 0, cert: '' },
   },
   // o — оставляет задания не больше 60 % своего дня и 4,2 дня недели, меняет обычные и редкие; e — берёт всё и заверяет недельный;
   // p — берёт всё и ловит редкость всеми платными заменами; q — p без платных замен: разница p и q — чистый вклад Энериума.
-  // lg — чей темп героев открывает Лигу (leagueOpen: o, e, p — плательщик с донатным сетом); у q — тот же, что у p
+  // lg — чей темп героев открывает Лигу (leagueOpen: o, e, p — плательщик с донатным сетом); у q — тот же, что у p.
+  // clan — в чьём клане играет профиль: плательщик и «тот же риск» — в клане обычных, клановая ступень от одного участника не зависит
+  /* типичный клан — как у Эхо и Событий (economy/echo.py, CLAN; event/build.js, SIM.clan): 25 мест (§24.1), в неделю играют 70 %.
+     Неделя клана — сумма недель играющих участников из прогона профиля: weeks недель на цикл. per — доли клановых ступеней в сотых
+     первой личной планки на участника */
+  clan: { members: 25, activeBp: 7000, per: 100, weeks: 600 },
 };
 
-/* Законы и пороги проверок. */
-const LAWS = { x17: 170, loopPct: 50, plankStep: 2 };
+/* Законы и пороги проверок. clanMarginBp — запас клана над своей клановой ступенью: закон не сидит на пороге (как у Эхо — 5 %) */
+const LAWS = { x17: 170, loopPct: 50, plankStep: 2, clanMarginBp: 500 };
 
 /* ================================ РАСЧЁТ ================================ */
 
@@ -214,7 +226,17 @@ function build() {
   const err = [], warn = [];
   const CAP = JSON.parse(fs.readFileSync(FILES.cap, 'utf8'));
   const LB = loadJs(FILES.loot, 'EN_LOOTBOXES'), RX = loadJs(FILES.recipes, 'EN_RECIPES'), WN = loadJs(FILES.wanderer, 'EN_WANDERER'), ER = loadJs(FILES.echo, 'EN_ECHO_RULES');
+  const EL = loadJs(FILES.loot, 'EnLoot');   // алгоритм лестницы планок — общий с прототипом (lootboxes/open.js, ladder)
   if (!ER) err.push('echo-rules.js: нет EN_ECHO_RULES — очки События не посчитать (python tools/content-gen/economy/echo.py --js)');
+  /* лестница планок контрактов в лутбоксах: слой личных планок (ladder.layer), слой клановых планок, где стоят профили (typical) */
+  const LM = LB.modes.contract, LAD = LM.ladder || null;
+  const meLy = LM.layers.find(l => l.kind === 'plank' && !l.clan && (!LAD || l.id === LAD.layer)), clanLy = LM.layers.find(l => l.kind === 'plank' && l.clan) || null;
+  const TYP = LM.typical || {};
+  if (!meLy) err.push('lootboxes.js: у контрактов нет слоя личных планок');
+  if (!LAD || !EL || typeof EL.ladder !== 'function') err.push('lootboxes.js: у контрактов нет лестницы планок (modes.contract.ladder, EnLoot.ladder) — node tools/content-gen/lootboxes/build.js');
+  if (!clanLy) err.push('lootboxes.js: у контрактов нет слоя клановых планок — клановые ступени не посчитать (§18.1, ADR-0047)');
+  if (!TYP.free || !TYP.fan || [TYP.free.me, TYP.fan.me, TYP.free.clan, TYP.fan.clan].some(v => !Number.isInteger(v))) err.push('lootboxes.js: у контрактов нет typical — где стоят обычный и увлечённый на личных и клановых планках');
+  if (err.length) return { data: null, tables: {}, err, warn };
   /* Лига: доля дней цикла, когда у профиля открыта Лига, б. п. — одно место, leagueOpen (темп героев прогона достижений) */
   const LO = leagueShare(CAP, LB, loadJs(FILES.roster, 'EN_ROSTER'), err);
   const KI = Object.fromEntries(KINDS.map(k => [k.id, k]));
@@ -350,20 +372,69 @@ function build() {
   };
   const weekOf = (c, k) => CAP.cycles[c].o[k] * 7;   // недельный доход обычного, × 100
 
-  /* --- пороги планок рейтинга контрактов: соседние ×2 (лутбоксы); увлечённый в среднем доходит до 5-й --- */
+  /* --- пороги планок рейтинга контрактов: соседние ×2 (лутбоксы); увлечённый в среднем доходит до 5-й. planks — пороги своей полосы:
+     первая планка цикла × шаг строки. Лестница (ADR-0047): за верхней планкой своей полосы — планки следующих полос, без перехода:
+     порог — первая планка цикла × множитель ступени (EnLoot.ladder), сундук ступени — своей полосы, содержимое — цикла игрока --- */
   const planks = {};
   const meanPts = (c, pid) => sims[c][pid].pts / sims[c][pid].weeks;
-  for (const c of RULES.cycles) { const p1 = niceDown(meanPts(c, 'e') / 16); planks[c] = LB.modes.contract.layers[0].rows.map(x => p1 * x.x); }
-  const plankOf = (c, pts) => planks[c].filter(x => pts >= x).length;
-  /* сундуки личных планок рейтинга за неделю — по планке, которую профиль берёт в среднем; ключи × 100 */
-  const ratingKeys100 = (c, pid) => LB.modes.contract.layers[0].rows.slice(0, plankOf(c, meanPts(c, pid)))
-    .reduce((a, row) => a + (row.cyc[c] || []).reduce((b, g) => b + g.count * LB.ev.keys[c][g.win][g.r - 1].keys, 0), 0);
+  const topX = meLy.rows[meLy.rows.length - 1].x;   // шаг верхней планки полосы: первая планка — такая, чтобы увлечённый в среднем брал её
+  for (const c of RULES.cycles) { const p1 = niceDown(meanPts(c, 'e') / topX); planks[c] = meLy.rows.map(x => p1 * x.x); }
+  const ladder = {};
+  for (const c of RULES.cycles) ladder[c] = EL.ladder(LB, 'contract', c).map(s => ({ k: s.k, band: s.band, i: s.i, need: Math.floor(planks[c][0] * s.x / meLy.rows[0].x), pay: s.pay }));
+  const plankOf = (c, pts) => ladder[c].filter(s => pts >= s.need).length;
+  const payKeys100 = (c, pay) => pay.reduce((b, g) => b + g.count * LB.ev.keys[c][g.win][g.r - 1].keys, 0);   // ожидаемые ключи сундуков выплаты, × 100
+  /* сундуки личных планок рейтинга за неделю — ступени лестницы, которые профиль берёт в среднем; ключи × 100 */
+  const ratingKeys100 = (c, pid) => ladder[c].slice(0, plankOf(c, meanPts(c, pid))).reduce((a, s) => a + payKeys100(c, s.pay), 0);
+
+  /* --- клановые ступени рейтинга контрактов (§18.1: «½ личный + клановый рейтинг»; ADR-0042, ADR-0047). Счёт клана — сумма очков
+     контрактов участников за неделю; ступень k — участников × ⌊первая личная планка цикла × доля[k] / per⌋ (offer.js, clanPlanks); очки
+     участника другого цикла — в долях первой планки его цикла (clanPts). Шаги — строки клановых планок контрактов в лутбоксах (x).
+     Первая доля — не ручка: середина самого длинного отрезка долей, при которых законы держатся во всех циклах (запас в обе стороны):
+     клан обычных в типичную неделю — на первой ступени с запасом не меньше clanMarginBp, клан увлечённых — на второй с тем же запасом --- */
+  const CLN = SIM.clan, clanAct = Math.floor(CLN.members * CLN.activeBp / RULES.bp), CLAN_STEP = { o: 1, e: 2 };
+  const median = xs => { const s = xs.slice().sort((a, b) => a - b); return s[Math.floor(s.length / 2)]; };
+  const simClan = (c, pid) => {
+    const rng = OC.makeRng(OC.seedOf(`${SIM.seed}|клан|${pid}|${c}`)), pool = sims[c][pid].ptsWeek, res = [];
+    for (let w = 0; w < CLN.weeks; w++) { let s = 0; for (let m = 0; m < clanAct; m++) s += pool[rng(pool.length)]; res.push(s); }
+    return res;
+  };
+  const clanSims = {}, clanMed = {};
+  for (const c of RULES.cycles) { clanSims[c] = { o: simClan(c, 'o'), e: simClan(c, 'e') }; clanMed[c] = { o: median(clanSims[c].o), e: median(clanSims[c].e) }; }
+  const clanXOf = x1 => clanLy.rows.map(r => x1 * r.x);
+  const clanNeeds = (x1, c) => OC.clanPlanks({ planks, clan: { per: CLN.per, x: clanXOf(x1) } }, CLN.members, c);
+  const reachedOf = (needs, v) => needs.filter(n => v >= n).length;
+  const clanLaws = (x1, c) => {   // законы кланов цикла c при первой доле x1 — список нарушений
+    const needs = clanNeeds(x1, c), out = [];
+    if (needs.length !== clanLy.rows.length || needs.some((n, i) => !(n > 0) || (i && n <= needs[i - 1]))) { out.push('клановые ступени не растут'); return out; }
+    for (const [pid, who] of [['o', 'клан обычных'], ['e', 'клан увлечённых']]) {
+      const m = clanMed[c][pid], k = CLAN_STEP[pid], got = reachedOf(needs, m);
+      if (got !== k) out.push(`${who} — на ${got}-й клановой ступени, а не на ${k}-й (${fmt(m)} очков недели при порогах ${needs.map(fmt).join(' / ')})`);
+      else if (m * RULES.bp < needs[k - 1] * (RULES.bp + LAWS.clanMarginBp)) out.push(`${who} — на ${k}-й клановой ступени без запаса ${pct(LAWS.clanMarginBp, RULES.bp)}`);
+    }
+    return out;
+  };
+  let cBest = [], cRun = [];
+  for (let x1 = 1; x1 <= CLN.per * topX; x1++) {   // выше верхней личной планки на участника клан не уйдёт
+    if (!RULES.cycles.every(c => !clanLaws(x1, c).length)) { cRun = []; continue; }
+    cRun.push(x1);
+    if (cRun.length > cBest.length) cBest = cRun.slice();
+  }
+  if (!cBest.length) err.push('клановые ступени: ни одна первая доля не держит законы кланов во всех циклах — клан обычных на 1-й, клан увлечённых на 2-й');
+  const clanX1 = cBest.length ? cBest[Math.floor(cBest.length / 2)] : CLN.per;
+  const clan = { x: clanXOf(clanX1), needs: {}, span: cBest.length ? [cBest[0], cBest[cBest.length - 1]] : [0, 0] };
+  for (const c of RULES.cycles) { clan.needs[c] = clanNeeds(clanX1, c); for (const e of clanLaws(clanX1, c)) err.push(`цикл ${ROMAN[c]}: ${e}`); }
+  const clanStepOf = (c, pid) => reachedOf(clan.needs[c], clanMed[c][SIM.prof[pid].clan]);
+  /* сундуки клановых ступеней за неделю — на участника клана профиля; ключи × 100 */
+  const clanKeys100 = (c, pid) => clanLy.rows.slice(0, clanStepOf(c, pid)).reduce((a, row) => a + payKeys100(c, row.cyc[c] || []), 0);
+
   const per = {}, keysGoal = {};
   for (const c of RULES.cycles) {
     const s = sims[c].o, W = s.weeks, units = s.units10;   // задание-дни × 10 за все недели
     const u3 = ['d', 'w'].reduce((a, t) => a + s.done[t].reduce((b, n, i) => b + (i + 1 >= TARGET.ckeyFrom ? n * U(i + 1) * (t === 'd' ? 1 : 7) : 0), 0), 0) / 7;
     const chK = s.chest.reduce((a, n, i) => a + n * chestKeys100(c, i + 1), 0) / (100 * W), chG = s.chest.reduce((a, n, i) => a + n * chestGold(c, i + 1), 0) / W;
-    keysGoal[c] = capKeysWeek(c) * TARGET.keysAllBp / RULES.bp - (bossKeys100Week(c, 'o') + ratingKeys100(c, 'o')) / 100;   // что должны дать контракты с их сундуками
+    /* что должны дать контракты с их сундуками: цель «75 % капа» без ключей с боссов и без сундуков рейтинга — личных планок и клановых ступеней */
+    keysGoal[c] = capKeysWeek(c) * TARGET.keysAllBp / RULES.bp - (bossKeys100Week(c, 'o') + ratingKeys100(c, 'o') + clanKeys100(c, 'o')) / 100;
+    if (!(keysGoal[c] - chK > 0)) err.push(`цикл ${ROMAN[c]}: сундуки рейтинга и клановых ступеней с боссами уже дают цель ключей — наградам заданий ничего не остаётся`);
     per[c] = {
       keys: (keysGoal[c] - chK) * W * 10 / units,
       gold: (weekOf(c, 'gold') / 100 * TARGET.goldBp / RULES.bp - chG) * W * 10 / units,
@@ -404,7 +475,8 @@ function build() {
       for (let r = 1; r <= 7; r++) { const n = s.chest[r - 1] + s.chestCert[r - 1]; out.chestKeys += n * chestKeys100(c, r) / 100; out.gold += n * chestGold(c, r); }
       for (const k of Object.keys(out)) out[k] = out[k] / W;   // в неделю
       out.rating = ratingKeys100(c, pid) / 100; out.boss = bossKeys100Week(c, SIM.prof[pid].cap) / 100;
-      out.keysAll = out.keys + out.chestKeys + out.boss + out.rating;
+      out.clanKeys = clanKeys100(c, pid) / 100;   // сундуки клановых ступеней — на участника
+      out.keysAll = out.keys + out.chestKeys + out.boss + out.rating + out.clanKeys;
       income[c][pid] = out;
     }
   }
@@ -463,10 +535,16 @@ function build() {
     loop[c] = { paid: n, spent: n * RULES.rer.price, got: p.en - q.en };
     if (n && (p.en - q.en) * 100 > LAWS.loopPct * n * RULES.rer.price) err.push(`цикл ${ROMAN[c]}: платные замены возвращают ${pct(p.en - q.en, n * RULES.rer.price)} Энериума — больше ${LAWS.loopPct} %`);
   }
+  /* где стоят профили — typical контрактов в лутбоксах: это не допущение, а итог этого прогона, и сборщик его подтверждает во всех
+     циклах — личные планки (обычный — 4-я, увлечённый — 5-я) и клановые ступени (клан обычных — 1-я, клан увлечённых — 2-я) */
   for (const c of RULES.cycles) {
-    if (plankOf(c, meanPts(c, 'o')) < 3) err.push(`цикл ${ROMAN[c]}: обычный не доходит до 3-й планки`);
-    if (plankOf(c, meanPts(c, 'e')) < 5) err.push(`цикл ${ROMAN[c]}: увлечённый не доходит до 5-й планки`);
-    for (let i = 1; i < planks[c].length; i++) if (planks[c][i] < planks[c][i - 1] * LAWS.plankStep) err.push(`цикл ${ROMAN[c]}: планки ближе ×${LAWS.plankStep}`);
+    for (const [pid, who, t] of [['o', 'обычный', TYP.free], ['e', 'увлечённый', TYP.fan]]) {
+      const got = plankOf(c, meanPts(c, pid)), cl = clanStepOf(c, pid);
+      if (got !== t.me) err.push(`цикл ${ROMAN[c]}: ${who} в среднем берёт ${got}-ю личную планку (${fmt(Math.round(meanPts(c, pid)))} очков недели), а typical контрактов в лутбоксах — ${t.me}-я`);
+      if (cl !== t.clan) err.push(`цикл ${ROMAN[c]}: клан профиля «${who}» берёт ${cl}-ю клановую ступень, а typical контрактов в лутбоксах — ${t.clan}-я`);
+    }
+    for (let i = 1; i < ladder[c].length; i++) if (ladder[c][i].need < ladder[c][i - 1].need * LAWS.plankStep) err.push(`цикл ${ROMAN[c]}: планки лестницы ближе ×${LAWS.plankStep} — ${ladder[c][i - 1].need} и ${ladder[c][i].need}`);
+    for (const x of clan.needs[c]) if (!Number.isInteger(x)) err.push(`цикл ${ROMAN[c]}: порог клановой ступени не целый — ${x}`);
   }
   /* определённость: тот же сид — тот же пул */
   {
@@ -479,9 +557,11 @@ function build() {
   const pas = id => { const p = WN.passives.find(x => x.id === id); return p ? { id, n: p.n, d: p.d, r: p.r } : null; };
   const achRer = WN.ach.list.filter(a => a.pk === 'reroll').map(a => ({ id: a.id, n: a.n, v: a.v }));
   const round1 = x => Math.round(x * 10) / 10;
+  /* ключи режима «Контракты»: награды заданий, сундук недельного контракта, сундуки рейтинга — личных планок и клановых ступеней */
+  const ctKeysOf = I => I.keys + I.chestKeys + I.rating + I.clanKeys;
   const data = {
     meta: { builder: 'tools/content-gen/contracts/build.js', capacity: 'tools/content-gen/contracts/capacity.json', capSha: crypto.createHash('sha256').update(fs.readFileSync(FILES.cap)).digest('hex').slice(0, 12),
-      sources: ['GDD §18', 'ADR-0014', 'ADR-0022', 'ADR-0023', 'ADR-0028', 'design/ui/lootboxes.js', 'design/ui/recipes.js', 'design/ui/wanderer.js', 'design/ui/echo-rules.js', 'tools/content-gen/event/build.js'] },
+      sources: ['GDD §18', 'ADR-0014', 'ADR-0022', 'ADR-0023', 'ADR-0028', 'ADR-0042', 'ADR-0047', 'design/ui/lootboxes.js', 'design/ui/recipes.js', 'design/ui/wanderer.js', 'design/ui/echo-rules.js', 'tools/content-gen/event/build.js'] },
     rules: {
       bp: RULES.bp, openLevel: RULES.openLevel, openCycle: RULES.openCycle, cycles: RULES.cycles, tables: RULES.tables, tableName: RULES.tableName,
       pool: Object.assign({}, RULES.pool, { artInfo: art(RULES.pool.art), memInfo: pas(RULES.pool.mem) }),
@@ -494,21 +574,30 @@ function build() {
     caps: Object.fromEntries(RULES.cycles.map(c => [c, Object.fromEntries(KINDS.map(K => [K.id, [caps[c][K.id].o, caps[c][K.id].e]]))])),
     hours: CAP.hours,
     typical: Object.fromEntries(RULES.cycles.map(c => [c, { pool: poolOf(c), rer: rerOf(c) }])),
+    /* planks — пороги личных планок своей полосы по циклам: первая планка цикла × шаг строки планки лутбоксов. Дальше — лестница
+       на все циклы (EnLoot.ladder, ADR-0047): порог ступени — первая планка цикла × множитель ступени */
     planks,
+    /* clan — клановые ступени рейтинга контрактов (§18.1, ADR-0042, ADR-0047): members и activeBp — клан модели (25 мест, играют 70 %);
+       x — доли ступеней в сотых (per) первой личной планки на участника; needs — пороги клана модели из одного цикла. Порог своего
+       клана и очки участника другого цикла — EnContracts.clanPlanks и clanPts */
+    clan: { members: CLN.members, activeBp: CLN.activeBp, per: CLN.per, x: clan.x, needs: clan.needs },
     /* econ — итог прогона в неделю: keys — ключи со всех источников, ctKeys — только режима «Контракты» (награды заданий, сундук
-       недельного контракта, сундуки планок рейтинга, без ключей с боссов) — их берёт калькулятор сет-бонусов economy/sets.py;
-       gold — золото наград и сундуков, stake — ставки заверения, spirit — дух наград: их берёт калькулятор экономики economy/economy.py (Т7) */
+       недельного контракта, сундуки планок рейтинга — личных и клановых, без ключей с боссов) — их берёт калькулятор сет-бонусов
+       economy/sets.py; gold — золото наград и сундуков, stake — ставки заверения, spirit — дух наград: их берёт калькулятор экономики
+       economy/economy.py (Т7); clanPts — медиана недели клана профиля (играющие участники клана модели), clanStep — его клановая ступень */
     econ: Object.fromEntries(RULES.cycles.map(c => [c, {
       capKeys: Math.round(capKeysWeek(c)),
       o: { dayDoneBp: Math.round(sims[c].o.dayDone * RULES.bp / sims[c].o.dayTry), weekDoneBp: Math.round(sims[c].o.weekDone * RULES.bp / sims[c].o.weekTry),
-        keys: Math.round(income[c].o.keysAll), ctKeys: Math.round(income[c].o.keys + income[c].o.chestKeys + income[c].o.rating),
-        pts: Math.round(meanPts(c, 'o')), en: Math.round(income[c].o.en), gold: Math.round(income[c].o.gold), stake: Math.round(income[c].o.stake), spirit: Math.round(income[c].o.spirit) },
+        keys: Math.round(income[c].o.keysAll), ctKeys: Math.round(ctKeysOf(income[c].o)),
+        pts: Math.round(meanPts(c, 'o')), en: Math.round(income[c].o.en), gold: Math.round(income[c].o.gold), stake: Math.round(income[c].o.stake), spirit: Math.round(income[c].o.spirit),
+        clanPts: clanMed[c].o, clanStep: clanStepOf(c, 'o') },
       e: { dayDoneBp: Math.round(sims[c].e.dayDone * RULES.bp / sims[c].e.dayTry), weekDoneBp: Math.round(sims[c].e.weekDone * RULES.bp / sims[c].e.weekTry),
-        keys: Math.round(income[c].e.keysAll), ctKeys: Math.round(income[c].e.keys + income[c].e.chestKeys + income[c].e.rating),
-        pts: Math.round(meanPts(c, 'e')), en: Math.round(income[c].e.en), gold: Math.round(income[c].e.gold), stake: Math.round(income[c].e.stake), spirit: Math.round(income[c].e.spirit) },
+        keys: Math.round(income[c].e.keysAll), ctKeys: Math.round(ctKeysOf(income[c].e)),
+        pts: Math.round(meanPts(c, 'e')), en: Math.round(income[c].e.en), gold: Math.round(income[c].e.gold), stake: Math.round(income[c].e.stake), spirit: Math.round(income[c].e.spirit),
+        clanPts: clanMed[c].e, clanStep: clanStepOf(c, 'e') },
       /* p — плательщик при времени обычного: его ключи контрактов берёт прогон темпа (biomes/pace.py, ×1,7 темпа цикла II),
          Энериум — калькулятор ручейка Энериума (economy/enerium.js, ×1,7 Энериума игрой) */
-      p: { keys: Math.round(income[c].p.keysAll), ctKeys: Math.round(income[c].p.keys + income[c].p.chestKeys + income[c].p.rating), pts: Math.round(meanPts(c, 'p')), en: Math.round(income[c].p.en) },
+      p: { keys: Math.round(income[c].p.keysAll), ctKeys: Math.round(ctKeysOf(income[c].p)), pts: Math.round(meanPts(c, 'p')), en: Math.round(income[c].p.en) },
       x17: Math.round(x17[c].worst * 100),
     }])),
   };
@@ -607,12 +696,23 @@ function build() {
   for (const c of RULES.cycles) { const L = loop[c]; T.push(cells([ROMAN[c], dec(L.paid, 1), fmt(Math.round(L.spent)), dec(L.got, 1), pct(L.got, L.spent || 1), L.got * 100 <= LAWS.loopPct * L.spent ? 'да' : 'нет', `${dec(income[c].o.en, 7)} / ${dec(income[c].e.en, 7)}`])); }
   TBL.loop = T.join('\n');
 
-  // планки
-  T = head(['Цикл', 'Планки 1–5, очков недели', 'Обычный: очков → планка', 'Увлечённый', 'Плательщик', 'Резервуар клана: очков в день с игрока, обычный']);
-  for (const c of RULES.cycles) T.push(cells([ROMAN[c], planks[c].map(fmt).join(' / '), `${fmt(Math.round(meanPts(c, 'o')))} → ${plankOf(c, meanPts(c, 'o'))}`, `${fmt(Math.round(meanPts(c, 'e')))} → ${plankOf(c, meanPts(c, 'e'))}`, `${fmt(Math.round(meanPts(c, 'p')))} → ${plankOf(c, meanPts(c, 'p'))}`, dec(meanPts(c, 'o') * RULES.splitBp / RULES.bp, 7)]));
+  // планки: своя полоса и первая планка следующей — её берут очками, без перехода в новый цикл (ADR-0047)
+  const nextOf = c => { const s = ladder[c][meLy.rows.length]; return s ? `${fmt(s.need)} · сундуки цикла ${ROMAN[s.band]}` : '— · полоса последняя'; };
+  T = head([`Цикл`, `Планки 1–${meLy.rows.length} своей полосы, очков недели`, 'За верхней — первая планка следующей полосы', 'Обычный: очков → планка', 'Увлечённый', 'Плательщик', 'Резервуар клана: очков в день с игрока, обычный']);
+  for (const c of RULES.cycles) T.push(cells([ROMAN[c], planks[c].map(fmt).join(' / '), nextOf(c), `${fmt(Math.round(meanPts(c, 'o')))} → ${plankOf(c, meanPts(c, 'o'))}`, `${fmt(Math.round(meanPts(c, 'e')))} → ${plankOf(c, meanPts(c, 'e'))}`, `${fmt(Math.round(meanPts(c, 'p')))} → ${plankOf(c, meanPts(c, 'p'))}`, dec(meanPts(c, 'o') * RULES.splitBp / RULES.bp, 7)]));
   TBL.planks = T.join('\n');
 
-  // цели наград
+  // клановые ступени: пороги клана модели, где стоят кланы и с каким запасом, ключи их сундуков на участника
+  const over = (v, need) => '+' + pct(v - need, need);
+  T = head(['Цикл', 'Первая личная планка', `Клановые ступени, клан из ${CLN.members}: на участника ×${clan.x.map(x => dec(x, CLN.per, 2)).join(' / ')} первой личной`, `Клан обычных, играют ${clanAct}: неделя → ступень`, 'Запас над ней', 'До следующей', 'Клан увлечённых: неделя → ступень', 'Запас над ней', 'До следующей', 'Ключи клановых сундуков в неделю на участника: обычный / увлечённый']);
+  for (const c of RULES.cycles) {
+    const nd = clan.needs[c], row = pid => { const m = clanMed[c][pid], k = clanStepOf(c, pid); return [`${fmt(m)} → ${k}`, k ? over(m, nd[k - 1]) : '—', k < nd.length ? pct(nd[k] - m, nd[k]) : '—']; };
+    T.push(cells([ROMAN[c], fmt(planks[c][0]), nd.map(fmt).join(' / '), ...row('o'), ...row('e'), `${dec(clanKeys100(c, 'o'), 100)} / ${dec(clanKeys100(c, 'e'), 100)}`]));
+  }
+  T.push('', `Первая доля — ×${dec(clanX1, CLN.per, 2)}: середина отрезка ×${dec(clan.span[0], CLN.per, 2)}–${dec(clan.span[1], CLN.per, 2)}, на котором законы кланов держатся во всех циклах. Ниже отрезка клан обычных уже на второй ступени, выше — клан увлечённых не на второй с запасом ${pct(LAWS.clanMarginBp, RULES.bp)}.`);
+  TBL.clan = T.join('\n');
+
+  // цели наград: ключи — без сундуков рейтинга; сколько из цели «75 % капа» дают боссы и сундуки рейтинга — личных планок и клановых ступеней
   T = head(['Цикл', 'Ключи: контракты / цель', 'Золото / цель', 'Дух / цель', 'Базовые / цель', 'Ставка увлечённого, доля его золота']);
   for (const c of RULES.cycles) { const a = ach[c]; T.push(cells([ROMAN[c], `${fmt(Math.round(a.keys))} / ${fmt(Math.round(a.keysT))}`, `${fmt(Math.round(a.gold))} / ${fmt(Math.round(a.goldT))}`, `${fmt(Math.round(a.spirit))} / ${fmt(Math.round(a.spiritT))}`, `${fmt(Math.round(a.base))} / ${fmt(Math.round(a.baseT))}`, pct(income[c].e.stake, CAP.cycles[c].e.gold * 7 / 100, 1)])); }
   TBL.target = T.join('\n');
@@ -622,7 +722,7 @@ function build() {
   for (const K of KINDS) T.push(cells([K.n, ...RULES.cycles.map(c => c < K.from ? '—' : capTxt(K, c))]));
   TBL.cap = T.join('\n');
 
-  return { data, tables: TBL, sims, income, x17, loop, planks, err, warn, D };
+  return { data, tables: TBL, sims, income, x17, loop, planks, ladder, clan, clanMed, clanSims, keysGoal, err, warn, D };
 }
 
 /* ================================ ВЫВОД ================================ */
@@ -634,6 +734,8 @@ function render(data) {
    Черновик · предложение · ждёт автора. Числа — демонстрация, только целые; шансы — в базисных пунктах (10 000 = 100 %).
    vol[таблица][цикл][вид] — объём задания по редкостям, 0 — на этой редкости вид не выдаётся; share — доля дня обычного
    и увлечённого игрока в б. п. (у недельных — дни × 10 000); rew — награда задания по редкости; stake — ставка заверения.
+   planks — пороги личных планок своей полосы; дальше — лестница на все циклы (EnLoot.ladder, ADR-0047): первая планка цикла ×
+   множитель ступени. clan — клановые ступени: доли x (в сотых per первой личной планки на участника) и пороги клана модели needs.
    Обоснование и таблицы — docs/content/контракты.md. В игре пул, замену, исход и награду решает сервер (§18, §36.16):
    клиент получает состав и прогресс. Ниже данных — алгоритм пула tools/content-gen/contracts/offer.js как есть. */\n`;
   return head + 'window.EN_CONTRACTS = ' + JSON.stringify(data) + ';\n' + offer;

@@ -28,7 +28,13 @@
    Свет и цвет редкости по-прежнему дают токены --r1…--r7 (ADR-0027); рисунок редкости — материал, оковка и камень сундука.
    «Пропустить анимацию» — итог сразу; выбор помнит localStorage (en-co-skip), без него всё работает; при prefers-reduced-motion
    анимации нет. Числа вида — CO_VIEW, арт — CO_ART, демо сценариев — CO_DEMO. Служебное — только команде: TM из index.html.
-   Автопроверка — tools/content-gen/screens/check_chest_open.js. */
+   Новые записи (ADR-0047). Итог сундука — гарантированные записи первыми (sure: гарантия осколков, запись темы и сильная линия
+   сундука КрафБосса), на карточке и плитке — золотая точка. Запись героя Эхо — связка его осколков и гарантия (вид target) — несёт
+   раздачу «сервера» героев Эхо (поле to, zpEchoGive в bag.js): лицо — первый получатель, подсказка — все получатели; что стало
+   прахом Эха — строкой итога «прах Эха ×N». Вид сундука — coKind: свой из CO_KINDS или собранный по теме сундука КрафБосса; пока
+   своего рисунка нет, сундук берёт чужой (coArtBox) и несёт отметку темы — бирку со значком ремесла (coMark), тип врага — её оковка.
+   Раздел «Лутбоксы» UI-кита (index.html) получает новые сундуки и записи дополнениями в конце этого файла.
+   Автопроверка — tools/content-gen/screens/check_chest_open.js: показ, выдача и законы открытия с мутациями. */
 'use strict';
 
 /* ================== вид: числа анимации, не баланс ================== */
@@ -39,6 +45,9 @@ const CO_VIEW = {
      столбцами и рядами; верх самой ценной; монеты справа от сундука: зазор и шаг; столп света [ширина, высота], ‰ ширины крышки — px */
   geo: { w: 720, h: 356, ground: 34, scale: 228, depth: 1000, persp: 3000, lock: 190, lockDrop: 64, card: [84, 112], hero: [124, 166],
     side: 28, colGap: 14, rowGap: 14, heroTop: 14, coin: [18, 36], beam: [760, 1500],
+    /* отметка темы — бирка на корпусе сундука с чужим рисунком: середина бирки — % ширины и высоты корпуса; слева — справа от
+       сундука встают монеты и туда же падает замок */
+    mark: [19, 58],
     /* помост под сундуком (арт --cr-dais, screens/crafthall.js): ширина — ‰ ширины сундука; середина верха помоста — на земле */
     dais: 1560 },
   /* моменты, мс */
@@ -202,7 +211,32 @@ const CO_KINDS = {
   workers: { n: 'Рабочие', ic: 'gear', wood: '#6a5137', wood2: '#46341f', metal: '#6f6c66', metal2: '#44423e' },     // рабочий короб: светлое дерево и железо
   craft: { n: 'Крафт', ic: 'crown', wood: '#48483f', wood2: '#2c2c27', metal: '#7f8b7c', metal2: '#4d564b' },        // каменный сундук руин
   wander: { n: 'Странник', ic: 'star', wood: '#4c3423', wood2: '#2e1f15', metal: '#c09858', metal2: '#735a33' },     // дорожный сундук: кожа и латунь
+  /* сундук артели (ритуалы, ADR-0047): своего рисунка пока нет — рабочий короб с отметкой артели; арт — в очереди docs/art-queue.md */
+  artel: { n: 'Артель', ic: 'users', art: 'workers', mark: 'artel', wood: '#5c4a36', wood2: '#3b2e20', metal: '#8a7a5c', metal2: '#54493a' },
 };
+/* вид сундука по id. Свой — из CO_KINDS. Сундук КрафБосса (EN_LOOTBOXES.boxes[id].theme — ремесло темы, type — тип врага: b — босс,
+   u — Убер, a — Пробуждённый; ADR-0047) собирается из данных: материал — каменный сундук призыва, эмблема и отметка — значок ремесла
+   темы, имя — тема и тип. art — чей рисунок берёт вид, пока своего нет; mark — отметка на сундуке: по ней виден сундук с чужим рисунком */
+const CO_TYPE = { b: '', u: ' · город', a: ' · пробуждённый' };
+function coKind(box) {
+  const B = LBX && LBX.boxes[box], Th = B && B.theme && LBX.summon && LBX.summon.themes ? LBX.summon.themes[B.theme] : null;
+  if (!Th) return CO_KINDS[box] || null;
+  const sp = RX.specs[B.theme];
+  return Object.assign({}, CO_KINDS.craft, { n: Th.n + (CO_TYPE[B.type] || ''), ic: (sp && sp.icon) || CO_KINDS.craft.ic, art: 'craft', mark: B.theme, type: B.type || 'b', spec: sp ? sp.n : '' });
+}
+/* чей рисунок берёт сундук: свой, как только он нарисован (рамка в CO_ART.chests или лист в CO_ART.sets), иначе — того, кого назвал вид */
+const coOwnArt = box => !!(CO_ART.chests[box] || (CO_ART.sets && CO_ART.sets[box]));
+const coArtBox = box => { const K = coKind(box); return coOwnArt(box) ? box : (K && K.art) || box; };
+/* отметка темы на сундуке: значок ремесла на бирке у корпуса; тип врага — цвет оковки бирки (стили — chest-open.css). Отметка нужна,
+   пока один рисунок делят несколько сундуков: у всех шести тем — каменный сундук призыва, у артели — рабочий короб. Свой рисунок
+   выгружен каждому — отметки уходят сами */
+function coMark(box) {
+  const K = coKind(box);
+  if (!K || !K.mark || !LBX) return null;
+  const ab = coArtBox(box);
+  if (!Object.keys(LBX.boxes).some(b => b !== box && coArtBox(b) === ab)) return null;
+  return { th: K.mark, ty: K.type || '', ic: K.ic, tip: K.spec ? `Тема сундука — ${K.n}: ${K.spec.toLowerCase()}` : K.n };
+}
 const CO_GOLD = ['#e3c27c', '#8e6b35'];            // золотая оковка заглушки SVG с редкости CO_VIEW.gild: светлая и тёмная
 /* сценарии презентации: какой сундук кладётся в запасы и сколько — демо, не выдача режима */
 const CO_DEMO = {
@@ -210,7 +244,7 @@ const CO_DEMO = {
   many: { box: 'shards', r: 4, cyc: 3, win: 'step', week: 'Эльфы', src: 'Эхо · личная планка', count: 10 },
 };
 /* ценность вида записи при равной редкости: кто вылетает позже и стоит выше в итоге */
-const CO_KIND_W = { shard: 6, tal: 5, equip: 4, wshard: 3, item: 2, cur: 1 };
+const CO_KIND_W = { shard: 6, target: 6, tal: 5, equip: 4, wshard: 3, item: 2, cur: 1 };
 
 /* ================== помощники ================== */
 const CO_KEY = 'en-co-skip';   // localStorage: «Пропустить анимацию» у сундуков — свой выбор, не общий с рулеткой
@@ -238,14 +272,17 @@ function coTex(n) {
 /* пути листа режима: корпус, крышка, плитка сундука редкости r; замок режима */
 const coSetPath = (box, r, part) => `chests/${box}/r${r}${part ? '-' + part : ''}.webp`;
 const coSetLock = box => `chests/${box}/lock.webp`;
-/* замок сундука: замок режима, если выгружен лист; иначе общий. p — путь (null — заглушка SVG), px — размер в исходнике */
+/* замок сундука: замок режима, если выгружен лист; иначе общий. p — путь (null — заглушка SVG), px — размер в исходнике.
+   Рисунок — своего вида или того, у кого вид его берёт (coArtBox): сундуки КрафБоссов и артели */
 function coLockOf(box) {
+  box = coArtBox(box);
   const S = CO_ART.sets[box];
   if (S && coArtOk(coSetLock(box))) return { p: coSetLock(box), px: S.lock };
   return { p: coArtOk('chests/lock.png') ? 'chests/lock.png' : null, px: CO_ART.lock };
 }
 /* сундук рисунком — если выгружены оба слоя: лист режима своей редкости, иначе прежний сундук вида */
 function coChestArt(box, r) {
+  box = coArtBox(box);
   const S = CO_ART.sets[box], g = S && S.by[(r || 1) - 1];
   if (g) {
     const b = coSetPath(box, r, 'body'), l = coSetPath(box, r, 'lid');
@@ -272,13 +309,46 @@ function coPreload(box, r) {
   for (const u of list) if (!CO_PRE.has(u)) { CO_PRE.add(u); try { const im = new Image(); im.decoding = 'async'; im.src = u; } catch (_) { } }
 }
 
-/* одна выпавшая запись — для карточки и плитки: значок, имя, количество, редкость — выпавшая из окна сундука */
+/* запись героя Эхо — связка его осколков или гарантия (запись вида target, ADR-0047): кому ушли осколки, решил «сервер» героев Эхо
+   при выдаче (zpEchoGive, bag.js) — поле записи to: { parts: [[id героя, осколков]], dust — прах Эха }. Лицо записи — первый
+   получатель: стекло осколка с его лицом; все осколки стали прахом Эха — значок праха Эха; получателя нет (показ без раздачи) —
+   значок героев. Подсказка называет всех получателей и прах Эха */
+function coEchoTip(o) {
+  const who = o.parts.map(([id, n]) => `${RSI[id] ? RSI[id].n : 'герой'} ×${fmt(n)}`).concat(o.edust ? [`прах Эха ×${fmt(o.edust)}`] : []).join(', ');
+  if (o.kind === 'target') return `Осколки герою-цели недели ×${fmt(o.q)}${who ? ': ' + who : ''}`;
+  const same = o.parts.length === 1 && o.parts[0][0] === o.id && !o.edust;
+  return `Осколки героя: ${o.hn} ×${fmt(o.q)}${same || !who ? '' : ' → ' + who}`;
+}
+function coEchoFace(o) {
+  const first = o.parts.length ? RSI[o.parts[0][0]] : null, more = o.parts.length - 1;
+  const g = first && typeof shardGhost === 'function' ? shardGhost(first, S.rs.shards[first.id] || 0, zpNeed(first), 96) : '';
+  o.face = !!first && !g; o.glass = !!g; o.toDust = !first && o.edust > 0;
+  o.icon = first ? (g || rsFace(first)) : o.toDust ? `<img src="${curImg('edust')}" alt="">` : ic('users');
+  o.name = first ? first.n + (more > 0 ? ` и ещё ${more}` : '') : o.toDust ? 'Прах Эха' : o.kind === 'target' ? 'Герой-цель недели' : o.hn || 'Герой';
+  o.tip = coEchoTip(o);
+  return o;
+}
+/* слить две записи героя Эхо в одну плитку итога: получатели — суммой по герою, прах Эха — суммой; лицо и подсказка — заново */
+function coEchoAdd(x, c) {
+  for (const [id, n] of c.parts) { const p = x.parts.find(v => v[0] === id); if (p) p[1] += n; else x.parts.push([id, n]); }
+  x.edust += c.edust;
+  return coEchoFace(x);
+}
+/* сколько на карточке и плитке: прах за осколки пробуждённого — «+N», прах Эха за все осколки записи — «×N», иначе — количество записи */
+const coQty = c => (c.dust ? '+' + fmt(c.dust) : c.toDust ? '×' + fmt(c.edust) : '×' + fmt(c.q));
+/* одна выпавшая запись — для карточки и плитки: значок, имя, количество, редкость — выпавшая из окна сундука; sure — запись
+   гарантированная (гарантия осколков, запись темы и сильная линия сундука КрафБосса) */
 function coView(it) {
-  const k = it.kind, o = { kind: k, id: it.id, r: it.r, q: it.q, dust: it.dust || 0, face: false, name: '', hn: '', icon: '', tip: '' };
-  if (k === 'shard') {
+  const k = it.kind, o = { kind: k, id: it.id, r: it.r, q: it.q, dust: it.dust || 0, face: false, name: '', hn: '', icon: '', tip: '', sure: !!it.sure, edust: 0 };
+  if (k === 'target' || (k === 'shard' && it.to)) {
+    const h0 = k === 'shard' ? RSI[it.id] : null;
+    o.parts = it.to ? it.to.parts.map(p => p.slice()) : []; o.edust = it.to ? it.to.dust || 0 : 0;
+    o.hn = h0 ? h0.n : k === 'shard' && LBX && LBX.heroInfo[it.id] ? LBX.heroInfo[it.id].n : '';
+    coEchoFace(o);
+  } else if (k === 'shard') {
     const h = RSI[it.id], n = h ? h.n : LBX && LBX.heroInfo[it.id] ? LBX.heroInfo[it.id].n : 'Герой';
     /* осколки — стекло с лицом героя и долей собранного (shardGhost, screens/art-icons.js); ушли в прах — портрет пробуждённого */
-    const g = h && !o.dust && typeof shardGhost === 'function' ? shardGhost(h, S.rs.shards[it.id] || 0, RS.rules.stub.shards, 96) : '';
+    const g = h && !o.dust && typeof shardGhost === 'function' ? shardGhost(h, S.rs.shards[it.id] || 0, zpNeed(h), 96) : '';
     o.face = !!h && !g; o.glass = !!g; o.icon = g || (h ? rsFace(h) : ic('users')); o.hn = n; o.name = o.dust ? `${n} → прах` : n;
     o.tip = o.dust ? `${n} уже пробуждён: осколки ×${fmt(it.q)} → прах +${fmt(o.dust)}` : `Осколки героя: ${n} ×${fmt(it.q)}`;
   } else if (k === 'item') {
@@ -528,7 +598,7 @@ function coBurstHero(R) {
 /* ================== разметка ================== */
 /* заглушка SVG, пока рисунка вида нет: крышка и корпус — отдельные SVG, их рамки — CO_ART.svg. u — префикс id градиентов */
 function coSvgPart(part, box, u) {
-  const K = CO_KINDS[box] || CO_KINDS.wander, emb = (typeof LB_IC !== 'undefined' && LB_IC[box]) || K.ic, G = CO_ART.svg[part];
+  const K = coKind(box) || CO_KINDS.wander, emb = K.mark ? K.ic : (typeof LB_IC !== 'undefined' && LB_IC[box]) || K.ic, G = CO_ART.svg[part];
   const shade = `<linearGradient id="${u}${part}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".14"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".46"/></linearGradient>`;
   const lid = 'M26 90V61C26 43 60 34 100 34C140 34 174 43 174 61V90Z';
   const body = part === 'lid'
@@ -582,10 +652,10 @@ function coCardsHtml(R, e, C, my) {
     const fly = best ? H.rise : V.fly, fl = best ? T.hero.flip : t + V.fly, fp = best ? H.flip : V.flip;
     const s = `left:${x}px;top:${y}px;--w:${w}px;--h:${h}px;--fx:${fx}px;--fy:${fy}px;--dc:${t - e}ms;--tf:${fly}ms;--dl:${fl - e}ms;--tp:${fp}ms;--ta:${ta}deg`
       + (best ? `;--dv:${T.hero.hover - e}ms;--tv:${H.hover}ms` : '');
-    const face = `<span class="co-cb co-face"><i class="co-cr"></i><span class="co-ci${c.face ? ' face' : c.glass ? ' glass' : ''}">${c.icon}</span><b class="co-cq">${c.dust ? '+' + fmt(c.dust) : '×' + fmt(c.q)}</b>${best ? '<i class="co-csh co-a"></i>' : ''}</span>`;
+    const face = `<span class="co-cb co-face"><i class="co-cr"></i>${c.sure ? '<i class="co-pin"></i>' : ''}<span class="co-ci${c.face ? ' face' : c.glass ? ' glass' : ''}">${c.icon}</span><b class="co-cq">${coQty(c)}</b>${best ? '<i class="co-csh co-a"></i>' : ''}</span>`;
     const back = `<span class="co-back"><i class="co-bk"></i></span>`;
     const inner = `<i class="co-tail co-a"></i>${best ? '<i class="co-aura co-a"></i>' : ''}<span class="co-flip co-a">${face}${back}</span>`;
-    return `<div class="co-card co-a${best ? ' best' : ''}${c.dust ? ' dust' : ''}" data-r="${c.r}" data-i="${i}" title="${trEsc(c.tip)}" style="${s}">`
+    return `<div class="co-card co-a${best ? ' best' : ''}${c.dust ? ' dust' : ''}${c.toDust ? ' edust' : ''}" data-r="${c.r}" data-i="${i}" title="${trEsc((c.sure ? 'Наверняка · ' : '') + c.tip)}" style="${s}">`
       + (best ? `<div class="co-bob co-a">${inner}</div>` : inner) + `<small class="co-cn co-a">${trEsc(c.name)}</small></div>`;
   }).join('');
 }
@@ -598,18 +668,20 @@ function coCoinsHtml(R, e, C, my, gy) {
     return `<span class="co-coin co-a" style="left:${left}px;top:${top}px;--fx:${mx - left}px;--fy:${my - top}px;--dq:${R.T.open + V.coin + i * V.coinStep - e}ms"><img src="${curImg(k)}" alt="${coCurName(k)}"><b>+${fmt(a)}</b></span>`;
   }).join('');
 }
-/* итог — одной сеткой: одинаковые записи слиты, редкие сверху; у пачки — по редкостям. Прах — плиткой героя и строкой суммы */
+/* итог — одной сеткой: одинаковые записи слиты, редкие сверху; у пачки — по редкостям. Прах — плиткой героя и строкой суммы.
+   Записи героя Эхо слиты по записи сундука (гарантия — одной плиткой, связки героя — его плиткой): получатели и прах Эха — суммой */
 function coGroups(R) {
   const m = new Map();
   for (const c of R.items) {
     const k = [c.kind, c.id, c.dust ? 'прах' : ''].join(':'), x = m.get(k);
-    if (x) { x.q += c.q; x.dust += c.dust; x.n++; if (c.r > x.r) x.r = c.r; } else m.set(k, Object.assign({}, c, { n: 1 }));
+    if (x) { x.q += c.q; x.dust += c.dust; x.n++; if (c.r > x.r) x.r = c.r; if (c.sure) x.sure = true; if (c.parts) coEchoAdd(x, c); }
+    else m.set(k, Object.assign({}, c, { n: 1 }, c.parts ? { parts: c.parts.map(p => p.slice()) } : {}));
   }
   return [...m.values()].sort((a, b) => b.r - a.r || (CO_KIND_W[b.kind] || 0) - (CO_KIND_W[a.kind] || 0) || b.q - a.q || a.name.localeCompare(b.name, 'ru'));
 }
 function coTile(g, i) {
-  const tip = g.kind === 'shard' ? (g.dust ? `${g.hn} уже пробуждён: осколки ×${fmt(g.q)} → прах +${fmt(g.dust)}` : `Осколки героя: ${g.hn} ×${fmt(g.q)}`) : `${g.name} ×${fmt(g.q)}`;
-  return `<div class="co-t${g.dust ? ' dust' : ''}" data-r="${g.r}" title="${trEsc(tip)}" style="--i:${i}"><span class="co-ti${g.face ? ' face' : g.glass ? ' glass' : ''}">${g.icon}<b class="co-tq">${g.dust ? '+' + fmt(g.dust) : '×' + fmt(g.q)}</b></span><small>${trEsc(g.name)}</small></div>`;
+  const tip = g.parts ? g.tip : g.kind === 'shard' ? (g.dust ? `${g.hn} уже пробуждён: осколки ×${fmt(g.q)} → прах +${fmt(g.dust)}` : `Осколки героя: ${g.hn} ×${fmt(g.q)}`) : `${g.name} ×${fmt(g.q)}`;
+  return `<div class="co-t${g.dust ? ' dust' : ''}" data-r="${g.r}" title="${trEsc((g.sure ? 'Наверняка · ' : '') + tip)}" style="--i:${i}"><span class="co-ti${g.face ? ' face' : g.glass ? ' glass' : ''}${g.toDust ? ' edust' : ''}">${g.icon}${g.sure ? '<i class="co-pin"></i>' : ''}<b class="co-tq">${coQty(g)}</b></span><small>${trEsc(g.name)}</small></div>`;
 }
 /* кнопки итога: «Открыть ещё» — один такой же сундук с полной анимацией, «Открыть все» — оставшиеся пачкой; номер операции — на кнопках */
 function coActs(R) {
@@ -630,10 +702,13 @@ function coResHtml(R, e) {
   else for (const r of [...new Set(G.map(g => g.r))]) body += `<div class="co-rg"><span class="co-rh">${rar(r)}</span>${grid(G.filter(g => g.r === r))}</div>`;
   const dust = G.reduce((a, g) => a + g.dust, 0);
   const dl = dust ? `<p class="co-dust"><img src="${curImg('dust')}" alt="${coCurName('dust')}"><span>Осколки пробуждённых героев ушли в прах: <b>+${fmt(dust)}</b></span></p>` : '';
+  /* осколки героев Эхо, которым не нашлось цели (отряд недели собран), стали прахом Эха — своей строкой (ADR-0047) */
+  const edust = G.reduce((a, g) => a + (g.edust || 0), 0);
+  const el = edust ? `<p class="co-dust co-edl"><img src="${curImg('edust')}" alt="${coCurName('edust')}"><span>Осколкам героев Эхо не нашлось цели: <b>прах Эха ×${fmt(edust)}</b></span></p>` : '';
   const note = R.trial ? TM('Проба тем же алгоритмом, что у запасов (EnLoot на сиде пробы): запасы и кошелёк не меняются.', 'p', 'reason')
     : TM(`Итог выдан до анимации одной операцией${R.op ? ' ' + R.op : ''}: у каждого сундука свой сид, выданный вместе с ним. Анимация только показывает: закрыть окно, пропустить её или нажимать на сцену — итог тот же, повтор номера операции ничего не выдаёт. Числа вида — CO_VIEW.`, 'p', 'reason');
   return `<button class="co-scrim2" data-a="close" aria-label="Закрыть итог" tabindex="-1" style="--dr:${dr}"></button>
-    <section class="co-res${many ? ' wide' : ''}" role="dialog" aria-label="Итог открытия" style="--dr:${dr}">${head}<div class="co-res-b">${coins}${body}${dl}${note}</div><div class="co-res-f">${coActs(R)}</div></section>`;
+    <section class="co-res${many ? ' wide' : ''}" role="dialog" aria-label="Итог открытия" style="--dr:${dr}">${head}<div class="co-res-b">${coins}${body}${dl}${el}${note}</div><div class="co-res-f">${coActs(R)}</div></section>`;
 }
 /* сцена целиком: дымка, кольцо под сундуком, ореол ступеней света, лучи, столп, сундук с крышкой и замком, пыль, вспышка, монеты,
    карточки, затемнение и самая ценная; шапка, подсказка и итог. Все задержки — от начала показа минус e: перерисовка посреди анимации
@@ -650,7 +725,9 @@ function coStageHtml(R, e) {
   const lidArt = A ? `<img src="${A.lid}" alt="" draggable="false">${gild ? `<i class="co-shn co-a" style="--m:url('${A.lidAbs}')"></i>` : ''}` : coSvgPart('lid', R.box, `co${R.host}${R.id}`);
   const bodyArt = A ? `<img src="${A.body}" alt="" draggable="false">${lv.map((x, k) => `<i class="co-lit co-lvx${lvx(k)};--m:url('${A.bodyAbs}')"></i>`).join('')}${gild ? `<i class="co-shn co-a" style="--m:url('${A.bodyAbs}')"></i>` : ''}`
     : coSvgPart('body', R.box, `co${R.host}${R.id}`);
-  const K = CO_KINDS[R.box] || CO_KINDS.wander, metal = gold ? CO_GOLD : [K.metal, K.metal2];
+  const K = coKind(R.box) || CO_KINDS.wander, metal = gold ? CO_GOLD : [K.metal, K.metal2];
+  /* отметка темы — бирка на корпусе: у сундука с чужим рисунком (сундуки КрафБоссов, сундук артели) */
+  const mk = coMark(R.box), mark = mk ? `<i class="co-thm" data-th="${mk.th}"${mk.ty ? ` data-ty="${mk.ty}"` : ''} title="${trEsc(mk.tip)}" style="left:${bx + coPct(bw, G.mark[0])}px;top:${by + coPct(bh, G.mark[1])}px">${ic(mk.ic)}</i>` : '';
   const hops = idle ? [] : lv.slice(1).map((x, k) => `<div class="co-hop co-a" style="--dh:${d(T.lv[k + 1])}">`);
   const chest = `<div class="co-chest co-a${A ? ' art' : ''}" data-g="${gild ? 1 : 0}" style="left:${cl}px;top:${top}px;width:${C.w}px;height:${C.h}px;--wood:${K.wood};--wood2:${K.wood2};--metal:${metal[0]};--metal2:${metal[1]}">
       <div class="co-land co-a">${hops.join('')}<div class="co-shake co-a"><div class="co-recoil co-a"><div class="co-c3" style="perspective:${C.persp}px">
@@ -658,7 +735,7 @@ function coStageHtml(R, e) {
           <div class="co-lidu${A ? ' art' : ''}" style="height:${C.depth}px${A ? `;--m:url('${A.lidAbs}')` : ''}">${A ? `<img class="co-lui" src="${A.lid}" alt="" draggable="false">` : ''}${lv.map((x, k) => `<i class="co-ulv co-lvx${lvx(k)}"></i>`).join('')}</div>
           <div class="co-lidf">${lidArt}</div></div></div>
         <div class="co-mouth co-a" data-r="${R.b}" style="left:${C.cx - Math.round(C.inner / 2)}px;top:${C.seam}px;width:${C.inner}px"><i class="co-a"></i></div>
-        <div class="co-body" style="left:${bx}px;top:${by}px;width:${bw}px;height:${bh}px">${bodyArt}</div>
+        <div class="co-body" style="left:${bx}px;top:${by}px;width:${bw}px;height:${bh}px">${bodyArt}</div>${mark}
         <div class="co-bloom co-a" data-r="${R.b}" style="left:${C.cx - Math.round(C.inner / 2)}px;top:${C.seam}px;width:${C.inner}px"><i class="co-a"></i></div>
         ${lv.map((x, k) => `<div class="co-crk co-lvx${lvx(k, idle ? null : T.open)};left:${C.cx - Math.round(C.inner / 2)}px;top:${C.seam}px;width:${C.inner}px"><i class="co-a"></i><b class="co-leak co-a"></b></div>`).join('')}
         <div class="co-lock co-a" style="left:${C.lock[0]}px;top:${C.lock[1]}px;width:${C.lock[2]}px;height:${C.lock[3]}px">${coLockArt(R.box)}<i class="co-kh co-a"></i></div>
@@ -716,22 +793,39 @@ Object.assign(ACT, {
    Своя сцена в разделе: семь редкостей выбранного вида — проба тем же показом, что в запасах; проба — не выдача (S не меняется).
    Кнопка «С анимацией» пробного открытия раздела «Лутбоксы» играет его сундук на его сиде — предметы те же, что в списке бросков */
 const CO_KIT = { run: null, box: 'shards', r: 4, cyc: 3, week: 'Эльфы', win: 'step', n: 0, last: null };
-/* проба: те же EnLoot.resolve и roll, что у запасов; awake — чьи осколки идут в прах: 'owned' — коллекция игрока, 'all', 'none' */
+/* проба: осколки героев Эхо делит тот же «сервер» героев Эхо, что и при выдаче (zpEchoGive, bag.js), — но проба не выдача: осколки
+   и прах Эха после раздачи возвращаются на место (coEchoKeep и coEchoBack). awake: 'owned' — по коллекции игрока; 'all' — все герои
+   собраны: осколки героев Эхо становятся прахом Эха; 'none' — без раздачи: получателя запись не называет */
+const coEchoKeep = () => ({ shards: Object.assign({}, S.rs.shards), edust: S.wallet.edust });
+function coEchoBack(k) {
+  for (const id of Object.keys(S.rs.shards)) delete S.rs.shards[id];
+  Object.assign(S.rs.shards, k.shards);
+  if (k.edust === undefined) delete S.wallet.edust; else S.wallet.edust = k.edust;
+}
+function coEchoTry(it, week, awake) {
+  if (awake === 'all') return { parts: [], dust: it.q * (RS.rules.echoDust ? RS.rules.echoDust.perShard : 1) };
+  return zpEchoGive(it, week);
+}
+/* проба: те же EnLoot.resolve и roll, что у запасов; записи — по порядку бросков, гарантированные первыми; awake — чьи осколки идут
+   в прах: 'owned' — коллекция игрока, 'all', 'none' */
 function coTrial(spec, count, seedOf, awake) {
   if (!LBX || !window.EnLoot) return null;
   let def; try { def = EnLoot.resolve(LBX, spec); } catch (_) { return null; }
-  const log = [];
-  for (let i = 0; i < count; i++) {
-    const res = EnLoot.roll(def, seedOf(i)), aw = {};
-    for (const it of res.items) if (it.kind === 'shard' && (awake === 'all' || (awake === 'owned' && RSI[it.id] && rsHas(RSI[it.id])))) aw[it.id] = true;
-    const conv = EnLoot.toDust(LBX, res, aw);
-    log.push({ id: 'проба-' + i, cur: conv.cur, items: conv.items });
-  }
+  const log = [], keep = coEchoKeep();
+  try {
+    for (let i = 0; i < count; i++) {
+      const res = EnLoot.roll(def, seedOf(i)), aw = {};
+      for (const it of (res.sure || []).concat(res.items)) if (it.kind === 'shard' && !zpEchoIt(it) && (awake === 'all' || (awake === 'owned' && RSI[it.id] && rsHas(RSI[it.id])))) aw[it.id] = true;
+      const conv = EnLoot.toDust(LBX, res, aw), all = (conv.sure || []).concat(conv.items);
+      if (awake !== 'none') for (const it of all) if (zpEchoIt(it)) Object.defineProperty(it, 'to', { value: coEchoTry(it, spec.week || null, awake), enumerable: false, configurable: true });
+      log.push({ id: 'проба-' + i, cur: conv.cur, items: all });
+    }
+  } finally { coEchoBack(keep); }
   CO_KIT.last = { spec, awake };
   return coShow({ key: '', cs: { box: spec.box, r: spec.r, cyc: spec.cyc, win: spec.win, week: spec.week || null }, sum: { n: count, log }, op: '' }, { host: 'kit', trial: true });
 }
 const coKitSeeds = (spec, n) => i => EnLoot.seedOf(['проба-анимации', spec.box, spec.r, spec.cyc, spec.win, spec.week || '', n, i].join('|'));
-function coKitSpec(r) { const K = CO_KIT; return { box: K.box, r, cyc: K.cyc, win: K.win, week: K.box === 'shards' ? K.week : null }; }
+function coKitSpec(r) { const K = CO_KIT; return { box: K.box, r, cyc: K.cyc, win: K.win, week: zpWeekBox(K.box) ? K.week : null }; }   // неделя — у сундука, который её помнит
 function coKitStop() { coStop(CO_KIT.run); CO_KIT.run = null; }
 function coKitAct(v) {
   const K = CO_KIT, s = String(v), i = s.indexOf(':'), a = i < 0 ? s : s.slice(0, i), x = i < 0 ? '' : s.slice(i + 1);
@@ -774,7 +868,7 @@ function coBoardHtml() {
   const sp = coKitSpec(CO_KIT.r), B = CO_VIEW.board;
   let def; try { def = EnLoot.resolve(LBX, sp); } catch (_) { return ''; }
   const conv = EnLoot.toDust(LBX, EnLoot.roll(def, EnLoot.seedOf(['раскадровка', sp.box, sp.r, sp.cyc, sp.win, sp.week || ''].join('|'))), {});
-  const base = coRun({ key: '', cs: sp, sum: { n: 1, log: [{ cur: conv.cur, items: conv.items }] }, op: '' }, 'kit', { trial: true }), T = base.T;
+  const base = coRun({ key: '', cs: sp, sum: { n: 1, log: [{ cur: conv.cur, items: (conv.sure || []).concat(conv.items) }] }, op: '' }, 'kit', { trial: true }), T = base.T;
   if (!T.cards.length) return '';
   const s = T.lv.length - 1, lastLv = T.lv[s], wait = lastLv + coPct(T.lock - lastLv, B.wait);
   const card = T.cards.length > 1 ? T.cards[0] + CO_VIEW.fly + coPct(CO_VIEW.flip, B.card) : T.hero.start + coPct(T.H.rise, B.card);
@@ -805,11 +899,13 @@ function coArtNote() {
   const kinds = Object.keys(CO_ART.chests), R7 = [1, 2, 3, 4, 5, 6, 7];
   const sets = kinds.filter(k => R7.every(r => { const A = coChestArt(k, r); return A && A.set; })), drawn = kinds.filter(k => coChestArt(k, 1));
   const fx = CO_ART.fx.filter(n => coArtOk(`chests/fx-${n}.png`)), names = l => l.map(k => CO_KINDS[k].n).join(', ');
-  return `Арт: листы режимов — ${sets.length} из ${kinds.length} видов по семи редкостям${sets.length && sets.length < kinds.length ? ` (${names(sets)})` : ''}, у каждого — свой замок; остальные — прежний сундук вида на все редкости (${drawn.length - sets.length}); замок — ${coArtOk('chests/lock.png') ? 'рисунок' : 'заглушка SVG'}; текстуры света — ${fx.length} из ${CO_ART.fx.length}. Задания — <code>tools/art-gen/jobs/chest-sheets.json</code> и <code>chests.json</code>, слои — <code>chest_layers.py sheets</code>, выгруженные пути — <code>CO_ART.ready</code>.`;
+  /* сундуки с чужим рисунком: сундуки КрафБоссов — каменный сундук призыва, сундук артели — рабочий короб; тему называет отметка */
+  const lent = LBX ? Object.keys(LBX.boxes).filter(b => coArtBox(b) !== b || coMark(b)).length : 0;
+  return `Арт: листы режимов — ${sets.length} из ${kinds.length} видов по семи редкостям${sets.length && sets.length < kinds.length ? ` (${names(sets)})` : ''}, у каждого — свой замок; остальные — прежний сундук вида на все редкости (${drawn.length - sets.length}); замок — ${coArtOk('chests/lock.png') ? 'рисунок' : 'заглушка SVG'}; текстуры света — ${fx.length} из ${CO_ART.fx.length}. Сундуки КрафБоссов и сундук артели — ${lent}: своего рисунка пока нет, берут каменный сундук призыва и рабочий короб с отметкой темы — значком ремесла; нужный арт — в <code>docs/art-queue.md</code>. Задания — <code>tools/art-gen/jobs/chest-sheets.json</code> и <code>chests.json</code>, слои — <code>chest_layers.py sheets</code>, выгруженные пути — <code>CO_ART.ready</code>.`;
 }
 function coKitHtml() {
   if (!LBX || !window.EnLoot) return '<section class="k-box" style="grid-column:1/-1"><h3>Открытие сундука</h3><p class="k-note">Нет данных: рядом с index.html должен лежать lootboxes.js.</p></section>';
-  const kinds = Object.keys(LBX.boxes).map(k => `<button role="tab" data-co="box:${k}" aria-selected="${CO_KIT.box === k}" title="${LBX.boxes[k].n}">${ic((typeof LB_IC !== 'undefined' && LB_IC[k]) || (CO_KINDS[k] || CO_KINDS.wander).ic)}${(CO_KINDS[k] || { n: k }).n}</button>`).join('');
+  const kinds = Object.keys(LBX.boxes).map(k => { const K = coKind(k) || { n: LBX.boxes[k].n, ic: CO_KINDS.wander.ic }; return `<button role="tab" data-co="box:${k}" aria-selected="${CO_KIT.box === k}" title="${LBX.boxes[k].n}">${ic(K.ic)}${K.n}</button>`; }).join('');
   const rars = [1, 2, 3, 4, 5, 6, 7].map(r => `<button class="btn sm co-kb" data-r="${r}" data-co="r:${r}" aria-pressed="${CO_KIT.r === r}">${ICON('r' + r, 16, RAR[r])}${RAR[r]}</button>`).join('');
   return `<section class="k-box co-kbox" style="grid-column:1/-1"><h3>Открытие сундука · одна анимация на все сундуки</h3>
     <p class="k-note">Сундук своего вида падает с пылью; свет из щели под крышкой поднимается по редкостям — от нижней ступени окна сундука до самой ценной записи, крышка подпрыгивает, дрожь нарастает. Замок срывается, крышка откидывается назад — вспышка, столп света, с эпической — лучи, с древней — кольца, золото и дрожь. Записи поднимаются карточками рубашкой вверх со шлейфом цвета редкости и переворачиваются; самая ценная — медленно, с приближением и вспышкой своей редкости. Итог — одной сеткой. Нажатие на сцену ведёт к следующему моменту, «Пропустить анимацию» — сразу итог. Пачка — коротко: фонтан искр всех выпавших редкостей и одна карточка. В игре окно открывают «Запасы → Сундуки»: итог выдан до анимации одной операцией с номером, анимация только показывает (§34.1). Здесь — проба на цикле ${ROMAN[CO_KIT.cyc]}, неделя ${typeof zpWeekGen === 'function' ? zpWeekGen(CO_KIT.week) : CO_KIT.week}: проба — не выдача. Числа вида — <code>CO_VIEW</code> в <code>screens/chest-open.js</code>.</p>
@@ -821,11 +917,62 @@ function coKitHtml() {
 }
 KIT_EXTRA.push({ html: coKitHtml, paint: () => { coKitBind(); coKitTabs(); coKitPaint(); coKitBoardPaint(); } });
 
+/* ================== UI-кит «Лутбоксы»: сундуки КрафБоссов, сундук артели и гарантированные записи ==================
+   Раздел «Лутбоксы» живёт в index.html (lbHtml и его части). Новые сундуки и записи (ADR-0047) он показывает через эти дополнения:
+   значки и меры новых сундуков, слова новых пулов и линий, блок «Наверняка» в карточке сундука и броски гарантированных записей
+   в пробном открытии. Слова — те же, что в запасах: линии — zpLineSum, «Наверняка» — zpSureHtml (screens/bag.js).
+   Пробное открытие с флажком «герои отряда пробуждены»: осколки героев возрождения душ — в общий прах (§15.2), осколки героев Эхо
+   и гарантия — в прах Эха, осколок в осколок (курс — roster.js, rules.echoDust). Проба — не выдача */
+if (typeof LB_IC !== 'undefined' && typeof lbHtml === 'function' && LBX) {
+  for (const id of Object.keys(LBX.boxes)) { const K = coKind(id); if (K && (K.mark || !LB_IC[id])) LB_IC[id] = K.ic; }   // значок сундука темы — значок её ремесла
+  if (!LB_UNIT.rv) LB_UNIT.rv = 'очков редкости';
+  if (!LB_MAIN.rv) LB_MAIN.rv = 'очков редкости всех записей';
+  for (const ln of Object.values(LBX.lines)) if (ln.kind === 'res') for (const by of ln.by) if (by && !LB_RES[by[0]]) LB_RES[by[0]] = zpPoolName(by[0]);
+  const lbWeek = () => (zpWeekBox(LB.box) ? LB.week : null);
+  const lbLineSum0 = lbLineSum;
+  lbLineSum = function (l, x) { const k = LBX.lines[l.line].kind; return k === 'target' || k === 'rshards' || k === 'runes' ? zpLineSum(l, x, { week: lbWeek() }) : lbLineSum0(l, x); };
+  const lbItemName0 = lbItemName;
+  lbItemName = function (kind, id, r) { return kind === 'target' ? `Осколки герою-цели недели${id ? ' · ' + id : ''}` : lbItemName0(kind, id, r); };
+  /* карточка сундука: «Наверняка» — перед окном редкостей */
+  const lbCardHtml0 = lbCardHtml;
+  lbCardHtml = function (def) {
+    const h = lbCardHtml0(def), sure = zpSureHtml({ box: LB.box, r: LB.r, win: LB.win, cyc: LB.cyc, week: lbWeek() }, def), at = h.indexOf('<span class="eyebrow">Окно редкостей');
+    return sure && at >= 0 ? h.slice(0, at) + sure + h.slice(at) : h;
+  };
+  /* пробное открытие: гарантированные записи — первыми, по порядку бросков: своей линии — один бросок, из своих линий по окну — три */
+  lbTrialHtml = function (def) {
+    const L = LBX, E = window.EnLoot, seed = E.seedOf(LB.seed), trace = [], res = E.roll(def, seed, trace);
+    const echo = it => it.kind === 'target' || (it.kind === 'shard' && zpIsEcho(it.id)), per = RS.rules.echoDust ? RS.rules.echoDust.perShard : 1;
+    const awake = {}; if (LB.awake) (res.sure || []).concat(res.items).forEach(it => { if (it.kind === 'shard' && !echo(it)) awake[it.id] = true; });
+    const conv = LB.awake ? E.toDust(L, res, awake) : null;
+    let edust = 0;
+    const row = (it, t, cv) => {
+      const d = cv && cv.dust, ed = LB.awake && echo(it) ? it.q * per : 0, line = L.lines[it.line].n.replace(' — заглушка', '');
+      edust += ed;
+      const spoil = KH.team && (it.kind === 'tal' ? (L.talInfo[it.id] || [])[2] : it.kind === 'item' && L.items[it.id] && L.items[it.id].team);
+      const rolls = t.rolls.length === 3 ? `1) ${fmt(t.rolls[0])} из ${fmt(t.of[0])} → ${RAR[it.r].toLowerCase()} · 2) ${t.rolls[1]} из ${t.of[1]} → ${line.charAt(0).toLowerCase() + line.slice(1)} · 3) ${fmt(t.rolls[2])} из ${fmt(t.of[2])} → запись`
+        : `редкость сундука — ${RAR[it.r].toLowerCase()} · ${line.charAt(0).toLowerCase() + line.slice(1)} · 1) ${fmt(t.rolls[0])} из ${fmt(t.of[0])} → запись`;
+      return `<li data-r="${it.r}"><span class="lb-it">${rar(it.r)}<b>${trEsc(lbItemName(it.kind, it.id, it.r))}</b>${it.sure ? '<span class="chip gold">наверняка</span>' : ''}${spoil ? '<span class="chip warn">спойлер · только команде</span>' : ''}${it.q > 1 || it.kind === 'cur' ? `<span class="num">×${fmt(it.q)}</span>` : ''}${d ? `<span class="chip warn">→ прах ×${fmt(d)}</span>` : ''}${ed ? `<span class="chip warn">→ прах Эха ×${fmt(ed)}</span>` : ''}</span>
+      <span class="lb-roll">${rolls}</span></li>`;
+    };
+    const items = (res.sure || []).map((it, i) => row(it, trace.sure[i], conv && conv.sure[i])).join('') + res.items.map((it, i) => row(it, trace[i], conv && conv.items[i])).join('');
+    const note = conv ? `<p class="k-note">Герои отряда уже пробуждены: осколки героев возрождения душ ушли в общий прах — ${fmt(conv.dust)} (§15.2; курс — демо-таблица §15.3); осколки героев Эхо и гарантия — в прах Эха, осколок в осколок: ${fmt(edust)} (ADR-0047).</p>`
+      : (res.sure || []).concat(res.items).some(it => it.kind === 'shard' || it.kind === 'target') ? '<p class="k-note">Включите «герои отряда пробуждены» — покажет перевод лишних осколков в прах и в прах Эха.</p>' : '';
+    return `<div class="lb-card">
+    <div class="row" style="gap:8px;flex-wrap:wrap"><span class="eyebrow">Пробное открытие на сиде</span><span class="chip warn">проба — не выдача</span><span class="faint" style="font-size:12px">«${trEsc(LB.seed)}» → ${fmt(seed)}</span><button class="btn sm" data-co="lb" style="margin-left:auto" title="Тот же сундук на том же сиде — анимацией в разделе «Открытие сундука»">${ic('chev')}С анимацией</button></div>
+    <div class="k-row">${res.cur.map(([k, a]) => money(k, a)).join('')}<span class="faint" style="font-size:12px">${res.cur.length ? 'гарантированно, без бросков' : 'валюты сундука нет: её заменяет запись темы'}</span></div>
+    <ol class="lb-items">${items}</ol>
+    ${note}
+    <p class="k-note">На предмет — три броска: редкость из окна, линия пула, запись. Гарантированная запись своей линии — один бросок на редкости сундука; из своих линий по окну — те же три броска. Порядок бросков не зависит от содержимого: гарантированные — первыми. В игре сид выдаёт сервер вместе с сундуком, открытие — операция с одним итогом (§34.1).</p>
+  </div>`;
+  };
+}
+
 /* ================== сценарии презентации ================== */
 /* демо-сундук кладётся в запасы, как его принесли бы Дары, и открывается кнопкой карточки — с номером операции */
 function coFlow(d) {
   S.route = 'craft'; S.seg.craft = 'stock'; S.overlay = null;
-  const V = zpV(), sp = { box: d.box, r: d.r, cyc: d.cyc, win: d.win, week: d.box === 'shards' ? d.week || null : null };
+  const V = zpV(), sp = { box: d.box, r: d.r, cyc: d.cyc, win: d.win, week: zpWeekBox(d.box) ? d.week || null : null };
   V.tab = 'chest';
   for (let i = 0; i < d.count; i++) BAG.addChest(Object.assign({ src: d.src }, sp));
   const key = 'g:' + zpChestKey(sp);

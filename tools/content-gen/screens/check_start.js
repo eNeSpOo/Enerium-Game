@@ -24,7 +24,10 @@
         операции сервера — отказ (Лавка, сундуки, артефакты — тоже);
       — сундук уровня 3, Лавка и первый артефакт — шаги с заданным итогом (EN_START.tut): карточка сундука и его открытие — содержимое
         сценария; витрина обучения — товары сценария по местам и ценам Лавки, срок и обновление её не меняют, купить — только товар шага;
-        артефакт — только свой, золото и души на него набраны к шагу. Сверка — со свежей сборкой, не с данными прототипа.
+        артефакт — только свой, золото и души на него набраны к шагу. Сверка — со свежей сборкой, не с данными прототипа;
+      — артефакт активных биомов (ADR-0054, слова автора 06.10.2026): шаг покупки — до первого забега; до покупки активного биома нет —
+        «Спуск» вместо «Начать забег» предлагает купить артефакт, забег не начинается; покупка — операция с номером: золото по цене
+        таблицы автора, активных биомов — один; повтор номера ничего не покупает; уровней артефакта в обучении нет.
    7б. Погружения Подземного леса (ADR-0049, слово автора 02.10.2026: биом 2 — «до условных 5 - 10 заходов», «с каждым новым погружением
       показывает новое окно… рассказывает про навыки героя, систему как и что работает»):
       — заходов в лес и к стражу — коридор автора; погружений — столько, сколько уроков; каждое глубже прежнего, хозяйка леса — в последнем;
@@ -113,6 +116,7 @@ const T = vm.runInContext(`({
   ACT, OV, SCREENS, NAV_OPEN, RSI, RS, BAG, EB, HD_SRV, WS_SRV, GD_SRV, SQ_SRV, LV_SRV, render, initialState, startRun, advance, focusRun,
   hdOp, wsOp, gdOp, gdCost, rsGold, rsHas, limitRune, hrTwin, hrMine, setTeam, get team() { return KH.team; }, H, zpOpen: function () { return zpOpen.apply(this, arguments); },
   zpV: () => zpV(), zpGroups: () => zpChestGroups(), zpDef: sp => zpDef(sp), WN_SRV, wnOp: () => wnOp(), shopCost, LV_DATA, mkMin, SH_SRV, get STORE() { return window.EN_STORE; },
+  EN_TRAIL: s => window.EN_TRAIL(s), get EN_WANDERER() { return window.EN_WANDERER; },   // активные биомы — слоты по артефакту (ADR-0054)
   renderKit: () => renderKit(), renderMap: () => renderMap(),
   OB: { D: OB_D, R: OB_R, SRV: OB_SRV, sync: obSync, switch: obSwitch, pop: obPopHtml, can: obCanShow, slotLock: obSlotLock, hero: obHero, get mode() { return OB_MODE; },
     SC: OB_SC, gate: obGate, step: () => obStepOf(), tut: () => obTut(), hintOn: () => obHintOn(), TEXT: OB_TEXT, HINT: OB_HINT, VIEW: OB_VIEW_ACT, rid: obRid,
@@ -323,6 +327,14 @@ function mkW(o = {}) {
       run('Лавка', () => T.ACT.buydo(s.overlay.v)); s.overlay = null;
       return s.sold.includes(i);
     },
+    /* артефакт активных биомов — главная кнопка «Спуска», пока активного биома нет: покупка операцией с номером (ADR-0054) */
+    trail(id) {
+      const s = T.S; s.route = 'descent'; s.overlay = null;
+      if (o.draw) { const h = draw('Спуск · активного биома нет'); if (!/data-a="wnbuy" data-v="[^"]*"/.test(h)) sink('«Спуск» без активного биома: нет покупки артефакта активных биомов'); }
+      run('артефакт активных биомов', () => T.ACT.wnbuy(`${id}:${T.wnOp()}`));
+      s.overlay = null;
+      return s.wn.art[id] != null;
+    },
     /* артефакт — «Купить» и «Улучшить» в Реликварии, каждое — операцией с номером */
     art(id, lv) {
       const s = T.S; s.route = 'profile'; s.seg.profile = 'arts'; s.overlay = null; if (o.draw) draw('Реликварий · первый артефакт');
@@ -380,7 +392,7 @@ function fp(s) {
     part: Object.keys(s.ws.part || {}).sort(), train: s.hd.train,
     bestiary: (s.known || []).slice().sort(), siege: Object.keys(s.siege).filter(b => s.siege[b] && s.siege[b].killed).sort(),
     best: sorted(s.ob.best), guard: sorted(s.ob.guard), lastRun: s.lastRun, runNo: s.runNo, biomes: s.biomes.map(b => [b.id, b.state, b.name]),
-    k: s.ob.k, mem: s.mem.slots.map(x => x.st), nav: JSON.parse(JSON.stringify(T.NAV_OPEN)), art: s.wn ? sorted(s.wn.art) : {},
+    k: s.ob.k, mem: s.mem.slots.map(x => x.st), nav: JSON.parse(JSON.stringify(T.NAV_OPEN)), art: s.wn ? Object.entries(s.wn.art).sort() : [],   // и купленный без уровня: артефакт активных биомов
     shop: s.lv ? [s.lv.buys || 0, (s.sold || []).length] : [], live: s.runs.filter(r => !r.over).length,
   });
 }
@@ -415,7 +427,10 @@ const SC = T.OB.SC, FP_END = fp(T.S);
   if (chests !== want) say(`сундуков уровня в запасах ${chests}, ждали ${want}`);
   /* шаги сверх боя сделаны: Лавка — покупка сценария, первый артефакт — на своём уровне */
   if (D.tut && D.tut.shop && !(s.sold.includes(D.tut.shop.i) && s.lv.buys === 1)) say('прохождение: покупки сценария в Лавке нет или она не одна');
-  if (D.tut && D.tut.art && (s.wn.art[D.tut.art.id] !== D.tut.art.lv || Object.keys(s.wn.art).length !== 1)) say(`прохождение: артефакты ${JSON.stringify(s.wn.art)} — ждали «${D.tut.art.id}» на ${D.tut.art.lv}-м`);
+  const artN = (D.tut && D.tut.art ? 1 : 0) + (D.tut && D.tut.trail ? 1 : 0);
+  if (D.tut && D.tut.art && (s.wn.art[D.tut.art.id] !== D.tut.art.lv || Object.keys(s.wn.art).length !== artN)) say(`прохождение: артефакты ${JSON.stringify(s.wn.art)} — ждали «${D.tut.art.id}» на ${D.tut.art.lv}-м`);
+  /* артефакт активных биомов: куплен, уровней нет — активный биом в обучении один и единственный (ADR-0054, п. 15) */
+  if (D.tut && D.tut.trail && (s.wn.art[D.tut.trail.id] !== 0 || T.EN_TRAIL(s).slots !== D.tut.trail.slots)) say(`прохождение: артефакт активных биомов ${JSON.stringify(s.wn.art)}, активных биомов ${T.EN_TRAIL(s).slots} — ждали «${D.tut.trail.id}» без уровней и ${D.tut.trail.slots}`);
   const sh = D.levels.flatMap(l => l.reward.shards || []); for (const [id, n] of sh) if ((s.rs.shards[id] || 0) !== n) say(`осколки ${id}: ${s.rs.shards[id] || 0}, ждали ${n}`);
   /* цикл II: Неделя открыта, Мастерская и лес пройдены, рубеж — Библиотека Улариона, место Памяти ждёт */
   if (T.NAV_OPEN.week > s.ob.srv.lvl) say('цикл II: Неделя не открылась на 10-м уровне');
@@ -580,8 +595,8 @@ function lawClosed(where) {
   if (gi >= 0 && !T.LV_SRV.buy('lvx' + no0, gi, s.lv ? s.lv.gen : 0).refuse) out.push(`${where}: покупка «${s.shop[gi][0]}» в Лавке вне шага — не отказ`);
   if (!T.LV_SRV.refresh('lvr' + no0, 'free').refuse) out.push(`${where}: обновление витрины в обучении — не отказ`);
   for (const g of T.zpGroups()) if (!(st.k === 'chest' && T.OB.isTutSp(g.cs))) run('сундук', () => T.zpOpen(g.key, 'zox' + no0, 1));
-  for (const id of ['a2', 'a4', 'a5', 'a7', 'a18', 'a19']) {
-    if (st.k === 'art' && st.id === id) continue;
+  for (const id of ['a1', 'a2', 'a4', 'a5', 'a7', 'a18', 'a19']) {
+    if ((st.k === 'art' || st.k === 'trail') && st.id === id) continue;
     if (!T.WN_SRV.buy('wnx' + id, id).refuse || !T.WN_SRV.up('wny' + id, id).refuse) out.push(`${where}: артефакт «${id}» вне шага — не отказ`);
   }
   /* Лавка Энериума — во 2 цикле (слово автора 01.10.2026): покупка и реклама за Энериум в обучении — отказ */
@@ -605,6 +620,7 @@ function stepAct(a, v, st) {
     case 'chest': return a === 'zpopen' && T.zpGroups().some(g => g.key === v && T.OB.isTutSp(g.cs));
     case 'shop': { const g = T.S.shop[+String(v || '').split(':')[0]]; return a === 'buydo' && !!g && g[0] === st.id; }
     case 'art': return (a === 'wnbuy' || a === 'wnup') && String(v || '').split(':')[0] === st.id;
+    case 'trail': return a === 'wnbuy' && String(v || '').split(':')[0] === st.id;
     case 'run': return a === 'start' || a === 'again' || (a === 'sheet' && v === 'prep');
     case 'guard': return (a === 'guard' || a === 'guardgo') && v !== 'demo';
   }
@@ -686,7 +702,7 @@ function lawArt(where) {
   if (s.wallet.gold < A.gold || s.wallet.souls < A.souls) out.push(`${where}: к шагу золота ${s.wallet.gold} и душ ${s.wallet.souls} — нужно ${A.gold} и ${A.souls}`);
   s.route = 'profile'; s.seg.profile = 'arts'; s.overlay = null; draw(`${where} · Реликварий`);
   const f0 = fp(s);
-  for (const id of ['a2', 'a3', 'a4', 'a5', 'a7', 'a18', 'a19', 'a20']) if (id !== A.id) run('другой артефакт', () => T.ACT.wnbuy(`${id}:${T.wnOp()}`));
+  for (const id of ['a1', 'a2', 'a3', 'a4', 'a5', 'a7', 'a18', 'a19', 'a20']) if (id !== A.id) { run('другой артефакт', () => T.ACT.wnbuy(`${id}:${T.wnOp()}`)); run('другой артефакт · уровень', () => T.ACT.wnup(`${id}:${T.wnOp()}`)); }
   if (fp(s) !== f0) out.push(`${where}: куплен не тот артефакт: ${JSON.stringify(s.wn.art)}`);
   const g0 = s.wallet.gold, u0 = s.wallet.souls;
   run('артефакт · купить', () => T.ACT.wnbuy(`${A.id}:${T.wnOp()}`));
@@ -694,6 +710,49 @@ function lawArt(where) {
   if (s.wn.art[A.id] !== A.lv || g0 - s.wallet.gold !== A.gold || u0 - s.wallet.souls !== A.souls) out.push(`${where}: артефакт ${JSON.stringify(s.wn.art)}, золото −${g0 - s.wallet.gold}, души −${u0 - s.wallet.souls}; ждали «${A.id}» на ${A.lv}-м, −${A.gold} и −${A.souls}`);
   const f1 = fp(s); run('артефакт · выше шага', () => T.WN_SRV.up('wnz' + s.wn.seq, A.id)); if (fp(s) !== f1) out.push(`${where}: артефакт поднят выше уровня шага`);
   s.overlay = null; T.OB.sync(); const st2 = T.OB.step(); if (st2 && st2.k === 'art') out.push(`${where}: после артефакта шаг сценария не сменился`);
+  return out;
+}
+
+/* артефакт активных биомов (слова автора 06.10.2026, ADR-0054, п. 3 и п. 15): «…обязан быть в обучении чтобы игрок его сам купил и мы
+   познакомили игрока с этой механикой»; «Я хочу чтобы игрок буквально покупал артефакт и ему открывался - 1 биом который он может
+   фармить»; «Я имею ввиду 1 и единственный биом на обучение не 2». На шаге покупки: забегов ещё не было; активного биома нет — «Спуск»
+   показывает замок слотов и вместо «Начать забег» — покупку артефакта, сервер забег не начинает; чужие артефакты — отказ; покупка —
+   золото по цене свежей сборки, артефакт куплен без уровня, активных биомов — один; повтор номера ничего не покупает; уровень
+   артефакта в обучении — отказ; шаг сменяется, «Спуск» показывает один слот */
+function lawTrail(where) {
+  const out = [], s = T.S, A = TUT0.trail, st = T.OB.step(); if (!A) return [`${where}: в сборке нет шага артефакта активных биомов`];
+  if (!st || st.k !== 'trail') return [`${where}: шаг сценария — не артефакт активных биомов (${st ? st.k : 'обучение кончилось'})`];
+  if (st.id !== A.id) out.push(`${where}: шаг сценария — «${st.id}», сборка — «${A.id}»`);
+  if (s.runNo) out.push(`${where}: до покупки артефакта активных биомов уже был забег (${s.runNo})`);
+  if (!s.heroes.length) out.push(`${where}: к шагу нет героя — покупка стоит после найма первого`);
+  if (s.wallet.gold < A.gold) out.push(`${where}: к шагу золота ${s.wallet.gold} — нужно ${A.gold}`);
+  const t0 = T.EN_TRAIL(s); if (t0.slots !== 0 || t0.own) out.push(`${where}: до покупки активных биомов ${t0.slots} — без артефакта их быть не должно`);
+  s.route = 'descent'; s.selBiome = 'b1'; s.overlay = null;
+  const h0 = draw(`${where} · Спуск без активного биома`);
+  if (/data-a="sheet" data-v="prep"/.test(h0) || /data-a="start"/.test(h0)) out.push(`${where}: «Спуск» без активного биома предлагает забег`);
+  if (!new RegExp(`data-a="wnbuy" data-v="${A.id}:`).test(h0)) out.push(`${where}: «Спуск» без активного биома не предлагает купить артефакт`);
+  if (!h0.includes(A.n)) out.push(`${where}: «Спуск» не называет артефакт «${A.n}»`);
+  if (!/class="ds-slots none"/.test(h0)) out.push(`${where}: слоты биомов не показаны закрытыми`);
+  const f0 = fp(s);
+  run('забег без активного биома', () => T.startRun('s1', 'b1'));
+  for (const id of ['a2', 'a3', 'a4', 'a5', 'a7', 'a18', 'a19', 'a20']) run('другой артефакт', () => T.ACT.wnbuy(`${id}:${T.wnOp()}`));
+  run('уровень некупленного артефакта', () => T.ACT.wnup(`${A.id}:${T.wnOp()}`));
+  if (fp(s) !== f0) out.push(`${where}: до покупки что-то изменилось: забег, чужой артефакт или уровень`);
+  const g0 = s.wallet.gold, u0 = s.wallet.souls, op = T.wnOp();
+  run('артефакт активных биомов · купить', () => T.ACT.wnbuy(`${A.id}:${op}`));
+  const t1 = T.EN_TRAIL(s);
+  if (s.wn.art[A.id] !== 0 || g0 - s.wallet.gold !== A.gold || u0 !== s.wallet.souls) out.push(`${where}: артефакт ${JSON.stringify(s.wn.art)}, золото −${g0 - s.wallet.gold}, души −${u0 - s.wallet.souls}; ждали «${A.id}» без уровня и −${A.gold} золота`);
+  if (t1.slots !== A.slots || A.slots !== 1) out.push(`${where}: после покупки активных биомов ${t1.slots} — в обучении он один и единственный (сборка — ${A.slots})`);
+  const f1 = fp(s);
+  run('артефакт активных биомов · повтор номера', () => T.ACT.wnbuy(`${A.id}:${op}`));
+  run('артефакт активных биомов · ещё раз', () => T.ACT.wnbuy(`${A.id}:${T.wnOp()}`));
+  run('артефакт активных биомов · уровень в обучении', () => T.ACT.wnup(`${A.id}:${T.wnOp()}`));
+  if (!T.WN_SRV.up('wnz' + s.wn.seq, A.id).refuse) out.push(`${where}: уровень артефакта активных биомов в обучении — не отказ`);
+  if (fp(s) !== f1) out.push(`${where}: повтор покупки или уровень в обучении что-то изменили`);
+  s.overlay = null; T.OB.sync(); const st2 = T.OB.step(); if (st2 && st2.k === 'trail') out.push(`${where}: после покупки шаг сценария не сменился`);
+  s.route = 'descent'; const h1 = draw(`${where} · Спуск с активным биомом`);
+  if (/class="ds-slots none"/.test(h1) || !/class="ds-slots[^"]*"[^>]*data-v="wnart:/.test(h1)) out.push(`${where}: после покупки «Спуск» не показывает слот и путь к артефакту`);
+  if (/data-a="wnbuy"/.test(h1)) out.push(`${where}: после покупки «Спуск» всё ещё предлагает купить артефакт`);
   return out;
 }
 
@@ -819,7 +878,7 @@ for (let L = 1; L <= D.levels.length; L++) for (const e of lawSkip(L, `проп�
   if (playTo(D.levels.length).stopped) { T.OB.sync(); for (const e of lawClosed(`уровень ${D.levels.length}, последние шаги`)) say(e); } else say(`сценарий: уровень ${D.levels.length} не взят`);
 }
 /* сундук, Лавка, первый артефакт — шаги с заданным итогом (ADR-0040): на каждом — всё прочее закрыто, а сам шаг даёт ровно итог сценария */
-for (const [k, n, law] of [['chest', 'сундук сценария', lawChest], ['shop', 'Лавка обучения', lawShop], ['art', 'первый артефакт', lawArt]]) {
+for (const [k, n, law] of [['trail', 'артефакт активных биомов', lawTrail], ['chest', 'сундук сценария', lawChest], ['shop', 'Лавка обучения', lawShop], ['art', 'первый артефакт', lawArt]]) {
   if (!TUT0[k]) continue;
   if (!playToK(k)) { say(`сценарий: шаг «${n}» не настал`); continue; }
   for (const e of lawClosed(`шаг «${n}»`)) say(e);
@@ -856,7 +915,7 @@ mutant('ворота сняты — действия вне сценария п�
 }
 {
   const a = SC[0], b = SC[1];
-  mutant('сценарий: первым шагом — дух в уровни, а не найм', () => { SC[0] = b; SC[1] = a; }, () => { SC[0] = a; SC[1] = b; },
+  mutant('сценарий: первые шаги переставлены — первым не найм', () => { SC[0] = b; SC[1] = a; }, () => { SC[0] = a; SC[1] = b; },
     () => { const errs = []; T.OB.switch(true); let P2 = null; try { P2 = play(mkW({ sink: e => errs.push(e) }), D); } catch (e) { errs.push(e.message); } return P2 && P2.done && !errs.length ? [] : ['сценарий не проходится'].concat(errs); });
 }
 {
@@ -877,6 +936,16 @@ mutant('ворота сняты — действия вне сценария п�
 {
   const E = T.OB.D.skip, a0 = E.art;
   mutant('пропуск: итог без первого артефакта', () => { E.art = {}; }, () => { E.art = a0; }, () => lawSkip(1, 'мутация', () => {}));
+  /* артефакт активных биомов (ADR-0054): итог пропуска без него; покупка открывает два биома; покупка без цены; артефакт уже куплен */
+  const tid = TUT0.trail ? TUT0.trail.id : '', noTrail = Object.fromEntries(Object.entries(a0).filter(([id]) => id !== tid));
+  mutant('пропуск: итог без артефакта активных биомов', () => { E.art = noTrail; }, () => { E.art = a0; }, () => lawSkip(1, 'мутация', () => {}));
+  const wa = T.EN_WANDERER.art.list.find(x => x.id === tid), own0 = wa ? wa.own : 0, gold0 = wa ? wa.gold : 0;
+  mutant('активные биомы: покупка открывает два биома', () => { if (wa) wa.own = 2; }, () => { if (wa) wa.own = own0; },
+    () => (playToK('trail', () => {}) ? lawTrail('мутация') : ['нет шага артефакта активных биомов']));
+  mutant('активные биомы: слот есть и без артефакта', () => { if (wa) wa.base = 1; }, () => { if (wa) wa.base = 0; },
+    () => (playToK('trail', () => {}) ? lawTrail('мутация') : ['нет шага артефакта активных биомов']));
+  mutant('активные биомы: артефакт дешевле таблицы автора', () => { if (wa) wa.gold = gold0 - 1; }, () => { if (wa) wa.gold = gold0; },
+    () => (playToK('trail', () => {}) ? lawTrail('мутация') : ['нет шага артефакта активных биомов']));
 }
 /* погружения леса и уроки (ADR-0049): прохождение с записью уроков и погружений; до погружения j — остановка */
 function playDives(sink) {
@@ -943,7 +1012,8 @@ run('режим «Игрок»', () => T.setTeam(false));
   for (const [id, lvl] of E.heroes) if (!h.includes(T.RSI[id].n) || !h.includes(`<span class="num">${lvl}</span>`)) say(`подтверждение пропуска: нет героя ${id} с уровнем ${lvl}`);
   for (const k of ['gold', 'spirit', 'souls', 'keys']) if (!h.includes(`<b class="num">${fmtN(E.wallet[k])}</b>`)) say(`подтверждение пропуска: нет ${k} ${E.wallet[k]}`);
   if (!h.includes(`<b class="num">${E.lvl}</b>`) || !h.includes(T.OB.TEXT.skipLead)) say('подтверждение пропуска: нет уровня Странника или слов о цикле II и первом рейтинге');
-  for (const id of Object.keys(E.art || {})) if (!h.includes(`«${TUT0.art && TUT0.art.id === id ? TUT0.art.n : id}»`)) say(`подтверждение пропуска: нет артефакта ${id}`);
+  for (const id of Object.keys(E.art || {})) if (!h.includes(`«${TUT0.trail && TUT0.trail.id === id ? TUT0.trail.n : TUT0.art && TUT0.art.id === id ? TUT0.art.n : id}»`)) say(`подтверждение пропуска: нет артефакта ${id}`);
+  if (TUT0.trail && !h.includes(T.OB.TEXT.skipTrail(TUT0.trail.slots))) say('подтверждение пропуска: не сказано, сколько активных биомов открывает артефакт');
   if (!h.includes(`закрытых сундуков — <b class="num">${E.chests.length}</b>`)) say(`подтверждение пропуска: закрытых сундуков не ${E.chests.length}`);
   if (!/data-a="obskipdo" data-v="ob\d+"/.test(h)) say('подтверждение пропуска: кнопка без номера операции');
   /* «Пропустить обучение» — в окне уровня, в Убежище и в настройках */

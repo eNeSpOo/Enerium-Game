@@ -3,12 +3,17 @@
    2. Данные: 146 пассивок Памяти, семь редкостей, вес — по «Настройкам» автора (база редкости × множитель силы), доли редкостей дают
       10 000 б. п.; цены §0 — переброс 50, сброс 100; места — циклы II–VI; «+1 активный биом» — ровно одна пассивка, это № mem.slot (ADR-0014);
       рунный ключ с элит нигде не обещан (ADR-0023, вариант Б); 18 артефактов, уровней не больше циклов, души на все уровни — по правилу автора;
-      с «Печатью открытых троп» и пассивкой — семь забегов; достижения — около 50 / 22 / 22 и первенства по циклам; все числа целые.
+      с «Печатью открытых троп» и пассивкой — семь забегов; вехи начала пути — около 50 / 22 / 22 и первенства по циклам; все числа целые.
    2б. Достижения: входы темпа pace-inputs.json свежие — tools/content-gen/wanderer/pace_inputs.py --check (sets.py, economy.py);
       wanderer.js и таблицы docs/content/достижения.md свежие — сборщик tools/content-gen/wanderer/build.js без ошибок даёт
-      ровно их; у каждого — редкость 1–7, день обычного и увлечённого в прогоне или за горизонтом, тема, счётчик и пассивка; серии — ступени
-      по порядку, цель растёт, ступень не раньше прошлой; сумма вида пассивок не выше потолка; в цикле I и каждый день цикла II — хоть одно
-      достижение у обоих профилей; подсказка тайны — без имени и чисел; контракты читают те же достижения с бесплатными заменами.
+      ровно их; у каждого — редкость 1–7, день обычного и увлечённого в прогоне (у каждого свой календарь, прогон — до конца цикла VI)
+      или за горизонтом, тема, счётчик и пассивка; серии — ступени по порядку, цель растёт, ступень не раньше прошлой; подсказка тайны —
+      без имени и чисел; контракты читают те же достижения с бесплатными заменами.
+   2в. Законы каталога (tools/content-gen/wanderer/achievements-pace.js, laws) и их мутации: у каждого цикла III–VI свой блок «Серии
+      цикла N» с таинственными; сколько достижений обычный берёт за цикл — не меньше нормы; в цикле I и каждый день цикла II — достижение
+      у обоих профилей, дальше пауза у обычного не длиннее порога цикла; сумма вида пассивок не выше потолка вех и потолка блока; пассивки
+      не боевые и не рейтинговые; цикл VI — только для команды; в блоках, которые видит игрок, нет слов лестницы спойлеров; счётчик блока —
+      своего цикла; условий за Энериум нет. Каждую мутацию ловит свой закон.
    3. «Сервер» Памяти: wnRoll — чистая функция; независимый пересчёт тем же генератором (mulberry32, FNV-1a) — те же тройки, ровно шесть
       бросков на тройку; в тройке нет повторов, закреплённых и прошлой тройки; на 40 000 вариантов доли редкостей и весов сходятся с данными;
       сумма шансов каталога — 100 %.
@@ -38,6 +43,9 @@
       лист — условие, награда и «когда получают»; тайна до выполнения — без условия.
    7в. Живые счётчики: ритуалы, снаряжение, Арена, Лига и планка События на вкладке — те же числа, что на экранах режимов; полученное
       по демо-дню этими числами подтверждено.
+   7г. Блоки циклов на вкладке: свой и прошлые циклы раскрыты, будущие — одной строкой «Цикл N» без имён, условий и подсказок; блок
+      цикла VI игроку не рисуется вовсе; закрытое не получить, сундук — по циклу получения; на карточке серии блока не больше двух чисел;
+      демо-цикл команды не трогает состояние аккаунта. Мутация «замок блоков снят» поймана.
    8. Вид: вкладки, окно, листы и каталог рисуются в режимах «Игрок» и «Команда» без исключений, undefined и NaN; игроку — без служебных слов.
    9. UI-кит: раздел «Память Странника» — карты всех семи редкостей, сцена «Вспомнить», состояния карты и мест, восемь значков,
       лестница сборки; кнопки раздела проигрывают сборку, переброс и «Вспомнить» без исключений; карта экранов отмечает готовое.
@@ -56,8 +64,8 @@ const say = m => { if (err.length < 80) err.push(m); else if (err.length === 80)
 function done() {
   if (MISSING.size) console.log(`Пропущены подключённые, но ещё не написанные чужие экраны: ${[...MISSING].join(', ')}.`);
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
-  console.log(`«Странник»: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; операций ${cnt.ops}, троек пересчитано ${cnt.triples}, вспышек ${cnt.bursts}.`);
-  console.log('Проверка пройдена: тройку решает «сервер» на сиде до анимации, расход один раз, карты собираются из осколков по лестнице редкостей, переброс бьёт стекло, выбранный осколок долетает до места, движение — transform и opacity, артефакты и достижения по правилам, в режиме «Игрок» служебного нет.');
+  console.log(`«Странник»: отрисовок ${cnt.views}, из них глазами игрока ${cnt.player}; операций ${cnt.ops}, троек пересчитано ${cnt.triples}, вспышек ${cnt.bursts}; мутаций каталога и блоков достижений ${cnt.mut || 0}, поймано ${cnt.caught || 0}.`);
+  console.log('Проверка пройдена: тройку решает «сервер» на сиде до анимации, расход один раз, карты собираются из осколков по лестнице редкостей, переброс бьёт стекло, выбранный осколок долетает до места, движение — transform и opacity, артефакты и достижения по правилам, у циклов III–VI свои блоки достижений и их законы держатся, в режиме «Игрок» служебного и закрытых блоков нет.');
   process.exit(0);
 }
 const run = (where, f) => { try { return f(); } catch (e) { say(`${where}: исключение — ${e.message} | ${(e.stack || '').split('\n').slice(1, 3).join(' | ').trim()}`); return undefined; } };
@@ -108,12 +116,17 @@ const WD = (() => { const ctx = { window: {} }; vm.createContext(ctx); vm.runInC
     if (a.total !== a.soul * a.lv * (a.lv + 1) / 2) say(`${a.id}: души на все уровни не по правилу «база × номер уровня»`);
     if (/(?:ресурс\S*|ключа) с элит(?!ой)/.test(a.d)) say(`${a.id} «${a.n}»: ресурсы или ключ «с элит» — против ADR-0010, ADR-0023`);
   }
-  const walk = A.find(a => a.no === 1);
-  if (!walk || walk.base + walk.step * walk.lv + 1 !== 7) say('«Знак открытых троп» и пассивка Памяти: забегов не семь (ADR-0014)');
+  /* артефакт активных биомов (ADR-0054): слот забега даёт только он — без него 0, покупка в обучении открывает один, уровни — с цикла II */
+  const walk = A.find(a => a.id === WD.art.rules.trail);
+  if (!walk || walk.base + (walk.own || 0) + walk.step * walk.lv + 1 !== 7) say('«Знак открытых троп» и пассивка Памяти: забегов не семь (ADR-0014)');
+  if (walk && (walk.base !== 0 || walk.own !== 1)) say('«Знак открытых троп»: без артефакта активного биома нет, покупка открывает один (ADR-0054)');
+  if (walk && (walk.open !== 1 || walk.buyFrom !== 1 || walk.from !== 2)) say('«Знак открытых троп»: покупка — в обучении (уровень Странника 1, цикл I), уровни — с цикла II (ADR-0054)');
+  if (A.some(a => a !== walk && (a.own || a.open || a.buyFrom))) say('артефакты: покупка сама даёт значение и продаётся раньше срока только у артефакта активных биомов');
   const keys = A.filter(a => /рунного ключа с босса/.test(a.d)).reduce((s, a) => s + a.step * a.lv, 0);
   if (10 + keys !== 25) say(`рунный ключ с босса: 10 % и артефакты дают ${10 + keys} %, по §11 — 25 %`);
-  const L = WD.ach.list, byCat = c => L.filter(a => a.cat === c).length;
-  if (byCat('pers') < 45 || byCat('pers') > 55 || byCat('rev') < 18 || byCat('rev') > 26 || byCat('myst') < 18 || byCat('myst') > 26) say('достижения: не около 50 / 22 / 22 (§29)');
+  /* «около 50 / 22 / 22» (§29) — каталог начала пути: вехи без блока цикла; блоки «Серии цикла N» считаются отдельно — раздел 2в */
+  const L = WD.ach.list, byCat = c => L.filter(a => a.c == null && a.cat === c).length;
+  if (byCat('pers') < 45 || byCat('pers') > 55 || byCat('rev') < 18 || byCat('rev') > 26 || byCat('myst') < 18 || byCat('myst') > 26) say('достижения начала пути: не около 50 / 22 / 22 (§29)');
   for (const a of L) { if (!WD.ach.kinds[a.pk]) say(`${a.id}: вид пассивки «${a.pk}»`); if (a.cat === 'myst' && !a.hint) say(`${a.id}: у таинственного нет подсказки`); }
   /* первенства: виды со своего цикла — в цикле I три (вход в цикл и нашествие Эхо — с цикла II), дальше по пять */
   for (let c = 1; c <= 6; c++) { const n = WD.ach.firsts.filter(f => f.c === c).length; if (n !== (c === 1 ? 3 : 5)) say(`первенства цикла ${c}: ${n}`); }
@@ -137,9 +150,10 @@ const WD = (() => { const ctx = { window: {} }; vm.createContext(ctx); vm.runInC
   }
   const A = WD.ach, P = A.pace, byS = {};
   if (!P || P.start.length !== 7 || P.start.some((d, c) => c > 1 && d <= P.start[c - 1])) say('темп: первые дни циклов не по порядку');
+  if (!P || !Array.isArray(P.startE) || P.startE.length !== 7 || !(P.horizon > P.start[6]) || !(P.horizonE > P.startE[6])) say('темп: нет календаря увлечённого или прогон не доходит до конца цикла VI');
   for (const a of A.list) {
     if (!(a.r >= 1 && a.r <= 7)) say(`${a.id}: редкость ${a.r}`);
-    for (const x of [a.at.o, a.at.e]) if (x != null && (!Number.isInteger(x) || x < 0 || x > P.horizon)) say(`${a.id}: день получения вне прогона`);
+    for (const [x, H] of [[a.at.o, P.horizon], [a.at.e, P.horizonE]]) if (x != null && (!Number.isInteger(x) || x < 0 || x > H)) say(`${a.id}: день получения вне прогона`);
     if (a.cat !== 'myst' && !A.metrics[a.m]) say(`${a.id}: счётчик «${a.m}» не описан`);
     if (!A.groups[a.g]) say(`${a.id}: тема «${a.g}»`);
     if (!Number.isInteger(a.v) || a.v < 1) say(`${a.id}: величина пассивки`);
@@ -153,15 +167,64 @@ const WD = (() => { const ctx = { window: {} }; vm.createContext(ctx); vm.runInC
       if (i && a.at.o != null && (l[i - 1].at.o == null || a.at.o < l[i - 1].at.o)) say(`серия ${s}: ступень ${a.k} у обычного раньше прошлой`);
     });
   }
-  const sum = {};
-  for (const a of A.list) sum[a.pk] = (sum[a.pk] || 0) + a.v;
-  for (const [k, v] of Object.entries(sum)) if (v > A.kinds[k].cap) say(`пассивки «${A.kinds[k].n}»: ${v} больше потолка ${A.kinds[k].cap}`);
-  for (const pr of ['o', 'e']) for (let d = 0; d <= 14; d++) if (!A.list.some(a => !a.est && a.at[pr] === d)) say(`кривая: у ${pr === 'o' ? 'обычного' : 'увлечённого'} в день ${d} нет достижения`);
   for (const a of A.list.filter(x => x.cat === 'myst')) if (!a.hint || a.hint.toLowerCase().includes(a.n.toLowerCase()) || /\d/.test(a.hint)) say(`${a.id}: подсказка выдаёт имя или число`);
   const ctx = { window: {} }; ctx.window = ctx; vm.createContext(ctx); vm.runInContext(read('contracts.js'), ctx);
   const want = A.list.filter(a => a.pk === 'reroll').map(a => ({ id: a.id, n: a.n, v: a.v }));
   if (!ctx.EN_CONTRACTS || JSON.stringify(ctx.EN_CONTRACTS.rules.rer.ach) !== JSON.stringify(want)) say('contracts.js: достижения с бесплатными заменами не совпадают с каталогом');
   for (const [m, v] of Object.entries(A.demo.n)) if (!Number.isInteger(v) || v < 0) say(`демо-счётчик ${m}: ${v}`);
+  for (let c = 1; c <= 6; c++) { const D = (A.demoBy || {})[c];
+    if (!D || !Number.isInteger(D.day) || Object.values(D.n).some(v => !Number.isInteger(v) || v < 0)) say(`демо-цикл ${c}: нет дня или счётчиков обычного`); }
+}
+
+/* ================== 2в. законы каталога и мутации ==================
+   Законы — tools/content-gen/wanderer/achievements-pace.js, laws: считаются по собранным данным экрана, их же держит сборщик.
+   Б1 — у каждого цикла III–VI свой блок с сериями и таинственными; Б2 — сколько достижений обычный берёт за цикл; Б3 — кривая: каждый день
+   циклов I–II и пауза не длиннее порога цикла; Б4 — потолки видов у вех и на блок; Б5 — пассивки не боевые и не рейтинговые; Б6 — цикл VI —
+   только для команды; Б7 — в блоках, которые видит игрок, нет слов лестницы спойлеров; Б8 — счётчик блока — своего цикла; Б9 — условий,
+   которые покупает Энериум, нет. Мутация ломает данные — её обязан поймать названный закон; после мутаций законы снова чисты. */
+{
+  const AP = require('../wanderer/achievements-pace.js'), LAD = require('../lore/ladder.js');
+  const spoil = t => LAD.scan(t).map(h => h.hit);
+  const run = D => AP.laws(D, spoil).err;
+  for (const e of run(WD.ach)) say(`закон ${e.k}: ${e.m}`);
+  const B = WD.ach.blocks, own = c => x => x.c === c;
+  if (!B || !eq(B.cycles, [3, 4, 5, 6]) || !eq(B.team, [6])) say('блоки циклов: не III–VI или цикл для команды — не VI');
+  /* блок считает только своё: счётчик достижения блока — своего цикла; гибкие ступени серии идут по дням и по целям */
+  for (const a of WD.ach.list) if (a.c != null && a.cat !== 'myst' && (WD.ach.metrics[a.m] || {}).c !== a.c) say(`${a.id}: счётчик блока не своего цикла`);
+  const pickBlk = (c, f = () => true) => D => D.list.find(a => a.c === c && !a.est && a.at.o != null && f(a));
+  const MUT = [
+    ['Б1', 'у цикла V нет блока', D => { D.list = D.list.filter(a => a.c !== 5); }],
+    ['Б1', 'в блоке III осталось две тайны', D => { let n = 0; D.list = D.list.filter(a => !(a.c === 3 && a.cat === 'myst' && n++ < 3)); }],
+    ['Б1', 'блок цикла, которого нет в списке блоков', D => { D.blocks.cycles = [3, 4, 5]; }],
+    ['Б2', 'из цикла IV убраны гибкие ступени', D => { D.list = D.list.filter(a => !(a.c === 4 && !a.est && /-(cb|run|rec|circ|step|eq|tal|val|aw)-/.test(a.id))); }],
+    ['Б2', 'планка цикла VI поднята выше каталога', D => { D.blocks.need[6] = 400; }],
+    ['Б3', 'ступень цикла VI уехала на сорок дней', D => { const l = D.list.filter(a => a.c === 6 && !a.est && a.at.o != null).sort((x, y) => x.at.o - y.at.o), a = l[Math.floor(l.length / 2)]; a.at.o += 40; }],
+    ['Б3', 'порог паузы цикла IV — неделя', D => { D.pace.curve.pause[4] = 7; }],
+    ['Б3', 'в первый день цикла V нет достижения', D => { D.list = D.list.filter(a => a.at.o !== D.pace.start[5]); }],
+    ['Б3', 'день цикла II без достижения', D => { D.list = D.list.filter(a => a.est || a.at.o !== 9); }],
+    ['Б4', 'золото блока — +3 %', D => { const a = D.list.find(x => x.c != null && x.pk === 'gold') || pickBlk(5)(D); a.pk = 'gold'; a.v = 3; }],
+    ['Б4', 'потолок шанса на блок — 6', D => { D.kinds.base.blk = 6; }],
+    ['Б4', 'веха начала пути сверх потолка вида', D => { const a = D.list.find(x => x.c == null && x.pk === 'gold'); a.v += 1; }],
+    ['Б5', 'боевая пассивка', D => { D.kinds.summon.t = '+{v} % урона по призванным врагам'; }],
+    ['Б5', 'рейтинговая пассивка', D => { D.kinds.cal.t = '+{v} % очков Эхо за неделю'; }],
+    ['Б5', 'пассивка неизвестного вида', D => { pickBlk(4)(D).pk = 'power'; }],
+    ['Б6', 'достижение цикла VI без пометки «для команды»', D => { delete D.list.find(own(6)).team; }],
+    ['Б6', 'пометка «для команды» в блоке IV', D => { D.list.find(own(4)).team = 1; }],
+    ['Б7', 'слово лестницы спойлеров в имени блока IV', D => { pickBlk(4)(D).n = 'Печать цикла'; }],
+    ['Б7', 'прямое раскрытие в подсказке тайны блока V', D => { D.list.find(a => a.c === 5 && a.est).hint = 'Оболочка помнит.'; }],
+    ['Б8', 'достижение блока IV на счётчике цикла V', D => { const a = pickBlk(4)(D); a.m = a.m.replace(/4$/, '5'); }],
+    ['Б8', 'веха начала пути на счётчике блока', D => { D.list.find(a => a.c == null && !a.est).m = 'cb4'; }],
+    ['Б9', 'условие покупается за Энериум', D => { pickBlk(4)(D).d = 'Купить за Энериум 10 прокруток'; }],
+  ];
+  let caught = 0;
+  for (const [k, what, brk] of MUT) {
+    const D = JSON.parse(JSON.stringify(WD.ach));
+    try { brk(D); } catch (e) { say(`мутация «${what}»: не применилась — ${e.message}`); continue; }
+    const got = run(D);
+    if (got.some(e => e.k === k)) caught++; else say(`мутация «${what}»: закон ${k} её не поймал${got.length ? ` (сработали ${[...new Set(got.map(e => e.k))].join(', ')})` : ''}`);
+  }
+  for (const e of run(WD.ach)) say(`закон ${e.k} после мутаций: ${e.m}`);
+  cnt.mut = MUT.length; cnt.caught = caught;
 }
 
 /* ================== песочница ==================
@@ -211,7 +274,7 @@ function load(o = {}) {
     get S() { return S; }, set S(v) { S = v; },
     ACT, OV, SCREENS, FLOWS, KH, KIT_EXTRA, MAP, BAG, LBX, render, initialState, setTeam, fmt, EnLoot: window.EnLoot, doc: document,
     WN, WN_VIEW, WN_DEMO, WN_SRV, WN_ART, wnRoll, wnChance, wnSync, wnBurst, wnShatter, wnPlan, wnCuts, wnCard, wnSpeed, wnChest, wnProg, wnReady, wnCap, wnLv, wnCyc,
-    wnMemTab, wnArtTab, wnAchTab, wnSeries, wnWhen, WN_ACH_VIEW, evPlanks: window.evPlanks || null,
+    wnMemTab, wnArtTab, wnAchTab, wnSeries, wnWhen, wnLocked, wnGot, WN_ACH_VIEW, evPlanks: window.evPlanks || null,
     evPastK: window.EN_EV && window.EnEvent && window.EN_EVENT ? () => window.EnEvent.reached(window.EnEvent.planks(window.EN_EVENT, S.acc.cycle), window.EN_EV.past().pts || 0) : null,
   })`, ctx);
   const advance = ms => {
@@ -224,7 +287,7 @@ function load(o = {}) {
     }
     clock.now = end;
   };
-  return { T, els, rootCls, fxLog, clock, advance, game: () => els.game.innerHTML };
+  return { T, ctx, els, rootCls, fxLog, clock, advance, game: () => els.game.innerHTML };
 }
 const ENT = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', '#39': "'" };
 const decode = s => s.replace(/&(#\d+|#x[\da-f]+|[a-z]+);/gi, (x, k) => ENT[k] || (k[0] === '#' ? String.fromCodePoint(k[1] === 'x' ? parseInt(k.slice(2), 16) : +k.slice(1)) : x));
@@ -809,6 +872,95 @@ function openAnim(P, where) { run('Вспомнить', () => P.T.ACT.wnmem('0')
   T.S.overlay = { t: 'wnfeat', arg: hid.id }; t = playerText(view(P, 'лист тайны'));
   if (t.includes(hid.d) || !t.includes(hid.hint)) say('лист тайны: условие видно или нет подсказки');
   T.S.overlay = null;
+}
+
+/* ================== 7г. блоки «Серии цикла N» на вкладке ==================
+   Свой и прошлые циклы раскрыты, будущие — одной строкой «Цикл N» под замком: без имён, условий и подсказок; блок цикла «для команды»
+   игроку не рисуется вовсе — ни на вкладке, ни в листе, ни в служебной справке. Закрытое не получить, открытое — сундук по циклу получения.
+   Демо-цикл команды показывает аккаунт обычного игрока на доле этого цикла и не трогает состояние аккаунта.
+   Мутация: замок блока снят — утечку обязан поймать закон вкладки */
+{
+  const BL = WD.ach.blocks, blk = WD.ach.list.filter(a => a.c != null);
+  const words = a => [a.d, a.hint, a.n.length >= 10 || a.n.includes(' · ') ? a.n : null].filter(Boolean);
+  /* что видно из закрытых блоков при цикле cyc: вкладки всех категорий и листы всех закрытых достижений. Блок «для команды» ищем
+     в сырой разметке — его нет и в служебных вставках; остальные — в тексте игрока */
+  const leak = (P, cyc, team) => {
+    const T = P.T, out = [];
+    run('режим', () => T.setTeam(team));
+    fresh(P, { cyc }); T.S.seg.profile = 'ach';
+    const shut = blk.filter(a => a.c > cyc || (a.team && !team)), tabs = {};
+    let raw = '';
+    for (const c of ['pers', 'rev', 'myst']) { T.S.seg.wnach = c; T.S.seg.wngot = '1'; T.S.overlay = null; tabs[c] = view(P, `блоки · ${c} · цикл ${cyc}${team ? ' [команда]' : ''}`); raw += '\n' + tabs[c]; }
+    for (const a of shut) { T.S.overlay = { t: 'wnfeat', arg: a.id }; raw += '\n' + view(P, `лист закрытого достижения ${a.id} · цикл ${cyc}${team ? ' [команда]' : ''}`); }
+    T.S.overlay = null;
+    const seen = playerText(raw);
+    for (const a of shut) for (const t of words(a)) if ((a.team && !team ? raw : seen).includes(t)) out.push(`${a.id} «${t}»`);
+    return { out, tabs, shut };
+  };
+  const bars = h => (h.match(/class="wn-blkbar"/g) || []).length, cards = (h, c) => (h.match(new RegExp(`data-v="wnfeat:b${c}-`, 'g')) || []).length;
+  const has = (cat, c) => blk.some(a => a.cat === cat && a.c === c);
+  const P = load(), T = P.T;
+  for (const [cyc, team] of [[1, false], [2, false], [4, false], [6, false], [6, true], [2, true]]) {
+    const R = leak(P, cyc, team), tag = `цикл ${cyc}${team ? ', команда' : ', игрок'}`;
+    if (R.out.length) say(`блоки, ${tag}: видно закрытое — ${R.out.slice(0, 4).join('; ')}`);
+    for (const cat of ['pers', 'rev', 'myst']) {
+      const want = BL.cycles.filter(c => has(cat, c) && (c > cyc || (BL.team.includes(c) && !team))).length;
+      if (bars(R.tabs[cat]) !== want) say(`блоки, ${tag}, вкладка ${cat}: закрытых заголовков «Цикл N» ${bars(R.tabs[cat])}, ждём ${want}`);
+      for (const c of BL.cycles) {
+        const open = c <= cyc && !(BL.team.includes(c) && !team);
+        if (!open && cards(R.tabs[cat], c)) say(`блоки, ${tag}, вкладка ${cat}: карточки закрытого блока цикла ${c}`);
+        if (open && c === cyc && has(cat, c) && !cards(R.tabs[cat], c)) say(`блоки, ${tag}, вкладка ${cat}: блок своего цикла не раскрыт`);
+      }
+    }
+  }
+  run('режим', () => T.setTeam(false));
+  /* сервер: закрытое не получить; в своём цикле — сундук по строке «Достижения» lootboxes.js на цикл получения */
+  fresh(P, { cyc: 2 }); T.S.seg.profile = 'ach';
+  const a4 = blk.find(a => a.c === 4 && a.cat === 'pers' && a.ks > 1 && a.k === 1);
+  T.S.wn.ach.n[a4.m] = a4.goal;
+  let s = snap(T);
+  if (!T.wnLocked(a4) || T.wnReady(a4) || T.WN_SRV.claim(uop(), a4.id).refuse !== 'goal' || !eq(snap(T), s)) say('блоки: достижение будущего цикла получено раньше своего цикла');
+  T.S.acc.cycle = 4;
+  if (T.wnLocked(a4) || !T.wnReady(a4)) say('блоки: в своём цикле достижение блока закрыто или счётчик не засчитан');
+  const want4 = T.wnChest(a4, 4), n0 = T.S.bag.chests.length;
+  run('получить в блоке', () => T.ACT.wnclaim(`${a4.id}:${op(T)}`)); cnt.ops++;
+  const got4 = T.S.bag.chests.slice(n0), row4 = T.LBX.modes.feats.layers.flatMap(l => l.rows).find(r => r.label === 'Персональные').cyc[4][0];
+  if (!T.S.wn.ach.got[a4.id] || got4.length !== want4.length || !got4.length || got4[0].r !== row4.r || got4[0].cyc !== 4) say('блоки: сундук за достижение блока — не по строке «Достижения» lootboxes.js на цикл получения');
+  /* карточка серии блока: имя серии без номера ступени, ступени — отметками; чисел по-прежнему не больше двух */
+  T.S.seg.wnach = 'pers'; T.S.seg.wngot = '0';
+  {
+    const h = view(P, 'блоки · карточки цикла IV'), st = [...h.matchAll(/<(?:div|button) class="wn-feat/g)].map(x => x.index);
+    st.forEach((i, k) => { const card = h.slice(i, k + 1 < st.length ? st[k + 1] : h.indexOf('</section>', i)), id = (card.match(/data-v="wnfeat:(b\d-[^"]+)"/) || [])[1]; if (!id) return;
+      const nums = (playerText(card).match(/\d[\d\s ]*/g) || []).filter(x => x.trim()).length;
+      if (nums > 2) say(`блоки: на карточке ${id} чисел ${nums} — больше двух`); });
+    if (!/class="wn-sec wn-blk"><span class="eyebrow">Цикл IV/.test(h)) say('блоки: у раскрытого блока своего цикла нет заголовка «Цикл IV»');
+  }
+  /* демо-цикл команды (переключатель виден только в режиме «Команда»): свои счётчики и полученное; состояние аккаунта не тронуто;
+     назад — снова аккаунт */
+  run('режим', () => T.setTeam(true));
+  fresh(P, { cyc: 2 }); T.S.seg.profile = 'ach';
+  const before = JSON.stringify(T.S.wn.ach);
+  run('демо-цикл', () => T.ACT.wncyc('5'));
+  const b5 = blk.filter(a => a.c === 5 && !a.est);
+  if (!T.S.wn.demo || T.S.wn.demo.c !== 5 || T.wnCyc() !== 5) say('демо-цикл: состояние демо не собрано');
+  else {
+    if (!b5.some(a => T.wnGot(a.id)) || !b5.some(a => !T.wnGot(a.id) && T.wnProg(a) > 0)) say('демо-цикл V: в блоке нет ни полученного, ни начатого — счётчики обычного не подставлены');
+    if (!WD.ach.list.filter(a => a.c == null && !a.est && a.at.o != null && a.at.o < WD.ach.demoBy[5].day).every(a => T.wnGot(a.id))) say('демо-цикл V: вехи начала пути, взятые раньше, не отмечены полученными');
+    view(P, 'демо-цикл V · вкладка');
+  }
+  if (JSON.stringify(T.S.wn.ach) !== before) say('демо-цикл: состояние достижений аккаунта изменилось');
+  run('демо-цикл назад', () => T.ACT.wncyc('2'));
+  if (T.S.wn.demo || JSON.stringify(T.S.wn.ach) !== before) say('демо-цикл: возврат к циклу аккаунта не вернул его состояние');
+  run('режим', () => T.setTeam(false));
+  /* мутация: замок блоков снят — закон вкладки обязан увидеть утечку */
+  {
+    const P2 = load();
+    try { vm.runInContext('wnLocked = () => false;', P2.ctx); } catch (e) { say('мутация «замок блоков снят»: не применилась — ' + e.message); }
+    const n = err.length, R = leak(P2, 2, false);
+    err.length = n;   // ошибки отрисовки мутанта — не ошибки экрана
+    cnt.mut = (cnt.mut || 0) + 1;
+    if (R.out.length) cnt.caught = (cnt.caught || 0) + 1; else say('мутация «замок блоков снят»: закон вкладки её не поймал');
+  }
 }
 
 /* ================== 7в. живые счётчики: те же числа, что на экранах ритуалов, снаряжения, Арены и События ================== */

@@ -1,7 +1,8 @@
-/* Лавка Энериума — калькулятор и сборщик витрины: GDD §32 (витрины: пропуск, наборы, разовые покупки Энериума с удвоением первой,
-   подписки с ежедневной выдачей, лимитированные предложения), §1.2 и §36.1 (за деньги — больше возможностей, не обход игры; плательщик
-   быстрее не больше ×1,7; души только фармятся — кроме стартовых наборов), §9.3 (Энериум), §36.16 (сервер решает, повтор ничего
-   не выдаёт); ADR-0021, ADR-0030 (облик не продаётся), ADR-0033, ADR-0034. Черновик · предложение · ждёт автора. Числа — демонстрация.
+/* Лавка Энериума — калькулятор и сборщик витрины: GDD §32 (витрины: пропуск, разовые наборы, комплекты Энериума, подписки
+   с ежедневной выдачей, лимитированные предложения; курс и два правила ×2), §1.2 и §36.1 (за деньги — больше возможностей, не обход
+   игры; плательщик быстрее не больше ×1,7; души только фармятся — кроме разовых наборов), §9.3 (Энериум), §36.16 (сервер решает,
+   повтор ничего не выдаёт); ADR-0021, ADR-0030 (облик не продаётся), ADR-0033, ADR-0034, ADR-0036, ADR-0047 (курс), ADR-0054 (×2).
+   Числа — демонстрация.
 
    Слово автора 30.09.2026, ночь — ответ на ADR-0034:
    «Я Вижу это как 5 стартовых наборов, все с х2 и 5 градаций, покупая 1 - открывается 2 ,и т.д. И собственно градации по самому
@@ -11,16 +12,27 @@
    «…реклама за просмотр которой тоже будет даться энериум, на её не много, от 10 в день и смотреть или нет игрок решит сам вместе
    с попапом.» «Я Думаю нужно Боевой пропуск делать за деньги, это основная подписочная система…»
 
+   Слово автора 02.10.2026 (ADR-0047) — курс: «1 рубль = 1 Энериум, обесценивать донат прямо в 0 нет смысла, ибо если давать Энериума
+   много за небольшую сумму, значит обесценивать его вовсе, донат это альтернативный путь прохождения игры, а удовольствие это дорогое.»
+   Слово автора 06.10.2026 (ADR-0054) — ×2: «…это должно быть на выбор игрока - то есть именно он решает какой набор будет х2 но только
+   самая первая покупка, касается только разовых наборов, какие они будут именно мы их сделаем когда будет готова вся игра и просчитана
+   вся экономика, сейчас смысла нет. На комплекты Энериума будет действовать х2 на каждый набор но только 1 раз на 1 набор.»
+   Прежнее «пять стартовых наборов цепочкой, все ×2, купил ступень — открылась следующая» отменено; состав разовых наборов — прежний,
+   автор определит его после экономики.
+
    Что считает и проверяет:
    1. Сетка цен — одна ступень, две валюты: рубли для платёжных систем России, доллары для App Store и Google Play. Коридор рубля к доллару.
-   2. Пять стартовых наборов цепочкой: каждый — раз за игру, все ×2, купил ступень — открылась следующая. Рунные ключи и души за деньги —
-      только здесь; вся цепочка — не больше CHAIN_DAYS дней дохода обычного игрока в цикле II, плательщик с цепочкой — не больше ×1,7.
-   3. Пять наборов Энериума: больше — не хуже курс, первая покупка каждого — ×2.
-   4. Три выдачи — Энериум раз в сутки 30 дней, письмом во Входящие, не сгорает, сама не продлевается.
-   5. Платный ряд пропуска — за деньги; его Энериум (design/ui/pass.js, rows.paid) — от ×1 до ×2 базового курса цены.
-   6. Лимитированные предложения: когда открываются, сколько живут, сколько раз, что внутри — не выгоднее первой покупки ×2.
-   7. Реклама за Энериум: награда за ролик, дневной потолок.
-   8. Арт: задания tools/art-gen/jobs/store.json, выбранные картинки, траты, выгружено ли в прототип.
+   2. Курс автора — 1 рубль = 1 Энериум (RATE): база каждого комплекта Энериума — ровно номинал его рублёвой цены, Энериум разового
+      набора — не выгоднее курса. Номинал — цена до ценовой точки: 249 ₽ → 250.
+   3. Пять разовых наборов — прежние «стартовые»: каждый — раз за игру, в любом порядке. Удвоение получает только самая первая покупка
+      разового набора, набор выбирает игрок. Рунные ключи и души за деньги — только здесь; все пять вместе в худшем случае — удвоен
+      самый большой — не больше LAWS.onceDays дней дохода обычного игрока в цикле II, плательщик с ними — не больше ×1,7.
+   4. Пять комплектов Энериума: больше — не хуже курс, первая покупка каждого — ×2, один раз на комплект.
+   5. Три выдачи — Энериум раз в сутки 30 дней, письмом во Входящие, не сгорает, сама не продлевается.
+   6. Платный ряд пропуска — за деньги; его Энериум (design/ui/pass.js, rows.paid) — от ×1 до ×2 базового курса цены.
+   7. Лимитированные предложения: когда открываются, сколько живут, сколько раз, что внутри — не выгоднее первой покупки ×2.
+   8. Реклама за Энериум: награда за ролик, дневной потолок.
+   9. Арт: задания tools/art-gen/jobs/store.json, выбранные картинки, траты, выгружено ли в прототип.
 
    Пишет:
    - design/ui/store.js — данные прототипа (window.EN_STORE) и алгоритм «сервера» (window.EnStore из rules.js), руками не править;
@@ -75,48 +87,60 @@ const TIERS = {
   r4990: { rub: 4990, usd: 5999 },
 };
 
-/* Пять стартовых наборов — цепочкой. Каждый — раз за игру, все ×2: покупка всегда первая. Первый продаётся сразу, следующий
-   открывается покупкой предыдущего. Ступени — по количеству ресурсов: рунные ключи, души и Энериум растут с ценой.
-   get — сколько до удвоения. Ключи и души за деньги — только здесь (слово автора 30.09.2026, ADR-0033, ADR-0034). Энериум набора —
-   по курсу первой покупки: не больше ×2 базового; ключи и души — сверх него. Состав не растёт с циклом: набор ждут в начале пути.
-   Души — 150 / 300 / 450 / 600 / 1 200 до удвоения (было 200 / 400 / 600 / 800 / 1 500, затем 150 / 300 / 450 / 650 / 1 300): с раундами
+/* Курс автора — базовый курс витрины: 1 рубль = 1 Энериум (слово автора 02.10.2026, ADR-0047; было около 2 за рубль, ADR-0036).
+   Курс считается по номиналу ступени — цене до ценовой точки: 249 ₽ → 250 Энериума, 2 490 ₽ → 2 500. Цены за Энериум — прокрутка,
+   донатные герои, друза — и ручеёк бесплатного игрока курс не меняет: за то же плательщик платит вдвое больше рублей */
+const RATE = { rub: 1, en: 1 };
+
+/* Пять разовых наборов — прежние «стартовые». Каждый — раз за игру, покупаются в любом порядке: замка «купил ступень — открылась
+   следующая» больше нет (ADR-0054, п. 1). x — удвоение самой первой покупки разового набора: какой набор удвоить, выбирает игрок,
+   один раз на игру; удваивается весь состав. Прежнее «все пять с ×2» отменено: всем старт не бустится.
+   Состав — прежний (имена, цены, ключи, души): автор определит разовые наборы, когда готова вся игра и просчитана экономика.
+   get — состав без удвоения. Ключи и души за деньги — только здесь (слово автора 30.09.2026, ADR-0033, ADR-0034). Энериум набора —
+   по курсу автора: 100 / 250 / 500 / 1 000 / 2 500 за 99 / 249 / 499 / 999 / 2 490 ₽ (было 150 / 500 / 1 000 / 2 000 / 5 000
+   по курсу около 2 за рубль); ключи и души — сверх него. Состав не растёт с циклом: набор ждут в начале пути.
+   Души — 150 / 300 / 450 / 600 / 1 200 (было 200 / 400 / 600 / 800 / 1 500, затем 150 / 300 / 450 / 650 / 1 300): с раундами
    по типу врага (ADR-0039) обычный в цикле II добывал 883 души в день вместо 1 001, с ритуалом этажа 11,5 с (ADR-0043) — 794, и прежние
-   5 700 душ цепочки были больше закона — 7 дней его душ (LAWS.chainDays) */
-const CHAIN = {
-  id: 'start', n: 'Стартовые наборы', x: 2,
+   5 700 душ пяти удвоенных наборов были больше закона — 7 дней его душ (LAWS.onceDays).
+   В данных прототипа наборы лежат под прежним ключом chain, поле — steps: их читают таблицы Excel (tables/collect.js, texts.js)
+   и проверка обучения (screens/check_start.js) */
+const ONCE = {
+  id: 'start', n: 'Разовые наборы', x: 2,
   steps: [
-    { id: 'start1', n: 'Котомка странника', tier: 'r99', get: [['keys', 5], ['souls', 150], ['enerium', 150]] },
-    { id: 'start2', n: 'Дорожный ларец', tier: 'r249', get: [['keys', 10], ['souls', 300], ['enerium', 500]] },
-    { id: 'start3', n: 'Окованный ларец', tier: 'r499', get: [['keys', 15], ['souls', 450], ['enerium', 1000]] },
-    { id: 'start4', n: 'Реликварий', tier: 'r999', get: [['keys', 20], ['souls', 600], ['enerium', 2000]] },
-    { id: 'start5', n: 'Сокровищница', tier: 'r2490', get: [['keys', 30], ['souls', 1200], ['enerium', 5000]] },
+    { id: 'start1', n: 'Котомка странника', tier: 'r99', get: [['keys', 5], ['souls', 150], ['enerium', 100]] },
+    { id: 'start2', n: 'Дорожный ларец', tier: 'r249', get: [['keys', 10], ['souls', 300], ['enerium', 250]] },
+    { id: 'start3', n: 'Окованный ларец', tier: 'r499', get: [['keys', 15], ['souls', 450], ['enerium', 500]] },
+    { id: 'start4', n: 'Реликварий', tier: 'r999', get: [['keys', 20], ['souls', 600], ['enerium', 1000]] },
+    { id: 'start5', n: 'Сокровищница', tier: 'r2490', get: [['keys', 30], ['souls', 1200], ['enerium', 2500]] },
   ],
 };
-/* Сегменты автора — на кого рассчитана цепочка: ступень и её цена около порога автора */
+/* Сегменты автора — на кого рассчитаны разовые наборы: набор по счёту и его цена около порога автора */
 const SEGMENTS = [
   { id: 's', n: 'не донатеры', from: 100, step: 1 },
   { id: 'm', n: 'средние', from: 500, step: 3 },
   { id: 'l', n: 'крупные', from: 2500, step: 5 },
 ];
 
-/* Пять наборов Энериума — имена автора по порядку. en — Энериум, bonusBp — прибавка к нему, firstX — первая покупка набора ×2
-   (§32: «разовые покупки Энериума с удвоением первой»). Покупать можно сколько угодно: объём покупки Энериума не ограничен (§1.2).
-   Малый — базовый курс витрины: 500 Энериума за 249 ₽ — около 2 Энериума за рубль */
+/* Пять комплектов Энериума — имена автора по порядку. en — база по курсу автора: номинал цены; bonusBp — прибавка к ней; firstX —
+   удвоение первой покупки этого комплекта: у каждого комплекта своё, один раз на комплект (ADR-0054, п. 1). Покупать можно сколько
+   угодно: объём покупки Энериума не ограничен (§1.2). Малый — базовый курс витрины: 250 Энериума за 249 ₽, без прибавки.
+   Было 500 / 1 000 / 2 000 / 5 000 / 10 000 — около 2 Энериума за рубль (ADR-0036); прибавки 0–40 % — прежние */
 const PACKS = [
-  { id: 'en1', n: 'Малый набор Энериума', tier: 'r249', en: 500, bonusBp: 0, firstX: 2 },
-  { id: 'en2', n: 'Средний набор Энериума', tier: 'r499', en: 1000, bonusBp: 1000, firstX: 2 },
-  { id: 'en3', n: 'Большой набор Энериума', tier: 'r999', en: 2000, bonusBp: 2000, firstX: 2 },
-  { id: 'en4', n: 'Огромный набор Энериума', tier: 'r2490', en: 5000, bonusBp: 3000, firstX: 2 },
-  { id: 'en5', n: 'Великий набор Энериума', tier: 'r4990', en: 10000, bonusBp: 4000, firstX: 2 },
+  { id: 'en1', n: 'Малый набор Энериума', tier: 'r249', en: 250, bonusBp: 0, firstX: 2 },
+  { id: 'en2', n: 'Средний набор Энериума', tier: 'r499', en: 500, bonusBp: 1000, firstX: 2 },
+  { id: 'en3', n: 'Большой набор Энериума', tier: 'r999', en: 1000, bonusBp: 2000, firstX: 2 },
+  { id: 'en4', n: 'Огромный набор Энериума', tier: 'r2490', en: 2500, bonusBp: 3000, firstX: 2 },
+  { id: 'en5', n: 'Великий набор Энериума', tier: 'r4990', en: 5000, bonusBp: 4000, firstX: 2 },
 ];
 
 /* Три выдачи — Энериум раз в сутки (слово автора «подписки дающие энериум раз в день, всего 3 штуки»). Покупка — daily сразу, дальше —
    письмом во Входящие в каждые серверные сутки: письмо не сгорает, пропущенный день ничего не отнимает. Сама не продлевается: игрок
-   покупает 30 дней, и только. Повторная покупка прибавляет дни, но не больше maxDays вперёд. Все три можно держать разом */
+   покупает 30 дней, и только. Повторная покупка прибавляет дни, но не больше maxDays вперёд. Все три можно держать разом.
+   10 / 23 / 50 в сутки — по курсу автора (было 20 / 45 / 100) */
 const SUBS = [
-  { id: 'sub1', n: 'Малая выдача', tier: 'r159', daily: 20, days: 30, maxDays: 90 },
-  { id: 'sub2', n: 'Ежедневная выдача', tier: 'r349', daily: 45, days: 30, maxDays: 90 },
-  { id: 'sub3', n: 'Великая выдача', tier: 'r749', daily: 100, days: 30, maxDays: 90 },
+  { id: 'sub1', n: 'Малая выдача', tier: 'r159', daily: 10, days: 30, maxDays: 90 },
+  { id: 'sub2', n: 'Ежедневная выдача', tier: 'r349', daily: 23, days: 30, maxDays: 90 },
+  { id: 'sub3', n: 'Великая выдача', tier: 'r749', daily: 50, days: 30, maxDays: 90 },
 ];
 
 /* Платный ряд пропуска — за деньги (слово автора 30.09.2026: «Боевой пропуск делать за деньги, это основная подписочная система»).
@@ -124,9 +148,10 @@ const SUBS = [
 const PASS = { id: 'pass', n: 'Платный ряд пропуска', tier: 'r399' };
 
 /* Лимитированные предложения. Лимитированное — значит, курс первой покупки ×2 или ×1,5 снова доступен ненадолго, в особый момент пути.
-   Внутри — только Энериум: ни ключей, ни душ (они — только в стартовых наборах), ни героев, ни облика, ни силы, которой нет в игре.
+   Внутри — только Энериум: ни ключей, ни душ (они — только в разовых наборах), ни героев, ни облика, ни силы, которой нет в игре.
    when — что открывает: cycle — новый цикл аккаунта, week — неделя расы, date — праздник календаря сервера. life — секунды жизни или
-   'week' — до недельной отсечки. limit — сколько раз за открытие. Срок — строкой с датой; попапов у предложений нет — только витрина */
+   'week' — до недельной отсечки. limit — сколько раз за открытие. Срок — строкой с датой; попапов у предложений нет — только витрина.
+   Энериум — по курсу автора: «Дар пути» 500 / 1 000 / 2 000, «Лавка недели» 750, «Праздничный дар» 1 500 (было вдвое больше) */
 const OFFERS = {
   kinds: {
     path: { n: 'Дар пути', when: 'cycle', life: 259200, limit: 1, what: 'открывается с новым циклом аккаунта, раз за цикл' },
@@ -134,33 +159,36 @@ const OFFERS = {
     fest: { n: 'Праздничный дар', when: 'date', life: 604800, limit: 2, what: 'открывается в праздник календаря сервера' },
   },
   list: [
-    { id: 'path2', of: 'path', cycle: 2, tier: 'r249', get: [['enerium', 1000]] },
-    { id: 'path3', of: 'path', cycle: 3, tier: 'r499', get: [['enerium', 2000]] },
-    { id: 'path4', of: 'path', cycle: 4, tier: 'r499', get: [['enerium', 2000]] },
-    { id: 'path5', of: 'path', cycle: 5, tier: 'r999', get: [['enerium', 4000]] },
-    { id: 'path6', of: 'path', cycle: 6, tier: 'r999', get: [['enerium', 4000]] },
-    { id: 'week', of: 'week', tier: 'r499', get: [['enerium', 1500]] },
-    { id: 'fest', of: 'fest', tier: 'r999', get: [['enerium', 3000]] },
+    { id: 'path2', of: 'path', cycle: 2, tier: 'r249', get: [['enerium', 500]] },
+    { id: 'path3', of: 'path', cycle: 3, tier: 'r499', get: [['enerium', 1000]] },
+    { id: 'path4', of: 'path', cycle: 4, tier: 'r499', get: [['enerium', 1000]] },
+    { id: 'path5', of: 'path', cycle: 5, tier: 'r999', get: [['enerium', 2000]] },
+    { id: 'path6', of: 'path', cycle: 6, tier: 'r999', get: [['enerium', 2000]] },
+    { id: 'week', of: 'week', tier: 'r499', get: [['enerium', 750]] },
+    { id: 'fest', of: 'fest', tier: 'r999', get: [['enerium', 1500]] },
   ],
   maxActive: 3,          // открытых предложений у игрока разом — не больше
 };
 
 /* Реклама за Энериум (слово автора: «от 10 в день и смотреть или нет игрок решит сам вместе с попапом»). Ролик — только по выбору
    игрока: попап спрашивает, награда — за досмотренный ролик, её засчитывает сервер по подтверждению рекламной сети. sec — длина
-   ролика, как её обещает попап */
+   ролика, как её обещает попап. Курс её не трогает: 5 за ролик — число автора */
 const ADS = { perView: 5, dayCap: 2, sec: 30 };
 
 /* Законы и пороги проверок */
 const LAWS = {
   rubPerUsd: [75, 100],   // коридор: рублей за доллар ступени — русский игрок не платит больше западного при курсе от 100 ₽/$
-  chainSteps: 5, chainX: 2,
-  chainDays: 7,           // вся цепочка с удвоением — не больше недели дохода обычного игрока в цикле II по ключам и по душам
-  x17: 170,               // плательщик со всей цепочкой к концу цикла II — не больше ×1,7 обычного по ключам и душам (§1.2)
-  segTolBp: 500,          // цена ступени сегмента — не дороже порога автора и не дешевле его на 5 %
-  packs: 5, subs: 3,
+  /* ценовые точки: цена даёт остаток по модулю — …9 ₽ или …90 ₽, …,99 $. Номинал ступени — цена до точки: 249 ₽ → 250, 2 490 ₽ → 2 500 */
+  point: { rub: [[10, 9], [100, 90]], usd: [[100, 99]] },
+  onceSets: 5, onceX: 2,  // разовых наборов — пять; удвоение самой первой покупки — ×2, одно на игру (ADR-0054, п. 1)
+  onceDays: 7,            // все разовые наборы, удвоен самый большой, — не больше недели дохода обычного игрока в цикле II по ключам и по душам
+  x17: 170,               // плательщик со всеми разовыми наборами к концу цикла II — не больше ×1,7 обычного по ключам и душам (§1.2)
+  segTolBp: 500,          // цена набора сегмента — не дороже порога автора и не дешевле его на 5 %
+  packs: 5, packX: 2,     // комплектов Энериума — пять; первая покупка каждого — ×2, один раз на комплект (ADR-0054, п. 1)
+  subs: 3,
   subMinBp: 15000,        // выдача — не хуже ×1,5 базового курса: верность раз в день выгоднее разовой покупки
   offerMaxBp: 20000,      // предложение — не выгоднее ×2 базового курса: как первая покупка, не больше
-  chainEnMaxBp: 20000,    // Энериум стартового набора — не выгоднее ×2 базового курса; ключи и души — сверх
+  onceEnMaxBp: 10000,     // Энериум разового набора без удвоения — не выгоднее курса автора; ключи и души — сверх
   passEn: [10000, 20000], // Энериум платного ряда — от ×1 до ×2 базового курса цены ряда: окупает себя, но не дороже выдачи
   offerLifeMax: 604800,   // предложение живёт не дольше недели
   ads: [10, 15],          // Энериума за рекламу в день: «от 10», «не много»
@@ -173,11 +201,11 @@ const DEMO = { region: 'ru', offers: ['week'] };
 
 /* Арт: задание tools/art-gen/jobs/store.json → путь выгрузки в прототип (design/ui/assets/art/…), размер и поле кадра */
 const ART = [
-  { key: 'start1', job: 'st-starter', cell: 'start1', to: 'store/start-1.png', use: 'стартовый набор I — «Котомка странника»' },
-  { key: 'start2', job: 'st-starter', cell: 'start2', to: 'store/start-2.png', use: 'стартовый набор II — «Дорожный ларец»' },
-  { key: 'start3', job: 'st-starter', cell: 'start3', to: 'store/start-3.png', use: 'стартовый набор III — «Окованный ларец»' },
-  { key: 'start4', job: 'st-starter', cell: 'start4', to: 'store/start-4.png', use: 'стартовый набор IV — «Реликварий»' },
-  { key: 'start5', job: 'st-starter', cell: 'start5', to: 'store/start-5.png', use: 'стартовый набор V — «Сокровищница»' },
+  { key: 'start1', job: 'st-starter', cell: 'start1', to: 'store/start-1.png', use: 'разовый набор I — «Котомка странника»' },
+  { key: 'start2', job: 'st-starter', cell: 'start2', to: 'store/start-2.png', use: 'разовый набор II — «Дорожный ларец»' },
+  { key: 'start3', job: 'st-starter', cell: 'start3', to: 'store/start-3.png', use: 'разовый набор III — «Окованный ларец»' },
+  { key: 'start4', job: 'st-starter', cell: 'start4', to: 'store/start-4.png', use: 'разовый набор IV — «Реликварий»' },
+  { key: 'start5', job: 'st-starter', cell: 'start5', to: 'store/start-5.png', use: 'разовый набор V — «Сокровищница»' },
   { key: 'seal', job: 'st-starter', cell: 'seal', to: 'store/pass-seal.png', use: 'печать платного ряда пропуска' },
   { key: 'en1', job: 'st-packs', cell: 'en1', to: 'store/pack-1.png', use: 'малый набор Энериума' },
   { key: 'en2', job: 'st-packs', cell: 'en2', to: 'store/pack-2.png', use: 'средний набор Энериума' },
@@ -209,11 +237,13 @@ function build() {
   const CAP = JSON.parse(fs.readFileSync(FILES.cap, 'utf8'));
   if (!PS || !CT || !RS) return { err: ['нет данных: pass.js, contracts.js или roster.js'], warn };
 
-  const D = { bp: BP, regions: REGIONS, tiers: TIERS, chain: CHAIN, segments: SEGMENTS, packs: PACKS, subs: SUBS, pass: PASS, offers: OFFERS, ads: ADS };
+  const D = { bp: BP, rate: RATE, regions: REGIONS, tiers: TIERS, chain: ONCE, segments: SEGMENTS, packs: PACKS, subs: SUBS, pass: PASS, offers: OFFERS, ads: ADS };
   const tierOf = id => TIERS[id] || null;
   const tierIds = Object.keys(TIERS);
+  /* номинал ступени — цена до ценовой точки: 249 ₽ → 250, 2 490 ₽ → 2 500, $2,99 → $3,00; null — цена не на точке */
+  const nominal = (v, cur) => { const p = LAWS.point[cur].find(([m, r]) => v % m === r); return p ? v + p[0] - p[1] : null; };
 
-  /* --- 1. сетка цен: целые, по возрастанию, рубль к доллару — в коридоре --- */
+  /* --- 1. сетка цен: целые, по возрастанию, на ценовых точках, рубль к доллару — в коридоре --- */
   let prev = null;
   for (const id of tierIds) {
     const T = TIERS[id];
@@ -221,71 +251,91 @@ function build() {
     if (prev && (T.rub <= prev.rub || T.usd <= prev.usd)) err.push(`ступень ${id}: цены не растут`);
     /* рублей за доллар = rub × 100 / usd — в коридоре: rub × 100 ≥ lo × usd и ≤ hi × usd */
     if (T.rub * 100 < LAWS.rubPerUsd[0] * T.usd || T.rub * 100 > LAWS.rubPerUsd[1] * T.usd) err.push(`ступень ${id}: ${rub(T.rub)} и ${usd(T.usd)} — ${dec(T.rub * 100, T.usd)} ₽ за доллар, вне коридора ${LAWS.rubPerUsd.join('–')}`);
-    if (T.usd % 100 !== 99) err.push(`ступень ${id}: ${usd(T.usd)} — не точка …,99 $`);
-    if (T.rub % 10 !== 9 && T.rub % 100 !== 90) err.push(`ступень ${id}: ${rub(T.rub)} — не точка …9 ₽ или …90 ₽`);
+    if (nominal(T.usd, 'usd') == null) err.push(`ступень ${id}: ${usd(T.usd)} — не точка …,99 $`);
+    if (nominal(T.rub, 'rub') == null) err.push(`ступень ${id}: ${rub(T.rub)} — не точка …9 ₽ или …90 ₽`);
     prev = T;
   }
   const used = new Set();
   const useTier = (id, who) => { if (!tierOf(id)) err.push(`${who}: нет ступени ${id}`); else used.add(id); };
+  if (err.length) return { err, warn };
 
-  /* базовый курс витрины — малый набор Энериума без первой покупки: Энериума на рубль и на цент */
-  const base = PACKS[0], baseT = tierOf(base.tier);
+  /* --- 2. курс автора: 1 рубль = 1 Энериум --- */
+  if (!Number.isInteger(RATE.rub) || !Number.isInteger(RATE.en) || RATE.rub <= 0 || RATE.en <= 0) return { err: ['курс автора: не целое или не больше нуля'], warn };
+  /* сколько Энериума даёт курс автора за ступень: номинал её рублёвой цены × курс */
+  const byRate = T => Math.floor(nominal(T.rub, 'rub') * RATE.en / RATE.rub);
+  const rateTxt = `${RATE.rub} рубль = ${RATE.en} Энериум`;
+  /* базовый курс витрины — малый комплект Энериума без первой покупки: Энериума на рубль и на цент. От него считаются «×2» и выгода —
+     от настоящего товара, а не от выдуманной цены (§32.4). Законом ниже он обязан быть курсом автора */
+  const base = PACKS[0], baseT = base ? tierOf(base.tier) : null;
+  if (!baseT) return { err: ['нет малого набора Энериума или его ступени — базового курса витрины'], warn };
   const baseEn = SR.packEn(D, base.id).n;
   /* rate ≤ k × base: en / price ≤ k/BP × baseEn / basePrice  ⇔  en × basePrice × BP ≤ k × baseEn × price */
   const cmp = (en, T, k, cur) => en * baseT[cur] * BP - k * baseEn * T[cur];   // ≤ 0 — не выгоднее ×k/BP базового курса
   const both = f => ['rub', 'usd'].every(f);
 
-  /* --- 2. стартовая цепочка --- */
-  if (CHAIN.steps.length !== LAWS.chainSteps) err.push(`стартовых наборов ${CHAIN.steps.length}, а по слову автора — ${LAWS.chainSteps}`);
-  if (CHAIN.x !== LAWS.chainX) err.push(`стартовые наборы: ×${CHAIN.x}, а по слову автора — все ×${LAWS.chainX}`);
+  /* --- 3. разовые наборы: пять, раз за игру, удвоение — одной самой первой покупке --- */
+  if (ONCE.steps.length !== LAWS.onceSets) err.push(`разовых наборов ${ONCE.steps.length}, а по слову автора — ${LAWS.onceSets}`);
+  if (ONCE.x !== LAWS.onceX) err.push(`разовые наборы: первая покупка — ×${ONCE.x}, а по слову автора — ×${LAWS.onceX}`);
   const keysDay = CT.econ[2] ? Math.floor(CT.econ[2].o.keys / 7) : 0, soulsDay = CAP.cycles[2] ? Math.floor(CAP.cycles[2].o.souls / 100) : 0;
   const c2Days = CAP.cycleDays['2'];
   if (!keysDay || !soulsDay || !c2Days) err.push('нет дохода обычного в цикле II: contracts.js (econ[2].o.keys) или capacity.json (cycles[2].o.souls, cycleDays)');
-  const chainTot = { keys: 0, souls: 0, enerium: 0, rub: 0, usd: 0 };
+  const KINDS3 = ['keys', 'souls', 'enerium'];
+  /* sum — все наборы без удвоения; top — самый большой набор по каждому ресурсу: ему в худшем случае достаётся удвоение */
+  const onceSum = { keys: 0, souls: 0, enerium: 0 }, onceTop = { keys: 0, souls: 0, enerium: 0 }, oncePrice = { rub: 0, usd: 0 };
+  const onceUsd100 = [];   // Энериум набора в долларах к курсу малого комплекта, сотые: свойство сетки цен, не курса автора
   let prevPrice = 0;
-  CHAIN.steps.forEach((s, i) => {
+  ONCE.steps.forEach((s, i) => {
     useTier(s.tier, s.n);
     const T = tierOf(s.tier); if (!T) return;
-    if (T.rub <= prevPrice) err.push(`стартовый набор ${i + 1}: цена не выше предыдущего`);
+    if (T.rub <= prevPrice) err.push(`разовый набор ${i + 1}: цена не выше предыдущего`);
     prevPrice = T.rub;
     for (const [k, n] of s.get) {
-      if (!['keys', 'souls', 'enerium'].includes(k)) err.push(`стартовый набор ${i + 1}: вид «${k}» — только рунные ключи, души и Энериум`);
-      if (!Number.isInteger(n) || n <= 0) err.push(`стартовый набор ${i + 1}: ${k} — ${n}`);
-      chainTot[k] = (chainTot[k] || 0) + n * CHAIN.x;
+      if (!KINDS3.includes(k)) { err.push(`разовый набор ${i + 1}: вид «${k}» — только рунные ключи, души и Энериум`); continue; }
+      if (!Number.isInteger(n) || n <= 0) { err.push(`разовый набор ${i + 1}: ${k} — ${n}`); continue; }
+      onceSum[k] += n; onceTop[k] = Math.max(onceTop[k], n);
     }
-    for (const k of ['keys', 'souls', 'enerium']) if (!s.get.some(x => x[0] === k)) err.push(`стартовый набор ${i + 1}: нет ${KIND[k]} — градации по количеству ресурсов`);
+    for (const k of KINDS3) if (!s.get.some(x => x[0] === k)) err.push(`разовый набор ${i + 1}: нет ${KIND[k]} — градации по количеству ресурсов`);
     if (i) {
-      const P = CHAIN.steps[i - 1];
-      for (const [k, n] of s.get) { const p = (P.get.find(x => x[0] === k) || [0, 0])[1]; if (n <= p) err.push(`стартовый набор ${i + 1}: ${KIND[k]} не больше, чем в ${i}-м — градация по количеству`); }
+      const P = ONCE.steps[i - 1];
+      for (const [k, n] of s.get) { const p = (P.get.find(x => x[0] === k) || [0, 0])[1]; if (n <= p) err.push(`разовый набор ${i + 1}: ${KIND[k]} не больше, чем в ${i}-м — градация по количеству`); }
     }
-    const en = (s.get.find(x => x[0] === 'enerium') || [0, 0])[1] * CHAIN.x;
-    if (!both(cur => cmp(en, T, LAWS.chainEnMaxBp, cur) <= 0)) err.push(`стартовый набор ${i + 1}: Энериум выгоднее ×${LAWS.chainEnMaxBp / BP} базового курса`);
-    chainTot.rub += T.rub; chainTot.usd += T.usd;
+    /* Энериум набора без удвоения — не выгоднее курса автора: en × BP ≤ onceEnMaxBp × Энериум номинала цены. С удвоением самой первой
+       покупки выходит не выгоднее ×x курса — как первая покупка комплекта Энериума. Закон — в рублях, в валюте слова автора */
+    const en = (s.get.find(x => x[0] === 'enerium') || [0, 0])[1];
+    if (en * BP > LAWS.onceEnMaxBp * byRate(T)) err.push(`разовый набор ${i + 1}: ${fmt(en)} Энериума за ${rub(T.rub)} — выгоднее курса автора «${rateTxt}» (${fmt(byRate(T))})`);
+    onceUsd100.push(Math.floor(en * nominal(baseT.usd, 'usd') * 100 / (baseEn * nominal(T.usd, 'usd'))));
+    oncePrice.rub += T.rub; oncePrice.usd += T.usd;
   });
-  /* сегменты автора: цена ступени — около порога, не дороже его */
+  /* сегменты автора: цена набора — около порога, не дороже его */
   for (const G of SEGMENTS) {
-    const s = CHAIN.steps[G.step - 1], T = s && tierOf(s.tier);
-    if (!T) { err.push(`сегмент «${G.n}»: нет ступени ${G.step}`); continue; }
-    if (T.rub > G.from || T.rub * BP < G.from * (BP - LAWS.segTolBp)) err.push(`сегмент «${G.n}»: ступень ${G.step} — ${rub(T.rub)}, а порог автора — от ${rub(G.from)}`);
+    const s = ONCE.steps[G.step - 1], T = s && tierOf(s.tier);
+    if (!T) { err.push(`сегмент «${G.n}»: нет набора ${G.step}`); continue; }
+    if (T.rub > G.from || T.rub * BP < G.from * (BP - LAWS.segTolBp)) err.push(`сегмент «${G.n}»: набор ${G.step} — ${rub(T.rub)}, а порог автора — от ${rub(G.from)}`);
   }
-  /* неделя обычного — потолок цепочки по ключам и душам; плательщик со всей цепочкой к концу цикла II — не больше ×1,7 */
-  const chainKeysDays100 = keysDay ? Math.floor(chainTot.keys * 100 / keysDay) : 0, chainSoulsDays100 = soulsDay ? Math.floor(chainTot.souls * 100 / soulsDay) : 0;
-  if (chainTot.keys > keysDay * LAWS.chainDays) err.push(`цепочка: ${chainTot.keys} рунных ключей — больше ${LAWS.chainDays} дней ключей обычного цикла II (${keysDay} в день)`);
-  if (chainTot.souls > soulsDay * LAWS.chainDays) err.push(`цепочка: ${chainTot.souls} душ — больше ${LAWS.chainDays} дней душ обычного цикла II (${soulsDay} в день)`);
+  /* худший случай горлышка: игрок купил все наборы, а удвоение отдал самому большому. По закону градаций самый большой по ключам,
+     душам и Энериуму — один и тот же набор; считаем по каждому ресурсу отдельно, чтобы закон держался и без этого совпадения */
+  const onceMax = Object.fromEntries(KINDS3.map(k => [k, onceSum[k] + onceTop[k] * (ONCE.x - 1)]));
+  const onceTopSet = ONCE.steps.reduce((a, s) => ((s.get.find(x => x[0] === 'souls') || [0, 0])[1] > (a.get.find(x => x[0] === 'souls') || [0, 0])[1] ? s : a), ONCE.steps[0]);
+  /* неделя обычного — потолок всех разовых наборов по ключам и душам; плательщик с ними к концу цикла II — не больше ×1,7 */
+  const onceKeysDays100 = keysDay ? Math.floor(onceMax.keys * 100 / keysDay) : 0, onceSoulsDays100 = soulsDay ? Math.floor(onceMax.souls * 100 / soulsDay) : 0;
+  if (onceMax.keys > keysDay * LAWS.onceDays) err.push(`разовые наборы: ${onceMax.keys} рунных ключей, если удвоен самый большой набор, — больше ${LAWS.onceDays} дней ключей обычного цикла II (${keysDay} в день)`);
+  if (onceMax.souls > soulsDay * LAWS.onceDays) err.push(`разовые наборы: ${onceMax.souls} душ, если удвоен самый большой набор, — больше ${LAWS.onceDays} дней душ обычного цикла II (${soulsDay} в день)`);
   const x17 = {
-    keys: keysDay ? Math.floor((keysDay * c2Days + chainTot.keys) * 100 / (keysDay * c2Days)) : 0,
-    souls: soulsDay ? Math.floor((soulsDay * c2Days + chainTot.souls) * 100 / (soulsDay * c2Days)) : 0,
+    keys: keysDay ? Math.floor((keysDay * c2Days + onceMax.keys) * 100 / (keysDay * c2Days)) : 0,
+    souls: soulsDay ? Math.floor((soulsDay * c2Days + onceMax.souls) * 100 / (soulsDay * c2Days)) : 0,
   };
-  if (x17.keys > LAWS.x17 || x17.souls > LAWS.x17) err.push(`цепочка: к концу цикла II плательщик — ×${dec(x17.keys, 100, 2)} по ключам и ×${dec(x17.souls, 100, 2)} по душам, больше ×1,7`);
+  if (x17.keys > LAWS.x17 || x17.souls > LAWS.x17) err.push(`разовые наборы: к концу цикла II плательщик — ×${dec(x17.keys, 100, 2)} по ключам и ×${dec(x17.souls, 100, 2)} по душам, больше ×1,7`);
 
-  /* --- 3. наборы Энериума: пять, по возрастанию, курс не хуже, первая покупка ×2 --- */
+  /* --- 4. комплекты Энериума: пять, по возрастанию, база — по курсу автора, курс не хуже, первая покупка ×2 — раз на комплект --- */
   if (PACKS.length !== LAWS.packs) err.push(`наборов Энериума ${PACKS.length}, а у автора — ${LAWS.packs}: малый, средний, большой, огромный, великий`);
   ['Малый', 'Средний', 'Большой', 'Огромный', 'Великий'].forEach((w, i) => { if (!PACKS[i] || !PACKS[i].n.startsWith(w)) err.push(`набор ${i + 1}: не «${w} набор Энериума» — имена автора по порядку`); });
   PACKS.forEach((p, i) => {
     useTier(p.tier, p.n);
     const T = tierOf(p.tier); if (!T) return;
     for (const v of [p.en, p.bonusBp, p.firstX]) if (!Number.isInteger(v) || v < 0) err.push(`${p.n}: не целое ${v}`);
-    if (p.firstX !== 2) err.push(`${p.n}: первая покупка — ×${p.firstX}, а по §32 — ×2`);
+    if (p.firstX !== LAWS.packX) err.push(`${p.n}: первая покупка — ×${p.firstX}, а по слову автора — ×${LAWS.packX}, один раз на комплект`);
+    if (p.en !== byRate(T)) err.push(`${p.n}: база ${fmt(p.en)} Энериума за ${rub(T.rub)} — не по курсу автора «${rateTxt}»: надо ${fmt(byRate(T))}`);
+    if (!i && p.bonusBp) err.push(`${p.n}: прибавка ${p.bonusBp / 100} % — а малый набор обязан быть базовым курсом витрины, без прибавки`);
     if (i) {
       const q = PACKS[i - 1], Q = tierOf(q.tier), a = SR.packEn(D, p.id).n, b = SR.packEn(D, q.id).n;
       if (T.rub <= Q.rub) err.push(`${p.n}: цена не выше, чем у «${q.n}»`);
@@ -295,7 +345,7 @@ function build() {
     }
   });
 
-  /* --- 4. выдача: три, 30 дней, курс — не хуже ×1,5 базового, дней вперёд — не меньше одной покупки --- */
+  /* --- 5. выдача: три, 30 дней, курс — не хуже ×1,5 базового, дней вперёд — не меньше одной покупки --- */
   if (SUBS.length !== LAWS.subs) err.push(`выдач ${SUBS.length}, а у автора — ${LAWS.subs}`);
   for (const s of SUBS) {
     useTier(s.tier, s.n);
@@ -306,15 +356,15 @@ function build() {
     if (!both(cur => cmp(en, T, LAWS.subMinBp, cur) >= 0)) err.push(`${s.n}: ${en} Энериума за ${s.days} дней — хуже ×${LAWS.subMinBp / BP} базового курса`);
   }
 
-  /* --- 5. платный ряд пропуска: за деньги; Энериум ряда — от ×1 до ×2 базового курса цены --- */
+  /* --- 6. платный ряд пропуска: за деньги; Энериум ряда — от ×1 до ×2 базового курса цены --- */
   useTier(PASS.tier, PASS.n);
   const paidEn = (PS.rows && PS.rows.paid ? PS.rows.paid : []).reduce((a, c) => a + c.filter(x => x.k === 'enerium').reduce((b, x) => b + (x.n || 0), 0), 0);
   const passT = tierOf(PASS.tier);
   if (PS.price != null) err.push('pass.js: у платного ряда цена в Энериуме — пропуск продаётся за деньги (слово автора 30.09.2026); пересобрать pass/build.js');
   if (passT && !both(cur => cmp(paidEn, passT, LAWS.passEn[0], cur) >= 0 && cmp(paidEn, passT, LAWS.passEn[1], cur) <= 0)) err.push(`платный ряд: ${paidEn} Энериума за ${rub(passT.rub)} — вне ×${LAWS.passEn[0] / BP}…×${LAWS.passEn[1] / BP} базового курса`);
-  if ((PS.rows && PS.rows.paid || []).some(c => c.some(x => x.k === 'keys' || x.k === 'souls'))) err.push('платный ряд: рунные ключи или души — за деньги они только в стартовых наборах');
+  if ((PS.rows && PS.rows.paid || []).some(c => c.some(x => x.k === 'keys' || x.k === 'souls'))) err.push('платный ряд: рунные ключи или души — за деньги они только в разовых наборах');
 
-  /* --- 6. предложения --- */
+  /* --- 7. предложения --- */
   for (const [k, K] of Object.entries(OFFERS.kinds)) {
     if (!['cycle', 'week', 'date'].includes(K.when)) err.push(`предложение ${k}: when — ${K.when}`);
     if (K.life !== 'week' && (!Number.isInteger(K.life) || K.life <= 0 || K.life > LAWS.offerLifeMax)) err.push(`предложение ${k}: живёт ${K.life} с — дольше недели или не целое`);
@@ -325,7 +375,7 @@ function build() {
     const T = tierOf(o.tier); if (!T) continue;
     if (!OFFERS.kinds[o.of]) err.push(`предложение ${o.id}: нет вида ${o.of}`);
     for (const [k, n] of o.get) {
-      if (k !== 'enerium') err.push(`предложение ${o.id}: «${k}» — в предложениях только Энериум: ключи и души — стартовыми наборами, облик и герои не продаются`);
+      if (k !== 'enerium') err.push(`предложение ${o.id}: «${k}» — в предложениях только Энериум: ключи и души — разовыми наборами, облик и герои не продаются`);
       if (!Number.isInteger(n) || n <= 0) err.push(`предложение ${o.id}: ${n}`);
     }
     const en = o.get.filter(x => x[0] === 'enerium').reduce((a, x) => a + x[1], 0);
@@ -336,13 +386,13 @@ function build() {
   if (!Number.isInteger(OFFERS.maxActive) || OFFERS.maxActive < 1) err.push('предложения: maxActive');
   for (const id of DEMO.offers) if (!OFFERS.list.some(o => o.id === id)) err.push(`демо: нет предложения ${id}`);
 
-  /* --- 7. реклама --- */
+  /* --- 8. реклама --- */
   const adsDay = ADS.perView * ADS.dayCap;
   if (!Number.isInteger(ADS.perView) || !Number.isInteger(ADS.dayCap) || ADS.perView <= 0 || ADS.dayCap <= 0) err.push('реклама: не целое');
   if (adsDay < LAWS.ads[0] || adsDay > LAWS.ads[1]) err.push(`реклама: ${adsDay} Энериума в день — вне ${LAWS.ads.join('–')} («от 10 в день», «не много»)`);
   if (ADS.dayCap > LAWS.adsCapMax) err.push(`реклама: ${ADS.dayCap} роликов в сутки — больше ${LAWS.adsCapMax}`);
 
-  /* --- ключи и души за деньги — только в цепочке --- */
+  /* --- ключи и души за деньги — только в разовых наборах --- */
   for (const p of PACKS) if (p.keys || p.souls) err.push(`${p.n}: ключи или души`);
   for (const t of tierIds) if (!used.has(t)) warn.push(`ступень ${t} не используется`);
   if (err.length) return { err, warn };
@@ -368,13 +418,14 @@ function build() {
   /* --- данные прототипа --- */
   const data = Object.assign({
     meta: { builder: 'tools/content-gen/store/build.js', rules: 'tools/content-gen/store/rules.js',
-      sources: ['GDD §32', 'GDD §1.2', 'GDD §9.3', 'GDD §36', 'ADR-0034', 'design/ui/pass.js', 'design/ui/contracts.js', 'tools/content-gen/contracts/capacity.json'] },
+      sources: ['GDD §32', 'GDD §1.2', 'GDD §9.3', 'GDD §36', 'ADR-0034', 'ADR-0036', 'ADR-0047', 'ADR-0054', 'design/ui/pass.js', 'design/ui/contracts.js', 'tools/content-gen/contracts/capacity.json'] },
   }, D, {
     demo: DEMO,
     art: artData,
     econ: {
       base: { en: baseEn, rub: baseT.rub, usd: baseT.usd },
-      chain: { keys: chainTot.keys, souls: chainTot.souls, enerium: chainTot.enerium, rub: chainTot.rub, usd: chainTot.usd, keysDays100: chainKeysDays100, soulsDays100: chainSoulsDays100, x17 },
+      /* разовые наборы: цена всех пяти; sum — состав всех без удвоения; max — худший случай: удвоение досталось самому большому (top) */
+      chain: { rub: oncePrice.rub, usd: oncePrice.usd, sum: onceSum, max: onceMax, top: onceTopSet.id, keysDays100: onceKeysDays100, soulsDays100: onceSoulsDays100, x17 },
       income: { keysDay, soulsDay, c2Days },
       passEn: paidEn, adsDay,
     },
@@ -392,7 +443,7 @@ function build() {
   const perUsd = (en, T) => dec(en * 100, T.usd, 0);              // Энериума на $1
   const low = t => t[0].toLowerCase() + t.slice(1);
   const who = id => [
-    ...CHAIN.steps.filter(s => s.tier === id).map(s => `стартовый набор ${ROMAN[CHAIN.steps.indexOf(s) + 1]}`),
+    ...ONCE.steps.filter(s => s.tier === id).map(s => `разовый набор ${ROMAN[ONCE.steps.indexOf(s) + 1]}`),
     ...PACKS.filter(p => p.tier === id).map(p => low(p.n)),
     ...SUBS.filter(s => s.tier === id).map(s => low(s.n)),
     ...(PASS.tier === id ? ['платный ряд пропуска'] : []),
@@ -405,26 +456,36 @@ function build() {
   for (const id of tierIds) { const X = TIERS[id]; T.push(cells([id, rub(X.rub), usd(X.usd), dec(X.rub * 100, X.usd, 1), who(id) || '—'])); }
   TBL.tiers = T.join('\n');
 
-  // стартовая цепочка
-  T = head(['Ступень', 'Набор', 'Цена', 'До удвоения', 'Придёт — ×2', 'Энериума на 100 ₽ / на $1', 'Для кого']);
-  CHAIN.steps.forEach((s, i) => {
-    const X = tierOf(s.tier), en = (s.get.find(x => x[0] === 'enerium') || [0, 0])[1] * CHAIN.x, G = SEGMENTS.find(g => g.step === i + 1);
-    T.push(cells([ROMAN[i + 1], `«${s.n}»`, both2(X), getTxt(s.get), `**${getTxt(s.get, CHAIN.x)}**`, `${perRub(en, X)} / ${perUsd(en, X)}`, G ? `${G.n} — от ${rub(G.from)}` : '']));
+  // разовые наборы
+  const enOf = s => (s.get.find(x => x[0] === 'enerium') || [0, 0])[1];
+  T = head(['Набор', 'Имя', 'Цена', 'Состав', `Если куплен первым — ×${ONCE.x}`, 'Энериума на 100 ₽ / на $1', 'Для кого']);
+  ONCE.steps.forEach((s, i) => {
+    const X = tierOf(s.tier), G = SEGMENTS.find(g => g.step === i + 1);
+    T.push(cells([ROMAN[i + 1], `«${s.n}»`, both2(X), getTxt(s.get), `**${getTxt(s.get, ONCE.x)}**`, `${perRub(enOf(s), X)} / ${perUsd(enOf(s), X)}`, G ? `${G.n} — от ${rub(G.from)}` : '']));
   });
-  T.push(cells(['Всего', '', `${rub(chainTot.rub)} · ${usd(chainTot.usd)}`, '', `ключи ${fmt(chainTot.keys)}, души ${fmt(chainTot.souls)}, Энериум ${fmt(chainTot.enerium)}`, '', '']));
-  TBL.chain = T.join('\n');
+  T.push(cells(['Все пять', '', both2(oncePrice), getTxt(KINDS3.map(k => [k, onceSum[k]])), `×${ONCE.x} достался набору ${ROMAN[ONCE.steps.indexOf(onceTopSet) + 1]} — худший случай: ${getTxt(KINDS3.map(k => [k, onceMax[k]]))}`, '', '']));
+  TBL.once = T.join('\n');
 
-  T = head(['Закон цепочки', 'Порог', 'Сейчас']);
-  T.push(cells(['Рунные ключи всей цепочки — дней дохода обычного, цикл II', `не больше ${LAWS.chainDays}`, `${dec(chainKeysDays100, 100, 1)} (${keysDay} в день)`]));
-  T.push(cells(['Души всей цепочки — дней дохода обычного, цикл II', `не больше ${LAWS.chainDays}`, `${dec(chainSoulsDays100, 100, 1)} (${fmt(soulsDay)} в день)`]));
-  T.push(cells([`Плательщик со всей цепочкой к концу цикла II (${c2Days} дней) — ключи / души`, '×1,7', `×${dec(x17.keys, 100, 2)} / ×${dec(x17.souls, 100, 2)}`]));
-  T.push(cells(['Энериум набора', `не выгоднее ×${LAWS.chainEnMaxBp / BP} базового курса`, 'как первая покупка набора Энериума, ключи и души — сверх']));
-  T.push(cells(['Ключи и души за деньги', 'только в цепочке', 'в наборах, выдаче, пропуске и предложениях — нет']));
-  TBL.chainLaws = T.join('\n');
+  T = head(['Закон разовых наборов', 'Порог', 'Сейчас']);
+  T.push(cells([`×${ONCE.x} — только самой первой покупке разового набора`, 'один раз на игру, набор выбирает игрок', 'удваивается весь состав; остальные четыре набора приходят как есть']));
+  T.push(cells(['Порядок покупки', 'любой, каждый набор — раз за игру', 'замка «купил набор — открылся следующий» нет']));
+  T.push(cells(['Рунные ключи всех пяти, удвоен самый большой, — дней дохода обычного, цикл II', `не больше ${LAWS.onceDays}`, `${dec(onceKeysDays100, 100, 1)} (${keysDay} в день)`]));
+  T.push(cells(['Души всех пяти, удвоен самый большой, — дней дохода обычного, цикл II', `не больше ${LAWS.onceDays}`, `${dec(onceSoulsDays100, 100, 1)} (${fmt(soulsDay)} в день)`]));
+  T.push(cells([`Плательщик со всеми пятью, удвоен самый большой, к концу цикла II (${c2Days} дней) — ключи / души`, '×1,7', `×${dec(x17.keys, 100, 2)} / ×${dec(x17.souls, 100, 2)}`]));
+  T.push(cells(['Энериум набора без удвоения', `не выгоднее курса автора: ${rateTxt}`, `${ONCE.steps.map(s => fmt(enOf(s))).join(' / ')} — по курсу; ключи и души — сверх`]));
+  {
+    /* в долларах курс набора задаёт сетка цен, а не курс автора: показываем, где он расходится с курсом малого комплекта */
+    const off = ONCE.steps.map((s, i) => [ROMAN[i + 1], onceUsd100[i], tierOf(s.tier)]).filter(x => x[1] !== 100);
+    T.push(cells(['Энериум набора в долларах — к курсу малого набора Энериума', 'по ступени сетки цен', off.length
+      ? off.map(([r, v, X]) => `×${dec(v, 100, 2)} у набора ${r}: его ступень — ${rub(X.rub)} и ${usd(X.usd)}, ${dec(X.rub * 100, X.usd, 0)} ₽ за доллар`).join('; ') + '; у остальных — ×1'
+      : '×1 у всех пяти']));
+  }
+  T.push(cells(['Ключи и души за деньги', 'только в разовых наборах', 'в наборах Энериума, выдаче, пропуске и предложениях — нет']));
+  TBL.onceLaws = T.join('\n');
 
-  // наборы Энериума
-  T = head(['Набор', 'Цена', 'Энериум', 'Прибавка', 'Первая покупка ×2', 'Энериума на 100 ₽ / на $1']);
-  for (const p of PACKS) { const X = tierOf(p.tier), e = SR.packEn(D, p.id); T.push(cells([p.n, both2(X), fmt(e.n), p.bonusBp ? `+${p.bonusBp / 100} %` : '—', fmt(e.first), `${perRub(e.n, X)} / ${perUsd(e.n, X)}`])); }
+  // комплекты Энериума
+  T = head(['Набор', 'Цена', 'База по курсу', 'Прибавка', 'Энериум', `Первая покупка ×${LAWS.packX} — раз на набор`, 'Энериума на 100 ₽ / на $1']);
+  for (const p of PACKS) { const X = tierOf(p.tier), e = SR.packEn(D, p.id); T.push(cells([p.n, both2(X), fmt(p.en), p.bonusBp ? `+${p.bonusBp / 100} %` : '—', fmt(e.n), fmt(e.first), `${perRub(e.n, X)} / ${perUsd(e.n, X)}`])); }
   TBL.packs = T.join('\n');
 
   // выдача
@@ -470,18 +531,22 @@ function build() {
   T.push(cells(['Всего', '', `${art.n} запросов`, `$${String(art.cost.toFixed(3)).replace('.', ',')}`, '']));
   TBL.art = T.join('\n');
 
-  return { data, tables: TBL, err, warn, chainTot, x17, keysDay, soulsDay, paidEn, art };
+  return { data, tables: TBL, err, warn, oncePrice, onceSum, onceMax, x17, keysDay, soulsDay, baseEn, paidEn, art };
 }
 
 /* ================================ ВЫВОД ================================ */
 
 function render(data) {
   const rules = fs.readFileSync(FILES.rules, 'utf8').replace(/\r\n/g, '\n');
-  const head = `/* Лавка Энериума — данные прототипа «Свет снизу». Собирает tools/content-gen/store/build.js: сетка цен, пять стартовых наборов
-   цепочкой, пять наборов Энериума, три выдачи, платный ряд пропуска, лимитированные предложения, реклама за Энериум. Руками не править:
-   пересборка затрёт правку. Черновик · предложение · ждёт автора. Числа — демонстрация, только целые; цены — рубли и центы доллара.
-   tiers — ступени цен; chain — стартовые наборы (get — до удвоения, x — удвоение); packs, subs, pass, offers, ads — витрина;
-   art — пути картинок и выгруженные (ready); demo — демо-аккаунт; econ — итоги расчёта. Обоснование — docs/content/монетизация.md.
+  const head = `/* Лавка Энериума — данные прототипа «Свет снизу». Собирает tools/content-gen/store/build.js: сетка цен, пять разовых наборов,
+   пять комплектов Энериума, три выдачи, платный ряд пропуска, лимитированные предложения, реклама за Энериум. Руками не править:
+   пересборка затрёт правку. Числа — демонстрация, только целые; цены — рубли и центы доллара.
+   rate — курс автора: 1 рубль = 1 Энериум (ADR-0047); tiers — ступени цен;
+   chain — разовые наборы, прежние «стартовые» (ключ данных прежний): steps — наборы, get — состав без удвоения, x — удвоение самой
+   первой покупки разового набора, одно на игру, набор выбирает игрок (ADR-0054); порядок покупки — любой;
+   packs — комплекты Энериума: en — база по курсу, bonusBp — прибавка, firstX — удвоение первой покупки, раз на комплект;
+   subs, pass, offers, ads — витрина; art — пути картинок и выгруженные (ready); demo — демо-аккаунт; econ — итоги расчёта.
+   Обоснование — docs/content/монетизация.md.
    В игре что продаётся, по какой цене и что придёт, решает сервер: платёж проводит платформа, сервер проверяет квитанцию и выдаёт товар
    один раз (§32, §36.16). Ниже данных — алгоритм tools/content-gen/store/rules.js как есть. */\n`;
   return head + 'window.EN_STORE = ' + JSON.stringify(data) + ';\n' + rules;
@@ -497,7 +562,7 @@ function withTables(doc, tables) {
   return doc;
 }
 
-module.exports = { build, render, withTables, markA, markB, FILES, TIERS, CHAIN, SEGMENTS, PACKS, SUBS, PASS, OFFERS, ADS, LAWS, DEMO, ART };
+module.exports = { build, render, withTables, markA, markB, FILES, RATE, TIERS, ONCE, SEGMENTS, PACKS, SUBS, PASS, OFFERS, ADS, LAWS, DEMO, ART };
 
 if (require.main === module) {
   const R = build();
@@ -519,6 +584,6 @@ if (require.main === module) {
   fs.writeFileSync(FILES.out, js);
   if (docNew) fs.writeFileSync(FILES.doc, docNew);
   else console.log(`предупреждение: в ${path.relative(ROOT, FILES.doc)} нет меток таблиц — таблицы не вставлены`);
-  const C = R.chainTot;
-  console.log(`Собрано: цепочка ${fmt(C.rub)} ₽ — ключи ${C.keys}, души ${fmt(C.souls)}, Энериум ${fmt(C.enerium)}; к концу цикла II плательщик ×${dec(R.x17.keys, 100, 2)} по ключам, ×${dec(R.x17.souls, 100, 2)} по душам. Энериум платного ряда — ${R.paidEn}. Арт: ${R.art.n} запросов, $${R.art.cost}.`);
+  const C = R.onceMax;
+  console.log(`Собрано: курс ${RATE.rub} ₽ = ${RATE.en} Энериум, малый набор — ${fmt(R.baseEn)}; разовые наборы ${fmt(R.oncePrice.rub)} ₽, удвоен самый большой — ключи ${C.keys}, души ${fmt(C.souls)}, Энериум ${fmt(C.enerium)}; к концу цикла II плательщик ×${dec(R.x17.keys, 100, 2)} по ключам, ×${dec(R.x17.souls, 100, 2)} по душам. Энериум платного ряда — ${R.paidEn}. Арт: ${R.art.n} запросов, $${R.art.cost}.`);
 }

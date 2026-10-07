@@ -159,6 +159,9 @@ function load(o = {}) {
   return { T, rootCls, rootVars, tick: ms => { now += ms; }, game: () => (els.game ? els.game.innerHTML : '') };
 }
 const P = load(), T = P.T;
+/* комплект осколков героя — свой у каждого: у героя Эхо — по его циклу (rules.echoSet, ADR-0047), у героев рулетки и крафта — прежний.
+   Герой с комплектом «известен» — его книга «до покупки» открыта: страницы до покупки проверка смотрит на таком герое */
+const setOf = h => (h.src === 'echo' ? T.RS.rules.echoSet[h.c - 1] : T.RS.rules.stub.shards);
 
 /* ================== 1а. арт страниц PG_ART ==================
    Выгруженный путь — файл в assets/art; окна рамок, срезы и полосы — целые ‰ и px; класс у <html> — ровно когда выгружен весь рисунок
@@ -409,7 +412,7 @@ fresh();
   const big = T.RS.heroes.filter(x => { const K = T.heroKit({ draft: T.hrDraft(x) }); return K && K.kit.length >= 5; }).slice(0, 3);
   if (!big.length) say('«Навыки»: в составе нет героя с набором из пяти способностей');
   for (const rh of big) for (const v of [0, rh.maxV]) {
-    fresh(); T.S.acc.cycle = 6; T.S.rs.cyc = 6; T.S.rs.shards[rh.id] = T.RS.rules.stub.shards;
+    fresh(); T.S.acc.cycle = 6; T.S.rs.cyc = 6; T.S.rs.shards[rh.id] = setOf(rh);
     T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'rs'; T.S.rs.sel = rh.id; T.S.seg.rhero = 'skills'; T.S.rs.val = { id: rh.id, v };
     const p = pageOf(view(`до покупки · ${rh.n} · «Навыки» · доблесть ${v}`));
     checkSkills(p, { draft: T.hrDraft(rh), valor: v }, `до покупки · ${rh.n} · доблесть ${v}`);
@@ -438,7 +441,7 @@ fresh();
   const rh = T.RS.heroes.find(x => x.maxV >= 3 && x.ch && x.ch.filter(c => c && c[1] && c[1].length).length >= 3 && !T.rsHas(x));
   if (!rh) say('«Путь»: в составе нет героя с тремя главами текста');
   else for (const v of [0, 1, rh.maxV]) {
-    fresh(); T.S.acc.cycle = 6; T.S.rs.cyc = 6; T.S.rs.shards[rh.id] = T.RS.rules.stub.shards;
+    fresh(); T.S.acc.cycle = 6; T.S.rs.cyc = 6; T.S.rs.shards[rh.id] = setOf(rh);
     T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'rs'; T.S.rs.sel = rh.id; T.S.seg.rhero = 'path'; T.S.rs.val = { id: rh.id, v };
     const p = pageOf(view(`до покупки · ${rh.n} · «Путь» · доблесть ${v}`));
     checkPath(p, rh, v, `«Путь» · ${rh.n} · доблесть ${v}`);
@@ -477,6 +480,17 @@ fresh();
   T.S.rs.shards[soul.id] = 1; T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'rs'; T.S.rs.sel = soul.id; T.S.overlay = null;
   const p = pageOf(view('неизвестная душа'));
   if (!p.includes('Неизвестная душа') || /class="pg-tabs"|class="ab-x"|class="pgm|class="rs-p"/.test(p)) say('неизвестная душа: на странице закладки или сведения');
+  /* герой Эхо (ADR-0047): комплект — по его циклу. С прежним общим комплектом он ещё неизвестная душа — страница без закладок, осколки
+     «собрано / нужно» от своего комплекта; с комплектом своего цикла — книга «до покупки» с закладками */
+  fresh(); T.S.acc.cycle = 6;
+  const echo = T.RS.heroes.find(x => x.src === 'echo' && x.c >= 3 && !T.rsHas(x)), old = T.RS.rules.stub.shards;
+  if (!echo || !(setOf(echo) > old)) say('герой Эхо: в составе нет героя Эхо с комплектом больше общего — сверять нечего');
+  else for (const [n, known] of [[old, false], [setOf(echo) - 1, false], [setOf(echo), true]]) {
+    T.S.rs.shards[echo.id] = n; T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'rs'; T.S.rs.sel = echo.id; T.S.seg.rhero = 'who'; T.S.overlay = null;
+    const q = pageOf(view(`герой Эхо · осколков ${n} из ${setOf(echo)}`));
+    if (/class="pg-tabs"/.test(q) !== known) say(`герой Эхо, осколков ${n} из ${setOf(echo)}: ${known ? 'книга «до покупки» не открылась' : 'книга открыта раньше комплекта своего цикла'}`);
+    if (!known && !q.includes(`${T.fmt(n)} / ${T.fmt(setOf(echo))}`)) say(`герой Эхо, осколков ${n}: на странице нет «${n} / ${setOf(echo)}» — счёт не от комплекта своего цикла`);
+  }
 }
 
 /* ================== 9. листы и окна поверх книги — тем же пергаментом ================== */
@@ -523,7 +537,7 @@ for (const team of [false, true]) {
   fresh();
   for (const h of T.S.heroes) for (const [tab, name] of TABS) { book(h.id, tab); view(`${team ? 'Команда' : 'Игрок'} · ${h.name} · ${name}`); }
   const rh = T.RS.heroes.find(x => x.src === 'roulette' && x.c <= T.rsCyc());
-  T.S.rs.shards[rh.id] = T.RS.rules.stub.shards;
+  T.S.rs.shards[rh.id] = setOf(rh);
   for (const tab of ['who', 'stats', 'skills', 'path']) { T.S.route = 'heroes'; T.S.seg.heroes = 'coll'; T.S.hview = 'rs'; T.S.rs.sel = rh.id; T.S.seg.rhero = tab; T.S.overlay = null; view(`${team ? 'Команда' : 'Игрок'} · до покупки · ${tab}`); }
 }
 run('режим «Игрок»', () => T.setTeam(false));

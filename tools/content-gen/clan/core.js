@@ -208,22 +208,40 @@ function payout(total, dmg) {
   return Object.fromEntries(ids.map((id, i) => [id, got[i]]));
 }
 
-/* ---------- награды: место клана → пул раздачи (§24.4, §23) ---------- */
-/* строка мест кланов lootboxes.js: наименьший «топ-N», куда место входит; у клана вне топа — «все с очками» */
+/* ---------- ступени кланового босса (ADR-0047): личные — по личным очкам недели, клановые — по кругам недели ----------
+   Данные — D.boss.ladder: plank1 — первая личная ступень в личных очках недели на своей копии цели, одна на все циклы (очки врага от
+   цикла не зависят, ADR-0042); circles — пороги клановых ступеней: сколько кругов клан взял за неделю. Множители личных ступеней
+   и сундуки ступеней — строки режима «Клановый босс» в lootboxes.js: их ведёт сборщик сундуков */
+/* сколько кругов клан взял за неделю: круг взят, когда пал его Хозяин; circle — номер круга, что стоит сейчас */
+const circlesDone = circle => Math.max(0, circle - 1);
+/* порог личной ступени с множителем x */
+const myNeed = (D, x) => D.boss.ladder.plank1 * x;
+/* сколько личных ступеней взято: xs — множители ступеней по возрастанию */
+function myStep(D, xs, pts) { let k = 0; for (const x of xs) if (pts >= myNeed(D, x)) k++; return k; }
+/* сколько клановых ступеней взято кругами done */
+function clanStep(D, done) { let k = 0; for (const at of D.boss.ladder.circles) if (done >= at) k++; return k; }
+
+/* ---------- награды: клановые ступени и место клана → пул раздачи (§24.4, §23) ---------- */
+/* строка мест кланов lootboxes.js: наименьший «топ-N», куда место входит; у клана вне топа строки места нет — ему платят клановые ступени */
 function tier(L, place, pts) {
   const M = L && L.modes.clan, ly = M ? M.layers.find(x => x.kind === 'place' && x.clan) : null;
   if (!ly || !place || !(pts > 0)) return null;
-  return ly.rows.filter(r => r.top && place <= r.top).sort((a, b) => a.top - b.top)[0] || ly.rows.find(r => r.top === 0) || null;
+  return ly.rows.filter(r => r.top && place <= r.top).sort((a, b) => a.top - b.top)[0] || null;
+}
+/* строки клановых ступеней lootboxes.js, взятые кругами недели done: слой клановых планок режима, порог at — кругов */
+function circleRows(L, done) {
+  const M = L && L.modes.clan, ly = M ? M.layers.find(x => x.kind === 'plank' && x.clan) : null;
+  return ly ? ly.rows.filter(r => r.at != null && done >= r.at) : [];
 }
 /* ступень сундука раздачи: редкость = цикл получателя − 1 + ступень; клан из разных циклов делит одни места, а не одни предметы */
 const stepsOf = (row, c) => (row.cyc[c] || []).map(g => ({ step: g.r - (c - 1), count: g.count, win: g.win }));
 const rOf = (step, c) => Math.max(1, Math.min(7, c - 1 + step));
-/* пул клана: на каждого участника — сундуки строки места; по ступеням */
-function pool(L, place, pts, members, c) {
-  const row = tier(L, place, pts); if (!row) return { row: null, groups: [] };
-  const by = new Map();
-  for (const g of stepsOf(row, c)) { const k = g.step + ':' + g.win, x = by.get(k); if (x) x.count += g.count * members; else by.set(k, { step: g.step, win: g.win, count: g.count * members }); }
-  return { row, groups: [...by.values()].sort((a, b) => b.step - a.step) };
+/* пул клана: на каждого участника — сундуки строки места и строк клановых ступеней, взятых кругами недели done; по ступеням сундука.
+   row — строка места или null, steps — сколько клановых ступеней вошло в пул */
+function pool(L, place, pts, members, c, done) {
+  const row = tier(L, place, pts), taken = circleRows(L, done || 0), by = new Map();
+  for (const r of (row ? [row] : []).concat(taken)) for (const g of stepsOf(r, c)) { const k = g.step + ':' + g.win, x = by.get(k); if (x) x.count += g.count * members; else by.set(k, { step: g.step, win: g.win, count: g.count * members }); }
+  return { row, steps: taken.length, groups: [...by.values()].sort((a, b) => b.step - a.step) };
 }
 /* половина пула — сервер по вкладу, половина — глава (§24.4): по каждой ступени; нечётный сундук — главе */
 function halves(D, groups) { return groups.map(g => ({ step: g.step, win: g.win, count: g.count, server: fl(g.count * D.rewards.splitBp, D.bp), head: g.count - fl(g.count * D.rewards.splitBp, D.bp) })); }
@@ -238,20 +256,14 @@ function serverSplit(D, groups, members) {
   return halves(D, groups).map(g => ({ step: g.step, win: g.win, got: share(g.server, w) }));
 }
 
-/* ---------- боевая мощь (§6, слой 0), как у бестиария биомов ---------- */
+/* ---------- боевая мощь (§6), как у бестиария биомов: функция ядра со слоем 1 — вкладом способностей (ADR-0051) ---------- */
 function isqrt(n) { if (n < 2) return n; let x = Math.floor(Math.sqrt(n)); while (x * x > n) x--; while ((x + 1) * (x + 1) <= n) x++; return x; }
-function bm(D, u) {
-  const R = EB().RULES, kl = R.K * u.lvl, cap = R.caps.defPct * 100;
-  const mit = k => Math.min(cap, fl(u.def[k] * 10000, kl + u.def[k]));
-  const m = fl(mit('str') + mit('int'), 2);
-  const dps = fl(u.atk[u.main] * u.as * (1000000 + u.crit * (u.critDmg - 100)), 100000000);
-  const ehp = fl(fl(u.maxHp * 10000, 10000 - m) * 10000, 10000 - u.eva);
-  return fl(D.boss.bmC * isqrt(dps * ehp), 100);
-}
+function bm(D, u) { return EB().bm(u, D.boss.bmC); }
 /* мощь карты врага: единица ядра той же карты */
 function cardBm(D, src) { const b = EB().create({ mode: 'rounds', seed: 1, heroes: [], foes: [src] }); return bm(D, b.u[1][0]); }
 
 root.EnClan = { iroot, need, capacity, milestones, attacksDay, walletCap, elitePool, resSpeedBp, picked, bonus, fxSum, rounds, clsOf, edge, fightMods, heroDmg, heroHp,
   cycOf, toCycle, counted, clanSum, hpIn, leftAfter, shareOff,
-  circlePow, circleLvl, points, fig, roll, kit, bossOf, card, retinue, battle, share, payout, tier, stepsOf, rOf, pool, halves, contrib, serverSplit, bm, cardBm };
+  circlePow, circleLvl, points, fig, roll, kit, bossOf, card, retinue, battle, share, payout,
+  circlesDone, myNeed, myStep, clanStep, tier, circleRows, stepsOf, rOf, pool, halves, contrib, serverSplit, bm, cardBm };
 })(typeof window !== 'undefined' ? window : globalThis);

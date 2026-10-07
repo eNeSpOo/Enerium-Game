@@ -14,21 +14,29 @@
       и в рейтинге не больше двух чисел, двух чипов и одного действия, на строке источника — двух чисел, двух чипов и двух кнопок;
       режим «Игрок» — без служебного, тем «для команды» и спойлеров; режим «Команда» — без исключений.
    7. Неделя: строка «Событие» в WEEK_MODES — экран режима, не демо; now и past по договору; прошлая — сундуки «Даров».
+   7а. Лестница планок (ADR-0047) — законы Л1–Л4 (ladder_laws.js), проверены мутацией: личные планки События — ступени лестницы на все
+      циклы, та же, что даёт EnLoot.ladder для цикла игрока; пороги своей полосы — EN_EVENT.planks, дальше — множителем первой планки;
+      в листе наград видны все пять полос — прошлые «пройдено», будущие с порогом и сундуком; за верхней планкой своей полосы —
+      планки следующей, без перехода в новый цикл: «сервер» отмечает взятую, полоса на карточке темы ведёт к следующей.
    8. UI-кит — раздел «Событие недели»; сценарии презентации.
-   Запуск: node tools/content-gen/screens/check_event.js [--dump] */
+   Запуск: node tools/content-gen/screens/check_event.js [--dump] [--mut] [--stale-ok]
+   --stale-ok — свежесть данных и таблиц — предупреждением, а не ошибкой: когда соседние сборщики в середине правок и экран нужно
+   проверить на тех данных, что есть; полный прогон перед коммитом — без флага. --mut — какой закон поймал каждую поломку. */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const { SERVICE, strip, playerText } = require('./check_player_view.js');
 const ROOT = path.join(__dirname, '..', '..', '..'), UI = path.join(ROOT, 'design', 'ui');
 const read = f => fs.readFileSync(path.join(UI, f), 'utf8');
 const html = read('index.html');
-const DUMP = process.argv.includes('--dump');
-const err = [];
+const DUMP = process.argv.includes('--dump'), STALE_OK = process.argv.includes('--stale-ok');
+const err = [], note = [];
+const stale = m => { if (STALE_OK) note.push(m); else say(m); };   // устаревшие данные: ошибка, с --stale-ok — предупреждение
 const say = m => { if (err.length < 80) err.push(m); else if (err.length === 80) err.push('… и ещё ошибки'); };
 function done(stat) {
+  for (const n of note) console.log('предупреждение: ' + n);
   if (err.length) { console.log('ОШИБКИ:\n' + err.join('\n')); process.exit(1); }
   if (stat) console.log(stat);
-  console.log('Проверка пройдена: данные свежие и целые, очки — операциями с номером один раз, наблюдатель засчитывает каждое дело однажды, экран и листы — по правилам воздуха, без служебного у игрока.');
+  console.log(`Проверка пройдена: ${note.length ? 'данные — как есть, их свежесть не подтверждена (--stale-ok, см. предупреждения)' : 'данные свежие и целые'}, очки — операциями с номером один раз, наблюдатель засчитывает каждое дело однажды, лестница планок — сразу на все циклы и без замка, экран и листы — по правилам воздуха, без служебного у игрока.`);
   process.exit(0);
 }
 
@@ -61,11 +69,11 @@ const B = require('../event/build.js');
 const built = B.build();
 if (built.err.length) say('калькулятор События: ' + built.err.slice(0, 6).join('; '));
 if (err.length) done();
-if (B.render(built.data) !== read('event.js')) say('event.js устарел: пересобрать — node tools/content-gen/event/build.js');
+if (B.render(built.data) !== read('event.js')) stale('event.js устарел: пересобрать — node tools/content-gen/event/build.js');
 {
   const doc = fs.existsSync(B.FILES.doc) ? fs.readFileSync(B.FILES.doc, 'utf8') : null;
   if (!doc) say('нет черновика docs/content/событие.md');
-  else { const fresh = B.withTables(doc, built.tables); if (fresh == null) say('событие.md: нет меток таблиц'); else if (fresh !== doc) say('событие.md: таблицы устарели — пересобрать'); if (!/## Вопросы автору/.test(doc)) say('событие.md: нет раздела «Вопросы автору»'); }
+  else { const fresh = B.withTables(doc, built.tables); if (fresh == null) say('событие.md: нет меток таблиц'); else if (fresh !== doc) stale('событие.md: таблицы устарели — пересобрать'); if (!/## Вопросы автору/.test(doc)) say('событие.md: нет раздела «Вопросы автору»'); }
 }
 const ctxD = { window: {} }; ctxD.window = ctxD; vm.createContext(ctxD); vm.runInContext(read('event.js'), ctxD);
 const D = ctxD.EN_EVENT, A = ctxD.EnEvent;
@@ -159,6 +167,7 @@ win.__scan = (key, h, team) => {
 };
 win.__player = h => playerText(h);
 win.__say = say;
+win.__LAD = require('./ladder_laws.js');   // законы лестницы планок (ADR-0047) — общие с проверками Недели и экранов режимов
 const ctx = vm.createContext(win);
 for (const s of scripts) {
   try { vm.runInContext(s.src ? read(s.src) : s.code, ctx, { filename: s.src || 'index.html' }); }
@@ -169,10 +178,13 @@ TEAM = vm.runInContext('RS.weeks.map(w => w.team && w.team.theme).filter(Boolean
 
 /* ================== 4–8. сценарии — внутри песочницы ================== */
 function suite() {
-  const out = { errors: [], views: 0, sheets: 0, credits: 0, rows: 0, cards: 0 };
+  const out = { errors: [], views: 0, sheets: 0, credits: 0, rows: 0, cards: 0, ladders: 0, mut: '', mutLog: [] };
   const fail = m => { if (out.errors.length < 80) out.errors.push(m); };
   const X = window.EN_EV, D = window.EN_EVENT, A = window.EnEvent;
   if (!X || !D || !A) { fail('нет EN_EV, EN_EVENT или EnEvent'); return out; }
+  /* лестница планок: общие законы (ladder_laws.js), алгоритм прототипа до мутаций; блок лестницы в листе наград кончается пояснением */
+  const LL = __LAD, LAD0 = window.EnLoot && EnLoot.ladder, ROAD_END = ['<p class="reason">', 'class="sheet-f"'];
+  if (typeof LAD0 !== 'function' || !window.EN_WEEK || typeof EN_WEEK.ladderHtml !== 'function') { fail('нет EnLoot.ladder или помощника лестницы EN_WEEK — планки События не сверить'); return out; }
   const draw = (key, team) => { render(); out.views++; const h = document.getElementById('game').innerHTML; __scan(key, h, team); return h; };
   const reset = (race, c) => { S = initialState(); if (race) rsSetWeek(race); if (c) S.acc.cycle = c; S.overlay = null; S.route = 'event'; X.sync(); };
   const isInt = v => Number.isInteger(v);
@@ -346,7 +358,10 @@ function suite() {
       if (!st || st.m.demo) fail(`${key}: строка «Событие» в «Неделе» — демо, а не экран режима`);
       else {
         if (st.points !== E().pts) fail(`${key}: в «Неделе» ${st.points} очков, на экране — ${E().pts}`);
-        if (st.planks.map(p => p.need).join() !== P(c).join()) fail(`${key}: в «Неделе» не те пороги`);
+        /* личные планки — ступени лестницы на все циклы (Л1–Л3): пороги своей полосы — данные цикла, дальше — множителем первой планки */
+        if (st.planks.filter(p => p.band === c && !p.cap).map(p => p.need).join() !== P(c).join()) fail(`${key}: в «Неделе» пороги своей полосы — не EN_EVENT.planks`);
+        LL.stateLaw(LBX, `${key} · Неделя`, st, c, LAD0).forEach(fail); out.ladders++;
+        if (JSON.stringify(X.planks().map(p => [p.k, p.band, p.need, p.got])) !== JSON.stringify(st.planks.map(p => [p.k, p.band, p.need, p.reached]))) fail(`${key}: планки экрана События и строки «Недели» разошлись`);
         if (st.place !== X.place()) fail(`${key}: место в «Неделе» ${st.place}, на экране ${X.place()}`);
         const ps = W.state('event', 'past'); if (!ps || ps.lock) fail(`${key}: прошлая неделя События закрыта`);
         else {
@@ -362,7 +377,9 @@ function suite() {
         if (!h.includes('class="ov"') || !h.includes(`aria-selected="true" data-a="sheet" data-v="evrew:${t}"`)) fail(`${key}: лист наград ${t} не открылся или не выбрана вкладка`);
       }
       S.overlay = { t: 'evrew', arg: 'me' }; h = draw(`${key} · планки`);
-      if ((h.match(/class="ev-pk[ "]/g) || []).length !== 5 || !h.includes('data-v="gifts:me"')) fail(`${key}: в листе нет пяти планок или пути в «Дары»`);
+      /* лист личных планок — лестница общего помощника Недели: все пять полос, пороги, сундуки, без замка (Л4) */
+      if (!h.includes('data-v="gifts:me"')) fail(`${key}: из листа планок нет пути в «Дары»`);
+      if (st && !st.m.demo) LL.roadLaw(LBX, `${key} · лист планок`, h, st, c, ROAD_END).forEach(fail);
       S.overlay = { t: 'evrew', arg: 'clan' }; h = draw(`${key} · клан`);
       if ((h.match(/class="ev-pk[ "]/g) || []).length !== 3 || !h.includes('data-v="gifts:clan"')) fail(`${key}: в листе клана нет трёх планок или пути в «Дары»`);
       const K = X.clan();
@@ -395,6 +412,48 @@ function suite() {
     const p0 = E().pts; X.srv.credit('проверка:место', 'floor', 400); out.credits++;
     if ((S.ranks.find(x => x[0] === 'Событие') || [])[1] !== X.place() || X.place() === null || (E().pts > p0 && X.place() > r0)) fail('место: после очков S.ranks разошёлся с местом События');
   }
+  /* 7а. За верхней планкой своей полосы — планки следующей, без перехода в новый цикл (Л3, Л4). Очков — ровно порог первой планки
+     следующей полосы по эталону: «сервер» отмечает её взятой, на карточке темы полоса ведёт ко второй с её сундуком, в листе наград
+     следующая полоса раскрыта. evBeyond(c) — список нарушений: его же зовёт проверка мутацией */
+  function evBeyond(c) {
+    const e = [], key = `за верхней планкой · цикл ${ROMAN[c]}`;
+    reset('Эльфы', c);
+    const ref = LL.ref(LBX, 'event', c), n = LL.ownCount(LBX, 'event', c), own = ref[0].band, p1 = P(c)[0];
+    if (ref.length <= n + 1) return e;   // полоса последняя — продолжения нет
+    const need = p1 * ref[n].x / ref[0].x;
+    /* «сервер»: дело, которое переводит через порог, отмечает взятую планку — n + 1 */
+    E().pts = need - 1; E().by = { descent: need - 1 };
+    const r = X.srv.credit('проверка:за-полосой:' + c, 'guard', 1); out.credits++;
+    if (!r.ok || r.plank !== n + 1) e.push(`${key}: «сервер» не отметил взятую планку следующей полосы — ${JSON.stringify(r)}`);
+    const st = EN_WEEK.state('event', 'now');
+    LL.stateLaw(LBX, key, st, c, LAD0).forEach(x => e.push(x));
+    const p = st.planks[n];
+    if (!p || !p.reached || p.band !== own + 1 || p.need !== need) { e.push(`${key}: Л3 — набрано ${E().pts}, а первая планка следующей полосы не взята: ${p ? `порог ${p.need}, полоса ${p.band}` : 'её нет в лестнице'}`); return e; }
+    S.overlay = null; S.route = 'event';
+    let h = draw(key + ' · экран');
+    const nx = st.planks[n + 1];
+    if (!h.includes(`ещё <b class="num">${fmt(nx.need - E().pts)}</b>`) || !new RegExp(`class="well itf ev-chest" data-r="${LL.topR(ref[n + 1].pay)}"`).test(h) || !h.includes(`цикл ${ROMAN[own + 1]}`)) e.push(`${key}: Л3 — карточка темы не ведёт ко второй планке следующей полосы с её сундуком`);
+    S.overlay = { t: 'evrew', arg: 'me' }; h = draw(key + ' · лист');
+    LL.roadLaw(LBX, key + ' · лист', h, st, c, ROAD_END).forEach(x => e.push(x));
+    if (!h.includes(`<div class="wk-ld-band" data-band="${own + 1}">`)) e.push(`${key}: Л4 — полоса, по которой игрок идёт, не раскрыта`);
+    return e;
+  }
+  for (let c = D.from; c <= 5; c++) evBeyond(c).forEach(fail);
+  {
+    const MUT = LL.mutations(LAD0);   // замок по циклу вернули; планка следующей полосы платит сундук своей; порог продолжения — не ×next
+    let caught = 0;
+    for (const [what, f] of MUT) {
+      EnLoot.ladder = f;
+      let got = [];
+      try { got = evBeyond(D.from); } catch (x) { got = ['исключение ' + x.message]; }
+      EnLoot.ladder = LAD0;
+      if (got.length) caught++; else fail(`мутация «${what}»: законы лестницы её не поймали`);
+      out.mutLog.push(`мутация «${what}»: ${got.length ? got.slice(0, 2).join(' | ').slice(0, 320) : 'НЕ ПОЙМАНА'}`);
+    }
+    out.mut = `${caught} из ${MUT.length}`;
+    evBeyond(D.from).forEach(x => fail('после мутаций: ' + x));
+  }
+
   /* после отсечки, без клана и в режиме «Команда» */
   reset('Эльфы', 2); S.week.left = 0; let h = draw('после отсечки'); if (!h.includes('Приём закрыт')) fail('после отсечки не видно, что приём закрыт');
   reset('Эльфы', 2); S.clan = Object.assign({}, S.clan, { in: false }); S.overlay = { t: 'evrew', arg: 'clan' }; h = draw('без клана');
@@ -433,4 +492,5 @@ const t0 = Date.now();
 let res;
 try { res = vm.runInContext('(' + suite.toString() + ')()', ctx); } catch (e) { say('сценарии: ' + (e.stack || e.message)); done(); }
 err.push(...res.errors);
-done(`Событие проверено за ${Math.round((Date.now() - t0) / 1000)} с: отрисовок ${res.views}, листов ${res.sheets}, карточек ${res.cards}, строк источников ${res.rows}, операций сервера ${res.credits}.`);
+if (process.argv.includes('--mut')) for (const m of res.mutLog) console.log(m);   // какой закон поймал каждую мутацию
+done(`Событие проверено за ${Math.round((Date.now() - t0) / 1000)} с: отрисовок ${res.views}, листов ${res.sheets}, карточек ${res.cards}, строк источников ${res.rows}, операций сервера ${res.credits}. Лестница планок: состояний сверено ${res.ladders}, мутаций поймано ${res.mut}.`);

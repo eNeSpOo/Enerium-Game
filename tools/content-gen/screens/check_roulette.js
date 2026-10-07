@@ -9,6 +9,10 @@
       в прах по §15.3 (rsDustOf); итог операции сходится с запасами и кошельком; повтор того же номера ничего не меняет; нехватка
       Энериума, пустой пул и неверное число — отказ без расхода. Полный чертёж — комплект осколков: «Пробудить» из итога приводит героя
       с 0 ур., 0 РП и 0 Добл, остаток — в прах (§15.2).
+   4а. Рулетка и герои Эхо (ADR-0047): комплект героя рулетки — прежний общий (rules.stub.shards), а не комплект по циклу
+      (rules.echoSet — только у героев Эхо): его отдают и экран (hrNeed), и «сервер» героев Эхо; полный чертёж ложится прежним
+      комплектом; прах Эха в героя рулетки не влить. Прокрутка, повтор и пробуждение героя рулетки прах Эха не трогают; их прах
+      в итоге, сводке, подтверждении и листе «Шансы» назван «прах душ».
    5. Вид: колонка на циклах I–VI, окно рулетки — лента, цена, три кнопки, галочка; нехватка — кнопка неактивна, причина — строкой.
       Без пропуска лента крутится: выпавшая карточка — итог сервера, длительность 4–6 с, у ×10 и ×100 — короткая лента на самый ценный
       итог; новая лента начинается с соседей прошлой остановки; кривая монотонна и тормозит до нуля; итог — только после остановки.
@@ -97,6 +101,7 @@ function load(o = {}) {
     ACT, OV, FLOWS, KH, RS, RSI, render, initialState, setTeam, rsPool, rsCyc, rsHas, rsDustOf, fmt, EnLoot: window.EnLoot,
     RL_DATA, RL_VIEW, RL_SRV, rlRoll, rlLand, rlReveal, rlFilm, rlBest, rlEase, rlGroups, rlCol, rlPct,
     RL_ART: typeof RL_ART !== 'undefined' ? RL_ART : null, rlCard: typeof rlCard === 'function' ? rlCard : null, RS_ART: typeof RS_ART !== 'undefined' ? RS_ART : null, KIT_EXTRA,
+    EH: window.EN_ECHO_HEROES || null, hrNeed: typeof hrNeed === 'function' ? hrNeed : null, hrStage: typeof hrStage === 'function' ? hrStage : null,
   })`, ctx);
   return { T, els, rootCls, game: () => (els.game ? els.game.innerHTML : '') };
 }
@@ -128,7 +133,7 @@ function fresh(P, o = {}) {
   T.S.acc.cycle = o.cyc || 2; T.S.rs.cyc = 0; T.S.wallet.enerium = o.en != null ? o.en : 1000000;
   if (o.skip != null) T.S.rl.skip = o.skip;
 }
-const snap = T => JSON.parse(JSON.stringify({ en: T.S.wallet.enerium, dust: T.S.wallet.dust, souls: T.S.wallet.souls, shards: T.S.rs.shards, owned: T.S.rs.owned, seq: T.S.rl.seq, pity: T.S.rl.srv.pity, pick: T.S.rl.srv.pick }));
+const snap = T => JSON.parse(JSON.stringify({ en: T.S.wallet.enerium, dust: T.S.wallet.dust, edust: T.S.wallet.edust || 0, souls: T.S.wallet.souls, shards: T.S.rs.shards, owned: T.S.rs.owned, seq: T.S.rl.seq, pity: T.S.rl.srv.pity, pick: T.S.rl.srv.pick }));
 const next = T => 'rl' + T.S.rl.seq;
 /* окно итога из разметки экрана: за ним — вкладка «За души» с теми же именами героев */
 const resOf = h => { const i = h.indexOf('<section class="rl-res'); return i < 0 ? '' : h.slice(i, h.indexOf('</section>', i)); };
@@ -162,6 +167,22 @@ fresh(P);
 const pool = T.rsPool(), need = T.RS.rules.stub.shards, counts = D.shards.map(x => x[0]);
 if (pool.length < 2) say(`пул рулетки цикла II: героев ${pool.length}`);
 if (pool.some(h => h.src !== 'roulette' || h.c !== 2)) say('пул рулетки цикла II: чужие герои');
+/* 4а. комплект героя рулетки — прежний общий: комплект по циклу героя (rules.echoSet, ADR-0047) — только у героев Эхо. Экран и «сервер»
+   героев Эхо отдают герою рулетки прежнее число; с ним он «известен»; прах Эха в него не влить */
+{
+  const R = T.RS.rules, rl = T.RS.heroes.filter(h => h.src === 'roulette');
+  if (!Number.isInteger(need) || need < 1) say(`комплект героя рулетки rules.stub.shards — ${need}`);
+  if (Array.isArray(R.echoSet) && R.echoSet.slice(1).some(x => !(x > need))) say(`комплект героя Эхо (${R.echoSet.slice(1).join(' / ')}) не больше комплекта героя рулетки ${need} — рулетку не отличить`);
+  const badScr = T.hrNeed ? rl.find(h => T.hrNeed(h) !== need) : null, badSrv = T.EH ? rl.find(h => T.EH.need(h) !== need) : null;
+  if (badScr) say(`комплект героя рулетки ${badScr.n} на экране — ${T.hrNeed(badScr)}, ждали прежний ${need}`);
+  if (badSrv) say(`комплект героя рулетки ${badSrv.n} у «сервера» героев Эхо — ${T.EH.need(badSrv)}, ждали прежний ${need}`);
+  const h0 = pool.find(h => !T.rsHas(h));
+  if (h0 && T.hrStage) { T.S.rs.shards[h0.id] = need - 1; const a = T.hrStage(h0); T.S.rs.shards[h0.id] = need; const b = T.hrStage(h0); delete T.S.rs.shards[h0.id];
+    if (a !== 1 || b !== 2) say(`герой рулетки: с ${need - 1} осколками стадия ${a}, с ${need} — ${b}; ждали 1 и 2 — комплект прежний`); }
+  if (h0 && T.EH) { const e0 = T.S.wallet.edust; T.S.wallet.edust = need; T.S.rs.shards[h0.id] = 1; const r = T.EH.pour('рулетка-проба', h0.id, 1);
+    if (!r.refuse || T.S.wallet.edust !== need || T.S.rs.shards[h0.id] !== 1) say('прах Эха влит в героя рулетки — он только для героев Эхо');
+    delete T.S.rs.shards[h0.id]; T.S.wallet.edust = e0; }
+}
 /* независимый пересчёт: три броска на прокрутку — герой, полный ли чертёж, число осколков */
 function reroll(pl, seed, n) {
   const rng = T.EnLoot.makeRng(seed), W = D.shards.reduce((a, x) => a + x[1], 0), out = [];
@@ -244,6 +265,7 @@ function checkOp(where, s0, op) {
   if (!eq(Object.entries(dsh).sort(), Object.entries(sh).sort())) say(`${where}: осколки в запасах ${JSON.stringify(dsh)}, ждали ${JSON.stringify(sh)}`);
   if (S.wallet.dust - s0.dust !== dust || R.dust !== dust) say(`${where}: прах +${S.wallet.dust - s0.dust} (в итоге ${R.dust}), ждали +${dust}`);
   if (S.wallet.souls !== s0.souls) say(`${where}: прокрутка тронула души`);
+  if ((S.wallet.edust || 0) !== s0.edust) say(`${where}: прокрутка тронула прах Эха — осколки героев рулетки уходят только в прах душ`);
   if (S.rl.seq !== s0.seq + 1) say(`${where}: номер следующей операции не сдвинулся`);
   return R;
 }
@@ -279,7 +301,8 @@ for (const n of D.counts) {
     const G = T.rlGroups(R), q = G.shards.reduce((a, x) => a + x.q, 0);
     if (G.shards.length && !h.includes(`Осколки · ${T.fmt(q)}`)) say(`${where}: сумма осколков ${q} не в сводке`);
     for (const x of G.shards) if ((h.match(new RegExp(`<b>${T.RSI[x.id].n}</b>`, 'g')) || []).length !== 1) say(`${where}: осколки ${T.RSI[x.id].n} не одной строкой`);
-    if (R.dust && (!h.includes('В прах') || !h.includes(T.fmt(R.dust)))) say(`${where}: прах ${R.dust} не в сводке`);
+    if (R.dust && (!h.includes('В прах душ') || !h.includes(T.fmt(R.dust)))) say(`${where}: прах душ ${R.dust} не в сводке или не назван «прах душ»`);
+    if (/прах Эха/.test(h)) say(`${where}: в сводке рулетки — прах Эха`);
     const iF = h.indexOf('Полные чертежи'), iS = h.indexOf('Осколки ·'), iD = h.indexOf('В прах');
     if (iF >= 0 && iS >= 0 && iF > iS) say(`${where}: полные чертежи не первыми`);
     if (iS >= 0 && iD >= 0 && iS > iD) say(`${where}: прах выше осколков`);
@@ -302,15 +325,16 @@ if (summary[100] && !summary[100].R.dust) say('×100 с тремя героям�
     if (T.S.rl.demoFull) say('полный чертёж: демо-флаг не снялся после операции');
     const html1 = resOf(view(P, 'полный чертёж · итог'));
     if (!html1.includes('Полный чертёж') || !html1.includes('Герой') || !html1.includes(`data-a="activate" data-v="${g.id}"`)) say('полный чертёж: в итоге нет «Полный чертёж», «Герой» или «Пробудить»');
-    const d0 = T.S.wallet.dust, extra = (T.S.rs.shards[g.id] || 0) - need;
+    const d0 = T.S.wallet.dust, e0 = T.S.wallet.edust || 0, extra = (T.S.rs.shards[g.id] || 0) - need;
     run('пробуждение', () => T.ACT.activate(g.id));
     if (!T.S.overlay || T.S.overlay.t !== 'confirm') say('пробуждение из итога: нет подтверждения');
-    else view(P, 'пробуждение · подтверждение');
+    else { const c = view(P, 'пробуждение · подтверждение'); if (!c.includes(`из ${T.fmt(need)} осколков`) || !/уйдут в прах душ/.test(c)) say(`пробуждение героя рулетки: подтверждение не называет прежний комплект ${need} или «прах душ» для лишних осколков`); }
     run('пробуждение', () => T.ACT.activatedo(g.id));
     const own = T.S.rs.owned[g.id];
     if (!own || own.lvl !== 0 || own.lim !== 0 || own.valor !== 0) say(`пробуждение: ${h.n} не пришёл с 0 ур., 0 РП и 0 Добл`);
     if (T.S.rs.shards[g.id]) say('пробуждение: осколки героя остались в запасах');
     if (T.S.wallet.dust - d0 !== Math.max(0, extra) * T.rsDustOf(h)) say(`пробуждение: остаток осколков в прах ${T.S.wallet.dust - d0}, ждали ${Math.max(0, extra) * T.rsDustOf(h)}`);
+    if ((T.S.wallet.edust || 0) !== e0) say('пробуждение героя рулетки тронуло прах Эха');
     /* тот же герой уже в коллекции: следующий чертёж — целиком в прах */
     T.S.overlay = { t: 'rl', arg: '' };
     let tries = 0, got = null;
@@ -323,7 +347,7 @@ if (summary[100] && !summary[100].R.dust) say('×100 с тремя героям�
     else {
       if (got.list[0].dust !== need * T.rsDustOf(h)) say(`чертёж героя из коллекции: прах ${got.list[0].dust}, ждали ${need * T.rsDustOf(h)}`);
       const html2 = resOf(view(P, 'чертёж героя из коллекции · итог'));
-      if (!html2.includes('Уже в коллекции')) say('чертёж героя из коллекции: итог не говорит, что всё ушло в прах');
+      if (!html2.includes('Уже в коллекции') || !html2.includes('прах душ')) say('чертёж героя из коллекции: итог не говорит, что всё ушло в прах душ');
     }
   }
   /* ×100 с полным чертежом: полные — первыми и крупно */
@@ -585,7 +609,7 @@ function tour(team) {
   for (let c = 1; c <= 6; c++) {
     fresh(P, { cyc: c, skip: true });
     v(`колонка · цикл ${c}`);
-    T.S.overlay = { t: 'rlodds', arg: '' }; v(`шансы · цикл ${c}`);
+    T.S.overlay = { t: 'rlodds', arg: '' }; if (!/уходят в прах душ/.test(v(`шансы · цикл ${c}`))) say(`шансы · цикл ${c}: лист не называет «прах душ» — куда уходят осколки героя из коллекции`);
     T.S.overlay = { t: 'rlpick', arg: '' }; v(`гарантия · цикл ${c}`);
     T.S.overlay = { t: 'rl', arg: '' }; v(`окно · цикл ${c}`);
     if (c < 2) continue;

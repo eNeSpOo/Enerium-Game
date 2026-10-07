@@ -96,7 +96,7 @@ python tools/art-gen/export_ui.py --spec ui-icons.json --no-stamp --quiet
 
 `ui_icons.py` берёт клетки больших листов, поверх — клетки листов переделки и `.fix.webp`, и проверяет, что иконка есть у каждой способности библиотеки, линейки талисмана и шаблона снаряжения. `export_ui.py` читает обе описи — `ui-art.json` (арт экранов) и `ui-icons.json` (иконки сеткой); `--spec` выгружает одну. Иконки — WebP 256 px в `design/ui/assets/art/spells`, `tal`, `gear`; пути строят помощники `abArt`, `talIcon`, `eqIcon` (`design/ui/screens/art-icons.js`). Проверка — `node tools/content-gen/screens/check_icons.js`.
 
-Задания сеткой: способности — `jobs/spell-icons-<школа>.json`, фарм с «Тысячей птиц» и «способность скрыта» — `jobs/spell-icons-farm.json`; талисманы — `jobs/talisman-icons.json`; снаряжение — `jobs/equip-icons.json`; ресурсы — `jobs/res-icons-<цикл>.json` и переделка `jobs/res-icons-fix.json`, их собирает `res_jobs.py` из поля `art` предметов `design/ui/recipes.js`. Язык иконок и уроки — `art/style/style.md`.
+Задания сеткой: способности — `jobs/spell-icons-<школа>.json`, сочетания и черты героев — `jobs/spell-icons-combo.json`, черты врагов (ADR-0051) — `jobs/spell-icons-foe.json`, фарм с «Тысячей птиц» и «способность скрыта» — `jobs/spell-icons-farm.json`; талисманы — `jobs/talisman-icons.json`; снаряжение — `jobs/equip-icons.json`; ресурсы — `jobs/res-icons-<цикл>.json` и переделка `jobs/res-icons-fix.json`, их собирает `res_jobs.py` из поля `art` предметов `design/ui/recipes.js`. Язык иконок и уроки — `art/style/style.md`.
 
 Светлая палитра даёт насыщенный конус света снизу — мяту вместо «белого с прозеленью». Полосу оттенков приглушает `hue_fix.py` без новой генерации: клетка с конусом получает рядом `<имя>.fix.webp`, выгрузка берёт его.
 

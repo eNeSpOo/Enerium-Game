@@ -172,6 +172,21 @@
 .ech-plank.got{opacity:.6}
 .ech-pk{font-size:12.5px;color:var(--parch-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ech-need{font-size:12px;white-space:nowrap}
+/* ступени следующих полос лестницы и потолок — тише своих */
+.ech-plank.far>b{font-size:15px;color:var(--parch-3)}
+.ech-plank.far.ready>b{color:var(--gold)}
+/* отряд недели: строка героя и «Сделать целью»; герой-цель недели — с золотой каймой */
+.ech-hrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center}
+.ech-hrow.tgt .rs-row{border-color:rgba(221,188,122,.55);box-shadow:inset 3px 0 0 var(--gold)}
+.ech-tgb{white-space:nowrap}
+.ech-face.tgt{box-shadow:inset 0 -2px 0 var(--rc),0 0 0 1px var(--gold)}
+/* гарантия недели и прах Эха */
+.ech-tg{display:flex;flex-direction:column;gap:var(--sp-s);flex:none}
+.ech-tg .rs-line{align-items:flex-start;line-height:1.3}
+.ech-tg .rs-line .i{flex:none;margin-top:1px}
+.ech-dust{gap:var(--sp-s);align-items:center;flex-wrap:wrap}
+.ech-dl{font-size:12.5px;color:var(--parch-2)}
+.ech-dn{gap:4px;display:inline-flex;align-items:center}
 .ech-demo{flex-wrap:wrap;gap:6px}
 .ech-demo .rs-cyc button{padding:0 9px}
 .ech-fhead{display:grid;grid-template-columns:96px minmax(0,1fr);gap:var(--sp-m);align-items:center;flex:none}

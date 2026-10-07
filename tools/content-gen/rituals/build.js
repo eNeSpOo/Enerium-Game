@@ -15,6 +15,12 @@
       с перековкой избытка (SIM.forge) против прогона без неё — артель, лучшая пятёрка, средняя бригада, базовые, золото; вариант «2 → 1».
    6. Проверки: целые числа и миллисекунды, сетка и потолки, законы §19.5, цели долей, ×1,7, генератор совпадает с сундуками;
       перековка — избыток не копится, золото — сток в своих пределах, бригадам не хуже.
+   7. Ступени загрузки (ADR-0047, RULES.ladder): мера — загрузка своих мест за неделю, целые проценты: часы завершённых ритуалов
+      по карточкам / (мест × часов недели); счёт — pool.js (weekMs, capMs, load, stepOf), пороги ступеней и сундуки артели —
+      EN_LOOTBOXES.modes.ritual. Загрузка недель — из того же прогона; пятый профиль — «без простоя» (SIM.ladder.top) — только для
+      верхней ступени. Законы: обычный и увлечённый стоят там, где их ставят сундуки (typical); верхняя ступень — только места почти
+      без простоя; плательщик — не выше обычного больше чем на ступень; ритуалы вместе с сундуками артели — не больше
+      TARGET.ladder.withBoxMaxBp золота забегов обычного.
 
    Пишет:
    - design/ui/rituals.js — данные прототипа (window.EN_RITUALS) и алгоритм tools/content-gen/rituals/pool.js как есть, руками не править;
@@ -74,6 +80,12 @@ const RULES = {
      need — 10, слова автора 29.09.2026: «игрок должен сам выбирать, какие 10 талисманов, рабочих и снаряжение он перекует» (ADR-0031,
      дополнение). Прежние 3 → 1 были решением исполнителя — таблица «forgeAlt» черновика показывает их для сравнения */
   forge: { need: 10, gold: [1000, 2000, 4000, 8000, 16000, 32000], cyc: [0, 0, 1, 2, 3, 4, 5] },
+  /* ступени загрузки — ADR-0047, слова автора 02.10.2026: «планок по рейтинговым режимам, у игрока они должны быть сразу и на все циклы…
+     Логика в контрактах, Ритуалах, в событии, Арене и Лиге, в Клановом боссе оно как бы это всё и должно учитывать». Мера — загрузка своих
+     мест ритуалов за неделю, целые проценты: часы завершённых ритуалов по карточкам / (мест × weekH). Ролл за Энериум часов не прибавляет:
+     в счёт идёт только завершённый ритуал (§19.5). Пороги ступеней и сундуки артели ведёт сборщик сундуков — EN_LOOTBOXES.modes[mode],
+     слой личных планок с порогом at в процентах; здесь — мера (алгоритм — pool.js) и её законы */
+  ladder: { mode: 'ritual', weekH: 168 },
 };
 
 /* Вкладки §19.3. ms — длительность по редкостям; unitMs — единица награды; crew — бригада lo…hi по редкостям. */
@@ -147,6 +159,12 @@ const SIM = {
      одной редкости, от младших к старшим — перековывает, пока хватает. keep — две бригады по пять: столько рабочих у обычного занято
      одновременно в пике. alt — вариант «2 → 1» для сравнения, вопрос автору. Профили — обычный и увлечённый, плательщик — для ×1,7 */
   forge: { keep: 10, alt: 3, prof: ['o', 'e', 'p'] },   // alt — сравнение: прежние 3 → 1
+  /* ступени загрузки: загрузка недель — из того же прогона профилей prof; неделя профиля — срединная из всех полных недель цикла на всех
+     сидах. Первая неделя прогона — разгон с пустых мест: в цикле открытия ритуалов она настоящая, в следующих её не считаем — места там
+     заняты с прошлого цикла. top — «места почти без простоя»: заходит каждые 2–3 часа и ставит самую долгую карточку, а не ту, что
+     влезает до следующего захода (long): место простаивает только от конца ритуала до захода. Нужен одной проверке — что верхняя
+     ступень достижима и только так; в доходы и доли он не идёт */
+  ladder: { prof: ['o', 'e', 'z', 'p'], top: { id: 'n', n: 'без простоя', cap: 'o', visits: [8, 10, 13, 15, 18, 20, 23], paid: 0, heroes: [12, 18, 24, 30, 36], event: 'free', craft: 'free', long: true } },
 };
 let ECHO_BP = SIM.echoBp, PAYER_BP = 0;   // PAYER_BP — лишний отряд плательщика в забегах: lootboxes.js, assume.payerPts
 
@@ -164,10 +182,17 @@ const TARGET = {
      При 10 → 1 (слово автора, RULES.forge.need) избыток уходит медленнее. Порог artelMax ловит, если артель начнёт расти без меры.
      Вневременных (высшая редкость) не считаем: дальше их не перековать, это и есть плод перековки. В годовых циклах (ADR-0043) их
      к концу цикла VI у обычного 18, у увлечённого 55 — артель целиком 47 и 76, ниже высшей редкости — 29 и 21.
-     Порог — 54 (было 45): при 10 → 1 в остатке — до девяти рабочих на каждую из шести редкостей ниже высшей, больше перековка не оставит.
-     Прежние 45 стояли вплотную к прогону (43 к концу цикла V у обычного), а число скачет с границей недели: после пересчёта ADR-0050
-     конец цикла V пришёлся на ровную 176-ю неделю — ещё один недельный приток до перековки, 48 */
-  forge: { artelMax: 54, goldMaxBp: 300, basicsMinBp: 9900 },
+     Порог — 45. С 02.10.2026 стоял временный 54: прогон упирался в 48 (ADR-0050). Лестница лутбоксов (ADR-0047) срезала шарды рабочих
+     в сундуках циклов V–VI — закон стока З9, а сундук призыва даёт их только в «Общем»: общий пересчёт 07.10.2026 — к концу цикла VI
+     в артели около тридцати рабочих (без перековки — больше восьмисот), ниже высшей редкости — около тридцати; точные числа — таблица
+     forge черновика. Порог возвращён на 45 */
+  forge: { artelMax: 45, goldMaxBp: 300, basicsMinBp: 9900 },
+  /* ступени загрузки (docs/content/лестница-лутбоксов.md, раздел 3, «Ритуалы — новое»): ритуалы вместе с сундуками артели дают обычному
+     не больше withBoxMaxBp золота его забегов — сундук считается золотом и ресурсами по цене рынка (EN_LOOTBOXES.ev, gold и resGold);
+     плательщик — не выше обычного больше чем на payerSteps ступень; верхнюю ступень профили прогона в срединную неделю не берут.
+     edge — «на пороге», п. п. загрузки: профиль, чья срединная неделя не дальше edge от порога соседней ступени, берёт то одну ступень,
+     то другую — расхождение с typical сундуков тогда предупреждение, а не ошибка: порог стоит на загрузке, двигать его — сундукам */
+  ladder: { withBoxMaxBp: 1500, payerSteps: 1, edge: 2 },
 };
 
 /* ================================ ЗАГРУЗКА ================================ */
@@ -265,13 +290,16 @@ function daysOf(I, c) {
 }
 function artLv(D, k, c) { const a = D.art[k]; return a ? Math.max(0, Math.min(a.lv, c - a.from + 1)) : 0; }   // один уровень за цикл (wnCap)
 
-/* F — перековка в прогоне (SIM.forge): { need, gold, cyc, keep }; без F — прогон без перековки, как раньше */
+/* F — перековка в прогоне (SIM.forge): { need, gold, cyc, keep }; без F — прогон без перековки, как раньше.
+   pk — ключ профиля SIM.prof или сам профиль с полем id (SIM.ladder.top). Заодно — загрузка мест по неделям (ступени загрузки):
+   weeks — целые проценты каждой полной недели цикла: мс карточек ритуалов, завершённых в эту неделю, к мс мест недели (pool.js) */
 function simulate(D, I, pk, c, seedNo, lists, F) {
-  const pr = SIM.prof[pk], R = D.rules, days = daysOf(I, c);
+  const pr = typeof pk === 'string' ? SIM.prof[pk] : pk, R = D.rules, days = daysOf(I, c);
   const nSlots = P.slots(D, artLv(D, 'slots', c)), nFree = P.freeRolls(D, artLv(D, 'rolls', c)), nCards = P.cardsN(D, artLv(D, 'cards', c));
   const heroSlots = Math.max(1, nSlots - Math.floor(nSlots * (SIM.heroShare.den - SIM.heroShare.num) / SIM.heroShare.den));
   const roster = pr.heroes[cycIdx(c)];
-  const seed = `прогон|${pk}|${c}|${seedNo}`;
+  const seed = `прогон|${typeof pk === 'string' ? pk : pk.id}|${c}|${seedNo}`;
+  const WK = P.weekMs(D), wkDone = Array.from({ length: Math.floor(days * 24 * H / WK) }, () => 0);
   /* артель к началу цикла: первая артель и приток прошлых циклов; дальше — по неделям этого */
   const workers = [];
   const shards = [0, 0, 0, 0, 0, 0, 0];
@@ -326,20 +354,23 @@ function simulate(D, I, pk, c, seedNo, lists, F) {
         const freeHeroes = roster - heroBusy.reduce((a, x) => a + x.n, 0);
         const freeW = workers.filter(w => w.until <= now).sort((a, b) => b.r - a.r);
         const staff = (tab, x) => tab === 'hero' ? x.crew <= freeHeroes : x.crew <= freeW.length;
+        /* сколько времени есть у карточки: до следующего захода; у профиля «без простоя» (long) — вся сетка вкладки: ставит самую долгую */
+        const room = tab => pr.long ? D.tabs[tab].ms[D.tabs[tab].ms.length - 1] : gap;
         const best = tab => {
+          const span = room(tab);
           let pick = null, pickReal = 0, over = null;
           for (const x of pools[tab]) {
             if (x.taken || !staff(tab, x)) continue;
             const real = P.time(D, x, tab === 'work' ? freeW.slice(0, x.crew).map(w => w.r) : []);
-            if (x.unique && real <= gap) return { x, real };
-            if (real <= gap && (!pick || x.ms > pick.ms)) { pick = x; pickReal = real; }
-            if (real > gap && (!over || real < over.real)) over = { x, real };
+            if (x.unique && real <= span) return { x, real };
+            if (real <= span && (!pick || x.ms > pick.ms)) { pick = x; pickReal = real; }
+            if (real > span && (!over || real < over.real)) over = { x, real };
           }
           return pick ? { x: pick, real: pickReal } : over;
         };
         /* вкладка: карточка, что влезает в зазор до следующего захода; короче 60 % возможного — ролл, бесплатный, потом платный */
         const tryTab = tab => {
-          const ideal = Math.max(...D.tabs[tab].ms.filter(ms => ms <= gap), D.tabs[tab].ms[0]);
+          const span = room(tab), ideal = Math.max(...D.tabs[tab].ms.filter(ms => ms <= span), D.tabs[tab].ms[0]);
           let b = best(tab), tries = 0;
           while (tries < SIM.rollsPerPick && (!b || (!b.x.unique && b.x.ms * R.bp < ideal * SIM.rollIfBelowBp))) {
             if (!pools[tab].some(x => !x.taken && staff(tab, x)) && pools[tab].every(x => x.taken || x.crew > (tab === 'hero' ? freeHeroes : freeW.length))) {
@@ -366,11 +397,15 @@ function simulate(D, I, pk, c, seedNo, lists, F) {
         tot.basics += A.basics; tot.keys += A.keys; tot.uniq += A.uniq; if (x.unique) tot.uniqRituals++;
         tot.rituals++;
         if (tab === 'hero') tot.hHero += x.ms; else { tot.hWork += x.ms; tot.wRituals++; tot.speedBp += P.speedBp(D, x, crewW.map(w => w.r)); }
+        /* ступени загрузки: ритуал идёт в счёт той недели, в которую завершился; время — по карточке */
+        const wi = Math.floor(until / WK); if (wi < wkDone.length) wkDone[wi] += x.ms;
       }
     }
   }
   const hist = [0, 0, 0, 0, 0, 0, 0]; workers.forEach(w => { hist[w.r - 1]++; });
-  return { tot, days, nSlots, heroSlots, nFree, nCards, roster, workers: workers.length, workersR: workers.reduce((a, w) => a + w.r, 0), hist };
+  const cap = P.capMs(D, nSlots);
+  return { tot, days, nSlots, heroSlots, nFree, nCards, roster, workers: workers.length, workersR: workers.reduce((a, w) => a + w.r, 0), hist,
+    weeks: wkDone.map(ms => P.load(ms, cap)) };
 }
 /* ускорение лучшей пятёрки артели, б. п.: пять самых редких, не больше капа — полная бригада долгого и уникального ритуала */
 function top5Bp(D, hist) {
@@ -400,6 +435,78 @@ function forgeSim(D, I, lists, need) {
     }
   }
   return out;
+}
+
+/* ================================ СТУПЕНИ ЗАГРУЗКИ ================================ */
+
+/* недели цикла, что идут в счёт: первая неделя прогона — разгон с пустых мест. В цикле открытия ритуалов она настоящая; в следующих
+   места заняты с прошлого цикла — её не считаем */
+function ladWeeks(D, c, weeks) { return c > D.rules.open.cycle && weeks.length > 1 ? weeks.slice(1) : weeks; }
+/* срединная неделя — нижняя медиана: целое из прогона, без усреднения */
+const median = a => { const s = a.slice().sort((x, y) => x - y); return s.length ? s[Math.floor((s.length - 1) / 2)] : 0; };
+/* загрузка недель по профилям и циклам и её законы. Пороги ступеней и «кто где стоит» — lootboxes.js: слой лестницы режима
+   RULES.ladder.mode и его typical. load — срединная неделя, lo и hi — края, step — взятых ступеней, at — доля недель, где верхняя
+   взятая ступень — k-я, б. п. */
+function ladder(D, I, sim, lists, err, warn) {
+  const LR = D.rules.ladder, M = I.L.modes && I.L.modes[LR.mode], lyr = M && M.ladder ? M.layers.find(l => l.id === M.ladder.layer) : null;
+  if (!M || !lyr || lyr.kind !== 'plank' || lyr.clan) { err.push(`lootboxes.js: у режима «${LR.mode}» нет слоя личных ступеней`); return null; }
+  const ats = lyr.rows.map(r => r.at), n = ats.length;
+  if (ats.some(a => !Number.isInteger(a) || a <= 0) || ats.some((a, i) => i && a <= ats[i - 1])) { err.push('ступени загрузки: пороги lootboxes.js — не целые проценты по возрастанию'); return null; }
+  if (M.ladder.next != null) err.push('ступени загрузки: порог — в процентах загрузки, продолжения за верхней ступенью нет, а в lootboxes.js оно задано (ladder.next)');
+  const typ = M.typical || {}, want = { o: typ.free ? typ.free[lyr.id] : null, e: typ.fan ? typ.fan[lyr.id] : null };
+  if (!Number.isInteger(want.o) || !Number.isInteger(want.e)) { err.push('ступени загрузки: в lootboxes.js нет typical — где стоят обычный и увлечённый'); return null; }
+  const top = SIM.ladder.top, edge = TARGET.ladder.edge;
+  const out = { mode: LR.mode, box0: M.box, layer: lyr, ats, want, weeks: {}, load: {}, lo: {}, hi: {}, step: {}, at: {}, slots: {} };
+  for (const c of SIM.cycles) {
+    const W = {}; for (const pk of SIM.ladder.prof) W[pk] = sim[c][pk].weeks;
+    W[top.id] = []; for (let s = 0; s < SIM.seeds; s++) W[top.id].push(...ladWeeks(D, c, simulate(D, I, top, c, s, lists).weeks));
+    out.weeks[c] = W; out.load[c] = {}; out.lo[c] = {}; out.hi[c] = {}; out.step[c] = {}; out.at[c] = {}; out.slots[c] = sim[c].o.nSlots;
+    for (const [pk, w] of Object.entries(W)) {
+      if (!w.length) { err.push(`ступени загрузки: в цикле ${ROMAN[c]} нет ни одной полной недели`); return null; }
+      const m = median(w);
+      out.load[c][pk] = m; out.lo[c][pk] = Math.min(...w); out.hi[c][pk] = Math.max(...w); out.step[c][pk] = P.stepOf(ats, m);
+      out.at[c][pk] = [0].concat(ats).map((_, k) => Math.round(w.filter(x => P.stepOf(ats, x) === k).length * RULES.bp / w.length));
+    }
+    /* законы.
+       1. Обычный и увлечённый стоят там, где их ставят сундуки (typical). «На пороге» — срединная неделя не дальше edge п. п. от порога
+          соседней ступени, и ступень из-за этого соседняя: игрок берёт то одну, то другую. Это предупреждение, а не ошибка: порог сидит
+          на загрузке профиля, двигать его — сборщику сундуков. Дальше edge — ошибка.
+       2. Верхняя ступень — только места почти без простоя: профили прогона в срединную неделю её не берут, «без простоя» — берёт.
+       3. Плательщик — не выше обычного больше чем на payerSteps: роллы за Энериум покупают выбор, не время (§19.5). */
+    const S = out.step[c], L = out.load[c], name = pk => pk === top.id ? top.n : SIM.prof[pk].n;
+    for (const pk of ['o', 'e']) {
+      if (S[pk] === want[pk]) continue;
+      const up = S[pk] === want[pk] + 1 && L[pk] - ats[want[pk]] <= edge, down = S[pk] === want[pk] - 1 && ats[want[pk] - 1] - L[pk] <= edge;
+      const msg = `ступени загрузки, цикл ${ROMAN[c]}: ${name(pk)} — на ${S[pk]}-й ступени (срединная неделя ${L[pk]} %), сундуки ставят его на ${want[pk]}-ю`;
+      if (up || down) warn.push(`${msg}; порог ${up ? ats[want[pk]] : ats[want[pk] - 1]} % — на его загрузке: ${up ? want[pk] + 1 : want[pk]}-ю он берёт в ${Math.round(w100(W[pk], x => P.stepOf(ats, x) >= (up ? want[pk] + 1 : want[pk])) / 100)} % недель`);
+      else err.push(msg);
+    }
+    for (const pk of SIM.ladder.prof) if (S[pk] >= n) err.push(`ступени загрузки, цикл ${ROMAN[c]}: ${name(pk)} берёт верхнюю ступень (срединная неделя ${L[pk]} %) — она только для мест почти без простоя`);
+    if (S[top.id] < n) (ats[n - 1] - L[top.id] <= edge ? warn : err).push(`ступени загрузки, цикл ${ROMAN[c]}: и без простоя верхняя ступень не берётся — срединная неделя ${L[top.id]} % при пороге ${ats[n - 1]} %`);
+    if (S.p > S.o + TARGET.ladder.payerSteps) err.push(`ступени загрузки, цикл ${ROMAN[c]}: плательщик — на ${S.p}-й ступени, обычный — на ${S.o}-й`);
+  }
+  return out;
+}
+/* доля недель по условию, б. п. */
+const w100 = (w, f) => Math.round(w.filter(f).length * RULES.bp / w.length);
+/* ритуалы вместе с сундуками артели — доля золота забегов обычного. Сундуки — ступени, которые обычный берёт в неделях того же прогона:
+   за каждую — её сундуки (строка слоя в lootboxes.js) по ожиданию сундука (EN_LOOTBOXES.ev): золото и ресурсы по цене рынка, сотые;
+   прах считается отдельно, в золото не идёт. Ритуалы и забеги — в день, сундуки — в неделю. box[c] — среднее за неделю: сундуков
+   (в сотых), золота, ресурсов и праха (в сотых), bp — доля; typ — для сверки: сундуков в типичной неделе обычного по lootboxes.js (week) */
+function ladderBox(D, I, lad, sim, capOf, err) {
+  const days = P.weekMs(D) / (24 * H), rows = lad.layer.rows;
+  lad.box = {};
+  for (const c of SIM.cycles) {
+    const EV = I.L.ev && I.L.ev[lad.box0] ? I.L.ev[lad.box0][c] : null, TW = I.L.week && I.L.week[lad.mode] && I.L.week[lad.mode][c] ? I.L.week[lad.mode][c].free : null;
+    if (!EV || !TW) { err.push(`lootboxes.js: нет ожидания сундука «${lad.box0}» или недели обычного у режима «${lad.mode}» в цикле ${ROMAN[c]}`); continue; }
+    const of = (row, k) => (row.cyc[c] || []).reduce((a, g) => a + g.count * (k === 'n' ? 100 : (EV[g.win] && EV[g.win][g.r - 1] ? EV[g.win][g.r - 1][k] || 0 : 0)), 0);
+    const w = lad.weeks[c].o, sum = { n: 0, gold: 0, resGold: 0, dust: 0 };
+    for (const x of w) for (let i = 0; i < P.stepOf(lad.ats, x); i++) for (const k of Object.keys(sum)) sum[k] += of(rows[i], k);
+    const rit = sim[c].o.day.gold, run = capOf('o', c).gold, all = rit * days * w.length + sum.gold + sum.resGold, base = run * days * w.length;
+    lad.box[c] = { boxes: Math.round(sum.n / w.length), gold: Math.round(sum.gold / w.length), res: Math.round(sum.resGold / w.length), dust: Math.round(sum.dust / w.length),
+      bp: Math.round(all * RULES.bp / base), typ: TW.boxes };
+    if (all * RULES.bp > base * TARGET.ladder.withBoxMaxBp) err.push(`ступени загрузки, цикл ${ROMAN[c]}: ритуалы с сундуками артели — ${lad.box[c].bp / 100} % золота забегов обычного, потолок ${TARGET.ladder.withBoxMaxBp / 100} %`);
+  }
 }
 
 /* ================================ СБОРКА ================================ */
@@ -469,19 +576,22 @@ function build() {
     sim[c] = {};
     for (const pk of Object.keys(SIM.prof)) {
       const acc = { gold: 0, spirit: 0, souls: 0, basics: 0, keys: 0, uniq: 0, rituals: 0, hWork: 0, hHero: 0, freeRolls: 0, paidRolls: 0, en: 0, awakenSouls: 0, uniqRituals: 0 };
-      let meta = null;
-      for (let s = 0; s < SIM.seeds; s++) { const r = simulate(D, I, pk, c, s, lists); for (const k of Object.keys(acc)) acc[k] += r.tot[k]; meta = r; }
+      let meta = null; const weeks = [];
+      for (let s = 0; s < SIM.seeds; s++) { const r = simulate(D, I, pk, c, s, lists); for (const k of Object.keys(acc)) acc[k] += r.tot[k]; meta = r; weeks.push(...ladWeeks(D, c, r.weeks)); }
       const n = SIM.seeds * meta.days;
       /* в день — в сотых */
       const day = {}; for (const k of Object.keys(acc)) day[k] = Math.round(acc[k] * 100 / n);
-      sim[c][pk] = { day, days: meta.days, nSlots: meta.nSlots, heroSlots: meta.heroSlots, nFree: meta.nFree, nCards: meta.nCards, roster: meta.roster, workers: meta.workers, workersR: meta.workersR };
+      sim[c][pk] = { day, days: meta.days, nSlots: meta.nSlots, heroSlots: meta.heroSlots, nFree: meta.nFree, nCards: meta.nCards, roster: meta.roster, workers: meta.workers, workersR: meta.workersR, weeks };
     }
   }
+  /* ступени загрузки: недели профилей — из прогона выше; «без простоя» — свой прогон, только для верхней ступени */
+  const lad = ladder(D, I, sim, lists, err, warn);
 
   /* доход забегов и доли */
   const capOf = (pk, c) => { const pr = SIM.prof[pk], x = I.cap.cycles[c][pr.cap], k = pr.capBp || RULES.bp;
     return { gold: x.gold * k / RULES.bp, spirit: x.spirit * k / RULES.bp, souls: x.souls * k / RULES.bp, basics: x.base * k / RULES.bp, keys: x.el * k / RULES.bp, uniq: x.boss * I.RX.drops.enemies[0].boss.uniqueBp * k / RULES.bp / RULES.bp }; };
   const share = (pk, c, k) => { const b = capOf(pk, c)[k]; return b ? Math.round(sim[c][pk].day[k] * RULES.bp / b) : 0; };
+  if (lad) ladderBox(D, I, lad, sim, capOf, err);
   for (const c of SIM.cycles) {
     for (const k of Object.keys(TARGET.shareO)) {
       const s = share('o', c, k), [lo, hi] = TARGET.shareO[k];
@@ -510,9 +620,17 @@ function build() {
   }
   for (const c of SIM.cycles) { const o = fsim[c].o.on.basics, p = fsim[c].p.on.basics; if (o && p * RULES.bp > o * TARGET.payer) err.push(`перековка, цикл ${ROMAN[c]}: плательщик ×${(p / o).toFixed(2)} по базовым`); }
 
-  const tables = makeTables(D, I, sim, capOf, share, lists, fsim, falt);
-  const data = Object.assign({}, D, { sim: slimSim(sim, capOf), forge: slimForge(fsim) });
-  return { data, tables, sim, fsim, falt, err, warn, D, I };
+  if (!lad || !lad.box) return { err, warn };
+  const tables = makeTables(D, I, sim, capOf, share, lists, fsim, falt, lad);
+  const data = Object.assign({}, D, { sim: slimSim(sim, capOf), forge: slimForge(fsim), ladder: slimLadder(lad) });
+  return { data, tables, sim, fsim, falt, lad, err, warn, D, I };
+}
+/* в данные прототипа — ступени загрузки: срединная неделя профилей по циклам (o — обычный, e — увлечённый, z — занятый, p — плательщик,
+   n — «без простоя»), на какой ступени она стоит и доля золота забегов обычного с сундуками артели, б. п. */
+function slimLadder(lad) {
+  const out = { load: {}, step: {}, withBoxBp: {} };
+  for (const c of SIM.cycles) { out.load[c] = Object.assign({}, lad.load[c]); out.step[c] = Object.assign({}, lad.step[c]); out.withBoxBp[c] = lad.box[c] ? lad.box[c].bp : 0; }
+  return out;
 }
 /* в данные прототипа — прогон перековки для UI-кита команде: артель, лучшая пятёрка и золото дня у обычного и увлечённого */
 function slimForge(fsim) {
@@ -539,9 +657,28 @@ const hrs = ms => { const m = ms / 60000; return m < 60 ? `${m} мин` : m % 60
 const head = cols => [`| ${cols.join(' | ')} |`, `|${cols.map(() => '---').join('|')}|`];
 const cells = a => `| ${a.join(' | ')} |`;
 
-function makeTables(D, I, sim, capOf, share, lists, fsim, falt) {
+function makeTables(D, I, sim, capOf, share, lists, fsim, falt, lad) {
   const TBL = {}, TW = D.tabs.work, TH = D.tabs.hero;
   let T;
+
+  // ступени загрузки: пороги и сундуки артели по циклам — из lootboxes.js
+  const boxR = I.L.boxRarity, boxOf = pay => (pay || []).map(g => `${g.count > 1 ? g.count + ' × ' : ''}${boxR[g.r - 1]}${g.win && g.win !== 'step' ? ' · ' + I.L.winNames[g.win] : ''}`).join(' + ') || '—';
+  T = head(['Ступень', 'Загрузка мест за неделю', `Сундук артели: цикл ${SIM.cycles.map(c => ROMAN[c]).join(' / ')}`, 'Кто стоит на ней в срединную неделю']);
+  const whoAt = k => { const out = []; for (const [pk, n] of [['o', 'обычный'], ['p', 'плательщик'], ['z', 'занятый'], ['e', 'увлечённый'], [SIM.ladder.top.id, 'места без простоя']]) {
+    const cs = SIM.cycles.filter(c => lad.step[c][pk] === k); if (cs.length) out.push(cs.length === SIM.cycles.length ? n : `${n} — в цикле ${cs.map(c => ROMAN[c]).join(', ')}`); } return out.join('; ') || '—'; };
+  lad.layer.rows.forEach((row, i) => T.push(cells([i + 1, `${row.at} %`, SIM.cycles.map(c => boxOf(row.cyc[c])).join(' / '), whoAt(i + 1)])));
+  TBL.ladRule = T.join('\n');
+  // ступени загрузки: срединная неделя профилей — загрузка, края недель, ступень
+  const ldCell = (c, pk) => `${lad.load[c][pk]} % · ${lad.lo[c][pk]}–${lad.hi[c][pk]} · ${lad.step[c][pk] ? lad.step[c][pk] + '-я' : 'нет'}`;
+  T = head(['Цикл', 'Мест', 'Обычный: срединная неделя · края недель · ступень', 'Увлечённый', 'Занятый', 'Плательщик', 'Без простоя']);
+  for (const c of SIM.cycles) T.push(cells([ROMAN[c], lad.slots[c], ldCell(c, 'o'), ldCell(c, 'e'), ldCell(c, 'z'), ldCell(c, 'p'), ldCell(c, SIM.ladder.top.id)]));
+  TBL.ladder = T.join('\n');
+  // ступени загрузки: в какой доле недель верхняя взятая ступень — k-я, и сундуки артели в доходе обычного
+  const atCell = (c, pk) => lad.at[c][pk].map((bp, k) => bp ? `${k ? k + '-я' : 'ни одной'} — ${pctBp(bp, 0)}` : '').filter(Boolean).join(', ');
+  T = head(['Цикл', 'Обычный: верхняя взятая ступень, доля недель', 'Увлечённый', 'Сундуков артели в неделю у обычного: в прогоне · по typical сундуков', 'В них за неделю: золото / ресурсы по цене рынка / прах', 'Ритуалы в золоте забегов обычного: сами → с сундуками']);
+  for (const c of SIM.cycles) { const b = lad.box[c] || { boxes: 0, gold: 0, res: 0, dust: 0, bp: 0, typ: 0 };
+    T.push(cells([ROMAN[c], atCell(c, 'o'), atCell(c, 'e'), `${dec(b.boxes)} · ${b.typ}`, `${fmt(b.gold / 100)} / ${fmt(b.res / 100)} / ${fmt(b.dust / 100)}`, `${pctBp(share('o', c, 'gold'))} → ${pctBp(b.bp)}`])); }
+  TBL.ladBox = T.join('\n');
 
   // сетка
   T = head(['Редкость', 'Шанс в пуле', 'Рабочие: время', 'Бригада', 'Базовые', 'Ключи ремёсел', 'Герои: время', 'Бригада', 'Цикл II: золото / дух / души']);
@@ -658,6 +795,10 @@ function render(data) {
    время — в миллисекундах. rules — слоты, роллы, карточки, веса редкостей, ускорение рабочих, уникальный ритуал, пробуждение;
    tabs — вкладки: длительность по редкостям, бригада, награда за единицу времени, имена карточек; biomes — вес «перевеса к свежим»;
    art — артефакты ритуалов из wanderer.js; sim — прогон калькулятора: доход дня в сотых и доли от забегов обычного.
+   Ступени загрузки (ADR-0047): rules.ladder — мера: mode — режим лестницы в EN_LOOTBOXES.modes (пороги ступеней в процентах и сундуки
+   артели — там), weekH — часов в неделе; счёт — EnRitual.weekMs, capMs, load, stepOf. ladder — прогон калькулятора: load — загрузка
+   срединной недели по циклам и профилям, целые проценты (o — обычный, e — увлечённый, z — занятый, p — плательщик, n — места без
+   простоя), step — сколько ступеней она берёт, withBoxBp — ритуалы вместе с сундуками артели в золоте забегов обычного, б. п.
    Обоснование и таблицы — docs/content/ритуалы.md. В игре пул, старт, исход и выдачу решает сервер (§19, §36.16):
    клиент получает карточки и итог. Ниже данных — алгоритм tools/content-gen/rituals/pool.js как есть. */\n`;
   return head + 'window.EN_RITUALS = ' + JSON.stringify(data) + ';\n' + pool;

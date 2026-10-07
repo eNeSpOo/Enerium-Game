@@ -21,6 +21,9 @@ const BUILDERS = [
   [PY, 'tools/content-gen/abilities/library.py', '--mut'],   // законы описаний О1–О4 (ADR-0052) ловят каждую поломку; число из данных меняет текст
   [PY, 'tools/content-gen/abilities/assign.py'],
   [PY, 'tools/content-gen/abilities/assign.py', '--mut'],
+  ['node', 'tools/content-gen/foes/ladder.js'],             // общая лестница врагов (ADR-0051): законы Л1–Л5 и свежесть снимка
+  ['node', 'tools/content-gen/foes/ladder.js', '--mut'],    // каждую поломку лестницы ловит свой закон
+  ['node', 'tools/content-gen/tables/check_spoilers.js', '--mut'],   // лестница спойлеров: раскрытие — с цикла VI (ADR-0054)
   [PY, 'tools/content-gen/recipes/tempo.py'],
   ['node', 'tools/content-gen/lootboxes/build.js'],
   ['node', 'tools/content-gen/contracts/build.js'],

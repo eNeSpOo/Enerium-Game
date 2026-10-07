@@ -7,9 +7,11 @@
    видны у входа и в окне, все шансы — лист «Шансы». Арт — RL_ART: пока пути нет, алтарь и раму рисует CSS, битых картинок нет.
    Правила §15: пул прокрутки привязан к циклу — герои рулетки текущего цикла (rsPool; потолок доблести — по циклу, RS.srcInfo.roulette.maxByC,
    ADR-0030, п. 5а: II — 2, III–IV — 3, V–VI — 4). Выпадают осколки
-   или, с малым шансом, полный чертёж. Осколки и чертёж героя из коллекции уходят в прах (§15.2, демо-таблица §15.3 — rsDustOf).
+   или, с малым шансом, полный чертёж. Осколки и чертёж героя из коллекции уходят в прах душ (§15.2, демо-таблица §15.3 — rsDustOf).
    Полный чертёж активируют души: он ложится комплектом осколков, и пробуждает его то же «Пробудить», что в каталоге праха
-   (ACT.activate) — герой приходит с 0 ур., 0 РП и 0 Добл, остаток осколков уходит в прах. Так пробуждение и прах сходятся с §15.2.
+   (ACT.activate) — герой приходит с 0 ур., 0 РП и 0 Добл, остаток осколков уходит в прах душ. Так пробуждение и прах сходятся с §15.2.
+   Комплект героя рулетки — прежний, EN_ROSTER.rules.stub.shards: комплект по циклу героя (rules.echoSet) и прах Эха — только у героев
+   Эхо (ADR-0047, screens/echo.js и heroes.js); рулетка их не трогает — её прах везде назван «прах душ».
    Сервер решает, клиент показывает. Итог операции — RL_SRV: проверка кошелька, один расход Энериума, бросок генератора на сиде
    операции (rlRoll, EnLoot.makeRng) и выдача — одним вызовом. Повтор того же номера операции возвращает прежний ответ без расхода
    и без выдачи. В игре сид и итог присылает сервер, здесь сид — заглушка от номера операции.
@@ -78,7 +80,7 @@ const RL_KEY = 'en-rl-skip';   // localStorage: «Пропустить аним�
 const rlSaved = () => { try { return localStorage.getItem(RL_KEY) === '1'; } catch (_) { return false; } };
 const rlReduced = () => { try { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (_) { return false; } };
 const rlSkipOn = () => !!S.rl.skip || rlReduced();
-const rlNeed = () => RS.rules ? RS.rules.stub.shards : 0;   // комплект осколков героя — заглушка roster.js; им же ложится полный чертёж
+const rlNeed = () => RS.rules ? RS.rules.stub.shards : 0;   // комплект осколков героя рулетки — заглушка roster.js, прежний (у героя Эхо — свой, по циклу: не здесь); им же ложится полный чертёж
 const rlNext = () => 'rl' + S.rl.seq;                       // номер следующей операции: его несут кнопки прокрутки
 const rlCost = n => RL_DATA.price * n;
 const rlSumW = list => list.reduce((a, x) => a + x[1], 0);
@@ -171,9 +173,9 @@ function rlGroups(R) {
 }
 /* одна строка об итоге: в колонке — «прошлая прокрутка», во всплывающем сообщении — когда окно закрыли посреди ленты */
 function rlSay(R, lead) {
-  if (R.n === 1) { const g = R.list[0], h = RSI[g.id]; return `${lead}: <b>${h.n}</b> · ${g.full ? 'полный чертёж' : 'осколки ×' + g.q}${g.pity ? ' · гарантия' : ''}${g.dust ? ' → прах' : ''}`; }
+  if (R.n === 1) { const g = R.list[0], h = RSI[g.id]; return `${lead}: <b>${h.n}</b> · ${g.full ? 'полный чертёж' : 'осколки ×' + g.q}${g.pity ? ' · гарантия' : ''}${g.dust ? ' → прах душ' : ''}`; }
   const G = rlGroups(R), bp = G.full.reduce((a, x) => a + x.bp, 0), q = G.shards.reduce((a, x) => a + x.q, 0);
-  return `${lead} ×${R.n}: осколков ${fmt(q)}${bp ? ` · чертежей ${fmt(bp)}` : ''}${R.dust ? ` · прах +${fmt(R.dust)}` : ''}`;
+  return `${lead} ×${R.n}: осколков ${fmt(q)}${bp ? ` · чертежей ${fmt(bp)}` : ''}${R.dust ? ` · прах душ +${fmt(R.dust)}` : ''}`;
 }
 
 /* ================== лента ==================
@@ -444,7 +446,7 @@ const rlBig = (h, full, q, k) => full
     : `<span class="rl-big shard" data-r="${h.r}">${rlShard(h, RL_VIEW.big, S.rs.shards[h.id] || 0)}<b class="rl-q">×${q}</b></span>`;
 function rlOne(g) {
   const h = RSI[g.id], need = rlNeed(), n = S.rs.shards[g.id] || 0, own = rsHas(h);
-  const line = g.dust ? `Уже в коллекции: ${g.full ? 'чертёж' : 'осколки ×' + g.q} → прах ${money('dust', g.dust)}`
+  const line = g.dust ? `Уже в коллекции: ${g.full ? 'чертёж' : 'осколки ×' + g.q} → прах душ ${money('dust', g.dust)}`
     : g.full ? (own ? 'Герой уже пробуждён.' : 'Герой целиком — пробудите его душами.')
       : !own && n >= need ? `Осколков ${fmt(n)} — можно пробудить` : `Собрано осколков ${fmt(n)} / ${fmt(need)}`;
   return `<div class="rl-one">${rlBig(h, g.full, g.q)}<div class="rl-one-tx"><span class="eyebrow">${g.pity ? 'Гарантия · осколки героя' : g.full ? 'Полный чертёж' : 'Осколки героя'}</span><b class="rl-nm">${h.n}</b>${rar(h.r)}<p class="rl-line">${line}</p>${g.dust ? '' : rlWake(h)}</div></div>`;
@@ -454,10 +456,10 @@ function rlOne(g) {
 function rlMany(R) {
   const G = rlGroups(R), need = rlNeed(), bp = G.full.reduce((a, x) => a + x.bp, 0), q = G.shards.reduce((a, x) => a + x.q, 0);
   const fulls = G.full.length ? `<span class="eyebrow">Полные чертежи · ${fmt(bp)}</span><div class="rl-fulls">${G.full.map((x, i) => { const h = RSI[x.id];
-    return `<div class="rl-fc" style="--i:${i}">${rlBig(h, true, 0, x.bp)}<b class="rl-nm">${h.n}</b>${rar(h.r)}${x.dust ? `<small class="rl-line">в прах ${money('dust', x.dust)}</small>` : rlWake(h)}</div>`; }).join('')}</div>` : '';
+    return `<div class="rl-fc" style="--i:${i}">${rlBig(h, true, 0, x.bp)}<b class="rl-nm">${h.n}</b>${rar(h.r)}${x.dust ? `<small class="rl-line">в прах душ ${money('dust', x.dust)}</small>` : rlWake(h)}</div>`; }).join('')}</div>` : '';
   const shards = G.shards.length ? `<span class="eyebrow">Осколки · ${fmt(q)}</span><div class="rl-grp">${G.shards.map(x => { const h = RSI[x.id], n = S.rs.shards[x.id] || 0;
     return `<div class="rl-gr" data-r="${h.r}"><span class="rl-gs">${rlShard(h, 34, n)}</span><span class="tx"><b>${h.n}</b><small>${n >= need ? `готов к пробуждению · ${fmt(n)}` : `собрано ${fmt(n)} / ${fmt(need)}`}${x.pity ? ` · гарантия${x.pity > 1 ? ' ×' + x.pity : ''}` : ''}</small></span><b class="rl-plus">+${fmt(x.q)}</b></div>`; }).join('')}</div>` : '';
-  const dust = R.dust ? `<span class="eyebrow">В прах</span><p class="rl-dust">${money('dust', R.dust)}<span>${G.dust.map(x => `${RSI[x.id].n}: ${[x.bp ? 'чертёж' + (x.bp > 1 ? ' ×' + x.bp : '') : '', x.q ? 'осколки ×' + fmt(x.q) : ''].filter(Boolean).join(', ')}`).join(' · ')}</span></p>` : '';
+  const dust = R.dust ? `<span class="eyebrow">В прах душ</span><p class="rl-dust">${money('dust', R.dust)}<span>${G.dust.map(x => `${RSI[x.id].n}: ${[x.bp ? 'чертёж' + (x.bp > 1 ? ' ×' + x.bp : '') : '', x.q ? 'осколки ×' + fmt(x.q) : ''].filter(Boolean).join(', ')}`).join(' · ')}</span></p>` : '';
   return fulls + shards + dust;
 }
 /* окно итога поверх рулетки: «Ещё раз», «×10», «×100» и «Закрыть» */
@@ -492,7 +494,7 @@ Object.assign(OV, {
       <span class="eyebrow">Иначе — осколки</span><dl class="kv rl-kv">${D.shards.map(([q, w]) => `<dt>×${q}</dt><dd>${rlPct(rlShare(w))}</dd>`).join('')}</dl>
       <span class="eyebrow">Гарантия</span><p class="rl-p">Каждая ${D.pity.every}-я прокрутка — ×${D.pity.q} осколков героя, которого вы выбрали. Следующая — ${rlPityLeft() === 1 ? 'на ближайшей прокрутке' : `через ${rlPityLeft()} ${plural(rlPityLeft(), 'прокрутку', 'прокрутки', 'прокруток')}`}.</p>`;
     const who = pool.length ? `<span class="eyebrow">Герои цикла ${ROMAN[rsCyc()]}</span><p class="rl-p">Герой — любой из ${pool.length}, поровну.</p><div class="rl-oface">${pool.map(h => `<span class="rs-av" data-r="${h.r}" title="${h.n}">${rsFace(h)}</span>`).join('')}</div>` : '';
-    const body = `${odds}${who}<p class="reason">Полный чертёж — герой целиком: его пробуждают души. Осколки и чертёж героя, который уже в коллекции, уходят в прах.</p>
+    const body = `${odds}${who}<p class="reason">Полный чертёж — герой целиком: его пробуждают души. Осколки и чертёж героя, который уже в коллекции, уходят в прах душ.</p>
       ${TM(`Шансы — демонстрация, не баланс: таблиц вероятностей в §15.1 ещё нет, числа — RL_DATA. Герой — поровну из пула цикла — толкование прототипа. Чертёж ложится комплектом из ${fmt(rlNeed())} осколков (заглушка roster.js): пробуждение и прах по §15.2 сходятся.`, 'p', 'reason')}`;
     return sheet('Шансы', body, pool.length ? '<button class="btn go" data-a="dlg" data-v="rl">К рулетке</button>' : '');
   },
@@ -580,7 +582,7 @@ KIT_EXTRA.push({
     return `<section class="k-box" style="grid-column:1/-1"><h3>Возрождение душ · рулетка</h3>
       <div class="k-demo row rl-kit" style="${rlFrVars()}">${cards}</div>
       <p class="k-note">${TM('Слова автора: «рулетка — это тоже для людей, которые донатят… дорого-богато». ')}Дорого — свет, материал и крупные формы: за вкладкой «За души» и за окном — алтарь душ, зеркало, из стекла выходят контуры героев. Герои пула — веером карточек в раме старого золота перед зеркалом (RL_VIEW.fan), лента в окне идёт сквозь зеркало. Полный герой — лицо в раме и «Герой»; осколки — стекло с лицом героя и «×N» (shardGhost). Кристалл — редкость героя.</p>
-      <p class="k-note">Честно (§1.2): у входа и в окне — цена прокрутки и шанс героя целиком, все шансы — лист «Шансы». Итог решает «сервер» на сиде до анимации: лента разгоняется и ${RL_VIEW.ms[0] / 1000}–${RL_VIEW.ms[1] / 1000} с тормозит ровно на выпавшей карточке. Частицы — цвета редкости; у полного героя золотая вспышка, три кольца и дрожь. ×10 и ×100 — короткая лента на самом ценном итоге, затем сводка: полные герои первыми, осколки по героям — стеклом с долей собранного, прах, расход. «Пропустить анимацию» запоминается; при системном «меньше движения» анимации нет.</p>
+      <p class="k-note">Честно (§1.2): у входа и в окне — цена прокрутки и шанс героя целиком, все шансы — лист «Шансы». Итог решает «сервер» на сиде до анимации: лента разгоняется и ${RL_VIEW.ms[0] / 1000}–${RL_VIEW.ms[1] / 1000} с тормозит ровно на выпавшей карточке. Частицы — цвета редкости; у полного героя золотая вспышка, три кольца и дрожь. ×10 и ×100 — короткая лента на самом ценном итоге, затем сводка: полные герои первыми, осколки по героям — стеклом с долей собранного, прах душ, расход. «Пропустить анимацию» запоминается; при системном «меньше движения» анимации нет.</p>
       <p class="k-note">Шансы — демонстрация: полный чертёж ${rlPct(RL_DATA.fullBp)}, иначе осколки ${odds}. Золотые карточки ленты — оформление, а не шанс. Арт — <code>tools/art-gen/jobs/souls-altar.json</code>: алтарь и рама, выгружено ${got} из ${RL_ART.want.length} (<code>RL_ART.ready</code>); пока пути нет, алтарь и раму рисует CSS. Окно — сценарий «Возрождение душ · рулетка».</p></section>`;
   },
 });
